@@ -55,6 +55,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/goodies.h>
 #include <util/lists.h>
@@ -264,7 +265,9 @@ static void add_recruits(unit * u, int number, int wanted)
       unew = create_unit(r, u->faction, number, u->race, 0, NULL, u);
     }
 
-    snprintf(equipment, sizeof(equipment), "new_%s_unit", u->race->_name[0]);
+    strlcpy(equipment, "new_", sizeof(equipment));
+    strlcat(equipment, u->race->_name[0], sizeof(equipment));
+    strlcat(equipment, "_unit", sizeof(equipment));
     equip_unit(unew, get_equipment(equipment));
 
     if (unew->race->ec_flags & ECF_REC_HORSES) {

@@ -1552,7 +1552,8 @@ int readgame(const char *filename, int mode, int backup)
     store->r_str_buf(store, basefile, sizeof(basefile));
     if (strcmp(game_name, basefile) != 0) {
       char buffer[64];
-      snprintf(buffer, sizeof(buffer), "%s.xml", game_name);
+      strlcpy(buffer, game_name, sizeof(buffer));
+      strlcat(buffer, ".xml", sizeof(buffer));
       if (strcmp(basefile, buffer) != 0) {
         log_warning("game mismatch: datafile contains %s, game is %s\n", basefile, game_name);
         printf("WARNING: any key to continue, Ctrl-C to stop\n");

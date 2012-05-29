@@ -15,13 +15,14 @@ without prior permission by the authors of Eressea.
 
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/bsdstring.h>
 #include <util/functions.h>
 #include <util/log.h>
 
 #include <kernel/config.h>
 #include <kernel/equipment.h>
 #include <kernel/faction.h>
-#include <kernel/magic.h>
+#include <kernel/spell.h>
 #include <kernel/race.h>
 #include <kernel/unit.h>
 #include <kernel/building.h>
@@ -77,7 +78,8 @@ static int limit_resource(const region * r, const resource_type * rtype)
   int result = -1;
   lua_State *L = (lua_State *) global.vm_state;
 
-  snprintf(fname, sizeof(fname), "%s_limit", rtype->_name[0]);
+  strlcpy(fname, rtype->_name[0], sizeof(fname));
+  strlcat(fname, "_limit", sizeof(fname));
 
   lua_pushstring(L, fname);
   lua_rawget(L, LUA_GLOBALSINDEX);
@@ -105,7 +107,9 @@ produce_resource(region * r, const resource_type * rtype, int norders)
 {
   lua_State *L = (lua_State *) global.vm_state;
   char fname[64];
-  snprintf(fname, sizeof(fname), "%s_produce", rtype->_name[0]);
+
+  strlcpy(fname, rtype->_name[0], sizeof(fname));
+  strlcat(fname, "_produce", sizeof(fname));
 
   lua_pushstring(L, fname);
   lua_rawget(L, LUA_GLOBALSINDEX);
@@ -245,7 +249,9 @@ static int lua_initfamiliar(unit * u)
   lua_State *L = (lua_State *) global.vm_state;
   char fname[64];
   int result = -1;
-  snprintf(fname, sizeof(fname), "initfamiliar_%s", u->race->_name[0]);
+
+  strlcpy(fname, "initfamiliar_", sizeof(fname));
+  strlcat(fname, u->race->_name[0], sizeof(fname));
 
   lua_pushstring(L, fname);
   lua_rawget(L, LUA_GLOBALSINDEX);
@@ -267,7 +273,8 @@ static int lua_initfamiliar(unit * u)
 
   create_mage(u, M_GRAY);
 
-  snprintf(fname, sizeof(fname), "%s_familiar", u->race->_name[0]);
+  strlcpy(fname, u->race->_name[0], sizeof(fname));
+  strlcat(fname, "_familiar", sizeof(fname));
   equip_unit(u, get_equipment(fname));
   return result;
 }
@@ -278,7 +285,9 @@ lua_changeresource(unit * u, const struct resource_type *rtype, int delta)
   lua_State *L = (lua_State *) global.vm_state;
   int result = -1;
   char fname[64];
-  snprintf(fname, sizeof(fname), "%s_changeresource", rtype->_name[0]);
+
+  strlcpy(fname, rtype->_name[0], sizeof(fname));
+  strlcat(fname, "_changeresource", sizeof(fname));
 
   lua_pushstring(L, fname);
   lua_rawget(L, LUA_GLOBALSINDEX);
@@ -307,7 +316,9 @@ static int lua_getresource(unit * u, const struct resource_type *rtype)
   lua_State *L = (lua_State *) global.vm_state;
   int result = -1;
   char fname[64];
-  snprintf(fname, sizeof(fname), "%s_getresource", rtype->_name[0]);
+
+  strlcpy(fname, rtype->_name[0], sizeof(fname));
+  strlcat(fname, "_getresource", sizeof(fname));
 
   lua_pushstring(L, fname);
   lua_rawget(L, LUA_GLOBALSINDEX);
@@ -398,7 +409,8 @@ static void lua_agebuilding(building * b)
   lua_State *L = (lua_State *) global.vm_state;
   char fname[64];
 
-  snprintf(fname, sizeof(fname), "age_%s", b->type->_name);
+  strlcpy(fname, "age_", sizeof(fname));
+  strlcat(fname, b->type->_name, sizeof(fname));
 
   lua_pushstring(L, fname);
   lua_rawget(L, LUA_GLOBALSINDEX);
@@ -502,7 +514,9 @@ static int lua_equipmentcallback(const struct equipment *eq, unit * u)
   lua_State *L = (lua_State *) global.vm_state;
   char fname[64];
   int result = -1;
-  snprintf(fname, sizeof(fname), "equip_%s", eq->name);
+
+  strlcpy(fname, "equip_", sizeof(fname));
+  strlcat(fname, eq->name, sizeof(fname));
 
   lua_pushstring(L, fname);
   lua_rawget(L, LUA_GLOBALSINDEX);
@@ -532,7 +546,9 @@ lua_useitem(struct unit *u, const struct item_type *itype, int amount,
   lua_State *L = (lua_State *) global.vm_state;
   int result = 0;
   char fname[64];
-  snprintf(fname, sizeof(fname), "use_%s", itype->rtype->_name[0]);
+
+  strlcpy(fname, "use_", sizeof(fname));
+  strlcat(fname, itype->rtype->_name[0], sizeof(fname));
 
   lua_pushstring(L, fname);
   lua_rawget(L, LUA_GLOBALSINDEX);
@@ -561,7 +577,9 @@ static int lua_recruit(struct unit *u, const struct archetype *arch, int amount)
   lua_State *L = (lua_State *) global.vm_state;
   int result = 0;
   char fname[64];
-  snprintf(fname, sizeof(fname), "recruit_%s", arch->name[0]);
+
+  strlcpy(fname, "recruit_", sizeof(fname));
+  strlcat(fname, arch->name[0], sizeof(fname));
 
   lua_pushstring(L, fname);
   lua_rawget(L, LUA_GLOBALSINDEX);

@@ -211,13 +211,7 @@ static char *sidename(side * s)
   static char sidename_buf[4][SIDENAMEBUFLEN];  /* STATIC_RESULT: used for return, not across calls */
 
   bufno = bufno % 4;
-  if (s->stealthfaction) {
-    snprintf(sidename_buf[bufno], SIDENAMEBUFLEN,
-      "%s", factionname(s->stealthfaction));
-  } else {
-    snprintf(sidename_buf[bufno], SIDENAMEBUFLEN,
-      "%s", factionname(s->faction));
-  }
+  strlcpy(sidename_buf[bufno], factionname(s->stealthfaction?s->stealthfaction:s->faction), SIDENAMEBUFLEN);
   return sidename_buf[bufno++];
 }
 
@@ -3850,9 +3844,8 @@ static int battle_report(battle * b)
           if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
         }
-        snprintf(buffer, sizeof(buffer), "%s %2d(%s): ",
+        slprintf(buffer, sizeof(buffer), "%s %2d(%s): ",
           loc_army, army_index(s), abbrev);
-        buffer[sizeof(buffer) - 1] = 0;
 
         bytes = (int)strlcpy(bufp, buffer, size);
         if (wrptr(&bufp, &size, bytes) != 0)

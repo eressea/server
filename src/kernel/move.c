@@ -2398,9 +2398,7 @@ static int hunt(unit * u, order * ord)
   }
 
   bufp = command;
-  bytes =
-    snprintf(bufp, size, "%s %s", LOC(u->faction->locale, keywords[K_MOVE]),
-    LOC(u->faction->locale, directions[dir]));
+  bytes = slprintf(bufp, size, "%s %s", LOC(u->faction->locale, keywords[K_MOVE]), LOC(u->faction->locale, directions[dir]));
   if (wrptr(&bufp, &size, bytes) != 0)
     WARN_STATIC_BUFFER();
 

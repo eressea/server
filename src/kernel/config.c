@@ -1653,8 +1653,7 @@ building *largestbuilding(const region * r, cmp_building_cb cmp_gt,
 
 char *write_unitname(const unit * u, char *buffer, size_t size)
 {
-  snprintf((char *)buffer, size, "%s (%s)", (const char *)u->name,
-    itoa36(u->no));
+  slprintf(buffer, size, "%s (%s)", (const char *)u->name, itoa36(u->no));
   buffer[size - 1] = 0;
   return buffer;
 }
