@@ -52,9 +52,32 @@ static void test_reorder_units(CuTest * tc)
   CuAssertPtrEquals(tc, 0, u0->next);
 }
 
+static void test_regionid(CuTest * tc) {
+  size_t len;
+  const struct terrain_type * plain;
+  struct region * r;
+  char buffer[64];
+
+  test_cleanup();
+  plain = test_create_terrain("plain", 0);
+  r = test_create_region(0, 0, plain);
+
+  memset(buffer, 0xff, sizeof(buffer));
+  len = f_regionid(r, 0, buffer, sizeof(buffer));
+  CuAssertIntEquals(tc, 11, len);
+  CuAssertStrEquals(tc, "plain (0,0)", buffer);
+
+  memset(buffer, -1, sizeof(buffer));
+  len = f_regionid(r, 0, buffer, 11);
+  CuAssertIntEquals(tc, 10, len);
+  CuAssertStrEquals(tc, "plain (0,0", buffer);
+  CuAssertIntEquals(tc, -1, buffer[11]);
+}
+
 CuSuite *get_reports_suite(void)
 {
   CuSuite *suite = CuSuiteNew();
   SUITE_ADD_TEST(suite, test_reorder_units);
+  SUITE_ADD_TEST(suite, test_regionid);
   return suite;
 }

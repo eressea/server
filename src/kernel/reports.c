@@ -1858,8 +1858,9 @@ const char *trailinto(const region * r, const struct locale *lang)
 size_t
 f_regionid(const region * r, const faction * f, char *buffer, size_t size)
 {
+  size_t len;
   if (!r) {
-    strncpy(buffer, "(Chaos)", size);
+    len = strlcpy(buffer, "(Chaos)", size);
   } else {
     plane *pl = rplane(r);
     const char *name = pl ? pl->name : 0;
@@ -1867,12 +1868,12 @@ f_regionid(const region * r, const faction * f, char *buffer, size_t size)
     int named = (name && name[0]);
     pnormalize(&nx, &ny, pl);
     adjust_coordinates(f, &nx, &ny, pl, r);
-    strncpy(buffer, rname(r, f->locale), size);
-    buffer[size - 1] = 0;
-    sprintf(buffer + strlen(buffer), " (%d,%d%s%s)", nx, ny, named ? "," : "",
-      (named) ? name : "");
+    len = strlcpy(buffer, rname(r, f?f->locale:0), size);
+    snprintf(buffer + len, size-len, " (%d,%d%s%s)", nx, ny, named ? "," : "", (named) ? name : "");
+    buffer[size-1] = 0;
+    len=strlen(buffer);
   }
-  return strlen(buffer);
+  return len;
 }
 
 static char *f_regionid_s(const region * r, const faction * f)
