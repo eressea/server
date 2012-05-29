@@ -125,6 +125,7 @@
     <ClCompile Include="util\base36.c" />
     <ClCompile Include="util\base36_test.c" />
     <ClCompile Include="util\bsdstring.c" />
+    <ClCompile Include="util\bsdstring_test.c" />
     <ClCompile Include="util\console.c" />
     <ClCompile Include="util\critbit.c" />
     <ClCompile Include="util\crmessage.c" />

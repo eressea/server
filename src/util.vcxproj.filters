@@ -208,5 +208,8 @@
     <ClCompile Include="util\umlaut_test.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="util\bsdstring_test.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

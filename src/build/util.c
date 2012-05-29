@@ -5,6 +5,8 @@
 #include <iniparser/iniparser.c>
 #include <mt19937ar.c>
 
+#include <util/bsdstring.c>
+
 #include <util/console.c>
 #include <util/attrib.c>
 #include <util/base36.c>
@@ -33,10 +35,5 @@
 #include <util/xml.c>
 
 #ifndef HAVE_INLINE
-#include <util/bsdstring.c>
 #include <util/strings.c>
-#endif
-
-#ifdef __GNUC__
-#include <util/strncpy.c>
 #endif
