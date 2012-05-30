@@ -31,6 +31,7 @@ without prior permission by the authors of Eressea.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/bsdstring.h>
 #include <util/language.h>
 #include <util/parser.h>
 #include <util/quicklist.h>
@@ -394,8 +395,7 @@ const char *alliancename(const alliance * al)
   char *ibuf = idbuf[(++nextbuf) % 8];
 
   if (al && al->name) {
-    snprintf(ibuf, sizeof(name), "%s (%s)", al->name, itoa36(al->id));
-    ibuf[sizeof(name) - 1] = 0;
+    slprintf(ibuf, sizeof(name), "%s (%s)", al->name, itoa36(al->id));
   } else {
     return NULL;
   }

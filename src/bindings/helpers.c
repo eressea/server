@@ -15,13 +15,14 @@ without prior permission by the authors of Eressea.
 
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/bsdstring.h>
 #include <util/functions.h>
 #include <util/log.h>
 
 #include <kernel/config.h>
 #include <kernel/equipment.h>
 #include <kernel/faction.h>
-#include <kernel/magic.h>
+#include <kernel/spell.h>
 #include <kernel/race.h>
 #include <kernel/unit.h>
 #include <kernel/building.h>
@@ -36,8 +37,7 @@ without prior permission by the authors of Eressea.
 #include <assert.h>
 
 static int
-lua_giveitem(unit * s, unit * d, const item_type * itype, int n,
-  struct order *ord)
+lua_giveitem(unit * s, unit * d, const item_type * itype, int n, struct order *ord)
 {
   lua_State *L = (lua_State *) global.vm_state;
   char fname[64];
@@ -45,11 +45,12 @@ lua_giveitem(unit * s, unit * d, const item_type * itype, int n,
   const char *iname = itype->rtype->_name[0];
 
   assert(s != NULL);
-  strcat(strcpy(fname, iname), "_give");
+  strlcpy(fname, iname, sizeof(fname));
+  strlcat(fname, "_give", sizeof(fname));
 
   lua_pushstring(L, fname);
   lua_rawget(L, LUA_GLOBALSINDEX);
-  if (lua_isfunction(L, 1)) {
+  if (lua_isfunction(L, -1)) {
     tolua_pushusertype(L, s, TOLUA_CAST "unit");
     tolua_pushusertype(L, d, TOLUA_CAST "unit");
     tolua_pushstring(L, iname);
@@ -77,11 +78,12 @@ static int limit_resource(const region * r, const resource_type * rtype)
   int result = -1;
   lua_State *L = (lua_State *) global.vm_state;
 
-  snprintf(fname, sizeof(fname), "%s_limit", rtype->_name[0]);
+  strlcpy(fname, rtype->_name[0], sizeof(fname));
+  strlcat(fname, "_limit", sizeof(fname));
 
   lua_pushstring(L, fname);
   lua_rawget(L, LUA_GLOBALSINDEX);
-  if (lua_isfunction(L, 1)) {
+  if (lua_isfunction(L, -1)) {
     tolua_pushusertype(L, (void *)r, TOLUA_CAST "region");
 
     if (lua_pcall(L, 1, 1, 0) != 0) {
@@ -105,11 +107,13 @@ produce_resource(region * r, const resource_type * rtype, int norders)
 {
   lua_State *L = (lua_State *) global.vm_state;
   char fname[64];
-  snprintf(fname, sizeof(fname), "%s_produce", rtype->_name[0]);
+
+  strlcpy(fname, rtype->_name[0], sizeof(fname));
+  strlcat(fname, "_produce", sizeof(fname));
 
   lua_pushstring(L, fname);
   lua_rawget(L, LUA_GLOBALSINDEX);
-  if (lua_isfunction(L, 1)) {
+  if (lua_isfunction(L, -1)) {
     tolua_pushusertype(L, (void *)r, TOLUA_CAST "region");
     tolua_pushnumber(L, (lua_Number) norders);
 
@@ -138,7 +142,7 @@ static int lc_age(struct attrib *a)
 
     lua_pushstring(L, fname);
     lua_rawget(L, LUA_GLOBALSINDEX);
-    if (lua_isfunction(L, 1)) {
+    if (lua_isfunction(L, -1)) {
       tolua_pushusertype(L, (void *)b, TOLUA_CAST "building");
       if (fparam) {
         tolua_pushstring(L, fparam);
@@ -199,7 +203,7 @@ static int lua_callspell(castorder * co)
 
   lua_pushstring(L, fname);
   lua_rawget(L, LUA_GLOBALSINDEX);
-  if (lua_isfunction(L, 1)) {
+  if (lua_isfunction(L, -1)) {
     int nparam = 4;
     tolua_pushusertype(L, r, TOLUA_CAST "region");
     tolua_pushusertype(L, caster, TOLUA_CAST "unit");
@@ -232,7 +236,8 @@ static int lua_callspell(castorder * co)
       lua_pop(L, 1);
     }
   } else {
-    log_error("spell(%s) calling '%s': not a function.\n", unitname(caster), fname);
+    int ltype = lua_type(L, -1);
+    log_error("spell(%s) calling '%s': not a function, has type %d.\n", unitname(caster), fname, ltype);
     lua_pop(L, 1);
   }
 
@@ -245,11 +250,13 @@ static int lua_initfamiliar(unit * u)
   lua_State *L = (lua_State *) global.vm_state;
   char fname[64];
   int result = -1;
-  snprintf(fname, sizeof(fname), "initfamiliar_%s", u->race->_name[0]);
+
+  strlcpy(fname, "initfamiliar_", sizeof(fname));
+  strlcat(fname, u->race->_name[0], sizeof(fname));
 
   lua_pushstring(L, fname);
   lua_rawget(L, LUA_GLOBALSINDEX);
-  if (lua_isfunction(L, 1)) {
+  if (lua_isfunction(L, -1)) {
     tolua_pushusertype(L, u, TOLUA_CAST "unit");
 
     if (lua_pcall(L, 1, 1, 0) != 0) {
@@ -267,7 +274,8 @@ static int lua_initfamiliar(unit * u)
 
   create_mage(u, M_GRAY);
 
-  snprintf(fname, sizeof(fname), "%s_familiar", u->race->_name[0]);
+  strlcpy(fname, u->race->_name[0], sizeof(fname));
+  strlcat(fname, "_familiar", sizeof(fname));
   equip_unit(u, get_equipment(fname));
   return result;
 }
@@ -278,11 +286,13 @@ lua_changeresource(unit * u, const struct resource_type *rtype, int delta)
   lua_State *L = (lua_State *) global.vm_state;
   int result = -1;
   char fname[64];
-  snprintf(fname, sizeof(fname), "%s_changeresource", rtype->_name[0]);
+
+  strlcpy(fname, rtype->_name[0], sizeof(fname));
+  strlcat(fname, "_changeresource", sizeof(fname));
 
   lua_pushstring(L, fname);
   lua_rawget(L, LUA_GLOBALSINDEX);
-  if (lua_isfunction(L, 1)) {
+  if (lua_isfunction(L, -1)) {
     tolua_pushusertype(L, u, TOLUA_CAST "unit");
     tolua_pushnumber(L, (lua_Number) delta);
 
@@ -307,11 +317,13 @@ static int lua_getresource(unit * u, const struct resource_type *rtype)
   lua_State *L = (lua_State *) global.vm_state;
   int result = -1;
   char fname[64];
-  snprintf(fname, sizeof(fname), "%s_getresource", rtype->_name[0]);
+
+  strlcpy(fname, rtype->_name[0], sizeof(fname));
+  strlcat(fname, "_getresource", sizeof(fname));
 
   lua_pushstring(L, fname);
   lua_rawget(L, LUA_GLOBALSINDEX);
-  if (lua_isfunction(L, 1)) {
+  if (lua_isfunction(L, -1)) {
     tolua_pushusertype(L, u, TOLUA_CAST "unit");
 
     if (lua_pcall(L, 1, 1, 0) != 0) {
@@ -341,7 +353,7 @@ static boolean lua_canuse_item(const unit * u, const struct item_type *itype)
 
     lua_pushstring(L, fname);
     lua_rawget(L, LUA_GLOBALSINDEX);
-    if (lua_isfunction(L, 1)) {
+    if (lua_isfunction(L, -1)) {
       tolua_pushusertype(L, (void *)u, TOLUA_CAST "unit");
       tolua_pushstring(L, itype->rtype->_name[0]);
 
@@ -371,7 +383,7 @@ lua_wage(const region * r, const faction * f, const race * rc, int in_turn)
 
   lua_pushstring(L, fname);
   lua_rawget(L, LUA_GLOBALSINDEX);
-  if (lua_isfunction(L, 1)) {
+  if (lua_isfunction(L, -1)) {
     tolua_pushusertype(L, (void *)r, TOLUA_CAST "region");
     tolua_pushusertype(L, (void *)f, TOLUA_CAST "faction");
     tolua_pushstring(L, rc ? rc->_name[0] : 0);
@@ -398,11 +410,12 @@ static void lua_agebuilding(building * b)
   lua_State *L = (lua_State *) global.vm_state;
   char fname[64];
 
-  snprintf(fname, sizeof(fname), "age_%s", b->type->_name);
+  strlcpy(fname, "age_", sizeof(fname));
+  strlcat(fname, b->type->_name, sizeof(fname));
 
   lua_pushstring(L, fname);
   lua_rawget(L, LUA_GLOBALSINDEX);
-  if (lua_isfunction(L, 1)) {
+  if (lua_isfunction(L, -1)) {
     tolua_pushusertype(L, (void *)b, TOLUA_CAST "building");
 
     if (lua_pcall(L, 1, 0, 0) != 0) {
@@ -424,7 +437,7 @@ static int lua_building_protection(building * b, unit * u)
 
   lua_pushstring(L, fname);
   lua_rawget(L, LUA_GLOBALSINDEX);
-  if (lua_isfunction(L, 1)) {
+  if (lua_isfunction(L, -1)) {
     tolua_pushusertype(L, (void *)b, TOLUA_CAST "building");
     tolua_pushusertype(L, (void *)u, TOLUA_CAST "unit");
 
@@ -451,7 +464,7 @@ static double lua_building_taxes(building * b, int level)
 
   lua_pushstring(L, fname);
   lua_rawget(L, LUA_GLOBALSINDEX);
-  if (lua_isfunction(L, 1)) {
+  if (lua_isfunction(L, -1)) {
     tolua_pushusertype(L, (void *)b, TOLUA_CAST "building");
     tolua_pushnumber(L, level);
 
@@ -478,7 +491,7 @@ static int lua_maintenance(const unit * u)
 
   lua_pushstring(L, fname);
   lua_rawget(L, LUA_GLOBALSINDEX);
-  if (lua_isfunction(L, 1)) {
+  if (lua_isfunction(L, -1)) {
     tolua_pushusertype(L, (void *)u, TOLUA_CAST "unit");
 
     if (lua_pcall(L, 1, 1, 0) != 0) {
@@ -502,11 +515,13 @@ static int lua_equipmentcallback(const struct equipment *eq, unit * u)
   lua_State *L = (lua_State *) global.vm_state;
   char fname[64];
   int result = -1;
-  snprintf(fname, sizeof(fname), "equip_%s", eq->name);
+
+  strlcpy(fname, "equip_", sizeof(fname));
+  strlcat(fname, eq->name, sizeof(fname));
 
   lua_pushstring(L, fname);
   lua_rawget(L, LUA_GLOBALSINDEX);
-  if (lua_isfunction(L, 1)) {
+  if (lua_isfunction(L, -1)) {
     tolua_pushusertype(L, (void *)u, TOLUA_CAST "unit");
 
     if (lua_pcall(L, 1, 1, 0) != 0) {
@@ -532,11 +547,13 @@ lua_useitem(struct unit *u, const struct item_type *itype, int amount,
   lua_State *L = (lua_State *) global.vm_state;
   int result = 0;
   char fname[64];
-  snprintf(fname, sizeof(fname), "use_%s", itype->rtype->_name[0]);
+
+  strlcpy(fname, "use_", sizeof(fname));
+  strlcat(fname, itype->rtype->_name[0], sizeof(fname));
 
   lua_pushstring(L, fname);
   lua_rawget(L, LUA_GLOBALSINDEX);
-  if (lua_isfunction(L, 1)) {
+  if (lua_isfunction(L, -1)) {
     tolua_pushusertype(L, (void *)u, TOLUA_CAST "unit");
     tolua_pushnumber(L, (lua_Number) amount);
 
@@ -561,11 +578,13 @@ static int lua_recruit(struct unit *u, const struct archetype *arch, int amount)
   lua_State *L = (lua_State *) global.vm_state;
   int result = 0;
   char fname[64];
-  snprintf(fname, sizeof(fname), "recruit_%s", arch->name[0]);
+
+  strlcpy(fname, "recruit_", sizeof(fname));
+  strlcat(fname, arch->name[0], sizeof(fname));
 
   lua_pushstring(L, fname);
   lua_rawget(L, LUA_GLOBALSINDEX);
-  if (lua_isfunction(L, 1)) {
+  if (lua_isfunction(L, -1)) {
     tolua_pushusertype(L, (void *)u, TOLUA_CAST "unit");
     tolua_pushnumber(L, (lua_Number) amount);
 

@@ -68,6 +68,9 @@
     <ClCompile Include="gamecode\xmlreport.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="gamecode\economy_test.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gamecode\archetype.h">

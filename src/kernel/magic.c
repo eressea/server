@@ -889,6 +889,7 @@ void pay_spell(unit * u, const spell * sp, int cast_level, int range)
   int k;
   int resuse;
 
+  assert(cast_level>0);
   for (k = 0; sp->components[k].type; k++) {
     if (sp->components[k].type == r_aura) {
       resuse = spellcost(u, sp) * range;
@@ -1394,7 +1395,7 @@ static void do_fumble(castorder * co)
   case 5:
   case 6:
     /* Spruch gelingt, aber alle Magiepunkte weg */
-    sp->cast(co);
+    co->level = sp->cast(co);
     set_spellpoints(u, 0);
     ADDMSG(&u->faction->msgs, msg_message("patzer4", "unit region spell",
         u, r, sp));
@@ -1405,7 +1406,7 @@ static void do_fumble(castorder * co)
   case 9:
   default:
     /* Spruch gelingt, alle nachfolgenden Sprüche werden 2^4 so teuer */
-    sp->cast(co);
+    co->level = sp->cast(co);
     ADDMSG(&u->faction->msgs, msg_message("patzer5", "unit region spell",
         u, r, sp));
     countspells(u, 3);
@@ -1452,6 +1453,9 @@ void regeneration_magiepunkte(void)
   double reg_aura;
   int regen;
   double mod;
+  int regen_enabled = get_param_int(global.parameters, "magic.regeneration.enable", 1);
+
+  if (!regen_enabled) return;
 
   for (r = regions; r; r = r->next) {
     for (u = r->units; u; u = u->next) {
@@ -2836,10 +2840,13 @@ void magic(void)
           }
         }
       }
-      pay_spell(u, sp, co->level, co->distance);
       /* erst bezahlen, dann Kostenzähler erhöhen */
-      if (fumbled)
+      if (fumbled) {
         do_fumble(co);
+      }
+      if (co->level>0) {
+        pay_spell(u, sp, co->level, co->distance);
+      }
       countspells(u, 1);
     }
   }

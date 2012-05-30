@@ -233,8 +233,7 @@ void free_ships(void)
 
 const char *write_shipname(const ship * sh, char *ibuf, size_t size)
 {
-  snprintf(ibuf, size, "%s (%s)", sh->name, itoa36(sh->no));
-  ibuf[size - 1] = 0;
+  slprintf(ibuf, size, "%s (%s)", sh->name, itoa36(sh->no));
   return ibuf;
 }
 

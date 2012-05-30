@@ -55,6 +55,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/goodies.h>
 #include <util/lists.h>
@@ -264,7 +265,9 @@ static void add_recruits(unit * u, int number, int wanted)
       unew = create_unit(r, u->faction, number, u->race, 0, NULL, u);
     }
 
-    snprintf(equipment, sizeof(equipment), "new_%s_unit", u->race->_name[0]);
+    strlcpy(equipment, "new_", sizeof(equipment));
+    strlcat(equipment, u->race->_name[0], sizeof(equipment));
+    strlcat(equipment, "_unit", sizeof(equipment));
     equip_unit(unew, get_equipment(equipment));
 
     if (unew->race->ec_flags & ECF_REC_HORSES) {
@@ -626,17 +629,19 @@ static void friendly_takeover(region * r, faction * f)
   }
 }
 
-static void give_control(unit * u, unit * u2)
+void give_control(unit * u, unit * u2)
 {
-  if (u->building && u->faction != u2->faction && rule_region_owners()) {
-    region *r = u->region;
-    faction *f = region_get_owner(r);
+  if (u->building) {
+    if (u->faction != u2->faction && rule_region_owners()) {
+      region *r = u->region;
+      faction *f = region_get_owner(r);
 
-    assert(u->building==u2->building);
-    if (f == u->faction) {
-      building *b = largestbuilding(r, &cmp_current_owner, false);
-      if (b == u->building) {
-        friendly_takeover(r, u2->faction);
+      assert(u->building==u2->building);
+      if (f == u->faction) {
+        building *b = largestbuilding(r, &cmp_current_owner, false);
+        if (b == u->building) {
+          friendly_takeover(r, u2->faction);
+        }
       }
     }
     building_set_owner(u2);

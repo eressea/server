@@ -2302,21 +2302,21 @@ static boolean display_race(faction * f, unit * u, const race * rc)
 
   /* hp_p : Trefferpunkte */
   bytes =
-    snprintf(bufp, size, " %d %s", rc->hitpoints, LOC(f->locale,
+    slprintf(bufp, size, " %d %s", rc->hitpoints, LOC(f->locale,
       "stat_hitpoints"));
   if (wrptr(&bufp, &size, bytes) != 0)
     WARN_STATIC_BUFFER();
 
   /* b_attacke : Angriff */
   bytes =
-    snprintf(bufp, size, ", %s: %d", LOC(f->locale, "stat_attack"),
+    slprintf(bufp, size, ", %s: %d", LOC(f->locale, "stat_attack"),
     (rc->at_default + rc->at_bonus));
   if (wrptr(&bufp, &size, bytes) != 0)
     WARN_STATIC_BUFFER();
 
   /* b_defense : Verteidigung */
   bytes =
-    snprintf(bufp, size, ", %s: %d", LOC(f->locale, "stat_defense"),
+    slprintf(bufp, size, ", %s: %d", LOC(f->locale, "stat_defense"),
     (rc->df_default + rc->df_bonus));
   if (wrptr(&bufp, &size, bytes) != 0)
     WARN_STATIC_BUFFER();
@@ -2324,7 +2324,7 @@ static boolean display_race(faction * f, unit * u, const race * rc)
   /* b_armor : Rüstung */
   if (rc->armor > 0) {
     bytes =
-      snprintf(bufp, size, ", %s: %d", LOC(f->locale, "stat_armor"), rc->armor);
+      slprintf(bufp, size, ", %s: %d", LOC(f->locale, "stat_armor"), rc->armor);
     if (wrptr(&bufp, &size, bytes) != 0)
       WARN_STATIC_BUFFER();
   }

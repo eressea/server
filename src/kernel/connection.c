@@ -532,7 +532,7 @@ static const char *b_nameroad(const connection * b, const region * r,
     } else {
       int percent = MAX(1, 100 * local / r->terrain->max_road);
       if (local) {
-        snprintf(buffer, sizeof(buffer), LOC(f->locale, mkname("border",
+        slprintf(buffer, sizeof(buffer), LOC(f->locale, mkname("border",
               "a_road_percent")), percent);
       } else {
         return LOC(f->locale, mkname("border", "a_road_connection"));

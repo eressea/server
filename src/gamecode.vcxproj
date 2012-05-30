@@ -92,6 +92,7 @@
     <ClCompile Include="gamecode\creport.c" />
     <ClCompile Include="gamecode\economy.c" />
     <ClCompile Include="eressea.c" />
+    <ClCompile Include="gamecode\economy_test.c" />
     <ClCompile Include="gamecode\give.c" />
     <ClCompile Include="gamecode\xmlreport.c" />
     <ClCompile Include="gmtool.c" />

@@ -613,8 +613,7 @@ int bt_effsize(const building_type * btype, const building * b, int bsize)
 
 const char *write_buildingname(const building * b, char *ibuf, size_t size)
 {
-  snprintf((char *)ibuf, size, "%s (%s)", b->name, itoa36(b->no));
-  ibuf[size - 1] = 0;
+  slprintf(ibuf, size, "%s (%s)", b->name, itoa36(b->no));
   return ibuf;
 }
 

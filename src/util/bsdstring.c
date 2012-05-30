@@ -2,12 +2,11 @@
 #include <string.h>
 #include <errno.h>
 #include <assert.h>
+#include <stdarg.h>
 
-#ifndef HAVE_INLINE
 #include "bsdstring.h"
-#endif
 
-INLINE_FUNCTION int wrptr(char **ptr, size_t * size, int bytes)
+int wrptr(char **ptr, size_t * size, int bytes)
 {
   assert(bytes >= 0 || !"you're not using snprintf right, maybe?");
 
@@ -29,8 +28,9 @@ INLINE_FUNCTION int wrptr(char **ptr, size_t * size, int bytes)
   return ENAMETOOLONG;
 }
 
-#if !defined(HAVE_STRLCPY)
-INLINE_FUNCTION size_t strlcpy(char *dst, const char *src, size_t siz)
+#ifndef HAVE_STRLCPY
+#define HAVE_STRLCPY
+size_t strlcpy(char *dst, const char *src, size_t siz)
 {                               /* copied from OpenBSD source code */
   register char *d = dst;
   register const char *s = src;
@@ -53,8 +53,11 @@ INLINE_FUNCTION size_t strlcpy(char *dst, const char *src, size_t siz)
 
   return (s - src - 1);         /* count does not include NUL */
 }
+#endif
 
-INLINE_FUNCTION size_t strlcat(char *dst, const char *src, size_t siz)
+#ifndef HAVE_STRLCAT
+#define HAVE_STRLCAT
+size_t strlcat(char *dst, const char *src, size_t siz)
 {
   register char *d = dst;
   register const char *s = src;
@@ -79,5 +82,25 @@ INLINE_FUNCTION size_t strlcat(char *dst, const char *src, size_t siz)
   *d = '\0';
 
   return (dlen + (s - src));    /* count does not include NUL */
+}
+#endif
+
+#ifndef HAVE_SLPRINTF
+#define HAVE_SLPRINTF
+size_t slprintf(char * dst, size_t size, const char * format, ...)
+{
+  va_list args;
+  int result;
+
+  va_start(args, format);
+  result = vsnprintf(dst, size, format, args);
+  if (result<0 || result>=(int)size) {
+    dst[size-1]='\0';
+    return size;
+  }
+  va_start(args, format);
+  va_end(args);
+
+  return (size_t)result;
 }
 #endif

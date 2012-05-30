@@ -6,6 +6,7 @@
 
 #include "tests_test.c"
 #include <util/base36_test.c>
+#include <util/bsdstring_test.c>
 #include <util/functions_test.c>
 #include <util/quicklist_test.c>
 #include <util/umlaut_test.c>
@@ -21,6 +22,7 @@
 #include <kernel/equipment_test.c>
 #include <kernel/reports_test.c>
 #include <kernel/spellbook_test.c>
+#include <gamecode/economy_test.c>
 #include <gamecode/laws_test.c>
 #include <gamecode/market_test.c>
 
@@ -48,6 +50,7 @@ int RunAllTests(void)
   CuSuiteAddSuite(suite, get_tests_suite());
   /* util */
   CuSuiteAddSuite(suite, get_base36_suite());
+  CuSuiteAddSuite(suite, get_bsdstring_suite());
   CuSuiteAddSuite(suite, get_quicklist_suite());
   CuSuiteAddSuite(suite, get_functions_suite());
   CuSuiteAddSuite(suite, get_umlaut_suite());
@@ -67,6 +70,7 @@ int RunAllTests(void)
   /* gamecode */
   CuSuiteAddSuite(suite, get_market_suite());
   CuSuiteAddSuite(suite, get_laws_suite());
+  CuSuiteAddSuite(suite, get_economy_suite());
 
   CuSuiteRun(suite);
   CuSuiteSummary(suite, output);
@@ -137,15 +141,15 @@ test_create_terrain(const char * name, unsigned int flags)
 
 building * test_create_building(region * r, const building_type * btype)
 {
-  building * b = new_building(btype, r, default_locale);
-  b->size = btype->maxsize>0?btype->maxsize:1;
+  building * b = new_building(btype?btype:bt_find("castle"), r, default_locale);
+  b->size = b->type->maxsize>0?b->type->maxsize:1;
   return b;
 }
 
 ship * test_create_ship(region * r, const ship_type * stype)
 {
-  ship * s = new_ship(stype, r, default_locale);
-  s->size = stype->construction?stype->construction->maxsize:1;
+  ship * s = new_ship(stype?stype:st_find("boat"), r, default_locale);
+  s->size = s->type->construction?s->type->construction->maxsize:1;
   return s;
 }
 

@@ -153,8 +153,7 @@ const char *factionname(const faction * f)
   char *ibuf = idbuf[(++nextbuf) % 8];
 
   if (f && f->name) {
-    snprintf(ibuf, sizeof(name), "%s (%s)", f->name, itoa36(f->no));
-    ibuf[sizeof(name) - 1] = 0;
+    slprintf(ibuf, sizeof(name), "%s (%s)", f->name, itoa36(f->no));
   } else {
     strcpy(ibuf, "Unbekannte Partei (?)");
   }
@@ -226,7 +225,7 @@ faction *addfaction(const char *email, const char *password,
   addlist(&factions, f);
   fhash(f);
 
-  snprintf(buf, sizeof(buf), "%s %s", LOC(loc, "factiondefault"), factionid(f));
+  slprintf(buf, sizeof(buf), "%s %s", LOC(loc, "factiondefault"), factionid(f));
   f->name = strdup(buf);
 
   return f;

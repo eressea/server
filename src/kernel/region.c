@@ -41,6 +41,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* util includes */
 #include <util/attrib.h>
+#include <util/bsdstring.h>
 #include <util/goodies.h>
 #include <util/lists.h>
 #include <util/log.h>
@@ -114,15 +115,14 @@ const char *write_regionname(const region * r, const faction * f, char *buffer,
   char *buf = (char *)buffer;
   const struct locale *lang = f ? f->locale : 0;
   if (r == NULL) {
-    strcpy(buf, "(null)");
+    strlcpy(buf, "(null)", size);
   } else {
     plane *pl = rplane(r);
     int nx = r->x, ny = r->y;
     pnormalize(&nx, &ny, pl);
     adjust_coordinates(f, &nx, &ny, pl, r);
-    snprintf(buf, size, "%s (%d,%d)", rname(r, lang), nx, ny);
+    slprintf(buf, size, "%s (%d,%d)", rname(r, lang), nx, ny);
   }
-  buf[size - 1] = 0;
   return buffer;
 }
 

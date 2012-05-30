@@ -55,6 +55,7 @@ extern "C" {
   extern void split_allocations(struct region *r);
   extern int recruit_archetypes(void);
   extern int give_control_cmd(struct unit *u, struct order *ord);
+  extern void give_control(struct unit * u, struct unit * u2);
 
 #ifdef __cplusplus
 }

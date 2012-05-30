@@ -44,6 +44,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/goodies.h>
 #include <util/language.h>
@@ -1424,7 +1425,9 @@ void name_unit(unit * u)
     } else {
       result = parameters[P_UNIT];
     }
-    snprintf(name, sizeof(name), "%s %s", result, itoa36(u->no));
+    strlcpy(name, result, sizeof(name));
+    strlcat(name, " ", sizeof(name));
+    strlcat(name, itoa36(u->no), sizeof(name));
     unit_setname(u, name);
   }
 }
