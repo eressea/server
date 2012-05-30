@@ -1452,6 +1452,9 @@ void regeneration_magiepunkte(void)
   double reg_aura;
   int regen;
   double mod;
+  int regen_enabled = get_param_int(global.parameters, "magic.regeneration.enable", 1);
+
+  if (!regen_enabled) return;
 
   for (r = regions; r; r = r->next) {
     for (u = r->units; u; u = u->next) {

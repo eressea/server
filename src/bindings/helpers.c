@@ -203,7 +203,7 @@ static int lua_callspell(castorder * co)
 
   lua_pushstring(L, fname);
   lua_rawget(L, LUA_GLOBALSINDEX);
-  if (lua_isfunction(L, 1)) {
+  if (lua_isfunction(L, -1)) {
     int nparam = 4;
     tolua_pushusertype(L, r, TOLUA_CAST "region");
     tolua_pushusertype(L, caster, TOLUA_CAST "unit");
@@ -236,7 +236,8 @@ static int lua_callspell(castorder * co)
       lua_pop(L, 1);
     }
   } else {
-    log_error("spell(%s) calling '%s': not a function.\n", unitname(caster), fname);
+    int ltype = lua_type(L, -1);
+    log_error("spell(%s) calling '%s': not a function, has type %d.\n", unitname(caster), fname, ltype);
     lua_pop(L, 1);
   }
 
