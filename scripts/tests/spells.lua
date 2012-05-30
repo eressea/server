@@ -6,7 +6,49 @@ function setup()
     free_game()
     settings.set("magic.fumble.enable", "0")
     settings.set("magic.regeneration.enable", "0")
-    settings.set("rules.economy.food", "0")
+    settings.set("rules.economy.food", "4")
+end
+
+function test_spell_payment()
+    local r = region.create(0,0, "plain")
+    local f = faction.create("spell_payment@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+    u:set_skill("magic", 12)
+    u.magic = "gwyrrd" -- calls create_mage
+    u:add_spell("create_roi")
+
+    local permaura = u:get_pooled("permaura")
+    u:add_item("money", 3000)
+    u.aura = 50
+    u:clear_orders()
+    u:add_order("ZAUBERE 'Erschaffe einen Ring der Unsichtbarkeit' ")
+    process_orders()
+
+    assert_equal(1, u:get_item("roi"))
+    assert_equal(0, u:get_item("money"))
+    assert_equal(0, u.aura)
+    assert_equal(permaura-1, u:get_pooled("permaura"))
+end
+
+function test_spell_not_found_no_payment()
+    local r = region.create(0,0, "plain")
+    local f = faction.create("spell_fails_no_payment@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+    u:set_skill("magic", 12)
+    u.magic = "gwyrrd" -- calls create_mage
+
+    local permaura = u:get_pooled("permaura")
+    u:add_item("money", 3000)
+    u.aura = 50
+
+    u:clear_orders()
+    u:add_order("ZAUBERE 'Erschaffe einen Ring der Unsichtbarkeit' ")
+    process_orders()
+
+    assert_equal(0, u:get_item("roi"))
+    assert_equal(3000, u:get_item("money"))
+    assert_equal(50, u.aura)
+    assert_equal(permaura, u:get_pooled("permaura"))
 end
 
 function test_create_firesword()
