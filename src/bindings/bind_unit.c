@@ -32,6 +32,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/pool.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
+#include <kernel/spellbook.h>
 #include <kernel/ship.h>
 #include <kernel/skill.h>
 #include <kernel/spell.h>
@@ -455,12 +456,11 @@ static int tolua_unit_addnotice(lua_State * L)
 
 static void unit_castspell(unit * u, const char *name, int level)
 {
-  quicklist *ql = spells;
-  int qi;
+  spell *sp = find_spell(name);
 
-  for (ql = spells, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-    spell *sp = (spell *) ql_get(ql, qi);
-    if (strcmp(name, sp->sname) == 0) {
+  if (sp) {
+    spellbook *book = unit_get_spellbook(u);
+    if (spellbook_get(book, sp)) {
       if (!sp->cast) {
         log_error("spell '%s' has no function.\n", sp->sname);
       } else {
