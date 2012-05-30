@@ -116,7 +116,7 @@ void test_cleanup(void)
   global.functions.maintenance = NULL;
   global.functions.wage = NULL;
   default_locale = 0;
-  free_locales(); /* TODO: this is evil and leaky */
+  free_locales();
   free_spells();
   free_spellbooks();
   free_gamedata();
