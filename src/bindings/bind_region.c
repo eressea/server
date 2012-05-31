@@ -33,7 +33,7 @@ without prior permission by the authors of Eressea.
 
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/critbit.h>
+#include <critbit.h>
 #include <util/language.h>
 #include <util/log.h>
 

@@ -21,7 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "spell.h"
 
 /* util includes */
-#include <util/critbit.h>
+#include <critbit.h>
 #include <util/goodies.h>
 #include <util/language.h>
 #include <util/log.h>

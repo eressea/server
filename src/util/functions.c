@@ -19,7 +19,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include "functions.h"
 
-#include <util/critbit.h>
+#include <critbit.h>
 
 /* libc includes */
 #include <assert.h>

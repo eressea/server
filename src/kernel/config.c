@@ -54,7 +54,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/bsdstring.h>
-#include <util/critbit.h>
+#include <critbit.h>
 #include <util/crmessage.h>
 #include <util/event.h>
 #include <util/functions.h>

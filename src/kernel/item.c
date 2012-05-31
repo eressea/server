@@ -41,7 +41,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/critbit.h>
+#include <critbit.h>
 #include <util/event.h>
 #include <util/functions.h>
 #include <util/goodies.h>
