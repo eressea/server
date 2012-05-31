@@ -24,7 +24,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <gmtool.h>
 #include <kernel/config.h>
 #include <kernel/save.h>
-#include <iniparser/iniparser.h>
+#include <iniparser.h>
 
 #include <assert.h>
 #include <locale.h>

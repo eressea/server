@@ -21,14 +21,26 @@ if (WIN32)
 else (WIN32)
   include_directories (/usr/include/lua5.1/ /usr/include/libxml2)
 endif (WIN32)
-include_directories (../external ../shared/src)
+
+include_directories (
+ ../external/bson
+ ../external/crypto
+ ../external/cutest
+ ../external/critbit
+ ../external/iniparser
+ ../external/pdcurses
+ ../shared/src
+)
 
 set (LIB_SRCS
- ../external/md5.c
  ../external/bson/bson.c
  ../external/bson/numbers.c
- ../external/dlmalloc/malloc.c
+ ../external/critbit/critbit.c
+ ../external/crypto/md5.c
+ ../external/crypto/mt19937ar.c
  ../external/cutest/CuTest.c
+ ../external/dlmalloc/malloc.c
+ ../external/iniparser/iniparser.c
  ../shared/src/build/gamecode.c
  ../shared/src/build/kernel.c
  ../shared/src/build/lib.c
@@ -40,8 +52,9 @@ set (LINK_LIBS tolua xml2 ncurses lua5.1 pthread)
 if (NEED_SQLITE)
  set(LIB_SRCS
    ${LIB_SRCS}
-   ../external/sqlite3.c
+   ../external/sqlite3/sqlite3.c
  )
+ include_directories (../external/sqlite3)
 else (NEED_SQLITE)
  set (LINK_LIBS ${LINK_LIBS} sqlite3)
 endif (NEED_SQLITE)
