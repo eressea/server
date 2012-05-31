@@ -4,7 +4,7 @@
 
 #include <util/attrib.h>
 
-#include <cutest/CuTest.h>
+#include <CuTest.h>
 
 static void test_curse(CuTest * tc)
 {

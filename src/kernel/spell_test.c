@@ -5,7 +5,7 @@
 #include <kernel/spell.h>
 #include <kernel/magic.h>
 
-#include <cutest/CuTest.h>
+#include <CuTest.h>
 #include <tests.h>
 
 #include <stdlib.h>

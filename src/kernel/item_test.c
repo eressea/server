@@ -4,7 +4,7 @@
 #include <kernel/item.h>
 #include <util/language.h>
 
-#include <cutest/CuTest.h>
+#include <CuTest.h>
 #include <tests.h>
 
 void test_resource_type(CuTest * tc)

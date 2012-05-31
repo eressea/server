@@ -4,7 +4,7 @@
 #include "unit.h"
 #include "item.h"
 #include "region.h"
-#include <cutest/CuTest.h>
+#include <CuTest.h>
 #include <tests.h>
 
 void test_change_resource(CuTest * tc)

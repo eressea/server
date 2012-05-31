@@ -62,7 +62,7 @@ without prior permission by the authors of Eressea.
 #include <util/rng.h>
 #include <util/storage.h>
 
-#include <iniparser/iniparser.h>
+#include <iniparser.h>
 #include <tolua.h>
 #include <lua.h>
 

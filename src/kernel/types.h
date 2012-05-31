@@ -56,6 +56,7 @@ struct ship;
 struct ship_type;
 struct skill;
 struct spell;
+struct spellbook;
 struct storage;
 struct strlist;
 struct terrain_type;

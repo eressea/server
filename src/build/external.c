@@ -22,5 +22,5 @@
 #include <md5.c>
 
 #ifndef DISABLE_TESTS
-#include <cutest/CuTest.c>
+#include <CuTest.c>
 #endif

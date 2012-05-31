@@ -9,7 +9,7 @@
 #include "skill.h"
 #include "unit.h"
 #include "tests.h"
-#include <cutest/CuTest.h>
+#include <CuTest.h>
 
 static void test_make_fighter(CuTest * tc)
 {

@@ -6,7 +6,7 @@
 #include <kernel/building.h>
 #include <kernel/ship.h>
 
-#include <cutest/CuTest.h>
+#include <CuTest.h>
 #include <tests.h>
 
 static void test_give_control_building(CuTest * tc)

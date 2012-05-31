@@ -2,7 +2,7 @@
 #include <kernel/item.h>
 #include <kernel/region.h>
 
-#include <cutest/CuTest.h>
+#include <CuTest.h>
 
 static void test_recreate_world(CuTest * tc)
 {

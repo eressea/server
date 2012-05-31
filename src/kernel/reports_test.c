@@ -6,7 +6,7 @@
 #include <kernel/ship.h>
 #include <kernel/unit.h>
 
-#include <cutest/CuTest.h>
+#include <CuTest.h>
 #include <tests.h>
 
 static void test_reorder_units(CuTest * tc)

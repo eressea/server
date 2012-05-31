@@ -10,7 +10,7 @@
 
 #include <util/quicklist.h>
 
-#include <cutest/CuTest.h>
+#include <CuTest.h>
 #include <tests.h>
 
 void test_equipment(CuTest * tc)

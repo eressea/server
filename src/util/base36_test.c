@@ -1,4 +1,4 @@
-#include <cutest/CuTest.h>
+#include <CuTest.h>
 #include "base36.h"
 #include <stdlib.h>
 #include <limits.h>

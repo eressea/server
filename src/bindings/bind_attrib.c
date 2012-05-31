@@ -25,7 +25,8 @@ without prior permission by the authors of Eressea.
 #include <util/resolve.h>
 #include <util/storage.h>
 
-#include <bson/bson.h>
+/* external libraries */
+#include <bson.h>
 
 #include <lua.h>
 #include <tolua.h>

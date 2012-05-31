@@ -14,7 +14,7 @@
 
 #include <util/language.h>
 
-#include <cutest/CuTest.h>
+#include <CuTest.h>
 #include <tests.h>
 
 static void test_new_building_can_be_renamed(CuTest * tc)

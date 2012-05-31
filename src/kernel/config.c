@@ -75,7 +75,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 
-#include <iniparser/iniparser.h>
+/* external libraries */
+#include <iniparser.h>
 
 /* libc includes */
 #include <stdio.h>

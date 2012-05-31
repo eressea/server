@@ -7,7 +7,7 @@
 #include <kernel/ship.h>
 #include <kernel/unit.h>
 
-#include <cutest/CuTest.h>
+#include <CuTest.h>
 #include <tests.h>
 #include <stdlib.h>
 #include <string.h>

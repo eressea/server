@@ -7,7 +7,7 @@
 
 #include <util/language.h>
 
-#include <cutest/CuTest.h>
+#include <CuTest.h>
 #include <tests.h>
 
 static void test_building_type_exists(CuTest * tc)

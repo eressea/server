@@ -1,4 +1,4 @@
-#include <cutest/CuTest.h>
+#include <CuTest.h>
 #include "bsdstring.h"
 #include <string.h>
 
