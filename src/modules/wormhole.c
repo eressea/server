@@ -30,7 +30,7 @@
 #include <util/language.h>
 #include <util/resolve.h>
 #include <util/rng.h>
-#include <util/quicklist.h>
+#include <quicklist.h>
 #include <util/storage.h>
 
 /* libc includes */

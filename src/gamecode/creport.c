@@ -64,7 +64,7 @@ without prior permission by the authors of Eressea.
 #include <util/log.h>
 #include <util/message.h>
 #include <util/nrmessage.h>
-#include <util/quicklist.h>
+#include <quicklist.h>
 
 #include <libxml/encoding.h>
 

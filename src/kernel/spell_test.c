@@ -1,6 +1,6 @@
 #include <platform.h>
 
-#include <util/quicklist.h>
+#include <quicklist.h>
 #include <kernel/types.h>
 #include <kernel/spell.h>
 #include <kernel/magic.h>

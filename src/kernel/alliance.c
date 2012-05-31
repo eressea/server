@@ -34,7 +34,7 @@ without prior permission by the authors of Eressea.
 #include <util/bsdstring.h>
 #include <util/language.h>
 #include <util/parser.h>
-#include <util/quicklist.h>
+#include <quicklist.h>
 #include <util/rng.h>
 #include <util/umlaut.h>
 

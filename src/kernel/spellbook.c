@@ -2,7 +2,7 @@
 #include <kernel/config.h>
 #include <kernel/spell.h>
 #include <kernel/magic.h>
-#include <util/quicklist.h>
+#include <quicklist.h>
 #include <util/log.h>
 
 #include "spellbook.h"

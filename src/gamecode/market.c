@@ -17,7 +17,7 @@ without prior permission by the authors of Eressea.
 #include <assert.h>
 
 #include <util/attrib.h>
-#include <util/quicklist.h>
+#include <quicklist.h>
 #include <util/rng.h>
 
 #include <kernel/building.h>

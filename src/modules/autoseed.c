@@ -35,7 +35,7 @@
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
-#include <util/quicklist.h>
+#include <quicklist.h>
 #include <util/rng.h>
 #include <util/sql.h>
 #include <util/unicode.h>

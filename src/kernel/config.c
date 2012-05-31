@@ -62,7 +62,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 #include <util/lists.h>
 #include <util/parser.h>
-#include <util/quicklist.h>
+#include <quicklist.h>
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/sql.h>

@@ -8,7 +8,6 @@
 #include <util/base36_test.c>
 #include <util/bsdstring_test.c>
 #include <util/functions_test.c>
-#include <util/quicklist_test.c>
 #include <util/umlaut_test.c>
 #include <kernel/magic_test.c>
 #include <kernel/move_test.c>
@@ -51,7 +50,6 @@ int RunAllTests(void)
   /* util */
   CuSuiteAddSuite(suite, get_base36_suite());
   CuSuiteAddSuite(suite, get_bsdstring_suite());
-  CuSuiteAddSuite(suite, get_quicklist_suite());
   CuSuiteAddSuite(suite, get_functions_suite());
   CuSuiteAddSuite(suite, get_umlaut_suite());
   /* kernel */

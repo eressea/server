@@ -28,7 +28,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "spellbook.h"
 
 /* util includes */
-#include <util/quicklist.h>
+#include <quicklist.h>
 #include <util/rand.h>
 #include <util/rng.h>
 

@@ -57,7 +57,7 @@ without prior permission by the authors of Eressea.
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
-#include <util/quicklist.h>
+#include <quicklist.h>
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/storage.h>

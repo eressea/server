@@ -10,7 +10,7 @@
 #include <kernel/spellbook.h>
 #include <kernel/unit.h>
 #include <kernel/pool.h>
-#include <util/quicklist.h>
+#include <quicklist.h>
 #include <util/language.h>
 
 #include <CuTest.h>

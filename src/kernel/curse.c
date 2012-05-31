@@ -284,7 +284,7 @@ attrib_type at_curse = {
 /* Spruch identifizieren */
 
 #include <util/umlaut.h>
-#include <util/quicklist.h>
+#include <quicklist.h>
 
 static quicklist *cursetypes[256];
 

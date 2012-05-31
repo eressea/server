@@ -26,7 +26,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/log.h>
 #include <util/umlaut.h>
-#include <util/quicklist.h>
+#include <quicklist.h>
 
 /* libc includes */
 #include <assert.h>

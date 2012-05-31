@@ -8,7 +8,7 @@
 #include <kernel/skill.h>
 #include <kernel/spell.h>
 
-#include <util/quicklist.h>
+#include <quicklist.h>
 
 #include <CuTest.h>
 #include <tests.h>

@@ -29,7 +29,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 #include <util/language.h>
 #include <util/log.h>
-#include <util/quicklist.h>
+#include <quicklist.h>
 #include <util/rng.h>
 #include <util/storage.h>
 

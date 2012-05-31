@@ -4,7 +4,7 @@
 #include <kernel/magic.h>
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
-#include <util/quicklist.h>
+#include <quicklist.h>
 #include <util/language.h>
 
 #include <CuTest.h>
