@@ -29,6 +29,7 @@ include_directories (
  ../external/critbit
  ../external/iniparser
  ../external/pdcurses
+ ../external/quicklist
  ../shared/src
 )
 
@@ -40,6 +41,7 @@ set (LIB_SRCS
  ../external/crypto/mt19937ar.c
  ../external/cutest/CuTest.c
  ../external/dlmalloc/malloc.c
+ ../external/quicklist/quicklist.c
  ../external/iniparser/iniparser.c
  ../shared/src/build/gamecode.c
  ../shared/src/build/kernel.c
