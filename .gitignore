@@ -1,0 +1,13 @@
+bin/
+Debug/
+Release/
+*~
+*.user
+*.pdb
+*.suo
+*.sdf
+*.opensdf
+*.ipch
+*.sh
+src/*.vcproj.*.user
+tags

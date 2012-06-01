@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.4)
-project (example C)
+project (server C)
 
 ## CMake configuration ##
 # You can pass these to cmake with -DNEED_OPTION=1
@@ -18,55 +18,50 @@ endif(${CMAKE_C_COMPILER} MATCHES ".*gcc")
 
 if (WIN32)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_CRT_SECURE_NO_DEPRECATE)
+  include_directories ( ../dependencies/pdcurses )
 else (WIN32)
-  include_directories (/usr/include/lua5.1/ /usr/include/libxml2)
+  include_directories ( /usr/include/lua5.1/ /usr/include/libxml2 )
 endif (WIN32)
 
 include_directories (
- ../external/bson
- ../external/crypto
- ../external/cutest
- ../external/critbit
- ../external/iniparser
- ../external/pdcurses
- ../external/quicklist
- ../shared/src
+ ../dependencies/bson
+ ../dependencies/crypto
+ ../dependencies/cutest
+ ../dependencies/critbit
+ ../dependencies/iniparser
+ ../dependencies/quicklist
+ ../core/src
 )
 
 set (LIB_SRCS
- ../external/bson/bson.c
- ../external/bson/numbers.c
- ../external/critbit/critbit.c
- ../external/crypto/md5.c
- ../external/crypto/mt19937ar.c
- ../external/cutest/CuTest.c
- ../external/dlmalloc/malloc.c
- ../external/quicklist/quicklist.c
- ../external/iniparser/iniparser.c
- ../shared/src/build/gamecode.c
- ../shared/src/build/kernel.c
- ../shared/src/build/lib.c
- ../shared/src/build/util.c
+ ../dependencies/bson/bson.c
+ ../dependencies/bson/numbers.c
+ ../dependencies/critbit/critbit.c
+ ../dependencies/crypto/md5.c
+ ../dependencies/crypto/mt19937ar.c
+ ../dependencies/cutest/CuTest.c
+ ../dependencies/dlmalloc/malloc.c
+ ../dependencies/quicklist/quicklist.c
+ ../dependencies/iniparser/iniparser.c
+ ../core/src/build/gamecode.c
+ ../core/src/build/kernel.c
+ ../core/src/build/lib.c
+ ../core/src/build/util.c
 )
 
 set (LINK_LIBS tolua xml2 ncurses lua5.1 pthread)
 
 if (NEED_SQLITE)
- set(LIB_SRCS
-   ${LIB_SRCS}
-   ../external/sqlite3/sqlite3.c
- )
- include_directories (../external/sqlite3)
+ set( LIB_SRCS ${LIB_SRCS} ../dependencies/sqlite3/sqlite3.c )
+ include_directories ( ../dependencies/sqlite3 )
 else (NEED_SQLITE)
- set (LINK_LIBS ${LINK_LIBS} sqlite3)
+ set ( LINK_LIBS ${LINK_LIBS} sqlite3 )
 endif (NEED_SQLITE)
  
-set (EXE_SRCS
-  src/server.c
-)
+set ( EXE_SRCS src/server.c )
 
-add_executable (example ${LIB_SRCS} ${EXE_SRCS})
+add_executable ( server ${LIB_SRCS} ${EXE_SRCS} )
 if (WIN32)
 else (WIN32)
-  target_link_libraries (example ${LINK_LIBS})
+  target_link_libraries (server ${LINK_LIBS})
 endif (WIN32)
