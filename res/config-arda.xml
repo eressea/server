@@ -89,18 +89,18 @@
 
   <strings>
     <string name="mailto">
-      <text locale="de">eressea-server@example.com</text>
-      <text locale="en">eressea-server@example.com</text>
+      <text locale="de">arda-server@example.com</text>
+      <text locale="en">arda-server@example.com</text>
     </string>
     <string name="newbie_info_1">
       <text locale="de">Bitte denke daran, deine Befehle mit dem Betreff
-        ERESSEA BEFEHLE an eressea-server@example.com zu senden.</text>
+        ERESSEA BEFEHLE an arda-server@example.com zu senden.</text>
       <text locale="en">Remember to send your orders to
-        eressea-server@example.com with the subject ERESSEA ORDERS.</text>
+        arda-server@example.com with the subject ERESSEA ORDERS.</text>
     </string>
     <string name="mailcmd">
-      <text locale="de">ERESSEA BEFEHLE</text>
-      <text locale="en">ERESSEA ORDERS</text>
+      <text locale="de">ARDA BEFEHLE</text>
+      <text locale="en">ARDA ORDERS</text>
     </string>
     <string name="defaultorder">
       <text locale="de">ARBEITEN</text>
