@@ -3,8 +3,6 @@ extern "C" {
 #endif
 
 #ifndef DISABLE_TESTS
-  struct building_type;
-  struct building;
   void test_cleanup(void);
 
   struct terrain_type * test_create_terrain(const char * name, unsigned int flags);

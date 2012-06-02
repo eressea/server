@@ -36,6 +36,9 @@
 #include <kernel/terrain.h>
 #include <util/functions.h>
 #include <util/language.h>
+#include <util/log.h>
+
+#include <assert.h>
 
 int RunAllTests(void)
 {
