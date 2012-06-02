@@ -3,7 +3,7 @@ local respath = srcpath .. '/server/res'
 local paths = {
   'server/scripts/?.lua',
   'core/scripts/?.lua',
---  'external/lunit/?.lua'
+  'dependencies/lunit/?.lua'
 }
 
 for idx, path in pairs(paths) do
