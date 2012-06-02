@@ -72,6 +72,7 @@ int msg_set_resource(lua_message * msg, const char *param, const char *resname)
 {
   if (msg->mtype) {
     int i = mtype_get_param(msg->mtype, param);
+    const resource_type * rtype;
     if (i == msg->mtype->nparameters) {
       return E_INVALID_PARAMETER_NAME;
     }
@@ -79,8 +80,12 @@ int msg_set_resource(lua_message * msg, const char *param, const char *resname)
       return E_INVALID_PARAMETER_TYPE;
     }
 
-    msg->args[i].v = (void *)rt_find(resname);
-
+    rtype = rt_find(resname);
+    if (rtype) {
+      msg->args[i].v = (void *)rtype;
+    } else {
+      return E_INVALID_PARAMETER_VALUE;
+    }
     return E_OK;
   }
   return E_INVALID_MESSAGE;
