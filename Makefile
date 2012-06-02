@@ -1,12 +1,15 @@
-all: bin/example
+all: tests
+
+tests: bin/server
+	@bin/server -l/dev/null --tests
 
 bin:
-	mkdir bin
+	@mkdir bin
 
-bin/example: bin/Makefile
+bin/server: bin/Makefile
 	cd bin ; make
 
-bin/Makefile: bin
+bin/Makefile: CMakeLists.txt | bin
 	cd bin ; cmake ..
 
 clean:

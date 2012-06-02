@@ -35,6 +35,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 static const char *luafile = "setup.lua";
 static const char *entry_point = NULL;
 static const char *inifile = "eressea.ini";
+static const char *logfile="eressea.log";
 static int memdebug = 0;
 
 static void parse_config(const char *filename)
@@ -95,6 +96,9 @@ static int parse_args(int argc, char **argv, int *exitcode)
       switch (argv[i][1]) {
         case 'C':
           entry_point = NULL;
+          break;
+        case 'l':
+          logfile = argv[i][2] ? argv[i]+2 : argv[++i];
           break;
         case 'e':
           entry_point = argv[i][2] ? argv[i]+2 : argv[++i];
@@ -157,13 +161,13 @@ int main(int argc, char **argv)
 
   parse_config(inifile);
 
-  log_open("eressea.log");
-  locale_init();
-
   err = parse_args(argc, argv, &result);
   if (err) {
     return result;
   }
+
+  log_open(logfile);
+  locale_init();
 
   err = eressea_init();
   if (err) {
