@@ -17,6 +17,7 @@
 #include "economy.h"
 
 /* kernel includes */
+#include <kernel/curse.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/magic.h>

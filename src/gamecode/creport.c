@@ -35,6 +35,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/alliance.h>
 #include <kernel/connection.h>
 #include <kernel/building.h>
+#include <kernel/curse.h>
 #include <kernel/faction.h>
 #include <kernel/group.h>
 #include <kernel/item.h>

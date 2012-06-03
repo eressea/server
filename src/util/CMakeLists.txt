@@ -3,16 +3,13 @@ project (util)
 
 find_package (Lua51 REQUIRED)
 find_package (LibXml2 REQUIRED)
-#find_package (CuTest REQUIRED HINTS ${DEPENDENCIES_DIR})
-#find_package (QuickList REQUIRED)
-#find_package (CritBit REQUIRED)
 
-include_directories (${LUA_INCLUDE_DIR} ${LIBXML2_INCLUDE_DIR})
-include_directories (..
-  ${CRITBIT_INCLUDE_DIR}
-  ${QUICKLIST_INCLUDE_DIR}
-  ${CUTEST_INCLUDE_DIR}
-  )
+include_directories (..)
+include_directories (${CRITBIT_INCLUDE_DIR})
+include_directories (${QUICKLIST_INCLUDE_DIR})
+include_directories (${CUTEST_INCLUDE_DIR})
+include_directories (${LUA_INCLUDE_DIR})
+include_directories (${LIBXML2_INCLUDE_DIR})
 
 add_library (util attrib.c
   base36.c

@@ -1,14 +1,7 @@
 cmake_minimum_required (VERSION 2.4)
 project (kernel)
 
-#find_package (Lua51 REQUIRED)
-#find_package (LibXml2 REQUIRED)
-#find_package (CuTest REQUIRED HINTS ${DEPENDENCIES_DIR})
-#find_package (QuickList REQUIRED)
-#find_package (CritBit REQUIRED)
-
 include_directories (..)
-#include_directories (${LUA_INCLUDE_DIR})
 include_directories (${LIBXML2_INCLUDE_DIR})
 include_directories (${CRITBIT_INCLUDE_DIR})
 include_directories (${QUICKLIST_INCLUDE_DIR})

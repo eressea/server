@@ -1,4 +1,5 @@
-#include "platform.h"
+#include <platform.h>
+#include <kernel/types.h>
 #include "economy.h"
 
 #include <kernel/unit.h>
