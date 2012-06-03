@@ -1,6 +1,7 @@
 #ifndef UTIL_BSDSTRING_H
 #define UTIL_BSDSTRING_H
 
+#include <stddef.h>
 extern int wrptr(char **ptr, size_t * size, int bytes);
 
 #ifndef HAVE_STRLCPY
