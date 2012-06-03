@@ -1,9 +1,11 @@
 #include <platform.h>
+#include <kernel/types.h>
 
 #include "pool.h"
 #include "unit.h"
 #include "item.h"
 #include "region.h"
+#include "skill.h"
 #include <CuTest.h>
 #include <tests.h>
 

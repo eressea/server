@@ -18,12 +18,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <platform.h>
 #include <kernel/config.h>
+#include <kernel/types.h>
 #include "unit.h"
 
 #include "building.h"
 #include "faction.h"
 #include "group.h"
 #include "connection.h"
+#include "curse.h"
 #include "item.h"
 #include "move.h"
 #include "order.h"

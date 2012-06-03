@@ -7,3 +7,4 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/../../cmake/Modu
 
 add_subdirectory (../../dependencies "${CMAKE_CURRENT_BINARY_DIR}/dependencies")
 add_subdirectory (util)
+add_subdirectory (kernel)
