@@ -6,13 +6,14 @@
 |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
 +-------------------+  Stefan Reich <reich@halbling.de>
 
-This program may not be used, modified or distributed 
+This program may not be used, modified or distributed
 without prior permission by the authors of Eressea.
 */
 #include <platform.h>
 #include "log.h"
 #include "unicode.h"
 
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -154,7 +155,7 @@ static void _log_write(FILE * stream, int codepage, const char * prefix, const c
     if (codepage) {
       char buffer[MAXLENGTH];
       char converted[MAXLENGTH];
-      
+
       vsnprintf(buffer, sizeof(buffer), format, args);
       if (cp_convert(buffer, converted, MAXLENGTH, codepage) == 0) {
         fputs(converted, stream);
@@ -308,4 +309,3 @@ void log_printf(FILE * io, const char *format, ...)
     log_flush();
   }
 }
-

@@ -98,7 +98,7 @@ static void txt_r_tok_buf(struct storage *store, char *result, size_t size)
   char format[16];
   if (result && size > 0) {
     format[0] = '%';
-    sprintf(format + 1, "%us", size);
+    sprintf(format + 1, "%lus", (unsigned long)size);
     fscanf((FILE *) store->userdata, format, result);
     if (result[0] == NULL_TOKEN) {
       result[0] = 0;

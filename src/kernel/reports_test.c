@@ -62,16 +62,16 @@ static void test_regionid(CuTest * tc) {
   plain = test_create_terrain("plain", 0);
   r = test_create_region(0, 0, plain);
 
-  memset(buffer, 0xff, sizeof(buffer));
+  memset(buffer, -2, sizeof(buffer));
   len = f_regionid(r, 0, buffer, sizeof(buffer));
   CuAssertIntEquals(tc, 11, len);
   CuAssertStrEquals(tc, "plain (0,0)", buffer);
 
-  memset(buffer, -1, sizeof(buffer));
+  memset(buffer, -2, sizeof(buffer));
   len = f_regionid(r, 0, buffer, 11);
   CuAssertIntEquals(tc, 10, len);
   CuAssertStrEquals(tc, "plain (0,0", buffer);
-  CuAssertIntEquals(tc, -1, buffer[11]);
+  CuAssertIntEquals(tc, (char)-2, buffer[11]);
 }
 
 CuSuite *get_reports_suite(void)

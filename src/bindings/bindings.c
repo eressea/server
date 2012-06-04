@@ -21,6 +21,7 @@ without prior permission by the authors of Eressea.
 
 #include <kernel/alliance.h>
 #include <kernel/building.h>
+#include <kernel/curse.h>
 #include <kernel/skill.h>
 #include <kernel/equipment.h>
 #include <kernel/calendar.h>

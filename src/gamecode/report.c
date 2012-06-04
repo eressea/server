@@ -42,6 +42,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/build.h>
 #include <kernel/building.h>
 #include <kernel/calendar.h>
+#include <kernel/curse.h>
 #include <kernel/faction.h>
 #include <kernel/group.h>
 #include <kernel/item.h>

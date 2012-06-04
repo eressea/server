@@ -83,7 +83,7 @@ void equipment_setskill(equipment * eq, skill_t sk, const char *value)
   }
 }
 
-void equipment_addspell(equipment * eq, spell * sp, int level)
+void equipment_addspell(equipment * eq, struct spell * sp, int level)
 {
   if (eq) {
     if (!eq->spellbook) {

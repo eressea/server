@@ -38,6 +38,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/unicode.h>
 
 /* libc includes */
+#include <assert.h>
 #include <ctype.h>
 #include <wctype.h>
 #include <stdlib.h>
@@ -466,7 +467,7 @@ const char *abkz(const char *s, char *buf, size_t buflen, size_t maxchars)
 void register_names(void)
 {
   register_function((pf_generic) describe_braineater, "describe_braineater");
-  /* function name 
+  /* function name
    * generate a name for a nonplayerunit
    * race->generate_name() */
   register_function((pf_generic) undead_name, "nameundead");

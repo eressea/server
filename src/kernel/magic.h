@@ -22,11 +22,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-#include "curse.h"
-  struct fighter;
-  struct building;
-  struct spellbook;
-
 /* ------------------------------------------------------------- */
 
 #define MAXCOMBATSPELLS 3       /* PRECOMBAT COMBAT POSTCOMBAT */

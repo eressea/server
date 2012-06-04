@@ -10,6 +10,8 @@ This program may not be used, modified or distributed
 without prior permission by the authors of Eressea.
 */
 
+#include <lua.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

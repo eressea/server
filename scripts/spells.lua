@@ -1,9 +1,14 @@
 function creation_message(mage, type, number)
   local msg = message.create("item_create_spell")
-  msg:set_unit("mage", mage)
-  msg:set_int("number", number)
-  msg:set_resource("item", type)
-  return msg
+  local err = 0
+  err = err + msg:set_unit("mage", mage)
+  err = err + msg:set_int("number", number)
+  err = err + msg:set_resource("item", type)
+  if err ~= 0 then
+      return nil
+  else
+      return msg
+  end
 end
 
 local function create_item(mage, level, name, number)
