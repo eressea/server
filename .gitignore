@@ -11,3 +11,4 @@ Release/
 *.sh
 src/*.vcproj.*.user
 tags
+build-vs2010
