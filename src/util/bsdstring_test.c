@@ -15,11 +15,11 @@ static void test_strlcat(CuTest * tc)
   buffer[0] = '\0';
   CuAssertIntEquals(tc, 4, strlcat(buffer, "herp", 8));
   CuAssertStrEquals(tc, "herp", buffer);
-  CuAssertIntEquals(tc, -2, buffer[5]);
+  CuAssertIntEquals(tc, (char)-2, buffer[5]);
 
   CuAssertIntEquals(tc, 8, strlcat(buffer, "derp", 8));
   CuAssertStrEquals(tc, "herpder", buffer);
-  CuAssertIntEquals(tc, -2, buffer[8]);
+  CuAssertIntEquals(tc, (char)-2, buffer[8]);
 }
 
 static void test_strlcpy(CuTest * tc)
@@ -33,11 +33,11 @@ static void test_strlcpy(CuTest * tc)
 
   CuAssertIntEquals(tc, 4, strlcpy(buffer, "herp", 8));
   CuAssertStrEquals(tc, "herp", buffer);
-  CuAssertIntEquals(tc, -2, buffer[5]);
+  CuAssertIntEquals(tc, (char)-2, buffer[5]);
 
   CuAssertIntEquals(tc, 8, strlcpy(buffer, "herpderp", 8));
   CuAssertStrEquals(tc, "herpder", buffer);
-  CuAssertIntEquals(tc, -2, buffer[8]);
+  CuAssertIntEquals(tc, (char)-2, buffer[8]);
 }
 
 static void test_slprintf(CuTest * tc)
@@ -51,11 +51,11 @@ static void test_slprintf(CuTest * tc)
 
   CuAssertIntEquals(tc, 4, slprintf(buffer, 8, "%s", "herp"));
   CuAssertStrEquals(tc, "herp", buffer);
-  CuAssertIntEquals(tc, -2, buffer[5]);
+  CuAssertIntEquals(tc, (char)-2, buffer[5]);
 
   CuAssertIntEquals(tc, 8, slprintf(buffer, 8, "%s", "herpderp"));
   CuAssertStrEquals(tc, "herpder", buffer);
-  CuAssertIntEquals(tc, -2, buffer[8]);
+  CuAssertIntEquals(tc, (char)-2, buffer[8]);
 }
 
 CuSuite *get_bsdstring_suite(void)
