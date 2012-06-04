@@ -50,11 +50,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/raceprefix.h>
 
 /* libc includes */
+#include <assert.h>
+#include <ctype.h>
+#include <math.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <math.h>
-#include <ctype.h>
 
 /** external variables **/
 race *races;

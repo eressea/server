@@ -1,6 +1,10 @@
-#include <util/language.h>
+#include <platform.h>
+
+#include <kernel/types.h>
 #include <kernel/item.h>
 #include <kernel/region.h>
+
+#include <util/language.h>
 
 #include <CuTest.h>
 

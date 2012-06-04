@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include <platform.h>
+#include <kernel/types.h>
 #include "tests.h"
 
 #include "tests_test.c"
