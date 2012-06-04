@@ -5,27 +5,7 @@
 #include <kernel/types.h>
 #include "tests.h"
 
-#include "tests_test.c"
-#include <util/base36_test.c>
-#include <util/bsdstring_test.c>
-#include <util/functions_test.c>
-#include <util/umlaut_test.c>
-#include <kernel/magic_test.c>
-#include <kernel/move_test.c>
-#include <kernel/item_test.c>
-#include <kernel/ship_test.c>
-#include <kernel/building_test.c>
-#include <kernel/spell_test.c>
-#include <kernel/curse_test.c>
-#include <kernel/battle_test.c>
-#include <kernel/pool_test.c>
-#include <kernel/equipment_test.c>
-#include <kernel/reports_test.c>
-#include <kernel/spellbook_test.c>
-#include <gamecode/economy_test.c>
-#include <gamecode/laws_test.c>
-#include <gamecode/market_test.c>
-
+#include <kernel/config.h>
 #include <kernel/region.h>
 #include <kernel/terrain.h>
 #include <kernel/item.h>
@@ -220,4 +200,8 @@ void test_create_world(void)
   stype->name[1] = strdup("boat_p");
   locale_setstring(default_locale, "boat", "boat");
   st_register(stype);
+}
+
+int main(int argc, char ** argv) {
+  return RunAllTests();
 }

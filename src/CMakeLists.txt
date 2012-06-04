@@ -1,24 +1,65 @@
 cmake_minimum_required(VERSION 2.6)
 project (eressea C)
 
-set (CORE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "Eressea Core headers")
+set (ERESSEA_LIBRARY ${PROJECT_NAME} CACHE INTERNAL "Eressea Core Library")
+set (ERESSEA_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "Eressea Core headers")
 
 find_package (Lua51 REQUIRED)
+find_package (ToLua REQUIRED)
 find_package (LibXml2 REQUIRED)
 find_package (Curses REQUIRED)
 find_package (SQLite3 REQUIRED)
 
-include_directories (${CORE_INCLUDE_DIR})
+set (ERESSEA_LIBRARIES
+  ${BSON_LIBRARIES}
+  ${CUTEST_LIBRARIES}
+  ${CRITBIT_LIBRARIES}
+  ${QUICKLIST_LIBRARIES}
+  ${CRYPTO_LIBRARIES}
+  ${INIPARSER_LIBRARIES}
+  ${LUA_LIBRARIES}
+  ${LIBXML2_LIBRARIES}
+  ${SQLITE3_LIBRARIES}
+  ${CURSES_LIBRARIES}
+  CACHE STRING "Eressea Libraries"
+)
+
+include_directories (${ERESSEA_INCLUDE_DIR})
 include_directories (${CRITBIT_INCLUDE_DIR})
 include_directories (${CRYPTO_INCLUDE_DIR})
 include_directories (${QUICKLIST_INCLUDE_DIR})
 include_directories (${CUTEST_INCLUDE_DIR})
 include_directories (${LUA_INCLUDE_DIR})
+include_directories (${TOLUA_INCLUDE_DIR})
 include_directories (${LIBXML2_INCLUDE_DIR})
 include_directories (${BSON_INCLUDE_DIR})
 include_directories (${INIPARSER_INCLUDE_DIR})
 
-add_library(${PROJECT_NAME}
+set (TEST_SRC
+  tests.c
+  tests_test.c
+  gamecode/economy_test.c
+  gamecode/laws_test.c
+  gamecode/market_test.c
+  kernel/battle_test.c
+  kernel/building_test.c
+  kernel/curse_test.c
+  kernel/equipment_test.c
+  kernel/item_test.c
+  kernel/magic_test.c
+  kernel/move_test.c
+  kernel/pool_test.c
+  kernel/reports_test.c
+  kernel/ship_test.c
+  kernel/spellbook_test.c
+  kernel/spell_test.c
+  util/base36_test.c
+  util/bsdstring_test.c
+  util/functions_test.c
+  util/umlaut_test.c
+)
+
+set (LIB_SRC
   attributes/alliance.c
   attributes/attributes.c
   attributes/fleechance.c
@@ -57,13 +98,10 @@ add_library(${PROJECT_NAME}
   gamecode/creation.c
   gamecode/creport.c
   gamecode/economy.c
-  gamecode/economy_test.c
   gamecode/give.c
   gamecode/items.c
   gamecode/laws.c
-  gamecode/laws_test.c
   gamecode/market.c
-  gamecode/market_test.c
   gamecode/monster.c
   gamecode/randenc.c
   gamecode/report.c
@@ -83,48 +121,36 @@ add_library(${PROJECT_NAME}
   kernel/alchemy.c
   kernel/alliance.c
   kernel/battle.c
-  kernel/battle_test.c
   kernel/binarystore.c
   kernel/build.c
   kernel/building.c
-  kernel/building_test.c
   kernel/calendar.c
   kernel/command.c
   kernel/config.c
   kernel/connection.c
   kernel/curse.c
-  kernel/curse_test.c
   kernel/equipment.c
-  kernel/equipment_test.c
   kernel/faction.c
   kernel/group.c
   kernel/item.c
-  kernel/item_test.c
   kernel/magic.c
-  kernel/magic_test.c
   kernel/message.c
   kernel/move.c
-  kernel/move_test.c
   kernel/names.c
   kernel/order.c
   kernel/pathfinder.c
   kernel/plane.c
   kernel/player.c
   kernel/pool.c
-  kernel/pool_test.c
   kernel/race.c
   kernel/region.c
   kernel/reports.c
-  kernel/reports_test.c
   kernel/resources.c
   kernel/save.c
   kernel/ship.c
-  kernel/ship_test.c
   kernel/skill.c
   kernel/spellbook.c
-  kernel/spellbook_test.c
   kernel/spell.c
-  kernel/spell_test.c
   kernel/sqlite.c
   kernel/teleport.c
   kernel/terrain.c
@@ -141,7 +167,6 @@ add_library(${PROJECT_NAME}
   modules/wormhole.c
   modules/xecmd.c
   modules/xmas.c
-  tests_test.c
   triggers/changefaction.c
   triggers/changerace.c
   triggers/clonedied.c
@@ -158,9 +183,7 @@ add_library(${PROJECT_NAME}
   triggers/unitmessage.c
   util/attrib.c
   util/base36.c
-  util/base36_test.c
   util/bsdstring.c
-  util/bsdstring_test.c
   util/console.c
   util/crmessage.c
   util/dice.c
@@ -168,7 +191,6 @@ add_library(${PROJECT_NAME}
   util/event.c
   util/filereader.c
   util/functions.c
-  util/functions_test.c
   util/goodies.c
   util/language.c
   util/listbox.c
@@ -184,7 +206,14 @@ add_library(${PROJECT_NAME}
   util/strings.c
   util/translation.c
   util/umlaut.c
-  util/umlaut_test.c
   util/unicode.c
   util/xml.c
 )
+
+add_library(${ERESSEA_LIBRARY} ${LIB_SRC})
+target_link_libraries(${ERESSEA_LIBRARY} ${ERESSEA_LIBRARIES})
+
+add_executable(${PROJECT_NAME}_test ${TEST_SRC})
+target_link_libraries(${PROJECT_NAME}_test ${ERESSEA_LIBRARY})
+
+add_test(${PROJECT_NAME} ${PROJECT_NAME}_test)
