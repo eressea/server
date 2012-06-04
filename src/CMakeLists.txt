@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.4)
-project (eressea)
+project (eressea C)
 
 set (CORE_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR} CACHE INTERNAL "Eressea Core headers")
 
