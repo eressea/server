@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.4)
 project (eressea C)
 
-set (CORE_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR} CACHE INTERNAL "Eressea Core headers")
+set (CORE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "Eressea Core headers")
 
 find_package (Lua51 REQUIRED)
 find_package (LibXml2 REQUIRED)
