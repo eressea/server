@@ -14,6 +14,8 @@
 #include <kernel/faction.h>
 #include <kernel/building.h>
 #include <kernel/ship.h>
+#include <kernel/spell.h>
+#include <kernel/spellbook.h>
 #include <kernel/terrain.h>
 #include <util/functions.h>
 #include <util/language.h>
