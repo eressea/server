@@ -13,7 +13,9 @@
 #include <lauxlib.h>
 #include <bindings/bindings.h>
 #include <bindings/helpers.h>
-#include <bindings/bind_attrib.h>
+#ifdef BSON_ATTRIB
+# include <bindings/bind_attrib.h>
+#endif
 #include <bindings/bind_building.h>
 #include <bindings/bind_faction.h>
 #include <bindings/bind_gmtool.h>
@@ -99,7 +101,9 @@ static lua_State *lua_init(void)
   tolua_ship_open(L);
   tolua_region_open(L);
   tolua_faction_open(L);
+#ifdef BSON_ATTRIB
   tolua_attrib_open(L);
+#endif
   tolua_unit_open(L);
   tolua_message_open(L);
   tolua_hashtable_open(L);

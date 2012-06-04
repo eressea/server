@@ -80,7 +80,7 @@ set (LIB_SRC
   attributes/raceprefix.c
   attributes/reduceproduction.c
   attributes/targetregion.c
-  bindings/bind_attrib.c
+#  bindings/bind_attrib.c
   bindings/bind_building.c
   bindings/bind_faction.c
   bindings/bind_gmtool.c
