@@ -7,6 +7,7 @@
 #include <util/language.h>
 
 #include <CuTest.h>
+#include <tests.h>
 
 static void test_recreate_world(CuTest * tc)
 {

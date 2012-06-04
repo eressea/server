@@ -5,6 +5,8 @@ set (CORE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "Eressea Core h
 
 find_package (Lua51 REQUIRED)
 find_package (LibXml2 REQUIRED)
+find_package (Curses REQUIRED)
+find_package (SQLite3 REQUIRED)
 
 include_directories (${CORE_INCLUDE_DIR})
 include_directories (${CRITBIT_INCLUDE_DIR})
@@ -139,7 +141,6 @@ add_library(${PROJECT_NAME}
   modules/wormhole.c
   modules/xecmd.c
   modules/xmas.c
-  tests.c
   tests_test.c
   triggers/changefaction.c
   triggers/changerace.c

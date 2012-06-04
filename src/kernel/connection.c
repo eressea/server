@@ -27,6 +27,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "version.h"
 
 #include <util/attrib.h>
+#include <util/bsdstring.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <quicklist.h>

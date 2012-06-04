@@ -2,10 +2,12 @@
 #include <kernel/types.h>
 
 #include "pool.h"
+#include "magic.h"
 #include "unit.h"
 #include "item.h"
 #include "region.h"
 #include "skill.h"
+
 #include <CuTest.h>
 #include <tests.h>
 
