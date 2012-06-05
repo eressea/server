@@ -39,6 +39,7 @@ struct building;
 struct building_type;
 struct curse;
 struct curse_type;
+struct castorder;
 struct equipment;
 struct faction;
 struct fighter;
