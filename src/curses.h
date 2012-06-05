@@ -19,6 +19,8 @@ extern "C" {
     boolean active;
     int countdown;
   } wall_data;
+  
+  extern const struct curse_type ct_firewall;
 
 #ifdef __cplusplus
 }

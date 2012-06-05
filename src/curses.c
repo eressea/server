@@ -74,6 +74,41 @@ static int cw_read(attrib * a, void *target, storage * store)
   return AT_READ_OK;
 }
 
+/* ------------------------------------------------------------- */
+/* Name:       Feuerwand
+ * Stufe:
+ * Gebiet:     Draig
+ * Kategorie:  Region, negativ
+ * Flag:
+ * Kosten:     SPC_LINEAR
+ * Aura:
+ * Komponenten:
+ *
+ * Wirkung:
+ *   eine Wand aus Feuer entsteht in der angegebenen Richtung
+ *
+ *   Was fuer eine Wirkung hat die?
+ */
+
+void wall_vigour(curse * c, double delta)
+{
+  wallcurse *wc = (wallcurse *) c->data.v;
+  assert(wc->buddy->vigour == c->vigour);
+  wc->buddy->vigour += delta;
+  if (wc->buddy->vigour <= 0) {
+    erase_border(wc->wall);
+    wc->wall = NULL;
+    ((wallcurse *) wc->buddy->data.v)->wall = NULL;
+  }
+}
+
+const curse_type ct_firewall = {
+  "Feuerwand",
+  CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR | NO_MERGE),
+  NULL,                         /* curseinfo */
+  wall_vigour                   /* change_vigour */
+};
+
 attrib_type at_cursewall = {
   "cursewall",
   cw_init,

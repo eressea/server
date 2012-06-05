@@ -13,13 +13,16 @@
  */
 
 #include <platform.h>
+#include <kernel/types.h>
 #include <kernel/config.h>
 #include "spells.h"
 
+#include "../curses.h"
 #include "buildingcurse.h"
 #include "regioncurse.h"
 #include "unitcurse.h"
 #include "shipcurse.h"
+#include "combatspells.h"
 
 /* kernel includes */
 #include <kernel/curse.h>
@@ -2595,41 +2598,6 @@ static int sp_summondragon(castorder * co)
   return cast_level;
 }
 
-/* ------------------------------------------------------------- */
-/* Name:       Feuerwand
- * Stufe:
- * Gebiet:     Draig
- * Kategorie:  Region, negativ
- * Flag:
- * Kosten:     SPC_LINEAR
- * Aura:
- * Komponenten:
- *
- * Wirkung:
- *   eine Wand aus Feuer entsteht in der angegebenen Richtung
- *
- *   Was fuer eine Wirkung hat die?
- */
-
-void wall_vigour(curse * c, double delta)
-{
-  wallcurse *wc = (wallcurse *) c->data.v;
-  assert(wc->buddy->vigour == c->vigour);
-  wc->buddy->vigour += delta;
-  if (wc->buddy->vigour <= 0) {
-    erase_border(wc->wall);
-    wc->wall = NULL;
-    ((wallcurse *) wc->buddy->data.v)->wall = NULL;
-  }
-}
-
-const curse_type ct_firewall = {
-  "Feuerwand",
-  CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR | NO_MERGE),
-  NULL,                         /* curseinfo */
-  wall_vigour                   /* change_vigour */
-};
-
 static int sp_firewall(castorder * co)
 {
   connection *b;
@@ -3048,6 +3016,44 @@ static int sp_summonshadowlords(castorder * co)
       mage, amount, u->race));
   return cast_level;
 }
+
+static boolean chaosgate_valid(const connection * b)
+{
+  const attrib *a = a_findc(b->from->attribs, &at_direction);
+  if (!a)
+    a = a_findc(b->to->attribs, &at_direction);
+  if (!a)
+    return false;
+  return true;
+}
+
+struct region *chaosgate_move(const connection * b, struct unit *u,
+  struct region *from, struct region *to, boolean routing)
+{
+  if (!routing) {
+    int maxhp = u->hp / 4;
+    if (maxhp < u->number)
+      maxhp = u->number;
+    u->hp = maxhp;
+  }
+  return to;
+}
+
+border_type bt_chaosgate = {
+  "chaosgate", VAR_NONE,
+  b_transparent,                /* transparent */
+  NULL,                         /* init */
+  NULL,                         /* destroy */
+  NULL,                         /* read */
+  NULL,                         /* write */
+  b_blocknone,                  /* block */
+  NULL,                         /* name */
+  b_rinvisible,                 /* rvisible */
+  b_finvisible,                 /* fvisible */
+  b_uinvisible,                 /* uvisible */
+  chaosgate_valid,
+  chaosgate_move
+};
 
 /* ------------------------------------------------------------- */
 /* Name:       Chaossog
@@ -6614,44 +6620,6 @@ static spelldata spell_functions[] = {
   { "acidrain", sp_immolation, 0},
   /* SPL_NOSPELL  MUSS der letzte Spruch der Liste sein */
   { 0, 0, 0 }
-};
-
-static boolean chaosgate_valid(const connection * b)
-{
-  const attrib *a = a_findc(b->from->attribs, &at_direction);
-  if (!a)
-    a = a_findc(b->to->attribs, &at_direction);
-  if (!a)
-    return false;
-  return true;
-}
-
-struct region *chaosgate_move(const connection * b, struct unit *u,
-  struct region *from, struct region *to, boolean routing)
-{
-  if (!routing) {
-    int maxhp = u->hp / 4;
-    if (maxhp < u->number)
-      maxhp = u->number;
-    u->hp = maxhp;
-  }
-  return to;
-}
-
-border_type bt_chaosgate = {
-  "chaosgate", VAR_NONE,
-  b_transparent,                /* transparent */
-  NULL,                         /* init */
-  NULL,                         /* destroy */
-  NULL,                         /* read */
-  NULL,                         /* write */
-  b_blocknone,                  /* block */
-  NULL,                         /* name */
-  b_rinvisible,                 /* rvisible */
-  b_finvisible,                 /* fvisible */
-  b_uinvisible,                 /* uvisible */
-  chaosgate_valid,
-  chaosgate_move
 };
 
 static void register_spelldata(void)

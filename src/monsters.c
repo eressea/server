@@ -31,6 +31,7 @@
 
 /* kernel includes */
 #include <kernel/build.h>
+#include <kernel/curse.h>
 #include <kernel/equipment.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
@@ -62,6 +63,8 @@
 #include <util/log.h>
 #include <util/rand.h>
 #include <util/rng.h>
+
+#include <quicklist.h>
 
 /* libc includes */
 #include <stdio.h>

@@ -11,17 +11,20 @@
 */
 #include <platform.h>
 #include <kernel/config.h>
+#include <kernel/types.h>
 #include "combatspells.h"
 
 /* kernel includes */
 #include <kernel/battle.h>
 #include <kernel/build.h>
 #include <kernel/building.h>
+#include <kernel/curse.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/magic.h>
 #include <kernel/message.h>
 #include <kernel/order.h>
+#include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
 #include <kernel/move.h>
@@ -34,9 +37,10 @@
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/quicklist.h>
 #include <util/rand.h>
 #include <util/rng.h>
+
+#include <quicklist.h>
 
 /* libc includes */
 #include <assert.h>

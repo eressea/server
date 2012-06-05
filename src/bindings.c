@@ -2,12 +2,15 @@
 #include <kernel/types.h>
 #include "spells/shipcurse.h"
 
+#include <kernel/equipment.h>
+#include <kernel/faction.h>
+#include <kernel/magic.h>
+#include <kernel/race.h>
 #include <kernel/ship.h>
 #include <kernel/spellbook.h>
 #include <kernel/unit.h>
-#include <kernel/faction.h>
 
-#include <util/quicklist.h>
+#include <quicklist.h>
 
 #include <tolua.h>
 

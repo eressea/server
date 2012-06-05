@@ -13,6 +13,8 @@
 
 #ifndef _UCURSE_H
 #define _UCURSE_H
+
+#include <kernel/objtypes.h>
 #ifdef __cplusplus
 extern "C" {
 #endif

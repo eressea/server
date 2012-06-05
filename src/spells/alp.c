@@ -15,7 +15,7 @@
 #include <kernel/config.h>
 #include "alp.h"
 
-#include <kernel/config.h>
+#include <kernel/curse.h>
 #include <kernel/faction.h>
 #include <kernel/magic.h>
 #include <kernel/message.h>

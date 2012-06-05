@@ -13,6 +13,9 @@
 
 #ifndef _SCURSE_H
 #define _SCURSE_H
+
+#include <kernel/objtypes.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
