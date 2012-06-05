@@ -1,0 +1,27 @@
+[submodule "cmake"]
+	path = cmake
+	url = git@github.com:eressea/cmake.git
+[submodule "eressea"]
+	path = eressea
+	url = git@github.com:eressea/core
+[submodule "quicklist"]
+	path = quicklist
+	url = git@github.com:badgerman/quicklist.git
+[submodule "critbit"]
+	path = critbit
+	url = git@github.com:badgerman/critbit.git
+[submodule "dlmalloc"]
+	path = dlmalloc
+	url = git@github.com:badgerman/dlmalloc.git
+[submodule "cutest"]
+	path = cutest
+	url = git@github.com:badgerman/cutest.git
+[submodule "iniparser"]
+	path = iniparser
+	url = git@github.com:badgerman/iniparser.git
+[submodule "crypto"]
+	path = crypto
+	url = git@github.com:eressea/crypto.git
+[submodule "lunit"]
+	path = lunit
+	url = git@github.com:eressea/lunit.git
