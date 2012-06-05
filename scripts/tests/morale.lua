@@ -1,6 +1,6 @@
 require "lunit"
 
-module( "morale", package.seeall, lunit.testcase )
+module("tests.e3.morale", package.seeall, lunit.testcase )
 
 function setup()
     free_game()

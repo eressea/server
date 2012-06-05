@@ -1,24 +1,21 @@
 require "lunit"
 
-module("e3-stealth", package.seeall, lunit.testcase)
+module("tests.e3.stealth", package.seeall, lunit.testcase)
 
-function setup_stealth()
-	local result = {}
+local f
+local u
+
+function setup()
 	free_game()
-    result.r = region.create(0,0, "plain")
-	result.f1 = faction.create("noreply@eressea.de", "human", "de")
-	result.f2 = faction.create("noreply@eressea.de", "human", "de")
-	result.u1 = unit.create(result.f1, result.r, 1)
-	result.u2 = unit.create(result.f2, result.r, 1)
-    result.u1:add_item("money", 1000)
-    result.u2:add_item("money", 1000)
-	return result
+  settings.set("rules.economy.food", "4")
+
+  local r = region.create(0,0, "plain")
+	f = faction.create("stealthy@eressea.de", "human", "de")
+  u = unit.create(f, r, 1)
+	f = faction.create("stealth@eressea.de", "human", "de")
 end
 
 function test_stealth_faction_on()
-	local result = setup_stealth()
-	local f = result.f2
-	local u = result.u1
 	u:clear_orders()
 	u:add_order("TARNEN PARTEI")
 
@@ -29,9 +26,6 @@ function test_stealth_faction_on()
 end
 
 function test_stealth_faction_off()
-	local result = setup_stealth()
-	local f = result.f2
-	local u = result.u1
 	u:clear_orders()
 	u:add_order("TARNEN PARTEI")
 

@@ -2,12 +2,15 @@
 #include <util/log.h>
 
 #include <kernel/types.h>
-#include <eressea.h>
-#include <gmtool.h>
 #include <kernel/config.h>
 #include <kernel/save.h>
 
+#include <eressea.h>
+#include <gmtool.h>
+
 #include "races/races.h"
+#include "spells/spells.h"
+#include "curses.h"
 
 #include <assert.h>
 #include <locale.h>
