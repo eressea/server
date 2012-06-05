@@ -35,7 +35,7 @@ local function two_factions()
   return f1, f2
 end
 
-module("tests.common", package.seeall, lunit.testcase)
+module("tests.eressea.common", package.seeall, lunit.testcase)
 
 function setup()
     free_game()

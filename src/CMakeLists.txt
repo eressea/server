@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 2.6)
 project (eressea C)
 
+IF(CMAKE_COMPILER_IS_GNUCC)
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long")
+ELSE(CMAKE_COMPILER_IS_GNUCC)
+    MESSAGE(STATUS "Unknown compiler ${CMAKE_C_COMPILER_ID}")
+ENDIF(CMAKE_COMPILER_IS_GNUCC)
+
 set (ERESSEA_LIBRARY ${PROJECT_NAME} CACHE INTERNAL "Eressea Core Library")
 set (ERESSEA_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "Eressea Core headers")
 

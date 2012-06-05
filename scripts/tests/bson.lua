@@ -1,6 +1,6 @@
 require "lunit"
 
-module("tests.bson", package.seeall, lunit.testcase)
+module("tests.eressea.bson", package.seeall, lunit.testcase)
 
 function setup()
     free_game()
