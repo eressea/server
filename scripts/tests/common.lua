@@ -917,6 +917,50 @@ function test_parser()
     assert_not_equal(0, u:get_skill("melee"))
 end
 
+function test_bug_1922()
+    -- see http://bugs.eressea.de/view.php?id=1922
+    local r = region.create(0, 0, "ocean")    
+    local r2 = region.create(1, 0, "plain")
+    r2:set_flag(2) -- region should not be accessible
+
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+
+    local s = _test_create_ship(r)
+
+    settings.set("rules.ship.drifting","0") -- ships are not drifting
+    settings.set("rules.economy.food","4") -- does not need silver
+
+    u.ship = s
+    u:clear_orders()
+    u:add_order("NACH O")
+    u:set_skill("sailing",120) -- supadupa captain able to drive a trireme
+    process_orders()
+    assert_not_equal(r2,u.region) -- unit should not reach r2.
+   
+end
+
+
+function test_bug_1922_by_foot()
+    -- see http://bugs.eressea.de/view.php?id=1922
+    local r = region.create(0, 0, "plain")    
+    local r2 = region.create(1, 0, "plain")
+    r2:set_flag(2) -- region should not be accessible
+
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+
+    settings.set("rules.economy.food","4") -- does not need silver
+
+    u:clear_orders()
+    u:add_order("NACH O")
+  
+    process_orders()
+    assert_not_equal(r2,u.region) -- unit should not reach r2.
+   
+end
+    
+
 function test_bug_1814()
     -- see http://bugs.eressea.de/view.php?id=1814
     local r = region.create(0, 0, "mountain")

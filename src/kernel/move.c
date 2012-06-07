@@ -704,6 +704,7 @@ static float damage_drift(void)
 static void drifting_ships(region * r)
 {
   direction_t d;
+  if (get_param_int(global.parameters, "rules.ship.drifting", 1)==0) return;
 
   if (fval(r->terrain, SEA_REGION)) {
     ship **shp = &r->ships;
@@ -1718,7 +1719,7 @@ sail(unit * u, order * ord, boolean move_on_land, region_list ** routep)
 
     assert(sh == u->ship || !"ship has sunk, but we didn't notice it");
 
-    if (fval(next_point->terrain, FORBIDDEN_REGION)) {
+    if (fval(next_point->terrain, FORBIDDEN_REGION)||fval(next_point,RF_BLOCKED)) {
       ADDMSG(&f->msgs, msg_message("sailforbidden",
           "ship region", sh, next_point));
       break;
