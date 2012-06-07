@@ -3,7 +3,7 @@ require "lunit"
 module("tests.eressea.bson", package.seeall, lunit.testcase)
 
 function setup()
-    free_game()
+    eressea.free_game()
 end
 
 function test_bson_create()
@@ -24,12 +24,12 @@ end
 function test_bson_readwrite()
     local i, r = region.create(0, 0, "mountain")
     attrib.create(r, 42)
-    i = write_game("test_read_write.dat")
+    i = eressea.write_game("test_read_write.dat")
     assert_equal(0, i)
-    free_game()
+    eressea.free_game()
     r = get_region(0, 0)
     assert_equal(nil, r)
-    i = read_game("test_read_write.dat")
+    i = eressea.read_game("test_read_write.dat")
     assert_equal(0, i)
     r = get_region(0, 0)
     assert_not_equal(nil, r)

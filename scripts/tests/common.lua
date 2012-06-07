@@ -38,12 +38,12 @@ end
 module("tests.eressea.common", package.seeall, lunit.testcase)
 
 function setup()
-    free_game()
-    write_game("free.dat")
-    settings.set("nmr.removenewbie", "0")
-    settings.set("nmr.timeout", "0")
-    settings.set("NewbieImmunity", "0")
-    settings.set("rules.economy.food", "4")
+    eressea.free_game()
+    eressea.write_game("free.dat")
+    eressea.settings.set("nmr.removenewbie", "0")
+    eressea.settings.set("nmr.timeout", "0")
+    eressea.settings.set("NewbieImmunity", "0")
+    eressea.settings.set("rules.economy.food", "4")
 end
 
 function DISABLE_test_eventbus_fire()
@@ -112,7 +112,7 @@ function test_read_write()
   local uno = u.id
   local result = 0
   assert_equal(r.terrain, "plain")
-  result = write_game("test_read_write.dat", "binary")
+  result = eressea.write_game("test_read_write.dat")
   assert_equal(result, 0)
   assert_not_equal(get_region(0, 0), nil)
   assert_not_equal(get_faction(fno), nil)
@@ -120,11 +120,11 @@ function test_read_write()
   r = nil
   f = nil
   u = nil
-  free_game()
+  eressea.free_game()
   assert_equal(get_region(0, 0), nil)
   assert_equal(nil, get_faction(fno))
   assert_equal(nil, get_unit(uno))
-  result = read_game("test_read_write.dat", "binary")
+  result = eressea.read_game("test_read_write.dat")
   assert_equal(0, result)
   assert_not_equal(nil, get_region(0, 0))
   assert_not_equal(nil, get_faction(fno))
@@ -388,7 +388,7 @@ function test_work()
 end
 
 function test_upkeep()
-    settings.set("rules.economy.food", "0")
+    eressea.settings.set("rules.economy.food", "0")
     local r = region.create(0, 0, "plain")
     local f = faction.create("noreply@eressea.de", "human", "de")
     local u = unit.create(f, r, 5)
@@ -541,7 +541,7 @@ function test_store_unit()
   assert_not_equal(store, nil)
   store:write_unit(u)
   store:close()
-  free_game()
+  eressea.free_game()
   -- recreate world:
   r = region.create(0, 0, "plain")
   f = faction.create("noreply@eressea.de", "human", "de")
@@ -668,7 +668,7 @@ function test_food_is_consumed()
   u:add_item("money", 100)
   u:clear_orders()
   u:add_order("LERNEN Reiten") -- don't work
-  settings.set("rules.economy.food", "4")
+  eressea.settings.set("rules.economy.food", "4")
   process_orders()
   assert_equal(100, u:get_item("money"))
 end
@@ -680,7 +680,7 @@ function test_food_can_override()
   u:add_item("money", 100)
   u:clear_orders()
   u:add_order("LERNEN Reiten") -- don't work
-  settings.set("rules.economy.food", "0")
+  eressea.settings.set("rules.economy.food", "0")
   process_orders()
   assert_equal(90, u:get_item("money"))
 end
@@ -806,10 +806,10 @@ end
 module("tests.report", package.seeall, lunit.testcase)
 
 function setup()
-    free_game()
-    settings.set("nmr.removenewbie", "0")
-    settings.set("nmr.timeout", "0")
-    settings.set("rules.economy.food", "4")
+    eressea.free_game()
+    eressea.settings.set("nmr.removenewbie", "0")
+    eressea.settings.set("nmr.timeout", "0")
+    eressea.settings.set("rules.economy.food", "4")
 end
 
 local function find_in_report(f, pattern, extension)
@@ -894,9 +894,9 @@ end
 module("tests.parser", package.seeall, lunit.testcase)
 
 function setup()
-    free_game()
-    write_game("free.dat")
-    settings.set("rules.economy.food", "4") -- FOOD_IS_FREE
+    eressea.free_game()
+    eressea.write_game("free.dat")
+    eressea.settings.set("rules.economy.food", "4") -- FOOD_IS_FREE
 end
 
 function test_parser()
@@ -909,12 +909,12 @@ function test_parser()
     assert_not_nil(file)
     file:write('ERESSEA ' .. itoa36(f.id) .. ' "' .. f.password .. '"\n')
     file:write('EINHEIT ' .. itoa36(u.id) .. "\n")
-    file:write("LERNEN Hiebwaffen\n")
+    file:write("BENENNEN EINHEIT 'Goldene Herde'\n")
     file:close()
     
     read_orders(filename)
     process_orders()
-    assert_not_equal(0, u:get_skill("melee"))
+    assert_equal("Goldene Herde", u.name)
 end
 
 function test_bug_1922()
@@ -928,8 +928,8 @@ function test_bug_1922()
 
     local s = _test_create_ship(r)
 
-    settings.set("rules.ship.drifting","0") -- ships are not drifting
-    settings.set("rules.economy.food","4") -- does not need silver
+    eressea.settings.set("rules.ship.drifting","0") -- ships are not drifting
+    eressea.settings.set("rules.economy.food","4") -- does not need silver
 
     u.ship = s
     u:clear_orders()
@@ -950,7 +950,7 @@ function test_bug_1922_by_foot()
     local f = faction.create("noreply@eressea.de", "human", "de")
     local u = unit.create(f, r, 1)
 
-    settings.set("rules.economy.food","4") -- does not need silver
+    eressea.settings.set("rules.economy.food","4") -- does not need silver
 
     u:clear_orders()
     u:add_order("NACH O")

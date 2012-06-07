@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.6)
 project (eressea C)
 
+add_subdirectory(bindings)
+
 IF(CMAKE_COMPILER_IS_GNUCC)
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long")
 ELSE(CMAKE_COMPILER_IS_GNUCC)
@@ -88,19 +90,6 @@ set (LIB_SRC
   attributes/raceprefix.c
   attributes/reduceproduction.c
   attributes/targetregion.c
-#  bindings/bind_attrib.c
-  bindings/bind_building.c
-  bindings/bind_faction.c
-  bindings/bind_gmtool.c
-  bindings/bind_hashtable.c
-  bindings/bindings.c
-  bindings/bind_message.c
-  bindings/bind_region.c
-  bindings/bind_ship.c
-  bindings/bind_sqlite.c
-  bindings/bind_storage.c
-  bindings/bind_unit.c
-  bindings/helpers.c
   eressea.c
   gamecode/archetype.c
   gamecode/creation.c
@@ -218,7 +207,7 @@ set (LIB_SRC
   util/xml.c
 )
 
-add_library(${ERESSEA_LIBRARY} ${LIB_SRC} ${LIB_HDR})
+add_library(${ERESSEA_LIBRARY} ${LIB_SRC} ${BIND_SRC} ${LIB_HDR})
 target_link_libraries(${ERESSEA_LIBRARY} ${ERESSEA_LIBRARIES})
 
 add_executable(${PROJECT_NAME}_test ${TEST_SRC})

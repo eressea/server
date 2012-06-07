@@ -1,0 +1,8 @@
+$#include <bindings/bind_process.h>
+
+module eressea {
+  module process {
+    void process_markets @ markets(void);
+    void process_produce @ produce(void);
+  }
+}
