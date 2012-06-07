@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 project (eressea C)
 
-add_subdirectory(bindings)
-
 IF(CMAKE_COMPILER_IS_GNUCC)
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long")
 ELSE(CMAKE_COMPILER_IS_GNUCC)
@@ -11,6 +9,8 @@ ENDIF(CMAKE_COMPILER_IS_GNUCC)
 
 set (ERESSEA_LIBRARY ${PROJECT_NAME} CACHE INTERNAL "Eressea Core Library")
 set (ERESSEA_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "Eressea Core headers")
+
+add_subdirectory(bindings)
 
 find_package (Lua51 REQUIRED)
 find_package (ToLua REQUIRED)
