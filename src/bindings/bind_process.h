@@ -6,6 +6,11 @@ extern "C" {
 
 void process_produce(void);
 void process_markets(void);
+void process_make_temp(void);
+void process_settings(void);
+void process_group(void);
+void process_origin(void);
+void process_quit(void);
 
 #ifdef __cplusplus
 }

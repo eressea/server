@@ -4,5 +4,10 @@ module eressea {
   module process {
     void process_markets @ markets(void);
     void process_produce @ produce(void);
+    void process_make_temp @ make_temp(void);
+	void process_settings @ settings(void);
+	void process_group @ set_group(void);
+	void process_origin @ set_origin(void);
+	void process_quit @ quit(void);
   }
 }

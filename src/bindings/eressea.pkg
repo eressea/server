@@ -4,4 +4,5 @@ module eressea {
 	void eressea_free_game @ free_game(void);
 	int eressea_read_game @ read_game(const char * filename);
 	int eressea_write_game @ write_game(const char * filename);
+	int eressea_read_orders @ read_orders(const char * filename);
 }

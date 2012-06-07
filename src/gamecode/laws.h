@@ -45,6 +45,16 @@ extern "C" {
   extern int dropouts[2];
   extern int *age;
 
+  extern void new_units(void);
+  extern void quit(void);
+  extern int password_cmd(struct unit *u, struct order *ord);
+  extern int banner_cmd(struct unit *u, struct order *ord);
+  extern int email_cmd(struct unit *u, struct order *ord);
+  extern int send_cmd(struct unit *u, struct order *ord);
+  extern int origin_cmd(struct unit *u, struct order *ord);
+  extern int group_cmd(struct unit *u, struct order *ord);
+  extern int quit_cmd(struct unit *u, struct order *ord);
+
 #ifdef __cplusplus
 }
 #endif

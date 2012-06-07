@@ -912,7 +912,7 @@ function test_parser()
     file:write("BENENNEN EINHEIT 'Goldene Herde'\n")
     file:close()
     
-    read_orders(filename)
+    eressea.read_orders(filename)
     process_orders()
     assert_equal("Goldene Herde", u.name)
 end
@@ -975,7 +975,7 @@ function test_bug_1814()
     file:write("; ARBEITE\n")
     file:close()
     
-    read_orders(filename)
+    eressea.read_orders(filename)
     process_orders()
     init_reports()
     write_report(f)
@@ -996,7 +996,7 @@ function test_bug_1679()
     file:write("ARBEITEN\n")
     file:close()
     
-    read_orders(filename)
+    eressea.read_orders(filename)
     process_orders()
     init_reports()
     write_report(f)
@@ -1103,7 +1103,7 @@ function test_bug_1875_use_normal()
     local r = region.create(0, 0, "plain")    
     r:set_resource("peasant", 0)
 
-    settings.set("rules.economy.food", "0") -- food is not free
+    eressea.settings.set("rules.economy.food", "0") -- food is not free
     
     local f = faction.create("noreply@eressea.de", "demon", "de")
     local u = unit.create(f, r, 1)
@@ -1126,7 +1126,7 @@ function test_bug_1875_use_help()
     local r = region.create(0, 0, "plain")    
     r:set_resource("peasant", 0)
 
-    settings.set("rules.economy.food", "0") -- food is not free
+    eressea.settings.set("rules.economy.food", "0") -- food is not free
 
     local f = faction.create("noreply@eressea.de", "demon", "de")
     local u = unit.create(f, r, 1)
@@ -1153,7 +1153,7 @@ function test_bug_1875_use_own_first()
     local r = region.create(0, 0, "plain")    
     r:set_resource("peasant", 0)
 
-    settings.set("rules.economy.food", "0") -- food is not free
+    eressea.settings.set("rules.economy.food", "0") -- food is not free
 
     local f = faction.create("noreply@eressea.de", "demon", "de")
     local u = unit.create(f, r, 1)

@@ -540,12 +540,6 @@ static int tolua_write_summary(lua_State * L)
   return 0;
 }
 
-static int tolua_free_game(lua_State * L)
-{
-  free_gamedata();
-  return 0;
-}
-
 static int tolua_write_map(lua_State * L)
 {
   const char *filename = tolua_tostring(L, 1, 0);
@@ -553,31 +547,6 @@ static int tolua_write_map(lua_State * L)
     crwritemap(filename);
   }
   return 0;
-}
-
-static int tolua_write_game(lua_State * L)
-{
-  const char *filename = tolua_tostring(L, 1, 0);
-  const char *mode = tolua_tostring(L, 2, 0);
-  int result, m = IO_BINARY;
-  if (mode && strcmp(mode, "text") == 0)
-    m = IO_TEXT;
-  remove_empty_factions();
-  result = writegame(filename, m);
-  tolua_pushnumber(L, (lua_Number) result);
-  return 1;
-}
-
-static int tolua_read_game(lua_State * L)
-{
-  const char *filename = tolua_tostring(L, 1, 0);
-  const char *mode = tolua_tostring(L, 2, 0);
-  int rv, m = IO_BINARY;
-  if (mode && strcmp(mode, "text") == 0)
-    m = IO_TEXT;
-  rv = readgame(filename, m, false);
-  tolua_pushnumber(L, (lua_Number) rv);
-  return 1;
 }
 
 static int tolua_read_turn(lua_State * L)
@@ -1208,9 +1177,6 @@ int tolua_bindings_open(lua_State * L)
     tolua_function(L, TOLUA_CAST "factions", tolua_get_factions);
     tolua_function(L, TOLUA_CAST "regions", tolua_get_regions);
     tolua_function(L, TOLUA_CAST "read_turn", tolua_read_turn);
-    tolua_function(L, TOLUA_CAST "read_game", tolua_read_game);
-    tolua_function(L, TOLUA_CAST "write_game", tolua_write_game);
-    tolua_function(L, TOLUA_CAST "free_game", tolua_free_game);
     tolua_function(L, TOLUA_CAST "write_map", &tolua_write_map);
     tolua_function(L, TOLUA_CAST "read_orders", tolua_read_orders);
     tolua_function(L, TOLUA_CAST "process_orders", tolua_process_orders);

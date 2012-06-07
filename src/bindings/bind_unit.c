@@ -28,6 +28,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/building.h>
 #include <kernel/config.h>
 #include <kernel/faction.h>
+#include <kernel/group.h>
 #include <kernel/item.h>
 #include <kernel/magic.h>
 #include <kernel/message.h>
@@ -139,6 +140,25 @@ int tolua_unitlist_next(lua_State * L)
     return 1;
   } else
     return 0;                   /* no more values to return */
+}
+
+static int tolua_unit_get_group(lua_State * L)
+{
+  unit *u = (unit *) tolua_tousertype(L, 1, 0);
+  group *g = get_group(u);
+  if (g) {
+    tolua_pushstring(L, g->name);
+    return 1;
+  }
+  return 0;
+}
+
+static int tolua_unit_set_group(lua_State * L)
+{
+  unit *self = (unit *) tolua_tousertype(L, 1, 0);
+  int result = join_group(self, tolua_tostring(L, 2, 0));
+  tolua_pushnumber(L, result);
+  return 1;
 }
 
 static int tolua_unit_get_name(lua_State * L)
@@ -936,9 +956,9 @@ void tolua_unit_open(lua_State * L)
         tolua_unit_set_name);
       tolua_variable(L, TOLUA_CAST "faction", &tolua_unit_get_faction,
         tolua_unit_set_faction);
-      tolua_variable(L, TOLUA_CAST "id", &tolua_unit_get_id, tolua_unit_set_id);
-      tolua_variable(L, TOLUA_CAST "info", &tolua_unit_get_info,
-        tolua_unit_set_info);
+      tolua_variable(L, TOLUA_CAST "id", tolua_unit_get_id, tolua_unit_set_id);
+      tolua_variable(L, TOLUA_CAST "group", tolua_unit_get_group, tolua_unit_set_group);
+      tolua_variable(L, TOLUA_CAST "info", tolua_unit_get_info, tolua_unit_set_info);
       tolua_variable(L, TOLUA_CAST "hp", &tolua_unit_get_hp, tolua_unit_set_hp);
       tolua_variable(L, TOLUA_CAST "status", &tolua_unit_get_status,
         tolua_unit_set_status);

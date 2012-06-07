@@ -7,6 +7,7 @@ extern "C" {
 void eressea_free_game(void);
 int eressea_read_game(const char * filename);
 int eressea_write_game(const char * filename);
+int eressea_read_orders(const char * filename);
 
 #ifdef __cplusplus
 }

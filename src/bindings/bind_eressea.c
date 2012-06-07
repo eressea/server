@@ -15,5 +15,10 @@ int eressea_read_game(const char * filename) {
 } 
 
 int eressea_write_game(const char * filename) {
+  remove_empty_factions();
   return writegame(filename, IO_BINARY);
+}
+
+int eressea_read_orders(const char * filename) {
+  return readorders(filename);
 }

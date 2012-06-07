@@ -1117,7 +1117,7 @@ static boolean EnhancedQuit(void)
   return value;
 }
 
-static int quit_cmd(unit * u, struct order *ord)
+int quit_cmd(unit * u, struct order *ord)
 {
   faction *f = u->faction;
   const char *passwd;
@@ -1159,7 +1159,7 @@ static int quit_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-static void quit(void)
+void quit(void)
 {
   faction **fptr = &factions;
   while (*fptr) {
@@ -2107,7 +2107,7 @@ static int mail_cmd(unit * u, struct order *ord)
 
 /* ------------------------------------------------------------- */
 
-static int banner_cmd(unit * u, struct order *ord)
+int banner_cmd(unit * u, struct order *ord)
 {
   init_tokens(ord);
   skip_token();
@@ -2120,7 +2120,7 @@ static int banner_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-static int email_cmd(unit * u, struct order *ord)
+int email_cmd(unit * u, struct order *ord)
 {
   const char *s;
 
@@ -2142,7 +2142,7 @@ static int email_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-static int password_cmd(unit * u, struct order *ord)
+int password_cmd(unit * u, struct order *ord)
 {
   char pwbuf[32];
   int i;
@@ -2182,7 +2182,7 @@ static int password_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-static int send_cmd(unit * u, struct order *ord)
+int send_cmd(unit * u, struct order *ord)
 {
   const char *s;
   int option;
@@ -2516,7 +2516,7 @@ static int promotion_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-static int group_cmd(unit * u, struct order *ord)
+int group_cmd(unit * u, struct order *ord)
 {
   const char *s;
 
@@ -2528,7 +2528,7 @@ static int group_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-static int origin_cmd(unit * u, struct order *ord)
+int origin_cmd(unit * u, struct order *ord)
 {
   short px, py;
 
@@ -3291,7 +3291,7 @@ int checkunitnumber(const faction * f, int add)
   return 0;
 }
 
-static void new_units(void)
+void new_units(void)
 {
   region *r;
   unit *u, *u2;
@@ -4154,7 +4154,7 @@ void init_processor(void)
 
   p += 10;
   add_proc_unit(p, &setdefaults, "Default-Befehle");
-  add_proc_order(p, K_BANNER, &banner_cmd, 0, NULL);
+  add_proc_order(p, K_BANNER, banner_cmd, 0, NULL);
   add_proc_order(p, K_EMAIL, &email_cmd, 0, NULL);
   add_proc_order(p, K_PASSWORD, &password_cmd, 0, NULL);
   add_proc_order(p, K_SEND, &send_cmd, 0, NULL);

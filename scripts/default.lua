@@ -26,7 +26,7 @@ function nmr_check(maxnmrs)
   if nmrs >= maxnmrs then
     print("Shit. More than " .. maxnmrs .. " factions with 1 NMR (" .. nmrs .. ")")
     write_summary()
-    write_game("aborted.dat")
+    eressea.write_game("aborted.dat")
     return -1
   end
   print (nmrs .. " Factions with 1 NMR")
@@ -35,10 +35,7 @@ end
 
 function open_game(turn)
   file = "" .. get_turn()
-  if read_game(file .. ".dat", "binary")~=0 then
-    return read_game(file, "text")
-  end
-  return 0
+  return eressea.read_game(file .. ".dat")
 end
 
 function write_emails(locales)
