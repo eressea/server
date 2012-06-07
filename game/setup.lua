@@ -1,9 +1,9 @@
 local srcpath = config.source_dir
-local respath = srcpath .. '/server/res'
+local respath = srcpath .. '/res'
 local paths = {
-  'server/scripts/?.lua',
-  'core/scripts/?.lua',
-  'dependencies/lunit/?.lua'
+  'scripts/?.lua',
+  'eressea/scripts/?.lua',
+  'lunit/?.lua'
 }
 
 for idx, path in pairs(paths) do

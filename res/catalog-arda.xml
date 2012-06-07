@@ -6,5 +6,5 @@
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
     <rewriteURI
         uriStartString="eressea:///core/"
-        rewritePrefix="../../core/res/" />
+        rewritePrefix="../eressea/res/" />
 </catalog>

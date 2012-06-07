@@ -3,11 +3,11 @@ project (server C)
 
 find_package (Lua51 REQUIRED)
 find_package (LibXml2 REQUIRED)
-find_package (Sqlite3 REQUIRED)
+find_package (SQLite3 REQUIRED)
 find_package (ToLua REQUIRED)
 find_package (Curses REQUIRED)
 
-include_directories (${CORE_INCLUDE_DIR})
+include_directories (${ERESSEA_INCLUDE_DIR})
 include_directories (${CRITBIT_INCLUDE_DIR})
 include_directories (${CRYPTO_INCLUDE_DIR})
 include_directories (${QUICKLIST_INCLUDE_DIR})
@@ -18,18 +18,9 @@ include_directories (${BSON_INCLUDE_DIR})
 include_directories (${INIPARSER_INCLUDE_DIR})
 
 add_executable(server main.c)
-
-target_link_libraries(server eressea)
-target_link_libraries(server ${QUICKLIST_LIBRARIES})
-target_link_libraries(server ${CRITBIT_LIBRARIES})
-target_link_libraries(server ${BSON_LIBRARIES})
-target_link_libraries(server ${CRYPTO_LIBRARIES})
-target_link_libraries(server ${INIPARSER_LIBRARIES})
-target_link_libraries(server ${CUTEST_LIBRARIES})
-target_link_libraries(server ${CURSES_LIBRARIES})
-target_link_libraries(server ${LUA_LIBRARIES})
-target_link_libraries(server ${TOLUA_LIBRARIES})
-target_link_libraries(server ${LIBXML2_LIBRARIES})
-target_link_libraries(server ${SQLITE3_LIBRARIES})
-
-add_test (server server --tests)
+target_link_libraries(server
+  ${ERESSEA_LIBRARY}
+  ${BINDINGS_LIBRARY}
+  ${TOLUA_LIBRARIES}
+  ${SQLITE3_LIBRARIES}
+)

@@ -3,10 +3,10 @@ require "lunit"
 module("tests.rules", package.seeall, lunit.testcase)
 
 function setup()
-  free_game()
-  settings.set("nmr.removenewbie", "0")
-  settings.set("nmr.timeout", "0")
-  settings.set("NewbieImmunity", "0")
+    eressea.free_game()
+    eressea.settings.set("nmr.removenewbie", "0")
+    eressea.settings.set("nmr.timeout", "0")
+    eressea.settings.set("NewbieImmunity", "0")
 end
 
 function test_landing1()
