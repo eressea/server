@@ -41,6 +41,8 @@ include_directories (${LIBXML2_INCLUDE_DIR})
 include_directories (${BSON_INCLUDE_DIR})
 include_directories (${INIPARSER_INCLUDE_DIR})
 
+FILE (GLOB_RECURSE LIB_HDR *.h)
+
 set (TEST_SRC
   tests.c
   tests_test.c
@@ -216,7 +218,7 @@ set (LIB_SRC
   util/xml.c
 )
 
-add_library(${ERESSEA_LIBRARY} ${LIB_SRC})
+add_library(${ERESSEA_LIBRARY} ${LIB_SRC} ${LIB_HDR})
 target_link_libraries(${ERESSEA_LIBRARY} ${ERESSEA_LIBRARIES})
 
 add_executable(${PROJECT_NAME}_test ${TEST_SRC})

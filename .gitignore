@@ -12,3 +12,4 @@ Release/
 src/*.vcproj.*.user
 tags
 build-vs2010
+config
