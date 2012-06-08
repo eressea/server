@@ -1181,8 +1181,8 @@ static void rotting_herbs(void)
   for (r = regions; r; r = r->next) {
     unit *u;
     for (u = r->units; u; u = u->next) {
-      item **itmp = &u->items, *hbag =
-        *i_find(itmp, olditemtype[I_SACK_OF_CONSERVATION]);
+      item **itmp = &u->items;
+      item *hbag = *i_find(itmp, olditemtype[I_SACK_OF_CONSERVATION]);
       int rot_chance = rule_rot;
 
       if (hbag)

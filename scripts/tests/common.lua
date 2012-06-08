@@ -1097,3 +1097,82 @@ function test_building_unique()
     assert_equal(1, bcount) -- only one should be completed
    end
 end
+
+function test_bug_1875_use_normal()
+    -- see http://bugs.eressea.de/view.php?id=1875
+    local r = region.create(0, 0, "plain")    
+    r:set_resource("peasant", 0)
+
+    settings.set("rules.economy.food", "0") -- food is not free
+    
+    local f = faction.create("noreply@eressea.de", "demon", "de")
+    local u = unit.create(f, r, 1)
+
+    u:add_item("peasantblood", 1)
+    u:add_order("BENUTZE 1 Bauernblut")
+
+    assert_equal(1, u:get_item("peasantblood")) 
+    assert_equal(0, u:get_potion("peasantblood"))
+
+    process_orders()
+
+    assert_equal(0, u:get_item("peasantblood")) 
+    assert_equal(0, r:get_resource("peasant")) 
+    assert_equal(99, u:get_potion("peasantblood")) -- unit used one peasantblood effect
+end
+
+function test_bug_1875_use_help()
+    -- see http://bugs.eressea.de/view.php?id=1875
+    local r = region.create(0, 0, "plain")    
+    r:set_resource("peasant", 0)
+
+    settings.set("rules.economy.food", "0") -- food is not free
+
+    local f = faction.create("noreply@eressea.de", "demon", "de")
+    local u = unit.create(f, r, 1)
+    local u2 = unit.create(f, r, 1)
+
+    u:add_item("peasantblood", 1)
+    u:add_order("BENUTZE 1 Bauernblut")
+
+    assert_equal(1, u:get_item("peasantblood")) 
+    assert_equal(0, u:get_potion("peasantblood"))
+    assert_equal(0, u2:get_item("peasantblood")) 
+    assert_equal(0, u2:get_potion("peasantblood"))
+
+    process_orders()
+
+    assert_equal(0, u:get_item("peasantblood")) 
+    assert_equal(0, r:get_resource("peasant")) 
+    assert_equal(0, u2:get_potion("peasantblood")) -- first unit helps this unit
+    assert_equal(98, u:get_potion("peasantblood")) -- unit uses one peasantblood effect
+end
+
+function test_bug_1875_use_own_first()
+    -- see http://bugs.eressea.de/view.php?id=1875
+    local r = region.create(0, 0, "plain")    
+    r:set_resource("peasant", 0)
+
+    settings.set("rules.economy.food", "0") -- food is not free
+
+    local f = faction.create("noreply@eressea.de", "demon", "de")
+    local u = unit.create(f, r, 1)
+    local u2 = unit.create(f, r, 1)
+
+    u:add_item("peasantblood", 1)
+    u:add_order("BENUTZE 1 Bauernblut")
+    u2:add_item("peasantblood", 1)
+    u2:add_order("BENUTZE 1 Bauernblut")
+
+    assert_equal(1, u:get_item("peasantblood")) 
+    assert_equal(0, u:get_potion("peasantblood"))
+    assert_equal(1, u2:get_item("peasantblood")) 
+    assert_equal(0, u2:get_potion("peasantblood"))
+
+    process_orders()
+
+    assert_equal(0, u:get_item("peasantblood")) 
+    assert_equal(0, r:get_resource("peasant")) 
+    assert_equal(99, u:get_potion("peasantblood")) -- unit uses one peasantblood effect
+    assert_equal(99, u2:get_potion("peasantblood")) -- u2 uses its own effect before u's
+end

@@ -333,20 +333,27 @@ void get_food(region * r)
    */
   for (u = r->units; u; u = u->next) {
     if (u->race == new_race[RC_DAEMON]) {
-      unit *donor = r->units;
       int hungry = u->number;
 
-      while (donor != NULL && hungry > 0) {
-        /* always start with the first known unit that may have some blood */
-        static const struct potion_type *pt_blood;
-        if (pt_blood == NULL) {
-          const item_type *it_blood = it_find("peasantblood");
-          if (it_blood)
-            pt_blood = it_blood->rtype->ptype;
-        }
-        if (pt_blood != NULL) {
+      /* use peasantblood before eating the peasants themselves */
+      static const struct potion_type *pt_blood;
+      if (pt_blood == NULL) {
+        const item_type *it_blood = it_find("peasantblood");
+        if (it_blood)
+          pt_blood = it_blood->rtype->ptype;
+      }
+      if (pt_blood != NULL) {
+        /* always start with the unit itself, then the first known unit that may have some blood */
+        unit *donor = u;
+        while (donor != NULL && hungry > 0) {
+          int blut = get_effect(donor, pt_blood);
+          blut = MIN(blut, hungry);
+          change_effect(donor, pt_blood, -blut);
+          hungry -= blut;
+          if (donor == u)
+            donor = r->units;
           while (donor != NULL) {
-            if (donor->race == new_race[RC_DAEMON]) {
+            if (donor->race == new_race[RC_DAEMON] && donor!=u) {
               if (get_effect(donor, pt_blood)) {
                 /* if he's in our faction, drain him: */
                 if (donor->faction == u->faction)
@@ -355,14 +362,9 @@ void get_food(region * r)
             }
             donor = donor->next;
           }
-          if (donor != NULL) {
-            int blut = get_effect(donor, pt_blood);
-            blut = MIN(blut, hungry);
-            change_effect(donor, pt_blood, -blut);
-            hungry -= blut;
-          }
         }
       }
+      /* remaining demons feed on peasants */
       if (pl == NULL || !fval(pl, PFL_NOFEED)) {
         if (peasantfood >= hungry) {
           peasantfood -= hungry;
@@ -377,15 +379,9 @@ void get_food(region * r)
             demon_hunger = get_param_int(global.parameters, "hunger.demons", 0);
           }
           if (demon_hunger == 0) {
-            /* nicht gefütterte dämonen hungern */
-#ifdef PEASANT_HUNGRY_DAEMONS_HAVE_FULL_SKILLS
-            /* wdw special rule */
-            hunger(hungry, u);
-#else
+            /* demons who don't feed are hungry */
             if (hunger(hungry, u))
               fset(u, UFL_HUNGER);
-#endif
-            /* used to be: hunger(hungry, u); */
           } else {
             /* no damage, but set the hungry-flag */
             fset(u, UFL_HUNGER);

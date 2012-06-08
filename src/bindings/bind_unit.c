@@ -23,6 +23,7 @@ without prior permission by the authors of Eressea.
 #include <attributes/key.h>
 
 /*  kernel includes */
+#include <kernel/alchemy.h>
 #include <kernel/building.h>
 #include <kernel/config.h>
 #include <kernel/faction.h>
@@ -326,6 +327,24 @@ static int tolua_unit_get_item(lua_State * L)
       result = i_get(self->items, itype);
     }
   }
+  lua_pushinteger(L, result);
+  return 1;
+}
+
+static int tolua_unit_get_effect(lua_State * L)
+{
+  const unit *self = (unit *)tolua_tousertype(L, 1, 0);
+  const char *potion_name = tolua_tostring(L, 2, 0);
+  int result = -1;
+  const potion_type *pt_potion;
+  const item_type *it_potion = it_find(potion_name);
+
+  if (it_potion != NULL) {
+    pt_potion = it_potion->rtype->ptype;
+    if (pt_potion != NULL)
+      result = get_effect(self, pt_potion);
+  }
+
   lua_pushinteger(L, result);
   return 1;
 }
@@ -946,6 +965,9 @@ void tolua_unit_open(lua_State * L)
       tolua_variable(L, TOLUA_CAST "items", &tolua_unit_get_items, 0);
       tolua_function(L, TOLUA_CAST "get_pooled", &tolua_unit_get_pooled);
       tolua_function(L, TOLUA_CAST "use_pooled", &tolua_unit_use_pooled);
+
+      /* effects */
+      tolua_function(L, TOLUA_CAST "get_potion", &tolua_unit_get_effect);
 
       /*  skills: */
       tolua_function(L, TOLUA_CAST "get_skill", &tolua_unit_getskill);
