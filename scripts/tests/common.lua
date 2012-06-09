@@ -936,7 +936,7 @@ function test_bug_1922()
     u:add_order("NACH O")
     u:set_skill("sailing",120) -- supadupa captain able to drive a trireme
     process_orders()
-    assert_not_equal(r2,u.region) -- unit should not reach r2.
+    assert_not_equal(r2.id, u.region.id) -- unit should not reach r2.
    
 end
 
@@ -956,7 +956,7 @@ function test_bug_1922_by_foot()
     u:add_order("NACH O")
   
     process_orders()
-    assert_not_equal(r2,u.region) -- unit should not reach r2.
+    assert_not_equal(r2.id, u.region.id) -- unit should not reach r2.
    
 end
     
