@@ -11,6 +11,7 @@ without prior permission by the authors of Eressea.
 */
 
 #include <platform.h>
+#include <kernel/types.h>
 
 #include "bind_unit.h"
 #ifdef BSON_ATTRIB

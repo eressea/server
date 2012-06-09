@@ -19,9 +19,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifndef H_KRNL_ALCHEMY_H
 #define H_KRNL_ALCHEMY_H
 
-#include <kernel/types.h>
-#include <util/variant.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
