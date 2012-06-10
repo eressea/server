@@ -4,7 +4,7 @@
 #include <kernel/types.h>
 #include <kernel/config.h>
 #include <kernel/save.h>
-
+#include <bindings/bindings.h>
 #include <eressea.h>
 #include <gmtool.h>
 
@@ -12,6 +12,7 @@
 #include "spells/spells.h"
 #include "curses.h"
 
+#include <lua.h>
 #include <assert.h>
 #include <locale.h>
 #include <wctype.h>
@@ -194,9 +195,10 @@ extern void bind_eressea(struct lua_State *L);
 int main(int argc, char **argv)
 {
   int err, result = 0;
+  lua_State *L;
 
   setup_signal_handler();
-
+  log_open("eressea.log");
   parse_config(inifile);
 
   err = parse_args(argc, argv, &result);
@@ -204,24 +206,20 @@ int main(int argc, char **argv)
     return result;
   }
 
-  log_open("eressea.log");
   locale_init();
 
 #ifdef CRTDBG
   init_crtdbg();
 #endif
 
-  err = eressea_init();
-  if (err) {
-    log_error("initialization failed with code %d\n", err);
-    return err;
-  }
+  L = lua_init();
+  game_init();
   register_races();
   register_curses();
   register_spells();
-  bind_eressea((struct lua_State *)global.vm_state);
+  bind_eressea(L);
 
-  err = eressea_run(luafile, entry_point);
+  err = eressea_run(L, luafile, entry_point);
   if (err) {
     log_error("server execution failed with code %d\n", err);
     return err;
@@ -230,7 +228,8 @@ int main(int argc, char **argv)
   malloc_stats();
 #endif
 
-  eressea_done();
+  game_done();
+  lua_done(L);
   log_close();
   if (global.inifile)
     iniparser_free(global.inifile);

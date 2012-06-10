@@ -5,10 +5,10 @@ module("tests.e3.spells-e2", package.seeall, lunit.testcase)
 local r, f, u
 
 function setup()
-    free_game()
-    settings.set("magic.regeneration.enable", "0")
-    settings.set("magic.fumble.enable", "0")
-    settings.set("rules.economy.food", "4")
+    eressea.free_game()
+    eressea.settings.set("magic.regeneration.enable", "0")
+    eressea.settings.set("magic.fumble.enable", "0")
+    eressea.settings.set("rules.economy.food", "4")
 
     r = region.create(0, 0, "plain")
     f = faction.create("spell_payment@eressea.de", "elf", "de")

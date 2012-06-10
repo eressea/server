@@ -3,13 +3,13 @@ require "lunit"
 module("tests.e3.e2features", package.seeall, lunit.testcase )
 
 function setup()
-    free_game()
-    settings.set("nmr.timeout", "0")
-    settings.set("rules.economy.food", "4")
+    eressea.free_game()
+    eressea.settings.set("nmr.timeout", "0")
+    eressea.settings.set("rules.economy.food", "4")
 end
 
 function test_learn()
-    settings.set("study.random_progress", "0")
+    eressea.settings.set("study.random_progress", "0")
     local r = region.create(0, 0, "plain")
     local f = faction.create("noreply@eressea.de", "human", "de")
     f.age = 20
@@ -28,7 +28,7 @@ function test_learn()
 end
 
 function test_teach()
-    settings.set("study.random_progress", "0")
+    eressea.settings.set("study.random_progress", "0")
     local r = region.create(0, 0, "plain")
     local f = faction.create("noreply@eressea.de", "human", "de")
     f.age = 20
