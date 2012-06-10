@@ -13,10 +13,17 @@ function test_eressea()
 end
 
 function test_process()
+	assert_equal("function", _G.type(eressea.process.update_long_order))
 	assert_equal("function", _G.type(eressea.process.markets))
 	assert_equal("function", _G.type(eressea.process.produce))
+
 	assert_equal("function", _G.type(eressea.process.make_temp))
 	assert_equal("function", _G.type(eressea.process.settings))
+	assert_equal("function", _G.type(eressea.process.set_allies))
+	assert_equal("function", _G.type(eressea.process.set_prefix))
+	assert_equal("function", _G.type(eressea.process.set_stealth))
+	assert_equal("function", _G.type(eressea.process.set_status))
+	assert_equal("function", _G.type(eressea.process.set_description))
 	assert_equal("function", _G.type(eressea.process.set_group))
 	assert_equal("function", _G.type(eressea.process.set_origin))
 	assert_equal("function", _G.type(eressea.process.quit))

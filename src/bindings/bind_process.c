@@ -16,6 +16,16 @@ void process_produce(void) {
   }
 }
 
+void process_update_long_order(void) {
+  region * r;
+  for (r=regions; r; r=r->next) {
+    unit * u;
+    for (u=r->units; u; u=u->next) {
+      update_long_order(u);
+    }
+  }
+}
+
 void process_markets(void) {
   do_markets();
 }
@@ -63,6 +73,26 @@ static void process_cmd(keyword_t kwd, int (*callback)(unit *, order *))
       }
     }
   }
+}
+
+void process_ally(void) {
+  process_cmd(K_ALLY, ally_cmd);
+}
+
+void process_prefix(void) {
+  process_cmd(K_PREFIX, prefix_cmd);
+}
+
+void process_setstealth(void) {
+  process_cmd(K_SETSTEALTH, setstealth_cmd);
+}
+
+void process_status(void) {
+  process_cmd(K_STATUS, status_cmd);
+}
+
+void process_display(void) {
+  process_cmd(K_DISPLAY, display_cmd);
 }
 
 void process_group(void) {

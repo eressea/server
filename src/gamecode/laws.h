@@ -47,14 +47,21 @@ extern "C" {
 
   extern void new_units(void);
   extern void quit(void);
+  extern void update_long_order(struct unit * u);
   extern int password_cmd(struct unit *u, struct order *ord);
   extern int banner_cmd(struct unit *u, struct order *ord);
   extern int email_cmd(struct unit *u, struct order *ord);
   extern int send_cmd(struct unit *u, struct order *ord);
-  extern int origin_cmd(struct unit *u, struct order *ord);
+  extern int ally_cmd(struct unit* u, struct order *ord);
+  extern int prefix_cmd(struct unit *u, struct order *ord);
+  extern int setstealth_cmd(struct unit *u, struct order *ord);
+  extern int status_cmd(struct unit *u, struct order *ord);
+  extern int display_cmd(struct unit *u, struct order *ord);
   extern int group_cmd(struct unit *u, struct order *ord);
+  extern int origin_cmd(struct unit *u, struct order *ord);
   extern int quit_cmd(struct unit *u, struct order *ord);
-
+  extern int name_cmd(struct unit *u, struct order *ord);
+  
 #ifdef __cplusplus
 }
 #endif

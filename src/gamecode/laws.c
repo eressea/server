@@ -1306,7 +1306,7 @@ static void parse_restart(void)
 
 /* HELFE partei [<ALLES | SILBER | GIB | KAEMPFE | WAHRNEHMUNG>] [NICHT] */
 
-static int ally_cmd(unit * u, struct order *ord)
+int ally_cmd(unit * u, struct order *ord)
 {
   ally *sf, **sfp;
   faction *f;
@@ -1461,7 +1461,7 @@ static void init_prefixnames(void)
   }
 }
 
-static int prefix_cmd(unit * u, struct order *ord)
+int prefix_cmd(unit * u, struct order *ord)
 {
   attrib **ap;
   const char *s;
@@ -1523,7 +1523,7 @@ static cmp_building_cb get_cmp_region_owner(void)
   }
 }
 
-static int display_cmd(unit * u, struct order *ord)
+int display_cmd(unit * u, struct order *ord)
 {
   char **s = NULL;
   const char *str;
@@ -1689,7 +1689,7 @@ rename_building(unit * u, order * ord, building * b, const char *name)
   return rename_cmd(u, ord, &b->name, name);
 }
 
-static int name_cmd(unit * u, struct order *ord)
+int name_cmd(struct unit *u, struct order *ord)
 {
   building *b = u->building;
   region *r = u->region;
@@ -2572,7 +2572,7 @@ static int reshow_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-static int status_cmd(unit * u, struct order *ord)
+int status_cmd(unit * u, struct order *ord)
 {
   const char *param;
 
@@ -3429,7 +3429,7 @@ void check_long_orders(unit * u)
   }
 }
 
-static void setdefaults(unit * u)
+void update_long_order(unit * u)
 {
   order *ord;
   boolean trade = false;
@@ -4043,7 +4043,7 @@ void process(void)
                     cmistake(u, ord, 224, MSG_MAGIC);
                     ord = NULL;
                   } else if (fval(u, UFL_LONGACTION)) {
-                    /* this message was already given in laws.setdefaults
+                    /* this message was already given in laws.update_long_order
                        cmistake(u, ord, 52, MSG_PRODUCE);
                      */
                     ord = NULL;
@@ -4153,7 +4153,7 @@ void init_processor(void)
   add_proc_global(p, &new_units, "Neue Einheiten erschaffen");
 
   p += 10;
-  add_proc_unit(p, &setdefaults, "Default-Befehle");
+  add_proc_unit(p, update_long_order, "Langen Befehl aktualisieren");
   add_proc_order(p, K_BANNER, banner_cmd, 0, NULL);
   add_proc_order(p, K_EMAIL, &email_cmd, 0, NULL);
   add_proc_order(p, K_PASSWORD, &password_cmd, 0, NULL);
