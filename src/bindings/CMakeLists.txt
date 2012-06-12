@@ -23,7 +23,6 @@ include_directories (${CUTEST_INCLUDE_DIR})
 include_directories (${LUA_INCLUDE_DIR})
 include_directories (${TOLUA_INCLUDE_DIR})
 include_directories (${LIBXML2_INCLUDE_DIR})
-include_directories (${BSON_INCLUDE_DIR})
 include_directories (${INIPARSER_INCLUDE_DIR})
 
 FILE (GLOB_RECURSE LIB_HDR *.h)
