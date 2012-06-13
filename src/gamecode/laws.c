@@ -3777,7 +3777,7 @@ static void age_factions(void)
   }
 }
 
-static int use_cmd(unit * u, struct order *ord)
+int use_cmd(unit * u, struct order *ord)
 {
   const char *t;
   int n, err = ENOITEM;

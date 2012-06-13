@@ -105,3 +105,40 @@ function test_process_quit()
 	eressea.read_game('test.dat')
 	assert_equal(nil, _G.get_faction(fno))
 end
+
+function test_process_make()
+    u.region:set_resource('tree', 100)
+	u:set_skill('forestry', 1)
+	u:add_order('MACHE HOLZ')
+	eressea.process.produce()
+	assert_equal(1, u:get_item('log'))
+end
+
+function test_process_teach()
+	u:add_order("LERNEN Holzfaellen")
+    eressea.process.update_long_order()
+	eressea.process.study()
+	x, y = u.faction:get_origin()
+	assert_equal(1, u:get_skill('forestry'))
+end
+
+function test_process_study()
+	u:set_skill('forestry', 3)
+	u2 = _G.unit.create(f, r, 10)
+    u2:clear_orders()
+	u2:set_skill('forestry', 1)
+	u2:add_order("LERNEN Holzfaellen")
+	u:add_order("LEHREN " .. _G.itoa36(u2.id))
+	eressea.process.update_long_order()
+	eressea.process.study()
+	assert_equal(2, u2:get_skill('forestry'))
+end
+
+function test_process_move()
+    r2 = _G.region.create(1, 0, 'plain')
+	u:add_order('NACH O')
+    eressea.process.update_long_order()
+	eressea.process.movement()
+	assert_equal(r2, u.region)
+end
+

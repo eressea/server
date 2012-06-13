@@ -61,6 +61,7 @@ extern "C" {
   extern int origin_cmd(struct unit *u, struct order *ord);
   extern int quit_cmd(struct unit *u, struct order *ord);
   extern int name_cmd(struct unit *u, struct order *ord);
+  extern int use_cmd(struct unit *u, struct order *ord);
   
 #ifdef __cplusplus
 }

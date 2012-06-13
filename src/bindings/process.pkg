@@ -4,7 +4,7 @@ module eressea {
 	module process {
 		void process_update_long_order @ update_long_order(void);
 		void process_markets @ markets(void); /* operate the e3 markets */
-		void process_produce @ produce(void); /* BUY/SELL/ENTERTAIN/WORK/TAX/STEAL/SPY/SABOTAGE/PLANT/BREED/RESEARCH */
+		void process_produce @ produce(void); /* MAKE+BUY/SELL/ENTERTAIN/WORK/TAX/STEAL/SPY/SABOTAGE/PLANT/BREED/RESEARCH */
 		void process_make_temp @ make_temp(void); /* MAKE TEMP */
 		void process_settings @ settings(void); /* EMAIL/PASSWORD/BANNER/OPTION */
 		void process_ally @ set_allies(void); /* HELP */
@@ -15,5 +15,8 @@ module eressea {
 		void process_group @ set_group(void); /* GROUP */
 		void process_origin @ set_origin(void); /* ORIGIN */
 		void process_quit @ quit(void); /* QUIT */
+		void process_study @ study(void); /* LEARN/TEACH */
+		void process_movement @ movement(void); /* MOVE/FOLLOW/ROUTE */
+		void process_use @ use(void); /* USE */
 	}
 }

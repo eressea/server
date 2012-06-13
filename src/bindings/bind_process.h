@@ -18,6 +18,9 @@ void process_display(void);
 void process_group(void);
 void process_origin(void);
 void process_quit(void);
+void process_study(void);
+void process_movement(void);
+void process_use(void);
 
 #ifdef __cplusplus
 }

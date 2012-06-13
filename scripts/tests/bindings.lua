@@ -27,6 +27,9 @@ function test_process()
 	assert_equal("function", _G.type(eressea.process.set_group))
 	assert_equal("function", _G.type(eressea.process.set_origin))
 	assert_equal("function", _G.type(eressea.process.quit))
+	assert_equal("function", _G.type(eressea.process.study))
+	assert_equal("function", _G.type(eressea.process.movement))
+	assert_equal("function", _G.type(eressea.process.use))
 end
 
 function test_settings()

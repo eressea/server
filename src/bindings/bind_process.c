@@ -5,14 +5,56 @@
 #include <kernel/order.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
+#include <kernel/move.h>
 #include <gamecode/economy.h>
 #include <gamecode/laws.h>
 #include <gamecode/market.h>
+#include <gamecode/study.h>
+
+static void process_cmd(keyword_t kwd, int (*callback)(unit *, order *))
+{
+  region * r;
+  for (r=regions; r; r=r->next) {
+    unit * u;
+    for (u=r->units; u; u=u->next) {
+      order * ord;
+      for (ord=u->orders; ord; ord=ord->next) {
+        if (kwd == get_keyword(ord)) {
+          callback(u, ord);
+        }
+      }
+    }
+  }
+}
+
+static void process_long_cmd(keyword_t kwd, int (*callback)(unit *, order *))
+{
+  region * r;
+  for (r=regions; r; r=r->next) {
+    unit * u;
+    for (u=r->units; u; u=u->next) {
+      order * ord = u->thisorder;
+      if (kwd == get_keyword(ord)) {
+        callback(u, ord);
+      }
+    }
+  }
+}
 
 void process_produce(void) {
   struct region *r;
   for (r = regions; r; r = r->next) {
+    unit * u;
+    for (u=r->units; u; u=u->next) {
+      order * ord;
+      for (ord=u->orders; ord; ord=ord->next) {
+        if (K_MAKE == get_keyword(ord)) {
+          make_cmd(u, ord);
+        }
+      }
+    }
     produce(r);
+    split_allocations(r);
   }
 }
 
@@ -59,22 +101,6 @@ void process_settings(void) {
   }
 }
 
-static void process_cmd(keyword_t kwd, int (*callback)(unit *, order *))
-{
-  region * r;
-  for (r=regions; r; r=r->next) {
-    unit * u;
-    for (u=r->units; u; u=u->next) {
-      order * ord;
-      for (ord=u->orders; ord; ord=ord->next) {
-        if (kwd == get_keyword(ord)) {
-          callback(u, ord);
-        }
-      }
-    }
-  }
-}
-
 void process_ally(void) {
   process_cmd(K_ALLY, ally_cmd);
 }
@@ -106,4 +132,17 @@ void process_origin(void) {
 void process_quit(void) {
   process_cmd(K_QUIT, quit_cmd);
   quit();
+}
+
+void process_study(void) {
+  process_long_cmd(K_TEACH, teach_cmd);
+  process_long_cmd(K_STUDY, learn_cmd);
+}
+
+void process_movement(void) {
+  movement();
+}
+
+void process_use(void) {
+  process_cmd(K_USE, use_cmd);
 }
