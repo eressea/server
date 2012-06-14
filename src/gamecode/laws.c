@@ -1063,6 +1063,112 @@ static void transfer_faction(faction * f, faction * f2)
   }
 }
 
+/* test if the unit can slip through a siege undetected.
+ * returns 0 if siege is successful, or 1 if the building is either
+ * not besieged or the unit can slip through the siege due to better stealth.
+ */
+static int slipthru(const region * r, const unit * u, const building * b)
+{
+  unit *u2;
+  int n, o;
+
+  /* b ist die burg, in die man hinein oder aus der man heraus will. */
+  if (b == NULL || b->besieged < b->size * SIEGEFACTOR) {
+    return 1;
+  }
+
+  /* u wird am hinein- oder herausschluepfen gehindert, wenn STEALTH <=
+   * OBSERVATION +2 der belagerer u2 ist */
+  n = eff_skill(u, SK_STEALTH, r);
+
+  for (u2 = r->units; u2; u2 = u2->next) {
+    if (usiege(u2) == b) {
+
+      if (invisible(u, u2) >= u->number)
+        continue;
+
+      o = eff_skill(u2, SK_PERCEPTION, r);
+
+      if (o + 2 >= n) {
+        return 0;               /* entdeckt! */
+      }
+    }
+  }
+  return 1;
+}
+
+int can_contact(const region * r, const unit * u, const unit * u2) {
+
+  /* hier geht es nur um die belagerung von burgen */
+
+  if (u->building == u2->building) {
+    return 1;
+  }
+
+  /* unit u is trying to contact u2 - unasked for contact. wenn u oder u2
+   * nicht in einer burg ist, oder die burg nicht belagert ist, ist
+   * slipthru () == 1. ansonsten ist es nur 1, wenn man die belagerer */
+
+  if (slipthru(u->region, u, u->building) && slipthru(u->region, u2, u2->building)) {
+    return 1;
+  }
+
+  return (alliedunit(u, u2->faction, HELP_GIVE));
+}
+
+void contact_cmd(unit * u, order * ord, int final)
+{
+  /* unit u kontaktiert unit u2. Dies setzt den contact einfach auf 1 -
+   * ein richtiger toggle ist (noch?) nicht noetig. die region als
+   * parameter ist nur deswegen wichtig, weil er an getunit ()
+   * weitergegeben wird. dies wird fuer das auffinden von tempunits in
+   * getnewunit () verwendet! */
+  unit *u2;
+  region *r = u->region;
+
+  init_tokens(ord);
+  skip_token();
+  u2 = getunitg(r, u->faction);
+
+  if (u2 != NULL) {
+    if (!can_contact(r, u, u2)) {
+      if (final) {
+        cmistake(u, u->thisorder, 23, MSG_EVENT);
+      }
+      return;
+    }
+    usetcontact(u, u2);
+  }
+}
+
+int leave_cmd(unit * u, struct order *ord)
+{
+  region *r = u->region;
+
+  if (fval(u, UFL_ENTER)) {
+    /* if we just entered this round, then we don't leave again */
+    return 0;
+  }
+
+  if (fval(r->terrain, SEA_REGION) && u->ship) {
+    if (!fval(u->race, RCF_SWIM)) {
+      cmistake(u, ord, 11, MSG_MOVE);
+      return 0;
+    }
+    if (has_horses(u)) {
+      cmistake(u, ord, 231, MSG_MOVE);
+      return 0;
+    }
+  }
+  if (!slipthru(r, u, u->building)) {
+    ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder, "entrance_besieged",
+        "building", u->building));
+  } else {
+    leave(u, true);
+  }
+  return 0;
+}
+
 static int restart_cmd(unit * u, struct order *ord)
 {
   init_tokens(ord);
@@ -1157,6 +1263,230 @@ int quit_cmd(unit * u, struct order *ord)
     log_warning("QUIT with illegal password for faction %s: %s\n", factionid(f), buffer);
   }
   return 0;
+}
+
+static boolean mayenter(region * r, unit * u, building * b)
+{
+  unit *u2;
+  if (fval(b, BLD_UNGUARDED))
+    return true;
+  u2 = building_owner(b);
+
+  if (u2 == NULL || ucontact(u2, u)
+    || alliedunit(u2, u->faction, HELP_GUARD))
+    return true;
+
+  return false;
+}
+
+static int mayboard(const unit * u, ship * sh)
+{
+  unit *u2 = ship_owner(sh);
+
+  return (!u2 || ucontact(u2, u) || alliedunit(u2, u->faction, HELP_GUARD));
+}
+
+static boolean CheckOverload(void)
+{
+  static int value = -1;
+  if (value < 0) {
+    value = get_param_int(global.parameters, "rules.check_overload", 0);
+  }
+  return value;
+}
+
+int enter_ship(unit * u, struct order *ord, int id, int report)
+{
+  region *r = u->region;
+  ship *sh;
+
+  /* Muß abgefangen werden, sonst könnten Schwimmer an
+   * Bord von Schiffen an Land gelangen. */
+  if (!fval(u->race, RCF_CANSAIL) || (!fval(u->race, RCF_WALK)
+      && !fval(u->race, RCF_FLY))) {
+    cmistake(u, ord, 233, MSG_MOVE);
+    return 0;
+  }
+
+  sh = findship(id);
+  if (sh == NULL || sh->region != r) {
+    if (report)
+      cmistake(u, ord, 20, MSG_MOVE);
+    return 0;
+  }
+  if (sh == u->ship) {
+    return 1;
+  }
+  if (!mayboard(u, sh)) {
+    if (report)
+      cmistake(u, ord, 34, MSG_MOVE);
+    return 0;
+  }
+  if (CheckOverload()) {
+    int sweight, scabins;
+    int mweight = shipcapacity(sh);
+    int mcabins = sh->type->cabins;
+
+    if (mweight > 0) {
+      getshipweight(sh, &sweight, &scabins);
+      sweight += weight(u);
+      if (mcabins) {
+        int pweight = u->number * u->race->weight;
+        /* weight goes into number of cabins, not cargo */
+        scabins += pweight;
+        sweight -= pweight;
+      }
+
+      if (sweight > mweight || (mcabins && (scabins > mcabins))) {
+        if (report)
+          cmistake(u, ord, 34, MSG_MOVE);
+        return 0;
+      }
+    }
+  }
+
+  if (leave(u, 0)) {
+    u_set_ship(u, sh);
+    fset(u, UFL_ENTER);
+  }
+  return 1;
+}
+
+int enter_building(unit * u, order * ord, int id, int report)
+{
+  region *r = u->region;
+  building *b;
+
+  /* Schwimmer können keine Gebäude betreten, außer diese sind
+   * auf dem Ozean */
+  if (!fval(u->race, RCF_WALK) && !fval(u->race, RCF_FLY)) {
+    if (!fval(r->terrain, SEA_REGION)) {
+      if (report) {
+        cmistake(u, ord, 232, MSG_MOVE);
+      }
+      return 0;
+    }
+  }
+
+  b = findbuilding(id);
+  if (b == NULL || b->region != r) {
+    if (report) {
+      cmistake(u, ord, 6, MSG_MOVE);
+    }
+    return 0;
+  }
+  if (!mayenter(r, u, b)) {
+    if (report) {
+      ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "entrance_denied",
+          "building", b));
+    }
+    return 0;
+  }
+  if (!slipthru(r, u, b)) {
+    if (report) {
+      ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "entrance_besieged",
+          "building", b));
+    }
+    return 0;
+  }
+
+  if (leave(u, 0)) {
+    fset(u, UFL_ENTER);
+    u_set_building(u, b);
+    return 1;
+  }
+  return 0;
+}
+
+static void do_misc(region * r, int is_final_attempt)
+{
+  unit **uptr, *uc;
+
+  for (uc = r->units; uc; uc = uc->next) {
+    order *ord;
+    for (ord = uc->orders; ord; ord = ord->next) {
+      keyword_t kwd = get_keyword(ord);
+      if (kwd == K_CONTACT) {
+        contact_cmd(uc, ord, is_final_attempt);
+      }
+    }
+  }
+
+  for (uptr = &r->units; *uptr;) {
+    unit *u = *uptr;
+    order **ordp = &u->orders;
+
+    while (*ordp) {
+      order *ord = *ordp;
+      if (get_keyword(ord) == K_ENTER) {
+        param_t p;
+        int id;
+        unit *ulast = NULL;
+        const char * s;
+
+        init_tokens(ord);
+        skip_token();
+        s = getstrtoken();
+        p = findparam_ex(s, u->faction->locale);
+        id = getid();
+
+        switch (p) {
+        case P_BUILDING:
+        case P_GEBAEUDE:
+          if (u->building && u->building->no == id)
+            break;
+          if (enter_building(u, ord, id, is_final_attempt)) {
+            unit *ub;
+            for (ub = u; ub; ub = ub->next) {
+              if (ub->building == u->building) {
+                ulast = ub;
+              }
+            }
+          }
+          break;
+
+        case P_SHIP:
+          if (u->ship && u->ship->no == id)
+            break;
+          if (enter_ship(u, ord, id, is_final_attempt)) {
+            unit *ub;
+            ulast = u;
+            for (ub = u; ub; ub = ub->next) {
+              if (ub->ship == u->ship) {
+                ulast = ub;
+              }
+            }
+          }
+          break;
+
+        default:
+          if (is_final_attempt) {
+            cmistake(u, ord, 79, MSG_MOVE);
+          }
+        }
+        if (ulast != NULL) {
+          /* Wenn wir hier angekommen sind, war der Befehl
+           * erfolgreich und wir löschen ihn, damit er im
+           * zweiten Versuch nicht nochmal ausgeführt wird. */
+          *ordp = ord->next;
+          ord->next = NULL;
+          free_order(ord);
+
+          if (ulast != u) {
+            /* put u behind ulast so it's the last unit in the building */
+            *uptr = u->next;
+            u->next = ulast->next;
+            ulast->next = u;
+          }
+          break;
+        }
+      }
+      if (*ordp == ord)
+        ordp = &ord->next;
+    }
+    if (*uptr == u)
+      uptr = &u->next;
+  }
 }
 
 void quit(void)
