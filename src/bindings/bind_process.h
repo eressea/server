@@ -21,6 +21,7 @@ void process_quit(void);
 void process_study(void);
 void process_movement(void);
 void process_use(void);
+void process_leave(void);
 
 #ifdef __cplusplus
 }

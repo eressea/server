@@ -30,6 +30,7 @@ function test_process()
 	assert_equal("function", _G.type(eressea.process.study))
 	assert_equal("function", _G.type(eressea.process.movement))
 	assert_equal("function", _G.type(eressea.process.use))
+	assert_equal("function", _G.type(eressea.process.leave))
 end
 
 function test_settings()

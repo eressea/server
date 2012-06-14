@@ -18,5 +18,6 @@ module eressea {
 		void process_study @ study(void); /* LEARN/TEACH */
 		void process_movement @ movement(void); /* MOVE/FOLLOW/ROUTE */
 		void process_use @ use(void); /* USE */
+		void process_leave @ leave(void); /* LEAVE */
 	}
 }

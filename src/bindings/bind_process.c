@@ -146,3 +146,7 @@ void process_movement(void) {
 void process_use(void) {
   process_cmd(K_USE, use_cmd);
 }
+
+void process_leave(void) {
+  process_cmd(K_LEAVE, leave_cmd);
+}

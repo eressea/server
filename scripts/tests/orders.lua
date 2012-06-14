@@ -137,8 +137,19 @@ end
 function test_process_move()
     r2 = _G.region.create(1, 0, 'plain')
 	u:add_order('NACH O')
+	assert_not_equal(r2, u.region)
     eressea.process.update_long_order()
 	eressea.process.movement()
 	assert_equal(r2, u.region)
+end
+
+function test_process_leave()
+    r2 = _G.region.create(1, 0, 'plain')
+    b = _G.building.create(r, "castle")
+    u.building = b
+	assert_equal(b, u.building)
+	u:add_order('VERLASSEN')
+	eressea.process.leave()
+	assert_not_equal(b, u.building)
 end
 
