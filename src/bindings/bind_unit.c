@@ -11,6 +11,7 @@ without prior permission by the authors of Eressea.
 */
 
 #include <platform.h>
+#include <kernel/types.h>
 
 #include "bind_unit.h"
 #ifdef BSON_ATTRIB
@@ -23,9 +24,11 @@ without prior permission by the authors of Eressea.
 #include <attributes/key.h>
 
 /*  kernel includes */
+#include <kernel/alchemy.h>
 #include <kernel/building.h>
 #include <kernel/config.h>
 #include <kernel/faction.h>
+#include <kernel/group.h>
 #include <kernel/item.h>
 #include <kernel/magic.h>
 #include <kernel/message.h>
@@ -137,6 +140,25 @@ int tolua_unitlist_next(lua_State * L)
     return 1;
   } else
     return 0;                   /* no more values to return */
+}
+
+static int tolua_unit_get_group(lua_State * L)
+{
+  unit *u = (unit *) tolua_tousertype(L, 1, 0);
+  group *g = get_group(u);
+  if (g) {
+    tolua_pushstring(L, g->name);
+    return 1;
+  }
+  return 0;
+}
+
+static int tolua_unit_set_group(lua_State * L)
+{
+  unit *self = (unit *) tolua_tousertype(L, 1, 0);
+  int result = join_group(self, tolua_tostring(L, 2, 0));
+  tolua_pushnumber(L, result);
+  return 1;
 }
 
 static int tolua_unit_get_name(lua_State * L)
@@ -326,6 +348,24 @@ static int tolua_unit_get_item(lua_State * L)
       result = i_get(self->items, itype);
     }
   }
+  lua_pushinteger(L, result);
+  return 1;
+}
+
+static int tolua_unit_get_effect(lua_State * L)
+{
+  const unit *self = (unit *)tolua_tousertype(L, 1, 0);
+  const char *potion_name = tolua_tostring(L, 2, 0);
+  int result = -1;
+  const potion_type *pt_potion;
+  const item_type *it_potion = it_find(potion_name);
+
+  if (it_potion != NULL) {
+    pt_potion = it_potion->rtype->ptype;
+    if (pt_potion != NULL)
+      result = get_effect(self, pt_potion);
+  }
+
   lua_pushinteger(L, result);
   return 1;
 }
@@ -916,9 +956,9 @@ void tolua_unit_open(lua_State * L)
         tolua_unit_set_name);
       tolua_variable(L, TOLUA_CAST "faction", &tolua_unit_get_faction,
         tolua_unit_set_faction);
-      tolua_variable(L, TOLUA_CAST "id", &tolua_unit_get_id, tolua_unit_set_id);
-      tolua_variable(L, TOLUA_CAST "info", &tolua_unit_get_info,
-        tolua_unit_set_info);
+      tolua_variable(L, TOLUA_CAST "id", tolua_unit_get_id, tolua_unit_set_id);
+      tolua_variable(L, TOLUA_CAST "group", tolua_unit_get_group, tolua_unit_set_group);
+      tolua_variable(L, TOLUA_CAST "info", tolua_unit_get_info, tolua_unit_set_info);
       tolua_variable(L, TOLUA_CAST "hp", &tolua_unit_get_hp, tolua_unit_set_hp);
       tolua_variable(L, TOLUA_CAST "status", &tolua_unit_get_status,
         tolua_unit_set_status);
@@ -946,6 +986,9 @@ void tolua_unit_open(lua_State * L)
       tolua_variable(L, TOLUA_CAST "items", &tolua_unit_get_items, 0);
       tolua_function(L, TOLUA_CAST "get_pooled", &tolua_unit_get_pooled);
       tolua_function(L, TOLUA_CAST "use_pooled", &tolua_unit_use_pooled);
+
+      /* effects */
+      tolua_function(L, TOLUA_CAST "get_potion", &tolua_unit_get_effect);
 
       /*  skills: */
       tolua_function(L, TOLUA_CAST "get_skill", &tolua_unit_getskill);

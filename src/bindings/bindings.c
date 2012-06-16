@@ -13,7 +13,14 @@ without prior permission by the authors of Eressea.
 #include <platform.h>
 #include "bindings.h"
 #include "bind_unit.h"
+#include "bind_storage.h"
+#include "bind_building.h"
+#include "bind_hashtable.h"
+#include "bind_message.h"
+#include "bind_building.h"
 #include "bind_faction.h"
+#include "bind_ship.h"
+#include "bind_gmtool.h"
 #include "bind_region.h"
 #include "helpers.h"
 
@@ -54,6 +61,7 @@ without prior permission by the authors of Eressea.
 
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/console.h>
 #include <util/eventbus.h>
 #include <util/language.h>
 #include <util/lists.h>
@@ -66,9 +74,17 @@ without prior permission by the authors of Eressea.
 #include <iniparser.h>
 #include <tolua.h>
 #include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
 
 #include <time.h>
 #include <assert.h>
+
+#define TOLUA_PKG(NAME) extern void tolua_##NAME##_open(lua_State * L)
+
+TOLUA_PKG(eressea);
+TOLUA_PKG(process);
+TOLUA_PKG(settings);
 
 int log_lua_error(lua_State * L)
 {
@@ -524,12 +540,6 @@ static int tolua_write_summary(lua_State * L)
   return 0;
 }
 
-static int tolua_free_game(lua_State * L)
-{
-  free_gamedata();
-  return 0;
-}
-
 static int tolua_write_map(lua_State * L)
 {
   const char *filename = tolua_tostring(L, 1, 0);
@@ -537,31 +547,6 @@ static int tolua_write_map(lua_State * L)
     crwritemap(filename);
   }
   return 0;
-}
-
-static int tolua_write_game(lua_State * L)
-{
-  const char *filename = tolua_tostring(L, 1, 0);
-  const char *mode = tolua_tostring(L, 2, 0);
-  int result, m = IO_BINARY;
-  if (mode && strcmp(mode, "text") == 0)
-    m = IO_TEXT;
-  remove_empty_factions();
-  result = writegame(filename, m);
-  tolua_pushnumber(L, (lua_Number) result);
-  return 1;
-}
-
-static int tolua_read_game(lua_State * L)
-{
-  const char *filename = tolua_tostring(L, 1, 0);
-  const char *mode = tolua_tostring(L, 2, 0);
-  int rv, m = IO_BINARY;
-  if (mode && strcmp(mode, "text") == 0)
-    m = IO_TEXT;
-  rv = readgame(filename, m, false);
-  tolua_pushnumber(L, (lua_Number) rv);
-  return 1;
 }
 
 static int tolua_read_turn(lua_State * L)
@@ -1016,21 +1001,6 @@ int tolua_read_xml(lua_State * L)
   return 0;
 }
 
-int tolua_process_markets(lua_State * L)
-{
-  do_markets();
-  return 0;
-}
-
-int tolua_process_produce(lua_State * L)
-{
-  region *r;
-  for (r = regions; r; r = r->next) {
-    produce(r);
-  }
-  return 0;
-}
-
 typedef struct event_args {
   int hfunction;
   int hargs;
@@ -1104,21 +1074,6 @@ static int tolua_report_unit(lua_State * L)
   return 1;
 }
 
-static int tolua_settings_get(lua_State * L)
-{
-  const char *name = tolua_tostring(L, 1, 0);
-  tolua_pushstring(L, get_param(global.parameters, name));
-  return 1;
-}
-
-static int tolua_settings_set(lua_State * L)
-{
-  const char *name = tolua_tostring(L, 1, 0);
-  const char *value = tolua_tostring(L, 2, 0);
-  set_param(&global.parameters, name, value);
-  return 0;
-}
-
 static void parse_inifile(lua_State * L, dictionary * d, const char *section)
 {
   int i;
@@ -1148,9 +1103,13 @@ static void parse_inifile(lua_State * L, dictionary * d, const char *section)
   lua_rawset(L, -3);
 }
 
-int tolua_eressea_open(lua_State * L)
+int tolua_bindings_open(lua_State * L)
 {
   tolua_open(L);
+
+  tolua_eressea_open(L);
+  tolua_process_open(L);
+  tolua_settings_open(L);
 
   /* register user types */
   tolua_usertype(L, TOLUA_CAST "spell");
@@ -1163,12 +1122,6 @@ int tolua_eressea_open(lua_State * L)
   tolua_module(L, NULL, 0);
   tolua_beginmodule(L, NULL);
   {
-    tolua_module(L, "process", 0);
-    tolua_beginmodule(L, "process");
-    {
-      tolua_function(L, "markets", &tolua_process_markets);
-      tolua_function(L, "produce", &tolua_process_produce);
-    } tolua_endmodule(L);
     tolua_cclass(L, TOLUA_CAST "alliance", TOLUA_CAST "alliance",
       TOLUA_CAST "", NULL);
     tolua_beginmodule(L, TOLUA_CAST "alliance");
@@ -1198,12 +1151,6 @@ int tolua_eressea_open(lua_State * L)
       tolua_function(L, TOLUA_CAST "register", &tolua_eventbus_register);
       tolua_function(L, TOLUA_CAST "fire", &tolua_eventbus_fire);
     } tolua_endmodule(L);
-    tolua_module(L, TOLUA_CAST "settings", 1);
-    tolua_beginmodule(L, TOLUA_CAST "settings");
-    {
-      tolua_function(L, TOLUA_CAST "set", &tolua_settings_set);
-      tolua_function(L, TOLUA_CAST "get", &tolua_settings_get);
-    } tolua_endmodule(L);
     tolua_module(L, TOLUA_CAST "report", 1);
     tolua_beginmodule(L, TOLUA_CAST "report");
     {
@@ -1230,9 +1177,6 @@ int tolua_eressea_open(lua_State * L)
     tolua_function(L, TOLUA_CAST "factions", tolua_get_factions);
     tolua_function(L, TOLUA_CAST "regions", tolua_get_regions);
     tolua_function(L, TOLUA_CAST "read_turn", tolua_read_turn);
-    tolua_function(L, TOLUA_CAST "read_game", tolua_read_game);
-    tolua_function(L, TOLUA_CAST "write_game", tolua_write_game);
-    tolua_function(L, TOLUA_CAST "free_game", tolua_free_game);
     tolua_function(L, TOLUA_CAST "write_map", &tolua_write_map);
     tolua_function(L, TOLUA_CAST "read_orders", tolua_read_orders);
     tolua_function(L, TOLUA_CAST "process_orders", tolua_process_orders);
@@ -1278,4 +1222,95 @@ int tolua_eressea_open(lua_State * L)
     tolua_function(L, TOLUA_CAST "read_xml", tolua_read_xml);
   } tolua_endmodule(L);
   return 1;
+}
+
+static const struct {
+  const char *name;
+  int (*func) (lua_State *);
+} lualibs[] = {
+  {
+  "", luaopen_base}, {
+  LUA_TABLIBNAME, luaopen_table}, {
+  LUA_IOLIBNAME, luaopen_io}, {
+  LUA_STRLIBNAME, luaopen_string}, {
+  LUA_MATHLIBNAME, luaopen_math}, {
+  LUA_LOADLIBNAME, luaopen_package}, {
+  LUA_DBLIBNAME, luaopen_debug},
+#if LUA_VERSION_NUM>=501
+  {
+  LUA_OSLIBNAME, luaopen_os},
+#endif
+  {
+  NULL, NULL}
+};
+
+static void openlibs(lua_State * L)
+{
+  int i;
+  for (i = 0; lualibs[i].func; ++i) {
+    lua_pushcfunction(L, lualibs[i].func);
+    lua_pushstring(L, lualibs[i].name);
+    lua_call(L, 1, 0);
+  }
+}
+
+void lua_done(lua_State * L) {
+  lua_close(L);
+}
+
+lua_State *lua_init(void) {
+  lua_State *L = lua_open();
+
+  openlibs(L);
+#ifdef BINDINGS_TOLUA
+  register_tolua_helpers();
+  tolua_bindings_open(L);
+  tolua_eressea_open(L);
+  tolua_sqlite_open(L);
+  tolua_unit_open(L);
+  tolua_building_open(L);
+  tolua_ship_open(L);
+  tolua_region_open(L);
+  tolua_faction_open(L);
+#ifdef BSON_ATTRIB
+  tolua_attrib_open(L);
+#endif
+  tolua_unit_open(L);
+  tolua_message_open(L);
+  tolua_hashtable_open(L);
+  tolua_gmtool_open(L);
+  tolua_storage_open(L);
+#endif
+  return L;
+}
+
+int eressea_run(lua_State *L, const char *luafile, const char *entry_point)
+{
+  int err;
+
+  global.vm_state = L;
+  /* run the main script */
+  if (luafile) {
+    log_debug("executing script %s\n", luafile);
+    lua_getglobal(L, "dofile");
+    lua_pushstring(L, luafile);
+    err = lua_pcall(L, 1, 0, 0);
+    if (err != 0) {
+      log_lua_error(L);
+      abort();
+      return err;
+    }
+  }
+  if (entry_point) {
+    lua_getglobal(L, entry_point);
+    err = lua_pcall(L, 0, 1, 0);
+    if (err != 0) {
+      log_lua_error(L);
+      abort();
+      return err;
+    }
+  } else {
+    err = lua_console(L);
+  }
+  return err;
 }

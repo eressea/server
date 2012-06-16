@@ -37,6 +37,7 @@ extern "C" {
   boolean renamed_building(const struct building * b);
   int rename_building(struct unit * u, struct order * ord, struct building * b, const char *name);
   void get_food(struct region * r);
+  extern int can_contact(const struct region *r, const struct unit *u, const struct unit *u2);
 
 /* eressea-specific. put somewhere else, please. */
   void processorders(void);
@@ -45,6 +46,29 @@ extern "C" {
   extern int dropouts[2];
   extern int *age;
 
+  extern int enter_building(struct unit *u, struct order *ord, int id, int report);
+  extern int enter_ship(struct unit *u, struct order *ord, int id, int report);
+  extern void contact_cmd(struct unit *u, struct order *ord, int final);
+
+  extern void new_units(void);
+  extern void quit(void);
+  extern void update_long_order(struct unit *u);
+  extern int password_cmd(struct unit *u, struct order *ord);
+  extern int banner_cmd(struct unit *u, struct order *ord);
+  extern int email_cmd(struct unit *u, struct order *ord);
+  extern int send_cmd(struct unit *u, struct order *ord);
+  extern int ally_cmd(struct unit* u, struct order *ord);
+  extern int prefix_cmd(struct unit *u, struct order *ord);
+  extern int setstealth_cmd(struct unit *u, struct order *ord);
+  extern int status_cmd(struct unit *u, struct order *ord);
+  extern int display_cmd(struct unit *u, struct order *ord);
+  extern int group_cmd(struct unit *u, struct order *ord);
+  extern int origin_cmd(struct unit *u, struct order *ord);
+  extern int quit_cmd(struct unit *u, struct order *ord);
+  extern int name_cmd(struct unit *u, struct order *ord);
+  extern int use_cmd(struct unit *u, struct order *ord);
+  extern int leave_cmd(struct unit *u, struct order *ord);
+  
 #ifdef __cplusplus
 }
 #endif

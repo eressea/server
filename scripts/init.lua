@@ -8,7 +8,7 @@ function run_editor()
         turn = read_turn()
         set_turn(turn)
     end
-    read_game(turn .. ".dat")
+    eressea.read_game(turn .. ".dat")
     gmtool.editor()
 end
     

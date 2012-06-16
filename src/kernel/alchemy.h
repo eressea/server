@@ -18,6 +18,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #ifndef H_KRNL_ALCHEMY_H
 #define H_KRNL_ALCHEMY_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -55,6 +56,7 @@ extern "C" {
   extern int use_potion_delayed(struct unit *u, const struct item_type *itype,
     int amount, struct order *);
   extern void init_potions(void);
+
 
   extern int get_effect(const struct unit *u, const struct potion_type *effect);
   extern int change_effect(struct unit *u, const struct potion_type *effect,

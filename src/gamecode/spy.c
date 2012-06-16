@@ -19,9 +19,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include <kernel/config.h>
 #include "spy.h"
+#include "laws.h"
 
 /* kernel includes */
-#include <kernel/build.h>
 #include <kernel/reports.h>
 #include <kernel/item.h>
 #include <kernel/faction.h>

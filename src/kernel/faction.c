@@ -284,19 +284,22 @@ void destroyfaction(faction * f)
   unit *u = f->units;
   faction *ff;
 
-  if (!f->alive)
+  if (!f->alive) {
     return;
+  }
   fset(f, FFL_QUIT);
 
-  spellbook_clear(f->spellbook);
-  free(f->spellbook);
-  f->spellbook = 0;
-
+  if (f->spellbook) {
+    spellbook_clear(f->spellbook);
+    free(f->spellbook);
+    f->spellbook = 0;
+  }
   while (f->battles) {
     struct bmsg *bm = f->battles;
     f->battles = bm->next;
-    if (bm->msgs)
+    if (bm->msgs) {
       free_messagelist(bm->msgs);
+    }
     free(bm);
   }
 

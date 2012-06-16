@@ -38,12 +38,12 @@ end
 module("tests.eressea.common", package.seeall, lunit.testcase)
 
 function setup()
-    free_game()
-    write_game("free.dat")
-    settings.set("nmr.removenewbie", "0")
-    settings.set("nmr.timeout", "0")
-    settings.set("NewbieImmunity", "0")
-    settings.set("rules.economy.food", "4")
+    eressea.free_game()
+    eressea.write_game("free.dat")
+    eressea.settings.set("nmr.removenewbie", "0")
+    eressea.settings.set("nmr.timeout", "0")
+    eressea.settings.set("NewbieImmunity", "0")
+    eressea.settings.set("rules.economy.food", "4")
 end
 
 function DISABLE_test_eventbus_fire()
@@ -112,7 +112,7 @@ function test_read_write()
   local uno = u.id
   local result = 0
   assert_equal(r.terrain, "plain")
-  result = write_game("test_read_write.dat", "binary")
+  result = eressea.write_game("test_read_write.dat")
   assert_equal(result, 0)
   assert_not_equal(get_region(0, 0), nil)
   assert_not_equal(get_faction(fno), nil)
@@ -120,11 +120,11 @@ function test_read_write()
   r = nil
   f = nil
   u = nil
-  free_game()
+  eressea.free_game()
   assert_equal(get_region(0, 0), nil)
   assert_equal(nil, get_faction(fno))
   assert_equal(nil, get_unit(uno))
-  result = read_game("test_read_write.dat", "binary")
+  result = eressea.read_game("test_read_write.dat")
   assert_equal(0, result)
   assert_not_equal(nil, get_region(0, 0))
   assert_not_equal(nil, get_faction(fno))
@@ -388,7 +388,7 @@ function test_work()
 end
 
 function test_upkeep()
-    settings.set("rules.economy.food", "0")
+    eressea.settings.set("rules.economy.food", "0")
     local r = region.create(0, 0, "plain")
     local f = faction.create("noreply@eressea.de", "human", "de")
     local u = unit.create(f, r, 5)
@@ -541,7 +541,7 @@ function test_store_unit()
   assert_not_equal(store, nil)
   store:write_unit(u)
   store:close()
-  free_game()
+  eressea.free_game()
   -- recreate world:
   r = region.create(0, 0, "plain")
   f = faction.create("noreply@eressea.de", "human", "de")
@@ -668,7 +668,7 @@ function test_food_is_consumed()
   u:add_item("money", 100)
   u:clear_orders()
   u:add_order("LERNEN Reiten") -- don't work
-  settings.set("rules.economy.food", "4")
+  eressea.settings.set("rules.economy.food", "4")
   process_orders()
   assert_equal(100, u:get_item("money"))
 end
@@ -680,7 +680,7 @@ function test_food_can_override()
   u:add_item("money", 100)
   u:clear_orders()
   u:add_order("LERNEN Reiten") -- don't work
-  settings.set("rules.economy.food", "0")
+  eressea.settings.set("rules.economy.food", "0")
   process_orders()
   assert_equal(90, u:get_item("money"))
 end
@@ -806,10 +806,10 @@ end
 module("tests.report", package.seeall, lunit.testcase)
 
 function setup()
-    free_game()
-    settings.set("nmr.removenewbie", "0")
-    settings.set("nmr.timeout", "0")
-    settings.set("rules.economy.food", "4")
+    eressea.free_game()
+    eressea.settings.set("nmr.removenewbie", "0")
+    eressea.settings.set("nmr.timeout", "0")
+    eressea.settings.set("rules.economy.food", "4")
 end
 
 local function find_in_report(f, pattern, extension)
@@ -894,9 +894,9 @@ end
 module("tests.parser", package.seeall, lunit.testcase)
 
 function setup()
-    free_game()
-    write_game("free.dat")
-    settings.set("rules.economy.food", "4") -- FOOD_IS_FREE
+    eressea.free_game()
+    eressea.write_game("free.dat")
+    eressea.settings.set("rules.economy.food", "4") -- FOOD_IS_FREE
 end
 
 function test_parser()
@@ -909,13 +909,57 @@ function test_parser()
     assert_not_nil(file)
     file:write('ERESSEA ' .. itoa36(f.id) .. ' "' .. f.password .. '"\n')
     file:write('EINHEIT ' .. itoa36(u.id) .. "\n")
-    file:write("LERNEN Hiebwaffen\n")
+    file:write("BENENNEN EINHEIT 'Goldene Herde'\n")
     file:close()
     
-    read_orders(filename)
+    eressea.read_orders(filename)
     process_orders()
-    assert_not_equal(0, u:get_skill("melee"))
+    assert_equal("Goldene Herde", u.name)
 end
+
+function test_bug_1922()
+    -- see http://bugs.eressea.de/view.php?id=1922
+    local r = region.create(0, 0, "ocean")    
+    local r2 = region.create(1, 0, "plain")
+    r2:set_flag(2) -- region should not be accessible
+
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+
+    local s = _test_create_ship(r)
+
+    eressea.settings.set("rules.ship.drifting","0") -- ships are not drifting
+    eressea.settings.set("rules.economy.food","4") -- does not need silver
+
+    u.ship = s
+    u:clear_orders()
+    u:add_order("NACH O")
+    u:set_skill("sailing",120) -- supadupa captain able to drive a trireme
+    process_orders()
+    assert_not_equal(r2.id, u.region.id) -- unit should not reach r2.
+   
+end
+
+
+function test_bug_1922_by_foot()
+    -- see http://bugs.eressea.de/view.php?id=1922
+    local r = region.create(0, 0, "plain")    
+    local r2 = region.create(1, 0, "plain")
+    r2:set_flag(2) -- region should not be accessible
+
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+
+    eressea.settings.set("rules.economy.food","4") -- does not need silver
+
+    u:clear_orders()
+    u:add_order("NACH O")
+  
+    process_orders()
+    assert_not_equal(r2.id, u.region.id) -- unit should not reach r2.
+   
+end
+    
 
 function test_bug_1814()
     -- see http://bugs.eressea.de/view.php?id=1814
@@ -931,7 +975,7 @@ function test_bug_1814()
     file:write("; ARBEITE\n")
     file:close()
     
-    read_orders(filename)
+    eressea.read_orders(filename)
     process_orders()
     init_reports()
     write_report(f)
@@ -952,7 +996,7 @@ function test_bug_1679()
     file:write("ARBEITEN\n")
     file:close()
     
-    read_orders(filename)
+    eressea.read_orders(filename)
     process_orders()
     init_reports()
     write_report(f)
@@ -1052,4 +1096,83 @@ function test_building_unique()
     end
     assert_equal(1, bcount) -- only one should be completed
    end
+end
+
+function test_bug_1875_use_normal()
+    -- see http://bugs.eressea.de/view.php?id=1875
+    local r = region.create(0, 0, "plain")    
+    r:set_resource("peasant", 0)
+
+    eressea.settings.set("rules.economy.food", "0") -- food is not free
+    
+    local f = faction.create("noreply@eressea.de", "demon", "de")
+    local u = unit.create(f, r, 1)
+
+    u:add_item("peasantblood", 1)
+    u:add_order("BENUTZE 1 Bauernblut")
+
+    assert_equal(1, u:get_item("peasantblood")) 
+    assert_equal(0, u:get_potion("peasantblood"))
+
+    process_orders()
+
+    assert_equal(0, u:get_item("peasantblood")) 
+    assert_equal(0, r:get_resource("peasant")) 
+    assert_equal(99, u:get_potion("peasantblood")) -- unit used one peasantblood effect
+end
+
+function test_bug_1875_use_help()
+    -- see http://bugs.eressea.de/view.php?id=1875
+    local r = region.create(0, 0, "plain")    
+    r:set_resource("peasant", 0)
+
+    eressea.settings.set("rules.economy.food", "0") -- food is not free
+
+    local f = faction.create("noreply@eressea.de", "demon", "de")
+    local u = unit.create(f, r, 1)
+    local u2 = unit.create(f, r, 1)
+
+    u:add_item("peasantblood", 1)
+    u:add_order("BENUTZE 1 Bauernblut")
+
+    assert_equal(1, u:get_item("peasantblood")) 
+    assert_equal(0, u:get_potion("peasantblood"))
+    assert_equal(0, u2:get_item("peasantblood")) 
+    assert_equal(0, u2:get_potion("peasantblood"))
+
+    process_orders()
+
+    assert_equal(0, u:get_item("peasantblood")) 
+    assert_equal(0, r:get_resource("peasant")) 
+    assert_equal(0, u2:get_potion("peasantblood")) -- first unit helps this unit
+    assert_equal(98, u:get_potion("peasantblood")) -- unit uses one peasantblood effect
+end
+
+function test_bug_1875_use_own_first()
+    -- see http://bugs.eressea.de/view.php?id=1875
+    local r = region.create(0, 0, "plain")    
+    r:set_resource("peasant", 0)
+
+    eressea.settings.set("rules.economy.food", "0") -- food is not free
+
+    local f = faction.create("noreply@eressea.de", "demon", "de")
+    local u = unit.create(f, r, 1)
+    local u2 = unit.create(f, r, 1)
+
+    u:add_item("peasantblood", 1)
+    u:add_order("BENUTZE 1 Bauernblut")
+    u2:add_item("peasantblood", 1)
+    u2:add_order("BENUTZE 1 Bauernblut")
+
+    assert_equal(1, u:get_item("peasantblood")) 
+    assert_equal(0, u:get_potion("peasantblood"))
+    assert_equal(1, u2:get_item("peasantblood")) 
+    assert_equal(0, u2:get_potion("peasantblood"))
+
+    process_orders()
+
+    assert_equal(0, u:get_item("peasantblood")) 
+    assert_equal(0, r:get_resource("peasant")) 
+    assert_equal(99, u:get_potion("peasantblood")) -- unit uses one peasantblood effect
+    assert_equal(99, u2:get_potion("peasantblood")) -- u2 uses its own effect before u's
 end

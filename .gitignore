@@ -9,6 +9,7 @@ Release/
 *.opensdf
 *.ipch
 *.sh
+*.tmp
 src/*.vcproj.*.user
 tags
 build-vs2010

@@ -1,0 +1,8 @@
+$#include <bindings/bind_settings.h>
+
+module eressea {
+  module settings {
+    void settings_set @ set(const char *key, const char *value);
+    const char * settings_get @ get(const char *key);
+  }
+}

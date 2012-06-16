@@ -136,6 +136,17 @@ void free_group(group * g)
   free(g);
 }
 
+group * get_group(const struct unit *u)
+{
+  if (fval(u, UFL_GROUP)) {
+    attrib * a = a_find(u->attribs, &at_group);
+    if (a) {
+      return (group *) a->data.v;
+    }
+  }
+  return 0;
+}
+
 void set_group(struct unit *u, struct group *g)
 {
   attrib *a = NULL;

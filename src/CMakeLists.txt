@@ -10,6 +10,8 @@ ENDIF(CMAKE_COMPILER_IS_GNUCC)
 set (ERESSEA_LIBRARY ${PROJECT_NAME} CACHE INTERNAL "Eressea Core Library")
 set (ERESSEA_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "Eressea Core headers")
 
+add_subdirectory(bindings)
+
 find_package (Lua51 REQUIRED)
 find_package (ToLua REQUIRED)
 find_package (LibXml2 REQUIRED)
@@ -17,7 +19,6 @@ find_package (Curses REQUIRED)
 find_package (SQLite3 REQUIRED)
 
 set (ERESSEA_LIBRARIES
-  ${BSON_LIBRARIES}
   ${CUTEST_LIBRARIES}
   ${CRITBIT_LIBRARIES}
   ${QUICKLIST_LIBRARIES}
@@ -38,7 +39,6 @@ include_directories (${CUTEST_INCLUDE_DIR})
 include_directories (${LUA_INCLUDE_DIR})
 include_directories (${TOLUA_INCLUDE_DIR})
 include_directories (${LIBXML2_INCLUDE_DIR})
-include_directories (${BSON_INCLUDE_DIR})
 include_directories (${INIPARSER_INCLUDE_DIR})
 
 FILE (GLOB_RECURSE LIB_HDR *.h)
@@ -88,19 +88,6 @@ set (LIB_SRC
   attributes/raceprefix.c
   attributes/reduceproduction.c
   attributes/targetregion.c
-#  bindings/bind_attrib.c
-  bindings/bind_building.c
-  bindings/bind_faction.c
-  bindings/bind_gmtool.c
-  bindings/bind_hashtable.c
-  bindings/bindings.c
-  bindings/bind_message.c
-  bindings/bind_region.c
-  bindings/bind_ship.c
-  bindings/bind_sqlite.c
-  bindings/bind_storage.c
-  bindings/bind_unit.c
-  bindings/helpers.c
   eressea.c
   gamecode/archetype.c
   gamecode/creation.c
@@ -218,7 +205,7 @@ set (LIB_SRC
   util/xml.c
 )
 
-add_library(${ERESSEA_LIBRARY} ${LIB_SRC} ${LIB_HDR})
+add_library(${ERESSEA_LIBRARY} ${LIB_SRC} ${BIND_SRC} ${LIB_HDR})
 target_link_libraries(${ERESSEA_LIBRARY} ${ERESSEA_LIBRARIES})
 
 add_executable(${PROJECT_NAME}_test ${TEST_SRC})

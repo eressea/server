@@ -333,20 +333,27 @@ void get_food(region * r)
    */
   for (u = r->units; u; u = u->next) {
     if (u->race == new_race[RC_DAEMON]) {
-      unit *donor = r->units;
       int hungry = u->number;
 
-      while (donor != NULL && hungry > 0) {
-        /* always start with the first known unit that may have some blood */
-        static const struct potion_type *pt_blood;
-        if (pt_blood == NULL) {
-          const item_type *it_blood = it_find("peasantblood");
-          if (it_blood)
-            pt_blood = it_blood->rtype->ptype;
-        }
-        if (pt_blood != NULL) {
+      /* use peasantblood before eating the peasants themselves */
+      static const struct potion_type *pt_blood;
+      if (pt_blood == NULL) {
+        const item_type *it_blood = it_find("peasantblood");
+        if (it_blood)
+          pt_blood = it_blood->rtype->ptype;
+      }
+      if (pt_blood != NULL) {
+        /* always start with the unit itself, then the first known unit that may have some blood */
+        unit *donor = u;
+        while (donor != NULL && hungry > 0) {
+          int blut = get_effect(donor, pt_blood);
+          blut = MIN(blut, hungry);
+          change_effect(donor, pt_blood, -blut);
+          hungry -= blut;
+          if (donor == u)
+            donor = r->units;
           while (donor != NULL) {
-            if (donor->race == new_race[RC_DAEMON]) {
+            if (donor->race == new_race[RC_DAEMON] && donor!=u) {
               if (get_effect(donor, pt_blood)) {
                 /* if he's in our faction, drain him: */
                 if (donor->faction == u->faction)
@@ -355,14 +362,9 @@ void get_food(region * r)
             }
             donor = donor->next;
           }
-          if (donor != NULL) {
-            int blut = get_effect(donor, pt_blood);
-            blut = MIN(blut, hungry);
-            change_effect(donor, pt_blood, -blut);
-            hungry -= blut;
-          }
         }
       }
+      /* remaining demons feed on peasants */
       if (pl == NULL || !fval(pl, PFL_NOFEED)) {
         if (peasantfood >= hungry) {
           peasantfood -= hungry;
@@ -377,15 +379,9 @@ void get_food(region * r)
             demon_hunger = get_param_int(global.parameters, "hunger.demons", 0);
           }
           if (demon_hunger == 0) {
-            /* nicht gefütterte dämonen hungern */
-#ifdef PEASANT_HUNGRY_DAEMONS_HAVE_FULL_SKILLS
-            /* wdw special rule */
-            hunger(hungry, u);
-#else
+            /* demons who don't feed are hungry */
             if (hunger(hungry, u))
               fset(u, UFL_HUNGER);
-#endif
-            /* used to be: hunger(hungry, u); */
           } else {
             /* no damage, but set the hungry-flag */
             fset(u, UFL_HUNGER);
@@ -1067,6 +1063,112 @@ static void transfer_faction(faction * f, faction * f2)
   }
 }
 
+/* test if the unit can slip through a siege undetected.
+ * returns 0 if siege is successful, or 1 if the building is either
+ * not besieged or the unit can slip through the siege due to better stealth.
+ */
+static int slipthru(const region * r, const unit * u, const building * b)
+{
+  unit *u2;
+  int n, o;
+
+  /* b ist die burg, in die man hinein oder aus der man heraus will. */
+  if (b == NULL || b->besieged < b->size * SIEGEFACTOR) {
+    return 1;
+  }
+
+  /* u wird am hinein- oder herausschluepfen gehindert, wenn STEALTH <=
+   * OBSERVATION +2 der belagerer u2 ist */
+  n = eff_skill(u, SK_STEALTH, r);
+
+  for (u2 = r->units; u2; u2 = u2->next) {
+    if (usiege(u2) == b) {
+
+      if (invisible(u, u2) >= u->number)
+        continue;
+
+      o = eff_skill(u2, SK_PERCEPTION, r);
+
+      if (o + 2 >= n) {
+        return 0;               /* entdeckt! */
+      }
+    }
+  }
+  return 1;
+}
+
+int can_contact(const region * r, const unit * u, const unit * u2) {
+
+  /* hier geht es nur um die belagerung von burgen */
+
+  if (u->building == u2->building) {
+    return 1;
+  }
+
+  /* unit u is trying to contact u2 - unasked for contact. wenn u oder u2
+   * nicht in einer burg ist, oder die burg nicht belagert ist, ist
+   * slipthru () == 1. ansonsten ist es nur 1, wenn man die belagerer */
+
+  if (slipthru(u->region, u, u->building) && slipthru(u->region, u2, u2->building)) {
+    return 1;
+  }
+
+  return (alliedunit(u, u2->faction, HELP_GIVE));
+}
+
+void contact_cmd(unit * u, order * ord, int final)
+{
+  /* unit u kontaktiert unit u2. Dies setzt den contact einfach auf 1 -
+   * ein richtiger toggle ist (noch?) nicht noetig. die region als
+   * parameter ist nur deswegen wichtig, weil er an getunit ()
+   * weitergegeben wird. dies wird fuer das auffinden von tempunits in
+   * getnewunit () verwendet! */
+  unit *u2;
+  region *r = u->region;
+
+  init_tokens(ord);
+  skip_token();
+  u2 = getunitg(r, u->faction);
+
+  if (u2 != NULL) {
+    if (!can_contact(r, u, u2)) {
+      if (final) {
+        cmistake(u, u->thisorder, 23, MSG_EVENT);
+      }
+      return;
+    }
+    usetcontact(u, u2);
+  }
+}
+
+int leave_cmd(unit * u, struct order *ord)
+{
+  region *r = u->region;
+
+  if (fval(u, UFL_ENTER)) {
+    /* if we just entered this round, then we don't leave again */
+    return 0;
+  }
+
+  if (fval(r->terrain, SEA_REGION) && u->ship) {
+    if (!fval(u->race, RCF_SWIM)) {
+      cmistake(u, ord, 11, MSG_MOVE);
+      return 0;
+    }
+    if (has_horses(u)) {
+      cmistake(u, ord, 231, MSG_MOVE);
+      return 0;
+    }
+  }
+  if (!slipthru(r, u, u->building)) {
+    ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder, "entrance_besieged",
+        "building", u->building));
+  } else {
+    leave(u, true);
+  }
+  return 0;
+}
+
 static int restart_cmd(unit * u, struct order *ord)
 {
   init_tokens(ord);
@@ -1121,7 +1223,7 @@ static boolean EnhancedQuit(void)
   return value;
 }
 
-static int quit_cmd(unit * u, struct order *ord)
+int quit_cmd(unit * u, struct order *ord)
 {
   faction *f = u->faction;
   const char *passwd;
@@ -1163,7 +1265,231 @@ static int quit_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-static void quit(void)
+static boolean mayenter(region * r, unit * u, building * b)
+{
+  unit *u2;
+  if (fval(b, BLD_UNGUARDED))
+    return true;
+  u2 = building_owner(b);
+
+  if (u2 == NULL || ucontact(u2, u)
+    || alliedunit(u2, u->faction, HELP_GUARD))
+    return true;
+
+  return false;
+}
+
+static int mayboard(const unit * u, ship * sh)
+{
+  unit *u2 = ship_owner(sh);
+
+  return (!u2 || ucontact(u2, u) || alliedunit(u2, u->faction, HELP_GUARD));
+}
+
+static boolean CheckOverload(void)
+{
+  static int value = -1;
+  if (value < 0) {
+    value = get_param_int(global.parameters, "rules.check_overload", 0);
+  }
+  return value;
+}
+
+int enter_ship(unit * u, struct order *ord, int id, int report)
+{
+  region *r = u->region;
+  ship *sh;
+
+  /* Muß abgefangen werden, sonst könnten Schwimmer an
+   * Bord von Schiffen an Land gelangen. */
+  if (!fval(u->race, RCF_CANSAIL) || (!fval(u->race, RCF_WALK)
+      && !fval(u->race, RCF_FLY))) {
+    cmistake(u, ord, 233, MSG_MOVE);
+    return 0;
+  }
+
+  sh = findship(id);
+  if (sh == NULL || sh->region != r) {
+    if (report)
+      cmistake(u, ord, 20, MSG_MOVE);
+    return 0;
+  }
+  if (sh == u->ship) {
+    return 1;
+  }
+  if (!mayboard(u, sh)) {
+    if (report)
+      cmistake(u, ord, 34, MSG_MOVE);
+    return 0;
+  }
+  if (CheckOverload()) {
+    int sweight, scabins;
+    int mweight = shipcapacity(sh);
+    int mcabins = sh->type->cabins;
+
+    if (mweight > 0) {
+      getshipweight(sh, &sweight, &scabins);
+      sweight += weight(u);
+      if (mcabins) {
+        int pweight = u->number * u->race->weight;
+        /* weight goes into number of cabins, not cargo */
+        scabins += pweight;
+        sweight -= pweight;
+      }
+
+      if (sweight > mweight || (mcabins && (scabins > mcabins))) {
+        if (report)
+          cmistake(u, ord, 34, MSG_MOVE);
+        return 0;
+      }
+    }
+  }
+
+  if (leave(u, 0)) {
+    u_set_ship(u, sh);
+    fset(u, UFL_ENTER);
+  }
+  return 1;
+}
+
+int enter_building(unit * u, order * ord, int id, int report)
+{
+  region *r = u->region;
+  building *b;
+
+  /* Schwimmer können keine Gebäude betreten, außer diese sind
+   * auf dem Ozean */
+  if (!fval(u->race, RCF_WALK) && !fval(u->race, RCF_FLY)) {
+    if (!fval(r->terrain, SEA_REGION)) {
+      if (report) {
+        cmistake(u, ord, 232, MSG_MOVE);
+      }
+      return 0;
+    }
+  }
+
+  b = findbuilding(id);
+  if (b == NULL || b->region != r) {
+    if (report) {
+      cmistake(u, ord, 6, MSG_MOVE);
+    }
+    return 0;
+  }
+  if (!mayenter(r, u, b)) {
+    if (report) {
+      ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "entrance_denied",
+          "building", b));
+    }
+    return 0;
+  }
+  if (!slipthru(r, u, b)) {
+    if (report) {
+      ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "entrance_besieged",
+          "building", b));
+    }
+    return 0;
+  }
+
+  if (leave(u, 0)) {
+    fset(u, UFL_ENTER);
+    u_set_building(u, b);
+    return 1;
+  }
+  return 0;
+}
+
+static void do_misc(region * r, int is_final_attempt)
+{
+  unit **uptr, *uc;
+
+  for (uc = r->units; uc; uc = uc->next) {
+    order *ord;
+    for (ord = uc->orders; ord; ord = ord->next) {
+      keyword_t kwd = get_keyword(ord);
+      if (kwd == K_CONTACT) {
+        contact_cmd(uc, ord, is_final_attempt);
+      }
+    }
+  }
+
+  for (uptr = &r->units; *uptr;) {
+    unit *u = *uptr;
+    order **ordp = &u->orders;
+
+    while (*ordp) {
+      order *ord = *ordp;
+      if (get_keyword(ord) == K_ENTER) {
+        param_t p;
+        int id;
+        unit *ulast = NULL;
+        const char * s;
+
+        init_tokens(ord);
+        skip_token();
+        s = getstrtoken();
+        p = findparam_ex(s, u->faction->locale);
+        id = getid();
+
+        switch (p) {
+        case P_BUILDING:
+        case P_GEBAEUDE:
+          if (u->building && u->building->no == id)
+            break;
+          if (enter_building(u, ord, id, is_final_attempt)) {
+            unit *ub;
+            for (ub = u; ub; ub = ub->next) {
+              if (ub->building == u->building) {
+                ulast = ub;
+              }
+            }
+          }
+          break;
+
+        case P_SHIP:
+          if (u->ship && u->ship->no == id)
+            break;
+          if (enter_ship(u, ord, id, is_final_attempt)) {
+            unit *ub;
+            ulast = u;
+            for (ub = u; ub; ub = ub->next) {
+              if (ub->ship == u->ship) {
+                ulast = ub;
+              }
+            }
+          }
+          break;
+
+        default:
+          if (is_final_attempt) {
+            cmistake(u, ord, 79, MSG_MOVE);
+          }
+        }
+        if (ulast != NULL) {
+          /* Wenn wir hier angekommen sind, war der Befehl
+           * erfolgreich und wir löschen ihn, damit er im
+           * zweiten Versuch nicht nochmal ausgeführt wird. */
+          *ordp = ord->next;
+          ord->next = NULL;
+          free_order(ord);
+
+          if (ulast != u) {
+            /* put u behind ulast so it's the last unit in the building */
+            *uptr = u->next;
+            u->next = ulast->next;
+            ulast->next = u;
+          }
+          break;
+        }
+      }
+      if (*ordp == ord)
+        ordp = &ord->next;
+    }
+    if (*uptr == u)
+      uptr = &u->next;
+  }
+}
+
+void quit(void)
 {
   faction **fptr = &factions;
   while (*fptr) {
@@ -1310,7 +1636,7 @@ static void parse_restart(void)
 
 /* HELFE partei [<ALLES | SILBER | GIB | KAEMPFE | WAHRNEHMUNG>] [NICHT] */
 
-static int ally_cmd(unit * u, struct order *ord)
+int ally_cmd(unit * u, struct order *ord)
 {
   ally *sf, **sfp;
   faction *f;
@@ -1465,7 +1791,7 @@ static void init_prefixnames(void)
   }
 }
 
-static int prefix_cmd(unit * u, struct order *ord)
+int prefix_cmd(unit * u, struct order *ord)
 {
   attrib **ap;
   const char *s;
@@ -1527,7 +1853,7 @@ static cmp_building_cb get_cmp_region_owner(void)
   }
 }
 
-static int display_cmd(unit * u, struct order *ord)
+int display_cmd(unit * u, struct order *ord)
 {
   char **s = NULL;
   const char *str;
@@ -1693,7 +2019,7 @@ rename_building(unit * u, order * ord, building * b, const char *name)
   return rename_cmd(u, ord, &b->name, name);
 }
 
-static int name_cmd(unit * u, struct order *ord)
+int name_cmd(struct unit *u, struct order *ord)
 {
   building *b = u->building;
   region *r = u->region;
@@ -2111,7 +2437,7 @@ static int mail_cmd(unit * u, struct order *ord)
 
 /* ------------------------------------------------------------- */
 
-static int banner_cmd(unit * u, struct order *ord)
+int banner_cmd(unit * u, struct order *ord)
 {
   init_tokens(ord);
   skip_token();
@@ -2124,7 +2450,7 @@ static int banner_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-static int email_cmd(unit * u, struct order *ord)
+int email_cmd(unit * u, struct order *ord)
 {
   const char *s;
 
@@ -2146,7 +2472,7 @@ static int email_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-static int password_cmd(unit * u, struct order *ord)
+int password_cmd(unit * u, struct order *ord)
 {
   char pwbuf[32];
   int i;
@@ -2186,7 +2512,7 @@ static int password_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-static int send_cmd(unit * u, struct order *ord)
+int send_cmd(unit * u, struct order *ord)
 {
   const char *s;
   int option;
@@ -2520,7 +2846,7 @@ static int promotion_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-static int group_cmd(unit * u, struct order *ord)
+int group_cmd(unit * u, struct order *ord)
 {
   const char *s;
 
@@ -2532,7 +2858,7 @@ static int group_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-static int origin_cmd(unit * u, struct order *ord)
+int origin_cmd(unit * u, struct order *ord)
 {
   short px, py;
 
@@ -2576,7 +2902,7 @@ static int reshow_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-static int status_cmd(unit * u, struct order *ord)
+int status_cmd(unit * u, struct order *ord)
 {
   const char *param;
 
@@ -3295,7 +3621,7 @@ int checkunitnumber(const faction * f, int add)
   return 0;
 }
 
-static void new_units(void)
+void new_units(void)
 {
   region *r;
   unit *u, *u2;
@@ -3433,7 +3759,7 @@ void check_long_orders(unit * u)
   }
 }
 
-static void setdefaults(unit * u)
+void update_long_order(unit * u)
 {
   order *ord;
   boolean trade = false;
@@ -3781,7 +4107,7 @@ static void age_factions(void)
   }
 }
 
-static int use_cmd(unit * u, struct order *ord)
+int use_cmd(unit * u, struct order *ord)
 {
   const char *t;
   int n, err = ENOITEM;
@@ -4050,7 +4376,7 @@ void process(void)
                     cmistake(u, ord, 224, MSG_MAGIC);
                     ord = NULL;
                   } else if (fval(u, UFL_LONGACTION)) {
-                    /* this message was already given in laws.setdefaults
+                    /* this message was already given in laws.update_long_order
                        cmistake(u, ord, 52, MSG_PRODUCE);
                      */
                     ord = NULL;
@@ -4160,8 +4486,8 @@ void init_processor(void)
   add_proc_global(p, &new_units, "Neue Einheiten erschaffen");
 
   p += 10;
-  add_proc_unit(p, &setdefaults, "Default-Befehle");
-  add_proc_order(p, K_BANNER, &banner_cmd, 0, NULL);
+  add_proc_unit(p, update_long_order, "Langen Befehl aktualisieren");
+  add_proc_order(p, K_BANNER, banner_cmd, 0, NULL);
   add_proc_order(p, K_EMAIL, &email_cmd, 0, NULL);
   add_proc_order(p, K_PASSWORD, &password_cmd, 0, NULL);
   add_proc_order(p, K_SEND, &send_cmd, 0, NULL);
