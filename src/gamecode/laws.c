@@ -3884,10 +3884,13 @@ enum {
   PROC_THISORDER = 1 << 0,
   PROC_LONGORDER = 1 << 1
 };
+
+typedef enum { PR_GLOBAL, PR_REGION_PRE, PR_UNIT, PR_ORDER, PR_REGION_POST } processor_t;
+
 typedef struct processor {
   struct processor *next;
   int priority;
-  enum { PR_GLOBAL, PR_REGION_PRE, PR_UNIT, PR_ORDER, PR_REGION_POST } type;
+  processor_t type;
   unsigned int flags;
   union {
     struct {
@@ -3909,7 +3912,7 @@ typedef struct processor {
 
 static processor *processors;
 
-processor *add_proc(int priority, const char *name, int type)
+static processor *add_proc(int priority, const char *name, processor_t type)
 {
   processor **pproc = &processors;
   processor *proc;
@@ -3923,7 +3926,7 @@ processor *add_proc(int priority, const char *name, int type)
     pproc = &proc->next;
   }
 
-  proc = malloc(sizeof(processor));
+  proc = (processor *)malloc(sizeof(processor));
   proc->priority = priority;
   proc->type = type;
   proc->name = name;
