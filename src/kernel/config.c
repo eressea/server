@@ -99,18 +99,6 @@ boolean sqlpatch = false;
 boolean battledebug = false;
 int turn = 0;
 
-#if XECMD_MODULE
-attrib_type at_xontormiaexpress = {
-  "xontormiaexpress",
-  DEFAULT_INIT,
-  DEFAULT_FINALIZE,
-  DEFAULT_AGE,
-  a_writeint,
-  a_readint,
-  ATF_UNIQUE
-};
-#endif
-
 int NewbieImmunity(void)
 {
   static int value = -1;
@@ -458,8 +446,6 @@ const char *keywords[MAXKEYWORDS] = {
   "INFO",
   "PRAEFIX",
   "PFLANZEN",
-  "WERWESEN",
-  "XONTORMIA",
   "ALLIANZ",
   "BEANSPRUCHEN",
   "PROMOTION",
@@ -3021,9 +3007,8 @@ void attrib_init(void)
   register_function((pf_generic) & minimum_wage, "minimum_wage");
 
   at_register(&at_germs);
-#if XECMD_MODULE
-  at_register(&at_xontormiaexpress);    /* required for old datafiles */
-#endif
+
+  at_deprecate("xontormiaexpress", a_readint);    /* required for old datafiles */
   at_register(&at_speedup);
   at_register(&at_building_action);
 }

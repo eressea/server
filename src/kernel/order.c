@@ -447,8 +447,6 @@ int is_exclusive(const order * ord)
 
   switch (kwd) {
   case K_MOVE:
-  case K_WEREWOLF:
-    /* these should not become persistent */
   case K_ROUTE:
   case K_DRIVE:
   case K_WORK:
@@ -513,7 +511,6 @@ int is_long(const order * ord)
   case K_BUY:
   case K_SELL:
   case K_MOVE:
-  case K_WEREWOLF:
   case K_ROUTE:
   case K_DRIVE:
   case K_WORK:
@@ -573,7 +570,6 @@ int is_persistent(const order * ord)
   int persist = ord->_persistent != 0;
   switch (kwd) {
   case K_MOVE:
-  case K_WEREWOLF:
   case NOKEYWORD:
     /* lang, aber niemals persistent! */
     return false;

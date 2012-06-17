@@ -88,7 +88,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/rng.h>
 #include <util/xml.h>
 
-#include <modules/xecmd.h>
 #include <attributes/otherfaction.h>
 
 /* libc includes */
@@ -3639,8 +3638,6 @@ void check_long_orders(unit * u)
             cmistake(u, ord, 52, MSG_EVENT);
           }
           break;
-        case K_WEREWOLF:
-          /* don't know what WEREWOLF does... */
         default:
           cmistake(u, ord, 52, MSG_EVENT);
         }
@@ -3696,7 +3693,10 @@ void update_long_order(unit * u)
       case K_BUY:
       case K_SELL:
         /* Wenn die Einheit handelt, muß der Default-Befehl gelöscht
-         * werden. */
+         * werden.
+         * Wird je diese Ausschliesslichkeit aufgehoben, muss man aufpassen
+         * mit der Reihenfolge von Kaufen, Verkaufen etc., damit es Spielern
+         * nicht moeglich ist, Schulden zu machen. */
         trade = true;
         break;
 
@@ -3706,13 +3706,6 @@ void update_long_order(unit * u)
         set_order(&u->thisorder, NULL);
         break;
 
-      case K_WEREWOLF:
-        set_order(&u->thisorder, copy_order(ord));
-        break;
-
-        /* Wird je diese Ausschliesslichkeit aufgehoben, muss man aufpassen
-         * mit der Reihenfolge von Kaufen, Verkaufen etc., damit es Spielern
-         * nicht moeglich ist, Schulden zu machen. */
       default:
         break;
       }
@@ -4580,10 +4573,6 @@ void init_processor(void)
 
   p += 10;
   add_proc_order(p, K_GUARD, &guard_on_cmd, 0, "Bewache (an)");
-#if XECMD_MODULE
-  /* can do together with guard */
-  add_proc_order(p, K_XE, &xecmd, 0, "Zeitung");
-#endif
 
   p += 10;
   add_proc_global(p, &encounters, "Zufallsbegegnungen");

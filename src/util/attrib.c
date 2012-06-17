@@ -22,6 +22,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "log.h"
 #include "storage.h"
 
+#include <critbit.h>
+
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
@@ -261,6 +263,16 @@ int a_age(attrib ** p)
   return (*p != NULL);
 }
 
+static critbit_tree cb_deprecated = { 0 };
+
+void at_deprecate(const char * name, int (*reader)(attrib *, void *, struct storage *))
+{
+  char buffer[64];
+  size_t len = strlen(name);
+  len = cb_new_kv(name, len, &reader, sizeof(reader), buffer);
+  cb_insert(&cb_deprecated, buffer, len);
+}
+
 int a_read(struct storage *store, attrib ** attribs, void *owner)
 {
   int key, retval = AT_READ_OK;
@@ -275,25 +287,38 @@ int a_read(struct storage *store, attrib ** attribs, void *owner)
     key = __at_hashkey(zText);
 
   while (key != -1) {
+    int (*reader)(attrib *, void *, struct storage *) = 0;
     attrib_type *at = at_find(key);
-    if (!at) {
-      fprintf(stderr, "attribute hash: %d (%s)\n", key, zText);
-      assert(at || !"attribute not registered");
+    attrib * na = 0;
+
+    if (at) {
+      reader = at->read;
+      na = a_new(at);
+    } else {
+      const void * kv;
+      cb_find_prefix(&cb_deprecated, zText, strlen(zText)+1, &kv, 1, 0);
+      if (kv) {
+        cb_get_kv(kv, &reader, sizeof(reader));
+      } else {
+        fprintf(stderr, "attribute hash: %d (%s)\n", key, zText);
+        assert(at || !"attribute not registered");
+      }
     }
-    if (at->read) {
-      attrib *na = a_new(at);
-      int i = at->read(na, owner, store);
-      switch (i) {
-        case AT_READ_OK:
-          a_add(attribs, na);
-          break;
-        case AT_READ_FAIL:
-          retval = AT_READ_FAIL;
-          a_free(na);
-          break;
-        default:
-          assert(!"invalid return value");
-          break;
+    if (reader) {
+      int i = reader(na, owner, store);
+      if (na) {
+        switch (i) {
+          case AT_READ_OK:
+            a_add(attribs, na);
+            break;
+          case AT_READ_FAIL:
+            retval = AT_READ_FAIL;
+            a_free(na);
+            break;
+          default:
+            assert(!"invalid return value");
+            break;
+        }
       }
     } else {
       assert(!"fehler: keine laderoutine für attribut");

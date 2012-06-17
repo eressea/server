@@ -160,7 +160,6 @@ set (LIB_SRC
   modules/score.c
   modules/weather.c
   modules/wormhole.c
-  modules/xecmd.c
   modules/xmas.c
   triggers/changefaction.c
   triggers/changerace.c

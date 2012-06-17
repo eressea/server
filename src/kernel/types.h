@@ -137,8 +137,6 @@ typedef enum {
   K_INFO,                       /* set player-info */
   K_PREFIX,
   K_PLANT,
-  K_WEREWOLF,
-  K_XE,
   K_ALLIANCE,
   K_CLAIM,
   K_PROMOTION,

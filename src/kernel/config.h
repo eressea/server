@@ -458,10 +458,6 @@ extern "C" {
 # define count_unit(u) 1
 #endif
 
-#if XECMD_MODULE
-  extern struct attrib_type at_xontormiaexpress;
-#endif
-
 #ifdef __cplusplus
 }
 #endif
