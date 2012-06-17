@@ -2703,7 +2703,7 @@ static void reshow(unit * u, struct order *ord, const char *s, param_t p)
   }
 }
 
-static int promotion_cmd(unit * u, struct order *ord)
+int promotion_cmd(unit * u, struct order *ord)
 {
   int money, people;
 
@@ -3005,7 +3005,7 @@ static attrib_type at_number = {
   ATF_UNIQUE
 };
 
-static void renumber_factions(void)
+void renumber_factions(void)
   /* gibt parteien neue nummern */
 {
   struct renum {
@@ -3066,7 +3066,7 @@ static void renumber_factions(void)
   }
 }
 
-static void reorder(void)
+void restack_units(void)
 {
   region *r;
   for (r = regions; r; r = r->next) {
@@ -3146,7 +3146,7 @@ static void reorder(void)
   }
 }
 
-static int renumber_cmd(unit * u, order * ord)
+int renumber_cmd(unit * u, order * ord)
 {
   const char *s;
   int i;
@@ -4605,7 +4605,7 @@ void init_processor(void)
 
   if (!global.disabled[K_SORT]) {
     p += 10;
-    add_proc_global(p, &reorder, "Einheiten sortieren");
+    add_proc_global(p, restack_units, "Einheiten sortieren");
   }
   add_proc_order(p, K_PROMOTION, &promotion_cmd, 0, "Heldenbefoerderung");
   if (!global.disabled[K_NUMBER]) {

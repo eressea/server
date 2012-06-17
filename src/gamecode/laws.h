@@ -52,6 +52,8 @@ extern "C" {
 
   extern void new_units(void);
   extern void quit(void);
+  extern void renumber_factions(void);
+  extern void restack_units(void);
   extern void update_long_order(struct unit *u);
   extern void sinkships(struct region * r);
   extern int password_cmd(struct unit *u, struct order *ord);
@@ -71,6 +73,8 @@ extern "C" {
   extern int siege_cmd(struct unit *u, struct order *ord);
   extern int leave_cmd(struct unit *u, struct order *ord);
   extern int pay_cmd(struct unit *u, struct order *ord);
+  extern int promotion_cmd(struct unit *u, struct order *ord);
+  extern int renumber_cmd(struct unit *u, struct order *ord);
   
 #ifdef __cplusplus
 }
