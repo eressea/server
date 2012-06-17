@@ -37,6 +37,7 @@ function test_process()
 	assert_equal("function", _G.type(eressea.process.renumber))
 	assert_equal("function", _G.type(eressea.process.restack))
 	assert_equal("function", _G.type(eressea.process.set_spells))
+	assert_equal("function", _G.type(eressea.process.set_help))
 end
 
 function test_settings()

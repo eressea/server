@@ -3654,6 +3654,7 @@ void update_long_order(unit * u)
   boolean trade = false;
   boolean hunger = LongHunger(u);
 
+  freset(u, UFL_MOVED);
   freset(u, UFL_LONGACTION);
   if (hunger) {
     /* Hungernde Einheiten führen NUR den default-Befehl aus */
@@ -4428,11 +4429,6 @@ static void maintain_buildings_1(region * r)
   maintain_buildings(r, false);
 }
 
-static void reset_moved(unit * u)
-{
-  freset(u, UFL_MOVED);
-}
-
 /** warn about passwords that are not US ASCII.
  * even though passwords are technically UTF8 strings, the server receives
  * them as part of the Subject of an email when reports are requested.
@@ -4476,7 +4472,6 @@ void init_processor(void)
   add_proc_order(p, K_GROUP, &group_cmd, 0, NULL);
 
   p += 10;
-  add_proc_unit(p, &reset_moved, "Instant-Befehle");
   add_proc_order(p, K_QUIT, &quit_cmd, 0, NULL);
   add_proc_order(p, K_URSPRUNG, &origin_cmd, 0, NULL);
   add_proc_order(p, K_ALLY, &ally_cmd, 0, NULL);

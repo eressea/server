@@ -26,5 +26,6 @@ module eressea {
 		void process_renumber @ renumber(void); /* RENUMBER */
 		void process_restack @ restack(void); /* SORT */
 		void process_setspells @ set_spells(void); /* COMBATSPELL */
+		void process_sethelp @ set_help(void); /* HELP */
 	}
 }

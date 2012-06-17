@@ -29,6 +29,7 @@ void process_promote(void);
 void process_renumber(void);
 void process_restack(void);
 void process_setspells(void);
+void process_sethelp(void);
 
 #ifdef __cplusplus
 }
