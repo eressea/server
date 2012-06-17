@@ -25,7 +25,7 @@ void process_battle(void);
 void process_siege(void);
 void process_leave(void);
 void process_maintenance(void);
-void process_promotion(void);
+void process_promote(void);
 void process_renumber(void);
 void process_restack(void);
 
