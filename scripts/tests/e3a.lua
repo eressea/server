@@ -3,8 +3,8 @@ require "lunit"
 module("tests.e3.e3features", package.seeall, lunit.testcase)
 
 function setup()
-    free_game()
-    settings.set("rules.economy.food", "0")
+    eressea.free_game()
+    eressea.settings.set("rules.economy.food", "0")
 end
 
 function test_no_stealth()
@@ -103,7 +103,7 @@ function test_xmastree()
   local r
   r = use_tree("ocean")
   assert_equal(0, r:get_resource("tree"))
-  free_game()
+  eressea.free_game()
   r = use_tree("plain")
   assert_equal(10, r:get_resource("tree"))
 end
@@ -272,7 +272,7 @@ function test_market()
   for i = 0, 5 do
     local rn = r:next(i)
   end
-  process.markets()
+  eressea.process.markets()
   u:add_item("money", -u:get_item("money")) -- now we only have herbs
   local len = 0
   for i in u.items do
@@ -415,7 +415,7 @@ function test_canoe_passes_through_land()
 end
 
 function test_give_50_percent_of_money()
-  settings.set("rules.economy.food", "4")
+    eressea.settings.set("rules.economy.food", "4")
   local r = region.create(0, 0, "plain")
   local u1 = unit.create(faction.create("noreply@eressea.de", "human", "de"), r, 1)
   local u2 = unit.create(faction.create("noreply@eressea.de", "orc", "de"), r, 1)

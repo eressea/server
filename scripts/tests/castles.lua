@@ -3,7 +3,7 @@ require "lunit"
 module("tests.e3.castles", package.seeall, lunit.testcase )
 
 function setup()
-    free_game()
+    eressea.free_game()
 end
 
 function test_small_castles()
