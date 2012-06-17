@@ -129,8 +129,6 @@ typedef enum {
   K_EMAIL,
   K_PIRACY,
   K_GROUP,
-  K_SACRIFICE,
-  K_PRAY,
   K_SORT,
   K_SETJIHAD,
   K_GM,                         /* perform GM commands */

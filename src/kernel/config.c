@@ -438,8 +438,6 @@ const char *keywords[MAXKEYWORDS] = {
   "EMAIL",
   "PIRATERIE",
   "GRUPPE",
-  "OPFERE",
-  "BETEN",
   "SORTIEREN",
   "JIHAD",
   "GM",
