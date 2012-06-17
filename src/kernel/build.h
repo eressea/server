@@ -64,7 +64,6 @@ extern "C" {
   extern int destroy_cmd(struct unit *u, struct order *ord);
   extern int leave_cmd(struct unit *u, struct order *ord);
 
-  void do_siege(struct region *r);
   void build_road(struct region *r, struct unit *u, int size, direction_t d);
   void create_ship(struct region *r, struct unit *u,
     const struct ship_type *newtype, int size, struct order *ord);

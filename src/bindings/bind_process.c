@@ -3,7 +3,9 @@
 #include <platform.h>
 #include <kernel/types.h>
 #include <kernel/order.h>
+#include <kernel/battle.h>
 #include <kernel/region.h>
+#include <kernel/terrain.h>
 #include <kernel/unit.h>
 #include <kernel/move.h>
 #include <gamecode/economy.h>
@@ -11,31 +13,36 @@
 #include <gamecode/market.h>
 #include <gamecode/study.h>
 
-static void process_cmd(keyword_t kwd, int (*callback)(unit *, order *))
-{
-  region * r;
-  for (r=regions; r; r=r->next) {
-    unit * u;
-    for (u=r->units; u; u=u->next) {
-      order * ord;
-      for (ord=u->orders; ord; ord=ord->next) {
-        if (kwd == get_keyword(ord)) {
-          callback(u, ord);
-        }
-      }
-    }
-  }
-}
+#define PROC_LAND_REGION 0x0001
+#define PROC_LONG_ORDER 0x0002
 
-static void process_long_cmd(keyword_t kwd, int (*callback)(unit *, order *))
+static void process_cmd(keyword_t kwd, int (*callback)(unit *, order *), int flags)
 {
   region * r;
   for (r=regions; r; r=r->next) {
     unit * u;
+
+    /* look for shortcuts */
+    if (flags&PROC_LAND_REGION) {
+      /* only execute when we are on solid terrain */
+      while (r && (r->terrain->flags&LAND_REGION)==0) {
+        r = r->next;
+      }
+      if (!r) break;
+    }
+
     for (u=r->units; u; u=u->next) {
-      order * ord = u->thisorder;
-      if (kwd == get_keyword(ord)) {
-        callback(u, ord);
+      if (flags & PROC_LONG_ORDER) {
+        if (kwd == get_keyword(u->thisorder)) {
+          callback(u, u->thisorder);
+        }
+      } else {
+        order * ord;
+        for (ord=u->orders; ord; ord=ord->next) {
+          if (kwd == get_keyword(ord)) {
+            callback(u, ord);
+          }
+        }
       }
     }
   }
@@ -56,6 +63,17 @@ void process_produce(void) {
     produce(r);
     split_allocations(r);
   }
+}
+
+void process_battle(void) {
+  struct region *r;
+  for (r = regions; r; r = r->next) {
+    do_battle(r);
+  }
+}
+
+void process_siege(void) {
+  process_cmd(K_BESIEGE, siege_cmd, PROC_LAND_REGION);
 }
 
 void process_update_long_order(void) {
@@ -102,41 +120,41 @@ void process_settings(void) {
 }
 
 void process_ally(void) {
-  process_cmd(K_ALLY, ally_cmd);
+  process_cmd(K_ALLY, ally_cmd, 0);
 }
 
 void process_prefix(void) {
-  process_cmd(K_PREFIX, prefix_cmd);
+  process_cmd(K_PREFIX, prefix_cmd, 0);
 }
 
 void process_setstealth(void) {
-  process_cmd(K_SETSTEALTH, setstealth_cmd);
+  process_cmd(K_SETSTEALTH, setstealth_cmd, 0);
 }
 
 void process_status(void) {
-  process_cmd(K_STATUS, status_cmd);
+  process_cmd(K_STATUS, status_cmd, 0);
 }
 
 void process_display(void) {
-  process_cmd(K_DISPLAY, display_cmd);
+  process_cmd(K_DISPLAY, display_cmd, 0);
 }
 
 void process_group(void) {
-  process_cmd(K_GROUP, group_cmd);
+  process_cmd(K_GROUP, group_cmd, 0);
 }
 
 void process_origin(void) {
-  process_cmd(K_URSPRUNG, origin_cmd);
+  process_cmd(K_URSPRUNG, origin_cmd, 0);
 }
 
 void process_quit(void) {
-  process_cmd(K_QUIT, quit_cmd);
+  process_cmd(K_QUIT, quit_cmd, 0);
   quit();
 }
 
 void process_study(void) {
-  process_long_cmd(K_TEACH, teach_cmd);
-  process_long_cmd(K_STUDY, learn_cmd);
+  process_cmd(K_TEACH, teach_cmd, PROC_LONG_ORDER);
+  process_cmd(K_STUDY, learn_cmd, PROC_LONG_ORDER);
 }
 
 void process_movement(void) {
@@ -144,9 +162,9 @@ void process_movement(void) {
 }
 
 void process_use(void) {
-  process_cmd(K_USE, use_cmd);
+  process_cmd(K_USE, use_cmd, 0);
 }
 
 void process_leave(void) {
-  process_cmd(K_LEAVE, leave_cmd);
+  process_cmd(K_LEAVE, leave_cmd, 0);
 }
