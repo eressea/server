@@ -90,8 +90,6 @@ typedef enum {
   K_END,
   K_DRIVE,
   K_NUMBER,
-  K_WAR,
-  K_PEACE,
   K_FOLLOW,
   K_RESEARCH,
   K_GIVE,
@@ -130,7 +128,6 @@ typedef enum {
   K_PIRACY,
   K_GROUP,
   K_SORT,
-  K_SETJIHAD,
   K_GM,                         /* perform GM commands */
   K_INFO,                       /* set player-info */
   K_PREFIX,
