@@ -2,6 +2,8 @@ require "lunit"
 
 local _G = _G
 local eressea = eressea
+local default_ship = config.ships[1]
+local default_building = config.buildings[1]
 
 module("tests.orders", lunit.testcase)
 
@@ -145,11 +147,39 @@ end
 
 function test_process_leave()
     r2 = _G.region.create(1, 0, 'plain')
-    b = _G.building.create(r, "castle")
+    b = _G.building.create(r, default_building)
     u.building = b
 	assert_equal(b, u.building)
 	u:add_order('VERLASSEN')
 	eressea.process.leave()
 	assert_not_equal(b, u.building)
+end
+
+function test_process_name_unit()
+	u:add_order("BENENNE EINHEIT 'Weasel'")
+	u:add_order("BESCHREIBE EINHEIT 'Juanita'")
+	eressea.process.set_name()
+	assert_equal('Weasel', u.name)
+	assert_equal('Juanita', u.info)
+end
+
+function test_process_name_faction()
+	u:add_order("BENENNE PARTEI 'Herpderp'")
+	eressea.process.set_name()
+	assert_equal('Herpderp', f.name)
+end
+
+function test_process_name_building()
+	u:add_order("BENENNE GEBAEUDE 'Herpderp'")
+	u.building = _G.building.create(r, default_building)
+	eressea.process.set_name()
+	assert_equal('Herpderp', u.building.name)
+end
+
+function test_process_name_ship()
+	u:add_order("BENENNE SCHIFF 'Herpderp'")
+	u.ship = _G.ship.create(r, default_ship)
+	eressea.process.set_name()
+	assert_equal('Herpderp', u.ship.name)
 end
 

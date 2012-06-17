@@ -135,7 +135,8 @@ void process_status(void) {
   process_cmd(K_STATUS, status_cmd, 0);
 }
 
-void process_display(void) {
+void process_name(void) {
+  process_cmd(K_NAME, name_cmd, 0);
   process_cmd(K_DISPLAY, display_cmd, 0);
 }
 
@@ -158,7 +159,14 @@ void process_study(void) {
 }
 
 void process_movement(void) {
+  region * r;
+
   movement();
+  for (r=regions; r; r=r->next) {
+    if (r->ships) {
+      sinkships(r);
+    }
+  }
 }
 
 void process_use(void) {
@@ -167,4 +175,21 @@ void process_use(void) {
 
 void process_leave(void) {
   process_cmd(K_LEAVE, leave_cmd, 0);
+}
+
+void process_maintenance(void) {
+  region * r;
+  for (r=regions; r; r=r->next) {
+    unit * u;
+    for (u=r->units; u; u=u->next) {
+      order * ord;
+      for (ord=u->orders; ord; ord=ord->next) {
+        keyword_t kwd = get_keyword(ord);
+        if (kwd==K_PAY) {
+          pay_cmd(u, ord);
+        }
+      }
+    }
+    maintain_buildings(r, 0);
+  }
 }

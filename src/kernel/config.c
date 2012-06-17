@@ -449,7 +449,6 @@ const char *keywords[MAXKEYWORDS] = {
   "URSPRUNG",
   "EMAIL",
   "PIRATERIE",
-  "NEUSTART",
   "GRUPPE",
   "OPFERE",
   "BETEN",

@@ -11,7 +11,7 @@ module eressea {
 		void process_prefix @ set_prefix(void); /* PREFIX */
 		void process_setstealth @ set_stealth(void); /* STEALTH */
 		void process_status @ set_status(void); /* STATUS */
-		void process_display @ set_description(void); /* DESCRIBE */
+		void process_name @ set_name(void); /* NAME/DISPLAY */
 		void process_group @ set_group(void); /* GROUP */
 		void process_origin @ set_origin(void); /* ORIGIN */
 		void process_quit @ quit(void); /* QUIT */
@@ -21,5 +21,6 @@ module eressea {
 		void process_battle @ battle(void); /* ATTACK */
 		void process_siege @ siege(void); /* SIEGE */
 		void process_leave @ leave(void); /* LEAVE */
+		void process_maintenance @ maintenance(void); /* PAY */
 	}
 }

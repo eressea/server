@@ -128,7 +128,6 @@ typedef enum {
   K_URSPRUNG,
   K_EMAIL,
   K_PIRACY,
-  K_RESTART,
   K_GROUP,
   K_SACRIFICE,
   K_PRAY,

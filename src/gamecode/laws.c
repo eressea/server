@@ -119,9 +119,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define DMRISEHAFEN    0.2F     /* weekly chance that demand goes up with harbor */
 
 /* - exported global symbols ----------------------------------- */
-boolean nobattle = false;
-boolean nomonsters = false;
-/* ------------------------------------------------------------- */
 
 static int RemoveNMRNewbie(void)
 {
@@ -133,40 +130,6 @@ static int RemoveNMRNewbie(void)
     gamecookie = global.cookie;
   }
   return value;
-}
-
-static void restart_race(unit * u, const race * rc)
-{
-  faction *oldf = u->faction;
-  faction *f = addfaction(oldf->email, oldf->passw, rc, oldf->locale,
-    oldf->subscription);
-  unit *nu = addplayer(u->region, f);
-  order **ordp = &u->orders;
-  f->subscription = u->faction->subscription;
-  f->age = u->faction->age;
-  fset(f, FFL_RESTART);
-  if (f->subscription) {
-    sql_print(
-      ("UPDATE subscriptions set faction='%s', race='%s' where id=%u;\n",
-        itoa36(f->no), dbrace(rc), f->subscription));
-  }
-  f->magiegebiet = u->faction->magiegebiet;
-  f->options = u->faction->options;
-  free_orders(&nu->orders);
-  nu->orders = u->orders;
-  u->orders = NULL;
-  while (*ordp) {
-    order *ord = *ordp;
-    if (get_keyword(ord) != K_RESTART) {
-      *ordp = ord->next;
-      ord->next = NULL;
-      if (u->thisorder == ord)
-        set_order(&u->thisorder, NULL);
-    } else {
-      ordp = &ord->next;
-    }
-  }
-  destroyfaction(u->faction);
 }
 
 static void checkorders(void)
@@ -1169,50 +1132,6 @@ int leave_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-static int restart_cmd(unit * u, struct order *ord)
-{
-  init_tokens(ord);
-  skip_token();                 /* skip keyword */
-
-  if (!fval(u->region->terrain, LAND_REGION)) {
-    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_onlandonly", ""));
-  } else {
-    const char *s_race = getstrtoken(), *s_pass;
-    const race *frace = findrace(s_race, u->faction->locale);
-
-    if (!frace) {
-      frace = u->faction->race;
-      s_pass = s_race;
-    } else {
-      s_pass = getstrtoken();
-    }
-
-    if (u->faction->age > 3 && fval(u->faction, FFL_RESTART)) {
-      cmistake(u, ord, 314, MSG_EVENT);
-      return 0;
-    }
-
-    if ( /* frace != u->faction->race && */ u->faction->age < 81) {
-      cmistake(u, ord, 241, MSG_EVENT);
-      return 0;
-    }
-
-    if (!playerrace(frace)) {
-      cmistake(u, ord, 243, MSG_EVENT);
-      return 0;
-    }
-
-    if (!checkpasswd(u->faction, (const char *)s_pass, false)) {
-      cmistake(u, ord, 86, MSG_EVENT);
-      log_warning("RESTART with wrong password, faction %s, pass %s\n", factionid(u->faction), s_pass);
-      return 0;
-    }
-    restart_race(u, frace);
-    return -1;
-  }
-  return 0;
-}
-
 static boolean EnhancedQuit(void)
 {
   static int value = -1;
@@ -1539,40 +1458,16 @@ static void nmr_death(faction * f)
   }
 }
 
-static void parse_restart(void)
+static void remove_idle_players(void)
 {
-  region *r;
   faction *f;
 
-  /* Sterben erst nachdem man allen anderen gegeben hat - bzw. man kann
-   * alles machen, was nicht ein dreißigtägiger Befehl ist. */
-
-  for (r = regions; r; r = r->next) {
-    unit *u, *un;
-    for (u = r->units; u;) {
-      order *ord;
-
-      un = u->next;
-      for (ord = u->orders; ord != NULL; ord = ord->next) {
-        if (get_keyword(ord) == K_RESTART) {
-          if (u->number > 0) {
-            if (restart_cmd(u, ord) != 0) {
-              break;
-            }
-          }
-        }
-      }
-      u = un;
-    }
-  }
-
-  if (verbosity >= 1)
-    puts
-      (" - beseitige Spieler, die sich zu lange nicht mehr gemeldet haben...");
+  log_info(" - beseitige Spieler, die sich zu lange nicht mehr gemeldet haben...");
 
   for (f = factions; f; f = f->next) {
-    if (fval(f, FFL_NOIDLEOUT))
+    if (fval(f, FFL_NOIDLEOUT)) {
       f->lastorders = turn;
+    }
     if (NMRTimeout() > 0 && turn - f->lastorders >= NMRTimeout()) {
       nmr_death(f);
       destroyfaction(f);
@@ -1606,10 +1501,7 @@ static void parse_restart(void)
       continue;
     }
   }
-  if (verbosity >= 1) {
-    puts(" - beseitige Spieler, die sich nach der Anmeldung nicht "
-      "gemeldet haben...");
-  }
+  log_info(" - beseitige Spieler, die sich nach der Anmeldung nicht gemeldet haben...");
 
   age = calloc(MAX(4, turn + 1), sizeof(int));
   for (f = factions; f; f = f->next)
@@ -3073,7 +2965,7 @@ static int guard_on_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-static void sinkships(region * r)
+void sinkships(struct region * r)
 {
   ship **shp = &r->ships;
 
@@ -4154,7 +4046,7 @@ int use_cmd(unit * u, struct order *ord)
   return err;
 }
 
-static int pay_cmd(unit * u, struct order *ord)
+int pay_cmd(unit * u, struct order *ord)
 {
   if (!u->building) {
     cmistake(u, ord, 6, MSG_EVENT);
@@ -4627,9 +4519,7 @@ void init_processor(void)
   p += 10;                      /* in case it has any effects on alliance victories */
   add_proc_order(p, K_LEAVE, &leave_cmd, 0, "Verlassen");
 
-  if (!nobattle) {
-    add_proc_region(p, &do_battle, "Attackieren");
-  }
+  add_proc_region(p, &do_battle, "Attackieren");
 
   if (!global.disabled[K_BESIEGE]) {
     p += 10;
@@ -4653,10 +4543,8 @@ void init_processor(void)
     "Gebaeudeunterhalt (1. Versuch)");
 
   p += 10;                      /* QUIT fuer sich alleine */
-  add_proc_global(p, &quit, "Sterben");
-  if (!global.disabled[K_RESTART]) {
-    add_proc_global(p, &parse_restart, "Neustart");
-  }
+  add_proc_global(p, quit, "Sterben");
+  add_proc_global(p, remove_idle_players, "remove idle players");
 
   if (!global.disabled[K_CAST]) {
     p += 10;

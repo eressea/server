@@ -14,7 +14,7 @@ void process_ally(void);
 void process_prefix(void);
 void process_setstealth(void);
 void process_status(void);
-void process_display(void);
+void process_name(void);
 void process_group(void);
 void process_origin(void);
 void process_quit(void);
@@ -24,6 +24,7 @@ void process_use(void);
 void process_battle(void);
 void process_siege(void);
 void process_leave(void);
+void process_maintenance(void);
 
 #ifdef __cplusplus
 }
