@@ -55,7 +55,7 @@ function process(orders)
   write_files(config.locales)
 
   file = "" .. get_turn() .. ".dat"
-  if write_game(file, "binary")~=0 then
+  if eressea.write_game(file)~=0 then
     print("could not write game")
     return -1
   end
