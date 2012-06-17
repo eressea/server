@@ -50,7 +50,6 @@
     <!-- Game specific settings -->
     <param name="database.gameid" value="7"></param>
 
-    <!--order name="ARBEITEN" disable="yes"/-->
     <order name="BETEN" disable="yes"/>
     <order name="BELAGERE" disable="yes"/>
     <order name="BEKLAUEN" disable="yes"/>
@@ -67,8 +66,6 @@
     <order name="TREIBEN" disable="yes"/>
     <order name="UNTERHALTEN" disable="yes"/>
     <order name="VERKAUFEN" disable="yes"/>
-    <order name="WERWESEN" disable="yes"/>
-    <order name="XONTORMIA" disable="yes"/>
 
     <skill name="armorer" enable="true"/>
     <skill name="bow" enable="true"/>

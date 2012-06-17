@@ -57,8 +57,6 @@
     <order name="GM" disable="yes"/>
     <order name="JIHAD" disable="yes"/>
     <order name="KRIEG" disable="yes"/>
-    <order name="WERWESEN" disable="yes"/>
-    <order name="XONTORMIA" disable="yes"/>
 
     <skill name="alchemy" enable="true"/>
     <skill name="crossbow" enable="true"/>
