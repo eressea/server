@@ -2838,7 +2838,7 @@ int status_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-static int combatspell_cmd(unit * u, struct order *ord)
+int combatspell_cmd(unit * u, struct order *ord)
 {
   const char *s;
   int level = 0;

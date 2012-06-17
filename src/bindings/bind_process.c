@@ -190,6 +190,10 @@ void process_restack(void) {
   restack_units();
 }
 
+void process_setspells(void) {
+  process_cmd(K_COMBATSPELL, combatspell_cmd, 0);
+}
+
 void process_maintenance(void) {
   region * r;
   for (r=regions; r; r=r->next) {

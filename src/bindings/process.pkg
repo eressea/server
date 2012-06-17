@@ -25,5 +25,6 @@ module eressea {
 		void process_promote @ promote(void); /* PROMOTE */
 		void process_renumber @ renumber(void); /* RENUMBER */
 		void process_restack @ restack(void); /* SORT */
+		void process_setspells @ set_spells(void); /* COMBATSPELL */
 	}
 }

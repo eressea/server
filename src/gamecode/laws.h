@@ -75,6 +75,7 @@ extern "C" {
   extern int pay_cmd(struct unit *u, struct order *ord);
   extern int promotion_cmd(struct unit *u, struct order *ord);
   extern int renumber_cmd(struct unit *u, struct order *ord);
+  extern int combatspell_cmd(struct unit *u, struct order *ord);
   
 #ifdef __cplusplus
 }
