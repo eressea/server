@@ -33,6 +33,7 @@ void process_sethelp(void);
 void process_contact(void);
 void process_enter(int final);
 void process_magic(void);
+void process_give_control(void);
 
 #ifdef __cplusplus
 }

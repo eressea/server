@@ -213,6 +213,14 @@ function test_process_contact()
     eressea.process.contact()
 end
 
+function test_process_battle()
+    eressea.process.battle()
+end
+
 function test_process_magic()
     eressea.process.magic()
+end
+
+function test_process_give_control()
+    eressea.process.give_control()
 end

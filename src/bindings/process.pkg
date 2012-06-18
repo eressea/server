@@ -30,5 +30,6 @@ module eressea {
 		void process_contact @ contact(void); /* CONTACT */
 		void process_enter @ enter(int message); /* ENTER */
 		void process_magic @ magic(void); /* CAST */
+		void process_give_control @ give_control(void); /* GIVE CONTROL */
 	}
 }
