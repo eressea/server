@@ -192,7 +192,7 @@ typedef struct sc_mage {
 
   void magic(void);
 
-  void regeneration_magiepunkte(void);
+  void regenerate_aura(void);
 
   extern struct attrib_type at_seenspell;
   extern struct attrib_type at_mage;

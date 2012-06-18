@@ -51,6 +51,7 @@ extern "C" {
 
   extern void new_units(void);
   extern void quit(void);
+  extern void monthly_healing(void);
   extern void renumber_factions(void);
   extern void restack_units(void);
   extern void update_long_order(struct unit *u);

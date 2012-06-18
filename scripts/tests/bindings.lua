@@ -42,6 +42,7 @@ function test_process()
 	assert_equal("function", _G.type(eressea.process.enter))
 	assert_equal("function", _G.type(eressea.process.magic))
 	assert_equal("function", _G.type(eressea.process.give_control))
+	assert_equal("function", _G.type(eressea.process.regeneration))
 end
 
 function test_settings()

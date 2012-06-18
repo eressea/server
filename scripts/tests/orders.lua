@@ -224,3 +224,8 @@ end
 function test_process_give_control()
     eressea.process.give_control()
 end
+
+function test_process_regeneration()
+    eressea.process.regeneration()
+end
+

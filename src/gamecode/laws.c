@@ -1514,9 +1514,16 @@ void quit(void)
         }
       }
       destroyfaction(f);
+    } else {
+      ++f->age;
+      if (f->age + 1 < NewbieImmunity()) {
+        ADDMSG(&f->msgs, msg_message("newbieimmunity", "turns",
+            NewbieImmunity() - f->age - 1));
+      }
     }
-    if (*fptr == f)
+    if (*fptr == f) {
       fptr = &f->next;
+    }
   }
   remove_idle_players();
   remove_empty_units();
@@ -3773,7 +3780,7 @@ static double heal_factor(const unit * u)
   }
 }
 
-static void monthly_healing(void)
+void monthly_healing(void)
 {
   region *r;
   static const curse_type *heal_ct = NULL;
@@ -3975,19 +3982,6 @@ static void update_spells(void)
           show_new_spells(f, level, mage->spellbook);
         }
       }
-    }
-  }
-}
-
-static void age_factions(void)
-{
-  faction *f;
-
-  for (f = factions; f; f = f->next) {
-    ++f->age;
-    if (f->age + 1 < NewbieImmunity()) {
-      ADDMSG(&f->msgs, msg_message("newbieimmunity", "turns",
-          NewbieImmunity() - f->age - 1));
     }
   }
 }
@@ -4489,7 +4483,6 @@ void init_processor(void)
   }
 
   p += 10;
-  add_proc_global(p, &age_factions, "Parteienalter++");
   add_proc_order(p, K_MAIL, &mail_cmd, 0, "Botschaften");
   add_proc_order(p, K_CONTACT, &contact_cmd, 0, "Kontaktieren");
 
@@ -4580,7 +4573,7 @@ void init_processor(void)
   p += 10;
 
   add_proc_global(p, &monthly_healing, "Regeneration (HP)");
-  add_proc_global(p, &regeneration_magiepunkte, "Regeneration (Aura)");
+  add_proc_global(p, &regenerate_aura, "Regeneration (Aura)");
   if (!global.disabled[K_DEFAULT]) {
     add_proc_global(p, &defaultorders, "Defaults setzen");
   }

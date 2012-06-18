@@ -211,6 +211,11 @@ void process_give_control(void) {
   process_cmd(K_CONTACT, give_control_cmd, 0);
 }
 
+void process_regeneration(void) {
+  monthly_healing();
+  regenerate_aura();
+}
+
 void process_enter(int final) {
   region * r;
   for (r=regions; r; r=r->next) {

@@ -1445,7 +1445,7 @@ static double regeneration(unit * u)
   return aura;
 }
 
-void regeneration_magiepunkte(void)
+void regenerate_aura(void)
 {
   region *r;
   unit *u;
