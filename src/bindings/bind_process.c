@@ -2,6 +2,7 @@
 
 #include <platform.h>
 #include <kernel/types.h>
+#include <kernel/magic.h>
 #include <kernel/order.h>
 #include <kernel/battle.h>
 #include <kernel/region.h>
@@ -198,6 +199,20 @@ void process_sethelp(void) {
   process_cmd(K_ALLY, ally_cmd, 0);
 }
 
+void process_contact(void) {
+  process_cmd(K_CONTACT, contact_cmd, 0);
+}
+
+void process_magic(void) {
+  magic();
+}
+
+void process_enter(int final) {
+  region * r;
+  for (r=regions; r; r=r->next) {
+    do_enter(r, final);
+  }
+}
 
 void process_maintenance(void) {
   region * r;

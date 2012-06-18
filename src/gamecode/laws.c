@@ -135,8 +135,7 @@ static void checkorders(void)
 {
   faction *f;
 
-  if (verbosity >= 1)
-    puts(" - Warne spaete Spieler...");
+  log_info(" - Warne spaete Spieler...");
   for (f = factions; f; f = f->next)
     if (!is_monsters(f) && turn - f->lastorders == NMRTimeout() - 1)
       ADDMSG(&f->msgs, msg_message("turnreminder", ""));
@@ -966,8 +965,7 @@ void demographics(void)
 
   remove_empty_units();
 
-  if (verbosity >= 1)
-    puts(" - Einwanderung...");
+  log_info(" - Einwanderung...");
   for (r = regions; r; r = r->next) {
     if (r->land && r->land->newpeasants) {
       int rp = rpeasants(r) + r->land->newpeasants;
@@ -1078,7 +1076,7 @@ int can_contact(const region * r, const unit * u, const unit * u2) {
   return (alliedunit(u, u2->faction, HELP_GIVE));
 }
 
-void contact_cmd(unit * u, order * ord, int final)
+int contact_cmd(unit * u, order * ord)
 {
   /* unit u kontaktiert unit u2. Dies setzt den contact einfach auf 1 -
    * ein richtiger toggle ist (noch?) nicht noetig. die region als
@@ -1094,13 +1092,12 @@ void contact_cmd(unit * u, order * ord, int final)
 
   if (u2 != NULL) {
     if (!can_contact(r, u, u2)) {
-      if (final) {
-        cmistake(u, u->thisorder, 23, MSG_EVENT);
-      }
-      return;
+      cmistake(u, u->thisorder, 23, MSG_EVENT);
+      return -1;
     }
     usetcontact(u, u2);
   }
+  return 0;
 }
 
 int leave_cmd(unit * u, struct order *ord)
@@ -1316,19 +1313,23 @@ int enter_building(unit * u, order * ord, int id, int report)
   return 0;
 }
 
-static void do_misc(region * r, int is_final_attempt)
+static void do_contact(region * r)
 {
-  unit **uptr, *uc;
-
-  for (uc = r->units; uc; uc = uc->next) {
+  unit * u;
+  for (u = r->units; u; u = u->next) {
     order *ord;
-    for (ord = uc->orders; ord; ord = ord->next) {
+    for (ord = u->orders; ord; ord = ord->next) {
       keyword_t kwd = get_keyword(ord);
       if (kwd == K_CONTACT) {
-        contact_cmd(uc, ord, is_final_attempt);
+        contact_cmd(u, ord);
       }
     }
   }
+}
+
+void do_enter(struct region *r, int is_final_attempt)
+{
+  unit **uptr;
 
   for (uptr = &r->units; *uptr;) {
     unit *u = *uptr;
@@ -1404,38 +1405,6 @@ static void do_misc(region * r, int is_final_attempt)
     }
     if (*uptr == u)
       uptr = &u->next;
-  }
-}
-
-void quit(void)
-{
-  faction **fptr = &factions;
-  while (*fptr) {
-    faction *f = *fptr;
-    if (f->flags & FFL_QUIT) {
-      if (EnhancedQuit()) {
-        /* this doesn't work well (use object_name()) */
-        attrib *a = a_find(f->attribs, &at_object);
-        if (a) {
-          variant var;
-          object_type type;
-          var.i = 0;
-          object_get(a, &type, &var);
-          assert(var.i && type == TINTEGER);
-          if (var.i) {
-            int f2_id = var.i;
-            faction *f2 = findfaction(f2_id);
-
-            assert(f2_id > 0);
-            assert(f2 != NULL);
-            transfer_faction(f, f2);
-          }
-        }
-      }
-      destroyfaction(f);
-    }
-    if (*fptr == f)
-      fptr = &f->next;
   }
 }
 
@@ -1517,9 +1486,39 @@ static void remove_idle_players(void)
         }
       }
     }
+}
 
-  if (verbosity >= 1)
-    puts(" - beseitige leere Einheiten und leere Parteien...");
+void quit(void)
+{
+  faction **fptr = &factions;
+  while (*fptr) {
+    faction *f = *fptr;
+    if (f->flags & FFL_QUIT) {
+      if (EnhancedQuit()) {
+        /* this doesn't work well (use object_name()) */
+        attrib *a = a_find(f->attribs, &at_object);
+        if (a) {
+          variant var;
+          object_type type;
+          var.i = 0;
+          object_get(a, &type, &var);
+          assert(var.i && type == TINTEGER);
+          if (var.i) {
+            int f2_id = var.i;
+            faction *f2 = findfaction(f2_id);
+
+            assert(f2_id > 0);
+            assert(f2 != NULL);
+            transfer_faction(f, f2);
+          }
+        }
+      }
+      destroyfaction(f);
+    }
+    if (*fptr == f)
+      fptr = &f->next;
+  }
+  remove_idle_players();
   remove_empty_units();
 }
 
@@ -4416,12 +4415,12 @@ void do_siege(region * r)
 
 static void enter_1(region * r)
 {
-  do_misc(r, 0);
+  do_enter(r, 0);
 }
 
 static void enter_2(region * r)
 {
-  do_misc(r, 1);
+  do_enter(r, 1);
 }
 
 static void maintain_buildings_1(region * r)
@@ -4492,9 +4491,10 @@ void init_processor(void)
   p += 10;
   add_proc_global(p, &age_factions, "Parteienalter++");
   add_proc_order(p, K_MAIL, &mail_cmd, 0, "Botschaften");
+  add_proc_order(p, K_CONTACT, &contact_cmd, 0, "Kontaktieren");
 
   p += 10;                      /* all claims must be done before we can USE */
-  add_proc_region(p, &enter_1, "Kontaktieren & Betreten (1. Versuch)");
+  add_proc_region(p, &enter_1, "Betreten (1. Versuch)");
   add_proc_order(p, K_USE, &use_cmd, 0, "Benutzen");
 
   if (!global.disabled[K_GM]) {
@@ -4515,7 +4515,7 @@ void init_processor(void)
   }
 
   p += 10;                      /* can't allow reserve before siege (weapons) */
-  add_proc_region(p, &enter_1, "Kontaktieren & Betreten (2. Versuch)");
+  add_proc_region(p, &enter_1, "Betreten (2. Versuch)");
   add_proc_order(p, K_RESERVE, &reserve_cmd, 0, "Reservieren");
   add_proc_order(p, K_CLAIM, &claim_cmd, 0, NULL);
   add_proc_unit(p, &follow_unit, "Folge auf Einheiten setzen");
@@ -4532,7 +4532,6 @@ void init_processor(void)
 
   p += 10;                      /* QUIT fuer sich alleine */
   add_proc_global(p, quit, "Sterben");
-  add_proc_global(p, remove_idle_players, "remove idle players");
 
   if (!global.disabled[K_CAST]) {
     p += 10;
@@ -4553,7 +4552,7 @@ void init_processor(void)
   add_proc_postregion(p, &split_allocations, "Produktion II");
 
   p += 10;
-  add_proc_region(p, &enter_2, "Kontaktieren & Betreten (3. Versuch)");
+  add_proc_region(p, &enter_2, "Betreten (3. Versuch)");
 
   p += 10;
   add_proc_region(p, &sinkships, "Schiffe sinken");
@@ -4615,8 +4614,7 @@ void processorders(void)
     do_markets();
   }
 
-  if (verbosity >= 1)
-    puts(" - Attribute altern");
+  log_info(" - Attribute altern");
   ageing();
   remove_empty_units();
 
@@ -4640,7 +4638,7 @@ int writepasswd(void)
   F = cfopen(zText, "w");
   if (F) {
     faction *f;
-    puts("writing passwords...");
+    log_info("writing passwords...");
 
     for (f = factions; f; f = f->next) {
       fprintf(F, "%s:%s:%s:%s:%u\n",

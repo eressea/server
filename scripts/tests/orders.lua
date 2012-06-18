@@ -190,3 +190,29 @@ function test_process_renumber()
     assert_equal(666, u.id)
 end
 
+function test_process_enter()
+    b = _G.building.create(r, default_building)
+    u:add_order("BETRETEN GEBAEUDE " .. _G.itoa36(b.id))
+    eressea.process.enter(1)
+    assert_equal(b, u.building)
+end
+
+function test_process_restack()
+    eressea.process.restack()
+end
+
+function test_process_setspells()
+    eressea.process.set_spells()
+end
+
+function test_process_help()
+    eressea.process.set_help()
+end
+
+function test_process_contact()
+    eressea.process.contact()
+end
+
+function test_process_magic()
+    eressea.process.magic()
+end

@@ -30,6 +30,9 @@ void process_renumber(void);
 void process_restack(void);
 void process_setspells(void);
 void process_sethelp(void);
+void process_contact(void);
+void process_enter(int final);
+void process_magic(void);
 
 #ifdef __cplusplus
 }

@@ -27,5 +27,8 @@ module eressea {
 		void process_restack @ restack(void); /* SORT */
 		void process_setspells @ set_spells(void); /* COMBATSPELL */
 		void process_sethelp @ set_help(void); /* HELP */
+		void process_contact @ contact(void); /* CONTACT */
+		void process_enter @ enter(int message); /* ENTER */
+		void process_magic @ magic(void); /* CAST */
 	}
 }
