@@ -181,7 +181,6 @@ set (LIB_SRC
   util/console.c
   util/crmessage.c
   util/dice.c
-  util/eventbus.c
   util/event.c
   util/filereader.c
   util/functions.c

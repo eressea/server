@@ -46,18 +46,6 @@ function setup()
     eressea.settings.set("rules.economy.food", "4")
 end
 
-function DISABLE_test_eventbus_fire()
-  local r = region.create(0, 0, "plain")
-  local f = faction.create("noreply@eressea.de", "human", "de")
-  local u = unit.create(f, r)
-  
-  function compare_f(u, event, f)
-    assert_equal(u.faction, f)
-  end
-  eventbus.register(u, "weird", compare_f)
-  eventbus.fire(u, "weird", f)
-end
-
 function test_fleeing_units_can_be_transported()
   local r = region.create(0, 0, "plain")
   local r1 = region.create(1, 0, "plain")

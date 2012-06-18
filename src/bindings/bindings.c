@@ -62,7 +62,6 @@ without prior permission by the authors of Eressea.
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/console.h>
-#include <util/eventbus.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
@@ -1031,39 +1030,6 @@ static void event_cb(void *sender, const char *event, void *udata)
   lua_pcall(L, nargs, 0, 0);
 }
 
-/* arguments:
- *  1: sender (usertype)
- *  2: event (string)
- *  3: handler (function)
- *  4: arguments (any, *optional*)
-**/
-static int tolua_eventbus_register(lua_State * L)
-{
-  void *sender = tolua_tousertype(L, 1, 0);
-  const char *event = tolua_tostring(L, 2, 0);
-  event_args *args = (event_args *)malloc(sizeof(event_args));
-  args->sendertype = sender ? tolua_typename(L, 1) : NULL;
-  lua_pushvalue(L, 3);
-  args->hfunction = luaL_ref(L, LUA_REGISTRYINDEX);
-  if (lua_type(L, 4) != LUA_TNONE) {
-    lua_pushvalue(L, 4);
-    args->hargs = luaL_ref(L, LUA_REGISTRYINDEX);
-  } else {
-    args->hargs = 0;
-  }
-  eventbus_register(sender, event, &event_cb, &args_free, args);
-  return 0;
-}
-
-static int tolua_eventbus_fire(lua_State * L)
-{
-  void *sender = tolua_tousertype(L, 1, 0);
-  const char *event = tolua_tostring(L, 2, 0);
-  void *args = NULL;
-  eventbus_fire(sender, event, args);
-  return 0;
-}
-
 static int tolua_report_unit(lua_State * L)
 {
   char buffer[512];
@@ -1144,12 +1110,6 @@ int tolua_bindings_open(lua_State * L)
       tolua_variable(L, TOLUA_CAST "level", tolua_get_spell_level, 0);
 #endif
       tolua_variable(L, TOLUA_CAST "text", tolua_get_spell_text, 0);
-    } tolua_endmodule(L);
-    tolua_module(L, TOLUA_CAST "eventbus", 1);
-    tolua_beginmodule(L, TOLUA_CAST "eventbus");
-    {
-      tolua_function(L, TOLUA_CAST "register", &tolua_eventbus_register);
-      tolua_function(L, TOLUA_CAST "fire", &tolua_eventbus_fire);
     } tolua_endmodule(L);
     tolua_module(L, TOLUA_CAST "report", 1);
     tolua_beginmodule(L, TOLUA_CAST "report");
