@@ -229,3 +229,10 @@ function test_process_regeneration()
     eressea.process.regeneration()
 end
 
+function test_process_guard_on()
+    eressea.process.guard_on()
+end
+
+function test_process_guard_off()
+    eressea.process.guard_off()
+end

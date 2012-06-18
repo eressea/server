@@ -211,6 +211,14 @@ void process_give_control(void) {
   process_cmd(K_CONTACT, give_control_cmd, 0);
 }
 
+void process_guard_on(void) {
+  process_cmd(K_GUARD, guard_on_cmd, PROC_LAND_REGION);
+}
+
+void process_guard_off(void) {
+  process_cmd(K_GUARD, guard_off_cmd, PROC_LAND_REGION);
+}
+
 void process_regeneration(void) {
   monthly_healing();
   regenerate_aura();

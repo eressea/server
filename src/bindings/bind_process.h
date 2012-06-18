@@ -35,6 +35,8 @@ void process_enter(int final);
 void process_magic(void);
 void process_give_control(void);
 void process_regeneration(void);
+void process_guard_on(void);
+void process_guard_off(void);
 
 #ifdef __cplusplus
 }

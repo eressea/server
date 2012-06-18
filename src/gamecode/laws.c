@@ -2769,7 +2769,7 @@ int origin_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-static int guard_off_cmd(unit * u, struct order *ord)
+int guard_off_cmd(unit * u, struct order *ord)
 {
   assert(get_keyword(ord) == K_GUARD);
   init_tokens(ord);
@@ -2930,7 +2930,7 @@ void update_guards(void)
   }
 }
 
-static int guard_on_cmd(unit * u, struct order *ord)
+int guard_on_cmd(unit * u, struct order *ord)
 {
   assert(get_keyword(ord) == K_GUARD);
 
