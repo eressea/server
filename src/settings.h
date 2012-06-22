@@ -48,9 +48,6 @@
 #define CHANGED_CROSSBOWS 0     /* use the WTF_ARMORPIERCING flag */
 #undef GLOBAL_WARMING           /* number of turns before global warming sets in */
 
-#define SIMPLE_COMBAT
-#define SIMPLE_ESCAPE
-
 #if defined(BINDINGS_LUABIND)
 # undef BINDINGS_TOLUA
 #elif defined(BINDINGS_TOLUA)
