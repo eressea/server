@@ -4483,8 +4483,8 @@ void init_processor(void)
   }
 
   p += 10;
+  add_proc_region(p, do_contact, "Kontaktieren");
   add_proc_order(p, K_MAIL, &mail_cmd, 0, "Botschaften");
-  add_proc_order(p, K_CONTACT, &contact_cmd, 0, "Kontaktieren");
 
   p += 10;                      /* all claims must be done before we can USE */
   add_proc_region(p, &enter_1, "Betreten (1. Versuch)");

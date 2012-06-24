@@ -2,20 +2,16 @@
 
 #if defined(WIN32)
 #include <direct.h>
-#else   /*  */
+#else   /* WIN32 */
 #include <sys/stat.h>
-#endif  /*  */
-int os_mkdir(const char *path, int mode) 
+#endif  /* WIN32 */
+int os_mkdir(const char *path, int mode) 
 {
   
 #ifdef WIN32
-    mode = mode;
-  return _mkdir(path);
-  
+  mode = mode;
+  return _mkdir(path);  
 #else   /* POSIX is our last hope */
-    return mkdir(path, (mode_t) mode);
-  
-#endif  /*  */
+  return mkdir(path, (mode_t) mode);  
+#endif  /* WIN32 */
 }
-
-
