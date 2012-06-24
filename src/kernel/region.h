@@ -210,7 +210,7 @@ extern "C" {
   short rroad(const struct region *r, direction_t d);
   void rsetroad(struct region *r, direction_t d, short value);
 
-  int is_coastregion(struct region *r);
+  bool is_coastregion(struct region *r);
 
   int rtrees(const struct region *r, int ageclass);
   enum {

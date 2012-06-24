@@ -1327,7 +1327,7 @@ static void do_contact(region * r)
   }
 }
 
-void do_enter(struct region *r, int is_final_attempt)
+void do_enter(struct region *r, bool is_final_attempt)
 {
   unit **uptr;
 

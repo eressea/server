@@ -56,7 +56,7 @@ extern "C" {
   extern void restack_units(void);
   extern void update_long_order(struct unit *u);
   extern void sinkships(struct region * r);
-  extern void do_enter(struct region *r, int is_final_attempt);
+  extern void do_enter(struct region *r, bool is_final_attempt);
 
   extern int password_cmd(struct unit *u, struct order *ord);
   extern int banner_cmd(struct unit *u, struct order *ord);

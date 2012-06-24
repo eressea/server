@@ -1403,13 +1403,13 @@ param_t findparam_ex(const char *s, const struct locale * lang)
   return (result == P_BUILDING) ? P_GEBAEUDE : result;
 }
 
-int isparam(const char *s, const struct locale * lang, param_t param)
+bool isparam(const char *s, const struct locale * lang, param_t param)
 {
   if (s[0]>'@') {
     param_t p = (param==P_GEBAEUDE) ? findparam_ex(s, lang) : findparam(s, lang);
     return p==param;
   }
-  return 0;
+  return false;
 }
 
 param_t getparam(const struct locale * lang)

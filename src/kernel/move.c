@@ -633,7 +633,7 @@ static bool is_freezing(const unit * u)
 #define SA_NO_INSECT -1
 #define SA_NO_COAST -2
 
-static int is_ship_allowed(struct ship *sh, const region * r)
+static bool is_ship_allowed(struct ship *sh, const region * r)
 {
   int c = 0;
   static const building_type *bt_harbour = NULL;

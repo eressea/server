@@ -817,17 +817,17 @@ bool r_isforest(const region * r)
   return false;
 }
 
-int is_coastregion(region * r)
+bool is_coastregion(region * r)
 {
   direction_t i;
   int res = 0;
 
-  for (i = 0; i < MAXDIRECTIONS; i++) {
+  for (i = 0; !res && i < MAXDIRECTIONS; i++) {
     region *rn = rconnect(r, i);
     if (rn && fval(rn->terrain, SEA_REGION))
       res++;
   }
-  return res;
+  return res!=0;
 }
 
 int rpeasants(const region * r)
