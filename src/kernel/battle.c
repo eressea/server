@@ -206,7 +206,7 @@ static void message_faction(battle * b, faction * f, struct message *m)
   region *r = b->region;
 
   if (f->battles == NULL || f->battles->r != r) {
-    struct bmsg *bm = calloc(1, sizeof(struct bmsg));
+    struct bmsg *bm = (struct bmsg *)calloc(1, sizeof(struct bmsg));
     bm->next = f->battles;
     f->battles = bm;
     bm->r = r;
@@ -3203,7 +3203,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     /* Zu diesem Zeitpunkt ist attacked noch 0, da die Einheit für noch
      * keinen Kampf ausgewählt wurde (sonst würde ein fighter existieren) */
   }
-  fig = calloc(1, sizeof(struct fighter));
+  fig = (struct fighter*)calloc(1, sizeof(struct fighter));
 
   fig->next = s1->fighters;
   s1->fighters = fig;
@@ -3228,7 +3228,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
   fig->catmsg = -1;
 
   /* Freigeben nicht vergessen! */
-  fig->person = calloc(fig->alive, sizeof(struct person));
+  fig->person = (struct person*)calloc(fig->alive, sizeof(struct person));
 
   h = u->hp / u->number;
   assert(h);
@@ -3542,7 +3542,7 @@ battle *make_battle(region * r)
     else {
       const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
       fwrite(utf8_bom, 1, 3, bdebug);
-      fprintf(bdebug, "In %s findet ein Kampf stattactics:\n", rname(r,
+      fprintf(bdebug, "In %s findet ein Kampf statt:\n", rname(r,
           default_locale));
     }
     obs_count++;
@@ -3600,7 +3600,6 @@ static void free_fighter(fighter * fig)
 
 static void free_battle(battle * b)
 {
-  side *s;
   int max_fac_no = 0;
 
   if (bdebug) {
@@ -3615,19 +3614,11 @@ static void free_battle(battle * b)
     free(bf);
   }
 
-  for (s = b->sides; s != b->sides + b->nsides; ++s) {
-    fighter *fnext = s->fighters;
-    while (fnext) {
-      fighter *fig = fnext;
-      fnext = fig->next;
-      free_fighter(fig);
-      free(fig);
-    }
-    free_side(s);
-  }
   ql_free(b->leaders);
   ql_foreach(b->meffects, free);
   ql_free(b->meffects);
+
+  battle_free(b);
 }
 
 static int *get_alive(side * s)
@@ -3876,7 +3867,7 @@ static void flee(const troop dt)
   kill_troop(dt);
 }
 
-static bool init_battle(region * r, battle ** bp)
+static bool start_battle(region * r, battle ** bp)
 {
   battle *b = NULL;
   unit *u;
@@ -4091,7 +4082,7 @@ static void battle_stats(FILE * F, battle * b)
         }
         stat = *slist;
         if (stat == NULL || stat->wtype != wtype || stat->level != level) {
-          stat = calloc(1, sizeof(stat_info));
+          stat = (stat_info*)calloc(1, sizeof(stat_info));
           stat->wtype = wtype;
           stat->level = level;
           stat->next = *slist;
@@ -4251,7 +4242,7 @@ void do_battle(region * r)
     msg_separator = msg_message("battle::section", "");
   }
 
-  fighting = init_battle(r, &b);
+  fighting = start_battle(r, &b);
 
   if (b == NULL)
     return;
@@ -4318,3 +4309,26 @@ void do_battle(region * r)
     free(b);
   }
 }
+
+void battle_init(battle * b) {
+  assert(b);
+  memset(b, 0, sizeof(battle));
+}
+
+void battle_free(battle * b) {
+  side *s;
+
+  assert(b);
+
+  for (s = b->sides; s != b->sides + b->nsides; ++s) {
+    fighter *fnext = s->fighters;
+    while (fnext) {
+      fighter *fig = fnext;
+      fnext = fig->next;
+      free_fighter(fig);
+      free(fig);
+    }
+    free_side(s);
+  }
+}
+

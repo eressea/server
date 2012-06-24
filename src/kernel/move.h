@@ -47,7 +47,6 @@ extern "C" {
 ** pferde, macht nur noch 100, aber samt eigenem gewicht (40) macht also 140. */
 
   int personcapacity(const struct unit *u);
-  direction_t getdirection(const struct locale *);
   void movement(void);
   void run_to(struct unit *u, struct region *to);
   struct unit *is_guarded(struct region *r, struct unit *u, unsigned int mask);

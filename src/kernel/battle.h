@@ -114,6 +114,9 @@ extern "C" {
     } fast;
   } battle;
 
+  void battle_init(battle * b);
+  void battle_free(battle * b);
+
   typedef struct weapon {
     int count, used;
     const struct weapon_type *type;

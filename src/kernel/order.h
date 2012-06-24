@@ -57,6 +57,7 @@ extern "C" {
   extern int is_long(const order * ord);
 
   extern char *write_order(const order * ord, char *buffer, size_t size);
+  extern void init_tokens(const struct order *ord);     /* initialize token parsing */
 
 #ifdef __cplusplus
 }
