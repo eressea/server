@@ -22,7 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-  extern boolean get_movement(struct attrib *const *alist, int type);
+  extern bool get_movement(struct attrib *const *alist, int type);
   extern void set_movement(struct attrib **alist, int type);
 
   extern struct attrib_type at_movement;

@@ -23,7 +23,7 @@ extern "C" {
 #endif
 
   void monster_kills_peasants(struct unit *u);
-  boolean monster_is_waiting(const struct unit *u);
+  bool monster_is_waiting(const struct unit *u);
 
 #ifdef __cplusplus
 }

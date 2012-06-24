@@ -17,7 +17,7 @@ extern "C" {
 
   struct summary;
   extern void report_summary(struct summary *n, struct summary *o,
-    boolean full);
+    bool full);
   extern struct summary *make_summary(void);
 
 #ifdef __cplusplus

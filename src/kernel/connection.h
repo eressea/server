@@ -39,7 +39,7 @@ extern "C" {
   typedef struct border_type {
     const char *__name;         /* internal use only */
     variant_type datatype;
-     boolean(*transparent) (const connection *, const struct faction *);
+     bool(*transparent) (const connection *, const struct faction *);
     /* is it possible to see through this? */
     void (*init) (connection *);
     /* constructor: initialize the connection. allocate extra memory if needed */
@@ -47,7 +47,7 @@ extern "C" {
     /* destructor: remove all extra memory for destruction */
     void (*read) (connection *, struct storage *);
     void (*write) (const connection *, struct storage *);
-     boolean(*block) (const connection *, const struct unit *,
+     bool(*block) (const connection *, const struct unit *,
       const struct region * r);
     /* return true if it blocks movement of u from
      * r to the opposite struct region.
@@ -59,11 +59,11 @@ extern "C" {
      * may depend on the struct faction, for example "a wall" may
      * turn out to be "an illusionary wall"
      */
-     boolean(*rvisible) (const connection *, const struct region *);
+     bool(*rvisible) (const connection *, const struct region *);
     /* is it visible to everyone in r ?
      * if not, it may still be fvisible() for some f.
      */
-     boolean(*fvisible) (const connection *, const struct faction *,
+     bool(*fvisible) (const connection *, const struct faction *,
       const struct region *);
     /* is it visible to units of f in r?
      * the function shall not check for
@@ -73,16 +73,16 @@ extern "C" {
      * the reporting function will have to assure).
      * if not true, it may still be uvisible() for some u.
      */
-     boolean(*uvisible) (const connection *, const struct unit *);
+     bool(*uvisible) (const connection *, const struct unit *);
     /* is it visible to u ?
      * a doorway may only be visible to a struct unit with perception > 5
      */
-     boolean(*valid) (const connection *);
+     bool(*valid) (const connection *);
     /* is the connection in a valid state,
      * or should it be erased at the end of this turn to save space?
      */
     struct region *(*move) (const connection *, struct unit * u,
-      struct region * from, struct region * to, boolean routing);
+      struct region * from, struct region * to, bool routing);
     /* executed when the units traverses this connection */
     int (*age) (struct connection *);
     /* return 0 if connection needs to be removed. >0 if still aging, <0 if not aging */
@@ -112,20 +112,20 @@ extern "C" {
   /* provide default implementations for some member functions: */
   extern void b_read(connection * b, struct storage *store);
   extern void b_write(const connection * b, struct storage *store);
-  extern boolean b_blockall(const connection *, const struct unit *,
+  extern bool b_blockall(const connection *, const struct unit *,
     const struct region *);
-  extern boolean b_blocknone(const connection *, const struct unit *,
+  extern bool b_blocknone(const connection *, const struct unit *,
     const struct region *);
-  extern boolean b_rvisible(const connection *, const struct region *r);
-  extern boolean b_fvisible(const connection *, const struct faction *f,
+  extern bool b_rvisible(const connection *, const struct region *r);
+  extern bool b_fvisible(const connection *, const struct faction *f,
     const struct region *);
-  extern boolean b_uvisible(const connection *, const struct unit *u);
-  extern boolean b_rinvisible(const connection *, const struct region *r);
-  extern boolean b_finvisible(const connection *, const struct faction *f,
+  extern bool b_uvisible(const connection *, const struct unit *u);
+  extern bool b_rinvisible(const connection *, const struct region *r);
+  extern bool b_finvisible(const connection *, const struct faction *f,
     const struct region *);
-  extern boolean b_uinvisible(const connection *, const struct unit *u);
-  extern boolean b_transparent(const connection *, const struct faction *);
-  extern boolean b_opaque(const connection *, const struct faction *);  /* !transparent */
+  extern bool b_uinvisible(const connection *, const struct unit *u);
+  extern bool b_transparent(const connection *, const struct faction *);
+  extern bool b_opaque(const connection *, const struct faction *);  /* !transparent */
 
   extern border_type bt_fogwall;
   extern border_type bt_noway;

@@ -37,7 +37,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
-static boolean good_region(const region * r)
+static bool good_region(const region * r)
 {
   return (!fval(r, RF_CHAOTIC) && r->age > 30 && rplane(r) == NULL
     && r->units != NULL && r->land != NULL);

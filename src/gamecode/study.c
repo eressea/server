@@ -87,7 +87,7 @@ magic_t getmagicskill(const struct locale * lang)
 
 /* ------------------------------------------------------------- */
 /* Vertraute und Kröten sind keine Migranten */
-boolean is_migrant(unit * u)
+bool is_migrant(unit * u)
 {
   if (u->race == u->faction->race)
     return false;
@@ -103,7 +103,7 @@ boolean is_migrant(unit * u)
 }
 
 /* ------------------------------------------------------------- */
-boolean magic_lowskill(unit * u)
+bool magic_lowskill(unit * u)
 {
   return (u->race == new_race[RC_TOAD]) ? true : false;
 }
@@ -174,7 +174,7 @@ static int study_days(unit * student, skill_t sk)
 
 static int
 teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
-  boolean report, int *academy)
+  bool report, int *academy)
 {
   teaching_info *teach = NULL;
   attrib *a;
@@ -393,7 +393,7 @@ int teach_cmd(unit * u, struct order *ord)
 
     while (!parser_end()) {
       unit *u2 = getunit(r, u->faction);
-      boolean feedback;
+      bool feedback;
       ++count;
 
       /* Falls die Unit nicht gefunden wird, Fehler melden */
@@ -763,7 +763,7 @@ int learn_cmd(unit * u, order * ord)
       while (teach->teachers[index] && index != MAXTEACHERS) {
         unit *teacher = teach->teachers[index++];
         if (teacher->faction != u->faction) {
-          boolean feedback = alliedunit(u, teacher->faction, HELP_GUARD);
+          bool feedback = alliedunit(u, teacher->faction, HELP_GUARD);
           if (feedback) {
             ADDMSG(&teacher->faction->msgs, msg_message("teach_teacher",
                 "teacher student skill level", teacher, u, sk,

@@ -25,7 +25,7 @@ extern "C" {
   extern int read_xml(const char *filename, const char *catalog);
   extern double xml_fvalue(xmlNodePtr node, const char *name, double dflt);
   extern int xml_ivalue(xmlNodePtr node, const char *name, int dflt);
-  extern boolean xml_bvalue(xmlNodePtr node, const char *name, boolean dflt);
+  extern bool xml_bvalue(xmlNodePtr node, const char *name, bool dflt);
 
   const xmlChar *xml_i(double number);
 

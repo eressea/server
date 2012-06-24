@@ -69,9 +69,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/otherfaction.h>
 #include <attributes/racename.h>
 
-boolean nocr = false;
-boolean nonr = false;
-boolean noreports = false;
+bool nocr = false;
+bool nonr = false;
+bool noreports = false;
 
 const char *visibility[] = {
   "none",
@@ -141,7 +141,7 @@ const char *hp_status(const unit * u)
 
 void
 report_item(const unit * owner, const item * i, const faction * viewer,
-  const char **name, const char **basename, int *number, boolean singular)
+  const char **name, const char **basename, int *number, bool singular)
 {
   assert(!owner || owner->number);
   if (owner && owner->faction == viewer) {
@@ -379,7 +379,7 @@ report_resources(const seen_region * sr, resource_report * result, int size,
     int horses = rhorses(r);
     int trees = rtrees(r, 2);
     int saplings = rtrees(r, 1);
-    boolean mallorn = fval(r, RF_MALLORN) != 0;
+    bool mallorn = fval(r, RF_MALLORN) != 0;
 
     if (money) {
       if (n >= size)
@@ -457,16 +457,16 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char *buf,
   int getarnt = fval(u, UFL_ANON_FACTION);
   const char *pzTmp, *str;
   building *b;
-  boolean isbattle = (boolean) (mode == see_battle);
+  bool isbattle = (bool) (mode == see_battle);
   int telepath_see = 0;
   attrib *a_fshidden = NULL;
   item *itm;
   item *show;
   faction *fv = visible_faction(f, u);
   char *bufp = buf;
-  boolean itemcloak = false;
+  bool itemcloak = false;
   static const curse_type *itemcloak_ct = 0;
-  static boolean init = false;
+  static bool init = false;
   int bytes;
   item result[MAX_INVENTORY];
 
@@ -774,7 +774,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char *buf,
       }
     }
     if (!isbattle) {
-      boolean printed = 0;
+      bool printed = 0;
       order *ord;;
       for (ord = u->old_orders; ord; ord = ord->next) {
         if (is_repeated(ord)) {
@@ -1095,7 +1095,7 @@ static void get_addresses(report_context * ctx)
       while (u != NULL) {
         if (u->faction != ctx->f) {
           faction *sf = visible_faction(ctx->f, u);
-          boolean ballied = sf && sf != ctx->f && sf != lastf
+          bool ballied = sf && sf != ctx->f && sf != lastf
             && !fval(u, UFL_ANON_FACTION) && cansee(ctx->f, r, u, stealthmod);
           if (ballied || ALLIED(ctx->f, sf)) {
             ql_set_insert(&flist, sf);
@@ -1208,9 +1208,9 @@ static void get_seen_interval(report_context * ctx)
   link_seen(ctx->seen, ctx->first, ctx->last);
 }
 
-boolean
+bool
 add_seen(struct seen_region *seehash[], struct region *r, unsigned char mode,
-  boolean dis)
+  bool dis)
 {
   seen_region *find = find_seen(seehash, r);
   if (find == NULL) {
@@ -1590,7 +1590,7 @@ static seen_region **prepare_report(faction * f)
 int write_reports(faction * f, time_t ltime)
 {
   int backup = 1, maxbackup = 128;
-  boolean gotit = false;
+  bool gotit = false;
   struct report_context ctx;
   const char *encoding = "UTF-8";
 
@@ -2321,7 +2321,7 @@ int report_action(region * r, unit * actor, message * msg, int flags)
   if (view) {
     for (u = r->units; u; u = u->next) {
       if (!fval(u->faction, FFL_SELECT)) {
-        boolean show = u->faction == actor->faction;
+        bool show = u->faction == actor->faction;
         fset(u->faction, FFL_SELECT);
         if (view == ACTION_CANSEE) {
           /* Bei Fernzaubern sieht nur die eigene Partei den Magier */

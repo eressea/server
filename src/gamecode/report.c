@@ -134,7 +134,7 @@ void rnl(FILE * F)
   fputc('\n', F);
 }
 
-static void centre(FILE * F, const char *s, boolean breaking)
+static void centre(FILE * F, const char *s, bool breaking)
 {
   /* Bei Namen die genau 80 Zeichen lang sind, kann es hier Probleme
    * geben. Seltsamerweise wird i dann auf MAXINT oder aehnlich
@@ -698,7 +698,7 @@ nr_unit(FILE * F, const faction * f, const unit * u, int indent, int mode)
   attrib *a_otherfaction;
   char marker;
   int dh;
-  boolean isbattle = (boolean) (mode == see_battle);
+  bool isbattle = (bool) (mode == see_battle);
   char buf[8192];
 
   if (fval(u->race, RCF_INVISIBLE))
@@ -735,7 +735,7 @@ nr_unit(FILE * F, const faction * f, const unit * u, int indent, int mode)
 
 static void
 rp_messages(FILE * F, message_list * msgs, faction * viewer, int indent,
-  boolean categorized)
+  bool categorized)
 {
   nrsection *section;
   if (!msgs)
@@ -866,9 +866,9 @@ static void prices(FILE * F, const region * r, const faction * f)
 
 }
 
-boolean see_border(const connection * b, const faction * f, const region * r)
+bool see_border(const connection * b, const faction * f, const region * r)
 {
-  boolean cs = b->type->fvisible(b, f, r);
+  bool cs = b->type->fvisible(b, f, r);
   if (!cs) {
     cs = b->type->rvisible(b, r);
     if (!cs) {
@@ -890,7 +890,7 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
 {
   const region *r = sr->r;
   int n;
-  boolean dh;
+  bool dh;
   direction_t d;
   int trees;
   int saplings;
@@ -899,12 +899,12 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
   struct edge {
     struct edge *next;
     char *name;
-    boolean transparent;
-    boolean block;
-    boolean exist[MAXDIRECTIONS];
+    bool transparent;
+    bool block;
+    bool exist[MAXDIRECTIONS];
     direction_t lastd;
   } *edges = NULL, *e;
-  boolean see[MAXDIRECTIONS];
+  bool see[MAXDIRECTIONS];
   char buf[8192];
   char *bufp = buf;
   size_t size = sizeof(buf);
@@ -919,7 +919,7 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
       continue;
     for (b = get_borders(r, r2); b;) {
       struct edge *e = edges;
-      boolean transparent = b->type->transparent(b, f);
+      bool transparent = b->type->transparent(b, f);
       const char *name = b->type->name(b, r, f, GF_DETAILED | GF_ARTICLE);
 
       if (!transparent)
@@ -1235,7 +1235,7 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
   if (edges)
     rnl(F);
   for (e = edges; e; e = e->next) {
-    boolean first = true;
+    bool first = true;
     bufp = buf;
     size = sizeof(buf) - 1;
     for (d = 0; d != MAXDIRECTIONS; ++d) {
@@ -1455,7 +1455,7 @@ static int buildingmaintenance(const building * b, const resource_type * rtype)
 {
   const building_type *bt = b->type;
   int c, cost = 0;
-  static boolean init = false;
+  static bool init = false;
   static const curse_type *nocost_ct;
   if (!init) {
     init = true;
@@ -1775,7 +1775,7 @@ static void guards(FILE * F, const region * r, const faction * see)
   unit *u;
   int i;
 
-  boolean tarned = false;
+  bool tarned = false;
   /* Bewachung */
 
   for (u = r->units; u; u = u->next) {
@@ -2579,7 +2579,7 @@ static void add_find(faction * f, unit * u, faction * f2)
 static void update_find(void)
 {
   region *r;
-  static boolean initial = true;
+  static bool initial = true;
 
   if (initial)
     for (r = regions; r; r = r->next) {
@@ -2601,10 +2601,10 @@ static void update_find(void)
   initial = false;
 }
 
-boolean kann_finden(faction * f1, faction * f2)
+bool kann_finden(faction * f1, faction * f2)
 {
   update_find();
-  return (boolean) (can_find(f1, f2) != NULL);
+  return (bool) (can_find(f1, f2) != NULL);
 }
 
 /******* end summary ******/

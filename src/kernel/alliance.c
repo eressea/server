@@ -452,7 +452,7 @@ int victorycondition(const alliance * al, const char *name)
       const struct item_type *itype = it_find(*igem);
       quicklist *flist = al->members;
       int qi;
-      boolean found = false;
+      bool found = false;
 
       assert(itype != NULL);
       for (qi = 0; flist && !found; ql_advance(&flist, &qi, 1)) {

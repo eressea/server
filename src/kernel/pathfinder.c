@@ -28,21 +28,21 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <assert.h>
 
-boolean allowed_swim(const region * src, const region * r)
+bool allowed_swim(const region * src, const region * r)
 {
   if (fval(r->terrain, SWIM_INTO))
     return true;
   return false;
 }
 
-boolean allowed_walk(const region * src, const region * r)
+bool allowed_walk(const region * src, const region * r)
 {
   if (fval(r->terrain, WALK_INTO))
     return true;
   return false;
 }
 
-boolean allowed_fly(const region * src, const region * r)
+bool allowed_fly(const region * src, const region * r)
 {
   if (fval(r->terrain, FLY_INTO))
     return true;
@@ -100,7 +100,7 @@ static void free_nodes(node * root)
 }
 
 struct quicklist *regions_in_range(struct region *start, int maxdist,
-  boolean(*allowed) (const struct region *, const struct region *))
+  bool(*allowed) (const struct region *, const struct region *))
 {
   quicklist * rlist = NULL;
   node *root = new_node(start, 0, NULL);
@@ -140,14 +140,14 @@ struct quicklist *regions_in_range(struct region *start, int maxdist,
 }
 
 static region **internal_path_find(region * start, const region * target,
-  int maxlen, boolean(*allowed) (const region *, const region *))
+  int maxlen, bool(*allowed) (const region *, const region *))
 {
   static region *path[MAXDEPTH + 2];    /* STATIC_RETURN: used for return, not across calls */
   direction_t d;
   node *root = new_node(start, 0, NULL);
   node **end = &root->next;
   node *n = root;
-  boolean found = false;
+  bool found = false;
   assert(maxlen <= MAXDEPTH);
   fset(start, RF_MARK);
 
@@ -190,9 +190,9 @@ static region **internal_path_find(region * start, const region * target,
   return NULL;
 }
 
-boolean
+bool
 path_exists(region * start, const region * target, int maxlen,
-  boolean(*allowed) (const region *, const region *))
+  bool(*allowed) (const region *, const region *))
 {
   assert((!fval(start, RF_MARK) && !fval(target, RF_MARK))
     || !"Some Algorithm did not clear its RF_MARKs!");
@@ -204,7 +204,7 @@ path_exists(region * start, const region * target, int maxlen,
 }
 
 region **path_find(region * start, const region * target, int maxlen,
-  boolean(*allowed) (const region *, const region *))
+  bool(*allowed) (const region *, const region *))
 {
   assert((!fval(start, RF_MARK) && !fval(target, RF_MARK))
     || !"Did you call path_init()?");

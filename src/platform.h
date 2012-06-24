@@ -247,7 +247,6 @@ extern char *strdup(const char *s);
 #endif /* ghs || __GNUC__ || ..... */
 
 #include "util/bool.h"
-typedef bool boolean;
   
 #ifndef INLINE_FUNCTION
 # define INLINE_FUNCTION

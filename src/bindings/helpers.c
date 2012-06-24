@@ -342,10 +342,10 @@ static int lua_getresource(unit * u, const struct resource_type *rtype)
   return result;
 }
 
-static boolean lua_canuse_item(const unit * u, const struct item_type *itype)
+static bool lua_canuse_item(const unit * u, const struct item_type *itype)
 {
   static int function_exists = 1;
-  boolean result = true;
+  bool result = true;
 
   if (function_exists) {
     lua_State *L = (lua_State *) global.vm_state;

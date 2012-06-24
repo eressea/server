@@ -145,7 +145,7 @@ extern "C" {
   const struct potion_type *ugetpotionuse(const struct unit *u);        /* benutzt u einein trank? */
   void usetpotionuse(struct unit *u, const struct potion_type *p);      /* u benutzt trank p (es darf halt nur einer pro runde) */
 
-  boolean ucontact(const struct unit *u, const struct unit *u2);
+  bool ucontact(const struct unit *u, const struct unit *u2);
   void usetcontact(struct unit *u, const struct unit *c);
 
   struct unit *findnewunit(const struct region *r, const struct faction *f,
@@ -155,7 +155,7 @@ extern "C" {
   extern struct skill *add_skill(struct unit *u, skill_t id);
   extern void remove_skill(struct unit *u, skill_t sk);
   extern struct skill *get_skill(const struct unit *u, skill_t id);
-  extern boolean has_skill(const unit * u, skill_t sk);
+  extern bool has_skill(const unit * u, skill_t sk);
 
   extern void set_level(struct unit *u, skill_t id, int level);
   extern int get_level(const struct unit *u, skill_t id);
@@ -167,7 +167,7 @@ extern "C" {
     const struct region *r);
 
   extern int get_modifier(const struct unit *u, skill_t sk, int lvl,
-    const struct region *r, boolean noitem);
+    const struct region *r, bool noitem);
   extern int remove_unit(struct unit **ulist, struct unit *u);
 
 #define GIFT_SELF     1<<0
@@ -181,8 +181,8 @@ extern "C" {
   extern void write_unit_reference(const struct unit *u, struct storage *store);
   extern variant read_unit_reference(struct storage *store);
 
-  extern boolean leave(struct unit *u, boolean force);
-  extern boolean can_leave(struct unit *u);
+  extern bool leave(struct unit *u, bool force);
+  extern bool can_leave(struct unit *u);
 
   extern void u_set_building(struct unit * u, struct building * b);
   extern void u_set_ship(struct unit * u, struct ship * sh);
@@ -191,7 +191,7 @@ extern "C" {
 
   extern void set_leftship(struct unit *u, struct ship *sh);
   extern struct ship *leftship(const struct unit *);
-  extern boolean can_survive(const struct unit *u, const struct region *r);
+  extern bool can_survive(const struct unit *u, const struct region *r);
   extern void move_unit(struct unit *u, struct region *target,
     struct unit **ulist);
 
@@ -203,7 +203,7 @@ extern "C" {
   extern void u_setfaction(struct unit *u, struct faction *f);
   extern void set_number(struct unit *u, int count);
 
-  extern boolean learn_skill(struct unit *u, skill_t sk, double chance);
+  extern bool learn_skill(struct unit *u, skill_t sk, double chance);
 
   extern int invisible(const struct unit *target, const struct unit *viewer);
   extern void free_unit(struct unit *u);

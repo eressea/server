@@ -34,7 +34,7 @@ extern "C" {
     const char *s, struct unit *receiver);
   int init_data(const char *filename, const char *catalog);
 
-  boolean renamed_building(const struct building * b);
+  bool renamed_building(const struct building * b);
   int rename_building(struct unit * u, struct order * ord, struct building * b, const char *name);
   void get_food(struct region * r);
   extern int can_contact(const struct region *r, const struct unit *u, const struct unit *u2);

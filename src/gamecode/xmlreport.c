@@ -213,10 +213,10 @@ static xmlNodePtr xml_unit(report_context * ctx, unit * u, int mode)
   xml_context *xct = (xml_context *) ctx->userdata;
   xmlNodePtr node = xmlNewNode(xct->ns_atl, BAD_CAST "unit");
   static const curse_type *itemcloak_ct = 0;
-  static boolean init = false;
+  static bool init = false;
   xmlNodePtr child;
   const char *str, *rcname, *rcillusion;
-  boolean disclosure = (ctx->f == u->faction || omniscient(ctx->f));
+  bool disclosure = (ctx->f == u->faction || omniscient(ctx->f));
 
   /* TODO: hitpoints, aura, combatspells, curses */
 
@@ -391,7 +391,7 @@ static xmlNodePtr xml_unit(report_context * ctx, unit * u, int mode)
     if (disclosure) {
       show = u->items;
     } else {
-      boolean see_items = (mode >= see_unit);
+      bool see_items = (mode >= see_unit);
       if (see_items) {
         if (itemcloak_ct && curse_active(get_curse(u->attribs, itemcloak_ct))) {
           see_items = false;

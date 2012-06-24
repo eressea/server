@@ -157,7 +157,7 @@ static void gm_create(const void *tnext, struct unit *u, struct order *ord)
   }
 }
 
-static boolean has_permission(const attrib * permissions, unsigned int key)
+static bool has_permission(const attrib * permissions, unsigned int key)
 {
   return (find_key((attrib *) permissions->data.v, key) ||
     find_key((attrib *) permissions->data.v, atoi36("master")));
@@ -600,7 +600,7 @@ faction *gm_addquest(const char *email, const char *name, int radius,
   plane *pl;
   watcher *w = calloc(sizeof(watcher), 1);
   region *center;
-  boolean invalid = false;
+  bool invalid = false;
   int minx, miny, maxx, maxy, cx, cy;
   int x;
   faction *f;
@@ -716,7 +716,7 @@ plane *gm_addplane(int radius, unsigned int flags, const char *name)
 {
   region *center;
   plane *pl;
-  boolean invalid = false;
+  bool invalid = false;
   int minx, miny, maxx, maxy, cx, cy;
   int x;
 

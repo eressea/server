@@ -70,13 +70,13 @@ extern "C" {
   } state;
 
   typedef struct window {
-    boolean(*handlekey) (struct window * win, struct state * st, int key);
+    bool(*handlekey) (struct window * win, struct state * st, int key);
     void (*paint) (struct window * win, const struct state * st);
 
     WINDOW *handle;
     struct window *next;
     struct window *prev;
-    boolean initialized;
+    bool initialized;
     int update;
   } window;
 

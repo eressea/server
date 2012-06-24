@@ -175,7 +175,7 @@ void set_group(struct unit *u, struct group *g)
   }
 }
 
-boolean join_group(unit * u, const char *name)
+bool join_group(unit * u, const char *name)
 {
   group *g = NULL;
 

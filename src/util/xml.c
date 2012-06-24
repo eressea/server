@@ -43,9 +43,9 @@ int xml_ivalue(xmlNodePtr node, const char *name, int dflt)
   return i;
 }
 
-boolean xml_bvalue(xmlNodePtr node, const char *name, boolean dflt)
+bool xml_bvalue(xmlNodePtr node, const char *name, bool dflt)
 {
-  boolean result = dflt;
+  bool result = dflt;
   xmlChar *propValue = xmlGetProp(node, BAD_CAST name);
   if (propValue != NULL) {
     if (strcmp((const char *)propValue, "no") == 0)
@@ -57,10 +57,10 @@ boolean xml_bvalue(xmlNodePtr node, const char *name, boolean dflt)
     else if (strcmp((const char *)propValue, "true") == 0)
       result = true;
     else if (strcmp((const char *)propValue, "1") == 0) {
-      log_warning("boolean value is '1': %s::%s\n", node->name, name);
+      log_warning("bool value is '1': %s::%s\n", node->name, name);
       result = true;
     } else if (strcmp((const char *)propValue, "0") == 0) {
-      log_warning("boolean value is '0': %s::%s\n", node->name, name);
+      log_warning("bool value is '0': %s::%s\n", node->name, name);
       result = false;
     }
     xmlFree(propValue);

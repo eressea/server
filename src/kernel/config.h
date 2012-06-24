@@ -111,7 +111,7 @@ extern "C" {
 
   extern int shipspeed(const struct ship *sh, const struct unit *u);
 
-#define i2b(i) ((boolean)((i)?(true):(false)))
+#define i2b(i) ((bool)((i)?(true):(false)))
 
   typedef struct ally {
     struct ally *next;
@@ -136,10 +136,10 @@ extern "C" {
   extern int verbosity;
 
 /* parteinummern */
-  extern boolean faction_id_is_unused(int);
+  extern bool faction_id_is_unused(int);
 
 /* leuchtturm */
-  extern boolean check_leuchtturm(struct region *r, struct faction *f);
+  extern bool check_leuchtturm(struct region *r, struct faction *f);
   extern void update_lighthouse(struct building *lh);
   extern int lighthouse_range(const struct building *b,
     const struct faction *f);
@@ -159,7 +159,7 @@ extern "C" {
 
   void addstrlist(strlist ** SP, const char *s);
 
-  int armedmen(const struct unit *u, boolean siege_weapons);
+  int armedmen(const struct unit *u, bool siege_weapons);
 
   unsigned int atoip(const char *s);
   unsigned int getuint(void);
@@ -188,13 +188,13 @@ extern "C" {
 #define factionid(x) itoa36((x)->no)
 #define curseid(x) itoa36((x)->no)
 
-  extern boolean cansee(const struct faction *f, const struct region *r,
+  extern bool cansee(const struct faction *f, const struct region *r,
     const struct unit *u, int modifier);
-  boolean cansee_durchgezogen(const struct faction *f, const struct region *r,
+  bool cansee_durchgezogen(const struct faction *f, const struct region *r,
     const struct unit *u, int modifier);
-  extern boolean cansee_unit(const struct unit *u, const struct unit *target,
+  extern bool cansee_unit(const struct unit *u, const struct unit *target,
     int modifier);
-  boolean seefaction(const struct faction *f, const struct region *r,
+  bool seefaction(const struct faction *f, const struct region *r,
     const struct unit *u, int modifier);
   extern int effskill(const struct unit *u, skill_t sk);
 
@@ -210,7 +210,7 @@ extern "C" {
   extern struct unit *createunit(struct region *r, struct faction *f,
     int number, const struct race *rc);
   extern void create_unitid(struct unit *u, int id);
-  extern boolean getunitpeasants;
+  extern bool getunitpeasants;
   extern struct unit *getunitg(const struct region *r, const struct faction *f);
   extern struct unit *getunit(const struct region *r, const struct faction *f);
 
@@ -242,7 +242,7 @@ extern "C" {
   typedef int (*cmp_building_cb) (const struct building * b,
     const struct building * a);
   struct building *largestbuilding(const struct region *r, cmp_building_cb,
-    boolean imaginary);
+    bool imaginary);
   int cmp_wage(const struct building *b, const struct building *bother);
   int cmp_taxes(const struct building *b, const struct building *bother);
   int cmp_current_owner(const struct building *b,
@@ -265,7 +265,7 @@ extern "C" {
   extern int count_migrants(const struct faction *f);
   extern int count_maxmigrants(const struct faction *f);
 
-  extern boolean has_limited_skills(const struct unit *u);
+  extern bool has_limited_skills(const struct unit *u);
   extern const struct race *findrace(const char *, const struct locale *);
 
   int eff_stealth(const struct unit *u, const struct region *r);
@@ -273,7 +273,7 @@ extern "C" {
 
   int check_option(struct faction *f, int option);
   extern void parse(keyword_t kword, int (*dofun) (struct unit *,
-      struct order *), boolean thisorder);
+      struct order *), bool thisorder);
 
 /* Anzahl Personen in einer Einheit festlegen. NUR (!) mit dieser Routine,
  * sonst großes Unglück. Durch asserts an ein paar Stellen abgesichert. */
@@ -293,8 +293,8 @@ extern "C" {
   void fhash(struct faction *f);
   void funhash(struct faction *f);
 
-  boolean idle(struct faction *f);
-  boolean unit_has_cursed_item(struct unit *u);
+  bool idle(struct faction *f);
+  bool unit_has_cursed_item(struct unit *u);
 
 /* simple garbage collection: */
   void *gc_add(void *p);
@@ -344,18 +344,18 @@ extern "C" {
    */
   unsigned int guard_flags(const struct unit *u);
 
-  extern boolean hunger(int number, struct unit *u);
+  extern bool hunger(int number, struct unit *u);
   extern int lifestyle(const struct unit *);
   extern int besieged(const struct unit *u);
   extern int maxworkingpeasants(const struct region *r);
-  extern boolean has_horses(const struct unit *u);
+  extern bool has_horses(const struct unit *u);
   extern int markets_module(void);
   extern int wage(const struct region *r, const struct faction *f,
     const struct race *rc, int in_turn);
   extern int maintenance_cost(const struct unit *u);
   extern struct message *movement_error(struct unit *u, const char *token,
     struct order *ord, int error_code);
-  extern boolean move_blocked(const struct unit *u, const struct region *src,
+  extern bool move_blocked(const struct unit *u, const struct region *src,
     const struct region *dest);
   extern void add_income(struct unit *u, int type, int want, int qty);
 
@@ -392,7 +392,7 @@ extern "C" {
     const char *gamename;
     struct attrib *attribs;
     unsigned int data_turn;
-    boolean disabled[MAXKEYWORDS];
+    bool disabled[MAXKEYWORDS];
     struct param *parameters;
     void *vm_state;
     float producexpchance;
@@ -409,9 +409,9 @@ extern "C" {
 
   extern int produceexp(struct unit *u, skill_t sk, int n);
 
-  extern boolean battledebug;
-  extern boolean sqlpatch;
-  extern boolean lomem;         /* save memory */
+  extern bool battledebug;
+  extern bool sqlpatch;
+  extern bool lomem;         /* save memory */
 
   extern const char *dbrace(const struct race *rc);
 
@@ -421,19 +421,19 @@ extern "C" {
   extern float get_param_flt(const struct param *p, const char *name,
     float def);
 
-  extern boolean ExpensiveMigrants(void);
+  extern bool ExpensiveMigrants(void);
   extern int NMRTimeout(void);
   extern int LongHunger(const struct unit *u);
   extern int SkillCap(skill_t sk);
   extern int NewbieImmunity(void);
-  extern boolean IsImmune(const struct faction *f);
+  extern bool IsImmune(const struct faction *f);
   extern int AllianceAuto(void);        /* flags that allied factions get automatically */
   extern int AllianceRestricted(void);  /* flags restricted to allied factions */
   extern int HelpMask(void);    /* flags restricted to allied factions */
   extern struct order *default_order(const struct locale *lang);
   extern int entertainmoney(const struct region *r);
 
-  extern void plagues(struct region *r, boolean ismagic);
+  extern void plagues(struct region *r, bool ismagic);
   typedef struct helpmode {
     const char *name;
     int status;

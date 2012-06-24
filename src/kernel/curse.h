@@ -248,7 +248,7 @@ extern "C" {
 
   extern void destroy_curse(curse * c);
 
-  boolean is_cursed_internal(struct attrib *ap, const curse_type * ctype);
+  bool is_cursed_internal(struct attrib *ap, const curse_type * ctype);
   /* ignoriert CURSE_ISNEW */
 
   extern void remove_curse(struct attrib **ap, const struct curse *c);
@@ -281,7 +281,7 @@ extern "C" {
    * */
 
   extern struct curse *get_cursex(struct attrib *ap, const curse_type * ctype,
-    variant data, boolean(*compare) (const struct curse *, variant));
+    variant data, bool(*compare) (const struct curse *, variant));
   /* gibt pointer auf die erste curse-struct zurück, deren Typ ctype ist,
    * und für die compare() true liefert, oder einen NULL-pointer.
    * */
@@ -303,15 +303,15 @@ extern "C" {
   extern void curse_done(struct attrib *a);
   extern int curse_age(struct attrib *a);
 
-  extern boolean cmp_curse(const struct attrib *a, const void *data);
-  extern boolean cmp_cursetype(const struct attrib *a, const void *data);
+  extern bool cmp_curse(const struct attrib *a, const void *data);
+  extern bool cmp_cursetype(const struct attrib *a, const void *data);
 
   extern double destr_curse(struct curse *c, int cast_level, double force);
 
   extern int resolve_curse(variant data, void *address);
-  extern boolean is_cursed_with(const struct attrib *ap, const struct curse *c);
+  extern bool is_cursed_with(const struct attrib *ap, const struct curse *c);
 
-  extern boolean curse_active(const struct curse *c);
+  extern bool curse_active(const struct curse *c);
   /* gibt true, wenn der Curse nicht NULL oder inaktiv ist */
 
 /*** COMPATIBILITY MACROS. DO NOT USE FOR NEW CODE, REPLACE IN OLD CODE: */

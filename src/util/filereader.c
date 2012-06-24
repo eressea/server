@@ -42,9 +42,9 @@ INLINE_FUNCTION int eatwhite(const char *ptr, size_t * total_size)
 
 static const char *getbuf_latin1(FILE * F)
 {
-  boolean cont = false;
+  bool cont = false;
   char quote = 0;
-  boolean comment = false;
+  bool comment = false;
   char *cp = fbuf;
   char *tail = lbuf + MAXLINE - 2;
 
@@ -57,8 +57,8 @@ static const char *getbuf_latin1(FILE * F)
     while (*bp && isxspace(*(unsigned char *)bp))
       ++bp;                     /* eatwhite */
 
-    comment = (boolean) (comment && cont);
-    quote = (boolean) (quote && cont);
+    comment = (bool) (comment && cont);
+    quote = (bool) (quote && cont);
 
     if (tail[1] == 0) {
       /* we read he maximum number of bytes! */
@@ -178,9 +178,9 @@ static const char *getbuf_latin1(FILE * F)
 
 static const char *getbuf_utf8(FILE * F)
 {
-  boolean cont = false;
+  bool cont = false;
   char quote = 0;
-  boolean comment = false;
+  bool comment = false;
   char *cp = fbuf;
   char *tail = lbuf + MAXLINE - 2;
 
@@ -195,8 +195,8 @@ static const char *getbuf_utf8(FILE * F)
     eatwhite(bp, &white);       /* decoding errors will get caught later on, don't have to check */
     bp += white;
 
-    comment = (boolean) (comment && cont);
-    quote = (boolean) (quote && cont);
+    comment = (bool) (comment && cont);
+    quote = (bool) (quote && cont);
 
     if (tail[1] == 0) {
       /* we read the maximum number of bytes! */

@@ -186,7 +186,7 @@ static const char *parse_symbol(opstack ** stack, const char *in,
  * result goes on the stack
  */
 {
-  boolean braces = false;
+  bool braces = false;
   char symbol[32];
   char *cp = symbol;            /* current position */
 
@@ -239,8 +239,8 @@ static const char *parse_string(opstack ** stack, const char *in,
   const char *ic = in;
   char *oc = buffer;
   /* mode flags */
-  boolean f_escape = false;
-  boolean bDone = false;
+  bool f_escape = false;
+  bool bDone = false;
   variant var;
 
   while (*ic && !bDone) {
@@ -310,7 +310,7 @@ static const char *parse_int(opstack ** stack, const char *in)
 {
   int k = 0;
   int vz = 1;
-  boolean ok = false;
+  bool ok = false;
   variant var;
   do {
     switch (*in) {

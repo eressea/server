@@ -80,7 +80,7 @@ without prior permission by the authors of Eressea.
 
 /* imports */
 extern int verbosity;
-boolean opt_cr_absolute_coords = false;
+bool opt_cr_absolute_coords = false;
 
 /* globals */
 #define C_REPORT_VERSION 66
@@ -177,7 +177,7 @@ static void print_items(FILE * F, item * items, const struct locale *lang)
 static void
 cr_output_curses(FILE * F, const faction * viewer, const void *obj, objtype_t typ)
 {
-  boolean header = false;
+  bool header = false;
   attrib *a = NULL;
   int self = 0;
   region *r;
@@ -508,7 +508,7 @@ static void render_messages(FILE * F, faction * f, message_list * msgs)
   struct mlist *m = msgs->begin;
   while (m) {
     char crbuffer[BUFFERSIZE];  /* gross, wegen spionage-messages :-( */
-    boolean printed = false;
+    bool printed = false;
     const struct message_type *mtype = m->msg->type;
     unsigned int hash = mtype->key;
 #ifdef RENDER_CRMESSAGES
@@ -637,7 +637,7 @@ cr_output_ship(FILE * F, const ship * sh, const unit * u, int fcaptain,
 
 static void
 fwriteorder(FILE * F, const struct order *ord, const struct locale *lang,
-  boolean escape)
+  bool escape)
 {
   char ebuf[1024];
   char obuf[1024];
@@ -690,9 +690,9 @@ static void cr_output_unit(FILE * F, const region * r, const faction * f,       
   const char *pzTmp;
   skill *sv;
   const attrib *a_fshidden = NULL;
-  boolean itemcloak = false;
+  bool itemcloak = false;
   static const curse_type *itemcloak_ct = 0;
-  static boolean init = false;
+  static bool init = false;
   item result[MAX_INVENTORY];
 
   if (fval(u->race, RCF_INVISIBLE))
@@ -1096,7 +1096,7 @@ cr_borders(seen_region ** seen, const region * r, const faction * f,
     }
     b = get_borders(r, r2);
     while (b) {
-      boolean cs = b->type->fvisible(b, f, r);
+      bool cs = b->type->fvisible(b, f, r);
 
       if (!cs) {
         cs = b->type->rvisible(b, r);
@@ -1352,7 +1352,7 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
     /* describe both passed and inhabited regions */
     show_active_spells(r);
     if (fval(r, RF_TRAVELUNIT)) {
-      boolean seeunits = false, seeships = false;
+      bool seeunits = false, seeships = false;
       const attrib *ru;
       /* show units pulled through region */
       for (ru = a_find(r->attribs, &at_travelunit);

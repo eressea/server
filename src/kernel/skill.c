@@ -73,7 +73,7 @@ const char *skillnames[MAXSKILLS] = {
   "unarmed"
 };
 
-boolean skill_enabled[MAXSKILLS];
+bool skill_enabled[MAXSKILLS];
 
 const char *skillname(skill_t sk, const struct locale *lang)
 {
@@ -83,7 +83,7 @@ const char *skillname(skill_t sk, const struct locale *lang)
   return NULL;
 }
 
-void enable_skill(const char *skname, boolean value)
+void enable_skill(const char *skname, bool value)
 {
   skill_t sk;
   for (sk = 0; sk != MAXSKILLS; ++sk) {
@@ -260,7 +260,7 @@ int level(int days)
 {
   int i;
   static int ldays[64];
-  static boolean init = false;
+  static bool init = false;
   if (!init) {
     init = true;
     for (i = 0; i != 64; ++i)

@@ -51,18 +51,18 @@ extern "C" {
   void movement(void);
   void run_to(struct unit *u, struct region *to);
   struct unit *is_guarded(struct region *r, struct unit *u, unsigned int mask);
-  boolean is_guard(const struct unit *u, int mask);
+  bool is_guard(const struct unit *u, int mask);
   int enoughsailors(const struct ship *sh, const struct region *r);
-  boolean canswim(struct unit *u);
-  boolean canfly(struct unit *u);
+  bool canswim(struct unit *u);
+  bool canfly(struct unit *u);
   struct unit *get_captain(const struct ship *sh);
   void travelthru(const struct unit *u, struct region *r);
   struct ship *move_ship(struct ship *sh, struct region *from,
     struct region *to, struct region_list *route);
   int walkingcapacity(const struct unit *u);
   void follow_unit(struct unit *u);
-  boolean buildingtype_exists(const struct region *r,
-    const struct building_type *bt, boolean working);
+  bool buildingtype_exists(const struct region *r,
+    const struct building_type *bt, bool working);
   struct unit *owner_buildingtyp(const struct region *r,
     const struct building_type *bt);
 

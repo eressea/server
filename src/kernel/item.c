@@ -684,7 +684,7 @@ typedef struct t_item {
   const char *name;
   /* [0]: Einzahl für eigene; [1]: Mehrzahl für eigene;
    * [2]: Einzahl für Fremde; [3]: Mehrzahl für Fremde */
-  boolean is_resource;
+  bool is_resource;
   skill_t skill;
   int minskill;
   int gewicht;
