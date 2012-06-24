@@ -3,6 +3,7 @@
 #if defined(WIN32)
 #include <direct.h>
 #else   /* WIN32 */
+#include <sys/types.h>
 #include <sys/stat.h>
 #endif  /* WIN32 */
 int os_mkdir(const char *path, int mode) 
