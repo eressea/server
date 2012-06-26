@@ -23,13 +23,17 @@
 #define LUA_MAXINPUT        512
 #endif
 
+#if LUA_VERSION_NUM >= 502
+#define lua_strlen(L, idx) lua_rawlen(L, idx)
+#endif
+
 #if defined(LUA_USE_READLINE)
 #include <stdio.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 #define default_readline(L,b,p)	((void)L, ((b)=readline(p)) != NULL)
 #define lua_saveline(L,idx) \
-  if (lua_rawlen(L,idx) > 0)  /* non-empty line? */ \
+  if (lua_strlen(L,idx) > 0)  /* non-empty line? */ \
   add_history(lua_tostring(L, idx));    /* add it to history */
 #define lua_freeline(L,b)	((void)L, free(b))
 #else
@@ -194,7 +198,7 @@ static int loadline(lua_State * L)
   if (!pushline(L, 1))
     return -1;                  /* no input */
   for (;;) {                    /* repeat until gets a complete line */
-    status = luaL_loadbuffer(L, lua_tostring(L, 1), lua_rawlen(L, 1), "=stdin");
+    status = luaL_loadbuffer(L, lua_tostring(L, 1), lua_strlen(L, 1), "=stdin");
     if (!incomplete(L, status))
       break;                    /* cannot try to add lines? */
     if (!pushline(L, 0))        /* no more input? */
