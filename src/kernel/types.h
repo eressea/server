@@ -394,10 +394,6 @@ typedef enum {
 /* ------------------------------------------------------------- */
 /* Prototypen */
 
-#define ALLIED_TAX     1
-#define ALLIED_NOBLOCK 2
-#define ALLIED_HELP    4
-
 /* alle vierstelligen zahlen: */
 #define MAX_UNIT_NR (36*36*36*36-1)
 #define MAX_CONTAINER_NR (36*36*36*36-1)

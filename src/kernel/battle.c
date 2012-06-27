@@ -3137,6 +3137,45 @@ static int weapon_weight(const weapon * w, bool missile)
   return 0;
 }
 
+side * get_side(battle * b, const const unit * u)
+{
+  side * s;
+  for (s = b->sides; s != b->sides + b->nsides; ++s) {
+    if (s->faction==u->faction) {
+      fighter * fig;
+      for (fig=s->fighters;fig;fig=fig->next) {
+        if (fig->unit==u) {
+          return s;
+        }
+      }
+    }
+  }
+  return 0;
+}
+
+side * find_side(battle * b, const faction * f, const group * g, int flags, const faction * stealthfaction)
+{
+  side * s;
+  static int rule_anon_battle = -1;
+
+  if (rule_anon_battle < 0) {
+    rule_anon_battle = get_param_int(global.parameters, "rules.stealth.anon_battle", 1);
+  }
+  for (s = b->sides; s != b->sides + b->nsides; ++s) {
+    if (s->faction == f && s->group == g) {
+      int s1flags = flags | SIDE_HASGUARDS;
+      int s2flags = s->flags | SIDE_HASGUARDS;
+      if (rule_anon_battle && s->stealthfaction != stealthfaction) {
+        continue;
+      }
+      if (s1flags == s2flags) {
+        return s;
+      }
+    }
+  }
+  return 0;
+}
+
 fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
 {
 #define WMAX 20
@@ -3147,9 +3186,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
   region *r = b->region;
   item *itm;
   fighter *fig = NULL;
-  int i, tactics = eff_skill(u, SK_TACTICS, r);
-  side *s2;
-  int h;
+  int h, i, tactics = eff_skill(u, SK_TACTICS, r);
   int berserk;
   int strongmen;
   int speeded = 0, speed = 1;
@@ -3159,14 +3196,8 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
   const attrib *a = a_find(u->attribs, &at_otherfaction);
   const faction *stealthfaction = a ? get_otherfaction(a) : NULL;
   unsigned int flags = 0;
-  static int rule_anon_battle = -1;
 
   assert(u->number);
-
-  if (rule_anon_battle < 0) {
-    rule_anon_battle =
-      get_param_int(global.parameters, "rules.stealth.anon_battle", 1);
-  }
   if (fval(u, UFL_ANON_FACTION) != 0)
     flags |= SIDE_STEALTH;
   if (!(AllianceAuto() & HELP_FIGHT) && fval(u, UFL_GROUP)) {
@@ -3180,20 +3211,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     return NULL;
   }
   if (s1 == NULL) {
-    for (s2 = b->sides; s2 != b->sides + b->nsides; ++s2) {
-      if (s2->faction == u->faction && s2->group == g) {
-        int s1flags = flags | SIDE_HASGUARDS;
-        int s2flags = s2->flags | SIDE_HASGUARDS;
-        if (rule_anon_battle && s2->stealthfaction != stealthfaction) {
-          continue;
-        }
-        if (s1flags == s2flags) {
-          s1 = s2;
-          break;
-        }
-      }
-    }
-
+    s1 = find_side(b, u->faction, g, flags, stealthfaction);
     /* aliances are moved out of make_fighter and will be handled later */
     if (!s1) {
       s1 = make_side(b, u->faction, g, flags, stealthfaction);
@@ -3457,6 +3475,23 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
   add_tactics(&fig->side->leader, fig, tactics);
   ++b->nfighters;
   return fig;
+}
+
+fighter * get_fighter(battle * b, const struct unit * u)
+{
+  side * s;
+
+  for (s = b->sides; s != b->sides + b->nsides; ++s) {
+    fighter *fig;
+    if (s->faction == u->faction) {
+      for (fig = s->fighters; fig; fig = fig->next) {
+        if (fig->unit == u) {
+          return fig;
+        }
+      }
+    }
+  }
+  return 0;
 }
 
 static int join_battle(battle * b, unit * u, bool attack, fighter ** cp)

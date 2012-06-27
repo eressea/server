@@ -119,6 +119,8 @@ extern "C" {
     int status;
   } ally;
 
+  ally * ally_find(const ally *al, const struct faction *f);
+
   void remove_empty_units_in_region(struct region *r);
   void remove_empty_units(void);
   void remove_empty_factions(void);
