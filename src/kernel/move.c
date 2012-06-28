@@ -176,13 +176,6 @@ attrib_type at_speedup = {
 
 /* ------------------------------------------------------------- */
 
-direction_t getdirection(const struct locale * lang)
-{
-  return finddirection(getstrtoken(), lang);
-}
-
-/* ------------------------------------------------------------- */
-
 static attrib_type at_driveweight = {
   "driveweight", NULL, NULL, NULL, NULL, NULL
 };

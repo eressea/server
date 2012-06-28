@@ -628,13 +628,13 @@ int distance(const region * r1, const region * r2)
 static direction_t
 koor_reldirection(int ax, int ay, int bx, int by, const struct plane *pl)
 {
-  direction_t dir;
+  int dir;
   for (dir = 0; dir != MAXDIRECTIONS; ++dir) {
     int x = ax + delta_x[dir];
     int y = ay + delta_y[dir];
     pnormalize(&x, &y, pl);
     if (bx == x && by == y)
-      return dir;
+      return (direction_t)dir;
   }
   return NODIRECTION;
 }
@@ -1593,9 +1593,9 @@ void region_set_morale(region * r, int morale, int turn)
 
 void get_neighbours(const region * r, region ** list)
 {
-  direction_t dir;
+  int dir;
   for (dir = 0; dir != MAXDIRECTIONS; ++dir) {
-    list[dir] = rconnect(r, dir);
+    list[dir] = rconnect(r, (direction_t)dir);
   }
 }
 

@@ -606,3 +606,9 @@ void push_order(order ** ordp, order * ord)
     ordp = &(*ordp)->next;
   *ordp = ord;
 }
+
+void init_tokens(const struct order *ord)
+{
+  char *cmd = getcommand(ord);
+  init_tokens_str(cmd, cmd);
+}
