@@ -35,6 +35,7 @@ typedef short item_t;
 
 struct attrib;
 struct attrib_type;
+struct ally;
 struct building;
 struct building_type;
 struct curse;

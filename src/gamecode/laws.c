@@ -37,6 +37,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* kernel includes */
 #include <kernel/alchemy.h>
 #include <kernel/alliance.h>
+#include <kernel/ally.h>
 #include <kernel/battle.h>
 #include <kernel/connection.h>
 #include <kernel/curse.h>

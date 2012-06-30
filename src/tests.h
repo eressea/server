@@ -25,6 +25,7 @@ extern "C" {
   CuSuite *get_bsdstring_suite(void);
   CuSuite *get_functions_suite(void);
   CuSuite *get_umlaut_suite(void);
+  CuSuite *get_ally_suite(void);
 
   void test_cleanup(void);
 

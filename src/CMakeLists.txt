@@ -50,6 +50,7 @@ set (TEST_SRC
   gamecode/economy_test.c
   gamecode/laws_test.c
   gamecode/market_test.c
+  kernel/ally_test.c
   kernel/battle_test.c
   kernel/building_test.c
   kernel/curse_test.c
@@ -116,6 +117,7 @@ set (LIB_SRC
   items/xerewards.c
   kernel/alchemy.c
   kernel/alliance.c
+  kernel/ally.c
   kernel/battle.c
   kernel/binarystore.c
   kernel/build.c

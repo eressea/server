@@ -51,6 +51,7 @@ int RunAllTests(void)
   CuSuiteAddSuite(suite, get_building_suite());
   CuSuiteAddSuite(suite, get_spell_suite());
   CuSuiteAddSuite(suite, get_battle_suite());
+  CuSuiteAddSuite(suite, get_ally_suite());
   /* gamecode */
   CuSuiteAddSuite(suite, get_market_suite());
   CuSuiteAddSuite(suite, get_laws_suite());

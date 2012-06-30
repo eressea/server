@@ -113,14 +113,6 @@ extern "C" {
 
 #define i2b(i) ((bool)((i)?(true):(false)))
 
-  typedef struct ally {
-    struct ally *next;
-    struct faction *faction;
-    int status;
-  } ally;
-
-  ally * ally_find(const ally *al, const struct faction *f);
-
   void remove_empty_units_in_region(struct region *r);
   void remove_empty_units(void);
   void remove_empty_factions(void);

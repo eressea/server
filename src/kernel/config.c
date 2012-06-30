@@ -25,6 +25,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* kernel includes */
 #include "alliance.h"
+#include "ally.h"
 #include "alchemy.h"
 #include "battle.h"
 #include "connection.h"

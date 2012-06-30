@@ -31,6 +31,7 @@ without prior permission by the authors of Eressea.
 /* kernel includes */
 #include <kernel/alchemy.h>
 #include <kernel/alliance.h>
+#include <kernel/ally.h>
 #include <kernel/connection.h>
 #include <kernel/curse.h>
 #include <kernel/building.h>
