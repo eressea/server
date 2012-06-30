@@ -125,7 +125,7 @@ extern "C" {
   extern void set_alliance(struct faction *a, struct faction *b, int status);
   extern int get_alliance(const struct faction *a, const struct faction *b);
 
-  extern struct alliance *f_get_alliance(const struct faction *a);
+  extern struct alliance *f_get_alliance(const struct faction *f);
 
   extern void write_faction_reference(const struct faction *f,
     struct storage *store);

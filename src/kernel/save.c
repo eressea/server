@@ -22,6 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "alchemy.h"
 #include "alliance.h"
+#include "ally.h"
 #include "connection.h"
 #include "building.h"
 #include "faction.h"

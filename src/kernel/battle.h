@@ -205,6 +205,14 @@ extern "C" {
 
   extern const troop no_troop;
 
+  /* BEGIN battle interface */
+  void battle_init(battle * b);
+  void battle_free(battle * b);
+  side * find_side(battle * b, const struct faction * f, const struct group * g, int flags, const struct faction * stealthfaction);
+  side * get_side(battle * b, const struct unit * u);
+  fighter * get_fighter(battle * b, const struct unit * u);
+  /* END battle interface */
+
   extern void do_battle(struct region *r);
 
   /* for combat spells and special attacks */

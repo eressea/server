@@ -21,6 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "faction.h"
 
 #include "alliance.h"
+#include "ally.h"
 #include "equipment.h"
 #include "group.h"
 #include "item.h"

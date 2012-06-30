@@ -25,6 +25,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* kernel includes */
 #include "alliance.h"
+#include "ally.h"
 #include "alchemy.h"
 #include "battle.h"
 #include "connection.h"
@@ -1249,12 +1250,6 @@ int count_maxmigrants(const faction * f)
   return migrants;
 }
 
-void init_tokens(const struct order *ord)
-{
-  char *cmd = getcommand(ord);
-  init_tokens_str(cmd, cmd);
-}
-
 void
 parse(keyword_t kword, int (*dofun) (unit *, struct order *), bool thisorder)
 {
@@ -1951,6 +1946,11 @@ direction_t finddirection(const char *s, const struct locale *lang)
     return (direction_t) token.i;
   }
   return NODIRECTION;
+}
+
+direction_t getdirection(const struct locale * lang)
+{
+  return finddirection(getstrtoken(), lang);
 }
 
 static void init_translations(const struct locale *lang, int ut, const char * (*string_cb)(int i), int maxstrings)

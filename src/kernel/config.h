@@ -113,12 +113,6 @@ extern "C" {
 
 #define i2b(i) ((bool)((i)?(true):(false)))
 
-  typedef struct ally {
-    struct ally *next;
-    struct faction *faction;
-    int status;
-  } ally;
-
   void remove_empty_units_in_region(struct region *r);
   void remove_empty_units(void);
   void remove_empty_factions(void);
@@ -165,9 +159,10 @@ extern "C" {
   unsigned int getuint(void);
   int getint(void);
 
+  direction_t getdirection(const struct locale *);
+
   extern const char *igetstrtoken(const char *s);
 
-  extern void init_tokens(const struct order *ord);     /* initialize token parsing */
   extern skill_t findskill(const char *s, const struct locale *lang);
 
   extern keyword_t findkeyword(const char *s, const struct locale *lang);
