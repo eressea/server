@@ -13,7 +13,7 @@ set (ERESSEA_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "Eressea Cor
 
 add_subdirectory(bindings)
 
-find_package (Lua52 REQUIRED)
+find_package (Lua 5 REQUIRED)
 find_package (ToLua REQUIRED)
 find_package (LibXml2 REQUIRED)
 find_package (Curses REQUIRED)

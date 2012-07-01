@@ -9,7 +9,7 @@ ENDIF(CMAKE_COMPILER_IS_GNUCC)
 
 set (BINDINGS_LIBRARY ${PROJECT_NAME} CACHE INTERNAL "Eressea Lua Bindings")
 
-find_package (Lua52 REQUIRED)
+find_package (Lua 5 REQUIRED)
 find_package (ToLua REQUIRED)
 find_package (LibXml2 REQUIRED)
 find_package (Curses REQUIRED)
