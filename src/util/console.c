@@ -29,7 +29,7 @@
 #include <readline/history.h>
 #define default_readline(L,b,p)	((void)L, ((b)=readline(p)) != NULL)
 #define lua_saveline(L,idx) \
-  if (lua_strlen(L,idx) > 0)  /* non-empty line? */ \
+  if (lua_rawlen(L,idx) > 0)  /* non-empty line? */ \
   add_history(lua_tostring(L, idx));    /* add it to history */
 #define lua_freeline(L,b)	((void)L, free(b))
 #else
@@ -109,7 +109,7 @@ static int report(lua_State * L, int status)
 
 static int traceback(lua_State * L)
 {
-  lua_getfield(L, LUA_GLOBALSINDEX, "debug");
+  lua_getglobal(L, "debug");
   if (!lua_istable(L, -1)) {
     lua_pop(L, 1);
     return 1;
@@ -149,8 +149,7 @@ static int docall(lua_State * L, int narg, int clear)
 static const char *get_prompt(lua_State * L, int firstline)
 {
   const char *p = NULL;
-  lua_pushstring(L, firstline ? "_PROMPT" : "_PROMPT2");
-  lua_rawget(L, LUA_GLOBALSINDEX);
+  lua_getglobal(L, firstline ? "_PROMPT" : "_PROMPT2");
   p = lua_tostring(L, -1);
   if (p == NULL)
     p = (firstline ? PROMPT : PROMPT2);
@@ -195,7 +194,7 @@ static int loadline(lua_State * L)
   if (!pushline(L, 1))
     return -1;                  /* no input */
   for (;;) {                    /* repeat until gets a complete line */
-    status = luaL_loadbuffer(L, lua_tostring(L, 1), lua_strlen(L, 1), "=stdin");
+    status = luaL_loadbuffer(L, lua_tostring(L, 1), lua_rawlen(L, 1), "=stdin");
     if (!incomplete(L, status))
       break;                    /* cannot try to add lines? */
     if (!pushline(L, 0))        /* no more input? */

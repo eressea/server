@@ -16,7 +16,6 @@ without prior permission by the authors of Eressea.
 #include "bindings.h"
 
 #include <sqlite3.h>
-#include <lua.h>
 #include <tolua.h>
 
 #define LTYPE_DB TOLUA_CAST "db"

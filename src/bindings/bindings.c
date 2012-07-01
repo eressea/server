@@ -1182,12 +1182,17 @@ static const struct {
 
 static void openlibs(lua_State * L)
 {
-  int i;
+  luaL_openlibs(L);
+/*  int i, err;
   for (i = 0; lualibs[i].func; ++i) {
     lua_pushcfunction(L, lualibs[i].func);
     lua_pushstring(L, lualibs[i].name);
-    lua_call(L, 1, 0);
+    err = lua_pcall(L, 1, 0, 0);
+    if (err != 0) {
+      log_lua_error(L);
+    }
   }
+*/
 }
 
 void lua_done(lua_State * L) {
@@ -1195,7 +1200,7 @@ void lua_done(lua_State * L) {
 }
 
 lua_State *lua_init(void) {
-  lua_State *L = lua_open();
+  lua_State *L = luaL_newstate();
 
   openlibs(L);
 #ifdef BINDINGS_TOLUA

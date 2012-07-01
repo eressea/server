@@ -22,7 +22,6 @@ without prior permission by the authors of Eressea.
 #include <math.h>
 #include <stdio.h>
 
-#include <lua.h>
 #include <tolua.h>
 
 static int tolua_storage_create(lua_State * L)

@@ -51,7 +51,6 @@ without prior permission by the authors of Eressea.
 #include <util/log.h>
 #include <quicklist.h>
 
-#include <lua.h>
 #include <tolua.h>
 
 #include <assert.h>
