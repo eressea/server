@@ -621,12 +621,7 @@ static bool is_freezing(const unit * u)
   return true;
 }
 
-#define SA_HARBOUR 1
-#define SA_COAST 1
-#define SA_NO_INSECT -1
-#define SA_NO_COAST -2
-
-static bool is_ship_allowed(struct ship *sh, const region * r)
+int check_ship_allowed(struct ship *sh, const region * r)
 {
   int c = 0;
   static const building_type *bt_harbour = NULL;
@@ -634,7 +629,7 @@ static bool is_ship_allowed(struct ship *sh, const region * r)
   if (bt_harbour == NULL)
     bt_harbour = bt_find("harbour");
 
-  if (r_insectstalled(r)) {
+  if (sh->region && r_insectstalled(r)) {
     /* insekten dürfen nicht hier rein. haben wir welche? */
     unit *u;
 
@@ -654,7 +649,7 @@ static bool is_ship_allowed(struct ship *sh, const region * r)
     }
   }
 
-  if (buildingtype_exists(r, bt_harbour, true))
+  if (bt_harbour && buildingtype_exists(r, bt_harbour, true))
     return SA_HARBOUR;
   for (c = 0; sh->type->coasts[c] != NULL; ++c) {
     if (sh->type->coasts[c] == r->terrain)
@@ -746,7 +741,7 @@ static void drifting_ships(region * r)
         region *rn;
         dir = (direction_t) ((d + d_offset) % MAXDIRECTIONS);
         rn = rconnect(r, dir);
-        if (rn != NULL && fval(rn->terrain, SAIL_INTO) && is_ship_allowed(sh, rn) > 0) {
+        if (rn != NULL && fval(rn->terrain, SAIL_INTO) && check_ship_allowed(sh, rn) > 0) {
           rnext = rn;
           if (!fval(rnext->terrain, SEA_REGION))
             break;
@@ -1809,7 +1804,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
         }
       }
 
-      reason = is_ship_allowed(sh, next_point);
+      reason = check_ship_allowed(sh, next_point);
       if (reason<0) {
         /* for some reason or another, we aren't allowed in there.. */
         if (check_leuchtturm(current_point, NULL) || reason == SA_NO_INSECT) {

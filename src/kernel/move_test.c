@@ -4,6 +4,8 @@
 #include <kernel/building.h>
 #include <kernel/move.h>
 #include <kernel/region.h>
+#include <kernel/ship.h>
+#include <kernel/terrain.h>
 
 #include <util/language.h>
 
@@ -78,5 +80,7 @@ CuSuite *get_move_suite(void)
 {
   CuSuite *suite = CuSuiteNew();
   SUITE_ADD_TEST(suite, test_building_type_exists);
+  SUITE_ADD_TEST(suite, test_ship_not_allowed_in_coast);
+  SUITE_ADD_TEST(suite, test_ship_allowed_with_harbor);
   return suite;
 }

@@ -66,7 +66,13 @@ extern "C" {
     const struct building_type *bt);
 
   extern struct attrib_type at_speedup;
+  
+#define SA_HARBOUR 2
+#define SA_COAST 1
+#define SA_NO_INSECT -1
+#define SA_NO_COAST -2
 
+  extern int check_ship_allowed(struct ship *sh, const struct region * r);
 #ifdef __cplusplus
 }
 #endif
