@@ -7027,6 +7027,21 @@
     <text locale="en">is helping the factions</text>
   </string>
 
+  <string name="see_travel">
+    <text locale="de">durchgereist</text>
+    <text locale="en">travel</text>
+  </string>
+
+  <string name="see_neighbour">
+    <text locale="de">benachbart</text>
+    <text locale="en">neighbour</text>
+  </string>
+
+  <string name="see_lighthouse">
+    <text locale="de">vom Turm erblickt</text>
+    <text locale="en">from lighthouse</text>
+  </string>
+
   <string name="list_and">
     <text locale="de"> und </text>
     <text locale="en"> and </text>

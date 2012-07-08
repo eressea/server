@@ -940,11 +940,11 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
     WARN_STATIC_BUFFER();
 
   if (sr->mode == see_travel) {
-    bytes = (int)strlcpy(bufp, " (durchgereist)", size);
+    bytes = snprintf(buf, size, " (%s)", LOC(f->locale, "see_travel"));
   } else if (sr->mode == see_neighbour) {
-    bytes = (int)strlcpy(bufp, " (benachbart)", size);
+    bytes = snprintf(buf, size, " (%s)", LOC(f->locale, "see_neighbour"));
   } else if (sr->mode == see_lighthouse) {
-    bytes = (int)strlcpy(bufp, " (vom Turm erblickt)", size);
+    bytes = snprintf(buf, size, " (%s)", LOC(f->locale, "see_lighthouse"));
   } else {
     bytes = 0;
   }
