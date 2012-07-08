@@ -221,7 +221,6 @@ rparagraph(FILE * F, const char *str, ptrdiff_t indent, int hanging_indent,
 static void nr_spell(FILE * F, spellbook_entry * sbe, const struct locale *lang)
 {
   int bytes, k, itemanz, costtyp;
-  int dh = 0;
   char buf[4096];
   char *bufp = buf;
   size_t size = sizeof(buf) - 1;

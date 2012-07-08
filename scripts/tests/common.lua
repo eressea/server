@@ -980,8 +980,8 @@ function test_bug_1679()
     local file = io.open(filename, "w")
     file:write('ERESSEA ' .. itoa36(f.id) .. ' "' .. f.password .. '"\n')
     file:write('EINHEIT ' .. itoa36(u.id) .. "\n")
-    file:write("NACH W\n")
     file:write("ARBEITEN\n")
+    file:write("NACH W\n")
     file:close()
     
     eressea.read_orders(filename)
@@ -989,7 +989,7 @@ function test_bug_1679()
     init_reports()
     write_report(f)
     assert_true(find_in_report(f, "Die Einheit kann keine weiteren langen Befehle", "cr"))
-    assert_true(find_in_report(f, "entdeckt, dass es keinen Weg nach Westen gibt"))
+    assert_false(find_in_report(f, "entdeckt, dass es keinen Weg nach Westen gibt"))
 end
 
 function test_building_unique0()
