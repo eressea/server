@@ -6982,6 +6982,31 @@
     <text locale="en">hungry</text>
   </string>
 
+  <string name="smod_far">
+    <text locale="de">Fernzauber</text>
+    <text locale="en">far</text>
+  </string>
+
+  <string name="smod_sea">
+    <text locale="de">Seezauber</text>
+    <text locale="en">sea</text>
+  </string>
+
+  <string name="smod_ship">
+    <text locale="de">Schiffszauber</text>
+    <text locale="en">ship</text>
+  </string>
+
+  <string name="smod_nofamiliar">
+    <text locale="de">Magier exklusiv</text>
+    <text locale="en">magicians only</text>
+  </string>
+
+  <string name="smod_none">
+    <text locale="de">Keine</text>
+    <text locale="en">none</text>
+  </string>
+
   <string name="list_and">
     <text locale="de"> und </text>
     <text locale="en"> and </text>

@@ -218,12 +218,26 @@ rparagraph(FILE * F, const char *str, ptrdiff_t indent, int hanging_indent,
   } while (*begin);
 }
 
+static size_t write_spell_modifier(spell * sp, int flag, const char * str, bool cont, char * bufp, size_t size) {
+  if (sp->sptyp & flag) {
+    size_t bytes = 0;
+    if (cont) {
+      bytes = strlcpy(bufp, ", ", size);
+    } else {
+      bytes = strlcpy(bufp, " ", size);
+    }
+    bytes += strlcpy(bufp+bytes, str, size-bytes);
+    return bytes;
+  }
+  return 0;
+}
+
 static void nr_spell(FILE * F, spellbook_entry * sbe, const struct locale *lang)
 {
   int bytes, k, itemanz, costtyp;
   int dh = 0;
   char buf[4096];
-  char *bufp = buf;
+  char *startp, *bufp = buf;
   size_t size = sizeof(buf) - 1;
   spell * sp = sbe->sp;
   const char *params = sp->parameter;
@@ -297,52 +311,29 @@ static void nr_spell(FILE * F, spellbook_entry * sbe, const struct locale *lang)
   bytes = (int)strlcpy(buf, LOC(lang, "nr_spell_modifiers"), size);
   if (wrptr(&bufp, &size, bytes) != 0)
     WARN_STATIC_BUFFER();
-  if (sp->sptyp & FARCASTING) {
-    bytes = (int)strlcpy(bufp, " Fernzauber", size);
-    if (wrptr(&bufp, &size, bytes) != 0)
-      WARN_STATIC_BUFFER();
-    dh = 1;
+
+  startp = bufp;
+  bytes = (int)write_spell_modifier(sp, FARCASTING, LOC(lang, "smod_far"), startp!=bufp, bufp, size);
+  if (bytes && wrptr(&bufp, &size, bytes) != 0) {
+    WARN_STATIC_BUFFER();
   }
-  if (sp->sptyp & OCEANCASTABLE) {
-    if (dh == 1) {
-      bytes = (int)strlcpy(bufp, ",", size);
-      if (wrptr(&bufp, &size, bytes) != 0)
-        WARN_STATIC_BUFFER();
+  bytes = (int)write_spell_modifier(sp, OCEANCASTABLE, LOC(lang, "smod_sea"), startp!=bufp, bufp, size);
+  if (bytes && wrptr(&bufp, &size, bytes) != 0) {
+    WARN_STATIC_BUFFER();
+  }
+  bytes = (int)write_spell_modifier(sp, ONSHIPCAST, LOC(lang, "smod_ship"), startp!=bufp, bufp, size);
+  if (bytes && wrptr(&bufp, &size, bytes) != 0) {
+    WARN_STATIC_BUFFER();
+  }
+  bytes = (int)write_spell_modifier(sp, NOTFAMILIARCAST, LOC(lang, "smod_nofamiliar"), startp!=bufp, bufp, size);
+  if (bytes && wrptr(&bufp, &size, bytes) != 0) {
+    WARN_STATIC_BUFFER();
+  }
+  if (startp==bufp) {
+    bytes = (int)write_spell_modifier(sp, NOTFAMILIARCAST, LOC(lang, "smod_none"), startp!=bufp, bufp, size);
+    if (bytes && wrptr(&bufp, &size, bytes) != 0) {
+      WARN_STATIC_BUFFER();
     }
-    bytes = (int)strlcpy(bufp, " Seezauber", size);
-    if (wrptr(&bufp, &size, bytes) != 0)
-      WARN_STATIC_BUFFER();
-    dh = 1;
-  }
-  if (sp->sptyp & ONSHIPCAST) {
-    if (dh == 1) {
-      bytes = (int)strlcpy(bufp, ",", size);
-      if (wrptr(&bufp, &size, bytes) != 0)
-        WARN_STATIC_BUFFER();
-    }
-    bytes = (int)strlcpy(bufp, " Schiffszauber", size);
-    if (wrptr(&bufp, &size, bytes) != 0)
-      WARN_STATIC_BUFFER();
-    dh = 1;
-  }
-  if (sp->sptyp & NOTFAMILIARCAST) {
-    if (dh == 1) {
-      bytes = (int)strlcpy(bufp, ", k", size);
-    } else {
-      bytes = (int)strlcpy(bufp, " K", size);
-    }
-    if (wrptr(&bufp, &size, bytes) != 0)
-      WARN_STATIC_BUFFER();
-    bytes =
-      (int)strlcpy(bufp, "ann nicht vom Vertrauten gezaubert werden", size);
-    if (wrptr(&bufp, &size, bytes) != 0)
-      WARN_STATIC_BUFFER();
-    dh = 1;
-  }
-  if (dh == 0) {
-    bytes = (int)strlcpy(bufp, " Keine", size);
-    if (wrptr(&bufp, &size, bytes) != 0)
-      WARN_STATIC_BUFFER();
   }
   *bufp = 0;
   rparagraph(F, buf, 0, 0, 0);
