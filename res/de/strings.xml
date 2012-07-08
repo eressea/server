@@ -2200,9 +2200,6 @@
   <string name="LERNEN">
     <text locale="de">LERNEN</text>
   </string>
-  <string name="LIEFERE">
-    <text locale="de">LIEFERE</text>
-  </string>
   <string name="MACHEN">
     <text locale="de">MACHEN</text>
   </string>
@@ -6978,6 +6975,11 @@
   <string name="unit_guards">
     <text locale="de">bewacht die Region</text>
     <text locale="en">guards the region</text>
+  </string>
+
+  <string name="unit_hungers">
+    <text locale="de">hungert</text>
+    <text locale="en">hungry</text>
   </string>
 
   <string name="list_and">

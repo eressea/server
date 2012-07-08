@@ -101,7 +101,6 @@ typedef enum {
   K_CONTACT,
   K_TEACH,
   K_STUDY,
-  K_LIEFERE,
   K_MAKE,
   K_MOVE,
   K_PASSWORD,
