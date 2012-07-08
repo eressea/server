@@ -1727,9 +1727,9 @@ static void allies(FILE * F, const faction * f)
     int bytes;
     size_t size = sizeof(buf);
     if (!f->allies->next) {
-      bytes = (int)strlcpy(buf, "Wir helfen der Partei ", size);
+      bytes = snprintf(buf, size, "%s ", LOC(f->locale, "faction_help_one"));
     } else {
-      bytes = (int)strlcpy(buf, "Wir helfen den Parteien ", size);
+      bytes = snprintf(buf, size, "%s ", LOC(f->locale, "faction_help_many"));
     }
     size -= bytes;
     show_allies(f, f->allies, buf + bytes, size);
@@ -1742,9 +1742,9 @@ static void allies(FILE * F, const faction * f)
       int bytes;
       size_t size = sizeof(buf);
       if (!g->allies->next) {
-        bytes = snprintf(buf, size, "%s hilft der Partei ", g->name);
+        bytes = snprintf(buf, size, "%s %s ", g->name, LOC(f->locale, "group_help_one"));
       } else {
-        bytes = snprintf(buf, size, "%s hilft den Parteien ", g->name);
+        bytes = snprintf(buf, size, "%s %s ", g->name, LOC(f->locale, "group_help_many"));
       }
       size -= bytes;
       show_allies(f, g->allies, buf + bytes, size);

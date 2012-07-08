@@ -7007,6 +7007,26 @@
     <text locale="en">none</text>
   </string>
 
+  <string name="faction_help_one">
+    <text locale="de">Wir helfen der Partei</text>
+    <text locale="en">We are helping the faction</text>
+  </string>
+
+  <string name="faction_help_many">
+    <text locale="de">Wir helfen den Parteien</text>
+    <text locale="en">We are helping the factions</text>
+  </string>
+
+  <string name="group_help_one">
+    <text locale="de">hilft der Partei</text>
+    <text locale="en">is helping the faction</text>
+  </string>
+
+  <string name="group_help_many">
+    <text locale="de">hilft den Parteien</text>
+    <text locale="en">is helping the factions</text>
+  </string>
+
   <string name="list_and">
     <text locale="de"> und </text>
     <text locale="en"> and </text>
