@@ -940,11 +940,11 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
     WARN_STATIC_BUFFER();
 
   if (sr->mode == see_travel) {
-    bytes = snprintf(buf, size, " (%s)", LOC(f->locale, "see_travel"));
+    bytes = snprintf(bufp, size, " (%s)", LOC(f->locale, "see_travel"));
   } else if (sr->mode == see_neighbour) {
-    bytes = snprintf(buf, size, " (%s)", LOC(f->locale, "see_neighbour"));
+    bytes = snprintf(bufp, size, " (%s)", LOC(f->locale, "see_neighbour"));
   } else if (sr->mode == see_lighthouse) {
-    bytes = snprintf(buf, size, " (%s)", LOC(f->locale, "see_lighthouse"));
+    bytes = snprintf(bufp, size, " (%s)", LOC(f->locale, "see_lighthouse"));
   } else {
     bytes = 0;
   }
@@ -1432,9 +1432,9 @@ static void durchreisende(FILE * F, const region * r, const faction * f)
     }
     /* TODO: finish localization */
     if (maxtravel == 1) {
-      bytes = (int)strlcpy(bufp, " hat die Region durchquert.", size);
+      bytes = snprintf(bufp, size, " %s", LOC(f->locale, "has_moved_one"));
     } else {
-      bytes = (int)strlcpy(bufp, " haben die Region durchquert.", size);
+      bytes = snprintf(bufp, size, " %s", LOC(f->locale, "has_moved_many"));
     }
     if (wrptr(&bufp, &size, bytes) != 0)
       WARN_STATIC_BUFFER();

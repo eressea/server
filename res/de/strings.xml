@@ -7027,6 +7027,16 @@
     <text locale="en">is helping the factions</text>
   </string>
 
+  <string name="has_moved_one">
+    <text locale="de">hat die Region durchquert</text>
+    <text locale="en">has traveled through the region</text>
+  </string>
+
+  <string name="has_moved_many">
+    <text locale="de">haben die Region durchquert</text>
+    <text locale="en">have traveled through the region</text>
+  </string>
+
   <string name="see_travel">
     <text locale="de">durchgereist</text>
     <text locale="en">travel</text>
