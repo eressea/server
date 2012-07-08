@@ -1306,7 +1306,7 @@ void economics(region * r)
               ord = NULL;
             destroyed = true;
           }
-        } else if (kwd == K_GIVE || kwd == K_LIEFERE) {
+        } else if (kwd == K_GIVE) {
           give_cmd(u, ord);
         } else if (kwd == K_FORGET) {
           forget_cmd(u, ord);

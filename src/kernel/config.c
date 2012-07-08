@@ -410,7 +410,6 @@ const char *keywords[MAXKEYWORDS] = {
   "KONTAKTIEREN",
   "LEHREN",
   "LERNEN",
-  "LIEFERE",
   "MACHEN",
   "NACH",
   "PASSWORT",

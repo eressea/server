@@ -260,10 +260,6 @@ static order *create_order_i(keyword_t kwd, const char *sptr, int persistent,
     case K_KOMMENTAR:
     case NOKEYWORD:
       return NULL;
-    case K_LIEFERE:
-      kwd = K_GIVE;
-      persistent = 1;
-      break;
     default:
       break;
     }
@@ -575,7 +571,6 @@ bool is_persistent(const order * ord)
     return false;
 
   case K_KOMMENTAR:
-  case K_LIEFERE:
     return true;
 
   default:

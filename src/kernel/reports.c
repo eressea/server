@@ -620,10 +620,12 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char *buf,
           WARN_STATIC_BUFFER();
       }
       if (fval(u, UFL_HUNGER)) {
-        if (c)
-          bytes = (int)strlcpy(bufp, ", hungert", size);
-        else
-          bytes = (int)strlcpy(bufp, "hungert", size);
+        if (c) {
+          bytes = (int)strlcpy(bufp, ", ", size);
+          if (wrptr(&bufp, &size, bytes) != 0)
+            WARN_STATIC_BUFFER();
+        }
+        bytes = (int)strlcpy(bufp, LOC(f->locale, "unit_hungers"), size);
         if (wrptr(&bufp, &size, bytes) != 0)
           WARN_STATIC_BUFFER();
       }
