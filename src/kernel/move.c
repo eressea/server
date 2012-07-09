@@ -1720,9 +1720,12 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
       int reason;
 
       if (gamecookie != global.cookie) {
-        gamedate date;
-        get_gamedate(turn, &date);
-        stormyness = storms[date.month] * 5;
+        bool storms_enabled = get_param_int(global.parameters, "rules.ship.storms", 1)!=0;
+        if (storms_enabled) {
+          gamedate date;
+          get_gamedate(turn, &date);
+          stormyness = storms[date.month] * 5;
+        }
         gamecookie = global.cookie;
       }
 
