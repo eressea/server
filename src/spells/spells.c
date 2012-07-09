@@ -134,7 +134,7 @@ static double curse_chance(const struct curse *c, double force)
 static void magicanalyse_region(region * r, unit * mage, double force)
 {
   attrib *a;
-  boolean found = false;
+  bool found = false;
 
   for (a = r->attribs; a; a = a->next) {
     curse *c = (curse *) a->data.v;
@@ -173,7 +173,7 @@ static void magicanalyse_region(region * r, unit * mage, double force)
 static void magicanalyse_unit(unit * u, unit * mage, double force)
 {
   attrib *a;
-  boolean found = false;
+  bool found = false;
 
   for (a = u->attribs; a; a = a->next) {
     curse *c;
@@ -211,7 +211,7 @@ static void magicanalyse_unit(unit * u, unit * mage, double force)
 static void magicanalyse_building(building * b, unit * mage, double force)
 {
   attrib *a;
-  boolean found = false;
+  bool found = false;
 
   for (a = b->attribs; a; a = a->next) {
     curse *c;
@@ -251,7 +251,7 @@ static void magicanalyse_building(building * b, unit * mage, double force)
 static void magicanalyse_ship(ship * sh, unit * mage, double force)
 {
   attrib *a;
-  boolean found = false;
+  bool found = false;
 
   for (a = sh->attribs; a; a = a->next) {
     curse *c;
@@ -1581,7 +1581,7 @@ static void destroy_all_roads(region * r)
 static int sp_great_drought(castorder * co)
 {
   unit *u;
-  boolean terraform = false;
+  bool terraform = false;
   region *r = co_get_region(co);
   unit *mage = co->magician.u;
   int cast_level = co->level;
@@ -3017,7 +3017,7 @@ static int sp_summonshadowlords(castorder * co)
   return cast_level;
 }
 
-static boolean chaosgate_valid(const connection * b)
+static bool chaosgate_valid(const connection * b)
 {
   const attrib *a = a_findc(b->from->attribs, &at_direction);
   if (!a)
@@ -3028,7 +3028,7 @@ static boolean chaosgate_valid(const connection * b)
 }
 
 struct region *chaosgate_move(const connection * b, struct unit *u,
-  struct region *from, struct region *to, boolean routing)
+  struct region *from, struct region *to, bool routing)
 {
   if (!routing) {
     int maxhp = u->hp / 4;
@@ -3421,7 +3421,7 @@ static int sp_analysesong_unit(castorder * co)
   return cast_level;
 }
 
-static boolean can_charm(const unit * u, int maxlevel)
+static bool can_charm(const unit * u, int maxlevel)
 {
   const skill_t expskills[] =
     { SK_ALCHEMY, SK_HERBALISM, SK_MAGIC, SK_SPY, SK_TACTICS, NOSKILL };
@@ -4025,7 +4025,7 @@ static int sp_pump(castorder * co)
 {
   unit *u, *target;
   region *rt;
-  boolean see = false;
+  bool see = false;
   unit *mage = co->magician.u;
   spellparameter *pa = co->par;
   int cast_level = co->level;

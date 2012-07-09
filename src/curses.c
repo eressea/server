@@ -212,7 +212,7 @@ static int wall_age(connection * b)
 }
 
 static region *wall_move(const connection * b, struct unit *u,
-  struct region *from, struct region *to, boolean routing)
+  struct region *from, struct region *to, bool routing)
 {
   wall_data *fd = (wall_data *) b->data.v;
   if (!routing && fd->active) {

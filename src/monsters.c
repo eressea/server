@@ -245,7 +245,7 @@ static direction_t richest_neighbour(region * r, faction * f, int absolut)
   return d;
 }
 
-static boolean room_for_race_in_region(region * r, const race * rc)
+static bool room_for_race_in_region(region * r, const race * rc)
 {
   unit *u;
   int c = 0;
@@ -428,7 +428,7 @@ static attrib *set_new_dragon_target(unit * u, region * r, int range)
 }
 
 static order *make_movement_order(unit * u, const region * target, int moves,
-  boolean(*allowed) (const region *, const region *))
+  bool(*allowed) (const region *, const region *))
 {
   region *r = u->region;
   region **plan;
@@ -593,7 +593,7 @@ static order *monster_learn(unit * u)
   return NULL;
 }
 
-static boolean check_overpopulated(unit * u)
+static bool check_overpopulated(unit * u)
 {
   unit *u2;
   int c = 0;
@@ -643,7 +643,7 @@ static order *plan_dragon(unit * u)
   attrib *ta = a_find(u->attribs, &at_targetregion);
   region *r = u->region;
   region *tr = NULL;
-  boolean move = false;
+  bool move = false;
   order *long_order = NULL;
 
   reduce_weight(u);
@@ -748,7 +748,7 @@ void plan_monsters(faction * f)
   for (r = regions; r; r = r->next) {
     unit *u;
     double attack_chance = MONSTERATTACK;
-    boolean attacking = false;
+    bool attacking = false;
 
     for (u = r->units; u; u = u->next) {
       attrib *ta;

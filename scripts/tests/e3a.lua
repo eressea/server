@@ -4,7 +4,7 @@ module("tests.e3.e3features", package.seeall, lunit.testcase)
 
 function setup()
     eressea.free_game()
-    eressea.settings.set("rules.economy.food", "0")
+    eressea.settings.set("rules.economy.food", "4")
 end
 
 function test_no_stealth()
@@ -109,6 +109,7 @@ function test_xmastree()
 end
 
 function test_fishing()
+    eressea.settings.set("rules.economy.food", "0")
     local r = region.create(0,0, "ocean")
     local r2 = region.create(1,0, "plain")
     local f = faction.create("noreply@eressea.de", "human", "de")
@@ -217,7 +218,6 @@ function test_taxes()
   r:set_resource("money", 5000)
   local f = faction.create("noreply@eressea.de", "human", "de")
   local u = unit.create(f, r, 1)
-  u:add_item("money", u.number * 10)
   u:clear_orders()
   u:add_order("LERNE Holzfaellen") -- do not work
   local b = building.create(r, "watch")
@@ -408,14 +408,15 @@ function test_canoe_passes_through_land()
   u1:clear_orders()
   u1:add_order("NACH O O O")
   process_orders()
-  assert_equal(u2.region.id, land.id, "canoe did not stop at coast")
+  assert_equal(land, u2.region, "canoe did not stop at coast")
   u1:add_order("NACH O O O")
   process_orders()
-  assert_equal(u2.region.id, dst.id, "canoe could not leave coast")
+  assert_equal(dst, sh.region, "canoe could not leave coast")
+  assert_equal(dst, u1.region, "canoe could not leave coast")
+  assert_equal(dst, u2.region, "canoe could not leave coast")
 end
 
 function test_give_50_percent_of_money()
-    eressea.settings.set("rules.economy.food", "4")
   local r = region.create(0, 0, "plain")
   local u1 = unit.create(faction.create("noreply@eressea.de", "human", "de"), r, 1)
   local u2 = unit.create(faction.create("noreply@eressea.de", "orc", "de"), r, 1)

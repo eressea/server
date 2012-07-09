@@ -16,7 +16,7 @@ extern "C" {
   typedef struct wall_data {
     struct unit *mage;
     int force;
-    boolean active;
+    bool active;
     int countdown;
   } wall_data;
   

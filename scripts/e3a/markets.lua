@@ -44,7 +44,7 @@ function market_action(r)
         give = {}
         local numlux = p / trade
         for x = 1, numlux do
-          local m = 1+math.mod(rng_int(), n)
+          local m = 1+math.fmod(rng_int(), n)
           u = markets[m]
           if give[u] then
             give[u] = give[u] + 1
@@ -62,7 +62,7 @@ function market_action(r)
         give = {}
         local numherb = p / 500
         for x = 1, numherb do
-          local m = 1+math.mod(rng_int(), n)
+          local m = 1+math.fmod(rng_int(), n)
           u = markets[m]
           if give[u] then
             give[u] = give[u] + 1

@@ -324,7 +324,7 @@ int sp_combatrosthauch(struct castorder * co)
         int n = MIN(force, wp->used);
         if (n) {
           requirement *mat = wp->type->itype->construction->materials;
-          boolean iron = false;
+          bool iron = false;
           while (mat && mat->number > 0) {
             if (mat->rtype == oldresourcetype[R_IRON]) {
               iron = true;
@@ -454,7 +454,7 @@ int sp_speed(struct castorder * co)
   return 1;
 }
 
-static skill_t random_skill(unit * u, boolean weighted)
+static skill_t random_skill(unit * u, bool weighted)
 {
   int n = 0;
   skill *sv;
@@ -909,7 +909,7 @@ int sp_strong_wall(struct castorder * co)
   unit *mage = fi->unit;
   building *burg;
   double effect;
-  static boolean init = false;
+  static bool init = false;
   message *msg;
   static const curse_type *strongwall_ct;
   if (!init) {
@@ -1539,7 +1539,7 @@ int sp_reanimate(struct castorder * co)
   int healable, j = 0;
   double c = 0.50 + 0.02 * power;
   double k = EFFECT_HEALING_SPELL * power;
-  boolean use_item = get_item(mage, I_AMULET_OF_HEALING) > 0;
+  bool use_item = get_item(mage, I_AMULET_OF_HEALING) > 0;
   message *msg;
 
   if (use_item) {
@@ -1605,7 +1605,7 @@ int sp_keeploot(struct castorder * co)
   return level;
 }
 
-static int heal_fighters(quicklist * fgs, int *power, boolean heal_monsters)
+static int heal_fighters(quicklist * fgs, int *power, bool heal_monsters)
 {
   int healhp = *power, healed = 0, qi;
   quicklist *ql;
@@ -1658,7 +1658,7 @@ int sp_healing(struct castorder * co)
   int healhp = (int)power * 200;
   quicklist *fgs;
   message *msg;
-  boolean use_item = get_item(mage, I_AMULET_OF_HEALING) > 0;
+  bool use_item = get_item(mage, I_AMULET_OF_HEALING) > 0;
 
   /* bis zu 11 Personen pro Stufe (einen HP müssen sie ja noch
    * haben, sonst wären sie tot) können geheilt werden */
