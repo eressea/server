@@ -623,9 +623,12 @@ function test_p2()
     u:clear_orders()
     u:add_order("BENUTZE 'Wasser des Lebens'")
     u:add_item("p2", 1)
-    u:add_item("log", 20)
+    u:add_item("log", 10)
+    u:add_item("mallorn", 10)
     process_orders()
     assert_equal(5, r:get_resource("tree"))
+    assert_equal(0, u:get_item("p2"))
+    assert_equal(15, u:get_item("log") + u:get_item("mallorn"))
 end
 
 function test_p2_move()
