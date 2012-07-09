@@ -74,7 +74,6 @@ function test_seecast()
     u1:clear_orders()
     u1:add_order("NACH O O O O")
     process_orders()
-    write_reports()
     assert_equal(8, u2.region.x)
 end
 
@@ -135,6 +134,8 @@ function test_fishing()
 end
 
 function test_ship_capacity()
+    eressea.settings.set("rules.ship.drifting", "0")
+    eressea.settings.set("rules.ship.storms", "0")
     local r = region.create(0,0, "ocean")
     region.create(1,0, "ocean")
     local r2 = region.create(2,0, "ocean")
@@ -178,10 +179,14 @@ function test_ship_capacity()
 
     update_owners()
     process_orders()
-    assert_equal(r2.id, u1.region.id)
-    assert_not_equal(r2.id, u2.region.id)
-    assert_equal(r2.id, u3.region.id)
-    assert_not_equal(r2.id, u4.region.id)
+    assert_equal(r2, u1.region)
+    assert_not_equal(r2, u2.region)
+    if r2~=u3.region then
+        print(get_turn(), u3, u3.faction)
+        write_reports()
+    end
+    assert_equal(r2, u3.region)
+    assert_not_equal(r2, u4.region)
 end
     
 function test_owners()
@@ -644,6 +649,7 @@ function test_p2_move()
     u:add_item("horse", 1)
     u:add_item("p2", 1)
     u:add_item("log", 1)
+    u:add_item("mallorn", 1)
     process_orders()
     assert_equal(1, u.region.x)
     assert_equal(1, r:get_resource("tree"))
