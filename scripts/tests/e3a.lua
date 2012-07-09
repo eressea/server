@@ -123,13 +123,14 @@ function test_fishing()
     update_owners()
 
     process_orders()
-    assert_equal(r2.id, u1.region.id)
+    assert_equal(r2, u1.region)
     assert_equal(90, u1:get_item("money"))
 
     u1:clear_orders()
     u1:add_order("NACH W")
 
     process_orders()
+    assert_equal(r, u1.region)
     assert_equal(60, u1:get_item("money"))
 end
 
