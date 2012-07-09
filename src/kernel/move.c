@@ -692,7 +692,7 @@ static float damage_drift(void)
 static void drifting_ships(region * r)
 {
   direction_t d;
-  if (get_param_int(global.parameters, "rules.ship.drifting", 1)==0) return;
+  bool drift = get_param_int(global.parameters, "rules.ship.drifting", 1)!=0;
 
   if (fval(r->terrain, SEA_REGION)) {
     ship **shp = &r->ships;
@@ -709,7 +709,7 @@ static void drifting_ships(region * r)
       }
 
       /* Schiff schon abgetrieben oder durch Zauber geschützt? */
-      if (fval(sh, SF_DRIFTED) || is_cursed(sh->attribs, C_SHIP_NODRIFT, 0)) {
+      if (!drift || fval(sh, SF_DRIFTED) || is_cursed(sh->attribs, C_SHIP_NODRIFT, 0)) {
         shp = &sh->next;
         continue;
       }
