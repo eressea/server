@@ -44,6 +44,7 @@ function setup()
     eressea.settings.set("nmr.timeout", "0")
     eressea.settings.set("NewbieImmunity", "0")
     eressea.settings.set("rules.economy.food", "4")
+    eressea.settings.set("rules.encounters", "0")
 end
 
 function test_fleeing_units_can_be_transported()
@@ -885,6 +886,7 @@ function setup()
     eressea.free_game()
     eressea.write_game("free.dat")
     eressea.settings.set("rules.economy.food", "4") -- FOOD_IS_FREE
+    eressea.settings.set("rules.encounters", "0")
 end
 
 function test_parser()
@@ -1132,7 +1134,12 @@ function test_bug_1875_use_help()
 
     assert_equal(0, u:get_item("peasantblood")) 
     assert_equal(0, r:get_resource("peasant")) 
+    assert_equal(0, r:get_resource("peasant"))
     assert_equal(0, u2:get_potion("peasantblood")) -- first unit helps this unit
+    if 98~=u:get_potion("peasantblood") then
+        print(get_turn(), f, u)
+        write_reports()
+    end
     assert_equal(98, u:get_potion("peasantblood")) -- unit uses one peasantblood effect
 end
 
