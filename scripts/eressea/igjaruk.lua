@@ -39,7 +39,7 @@ function wyrm()
  local r
  for index, r in pairs(map) do
   if r~=grave then
-   if (math.mod(r.x,2)==math.mod(get_turn(),2)) then
+   if (math.fmod(r.x,2)==math.fmod(get_turn(),2)) then
      r:add_notice("Eine Botschaft von Igjarjuk, Herr der Wyrme: 'Die Zeit des Wartens ist beinahe vorrüber. Euer Fürst kehrt aus dem Grabe zurück.'")
    else
      r:add_notice("Eine Botschaft von Gwaewar, Herr der Greife: 'Das Ende naht. Igjarjuk ist aus seinem Grab auferstanden. Eilt, noch ist die Welt zu retten!'")

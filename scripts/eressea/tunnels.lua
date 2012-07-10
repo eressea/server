@@ -34,7 +34,7 @@ local function get_target(param)
   if ntargets==0 then
     return nil
   end
-  local rn = math.mod(rng_int(), ntargets)
+  local rn = math.fmod(rng_int(), ntargets)
   return targets[rn]
 end
 

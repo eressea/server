@@ -13,14 +13,14 @@ end
 local function freeze(r, chance)
     for i, rn in ipairs(r.adj) do
         -- each region has a chance to freeze
-        if rn.terrain=="ocean" and (chance>=100 or math.mod(rng_int(), 100)<chance) then
+        if rn.terrain=="ocean" and (chance>=100 or math.fmod(rng_int(), 100)<chance) then
             rn.terrain = "packice"
         end
     end
 end
 
 local function thaw(r, chance)
-    if chance>=100 or math.mod(rng_int(), 100)<chance then
+    if chance>=100 or math.fmod(rng_int(), 100)<chance then
         r.terrain = "ocean"
         for s in r.ships do
             s.coast = nil

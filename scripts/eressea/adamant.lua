@@ -3,7 +3,7 @@
 -- use only once to hand out some items to existing factions
 function adamant_gifts()
   for f in factions() do
-    local i = math.mod(test.rng_int(), 2)
+    local i = math.fmod(test.rng_int(), 2)
     if i==0 then
       f:add_item("adamantium", 1)
       f:add_item("adamantiumplate", 1)
