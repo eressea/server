@@ -29,18 +29,18 @@ extern "C" {
 
   extern struct region **path_find(struct region *start,
     const struct region *target, int maxlen,
-    boolean(*allowed) (const struct region *, const struct region *));
-  extern boolean path_exists(struct region *start, const struct region *target,
-    int maxlen, boolean(*allowed) (const struct region *,
+    bool(*allowed) (const struct region *, const struct region *));
+  extern bool path_exists(struct region *start, const struct region *target,
+    int maxlen, bool(*allowed) (const struct region *,
       const struct region *));
-  extern boolean allowed_swim(const struct region *src,
+  extern bool allowed_swim(const struct region *src,
     const struct region *target);
-  extern boolean allowed_fly(const struct region *src,
+  extern bool allowed_fly(const struct region *src,
     const struct region *target);
-  extern boolean allowed_walk(const struct region *src,
+  extern bool allowed_walk(const struct region *src,
     const struct region *target);
   extern struct quicklist *regions_in_range(struct region *src, int maxdist,
-    boolean(*allowed) (const struct region *, const struct region *));
+    bool(*allowed) (const struct region *, const struct region *));
 
   extern void pathfinder_cleanup(void);
 

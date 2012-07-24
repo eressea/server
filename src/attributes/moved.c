@@ -48,7 +48,7 @@ attrib_type at_moved = {
   "moved", NULL, NULL, age_moved, write_moved, read_moved
 };
 
-boolean get_moved(attrib ** alist)
+bool get_moved(attrib ** alist)
 {
   return a_find(*alist, &at_moved) ? true : false;
 }

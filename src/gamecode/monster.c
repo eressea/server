@@ -70,7 +70,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #define MAXILLUSION_TEXTS   3
 
-boolean monster_is_waiting(const unit * u)
+bool monster_is_waiting(const unit * u)
 {
   if (fval(u, UFL_ISNEW | UFL_MOVED))
     return true;

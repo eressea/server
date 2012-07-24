@@ -260,10 +260,6 @@ static order *create_order_i(keyword_t kwd, const char *sptr, int persistent,
     case K_KOMMENTAR:
     case NOKEYWORD:
       return NULL;
-    case K_LIEFERE:
-      kwd = K_GIVE;
-      persistent = 1;
-      break;
     default:
       break;
     }
@@ -373,7 +369,7 @@ order *parse_order(const char *s, const struct locale * lang)
  * \return true if the order is long
  * \sa is_exclusive(), is_repeated(), is_persistent()
  */
-int is_repeated(const order * ord)
+bool is_repeated(const order * ord)
 {
   keyword_t kwd = ORD_KEYWORD(ord);
   const struct locale *lang = ORD_LOCALE(ord);
@@ -439,7 +435,7 @@ int is_repeated(const order * ord)
  * \return true if the order is long
  * \sa is_exclusive(), is_repeated(), is_persistent()
  */
-int is_exclusive(const order * ord)
+bool is_exclusive(const order * ord)
 {
   keyword_t kwd = ORD_KEYWORD(ord);
   const struct locale *lang = ORD_LOCALE(ord);
@@ -500,11 +496,11 @@ int is_exclusive(const order * ord)
  * \return true if the order is long
  * \sa is_exclusive(), is_repeated(), is_persistent()
  */
-int is_long(const order * ord)
+bool is_long(const order * ord)
 {
   keyword_t kwd = ORD_KEYWORD(ord);
   const struct locale *lang = ORD_LOCALE(ord);
-  int result = 0;
+  bool result = false;
 
   switch (kwd) {
   case K_CAST:
@@ -550,7 +546,7 @@ int is_long(const order * ord)
     parser_popstate();
     break;
   default:
-    result = 0;
+    result = false;
   }
   return result;
 }
@@ -564,7 +560,7 @@ int is_long(const order * ord)
  * \return true if the order is persistent
  * \sa is_exclusive(), is_repeated(), is_persistent()
  */
-int is_persistent(const order * ord)
+bool is_persistent(const order * ord)
 {
   keyword_t kwd = ORD_KEYWORD(ord);
   int persist = ord->_persistent != 0;
@@ -575,7 +571,6 @@ int is_persistent(const order * ord)
     return false;
 
   case K_KOMMENTAR:
-  case K_LIEFERE:
     return true;
 
   default:
@@ -605,4 +600,10 @@ void push_order(order ** ordp, order * ord)
   while (*ordp)
     ordp = &(*ordp)->next;
   *ordp = ord;
+}
+
+void init_tokens(const struct order *ord)
+{
+  char *cmd = getcommand(ord);
+  init_tokens_str(cmd, cmd);
 }

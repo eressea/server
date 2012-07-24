@@ -44,6 +44,7 @@ function setup()
     eressea.settings.set("nmr.timeout", "0")
     eressea.settings.set("NewbieImmunity", "0")
     eressea.settings.set("rules.economy.food", "4")
+    eressea.settings.set("rules.encounters", "0")
 end
 
 function test_fleeing_units_can_be_transported()
@@ -594,7 +595,7 @@ function test_guard_resources()
 end
 
 local function is_flag_set(flags, flag)
-  return math.mod(flags, flag*2) - math.mod(flags, flag) == flag;
+  return math.fmod(flags, flag*2) - math.fmod(flags, flag) == flag;
 end
 
 function test_hero_hero_transfer()
@@ -803,7 +804,7 @@ end
 local function find_in_report(f, pattern, extension)
     extension = extension or "nr"
     local filename = config.reportpath .. "/" .. get_turn() .. "-" .. itoa36(f.id) .. "." .. extension
-    local report = io.open(filename, 'rt');
+    local report = io.open(filename, 'r');
     assert_not_nil(report)
     t = report:read("*all")
     report:close()
@@ -885,6 +886,7 @@ function setup()
     eressea.free_game()
     eressea.write_game("free.dat")
     eressea.settings.set("rules.economy.food", "4") -- FOOD_IS_FREE
+    eressea.settings.set("rules.encounters", "0")
 end
 
 function test_parser()
@@ -893,7 +895,7 @@ function test_parser()
     local u = unit.create(f, r, 1)
     local filename = config.basepath .. "/data/orders.txt"
     
-    local file = io.open(filename, "w+")
+    local file = io.open(filename, "w")
     assert_not_nil(file)
     file:write('ERESSEA ' .. itoa36(f.id) .. ' "' .. f.password .. '"\n')
     file:write('EINHEIT ' .. itoa36(u.id) .. "\n")
@@ -956,7 +958,7 @@ function test_bug_1814()
     local u = unit.create(f, r, 1)
     local filename = config.basepath .. "/data/1814.txt"
     
-    local file = io.open(filename, "w+")
+    local file = io.open(filename, "w")
     file:write('ERESSEA ' .. itoa36(f.id) .. ' "' .. f.password .. '"\n')
     file:write('EINHEIT ' .. itoa36(u.id) .. "\n")
     file:write("; parse error follows: '\n")
@@ -977,11 +979,11 @@ function test_bug_1679()
     local u = unit.create(f, r, 1)
     local filename = config.basepath .. "/data/1679.txt"
     
-    local file = io.open(filename, "w+")
+    local file = io.open(filename, "w")
     file:write('ERESSEA ' .. itoa36(f.id) .. ' "' .. f.password .. '"\n')
     file:write('EINHEIT ' .. itoa36(u.id) .. "\n")
-    file:write("NACH W\n")
     file:write("ARBEITEN\n")
+    file:write("NACH W\n")
     file:close()
     
     eressea.read_orders(filename)
@@ -989,7 +991,7 @@ function test_bug_1679()
     init_reports()
     write_report(f)
     assert_true(find_in_report(f, "Die Einheit kann keine weiteren langen Befehle", "cr"))
-    assert_true(find_in_report(f, "entdeckt, dass es keinen Weg nach Westen gibt"))
+    assert_false(find_in_report(f, "entdeckt, dass es keinen Weg nach Westen gibt"))
 end
 
 function test_building_unique0()
@@ -1132,7 +1134,12 @@ function test_bug_1875_use_help()
 
     assert_equal(0, u:get_item("peasantblood")) 
     assert_equal(0, r:get_resource("peasant")) 
+    assert_equal(0, r:get_resource("peasant"))
     assert_equal(0, u2:get_potion("peasantblood")) -- first unit helps this unit
+    if 98~=u:get_potion("peasantblood") then
+        print(get_turn(), f, u)
+        write_reports()
+    end
     assert_equal(98, u:get_potion("peasantblood")) -- unit uses one peasantblood effect
 end
 

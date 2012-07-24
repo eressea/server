@@ -29,7 +29,7 @@ extern "C" {
   /* in rand.c: */
   extern double normalvariate(double mu, double sigma);
   extern int ntimespprob(int n, double p, double mod);
-  extern boolean chance(double x);
+  extern bool chance(double x);
 
 #ifdef __cplusplus
 }

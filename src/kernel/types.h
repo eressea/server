@@ -35,6 +35,7 @@ typedef short item_t;
 
 struct attrib;
 struct attrib_type;
+struct ally;
 struct building;
 struct building_type;
 struct curse;
@@ -100,7 +101,6 @@ typedef enum {
   K_CONTACT,
   K_TEACH,
   K_STUDY,
-  K_LIEFERE,
   K_MAKE,
   K_MOVE,
   K_PASSWORD,
@@ -393,10 +393,6 @@ typedef enum {
 /* HELP_OBSERVE deaktiviert */
 /* ------------------------------------------------------------- */
 /* Prototypen */
-
-#define ALLIED_TAX     1
-#define ALLIED_NOBLOCK 2
-#define ALLIED_HELP    4
 
 /* alle vierstelligen zahlen: */
 #define MAX_UNIT_NR (36*36*36*36-1)

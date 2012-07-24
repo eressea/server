@@ -104,7 +104,7 @@ static int count_demand(const region * r)
 
 static int
 recurse_regions(region * r, region_list ** rlist,
-  boolean(*fun) (const region * r))
+  bool(*fun) (const region * r))
 {
   if (!fun(r))
     return 0;
@@ -125,7 +125,7 @@ recurse_regions(region * r, region_list ** rlist,
   }
 }
 
-static boolean f_nolux(const region * r)
+static bool f_nolux(const region * r)
 {
   if (r->land && count_demand(r) != get_maxluxuries())
     return true;
@@ -337,7 +337,7 @@ static const terrain_type *preferred_terrain(const struct race *rc)
 #define MINFACTIONS 1
 #define VOLCANO_CHANCE 100
 
-static boolean virgin_region(const region * r)
+static bool virgin_region(const region * r)
 {
   direction_t d;
   if (r == NULL)

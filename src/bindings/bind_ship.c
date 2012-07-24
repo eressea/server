@@ -22,7 +22,6 @@ without prior permission by the authors of Eressea.
 
 #include <util/language.h>
 
-#include <lua.h>
 #include <tolua.h>
 
 int tolua_shiplist_next(lua_State * L)

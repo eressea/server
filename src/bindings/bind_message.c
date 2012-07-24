@@ -13,7 +13,6 @@
 #include <util/message.h>
 
 /* lua includes */
-#include <lua.h>
 #include <tolua.h>
 
 #include <assert.h>

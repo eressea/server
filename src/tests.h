@@ -25,6 +25,7 @@ extern "C" {
   CuSuite *get_bsdstring_suite(void);
   CuSuite *get_functions_suite(void);
   CuSuite *get_umlaut_suite(void);
+  CuSuite *get_ally_suite(void);
 
   void test_cleanup(void);
 
@@ -38,6 +39,9 @@ extern "C" {
   struct building * test_create_building(struct region * r, const struct building_type * btype);
   struct ship * test_create_ship(struct region * r, const struct ship_type * stype);
   struct item_type * test_create_itemtype(const char ** names);
+  struct ship_type *test_create_shiptype(const char **names);
+  struct building_type *test_create_buildingtype(const char *name);
+
   int RunAllTests(void);
 
 #ifdef __cplusplus

@@ -1006,30 +1006,6 @@ typedef struct event_args {
   const char *sendertype;
 } event_args;
 
-static void args_free(void *udata)
-{
-  free(udata);
-}
-
-static void event_cb(void *sender, const char *event, void *udata)
-{
-  lua_State *L = (lua_State *) global.vm_state;
-  event_args *args = (event_args *) udata;
-  int nargs = 2;
-  lua_rawgeti(L, LUA_REGISTRYINDEX, args->hfunction);
-  if (sender && args->sendertype) {
-    tolua_pushusertype(L, sender, TOLUA_CAST args->sendertype);
-  } else {
-    lua_pushnil(L);
-  }
-  tolua_pushstring(L, event);
-  if (args->hargs) {
-    lua_rawgeti(L, LUA_REGISTRYINDEX, args->hfunction);
-    ++nargs;
-  }
-  lua_pcall(L, nargs, 0, 0);
-}
-
 static int tolua_report_unit(lua_State * L)
 {
   char buffer[512];
@@ -1184,34 +1160,9 @@ int tolua_bindings_open(lua_State * L)
   return 1;
 }
 
-static const struct {
-  const char *name;
-  int (*func) (lua_State *);
-} lualibs[] = {
-  {
-  "", luaopen_base}, {
-  LUA_TABLIBNAME, luaopen_table}, {
-  LUA_IOLIBNAME, luaopen_io}, {
-  LUA_STRLIBNAME, luaopen_string}, {
-  LUA_MATHLIBNAME, luaopen_math}, {
-  LUA_LOADLIBNAME, luaopen_package}, {
-  LUA_DBLIBNAME, luaopen_debug},
-#if LUA_VERSION_NUM>=501
-  {
-  LUA_OSLIBNAME, luaopen_os},
-#endif
-  {
-  NULL, NULL}
-};
-
 static void openlibs(lua_State * L)
 {
-  int i;
-  for (i = 0; lualibs[i].func; ++i) {
-    lua_pushcfunction(L, lualibs[i].func);
-    lua_pushstring(L, lualibs[i].name);
-    lua_call(L, 1, 0);
-  }
+  luaL_openlibs(L);
 }
 
 void lua_done(lua_State * L) {
@@ -1219,7 +1170,7 @@ void lua_done(lua_State * L) {
 }
 
 lua_State *lua_init(void) {
-  lua_State *L = lua_open();
+  lua_State *L = luaL_newstate();
 
   openlibs(L);
 #ifdef BINDINGS_TOLUA

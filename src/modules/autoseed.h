@@ -26,7 +26,7 @@ extern "C" {
     const struct race *race;
     int bonus;
     int subscription;
-    boolean oldregions;
+    bool oldregions;
     struct alliance *allies;
   } newfaction;
 

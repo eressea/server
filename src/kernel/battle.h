@@ -46,7 +46,7 @@ extern "C" {
     struct bfaction *next;
     struct side *sides;
     struct faction *faction;
-    boolean attacker;
+    bool attacker;
   } bfaction;
 
   typedef struct tactics {
@@ -94,9 +94,9 @@ extern "C" {
     struct quicklist *meffects;
     int max_tactics;
     int turn;
-    boolean has_tactics_turn;
+    bool has_tactics_turn;
     int keeploot;
-    boolean reelarrow;
+    bool reelarrow;
     int alive;
     struct {
       const struct side *as;
@@ -205,6 +205,14 @@ extern "C" {
 
   extern const troop no_troop;
 
+  /* BEGIN battle interface */
+  void battle_init(battle * b);
+  void battle_free(battle * b);
+  side * find_side(battle * b, const struct faction * f, const struct group * g, int flags, const struct faction * stealthfaction);
+  side * get_side(battle * b, const struct unit * u);
+  fighter * get_fighter(battle * b, const struct unit * u);
+  /* END battle interface */
+
   extern void do_battle(struct region *r);
 
   /* for combat spells and special attacks */
@@ -218,8 +226,8 @@ extern "C" {
 
   extern int count_enemies(struct battle *b, const struct fighter *af,
     int minrow, int maxrow, int select);
-  extern boolean terminate(troop dt, troop at, int type, const char *damage,
-    boolean missile);
+  extern bool terminate(troop dt, troop at, int type, const char *damage,
+    bool missile);
   extern void message_all(battle * b, struct message *m);
   extern int hits(troop at, troop dt, weapon * awp);
   extern void damage_building(struct battle *b, struct building *bldg,
@@ -229,18 +237,18 @@ extern "C" {
   extern int count_allies(const struct side *as, int minrow, int maxrow,
     int select, int allytype);
   extern int get_unitrow(const struct fighter *af, const struct side *vs);
-  extern boolean helping(const struct side *as, const struct side *ds);
+  extern bool helping(const struct side *as, const struct side *ds);
   extern void rmfighter(fighter * df, int i);
   extern struct fighter *select_corpse(struct battle *b, struct fighter *af);
   extern int statusrow(int status);
   extern void drain_exp(struct unit *u, int d);
   extern void kill_troop(troop dt);
   extern void remove_troop(troop dt);   /* not the same as the badly named rmtroop */
-  extern boolean is_attacker(const fighter * fig);
+  extern bool is_attacker(const fighter * fig);
 
   extern struct battle *make_battle(struct region * r);
   extern fighter *make_fighter(struct battle *b, struct unit *u, side * s,
-    boolean attack);
+    bool attack);
   extern struct side *make_side(struct battle * b, const struct faction * f,
     const struct group * g, unsigned int flags, 
     const struct faction * stealthfaction);

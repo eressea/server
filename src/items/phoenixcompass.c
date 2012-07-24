@@ -45,7 +45,7 @@ use_phoenixcompass(struct unit *u, const struct item_type *itype,
   region *r;
   unit *closest_phoenix = NULL;
   int closest_phoenix_distance = INT_MAX;
-  boolean confusion = false;
+  bool confusion = false;
   direction_t direction;
   unit *u2;
   direction_t closest_neighbour_direction = 0;

@@ -89,7 +89,7 @@ typedef struct request {
   int qty;
   int no;
   union {
-    boolean goblin;             /* stealing */
+    bool goblin;             /* stealing */
     const struct luxury_type *ltype;    /* trading */
   } type;
 } request;
@@ -392,7 +392,7 @@ static void feedback_give_not_allowed(unit * u, order * ord)
       ""));
 }
 
-static boolean check_give(unit * u, unit * u2, const item_type * itype,
+static bool check_give(unit * u, unit * u2, const item_type * itype,
   int mask)
 {
   if (u2) {
@@ -537,7 +537,7 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
     get_gamedate(turn, &date);
     if (date.season == 0 && r->terrain != newterrain(T_DESERT)) {
 #ifdef INSECT_POTION
-      boolean usepotion = false;
+      bool usepotion = false;
       unit *u2;
 
       for (u2 = r->units; u2; u2 = u2->next)
@@ -769,7 +769,7 @@ static void give_cmd(unit * u, order * ord)
   }
 
   else if (p == P_HERBS) {
-    boolean given = false;
+    bool given = false;
     if (!(u->race->ec_flags & GIVEITEM) && u2 != NULL) {
       ADDMSG(&u->faction->msgs,
         msg_feedback(u, ord, "race_nogive", "race", u->race));
@@ -996,12 +996,12 @@ void add_spende(faction * f1, faction * f2, int amount, region * r)
   r->donations = sp;
 }
 
-static boolean maintain(building * b, boolean first)
+static bool maintain(building * b, bool first)
 /* first==false -> take money from wherever you can */
 {
   int c;
   region *r = b->region;
-  boolean paid = true, work = first;
+  bool paid = true, work = first;
   unit *u;
   if (fval(b, BLD_MAINTAINED) || b->type == NULL || b->type->maintenance == NULL
     || is_cursed(b->attribs, C_NOCOST, 0)) {
@@ -1111,12 +1111,12 @@ static boolean maintain(building * b, boolean first)
   return true;
 }
 
-void maintain_buildings(region * r, boolean crash)
+void maintain_buildings(region * r, bool crash)
 {
   building **bp = &r->buildings;
   while (*bp) {
     building *b = *bp;
-    boolean maintained = maintain(b, !crash);
+    bool maintained = maintain(b, !crash);
 
     /* the second time, send a message */
     if (crash) {
@@ -1141,7 +1141,7 @@ void maintain_buildings(region * r, boolean crash)
 
 static int recruit_archetype(unit * u, order * ord)
 {
-  boolean merge = (u->number > 0);
+  bool merge = (u->number > 0);
   int want;
   const char *s;
 
@@ -1178,7 +1178,7 @@ static int recruit_archetype(unit * u, order * ord)
        */
       int k;
       for (k = 0; arch->rules[k].property; ++k) {
-        boolean match = false;
+        bool match = false;
         if (arch->rules[k].value[0] == '*')
           match = true;
         else if (strcmp(arch->rules[k].property, "race") == 0) {
@@ -1296,7 +1296,7 @@ void economics(region * r)
 
   for (u = r->units; u; u = u->next) {
     order *ord;
-    boolean destroyed = false;
+    bool destroyed = false;
     if (u->number > 0) {
       for (ord = u->orders; ord; ord = ord->next) {
         keyword_t kwd = get_keyword(ord);
@@ -1306,7 +1306,7 @@ void economics(region * r)
               ord = NULL;
             destroyed = true;
           }
-        } else if (kwd == K_GIVE || kwd == K_LIEFERE) {
+        } else if (kwd == K_GIVE) {
           give_cmd(u, ord);
         } else if (kwd == K_FORGET) {
           forget_cmd(u, ord);
@@ -1421,7 +1421,7 @@ typedef struct allocation_list {
 
 static allocation_list *allocations;
 
-static boolean can_guard(const unit * guard, const unit * u)
+static bool can_guard(const unit * guard, const unit * u)
 {
   if (fval(guard, UFL_ISNEW))
     return false;
@@ -1612,7 +1612,7 @@ leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
   const item_type *itype = resource2item(rtype);
   rawmaterial *rm = rm_get(r, rtype);
   int need;
-  boolean first = true;
+  bool first = true;
 
   if (rm != NULL) {
     do {
@@ -2373,9 +2373,9 @@ static void expandselling(region * r, request * sellorders, int limit)
   }
 }
 
-static boolean sell(unit * u, request ** sellorders, struct order *ord)
+static bool sell(unit * u, request ** sellorders, struct order *ord)
 {
-  boolean unlimited = true;
+  bool unlimited = true;
   const item_type *itype;
   const luxury_type *ltype = NULL;
   int n;
@@ -2904,7 +2904,7 @@ static int max_skill(region * r, faction * f, skill_t sk)
 static void steal_cmd(unit * u, struct order *ord, request ** stealorders)
 {
   int n, i, id;
-  boolean goblin = false;
+  bool goblin = false;
   request *o;
   unit *u2 = NULL;
   region *r = u->region;
@@ -3342,7 +3342,7 @@ void produce(struct region *r)
   unit *u;
   int todo;
   static int rule_autowork = -1;
-  boolean limited = true;
+  bool limited = true;
   request *nextworker = workers;
   assert(r);
 
@@ -3378,7 +3378,7 @@ void produce(struct region *r)
 
   for (u = r->units; u; u = u->next) {
     order *ord;
-    boolean trader = false;
+    bool trader = false;
 
     if (u->race == new_race[RC_SPELL] || fval(u, UFL_LONGACTION))
       continue;

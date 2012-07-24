@@ -37,6 +37,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* kernel includes */
 #include <kernel/alchemy.h>
 #include <kernel/alliance.h>
+#include <kernel/ally.h>
 #include <kernel/battle.h>
 #include <kernel/connection.h>
 #include <kernel/curse.h>
@@ -141,7 +142,7 @@ static void checkorders(void)
       ADDMSG(&f->msgs, msg_message("turnreminder", ""));
 }
 
-static boolean help_money(const unit * u)
+static bool help_money(const unit * u)
 {
   if (u->race->ec_flags & GIVEITEM)
     return true;
@@ -1128,7 +1129,7 @@ int leave_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-static boolean EnhancedQuit(void)
+static bool EnhancedQuit(void)
 {
   static int value = -1;
   if (value < 0) {
@@ -1180,7 +1181,7 @@ int quit_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-static boolean mayenter(region * r, unit * u, building * b)
+static bool mayenter(region * r, unit * u, building * b)
 {
   unit *u2;
   if (fval(b, BLD_UNGUARDED))
@@ -1201,7 +1202,7 @@ static int mayboard(const unit * u, ship * sh)
   return (!u2 || ucontact(u2, u) || alliedunit(u2, u->faction, HELP_GUARD));
 }
 
-static boolean CheckOverload(void)
+static bool CheckOverload(void)
 {
   static int value = -1;
   if (value < 0) {
@@ -1327,7 +1328,7 @@ static void do_contact(region * r)
   }
 }
 
-void do_enter(struct region *r, int is_final_attempt)
+void do_enter(struct region *r, bool is_final_attempt)
 {
   unit **uptr;
 
@@ -1655,7 +1656,7 @@ static void init_prefixnames(void)
   int i;
   for (i = 0; localenames[i]; ++i) {
     const struct locale *lang = find_locale(localenames[i]);
-    boolean exist = false;
+    bool exist = false;
     struct local_names *in = pnames;
 
     while (in != NULL) {
@@ -1839,7 +1840,7 @@ int display_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-boolean renamed_building(const building * b)
+bool renamed_building(const building * b)
 {
   const struct locale *lang = locales;
   size_t len = strlen(b->name);
@@ -1877,7 +1878,7 @@ int
 rename_building(unit * u, order * ord, building * b, const char *name)
 {
   unit *owner = b ? building_owner(b) : 0;
-  boolean foreign = !(owner && owner->faction == u->faction);
+  bool foreign = !(owner && owner->faction == u->faction);
 
   if (!b) {
     cmistake(u, ord, u->building ? 6 : 145, MSG_EVENT);
@@ -1922,7 +1923,7 @@ int name_cmd(struct unit *u, struct order *ord)
   region *r = u->region;
   char **s = NULL;
   param_t p;
-  boolean foreign = false;
+  bool foreign = false;
   const char *str;
 
   init_tokens(ord);
@@ -2196,7 +2197,7 @@ int mail_cmd(unit * u, struct order *ord)
 
     case P_FACTION:
     {
-      boolean see = false;
+      bool see = false;
 
       n = getfactionid();
 
@@ -2223,7 +2224,7 @@ int mail_cmd(unit * u, struct order *ord)
 
     case P_UNIT:
     {
-      boolean see = false;
+      bool see = false;
       n = getid();
 
       for (u2 = r->units; u2; u2 = u2->next) {
@@ -2374,7 +2375,7 @@ int password_cmd(unit * u, struct order *ord)
   char pwbuf[32];
   int i;
   const char *s;
-  boolean pwok = true;
+  bool pwok = true;
 
   init_tokens(ord);
   skip_token();
@@ -2440,7 +2441,7 @@ int send_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-static boolean display_item(faction * f, unit * u, const item_type * itype)
+static bool display_item(faction * f, unit * u, const item_type * itype)
 {
   const char *name;
   const char *key;
@@ -2473,7 +2474,7 @@ static boolean display_item(faction * f, unit * u, const item_type * itype)
   return true;
 }
 
-static boolean display_potion(faction * f, unit * u, const potion_type * ptype)
+static bool display_potion(faction * f, unit * u, const potion_type * ptype)
 {
   attrib *a;
 
@@ -2497,7 +2498,7 @@ static boolean display_potion(faction * f, unit * u, const potion_type * ptype)
   return true;
 }
 
-static boolean display_race(faction * f, unit * u, const race * rc)
+static bool display_race(faction * f, unit * u, const race * rc)
 {
   const char *name, *key;
   const char *info;
@@ -3076,7 +3077,7 @@ void restack_units(void)
   region *r;
   for (r = regions; r; r = r->next) {
     unit **up = &r->units;
-    boolean sorted = false;
+    bool sorted = false;
     while (*up) {
       unit *u = *up;
       if (!fval(u, UFL_MARK)) {
@@ -3271,7 +3272,7 @@ int renumber_cmd(unit * u, order * ord)
 
 static building *age_building(building * b)
 {
-  static boolean init = false;
+  static bool init = false;
   static const building_type *bt_blessed;
   static const curse_type *ct_astralblock;
   if (!init) {
@@ -3657,8 +3658,8 @@ void check_long_orders(unit * u)
 void update_long_order(unit * u)
 {
   order *ord;
-  boolean trade = false;
-  boolean hunger = LongHunger(u);
+  bool trade = false;
+  bool hunger = LongHunger(u);
 
   freset(u, UFL_MOVED);
   freset(u, UFL_LONGACTION);
@@ -3875,7 +3876,7 @@ void defaultorders(void)
   for (r = regions; r; r = r->next) {
     unit *u;
     for (u = r->units; u; u = u->next) {
-      boolean neworders = false;
+      bool neworders = false;
       order **ordp = &u->orders;
       while (*ordp != NULL) {
         order *ord = *ordp;
@@ -4350,7 +4351,7 @@ int siege_cmd(unit * u, order * ord)
   building *b;
   int d, pooled;
   int bewaffnete, katapultiere = 0;
-  static boolean init = false;
+  static bool init = false;
   static const curse_type *magicwalls_ct;
   static item_type *it_catapultammo = NULL;
   static item_type *it_catapult = NULL;
@@ -4466,7 +4467,7 @@ static int warn_password(void)
 {
   faction *f = factions;
   while (f) {
-    boolean pwok = true;
+    bool pwok = true;
     const char *c = f->passw;
     while (*c && pwok) {
       if (!isalnum((unsigned char)*c))
@@ -4517,8 +4518,8 @@ void init_processor(void)
   }
 
   p += 10;
+  add_proc_region(p, do_contact, "Kontaktieren");
   add_proc_order(p, K_MAIL, &mail_cmd, 0, "Botschaften");
-  add_proc_order(p, K_CONTACT, &contact_cmd, 0, "Kontaktieren");
 
   p += 10;                      /* all claims must be done before we can USE */
   add_proc_region(p, &enter_1, "Betreten (1. Versuch)");
@@ -4595,8 +4596,11 @@ void init_processor(void)
   p += 10;
   add_proc_order(p, K_GUARD, &guard_on_cmd, 0, "Bewache (an)");
 
-  p += 10;
-  add_proc_global(p, &encounters, "Zufallsbegegnungen");
+  if (get_param_int(global.parameters, "rules.encounters", 1)) {
+    p += 10;
+    add_proc_global(p, &encounters, "Zufallsbegegnungen");
+  }
+
   p += 10;
   add_proc_unit(p, &monster_kills_peasants,
     "Monster fressen und vertreiben Bauern");

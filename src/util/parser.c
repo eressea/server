@@ -76,7 +76,7 @@ void parser_popstate(void)
   state = new_state;
 }
 
-boolean parser_end(void)
+bool parser_end(void)
 {
   eatwhitespace_c(&state->current_token);
   return *state->current_token == 0;
@@ -126,7 +126,7 @@ const char *parse_token(const char **str)
   static char lbuf[MAXTOKENSIZE];       /* STATIC_RESULT: used for return, not across calls */
   char *cursor = lbuf;
   char quotechar = 0;
-  boolean escape = false;
+  bool escape = false;
   const char *ctoken = *str;
 
   assert(ctoken);
@@ -135,7 +135,7 @@ const char *parse_token(const char **str)
   while (*ctoken && cursor - lbuf < MAXTOKENSIZE - 1) {
     ucs4_t ucs;
     size_t len;
-    boolean copy = false;
+    bool copy = false;
 
     unsigned char utf8_character = *(unsigned char *)ctoken;
     if (~utf8_character & 0x80) {

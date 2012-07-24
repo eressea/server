@@ -25,6 +25,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* kernel includes */
 #include "alliance.h"
+#include "ally.h"
 #include "alchemy.h"
 #include "battle.h"
 #include "connection.h"
@@ -95,8 +96,8 @@ struct settings global = {
 FILE *logfile;
 FILE *updatelog;
 const struct race *new_race[MAXRACES];
-boolean sqlpatch = false;
-boolean battledebug = false;
+bool sqlpatch = false;
+bool battledebug = false;
 int turn = 0;
 
 int NewbieImmunity(void)
@@ -110,7 +111,7 @@ int NewbieImmunity(void)
   return value;
 }
 
-boolean IsImmune(const faction * f)
+bool IsImmune(const faction * f)
 {
   return !fval(f, FFL_NPC) && f->age < NewbieImmunity();
 }
@@ -143,7 +144,7 @@ static int ally_flag(const char *s, int help_mask)
   return 0;
 }
 
-boolean ExpensiveMigrants(void)
+bool ExpensiveMigrants(void)
 {
   static int value = -1;
   static int gamecookie = -1;
@@ -409,7 +410,6 @@ const char *keywords[MAXKEYWORDS] = {
   "KONTAKTIEREN",
   "LEHREN",
   "LERNEN",
-  "LIEFERE",
   "MACHEN",
   "NACH",
   "PASSWORT",
@@ -617,7 +617,7 @@ int shipspeed(const ship * sh, const unit * u)
 {
   double k = sh->type->range;
   static const curse_type *stormwind_ct, *nodrift_ct;
-  static boolean init;
+  static bool init;
   attrib *a;
   curse *c;
 
@@ -829,7 +829,7 @@ int eff_stealth(const unit * u, const region * r)
   return e;
 }
 
-boolean unit_has_cursed_item(unit * u)
+bool unit_has_cursed_item(unit * u)
 {
   item *itm = u->items;
   while (itm) {
@@ -855,7 +855,7 @@ static void init_gms(void)
 static int
 autoalliance(const plane * pl, const faction * sf, const faction * f2)
 {
-  static boolean init = false;
+  static bool init = false;
   if (!init) {
     init_gms();
     init = true;
@@ -959,7 +959,7 @@ int alliedunit(const unit * u, const faction * f2, int mode)
   return 0;
 }
 
-boolean
+bool
 seefaction(const faction * f, const region * r, const unit * u, int modifier)
 {
   if (((f == u->faction) || !fval(u, UFL_ANON_FACTION))
@@ -968,7 +968,7 @@ seefaction(const faction * f, const region * r, const unit * u, int modifier)
   return false;
 }
 
-boolean
+bool
 cansee(const faction * f, const region * r, const unit * u, int modifier)
   /* r kann != u->region sein, wenn es um durchreisen geht */
   /* und es muss niemand aus f in der region sein, wenn sie vom Turm
@@ -977,7 +977,7 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
   int stealth, rings;
   unit *u2 = r->units;
   static const item_type *itype_grail;
-  static boolean init;
+  static bool init;
 
   if (!init) {
     init = true;
@@ -1037,7 +1037,7 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
   return false;
 }
 
-boolean cansee_unit(const unit * u, const unit * target, int modifier)
+bool cansee_unit(const unit * u, const unit * target, int modifier)
 /* target->region kann != u->region sein, wenn es um durchreisen geht */
 {
   if (fval(target->race, RCF_INVISIBLE) || target->number == 0)
@@ -1073,7 +1073,7 @@ boolean cansee_unit(const unit * u, const unit * target, int modifier)
   return false;
 }
 
-boolean
+bool
 cansee_durchgezogen(const faction * f, const region * r, const unit * u,
   int modifier)
 /* r kann != u->region sein, wenn es um durchreisen geht */
@@ -1144,7 +1144,7 @@ static attrib_type at_lighthouse = {
  */
 void update_lighthouse(building * lh)
 {
-  static boolean init_lighthouse = false;
+  static bool init_lighthouse = false;
   static const struct building_type *bt_lighthouse = 0;
 
   if (!init_lighthouse) {
@@ -1249,14 +1249,8 @@ int count_maxmigrants(const faction * f)
   return migrants;
 }
 
-void init_tokens(const struct order *ord)
-{
-  char *cmd = getcommand(ord);
-  init_tokens_str(cmd, cmd);
-}
-
 void
-parse(keyword_t kword, int (*dofun) (unit *, struct order *), boolean thisorder)
+parse(keyword_t kword, int (*dofun) (unit *, struct order *), bool thisorder)
 {
   region *r;
 
@@ -1403,13 +1397,13 @@ param_t findparam_ex(const char *s, const struct locale * lang)
   return (result == P_BUILDING) ? P_GEBAEUDE : result;
 }
 
-int isparam(const char *s, const struct locale * lang, param_t param)
+bool isparam(const char *s, const struct locale * lang, param_t param)
 {
   if (s[0]>'@') {
     param_t p = (param==P_GEBAEUDE) ? findparam_ex(s, lang) : findparam(s, lang);
     return p==param;
   }
-  return 0;
+  return false;
 }
 
 param_t getparam(const struct locale * lang)
@@ -1502,7 +1496,7 @@ int read_unitid(const faction * f, const region * r)
 }
 
 /* exported symbol */
-boolean getunitpeasants;
+bool getunitpeasants;
 unit *getunitg(const region * r, const faction * f)
 {
   int n = read_unitid(f, r);
@@ -1565,7 +1559,7 @@ void freestrlist(strlist * s)
 
 /* - Meldungen und Fehler ------------------------------------------------- */
 
-boolean lomem = false;
+bool lomem = false;
 
 /* - Namen der Strukturen -------------------------------------- */
 typedef char name[OBJECTIDSIZE + 1];
@@ -1615,7 +1609,7 @@ char *cstring(const char *s)
 }
 
 building *largestbuilding(const region * r, cmp_building_cb cmp_gt,
-  boolean imaginary)
+  bool imaginary)
 {
   building *b, *best = NULL;
 
@@ -1720,9 +1714,9 @@ unit *createunit(region * r, faction * f, int number, const struct race * rc)
   return create_unit(r, f, number, rc, 0, NULL, NULL);
 }
 
-boolean idle(faction * f)
+bool idle(faction * f)
 {
-  return (boolean) (f ? false : true);
+  return (bool) (f ? false : true);
 }
 
 int maxworkingpeasants(const struct region *r)
@@ -1765,7 +1759,7 @@ int lighthouse_range(const building * b, const faction * f)
   return d;
 }
 
-boolean check_leuchtturm(region * r, faction * f)
+bool check_leuchtturm(region * r, faction * f)
 {
   attrib *a;
 
@@ -1951,6 +1945,11 @@ direction_t finddirection(const char *s, const struct locale *lang)
     return (direction_t) token.i;
   }
   return NODIRECTION;
+}
+
+direction_t getdirection(const struct locale * lang)
+{
+  return finddirection(getstrtoken(), lang);
 }
 
 static void init_translations(const struct locale *lang, int ut, const char * (*string_cb)(int i), int maxstrings)
@@ -2364,7 +2363,7 @@ void remove_empty_units(void)
   }
 }
 
-boolean faction_id_is_unused(int id)
+bool faction_id_is_unused(int id)
 {
   return findfaction(id) == NULL;
 }
@@ -2461,7 +2460,7 @@ int lifestyle(const unit * u)
   return need;
 }
 
-boolean has_horses(const struct unit * u)
+bool has_horses(const struct unit * u)
 {
   item *itm = u->items;
   for (; itm; itm = itm->next) {
@@ -2471,7 +2470,7 @@ boolean has_horses(const struct unit * u)
   return false;
 }
 
-boolean hunger(int number, unit * u)
+bool hunger(int number, unit * u)
 {
   region *r = u->region;
   int dead = 0, hpsub = 0;
@@ -2520,7 +2519,7 @@ boolean hunger(int number, unit * u)
   return (dead || hpsub);
 }
 
-void plagues(region * r, boolean ismagic)
+void plagues(region * r, bool ismagic)
 {
   int peasants;
   int i;
@@ -2584,7 +2583,7 @@ int cmp_wage(const struct building *b, const building * a)
   return -1;
 }
 
-boolean is_owner_building(const struct building * b)
+bool is_owner_building(const struct building * b)
 {
   region *r = b->region;
   if (b->type->taxes && r->land && r->land->ownership) {
@@ -2754,7 +2753,7 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
   attrib *a;
   const building_type *artsculpture_type = bt_find("artsculpture");
   static const curse_type *drought_ct, *blessedharvest_ct;
-  static boolean init;
+  static bool init;
 
   if (!init) {
     init = true;
@@ -2895,7 +2894,7 @@ int movewhere(const unit * u, const char *token, region * r, region ** resultp)
   return E_MOVE_OK;
 }
 
-boolean move_blocked(const unit * u, const region * r, const region * r2)
+bool move_blocked(const unit * u, const region * r, const region * r2)
 {
   connection *b;
   curse *c;
@@ -2944,7 +2943,7 @@ int lovar(double xpct_x2)
   return (rng_int() % n + rng_int() % n) / 1000;
 }
 
-boolean has_limited_skills(const struct unit * u)
+bool has_limited_skills(const struct unit * u)
 {
   if (has_skill(u, SK_MAGIC) || has_skill(u, SK_ALCHEMY) ||
     has_skill(u, SK_TACTICS) || has_skill(u, SK_HERBALISM) ||

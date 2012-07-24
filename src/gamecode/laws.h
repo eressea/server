@@ -34,7 +34,7 @@ extern "C" {
     const char *s, struct unit *receiver);
   int init_data(const char *filename, const char *catalog);
 
-  boolean renamed_building(const struct building * b);
+  bool renamed_building(const struct building * b);
   int rename_building(struct unit * u, struct order * ord, struct building * b, const char *name);
   void get_food(struct region * r);
   extern int can_contact(const struct region *r, const struct unit *u, const struct unit *u2);
@@ -57,7 +57,7 @@ extern "C" {
   extern void restack_units(void);
   extern void update_long_order(struct unit *u);
   extern void sinkships(struct region * r);
-  extern void do_enter(struct region *r, int is_final_attempt);
+  extern void do_enter(struct region *r, bool is_final_attempt);
 
   extern int password_cmd(struct unit *u, struct order *ord);
   extern int banner_cmd(struct unit *u, struct order *ord);

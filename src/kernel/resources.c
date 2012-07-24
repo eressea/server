@@ -118,7 +118,7 @@ static void terraform_default(struct rawmaterial *res, const region * r)
 }
 
 #ifdef RANDOM_CHANGE
-static void resource_random_change(int *pvalue, boolean used)
+static void resource_random_change(int *pvalue, bool used)
 {
   int split = 5;
   int rnd = rng_int() % 100;

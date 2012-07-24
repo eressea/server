@@ -2200,9 +2200,6 @@
   <string name="LERNEN">
     <text locale="de">LERNEN</text>
   </string>
-  <string name="LIEFERE">
-    <text locale="de">LIEFERE</text>
-  </string>
   <string name="MACHEN">
     <text locale="de">MACHEN</text>
   </string>
@@ -6978,6 +6975,81 @@
   <string name="unit_guards">
     <text locale="de">bewacht die Region</text>
     <text locale="en">guards the region</text>
+  </string>
+
+  <string name="unit_hungers">
+    <text locale="de">hungert</text>
+    <text locale="en">hungry</text>
+  </string>
+
+  <string name="smod_far">
+    <text locale="de">Fernzauber</text>
+    <text locale="en">far</text>
+  </string>
+
+  <string name="smod_sea">
+    <text locale="de">Seezauber</text>
+    <text locale="en">sea</text>
+  </string>
+
+  <string name="smod_ship">
+    <text locale="de">Schiffszauber</text>
+    <text locale="en">ship</text>
+  </string>
+
+  <string name="smod_nofamiliar">
+    <text locale="de">Magier exklusiv</text>
+    <text locale="en">magicians only</text>
+  </string>
+
+  <string name="smod_none">
+    <text locale="de">Keine</text>
+    <text locale="en">none</text>
+  </string>
+
+  <string name="faction_help_one">
+    <text locale="de">Wir helfen der Partei</text>
+    <text locale="en">We are helping the faction</text>
+  </string>
+
+  <string name="faction_help_many">
+    <text locale="de">Wir helfen den Parteien</text>
+    <text locale="en">We are helping the factions</text>
+  </string>
+
+  <string name="group_help_one">
+    <text locale="de">hilft der Partei</text>
+    <text locale="en">is helping the faction</text>
+  </string>
+
+  <string name="group_help_many">
+    <text locale="de">hilft den Parteien</text>
+    <text locale="en">is helping the factions</text>
+  </string>
+
+  <string name="has_moved_one">
+    <text locale="de">hat die Region durchquert</text>
+    <text locale="en">has traveled through the region</text>
+  </string>
+
+  <string name="has_moved_many">
+    <text locale="de">haben die Region durchquert</text>
+    <text locale="en">have traveled through the region</text>
+  </string>
+
+  <string name="see_travel">
+    <text locale="de">durchgereist</text>
+    <text locale="en">travel</text>
+  </string>
+
+  <string name="see_neighbour">
+    <text locale="de">benachbart</text>
+    <text locale="en">neighbour</text>
+  </string>
+
+  <string name="see_lighthouse">
+    <text locale="de">vom Turm erblickt</text>
+    <text locale="en">from lighthouse</text>
   </string>
 
   <string name="list_and">

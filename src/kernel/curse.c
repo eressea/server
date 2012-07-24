@@ -322,7 +322,7 @@ const curse_type *ct_find(const char *c)
  * einen pointer auf die struct zurück.
  */
 
-boolean cmp_curse(const attrib * a, const void *data)
+bool cmp_curse(const attrib * a, const void *data)
 {
   const curse *c = (const curse *)data;
   if (a->type->flags & ATF_CURSE) {
@@ -332,7 +332,7 @@ boolean cmp_curse(const attrib * a, const void *data)
   return false;
 }
 
-boolean cmp_cursetype(const attrib * a, const void *data)
+bool cmp_cursetype(const attrib * a, const void *data)
 {
   const curse_type *ct = (const curse_type *)data;
   if (a->type->flags & ATF_CURSE) {
@@ -343,7 +343,7 @@ boolean cmp_cursetype(const attrib * a, const void *data)
 }
 
 curse *get_cursex(attrib * ap, const curse_type * ctype, variant data,
-  boolean(*compare) (const curse *, variant))
+  bool(*compare) (const curse *, variant))
 {
   attrib *a = a_select(ap, ctype, cmp_cursetype);
   while (a) {
@@ -582,7 +582,7 @@ static void do_transfer_curse(curse * c, unit * u, unit * u2, int n)
 {
   int cursedmen = 0;
   int men = get_cursedmen(u, c);
-  boolean dogive = false;
+  bool dogive = false;
   const curse_type *ct = c->type;
 
   switch ((ct->flags | c->flags) & CURSE_SPREADMASK) {
@@ -639,7 +639,7 @@ void transfer_curse(unit * u, unit * u2, int n)
 
 /* ------------------------------------------------------------- */
 
-boolean curse_active(const curse * c)
+bool curse_active(const curse * c)
 {
   if (!c)
     return false;
@@ -651,7 +651,7 @@ boolean curse_active(const curse * c)
   return true;
 }
 
-boolean is_cursed_internal(attrib * ap, const curse_type * ct)
+bool is_cursed_internal(attrib * ap, const curse_type * ct)
 {
   curse *c = get_curse(ap, ct);
 
@@ -661,7 +661,7 @@ boolean is_cursed_internal(attrib * ap, const curse_type * ct)
   return true;
 }
 
-boolean is_cursed_with(const attrib * ap, const curse * c)
+bool is_cursed_with(const attrib * ap, const curse * c)
 {
   const attrib *a = ap;
 

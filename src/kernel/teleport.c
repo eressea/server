@@ -61,7 +61,7 @@ static region *tpregion(const region * r)
   return rt;
 }
 
-region_list *astralregions(const region * r, boolean(*valid) (const region *))
+region_list *astralregions(const region * r, bool(*valid) (const region *))
 {
   region_list *rlist = NULL;
   int x, y;
@@ -116,7 +116,7 @@ region *r_astral_to_standard(const region * r)
 }
 
 region_list *all_in_range(const region * r, int n,
-  boolean(*valid) (const region *))
+  bool(*valid) (const region *))
 {
   int x, y;
   region_list *rlist = NULL;
@@ -171,7 +171,7 @@ plane *get_normalplane(void)
   return NULL;
 }
 
-boolean is_astral(const region * r)
+bool is_astral(const region * r)
 {
   plane *pl = get_astralplane();
   return (pl && rplane(r) == pl);
@@ -227,7 +227,7 @@ void create_teleport_plane(void)
   }
 }
 
-boolean inhabitable(const region * r)
+bool inhabitable(const region * r)
 {
   return fval(r->terrain, LAND_REGION);
 }

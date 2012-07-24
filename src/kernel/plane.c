@@ -309,7 +309,7 @@ int read_plane_reference(plane ** pp, struct storage *store)
   return AT_READ_OK;
 }
 
-boolean is_watcher(const struct plane * p, const struct faction * f)
+bool is_watcher(const struct plane * p, const struct faction * f)
 {
   struct watcher *w;
   if (!p)

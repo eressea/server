@@ -171,7 +171,6 @@ ship *new_ship(const ship_type * stype, region * r, const struct locale *lang)
   const char *sname = 0;
 
   assert(stype);
-  assert(r);
   sh->no = newcontainerid();
   sh->coast = NODIRECTION;
   sh->type = stype;
@@ -188,7 +187,9 @@ ship *new_ship(const ship_type * stype, region * r, const struct locale *lang)
   slprintf(buffer, sizeof(buffer), "%s %s", sname, shipid(sh));
   sh->name = strdup(buffer);
   shash(sh);
-  addlist(&r->ships, sh);
+  if (r) {
+    addlist(&r->ships, sh);
+  }
   return sh;
 }
 

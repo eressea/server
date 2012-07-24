@@ -224,21 +224,21 @@ void b_write(const connection * b, storage * store)
   }
 }
 
-boolean b_transparent(const connection * b, const struct faction *f)
+bool b_transparent(const connection * b, const struct faction *f)
 {
   unused(b);
   unused(f);
   return true;
 }
 
-boolean b_opaque(const connection * b, const struct faction * f)
+bool b_opaque(const connection * b, const struct faction * f)
 {
   unused(b);
   unused(f);
   return false;
 }
 
-boolean b_blockall(const connection * b, const unit * u, const region * r)
+bool b_blockall(const connection * b, const unit * u, const region * r)
 {
   unused(u);
   unused(r);
@@ -246,7 +246,7 @@ boolean b_blockall(const connection * b, const unit * u, const region * r)
   return true;
 }
 
-boolean b_blocknone(const connection * b, const unit * u, const region * r)
+bool b_blocknone(const connection * b, const unit * u, const region * r)
 {
   unused(u);
   unused(r);
@@ -254,12 +254,12 @@ boolean b_blocknone(const connection * b, const unit * u, const region * r)
   return false;
 }
 
-boolean b_rvisible(const connection * b, const region * r)
+bool b_rvisible(const connection * b, const region * r)
 {
-  return (boolean) (b->to == r || b->from == r);
+  return (bool) (b->to == r || b->from == r);
 }
 
-boolean b_fvisible(const connection * b, const struct faction * f,
+bool b_fvisible(const connection * b, const struct faction * f,
   const region * r)
 {
   unused(r);
@@ -268,21 +268,21 @@ boolean b_fvisible(const connection * b, const struct faction * f,
   return true;
 }
 
-boolean b_uvisible(const connection * b, const unit * u)
+bool b_uvisible(const connection * b, const unit * u)
 {
   unused(u);
   unused(b);
   return true;
 }
 
-boolean b_rinvisible(const connection * b, const region * r)
+bool b_rinvisible(const connection * b, const region * r)
 {
   unused(r);
   unused(b);
   return false;
 }
 
-boolean b_finvisible(const connection * b, const struct faction * f,
+bool b_finvisible(const connection * b, const struct faction * f,
   const region * r)
 {
   unused(r);
@@ -291,7 +291,7 @@ boolean b_finvisible(const connection * b, const struct faction * f,
   return false;
 }
 
-boolean b_uinvisible(const connection * b, const unit * u)
+bool b_uinvisible(const connection * b, const unit * u)
 {
   unused(u);
   unused(b);
@@ -399,14 +399,14 @@ static const char *b_namefogwall(const connection * b, const region * r,
   return LOC(f->locale, mkname("border", "fogwall"));
 }
 
-static boolean
+static bool
 b_blockfogwall(const connection * b, const unit * u, const region * r)
 {
   unused(b);
   unused(r);
   if (!u)
     return true;
-  return (boolean) (effskill(u, SK_PERCEPTION) > 4);    /* Das ist die alte Nebelwand */
+  return (bool) (effskill(u, SK_PERCEPTION) > 4);    /* Das ist die alte Nebelwand */
 }
 
 /** Legacy type used in old Eressea games, no longer in use. */
@@ -458,7 +458,7 @@ border_type bt_illusionwall = {
  * special quest door
  ***/
 
-boolean b_blockquestportal(const connection * b, const unit * u,
+bool b_blockquestportal(const connection * b, const unit * u,
   const region * r)
 {
   if (b->data.i > 0)
@@ -558,14 +558,14 @@ static void b_writeroad(const connection * b, storage * store)
   store->w_int(store, b->data.sa[1]);
 }
 
-static boolean b_validroad(const connection * b)
+static bool b_validroad(const connection * b)
 {
   if (b->data.sa[0] == SHRT_MAX)
     return false;
   return true;
 }
 
-static boolean b_rvisibleroad(const connection * b, const region * r)
+static bool b_rvisibleroad(const connection * b, const region * r)
 {
   int x = b->data.i;
   x = (r == b->from) ? b->data.sa[0] : b->data.sa[1];

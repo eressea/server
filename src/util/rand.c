@@ -61,7 +61,7 @@ int ntimespprob(int n, double p, double mod)
   return count;
 }
 
-boolean chance(double x)
+bool chance(double x)
 {
   if (x >= 1.0)
     return true;

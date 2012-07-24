@@ -180,7 +180,7 @@ const char *buildingtype(const building_type * btype, const building * b,
   int bsize)
 {
   const char *s = NULL;
-  static boolean init_generic = false;
+  static bool init_generic = false;
   static const struct building_type *bt_generic;
 
   if (!init_generic) {
@@ -451,7 +451,7 @@ building *new_building(const struct building_type * btype, region * r,
 {
   building **bptr = &r->buildings;
   building *b = (building *) calloc(1, sizeof(building));
-  static boolean init_lighthouse = false;
+  static bool init_lighthouse = false;
   static const struct building_type *bt_lighthouse = 0;
   const char *bname = 0;
   char buffer[32];
@@ -501,7 +501,7 @@ void remove_building(building ** blist, building * b)
 {
   unit *u;
   static const struct building_type *bt_caravan, *bt_dam, *bt_tunnel;
-  static boolean init = false;
+  static bool init = false;
 
   if (!init) {
     init = true;

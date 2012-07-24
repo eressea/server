@@ -19,7 +19,7 @@ extern "C" {
   extern const char *parse_token(const char **str);
   extern void parser_pushstate(void);
   extern void parser_popstate(void);
-  extern boolean parser_end(void);
+  extern bool parser_end(void);
   extern const char *getstrtoken(void);
 
 #ifdef __cplusplus

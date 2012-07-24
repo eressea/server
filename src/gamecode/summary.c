@@ -132,7 +132,7 @@ static void writeturn(void)
   fclose(f);
 }
 
-void report_summary(summary * s, summary * o, boolean full)
+void report_summary(summary * s, summary * o, bool full)
 {
   FILE *F = NULL;
   int i, newplayers = 0;

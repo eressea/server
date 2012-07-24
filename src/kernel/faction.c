@@ -21,6 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "faction.h"
 
 #include "alliance.h"
+#include "ally.h"
 #include "equipment.h"
 #include "group.h"
 #include "item.h"
@@ -258,7 +259,7 @@ unit *addplayer(region * r, faction * f)
   return u;
 }
 
-boolean checkpasswd(const faction * f, const char *passwd, boolean shortp)
+bool checkpasswd(const faction * f, const char *passwd, bool shortp)
 {
   if (unicode_utf8_strcasecmp(f->passw, passwd) == 0)
     return true;
@@ -490,14 +491,14 @@ void faction_setpassword(faction * f, const char *passw)
     f->passw = strdup(itoa36(rng_int()));
 }
 
-boolean valid_race(const struct faction *f, const struct race *rc)
+bool valid_race(const struct faction *f, const struct race *rc)
 {
   if (f->race == rc)
     return true;
   else {
     const char *str = get_param(f->race->parameters, "other_race");
     if (str)
-      return (boolean) (rc_find(str) == rc);
+      return (bool) (rc_find(str) == rc);
     return false;
   }
 }

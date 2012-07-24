@@ -75,7 +75,7 @@ list_selection *do_selection(list_selection * sel, const char *title,
   void (*perform) (list_selection *, void *), void *data)
 {
   WINDOW *wn;
-  boolean update = true;
+  bool update = true;
   list_selection *s;
   list_selection *top = sel;
   list_selection *current = top;
