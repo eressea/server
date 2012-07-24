@@ -37,6 +37,14 @@ void process_give_control(void);
 void process_regeneration(void);
 void process_guard_on(void);
 void process_guard_off(void);
+void process_explain(void);
+void process_messages(void);
+void process_reserve(void);
+void process_claim(void);
+void process_follow(void);
+void process_alliance(void);
+void process_idle(void);
+void process_set_default(void);
 
 #ifdef __cplusplus
 }
