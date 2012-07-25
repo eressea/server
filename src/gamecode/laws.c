@@ -3711,7 +3711,7 @@ void update_long_order(unit * u)
       case K_CAST:
         /* dient dazu, das neben Zaubern kein weiterer Befehl
          * ausgeführt werden kann, Zaubern ist ein kurzer Befehl */
-        set_order(&u->thisorder, NULL);
+        set_order(&u->thisorder, copy_order(ord));
         break;
 
       default:

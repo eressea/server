@@ -1171,3 +1171,21 @@ function test_bug_1875_use_own_first()
     assert_equal(99, u:get_potion("peasantblood")) -- unit uses one peasantblood effect
     assert_equal(99, u2:get_potion("peasantblood")) -- u2 uses its own effect before u's
 end
+
+
+function test_bug_1879_follow_unit()
+  local r = region.create(0, 0, "plain")    
+  local r1 = region.create(1, 0, "plain")
+  local f = faction.create("noreply@eressea.de", "human", "de")
+  local u1, u2 = two_units(r, f, f)
+  u1:clear_orders()
+  u1:set_skill("magic", 10)
+  u1:add_order("ZAUBERE STUFE 1 Kleine Flüche")
+  u1:add_order("FOLGEN EINHEIT " .. itoa36(u2.id))
+  u2:clear_orders()
+  u2:add_order("NACH o")
+  process_orders()
+  assert_equal(u1.region.id, r1.id)
+  assert_equal(u2.region.id, r1.id)
+end
+
