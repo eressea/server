@@ -955,6 +955,7 @@ function setup()
     eressea.write_game("free.dat")
     eressea.settings.set("rules.economy.food", "4") -- FOOD_IS_FREE
     eressea.settings.set("rules.encounters", "0")
+    eressea.settings.set("rules.move.owner_leave", "0")
 end
 
 function test_parser()
@@ -1257,3 +1258,44 @@ function test_bug_1879_follow_unit()
   assert_equal(u2.region.id, r1.id)
 end
 
+function test_bug_1870_leave_enter_e2()
+  local r = region.create(0, 0, "plain")    
+  local f = faction.create("noreply@eressea.de", "human", "de")
+  local u1, u2 = two_units(r, f, f)
+  local mine = building.create(r, "mine")
+  mine.size = 10
+  u1.building = mine
+
+  local b = building.create(r, "castle")
+  b.size = 10
+  u2.building = b
+    
+  u1:clear_orders()
+  u1:add_order("LERNEN Burgenbau ")
+  u1:add_order("BETRETEN BURG " .. itoa36(b.id))
+
+  eressea.settings.set("rules.move.owner_leave", "0")
+  process_orders()
+  assert_equal(u1.building.id, b.id)
+end
+
+function test_bug_1870_leave_enter_e3()
+  local r = region.create(0, 0, "plain")    
+  local f = faction.create("noreply@eressea.de", "human", "de")
+  local u1, u2 = two_units(r, f, f)
+  local mine = building.create(r, "mine")
+  mine.size = 10
+  u1.building = mine
+
+  local b = building.create(r, "castle")
+  b.size = 10
+  u2.building = b
+    
+  u1:clear_orders()
+  u1:add_order("LERNEN Burgenbau ")
+  u1:add_order("BETRETEN BURG " .. itoa36(b.id))
+
+  eressea.settings.set("rules.move.owner_leave", "1")
+  process_orders()
+  assert_equal(u1.building.id, mine.id)
+end

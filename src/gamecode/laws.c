@@ -1261,9 +1261,11 @@ int enter_ship(unit * u, struct order *ord, int id, int report)
     }
   }
 
-  if (leave(u, 0)) {
+  if (leave(u, false)) {
     u_set_ship(u, sh);
     fset(u, UFL_ENTER);
+  } else if (report) {
+    cmistake(u, ord, 150, MSG_MOVE);
   }
   return 1;
 }
@@ -1310,6 +1312,8 @@ int enter_building(unit * u, order * ord, int id, int report)
     fset(u, UFL_ENTER);
     u_set_building(u, b);
     return 1;
+  } else if (report) {
+    cmistake(u, ord, 150, MSG_MOVE);
   }
   return 0;
 }
