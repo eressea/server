@@ -568,6 +568,73 @@ function test_config()
   assert_not_equal(nil, config.locales)
 end
 
+local function _test_create_laen()
+  local r = region.create(0,0, "mountain")
+  local f1 = faction.create("noreply@eressea.de", "human", "de")
+  local u1 = unit.create(f1, r, 1)
+  
+  -- TODO this is a stupid way to create a laen region
+  for i = 1, 10000 do
+    r = region.create(i,0, "mountain")
+    if r:get_resource("laen") > 2 then
+      break
+    end
+  end
+  assert(r:get_resource("laen")>2, "could not run test properly, please try again")
+  
+  return r, u1
+end
+
+function test_laen1()
+  local r, u1 = _test_create_laen()
+  
+  u1:add_item("money", 1000)
+  u1:set_skill("mining", 14)
+  u1:clear_orders()
+  u1:add_order("MACHEN Laen")
+ 
+  process_orders()
+  assert_equal(0, u1:get_item("laen"))
+end
+
+function test_laen2()
+  local r, u1 = _test_create_laen()
+  
+  u1:add_item("money", 1000)
+  u1:set_skill("mining", 15)
+  u1:clear_orders()
+  u1:add_order("MACHEN Laen")
+ 
+  local b = building.create(r, "mine")
+  b.size = 10
+  u1.building = b
+  local laen = r:get_resource("laen")
+ 
+  process_orders()
+  assert_equal(2, u1:get_item("laen"))
+  assert_equal(laen - 2, r:get_resource("laen"))
+end
+
+function test_mine()
+  local r = region.create(0,0, "mountain")
+  local f1 = faction.create("noreply@eressea.de", "human", "de")
+  local u1 = unit.create(f1, r, 1)
+  
+  u1:add_item("money", 1000)
+  u1:set_skill("mining", 1)
+  u1:clear_orders()
+  u1:add_order("MACHEN Eisen")
+ 
+  local b = building.create(r, "mine")
+  b.size = 10
+  u1.building = b
+  local iron = r:get_resource("iron")
+ 
+  process_orders()
+  assert_equal(2, u1:get_item("iron")) -- skill +1
+  assert_equal(iron - 1, r:get_resource("iron")) -- only 1/2 is taken away
+end
+
 function test_guard_resources()
   -- this is not quite http://bugs.eressea.de/view.php?id=1756
   local r = region.create(0,0, "mountain")
@@ -590,6 +657,7 @@ function test_guard_resources()
  
   process_orders()
   local iron = u2:get_item("iron")
+  assert_true(iron > 0)
   process_orders()
   assert_equal(iron, u2:get_item("iron"))
 end
