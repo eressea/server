@@ -33,12 +33,12 @@ extern "C" {
 
   extern const char *directions[];
   extern const char *coasts[];
-  extern boolean nonr;
-  extern boolean nocr;
-  extern boolean noreports;
+  extern bool nonr;
+  extern bool nocr;
+  extern bool noreports;
 
 /* kann_finden speedups */
-  extern boolean kann_finden(struct faction *f1, struct faction *f2);
+  extern bool kann_finden(struct faction *f1, struct faction *f2);
   extern struct unit *can_find(struct faction *, struct faction *);
 
 /* funktionen zum schreiben eines reports */
@@ -77,13 +77,13 @@ extern "C" {
     struct seen_region *next;
     struct region *r;
     unsigned char mode;
-    boolean disbelieves;
+    bool disbelieves;
   } seen_region;
 
   extern struct seen_region *find_seen(struct seen_region *seehash[],
     const struct region *r);
-  extern boolean add_seen(struct seen_region *seehash[], struct region *r,
-    unsigned char mode, boolean dis);
+  extern bool add_seen(struct seen_region *seehash[], struct region *r,
+    unsigned char mode, bool dis);
   extern struct seen_region **seen_init(void);
   extern void seen_done(struct seen_region *seehash[]);
   extern void free_seen(void);
@@ -137,7 +137,7 @@ extern "C" {
     const struct unit *owner, const struct faction *viewer);
   void report_item(const struct unit *owner, const struct item *i,
     const struct faction *viewer, const char **name, const char **basename,
-    int *number, boolean singular);
+    int *number, bool singular);
   void report_building(const struct building *b, const char **btype,
     const char **billusion);
   void report_race(const struct unit *u, const char **rcname,

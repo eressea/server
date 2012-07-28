@@ -38,7 +38,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* damage types */
 
-static boolean
+static bool
 attack_firesword(const troop * at, const struct weapon_type *wtype,
   int *casualties)
 {
@@ -83,7 +83,7 @@ attack_firesword(const troop * at, const struct weapon_type *wtype,
 
 #define CATAPULT_ATTACKS 6
 
-static boolean
+static bool
 attack_catapult(const troop * at, const struct weapon_type *wtype,
   int *casualties)
 {

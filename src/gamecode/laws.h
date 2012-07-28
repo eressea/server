@@ -34,9 +34,10 @@ extern "C" {
     const char *s, struct unit *receiver);
   int init_data(const char *filename, const char *catalog);
 
-  boolean renamed_building(const struct building * b);
+  bool renamed_building(const struct building * b);
   int rename_building(struct unit * u, struct order * ord, struct building * b, const char *name);
   void get_food(struct region * r);
+  extern int can_contact(const struct region *r, const struct unit *u, const struct unit *u2);
 
 /* eressea-specific. put somewhere else, please. */
   void processorders(void);
@@ -45,9 +46,19 @@ extern "C" {
   extern int dropouts[2];
   extern int *age;
 
+  extern int enter_building(struct unit *u, struct order *ord, int id, int report);
+  extern int enter_ship(struct unit *u, struct order *ord, int id, int report);
+
   extern void new_units(void);
+  extern void defaultorders(void);
   extern void quit(void);
-  extern void update_long_order(struct unit * u);
+  extern void monthly_healing(void);
+  extern void renumber_factions(void);
+  extern void restack_units(void);
+  extern void update_long_order(struct unit *u);
+  extern void sinkships(struct region * r);
+  extern void do_enter(struct region *r, bool is_final_attempt);
+
   extern int password_cmd(struct unit *u, struct order *ord);
   extern int banner_cmd(struct unit *u, struct order *ord);
   extern int email_cmd(struct unit *u, struct order *ord);
@@ -61,7 +72,22 @@ extern "C" {
   extern int origin_cmd(struct unit *u, struct order *ord);
   extern int quit_cmd(struct unit *u, struct order *ord);
   extern int name_cmd(struct unit *u, struct order *ord);
-  
+  extern int use_cmd(struct unit *u, struct order *ord);
+  extern int siege_cmd(struct unit *u, struct order *ord);
+  extern int leave_cmd(struct unit *u, struct order *ord);
+  extern int pay_cmd(struct unit *u, struct order *ord);
+  extern int promotion_cmd(struct unit *u, struct order *ord);
+  extern int renumber_cmd(struct unit *u, struct order *ord);
+  extern int combatspell_cmd(struct unit *u, struct order *ord);
+  extern int contact_cmd(struct unit *u, struct order *ord);
+  extern int guard_on_cmd(struct unit *u, struct order *ord);
+  extern int guard_off_cmd(struct unit *u, struct order *ord);
+  extern int reshow_cmd(struct unit *u, struct order *ord);
+  extern int mail_cmd(struct unit *u, struct order *ord);
+  extern int reserve_cmd(struct unit *u, struct order *ord);
+  extern int claim_cmd(struct unit *u, struct order *ord);
+  extern int follow_cmd(struct unit *u, struct order *ord);
+
 #ifdef __cplusplus
 }
 #endif

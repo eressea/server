@@ -21,9 +21,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "group.h"
 
 /* kernel includes */
-#include "unit.h"
+#include "ally.h"
 #include "faction.h"
 #include "save.h"
+#include "unit.h"
 #include "version.h"
 
 /* attrib includes */
@@ -175,7 +176,7 @@ void set_group(struct unit *u, struct group *g)
   }
 }
 
-boolean join_group(unit * u, const char *name)
+bool join_group(unit * u, const char *name)
 {
   group *g = NULL;
 

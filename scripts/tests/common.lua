@@ -44,18 +44,7 @@ function setup()
     eressea.settings.set("nmr.timeout", "0")
     eressea.settings.set("NewbieImmunity", "0")
     eressea.settings.set("rules.economy.food", "4")
-end
-
-function DISABLE_test_eventbus_fire()
-  local r = region.create(0, 0, "plain")
-  local f = faction.create("noreply@eressea.de", "human", "de")
-  local u = unit.create(f, r)
-  
-  function compare_f(u, event, f)
-    assert_equal(u.faction, f)
-  end
-  eventbus.register(u, "weird", compare_f)
-  eventbus.fire(u, "weird", f)
+    eressea.settings.set("rules.encounters", "0")
 end
 
 function test_fleeing_units_can_be_transported()
@@ -579,6 +568,73 @@ function test_config()
   assert_not_equal(nil, config.locales)
 end
 
+local function _test_create_laen()
+  local r = region.create(0,0, "mountain")
+  local f1 = faction.create("noreply@eressea.de", "human", "de")
+  local u1 = unit.create(f1, r, 1)
+  
+  -- TODO this is a stupid way to create a laen region
+  for i = 1, 10000 do
+    r = region.create(i,0, "mountain")
+    if r:get_resource("laen") > 2 then
+      break
+    end
+  end
+  assert(r:get_resource("laen")>2, "could not run test properly, please try again")
+  
+  return r, u1
+end
+
+function test_laen1()
+  local r, u1 = _test_create_laen()
+  
+  u1:add_item("money", 1000)
+  u1:set_skill("mining", 14)
+  u1:clear_orders()
+  u1:add_order("MACHEN Laen")
+ 
+  process_orders()
+  assert_equal(0, u1:get_item("laen"))
+end
+
+function test_laen2()
+  local r, u1 = _test_create_laen()
+  
+  u1:add_item("money", 1000)
+  u1:set_skill("mining", 15)
+  u1:clear_orders()
+  u1:add_order("MACHEN Laen")
+ 
+  local b = building.create(r, "mine")
+  b.size = 10
+  u1.building = b
+  local laen = r:get_resource("laen")
+ 
+  process_orders()
+  assert_equal(2, u1:get_item("laen"))
+  assert_equal(laen - 2, r:get_resource("laen"))
+end
+
+function test_mine()
+  local r = region.create(0,0, "mountain")
+  local f1 = faction.create("noreply@eressea.de", "human", "de")
+  local u1 = unit.create(f1, r, 1)
+  
+  u1:add_item("money", 1000)
+  u1:set_skill("mining", 1)
+  u1:clear_orders()
+  u1:add_order("MACHEN Eisen")
+ 
+  local b = building.create(r, "mine")
+  b.size = 10
+  u1.building = b
+  local iron = r:get_resource("iron")
+ 
+  process_orders()
+  assert_equal(2, u1:get_item("iron")) -- skill +1
+  assert_equal(iron - 1, r:get_resource("iron")) -- only 1/2 is taken away
+end
+
 function test_guard_resources()
   -- this is not quite http://bugs.eressea.de/view.php?id=1756
   local r = region.create(0,0, "mountain")
@@ -601,12 +657,13 @@ function test_guard_resources()
  
   process_orders()
   local iron = u2:get_item("iron")
+  assert_true(iron > 0)
   process_orders()
   assert_equal(iron, u2:get_item("iron"))
 end
 
 local function is_flag_set(flags, flag)
-  return math.mod(flags, flag*2) - math.mod(flags, flag) == flag;
+  return math.fmod(flags, flag*2) - math.fmod(flags, flag) == flag;
 end
 
 function test_hero_hero_transfer()
@@ -815,7 +872,7 @@ end
 local function find_in_report(f, pattern, extension)
     extension = extension or "nr"
     local filename = config.reportpath .. "/" .. get_turn() .. "-" .. itoa36(f.id) .. "." .. extension
-    local report = io.open(filename, 'rt');
+    local report = io.open(filename, 'r');
     assert_not_nil(report)
     t = report:read("*all")
     report:close()
@@ -897,6 +954,8 @@ function setup()
     eressea.free_game()
     eressea.write_game("free.dat")
     eressea.settings.set("rules.economy.food", "4") -- FOOD_IS_FREE
+    eressea.settings.set("rules.encounters", "0")
+    eressea.settings.set("rules.move.owner_leave", "0")
 end
 
 function test_parser()
@@ -905,7 +964,7 @@ function test_parser()
     local u = unit.create(f, r, 1)
     local filename = config.basepath .. "/data/orders.txt"
     
-    local file = io.open(filename, "w+")
+    local file = io.open(filename, "w")
     assert_not_nil(file)
     file:write('ERESSEA ' .. itoa36(f.id) .. ' "' .. f.password .. '"\n')
     file:write('EINHEIT ' .. itoa36(u.id) .. "\n")
@@ -968,7 +1027,7 @@ function test_bug_1814()
     local u = unit.create(f, r, 1)
     local filename = config.basepath .. "/data/1814.txt"
     
-    local file = io.open(filename, "w+")
+    local file = io.open(filename, "w")
     file:write('ERESSEA ' .. itoa36(f.id) .. ' "' .. f.password .. '"\n')
     file:write('EINHEIT ' .. itoa36(u.id) .. "\n")
     file:write("; parse error follows: '\n")
@@ -989,11 +1048,11 @@ function test_bug_1679()
     local u = unit.create(f, r, 1)
     local filename = config.basepath .. "/data/1679.txt"
     
-    local file = io.open(filename, "w+")
+    local file = io.open(filename, "w")
     file:write('ERESSEA ' .. itoa36(f.id) .. ' "' .. f.password .. '"\n')
     file:write('EINHEIT ' .. itoa36(u.id) .. "\n")
-    file:write("NACH W\n")
     file:write("ARBEITEN\n")
+    file:write("NACH W\n")
     file:close()
     
     eressea.read_orders(filename)
@@ -1001,7 +1060,7 @@ function test_bug_1679()
     init_reports()
     write_report(f)
     assert_true(find_in_report(f, "Die Einheit kann keine weiteren langen Befehle", "cr"))
-    assert_true(find_in_report(f, "entdeckt, dass es keinen Weg nach Westen gibt"))
+    assert_false(find_in_report(f, "entdeckt, dass es keinen Weg nach Westen gibt"))
 end
 
 function test_building_unique0()
@@ -1144,7 +1203,12 @@ function test_bug_1875_use_help()
 
     assert_equal(0, u:get_item("peasantblood")) 
     assert_equal(0, r:get_resource("peasant")) 
+    assert_equal(0, r:get_resource("peasant"))
     assert_equal(0, u2:get_potion("peasantblood")) -- first unit helps this unit
+    if 98~=u:get_potion("peasantblood") then
+        print(get_turn(), f, u)
+        write_reports()
+    end
     assert_equal(98, u:get_potion("peasantblood")) -- unit uses one peasantblood effect
 end
 
@@ -1175,4 +1239,98 @@ function test_bug_1875_use_own_first()
     assert_equal(0, r:get_resource("peasant")) 
     assert_equal(99, u:get_potion("peasantblood")) -- unit uses one peasantblood effect
     assert_equal(99, u2:get_potion("peasantblood")) -- u2 uses its own effect before u's
+end
+
+
+function test_bug_1879_follow_unit()
+  local r = region.create(0, 0, "plain")    
+  local r1 = region.create(1, 0, "plain")
+  local f = faction.create("noreply@eressea.de", "human", "de")
+  local u1, u2 = two_units(r, f, f)
+  u1:clear_orders()
+  u1:set_skill("magic", 10)
+  u1:add_order("ZAUBERE STUFE 1 Kleine Flüche")
+  u1:add_order("FOLGEN EINHEIT " .. itoa36(u2.id))
+  u2:clear_orders()
+  u2:add_order("NACH o")
+  process_orders()
+  assert_equal(u1.region.id, r1.id)
+  assert_equal(u2.region.id, r1.id)
+end
+
+function test_bug_1870_leave_enter_e2()
+  local r = region.create(0, 0, "plain")    
+  local f = faction.create("noreply@eressea.de", "human", "de")
+  local u1, u2 = two_units(r, f, f)
+  local mine = building.create(r, "mine")
+  mine.size = 10
+  u1.building = mine
+
+  local b = building.create(r, "castle")
+  b.size = 10
+  u2.building = b
+    
+  u1:clear_orders()
+  u1:add_order("LERNEN Burgenbau ")
+  u1:add_order("BETRETEN BURG " .. itoa36(b.id))
+
+  eressea.settings.set("rules.move.owner_leave", "0")
+  process_orders()
+  assert_equal(u1.building.id, b.id)
+end
+
+function test_bug_1870_leave_enter_e3()
+  local r = region.create(0, 0, "plain")    
+  local f = faction.create("noreply@eressea.de", "human", "de")
+  local u1, u2 = two_units(r, f, f)
+  local mine = building.create(r, "mine")
+  mine.size = 10
+  u1.building = mine
+
+  local b = building.create(r, "castle")
+  b.size = 10
+  u2.building = b
+    
+  u1:clear_orders()
+  u1:add_order("LERNEN Burgenbau ")
+  u1:add_order("BETRETEN BURG " .. itoa36(b.id))
+
+  eressea.settings.set("rules.move.owner_leave", "1")
+  process_orders()
+  assert_equal(u1.building.id, mine.id)
+end
+
+function test_bug_1795_limit()
+  local r = region.create(0, 0, "plain")    
+  local f = faction.create("noreply@eressea.de", "human", "de")
+  local u1 = one_unit(r,f) 
+  u1:add_item("money", 100000000)
+  u1:add_order("REKRUTIEREN 9999")
+  r:set_resource("peasant", 2000) -- no fractional growth!
+  local peasants = r:get_resource("peasant")
+  local limit,frac = math.modf(peasants/40) -- one day this should be a parameter
+  local growth = peasants * 0.001
+  
+  process_orders()
+  
+  assert_equal(limit+1, u1.number, u1.number .. "!=" .. (limit+1))
+  assert_equal(peasants+growth-limit, r:get_resource("peasant"))
+end
+
+function test_bug_1795_demons()
+  local r = region.create(0, 0, "plain")    
+  local f = faction.create("noreply@eressea.de", "demon", "de")
+  local u1 = one_unit(r,f) 
+  r:set_resource("peasant", 2000)
+  local peasants = r:get_resource("peasant")
+  local limit,frac = math.modf(peasants/40) 
+  local growth = peasants * 0.001
+
+  u1:add_item("money", 100000000)
+  u1:add_order("REKRUTIEREN 9999")
+  
+  process_orders()
+  
+  assert_equal(limit+1, u1.number, u1.number .. "!=" .. (limit+1))
+  assert_equal(peasants+growth, r:get_resource("peasant"))
 end

@@ -61,9 +61,10 @@ extern "C" {
   } attrib_type;
 
   extern void at_register(attrib_type * at);
+  extern void at_deprecate(const char * name, int (*reader)(attrib *, void *, struct storage *));
 
   extern attrib *a_select(attrib * a, const void *data,
-    boolean(*compare) (const attrib *, const void *));
+    bool(*compare) (const attrib *, const void *));
   extern attrib *a_find(attrib * a, const attrib_type * at);
   extern const attrib *a_findc(const attrib * a, const attrib_type * at);
   extern attrib *a_add(attrib ** pa, attrib * at);

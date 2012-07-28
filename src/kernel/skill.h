@@ -48,7 +48,7 @@ extern "C" {
 
   extern const char *skillname(skill_t, const struct locale *);
   extern skill_t sk_find(const char *name);
-  extern void enable_skill(const char *name, boolean value);
+  extern void enable_skill(const char *name, bool value);
   extern int level_days(int level);
   extern int level(int days);
 
@@ -60,7 +60,7 @@ extern "C" {
   extern void sk_set(skill * sv, int level);
 
   extern const char *skillnames[];
-  extern boolean skill_enabled[];
+  extern bool skill_enabled[];
 
 #ifdef __cplusplus
 }

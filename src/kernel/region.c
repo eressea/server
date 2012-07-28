@@ -431,7 +431,7 @@ static int hash_requests;
 static int hash_misses;
 #endif
 
-boolean pnormalize(int *x, int *y, const plane * pl)
+bool pnormalize(int *x, int *y, const plane * pl)
 {
   if (pl) {
     if (x) {
@@ -628,13 +628,13 @@ int distance(const region * r1, const region * r2)
 static direction_t
 koor_reldirection(int ax, int ay, int bx, int by, const struct plane *pl)
 {
-  direction_t dir;
+  int dir;
   for (dir = 0; dir != MAXDIRECTIONS; ++dir) {
     int x = ax + delta_x[dir];
     int y = ay + delta_y[dir];
     pnormalize(&x, &y, pl);
     if (bx == x && by == y)
-      return dir;
+      return (direction_t)dir;
   }
   return NODIRECTION;
 }
@@ -806,7 +806,7 @@ short rroad(const region * r, direction_t d)
   return (r == b->from) ? b->data.sa[0] : b->data.sa[1];
 }
 
-boolean r_isforest(const region * r)
+bool r_isforest(const region * r)
 {
   if (fval(r->terrain, FOREST_REGION)) {
     /* needs to be covered with at leas 48% trees */
@@ -817,17 +817,17 @@ boolean r_isforest(const region * r)
   return false;
 }
 
-int is_coastregion(region * r)
+bool is_coastregion(region * r)
 {
   direction_t i;
   int res = 0;
 
-  for (i = 0; i < MAXDIRECTIONS; i++) {
+  for (i = 0; !res && i < MAXDIRECTIONS; i++) {
     region *rn = rconnect(r, i);
     if (rn && fval(rn->terrain, SEA_REGION))
       res++;
   }
-  return res;
+  return res!=0;
 }
 
 int rpeasants(const region * r)
@@ -1593,9 +1593,9 @@ void region_set_morale(region * r, int morale, int turn)
 
 void get_neighbours(const region * r, region ** list)
 {
-  direction_t dir;
+  int dir;
   for (dir = 0; dir != MAXDIRECTIONS; ++dir) {
-    list[dir] = rconnect(r, dir);
+    list[dir] = rconnect(r, (direction_t)dir);
   }
 }
 
@@ -1607,7 +1607,7 @@ int owner_change(const region * r)
   return -1;
 }
 
-boolean is_mourning(const region * r, int in_turn)
+bool is_mourning(const region * r, int in_turn)
 {
   int change = owner_change(r);
   return (change == in_turn - 1

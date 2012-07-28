@@ -44,13 +44,9 @@
 #define SCORE_MODULE 1
 #define MUSEUM_MODULE 1
 #define ARENA_MODULE 1
-#define XECMD_MODULE 1
 #define DUNGEON_MODULE 0
 #define CHANGED_CROSSBOWS 0     /* use the WTF_ARMORPIERCING flag */
 #undef GLOBAL_WARMING           /* number of turns before global warming sets in */
-
-#define SIMPLE_COMBAT
-#define SIMPLE_ESCAPE
 
 #if defined(BINDINGS_LUABIND)
 # undef BINDINGS_TOLUA

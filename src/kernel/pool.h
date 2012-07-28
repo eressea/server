@@ -54,11 +54,7 @@ extern "C" {
   int change_reservation(struct unit *u, const struct resource_type *res,
     int value);
 
-  int reserve_cmd(struct unit *u, struct order *ord);
-
-/** init_pool
- * initialisiert den regionalen Pool.
- */
+  int set_resvalue(struct unit * u, const struct resource_type * rtype, int value);
 
 #ifdef __cplusplus
 }

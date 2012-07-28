@@ -612,7 +612,7 @@ void usetcontact(unit * u, const unit * u2)
   a_add(&u->attribs, a_new(&at_contact))->data.v = (void *)u2;
 }
 
-boolean ucontact(const unit * u, const unit * u2)
+bool ucontact(const unit * u, const unit * u2)
 /* Prüft, ob u den Kontaktiere-Befehl zu u2 gesetzt hat. */
 {
   attrib *ru;
@@ -820,23 +820,27 @@ void leave_building(unit * u)
   }
 }
 
-boolean can_leave(unit * u)
+bool can_leave(unit * u)
 {
+  static int gamecookie = -1;
   static int rule_leave = -1;
 
   if (!u->building) {
     return true;
   }
-  if (rule_leave < 0) {
+
+  if (rule_leave < 0 || gamecookie != global.cookie) {
+    gamecookie = global.cookie;
     rule_leave = get_param_int(global.parameters, "rules.move.owner_leave", 0);
   }
+
   if (rule_leave && u->building && u == building_owner(u->building)) {
     return false;
   }
   return true;
 }
 
-boolean leave(unit * u, boolean force)
+bool leave(unit * u, bool force)
 {
   if (!force) {
     if (!can_leave(u)) {
@@ -856,7 +860,7 @@ const struct race *urace(const struct unit *u)
   return u->race;
 }
 
-boolean can_survive(const unit * u, const region * r)
+bool can_survive(const unit * u, const region * r)
 {
   if ((fval(r->terrain, WALK_INTO) && (u->race->flags & RCF_WALK))
     || (fval(r->terrain, SWIM_INTO) && (u->race->flags & RCF_SWIM))
@@ -891,7 +895,7 @@ void move_unit(unit * u, region * r, unit ** ulist)
     if (u->ship || u->building) {
       /* can_leave must be checked in travel_i */
 #ifndef NDEBUG
-      boolean result = leave(u, false);
+      bool result = leave(u, false);
       assert(result);
 #else
       leave(u, false);
@@ -1117,7 +1121,7 @@ void set_number(unit * u, int count)
   u->number = (unsigned short)count;
 }
 
-boolean learn_skill(unit * u, skill_t sk, double chance)
+bool learn_skill(unit * u, skill_t sk, double chance)
 {
   skill *sv = u->skills;
   if (chance < 1.0 && rng_int() % 10000 >= chance * 10000)
@@ -1183,7 +1187,7 @@ skill *get_skill(const unit * u, skill_t sk)
   return NULL;
 }
 
-boolean has_skill(const unit * u, skill_t sk)
+bool has_skill(const unit * u, skill_t sk)
 {
   skill *sv = u->skills;
   while (sv != u->skills + u->skill_size) {
@@ -1224,7 +1228,7 @@ static int item_modification(const unit * u, skill_t sk, int val)
 static int att_modification(const unit * u, skill_t sk)
 {
   double result = 0;
-  static boolean init = false;
+  static bool init = false;
   static const curse_type *skillmod_ct, *gbdream_ct, *worse_ct;
   curse *c;
 
@@ -1283,7 +1287,7 @@ static int att_modification(const unit * u, skill_t sk)
 
 int
 get_modifier(const unit * u, skill_t sk, int level, const region * r,
-  boolean noitem)
+  bool noitem)
 {
   int bskill = level;
   int skill = bskill;

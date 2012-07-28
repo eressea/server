@@ -62,7 +62,6 @@ without prior permission by the authors of Eressea.
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/console.h>
-#include <util/eventbus.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
@@ -1007,63 +1006,6 @@ typedef struct event_args {
   const char *sendertype;
 } event_args;
 
-static void args_free(void *udata)
-{
-  free(udata);
-}
-
-static void event_cb(void *sender, const char *event, void *udata)
-{
-  lua_State *L = (lua_State *) global.vm_state;
-  event_args *args = (event_args *) udata;
-  int nargs = 2;
-  lua_rawgeti(L, LUA_REGISTRYINDEX, args->hfunction);
-  if (sender && args->sendertype) {
-    tolua_pushusertype(L, sender, TOLUA_CAST args->sendertype);
-  } else {
-    lua_pushnil(L);
-  }
-  tolua_pushstring(L, event);
-  if (args->hargs) {
-    lua_rawgeti(L, LUA_REGISTRYINDEX, args->hfunction);
-    ++nargs;
-  }
-  lua_pcall(L, nargs, 0, 0);
-}
-
-/* arguments:
- *  1: sender (usertype)
- *  2: event (string)
- *  3: handler (function)
- *  4: arguments (any, *optional*)
-**/
-static int tolua_eventbus_register(lua_State * L)
-{
-  void *sender = tolua_tousertype(L, 1, 0);
-  const char *event = tolua_tostring(L, 2, 0);
-  event_args *args = (event_args *)malloc(sizeof(event_args));
-  args->sendertype = sender ? tolua_typename(L, 1) : NULL;
-  lua_pushvalue(L, 3);
-  args->hfunction = luaL_ref(L, LUA_REGISTRYINDEX);
-  if (lua_type(L, 4) != LUA_TNONE) {
-    lua_pushvalue(L, 4);
-    args->hargs = luaL_ref(L, LUA_REGISTRYINDEX);
-  } else {
-    args->hargs = 0;
-  }
-  eventbus_register(sender, event, &event_cb, &args_free, args);
-  return 0;
-}
-
-static int tolua_eventbus_fire(lua_State * L)
-{
-  void *sender = tolua_tousertype(L, 1, 0);
-  const char *event = tolua_tostring(L, 2, 0);
-  void *args = NULL;
-  eventbus_fire(sender, event, args);
-  return 0;
-}
-
 static int tolua_report_unit(lua_State * L)
 {
   char buffer[512];
@@ -1145,12 +1087,6 @@ int tolua_bindings_open(lua_State * L)
 #endif
       tolua_variable(L, TOLUA_CAST "text", tolua_get_spell_text, 0);
     } tolua_endmodule(L);
-    tolua_module(L, TOLUA_CAST "eventbus", 1);
-    tolua_beginmodule(L, TOLUA_CAST "eventbus");
-    {
-      tolua_function(L, TOLUA_CAST "register", &tolua_eventbus_register);
-      tolua_function(L, TOLUA_CAST "fire", &tolua_eventbus_fire);
-    } tolua_endmodule(L);
     tolua_module(L, TOLUA_CAST "report", 1);
     tolua_beginmodule(L, TOLUA_CAST "report");
     {
@@ -1224,34 +1160,9 @@ int tolua_bindings_open(lua_State * L)
   return 1;
 }
 
-static const struct {
-  const char *name;
-  int (*func) (lua_State *);
-} lualibs[] = {
-  {
-  "", luaopen_base}, {
-  LUA_TABLIBNAME, luaopen_table}, {
-  LUA_IOLIBNAME, luaopen_io}, {
-  LUA_STRLIBNAME, luaopen_string}, {
-  LUA_MATHLIBNAME, luaopen_math}, {
-  LUA_LOADLIBNAME, luaopen_package}, {
-  LUA_DBLIBNAME, luaopen_debug},
-#if LUA_VERSION_NUM>=501
-  {
-  LUA_OSLIBNAME, luaopen_os},
-#endif
-  {
-  NULL, NULL}
-};
-
 static void openlibs(lua_State * L)
 {
-  int i;
-  for (i = 0; lualibs[i].func; ++i) {
-    lua_pushcfunction(L, lualibs[i].func);
-    lua_pushstring(L, lualibs[i].name);
-    lua_call(L, 1, 0);
-  }
+  luaL_openlibs(L);
 }
 
 void lua_done(lua_State * L) {
@@ -1259,7 +1170,7 @@ void lua_done(lua_State * L) {
 }
 
 lua_State *lua_init(void) {
-  lua_State *L = lua_open();
+  lua_State *L = luaL_newstate();
 
   openlibs(L);
 #ifdef BINDINGS_TOLUA
@@ -1286,7 +1197,7 @@ lua_State *lua_init(void) {
 
 int eressea_run(lua_State *L, const char *luafile, const char *entry_point)
 {
-  int err;
+  int err = 0;
 
   global.vm_state = L;
   /* run the main script */
@@ -1303,14 +1214,16 @@ int eressea_run(lua_State *L, const char *luafile, const char *entry_point)
   }
   if (entry_point) {
     lua_getglobal(L, entry_point);
-    err = lua_pcall(L, 0, 1, 0);
-    if (err != 0) {
-      log_lua_error(L);
-      abort();
+    if (lua_isfunction(L, -1)) {
+      log_debug("calling entry-point: %s\n", entry_point);
+      err = lua_pcall(L, 0, 1, 0);
+      if (err != 0) {
+        log_lua_error(L);
+      }
       return err;
+    } else {
+      log_error("unknown entry-point: %s\n", entry_point);
     }
-  } else {
-    err = lua_console(L);
   }
-  return err;
+  return lua_console(L);
 }

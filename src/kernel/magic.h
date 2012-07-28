@@ -192,7 +192,7 @@ typedef struct sc_mage {
 
   void magic(void);
 
-  void regeneration_magiepunkte(void);
+  void regenerate_aura(void);
 
   extern struct attrib_type at_seenspell;
   extern struct attrib_type at_mage;
@@ -228,9 +228,9 @@ typedef struct sc_mage {
    *      und     initialisiert den Magiertypus mit mtyp.  */
   sc_mage *get_mage(const struct unit *u);
   /*      gibt u->mage zurück, bei nicht-Magiern *NULL */
-  boolean is_mage(const struct unit *u);
+  bool is_mage(const struct unit *u);
   /*      gibt true, wenn u->mage gesetzt.  */
-  boolean is_familiar(const struct unit *u);
+  bool is_familiar(const struct unit *u);
   /*      gibt true, wenn eine Familiar-Relation besteht.  */
 
 /* Sprüche */
@@ -253,7 +253,7 @@ typedef struct sc_mage {
   /* fügt alle Zauber des Magiegebietes der Einheit, deren Stufe kleiner
    * als das aktuelle Magietalent ist, in die Spruchliste der Einheit
    * ein */
-  boolean knowsspell(const struct region *r, const struct unit *u,
+  bool knowsspell(const struct region *r, const struct unit *u,
     const struct spell * sp);
   /* prüft, ob die Einheit diesen Spruch gerade beherrscht, dh
    * mindestens die erforderliche Stufe hat. Hier können auch Abfragen
@@ -277,7 +277,7 @@ typedef struct sc_mage {
   extern double spellpower(struct region *r, struct unit *u, const struct spell * sp,
     int cast_level, struct order *ord);
   /*      ermittelt die Stärke eines Spruchs */
-  boolean fumble(struct region *r, struct unit *u, const struct spell * sp,
+  bool fumble(struct region *r, struct unit *u, const struct spell * sp,
     int cast_level);
   /*      true, wenn der Zauber misslingt, bei false gelingt der Zauber */
 
@@ -304,7 +304,7 @@ typedef struct sc_mage {
   /*      gibt die für diesen Spruch derzeit notwendigen Magiepunkte auf der
    *      geringstmöglichen Stufe zurück, schon um den Faktor der bereits
    *      zuvor gezauberten Sprüche erhöht */
-  boolean cancast(struct unit *u, const struct spell * spruch, int eff_stufe,
+  bool cancast(struct unit *u, const struct spell * spruch, int eff_stufe,
     int distance, struct order *ord);
   /*      true, wenn Einheit alle Komponenten des Zaubers (incl. MP) für die
    *      geringstmögliche Stufe hat und den Spruch beherrscht */
@@ -317,13 +317,13 @@ typedef struct sc_mage {
   /*      ermittelt die effektive Stufe des Zaubers. Dabei ist cast_level
    *      die gewünschte maximale Stufe (im Normalfall Stufe des Magiers,
    *      bei Farcasting Stufe*2^Entfernung) */
-  boolean is_magic_resistant(struct unit *magician, struct unit *target, int
+  bool is_magic_resistant(struct unit *magician, struct unit *target, int
     resist_bonus);
   /*      Mapperfunktion für target_resists_magic() vom Typ struct unit. */
   extern double magic_resistance(struct unit *target);
   /*      gibt die Chance an, mit der einem Zauber widerstanden wird. Je
    *      größer, desto resistenter ist da Opfer */
-  boolean target_resists_magic(struct unit *magician, void *obj, int objtyp,
+  bool target_resists_magic(struct unit *magician, void *obj, int objtyp,
     int resist_bonus);
   /*      gibt false zurück, wenn der Zauber gelingt, true, wenn das Ziel
    *      widersteht */
@@ -339,7 +339,7 @@ typedef struct sc_mage {
   extern struct attrib_type at_familiar;
   extern struct attrib_type at_familiarmage;
   extern void remove_familiar(struct unit *mage);
-  extern boolean create_newfamiliar(struct unit *mage, struct unit *familiar);
+  extern bool create_newfamiliar(struct unit *mage, struct unit *familiar);
   extern void create_newclone(struct unit *mage, struct unit *familiar);
   extern struct unit *has_clone(struct unit *mage);
 

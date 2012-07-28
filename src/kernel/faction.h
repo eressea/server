@@ -87,7 +87,7 @@ extern "C" {
     int no_units;
     struct ally *allies;
     struct group *groups;
-    boolean alive;              /* enno: sollte ein flag werden */
+    bool alive;              /* enno: sollte ein flag werden */
     int nregions;
     int money;
 #if SCORE_MODULE
@@ -118,14 +118,14 @@ extern "C" {
   extern struct unit *addplayer(struct region *r, faction * f);
   extern struct faction *addfaction(const char *email, const char *password,
     const struct race *frace, const struct locale *loc, int subscription);
-  extern boolean checkpasswd(const faction * f, const char *passwd,
-    boolean shortp);
+  extern bool checkpasswd(const faction * f, const char *passwd,
+    bool shortp);
   extern void destroyfaction(faction * f);
 
   extern void set_alliance(struct faction *a, struct faction *b, int status);
   extern int get_alliance(const struct faction *a, const struct faction *b);
 
-  extern struct alliance *f_get_alliance(const struct faction *a);
+  extern struct alliance *f_get_alliance(const struct faction *f);
 
   extern void write_faction_reference(const struct faction *f,
     struct storage *store);
@@ -150,7 +150,7 @@ extern "C" {
 
   const char *faction_getpassword(const struct faction *self);
   void faction_setpassword(struct faction *self, const char *password);
-  boolean valid_race(const struct faction *f, const struct race *rc);
+  bool valid_race(const struct faction *f, const struct race *rc);
 
   struct spellbook * faction_get_spellbook(struct faction *f);
 #ifdef __cplusplus

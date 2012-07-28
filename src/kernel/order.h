@@ -51,12 +51,13 @@ extern "C" {
   extern keyword_t get_keyword(const order * ord);
   extern void set_order(order ** destp, order * src);
   extern char *getcommand(const order * ord);
-  extern int is_persistent(const order * ord);
-  extern int is_exclusive(const order * ord);
-  extern int is_repeated(const order * ord);
-  extern int is_long(const order * ord);
+  extern bool is_persistent(const order * ord);
+  extern bool is_exclusive(const order * ord);
+  extern bool is_repeated(const order * ord);
+  extern bool is_long(const order * ord);
 
   extern char *write_order(const order * ord, char *buffer, size_t size);
+  extern void init_tokens(const struct order *ord);     /* initialize token parsing */
 
 #ifdef __cplusplus
 }

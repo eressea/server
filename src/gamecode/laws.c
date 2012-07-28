@@ -37,6 +37,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* kernel includes */
 #include <kernel/alchemy.h>
 #include <kernel/alliance.h>
+#include <kernel/ally.h>
 #include <kernel/battle.h>
 #include <kernel/connection.h>
 #include <kernel/curse.h>
@@ -88,7 +89,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/rng.h>
 #include <util/xml.h>
 
-#include <modules/xecmd.h>
 #include <attributes/otherfaction.h>
 
 /* libc includes */
@@ -119,9 +119,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define DMRISEHAFEN    0.2F     /* weekly chance that demand goes up with harbor */
 
 /* - exported global symbols ----------------------------------- */
-boolean nobattle = false;
-boolean nomonsters = false;
-/* ------------------------------------------------------------- */
 
 static int RemoveNMRNewbie(void)
 {
@@ -135,52 +132,17 @@ static int RemoveNMRNewbie(void)
   return value;
 }
 
-static void restart_race(unit * u, const race * rc)
-{
-  faction *oldf = u->faction;
-  faction *f = addfaction(oldf->email, oldf->passw, rc, oldf->locale,
-    oldf->subscription);
-  unit *nu = addplayer(u->region, f);
-  order **ordp = &u->orders;
-  f->subscription = u->faction->subscription;
-  f->age = u->faction->age;
-  fset(f, FFL_RESTART);
-  if (f->subscription) {
-    sql_print(
-      ("UPDATE subscriptions set faction='%s', race='%s' where id=%u;\n",
-        itoa36(f->no), dbrace(rc), f->subscription));
-  }
-  f->magiegebiet = u->faction->magiegebiet;
-  f->options = u->faction->options;
-  free_orders(&nu->orders);
-  nu->orders = u->orders;
-  u->orders = NULL;
-  while (*ordp) {
-    order *ord = *ordp;
-    if (get_keyword(ord) != K_RESTART) {
-      *ordp = ord->next;
-      ord->next = NULL;
-      if (u->thisorder == ord)
-        set_order(&u->thisorder, NULL);
-    } else {
-      ordp = &ord->next;
-    }
-  }
-  destroyfaction(u->faction);
-}
-
 static void checkorders(void)
 {
   faction *f;
 
-  if (verbosity >= 1)
-    puts(" - Warne spaete Spieler...");
+  log_info(" - Warne spaete Spieler...");
   for (f = factions; f; f = f->next)
     if (!is_monsters(f) && turn - f->lastorders == NMRTimeout() - 1)
       ADDMSG(&f->msgs, msg_message("turnreminder", ""));
 }
 
-static boolean help_money(const unit * u)
+static bool help_money(const unit * u)
 {
   if (u->race->ec_flags & GIVEITEM)
     return true;
@@ -1004,8 +966,7 @@ void demographics(void)
 
   remove_empty_units();
 
-  if (verbosity >= 1)
-    puts(" - Einwanderung...");
+  log_info(" - Einwanderung...");
   for (r = regions; r; r = r->next) {
     if (r->land && r->land->newpeasants) {
       int rp = rpeasants(r) + r->land->newpeasants;
@@ -1063,51 +1024,112 @@ static void transfer_faction(faction * f, faction * f2)
   }
 }
 
-static int restart_cmd(unit * u, struct order *ord)
+/* test if the unit can slip through a siege undetected.
+ * returns 0 if siege is successful, or 1 if the building is either
+ * not besieged or the unit can slip through the siege due to better stealth.
+ */
+static int slipthru(const region * r, const unit * u, const building * b)
 {
+  unit *u2;
+  int n, o;
+
+  /* b ist die burg, in die man hinein oder aus der man heraus will. */
+  if (b == NULL || b->besieged < b->size * SIEGEFACTOR) {
+    return 1;
+  }
+
+  /* u wird am hinein- oder herausschluepfen gehindert, wenn STEALTH <=
+   * OBSERVATION +2 der belagerer u2 ist */
+  n = eff_skill(u, SK_STEALTH, r);
+
+  for (u2 = r->units; u2; u2 = u2->next) {
+    if (usiege(u2) == b) {
+
+      if (invisible(u, u2) >= u->number)
+        continue;
+
+      o = eff_skill(u2, SK_PERCEPTION, r);
+
+      if (o + 2 >= n) {
+        return 0;               /* entdeckt! */
+      }
+    }
+  }
+  return 1;
+}
+
+int can_contact(const region * r, const unit * u, const unit * u2) {
+
+  /* hier geht es nur um die belagerung von burgen */
+
+  if (u->building == u2->building) {
+    return 1;
+  }
+
+  /* unit u is trying to contact u2 - unasked for contact. wenn u oder u2
+   * nicht in einer burg ist, oder die burg nicht belagert ist, ist
+   * slipthru () == 1. ansonsten ist es nur 1, wenn man die belagerer */
+
+  if (slipthru(u->region, u, u->building) && slipthru(u->region, u2, u2->building)) {
+    return 1;
+  }
+
+  return (alliedunit(u, u2->faction, HELP_GIVE));
+}
+
+int contact_cmd(unit * u, order * ord)
+{
+  /* unit u kontaktiert unit u2. Dies setzt den contact einfach auf 1 -
+   * ein richtiger toggle ist (noch?) nicht noetig. die region als
+   * parameter ist nur deswegen wichtig, weil er an getunit ()
+   * weitergegeben wird. dies wird fuer das auffinden von tempunits in
+   * getnewunit () verwendet! */
+  unit *u2;
+  region *r = u->region;
+
   init_tokens(ord);
-  skip_token();                 /* skip keyword */
+  skip_token();
+  u2 = getunitg(r, u->faction);
 
-  if (!fval(u->region->terrain, LAND_REGION)) {
-    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_onlandonly", ""));
-  } else {
-    const char *s_race = getstrtoken(), *s_pass;
-    const race *frace = findrace(s_race, u->faction->locale);
-
-    if (!frace) {
-      frace = u->faction->race;
-      s_pass = s_race;
-    } else {
-      s_pass = getstrtoken();
+  if (u2 != NULL) {
+    if (!can_contact(r, u, u2)) {
+      cmistake(u, u->thisorder, 23, MSG_EVENT);
+      return -1;
     }
-
-    if (u->faction->age > 3 && fval(u->faction, FFL_RESTART)) {
-      cmistake(u, ord, 314, MSG_EVENT);
-      return 0;
-    }
-
-    if ( /* frace != u->faction->race && */ u->faction->age < 81) {
-      cmistake(u, ord, 241, MSG_EVENT);
-      return 0;
-    }
-
-    if (!playerrace(frace)) {
-      cmistake(u, ord, 243, MSG_EVENT);
-      return 0;
-    }
-
-    if (!checkpasswd(u->faction, (const char *)s_pass, false)) {
-      cmistake(u, ord, 86, MSG_EVENT);
-      log_warning("RESTART with wrong password, faction %s, pass %s\n", factionid(u->faction), s_pass);
-      return 0;
-    }
-    restart_race(u, frace);
-    return -1;
+    usetcontact(u, u2);
   }
   return 0;
 }
 
-static boolean EnhancedQuit(void)
+int leave_cmd(unit * u, struct order *ord)
+{
+  region *r = u->region;
+
+  if (fval(u, UFL_ENTER)) {
+    /* if we just entered this round, then we don't leave again */
+    return 0;
+  }
+
+  if (fval(r->terrain, SEA_REGION) && u->ship) {
+    if (!fval(u->race, RCF_SWIM)) {
+      cmistake(u, ord, 11, MSG_MOVE);
+      return 0;
+    }
+    if (has_horses(u)) {
+      cmistake(u, ord, 231, MSG_MOVE);
+      return 0;
+    }
+  }
+  if (!slipthru(r, u, u->building)) {
+    ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder, "entrance_besieged",
+        "building", u->building));
+  } else {
+    leave(u, true);
+  }
+  return 0;
+}
+
+static bool EnhancedQuit(void)
 {
   static int value = -1;
   if (value < 0) {
@@ -1159,35 +1181,235 @@ int quit_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-void quit(void)
+static bool mayenter(region * r, unit * u, building * b)
 {
-  faction **fptr = &factions;
-  while (*fptr) {
-    faction *f = *fptr;
-    if (f->flags & FFL_QUIT) {
-      if (EnhancedQuit()) {
-        /* this doesn't work well (use object_name()) */
-        attrib *a = a_find(f->attribs, &at_object);
-        if (a) {
-          variant var;
-          object_type type;
-          var.i = 0;
-          object_get(a, &type, &var);
-          assert(var.i && type == TINTEGER);
-          if (var.i) {
-            int f2_id = var.i;
-            faction *f2 = findfaction(f2_id);
+  unit *u2;
+  if (fval(b, BLD_UNGUARDED))
+    return true;
+  u2 = building_owner(b);
 
-            assert(f2_id > 0);
-            assert(f2 != NULL);
-            transfer_faction(f, f2);
+  if (u2 == NULL || ucontact(u2, u)
+    || alliedunit(u2, u->faction, HELP_GUARD))
+    return true;
+
+  return false;
+}
+
+static int mayboard(const unit * u, ship * sh)
+{
+  unit *u2 = ship_owner(sh);
+
+  return (!u2 || ucontact(u2, u) || alliedunit(u2, u->faction, HELP_GUARD));
+}
+
+static bool CheckOverload(void)
+{
+  static int value = -1;
+  if (value < 0) {
+    value = get_param_int(global.parameters, "rules.check_overload", 0);
+  }
+  return value;
+}
+
+int enter_ship(unit * u, struct order *ord, int id, int report)
+{
+  region *r = u->region;
+  ship *sh;
+
+  /* Muß abgefangen werden, sonst könnten Schwimmer an
+   * Bord von Schiffen an Land gelangen. */
+  if (!fval(u->race, RCF_CANSAIL) || (!fval(u->race, RCF_WALK)
+      && !fval(u->race, RCF_FLY))) {
+    cmistake(u, ord, 233, MSG_MOVE);
+    return 0;
+  }
+
+  sh = findship(id);
+  if (sh == NULL || sh->region != r) {
+    if (report)
+      cmistake(u, ord, 20, MSG_MOVE);
+    return 0;
+  }
+  if (sh == u->ship) {
+    return 1;
+  }
+  if (!mayboard(u, sh)) {
+    if (report)
+      cmistake(u, ord, 34, MSG_MOVE);
+    return 0;
+  }
+  if (CheckOverload()) {
+    int sweight, scabins;
+    int mweight = shipcapacity(sh);
+    int mcabins = sh->type->cabins;
+
+    if (mweight > 0) {
+      getshipweight(sh, &sweight, &scabins);
+      sweight += weight(u);
+      if (mcabins) {
+        int pweight = u->number * u->race->weight;
+        /* weight goes into number of cabins, not cargo */
+        scabins += pweight;
+        sweight -= pweight;
+      }
+
+      if (sweight > mweight || (mcabins && (scabins > mcabins))) {
+        if (report)
+          cmistake(u, ord, 34, MSG_MOVE);
+        return 0;
+      }
+    }
+  }
+
+  if (leave(u, false)) {
+    u_set_ship(u, sh);
+    fset(u, UFL_ENTER);
+  } else if (report) {
+    cmistake(u, ord, 150, MSG_MOVE);
+  }
+  return 1;
+}
+
+int enter_building(unit * u, order * ord, int id, int report)
+{
+  region *r = u->region;
+  building *b;
+
+  /* Schwimmer können keine Gebäude betreten, außer diese sind
+   * auf dem Ozean */
+  if (!fval(u->race, RCF_WALK) && !fval(u->race, RCF_FLY)) {
+    if (!fval(r->terrain, SEA_REGION)) {
+      if (report) {
+        cmistake(u, ord, 232, MSG_MOVE);
+      }
+      return 0;
+    }
+  }
+
+  b = findbuilding(id);
+  if (b == NULL || b->region != r) {
+    if (report) {
+      cmistake(u, ord, 6, MSG_MOVE);
+    }
+    return 0;
+  }
+  if (!mayenter(r, u, b)) {
+    if (report) {
+      ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "entrance_denied",
+          "building", b));
+    }
+    return 0;
+  }
+  if (!slipthru(r, u, b)) {
+    if (report) {
+      ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "entrance_besieged",
+          "building", b));
+    }
+    return 0;
+  }
+
+  if (leave(u, 0)) {
+    fset(u, UFL_ENTER);
+    u_set_building(u, b);
+    return 1;
+  } else if (report) {
+    cmistake(u, ord, 150, MSG_MOVE);
+  }
+  return 0;
+}
+
+static void do_contact(region * r)
+{
+  unit * u;
+  for (u = r->units; u; u = u->next) {
+    order *ord;
+    for (ord = u->orders; ord; ord = ord->next) {
+      keyword_t kwd = get_keyword(ord);
+      if (kwd == K_CONTACT) {
+        contact_cmd(u, ord);
+      }
+    }
+  }
+}
+
+void do_enter(struct region *r, bool is_final_attempt)
+{
+  unit **uptr;
+
+  for (uptr = &r->units; *uptr;) {
+    unit *u = *uptr;
+    order **ordp = &u->orders;
+
+    while (*ordp) {
+      order *ord = *ordp;
+      if (get_keyword(ord) == K_ENTER) {
+        param_t p;
+        int id;
+        unit *ulast = NULL;
+        const char * s;
+
+        init_tokens(ord);
+        skip_token();
+        s = getstrtoken();
+        p = findparam_ex(s, u->faction->locale);
+        id = getid();
+
+        switch (p) {
+        case P_BUILDING:
+        case P_GEBAEUDE:
+          if (u->building && u->building->no == id)
+            break;
+          if (enter_building(u, ord, id, is_final_attempt)) {
+            unit *ub;
+            for (ub = u; ub; ub = ub->next) {
+              if (ub->building == u->building) {
+                ulast = ub;
+              }
+            }
+          }
+          break;
+
+        case P_SHIP:
+          if (u->ship && u->ship->no == id)
+            break;
+          if (enter_ship(u, ord, id, is_final_attempt)) {
+            unit *ub;
+            ulast = u;
+            for (ub = u; ub; ub = ub->next) {
+              if (ub->ship == u->ship) {
+                ulast = ub;
+              }
+            }
+          }
+          break;
+
+        default:
+          if (is_final_attempt) {
+            cmistake(u, ord, 79, MSG_MOVE);
           }
         }
+        if (ulast != NULL) {
+          /* Wenn wir hier angekommen sind, war der Befehl
+           * erfolgreich und wir löschen ihn, damit er im
+           * zweiten Versuch nicht nochmal ausgeführt wird. */
+          *ordp = ord->next;
+          ord->next = NULL;
+          free_order(ord);
+
+          if (ulast != u) {
+            /* put u behind ulast so it's the last unit in the building */
+            *uptr = u->next;
+            u->next = ulast->next;
+            ulast->next = u;
+          }
+          break;
+        }
       }
-      destroyfaction(f);
+      if (*ordp == ord)
+        ordp = &ord->next;
     }
-    if (*fptr == f)
-      fptr = &f->next;
+    if (*uptr == u)
+      uptr = &u->next;
   }
 }
 
@@ -1209,40 +1431,16 @@ static void nmr_death(faction * f)
   }
 }
 
-static void parse_restart(void)
+static void remove_idle_players(void)
 {
-  region *r;
   faction *f;
 
-  /* Sterben erst nachdem man allen anderen gegeben hat - bzw. man kann
-   * alles machen, was nicht ein dreißigtägiger Befehl ist. */
-
-  for (r = regions; r; r = r->next) {
-    unit *u, *un;
-    for (u = r->units; u;) {
-      order *ord;
-
-      un = u->next;
-      for (ord = u->orders; ord != NULL; ord = ord->next) {
-        if (get_keyword(ord) == K_RESTART) {
-          if (u->number > 0) {
-            if (restart_cmd(u, ord) != 0) {
-              break;
-            }
-          }
-        }
-      }
-      u = un;
-    }
-  }
-
-  if (verbosity >= 1)
-    puts
-      (" - beseitige Spieler, die sich zu lange nicht mehr gemeldet haben...");
+  log_info(" - beseitige Spieler, die sich zu lange nicht mehr gemeldet haben...");
 
   for (f = factions; f; f = f->next) {
-    if (fval(f, FFL_NOIDLEOUT))
+    if (fval(f, FFL_NOIDLEOUT)) {
       f->lastorders = turn;
+    }
     if (NMRTimeout() > 0 && turn - f->lastorders >= NMRTimeout()) {
       nmr_death(f);
       destroyfaction(f);
@@ -1276,10 +1474,7 @@ static void parse_restart(void)
       continue;
     }
   }
-  if (verbosity >= 1) {
-    puts(" - beseitige Spieler, die sich nach der Anmeldung nicht "
-      "gemeldet haben...");
-  }
+  log_info(" - beseitige Spieler, die sich nach der Anmeldung nicht gemeldet haben...");
 
   age = calloc(MAX(4, turn + 1), sizeof(int));
   for (f = factions; f; f = f->next)
@@ -1296,9 +1491,46 @@ static void parse_restart(void)
         }
       }
     }
+}
 
-  if (verbosity >= 1)
-    puts(" - beseitige leere Einheiten und leere Parteien...");
+void quit(void)
+{
+  faction **fptr = &factions;
+  while (*fptr) {
+    faction *f = *fptr;
+    if (f->flags & FFL_QUIT) {
+      if (EnhancedQuit()) {
+        /* this doesn't work well (use object_name()) */
+        attrib *a = a_find(f->attribs, &at_object);
+        if (a) {
+          variant var;
+          object_type type;
+          var.i = 0;
+          object_get(a, &type, &var);
+          assert(var.i && type == TINTEGER);
+          if (var.i) {
+            int f2_id = var.i;
+            faction *f2 = findfaction(f2_id);
+
+            assert(f2_id > 0);
+            assert(f2 != NULL);
+            transfer_faction(f, f2);
+          }
+        }
+      }
+      destroyfaction(f);
+    } else {
+      ++f->age;
+      if (f->age + 1 < NewbieImmunity()) {
+        ADDMSG(&f->msgs, msg_message("newbieimmunity", "turns",
+            NewbieImmunity() - f->age - 1));
+      }
+    }
+    if (*fptr == f) {
+      fptr = &f->next;
+    }
+  }
+  remove_idle_players();
   remove_empty_units();
 }
 
@@ -1428,7 +1660,7 @@ static void init_prefixnames(void)
   int i;
   for (i = 0; localenames[i]; ++i) {
     const struct locale *lang = find_locale(localenames[i]);
-    boolean exist = false;
+    bool exist = false;
     struct local_names *in = pnames;
 
     while (in != NULL) {
@@ -1612,7 +1844,7 @@ int display_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-boolean renamed_building(const building * b)
+bool renamed_building(const building * b)
 {
   const struct locale *lang = locales;
   size_t len = strlen(b->name);
@@ -1650,7 +1882,7 @@ int
 rename_building(unit * u, order * ord, building * b, const char *name)
 {
   unit *owner = b ? building_owner(b) : 0;
-  boolean foreign = !(owner && owner->faction == u->faction);
+  bool foreign = !(owner && owner->faction == u->faction);
 
   if (!b) {
     cmistake(u, ord, u->building ? 6 : 145, MSG_EVENT);
@@ -1695,7 +1927,7 @@ int name_cmd(struct unit *u, struct order *ord)
   region *r = u->region;
   char **s = NULL;
   param_t p;
-  boolean foreign = false;
+  bool foreign = false;
   const char *str;
 
   init_tokens(ord);
@@ -1939,7 +2171,7 @@ static void mailfaction(unit * u, int n, struct order *ord, const char *s)
     cmistake(u, ord, 66, MSG_MESSAGE);
 }
 
-static int mail_cmd(unit * u, struct order *ord)
+int mail_cmd(unit * u, struct order *ord)
 {
   region *r = u->region;
   unit *u2;
@@ -1969,7 +2201,7 @@ static int mail_cmd(unit * u, struct order *ord)
 
     case P_FACTION:
     {
-      boolean see = false;
+      bool see = false;
 
       n = getfactionid();
 
@@ -1996,7 +2228,7 @@ static int mail_cmd(unit * u, struct order *ord)
 
     case P_UNIT:
     {
-      boolean see = false;
+      bool see = false;
       n = getid();
 
       for (u2 = r->units; u2; u2 = u2->next) {
@@ -2147,7 +2379,7 @@ int password_cmd(unit * u, struct order *ord)
   char pwbuf[32];
   int i;
   const char *s;
-  boolean pwok = true;
+  bool pwok = true;
 
   init_tokens(ord);
   skip_token();
@@ -2213,7 +2445,7 @@ int send_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-static boolean display_item(faction * f, unit * u, const item_type * itype)
+static bool display_item(faction * f, unit * u, const item_type * itype)
 {
   const char *name;
   const char *key;
@@ -2246,7 +2478,7 @@ static boolean display_item(faction * f, unit * u, const item_type * itype)
   return true;
 }
 
-static boolean display_potion(faction * f, unit * u, const potion_type * ptype)
+static bool display_potion(faction * f, unit * u, const potion_type * ptype)
 {
   attrib *a;
 
@@ -2270,7 +2502,7 @@ static boolean display_potion(faction * f, unit * u, const potion_type * ptype)
   return true;
 }
 
-static boolean display_race(faction * f, unit * u, const race * rc)
+static bool display_race(faction * f, unit * u, const race * rc)
 {
   const char *name, *key;
   const char *info;
@@ -2481,7 +2713,7 @@ static void reshow(unit * u, struct order *ord, const char *s, param_t p)
   }
 }
 
-static int promotion_cmd(unit * u, struct order *ord)
+int promotion_cmd(unit * u, struct order *ord)
 {
   int money, people;
 
@@ -2542,7 +2774,7 @@ int origin_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-static int guard_off_cmd(unit * u, struct order *ord)
+int guard_off_cmd(unit * u, struct order *ord)
 {
   assert(get_keyword(ord) == K_GUARD);
   init_tokens(ord);
@@ -2554,7 +2786,7 @@ static int guard_off_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-static int reshow_cmd(unit * u, struct order *ord)
+int reshow_cmd(unit * u, struct order *ord)
 {
   const char *s;
   param_t p = NOPARAM;
@@ -2617,7 +2849,7 @@ int status_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-static int combatspell_cmd(unit * u, struct order *ord)
+int combatspell_cmd(unit * u, struct order *ord)
 {
   const char *s;
   int level = 0;
@@ -2703,7 +2935,7 @@ void update_guards(void)
   }
 }
 
-static int guard_on_cmd(unit * u, struct order *ord)
+int guard_on_cmd(unit * u, struct order *ord)
 {
   assert(get_keyword(ord) == K_GUARD);
 
@@ -2743,7 +2975,7 @@ static int guard_on_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-static void sinkships(region * r)
+void sinkships(struct region * r)
 {
   ship **shp = &r->ships;
 
@@ -2783,7 +3015,7 @@ static attrib_type at_number = {
   ATF_UNIQUE
 };
 
-static void renumber_factions(void)
+void renumber_factions(void)
   /* gibt parteien neue nummern */
 {
   struct renum {
@@ -2844,12 +3076,12 @@ static void renumber_factions(void)
   }
 }
 
-static void reorder(void)
+void restack_units(void)
 {
   region *r;
   for (r = regions; r; r = r->next) {
     unit **up = &r->units;
-    boolean sorted = false;
+    bool sorted = false;
     while (*up) {
       unit *u = *up;
       if (!fval(u, UFL_MARK)) {
@@ -2924,7 +3156,7 @@ static void reorder(void)
   }
 }
 
-static int renumber_cmd(unit * u, order * ord)
+int renumber_cmd(unit * u, order * ord)
 {
   const char *s;
   int i;
@@ -3044,7 +3276,7 @@ static int renumber_cmd(unit * u, order * ord)
 
 static building *age_building(building * b)
 {
-  static boolean init = false;
+  static bool init = false;
   static const building_type *bt_blessed;
   static const curse_type *ct_astralblock;
   if (!init) {
@@ -3417,8 +3649,6 @@ void check_long_orders(unit * u)
             cmistake(u, ord, 52, MSG_EVENT);
           }
           break;
-        case K_WEREWOLF:
-          /* don't know what WEREWOLF does... */
         default:
           cmistake(u, ord, 52, MSG_EVENT);
         }
@@ -3432,9 +3662,10 @@ void check_long_orders(unit * u)
 void update_long_order(unit * u)
 {
   order *ord;
-  boolean trade = false;
-  boolean hunger = LongHunger(u);
+  bool trade = false;
+  bool hunger = LongHunger(u);
 
+  freset(u, UFL_MOVED);
   freset(u, UFL_LONGACTION);
   if (hunger) {
     /* Hungernde Einheiten führen NUR den default-Befehl aus */
@@ -3474,23 +3705,19 @@ void update_long_order(unit * u)
       case K_BUY:
       case K_SELL:
         /* Wenn die Einheit handelt, muß der Default-Befehl gelöscht
-         * werden. */
+         * werden.
+         * Wird je diese Ausschliesslichkeit aufgehoben, muss man aufpassen
+         * mit der Reihenfolge von Kaufen, Verkaufen etc., damit es Spielern
+         * nicht moeglich ist, Schulden zu machen. */
         trade = true;
         break;
 
       case K_CAST:
         /* dient dazu, das neben Zaubern kein weiterer Befehl
          * ausgeführt werden kann, Zaubern ist ein kurzer Befehl */
-        set_order(&u->thisorder, NULL);
-        break;
-
-      case K_WEREWOLF:
         set_order(&u->thisorder, copy_order(ord));
         break;
 
-        /* Wird je diese Ausschliesslichkeit aufgehoben, muss man aufpassen
-         * mit der Reihenfolge von Kaufen, Verkaufen etc., damit es Spielern
-         * nicht moeglich ist, Schulden zu machen. */
       default:
         break;
       }
@@ -3558,7 +3785,7 @@ static double heal_factor(const unit * u)
   }
 }
 
-static void monthly_healing(void)
+void monthly_healing(void)
 {
   region *r;
   static const curse_type *heal_ct = NULL;
@@ -3645,13 +3872,15 @@ static void remove_exclusive(order ** ordp)
   }
 }
 
-static void defaultorders(void)
+void defaultorders(void)
 {
   region *r;
+
+  assert(!global.disabled[K_DEFAULT]);
   for (r = regions; r; r = r->next) {
     unit *u;
     for (u = r->units; u; u = u->next) {
-      boolean neworders = false;
+      bool neworders = false;
       order **ordp = &u->orders;
       while (*ordp != NULL) {
         order *ord = *ordp;
@@ -3764,20 +3993,7 @@ static void update_spells(void)
   }
 }
 
-static void age_factions(void)
-{
-  faction *f;
-
-  for (f = factions; f; f = f->next) {
-    ++f->age;
-    if (f->age + 1 < NewbieImmunity()) {
-      ADDMSG(&f->msgs, msg_message("newbieimmunity", "turns",
-          NewbieImmunity() - f->age - 1));
-    }
-  }
-}
-
-static int use_cmd(unit * u, struct order *ord)
+int use_cmd(unit * u, struct order *ord)
 {
   const char *t;
   int n, err = ENOITEM;
@@ -3824,7 +4040,7 @@ static int use_cmd(unit * u, struct order *ord)
   return err;
 }
 
-static int pay_cmd(unit * u, struct order *ord)
+int pay_cmd(unit * u, struct order *ord)
 {
   if (!u->building) {
     cmistake(u, ord, 6, MSG_EVENT);
@@ -3845,7 +4061,39 @@ static int pay_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-static int claim_cmd(unit * u, struct order *ord)
+
+int reserve_cmd(unit * u, struct order *ord)
+{
+  if (u->number > 0 && (urace(u)->ec_flags & GETITEM)) {
+    int use, count;
+    const resource_type *rtype;
+    const char *s;
+
+    init_tokens(ord);
+    skip_token();
+    s = getstrtoken();
+    count = atoip((const char *)s);
+
+    if (count == 0 && findparam(s, u->faction->locale) == P_EACH) {
+      count = getint() * u->number;
+    }
+
+    rtype = findresourcetype(getstrtoken(), u->faction->locale);
+    if (rtype == NULL)
+      return 0;
+
+    set_resvalue(u, rtype, 0);      /* make sure the pool is empty */
+    use = use_pooled(u, rtype, GET_DEFAULT, count);
+    if (use) {
+      set_resvalue(u, rtype, use);
+      change_resource(u, rtype, use);
+      return use;
+    }
+  }
+  return 0;
+}
+
+int claim_cmd(unit * u, struct order *ord)
 {
   const char *t;
   int n;
@@ -3880,10 +4128,13 @@ enum {
   PROC_THISORDER = 1 << 0,
   PROC_LONGORDER = 1 << 1
 };
+
+typedef enum { PR_GLOBAL, PR_REGION_PRE, PR_UNIT, PR_ORDER, PR_REGION_POST } processor_t;
+
 typedef struct processor {
   struct processor *next;
   int priority;
-  enum { PR_GLOBAL, PR_REGION_PRE, PR_UNIT, PR_ORDER, PR_REGION_POST } type;
+  processor_t type;
   unsigned int flags;
   union {
     struct {
@@ -3905,7 +4156,7 @@ typedef struct processor {
 
 static processor *processors;
 
-processor *add_proc(int priority, const char *name, int type)
+static processor *add_proc(int priority, const char *name, processor_t type)
 {
   processor **pproc = &processors;
   processor *proc;
@@ -3919,7 +4170,7 @@ processor *add_proc(int priority, const char *name, int type)
     pproc = &proc->next;
   }
 
-  proc = malloc(sizeof(processor));
+  proc = (processor *)malloc(sizeof(processor));
   proc->priority = priority;
   proc->type = type;
   proc->name = name;
@@ -4098,24 +4349,116 @@ void process(void)
 
 }
 
+int siege_cmd(unit * u, order * ord)
+{
+  region *r = u->region;
+  building *b;
+  int d, pooled;
+  int bewaffnete, katapultiere = 0;
+  static bool init = false;
+  static const curse_type *magicwalls_ct;
+  static item_type *it_catapultammo = NULL;
+  static item_type *it_catapult = NULL;
+  if (!init) {
+    init = true;
+    magicwalls_ct = ct_find("magicwalls");
+    it_catapultammo = it_find("catapultammo");
+    it_catapult = it_find("catapult");
+  }
+  /* gibt es ueberhaupt Burgen? */
+
+  init_tokens(ord);
+  skip_token();
+  b = getbuilding(r);
+
+  if (!b) {
+    cmistake(u, ord, 31, MSG_BATTLE);
+    return 31;
+  }
+
+  if (!playerrace(u->race)) {
+    /* keine Drachen, Illusionen, Untote etc */
+    cmistake(u, ord, 166, MSG_BATTLE);
+    return 166;
+  }
+  /* schaden durch katapulte */
+
+  d = i_get(u->items, it_catapult);
+  d = MIN(u->number, d);
+  pooled = get_pooled(u, it_catapultammo->rtype, GET_DEFAULT, d);
+  d = MIN(pooled, d);
+  if (eff_skill(u, SK_CATAPULT, r) >= 1) {
+    katapultiere = d;
+    d *= eff_skill(u, SK_CATAPULT, r);
+  } else {
+    d = 0;
+  }
+
+  bewaffnete = armedmen(u, true);
+  if (d == 0 && bewaffnete == 0) {
+    /* abbruch, falls unbewaffnet oder unfaehig, katapulte zu benutzen */
+    cmistake(u, ord, 80, MSG_EVENT);
+    return 80;
+  }
+
+  if (!is_guard(u, GUARD_TRAVELTHRU)) {
+    /* abbruch, wenn die einheit nicht vorher die region bewacht - als
+     * warnung fuer alle anderen! */
+    cmistake(u, ord, 81, MSG_EVENT);
+    return 81;
+  }
+  /* einheit und burg markieren - spart zeit beim behandeln der einheiten
+   * in der burg, falls die burg auch markiert ist und nicht alle
+   * einheiten wieder abgesucht werden muessen! */
+
+  usetsiege(u, b);
+  b->besieged += MAX(bewaffnete, katapultiere);
+
+  /* definitiver schaden eingeschraenkt */
+
+  d = MIN(d, b->size - 1);
+
+  /* meldung, schaden anrichten */
+  if (d && !curse_active(get_curse(b->attribs, magicwalls_ct))) {
+    b->size -= d;
+    use_pooled(u, it_catapultammo->rtype,
+      GET_SLACK | GET_RESERVE | GET_POOLED_SLACK, d);
+    /* send message to the entire region */
+    ADDMSG(&r->msgs, msg_message("siege_catapults",
+        "unit building destruction", u, b, d));
+  } else {
+    /* send message to the entire region */
+    ADDMSG(&r->msgs, msg_message("siege", "unit building", u, b));
+  }
+  return 0;
+}
+
+void do_siege(region * r)
+{
+  if (fval(r->terrain, LAND_REGION)) {
+    unit *u;
+
+    for (u = r->units; u; u = u->next) {
+      if (get_keyword(u->thisorder) == K_BESIEGE) {
+        siege_cmd(u, u->thisorder);
+      }
+    }
+  }
+}
+
 static void enter_1(region * r)
 {
-  do_misc(r, 0);
+  do_enter(r, 0);
 }
 
 static void enter_2(region * r)
 {
-  do_misc(r, 1);
+  do_enter(r, 1);
 }
 
 static void maintain_buildings_1(region * r)
 {
   maintain_buildings(r, false);
-}
-
-static void reset_moved(unit * u)
-{
-  freset(u, UFL_MOVED);
 }
 
 /** warn about passwords that are not US ASCII.
@@ -4128,7 +4471,7 @@ static int warn_password(void)
 {
   faction *f = factions;
   while (f) {
-    boolean pwok = true;
+    bool pwok = true;
     const char *c = f->passw;
     while (*c && pwok) {
       if (!isalnum((unsigned char)*c))
@@ -4161,7 +4504,6 @@ void init_processor(void)
   add_proc_order(p, K_GROUP, &group_cmd, 0, NULL);
 
   p += 10;
-  add_proc_unit(p, &reset_moved, "Instant-Befehle");
   add_proc_order(p, K_QUIT, &quit_cmd, 0, NULL);
   add_proc_order(p, K_URSPRUNG, &origin_cmd, 0, NULL);
   add_proc_order(p, K_ALLY, &ally_cmd, 0, NULL);
@@ -4180,11 +4522,11 @@ void init_processor(void)
   }
 
   p += 10;
-  add_proc_global(p, &age_factions, "Parteienalter++");
+  add_proc_region(p, do_contact, "Kontaktieren");
   add_proc_order(p, K_MAIL, &mail_cmd, 0, "Botschaften");
 
   p += 10;                      /* all claims must be done before we can USE */
-  add_proc_region(p, &enter_1, "Kontaktieren & Betreten (1. Versuch)");
+  add_proc_region(p, &enter_1, "Betreten (1. Versuch)");
   add_proc_order(p, K_USE, &use_cmd, 0, "Benutzen");
 
   if (!global.disabled[K_GM]) {
@@ -4197,9 +4539,7 @@ void init_processor(void)
   p += 10;                      /* in case it has any effects on alliance victories */
   add_proc_order(p, K_LEAVE, &leave_cmd, 0, "Verlassen");
 
-  if (!nobattle) {
-    add_proc_region(p, &do_battle, "Attackieren");
-  }
+  add_proc_region(p, &do_battle, "Attackieren");
 
   if (!global.disabled[K_BESIEGE]) {
     p += 10;
@@ -4207,7 +4547,7 @@ void init_processor(void)
   }
 
   p += 10;                      /* can't allow reserve before siege (weapons) */
-  add_proc_region(p, &enter_1, "Kontaktieren & Betreten (2. Versuch)");
+  add_proc_region(p, &enter_1, "Betreten (2. Versuch)");
   add_proc_order(p, K_RESERVE, &reserve_cmd, 0, "Reservieren");
   add_proc_order(p, K_CLAIM, &claim_cmd, 0, NULL);
   add_proc_unit(p, &follow_unit, "Folge auf Einheiten setzen");
@@ -4223,10 +4563,7 @@ void init_processor(void)
     "Gebaeudeunterhalt (1. Versuch)");
 
   p += 10;                      /* QUIT fuer sich alleine */
-  add_proc_global(p, &quit, "Sterben");
-  if (!global.disabled[K_RESTART]) {
-    add_proc_global(p, &parse_restart, "Neustart");
-  }
+  add_proc_global(p, quit, "Sterben");
 
   if (!global.disabled[K_CAST]) {
     p += 10;
@@ -4247,7 +4584,7 @@ void init_processor(void)
   add_proc_postregion(p, &split_allocations, "Produktion II");
 
   p += 10;
-  add_proc_region(p, &enter_2, "Kontaktieren & Betreten (3. Versuch)");
+  add_proc_region(p, &enter_2, "Betreten (3. Versuch)");
 
   p += 10;
   add_proc_region(p, &sinkships, "Schiffe sinken");
@@ -4262,13 +4599,12 @@ void init_processor(void)
 
   p += 10;
   add_proc_order(p, K_GUARD, &guard_on_cmd, 0, "Bewache (an)");
-#if XECMD_MODULE
-  /* can do together with guard */
-  add_proc_order(p, K_XE, &xecmd, 0, "Zeitung");
-#endif
 
-  p += 10;
-  add_proc_global(p, &encounters, "Zufallsbegegnungen");
+  if (get_param_int(global.parameters, "rules.encounters", 1)) {
+    p += 10;
+    add_proc_global(p, &encounters, "Zufallsbegegnungen");
+  }
+
   p += 10;
   add_proc_unit(p, &monster_kills_peasants,
     "Monster fressen und vertreiben Bauern");
@@ -4279,7 +4615,7 @@ void init_processor(void)
   p += 10;
 
   add_proc_global(p, &monthly_healing, "Regeneration (HP)");
-  add_proc_global(p, &regeneration_magiepunkte, "Regeneration (Aura)");
+  add_proc_global(p, &regenerate_aura, "Regeneration (Aura)");
   if (!global.disabled[K_DEFAULT]) {
     add_proc_global(p, &defaultorders, "Defaults setzen");
   }
@@ -4287,7 +4623,7 @@ void init_processor(void)
 
   if (!global.disabled[K_SORT]) {
     p += 10;
-    add_proc_global(p, &reorder, "Einheiten sortieren");
+    add_proc_global(p, restack_units, "Einheiten sortieren");
   }
   add_proc_order(p, K_PROMOTION, &promotion_cmd, 0, "Heldenbefoerderung");
   if (!global.disabled[K_NUMBER]) {
@@ -4313,8 +4649,7 @@ void processorders(void)
     do_markets();
   }
 
-  if (verbosity >= 1)
-    puts(" - Attribute altern");
+  log_info(" - Attribute altern");
   ageing();
   remove_empty_units();
 
@@ -4338,7 +4673,7 @@ int writepasswd(void)
   F = cfopen(zText, "w");
   if (F) {
     faction *f;
-    puts("writing passwords...");
+    log_info("writing passwords...");
 
     for (f = factions; f; f = f->next) {
       fprintf(F, "%s:%s:%s:%s:%u\n",

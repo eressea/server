@@ -153,7 +153,7 @@ static void dissolve_units(void)
 static int improve_all(faction * f, skill_t sk, int by_weeks)
 {
   unit *u;
-  boolean ret = by_weeks;
+  bool ret = by_weeks;
 
   for (u = f->units; u; u = u->nextF) {
     if (has_skill(u, sk)) {
@@ -596,7 +596,7 @@ static int nb_armor(const unit * u, int index)
 }
 
 static int
-damage_unit(unit * u, const char *dam, boolean physical, boolean magic)
+damage_unit(unit * u, const char *dam, bool physical, bool magic)
 {
   int *hp = malloc(u->number * sizeof(int));
   int h;
@@ -980,7 +980,7 @@ void create_icebergs(void)
 
   for (r = regions; r; r = r->next) {
     if (r->terrain == newterrain(T_ICEBERG_SLEEP) && chance(0.05)) {
-      boolean has_ocean_neighbour = false;
+      bool has_ocean_neighbour = false;
       direction_t dir;
       region *rc;
       unit *u;
@@ -1062,7 +1062,7 @@ static void orc_growth(void)
   for (r = regions; r; r = r->next) {
     unit *u;
     for (u = r->units; u; u = u->next) {
-      static boolean init = false;
+      static bool init = false;
       static const curse_type *ct_orcish = 0;
       curse *c = 0;
       if (!init) {

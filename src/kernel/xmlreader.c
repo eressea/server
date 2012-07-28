@@ -51,7 +51,7 @@ without prior permission by the authors of Eressea.
 #include <limits.h>
 #include <string.h>
 
-static boolean gamecode_enabled = false;
+static bool gamecode_enabled = false;
 
 static building_type *bt_get_or_create(const char *name)
 {
@@ -824,7 +824,7 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
       assert(propValue != NULL);
       if (strcmp((const char *)propValue, "attack") == 0) {
         wtype->attack =
-          (boolean(*)(const struct troop *, const struct weapon_type *,
+          (bool(*)(const struct troop *, const struct weapon_type *,
             int *))fun;
       } else {
         log_error("unknown function type '%s' for item '%s'\n", (const char *)propValue, itype->rtype->_name[0]);
@@ -938,7 +938,7 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
             struct order *))fun;
       } else if (strcmp((const char *)propValue, "canuse") == 0) {
         itype->canuse =
-          (boolean(*)(const struct unit *, const struct item_type *))fun;
+          (bool(*)(const struct unit *, const struct item_type *))fun;
       } else if (strcmp((const char *)propValue, "useonother") == 0) {
         itype->useonother =
           (int (*)(struct unit *, int, const struct item_type *, int,
@@ -1893,7 +1893,7 @@ static int parse_races(xmlDocPtr doc)
           rc->age = (void (*)(struct unit *))fun;
         } else if (strcmp((const char *)propValue, "move") == 0) {
           rc->move_allowed =
-            (boolean(*)(const struct region *, const struct region *))fun;
+            (bool(*)(const struct region *, const struct region *))fun;
         } else if (strcmp((const char *)propValue, "itemdrop") == 0) {
           rc->itemdrop = (struct item * (*)(const struct race *, int))fun;
         } else if (strcmp((const char *)propValue, "initfamiliar") == 0) {
@@ -2206,7 +2206,7 @@ static int parse_messages(xmlDocPtr doc)
 
 static void
 xml_readstrings(xmlXPathContextPtr xpath, xmlNodePtr * nodeTab, int nodeNr,
-  boolean names)
+  bool names)
 {
   int i;
 
@@ -2274,7 +2274,7 @@ static int parse_strings(xmlDocPtr doc)
 
 static void
 xml_readprefixes(xmlXPathContextPtr xpath, xmlNodePtr * nodeTab, int nodeNr,
-  boolean names)
+  bool names)
 {
   int i;
 
@@ -2344,7 +2344,7 @@ static int parse_main(xmlDocPtr doc)
     for (i = 0; i != nodes->nodeNr; ++i) {
       xmlNodePtr node = nodes->nodeTab[i];
       xmlChar *propName = xmlGetProp(node, BAD_CAST "name");
-      boolean disable = xml_bvalue(node, "disable", false);
+      bool disable = xml_bvalue(node, "disable", false);
 
       if (disable) {
         int k;
@@ -2369,7 +2369,7 @@ static int parse_main(xmlDocPtr doc)
     for (i = 0; i != nodes->nodeNr; ++i) {
       xmlNodePtr node = nodes->nodeTab[i];
       xmlChar *propName = xmlGetProp(node, BAD_CAST "name");
-      boolean enable = xml_bvalue(node, "enable", true);
+      bool enable = xml_bvalue(node, "enable", true);
       enable_skill((const char *)propName, enable);
       xmlFree(propName);
     }

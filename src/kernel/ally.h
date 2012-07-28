@@ -16,18 +16,25 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#ifndef H_ATTRIBUTE_MOVEMENT
-#define H_ATTRIBUTE_MOVEMENT
+#ifndef ALLY_H
+#define ALLY_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-  extern bool get_movement(struct attrib *const *alist, int type);
-  extern void set_movement(struct attrib **alist, int type);
+  typedef struct ally {
+    struct ally *next;
+    struct faction *faction;
+    int status;
+  } ally;
 
-  extern struct attrib_type at_movement;
+  ally * ally_find(ally *al, const struct faction *f);
+  ally * ally_add(ally **al_p, struct faction *f);
+  void ally_remove(ally **al_p, struct faction *f);
 
 #ifdef __cplusplus
 }
 #endif
+
 #endif

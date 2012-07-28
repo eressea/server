@@ -33,7 +33,7 @@ extern "C" {
   void state_close(struct state *);
 
   void make_block(int x, int y, int radius, const struct terrain_type *terrain);
-  void seed_players(const char *filename, boolean new_island);
+  void seed_players(const char *filename, bool new_island);
 
 #ifdef __cplusplus
 }

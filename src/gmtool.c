@@ -356,7 +356,7 @@ static void paint_status(window * wnd, const state * st)
   wclrtoeol(win);
 }
 
-static boolean handle_info_region(window * wnd, state * st, int c)
+static bool handle_info_region(window * wnd, state * st, int c)
 {
   return false;
 }
@@ -1281,7 +1281,7 @@ curses_readline(struct lua_State *L, char *buffer, size_t size,
   return buffer[0] != 0;
 }
 
-void seed_players(const char *filename, boolean new_island)
+void seed_players(const char *filename, bool new_island)
 {
   newfaction *players = read_newfactions(filename);
   if (players != NULL) {

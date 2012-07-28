@@ -51,6 +51,7 @@ int RunAllTests(void)
   CuSuiteAddSuite(suite, get_building_suite());
   CuSuiteAddSuite(suite, get_spell_suite());
   CuSuiteAddSuite(suite, get_battle_suite());
+  CuSuiteAddSuite(suite, get_ally_suite());
   /* gamecode */
   CuSuiteAddSuite(suite, get_market_suite());
   CuSuiteAddSuite(suite, get_laws_suite());
@@ -137,6 +138,26 @@ ship * test_create_ship(region * r, const ship_type * stype)
   return s;
 }
 
+ship_type * test_create_shiptype(const char ** names)
+{
+  ship_type * stype = (ship_type*)calloc(sizeof(ship_type), 1);
+  stype->name[0] = strdup(names[0]);
+  stype->name[1] = strdup(names[1]);
+  locale_setstring(default_locale, names[0], names[0]);
+  st_register(stype);
+  return stype;
+}
+
+building_type * test_create_buildingtype(const char * name)
+{
+  building_type * btype = (building_type*)calloc(sizeof(building_type), 1);
+  btype->flags = BTF_NAMECHANGE;
+  btype->_name = strdup(name);
+  locale_setstring(default_locale, name, name);
+  bt_register(btype);
+  return btype;
+}
+
 item_type * test_create_itemtype(const char ** names) {
   resource_type * rtype;
   item_type * itype;
@@ -159,16 +180,14 @@ void test_create_world(void)
   terrain_type *t_plain, *t_ocean;
   region *island[2];
   int i;
-  building_type *btype;
-  ship_type *stype;
   item_type * itype;
-  const char * horses[2] = { "horse", "horse_p" };
+  const char * names[] = { "horse", "horse_p", "boat", "boat_p" };
 
   make_locale("de");
   init_resources();
   assert(!olditemtype[I_HORSE]);
 
-  itype = test_create_itemtype(horses);
+  itype = test_create_itemtype(names);
   olditemtype[I_HORSE] = itype;
 
   t_plain = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION);
@@ -191,17 +210,8 @@ void test_create_world(void)
 
   test_create_race("human");
 
-  btype = (building_type*)calloc(sizeof(building_type), 1);
-  btype->flags = BTF_NAMECHANGE;
-  btype->_name = strdup("castle");
-  locale_setstring(default_locale, "castle", "castle");
-  bt_register(btype);
-
-  stype = (ship_type*)calloc(sizeof(ship_type), 1);
-  stype->name[0] = strdup("boat");
-  stype->name[1] = strdup("boat_p");
-  locale_setstring(default_locale, "boat", "boat");
-  st_register(stype);
+  test_create_buildingtype("castle");
+  test_create_shiptype(names+2);
 }
 
 int main(int argc, char ** argv) {

@@ -246,22 +246,8 @@ extern char *strdup(const char *s);
 # define unused(a) (a)
 #endif /* ghs || __GNUC__ || ..... */
 
-/****                      ****
- ** The Eressea boolean type **
- ****                      ****/
-#if defined(BOOLEAN)
-# define boolean BOOLEAN
-#else
-typedef int boolean;            /* not bool! wrong size. */
-#endif
-#ifndef __cplusplus
-# define false ((boolean)0)
-# define true ((boolean)!false)
-#endif
-#ifdef __cplusplus
-}
-#endif
-
+#include "util/bool.h"
+  
 #ifndef INLINE_FUNCTION
 # define INLINE_FUNCTION
 #endif

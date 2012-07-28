@@ -3,6 +3,7 @@ project (eressea C)
 
 IF(CMAKE_COMPILER_IS_GNUCC)
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long")
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -DHAVE__BOOL")
 ELSE(CMAKE_COMPILER_IS_GNUCC)
     MESSAGE(STATUS "Unknown compiler ${CMAKE_C_COMPILER_ID}")
 ENDIF(CMAKE_COMPILER_IS_GNUCC)
@@ -12,14 +13,13 @@ set (ERESSEA_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "Eressea Cor
 
 add_subdirectory(bindings)
 
-find_package (Lua51 REQUIRED)
+find_package (Lua 5 REQUIRED)
 find_package (ToLua REQUIRED)
 find_package (LibXml2 REQUIRED)
 find_package (Curses REQUIRED)
 find_package (SQLite3 REQUIRED)
 
 set (ERESSEA_LIBRARIES
-  ${BSON_LIBRARIES}
   ${CUTEST_LIBRARIES}
   ${CRITBIT_LIBRARIES}
   ${QUICKLIST_LIBRARIES}
@@ -40,7 +40,6 @@ include_directories (${CUTEST_INCLUDE_DIR})
 include_directories (${LUA_INCLUDE_DIR})
 include_directories (${TOLUA_INCLUDE_DIR})
 include_directories (${LIBXML2_INCLUDE_DIR})
-include_directories (${BSON_INCLUDE_DIR})
 include_directories (${INIPARSER_INCLUDE_DIR})
 
 FILE (GLOB_RECURSE LIB_HDR *.h)
@@ -51,6 +50,7 @@ set (TEST_SRC
   gamecode/economy_test.c
   gamecode/laws_test.c
   gamecode/market_test.c
+  kernel/ally_test.c
   kernel/battle_test.c
   kernel/building_test.c
   kernel/curse_test.c
@@ -117,6 +117,7 @@ set (LIB_SRC
   items/xerewards.c
   kernel/alchemy.c
   kernel/alliance.c
+  kernel/ally.c
   kernel/battle.c
   kernel/binarystore.c
   kernel/build.c
@@ -162,7 +163,6 @@ set (LIB_SRC
   modules/score.c
   modules/weather.c
   modules/wormhole.c
-  modules/xecmd.c
   modules/xmas.c
   triggers/changefaction.c
   triggers/changerace.c
@@ -184,7 +184,6 @@ set (LIB_SRC
   util/console.c
   util/crmessage.c
   util/dice.c
-  util/eventbus.c
   util/event.c
   util/filereader.c
   util/functions.c

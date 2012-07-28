@@ -22,6 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "alchemy.h"
 #include "alliance.h"
+#include "ally.h"
 #include "connection.h"
 #include "building.h"
 #include "faction.h"
@@ -132,7 +133,7 @@ FILE *cfopen(const char *filename, const char *mode)
 int freadstr(FILE * F, int encoding, char *start, size_t size)
 {
   char *str = start;
-  boolean quote = false;
+  bool quote = false;
   for (;;) {
     int c = fgetc(F);
 
@@ -298,7 +299,7 @@ static unit *unitorders(FILE * F, int enc, struct faction *f)
           stok = parse_token(&stok);
 
           if (stok) {
-            boolean quit = false;
+            bool quit = false;
             param_t param = findparam(stok, u->faction->locale);
             switch (param) {
             case P_UNIT:

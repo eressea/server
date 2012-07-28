@@ -35,6 +35,7 @@ typedef short item_t;
 
 struct attrib;
 struct attrib_type;
+struct ally;
 struct building;
 struct building_type;
 struct curse;
@@ -90,8 +91,6 @@ typedef enum {
   K_END,
   K_DRIVE,
   K_NUMBER,
-  K_WAR,
-  K_PEACE,
   K_FOLLOW,
   K_RESEARCH,
   K_GIVE,
@@ -102,7 +101,6 @@ typedef enum {
   K_CONTACT,
   K_TEACH,
   K_STUDY,
-  K_LIEFERE,
   K_MAKE,
   K_MOVE,
   K_PASSWORD,
@@ -128,18 +126,12 @@ typedef enum {
   K_URSPRUNG,
   K_EMAIL,
   K_PIRACY,
-  K_RESTART,
   K_GROUP,
-  K_SACRIFICE,
-  K_PRAY,
   K_SORT,
-  K_SETJIHAD,
   K_GM,                         /* perform GM commands */
   K_INFO,                       /* set player-info */
   K_PREFIX,
   K_PLANT,
-  K_WEREWOLF,
-  K_XE,
   K_ALLIANCE,
   K_CLAIM,
   K_PROMOTION,
@@ -401,10 +393,6 @@ typedef enum {
 /* HELP_OBSERVE deaktiviert */
 /* ------------------------------------------------------------- */
 /* Prototypen */
-
-#define ALLIED_TAX     1
-#define ALLIED_NOBLOCK 2
-#define ALLIED_HELP    4
 
 /* alle vierstelligen zahlen: */
 #define MAX_UNIT_NR (36*36*36*36-1)

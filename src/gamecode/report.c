@@ -38,6 +38,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* kernel includes */
 #include <kernel/alchemy.h>
+#include <kernel/ally.h>
 #include <kernel/connection.h>
 #include <kernel/build.h>
 #include <kernel/building.h>
@@ -134,7 +135,7 @@ void rnl(FILE * F)
   fputc('\n', F);
 }
 
-static void centre(FILE * F, const char *s, boolean breaking)
+static void centre(FILE * F, const char *s, bool breaking)
 {
   /* Bei Namen die genau 80 Zeichen lang sind, kann es hier Probleme
    * geben. Seltsamerweise wird i dann auf MAXINT oder aehnlich
@@ -217,12 +218,25 @@ rparagraph(FILE * F, const char *str, ptrdiff_t indent, int hanging_indent,
   } while (*begin);
 }
 
+static size_t write_spell_modifier(spell * sp, int flag, const char * str, bool cont, char * bufp, size_t size) {
+  if (sp->sptyp & flag) {
+    size_t bytes = 0;
+    if (cont) {
+      bytes = strlcpy(bufp, ", ", size);
+    } else {
+      bytes = strlcpy(bufp, " ", size);
+    }
+    bytes += strlcpy(bufp+bytes, str, size-bytes);
+    return bytes;
+  }
+  return 0;
+}
+
 static void nr_spell(FILE * F, spellbook_entry * sbe, const struct locale *lang)
 {
   int bytes, k, itemanz, costtyp;
-  int dh = 0;
   char buf[4096];
-  char *bufp = buf;
+  char *startp, *bufp = buf;
   size_t size = sizeof(buf) - 1;
   spell * sp = sbe->sp;
   const char *params = sp->parameter;
@@ -296,52 +310,29 @@ static void nr_spell(FILE * F, spellbook_entry * sbe, const struct locale *lang)
   bytes = (int)strlcpy(buf, LOC(lang, "nr_spell_modifiers"), size);
   if (wrptr(&bufp, &size, bytes) != 0)
     WARN_STATIC_BUFFER();
-  if (sp->sptyp & FARCASTING) {
-    bytes = (int)strlcpy(bufp, " Fernzauber", size);
-    if (wrptr(&bufp, &size, bytes) != 0)
-      WARN_STATIC_BUFFER();
-    dh = 1;
+
+  startp = bufp;
+  bytes = (int)write_spell_modifier(sp, FARCASTING, LOC(lang, "smod_far"), startp!=bufp, bufp, size);
+  if (bytes && wrptr(&bufp, &size, bytes) != 0) {
+    WARN_STATIC_BUFFER();
   }
-  if (sp->sptyp & OCEANCASTABLE) {
-    if (dh == 1) {
-      bytes = (int)strlcpy(bufp, ",", size);
-      if (wrptr(&bufp, &size, bytes) != 0)
-        WARN_STATIC_BUFFER();
+  bytes = (int)write_spell_modifier(sp, OCEANCASTABLE, LOC(lang, "smod_sea"), startp!=bufp, bufp, size);
+  if (bytes && wrptr(&bufp, &size, bytes) != 0) {
+    WARN_STATIC_BUFFER();
+  }
+  bytes = (int)write_spell_modifier(sp, ONSHIPCAST, LOC(lang, "smod_ship"), startp!=bufp, bufp, size);
+  if (bytes && wrptr(&bufp, &size, bytes) != 0) {
+    WARN_STATIC_BUFFER();
+  }
+  bytes = (int)write_spell_modifier(sp, NOTFAMILIARCAST, LOC(lang, "smod_nofamiliar"), startp!=bufp, bufp, size);
+  if (bytes && wrptr(&bufp, &size, bytes) != 0) {
+    WARN_STATIC_BUFFER();
+  }
+  if (startp==bufp) {
+    bytes = (int)write_spell_modifier(sp, NOTFAMILIARCAST, LOC(lang, "smod_none"), startp!=bufp, bufp, size);
+    if (bytes && wrptr(&bufp, &size, bytes) != 0) {
+      WARN_STATIC_BUFFER();
     }
-    bytes = (int)strlcpy(bufp, " Seezauber", size);
-    if (wrptr(&bufp, &size, bytes) != 0)
-      WARN_STATIC_BUFFER();
-    dh = 1;
-  }
-  if (sp->sptyp & ONSHIPCAST) {
-    if (dh == 1) {
-      bytes = (int)strlcpy(bufp, ",", size);
-      if (wrptr(&bufp, &size, bytes) != 0)
-        WARN_STATIC_BUFFER();
-    }
-    bytes = (int)strlcpy(bufp, " Schiffszauber", size);
-    if (wrptr(&bufp, &size, bytes) != 0)
-      WARN_STATIC_BUFFER();
-    dh = 1;
-  }
-  if (sp->sptyp & NOTFAMILIARCAST) {
-    if (dh == 1) {
-      bytes = (int)strlcpy(bufp, ", k", size);
-    } else {
-      bytes = (int)strlcpy(bufp, " K", size);
-    }
-    if (wrptr(&bufp, &size, bytes) != 0)
-      WARN_STATIC_BUFFER();
-    bytes =
-      (int)strlcpy(bufp, "ann nicht vom Vertrauten gezaubert werden", size);
-    if (wrptr(&bufp, &size, bytes) != 0)
-      WARN_STATIC_BUFFER();
-    dh = 1;
-  }
-  if (dh == 0) {
-    bytes = (int)strlcpy(bufp, " Keine", size);
-    if (wrptr(&bufp, &size, bytes) != 0)
-      WARN_STATIC_BUFFER();
   }
   *bufp = 0;
   rparagraph(F, buf, 0, 0, 0);
@@ -698,7 +689,7 @@ nr_unit(FILE * F, const faction * f, const unit * u, int indent, int mode)
   attrib *a_otherfaction;
   char marker;
   int dh;
-  boolean isbattle = (boolean) (mode == see_battle);
+  bool isbattle = (bool) (mode == see_battle);
   char buf[8192];
 
   if (fval(u->race, RCF_INVISIBLE))
@@ -735,7 +726,7 @@ nr_unit(FILE * F, const faction * f, const unit * u, int indent, int mode)
 
 static void
 rp_messages(FILE * F, message_list * msgs, faction * viewer, int indent,
-  boolean categorized)
+  bool categorized)
 {
   nrsection *section;
   if (!msgs)
@@ -866,9 +857,9 @@ static void prices(FILE * F, const region * r, const faction * f)
 
 }
 
-boolean see_border(const connection * b, const faction * f, const region * r)
+bool see_border(const connection * b, const faction * f, const region * r)
 {
-  boolean cs = b->type->fvisible(b, f, r);
+  bool cs = b->type->fvisible(b, f, r);
   if (!cs) {
     cs = b->type->rvisible(b, r);
     if (!cs) {
@@ -890,7 +881,7 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
 {
   const region *r = sr->r;
   int n;
-  boolean dh;
+  bool dh;
   direction_t d;
   int trees;
   int saplings;
@@ -899,12 +890,12 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
   struct edge {
     struct edge *next;
     char *name;
-    boolean transparent;
-    boolean block;
-    boolean exist[MAXDIRECTIONS];
+    bool transparent;
+    bool block;
+    bool exist[MAXDIRECTIONS];
     direction_t lastd;
   } *edges = NULL, *e;
-  boolean see[MAXDIRECTIONS];
+  bool see[MAXDIRECTIONS];
   char buf[8192];
   char *bufp = buf;
   size_t size = sizeof(buf);
@@ -919,7 +910,7 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
       continue;
     for (b = get_borders(r, r2); b;) {
       struct edge *e = edges;
-      boolean transparent = b->type->transparent(b, f);
+      bool transparent = b->type->transparent(b, f);
       const char *name = b->type->name(b, r, f, GF_DETAILED | GF_ARTICLE);
 
       if (!transparent)
@@ -948,11 +939,11 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
     WARN_STATIC_BUFFER();
 
   if (sr->mode == see_travel) {
-    bytes = (int)strlcpy(bufp, " (durchgereist)", size);
+    bytes = snprintf(bufp, size, " (%s)", LOC(f->locale, "see_travel"));
   } else if (sr->mode == see_neighbour) {
-    bytes = (int)strlcpy(bufp, " (benachbart)", size);
+    bytes = snprintf(bufp, size, " (%s)", LOC(f->locale, "see_neighbour"));
   } else if (sr->mode == see_lighthouse) {
-    bytes = (int)strlcpy(bufp, " (vom Turm erblickt)", size);
+    bytes = snprintf(bufp, size, " (%s)", LOC(f->locale, "see_lighthouse"));
   } else {
     bytes = 0;
   }
@@ -1235,7 +1226,7 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
   if (edges)
     rnl(F);
   for (e = edges; e; e = e->next) {
-    boolean first = true;
+    bool first = true;
     bufp = buf;
     size = sizeof(buf) - 1;
     for (d = 0; d != MAXDIRECTIONS; ++d) {
@@ -1440,9 +1431,9 @@ static void durchreisende(FILE * F, const region * r, const faction * f)
     }
     /* TODO: finish localization */
     if (maxtravel == 1) {
-      bytes = (int)strlcpy(bufp, " hat die Region durchquert.", size);
+      bytes = snprintf(bufp, size, " %s", LOC(f->locale, "has_moved_one"));
     } else {
-      bytes = (int)strlcpy(bufp, " haben die Region durchquert.", size);
+      bytes = snprintf(bufp, size, " %s", LOC(f->locale, "has_moved_many"));
     }
     if (wrptr(&bufp, &size, bytes) != 0)
       WARN_STATIC_BUFFER();
@@ -1455,7 +1446,7 @@ static int buildingmaintenance(const building * b, const resource_type * rtype)
 {
   const building_type *bt = b->type;
   int c, cost = 0;
-  static boolean init = false;
+  static bool init = false;
   static const curse_type *nocost_ct;
   if (!init) {
     init = true;
@@ -1735,9 +1726,9 @@ static void allies(FILE * F, const faction * f)
     int bytes;
     size_t size = sizeof(buf);
     if (!f->allies->next) {
-      bytes = (int)strlcpy(buf, "Wir helfen der Partei ", size);
+      bytes = snprintf(buf, size, "%s ", LOC(f->locale, "faction_help_one"));
     } else {
-      bytes = (int)strlcpy(buf, "Wir helfen den Parteien ", size);
+      bytes = snprintf(buf, size, "%s ", LOC(f->locale, "faction_help_many"));
     }
     size -= bytes;
     show_allies(f, f->allies, buf + bytes, size);
@@ -1750,9 +1741,9 @@ static void allies(FILE * F, const faction * f)
       int bytes;
       size_t size = sizeof(buf);
       if (!g->allies->next) {
-        bytes = snprintf(buf, size, "%s hilft der Partei ", g->name);
+        bytes = snprintf(buf, size, "%s %s ", g->name, LOC(f->locale, "group_help_one"));
       } else {
-        bytes = snprintf(buf, size, "%s hilft den Parteien ", g->name);
+        bytes = snprintf(buf, size, "%s %s ", g->name, LOC(f->locale, "group_help_many"));
       }
       size -= bytes;
       show_allies(f, g->allies, buf + bytes, size);
@@ -1775,7 +1766,7 @@ static void guards(FILE * F, const region * r, const faction * see)
   unit *u;
   int i;
 
-  boolean tarned = false;
+  bool tarned = false;
   /* Bewachung */
 
   for (u = r->units; u; u = u->next) {
@@ -2579,7 +2570,7 @@ static void add_find(faction * f, unit * u, faction * f2)
 static void update_find(void)
 {
   region *r;
-  static boolean initial = true;
+  static bool initial = true;
 
   if (initial)
     for (r = regions; r; r = r->next) {
@@ -2601,10 +2592,10 @@ static void update_find(void)
   initial = false;
 }
 
-boolean kann_finden(faction * f1, faction * f2)
+bool kann_finden(faction * f1, faction * f2)
 {
   update_find();
-  return (boolean) (can_find(f1, f2) != NULL);
+  return (bool) (can_find(f1, f2) != NULL);
 }
 
 /******* end summary ******/

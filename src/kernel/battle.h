@@ -22,9 +22,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-#define SHOW_KILLS
-#undef SMALL_BATTLE_MESSAGES
-
   /** more defines **/
 #define FS_ENEMY 1
 #define FS_HELP  2
@@ -49,10 +46,7 @@ extern "C" {
     struct bfaction *next;
     struct side *sides;
     struct faction *faction;
-#ifndef SIMPLE_COMBAT
-    int lastturn;               /* last time this struct faction was involved in combat */
-#endif
-    boolean attacker;
+    bool attacker;
   } bfaction;
 
   typedef struct tactics {
@@ -61,9 +55,7 @@ extern "C" {
   } tactics;
 
 #define SIDE_STEALTH   1<<0
-#ifdef SIMPLE_COMBAT
 #define SIDE_HASGUARDS  1<<1
-#endif
   typedef struct side {
     struct side *nextF;         /* next army of same faction */
     struct battle *battle;
@@ -102,15 +94,10 @@ extern "C" {
     struct quicklist *meffects;
     int max_tactics;
     int turn;
-    boolean has_tactics_turn;
+    bool has_tactics_turn;
     int keeploot;
-    boolean reelarrow;
+    bool reelarrow;
     int alive;
-#ifdef SMALL_BATTLE_MESSAGES
-    boolean small;
-#endif
-#define FASTROW
-#ifdef FASTROW
     struct {
       const struct side *as;
       const struct side *vs;
@@ -118,9 +105,6 @@ extern "C" {
       int row;
       int result;
     } rowcache;
-#endif
-#define FASTCOUNT
-#ifdef FASTCOUNT
     struct {
       struct side *side;
       int status;
@@ -128,7 +112,6 @@ extern "C" {
       int minrow, maxrow;
       int enemies[8];
     } fast;
-#endif
   } battle;
 
   typedef struct weapon {
@@ -198,18 +181,9 @@ extern "C" {
     struct {
       int number;               /* number of people who fled */
       int hp;                   /* accumulated hp of fleeing people */
-#ifndef SIMPLE_ESCAPE
-      struct region *region;    /* destination of fleeing people */
-      struct item *items;       /* items they take */
-#endif                          /* SIMPLE_ESCAPE */
     } run;
-#ifndef SIMPLE_COMBAT
-    int action_counter;         /* number of active actions the struct unit did in the fight */
-#endif                          /* SIMPLE_COMBAT */
-#ifdef SHOW_KILLS
     int kills;
     int hits;
-#endif
   } fighter;
 
   /* schilde */
@@ -231,6 +205,14 @@ extern "C" {
 
   extern const troop no_troop;
 
+  /* BEGIN battle interface */
+  void battle_init(battle * b);
+  void battle_free(battle * b);
+  side * find_side(battle * b, const struct faction * f, const struct group * g, int flags, const struct faction * stealthfaction);
+  side * get_side(battle * b, const struct unit * u);
+  fighter * get_fighter(battle * b, const struct unit * u);
+  /* END battle interface */
+
   extern void do_battle(struct region *r);
 
   /* for combat spells and special attacks */
@@ -244,8 +226,8 @@ extern "C" {
 
   extern int count_enemies(struct battle *b, const struct fighter *af,
     int minrow, int maxrow, int select);
-  extern boolean terminate(troop dt, troop at, int type, const char *damage,
-    boolean missile);
+  extern bool terminate(troop dt, troop at, int type, const char *damage,
+    bool missile);
   extern void message_all(battle * b, struct message *m);
   extern int hits(troop at, troop dt, weapon * awp);
   extern void damage_building(struct battle *b, struct building *bldg,
@@ -255,21 +237,18 @@ extern "C" {
   extern int count_allies(const struct side *as, int minrow, int maxrow,
     int select, int allytype);
   extern int get_unitrow(const struct fighter *af, const struct side *vs);
-  extern boolean helping(const struct side *as, const struct side *ds);
+  extern bool helping(const struct side *as, const struct side *ds);
   extern void rmfighter(fighter * df, int i);
-#ifndef SIMPLE_ESCAPE
-  extern struct region *fleeregion(const struct unit *u);
-#endif
   extern struct fighter *select_corpse(struct battle *b, struct fighter *af);
   extern int statusrow(int status);
   extern void drain_exp(struct unit *u, int d);
   extern void kill_troop(troop dt);
   extern void remove_troop(troop dt);   /* not the same as the badly named rmtroop */
-  extern boolean is_attacker(const fighter * fig);
+  extern bool is_attacker(const fighter * fig);
 
   extern struct battle *make_battle(struct region * r);
   extern fighter *make_fighter(struct battle *b, struct unit *u, side * s,
-    boolean attack);
+    bool attack);
   extern struct side *make_side(struct battle * b, const struct faction * f,
     const struct group * g, unsigned int flags, 
     const struct faction * stealthfaction);

@@ -80,7 +80,7 @@ extern "C" {
     struct att attack[10];
     char bonus[MAXSKILLS];
     signed char *study_speed;   /* study-speed-bonus in points/turn (0=30 Tage) */
-    boolean __remove_me_nonplayer;
+    bool __remove_me_nonplayer;
     int flags;
     int battle_flags;
     int ec_flags;
@@ -89,7 +89,7 @@ extern "C" {
     const char *(*generate_name) (const struct unit *);
     const char *(*describe) (const struct unit *, const struct locale *);
     void (*age) (struct unit * u);
-     boolean(*move_allowed) (const struct region *, const struct region *);
+     bool(*move_allowed) (const struct region *, const struct region *);
     struct item *(*itemdrop) (const struct race *, int size);
     void (*init_familiar) (struct unit *);
 
@@ -176,10 +176,10 @@ extern "C" {
 #define humanoidrace(rc) (fval((rc), RCF_UNDEAD) || (rc)==new_race[RC_DRACOID] || playerrace(rc))
 #define illusionaryrace(rc) (fval(rc, RCF_ILLUSIONARY))
 
-  extern boolean allowed_dragon(const struct region *src,
+  extern bool allowed_dragon(const struct region *src,
     const struct region *target);
 
-  extern boolean r_insectstalled(const struct region *r);
+  extern bool r_insectstalled(const struct region *r);
 
   extern void add_raceprefix(const char *);
   extern char **race_prefixes;

@@ -132,7 +132,7 @@ extern "C" {
     int capacity;
     struct construction *construction;
     /* --- functions --- */
-     boolean(*canuse) (const struct unit * user,
+     bool(*canuse) (const struct unit * user,
       const struct item_type * itype);
     int (*use) (struct unit * user, const struct item_type * itype, int amount,
       struct order * ord);
@@ -220,7 +220,7 @@ extern "C" {
     int reload;                 /* time to reload this weapon */
     weapon_mod *modifiers;
     /* --- functions --- */
-     boolean(*attack) (const struct troop *, const struct weapon_type *,
+     bool(*attack) (const struct troop *, const struct weapon_type *,
       int *deaths);
   } weapon_type;
 

@@ -157,7 +157,7 @@ extern "C" {
   typedef struct spec_direction {
     int x, y;
     int duration;
-    boolean active;
+    bool active;
     char *desc;
     char *keyword;
   } spec_direction;
@@ -210,7 +210,7 @@ extern "C" {
   short rroad(const struct region *r, direction_t d);
   void rsetroad(struct region *r, direction_t d, short value);
 
-  int is_coastregion(struct region *r);
+  bool is_coastregion(struct region *r);
 
   int rtrees(const struct region *r, int ageclass);
   enum {
@@ -236,7 +236,7 @@ extern "C" {
 #define rherbs(r) ((r)->land?(r)->land->herbs:0)
 #define rsetherbs(r, value) if ((r)->land) ((r)->land->herbs=(short)(value))
 
-  boolean r_isforest(const struct region *r);
+  bool r_isforest(const struct region *r);
 
 #define rterrain(r) (oldterrain((r)->terrain))
 #define rsetterrain(r, t) ((r)->terrain = newterrain(t))
@@ -255,7 +255,7 @@ extern "C" {
   struct region *new_region(int x, int y, struct plane *pl, unsigned int uid);
   void remove_region(region ** rlist, region * r);
   void terraform_region(struct region *r, const struct terrain_type *terrain);
-  boolean pnormalize(int *x, int *y, const struct plane *pl);
+  bool pnormalize(int *x, int *y, const struct plane *pl);
 
   extern const int delta_x[MAXDIRECTIONS];
   extern const int delta_y[MAXDIRECTIONS];
@@ -295,7 +295,7 @@ extern "C" {
   void region_setresource(struct region *r, const struct resource_type *rtype,
     int value);
   int owner_change(const region * r);
-  boolean is_mourning(const region * r, int in_turn);
+  bool is_mourning(const region * r, int in_turn);
   const struct item_type *r_luxury(struct region *r);
   void get_neighbours(const struct region *r, struct region **list);
 

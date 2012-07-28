@@ -73,9 +73,9 @@ typedef struct db_faction {
 
 static int
 db_update_email(sqlite3 * db, const faction * f, const db_faction * dbstate,
-  boolean force, /* [OUT] */ sqlite3_uint64 * id_email)
+  bool force, /* [OUT] */ sqlite3_uint64 * id_email)
 {
-  boolean update = force;
+  bool update = force;
   int res = SQLITE_OK;
   char email_lc[MAX_EMAIL_LENGTH];
 
@@ -129,7 +129,7 @@ db_update_email(sqlite3 * db, const faction * f, const db_faction * dbstate,
   return SQLITE_OK;
 }
 
-int db_update_factions(sqlite3 * db, boolean force)
+int db_update_factions(sqlite3 * db, bool force)
 {
   int game_id = 6;
   const char sql_select[] =
@@ -172,7 +172,7 @@ int db_update_factions(sqlite3 * db, boolean force)
       int i;
       char passwd_md5[MD5_LENGTH_0];
       sqlite3_uint64 id_email;
-      boolean update = force;
+      bool update = force;
       db_faction dbstate;
       const char *no_b36;
 
@@ -241,7 +241,7 @@ int db_update_factions(sqlite3 * db, boolean force)
   return SQLITE_OK;
 }
 
-int db_update_scores(sqlite3 * db, boolean force)
+int db_update_scores(sqlite3 * db, bool force)
 {
   const char *sql_ins =
     "INSERT OR FAIL INTO score (value,faction_id,turn) VALUES (?,?,?)";

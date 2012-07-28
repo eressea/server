@@ -253,7 +253,7 @@ void log_error(const char *format, ...)
   }
 }
 
-void _log_info(const char *format, ...)
+void log_info(const char *format, ...)
 {
   const char * prefix = "INFO";
   const int mask = LOG_CPINFO;

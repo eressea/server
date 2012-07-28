@@ -89,7 +89,7 @@ typedef struct request {
   int qty;
   int no;
   union {
-    boolean goblin;             /* stealing */
+    bool goblin;             /* stealing */
     const struct luxury_type *ltype;    /* trading */
   } type;
 } request;
@@ -215,6 +215,9 @@ typedef struct recruitment {
   int total, assigned;
 } recruitment;
 
+/** Creates a list of recruitment structs, one for each faction. Adds every quantifyable request
+ * to the faction's struct and to total.
+ */
 static recruitment *select_recruitment(request ** rop,
   int (*quantify) (const struct race *, int), int *total)
 {
@@ -292,14 +295,14 @@ static int any_recruiters(const struct race *rc, int qty)
   return (int)(qty * 2 * rc->recruit_multi);
 }
 
-static int peasant_recruiters(const struct race *rc, int qty)
+/*static int peasant_recruiters(const struct race *rc, int qty)
 {
   if (rc->ec_flags & ECF_REC_ETHEREAL)
     return -1;
   if (rc->ec_flags & ECF_REC_HORSES)
     return -1;
   return (int)(qty * 2 * rc->recruit_multi);
-}
+}*/
 
 static int horse_recruiters(const struct race *rc, int qty)
 {
@@ -315,10 +318,12 @@ static int do_recruiting(recruitment * recruits, int available)
   recruitment *rec;
   int recruited = 0;
 
+  /* try to assign recruits to factions fairly */
   while (available > 0) {
     int n = 0;
     int rest, mintotal = INT_MAX;
 
+    /* find smallest request */
     for (rec = recruits; rec != NULL; rec = rec->next) {
       int want = rec->total - rec->assigned;
       if (want > 0) {
@@ -334,6 +339,8 @@ static int do_recruiting(recruitment * recruits, int available)
     }
     rest = available - mintotal * n;
 
+    /* assign size of smallest request for everyone if possible; in the end roll dice to assign
+     * small rest */
     for (rec = recruits; rec != NULL; rec = rec->next) {
       int want = rec->total - rec->assigned;
 
@@ -350,6 +357,7 @@ static int do_recruiting(recruitment * recruits, int available)
     }
   }
 
+  /* do actual recruiting */
   for (rec = recruits; rec != NULL; rec = rec->next) {
     request *req;
     int get = rec->assigned;
@@ -365,14 +373,16 @@ static int do_recruiting(recruitment * recruits, int available)
         int afford = get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT,
           number * rc->recruitcost) / rc->recruitcost;
         number = MIN(number, afford);
-        use_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT,
-          rc->recruitcost * number);
       }
       if (u->number + number > UNIT_MAXSIZE) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, req->ord, "error_unit_size",
             "maxsize", UNIT_MAXSIZE));
         number = UNIT_MAXSIZE - u->number;
         assert(number >= 0);
+      }
+      if (rc->recruitcost) {
+        use_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT,
+          rc->recruitcost * number);
       }
       add_recruits(u, number, req->qty);
       dec = (int)(number * multi);
@@ -392,7 +402,7 @@ static void feedback_give_not_allowed(unit * u, order * ord)
       ""));
 }
 
-static boolean check_give(unit * u, unit * u2, const item_type * itype,
+static bool check_give(unit * u, unit * u2, const item_type * itype,
   int mask)
 {
   if (u2) {
@@ -449,7 +459,7 @@ static void expandrecruit(region * r, request * recruitorders)
   }
 
   /* peasant limited: */
-  recruits = select_recruitment(&recruitorders, peasant_recruiters, &orc_total);
+  recruits = select_recruitment(&recruitorders, any_recruiters, &orc_total);
   if (recruits) {
     int orc_recruited, orc_peasants = rpeasants(r) * 2;
     int orc_frac = orc_peasants / RECRUITFRACTION;      /* anzahl orks. 2 ork = 1 bauer */
@@ -464,10 +474,10 @@ static void expandrecruit(region * r, request * recruitorders)
   /* no limit: */
   recruits = select_recruitment(&recruitorders, any_recruiters, &orc_total);
   if (recruits) {
-    int recruited, peasants = rpeasants(r);
+    int recruited, peasants = rpeasants(r) * 2;
     recruited = do_recruiting(recruits, INT_MAX);
     if (recruited > 0) {
-      rsetpeasants(r, peasants - recruited / 2);
+      rsetpeasants(r, (peasants - recruited) / 2);
     }
     free_recruitments(recruits);
   }
@@ -537,7 +547,7 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
     get_gamedate(turn, &date);
     if (date.season == 0 && r->terrain != newterrain(T_DESERT)) {
 #ifdef INSECT_POTION
-      boolean usepotion = false;
+      bool usepotion = false;
       unit *u2;
 
       for (u2 = r->units; u2; u2 = u2->next)
@@ -769,7 +779,7 @@ static void give_cmd(unit * u, order * ord)
   }
 
   else if (p == P_HERBS) {
-    boolean given = false;
+    bool given = false;
     if (!(u->race->ec_flags & GIVEITEM) && u2 != NULL) {
       ADDMSG(&u->faction->msgs,
         msg_feedback(u, ord, "race_nogive", "race", u->race));
@@ -996,12 +1006,12 @@ void add_spende(faction * f1, faction * f2, int amount, region * r)
   r->donations = sp;
 }
 
-static boolean maintain(building * b, boolean first)
+static bool maintain(building * b, bool first)
 /* first==false -> take money from wherever you can */
 {
   int c;
   region *r = b->region;
-  boolean paid = true, work = first;
+  bool paid = true, work = first;
   unit *u;
   if (fval(b, BLD_MAINTAINED) || b->type == NULL || b->type->maintenance == NULL
     || is_cursed(b->attribs, C_NOCOST, 0)) {
@@ -1111,12 +1121,12 @@ static boolean maintain(building * b, boolean first)
   return true;
 }
 
-void maintain_buildings(region * r, boolean crash)
+void maintain_buildings(region * r, bool crash)
 {
   building **bp = &r->buildings;
   while (*bp) {
     building *b = *bp;
-    boolean maintained = maintain(b, !crash);
+    bool maintained = maintain(b, !crash);
 
     /* the second time, send a message */
     if (crash) {
@@ -1141,7 +1151,7 @@ void maintain_buildings(region * r, boolean crash)
 
 static int recruit_archetype(unit * u, order * ord)
 {
-  boolean merge = (u->number > 0);
+  bool merge = (u->number > 0);
   int want;
   const char *s;
 
@@ -1178,7 +1188,7 @@ static int recruit_archetype(unit * u, order * ord)
        */
       int k;
       for (k = 0; arch->rules[k].property; ++k) {
-        boolean match = false;
+        bool match = false;
         if (arch->rules[k].value[0] == '*')
           match = true;
         else if (strcmp(arch->rules[k].property, "race") == 0) {
@@ -1296,7 +1306,7 @@ void economics(region * r)
 
   for (u = r->units; u; u = u->next) {
     order *ord;
-    boolean destroyed = false;
+    bool destroyed = false;
     if (u->number > 0) {
       for (ord = u->orders; ord; ord = ord->next) {
         keyword_t kwd = get_keyword(ord);
@@ -1306,7 +1316,7 @@ void economics(region * r)
               ord = NULL;
             destroyed = true;
           }
-        } else if (kwd == K_GIVE || kwd == K_LIEFERE) {
+        } else if (kwd == K_GIVE) {
           give_cmd(u, ord);
         } else if (kwd == K_FORGET) {
           forget_cmd(u, ord);
@@ -1421,7 +1431,7 @@ typedef struct allocation_list {
 
 static allocation_list *allocations;
 
-static boolean can_guard(const unit * guard, const unit * u)
+static bool can_guard(const unit * guard, const unit * u)
 {
   if (fval(guard, UFL_ISNEW))
     return false;
@@ -1612,7 +1622,7 @@ leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
   const item_type *itype = resource2item(rtype);
   rawmaterial *rm = rm_get(r, rtype);
   int need;
-  boolean first = true;
+  bool first = true;
 
   if (rm != NULL) {
     do {
@@ -2373,9 +2383,9 @@ static void expandselling(region * r, request * sellorders, int limit)
   }
 }
 
-static boolean sell(unit * u, request ** sellorders, struct order *ord)
+static bool sell(unit * u, request ** sellorders, struct order *ord)
 {
-  boolean unlimited = true;
+  bool unlimited = true;
   const item_type *itype;
   const luxury_type *ltype = NULL;
   int n;
@@ -2904,7 +2914,7 @@ static int max_skill(region * r, faction * f, skill_t sk)
 static void steal_cmd(unit * u, struct order *ord, request ** stealorders)
 {
   int n, i, id;
-  boolean goblin = false;
+  bool goblin = false;
   request *o;
   unit *u2 = NULL;
   region *r = u->region;
@@ -3342,7 +3352,7 @@ void produce(struct region *r)
   unit *u;
   int todo;
   static int rule_autowork = -1;
-  boolean limited = true;
+  bool limited = true;
   request *nextworker = workers;
   assert(r);
 
@@ -3378,7 +3388,7 @@ void produce(struct region *r)
 
   for (u = r->units; u; u = u->next) {
     order *ord;
-    boolean trader = false;
+    bool trader = false;
 
     if (u->race == new_race[RC_SPELL] || fval(u, UFL_LONGACTION))
       continue;

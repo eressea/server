@@ -87,7 +87,7 @@ add_give(unit * u, unit * u2, int given, int received,
   }
 }
 
-static boolean limited_give(const item_type * type)
+static bool limited_give(const item_type * type)
 {
   /* trade only money 2:1, if at all */
   return (type == i_silver);
@@ -288,7 +288,7 @@ void give_men(int n, unit * u, unit * u2, struct order *ord)
     if (u2) {
       if (u2->number != 0 && recruit_archetypes()) {
         /* must have same set of skills */
-        boolean okay = false;
+        bool okay = false;
         if (u->skill_size == u2->skill_size) {
           int i;
           for (i = 0; i != u->skill_size; ++i) {

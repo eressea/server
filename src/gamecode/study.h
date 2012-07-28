@@ -27,7 +27,7 @@ extern "C" {
   extern int learn_cmd(struct unit *u, struct order *ord);
 
   extern magic_t getmagicskill(const struct locale *lang);
-  extern boolean is_migrant(struct unit *u);
+  extern bool is_migrant(struct unit *u);
   extern int study_cost(struct unit *u, skill_t talent);
 
 #define MAXTEACHERS 4

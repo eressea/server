@@ -18,7 +18,7 @@ extern "C" {
 #endif
 
   typedef struct rule {
-    boolean allow;
+    bool allow;
     char *property;
     char *value;
   } rule;

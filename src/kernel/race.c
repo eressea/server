@@ -153,7 +153,7 @@ race *rc_find(const char *name)
 }
 
 /** dragon movement **/
-boolean allowed_dragon(const region * src, const region * target)
+bool allowed_dragon(const region * src, const region * target)
 {
   if (fval(src->terrain, ARCTIC_REGION) && fval(target->terrain, SEA_REGION))
     return false;
@@ -187,7 +187,7 @@ void set_show_item(faction * f, item_t i)
   a->data.v = (void *)olditemtype[i];
 }
 
-boolean r_insectstalled(const region * r)
+bool r_insectstalled(const region * r)
 {
   return fval(r->terrain, ARCTIC_REGION);
 }

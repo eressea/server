@@ -8,8 +8,9 @@
 #include "region.h"
 #include "skill.h"
 #include "unit.h"
-#include "tests.h"
+
 #include <CuTest.h>
+#include "tests.h"
 
 static void test_make_fighter(CuTest * tc)
 {

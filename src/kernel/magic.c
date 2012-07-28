@@ -345,7 +345,7 @@ attrib_type at_mage = {
   ATF_UNIQUE
 };
 
-boolean is_mage(const unit * u)
+bool is_mage(const unit * u)
 {
   return i2b(get_mage(u) != NULL);
 }
@@ -407,7 +407,7 @@ attrib_type at_seenspell = {
 
 #define MAXSPELLS 256
 
-static boolean already_seen(const faction * f, const spell * sp)
+static bool already_seen(const faction * f, const spell * sp)
 {
   attrib *a;
 
@@ -912,7 +912,7 @@ void pay_spell(unit * u, const spell * sp, int cast_level, int range)
  * aber dann immer noch nicht können, vieleicht ist seine Stufe derzeit
  * nicht ausreichend oder die Komponenten fehlen.
  */
-boolean knowsspell(const region * r, const unit * u, const spell * sp)
+bool knowsspell(const region * r, const unit * u, const spell * sp)
 {
   /* Ist überhaupt ein gültiger Spruch angegeben? */
   if (!sp || sp->id == 0) {
@@ -929,7 +929,7 @@ boolean knowsspell(const region * r, const unit * u, const spell * sp)
  * und sonstige Gegenstaende sein.
  */
 
-boolean
+bool
 cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
 {
   int k;
@@ -1178,7 +1178,7 @@ double magic_resistance(unit * target)
  * true zurück
  */
 
-boolean
+bool
 target_resists_magic(unit * magician, void *obj, int objtyp, int t_bonus)
 {
   double probability = 0.0;
@@ -1244,9 +1244,9 @@ target_resists_magic(unit * magician, void *obj, int objtyp, int t_bonus)
 
 /* ------------------------------------------------------------- */
 
-boolean is_magic_resistant(unit * magician, unit * target, int resist_bonus)
+bool is_magic_resistant(unit * magician, unit * target, int resist_bonus)
 {
-  return (boolean) target_resists_magic(magician, target, TYP_UNIT,
+  return (bool) target_resists_magic(magician, target, TYP_UNIT,
     resist_bonus);
 }
 
@@ -1261,7 +1261,7 @@ boolean is_magic_resistant(unit * magician, unit * target, int resist_bonus)
  * eben) bis zu etwa 1% bei doppelt so gut wie notwendig
  */
 
-boolean fumble(region * r, unit * u, const spell * sp, int cast_grade)
+bool fumble(region * r, unit * u, const spell * sp, int cast_grade)
 {
 /* X ergibt Zahl zwischen 1 und 0, je kleiner, desto besser der Magier.
  * 0,5*40-20=0, dh wenn der Magier doppelt so gut ist, wie der Spruch
@@ -1445,7 +1445,7 @@ static double regeneration(unit * u)
   return aura;
 }
 
-void regeneration_magiepunkte(void)
+void regenerate_aura(void)
 {
   region *r;
   unit *u;
@@ -1500,7 +1500,7 @@ void regeneration_magiepunkte(void)
   }
 }
 
-static boolean
+static bool
 verify_ship(region * r, unit * mage, const spell * sp, spllprm * spobj,
   order * ord)
 {
@@ -1523,7 +1523,7 @@ verify_ship(region * r, unit * mage, const spell * sp, spllprm * spobj,
   return true;
 }
 
-static boolean
+static bool
 verify_building(region * r, unit * mage, const spell * sp, spllprm * spobj,
   order * ord)
 {
@@ -1564,7 +1564,7 @@ message *msg_unitnotfound(const struct unit * mage, struct order * ord,
     "unit region command id", mage, mage->region, ord, uid);
 }
 
-static boolean
+static bool
 verify_unit(region * r, unit * mage, const spell * sp, spllprm * spobj,
   order * ord)
 {
@@ -1907,7 +1907,7 @@ addparam_unit(const char *const param[], spllprm ** spobjp, const unit * u,
 static spellparameter *add_spellparameter(region * target_r, unit * u,
   const char *syntax, const char *const param[], int size, struct order *ord)
 {
-  boolean fail = false;
+  bool fail = false;
   int i = 0;
   int p = 0;
   const char *c;
@@ -2116,7 +2116,7 @@ typedef struct familiar_data {
   unit *familiar;
 } famililar_data;
 
-boolean is_familiar(const unit * u)
+bool is_familiar(const unit * u)
 {
   attrib *a = a_find(u->attribs, &at_familiarmage);
   return i2b(a != NULL);
@@ -2200,7 +2200,7 @@ void remove_familiar(unit * mage)
   }
 }
 
-boolean create_newfamiliar(unit * mage, unit * familiar)
+bool create_newfamiliar(unit * mage, unit * familiar)
 {
   /* if the skill modifier for the mage does not yet exist, add it */
   attrib *a;
@@ -2461,7 +2461,7 @@ unit *get_clone_mage(const unit * u)
   return NULL;
 }
 
-static boolean is_moving_ship(const region * r, ship * sh)
+static bool is_moving_ship(const region * r, ship * sh)
 {
   const unit *u = ship_owner(sh);
 
@@ -2743,13 +2743,15 @@ void magic(void)
         continue;
       }
 
-      for (ord = u->orders; ord; ord = ord->next) {
-        if (get_keyword(ord) == K_CAST) {
-          castorder *co = cast_cmd(u, ord);
-          fset(u, UFL_LONGACTION | UFL_NOTMOVING);
-          if (co) {
-            const spell *sp = co->sp;
-            add_castorder(&spellranks[sp->rank], co);
+      if (u->thisorder != NULL) {
+        for (ord = u->orders; ord; ord = ord->next) {
+          if (get_keyword(ord) == K_CAST) {
+            castorder *co = cast_cmd(u, ord);
+            fset(u, UFL_LONGACTION | UFL_NOTMOVING);
+            if (co) {
+              const spell *sp = co->sp;
+              add_castorder(&spellranks[sp->rank], co);
+            }
           }
         }
       }
@@ -2767,7 +2769,7 @@ void magic(void)
     for (co = spellranks[rank].begin; co; co = co->next) {
       order *ord = co->order;
       int invalid, resist, success, cast_level = co->level;
-      boolean fumbled = false;
+      bool fumbled = false;
       unit *u = co->magician.u;
       const spell *sp = co->sp;
       region *target_r = co_get_region(co);

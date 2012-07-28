@@ -16,12 +16,11 @@ without prior permission by the authors of Eressea.
 #include "bindings.h"
 
 #include <sqlite3.h>
-#include <lua.h>
 #include <tolua.h>
 
 #define LTYPE_DB TOLUA_CAST "db"
 
-extern int db_update_factions(sqlite3 * db, boolean force);
+extern int db_update_factions(sqlite3 * db, bool force);
 static int tolua_db_update_factions(lua_State * L)
 {
   sqlite3 *db = (sqlite3 *) tolua_tousertype(L, 1, 0);
@@ -29,7 +28,7 @@ static int tolua_db_update_factions(lua_State * L)
   return 0;
 }
 
-extern int db_update_scores(sqlite3 * db, boolean force);
+extern int db_update_scores(sqlite3 * db, bool force);
 static int tolua_db_update_scores(lua_State * L)
 {
   sqlite3 *db = (sqlite3 *) tolua_tousertype(L, 1, 0);
