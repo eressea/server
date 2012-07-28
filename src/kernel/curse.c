@@ -438,7 +438,10 @@ double curse_geteffect(const curse * c)
 int curse_geteffect_int(const curse * c)
 {
   double effect = curse_geteffect(c);
-  assert(effect - (int)effect == 0);
+  if (effect - (int)effect != 0) {
+    log_error("curse has an integer attribute with float value: '%s' = %lf",
+              c->type->cname, effect);
+  }
   return (int)effect;
 }
 
