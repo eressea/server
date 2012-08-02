@@ -329,7 +329,7 @@ function test_guard()
   u2:add_item("money", 100)
   u3:add_item("money", 100)
   process_orders()
-  assert_equal(r.id, u1.region.id, "unit may not move after combat")
+  assert_equal(r, u1.region, "unit may not move after combat")
 end
 
 function test_recruit()
