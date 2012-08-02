@@ -237,22 +237,22 @@ function test_taxes()
 end
 
 function test_leave()
-  local r = region.create(0, 0, "plain")
-  local f = faction.create("noreply@eressea.de", "human", "de")
-  f.id = 42
-  local b1 = building.create(r, "castle")
-  b1.size = 10
-  local b2 = building.create(r, "lighthouse")
-  b2.size = 10
-  local u = unit.create(f, r, 1)
-  u.building = b1
-  assert_not_equal(nil, u.building)
-  u:add_item("money", u.number * 100)
-  u:clear_orders()
-  u:add_order("BETRETE BURG " .. itoa36(b2.id))
-  update_owners()
-  process_orders()
-  assert_equal(u.building.id, b1.id, "region owner has left the building") -- region owners may not leave
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    f.id = 42
+    local b1 = building.create(r, "castle")
+    b1.size = 10
+    local b2 = building.create(r, "lighthouse")
+    b2.size = 10
+    local u = unit.create(f, r, 1)
+    u.building = b1
+    assert_not_equal(nil, u.building)
+    u:add_item("money", u.number * 100)
+    u:clear_orders()
+    u:add_order("BETRETE BURG " .. itoa36(b2.id))
+    update_owners()
+    process_orders()
+    assert_equal(u.building, b1, "region owner has left the building") -- region owners may not leave
 end
 
 function test_market()
