@@ -570,20 +570,11 @@ function test_config()
 end
 
 local function _test_create_laen()
-  local r = region.create(0,0, "mountain")
-  local f1 = faction.create("noreply@eressea.de", "human", "de")
-  local u1 = unit.create(f1, r, 1)
-  
-  -- TODO this is a stupid way to create a laen region
-  for i = 1, 10000 do
-    r = region.create(i,0, "mountain")
-    if r:get_resource("laen") > 2 then
-      break
-    end
-  end
-  assert(r:get_resource("laen")>2, "could not run test properly, please try again")
-  
-  return r, u1
+    local r = region.create(0,0, "mountain")
+    local f1 = faction.create("noreply@eressea.de", "human", "de")
+    local u1 = unit.create(f1, r, 1)
+    r:set_resource("laen", 3)
+    return r, u1
 end
 
 function test_laen1()
@@ -611,7 +602,7 @@ function test_laen2()
   u1.building = b
   local laen = r:get_resource("laen")
  
-  process_orders()
+  process_orders() 
   assert_equal(2, u1:get_item("laen"))
   assert_equal(laen - 2, r:get_resource("laen"))
 end

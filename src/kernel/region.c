@@ -1016,6 +1016,16 @@ void region_setresource(region * r, const resource_type * rtype, int value)
       rsetpeasants(r, value);
     else if (rtype == rt_find("horse"))
       rsethorses(r, value);
+    else {
+      int i;
+      for (i = 0; r->terrain->production[i].type; ++i) {
+        const terrain_production *production = r->terrain->production + i;
+        if (production->type==rtype) {
+          add_resource(r, 1, value, dice_rand(production->divisor), rtype);
+          break;
+        }
+      }
+    }
   }
 }
 
