@@ -1604,7 +1604,7 @@ int owner_change(const region * r)
   if (r->land && r->land->ownership) {
     return r->land->ownership->since_turn;
   }
-  return -1;
+  return INT_MIN;
 }
 
 bool is_mourning(const region * r, int in_turn)
