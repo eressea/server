@@ -309,12 +309,13 @@ function test_guard()
   local r = region.create(0, 0, "plain")
   local f1 = faction.create("noreply@eressea.de", "human", "de")
   f1.age = 20
-  local u1 = unit.create(f1, r, 1)
+  local u1 = unit.create(f1, r, 10)
   u1:add_item("sword", 10)
   u1:add_item("money", 10)
   u1:set_skill("melee", 10)
   u1:clear_orders()
   u1:add_order("NACH O")
+  u1.name="Kalle Pimp"
 
   local f2 = faction.create("noreply@eressea.de", "human", "de")
   f2.age = 20
