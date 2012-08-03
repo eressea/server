@@ -179,6 +179,10 @@ function test_ship_capacity()
 
     update_owners()
     process_orders()
+    if r2~=u1.region then
+        print(get_turn(), u1, u1.faction)
+        write_reports()
+    end
     assert_equal(r2, u1.region)
     assert_not_equal(r2, u2.region)
     if r2~=u3.region then
@@ -246,13 +250,14 @@ function test_leave()
     b2.size = 10
     local u = unit.create(f, r, 1)
     u.building = b1
-    assert_not_equal(nil, u.building)
     u:add_item("money", u.number * 100)
     u:clear_orders()
     u:add_order("BETRETE BURG " .. itoa36(b2.id))
-    update_owners()
     process_orders()
-    assert_equal(u.building, b1, "region owner has left the building") -- region owners may not leave
+    init_reports()
+    write_report(u.faction)
+    print(u.faction)
+    assert_equal(b1, u.building, "region owner has left the building") -- region owners may not leave
 end
 
 function test_market()
