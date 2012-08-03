@@ -570,10 +570,11 @@ function test_config()
 end
 
 local function _test_create_laen()
+    eressea.settings.set("rules.terraform.all", "1")
     local r = region.create(0,0, "mountain")
     local f1 = faction.create("noreply@eressea.de", "human", "de")
     local u1 = unit.create(f1, r, 1)
-    r:set_resource("laen", 3)
+    r:set_resource("laen", 50)
     return r, u1
 end
 
@@ -596,15 +597,18 @@ function test_laen2()
   u1:set_skill("mining", 15)
   u1:clear_orders()
   u1:add_order("MACHEN Laen")
- 
+  u1.name = "Laenmeister"
+
   local b = building.create(r, "mine")
   b.size = 10
   u1.building = b
   local laen = r:get_resource("laen")
  
-  process_orders() 
-  assert_equal(2, u1:get_item("laen"))
+  process_orders()
+  init_reports()
+  write_report(u1.faction)
   assert_equal(laen - 2, r:get_resource("laen"))
+  assert_equal(2, u1:get_item("laen"))
 end
 
 function test_mine()

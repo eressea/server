@@ -82,6 +82,10 @@ void terraform_resources(region * r)
 {
   int i;
   const terrain_type *terrain = r->terrain;
+  static int terraform_all = -1;
+  if (terraform_all<0) {
+    terraform_all = get_param_int(global.parameters, "rules.terraform.all", 0);
+  }
 
   if (terrain->production == NULL)
     return;
@@ -94,10 +98,11 @@ void terraform_resources(region * r)
       if (rm->type->rtype == rtype)
         break;
     }
-    if (rm)
+    if (rm) {
       continue;
-
-    if (chance(production->chance)) {
+    }
+    
+    if (terraform_all || chance(production->chance)) {
       add_resource(r, dice_rand(production->startlevel),
         dice_rand(production->base), dice_rand(production->divisor),
         production->type);
