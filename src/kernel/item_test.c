@@ -2,10 +2,34 @@
 
 #include <kernel/types.h>
 #include <kernel/item.h>
+#include <kernel/unit.h>
 #include <util/language.h>
+#include <util/functions.h>
 
 #include <CuTest.h>
 #include <tests.h>
+
+void test_change_item(CuTest * tc)
+{
+  rtype_uchange res_changeitem;
+  const resource_type * rtype;
+  unit * u;
+
+  register_resources();
+  res_changeitem = (rtype_uchange)get_function("changeitem");
+  CuAssertPtrNotNull(tc, res_changeitem);
+
+  test_cleanup();
+  test_create_world();
+  rtype = olditemtype[I_IRON]->rtype;
+
+  u = test_create_unit(0, 0);
+  CuAssertIntEquals(tc, 0, res_changeitem(u, rtype, 0));
+  i_change(&u->items, rtype->itype, 4);
+  CuAssertIntEquals(tc, 4, res_changeitem(u, rtype, 0));
+  CuAssertIntEquals(tc, 1, res_changeitem(u, rtype, -3));
+  CuAssertIntEquals(tc, 1, i_get(u->items, rtype->itype));
+}
 
 void test_resource_type(CuTest * tc)
 {
@@ -68,6 +92,7 @@ void test_findresourcetype(CuTest * tc)
 CuSuite *get_item_suite(void)
 {
   CuSuite *suite = CuSuiteNew();
+  SUITE_ADD_TEST(suite, test_change_item);
   SUITE_ADD_TEST(suite, test_resource_type);
   SUITE_ADD_TEST(suite, test_finditemtype);
   SUITE_ADD_TEST(suite, test_findresourcetype);

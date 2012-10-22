@@ -1226,6 +1226,10 @@ void test_clear_resources(void)
 
 void register_resources(void)
 {
+  static bool registered = false;
+  if (registered) return;
+  registered = true;
+
   register_function((pf_generic) mod_elves_only, "mod_elves_only");
   register_function((pf_generic) mod_dwarves_only, "mod_dwarves_only");
   register_function((pf_generic) res_changeitem, "changeitem");
