@@ -73,7 +73,11 @@ static int res_changeaura(unit * u, const resource_type * rtype, int delta)
 static int res_changeperson(unit * u, const resource_type * rtype, int delta)
 {
   assert(rtype != NULL || !"not implemented");
-  scale_number(u, u->number + delta);
+  if (u->number + delta >=0) {
+    scale_number(u, u->number + delta);
+  } else {
+    scale_number(u, 0);
+  }
   return u->number;
 }
 
