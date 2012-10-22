@@ -89,6 +89,10 @@ static int parse_args(int argc, char **argv, int *exitcode)
         case 't':
           turn = atoi(argv[i][2] ? argv[i]+2 : argv[++i]);
           break;
+        case 'r':
+          entry_point = "run_turn";
+          turn = atoi(argv[i][2] ? argv[i]+2 : argv[++i]);
+          break;
         case 'q':
           verbosity = 0;
           break;
