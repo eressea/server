@@ -1330,3 +1330,10 @@ function test_bug_1795_demons()
   assert_equal(limit+1, u1.number, u1.number .. "!=" .. (limit+1))
   assert_equal(peasants+growth, r:get_resource("peasant"))
 end
+
+function test_faction_flags()
+	f = faction.create("noreply@eressea.de", "human", "de")
+	assert_equal(0, f.flags)
+	f.flags = 42
+	assert_equal(42, f.flags)
+end
