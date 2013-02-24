@@ -11,8 +11,3 @@ Release/
 *.sh
 src/*.vcproj.*.user
 tags
-build*/
-game/server
-game/data/
-game/reports/
-game/*.log
