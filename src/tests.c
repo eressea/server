@@ -180,15 +180,15 @@ void test_create_world(void)
   terrain_type *t_plain, *t_ocean;
   region *island[2];
   int i;
-  item_type * itype;
-  const char * names[] = { "horse", "horse_p", "boat", "boat_p" };
+  const char * names[] = { "horse", "horse_p", "boat", "boat_p", "iron", "iron_p", "stone", "stone_p" };
 
   make_locale("de");
   init_resources();
   assert(!olditemtype[I_HORSE]);
 
-  itype = test_create_itemtype(names);
-  olditemtype[I_HORSE] = itype;
+  olditemtype[I_HORSE] = test_create_itemtype(names+0);
+  olditemtype[I_IRON] = test_create_itemtype(names+4);
+  olditemtype[I_STONE] = test_create_itemtype(names+6);
 
   t_plain = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION);
   t_plain->size = 1000;

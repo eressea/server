@@ -309,12 +309,13 @@ function test_guard()
   local r = region.create(0, 0, "plain")
   local f1 = faction.create("noreply@eressea.de", "human", "de")
   f1.age = 20
-  local u1 = unit.create(f1, r, 1)
+  local u1 = unit.create(f1, r, 10)
   u1:add_item("sword", 10)
   u1:add_item("money", 10)
   u1:set_skill("melee", 10)
   u1:clear_orders()
   u1:add_order("NACH O")
+  u1.name="Kalle Pimp"
 
   local f2 = faction.create("noreply@eressea.de", "human", "de")
   f2.age = 20
@@ -329,7 +330,7 @@ function test_guard()
   u2:add_item("money", 100)
   u3:add_item("money", 100)
   process_orders()
-  assert_equal(r.id, u1.region.id, "unit may not move after combat")
+  assert_equal(r, u1.region, "unit may not move after combat")
 end
 
 function test_recruit()
@@ -569,20 +570,12 @@ function test_config()
 end
 
 local function _test_create_laen()
-  local r = region.create(0,0, "mountain")
-  local f1 = faction.create("noreply@eressea.de", "human", "de")
-  local u1 = unit.create(f1, r, 1)
-  
-  -- TODO this is a stupid way to create a laen region
-  for i = 1, 10000 do
-    r = region.create(i,0, "mountain")
-    if r:get_resource("laen") > 2 then
-      break
-    end
-  end
-  assert(r:get_resource("laen")>2, "could not run test properly, please try again")
-  
-  return r, u1
+    eressea.settings.set("rules.terraform.all", "1")
+    local r = region.create(0,0, "mountain")
+    local f1 = faction.create("noreply@eressea.de", "human", "de")
+    local u1 = unit.create(f1, r, 1)
+    r:set_resource("laen", 50)
+    return r, u1
 end
 
 function test_laen1()
@@ -604,15 +597,18 @@ function test_laen2()
   u1:set_skill("mining", 15)
   u1:clear_orders()
   u1:add_order("MACHEN Laen")
- 
+  u1.name = "Laenmeister"
+
   local b = building.create(r, "mine")
   b.size = 10
   u1.building = b
   local laen = r:get_resource("laen")
  
   process_orders()
-  assert_equal(2, u1:get_item("laen"))
+  init_reports()
+  write_report(u1.faction)
   assert_equal(laen - 2, r:get_resource("laen"))
+  assert_equal(2, u1:get_item("laen"))
 end
 
 function test_mine()
@@ -1333,4 +1329,11 @@ function test_bug_1795_demons()
   
   assert_equal(limit+1, u1.number, u1.number .. "!=" .. (limit+1))
   assert_equal(peasants+growth, r:get_resource("peasant"))
+end
+
+function test_faction_flags()
+	f = faction.create("noreply@eressea.de", "human", "de")
+	assert_equal(0, f.flags)
+	f.flags = 42
+	assert_equal(42, f.flags)
 end

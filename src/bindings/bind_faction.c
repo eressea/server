@@ -160,6 +160,14 @@ static int tolua_faction_get_flags(lua_State * L)
   return 1;
 }
 
+static int tolua_faction_set_flags(lua_State * L)
+{
+  faction *self = (faction *) tolua_tousertype(L, 1, 0);
+  int flags = (int)tolua_tonumber(L, 2, self->flags);
+  self->flags = flags;
+  return 1;
+}
+
 static int tolua_faction_get_options(lua_State * L)
 {
   faction *self = (faction *) tolua_tousertype(L, 1, 0);
@@ -525,7 +533,7 @@ void tolua_faction_open(lua_State * L)
         tolua_faction_set_age);
       tolua_variable(L, TOLUA_CAST "options", tolua_faction_get_options,
         tolua_faction_set_options);
-      tolua_variable(L, TOLUA_CAST "flags", tolua_faction_get_flags, NULL);
+      tolua_variable(L, TOLUA_CAST "flags", tolua_faction_get_flags, tolua_faction_set_flags);
       tolua_variable(L, TOLUA_CAST "lastturn", tolua_faction_get_lastturn,
         tolua_faction_set_lastturn);
 

@@ -2,10 +2,51 @@
 
 #include <kernel/types.h>
 #include <kernel/item.h>
+#include <kernel/pool.h>
+#include <kernel/unit.h>
 #include <util/language.h>
+#include <util/functions.h>
 
 #include <CuTest.h>
 #include <tests.h>
+
+static void test_uchange(CuTest * tc, unit * u, const resource_type * rtype) {
+  int n;
+  change_resource(u, rtype, 4);
+  n = get_resource(u, rtype);
+  CuAssertPtrNotNull(tc, rtype->uchange);
+  CuAssertIntEquals(tc, n, rtype->uchange(u, rtype, 0));
+  CuAssertIntEquals(tc, n-3, rtype->uchange(u, rtype, -3));
+  CuAssertIntEquals(tc, n-3, get_resource(u, rtype));
+  CuAssertIntEquals(tc, 0, rtype->uchange(u, rtype, -n));
+}
+
+void test_change_item(CuTest * tc)
+{
+  unit * u;
+
+  test_cleanup();
+  register_resources();
+  init_resources();
+  test_create_world();
+
+  u = test_create_unit(0, 0);
+  test_uchange(tc, u, olditemtype[I_IRON]->rtype);
+}
+
+void test_change_person(CuTest * tc)
+{
+  unit * u;
+
+  test_cleanup();
+
+  register_resources();
+  init_resources();
+  test_create_world();
+
+  u = test_create_unit(0, 0);
+  test_uchange(tc, u, r_unit);
+}
 
 void test_resource_type(CuTest * tc)
 {
@@ -68,6 +109,8 @@ void test_findresourcetype(CuTest * tc)
 CuSuite *get_item_suite(void)
 {
   CuSuite *suite = CuSuiteNew();
+  SUITE_ADD_TEST(suite, test_change_item);
+  SUITE_ADD_TEST(suite, test_change_person);
   SUITE_ADD_TEST(suite, test_resource_type);
   SUITE_ADD_TEST(suite, test_finditemtype);
   SUITE_ADD_TEST(suite, test_findresourcetype);

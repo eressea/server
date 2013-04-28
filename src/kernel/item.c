@@ -73,7 +73,11 @@ static int res_changeaura(unit * u, const resource_type * rtype, int delta)
 static int res_changeperson(unit * u, const resource_type * rtype, int delta)
 {
   assert(rtype != NULL || !"not implemented");
-  scale_number(u, u->number + delta);
+  if (u->number + delta >=0) {
+    scale_number(u, u->number + delta);
+  } else {
+    scale_number(u, 0);
+  }
   return u->number;
 }
 
@@ -1226,6 +1230,10 @@ void test_clear_resources(void)
 
 void register_resources(void)
 {
+  static bool registered = false;
+  if (registered) return;
+  registered = true;
+
   register_function((pf_generic) mod_elves_only, "mod_elves_only");
   register_function((pf_generic) mod_dwarves_only, "mod_dwarves_only");
   register_function((pf_generic) res_changeitem, "changeitem");
