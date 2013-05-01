@@ -23,6 +23,7 @@ include_directories (${LUA_INCLUDE_DIR})
 include_directories (${LIBXML2_INCLUDE_DIR})
 include_directories (${BSON_INCLUDE_DIR})
 include_directories (${INIPARSER_INCLUDE_DIR})
+include_directories (${CURSES_INCLUDE_DIR})
 
 set (SERVER_SRC
   races/races.c
@@ -49,4 +50,5 @@ target_link_libraries(server
   ${TOLUA_LIBRARIES}
   ${LUA_LIBRARIES}
   ${SQLITE3_LIBRARIES}
+  ${CURSES_LIBRARIES}
 )
