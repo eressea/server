@@ -40,7 +40,7 @@ static void oldfamiliars(unit * u)
   char fname[64];
   /* these familiars have no special skills.
    */
-  snprintf(fname, sizeof(fname), "%s_familiar", u->race->_name[0]);
+  snprintf(fname, sizeof(fname), "%s_familiar", u_race(u)->_name[0]);
   create_mage(u, M_GRAY);
   equip_unit(u, get_equipment(fname));
 }
@@ -55,7 +55,7 @@ static void equip_newunits(const struct equipment *eq, struct unit *u)
 {
   struct region *r = u->region;
 
-  switch (old_race(u->race)) {
+  switch (old_race(u_race(u))) {
   case RC_ELF:
     set_show_item(u->faction, I_FEENSTIEFEL);
     break;

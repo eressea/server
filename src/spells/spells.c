@@ -490,8 +490,8 @@ static const race *select_familiar(const race * magerace, magic_t magiegebiet)
 static void make_familiar(unit * familiar, unit * mage)
 {
   /* skills and spells: */
-  if (familiar->race->init_familiar != NULL) {
-    familiar->race->init_familiar(familiar);
+  if (u_race(familiar)->init_familiar != NULL) {
+    u_race(familiar)->init_familiar(familiar);
   } else {
     log_error("could not perform initialization for familiar %s.\n", familiar->faction->race->_name[0]);
   }
@@ -1636,7 +1636,7 @@ static int sp_great_drought(castorder * co)
           rsetterrain(r, T_OCEAN);
           /* Einheiten duerfen hier auf keinen Fall geloescht werden! */
           for (u = r->units; u; u = u->next) {
-            if (u->race != new_race[RC_SPELL] && u->ship == 0) {
+            if (u_race(u) != new_race[RC_SPELL] && u->ship == 0) {
               set_number(u, 0);
             }
           }
@@ -2151,7 +2151,7 @@ static int sp_ironkeeper(castorder * co)
         tkill));
   }
 
-  msg = msg_message("summon_effect", "mage amount race", mage, 1, keeper->race);
+  msg = msg_message("summon_effect", "mage amount race", mage, 1, u_race(keeper));
   r_addmessage(r, NULL, msg);
   msg_release(msg);
 
@@ -2580,7 +2580,7 @@ static int sp_summondragon(castorder * co)
   for (rl2 = rl; rl2; rl2 = rl2->next) {
     region *r2 = rl2->data;
     for (u = r2->units; u; u = u->next) {
-      if (u->race == new_race[RC_WYRM] || u->race == new_race[RC_DRAGON]) {
+      if (u_race(u) == new_race[RC_WYRM] || u_race(u) == new_race[RC_DRAGON]) {
         attrib *a = a_find(u->attribs, &at_targetregion);
         if (!a) {
           a = a_add(&u->attribs, make_targetregion(r));
@@ -2690,7 +2690,7 @@ static int sp_unholypower(castorder * co)
 
     u = pa->param[i]->data.u;
 
-    switch (old_race(u->race)) {
+    switch (old_race(u_race(u))) {
       case RC_SKELETON:
         target_race = new_race[RC_SKELETON_LORD];
         break;
@@ -2711,7 +2711,7 @@ static int sp_unholypower(castorder * co)
     if (u->number <= n) {
       n -= u->number;
       u->irace = NULL;
-      u->race = target_race;
+      u_setrace(u, target_race);
       u->hp = unit_max_hp(u) * u->number - wounds;
       ADDMSG(&r->msgs, msg_message("unholypower_effect",
           "mage target race", mage, u, target_race));
@@ -3013,7 +3013,7 @@ static int sp_summonshadowlords(castorder * co)
   set_level(u, SK_PERCEPTION, 5);
 
   ADDMSG(&mage->faction->msgs, msg_message("summon_effect", "mage amount race",
-      mage, amount, u->race));
+      mage, amount, u_race(u)));
   return cast_level;
 }
 
@@ -3228,7 +3228,7 @@ static int sp_bloodsacrifice(castorder * co)
 static void skill_summoned(unit * u, int level)
 {
   if (level > 0) {
-    const race *rc = u->race;
+    const race *rc = u_race(u);
     skill_t sk;
     for (sk = 0; sk != MAXSKILLS; ++sk) {
       if (rc->bonus[sk] > 0) {
@@ -3642,7 +3642,7 @@ static int sp_rallypeasantmob(castorder * co)
 
   for (u = r->units; u; u = un) {
     un = u->next;
-    if (is_monsters(u->faction) && u->race == new_race[RC_PEASANT]) {
+    if (is_monsters(u->faction) && u_race(u) == new_race[RC_PEASANT]) {
       rsetpeasants(r, rpeasants(r) + u->number);
       rsetmoney(r, rmoney(r) + get_money(u));
       set_money(u, 0);
@@ -3755,7 +3755,7 @@ static int sp_migranten(castorder * co)
   target = pa->param[0]->data.u;        /* Zieleinheit */
 
   /* Personen unserer Rasse koennen problemlos normal uebergeben werden */
-  if (target->race == mage->faction->race) {
+  if (u_race(target) == mage->faction->race) {
     /* u ist von unserer Art, das Ritual waere verschwendete Aura. */
     ADDMSG(&mage->faction->msgs, msg_message("sp_migranten_fail1",
         "unit region command target", mage, mage->region, co->order, target));
@@ -3766,7 +3766,7 @@ static int sp_migranten(castorder * co)
   }
 
   /* Keine Monstereinheiten */
-  if (!playerrace(target->race)) {
+  if (!playerrace(u_race(target))) {
     ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
         "spellfail_nomonsters", ""));
     return 0;
@@ -4036,7 +4036,7 @@ static int sp_pump(castorder * co)
 
   target = pa->param[0]->data.u;        /* Zieleinheit */
 
-  if (fval(target->race, RCF_UNDEAD)) {
+  if (fval(u_race(target), RCF_UNDEAD)) {
     ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
         "error_not_on_undead", ""));
     return 0;
@@ -4102,7 +4102,7 @@ static int sp_seduce(castorder * co)
 
   target = pa->param[0]->data.u;        /* Zieleinheit */
 
-  if (fval(target->race, RCF_UNDEAD)) {
+  if (fval(u_race(target), RCF_UNDEAD)) {
     ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
         "spellfail_noundead", ""));
     return 0;
@@ -4179,7 +4179,7 @@ static int sp_calm_monster(castorder * co)
 
   target = pa->param[0]->data.u;        /* Zieleinheit */
 
-  if (fval(target->race, RCF_UNDEAD)) {
+  if (fval(u_race(target), RCF_UNDEAD)) {
     ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
         "spellfail_noundead", ""));
     return 0;
@@ -4503,7 +4503,7 @@ int sp_illusionary_shapeshift(castorder * co)
     return 0;
   }
   irace = u_irace(u);
-  if (irace == u->race) {
+  if (irace == u_race(u)) {
     trigger *trestore = trigger_changerace(u, NULL, irace);
     add_trigger(&u->attribs, "timer", trigger_timeout((int)power + 2,
         trestore));
@@ -4712,7 +4712,7 @@ int sp_dreamreading(castorder * co)
   u = pa->param[0]->data.u;
 
   /* Illusionen und Untote abfangen. */
-  if (fval(u->race, RCF_UNDEAD | RCF_ILLUSIONARY)) {
+  if (fval(u_race(u), RCF_UNDEAD | RCF_ILLUSIONARY)) {
     ADDMSG(&mage->faction->msgs, msg_unitnotfound(mage, co->order,
         pa->param[0]));
     return 0;
@@ -5521,7 +5521,7 @@ int sp_showastral(castorder * co)
     region *r2 = rl2->data;
     if (!is_cursed(r2->attribs, C_ASTRALBLOCK, 0)) {
       for (u = r2->units; u; u = u->next) {
-        if (u->race != new_race[RC_SPECIAL] && u->race != new_race[RC_SPELL])
+        if (u_race(u) != new_race[RC_SPECIAL] && u_race(u) != new_race[RC_SPELL])
           n++;
       }
     }
@@ -5541,7 +5541,7 @@ int sp_showastral(castorder * co)
     for (rl2 = rl; rl2; rl2 = rl2->next) {
       if (!is_cursed(rl2->data->attribs, C_ASTRALBLOCK, 0)) {
         for (u = rl2->data->units; u; u = u->next) {
-          if (u->race != new_race[RC_SPECIAL] && u->race != new_race[RC_SPELL]) {
+          if (u_race(u) != new_race[RC_SPECIAL] && u_race(u) != new_race[RC_SPELL]) {
             c++;
             scat(unitname(u));
             scat(" (");
@@ -5551,7 +5551,7 @@ int sp_showastral(castorder * co)
             }
             icat(u->number);
             scat(" ");
-            scat(LOC(mage->faction->locale, rc_name(u->race, u->number != 1)));
+            scat(LOC(mage->faction->locale, rc_name(u_race(u), u->number != 1)));
             scat(", Entfernung ");
             icat(distance(rl2->data, rt));
             scat(")");
@@ -5681,7 +5681,7 @@ int sp_disruptastral(castorder * co)
 
     if (trl != NULL) {
       for (u = r2->units; u; u = u->next) {
-        if (u->race != new_race[RC_SPELL]) {
+        if (u_race(u) != new_race[RC_SPELL]) {
           region_list *trl2 = trl;
           region *tr;
           int c = rng_int() % inhab_regions;

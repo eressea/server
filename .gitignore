@@ -12,3 +12,7 @@ ipch/
 src/Release/
 game-e3/data/
 game-e3/reports/
+game-e3/*.log*
+game-e2/data
+game-e2/reports/
+game-e2/*.log*

@@ -525,7 +525,7 @@ int sp_mindblast_temp(struct castorder * co)
       continue;
     }
 
-    if (humanoidrace(du->race) && force >= du->number) {
+    if (humanoidrace(u_race(du)) && force >= du->number) {
       if (!is_magic_resistant(mage, du, 0)) {
         skill_t sk = random_skill(du, true);
         if (sk != NOSKILL) {
@@ -591,7 +591,7 @@ int sp_mindblast(struct castorder * co)
       continue;
     }
 
-    if (humanoidrace(du->race) && force >= du->number) {
+    if (humanoidrace(u_race(du)) && force >= du->number) {
       if (!is_magic_resistant(mage, du, 0)) {
         skill_t sk = random_skill(du, false);
         if (sk != NOSKILL) {
@@ -815,7 +815,7 @@ int sp_shadowcall(struct castorder * co)
   make_fighter(b, u, fi->side, is_attacker(fi));
   msg =
     msg_message("sp_shadowcall_effect", "mage amount race", mage, u->number,
-    u->race);
+    u_race(u));
   message_all(b, msg);
   msg_release(msg);
   return level;
@@ -980,7 +980,7 @@ int sp_chaosrow(struct castorder * co)
     if (chance(power / n)) {
       int row = statusrow(df->status);
       df->side->size[row] -= df->alive;
-      if (df->unit->race->battle_flags & BF_NOBLOCK) {
+      if (u_race(df->unit)->battle_flags & BF_NOBLOCK) {
         df->side->nonblockers[row] -= df->alive;
       }
       row = FIRST_ROW + (rng_int() % (LAST_ROW - FIRST_ROW));
@@ -1002,7 +1002,7 @@ int sp_chaosrow(struct castorder * co)
       }
       assert(statusrow(df->status) == row);
       df->side->size[row] += df->alive;
-      if (df->unit->race->battle_flags & BF_NOBLOCK) {
+      if (u_race(df->unit)->battle_flags & BF_NOBLOCK) {
         df->side->nonblockers[row] += df->alive;
       }
       k += df->alive;
@@ -1074,7 +1074,7 @@ int sp_flee(struct castorder * co)
         --force;
         ++panik;
       } else if (!(df->person[n].flags & FL_COURAGE)
-        || !fval(df->unit->race, RCF_UNDEAD)) {
+        || !fval(u_race(df->unit), RCF_UNDEAD)) {
         if (!is_magic_resistant(mage, df->unit, 0)) {
           df->person[n].flags |= FL_PANICED;
           ++panik;
@@ -1552,7 +1552,7 @@ int sp_reanimate(struct castorder * co)
   while (healable--) {
     fighter *tf = select_corpse(b, fi);
     if (tf != NULL && tf->side->casualties > 0
-      && tf->unit->race != new_race[RC_DAEMON]
+      && u_race(tf->unit) != new_race[RC_DAEMON]
       && (chance(c))) {
       assert(tf->alive < tf->unit->number);
       /* t.fighter->person[].hp beginnt mit t.index = 0 zu zählen,
@@ -1617,11 +1617,11 @@ static int heal_fighters(quicklist * fgs, int *power, bool heal_monsters)
       break;
 
     /* Untote kann man nicht heilen */
-    if (df->unit->number == 0 || fval(df->unit->race, RCF_NOHEAL))
+    if (df->unit->number == 0 || fval(u_race(df->unit), RCF_NOHEAL))
       continue;
 
     /* wir heilen erstmal keine Monster */
-    if (heal_monsters || playerrace(df->unit->race)) {
+    if (heal_monsters || playerrace(u_race(df->unit))) {
       int n, hp = df->unit->hp / df->unit->number;
       int rest = df->unit->hp % df->unit->number;
 
@@ -1718,7 +1718,7 @@ int sp_undeadhero(struct castorder * co)
       break;
 
     /* keine Monster */
-    if (!playerrace(du->race))
+    if (!playerrace(u_race(du)))
       continue;
 
     if (df->alive + df->run.number < du->number) {
