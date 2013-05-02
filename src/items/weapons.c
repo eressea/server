@@ -72,9 +72,10 @@ attack_firesword(const troop * at, const struct weapon_type *wtype,
 
   do {
     dt = select_enemy(fi, 0, 1, SELECT_ADVANCE | SELECT_DISTANCE);
-    assert(dt.fighter);
     --force;
-    killed += terminate(dt, *at, AT_SPELL, damage, 1);
+    if (dt.fighter) {
+      killed += terminate(dt, *at, AT_SPELL, damage, 1);
+    }
   } while (force && killed < enemies);
   if (casualties)
     *casualties = killed;

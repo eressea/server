@@ -2,6 +2,8 @@
 
 #include <platform.h>
 #include <kernel/types.h>
+#include <kernel/alliance.h>
+#include <kernel/config.h>
 #include <kernel/magic.h>
 #include <kernel/order.h>
 #include <kernel/battle.h>
@@ -215,6 +217,32 @@ void process_guard_on(void) {
   process_cmd(K_GUARD, guard_on_cmd, PROC_LAND_REGION);
 }
 
+void process_explain(void) {
+  process_cmd(K_RESHOW, reshow_cmd, 0);
+}
+
+void process_reserve(void) {
+  process_cmd(K_RESERVE, reserve_cmd, 0);
+}
+
+void process_claim(void) {
+  process_cmd(K_CLAIM, claim_cmd, 0);
+}
+
+void process_follow(void) {
+  struct region *r;
+  for (r = regions; r; r = r->next) {
+    unit * u;
+    for (u=r->units; u; u=u->next) {
+      follow_unit(u);
+    }
+  }
+}
+
+void process_messages(void) {
+  process_cmd(K_MAIL, mail_cmd, 0);
+}
+
 void process_guard_off(void) {
   process_cmd(K_GUARD, guard_off_cmd, PROC_LAND_REGION);
 }
@@ -245,5 +273,22 @@ void process_maintenance(void) {
       }
     }
     maintain_buildings(r, 0);
+  }
+}
+
+void process_alliance(void) {
+  alliance_cmd();
+}
+
+void process_idle(void) {
+  region * r;
+  for (r=regions; r; r=r->next) {
+    auto_work(r);
+  }
+}
+
+void process_set_default(void) {
+  if (!global.disabled[K_DEFAULT]) {
+    defaultorders();
   }
 }

@@ -7290,6 +7290,7 @@
 
   <string name="nr_insectfall">
     <text locale="de">Es ist Spätherbst, und diese Woche ist die letzte vor dem Winter, in der Insekten rekrutieren können.</text>
+    <text locale="en">It is the last week before winter in which insects can still recruit.</text>
   </string>
 
   <string name="nr_owner">

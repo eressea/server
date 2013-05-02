@@ -96,7 +96,7 @@ int change_resource(unit * u, const resource_type * rtype, int change)
 
 int get_reservation(const unit * u, const resource_type * rtype)
 {
-  struct reservation *res = u->reservations;
+  reservation *res = u->reservations;
 
   if (rtype == oldresourcetype[R_STONE] && (u_race(u)->flags & RCF_STONEGOLEM))
     return (u->number * GOLEM_STONE);
@@ -111,7 +111,7 @@ int get_reservation(const unit * u, const resource_type * rtype)
 
 int change_reservation(unit * u, const resource_type * rtype, int value)
 {
-  struct reservation *res, **rp = &u->reservations;
+  reservation *res, **rp = &u->reservations;
 
   if (!value)
     return 0;
@@ -120,7 +120,7 @@ int change_reservation(unit * u, const resource_type * rtype, int value)
     rp = &(*rp)->next;
   res = *rp;
   if (!res) {
-    *rp = res = calloc(sizeof(struct reservation), 1);
+    *rp = res = calloc(sizeof(reservation), 1);
     res->type = rtype;
     res->value = value;
   } else if (res && res->value + value <= 0) {
@@ -133,9 +133,9 @@ int change_reservation(unit * u, const resource_type * rtype, int value)
   return res->value;
 }
 
-static int new_set_resvalue(unit * u, const resource_type * rtype, int value)
+int set_resvalue(unit * u, const resource_type * rtype, int value)
 {
-  struct reservation *res, **rp = &u->reservations;
+  reservation *res, **rp = &u->reservations;
 
   while (*rp && (*rp)->type != rtype)
     rp = &(*rp)->next;
@@ -143,7 +143,7 @@ static int new_set_resvalue(unit * u, const resource_type * rtype, int value)
   if (!res) {
     if (!value)
       return 0;
-    *rp = res = calloc(sizeof(struct reservation), 1);
+    *rp = res = calloc(sizeof(reservation), 1);
     res->type = rtype;
     res->value = value;
   } else if (res && value <= 0) {
@@ -252,35 +252,4 @@ use_pooled(unit * u, const resource_type * rtype, unsigned int mode, int count)
       }
   }
   return count - use;
-}
-
-int reserve_cmd(unit * u, struct order *ord)
-{
-  if (u->number > 0 && (urace(u)->ec_flags & GETITEM)) {
-    int use, count;
-    const resource_type *rtype;
-    const char *s;
-
-    init_tokens(ord);
-    skip_token();
-    s = getstrtoken();
-    count = atoip((const char *)s);
-
-    if (count == 0 && findparam(s, u->faction->locale) == P_EACH) {
-      count = getint() * u->number;
-    }
-
-    rtype = findresourcetype(getstrtoken(), u->faction->locale);
-    if (rtype == NULL)
-      return 0;
-
-    new_set_resvalue(u, rtype, 0);      /* make sure the pool is empty */
-    use = use_pooled(u, rtype, GET_DEFAULT, count);
-    if (use) {
-      new_set_resvalue(u, rtype, use);
-      change_resource(u, rtype, use);
-      return use;
-    }
-  }
-  return 0;
 }

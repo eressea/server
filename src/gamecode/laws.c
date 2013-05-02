@@ -1261,9 +1261,11 @@ int enter_ship(unit * u, struct order *ord, int id, int report)
     }
   }
 
-  if (leave(u, 0)) {
+  if (leave(u, false)) {
     u_set_ship(u, sh);
     fset(u, UFL_ENTER);
+  } else if (report) {
+    cmistake(u, ord, 150, MSG_MOVE);
   }
   return 1;
 }
@@ -1310,6 +1312,8 @@ int enter_building(unit * u, order * ord, int id, int report)
     fset(u, UFL_ENTER);
     u_set_building(u, b);
     return 1;
+  } else if (report) {
+    cmistake(u, ord, 150, MSG_MOVE);
   }
   return 0;
 }
@@ -2167,7 +2171,7 @@ static void mailfaction(unit * u, int n, struct order *ord, const char *s)
     cmistake(u, ord, 66, MSG_MESSAGE);
 }
 
-static int mail_cmd(unit * u, struct order *ord)
+int mail_cmd(unit * u, struct order *ord)
 {
   region *r = u->region;
   unit *u2;
@@ -2782,7 +2786,7 @@ int guard_off_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-static int reshow_cmd(unit * u, struct order *ord)
+int reshow_cmd(unit * u, struct order *ord)
 {
   const char *s;
   param_t p = NOPARAM;
@@ -3711,7 +3715,7 @@ void update_long_order(unit * u)
       case K_CAST:
         /* dient dazu, das neben Zaubern kein weiterer Befehl
          * ausgeführt werden kann, Zaubern ist ein kurzer Befehl */
-        set_order(&u->thisorder, NULL);
+        set_order(&u->thisorder, copy_order(ord));
         break;
 
       default:
@@ -3868,9 +3872,11 @@ static void remove_exclusive(order ** ordp)
   }
 }
 
-static void defaultorders(void)
+void defaultorders(void)
 {
   region *r;
+
+  assert(!global.disabled[K_DEFAULT]);
   for (r = regions; r; r = r->next) {
     unit *u;
     for (u = r->units; u; u = u->next) {
@@ -4055,7 +4061,39 @@ int pay_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-static int claim_cmd(unit * u, struct order *ord)
+
+int reserve_cmd(unit * u, struct order *ord)
+{
+  if (u->number > 0 && (urace(u)->ec_flags & GETITEM)) {
+    int use, count;
+    const resource_type *rtype;
+    const char *s;
+
+    init_tokens(ord);
+    skip_token();
+    s = getstrtoken();
+    count = atoip((const char *)s);
+
+    if (count == 0 && findparam(s, u->faction->locale) == P_EACH) {
+      count = getint() * u->number;
+    }
+
+    rtype = findresourcetype(getstrtoken(), u->faction->locale);
+    if (rtype == NULL)
+      return 0;
+
+    set_resvalue(u, rtype, 0);      /* make sure the pool is empty */
+    use = use_pooled(u, rtype, GET_DEFAULT, count);
+    if (use) {
+      set_resvalue(u, rtype, use);
+      change_resource(u, rtype, use);
+      return use;
+    }
+  }
+  return 0;
+}
+
+int claim_cmd(unit * u, struct order *ord)
 {
   const char *t;
   int n;

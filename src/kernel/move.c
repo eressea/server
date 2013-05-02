@@ -2697,12 +2697,13 @@ void follow_unit(unit * u)
       attrib *a2 = a_find(u2->attribs, &at_follow);
       if (a2 != NULL) {
         unit *u3 = a2->data.v;
-        follow = (u3 && u2->region == u2->region);
+        follow = (u3 && u2->region == u3->region);
       }
     }
     if (follow) {
       fset(u, UFL_FOLLOWING);
       fset(u2, UFL_FOLLOWED);
+      /* FOLLOW unit on a (potentially) moving unit prevents long orders */
       set_order(&u->thisorder, NULL);
     }
   }

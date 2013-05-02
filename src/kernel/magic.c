@@ -2743,13 +2743,15 @@ void magic(void)
         continue;
       }
 
-      for (ord = u->orders; ord; ord = ord->next) {
-        if (get_keyword(ord) == K_CAST) {
-          castorder *co = cast_cmd(u, ord);
-          fset(u, UFL_LONGACTION | UFL_NOTMOVING);
-          if (co) {
-            const spell *sp = co->sp;
-            add_castorder(&spellranks[sp->rank], co);
+      if (u->thisorder != NULL) {
+        for (ord = u->orders; ord; ord = ord->next) {
+          if (get_keyword(ord) == K_CAST) {
+            castorder *co = cast_cmd(u, ord);
+            fset(u, UFL_LONGACTION | UFL_NOTMOVING);
+            if (co) {
+              const spell *sp = co->sp;
+              add_castorder(&spellranks[sp->rank], co);
+            }
           }
         }
       }

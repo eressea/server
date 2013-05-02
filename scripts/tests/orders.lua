@@ -236,3 +236,31 @@ end
 function test_process_guard_off()
     eressea.process.guard_off()
 end
+
+function test_process_explain()
+    eressea.process.explain()
+end
+
+function test_process_messages()
+    eressea.process.messages()
+end
+
+function test_process_reserve()
+    eressea.process.reserve()
+end
+
+function test_process_claim()
+    eressea.process.claim()
+end
+
+function test_process_follow()
+    eressea.process.follow()
+end
+
+function test_process_idle()
+    eressea.process.idle()
+end
+
+function test_process_set_default()
+    eressea.process.set_default()
+end

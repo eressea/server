@@ -34,5 +34,13 @@ module eressea {
 		void process_regeneration @ regeneration(void); /* regen health & aura */
 		void process_guard_on @ guard_on(void); /* GUARD */
 		void process_guard_off @ guard_off(void); /* GUARD NOT */
+		void process_explain @ explain(void); /* SHOW */
+		void process_messages @ messages(void); /* MESSAGE */
+		void process_reserve @ reserve(void); /* RESERVE */
+		void process_claim @ claim(void); /* CLAIM */
+		void process_follow @ follow(void); /* FOLLOW */
+        void process_alliance @ alliance(void); /* FOLLOW */
+        void process_idle @ idle(void); /* work.auto */
+        void process_set_default @ set_default(void); /* work.auto */
 	}
 }

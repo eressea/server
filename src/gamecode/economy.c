@@ -215,6 +215,9 @@ typedef struct recruitment {
   int total, assigned;
 } recruitment;
 
+/** Creates a list of recruitment structs, one for each faction. Adds every quantifyable request
+ * to the faction's struct and to total.
+ */
 static recruitment *select_recruitment(request ** rop,
   int (*quantify) (const struct race *, int), int *total)
 {
@@ -292,14 +295,14 @@ static int any_recruiters(const struct race *rc, int qty)
   return (int)(qty * 2 * rc->recruit_multi);
 }
 
-static int peasant_recruiters(const struct race *rc, int qty)
+/*static int peasant_recruiters(const struct race *rc, int qty)
 {
   if (rc->ec_flags & ECF_REC_ETHEREAL)
     return -1;
   if (rc->ec_flags & ECF_REC_HORSES)
     return -1;
   return (int)(qty * 2 * rc->recruit_multi);
-}
+}*/
 
 static int horse_recruiters(const struct race *rc, int qty)
 {
@@ -315,10 +318,12 @@ static int do_recruiting(recruitment * recruits, int available)
   recruitment *rec;
   int recruited = 0;
 
+  /* try to assign recruits to factions fairly */
   while (available > 0) {
     int n = 0;
     int rest, mintotal = INT_MAX;
 
+    /* find smallest request */
     for (rec = recruits; rec != NULL; rec = rec->next) {
       int want = rec->total - rec->assigned;
       if (want > 0) {
@@ -334,6 +339,8 @@ static int do_recruiting(recruitment * recruits, int available)
     }
     rest = available - mintotal * n;
 
+    /* assign size of smallest request for everyone if possible; in the end roll dice to assign
+     * small rest */
     for (rec = recruits; rec != NULL; rec = rec->next) {
       int want = rec->total - rec->assigned;
 
@@ -350,6 +357,7 @@ static int do_recruiting(recruitment * recruits, int available)
     }
   }
 
+  /* do actual recruiting */
   for (rec = recruits; rec != NULL; rec = rec->next) {
     request *req;
     int get = rec->assigned;
@@ -365,14 +373,16 @@ static int do_recruiting(recruitment * recruits, int available)
         int afford = get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT,
           number * rc->recruitcost) / rc->recruitcost;
         number = MIN(number, afford);
-        use_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT,
-          rc->recruitcost * number);
       }
       if (u->number + number > UNIT_MAXSIZE) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, req->ord, "error_unit_size",
             "maxsize", UNIT_MAXSIZE));
         number = UNIT_MAXSIZE - u->number;
         assert(number >= 0);
+      }
+      if (rc->recruitcost) {
+        use_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT,
+          rc->recruitcost * number);
       }
       add_recruits(u, number, req->qty);
       dec = (int)(number * multi);
@@ -449,7 +459,7 @@ static void expandrecruit(region * r, request * recruitorders)
   }
 
   /* peasant limited: */
-  recruits = select_recruitment(&recruitorders, peasant_recruiters, &orc_total);
+  recruits = select_recruitment(&recruitorders, any_recruiters, &orc_total);
   if (recruits) {
     int orc_recruited, orc_peasants = rpeasants(r) * 2;
     int orc_frac = orc_peasants / RECRUITFRACTION;      /* anzahl orks. 2 ork = 1 bauer */
@@ -464,10 +474,10 @@ static void expandrecruit(region * r, request * recruitorders)
   /* no limit: */
   recruits = select_recruitment(&recruitorders, any_recruiters, &orc_total);
   if (recruits) {
-    int recruited, peasants = rpeasants(r);
+    int recruited, peasants = rpeasants(r) * 2;
     recruited = do_recruiting(recruits, INT_MAX);
     if (recruited > 0) {
-      rsetpeasants(r, peasants - recruited / 2);
+      rsetpeasants(r, (peasants - recruited) / 2);
     }
     free_recruitments(recruits);
   }

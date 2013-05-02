@@ -71,6 +71,12 @@ extern "C" {
   extern int maxheroes(const struct faction *f);
   extern int countheroes(const struct faction *f);
 
+  typedef struct reservation {
+    struct reservation *next;
+    const struct resource_type *type;
+    int value;
+  } reservation;
+
   typedef struct unit {
     struct unit *next;          /* needs to be first entry, for region's unitlist */
     struct unit *nextF;         /* nächste Einheit der Partei */
@@ -90,11 +96,7 @@ extern "C" {
     short skill_size;
     struct skill *skills;
     struct item *items;
-    struct reservation {
-      struct reservation *next;
-      const struct resource_type *type;
-      int value;
-    } *reservations;
+    reservation *reservations;
 
     /* orders */
     struct order *orders;

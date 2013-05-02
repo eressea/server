@@ -50,6 +50,7 @@ extern "C" {
   extern int enter_ship(struct unit *u, struct order *ord, int id, int report);
 
   extern void new_units(void);
+  extern void defaultorders(void);
   extern void quit(void);
   extern void monthly_healing(void);
   extern void renumber_factions(void);
@@ -81,7 +82,12 @@ extern "C" {
   extern int contact_cmd(struct unit *u, struct order *ord);
   extern int guard_on_cmd(struct unit *u, struct order *ord);
   extern int guard_off_cmd(struct unit *u, struct order *ord);
-  
+  extern int reshow_cmd(struct unit *u, struct order *ord);
+  extern int mail_cmd(struct unit *u, struct order *ord);
+  extern int reserve_cmd(struct unit *u, struct order *ord);
+  extern int claim_cmd(struct unit *u, struct order *ord);
+  extern int follow_cmd(struct unit *u, struct order *ord);
+
 #ifdef __cplusplus
 }
 #endif
