@@ -189,7 +189,7 @@ void give_men(int n, unit * u, unit * u2, struct order *ord)
     return;
   } else if (u == u2) {
     error = 10;
-  } else if (!u2 && u->race == new_race[RC_SNOTLING]) {
+  } else if (!u2 && u_race(u) == new_race[RC_SNOTLING]) {
     /* snotlings may not be given to the peasants. */
     error = 307;
   } else if (u2 && u2->number && (fval(u, UFL_HERO) != fval(u2, UFL_HERO))) {
@@ -214,8 +214,8 @@ void give_men(int n, unit * u, unit * u2, struct order *ord)
   } else if (u2 && (fval(u, UFL_WERE) != fval(u2, UFL_WERE))) {
     /* werewolves can't be given to non-werewolves and vice-versa */
     error = 312;
-  } else if (u2 && u2->number != 0 && u2->race != u->race) {
-    log_warning("faction %s attempts to give %s to %s.\n", itoa36(u->faction->no), u->race->_name[0], u2->race->_name[1]);
+  } else if (u2 && u2->number != 0 && u_race(u2) != u_race(u)) {
+    log_warning("faction %s attempts to give %s to %s.\n", itoa36(u->faction->no), u_race(u)->_name[0], u_race(u2)->_name[1]);
     error = 139;
   } else if (u2 != NULL && (get_racename(u2->attribs)
       || get_racename(u->attribs))) {
@@ -236,7 +236,7 @@ void give_men(int n, unit * u, unit * u2, struct order *ord)
     } else if (u2 && u->faction != u2->faction) {
       if (u2->faction->newbies + n > MAXNEWBIES) {
         error = 129;
-      } else if (u->race != u2->faction->race) {
+      } else if (u_race(u) != u2->faction->race) {
         if (u2->faction->race != new_race[RC_HUMAN]) {
           error = 120;
         } else if (count_migrants(u2->faction) + n >
@@ -277,7 +277,7 @@ void give_men(int n, unit * u, unit * u2, struct order *ord)
   if (error == 0) {
     if (u2 && u2->number == 0) {
       set_racename(&u2->attribs, get_racename(u->attribs));
-      u2->race = u->race;
+      u_setrace(u2, u_race(u));
       u2->irace = u->irace;
       if (fval(u, UFL_HERO))
         fset(u2, UFL_HERO);
@@ -322,7 +322,7 @@ void give_men(int n, unit * u, unit * u2, struct order *ord)
     } else {
       if (getunitpeasants) {
 #ifdef ORCIFICATION
-        if (u->race == new_race[RC_SNOTLING] && !fval(u->region, RF_ORCIFIED)) {
+        if (u_race(u) == new_race[RC_SNOTLING] && !fval(u->region, RF_ORCIFIED)) {
           attrib *a = a_find(u->region->attribs, &at_orcification);
           if (!a)
             a = a_add(&u->region->attribs, a_new(&at_orcification));
@@ -416,7 +416,7 @@ void give_unit(unit * u, unit * u2, order * ord)
     cmistake(u, ord, 129, MSG_COMMERCE);
     return;
   }
-  if (u->race != u2->faction->race) {
+  if (u_race(u) != u2->faction->race) {
     if (u2->faction->race != new_race[RC_HUMAN]) {
       cmistake(u, ord, 120, MSG_COMMERCE);
       return;

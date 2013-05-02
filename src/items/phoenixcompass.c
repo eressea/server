@@ -61,7 +61,7 @@ use_phoenixcompass(struct unit *u, const struct item_type *itype,
 
   for (r = regions; r; r = r->next) {
     for (u2 = r->units; u2; u2 = u2->next) {
-      if (u2->race == rc_phoenix) {
+      if (u_race(u2) == rc_phoenix) {
         if (closest_phoenix == NULL) {
           closest_phoenix = u2;
           closest_phoenix_distance =

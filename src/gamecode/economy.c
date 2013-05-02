@@ -126,7 +126,7 @@ static void recruit_init(void)
 
 int income(const unit * u)
 {
-  switch (old_race(u->race)) {
+  switch (old_race(u_race(u))) {
   case RC_FIREDRAGON:
     return 150 * u->number;
   case RC_DRAGON:
@@ -224,7 +224,7 @@ static recruitment *select_recruitment(request ** rop,
     recruitment *rec = recruits;
     request *ro = *rop;
     unit *u = ro->unit;
-    const race *rc = u->race;
+    const race *rc = u_race(u);
     int qty = quantify(rc, ro->qty);
 
     if (qty < 0) {
@@ -264,15 +264,15 @@ static void add_recruits(unit * u, int number, int wanted)
       u->hp = number * unit_max_hp(u);
       unew = u;
     } else {
-      unew = create_unit(r, u->faction, number, u->race, 0, NULL, u);
+      unew = create_unit(r, u->faction, number, u_race(u), 0, NULL, u);
     }
 
     strlcpy(equipment, "new_", sizeof(equipment));
-    strlcat(equipment, u->race->_name[0], sizeof(equipment));
+    strlcat(equipment, u_race(u)->_name[0], sizeof(equipment));
     strlcat(equipment, "_unit", sizeof(equipment));
     equip_unit(unew, get_equipment(equipment));
 
-    if (unew->race->ec_flags & ECF_REC_HORSES) {
+    if (u_race(unew)->ec_flags & ECF_REC_HORSES) {
       change_level(unew, SK_RIDING, 1);
     }
 
@@ -356,7 +356,7 @@ static int do_recruiting(recruitment * recruits, int available)
 
     for (req = rec->requests; req; req = req->next) {
       unit *u = req->unit;
-      const race *rc = u->race; /* race is set in recruit() */
+      const race *rc = u_race(u); /* race is set in recruit() */
       int number, dec;
       float multi = 2.0F * rc->recruit_multi;
 
@@ -494,7 +494,7 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
   request *o;
   int recruitcost = -1;
   const faction *f = u->faction;
-  const struct race *rc = u->race;
+  const struct race *rc = u_race(u);
   const char *str;
 
   init_tokens(ord);
@@ -513,14 +513,14 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
     }
   }
   if (recruitcost < 0) {
-    rc = u->race;
+    rc = u_race(u);
     recruitcost = recruit_cost(f, rc);
     if (recruitcost < 0) {
       recruitcost = INT_MAX;
     }
   }
   assert(rc);
-  u->race = rc;
+  u_setrace(u, rc);
 
 #if GUARD_DISABLES_RECRUIT
   /* this is a very special case because the recruiting unit may be empty
@@ -757,7 +757,7 @@ static void give_cmd(unit * u, order * ord)
     return;
   }
 
-  if (u2 && u2->race == new_race[RC_SPELL]) {
+  if (u2 && u_race(u2) == new_race[RC_SPELL]) {
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found",
         ""));
     return;
@@ -770,18 +770,18 @@ static void give_cmd(unit * u, order * ord)
 
   else if (p == P_HERBS) {
     bool given = false;
-    if (!(u->race->ec_flags & GIVEITEM) && u2 != NULL) {
+    if (!(u_race(u)->ec_flags & GIVEITEM) && u2 != NULL) {
       ADDMSG(&u->faction->msgs,
-        msg_feedback(u, ord, "race_nogive", "race", u->race));
+        msg_feedback(u, ord, "race_nogive", "race", u_race(u)));
       return;
     }
     if (!check_give(u, u2, NULL, GIVE_HERBS)) {
       feedback_give_not_allowed(u, ord);
       return;
     }
-    if (u2 && !(u2->race->ec_flags & GETITEM)) {
+    if (u2 && !(u_race(u2)->ec_flags & GETITEM)) {
       ADDMSG(&u->faction->msgs,
-        msg_feedback(u, ord, "race_notake", "race", u2->race));
+        msg_feedback(u, ord, "race_notake", "race", u_race(u2)));
       return;
     }
     if (!u2) {
@@ -821,7 +821,7 @@ static void give_cmd(unit * u, order * ord)
   }
 
   else if (p == P_UNIT) {       /* Einheiten uebergeben */
-    if (!(u->race->ec_flags & GIVEUNIT)) {
+    if (!(u_race(u)->ec_flags & GIVEUNIT)) {
       cmistake(u, ord, 167, MSG_COMMERCE);
       return;
     }
@@ -841,14 +841,14 @@ static void give_cmd(unit * u, order * ord)
     if (*s == 0) {              /* GIVE ALL items that you have */
 
       /* do these checks once, not for each item we have: */
-      if (!(u->race->ec_flags & GIVEITEM) && u2 != NULL) {
+      if (!(u_race(u)->ec_flags & GIVEITEM) && u2 != NULL) {
         ADDMSG(&u->faction->msgs,
-          msg_feedback(u, ord, "race_nogive", "race", u->race));
+          msg_feedback(u, ord, "race_nogive", "race", u_race(u)));
         return;
       }
-      if (u2 && !(u2->race->ec_flags & GETITEM)) {
+      if (u2 && !(u_race(u2)->ec_flags & GETITEM)) {
         ADDMSG(&u->faction->msgs,
-          msg_feedback(u, ord, "race_notake", "race", u2->race));
+          msg_feedback(u, ord, "race_notake", "race", u_race(u2)));
         return;
       }
 
@@ -872,19 +872,19 @@ static void give_cmd(unit * u, order * ord)
       }
     } else {
       if (isparam(s, u->faction->locale, P_PERSON)) {
-        if (!(u->race->ec_flags & GIVEPERSON)) {
+        if (!(u_race(u)->ec_flags & GIVEPERSON)) {
           ADDMSG(&u->faction->msgs,
-            msg_feedback(u, ord, "race_noregroup", "race", u->race));
+            msg_feedback(u, ord, "race_noregroup", "race", u_race(u)));
         } else {
           n = u->number;
           give_men(n, u, u2, ord);
         }
-      } else if (!(u->race->ec_flags & GIVEITEM) && u2 != NULL) {
+      } else if (!(u_race(u)->ec_flags & GIVEITEM) && u2 != NULL) {
         ADDMSG(&u->faction->msgs,
-          msg_feedback(u, ord, "race_nogive", "race", u->race));
-      } else if (u2 && !(u2->race->ec_flags & GETITEM)) {
+          msg_feedback(u, ord, "race_nogive", "race", u_race(u)));
+      } else if (u2 && !(u_race(u2)->ec_flags & GETITEM)) {
         ADDMSG(&u->faction->msgs,
-          msg_feedback(u, ord, "race_notake", "race", u2->race));
+          msg_feedback(u, ord, "race_notake", "race", u_race(u2)));
       } else {
         itype = finditemtype(s, u->faction->locale);
         if (itype != NULL) {
@@ -919,9 +919,9 @@ static void give_cmd(unit * u, order * ord)
   }
 
   if (isparam(s, u->faction->locale, P_PERSON)) {
-    if (!(u->race->ec_flags & GIVEPERSON)) {
+    if (!(u_race(u)->ec_flags & GIVEPERSON)) {
       ADDMSG(&u->faction->msgs,
-        msg_feedback(u, ord, "race_noregroup", "race", u->race));
+        msg_feedback(u, ord, "race_noregroup", "race", u_race(u)));
       return;
     }
     give_men(n, u, u2, ord);
@@ -929,14 +929,14 @@ static void give_cmd(unit * u, order * ord)
   }
 
   if (u2 != NULL) {
-    if (!(u->race->ec_flags & GIVEITEM) && u2 != NULL) {
+    if (!(u_race(u)->ec_flags & GIVEITEM) && u2 != NULL) {
       ADDMSG(&u->faction->msgs,
-        msg_feedback(u, ord, "race_nogive", "race", u->race));
+        msg_feedback(u, ord, "race_nogive", "race", u_race(u)));
       return;
     }
-    if (!(u2->race->ec_flags & GETITEM)) {
+    if (!(u_race(u2)->ec_flags & GETITEM)) {
       ADDMSG(&u->faction->msgs,
-        msg_feedback(u, ord, "race_notake", "race", u2->race));
+        msg_feedback(u, ord, "race_notake", "race", u_race(u2)));
       return;
     }
   }
@@ -1184,7 +1184,7 @@ static int recruit_archetype(unit * u, order * ord)
         else if (strcmp(arch->rules[k].property, "race") == 0) {
           const race *rc = rc_find(arch->rules[k].value);
           assert(rc);
-          if (rc == u->race)
+          if (rc == u_race(u))
             match = true;
         } else if (strcmp(arch->rules[k].property, "building") == 0) {
           const building_type *btype = bt_find(arch->rules[k].value);
@@ -1232,7 +1232,7 @@ static int recruit_archetype(unit * u, order * ord)
     if (n > 0) {
       unit *u2;
       if (merge) {
-        u2 = create_unit(u->region, u->faction, 0, u->race, 0, 0, u);
+        u2 = create_unit(u->region, u->faction, 0, u_race(u), 0, 0, u);
       } else {
         u2 = u;
       }
@@ -1250,7 +1250,7 @@ static int recruit_archetype(unit * u, order * ord)
       }
       ADDMSG(&u->faction->msgs, msg_message("recruit_archetype",
           "unit amount archetype", u, n, arch->name[n == 1]));
-      if (u != u2 && u->race == u2->race) {
+      if (u != u2 && u_race(u) == u_race(u2)) {
         transfermen(u2, u, u2->number);
       }
       return n;
@@ -1427,7 +1427,7 @@ static bool can_guard(const unit * guard, const unit * u)
     return false;
   if (guard->number <= 0 || !cansee(guard->faction, guard->region, u, 0))
     return false;
-  if (besieged(guard) || !(fval(guard->race, RCF_UNARMEDGUARD)
+  if (besieged(guard) || !(fval(u_race(guard), RCF_UNARMEDGUARD)
       || armedmen(guard, true)))
     return false;
 
@@ -1536,7 +1536,7 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
       for (; mod->flags != 0; ++mod) {
         if (mod->flags & RMF_SKILL) {
           if (mod->btype == NULL || mod->btype == btype) {
-            if (mod->race == NULL || mod->race == u->race) {
+            if (mod->race == NULL || mod->race == u_race(u)) {
               skill += mod->value.i;
             }
           }
@@ -1589,7 +1589,7 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
     for (; mod->flags != 0; ++mod) {
       if (mod->flags & RMF_SAVEMATERIAL) {
         if (mod->btype == NULL || mod->btype == btype) {
-          if (mod->race == NULL || mod->race == u->race) {
+          if (mod->race == NULL || mod->race == u_race(u)) {
             al->save *= mod->value.f;
           }
         }
@@ -2113,7 +2113,7 @@ static void buy(unit * u, request ** buyorders, struct order *ord)
     return;
   }
 
-  if (u->race == new_race[RC_INSECT]) {
+  if (u_race(u) == new_race[RC_INSECT]) {
     /* entweder man ist insekt, oder... */
     if (r->terrain != newterrain(T_SWAMP) && r->terrain != newterrain(T_DESERT)
       && !rbuildings(r)) {
@@ -2418,7 +2418,7 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
   }
   /* In der Region muß es eine Burg geben. */
 
-  if (u->race == new_race[RC_INSECT]) {
+  if (u_race(u) == new_race[RC_INSECT]) {
     if (r->terrain != newterrain(T_SWAMP) && r->terrain != newterrain(T_DESERT)
       && !rbuildings(r)) {
       cmistake(u, ord, 119, MSG_COMMERCE);
@@ -2913,13 +2913,13 @@ static void steal_cmd(unit * u, struct order *ord, request ** stealorders)
 
   assert(skill_enabled[SK_PERCEPTION] && skill_enabled[SK_STEALTH]);
 
-  if (!fval(u->race, RCF_CANSTEAL)) {
+  if (!fval(u_race(u), RCF_CANSTEAL)) {
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "race_nosteal", "race",
-        u->race));
+        u_race(u)));
     return;
   }
 
-  if (fval(r->terrain, SEA_REGION) && u->race != new_race[RC_AQUARIAN]) {
+  if (fval(r->terrain, SEA_REGION) && u_race(u) != new_race[RC_AQUARIAN]) {
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_onlandonly", ""));
     return;
   }
@@ -2973,7 +2973,7 @@ static void steal_cmd(unit * u, struct order *ord, request ** stealorders)
 
   if (n <= 0) {
     /* Wahrnehmung == Tarnung */
-    if (u->race != new_race[RC_GOBLIN] || eff_skill(u, SK_STEALTH, r) <= 3) {
+    if (u_race(u) != new_race[RC_GOBLIN] || eff_skill(u, SK_STEALTH, r) <= 3) {
       ADDMSG(&u->faction->msgs, msg_message("stealfail", "unit target", u, u2));
       if (n == 0) {
         ADDMSG(&u2->faction->msgs, msg_message("stealdetect", "unit", u2));
@@ -3126,7 +3126,7 @@ expandwork(region * r, request * work_begin, request * work_end, int maxwork)
 
     assert(workers >= 0);
 
-    u->n = workers * wage(u->region, u->faction, u->race, turn);
+    u->n = workers * wage(u->region, u->faction, u_race(u), turn);
 
     jobs -= workers;
     assert(jobs >= 0);
@@ -3159,7 +3159,7 @@ expandwork(region * r, request * work_begin, request * work_end, int maxwork)
 
 static int do_work(unit * u, order * ord, request * o)
 {
-  if (playerrace(u->race)) {
+  if (playerrace(u_race(u))) {
     region *r = u->region;
     int w;
 
@@ -3178,7 +3178,7 @@ static int do_work(unit * u, order * ord, request * o)
         cmistake(u, ord, 69, MSG_INCOME);
       return -1;
     }
-    w = wage(r, u->faction, u->race, turn);
+    w = wage(r, u->faction, u_race(u), turn);
     u->wants = u->number * w;
     o->unit = u;
     o->qty = u->number * w;
@@ -3186,7 +3186,7 @@ static int do_work(unit * u, order * ord, request * o)
     return 0;
   } else if (ord && !is_monsters(u->faction)) {
     ADDMSG(&u->faction->msgs,
-      msg_feedback(u, ord, "race_cantwork", "race", u->race));
+      msg_feedback(u, ord, "race_cantwork", "race", u_race(u)));
   }
   return -1;
 }
@@ -3224,7 +3224,7 @@ void tax_cmd(unit * u, struct order *ord, request ** taxorders)
   request *o;
   int max;
 
-  if (!humanoidrace(u->race) && !is_monsters(u->faction)) {
+  if (!humanoidrace(u_race(u)) && !is_monsters(u->faction)) {
     cmistake(u, ord, 228, MSG_INCOME);
     return;
   }
@@ -3251,7 +3251,7 @@ void tax_cmd(unit * u, struct order *ord, request ** taxorders)
 
   if (max == 0)
     max = INT_MAX;
-  if (!playerrace(u->race)) {
+  if (!playerrace(u_race(u))) {
     u->wants = MIN(income(u), max);
   } else {
     u->wants = MIN(n * eff_skill(u, SK_TAXING, r) * 20, max);
@@ -3380,10 +3380,10 @@ void produce(struct region *r)
     order *ord;
     bool trader = false;
 
-    if (u->race == new_race[RC_SPELL] || fval(u, UFL_LONGACTION))
+    if (u_race(u) == new_race[RC_SPELL] || fval(u, UFL_LONGACTION))
       continue;
 
-    if (u->race == new_race[RC_INSECT] && r_insectstalled(r) &&
+    if (u_race(u) == new_race[RC_INSECT] && r_insectstalled(r) &&
       !is_cursed(u->attribs, C_KAELTESCHUTZ, 0))
       continue;
 
@@ -3419,8 +3419,8 @@ void produce(struct region *r)
     if (todo == NOKEYWORD)
       continue;
 
-    if (fval(r->terrain, SEA_REGION) && u->race != new_race[RC_AQUARIAN]
-      && !(u->race->flags & RCF_SWIM)
+    if (fval(r->terrain, SEA_REGION) && u_race(u) != new_race[RC_AQUARIAN]
+      && !(u_race(u)->flags & RCF_SWIM)
       && todo != K_STEAL && todo != K_SPY && todo != K_SABOTAGE)
       continue;
 

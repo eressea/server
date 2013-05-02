@@ -89,14 +89,14 @@ magic_t getmagicskill(const struct locale * lang)
 /* Vertraute und Kröten sind keine Migranten */
 bool is_migrant(unit * u)
 {
-  if (u->race == u->faction->race)
+  if (u_race(u) == u->faction->race)
     return false;
 
-  if (fval(u->race, RCF_UNDEAD | RCF_ILLUSIONARY))
+  if (fval(u_race(u), RCF_UNDEAD | RCF_ILLUSIONARY))
     return false;
   if (is_familiar(u))
     return false;
-  if (u->race == new_race[RC_TOAD])
+  if (u_race(u) == new_race[RC_TOAD])
     return false;
 
   return true;
@@ -105,7 +105,7 @@ bool is_migrant(unit * u)
 /* ------------------------------------------------------------- */
 bool magic_lowskill(unit * u)
 {
-  return (u->race == new_race[RC_TOAD]) ? true : false;
+  return (u_race(u) == new_race[RC_TOAD]) ? true : false;
 }
 
 /* ------------------------------------------------------------- */
@@ -160,8 +160,8 @@ const attrib_type at_learning = {
 static int study_days(unit * student, skill_t sk)
 {
   int speed = 30;
-  if (student->race->study_speed) {
-    speed += student->race->study_speed[sk];
+  if (u_race(student)->study_speed) {
+    speed += u_race(student)->study_speed[sk];
     if (speed < 30) {
       skill *sv = get_skill(student, sk);
       if (sv == 0) {
@@ -288,7 +288,7 @@ int teach_cmd(unit * u, struct order *ord)
     }
   }
 
-  if ((u->race->flags & RCF_NOTEACH) || fval(u, UFL_WERE)) {
+  if ((u_race(u)->flags & RCF_NOTEACH) || fval(u, UFL_WERE)) {
     cmistake(u, ord, 274, MSG_EVENT);
     return 0;
   }
@@ -542,9 +542,9 @@ int learn_cmd(unit * u, order * ord)
       learn_newskills = 1;
   }
 
-  if ((u->race->flags & RCF_NOLEARN) || fval(u, UFL_WERE)) {
+  if ((u_race(u)->flags & RCF_NOLEARN) || fval(u, UFL_WERE)) {
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_race_nolearn", "race",
-        u->race));
+        u_race(u)));
     return 0;
   }
 
@@ -561,7 +561,7 @@ int learn_cmd(unit * u, order * ord)
     return 0;
   }
   /* Hack: Talente mit Malus -99 können nicht gelernt werden */
-  if (u->race->bonus[sk] == -99) {
+  if (u_race(u)->bonus[sk] == -99) {
     cmistake(u, ord, 771, MSG_EVENT);
     return 0;
   }
@@ -575,7 +575,7 @@ int learn_cmd(unit * u, order * ord)
   }
 
   /* snotlings können Talente nur bis T8 lernen */
-  if (u->race == new_race[RC_SNOTLING]) {
+  if (u_race(u) == new_race[RC_SNOTLING]) {
     if (get_level(u, sk) >= 8) {
       cmistake(u, ord, 308, MSG_EVENT);
       return 0;

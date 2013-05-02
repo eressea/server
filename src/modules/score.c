@@ -106,13 +106,13 @@ void score(void)
       int i;
       faction *f = u->faction;
 
-      if (f == NULL || u->race == new_race[RC_SPELL]
-        || u->race == new_race[RC_BIRTHDAYDRAGON]) {
+      if (f == NULL || u_race(u) == new_race[RC_SPELL]
+        || u_race(u) == new_race[RC_BIRTHDAYDRAGON]) {
         continue;
       }
 
-      if (old_race(u->race) <= RC_AQUARIAN) {
-        f->score += (u->race->recruitcost * u->number) / 50;
+      if (old_race(u_race(u)) <= RC_AQUARIAN) {
+        f->score += (u_race(u)->recruitcost * u->number) / 50;
       }
       f->score += get_money(u) / 50;
       for (itm = u->items; itm; itm = itm->next) {

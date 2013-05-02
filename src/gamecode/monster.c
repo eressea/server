@@ -88,7 +88,7 @@ static void eaten_by_monster(unit * u)
     multi = RESOURCE_QUANTITY * newterrain(T_PLAIN)->size / 10000.0;
   }
 
-  switch (old_race(u->race)) {
+  switch (old_race(u_race(u))) {
     case RC_FIREDRAGON:
       n = rng_int() % 80 * u->number;
       horse = get_item(u, I_HORSE);
@@ -126,7 +126,7 @@ static void absorbed_by_monster(unit * u)
 {
   int n;
 
-  switch (old_race(u->race)) {
+  switch (old_race(u_race(u))) {
     default:
       n = rng_int() % (u->number / 20 + 1);
   }
@@ -138,7 +138,7 @@ static void absorbed_by_monster(unit * u)
       rsetpeasants(u->region, rpeasants(u->region) - n);
       scale_number(u, u->number + n);
       ADDMSG(&u->region->msgs, msg_message("absorbpeasants",
-          "unit race amount", u, u->race, n));
+          "unit race amount", u, u_race(u), n));
     }
   }
 }
@@ -179,7 +179,7 @@ static void scared_by_monster(unit * u)
 {
   int n;
 
-  switch (old_race(u->race)) {
+  switch (old_race(u_race(u))) {
     case RC_FIREDRAGON:
       n = rng_int() % 160 * u->number;
       break;
@@ -209,13 +209,13 @@ static void scared_by_monster(unit * u)
 void monster_kills_peasants(unit * u)
 {
   if (!monster_is_waiting(u)) {
-    if (u->race->flags & RCF_SCAREPEASANTS) {
+    if (u_race(u)->flags & RCF_SCAREPEASANTS) {
       scared_by_monster(u);
     }
-    if (u->race->flags & RCF_KILLPEASANTS) {
+    if (u_race(u)->flags & RCF_KILLPEASANTS) {
       eaten_by_monster(u);
     }
-    if (u->race->flags & RCF_ABSORBPEASANTS) {
+    if (u_race(u)->flags & RCF_ABSORBPEASANTS) {
       absorbed_by_monster(u);
     }
   }

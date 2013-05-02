@@ -554,8 +554,8 @@ const spell *get_combatspell(const unit * u, int nr)
   m = get_mage(u);
   if (m) {
     return m->combatspells[nr].sp;
-  } else if (u->race->precombatspell != NULL) {
-    return u->race->precombatspell;
+  } else if (u_race(u)->precombatspell != NULL) {
+    return u_race(u)->precombatspell;
   }
 
   return NULL;
@@ -706,7 +706,7 @@ static int use_item_aura(const region * r, const unit * u)
   int sk, n;
 
   sk = eff_skill(u, SK_MAGIC, r);
-  n = (int)(sk * sk * u->race->maxaura / 4);
+  n = (int)(sk * sk * u_race(u)->maxaura / 4);
 
   return n;
 }
@@ -719,7 +719,7 @@ int max_spellpoints(const region * r, const unit * u)
   double divisor = 1.2;
 
   sk = eff_skill(u, SK_MAGIC, r);
-  msp = u->race->maxaura * (pow(sk, potenz) / divisor + 1) + get_spchange(u);
+  msp = u_race(u)->maxaura * (pow(sk, potenz) / divisor + 1) + get_spchange(u);
 
   if (get_item(u, I_AURAKULUM) > 0) {
     msp += use_item_aura(r, u);
@@ -1025,7 +1025,7 @@ spellpower(region * r, unit * u, const spell * sp, int cast_level,
   if (elf_power < 0) {
     elf_power = get_param_int(global.parameters, "rules.magic.elfpower", 0);
   }
-  if (elf_power && u->race == new_race[RC_ELF] && r_isforest(r)) {
+  if (elf_power && u_race(u) == new_race[RC_ELF] && r_isforest(r)) {
     ++force;
   }
 
@@ -1110,7 +1110,7 @@ double magic_resistance(unit * target)
   const curse_type * ct_goodresist = 0, * ct_badresist = 0;
 
   /* Bonus durch Rassenmagieresistenz */
-  double probability = target->race->magres;
+  double probability = u_race(target)->magres;
   assert(target->number > 0);
 
   /* Magier haben einen Resistenzbonus vom Magietalent * 5% */
@@ -1354,7 +1354,7 @@ static void do_fumble(castorder * co)
      * The list of things to happen are attached to a timeout
      * trigger and that's added to the triggerlit of the mage gone toad.
      */
-    trigger *trestore = trigger_changerace(u, u->race, u->irace);
+    trigger *trestore = trigger_changerace(u, u_race(u), u->irace);
 
     if (chance(0.7)) {
       const item_type *it_toadslime = it_find("toadslime");
@@ -1367,7 +1367,7 @@ static void do_fumble(castorder * co)
     if (duration < 2)
       duration = 2;
     add_trigger(&u->attribs, "timer", trigger_timeout(duration, trestore));
-    u->race = new_race[RC_TOAD];
+    u_setrace(u, new_race[RC_TOAD]);
     u->irace = NULL;
     ADDMSG(&r->msgs, msg_message("patzer6", "unit region spell", u, r, sp));
     break;
@@ -1431,7 +1431,7 @@ static double regeneration(unit * u)
 
   sk = effskill(u, SK_MAGIC);
   /* Rassenbonus/-malus */
-  d = pow(sk, potenz) * u->race->regaura / divisor;
+  d = pow(sk, potenz) * u_race(u)->regaura / divisor;
   d++;
 
   /* Einfluss von Artefakten */
@@ -2594,8 +2594,8 @@ static castorder *cast_cmd(unit * u, order * ord)
    * normalerweise nur Meermenschen, ausgenommen explizit als
    * OCEANCASTABLE deklarierte Sprüche */
   if (fval(r->terrain, SEA_REGION)) {
-    if (u->race != new_race[RC_AQUARIAN]
-      && !fval(u->race, RCF_SWIM)
+    if (u_race(u) != new_race[RC_AQUARIAN]
+      && !fval(u_race(u), RCF_SWIM)
       && !(sp->sptyp & OCEANCASTABLE)) {
       /* Fehlermeldung */
       ADDMSG(&u->faction->msgs, msg_message("spellfail_onocean",
@@ -2732,10 +2732,10 @@ void magic(void)
     for (u = r->units; u; u = u->next) {
       order *ord;
 
-      if (u->number <= 0 || u->race == new_race[RC_SPELL])
+      if (u->number <= 0 || u_race(u) == new_race[RC_SPELL])
         continue;
 
-      if (u->race == new_race[RC_INSECT] && r_insectstalled(r) &&
+      if (u_race(u) == new_race[RC_INSECT] && r_insectstalled(r) &&
         !is_cursed(u->attribs, C_KAELTESCHUTZ, 0))
         continue;
 

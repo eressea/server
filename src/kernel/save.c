@@ -256,7 +256,7 @@ static unit *unitorders(FILE * F, int enc, struct faction *f)
   i = getid();
   u = findunitg(i, NULL);
 
-  if (u && u->race == new_race[RC_SPELL])
+  if (u && u_race(u) == new_race[RC_SPELL])
     return NULL;
   if (u && u->faction == f) {
     order **ordp;
@@ -764,8 +764,8 @@ unit *read_unit(struct storage *store)
   } else {
     store->r_tok_buf(store, rname, sizeof(rname));
   }
-  u->race = rc_find(rname);
-  assert(u->race);
+  u_setrace(u, rc_find(rname));
+
   if (store->version < STORAGE_VERSION) {
     store->r_str_buf(store, rname, sizeof(rname));
   } else {
@@ -776,8 +776,8 @@ unit *read_unit(struct storage *store)
   else
     u->irace = NULL;
 
-  if (u->race->describe) {
-    const char *rcdisp = u->race->describe(u, u->faction->locale);
+  if (u_race(u)->describe) {
+    const char *rcdisp = u_race(u)->describe(u, u->faction->locale);
     if (u->display && rcdisp) {
       /* see if the data file contains old descriptions */
       if (strcmp(rcdisp, u->display) == 0) {
@@ -867,7 +867,7 @@ unit *read_unit(struct storage *store)
   }
   set_order(&u->thisorder, NULL);
 
-  assert(u->race);
+  assert(u_race(u));
   while ((sk = (skill_t) store->r_int(store)) != NOSKILL) {
     int level = store->r_int(store);
     int weeks = store->r_int(store);
@@ -901,8 +901,8 @@ void write_unit(struct storage *store, const unit * u)
   store->w_str(store, u->display ? (const char *)u->display : "");
   store->w_int(store, u->number);
   store->w_int(store, u->age);
-  store->w_tok(store, u->race->_name[0]);
-  store->w_tok(store, (irace && irace != u->race) ? irace->_name[0] : "");
+  store->w_tok(store, u_race(u)->_name[0]);
+  store->w_tok(store, (irace && irace != u_race(u)) ? irace->_name[0] : "");
   write_building_reference(u->building, store);
   write_ship_reference(u->ship, store);
   store->w_int(store, u->status);
@@ -934,7 +934,7 @@ void write_unit(struct storage *store, const unit * u)
   store->w_str(store, "");
   store->w_brk(store);
 
-  assert(u->race);
+  assert(u_race(u));
 
   for (i = 0; i != u->skill_size; ++i) {
     skill *sv = u->skills + i;
@@ -1497,7 +1497,7 @@ static void repair_unit(unit * u) {
   static const race * rctoad;
   if (!rctoad) rctoad = rc_find("toad");
 
-  if (u->race==rctoad) {
+  if (u_race(u)==rctoad) {
     int found = 0;
     attrib * a = a_find(u->attribs, &at_eventhandler);
     while (!found && a && a->type==&at_eventhandler) {
@@ -1512,7 +1512,7 @@ static void repair_unit(unit * u) {
       a = a->next;
     }
     if (!found) {
-      u->race = u->faction->race;
+      u_setrace(u, u->faction->race);
       log_warning("This toad did not have a changerace trigger: %s\n", unitname(u));
     }
   }

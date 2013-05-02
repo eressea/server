@@ -196,7 +196,7 @@ static bool entrance_allowed(const struct unit *u, const struct region *r)
 
 int personcapacity(const unit * u)
 {
-  int cap = u->race->weight + u->race->capacity;
+  int cap = u_race(u)->weight + u_race(u)->capacity;
   return cap;
 }
 
@@ -254,7 +254,7 @@ static int ridingcapacity(unit * u)
    ** von zwei Pferden gezogen wird */
 
   animals = MIN(animals, effskill(u, SK_RIDING) * u->number * 2);
-  if (fval(u->race, RCF_HORSE))
+  if (fval(u_race(u), RCF_HORSE))
     animals += u->number;
 
   /* maximal diese Pferde können zum Ziehen benutzt werden */
@@ -276,7 +276,7 @@ int walkingcapacity(const struct unit *u)
    * die Leute tragen */
 
   pferde_fuer_wagen = MIN(animals, effskill(u, SK_RIDING) * u->number * 4);
-  if (fval(u->race, RCF_HORSE)) {
+  if (fval(u_race(u), RCF_HORSE)) {
     animals += u->number;
     people = 0;
   } else {
@@ -288,7 +288,7 @@ int walkingcapacity(const struct unit *u)
 
   n = wagen_mit_pferden * vcap;
 
-  if (u->race == new_race[RC_TROLL]) {
+  if (u_race(u) == new_race[RC_TROLL]) {
     /* 4 Trolle ziehen einen Wagen. */
     /* Unbesetzte Wagen feststellen */
     wagen_ohne_pferde = vehicles - wagen_mit_pferden;
@@ -340,7 +340,7 @@ static int canwalk(unit * u)
   get_transporters(u->items, &animals, &acap, &vehicles, &vcap);
 
   maxwagen = effskill(u, SK_RIDING) * u->number * 2;
-  if (u->race == new_race[RC_TROLL]) {
+  if (u_race(u) == new_race[RC_TROLL]) {
     maxwagen = MAX(maxwagen, u->number / 4);
   }
   maxpferde = effskill(u, SK_RIDING) * u->number * 4 + u->number;
@@ -370,7 +370,7 @@ bool canfly(unit * u)
   if (get_item(u, I_PEGASUS) >= u->number && effskill(u, SK_RIDING) >= 4)
     return true;
 
-  if (fval(u->race, RCF_FLY))
+  if (fval(u_race(u), RCF_FLY))
     return true;
 
   if (get_movement(&u->attribs, MV_FLY))
@@ -384,10 +384,10 @@ bool canswim(unit * u)
   if (get_item(u, I_DOLPHIN) >= u->number && effskill(u, SK_RIDING) >= 4)
     return true;
 
-  if (u->race->flags & RCF_FLY)
+  if (u_race(u)->flags & RCF_FLY)
     return true;
 
-  if (u->race->flags & RCF_SWIM)
+  if (u_race(u)->flags & RCF_SWIM)
     return true;
 
   if (get_movement(&u->attribs, MV_FLY))
@@ -425,14 +425,14 @@ static int canride(unit * u)
   maxunicorns = (skill / 5) * u->number;
   maxhorses = skill * u->number * 2;
 
-  if (!(u->race->flags & RCF_HORSE)
+  if (!(u_race(u)->flags & RCF_HORSE)
     && ((horses == 0 && unicorns == 0)
       || horses > maxhorses || unicorns > maxunicorns)) {
     return 0;
   }
 
   if (ridingcapacity(u) - eff_weight(u) >= 0) {
-    if (horses == 0 && unicorns >= u->number && !(u->race->flags & RCF_HORSE)) {
+    if (horses == 0 && unicorns >= u->number && !(u_race(u)->flags & RCF_HORSE)) {
       return 2;
     }
     return 1;
@@ -614,7 +614,7 @@ ship *move_ship(ship * sh, region * from, region * to, region_list * route)
 
 static bool is_freezing(const unit * u)
 {
-  if (u->race != new_race[RC_INSECT])
+  if (u_race(u) != new_race[RC_INSECT])
     return false;
   if (is_cursed(u->attribs, C_KAELTESCHUTZ, 0))
     return false;
@@ -828,7 +828,7 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
   bool contact = false;
   unit *guard = NULL;
 
-  if (fval(reisender->race, RCF_ILLUSIONARY))
+  if (fval(u_race(reisender), RCF_ILLUSIONARY))
     return NULL;
   for (u = r->units; u && !contact; u = u->next) {
     if (is_guard(u, GUARD_TRAVELTHRU)) {
@@ -895,7 +895,7 @@ static bool is_guardian_r(const unit * guard)
 
   if ((guard->flags & UFL_GUARD) == 0)
     return false;
-  if (!armedmen(guard, true) && !fval(guard->race, RCF_UNARMEDGUARD))
+  if (!armedmen(guard, true) && !fval(u_race(guard), RCF_UNARMEDGUARD))
     return false;
   return true;
 }
@@ -1096,7 +1096,7 @@ static bool transport(unit * ut, unit * u)
 
 static bool can_move(const unit * u)
 {
-  if (u->race->flags & RCF_CANNOTMOVE)
+  if (u_race(u)->flags & RCF_CANNOTMOVE)
     return false;
   if (get_movement(&u->attribs, MV_CANNOTMOVE))
     return false;
@@ -1318,11 +1318,11 @@ static int movement_speed(unit * u)
   int mp;
   static const curse_type *speed_ct;
   static bool init = false;
-  double dk = u->race->speed;
+  double dk = u_race(u)->speed;
 
   assert(u->number);
   /* dragons have a fixed speed, and no other effects work on them: */
-  switch (old_race(u->race)) {
+  switch (old_race(u_race(u))) {
   case RC_DRAGON:
   case RC_WYRM:
   case RC_FIREDRAGON:
@@ -1371,7 +1371,7 @@ static int movement_speed(unit * u)
 
     /* Im Astralraum sind Tyb und Ill-Magier doppelt so schnell.
      * Nicht kumulativ mit anderen Beschleunigungen! */
-    if (mp * dk <= BP_WALKING * u->race->speed && is_astral(u->region)
+    if (mp * dk <= BP_WALKING * u_race(u)->speed && is_astral(u->region)
       && is_mage(u)) {
       sc_mage *mage = get_mage(u);
       if (mage->magietyp == M_TYBIED || mage->magietyp == M_ILLAUN) {
@@ -1436,11 +1436,11 @@ static const region_list *travel_route(unit * u,
 
     /* check movement from/to oceans. 
      * aquarian special, flying units, horses, the works */
-    if ((u->race->flags & RCF_FLY) == 0) {
+    if ((u_race(u)->flags & RCF_FLY) == 0) {
       if (!fval(next->terrain, SEA_REGION)) {
         /* next region is land */
         if (fval(current->terrain, SEA_REGION)) {
-          int moving = u->race->flags & (RCF_SWIM | RCF_WALK | RCF_COASTAL);
+          int moving = u_race(u)->flags & (RCF_SWIM | RCF_WALK | RCF_COASTAL);
           /* Die Einheit kann nicht fliegen, ist im Ozean, und will an Land */
           if (moving != (RCF_SWIM | RCF_WALK) && (moving & RCF_COASTAL) == 0) {
             /* can't swim+walk and isn't allowed to enter coast from sea */
@@ -1449,7 +1449,7 @@ static const region_list *travel_route(unit * u,
             break;
           }
           landing = true;
-        } else if ((u->race->flags & RCF_WALK) == 0) {
+        } else if ((u_race(u)->flags & RCF_WALK) == 0) {
           /* Spezialeinheiten, die nicht laufen können. */
           ADDMSG(&u->faction->msgs, msg_message("detectocean",
               "unit region", u, next));
@@ -1497,7 +1497,7 @@ static const region_list *travel_route(unit * u,
     }
 
     /* illusionary units disappear in antimagic zones */
-    if (fval(u->race, RCF_ILLUSIONARY)) {
+    if (fval(u_race(u), RCF_ILLUSIONARY)) {
       curse *c = get_curse(next->attribs, ct_find("antimagiczone"));
       if (curse_active(c)) {
         curse_changevigour(&next->attribs, c, (float)-u->number);
@@ -1515,7 +1515,7 @@ static const region_list *travel_route(unit * u,
     }
 
     /* unit is an insect and cannot move into a glacier */
-    if (u->race == new_race[RC_INSECT]) {
+    if (u_race(u) == new_race[RC_INSECT]) {
       if (r_insectstalled(next) && is_freezing(u)) {
         ADDMSG(&u->faction->msgs, msg_message("detectforbidden",
             "unit region", u, next));
@@ -2097,7 +2097,7 @@ static void travel(unit * u, region_list ** routep)
         return;
       }
     }
-    if (u->ship && u->race->flags & RCF_SWIM) {
+    if (u->ship && u_race(u)->flags & RCF_SWIM) {
       cmistake(u, u->thisorder, 143, MSG_MOVE);
       return;
     }

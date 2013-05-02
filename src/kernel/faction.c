@@ -243,7 +243,7 @@ unit *addplayer(region * r, faction * f)
   u = createunit(r, f, 1, f->race);
   equip_items(&u->faction->items, get_equipment("new_faction"));
   equip_unit(u, get_equipment("first_unit"));
-  sprintf(buffer, "first_%s", u->race->_name[0]);
+  sprintf(buffer, "first_%s", u_race(u)->_name[0]);
   equip_unit(u, get_equipment(buffer));
   u->hp = unit_max_hp(u) * u->number;
   fset(u, UFL_ISNEW);
@@ -314,8 +314,8 @@ void destroyfaction(faction * f)
     } else {
       region *r = u->region;
 
-      if (!fval(r->terrain, SEA_REGION) && !!playerrace(u->race)) {
-        const race *rc = u->race;
+      if (!fval(r->terrain, SEA_REGION) && !!playerrace(u_race(u))) {
+        const race *rc = u_race(u);
         int m = rmoney(r);
 
         if ((rc->ec_flags & ECF_REC_ETHEREAL) == 0) {

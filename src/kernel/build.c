@@ -320,7 +320,7 @@ void build_road(region * r, unit * u, int size, direction_t d)
   if (size > 0)
     left = MIN(size, left);
   /* baumaximum anhand der rohstoffe */
-  if (u->race == new_race[RC_STONEGOLEM]) {
+  if (u_race(u) == new_race[RC_STONEGOLEM]) {
     n = u->number * GOLEM_STONE;
   } else {
     n = get_pooled(u, oldresourcetype[R_STONE], GET_DEFAULT, left);
@@ -360,7 +360,7 @@ void build_road(region * r, unit * u, int size, direction_t d)
    * maximum. */
   rsetroad(r, d, rroad(r, d) + (short)n);
 
-  if (u->race == new_race[RC_STONEGOLEM]) {
+  if (u_race(u) == new_race[RC_STONEGOLEM]) {
     int golemsused = n / GOLEM_STONE;
     if (n % GOLEM_STONE != 0) {
       ++golemsused;
@@ -904,7 +904,7 @@ create_ship(region * r, unit * u, const struct ship_type *newtype, int want,
   sh = new_ship(newtype, r, u->faction->locale);
 
   if (leave(u, false)) {
-    if (fval(u->race, RCF_CANSAIL)) {
+    if (fval(u_race(u), RCF_CANSAIL)) {
       u_set_ship(u, sh);
     }
   }

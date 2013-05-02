@@ -128,6 +128,8 @@ extern "C" {
   void u_seteffstealth(struct unit *u, int value);
   int u_geteffstealth(const struct unit *u);
   const struct race *u_irace(const struct unit *u);
+  const struct race *u_race(const struct unit *u);
+  void u_setrace(struct unit *u, const struct race *);
   struct building *usiege(const struct unit *u);
   void usetsiege(struct unit *u, const struct building *b);
 

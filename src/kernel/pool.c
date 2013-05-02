@@ -55,9 +55,9 @@ int get_resource(const unit * u, const resource_type * rtype)
       return i;
   }
   if (itype != NULL) {
-    if (itype == olditemtype[R_STONE] && (u->race->flags & RCF_STONEGOLEM)) {
+    if (itype == olditemtype[R_STONE] && (u_race(u)->flags & RCF_STONEGOLEM)) {
       return u->number * GOLEM_STONE;
-    } else if (itype == olditemtype[R_IRON] && (u->race->flags & RCF_IRONGOLEM)) {
+    } else if (itype == olditemtype[R_IRON] && (u_race(u)->flags & RCF_IRONGOLEM)) {
       return u->number * GOLEM_IRON;
     } else {
       const item *i = *i_findc(&u->items, itype);
@@ -98,9 +98,9 @@ int get_reservation(const unit * u, const resource_type * rtype)
 {
   struct reservation *res = u->reservations;
 
-  if (rtype == oldresourcetype[R_STONE] && (u->race->flags & RCF_STONEGOLEM))
+  if (rtype == oldresourcetype[R_STONE] && (u_race(u)->flags & RCF_STONEGOLEM))
     return (u->number * GOLEM_STONE);
-  if (rtype == oldresourcetype[R_IRON] && (u->race->flags & RCF_IRONGOLEM))
+  if (rtype == oldresourcetype[R_IRON] && (u_race(u)->flags & RCF_IRONGOLEM))
     return (u->number * GOLEM_IRON);
   while (res && res->type != rtype)
     res = res->next;
@@ -166,7 +166,7 @@ get_pooled(const unit * u, const resource_type * rtype, unsigned int mode,
   region *r = u->region;
   int have = get_resource(u, rtype);
 
-  if ((u->race->ec_flags & GETITEM) == 0) {
+  if ((u_race(u)->ec_flags & GETITEM) == 0) {
     mode &= (GET_SLACK | GET_RESERVE);
   }
 
@@ -211,7 +211,7 @@ use_pooled(unit * u, const resource_type * rtype, unsigned int mode, int count)
   region *r = u->region;
   int n = 0, have = get_resource(u, rtype);
 
-  if ((u->race->ec_flags & GETITEM) == 0) {
+  if ((u_race(u)->ec_flags & GETITEM) == 0) {
     mode &= (GET_SLACK | GET_RESERVE);
   }
 

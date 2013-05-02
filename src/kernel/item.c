@@ -100,7 +100,7 @@ static int res_changepeasants(unit * u, const resource_type * rtype, int delta)
 static int res_changeitem(unit * u, const resource_type * rtype, int delta)
 {
   int num;
-  if (rtype == oldresourcetype[R_STONE] && u->race == new_race[RC_STONEGOLEM]
+  if (rtype == oldresourcetype[R_STONE] && u_race(u) == new_race[RC_STONEGOLEM]
     && delta <= 0) {
     int reduce = delta / GOLEM_STONE;
     if (delta % GOLEM_STONE != 0)
@@ -108,7 +108,7 @@ static int res_changeitem(unit * u, const resource_type * rtype, int delta)
     scale_number(u, u->number + reduce);
     num = u->number;
   } else if (rtype == oldresourcetype[R_IRON]
-    && u->race == new_race[RC_IRONGOLEM] && delta <= 0) {
+    && u_race(u) == new_race[RC_IRONGOLEM] && delta <= 0) {
     int reduce = delta / GOLEM_IRON;
     if (delta % GOLEM_IRON != 0)
       --reduce;
@@ -708,7 +708,7 @@ const char *itemnames[MAXITEMS] = {
 static int
 mod_elves_only(const unit * u, const region * r, skill_t sk, int value)
 {
-  if (u->race == new_race[RC_ELF])
+  if (u_race(u) == new_race[RC_ELF])
     return value;
   unused(r);
   return -118;
@@ -717,7 +717,7 @@ mod_elves_only(const unit * u, const region * r, skill_t sk, int value)
 static int
 mod_dwarves_only(const unit * u, const region * r, skill_t sk, int value)
 {
-  if (u->race == new_race[RC_DWARF])
+  if (u_race(u) == new_race[RC_DWARF])
     return value;
   unused(r);
   return -118;
@@ -838,11 +838,11 @@ static int
 use_bloodpotion(struct unit *u, const struct item_type *itype, int amount,
   struct order *ord)
 {
-  if (u->race == new_race[RC_DAEMON]) {
+  if (u_race(u) == new_race[RC_DAEMON]) {
     change_effect(u, itype->rtype->ptype, 100 * amount);
   } else {
     const race *irace = u_irace(u);
-    if (irace == u->race) {
+    if (irace == u_race(u)) {
       static race *rcfailure;
       if (!rcfailure) {
         rcfailure = rc_find("smurf");
@@ -850,14 +850,14 @@ use_bloodpotion(struct unit *u, const struct item_type *itype, int amount,
           rcfailure = rc_find("toad");
       }
       if (rcfailure) {
-        trigger *trestore = trigger_changerace(u, u->race, irace);
+        trigger *trestore = trigger_changerace(u, u_race(u), irace);
         if (trestore) {
           int duration = 2 + rng_int() % 8;
 
           add_trigger(&u->attribs, "timer", trigger_timeout(duration,
               trestore));
           u->irace = NULL;
-          u->race = rcfailure;
+          u_setrace(u, rcfailure);
         }
       }
     }
