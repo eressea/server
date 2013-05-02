@@ -1493,31 +1493,6 @@ void writefaction(struct storage *store, const faction * f)
   write_spellbook(f->spellbook, store);
 }
 
-static void repair_unit(unit * u) {
-  static const race * rctoad;
-  if (!rctoad) rctoad = rc_find("toad");
-
-  if (u_race(u)==rctoad) {
-    int found = 0;
-    attrib * a = a_find(u->attribs, &at_eventhandler);
-    while (!found && a && a->type==&at_eventhandler) {
-      struct trigger ** tlist = get_triggers(a, "timer");
-      while (!found && tlist && *tlist) {
-        trigger * t = *tlist;
-        if (strcmp("changerace", t->type->name)==0) {
-          found = 1;
-        }
-        tlist = &t->next;
-      }
-      a = a->next;
-    }
-    if (!found) {
-      u_setrace(u, u->faction->race);
-      log_warning("This toad did not have a changerace trigger: %s\n", unitname(u));
-    }
-  }
-}
-
 int readgame(const char *filename, int mode, int backup)
 {
   int i, n, p;
@@ -1743,7 +1718,6 @@ int readgame(const char *filename, int mode, int backup)
       unit *u = read_unit(store);
       sc_mage *mage;
 
-      repair_unit(u);
       assert(u->region == NULL);
       u->region = r;
       *up = u;
