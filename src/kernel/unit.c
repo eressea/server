@@ -853,7 +853,7 @@ bool leave(unit * u, bool force)
 
 const struct race *urace(const struct unit *u)
 {
-  return u->race;
+  return u->race_;
 }
 
 bool can_survive(const unit * u, const region * r)
@@ -1730,18 +1730,18 @@ const struct race *u_irace(const struct unit *u)
   if (u->irace && skill_enabled[SK_STEALTH]) {
     return u->irace;
   }
-  return u->race;
+  return u->race_;
 }
 
 const struct race *u_race(const struct unit *u)
 {
-  return u->race;
+  return u->race_;
 }
 
 void u_setrace(struct unit *u, const struct race *rc)
 {
   assert(rc);
-  u->race = rc;
+  u->race_ = rc;
 }
 
 void unit_add_spell(unit * u, sc_mage * m, struct spell * sp, int level)
