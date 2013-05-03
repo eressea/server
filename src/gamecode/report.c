@@ -692,7 +692,7 @@ nr_unit(FILE * F, const faction * f, const unit * u, int indent, int mode)
   bool isbattle = (bool) (mode == see_battle);
   char buf[8192];
 
-  if (fval(u->race, RCF_INVISIBLE))
+  if (fval(u_race(u), RCF_INVISIBLE))
     return;
 
   {
@@ -1283,7 +1283,7 @@ static void statistics(FILE * F, const region * r, const faction * f)
 
   /* count */
   for (u = r->units; u; u = u->next) {
-    if (u->faction == f && !fval(u->race, RCF_INVISIBLE)) {
+    if (u->faction == f && !fval(u_race(u), RCF_INVISIBLE)) {
       for (itm = u->items; itm; itm = itm->next) {
         i_change(&items, itm->type, itm->number);
       }
@@ -1523,7 +1523,7 @@ report_template(const char *filename, report_context * ctx, const char *charset)
       continue;
 
     for (u = r->units; u; u = u->next) {
-      if (u->faction == f && !fval(u->race, RCF_INVISIBLE)) {
+      if (u->faction == f && !fval(u_race(u), RCF_INVISIBLE)) {
         order *ord;
         if (!dh) {
           plane *pl = getplane(r);
@@ -2191,7 +2191,7 @@ report_plaintext(const char *filename, report_context * ctx,
   no_units = 0;
   no_people = 0;
   for (u = f->units; u; u = u->nextF) {
-    if (playerrace(u->race)) {
+    if (playerrace(u_race(u))) {
       ++no_people;
       no_units += u->number;
       assert(f == u->faction);

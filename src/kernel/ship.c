@@ -277,7 +277,7 @@ void getshipweight(const ship * sh, int *sweight, int *scabins)
     if (u->ship == sh) {
       *sweight += weight(u);
       if (sh->type->cabins) {
-        int pweight = u->number * u->race->weight;
+        int pweight = u->number * u_race(u)->weight;
         /* weight goes into number of cabins, not cargo */
         *scabins += pweight;
         *sweight -= pweight;

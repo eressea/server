@@ -247,7 +247,7 @@ static int lua_initfamiliar(unit * u)
   int result = -1;
 
   strlcpy(fname, "initfamiliar_", sizeof(fname));
-  strlcat(fname, u->race->_name[0], sizeof(fname));
+  strlcat(fname, u_race(u)->_name[0], sizeof(fname));
 
   lua_getglobal(L, fname);
   if (lua_isfunction(L, -1)) {
@@ -268,7 +268,7 @@ static int lua_initfamiliar(unit * u)
 
   create_mage(u, M_GRAY);
 
-  strlcpy(fname, u->race->_name[0], sizeof(fname));
+  strlcpy(fname, u_race(u)->_name[0], sizeof(fname));
   strlcat(fname, "_familiar", sizeof(fname));
   equip_unit(u, get_equipment(fname));
   return result;

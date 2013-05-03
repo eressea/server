@@ -351,7 +351,7 @@ fighter *select_corpse(battle * b, fighter * af)
       /* Geflohene haben auch 0 hp, dürfen hier aber nicht ausgewählt
        * werden! */
       int dead = dead_fighters(df);
-      if (!playerrace(df->unit->race))
+      if (!playerrace(u_race(df->unit)))
         continue;
 
       if (af && !helping(af->side, df->side))
@@ -624,39 +624,39 @@ weapon_skill(const weapon_type * wtype, const unit * u, bool attacking)
     skill = effskill(u, SK_WEAPONLESS);
     if (skill <= 0) {
       /* wenn kein waffenloser kampf, dann den rassen-defaultwert */
-      if (u->race == new_race[RC_ORC]) {
+      if (u_race(u) == new_race[RC_ORC]) {
         int sword = effskill(u, SK_MELEE);
         int spear = effskill(u, SK_SPEAR);
         skill = MAX(sword, spear) - 3;
         if (attacking) {
-          skill = MAX(skill, u->race->at_default);
+          skill = MAX(skill, u_race(u)->at_default);
         } else {
-          skill = MAX(skill, u->race->df_default);
+          skill = MAX(skill, u_race(u)->df_default);
         }
       } else {
         if (attacking) {
-          skill = u->race->at_default;
+          skill = u_race(u)->at_default;
         } else {
-          skill = u->race->df_default;
+          skill = u_race(u)->df_default;
         }
       }
     } else {
       /* der rassen-defaultwert kann höher sein als der Talentwert von
        * waffenloser kampf */
       if (attacking) {
-        if (skill < u->race->at_default)
-          skill = u->race->at_default;
+        if (skill < u_race(u)->at_default)
+          skill = u_race(u)->at_default;
       } else {
-        if (skill < u->race->df_default)
-          skill = u->race->df_default;
+        if (skill < u_race(u)->df_default)
+          skill = u_race(u)->df_default;
       }
     }
     if (attacking) {
-      skill += u->race->at_bonus;
+      skill += u_race(u)->at_bonus;
       if (fval(u->region->terrain, SEA_REGION) && u->ship)
         skill += u->ship->type->at_bonus;
     } else {
-      skill += u->race->df_bonus;
+      skill += u_race(u)->df_bonus;
       if (fval(u->region->terrain, SEA_REGION) && u->ship)
         skill += u->ship->type->df_bonus;
     }
@@ -669,9 +669,9 @@ weapon_skill(const weapon_type * wtype, const unit * u, bool attacking)
       skill = 0;
     if (skill > 0) {
       if (attacking) {
-        skill += u->race->at_bonus;
+        skill += u_race(u)->at_bonus;
       } else {
-        skill += u->race->df_bonus;
+        skill += u_race(u)->df_bonus;
       }
     }
     if (attacking) {
@@ -713,7 +713,7 @@ static int CavalryBonus(const unit * u, troop enemy, int type)
     if (skl > 0) {
       if (type == BONUS_DAMAGE) {
         int dmg = MIN(skl, 8);
-        if (enemy.fighter->unit->race == new_race[RC_TROLL]) {
+        if (u_race(enemy.fighter->unit) == new_race[RC_TROLL]) {
           dmg = dmg / 4;
         } else {
           dmg = dmg / 2;
@@ -769,7 +769,7 @@ weapon_effskill(troop t, troop enemy, const weapon * w, bool attacking,
           race_list *rlist = wtype->modifiers[m].races;
           if (rlist != NULL) {
             while (rlist) {
-              if (rlist->data == tu->race)
+              if (rlist->data == u_race(tu))
                 break;
               rlist = rlist->next;
             }
@@ -818,7 +818,7 @@ static const armor_type *select_armor(troop t, bool shield)
   int geschuetzt = 0;
 
   /* some monsters should not use armor (dragons in chainmail? ha!) */
-  if (!(u->race->battle_flags & BF_EQUIPMENT))
+  if (!(u_race(u)->battle_flags & BF_EQUIPMENT))
     return NULL;
 
   /* ... neither do werewolves */
@@ -903,7 +903,7 @@ void rmfighter(fighter * df, int i)
   ds->size[statusrow(df->status)] -= i;
 
   /* Spezialwirkungen, z.B. Schattenritter */
-  if (df->unit->race->battle_flags & BF_NOBLOCK) {
+  if (u_race(df->unit)->battle_flags & BF_NOBLOCK) {
     ds->nonblockers[SUM_ROW] -= i;
     ds->nonblockers[statusrow(df->status)] -= i;
   }
@@ -949,14 +949,14 @@ void kill_troop(troop dt)
   if (!df->alive) {
     char eqname[64];
     const struct equipment *eq;
-    if (du->race->itemdrop) {
-      item *drops = du->race->itemdrop(du->race, du->number - df->run.number);
+    if (u_race(du)->itemdrop) {
+      item *drops = u_race(du)->itemdrop(u_race(du), du->number - df->run.number);
 
       if (drops != NULL) {
         i_merge(&du->items, &drops);
       }
     }
-    sprintf(eqname, "%s_spoils", du->race->_name[0]);
+    sprintf(eqname, "%s_spoils", u_race(du)->_name[0]);
     eq = get_equipment(eqname);
     if (eq != NULL) {
       equip_items(&du->items, eq);
@@ -1033,19 +1033,19 @@ static void vampirism(troop at, int damage)
 static int natural_armor(unit * du)
 {
   static int *bonus = 0;
-  int an = du->race->armor;
+  int an = u_race(du)->armor;
   if (bonus == 0) {
     bonus = calloc(sizeof(int), num_races);
   }
-  if (bonus[du->race->index] == 0) {
-    bonus[du->race->index] =
-      get_param_int(du->race->parameters, "armor.stamina", -1);
-    if (bonus[du->race->index] == 0)
-      bonus[du->race->index] = -1;
+  if (bonus[u_race(du)->index] == 0) {
+    bonus[u_race(du)->index] =
+      get_param_int(u_race(du)->parameters, "armor.stamina", -1);
+    if (bonus[u_race(du)->index] == 0)
+      bonus[u_race(du)->index] = -1;
   }
-  if (bonus[du->race->index] > 0) {
+  if (bonus[u_race(du)->index] > 0) {
     int sk = effskill(du, SK_STAMINA);
-    sk /= bonus[du->race->index];
+    sk /= bonus[u_race(du)->index];
     an += sk;
   }
   return an;
@@ -1170,7 +1170,7 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
       }
     }
 
-    da += rc_specialdamage(au->race, du->race, awtype);
+    da += rc_specialdamage(u_race(au), u_race(du), awtype);
 
     if (awtype != NULL && fval(awtype, WTF_MISSILE)) {
       /* missile weapon bonus */
@@ -1202,7 +1202,7 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
     /* magic_resistance gib x% Resistenzbonus zurück */
     res -= magic_resistance(du) * 3.0;
 
-    if (du->race->battle_flags & BF_EQUIPMENT) {
+    if (u_race(du)->battle_flags & BF_EQUIPMENT) {
 #ifdef TODO_RUNESWORD
       /* Runenschwert gibt im Kampf 80% Resistenzbonus */
       if (dwp == WP_RUNESWORD)
@@ -1226,18 +1226,18 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
 
   rda = MAX(da - ar, 0);
 
-  if ((du->race->battle_flags & BF_INV_NONMAGIC) && !magic)
+  if ((u_race(du)->battle_flags & BF_INV_NONMAGIC) && !magic)
     rda = 0;
   else {
     int qi;
     quicklist *ql;
     unsigned int i = 0;
 
-    if (du->race->battle_flags & BF_RES_PIERCE)
+    if (u_race(du)->battle_flags & BF_RES_PIERCE)
       i |= WTF_PIERCE;
-    if (du->race->battle_flags & BF_RES_CUT)
+    if (u_race(du)->battle_flags & BF_RES_CUT)
       i |= WTF_CUT;
-    if (du->race->battle_flags & BF_RES_BASH)
+    if (u_race(du)->battle_flags & BF_RES_BASH)
       i |= WTF_BLUNT;
 
     if (i && awtype && fval(awtype, i))
@@ -1266,7 +1266,7 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
 
   assert(dt.index < du->number);
   df->person[dt.index].hp -= rda;
-  if (au->race == new_race[RC_DAEMON]) {
+  if (u_race(au) == new_race[RC_DAEMON]) {
     vampirism(at, rda);
   }
 
@@ -1275,7 +1275,7 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
       fprintf(bdebug, "Damage %d, armor %d: %d -> %d HP\n",
         da, ar, df->person[dt.index].hp + rda, df->person[dt.index].hp);
     }
-    if (au->race == new_race[RC_DAEMON]) {
+    if (u_race(au) == new_race[RC_DAEMON]) {
 #ifdef TODO_RUNESWORD
       if (select_weapon(dt, 0, -1) == WP_RUNESWORD)
         continue;
@@ -1290,7 +1290,7 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
   }
 
   /* Sieben Leben */
-  if (du->race == new_race[RC_CAT] && (chance(1.0 / 7))) {
+  if (u_race(du) == new_race[RC_CAT] && (chance(1.0 / 7))) {
     assert(dt.index >= 0 && dt.index < du->number);
     df->person[dt.index].hp = unit_max_hp(du);
     return false;
@@ -1313,7 +1313,7 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
         msg_release(m);
       }
       assert(dt.index >= 0 && dt.index < du->number);
-      df->person[dt.index].hp = du->race->hitpoints;
+      df->person[dt.index].hp = u_race(du)->hitpoints;
       return false;
     }
   }
@@ -1464,7 +1464,7 @@ troop select_enemy(fighter * af, int minrow, int maxrow, int select)
 #ifdef DEBUG_SELECT
   troop result = no_troop;
 #endif
-  if (af->unit->race->flags & RCF_FLY) {
+  if (u_race(af->unit)->flags & RCF_FLY) {
     /* flying races ignore min- and maxrow and can attack anyone fighting
      * them */
     minrow = FIGHT_ROW;
@@ -1564,7 +1564,7 @@ static troop select_opponent(battle * b, troop at, int mindist, int maxdist)
   fighter *af = at.fighter;
   troop dt;
 
-  if (af->unit->race->flags & RCF_FLY) {
+  if (u_race(af->unit)->flags & RCF_FLY) {
     /* flying races ignore min- and maxrow and can attack anyone fighting
      * them */
     dt = select_enemy(at.fighter, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
@@ -1849,11 +1849,11 @@ int skilldiff(troop at, troop dt, int dist)
     skdiff += 2;
 
   /* Effekte durch Rassen */
-  if (awp != NULL && au->race == new_race[RC_HALFLING] && dragonrace(du->race)) {
+  if (awp != NULL && u_race(au) == new_race[RC_HALFLING] && dragonrace(u_race(du))) {
     skdiff += 5;
   }
 
-  if (au->race == new_race[RC_GOBLIN]) {
+  if (u_race(au) == new_race[RC_GOBLIN]) {
     static int goblin_bonus = -1;
     if (goblin_bonus < 0)
       goblin_bonus =
@@ -2067,8 +2067,8 @@ static void make_heroes(battle * b)
       unit *u = fig->unit;
       if (fval(u, UFL_HERO)) {
         int i;
-        if (!playerrace(u->race)) {
-          log_error("Hero %s is a %s.\n", unitname(u), u->race->_name[0]);
+        if (!playerrace(u_race(u))) {
+          log_error("Hero %s is a %s.\n", unitname(u), u_race(u)->_name[0]);
         }
         for (i = 0; i != u->number; ++i) {
           fig->person[i].speed += (hero_speed - 1);
@@ -2144,7 +2144,7 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
             if (hits(ta, td, wp)) {
               const char *d;
               if (wp == NULL)
-                d = au->race->def_damage;
+                d = u_race(au)->def_damage;
               else if (is_riding(ta))
                 d = wp->type->damage[1];
               else
@@ -2260,11 +2260,11 @@ void do_attack(fighter * af)
 
     for (apr = 0; apr != attacks; ++apr) {
       int a;
-      for (a = 0; a != 10 && au->race->attack[a].type != AT_NONE; ++a) {
+      for (a = 0; a != 10 && u_race(au)->attack[a].type != AT_NONE; ++a) {
         if (apr > 0) {
           /* Wenn die Waffe nachladen muss, oder es sich nicht um einen
            * Waffen-Angriff handelt, dann gilt der Speed nicht. */
-          if (au->race->attack[a].type != AT_STANDARD)
+          if (u_race(au)->attack[a].type != AT_STANDARD)
             continue;
           else {
             weapon *wp = preferred_weapon(ta, true);
@@ -2272,7 +2272,7 @@ void do_attack(fighter * af)
               continue;
           }
         }
-        attack(b, ta, &(au->race->attack[a]), apr);
+        attack(b, ta, &(u_race(au)->attack[a]), apr);
       }
     }
   }
@@ -2362,7 +2362,7 @@ double fleechance(unit * u)
   c += (eff_skill(u, SK_STEALTH, r) * 0.05);
   c += horsebonus(u);
 
-  if (u->race == new_race[RC_HALFLING]) {
+  if (u_race(u) == new_race[RC_HALFLING]) {
     c += 0.20;
     c = MIN(c, 0.90);
   } else {
@@ -2652,8 +2652,8 @@ static void aftermath(battle * b)
 
       /* tote insgesamt: */
       s->dead += dead;
-      /* Tote, die wiederbelebt werde können: */
-      if (playerrace(df->unit->race)) {
+      /* Tote, die wiederbelebt werde koennen: */
+      if (playerrace(u_race(df->unit))) {
         s->casualties += dead;
       }
       if (df->hits + df->kills) {
@@ -2769,7 +2769,7 @@ static void aftermath(battle * b)
       }
       s->flee += df->run.number;
 
-      if (playerrace(du->race)) {
+      if (playerrace(u_race(du))) {
         /* tote im kampf werden zu regionsuntoten:
          * for each of them, a peasant will die as well */
         dead_players += dead;
@@ -3207,7 +3207,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
   }
 
   /* Illusionen und Zauber kaempfen nicht */
-  if (fval(u->race, RCF_ILLUSIONARY) || idle(u->faction) || u->number == 0) {
+  if (fval(u_race(u), RCF_ILLUSIONARY) || idle(u->faction) || u->number == 0) {
     return NULL;
   }
   if (s1 == NULL) {
@@ -3233,7 +3233,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     set_attacker(fig);
   } else {
     building *bld = u->building;
-    if (bld && bld->sizeleft >= u->number && playerrace(u->race)) {
+    if (bld && bld->sizeleft >= u->number && playerrace(u_race(u))) {
       fig->building = bld;
       fig->building->sizeleft -= u->number;
     }
@@ -3304,7 +3304,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
 
   /* Für alle Waffengattungen wird bestimmt, wie viele der Personen mit
    * ihr kämpfen könnten, und was ihr Wert darin ist. */
-  if (u->race->battle_flags & BF_EQUIPMENT) {
+  if (u_race(u)->battle_flags & BF_EQUIPMENT) {
     int oi = 0, di = 0;
     for (itm = u->items; itm && w != WMAX; itm = itm->next) {
       const weapon_type *wtype = resource2weapon(itm->type->rtype);
@@ -3382,11 +3382,11 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
 
   s1->size[statusrow(fig->status)] += u->number;
   s1->size[SUM_ROW] += u->number;
-  if (u->race->battle_flags & BF_NOBLOCK) {
+  if (u_race(u)->battle_flags & BF_NOBLOCK) {
     s1->nonblockers[statusrow(fig->status)] += u->number;
   }
 
-  if (fig->unit->race->flags & RCF_HORSE) {
+  if (u_race(fig->unit)->flags & RCF_HORSE) {
     fig->horses = fig->unit->number;
     fig->elvenhorses = 0;
   } else {
@@ -3401,7 +3401,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     fig->elvenhorses = get_item(u, I_ELVENHORSE);
   }
 
-  if (u->race->battle_flags & BF_EQUIPMENT) {
+  if (u_race(u)->battle_flags & BF_EQUIPMENT) {
     for (itm = u->items; itm; itm = itm->next) {
       if (itm->type->rtype->atype) {
         if (i_canuse(u, itm->type)) {
@@ -3430,18 +3430,18 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
   if (fig->horses) {
     if (!fval(r->terrain, CAVALRY_REGION) || r_isforest(r)
       || eff_skill(u, SK_RIDING, r) < CavalrySkill()
-      || u->race == new_race[RC_TROLL] || fval(u, UFL_WERE))
+      || u_race(u) == new_race[RC_TROLL] || fval(u, UFL_WERE))
       fig->horses = 0;
   }
 
   if (fig->elvenhorses) {
-    if (eff_skill(u, SK_RIDING, r) < 5 || u->race == new_race[RC_TROLL]
+    if (eff_skill(u, SK_RIDING, r) < 5 || u_race(u) == new_race[RC_TROLL]
       || fval(u, UFL_WERE))
       fig->elvenhorses = 0;
   }
 
   /* Schauen, wie gut wir in Taktik sind. */
-  if (tactics > 0 && u->race == new_race[RC_INSECT])
+  if (tactics > 0 && u_race(u) == new_race[RC_INSECT])
     tactics -= 1 - (int)log10(fig->side->size[SUM_ROW]);
 #ifdef TACTICS_MODIFIER
   if (tactics > 0 && statusrow(fig->status) == FIGHT_ROW)
@@ -3936,9 +3936,9 @@ static bool start_battle(region * r, battle ** bp)
             continue;
           }
 
-          if ((u->race->battle_flags & BF_CANATTACK) == 0) {
+          if ((u_race(u)->battle_flags & BF_CANATTACK) == 0) {
             ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "race_no_attack",
-                "race", u->race));
+                "race", u_race(u)));
             continue;
           }
           /**
@@ -4209,7 +4209,7 @@ static void battle_flee(battle * b)
           /* keine Flucht von Schiffen auf hoher See */
           continue;
         }
-        if (fval(u->race, RCF_UNDEAD) || u->race == new_race[RC_SHADOWKNIGHT]) {
+        if (fval(u_race(u), RCF_UNDEAD) || u_race(u) == new_race[RC_SHADOWKNIGHT]) {
           /* Untote fliehen nicht. Warum eigentlich? */
           continue;
         }

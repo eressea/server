@@ -239,7 +239,7 @@ int LongHunger(const struct unit *u)
     if (!fval(u, UFL_HUNGER))
       return false;
 #ifdef NEW_DAEMONHUNGER_RULE
-    if (u->race == new_race[RC_DAEMON])
+    if (u_race(u) == new_race[RC_DAEMON])
       return false;
 #endif
   }
@@ -637,9 +637,9 @@ int shipspeed(const ship * sh, const unit * u)
   if (curse_active(get_curse(sh->attribs, nodrift_ct)))
     k += 1;
 
-  if (u->faction->race == u->race) {
+  if (u->faction->race == u_race(u)) {
     /* race bonus for this faction? */
-    if (fval(u->race, RCF_SHIPSPEED)) {
+    if (fval(u_race(u), RCF_SHIPSPEED)) {
       k += 1;
     }
   }
@@ -986,7 +986,7 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
 
   if (u->faction == f || omniscient(f)) {
     return true;
-  } else if (fval(u->race, RCF_INVISIBLE)) {
+  } else if (fval(u_race(u), RCF_INVISIBLE)) {
     return false;
   } else if (u->number == 0) {
     attrib *a = a_find(u->attribs, &at_creator);
@@ -1040,7 +1040,7 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
 bool cansee_unit(const unit * u, const unit * target, int modifier)
 /* target->region kann != u->region sein, wenn es um durchreisen geht */
 {
-  if (fval(target->race, RCF_INVISIBLE) || target->number == 0)
+  if (fval(u_race(target), RCF_INVISIBLE) || target->number == 0)
     return false;
   else if (target->faction == u->faction)
     return true;
@@ -1083,7 +1083,7 @@ cansee_durchgezogen(const faction * f, const region * r, const unit * u,
   int n;
   unit *u2;
 
-  if (fval(u->race, RCF_INVISIBLE) || u->number == 0)
+  if (fval(u_race(u), RCF_INVISIBLE) || u->number == 0)
     return false;
   else if (u->faction == f)
     return true;
@@ -1199,7 +1199,7 @@ int count_all(const faction * f)
   int n = 0;
   unit *u;
   for (u = f->units; u; u = u->nextF) {
-    if (playerrace(u->race)) {
+    if (playerrace(u_race(u))) {
       n += u->number;
       assert(f == u->faction);
     }
@@ -1217,9 +1217,9 @@ int count_migrants(const faction * f)
   int n = 0;
   while (u) {
     assert(u->faction == f);
-    if (u->race != f->race && u->race != new_race[RC_ILLUSION]
-      && u->race != new_race[RC_SPELL]
-      && !!playerrace(u->race) && !(is_cursed(u->attribs, C_SLAVE, 0))) {
+    if (u_race(u) != f->race && u_race(u) != new_race[RC_ILLUSION]
+      && u_race(u) != new_race[RC_SPELL]
+      && !!playerrace(u_race(u)) && !(is_cursed(u->attribs, C_SLAVE, 0))) {
       n += u->number;
     }
     u = u->nextF;
@@ -2345,8 +2345,8 @@ void remove_empty_units_in_region(region * r)
         }
       }
     }
-    if ((u->number == 0 && u->race != new_race[RC_SPELL]) || (u->age <= 0
-        && u->race == new_race[RC_SPELL])) {
+    if ((u->number == 0 && u_race(u) != new_race[RC_SPELL]) || (u->age <= 0
+        && u_race(u) == new_race[RC_SPELL])) {
       remove_unit(up, u);
     }
     if (*up == u)
@@ -2380,7 +2380,7 @@ int weight(const unit * u)
       in_bag += w;
   }
 
-  n += u->number * u->race->weight;
+  n += u->number * u_race(u)->weight;
 
   w = get_item(u, I_BAG_OF_HOLDING) * BAGCAPACITY;
   if (w > in_bag)
@@ -2407,9 +2407,9 @@ unsigned int guard_flags(const unit * u)
 #if GUARD_DISABLES_RECRUIT == 1
   flags |= GUARD_RECRUIT;
 #endif
-  switch (old_race(u->race)) {
+  switch (old_race(u_race(u))) {
   case RC_ELF:
-    if (u->faction->race != u->race)
+    if (u->faction->race != u_race(u))
       break;
     /* else fallthrough */
   case RC_TREEMAN:
@@ -2484,9 +2484,9 @@ bool hunger(int number, unit * u)
     if (damage == NULL)
       damage = "1d12+12";
   }
-  if (rc != u->race) {
-    rcdamage = get_param(u->race->parameters, "hunger.damage");
-    rc = u->race;
+  if (rc != u_race(u)) {
+    rcdamage = get_param(u_race(u)->parameters, "hunger.damage");
+    rc = u_race(u);
   }
 
   while (number--) {
@@ -2843,7 +2843,7 @@ int maintenance_cost(const struct unit *u)
     if (retval >= 0)
       return retval;
   }
-  return u->race->maintenance * u->number;
+  return u_race(u)->maintenance * u->number;
 }
 
 message *movement_error(unit * u, const char *token, order * ord,
@@ -2928,7 +2928,7 @@ void add_income(unit * u, int type, int want, int qty)
 int produceexp(struct unit *u, skill_t sk, int n)
 {
   if (global.producexpchance > 0.0F) {
-    if (n == 0 || !playerrace(u->race))
+    if (n == 0 || !playerrace(u_race(u)))
       return 0;
     learn_skill(u, sk, global.producexpchance);
   }

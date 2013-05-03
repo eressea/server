@@ -839,7 +839,7 @@ static int tolua_unit_set_faction(lua_State * L)
 static int tolua_unit_get_race(lua_State * L)
 {
   unit *self = (unit *) tolua_tousertype(L, 1, 0);
-  tolua_pushstring(L, self->race->_name[0]);
+  tolua_pushstring(L, u_race(self)->_name[0]);
   return 1;
 }
 
@@ -851,9 +851,9 @@ static int tolua_unit_set_race(lua_State * L)
   if (rc != NULL) {
     if (count_unit(self))
       --self->faction->no_units;
-    if (self->irace == self->race)
+    if (self->irace == u_race(self))
       self->irace = NULL;
-    self->race = rc;
+    u_setrace(self, rc);
     if (count_unit(self))
       --self->faction->no_units;
   }

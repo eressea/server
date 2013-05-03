@@ -239,7 +239,7 @@ int setstealth_cmd(unit * u, struct order *ord)
   trace = findrace(s, u->faction->locale);
   if (trace) {
     /* Dämonen können sich nur als andere Spielerrassen tarnen */
-    if (u->race == new_race[RC_DAEMON]) {
+    if (u_race(u) == new_race[RC_DAEMON]) {
       race_t allowed[] = { RC_DWARF, RC_ELF, RC_ORC, RC_GOBLIN, RC_HUMAN,
         RC_TROLL, RC_DAEMON, RC_INSECT, RC_HALFLING, RC_CAT, RC_AQUARIAN,
         NORACE
@@ -250,29 +250,29 @@ int setstealth_cmd(unit * u, struct order *ord)
           break;
       if (new_race[allowed[i]] == trace) {
         u->irace = trace;
-        if (u->race->flags & RCF_SHAPESHIFTANY && get_racename(u->attribs))
+        if (u_race(u)->flags & RCF_SHAPESHIFTANY && get_racename(u->attribs))
           set_racename(&u->attribs, NULL);
       }
       return 0;
     }
 
     /* Singdrachen können sich nur als Drachen tarnen */
-    if (u->race == new_race[RC_SONGDRAGON]
-      || u->race == new_race[RC_BIRTHDAYDRAGON]) {
+    if (u_race(u) == new_race[RC_SONGDRAGON]
+      || u_race(u) == new_race[RC_BIRTHDAYDRAGON]) {
       if (trace == new_race[RC_SONGDRAGON] || trace == new_race[RC_FIREDRAGON]
         || trace == new_race[RC_DRAGON] || trace == new_race[RC_WYRM]) {
         u->irace = trace;
-        if (u->race->flags & RCF_SHAPESHIFTANY && get_racename(u->attribs))
+        if (u_race(u)->flags & RCF_SHAPESHIFTANY && get_racename(u->attribs))
           set_racename(&u->attribs, NULL);
       }
       return 0;
     }
 
     /* Dämomen und Illusionsparteien können sich als andere race tarnen */
-    if (u->race->flags & RCF_SHAPESHIFT) {
+    if (u_race(u)->flags & RCF_SHAPESHIFT) {
       if (playerrace(trace)) {
         u->irace = trace;
-        if ((u->race->flags & RCF_SHAPESHIFTANY) && get_racename(u->attribs))
+        if ((u_race(u)->flags & RCF_SHAPESHIFTANY) && get_racename(u->attribs))
           set_racename(&u->attribs, NULL);
       }
     }
@@ -328,7 +328,7 @@ int setstealth_cmd(unit * u, struct order *ord)
       u_seteffstealth(u, -1);
       break;
     default:
-      if (u->race->flags & RCF_SHAPESHIFTANY) {
+      if (u_race(u)->flags & RCF_SHAPESHIFTANY) {
         set_racename(&u->attribs, s);
       } else {
         cmistake(u, ord, 289, MSG_EVENT);

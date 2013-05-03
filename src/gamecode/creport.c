@@ -696,7 +696,7 @@ static void cr_output_unit(FILE * F, const region * r, const faction * f,       
   static bool init = false;
   item result[MAX_INVENTORY];
 
-  if (fval(u->race, RCF_INVISIBLE))
+  if (fval(u_race(u), RCF_INVISIBLE))
     return;
 
   if (!init) {
@@ -785,8 +785,8 @@ static void cr_output_unit(FILE * F, const region * r, const faction * f,       
   pzTmp = get_racename(u->attribs);
   if (pzTmp) {
     fprintf(F, "\"%s\";Typ\n", pzTmp);
-    if (u->faction == f && fval(u->race, RCF_SHAPESHIFTANY)) {
-      const char *zRace = rc_name(u->race, 1);
+    if (u->faction == f && fval(u_race(u), RCF_SHAPESHIFTANY)) {
+      const char *zRace = rc_name(u_race(u), 1);
       fprintf(F, "\"%s\";wahrerTyp\n",
         add_translation(zRace, locale_string(f->locale, zRace)));
     }
@@ -795,10 +795,10 @@ static void cr_output_unit(FILE * F, const region * r, const faction * f,       
     const char *zRace = rc_name(irace, 1);
     fprintf(F, "\"%s\";Typ\n",
       add_translation(zRace, locale_string(f->locale, zRace)));
-    if (u->faction == f && irace != u->race) {
+    if (u->faction == f && irace != u_race(u)) {
       assert(skill_enabled[SK_STEALTH]
         || !"we're resetting this on load, so.. ircase should never be used");
-      zRace = rc_name(u->race, 1);
+      zRace = rc_name(u_race(u), 1);
       fprintf(F, "\"%s\";wahrerTyp\n",
         add_translation(zRace, locale_string(f->locale, zRace)));
     }

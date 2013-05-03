@@ -404,7 +404,7 @@ summary *make_summary(void)
 
         f->num_total += u->number;
         f->money += get_money(u);
-        s->poprace[old_race(u->race)] += u->number;
+        s->poprace[old_race(u_race(u))] += u->number;
       }
     }
   }

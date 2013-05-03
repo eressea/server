@@ -448,7 +448,7 @@ extern "C" {
   extern struct attrib_type at_guard;
   extern void free_gamedata(void);
 #if 1                           /* disable to count all units */
-# define count_unit(u) playerrace(u->race)
+# define count_unit(u) playerrace(u_race(u))
 #else
 # define count_unit(u) 1
 #endif

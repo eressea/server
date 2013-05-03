@@ -183,7 +183,7 @@ static buddy *get_friends(const unit * u, int *numfriends)
         buddy *nf, **fr = &friends;
 
         /* some units won't take stuff: */
-        if (u2->race->ec_flags & GETITEM) {
+        if (u_race(u2)->ec_flags & GETITEM) {
           while (*fr && (*fr)->faction->no < u2->faction->no)
             fr = &(*fr)->next;
           nf = *fr;
@@ -195,9 +195,9 @@ static buddy *get_friends(const unit * u, int *numfriends)
             nf->number = 0;
             *fr = nf;
           } else if (nf->faction == u2->faction
-            && (u2->race->ec_flags & GIVEITEM)) {
+            && (u_race(u2)->ec_flags & GIVEITEM)) {
             /* we don't like to gift it to units that won't give it back */
-            if ((nf->unit->race->ec_flags & GIVEITEM) == 0) {
+            if ((u_race(nf->unit)->ec_flags & GIVEITEM) == 0) {
               nf->unit = u2;
             }
           }
@@ -234,9 +234,9 @@ int gift_items(unit * u, int flags)
       flags -= GIFT_SELF;
   }
 
-  if (u->items == NULL || fval(u->race, RCF_ILLUSIONARY))
+  if (u->items == NULL || fval(u_race(u), RCF_ILLUSIONARY))
     return 0;
-  if ((u->race->ec_flags & GIVEITEM) == 0)
+  if ((u_race(u)->ec_flags & GIVEITEM) == 0)
     return 0;
 
   /* at first, I should try giving my crap to my own units in this region */
@@ -245,9 +245,9 @@ int gift_items(unit * u, int flags)
     for (u2 = r->units; u2; u2 = u2->next) {
       if (u2 != u && u2->faction == u->faction && u2->number > 0) {
         /* some units won't take stuff: */
-        if (u2->race->ec_flags & GETITEM) {
+        if (u_race(u2)->ec_flags & GETITEM) {
           /* we don't like to gift it to units that won't give it back */
-          if (u2->race->ec_flags & GIVEITEM) {
+          if (u_race(u2)->ec_flags & GIVEITEM) {
             i_merge(&u2->items, &u->items);
             u->items = NULL;
             break;
@@ -324,7 +324,7 @@ void make_zombie(unit * u)
 {
   u_setfaction(u, get_monsters());
   scale_number(u, 1);
-  u->race = new_race[RC_ZOMBIE];
+  u_setrace(u, new_race[RC_ZOMBIE]);
   u->irace = NULL;
 }
 
@@ -438,8 +438,8 @@ const char *u_description(const unit * u, const struct locale *lang)
 {
   if (u->display && u->display[0]) {
     return u->display;
-  } else if (u->race->describe) {
-    return u->race->describe(u, lang);
+  } else if (u_race(u)->describe) {
+    return u_race(u)->describe(u, lang);
   }
   return NULL;
 }
@@ -857,14 +857,14 @@ bool leave(unit * u, bool force)
 
 const struct race *urace(const struct unit *u)
 {
-  return u->race;
+  return u->race_;
 }
 
 bool can_survive(const unit * u, const region * r)
 {
-  if ((fval(r->terrain, WALK_INTO) && (u->race->flags & RCF_WALK))
-    || (fval(r->terrain, SWIM_INTO) && (u->race->flags & RCF_SWIM))
-    || (fval(r->terrain, FLY_INTO) && (u->race->flags & RCF_FLY))) {
+  if ((fval(r->terrain, WALK_INTO) && (u_race(u)->flags & RCF_WALK))
+    || (fval(r->terrain, SWIM_INTO) && (u_race(u)->flags & RCF_SWIM))
+    || (fval(r->terrain, FLY_INTO) && (u_race(u)->flags & RCF_FLY))) {
     static const curse_type *ctype = NULL;
 
     if (has_horses(u) && !fval(r->terrain, WALK_INTO))
@@ -872,7 +872,7 @@ bool can_survive(const unit * u, const region * r)
 
     if (!ctype)
       ctype = ct_find("holyground");
-    if (fval(u->race, RCF_UNDEAD) && curse_active(get_curse(r->attribs, ctype)))
+    if (fval(u_race(u), RCF_UNDEAD) && curse_active(get_curse(r->attribs, ctype)))
       return false;
 
     return true;
@@ -1021,8 +1021,8 @@ void transfermen(unit * u, unit * u2, int n)
       a = an;
     }
   } else if (r->land) {
-    if ((u->race->ec_flags & ECF_REC_ETHEREAL) == 0) {
-      const race *rc = u->race;
+    if ((u_race(u)->ec_flags & ECF_REC_ETHEREAL) == 0) {
+      const race *rc = u_race(u);
       if (rc->ec_flags & ECF_REC_HORSES) {      /* Zentauren an die Pferde */
         int h = rhorses(r) + n;
         rsethorses(r, h);
@@ -1115,7 +1115,7 @@ void set_number(unit * u, int count)
   if (count == 0) {
     u->flags &= ~(UFL_HERO);
   }
-  if (u->faction && playerrace(u->race)) {
+  if (u->faction && playerrace(u_race(u))) {
     u->faction->num_people += count - u->number;
   }
   u->number = (unsigned short)count;
@@ -1299,7 +1299,7 @@ get_modifier(const unit * u, skill_t sk, int level, const region * r,
     }
   }
 
-  skill += rc_skillmod(u->race, r, sk);
+  skill += rc_skillmod(u_race(u), r, sk);
   skill += att_modification(u, sk);
 
   if (!noitem) {
@@ -1407,12 +1407,12 @@ static void createunitid(unit * u, int id)
 
 void name_unit(unit * u)
 {
-  if (u->race->generate_name) {
-    const char *gen_name = u->race->generate_name(u);
+  if (u_race(u)->generate_name) {
+    const char *gen_name = u_race(u)->generate_name(u);
     if (gen_name) {
       unit_setname(u, gen_name);
     } else {
-      unit_setname(u, racename(u->faction->locale, u, u->race));
+      unit_setname(u, racename(u->faction->locale, u, u_race(u)));
     }
   } else {
     char name[32];
@@ -1462,7 +1462,7 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
     }
   }
   u_seteffstealth(u, -1);
-  u->race = urace;
+  u_setrace(u, urace);
   u->irace = NULL;
 
   set_number(u, number);
@@ -1497,7 +1497,7 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
       if (creator->building) {
         u_set_building(u, creator->building);
       }
-      if (creator->ship && fval(u->race, RCF_CANSAIL)) {
+      if (creator->ship && fval(u_race(u), RCF_CANSAIL)) {
         u_set_ship(u, creator->ship);
       }
     }
@@ -1518,7 +1518,7 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
     }
     /* Daemonentarnung */
     set_racename(&u->attribs, get_racename(creator->attribs));
-    if (fval(u->race, RCF_SHAPESHIFT) && fval(creator->race, RCF_SHAPESHIFT)) {
+    if (fval(u_race(u), RCF_SHAPESHIFT) && fval(u_race(creator), RCF_SHAPESHIFT)) {
       u->irace = creator->irace;
     }
 
@@ -1665,7 +1665,7 @@ int unit_max_hp(const unit * u)
     rules_stamina =
       get_param_int(global.parameters, "rules.stamina", STAMINA_AFFECTS_HP);
   }
-  h = u->race->hitpoints;
+  h = u_race(u)->hitpoints;
   if (heal_ct == NULL)
     heal_ct = ct_find("healingzone");
 
@@ -1734,7 +1734,18 @@ const struct race *u_irace(const struct unit *u)
   if (u->irace && skill_enabled[SK_STEALTH]) {
     return u->irace;
   }
-  return u->race;
+  return u->race_;
+}
+
+const struct race *u_race(const struct unit *u)
+{
+  return u->race_;
+}
+
+void u_setrace(struct unit *u, const struct race *rc)
+{
+  assert(rc);
+  u->race_ = rc;
 }
 
 void unit_add_spell(unit * u, sc_mage * m, struct spell * sp, int level)

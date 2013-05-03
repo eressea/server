@@ -144,7 +144,7 @@ static void checkorders(void)
 
 static bool help_money(const unit * u)
 {
-  if (u->race->ec_flags & GIVEITEM)
+  if (u_race(u)->ec_flags & GIVEITEM)
     return true;
   return false;
 }
@@ -294,7 +294,7 @@ void get_food(region * r)
    * bei fehlenden Bauern den Dämon hungern lassen
    */
   for (u = r->units; u; u = u->next) {
-    if (u->race == new_race[RC_DAEMON]) {
+    if (u_race(u) == new_race[RC_DAEMON]) {
       int hungry = u->number;
 
       /* use peasantblood before eating the peasants themselves */
@@ -315,7 +315,7 @@ void get_food(region * r)
           if (donor == u)
             donor = r->units;
           while (donor != NULL) {
-            if (donor->race == new_race[RC_DAEMON] && donor!=u) {
+            if (u_race(donor) == new_race[RC_DAEMON] && donor!=u) {
               if (get_effect(donor, pt_blood)) {
                 /* if he's in our faction, drain him: */
                 if (donor->faction == u->faction)
@@ -363,14 +363,14 @@ void get_food(region * r)
 
 static void age_unit(region * r, unit * u)
 {
-  if (u->race == new_race[RC_SPELL]) {
+  if (u_race(u) == new_race[RC_SPELL]) {
     if (--u->age <= 0) {
       remove_unit(&r->units, u);
     }
   } else {
     ++u->age;
-    if (u->number > 0 && u->race->age) {
-      u->race->age(u);
+    if (u->number > 0 && u_race(u)->age) {
+      u_race(u)->age(u);
     }
   }
 #ifdef ASTRAL_ITEM_RESTRICTIONS
@@ -681,7 +681,7 @@ static int count_race(const region * r, const race * rc)
   int c = 0;
 
   for (u = r->units; u; u = u->next)
-    if (u->race == rc)
+    if (u_race(u) == rc)
       c += u->number;
 
   return c;
@@ -1111,7 +1111,7 @@ int leave_cmd(unit * u, struct order *ord)
   }
 
   if (fval(r->terrain, SEA_REGION) && u->ship) {
-    if (!fval(u->race, RCF_SWIM)) {
+    if (!fval(u_race(u), RCF_SWIM)) {
       cmistake(u, ord, 11, MSG_MOVE);
       return 0;
     }
@@ -1216,10 +1216,10 @@ int enter_ship(unit * u, struct order *ord, int id, int report)
   region *r = u->region;
   ship *sh;
 
-  /* Muß abgefangen werden, sonst könnten Schwimmer an
+  /* Muss abgefangen werden, sonst koennten Schwimmer an
    * Bord von Schiffen an Land gelangen. */
-  if (!fval(u->race, RCF_CANSAIL) || (!fval(u->race, RCF_WALK)
-      && !fval(u->race, RCF_FLY))) {
+  if (!fval(u_race(u), RCF_CANSAIL) || (!fval(u_race(u), RCF_WALK)
+      && !fval(u_race(u), RCF_FLY))) {
     cmistake(u, ord, 233, MSG_MOVE);
     return 0;
   }
@@ -1247,7 +1247,7 @@ int enter_ship(unit * u, struct order *ord, int id, int report)
       getshipweight(sh, &sweight, &scabins);
       sweight += weight(u);
       if (mcabins) {
-        int pweight = u->number * u->race->weight;
+        int pweight = u->number * u_race(u)->weight;
         /* weight goes into number of cabins, not cargo */
         scabins += pweight;
         sweight -= pweight;
@@ -1277,7 +1277,7 @@ int enter_building(unit * u, order * ord, int id, int report)
 
   /* Schwimmer können keine Gebäude betreten, außer diese sind
    * auf dem Ozean */
-  if (!fval(u->race, RCF_WALK) && !fval(u->race, RCF_FLY)) {
+  if (!fval(u_race(u), RCF_WALK) && !fval(u_race(u), RCF_FLY)) {
     if (!fval(r->terrain, SEA_REGION)) {
       if (report) {
         cmistake(u, ord, 232, MSG_MOVE);
@@ -2153,7 +2153,7 @@ mailunit(region * r, unit * u, int n, struct order *ord, const char *s)
     deliverMail(u2->faction, r, u, s, u2);
     /* now done in prepare_mail_cmd */
   } else {
-    /* Immer eine Meldung - sonst könnte man so getarnte EHs enttarnen:
+    /* Immer eine Meldung - sonst koennte man so getarnte EHs enttarnen:
      * keine Meldung -> EH hier. */
     ADDMSG(&u->faction->msgs,
       msg_feedback(u, ord, "feedback_unit_not_found", ""));
@@ -2511,7 +2511,7 @@ static bool display_race(faction * f, unit * u, const race * rc)
   size_t size = sizeof(buf) - 1;
   int bytes;
 
-  if (u && u->race != rc)
+  if (u && u_race(u) != rc)
     return false;
   name = rc_name(rc, 0);
 
@@ -2728,9 +2728,9 @@ int promotion_cmd(unit * u, struct order *ord)
         maxheroes(u->faction), countheroes(u->faction)));
     return 0;
   }
-  if (!valid_race(u->faction, u->race)) {
+  if (!valid_race(u->faction, u_race(u))) {
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "heroes_race", "race",
-        u->race));
+        u_race(u)));
     return 0;
   }
   people = count_all(u->faction) * u->number;
@@ -2904,7 +2904,7 @@ static int can_start_guarding(const unit * u)
 {
   if (u->status >= ST_FLEE)
     return E_GUARD_FLEEING;
-  if (fval(u->race, RCF_UNARMEDGUARD))
+  if (fval(u_race(u), RCF_UNARMEDGUARD))
     return E_GUARD_OK;
   if (!armedmen(u, true))
     return E_GUARD_UNARMED;
@@ -2951,8 +2951,8 @@ int guard_on_cmd(unit * u, struct order *ord)
   } else {
     if (fval(u, UFL_MOVED)) {
       cmistake(u, ord, 187, MSG_EVENT);
-    } else if (fval(u->race, RCF_ILLUSIONARY)
-      || u->race == new_race[RC_SPELL]) {
+    } else if (fval(u_race(u), RCF_ILLUSIONARY)
+      || u_race(u) == new_race[RC_SPELL]) {
       cmistake(u, ord, 95, MSG_EVENT);
     } else {
       /* Monster der Monsterpartei dürfen immer bewachen */
@@ -3303,7 +3303,7 @@ static building *age_building(building * b)
      * find out if there's a magician in there. */
     for (u = r->units; u; u = u->next) {
       if (b == u->building && inside_building(u)) {
-        if (!(u->race->ec_flags & GIVEITEM) == 0) {
+        if (!(u_race(u)->ec_flags & GIVEITEM) == 0) {
           int n, unicorns = 0;
           for (n = 0; n != u->number; ++n) {
             if (chance(0.02)) {
@@ -3421,7 +3421,7 @@ static void ageing(void)
       if (is_cursed(u->attribs, C_OLDRACE, 0)) {
         curse *c = get_curse(u->attribs, ct_find("oldrace"));
         if (c->duration == 1 && !(c_flags(c) & CURSE_NOAGE)) {
-          u->race = new_race[curse_geteffect_int(c)];
+          u_setrace(u, new_race[curse_geteffect_int(c)]);
           u->irace = NULL;
         }
       }
@@ -3767,7 +3767,7 @@ use_item(unit * u, const item_type * itype, int amount, struct order *ord)
 static double heal_factor(const unit * u)
 {
   static float elf_regen = -1;
-  switch (old_race(u->race)) {
+  switch (old_race(u_race(u))) {
   case RC_TROLL:
   case RC_DAEMON:
     return 1.5;
@@ -3775,7 +3775,7 @@ static double heal_factor(const unit * u)
     return 2.0;
   case RC_ELF:
     if (elf_regen < 0)
-      elf_regen = get_param_flt(u->race->parameters, "regen.forest", 1.0F);
+      elf_regen = get_param_flt(u_race(u)->parameters, "regen.forest", 1.0F);
     if (elf_regen != 1.0 && r_isforest(u->region)) {
       return elf_regen;
     }
@@ -3816,7 +3816,7 @@ void monthly_healing(void)
         continue;
       }
 
-      if (u->race->flags & RCF_NOHEAL)
+      if (u_race(u)->flags & RCF_NOHEAL)
         continue;
       if (fval(u, UFL_HUNGER))
         continue;
@@ -3911,8 +3911,8 @@ void defaultorders(void)
 }
 
 /* ************************************************************ */
-/* GANZ WICHTIG! ALLE GEÄNDERTEN SPRÜCHE NEU ANZEIGEN */
-/* GANZ WICHTIG! FÜGT AUCH NEUE ZAUBER IN DIE LISTE DER BEKANNTEN EIN */
+/* GANZ WICHTIG! ALLE GEAENDERTEN SPRUECHE NEU ANZEIGEN */
+/* GANZ WICHTIG! FUEGT AUCH NEUE ZAUBER IN DIE LISTE DER BEKANNTEN EIN */
 /* ************************************************************ */
 #define COMMONSPELLS 1          /* number of new common spells per level */
 #define MAXMAGES 128            /* should be enough */
@@ -4286,7 +4286,7 @@ void process(void)
                 if (porder->flags & PROC_LONGORDER) {
                   if (u->number == 0) {
                     ord = NULL;
-                  } else if (u->race == new_race[RC_INSECT]
+                  } else if (u_race(u) == new_race[RC_INSECT]
                     && r_insectstalled(r)
                     && !is_cursed(u->attribs, C_KAELTESCHUTZ, 0)) {
                     ord = NULL;
@@ -4299,8 +4299,8 @@ void process(void)
                      */
                     ord = NULL;
                   } else if (fval(r->terrain, SEA_REGION)
-                    && u->race != new_race[RC_AQUARIAN]
-                    && !(u->race->flags & RCF_SWIM)) {
+                    && u_race(u) != new_race[RC_AQUARIAN]
+                    && !(u_race(u)->flags & RCF_SWIM)) {
                     /* error message disabled by popular demand */
                     ord = NULL;
                   }
@@ -4376,7 +4376,7 @@ int siege_cmd(unit * u, order * ord)
     return 31;
   }
 
-  if (!playerrace(u->race)) {
+  if (!playerrace(u_race(u))) {
     /* keine Drachen, Illusionen, Untote etc */
     cmistake(u, ord, 166, MSG_BATTLE);
     return 166;

@@ -215,9 +215,9 @@ const char *silbe3[SIL3] = {
 const char *generic_name(const unit * u)
 {
   if (u->no == 1) {
-    return LOC(u->faction->locale, mkname("race", u->race->_name[0]));
+    return LOC(u->faction->locale, mkname("race", u_race(u)->_name[0]));
   }
-  return LOC(u->faction->locale, mkname("race", u->race->_name[1]));
+  return LOC(u->faction->locale, mkname("race", u_race(u)->_name[1]));
 }
 
 const char *dragon_name(const unit * u)

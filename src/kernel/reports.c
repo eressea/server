@@ -157,7 +157,7 @@ report_item(const unit * owner, const item * i, const faction * viewer,
     int pp = i->number / owner->number;
     if (number)
       *number = 1;
-    if (pp > 50000 && dragonrace(owner->race)) {
+    if (pp > 50000 && dragonrace(u_race(owner))) {
       if (name)
         *name = locale_string(viewer->locale, "dragonhoard");
       if (basename)
@@ -323,15 +323,15 @@ void report_race(const struct unit *u, const char **name, const char **illusion)
 {
   if (illusion) {
     const race *irace = u_irace(u);
-    if (irace && irace != u->race) {
+    if (irace && irace != u_race(u)) {
       *illusion = irace->_name[0];
     } else {
       *illusion = NULL;
     }
   }
   if (name) {
-    *name = u->race->_name[0];
-    if (fval(u->race, RCF_SHAPESHIFTANY)) {
+    *name = u_race(u)->_name[0];
+    if (fval(u_race(u), RCF_SHAPESHIFTANY)) {
       const char *str = get_racename(u->attribs);
       if (str)
         *name = str;
@@ -561,11 +561,11 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char *buf,
     bytes = (int)strlcpy(bufp, pzTmp, size);
     if (wrptr(&bufp, &size, bytes) != 0)
       WARN_STATIC_BUFFER();
-    if (u->faction == f && fval(u->race, RCF_SHAPESHIFTANY)) {
+    if (u->faction == f && fval(u_race(u), RCF_SHAPESHIFTANY)) {
       bytes = (int)strlcpy(bufp, " (", size);
       if (wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
-      bytes = (int)strlcpy(bufp, racename(f->locale, u, u->race), size);
+      bytes = (int)strlcpy(bufp, racename(f->locale, u, u_race(u)), size);
       if (wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
       if (size > 1) {
@@ -578,11 +578,11 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char *buf,
     bytes = (int)strlcpy(bufp, racename(f->locale, u, irace), size);
     if (wrptr(&bufp, &size, bytes) != 0)
       WARN_STATIC_BUFFER();
-    if (u->faction == f && irace != u->race) {
+    if (u->faction == f && irace != u_race(u)) {
       bytes = (int)strlcpy(bufp, " (", size);
       if (wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
-      bytes = (int)strlcpy(bufp, racename(f->locale, u, u->race), size);
+      bytes = (int)strlcpy(bufp, racename(f->locale, u, u_race(u)), size);
       if (wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
       if (size > 1) {
@@ -1538,7 +1538,7 @@ static void prepare_reports(void)
         prepare_lighthouse(u->building, u->faction);
       }
 
-      if (u->race != new_race[RC_SPELL] || u->number == RS_FARVISION) {
+      if (u_race(u) != new_race[RC_SPELL] || u->number == RS_FARVISION) {
         if (fval(u, UFL_DISBELIEVES)) {
           add_seen(u->faction->seen, r, see_unit, true);
         } else {
@@ -1788,7 +1788,7 @@ int reports(void)
 
 static variant var_copy_string(variant x)
 {
-  x.v = x.v?strdup((const char *)x.v):0;
+  x.v = x.v ? strdup((const char *)x.v) : 0;
   return x;
 }
 
