@@ -11,9 +11,6 @@ set (BINDINGS_LIBRARY ${PROJECT_NAME} CACHE INTERNAL "Eressea Lua Bindings")
 
 find_package (Lua 5 REQUIRED)
 find_package (ToLua REQUIRED)
-find_package (LibXml2 REQUIRED)
-find_package (Curses REQUIRED)
-find_package (SQLite3 REQUIRED)
 
 include_directories (${ERESSEA_INCLUDE_DIR})
 include_directories (${CRITBIT_INCLUDE_DIR})
