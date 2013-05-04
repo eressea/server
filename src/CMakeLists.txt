@@ -8,12 +8,6 @@ ELSE(CMAKE_COMPILER_IS_GNUCC)
     MESSAGE(STATUS "Unknown compiler ${CMAKE_C_COMPILER_ID}")
 ENDIF(CMAKE_COMPILER_IS_GNUCC)
 
-find_package (Lua 5 REQUIRED)
-find_package (LibXml2 REQUIRED)
-find_package (SQLite3 REQUIRED)
-find_package (ToLua REQUIRED)
-find_package (Curses REQUIRED)
-
 include_directories (${ERESSEA_INCLUDE_DIR})
 include_directories (${CRITBIT_INCLUDE_DIR})
 include_directories (${CRYPTO_INCLUDE_DIR})
