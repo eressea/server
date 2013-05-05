@@ -25,3 +25,6 @@
 [submodule "lunit"]
 	path = lunit
 	url = git@github.com:eressea/lunit.git
+[submodule "cJSON"]
+	path = cJSON
+	url = git://github.com/kbranigan/cJSON.git
