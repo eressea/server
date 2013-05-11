@@ -7,9 +7,6 @@
 [submodule "cmake"]
 	path = cmake
 	url = git://github.com/eressea/cmake.git
-[submodule "eressea"]
-	path = eressea
-	url = git://github.com/eressea/core.git
 [submodule "quicklist"]
 	path = quicklist
 	url = git://github.com/badgerman/quicklist.git
