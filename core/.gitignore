@@ -1,0 +1,16 @@
+bin/
+Debug/
+Release/
+*~
+*.user
+*.pdb
+*.suo
+*.sdf
+*.opensdf
+*.ipch
+*.sh
+*.tmp
+src/*.vcproj.*.user
+tags
+build-vs2010
+config

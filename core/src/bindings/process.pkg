@@ -1,0 +1,46 @@
+$#include <bindings/bind_process.h>
+
+module eressea {
+	module process {
+		void process_update_long_order @ update_long_order(void);
+		void process_markets @ markets(void); /* operate the e3 markets */
+		void process_produce @ produce(void); /* MAKE+BUY/SELL/ENTERTAIN/WORK/TAX/STEAL/SPY/SABOTAGE/PLANT/BREED/RESEARCH */
+		void process_make_temp @ make_temp(void); /* MAKE TEMP */
+		void process_settings @ settings(void); /* EMAIL/PASSWORD/BANNER/OPTION */
+		void process_ally @ set_allies(void); /* HELP */
+		void process_prefix @ set_prefix(void); /* PREFIX */
+		void process_setstealth @ set_stealth(void); /* STEALTH */
+		void process_status @ set_status(void); /* STATUS */
+		void process_name @ set_name(void); /* NAME/DISPLAY */
+		void process_group @ set_group(void); /* GROUP */
+		void process_origin @ set_origin(void); /* ORIGIN */
+		void process_quit @ quit(void); /* QUIT */
+		void process_study @ study(void); /* LEARN/TEACH */
+		void process_movement @ movement(void); /* MOVE/FOLLOW/ROUTE */
+		void process_use @ use(void); /* USE */
+		void process_battle @ battle(void); /* ATTACK */
+		void process_siege @ siege(void); /* SIEGE */
+		void process_leave @ leave(void); /* LEAVE */
+		void process_maintenance @ maintenance(void); /* PAY */
+		void process_promote @ promote(void); /* PROMOTE */
+		void process_renumber @ renumber(void); /* RENUMBER */
+		void process_restack @ restack(void); /* SORT */
+		void process_setspells @ set_spells(void); /* COMBATSPELL */
+		void process_sethelp @ set_help(void); /* HELP */
+		void process_contact @ contact(void); /* CONTACT */
+		void process_enter @ enter(int message); /* ENTER */
+		void process_magic @ magic(void); /* CAST */
+		void process_give_control @ give_control(void); /* GIVE CONTROL */
+		void process_regeneration @ regeneration(void); /* regen health & aura */
+		void process_guard_on @ guard_on(void); /* GUARD */
+		void process_guard_off @ guard_off(void); /* GUARD NOT */
+		void process_explain @ explain(void); /* SHOW */
+		void process_messages @ messages(void); /* MESSAGE */
+		void process_reserve @ reserve(void); /* RESERVE */
+		void process_claim @ claim(void); /* CLAIM */
+		void process_follow @ follow(void); /* FOLLOW */
+        void process_alliance @ alliance(void); /* FOLLOW */
+        void process_idle @ idle(void); /* work.auto */
+        void process_set_default @ set_default(void); /* work.auto */
+	}
+}

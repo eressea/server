@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<resource name="greatbow">
+  <item weight="100">
+    <function name="canuse" value="lua_canuse_item"/>
+    <construction skill="weaponsmithing" minskill="5" reqsize="1">
+      <modifier function="mod_elves_only"/>
+      <requirement type="mallorn" quantity="2"/>
+    </construction>
+    <weapon pierce="true" missile="true" skill="bow" offmod="0" defmod="0" reload="0" magres="0.0">
+      <damage type="rider" value="2d6+4"/>
+      <damage type="footman" value="2d6+4"/>
+      <modifier type="missile_target" value="2"/>
+      <modifier type="damage" value="1">
+        <race name="elf"/>
+      </modifier>
+    </weapon>
+  </item>
+</resource>

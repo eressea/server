@@ -1,0 +1,192 @@
+#include <platform.h>
+#include "parser.h"
+#include "unicode.h"
+#include "log.h"
+
+#include <assert.h>
+#include <wctype.h>
+#include <memory.h>
+
+#define SPACE_REPLACEMENT '~'
+#define ESCAPE_CHAR       '\\'
+#define MAXTOKENSIZE      8192
+
+typedef struct parser_state {
+  const char *current_token;
+  char *current_cmd;
+  struct parser_state *next;
+} parser_state;
+
+static parser_state *state;
+
+static int eatwhitespace_c(const char **str_p)
+{
+  int ret = 0;
+  ucs4_t ucs;
+  size_t len;
+  const char *str = *str_p;
+
+  /* skip over potential whitespace */
+  for (;;) {
+    unsigned char utf8_character = (unsigned char)*str;
+    if (~utf8_character & 0x80) {
+      if (!iswxspace(utf8_character))
+        break;
+      ++str;
+    } else {
+      ret = unicode_utf8_to_ucs4(&ucs, str, &len);
+      if (ret != 0) {
+        log_warning("illegal character sequence in UTF8 string: %s\n", str);
+        break;
+      }
+      if (!iswxspace((wint_t) ucs))
+        break;
+      str += len;
+    }
+  }
+  *str_p = str;
+  return ret;
+}
+
+void init_tokens_str(const char *initstr, char *cmd)
+{
+  if (state == NULL) {
+    state = malloc(sizeof(parser_state));
+  } else if (state->current_cmd)
+    free(state->current_cmd);
+  state->current_cmd = cmd;
+  state->current_token = initstr;
+}
+
+void parser_pushstate(void)
+{
+  parser_state *new_state = malloc(sizeof(parser_state));
+  new_state->current_cmd = NULL;
+  new_state->current_token = NULL;
+  new_state->next = state;
+  state = new_state;
+}
+
+void parser_popstate(void)
+{
+  parser_state *new_state = state->next;
+  if (state->current_cmd != NULL)
+    free(state->current_cmd);
+  free(state);
+  state = new_state;
+}
+
+bool parser_end(void)
+{
+  eatwhitespace_c(&state->current_token);
+  return *state->current_token == 0;
+}
+
+void skip_token(void)
+{
+  char quotechar = 0;
+  eatwhitespace_c(&state->current_token);
+
+  while (*state->current_token) {
+    ucs4_t ucs;
+    size_t len;
+
+    unsigned char utf8_character = (unsigned char)state->current_token[0];
+    if (~utf8_character & 0x80) {
+      ucs = utf8_character;
+      ++state->current_token;
+    } else {
+      int ret = unicode_utf8_to_ucs4(&ucs, state->current_token, &len);
+      if (ret == 0) {
+        state->current_token += len;
+      } else {
+        log_warning("illegal character sequence in UTF8 string: %s\n", state->current_token);
+      }
+    }
+    if (iswxspace((wint_t) ucs) && quotechar == 0) {
+      return;
+    } else {
+      switch (utf8_character) {
+        case '"':
+        case '\'':
+          if (utf8_character == quotechar)
+            return;
+          quotechar = utf8_character;
+          break;
+        case ESCAPE_CHAR:
+          ++state->current_token;
+          break;
+      }
+    }
+  }
+}
+
+const char *parse_token(const char **str)
+{
+  static char lbuf[MAXTOKENSIZE];       /* STATIC_RESULT: used for return, not across calls */
+  char *cursor = lbuf;
+  char quotechar = 0;
+  bool escape = false;
+  const char *ctoken = *str;
+
+  assert(ctoken);
+
+  eatwhitespace_c(&ctoken);
+  while (*ctoken && cursor - lbuf < MAXTOKENSIZE - 1) {
+    ucs4_t ucs;
+    size_t len;
+    bool copy = false;
+
+    unsigned char utf8_character = *(unsigned char *)ctoken;
+    if (~utf8_character & 0x80) {
+      ucs = utf8_character;
+      len = 1;
+    } else {
+      int ret = unicode_utf8_to_ucs4(&ucs, ctoken, &len);
+      if (ret != 0) {
+        log_warning("illegal character sequence in UTF8 string: %s\n", ctoken);
+        break;
+      }
+    }
+    if (escape) {
+      copy = true;
+      escape = false;
+    } else if (iswxspace((wint_t) ucs)) {
+      if (quotechar == 0)
+        break;
+      copy = true;
+    } else if (utf8_character == '"' || utf8_character == '\'') {
+      if (utf8_character == quotechar) {
+        ++ctoken;
+        break;
+      } else if (quotechar == 0) {
+        quotechar = utf8_character;
+        ++ctoken;
+      } else {
+        *cursor++ = *ctoken++;
+      }
+    } else if (utf8_character == SPACE_REPLACEMENT) {
+      *cursor++ = ' ';
+      ++ctoken;
+    } else if (utf8_character == ESCAPE_CHAR) {
+      escape = true;
+      ++ctoken;
+    } else {
+      copy = true;
+    }
+    if (copy) {
+      memcpy(cursor, ctoken, len);
+      cursor += len;
+      ctoken += len;
+    }
+  }
+
+  *cursor = '\0';
+  *str = ctoken;
+  return lbuf;
+}
+
+const char *getstrtoken(void)
+{
+  return parse_token((const char **)&state->current_token);
+}
