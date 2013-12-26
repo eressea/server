@@ -6,7 +6,7 @@
 	url = git://github.com/eressea/crypto.git
 [submodule "cmake"]
 	path = cmake
-	url = git://github.com/eressea/cmake.git
+	url = git://github.com/badgerman/cmake.git
 [submodule "quicklist"]
 	path = quicklist
 	url = git://github.com/badgerman/quicklist.git

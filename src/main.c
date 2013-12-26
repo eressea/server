@@ -72,6 +72,19 @@ static int usage(const char *prog, const char *arg)
   return -1;
 }
 
+static int get_arg(int argc, char **argv, size_t len, int index, const char **result, const char *def) {
+  if (argv[index][len]) {
+    *result = argv[index]+len;
+    return index;
+  }
+  if (index+1 < argc) {
+    *result = argv[index];
+    return index+1;
+  }
+  *result = def;
+  return index;
+}
+
 static int parse_args(int argc, char **argv, int *exitcode)
 {
   int i;
@@ -94,36 +107,39 @@ static int parse_args(int argc, char **argv, int *exitcode)
         return usage(argv[0], argv[i]);
       }
     } else {
+      const char *arg;
       switch (argv[i][1]) {
-        case 'C':
-          entry_point = NULL;
-          break;
-        case 'l':
-          logfile = argv[i][2] ? argv[i]+2 : argv[++i];
-          break;
-        case 'e':
-          entry_point = argv[i][2] ? argv[i]+2 : argv[++i];
-          break;
-        case 't':
-          turn = atoi(argv[i][2] ? argv[i]+2 : argv[++i]);
-          break;
-        case 'q':
-          verbosity = 0;
-          break;
-        case 'v':
-          verbosity = atoi(argv[i][2] ? argv[i]+2 : argv[++i]);
-          break;
-        case 'h':
-          usage(argv[0], NULL);
-          return 1;
-        default:
-          *exitcode = -1;
-          usage(argv[0], argv[i]);
-          return 1;
+      case 'C':
+        entry_point = NULL;
+        break;
+      case 'l':
+        i = get_arg(argc, argv, 2, i, &logfile, 0);
+        break;
+      case 'e':
+        i = get_arg(argc, argv, 2, i, &entry_point, 0);
+        break;
+      case 't':
+        i = get_arg(argc, argv, 2, i, &arg, 0);
+        turn = atoi(arg);
+        break;
+      case 'q':
+        verbosity = 0;
+        break;
+      case 'v':
+        i = get_arg(argc, argv, 2, i, &arg, 0);
+        verbosity = arg ? atoi(arg) : 0xff;
+        break;
+      case 'h':
+        usage(argv[0], NULL);
+        return 1;
+      default:
+        *exitcode = -1;
+        usage(argv[0], argv[i]);
+        return 1;
       }
-	}
+    }
   }
-
+  
   switch (verbosity) {
   case 0:
     log_stderr = 0;
