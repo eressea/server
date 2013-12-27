@@ -1,0 +1,28 @@
+src/util
+	1. Was ist hier drin?
+	Hier drin steckt Code, der nicht nur für Eressea zu gebrauchen ist. Wann immer möglich, sollte man versuchen, Code hier unterzubringen. Code in diesem Verzeichnis verwendet config.h, aber unter keinen Umständen eressea.h oder anderen code aus src/common.
+	2. Beispiele:
+	attrib, event, base36, rand
+src/common
+	1. Was ist hier drin?
+	Der Kern des Spiels. Funktionen, ohne die ein Eressea-Spiel nicht existieren kann. Zum Beispiel Kampfsystem, Magiesystem, item-typen (aber möglichst wenige items). Je allgemeiner gehalten der Code ist, desto weniger muß in common, desto mehr kann in "pluggable" Modulen untergebracht werden.
+	Bei Code im Kern des Spiels sollte man beachten, das eine Abfrage auf einen konkreten item-typ immer zu einer Abhängigkeit mit Code führt, der eigentlich nicht dem Kern zuzurechnen ist. Wenn im Kampf z.B. eine Spezialwaffe erfragt wird, dann kann man kein Eressea-Spiel erzeugen, ohne diese Waffe mit zu linken, selbst wenn man sie nicht benutzt. Besser ist es in diesem Fall, wiederverwendbare attribute oder itemtype-flags zu benutzen. Analog gilt das für alle anderen typen: rassen, gebäude, schiffe, Regionstypen, Zauber.
+	2. Beispiele:
+	battle, economy, magic (vormals newmagic), item (allerdings ohne konkret items zu enthalten), build, building, ship
+src/common/gamecode
+	1. Was ist hier drin?
+	Code, der nur die Auswertung und den Ablauf betrifft, aber keine statischen Tools wie z.B. den Mapper.
+	2. Beispiele:
+	Hier ist die Ökonomie drin, Zufallsereignisse, Reportgenerierung.
+src/common/modules
+	1. Was ist hier drin?
+	"Pluggable" Module, wie Questen, Spezial-Planes, Events. Alles, was dem Spiel Leben einhaucht, ohne im Kern verankert zu sein.
+	2. Beispiele:
+	arena, xmas2000, museum, score (?).
+	3. Style
+	Ein Modul sollte aus main.c heraus initialisiert werden können. Ideal ist, wenn ein Aufruf von init_<module>() genügt, um es zu aktivieren. Das sorgt z.B. beim Weihnachtsmann-Modul für die Erzeugung der Plane und der Units, der Registrierung der nötigen Items und Attribute, und mehr muß nicht getan werden.
+	Darf keine Funktionen aus gamecode() benutzen, oder sollte selber im gamecode landen.
+src/triggers
+src/items
+src/spells
+

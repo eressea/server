@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<spellbook name="tybied">
+  <entry spell="auratransfer" level="5" />
+  <entry spell="antimagiczone" level="5" />
+  <entry spell="steal_aura" level="6" />
+  <entry spell="airship" level="6" />
+  <entry spell="enterastral" level="4" />
+  <entry spell="leaveastral" level="4" />
+  <entry spell="view_reality" level="10" />
+  <entry spell="astral_disruption" level="14" />
+  <entry spell="combat_speed" level="9" />
+  <entry spell="double_time" level="11" />
+  <entry spell="sacrifice_strength" level="15" />
+  <entry spell="resist_magic" level="3" />
+  <entry spell="keeploot" level="3" />
+  <entry spell="protective_runes" level="8" />
+  <entry spell="analyze_magic" level="1" />
+  <entry spell="destroy_magic" level="5" />
+  <entry spell="break_curse" level="7" />
+  <entry spell="fish_shield" level="8" />
+  <entry spell="armor_shield" level="12" />
+  <entry spell="living_rock" level="13" />
+  <entry spell="summon_familiar" level="12" />
+  <entry spell="tybiedfumbleshield" level="2" />
+  <entry spell="concealing_aura" level="1" />
+  <entry spell="pull_astral" level="6" />
+  <entry spell="fetch_astral" level="6" />
+  <entry spell="shockwave" level="5" />
+  <entry spell="eternal_walls" level="7" />
+  <entry spell="create_roi" level="6" />
+  <entry spell="earn_silver#tybied" level="1" />
+  <entry spell="create_aots" level="6" />
+  <entry spell="create_antimagic" level="7" />
+  <entry spell="create_rop" level="9" />
+  <entry spell="create_bagofholding" level="10" />
+</spellbook>

@@ -1,0 +1,923 @@
+BUGS
+
+? > nicht untersucht, fraglich
+- > bestätigt, aber unerledigt
++ > erledigt
+(!) kritische Bugs, die unbedingt vor der nächsten Auswertung repariert werden müssen
+
++ Für alle nur den kurzen Report. War Fehler in einem logischen Ausdruck
+  in creport.c
+
++ URSPRUNG hat eine kranke Semantik
+  (enno) repariert. Nach der alten Routine konnte man seine Koordinaten durch Neusetzen ermitteln!
+
++ Die neuen Kampfmeldungen könnten Kosmetik brauchen, à la: Einheit(en)
+  (corwin) Das Gröbste verbessert. Könnte aber noch mehr Arbeit brauchen.
+
++ im CR fehlen die Botschaften
+  (enno) Hatte Sören nicht gemacht. ist im standard-cr jetzt drin.
+
++ Orks können die Vermehrungsmeldungen nicht separat abschalten
+  (Henning) MSG_ORKVERMEHRUNG eingebaut, ist ML_INFO, kann also mit REPORT ORK WARN
+  abgestellt werden
+
++ Talenttage gibt's für jedermann, der kämpft
+  (enno) Nur noch für die, die min. 2 Runden lang kämpfen.
+
++ "Einheiten vor der x. Runde" wird einmal zuviel angezeigt.
+  (enno) War ein Fehler in der Berechnung von side::alive
+
++ Karawansereien wirken sich nicht auf die Anzeige der Luxusgüter aus.
+
++ FL_LEFTSHIP wurde fälschlicherweise gespeichert.
+
++ Fehler im Handel, von Thorsten beobachtet. Einheiten verkaufen, ohne etwas zu haben.
+  Vermutung: Zwei gleichzeitig verkaufende Einheiten bedienne sich beide aus dem Pool.
+  (enno) Das auch, aber außerdem wurden die Güter dem falschen abgezogen.
+
++ Kapitäne ohne Wahrnehmung durchbrechen Nebelwand
+  (katja) Auch Kapitäne müssen nun Wahrnehmung haben
+
++ Mantel der Unverwundbarkeit wirkt nicht.
+  (corwin) survival_chance() gab einen Prozentwert zurück, gebraucht
+  wurde aber ein Wert von 0-1. Funktioniert die Rüstungsfunktion?
+
++ Absturz in set_resource() bei Kräuterreservierung.
+  (corwin) Hektischer Bugfix (|| resource == NORESOURCE).
+
++ Bug in hp_status (Cast/Klammerung)
+
++ Ausdauerlernen und HP richtig verwurstet.
+
++ Luftschiff
+  (enno) Eine Alraune wurde statt des Windbeutel verwendet. Auch, wenn man keine hatte.
+
++ Fehler in den expandxxx routinen!
+  (enno) statt addlist(xxxorders) wurde addlist(&xxxorders) gemacht.
+
++ Angabe 'erschoepft' bei Personen, die Ausdauer lernen.
+  (corwin) HP-Gewinn beim Ausdauer lernen war inkorrekt.
+  (corwin) Fehler gefunden, ich war blind.
+
++ SCHWERER BUG: Orks bekommen falsche Lerntage
+  (enno) u->n statt u->no benutzt.
+  (enno) change_skill statt set_skill benutzt.
+
++ SCHWERER BUG: Im Kampf gehen Talentwerte kaputt
+  (enno) set_number statt scale_unit
+
++ SCHWERER BUG: Fliehende Einheiten ohne Talente
+  (enno) schlicht und einfach vergessen
+
++ Trankbeschreibungen stimmen nicht mit Kräutern überein
+  (corwin) Beschreibungen waren schon bei den alten Tränken falsch.
+
++ Ostfriesische Burgen konnten nicht gebaut werden
+  (enno) Fehler, soweit im Server, behoben:
+  wenn eine einheit MACHE X 123 sagt, und es gibt ein Gebäude 123,
+  egal welchen Typs, dann baut sie Gebäude 123 weiter. Auch wenn
+  sie selbst in einem anderen steht.
+
++ in den Kampfbeschreibungen ist ein Umbruch zuviel. CR klappt nicht.
+  (enno) repariert. in addmessage() niemals \n benutzen!
+
++ im Handel (sell) werden die Steuern nicht vom Verdienst abgezogen.
+  (martin+enno) repariert. Der spieler bezahlt.
+
++ Einheiten leben nach dem Kampf noch weiter
+  (enno) u->number auf 0 setzen.
+
++ herbs-pool hatte eine macke
+  (enno) use_pooled klappte nicht, weil NULL übergeben wird.
+  Das könte den Thorsten-Bug erklären.
+
++ Einheiten von angegriffenen klagen über kampferschöpfte Personen
+  (enno) flag setzen.
+
++ Übergabe von 4. Magier an Elfenpartei klappt nicht. (Partei 10)
+  (corwin) u statt u2 in givemen()
+  (enno) in giveunit() auch. und daran ist es auch gescheitert.
+
++ Antimagiezone sollte erst in der darauffolgenden Runde wirken.
+  (NEW-Flag setzen.)
+  (corwin) NEW-Flag wird gesetzt und in spell_active() abgefragt.
+
++ move_monster() - warning
+  (enno) Variable d wurde nicht initialisiert.
+
++ Rundungsfehler in scale_number, wenn Einheiten-Anzahl zu groß.
+  (enno) repariert, noch undurchsichtiger geworden.
+
++ Schiffe aus Mallorn bauen zieht keine Ressourcen aus der Region ab
+  (enno) repariert. Es wurde an use_pooled keine Region gegeben,
+  Test auf Mallorn fehlte völlig.
+
++ Zauber brauchen Holz als Komponenten.
+ (enno) Mallorn kann das Holz notfalls ersetzen.
+
++ Elfenparteien konnten keinen 4. Magier übergeben bekommen.
+  (enno) Es wurde bei der Quellpartei das Magiermax gefragt.
+
++ Aji - die Drachentöter (29206) hat -1 Gefallene zu beklagen.
+  Katzeneinheit. Evt. Kollision von Heilung und 14%-Chance.
+  (enno) gefunden. indexüberschreitung, msvc macht's möglich.
+
++ random_neighbour() - warnings
+  (enno) implizite typecasts von int nach direction_t
+
++ fliehende können von Schiffen herunterfliehen.
+  (enno) änderung in fleeregion(), sollte das reparieren.
+
++ Fliehende Magier verlieren evt. ihre Sprüche.
+  (enno) stimmt! dicker bug, wer war davon betroffen?
+
++ Hitpointberechnung bei Einheitensplitting fehlerhaft.
+  (corwin) Gefunden. change_skill in transfermen macht Probleme, dort
+           ersetzt durch change_skill_transfermen.
+
++ dazzle und demoralize klappten nicht.
+  (enno) neu implementiert.
+
++ Stringzuweisungen in Mapper falsch.
+
++ angegriffene einheiten können nichts tun
+  (enno) tritt in allen getesteten kämpfen nicht mehr auf.
+
++ fliehende einheiten attackieren in seltenen Fällen ein zweites mal.
+  (enno) gefixt. passierte bei einheiten, die komplett (ohne fluechttlings-einheit) wegrannten.
+
++ HELFE GIB verhindert Einsatz von Dumpfbackbrot
+  (corwin) Geändert, relevant ist jetzt nur noch der HELFE-Status des
+           Gebers.
+
++ Meldung über fehlenden Zug irritiert Neueinsteiger
+  (corwin) Geändert, Neueinsteiger bekommen die Meldung nicht mehr
+
++ Meldungen zum Abtreiben fehlen.
+  (corwin) f->dh in drifting_ships wird nie gesetzt.
+
++ Formatierungsfehler im Spionagebericht.
+
++ Ents entstehen nicht.
+
++ Vogelfreund als Einheit sichtbar (NR)
+  (corwin) Alle U_SPELL-Einheiten werden angezeigt? Wer hat da wieder
+	gefummelt, ohne zu testen... Auch Befehle kann man ihnen geben,
+	klasse Sache, bei ner Antimagiezone.
+	(enno) hihi. wäre ein cooles feature fürs neue magsystem
+  (corwin) Brachialfix in readorders() und rpunit().
+
++ Verteidigung mit halbem Waffentalent gegen Fernwaffen funktioniert
+  nicht.
+  (corwin) Fehler lokalisiert, switch/case in hits(). Wie soll es sein?
+
++ Es wurde vergessen, die Kampfwirkung der Antimagiezone an die
+  veränderte Stärke anzupassen.
+  (corwin) Gefixt, Durchbruchschance jetzt wieder normal.
+
++ Katapulte ohne Talent Katapultbedienung benutzt.
+  (enno) Waffenauswahl war verhunzt.
+
++ Überlange Zeilen werden in der Zugvorlage umgebrochen.
+  (corwin) In der Zugvorlage wird nicht mehr umgebrochen.
+
++ Heilung funktioniert nicht. (Wyrm vollständig geheilt.)
+  (corwin) Nicht reproduzierbar. Ursache unbekannt.
+	(corwin) Fehler in battle.c, Hitpointberechnung fehlerhaft,
+	         wenn keine Toten in Einheit.
+
+? HP-Berechnung bei neu hinzurekrutierten scheint fehlerhaft.
+  (corwin) In Testspiel nicht reproduzierbar, scheint ok.
+
++ Taktik funktioniert nicht korrekt, Werte werden nirgends verglichen.
+  (corwin) Taktikvergleich war nirgends implementiert.
+
++ Drachen heilen nicht.
+
++ Kampfmessages sind verwirrend.
+  (corwin) Kampfmeldungen aussagekräftiger gemacht.
+
++ Schüler müssen Lehrer kontaktieren.
+  (corwin) Abfrage rausgenommen. Kein Sinn erkennbar.
+
++ Handeln-Talent wurde negativ.
+  (corwin) Gefunden. Fehler in der Poolbehandlung in sell().
+
+? Deadlock bei Kampf in Carwin.
+  (enno) war evtl. ein Problem mit der Alliiertenmatrix?
+
++ Aus einem Kampf geflohene Einheiten bekommen keinerlei Kampferfahrung,
+  auch wenn sie vorher aktiv gekämpft haben.
+  (katja) Kampferfahrung ist eh abgeschafft
+
+? Probleme beim Übergeben von Personen mit unterschiedlichem
+  Ausdauer-Talent.
+  ! was für ein problem? !
+
+- Einige Kampftexte grammatisch falsch. (Plural einsetzen... andere
+  Fälle.)
+
++ die Tavernen tun nichts
+  (enno) Neue Regeln fuer Tavernen, alte Tavernen konvertiert zu neuen.
+
++ Semikolon in Strings führen zu Ärger.
+  [BESCHREIBE EINHEIT "Schlaue Leute; Sie sind nicht dumm"].
+  Generell kann man das Parsen noch verbessern.
+  (enno) komplett neuer parser
+
++ Umlaute an einigen Stellen noch fehlend. (Bla lst sich auf.)
+  (enno) repariert
+
++ Adresslisten sind nicht in Ordnung, es erscheinen Parteien,
+  die man nur parteigetarnt sieht.
+	(Faroul) sollte schon einige Zeit gefixt sein in spunit
+
+? Fernkämpfer bekommen keine Kriegsbeute.
+  (enno) das ist doch sicher nicht mehr so.
+
++ BEWACHE geht nicht (Marco Zielinski)
+  (enno) fehler gefunden, es fehlte ein !
+
++ Parteien bekommen Meldungen, die nichts mit ihnen zu tun haben.
+  (corwin) Fehler in givesilver, alter buf verwendet.
+
+- Fehler mit Pferden in plan_monsters. Ich weiß aber nicht,
+  wozu der Code gut sein soll, habe es markiert. (enno)
+
+? magres wird nicht beachtet.
+  (katja) wo?
+
+? Immer noch erschöpfte Einheiten.
+  (enno) lag vielleicht an der kampf-hp-aufteilung, die wir aber im juli 00 gefixt haben?
+
+? Heilung funktioniert nicht.
+
+? Negative Handelsvolumina führen zu Absturz in expandselling.
+  (corwin) Quickfix fängt negative Mengen dort ab. Ursache für die
+  negativen Mengen noch nicht gefunden. Zusammenhang mit
+  VERKAUFE ALLES vermutet.
+  ! (enno) ! hatten wir das nicht repariert?
+
++ Fehlende Anführungszeichnen bei BENENNE führen zu Stringüberlauf.
+	(enno) gefixt, mit komplett neuem parser.
+
+- r->demand fällt auf 0. assertion in readgame springt an.
+  (corwin) Brachialfix beim Einlesen. Ursache nicht gefunden.
+
+- flutwellen löschen bauern, silber und sonstige regionswerte nicht.
+
+- flutwellen vernichten schiffe, aber nicht die besatzung
+
+- Übergaben können an Einheiten erfolgen, die man nicht sieht.
+  Auf diese Weise können Tarner identifiziert werden. (In dogive()
+  fixen!?) auf kontaktiere prüfen, dann erlauben
+
++ Betrete Schiff sollte vor Attackiere kommen, um att,betrete,nach
+  zu verhindern.
+	(corwin) Reihenfolge unverändert, aber trotzdem gefixt in
+	         building/shipowner.
+
++ Formatierungsproblem: Zentrierte lange Strings beginnen manchmal
+  schon in Spalte 0. Vermutlich Rundungsproblem.
+  (enno) in zukunft sollen eh alle bei spalte 0 anfangen.
+
++ addmessage( ,"", ) erzeugt eine Zeile mit einem Space "^ $"
+	(enno) addmessage fliegt eh raus
+
++ Magieresistenz funktioniert nicht.
+	(corwin) Wieder eingebaut.
+
++ Drachen greifen trotz WARTEN an.
+  (corwin) Hoffentlich gefixt, Verwechslung thisorder, lastorder
+
++ Ablegen in Nachbarregionen funktioniert nicht.
+  (corwin) Gefixt.
+
++ Kapitäne und Burgherren stehen in der Zugvorlage nicht an der
+  richtigen Stelle.
+  (enno) eingebaut.
+
++ Im Gletscher ist zuviel Eisen. Menge begrenzen.
+  (corwin) Max 80 Eisen pro Gletscherregion.
+
++ Nebelwälle?
+  (corwin) Nebelwall-Anzeige in describe() war Unfug, ebenso
+		   is_fogwalled().
+
++ Absturz bei destroy_ship durch zuviel Schaden.
+
++ reale Koordinaten in den Fehlermeldungen in sail()
+  (katja) durch regionid() ersetzt
+
++ Beschriftung der Meriankarten falsch (Beschriftung oben verschoben)
+  (enno) sollte gefixt sein.
+
++ Man sieht Botschaften in Regionen, die nur vom Leuchtturm gesehen
+  werden.
+  (corwin) Abfrage in die Reportgenerierung eingebaut.
+
++ CR bei vorigem übersehen.
+  (enno) gefixt.
+
++ Flüchtende Drachen hinterlassen Drachenkopf und -blut.
+  (corwin) Hoffentlich gefixt.
+
+? Eine Partei in einer Kampfregion erhielt keinen Kampfbericht.
+
++ Flüchtende Einheiten verlassen Burgen und Gebäude evt. nicht.
+  (corwin) Fliehende Einheiten verlassen auf jeden Fall Gebäude und
+	Schiffe.
+
++ von Turmregionen erhält man keine Durchreiseereignisse
+	(katja) gefixt
+
++ Im CR ist erkennbar, ob eine Region Mallornregion ist.
+	(corwin) Mallorn nur noch = 1, wenn auch Bäume da sind.
+
++ Magieresistenz für Drachen falsch.
+	(corwin) magicresistance() muß natürlich auf alles wirken.
+
++ "Maentel" ohne Umlaut wird nicht erkannt.
+  (corwin) In Tabelle eingefügt.
+
++ Illusionen werden als Migranten gezählt.
+	(corwin) count_migrants prüfte nur auf nonplayer(), nicht auf
+	Illusionen.
+
++ Werden Kämpfer auf Schiffen in einen Kampf gezogen bleiben
+  die Schiffe unbeschädigt.
+	(corwin) Damage-Routine berücksichtigte nur Kapitäne.
+
++ Adressen von Parteien, die man nur in einer Turmregion oder
+  Durchreiseregion sieht, stehen im NR aber nicht im CR
+
++ Von Migranten und Untoten erzeugte TEMP-Einheiten haben den falschen
+  Typ/Rasse.
+	(corwin) u->race statt u->faction->race
+
++ material- und silberpool in den cr mit aufnehmen
+  (corwin) Neues Tag ;Optionen mit f->options
+
++ Flüchtende Einheiten werden evt in mehrere Kämpfe verwickelt, wenn die
+	Region, in die sie flüchten, später ausgewertet wird.
+	(enno) sollte längst gefixt sein.
+
++ Schiffe, die in der selben Region an- wie ablegen, haben die kueste
+  falsch gesetzt.und kriegen keine durchreiseinfos.
+	(corwin) Zumindest die Küstengeschichte ist gefixt. (Auch das hatte
+	ich übrigens schonmal gemacht.)
+
+? Schiffe, die in der selben Region an- wie ablegen, haben die kueste
+  falsch gesetzt.und kriegen keine durchreiseinfos.
+  (corwin) Küste gefixt. Durchreiseinfos müßten imho kommen.
+
++ bugreport isilpetz, teleport funktioniert nicht, obwohl kontaktiert wurde.
+  (corwin) Gefixt. Isilpetz'Partei muß in TELEPORT_HACK extra
+	berücksichtigt werden.
+
++ Ein Kampf, der 1+1 Kampfrunden dauert, gibt keine Kampferfahrung.
+  (corwin) Geändert.
+
++ Mapper - Einheit ins Clip nehmen geht nicht. (Es wird eine scheinbar
+  ausgewürfelte Einheit genommen.)
+  (corwin) atoi36-Umstellung vergessen. Gefixt.
+
++ von Migranten rekrutierte Temp-Einheiten erscheinen als eine andere Rasse als sie sind.
+  (enno) gefixt.
+
++ mehrere Ponnukis
+  (enno) gefixt.
+
+? artefakte werden auf der flucht nicht mitgenommen - bugreport 26.oct.99 stefan reich
+	(corwin) Alte Flucht rausgenommen.
+	(enno) stefan sagt, es sei schon wieder passiert.
+	(corwin) War nur in der alten Flucht überhaupt berücksichtigt.
+	0 Gewicht-Items werden jetzt wie Pferde behandelt. (Ein
+	Exemplar pro Person wird bei Flucht mitgenommen.)
+
+	Dies bedeutet, daß Flüchtlinge immer z.B. einen MdU
+	mitnehmen, wenn in der Einheit vorhanden. Das ist eigentlich
+	nicht gut, aber nicht ohne großen Aufwand anders zu lösen.
+
++ Merian-X-Koordinaten sind manchmal verschoben.
+  (corwin) Rundungsfehler bei der Kartenerstellung. Bitte nochmal
+	         im Spiel nachgucken, ob Fix ok.
+  (enno) Merian ist rausgeflogen
+
++ Diebstahl kann durch TEMP-Machen verhindert werden
+  (enno) Reihenfolge des shash in destroy_unit falsch.
+
+- Durch den selben trick (TEMP-Übergabe) kann man sich vor
+  spionage schützen
+
++ Parteien aus Leuchtturmregionen ersheinne nicht in der Adressliste.
+	(enno) ich glaub, ich hab's. oder doch nicht?
+
++ Bauernblut hilft auch fremden Dämoneneinheiten,
+	(enno) Auswirkungen kann man vernachlässigen. niemand hat
+	>100 Dämonen aus zwei parteien in einer region mit <100 bauern.
+
++ potion-effects werden in scale_number nicht berücksichtigt
+	(enno) repariert, skalieren jetzt genau wie skills.
+
+- assert in battle.c:4958 wird getriggert. Schlecht reproduzierbar.
+	(enno) ein paar asserts zusätzlich eingebaut, falls es nochmal passiert.
+
++ ; terminiert einlesen der Befehlsdatei.
+	(enno) repariert. 'comment' wurde nie wieder false.
+
++ fix_irace ignoriert dämonen
+	(enno) repariert.
+
++ strassen gingen verloren
+	(enno) read/write reparatur-routine.
+
++ doppeltes ;; im CR
+	(enno) doppelt gemacht, in sprintf und im fprintf.
+
++ Trollstärke-Gürtel
+	(enno) wurde nicht um SCALEWEIGHT skaliert, brachte nur 5 GE.
+
++ kampfresultat in Sun Lake City. funktioniert Magieschutz nicht?
+
+- komische leerzeilen in kampfabrechnungen:
+> Schauspieler (pg2d) verlor 9 Personen, 0 überlebten und 1 flohen nach Heredon
+>   (-3,5).
+> Händler (uk53) verlor 1 Personen, 0 überlebten und 0 flohen nach Lykubet
+>   (-1,3).
+>
+> Schattenluchse (umnb) verlor 18 Personen, 0 überlebten und 0 flohen nach
+>   Sturmhafen (-2,5).
+> Baumeister (f0o7) verlor 1 Personen, 0 überlebten und 0 flohen nach Heredon
+>   (-3,5).
+
+? insekten, geht der handel in wüsten und sümpfen?
+
++ Meer-Vertraute können in Nichtküstenländern erscheinen. (wegen 3% in
+  select_famaliar())
+  (corwin) Gefixt.
+
++ Magielernen bei Vertrauten allgemein machen, da Goblin-Vertraute sonst
+  keine Magie lernen können.
+
+? kostenlose Talente lernen in Akademie geht nciht, wenn akademie nicht
+  finanziert und zwar nichtmal 30 tage
+  (corwin) Ist das wirklich so? Ich finde im Source keine Stelle,
+           die das bewirken könnte.
+
++ Handelsgüterpreis wurde beim kauf zu spät erhöht
+
+- astraler nebel taucht in messages mit koordinaten auf.
+
+? Mein Alchemist (gxd) hatte letzte Woche noch 2 Bauernlieb. EIn BENUTZE
+  Bauernlieb brachte mir die Fehlermeldung "Gouldie Horrn (gxd) in
+  Wywipozos (-1,0): 'benutze bauernlieb' - Die Einheit besitzt den Trank
+  nicht." ein und diese Woche hat er gar keine dieser Tränke mehr.
+  (Seine anderen Tränke waren davon nicht betroffen).
+  (corwin) Wann soll das passiert sein? Diese Runde hatte er kein
+           BENUTZE.
+  (enno) das mußt du den fragen, der den bugreport gemacht hat.
+
++ Leuchturm funktioniert nicht für Regionen, die in der
+  Regionsreihenfolge vor dem Leuchturm kommen - kein Report
+  (enno) repariert.
+
+? Probleme bei sp_charmingsong: Auflösung scheint nicht zu
+  funktionieren, wenn in der gleichen Runde die alte Partei gelöscht
+  wird.
+
++ Jeder Verkauf reduzierte die Verkaufspreise.
+  (enno) Fehler beseitigt.
+
++ Bauern wandern in und aus orkifierte Regionen.
+  (corwin) Unterbunden.
+
++ Falsche Rundung beim Verhungern.
+  (corwin) Gefixt.
+
++ HP von Eisengolems werden bei Mache nicht runterskaliert.
+  (corwin) gefixt
+
+? flüchtlinge verdoppeln sich
+  (enno) da fehlte ein scale_number in der routine.
+
++ luftschiff-landungen (edelmayer, 13.6.00)
+  (corwin) Gelandete Luftschiffe können in Zukunft beliebig ablegen,
+           ebenso startende.
+
++ schiffe aus mallorn (stanka, 13.6.00)
+  (corwin) Gefixt, fehlende Abfrage in continue_ship()
+
++ bei handel wird ein gut zuviel bezahlt (ashdurbuk, 13.6.00)
+  (enno) gefixt
+
+? Adressliste sollte gescramblet werden
+  (corwin) Implementiert
+  (enno) sortiern wäre besser
+
++ Statistik: Lohn auf Ozean für Nichtmeermenschen weglassen
+  (corwin) Implementiert
+
++ Karavelle in Sumpf
+  (corwin) Hoffentlich gefixt.
+
++ Mehrfachnennungen in Kampfauslösung
+  (corwin) Gefixt
+
++ eisengolems ziehen ihr verbrauchtes eisen aus dem pool ab
+  (enno) repariert
+
++ schiffbau mit mallorn geht nicht
+  (enno) es gab garkiene sonderbehandlung. ist drin, aber ohne poolnutzung
+
+? HELFE xyz NICHT funktioniert nicht.
+  (enno) Es muß doch HELFE xyz ALLES NICHT heißen.
+
+? HELFE GIB reicht scheinbar, um eine Burg betreten zu können.
+
+- Eisengolems übergeben nichts an andere (Bugreport Thomas Stankats, 3.7.)
+
+- bug bei goblinklau (Jens Meirose, 9.7.00)
+
+- fehlende zaubersyntax im cr (stefan götz, e-client, 9.7.00)
+
++ trank der wahrheit - beschreibung passt nicht zu zutatenliste (ashdurbuk, 3.7.00)
+  (corwin) Beschreibung geändert.
+
+? bug bei beklauen (ilia, 40.6.00)
+  (enno) diebstahl aus dem pool ging bei reservierungen schief. neu: use_all(), get_all()
+
+- "Keine Gräber" (Hjalmar Bruns, 27.6.00) - trotz schlacht keine gräber gefunden
+
++ "Burgenbau" (christian decomain, 26.6.00) - nicht neue größe, sondern alte zählt für das talent
+  (corwin) Gefixt.
+
+- "Antimagiekristalle" (stefan schubert, 26.6.00) - trotz antimagie finden zauber statt
+
++ Im Astralraum kann man arbeiten
+  (corwin) maxworkingspeasants gab minimal 1 zurück. Das ausgebaut. Ich
+  hoffe ich habe alle DivByZero-Möglichkeiten, die dadurch entstehen
+  gefunden.
+
++ Wölfe verschwinden nach der Schlacht nicht.
+  (corwin) Fehler in at_unitdissolve, gefixt.
+
++ Sortierung der Adressliste nach Parteinummer funktioniert nicht.
+  (enno) war ein falscher cast, schätze ich.
+
+- Vertraute nehmen keine Gegenstände an.
+
++ Mallorn für Schiffsreparatur geht nicht (Thomas Stanka, 14/8/00)
+  (enno) copy&paste bug
+
+- Mallorn für Schiffbau geht noicht (Zemsauer 9/8/00
+
++ Drachen bewachen Ozeane (10/8/00)
+  (corwin) geändert
+
+- Doku zu Reserviere sollte auf GIB ALLES angepasst werden
+
++ zauber auf temp-einheiten (Sven Howard, 13.8.00)
+  (corwin) Für die Tyb-Zauber gefixt. Gibt es noch mehr?
+
++ BE's Taktiker half den NK nicht im Kampf.
+  (enno) Es wurde HELFE BEWACHE statt HELFE KAEMPFE überprüft.
+
+- Gabe des Chaos, Negativwirkung hört nicht mehr auf (Kollakowski, 24.8.00 ; Emmler, 19.8.00)
+
+- Meldung, Runen des Schutzes, ist buggy (Weinzinger, 23.8.00)
+
+- FOLGE EINHEIT geht nicht (Dagmar Müller, 23.8.00)
+
+- FAHRE mit Reiter hat nicht funktioniert (Enno, 20.8.00)
+
+- Sägewerk funktioniert nicht (Andreas Beer, 15.8.00)
+
+- Mallorn für Leuchttürme verbauen? (Florian Lang, 15.8.00)
+
++ Silberspenden an die eigene Partei? (Stean Reich, 20.8.00)
+  (corwin) Fehlendes spender->faction != bedürftiger->faction in
+           get_food().
+
+? Xandril vermutet, man könne mit Nahkampfwaffen aus der 2. Reihe kämpfen. Vage Behauptung.
+
++ GIB 0 EINHEIT geht nicht (Alke Rehling, 21.8.00; Alex Mielke, 21.8.00)
+  (corwin) Das war überhaupt nicht implementiert. Quickhack eingebaut.
+
++ Neue Katapultregel funktionert nicht! Datenfile 201, Kampf in Rudkepaso (-8,24).
+	(enno) nachladen war kaputt.
+
+- Tempeinheiten profitieren nicht von Uni
+
+- Sinkende Schiffe erzeugen keine Globalmeldung, damit sieht man die
+  nicht!
+
+== Aus PLAN übertragen: ==
+
+- Alp funktioniert nicht, Suchroutine wird nirgends aufgerufen und
+  enthält TODOs.
+
+- teil-verhungern:
+  "0;live" kommt im Template nicht vor.
+
+- Monsterauseinanderlaufen klappt nicht.
+
+- cansee() fehlt in vielen Zaubern.
+
+- Schiffeversenken gibt kaputte Meldung
+  Cef'az (c142) in Dór'Aglar (18,-16) versenkt die X~Lc^H~@~[c^H^X~Gc^Hm
+	(17).
+	(Das Schiff war die Cir'mor (1142), Langboot)
+
+- Botschaft an Einheit <nr> gibt als Meldung nur
+  'Eine Botschaft von xyz: "<nr>"'
+
+- Durch übergeben kann man Silber vor Beklaue schützen
+
+- Aufgelöste Zauber (z.B. Magischer Pfad) sollten eine Meldung in der
+  Region geben. ('Die Straße ist verschwunden')
+
+- Meldungen zuhauf unvollständig, Regionsangabe oder Einheitenkennung
+  fehlt. Sehr uneinheitlich.
+
++ Zauberliste für Dämonen wird nicht aktualisiert
+	(enno) gefixt. Erst nach randomevents() berechnen.
+
+- NUMMER PARTEI ändert auch die Nummer der befehlenden Einheit
+
++ Eigene Einheiten halfen nicht, wenn man attackiert hatte und gleichzeitig wurde.
+	(enno) Test in join_allies auf eigene Partei fehlte.
+
+- Einheit auf Schiff flieht, kommt aber nicht in Nachbarregion an (Marc Korevar, 14.09.00, Runde 207->208)
+
+? KÄMPFE HELFE NICHT geht nicht.
+	(corwin) gefixt?
+
++ Mehrere Kräuterbeutel im CR
+	(enno) 2 wurde ausgegeben, wenn mehr als ein Kraut vorhanden.
+
+? Benennen fremder Schiffe ging nicht (Enno)
+	(corwin) gefixt?
+
++ Anzeige von Zitadellen als "Burg"
+
++ Bau von Gebäuden klappt nicht. "Baut für 0 an ..."
+	(enno) Bei want=0 wurde nix gebaut. Ich dooof.
+
++ Traumschlößchen sind erkennbar.
+  (enno) gefixt.
+
+- Einheiten können nach Kampf noch lange Befele ausführen. (Wenninger, 30.09.)
+
+? Karawanserei funktioniert nicht, Größe stimmt nicht
+  (enno) Max. Größenpunkte der Karawanserei waren 50 statt 10
+
++ NUMMER PARTEI ändert die Einhietennummer (G. Grundhöfer, 5.10.)
+	(enno) ein break im switch fehlte
+
+? Boot mit 4% Schaden hat 40 Kapazität? (M.Bank, 5.10.)
+	(enno) ist ein Rundungsfehler in shipcapacity(). Änderung noch nicht getestet.
+
+- Sturmmeldungen fehlen (M. Bank, 5.10.)
+
+- Durch Sturm unterwegs stark beschädigte Schiffe melden, das sie nicht ablegen können. (M. Bank, 5.10.)
+
+- Silberspende mri->bierbrauer falschrum? (S. Reich, 5.10.)
+
++ FUZZY wirkt nicht auf PARTEI-Befehl (Mangar, 5.10.)
+	(enno) Ich denke, da habe ich jetzt eine wirklich gute Lösung gefunden.
+
+? Steinverbrauch beim Burgenbau falsch (Kirche des Morgenstern, 5.10.)
+	(stefan) lag wohl an
+
++ Hohe Patzerchance Draig-Magier (Knoche, 5.10.)
+	(enno) Er hat auf maximaler Stufe, T 13, gezaubert.
+
++ BENENNE FREMDES geht nicht mit base36 (wuzel, 5.10.)
+	(enno) Repariert, nicht schwer.
+
++ Hafenbau > 25 (Klüstenhof, 5.10.)
+	(stefan, enno) falscher eintrag im buildingtype
+
+? Zombies gehen trotz massiver Katapultangriffe nicht kaputt (Meirose, Reich, et al, 5.10.)
+	(enno) In normalen Kämpfen mit Skeletten sieht das okay aus.
+
+? Boot wird mehr als 100% repariert (Wachtendorf, 5.10.)
+	(stefan) fehler in build
+
++ gebäude werden doppelt bezahlt (Mueller, Rehling, et al, 5.10.)
+	(enno) heftiger bug, führt zu neuauswertung. flag wurde nicht getestet
+
++ einstürzendes gebäude führt zu einheiten mit 0 personen (o. eckstein, 5.10.)
+	(enno) remove_empty_units() einfach noch einmal vor der reportgenerierung machen.
+
+? Vermishcung zweier Züge? (Necron, 16.10.)
+
++ chaosregionen auf Insel der Partei o8 (Kirche des morgenstern, 16.10.)
+
++ Überflüssige Gruppen löschen (Sassmanshausen 16.10.)
+	(Stefan) g->members werden jetzt wieder runtergezählt.
+
+? Steingolems vermehren sich, statt zu verschwinden (Emmler, 16.10.)
+	(enno) sollte sich mit der neuen production erledigt haben.
+
+- feuerwand bug, nicht erschienen (wolfgang haupt 16.10.)
+
++ mallorn beim neuen gebäudeschiffs-bau (Stanka, 16.10.)
+	(enno) ja, das klappt nicht mehr
+
++ keine Meldungen im CR (diverse, 16.10.)
+	(enno) corwin hat das beim abschaltender messagelevel verbockt.
+
+- messagelevel kaputt, warnings-pointer ist verhunzt (auswertung)
+
+- bekannte Zauber werden erneut angezeigt.
+
++ Steinbruch hat verbraucht 5 Steine statt 5 Holz (ullrich, 30.10.)
+	(stefan) gefixed
+
+- Luxusgut-Preise fallen (diverse, 30.10.)
+  (corwin) Auswirkungen gefixt, aber Bug vermutlich noch da.
+
++ Gewichtsberechnung geht nicht (diverse, 30.10.)
+  (corwin) Eine wichtige Zeile in weight() ist vergessen worden.
+
++ Lokalisierung in Kampf und Produktion falsch (diverse, 30.10.)
+	(enno) repariert
+
++ Luxusgut-Preise im CR falsch (diverse, 30.10.)
+	(stefan) Verkaufte Güter wurden mit Preis=0 statt negativem
+	Grundpreis angegeben.
+
++ Materialpool funktioniert nicht bei Tränken (Katja, 30.10.)
+	(enno) in welchem kontext? GIB, BENUTZE, MACHE?
+	(katja) BENUTZE
+	(enno) gefixed.
+
++ Alchemisten ohne Produktion (Katja, 30.10.)
+	(stefan) i_change fehlte in create_potion()
+
++ Schrottige Meldungen bei MACHE Trank (diverse, 30.10.)
+	(stefan) create_potion wurde mit zuwenig Parametern aufgerufen
+
++ Zuviele Kräuterbeutel (Katja, 30.10.)
+	(enno) repariert, fehler in report_item.
+
++ Schmiede funktioniert nicht (diverse, 30.10.)
+	(enno) Schmiede funktioniert wieder. Aufruf von init_buildings() fehlte.
+
++ Zauber verbrauchen keine Aura (diverse, 30.10.)
+	(enno) res_changeaura, res_changepremaura, res_changehp u.a.
+	waren not implemented. erledigt.
+
++ Zauber erzeugen keine Gegenstände (diverse, 30.10.)
+
+? Wald/Ebenen-Kräuter wechseln nicht, wenn sich das Terrain ändert
+	(wuzel, 30.10)
+
++ Waldkräuter nicht korrekt initialisiert, in Wäldern sind jetzt
+	Ebenenkräuter (wuzel, 30.10.)
+	(enno) rterrain() statt mainterrain() benutzt.
+	(enno) gefixt, korrektur() erledigt das nächste woche.
+
++ Verkaufte Luxusgüter werden nicht abgezogen, sondern dazugezählt
+	(mbank, 30.10)
+	(enno) gefixt, das i_change war falsch. (copy&paste)
+
+- Gewürze wurde nicht erkannt (stanka, 30.10.)
+	(enno) Mehrzahl von Gewürz ist Gewürz.
+	Ich habe einen String für spices eingebaut, aber der wird noch nicht verwendet,
+	da außer den korrekten Namen der Items noch keine aliase verarbeitet werden.
+	(enno) am besten wären standardisierte abkürzungen. ich hab da was im kopf.
+
++ doppelte Silberbeutel (diverse, 30.10.)
+	(enno) die alte routine war noch drin, gefixt.
+
++ Abzug von Luxusgütern immer noch falsch: Güter aus dem Pool
+	werden bei Verkauf von der Einheit gezogen, assert in
+	i_change triggert.
+	(enno) Umstellung auf new_use_pooled() und kleiner speedup.
+
+- Silberspenden werden gemacht, obwohl eigentlich unnötig gewesen.
+  (katja) warscheinlich am Anfang der Runde nicht genug Geld für die
+  Gebäudeversorgung, dann helfen die aliierten aus
+
++ Gespenster aus der Unterwelt (w9kL) erzielte 1026 Treffer und tötete 0 Gegner.
+  (enno) scheisse. waffenloser kampf. fixed.
+
++ 42 Kämpfer aus Rukh-R (1ftp) feuern ihr Katapult ab:
+    (enno) ...und sie haben nur 42 katapulte. alle in der gleichen runde ist zuviel.
+	(enno) war nur kosmetisch
+
+- Parteien aus Durchreiseregionen erschienen nicht in den ADressen
+
+- Transporteure (2jws) arbeitet in Twerken (-7,8) für einen Lohn von 70
+  statt 65 Silber.
+
++ Illaun-Zauber Schoene/Schlechte Träume wirkt zu kurz: beginnt erst in der
+  darauffolgenden runde, endet aber evtl. schon in der aktuellen.
+  (katja) irgendwer hatte bei Schöne Träume die Dauer total verhuzt.
+
++ Schattendämonen können reservieren (P. Horner, 15.09.00)
+  (katja) repariert
+
++ Tunnelwürmer können Straßenbau statt Steinbau (H. Steinbeißer, 16.09.00)
+
++ Vertraute nehmen nichts an (O. Eckstein, 17.09.00)
+  (katja) ist gefixt
+
+- FAHRE funktioniert nicht (G. Großberger, 19.09.00)
+  (enno) ist bei uns auch schonmal schiefgegangen, kann was dran sein.
+
+? Bei "Verwünschung" sieht das Opfer der Verwünschung den Zaubernden.
+  (enno) ich glaub, das hatte ich gefixt.
+
+? "Schlägerzwerg (id84) in Kitpad (-1,2): 'KAEMPFE HELFE NICHT' - unbekannter
+  Kampfstatus."
+  (corwin) Kann nicht sein. Ist das noch aktuell?
+
+- Einheit auf Schiff flieht nicht in benachbarte Region (M. Korevaar, 24.09.00)
+
+- Astraler Ausgang funktioniert nicth (Synes Elischka, 29.09.2000)
+
+- Leuchtturmeinsturz macht Einheiten mit 0 Personen (O. Eckstein, 05.10.2000)
+  * Krath (hqk), 0 Elfen, "lerne wahrnehmung"; In eine dunkle Robe gehüllter
+    Elf - er vertritt hier seinen Herrn und Meister.
+
+? Bergwerk stürzt trotz genug Silber ein (M. Müller, 05.10.2000)
+  (enno) Die Routine ist seit dem überarbeitet worden.
+
++ Zauber "Runen des Schutzes" nicht base36 (F. Wolkwitz, 04.11.2000)
+  Maehrlin (39x) in Amandor (0,23): 'zaubere Runen~des~Schutzes Schiff 1bq' -
+  Schiff 1 wurde nicht gefunden.
+  (katja) #define FULL_BASE36 war vergessen worden
+
++ Schmieden funktioiniern nicht (O. Eckstein, 05.11.2000)
+  (enno) Beispiel überprüft, er muss sich verrechnet haben.
+
+- Übergabe klappte mit Pferd, aber nicht mit Silber? I. Schröder, 05.11.2000)
+
+- einheit waru mcht zu wenig Kettenhemden (A. Neumann, 05.11.2000)
+  (enno) evtl. nicht oben in der schmiede gestanden? trotzdem zu wenig
+
+- einhiet buf erzeugt 5 statt 6 schwertern (dwalin, 6.09.2000)
+  (enno) die hat sich bestimmt verechnet.
+
++ kostenlose kostenpflichtige talente mit lehrer (A. Klauer, 06.11.2000)
+  (stefan) Anteiliges Lernen betrifft jetzt alle Effekte mit.
+  
+- hegg hat genug Material, kann aber nicht produzieren (P. Burkert, 06.11.00)
+
++ Kein Anlegen in neuen Regionstypen möglich (Joern Stampehl, 09.11.00)
+  (corwin) Neue Terraintypen fehlten in coast_allowed komplett.
+
+o Leuchttürme schauen mindestens eine Region zu weit. (Größe 10
+  Leuchtturm 3 Regionen.)
+  (stefan) Bei mir nicht. Zu beachten ist, daß man halt 2 Regionen weit sieht,
+  und DANN noch die Nachbarregionen drangehängt werden. 
+
++ 'cannot resolve action' vereinzelt
+  (enno) die alten actios sind weg, damit erledigt sich das wohl.
+
++ timeout auf eine Vertrautenlöschung
+  (enno) Das ist dank neuer events wohl auch repariert?
+
++ Museums'gebäude' können umbenannt werden
+  (corwin) Generische Gebäude (bt_generic) können bis zur Implementation
+           eines besseren Mechanismus nicht mehr umbenannt werden.
+
++ Benennen fremder Burgen klappt nicht.
+  (corwin) Bei der Umstrukturierung der Gebäude vergessen worden.
+
++ Benennen fremder Schiffe und Gebäude ist nicht an Locales angepaßt.
+  (corwin) Wird nicht mehr nahnd des Namens, sondern mit einem Flag geprüft.
+
++ Bauernfressen und Vertreiben trotz Vernichtung der Untoten
+  (corwin) In der Reihenfolge vor die Zufallsereignisse gelegt.
+
++ Straßen über 100% fertig
+  (corwin) Fehler in build_road()
+
++ Verfolgendes Schiff fährt in falsche Richtung
+  (corwin) u->wants bei Verfolgungen nicht mit 0 initialisiert.
+
++ (katja) diverse Zauberfehlschläge, obwohl Aura übertragen wurde (u.a.
+  Segne Steinkreis) weil VOR allen Zaubern, also auch vor dem
+  Auratransver, eine cancast Überprüfung war, die zu dem Zeitpunkt
+  natürlich fehlschlug.
+  
+- memoryleak in curseid?
+
++ Fliehende Einheiten nehmen kein Silber mehr mit (Katja, 28.12.2000)
+
++ Magiebegabte Vertraute haben keine Zauber mehr
+
+- lmsreward funktioiniert nicht (curse wird nicht gesetzt)
+
+- benutze item funktioniert nicht. itype->use ist überall 0x0
+
+- auch nichtpoolbare Resourcen wie Aura, HP, perm Aura sind im pool
+
+- lernen in akademie bringt 80 statt 70 Tage, ausser bei Magie, da
+  funktionierts?
+  (Zhardamon, irq 20.2.01)

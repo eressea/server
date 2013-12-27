@@ -19,24 +19,27 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include <util/log.h>
 
-#include <kernel/types.h>
-#include <eressea.h>
-#include <gmtool.h>
 #include <kernel/config.h>
+#include <kernel/types.h>
 #include <kernel/save.h>
 #include <bindings/bindings.h>
-#include <iniparser.h>
+#include <eressea.h>
+#include <gmtool.h>
+
+#include "races/races.h"
+#include "spells/spells.h"
+#include "curses.h"
 
 #include <lua.h>
-
 #include <assert.h>
 #include <locale.h>
 #include <wctype.h>
+#include <iniparser.h>
 
-static const char *luafile = 0;
+static const char *logfile= "eressea.log";
+static const char *luafile = "setup.lua";
 static const char *entry_point = NULL;
 static const char *inifile = "eressea.ini";
-static const char *logfile= "eressea.log";
 static int memdebug = 0;
 
 static void parse_config(const char *filename)
@@ -52,6 +55,9 @@ static void parse_config(const char *filename)
 
     /* only one value in the [editor] section */
     force_color = iniparser_getint(d, "editor:color", force_color);
+
+    /* excerpt from [config] (the rest is used in bindings.c) */
+    game_name = iniparser_getstring(d, "config:game", game_name);
   } else {
     log_error("could not open configuration file %s\n", filename);
   }
@@ -125,6 +131,11 @@ static int parse_args(int argc, char **argv, int *exitcode)
       case 'q':
         verbosity = 0;
         break;
+      case 'r':
+        entry_point = "run_turn";
+        i = get_arg(argc, argv, 2, i, &arg, 0);
+        turn = atoi(arg);
+        break;
       case 'v':
         i = get_arg(argc, argv, 2, i, &arg, 0);
         verbosity = arg ? atoi(arg) : 0xff;
@@ -161,20 +172,80 @@ static int parse_args(int argc, char **argv, int *exitcode)
   return 0;
 }
 
+#if defined(HAVE_SIGACTION) && defined(HAVE_EXECINFO)
+#include <execinfo.h>
+#include <signal.h>
+
+static void report_segfault(int signo, siginfo_t * sinf, void *arg)
+{
+  void *btrace[50];
+  size_t size;
+  int fd = fileno(stderr);
+
+  fflush(stdout);
+  fputs("\n\nProgram received SIGSEGV, backtrace follows.\n", stderr);
+  size = backtrace(btrace, 50);
+  backtrace_symbols_fd(btrace, size, fd);
+  abort();
+}
+
+static int setup_signal_handler(void)
+{
+  struct sigaction act;
+
+  act.sa_flags = SA_ONESHOT | SA_SIGINFO;
+  act.sa_sigaction = report_segfault;
+  sigfillset(&act.sa_mask);
+  return sigaction(SIGSEGV, &act, NULL);
+}
+#else
+static int setup_signal_handler(void)
+{
+  return 0;
+}
+#endif
+
+#undef CRTDBG
+#ifdef CRTDBG
+#include <crtdbg.h>
+void init_crtdbg(void)
+{
+#if (defined(_MSC_VER))
+  int flags = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
+  if (memdebug == 1) {
+    flags |= _CRTDBG_CHECK_ALWAYS_DF;   /* expensive */
+  } else if (memdebug == 2) {
+    flags = (flags & 0x0000FFFF) | _CRTDBG_CHECK_EVERY_16_DF;
+  } else if (memdebug == 3) {
+    flags = (flags & 0x0000FFFF) | _CRTDBG_CHECK_EVERY_128_DF;
+  } else if (memdebug == 4) {
+    flags = (flags & 0x0000FFFF) | _CRTDBG_CHECK_EVERY_1024_DF;
+  }
+  _CrtSetDbgFlag(flags);
+#endif
+}
+#endif
+
 void locale_init(void)
 {
   setlocale(LC_CTYPE, "");
   setlocale(LC_NUMERIC, "C");
-  assert(towlower(0xC4) == 0xE4);       /* &Auml; => &auml; */
+  if (towlower(0xC4) != 0xE4) { /* &Auml; => &auml; */
+    log_error("Umlaut conversion is not working properly. Wrong locale? LANG=%s\n",
+        getenv("LANG"));
+  }
 }
+
+extern void bind_eressea(struct lua_State *L);
 
 int main(int argc, char **argv)
 {
   int err, result = 0;
-  lua_State * L;
+  lua_State *L;
 
-  log_open(logfile);
+  setup_signal_handler();
   parse_config(inifile);
+  log_open(logfile);
 
   err = parse_args(argc, argv, &result);
   if (err) {
@@ -183,17 +254,31 @@ int main(int argc, char **argv)
 
   locale_init();
 
+#ifdef CRTDBG
+  init_crtdbg();
+#endif
+
   L = lua_init();
   game_init();
+  register_races();
+  register_curses();
+  register_spells();
+  bind_eressea(L);
 
   err = eressea_run(L, luafile, entry_point);
   if (err) {
     log_error("server execution failed with code %d\n", err);
     return err;
   }
+#ifdef MSPACES
+  malloc_stats();
+#endif
 
   game_done();
   lua_done(L);
   log_close();
+  if (global.inifile) {
+    iniparser_free(global.inifile);
+  }
   return 0;
 }

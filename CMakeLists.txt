@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
-project (arda-server C)
+project (eressea-server C)
 
 enable_testing()
 
@@ -13,6 +13,12 @@ CONFIGURE_FILE (
     ${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
     ${CMAKE_BINARY_DIR}/include/config.h)
 INCLUDE_DIRECTORIES (${CMAKE_BINARY_DIR}/include)
+
+IF(CMAKE_COMPILER_IS_GNUCC)
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -DHAVE__BOOL")
+ELSE(CMAKE_COMPILER_IS_GNUCC)
+    MESSAGE(STATUS "Unknown compiler ${CMAKE_C_COMPILER_ID}")
+ENDIF(CMAKE_COMPILER_IS_GNUCC)
 
 find_package (Lua 5 REQUIRED)
 find_package (ToLua REQUIRED)

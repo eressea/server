@@ -1,0 +1,684 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<spells xmlns:xi="http://www.w3.org/2001/XInclude">
+
+  <xi:include href="spellbooks/common.xml"/>
+  <xi:include href="spellbooks/gray.xml"/>
+  <xi:include href="spellbooks/gwyrrd.xml"/>
+  <xi:include href="spellbooks/draig.xml"/>
+  <xi:include href="spellbooks/illaun.xml"/>
+  <xi:include href="spellbooks/cerddor.xml"/>
+
+  <!-- shared spells -->
+  <spell name="create_roi" ship="true" rank="5" index="130">
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="50" cost="fixed"/>
+    <resource name="money" amount="3000" cost="fixed"/>
+    <resource name="permaura" amount="1" cost="fixed"/>
+  </spell>
+
+  <spell name="create_aots" ship="true" rank="5" index="125">
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="50" cost="fixed"/>
+    <resource name="money" amount="3000" cost="fixed"/>
+    <resource name="permaura" amount="1" cost="fixed"/>
+  </spell>
+
+  <spell name="disturbingdreams" rank="5" index="50" far="true">
+    <!-- Schlechter Schlaf -->
+    <resource name="aura" amount="18" cost="fixed"/>
+  </spell>
+
+  <!-- new illaun -->
+  <spell name="shadowknights" rank="4" index="147" variable="true" combat="1">
+    <!-- Schattenritter -->
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="sparkledream" rank="5" index="154" parameters="u" los="true" ship="true" variable="true">
+    <!-- Traumsenden -->
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="earn_silver#illaun" ship="true" variable="true" rank="5" index="159">
+    <!-- Wahrsagen -->
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="flee" rank="5" index="20" variable="true" combat="1">
+    <!-- Grauen der Schlacht -->
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="puttorest" rank="5" index="168" variable="true">
+    <!-- Seelenfrieden -->
+    <resource name="aura" amount="3" cost="level"/>
+    <resource name="balm" amount="10" cost="fixed"/>
+  </spell>
+  <spell name="shapeshift" rank="5" index="93" syntax="race" parameters="uc" variable="true">
+    <!-- Gestaltwandlung -->
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="icastle" rank="5" index="137" syntax="buildingtype" parameters="c">
+    <!-- Traumschlößchen -->
+    <resource name="aura" amount="3" cost="fixed"/>
+  </spell>
+  <spell name="dreamreading" rank="5" index="13" parameters="u" far="true">
+    <!-- Traumlesen -->
+    <resource name="aura" amount="8" cost="fixed"/>
+  </spell>
+  <spell name="tiredsoldiers" rank="5" index="15" variable="true" combat="1">
+    <!-- Schwere Glieder -->
+    <resource name="aura" amount="4" cost="level"/>
+  </spell>
+  <spell name="reanimate" rank="4" index="85" variable="true" combat="3">
+    <!-- Wiederbelebung -->
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="sleep" rank="5" index="52" variable="true" combat="2">
+    <!-- Schlaf -->
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="readmind" parameters="u" rank="5" index="114">
+    <!-- Traumdeuten -->
+    <function name="cast" value="cast_readmind"/>
+    <resource name="aura" amount="20" cost="fixed"/>
+    <!-- missing syntactical info: ONETARGET | UNITSPELL -->
+  </spell>
+  <spell name="gooddreams" rank="5" index="12" far="true">
+    <!-- Schöne Träume -->
+    <resource name="aura" amount="80" cost="fixed"/>
+  </spell>
+  <spell name="illaundestroymagic" rank="2" index="140" parameters="kc+" los="true" ship="true" far="true" variable="true">
+    <!-- Traumbilder entwirren -->
+    <resource name="aura" amount="6" cost="level"/>
+  </spell>
+  <spell name="clone" rank="5" index="173">
+    <!-- Seelenkopie -->
+    <resource name="aura" amount="100" cost="fixed"/>
+    <resource name="permaura" amount="20" cost="fixed"/>
+    <resource name="dragonblood" amount="5" cost="fixed"/>
+    <resource name="silk" amount="20" cost="fixed"/>
+  </spell>
+  <spell name="bad_dreams" rank="5" index="11" far="true">
+    <!-- Schlechte Träume -->
+    <resource name="aura" amount="90" cost="fixed"/>
+  </spell>
+  <spell name="mindblast" rank="5" index="78" variable="true" combat="1">
+    <!-- Tod des Geistes -->
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="create_dreameye" ship="true" rank="5" index="149">
+    <!-- Erschaffe ein Traumauge -->
+    <function name="cast" value="lua_castspell"/>
+    <resource name="dragonhead" amount="1" cost="fixed"/>
+    <resource name="permaura" amount="5" cost="fixed"/>
+  </spell>
+  <!-- end illaun -->
+
+  <!-- new draig -->
+  <spell name="sparklechaos" rank="5" index="153" parameters="u" los="true" variable="true">
+    <!-- Verwünschung -->
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="earn_silver#draig" ship="true" variable="true" rank="5" index="159">
+    <!-- Kleine Flüche -->
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="fireball" rank="5" index="4" variable="true" combat="2">
+    <!-- Feuerball -->
+    <function name="cast" value="combat_spell"/>
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="magicboost" rank="3" index="17" ship="true">
+    <!-- Gabe des Chaos -->
+    <resource name="aura" amount="6" cost="fixed"/>
+  </spell>
+  <spell name="bloodsacrifice" rank="1" index="171" ship="true">
+    <!-- Kleines Blutopfer -->
+    <resource name="hp" amount="16" cost="fixed"/>
+  </spell>
+  <spell name="berserk" rank="4" index="22" variable="true" combat="1">
+    <!-- Blutrausch -->
+    <resource name="aura" amount="5" cost="level"/>
+    <resource name="peasant" amount="1" cost="fixed"/>
+  </spell>
+  <spell name="fumblecurse" rank="4" index="136" parameters="u" los="true" variable="true">
+    <!-- Chaosfluch -->
+    <resource name="aura" amount="4" cost="level"/>
+  </spell>
+  <spell name="combatrust" rank="5" index="7" variable="true" combat="2">
+    <!-- Rosthauch -->
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="summonundead" rank="5" index="41" ship="true" far="true" variable="true">
+    <!-- Mächte des Todes -->
+    <resource name="aura" amount="5" cost="level"/>
+  </spell>
+  <spell name="firewall" rank="4" index="151" syntax="direction" parameters="c" variable="true">
+    <!-- Feuerwand -->
+    <resource name="aura" amount="6" cost="level"/>
+  </spell>
+  <spell name="chaosrow" rank="5" index="18" variable="true" combat="1">
+    <!-- Wahnsinn des Krieges -->
+    <resource name="aura" amount="3" cost="level"/>
+    <resource name="peasant" amount="10" cost="fixed"/>
+  </spell>
+  <spell name="summonshadow" rank="5" index="34" variable="true">
+    <!-- Beschwöre Schattendämonen -->
+    <resource name="aura" amount="3" cost="level"/>
+  </spell>
+  <spell name="undeadhero" rank="5" index="164" variable="true" combat="3">
+    <!-- Untote Helden -->
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="draigdestroymagic" rank="2" index="139" parameters="kc+" los="true" ship="true" far="true" variable="true">
+    <!-- Pentagramm -->
+    <resource name="aura" amount="10" cost="level"/>
+  </spell>
+  <spell name="deathcloud" rank="5" index="111" far="true">
+    <!-- Todeswolke -->
+    <resource name="aura" amount="40" cost="fixed"/>
+    <resource name="hp" amount="15" cost="fixed"/>
+  </spell>
+  <spell name="summondragon" rank="5" index="113" far="true">
+    <!-- Drachenruf -->
+    <resource name="aura" amount="80" cost="fixed"/>
+    <resource name="dragonhead" amount="1" cost="fixed"/>
+  </spell>
+  <spell name="summonshadowlords" rank="5" index="35" variable="true">
+    <!-- Beschwöre Schattenmeister -->
+    <resource name="aura" amount="7" cost="level"/>
+  </spell>
+  <spell name="create_firesword" ship="true" rank="5" index="148">
+    <!-- Erschaffe ein Flammenschwert -->
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="100" cost="fixed"/>
+    <resource name="oil" amount="10" cost="fixed"/>
+    <resource name="sword" amount="1" cost="fixed"/>
+    <resource name="permaura" amount="1" cost="fixed"/>
+  </spell>
+  <spell name="unholypower" rank="5" index="169" parameters="u+" los="true" variable="true">
+    <!-- Unheilige Kraft -->
+    <resource name="aura" amount="10" cost="level"/>
+    <resource name="peasant" amount="5" cost="level"/>
+  </spell>
+  <!-- end draig -->
+
+  <!-- new cerddor -->
+  <spell name="earn_silver#cerddor" ship="true" variable="true" rank="5" index="159">
+    <!-- Gaukeleien -->
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="song_of_healing" rank="5" index="10" variable="true" combat="3">
+    <!-- Lied der Heilung -->
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="generous" rank="5" index="87" ship="true" far="true" variable="true">
+    <!-- Hohes Lied der Gaukelei -->
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="song_of_fear" rank="5" index="21" variable="true" combat="2">
+    <!-- Gesang der Furcht -->
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="song_of_confusion" rank="5" index="19" variable="true" combat="1">
+    <!-- Gesang der Verwirrung -->
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="blabbermouth" parameters="u" los="true" rank="5" index="115">
+    <!-- Plappermaul -->
+    <function name="cast" value="cast_babbler"/>
+    <resource name="aura" amount="10" cost="fixed"/>
+    <!-- missing syntactical info: ONETARGET | UNITSPELL -->
+  </spell>
+  <spell name="heroic_song" rank="4" index="76" variable="true" combat="1">
+    <!-- Heldengesang -->
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="seduction" rank="5" index="73" parameters="u" los="true">
+    <!-- Lied der Verführung -->
+    <resource name="aura" amount="12" cost="fixed"/>
+  </spell>
+  <spell name="calm_monster" rank="5" index="75" parameters="u" los="true" ship="true">
+    <!-- Monster friedlich stimmen -->
+    <resource name="aura" amount="15" cost="fixed"/>
+  </spell>
+  <spell name="bloodthirst" rank="4" index="23" variable="true" combat="1">
+    <!-- Kriegsgesang -->
+    <resource name="aura" amount="5" cost="level"/>
+  </spell>
+  <spell name="frighten" rank="5" index="77" variable="true" combat="1">
+    <!-- Gesang der Angst -->
+    <resource name="aura" amount="5" cost="level"/>
+  </spell>
+  <spell name="cerddor_destroymagic" rank="2" index="141" parameters="kc+" los="true" ship="true" far="true" variable="true">
+    <!-- Lebenslied festigen -->
+    <resource name="aura" amount="5" cost="level"/>
+  </spell>
+  <spell name="migration" rank="5" index="90" parameters="u" los="true" variable="true">
+    <!-- Ritual der Aufnahme -->
+    <resource name="aura" amount="3" cost="level"/>
+    <resource name="permaura" amount="1" cost="level"/>
+  </spell>
+  <spell name="raise_mob" rank="5" index="60" variable="true">
+    <!-- Mob aufwiegeln -->
+    <resource name="aura" amount="4" cost="level"/>
+  </spell>
+  <spell name="song_resist_magic" rank="2" index="100" far="true" variable="true">
+    <!-- Gesang des wachen Geistes -->
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="create_roqf" ship="true" rank="5" index="63">
+    <!-- Miriams flinke Finger -->
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="20" cost="fixed"/>
+    <resource name="money" amount="1000" cost="fixed"/>
+    <resource name="permaura" amount="1" cost="fixed"/>
+  </spell>
+  <spell name="song_of_peace" rank="5" index="89" variable="true">
+    <!-- Gesang der Friedfertigkeit -->
+    <resource name="aura" amount="20" cost="level"/>
+  </spell>
+  <spell name="song_suscept_magic" rank="2" index="101" far="true" variable="true">
+    <!-- Gesang des schwachen Geistes -->
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="song_of_slavery" rank="5" index="123" parameters="u" los="true">
+    <!-- Gesang der Versklavung -->
+    <resource name="aura" amount="40" cost="fixed"/>
+  </spell>
+<!-- TODO: exploitable (transfers items) -->
+  <spell name="big_recruit" rank="5" index="179" variable="true">
+    <!-- Hohe Kunst der Überzeugung -->
+    <resource name="aura" amount="20" cost="level"/>
+  </spell>
+  <spell name="calm_riot" rank="5" index="91" far="true">
+    <!-- Aufruhr beschwichtigen -->
+    <resource name="aura" amount="30" cost="fixed"/>
+  </spell>
+  <spell name="incite_riot" rank="5" index="92" far="true">
+    <!-- Aufruhr verursachen -->
+    <resource name="aura" amount="40" cost="fixed"/>
+  </spell>
+  <!-- end cerddor -->
+
+  <!-- new gwyrrd -->
+  <spell name="blessedharvest" rank="5" index="25" ship="true" far="true" variable="true">
+    <!-- Segen der Erde -->
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="earn_silver#gwyrrd" ship="true" variable="true" rank="5" index="159">
+    <!-- Viehheilung -->
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="stonegolem" rank="4" index="32" variable="true">
+    <!-- Erschaffe Steingolems -->
+    <resource name="aura" amount="2" cost="level"/>
+    <resource name="stone" amount="1" cost="level"/>
+    <resource name="jewel" amount="10" cost="fixed"/>
+  </spell>
+  <spell name="treegrow" rank="5" index="8" far="true" variable="true">
+    <!-- Hainzauber -->
+    <resource name="aura" amount="4" cost="level"/>
+    <resource name="log" amount="1" cost="level"/>
+    <resource name="myrrh" amount="10" cost="fixed"/>
+  </spell>
+  <spell name="hail" rank="5" index="5" variable="true" combat="2">
+    <!-- Hagel -->
+    <function name="cast" value="combat_spell"/>
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="goodwinds" rank="5" index="56" parameters="s" ship="true" variable="true">
+    <!-- Beschwörung eines Wasserelementares -->
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="windshield" rank="5" index="59" variable="true" combat="1">
+    <!-- Windschild -->
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="healing" rank="5" index="9" variable="true" combat="3">
+    <!-- Heilung -->
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="earthquake" rank="5" index="53" far="true">
+    <!-- Beschwöre einen Erdelementar -->
+    <resource name="aura" amount="25" cost="fixed"/>
+    <resource name="laen" amount="2" cost="fixed"/>
+  </spell>
+  <spell name="stormwinds" rank="5" index="55" parameters="s+" ship="true" ocean="true" variable="true">
+    <!-- Beschwöre einen Sturmelementar -->
+    <resource name="aura" amount="6" cost="level"/>
+  </spell>
+  <spell name="wolfhowl" rank="5" index="94" variable="true" combat="1">
+    <!-- Wolfsgeheul -->
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="versteinern" rank="5" index="67" variable="true" combat="2">
+    <!-- Blick des Basilisken -->
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="gwyrrddestroymagic" rank="2" index="138" parameters="kc+" los="true" ship="true" far="true" variable="true">
+    <!-- Geister bannen -->
+    <resource name="aura" amount="6" cost="level"/>
+  </spell>
+  <spell name="holyground" rank="5" index="170">
+    <!-- Heiliger Boden -->
+    <resource name="aura" amount="80" cost="fixed"/>
+    <resource name="permaura" amount="3" cost="fixed"/>
+  </spell>
+  <spell name="summonent" rank="5" index="49" variable="true">
+    <!-- Erwecke Ents -->
+    <resource name="aura" amount="6" cost="level"/>
+  </spell>
+  <spell name="blessstonecircle" rank="5" index="117" parameters="b">
+    <!-- Segne Steinkreis -->
+    <resource name="aura" amount="350" cost="fixed"/>
+    <resource name="permaura" amount="5" cost="fixed"/>
+  </spell>
+  <spell name="barkskin" rank="2" index="142" variable="true" combat="1">
+    <!-- Rindenhaut -->
+    <resource name="aura" amount="4" cost="level"/>
+  </spell>
+  <spell name="summonfireelemental" rank="5" index="46" far="true">
+    <!-- Beschwörung eines Hitzeelementar -->
+    <resource name="aura" amount="600" cost="fixed"/>
+  </spell>
+  <spell name="maelstrom" rank="5" index="24" ship="true" ocean="true">
+    <!-- Mahlstrom -->
+    <resource name="aura" amount="200" cost="fixed"/>
+    <resource name="seaserpenthead" amount="1" cost="fixed"/>
+  </spell>
+  <!-- end gwyrrd -->
+
+  <!-- new tybied - spells known to all schools -->
+  <spell name="create_potion_p2" ship="true" rank="5" variable="true">
+    <!-- Wasser des Lebens -->
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="2" cost="linear"/>
+    <resource name="h4" amount="1" cost="linear"/><!-- Baumringel -->
+    <resource name="h6" amount="1" cost="linear"/><!-- Gurgelkraut -->
+  </spell>
+  <spell name="create_potion_p0" ship="true" rank="5" variable="true">
+    <!-- Siebenmeilentee -->
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="2" cost="linear"/>
+    <resource name="h12" amount="1" cost="linear"/><!-- Windbeutel -->
+    <resource name="h17" amount="1" cost="linear"/><!-- Höhlenglimm -->
+  </spell>
+  <spell name="create_potion_p9" ship="true" rank="5" variable="true">
+    <!-- Pferdeglück -->
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="3" cost="linear"/>
+    <resource name="h0" amount="1" cost="linear"/><!-- Flachwurz -->
+    <resource name="h8" amount="1" cost="linear"/><!-- Blasenmorchel -->
+    <resource name="h15" amount="1" cost="linear"/><!-- Steinbeißer -->
+  </spell>
+  <spell name="create_potion_peasantblood" ship="true" rank="5" variable="true">
+    <!-- Bauernblut -->
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="3" cost="linear"/>
+    <resource name="h14" amount="1" cost="linear"/><!-- Alraune -->
+    <resource name="h6" amount="1" cost="linear"/><!-- Gurgelkraut -->
+    <resource name="h17" amount="1" cost="linear"/><!-- Höhlenglimm -->
+    <resource name="peasant" amount="1" cost="fixed"/><!-- Bauer -->
+  </spell>
+
+  <spell name="create_potion_ointment" ship="true" rank="5" variable="true">
+    <!-- Wundsalbe -->
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="4" cost="linear"/>
+    <resource name="h4" amount="1" cost="linear"/><!-- Baumringel -->
+    <resource name="h15" amount="1" cost="linear"/><!-- Steinbeißer -->
+    <resource name="h18" amount="1" cost="linear"/><!-- Eisblume -->
+    <resource name="h11" amount="1" cost="linear"/><!-- Sandfäule -->
+  </spell>
+  <spell name="create_potion_p3" ship="true" rank="5" variable="true">
+    <!-- Schaffenstrunk -->
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="4" cost="linear"/>
+    <resource name="h12" amount="1" cost="linear"/><!-- Windbeutel -->
+    <resource name="h6" amount="1" cost="linear"/><!-- Gurgelkraut -->
+    <resource name="h20" amount="1" cost="linear"/><!-- Schneekristall -->
+    <resource name="h9" amount="1" cost="linear"/><!-- Wasserfinder -->
+  </spell>
+  <spell name="create_potion_p14" ship="true" rank="5" variable="true">
+    <!-- Heiltrank -->
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="5" cost="linear"/>
+    <resource name="h0" amount="1" cost="linear"/><!-- Flachwurz -->
+    <resource name="h8" amount="1" cost="linear"/><!-- Blasenmorchel -->
+    <resource name="h15" amount="1" cost="linear"/><!-- Steinbeißer -->
+    <resource name="h18" amount="1" cost="linear"/><!-- Eisblume -->
+    <resource name="h9" amount="1" cost="linear"/><!-- Wasserfinder -->
+  </spell>
+  <spell name="create_potion_p13" ship="true" rank="5" variable="true">
+    <!-- Elixier der Macht -->
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="5" cost="linear"/>
+    <resource name="h14" amount="1" cost="linear"/><!-- Alraune -->
+    <resource name="h8" amount="1" cost="linear"/><!-- Blasenmorchel -->
+    <resource name="h17" amount="1" cost="linear"/><!-- Höhlenglimm -->
+    <resource name="h20" amount="1" cost="linear"/><!-- Schneekristall -->
+    <resource name="h11" amount="1" cost="linear"/><!-- Sandfäule -->
+    <resource name="dragonblood" amount="1" cost="fixed"/><!-- Drachenblut -->
+  </spell>
+
+  <spell name="auratransfer" rank="1" index="31" syntax="aura" parameters="ui" ship="true">
+    <!-- Auratransfer -->
+    <resource name="aura" amount="1" cost="fixed"/>
+  </spell>
+  <!-- end tybied -->
+
+  <!-- common spells: randomly given, one per level -->
+  <spell name="create_trollbelt" ship="true" rank="5" index="48">
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="20" cost="fixed"/>
+    <resource name="permaura" amount="1" cost="fixed"/>
+  </spell>
+
+  <spell name="create_antimagic" ship="true" rank="5" index="38">
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="50" cost="fixed"/>
+    <resource name="money" amount="3000" cost="fixed"/>
+  </spell>
+
+  <spell name="create_rop" ship="true" rank="5" index="1">
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="100" cost="fixed"/>
+    <resource name="permaura" amount="1" cost="fixed"/>
+    <resource name="money" amount="4000" cost="fixed"/>
+  </spell>
+
+  <spell name="create_bagofholding" ship="true" rank="5" index="155">
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="30" cost="fixed"/>
+    <resource name="permaura" amount="1" cost="fixed"/>
+    <resource name="money" amount="5000" cost="fixed"/>
+  </spell>
+
+  <spell name="create_focus" ship="true" rank="5" index="2">
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="100" cost="fixed"/>
+    <resource name="permaura" amount="1" cost="fixed"/>
+  </spell>
+
+  <spell name="create_ror" ship="true" rank="5" index="3">
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="100" cost="fixed"/>
+    <resource name="permaura" amount="1" cost="fixed"/>
+  </spell>
+
+  <spell name="rustweapon" rank="5" index="6" parameters="u+" los="true" far="true" variable="true">
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="plague" rank="5" index="16" far="true">
+    <resource name="aura" amount="30" cost="fixed"/>
+    <resource name="peasant" amount="50" cost="fixed"/>
+  </spell>
+  <spell name="raindance" rank="5" index="26" ship="true" far="true" variable="true">
+    <!-- Regentanz -->
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="irongolem" rank="4" index="33" variable="true">
+    <!-- Eisengolem -->
+    <resource name="aura" amount="2" cost="level"/>
+    <resource name="iron" amount="1" cost="level"/>
+    <resource name="incense" amount="1" cost="fixed"/>
+  </spell>
+  <spell name="reelingarrows" rank="5" index="36" variable="true" combat="1">
+    <!-- Wirbelwind -->
+    <resource name="aura" amount="15" cost="fixed"/>
+  </spell>
+  <spell name="antimagiczone" rank="2" index="37" far="true" variable="true">
+    <resource name="aura" amount="3" cost="level"/>
+  </spell>
+  <spell name="steal_aura" rank="3" index="40" parameters="u" los="true" far="true" variable="true">
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="auraleak" rank="3" index="42">
+    <resource name="aura" amount="35" cost="fixed"/>
+    <resource name="dragonblood" amount="1" cost="fixed"/>
+  </spell>
+  <spell name="strongwall" rank="5" index="44" variable="true" combat="1">
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="homestone" rank="5" index="45">
+    <resource name="aura" amount="50" cost="fixed"/>
+    <resource name="permaura" amount="1" cost="fixed"/>
+  </spell>
+  <spell name="forestfire" rank="5" index="47" far="true">
+    <resource name="aura" amount="50" cost="fixed"/>
+    <resource name="oil" amount="5" cost="fixed"/>
+  </spell>
+  <spell name="appeasement" rank="5" index="51" variable="true" combat="1">
+    <resource name="aura" amount="2" cost="fixed"/>
+  </spell>
+  <spell name="ironkeeper" rank="5" index="54" far="true" variable="true">
+    <resource name="aura" amount="3" cost="level"/>
+  </spell>
+  <spell name="airship" rank="5" index="57" parameters="s" ship="true">
+    <resource name="aura" amount="10" cost="fixed"/>
+    <resource name="h12" amount="1" cost="fixed"/>
+    <resource name="h20" amount="1" cost="fixed"/>
+  </spell>
+  <spell name="sound_out" rank="5" index="74" parameters="ur" los="true">
+    <resource name="aura" amount="4" cost="fixed"/>
+    <resource name="money" amount="100" cost="fixed"/>
+  </spell>
+  <spell name="combat_speed" rank="5" index="79" variable="true" combat="1">
+    <resource name="aura" amount="5" cost="level"/>
+  </spell>
+  <spell name="double_time" rank="5" index="80" parameters="u+" los="true" ship="true" variable="true">
+    <resource name="aura" amount="5" cost="level"/>
+  </spell>
+  <spell name="magicstreet" rank="5" index="84" ship="true" far="true" variable="true">
+    <resource name="aura" amount="1" cost="level"/>
+    <resource name="stone" amount="1" cost="fixed"/>
+    <resource name="log" amount="1" cost="fixed"/>
+  </spell>
+  <spell name="sacrifice_strength" rank="1" index="88" syntax="aura" parameters="ui">
+    <resource name="aura" amount="100" cost="fixed"/>
+  </spell>
+  <spell name="resist_magic" rank="2" index="97" parameters="u+" los="true" ship="true" variable="true">
+    <!-- Schutzzauber -->
+    <resource name="aura" amount="5" cost="level"/>
+  </spell>
+  <spell name="protective_runes" rank="2" index="99" parameters="kc" ship="true">
+    <resource name="aura" amount="20" cost="fixed"/>
+  </spell>
+  <spell name="analyze_magic" rank="5" index="102" parameters="kc?" los="true" ship="true" variable="true">
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="destroy_magic" rank="2" index="106" parameters="kc+" los="true" ship="true" far="true" variable="true">
+    <resource name="aura" amount="4" cost="level"/>
+  </spell>
+  <spell name="break_curse" rank="3" index="107" syntax="spellid" parameters="kcc?" los="true" ship="true" far="true" variable="true">
+    <resource name="aura" amount="3" cost="level"/>
+  </spell>
+  <spell name="fish_shield" rank="2" index="109" variable="true" combat="1">
+    <resource name="aura" amount="4" cost="level"/>
+  </spell>
+  <spell name="armor_shield" rank="2" index="110" variable="true" combat="1">
+    <resource name="aura" amount="4" cost="level"/>
+  </spell>
+  <spell name="living_rock" rank="5" index="116" syntax="direction" parameters="bc" variable="true">
+    <resource name="aura" amount="10" cost="level"/>
+    <resource name="permaura" amount="1" cost="fixed"/>
+    <resource name="laen" amount="5" cost="fixed"/>
+  </spell>
+  <spell name="summon_familiar" rank="5" index="118">
+    <function name="cast" value="cast_familiar"/>
+    <resource name="aura" amount="100" cost="fixed"/>
+    <resource name="permaura" amount="5" cost="fixed"/>
+  </spell>
+  <spell name="draigfumbleshield" rank="2" index="143" variable="true" combat="1">
+    <resource name="aura" amount="6" cost="level"/>
+  </spell>
+  <spell name="gwyrrdfumbleshield" rank="2" index="144" variable="true" combat="1">
+    <resource name="aura" amount="5" cost="level"/>
+  </spell>
+  <spell name="cerrdorfumbleshield" rank="2" index="145" variable="true" combat="1">
+    <resource name="aura" amount="5" cost="level"/>
+  </spell>
+  <spell name="tybiedfumbleshield" rank="2" index="146" variable="true" combat="1">
+    <resource name="aura" amount="3" cost="level"/>
+  </spell>
+  <spell name="concealing_aura" rank="5" index="150" parameters="u" ship="true" variable="true">
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="shockwave" rank="5" index="163" variable="true" combat="2">
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="eternal_walls" rank="5" index="167" parameters="b" ship="true" variable="true">
+    <resource name="aura" amount="50" cost="fixed"/>
+    <resource name="permaura" amount="1" cost="fixed"/>
+  </spell>
+  <!-- end common spells -->
+
+  <!-- gray spells: given to individuals or monsters -->
+  <spell name="fiery_dragonbreath" rank="5" index="81" combat="2">
+    <resource name="aura" amount="1" cost="fixed"/>
+  </spell>
+  <spell name="icy_dragonbreath" rank="5" index="82" combat="2">
+    <resource name="aura" amount="2" cost="fixed"/>
+  </spell>
+  <spell name="powerful_dragonbreath" rank="5" index="83" combat="2">
+    <resource name="aura" amount="3" cost="fixed"/>
+  </spell>
+  <spell name="meteor_rain" rank="5" index="108" variable="true" combat="2">
+    <function name="cast" value="combat_spell"/>
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="wyrm_transformation" rank="5" index="166">
+    <resource name="aura" amount="1" cost="fixed"/>
+    <resource name="permaura" amount="1" cost="fixed"/>
+  </spell>
+  <spell name="transferauratraum" rank="1" index="30" syntax="aura" parameters="ui" ship="true">
+    <!-- Traum der Magie -->
+    <resource name="aura" amount="2" cost="fixed"/>
+  </spell>
+  <spell name="drain_skills" rank="5" index="174" combat="2">
+    <resource name="aura" amount="4" cost="fixed"/>
+  </spell>
+  <spell name="aura_of_fear" rank="5" index="175" combat="2">
+    <resource name="aura" amount="12" cost="fixed"/>
+  </spell>
+  <spell name="shadowcall" rank="5" index="176" combat="1">
+    <resource name="aura" amount="24" cost="fixed"/>
+  </spell>
+  <spell name="immolation" rank="5" index="180" combat="2">
+    <resource name="aura" amount="24" cost="fixed"/>
+  </spell>
+  <spell name="firestorm" rank="5" index="181" combat="2">
+    <resource name="aura" amount="2" cost="fixed"/>
+  </spell>
+  <spell name="coldfront" rank="5" index="182" combat="2">
+    <resource name="aura" amount="2" cost="fixed"/>
+  </spell>
+  <spell name="acidrain" rank="5" index="183" combat="2">
+    <resource name="aura" amount="2" cost="fixed"/>
+  </spell>
+  <!-- end gray spells -->
+</spells>

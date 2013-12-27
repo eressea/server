@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<spellbook name="cerddor">
+  <entry spell="create_potion_p2" level="2" />
+  <entry spell="create_potion_p0" level="3" />
+  <entry spell="create_potion_p9" level="4" />
+  <entry spell="create_potion_peasantblood" level="5" />
+  <entry spell="create_potion_ointment" level="6" />
+  <entry spell="create_potion_p3" level="7" />
+  <entry spell="create_potion_p14" level="8" />
+  <entry spell="create_potion_p13" level="9" />
+  <entry spell="create_roi" level="7" />
+  <entry spell="create_aots" level="6" />
+  <entry spell="auratransfer" level="5" />
+    <entry spell="earn_silver#cerddor" level="1" />
+    <entry spell="song_of_healing" level="2" />
+    <entry spell="generous" level="2" />
+    <entry spell="song_of_fear" level="3" />
+    <entry spell="song_of_confusion" level="4" />
+    <entry spell="blabbermouth" level="4" />
+    <entry spell="heroic_song" level="5" />
+    <entry spell="seduction" level="6" />
+    <entry spell="calm_monster" level="6" />
+    <entry spell="bloodthirst" level="7" />
+    <entry spell="frighten" level="8" />
+    <entry spell="cerddor_destroymagic" level="8" />
+    <entry spell="migration" level="9" />
+    <entry spell="raise_mob" level="10" />
+    <entry spell="song_resist_magic" level="10" />
+    <entry spell="create_roqf" level="11" />
+    <entry spell="song_of_peace" level="12" />
+    <entry spell="song_suscept_magic" level="12" />
+    <entry spell="song_of_slavery" level="13" />
+    <entry spell="big_recruit" level="14" />
+    <entry spell="calm_riot" level="14" />
+    <entry spell="incite_riot" level="15" />
+</spellbook>

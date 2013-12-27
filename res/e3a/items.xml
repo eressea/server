@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+
+  <resource name="rpg_item_1"><item weight="10"/></resource>
+  <resource name="rpg_item_2"><item weight="1"/></resource>
+  <resource name="rpg_item_3"><item weight="100"/></resource>
+  
+  <resource name="ointment" appearance="vial">
+    <!-- Wundsalbe -->
+    <item weight="0" score="60">
+      <function name="use" value="usehealingpotion"/>
+      <potion level="2"/>
+    </item>
+  </resource>
+
+  <resource name="p13" appearance="vial">
+    <!-- Elixier der Macht -->
+    <item weight="0" score="120">
+      <function name="use" value="usepotion"/>
+      <potion level="4"/>
+    </item>
+  </resource>
+
+  <resource name="p3" appearance="vial">
+    <!-- Schaffenstrunk -->
+    <item weight="0" score="60">
+      <function name="use" value="usepotion"/>
+      <potion level="2"/>
+    </item>
+  </resource>
+
+  <resource name="p14" appearance="vial">
+    <!-- Heiltrank -->
+    <item weight="0" score="120">
+      <function name="use" value="usepotion"/>
+      <potion level="4"/>
+    </item>
+  </resource>
+
+  <resource name="p0" appearance="vial">
+    <!-- Siebenmeilentee -->
+    <item weight="0" score="30">
+      <function name="use" value="usepotion"/>
+      <potion level="1"/>
+    </item>
+  </resource>
+
+  <resource name="p2" appearance="vial">
+    <!-- Wasser des Lebens -->
+    <item weight="0" score="30">
+      <function name="use" value="usepotion_delayed"/>
+      <potion level="1"/>
+    </item>
+  </resource>
+
+  <resource name="peasantblood" appearance="vial">
+    <!-- Bauernblut -->
+    <item weight="0" score="60">
+      <function name="use" value="usebloodpotion"/>
+      <potion level="2"/>
+    </item>
+  </resource>
+
+  <resource name="p9" appearance="vial">
+    <!-- Pferdeglück -->
+    <item weight="0" score="90">
+      <function name="use" value="usepotion"/>
+      <potion level="3"/>
+    </item>
+  </resource>
+
+  <resource name="charger">
+    <item big="yes" weight="5000" score="10" capacity="7000" animal="yes">
+      <construction skill="training" minskill="4" reqsize="1">
+        <requirement type="money" quantity="200"/>
+        <requirement type="iron" quantity="1"/>
+        <requirement type="horse" quantity="1"/>
+      </construction>
+      <function name="give" value="givehorses"/>
+    </item>
+  </resource>
+
+  <resource name="xmastree">
+    <item weight="0">
+      <function name="use" value="lua_useitem"/>
+    </item>
+  </resource>
+
+</resources>

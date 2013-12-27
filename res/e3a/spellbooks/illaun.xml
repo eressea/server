@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<spellbook name="illaun">
+  <entry spell="create_potion_p2" level="2" />
+  <entry spell="create_potion_p0" level="3" />
+  <entry spell="create_potion_p9" level="4" />
+  <entry spell="create_potion_peasantblood" level="5" />
+  <entry spell="create_potion_ointment" level="6" />
+  <entry spell="create_potion_p3" level="7" />
+  <entry spell="create_potion_p14" level="8" />
+  <entry spell="create_potion_p13" level="9" />
+  <entry spell="create_roi" level="7" />
+  <entry spell="create_aots" level="6" />
+  <entry spell="auratransfer" level="5" />
+  <entry spell="shadowknights" level="1" />
+  <entry spell="sparkledream" level="1" />
+  <entry spell="earn_silver#illaun" level="1" />
+  <entry spell="flee" level="2" />
+  <entry spell="puttorest" level="2" />
+  <entry spell="shapeshift" level="3" />
+  <entry spell="icastle" level="3" />
+  <entry spell="dreamreading" level="4" />
+  <entry spell="tiredsoldiers" level="4" />
+  <entry spell="reanimate" level="5" />
+  <entry spell="disturbingdreams" level="6" />
+  <entry spell="sleep" level="7" />
+  <entry spell="readmind" level="7" />
+  <entry spell="gooddreams" level="8" />
+  <entry spell="illaundestroymagic" level="8" />
+  <entry spell="clone" level="9" />
+  <entry spell="bad_dreams" level="10" />
+  <entry spell="mindblast" level="11" />
+  <entry spell="create_dreameye" level="14" />
+</spellbook>

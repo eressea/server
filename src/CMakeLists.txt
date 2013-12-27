@@ -19,7 +19,25 @@ include_directories (${BSON_INCLUDE_DIR})
 include_directories (${INIPARSER_INCLUDE_DIR})
 include_directories (${CURSES_INCLUDE_DIR})
 
-add_executable(server main.c)
+set (SERVER_SRC
+  races/races.c
+  races/dragons.c
+  races/zombies.c
+  races/illusion.c
+  main.c
+  bindings.c
+  monsters.c
+  spells/combatspells.c
+  spells/shipcurse.c
+  spells/regioncurse.c
+  spells/buildingcurse.c
+  spells/alp.c
+  spells/unitcurse.c
+  spells/spells.c
+  curses.c
+)
+
+add_executable(server ${SERVER_SRC})
 target_link_libraries(server
   ${ERESSEA_LIBRARY}
   ${BINDINGS_LIBRARY}

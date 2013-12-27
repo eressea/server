@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<spellbook name="draig">
+  <entry spell="fireball" level="2" />
+  <entry spell="combatrust" level="6" />
+  <entry spell="plague" level="7" />
+  <entry spell="magicboost" level="3" />
+  <entry spell="chaosrow" level="8" />
+  <entry spell="berserk" level="5" />
+  <entry spell="transferaurachaos" level="7" />
+  <entry spell="summonshadow" level="8" />
+  <entry spell="summonshadowlords" level="12" />
+  <entry spell="summonundead" level="6" />
+  <entry spell="auraleak" level="9" />
+  <entry spell="forestfire" level="10" />
+  <entry spell="chaossuction" level="14" />
+  <entry spell="deathcloud" level="11" />
+  <entry spell="summondragon" level="11" />
+  <entry spell="summon_familiar" level="13" />
+  <entry spell="fumblecurse" level="5" />
+  <entry spell="draigdestroymagic" level="10" />
+  <entry spell="draigfumbleshield" level="9" />
+  <entry spell="firewall" level="7" />
+  <entry spell="sparklechaos" level="1" />
+  <entry spell="undeadhero" level="9" />
+  <entry spell="unholypower" level="14" />
+  <entry spell="bloodsacrifice" level="4" />
+  <entry spell="create_roi" level="6" />
+  <entry spell="earn_silver#draig" level="1" />
+  <entry spell="create_aots" level="6" />
+  <entry spell="create_firesword" level="12" />
+  <entry spell="create_trollbelt" level="9" />
+</spellbook>

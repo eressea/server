@@ -1,0 +1,111 @@
+==-------------------==
+New Style Eventhandling
+==-------------------==
+
+	Zweck des ganzen ist es, möglichst frei Reaktionen auf Ereignisse zu
+	implementieren. Dazu muß natürlich defineirt sein, was so ein Ereignis
+	ist. Sowohl die Eriegnisse als auch das, was daraufhin geschieht, muß
+	möglichst flexibel erweiterbar sein. außerdem sollen solche
+	Ereigniss-Behandlungen zur Laufzeit defineirt werden können. Die möglichen
+	Events kann man nur zur Compilezeit definieren, und auch die Klassen von
+	Behandlungsroutinen, aber festzulegen wer wann auf was reagiert sollte
+	durch einen Spruch, das auftauchen eines Drachen, einen Event oder den Tod
+	einer Einheit ausgelöst werden können, und beliebiges anderes.
+
+Wie's geht:
+
+	Wenn durch den Code ein Event "event" ausgelöst wird, dann wird für das
+	betroffene Objekt X die Funktion handle_event(X->attribs, "event")
+	aufgerufen. Ja, der Event ist ein String.
+
+	handle_event(a, e) sucht in der Liste der attribute nach einem
+	at_eventhandler Objekt. So ein at_eventhandler verwaltet eine Liste von
+	Trigger-Objekten trigger_list mit Daten und handle() Funktion, die im Fall
+	des Events aufgerufen wird. Für jeden event-typ (string) gibt es ein
+	solches at_eventhandler Attribut in der Attributliste, das mehrere
+	Trigger-Funktionen beinhalten kann. Ich glaube, die hat Ingo in seinem
+	Ansatz "action" getauft.
+
+	Wurde ein Passendes gefunden, dann wird der Reihe nach jeder Trigger
+	ausgeführt.
+
+	Das ganze wird im Datenfile sogar ziemlich lesbar, wie man hier an diesem
+	Magier sieht:
+		eventhandler destroy killunit LeL end
+	Hier ist ein eventhandler, der im falle eines "destroy" Events auch die
+	Einheit LeL killt (LeL ist der Vertraute des Magiers).
+
+Neue Trigger-Typen machen:
+
+	Neue Trigger zu definieren ist ziemlich leicht, und ich habe schonmal ein
+	paar flexible vordefiniert. Sie sollten möglichst im Verzeichnis triggers/
+	landen. Dran denken, das jeder in Eressea verwendete trigger-typ mit
+	tt_register() angemeldet werden muß. Das passiert in der Datei
+	eressea/triggers.c
+
+	Dabei lohnt es sich, die trigger etwas genereller zu mchen. Für viele von
+	ihnen sollte man resolve.[hc] verstanden haben, da man das zum Speichern
+	von Referenzen auf Parteien, Einheiten, usw. benötigt.
+
+Trigger aktivieren:
+
+	Der Trigger sollte jeweils in der Attributliste des Objektes landen,
+	dessen Existnez für die Ausführung nötig ist. z.B. der Trigger zum Töten
+	des Familiars beim Magier, der zum übergeben eines item an eine person die
+	ein gebäude betritt, in das Gebäude.
+
+	Beispiel: Wenn die verzauberte Burg b zerstört wird, soll der zaubernde
+	Magier einen Schock erleiden:
+		add_trigger(&b->attribs, "destroy", trigger_shock(mage));
+	Steht die Burg jedoch nach 10 Runden noch an ihrem Fleck, bekommt er einen
+	Schatz von 100 Silber:
+		trigger * ttreasure = trigger_giveitem(mage, &i_silver, 100);
+		trigger * ttimer = trigger_timetrigger(10, ttreasure);
+		add_trigger(&b-attribs, "timer", ttimer);
+	Wie man sieht, kann ein trigger einen anderen auslösen, und mit etwas
+	Geschick kann man ganze Ketten von Ereignissen hinbekommen, die wieder
+	neue Trigger setzen, usw.
+
+Bisher definierte Events: (NI=Not Implemented)
+
+	{building|faction|unit|ship}:"destroy" - Das Objekt verschwindet.
+	{building|faction|unit|ship|region}:"timer" - einmal pro Runde in
+	eressea.c::ageing()
+	{building}"enter" - Gebäude oder Schiff wird betreten (NI)
+
+Bisher definierte trigger:
+
+	- timeout: meta-trigger, aktiviert eine liste von triggern nach einer
+	zeitspanne.
+	- changerace: ändert race/irace für eine einheit
+	- giveitem: gibt items eines typs an eine einheit.
+	- killunit: tötet die angegebene einhiet.
+	- shock: schockt einen magier.
+	- changefaction
+	- removecurse
+
+adaptierte alte trigger:
+
+	- famililars:
+		familiar: on "destroy" shock(mage)
+		mage: on "destroy" killunit(familiar)
+	- toad:
+		mage: on "timer" timeout([changerace(), giveitem(toadslime)])
+	- summondragon:
+		region: on "timer" timeout([createunit()])
+	- magicboost:
+		mage: on "timer" timeout(createcurse())
+	- charm:
+		target: on "timer" changefaction(target)
+		new faction: on "destroy" destroy(target)
+
+problems to be solved:
+
+	- propagation of triggers/attributes in general
+	- was, wenn ein removecurse(c) ausgefuehrt werden soll, aber der curse
+	sich propagiert hat? dafür waere wohl ein forwarding-graph ganz geeignet.
+	(spells:5066, alp)
+
+TODO:
+
+	- fprintf/fscanf nochmal checken.
