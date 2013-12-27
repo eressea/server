@@ -2,7 +2,7 @@ local srcpath = config.source_dir
 local respath = srcpath .. '/res'
 local paths = {
   'scripts/?.lua',
-  'eressea/scripts/?.lua',
+  'core/scripts/?.lua',
   'lunit/?.lua'
 }
 
