@@ -39,7 +39,7 @@ function create_potion_peasantblood(r, mage, level, force)
   return create_item(mage, level, "peasantblood", level)
 end
 
--- Pferdeglück
+-- Pferdeglueck
 function create_potion_p9(r, mage, level, force)
   return create_item(mage, level, "p9", level)
 end
@@ -61,10 +61,10 @@ end
 
 -- Erschaffe ein Flammenschwert
 function create_firesword(r, mage, level, force)
-  return create_item(mage, level, "firesword")
+    return create_item(mage, level, "firesword")
 end
 
--- Erschaffe einen Gürtel der Trollstärke
+-- Erschaffe einen Guertel der Trollstaerke
 function create_trollbelt(r, mage, level, force)
   return create_item(mage, level, "trollbelt")
 end
@@ -84,7 +84,7 @@ function create_aots(r, mage, level, force)
   return create_item(mage, level, "aots")
 end
 
--- Erschaffe einen magischen Kräuterbeutel
+-- Erschaffe einen magischen Kraeuterbeutel
 function create_magicherbbag(r, mage, level, force)
   return create_item(mage, level, "magicherbbag")
 end
@@ -99,12 +99,12 @@ function create_antimagic(r, mage, level, force)
   return create_item(mage, level, "antimagic")
 end
 
--- Erschaffe eine Sphäre der Unsichtbarkeit
+-- Erschaffe eine Sphaere der Unsichtbarkeit
 function create_invisibility_sphere(r, mage, level, force)
   return create_item(mage, level, "sphereofinv")
 end
 
--- Erschaffe einen Gürtel der Keuschheit
+-- Erschaffe einen Guertel der Keuschheit
 function create_chastitybelt(r, mage, level, force)
   return create_item(mage, level, "ao_chastity")
 end

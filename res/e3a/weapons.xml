@@ -12,6 +12,7 @@
   <xi:include href="eressea:///core/weapons/rustysword.xml"/>
   <xi:include href="eressea:///core/weapons/spear.xml"/>
   <xi:include href="eressea:///core/weapons/sword.xml"/>
+  <xi:include href="eressea:///core/weapons/firesword.xml"/>
   <xi:include href="weapons/crossbow.xml"/>
   <xi:include href="weapons/greatbow.xml"/>
   <xi:include href="weapons/greatsword.xml"/>
