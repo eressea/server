@@ -1,9 +1,9 @@
 [submodule "lunit"]
 	path = lunit
-	url = git://github.com/eressea/lunit.git
+	url = git://github.com/badgerman/lunit.git
 [submodule "crypto"]
 	path = crypto
-	url = git://github.com/eressea/crypto.git
+	url = git://github.com/badgerman/crypto.git
 [submodule "cmake"]
 	path = cmake
 	url = git://github.com/badgerman/cmake.git
