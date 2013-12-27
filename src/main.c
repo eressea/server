@@ -84,7 +84,7 @@ static int get_arg(int argc, char **argv, size_t len, int index, const char **re
     return index;
   }
   if (index+1 < argc) {
-    *result = argv[index];
+    *result = argv[index+1];
     return index+1;
   }
   *result = def;
