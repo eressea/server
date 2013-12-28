@@ -3297,8 +3297,6 @@ static building *age_building(building * b)
     region *rt = r_standard_to_astral(r);
     unit *u, *mage = NULL;
 
-    if (fval(rt->terrain, FORBIDDEN_REGION))
-      rt = NULL;
     /* step 1: give unicorns to people in the building,
      * find out if there's a magician in there. */
     for (u = r->units; u; u = u->next) {
@@ -3325,7 +3323,7 @@ static building *age_building(building * b)
 
     /* if there's a magician, and a connection to astral space, create the
      * curse. */
-    if (rt != NULL && mage != NULL) {
+    if (rt && !fval(rt->terrain, FORBIDDEN_REGION) && mage != NULL) {
       curse *c = get_curse(rt->attribs, ct_astralblock);
       if (c == NULL) {
         if (mage != NULL) {
