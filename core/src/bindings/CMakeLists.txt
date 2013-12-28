@@ -3,6 +3,7 @@ project (bindings C)
 
 IF(CMAKE_COMPILER_IS_GNUCC)
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -pedantic -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long")
+ELSEIF(MSVC)
 ELSE(CMAKE_COMPILER_IS_GNUCC)
     MESSAGE(STATUS "Unknown compiler ${CMAKE_C_COMPILER_ID}")
 ENDIF(CMAKE_COMPILER_IS_GNUCC)
@@ -36,7 +37,7 @@ MACRO(TOLUA_BINDING PKGFILE FILES)
   ADD_CUSTOM_COMMAND(
     OUTPUT ${PKGFILE}.c
     DEPENDS ${FILES} ${PKGFILE}
-    COMMAND tolua
+    COMMAND ${TOLUA_EXECUTABLE}
     ARGS -o ${CMAKE_CURRENT_BINARY_DIR}/${PKGFILE}.c ${PKGFILE}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   )
