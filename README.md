@@ -1,0 +1,20 @@
+# What is this?
+
+This repository contains an the source code for the Play-by-Mail strategy game [Eressea](http://www.eressea.de/).
+
+# Prerequisites
+
+Eressea depends on a number of external libraries. On a recent Debian-based Linux system, this is the apt-get command to install all of them:
+
+    sudo apt-get install git cmake gcc make libxml2-dev liblua5.2-dev libtolua-dev libncurses5-dev libsqlite3-dev
+
+# How to check out and build the Eressea server
+
+This repository relies heavily on the use of submodules, and it pulls in most of the code from those. The build system being used is cmake, which can create Makefiles on Unix, or Visual Studio project files on Windows. Here's how you clone and build the source on Ubuntu:
+
+    git clone git://github.com/eressea/server.git
+    cd server
+    git submodule update --init
+    ./configure
+
+If you got this far and all went well, you have built a server (it is linked from the `game` subdirectory), and it will have passed some basic functionality tests.
