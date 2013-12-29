@@ -8,8 +8,8 @@
  *
  */
 
-#include <curses.h>
 #include <platform.h>
+#include <curses.h>
 #include <util/bool.h>
 
 #include <kernel/config.h>

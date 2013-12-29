@@ -200,10 +200,6 @@ typedef struct _stat stat_type;
 # endif
 #endif
 
-#ifndef HAVE_STRDUP
-extern char *strdup(const char *s);
-#endif
-
 #ifndef HAVE_SLEEP
 #ifdef HAVE__SLEEP_MSEC
 # define sleep(sec) _sleep(1000*sec)

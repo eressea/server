@@ -9,8 +9,8 @@
 */
 
 /* wenn platform.h nicht vor curses included wird, kompiliert es unter windows nicht */
-#include <curses.h>
 #include <platform.h>
+#include <curses.h>
 #include <kernel/config.h>
 
 #include "listbox.h"
