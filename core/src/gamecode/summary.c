@@ -149,9 +149,11 @@ void report_summary(summary * s, summary * o, bool full)
   } else {
     sprintf(zText, "%s/parteien", basepath());
   }
-  F = cfopen(zText, "w");
-  if (!F)
+  F = fopen(zText, "w");
+  if (!F) {
+    perror(zText);
     return;
+  }
 #ifdef SUMMARY_BOM
   else {
     const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };

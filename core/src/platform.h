@@ -117,7 +117,6 @@ extern "C" {
 # define HAVE_STAT
 typedef struct stat stat_type;
 # include <string.h>
-# define HAVE_STRDUP
 # define HAVE_SNPRINTF
 #ifdef _POSIX_SOURCE            /* MINGW doesn't seem to have these */
 # define HAVE_EXECINFO
@@ -143,7 +142,6 @@ typedef struct stat stat_type;
 typedef struct stat stat_type;
 # define HAVE_STRICMP
 # define HAVE_STRNICMP
-# define HAVE_STRDUP
 # define HAVE_SLEEP
 # define snprintf _snprintf
 # define HAVE_SNPRINTF
@@ -174,10 +172,6 @@ typedef struct stat stat_type;
 #include <sys/stat.h>
 # define stat(a, b) _stat(a, b)
 typedef struct _stat stat_type;
-
-/* MSVC has _strdup */
-# define strdup _strdup
-# define HAVE_STRDUP
 
 # define stricmp(a, b) _stricmp(a, b)
 # define HAVE_STRICMP
@@ -256,4 +250,17 @@ extern char *strdup(const char *s);
 #define isxspace(c) (c==160 || isspace(c))
 
 #define TOLUA_CAST (char*)
+
+#if !defined(HAVE_STRDUP)
+# if defined(HAVE__STRDUP)
+#  define strdup(s) _strdup(s)
+# endif
+#endif
+
+#if !defined(HAVE__STRDUP)
+# if defined(HAVE_STRDUP)
+#  define _strdup(s) strdup(s)
+# endif
+#endif
+
 #endif

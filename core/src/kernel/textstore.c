@@ -17,6 +17,7 @@ without prior permission by the authors of Eressea.
 #include <util/log.h>
 
 #include <assert.h>
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -27,7 +28,7 @@ without prior permission by the authors of Eressea.
 /** writes a quoted string to the file
 * no trailing space, since this is used to make the creport.
 */
-static int fwritestr(FILE * F, const char *str)
+int fwritestr(FILE * F, const char *str)
 {
   int nwrite = 0;
   fputc('\"', F);

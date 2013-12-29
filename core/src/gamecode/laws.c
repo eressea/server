@@ -4668,8 +4668,10 @@ int writepasswd(void)
   char zText[128];
 
   sprintf(zText, "%s/passwd", basepath());
-  F = cfopen(zText, "w");
-  if (F) {
+  F = fopen(zText, "w");
+  if (!F) {
+    perror(zText);
+  } else {
     faction *f;
     log_info("writing passwords...");
 

@@ -504,6 +504,8 @@ static unsigned int messagehash(const struct message *msg)
   return (unsigned int)var.i;
 }
 
+extern int fwritestr(FILE * F, const char *str);
+
 static void render_messages(FILE * F, faction * f, message_list * msgs)
 {
   struct mlist *m = msgs->begin;
