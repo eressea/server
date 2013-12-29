@@ -205,3 +205,9 @@ add_executable(${PROJECT_NAME}_test ${TEST_SRC})
 target_link_libraries(${PROJECT_NAME}_test ${ERESSEA_LIBRARY})
 
 add_test(${PROJECT_NAME} ${PROJECT_NAME}_test)
+
+IF (MSVC)
+    find_package (MSVC MODULE)
+    MSVC_CRT_SECURE_NO_WARNINGS (${ERESSEA_LIBRARY})
+ENDIF (MSVC)
+

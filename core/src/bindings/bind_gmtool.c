@@ -13,6 +13,8 @@
 
 #include <tolua.h>
 
+#include <string.h>
+
 static int tolua_run_mapper(lua_State * L)
 {
   run_mapper();
