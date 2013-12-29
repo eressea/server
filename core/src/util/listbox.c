@@ -9,12 +9,9 @@
 */
 
 /* wenn platform.h nicht vor curses included wird, kompiliert es unter windows nicht */
+#include <curses.h>
 #include <platform.h>
 #include <kernel/config.h>
-
-#undef bool
-#include <curses.h>
-#include <util/bool.h>
 
 #include "listbox.h"
 #include "gmtool_structs.h"

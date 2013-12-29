@@ -8,10 +8,8 @@
  *
  */
 
-/* wenn platform.h nicht vor curses included wird, kompiliert es unter windows nicht */
-#include <platform.h>
-#undef bool
 #include <curses.h>
+#include <platform.h>
 #include <util/bool.h>
 
 #include <kernel/config.h>
