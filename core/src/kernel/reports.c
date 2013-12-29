@@ -1788,7 +1788,7 @@ int reports(void)
 
 static variant var_copy_string(variant x)
 {
-  x.v = x.v ? strdup((const char *)x.v) : 0;
+  x.v = x.v ? _strdup((const char *)x.v) : 0;
   return x;
 }
 

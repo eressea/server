@@ -12,7 +12,7 @@
 spellbook * create_spellbook(const char * name)
 {
   spellbook *result = (spellbook *)malloc(sizeof(spellbook));
-  result->name = name ? strdup(name) : 0;
+  result->name = name ? _strdup(name) : 0;
   result->spells = 0;
   return result;
 }

@@ -104,9 +104,9 @@ static int lc_read(struct attrib *a, void *owner, struct storage *store)
     if (strcmp(lbuf, NULLSTRING) == 0)
       data->param = NULL;
     else
-      data->param = strdup(lbuf);
+      data->param = _strdup(lbuf);
   } else {
-    data->param = strdup(NULLSTRING);
+    data->param = _strdup(NULLSTRING);
   }
   if (result == 0 && !data->b) {
     return AT_READ_FAIL;
@@ -488,7 +488,7 @@ building *new_building(const struct building_type * btype, region * r,
   }
   assert(bname);
   slprintf(buffer, sizeof(buffer), "%s %s", bname, buildingid(b));
-  b->name = strdup(bname);
+  b->name = _strdup(bname);
   return b;
 }
 
@@ -678,7 +678,7 @@ void building_setname(building * self, const char *name)
 {
   free(self->name);
   if (name)
-    self->name = strdup(name);
+    self->name = _strdup(name);
   else
     self->name = NULL;
 }
@@ -688,9 +688,9 @@ void building_addaction(building * b, const char *fname, const char *param)
   attrib *a = a_add(&b->attribs, a_new(&at_building_action));
   building_action *data = (building_action *) a->data.v;
   data->b = b;
-  data->fname = strdup(fname);
+  data->fname = _strdup(fname);
   if (param) {
-    data->param = strdup(param);
+    data->param = _strdup(param);
   }
 }
 

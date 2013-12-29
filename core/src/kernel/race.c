@@ -108,13 +108,13 @@ race *rc_new(const char *zName)
     assert(strchr(zName, ' ') == NULL);
   }
   strcpy(zBuffer, zName);
-  rc->_name[0] = strdup(zBuffer);
+  rc->_name[0] = _strdup(zBuffer);
   sprintf(zBuffer, "%s_p", zName);
-  rc->_name[1] = strdup(zBuffer);
+  rc->_name[1] = _strdup(zBuffer);
   sprintf(zBuffer, "%s_d", zName);
-  rc->_name[2] = strdup(zBuffer);
+  rc->_name[2] = _strdup(zBuffer);
   sprintf(zBuffer, "%s_x", zName);
-  rc->_name[3] = strdup(zBuffer);
+  rc->_name[3] = _strdup(zBuffer);
   rc->precombatspell = NULL;
 
   rc->attack[0].type = AT_COMBATSPELL;
@@ -172,7 +172,7 @@ extern void add_raceprefix(const char *prefix)
     size *= 2;
     race_prefixes = realloc(race_prefixes, size * sizeof(char *));
   }
-  race_prefixes[next++] = strdup(prefix);
+  race_prefixes[next++] = _strdup(prefix);
   race_prefixes[next] = NULL;
 }
 

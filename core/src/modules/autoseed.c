@@ -267,7 +267,7 @@ newfaction *read_newfactions(const char *filename)
       log_error("Invalid email address for subscription %s: %s\n", itoa36(subscription), email);
       continue;
     }
-    nf->password = strdup(password);
+    nf->password = _strdup(password);
     nf->race = rc_find(race);
     nf->subscription = subscription;
     if (alliances != NULL) {

@@ -91,7 +91,7 @@ const nrsection *section_add(const char *name)
   }
   if (!*mcp) {
     nrsection *mc = calloc(sizeof(nrsection), 1);
-    mc->name = strdup(name);
+    mc->name = _strdup(name);
     *mcp = mc;
   }
   return *mcp;
@@ -128,14 +128,14 @@ nrt_register(const struct message_type *mtype, const struct locale *lang,
       nrt->section = NULL;
     nrtypes[hash] = nrt;
     assert(string && *string);
-    nrt->string = strdup(string);
+    nrt->string = _strdup(string);
     *c = '\0';
     for (i = 0; i != mtype->nparameters; ++i) {
       if (i != 0)
         *c++ = ' ';
       c += strlen(strcpy(c, mtype->pnames[i]));
     }
-    nrt->vars = strdup(zNames);
+    nrt->vars = _strdup(zNames);
   }
 }
 

@@ -19,7 +19,7 @@ static void test_register_ship(CuTest * tc)
   test_cleanup();
 
   stype = (ship_type *)calloc(sizeof(ship_type), 1);
-  stype->name[0] = strdup("herp");
+  stype->name[0] = _strdup("herp");
   st_register(stype);
 
   CuAssertPtrNotNull(tc, st_find("herp"));

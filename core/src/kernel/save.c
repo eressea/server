@@ -1224,7 +1224,7 @@ faction *readfaction(struct storage * store)
   if (store->version >= OVERRIDE_VERSION) {
     f->override = store->r_str(store);
   } else {
-    f->override = strdup(itoa36(rng_int()));
+    f->override = _strdup(itoa36(rng_int()));
   }
 
   store->r_str_buf(store, token, sizeof(token));

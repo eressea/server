@@ -94,7 +94,7 @@ static int unitmessage_read(trigger * t, struct storage *store)
   td->string = store->r_tok(store);
   td->type = store->r_int(store);
   td->level = store->r_int(store);
-  td->string = strdup(zText);
+  td->string = _strdup(zText);
 
   if (result == 0 && td->target == NULL) {
     return AT_READ_FAIL;
@@ -117,7 +117,7 @@ trigger *trigger_unitmessage(unit * target, const char *string, int type,
   trigger *t = t_new(&tt_unitmessage);
   unitmessage_data *td = (unitmessage_data *) t->data.v;
   td->target = target;
-  td->string = strdup(string);
+  td->string = _strdup(string);
   td->type = type;
   td->level = level;
   return t;

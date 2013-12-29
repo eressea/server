@@ -1807,7 +1807,7 @@ static int addparam_string(const char *const param[], spllprm ** spobjp)
 
   spobj->flag = 0;
   spobj->typ = SPP_STRING;
-  spobj->data.xs = strdup(param[0]);
+  spobj->data.xs = _strdup(param[0]);
   return 1;
 }
 
@@ -2682,7 +2682,7 @@ static castorder *cast_cmd(unit * u, order * ord)
         size *= 2;
         params = (char**)realloc(params, sizeof(char *) * size);
       }
-      params[p++] = strdup(s);
+      params[p++] = _strdup(s);
     }
     params[p] = 0;
     args =

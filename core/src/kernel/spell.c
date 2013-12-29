@@ -64,7 +64,7 @@ spell * create_spell(const char * name, unsigned int id)
   len = cb_new_kv(name, len, &sp, sizeof(sp), buffer);
   if (cb_insert(&cb_spells, buffer, len)) {
     sp->id = id ? id : hashstring(name);
-    sp->sname = strdup(name);
+    sp->sname = _strdup(name);
     add_spell(&spells, sp);
     return sp;
   }

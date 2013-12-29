@@ -32,7 +32,7 @@ void sql_init(const char *filename)
 {
   if (sqlfilename != NULL)
     free(sqlfilename);
-  sqlfilename = strdup(filename);
+  sqlfilename = _strdup(filename);
 }
 
 void _sql_print(const char *format, ...)

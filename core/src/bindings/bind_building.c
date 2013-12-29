@@ -81,7 +81,7 @@ static int tolua_building_set_info(lua_State * L)
   const char *info = tolua_tostring(L, 2, 0);
   free(self->display);
   if (info)
-    self->display = strdup(info);
+    self->display = _strdup(info);
   else
     self->display = NULL;
   return 0;

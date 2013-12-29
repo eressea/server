@@ -46,7 +46,7 @@ equipment *create_equipment(const char *eqname)
     int i = eq ? strcmp(eq->name, eqname) : 1;
     if (i > 0) {
       eq = (equipment *)calloc(1, sizeof(equipment));
-      eq->name = strdup(eqname);
+      eq->name = _strdup(eqname);
       eq->next = *eqp;
       memset(eq->skills, 0, sizeof(eq->skills));
       *eqp = eq;
@@ -76,7 +76,7 @@ void equipment_setskill(equipment * eq, skill_t sk, const char *value)
 {
   if (eq != NULL) {
     if (value != NULL) {
-      eq->skills[sk] = strdup(value);
+      eq->skills[sk] = _strdup(value);
     } else if (eq->skills[sk]) {
       free(eq->skills[sk]);
     }
@@ -105,7 +105,7 @@ equipment_setitem(equipment * eq, const item_type * itype, const char *value)
       if (idata == NULL) {
         idata = (itemdata *) malloc(sizeof(itemdata));
         idata->itype = itype;
-        idata->value = strdup(value);
+        idata->value = _strdup(value);
         idata->next = eq->items;
         eq->items = idata;
       }

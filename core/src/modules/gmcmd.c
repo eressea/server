@@ -662,10 +662,10 @@ faction *gm_addfaction(const char *email, plane * p, region * r)
 
   /* GM faction */
   a_add(&f->attribs, make_key(atoi36("quest")));
-  f->banner = strdup("quest faction");
-  f->name = strdup("quest faction");
-  f->passw = strdup(itoa36(rng_int()));
-  f->override = strdup(itoa36(rng_int()));
+  f->banner = _strdup("quest faction");
+  f->name = _strdup("quest faction");
+  f->passw = _strdup(itoa36(rng_int()));
+  f->override = _strdup(itoa36(rng_int()));
   if (set_email(&f->email, email) != 0) {
     log_error("Invalid email address for faction %s: %s\n", itoa36(f->no), email);
   }

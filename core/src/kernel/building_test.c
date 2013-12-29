@@ -19,7 +19,7 @@ static void test_register_building(CuTest * tc)
   test_cleanup();
 
   btype = (building_type *)calloc(sizeof(building_type), 1);
-  btype->_name = strdup("herp");
+  btype->_name = _strdup("herp");
   bt_register(btype);
 
   CuAssertPtrNotNull(tc, bt_find("herp"));

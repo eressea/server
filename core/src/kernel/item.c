@@ -158,9 +158,9 @@ resource_type *new_resourcetype(const char **names, const char **appearances,
     rtype = (resource_type *)calloc(sizeof(resource_type), 1);
 
     for (i = 0; i != 2; ++i) {
-      rtype->_name[i] = strdup(names[i]);
+      rtype->_name[i] = _strdup(names[i]);
       if (appearances)
-        rtype->_appearance[i] = strdup(appearances[i]);
+        rtype->_appearance[i] = _strdup(appearances[i]);
       else
         rtype->_appearance[i] = NULL;
     }
@@ -239,8 +239,8 @@ weapon_type *new_weapontype(item_type * itype,
 
   wtype = calloc(sizeof(weapon_type), 1);
   if (damage) {
-    wtype->damage[0] = strdup(damage[0]);
-    wtype->damage[1] = strdup(damage[1]);
+    wtype->damage[0] = _strdup(damage[0]);
+    wtype->damage[1] = _strdup(damage[1]);
   }
   wtype->defmod = defmod;
   wtype->flags |= wflags;

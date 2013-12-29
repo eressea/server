@@ -218,7 +218,7 @@ static dir_lookup *dir_name_lookup;
 void register_special_direction(const char *name)
 {
   struct locale *lang;
-  char *str = strdup(name);
+  char *str = _strdup(name);
 
   for (lang = locales; lang; lang = nextlocale(lang)) {
     void **tokens = get_translations(lang, UT_SPECDIR);
@@ -260,9 +260,9 @@ static int a_readdirection(attrib * a, void *owner, struct storage *store)
     cstring_i(lbuf);
     for (; dl; dl = dl->next) {
       if (strcmp(lbuf, dl->oldname) == 0) {
-        d->keyword = strdup(dl->name);
+        d->keyword = _strdup(dl->name);
         sprintf(lbuf, "%s_desc", d->keyword);
-        d->desc = strdup(dl->name);
+        d->desc = _strdup(dl->name);
         break;
       }
     }
@@ -335,8 +335,8 @@ attrib *create_special_direction(region * r, region * rt, int duration,
   d->x = rt->x;
   d->y = rt->y;
   d->duration = duration;
-  d->desc = strdup(desc);
-  d->keyword = strdup(keyword);
+  d->desc = _strdup(desc);
+  d->keyword = _strdup(keyword);
 
   return a;
 }
@@ -1557,7 +1557,7 @@ faction *update_owners(region * r)
 void region_setinfo(struct region *r, const char *info)
 {
   free(r->display);
-  r->display = info ? strdup(info) : 0;
+  r->display = info ? _strdup(info) : 0;
 }
 
 const char *region_getinfo(const region * r)
@@ -1569,7 +1569,7 @@ void region_setname(struct region *r, const char *name)
 {
   if (r->land) {
     free(r->land->name);
-    r->land->name = name ? strdup(name) : 0;
+    r->land->name = name ? _strdup(name) : 0;
   }
 }
 

@@ -168,7 +168,7 @@ int AllianceAuto(void)
     gamecookie = global.cookie;
     value = 0;
     if (str != NULL) {
-      char *sstr = strdup(str);
+      char *sstr = _strdup(str);
       char *tok = strtok(sstr, " ");
       while (tok) {
         value |= ally_flag(tok, -1);
@@ -195,7 +195,7 @@ int HelpMask(void)
     gamecookie = global.cookie;
     rule = 0;
     if (str != NULL) {
-      char *sstr = strdup(str);
+      char *sstr = _strdup(str);
       char *tok = strtok(sstr, " ");
       while (tok) {
         rule |= ally_flag(tok, -1);
@@ -218,7 +218,7 @@ int AllianceRestricted(void)
     gamecookie = global.cookie;
     rule = 0;
     if (str != NULL) {
-      char *sstr = strdup(str);
+      char *sstr = _strdup(str);
       char *tok = strtok(sstr, " ");
       while (tok) {
         rule |= ally_flag(tok, -1);
@@ -1542,7 +1542,7 @@ void addstrlist(strlist ** SP, const char *s)
 {
   strlist *slist = malloc(sizeof(strlist));
   slist->next = NULL;
-  slist->s = strdup(s);
+  slist->s = _strdup(s);
   addlist(SP, slist);
 }
 
@@ -2015,7 +2015,7 @@ static void init_locale(const struct locale *lang)
       str = "gwyrrd illaun draig cerddor tybied";
     }
 
-    sstr = strdup(str);
+    sstr = _strdup(str);
     tok = strtok(sstr, " ");
     while (tok) {
       for (i = 0; i != MAXMAGIETYP; ++i) {
@@ -2151,14 +2151,14 @@ void set_param(struct param **p, const char *key, const char *data)
   while (*p != NULL) {
     if (strcmp((*p)->name, key) == 0) {
       free((*p)->data);
-      (*p)->data = strdup(data);
+      (*p)->data = _strdup(data);
       return;
     }
     p = &(*p)->next;
   }
   *p = malloc(sizeof(param));
-  (*p)->name = strdup(key);
-  (*p)->data = strdup(data);
+  (*p)->name = _strdup(key);
+  (*p)->data = _strdup(data);
   (*p)->next = NULL;
 }
 
@@ -2262,7 +2262,7 @@ unsigned int getguard(const unit * u)
 }
 
 #ifndef HAVE_STRDUP
-char *strdup(const char *s)
+char *_strdup(const char *s)
 {
   return strcpy((char *)malloc(sizeof(char) * (strlen(s) + 1)), s);
 }

@@ -87,9 +87,9 @@ static int parse_archetypes(xmlDocPtr doc)
 
       propValue = xmlGetProp(node, BAD_CAST "name");
       assert(propValue != NULL);
-      arch->name[0] = strdup((const char *)propValue);
+      arch->name[0] = _strdup((const char *)propValue);
       sprintf(zName, "%s_p", arch->name[0]);
-      arch->name[1] = strdup(zName);
+      arch->name[1] = _strdup(zName);
       xmlFree(propValue);
 
       propValue = xmlGetProp(node, BAD_CAST "equip");
@@ -130,11 +130,11 @@ static int parse_archetypes(xmlDocPtr doc)
           arch->rules[k].allow = (rule->name[0] == 'a');
 
           propValue = xmlGetProp(rule, BAD_CAST "property");
-          arch->rules[k].property = strdup((const char *)propValue);
+          arch->rules[k].property = _strdup((const char *)propValue);
           xmlFree(propValue);
 
           propValue = xmlGetProp(rule, BAD_CAST "value");
-          arch->rules[k].value = strdup((const char *)propValue);
+          arch->rules[k].value = _strdup((const char *)propValue);
           xmlFree(propValue);
         }
       }

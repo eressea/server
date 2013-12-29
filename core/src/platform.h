@@ -247,12 +247,6 @@ typedef struct _stat stat_type;
 
 #define TOLUA_CAST (char*)
 
-#if !defined(HAVE_STRDUP)
-# if defined(HAVE__STRDUP)
-#  define strdup(s) _strdup(s)
-# endif
-#endif
-
 #if !defined(HAVE__STRDUP)
 # if defined(HAVE_STRDUP)
 #  define _strdup(s) strdup(s)

@@ -185,7 +185,7 @@ struct attrib *object_create(const char *name, object_type type, variant value)
 {
   attrib *a = a_new(&at_object);
   object_data *data = (object_data *) a->data.v;
-  data->name = strdup(name);
+  data->name = _strdup(name);
 
   object_set(a, type, value);
   return a;
@@ -200,7 +200,7 @@ void object_set(attrib * a, object_type type, variant value)
   data->type = type;
   switch (type) {
     case TSTRING:
-      data->data.str = value.v ? strdup(value.v) : NULL;
+      data->data.str = value.v ? _strdup(value.v) : NULL;
       break;
     case TINTEGER:
       data->data.i = value.i;

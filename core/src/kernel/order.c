@@ -139,7 +139,7 @@ static char *get_command(const order * ord, char *sbuffer, size_t size)
 char *getcommand(const order * ord)
 {
   char sbuffer[DISPLAYSIZE * 2];
-  return strdup(get_command(ord, sbuffer, sizeof(sbuffer)));
+  return _strdup(get_command(ord, sbuffer, sizeof(sbuffer)));
 }
 
 void free_order(order * ord)
@@ -217,7 +217,7 @@ static order_data *create_data(keyword_t kwd, const char *sptr, int lindex)
           data->_str[len + 1] = '\"';
           data->_str[len + 2] = '\0';
         } else {
-          data->_str = strdup(skname);
+          data->_str = _strdup(skname);
         }
         data->_refcount = 1;
       }
@@ -243,7 +243,7 @@ static order_data *create_data(keyword_t kwd, const char *sptr, int lindex)
   data = (order_data *) malloc(sizeof(order_data));
   data->_keyword = kwd;
   data->_lindex = lindex;
-  data->_str = s ? strdup(s) : NULL;
+  data->_str = s ? _strdup(s) : NULL;
   data->_refcount = 1;
   return data;
 }

@@ -185,7 +185,7 @@ ship *new_ship(const ship_type * stype, region * r, const struct locale *lang)
   }
   assert(sname);
   slprintf(buffer, sizeof(buffer), "%s %s", sname, shipid(sh));
-  sh->name = strdup(buffer);
+  sh->name = _strdup(buffer);
   shash(sh);
   if (r) {
     addlist(&r->ships, sh);
@@ -337,7 +337,7 @@ void ship_setname(ship * self, const char *name)
 {
   free(self->name);
   if (name)
-    self->name = strdup(name);
+    self->name = _strdup(name);
   else
     self->name = NULL;
 }

@@ -123,7 +123,7 @@ static const char *add_translation(const char *key, const char *value)
       junkyard = junkyard->next;
     } else
       t = malloc(sizeof(translation));
-    t->key = strdup(key);
+    t->key = _strdup(key);
     t->value = value;
     t->next = translation_table[kk];
     translation_table[kk] = t;

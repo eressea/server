@@ -62,8 +62,8 @@ faction *createmonsters(int no)
   /* alles ist auf null gesetzt, ausser dem folgenden. achtung - partei
    * no 0 muss keine orders einreichen! */
 
-  f->email = strdup("monsters@eressea.de");
-  f->name = strdup("Monster");
+  f->email = _strdup("monsters@eressea.de");
+  f->name = _strdup("Monster");
   f->alive = 1;
   f->options = (char)(1 << O_REPORT);
   addlist(&factions, f);

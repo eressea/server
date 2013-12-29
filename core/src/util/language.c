@@ -68,7 +68,7 @@ locale *make_locale(const char *name)
   }
 
   l->hashkey = hkey;
-  l->name = strdup(name);
+  l->name = _strdup(name);
   l->next = NULL;
   l->index = nextlocaleindex++;
   assert(nextlocaleindex <= MAXLOCALES);
@@ -181,8 +181,8 @@ void locale_setstring(locale * lang, const char *key, const char *value)
     find->nexthash = lang->strings[id];
     lang->strings[id] = find;
     find->hashkey = hkey;
-    find->key = strdup(key);
-    find->str = strdup(value);
+    find->key = _strdup(key);
+    find->str = _strdup(value);
   } else {
     if (strcmp(find->str, value) != 0) {
       log_error("duplicate translation '%s' for key %s\n", value, key);

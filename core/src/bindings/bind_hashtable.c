@@ -24,6 +24,7 @@ without prior permission by the authors of Eressea.
 #include <util/attrib.h>
 
 #include <tolua.h>
+#include <lua.h>
 
 #include <assert.h>
 
@@ -104,7 +105,7 @@ static int tolua_hashtable_set_string(lua_State * L)
   attrib *a = a_find(*self, &at_object);
   variant val;
 
-  val.v = strdup(value);
+  val.v = _strdup(value);
 
   for (; a && a->type == &at_object; a = a->next) {
     if (strcmp(object_name(a), name) == 0) {

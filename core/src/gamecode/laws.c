@@ -1448,7 +1448,7 @@ static void remove_idle_players(void)
     }
     if (fval(f, FFL_OVERRIDE)) {
       free(f->override);
-      f->override = strdup(itoa36(rng_int()));
+      f->override = _strdup(itoa36(rng_int()));
       freset(f, FFL_OVERRIDE);
     }
     if (turn != f->lastorders) {
@@ -1835,7 +1835,7 @@ int display_cmd(unit * u, struct order *ord)
     const char *s2 = getstrtoken();
 
     free(*s);
-    *s = strdup(s2);
+    *s = _strdup(s2);
     if (strlen(s2) >= DISPLAYSIZE) {
       (*s)[DISPLAYSIZE] = 0;
     }
@@ -1871,7 +1871,7 @@ static int rename_cmd(unit * u, order * ord, char **s, const char *s2)
    * names, phishing-style? () come to mind. */
 
   free(*s);
-  *s = strdup(s2);
+  *s = _strdup(s2);
   if (strlen(s2) >= NAMESIZE) {
     (*s)[NAMESIZE] = 0;
   }
@@ -2345,7 +2345,7 @@ int banner_cmd(unit * u, struct order *ord)
   skip_token();
 
   free(u->faction->banner);
-  u->faction->banner = strdup(getstrtoken());
+  u->faction->banner = _strdup(getstrtoken());
   add_message(&u->faction->msgs, msg_message("changebanner", "value",
       u->faction->banner));
 
@@ -2404,9 +2404,9 @@ int password_cmd(unit * u, struct order *ord)
   free(u->faction->passw);
   if (!pwok) {
     cmistake(u, ord, 283, MSG_EVENT);
-    u->faction->passw = strdup(itoa36(rng_int()));
+    u->faction->passw = _strdup(itoa36(rng_int()));
   } else {
-    u->faction->passw = strdup(pwbuf);
+    u->faction->passw = _strdup(pwbuf);
   }
   fset(u->faction, FFL_OVERRIDE);
   ADDMSG(&u->faction->msgs, msg_message("changepasswd",
@@ -3582,7 +3582,7 @@ void new_units(void)
 
             token = getstrtoken();
             if (token && token[0]) {
-              name = strdup(token);
+              name = _strdup(token);
             }
             u2 = create_unit(r, u->faction, 0, u->faction->race, alias, name, u);
             if (name != NULL)
@@ -4478,7 +4478,7 @@ static int warn_password(void)
     }
     if (!pwok) {
       free(f->passw);
-      f->passw = strdup(itoa36(rng_int()));
+      f->passw = _strdup(itoa36(rng_int()));
       ADDMSG(&f->msgs, msg_message("illegal_password", "newpass", f->passw));
     }
     f = f->next;

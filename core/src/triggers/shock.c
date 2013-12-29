@@ -85,7 +85,7 @@ static void do_shock(unit * u, const char *reason)
   }
   if (u->faction != NULL) {
     ADDMSG(&u->faction->msgs, msg_message("shock",
-        "mage reason", u, strdup(reason)));
+        "mage reason", u, _strdup(reason)));
   }
 }
 

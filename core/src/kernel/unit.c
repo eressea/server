@@ -465,7 +465,7 @@ void usetprivate(unit * u, const char *str)
     a = a_add(&u->attribs, a_new(&at_private));
   if (a->data.v)
     free(a->data.v);
-  a->data.v = strdup((const char *)str);
+  a->data.v = _strdup((const char *)str);
 }
 
 /*********************/
@@ -1483,7 +1483,7 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
   if (!dname) {
     name_unit(u);
   } else {
-    u->name = strdup(dname);
+    u->name = _strdup(dname);
   }
 
   if (creator) {
@@ -1581,7 +1581,7 @@ void unit_setname(unit * u, const char *name)
 {
   free(u->name);
   if (name)
-    u->name = strdup(name);
+    u->name = _strdup(name);
   else
     u->name = NULL;
 }
@@ -1595,7 +1595,7 @@ void unit_setinfo(unit * u, const char *info)
 {
   free(u->display);
   if (info)
-    u->display = strdup(info);
+    u->display = _strdup(info);
   else
     u->display = NULL;
 }

@@ -212,7 +212,7 @@ struct rawmaterial_type *rmt_create(const struct resource_type *rtype,
   const char *name)
 {
   rawmaterial_type *rmtype = malloc(sizeof(rawmaterial_type));
-  rmtype->name = strdup(name);
+  rmtype->name = _strdup(name);
   rmtype->rtype = rtype;
   rmtype->terraform = terraform_default;
   rmtype->update = NULL;

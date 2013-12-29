@@ -275,9 +275,9 @@ static void make_temple(region * r)
 
   b = new_building(btype, r, NULL);
   b->size = btype->maxsize;
-  b->name = strdup("Igjarjuk's Tempel der Schreie");
+  b->name = _strdup("Igjarjuk's Tempel der Schreie");
   b->display =
-    strdup
+    _strdup
     ("Ein Schrein aus spitzen Knochen und lodernden Flammen, gewidmet dem Wyrm der Wyrme");
   a_add(&b->attribs, a_new(&at_hurting))->data.v = b;
 }
@@ -338,11 +338,11 @@ static void guardian_faction(plane * pl, int id)
 
   if (!f) {
     f = calloc(1, sizeof(faction));
-    f->banner = strdup("Sie dienen dem großen Wyrm");
-    f->passw = strdup(itoa36(rng_int()));
-    f->override = strdup(itoa36(rng_int()));
+    f->banner = _strdup("Sie dienen dem großen Wyrm");
+    f->passw = _strdup(itoa36(rng_int()));
+    f->override = _strdup(itoa36(rng_int()));
     set_email(&f->email, "igjarjuk@eressea.de");
-    f->name = strdup("Igjarjuks Kundschafter");
+    f->name = _strdup("Igjarjuks Kundschafter");
     f->race = new_race[RC_ILLUSION];
     f->age = turn;
     f->locale = find_locale("de");
@@ -480,9 +480,9 @@ static void init_volcano(void)
   terraform(arena_center, T_VOLCANO_SMOKING);
   b = new_building(bt_find("caldera"), r, NULL);
   b->size = 1;
-  b->name = strdup("Igjarjuk's Schlund");
+  b->name = _strdup("Igjarjuk's Schlund");
   b->display =
-    strdup
+    _strdup
     ("Feurige Lava fließt aus dem Krater des großen Vulkans. Alles wird von ihr verschlungen.");
   add_trigger(&b->attribs, "timer", trigger_caldera(b));
   tt_register(&tt_caldera);

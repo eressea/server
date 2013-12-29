@@ -59,7 +59,7 @@ static building_type *bt_get_or_create(const char *name)
     building_type *btype = bt_find(name);
     if (btype == NULL) {
       btype = calloc(sizeof(building_type), 1);
-      btype->_name = strdup(name);
+      btype->_name = _strdup(name);
       bt_register(btype);
     }
     return btype;
@@ -403,7 +403,7 @@ static int parse_calendar(xmlDocPtr doc)
       first_turn = xml_ivalue(calendar, "start", first_turn);
       if (propValue) {
         free(agename);
-        agename = strdup(mkname("calendar", (const char *)propValue));
+        agename = _strdup(mkname("calendar", (const char *)propValue));
         xmlFree(propValue);
       }
 
@@ -421,7 +421,7 @@ static int parse_calendar(xmlDocPtr doc)
           xmlNodePtr week = nsetWeeks->nodeTab[i];
           xmlChar *propValue = xmlGetProp(week, BAD_CAST "name");
           if (propValue) {
-            weeknames[i] = strdup(mkname("calendar", (const char *)propValue));
+            weeknames[i] = _strdup(mkname("calendar", (const char *)propValue));
             weeknames2[i] = malloc(strlen(weeknames[i]) + 3);
             sprintf(weeknames2[i], "%s_d", weeknames[i]);
             xmlFree(propValue);
@@ -444,7 +444,7 @@ static int parse_calendar(xmlDocPtr doc)
           xmlChar *propValue = xmlGetProp(season, BAD_CAST "name");
           if (propValue) {
             seasonnames[i] =
-              strdup(mkname("calendar", (const char *)propValue));
+              _strdup(mkname("calendar", (const char *)propValue));
             xmlFree(propValue);
           }
         }
@@ -473,7 +473,7 @@ static int parse_calendar(xmlDocPtr doc)
               xmlFree(newyear);
               newyear = NULL;
             }
-            monthnames[i] = strdup(mkname("calendar", (const char *)propValue));
+            monthnames[i] = _strdup(mkname("calendar", (const char *)propValue));
             xmlFree(propValue);
           }
           for (j = 0; j != seasons; ++j) {
@@ -542,7 +542,7 @@ static int parse_ships(xmlDocPtr doc)
 
       propValue = xmlGetProp(node, BAD_CAST "name");
       assert(propValue != NULL);
-      st->name[0] = strdup((const char *)propValue);
+      st->name[0] = _strdup((const char *)propValue);
       st->name[1] =
         strcat(strcpy(malloc(strlen(st->name[0]) + 3), st->name[0]), "_a");
       xmlFree(propValue);
@@ -746,7 +746,7 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
     xmlFree(propValue);
 
     propValue = xmlGetProp(node, BAD_CAST "value");
-    wtype->damage[pos] = gc_add(strdup((const char *)propValue));
+    wtype->damage[pos] = gc_add(_strdup((const char *)propValue));
     if (k == 0)
       wtype->damage[1 - pos] = wtype->damage[pos];
     xmlFree(propValue);
@@ -1034,7 +1034,7 @@ static int parse_resources(xmlDocPtr doc)
       /* dependency from another item, was created earlier */
       rtype->flags |= flags;
       if (appearance) {
-        rtype->_appearance[0] = strdup((const char *)appearance);
+        rtype->_appearance[0] = _strdup((const char *)appearance);
         rtype->_appearance[1] = appearancep;
         free(appearancep);
       }
@@ -1547,13 +1547,13 @@ static int parse_spells(xmlDocPtr doc)
 
       propValue = xmlGetProp(node, BAD_CAST "parameters");
       if (propValue) {
-        sp->parameter = strdup((const char *)propValue);
+        sp->parameter = _strdup((const char *)propValue);
         xmlFree(propValue);
       }
 
       propValue = xmlGetProp(node, BAD_CAST "syntax");
       if (propValue) {
-        sp->syntax = strdup((const char *)propValue);
+        sp->syntax = _strdup((const char *)propValue);
         xmlFree(propValue);
       }
 #ifdef TODO /* no longer need it, spellbooks! */
@@ -1730,7 +1730,7 @@ static int parse_races(xmlDocPtr doc)
 
     propValue = xmlGetProp(node, BAD_CAST "damage");
     assert(propValue != NULL);
-    rc->def_damage = strdup((const char *)propValue);
+    rc->def_damage = _strdup((const char *)propValue);
     xmlFree(propValue);
 
     rc->magres = (float)xml_fvalue(node, "magres", 0.0);
@@ -1951,7 +1951,7 @@ static int parse_races(xmlDocPtr doc)
 
       propValue = xmlGetProp(node, BAD_CAST "damage");
       if (propValue != NULL) {
-        attack->data.dice = strdup((const char *)propValue);
+        attack->data.dice = _strdup((const char *)propValue);
         xmlFree(propValue);
       } else {
         attack->data.sp = xml_spell(node, "spell");
@@ -1997,7 +1997,7 @@ static int parse_terrains(xmlDocPtr doc)
 
     propValue = xmlGetProp(node, BAD_CAST "name");
     assert(propValue != NULL);
-    terrain->_name = strdup((const char *)propValue);
+    terrain->_name = _strdup((const char *)propValue);
     xmlFree(propValue);
 
     terrain->max_road = (short)xml_ivalue(node, "road", 0);
@@ -2074,17 +2074,17 @@ static int parse_terrains(xmlDocPtr doc)
 
         propValue = xmlGetProp(nodeProd, BAD_CAST "level");
         assert(propValue);
-        terrain->production[k].startlevel = strdup((const char *)propValue);
+        terrain->production[k].startlevel = _strdup((const char *)propValue);
         xmlFree(propValue);
 
         propValue = xmlGetProp(nodeProd, BAD_CAST "base");
         assert(propValue);
-        terrain->production[k].base = strdup((const char *)propValue);
+        terrain->production[k].base = _strdup((const char *)propValue);
         xmlFree(propValue);
 
         propValue = xmlGetProp(nodeProd, BAD_CAST "div");
         assert(propValue);
-        terrain->production[k].divisor = strdup((const char *)propValue);
+        terrain->production[k].divisor = _strdup((const char *)propValue);
         xmlFree(propValue);
 
         terrain->production[k].chance =
@@ -2145,7 +2145,7 @@ static int parse_messages(xmlDocPtr doc)
           (const char *)propType);
         xmlFree(propName);
         xmlFree(propType);
-        argv[k] = strdup(zBuffer);
+        argv[k] = _strdup(zBuffer);
       }
       argv[result->nodesetval->nodeNr] = NULL;
     }
@@ -2321,7 +2321,7 @@ static int parse_main(xmlDocPtr doc)
 
     propValue = xmlGetProp(node, BAD_CAST "name");
     if (propValue != NULL) {
-      global.gamename = strdup((const char *)propValue);
+      global.gamename = _strdup((const char *)propValue);
       xmlFree(propValue);
     }
 

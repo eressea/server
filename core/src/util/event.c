@@ -147,7 +147,7 @@ static int read_handler(attrib * a, void *owner, struct storage *store)
   handler_info *hi = (handler_info *) a->data.v;
 
   store->r_tok_buf(store, zText, sizeof(zText));
-  hi->event = strdup(zText);
+  hi->event = _strdup(zText);
   read_triggers(store, &hi->triggers);
   if (hi->triggers != NULL) {
     return AT_READ_OK;
@@ -194,7 +194,7 @@ void add_trigger(struct attrib **ap, const char *eventname, struct trigger *t)
   if (a == NULL || a->type != &at_eventhandler) {
     a = a_add(ap, a_new(&at_eventhandler));
     td = (handler_info *) a->data.v;
-    td->event = strdup(eventname);
+    td->event = _strdup(eventname);
   }
   tp = &td->triggers;
   while (*tp)

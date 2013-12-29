@@ -118,7 +118,7 @@ test_create_terrain(const char * name, unsigned int flags)
 
   assert(!get_terrain(name));
   t = (terrain_type*)calloc(1, sizeof(terrain_type));
-  t->_name = strdup(name);
+  t->_name = _strdup(name);
   t->flags = flags;
   register_terrain(t);
   return t;
@@ -141,8 +141,8 @@ ship * test_create_ship(region * r, const ship_type * stype)
 ship_type * test_create_shiptype(const char ** names)
 {
   ship_type * stype = (ship_type*)calloc(sizeof(ship_type), 1);
-  stype->name[0] = strdup(names[0]);
-  stype->name[1] = strdup(names[1]);
+  stype->name[0] = _strdup(names[0]);
+  stype->name[1] = _strdup(names[1]);
   locale_setstring(default_locale, names[0], names[0]);
   st_register(stype);
   return stype;
@@ -152,7 +152,7 @@ building_type * test_create_buildingtype(const char * name)
 {
   building_type * btype = (building_type*)calloc(sizeof(building_type), 1);
   btype->flags = BTF_NAMECHANGE;
-  btype->_name = strdup(name);
+  btype->_name = _strdup(name);
   locale_setstring(default_locale, name, name);
   bt_register(btype);
   return btype;

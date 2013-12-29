@@ -923,7 +923,7 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
         e = e->next;
       if (!e) {
         e = calloc(sizeof(struct edge), 1);
-        e->name = strdup(name);
+        e->name = _strdup(name);
         e->transparent = transparent;
         e->next = edges;
         edges = e;

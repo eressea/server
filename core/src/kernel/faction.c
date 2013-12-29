@@ -203,7 +203,7 @@ faction *addfaction(const char *email, const char *password,
     log_error("Invalid email address for faction %s: %s\n", itoa36(f->no), email);
   }
 
-  f->override = strdup(itoa36(rng_int()));
+  f->override = _strdup(itoa36(rng_int()));
   faction_setpassword(f, password);
 
   f->alliance_joindate = turn;
@@ -228,7 +228,7 @@ faction *addfaction(const char *email, const char *password,
   fhash(f);
 
   slprintf(buf, sizeof(buf), "%s %s", LOC(loc, "factiondefault"), factionid(f));
-  f->name = strdup(buf);
+  f->name = _strdup(buf);
 
   return f;
 }
@@ -455,7 +455,7 @@ void faction_setname(faction * self, const char *name)
 {
   free(self->name);
   if (name)
-    self->name = strdup(name);
+    self->name = _strdup(name);
 }
 
 const char *faction_getemail(const faction * self)
@@ -467,7 +467,7 @@ void faction_setemail(faction * self, const char *email)
 {
   free(self->email);
   if (email)
-    self->email = strdup(email);
+    self->email = _strdup(email);
 }
 
 const char *faction_getbanner(const faction * self)
@@ -479,16 +479,16 @@ void faction_setbanner(faction * self, const char *banner)
 {
   free(self->banner);
   if (banner)
-    self->banner = strdup(banner);
+    self->banner = _strdup(banner);
 }
 
 void faction_setpassword(faction * f, const char *passw)
 {
   free(f->passw);
   if (passw)
-    f->passw = strdup(passw);
+    f->passw = _strdup(passw);
   else
-    f->passw = strdup(itoa36(rng_int()));
+    f->passw = _strdup(itoa36(rng_int()));
 }
 
 bool valid_race(const struct faction *f, const struct race *rc)

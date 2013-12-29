@@ -45,7 +45,7 @@ message_type *mt_new(const char *name, const char *args[])
   if (args != NULL)
     for (nparameters = 0; args[nparameters]; ++nparameters) ;
 
-  mtype->name = strdup(name);
+  mtype->name = _strdup(name);
   mtype->nparameters = nparameters;
   if (nparameters > 0) {
     mtype->pnames = (const char **)malloc(sizeof(char *) * nparameters);
@@ -59,7 +59,7 @@ message_type *mt_new(const char *name, const char *args[])
       const char *x = args[i];
       const char *spos = strchr(x, ':');
       if (spos == NULL) {
-        mtype->pnames[i] = strdup(x);
+        mtype->pnames[i] = _strdup(x);
         mtype->types[i] = NULL;
       } else {
         char *cp = strncpy((char *)malloc(spos - x + 1), x, spos - x);
