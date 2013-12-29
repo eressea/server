@@ -34,6 +34,7 @@
 #include <util/lists.h>
 
 #include <string.h>
+#include <stdio.h>
 
 #undef SUMMARY_BOM              /* write a BOM in the summary file */
 
@@ -119,15 +120,19 @@ static void writeturn(void)
   FILE *f;
 
   sprintf(zText, "%s/datum", basepath());
-  f = cfopen(zText, "w");
-  if (!f)
+  f = fopen(zText, "w");
+  if (!f) {
+    perror(zText);
     return;
+  }
   fputs(gamedate2(default_locale), f);
   fclose(f);
   sprintf(zText, "%s/turn", basepath());
-  f = cfopen(zText, "w");
-  if (!f)
+  f = fopen(zText, "w");
+  if (!f) {
+    perror(zText);
     return;
+  }
   fprintf(f, "%d\n", turn);
   fclose(f);
 }

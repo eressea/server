@@ -1,3 +1,5 @@
 #cmakedefine HAVE_STDBOOL_H 1
 #cmakedefine HAVE__BOOL 1
 #cmakedefine HAVE_STRINGS_H 1
+#cmakedefine HAVE_STRDUP 1
+#cmakedefine HAVE__STRDUP 1

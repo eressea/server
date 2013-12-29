@@ -118,132 +118,6 @@ char *rns(FILE * f, char *c, size_t size)
 
 extern unsigned int __at_hashkey(const char *s);
 
-FILE *cfopen(const char *filename, const char *mode)
-{
-  FILE *F = fopen(filename, mode);
-
-  if (F == 0) {
-    perror(filename);
-    return NULL;
-  }
-  setvbuf(F, 0, _IOFBF, 32 * 1024);     /* 32 kb buffer size */
-  return F;
-}
-
-int freadstr(FILE * F, int encoding, char *start, size_t size)
-{
-  char *str = start;
-  bool quote = false;
-  for (;;) {
-    int c = fgetc(F);
-
-    if (isxspace(c)) {
-      if (str == start) {
-        continue;
-      }
-      if (!quote) {
-        *str = 0;
-        return (int)(str - start);
-      }
-    }
-    switch (c) {
-    case EOF:
-      return EOF;
-    case '"':
-      if (!quote && str != start) {
-        log_error(
-          ("datafile contains a \" that isn't at the start of a string.\n"));
-        assert
-          (!"datafile contains a \" that isn't at the start of a string.\n");
-      }
-      if (quote) {
-        *str = 0;
-        return (int)(str - start);
-      }
-      quote = true;
-      break;
-    case '\\':
-      c = fgetc(F);
-      switch (c) {
-      case EOF:
-        return EOF;
-      case 'n':
-        if ((size_t) (str - start + 1) < size) {
-          *str++ = '\n';
-        }
-        break;
-      default:
-        if ((size_t) (str - start + 1) < size) {
-          if (encoding == XML_CHAR_ENCODING_8859_1 && c & 0x80) {
-            char inbuf = (char)c;
-            size_t inbytes = 1;
-            size_t outbytes = size - (str - start);
-            int ret = unicode_latin1_to_utf8(str, &outbytes, &inbuf, &inbytes);
-            if (ret > 0)
-              str += ret;
-            else {
-              log_error("input data was not iso-8859-1! assuming utf-8\n");
-              encoding = XML_CHAR_ENCODING_ERROR;
-              *str++ = (char)c;
-            }
-          } else {
-            *str++ = (char)c;
-          }
-        }
-      }
-      break;
-    default:
-      if ((size_t) (str - start + 1) < size) {
-        if (encoding == XML_CHAR_ENCODING_8859_1 && c & 0x80) {
-          char inbuf = (char)c;
-          size_t inbytes = 1;
-          size_t outbytes = size - (str - start);
-          int ret = unicode_latin1_to_utf8(str, &outbytes, &inbuf, &inbytes);
-          if (ret > 0)
-            str += ret;
-          else {
-            log_error("input data was not iso-8859-1! assuming utf-8\n");
-            encoding = XML_CHAR_ENCODING_ERROR;
-            *str++ = (char)c;
-          }
-        } else {
-          *str++ = (char)c;
-        }
-      }
-    }
-  }
-}
-
-/** writes a quoted string to the file
-* no trailing space, since this is used to make the creport.
-*/
-int fwritestr(FILE * F, const char *str)
-{
-  int nwrite = 0;
-  fputc('\"', F);
-  if (str)
-    while (*str) {
-      int c = (int)(unsigned char)*str++;
-      switch (c) {
-      case '"':
-      case '\\':
-        fputc('\\', F);
-        fputc(c, F);
-        nwrite += 2;
-        break;
-      case '\n':
-        fputc('\\', F);
-        fputc('n', F);
-        nwrite += 2;
-        break;
-      default:
-        fputc(c, F);
-        ++nwrite;
-      }
-    }
-  fputc('\"', F);
-  return nwrite + 2;
-}
 
 static unit *unitorders(FILE * F, int enc, struct faction *f)
 {
@@ -389,13 +263,11 @@ int readorders(const char *filename)
   int nfactions = 0;
   struct faction *f = NULL;
 
-  if (filename) {
-    F = cfopen(filename, "rb");
-  }
+  F = fopen(filename, "rb");
   if (!F) {
+    perror(filename);
     return -1;
   }
-
   if (verbosity >= 1)
     puts(" - lese Befehlsdatei...\n");
 
@@ -679,13 +551,16 @@ int current_turn(void)
 {
   char zText[MAX_PATH];
   int cturn = 0;
-  FILE *f;
+  FILE *F;
 
   sprintf(zText, "%s/turn", basepath());
-  f = cfopen(zText, "r");
-  if (f) {
-    fscanf(f, "%d\n", &cturn);
-    fclose(f);
+  F = fopen(zText, "r");
+  if (!F) {
+    perror(zText);
+  }
+  else {
+    fscanf(F, "%d\n", &cturn);
+    fclose(F);
   }
   return cturn;
 }

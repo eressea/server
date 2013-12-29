@@ -12,15 +12,134 @@ without prior permission by the authors of Eressea.
 
 #include "save.h"
 #include "version.h"
+#include <util/unicode.h>
 #include <util/base36.h>
 #include <util/log.h>
 
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <libxml/encoding.h>
 
 #define NULL_TOKEN '@'
+
+/** writes a quoted string to the file
+* no trailing space, since this is used to make the creport.
+*/
+static int fwritestr(FILE * F, const char *str)
+{
+  int nwrite = 0;
+  fputc('\"', F);
+  if (str)
+  while (*str) {
+    int c = (int)(unsigned char)*str++;
+    switch (c) {
+    case '"':
+    case '\\':
+      fputc('\\', F);
+      fputc(c, F);
+      nwrite += 2;
+      break;
+    case '\n':
+      fputc('\\', F);
+      fputc('n', F);
+      nwrite += 2;
+      break;
+    default:
+      fputc(c, F);
+      ++nwrite;
+    }
+  }
+  fputc('\"', F);
+  return nwrite + 2;
+}
+
+static int freadstr(FILE * F, int encoding, char *start, size_t size)
+{
+  char *str = start;
+  bool quote = false;
+  for (;;) {
+    int c = fgetc(F);
+
+    if (isxspace(c)) {
+      if (str == start) {
+        continue;
+      }
+      if (!quote) {
+        *str = 0;
+        return (int)(str - start);
+      }
+    }
+    switch (c) {
+    case EOF:
+      return EOF;
+    case '"':
+      if (!quote && str != start) {
+        log_error(
+          ("datafile contains a \" that isn't at the start of a string.\n"));
+        assert
+          (!"datafile contains a \" that isn't at the start of a string.\n");
+      }
+      if (quote) {
+        *str = 0;
+        return (int)(str - start);
+      }
+      quote = true;
+      break;
+    case '\\':
+      c = fgetc(F);
+      switch (c) {
+      case EOF:
+        return EOF;
+      case 'n':
+        if ((size_t)(str - start + 1) < size) {
+          *str++ = '\n';
+        }
+        break;
+      default:
+        if ((size_t)(str - start + 1) < size) {
+          if (encoding == XML_CHAR_ENCODING_8859_1 && c & 0x80) {
+            char inbuf = (char)c;
+            size_t inbytes = 1;
+            size_t outbytes = size - (str - start);
+            int ret = unicode_latin1_to_utf8(str, &outbytes, &inbuf, &inbytes);
+            if (ret > 0)
+              str += ret;
+            else {
+              log_error("input data was not iso-8859-1! assuming utf-8\n");
+              encoding = XML_CHAR_ENCODING_ERROR;
+              *str++ = (char)c;
+            }
+          }
+          else {
+            *str++ = (char)c;
+          }
+        }
+      }
+      break;
+    default:
+      if ((size_t)(str - start + 1) < size) {
+        if (encoding == XML_CHAR_ENCODING_8859_1 && c & 0x80) {
+          char inbuf = (char)c;
+          size_t inbytes = 1;
+          size_t outbytes = size - (str - start);
+          int ret = unicode_latin1_to_utf8(str, &outbytes, &inbuf, &inbytes);
+          if (ret > 0)
+            str += ret;
+          else {
+            log_error("input data was not iso-8859-1! assuming utf-8\n");
+            encoding = XML_CHAR_ENCODING_ERROR;
+            *str++ = (char)c;
+          }
+        }
+        else {
+          *str++ = (char)c;
+        }
+      }
+    }
+  }
+}
 
 static int txt_w_brk(struct storage *store)
 {
@@ -90,7 +209,7 @@ static char *txt_r_tok(struct storage *store)
   if (result[0] == NULL_TOKEN || result[0] == 0) {
     return NULL;
   }
-  return strdup(result);
+  return _strdup(result);
 }
 
 static void txt_r_tok_buf(struct storage *store, char *result, size_t size)
@@ -121,7 +240,7 @@ static char *txt_r_str(struct storage *store)
   char buffer[DISPLAYSIZE];
   /* you should not use this */
   freadstr((FILE *) store->userdata, store->encoding, buffer, sizeof(buffer));
-  return strdup(buffer);
+  return _strdup(buffer);
 }
 
 static void txt_r_str_buf(struct storage *store, char *result, size_t size)

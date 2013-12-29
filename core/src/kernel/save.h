@@ -28,13 +28,10 @@ extern "C" {
 /* Nach MAX_INPUT_SIZE brechen wir das Einlesen der Zeile ab und nehmen an,
  * dass hier ein Fehler (fehlende ") vorliegt */
 
-  FILE *cfopen(const char *filename, const char *mode);
   int readorders(const char *filename);
   int creategame(void);
   extern int readgame(const char *filename, int mode, int backup);
   int writegame(const char *filename, int mode);
-
-  extern void rsf(FILE * F, char *s, size_t len);
 
 /* Versionsänderungen: */
   extern int data_version;
@@ -69,9 +66,6 @@ extern "C" {
   extern void a_writestring(const struct attrib *a, const void *owner,
     struct storage *store);
   extern void a_finalizestring(struct attrib *a);
-
-  extern int freadstr(FILE * F, int encoding, char *str, size_t size);
-  extern int fwritestr(FILE * F, const char *str);
 
   extern void create_backup(char *file);
 

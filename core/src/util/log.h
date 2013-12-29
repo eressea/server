@@ -14,7 +14,7 @@ without prior permission by the authors of Eressea.
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+#include <stdio.h>
   extern void log_open(const char *filename);
   extern void log_close(void);
   extern void log_flush(void);
