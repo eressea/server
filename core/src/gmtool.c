@@ -10,7 +10,10 @@
 
 /* wenn platform.h nicht vor curses included wird, kompiliert es unter windows nicht */
 #include <platform.h>
+#undef bool
 #include <curses.h>
+#include <util/bool.h>
+
 #include <kernel/config.h>
 
 #include "gmtool.h"
@@ -93,9 +96,9 @@ static void init_curses(void)
     /* looks crap on putty with TERM=linux */
     if (can_change_color()) {
       init_color(COLOR_YELLOW, 1000, 1000, 0);
+      init_color(COLOR_CYAN, 0, 1000, 1000);
     }
 #endif
-
     for (fg = 0; fg != 8; ++fg) {
       for (bg = 0; bg != 2; ++bg) {
         init_pair(fg + 8 * bg, fg, bg ? hcol : bcol);
@@ -201,14 +204,14 @@ static int tagged_region(selection * s, int nx, int ny)
   return 0;
 }
 
-static int mr_tile(const map_region * mr, int highlight)
+static chtype mr_tile(const map_region * mr, int highlight)
 {
   int hl = 8 * highlight;
   if (mr != NULL && mr->r != NULL) {
     const region *r = mr->r;
     switch (r->terrain->_name[0]) {
       case 'o':
-        return '.' | COLOR_PAIR(hl + COLOR_CYAN);
+        return '.' | COLOR_PAIR(hl + COLOR_CYAN) | A_BOLD;
       case 'd':
         return 'D' | COLOR_PAIR(hl + COLOR_YELLOW) | A_BOLD;
       case 't':

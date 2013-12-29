@@ -1,6 +1,9 @@
 #include <platform.h>
 #include <kernel/types.h>
+
+#undef bool
 #include <curses.h>
+#include <util/bool.h>
 
 #include "bind_gmtool.h"
 #include "../gmtool.h"
