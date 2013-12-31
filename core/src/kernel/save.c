@@ -1404,7 +1404,7 @@ void writefaction(struct gamedata *data, const faction * f)
 
 int readgame(const char *filename, int backup)
 {
-  int i, n, p;
+  int i, n, p, nread;
   faction *f, **fp;
   region *r;
   building *b, **bp;
@@ -1465,13 +1465,13 @@ int readgame(const char *filename, int backup)
   log_printf(stdout, " - reading turn %d\n", turn);
   rng_init(turn);
   ++global.cookie;
-  READ_INT(&store, &n);          /* max_unique_id = ignore */
+  READ_INT(&store, &nread);          /* max_unique_id = ignore */
   READ_UINT(&store, &nextborder);
 
   /* Planes */
   planes = NULL;
-  READ_INT(&store, &n);
-  while (--n >= 0) {
+  READ_INT(&store, &nread);
+  while (--nread >= 0) {
     int id;
     variant fno;
     plane *pl;
@@ -1526,13 +1526,13 @@ int readgame(const char *filename, int backup)
   if (gdata.version >= ALLIANCES_VERSION) {
     read_alliances(&store);
   }
-  READ_INT(&store, &n);
-  log_printf(stdout, " - Einzulesende Parteien: %d\n", n);
+  READ_INT(&store, &nread);
+  log_printf(stdout, " - Einzulesende Parteien: %d\n", nread);
   fp = &factions;
   while (*fp)
     fp = &(*fp)->next;
 
-  while (--n >= 0) {
+  while (--nread >= 0) {
     faction *f = readfaction(&gdata);
 
     *fp = f;
@@ -1551,20 +1551,20 @@ int readgame(const char *filename, int backup)
 
   /* Regionen */
 
-  READ_INT(&store, &n);
-  assert(n < MAXREGIONS);
+  READ_INT(&store, &nread);
+  assert(nread < MAXREGIONS);
   if (rmax < 0) {
-    rmax = n;
+    rmax = nread;
   }
-  log_printf(stdout, " - Einzulesende Regionen: %d/%d\r", rmax, n);
-  while (--n >= 0) {
+  log_printf(stdout, " - Einzulesende Regionen: %d/%d\r", rmax, nread);
+  while (--nread >= 0) {
     unit **up;
     int x, y;
     READ_INT(&store, &x);
     READ_INT(&store, &y);
 
-    if ((n & 0x3FF) == 0) {     /* das spart extrem Zeit */
-      log_printf(stdout, " - Einzulesende Regionen: %d/%d * %d,%d    \r", rmax, n, x, y);
+    if ((nread & 0x3FF) == 0) {     /* das spart extrem Zeit */
+      log_printf(stdout, " - Einzulesende Regionen: %d/%d * %d,%d    \r", rmax, nread, x, y);
     }
     --rmax;
 

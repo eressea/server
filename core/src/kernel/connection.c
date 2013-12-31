@@ -652,7 +652,7 @@ int read_borders(struct storage *store)
 
     type = find_bordertype(zText);
     if (type == NULL) {
-      log_error("[read_borders] unknown connection type %s in %s\n", zText, regionname(from, NULL));
+      log_error("[read_borders] unknown connection type '%s' in %s\n", zText, regionname(from, NULL));
       assert(type || !"connection type not registered");
     }
 
