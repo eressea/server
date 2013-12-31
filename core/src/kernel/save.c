@@ -78,6 +78,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* libc includes */
 #include <string.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -441,7 +442,7 @@ static void read_alliances(struct storage *store)
     READ_STR(store, aname, sizeof(aname));
     al = makealliance(id, aname);
     if (global.data_version >= OWNER_2_VERSION) {
-      READ_INT(store, &al->flags);
+      READ_UINT(store, &al->flags);
     }
     if (global.data_version >= ALLIANCELEADER_VERSION) {
       read_reference(&al->_leader, store, read_faction_reference,
@@ -513,7 +514,7 @@ static void read_owner(struct gamedata *data, region_owner ** powner)
     owner->since_turn = since_turn;
     READ_INT(data->store, &owner->morale_turn);
     if (data->version >= MOURNING_VERSION) {
-      READ_INT(data->store, &owner->flags);
+      READ_UINT(data->store, &owner->flags);
     } else {
       owner->flags = 0;
     }
@@ -699,7 +700,7 @@ unit *read_unit(struct gamedata *data)
 
   READ_INT(data->store, &n);
   setstatus(u, n);
-  READ_INT(data->store, &u->flags);
+  READ_UINT(data->store, &u->flags);
   u->flags &= UFL_SAVEMASK;
   if ((u->flags & UFL_ANON_FACTION) && !rule_stealth_faction()) {
     /* if this rule is broken, then fix broken units */
@@ -848,7 +849,7 @@ static region *readregion(struct gamedata *data, int x, int y)
   int n;
 
   if (data->version >= UID_VERSION) {
-    READ_INT(data->store, &uid);
+    READ_UINT(data->store, &uid);
   }
 
   if (r == NULL) {
@@ -896,7 +897,7 @@ static region *readregion(struct gamedata *data, int x, int y)
     }
   }
   r->terrain = terrain;
-  READ_INT(data->store, &r->flags);
+  READ_UINT(data->store, &r->flags);
   READ_INT(data->store, &n);
   r->age = (unsigned short)n;
 
@@ -1269,7 +1270,7 @@ faction *readfaction(struct gamedata * data)
     READ_INT(data->store, &n);
   }
 
-  READ_INT(data->store, &f->flags);
+  READ_UINT(data->store, &f->flags);
   if (f->no == 0) {
     f->flags |= FFL_NPC;
   }
@@ -1465,7 +1466,7 @@ int readgame(const char *filename, int backup)
   rng_init(turn);
   ++global.cookie;
   READ_INT(&store, &n);          /* max_unique_id = ignore */
-  READ_INT(&store, &nextborder);
+  READ_UINT(&store, &nextborder);
 
   /* Planes */
   planes = NULL;
@@ -1490,7 +1491,7 @@ int readgame(const char *filename, int backup)
     READ_INT(&store, &pl->maxx);
     READ_INT(&store, &pl->miny);
     READ_INT(&store, &pl->maxy);
-    READ_INT(&store, &pl->flags);
+    READ_UINT(&store, &pl->flags);
 
     /* read watchers */
     if (gdata.version < FIX_WATCHERS_VERSION) {
@@ -1628,7 +1629,7 @@ int readgame(const char *filename, int backup)
       READ_INT(&store, &sh->size);
       READ_INT(&store, &sh->damage);
       if (gdata.version >= FOSS_VERSION) {
-        READ_INT(&store, &sh->flags);
+        READ_UINT(&store, &sh->flags);
       }
 
       /* Attribute rekursiv einlesen */
