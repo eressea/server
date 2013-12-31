@@ -39,11 +39,4 @@ set (SERVER_SRC
 )
 
 add_executable(server ${SERVER_SRC})
-target_link_libraries(server
-  ${ERESSEA_LIBRARY}
-  ${BINDINGS_LIBRARY}
-  ${TOLUA_LIBRARIES}
-  ${LUA_LIBRARIES}
-  ${SQLITE3_LIBRARIES}
-  ${CURSES_LIBRARIES}
-)
+target_link_libraries(server ${BINDINGS_LIBRARY})

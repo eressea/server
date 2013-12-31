@@ -6,23 +6,8 @@ IF(CMAKE_COMPILER_IS_GNUCC)
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
 ENDIF(CMAKE_COMPILER_IS_GNUCC)
 
-set (ERESSEA_LIBRARY ${PROJECT_NAME} CACHE INTERNAL "Eressea Core Library")
-set (ERESSEA_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "Eressea Core headers")
-
-add_subdirectory(bindings)
-
-set (ERESSEA_LIBRARIES
-  ${CUTEST_LIBRARIES}
-  ${CRITBIT_LIBRARIES}
-  ${QUICKLIST_LIBRARIES}
-  ${CRYPTO_LIBRARIES}
-  ${INIPARSER_LIBRARIES}
-  ${LUA_LIBRARIES}
-  ${LIBXML2_LIBRARIES}
-  ${SQLITE3_LIBRARIES}
-  ${CURSES_LIBRARIES}
-  CACHE STRING "Eressea Libraries"
-)
+set (ERESSEA_LIBRARY eressea CACHE INTERNAL "eressea library")
+set (ERESSEA_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "eressea includes")
 
 include_directories (${ERESSEA_INCLUDE_DIR})
 include_directories (${CRITBIT_INCLUDE_DIR})
@@ -30,7 +15,6 @@ include_directories (${CRYPTO_INCLUDE_DIR})
 include_directories (${QUICKLIST_INCLUDE_DIR})
 include_directories (${CUTEST_INCLUDE_DIR})
 include_directories (${LUA_INCLUDE_DIR})
-include_directories (${TOLUA_INCLUDE_DIR})
 include_directories (${LIBXML2_INCLUDE_DIR})
 include_directories (${INIPARSER_INCLUDE_DIR})
 
@@ -199,15 +183,26 @@ set (LIB_SRC
 )
 
 add_library(${ERESSEA_LIBRARY} ${LIB_SRC} ${BIND_SRC} ${LIB_HDR})
-target_link_libraries(${ERESSEA_LIBRARY} ${ERESSEA_LIBRARIES})
+target_link_libraries(${ERESSEA_LIBRARY}
+  ${CRITBIT_LIBRARIES}
+  ${QUICKLIST_LIBRARIES}
+  ${CRYPTO_LIBRARIES}
+  ${INIPARSER_LIBRARIES}
+  ${LIBXML2_LIBRARIES}
+  ${SQLITE3_LIBRARIES}
+  ${CURSES_LIBRARIES}
+	${LUA_LIBRARIES}
+)
 
-add_executable(${PROJECT_NAME}_test ${TEST_SRC})
-target_link_libraries(${PROJECT_NAME}_test ${ERESSEA_LIBRARY})
+add_executable(test_eressea ${TEST_SRC})
+target_link_libraries(test_eressea ${ERESSEA_LIBRARY})
+target_link_libraries(test_eressea ${CUTEST_LIBRARIES})
 
-add_test(${PROJECT_NAME} ${PROJECT_NAME}_test)
+add_test(eressea test_eressea)
 
 IF (MSVC)
     find_package (MSVC MODULE)
     MSVC_CRT_SECURE_NO_WARNINGS (${ERESSEA_LIBRARY})
 ENDIF (MSVC)
 
+add_subdirectory(bindings)

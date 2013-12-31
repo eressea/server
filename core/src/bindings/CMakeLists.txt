@@ -13,17 +13,9 @@ set (BINDINGS_LIBRARY ${PROJECT_NAME} CACHE INTERNAL "Eressea Lua Bindings")
 find_package (Lua 5 REQUIRED)
 find_package (ToLua REQUIRED)
 
-include_directories (${ERESSEA_INCLUDE_DIR})
-include_directories (${CRITBIT_INCLUDE_DIR})
-include_directories (${CRYPTO_INCLUDE_DIR})
-include_directories (${QUICKLIST_INCLUDE_DIR})
-include_directories (${CUTEST_INCLUDE_DIR})
-include_directories (${LUA_INCLUDE_DIR})
 include_directories (${TOLUA_INCLUDE_DIR})
-include_directories (${LIBXML2_INCLUDE_DIR})
-include_directories (${INIPARSER_INCLUDE_DIR})
 
-FILE (GLOB_RECURSE LIB_HDR *.h)
+FILE (GLOB_RECURSE BINDINGS_HDR *.h)
 
 MACRO(ADD_LUA_MODULE MODULE_NAME FILES)
   ADD_LIBRARY (${MODULE_NAME} SHARED ${FILES})
@@ -47,16 +39,13 @@ TOLUA_BINDING(process.pkg bind_process.h)
 TOLUA_BINDING(eressea.pkg bind_eressea.h)
 TOLUA_BINDING(settings.pkg bind_settings.h)
 
-set (BIND_SRC
+set (BINDINGS_SRC
 	process.pkg.c
 	eressea.pkg.c
 	settings.pkg.c
-
 	bind_process.c
 	bind_eressea.c
 	bind_settings.c
-
-#    bind_attrib.c
 	bind_building.c
 	bind_faction.c
 	bind_gmtool.c
@@ -71,5 +60,6 @@ set (BIND_SRC
 	helpers.c
 )
 
-add_library(${BINDINGS_LIBRARY} ${LIB_SRC} ${BIND_SRC} ${LIB_HDR})
+add_library(${BINDINGS_LIBRARY} ${BINDINGS_SRC} ${BINDINGS_HDR})
+target_link_libraries(${BINDINGS_LIBRARY} ${TOLUA_LIBRARIES})
 target_link_libraries(${BINDINGS_LIBRARY} ${ERESSEA_LIBRARY})
