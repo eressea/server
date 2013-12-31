@@ -156,7 +156,6 @@ typedef struct stat stat_type;
 
 /* Microsoft Visual C */
 #ifdef _MSC_VER
-# include <direct.h>
 # include <string.h>            /* must be included here so strdup is not redefined */
 # define R_OK 4
 # define HAVE_INLINE
@@ -255,6 +254,15 @@ typedef struct _stat stat_type;
 #if !defined(HAVE__STRDUP)
 # if defined(HAVE_STRDUP)
 #  define _strdup(s) strdup(s)
+# endif
+#endif
+
+#if defined(HAVE__MKDIR)
+# include <direct.h>
+#else
+# if defined(HAVE_MKDIR)
+#  include <sys/stat.h>
+#  define _mkdir(s) mkdir(s, 0777)
 # endif
 #endif
 

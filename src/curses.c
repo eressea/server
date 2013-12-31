@@ -65,7 +65,7 @@ static int cw_read(attrib * a, void *target, storage * store)
 
   curse_read(a, store, target);
   br->self = c;
-  READ_INT(store, &br->id);
+  READ_UINT(store, &br->id);
 
   var.i = br->id;
   ur_add(var, &wc->wall, resolve_borderid);

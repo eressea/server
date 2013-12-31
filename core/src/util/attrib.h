@@ -23,6 +23,7 @@ extern "C" {
 #endif
 
   struct gamedata;
+  struct storage;
   typedef void (*afun) (void);
 
   typedef struct attrib {

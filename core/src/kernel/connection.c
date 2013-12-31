@@ -633,7 +633,7 @@ int read_borders(struct storage *store)
     READ_TOK(store, zText, sizeof(zText));
     if (!strcmp(zText, "end"))
       break;
-    READ_INT(store, &bid);
+    READ_UINT(store, &bid);
     if (global.data_version < UIDHASH_VERSION) {
       int fx, fy, tx, ty;
       READ_INT(store, &fx);
@@ -644,8 +644,8 @@ int read_borders(struct storage *store)
       to = findregion(tx, ty);
     } else {
       unsigned int fid, tid;
-      READ_INT(store, &fid);
-      READ_INT(store, &tid);
+      READ_UINT(store, &fid);
+      READ_UINT(store, &tid);
       from = findregionbyid(fid);
       to = findregionbyid(tid);
     }
