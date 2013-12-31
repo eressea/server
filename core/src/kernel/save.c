@@ -93,7 +93,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* exported symbols symbols */
 const char *game_name = "eressea";
 int firstx = 0, firsty = 0;
-int enc_gamedata = 0;
+int enc_gamedata = XML_CHAR_ENCODING_UTF8;
 
 /* local symbols */
 static region *current_region;
