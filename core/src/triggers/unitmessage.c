@@ -24,7 +24,8 @@ without prior permission by the authors of Eressea.
 #include <util/language.h>
 #include <util/log.h>
 #include <util/resolve.h>
-#include <util/storage.h>
+
+#include <storage.h>
 
 /* ansi includes */
 #include <stdio.h>
@@ -78,9 +79,9 @@ static void unitmessage_write(const trigger * t, struct storage *store)
 {
   unitmessage_data *td = (unitmessage_data *) t->data.v;
   write_unit_reference(td->target, store);
-  store->w_tok(store, td->string);
-  store->w_int(store, td->type);
-  store->w_int(store, td->level);
+  WRITE_TOK(store, td->string);
+  WRITE_INT(store, td->type);
+  WRITE_INT(store, td->level);
 }
 
 static int unitmessage_read(trigger * t, struct storage *store)
@@ -90,11 +91,10 @@ static int unitmessage_read(trigger * t, struct storage *store)
 
   int result =
     read_reference(&td->target, store, read_unit_reference, resolve_unit);
-
-  td->string = store->r_tok(store);
-  td->type = store->r_int(store);
-  td->level = store->r_int(store);
+  READ_TOK(store, zText, sizeof(zText));
   td->string = _strdup(zText);
+  READ_INT(store, &td->type);
+  READ_INT(store, &td->level);
 
   if (result == 0 && td->target == NULL) {
     return AT_READ_FAIL;

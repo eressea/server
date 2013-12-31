@@ -30,8 +30,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/resolve.h>
-#include <util/storage.h>
 #include <util/goodies.h>
+
+#include <storage.h>
 
 /* libc includes */
 #include <stdlib.h>
@@ -49,10 +50,10 @@ a_writegive(const attrib * a, const void *owner, struct storage *store)
   item *itm;
   write_building_reference(gdata->building, store);
   for (itm = gdata->items; itm; itm = itm->next) {
-    store->w_tok(store, resourcename(itm->type->rtype, 0));
-    store->w_int(store, itm->number);
+    WRITE_TOK(store, resourcename(itm->type->rtype, 0));
+    WRITE_INT(store, itm->number);
   }
-  store->w_tok(store, "end");
+  WRITE_TOK(store, "end");
 }
 
 static int a_readgive(attrib * a, void *owner, struct storage *store)
@@ -61,7 +62,7 @@ static int a_readgive(attrib * a, void *owner, struct storage *store)
   variant var;
   char zText[32];
 
-  var.i = store->r_id(store);
+  READ_INT(store, &var.i);
   if (var.i > 0) {
     gdata->building = findbuilding(var.i);
     if (gdata->building == NULL) {
@@ -72,10 +73,10 @@ static int a_readgive(attrib * a, void *owner, struct storage *store)
   }
   for (;;) {
     int i;
-    store->r_tok_buf(store, zText, sizeof(zText));
+    READ_TOK(store, zText, sizeof(zText));
     if (!strcmp("end", zText))
       break;
-    i = store->r_int(store);
+    READ_INT(store, &i);
     if (i == 0)
       i_add(&gdata->items, i_new(it_find(zText), i));
   }

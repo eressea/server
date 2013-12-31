@@ -21,17 +21,18 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "movement.h"
 
 #include <util/attrib.h>
-#include <util/storage.h>
+
+#include <storage.h>
 
 static void
 write_movement(const attrib * a, const void *owner, struct storage *store)
 {
-  store->w_int(store, a->data.i);
+  WRITE_INT(store, a->data.i);
 }
 
 static int read_movement(attrib * a, void *owner, struct storage *store)
 {
-  a->data.i = store->r_int(store);
+  READ_INT(store, &a->data.i);
   if (a->data.i != 0)
     return AT_READ_OK;
   else

@@ -46,11 +46,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <quicklist.h>
 #include <util/resolve.h>
 #include <util/rng.h>
-#include <util/storage.h>
 #include <util/sql.h>
 #include <util/variant.h>
 #include <util/unicode.h>
 #include <attributes/otherfaction.h>
+
+#include <storage.h>
 
 /* libc includes */
 #include <assert.h>
@@ -271,13 +272,13 @@ bool checkpasswd(const faction * f, const char *passwd, bool shortp)
 variant read_faction_reference(struct storage * store)
 {
   variant id;
-  id.i = store->r_id(store);
+  READ_INT(store, &id.i);
   return id;
 }
 
 void write_faction_reference(const faction * f, struct storage *store)
 {
-  store->w_id(store, f ? f->no : 0);
+  WRITE_INT(store, f ? f->no : 0);
 }
 
 void destroyfaction(faction * f)

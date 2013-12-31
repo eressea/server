@@ -72,3 +72,5 @@
 
 #define MIN_VERSION CURSETYPE_VERSION   /* minimal datafile we support */
 #define RELEASE_VERSION SPELLBOOK_VERSION    /* current datafile */
+
+#define STREAM_VERSION 2 /* internal encoding of binary files */

@@ -24,7 +24,8 @@
 #include <util/event.h>
 #include <util/log.h>
 #include <util/resolve.h>
-#include <util/storage.h>
+
+#include <storage.h>
 
 /* libc includes */
 #include <stdlib.h>
@@ -78,7 +79,7 @@ static int gate_read(trigger * t, struct storage *store)
     read_reference(&gd->gate, store, read_building_reference, resolve_building);
   int rc =
     read_reference(&gd->target, store, read_region_reference,
-    RESOLVE_REGION(store->version));
+    RESOLVE_REGION(global.data_version));
 
   if (bc == 0 && rc == 0) {
     if (!gd->gate || !gd->target)

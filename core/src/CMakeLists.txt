@@ -13,6 +13,7 @@ include_directories (${ERESSEA_INCLUDE_DIR})
 include_directories (${CRITBIT_INCLUDE_DIR})
 include_directories (${CRYPTO_INCLUDE_DIR})
 include_directories (${QUICKLIST_INCLUDE_DIR})
+include_directories (${STORAGE_INCLUDE_DIR})
 include_directories (${CUTEST_INCLUDE_DIR})
 include_directories (${LUA_INCLUDE_DIR})
 include_directories (${LIBXML2_INCLUDE_DIR})
@@ -95,7 +96,6 @@ set (LIB_SRC
   kernel/alliance.c
   kernel/ally.c
   kernel/battle.c
-  kernel/binarystore.c
   kernel/build.c
   kernel/building.c
   kernel/calendar.c
@@ -128,7 +128,6 @@ set (LIB_SRC
   kernel/sqlite.c
   kernel/teleport.c
   kernel/terrain.c
-  kernel/textstore.c
   kernel/unit.c
   kernel/xmlreader.c
   modules/arena.c
@@ -184,6 +183,7 @@ set (LIB_SRC
 
 add_library(${ERESSEA_LIBRARY} ${LIB_SRC} ${BIND_SRC} ${LIB_HDR})
 target_link_libraries(${ERESSEA_LIBRARY}
+  ${STORAGE_LIBRARIES}
   ${CRITBIT_LIBRARIES}
   ${QUICKLIST_LIBRARIES}
   ${CRYPTO_LIBRARIES}
@@ -191,12 +191,14 @@ target_link_libraries(${ERESSEA_LIBRARY}
   ${LIBXML2_LIBRARIES}
   ${SQLITE3_LIBRARIES}
   ${CURSES_LIBRARIES}
-	${LUA_LIBRARIES}
+  ${LUA_LIBRARIES}
 )
 
 add_executable(test_eressea ${TEST_SRC})
-target_link_libraries(test_eressea ${ERESSEA_LIBRARY})
-target_link_libraries(test_eressea ${CUTEST_LIBRARIES})
+target_link_libraries(test_eressea
+  ${ERESSEA_LIBRARY}
+  ${CUTEST_LIBRARIES}
+)
 
 add_test(eressea test_eressea)
 

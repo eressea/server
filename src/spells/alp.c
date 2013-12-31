@@ -29,7 +29,8 @@
 #include <util/event.h>
 #include <util/resolve.h>
 #include <util/umlaut.h>
-#include <util/storage.h>
+
+#include <storage.h>
 
 #include <triggers/createcurse.h>
 #include <triggers/killunit.h>
@@ -147,7 +148,7 @@ void alp_findet_opfer(unit * alp, region * r)
   alp_data *ad = (alp_data *) a->data.v;
   unit *mage = ad->mage;
   unit *opfer = ad->target;
-  double effect;
+  float effect;
   message *msg;
 
   assert(opfer);

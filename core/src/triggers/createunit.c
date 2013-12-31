@@ -33,7 +33,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/event.h>
 #include <util/log.h>
 #include <util/resolve.h>
-#include <util/storage.h>
+
+#include <storage.h>
 
 /* ansi includes */
 #include <stdio.h>
@@ -83,7 +84,7 @@ static void createunit_write(const trigger * t, struct storage *store)
   write_faction_reference(td->f, store);
   write_region_reference(td->r, store);
   write_race_reference(td->race, store);
-  store->w_int(store, td->number);
+  WRITE_INT(store, td->number);
 }
 
 static int createunit_read(trigger * t, struct storage *store)
@@ -94,14 +95,14 @@ static int createunit_read(trigger * t, struct storage *store)
     read_reference(&td->f, store, read_faction_reference, resolve_faction);
   int rc =
     read_reference(&td->r, store, read_region_reference,
-    RESOLVE_REGION(store->version));
+    RESOLVE_REGION(global.data_version));
   td->race = (const struct race *)read_race_reference(store).v;
 
   if (uc == 0 && rc == 0) {
     if (!td->f || !td->r)
       return AT_READ_FAIL;
   }
-  td->number = store->r_int(store);
+  READ_INT(store, &td->number);
 
   return AT_READ_OK;
 }

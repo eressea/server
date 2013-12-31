@@ -11,13 +11,15 @@ without prior permission by the authors of Eressea.
 */
 
 #include <platform.h>
+#include <kernel/config.h>
 #include <kernel/types.h>
 #include "bind_storage.h"
 
-#include <util/storage.h>
 #include <kernel/save.h>
-#include <kernel/textstore.h>
-#include <kernel/binarystore.h>
+#include <kernel/version.h>
+
+#include <storage.h>
+#include <binarystore.h>
 
 #include <math.h>
 #include <stdio.h>
@@ -28,68 +30,73 @@ static int tolua_storage_create(lua_State * L)
 {
   const char *filename = tolua_tostring(L, 1, 0);
   const char *type = tolua_tostring(L, 2, "rb");
-  storage *store = 0;
-  int mode = IO_READ;
-  if (strchr(type, 't')) {
-    store = malloc(sizeof(text_store));
-    memcpy(store, &text_store, sizeof(text_store));
-  } else {
-    store = malloc(sizeof(binary_store));
-    memcpy(store, &binary_store, sizeof(binary_store));
+  gamedata *data = (gamedata *)calloc(1, sizeof(gamedata));
+  storage *store = (storage *)calloc(1, sizeof(storage));
+
+  data->store = store;
+
+  FILE *F = fopen(filename, type);
+  if (strchr(type, 'r')) {
+    fread(&data->version, sizeof(int), 1, F);
+    fseek(F, sizeof(int), SEEK_CUR);
   }
-  if (strchr(type, 'r'))
-    mode = IO_READ;
-  if (strchr(type, 'w'))
-    mode = IO_WRITE;
-  store->open(store, filename, mode);
-  tolua_pushusertype(L, (void *)store, TOLUA_CAST "storage");
+  else if (strchr(type, 'w')) {
+    int n = STREAM_VERSION;
+    data->version = RELEASE_VERSION;
+    fwrite(&data->version, sizeof(int), 1, F);
+    fwrite(&n, sizeof(int), 1, F);
+  }
+  binstore_init(store, F);
+  tolua_pushusertype(L, (void *)data, TOLUA_CAST "storage");
   return 1;
 }
 
 static int tolua_storage_read_unit(lua_State * L)
 {
-  storage *self = (storage *) tolua_tousertype(L, 1, 0);
-  struct unit *u = read_unit(self);
+  gamedata *data = (gamedata *)tolua_tousertype(L, 1, 0);
+  struct unit *u = read_unit(data);
   tolua_pushusertype(L, (void *)u, TOLUA_CAST "unit");
   return 1;
 }
 
 static int tolua_storage_write_unit(lua_State * L)
 {
-  storage *store = (storage *) tolua_tousertype(L, 1, 0);
+  gamedata *data = (gamedata *)tolua_tousertype(L, 1, 0);
   struct unit *u = (struct unit *)tolua_tousertype(L, 2, 0);
-  if (store->version) {
-    write_unit(store, u);
+  if (global.data_version) {
+    write_unit(data, u);
   }
   return 0;
 }
 
 static int tolua_storage_read_float(lua_State * L)
 {
-  storage *self = (storage *) tolua_tousertype(L, 1, 0);
-  float num = self->r_flt(self);
+  gamedata *data = (gamedata *)tolua_tousertype(L, 1, 0);
+  float num;
+  READ_FLT(data->store, &num);
   tolua_pushnumber(L, (lua_Number) num);
   return 1;
 }
 
 static int tolua_storage_read_int(lua_State * L)
 {
-  storage *self = (storage *) tolua_tousertype(L, 1, 0);
-  int num = self->r_int(self);
+  gamedata *data = (gamedata *)tolua_tousertype(L, 1, 0);
+  int num;
+  READ_INT(data->store, &num);
   tolua_pushnumber(L, (lua_Number) num);
   return 1;
 }
 
 static int tolua_storage_write(lua_State * L)
 {
-  storage *self = (storage *) tolua_tousertype(L, 1, 0);
-  if (self->version && tolua_isnumber(L, 2, 0, 0)) {
+  gamedata *data = (gamedata *)tolua_tousertype(L, 1, 0);
+  if (data->version && tolua_isnumber(L, 2, 0, 0)) {
     lua_Number num = tolua_tonumber(L, 2, 0);
     double n;
     if (modf(num, &n) == 0.0) {
-      self->w_int(self, (int)num);
+      WRITE_INT(data->store, (int)num);
     } else {
-      self->w_flt(self, (float)num);
+      WRITE_FLT(data->store, (float)num);
     }
   }
   return 0;
@@ -97,18 +104,18 @@ static int tolua_storage_write(lua_State * L)
 
 static int tolua_storage_tostring(lua_State * L)
 {
-  storage *self = (storage *) tolua_tousertype(L, 1, 0);
+  gamedata *data = (gamedata *)tolua_tousertype(L, 1, 0);
   char name[64];
-  snprintf(name, sizeof(name), "<storage enc=%d ver=%d>", self->encoding,
-    self->version);
+  snprintf(name, sizeof(name), "<storage enc=%d ver=%d>", data->encoding,
+    data->version);
   lua_pushstring(L, name);
   return 1;
 }
 
 static int tolua_storage_close(lua_State * L)
 {
-  storage *self = (storage *) tolua_tousertype(L, 1, 0);
-  self->close(self);
+  gamedata *data = (gamedata *)tolua_tousertype(L, 1, 0);
+  binstore_done(data->store);
   return 0;
 }
 

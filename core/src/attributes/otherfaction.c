@@ -23,7 +23,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/faction.h>
 #include <kernel/unit.h>
 #include <util/attrib.h>
-#include <util/storage.h>
+
+#include <storage.h>
 #include <assert.h>
 
 /*
@@ -33,7 +34,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 void write_of(const struct attrib *a, const void *owner, struct storage *store)
 {
   const faction *f = (faction *) a->data.v;
-  store->w_int(store, f->no);
+  WRITE_INT(store, f->no);
 }
 
 int read_of(struct attrib *a, void *owner, struct storage *store)
@@ -44,7 +45,7 @@ int read_of(struct attrib *a, void *owner, struct storage *store)
     rule = rule_stealth_faction();
   }
 
-  of = store->r_int(store);
+  READ_INT(store, &of);
   if (rule&2) {
     a->data.v = findfaction(of);
     if (a->data.v) {

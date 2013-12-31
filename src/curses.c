@@ -24,7 +24,8 @@
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/resolve.h>
-#include <util/storage.h>
+
+#include <storage.h>
 
 #include <assert.h>
 
@@ -45,7 +46,7 @@ void cw_write(const attrib * a, const void *target, storage * store)
 {
   connection *b = ((wallcurse *) ((curse *) a->data.v)->data.v)->wall;
   curse_write(a, target, store);
-  store->w_int(store, b->id);
+  WRITE_INT(store, b->id);
 }
 
 typedef struct bresolve {
@@ -64,7 +65,7 @@ static int cw_read(attrib * a, void *target, storage * store)
 
   curse_read(a, store, target);
   br->self = c;
-  br->id = store->r_int(store);
+  READ_INT(store, &br->id);
 
   var.i = br->id;
   ur_add(var, &wc->wall, resolve_borderid);
@@ -90,7 +91,7 @@ static int cw_read(attrib * a, void *target, storage * store)
  *   Was fuer eine Wirkung hat die?
  */
 
-void wall_vigour(curse * c, double delta)
+void wall_vigour(curse * c, float delta)
 {
   wallcurse *wc = (wallcurse *) c->data.v;
   assert(wc->buddy->vigour == c->vigour);
@@ -180,8 +181,8 @@ static void wall_read(connection * b, storage * store)
   wall_data *fd = b->data.v ? (wall_data *) b->data.v : &dummy;
   variant mno;
 
-  if (store->version < STORAGE_VERSION) {
-    mno.i = store->r_int(store);
+  if (global.data_version < STORAGE_VERSION) {
+    READ_INT(store, &mno.i);
     fd->mage = findunit(mno.i);
     if (!fd->mage && b->data.v) {
       ur_add(mno, &fd->mage, resolve_unit);
@@ -189,9 +190,9 @@ static void wall_read(connection * b, storage * store)
   } else {
     read_reference(&fd->mage, store, read_unit_reference, resolve_unit);
   }
-  fd->force = store->r_int(store);
-  if (store->version >= NOBORDERATTRIBS_VERSION) {
-    fd->countdown = store->r_int(store);
+  READ_INT(store, &fd->force);
+  if (global.data_version >= NOBORDERATTRIBS_VERSION) {
+    READ_INT(store, &fd->countdown);
   }
   fd->active = true;
 }
@@ -200,8 +201,8 @@ static void wall_write(const connection * b, storage * store)
 {
   wall_data *fd = (wall_data *) b->data.v;
   write_unit_reference(fd->mage, store);
-  store->w_int(store, fd->force);
-  store->w_int(store, fd->countdown);
+  WRITE_INT(store, fd->force);
+  WRITE_INT(store, fd->countdown);
 }
 
 static int wall_age(connection * b)

@@ -11,6 +11,7 @@ ENDIF(CMAKE_COMPILER_IS_GNUCC)
 
 include_directories (${ERESSEA_INCLUDE_DIR})
 include_directories (${CRITBIT_INCLUDE_DIR})
+include_directories (${STORAGE_INCLUDE_DIR})
 include_directories (${CRYPTO_INCLUDE_DIR})
 include_directories (${QUICKLIST_INCLUDE_DIR})
 include_directories (${CUTEST_INCLUDE_DIR})

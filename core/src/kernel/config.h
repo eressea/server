@@ -87,10 +87,10 @@ extern "C" {
 
 #define ENCCHANCE           10  /* %-Chance für einmalige Zufallsbegegnung */
 
-#define DISPLAYSIZE         8191        /* max. Länge einer Beschreibung, ohne trailing 0 */
-#define NAMESIZE            127 /* max. Länge eines Namens, ohne trailing 0 */
-#define IDSIZE              15  /* max. Länge einer no (als String), ohne trailing 0 */
-#define KEYWORDSIZE         15  /* max. Länge eines Keyword, ohne trailing 0 */
+#define DISPLAYSIZE         8192        /* max. Länge einer Beschreibung, incl trailing 0 */
+#define NAMESIZE            128 /* max. Länge eines Namens, incl trailing 0 */
+#define IDSIZE              16  /* max. Länge einer no (als String), incl trailing 0 */
+#define KEYWORDSIZE         16  /* max. Länge eines Keyword, incl trailing 0 */
 #define OBJECTIDSIZE        (NAMESIZE+5+IDSIZE) /* max. Länge der Strings, die
                                                  * von struct unitname, etc. zurückgegeben werden. ohne die 0 */
 
@@ -392,6 +392,7 @@ extern "C" {
     void *vm_state;
     float producexpchance;
     int cookie;
+    int data_version; /* TODO: eliminate in favor of gamedata.version */
     struct _dictionary_ *inifile;
 
     struct global_functions {

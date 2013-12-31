@@ -44,7 +44,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/log.h>
 #include <util/rng.h>
-#include <util/storage.h>
+
+#include <storage.h>
 
 /* attrib includes */
 #include <attributes/raceprefix.h>
@@ -274,14 +275,14 @@ rc_specialdamage(const race * ar, const race * dr,
 
 void write_race_reference(const race * rc, struct storage *store)
 {
-  store->w_tok(store, rc ? rc->_name[0] : "none");
+  WRITE_TOK(store, rc ? rc->_name[0] : "none");
 }
 
 variant read_race_reference(struct storage *store)
 {
   variant result;
   char zName[20];
-  store->r_tok_buf(store, zName, sizeof(zName));
+  READ_TOK(store, zName, sizeof(zName));
 
   if (strcmp(zName, "none") == 0) {
     result.v = NULL;

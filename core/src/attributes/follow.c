@@ -23,8 +23,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/unit.h>
 
 #include <util/attrib.h>
-#include <util/storage.h>
 #include <util/variant.h>
+
+#include <storage.h>
 
 static int read_follow(attrib * a, void *owner, struct storage *store)
 {

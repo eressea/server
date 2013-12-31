@@ -31,7 +31,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 #include <util/resolve.h>
 #include <util/base36.h>
-#include <util/storage.h>
+
+#include <storage.h>
 
 /* ansi includes */
 #include <stdio.h>

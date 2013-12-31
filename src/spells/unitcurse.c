@@ -31,7 +31,8 @@
 #include <util/message.h>
 #include <util/base36.h>
 #include <util/functions.h>
-#include <util/storage.h>
+
+#include <storage.h>
 
 /* libc includes */
 #include <string.h>
@@ -312,11 +313,11 @@ static struct curse_type ct_magicresistance = {
 static int read_skill(struct storage *store, curse * c, void *target)
 {
   int skill;
-  if (store->version < CURSETYPE_VERSION) {
-    skill = store->r_int(store);
-    store->r_int(store); /* men, deprecated */
+  if (global.data_version < CURSETYPE_VERSION) {
+    READ_INT(store, &skill);
+    READ_INT(store, 0); /* men, ignored */
   } else {
-    skill = store->r_int(store);
+    READ_INT(store, &skill);
   }
   c->data.i = skill;
   return 0;
@@ -325,7 +326,7 @@ static int read_skill(struct storage *store, curse * c, void *target)
 static int
 write_skill(struct storage *store, const curse * c, const void *target)
 {
-  store->w_int(store, c->data.i);
+  WRITE_INT(store, c->data.i);
   return 0;
 }
 

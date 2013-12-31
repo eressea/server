@@ -3328,8 +3328,7 @@ static building *age_building(building * b)
       if (c == NULL) {
         if (mage != NULL) {
           int sk = effskill(mage, SK_MAGIC);
-          double effect;
-          effect = 100;
+          float effect = 100;
           /* the mage reactivates the circle */
           c = create_curse(mage, &rt->attribs, ct_astralblock,
             (float)MAX(1, sk), MAX(1, sk / 2), effect, 0);

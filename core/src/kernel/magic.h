@@ -128,7 +128,7 @@ typedef struct sc_mage {
                                    den Vertrauten gezaubert wird */
     const struct spell *sp;     /* Spruch */
     int level;                  /* gewünschte Stufe oder Stufe des Magiers */
-    double force;               /* Stärke des Zaubers */
+    float force;               /* Stärke des Zaubers */
     struct region *_rtarget;     /* Zielregion des Spruchs */
     int distance;               /* Entfernung zur Zielregion */
     struct order *order;        /* Befehl */
@@ -274,7 +274,7 @@ typedef struct sc_mage {
   /* verändert die maximalen Magiepunkte einer Einheit */
 
 /* Zaubern */
-  extern double spellpower(struct region *r, struct unit *u, const struct spell * sp,
+  extern float spellpower(struct region *r, struct unit *u, const struct spell * sp,
     int cast_level, struct order *ord);
   /*      ermittelt die Stärke eines Spruchs */
   bool fumble(struct region *r, struct unit *u, const struct spell * sp,
@@ -288,7 +288,7 @@ typedef struct sc_mage {
 
   struct castorder *create_castorder(struct castorder * co, struct unit *caster, 
     struct unit * familiar, const struct spell * sp, struct region * r,
-    int lev, double force, int range, struct order * ord, struct spellparameter * p);
+    int lev, float force, int range, struct order * ord, struct spellparameter * p);
   void free_castorder(struct castorder *co);
   /* Zwischenspreicher für Zauberbefehle, notwendig für Prioritäten */
   void add_castorder(struct spellrank *cll, struct castorder *co);
@@ -357,7 +357,7 @@ typedef struct sc_mage {
   extern void write_spells(struct quicklist *slist, struct storage *store);
   extern void read_spells(struct quicklist **slistp, magic_t mtype,
     struct storage *store);
-  extern double MagicPower(void);
+  extern float MagicPower(void);
 
   extern struct spellbook * get_spellbook(const char * name);
   extern void free_spellbooks(void);

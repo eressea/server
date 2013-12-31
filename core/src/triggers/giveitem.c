@@ -30,7 +30,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/event.h>
 #include <util/log.h>
 #include <util/resolve.h>
-#include <util/storage.h>
+
+#include <storage.h>
 
 /* ansi includes */
 #include <stdio.h>
@@ -76,8 +77,8 @@ static void giveitem_write(const trigger * t, struct storage *store)
 {
   giveitem_data *td = (giveitem_data *) t->data.v;
   write_unit_reference(td->u, store);
-  store->w_int(store, td->number);
-  store->w_tok(store, td->itype->rtype->_name[0]);
+  WRITE_INT(store, td->number);
+  WRITE_TOK(store, td->itype->rtype->_name[0]);
 }
 
 static int giveitem_read(trigger * t, struct storage *store)
@@ -87,8 +88,8 @@ static int giveitem_read(trigger * t, struct storage *store)
 
   int result = read_reference(&td->u, store, read_unit_reference, resolve_unit);
 
-  td->number = store->r_int(store);
-  store->r_tok_buf(store, zText, sizeof(zText));
+  READ_INT(store, &td->number);
+  READ_TOK(store, zText, sizeof(zText));
   td->itype = it_find(zText);
   assert(td->itype);
 

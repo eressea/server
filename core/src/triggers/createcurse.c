@@ -30,8 +30,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/event.h>
 #include <util/log.h>
 #include <util/resolve.h>
-#include <util/storage.h>
 #include <util/base36.h>
+
+#include <storage.h>
 
 /* ansi includes */
 #include <stdio.h>
@@ -47,9 +48,9 @@ typedef struct createcurse_data {
   struct unit *mage;
   struct unit *target;
   const curse_type *type;
-  double vigour;
+  float vigour;
   int duration;
-  double effect;
+  float effect;
   int men;
 } createcurse_data;
 
@@ -84,11 +85,11 @@ static void createcurse_write(const trigger * t, struct storage *store)
   createcurse_data *td = (createcurse_data *) t->data.v;
   write_unit_reference(td->mage, store);
   write_unit_reference(td->target, store);
-  store->w_tok(store, td->type->cname);
-  store->w_flt(store, (float)td->vigour);
-  store->w_int(store, td->duration);
-  store->w_flt(store, (float)td->effect);
-  store->w_int(store, td->men);
+  WRITE_TOK(store, td->type->cname);
+  WRITE_FLT(store, (float)td->vigour);
+  WRITE_INT(store, td->duration);
+  WRITE_FLT(store, (float)td->effect);
+  WRITE_INT(store, td->men);
 }
 
 static int createcurse_read(trigger * t, struct storage *store)
@@ -99,27 +100,30 @@ static int createcurse_read(trigger * t, struct storage *store)
   read_reference(&td->mage, store, read_unit_reference, resolve_unit);
   read_reference(&td->target, store, read_unit_reference, resolve_unit);
 
-  if (store->version < CURSETYPE_VERSION) {
-    int id1, id2;
-    id1 = store->r_int(store);
-    id2 = store->r_int(store);
+  if (global.data_version < CURSETYPE_VERSION) {
+    int id1, id2, n;
+    READ_INT(store, &id1);
+    READ_INT(store, &id2);
     assert(id2 == 0);
-    td->vigour = store->r_flt(store);
-    td->duration = store->r_int(store);
-    td->effect = store->r_int(store);
-    td->men = store->r_int(store);
+    READ_FLT(store, &td->vigour);
+    READ_INT(store, &td->duration);
+    READ_INT(store, &n);
+    td->effect = (float)n;
+    READ_INT(store, &td->men);
     td->type = ct_find(oldcursename(id1));
   } else {
-    store->r_tok_buf(store, zText, sizeof(zText));
+    READ_TOK(store, zText, sizeof(zText));
     td->type = ct_find(zText);
-    td->vigour = store->r_flt(store);
-    td->duration = store->r_int(store);
-    if (store->version < CURSEFLOAT_VERSION) {
-      td->effect = (double)store->r_int(store);
+    READ_FLT(store, &td->vigour);
+    READ_INT(store, &td->duration);
+    if (global.data_version < CURSEFLOAT_VERSION) {
+      int n;
+      READ_INT(store, &n);
+      td->effect = (float)n;
     } else {
-      td->effect = store->r_flt(store);
+      READ_FLT(store, &td->effect);
     }
-    td->men = store->r_int(store);
+    READ_INT(store, &td->men);
   }
   return AT_READ_OK;
 }
@@ -134,7 +138,7 @@ trigger_type tt_createcurse = {
 };
 
 trigger *trigger_createcurse(struct unit * mage, struct unit * target,
-  const curse_type * ct, double vigour, int duration, double effect, int men)
+  const curse_type * ct, float vigour, int duration, float effect, int men)
 {
   trigger *t = t_new(&tt_createcurse);
   createcurse_data *td = (createcurse_data *) t->data.v;

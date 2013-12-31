@@ -666,13 +666,13 @@ use_tacticcrystal(unit * u, const struct item_type *itype, int amount,
   int i;
   for (i = 0; i != amount; ++i) {
     int duration = 1;           /* wirkt nur eine Runde */
+    curse *c;
+    float effect;
     float power = 5;            /* Widerstand gegen Antimagiesprüche, ist in diesem
                                    Fall egal, da der curse für den Kampf gelten soll,
                                    der vor den Antimagiezaubern passiert */
-    curse *c;
-    double effect;
 
-    effect = rng_int() % 6 - 1;
+    effect = (float)(rng_int() % 6 - 1);
     c = create_curse(u, &u->attribs, ct_find("skillmod"), power,
       duration, effect, u->number);
     c->data.i = SK_TACTICS;

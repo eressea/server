@@ -25,7 +25,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <util/attrib.h>
 #include <util/resolve.h>
-#include <util/storage.h>
+
+#include <storage.h>
 
 static int verify_hate(attrib * a)
 {

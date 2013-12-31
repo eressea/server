@@ -22,7 +22,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-  double version(void);
+  typedef struct gamedata {
+    struct storage *store;
+    int version;
+    int encoding;
+  } gamedata;
 
 #define MAX_INPUT_SIZE	DISPLAYSIZE*2
 /* Nach MAX_INPUT_SIZE brechen wir das Einlesen der Zeile ab und nehmen an,
@@ -30,8 +34,8 @@ extern "C" {
 
   int readorders(const char *filename);
   int creategame(void);
-  extern int readgame(const char *filename, int mode, int backup);
-  int writegame(const char *filename, int mode);
+  extern int readgame(const char *filename, int backup);
+  int writegame(const char *filename);
 
 /* Versionsänderungen: */
   extern int data_version;
@@ -47,8 +51,8 @@ extern "C" {
   extern void read_spellbook(struct spellbook **bookp, struct storage *store, int (*get_level)(const struct spell * sp, void *), void * cbdata);
   extern void write_spellbook(const struct spellbook *book, struct storage *store);
 
-  extern void write_unit(struct storage *store, const struct unit *u);
-  extern struct unit *read_unit(struct storage *store);
+  extern void write_unit(struct gamedata *data, const struct unit *u);
+  extern struct unit *read_unit(struct gamedata *data);
 
   extern int a_readint(struct attrib *a, void *owner, struct storage *store);
   extern void a_writeint(const struct attrib *a, const void *owner,

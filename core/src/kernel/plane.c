@@ -27,8 +27,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/resolve.h>
-#include <util/storage.h>
 #include <util/lists.h>
+
+#include <storage.h>
 
 /* libc includes */
 #include <assert.h>
@@ -292,13 +293,13 @@ int resolve_plane(variant id, void *addr)
 
 void write_plane_reference(const plane * u, struct storage *store)
 {
-  store->w_int(store, u ? (u->id) : 0);
+  WRITE_INT(store, u ? (u->id) : 0);
 }
 
 int read_plane_reference(plane ** pp, struct storage *store)
 {
   variant id;
-  id.i = store->r_int(store);
+  READ_INT(store, &id.i);
   if (id.i == 0) {
     *pp = NULL;
     return AT_READ_FAIL;

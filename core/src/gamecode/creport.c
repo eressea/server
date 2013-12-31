@@ -504,7 +504,36 @@ static unsigned int messagehash(const struct message *msg)
   return (unsigned int)var.i;
 }
 
-extern int fwritestr(FILE * F, const char *str);
+/** writes a quoted string to the file
+* no trailing space, since this is used to make the creport.
+*/
+static int fwritestr(FILE * F, const char *str)
+{
+  int nwrite = 0;
+  fputc('\"', F);
+  if (str)
+  while (*str) {
+    int c = (int)(unsigned char)*str++;
+    switch (c) {
+    case '"':
+    case '\\':
+      fputc('\\', F);
+      fputc(c, F);
+      nwrite += 2;
+      break;
+    case '\n':
+      fputc('\\', F);
+      fputc('n', F);
+      nwrite += 2;
+      break;
+    default:
+      fputc(c, F);
+      ++nwrite;
+    }
+  }
+  fputc('\"', F);
+  return nwrite + 2;
+}
 
 static void render_messages(FILE * F, faction * f, message_list * msgs)
 {

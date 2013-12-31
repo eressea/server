@@ -36,7 +36,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 #include <util/resolve.h>
 #include <util/rng.h>
-#include <util/storage.h>
+
+#include <storage.h>
 
 /* libc includes */
 #include <assert.h>

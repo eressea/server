@@ -43,8 +43,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/rand.h>
 #include <util/resolve.h>
 #include <util/rng.h>
-#include <util/storage.h>
 #include <util/variant.h>
+
+#include <storage.h>
 
 /* libc includes */
 #include <stdio.h>
@@ -159,19 +160,19 @@ static int read_ccompat(const char *cursename, struct storage *store)
       for (p = seek->name; p; ++p) {
         switch (*p) {
           case 'd':
-            store->r_int(store);
+            READ_INT(store, 0);
             break;
           case 's':
-            store->r_str(store);
+            READ_STR(store, 0, 0);
             break;
           case 't':
-            store->r_tok(store);
+            READ_TOK(store, 0, 0);
             break;
           case 'i':
-            store->r_id(store);
+            READ_INT(store, 0);
             break;
           case 'f':
-            store->r_flt(store);
+            READ_FLT(store, 0);
             break;
         }
       }
@@ -186,28 +187,32 @@ int curse_read(attrib * a, void *owner, struct storage *store)
   curse *c = (curse *) a->data.v;
   int ur;
   char cursename[64];
-  unsigned int flags;
+  unsigned int n, flags;
+  float flt;
 
-  c->no = store->r_int(store);
+  READ_INT(store, &c->no);
   chash(c);
-  store->r_tok_buf(store, cursename, sizeof(cursename));
-  flags = store->r_int(store);
-  c->duration = store->r_int(store);
-  if (store->version >= CURSEVIGOURISFLOAT_VERSION) {
-    c->vigour = store->r_flt(store);
+  READ_TOK(store, cursename, sizeof(cursename));
+  READ_INT(store, &flags);
+  READ_INT(store, &c->duration);
+  if (global.data_version >= CURSEVIGOURISFLOAT_VERSION) {
+    READ_FLT(store, &flt);
+    c->vigour = flt;
   } else {
-    int vigour = store->r_int(store);
-    c->vigour = vigour;
+    READ_INT(store, &n);
+    c->vigour = (float)n;
   }
-  if (store->version < INTPAK_VERSION) {
+  if (global.data_version < INTPAK_VERSION) {
     ur = read_reference(&c->magician, store, read_int, resolve_unit);
   } else {
     ur = read_reference(&c->magician, store, read_unit_reference, resolve_unit);
   }
-  if (store->version < CURSEFLOAT_VERSION) {
-    c->effect = (double)store->r_int(store);
+  if (global.data_version < CURSEFLOAT_VERSION) {
+    READ_INT(store, &n);
+    c->effect = (float)n;
   } else {
-    c->effect = store->r_flt(store);
+    READ_FLT(store, &flt);
+    c->effect = flt;
   }
   c->type = ct_find(cursename);
   if (c->type == NULL) {
@@ -218,7 +223,7 @@ int curse_read(attrib * a, void *owner, struct storage *store)
     assert(result == 0);
     return AT_READ_FAIL;
   }
-  if (store->version < CURSEFLAGS_VERSION) {
+  if (global.data_version < CURSEFLAGS_VERSION) {
     c_setflag(c, flags);
   } else {
     c->flags = flags;
@@ -228,12 +233,12 @@ int curse_read(attrib * a, void *owner, struct storage *store)
   if (c->type->read)
     c->type->read(store, c, owner);
   else if (c->type->typ == CURSETYP_UNIT) {
-    c->data.i = store->r_int(store);
+    READ_INT(store, &c->data.i);
   }
   if (c->type->typ == CURSETYP_REGION) {
     int rr =
       read_reference(&c->data.v, store, read_region_reference,
-      RESOLVE_REGION(store->version));
+      RESOLVE_REGION(global.data_version));
     if (ur == 0 && rr == 0 && !c->data.v) {
       return AT_READ_FAIL;
     }
@@ -252,18 +257,18 @@ void curse_write(const attrib * a, const void *owner, struct storage *store)
   /* copied from c_clearflag */
   flags = (c->flags & ~CURSE_ISNEW) | (c->type->flags & CURSE_ISNEW);
 
-  store->w_int(store, c->no);
-  store->w_tok(store, ct->cname);
-  store->w_int(store, flags);
-  store->w_int(store, c->duration);
-  store->w_flt(store, (float)c->vigour);
+  WRITE_INT(store, c->no);
+  WRITE_TOK(store, ct->cname);
+  WRITE_INT(store, flags);
+  WRITE_INT(store, c->duration);
+  WRITE_FLT(store, (float)c->vigour);
   write_unit_reference(mage, store);
-  store->w_flt(store, (float)c->effect);
+  WRITE_FLT(store, (float)c->effect);
 
   if (c->type->write)
     c->type->write(store, c, owner);
   else if (c->type->typ == CURSETYP_UNIT) {
-    store->w_int(store, c->data.i);
+    WRITE_INT(store, c->data.i);
   }
   if (c->type->typ == CURSETYP_REGION) {
     write_region_reference((region *) c->data.v, store);
@@ -393,7 +398,7 @@ void remove_curse(attrib ** ap, const curse * c)
 /* gibt die allgemeine Stärke der Verzauberung zurück. id2 wird wie
  * oben benutzt. Dies ist nicht die Wirkung, sondern die Kraft und
  * damit der gegen Antimagie wirkende Widerstand einer Verzauberung */
-static double get_cursevigour(const curse * c)
+static float get_cursevigour(const curse * c)
 {
   if (c)
     return c->vigour;
@@ -401,7 +406,7 @@ static double get_cursevigour(const curse * c)
 }
 
 /* setzt die Stärke der Verzauberung auf i */
-static void set_cursevigour(curse * c, double vigour)
+static void set_cursevigour(curse * c, float vigour)
 {
   assert(c && vigour > 0);
   c->vigour = vigour;
@@ -411,7 +416,7 @@ static void set_cursevigour(curse * c, double vigour)
  * Stärke zurück. Sollte die Zauberstärke unter Null sinken, löst er
  * sich auf.
  */
-double curse_changevigour(attrib ** ap, curse * c, double vigour)
+float curse_changevigour(attrib ** ap, curse * c, float vigour)
 {
   vigour += get_cursevigour(c);
 
@@ -426,7 +431,7 @@ double curse_changevigour(attrib ** ap, curse * c, double vigour)
 
 /* ------------------------------------------------------------- */
 
-double curse_geteffect(const curse * c)
+float curse_geteffect(const curse * c)
 {
   if (c == NULL)
     return 0;
@@ -437,7 +442,7 @@ double curse_geteffect(const curse * c)
 
 int curse_geteffect_int(const curse * c)
 {
-  double effect = curse_geteffect(c);
+  float effect = curse_geteffect(c);
   if (effect - (int)effect != 0) {
     log_error("curse has an integer attribute with float value: '%s' = %lf",
               c->type->cname, effect);
@@ -491,7 +496,7 @@ static void set_cursedmen(curse * c, int cursedmen)
  * dieses Typs geben, gibt es den bestehenden zurück.
  */
 static curse *make_curse(unit * mage, attrib ** ap, const curse_type * ct,
-  double vigour, int duration, double effect, int men)
+  float vigour, int duration, float effect, int men)
 {
   curse *c;
   attrib *a;
@@ -528,7 +533,7 @@ static curse *make_curse(unit * mage, attrib ** ap, const curse_type * ct,
  * passenden Typ verzweigt und die relevanten Variablen weitergegeben.
  */
 curse *create_curse(unit * magician, attrib ** ap, const curse_type * ct,
-  double vigour, int duration, double effect, int men)
+  float vigour, int duration, float effect, int men)
 {
   curse *c;
 
@@ -784,7 +789,7 @@ message *cinfo_simple(const void *obj, objtype_t typ, const struct curse * c,
 * die Kraft des Curse um die halbe Stärke der Antimagie reduziert.
 * Zurückgegeben wird der noch unverbrauchte Rest von force.
 */
-double destr_curse(curse * c, int cast_level, double force)
+float destr_curse(curse * c, int cast_level, float force)
 {
   if (cast_level < c->vigour) { /* Zauber ist nicht stark genug */
     double probability = 0.1 + (cast_level - c->vigour) * 0.2;
@@ -792,7 +797,7 @@ double destr_curse(curse * c, int cast_level, double force)
     if (chance(probability)) {
       force -= c->vigour;
       if (c->type->change_vigour) {
-        c->type->change_vigour(c, -(cast_level + 1 / 2));
+        c->type->change_vigour(c, -((float)cast_level + 1) / 2);
       } else {
         c->vigour -= cast_level + 1 / 2;
       }

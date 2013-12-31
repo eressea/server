@@ -50,7 +50,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/rand.h>
 #include <util/rng.h>
-#include <util/storage.h>
+
+#include <storage.h>
 
 #include <modules/autoseed.h>
 
@@ -247,15 +248,15 @@ static int a_readdirection(attrib * a, void *owner, struct storage *store)
 {
   spec_direction *d = (spec_direction *) (a->data.v);
 
-  d->x = (short)store->r_int(store);
-  d->y = (short)store->r_int(store);
-  d->duration = store->r_int(store);
-  if (store->version < UNICODE_VERSION) {
+  READ_INT(store, &d->x);
+  READ_INT(store, &d->y);
+  READ_INT(store, &d->duration);
+  if (global.data_version < UNICODE_VERSION) {
     char lbuf[16];
     dir_lookup *dl = dir_name_lookup;
 
-    store->r_tok_buf(store, NULL, 0);
-    store->r_tok_buf(store, lbuf, sizeof(lbuf));
+    READ_TOK(store, NULL, 0);
+    READ_TOK(store, lbuf, sizeof(lbuf));
 
     cstring_i(lbuf);
     for (; dl; dl = dl->next) {
@@ -271,8 +272,11 @@ static int a_readdirection(attrib * a, void *owner, struct storage *store)
       assert(!"not implemented");
     }
   } else {
-    d->desc = store->r_tok(store);
-    d->keyword = store->r_tok(store);
+    char lbuf[32];
+    READ_TOK(store, lbuf, sizeof(lbuf));
+    d->desc = _strdup(lbuf);
+    READ_TOK(store, lbuf, sizeof(lbuf));
+    d->keyword = _strdup(lbuf);
   }
   d->active = true;
   return AT_READ_OK;
@@ -283,11 +287,11 @@ a_writedirection(const attrib * a, const void *owner, struct storage *store)
 {
   spec_direction *d = (spec_direction *) (a->data.v);
 
-  store->w_int(store, d->x);
-  store->w_int(store, d->y);
-  store->w_int(store, d->duration);
-  store->w_tok(store, d->desc);
-  store->w_tok(store, d->keyword);
+  WRITE_INT(store, d->x);
+  WRITE_INT(store, d->y);
+  WRITE_INT(store, d->duration);
+  WRITE_TOK(store, d->desc);
+  WRITE_TOK(store, d->keyword);
 }
 
 attrib_type at_direction = {
@@ -358,7 +362,7 @@ int a_readmoveblock(attrib * a, void *owner, struct storage *store)
   moveblock *m = (moveblock *) (a->data.v);
   int i;
 
-  i = store->r_int(store);
+  READ_INT(store, &i);
   m->dir = (direction_t) i;
   return AT_READ_OK;
 }
@@ -367,7 +371,7 @@ void
 a_writemoveblock(const attrib * a, const void *owner, struct storage *store)
 {
   moveblock *m = (moveblock *) (a->data.v);
-  store->w_int(store, (int)m->dir);
+  WRITE_INT(store, (int)m->dir);
 }
 
 attrib_type at_moveblock = {
@@ -1417,11 +1421,14 @@ int resolve_region_id(variant id, void *address)
 variant read_region_reference(struct storage * store)
 {
   variant result;
-  if (store->version < UIDHASH_VERSION) {
-    result.sa[0] = (short)store->r_int(store);
-    result.sa[1] = (short)store->r_int(store);
+  if (global.data_version < UIDHASH_VERSION) {
+    int n;
+    READ_INT(store, &n);
+    result.sa[0] = (short)n;
+    READ_INT(store, &n);
+    result.sa[1] = (short)n;
   } else {
-    result.i = store->r_int(store);
+    READ_INT(store, &result.i);
   }
   return result;
 }
@@ -1429,9 +1436,9 @@ variant read_region_reference(struct storage * store)
 void write_region_reference(const region * r, struct storage *store)
 {
   if (r) {
-    store->w_int(store, r->uid);
+    WRITE_INT(store, r->uid);
   } else {
-    store->w_int(store, 0);
+    WRITE_INT(store, 0);
   }
 }
 

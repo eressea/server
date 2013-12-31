@@ -37,7 +37,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/base36.h>
 #include <util/log.h>
 #include <util/rand.h>
-#include <util/storage.h>
+
+#include <storage.h>
 
 /* libc includes */
 #include <stdio.h>
@@ -270,8 +271,8 @@ static void
 a_writeeffect(const attrib * a, const void *owner, struct storage *store)
 {
   effect_data *edata = (effect_data *) a->data.v;
-  store->w_tok(store, resourcename(edata->type->itype->rtype, 0));
-  store->w_int(store, edata->value);
+  WRITE_TOK(store, resourcename(edata->type->itype->rtype, 0));
+  WRITE_INT(store, edata->value);
 }
 
 static int a_readeffect(attrib * a, void *owner, struct storage *store)
@@ -281,10 +282,10 @@ static int a_readeffect(attrib * a, void *owner, struct storage *store)
   effect_data *edata = (effect_data *) a->data.v;
   char zText[32];
 
-  store->r_tok_buf(store, zText, sizeof(zText));
+  READ_TOK(store, zText, sizeof(zText));
   itype = it_find(zText);
 
-  power = store->r_int(store);
+  READ_INT(store, &power);
   if (itype == NULL || itype->rtype == NULL || itype->rtype->ptype == NULL
     || power <= 0) {
     return AT_READ_FAIL;

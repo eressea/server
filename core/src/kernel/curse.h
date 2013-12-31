@@ -194,9 +194,9 @@ extern "C" {
     const struct curse_type *type;      /* Zeiger auf ein curse_type-struct */
     unsigned int flags;         /* WARNING: these are XORed with type->flags! */
     int duration;               /* Dauer der Verzauberung. Wird jede Runde vermindert */
-    double vigour;              /* Stärke der Verzauberung, Widerstand gegen Antimagie */
+    float vigour;              /* Stärke der Verzauberung, Widerstand gegen Antimagie */
     struct unit *magician;      /* Pointer auf den Magier, der den Spruch gewirkt hat */
-    double effect;
+    float effect;
     variant data;               /* pointer auf spezielle curse-unterstructs */
   } curse;
 
@@ -211,7 +211,7 @@ extern "C" {
     unsigned int mergeflags;
     struct message *(*curseinfo) (const void *, objtype_t, const struct curse *,
       int);
-    void (*change_vigour) (curse *, double);
+    void(*change_vigour) (curse *, float);
     int (*read) (struct storage * store, curse * c, void *target);
     int (*write) (struct storage * store, const struct curse * c,
       const void *target);
@@ -238,7 +238,7 @@ extern "C" {
 */
 
   curse *create_curse(struct unit *magician, struct attrib **ap,
-    const curse_type * ctype, double vigour, int duration, double ceffect,
+    const curse_type * ctype, float vigour, int duration, float ceffect,
     int men);
   /* Verzweigt automatisch zum passenden struct-typ. Sollte es schon
    * einen Zauber dieses Typs geben, so wird der neue dazuaddiert. Die
@@ -255,15 +255,15 @@ extern "C" {
   /* löscht einen konkreten Spruch auf einem Objekt.
    */
 
-  extern int curse_geteffect_int(const struct curse *c);
-  extern double curse_geteffect(const struct curse *c);
+  int curse_geteffect_int(const struct curse *c);
+  float curse_geteffect(const struct curse *c);
   /* gibt die Auswirkungen der Verzauberungen zurück. zB bei
    * Skillmodifiziernden Verzauberungen ist hier der Modifizierer
    * gespeichert. Wird automatisch beim Anlegen eines neuen curse
    * gesetzt. Gibt immer den ersten Treffer von ap aus zurück.
    */
 
-  extern double curse_changevigour(struct attrib **ap, curse * c, double i);
+  float curse_changevigour(struct attrib **ap, curse * c, float i);
   /* verändert die Stärke der Verzauberung um i */
 
   extern int get_cursedmen(struct unit *u, const struct curse *c);
@@ -306,7 +306,7 @@ extern "C" {
   extern bool cmp_curse(const struct attrib *a, const void *data);
   extern bool cmp_cursetype(const struct attrib *a, const void *data);
 
-  extern double destr_curse(struct curse *c, int cast_level, double force);
+  extern float destr_curse(struct curse *c, int cast_level, float force);
 
   extern int resolve_curse(variant data, void *address);
   extern bool is_cursed_with(const struct attrib *ap, const struct curse *c);

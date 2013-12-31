@@ -280,7 +280,7 @@ int a_read(struct storage *store, attrib ** attribs, void *owner)
   
   zText[0] = 0;
   key = -1;
-  store->r_tok_buf(store, zText, sizeof(zText));
+  READ_TOK(store, zText, sizeof(zText));
   if (strcmp(zText, "end") == 0)
     return retval;
   else
@@ -324,7 +324,7 @@ int a_read(struct storage *store, attrib ** attribs, void *owner)
       assert(!"fehler: keine laderoutine für attribut");
     }
 
-    store->r_tok_buf(store, zText, sizeof(zText));
+    READ_TOK(store, zText, sizeof(zText));
     if (!strcmp(zText, "end"))
       break;
     key = __at_hashkey(zText);
@@ -339,12 +339,12 @@ void a_write(struct storage *store, const attrib * attribs, const void *owner)
   while (na) {
     if (na->type->write) {
       assert(na->type->hashkey || !"attribute not registered");
-      store->w_tok(store, na->type->name);
+      WRITE_TOK(store, na->type->name);
       na->type->write(na, owner, store);
       na = na->next;
     } else {
       na = na->nexttype;
     }
   }
-  store->w_tok(store, "end");
+  WRITE_TOK(store, "end");
 }

@@ -32,7 +32,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/resolve.h>
-#include <util/storage.h>
+
+#include <storage.h>
 
 /* stdc includes */
 #include <string.h>
@@ -58,17 +59,17 @@ object_write(const attrib * a, const void *owner, struct storage *store)
 {
   const object_data *data = (object_data *) a->data.v;
   int type = (int)data->type;
-  store->w_tok(store, data->name);
-  store->w_int(store, type);
+  WRITE_TOK(store, data->name);
+  WRITE_INT(store, type);
   switch (data->type) {
     case TINTEGER:
-      store->w_int(store, data->data.i);
+      WRITE_INT(store, data->data.i);
       break;
     case TREAL:
-      store->w_flt(store, (float)data->data.real);
+      WRITE_FLT(store, (float)data->data.real);
       break;
     case TSTRING:
-      store->w_str(store, data->data.str);
+      WRITE_STR(store, data->data.str);
       break;
     case TUNIT:
       write_unit_reference(data->data.u, store);
@@ -95,20 +96,26 @@ object_write(const attrib * a, const void *owner, struct storage *store)
 
 static int object_read(attrib * a, void *owner, struct storage *store)
 {
+  char name[NAMESIZE];
   object_data *data = (object_data *) a->data.v;
-  int result;
+  int result, n;
+  float flt;
 
-  data->name = store->r_str(store);
-  data->type = (object_type) store->r_int(store);
+  READ_STR(store, name, sizeof(name));
+  data->name = _strdup(name);
+  READ_INT(store, &n);
+  data->type = (object_type)n;
   switch (data->type) {
     case TINTEGER:
-      data->data.i = store->r_int(store);
+      READ_INT(store, &data->data.i);
       break;
     case TREAL:
-      data->data.real = store->r_flt(store);
+      READ_FLT(store, &flt);
+      data->data.real = flt;
       break;
     case TSTRING:
-      data->data.str = store->r_str(store);
+      READ_STR(store, name, sizeof(name));
+      data->data.str = _strdup(name);
       break;
     case TBUILDING:
       result =
@@ -136,7 +143,7 @@ static int object_read(attrib * a, void *owner, struct storage *store)
     case TREGION:
       result =
         read_reference(&data->data.r, store, read_region_reference,
-        RESOLVE_REGION(store->version));
+        RESOLVE_REGION(global.data_version));
       if (result == 0 && !data->data.r) {
         return AT_READ_FAIL;
       }

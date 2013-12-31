@@ -42,7 +42,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/base36.h>
 #include <util/functions.h>
 #include <util/goodies.h>
-#include <util/storage.h>
+
+#include <storage.h>
 
 /* libc includes */
 #include <limits.h>
@@ -70,16 +71,16 @@ a_writemuseumgivebackcookie(const attrib * a, const void *owner,
   struct storage *store)
 {
   museumgivebackcookie *gbc = (museumgivebackcookie *) a->data.v;
-  store->w_int(store, gbc->warden_no);
-  store->w_int(store, gbc->cookie);
+  WRITE_INT(store, gbc->warden_no);
+  WRITE_INT(store, gbc->cookie);
 }
 
 static int
 a_readmuseumgivebackcookie(attrib * a, void *owner, struct storage *store)
 {
   museumgivebackcookie *gbc = (museumgivebackcookie *) a->data.v;
-  gbc->warden_no = store->r_int(store);
-  gbc->cookie = store->r_int(store);
+  READ_INT(store, &gbc->warden_no);
+  READ_INT(store, &gbc->cookie);
   return AT_READ_OK;
 }
 
@@ -113,14 +114,14 @@ a_writemuseumgiveback(const attrib * a, const void *owner,
   struct storage *store)
 {
   museumgiveback *gb = (museumgiveback *) a->data.v;
-  store->w_int(store, gb->cookie);
+  WRITE_INT(store, gb->cookie);
   write_items(store, gb->items);
 }
 
 static int a_readmuseumgiveback(attrib * a, void *owner, struct storage *store)
 {
   museumgiveback *gb = (museumgiveback *) a->data.v;
-  gb->cookie = store->r_int(store);
+  READ_INT(store, &gb->cookie);
   read_items(store, &gb->items);
   return AT_READ_OK;
 }

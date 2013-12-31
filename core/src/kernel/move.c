@@ -54,7 +54,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/rng.h>
-#include <util/storage.h>
+
+#include <storage.h>
 
 /* attributes includes */
 #include <attributes/follow.h>
@@ -132,11 +133,13 @@ static int shiptrail_age(attrib * a)
 
 static int shiptrail_read(attrib * a, void *owner, struct storage *store)
 {
+  int n;
   traveldir *t = (traveldir *) (a->data.v);
 
-  t->no = store->r_int(store);
-  t->dir = (direction_t) store->r_int(store);
-  t->age = store->r_int(store);
+  READ_INT(store, &t->no);
+  READ_INT(store, &n);
+  t->dir = (direction_t)n;
+  READ_INT(store, &t->age);
   return AT_READ_OK;
 }
 
@@ -144,9 +147,9 @@ static void
 shiptrail_write(const attrib * a, const void *owner, struct storage *store)
 {
   traveldir *t = (traveldir *) (a->data.v);
-  store->w_int(store, t->no);
-  store->w_int(store, t->dir);
-  store->w_int(store, t->age);
+  WRITE_INT(store, t->no);
+  WRITE_INT(store, t->dir);
+  WRITE_INT(store, t->age);
 }
 
 attrib_type at_shiptrail = {

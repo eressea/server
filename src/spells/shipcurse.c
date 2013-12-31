@@ -28,7 +28,8 @@
 #include <util/functions.h>
 #include <util/language.h>
 #include <util/log.h>
-#include <util/storage.h>
+
+#include <storage.h>
 
 /* libc includes */
 #include <string.h>
@@ -80,7 +81,7 @@ static int flyingship_read(storage * store, curse * c, void *target)
 {
   ship *sh = (ship *) target;
   c->data.v = sh;
-  if (store->version < FOSS_VERSION) {
+  if (global.data_version < FOSS_VERSION) {
     sh->flags |= SF_FLYING;
     return 0;
   }
@@ -119,7 +120,7 @@ static struct curse_type ct_shipspeedup = { "shipspeedup",
   CURSETYP_NORM, 0, 0, cinfo_ship
 };
 
-curse *shipcurse_flyingship(ship * sh, unit * mage, double power, int duration)
+curse *shipcurse_flyingship(ship * sh, unit * mage, float power, int duration)
 {
   static const curse_type *ct_flyingship = NULL;
   if (!ct_flyingship) {
@@ -142,7 +143,7 @@ curse *shipcurse_flyingship(ship * sh, unit * mage, double power, int duration)
   }
 }
 
-int levitate_ship(ship * sh, unit * mage, double power, int duration)
+int levitate_ship(ship * sh, unit * mage, float power, int duration)
 {
   curse *c = shipcurse_flyingship(sh, mage, power, duration);
   if (c) {

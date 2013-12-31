@@ -22,7 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-  struct storage;
+  struct gamedata;
   typedef void (*afun) (void);
 
   typedef struct attrib {
@@ -52,8 +52,8 @@ extern "C" {
     void (*finalize) (struct attrib *);
     int (*age) (struct attrib *);
     /* age returns 0 if the attribute needs to be removed, !=0 otherwise */
-    void (*write) (const struct attrib *, const void *owner, struct storage *);
-    int (*read) (struct attrib *, void *owner, struct storage *);       /* return AT_READ_OK on success, AT_READ_FAIL if attrib needs removal */
+    void(*write) (const struct attrib *, const void *owner, struct storage *);
+    int(*read) (struct attrib *, void *owner, struct storage *);       /* return AT_READ_OK on success, AT_READ_FAIL if attrib needs removal */
     unsigned int flags;
     /* ---- internal data, do not modify: ---- */
     struct attrib_type *nexthash;

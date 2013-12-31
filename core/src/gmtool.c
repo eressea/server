@@ -59,10 +59,10 @@
 #include <util/base36.h>
 #include <util/console.h>
 #include <util/listbox.h>
-#include <util/storage.h>
 
 #include <libxml/encoding.h>
 
+#include <storage.h>
 #include <lua.h>
 
 #include <assert.h>
@@ -807,7 +807,7 @@ static void handlekey(state * st, int c)
       if (strlen(datafile) > 0) {
         create_backup(datafile);
         remove_empty_units();
-        writegame(datafile, IO_DEFAULT);
+        writegame(datafile);
         st->modified = 0;
       }
     }

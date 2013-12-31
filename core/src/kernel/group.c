@@ -34,8 +34,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/resolve.h>
-#include <util/storage.h>
 #include <util/unicode.h>
+
+#include <storage.h>
 
 /* libc includes */
 #include <assert.h>
@@ -98,7 +99,9 @@ static group *find_group(int gid)
 static int read_group(attrib * a, void *owner, struct storage *store)
 {
   group *g;
-  int gid = store->r_int(store);
+  int gid;
+
+  READ_INT(store, &gid);
   a->data.v = g = find_group(gid);
   if (g != 0) {
     g->members++;
@@ -111,7 +114,7 @@ static void
 write_group(const attrib * a, const void *owner, struct storage *store)
 {
   group *g = (group *) a->data.v;
-  store->w_int(store, g->gid);
+  WRITE_INT(store, g->gid);
 }
 
 attrib_type at_group = {        /* attribute for units assigned to a group */
@@ -196,20 +199,20 @@ void write_groups(struct storage *store, group * g)
 {
   while (g) {
     ally *a;
-    store->w_int(store, g->gid);
-    store->w_str(store, g->name);
+    WRITE_INT(store, g->gid);
+    WRITE_STR(store, g->name);
     for (a = g->allies; a; a = a->next) {
       if (a->faction) {
         write_faction_reference(a->faction, store);
-        store->w_int(store, a->status);
+        WRITE_INT(store, a->status);
       }
     }
-    store->w_id(store, 0);
+    WRITE_INT(store, 0);
     a_write(store, g->attribs, g);
-    store->w_brk(store);
+    WRITE_SECTION(store);
     g = g->next;
   }
-  store->w_int(store, 0);
+  WRITE_INT(store, 0);
 }
 
 void read_groups(struct storage *store, faction * f)
@@ -220,24 +223,24 @@ void read_groups(struct storage *store, faction * f)
     int gid;
     char buf[1024];
 
-    gid = store->r_int(store);
+    READ_INT(store, &gid);
     if (gid == 0)
       break;
-    store->r_str_buf(store, buf, sizeof(buf));
+    READ_STR(store, buf, sizeof(buf));
     g = new_group(f, buf, gid);
     pa = &g->allies;
     for (;;) {
       ally *a;
       variant fid;
-      fid.i = store->r_id(store);
+      READ_INT(store, &fid.i);
       if (fid.i <= 0)
         break;
-      if (store->version < STORAGE_VERSION && fid.i == 0)
+      if (global.data_version < STORAGE_VERSION && fid.i == 0)
         break;
       a = malloc(sizeof(ally));
       *pa = a;
       pa = &a->next;
-      a->status = store->r_int(store);
+      READ_INT(store, &a->status);
 
       a->faction = findfaction(fid.i);
       if (!a->faction)

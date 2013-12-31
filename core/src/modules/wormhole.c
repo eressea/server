@@ -31,7 +31,8 @@
 #include <util/resolve.h>
 #include <util/rng.h>
 #include <quicklist.h>
-#include <util/storage.h>
+
+#include <storage.h>
 
 /* libc includes */
 #include <assert.h>
@@ -125,11 +126,10 @@ static int resolve_exit(variant id, void *address)
 static int wormhole_read(struct attrib *a, void *owner, struct storage *store)
 {
   wormhole_data *data = (wormhole_data *) a->data.v;
-  resolve_fun resolver =
-    (store->version < UIDHASH_VERSION) ? resolve_exit : resolve_region_id;
-  read_fun reader =
-    (store->version <
-    UIDHASH_VERSION) ? read_building_reference : read_region_reference;
+  resolve_fun resolver = (global.data_version < UIDHASH_VERSION)
+    ? resolve_exit : resolve_region_id;
+  read_fun reader = (global.data_version < UIDHASH_VERSION) 
+    ? read_building_reference : read_region_reference;
 
   int rb =
     read_reference(&data->entry, store, read_building_reference,

@@ -13,6 +13,7 @@ set (BINDINGS_LIBRARY ${PROJECT_NAME} CACHE INTERNAL "Eressea Lua Bindings")
 find_package (Lua 5 REQUIRED)
 find_package (ToLua REQUIRED)
 
+include_directories (${STORAGE_INCLUDE_DIR})
 include_directories (${TOLUA_INCLUDE_DIR})
 
 FILE (GLOB_RECURSE BINDINGS_HDR *.h)

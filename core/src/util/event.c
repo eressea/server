@@ -34,12 +34,12 @@ void write_triggers(struct storage *store, const trigger * t)
 {
   while (t) {
     if (t->type->write) {
-      store->w_tok(store, t->type->name);
+      WRITE_TOK(store, t->type->name);
       t->type->write(t, store);
     }
     t = t->next;
   }
-  store->w_tok(store, "end");
+  WRITE_TOK(store, "end");
 }
 
 int read_triggers(struct storage *store, trigger ** tp)
@@ -48,7 +48,7 @@ int read_triggers(struct storage *store, trigger ** tp)
     trigger_type *ttype;
     char zText[128];
 
-    store->r_tok_buf(store, zText, sizeof(zText));
+    READ_TOK(store, zText, sizeof(zText));
     if (!strcmp(zText, "end"))
       break;
     ttype = tt_find(zText);
@@ -137,7 +137,7 @@ static void
 write_handler(const attrib * a, const void *owner, struct storage *store)
 {
   handler_info *hi = (handler_info *) a->data.v;
-  store->w_tok(store, hi->event);
+  WRITE_TOK(store, hi->event);
   write_triggers(store, hi->triggers);
 }
 
@@ -146,7 +146,7 @@ static int read_handler(attrib * a, void *owner, struct storage *store)
   char zText[128];
   handler_info *hi = (handler_info *) a->data.v;
 
-  store->r_tok_buf(store, zText, sizeof(zText));
+  READ_TOK(store, zText, sizeof(zText));
   hi->event = _strdup(zText);
   read_triggers(store, &hi->triggers);
   if (hi->triggers != NULL) {

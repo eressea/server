@@ -28,8 +28,9 @@
 #include <util/base36.h>
 #include <util/event.h>
 #include <util/goodies.h>
-#include <util/storage.h>
 #include <util/resolve.h>
+
+#include <storage.h>
 
 /* libc includes */
 #include <stdlib.h>
@@ -42,7 +43,7 @@ static int xmasgate_handle(trigger * t, void *data)
 static void xmasgate_write(const trigger * t, struct storage *store)
 {
   building *b = (building *) t->data.v;
-  store->w_tok(store, itoa36(b->no));
+  WRITE_TOK(store, itoa36(b->no));
 }
 
 static int xmasgate_read(trigger * t, struct storage *store)

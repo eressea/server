@@ -21,7 +21,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "moved.h"
 
 #include <util/attrib.h>
-#include <util/storage.h>
+
+#include <storage.h>
 
 static int age_moved(attrib * a)
 {
@@ -32,12 +33,12 @@ static int age_moved(attrib * a)
 static void
 write_moved(const attrib * a, const void *owner, struct storage *store)
 {
-  store->w_int(store, a->data.i);
+  WRITE_INT(store, a->data.i);
 }
 
 static int read_moved(attrib * a, void *owner, struct storage *store)
 {
-  a->data.i = store->r_int(store);
+  READ_INT(store, &a->data.i);
   if (a->data.i != 0)
     return AT_READ_OK;
   else

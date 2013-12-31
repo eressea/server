@@ -32,7 +32,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 #include <quicklist.h>
 #include <util/rng.h>
-#include <util/storage.h>
+
+#include <storage.h>
 
 /* libc includes */
 #include <assert.h>
@@ -189,15 +190,17 @@ border_type *find_bordertype(const char *name)
 
 void b_read(connection * b, storage * store)
 {
-  int result = 0;
+  int n, result = 0;
   switch (b->type->datatype) {
     case VAR_NONE:
     case VAR_INT:
-      b->data.i = store->r_int(store);
+      READ_INT(store, &b->data.i);
       break;
     case VAR_SHORTA:
-      b->data.sa[0] = (short)store->r_int(store);
-      b->data.sa[1] = (short)store->r_int(store);
+      READ_INT(store, &n);
+      b->data.sa[0] = (short)n;
+      READ_INT(store, &n);
+      b->data.sa[1] = (short)n;
       break;
     case VAR_VOIDPTR:
     default:
@@ -212,11 +215,11 @@ void b_write(const connection * b, storage * store)
   switch (b->type->datatype) {
     case VAR_NONE:
     case VAR_INT:
-      store->w_int(store, b->data.i);
+      WRITE_INT(store, b->data.i);
       break;
     case VAR_SHORTA:
-      store->w_int(store, b->data.sa[0]);
-      store->w_int(store, b->data.sa[1]);
+      WRITE_INT(store, b->data.sa[0]);
+      WRITE_INT(store, b->data.sa[1]);
       break;
     case VAR_VOIDPTR:
     default:
@@ -548,21 +551,22 @@ static const char *b_nameroad(const connection * b, const region * r,
 
 static void b_readroad(connection * b, storage * store)
 {
-  b->data.sa[0] = (short)store->r_int(store);
-  b->data.sa[1] = (short)store->r_int(store);
+  int n;
+  READ_INT(store, &n);
+  b->data.sa[0] = (short)n;
+  READ_INT(store, &n);
+  b->data.sa[1] = (short)n;
 }
 
 static void b_writeroad(const connection * b, storage * store)
 {
-  store->w_int(store, b->data.sa[0]);
-  store->w_int(store, b->data.sa[1]);
+  WRITE_INT(store, b->data.sa[0]);
+  WRITE_INT(store, b->data.sa[1]);
 }
 
 static bool b_validroad(const connection * b)
 {
-  if (b->data.sa[0] == SHRT_MAX)
-    return false;
-  return true;
+  return (b->data.sa[0] != SHRT_MAX);
 }
 
 static bool b_rvisibleroad(const connection * b, const region * r)
@@ -603,18 +607,18 @@ void write_borders(struct storage *store)
       for (b = bhash; b != NULL; b = b->next) {
         if (b->type->valid && !b->type->valid(b))
           continue;
-        store->w_tok(store, b->type->__name);
-        store->w_int(store, b->id);
-        store->w_int(store, b->from->uid);
-        store->w_int(store, b->to->uid);
+        WRITE_TOK(store, b->type->__name);
+        WRITE_INT(store, b->id);
+        WRITE_INT(store, b->from->uid);
+        WRITE_INT(store, b->to->uid);
 
         if (b->type->write)
           b->type->write(b, store);
-        store->w_brk(store);
+        WRITE_SECTION(store);
       }
     }
   }
-  store->w_tok(store, "end");
+  WRITE_TOK(store, "end");
 }
 
 int read_borders(struct storage *store)
@@ -626,21 +630,22 @@ int read_borders(struct storage *store)
     region *from, *to;
     border_type *type;
 
-    store->r_tok_buf(store, zText, sizeof(zText));
+    READ_TOK(store, zText, sizeof(zText));
     if (!strcmp(zText, "end"))
       break;
-    bid = store->r_int(store);
-    if (store->version < UIDHASH_VERSION) {
-      short fx, fy, tx, ty;
-      fx = (short)store->r_int(store);
-      fy = (short)store->r_int(store);
-      tx = (short)store->r_int(store);
-      ty = (short)store->r_int(store);
+    READ_INT(store, &bid);
+    if (global.data_version < UIDHASH_VERSION) {
+      int fx, fy, tx, ty;
+      READ_INT(store, &fx);
+      READ_INT(store, &fy);
+      READ_INT(store, &tx);
+      READ_INT(store, &ty);
       from = findregion(fx, fy);
       to = findregion(tx, ty);
     } else {
-      unsigned int fid = (unsigned int)store->r_int(store);
-      unsigned int tid = (unsigned int)store->r_int(store);
+      unsigned int fid, tid;
+      READ_INT(store, &fid);
+      READ_INT(store, &tid);
       from = findregionbyid(fid);
       to = findregionbyid(tid);
     }
@@ -664,7 +669,7 @@ int read_borders(struct storage *store)
     assert(bid <= nextborder);
     if (type->read)
       type->read(b, store);
-    if (store->version < NOBORDERATTRIBS_VERSION) {
+    if (global.data_version < NOBORDERATTRIBS_VERSION) {
       attrib *a = NULL;
       int result = a_read(store, &a, b);
       if (border_convert_cb)

@@ -904,11 +904,11 @@ int sp_strong_wall(struct castorder * co)
 {
   fighter * fi = co->magician.fig;
   int level = co->level;
-  double power = co->force;
+  float power = co->force;
   battle *b = fi->side->battle;
   unit *mage = fi->unit;
   building *burg;
-  double effect;
+  float effect;
   static bool init = false;
   message *msg;
   static const curse_type *strongwall_ct;
@@ -922,7 +922,7 @@ int sp_strong_wall(struct castorder * co)
   }
   burg = mage->building;
 
-  effect = power * 0.25;
+  effect = power / 4;
   create_curse(mage, &burg->attribs, strongwall_ct, power, 1, effect, 0);
 
   msg =

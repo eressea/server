@@ -1734,7 +1734,7 @@ int init_reports(void)
       return 0;
   }
 #endif
-  if (os_mkdir(reportpath(), 0700) != 0) {
+  if (_mkdir(reportpath()) != 0) {
     if (errno != EEXIST) {
       perror("could not create reportpath");
       return -1;

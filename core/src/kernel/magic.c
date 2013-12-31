@@ -61,10 +61,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/resolve.h>
 #include <util/rand.h>
 #include <util/rng.h>
-#include <util/storage.h>
 #include <util/umlaut.h>
 #include <util/base36.h>
 #include <util/event.h>
+
+#include <storage.h>
 
 /* libc includes */
 #include <assert.h>
@@ -104,22 +105,22 @@ attrib_type at_reportspell = {
  ** TODO: separate castle-appearance from illusion-effects
  **/
 
-static double MagicRegeneration(void)
+static float MagicRegeneration(void)
 {
-  static double value = -1.0;
+  static float value = -1.0;
   if (value < 0) {
     const char *str = get_param(global.parameters, "magic.regeneration");
-    value = str ? atof(str) : 1.0;
+    value = str ? (float)atof(str) : 1.0F;
   }
   return value;
 }
 
-double MagicPower(void)
+float MagicPower(void)
 {
-  static double value = -1.0;
+  static float value = -1.0;
   if (value < 0) {
     const char *str = get_param(global.parameters, "magic.power");
-    value = str ? atof(str) : 1.0;
+    value = str ? (float)atof(str) : 1.0f;
   }
   return value;
 }
@@ -129,9 +130,9 @@ static int a_readicastle(attrib * a, void *owner, struct storage *store)
   icastle_data *data = (icastle_data *) a->data.v;
   variant bno;
   char token[32];
-  store->r_tok_buf(store, token, sizeof(token));
-  bno.i = store->r_int(store);
-  data->time = store->r_int(store);
+  READ_TOK(store, token, sizeof(token));
+  READ_INT(store, &bno.i);
+  READ_INT(store, &data->time);
   data->building = findbuilding(bno.i);
   if (!data->building) {
     /* this shouldn't happen, but just in case it does: */
@@ -145,9 +146,9 @@ static void
 a_writeicastle(const attrib * a, const void *owner, struct storage *store)
 {
   icastle_data *data = (icastle_data *) a->data.v;
-  store->w_tok(store, data->type->_name);
-  store->w_int(store, data->building->no);
-  store->w_int(store, data->time);
+  WRITE_TOK(store, data->type->_name);
+  WRITE_INT(store, data->building->no);
+  WRITE_INT(store, data->time);
 }
 
 static int a_ageicastle(struct attrib *a)
@@ -225,13 +226,14 @@ void read_spells(struct quicklist **slistp, magic_t mtype,
     spell *sp;
     char spname[64];
 
-    if (store->version < SPELLNAME_VERSION) {
-      int i = store->r_int(store);
+    if (global.data_version < SPELLNAME_VERSION) {
+      int i;
+      READ_INT(store, &i);
       if (i < 0)
         break;
       sp = find_spellbyid((unsigned int) i);
     } else {
-      store->r_tok_buf(store, spname, sizeof(spname));
+      READ_TOK(store, spname, sizeof(spname));
       if (strcmp(spname, "end") == 0)
         break;
       sp = find_spell(spname);
@@ -259,23 +261,23 @@ static int read_mage(attrib * a, void *owner, struct storage *store)
   sc_mage *mage = (sc_mage *) a->data.v;
   char spname[64];
 
-  mtype = store->r_int(store);
-  mage->spellpoints = store->r_int(store);
-  mage->spchange = store->r_int(store);
-  mage->magietyp = (magic_t) mtype;
+  READ_INT(store, &mtype);
+  mage->magietyp = (magic_t)mtype;
+  READ_INT(store, &mage->spellpoints);
+  READ_INT(store, &mage->spchange);
   for (i = 0; i != MAXCOMBATSPELLS; ++i) {
     spell *sp = NULL;
     int level = 0;
-    if (store->version < SPELLNAME_VERSION) {
+    if (global.data_version < SPELLNAME_VERSION) {
       int spid;
-      spid = store->r_int(store);
-      level = store->r_int(store);
+      READ_INT(store, &spid);
+      READ_INT(store, &level);
       if (spid >= 0) {
         sp = find_spellbyid((unsigned int) spid);
       }
     } else {
-      store->r_tok_buf(store, spname, sizeof(spname));
-      level = store->r_int(store);
+      READ_TOK(store, spname, sizeof(spname));
+      READ_INT(store, &level);
 
       if (strcmp("none", spname) != 0) {
         sp = find_spell(spname);
@@ -313,9 +315,9 @@ void write_spells(struct quicklist *slist, struct storage *store)
 
   for (ql = slist, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
     spell *sp = (spell *) ql_get(ql, qi);
-    store->w_tok(store, sp->sname);
+    WRITE_TOK(store, sp->sname);
   }
-  store->w_tok(store, "end");
+  WRITE_TOK(store, "end");
 }
 
 static void
@@ -324,13 +326,13 @@ write_mage(const attrib * a, const void *owner, struct storage *store)
   int i;
   sc_mage *mage = (sc_mage *) a->data.v;
 
-  store->w_int(store, mage->magietyp);
-  store->w_int(store, mage->spellpoints);
-  store->w_int(store, mage->spchange);
+  WRITE_INT(store, mage->magietyp);
+  WRITE_INT(store, mage->spellpoints);
+  WRITE_INT(store, mage->spchange);
   for (i = 0; i != MAXCOMBATSPELLS; ++i) {
-    store->w_tok(store,
+    WRITE_TOK(store,
       mage->combatspells[i].sp ? mage->combatspells[i].sp->sname : "none");
-    store->w_int(store, mage->combatspells[i].level);
+    WRITE_INT(store, mage->combatspells[i].level);
   }
   write_spellbook(mage->spellbook, store);
 }
@@ -374,13 +376,13 @@ static int read_seenspell(attrib * a, void *owner, struct storage *store)
   spell *sp = 0;
   char token[32];
 
-  store->r_tok_buf(store, token, sizeof(token));
+  READ_TOK(store, token, sizeof(token));
   i = atoi(token);
   if (i != 0) {
     sp = find_spellbyid((unsigned int) i);
   } else {
-    if (store->version<UNIQUE_SPELLS_VERSION) {
-      store->r_int(store); /* ignore mtype */
+    if (global.data_version<UNIQUE_SPELLS_VERSION) {
+      READ_INT(store, 0); /* ignore mtype */
     }
     sp = find_spell(token);
     if (!sp) {
@@ -398,7 +400,7 @@ static void
 write_seenspell(const attrib * a, const void *owner, struct storage *store)
 {
   const spell *sp = (const spell *)a->data.v;
-  store->w_tok(store, sp->sname);
+  WRITE_TOK(store, sp->sname);
 }
 
 attrib_type at_seenspell = {
@@ -1002,12 +1004,12 @@ cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
  * Spruchfunktionsroutine ermittelt.
  */
 
-double
+float
 spellpower(region * r, unit * u, const spell * sp, int cast_level,
   struct order *ord)
 {
   curse *c;
-  double force = cast_level;
+  float force = (float)cast_level;
   int elf_power = -1;
 
   if (sp == NULL) {
@@ -1333,7 +1335,7 @@ static void do_fumble(castorder * co)
   const spell *sp = co->sp;
   int level = co->level;
   int duration;
-  double effect;
+  float effect;
 
   ADDMSG(&u->faction->msgs, msg_message("patzer", "unit region spell",
       u, r, sp));
@@ -1377,7 +1379,7 @@ static void do_fumble(castorder * co)
   case 2:
     /* temporärer Stufenverlust */
     duration = MAX(rng_int() % level / 2, 2);
-    effect = -0.5 * level;
+    effect = -(float)level/2;
     c =
       create_curse(u, &u->attribs, ct_find("skillmod"), (float)level,
       duration, effect, 1);
@@ -2057,7 +2059,7 @@ struct region * co_get_region(struct castorder * co) {
 }
 
 castorder *create_castorder(castorder * co, unit *caster, unit * familiar, const spell * sp, region * r,
-  int lev, double force, int range, struct order * ord, spellparameter * p)
+  int lev, float force, int range, struct order * ord, spellparameter * p)
 {
   if (!co) co = (castorder*)calloc(1, sizeof(castorder));
 

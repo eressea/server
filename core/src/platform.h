@@ -43,7 +43,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 # define _CRT_SECURE_NO_DEPRECATE
 #endif
 
-/* http://msdn2.microsoft.com/en-us/library/ms235505(VS.80).aspx */
+/*
+ * http://msdn2.microsoft.com/en-us/library/ms235505(VS.80).aspx
+ * Defining _CRT_DISABLE_PERFCRIT_LOCKS forces all I/O operations to assume a 
+ * single-threaded I/O model and use the _nolock forms of the functions. 
+ */
 #ifndef _CRT_DISABLE_PERFCRIT_LOCKS
 # define _CRT_DISABLE_PERFCRIT_LOCKS
 #endif
@@ -152,6 +156,7 @@ typedef struct stat stat_type;
 
 /* Microsoft Visual C */
 #ifdef _MSC_VER
+# include <direct.h>
 # include <string.h>            /* must be included here so strdup is not redefined */
 # define R_OK 4
 # define HAVE_INLINE

@@ -59,7 +59,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 #include <util/resolve.h>
 #include <util/rng.h>
-#include <util/storage.h>
+
+#include <storage.h>
 
 /* libc include */
 #include <assert.h>
@@ -238,13 +239,13 @@ static void
 write_hurting(const attrib * a, const void *owner, struct storage *store)
 {
   building *b = a->data.v;
-  store->w_int(store, b->no);
+  WRITE_INT(store, b->no);
 }
 
 static int read_hurting(attrib * a, void *owner, struct storage *store)
 {
   int i;
-  i = store->r_int(store);
+  READ_INT(store, &i);
   a->data.v = (void *)findbuilding(i);
   if (a->data.v == NULL) {
     log_error("temple of pain is broken\n");

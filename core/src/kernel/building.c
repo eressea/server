@@ -42,8 +42,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 #include <quicklist.h>
 #include <util/resolve.h>
-#include <util/storage.h>
 #include <util/umlaut.h>
+
+#include <storage.h>
 
 /* libc includes */
 #include <assert.h>
@@ -80,33 +81,34 @@ lc_write(const struct attrib *a, const void *owner, struct storage *store)
   building *b = data->b;
 
   write_building_reference(b, store);
-  store->w_tok(store, fname);
-  store->w_tok(store, fparam ? fparam : NULLSTRING);
+  WRITE_TOK(store, fname);
+  WRITE_TOK(store, fparam ? fparam : NULLSTRING);
 }
 
 static int lc_read(struct attrib *a, void *owner, struct storage *store)
 {
+  char name[NAMESIZE];
   building_action *data = (building_action *) a->data.v;
   int result =
     read_reference(&data->b, store, read_building_reference, resolve_building);
-  if (store->version < UNICODE_VERSION) {
-    data->fname = store->r_str(store);
+  if (global.data_version < UNICODE_VERSION) {
+    READ_STR(store, name, sizeof(name));
   } else {
-    data->fname = store->r_tok(store);
+    READ_TOK(store, name, sizeof(name));
   }
-  if (store->version >= BACTION_VERSION) {
-    char lbuf[256];
-    if (store->version < UNICODE_VERSION) {
-      store->r_str_buf(store, lbuf, sizeof(lbuf));
+  data->fname = _strdup(name);
+  if (global.data_version >= BACTION_VERSION) {
+    if (global.data_version < UNICODE_VERSION) {
+      READ_STR(store, name, sizeof(name));
     } else {
-      store->r_tok_buf(store, lbuf, sizeof(lbuf));
+      READ_TOK(store, name, sizeof(name));
     }
-    if (strcmp(lbuf, NULLSTRING) == 0)
-      data->param = NULL;
+    if (strcmp(name, NULLSTRING) == 0)
+      data->param = 0;
     else
-      data->param = _strdup(lbuf);
+      data->param = _strdup(name);
   } else {
-    data->param = _strdup(NULLSTRING);
+    data->param = 0;
   }
   if (result == 0 && !data->b) {
     return AT_READ_FAIL;
@@ -422,7 +424,7 @@ void register_buildings(void)
 
 void write_building_reference(const struct building *b, struct storage *store)
 {
-  store->w_id(store, (b && b->region) ? b->no : 0);
+  WRITE_INT(store, (b && b->region) ? b->no : 0);
 }
 
 int resolve_building(variant id, void *address)
@@ -442,7 +444,7 @@ int resolve_building(variant id, void *address)
 variant read_building_reference(struct storage * store)
 {
   variant result;
-  result.i = store->r_id(store);
+  READ_INT(store, &result.i);
   return result;
 }
 

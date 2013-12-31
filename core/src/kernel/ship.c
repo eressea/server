@@ -37,8 +37,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/lists.h>
 #include <util/umlaut.h>
 #include <quicklist.h>
-#include <util/storage.h>
 #include <util/xml.h>
+
+#include <storage.h>
 
 /* libc includes */
 #include <assert.h>
@@ -330,7 +331,7 @@ unit *ship_owner(const ship * sh)
 
 void write_ship_reference(const struct ship *sh, struct storage *store)
 {
-  store->w_id(store, (sh && sh->region) ? sh->no : 0);
+  WRITE_INT(store, (sh && sh->region) ? sh->no : 0);
 }
 
 void ship_setname(ship * self, const char *name)

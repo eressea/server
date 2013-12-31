@@ -40,7 +40,7 @@ static unresolved *ur_current;
 variant read_int(struct storage *store)
 {
   variant var;
-  var.i = store->r_int(store);
+  READ_INT(store, &var.i);
   return var;
 }
 

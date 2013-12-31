@@ -25,6 +25,8 @@ extern "C" {
 /* bitfield value for group::flags */
 #define GFL_ALIVE 0x01          /* There is at least one struct unit in the group */
 
+  struct gamedata;
+
   typedef struct group {
     struct group *next;
     struct group *nexthash;
@@ -43,8 +45,8 @@ extern "C" {
   extern struct group * get_group(const struct unit *u);
   extern void free_group(struct group *g);
 
-  extern void write_groups(struct storage *F, struct group *g);
-  extern void read_groups(struct storage *F, struct faction *f);
+  extern void write_groups(struct storage *data, struct group *g);
+  extern void read_groups(struct storage *data, struct faction *f);
 
 #ifdef __cplusplus
 }

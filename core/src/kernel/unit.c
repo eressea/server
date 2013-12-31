@@ -54,8 +54,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 #include <util/resolve.h>
 #include <util/rng.h>
-#include <util/storage.h>
 #include <util/variant.h>
+
+#include <storage.h>
 
 /* libc includes */
 #include <assert.h>
@@ -416,10 +417,10 @@ int ualias(const unit * u)
 
 int a_readprivate(attrib * a, void *owner, struct storage *store)
 {
-  a->data.v = store->r_str(store);
-  if (a->data.v)
-    return AT_READ_OK;
-  return AT_READ_FAIL;
+  char lbuf[DISPLAYSIZE];
+  READ_STR(store, lbuf, sizeof(lbuf));
+  a->data.v = _strdup(lbuf);
+  return (a->data.v) ? AT_READ_OK : AT_READ_FAIL;
 }
 
 /*********************/
@@ -646,7 +647,7 @@ void free_units(void)
 
 void write_unit_reference(const unit * u, struct storage *store)
 {
-  store->w_id(store, (u && u->region) ? u->no : 0);
+  WRITE_INT(store, (u && u->region) ? u->no : 0);
 }
 
 int resolve_unit(variant id, void *address)
@@ -666,7 +667,7 @@ int resolve_unit(variant id, void *address)
 variant read_unit_reference(struct storage * store)
 {
   variant var;
-  var.i = store->r_id(store);
+  READ_INT(store, &var.i);
   return var;
 }
 

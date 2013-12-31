@@ -29,8 +29,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/event.h>
 #include <util/log.h>
 #include <util/resolve.h>
-#include <util/storage.h>
 #include <util/base36.h>
+
+#include <storage.h>
 
 /* ansi includes */
 #include <stdio.h>

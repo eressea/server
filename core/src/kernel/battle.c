@@ -109,8 +109,8 @@ static int obs_count = 0;
 #ifndef ROW_FACTOR
 # define ROW_FACTOR 10
 #endif
-static const double EFFECT_PANIC_SPELL = 0.25;
-static const double TROLL_REGENERATION = 0.10;
+#define EFFECT_PANIC_SPELL 0.25
+#define TROLL_REGENERATION 0.10
 
 /* Nach dem alten System: */
 static int missile_range[2] = { FIGHT_ROW, BEHIND_ROW };
@@ -1662,7 +1662,7 @@ void do_combatmagic(battle * b, combatmagic_t was)
 
       level = eff_skill(mage, SK_MAGIC, r);
       if (level > 0) {
-        double power;
+        float power;
         const spell *sp;
         const struct locale *lang = mage->faction->locale;
         order *ord;
@@ -1735,7 +1735,7 @@ void do_combatmagic(battle * b, combatmagic_t was)
   }
 }
 
-static int cast_combatspell(troop at, const spell * sp, int level, double force)
+static int cast_combatspell(troop at, const spell * sp, int level, float force)
 {
   castorder co;
 
@@ -1758,7 +1758,7 @@ static void do_combatspell(troop at)
   region *r = b->region;
   quicklist *ql;
   int level, qi;
-  double power;
+  float power;
   int fumblechance = 0;
   order *ord;
   int sl;
@@ -3569,7 +3569,7 @@ battle *make_battle(region * r)
     char zText[MAX_PATH];
     char zFilename[MAX_PATH];
     sprintf(zText, "%s/battles", basepath());
-    os_mkdir(zText, 0700);
+    _mkdir(zText);
     sprintf(zFilename, "%s/battle-%d-%s.log", zText, obs_count, simplename(r));
     bdebug = fopen(zFilename, "w");
     if (!bdebug)

@@ -26,7 +26,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <util/attrib.h>
 #include <util/resolve.h>
-#include <util/storage.h>
+
+#include <storage.h>
 
 static void
 write_targetregion(const attrib * a, const void *owner, struct storage *store)
@@ -38,7 +39,7 @@ static int read_targetregion(attrib * a, void *owner, struct storage *store)
 {
   int result =
     read_reference(&a->data.v, store, read_region_reference,
-    RESOLVE_REGION(store->version));
+    RESOLVE_REGION(global.data_version));
   if (result == 0 && !a->data.v)
     return AT_READ_FAIL;
   return AT_READ_OK;

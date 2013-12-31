@@ -24,7 +24,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 #include <util/event.h>
 #include <util/log.h>
-#include <util/storage.h>
+
+#include <storage.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -67,14 +68,14 @@ static int timeout_handle(trigger * t, void *data)
 static void timeout_write(const trigger * t, struct storage *store)
 {
   timeout_data *td = (timeout_data *) t->data.v;
-  store->w_int(store, td->timer);
+  WRITE_INT(store, td->timer);
   write_triggers(store, td->triggers);
 }
 
 static int timeout_read(trigger * t, struct storage *store)
 {
   timeout_data *td = (timeout_data *) t->data.v;
-  td->timer = store->r_int(store);
+  READ_INT(store, &td->timer);
   read_triggers(store, &td->triggers);
   if (td->timer > 20) {
     trigger *tr = td->triggers;

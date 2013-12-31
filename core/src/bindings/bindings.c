@@ -68,7 +68,8 @@ without prior permission by the authors of Eressea.
 #include <quicklist.h>
 #include <util/rand.h>
 #include <util/rng.h>
-#include <util/storage.h>
+
+#include <storage.h>
 
 #include <iniparser.h>
 #include <tolua.h>
@@ -351,9 +352,9 @@ static int tolua_create_curse(lua_State * L)
     const char *cname = tolua_tostring(L, 3, 0);
     const curse_type *ctype = ct_find(cname);
     if (ctype) {
-      double vigour = tolua_tonumber(L, 4, 0);
+      float vigour = (float)tolua_tonumber(L, 4, 0);
       int duration = (int)tolua_tonumber(L, 5, 0);
-      double effect = tolua_tonumber(L, 6, 0);
+      float effect = (float)tolua_tonumber(L, 6, 0);
       int men = (int)tolua_tonumber(L, 7, 0);   /* optional */
       curse *c = create_curse(u, ap, ctype, vigour, duration, effect, men);
       if (c) {

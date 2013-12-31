@@ -25,7 +25,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* util includes */
 #include <util/attrib.h>
-#include <util/storage.h>
+
+#include <storage.h>
 
 static void write_gm(const attrib * a, const void *owner, struct storage *store)
 {

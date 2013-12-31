@@ -26,11 +26,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* util includes */
 #include <util/attrib.h>
+#include <util/base36.h>
 #include <util/event.h>
 #include <util/log.h>
 #include <util/resolve.h>
-#include <util/storage.h>
-#include <util/base36.h>
+
+#include <storage.h>
 
 /* ansi includes */
 #include <stdio.h>
@@ -74,8 +75,8 @@ static int removecurse_handle(trigger * t, void *data)
 static void removecurse_write(const trigger * t, struct storage *store)
 {
   removecurse_data *td = (removecurse_data *) t->data.v;
-  store->w_tok(store, td->target ? itoa36(td->target->no) : 0);
-  store->w_int(store, td->curse ? td->curse->no : 0);
+  WRITE_TOK(store, td->target ? itoa36(td->target->no) : 0);
+  WRITE_INT(store, td->curse ? td->curse->no : 0);
 }
 
 static int removecurse_read(trigger * t, struct storage *store)
