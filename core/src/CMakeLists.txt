@@ -169,7 +169,6 @@ set (LIB_SRC
   util/log.c
   util/message.c
   util/nrmessage.c
-  util/os.c
   util/parser.c
   util/rand.c
   util/resolve.c
