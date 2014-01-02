@@ -1247,11 +1247,8 @@ faction *readfaction(struct gamedata * data)
 
   READ_STR(data->store, name, sizeof(name));
   f->passw = _strdup(name);
-  if (data->version >= OVERRIDE_VERSION) {
-    READ_STR(data->store, name, sizeof(name));
-    f->override = _strdup(name);
-  } else {
-    f->override = _strdup(itoa36(rng_int()));
+  if (data->version < NOOVERRIDE_VERSION && data->version >= OVERRIDE_VERSION) {
+    READ_STR(data->store, 0, 0);
   }
 
   READ_STR(data->store, name, sizeof(name));
@@ -1362,7 +1359,6 @@ void writefaction(struct gamedata *data, const faction * f)
   WRITE_STR(data->store, (const char *)f->banner);
   WRITE_STR(data->store, f->email);
   WRITE_TOK(data->store, (const char *)f->passw);
-  WRITE_TOK(data->store, (const char *)f->override);
   WRITE_TOK(data->store, locale_name(f->locale));
   WRITE_INT(data->store, f->lastorders);
   WRITE_INT(data->store, f->age);

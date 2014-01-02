@@ -88,7 +88,6 @@ void free_faction(faction * f)
   free(f->email);
   free(f->banner);
   free(f->passw);
-  free(f->override);
   free(f->name);
 
   while (f->attribs) {
@@ -204,7 +203,6 @@ faction *addfaction(const char *email, const char *password,
     log_error("Invalid email address for faction %s: %s\n", itoa36(f->no), email);
   }
 
-  f->override = _strdup(itoa36(rng_int()));
   faction_setpassword(f, password);
 
   f->alliance_joindate = turn;
@@ -263,8 +261,6 @@ unit *addplayer(region * r, faction * f)
 bool checkpasswd(const faction * f, const char *passwd, bool shortp)
 {
   if (unicode_utf8_strcasecmp(f->passw, passwd) == 0)
-    return true;
-  if (unicode_utf8_strcasecmp(f->override, passwd) == 0)
     return true;
   return false;
 }

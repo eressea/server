@@ -689,9 +689,8 @@ int autoseed(newfaction ** players, int nsize, int max_agediff)
         f->email, regionname(r, NULL));
       if (f->subscription) {
         sql_print(
-          ("UPDATE subscriptions SET status='ACTIVE', faction='%s', firstturn=%d, lastturn=%d, password='%s' WHERE id=%u;\n",
-            factionid(f), f->lastorders, f->lastorders, f->override,
-            f->subscription));
+          ("UPDATE subscriptions SET status='ACTIVE', faction='%s', firstturn=%d, lastturn=%d WHERE id=%u;\n",
+            factionid(f), f->lastorders, f->lastorders, f->subscription));
       }
 
       /* remove duplicate email addresses */
