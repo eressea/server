@@ -32,10 +32,11 @@ static int tolua_storage_create(lua_State * L)
   const char *type = tolua_tostring(L, 2, "rb");
   gamedata *data = (gamedata *)calloc(1, sizeof(gamedata));
   storage *store = (storage *)calloc(1, sizeof(storage));
+  FILE * F;
 
   data->store = store;
 
-  FILE *F = fopen(filename, type);
+  F = fopen(filename, type);
   if (strchr(type, 'r')) {
     fread(&data->version, sizeof(int), 1, F);
     fseek(F, sizeof(int), SEEK_CUR);
