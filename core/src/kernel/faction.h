@@ -44,7 +44,6 @@ extern "C" {
                                          * (FFL_SELECT muss man vorher initialisieren, 
                                          * FL_MARK hinterher löschen) */
 #define FFL_NOIDLEOUT     (1<<24)       /* Partei stirbt nicht an NMRs */
-#define FFL_OVERRIDE      (1<<27)       /* Override-Passwort wurde benutzt */
 #define FFL_DBENTRY       (1<<28)       /* Partei ist in Datenbank eingetragen */
 #define FFL_NOTIMEOUT     (1<<29)       /* ignore MaxAge() */
 #define FFL_GM            (1<<30)       /* eine Partei mit Sonderrechten */
@@ -71,7 +70,6 @@ extern "C" {
     char *banner;
     char *email;
     char *passw;
-    char *override;
     int max_spelllevel;
     struct spellbook *spellbook;
     const struct locale *locale;

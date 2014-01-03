@@ -1446,26 +1446,20 @@ static void remove_idle_players(void)
       destroyfaction(f);
       continue;
     }
-    if (fval(f, FFL_OVERRIDE)) {
-      free(f->override);
-      f->override = _strdup(itoa36(rng_int()));
-      freset(f, FFL_OVERRIDE);
-    }
     if (turn != f->lastorders) {
       char info[256];
       sprintf(info, "%d Einheiten, %d Personen, %d Silber",
         f->no_units, f->num_total, f->money);
       if (f->subscription) {
         sql_print(
-          ("UPDATE subscriptions SET lastturn=%d, password='%s', info='%s' WHERE id=%u;\n",
-            f->lastorders, f->override, info, f->subscription));
+          ("UPDATE subscriptions SET lastturn=%d, info='%s' WHERE id=%u;\n",
+            f->lastorders, info, f->subscription));
       }
     } else {
       if (f->subscription) {
         sql_print(
-          ("UPDATE subscriptions SET status='ACTIVE', lastturn=%d, firstturn=greatest(firstturn,%d), password='%s' WHERE id=%u;\n",
-            f->lastorders, f->lastorders - f->age, f->override,
-            f->subscription));
+          ("UPDATE subscriptions SET status='ACTIVE', lastturn=%d, firstturn=greatest(firstturn,%d) WHERE id=%u;\n",
+            f->lastorders, f->lastorders - f->age, f->subscription));
       }
     }
 
@@ -2408,7 +2402,6 @@ int password_cmd(unit * u, struct order *ord)
   } else {
     u->faction->passw = _strdup(pwbuf);
   }
-  fset(u->faction, FFL_OVERRIDE);
   ADDMSG(&u->faction->msgs, msg_message("changepasswd",
       "value", u->faction->passw));
   return 0;
@@ -4675,8 +4668,8 @@ int writepasswd(void)
     log_info("writing passwords...");
 
     for (f = factions; f; f = f->next) {
-      fprintf(F, "%s:%s:%s:%s:%u\n",
-        factionid(f), f->email, f->passw, f->override, f->subscription);
+      fprintf(F, "%s:%s:%s:%u\n",
+        factionid(f), f->email, f->passw, f->subscription);
     }
     fclose(F);
     return 0;
@@ -4711,9 +4704,8 @@ void update_subscriptions(void)
   sprintf(zText, "subscriptions.%u", turn);
   F = fopen(zText, "w");
   for (f = factions; f != NULL; f = f->next) {
-    fprintf(F, "%s:%u:%s:%s:%s:%u:\n",
-      itoa36(f->no), f->subscription, f->email, f->override,
-      dbrace(f->race), f->lastorders);
+    fprintf(F, "%s:%u:%s:%s:%u:\n",
+      itoa36(f->no), f->subscription, f->email, dbrace(f->race), f->lastorders);
   }
   fclose(F);
 }

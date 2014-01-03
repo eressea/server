@@ -341,7 +341,6 @@ static void guardian_faction(plane * pl, int id)
     f = calloc(1, sizeof(faction));
     f->banner = _strdup("Sie dienen dem großen Wyrm");
     f->passw = _strdup(itoa36(rng_int()));
-    f->override = _strdup(itoa36(rng_int()));
     set_email(&f->email, "igjarjuk@eressea.de");
     f->name = _strdup("Igjarjuks Kundschafter");
     f->race = new_race[RC_ILLUSION];
