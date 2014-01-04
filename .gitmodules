@@ -27,5 +27,5 @@
 	url = git://github.com/kbranigan/cJSON.git
 [submodule "storage"]
 	path = storage
-	url = git@github.com:badgerman/storage.git
+	url = git://github.com/badgerman/storage.git
 	branch = master
