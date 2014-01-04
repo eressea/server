@@ -283,7 +283,7 @@ static const char *parse_string(opstack ** stack, const char *in,
           if (ic == NULL)
             return NULL;
           c = (char *)opop_v(stack);
-          bytes = (int)c?strlcpy(oc, c, size):0;
+          bytes = (int)(c?strlcpy(oc, c, size):0);
           if (bytes < (int)size)
             oc += bytes;
           else
