@@ -482,7 +482,8 @@ static void report_crtypes(FILE * F, const struct locale *lang)
       const struct nrmessage_type *nrt = nrt_find(lang, kmt->mtype);
       if (nrt) {
         unsigned int hash = kmt->mtype->key;
-        fprintf(F, "MESSAGETYPE %d\n", hash);
+        assert(hash > 0);
+        fprintf(F, "MESSAGETYPE %u\n", hash);
         fputc('\"', F);
         fputs(escape_string(nrt_string(nrt), NULL, 0), F);
         fputs("\";text\n", F);
@@ -548,7 +549,7 @@ static void render_messages(FILE * F, faction * f, message_list * msgs)
     nrbuffer[0] = '\0';
     if (nr_render(m->msg, f->locale, nrbuffer, sizeof(nrbuffer), f) > 0) {
       fprintf(F, "MESSAGE %u\n", messagehash(m->msg));
-      fprintf(F, "%d;type\n", hash);
+      fprintf(F, "%u;type\n", hash);
       fwritestr(F, nrbuffer);
       fputs(";rendered\n", F);
       printed = true;

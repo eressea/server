@@ -42,9 +42,11 @@ message_type *mt_new(const char *name, const char *args[])
     log_error("Trying to create message_type with name=0x0\n");
     return NULL;
   }
-  if (args != NULL)
-    for (nparameters = 0; args[nparameters]; ++nparameters) ;
-
+  if (args != NULL) {
+    /* count the number of parameters */
+    while (args[nparameters]) ++nparameters;
+  }
+  mtype->key = 0;
   mtype->name = _strdup(name);
   mtype->nparameters = nparameters;
   if (nparameters > 0) {
@@ -188,7 +190,7 @@ const message_type *mt_register(message_type * type)
   unsigned int hash = hashstring(type->name) % MT_MAXHASH;
   quicklist **qlp = messagetypes + hash;
 
-  if (ql_set_insert(qlp, type) == 0) {
+  if (ql_set_insert(qlp, type)) {
     type->key = mt_id(type);
   }
   return type;

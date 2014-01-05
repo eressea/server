@@ -43,7 +43,7 @@ void free_spells(void) {
 
 void add_spell(struct quicklist **slistp, spell * sp)
 {
-  if (ql_set_insert(slistp, sp) != 0) {
+  if (!ql_set_insert(slistp, sp)) {
     log_error("add_spell: the list already contains the spell '%s'.\n", sp->sname);
   }
 }
