@@ -577,7 +577,7 @@ unit *read_unit(struct gamedata *data)
   unit *u;
   int number, n, p;
   order **orderp;
-  char obuf[1024];
+  char obuf[DISPLAYSIZE];
   faction *f;
   char rname[32];
 
@@ -1407,7 +1407,7 @@ int readgame(const char *filename, int backup)
   unit *u;
   int rmax = maxregions;
   char path[MAX_PATH];
-  char name[NAMESIZE];
+  char name[DISPLAYSIZE];
   const struct building_type *bt_lighthouse = bt_find("lighthouse");
   gamedata gdata = { 0 };
   storage store;
