@@ -184,13 +184,13 @@ function test_ship_capacity()
         write_reports()
     end
     assert_equal(r2, u1.region)
-    assert_not_equal(r2, u2.region)
+    assert_not_equal(r2.id, u2.region.id)
     if r2~=u3.region then
         print(get_turn(), u3, u3.faction)
         write_reports()
     end
     assert_equal(r2, u3.region)
-    assert_not_equal(r2, u4.region)
+    assert_not_equal(r2.id, u4.region.id)
 end
     
 function test_owners()
@@ -256,7 +256,6 @@ function test_leave()
     process_orders()
     init_reports()
     write_report(u.faction)
-    print(u.faction)
     assert_equal(b1, u.building, "region owner has left the building") -- region owners may not leave
 end
 
