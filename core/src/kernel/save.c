@@ -1194,7 +1194,7 @@ faction *readfaction(struct gamedata * data)
   ally **sfp;
   int planes, n;
   faction *f;
-  char name[NAMESIZE];
+  char name[DISPLAYSIZE];
 
   READ_INT(data->store, &n);
   f = findfaction(n);
