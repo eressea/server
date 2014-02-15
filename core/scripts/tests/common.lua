@@ -45,6 +45,29 @@ function setup()
     eressea.settings.set("NewbieImmunity", "0")
     eressea.settings.set("rules.economy.food", "4")
     eressea.settings.set("rules.encounters", "0")
+    eressea.settings.set("rules.peasants.growth", "1")
+end
+
+function test_no_peasant_growth()
+    local r = region.create(0, 0, "plain")
+    r:set_resource("peasant", 2000)
+    eressea.settings.set("rules.peasants.growth", "0")
+    process_orders()
+    assert_equal(r:get_resource("peasant"), 2000)
+end
+
+function test_demon_food()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "demon", "de")
+    local u = unit.create(f, r, 1)
+    local p = r:get_resource("peasant")
+    r:set_resource("peasant", 2000)
+    eressea.settings.set("rules.economy.food", "0")
+    eressea.settings.set("rules.peasants.growth", "0")
+    process_orders()
+    assert_not_nil(u)
+    assert_equal(1, u.number)
+    assert_equal(1999, r:get_resource("peasant"))
 end
 
 function test_fleeing_units_can_be_transported()
