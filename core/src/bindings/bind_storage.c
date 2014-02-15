@@ -62,12 +62,10 @@ static int tolua_storage_read_unit(lua_State * L)
 
 static int tolua_storage_write_unit(lua_State * L)
 {
-  gamedata *data = (gamedata *)tolua_tousertype(L, 1, 0);
-  struct unit *u = (struct unit *)tolua_tousertype(L, 2, 0);
-  if (global.data_version) {
+    gamedata *data = (gamedata *)tolua_tousertype(L, 1, 0);
+    struct unit *u = (struct unit *)tolua_tousertype(L, 2, 0);
     write_unit(data, u);
-  }
-  return 0;
+    return 0;
 }
 
 static int tolua_storage_read_float(lua_State * L)

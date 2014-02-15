@@ -938,7 +938,9 @@ void demographics(void)
          * und gewandert sind */
 
         calculate_emigration(r);
-        peasants(r);
+        if (get_param_int(global.parameters, "rules.peasants.growth", 1)) {
+            peasants(r);
+        }
         if (r->age > 20) {
           plagues(r, false);
         }
