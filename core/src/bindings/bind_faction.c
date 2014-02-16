@@ -127,11 +127,11 @@ static int tolua_faction_set_magic(lua_State * L)
 {
   faction *self = (faction *) tolua_tousertype(L, 1, 0);
   const char *type = tolua_tostring(L, 2, 0);
-  magic_t mtype;
+  int mtype;
 
   for (mtype = 0; mtype != MAXMAGIETYP; ++mtype) {
     if (strcmp(magic_school[mtype], type) == 0) {
-      self->magiegebiet = mtype;
+      self->magiegebiet = (magic_t)mtype;
       break;
     }
   }

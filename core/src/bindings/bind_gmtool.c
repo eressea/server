@@ -23,7 +23,7 @@ static int tolua_run_mapper(lua_State * L)
 
 static int tolua_highlight_region(lua_State * L)
 {
-  region *r = tolua_tousertype(L, 1, 0);
+  region *r = (region *)tolua_tousertype(L, 1, 0);
   int select = tolua_toboolean(L, 2, 0);
   highlight_region(r, select);
   return 0;

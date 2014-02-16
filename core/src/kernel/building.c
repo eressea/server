@@ -376,7 +376,7 @@ const building_type *findbuildingtype(const char *name,
     quicklist *ql = buildingtypes;
     int qi;
 
-    bn = calloc(sizeof(local_names), 1);
+    bn = (local_names *)calloc(sizeof(local_names), 1);
     bn->next = bnames;
     bn->lang = lang;
 

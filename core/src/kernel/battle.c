@@ -3404,7 +3404,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     for (itm = u->items; itm; itm = itm->next) {
       if (itm->type->rtype->atype) {
         if (i_canuse(u, itm->type)) {
-          struct armor *adata = malloc(sizeof(armor)), **aptr;
+          struct armor *adata = (struct armor *)malloc(sizeof(armor)), **aptr;
           adata->atype = itm->type->rtype->atype;
           adata->count = itm->number;
           for (aptr = &fig->armors; *aptr; aptr = &(*aptr)->next) {
