@@ -2616,6 +2616,7 @@ static bool display_race(faction * f, unit * u, const race * rc)
       case AT_SPELL:
       case AT_COMBATSPELL:
       case AT_DRAIN_ST:
+      case AT_DRAIN_EXP:
       case AT_DAZZLE:
         bytes = snprintf(bufp, size, "%s", LOC(f->locale, "attack_magical"));
         break;
