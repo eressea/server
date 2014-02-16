@@ -938,6 +938,19 @@ function test_coordinates_no_plane()
     assert_true(find_in_report(f, r.name .. " %(0,0%), Berg"))
 end
 
+function test_show_shadowmaster_attacks()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+    u.race = "shadowmaster"
+    u:clear_orders()
+    u:add_order("ZEIGE Schattenmeister")
+    process_orders()
+    init_reports()
+    write_report(f)
+    assert_false(find_in_report(f, ", ,"))
+end
+
 function test_coordinates_named_plane()
     local p = plane.create(0, -3, -3, 7, 7, "Hell")
     local r = region.create(0, 0, "mountain")
