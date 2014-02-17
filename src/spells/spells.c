@@ -1167,7 +1167,7 @@ static int sp_mallornhain(castorder * co)
   return cast_level;
 }
 
-void patzer_ents(castorder * co)
+static void fumble_ents(const castorder * co)
 {
   int ents;
   unit *u;
@@ -2301,7 +2301,7 @@ static int sp_earthquake(castorder * co)
 /* ------------------------------------------------------------- */
 /* CHAOS / M_DRAIG / Draig */
 /* ------------------------------------------------------------- */
-void patzer_peasantmob(castorder * co)
+void patzer_peasantmob(const castorder * co)
 {
   int anteil = 6, n;
   unit *u;
@@ -2488,7 +2488,7 @@ static int sp_fumblecurse(castorder * co)
   return cast_level;
 }
 
-void patzer_fumblecurse(castorder * co)
+void patzer_fumblecurse(const castorder * co)
 {
   unit *mage = co->magician.u;
   int cast_level = co->level;
@@ -6469,13 +6469,13 @@ static spelldata spell_functions[] = {
   /* M_GWYRRD */
   { "stonegolem", sp_create_stonegolem, 0},
   { "irongolem", sp_create_irongolem, 0},
-  { "treegrow", sp_hain, patzer_ents},
+  { "treegrow", sp_hain, fumble_ents},
   { "rustweapon", sp_rosthauch, 0},
   { "cold_protection", sp_kaelteschutz, 0},
   { "ironkeeper", sp_ironkeeper, 0},
   { "magicstreet", sp_magicstreet, 0},
   { "windshield", sp_windshield, 0},
-  { "mallorntreegrow", sp_mallornhain, patzer_ents},
+  { "mallorntreegrow", sp_mallornhain, fumble_ents},
   { "goodwinds", sp_goodwinds, 0},
   { "healing", sp_healing, 0},
   { "reelingarrows", sp_reeling_arrows, 0},

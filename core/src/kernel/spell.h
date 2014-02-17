@@ -24,7 +24,7 @@ extern "C" {
 
   struct castorder;
   typedef int (*spell_f)(struct castorder * co);
-  typedef void(*fumble_f)(struct castorder * co);
+  typedef void(*fumble_f)(const struct castorder * co);
 
   typedef struct spell {
     unsigned int id;

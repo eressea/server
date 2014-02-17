@@ -2048,11 +2048,11 @@ static spellparameter *add_spellparameter(region * target_r, unit * u,
   return par;
 }
 
-struct unit * co_get_caster(struct castorder * co) {
+struct unit * co_get_caster(const struct castorder * co) {
   return co->_familiar ? co->_familiar : co->magician.u;
 }
 
-struct region * co_get_region(struct castorder * co) {
+struct region * co_get_region(const struct castorder * co) {
   return co->_rtarget;
 }
 

@@ -135,8 +135,8 @@ typedef struct sc_mage {
     struct spellparameter *par; /* für weitere Parameter */
   } castorder;
 
-  struct unit * co_get_caster(struct castorder * co);
-  struct region * co_get_region(struct castorder * co);
+  struct unit * co_get_caster(const struct castorder * co);
+  struct region * co_get_region(const struct castorder * co);
 
   typedef struct spell_component {
     const struct resource_type *type;
