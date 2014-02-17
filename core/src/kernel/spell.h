@@ -35,7 +35,7 @@ extern "C" {
     int rank;                   /* Reihenfolge der Zauber */
     struct spell_component *components;
     spell_f cast;
-    fumble_f patzer;
+    fumble_f fumble;
   } spell;
 
   int use_item_power(struct region *r, struct unit *u);

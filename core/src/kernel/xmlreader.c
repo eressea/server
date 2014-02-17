@@ -1622,7 +1622,7 @@ static int parse_spells(xmlDocPtr doc)
           }
         }
         sp->cast = (spell_f)cast;
-        sp->patzer = (fumble_f)fumble;
+        sp->fumble = (fumble_f)fumble;
         xmlXPathFreeObject(result);
       }
 

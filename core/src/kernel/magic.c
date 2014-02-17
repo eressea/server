@@ -1273,7 +1273,7 @@ bool fumble(region * r, unit * u, const spell * sp, int cast_grade)
 
   int rnd = 0;
   double x = (double)cast_grade / (double)eff_skill(u, SK_MAGIC, r);
-  int patzer = (int)(((double)x * 40.0) - 20.0);
+  int fumble_chance = (int)(((double)x * 40.0) - 20.0);
   struct building *b = inside_building(u);
   const struct building_type *btype = b ? b->type : NULL;
   int fumble_enabled = get_param_int(global.parameters, "magic.fumble.enable", 1);
@@ -1283,38 +1283,34 @@ bool fumble(region * r, unit * u, const spell * sp, int cast_grade)
     return false;
   }
   if (btype)
-    patzer -= btype->fumblebonus;
+    fumble_chance -= btype->fumblebonus;
 
   /* CHAOSPATZERCHANCE 10 : +10% Chance zu Patzern */
   mage = get_mage(u);
   if (mage->magietyp == M_DRAIG) {
-    patzer += CHAOSPATZERCHANCE;
+    fumble_chance += CHAOSPATZERCHANCE;
   }
   if (is_cursed(u->attribs, C_MBOOST, 0)) {
-    patzer += CHAOSPATZERCHANCE;
+    fumble_chance += CHAOSPATZERCHANCE;
   }
   if (is_cursed(u->attribs, C_FUMBLE, 0)) {
-    patzer += CHAOSPATZERCHANCE;
+    fumble_chance += CHAOSPATZERCHANCE;
   }
 
   /* wenn die Chance kleiner als 0 ist, können wir gleich false
    * zurückgeben */
-  if (patzer <= 0) {
+  if (fumble_chance <= 0) {
     return false;
   }
   rnd = rng_int() % 100;
 
-  if (rnd > patzer) {
-    /* Glück gehabt, kein Patzer */
-    return false;
-  }
-  return true;
+  return (rnd <= fumble_chance);
 }
 
 /* ------------------------------------------------------------- */
 /* Dummy-Zauberpatzer, Platzhalter für speziel auf die Sprüche
 * zugeschnittene Patzer */
-static void patzer(castorder * co)
+static void fumble_default(castorder * co)
 {
   unit *mage = co->magician.u;
 
@@ -1342,10 +1338,12 @@ static void do_fumble(castorder * co)
   switch (rng_int() % 10) {
   case 0:
     /* wenn vorhanden spezieller Patzer, ansonsten nix */
-    if (sp->patzer)
-      sp->patzer(co);
-    else
-      patzer(co);
+    if (sp->fumble) {
+      sp->fumble(co);
+    } 
+    else {
+      fumble_default(co);
+    }
     break;
 
   case 1:
