@@ -1,10 +1,11 @@
 #!/bin/sh
+git submodule update --init
 MACHINE=`uname -m`
 BIN_DIR="build-$MACHINE-Debug"
 [ -z "$CC" ] && [ ! -z `which gcc` ] && CC="gcc"
 [ -z "$CC" ] && [ ! -z `which tcc` ] && CC="tcc"
 [ -z "$CC" ] && [ ! -z `which cc` ] && CC="cc"
-[ -z "$JOBS" ] && JOBS=1
+[ -z "$JOBS" ] && JOBS=$(nproc)
 
 DISTCC=`which distcc`
 if [ ! -z "$DISTCC" ] ; then
