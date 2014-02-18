@@ -42,3 +42,4 @@ add_subdirectory (iniparser)
 add_subdirectory (quicklist)
 add_subdirectory (critbit)
 add_subdirectory (src eressea)
+
