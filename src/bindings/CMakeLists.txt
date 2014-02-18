@@ -46,6 +46,10 @@ helpers.c
 )
 
 FOREACH(_FILE ${_FILES})
-    LIST(APPEND _SOURCES ${PROJECT_NAME}/${_FILE})
+    if(EXISTS ${_FILE})
+        LIST(APPEND _SOURCES ${PROJECT_NAME}/${_FILE})
+    else()
+    	message(WARNING "File \"${_FILE}\" does not exist but is listed as source.")
+    endif()
 ENDFOREACH(_FILE)
 SET(BINDINGS_SRC ${_SOURCES} PARENT_SCOPE)
