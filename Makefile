@@ -1,13 +1,2 @@
-all: bin/eressea
-
-bin:
-	mkdir bin
-
-bin/eressea: bin/Makefile
-	cd bin ; make
-
-bin/Makefile: bin
-	cd bin ; cmake ..
-
-clean:
-	rm -rf bin
+all:
+	@echo "Please use the cmake build system by running configure"

@@ -1,4 +1,4 @@
-$#include <bindings/bind_process.h>
+$#include "bind_process.h"
 
 module eressea {
 	module process {

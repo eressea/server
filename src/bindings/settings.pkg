@@ -1,4 +1,4 @@
-$#include <bindings/bind_settings.h>
+$#include "bind_settings.h"
 
 module eressea {
   module settings {

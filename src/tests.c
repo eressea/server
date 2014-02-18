@@ -1,6 +1,3 @@
-#include <CuTest.h>
-#include <stdio.h>
-
 #include <platform.h>
 #include <kernel/types.h>
 #include "tests.h"
@@ -22,49 +19,6 @@
 #include <util/log.h>
 
 #include <assert.h>
-
-int RunAllTests(void)
-{
-  CuString *output = CuStringNew();
-  CuSuite *suite = CuSuiteNew();
-  int flags = log_flags;
-
-  log_flags = LOG_FLUSH | LOG_CPERROR;
-
-  /* self-test */
-  CuSuiteAddSuite(suite, get_tests_suite());
-  /* util */
-  CuSuiteAddSuite(suite, get_base36_suite());
-  CuSuiteAddSuite(suite, get_bsdstring_suite());
-  CuSuiteAddSuite(suite, get_functions_suite());
-  CuSuiteAddSuite(suite, get_umlaut_suite());
-  /* kernel */
-  CuSuiteAddSuite(suite, get_pool_suite());
-  CuSuiteAddSuite(suite, get_curse_suite());
-  CuSuiteAddSuite(suite, get_equipment_suite());
-  CuSuiteAddSuite(suite, get_item_suite());
-  CuSuiteAddSuite(suite, get_magic_suite());
-  CuSuiteAddSuite(suite, get_move_suite());
-  CuSuiteAddSuite(suite, get_reports_suite());
-  CuSuiteAddSuite(suite, get_ship_suite());
-  CuSuiteAddSuite(suite, get_spellbook_suite());
-  CuSuiteAddSuite(suite, get_building_suite());
-  CuSuiteAddSuite(suite, get_spell_suite());
-  CuSuiteAddSuite(suite, get_battle_suite());
-  CuSuiteAddSuite(suite, get_ally_suite());
-  /* gamecode */
-  CuSuiteAddSuite(suite, get_market_suite());
-  CuSuiteAddSuite(suite, get_laws_suite());
-  CuSuiteAddSuite(suite, get_economy_suite());
-
-  CuSuiteRun(suite);
-  CuSuiteSummary(suite, output);
-  CuSuiteDetails(suite, output);
-  printf("%s\n", output->buffer);
-
-  log_flags = flags;
-  return suite->failCount;
-}
 
 struct race *test_create_race(const char *name)
 {
@@ -214,6 +168,3 @@ void test_create_world(void)
   test_create_shiptype(names+2);
 }
 
-int main(int argc, char ** argv) {
-  return RunAllTests();
-}

@@ -15,9 +15,10 @@
 #include <platform.h>
 #include <kernel/types.h>
 #include <kernel/config.h>
-#include "spells.h"
 
-#include "../curses.h"
+#include "../spy.h"
+#include "spells.h"
+#include "borders.h"
 #include "buildingcurse.h"
 #include "regioncurse.h"
 #include "unitcurse.h"
@@ -52,8 +53,6 @@
 #include <kernel/unit.h>
 #include <kernel/xmlreader.h>
 #include <kernel/version.h>
-
-#include <gamecode/spy.h>
 
 /* spells includes */
 #include "alp.h"
@@ -6750,4 +6749,9 @@ void register_spells(void)
   register_function((pf_generic) sp_kampfzauber, "combat_spell");
 
   register_spelldata();
+
+  register_unitcurse();
+  register_regioncurse();
+  register_shipcurse();
+  register_buildingcurse();
 }

@@ -29,7 +29,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/item.h>
 #include <kernel/region.h>
 
-#include <gamecode/archetype.h>
+#include "archetype.h"
 
 #include <tolua.h>
 #include <lua.h>

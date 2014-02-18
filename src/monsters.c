@@ -22,6 +22,10 @@
 #include <platform.h>
 #include <kernel/config.h>
 
+#include "economy.h"
+#include "give.h"
+#include "monster.h"
+
 /* triggers includes */
 #include <triggers/removecurse.h>
 
@@ -48,10 +52,6 @@
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
-
-#include <gamecode/economy.h>
-#include <gamecode/give.h>
-#include <gamecode/monster.h>
 
 /* util includes */
 #include <util/attrib.h>

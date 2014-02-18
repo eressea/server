@@ -22,13 +22,13 @@
 #include <modules/wormhole.h>
 #include <modules/gmcmd.h>
 #include <modules/xmas.h>
-#include <gamecode/archetype.h>
-#include <gamecode/report.h>
-#include <gamecode/items.h>
-#include <gamecode/creport.h>
-#include <gamecode/xmlreport.h>
 #include <items/itemtypes.h>
 #include <attributes/attributes.h>
+#include "archetype.h"
+#include "report.h"
+#include "items.h"
+#include "creport.h"
+#include "xmlreport.h"
 
 void game_done(void)
 {

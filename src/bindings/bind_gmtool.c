@@ -3,8 +3,8 @@
 #include <kernel/types.h>
 
 #include "bind_gmtool.h"
-#include "../gmtool.h"
-#include "../gmtool_structs.h"
+#include "gmtool.h"
+#include "gmtool_structs.h"
 
 #include <kernel/region.h>
 #include <kernel/terrain.h>

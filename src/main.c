@@ -23,13 +23,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/types.h>
 #include <kernel/save.h>
 #include <kernel/version.h>
-#include <bindings/bindings.h>
-#include <eressea.h>
-#include <gmtool.h>
+#include "eressea.h"
+#include "gmtool.h"
 
+#include "bindings/bindings.h"
 #include "races/races.h"
 #include "spells/spells.h"
-#include "curses.h"
+#include "spells/borders.h"
 
 #include <lua.h>
 #include <assert.h>
@@ -237,7 +237,7 @@ void locale_init(void)
   }
 }
 
-extern void bind_eressea(struct lua_State *L);
+extern void bind_monsters(struct lua_State *L);
 
 int main(int argc, char **argv)
 {
@@ -262,9 +262,9 @@ int main(int argc, char **argv)
   L = lua_init();
   game_init();
   register_races();
-  register_curses();
+  register_borders();
   register_spells();
-  bind_eressea(L);
+  bind_monsters(L);
 
   err = eressea_run(L, luafile, entry_point);
   if (err) {

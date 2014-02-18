@@ -8,7 +8,7 @@
  *
  */
 
-#include <platform.h>
+#include "platform.h"
 #include <kernel/config.h>
 #include "races.h"
 

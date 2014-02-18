@@ -11,10 +11,10 @@
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 #include <kernel/move.h>
-#include <gamecode/economy.h>
-#include <gamecode/laws.h>
-#include <gamecode/market.h>
-#include <gamecode/study.h>
+#include "economy.h"
+#include "laws.h"
+#include "market.h"
+#include "study.h"
 
 #define PROC_LAND_REGION 0x0001
 #define PROC_LONG_ORDER 0x0002

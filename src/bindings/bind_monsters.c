@@ -79,7 +79,7 @@ static int fix_familiars(struct lua_State *L)
   return 0;
 }
 
-void bind_eressea(struct lua_State *L)
+void bind_monsters(struct lua_State *L)
 {
   tolua_module(L, NULL, 0);
   tolua_beginmodule(L, NULL);

@@ -4,7 +4,7 @@
 extern "C" {
 #endif
 
-  extern void register_curses(void);
+  extern void register_borders(void);
 
   /* für Feuerwände: in movement muß das noch explizit getestet werden.
    ** besser wäre eine blcok_type::move() routine, die den effekt

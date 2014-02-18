@@ -48,12 +48,12 @@ without prior permission by the authors of Eressea.
 #include <kernel/save.h>
 #include <kernel/spell.h>
 
-#include <gamecode/creport.h>
-#include <gamecode/economy.h>
-#include <gamecode/summary.h>
-#include <gamecode/laws.h>
-#include <gamecode/monster.h>
-#include <gamecode/market.h>
+#include "creport.h"
+#include "economy.h"
+#include "summary.h"
+#include "laws.h"
+#include "monster.h"
+#include "market.h"
 
 #include <modules/autoseed.h>
 #include <modules/score.h>

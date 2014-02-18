@@ -1,7 +1,7 @@
 #include <platform.h>
 #include <kernel/types.h>
 
-#include "curses.h"
+#include "borders.h"
 
 #include <kernel/connection.h>
 #include <kernel/curse.h>
@@ -13,11 +13,6 @@
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 #include <kernel/version.h>
-
-#include "spells/regioncurse.h"
-#include "spells/unitcurse.h"
-#include "spells/shipcurse.h"
-#include "spells/buildingcurse.h"
 
 #include <util/attrib.h>
 #include <util/language.h>
@@ -294,7 +289,7 @@ border_type bt_wisps = { /* only here for reading old data */
   0
 };
 
-void register_curses(void)
+void register_borders(void)
 {
   border_convert_cb = &convert_firewall_timeouts;
   at_register(&at_cursewall);
@@ -302,9 +297,4 @@ void register_curses(void)
   register_bordertype(&bt_firewall);
   register_bordertype(&bt_wisps);
   register_bordertype(&bt_chaosgate);
-
-  register_unitcurse();
-  register_regioncurse();
-  register_shipcurse();
-  register_buildingcurse();
 }
