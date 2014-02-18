@@ -38,7 +38,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <iniparser.h>
 
 static const char *logfile= "eressea.log";
-static const char *luafile = "setup.lua";
+static const char *luafile = 0;
 static const char *entry_point = NULL;
 static const char *inifile = "eressea.ini";
 static int memdebug = 0;
@@ -60,7 +60,7 @@ static void parse_config(const char *filename)
     /* excerpt from [config] (the rest is used in bindings.c) */
     game_name = iniparser_getstring(d, "config:game", game_name);
   } else {
-    log_error("could not open configuration file %s\n", filename);
+    log_warning("could not open configuration file %s\n", filename);
   }
   global.inifile = d;
 }
