@@ -29,11 +29,32 @@ add_subdirectory(util)
 add_subdirectory(kernel)
 add_subdirectory(items)
 add_subdirectory(attributes)
-add_subdirectory(bindings)
 add_subdirectory(spells)
 add_subdirectory(triggers)
 add_subdirectory(modules)
 add_subdirectory(races)
+
+MACRO(ADD_LUA_MODULE MODULE_NAME FILES)
+  ADD_LIBRARY (${MODULE_NAME} SHARED ${FILES})
+  SET_TARGET_PROPERTIES(${MODULE_NAME}
+    PROPERTIES
+    PREFIX ""
+  )
+ENDMACRO(ADD_LUA_MODULE)
+
+MACRO(TOLUA_BINDING PKGFILE FILES)
+  ADD_CUSTOM_COMMAND(
+    OUTPUT ${PKGFILE}.c
+    DEPENDS ${FILES} ${PKGFILE}
+    COMMAND ${TOLUA_EXECUTABLE}
+    ARGS -o ${CMAKE_CURRENT_BINARY_DIR}/${PKGFILE}.c ${PKGFILE}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  )
+ENDMACRO(TOLUA_BINDING)
+
+TOLUA_BINDING(process.pkg bind_process.h)
+TOLUA_BINDING(eressea.pkg bind_eressea.h)
+TOLUA_BINDING(settings.pkg bind_settings.h)
 
 set(TESTS
   laws_test.c
@@ -42,6 +63,9 @@ set(TESTS
 )
 
 set (SERVER_SRC
+  process.pkg.c
+  eressea.pkg.c
+  settings.pkg.c
   eressea.c
   archetype.c
   creation.c
@@ -60,7 +84,22 @@ set (SERVER_SRC
   xmlreport.c
   gmtool.c
   monsters.c
-  ${BINDINGS_SRC}
+	bind_building.c
+	bind_eressea.c
+	bind_faction.c
+	bind_gmtool.c
+	bind_hashtable.c
+	bindings.c
+  helpers.c
+	bind_message.c
+	bind_monsters.c
+  bind_process.c
+  bind_region.c
+	bind_settings.c
+	bind_ship.c
+	bind_sqlite.c
+	bind_storage.c
+	bind_unit.c
   ${SPELLS_SRC}
   ${RACES_SRC}
   ${ITEMS_SRC}

@@ -26,7 +26,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "eressea.h"
 #include "gmtool.h"
 
-#include "bindings/bindings.h"
+#include "bindings.h"
 #include "races/races.h"
 #include "spells/spells.h"
 #include "spells/borders.h"

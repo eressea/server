@@ -23,7 +23,8 @@ without prior permission by the authors of Eressea.
 #include <util/attrib.h>
 #include <util/log.h>
 #include <util/resolve.h>
-#include <util/storage.h>
+
+#include <storage.h>
 
 /* external libraries */
 #include <bson.h>
