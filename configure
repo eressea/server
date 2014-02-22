@@ -24,10 +24,3 @@ cd $BIN_DIR
 CC="$CC" cmake .. -DCMAKE_MODULE_PATH=$PWD/../cmake/Modules -DCMAKE_BUILD_TYPE=Debug
 make -j$JOBS
 make test
-cd ..
-for GAME in game* ; do
-  cd $GAME
-  ln -sf ../$BIN_DIR/server/server
-  ./server -e run_tests
-  cd ..
-done
