@@ -1,0 +1,28 @@
+#!/bin/sh
+if [ ! -e ../CMakeLists.txt ]; then
+  echo "are you sure you are in the build directory?"
+  exit
+fi
+
+MACHINE=$(gcc -dumpmachine)
+rm -f CMakeCache.txt
+
+# use anything installed in /opt or /usr
+LIBRARY_PATH=/opt/lib:/opt/lib/$MACHINE:/usr/lib/$MACHINE
+INCLUDE_PATH=/opt/include:/usr/include
+PREFIX_PATH=/opt
+
+# I like to put stuff in ~/usr if I don't have permission to install packages on the machine:
+if [ -d $HOME/usr ]; then
+  LIBRARY_PATH=$HOME/usr/lib:$HOME/usr/lib/$MACHINE:$LIBRARY_PATH
+  INCLUDE_PATH=$HOME/usr/include:$HOME/usr/include/$MACHINE:$INCLUDE_PATH
+  PREFIX_PATH=$HOME/usr:$HOME/usr/local:$PREFIX_PATH
+fi
+
+cmake .. \
+ -DCMAKE_MODULE_PATH=$PWD/../cmake/Modules \
+ -DCMAKE_BUILD_TYPE=Debug \
+ -DCMAKE_LIBRARY_PATH=$LIBRARY_PATH \
+ -DCMAKE_INCLUDE_PATH=$INCLUDE_PATH \
+ -DCMAKE_PREFIX_PATH=$PREFIX_PATH \
+ -DCMAKE_INSTALL_PREFIX=$HOME/eressea $*

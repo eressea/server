@@ -153,3 +153,5 @@ target_link_libraries(test_eressea
 add_test(server test_eressea)
 add_test(NAME E3 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/game-e3 COMMAND $<TARGET_FILE:eressea> -e run_tests)
 add_test(NAME E2 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/game-e2 COMMAND $<TARGET_FILE:eressea> -e run_tests)
+
+install(TARGETS eressea DESTINATION bin)
