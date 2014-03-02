@@ -50,6 +50,13 @@ static int tolua_ship_get_name(lua_State * L)
   return 1;
 }
 
+static int tolua_ship_get_display(lua_State * L)
+{
+  ship *self = (ship *) tolua_tousertype(L, 1, 0);
+  tolua_pushstring(L, self->display);
+  return 1;
+}
+
 static int tolua_ship_get_region(lua_State * L)
 {
   ship *self = (ship *) tolua_tousertype(L, 1, 0);
@@ -75,6 +82,14 @@ static int tolua_ship_set_name(lua_State * L)
   ship *self = (ship *) tolua_tousertype(L, 1, 0);
   ship_setname(self, tolua_tostring(L, 2, 0));
   return 0;
+}
+
+static int tolua_ship_set_display(lua_State * L)
+{
+    ship *self = (ship *) tolua_tousertype(L, 1, 0);
+    free(self->display);
+    self->display = _strdup(tolua_tostring(L, 2, 0));
+    return 0;
 }
 
 static int tolua_ship_get_units(lua_State * L)
@@ -175,6 +190,8 @@ void tolua_ship_open(lua_State * L)
       tolua_variable(L, TOLUA_CAST "id", tolua_ship_get_id, NULL);
       tolua_variable(L, TOLUA_CAST "name", tolua_ship_get_name,
         tolua_ship_set_name);
+      tolua_variable(L, TOLUA_CAST "info", tolua_ship_get_display,
+        tolua_ship_set_display);
       tolua_variable(L, TOLUA_CAST "units", tolua_ship_get_units, NULL);
       tolua_variable(L, TOLUA_CAST "flags", &tolua_ship_get_flags,
         tolua_ship_set_flags);

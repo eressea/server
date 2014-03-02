@@ -19,7 +19,7 @@ function run_tests()
   local argv = tests or {}
   local stats = lunit.main(argv)
   if stats.errors > 0 or stats.failed > 0 then
-    return 1
+      assert(stats.errors == 0 and stats.failed == 0)
   end
   return 0
 end

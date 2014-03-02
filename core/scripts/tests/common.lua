@@ -39,7 +39,6 @@ module("tests.eressea.common", package.seeall, lunit.testcase)
 
 function setup()
     eressea.free_game()
-    eressea.write_game("free.dat")
     eressea.settings.set("nmr.removenewbie", "0")
     eressea.settings.set("nmr.timeout", "0")
     eressea.settings.set("NewbieImmunity", "0")
@@ -152,7 +151,7 @@ function test_read_write()
   local uno = u.id
   local result = 0
   assert_equal(r.terrain, "plain")
-  result = eressea.write_game("test_read_write.dat")
+  result = eressea.write_game("test.dat")
   assert_equal(result, 0)
   assert_not_equal(get_region(0, 0), nil)
   assert_not_equal(get_faction(fno), nil)
@@ -164,11 +163,39 @@ function test_read_write()
   assert_equal(get_region(0, 0), nil)
   assert_equal(nil, get_faction(fno))
   assert_equal(nil, get_unit(uno))
-  result = eressea.read_game("test_read_write.dat")
+  result = eressea.read_game("test.dat")
   assert_equal(0, result)
   assert_not_equal(nil, get_region(0, 0))
   assert_not_equal(nil, get_faction(fno))
   assert_not_equal(nil, get_unit(uno))
+end
+
+function test_descriptions()
+    local info = "Descriptions can be very long. Bug 1984 behauptet, dass es Probleme gibt mit Beschreibungen die laenger als 120 Zeichen sind. This description is longer than 120 characters."
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+    local s = _test_create_ship(r)
+    local b = building.create(r, "castle")
+    local uno = u.id
+    local fno = f.id
+    local sno = s.id
+    local bno = b.id
+    u.info = info
+    r.info = info
+    f.info = info
+    s.info = info
+    b.info = info
+
+    filename = "test.dat"
+    eressea.write_game(filename)
+    eressea.free_game()
+    eressea.read_game(filename)
+    assert_equal(info, get_ship(sno).info)
+    assert_equal(info, get_unit(uno).info)
+    assert_equal(info, get_faction(fno).info)
+    assert_equal(info, get_building(bno).info)
+    assert_equal(info, get_region(0, 0).info)
 end
 
 function test_gmtool()
@@ -577,7 +604,7 @@ function test_store_unit()
   local u = unit.create(f, r, 1)
   local fid = f.id
   u:add_item("money", u.number * 100)
-  local filename = config.basepath .. "/data/test.unit.dat"
+  local filename = config.basepath .. "/data/test.dat"
   store = storage.create(filename, "wb")
   assert_not_equal(store, nil)
   store:write_unit(u)
@@ -1012,7 +1039,6 @@ module("tests.parser", package.seeall, lunit.testcase)
 
 function setup()
     eressea.free_game()
-    eressea.write_game("free.dat")
     eressea.settings.set("rules.economy.food", "4") -- FOOD_IS_FREE
     eressea.settings.set("rules.encounters", "0")
     eressea.settings.set("rules.move.owner_leave", "0")
