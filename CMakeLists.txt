@@ -37,6 +37,7 @@ find_package (ToLua REQUIRED)
 
 add_subdirectory (cutest)
 add_subdirectory (crypto)
+add_subdirectory (cJSON)
 add_subdirectory (storage)
 add_subdirectory (iniparser)
 add_subdirectory (quicklist)
