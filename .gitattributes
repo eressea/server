@@ -1,3 +1,4 @@
+*.[hc]  text
 *.json  text
 *.xml   text
 *.py    text

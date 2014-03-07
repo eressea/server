@@ -86,7 +86,7 @@ magic_t getmagicskill(const struct locale * lang)
 }
 
 /* ------------------------------------------------------------- */
-/* Vertraute und Kröten sind keine Migranten */
+/* familiars and toads are not migrants */
 bool is_migrant(unit * u)
 {
   if (u_race(u) == u->faction->race)
@@ -131,7 +131,7 @@ int study_cost(unit * u, skill_t sk)
   case SK_ALCHEMY:
     return 200;
   case SK_MAGIC:               /* Die Magiekosten betragen 50+Summe(50*Stufe) */
-    /* 'Stufe' ist dabei die nächste zu erreichende Stufe */
+    /* 'Stufe' ist dabei die naechste zu erreichende Stufe */
     stufe = 1 + get_level(u, SK_MAGIC);
     return k * (1 + ((stufe + 1) * stufe / 2));
   default:
@@ -181,10 +181,10 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
   int n;
 
   /* learning sind die Tage, die sie schon durch andere Lehrer zugute
-   * geschrieben bekommen haben. Total darf dies nicht über 30 Tage pro Mann
+   * geschrieben bekommen haben. Total darf dies nicht ueber 30 Tage pro Mann
    * steigen.
    *
-   * n ist die Anzahl zusätzlich gelernter Tage. n darf max. die Differenz
+   * n ist die Anzahl zusaetzlich gelernter Tage. n darf max. die Differenz
    * von schon gelernten Tagen zum MAX(30 Tage pro Mann) betragen. */
 
   if (magic_lowskill(student)) {
@@ -219,36 +219,36 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
       teach->teachers[index] = NULL;
     teach->value += n;
 
-    /* Solange Akademien größenbeschränkt sind, sollte Lehrer und
-     * Student auch in unterschiedlichen Gebäuden stehen dürfen */
+    /* Solange Akademien groessenbeschraenkt sind, sollte Lehrer und
+     * Student auch in unterschiedlichen Gebaeuden stehen duerfen */
     if (btype == bt_find("academy")
       && student->building && student->building->type == bt_find("academy")) {
       int j = study_cost(student, sk);
       j = MAX(50, j * 2);
       /* kann Einheit das zahlen? */
       if (get_pooled(student, oldresourcetype[R_SILVER], GET_DEFAULT, j) >= j) {
-        /* Jeder Schüler zusätzlich +10 Tage wenn in Uni. */
-        teach->value += (n / 30) * 10;  /* learning erhöhen */
-        /* Lehrer zusätzlich +1 Tag pro Schüler. */
+        /* Jeder Schueler zusaetzlich +10 Tage wenn in Uni. */
+        teach->value += (n / 30) * 10;  /* learning erhoehen */
+        /* Lehrer zusaetzlich +1 Tag pro Schueler. */
         if (academy)
           *academy += n;
       }                         /* sonst nehmen sie nicht am Unterricht teil */
     }
 
     /* Teaching ist die Anzahl Leute, denen man noch was beibringen kann. Da
-     * hier nicht n verwendet wird, werden die Leute gezählt und nicht die
+     * hier nicht n verwendet wird, werden die Leute gezaehlt und nicht die
      * effektiv gelernten Tage. -> FALSCH ? (ENNO)
      *
      * Eine Einheit A von 11 Mann mit Talent 0 profitiert vom ersten Lehrer B
-     * also 10x30=300 tage, und der zweite Lehrer C lehrt für nur noch 1x30=30
-     * Tage (damit das Maximum von 11x30=330 nicht überschritten wird).
+     * also 10x30=300 tage, und der zweite Lehrer C lehrt fuer nur noch 1x30=30
+     * Tage (damit das Maximum von 11x30=330 nicht ueberschritten wird).
      *
-     * Damit es aber in der Ausführung nicht auf die Reihenfolge drauf ankommt,
+     * Damit es aber in der Ausfuehrung nicht auf die Reihenfolge drauf ankommt,
      * darf der zweite Lehrer C keine weiteren Einheiten D mehr lehren. Also
      * wird student 30 Tage gutgeschrieben, aber teaching sinkt auf 0 (300-11x30 <=
      * 0).
      *
-     * Sonst träte dies auf:
+     * Sonst traete dies auf:
      *
      * A: lernt B: lehrt A C: lehrt A D D: lernt
      *
@@ -258,11 +258,11 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
      * Ist C aber vor B dran, lehrt C 300 tage an A, und 0 tage an D,
      * und B lehrt auch 0 tage an A.
      *
-     * Deswegen darf C D nie lehren dürfen.
+     * Deswegen darf C D nie lehren duerfen.
      *
      * -> Das ist wirr. wer hat das entworfen?
-     * Besser wäre, man macht erst vorab alle zuordnungen, und dann
-     * die Talentänderung (enno).
+     * Besser waere, man macht erst vorab alle zuordnungen, und dann
+     * die Talentaenderung (enno).
      */
 
     nteaching = MAX(0, nteaching - student->number * 30);
@@ -303,7 +303,7 @@ int teach_cmd(unit * u, struct order *ord)
 
   if ((i = get_effect(u, oldpotiontype[P_FOOL])) > 0) { /* Trank "Dumpfbackenbrot" */
     i = MIN(i, u->number * TEACHNUMBER);
-    /* Trank wirkt pro Schüler, nicht pro Lehrer */
+    /* Trank wirkt pro Schueler, nicht pro Lehrer */
     teaching -= i * 30;
     change_effect(u, oldpotiontype[P_FOOL], -i);
     j = teaching / 30;
@@ -434,7 +434,7 @@ int teach_cmd(unit * u, struct order *ord)
         || alliedunit(u2, u->faction, HELP_GUARD);
 
       /* Neuen Befehl zusammenbauen. TEMP-Einheiten werden automatisch in
-       * ihre neuen Nummern übersetzt. */
+       * ihre neuen Nummern uebersetzt. */
       if (zOrder[0])
         strcat(zOrder, " ");
       strcat(zOrder, unitid(u2));
@@ -560,7 +560,7 @@ int learn_cmd(unit * u, order * ord)
     cmistake(u, ord, 771, MSG_EVENT);
     return 0;
   }
-  /* Hack: Talente mit Malus -99 können nicht gelernt werden */
+  /* Hack: Talente mit Malus -99 koennen nicht gelernt werden */
   if (u_race(u)->bonus[sk] == -99) {
     cmistake(u, ord, 771, MSG_EVENT);
     return 0;
@@ -574,7 +574,7 @@ int learn_cmd(unit * u, order * ord)
     }
   }
 
-  /* snotlings können Talente nur bis T8 lernen */
+  /* snotlings koennen Talente nur bis T8 lernen */
   if (u_race(u) == new_race[RC_SNOTLING]) {
     if (get_level(u, sk) >= 8) {
       cmistake(u, ord, 308, MSG_EVENT);
@@ -588,9 +588,9 @@ int learn_cmd(unit * u, order * ord)
     teach = (teaching_info *) a->data.v;
   }
 
-  /* keine kostenpflichtigen Talente für Migranten. Vertraute sind
+  /* keine kostenpflichtigen Talente fuer Migranten. Vertraute sind
    * keine Migranten, wird in is_migrant abgefangen. Vorsicht,
-   * studycost darf hier noch nicht durch Akademie erhöht sein */
+   * studycost darf hier noch nicht durch Akademie erhoeht sein */
   if (studycost > 0 && !ExpensiveMigrants() && is_migrant(u)) {
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_migrants_nolearn",
         ""));
@@ -612,8 +612,8 @@ int learn_cmd(unit * u, order * ord)
       return 0;
     }
     if (is_familiar(u)) {
-      /* Vertraute zählen nicht zu den Magiern einer Partei,
-       * können aber nur Graue Magie lernen */
+      /* Vertraute zaehlen nicht zu den Magiern einer Partei,
+       * koennen aber nur Graue Magie lernen */
       mtyp = M_GRAY;
       if (!is_mage(u))
         create_mage(u, mtyp);
@@ -628,12 +628,12 @@ int learn_cmd(unit * u, order * ord)
       mtyp = getmagicskill(u->faction->locale);
       if (mtyp == M_NONE || mtyp == M_GRAY) {
         /* wurde kein Magiegebiet angegeben, wird davon
-         * ausgegangen, daß das normal gelernt werden soll */
+         * ausgegangen, dass das normal gelernt werden soll */
         if (u->faction->magiegebiet != 0) {
           mtyp = u->faction->magiegebiet;
         } else {
           /* Es wurde kein Magiegebiet angegeben und die Partei
-           * hat noch keins gewählt. */
+           * hat noch keins gewaehlt. */
           mtyp = getmagicskill(u->faction->locale);
           if (mtyp == M_NONE) {
             cmistake(u, ord, 178, MSG_MAGIC);
@@ -658,7 +658,7 @@ int learn_cmd(unit * u, order * ord)
     } else {
       /* ist schon ein Magier und kein Vertrauter */
       if (u->faction->magiegebiet == 0) {
-        /* die Partei hat noch kein Magiegebiet gewählt. */
+        /* die Partei hat noch kein Magiegebiet gewaehlt. */
         mtyp = getmagicskill(u->faction->locale);
         if (mtyp == M_NONE) {
           mtyp = getmagicskill(u->faction->locale);
@@ -779,7 +779,7 @@ int learn_cmd(unit * u, order * ord)
   }
   fset(u, UFL_LONGACTION | UFL_NOTMOVING);
 
-  /* Anzeigen neuer Tränke */
+  /* Anzeigen neuer Traenke */
   /* Spruchlistenaktualiesierung ist in Regeneration */
 
   if (sk == SK_ALCHEMY) {

@@ -65,7 +65,7 @@ void spy_message(int spy, const unit * u, const unit * target)
       target, str));
   if (spy > 20) {
     sc_mage *mage = get_mage(target);
-    /* bei Magiern Zaubersprüche und Magiegebiet */
+    /* for mages, spells and magic school */
     if (mage) {
       ADDMSG(&u->faction->msgs, msg_message("spyreport_mage", "target type",
           target, magic_school[mage->magietyp]));
@@ -74,7 +74,7 @@ void spy_message(int spy, const unit * u, const unit * target)
   if (spy > 6) {
     faction *fv = visible_faction(u->faction, target);
     if (fv && fv != target->faction) {
-      /* wahre Partei */
+      /* true faction */
       ADDMSG(&u->faction->msgs, msg_message("spyreport_faction",
           "target faction", target, target->faction));
       ql_set_insert(&u->faction->seen_factions, target->faction);
@@ -138,9 +138,9 @@ int spy_cmd(unit * u, struct order *ord)
     cmistake(u, u->thisorder, 39, MSG_EVENT);
     return 0;
   }
-  /* Die Grundchance für einen erfolgreichen Spionage-Versuch ist 10%.
-   * Für jeden Talentpunkt, den das Spionagetalent das Tarnungstalent
-   * des Opfers übersteigt, erhöht sich dieses um 5%*/
+  /* Die Grundchance fuer einen erfolgreichen Spionage-Versuch ist 10%.
+   * Fuer jeden Talentpunkt, den das Spionagetalent das Tarnungstalent
+   * des Opfers uebersteigt, erhoeht sich dieses um 5%*/
   spy = eff_skill(u, SK_SPY, r) - eff_skill(target, SK_STEALTH, r);
   spychance = 0.1 + MAX(spy * 0.05, 0.0);
 
@@ -160,8 +160,8 @@ int spy_cmd(unit * u, struct order *ord)
     observe = MIN(observe, 0);
   }
 
-  /* Anschließend wird - unabhängig vom Erfolg - gewürfelt, ob der
-   * Spionageversuch bemerkt wurde. Die Wahrscheinlich dafür ist (100 -
+  /* Anschliessend wird - unabhaengig vom Erfolg - gewuerfelt, ob der
+   * Spionageversuch bemerkt wurde. Die Wahrscheinlich dafuer ist (100 -
    * SpionageSpion*5 + WahrnehmungOpfer*2)%. */
   observechance = 1.0 - (eff_skill(u, SK_SPY, r) * 0.05)
     + (eff_skill(target, SK_PERCEPTION, r) * 0.02);
@@ -238,7 +238,7 @@ int setstealth_cmd(unit * u, struct order *ord)
 
   trace = findrace(s, u->faction->locale);
   if (trace) {
-    /* Dämonen können sich nur als andere Spielerrassen tarnen */
+    /* demons can cloak as other player-races */
     if (u_race(u) == new_race[RC_DAEMON]) {
       race_t allowed[] = { RC_DWARF, RC_ELF, RC_ORC, RC_GOBLIN, RC_HUMAN,
         RC_TROLL, RC_DAEMON, RC_INSECT, RC_HALFLING, RC_CAT, RC_AQUARIAN,
@@ -256,7 +256,7 @@ int setstealth_cmd(unit * u, struct order *ord)
       return 0;
     }
 
-    /* Singdrachen können sich nur als Drachen tarnen */
+    /* Singdrachen koennen sich nur als Drachen tarnen */
     if (u_race(u) == new_race[RC_SONGDRAGON]
       || u_race(u) == new_race[RC_BIRTHDAYDRAGON]) {
       if (trace == new_race[RC_SONGDRAGON] || trace == new_race[RC_FIREDRAGON]
@@ -268,7 +268,7 @@ int setstealth_cmd(unit * u, struct order *ord)
       return 0;
     }
 
-    /* Dämomen und Illusionsparteien können sich als andere race tarnen */
+    /* Daemomen und Illusionsparteien koennen sich als andere race tarnen */
     if (u_race(u)->flags & RCF_SHAPESHIFT) {
       if (playerrace(trace)) {
         u->irace = trace;
