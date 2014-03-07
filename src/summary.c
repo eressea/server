@@ -339,7 +339,7 @@ summary *make_summary(void)
     }
   }
 
-  /* Alles zählen */
+  /* count everything */
 
   for (r = regions; r; r = r->next) {
     s->pferde += rhorses(r);
