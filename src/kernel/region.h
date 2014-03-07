@@ -22,6 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
+#include <stddef.h>
 #include "types.h"
 
 /* FAST_CONNECT: regions are directly connected to neighbours, saves doing
