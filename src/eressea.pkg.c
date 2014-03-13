@@ -1,6 +1,6 @@
 /*
 ** Lua binding: eressea
-** Generated automatically by tolua 5.1.3 on Sat Mar  8 10:21:00 2014.
+** Generated automatically by tolua 5.1.3 on Thu Mar 13 14:40:47 2014.
 */
 
 #include "tolua.h"
@@ -131,6 +131,35 @@ static int tolua_eressea_eressea_read_orders00(lua_State* tolua_S)
 #endif
 }
 
+/* function: eressea_export_json */
+static int tolua_eressea_eressea_export00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isstring(tolua_S,1,0,&tolua_err) || 
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) || 
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const char* filename = ((const char*)  tolua_tostring(tolua_S,1,0));
+  unsigned int flags = ((unsigned int)  tolua_tonumber(tolua_S,2,0));
+ {
+  int tolua_ret = (int)  eressea_export_json(filename,flags);
+ tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'export'.",&tolua_err);
+ return 0;
+#endif
+}
+
 /* Open lib function */
 LUALIB_API int luaopen_eressea (lua_State* tolua_S)
 {
@@ -144,6 +173,7 @@ LUALIB_API int luaopen_eressea (lua_State* tolua_S)
  tolua_function(tolua_S,"read_game",tolua_eressea_eressea_read_game00);
  tolua_function(tolua_S,"write_game",tolua_eressea_eressea_write_game00);
  tolua_function(tolua_S,"read_orders",tolua_eressea_eressea_read_orders00);
+ tolua_function(tolua_S,"export",tolua_eressea_eressea_export00);
  tolua_endmodule(tolua_S);
  tolua_endmodule(tolua_S);
  return 1;

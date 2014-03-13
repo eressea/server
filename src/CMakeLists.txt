@@ -59,12 +59,6 @@ TOLUA_BINDING(eressea.pkg bind_eressea.h)
 TOLUA_BINDING(settings.pkg bind_settings.h)
 ENDIF()
 
-set(TESTS
-  laws_test.c
-  economy_test.c
-  market_test.c
-)
-
 set (SERVER_SRC
   process.pkg.c
   eressea.pkg.c
@@ -133,6 +127,7 @@ set(SERVER_TEST_SRC
   test_eressea.c
   tests.c
   tests_test.c
+  bindings_test.c
   economy_test.c
   market_test.c
   laws_test.c

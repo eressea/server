@@ -11,8 +11,11 @@
 #include <stream.h>
 #include "cJSON.h"
 
-void export_json(stream * out, unsigned int flags) {
+#include <assert.h>
+
+int export_json(stream * out, unsigned int flags) {
     cJSON *json, *root = cJSON_CreateObject();
+    assert(out && out->api);
     if (flags & EXPORT_REGIONS) {
         region * r;
         cJSON_AddItemToObject(root, "regions", json = cJSON_CreateObject());
@@ -50,4 +53,5 @@ void export_json(stream * out, unsigned int flags) {
         free(output);
     }
     cJSON_Delete(root);
+    return 0;
 }
