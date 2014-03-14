@@ -14,8 +14,8 @@ static void test_export(CuTest * tc) {
     err = export_json(&out, EXPORT_REGIONS);
     CuAssertIntEquals(tc, 0, err);
     out.api->rewind(out.handle);
-    out.api->readln(out.handle, buf, sizeof(buf));
-    CuAssertStrEquals(tc, "{}", buf);
+    out.api->read(out.handle, buf, sizeof(buf));
+    CuAssertStrEquals(tc, "{\n}\n", buf);
     mstream_done(&out);
 }
   
