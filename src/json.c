@@ -2,7 +2,7 @@
 #include <util/base36.h>
 #include <platform.h>
 
-#include "export.h"
+#include "json.h"
 
 #include <kernel/types.h>
 #include <kernel/region.h>
@@ -13,7 +13,11 @@
 
 #include <assert.h>
 
-int export_json(stream * out, unsigned int flags) {
+int json_import(struct stream * out) {
+    return 0;
+}
+
+int json_export(stream * out, unsigned int flags) {
     cJSON *json, *root = cJSON_CreateObject();
     assert(out && out->api);
     if (flags & EXPORT_REGIONS) {

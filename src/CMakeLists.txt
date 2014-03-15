@@ -64,7 +64,7 @@ set (SERVER_SRC
   eressea.pkg.c
   settings.pkg.c
   eressea.c
-  export.c
+  json.c
   archetype.c
   creation.c
   creport.c
@@ -127,7 +127,7 @@ set(SERVER_TEST_SRC
   test_eressea.c
   tests.c
   tests_test.c
-  bindings_test.c
+  json_test.c
   economy_test.c
   market_test.c
   laws_test.c

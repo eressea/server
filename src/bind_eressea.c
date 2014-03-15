@@ -2,7 +2,7 @@
 
 #include <platform.h>
 
-#include "export.h"
+#include "json.h"
 
 #include <kernel/types.h>
 #include <kernel/config.h>
@@ -35,7 +35,7 @@ int eressea_export_json(const char * filename, unsigned int flags) {
         stream out = { 0 };
         int err;
         fstream_init(&out, F);
-        err = export_json(&out, flags);
+        err = json_export(&out, flags);
         fstream_done(&out);
         return err;
     }

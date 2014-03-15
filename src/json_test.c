@@ -2,7 +2,7 @@
 #include <CuTest.h>
 #include <stream.h>
 #include <memstream.h>
-#include "export.h"
+#include "json.h"
 #include "bind_eressea.h"
 
 static void test_export(CuTest * tc) {
@@ -11,7 +11,7 @@ static void test_export(CuTest * tc) {
     int err;
     
     mstream_init(&out);
-    err = export_json(&out, EXPORT_REGIONS);
+    err = json_export(&out, EXPORT_REGIONS);
     CuAssertIntEquals(tc, 0, err);
     out.api->rewind(out.handle);
     out.api->read(out.handle, buf, sizeof(buf));
@@ -19,7 +19,7 @@ static void test_export(CuTest * tc) {
     mstream_done(&out);
 }
   
-CuSuite *get_bindings_suite(void) {
+CuSuite *get_json_suite(void) {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_export);
     return suite;
