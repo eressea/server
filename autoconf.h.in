@@ -39,12 +39,6 @@
 #ifndef HAVE__ACCESS
 #ifdef HAVE_ACCESS
 #define _access(path, mode) access(path, mode)
-#ifndef _A_RDONLY
-#define _A_RDONLY R_OK
-#endif
-#ifndef _A_WRONLY
-#define _A_WRONLY W_OK
-#endif
 #endif
 #endif
 
