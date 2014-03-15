@@ -44,6 +44,7 @@
 
 /* libc includes */
 #include <assert.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define EFFECT_HEALING_SPELL     5

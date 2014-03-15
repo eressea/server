@@ -35,6 +35,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* libc includes */
 #include <assert.h>
 #include <string.h>
+#include <stdlib.h>
 
 static equipment *equipment_sets;
 

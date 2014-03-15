@@ -40,6 +40,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* libc includes */
 #include <math.h>
+#include <stdio.h>
 
 int average_score_of_age(int age, int a)
 {

@@ -35,6 +35,7 @@ without prior permission by the authors of Eressea.
 #include <lua.h>
 
 #include <assert.h>
+#include <string.h>
 
 static int
 lua_giveitem(unit * s, unit * d, const item_type * itype, int n, struct order *ord)

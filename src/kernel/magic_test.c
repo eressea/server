@@ -16,6 +16,8 @@
 #include <CuTest.h>
 #include <tests.h>
 
+#include <stdlib.h>
+
 void test_updatespells(CuTest * tc)
 {
   faction * f;

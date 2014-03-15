@@ -34,6 +34,7 @@
 #include <util/lists.h>
 
 #include <string.h>
+#include <stdlib.h>
 #include <stdio.h>
 
 #undef SUMMARY_BOM              /* write a BOM in the summary file */

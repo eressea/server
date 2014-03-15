@@ -9,6 +9,8 @@
 #include <CuTest.h>
 #include <tests.h>
 
+#include <string.h>
+
 static void test_reorder_units(CuTest * tc)
 {
   region *r;

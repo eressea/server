@@ -8,6 +8,8 @@
 #include "spellbook.h"
 
 #include <assert.h>
+#include <stdlib.h>
+#include <string.h>
 
 spellbook * create_spellbook(const char * name)
 {

@@ -23,6 +23,7 @@
 #include <storage.h>
 
 #include <assert.h>
+#include <stdlib.h>
 
 typedef struct wallcurse {
   curse *buddy;

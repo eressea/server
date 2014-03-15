@@ -13,6 +13,7 @@
 #include <quicklist.h>
 
 #include <tolua.h>
+#include <stdlib.h>
 
 static int tolua_levitate_ship(lua_State * L)
 {

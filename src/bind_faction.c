@@ -30,6 +30,7 @@ without prior permission by the authors of Eressea.
 #include <quicklist.h>
 
 #include <tolua.h>
+#include <string.h>
 
 int tolua_factionlist_next(lua_State * L)
 {

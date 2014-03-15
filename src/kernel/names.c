@@ -42,6 +42,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <ctype.h>
 #include <wctype.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 const char *describe_braineater(unit * u, const struct locale *lang)

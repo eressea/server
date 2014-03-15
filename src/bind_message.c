@@ -16,6 +16,8 @@
 #include <tolua.h>
 
 #include <assert.h>
+#include <string.h>
+#include <stdlib.h>
 
 #define E_OK 0
 #define E_INVALID_MESSAGE 1

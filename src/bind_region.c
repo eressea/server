@@ -40,6 +40,8 @@ without prior permission by the authors of Eressea.
 #include <tolua.h>
 
 #include <assert.h>
+#include <string.h>
+#include <stdlib.h>
 
 int tolua_regionlist_next(lua_State * L)
 {

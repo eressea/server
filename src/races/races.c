@@ -8,7 +8,7 @@
  *
  */
 
-#include "platform.h"
+#include <platform.h>
 #include <kernel/config.h>
 #include "races.h"
 
@@ -27,6 +27,9 @@
 #include <util/functions.h>
 #include <util/rng.h>
 
+#include <string.h>
+#include <stdio.h>
+
 void age_firedragon(struct unit *u);
 void age_dragon(struct unit *u);
 void age_illusion(struct unit *u);
@@ -40,7 +43,7 @@ static void oldfamiliars(unit * u)
   char fname[64];
   /* these familiars have no special skills.
    */
-  snprintf(fname, sizeof(fname), "%s_familiar", u_race(u)->_name[0]);
+  _snprintf(fname, sizeof(fname), "%s_familiar", u_race(u)->_name[0]);
   create_mage(u, M_GRAY);
   equip_unit(u, get_equipment(fname));
 }

@@ -70,6 +70,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <limits.h>
 #include <math.h>
 #include <string.h>
+#include <stdlib.h>
 #include <sys/stat.h>
 
 #pragma endregion

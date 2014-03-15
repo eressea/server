@@ -1590,7 +1590,7 @@ static seen_region **prepare_report(faction * f)
 
 int write_reports(faction * f, time_t ltime)
 {
-  int backup = 1, maxbackup = 128;
+  int backup = 1, maxbackup = 128*1000;
   bool gotit = false;
   struct report_context ctx;
   const char *encoding = "UTF-8";
@@ -1629,9 +1629,9 @@ int write_reports(faction * f, time_t ltime)
     if (errno) {
       char zText[64];
       puts(" ERROR");
-      sprintf(zText, "Waiting %u seconds before retry", backup);
+      sprintf(zText, "Waiting %u seconds before we retry", backup/1000);
       perror(zText);
-      sleep(backup);
+      _sleep(backup);
       if (backup < maxbackup) {
         backup *= 2;
       }

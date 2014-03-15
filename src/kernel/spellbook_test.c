@@ -10,6 +10,7 @@
 #include <CuTest.h>
 #include <tests.h>
 
+#include <stdlib.h>
 
 int count_spell_cb(spellbook_entry * sbe, void * ptr)
 {

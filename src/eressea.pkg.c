@@ -1,6 +1,6 @@
 /*
 ** Lua binding: eressea
-** Generated automatically by tolua 5.1.3 on Thu Mar 13 14:40:47 2014.
+** Generated automatically by tolua 5.1.3 on Sat Mar 15 19:26:36 2014.
 */
 
 #include "tolua.h"

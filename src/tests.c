@@ -19,6 +19,8 @@
 #include <util/log.h>
 
 #include <assert.h>
+#include <stdlib.h>
+#include <string.h>
 
 struct race *test_create_race(const char *name)
 {

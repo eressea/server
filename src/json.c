@@ -1,6 +1,5 @@
-#include <util/bool.h>
+#include "platform.h"
 #include <util/base36.h>
-#include <platform.h>
 
 #include "json.h"
 
@@ -11,6 +10,9 @@
 #include <stream.h>
 #include "cJSON.h"
 
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include <assert.h>
 
 int json_import(struct stream * out) {
@@ -26,7 +28,7 @@ int json_export(stream * out, unsigned int flags) {
         for (r = regions; r; r = r->next) {
             char id[32];
             cJSON *data;
-            snprintf(id, sizeof(id), "%u", r->uid);
+            _snprintf(id, sizeof(id), "%u", r->uid);
             cJSON_AddItemToObject(json, id, data = cJSON_CreateObject());
             cJSON_AddNumberToObject(data, "x", r->x);
             cJSON_AddNumberToObject(data, "y", r->y);

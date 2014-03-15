@@ -2,6 +2,7 @@
 #include "calendar.h"
 
 #include <assert.h>
+#include <stdlib.h>
 
 int first_turn = 0;
 int first_month = 0;

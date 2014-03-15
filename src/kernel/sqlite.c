@@ -7,6 +7,7 @@
 #include <sqlite3.h>
 #include <md5.h>
 #include <assert.h>
+#include <string.h>
 
 faction *get_faction_by_id(int uid)
 {

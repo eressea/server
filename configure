@@ -21,6 +21,6 @@ echo "Building with $CC and $JOBS jobs"
 
 mkdir -p $BIN_DIR
 cd $BIN_DIR
-CC="$CC" cmake .. -DCMAKE_MODULE_PATH=$PWD/../cmake/Modules -DCMAKE_BUILD_TYPE=Debug
+CC="$CC" ../s/cmake-init
 make -j$JOBS
 make test
