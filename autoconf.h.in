@@ -4,6 +4,7 @@
 #cmakedefine HAVE_STDBOOL_H 1
 #cmakedefine HAVE_STRINGS_H 1
 #cmakedefine HAVE_WINDOWS_H 1
+#cmakedefine HAVE_IO_H 1
 #cmakedefine HAVE_UNISTD_H 1
 #cmakedefine HAVE__BOOL 1
 #cmakedefine HAVE_STRCASECMP 1

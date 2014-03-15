@@ -2568,28 +2568,28 @@ static bool display_race(faction * f, unit * u, const race * rc)
     }
   }
   if (rc->battle_flags & BF_EQUIPMENT) {
-    bytes = snprintf(bufp, size, " %s", LOC(f->locale, "stat_equipment"));
+    bytes = _snprintf(bufp, size, " %s", LOC(f->locale, "stat_equipment"));
     if (wrptr(&bufp, &size, bytes) != 0)
       WARN_STATIC_BUFFER();
   }
   if (rc->battle_flags & BF_RES_PIERCE) {
-    bytes = snprintf(bufp, size, " %s", LOC(f->locale, "stat_pierce"));
+    bytes = _snprintf(bufp, size, " %s", LOC(f->locale, "stat_pierce"));
     if (wrptr(&bufp, &size, bytes) != 0)
       WARN_STATIC_BUFFER();
   }
   if (rc->battle_flags & BF_RES_CUT) {
-    bytes = snprintf(bufp, size, " %s", LOC(f->locale, "stat_cut"));
+    bytes = _snprintf(bufp, size, " %s", LOC(f->locale, "stat_cut"));
     if (wrptr(&bufp, &size, bytes) != 0)
       WARN_STATIC_BUFFER();
   }
   if (rc->battle_flags & BF_RES_BASH) {
-    bytes = snprintf(bufp, size, " %s", LOC(f->locale, "stat_bash"));
+    bytes = _snprintf(bufp, size, " %s", LOC(f->locale, "stat_bash"));
     if (wrptr(&bufp, &size, bytes) != 0)
       WARN_STATIC_BUFFER();
   }
 
   bytes =
-    snprintf(bufp, size, " %d %s", at_count, LOC(f->locale,
+    _snprintf(bufp, size, " %d %s", at_count, LOC(f->locale,
       (at_count == 1) ? "stat_attack" : "stat_attacks"));
   if (wrptr(&bufp, &size, bytes) != 0)
     WARN_STATIC_BUFFER();
@@ -2606,12 +2606,12 @@ static bool display_race(faction * f, unit * u, const race * rc)
       switch (rc->attack[a].type) {
       case AT_STANDARD:
         bytes =
-          snprintf(bufp, size, "%s (%s)",
+          _snprintf(bufp, size, "%s (%s)",
           LOC(f->locale, "attack_standard"), rc->def_damage);
         break;
       case AT_NATURAL:
         bytes =
-          snprintf(bufp, size, "%s (%s)",
+          _snprintf(bufp, size, "%s (%s)",
           LOC(f->locale, "attack_natural"), rc->attack[a].data.dice);
         break;
       case AT_SPELL:
@@ -2619,11 +2619,11 @@ static bool display_race(faction * f, unit * u, const race * rc)
       case AT_DRAIN_ST:
       case AT_DRAIN_EXP:
       case AT_DAZZLE:
-        bytes = snprintf(bufp, size, "%s", LOC(f->locale, "attack_magical"));
+        bytes = _snprintf(bufp, size, "%s", LOC(f->locale, "attack_magical"));
         break;
       case AT_STRUCTURAL:
         bytes =
-          snprintf(bufp, size, "%s (%s)",
+          _snprintf(bufp, size, "%s (%s)",
           LOC(f->locale, "attack_structural"), rc->attack[a].data.dice);
         break;
       default:

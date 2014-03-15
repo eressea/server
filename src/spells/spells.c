@@ -4671,7 +4671,7 @@ int sp_clonecopy(castorder * co)
     return 0;
   }
 
-  snprintf(name, sizeof(name), (const char *)LOC(mage->faction->locale,
+  _snprintf(name, sizeof(name), (const char *)LOC(mage->faction->locale,
       "clone_of"), unitname(mage));
   clone =
     create_unit(target_region, mage->faction, 1, new_race[RC_CLONE], 0, name,

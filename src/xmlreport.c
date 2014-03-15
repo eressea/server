@@ -102,49 +102,49 @@ xml_link(report_context * ctx, const xmlChar * rel, const xmlChar * ref)
 static const xmlChar *xml_ref_unit(const unit * u)
 {
   static char idbuf[20];
-  snprintf(idbuf, sizeof(idbuf), "unit_%d", u->no);
+  _snprintf(idbuf, sizeof(idbuf), "unit_%d", u->no);
   return (const xmlChar *)idbuf;
 }
 
 static const xmlChar *xml_ref_faction(const faction * f)
 {
   static char idbuf[20];
-  snprintf(idbuf, sizeof(idbuf), "fctn_%d", f->no);
+  _snprintf(idbuf, sizeof(idbuf), "fctn_%d", f->no);
   return (const xmlChar *)idbuf;
 }
 
 static const xmlChar *xml_ref_group(const group * g)
 {
   static char idbuf[20];
-  snprintf(idbuf, sizeof(idbuf), "grp_%d", g->gid);
+  _snprintf(idbuf, sizeof(idbuf), "grp_%d", g->gid);
   return (const xmlChar *)idbuf;
 }
 
 static const xmlChar *xml_ref_prefix(const char *str)
 {
   static char idbuf[20];
-  snprintf(idbuf, sizeof(idbuf), "pref_%s", str);
+  _snprintf(idbuf, sizeof(idbuf), "pref_%s", str);
   return (const xmlChar *)idbuf;
 }
 
 static const xmlChar *xml_ref_building(const building * b)
 {
   static char idbuf[20];
-  snprintf(idbuf, sizeof(idbuf), "bldg_%d", b->no);
+  _snprintf(idbuf, sizeof(idbuf), "bldg_%d", b->no);
   return (const xmlChar *)idbuf;
 }
 
 static const xmlChar *xml_ref_ship(const ship * sh)
 {
   static char idbuf[20];
-  snprintf(idbuf, sizeof(idbuf), "shp_%d", sh->no);
+  _snprintf(idbuf, sizeof(idbuf), "shp_%d", sh->no);
   return (const xmlChar *)idbuf;
 }
 
 static const xmlChar *xml_ref_region(const region * r)
 {
   static char idbuf[20];
-  snprintf(idbuf, sizeof(idbuf), "rgn_%d", r->uid);
+  _snprintf(idbuf, sizeof(idbuf), "rgn_%d", r->uid);
   return (const xmlChar *)idbuf;
 }
 
@@ -736,7 +736,7 @@ static xmlNodePtr report_root(report_context * ctx)
 
   node = xmlAddChild(xmlReport, xmlNewNode(xct->ns_atl, BAD_CAST "server"));
   if (mailto) {
-    snprintf(zText, sizeof(zText), "mailto:%s?subject=%s", mailto, mailcmd);
+    _snprintf(zText, sizeof(zText), "mailto:%s?subject=%s", mailto, mailcmd);
     child = xmlAddChild(node, xmlNewNode(xct->ns_atl, BAD_CAST "delivery"));
     xmlNewNsProp(child, xct->ns_atl, BAD_CAST "method", BAD_CAST "mail");
     xmlNewNsProp(child, xct->ns_atl, BAD_CAST "href", BAD_CAST zText);

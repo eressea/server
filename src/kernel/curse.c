@@ -316,7 +316,7 @@ const curse_type *ct_find(const char *c)
       return type;
     } else {
       size_t k = MIN(strlen(c), strlen(type->cname));
-      if (!strncasecmp(c, type->cname, k)) {
+      if (!_memicmp(c, type->cname, k)) {
         return type;
       }
     }

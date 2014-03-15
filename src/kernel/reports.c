@@ -526,7 +526,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char *buf,
         if (a_otherfaction && alliedunit(u, f, HELP_FSTEALTH)) {
           faction *f = get_otherfaction(a_otherfaction);
           bytes =
-            snprintf(bufp, size, ", %s (%s)", factionname(f),
+            _snprintf(bufp, size, ", %s (%s)", factionname(f),
             factionname(u->faction));
           if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
@@ -550,7 +550,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char *buf,
     && effskill(u, SK_STEALTH) >= 6) {
     bytes = (int)strlcpy(bufp, "? ", size);
   } else {
-    bytes = snprintf(bufp, size, "%d ", u->number);
+    bytes = _snprintf(bufp, size, "%d ", u->number);
   }
   if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0)
     WARN_STATIC_BUFFER();
@@ -687,7 +687,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char *buf,
       WARN_STATIC_BUFFER();
 
     if (!dh) {
-      bytes = snprintf(bufp, size, "%s: ", LOC(f->locale, "nr_inventory"));
+      bytes = _snprintf(bufp, size, "%s: ", LOC(f->locale, "nr_inventory"));
       if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
       dh = 1;
@@ -695,7 +695,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char *buf,
     if (in == 1) {
       bytes = (int)strlcpy(bufp, ic, size);
     } else {
-      bytes = snprintf(bufp, size, "%d %s", in, ic);
+      bytes = _snprintf(bufp, size, "%d %s", in, ic);
     }
     if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0)
       WARN_STATIC_BUFFER();
@@ -707,7 +707,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char *buf,
     if (book) {
       quicklist *ql = book->spells;
       int qi, header, maxlevel = effskill(u, SK_MAGIC);
-      int bytes = snprintf(bufp, size, ". Aura %d/%d", get_spellpoints(u), max_spellpoints(u->region, u));
+      int bytes = _snprintf(bufp, size, ". Aura %d/%d", get_spellpoints(u), max_spellpoints(u->region, u));
       if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0) {
         WARN_STATIC_BUFFER();
       }
@@ -716,7 +716,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char *buf,
         spellbook_entry * sbe = (spellbook_entry *) ql_get(ql, qi);
         if (sbe->level <= maxlevel) {
           if (!header) {
-            bytes = snprintf(bufp, size, ", %s: ", LOC(f->locale, "nr_spells"));
+            bytes = _snprintf(bufp, size, ", %s: ", LOC(f->locale, "nr_spells"));
             header = 1;
           } else {
             bytes = (int)strlcpy(bufp, ", ", size);
@@ -737,7 +737,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char *buf,
       }
       if (i != MAXCOMBATSPELLS) {
         bytes =
-          snprintf(bufp, size, ", %s: ", LOC(f->locale, "nr_combatspells"));
+          _snprintf(bufp, size, ", %s: ", LOC(f->locale, "nr_combatspells"));
         if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0)
           WARN_STATIC_BUFFER();
 
@@ -762,7 +762,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char *buf,
             }
 
             if (sl > 0) {
-              bytes = snprintf(bufp, size, " (%d)", sl);
+              bytes = _snprintf(bufp, size, " (%d)", sl);
               if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
             }
@@ -1870,7 +1870,7 @@ f_regionid(const region * r, const faction * f, char *buffer, size_t size)
     pnormalize(&nx, &ny, pl);
     adjust_coordinates(f, &nx, &ny, pl, r);
     len = strlcpy(buffer, rname(r, f?f->locale:0), size);
-    snprintf(buffer + len, size-len, " (%d,%d%s%s)", nx, ny, named ? "," : "", (named) ? name : "");
+    _snprintf(buffer + len, size-len, " (%d,%d%s%s)", nx, ny, named ? "," : "", (named) ? name : "");
     buffer[size-1] = 0;
     len=strlen(buffer);
   }
@@ -2149,7 +2149,7 @@ static void eval_resources(struct opstack **stack, const void *userdata)
   while (res != NULL && size > 4) {
     const char *rname =
       resourcename(res->type, (res->number != 1) ? NMF_PLURAL : 0);
-    int bytes = snprintf(bufp, size, "%d %s", res->number, LOC(lang, rname));
+    int bytes = _snprintf(bufp, size, "%d %s", res->number, LOC(lang, rname));
     if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0 || size < sizeof(buf) / 2) {
       WARN_STATIC_BUFFER();
       break;
@@ -2214,7 +2214,7 @@ static void eval_trail(struct opstack **stack, const void *userdata)
   variant var;
   char *bufp = buf;
 #ifdef _SECURECRT_ERRCODE_VALUES_DEFINED
-  /* stupid MS broke snprintf */
+  /* stupid MS broke _snprintf */
   int eold = errno;
 #endif
 
@@ -2224,7 +2224,7 @@ static void eval_trail(struct opstack **stack, const void *userdata)
       region *r = regions->regions[i];
       const char *trail = trailinto(r, lang);
       const char *rn = f_regionid_s(r, report);
-      int bytes = snprintf(bufp, size, trail, rn);
+      int bytes = _snprintf(bufp, size, trail, rn);
       if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
 

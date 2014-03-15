@@ -139,4 +139,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <strings.h>
 #endif
 
+#ifdef HAVE_IO_H
+#include <io.h>
+#endif
+
 #endif
