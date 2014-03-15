@@ -12,6 +12,8 @@
 #cmakedefine HAVE__STRICMP 1
 #cmakedefine HAVE_SNPRINTF 1
 #cmakedefine HAVE__SNPRINTF 1
+#cmakedefine HAVE_ACCESS 1
+#cmakedefine HAVE__ACCESS 1
 #cmakedefine HAVE_SLEEP 1
 #cmakedefine HAVE_USLEEP 1
 #cmakedefine HAVE__SLEEP 1
@@ -32,6 +34,24 @@
 
 #if defined(HAVE_STRINGS_H)
 #include <strings.h>
+#endif
+
+#ifndef HAVE__ACCESS
+#ifdef HAVE_ACCESS
+#define _access(path, mode) access(path, mode)
+#ifndef _A_RDONLY
+#define _A_RDONLY R_OK
+#endif
+#ifndef _A_WRONLY
+#define _A_WRONLY W_OK
+#endif
+#endif
+#endif
+
+#ifndef _A_RDONLY
+#ifdef R_OK
+#define _A_RDONLY R_OK
+#endif
 #endif
 
 #if !defined(HAVE__MEMICMP)
