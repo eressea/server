@@ -28,6 +28,7 @@ parser.c
 rand.c
 resolve.c
 sql.c
+stack.c
 strings.c
 translation.c
 umlaut.c
