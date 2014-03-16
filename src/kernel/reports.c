@@ -55,7 +55,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <quicklist.h>
 
 /* libc includes */
-#include <sys/stat.h>
 #include <assert.h>
 #include <errno.h>
 #include <limits.h>
@@ -1726,13 +1725,11 @@ static void write_script(FILE * F, const faction * f)
 int init_reports(void)
 {
   prepare_reports();
-#ifdef HAVE_STAT
   {
-    stat_type st;
-    if (stat(reportpath(), &st) == 0)
+    if (_access(reportpath(), 0)!=0) {
       return 0;
+    }
   }
-#endif
   if (_mkdir(reportpath()) != 0) {
     if (errno != EEXIST) {
       perror("could not create reportpath");

@@ -96,11 +96,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <limits.h>
 #include <stdlib.h>
 
-#ifdef HAVE_STAT
-#include <sys/types.h>
-#include <sys/stat.h>
-#endif
-
 extern int verbosity;
 extern int *storms;
 extern int weeks_per_month;
