@@ -513,7 +513,8 @@ int build(unit * u, const construction * ctype, int completed, int want)
       if (made == 0) {
         return ELOWSKILL;       /* not good enough to go on */
       } else {
-        /* skill too low? Set remaining skill points to zero. */
+        /* skill too low? Set remaining skill
+           points to zero to abort production. */
         skills = 0;
       }
     }
