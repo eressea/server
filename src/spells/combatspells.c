@@ -44,6 +44,7 @@
 
 /* libc includes */
 #include <assert.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define EFFECT_HEALING_SPELL     5
@@ -314,14 +315,14 @@ int sp_combatrosthauch(struct castorder * co)
     if (force <= 0)
       break;
 
-    /* da n MIN(force, x), sollte force maximal auf 0 sinken */
+    /* da n _min(force, x), sollte force maximal auf 0 sinken */
     assert(force >= 0);
 
     if (df->weapons) {
       int w;
       for (w = 0; df->weapons[w].type != NULL; ++w) {
         weapon *wp = df->weapons;
-        int n = MIN(force, wp->used);
+        int n = _min(force, wp->used);
         if (n) {
           requirement *mat = wp->type->itype->construction->materials;
           bool iron = false;
@@ -872,7 +873,7 @@ int sp_shadowknights(struct castorder * co)
   region *r = b->region;
   unit *mage = fi->unit;
   attrib *a;
-  int force = MAX(1, (int)get_force(power, 3));
+  int force = _max(1, (int)get_force(power, 3));
   message *msg;
 
   u =
@@ -972,7 +973,7 @@ int sp_chaosrow(struct castorder * co)
       continue;
     if (power <= 0.0)
       break;
-    /* force sollte wegen des MAX(0,x) nicht unter 0 fallen können */
+    /* force sollte wegen des _max(0,x) nicht unter 0 fallen können */
 
     if (is_magic_resistant(mage, df->unit, 0))
       continue;
@@ -1007,7 +1008,7 @@ int sp_chaosrow(struct castorder * co)
       }
       k += df->alive;
     }
-    power = MAX(0, power - n);
+    power = _max(0, power - n);
   }
   ql_free(fgs);
 
@@ -1109,12 +1110,12 @@ int sp_hero(struct castorder * co)
   switch (sp->id) {
     case SPL_HERO:
       df_bonus = (int)(power / 5);
-      force = MAX(1, lovar(get_force(power, 4)));
+      force = _max(1, lovar(get_force(power, 4)));
       break;
 
     default:
       df_bonus = 1;
-      force = MAX(1, (int)power);
+      force = _max(1, (int)power);
   }
 
   allies =
@@ -1163,7 +1164,7 @@ int sp_berserk(struct castorder * co)
   switch (sp->id) {
     case SPL_BERSERK:
     case SPL_BLOODTHIRST:
-      at_bonus = MAX(1, level / 3);
+      at_bonus = _max(1, level / 3);
       df_malus = 2;
       force = (int)get_force(power, 2);
       break;
@@ -1219,7 +1220,7 @@ int sp_frighten(struct castorder * co)
   int targets = 0;
   message *m;
 
-  at_malus = MAX(1, level - 4);
+  at_malus = _max(1, level - 4);
   df_malus = 2;
   force = (int)get_force(power, 2);
 
@@ -1501,7 +1502,7 @@ int sp_fumbleshield(struct castorder * co)
     case SPL_CERRDOR_FUMBLESHIELD:
     case SPL_TYBIED_FUMBLESHIELD:
       duration = 100;
-      effect = MAX(1, 25 - level);
+      effect = _max(1, 25 - level);
       break;
 
     default:
@@ -1548,7 +1549,7 @@ int sp_reanimate(struct castorder * co)
   }
 
   healable = count_healable(b, fi);
-  healable = (int)MIN(k, healable);
+  healable = (int)_min(k, healable);
   while (healable--) {
     fighter *tf = select_corpse(b, fi);
     if (tf != NULL && tf->side->casualties > 0
@@ -1600,7 +1601,7 @@ int sp_keeploot(struct castorder * co)
   message_all(b, m);
   msg_release(m);
 
-  b->keeploot = (int)MAX(25, b->keeploot + 5 * power);
+  b->keeploot = (int)_max(25, b->keeploot + 5 * power);
 
   return level;
 }
@@ -1631,10 +1632,10 @@ static int heal_fighters(quicklist * fgs, int *power, bool heal_monsters)
           ++wound;
 
         if (wound > 0 && wound < hp) {
-          int heal = MIN(healhp, wound);
+          int heal = _min(healhp, wound);
           assert(heal >= 0);
           df->person[n].hp += heal;
-          healhp = MAX(0, healhp - heal);
+          healhp = _max(0, healhp - heal);
           ++healed;
           if (healhp <= 0)
             break;
@@ -1767,7 +1768,7 @@ int sp_undeadhero(struct castorder * co)
   }
   ql_free(fgs);
 
-  level = MIN(level, undead);
+  level = _min(level, undead);
   if (undead == 0) {
     msg =
       msg_message("summonundead_effect_0", "mage region", mage, mage->region);

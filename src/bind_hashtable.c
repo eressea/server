@@ -26,6 +26,7 @@ without prior permission by the authors of Eressea.
 #include <tolua.h>
 #include <lua.h>
 
+#include <string.h>
 #include <assert.h>
 
 static int tolua_hashtable_get(lua_State * L)

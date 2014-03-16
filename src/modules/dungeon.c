@@ -225,8 +225,8 @@ static int tagbegin(xml_stack * stack)
       monster *m = calloc(sizeof(monster), 1);
       m->race = rc_find(xml_value(tag, "race"));
       m->chance = xml_fvalue(tag, "chance");
-      m->avgsize = MAX(1, xml_ivalue(tag, "size"));
-      m->maxunits = MIN(1, xml_ivalue(tag, "maxunits"));
+      m->avgsize = _max(1, xml_ivalue(tag, "size"));
+      m->maxunits = _min(1, xml_ivalue(tag, "maxunits"));
 
       if (m->race) {
         if (xml_bvalue(tag, "boss")) {

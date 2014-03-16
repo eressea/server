@@ -23,6 +23,7 @@
 #include <storage.h>
 
 #include <assert.h>
+#include <stdlib.h>
 
 typedef struct wallcurse {
   curse *buddy;
@@ -213,7 +214,7 @@ static region *wall_move(const connection * b, struct unit *u,
   wall_data *fd = (wall_data *) b->data.v;
   if (!routing && fd->active) {
     int hp = dice(3, fd->force) * u->number;
-    hp = MIN(u->hp, hp);
+    hp = _min(u->hp, hp);
     u->hp -= hp;
     if (u->hp) {
       ADDMSG(&u->faction->msgs, msg_message("firewall_damage",

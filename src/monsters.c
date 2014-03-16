@@ -82,7 +82,7 @@ static void reduce_weight(unit * u)
   int horses = get_resource(u, oldresourcetype[R_HORSE]);
 
   if (horses > 0) {
-    horses = MIN(horses, (u->number * 2));
+    horses = _min(horses, (u->number * 2));
     change_resource(u, oldresourcetype[R_HORSE], -horses);
   }
 
@@ -109,7 +109,7 @@ static void reduce_weight(unit * u)
       if (itype->weight >= 10 && itype->rtype->wtype == 0
         && itype->rtype->atype == 0) {
         if (itype->capacity < itype->weight) {
-          int reduce = MIN(itm->number, -((capacity - weight) / itype->weight));
+          int reduce = _min(itm->number, -((capacity - weight) / itype->weight));
           give_item(reduce, itm->type, u, NULL, NULL);
           weight -= reduce * itype->weight;
         }
@@ -124,7 +124,7 @@ static void reduce_weight(unit * u)
     const item_type *itype = itm->type;
     weight += itm->number * itype->weight;
     if (itype->capacity < itype->weight) {
-      int reduce = MIN(itm->number, -((capacity - weight) / itype->weight));
+      int reduce = _min(itm->number, -((capacity - weight) / itype->weight));
       give_item(reduce, itm->type, u, NULL, NULL);
       weight -= reduce * itype->weight;
     }

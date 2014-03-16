@@ -28,7 +28,7 @@
 const xmlChar *xml_i(double number)
 {
   static char buffer[128];
-  snprintf(buffer, sizeof(buffer), "%.0f", number);
+  _snprintf(buffer, sizeof(buffer), "%.0f", number);
   return (const xmlChar *)buffer;
 }
 

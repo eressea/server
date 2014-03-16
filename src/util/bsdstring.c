@@ -1,4 +1,5 @@
 #include <platform.h>
+#include <stdio.h>
 #include <string.h>
 #include <errno.h>
 #include <assert.h>
@@ -8,7 +9,7 @@
 
 int wrptr(char **ptr, size_t * size, int bytes)
 {
-  assert(bytes >= 0 || !"you're not using snprintf right, maybe?");
+  assert(bytes >= 0 || !"you're not using _snprintf right, maybe?");
 
   if (bytes == 0) {
     return 0;

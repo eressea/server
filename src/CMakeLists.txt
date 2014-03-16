@@ -10,7 +10,7 @@ ELSE(CMAKE_COMPILER_IS_GNUCC)
 ENDIF(CMAKE_COMPILER_IS_GNUCC)
 
 find_package (Lua 5 REQUIRED)
-find_package (ToLua REQUIRED)
+find_package (ToLua)
 find_package (SQLite3 REQUIRED)
 
 include_directories (${CMAKE_CURRENT_SOURCE_DIR})
@@ -45,30 +45,26 @@ ENDMACRO(ADD_LUA_MODULE)
 
 MACRO(TOLUA_BINDING PKGFILE FILES)
   ADD_CUSTOM_COMMAND(
-    OUTPUT ${PKGFILE}.c
+    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${PKGFILE}.c
     DEPENDS ${FILES} ${PKGFILE}
     COMMAND ${TOLUA_EXECUTABLE}
-    ARGS -o ${CMAKE_CURRENT_BINARY_DIR}/${PKGFILE}.c ${PKGFILE}
+    ARGS -o ${CMAKE_CURRENT_SOURCE_DIR}/${PKGFILE}.c ${PKGFILE}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   )
 ENDMACRO(TOLUA_BINDING)
 
+IF(NOT MSVC)
 TOLUA_BINDING(process.pkg bind_process.h)
 TOLUA_BINDING(eressea.pkg bind_eressea.h)
 TOLUA_BINDING(settings.pkg bind_settings.h)
-
-set(TESTS
-  laws_test.c
-  economy_test.c
-  market_test.c
-)
+ENDIF()
 
 set (SERVER_SRC
   process.pkg.c
   eressea.pkg.c
   settings.pkg.c
   eressea.c
-  export.c
+  json.c
   archetype.c
   creation.c
   creport.c
@@ -131,6 +127,7 @@ set(SERVER_TEST_SRC
   test_eressea.c
   tests.c
   tests_test.c
+  json_test.c
   economy_test.c
   market_test.c
   laws_test.c

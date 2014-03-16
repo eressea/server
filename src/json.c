@@ -1,0 +1,98 @@
+#include "platform.h"
+#include <util/base36.h>
+
+#include "json.h"
+
+#include <kernel/types.h>
+#include <kernel/region.h>
+#include <kernel/faction.h>
+#include <kernel/terrain.h>
+#include <stream.h>
+#include "cJSON.h"
+
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <assert.h>
+
+int json_import(struct stream * out) {
+    cJSON *json, *child;
+    char buffer[1024], *data = 0;
+    size_t sz = 0;
+    assert(out && out->api);
+    while (!out->api->readln(out->handle, buffer, sizeof(buffer))) {
+        size_t len = strlen(buffer);
+        data = (char *)realloc(data, sz + len + 1);
+        memcpy(data + sz, buffer, len);
+        sz += len;
+        data[sz] = 0;
+    }
+    json = cJSON_Parse(data);
+    child = cJSON_GetObjectItem(json, "regions");
+    if (child && child->type==cJSON_Object) {
+        cJSON *j;
+        for (j = child->child; j; j = j->next) {
+            cJSON *attr;
+            unsigned int id = 0;
+            int x = 0, y = 0;
+            region * r;
+
+            id = (unsigned int)atol(j->string);
+            if ((attr = cJSON_GetObjectItem(j, "x")) != 0 && attr->type == cJSON_Number) x = attr->valueint;
+            if ((attr = cJSON_GetObjectItem(j, "y")) != 0 && attr->type == cJSON_Number) y = attr->valueint;
+            r = new_region(x, y, 0, id);
+            if ((attr = cJSON_GetObjectItem(j, "type")) != 0 && attr->type == cJSON_String) {
+                const terrain_type *terrain = get_terrain(attr->valuestring);
+                terraform_region(r, terrain);
+            }
+            if ((attr = cJSON_GetObjectItem(j, "name")) != 0 && attr->type == cJSON_String) {
+                region_setname(r, attr->valuestring);
+            }
+        }
+    }
+    cJSON_Delete(json);
+    return 0;
+}
+
+int json_export(stream * out, unsigned int flags) {
+    cJSON *json, *root = cJSON_CreateObject();
+    assert(out && out->api);
+    if (flags & EXPORT_REGIONS) {
+        region * r;
+        cJSON_AddItemToObject(root, "regions", json = cJSON_CreateObject());
+        for (r = regions; r; r = r->next) {
+            char id[32];
+            cJSON *data;
+            _snprintf(id, sizeof(id), "%u", r->uid);
+            cJSON_AddItemToObject(json, id, data = cJSON_CreateObject());
+            cJSON_AddNumberToObject(data, "x", r->x);
+            cJSON_AddNumberToObject(data, "y", r->y);
+            cJSON_AddStringToObject(data, "type", r->terrain->_name);
+        }
+    }
+    if (flags & EXPORT_FACTIONS) {
+        faction *f;
+        cJSON_AddItemToObject(root, "factions", json = cJSON_CreateObject());
+        for (f = factions; f; f = f->next) {
+            cJSON *data;
+            cJSON_AddItemToObject(json, itoa36(f->no), data = cJSON_CreateObject());
+            cJSON_AddStringToObject(data, "name", f->name);
+            cJSON_AddStringToObject(data, "email", f->email);
+            cJSON_AddNumberToObject(data, "score", f->score);
+        }
+    }
+    if (flags) {
+        char *tok, *output;
+        output = cJSON_Print(root);
+        tok = strtok(output, "\n\r");
+        while (tok) {
+            if (tok[0]) {
+                out->api->writeln(out->handle, tok);
+            }
+            tok = strtok(NULL, "\n\r");
+        }
+        free(output);
+    }
+    cJSON_Delete(root);
+    return 0;
+}

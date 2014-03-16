@@ -67,6 +67,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 int *storms;
@@ -256,12 +257,12 @@ static int ridingcapacity(unit * u)
    ** tragen nichts (siehe walkingcapacity). Ein Wagen zählt nur, wenn er
    ** von zwei Pferden gezogen wird */
 
-  animals = MIN(animals, effskill(u, SK_RIDING) * u->number * 2);
+  animals = _min(animals, effskill(u, SK_RIDING) * u->number * 2);
   if (fval(u_race(u), RCF_HORSE))
     animals += u->number;
 
   /* maximal diese Pferde können zum Ziehen benutzt werden */
-  vehicles = MIN(animals / HORSESNEEDED, vehicles);
+  vehicles = _min(animals / HORSESNEEDED, vehicles);
 
   return vehicles * vcap + animals * acap;
 }
@@ -278,7 +279,7 @@ int walkingcapacity(const struct unit *u)
   /* Das Gewicht, welches die Pferde tragen, plus das Gewicht, welches
    * die Leute tragen */
 
-  pferde_fuer_wagen = MIN(animals, effskill(u, SK_RIDING) * u->number * 4);
+  pferde_fuer_wagen = _min(animals, effskill(u, SK_RIDING) * u->number * 4);
   if (fval(u_race(u), RCF_HORSE)) {
     animals += u->number;
     people = 0;
@@ -287,7 +288,7 @@ int walkingcapacity(const struct unit *u)
   }
 
   /* maximal diese Pferde können zum Ziehen benutzt werden */
-  wagen_mit_pferden = MIN(vehicles, pferde_fuer_wagen / HORSESNEEDED);
+  wagen_mit_pferden = _min(vehicles, pferde_fuer_wagen / HORSESNEEDED);
 
   n = wagen_mit_pferden * vcap;
 
@@ -297,7 +298,7 @@ int walkingcapacity(const struct unit *u)
     wagen_ohne_pferde = vehicles - wagen_mit_pferden;
 
     /* Genug Trolle, um die Restwagen zu ziehen? */
-    wagen_mit_trollen = MIN(u->number / 4, wagen_ohne_pferde);
+    wagen_mit_trollen = _min(u->number / 4, wagen_ohne_pferde);
 
     /* Wagenkapazität hinzuzählen */
     n += wagen_mit_trollen * vcap;
@@ -316,7 +317,7 @@ int walkingcapacity(const struct unit *u)
   }
   /* change_effect wird in ageing gemacht */
   tmp = get_item(u, I_TROLLBELT);
-  n += MIN(people, tmp) * (STRENGTHMULTIPLIER - 1) * personcapacity(u);
+  n += _min(people, tmp) * (STRENGTHMULTIPLIER - 1) * personcapacity(u);
 
   return n;
 }
@@ -344,7 +345,7 @@ static int canwalk(unit * u)
 
   maxwagen = effskill(u, SK_RIDING) * u->number * 2;
   if (u_race(u) == new_race[RC_TROLL]) {
-    maxwagen = MAX(maxwagen, u->number / 4);
+    maxwagen = _max(maxwagen, u->number / 4);
   }
   maxpferde = effskill(u, SK_RIDING) * u->number * 4 + u->number;
 
@@ -853,7 +854,7 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
   if (!contact && guard) {
     double prob = 0.3;          /* 30% base chance */
     prob += 0.1 * (perception - eff_stealth(reisender, r));
-    prob += 0.1 * MIN(guard->number, get_item(guard, I_AMULET_OF_TRUE_SEEING));
+    prob += 0.1 * _min(guard->number, get_item(guard, I_AMULET_OF_TRUE_SEEING));
 
     if (chance(prob)) {
       return guard;
@@ -1926,7 +1927,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
               const luxury_type *ltype = resource2luxury(itm->type->rtype);
               if (ltype != NULL && itm->number > 0) {
                 int st = itm->number * effskill(hafenmeister, SK_TRADE) / 50;
-                st = MIN(itm->number, st);
+                st = _min(itm->number, st);
 
                 if (st > 0) {
                   i_change(&u2->items, itm->type, -st);

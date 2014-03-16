@@ -117,11 +117,11 @@ static void destroy_road(unit * u, int nmax, struct order *ord)
     cmistake(u, ord, 71, MSG_PRODUCE);
   } else {
     short road = rroad(r, d);
-    n = MIN(n, road);
+    n = _min(n, road);
     if (n != 0) {
       region *r2 = rconnect(r, d);
       int willdo = eff_skill(u, SK_ROAD_BUILDING, r) * u->number;
-      willdo = MIN(willdo, n);
+      willdo = _min(willdo, n);
       if (willdo == 0) {
         /* TODO: error message */
       }
@@ -318,7 +318,7 @@ void build_road(region * r, unit * u, int size, direction_t d)
   }
 
   if (size > 0)
-    left = MIN(size, left);
+    left = _min(size, left);
   /* baumaximum anhand der rohstoffe */
   if (u_race(u) == new_race[RC_STONEGOLEM]) {
     n = u->number * GOLEM_STONE;
@@ -329,14 +329,14 @@ void build_road(region * r, unit * u, int size, direction_t d)
       return;
     }
   }
-  left = MIN(n, left);
+  left = _min(n, left);
 
   /* n = maximum by skill. try to maximize it */
   n = u->number * eff_skill(u, SK_ROAD_BUILDING, r);
   if (n < left) {
     item *itm = *i_find(&u->items, olditemtype[I_RING_OF_NIMBLEFINGER]);
     if (itm != NULL && itm->number > 0) {
-      int rings = MIN(u->number, itm->number);
+      int rings = _min(u->number, itm->number);
       n = n * ((roqf_factor() - 1) * rings + u->number) / u->number;
     }
   }
@@ -345,15 +345,15 @@ void build_road(region * r, unit * u, int size, direction_t d)
     if (dm != 0) {
       int sk = eff_skill(u, SK_ROAD_BUILDING, r);
       int todo = (left - n + sk - 1) / sk;
-      todo = MIN(todo, u->number);
-      dm = MIN(dm, todo);
+      todo = _min(todo, u->number);
+      dm = _min(dm, todo);
       change_effect(u, oldpotiontype[P_DOMORE], -dm);
       n += dm * sk;
     }                           /* Auswirkung Schaffenstrunk */
   }
 
   /* make minimum of possible and available: */
-  n = MIN(left, n);
+  n = _min(left, n);
 
   /* n is now modified by several special effects, so we have to
    * minimize it again to make sure the road will not grow beyond
@@ -369,7 +369,7 @@ void build_road(region * r, unit * u, int size, direction_t d)
   } else {
     use_pooled(u, oldresourcetype[R_STONE], GET_DEFAULT, n);
     /* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
-    produceexp(u, SK_ROAD_BUILDING, MIN(n, u->number));
+    produceexp(u, SK_ROAD_BUILDING, _min(n, u->number));
   }
   ADDMSG(&u->faction->msgs, msg_message("buildroad",
       "region unit size", r, u, n));
@@ -473,7 +473,7 @@ int build(unit * u, const construction * ctype, int completed, int want)
 
     if (dm != 0) {
       /* Auswirkung Schaffenstrunk */
-      dm = MIN(dm, u->number);
+      dm = _min(dm, u->number);
       change_effect(u, oldpotiontype[P_DOMORE], -dm);
       skills += dm * effsk;
     }
@@ -529,17 +529,17 @@ int build(unit * u, const construction * ctype, int completed, int want)
       if (itm != NULL)
         i = itm->number;
       if (i > 0) {
-        int rings = MIN(u->number, i);
+        int rings = _min(u->number, i);
         n = n * ((roqf_factor() - 1) * rings + u->number) / u->number;
       }
     }
 
     if (want > 0) {
-      n = MIN(want, n);
+      n = _min(want, n);
     }
 
     if (type->maxsize > 0) {
-      n = MIN(type->maxsize - completed, n);
+      n = _min(type->maxsize - completed, n);
       if (type->improvement == NULL) {
         want = n;
       }
@@ -610,7 +610,7 @@ int build(unit * u, const construction * ctype, int completed, int want)
     completed = completed + n;
   }
   /* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
-  produceexp(u, ctype->skill, MIN(made, u->number));
+  produceexp(u, ctype->skill, _min(made, u->number));
 
   return made;
 }
@@ -647,7 +647,7 @@ int maxbuild(const unit * u, const construction * cons)
     if (have < need) {
       return 0;
     } else
-      maximum = MIN(maximum, have / need);
+      maximum = _min(maximum, have / need);
   }
   return maximum;
 }
@@ -853,7 +853,7 @@ static void build_ship(unit * u, ship * sh, int want)
   }
 
   if (sh->damage && can) {
-    int repair = MIN(sh->damage, can * DAMAGE_SCALE);
+    int repair = _min(sh->damage, can * DAMAGE_SCALE);
     n += repair / DAMAGE_SCALE;
     if (repair % DAMAGE_SCALE)
       ++n;
@@ -897,7 +897,7 @@ create_ship(region * r, unit * u, const struct ship_type *newtype, int want,
     return;
   }
   if (want > 0)
-    want = MIN(want, msize);
+    want = _min(want, msize);
   else
     want = msize;
 
@@ -956,7 +956,7 @@ void continue_ship(region * r, unit * u, int want)
     return;
   }
   if (want > 0)
-    want = MIN(want, msize);
+    want = _min(want, msize);
   else
     want = msize;
 

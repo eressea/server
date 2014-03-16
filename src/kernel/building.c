@@ -158,7 +158,7 @@ int buildingcapacity(const building * b)
 {
   if (b->type->capacity >= 0) {
     if (b->type->maxcapacity >= 0) {
-      return MIN(b->type->maxcapacity, b->size * b->type->capacity);
+      return _min(b->type->maxcapacity, b->size * b->type->capacity);
     }
     return b->size * b->type->capacity;
   }

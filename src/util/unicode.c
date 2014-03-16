@@ -12,6 +12,7 @@
 #include "unicode.h"
 
 #include <errno.h>
+#include <string.h>
 #include <wctype.h>
 
 #define B00000000 0x00

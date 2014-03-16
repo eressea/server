@@ -52,196 +52,34 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 # define _CRT_DISABLE_PERFCRIT_LOCKS
 #endif
 
-#endif /* _MSC_VER_ */
-
-#ifdef __cplusplus
-# include <cstdio>
-# include <cstdlib>
-extern "C" {
-#else
-# include <stdio.h>
-# include <stdlib.h>
-#endif
-
-/****                 ****
- ** Debugging Libraries **
- ****                 ****/
-#if defined __GNUC__
-# define HAVE_INLINE
-# define INLINE_FUNCTION static __inline
-#endif
-
-/* define USE_DMALLOC to enable use of the dmalloc library */
-#ifdef USE_DMALLOC
-# include <stdlib.h>
-# include <string.h>
-# include <dmalloc.h>
-#endif
-
 /* define CRTDBG to enable MSVC CRT Debug library functions */
-#if defined(_DEBUG) && defined(_MSC_VER) && defined(CRTDBG)
+#if defined(_DEBUG) && defined(CRTDBG)
 # include <crtdbg.h>
 # define _CRTDBG_MAP_ALLOC
 #endif
 
-/****                    ****
- ** Architecture Dependent **
- ****                    ****/
+#endif /* _MSC_VER_ */
 
-/* für solaris: */
-#ifdef SOLARIS
-# define _SYS_PROCSET_H
-# define _XOPEN_SOURCE
-#endif
-
-#ifdef __GNUC__
-# ifndef _BSD_SOURCE
-#  define _BSD_SOURCE
-#  define __USE_BSD
-# endif
-/* # include <features.h> */
-# include <strings.h>           /* strncasecmp-Prototyp */
+#if defined __GNUC__
+# undef _BSD_SOURCE
+# define _BSD_SOURCE
+# undef __USE_BSD
+# define __USE_BSD
 #endif
 
 #ifdef _BSD_SOURCE
+# undef __EXTENSIONS__
 # define __EXTENSIONS__
 #endif
 
-#ifdef WIN32
-# define HAVE__MKDIR_WITHOUT_PERMISSION
-# define HAVE__SLEEP_MSEC
+#ifdef SOLARIS
+# define _SYS_PROCSET_H
+#undef _XOPEN_SOURCE
+# define _XOPEN_SOURCE
 #endif
 
-#if defined(__USE_SVID) || defined(_BSD_SOURCE) || defined(__USE_XOPEN_EXTENDED) || defined(_BE_SETUP_H) || defined(CYGWIN)
-# include <unistd.h>
-# define HAVE_UNISTD_H
-# define HAVE_STRCASECMP
-# define HAVE_STRNCASECMP
-# define HAVE_ACCESS
-# define HAVE_STAT
-typedef struct stat stat_type;
-# include <string.h>
-# define HAVE_SNPRINTF
-#ifdef _POSIX_SOURCE            /* MINGW doesn't seem to have these */
-# define HAVE_EXECINFO
-# define HAVE_SIGACTION
-# define HAVE_LINK
-# define HAVE_SLEEP
-#endif
-#endif
+#define unused (void)
 
-/* TinyCC */
-#ifdef TINYCC
-# undef HAVE_INLINE
-# define INLINE_FUNCTION
-#endif
-
-/* lcc-win32 */
-#ifdef __LCC__
-# include <string.h>
-# include <direct.h>
-# include <io.h>
-# define HAVE_ACCESS
-# define HAVE_STAT
-typedef struct stat stat_type;
-# define HAVE_STRICMP
-# define HAVE_STRNICMP
-# define HAVE_SLEEP
-# define snprintf _snprintf
-# define HAVE_SNPRINTF
-# undef HAVE_STRCASECMP
-# undef HAVE_STRNCASECMP
-# define R_OK 4
-#endif
-
-/* Microsoft Visual C */
-#ifdef _MSC_VER
-# include <string.h>            /* must be included here so strdup is not redefined */
-# define R_OK 4
-# define HAVE_INLINE
-# define INLINE_FUNCTION __inline
-
-# define snprintf _snprintf
-# define HAVE_SNPRINTF
-
-/* MSVC has _access, not access */
-#ifndef access
-#include <io.h>
-# define access(f, m) _access(f, m)
-#endif
-#define HAVE_ACCESS
-
-/* MSVC has _stat, not stat */
-# define HAVE_STAT
-#include <sys/stat.h>
-# define stat(a, b) _stat(a, b)
-typedef struct _stat stat_type;
-
-# define stricmp(a, b) _stricmp(a, b)
-# define HAVE_STRICMP
-
-# define strnicmp(a, b, c) _strnicmp(a, b, c)
-# define HAVE_STRNICMP
-# undef HAVE_STRCASECMP
-# undef HAVE_STRNCASECMP
-#endif
-
-/* replacements for missing functions: */
-
-#ifndef HAVE_STRCASECMP
-# if defined(HAVE_STRICMP)
-#  define strcasecmp stricmp
-# elif defined(HAVE__STRICMP)
-#  define strcasecmp _stricmp
-# endif
-#endif
-
-#ifndef HAVE_STRNCASECMP
-# if defined(HAVE_STRNICMP)
-#  define strncasecmp strnicmp
-# elif defined(HAVE__STRNICMP)
-#  define strncasecmp _strnicmp
-# endif
-#endif
-
-#ifndef HAVE_SLEEP
-#ifdef HAVE__SLEEP_MSEC
-# define sleep(sec) _sleep(1000*sec)
-#elif defined(HAVE__SLEEP)
-# define sleep(sec) _sleep(sec)
-#endif
-#endif
-
-#if !defined(MAX_PATH)
-# if defined(PATH_MAX)
-#  define MAX_PATH PATH_MAX
-# else
-#  define MAX_PATH 1024
-# endif
-#endif
-
-/****            ****
- ** min/max macros **
- ****            ****/
-#ifndef NOMINMAX
-#ifndef MIN
-# define MIN(a,b) ((a) < (b) ? (a) : (b))
-#endif
-#ifndef MAX
-# define MAX(a,b) ((a) > (b) ? (a) : (b))
-#endif
-#endif
-
-#if defined (__GNUC__)
-# define unused(a)              /* unused: a */
-#elif defined (ghs) || defined (__hpux) || defined (__sgi) || defined (__DECCXX) || defined (__KCC) || defined (__rational__) || defined (__USLC__) || defined (ACE_RM544)
-# define unused(a) do {/* null */} while (&a == 0)
-#else /* ghs || __GNUC__ || ..... */
-# define unused(a) (a)
-#endif /* ghs || __GNUC__ || ..... */
-
-#include "util/bool.h"
-  
 #ifndef INLINE_FUNCTION
 # define INLINE_FUNCTION
 #endif
@@ -251,19 +89,28 @@ typedef struct _stat stat_type;
 
 #define TOLUA_CAST (char*)
 
-#if !defined(HAVE__STRDUP)
-# if defined(HAVE_STRDUP)
-#  define _strdup(s) strdup(s)
-# endif
+#ifdef USE_AUTOCONF
+# include <autoconf.h>
 #endif
 
-#if defined(HAVE__MKDIR)
-# include <direct.h>
+#if !defined(MAX_PATH)
+#if defined(PATH_MAX)
+# define MAX_PATH PATH_MAX
 #else
-# if defined(HAVE_MKDIR)
-#  include <sys/stat.h>
-#  define _mkdir(s) mkdir(s, 0777)
-# endif
+# define MAX_PATH 256
+#endif
+#endif
+
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
+#ifdef HAVE_STRINGS_H
+#include <strings.h>
+#endif
+
+#ifdef HAVE_IO_H
+#include <io.h>
 #endif
 
 #endif

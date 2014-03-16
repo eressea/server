@@ -1194,7 +1194,7 @@ static void rotting_herbs(void)
         if (fval(itm->type, ITF_HERB)) {
           double nv = normalvariate(k, k / 4);
           int inv = (int)nv;
-          int delta = MIN(n, inv);
+          int delta = _min(n, inv);
           if (i_change(itmp, itm->type, -delta) == NULL) {
             continue;
           }
@@ -1242,7 +1242,7 @@ void randomevents(void)
           a_remove(&r->attribs, a);
           ADDMSG(&r->msgs, msg_message("orcified", "region", r));
         } else {
-          a->data.i -= MAX(10, a->data.i / 10);
+          a->data.i -= _max(10, a->data.i / 10);
           if (a->data.i <= 0)
             a_remove(&r->attribs, a);
         }
@@ -1279,7 +1279,7 @@ void randomevents(void)
     while (*blist) {
       building *b = *blist;
       if (fval(b->type, BTF_DECAY) && !building_owner(b)) {
-        b->size -= MAX(1, (b->size * 20) / 100);
+        b->size -= _max(1, (b->size * 20) / 100);
         if (b->size == 0) {
           remove_building(blist, r->buildings);
         }

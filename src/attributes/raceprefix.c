@@ -25,6 +25,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <assert.h>
 #include <string.h>
+#include <stdlib.h>
 
 attrib_type at_raceprefix = {
   "raceprefix", NULL, a_finalizestring, NULL, a_writestring, a_readstring,

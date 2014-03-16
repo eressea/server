@@ -37,6 +37,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* stdc includes */
 #include <string.h>
+#include <stdlib.h>
 #include <assert.h>
 
 typedef struct object_data {

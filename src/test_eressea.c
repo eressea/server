@@ -3,6 +3,7 @@
 #include <util/log.h>
 
 CuSuite *get_tests_suite(void);
+CuSuite *get_json_suite(void);
 CuSuite *get_economy_suite(void);
 CuSuite *get_laws_suite(void);
 CuSuite *get_market_suite(void);
@@ -34,6 +35,7 @@ int RunAllTests(void)
 
   /* self-test */
   CuSuiteAddSuite(suite, get_tests_suite());
+  CuSuiteAddSuite(suite, get_json_suite());
   /* util */
   CuSuiteAddSuite(suite, get_base36_suite());
   CuSuiteAddSuite(suite, get_bsdstring_suite());

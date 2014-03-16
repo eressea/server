@@ -55,6 +55,8 @@ without prior permission by the authors of Eressea.
 
 #include <assert.h>
 #include <errno.h>
+#include <string.h>
+#include <stdlib.h>
 #include <limits.h>
 
 static int tolua_unit_get_objects(lua_State * L)

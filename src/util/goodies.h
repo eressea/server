@@ -29,15 +29,11 @@ extern "C" {
   extern int *intlist_add(int *i_p, int i);
   extern int *intlist_find(int *i_p, int i);
 
-#ifdef HAVE_INLINE
-# include "strings.c"
-#else
   extern unsigned int hashstring(const char *s);
   extern const char *escape_string(const char *str, char *buffer,
     unsigned int len);
   extern unsigned int jenkins_hash(unsigned int a);
   extern unsigned int wang_hash(unsigned int a);
-#endif
 
 /* benchmark for units: 
  * JENKINS_HASH: 5.25 misses/hit (with good cache behavior)

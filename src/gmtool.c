@@ -9,7 +9,6 @@
  */
 
 #include <platform.h>
-#include <util/bool.h>
 #include <curses.h>
 
 #include <kernel/config.h>

@@ -185,7 +185,7 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
    * steigen.
    *
    * n ist die Anzahl zusaetzlich gelernter Tage. n darf max. die Differenz
-   * von schon gelernten Tagen zum MAX(30 Tage pro Mann) betragen. */
+   * von schon gelernten Tagen zum _max(30 Tage pro Mann) betragen. */
 
   if (magic_lowskill(student)) {
     cmistake(teacher, teacher->thisorder, 292, MSG_EVENT);
@@ -199,7 +199,7 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
     n -= teach->value;
   }
 
-  n = MIN(n, nteaching);
+  n = _min(n, nteaching);
 
   if (n != 0) {
     struct building *b = inside_building(teacher);
@@ -224,7 +224,7 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
     if (btype == bt_find("academy")
       && student->building && student->building->type == bt_find("academy")) {
       int j = study_cost(student, sk);
-      j = MAX(50, j * 2);
+      j = _max(50, j * 2);
       /* kann Einheit das zahlen? */
       if (get_pooled(student, oldresourcetype[R_SILVER], GET_DEFAULT, j) >= j) {
         /* Jeder Schueler zusaetzlich +10 Tage wenn in Uni. */
@@ -265,7 +265,7 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
      * die Talentaenderung (enno).
      */
 
-    nteaching = MAX(0, nteaching - student->number * 30);
+    nteaching = _max(0, nteaching - student->number * 30);
 
   }
   return n;
@@ -302,7 +302,7 @@ int teach_cmd(unit * u, struct order *ord)
   teaching = u->number * 30 * TEACHNUMBER;
 
   if ((i = get_effect(u, oldpotiontype[P_FOOL])) > 0) { /* Trank "Dumpfbackenbrot" */
-    i = MIN(i, u->number * TEACHNUMBER);
+    i = _min(i, u->number * TEACHNUMBER);
     /* Trank wirkt pro Schueler, nicht pro Lehrer */
     teaching -= i * 30;
     change_effect(u, oldpotiontype[P_FOOL], -i);
@@ -602,7 +602,7 @@ int learn_cmd(unit * u, order * ord)
     const struct building_type *btype = b ? b->type : NULL;
 
     if (btype && btype == bt_find("academy")) {
-      studycost = MAX(50, studycost * 2);
+      studycost = _max(50, studycost * 2);
     }
   }
 
@@ -686,11 +686,11 @@ int learn_cmd(unit * u, order * ord)
   if (studycost) {
     int cost = studycost * u->number;
     money = get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, cost);
-    money = MIN(money, cost);
+    money = _min(money, cost);
   }
   if (money < studycost * u->number) {
     studycost = p;              /* Ohne Univertreurung */
-    money = MIN(money, studycost);
+    money = _min(money, studycost);
     if (p > 0 && money < studycost * u->number) {
       cmistake(u, ord, 65, MSG_EVENT);
       multi = money / (double)(studycost * u->number);
@@ -709,12 +709,12 @@ int learn_cmd(unit * u, order * ord)
   }
 
   if (get_effect(u, oldpotiontype[P_WISE])) {
-    l = MIN(u->number, get_effect(u, oldpotiontype[P_WISE]));
+    l = _min(u->number, get_effect(u, oldpotiontype[P_WISE]));
     teach->value += l * 10;
     change_effect(u, oldpotiontype[P_WISE], -l);
   }
   if (get_effect(u, oldpotiontype[P_FOOL])) {
-    l = MIN(u->number, get_effect(u, oldpotiontype[P_FOOL]));
+    l = _min(u->number, get_effect(u, oldpotiontype[P_FOOL]));
     teach->value -= l * 30;
     change_effect(u, oldpotiontype[P_FOOL], -l);
   }

@@ -22,6 +22,8 @@ without prior permission by the authors of Eressea.
 #include <util/language.h>
 
 #include <tolua.h>
+#include <stdlib.h>
+#include <string.h>
 
 int tolua_buildinglist_next(lua_State * L)
 {

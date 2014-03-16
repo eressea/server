@@ -39,6 +39,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <assert.h>
 #include <limits.h>
 #include <string.h>
+#include <stdlib.h>
 
 unsigned int nextborder = 0;
 
@@ -104,7 +105,7 @@ static connection **get_borders_i(const region * r1, const region * r2)
   int key = reg_hashkey(r1);
   int k2 = reg_hashkey(r2);
 
-  key = MIN(k2, key) % BORDER_MAXHASH;
+  key = _min(k2, key) % BORDER_MAXHASH;
   bp = &borders[key];
   while (*bp) {
     connection *b = *bp;
@@ -534,7 +535,7 @@ static const char *b_nameroad(const connection * b, const region * r,
         return LOC(f->locale, mkname("border", "an_incomplete_road"));
       }
     } else {
-      int percent = MAX(1, 100 * local / r->terrain->max_road);
+      int percent = _max(1, 100 * local / r->terrain->max_road);
       if (local) {
         slprintf(buffer, sizeof(buffer), LOC(f->locale, mkname("border",
               "a_road_percent")), percent);

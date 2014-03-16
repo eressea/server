@@ -21,7 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* libc includes */
 #include <string.h>
 
-INLINE_FUNCTION unsigned int hashstring(const char *s)
+unsigned int hashstring(const char *s)
 {
   unsigned int key = 0;
   while (*s) {
@@ -30,7 +30,7 @@ INLINE_FUNCTION unsigned int hashstring(const char *s)
   return key & 0x7FFFFFFF;
 }
 
-INLINE_FUNCTION const char *escape_string(const char *str, char *buffer,
+const char *escape_string(const char *str, char *buffer,
   unsigned int len)
 {
   const char *start = strchr(str, '\"');
@@ -69,7 +69,7 @@ INLINE_FUNCTION const char *escape_string(const char *str, char *buffer,
   return str;
 }
 
-INLINE_FUNCTION unsigned int jenkins_hash(unsigned int a)
+unsigned int jenkins_hash(unsigned int a)
 {
   a = (a + 0x7ed55d16) + (a << 12);
   a = (a ^ 0xc761c23c) ^ (a >> 19);
@@ -80,7 +80,7 @@ INLINE_FUNCTION unsigned int jenkins_hash(unsigned int a)
   return a;
 }
 
-INLINE_FUNCTION unsigned int wang_hash(unsigned int a)
+unsigned int wang_hash(unsigned int a)
 {
   a = ~a + (a << 15);           /*  a = (a << 15) - a - 1; */
   a = a ^ (a >> 12);

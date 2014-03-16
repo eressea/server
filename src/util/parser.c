@@ -4,6 +4,7 @@
 #include "log.h"
 
 #include <assert.h>
+#include <stdlib.h>
 #include <wctype.h>
 #include <memory.h>
 

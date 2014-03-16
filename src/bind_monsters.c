@@ -13,6 +13,7 @@
 #include <quicklist.h>
 
 #include <tolua.h>
+#include <stdlib.h>
 
 static int tolua_levitate_ship(lua_State * L)
 {
@@ -67,7 +68,7 @@ static int fix_familiars(struct lua_State *L)
           free(mage->spellbook);
           mage->spellbook = 0;
 
-          snprintf(buffer, sizeof(buffer), "%s_familiar", u_race(u)->_name[0]);
+          _snprintf(buffer, sizeof(buffer), "%s_familiar", u_race(u)->_name[0]);
           eq = get_equipment(buffer);
           if (eq) {
             equip_unit_mask(u, eq, EQUIP_SPELLS);

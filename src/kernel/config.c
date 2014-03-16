@@ -1723,7 +1723,7 @@ int maxworkingpeasants(const struct region *r)
 {
   int i = production(r) * MAXPEASANTS_PER_AREA
     - ((rtrees(r, 2) + rtrees(r, 1) / 2) * TREESIZE);
-  return MAX(i, 0);
+  return _max(i, 0);
 }
 
 int lighthouse_range(const building * b, const faction * f)
@@ -1743,8 +1743,8 @@ int lighthouse_range(const building * b, const faction * f)
             break;
           if (f == NULL || u->faction == f) {
             int sk = eff_skill(u, SK_PERCEPTION, r) / 3;
-            d = MAX(d, sk);
-            d = MIN(maxd, d);
+            d = _max(d, sk);
+            d = _min(maxd, d);
             if (d == maxd)
               break;
           }
@@ -2528,7 +2528,7 @@ void plagues(region * r, bool ismagic)
   /* Seuchenwahrscheinlichkeit in % */
 
   if (!ismagic) {
-    double mwp = MAX(maxworkingpeasants(r), 1);
+    double mwp = _max(maxworkingpeasants(r), 1);
     double prob =
       pow(rpeasants(r) / (mwp * wage(r, NULL, NULL, turn) * 0.13), 4.0)
       * PLAGUE_CHANCE;
@@ -2797,7 +2797,7 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
 
   /* Godcurse: Income -10 */
   if (curse_active(get_curse(r->attribs, ct_find("godcursezone")))) {
-    wage = MAX(0, wage - 10);
+    wage = _max(0, wage - 10);
   }
 
   /* Bei einer Dürre verdient man nur noch ein Viertel  */

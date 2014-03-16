@@ -124,7 +124,7 @@ give_item(int want, const item_type * itype, unit * src, unit * dest,
 
   assert(itype != NULL);
   n = get_pooled(src, item2resource(itype), GET_DEFAULT, want);
-  n = MIN(want, n);
+  n = _min(want, n);
   r = n;
   if (dest && src->faction != dest->faction
     && src->faction->age < GiveRestriction()) {

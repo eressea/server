@@ -61,6 +61,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* libc includes */
 #include <assert.h>
 #include <limits.h>
+#include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
@@ -1360,7 +1361,7 @@ int invisible(const unit * target, const unit * viewer)
       get_item(target, I_RING_OF_INVISIBILITY) + 100 * get_item(target,
       I_SPHERE_OF_INVISIBILITY);
     if (hidden) {
-      hidden = MIN(hidden, target->number);
+      hidden = _min(hidden, target->number);
       if (viewer)
         hidden -= get_item(viewer, I_AMULET_OF_TRUE_SEEING);
     }

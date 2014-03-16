@@ -58,7 +58,7 @@ static group *new_group(faction * f, const char *name, int gid)
     gp = &(*gp)->next;
   *gp = g;
 
-  maxgid = MAX(gid, maxgid);
+  maxgid = _max(gid, maxgid);
   g->name = _strdup(name);
   g->gid = gid;
 
