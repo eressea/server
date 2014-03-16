@@ -1,6 +1,8 @@
 @ECHO OFF
 SET VSVERSION=11
-SET ERESSEA=%Userprofile%/Documents/Eressea
+SET SRCDIR=%CD%
+CD ..
+SET ERESSEA=%CD%
 
 mkdir build-vs%VSVERSION%
 cd build-vs%VSVERSION%

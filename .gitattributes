@@ -5,6 +5,7 @@
 *.md    text
 *.txt   text
 *.lua   text
+*.bat   text
 
 # Shell scripts should *always* be LF, regardless of platfrom
 s/*     text eol=lf

@@ -68,6 +68,9 @@ int json_export(stream * out, unsigned int flags) {
             cJSON_AddNumberToObject(data, "x", r->x);
             cJSON_AddNumberToObject(data, "y", r->y);
             cJSON_AddStringToObject(data, "type", r->terrain->_name);
+            if (r->land) {
+                cJSON_AddStringToObject(data, "name", r->land->name);
+            }
         }
     }
     if (factions && (flags & EXPORT_FACTIONS)) {
