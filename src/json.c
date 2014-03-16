@@ -83,7 +83,7 @@ int json_export(stream * out, unsigned int flags) {
     }
     if (flags) {
         char *tok, *output;
-        output = cJSON_Print(json);
+        output = cJSON_Print(root);
         tok = strtok(output, "\n\r");
         while (tok) {
             if (tok[0]) {

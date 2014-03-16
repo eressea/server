@@ -240,7 +240,7 @@ function test_taxes()
   assert_equal(25, u:get_item("money"))
 end
 
-function test_leave()
+function test_region_owner_cannot_leave_castle()
     local r = region.create(0, 0, "plain")
     local f = faction.create("noreply@eressea.de", "human", "de")
     f.id = 42

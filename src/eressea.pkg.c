@@ -1,6 +1,5 @@
 /*
 ** Lua binding: eressea
-** Generated automatically by tolua 5.1.3 on Sat Mar 15 19:26:36 2014.
 */
 
 #include "tolua.h"
@@ -160,6 +159,33 @@ static int tolua_eressea_eressea_export00(lua_State* tolua_S)
 #endif
 }
 
+/* function: eressea_import_json */
+static int tolua_eressea_eressea_import00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isstring(tolua_S,1,0,&tolua_err) || 
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const char* filename = ((const char*)  tolua_tostring(tolua_S,1,0));
+ {
+  int tolua_ret = (int)  eressea_import_json(filename);
+ tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'import'.",&tolua_err);
+ return 0;
+#endif
+}
+
 /* Open lib function */
 LUALIB_API int luaopen_eressea (lua_State* tolua_S)
 {
@@ -174,6 +200,7 @@ LUALIB_API int luaopen_eressea (lua_State* tolua_S)
  tolua_function(tolua_S,"write_game",tolua_eressea_eressea_write_game00);
  tolua_function(tolua_S,"read_orders",tolua_eressea_eressea_read_orders00);
  tolua_function(tolua_S,"export",tolua_eressea_eressea_export00);
+ tolua_function(tolua_S,"import",tolua_eressea_eressea_import00);
  tolua_endmodule(tolua_S);
  tolua_endmodule(tolua_S);
  return 1;
