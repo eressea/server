@@ -5,7 +5,7 @@
 #include "json.h"
 #include "bind_eressea.h"
 
-static void test_export(CuTest * tc) {
+static void test_export_no_regions(CuTest * tc) {
     char buf[1024];
     stream out = { 0 };
     int err;
@@ -19,8 +19,23 @@ static void test_export(CuTest * tc) {
     mstream_done(&out);
 }
   
+static void test_export_no_factions(CuTest * tc) {
+    char buf[1024];
+    stream out = { 0 };
+    int err;
+
+    mstream_init(&out);
+    err = json_export(&out, EXPORT_FACTIONS);
+    CuAssertIntEquals(tc, 0, err);
+    out.api->rewind(out.handle);
+    out.api->read(out.handle, buf, sizeof(buf));
+    CuAssertStrEquals(tc, "{\n}\n", buf);
+    mstream_done(&out);
+}
+
 CuSuite *get_json_suite(void) {
     CuSuite *suite = CuSuiteNew();
-    SUITE_ADD_TEST(suite, test_export);
+    SUITE_ADD_TEST(suite, test_export_no_regions);
+    SUITE_ADD_TEST(suite, test_export_no_factions);
     return suite;
 }
