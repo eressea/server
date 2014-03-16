@@ -215,8 +215,8 @@ int update_nmrs(void)
       int nmr = turn - f->lastorders + 1;
       if (nmr < 0 || nmr > NMRTimeout()) {
         log_error("faction %s has %d NMRS\n", factionid(f), nmr);
-        nmr = MAX(0, nmr);
-        nmr = MIN(nmr, NMRTimeout());
+        nmr = _max(0, nmr);
+        nmr = _min(nmr, NMRTimeout());
       }
       ++nmrs[nmr];
     }
@@ -935,7 +935,7 @@ spskill(char *buffer, size_t size, const struct locale * lang,
       oldeff = sv->old + get_modifier(u, sv->id, sv->old, u->region, false);
     }
 
-    oldeff = MAX(0, oldeff);
+    oldeff = _max(0, oldeff);
     diff = effsk - oldeff;
 
     if (diff != 0) {

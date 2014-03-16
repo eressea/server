@@ -78,18 +78,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 # define _XOPEN_SOURCE
 #endif
 
-/****            ****
- ** min/max macros **
- ****            ****/
-#ifndef NOMINMAX
-#ifndef MIN
-# define MIN(a,b) ((a) < (b) ? (a) : (b))
-#endif
-#ifndef MAX
-# define MAX(a,b) ((a) > (b) ? (a) : (b))
-#endif
-#endif
-
 #define unused (void)
 
 #include "util/bool.h"

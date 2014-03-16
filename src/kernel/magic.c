@@ -540,7 +540,7 @@ int get_combatspelllevel(const unit * u, int nr)
   assert(nr < MAXCOMBATSPELLS);
   if (m) {
     int level = eff_skill(u, SK_MAGIC, u->region);
-    return MIN(m->combatspells[nr].level, level);
+    return _min(m->combatspells[nr].level, level);
   }
   return -1;
 }
@@ -672,7 +672,7 @@ int change_spellpoints(unit * u, int mp)
   }
 
   /* verhindere negative Magiepunkte */
-  sp = MAX(m->spellpoints + mp, 0);
+  sp = _max(m->spellpoints + mp, 0);
   m->spellpoints = sp;
 
   return sp;
@@ -730,7 +730,7 @@ int max_spellpoints(const region * r, const unit * u)
   if (n > 0)
     msp = (msp * n) / 100;
 
-  return MAX((int)msp, 0);
+  return _max((int)msp, 0);
 }
 
 int change_maxspellpoints(unit * u, int csp)
@@ -765,7 +765,7 @@ int countspells(unit * u, int step)
   count = m->spellcount + step;
 
   /* negative Werte abfangen. */
-  m->spellcount = MAX(0, count);
+  m->spellcount = _max(0, count);
 
   return m->spellcount;
 }
@@ -854,7 +854,7 @@ int eff_spelllevel(unit * u, const spell * sp, int cast_level, int range)
          * gewünschten gebildet */
       } else if (sp->components[k].cost == SPC_LEVEL) {
         costtyp = SPC_LEVEL;
-        cast_level = MIN(cast_level, maxlevel);
+        cast_level = _min(cast_level, maxlevel);
         /* bei Typ Linear müssen die Kosten in Höhe der Stufe vorhanden
          * sein, ansonsten schlägt der Spruch fehl */
       } else if (sp->components[k].cost == SPC_LINEAR) {
@@ -871,7 +871,7 @@ int eff_spelllevel(unit * u, const spell * sp, int cast_level, int range)
     if (spells) {
       spellbook_entry * sbe = spellbook_get(spells, sp); 
       if (sbe) {
-        return MIN(cast_level, sbe->level);
+        return _min(cast_level, sbe->level);
       }
     }
     log_error("spell %s is not in the spellbook for %s\n", sp->sname, unitname(u));
@@ -1069,7 +1069,7 @@ spellpower(region * r, unit * u, const spell * sp, int cast_level,
 
   force = force * MagicPower();
 
-  return MAX(force, 0);
+  return _max(force, 0);
 }
 
 /* ------------------------------------------------------------- */
@@ -1235,8 +1235,8 @@ target_resists_magic(unit * magician, void *obj, int objtyp, int t_bonus)
     break;
   }
 
-  probability = MAX(0.02, probability + t_bonus * 0.01);
-  probability = MIN(0.98, probability);
+  probability = _max(0.02, probability + t_bonus * 0.01);
+  probability = _min(0.98, probability);
 
   /* gibt true, wenn die Zufallszahl kleiner als die chance ist und
    * false, wenn sie gleich oder größer ist, dh je größer die
@@ -1376,7 +1376,7 @@ static void do_fumble(castorder * co)
 
   case 2:
     /* temporärer Stufenverlust */
-    duration = MAX(rng_int() % level / 2, 2);
+    duration = _max(rng_int() % level / 2, 2);
     effect = -(float)level/2;
     c =
       create_curse(u, &u->attribs, ct_find("skillmod"), (float)level,
@@ -1487,14 +1487,14 @@ void regenerate_aura(void)
           reg_aura -= regen;
           if (chance(reg_aura))
             ++regen;
-          regen = MAX(1, regen);
-          regen = MIN((auramax - aura), regen);
+          regen = _max(1, regen);
+          regen = _min((auramax - aura), regen);
 
           aura += regen;
           ADDMSG(&u->faction->msgs, msg_message("regenaura",
               "unit region amount", u, r, regen));
         }
-        set_spellpoints(u, MIN(aura, auramax));
+        set_spellpoints(u, _min(aura, auramax));
       }
     }
   }
@@ -2508,7 +2508,7 @@ static castorder *cast_cmd(unit * u, order * ord)
   /* für Syntax ' STUFE x REGION y z ' */
   if (param == P_LEVEL) {
     int p = getint();
-    level = MIN(p, level);
+    level = _min(p, level);
     if (level < 1) {
       /* Fehler "Das macht wenig Sinn" */
       cmistake(u, ord, 10, MSG_MAGIC);
@@ -2538,7 +2538,7 @@ static castorder *cast_cmd(unit * u, order * ord)
    * hier nach REGION nochmal auf STUFE prüfen */
   if (param == P_LEVEL) {
     int p = getint();
-    level = MIN(p, level);
+    level = _min(p, level);
     if (level < 1) {
       /* Fehler "Das macht wenig Sinn" */
       cmistake(u, ord, 10, MSG_MAGIC);
@@ -2667,7 +2667,7 @@ static castorder *cast_cmd(unit * u, order * ord)
        * löschen, zaubern kann er noch */
       range *= 2;
       set_order(&caster->thisorder, NULL);
-      level = MIN(level, eff_skill(caster, SK_MAGIC, caster->region) / 2);
+      level = _min(level, eff_skill(caster, SK_MAGIC, caster->region) / 2);
     }
   }
   /* Weitere Argumente zusammenbasteln */

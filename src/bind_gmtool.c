@@ -186,7 +186,7 @@ static void lua_paint_info(struct window *wnd, const struct state *st)
         break;
       else {
         size_t len = end - str;
-        int bytes = MIN((int)len, size);
+        int bytes = _min((int)len, size);
         mvwaddnstr(win, line++, 1, str, bytes);
         wclrtoeol(win);
         str = end + 1;

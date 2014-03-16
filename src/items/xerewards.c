@@ -76,7 +76,7 @@ use_manacrystal(struct unit *u, const struct item_type *itype, int amount,
   }
 
   for (i = 0; i != amount; ++i) {
-    sp += MAX(25, max_spellpoints(u->region, u) / 2);
+    sp += _max(25, max_spellpoints(u->region, u) / 2);
     change_spellpoints(u, sp);
   }
 

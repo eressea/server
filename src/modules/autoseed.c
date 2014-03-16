@@ -1021,8 +1021,8 @@ int build_island_e3(int x, int y, int numfactions, int minsize)
         q = region_quality(r, rn);
         if (q >= MIN_QUALITY && nfactions < numfactions) {
           starting_region(r, rn);
-          minq = MIN(minq, q);
-          maxq = MAX(maxq, q);
+          minq = _min(minq, q);
+          maxq = _max(maxq, q);
           ++nfactions;
         }
       }
@@ -1036,8 +1036,8 @@ int build_island_e3(int x, int y, int numfactions, int minsize)
         q = region_quality(r, rn);
         if (q >= MIN_QUALITY * 4 / 3 && nfactions < numfactions) {
           starting_region(r, rn);
-          minq = MIN(minq, q);
-          maxq = MAX(maxq, q);
+          minq = _min(minq, q);
+          maxq = _max(maxq, q);
           ++nfactions;
         }
       }
