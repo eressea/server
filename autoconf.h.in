@@ -30,21 +30,41 @@
 #cmakedefine HAVE_DIRECT_MKDIR 1
 #cmakedefine HAVE_DIRECT__MKDIR 1
 
-#include <stddef.h>
-
 #if defined(HAVE_STRINGS_H)
 #include <strings.h>
+#endif
+
+#if defined(HAVE_UNISTD_H)
+#include <unistd.h>
+#endif
+
+#if defined(HAVE_IO_H)
+#include <io.h>
+#endif
+
+#if defined(HAVE_WINDOWS_H)
+#include <windows.h>
+#endif
+
+#if defined(HAVE_STDBOOL_H)
+# include <stdbool.h>
+#else
+# if ! HAVE__BOOL
+#  ifdef __cplusplus
+typedef bool _Bool;
+#  else
+typedef unsigned char _Bool;
+#  endif
+# endif
+# define bool _Bool
+# define false 0
+# define true 1
+# define __bool_true_false_are_defined 1
 #endif
 
 #ifndef HAVE__ACCESS
 #ifdef HAVE_ACCESS
 #define _access(path, mode) access(path, mode)
-#ifndef _A_RDONLY
-#define _A_RDONLY R_OK
-#endif
-#ifndef _A_WRONLY
-#define _A_WRONLY W_OK
-#endif
 #endif
 #endif
 
@@ -122,11 +142,11 @@
 #endif
 #endif
 
-#ifndef MIN
-#define MIN(a,b) ((a) < (b) ? (a) : (b))
+#ifndef _min
+#define _min(a,b) ((a) < (b) ? (a) : (b))
 #endif
-#ifndef MAX
-#define MAX(a,b) ((a) > (b) ? (a) : (b))
+#ifndef _max
+#define _max(a,b) ((a) > (b) ? (a) : (b))
 #endif
 
 #if !defined(DBG_UNREFERENCED_PARAMETER)

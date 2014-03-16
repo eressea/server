@@ -129,7 +129,7 @@ int curse_age(attrib * a)
   if (result != 0) {
     c->duration = 0;
   } else if (c->duration != INT_MAX) {
-    c->duration = MAX(0, c->duration - 1);
+    c->duration = _max(0, c->duration - 1);
   }
   return c->duration;
 }
@@ -315,7 +315,7 @@ const curse_type *ct_find(const char *c)
     if (strcmp(c, type->cname) == 0) {
       return type;
     } else {
-      size_t k = MIN(strlen(c), strlen(type->cname));
+      size_t k = _min(strlen(c), strlen(type->cname));
       if (!_memicmp(c, type->cname, k)) {
         return type;
       }
@@ -478,7 +478,7 @@ int get_cursedmen(unit * u, const curse * c)
     cursedmen = c->data.i;
   }
 
-  return MIN(u->number, cursedmen);
+  return _min(u->number, cursedmen);
 }
 
 /* setzt die Anzahl der betroffenen Personen auf cursedmen */
@@ -552,7 +552,7 @@ curse *create_curse(unit * magician, attrib ** ap, const curse_type * ct,
   /* es gibt schon eins diese Typs */
   if (c && ct->mergeflags != NO_MERGE) {
     if (ct->mergeflags & M_DURATION) {
-      c->duration = MAX(c->duration, duration);
+      c->duration = _max(c->duration, duration);
     }
     if (ct->mergeflags & M_SUMDURATION) {
       c->duration += duration;
@@ -561,10 +561,10 @@ curse *create_curse(unit * magician, attrib ** ap, const curse_type * ct,
       c->effect += effect;
     }
     if (ct->mergeflags & M_MAXEFFECT) {
-      c->effect = MAX(c->effect, effect);
+      c->effect = _max(c->effect, effect);
     }
     if (ct->mergeflags & M_VIGOUR) {
-      c->vigour = MAX(vigour, c->vigour);
+      c->vigour = _max(vigour, c->vigour);
     }
     if (ct->mergeflags & M_VIGOUR_ADD) {
       c->vigour = vigour + c->vigour;

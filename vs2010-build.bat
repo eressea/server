@@ -1,5 +1,5 @@
 @ECHO OFF
-SET VSVERSION=11
+SET VSVERSION=10
 SET ERESSEA=%Userprofile%/Documents/Eressea
 
 mkdir build-vs%VSVERSION%

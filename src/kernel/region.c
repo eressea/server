@@ -573,7 +573,7 @@ koor_distance_wrap_xy(int x1, int y1, int x2, int y2, int width, int height)
   int dx = x1 - x2;
   int dy = y1 - y2;
   int result, dist;
-  int mindist = MIN(width, height) >> 1;
+  int mindist = _min(width, height) >> 1;
 
   /* Bei negativem dy am Ursprung spiegeln, das veraendert
    * den Abstand nicht
@@ -596,13 +596,13 @@ koor_distance_wrap_xy(int x1, int y1, int x2, int y2, int width, int height)
     if (result <= mindist)
       return result;
   }
-  dist = MAX(dx, height - dy);
+  dist = _max(dx, height - dy);
   if (dist >= 0 && dist < result) {
     result = dist;
     if (result <= mindist)
       return result;
   }
-  dist = MAX(width - dx, dy);
+  dist = _max(width - dx, dy);
   if (dist >= 0 && dist < result)
     result = dist;
   return result;
@@ -1371,7 +1371,7 @@ void terraform_region(region * r, const terrain_type * terrain)
     if (!fval(r, RF_CHAOTIC)) {
       int peasants;
       peasants = (maxworkingpeasants(r) * (20 + dice_rand("6d10"))) / 100;
-      rsetpeasants(r, MAX(100, peasants));
+      rsetpeasants(r, _max(100, peasants));
       rsetmoney(r, rpeasants(r) * ((wage(r, NULL, NULL,
               INT_MAX) + 1) + rng_int() % 5));
     }
@@ -1540,7 +1540,7 @@ faction *update_owners(region * r)
           } else {
             alliance *al = region_get_alliance(r);
             if (al && u->faction->alliance == al) {
-              int morale = MAX(0, r->land->morale - MORALE_TRANSFER);
+              int morale = _max(0, r->land->morale - MORALE_TRANSFER);
               region_set_morale(r, morale, turn);
             } else {
               region_set_morale(r, MORALE_TAKEOVER, turn);

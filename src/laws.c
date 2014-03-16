@@ -154,7 +154,7 @@ static void help_feed(unit * donor, unit * u, int *need_p)
 {
   int need = *need_p;
   int give = get_money(donor) - lifestyle(donor);
-  give = MIN(need, give);
+  give = _min(need, give);
 
   if (give > 0) {
     change_money(donor, -give);
@@ -223,7 +223,7 @@ void get_food(region * r)
        * food from the peasants - should not be used with WORK */
       if (owner != NULL && (get_alliance(owner, u->faction) & HELP_MONEY)) {
         int rm = rmoney(r);
-        int use = MIN(rm, need);
+        int use = _min(rm, need);
         rsetmoney(r, rm - use);
         need -= use;
       }
@@ -236,7 +236,7 @@ void get_food(region * r)
       for (v = r->units; need && v; v = v->next) {
         if (v->faction == u->faction && help_money(v)) {
           int give = get_money(v) - lifestyle(v);
-          give = MIN(need, give);
+          give = _min(need, give);
           if (give > 0) {
             change_money(v, -give);
             change_money(u, give);
@@ -253,7 +253,7 @@ void get_food(region * r)
     int need = lifestyle(u);
     faction *f = u->faction;
 
-    need -= MAX(0, get_money(u));
+    need -= _max(0, get_money(u));
 
     if (need > 0) {
       unit *v;
@@ -310,7 +310,7 @@ void get_food(region * r)
         unit *donor = u;
         while (donor != NULL && hungry > 0) {
           int blut = get_effect(donor, pt_blood);
-          blut = MIN(blut, hungry);
+          blut = _min(blut, hungry);
           change_effect(donor, pt_blood, -blut);
           hungry -= blut;
           if (donor == u)
@@ -357,7 +357,7 @@ void get_food(region * r)
 
   /* 3. Von den überlebenden das Geld abziehen: */
   for (u = r->units; u; u = u->next) {
-    int need = MIN(get_money(u), lifestyle(u));
+    int need = _min(get_money(u), lifestyle(u));
     change_money(u, -need);
   }
 }
@@ -417,7 +417,7 @@ static void live(region * r)
       }
       /* bestes Talent raussuchen */
       if (sb != NULL) {
-        int weeks = MIN(effect, u->number);
+        int weeks = _min(effect, u->number);
         reduce_skill(u, sb, weeks);
         ADDMSG(&u->faction->msgs, msg_message("dumbeffect",
             "unit weeks skill", u, weeks, (skill_t) sb->id));
@@ -475,7 +475,7 @@ static void calculate_emigration(region * r)
       int max_emigration = MAX_EMIGRATION(rp2 - maxp2);
 
       if (max_emigration > 0) {
-        max_emigration = MIN(max_emigration, max_immigrants);
+        max_emigration = _min(max_emigration, max_immigrants);
         r->land->newpeasants += max_emigration;
         rc->land->newpeasants -= max_emigration;
         max_immigrants -= max_emigration;
@@ -534,7 +534,7 @@ static void peasants(region * r)
 
   /* Alle werden satt, oder halt soviele für die es auch Geld gibt */
 
-  satiated = MIN(peasants, money / maintenance_cost(NULL));
+  satiated = _min(peasants, money / maintenance_cost(NULL));
   rsetmoney(r, money - satiated * maintenance_cost(NULL));
 
   /* Von denjenigen, die nicht satt geworden sind, verhungert der
@@ -543,7 +543,7 @@ static void peasants(region * r)
 
   /* Es verhungert maximal die unterernährten Bevölkerung. */
 
-  n = MIN(peasants - satiated, rpeasants(r));
+  n = _min(peasants - satiated, rpeasants(r));
   dead += (int)(0.5F + n * PEASANT_STARVATION_CHANCE);
 
   if (dead > 0) {
@@ -624,7 +624,7 @@ static void horses(region * r)
 
   /* Logistisches Wachstum, Optimum bei halbem Maximalbesatz. */
   maxhorses = maxworkingpeasants(r) / 10;
-  maxhorses = MAX(0, maxhorses);
+  maxhorses = _max(0, maxhorses);
   horses = rhorses(r);
   if (horses > 0) {
     if (is_cursed(r->attribs, C_CURSED_BY_THE_GODS, 0)) {
@@ -657,7 +657,7 @@ static void horses(region * r)
     if (r2 && fval(r2->terrain, WALK_INTO)) {
       int pt = (rhorses(r) * HORSEMOVE) / 100;
       pt = (int)normalvariate(pt, pt / 4.0);
-      pt = MAX(0, pt);
+      pt = _max(0, pt);
       if (fval(r2, RF_MIGRATION))
         rsethorses(r2, rhorses(r2) + pt);
       else {
@@ -760,7 +760,7 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
     a = a_find(r->attribs, &at_germs);
     if (a && last_weeks_season == SEASON_SPRING) {
       /* ungekeimte Samen bleiben erhalten, Sprößlinge wachsen */
-      sprout = MIN(a->data.sa[1], rtrees(r, 1));
+      sprout = _min(a->data.sa[1], rtrees(r, 1));
       /* aus dem gesamt Sprößlingepool abziehen */
       rsettrees(r, 1, rtrees(r, 1) - sprout);
       /* zu den Bäumen hinzufügen */
@@ -780,7 +780,7 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
 
     /* Grundchance 1.0% */
     /* Jeder Elf in der Region erhöht die Chance marginal */
-    elves = MIN(elves, (production(r) * MAXPEASANTS_PER_AREA) / 8);
+    elves = _min(elves, (production(r) * MAXPEASANTS_PER_AREA) / 8);
     if (elves) {
       seedchance += 1.0 - pow(0.99999, elves * RESOURCE_QUANTITY);
     }
@@ -845,7 +845,7 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
 
     /* Raubbau abfangen, es dürfen nie mehr Samen wachsen, als aktuell
      * in der Region sind */
-    seeds = MIN(a->data.sa[0], rtrees(r, 0));
+    seeds = _min(a->data.sa[0], rtrees(r, 0));
     sprout = 0;
 
     for (i = 0; i < seeds; i++) {
@@ -865,7 +865,7 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
      * der Region entfernt werden können, da Jungbäume in der gleichen
      * Runde nachwachsen, wir also nicht mehr zwischen diesjährigen und
      * 'alten' Jungbäumen unterscheiden könnten */
-    sprout = MIN(a->data.sa[1], rtrees(r, 1));
+    sprout = _min(a->data.sa[1], rtrees(r, 1));
     grownup_trees = 0;
 
     for (i = 0; i < sprout; i++) {
@@ -973,7 +973,7 @@ void demographics(void)
   for (r = regions; r; r = r->next) {
     if (r->land && r->land->newpeasants) {
       int rp = rpeasants(r) + r->land->newpeasants;
-      rsetpeasants(r, MAX(0, rp));
+      rsetpeasants(r, _max(0, rp));
     }
   }
 
@@ -1473,7 +1473,7 @@ static void remove_idle_players(void)
   }
   log_info(" - beseitige Spieler, die sich nach der Anmeldung nicht gemeldet haben...");
 
-  age = calloc(MAX(4, turn + 1), sizeof(int));
+  age = calloc(_max(4, turn + 1), sizeof(int));
   for (f = factions; f; f = f->next)
     if (!is_monsters(f)) {
       if (RemoveNMRNewbie() && !fval(f, FFL_NOIDLEOUT)) {
@@ -2866,7 +2866,7 @@ int combatspell_cmd(unit * u, struct order *ord)
   if (findparam(s, u->faction->locale) == P_LEVEL) {
     /* Merken, setzen kommt erst später */
     level = getint();
-    level = MAX(0, level);
+    level = _max(0, level);
     s = getstrtoken();
   }
 
@@ -3328,14 +3328,14 @@ static building *age_building(building * b)
           float effect = 100;
           /* the mage reactivates the circle */
           c = create_curse(mage, &rt->attribs, ct_astralblock,
-            (float)MAX(1, sk), MAX(1, sk / 2), effect, 0);
+            (float)_max(1, sk), _max(1, sk / 2), effect, 0);
           ADDMSG(&r->msgs,
             msg_message("astralshield_activate", "region unit", r, mage));
         }
       } else if (mage != NULL) {
         int sk = effskill(mage, SK_MAGIC);
-        c->duration = MAX(c->duration, sk / 2);
-        c->vigour = MAX(c->vigour, sk);
+        c->duration = _max(c->duration, sk / 2);
+        c->vigour = _max(c->vigour, sk);
       }
     }
   }
@@ -3404,12 +3404,12 @@ static void ageing(void)
       /* Goliathwasser */
       int i = get_effect(u, oldpotiontype[P_STRONG]);
       if (i > 0) {
-        change_effect(u, oldpotiontype[P_STRONG], -1 * MIN(u->number, i));
+        change_effect(u, oldpotiontype[P_STRONG], -1 * _min(u->number, i));
       }
       /* Berserkerblut */
       i = get_effect(u, oldpotiontype[P_BERSERK]);
       if (i > 0) {
-        change_effect(u, oldpotiontype[P_BERSERK], -1 * MIN(u->number, i));
+        change_effect(u, oldpotiontype[P_BERSERK], -1 * _min(u->number, i));
       }
 
       if (is_cursed(u->attribs, C_OLDRACE, 0)) {
@@ -3483,7 +3483,7 @@ static int maxunits(const faction * f)
   if (flimit == 0) {
     return alimit;
   }
-  return MIN(alimit, flimit);
+  return _min(alimit, flimit);
 }
 
 int checkunitnumber(const faction * f, int add)
@@ -3823,9 +3823,9 @@ void monthly_healing(void)
       p *= heal_factor(u);
       if (u->hp < umhp) {
 #ifdef NEW_DAEMONHUNGER_RULE
-        double maxheal = MAX(u->number, umhp / 20.0);
+        double maxheal = _max(u->number, umhp / 20.0);
 #else
-        double maxheal = MAX(u->number, umhp / 10.0);
+        double maxheal = _max(u->number, umhp / 10.0);
 #endif
         int addhp;
         struct building *b = inside_building(u);
@@ -3843,7 +3843,7 @@ void monthly_healing(void)
           ++addhp;
 
         /* Aufaddieren der geheilten HP. */
-        u->hp = MIN(u->hp + addhp, umhp);
+        u->hp = _min(u->hp + addhp, umhp);
 
         /* soll man an negativer regeneration sterben können? */
         assert(u->hp > 0);
@@ -4108,7 +4108,7 @@ int claim_cmd(unit * u, struct order *ord)
   if (itype != NULL) {
     item **iclaim = i_find(&u->faction->items, itype);
     if (iclaim != NULL && *iclaim != NULL) {
-      n = MIN(n, (*iclaim)->number);
+      n = _min(n, (*iclaim)->number);
       i_change(iclaim, itype, -n);
       i_change(&u->items, itype, n);
     }
@@ -4378,9 +4378,9 @@ int siege_cmd(unit * u, order * ord)
   /* schaden durch katapulte */
 
   d = i_get(u->items, it_catapult);
-  d = MIN(u->number, d);
+  d = _min(u->number, d);
   pooled = get_pooled(u, it_catapultammo->rtype, GET_DEFAULT, d);
-  d = MIN(pooled, d);
+  d = _min(pooled, d);
   if (eff_skill(u, SK_CATAPULT, r) >= 1) {
     katapultiere = d;
     d *= eff_skill(u, SK_CATAPULT, r);
@@ -4406,11 +4406,11 @@ int siege_cmd(unit * u, order * ord)
    * einheiten wieder abgesucht werden muessen! */
 
   usetsiege(u, b);
-  b->besieged += MAX(bewaffnete, katapultiere);
+  b->besieged += _max(bewaffnete, katapultiere);
 
   /* definitiver schaden eingeschraenkt */
 
-  d = MIN(d, b->size - 1);
+  d = _min(d, b->size - 1);
 
   /* meldung, schaden anrichten */
   if (d && !curse_active(get_curse(b->attribs, magicwalls_ct))) {

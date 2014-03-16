@@ -746,7 +746,7 @@ static int heal(unit * user, int effect)
 {
   int req = unit_max_hp(user) * user->number - user->hp;
   if (req > 0) {
-    req = MIN(req, effect);
+    req = _min(req, effect);
     effect -= req;
     user->hp += req;
   }

@@ -101,15 +101,17 @@ static int
 leave_arena(struct unit *u, const struct item_type *itype, int amount,
   order * ord)
 {
-  if (!u->building && leave_fail(u))
-    return -1;
-  if (u->building != arena_tower(u->faction->magiegebiet) && leave_fail(u))
-    return -1;
-  unused(amount);
-  unused(ord);
-  unused(itype);
-  assert(!"not implemented");
-  return 0;
+    if (!u->building && leave_fail(u)) {
+        return -1;
+    }
+    if (u->building != arena_tower(u->faction->magiegebiet) && leave_fail(u)) {
+       return -1;
+    }
+    unused(amount);
+    unused(ord);
+    unused(itype);
+    assert(!"not implemented");
+    return 0;
 }
 
 static int enter_fail(unit * u)

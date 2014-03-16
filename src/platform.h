@@ -58,13 +58,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 # define _CRTDBG_MAP_ALLOC
 #endif
 
-# define HAVE_INLINE
-# define INLINE_FUNCTION __inline
 #endif /* _MSC_VER_ */
 
 #if defined __GNUC__
-# define HAVE_INLINE
-# define INLINE_FUNCTION static __inline
 # undef _BSD_SOURCE
 # define _BSD_SOURCE
 # undef __USE_BSD
@@ -82,34 +78,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 # define _XOPEN_SOURCE
 #endif
 
-/* TinyCC */
-#ifdef TINYCC
-# undef HAVE_INLINE
-# define INLINE_FUNCTION
-#endif
+#define unused (void)
 
-/****            ****
- ** min/max macros **
- ****            ****/
-#ifndef NOMINMAX
-#ifndef MIN
-# define MIN(a,b) ((a) < (b) ? (a) : (b))
-#endif
-#ifndef MAX
-# define MAX(a,b) ((a) > (b) ? (a) : (b))
-#endif
-#endif
-
-#if defined (__GNUC__)
-# define unused(a)              /* unused: a */
-#elif defined (ghs) || defined (__hpux) || defined (__sgi) || defined (__DECCXX) || defined (__KCC) || defined (__rational__) || defined (__USLC__) || defined (ACE_RM544)
-# define unused(a) do {/* null */} while (&a == 0)
-#else /* ghs || __GNUC__ || ..... */
-# define unused(a) (a)
-#endif /* ghs || __GNUC__ || ..... */
-
-#include "util/bool.h"
-  
 #ifndef INLINE_FUNCTION
 # define INLINE_FUNCTION
 #endif

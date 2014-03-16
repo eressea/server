@@ -55,7 +55,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <quicklist.h>
 
 /* libc includes */
-#include <sys/stat.h>
 #include <assert.h>
 #include <errno.h>
 #include <limits.h>
@@ -216,8 +215,8 @@ int update_nmrs(void)
       int nmr = turn - f->lastorders + 1;
       if (nmr < 0 || nmr > NMRTimeout()) {
         log_error("faction %s has %d NMRS\n", factionid(f), nmr);
-        nmr = MAX(0, nmr);
-        nmr = MIN(nmr, NMRTimeout());
+        nmr = _max(0, nmr);
+        nmr = _min(nmr, NMRTimeout());
       }
       ++nmrs[nmr];
     }
@@ -936,7 +935,7 @@ spskill(char *buffer, size_t size, const struct locale * lang,
       oldeff = sv->old + get_modifier(u, sv->id, sv->old, u->region, false);
     }
 
-    oldeff = MAX(0, oldeff);
+    oldeff = _max(0, oldeff);
     diff = effsk - oldeff;
 
     if (diff != 0) {
@@ -1726,13 +1725,11 @@ static void write_script(FILE * F, const faction * f)
 int init_reports(void)
 {
   prepare_reports();
-#ifdef HAVE_STAT
   {
-    stat_type st;
-    if (stat(reportpath(), &st) == 0)
+    if (_access(reportpath(), 0)!=0) {
       return 0;
+    }
   }
-#endif
   if (_mkdir(reportpath()) != 0) {
     if (errno != EEXIST) {
       perror("could not create reportpath");

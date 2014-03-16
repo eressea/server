@@ -70,12 +70,12 @@ void herbsearch(region * r, unit * u, int max)
   }
 
   if (max)
-    max = MIN(max, rherbs(r));
+    max = _min(max, rherbs(r));
   else
     max = rherbs(r);
   herbsfound = ntimespprob(eff_skill(u, SK_HERBALISM, r) * u->number,
     (double)rherbs(r) / 100.0F, -0.01F);
-  herbsfound = MIN(herbsfound, max);
+  herbsfound = _min(herbsfound, max);
   rsetherbs(r, rherbs(r) - herbsfound);
 
   if (herbsfound) {
@@ -153,7 +153,7 @@ static int do_potion(unit * u, region *r, const potion_type * ptype, int amount)
     ADDMSG(&u->faction->msgs, msg_message("growtree_effect",
         "mage amount", u, holz));
   } else if (ptype == oldpotiontype[P_HEILWASSER]) {
-    u->hp = MIN(unit_max_hp(u) * u->number, u->hp + 400 * amount);
+    u->hp = _min(unit_max_hp(u) * u->number, u->hp + 400 * amount);
   } else if (ptype == oldpotiontype[P_PEOPLE]) {
     attrib *a = (attrib *) a_find(r->attribs, &at_peasantluck);
     if (!a)
@@ -169,7 +169,7 @@ static int do_potion(unit * u, region *r, const potion_type * ptype, int amount)
     amount = 1;
   } else if (ptype == oldpotiontype[P_MACHT]) {
     /* Verfünffacht die HP von max. 10 Personen in der Einheit */
-    u->hp += MIN(u->number, 10 * amount) * unit_max_hp(u) * 4;
+    u->hp += _min(u->number, 10 * amount) * unit_max_hp(u) * 4;
   } else {
     change_effect(u, ptype, 10 * amount);
   }

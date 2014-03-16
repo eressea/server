@@ -108,7 +108,7 @@ static void eaten_by_monster(unit * u)
   n = (int)(n * multi);
   if (n > 0) {
     n = lovar(n);
-    n = MIN(rpeasants(u->region), n);
+    n = _min(rpeasants(u->region), n);
 
     if (n > 0) {
       deathcounts(u->region, n);
@@ -133,7 +133,7 @@ static void absorbed_by_monster(unit * u)
 
   if (n > 0) {
     n = lovar(n);
-    n = MIN(rpeasants(u->region), n);
+    n = _min(rpeasants(u->region), n);
     if (n > 0) {
       rsetpeasants(u->region, rpeasants(u->region) - n);
       scale_number(u, u->number + n);
@@ -148,7 +148,7 @@ static int scareaway(region * r, int anzahl)
   int n, p, diff = 0, emigrants[MAXDIRECTIONS];
   direction_t d;
 
-  anzahl = MIN(MAX(1, anzahl), rpeasants(r));
+  anzahl = _min(_max(1, anzahl), rpeasants(r));
 
   /* Wandern am Ende der Woche (normal) oder wegen Monster. Die
    * Wanderung wird erst am Ende von demographics () ausgefuehrt.
@@ -160,7 +160,7 @@ static int scareaway(region * r, int anzahl)
 
   p = rpeasants(r);
   assert(p >= 0 && anzahl >= 0);
-  for (n = MIN(p, anzahl); n; n--) {
+  for (n = _min(p, anzahl); n; n--) {
     direction_t dir = (direction_t) (rng_int() % MAXDIRECTIONS);
     region *rc = rconnect(r, dir);
 
@@ -195,7 +195,7 @@ static void scared_by_monster(unit * u)
 
   if (n > 0) {
     n = lovar(n);
-    n = MIN(rpeasants(u->region), n);
+    n = _min(rpeasants(u->region), n);
     if (n > 0) {
       n = scareaway(u->region, n);
       if (n > 0) {

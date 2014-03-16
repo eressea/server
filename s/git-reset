@@ -1,0 +1,8 @@
+#/bin/sh
+if [ ! -d .git ] ; then
+  echo "please run this script from the repository's top-level directory"
+  exit 1
+fi
+
+git submodule sync
+git submodule update --init

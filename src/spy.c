@@ -142,7 +142,7 @@ int spy_cmd(unit * u, struct order *ord)
    * Fuer jeden Talentpunkt, den das Spionagetalent das Tarnungstalent
    * des Opfers uebersteigt, erhoeht sich dieses um 5%*/
   spy = eff_skill(u, SK_SPY, r) - eff_skill(target, SK_STEALTH, r);
-  spychance = 0.1 + MAX(spy * 0.05, 0.0);
+  spychance = 0.1 + _max(spy * 0.05, 0.0);
 
   if (chance(spychance)) {
     produceexp(u, SK_SPY, u->number);
@@ -157,7 +157,7 @@ int spy_cmd(unit * u, struct order *ord)
     - (effskill(u, SK_STEALTH) + eff_skill(u, SK_SPY, r) / 2);
 
   if (invisible(u, target) >= u->number) {
-    observe = MIN(observe, 0);
+    observe = _min(observe, 0);
   }
 
   /* Anschliessend wird - unabhaengig vom Erfolg - gewuerfelt, ob der
@@ -345,7 +345,7 @@ static int crew_skill(region * r, faction * f, ship * sh, skill_t sk)
   for (u = r->units; u; u = u->next) {
     if (u->ship == sh && u->faction == f) {
       int s = eff_skill(u, sk, r);
-      value = MAX(s, value);
+      value = _max(s, value);
     }
   }
   return value;

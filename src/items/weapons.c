@@ -111,7 +111,7 @@ attack_catapult(const troop * at, const struct weapon_type *wtype,
   }
 
   enemies = count_enemies(b, af, FIGHT_ROW, FIGHT_ROW, SELECT_ADVANCE);
-  enemies = MIN(enemies, CATAPULT_ATTACKS);
+  enemies = _min(enemies, CATAPULT_ATTACKS);
   if (enemies == 0) {
     return true;                /* allow further attacks */
   }

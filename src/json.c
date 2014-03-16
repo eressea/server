@@ -16,13 +16,48 @@
 #include <assert.h>
 
 int json_import(struct stream * out) {
+    cJSON *json, *child;
+    char buffer[1024], *data = 0;
+    size_t sz = 0;
+    assert(out && out->api);
+    while (!out->api->readln(out->handle, buffer, sizeof(buffer))) {
+        size_t len = strlen(buffer);
+        data = (char *)realloc(data, sz + len + 1);
+        memcpy(data + sz, buffer, len);
+        sz += len;
+        data[sz] = 0;
+    }
+    json = cJSON_Parse(data);
+    child = cJSON_GetObjectItem(json, "regions");
+    if (child && child->type==cJSON_Object) {
+        cJSON *j;
+        for (j = child->child; j; j = j->next) {
+            cJSON *attr;
+            unsigned int id = 0;
+            int x = 0, y = 0;
+            region * r;
+
+            id = (unsigned int)atol(j->string);
+            if ((attr = cJSON_GetObjectItem(j, "x")) != 0 && attr->type == cJSON_Number) x = attr->valueint;
+            if ((attr = cJSON_GetObjectItem(j, "y")) != 0 && attr->type == cJSON_Number) y = attr->valueint;
+            r = new_region(x, y, 0, id);
+            if ((attr = cJSON_GetObjectItem(j, "type")) != 0 && attr->type == cJSON_String) {
+                const terrain_type *terrain = get_terrain(attr->valuestring);
+                terraform_region(r, terrain);
+            }
+            if ((attr = cJSON_GetObjectItem(j, "name")) != 0 && attr->type == cJSON_String) {
+                region_setname(r, attr->valuestring);
+            }
+        }
+    }
+    cJSON_Delete(json);
     return 0;
 }
 
 int json_export(stream * out, unsigned int flags) {
     cJSON *json, *root = cJSON_CreateObject();
     assert(out && out->api);
-    if (flags & EXPORT_REGIONS) {
+    if (regions && (flags & EXPORT_REGIONS)) {
         region * r;
         cJSON_AddItemToObject(root, "regions", json = cJSON_CreateObject());
         for (r = regions; r; r = r->next) {
@@ -35,7 +70,7 @@ int json_export(stream * out, unsigned int flags) {
             cJSON_AddStringToObject(data, "type", r->terrain->_name);
         }
     }
-    if (flags & EXPORT_FACTIONS) {
+    if (factions && (flags & EXPORT_FACTIONS)) {
         faction *f;
         cJSON_AddItemToObject(root, "factions", json = cJSON_CreateObject());
         for (f = factions; f; f = f->next) {
@@ -48,7 +83,7 @@ int json_export(stream * out, unsigned int flags) {
     }
     if (flags) {
         char *tok, *output;
-        output = cJSON_Print(json);
+        output = cJSON_Print(root);
         tok = strtok(output, "\n\r");
         while (tok) {
             if (tok[0]) {
