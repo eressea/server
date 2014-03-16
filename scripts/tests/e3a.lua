@@ -679,7 +679,7 @@ function test_bug_1738_build_castle_e3()
   -- castle now has size 229.
   u2:clear_orders()
   u2:add_order("MACHE BURG " .. itoa36(c.id))
-  -- 32 * 3 makes 96 talent points.
+  -- 32 * 3 makes 96 skill points.
   -- from size 229 to size 250 needs 21 * 3 = 63 points, rest 33.
   -- 33/4 makes 8 points, resulting size is 258.
 
@@ -689,6 +689,6 @@ function test_bug_1738_build_castle_e3()
   write_report(f)
   ]]--
   -- resulting size should be 250 because unit 2
-  -- does not have the needed minimum talent.
+  -- does not have the needed minimum skill.
   assert_equal(c.size, 250)
 end
