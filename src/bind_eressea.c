@@ -42,3 +42,17 @@ int eressea_export_json(const char * filename, unsigned int flags) {
     perror(filename);
     return -1;
 }
+
+int eressea_import_json(const char * filename) {
+    FILE *F = fopen(filename, "rt");
+    if (F) {
+        stream out = { 0 };
+        int err;
+        fstream_init(&out, F);
+        err = json_import(&out);
+        fstream_done(&out);
+        return err;
+    }
+    perror(filename);
+    return -1;
+}
