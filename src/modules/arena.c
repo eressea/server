@@ -105,9 +105,7 @@ leave_arena(struct unit *u, const struct item_type *itype, int amount,
     return -1;
   if (u->building != arena_tower(u->faction->magiegebiet) && leave_fail(u))
     return -1;
-  unused(amount);
-  unused(ord);
-  unused(itype);
+  unused(amount, ord, itype);
   assert(!"not implemented");
   return 0;
 }
