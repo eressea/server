@@ -1,4 +1,4 @@
-# Microsoft Visual Studio build artefacts
+# Microsoft Visual Studio build artifacts
 src/Debug/
 src/Release/
 src/*.vcproj.*.user
@@ -13,6 +13,9 @@ ipch/
 *.sh
 *.suo
 *.user
+
+# ViM artifacts
+.*.swp
 
 *~
 *.bak
