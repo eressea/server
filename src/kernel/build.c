@@ -435,12 +435,10 @@ int build(unit * u, const construction * ctype, int completed, int want)
   if (type->improvement == NULL && completed == type->maxsize)
     return ECOMPLETE;
   if (type->btype != NULL) {
-    building *b;
     if (!u->building || u->building->type != type->btype) {
       return EBUILDINGREQ;
     }
-    b = inside_building(u);
-    if (b == NULL)
+    if (inside_building(u) == NULL)
       return EBUILDINGREQ;
   }
 
@@ -478,6 +476,7 @@ int build(unit * u, const construction * ctype, int completed, int want)
       skills += dm * effsk;
     }
   }
+
   for (; want > 0 && skills > 0;) {
     int c, n;
 
@@ -511,16 +510,17 @@ int build(unit * u, const construction * ctype, int completed, int want)
     }
 
     if (basesk < type->minskill) {
-      if (made == 0)
+      if (made == 0) {
         return ELOWSKILL;       /* not good enough to go on */
+      } else {
+        /* skill too low? Set remaining skill points to zero. */
+        skills = 0;
+      }
     }
 
     /* n = maximum buildable size */
-    if (type->minskill > 1) {
-      n = skills / type->minskill;
-    } else {
-      n = skills;
-    }
+    n = skills / _max(1, type->minskill);
+
     /* Flinkfingerring wirkt nicht auf Mengenbegrenzte (magische)
      * Talente */
     if (skill_limit(u->faction, type->skill) == INT_MAX) {
@@ -545,7 +545,7 @@ int build(unit * u, const construction * ctype, int completed, int want)
       }
     }
 
-    if (type->materials)
+    if (type->materials) {
       for (c = 0; n > 0 && type->materials[c].number; c++) {
         const struct resource_type *rtype = type->materials[c].rtype;
         int need, prebuilt;
@@ -574,13 +574,17 @@ int build(unit * u, const construction * ctype, int completed, int want)
             n = maxn;
         }
       }
-    if (n <= 0) {
-      if (made == 0)
-        return ENOMATERIALS;
-      else
-        break;
     }
-    if (type->materials)
+
+    if (n <= 0) {
+      if (made == 0) {
+        return ENOMATERIALS;
+      } else {
+        break;
+      }
+    }
+
+    if (type->materials) {
       for (c = 0; type->materials[c].number; c++) {
         const struct resource_type *rtype = type->materials[c].rtype;
         int prebuilt =
@@ -604,11 +608,14 @@ int build(unit * u, const construction * ctype, int completed, int want)
         use_pooled(u, rtype, GET_DEFAULT,
           (need - prebuilt + multi - 1) / multi);
       }
+    }
+
     made += n;
     skills -= n * type->minskill;
     want -= n;
     completed = completed + n;
   }
+
   /* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
   produceexp(u, ctype->skill, _min(made, u->number));
 
