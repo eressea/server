@@ -57,7 +57,7 @@ int json_import(struct stream * out) {
 int json_export(stream * out, unsigned int flags) {
     cJSON *json, *root = cJSON_CreateObject();
     assert(out && out->api);
-    if (flags & EXPORT_REGIONS) {
+    if (regions && (flags & EXPORT_REGIONS)) {
         region * r;
         cJSON_AddItemToObject(root, "regions", json = cJSON_CreateObject());
         for (r = regions; r; r = r->next) {
@@ -70,7 +70,7 @@ int json_export(stream * out, unsigned int flags) {
             cJSON_AddStringToObject(data, "type", r->terrain->_name);
         }
     }
-    if (flags & EXPORT_FACTIONS) {
+    if (factions && (flags & EXPORT_FACTIONS)) {
         faction *f;
         cJSON_AddItemToObject(root, "factions", json = cJSON_CreateObject());
         for (f = factions; f; f = f->next) {
