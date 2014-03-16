@@ -80,8 +80,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #define unused (void)
 
-#include "util/bool.h"
-  
 #ifndef INLINE_FUNCTION
 # define INLINE_FUNCTION
 #endif
