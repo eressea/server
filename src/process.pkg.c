@@ -1,6 +1,5 @@
 /*
 ** Lua binding: process
-** Generated automatically by tolua 5.1.3 on Sat Mar 15 19:26:36 2014.
 */
 
 #include "tolua.h"

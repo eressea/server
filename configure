@@ -1,19 +1,19 @@
 #!/bin/sh
 git submodule update --init
 MACHINE=`uname -m`
-BIN_DIR="build-$MACHINE-Debug"
 [ -z "$CC" ] && [ ! -z `which gcc` ] && CC="gcc"
 [ -z "$CC" ] && [ ! -z `which tcc` ] && CC="tcc"
 [ -z "$CC" ] && [ ! -z `which cc` ] && CC="cc"
 [ -z "$JOBS" ] && JOBS=$(nproc)
 
+BIN_DIR="build-$MACHINE-$CC-Debug"
 DISTCC=`which distcc`
 if [ ! -z "$DISTCC" ] ; then
 JOBS=`distcc -j`
 if [ -z "$JOBS" ] ; then
 JOBS=1
 elif [ $JOBS -gt 1 ] ; then
-CC="distcc $CC"
+CC="$DISTCC $CC"
 MAKEOPTS=-j$JOBS
 fi
 fi
