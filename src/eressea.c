@@ -20,7 +20,6 @@
 #include <kernel/reports.h>
 #include <kernel/building.h>
 #include <modules/wormhole.h>
-#include <modules/gmcmd.h>
 #include <modules/xmas.h>
 #include <items/itemtypes.h>
 #include <attributes/attributes.h>
@@ -81,6 +80,5 @@ void game_init(void)
   enable_xml_gamecode();
 
   register_attributes();
-  register_gmcmd();
 
 }

@@ -15,7 +15,6 @@
 
 #if DUNGEON_MODULE
 #include "dungeon.h"
-#include "gmcmd.h"
 
 #include <triggers/gate.h>
 #include <triggers/unguard.h>
