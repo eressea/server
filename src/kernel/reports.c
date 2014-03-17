@@ -1606,7 +1606,7 @@ int write_reports(faction * f, time_t ltime)
   ctx.userdata = NULL;
   get_seen_interval(&ctx);
   get_addresses(&ctx);
-
+  _mkdir(reportpath());
   do {
     report_type *rtype = report_types;
 

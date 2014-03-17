@@ -5,6 +5,9 @@ module("tests.e3.spells", package.seeall, lunit.testcase)
 function setup()
     eressea.free_game()
     eressea.settings.set("magic.fumble.enable", "0")
+    eressea.settings.set("nmr.removenewbie", "0")
+    eressea.settings.set("nmr.timeout", "0")
+    eressea.settings.set("rules.peasants.growth", "0")
 end
 
 function test_blessedharvest_lasts_n_turn()
@@ -25,25 +28,20 @@ function test_blessedharvest_lasts_n_turn()
     assert_equal(0, err)
     
     u:clear_orders()
-    local level = 5
-    u:add_order("ZAUBERE STUFE " .. level .. " Regentanz")
+    u:add_order("ZAUBERE STUFE 3 Regentanz")
     assert_equal(0, r:get_resource("money"), 0)
     
     local m = 0
     local p = 100
-    for i=1,level+2 do
-        process_orders()
-        local income = p * 12
-        p = r:get_resource("peasant")
-        income = income - p * 10
-        m = m + income
-        -- print(i, m, p, r:get_resource("money"))
-        if (i>level+1) then
-            assert_not_equal(m, r:get_resource("money"))
-        else
-            assert_equal(m, r:get_resource("money"))
-        end
-        u:clear_orders()
-        u:add_order("ARBEITEN")
-    end
+
+    process_orders()
+    assert_equal(200, r:get_resource("money"))
+    u:clear_orders()
+    u:add_order("ARBEITEN")
+    process_orders()
+    process_orders()
+    process_orders()
+    assert_equal(800, r:get_resource("money"))
+    process_orders()
+    assert_equal(900, r:get_resource("money"))
 end

@@ -496,7 +496,7 @@ static void peasants(region * r)
   /* Bis zu 1000 Bauern können Zwillinge bekommen oder 1000 Bauern
    * wollen nicht! */
 
-  if (peasants > 0) {
+  if (peasants > 0 && get_param_int(global.parameters, "rules.peasants.growth", 1)) {
     int glueck = 0;
     double fraction = peasants * 0.0001F * PEASANTGROWTH;
     int births = (int)fraction;
@@ -938,9 +938,7 @@ void demographics(void)
          * und gewandert sind */
 
         calculate_emigration(r);
-        if (get_param_int(global.parameters, "rules.peasants.growth", 1)) {
-            peasants(r);
-        }
+        peasants(r);
         if (r->age > 20) {
           plagues(r, false);
         }
