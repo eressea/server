@@ -934,6 +934,46 @@ function test_walk_and_carry_the_cart()
     assert_equal(1, u.region.x)
 end
 
+module("tests.recruit", package.seeall, lunit.testcase)
+
+function setup()
+    eressea.free_game()
+    eressea.settings.set("rules.economy.food", "4")
+    eressea.settings.set("rules.peasants.growth", "0")
+end
+
+function test_bug_1795_limit()
+  local r = region.create(0, 0, "plain")    
+  local f = faction.create("noreply@eressea.de", "human", "de")
+  local u1 = one_unit(r,f) 
+  u1:add_item("money", 100000000)
+  u1:add_order("REKRUTIEREN 9999")
+  r:set_resource("peasant", 2000) -- no fractional growth!
+  local peasants = r:get_resource("peasant")
+  local limit,frac = math.modf(peasants/40) -- one day this should be a parameter
+  
+  process_orders()
+  assert_equal(limit+1, u1.number, u1.number .. "!=" .. (limit+1))
+  assert_equal(peasants-limit, r:get_resource("peasant"))
+end
+
+function test_bug_1795_demons()
+  local r = region.create(0, 0, "plain")    
+  local f = faction.create("noreply@eressea.de", "demon", "de")
+  local u1 = one_unit(r,f) 
+  r:set_resource("peasant", 2000)
+  local peasants = r:get_resource("peasant")
+  local limit,frac = math.modf(peasants/40) 
+
+  u1:add_item("money", 100000000)
+  u1:add_order("REKRUTIEREN 9999")
+  
+  process_orders()
+  
+  assert_equal(limit+1, u1.number, u1.number .. "!=" .. (limit+1))
+  assert_equal(peasants, r:get_resource("peasant"))
+end
+
 module("tests.report", package.seeall, lunit.testcase)
 
 function setup()
@@ -1384,41 +1424,6 @@ function test_bug_1870_leave_enter_e3()
   eressea.settings.set("rules.move.owner_leave", "1")
   process_orders()
   assert_equal(u1.building.id, mine.id)
-end
-
-function test_bug_1795_limit()
-  local r = region.create(0, 0, "plain")    
-  local f = faction.create("noreply@eressea.de", "human", "de")
-  local u1 = one_unit(r,f) 
-  u1:add_item("money", 100000000)
-  u1:add_order("REKRUTIEREN 9999")
-  r:set_resource("peasant", 2000) -- no fractional growth!
-  local peasants = r:get_resource("peasant")
-  local limit,frac = math.modf(peasants/40) -- one day this should be a parameter
-  local growth = peasants * 0.001
-  
-  process_orders()
-  
-  assert_equal(limit+1, u1.number, u1.number .. "!=" .. (limit+1))
-  assert_equal(peasants+growth-limit, r:get_resource("peasant"))
-end
-
-function test_bug_1795_demons()
-  local r = region.create(0, 0, "plain")    
-  local f = faction.create("noreply@eressea.de", "demon", "de")
-  local u1 = one_unit(r,f) 
-  r:set_resource("peasant", 2000)
-  local peasants = r:get_resource("peasant")
-  local limit,frac = math.modf(peasants/40) 
-  local growth = peasants * 0.001
-
-  u1:add_item("money", 100000000)
-  u1:add_order("REKRUTIEREN 9999")
-  
-  process_orders()
-  
-  assert_equal(limit+1, u1.number, u1.number .. "!=" .. (limit+1))
-  assert_equal(peasants+growth, r:get_resource("peasant"))
 end
 
 function test_faction_flags()
