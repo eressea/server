@@ -241,6 +241,7 @@ function test_taxes()
 end
 
 function test_region_owner_cannot_leave_castle()
+    eressea.settings.set("rules.move.owner_leave", "1")
     local r = region.create(0, 0, "plain")
     local f = faction.create("noreply@eressea.de", "human", "de")
     f.id = 42
