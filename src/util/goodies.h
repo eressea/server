@@ -53,7 +53,6 @@ extern "C" {
 #define HASH1 JENKINS_HASH1
 #define HASH2 JENKINS_HASH2
 
-#define SWAP_INTS(a, b) { a^=b; b^=a; a^=b; }
 #ifdef __cplusplus
 }
 #endif

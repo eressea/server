@@ -4,6 +4,7 @@
 #include "json.h"
 
 #include <kernel/types.h>
+#include <kernel/plane.h>
 #include <kernel/region.h>
 #include <kernel/faction.h>
 #include <kernel/terrain.h>
@@ -58,10 +59,23 @@ int json_export(stream * out, unsigned int flags) {
     cJSON *json, *root = cJSON_CreateObject();
     assert(out && out->api);
     if (regions && (flags & EXPORT_REGIONS)) {
+        char id[32];
         region * r;
+        plane * p;
+        cJSON_AddItemToObject(root, "planes", json = cJSON_CreateObject());
+        for (p=planes;p;p=p->next) {
+           cJSON *data;
+           _snprintf(id, sizeof(id), "%u", p->id);
+           cJSON_AddItemToObject(json, id, data = cJSON_CreateObject());
+           cJSON_AddNumberToObject(data, "x", p->minx);
+           cJSON_AddNumberToObject(data, "y", p->miny);
+           cJSON_AddNumberToObject(data, "width", p->maxx-p->minx);
+           cJSON_AddNumberToObject(data, "height", p->maxy-p->miny);
+           cJSON_AddStringToObject(data, "name", p->name);
+        }
+
         cJSON_AddItemToObject(root, "regions", json = cJSON_CreateObject());
         for (r = regions; r; r = r->next) {
-            char id[32];
             cJSON *data;
             _snprintf(id, sizeof(id), "%u", r->uid);
             cJSON_AddItemToObject(json, id, data = cJSON_CreateObject());
