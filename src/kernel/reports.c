@@ -1754,6 +1754,7 @@ int reports(void)
   report_donations();
   remove_empty_units();
 
+  _mkdir(reportpath());
   sprintf(path, "%s/reports.txt", reportpath());
   mailit = fopen(path, "w");
   if (mailit == NULL) {
