@@ -2355,7 +2355,7 @@ static int parse_main(xmlDocPtr doc)
           }
         }
         if (k == MAXKEYWORDS) {
-          log_error("trying to disable unknown comand %s\n", (const char *)propName);
+          log_error("trying to disable unknown command %s\n", (const char *)propName);
         }
       }
       xmlFree(propName);
