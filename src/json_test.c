@@ -63,10 +63,8 @@ static cJSON *export_a_region(CuTest * tc, const struct terrain_type *terrain, r
     json = cJSON_Parse(buf);
     CuAssertPtrNotNull(tc, json);
     CuAssertIntEquals(tc, cJSON_Object, json->type);
-    json = json->child;
-    CuAssertPtrEquals(tc, 0, json->next);
+    json = cJSON_GetObjectItem(json, "regions");
     CuAssertIntEquals(tc, cJSON_Object, json->type);
-    CuAssertStrEquals(tc, "regions", json->string);
     json = json->child;
     CuAssertIntEquals(tc, r->uid, atoi(json->string));
     CuAssertPtrNotNull(tc, attr = cJSON_GetObjectItem(json, "x"));
