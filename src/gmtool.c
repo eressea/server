@@ -17,6 +17,7 @@
 #include "gmtool_structs.h"
 
 #include <modules/xmas.h>
+#include <modules/gmcmd.h>
 #if MUSEUM_MODULE
 #include <modules/museum.h>
 #endif

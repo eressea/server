@@ -437,6 +437,7 @@ const char *keywords[MAXKEYWORDS] = {
   "PIRATERIE",
   "GRUPPE",
   "SORTIEREN",
+  "GM",
   "INFO",
   "PRAEFIX",
   "PFLANZEN",

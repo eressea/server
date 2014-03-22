@@ -128,6 +128,7 @@ typedef enum {
   K_PIRACY,
   K_GROUP,
   K_SORT,
+  K_GM,                         /* perform GM commands */
   K_INFO,                       /* set player-info */
   K_PREFIX,
   K_PLANT,

@@ -3,6 +3,7 @@ SET(_FILES
 arena.c
 autoseed.c
 dungeon.c
+gmcmd.c
 museum.c
 score.c
 weather.c
