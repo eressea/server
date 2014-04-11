@@ -1,0 +1,19 @@
+#!/bin/sh
+ROOT=$(pwd)
+while [ ! -d $ROOT/.git ]; do
+  ROOT=$(dirname $ROOT)
+done
+
+[ -z "$CC" ] && [ ! -z `which gcc` ] && CC="gcc"
+[ -z "$CC" ] && [ ! -z `which tcc` ] && CC="tcc"
+[ -z "$CC" ] && [ ! -z `which cc` ] && CC="cc"
+MACHINE=`uname -m`
+BIN_DIR="build-$MACHINE-$CC-Debug"
+if [ ! -d $ROOT/$BIN_DIR ]; then
+  echo "cannot find build directory $BIN_DIR in $ROOT. did you run cmake-init?"
+  exit
+fi
+
+cd $ROOT/$BIN_DIR
+make && make test
+cd -
