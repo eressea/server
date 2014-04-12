@@ -177,6 +177,13 @@ static int tolua_ship_get_coast(lua_State * L)
   return 0;
 }
 
+static int tolua_ship_get_type(lua_State * L)
+{
+    ship *self = (ship *) tolua_tousertype(L, 1, 0);
+    tolua_pushstring(L, self->type->name[0]);
+    return 1;
+}
+
 void tolua_ship_open(lua_State * L)
 {
   /* register user types */
@@ -201,8 +208,8 @@ void tolua_ship_open(lua_State * L)
         tolua_ship_set_region);
       tolua_variable(L, TOLUA_CAST "coast", tolua_ship_get_coast,
         tolua_ship_set_coast);
+      tolua_variable(L, TOLUA_CAST "type", tolua_ship_get_type, 0);
 #ifdef TODO
-      .property("type", &ship_gettype)
         .property("weight", &ship_getweight)
         .property("capacity", &ship_getcapacity)
         .property("maxsize", &ship_maxsize)

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 ROOT=$(pwd)
 while [ ! -d $ROOT/.git ]; do
   ROOT=$(dirname $ROOT)
@@ -10,24 +10,15 @@ MACHINE=`uname -m`
 [ -z "$CC" ] && [ ! -z `which cc` ] && CC="cc"
 BIN_DIR="build-$MACHINE-$CC-Debug"
 
-[ -z "$JOBS" ] && JOBS=$(nproc)
-DISTCC=`which distcc`
-if [ ! -z "$DISTCC" ] ; then
-JOBS=`distcc -j`
-if [ -z "$JOBS" ] ; then
-JOBS=1
-elif [ $JOBS -gt 1 ] ; then
-CC="$DISTCC $CC"
-MAKEOPTS=-j$JOBS
-fi
-fi
-echo "Building with $CC and $JOBS jobs"
-
 if [ ! -d $ROOT/$BIN_DIR ]; then
   echo "cannot find build directory $BIN_DIR in $ROOT. did you run cmake-init?"
   exit
 fi
 
-cd $ROOT/$BIN_DIR
-make $MAKEOPTS && make test
-cd -
+echo $ROOT
+$ROOT/$BIN_DIR/eressea/test_eressea
+pushd $ROOT/game-e2
+$ROOT/$BIN_DIR/eressea/eressea -e run_tests
+cd $ROOT/game-e3
+$ROOT/$BIN_DIR/eressea/eressea -e run_tests
+popd
