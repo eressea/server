@@ -102,13 +102,13 @@ void st_register(const ship_type * type)
   ql_push(&shiptypes, (void *)type);
 }
 
-#define SMAXHASH 7919
-ship *shiphash[SMAXHASH];
+#define MAXSHIPHASH 7919
+ship *shiphash[MAXSHIPHASH];
 void shash(ship * s)
 {
-  ship *old = shiphash[s->no % SMAXHASH];
+  ship *old = shiphash[s->no % MAXSHIPHASH];
 
-  shiphash[s->no % SMAXHASH] = s;
+  shiphash[s->no % MAXSHIPHASH] = s;
   s->nexthash = old;
 }
 
@@ -116,7 +116,7 @@ void sunhash(ship * s)
 {
   ship **show;
 
-  for (show = &shiphash[s->no % SMAXHASH]; *show; show = &(*show)->nexthash) {
+  for (show = &shiphash[s->no % MAXSHIPHASH]; *show; show = &(*show)->nexthash) {
     if ((*show)->no == s->no)
       break;
   }
@@ -131,7 +131,7 @@ static ship *sfindhash(int i)
 {
   ship *old;
 
-  for (old = shiphash[i % SMAXHASH]; old; old = old->nexthash)
+  for (old = shiphash[i % MAXSHIPHASH]; old; old = old->nexthash)
     if (old->no == i)
       return old;
   return 0;

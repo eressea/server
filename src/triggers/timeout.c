@@ -61,7 +61,7 @@ static int timeout_handle(trigger * t, void *data)
     handle_triggers(&td->triggers, NULL);
     return -1;
   }
-  unused(data);
+  unused_arg(data);
   return 0;
 }
 

@@ -68,7 +68,7 @@ static int removecurse_handle(trigger * t, void *data)
     } else
       log_error("could not perform removecurse::handle()\n");
   }
-  unused(data);
+  unused_arg(data);
   return 0;
 }
 

@@ -107,9 +107,9 @@ leave_arena(struct unit *u, const struct item_type *itype, int amount,
     if (u->building != arena_tower(u->faction->magiegebiet) && leave_fail(u)) {
        return -1;
     }
-    unused(amount);
-    unused(ord);
-    unused(itype);
+    unused_arg(amount);
+    unused_arg(ord);
+    unused_arg(itype);
     assert(!"not implemented");
     return 0;
 }
@@ -128,9 +128,9 @@ enter_arena(unit * u, const item_type * itype, int amount, order * ord)
   region *r = u->region;
   unit *u2;
   int fee = u->faction->score / 5;
-  unused(ord);
-  unused(amount);
-  unused(itype);
+  unused_arg(ord);
+  unused_arg(amount);
+  unused_arg(itype);
   if (fee > 2000)
     fee = 2000;
   if (getplane(r) == arena)
@@ -186,7 +186,7 @@ use_wand_of_tears(unit * user, const struct item_type *itype, int amount,
   order * ord)
 {
   int n;
-  unused(ord);
+  unused_arg(ord);
   for (n = 0; n != amount; ++n) {
     unit *u;
     for (u = user->region->units; u; u = u->next) {
@@ -432,7 +432,7 @@ static int caldera_handle(trigger * t, void *data)
   } else {
     log_error("could not perform caldera::handle()\n");
   }
-  unused(data);
+  unused_arg(data);
   return 0;
 }
 

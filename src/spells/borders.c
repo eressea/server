@@ -234,9 +234,9 @@ static const char *b_namefirewall(const connection * b, const region * r,
   const faction * f, int gflags)
 {
   const char *bname;
-  unused(f);
-  unused(r);
-  unused(b);
+  unused_arg(f);
+  unused_arg(r);
+  unused_arg(b);
   if (gflags & GF_ARTICLE)
     bname = "a_firewall";
   else

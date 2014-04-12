@@ -119,7 +119,7 @@ use_antimagiccrystal(unit * u, const struct item_type *itype, int amount,
     float force;
     spell *sp = find_spell("antimagiczone");
     attrib **ap = &r->attribs;
-    unused(ord);
+    unused_arg(ord);
     assert(sp);
 
     /* Reduziert die Stärke jedes Spruchs um effect */

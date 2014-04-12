@@ -346,7 +346,7 @@ static int cr_alliance(variant var, char *buffer, const void *userdata)
   if (al != NULL) {
     sprintf(buffer, "%d", al->id);
   }
-  unused(userdata);
+  unused_arg(userdata);
   return 0;
 }
 

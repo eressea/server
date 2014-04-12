@@ -48,7 +48,7 @@ static message *cinfo_auraboost(const void *obj, objtype_t typ, const curse * c,
   int self)
 {
   struct unit *u = (struct unit *)obj;
-  unused(typ);
+  unused_arg(typ);
   assert(typ == TYP_UNIT);
 
   if (self != 0) {
@@ -81,7 +81,7 @@ static message *cinfo_slave(const void *obj, objtype_t typ, const curse * c,
   int self)
 {
   unit *u;
-  unused(typ);
+  unused_arg(typ);
 
   assert(typ == TYP_UNIT);
   u = (unit *) obj;
@@ -105,7 +105,7 @@ static struct curse_type ct_slavery = { "slavery",
 static message *cinfo_calm(const void *obj, objtype_t typ, const curse * c,
   int self)
 {
-  unused(typ);
+  unused_arg(typ);
   assert(typ == TYP_UNIT);
 
   if (c->magician && c->magician->faction) {
@@ -134,7 +134,7 @@ static struct curse_type ct_calmmonster = {
 static message *cinfo_speed(const void *obj, objtype_t typ, const curse * c,
   int self)
 {
-  unused(typ);
+  unused_arg(typ);
   assert(typ == TYP_UNIT);
 
   if (self != 0) {
@@ -157,7 +157,7 @@ static struct curse_type ct_speed = {
  */
 message *cinfo_unit(const void *obj, objtype_t typ, const curse * c, int self)
 {
-  unused(typ);
+  unused_arg(typ);
   assert(typ == TYP_UNIT);
 
   if (self != 0) {
@@ -181,7 +181,7 @@ static struct curse_type ct_orcish = {
 static message *cinfo_kaelteschutz(const void *obj, objtype_t typ, const curse * c,
   int self)
 {
-  unused(typ);
+  unused_arg(typ);
   assert(typ == TYP_UNIT);
 
   if (self != 0) {
@@ -233,7 +233,7 @@ static message *cinfo_sparkle(const void *obj, objtype_t typ, const curse * c,
   };
   int m, begin = 0, end = 0;
   unit *u;
-  unused(typ);
+  unused_arg(typ);
 
   assert(typ == TYP_UNIT);
   u = (unit *) obj;
@@ -333,7 +333,7 @@ write_skill(struct storage *store, const curse * c, const void *target)
 static message *cinfo_skillmod(const void *obj, objtype_t typ, const curse * c,
   int self)
 {
-  unused(typ);
+  unused_arg(typ);
 
   if (self != 0) {
     unit *u = (unit *) obj;

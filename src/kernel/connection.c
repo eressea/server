@@ -230,31 +230,29 @@ void b_write(const connection * b, storage * store)
 
 bool b_transparent(const connection * b, const struct faction *f)
 {
-  unused(b);
-  unused(f);
+  unused_arg(b);
+  unused_arg(f);
   return true;
 }
 
 bool b_opaque(const connection * b, const struct faction * f)
 {
-  unused(b);
-  unused(f);
+  unused_arg(b);
+  unused_arg(f);
   return false;
 }
 
 bool b_blockall(const connection * b, const unit * u, const region * r)
 {
-  unused(u);
-  unused(r);
-  unused(b);
+  unused_arg(u);
+  unused_arg(r);
+  unused_arg(b);
   return true;
 }
 
 bool b_blocknone(const connection * b, const unit * u, const region * r)
 {
-  unused(u);
-  unused(r);
-  unused(b);
+  unused_arg((u, r, b));
   return false;
 }
 
@@ -266,39 +264,36 @@ bool b_rvisible(const connection * b, const region * r)
 bool b_fvisible(const connection * b, const struct faction * f,
   const region * r)
 {
-  unused(r);
-  unused(f);
-  unused(b);
+  unused_arg(r, f, b);
   return true;
 }
 
 bool b_uvisible(const connection * b, const unit * u)
 {
-  unused(u);
-  unused(b);
+  unused_arg(u, b);
   return true;
 }
 
 bool b_rinvisible(const connection * b, const region * r)
 {
-  unused(r);
-  unused(b);
+  unused_arg(r);
+  unused_arg(b);
   return false;
 }
 
 bool b_finvisible(const connection * b, const struct faction * f,
   const region * r)
 {
-  unused(r);
-  unused(f);
-  unused(b);
+  unused_arg(r);
+  unused_arg(f);
+  unused_arg(b);
   return false;
 }
 
 bool b_uinvisible(const connection * b, const unit * u)
 {
-  unused(u);
-  unused(b);
+  unused_arg(u);
+  unused_arg(b);
   return false;
 }
 
@@ -352,9 +347,9 @@ static const char *b_namewall(const connection * b, const region * r,
 {
   const char *bname = "wall";
 
-  unused(f);
-  unused(r);
-  unused(b);
+  unused_arg(f);
+  unused_arg(r);
+  unused_arg(b);
   if (gflags & GF_ARTICLE)
     bname = "a_wall";
   if (gflags & GF_PURE)
@@ -393,9 +388,9 @@ border_type bt_noway = {
 static const char *b_namefogwall(const connection * b, const region * r,
   const struct faction *f, int gflags)
 {
-  unused(f);
-  unused(b);
-  unused(r);
+  unused_arg(f);
+  unused_arg(b);
+  unused_arg(r);
   if (gflags & GF_PURE)
     return "fogwall";
   if (gflags & GF_ARTICLE)
@@ -406,8 +401,8 @@ static const char *b_namefogwall(const connection * b, const region * r,
 static bool
 b_blockfogwall(const connection * b, const unit * u, const region * r)
 {
-  unused(b);
-  unused(r);
+  unused_arg(b);
+  unused_arg(r);
   if (!u)
     return true;
   return (bool) (effskill(u, SK_PERCEPTION) > 4);    /* Das ist die alte Nebelwand */
@@ -432,8 +427,8 @@ static const char *b_nameillusionwall(const connection * b, const region * r,
   const struct faction *f, int gflags)
 {
   int fno = b->data.i;
-  unused(b);
-  unused(r);
+  unused_arg(b);
+  unused_arg(r);
   if (gflags & GF_PURE)
     return (f && fno == f->no) ? "illusionwall" : "wall";
   if (gflags & GF_ARTICLE) {
@@ -475,8 +470,8 @@ static const char *b_namequestportal(const connection * b, const region * r,
 {
   const char *bname;
   int lock = b->data.i;
-  unused(b);
-  unused(r);
+  unused_arg(b);
+  unused_arg(r);
 
   if (gflags & GF_ARTICLE) {
     if (lock > 0) {
@@ -521,7 +516,7 @@ static const char *b_nameroad(const connection * b, const region * r,
   int local = (r == b->from) ? b->data.sa[0] : b->data.sa[1];
   static char buffer[64];
 
-  unused(f);
+  unused_arg(f);
   if (gflags & GF_PURE)
     return "road";
   if (gflags & GF_ARTICLE) {

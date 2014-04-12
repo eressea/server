@@ -71,7 +71,7 @@ static int unitmessage_handle(trigger * t, void *data)
         td->level);
     }
   }
-  unused(data);
+  unused_arg(data);
   return 0;
 }
 

@@ -132,14 +132,14 @@ static int tolua_selected_regions(lua_State * L)
 
 static int tolua_state_open(lua_State * L)
 {
-  unused(L);
+  unused_arg(L);
   state_open();
   return 0;
 }
 
 static int tolua_state_close(lua_State * L)
 {
-  unused(L);
+  unused_arg(L);
   state_close(current_state);
   return 0;
 }

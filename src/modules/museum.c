@@ -306,7 +306,7 @@ use_museumexitticket(unit * u, const struct item_type *itype, int amount,
   unit *warden = findunit(atoi36("mwar"));
   int unit_cookie;
 
-  unused(amount);
+  unused_arg(amount);
 
   /* Prüfen ob in Eingangshalle */
   if (u->region->x != 9525 || u->region->y != 9525) {
@@ -362,9 +362,9 @@ use_museumticket(unit * u, const struct item_type *itype, int amount,
   region *r = u->region;
   plane *pl = rplane(r);
 
-  unused(amount);
+  unused_arg(amount);
 
-  /* Prüfen ob in normaler Plane und nur eine Person */
+  /* PrÃ¼fen ob in normaler Plane und nur eine Person */
   if (pl != get_homeplane()) {
     cmistake(u, ord, 265, MSG_MAGIC);
     return 0;

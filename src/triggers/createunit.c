@@ -74,7 +74,7 @@ static int createunit_handle(trigger * t, void *data)
   } else {
     log_error("could not perform createunit::handle()\n");
   }
-  unused(data);
+  unused_arg(data);
   return 0;
 }
 

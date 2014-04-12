@@ -749,7 +749,7 @@ void set_level(unit * u, skill_t sk, int value)
 static int leftship_age(struct attrib *a)
 {
   /* must be aged, so it doesn't affect report generation (cansee) */
-  unused(a);
+  unused_arg(a);
   return AT_AGE_REMOVE;         /* remove me */
 }
 

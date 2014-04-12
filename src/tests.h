@@ -3,8 +3,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-  #include <CuTest.h>
-  
+
   void test_cleanup(void);
 
   struct terrain_type * test_create_terrain(const char * name, unsigned int flags);

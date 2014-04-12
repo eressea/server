@@ -267,7 +267,7 @@ extern "C" {
   int ispresent(const struct faction *f, const struct region *r);
 
   int check_option(struct faction *f, int option);
-  extern void parse(keyword_t kword, int (*dofun) (struct unit *,
+  extern void parse_kwd(keyword_t kword, int (*dofun) (struct unit *,
       struct order *), bool thisorder);
 
 /* Anzahl Personen in einer Einheit festlegen. NUR (!) mit dieser Routine,

@@ -36,7 +36,7 @@
 static message *cinfo_building(const void *obj, objtype_t typ, const curse * c,
   int self)
 {
-  unused(typ);
+  unused_arg(typ);
   assert(typ == TYP_BUILDING);
 
   if (self != 0) {              /* owner or inside */

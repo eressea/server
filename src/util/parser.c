@@ -18,7 +18,7 @@ typedef struct parser_state {
   struct parser_state *next;
 } parser_state;
 
-static parser_state *state;
+static parser_state *states;
 
 static int eatwhitespace_c(const char **str_p)
 {
@@ -51,12 +51,12 @@ static int eatwhitespace_c(const char **str_p)
 
 void init_tokens_str(const char *initstr, char *cmd)
 {
-  if (state == NULL) {
-    state = malloc(sizeof(parser_state));
-  } else if (state->current_cmd)
-    free(state->current_cmd);
-  state->current_cmd = cmd;
-  state->current_token = initstr;
+  if (states == NULL) {
+    states = malloc(sizeof(parser_state));
+  } else if (states->current_cmd)
+    free(states->current_cmd);
+  states->current_cmd = cmd;
+  states->current_token = initstr;
 }
 
 void parser_pushstate(void)
@@ -64,44 +64,44 @@ void parser_pushstate(void)
   parser_state *new_state = malloc(sizeof(parser_state));
   new_state->current_cmd = NULL;
   new_state->current_token = NULL;
-  new_state->next = state;
-  state = new_state;
+  new_state->next = states;
+  states = new_state;
 }
 
 void parser_popstate(void)
 {
-  parser_state *new_state = state->next;
-  if (state->current_cmd != NULL)
-    free(state->current_cmd);
-  free(state);
-  state = new_state;
+  parser_state *new_state = states->next;
+  if (states->current_cmd != NULL)
+    free(states->current_cmd);
+  free(states);
+  states = new_state;
 }
 
 bool parser_end(void)
 {
-  eatwhitespace_c(&state->current_token);
-  return *state->current_token == 0;
+  eatwhitespace_c(&states->current_token);
+  return *states->current_token == 0;
 }
 
 void skip_token(void)
 {
   char quotechar = 0;
-  eatwhitespace_c(&state->current_token);
+  eatwhitespace_c(&states->current_token);
 
-  while (*state->current_token) {
+  while (*states->current_token) {
     ucs4_t ucs;
     size_t len;
 
-    unsigned char utf8_character = (unsigned char)state->current_token[0];
+    unsigned char utf8_character = (unsigned char)states->current_token[0];
     if (~utf8_character & 0x80) {
       ucs = utf8_character;
-      ++state->current_token;
+      ++states->current_token;
     } else {
-      int ret = unicode_utf8_to_ucs4(&ucs, state->current_token, &len);
+      int ret = unicode_utf8_to_ucs4(&ucs, states->current_token, &len);
       if (ret == 0) {
-        state->current_token += len;
+        states->current_token += len;
       } else {
-        log_warning("illegal character sequence in UTF8 string: %s\n", state->current_token);
+        log_warning("illegal character sequence in UTF8 string: %s\n", states->current_token);
       }
     }
     if (iswxspace((wint_t) ucs) && quotechar == 0) {
@@ -115,7 +115,7 @@ void skip_token(void)
           quotechar = utf8_character;
           break;
         case ESCAPE_CHAR:
-          ++state->current_token;
+          ++states->current_token;
           break;
       }
     }
@@ -189,5 +189,5 @@ const char *parse_token(const char **str)
 
 const char *getstrtoken(void)
 {
-  return parse_token((const char **)&state->current_token);
+  return parse_token((const char **)&states->current_token);
 }

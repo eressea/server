@@ -28,8 +28,6 @@ without prior permission by the authors of Eressea.
 #include <kernel/region.h>
 #include <kernel/unit.h>
 
-#include <tests.h>
-
 static unsigned int get_markets(region * r, unit ** results, size_t size)
 {
   unsigned int n = 0;

@@ -2127,7 +2127,7 @@ static void eval_order(struct opstack **stack, const void *userdata)
   size_t len;
   variant var;
 
-  unused(userdata);
+  unused_arg(userdata);
   write_order(ord, buf, sizeof(buf));
   len = strlen(buf);
   var.v = strcpy(balloc(len + 1), buf);
@@ -2282,7 +2282,7 @@ static void eval_int36(struct opstack **stack, const void *userdata)
 
   var.v = strcpy(balloc(len + 1), c);
   opush(stack, var);
-  unused(userdata);
+  unused_arg(userdata);
 }
 
 /*** END MESSAGE RENDERING ***/

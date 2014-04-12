@@ -201,7 +201,7 @@ caddmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
     log_warning("message for locale \"%s\": %s\n", locale_name(f->locale), s);
   }
 #endif
-  unused(level);
+  unused_arg(level);
   switch (mtype) {
     case MSG_INCOME:
       assert(f);
@@ -255,7 +255,7 @@ message * cmistake(const unit * u, struct order *ord, int mno, int mtype)
 {
   message * result;
   static char msgname[20];
-  unused(mtype);
+  unused_arg(mtype);
 
   if (is_monsters(u->faction))
     return 0;

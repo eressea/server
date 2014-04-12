@@ -38,7 +38,7 @@ static int unguard_handle(trigger * t, void *data)
     log_error("could not perform unguard::handle()\n");
     return -1;
   }
-  unused(data);
+  unused_arg(data);
   return 0;
 }
 

@@ -635,9 +635,9 @@ use_birthdayamulet(unit * u, const struct item_type *itype, int amount,
   direction_t d;
   message *msg = msg_message("meow", "");
 
-  unused(ord);
-  unused(amount);
-  unused(itype);
+  unused_arg(ord);
+  unused_arg(amount);
+  unused_arg(itype);
 
   add_message(&u->region->msgs, msg);
   for (d = 0; d < MAXDIRECTIONS; d++) {
@@ -676,7 +676,7 @@ use_tacticcrystal(unit * u, const struct item_type *itype, int amount,
     c = create_curse(u, &u->attribs, ct_find("skillmod"), power,
       duration, effect, u->number);
     c->data.i = SK_TACTICS;
-    unused(ord);
+    unused_arg(ord);
   }
   use_pooled(u, itype->rtype, GET_DEFAULT, amount);
   ADDMSG(&u->faction->msgs, msg_message("use_tacticcrystal",
@@ -714,7 +714,7 @@ mod_elves_only(const unit * u, const region * r, skill_t sk, int value)
 {
   if (u_race(u) == new_race[RC_ELF])
     return value;
-  unused(r);
+  unused_arg(r);
   return -118;
 }
 
@@ -723,7 +723,7 @@ mod_dwarves_only(const unit * u, const region * r, skill_t sk, int value)
 {
   if (u_race(u) == new_race[RC_DWARF])
     return value;
-  unused(r);
+  unused_arg(r);
   return -118;
 }
 

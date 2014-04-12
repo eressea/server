@@ -97,7 +97,7 @@ static int shock_handle(trigger * t, void *data)
   if (u && u->number) {
     do_shock(u, "trigger");
   }
-  unused(data);
+  unused_arg(data);
   return 0;
 }
 

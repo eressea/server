@@ -5569,7 +5569,7 @@ int sp_showastral(castorder * co)
 
   free_regionlist(rl);
   return cast_level;
-  unused(co);
+  unused_arg(co);
   return 0;
 }
 #endif

@@ -56,8 +56,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <math.h>
 #include <ctype.h>
 
-#include <tests.h>
-
 #define MAXENTITYHASH 7919
 curse *cursehash[MAXENTITYHASH];
 
@@ -769,9 +767,9 @@ message *cinfo_simple(const void *obj, objtype_t typ, const struct curse * c,
 {
   struct message *msg;
 
-  unused(typ);
-  unused(self);
-  unused(obj);
+  unused_arg(typ);
+  unused_arg(self);
+  unused_arg(obj);
 
   msg = msg_message(mkname("curseinfo", c->type->cname), "id", c->no);
   if (msg == NULL) {

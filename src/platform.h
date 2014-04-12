@@ -78,7 +78,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 # define _XOPEN_SOURCE
 #endif
 
-#define unused (void)
+#define unused_arg (void)
 
 #ifndef INLINE_FUNCTION
 # define INLINE_FUNCTION

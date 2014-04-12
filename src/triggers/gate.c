@@ -57,7 +57,7 @@ static int gate_handle(trigger * t, void *data)
     log_error("could not perform gate::handle()\n");
     return -1;
   }
-  unused(data);
+  unused_arg(data);
   return 0;
 }
 

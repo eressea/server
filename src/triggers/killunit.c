@@ -48,7 +48,7 @@ static int killunit_handle(trigger * t, void *data)
     /* we can't remove_unit() here, because that's what's calling us. */
     set_number(u, 0);
   }
-  unused(data);
+  unused_arg(data);
   return 0;
 }
 

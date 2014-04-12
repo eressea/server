@@ -119,7 +119,7 @@ static void terraform_default(struct rawmaterial *res, const region * r)
   res->amount = (int)(res->amount * modifier);  /* random adjustment, +/- 91% */
   if (res->amount < 1)
     res->amount = 1;
-  unused(r);
+  unused_arg(r);
 }
 
 #ifdef RANDOM_CHANGE

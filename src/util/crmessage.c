@@ -135,21 +135,21 @@ int cr_render(const message * msg, char *buffer, const void *userdata)
 int cr_string(variant var, char *buffer, const void *userdata)
 {
   sprintf(buffer, "\"%s\"", (const char *)var.v);
-  unused(userdata);
+  unused_arg(userdata);
   return 0;
 }
 
 int cr_int(variant var, char *buffer, const void *userdata)
 {
   sprintf(buffer, "%d", var.i);
-  unused(userdata);
+  unused_arg(userdata);
   return 0;
 }
 
 int cr_ignore(variant var, char *buffer, const void *userdata)
 {
-  unused(var);
-  unused(buffer);
-  unused(userdata);
+  unused_arg(var);
+  unused_arg(buffer);
+  unused_arg(userdata);
   return -1;
 }
