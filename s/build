@@ -7,6 +7,19 @@ done
 [ -z "$CC" ] && [ ! -z `which gcc` ] && CC="gcc"
 [ -z "$CC" ] && [ ! -z `which tcc` ] && CC="tcc"
 [ -z "$CC" ] && [ ! -z `which cc` ] && CC="cc"
+[ -z "$JOBS" ] && JOBS=$(nproc)
+DISTCC=`which distcc`
+if [ ! -z "$DISTCC" ] ; then
+JOBS=`distcc -j`
+if [ -z "$JOBS" ] ; then
+JOBS=1
+elif [ $JOBS -gt 1 ] ; then
+CC="$DISTCC $CC"
+MAKEOPTS=-j$JOBS
+fi
+fi
+echo "Building with $CC and $JOBS jobs"
+
 MACHINE=`uname -m`
 BIN_DIR="build-$MACHINE-$CC-Debug"
 if [ ! -d $ROOT/$BIN_DIR ]; then
@@ -15,5 +28,5 @@ if [ ! -d $ROOT/$BIN_DIR ]; then
 fi
 
 cd $ROOT/$BIN_DIR
-make && make test
+make $MAKEOPTS && make test
 cd -

@@ -252,7 +252,9 @@ bool b_blockall(const connection * b, const unit * u, const region * r)
 
 bool b_blocknone(const connection * b, const unit * u, const region * r)
 {
-  unused_arg((u, r, b));
+  unused_arg(u);
+  unused_arg(r);
+  unused_arg(b);
   return false;
 }
 
@@ -264,13 +266,16 @@ bool b_rvisible(const connection * b, const region * r)
 bool b_fvisible(const connection * b, const struct faction * f,
   const region * r)
 {
-  unused_arg(r, f, b);
+  unused_arg(r);
+  unused_arg(f);
+  unused_arg(b);
   return true;
 }
 
 bool b_uvisible(const connection * b, const unit * u)
 {
-  unused_arg(u, b);
+  unused_arg(u);
+  unused_arg(b);
   return true;
 }
 
