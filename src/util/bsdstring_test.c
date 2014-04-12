@@ -15,11 +15,11 @@ static void test_strlcat(CuTest * tc)
   buffer[0] = '\0';
   CuAssertIntEquals(tc, 4, strlcat(buffer, "herp", 8));
   CuAssertStrEquals(tc, "herp", buffer);
-  CuAssertIntEquals(tc, 0xfe, buffer[5]);
+  CuAssertIntEquals(tc, (char)0xfe, buffer[5]);
 
   CuAssertIntEquals(tc, 8, strlcat(buffer, "derp", 8));
   CuAssertStrEquals(tc, "herpder", buffer);
-  CuAssertIntEquals(tc, 0xfe, buffer[8]);
+  CuAssertIntEquals(tc, (char)0xfe, buffer[8]);
 }
 
 static void test_strlcpy(CuTest * tc)
@@ -33,11 +33,11 @@ static void test_strlcpy(CuTest * tc)
 
   CuAssertIntEquals(tc, 4, strlcpy(buffer, "herp", 8));
   CuAssertStrEquals(tc, "herp", buffer);
-  CuAssertIntEquals(tc, 0xed, buffer[5]);
+  CuAssertIntEquals(tc, (char)0xed, buffer[5]);
 
   CuAssertIntEquals(tc, 8, strlcpy(buffer, "herpderp", 8));
   CuAssertStrEquals(tc, "herpder", buffer);
-  CuAssertIntEquals(tc, 0xed, buffer[8]);
+  CuAssertIntEquals(tc, (char)0xed, buffer[8]);
 }
 
 static void test_slprintf(CuTest * tc)
