@@ -1198,33 +1198,36 @@ lua_State *lua_init(void) {
 
 int eressea_run(lua_State *L, const char *luafile, const char *entry_point)
 {
-  int err = 0;
+    int err = 0;
 
-  global.vm_state = L;
-  /* run the main script */
-  if (luafile) {
-    log_debug("executing script %s\n", luafile);
-    lua_getglobal(L, "dofile");
-    lua_pushstring(L, luafile);
-    err = lua_pcall(L, 1, 0, 0);
-    if (err != 0) {
-      log_lua_error(L);
-      abort();
-      return err;
+    global.vm_state = L;
+    /* run the main script */
+    if (luafile) {
+        log_debug("executing script %s\n", luafile);
+        lua_getglobal(L, "dofile");
+        lua_pushstring(L, luafile);
+        err = lua_pcall(L, 1, 0, 0);
+        if (err != 0) {
+            log_lua_error(L);
+            abort();
+            return err;
+        }
     }
-  }
-  if (entry_point) {
-    lua_getglobal(L, entry_point);
-    if (lua_isfunction(L, -1)) {
-      log_debug("calling entry-point: %s\n", entry_point);
-      err = lua_pcall(L, 0, 1, 0);
-      if (err != 0) {
-        log_lua_error(L);
-      }
-      return err;
-    } else {
-      log_error("unknown entry-point: %s\n", entry_point);
+    if (entry_point) {
+        if (strcmp("console", entry_point)==0) {
+            return lua_console(L);
+        }
+        lua_getglobal(L, entry_point);
+        if (lua_isfunction(L, -1)) {
+            log_debug("calling entry-point: %s\n", entry_point);
+            err = lua_pcall(L, 0, 1, 0);
+            if (err != 0) {
+                log_lua_error(L);
+            }
+            return err;
+        } else {
+            log_error("unknown entry-point: %s\n", entry_point);
+        }
     }
-  }
-  return lua_console(L);
+    return 0;
 }

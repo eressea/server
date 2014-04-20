@@ -3,11 +3,35 @@
 
   <!-- begin main races -->
 
-  <xi:include href="../races/goblin-3.xml"/>
-  <xi:include href="../races/wyrm.xml"/>
-  <xi:include href="../races/dragon.xml"/>
-  <xi:include href="../races/youngdragon.xml"/>
+  <xi:include href="config:///default/races/goblin-3.xml"/>
+  <xi:include href="config:///default/races/wyrm.xml"/>
+  <xi:include href="config:///default/races/dragon.xml"/>
+  <xi:include href="config:///default/races/youngdragon.xml"/>
   
+  <race name="lynx" magres="0.000000" maxaura="0.000000" regaura="0.000000" weight="500" capacity="540" speed="1.0" hp="20" damage="2d3" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="5" walk="yes" teach="no" giveitem="yes" getitem="yes">
+    <ai splitsize="99999"/>
+    <function name="initfamiliar" value="oldfamiliars"/>
+    <skill name="crossbow" modifier="-99"/>
+    <skill name="mining" modifier="-99"/>
+    <skill name="bow" modifier="-99"/>
+    <skill name="building" modifier="-99"/>
+    <skill name="forestry" modifier="-99"/>
+    <skill name="catapult" modifier="-99"/>
+    <skill name="training" modifier="1"/>
+    <skill name="riding" modifier="-99"/>
+    <skill name="armorer" modifier="-99"/>
+    <skill name="shipcraft" modifier="-99"/>
+    <skill name="melee" modifier="-99"/>
+    <skill name="sailing" modifier="-99"/>
+    <skill name="polearm" modifier="-99"/>
+    <skill name="quarrying" modifier="-99"/>
+    <skill name="roadwork" modifier="-99"/>
+    <skill name="tactics" modifier="-99"/>
+    <skill name="weaponsmithing" modifier="-99"/>
+    <skill name="cartmaking" modifier="-99"/>
+    <attack type="4" damage="2d3"/>
+  </race>
+
   <race name="human" magres="0.000000" maxaura="1.0" regaura="1.0" recruitcost="100" maintenance="10" weight="1000" capacity="540" speed="1.0" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <function name="itemdrop" value="defaultdrops"/>
@@ -582,29 +606,6 @@
     <skill name="stamina" modifier="2"/>
     <attack type="4" damage="3d20"/>
     <attack type="8" damage="1d10"/>
-  </race>
-  <race name="lynx" magres="0.000000" maxaura="0.000000" regaura="0.000000" weight="500" capacity="540" speed="1.0" hp="20" damage="2d3" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="5" walk="yes" teach="no" giveitem="yes" getitem="yes">
-    <ai splitsize="99999"/>
-    <function name="initfamiliar" value="oldfamiliars"/>
-    <skill name="crossbow" modifier="-99"/>
-    <skill name="mining" modifier="-99"/>
-    <skill name="bow" modifier="-99"/>
-    <skill name="building" modifier="-99"/>
-    <skill name="forestry" modifier="-99"/>
-    <skill name="catapult" modifier="-99"/>
-    <skill name="training" modifier="1"/>
-    <skill name="riding" modifier="-99"/>
-    <skill name="armorer" modifier="-99"/>
-    <skill name="shipcraft" modifier="-99"/>
-    <skill name="melee" modifier="-99"/>
-    <skill name="sailing" modifier="-99"/>
-    <skill name="polearm" modifier="-99"/>
-    <skill name="quarrying" modifier="-99"/>
-    <skill name="roadwork" modifier="-99"/>
-    <skill name="tactics" modifier="-99"/>
-    <skill name="weaponsmithing" modifier="-99"/>
-    <skill name="cartmaking" modifier="-99"/>
-    <attack type="4" damage="2d3"/>
   </race>
   <race name="direwolf" magres="0.000000" maxaura="0.000000" regaura="0.000000" weight="500" capacity="540" speed="1.0" hp="20" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="1" walk="yes" teach="no" giveperson="yes">
     <function name="initfamiliar" value="oldfamiliars"/>
