@@ -10,8 +10,6 @@ This program may not be used, modified or distributed
 without prior permission by the authors of Eressea.
 */
 
-#pragma region includes
-
 #include <platform.h>
 #include <kernel/config.h>
 #include "alliance.h"
@@ -42,8 +40,6 @@ without prior permission by the authors of Eressea.
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-
-#pragma endregion
 
 alliance *alliances = NULL;
 

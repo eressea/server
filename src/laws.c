@@ -16,8 +16,6 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#pragma region includes
-
 #include <platform.h>
 #include <kernel/config.h>
 #include "laws.h"
@@ -102,8 +100,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <limits.h>
 
 #include <tests.h>
-
-#pragma endregion
 
 /* chance that a peasant dies of starvation: */
 #define PEASANT_STARVATION_CHANCE 0.9F

@@ -16,8 +16,6 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#pragma region includes
-
 #include <platform.h>
 #include <kernel/config.h>
 #include "battle.h"
@@ -72,8 +70,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <string.h>
 #include <stdlib.h>
 #include <sys/stat.h>
-
-#pragma endregion
 
 static FILE *bdebug;
 
