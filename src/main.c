@@ -73,6 +73,7 @@ static int usage(const char *prog, const char *arg)
   }
   fprintf(stderr, "Usage: %s [options]\n"
     "-t <turn>        : read this datafile, not the most current one\n"
+    "-f <script.lua>  : execute a lua script\n"
     "-q               : be quite (same as -v 0)\n"
     "-v <level>       : verbosity level\n"
     "-C               : run in interactive mode\n"
@@ -118,7 +119,10 @@ static int parse_args(int argc, char **argv, int *exitcode)
       const char *arg;
       switch (argv[i][1]) {
       case 'C':
-        entry_point = NULL;
+        entry_point = "console";
+        break;
+      case 'f':
+        i = get_arg(argc, argv, 2, i, &luafile, 0);
         break;
       case 'l':
         i = get_arg(argc, argv, 2, i, &logfile, 0);
