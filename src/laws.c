@@ -4521,10 +4521,6 @@ void init_processor(void)
   add_proc_region(p, &enter_1, "Betreten (1. Versuch)");
   add_proc_order(p, K_USE, &use_cmd, 0, "Benutzen");
 
-  if (!global.disabled[K_GM]) {
-    add_proc_global(p, &gmcommands, "GM Kommandos");
-  }
-
   p += 10;                      /* in case it has any effects on alliance victories */
   add_proc_order(p, K_GIVE, &give_control_cmd, 0, "GIB KOMMANDO");
 

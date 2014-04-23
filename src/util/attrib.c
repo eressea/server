@@ -321,7 +321,7 @@ int a_read(struct storage *store, attrib ** attribs, void *owner)
         }
       }
     } else {
-      assert(!"fehler: keine laderoutine für attribut");
+      assert(!"error: no registered callback can read attribute");
     }
 
     READ_TOK(store, zText, sizeof(zText));
