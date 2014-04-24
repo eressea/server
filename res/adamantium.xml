@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<resources>
+
+  <resource name="adamantium" limited="yes" material="rm_adamantium">
+    <item weight="200" score="200">
+      <construction skill="mining" minskill="8" reqsize="1"/>
+    </item>
+    <resourcelimit>
+      <modifier type="require" building="mine"/>
+      <guard flag="mining"/>
+    </resourcelimit>
+  </resource>
+
+  <resource name="adamantiumaxe">
+    <item weight="100" score="500">
+      <construction skill="weaponsmithing" minskill="8" reqsize="1">
+        <requirement type="adamantium" quantity="1"/>
+        <requirement type="log" quantity="1"/>
+      </construction>
+      <weapon cut="true" skill="melee" offmod="2" defmod="-2" magres="0.30">
+        <damage type="rider" value="3d4+15"/>
+        <damage type="footman" value="3d4+15"/>
+      </weapon>
+    </item>
+  </resource>
+
+  <resource name="adamantiumplate">
+    <item weight="100" score="2000">
+      <construction skill="armorer" minskill="10" reqsize="1">
+        <requirement type="adamantium" quantity="3"/>
+      </construction>
+      <armor ac="7" penalty="0.1"/>
+    </item>
+  </resource>
+
+</resources>

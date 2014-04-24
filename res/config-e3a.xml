@@ -30,6 +30,7 @@
   <xi:include href="e3a/weapons.xml" />
   <xi:include href="e3a/armor.xml" />
   <xi:include href="e3a/resources.xml" />
+  <xi:include href="adamantium.xml"/>
 
   <equipment>
     <set name="first_unit">
