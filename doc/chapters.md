@@ -15,10 +15,11 @@
 8. Magic and Alchemy
 9. Castles and other buildings
 10. Races
-11. List of Skills
-12. List of Buildings
-12. List of Items
-13. Appendices and Tables
+11. List of Orders
+12. List of Skills
+13. List of Buildings
+14. List of Items
+15. Appendices and Tables
 
 ## Acknowledgments
 
