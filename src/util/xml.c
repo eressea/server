@@ -113,7 +113,7 @@ int read_xml(const char *filename, const char *catalog)
     xmlLoadCatalog(catalog);
   }
 #ifdef XML_PARSE_XINCLUDE
-  doc = xmlReadFile(filename, NULL, XML_PARSE_XINCLUDE);
+  doc = xmlReadFile(filename, NULL, XML_PARSE_XINCLUDE|XML_PARSE_NONET|XML_PARSE_PEDANTIC);
 #else
   doc = xmlParseFile(filename);
 #endif

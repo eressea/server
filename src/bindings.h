@@ -29,7 +29,7 @@ extern "C" {
 
   void lua_done(struct lua_State *L);
   struct lua_State *lua_init(void);
-  int eressea_run(struct lua_State *L, const char *luafile, const char *entry_point);
+  int eressea_run(struct lua_State *L, const char *luafile);
 
 #ifdef __cplusplus
 }
