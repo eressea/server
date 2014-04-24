@@ -1,37 +1,37 @@
 <?xml version="1.0"?>
 <eressea xmlns:xi="http://www.w3.org/2001/XInclude">
-  <xi:include href="eressea:///core/messages.xml"/>
+  <xi:include href="config:///core/messages.xml"/>
 
   <!-- Localization -->
-  <xi:include href="eressea:///core/de/strings.xml"/>
-  <xi:include href="eressea:///core/en/strings.xml"/>
-  <xi:include href="eressea/spellinfo.xml" />
+  <xi:include href="config:///core/de/strings.xml"/>
+  <xi:include href="config:///core/en/strings.xml"/>
+  <xi:include href="config:///game/spellinfo.xml" />
 
-  <xi:include href="eressea:///core/common/items.xml" />
-  <xi:include href="eressea:///core/common/armor.xml" />
-  <xi:include href="eressea:///core/common/weapons.xml" />
-  <xi:include href="eressea:///core/common/resources.xml" />
-  <xi:include href="eressea:///core/common/luxuries.xml" />
-  <xi:include href="eressea:///core/common/herbs.xml" />
-  <xi:include href="eressea:///core/common/potions.xml" />
-  <xi:include href="eressea:///core/spoils.xml"/>
-  <xi:include href="eressea/races.xml"/>
-  <xi:include href="eressea:///core/prefixes.xml"/>
-  <xi:include href="eressea:///core/ships.xml"/>
-  <xi:include href="eressea:///core/common/buildings.xml"/>
-  <xi:include href="eressea:///core/equipment.xml"/>
-  <xi:include href="eressea:///core/terrains.xml"/>
-  <xi:include href="eressea/terrains.xml"/>
-  <xi:include href="directions.xml"/>
-  <xi:include href="eressea/artrewards.xml"/>
-  <xi:include href="eressea/buildings.xml"/>
-  <xi:include href="eressea:///core/calendar.xml"/>
+  <xi:include href="config:///core/common/items.xml" />
+  <xi:include href="config:///core/common/armor.xml" />
+  <xi:include href="config:///core/common/weapons.xml" />
+  <xi:include href="config:///core/common/resources.xml" />
+  <xi:include href="config:///core/common/luxuries.xml" />
+  <xi:include href="config:///core/common/herbs.xml" />
+  <xi:include href="config:///core/common/potions.xml" />
+  <xi:include href="config:///core/spoils.xml"/>
+  <xi:include href="config:///game/races.xml"/>
+  <xi:include href="config:///core/prefixes.xml"/>
+  <xi:include href="config:///core/ships.xml"/>
+  <xi:include href="config:///core/common/buildings.xml"/>
+  <xi:include href="config:///core/equipment.xml"/>
+  <xi:include href="config:///core/terrains.xml"/>
+  <xi:include href="config:///game/terrains.xml"/>
+  <xi:include href="config:///default/directions.xml"/>
+  <xi:include href="config:///game/artrewards.xml"/>
+  <xi:include href="config:///game/buildings.xml"/>
+  <xi:include href="config:///core/calendar.xml"/>
   <calendar name="secondage" newyear="month_1" start="184"/>
-  <xi:include href="eressea/equipment.xml"/>
-  <xi:include href="eressea/items.xml"/>
-  <xi:include href="eressea/spells.xml"/>
-  <xi:include href="eressea/strings.xml"/>
-  <xi:include href="adamantium.xml"/>
+  <xi:include href="config:///game/equipment.xml"/>
+  <xi:include href="config:///game/items.xml"/>
+  <xi:include href="config:///game/spells.xml"/>
+  <xi:include href="config:///game/strings.xml"/>
+  <xi:include href="config:///default/adamantium.xml"/>
   <equipment>
     <set name="first_unit">
       <item name="conquesttoken" amount="1"/>
@@ -44,11 +44,11 @@
     </set>
   </equipment>
 
-  <xi:include href="names-undead.xml"/>
-  <xi:include href="names-skeletons.xml"/>
-  <xi:include href="names-zombies.xml"/>
-  <xi:include href="names-ghouls.xml"/>
-  <xi:include href="names-dragons.xml"/>
+  <xi:include href="config:///default/names-undead.xml"/>
+  <xi:include href="config:///default/names-skeletons.xml"/>
+  <xi:include href="config:///default/names-zombies.xml"/>
+  <xi:include href="config:///default/names-ghouls.xml"/>
+  <xi:include href="config:///default/names-dragons.xml"/>
 
   <game name="Eressea">
     <!-- Game specific settings -->
