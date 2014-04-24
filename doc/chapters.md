@@ -23,6 +23,6 @@
 
 ## Acknowledgments
 
-This game would not be possible without the work of Russell Wallace, who created the Atlantis PBEM in 1993. I would also like to thank Alex Schröder, who wrote the first German translation of Atlantis. Christian Schlittchen, Katja Zedel and Henning Peters started Eressea, and invited me to be a part of their team and become their friends in the process. Ingo Wilken, Benjamin Bärmann, Stefan Reich, and Martin Hershoff have contributed code to the server, and valuable design input. Many of the features are a direct result of entertaining debates on the eressea-kom discussion list, and I would like to thank them and the entire community for their support and encouragement over the years.
+This game would not be possible without the work of Russell Wallace, who created the Atlantis PBEM in 1993. I would also like to thank Alex Schröder, who wrote the first German translation of Atlantis. Christian Schlittchen, Katja Zedel and Henning Peters started Eressea, and invited me to be a part of their team and become their friends in the process. Ingo Wilken, Benjamin Bärmann, Stefan Reich, and Martin Hershoff have contributed code and valuable design input to the server. Many advanced features are a direct result of entertaining debates on the eressea-kom and atlantisdev discussion lists, and I would like to thank them and the entire community for their support and encouragement over the years.
 
 Enno Rehling, April 2014
