@@ -31,6 +31,7 @@
   <xi:include href="eressea/items.xml"/>
   <xi:include href="eressea/spells.xml"/>
   <xi:include href="eressea/strings.xml"/>
+  <xi:include href="adamantium.xml"/>
   <equipment>
     <set name="first_unit">
       <item name="conquesttoken" amount="1"/>
