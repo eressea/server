@@ -98,7 +98,7 @@ FILE *updatelog;
 const struct race *new_race[MAXRACES];
 bool sqlpatch = false;
 bool battledebug = false;
-int turn = 0;
+int turn = -1;
 
 int NewbieImmunity(void)
 {

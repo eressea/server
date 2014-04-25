@@ -8,7 +8,7 @@ function item_canuse(u, iname)
     end
   end
   if iname=="rep_crossbow" then
-    -- only dwarves and halflings allowed to use towershield
+    -- only dwarves and halflings allowed to use repeating crossbow
     return race=="dwarf" or race=="halfling"
   end
   if iname=="scale" then
