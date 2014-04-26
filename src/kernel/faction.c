@@ -112,7 +112,7 @@ faction *get_monsters(void)
   if (!monsters) {
     faction *f;
     for (f = factions; f; f = f->next) {
-      if (f->flags & FFL_NPC) {
+      if ((f->flags & FFL_NPC) && !(f->flags & FFL_DEFENDER)) {
         return monsters = f;
       }
     }

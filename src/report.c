@@ -2199,8 +2199,14 @@ report_plaintext(const char *filename, report_context * ctx,
     f->num_people = no_people;
   }
 #else
-  no_units = f->no_units;
-  no_people = f->num_people;
+  no_units = count_units(f);
+  no_people = count_all(f);
+  if (f->flags & FFL_NPC) {
+      no_people = f->num_total;
+  } 
+  else {
+      no_people = f->num_people;
+  }
 #endif
   m = msg_message("nr_population", "population units", no_people, no_units);
   nr_render(m, f->locale, buf, sizeof(buf), f);
