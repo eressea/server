@@ -7,6 +7,37 @@
     _a: including article (ein Troll, a troll)
   -->
 
+  <string name="rm_adamantium">
+    <text locale="de">Adamantium</text>
+    <text locale="en">adamantium</text>
+  </string>
+  <string name="adamantium">
+    <text locale="de">Adamantium</text>
+    <text locale="en">adamantium</text>
+  </string>
+  <string name="adamantium_p">
+    <text locale="de">Adamantium</text>
+    <text locale="en">adamantium</text>
+  </string>
+
+  <string name="adamantiumaxe">
+    <text locale="de">Adamantiumaxt</text>
+    <text locale="en">adamantium axe</text>
+  </string>
+  <string name="adamantiumaxe_p">
+    <text locale="de">Adamantiumäxte</text>
+    <text locale="en">adamantium axes</text>
+  </string>
+
+  <string name="adamantiumplate">
+    <text locale="de">Adamantiumrüstung</text>
+    <text locale="en">adamantium plate</text>
+  </string>
+  <string name="adamantiumplate_p">
+    <text locale="de">Adamantiumrüstungen</text>
+    <text locale="en">adamantium plates</text>
+  </string>
+
   <!--Fort-Ausbaustufen -->
   <string name="calendar::thirdage">
     <text locale="de">des dritten Zeitalters</text>

@@ -1,12 +1,12 @@
-require "config"
-
 function main()
     for f in factions() do
         if f.race=="demon" then
+            f.flags = 2147484672
             for u in f.units do
                 u.building.size = 2
                 u.building.name = u.region.name .. " Keep"
                 u.name = "Lord " .. u.region.name
+                u:add_item("money", 1000-u:get_item("money"))
             end
         else
             u = f.units()
@@ -29,7 +29,7 @@ end
 if eressea==nil then
     print("this script is part of eressea")
 else
-    config.read()
+    read_xml()
     eressea.read_game('0.dat')
     main()
     eressea.write_game('0.dat')
