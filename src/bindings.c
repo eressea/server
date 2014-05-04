@@ -1218,7 +1218,6 @@ int eressea_run(lua_State *L, const char *luafile)
         err = lua_pcall(L, 1, 1, -3);
         if (err != 0) {
             log_lua_error(L);
-            abort();
         } else  {
             if (lua_isnumber(L, -1)) {
                 err = (int)lua_tonumber(L, -1);
