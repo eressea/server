@@ -15,16 +15,17 @@ without prior permission by the authors of Eressea.
 #include "bind_unit.h"
 #include "bindings.h"
 
+#include <kernel/config.h>
 #include <sqlite3.h>
 #include <tolua.h>
 
 #define LTYPE_DB TOLUA_CAST "db"
 
-extern int db_update_factions(sqlite3 * db, bool force);
+extern int db_update_factions(sqlite3 * db, bool force, int game);
 static int tolua_db_update_factions(lua_State * L)
 {
   sqlite3 *db = (sqlite3 *) tolua_tousertype(L, 1, 0);
-  db_update_factions(db, tolua_toboolean(L, 2, 0));
+  db_update_factions(db, tolua_toboolean(L, 2, 0), global.game_id);
   return 0;
 }
 

@@ -93,6 +93,7 @@ struct settings global = {
   "Eressea",                    /* gamename */
 };
 
+bool lomem = false;
 FILE *logfile;
 FILE *updatelog;
 const struct race *new_race[MAXRACES];
@@ -1577,10 +1578,6 @@ void freestrlist(strlist * s)
     p = q;
   }
 }
-
-/* - Meldungen und Fehler ------------------------------------------------- */
-
-bool lomem = false;
 
 /* - Namen der Strukturen -------------------------------------- */
 typedef char name[OBJECTIDSIZE + 1];
@@ -3168,7 +3165,6 @@ void load_inifile(dictionary * d)
   make_locales(str);
 
   /* excerpt from [config] (the rest is used in bindings.c) */
-  game_name = iniparser_getstring(d, "config:game", game_name);
-
+  global.game_id = iniparser_getint(d, "config:game_id", 0);
   global.inifile = d;
 }
