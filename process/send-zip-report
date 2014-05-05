@@ -1,0 +1,46 @@
+#!/bin/bash
+if [ -z $ERESSEA ]; then
+  ERESSEA=`echo $PWD |sed -e 's/\/game.*//'`
+  echo "Assuming that ERESSEA=$ERESSEA"
+fi
+if [ ! -f reports.txt ]; then
+  echo "need to run $0 from the report direcory"
+  exit -2
+fi
+
+PWD=$(pwd)
+GAME=$(dirname $PWD)
+
+TEMPLATE=report-mail.txt
+if [ "$1" == "-Lde" ]
+then
+  TEMPLATE=report-mail.de.txt
+  shift
+fi
+
+if [ "$1" == "-Len" ]
+then
+  TEMPLATE=report-mail.en.txt
+  shift
+fi
+
+if [ -e $GAME/$TEMPLATE ]; then
+TEMPLATE=$GAME/$TEMPLATE
+else
+TEMPLATE=$ERESSEA/etc/$TEMPLATE
+fi
+
+if [ ! -e $TEMPLATE ]; then
+  echo "no such email template: $TEMPLATE"
+  exit -3
+fi
+
+while [ -e /tmp/.stopped ] ; do
+  echo "waiting 2 minutes for lockfile in /tmp/.stopped to clear"
+  sleep 120
+done
+mutt -F $ERESSEA/etc/muttrc -s "$2" -a "$3" -- $1 < $TEMPLATE
+
+if [ $? -ne 0 ] ; then
+  echo "Sending failed for email/report: $2/$3"
+fi

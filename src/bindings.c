@@ -462,9 +462,14 @@ static int tolua_init_reports(lua_State * L)
 static int tolua_write_report(lua_State * L)
 {
   faction *f = (faction *) tolua_tousertype(L, 1, 0);
-  time_t ltime = time(0);
-  int result = write_reports(f, ltime);
-  tolua_pushnumber(L, (lua_Number) result);
+  if (f) {
+      time_t ltime = time(0);
+      int result = write_reports(f, ltime);
+      tolua_pushnumber(L, (lua_Number)result);
+  }
+  else {
+      tolua_pushstring(L, "function expects a faction, got nil");
+  }
   return 1;
 }
 
@@ -995,10 +1000,10 @@ static int tolua_get_spells(lua_State * L)
 
 int tolua_read_xml(lua_State * L)
 {
-  const char *filename = tolua_tostring(L, 1, 0);
-  const char *catalog = tolua_tostring(L, 2, 0);
-  init_data(filename, catalog);
-  return 0;
+  const char *filename = tolua_tostring(L, 1, "config.xml");
+  const char *catalog = tolua_tostring(L, 2, "catalog.xml");
+  lua_pushinteger(L, init_data(filename, catalog));
+  return 1;
 }
 
 typedef struct event_args {
@@ -1196,7 +1201,7 @@ lua_State *lua_init(void) {
   return L;
 }
 
-int eressea_run(lua_State *L, const char *luafile, const char *entry_point)
+int eressea_run(lua_State *L, const char *luafile)
 {
     int err = 0;
 
@@ -1204,30 +1209,22 @@ int eressea_run(lua_State *L, const char *luafile, const char *entry_point)
     /* run the main script */
     if (luafile) {
         log_debug("executing script %s\n", luafile);
+
+        lua_getglobal(L, "debug");
+        lua_getfield(L, -1, "traceback");
+        lua_remove(L, -2);
         lua_getglobal(L, "dofile");
         lua_pushstring(L, luafile);
-        err = lua_pcall(L, 1, 0, 0);
+        err = lua_pcall(L, 1, 1, -3);
         if (err != 0) {
             log_lua_error(L);
-            abort();
-            return err;
-        }
-    }
-    if (entry_point) {
-        if (strcmp("console", entry_point)==0) {
-            return lua_console(L);
-        }
-        lua_getglobal(L, entry_point);
-        if (lua_isfunction(L, -1)) {
-            log_debug("calling entry-point: %s\n", entry_point);
-            err = lua_pcall(L, 0, 1, 0);
-            if (err != 0) {
-                log_lua_error(L);
+        } else  {
+            if (lua_isnumber(L, -1)) {
+                err = (int)lua_tonumber(L, -1);
             }
-            return err;
-        } else {
-            log_error("unknown entry-point: %s\n", entry_point);
+            lua_pop(L, 1);
         }
+        return err;
     }
-    return 0;
+    return lua_console(L);
 }

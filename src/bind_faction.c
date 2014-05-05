@@ -375,7 +375,14 @@ static int tolua_faction_set_locale(lua_State * L)
 {
   faction *self = (faction *) tolua_tousertype(L, 1, 0);
   const char *name = tolua_tostring(L, 2, 0);
-  self->locale = find_locale(name);
+  const struct locale *loc = find_locale(name);
+  if (loc) {
+      self->locale = loc;
+  }
+  else {
+      tolua_pushstring(L, "invalid locale");
+      return 1;
+  }
   return 0;
 }
 

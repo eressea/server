@@ -1,6 +1,6 @@
 function kill_nonstarters()
   for f in factions() do
-    if f.lastturn==1 then
+    if f.lastturn==0 then
       kill_faction(f, true)
     end
   end

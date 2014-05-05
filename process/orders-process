@@ -1,0 +1,218 @@
+#!/usr/bin/env python
+# -*- coding: iso-8859-1 -*-
+
+from os import unlink, symlink, rename, popen, tmpfile
+from os.path import exists
+from re import compile, IGNORECASE
+from string import split, join, upper, strip
+from sys import argv, exit
+from time import sleep, time, ctime
+from syslog import openlog, closelog, syslog
+
+from epasswd import EPasswd
+
+def pwd_get_email(faction, pwd, pwdfile=None):
+    return None
+
+def splitfilename(filename):
+    from os.path import split
+    return split(filename)
+
+def unlock_file(filename):
+    try:
+        unlink(filename+".lock")
+    except:
+        print "could not unlock %s.lock, file not found" % filename
+        raise
+    
+def lock_file(filename):
+    i = 0
+    wait = 1
+    if not exists(filename):
+        file=open(filename, "w")
+        file.close()
+    while True:
+        try:
+            symlink(filename, filename+".lock")
+            return
+        except:
+            i = i+1
+            if i == 5:
+                raise
+            sleep(wait)
+            wait = wait*2
+
+messages = {
+"subject-de": "Befehle angekommen",
+"subject-en": "orders received",
+
+"validate-en": "Validating",
+"validate-de": "Verarbeite",
+
+"faction-en": "Faction",
+"faction-de": "Partei",
+
+"unknown-de": "WARNUNG: Die Partei ist nicht bekannt, oder das Passwort falsch!",
+"unknown-en": "WARNING: This faction is unknown, or the password is incorrect!",
+
+"warning-de": "Warnung",
+"warning-en": "Warning",
+
+"error-de": "Fehler",
+"error-en": "Error",
+}
+
+
+# base directory for all your games:
+rootdir = "/home/eressea/eressea"
+frommail = "Eressea Server <eressea-server@eressea.de>"
+orderbase = "orders.dir"
+sendmail = True
+maxlines = 25
+echeck_cmd = "/home/eressea/echeck/echeck.sh"
+
+# regular expression that finds the start of a faction
+fact_re = compile("^\s*(eressea|vinyambar|partei|faction)\s+([a-zA-Z0-9]+)\s+\"?([^\"]*)\"?", IGNORECASE)
+
+def check_pwd(filename, email, pw_data):
+    results = []
+    try:
+        file = open(filename, "r")
+    except:
+        print "could not open file", filename
+        return results
+    for line in file.readlines():
+        mo = fact_re.search(strip(line))
+        if mo != None:
+            fact_nr = str(mo.group(2))
+            fact_pw = str(mo.group(3))
+            if pw_data.fac_exists(fact_nr):
+                if pw_data.check(fact_nr, fact_pw) == 0:
+                    game_email = pw_data.get_email(fact_nr)
+                    results = results + [ (fact_nr, game_email, False, fact_pw) ]
+                else:
+                    game_email = pw_data.get_email(fact_nr)
+                    results = results + [ (fact_nr, game_email, True, fact_pw) ]
+            else:
+                results = results + [ (fact_nr, None, False, fact_pw) ]
+    return results
+
+def echeck(filename, locale, rules):
+    dirname, filename = splitfilename(filename)
+    stream = popen("%s %s %s %s %s" % (echeck_cmd, locale, filename, dirname, rules), 'r')
+    lines = stream.readlines()
+    if len(lines)==0:
+        stream.close()
+        return None
+    if len(lines)>maxlines:
+        mail = join(lines[:maxlines-3] + ["...", "\n"] + lines[-3:], '')
+    else:
+        mail = join(lines[:maxlines], '')
+    stream.close()
+    return mail
+
+## the main body of the script
+game = int(argv[1])
+
+basedir = rootdir + "/game-%d"  % (game, )
+queuename = basedir + "/orders.queue"
+if not exists(queuename):
+    exit(0)
+
+# parse the queue file -
+#print "connecting to SMTP..."
+from smtplib import SMTP
+try:
+    server = SMTP("localhost")
+except:
+    print "could not connect to SMTP server"
+    exit(0)
+#print "reading password file..."
+pw_data = EPasswd(basedir + "/passwd")
+
+#print "reading orders.queue..."
+# move the queue file to a save space while locking it:
+try:
+    lock_file(queuename)
+except:
+    exit(0)
+queuefile = open(queuename, "r")
+lines = queuefile.readlines()
+queuefile.close()
+
+# copy to a temp file
+
+tname="/tmp/orders.queue.%s" % str(time())
+try:
+    lock_file(tname)
+except:
+    exit(0)
+tmpfile=open(tname, "w")
+for line in lines:
+    tmpfile.write(line)
+tmpfile.close()
+
+openlog("orders")
+
+unlink(queuename)
+try:
+    unlock_file(queuename)
+except:
+    pass
+
+for line in lines:
+    tokens = split(line[:-1], ' ')
+    dict = {}
+    for token in tokens:
+        name, value = split(token, '=')
+        dict[name] = value
+
+    email = dict["email"]
+    locale = dict["locale"]
+    game = int(dict["game"])
+    file = dict["file"]
+    gamename='[E%d]' % game
+    rules='e%d' % game
+    warning = ""
+    failed = True
+    results = check_pwd(file, email, pw_data)
+    logfile = open(basedir+"/zug.log", "a")
+    dirname, filename = splitfilename(file)
+    msg = messages["validate-"+locale] + " " + filename + "\n\n"
+    for faction, game_email, success, pwd in results:
+        msg = msg + messages["faction-"+locale] + " " + faction + "\n"
+        if success: failed = False
+        else: msg = msg + messages["unknown-"+locale] + "\n"
+        msg = msg + "\n"
+        logfile.write("%s:%s:%s:%s:%s:%s\n" % (ctime(time()), email, game_email, faction, pwd, success))
+    logfile.close()
+
+    if failed:
+        warning = " (" + messages["warning-" + locale] + ")"
+        syslog("failed - no valid password in " + file)
+    else:
+        result = echeck(file, locale, rules)
+        if email=='eressea':
+            print result
+            continue
+        elif result is None:
+            # echeck did not finish
+            msg = msg + "Echeck was killed. Your turn was accepted, but could not be verified.\n"
+            warning = " (" + messages["warning-" + locale] + ")"
+            syslog("process - echeck got killed, " + file)
+        else:
+            msg = msg + result
+            syslog("process - checked orders in " + file)
+
+    subject = gamename + " " + messages["subject-" + locale] + warning
+    msg = "Subject: %s\nFrom: %s\nTo: %s\nContent-Type: text/plain; charset=utf-8\n\n" % (subject, frommail, email) + msg
+    try:
+        server.sendmail(frommail, email, msg)
+    except:
+        syslog("failed - cannot send to " + email)
+
+server.close()
+
+closelog()
+unlink(tname)
+unlock_file(tname)

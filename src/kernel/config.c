@@ -93,12 +93,13 @@ struct settings global = {
   "Eressea",                    /* gamename */
 };
 
+bool lomem = false;
 FILE *logfile;
 FILE *updatelog;
 const struct race *new_race[MAXRACES];
 bool sqlpatch = false;
 bool battledebug = false;
-int turn = 0;
+int turn = -1;
 
 int NewbieImmunity(void)
 {
@@ -1196,19 +1197,40 @@ void update_lighthouse(building * lh)
 int count_all(const faction * f)
 {
 #ifndef NDEBUG
-  int n = 0;
-  unit *u;
-  for (u = f->units; u; u = u->nextF) {
-    if (playerrace(u_race(u))) {
-      n += u->number;
-      assert(f == u->faction);
+    unit *u;
+    int np = 0, n = 0;
+    for (u = f->units; u; u = u->nextF) {
+        assert(f == u->faction);
+        n += u->number;
+        if (playerrace(u_race(u))) {
+            np += u->number;
+        }
     }
-  }
-  if (f->num_people != n) {
-    log_error("# of people in %s is != num_people: %d should be %d.\n", factionid(f), f->num_people, n);
-  }
+    if (f->num_people != np) {
+        log_error("# of people in %s is != num_people: %d should be %d.\n", factionid(f), f->num_people, np);
+    }
+    if (f->num_total != n) {
+        log_error("# of men in %s is != num_total: %d should be %d.\n", factionid(f), f->num_total, n);
+    }
 #endif
-  return f->num_people;
+    return (f->flags & FFL_NPC) ? f->num_total : f->num_people;
+}
+
+int count_units(const faction * f)
+{
+#ifndef NDEBUG
+    unit *u;
+    int n = 0, np = 0;
+    for (u = f->units; u; u = u->nextF) {
+        ++n;
+        if (playerrace(u_race(u))) ++np;
+    }
+    n = (f->flags & FFL_NPC) ? n : np;
+    if (f->no_units && n != f->no_units) {
+        log_warning("# of units in %s is != no_units: %d should be %d.\n", factionid(f), f->no_units, n);
+    }
+#endif
+    return n;
 }
 
 int count_migrants(const faction * f)
@@ -1556,10 +1578,6 @@ void freestrlist(strlist * s)
     p = q;
   }
 }
-
-/* - Meldungen und Fehler ------------------------------------------------- */
-
-bool lomem = false;
 
 /* - Namen der Strukturen -------------------------------------- */
 typedef char name[OBJECTIDSIZE + 1];
@@ -3147,7 +3165,6 @@ void load_inifile(dictionary * d)
   make_locales(str);
 
   /* excerpt from [config] (the rest is used in bindings.c) */
-  game_name = iniparser_getstring(d, "config:game", game_name);
-
+  global.game_id = iniparser_getint(d, "config:game_id", 0);
   global.inifile = d;
 }

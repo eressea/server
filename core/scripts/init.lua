@@ -4,7 +4,7 @@ require "resources"
 
 function run_editor()
     local turn = get_turn()
-    if turn==0 then
+    if turn<0 then
         turn = read_turn()
         set_turn(turn)
     end
@@ -28,7 +28,7 @@ function run_turn()
   require(config.game .. ".main")
 
   local turn = get_turn()
-  if turn==0 then
+  if turn<0 then
     turn = read_turn()
     set_turn(turn)
   end

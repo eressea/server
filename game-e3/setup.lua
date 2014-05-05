@@ -10,6 +10,5 @@ for idx, path in pairs(paths) do
   package.path = srcpath .. '/' .. path .. ';' .. package.path
 end
 
-read_xml(respath..'/config-e3a.xml', respath..'/catalog-e3a.xml')
-
+assert(read_xml())
 require "init"

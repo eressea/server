@@ -129,117 +129,133 @@ db_update_email(sqlite3 * db, const faction * f, const db_faction * dbstate,
 
   return SQLITE_OK;
 }
-
-int db_update_factions(sqlite3 * db, bool force)
-{
-  int game_id = 6;
-  const char sql_select[] =
-    "SELECT faction.id, faction.email_id, faction.code, email.email, faction.password_md5, faction.name, faction.lastturn FROM email, faction"
-    " WHERE email.id=faction.email_id AND faction.game_id=? AND (lastturn IS NULL OR lastturn>?)";
-  sqlite3_stmt *stmt_select = stmt_cache_get(db, sql_select);
-  faction *f;
-  int res;
-
-  res = sqlite3_bind_int(stmt_select, 1, game_id);
-  SQL_EXPECT(res, SQLITE_OK);
-  res = sqlite3_bind_int(stmt_select, 2, turn - 2);
-  SQL_EXPECT(res, SQLITE_OK);
-  for (;;) {
-    sqlite3_uint64 id_faction;
-    int lastturn;
-
+/*
+int db_get_game(sqlite3 *db) {
+    int game_id = 0;
+    const char sql_game[] =
+      "SELECT id FROM game WHERE name=?";
+    sqlite3_stmt *stmt_game = stmt_cache(db, sql_game);
+    res = sqlite3_bind_text(stmt_game, 1, gamename, -1, SQLITE_TRANSIENT);
+    SQL_EXPECT(res, SQLITE_OK);
     res = sqlite3_step(stmt_select);
-    if (res != SQLITE_ROW)
-      break;
-
-    id_faction = sqlite3_column_int64(stmt_select, 0);
-    lastturn = sqlite3_column_int(stmt_select, 6);
-    f = get_faction_by_id((int)id_faction);
-
-    if (f == NULL || !f->alive) {
-      if (lastturn == 0) {
-        const char sql_update[] = "UPDATE faction SET lastturn=? WHERE id=?";
-        sqlite3_stmt *stmt = stmt_cache_get(db, sql_update);
-
-        lastturn = f ? f->lastorders : turn - 1;
-        sqlite3_bind_int(stmt, 1, lastturn);
-        sqlite3_bind_int64(stmt, 2, id_faction);
-        res = sqlite3_step(stmt);
-        SQL_EXPECT(res, SQLITE_DONE);
-      }
-    } else {
-      md5_state_t ms;
-      md5_byte_t digest[16];
-      int i;
-      char passwd_md5[MD5_LENGTH_0];
-      sqlite3_uint64 id_email;
-      bool update = force;
-      db_faction dbstate;
-      const char *no_b36;
-
-      fset(f, FFL_MARK);
-      dbstate.id_faction = id_faction;
-      dbstate.id_email = sqlite3_column_int64(stmt_select, 1);
-      no_b36 = (const char *)sqlite3_column_text(stmt_select, 2);
-      dbstate.no = no_b36 ? atoi36(no_b36) : -1;
-      dbstate.email = (const char *)sqlite3_column_text(stmt_select, 3);
-      dbstate.passwd_md5 = (const char *)sqlite3_column_text(stmt_select, 4);
-      dbstate.name = (const char *)sqlite3_column_text(stmt_select, 5);
-
-      id_email = dbstate.id_email;
-      res = db_update_email(db, f, &dbstate, force, &id_email);
-      SQL_EXPECT(res, SQLITE_OK);
-
-      md5_init(&ms);
-      md5_append(&ms, (md5_byte_t *) f->passw, (int)strlen(f->passw));
-      md5_finish(&ms, digest);
-      for (i = 0; i != 16; ++i)
-        sprintf(passwd_md5 + 2 * i, "%.02x", digest[i]);
-
-      if (!update) {
-        update = ((id_email != 0 && dbstate.id_email != id_email)
-          || dbstate.no != f->no || dbstate.passwd_md5 == NULL
-          || strcmp(passwd_md5, dbstate.passwd_md5) != 0 || dbstate.name == NULL
-          || strncmp(f->name, dbstate.name, MAX_FACTION_NAME) != 0);
-      }
-      if (update) {
-        const char sql_update_faction[] =
-          "UPDATE faction SET email_id=?, password_md5=?, code=?, name=?, firstturn=? WHERE id=?";
-        sqlite3_stmt *stmt_update_faction =
-          stmt_cache_get(db, sql_update_faction);
-
-        res = sqlite3_bind_int64(stmt_update_faction, 1, id_email);
-        SQL_EXPECT(res, SQLITE_OK);
-        res =
-          sqlite3_bind_text(stmt_update_faction, 2, passwd_md5, MD5_LENGTH,
-          SQLITE_TRANSIENT);
-        SQL_EXPECT(res, SQLITE_OK);
-        res =
-          sqlite3_bind_text(stmt_update_faction, 3, no_b36, -1,
-          SQLITE_TRANSIENT);
-        SQL_EXPECT(res, SQLITE_OK);
-        res =
-          sqlite3_bind_text(stmt_update_faction, 4, f->name, -1,
-          SQLITE_TRANSIENT);
-        SQL_EXPECT(res, SQLITE_OK);
-        res = sqlite3_bind_int(stmt_update_faction, 5, turn - f->age);
-        SQL_EXPECT(res, SQLITE_OK);
-        res = sqlite3_bind_int64(stmt_update_faction, 6, f->subscription);
-        SQL_EXPECT(res, SQLITE_OK);
-        res = sqlite3_step(stmt_update_faction);
-        SQL_EXPECT(res, SQLITE_DONE);
-      }
+    return game_id;
+}
+*/
+int db_update_factions(sqlite3 * db, bool force, int game_id)
+{
+    const char sql_select[] =
+      "SELECT faction.id, faction.email_id, faction.code, email.email, faction.password_md5, faction.name, faction.lastturn FROM email, faction"
+      " WHERE email.id=faction.email_id AND faction.game_id=? AND (lastturn IS NULL OR lastturn>?)";
+    sqlite3_stmt *stmt_select = stmt_cache_get(db, sql_select);
+    faction *f;
+    int res;
+   
+    res = sqlite3_bind_int(stmt_select, 1, game_id);
+    SQL_EXPECT(res, SQLITE_OK);
+    res = sqlite3_bind_int(stmt_select, 2, turn - 2);
+    SQL_EXPECT(res, SQLITE_OK);
+    for (;;) {
+        sqlite3_uint64 id_faction;
+        int lastturn;
+        const char * no_b36;
+        
+        res = sqlite3_step(stmt_select);
+        if (res != SQLITE_ROW)
+          break;
+        
+        id_faction = sqlite3_column_int64(stmt_select, 0);
+        lastturn = sqlite3_column_int(stmt_select, 6);
+        no_b36 = (const char *)sqlite3_column_text(stmt_select, 2);
+        f = get_faction_by_id((int)id_faction);
+        if (!f) {
+            int no = atoi36(no_b36);
+            f = findfaction(no);
+            if (f) {
+                f->subscription = (int)id_faction;
+            }
+        }
+        if (!f || !f->alive) {
+            if (lastturn == 0) {
+                const char sql_update[] = "UPDATE faction SET lastturn=? WHERE id=?";
+                sqlite3_stmt *stmt = stmt_cache_get(db, sql_update);
+                
+                lastturn = f ? f->lastorders : turn - 1;
+                sqlite3_bind_int(stmt, 1, lastturn);
+                sqlite3_bind_int64(stmt, 2, id_faction);
+                res = sqlite3_step(stmt);
+                SQL_EXPECT(res, SQLITE_DONE);
+            }
+        } else {
+            md5_state_t ms;
+            md5_byte_t digest[16];
+            int i;
+            char passwd_md5[MD5_LENGTH_0];
+            sqlite3_uint64 id_email;
+            bool update = force;
+            db_faction dbstate;
+            
+            fset(f, FFL_MARK);
+            dbstate.id_faction = id_faction;
+            dbstate.id_email = sqlite3_column_int64(stmt_select, 1);
+            dbstate.no = no_b36 ? atoi36(no_b36) : -1;
+            dbstate.email = (const char *)sqlite3_column_text(stmt_select, 3);
+            dbstate.passwd_md5 = (const char *)sqlite3_column_text(stmt_select, 4);
+            dbstate.name = (const char *)sqlite3_column_text(stmt_select, 5);
+            
+            id_email = dbstate.id_email;
+            res = db_update_email(db, f, &dbstate, force, &id_email);
+            SQL_EXPECT(res, SQLITE_OK);
+            
+            md5_init(&ms);
+            md5_append(&ms, (md5_byte_t *) f->passw, (int)strlen(f->passw));
+            md5_finish(&ms, digest);
+            for (i = 0; i != 16; ++i)
+              sprintf(passwd_md5 + 2 * i, "%.02x", digest[i]);
+            
+            if (!update) {
+                update = ((id_email != 0 && dbstate.id_email != id_email)
+                          || dbstate.no != f->no || dbstate.passwd_md5 == NULL
+                          || strcmp(passwd_md5, dbstate.passwd_md5) != 0 || dbstate.name == NULL
+                          || strncmp(f->name, dbstate.name, MAX_FACTION_NAME) != 0);
+            }
+            if (update) {
+                const char sql_update_faction[] =
+                  "UPDATE faction SET email_id=?, password_md5=?, code=?, name=?, firstturn=? WHERE id=?";
+                sqlite3_stmt *stmt_update_faction =
+                  stmt_cache_get(db, sql_update_faction);
+                
+                res = sqlite3_bind_int64(stmt_update_faction, 1, id_email);
+                SQL_EXPECT(res, SQLITE_OK);
+                res =
+                  sqlite3_bind_text(stmt_update_faction, 2, passwd_md5, MD5_LENGTH,
+                                    SQLITE_TRANSIENT);
+                SQL_EXPECT(res, SQLITE_OK);
+                res =
+                  sqlite3_bind_text(stmt_update_faction, 3, no_b36, -1,
+                                    SQLITE_TRANSIENT);
+                SQL_EXPECT(res, SQLITE_OK);
+                res =
+                  sqlite3_bind_text(stmt_update_faction, 4, f->name, -1,
+                                    SQLITE_TRANSIENT);
+                SQL_EXPECT(res, SQLITE_OK);
+                res = sqlite3_bind_int(stmt_update_faction, 5, turn - f->age);
+                SQL_EXPECT(res, SQLITE_OK);
+                res = sqlite3_bind_int64(stmt_update_faction, 6, f->subscription);
+                SQL_EXPECT(res, SQLITE_OK);
+                res = sqlite3_step(stmt_update_faction);
+                SQL_EXPECT(res, SQLITE_DONE);
+            }
+        }
     }
-  }
-
-  for (f = factions; f; f = f->next) {
-    if (!fval(f, FFL_MARK)) {
-      log_error("%s (sub=%d, email=%s) has no entry in the database\n", factionname(f), f->subscription, f->email);
-    } else {
-      freset(f, FFL_MARK);
+    
+    for (f = factions; f; f = f->next) {
+        if (!fval(f, FFL_MARK)) {
+            log_error("%s (sub=%d, email=%s) has no entry in the database\n", factionname(f), f->subscription, f->email);
+        } else {
+            freset(f, FFL_MARK);
+        }
     }
-  }
-  return SQLITE_OK;
+    return SQLITE_OK;
 }
 
 int db_update_scores(sqlite3 * db, bool force)

@@ -256,9 +256,10 @@ extern "C" {
   extern int rule_alliance_limit(void);
   extern int rule_faction_limit(void);
 
-  extern int count_all(const struct faction *f);
-  extern int count_migrants(const struct faction *f);
-  extern int count_maxmigrants(const struct faction *f);
+  int count_units(const struct faction * f);
+  int count_all(const struct faction *f);
+  int count_migrants(const struct faction *f);
+  int count_maxmigrants(const struct faction *f);
 
   extern bool has_limited_skills(const struct unit *u);
   extern const struct race *findrace(const char *, const struct locale *);
@@ -392,6 +393,7 @@ extern "C" {
     void *vm_state;
     float producexpchance;
     int cookie;
+    int game_id;
     int data_version; /* TODO: eliminate in favor of gamedata.version */
     struct _dictionary_ *inifile;
 
@@ -449,7 +451,7 @@ extern "C" {
   extern struct attrib_type at_guard;
   extern void free_gamedata(void);
 #if 1                           /* disable to count all units */
-# define count_unit(u) playerrace(u_race(u))
+# define count_unit(u) (u->number>0 && playerrace(u_race(u)))
 #else
 # define count_unit(u) 1
 #endif

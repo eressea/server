@@ -10,5 +10,6 @@ for idx, path in pairs(paths) do
   package.path = srcpath .. '/' .. path .. ';' .. package.path
 end
 
-assert(read_xml())
+read_xml()
+
 require "init"
