@@ -393,6 +393,7 @@ extern "C" {
     void *vm_state;
     float producexpchance;
     int cookie;
+    int game_id;
     int data_version; /* TODO: eliminate in favor of gamedata.version */
     struct _dictionary_ *inifile;
 

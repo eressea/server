@@ -18,7 +18,7 @@ fi
 echo $ROOT
 $ROOT/$BIN_DIR/eressea/test_eressea
 pushd $ROOT/game-e2
-$ROOT/$BIN_DIR/eressea/eressea -e run_tests
+$ROOT/$BIN_DIR/eressea/eressea runtests.lua
 cd $ROOT/game-e3
-$ROOT/$BIN_DIR/eressea/eressea -e run_tests
+$ROOT/$BIN_DIR/eressea/eressea runtests.lua
 popd
