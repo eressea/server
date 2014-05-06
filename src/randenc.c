@@ -1209,6 +1209,7 @@ static void rotting_herbs(void)
 void randomevents(void)
 {
   region *r;
+  faction *monsters = get_monsters();
 
   icebergs();
   godcurse();
@@ -1290,21 +1291,23 @@ void randomevents(void)
   }
 
   /* monster-einheiten desertieren */
-  for (r = regions; r; r = r->next) {
-    unit *u;
+  if (monsters) {
+      for (r = regions; r; r = r->next) {
+          unit *u;
 
-    for (u = r->units; u; u = u->next) {
-      if (u->faction && !is_monsters(u->faction)
-        && (u_race(u)->flags & RCF_DESERT)) {
-        if (fval(u, UFL_ISNEW))
-          continue;
-        if (rng_int() % 100 < 5) {
-          ADDMSG(&u->faction->msgs, msg_message("desertion",
-              "unit region", u, r));
-          u_setfaction(u, get_monsters());
-        }
+          for (u = r->units; u; u = u->next) {
+              if (u->faction && !is_monsters(u->faction)
+                  && (u_race(u)->flags & RCF_DESERT)) {
+                  if (fval(u, UFL_ISNEW))
+                      continue;
+                  if (rng_int() % 100 < 5) {
+                      ADDMSG(&u->faction->msgs, msg_message("desertion",
+                          "unit region", u, r));
+                      u_setfaction(u, monsters);
+                  }
+              }
+          }
       }
-    }
   }
 
   /* Chaos */
