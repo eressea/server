@@ -1266,8 +1266,9 @@ faction *readfaction(struct gamedata * data)
     READ_INT(data->store, &n);
   }
 
-  READ_UINT(data->store, &f->flags);
-  if (f->no == 0) {
+  READ_INT(data->store, &f->flags);
+  assert((f->flags&FFL_SAVEMASK) == f->flags);
+  if (f->no==0 || f->no==666) {
     f->flags |= FFL_NPC;
   }
 
