@@ -70,8 +70,9 @@
 #define UNIQUE_SPELLS_VERSION 339    /* turn 775, spell names are now unique globally, not just per school */
 #define SPELLBOOK_VERSION 340        /* turn 775, full spellbooks are stored for factions */
 #define NOOVERRIDE_VERSION 341        /* turn 775, full spellbooks are stored for factions */
+#define INTFLAGS_VERSION 342   /* turn 876, FFL_NPC is now bit 25, flags is an int */
 
 #define MIN_VERSION CURSETYPE_VERSION      /* minimal datafile we support */
-#define RELEASE_VERSION NOOVERRIDE_VERSION /* current datafile */
+#define RELEASE_VERSION INTFLAGS_VERSION /* current datafile */
 
 #define STREAM_VERSION 2 /* internal encoding of binary files */

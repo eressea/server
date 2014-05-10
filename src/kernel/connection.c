@@ -41,7 +41,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <string.h>
 #include <stdlib.h>
 
-unsigned int nextborder = 0;
+int nextborder = 0;
 
 #define BORDER_MAXHASH 8191
 connection *borders[BORDER_MAXHASH];

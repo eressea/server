@@ -25,7 +25,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-  extern unsigned int nextborder;
+  extern int nextborder;
 
   typedef struct connection {
     struct border_type *type;   /* the type of this connection */
@@ -33,7 +33,7 @@ extern "C" {
     struct connection *nexthash;        /* next connection between these regions */
     struct region *from, *to;   /* borders can be directed edges */
     variant data;
-    unsigned int id;            /* unique id */
+    int id;            /* unique id */
   } connection;
 
   typedef struct border_type {

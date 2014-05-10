@@ -34,7 +34,7 @@ extern "C" {
   typedef struct maintenance {
     const struct resource_type *rtype;  /* type of resource required */
     int number;                 /* amount of resources */
-    unsigned int flags;         /* misc. flags */
+    int flags;         /* misc. flags */
   } maintenance;
 
 /* building_type::flags */
@@ -112,7 +112,7 @@ extern "C" {
     int size;
     int sizeleft;               /* is only used during battle. should be a temporary attribute */
     int besieged;               /* should be an attribute */
-    unsigned int flags;
+    int flags;
   } building;
 
   extern struct attrib_type at_building_generic_type;

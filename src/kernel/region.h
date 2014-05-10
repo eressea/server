@@ -81,7 +81,7 @@ extern "C" {
     struct alliance *alliance;
     int since_turn;             /* turn the region changed owners */
     int morale_turn;            /* turn when morale has changed most recently */
-    unsigned int flags;
+    int flags;
   } region_owner;
 
   typedef struct demand {
@@ -126,7 +126,7 @@ extern "C" {
     int x, y;
     struct plane *_plane;       /* to access, use rplane(r) */
     char *display;
-    unsigned int flags;
+    int flags;
     unsigned short age;
     struct message_list *msgs;
     struct individual_message {
