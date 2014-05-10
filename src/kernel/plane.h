@@ -51,7 +51,7 @@ extern "C" {
     int id;
     char *name;
     int minx, maxx, miny, maxy;
-    unsigned int flags;
+    int flags;
     struct attrib *attribs;
   } plane;
 

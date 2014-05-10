@@ -107,7 +107,7 @@ extern "C" {
     const struct race *race_;
     const struct race *irace;
 
-    unsigned int flags;
+    int flags;
     struct attrib *attribs;
     status_t status;
     int n;                      /* enno: attribut? */

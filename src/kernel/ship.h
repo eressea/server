@@ -89,7 +89,7 @@ extern "C" {
     struct attrib *attribs;
     int size;
     int damage;                 /* damage in 100th of a point of size */
-    unsigned int flags;
+    int flags;
     const struct ship_type *type;
     direction_t coast;
   } ship;

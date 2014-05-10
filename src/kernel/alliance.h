@@ -46,7 +46,7 @@ extern "C" {
     struct alliance *next;
     struct faction *_leader;
     struct quicklist *members;
-    unsigned int flags;
+    int flags;
     int id;
     char *name;
     struct ally *allies;

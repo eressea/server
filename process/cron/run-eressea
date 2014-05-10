@@ -1,0 +1,31 @@
+#!/bin/sh
+GAME=$1
+BIN=$HOME/bin
+export ERESSEA=$HOME/eressea
+export PATH
+TURN=$(cat $ERESSEA/game-$GAME)
+if [ ! -e $ERESSEA/game-$GAME/data/$TURN.dat ]; then
+  echo "data file $TURN is missing, cannot run turn for game $GAME"
+  exit 1
+fi
+$REPORTS=$ERESSEA/game-$GAME/reports
+if [ -d $REPORTS ]; then
+  rm -rf $REPORTS
+fi
+mkdir $REPORTS
+$BIN/run-turn.sh $GAME
+if [ ! -s $ERESSEA/game-$GAME/orders.$TURN ]; then
+  echo "server did not create orders for turn $TURN in game $GAME"
+  exit 2
+fi
+LET TURN=$TURN+1
+if [ ! -s $ERESSEA/game-$GAME/data/$TURN.dat ]; then
+  echo "server did not create data for turn $TURN in game $GAME"
+  exit 3
+fi
+if [ ! -s $REPORTS/reports.txt ]; then
+  echo "server did not create reports.txt for turn $TURN in game $GAME"
+  exit 4
+fi
+$BIN/compress.sh $GAME $TURN
+$BIN/sendreports.sh $GAME

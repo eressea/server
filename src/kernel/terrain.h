@@ -61,7 +61,7 @@ extern "C" {
   typedef struct terrain_type {
     char *_name;
     int size;                   /* how many peasants can work? */
-    unsigned int flags;
+    int flags;
     short max_road;             /* this many stones make a full road */
     short distribution;         /* multiplier used for seeding */
     struct terrain_production *production;
