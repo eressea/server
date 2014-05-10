@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+<equipment>
+
+  <!-- equipment given to familiars -->
+  <set name="lynx_familiar">
+    <skill name="magic" level="1"/>
+  </set>
+
+  <set name="tunnelworm_familiar">
+    <skill name="magic" level="1"/>
+    <skill name="mining" level="1"/>
+    <skill name="forestry" level="1"/>
+    <skill name="stamina" level="1"/>
+  </set>
+
+  <set name="eagle_familiar">
+    <skill name="magic" level="1"/>
+  </set>
+
+  <set name="rat_familiar">
+    <skill name="magic" level="1"/>
+    <skill name="stamina" level="6"/>
+  </set>
+
+  <set name="songdragon_familiar">
+    <skill name="magic" level="1"/>
+    <!-- spells -->
+    <spell name="flee" level="2"/>
+    <spell name="sleep" level="7"/>
+    <spell name="frighten" level="8"/>
+  </set>
+
+  <set name="nymph_familiar">
+    <skill name="magic" level="1"/>
+    <skill name="bow" level="1"/>
+    <skill name="herbalism" level="1"/>
+    <skill name="training" level="1"/>
+    <skill name="riding" level="1"/>
+    <!-- spells -->
+    <spell name="seduction" level="6"/>
+    <spell name="calm_monster" level="6"/>
+    <spell name="song_of_confusion" level="4"/>
+    <spell name="appeasement" level="1"/>
+  </set>
+
+  <set name="unicorn_familiar">
+    <skill name="magic" level="1"/>
+    <!-- spells -->
+    <spell name="resist_magic" level="3"/>
+    <spell name="song_of_peace" level="12"/>
+    <spell name="calm_monster" level="6"/>
+    <spell name="heroic_song" level="5"/>
+    <spell name="song_of_healing" level="2"/>
+    <spell name="appeasement" level="1"/>
+  </set>
+
+  <set name="direwolf_familiar">
+    <skill name="magic" level="1"/>
+  </set>
+
+  <set name="ghost_familiar">
+    <skill name="magic" level="1"/>
+    <!-- spells -->
+    <spell name="steal_aura" level="6"/>
+    <spell name="frighten" level="8"/>
+    <spell name="summonundead" level="6"/>
+  </set>
+
+  <set name="imp_familiar">
+    <skill name="magic" level="1"/>
+    <skill name="taxation" level="1"/>
+    <!-- spells -->
+    <spell name="steal_aura" level="6"/>
+    <spell name="shapeshift" level="3"/>
+    <spell name="seduction" level="6"/>
+  </set>
+
+  <set name="dreamcat_familiar">
+    <skill name="magic" level="1"/>
+    <skill name="taxation" level="1"/>
+    <!-- spells -->
+    <spell name="shapeshift" level="3"/>
+    <spell name="transferauratraum" level="3"/>
+  </set>
+
+  <set name="fairy_familiar">
+    <skill name="magic" level="1"/>
+    <!-- spells -->
+    <spell name="appeasement" level="1"/>
+    <spell name="calm_monster" level="6"/>
+    <spell name="seduction" level="6"/>
+  </set>
+
+  <set name="owl_familiar">
+    <skill name="magic" level="1"/>
+  </set>
+
+  <set name="hellcat_familiar">
+    <skill name="magic" level="1"/>
+  </set>
+
+  <set name="tiger_familiar">
+    <skill name="magic" level="1"/>
+  </set>
+
+</equipment>
+
