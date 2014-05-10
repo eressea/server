@@ -13,6 +13,7 @@
   <xi:include href="config:///core/prefixes.xml"/>
   <xi:include href="config:///core/common/buildings.xml"/>
   <xi:include href="config:///core/equipment.xml"/>
+  <xi:include href="config:///core/familiars.xml"/>
 
   <xi:include href="config:///game/ships.xml"/>
   <xi:include href="config:///game/shipnames.xml"/>
