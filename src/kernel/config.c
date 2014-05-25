@@ -1194,59 +1194,41 @@ void update_lighthouse(building * lh)
   }
 }
 
-int count_all(const faction * f)
+int count_faction(const faction * f, int flags)
 {
-#ifndef NDEBUG
     unit *u;
-    int np = 0, n = 0;
+    int n = 0;
     for (u = f->units; u; u = u->nextF) {
-        assert(f == u->faction);
-        n += u->number;
-        if (playerrace(u_race(u))) {
-            np += u->number;
+        const race *rc = u_race(u);
+        int x = (flags&COUNT_UNITS) ? 1 : u->number;
+        if (f->race!=rc) {
+            if (!playerrace(rc)) {
+                if (flags&COUNT_MONSTERS) {
+                    n+=x;
+                }
+            } else if (flags&COUNT_MIGRANTS) {
+                if (!is_cursed(u->attribs, C_SLAVE, 0)) {
+                    n+=x;
+                }
+            }
+        } else if (flags&COUNT_DEFAULT) {
+            n+=x;
         }
     }
-    if (f->num_people != np) {
-        log_error("# of people in %s is != num_people: %d should be %d.\n", factionid(f), f->num_people, np);
-    }
-    if (f->num_total != n) {
-        log_error("# of men in %s is != num_total: %d should be %d.\n", factionid(f), f->num_total, n);
-    }
-#endif
-    return (f->flags & FFL_NPC) ? f->num_total : f->num_people;
+    return n;
 }
 
 int count_units(const faction * f)
 {
-#ifndef NDEBUG
-    unit *u;
-    int n = 0, np = 0;
-    for (u = f->units; u; u = u->nextF) {
-        ++n;
-        if (playerrace(u_race(u))) ++np;
-    }
-    n = (f->flags & FFL_NPC) ? n : np;
-    if (f->no_units && n != f->no_units) {
-        log_warning("# of units in %s is != no_units: %d should be %d.\n", factionid(f), f->no_units, n);
-    }
-#endif
-    return n;
+    return count_faction(f, COUNT_ALL|COUNT_UNITS);
 }
-
+int count_all(const faction * f)
+{
+    return count_faction(f, COUNT_ALL);
+}
 int count_migrants(const faction * f)
 {
-  unit *u = f->units;
-  int n = 0;
-  while (u) {
-    assert(u->faction == f);
-    if (u_race(u) != f->race && u_race(u) != new_race[RC_ILLUSION]
-      && u_race(u) != new_race[RC_SPELL]
-      && !!playerrace(u_race(u)) && !(is_cursed(u->attribs, C_SLAVE, 0))) {
-      n += u->number;
-    }
-    u = u->nextF;
-  }
-  return n;
+    return count_faction(f, COUNT_MIGRANTS);
 }
 
 int count_maxmigrants(const faction * f)

@@ -256,16 +256,23 @@ extern "C" {
   extern int rule_alliance_limit(void);
   extern int rule_faction_limit(void);
 
-  int count_units(const struct faction * f);
-  int count_all(const struct faction *f);
-  int count_migrants(const struct faction *f);
-  int count_maxmigrants(const struct faction *f);
+#define COUNT_MONSTERS 0x01
+#define COUNT_MIGRANTS 0x02
+#define COUNT_DEFAULT  0x04
+#define COUNT_ALL      0x07
+#define COUNT_UNITS    0x10
+    
+    int count_faction(const struct faction * f, int flags);
+    int count_migrants(const struct faction * f);
+    int count_maxmigrants(const struct faction * f);
+    int count_all(const struct faction * f);
+    int count_units(const struct faction * f);
 
-  extern bool has_limited_skills(const struct unit *u);
-  extern const struct race *findrace(const char *, const struct locale *);
+    bool has_limited_skills(const struct unit *u);
+    const struct race *findrace(const char *, const struct locale *);
 
-  int eff_stealth(const struct unit *u, const struct region *r);
-  int ispresent(const struct faction *f, const struct region *r);
+    int eff_stealth(const struct unit *u, const struct region *r);
+    int ispresent(const struct faction *f, const struct region *r);
 
   int check_option(struct faction *f, int option);
   extern void parse_kwd(keyword_t kword, int (*dofun) (struct unit *,
@@ -450,11 +457,6 @@ extern "C" {
 
   extern struct attrib_type at_guard;
   extern void free_gamedata(void);
-#if 1                           /* disable to count all units */
-# define count_unit(u) (u->number>0 && playerrace(u_race(u)))
-#else
-# define count_unit(u) 1
-#endif
 
 #ifdef __cplusplus
 }

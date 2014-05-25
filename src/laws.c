@@ -3482,33 +3482,32 @@ static int maxunits(const faction * f)
 
 int checkunitnumber(const faction * f, int add)
 {
-  int alimit, flimit;
-
-  alimit = rule_alliance_limit();
-  if (alimit) {
-    /* if unitsperalliance is true, maxunits returns the
-       number of units allowed in an alliance */
-    faction *f2;
-    int unitsinalliance = add;
-
-    for (f2 = factions; f2; f2 = f2->next) {
-      if (f->alliance == f2->alliance) {
-        unitsinalliance += f2->no_units;
-      }
-      if (unitsinalliance > alimit) {
-        return 1;
-      }
+    int alimit, flimit;
+    int flags = COUNT_DEFAULT|COUNT_MIGRANTS|COUNT_UNITS;
+    int fno = count_faction(f, flags) + add;
+    flimit = rule_faction_limit();
+    if (flimit && fno > flimit) {
+        return 2;
     }
-  }
 
-  flimit = rule_faction_limit();
-  if (flimit) {
-    if (f->no_units + add > flimit) {
-      return 2;
+    alimit = rule_alliance_limit();
+    if (alimit) {
+        /* if unitsperalliance is true, maxunits returns the
+         number of units allowed in an alliance */
+        faction *f2;
+        int unitsinalliance = fno;
+
+        for (f2 = factions; f2; f2 = f2->next) {
+            if (f != f2 && f->alliance == f2->alliance) {
+                unitsinalliance += count_faction(f2, flags);
+                if (unitsinalliance > alimit) {
+                    return 1;
+                }
+            }
+        }
     }
-  }
 
-  return 0;
+    return 0;
 }
 
 void new_units(void)

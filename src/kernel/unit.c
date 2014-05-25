@@ -1074,9 +1074,7 @@ void u_setfaction(unit * u, faction * f)
     if (u->faction == f)
         return;
     if (u->faction) {
-        if (count_unit(u)) {
-            --u->faction->no_units;
-        }
+        --u->faction->no_units;
         set_number(u, 0);
         join_group(u, NULL);
         free_orders(&u->orders);
@@ -1112,7 +1110,7 @@ void u_setfaction(unit * u, faction * f)
     if (cnt) {
         set_number(u, cnt);
     }
-    if (f && count_unit(u)) {
+    if (f) {
         ++f->no_units;
     }
 }
@@ -1126,7 +1124,7 @@ void set_number(unit * u, int count)
   if (count == 0) {
     u->flags &= ~(UFL_HERO);
   }
-  if (u->faction && playerrace(u_race(u))) {
+  if (u->faction) {
     u->faction->num_people += count - u->number;
   }
   u->number = (unsigned short)count;

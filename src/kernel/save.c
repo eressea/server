@@ -574,36 +574,50 @@ writeorder(struct gamedata *data, const struct order *ord,
 
 unit *read_unit(struct gamedata *data)
 {
-  unit *u;
-  int number, n, p;
-  order **orderp;
-  char obuf[DISPLAYSIZE];
-  faction *f;
-  char rname[32];
+    unit *u;
+    int number, n, p;
+    order **orderp;
+    char obuf[DISPLAYSIZE];
+    faction *f;
+    char rname[32];
 
-  READ_INT(data->store, &n);
-  if (n <= 0)
-    return NULL;
-  u = findunit(n);
-  if (u == NULL) {
-    u = calloc(sizeof(unit), 1);
-    u->no = n;
-    uhash(u);
-  } else {
-    while (u->attribs)
-      a_remove(&u->attribs, u->attribs);
-    while (u->items)
-      i_free(i_remove(&u->items, u->items));
-    free(u->skills);
-    u->skills = 0;
-    u->skill_size = 0;
-    u_setfaction(u, NULL);
-  }
+    READ_INT(data->store, &n);
+    if (n <= 0) {
+        log_error("data contains invalid unit %d.\n", n);
+        assert(n>0);
+        return 0;
+    }
+    u = findunit(n);
+    if (u) {
+        log_error("reading unit %s that already exists.\n", unitname(u));
+        while (u->attribs) {
+            a_remove(&u->attribs, u->attribs);
+        }
+        while (u->items) {
+            i_free(i_remove(&u->items, u->items));
+        }
+        free(u->skills);
+        u->skills = 0;
+        u->skill_size = 0;
+        u_setfaction(u, NULL);
+    } else {
+        u = calloc(sizeof(unit), 1);
+        u->no = n;
+        uhash(u);
+    }
 
-  READ_INT(data->store, &n);
-  f = findfaction(n);
-  if (f != u->faction)
-    u_setfaction(u, f);
+    READ_INT(data->store, &n);
+    f = findfaction(n);
+    if (f != u->faction) {
+        u_setfaction(u, f);
+    }
+    if (u->faction) {
+        ++u->faction->no_units;
+    } else {
+        log_error("unit %s has faction == NULL\n", unitname(u));
+        assert(u->faction);
+        return 0;
+    }
 
   READ_STR(data->store, obuf, sizeof(obuf));
   u->name = _strdup(obuf);
@@ -614,6 +628,11 @@ unit *read_unit(struct gamedata *data)
     u->display = _strdup(obuf);
   }
   READ_INT(data->store, &number);
+    set_number(u, number);
+
+    
+    
+    
   READ_INT(data->store, &n);
   u->age = (short)n;
 
@@ -660,16 +679,6 @@ unit *read_unit(struct gamedata *data)
       }
     }
   }
-  if (u->faction == NULL) {
-    log_error("unit %s has faction == NULL\n", unitname(u));
-    u_setfaction(u, get_monsters());
-    set_number(u, 0);
-  }
-
-  if (count_unit(u) && u->faction)
-    u->faction->no_units++;
-
-  set_number(u, number);
 
   READ_INT(data->store, &n);
   if (n > 0) {
