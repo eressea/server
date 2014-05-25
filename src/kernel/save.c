@@ -400,24 +400,27 @@ void create_backup(char *file)
 
 void read_items(struct storage *store, item ** ilist)
 {
-  for (;;) {
-    char ibuf[32];
-    const item_type *itype;
-    int i;
-    READ_STR(store, ibuf, sizeof(ibuf));
-    if (!strcmp("end", ibuf))
-      break;
-    itype = it_find(ibuf);
-    READ_INT(store, &i);
-    if (i <= 0) {
-      log_error("data contains an entry with %d %s\n", i, itype->rtype->_name[1]);
-    } else {
-      assert(itype != NULL);
-      if (itype != NULL) {
-        i_change(ilist, itype, i);
-      }
+    for (;;) {
+        char ibuf[32];
+        const item_type *itype;
+        int i;
+        READ_STR(store, ibuf, sizeof(ibuf));
+        if (!strcmp("end", ibuf)) {
+            break;
+        }
+        itype = it_find(ibuf);
+        READ_INT(store, &i);
+        if (i <= 0) {
+            log_error("data contains an entry with %d %s\n", i, itype->rtype->_name[1]);
+        } else {
+            if (itype != NULL) {
+                i_change(ilist, itype, i);
+            } else {
+                log_error("data contains unknown item type %s.\n", ibuf);
+            }
+            assert(itype != NULL);
+        }
     }
-  }
 }
 
 static void read_alliances(struct storage *store)
