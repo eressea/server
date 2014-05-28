@@ -2,6 +2,23 @@ require "lunit"
 
 module("tests.e3.e2features", package.seeall, lunit.testcase )
 
+local function one_unit(r, f)
+  local u = unit.create(f, r, 1)
+  u:add_item("money", u.number * 100)
+  u:clear_orders()
+  return u
+end
+
+local function two_factions()
+  local f1 = faction.create("one@eressea.de", "human", "de")
+  local f2 = faction.create("two@eressea.de", "human", "de")
+  return f1, f2
+end
+
+local function two_units(r, f1, f2)
+  return one_unit(r, f1), one_unit(r, f2)
+end
+
 function setup()
     eressea.free_game()
     eressea.settings.set("nmr.timeout", "0")
@@ -199,4 +216,93 @@ function test_snowman()
         end
     end
     assert_equal(nil, u)
+end
+
+function test_block_movement()
+  eressea.settings.set("rules.guard.base_stop_prob", "0.3")
+  eressea.settings.set("rules.guard.amulet_stop_prob", "0.0")
+  eressea.settings.set("rules.guard.skill_stop_prob", "0.1")
+
+  local r0 = region.create(0, 0, "plain")
+  local r1 = region.create(1, 0, "plain")
+  local r2 = region.create(2, 0, "plain")
+  local f1, f2 = two_factions()
+  f1.age=20
+  f2.age=20
+
+  local u11 = one_unit(r1, f1)
+  local u2 = { }
+  for i = 1, 20 do
+    u2[i] = one_unit(r0, f2)
+  end
+  
+  u11:add_item("sword", 1)
+  u11:add_item("money", 1)
+  u11:set_skill("melee", 1)
+  u11:set_skill("perception", 7)
+  u11:clear_orders()
+  u11:add_order("BEWACHEN")
+  
+  process_orders()
+  
+  for i, u in ipairs(u2) do
+    u:add_item("horse", 1)
+  	u:set_skill("riding", 1)
+  	u:clear_orders()
+  	u:add_order("NACH o o")
+  end
+  
+  u2[1]:set_skill("stealth", 8)
+  
+  process_orders()
+
+  assert_equal(r2, u2[1].region, "nobody should see me")
+  for i, u in ipairs(u2) do
+    if i > 1 then
+      assert_equal(r1, u.region, "perception +7 should always stop me")
+    end
+  end
+end
+
+
+
+function test_block_movement_aots()
+  eressea.settings.set("rules.guard.base_stop_prob", "0.0")
+  eressea.settings.set("rules.guard.skill_stop_prob", "1.0")
+  eressea.settings.set("rules.guard.amulet_stop_prob", "1.1")
+
+  local r0 = region.create(0, 0, "plain")
+  local r1 = region.create(1, 0, "plain")
+  local r2 = region.create(2, 0, "plain")
+  local f1, f2 = two_factions()
+  f1.age=20
+  f2.age=20
+
+  local u11, u12 = two_units(r1, f1, f1)
+  local u21, u22 = two_units(r0, f2, f2)
+  
+  for i, u in ipairs ({ u11, u12 }) do
+    u:add_item("sword", 1)
+  	u:add_item("money", 1)
+  	u:set_skill("melee", 1)
+  	u:clear_orders()
+  	u:add_order("BEWACHEN")
+  end
+  
+  process_orders()
+  
+  for i, u in ipairs ({ u21, u22 }) do
+    u:add_item("horse", 1)
+  	u:set_skill("riding", 1)
+  	u:clear_orders()
+  	u:add_order("NACH o o")
+  end
+  
+  u12:add_item("aots", 10)
+  u22:set_skill("stealth", 1)
+
+  process_orders()
+
+  assert_equal(r1, u21.region, "unit with amulet should stop me")
+  assert_equal(r2, u22.region, "nobody should see me")
 end

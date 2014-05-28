@@ -828,9 +828,24 @@ static void caught_target(region * r, unit * u)
 static unit *bewegung_blockiert_von(unit * reisender, region * r)
 {
   unit *u;
-  int perception = 0;
+  double prob = 0.0;
   bool contact = false;
   unit *guard = NULL;
+  int stealth = eff_stealth(reisender, r);
+  static int gamecookie = -1;
+  static double base_prob = -999;
+  static double skill_prob = -999;
+  static double amulet_prob = -999;
+
+  if (gamecookie < 0 || gamecookie != global.cookie) {
+    base_prob =
+      get_param_flt(global.parameters, "rules.guard.base_stop_prob", .3);
+    skill_prob =
+      get_param_flt(global.parameters, "rules.guard.skill_stop_prob", .1);
+    amulet_prob =
+      get_param_flt(global.parameters, "rules.guard.amulet_stop_prob", .1);
+    gamecookie = global.cookie;
+  }
 
   if (fval(u_race(reisender), RCF_ILLUSIONARY))
     return NULL;
@@ -845,16 +860,19 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
         contact = true;
       else if (alliedunit(u, reisender->faction, HELP_GUARD))
         contact = true;
-      else if (sk >= perception) {
-        perception = sk;
-        guard = u;
+      else if (sk >= stealth) {
+    	  double prob_u = (sk - stealth) * skill_prob;
+    	  /* amulet counts at most once */
+    	  prob_u += _min (1, _min(u->number, get_item(u, I_AMULET_OF_TRUE_SEEING))) * amulet_prob;
+    	  if (prob_u >= prob) {
+    		  prob = prob_u;
+    		  guard = u;
+    	  }
       }
     }
   }
   if (!contact && guard) {
-    double prob = 0.3;          /* 30% base chance */
-    prob += 0.1 * (perception - eff_stealth(reisender, r));
-    prob += 0.1 * _min(guard->number, get_item(guard, I_AMULET_OF_TRUE_SEEING));
+    prob += base_prob;          /* 30% base chance */
 
     if (chance(prob)) {
       return guard;
