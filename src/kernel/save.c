@@ -1269,7 +1269,10 @@ faction *readfaction(struct gamedata * data)
   READ_INT(data->store, &f->age);
   READ_STR(data->store, name, sizeof(name));
   f->race = rc_find(name);
-  assert(f->race);
+    if (!f->race) {
+        log_error("unknown race in data: %s\n", name);
+    }
+    assert(f->race);
   READ_INT(data->store, &n);
   f->magiegebiet = (magic_t)n;
 

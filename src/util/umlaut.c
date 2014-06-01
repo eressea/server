@@ -236,7 +236,7 @@ int findtoken(const void * root, const char *key, variant * result)
 
     if (ret != 0) {
       /* encoding is broken. youch */
-      log_debug("findtoken | encoding error in '%s'\n", key);
+      log_error("findtoken | encoding error in '%s'\n", key);
       return E_TOK_NOMATCH;
     }
 #if NODEHASHSIZE == 8
@@ -249,7 +249,7 @@ int findtoken(const void * root, const char *key, variant * result)
       ref = ref->nexthash;
     str += len;
     if (!ref) {
-      log_debug("findtoken | token not found '%s'\n", key);
+      log_info("findtoken | token not found '%s'\n", key);
       return E_TOK_NOMATCH;
     }
     tk = ref->node;
@@ -258,6 +258,6 @@ int findtoken(const void * root, const char *key, variant * result)
     *result = tk->id;
     return E_TOK_SUCCESS;
   }
-  log_debug("findtoken | token not found '%s'\n", key);
+  log_info("findtoken | token not found '%s'\n", key);
   return E_TOK_NOMATCH;
 }

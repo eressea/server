@@ -307,8 +307,10 @@ void get_food(region * r)
         while (donor != NULL && hungry > 0) {
           int blut = get_effect(donor, pt_blood);
           blut = _min(blut, hungry);
-          change_effect(donor, pt_blood, -blut);
-          hungry -= blut;
+          if (blut) {
+            change_effect(donor, pt_blood, -blut);
+            hungry -= blut;
+          }
           if (donor == u)
             donor = r->units;
           while (donor != NULL) {
@@ -3496,6 +3498,9 @@ int checkunitnumber(const faction * f, int add)
          number of units allowed in an alliance */
         faction *f2;
         int unitsinalliance = fno;
+        if (unitsinalliance > alimit) {
+            return 1;
+        }
 
         for (f2 = factions; f2; f2 = f2->next) {
             if (f != f2 && f->alliance == f2->alliance) {
