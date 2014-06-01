@@ -33,7 +33,6 @@
   <set name="nymph_familiar">
     <skill name="magic" level="1"/>
     <skill name="bow" level="1"/>
-    <skill name="herbalism" level="1"/>
     <skill name="training" level="1"/>
     <skill name="riding" level="1"/>
     <!-- spells -->
@@ -68,7 +67,6 @@
 
   <set name="imp_familiar">
     <skill name="magic" level="1"/>
-    <skill name="taxation" level="1"/>
     <!-- spells -->
     <spell name="steal_aura" level="6"/>
     <spell name="shapeshift" level="3"/>
@@ -77,7 +75,6 @@
 
   <set name="dreamcat_familiar">
     <skill name="magic" level="1"/>
-    <skill name="taxation" level="1"/>
     <!-- spells -->
     <spell name="shapeshift" level="3"/>
     <spell name="transferauratraum" level="3"/>
