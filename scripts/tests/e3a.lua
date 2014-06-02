@@ -660,7 +660,7 @@ function test_p2_move()
     assert_equal(1, r:get_resource("tree"))
 end
 
-function test_bug_1738_build_castle_e3()
+function disabled_test_bug_1738_build_castle_e3()
   local r = region.create(0, 0, "plain")    
   local f = faction.create("bug_1738@eressea.de", "human", "de")
 
