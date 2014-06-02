@@ -3023,14 +3023,17 @@ static order * defaults[MAXLOCALES];
 
 order *default_order(const struct locale *lang)
 {
+  static int usedefault = 1;
   int i = locale_index(lang);
   order *result = 0;
   assert(i<MAXLOCALES);
   result = defaults[i];
-  if (!result) {
+  if (!result && usedefault) {
     const char * str = locale_string(lang, "defaultorder");
     if (str) {
       result = defaults[i] = parse_order(str, lang);
+    } else {
+      usedefault = 0;
     }
   }
   return result ? copy_order(result) : 0;
