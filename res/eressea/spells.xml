@@ -415,9 +415,6 @@
   <spell name="firewall" rank="4" index="151" syntax="direction" parameters="c" variable="true">
     <resource name="aura" amount="6" cost="level"/>
   </spell>
-  <spell name="wisps" rank="5" index="152" syntax="direction" parameters="c" far="true" variable="true">
-    <resource name="aura" amount="2" cost="level"/>
-  </spell>
   <spell name="sparklechaos" rank="5" index="153" parameters="u" los="true" variable="true">
     <resource name="aura" amount="1" cost="level"/>
   </spell>

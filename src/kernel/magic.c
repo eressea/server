@@ -386,7 +386,7 @@ static int read_seenspell(attrib * a, void *owner, struct storage *store)
     }
     sp = find_spell(token);
     if (!sp) {
-      log_error("read_seenspell: could not find spell '%s'\n", token);
+      log_warning("read_seenspell: could not find spell '%s'\n", token);
     }
   }
   if (!sp) {

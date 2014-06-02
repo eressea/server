@@ -1744,15 +1744,6 @@
     <text locale="de">"$unit($mage) verwandelt sich in einen Wyrm."</text>
     <text locale="en">"$unit($mage) turns into a wyrm."</text>
   </message>
-  <message name="wisps_effect" section="magic">
-    <type>
-      <arg name="mage" type="unit"/>
-      <arg name="region" type="region"/>
-    </type>
-    <text locale="de">"$unit($mage) ruft Irrlichter in $region($region)."</text>
-    <text locale="fr">"$unit($mage) summons wisps in $region($region)."</text>
-    <text locale="en">"$unit($mage) summons wisps in $region($region)."</text>
-  </message>
   <message name="firewall_effect" section="magic">
     <type>
       <arg name="mage" type="unit"/>

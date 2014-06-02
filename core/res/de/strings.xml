@@ -4183,10 +4183,6 @@
       <text locale="de">Seelenkopie</text>
       <text locale="en">Doppelganger</text>
     </string>
-    <string name="wisps">
-      <text locale="de">Irrlichter</text>
-      <text locale="en">Wisps</text>
-    </string>
     <string name="bad_dreams">
       <text locale="de">Schlechte Träume</text>
       <text locale="en">Bad Dreams</text>
@@ -4781,14 +4777,6 @@
       Klon und der erschaffene Körper dient nun dem Magier als neues Gefäß. 
       Es besteht allerdings eine geringer Wahrscheinlichkeit, dass die Seele 
       nach dem Tod zu schwach ist, das neue Gefäß zu erreichen.
-      </text>
-    </string>
-    <string name="wisps">
-      <text locale="de">
-      Der Zauberer spricht eine Beschwörung über einen Teil der Region, 
-      und in der Folgewoche entstehen dort Irrlichter. 
-      Wer durch diese Nebel wandert, wird von Visionen geplagt und 
-      in die Irre geleitet.
       </text>
     </string>
     <string name="great_drought">
