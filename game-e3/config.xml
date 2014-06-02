@@ -12,7 +12,6 @@
   <xi:include href="config:///core/spoils.xml"/>
   <xi:include href="config:///core/prefixes.xml"/>
   <xi:include href="config:///core/common/buildings.xml"/>
-  <xi:include href="config:///core/equipment.xml"/>
   <xi:include href="config:///game/familiars.xml"/>
 
   <xi:include href="config:///game/ships.xml"/>

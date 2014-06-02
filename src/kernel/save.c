@@ -225,7 +225,7 @@ static faction *factionorders(void)
     const char *pass = getstrtoken();
 
     if (!checkpasswd(f, (const char *)pass, true)) {
-      log_warning("Invalid password for faction %s\n", itoa36(fid));
+      log_debug("Invalid password for faction %s\n", itoa36(fid));
       ADDMSG(&f->msgs, msg_message("wrongpasswd", "faction password",
           f->no, pass));
       return 0;
@@ -806,7 +806,7 @@ void write_unit(struct gamedata *data, const unit * u)
     if (++p < MAXPERSISTENT) {
       writeorder(data, ord, u->faction->locale);
     } else {
-      log_error("%s had %d or more persistent orders\n", unitname(u), MAXPERSISTENT);
+      log_warning("%s had %d or more persistent orders\n", unitname(u), MAXPERSISTENT);
       break;
     }
   }
@@ -817,7 +817,7 @@ void write_unit(struct gamedata *data, const unit * u)
       if (++p < MAXPERSISTENT) {
         writeorder(data, ord, u->faction->locale);
       } else {
-        log_error("%s had %d or more persistent orders\n", unitname(u), MAXPERSISTENT);
+        log_warning("%s had %d or more persistent orders\n", unitname(u), MAXPERSISTENT);
         break;
       }
     }
