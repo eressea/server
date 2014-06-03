@@ -1,11 +1,3 @@
-function kill_nonstarters()
-  for f in factions() do
-    if f.lastturn==0 then
-      kill_faction(f, true)
-    end
-  end
-end
-
 function kill_multis(multis, destructive)
   for idx, fno in ipairs(multis) do  
     local f = get_faction(fno)

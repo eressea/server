@@ -93,7 +93,7 @@
     <skill name="taxation" enable="false"/>
     <skill name="trade" enable="false"/>
 
-    <param name="NewbieImmunity" value="4"/>-
+    <param name="NewbieImmunity" value="4"/>
     <param name="modules.astralspace" value="0"/>
     <param name="modules.wormholes" value="0"/>
     <param name="modules.markets" value="1"/>

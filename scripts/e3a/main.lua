@@ -42,7 +42,6 @@ function process(orders)
   -- spawn_braineaters(0.25)
   -- spawn_ents()
 
-  kill_nonstarters()
   -- post-turn updates:
   update_guards()
   update_scores()
