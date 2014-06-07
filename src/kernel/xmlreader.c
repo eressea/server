@@ -51,8 +51,6 @@ without prior permission by the authors of Eressea.
 #include <limits.h>
 #include <string.h>
 
-static bool gamecode_enabled = false;
-
 static building_type *bt_get_or_create(const char *name)
 {
   if (name != NULL) {
@@ -65,11 +63,6 @@ static building_type *bt_get_or_create(const char *name)
     return btype;
   }
   return NULL;
-}
-
-void enable_xml_gamecode(void)
-{
-  gamecode_enabled = true;
 }
 
 static void xml_readtext(xmlNodePtr node, struct locale **lang, xmlChar ** text)
@@ -304,11 +297,10 @@ static int parse_buildings(xmlDocPtr doc)
       xml_readconstruction(xpath, result->nodesetval, &btype->construction);
       xmlXPathFreeObject(result);
 
-      if (gamecode_enabled) {
-        /* reading eressea/buildings/building/function */
-        xpath->node = node;
-        result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
-        for (k = 0; k != result->nodesetval->nodeNr; ++k) {
+      /* reading eressea/buildings/building/function */
+      xpath->node = node;
+      result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
+      for (k = 0; k != result->nodesetval->nodeNr; ++k) {
           xmlNodePtr node = result->nodesetval->nodeTab[k];
           pf_generic fun;
           parse_function(node, &fun, &propValue);
@@ -337,9 +329,8 @@ static int parse_buildings(xmlDocPtr doc)
             log_error("unknown function type '%s' for building %s\n", (const char *)propValue, btype->_name);
           }
           xmlFree(propValue);
-        }
-        xmlXPathFreeObject(result);
       }
+      xmlXPathFreeObject(result);
 
       /* reading eressea/buildings/building/maintenance */
       result = xmlXPathEvalExpression(BAD_CAST "maintenance", xpath);
@@ -806,11 +797,10 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
   }
   xmlXPathFreeObject(result);
 
-  if (gamecode_enabled) {
-    /* reading weapon/function */
-    xpath->node = node;
-    result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
-    for (k = 0; k != result->nodesetval->nodeNr; ++k) {
+  /* reading weapon/function */
+  xpath->node = node;
+  result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
+  for (k = 0; k != result->nodesetval->nodeNr; ++k) {
       xmlNodePtr node = result->nodesetval->nodeTab[k];
       xmlChar *propValue;
       pf_generic fun;
@@ -830,9 +820,8 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
         log_error("unknown function type '%s' for item '%s'\n", (const char *)propValue, itype->rtype->_name[0]);
       }
       xmlFree(propValue);
-    }
-    xmlXPathFreeObject(result);
   }
+  xmlXPathFreeObject(result);
 
   xpath->node = node;
   return wtype;
@@ -912,11 +901,10 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
   }
   xmlXPathFreeObject(result);
 
-  if (gamecode_enabled) {
-    /* reading item/function */
-    xpath->node = node;
-    result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
-    for (k = 0; k != result->nodesetval->nodeNr; ++k) {
+  /* reading item/function */
+  xpath->node = node;
+  result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
+  for (k = 0; k != result->nodesetval->nodeNr; ++k) {
       xmlNodePtr node = result->nodesetval->nodeTab[k];
       xmlChar *propValue;
       pf_generic fun;
@@ -947,9 +935,8 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
         log_error("unknown function type '%s' for item '%s'\n", (const char *)propValue, rtype->_name[0]);
       }
       xmlFree(propValue);
-    }
-    xmlXPathFreeObject(result);
   }
+  xmlXPathFreeObject(result);
 
   return itype;
 }
@@ -1068,11 +1055,10 @@ static int parse_resources(xmlDocPtr doc)
       xmlFree(name);
     }
 
-    if (gamecode_enabled) {
-      /* reading eressea/resources/resource/function */
-      xpath->node = node;
-      result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
-      if (result->nodesetval != NULL)
+    /* reading eressea/resources/resource/function */
+    xpath->node = node;
+    result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
+    if (result->nodesetval != NULL)
         for (k = 0; k != result->nodesetval->nodeNr; ++k) {
           xmlNodePtr node = result->nodesetval->nodeTab[k];
           pf_generic fun;
@@ -1096,8 +1082,7 @@ static int parse_resources(xmlDocPtr doc)
           }
           xmlFree(propValue);
         }
-      xmlXPathFreeObject(result);
-    }
+    xmlXPathFreeObject(result);
 
     /* reading eressea/resources/resource/resourcelimit */
     xpath->node = node;
@@ -1585,22 +1570,21 @@ static int parse_spells(xmlDocPtr doc)
       if (k >= 0 && k <= 3)
         sp->sptyp |= modes[k];
 
-      if (gamecode_enabled) {
-        /* reading eressea/spells/spell/function */
-        pf_generic cast = 0;
-        pf_generic fumble = 0;
+      /* reading eressea/spells/spell/function */
+      pf_generic cast = 0;
+      pf_generic fumble = 0;
 
-        xpath->node = node;
-        result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
+      xpath->node = node;
+      result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
 
-        if (result->nodesetval->nodeNr == 0) {
+      if (result->nodesetval->nodeNr == 0) {
           cast = get_function(sp->sname);
           if (!cast) {
             log_error("no spell cast function registered for '%s'\n", sp->sname);
           }
           strlcpy(zText+7, sp->sname, sizeof(zText)-7);
           fumble = get_function(zText);
-        } else {
+      } else {
           for (k = 0; k != result->nodesetval->nodeNr; ++k) {
             xmlNodePtr node = result->nodesetval->nodeTab[k];
             pf_generic fun;
@@ -1620,11 +1604,10 @@ static int parse_spells(xmlDocPtr doc)
             }
             xmlFree(propValue);
           }
-        }
-        sp->cast = (spell_f)cast;
-        sp->fumble = (fumble_f)fumble;
-        xmlXPathFreeObject(result);
       }
+      sp->cast = (spell_f)cast;
+      sp->fumble = (fumble_f)fumble;
+      xmlXPathFreeObject(result);
 
       /* reading eressea/spells/spell/resource */
       xpath->node = node;
@@ -1869,11 +1852,10 @@ static int parse_races(xmlDocPtr doc)
     }
     xmlXPathFreeObject(result);
 
-    if (gamecode_enabled) {
-      /* reading eressea/races/race/function */
-      xpath->node = node;
-      result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
-      for (k = 0; k != result->nodesetval->nodeNr; ++k) {
+    /* reading eressea/races/race/function */
+    xpath->node = node;
+    result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
+    for (k = 0; k != result->nodesetval->nodeNr; ++k) {
         xmlNodePtr node = result->nodesetval->nodeTab[k];
         pf_generic fun;
 
@@ -1902,9 +1884,8 @@ static int parse_races(xmlDocPtr doc)
           log_error("unknown function type '%s' for race %s\n", (const char *)propValue, rc->_name[0]);
         }
         xmlFree(propValue);
-      }
-      xmlXPathFreeObject(result);
     }
+    xmlXPathFreeObject(result);
 
     /* reading eressea/races/race/familiar */
     xpath->node = node;
@@ -2109,9 +2090,6 @@ static int parse_messages(xmlDocPtr doc)
   xmlXPathObjectPtr messages;
   xmlNodeSetPtr nodes;
   int i;
-
-  if (!gamecode_enabled)
-    return 0;
 
   xpath = xmlXPathNewContext(doc);
 

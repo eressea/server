@@ -78,8 +78,6 @@ void game_init(void)
   register_itemtypes();
   register_xmlreader();
   register_archetypes();
-  enable_xml_gamecode();
-
   register_attributes();
   register_gmcmd();
 
