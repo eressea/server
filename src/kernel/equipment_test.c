@@ -23,6 +23,7 @@ void test_equipment(CuTest * tc)
   sc_mage * mage;
   
   test_cleanup();
+  test_create_race("human");
   skill_enabled[SK_MAGIC] = 1;
   it_horses = test_create_itemtype(names);
   CuAssertPtrNotNull(tc, it_horses);

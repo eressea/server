@@ -15,6 +15,7 @@ pool_test.c
 reports_test.c
 spellbook_test.c
 curse_test.c
+jsonconf_test.c
 )
 
 SET(_FILES
@@ -56,6 +57,7 @@ teleport.c
 terrain.c
 unit.c
 xmlreader.c
+jsonconf.c
 )
 
 FOREACH(_FILE ${_FILES})

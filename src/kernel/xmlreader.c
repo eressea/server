@@ -51,20 +51,6 @@ without prior permission by the authors of Eressea.
 #include <limits.h>
 #include <string.h>
 
-static building_type *bt_get_or_create(const char *name)
-{
-  if (name != NULL) {
-    building_type *btype = bt_find(name);
-    if (btype == NULL) {
-      btype = calloc(sizeof(building_type), 1);
-      btype->_name = _strdup(name);
-      bt_register(btype);
-    }
-    return btype;
-  }
-  return NULL;
-}
-
 static void xml_readtext(xmlNodePtr node, struct locale **lang, xmlChar ** text)
 {
   xmlChar *propValue = xmlGetProp(node, BAD_CAST "locale");

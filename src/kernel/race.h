@@ -115,6 +115,7 @@ extern "C" {
   extern struct race *rc_new(const char *zName);
   extern int rc_specialdamage(const race *, const race *,
     const struct weapon_type *);
+  void free_races(void);
 
 /* Flags */
 #define RCF_PLAYERRACE     (1<<0)       /* can be played by a player. */

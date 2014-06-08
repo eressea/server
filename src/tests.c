@@ -63,6 +63,7 @@ void test_cleanup(void)
   default_locale = 0;
   free_locales();
   free_spells();
+  free_races();
   free_spellbooks();
   free_gamedata();
 }

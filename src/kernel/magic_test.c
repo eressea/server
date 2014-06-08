@@ -25,7 +25,8 @@ void test_updatespells(CuTest * tc)
   spellbook *book = 0;
 
   test_cleanup();
-  
+  test_create_race("human");
+
   f = test_create_faction(0);
   sp = create_spell("testspell", 0);
   CuAssertPtrNotNull(tc, sp);

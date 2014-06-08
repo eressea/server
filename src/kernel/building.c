@@ -154,6 +154,20 @@ void bt_register(building_type * type)
   ql_push(&buildingtypes, (void *)type);
 }
 
+building_type *bt_get_or_create(const char *name)
+{
+  if (name != NULL) {
+    building_type *btype = bt_find(name);
+    if (btype == NULL) {
+      btype = calloc(sizeof(building_type), 1);
+      btype->_name = _strdup(name);
+      bt_register(btype);
+    }
+    return btype;
+  }
+  return NULL;
+}
+
 int buildingcapacity(const building * b)
 {
   if (b->type->capacity >= 0) {

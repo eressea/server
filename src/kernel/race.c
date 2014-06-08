@@ -98,6 +98,14 @@ void racelist_insert(struct race_list **rl, const struct race *r)
   *rl = rl2;
 }
 
+void free_races(void) {
+    while (races) {
+        race * rc = races->next;
+        free(races);
+        races =rc;
+    }
+}
+
 race *rc_new(const char *zName)
 {
   char zBuffer[80];

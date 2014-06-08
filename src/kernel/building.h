@@ -73,10 +73,11 @@ extern "C" {
 
   extern struct quicklist *buildingtypes;
 
-  extern building_type *bt_find(const char *name);
-  extern void register_buildings(void);
-  extern void bt_register(struct building_type *type);
-  extern int bt_effsize(const struct building_type *btype,
+  building_type *bt_find(const char *name);
+  building_type *bt_get_or_create(const char *name);
+  void register_buildings(void);
+  void bt_register(struct building_type *type);
+  int bt_effsize(const struct building_type *btype,
     const struct building *b, int bsize);
 
 /* buildingt => building_type
