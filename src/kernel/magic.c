@@ -25,7 +25,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "curse.h"
 #include "faction.h"
 #include "item.h"
-#include "message.h"
+#include "messages.h"
 #include "objtypes.h"
 #include "order.h"
 #include "pathfinder.h"

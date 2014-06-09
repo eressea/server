@@ -18,7 +18,7 @@
 /* kernel includes */
 #include <kernel/curse.h>
 #include <kernel/magic.h>
-#include <kernel/message.h>
+#include <kernel/messages.h>
 #include <kernel/objtypes.h>
 #include <kernel/region.h>
 #include <kernel/terrain.h>

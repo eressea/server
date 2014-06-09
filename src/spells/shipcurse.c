@@ -17,7 +17,7 @@
 #include "shipcurse.h"
 
 /* kernel includes */
-#include <kernel/message.h>
+#include <kernel/messages.h>
 #include <kernel/objtypes.h>
 #include <kernel/ship.h>
 #include <kernel/unit.h>

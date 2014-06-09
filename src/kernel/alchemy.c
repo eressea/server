@@ -22,7 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "item.h"
 #include "faction.h"
-#include "message.h"
+#include "messages.h"
 #include "build.h"
 #include "magic.h"
 #include "region.h"

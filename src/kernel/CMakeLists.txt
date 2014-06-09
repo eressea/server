@@ -35,7 +35,7 @@ faction.c
 group.c
 item.c
 magic.c
-message.c
+messages.c
 move.c
 names.c
 order.c

@@ -29,7 +29,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "group.h"
 #include "item.h"
 #include "magic.h"
-#include "message.h"
+#include "messages.h"
 #include "move.h"
 #include "objtypes.h"
 #include "order.h"

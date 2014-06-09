@@ -18,7 +18,7 @@
 /* kernel includes */
 #include <kernel/unit.h>
 #include <kernel/faction.h>
-#include <kernel/message.h>
+#include <kernel/messages.h>
 
 /* libc includes */
 #include <stdlib.h>

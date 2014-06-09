@@ -18,7 +18,7 @@ without prior permission by the authors of Eressea.
 #include "building.h"
 #include "equipment.h"
 #include "item.h"
-#include "message.h"
+#include "messages.h"
 #include "race.h"
 #include "region.h"
 #include "resources.h"

@@ -24,11 +24,8 @@ extern "C" {
 
 #include <util/message.h>
 
-  struct message;
-  struct faction;
-  struct msglevel;
-
-  struct message_type;
+    struct faction;
+    struct msglevel;
 
   typedef struct mlist {
     struct mlist *next;

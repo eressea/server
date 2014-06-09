@@ -26,7 +26,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "build.h"
 #include "curse.h"
 #include "faction.h"
-#include "message.h"
+#include "messages.h"
 #include "pool.h"
 #include "race.h"
 #include "region.h"

@@ -29,7 +29,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "faction.h"
 #include "item.h"
 #include "magic.h"
-#include "message.h"
+#include "messages.h"
 #include "order.h"
 #include "plane.h"
 #include "race.h"

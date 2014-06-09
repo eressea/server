@@ -34,7 +34,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/calendar.h>
 #include <kernel/unit.h>
 #include <kernel/terrain.h>
-#include <kernel/message.h>
+#include <kernel/messages.h>
 #include <kernel/region.h>
 #include <kernel/reports.h>
 #include <kernel/building.h>

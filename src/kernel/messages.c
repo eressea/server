@@ -18,7 +18,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <platform.h>
 #include <kernel/config.h>
-#include "message.h"
+#include "messages.h"
 
 /* kernel includes */
 #include "building.h"

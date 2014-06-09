@@ -18,7 +18,7 @@
 #include <kernel/curse.h>
 #include <kernel/faction.h>
 #include <kernel/magic.h>
-#include <kernel/message.h>
+#include <kernel/messages.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/skill.h>

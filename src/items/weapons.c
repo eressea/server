@@ -24,7 +24,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/build.h>
 #include <kernel/race.h>
 #include <kernel/item.h>
-#include <kernel/message.h>
+#include <kernel/messages.h>
 #include <kernel/battle.h>
 #include <kernel/pool.h>
 

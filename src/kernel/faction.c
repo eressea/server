@@ -25,7 +25,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "equipment.h"
 #include "group.h"
 #include "item.h"
-#include "message.h"
+#include "messages.h"
 #include "plane.h"
 #include "race.h"
 #include "region.h"
