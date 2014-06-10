@@ -64,11 +64,13 @@ without prior permission by the authors of Eressea.
 #include <util/unicode.h>
 #include <util/xml.h>
 
+#ifdef USE_LIBXML2
 /* libxml2 includes */
 #include <libxml/tree.h>
 #include <libxml/encoding.h>
 #ifdef USE_ICONV
 #include <iconv.h>
+#endif
 #endif
 
 /* libc includes */

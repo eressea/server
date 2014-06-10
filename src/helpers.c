@@ -29,8 +29,6 @@ without prior permission by the authors of Eressea.
 #include <kernel/item.h>
 #include <kernel/region.h>
 
-#include "archetype.h"
-
 #include <tolua.h>
 #include <lua.h>
 
@@ -558,35 +556,6 @@ lua_useitem(struct unit *u, const struct item_type *itype, int amount,
   return result;
 }
 
-static int lua_recruit(struct unit *u, const struct archetype *arch, int amount)
-{
-  lua_State *L = (lua_State *) global.vm_state;
-  int result = 0;
-  char fname[64];
-
-  strlcpy(fname, "recruit_", sizeof(fname));
-  strlcat(fname, arch->name[0], sizeof(fname));
-
-  lua_getglobal(L, fname);
-  if (lua_isfunction(L, -1)) {
-    tolua_pushusertype(L, (void *)u, TOLUA_CAST "unit");
-    tolua_pushnumber(L, (lua_Number) amount);
-
-    if (lua_pcall(L, 2, 1, 0) != 0) {
-      const char *error = lua_tostring(L, -1);
-      log_error("use(%s) calling '%s': %s.\n", unitname(u), fname, error);
-      lua_pop(L, 1);
-    } else {
-      result = (int)lua_tonumber(L, -1);
-      lua_pop(L, 1);
-    }
-  } else {
-    log_error("use(%s) calling '%s': not a function.\n", unitname(u), fname);
-    lua_pop(L, 1);
-  }
-  return result;
-}
-
 int tolua_toid(lua_State * L, int idx, int def)
 {
   int no = 0;
@@ -610,7 +579,6 @@ void register_tolua_helpers(void)
     TOLUA_CAST "lua_building_taxes");
   register_function((pf_generic) & lua_agebuilding,
     TOLUA_CAST "lua_agebuilding");
-  register_function((pf_generic) & lua_recruit, TOLUA_CAST "lua_recruit");
   register_function((pf_generic) & lua_callspell, TOLUA_CAST "lua_castspell");
   register_function((pf_generic) & lua_initfamiliar,
     TOLUA_CAST "lua_initfamiliar");

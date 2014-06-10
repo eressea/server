@@ -25,7 +25,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* gamecode includes */
 #include "economy.h"
-#include "archetype.h"
 #include "monster.h"
 #include "randenc.h"
 #include "spy.h"
@@ -4717,7 +4716,6 @@ int init_data(const char *filename, const char *catalog)
     return l;
 
   init_locales();
-  init_archetypes();
 
   if (turn < 0) {
     turn = first_turn;

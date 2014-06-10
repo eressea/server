@@ -85,6 +85,7 @@ double xml_fvalue(xmlNodePtr node, const char *name, double dflt)
 #include <libxml/parser.h>
 #include <libxml/xinclude.h>
 
+#ifdef USE_LIBXML2
 typedef struct xml_reader {
   struct xml_reader *next;
   xml_callback callback;
@@ -103,9 +104,11 @@ void xml_register_callback(xml_callback callback)
     insert = &(*insert)->next;
   *insert = reader;
 }
+#endif
 
 int read_xml(const char *filename, const char *catalog)
 {
+#ifdef USE_LIBXML2
   xml_reader *reader = xmlReaders;
   xmlDocPtr doc;
   int result;
@@ -132,4 +135,8 @@ int read_xml(const char *filename, const char *catalog)
   }
   xmlFreeDoc(doc);
   return result;
+#else
+    log_error("LIBXML2 disabled, cannot read %s.\n", filename);
+    return -1;
+#endif
 }

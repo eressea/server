@@ -21,7 +21,6 @@ include_directories (${CRYPTO_INCLUDE_DIR})
 include_directories (${QUICKLIST_INCLUDE_DIR})
 include_directories (${CUTEST_INCLUDE_DIR})
 include_directories (${LUA_INCLUDE_DIR})
-include_directories (${LIBXML2_INCLUDE_DIR})
 include_directories (${BSON_INCLUDE_DIR})
 include_directories (${INIPARSER_INCLUDE_DIR})
 include_directories (${CURSES_INCLUDE_DIR})
@@ -65,7 +64,6 @@ set (SERVER_SRC
   settings.pkg.c
   eressea.c
   json.c
-  archetype.c
   creation.c
   creport.c
   economy.c
@@ -79,7 +77,7 @@ set (SERVER_SRC
   spy.c
   study.c
   summary.c
-  xmlreport.c
+#  xmlreport.c
   gmtool.c
   monsters.c
 	bind_building.c
@@ -88,11 +86,11 @@ set (SERVER_SRC
 	bind_gmtool.c
 	bind_hashtable.c
 	bindings.c
-  helpers.c
+	helpers.c
 	bind_message.c
 	bind_monsters.c
-  bind_process.c
-  bind_region.c
+	bind_process.c
+	bind_region.c
 	bind_settings.c
 	bind_ship.c
 	bind_sqlite.c
@@ -113,7 +111,6 @@ target_link_libraries(eressea
   ${LUA_LIBRARIES}
   ${TOLUA_LIBRARIES}
   ${QUICKLIST_LIBRARIES}
-  ${LIBXML2_LIBRARIES}
   ${STORAGE_LIBRARIES}
   ${SQLITE3_LIBRARIES}
   ${CRITBIT_LIBRARIES}
@@ -141,7 +138,6 @@ target_link_libraries(test_eressea
   ${LUA_LIBRARIES}
   ${TOLUA_LIBRARIES}
   ${QUICKLIST_LIBRARIES}
-  ${LIBXML2_LIBRARIES}
   ${STORAGE_LIBRARIES}
   ${SQLITE3_LIBRARIES}
   ${CRITBIT_LIBRARIES}
@@ -164,3 +160,10 @@ add_test(
   )
 
 install(TARGETS eressea DESTINATION bin)
+
+if (LIBXML2_FOUND)
+include_directories (${LIBXML2_INCLUDE_DIR})
+target_link_libraries(eressea ${LIBXML2_LIBRARIES})
+target_link_libraries(test_eressea ${LIBXML2_LIBRARIES})
+endif(LIBXML2_FOUND)
+

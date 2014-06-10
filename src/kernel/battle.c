@@ -74,7 +74,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 static FILE *bdebug;
 
 #define TACTICS_BONUS 1         /* when undefined, we have a tactics round. else this is the bonus tactics give */
-#define TACTICS_MODIFIER 1      /* modifier for generals in the fromt/rear */
+#define TACTICS_MODIFIER 1      /* modifier for generals in the front/rear */
 
 #define CATAPULT_INITIAL_RELOAD 4       /* erster schuss in runde 1 + rng_int() % INITIAL */
 #define CATAPULT_STRUCTURAL_DAMAGE
