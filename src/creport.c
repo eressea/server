@@ -68,8 +68,6 @@ without prior permission by the authors of Eressea.
 #include <util/nrmessage.h>
 #include <quicklist.h>
 
-#include <libxml/encoding.h>
-
 /* libc includes */
 #include <assert.h>
 #include <errno.h>
@@ -1470,7 +1468,6 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
 #if SCORE_MODULE
   int score = 0, avgscore = 0;
 #endif
-  int enc = xmlParseCharEncoding(charset);
   FILE *F = fopen(filename, "wt");
 
   if (era < 0) {
@@ -1479,7 +1476,7 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
   if (F == NULL) {
     perror(filename);
     return -1;
-  } else if (enc == XML_CHAR_ENCODING_UTF8) {
+  } else if (_strcmpl(charset, "utf-8")==0 || _strcmpl(charset, "utf8")==0) {
     const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
     fwrite(utf8_bom, 1, 3, F);
   }

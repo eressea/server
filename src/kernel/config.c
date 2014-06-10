@@ -58,8 +58,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <critbit.h>
 #include <util/crmessage.h>
 #include <util/event.h>
-#include <util/functions.h>
 #include <util/language.h>
+#include <util/filereader.h>
+#include <util/functions.h>
 #include <util/log.h>
 #include <util/lists.h>
 #include <util/parser.h>
@@ -72,9 +73,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/umlaut.h>
 #include <util/xml.h>
 
+#ifdef USE_LIBXML2
 /* libxml includes */
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
+#endif
 
 /* external libraries */
 #include <iniparser.h>
@@ -3139,8 +3142,9 @@ void load_inifile(dictionary * d)
   lomem = iniparser_getint(d, "eressea:lomem", lomem) ? 1 : 0;
 
   str = iniparser_getstring(d, "eressea:encoding", NULL);
-  if (str)
-    enc_gamedata = xmlParseCharEncoding(str);
+  if (str && (_strcmpl(str, "utf8")==0 || _strcmpl(str, "utf-8")==0)) {
+    enc_gamedata = ENCODING_UTF8;
+  }
 
   verbosity = iniparser_getint(d, "eressea:verbose", 2);
   sqlpatch = iniparser_getint(d, "eressea:sqlpatch", false);

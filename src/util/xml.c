@@ -15,8 +15,10 @@
 /* util includes */
 #include "log.h"
 
+#ifdef USE_LIBXML2
 #include <libxml/catalog.h>
 #include <libxml/xmlstring.h>
+#endif
 
 /* libc includes */
 #include <assert.h>
@@ -25,6 +27,7 @@
 #include <string.h>
 #include <ctype.h>
 
+#ifdef USE_LIBXML2
 const xmlChar *xml_i(double number)
 {
   static char buffer[128];
@@ -85,7 +88,6 @@ double xml_fvalue(xmlNodePtr node, const char *name, double dflt)
 #include <libxml/parser.h>
 #include <libxml/xinclude.h>
 
-#ifdef USE_LIBXML2
 typedef struct xml_reader {
   struct xml_reader *next;
   xml_callback callback;

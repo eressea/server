@@ -59,14 +59,13 @@
 #include <util/console.h>
 #include <util/listbox.h>
 
-#include <libxml/encoding.h>
-
 #include <storage.h>
 #include <lua.h>
 
 #include <assert.h>
-#include <string.h>
 #include <locale.h>
+#include <stdlib.h>
+#include <string.h>
 
 static int g_quit;
 int force_color = 0;

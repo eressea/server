@@ -15,6 +15,9 @@
 extern "C" {
 #endif
 
+#define ENCODING_UTF8   0
+#define ENCODING_LATIN1 1
+
   const char *getbuf(FILE *, int encoding);
 
 #ifdef __cplusplus

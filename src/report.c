@@ -82,8 +82,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <quicklist.h>
 #include <util/rng.h>
 
-#include <libxml/encoding.h>
-
 /* libc includes */
 #include <assert.h>
 #include <ctype.h>
@@ -1472,15 +1470,14 @@ report_template(const char *filename, report_context * ctx, const char *charset)
   char buf[8192], *bufp;
   size_t size;
   int bytes;
-
-  int enc = xmlParseCharEncoding(charset);
+  bool utf8 = _strcmpl(charset, "utf8")==0 || _strcmpl(charset, "utf-8")==0;
 
   if (F == NULL) {
     perror(filename);
     return -1;
   }
 
-  if (enc == XML_CHAR_ENCODING_UTF8) {
+  if (utf8) {
     const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
     fwrite(utf8_bom, 1, 3, F);
   }
@@ -2106,7 +2103,7 @@ report_plaintext(const char *filename, report_context * ctx,
   seen_region *sr = NULL;
   char buf[8192];
   char *bufp;
-  int enc = xmlParseCharEncoding(charset);
+  bool utf8 = _strcmpl(charset, "utf8")==0 || _strcmpl(charset, "utf-8")==0;
   size_t size;
 
   /* static variables can cope with writing for different turns */
@@ -2126,7 +2123,7 @@ report_plaintext(const char *filename, report_context * ctx,
     perror(filename);
     return -1;
   }
-  if (enc == XML_CHAR_ENCODING_UTF8) {
+  if (utf8) {
     const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
     fwrite(utf8_bom, 1, 3, F);
   }
