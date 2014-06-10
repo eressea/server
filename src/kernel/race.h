@@ -78,7 +78,7 @@ extern "C" {
     int df_bonus;               /* Verändert den Verteidigungskill (default: 0) */
     const struct spell *precombatspell;
     struct att attack[10];
-    char bonus[MAXSKILLS];
+    signed char bonus[MAXSKILLS];
     signed char *study_speed;   /* study-speed-bonus in points/turn (0=30 Tage) */
     bool __remove_me_nonplayer;
     int flags;
