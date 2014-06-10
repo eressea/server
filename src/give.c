@@ -286,29 +286,6 @@ void give_men(int n, unit * u, unit * u2, struct order *ord)
     }
 
     if (u2) {
-      if (u2->number != 0 && recruit_archetypes()) {
-        /* must have same set of skills */
-        bool okay = false;
-        if (u->skill_size == u2->skill_size) {
-          int i;
-          for (i = 0; i != u->skill_size; ++i) {
-            int j;
-            for (j = 0; j != u2->skill_size; ++j) {
-              if (u->skills[i].id == u2->skills[j].id)
-                break;
-            }
-            if (j != u2->skill_size)
-              break;
-          }
-          if (i == u->skill_size)
-            okay = true;
-        }
-        if (!okay) {
-          ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "give_cannot_merge",
-              ""));
-        }
-      }
-
       /* Einheiten von Schiffen können nicht NACH in von
        * Nicht-alliierten bewachten Regionen ausführen */
       sh = leftship(u);
