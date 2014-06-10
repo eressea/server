@@ -1,3 +1,7 @@
+# SlickEdit
+*.vtg
+*.vpwhistu
+
 # Microsoft Visual Studio build artefacts
 src/Debug/
 src/Release/
