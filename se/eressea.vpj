@@ -282,7 +282,6 @@
 			<F N="../src/triggers/giveitem.c"/>
 			<F N="../src/attributes/gm.c"/>
 			<F N="../src/modules/gmcmd.c"/>
-			<F N="../src/gmtool.c"/>
 			<F N="../src/util/goodies.c"/>
 			<F N="../src/kernel/group.c"/>
 			<F N="../src/attributes/hate.c"/>
