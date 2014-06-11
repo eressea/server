@@ -27,6 +27,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "eressea.h"
 #include "gmtool.h"
 
+#include "build.h"
 #include "bindings.h"
 #include "races/races.h"
 #include "spells/spells.h"
@@ -102,8 +103,8 @@ static int parse_args(int argc, char **argv, int *exitcode)
       if (strcmp(argv[i] + 2, "version") == 0) {
         printf("\n%s PBEM host\n"
           "Copyright (C) 1996-2005 C. Schlittchen, K. Zedel, E. Rehling, H. Peters.\n\n"
-          "Compilation: " __DATE__ " at " __TIME__ "\nVersion: %d\n\n",
-          global.gamename, RELEASE_VERSION);
+          "Compilation: " __DATE__ " at " __TIME__ "\nVersion: %d.%d.%d\n\n",
+          global.gamename, VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD);
       } else if (strcmp(argv[i] + 2, "color") == 0) {
         /* force the editor to have colors */
         force_color = 1;

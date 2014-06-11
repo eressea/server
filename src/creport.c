@@ -9,6 +9,7 @@ without prior permission by the authors of Eressea.
 
 #include <platform.h>
 #include <kernel/config.h>
+#include "build.h"
 #include "creport.h"
 
 /* tweakable features */
@@ -1496,6 +1497,7 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
   fprintf(F, "%d;Basis\n", 36);
   fprintf(F, "%d;Runde\n", turn);
   fprintf(F, "%d;Zeitalter\n", era);
+  fprintf(F, "%d;Build\n", VERSION_BUILD);
   if (mailto != NULL) {
     fprintf(F, "\"%s\";mailto\n", mailto);
     fprintf(F, "\"%s\";mailcmd\n", locale_string(f->locale, "mailcmd"));

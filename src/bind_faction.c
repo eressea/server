@@ -322,10 +322,6 @@ static int tolua_faction_create(lua_State * L)
   struct locale *loc = find_locale(lang);
   faction *f = NULL;
   const struct race *frace = rc_find(racename);
-  if (frace == NULL)
-    frace = findrace(racename, find_locale("de"));
-  if (frace == NULL)
-    frace = findrace(racename, find_locale("en"));
   if (frace != NULL) {
     f = addfaction(email, NULL, frace, loc, 0);
   }
