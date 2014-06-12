@@ -1179,25 +1179,24 @@ lua_State *lua_init(void) {
   lua_State *L = luaL_newstate();
 
   openlibs(L);
-#ifdef BINDINGS_TOLUA
   register_tolua_helpers();
   tolua_bindings_open(L);
   tolua_eressea_open(L);
+#ifdef USE_SQLITE
   tolua_sqlite_open(L);
+#endif
   tolua_unit_open(L);
   tolua_building_open(L);
   tolua_ship_open(L);
   tolua_region_open(L);
   tolua_faction_open(L);
-#ifdef BSON_ATTRIB
-  tolua_attrib_open(L);
-#endif
   tolua_unit_open(L);
   tolua_message_open(L);
   tolua_hashtable_open(L);
+#ifdef USE_CURSES
   tolua_gmtool_open(L);
-  tolua_storage_open(L);
 #endif
+  tolua_storage_open(L);
   return L;
 }
 

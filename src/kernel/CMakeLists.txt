@@ -52,7 +52,6 @@ ship.c
 skill.c
 spellbook.c
 spell.c
-sqlite.c
 teleport.c
 terrain.c
 unit.c

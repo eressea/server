@@ -6,8 +6,8 @@
 
 int first_turn = 0;
 int first_month = 0;
-int weeks_per_month = 0;
-int months_per_year = 0;
+int weeks_per_month = 4;
+int months_per_year = 12;
 char **seasonnames = NULL;
 char **weeknames = NULL;
 char **weeknames2 = NULL;
@@ -28,7 +28,7 @@ const gamedate *get_gamedate(int turn, gamedate * gd)
   gd->week = t % weeks_per_month;       /* 0 - weeks_per_month-1 */
   gd->month = (t / weeks_per_month + first_month) % months_per_year;    /* 0 - months_per_year-1 */
   gd->year = t / (weeks_per_year) + 1;
-  gd->season = month_season[gd->month];
+  gd->season = month_season ? month_season[gd->month] : 0;
   return gd;
 }
 
