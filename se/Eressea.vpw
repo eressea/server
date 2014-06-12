@@ -2,6 +2,7 @@
 <Workspace Version="10.0" VendorName="SlickEdit">
 	<Projects>
 		<Project File="eressea.vpj"/>
+		<Project File="server.vpj"/>
 		<Project File="tests.vpj"/>
 	</Projects>
 </Workspace>

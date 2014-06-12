@@ -37,7 +37,6 @@
 #include <util/log.h>
 #include <quicklist.h>
 #include <util/rng.h>
-#include <util/sql.h>
 #include <util/unicode.h>
 
 /* libc includes */
@@ -685,13 +684,6 @@ int autoseed(newfaction ** players, int nsize, int max_agediff)
       f = u->faction;
       fset(f, FFL_ISNEW);
       f->alliance = nextf->allies;
-      log_printf(stdout, "New faction (%s), %s at %s\n", itoa36(f->no),
-        f->email, regionname(r, NULL));
-      if (f->subscription) {
-        sql_print(
-          ("UPDATE subscriptions SET status='ACTIVE', faction='%s', firstturn=%d, lastturn=%d WHERE id=%u;\n",
-            factionid(f), f->lastorders, f->lastorders, f->subscription));
-      }
 
       /* remove duplicate email addresses */
       nfp = &nextf->next;

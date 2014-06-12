@@ -80,7 +80,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <quicklist.h>
 #include <util/rand.h>
 #include <util/rng.h>
-#include <util/sql.h>
 #include <util/umlaut.h>
 #include <util/message.h>
 #include <util/rng.h>
@@ -1448,17 +1447,6 @@ static void remove_idle_players(void)
       char info[256];
       sprintf(info, "%d Einheiten, %d Personen, %d Silber",
         f->no_units, f->num_total, f->money);
-      if (f->subscription) {
-        sql_print(
-          ("UPDATE subscriptions SET lastturn=%d, info='%s' WHERE id=%u;\n",
-            f->lastorders, info, f->subscription));
-      }
-    } else {
-      if (f->subscription) {
-        sql_print(
-          ("UPDATE subscriptions SET status='ACTIVE', lastturn=%d, firstturn=greatest(firstturn,%d) WHERE id=%u;\n",
-            f->lastorders, f->lastorders - f->age, f->subscription));
-      }
     }
 
     if (NMRTimeout() > 0 && turn - f->lastorders >= (NMRTimeout() - 1)) {

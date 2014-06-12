@@ -1,0 +1,316 @@
+<!DOCTYPE Project SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpj.dtd">
+<Project
+    Version="10.0"
+    VendorName="SlickEdit"
+    TemplateName="GNU C/C++"
+    WorkingDir="."
+    BuildSystem="vsbuild">
+    <Config
+        Name="Debug"
+        Type="gnuc"
+        DebugCallbackName="gdb"
+        Version="1"
+        OutputFile="%bdserver"
+        CompilerConfigName="Latest Version"
+        Defines='"/DUSE_AUTOCONF"'>
+        <Menu>
+            <Target
+                Name="Compile"
+                MenuCaption="&amp;Compile"
+                Dialog="_gnuc_options_form Compile"
+                CaptureOutputWith="ProcessBuffer"
+                Deletable="0"
+                OutputExts="*.o"
+                SaveOption="SaveCurrent"
+                RunFromDir="%rw">
+                <Exec
+                    CmdLine='gcc -c %xup %defd -g -Wall -Werror -Wsign-compare -Wunreachable-code -Wunused -Wuninitialized %~other -o "%bd%n%oe" %i %f'
+                    OtherOptions="-std=c99"/>
+            </Target>
+            <Target
+                Name="Link"
+                MenuCaption="&amp;Link"
+                ShowOnMenu="Never"
+                Dialog="_gnuc_options_form Link"
+                CaptureOutputWith="ProcessBuffer"
+                Deletable="0"
+                SaveOption="SaveCurrent"
+                RunFromDir="%rw">
+                <Exec CmdLine='gcc %xup -g -Wall -Werror -o "%o" %objs'/>
+            </Target>
+            <Target
+                Name="Build"
+                MenuCaption="&amp;Build"
+                Dialog="_gnuc_options_form Compile"
+                CaptureOutputWith="ProcessBuffer"
+                Deletable="0"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw"
+                DependsRef="Debug">
+                <Exec CmdLine='"%(VSLICKBIN1)vsbuild" "%w" "%r" -t build'/>
+            </Target>
+            <Target
+                Name="Rebuild"
+                MenuCaption="&amp;Rebuild"
+                Dialog="_gnuc_options_form Compile"
+                CaptureOutputWith="ProcessBuffer"
+                Deletable="0"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw"
+                DependsRef="Debug">
+                <Exec CmdLine='"%(VSLICKBIN1)vsbuild" "%w" "%r" -t rebuild'/>
+            </Target>
+            <Target
+                Name="Debug"
+                MenuCaption="&amp;Debug"
+                Dialog="_gnuc_options_form Run/Debug"
+                BuildFirst="1"
+                CaptureOutputWith="ProcessBuffer"
+                Deletable="0"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec CmdLine='vsdebugio -prog "%o"'/>
+            </Target>
+            <Target
+                Name="Execute"
+                MenuCaption="E&amp;xecute"
+                Dialog="_gnuc_options_form Run/Debug"
+                BuildFirst="1"
+                CaptureOutputWith="ProcessBuffer"
+                Deletable="0"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw"
+                RunInXterm="1">
+                <Exec CmdLine='"%o"'/>
+            </Target>
+            <Target
+                Name="dash"
+                MenuCaption="-"
+                Deletable="0">
+                <Exec/>
+            </Target>
+            <Target
+                Name="GNU C Options"
+                MenuCaption="GNU C &amp;Options..."
+                ShowOnMenu="HideIfNoCmdLine"
+                Deletable="0"
+                SaveOption="SaveNone">
+                <Exec
+                    CmdLine="gnucoptions"
+                    Type="Slick-C"/>
+            </Target>
+        </Menu>
+        <List Name="GNUC Options">
+            <Item
+                Name="LinkerOutputType"
+                Value="Executable"/>
+        </List>
+        <Includes>
+            <Include Dir="/usr/include/lua5.2"/>
+            <Include Dir="../build-i686-gcc-Debug/include"/>
+            <Include Dir="../src"/>
+            <Include Dir="../storage"/>
+            <Include Dir="../quicklist"/>
+            <Include Dir="../critbit"/>
+            <Include Dir="../iniparser"/>
+            <Include Dir="../crypto"/>
+        </Includes>
+        <Libs PreObjects="0">
+            <Lib File="%bderessea.a"/>
+            <Lib File="/usr/lib/libtolua.a"/>
+            <Lib File="/usr/lib/i386-linux-gnu/liblua5.2.so"/>
+            <Lib File="/usr/lib/i386-linux-gnu/libncurses.so"/>
+            <Lib File="/usr/lib/i386-linux-gnu/libsqlite3.so"/>
+            <Lib File="/usr/lib/i386-linux-gnu/libm.a"/>
+            <Lib File="/usr/lib/i386-linux-gnu/libpthread.a"/>
+            <Lib File="/usr/lib/i386-linux-gnu/libdl.a"/>
+        </Libs>
+        <Dependencies Name="Debug">
+            <Dependency Project="eressea.vpj"/>
+        </Dependencies>
+    </Config>
+    <Config
+        Name="Release"
+        Type="gnuc"
+        DebugCallbackName="gdb"
+        Version="1"
+        OutputFile="%bdserver"
+        CompilerConfigName="Latest Version"
+        Defines='"/DUSE_AUTOCONF"'>
+        <Menu>
+            <Target
+                Name="Compile"
+                MenuCaption="&amp;Compile"
+                Dialog="_gnuc_options_form Compile"
+                CaptureOutputWith="ProcessBuffer"
+                Deletable="0"
+                OutputExts="*.o"
+                SaveOption="SaveCurrent"
+                RunFromDir="%rw">
+                <Exec
+                    CmdLine='gcc -c %xup %defd -Wall -Werror -Wsign-compare -Wunreachable-code -Wunused -Wuninitialized %~other -o "%bd%n%oe" %i %f'
+                    OtherOptions="-std=c99"/>
+            </Target>
+            <Target
+                Name="Link"
+                MenuCaption="&amp;Link"
+                ShowOnMenu="Never"
+                Dialog="_gnuc_options_form Link"
+                CaptureOutputWith="ProcessBuffer"
+                Deletable="0"
+                SaveOption="SaveCurrent"
+                RunFromDir="%rw">
+                <Exec CmdLine='gcc %xup -Wall -Werror -o "%o" %objs'/>
+            </Target>
+            <Target
+                Name="Build"
+                MenuCaption="&amp;Build"
+                Dialog="_gnuc_options_form Compile"
+                CaptureOutputWith="ProcessBuffer"
+                Deletable="0"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw"
+                DependsRef="Release">
+                <Exec CmdLine='"%(VSLICKBIN1)vsbuild" "%w" "%r" -t build'/>
+            </Target>
+            <Target
+                Name="Rebuild"
+                MenuCaption="&amp;Rebuild"
+                Dialog="_gnuc_options_form Compile"
+                CaptureOutputWith="ProcessBuffer"
+                Deletable="0"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw"
+                DependsRef="Release">
+                <Exec CmdLine='"%(VSLICKBIN1)vsbuild" "%w" "%r" -t rebuild'/>
+            </Target>
+            <Target
+                Name="Debug"
+                MenuCaption="&amp;Debug"
+                Dialog="_gnuc_options_form Run/Debug"
+                BuildFirst="1"
+                CaptureOutputWith="ProcessBuffer"
+                Deletable="0"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec CmdLine='vsdebugio -prog "%o"'/>
+            </Target>
+            <Target
+                Name="Execute"
+                MenuCaption="E&amp;xecute"
+                Dialog="_gnuc_options_form Run/Debug"
+                BuildFirst="1"
+                CaptureOutputWith="ProcessBuffer"
+                Deletable="0"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw"
+                RunInXterm="1">
+                <Exec CmdLine='"%o"'/>
+            </Target>
+            <Target
+                Name="dash"
+                MenuCaption="-"
+                Deletable="0">
+                <Exec/>
+            </Target>
+            <Target
+                Name="GNU C Options"
+                MenuCaption="GNU C &amp;Options..."
+                ShowOnMenu="HideIfNoCmdLine"
+                Deletable="0"
+                SaveOption="SaveNone">
+                <Exec
+                    CmdLine="gnucoptions"
+                    Type="Slick-C"/>
+            </Target>
+        </Menu>
+        <List Name="GNUC Options">
+            <Item
+                Name="LinkerOutputType"
+                Value="Executable"/>
+        </List>
+        <Includes>
+            <Include Dir="/usr/include/lua5.2"/>
+            <Include Dir="../build-i686-gcc-Debug/include"/>
+            <Include Dir="../src"/>
+            <Include Dir="../storage"/>
+            <Include Dir="../quicklist"/>
+            <Include Dir="../critbit"/>
+            <Include Dir="../iniparser"/>
+            <Include Dir="../crypto"/>
+        </Includes>
+        <Libs PreObjects="0">
+            <Lib File="%bderessea.a"/>
+            <Lib File="/usr/lib/libtolua.a"/>
+            <Lib File="/usr/lib/i386-linux-gnu/liblua5.2.so"/>
+            <Lib File="/usr/lib/i386-linux-gnu/libncurses.so"/>
+            <Lib File="/usr/lib/i386-linux-gnu/libsqlite3.so"/>
+            <Lib File="/usr/lib/i386-linux-gnu/libm.a"/>
+            <Lib File="/usr/lib/i386-linux-gnu/libpthread.a"/>
+            <Lib File="/usr/lib/i386-linux-gnu/libdl.a"/>
+        </Libs>
+        <Dependencies Name="Release">
+            <Dependency Project="eressea.vpj"/>
+        </Dependencies>
+    </Config>
+    <Files>
+        <Folder
+            Name="Source Files"
+            Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm;*.go">
+            <F N="../src/bind_building.c"/>
+            <F N="../src/bind_eressea.c"/>
+            <F N="../src/bind_faction.c"/>
+            <F N="../src/bind_gmtool.c"/>
+            <F N="../src/bind_hashtable.c"/>
+            <F N="../src/bind_message.c"/>
+            <F N="../src/bind_monsters.c"/>
+            <F N="../src/bind_process.c"/>
+            <F N="../src/bind_region.c"/>
+            <F N="../src/bind_settings.c"/>
+            <F N="../src/bind_ship.c"/>
+            <F N="../src/bind_sqlite.c"/>
+            <F N="../src/bind_storage.c"/>
+            <F N="../src/bind_unit.c"/>
+            <F N="../src/bindings.c"/>
+            <F N="../src/console.c"/>
+            <F N="../src/eressea.pkg.c"/>
+            <F N="../src/gmtool.c"/>
+            <F N="../src/helpers.c"/>
+            <F N="../src/listbox.c"/>
+            <F N="../src/main.c"/>
+            <F N="../src/process.pkg.c"/>
+            <F N="../src/settings.pkg.c"/>
+            <F N="../src/sqlite.c"/>
+        </Folder>
+        <Folder
+            Name="Header Files"
+            Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.inc;*.sh;*.cpy;*.if">
+            <F N="../src/bind_building.h"/>
+            <F N="../src/bind_eressea.h"/>
+            <F N="../src/bind_faction.h"/>
+            <F N="../src/bind_gmtool.h"/>
+            <F N="../src/bind_hashtable.h"/>
+            <F N="../src/bind_message.h"/>
+            <F N="../src/bind_process.h"/>
+            <F N="../src/bind_region.h"/>
+            <F N="../src/bind_settings.h"/>
+            <F N="../src/bind_ship.h"/>
+            <F N="../src/bind_storage.h"/>
+            <F N="../src/bind_unit.h"/>
+            <F N="../src/bindings.h"/>
+            <F N="../src/gmtool.h"/>
+            <F N="../src/gmtool_structs.h"/>
+            <F N="../src/helpers.h"/>
+            <F N="../src/listbox.h"/>
+        </Folder>
+        <Folder
+            Name="Resource Files"
+            Filters="*.ico;*.cur;*.dlg"/>
+        <Folder
+            Name="Bitmaps"
+            Filters="*.bmp"/>
+        <Folder
+            Name="Other Files"
+            Filters=""/>
+    </Files>
+</Project>

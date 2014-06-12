@@ -46,7 +46,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <quicklist.h>
 #include <util/resolve.h>
 #include <util/rng.h>
-#include <util/sql.h>
 #include <util/variant.h>
 #include <util/unicode.h>
 #include <attributes/otherfaction.h>
@@ -419,10 +418,6 @@ void set_alliance(faction * a, faction * b, int status)
 
 void renumber_faction(faction * f, int no)
 {
-  if (f->subscription) {
-    sql_print(("UPDATE subscriptions set faction='%s' where id=%u;\n",
-        itoa36(no), f->subscription));
-  }
   funhash(f);
   f->no = no;
   fhash(f);

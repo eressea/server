@@ -66,7 +66,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/rand.h>
 #include <util/resolve.h>
 #include <util/rng.h>
-#include <util/sql.h>
 #include <util/umlaut.h>
 #include <util/unicode.h>
 

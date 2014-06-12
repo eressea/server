@@ -81,6 +81,8 @@ set (ERESSEA_SRC
 )
 
 set(SERVER_SRC
+  main.c
+  console.c
   helpers.c
   process.pkg.c
   eressea.pkg.c
@@ -115,7 +117,7 @@ set (SERVER_SRC
   ${SERVER_SRC})
 endif(CURSES_FOUND)
 
-add_executable(eressea ${SERVER_SRC} main.c)
+add_executable(eressea ${SERVER_SRC})
 target_link_libraries(eressea
   ${TOLUA_LIBRARIES}
   ${LUA_LIBRARIES}

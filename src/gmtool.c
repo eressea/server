@@ -15,6 +15,8 @@
 
 #include "gmtool.h"
 #include "gmtool_structs.h"
+#include "console.h"
+#include "listbox.h"
 
 #include <modules/xmas.h>
 #include <modules/gmcmd.h>
@@ -56,8 +58,6 @@
 #include <util/lists.h>
 #include <util/rng.h>
 #include <util/base36.h>
-#include <util/console.h>
-#include <util/listbox.h>
 
 #include <storage.h>
 #include <lua.h>

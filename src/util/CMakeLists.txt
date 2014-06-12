@@ -11,7 +11,6 @@ SET(_FILES
 attrib.c
 base36.c
 bsdstring.c
-console.c
 crmessage.c
 dice.c
 event.c
@@ -26,7 +25,6 @@ nrmessage.c
 parser.c
 rand.c
 resolve.c
-sql.c
 strings.c
 translation.c
 umlaut.c

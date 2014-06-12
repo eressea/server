@@ -23,6 +23,7 @@ without prior permission by the authors of Eressea.
 #include "bind_gmtool.h"
 #include "bind_region.h"
 #include "helpers.h"
+#include "console.h"
 
 #include <kernel/config.h>
 
@@ -61,7 +62,6 @@ without prior permission by the authors of Eressea.
 
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/console.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>

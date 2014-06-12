@@ -67,7 +67,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <quicklist.h>
 #include <util/rand.h>
 #include <util/rng.h>
-#include <util/sql.h>
 #include <util/translation.h>
 #include <util/unicode.h>
 #include <util/umlaut.h>
@@ -100,7 +99,6 @@ bool lomem = false;
 FILE *logfile;
 FILE *updatelog;
 const struct race *new_race[MAXRACES];
-bool sqlpatch = false;
 bool battledebug = false;
 int turn = -1;
 
@@ -2172,7 +2170,6 @@ void kernel_done(void)
    */
   translation_done();
   gc_done();
-  sql_done();
 }
 
 const char *localenames[] = {
@@ -2315,10 +2312,6 @@ void remove_empty_factions(void)
               sfp = &(*sfp)->next;
           }
         }
-      }
-      if (f->subscription) {
-        sql_print(("UPDATE subscriptions set status='DEAD' where id=%u;\n",
-            f->subscription));
       }
 
       *fp = f->next;
@@ -3012,14 +3005,8 @@ void attrib_init(void)
 
 void kernel_init(void)
 {
-  char zBuffer[MAX_PATH];
   attrib_init();
   translation_init();
-
-  if (sqlpatch) {
-    sprintf(zBuffer, "%s/patch-%d.sql", datapath(), turn);
-    sql_init(zBuffer);
-  }
 }
 
 static order * defaults[MAXLOCALES];
@@ -3147,7 +3134,6 @@ void load_inifile(dictionary * d)
   }
 
   verbosity = iniparser_getint(d, "eressea:verbose", 2);
-  sqlpatch = iniparser_getint(d, "eressea:sqlpatch", false);
   battledebug = iniparser_getint(d, "eressea:debug", battledebug) ? 1 : 0;
 
   str = iniparser_getstring(d, "eressea:locales", "de,en");
