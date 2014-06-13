@@ -1,0 +1,8 @@
+$#include "bind_config.h"
+
+module eressea {
+  module config {
+    void config_read @ read(const char *filename);
+    void config_parse @ parse(const char *json);
+  }
+}

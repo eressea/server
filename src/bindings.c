@@ -85,6 +85,7 @@ without prior permission by the authors of Eressea.
 TOLUA_PKG(eressea);
 TOLUA_PKG(process);
 TOLUA_PKG(settings);
+TOLUA_PKG(config);
 
 int log_lua_error(lua_State * L)
 {
@@ -1058,6 +1059,7 @@ int tolua_bindings_open(lua_State * L)
   tolua_eressea_open(L);
   tolua_process_open(L);
   tolua_settings_open(L);
+  tolua_config_open(L);
 
   /* register user types */
   tolua_usertype(L, TOLUA_CAST "spell");
