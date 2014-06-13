@@ -1,4 +1,20 @@
 #!/bin/sh
+ROOT=$(pwd)
+while [ ! -d $ROOT/.git ]; do
+  ROOT=$(dirname $ROOT)
+  if [ "$ROOT" == "/" ; then
+    echo "could not find root, are you in the git repository?"
+    exit
+  fi
+done
+
+MACHINE=`uname -m`
+[ -z "$CC" ] && [ ! -z `which gcc` ] && CC="gcc"
+[ -z "$CC" ] && [ ! -z `which tcc` ] && CC="tcc"
+[ -z "$CC" ] && [ ! -z `which cc` ] && CC="cc"
+BIN_DIR="build-$MACHINE-$CC-Debug"
+cd $BIN_DIR
+
 if [ ! -e ../CMakeLists.txt ]; then
   echo "are you sure you are in the build directory?"
   exit
@@ -26,3 +42,4 @@ cmake .. \
  -DCMAKE_INCLUDE_PATH=$INCLUDE_PATH \
  -DCMAKE_PREFIX_PATH=$PREFIX_PATH \
  -DCMAKE_INSTALL_PREFIX=$HOME/eressea $*
+cd -

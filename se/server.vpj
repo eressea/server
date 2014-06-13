@@ -258,6 +258,7 @@
             Name="Source Files"
             Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm;*.go">
             <F N="../src/bind_building.c"/>
+            <F N="../src/bind_config.c"/>
             <F N="../src/bind_eressea.c"/>
             <F N="../src/bind_faction.c"/>
             <F N="../src/bind_gmtool.c"/>
@@ -272,6 +273,7 @@
             <F N="../src/bind_storage.c"/>
             <F N="../src/bind_unit.c"/>
             <F N="../src/bindings.c"/>
+            <F N="../src/config.pkg.c"/>
             <F N="../src/console.c"/>
             <F N="../src/eressea.pkg.c"/>
             <F N="../src/gmtool.c"/>
@@ -286,6 +288,7 @@
             Name="Header Files"
             Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.inc;*.sh;*.cpy;*.if">
             <F N="../src/bind_building.h"/>
+            <F N="../src/bind_config.h"/>
             <F N="../src/bind_eressea.h"/>
             <F N="../src/bind_faction.h"/>
             <F N="../src/bind_gmtool.h"/>
