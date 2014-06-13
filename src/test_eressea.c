@@ -72,5 +72,6 @@ int RunAllTests(void)
 }
 
 int main(int argc, char ** argv) {
-  return RunAllTests();
+    log_stderr = 0;
+    return RunAllTests();
 }

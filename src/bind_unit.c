@@ -849,7 +849,7 @@ static int tolua_unit_set_race(lua_State * L)
 {
     unit *self = (unit *) tolua_tousertype(L, 1, 0);
     const char *rcname = tolua_tostring(L, 2, 0);
-    race *rc = rc_find(rcname);
+    const race *rc = rc_find(rcname);
     if (rc != NULL) {
         if (self->irace == u_race(self)) {
             self->irace = NULL;

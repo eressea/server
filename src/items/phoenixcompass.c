@@ -49,7 +49,7 @@ use_phoenixcompass(struct unit *u, const struct item_type *itype,
   direction_t direction;
   unit *u2;
   direction_t closest_neighbour_direction = 0;
-  static race *rc_phoenix = NULL;
+  static const race *rc_phoenix = NULL;
 
   if (rc_phoenix == NULL) {
     rc_phoenix = rc_find("phoenix");

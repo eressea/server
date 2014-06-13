@@ -1988,7 +1988,7 @@ int name_cmd(struct unit *u, struct order *ord)
       } else {
         const struct locale *lang = locales;
         for (; lang; lang = nextlocale(lang)) {
-          const char *sdname = LOC(lang, sh->type->name[0]);
+          const char *sdname = LOC(lang, sh->type->_name);
           size_t sdlen = strlen(sdname);
           if (strlen(sh->name) >= sdlen
             && strncmp(sh->name, sdname, sdlen) == 0) {

@@ -71,7 +71,7 @@ static void test_defenders_get_building_bonus(CuTest * tc)
   test_cleanup();
   test_create_world();
   r = findregion(0, 0);
-  btype = bt_find("castle");
+  btype = bt_get_or_create("castle");
   btype->protection = &add_two;
   bld = test_create_building(r, btype);
   bld->size = 10;
@@ -114,7 +114,7 @@ static void test_attackers_get_no_building_bonus(CuTest * tc)
   test_cleanup();
   test_create_world();
   r = findregion(0, 0);
-  btype = bt_find("castle");
+  btype = bt_get_or_create("castle");
   btype->protection = &add_two;
   bld = test_create_building(r, btype);
   bld->size = 10;
@@ -143,7 +143,7 @@ static void test_building_bonus_respects_size(CuTest * tc)
   test_cleanup();
   test_create_world();
   r = findregion(0, 0);
-  btype = bt_find("castle");
+  btype = bt_get_or_create("castle");
   btype->protection = &add_two;
   bld = test_create_building(r, btype);
   bld->size = 10;

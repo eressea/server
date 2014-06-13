@@ -32,7 +32,7 @@ static unsigned int get_markets(region * r, unit ** results, size_t size)
 {
   unsigned int n = 0;
   building *b;
-  static building_type *btype;
+  static const building_type *btype;
   if (!btype)
     btype = bt_find("market");
   if (!btype)

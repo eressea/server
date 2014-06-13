@@ -1879,11 +1879,11 @@ nr_ship(FILE * F, const seen_region * sr, const ship * sh, const faction * f,
     n = (n + 99) / 100;         /* 1 Silber = 1 GE */
 
     bytes = _snprintf(bufp, size, "%s, %s, (%d/%d)", shipname(sh),
-      LOC(f->locale, sh->type->name[0]), n, shipcapacity(sh) / 100);
+      LOC(f->locale, sh->type->_name), n, shipcapacity(sh) / 100);
   } else {
     bytes =
       _snprintf(bufp, size, "%s, %s", shipname(sh), LOC(f->locale,
-        sh->type->name[0]));
+        sh->type->_name));
   }
   if (wrptr(&bufp, &size, bytes) != 0)
     WARN_STATIC_BUFFER();

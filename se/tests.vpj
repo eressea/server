@@ -279,8 +279,10 @@
             Name="Other Files"
             Filters="">
             <F N="../scripts/tests/config.lua"/>
+            <F N="../scripts/tests/rules.lua"/>
             <F N="../scripts/runtests.lua"/>
             <F N="../scripts/tests/settings.lua"/>
+            <F N="../scripts/tests/ships.lua"/>
         </Folder>
     </Files>
 </Project>

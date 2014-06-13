@@ -26,7 +26,7 @@ static void test_new_building_can_be_renamed(CuTest * tc)
   test_cleanup();
   test_create_world();
 
-  btype = bt_find("castle");
+  btype = bt_get_or_create("castle");
   r = findregion(-1, 0);
 
   b = new_building(btype, r, default_locale);
@@ -44,7 +44,7 @@ static void test_rename_building(CuTest * tc)
   test_cleanup();
   test_create_world();
 
-  btype = bt_find("castle");
+  btype = bt_get_or_create("castle");
 
   r = findregion(-1, 0);
   b = new_building(btype, r, default_locale);
@@ -67,7 +67,7 @@ static void test_rename_building_twice(CuTest * tc)
   test_cleanup();
   test_create_world();
 
-  btype = bt_find("castle");
+  btype = bt_get_or_create("castle");
 
   r = findregion(-1, 0);
   b = new_building(btype, r, default_locale);

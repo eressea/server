@@ -25,9 +25,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* modules include */
 #include "score.h"
 
-/* attributes include */
-#include <attributes/giveitem.h>
-
 /* items include */
 #include <items/demonseye.h>
 

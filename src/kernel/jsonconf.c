@@ -49,6 +49,28 @@ without prior permission by the authors of Eressea.
 #include <limits.h>
 #include <string.h>
 
+void json_building(cJSON *json, building_type *rc) {
+    cJSON *child;
+    if (json->type!=cJSON_Object) {
+        log_error("building %s is not a json object: %d\n", json->string, json->type);
+        return;
+    }
+    for (child=json->child;child;child=child->next) {
+        log_error("building %s contains unknown attribute %s\n", json->string, child->string);
+    }
+}
+
+void json_ship(cJSON *json, ship_type *rc) {
+    cJSON *child;
+    if (json->type!=cJSON_Object) {
+        log_error("ship %s is not a json object: %d\n", json->string, json->type);
+        return;
+    }
+    for (child=json->child;child;child=child->next) {
+        log_error("ship %s contains unknown attribute %s\n", json->string, child->string);
+    }
+}
+
 void json_race(cJSON *json, race *rc) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
@@ -119,6 +141,28 @@ void json_race(cJSON *json, race *rc) {
     }
 }
 
+void json_buildings(cJSON *json) {
+    cJSON *child;
+    if (json->type!=cJSON_Object) {
+        log_error("ships is not a json object: %d\n", json->type);
+        return;
+    }
+    for (child=json->child;child;child=child->next) {
+        json_building(child, bt_get_or_create(child->string));
+    }
+}
+
+void json_ships(cJSON *json) {
+    cJSON *child;
+    if (json->type!=cJSON_Object) {
+        log_error("ships is not a json object: %d\n", json->type);
+        return;
+    }
+    for (child=json->child;child;child=child->next) {
+        json_ship(child, st_get_or_create(child->string));
+    }
+}
+
 void json_races(cJSON *json) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
@@ -126,11 +170,7 @@ void json_races(cJSON *json) {
         return;
     }
     for (child=json->child;child;child=child->next) {
-        race * rc = rc_find(child->string);
-        if (!rc) {
-            rc = rc_add(rc_new((const char *)child->string));
-            json_race(child, rc);
-        }
+        json_race(child, rc_get_or_create(child->string));
     }
 }
 
@@ -143,6 +183,14 @@ void json_config(cJSON *json) {
     child = cJSON_GetObjectItem(json, "races");
     if (child && child->type==cJSON_Object) {
         json_races(child);
+    }
+    child = cJSON_GetObjectItem(json, "ships");
+    if (child && child->type==cJSON_Object) {
+        json_ships(child);
+    }
+    child = cJSON_GetObjectItem(json, "buildings");
+    if (child && child->type==cJSON_Object) {
+        json_buildings(child);
     }
 }
 

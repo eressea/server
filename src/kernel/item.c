@@ -847,7 +847,7 @@ use_bloodpotion(struct unit *u, const struct item_type *itype, int amount,
   } else {
     const race *irace = u_irace(u);
     if (irace == u_race(u)) {
-      static race *rcfailure;
+      static const race *rcfailure;
       if (!rcfailure) {
         rcfailure = rc_find("smurf");
         if (!rcfailure)

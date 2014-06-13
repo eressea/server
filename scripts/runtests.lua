@@ -3,5 +3,7 @@
 require "lunit"
 require "tests.settings"
 require "tests.config"
+-- require "tests.ships"
+
 lunit.main()
 

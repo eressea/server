@@ -758,7 +758,7 @@ static int config_get_ships(lua_State * L)
   lua_createtable(L, ql_length(shiptypes), 0);
   for (qi = 0, ql = shiptypes; ql; ql_advance(&ql, &qi, 1)) {
     ship_type *stype = (ship_type *) ql_get(ql, qi);
-    tolua_pushstring(L, TOLUA_CAST stype->name[0]);
+    tolua_pushstring(L, TOLUA_CAST stype->_name);
     lua_rawseti(L, -2, ++i);
   }
   return 1;

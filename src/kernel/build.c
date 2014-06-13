@@ -886,8 +886,7 @@ create_ship(region * r, unit * u, const struct ship_type *newtype, int want,
   /* check if skill and material for 1 size is available */
   if (eff_skill(u, cons->skill, r) < cons->minskill) {
     ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
-        "error_build_skill_low", "value name", cons->minskill,
-        newtype->name[1]));
+        "error_build_skill_low", "value", cons->minskill));
     return;
   }
 
@@ -946,8 +945,7 @@ void continue_ship(region * r, unit * u, int want)
   }
   if (eff_skill(u, cons->skill, r) < cons->minskill) {
     ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
-        "error_build_skill_low", "value name", cons->minskill,
-        sh->type->name[1]));
+        "error_build_skill_low", "value", cons->minskill));
     return;
   }
   msize = maxbuild(u, cons);

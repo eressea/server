@@ -32,7 +32,7 @@ extern "C" {
 #define SFL_NOCOAST 0x04
 
   typedef struct ship_type {
-    const char *name[2];
+    const char *_name;
 
     int range;                  /* range in regions */
     int flags;                  /* flags */
@@ -64,7 +64,7 @@ extern "C" {
 /* Alte Schiffstypen: */
 
   extern const ship_type *st_find(const char *name);
-  extern void st_register(const ship_type * type);
+  extern ship_type *st_get_or_create(const char *name);
 
 #define NOSHIP NULL
 

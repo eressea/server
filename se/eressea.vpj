@@ -276,7 +276,6 @@
             <F N="../src/util/functions.c"/>
             <F N="../src/triggers/gate.c"/>
             <F N="../src/give.c"/>
-            <F N="../src/attributes/giveitem.c"/>
             <F N="../src/triggers/giveitem.c"/>
             <F N="../src/attributes/gm.c"/>
             <F N="../src/modules/gmcmd.c"/>
@@ -430,7 +429,6 @@
             <F N="../src/util/functions.h"/>
             <F N="../src/triggers/gate.h"/>
             <F N="../src/give.h"/>
-            <F N="../src/attributes/giveitem.h"/>
             <F N="../src/triggers/giveitem.h"/>
             <F N="../src/attributes/gm.h"/>
             <F N="../src/modules/gmcmd.h"/>

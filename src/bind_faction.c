@@ -393,7 +393,7 @@ static int tolua_faction_set_race(lua_State * L)
 {
   faction *self = (faction *) tolua_tousertype(L, 1, 0);
   const char *name = tolua_tostring(L, 2, 0);
-  race *rc = rc_find(name);
+  const race *rc = rc_find(name);
   if (rc != NULL) {
     self->race = rc;
   }

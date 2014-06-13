@@ -516,15 +516,13 @@ static int parse_ships(xmlDocPtr doc)
     for (i = 0; i != nodes->nodeNr; ++i) {
       xmlNodePtr child, node = nodes->nodeTab[i];
       xmlChar *propValue;
-      ship_type *st = (ship_type *)calloc(sizeof(ship_type), 1);
+      ship_type *st;
       xmlXPathObjectPtr result;
       int k, c;
 
       propValue = xmlGetProp(node, BAD_CAST "name");
       assert(propValue != NULL);
-      st->name[0] = _strdup((const char *)propValue);
-      st->name[1] =
-        strcat(strcpy(malloc(strlen(st->name[0]) + 3), st->name[0]), "_a");
+      st = st_get_or_create((const char *)propValue);
       xmlFree(propValue);
 
       st->cabins = xml_ivalue(node, "cabins", 0) * PERSON_WEIGHT;
@@ -583,14 +581,11 @@ static int parse_ships(xmlDocPtr doc)
         if (st->coasts[c] != NULL)
           ++c;
         else {
-          log_warning("ship %s mentions a non-existing terrain %s.\n", st->name[0], propValue);
+          log_warning("ship %s mentions a non-existing terrain %s.\n", st->_name, propValue);
         }
         xmlFree(propValue);
       }
       xmlXPathFreeObject(result);
-
-      /* finally, register the new building type */
-      st_register(st);
     }
   }
   xmlXPathFreeObject(ships);
@@ -777,7 +772,7 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
       if (propValue != NULL) {
         const race *rc = rc_find((const char *)propValue);
         if (rc == NULL)
-          rc = rc_add(rc_new((const char *)propValue));
+          rc = rc_get_or_create((const char *)propValue));
         racelist_insert(&wtype->modifiers[k].races, rc);
         xmlFree(propValue);
       }
@@ -1102,7 +1097,7 @@ static int parse_resources(xmlDocPtr doc)
           if (propValue != NULL) {
             rc = rc_find((const char *)propValue);
             if (rc == NULL)
-              rc = rc_add(rc_new((const char *)propValue));
+              rc = rc_get_or_create((const char *)propValue);
             xmlFree(propValue);
           }
           rdata->modifiers[k].race = rc;
@@ -1697,7 +1692,7 @@ static int parse_races(xmlDocPtr doc)
     assert(propValue != NULL);
     rc = rc_find((const char *)propValue);
     if (rc == NULL)
-      rc = rc_add(rc_new((const char *)propValue));
+      rc = rc_get_or_create((const char *)propValue);
     xmlFree(propValue);
 
     propValue = xmlGetProp(node, BAD_CAST "damage");
@@ -1887,7 +1882,7 @@ static int parse_races(xmlDocPtr doc)
       assert(propValue != NULL);
       frc = rc_find((const char *)propValue);
       if (!frc) {
-        frc = rc_add(rc_new((const char *)propValue));
+        frc = rc_get_or_create((const char *)propValue);
       }
       if (xml_bvalue(node, "default", false)) {
         rc->familiars[k] = rc->familiars[0];

@@ -18,11 +18,9 @@ static void test_register_ship(CuTest * tc)
 
   test_cleanup();
 
-  stype = (ship_type *)calloc(sizeof(ship_type), 1);
-  stype->name[0] = _strdup("herp");
-  st_register(stype);
-
-  CuAssertPtrNotNull(tc, st_find("herp"));
+  stype = st_get_or_create("herp");
+  CuAssertPtrNotNull(tc, stype);
+  CuAssertPtrEquals(tc, stype, (void *)st_find("herp"));
 }
 
 static void test_ship_set_owner(CuTest * tc)

@@ -180,7 +180,7 @@ static int tolua_ship_get_coast(lua_State * L)
 static int tolua_ship_get_type(lua_State * L)
 {
     ship *self = (ship *) tolua_tousertype(L, 1, 0);
-    tolua_pushstring(L, self->type->name[0]);
+    tolua_pushstring(L, self->type->_name);
     return 1;
 }
 

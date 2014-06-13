@@ -59,13 +59,13 @@ static void test_building_type_exists(CuTest * tc)
 {
   region *r;
   building *b;
-  building_type *btype;
-  building_type *btype2 = (building_type *)calloc(1, sizeof(building_type));
+  building_type *btype, *btype2;
 
   test_cleanup();
   test_create_world();
 
-  btype = bt_find("castle");
+  btype2 = bt_get_or_create("lighthouse");
+  btype = bt_get_or_create("castle");
 
   r = findregion(-1, 0);
   b = new_building(btype, r, default_locale);

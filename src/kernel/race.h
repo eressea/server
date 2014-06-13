@@ -109,10 +109,9 @@ extern "C" {
   extern struct race_list *get_familiarraces(void);
   extern struct race *races;
 
-  extern struct race *rc_find(const char *);
-  extern const char *rc_name(const struct race *, int);
-  extern struct race *rc_add(struct race *);
-  extern struct race *rc_new(const char *zName);
+  extern race *rc_get_or_create(const char *name);
+  extern const race *rc_find(const char *);
+  extern const char *rc_name(const race *, int);
   extern int rc_specialdamage(const race *, const race *,
     const struct weapon_type *);
   void free_races(void);

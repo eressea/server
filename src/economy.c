@@ -1753,7 +1753,7 @@ int make_cmd(unit * u, struct order *ord)
       /* if the item cannot be made, we probably didn't mean to make it */
       itype = NULL;
     } else if (stype != NULL) {
-      const char *sname = LOC(lang, stype->name[0]);
+      const char *sname = LOC(lang, stype->_name);
       const char *iname = LOC(lang, resourcename(itype->rtype, 0));
       if (strlen(iname) < strlen(sname))
         stype = NULL;
@@ -1771,7 +1771,7 @@ int make_cmd(unit * u, struct order *ord)
 
   if (btype != NULL && stype != NULL) {
     const char *bname = LOC(lang, btype->_name);
-    const char *sname = LOC(lang, stype->name[0]);
+    const char *sname = LOC(lang, stype->_name);
     if (strlen(sname) < strlen(bname))
       btype = NULL;
     else

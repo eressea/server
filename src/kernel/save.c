@@ -1881,7 +1881,7 @@ int writegame(const char *filename)
       write_ship_reference(sh, &store);
       WRITE_STR(&store, (const char *)sh->name);
       WRITE_STR(&store, sh->display ? (const char *)sh->display : "");
-      WRITE_TOK(&store, sh->type->name[0]);
+      WRITE_TOK(&store, sh->type->_name);
       WRITE_INT(&store, sh->size);
       WRITE_INT(&store, sh->damage);
       WRITE_INT(&store, sh->flags & SFL_SAVEMASK);

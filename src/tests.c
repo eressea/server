@@ -24,7 +24,7 @@
 
 struct race *test_create_race(const char *name)
 {
-  race *rc = rc_add(rc_new(name));
+  race *rc = rc_get_or_create(name);
   rc->flags |= RCF_PLAYERRACE;
   rc->maintenance = 10;
   return rc;
@@ -97,11 +97,8 @@ ship * test_create_ship(region * r, const ship_type * stype)
 
 ship_type * test_create_shiptype(const char ** names)
 {
-  ship_type * stype = (ship_type*)calloc(sizeof(ship_type), 1);
-  stype->name[0] = _strdup(names[0]);
-  stype->name[1] = _strdup(names[1]);
+  ship_type * stype = st_get_or_create(names[0]);
   locale_setstring(default_locale, names[0], names[0]);
-  st_register(stype);
   return stype;
 }
 

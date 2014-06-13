@@ -394,7 +394,7 @@ static void paint_info_region(window * wnd, const state * st)
       wattroff(win, A_BOLD | COLOR_PAIR(COLOR_YELLOW));
       for (sh = r->ships; sh && line < maxline; sh = sh->next) {
         mvwprintw(win, line, 1, "%.4s ", itoa36(sh->no));
-        mvwaddnstr(win, line++, 6, (char *)sh->type->name[0], size - 5);
+        mvwaddnstr(win, line++, 6, (char *)sh->type->_name, size - 5);
       }
     }
     if (r->units && (st->info_flags & IFL_FACTIONS)) {

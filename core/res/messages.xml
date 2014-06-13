@@ -8461,10 +8461,9 @@
       <arg name="unit" type="unit"/>
       <arg name="command" type="order"/>
       <arg name="value" type="int"/>
-      <arg name="name" type="string"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Um $localize($name) zu bauen, braucht man ein Talent von mindestens $int($value)."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - To build $localize($name) requires a skill of at least $int($value)."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Um das zu bauen, braucht man ein Talent von mindestens $int($value)."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This requires a skill of at least $int($value) to build."</text>
   </message>
 
   <message name="slave_active" section="battle">

@@ -131,7 +131,7 @@ typedef struct building_typelist {
 quicklist *buildingtypes = NULL;
 
 /* Returns a building type for the (internal) name */
-building_type *bt_find(const char *name)
+static building_type *bt_find_i(const char *name)
 {
   quicklist *ql;
   int qi;
@@ -146,6 +146,11 @@ building_type *bt_find(const char *name)
   return NULL;
 }
 
+const building_type *bt_find(const char *name)
+{
+    return bt_find_i(name);
+}
+
 void bt_register(building_type * type)
 {
   if (type->init) {
@@ -157,7 +162,7 @@ void bt_register(building_type * type)
 building_type *bt_get_or_create(const char *name)
 {
   if (name != NULL) {
-    building_type *btype = bt_find(name);
+    building_type *btype = bt_find_i(name);
     if (btype == NULL) {
       btype = calloc(sizeof(building_type), 1);
       btype->_name = _strdup(name);
