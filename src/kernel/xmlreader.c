@@ -617,7 +617,7 @@ static void race_compat(void)
     if (rcname == NULL) {
       new_race[i] = NULL;
     } else {
-      race *rc = rc_find(oldracenames[i]);
+      race *rc = rc_get_or_create(oldracenames[i]);
       if (rc) {
         new_race[i] = rc;
         if (rc == new_race[RC_TROLL]) {
@@ -772,7 +772,7 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
       if (propValue != NULL) {
         const race *rc = rc_find((const char *)propValue);
         if (rc == NULL)
-          rc = rc_get_or_create((const char *)propValue));
+          rc = rc_get_or_create((const char *)propValue);
         racelist_insert(&wtype->modifiers[k].races, rc);
         xmlFree(propValue);
       }
@@ -1690,9 +1690,7 @@ static int parse_races(xmlDocPtr doc)
 
     propValue = xmlGetProp(node, BAD_CAST "name");
     assert(propValue != NULL);
-    rc = rc_find((const char *)propValue);
-    if (rc == NULL)
-      rc = rc_get_or_create((const char *)propValue);
+    rc = rc_get_or_create((const char *)propValue);
     xmlFree(propValue);
 
     propValue = xmlGetProp(node, BAD_CAST "damage");
@@ -1880,10 +1878,7 @@ static int parse_races(xmlDocPtr doc)
 
       propValue = xmlGetProp(node, BAD_CAST "race");
       assert(propValue != NULL);
-      frc = rc_find((const char *)propValue);
-      if (!frc) {
-        frc = rc_get_or_create((const char *)propValue);
-      }
+      frc = rc_get_or_create((const char *)propValue);
       if (xml_bvalue(node, "default", false)) {
         rc->familiars[k] = rc->familiars[0];
         rc->familiars[0] = frc;
