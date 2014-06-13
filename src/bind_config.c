@@ -3,6 +3,7 @@
 #include <platform.h>
 #include <kernel/types.h>
 #include <kernel/jsonconf.h>
+#include <util/log.h>
 #include <cJSON.h>
 
 void config_parse(const char *json)
@@ -11,6 +12,8 @@ void config_parse(const char *json)
     if (conf) {
         json_config(conf); 
         cJSON_Delete(conf);
+    } else {
+        log_error("json parse error: %s\n", cJSON_GetErrorPtr());
     }
 }
 

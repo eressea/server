@@ -114,6 +114,7 @@
             <Include Dir="../critbit"/>
             <Include Dir="../iniparser"/>
             <Include Dir="../crypto"/>
+            <Include Dir="../cJSON"/>
         </Includes>
         <Libs PreObjects="0">
             <Lib File="%bderessea.a"/>
@@ -238,6 +239,7 @@
             <Include Dir="../critbit"/>
             <Include Dir="../iniparser"/>
             <Include Dir="../crypto"/>
+            <Include Dir="../cJSON"/>
         </Includes>
         <Libs PreObjects="0">
             <Lib File="%bderessea.a"/>

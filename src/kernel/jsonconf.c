@@ -47,9 +47,37 @@ without prior permission by the authors of Eressea.
 #include <assert.h>
 #include <ctype.h>
 #include <limits.h>
+#include <stdlib.h>
 #include <string.h>
 
-void json_building(cJSON *json, building_type *rc) {
+void json_construction(cJSON *json, construction **consp) {
+    cJSON *child;
+    if (json->type!=cJSON_Object) {
+        log_error("building %s is not a json object: %d\n", json->string, json->type);
+        return;
+    }
+    construction * cons = (construction *)calloc(sizeof(construction), 1);
+    for (child=json->child;child;child=child->next) {
+        switch(child->type) {
+        case cJSON_Number:
+            if (strcmp(child->string, "maxsize")==0) {
+                cons->maxsize = child->valueint;
+            }
+            else if (strcmp(child->string, "reqsize")==0) {
+                cons->reqsize = child->valueint;
+            }
+            else if (strcmp(child->string, "minskill")==0) {
+                cons->minskill = child->valueint;
+            }
+            break; 
+        default:
+            log_error("building %s contains unknown attribute %s\n", json->string, child->string);
+        }
+    }
+    *consp = cons;
+}
+
+void json_building(cJSON *json, building_type *st) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
         log_error("building %s is not a json object: %d\n", json->string, json->type);
@@ -60,14 +88,22 @@ void json_building(cJSON *json, building_type *rc) {
     }
 }
 
-void json_ship(cJSON *json, ship_type *rc) {
+void json_ship(cJSON *json, ship_type *st) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
         log_error("ship %s is not a json object: %d\n", json->string, json->type);
         return;
     }
     for (child=json->child;child;child=child->next) {
-        log_error("ship %s contains unknown attribute %s\n", json->string, child->string);
+        switch(child->type) {
+        case cJSON_Object:
+            if (strcmp(child->string, "construction")==0) {
+                json_construction(child, &st->construction);
+            }
+            break;
+        default:
+            log_error("ship %s contains unknown attribute %s\n", json->string, child->string);
+        }
     }
 }
 

@@ -234,6 +234,12 @@ void free_ship(ship * s)
   free(s);
 }
 
+void free_shiptypes(void) {
+    ql_foreach(shiptypes, free);
+    ql_free(shiptypes);
+    shiptypes = 0;
+}
+
 void free_ships(void)
 {
   while (deleted_ships) {
