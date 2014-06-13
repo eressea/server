@@ -1,0 +1,9 @@
+$#include <util/log.h>
+
+module eressea {
+  module log {
+    void log_error @ error(const char *message);
+    void log_warning @ warning(const char *message);
+  }
+}
+

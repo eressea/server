@@ -48,6 +48,7 @@ MACRO(TOLUA_BINDING PKGFILE FILES)
 ENDMACRO(TOLUA_BINDING)
 
 IF(NOT MSVC)
+TOLUA_BINDING(log.pkg util/log.h)
 TOLUA_BINDING(config.pkg bind_config.h)
 TOLUA_BINDING(process.pkg bind_process.h)
 TOLUA_BINDING(eressea.pkg bind_eressea.h)
@@ -86,6 +87,7 @@ set(SERVER_SRC
   console.c
   helpers.c
   config.pkg.c
+  log.pkg.c
   process.pkg.c
   eressea.pkg.c
   settings.pkg.c

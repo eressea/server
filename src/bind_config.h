@@ -4,8 +4,8 @@
 extern "C" {
 #endif
 
-void config_parse(const char *json);
-void config_read(const char *filename);
+int config_parse(const char *json);
+int config_read(const char *filename);
 
 #ifdef __cplusplus
 }

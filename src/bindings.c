@@ -86,6 +86,7 @@ TOLUA_PKG(eressea);
 TOLUA_PKG(process);
 TOLUA_PKG(settings);
 TOLUA_PKG(config);
+TOLUA_PKG(log);
 
 int log_lua_error(lua_State * L)
 {
@@ -1060,6 +1061,7 @@ int tolua_bindings_open(lua_State * L)
   tolua_process_open(L);
   tolua_settings_open(L);
   tolua_config_open(L);
+  tolua_log_open(L);
 
   /* register user types */
   tolua_usertype(L, TOLUA_CAST "spell");

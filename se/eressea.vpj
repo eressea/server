@@ -547,6 +547,8 @@
             Filters="*.bmp"/>
         <Folder
             Name="Other Files"
-            Filters=""/>
+            Filters="">
+            <F N="../src/log.pkg"/>
+        </Folder>
     </Files>
 </Project>

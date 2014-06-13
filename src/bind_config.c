@@ -5,18 +5,33 @@
 #include <kernel/jsonconf.h>
 #include <util/log.h>
 #include <cJSON.h>
+#include <string.h>
 
-void config_parse(const char *json)
+int config_parse(const char *json)
 {
     cJSON * conf = cJSON_Parse(json);
     if (conf) {
         json_config(conf); 
         cJSON_Delete(conf);
+        return 0;
     } else {
-        log_error("json parse error: %s\n", cJSON_GetErrorPtr());
+        int line;
+        char buffer[10];
+        const char *xp = json, *lp, *ep = cJSON_GetErrorPtr();
+        for (line=0;xp && xp<ep;++line) {
+            lp = xp;
+            xp = strchr(xp, '\n');
+        }
+        xp = (ep > json + 10) ? ep - 10 : json; 
+        strncpy(buffer, xp, sizeof(buffer));
+        buffer[9] = 0;
+        log_error("json parse error in line %d, position %d, near `%s`\n", line, ep-lp, buffer);
+        return 1;
     }
 }
 
-void config_read(const char *filename)
+int config_read(const char *filename)
 {
+    return 1;
 }
+
