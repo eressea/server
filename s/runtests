@@ -15,8 +15,7 @@ if [ ! -d $ROOT/$BIN_DIR ]; then
   exit
 fi
 
-echo $ROOT
 $ROOT/$BIN_DIR/eressea/test_eressea
-cd $ROOT/scripts
-$ROOT/$BIN_DIR/eressea/eressea -v0 runtests.lua
-
+cd $ROOT
+$ROOT/$BIN_DIR/eressea/eressea -v0 scripts/runtests.lua
+cd -
