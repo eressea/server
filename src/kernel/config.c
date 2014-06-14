@@ -1351,6 +1351,8 @@ keyword_t findkeyword(const char *s, const struct locale * lang)
   keyword_t result = NOKEYWORD;
   char buffer[64];
 
+  assert(lang);
+  assert(s);
   while (*s == '@') ++s;
 
   if (*s) {
@@ -1361,6 +1363,7 @@ keyword_t findkeyword(const char *s, const struct locale * lang)
       const void * match;
       void **tokens = get_translations(lang, UT_KEYWORDS);
       critbit_tree *cb = (critbit_tree *)*tokens;
+      assert(cb);
       if (cb_find_prefix(cb, str, strlen(str), &match, 1, 0)) {
         cb_get_kv(match, &i, sizeof(int));
         result = (keyword_t)i;
@@ -1965,12 +1968,13 @@ static void init_translations(const struct locale *lang, int ut, const char * (*
   for (i = 0; i != maxstrings; ++i) {
     const char * s = string_cb(i);
     const char * key = s ? locale_string(lang, s) : 0;
+    key = key ? key : s;
     if (key) {
       char * str = transliterate(buffer, sizeof(buffer)-sizeof(int), key);
       if (str) {
         critbit_tree * cb = (critbit_tree *)*tokens;
-		size_t len = strlen(str);
-		if (!cb) {
+        size_t len = strlen(str);
+        if (!cb) {
           *tokens = cb = (critbit_tree *)calloc(1, sizeof(critbit_tree *));
         }
         len = cb_new_kv(str, len, &i, sizeof(int), buffer);
@@ -2002,61 +2006,59 @@ static const char * skill_key(int sk)
 
 static void init_locale(const struct locale *lang)
 {
-  variant var;
-  int i;
-  const struct race *rc;
-  const terrain_type *terrain;
-  void **tokens;
+    variant var;
+    int i;
+    const struct race *rc;
+    const terrain_type *terrain;
+    void **tokens;
 
-  tokens = get_translations(lang, UT_MAGIC);
-  if (tokens) {
-    const char *str = get_param(global.parameters, "rules.magic.playerschools");
-    char *sstr, *tok;
-    if (str == NULL) {
-      str = "gwyrrd illaun draig cerddor tybied";
+    tokens = get_translations(lang, UT_MAGIC);
+    if (tokens) {
+        const char *str = get_param(global.parameters, "rules.magic.playerschools");
+        char *sstr, *tok;
+        if (str == NULL) {
+            str = "gwyrrd illaun draig cerddor tybied";
+        }
+
+        sstr = _strdup(str);
+        tok = strtok(sstr, " ");
+        while (tok) {
+            for (i = 0; i != MAXMAGIETYP; ++i) {
+                if (strcmp(tok, magic_school[i]) == 0) break;
+            }
+            assert(i != MAXMAGIETYP);
+            var.i = i;
+            addtoken(tokens, LOC(lang, mkname("school", tok)), var);
+            tok = strtok(NULL, " ");
+        }
+        free(sstr);
     }
 
-    sstr = _strdup(str);
-    tok = strtok(sstr, " ");
-    while (tok) {
-      for (i = 0; i != MAXMAGIETYP; ++i) {
-        if (strcmp(tok, magic_school[i]) == 0)
-          break;
-      }
-      assert(i != MAXMAGIETYP);
-      var.i = i;
-      addtoken(tokens, LOC(lang, mkname("school", tok)), var);
-      tok = strtok(NULL, " ");
+    tokens = get_translations(lang, UT_DIRECTIONS);
+    init_directions(tokens, lang);
+
+    tokens = get_translations(lang, UT_RACES);
+    for (rc = races; rc; rc = rc->next) {
+        var.v = (void *)rc;
+        addtoken(tokens, LOC(lang, rc_name(rc, 1)), var);
+        addtoken(tokens, LOC(lang, rc_name(rc, 0)), var);
     }
-    free(sstr);
-  }
 
-  tokens = get_translations(lang, UT_DIRECTIONS);
-  init_directions(tokens, lang);
+    init_translations(lang, UT_PARAMS, parameter_key, MAXPARAMS);
+    init_translations(lang, UT_SKILLS, skill_key, MAXSKILLS);
+    init_translations(lang, UT_KEYWORDS, keyword_key, MAXKEYWORDS);
 
-  tokens = get_translations(lang, UT_RACES);
-  for (rc = races; rc; rc = rc->next) {
-    var.v = (void *)rc;
-    addtoken(tokens, LOC(lang, rc_name(rc, 1)), var);
-    addtoken(tokens, LOC(lang, rc_name(rc, 0)), var);
-  }
+    tokens = get_translations(lang, UT_OPTIONS);
+    for (i = 0; i != MAXOPTIONS; ++i) {
+        var.i = i;
+        if (options[i]) addtoken(tokens, LOC(lang, options[i]), var);
+    }
 
-  init_translations(lang, UT_PARAMS, parameter_key, MAXPARAMS);
-  init_translations(lang, UT_SKILLS, skill_key, MAXSKILLS);
-  init_translations(lang, UT_KEYWORDS, keyword_key, MAXKEYWORDS);
-
-  tokens = get_translations(lang, UT_OPTIONS);
-  for (i = 0; i != MAXOPTIONS; ++i) {
-    var.i = i;
-    if (options[i])
-      addtoken(tokens, LOC(lang, options[i]), var);
-  }
-
-  tokens = get_translations(lang, UT_TERRAINS);
-  for (terrain = terrains(); terrain != NULL; terrain = terrain->next) {
-    var.v = (void *)terrain;
-    addtoken(tokens, LOC(lang, terrain->_name), var);
-  }
+    tokens = get_translations(lang, UT_TERRAINS);
+    for (terrain = terrains(); terrain != NULL; terrain = terrain->next) {
+        var.v = (void *)terrain;
+        addtoken(tokens, LOC(lang, terrain->_name), var);
+    }
 }
 
 typedef struct param {
@@ -2179,12 +2181,14 @@ const char *localenames[] = {
 
 void init_locales(void)
 {
-  int l;
-  for (l = 0; localenames[l]; ++l) {
-    const struct locale *lang = find_locale(localenames[l]);
-    if (lang)
-      init_locale(lang);
-  }
+    int l;
+    for (l = 0; localenames[l]; ++l) {
+        const struct locale *lang = find_locale(localenames[l]);
+        if (!lang) {
+            lang = make_locale(localenames[l]);
+        }
+        init_locale(lang);
+    }
 }
 
 /* TODO: soll hier weg */

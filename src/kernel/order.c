@@ -338,27 +338,29 @@ order *create_order(keyword_t kwd, const struct locale * lang,
 
 order *parse_order(const char *s, const struct locale * lang)
 {
-  while (*s && !isalnum(*(unsigned char *)s) && !ispunct(*(unsigned char *)s))
-    ++s;
-  if (*s != 0) {
-    keyword_t kwd;
-    const char *sptr;
-    int persistent = 0;
+    assert(lang);
+    assert(s);
+    while (*s && !isalnum(*(unsigned char *)s) && !ispunct(*(unsigned char *)s)) {
+        ++s;
+    }
+    if (*s != 0) {
+        keyword_t kwd;
+        const char *sptr;
+        int persistent = 0; 
 
-    while (*s == '@') {
-      persistent = 1;
-      ++s;
+        while (*s == '@') {
+            persistent = 1;
+            ++s;
+        }
+        sptr = s;
+        kwd = findkeyword(parse_token(&sptr), lang);
+        if (kwd != NOKEYWORD) {
+            while (isxspace(*(unsigned char *)sptr)) ++sptr;
+            s = sptr;
+        }
+        return create_order_i(kwd, s, persistent, lang);
     }
-    sptr = s;
-    kwd = findkeyword(parse_token(&sptr), lang);
-    if (kwd != NOKEYWORD) {
-      while (isxspace(*(unsigned char *)sptr))
-        ++sptr;
-      s = sptr;
-    }
-    return create_order_i(kwd, s, persistent, lang);
-  }
-  return NULL;
+    return NULL;
 }
 
 /**

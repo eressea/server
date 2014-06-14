@@ -86,6 +86,7 @@ TOLUA_PKG(eressea);
 TOLUA_PKG(process);
 TOLUA_PKG(settings);
 TOLUA_PKG(config);
+TOLUA_PKG(locale);
 TOLUA_PKG(log);
 
 int log_lua_error(lua_State * L)
@@ -780,16 +781,15 @@ static int config_get_buildings(lua_State * L)
 
 static int config_get_locales(lua_State * L)
 {
-  const struct locale *lang;
-  int i = 0, n = 0;
-  for (lang = locales; lang; lang = nextlocale(lang))
-    ++n;
-  lua_createtable(L, n, 0);
-  for (lang = locales; lang; lang = nextlocale(lang)) {
-    tolua_pushstring(L, TOLUA_CAST locale_name(lang));
-    lua_rawseti(L, -2, ++i);
-  }
-  return 1;
+    const struct locale *lang;
+    int i = 0, n = 0;
+    for (lang = locales; lang; lang = nextlocale(lang)) ++n;
+    lua_createtable(L, n, 0);
+    for (lang = locales; lang; lang = nextlocale(lang)) {
+        tolua_pushstring(L, TOLUA_CAST locale_name(lang));
+        lua_rawseti(L, -2, ++i);
+    }
+    return 1;
 }
 
 static int config_get_resource(lua_State * L)
@@ -1061,6 +1061,7 @@ int tolua_bindings_open(lua_State * L)
   tolua_process_open(L);
   tolua_settings_open(L);
   tolua_config_open(L);
+  tolua_locale_open(L);
   tolua_log_open(L);
 
   /* register user types */

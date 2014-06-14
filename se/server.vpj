@@ -265,6 +265,10 @@
             <F N="../src/bind_faction.c"/>
             <F N="../src/bind_gmtool.c"/>
             <F N="../src/bind_hashtable.c"/>
+            <F N="../src/bind_locale.c"/>
+            <F N="../src/bind_locale.h"/>
+            <F N="../src/bind_log.c"/>
+            <F N="../src/bind_log.h"/>
             <F N="../src/bind_message.c"/>
             <F N="../src/bind_monsters.c"/>
             <F N="../src/bind_process.c"/>
@@ -281,6 +285,9 @@
             <F N="../src/gmtool.c"/>
             <F N="../src/helpers.c"/>
             <F N="../src/listbox.c"/>
+            <F N="../src/locale.pkg"/>
+            <F N="../src/locale.pkg.c"/>
+            <F N="../src/log.pkg.c"/>
             <F N="../src/main.c"/>
             <F N="../src/process.pkg.c"/>
             <F N="../src/settings.pkg.c"/>

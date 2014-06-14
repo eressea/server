@@ -131,7 +131,7 @@ static int tolua_ship_create(lua_State * L)
       tolua_pushusertype(L, (void *)sh, TOLUA_CAST "ship");
       return 1;
     } else {
-        log_error("Unkown ship type '%s'\n", sname);
+        log_error("Unknown ship type '%s'\n", sname);
     }
   }
   return 0;

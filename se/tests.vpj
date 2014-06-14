@@ -278,11 +278,12 @@
         <Folder
             Name="Other Files"
             Filters="">
-            <F N="../scripts/tests/config.lua"/>
-            <F N="../scripts/tests/rules.lua"/>
-            <F N="../scripts/runtests.lua"/>
-            <F N="../scripts/tests/settings.lua"/>
-            <F N="../scripts/tests/ships.lua"/>
+            <F N="../tests/config.lua"/>
+            <F N="../tests/init.lua"/>
+            <F N="../tests/locale.lua"/>
+            <F N="../tests/regions.lua"/>
+            <F N="../tests/settings.lua"/>
+            <F N="../tests/ships.lua"/>
         </Folder>
     </Files>
 </Project>

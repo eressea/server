@@ -49,6 +49,7 @@ ENDMACRO(TOLUA_BINDING)
 
 IF(NOT MSVC)
 TOLUA_BINDING(log.pkg util/log.h)
+TOLUA_BINDING(locale.pkg bind_locale.h)
 TOLUA_BINDING(config.pkg bind_config.h)
 TOLUA_BINDING(process.pkg bind_process.h)
 TOLUA_BINDING(eressea.pkg bind_eressea.h)
@@ -87,12 +88,14 @@ set(SERVER_SRC
   console.c
   helpers.c
   config.pkg.c
+  locale.pkg.c
   log.pkg.c
   process.pkg.c
   eressea.pkg.c
   settings.pkg.c
   bind_building.c
   bind_config.c
+  bind_locale.c
   bind_eressea.c
   bind_faction.c
   bind_hashtable.c
