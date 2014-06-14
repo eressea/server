@@ -56,29 +56,26 @@ struct unit *test_create_unit(struct faction *f, struct region *r)
 
 void test_cleanup(void)
 {
-  test_clear_terrains();
-  test_clear_resources();
-  global.functions.maintenance = NULL;
-  global.functions.wage = NULL;
-  default_locale = 0;
-  free_locales();
-  free_spells();
-  free_shiptypes();
-  free_races();
-  free_spellbooks();
-  free_gamedata();
+    test_clear_terrains();
+    test_clear_resources();
+    global.functions.maintenance = NULL;
+    global.functions.wage = NULL;
+    default_locale = 0;
+    free_locales();
+    free_spells();
+    free_buildingtypes();
+    free_shiptypes();
+    free_races();
+    free_spellbooks();
+    free_gamedata();
 }
 
 terrain_type *
 test_create_terrain(const char * name, unsigned int flags)
 {
-  terrain_type * t;
-
-  assert(!get_terrain(name));
-  t = (terrain_type*)calloc(1, sizeof(terrain_type));
+  terrain_type * t = terrain_get_or_create(name);
   t->_name = _strdup(name);
   t->flags = flags;
-  register_terrain(t);
   return t;
 }
 

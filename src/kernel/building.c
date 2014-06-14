@@ -159,6 +159,12 @@ void bt_register(building_type * type)
   ql_push(&buildingtypes, (void *)type);
 }
 
+void free_buildingtypes(void) {
+    ql_foreach(buildingtypes, free);
+    ql_free(buildingtypes);
+    buildingtypes = 0;
+}
+
 building_type *bt_get_or_create(const char *name)
 {
   if (name != NULL) {

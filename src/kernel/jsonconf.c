@@ -77,14 +77,33 @@ void json_construction(cJSON *json, construction **consp) {
     *consp = cons;
 }
 
-void json_building(cJSON *json, building_type *st) {
+void json_terrain(cJSON *json, terrain_type *ter) {
+    cJSON *child;
+    if (json->type!=cJSON_Object) {
+        log_error("terrain %s is not a json object: %d\n", json->string, json->type);
+        return;
+    }
+    for (child=json->child;child;child=child->next) {
+        log_error("terrain %s contains unknown attribute %s\n", json->string, child->string);
+    }
+}
+
+void json_building(cJSON *json, building_type *bt) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
         log_error("building %s is not a json object: %d\n", json->string, json->type);
         return;
     }
     for (child=json->child;child;child=child->next) {
-        log_error("building %s contains unknown attribute %s\n", json->string, child->string);
+        switch(child->type) {
+        case cJSON_Object:
+            if (strcmp(child->string, "construction")==0) {
+                json_construction(child, &bt->construction);
+            }
+            break;
+        default:
+            log_error("building %s contains unknown attribute %s\n", json->string, child->string);
+        }
     }
 }
 
@@ -177,10 +196,21 @@ void json_race(cJSON *json, race *rc) {
     }
 }
 
+void json_terrains(cJSON *json) {
+    cJSON *child;
+    if (json->type!=cJSON_Object) {
+        log_error("terrains is not a json object: %d\n", json->type);
+        return;
+    }
+    for (child=json->child;child;child=child->next) {
+        json_terrain(child, terrain_get_or_create(child->string));
+    }
+}
+
 void json_buildings(cJSON *json) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
-        log_error("ships is not a json object: %d\n", json->type);
+        log_error("buildings is not a json object: %d\n", json->type);
         return;
     }
     for (child=json->child;child;child=child->next) {
@@ -216,17 +246,21 @@ void json_config(cJSON *json) {
         log_error("config is not a json object: %d\n", json->type);
         return;
     }
-    child = cJSON_GetObjectItem(json, "races");
-    if (child && child->type==cJSON_Object) {
-        json_races(child);
-    }
-    child = cJSON_GetObjectItem(json, "ships");
-    if (child && child->type==cJSON_Object) {
-        json_ships(child);
-    }
-    child = cJSON_GetObjectItem(json, "buildings");
-    if (child && child->type==cJSON_Object) {
-        json_buildings(child);
+    for (child=json->child;child;child=child->next) {
+        if (strcmp(child->string, "races")==0) {
+            json_races(child);
+        }
+        else if (strcmp(child->string, "ships")==0) {
+            json_ships(child);
+        }
+        else if (strcmp(child->string, "buildings")==0) {
+            json_buildings(child);
+        }
+        else if (strcmp(child->string, "terrains")==0) {
+            json_terrains(child);
+        } else {
+            log_error("config contains unknown attribute %s\n", child->string);
+        }
     }
 }
 

@@ -1,8 +1,9 @@
 #include <platform.h>
 #include "types.h"
 #include "jsonconf.h"
-#include "race.h"
 #include "building.h"
+#include "race.h"
+#include "terrain.h"
 #include "ship.h"
 #include <CuTest.h>
 #include <cJSON.h>
@@ -100,10 +101,53 @@ static void test_ships(CuTest * tc)
     test_cleanup();
 }
 
+static void test_buildings(CuTest * tc)
+{
+    const char * data = "{\"buildings\": { \"house\" : { "
+        "\"construction\" : { \"maxsize\" : 20, \"reqsize\" : 10, \"minskill\" : 1 }"
+        "}}}";
+
+    cJSON *json = cJSON_Parse(data);
+    const building_type *bt;
+
+    test_cleanup();
+
+    CuAssertPtrNotNull(tc, json);
+    CuAssertPtrEquals(tc, 0, buildingtypes);
+    json_config(json);
+
+    CuAssertPtrNotNull(tc, buildingtypes);
+    bt = bt_find("house");
+    CuAssertPtrNotNull(tc, bt);
+    CuAssertPtrNotNull(tc, bt->construction);
+    CuAssertIntEquals(tc, 10, bt->construction->reqsize);
+    CuAssertIntEquals(tc, 20, bt->construction->maxsize);
+    CuAssertIntEquals(tc, 1, bt->construction->minskill);
+    test_cleanup();
+}
+
+static void test_terrains(CuTest * tc)
+{
+    const char * data = "{\"terrains\": { \"plain\" : {} }}";
+
+    cJSON *json = cJSON_Parse(data);
+
+    test_cleanup();
+    CuAssertPtrNotNull(tc, json);
+    CuAssertPtrEquals(tc, 0, (void *)get_terrain("plain"));
+
+    json_config(json);
+    CuAssertPtrNotNull(tc, get_terrain("plain"));
+
+    test_cleanup();
+}
+
 CuSuite *get_jsonconf_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_ships);
+    SUITE_ADD_TEST(suite, test_buildings);
+    SUITE_ADD_TEST(suite, test_terrains);
     SUITE_ADD_TEST(suite, test_races);
     SUITE_ADD_TEST(suite, test_flags);
     return suite;

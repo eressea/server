@@ -127,7 +127,7 @@ static int tolua_ship_create(lua_State * L)
     const ship_type *stype = st_find(sname);
     if (stype) {
       ship *sh = new_ship(stype, r, default_locale);
-      sh->size = stype->construction->maxsize;
+      sh->size = stype->construction ? stype->construction->maxsize : 1;
       tolua_pushusertype(L, (void *)sh, TOLUA_CAST "ship");
       return 1;
     } else {

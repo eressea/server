@@ -8,6 +8,7 @@ end
 
 function test_read_race()
     local f
+    eressea.free_game()
     f = faction.create("orc@example.com", "orc", "en")
     assert_equal(nil, f)
     assert_not_nil(eressea.config)
@@ -18,6 +19,7 @@ end
 
 function test_read_ship()
     local s
+    eressea.free_game()
     s = ship.create(nil, "boat")
     assert_equal(nil, s)
     assert_not_nil(eressea.config)

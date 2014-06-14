@@ -75,6 +75,7 @@ extern "C" {
 
   building_type *bt_get_or_create(const char *name);
   const building_type *bt_find(const char *name);
+  void free_buildingtypes(void);
   void register_buildings(void);
   void bt_register(struct building_type *type);
   int bt_effsize(const struct building_type *btype,
