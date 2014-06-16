@@ -52,7 +52,6 @@
 
     <order name="BELAGERE" disable="yes"/>
     <order name="BEKLAUEN" disable="yes"/>
-    <order name="GM" disable="yes"/>
     <order name="KAUFEN" disable="yes"/>
     <order name="LEHREN" disable="yes"/>
     <order name="SABOTIEREN" disable="yes"/>
