@@ -246,6 +246,7 @@
             <F N="../src/util/bsdstring_test.c"/>
             <F N="../src/kernel/building_test.c"/>
             <F N="../src/kernel/curse_test.c"/>
+            <F N="../src/direction_test.c"/>
             <F N="../src/economy_test.c"/>
             <F N="../src/kernel/equipment_test.c"/>
             <F N="../src/util/functions_test.c"/>
@@ -268,7 +269,8 @@
         </Folder>
         <Folder
             Name="Header Files"
-            Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.inc;*.sh;*.cpy;*.if"/>
+            Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.inc;*.sh;*.cpy;*.if">
+        </Folder>
         <Folder
             Name="Resource Files"
             Filters="*.ico;*.cur;*.dlg"/>

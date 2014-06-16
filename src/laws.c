@@ -23,13 +23,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <modules/gmcmd.h>
 #include <modules/wormhole.h>
 
-/* gamecode includes */
 #include "economy.h"
 #include "monster.h"
 #include "randenc.h"
 #include "spy.h"
 #include "study.h"
 #include "market.h"
+#include "keyword.h"
 
 /* kernel includes */
 #include <kernel/alchemy.h>
@@ -3855,7 +3855,7 @@ void defaultorders(void)
 {
   region *r;
 
-  assert(!global.disabled[K_DEFAULT]);
+  assert(!keyword_disabled(K_DEFAULT));
   for (r = regions; r; r = r->next) {
     unit *u;
     for (u = r->units; u; u = u->next) {
@@ -4162,7 +4162,7 @@ void
 add_proc_order(int priority, keyword_t kword, int (*parser) (struct unit *,
     struct order *), unsigned int flags, const char *name)
 {
-  if (!global.disabled[kword]) {
+  if (!keyword_disabled(kword)) {
     processor *proc = add_proc(priority, name, PR_ORDER);
     if (proc) {
       proc->data.per_order.process = parser;
@@ -4516,7 +4516,7 @@ void init_processor(void)
 
   add_proc_region(p, &do_battle, "Attackieren");
 
-  if (!global.disabled[K_BESIEGE]) {
+  if (!keyword_disabled(K_BESIEGE)) {
     p += 10;
     add_proc_region(p, &do_siege, "Belagern");
   }
@@ -4531,7 +4531,7 @@ void init_processor(void)
   add_proc_region(p, &economics, "Zerstoeren, Geben, Rekrutieren, Vergessen");
 
   p += 10;
-  if (!global.disabled[K_PAY]) {
+  if (!keyword_disabled(K_PAY)) {
     add_proc_order(p, K_PAY, &pay_cmd, 0, "Gebaeudeunterhalt (disable)");
   }
   add_proc_postregion(p, &maintain_buildings_1,
@@ -4540,7 +4540,7 @@ void init_processor(void)
   p += 10;                      /* QUIT fuer sich alleine */
   add_proc_global(p, quit, "Sterben");
 
-  if (!global.disabled[K_CAST]) {
+  if (!keyword_disabled(K_CAST)) {
     p += 10;
     add_proc_global(p, &magic, "Zaubern");
   }
@@ -4591,17 +4591,17 @@ void init_processor(void)
 
   add_proc_global(p, &monthly_healing, "Regeneration (HP)");
   add_proc_global(p, &regenerate_aura, "Regeneration (Aura)");
-  if (!global.disabled[K_DEFAULT]) {
+  if (!keyword_disabled(K_DEFAULT)) {
     add_proc_global(p, &defaultorders, "Defaults setzen");
   }
   add_proc_global(p, &demographics, "Nahrung, Seuchen, Wachstum, Wanderung");
 
-  if (!global.disabled[K_SORT]) {
+  if (!keyword_disabled(K_SORT)) {
     p += 10;
     add_proc_global(p, restack_units, "Einheiten sortieren");
   }
   add_proc_order(p, K_PROMOTION, &promotion_cmd, 0, "Heldenbefoerderung");
-  if (!global.disabled[K_NUMBER]) {
+  if (!keyword_disabled(K_NUMBER)) {
     add_proc_order(p, K_NUMBER, &renumber_cmd, 0, "Neue Nummern (Einheiten)");
     p += 10;
     add_proc_global(p, &renumber_factions, "Neue Nummern");
@@ -4702,8 +4702,6 @@ int init_data(const char *filename, const char *catalog)
   l = read_xml(filename, catalog);
   if (l)
     return l;
-
-  init_locales();
 
   if (turn < 0) {
     turn = first_turn;

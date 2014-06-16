@@ -24,6 +24,7 @@ extern "C" {
 
 #include <stddef.h>
 #include "types.h"
+#include "direction.h"
 
 /* FAST_CONNECT: regions are directly connected to neighbours, saves doing
    a hash-access each time a neighbour is needed */

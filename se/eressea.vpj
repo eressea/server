@@ -262,6 +262,7 @@
             <F N="../src/kernel/curse.c"/>
             <F N="../src/items/demonseye.c"/>
             <F N="../src/util/dice.c"/>
+            <F N="../src/direction.c"/>
             <F N="../src/races/dragons.c"/>
             <F N="../src/modules/dungeon.c"/>
             <F N="../src/economy.c"/>
@@ -291,6 +292,7 @@
             <F N="../src/json.c"/>
             <F N="../src/kernel/jsonconf.c"/>
             <F N="../src/attributes/key.c"/>
+            <F N="../src/keyword.c"/>
             <F N="../src/triggers/killunit.c"/>
             <F N="../src/util/language.c"/>
             <F N="../src/laws.c"/>
@@ -415,6 +417,7 @@
             <F N="../src/util/crmessage.h"/>
             <F N="../src/kernel/curse.h"/>
             <F N="../src/items/demonseye.h"/>
+            <F N="../src/direction.h"/>
             <F N="../src/modules/dungeon.h"/>
             <F N="../src/economy.h"/>
             <F N="../src/util/encoding.h"/>
@@ -442,6 +445,7 @@
             <F N="../src/json.h"/>
             <F N="../src/kernel/jsonconf.h"/>
             <F N="../src/attributes/key.h"/>
+            <F N="../src/keyword.h"/>
             <F N="../src/triggers/killunit.h"/>
             <F N="../src/util/language.h"/>
             <F N="../src/util/language_struct.h"/>

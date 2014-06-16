@@ -2307,7 +2307,7 @@ static int parse_main(xmlDocPtr doc)
         int k;
         for (k = 0; k != MAXKEYWORDS; ++k) {
           if (strcmp(keywords[k], (const char *)propName) == 0) {
-            global.disabled[k] = 1;
+            enable_keyword(k, false);
             break;
           }
         }

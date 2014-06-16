@@ -21,7 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/types.h>
 #include "economy.h"
 
-/* gamecode includes */
+#include "direction.h"
 #include "give.h"
 #include "laws.h"
 #include "randenc.h"

@@ -26,6 +26,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "building.h"
 #include "calendar.h"
 #include "curse.h"
+#include "direction.h"
 #include "faction.h"
 #include "item.h"
 #include "magic.h"

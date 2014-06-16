@@ -25,3 +25,4 @@ CuSuite *get_ally_suite(void)
   SUITE_ADD_TEST(suite, test_ally);
   return suite;
 }
+

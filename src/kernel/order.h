@@ -16,6 +16,8 @@
 extern "C" {
 #endif
 
+#include "keyword.h"
+
 /* Encapsulation of an order
  *
  * This structure contains one order given by a unit. These used to be

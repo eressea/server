@@ -24,6 +24,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "alchemy.h"
 #include "alliance.h"
 #include "connection.h"
+#include "direction.h"
 #include "building.h"
 #include "curse.h"
 #include "faction.h"
@@ -93,7 +94,7 @@ ship *getship(const struct region * r)
 
 static void destroy_road(unit * u, int nmax, struct order *ord)
 {
-  direction_t d = getdirection(u->faction->locale);
+  direction_t d = finddirection(getstrtoken(), u->faction->locale);
   unit *u2;
   region *r = u->region;
   short n = (short)nmax;

@@ -20,6 +20,7 @@
 #include "spells.h"
 #include "borders.h"
 #include "buildingcurse.h"
+#include "direction.h"
 #include "regioncurse.h"
 #include "unitcurse.h"
 #include "shipcurse.h"

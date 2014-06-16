@@ -23,6 +23,7 @@ extern "C" {
 #endif
 
 #include "types.h"
+#include "direction.h"
 
 #define DAMAGE_SCALE 100        /* multiplier for sh->damage */
 

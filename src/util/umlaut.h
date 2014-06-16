@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define _UMLAUT_H
 
 #include "variant.h"
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {

@@ -32,6 +32,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "building.h"
 #include "calendar.h"
 #include "curse.h"
+#include "direction.h"
 #include "faction.h"
 #include "group.h"
 #include "item.h"
@@ -55,7 +56,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/bsdstring.h>
-#include <critbit.h>
 #include <util/crmessage.h>
 #include <util/event.h>
 #include <util/language.h>
@@ -80,6 +80,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* external libraries */
 #include <iniparser.h>
+#include <critbit.h>
 
 /* libc includes */
 #include <stdio.h>
@@ -384,69 +385,6 @@ const char *parameters[MAXPARAMS] = {
   "XEBALLOON",
   "XELAEN",
   "ALLIANZ"
-};
-
-const char *keywords[MAXKEYWORDS] = {
-  "//",
-  "BANNER",
-  "ARBEITEN",
-  "ATTACKIEREN",
-  "BEKLAUEN",
-  "BELAGERE",
-  "BENENNEN",
-  "BENUTZEN",
-  "BESCHREIBEN",
-  "BETRETEN",
-  "BEWACHEN",
-  "BOTSCHAFT",
-  "ENDE",
-  "FAHREN",
-  "NUMMER",
-  "FOLGEN",
-  "FORSCHEN",
-  "GIB",
-  "HELFEN",
-  "KAEMPFEN",
-  "KAMPFZAUBER",
-  "KAUFEN",
-  "KONTAKTIEREN",
-  "LEHREN",
-  "LERNEN",
-  "MACHEN",
-  "NACH",
-  "PASSWORT",
-  "REKRUTIEREN",
-  "RESERVIEREN",
-  "ROUTE",
-  "SABOTIEREN",
-  "OPTION",
-  "SPIONIEREN",
-  "STIRB",
-  "TARNEN",
-  "TRANSPORTIEREN",
-  "TREIBEN",
-  "UNTERHALTEN",
-  "VERKAUFEN",
-  "VERLASSEN",
-  "VERGESSEN",
-  "ZAUBERE",
-  "ZEIGEN",
-  "ZERSTOEREN",
-  "ZUECHTEN",
-  "DEFAULT",
-  "URSPRUNG",
-  "EMAIL",
-  "PIRATERIE",
-  "GRUPPE",
-  "SORTIEREN",
-  "GM",
-  "INFO",
-  "PRAEFIX",
-  "PFLANZEN",
-  "ALLIANZ",
-  "BEANSPRUCHEN",
-  "PROMOTION",
-  "BEZAHLEN",
 };
 
 const char *report_options[MAX_MSG] = {
@@ -1346,34 +1284,6 @@ skill_t findskill(const char *s, const struct locale * lang)
   return result;
 }
 
-keyword_t findkeyword(const char *s, const struct locale * lang)
-{
-  keyword_t result = NOKEYWORD;
-  char buffer[64];
-
-  assert(lang);
-  assert(s);
-  while (*s == '@') ++s;
-
-  if (*s) {
-    char * str = transliterate(buffer, sizeof(buffer)-sizeof(int), s);
-
-    if (str) {
-      int i;
-      const void * match;
-      void **tokens = get_translations(lang, UT_KEYWORDS);
-      critbit_tree *cb = (critbit_tree *)*tokens;
-      assert(cb);
-      if (cb_find_prefix(cb, str, strlen(str), &match, 1, 0)) {
-        cb_get_kv(match, &i, sizeof(int));
-        result = (keyword_t)i;
-        return global.disabled[result] ? NOKEYWORD : result;
-      }
-    }
-  }
-  return NOKEYWORD;
-}
-
 param_t findparam(const char *s, const struct locale * lang)
 {
   param_t result = NOPARAM;
@@ -1906,57 +1816,7 @@ void *gc_add(void *p)
   return p;
 }
 
-static void init_directions(void ** root, const struct locale *lang)
-{
-  /* mit dieser routine kann man mehrere namen für eine direction geben,
-   * das ist für die hexes ideal. */
-  const struct {
-    const char *name;
-    int direction;
-  } dirs[] = {
-    {
-    "dir_ne", D_NORTHEAST}, {
-    "dir_nw", D_NORTHWEST}, {
-    "dir_se", D_SOUTHEAST}, {
-    "dir_sw", D_SOUTHWEST}, {
-    "dir_east", D_EAST}, {
-    "dir_west", D_WEST}, {
-    "northeast", D_NORTHEAST}, {
-    "northwest", D_NORTHWEST}, {
-    "southeast", D_SOUTHEAST}, {
-    "southwest", D_SOUTHWEST}, {
-    "east", D_EAST}, {
-    "west", D_WEST}, {
-    "PAUSE", D_PAUSE}, {
-    NULL, NODIRECTION}
-  };
-  int i;
-  void **tokens = get_translations(lang, UT_DIRECTIONS);
-
-  for (i = 0; dirs[i].direction != NODIRECTION; ++i) {
-    variant token;
-    token.i = dirs[i].direction;
-    addtoken(tokens, LOC(lang, dirs[i].name), token);
-  }
-}
-
-direction_t finddirection(const char *s, const struct locale *lang)
-{
-  void **tokens = get_translations(lang, UT_DIRECTIONS);
-  variant token;
-
-  if (findtoken(*tokens, s, &token) == E_TOK_SUCCESS) {
-    return (direction_t) token.i;
-  }
-  return NODIRECTION;
-}
-
-direction_t getdirection(const struct locale * lang)
-{
-  return finddirection(getstrtoken(), lang);
-}
-
-static void init_translations(const struct locale *lang, int ut, const char * (*string_cb)(int i), int maxstrings)
+void init_translations(const struct locale *lang, int ut, const char * (*string_cb)(int i), int maxstrings)
 {
   char buffer[256];
   void **tokens;
@@ -1984,12 +1844,6 @@ static void init_translations(const struct locale *lang, int ut, const char * (*
       }
     }
   }
-}
-
-static const char * keyword_key(int i)
-{
-  assert(i<MAXKEYWORDS&& i>=0);
-  return keywords[i];
 }
 
 static const char * parameter_key(int i)
@@ -2034,8 +1888,7 @@ static void init_locale(const struct locale *lang)
         free(sstr);
     }
 
-    tokens = get_translations(lang, UT_DIRECTIONS);
-    init_directions(tokens, lang);
+    init_directions(lang);
 
     tokens = get_translations(lang, UT_RACES);
     for (rc = races; rc; rc = rc->next) {
@@ -2046,7 +1899,7 @@ static void init_locale(const struct locale *lang)
 
     init_translations(lang, UT_PARAMS, parameter_key, MAXPARAMS);
     init_translations(lang, UT_SKILLS, skill_key, MAXSKILLS);
-    init_translations(lang, UT_KEYWORDS, keyword_key, MAXKEYWORDS);
+//  init_translations(lang, UT_KEYWORDS, keyword_key, MAXKEYWORDS);
 
     tokens = get_translations(lang, UT_OPTIONS);
     for (i = 0; i != MAXOPTIONS; ++i) {
@@ -2434,7 +2287,7 @@ void guard(unit * u, unsigned int mask)
 int besieged(const unit * u)
 {
   /* belagert kann man in schiffen und burgen werden */
-  return (u && !global.disabled[K_BESIEGE]
+  return (u && !keyword_disabled(K_BESIEGE)
     && u->building && u->building->besieged
     && u->building->besieged >= u->building->size * SIEGEFACTOR);
 }

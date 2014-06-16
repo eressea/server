@@ -128,6 +128,7 @@ const char *locale_getstring(const locale * lang, const char *key)
 const char *locale_string(const locale * lang, const char *key)
 {
   assert(lang);
+  assert(key);
 
   if (key != NULL) {
     unsigned int hkey = hashstring(key);
@@ -154,7 +155,7 @@ const char *locale_string(const locale * lang, const char *key)
       if (lang->fallback) {
         return locale_string(lang->fallback, key);
       }
-      return 0;
+      return key;
     }
     return find->str;
   }

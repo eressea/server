@@ -42,7 +42,6 @@ extern "C" {
   extern const char *game_name;
   extern int enc_gamedata;
 
-  extern void init_locales(void);
   extern int current_turn(void);
 
   extern void read_items(struct storage *store, struct item **it);

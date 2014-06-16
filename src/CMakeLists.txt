@@ -58,6 +58,8 @@ ENDIF()
 
 set (ERESSEA_SRC
   eressea.c
+  direction.c
+  keyword.c
   json.c
   creation.c
   creport.c
@@ -141,6 +143,7 @@ set(TESTS_SRC
   test_eressea.c
   tests.c
   tests_test.c
+  direction_test.c
   json_test.c
   economy_test.c
   market_test.c
