@@ -2466,7 +2466,7 @@ static bool is_moving_ship(const region * r, ship * sh)
   const unit *u = ship_owner(sh);
 
   if (u)
-    switch (get_keyword(u->thisorder)) {
+    switch (getkeyword(u->thisorder)) {
     case K_ROUTE:
     case K_MOVE:
     case K_FOLLOW:
@@ -2745,7 +2745,7 @@ void magic(void)
 
       if (u->thisorder != NULL) {
         for (ord = u->orders; ord; ord = ord->next) {
-          if (get_keyword(ord) == K_CAST) {
+          if (getkeyword(ord) == K_CAST) {
             castorder *co = cast_cmd(u, ord);
             fset(u, UFL_LONGACTION | UFL_NOTMOVING);
             if (co) {

@@ -76,7 +76,7 @@ void replace_order(order ** dlist, order * orig, const order * src)
   }
 }
 
-keyword_t get_keyword(const order * ord)
+keyword_t getkeyword(const order * ord)
 {
   if (ord == NULL) {
     return NOKEYWORD;

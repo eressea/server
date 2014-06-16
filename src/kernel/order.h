@@ -50,7 +50,7 @@ extern "C" {
   extern void push_order(struct order **olist, struct order *ord);
 
 /* access functions for orders */
-  extern keyword_t get_keyword(const order * ord);
+  extern keyword_t getkeyword(const order * ord);
   extern void set_order(order ** destp, order * src);
   extern char *getcommand(const order * ord);
   extern bool is_persistent(const order * ord);

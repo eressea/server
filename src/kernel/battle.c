@@ -3921,7 +3921,7 @@ static bool start_battle(region * r, battle ** bp)
           slave_ct = ct_find("slavery");
           calm_ct = ct_find("calmmonster");
         }
-        if (get_keyword(ord) == K_ATTACK) {
+        if (getkeyword(ord) == K_ATTACK) {
           unit *u2;
           fighter *c1, *c2;
           ship *lsh = NULL;

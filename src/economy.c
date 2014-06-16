@@ -1154,7 +1154,7 @@ void economics(region * r)
     bool destroyed = false;
     if (u->number > 0) {
       for (ord = u->orders; ord; ord = ord->next) {
-        keyword_t kwd = get_keyword(ord);
+        keyword_t kwd = getkeyword(ord);
         if (kwd == K_DESTROY) {
           if (!destroyed) {
             if (destroy_cmd(u, ord) != 0)
@@ -1181,7 +1181,7 @@ void economics(region * r)
 
     if ((rules_recruit & RECRUIT_MERGE) || u->number == 0) {
       for (ord = u->orders; ord; ord = ord->next) {
-        if (get_keyword(ord) == K_RECRUIT) {
+        if (getkeyword(ord) == K_RECRUIT) {
           if (rules_recruit & RECRUIT_CLASSIC) {
             recruit(u, ord, &recruitorders);
           }
@@ -3245,7 +3245,7 @@ void produce(struct region *r)
     }
 
     for (ord = u->orders; ord; ord = ord->next) {
-      keyword_t kwd = get_keyword(ord);
+      keyword_t kwd = getkeyword(ord);
       if (kwd == K_BUY) {
         buy(u, &buyorders, ord);
         trader = true;
@@ -3265,7 +3265,7 @@ void produce(struct region *r)
       continue;
     }
 
-    todo = get_keyword(u->thisorder);
+    todo = getkeyword(u->thisorder);
     if (todo == NOKEYWORD)
       continue;
 

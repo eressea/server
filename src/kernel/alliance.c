@@ -290,7 +290,7 @@ static void execute(const struct syntaxtree *syntax, keyword_t kwd)
         void *root = stree_find(syntax, lang);
         order *ord;
         for (ord = u->orders; ord; ord = ord->next) {
-          if (get_keyword(ord) == kwd) {
+          if (getkeyword(ord) == kwd) {
             do_command(root, u, ord);
             run = 1;
           }

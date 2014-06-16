@@ -37,13 +37,13 @@ static void process_cmd(keyword_t kwd, int (*callback)(unit *, order *), int fla
 
     for (u=r->units; u; u=u->next) {
       if (flags & PROC_LONG_ORDER) {
-        if (kwd == get_keyword(u->thisorder)) {
+        if (kwd == getkeyword(u->thisorder)) {
           callback(u, u->thisorder);
         }
       } else {
         order * ord;
         for (ord=u->orders; ord; ord=ord->next) {
-          if (kwd == get_keyword(ord)) {
+          if (kwd == getkeyword(ord)) {
             callback(u, ord);
           }
         }
@@ -59,7 +59,7 @@ void process_produce(void) {
     for (u=r->units; u; u=u->next) {
       order * ord;
       for (ord=u->orders; ord; ord=ord->next) {
-        if (K_MAKE == get_keyword(ord)) {
+        if (K_MAKE == getkeyword(ord)) {
           make_cmd(u, ord);
         }
       }
@@ -105,7 +105,7 @@ void process_settings(void) {
     for (u=r->units; u; u=u->next) {
       order * ord;
       for (ord=u->orders; ord; ord=ord->next) {
-        keyword_t kwd = get_keyword(ord);
+        keyword_t kwd = getkeyword(ord);
         if (kwd==K_BANNER) {
           banner_cmd(u, ord);
         }
@@ -267,7 +267,7 @@ void process_maintenance(void) {
         for (u = r->units; u; u = u->next) {
             order *ord;
             for (ord = u->orders; ord; ord = ord->next) {
-                keyword_t kwd = get_keyword(ord);
+                keyword_t kwd = getkeyword(ord);
                 if (kwd == K_PAY) {
                     pay_cmd(u, ord);
                 }

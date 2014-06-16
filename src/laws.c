@@ -1321,7 +1321,7 @@ static void do_contact(region * r)
   for (u = r->units; u; u = u->next) {
     order *ord;
     for (ord = u->orders; ord; ord = ord->next) {
-      keyword_t kwd = get_keyword(ord);
+      keyword_t kwd = getkeyword(ord);
       if (kwd == K_CONTACT) {
         contact_cmd(u, ord);
       }
@@ -1339,7 +1339,7 @@ void do_enter(struct region *r, bool is_final_attempt)
 
     while (*ordp) {
       order *ord = *ordp;
-      if (get_keyword(ord) == K_ENTER) {
+      if (getkeyword(ord) == K_ENTER) {
         param_t p;
         int id;
         unit *ulast = NULL;
@@ -2756,7 +2756,7 @@ int origin_cmd(unit * u, struct order *ord)
 
 int guard_off_cmd(unit * u, struct order *ord)
 {
-  assert(get_keyword(ord) == K_GUARD);
+  assert(getkeyword(ord) == K_GUARD);
   init_tokens(ord);
   skip_token();
 
@@ -2917,7 +2917,7 @@ void update_guards(void)
 
 int guard_on_cmd(unit * u, struct order *ord)
 {
-  assert(get_keyword(ord) == K_GUARD);
+  assert(getkeyword(ord) == K_GUARD);
 
   init_tokens(ord);
   skip_token();
@@ -3067,7 +3067,7 @@ void restack_units(void)
       if (!fval(u, UFL_MARK)) {
         struct order *ord;
         for (ord = u->orders; ord; ord = ord->next) {
-          if (get_keyword(ord) == K_SORT) {
+          if (getkeyword(ord) == K_SORT) {
             const char *s;
             param_t p;
             int id;
@@ -3524,7 +3524,7 @@ void new_units(void)
 
       while (*ordp) {
         order *makeord = *ordp;
-        if (get_keyword(makeord) == K_MAKE) {
+        if (getkeyword(makeord) == K_MAKE) {
           init_tokens(makeord);
           skip_token();
           if (isparam(getstrtoken(), u->faction->locale, P_TEMP)) {
@@ -3551,7 +3551,7 @@ void new_units(void)
 
               while (*ordp) {
                 order *ord = *ordp;
-                if (get_keyword(ord) == K_END)
+                if (getkeyword(ord) == K_END)
                   break;
                 *ordp = ord->next;
                 ord->next = NULL;
@@ -3581,7 +3581,7 @@ void new_units(void)
             newordersp = &u2->orders;
             while (*ordp) {
               order *ord = *ordp;
-              if (get_keyword(ord) == K_END)
+              if (getkeyword(ord) == K_END)
                 break;
               *ordp = ord->next;
               ord->next = NULL;
@@ -3605,10 +3605,10 @@ void check_long_orders(unit * u)
   keyword_t otherorder = MAXKEYWORDS;
 
   for (ord = u->orders; ord; ord = ord->next) {
-    if (get_keyword(ord) == NOKEYWORD) {
+    if (getkeyword(ord) == NOKEYWORD) {
       cmistake(u, ord, 22, MSG_EVENT);
     } else if (is_long(ord)) {
-      keyword_t longorder = get_keyword(ord);
+      keyword_t longorder = getkeyword(ord);
       if (otherorder != MAXKEYWORDS) {
         switch (longorder) {
         case K_CAST:
@@ -3654,7 +3654,7 @@ void update_long_order(unit * u)
   }
   /* check all orders for a potential new long order this round: */
   for (ord = u->orders; ord; ord = ord->next) {
-    if (get_keyword(ord) == NOKEYWORD)
+    if (getkeyword(ord) == NOKEYWORD)
       continue;
 
     if (u->old_orders && is_repeated(ord)) {
@@ -3675,7 +3675,7 @@ void update_long_order(unit * u)
       }
       break;
     } else {
-      keyword_t keyword = get_keyword(ord);
+      keyword_t keyword = getkeyword(ord);
       switch (keyword) {
         /* Wenn gehandelt wird, darf kein langer Befehl ausgeführt
          * werden. Da Handel erst nach anderen langen Befehlen kommt,
@@ -3863,7 +3863,7 @@ void defaultorders(void)
       order **ordp = &u->orders;
       while (*ordp != NULL) {
         order *ord = *ordp;
-        if (get_keyword(ord) == K_DEFAULT) {
+        if (getkeyword(ord) == K_DEFAULT) {
           char lbuf[8192];
           order *new_order;
           init_tokens(ord);
@@ -4261,7 +4261,7 @@ void process(void)
               ordp = &u->thisorder;
             while (*ordp) {
               order *ord = *ordp;
-              if (get_keyword(ord) == porder->data.per_order.kword) {
+              if (getkeyword(ord) == porder->data.per_order.kword) {
                 if (porder->flags & PROC_LONGORDER) {
                   if (u->number == 0) {
                     ord = NULL;
@@ -4418,7 +4418,7 @@ void do_siege(region * r)
     unit *u;
 
     for (u = r->units; u; u = u->next) {
-      if (get_keyword(u->thisorder) == K_BESIEGE) {
+      if (getkeyword(u->thisorder) == K_BESIEGE) {
         siege_cmd(u, u->thisorder);
       }
     }

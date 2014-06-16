@@ -335,7 +335,7 @@ int teach_cmd(unit * u, struct order *ord)
         if (fval(student, UFL_HUNGER))
           continue;
 #endif
-        if (get_keyword(student->thisorder) == K_STUDY) {
+        if (getkeyword(student->thisorder) == K_STUDY) {
           /* Input ist nun von student->thisorder !! */
           init_tokens(student->thisorder);
           skip_token();
@@ -366,7 +366,7 @@ int teach_cmd(unit * u, struct order *ord)
         if (fval(student, UFL_HUNGER))
           continue;
 #endif
-        if (get_keyword(student->thisorder) == K_STUDY) {
+        if (getkeyword(student->thisorder) == K_STUDY) {
           /* Input ist nun von student->thisorder !! */
           init_tokens(student->thisorder);
           skip_token();
@@ -439,7 +439,7 @@ int teach_cmd(unit * u, struct order *ord)
         strcat(zOrder, " ");
       strcat(zOrder, unitid(u2));
 
-      if (get_keyword(u2->thisorder) != K_STUDY) {
+      if (getkeyword(u2->thisorder) != K_STUDY) {
         ADDMSG(&u->faction->msgs,
           msg_feedback(u, ord, "teach_nolearn", "student", u2));
         continue;

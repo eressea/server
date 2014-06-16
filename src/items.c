@@ -35,7 +35,7 @@ static int
 use_studypotion(struct unit *u, const struct item_type *itype, int amount,
   struct order *ord)
 {
-  if (get_keyword(u->thisorder) == K_STUDY) {
+  if (getkeyword(u->thisorder) == K_STUDY) {
     skill_t sk;
     skill *sv;
 

@@ -1009,7 +1009,7 @@ static void cycle_route(order * ord, unit * u, int gereist)
   order *norder;
   size_t size = sizeof(tail) - 1;
 
-  if (get_keyword(ord) != K_ROUTE)
+  if (getkeyword(ord) != K_ROUTE)
     return;
   tail[0] = '\0';
 
@@ -1088,7 +1088,7 @@ static bool transport(unit * ut, unit * u)
   }
 
   for (ord = ut->orders; ord; ord = ord->next) {
-    if (get_keyword(ord) == K_TRANSPORT) {
+    if (getkeyword(ord) == K_TRANSPORT) {
       init_tokens(ord);
       skip_token();
       if (getunit(ut->region, ut->faction) == u) {
@@ -1119,7 +1119,7 @@ static void init_transportation(void)
      * K_DRIVE. This is time consuming for an error check, but there
      * doesn't seem to be an easy way to speed this up. */
     for (u = r->units; u; u = u->next) {
-      if (get_keyword(u->thisorder) == K_DRIVE && can_move(u)
+      if (getkeyword(u->thisorder) == K_DRIVE && can_move(u)
         && !fval(u, UFL_NOTMOVING) && !LongHunger(u)) {
         unit *ut;
 
@@ -1152,7 +1152,7 @@ static void init_transportation(void)
         int w = 0;
 
         for (ord = u->orders; ord; ord = ord->next) {
-          if (get_keyword(ord) == K_TRANSPORT) {
+          if (getkeyword(ord) == K_TRANSPORT) {
             init_tokens(ord);
             skip_token();
             for (;;) {
@@ -1160,7 +1160,7 @@ static void init_transportation(void)
 
               if (ut == NULL)
                 break;
-              if (get_keyword(ut->thisorder) == K_DRIVE && can_move(ut)
+              if (getkeyword(ut->thisorder) == K_DRIVE && can_move(ut)
                 && !fval(ut, UFL_NOTMOVING) && !LongHunger(ut)) {
                 init_tokens(ut->thisorder);
                 skip_token();
@@ -2017,14 +2017,14 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
   for (ord = u->orders; ord; ord = ord->next) {
     unit *ut;
 
-    if (get_keyword(ord) != K_TRANSPORT)
+    if (getkeyword(ord) != K_TRANSPORT)
       continue;
 
     init_tokens(ord);
     skip_token();
     ut = getunit(r, u->faction);
     if (ut != NULL) {
-      if (get_keyword(ut->thisorder) == K_DRIVE) {
+      if (getkeyword(ut->thisorder) == K_DRIVE) {
         if (ut->building && !can_leave(ut)) {
           cmistake(ut, ut->thisorder, 150, MSG_MOVE);
           cmistake(u, ord, 99, MSG_MOVE);
@@ -2467,7 +2467,7 @@ static void move_hunters(void)
         order *ord;
 
         for (ord = u->orders; ord; ord = ord->next) {
-          if (get_keyword(ord) == K_FOLLOW) {
+          if (getkeyword(ord) == K_FOLLOW) {
             param_t p;
 
             init_tokens(ord);
@@ -2516,7 +2516,7 @@ static void move_pirates(void)
     while (*up) {
       unit *u = *up;
 
-      if (!fval(u, UFL_NOTMOVING) && get_keyword(u->thisorder) == K_PIRACY) {
+      if (!fval(u, UFL_NOTMOVING) && getkeyword(u->thisorder) == K_PIRACY) {
         piracy_cmd(u, u->thisorder);
         fset(u, UFL_LONGACTION | UFL_NOTMOVING);
       }
@@ -2562,7 +2562,7 @@ void movement(void)
           up = &u->next;
           continue;
         }
-        kword = get_keyword(u->thisorder);
+        kword = getkeyword(u->thisorder);
 
         if (kword == K_ROUTE || kword == K_MOVE) {
           /* after moving, the unit has no thisorder. this prevents
@@ -2645,7 +2645,7 @@ void follow_unit(unit * u)
   for (ord = u->orders; ord; ord = ord->next) {
     const struct locale *lang = u->faction->locale;
 
-    if (get_keyword(ord) == K_FOLLOW) {
+    if (getkeyword(ord) == K_FOLLOW) {
       init_tokens(ord);
       skip_token();
       if (getparam(lang) == P_UNIT) {
@@ -2678,7 +2678,7 @@ void follow_unit(unit * u)
       return;
     }
 
-    switch (get_keyword(u2->thisorder)) {
+    switch (getkeyword(u2->thisorder)) {
     case K_MOVE:
     case K_ROUTE:
     case K_DRIVE:
@@ -2686,7 +2686,7 @@ void follow_unit(unit * u)
       break;
     default:
       for (ord = u2->orders; ord; ord = ord->next) {
-        switch (get_keyword(ord)) {
+        switch (getkeyword(ord)) {
         case K_FOLLOW:
         case K_PIRACY:
           follow = true;
