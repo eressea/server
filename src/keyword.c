@@ -18,9 +18,8 @@ static const char * keyword_key(int i)
 
 void init_keyword(const struct locale *lang, keyword_t kwd, const char *str) {
     void **tokens = get_translations(lang, UT_KEYWORDS);
-    variant token;
-    token.i = kwd;
-    addtoken(tokens, str, token);
+    struct critbit_tree **cb = (critbit_tree **)tokens;
+    add_translation(cb, str, (int)kwd);
 }
 
 keyword_t findkeyword(const char *s) {

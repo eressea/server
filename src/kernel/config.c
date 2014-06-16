@@ -1265,7 +1265,7 @@ skill_t findskill(const char *s, const struct locale * lang)
     int i;
     const void * match;
     void **tokens = get_translations(lang, UT_SKILLS);
-    critbit_tree *cb = (critbit_tree *)*tokens;
+    struct critbit_tree *cb = (critbit_tree *)*tokens;
     if (cb_find_prefix(cb, str, strlen(str), &match, 1, 0)) {
       cb_get_kv(match, &i, sizeof(int));
       result = (skill_t)i;
@@ -1806,9 +1806,24 @@ void *gc_add(void *p)
   return p;
 }
 
+void add_translation(critbit_tree **cbp, const char *key, int i) {
+    char buffer[256];
+    char * str = transliterate(buffer, sizeof(buffer)-sizeof(int), key);
+    critbit_tree * cb = *cbp;
+    if (str) {
+        size_t len = strlen(str);
+        if (!cb) {
+            *cbp = cb = (critbit_tree *)calloc(1, sizeof(critbit_tree *));
+        }
+        len = cb_new_kv(str, len, &i, sizeof(int), buffer);
+        cb_insert(cb, buffer, len);
+    } else {
+        log_error("could not transliterate '%s'\n", key);
+    }
+}
+
 void init_translations(const struct locale *lang, int ut, const char * (*string_cb)(int i), int maxstrings)
 {
-  char buffer[256];
   void **tokens;
   int i;
 
@@ -1820,18 +1835,8 @@ void init_translations(const struct locale *lang, int ut, const char * (*string_
     const char * key = s ? locale_string(lang, s) : 0;
     key = key ? key : s;
     if (key) {
-      char * str = transliterate(buffer, sizeof(buffer)-sizeof(int), key);
-      if (str) {
-        critbit_tree * cb = (critbit_tree *)*tokens;
-        size_t len = strlen(str);
-        if (!cb) {
-          *tokens = cb = (critbit_tree *)calloc(1, sizeof(critbit_tree *));
-        }
-        len = cb_new_kv(str, len, &i, sizeof(int), buffer);
-        cb_insert(cb, buffer, len);
-      } else {
-        log_error("could not transliterate '%s'\n", key);
-      }
+      critbit_tree ** cb = (critbit_tree **)tokens;
+      add_translation(cb, key, i);
     }
   }
 }

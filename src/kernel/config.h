@@ -27,7 +27,7 @@ extern "C" {
 #include "types.h"
 
   struct _dictionary_;
-
+  struct critbit_tree;
   /* experimental gameplay features (that don't affect the savefile) */
   /* TODO: move these settings to settings.h or into configuration files */
 #define GOBLINKILL              /* Goblin-Spezialklau kann tödlich enden */
@@ -107,6 +107,7 @@ extern "C" {
   extern const char *options[MAXOPTIONS];
 
 /* ------------------------------------------------------------- */
+  void add_translation(struct critbit_tree **cb, const char *str, int i);
   void init_translations(const struct locale *lang, int ut, const char * (*string_cb)(int i), int maxstrings);
   int shipspeed(const struct ship *sh, const struct unit *u);
 
