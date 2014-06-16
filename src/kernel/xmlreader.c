@@ -14,10 +14,10 @@ without prior permission by the authors of Eressea.
 #include <kernel/config.h>
 #include "xmlreader.h"
 
-/* kernel includes */
 #include "building.h"
 #include "equipment.h"
 #include "item.h"
+#include "keyword.h"
 #include "messages.h"
 #include "race.h"
 #include "region.h"
@@ -1950,14 +1950,14 @@ static int parse_terrains(xmlDocPtr doc)
   nodes = terrains->nodesetval;
   for (i = 0; i != nodes->nodeNr; ++i) {
     xmlNodePtr node = nodes->nodeTab[i];
-    terrain_type *terrain = calloc(1, sizeof(terrain_type));
+    terrain_type *terrain;
     xmlChar *propValue;
     xmlXPathObjectPtr xpathChildren;
     xmlNodeSetPtr children;
 
     propValue = xmlGetProp(node, BAD_CAST "name");
     assert(propValue != NULL);
-    terrain->_name = _strdup((const char *)propValue);
+    terrain = get_or_create_terrain((const char *)propValue);
     xmlFree(propValue);
 
     terrain->max_road = (short)xml_ivalue(node, "road", 0);
@@ -2053,7 +2053,6 @@ static int parse_terrains(xmlDocPtr doc)
     }
     xmlXPathFreeObject(xpathChildren);
 
-    register_terrain(terrain);
   }
   xmlXPathFreeObject(terrains);
 
@@ -2226,6 +2225,7 @@ static int parse_strings(xmlDocPtr doc)
   xmlXPathFreeObject(strings);
 
   xmlXPathFreeContext(xpath);
+  init_locales();
   return 0;
 }
 

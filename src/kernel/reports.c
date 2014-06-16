@@ -601,7 +601,8 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char *buf,
   /* status */
 
   if (u->number && (u->faction == f || telepath_see || isbattle)) {
-    const char *c = locale_string(f->locale, hp_status(u));
+    const char *c = hp_status(u);
+    c = c ? locale_string(f->locale, c) : 0;
     bytes = (int)strlcpy(bufp, ", ", size);
     if (wrptr(&bufp, &size, bytes) != 0)
       WARN_STATIC_BUFFER();

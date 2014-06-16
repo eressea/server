@@ -70,7 +70,7 @@ extern "C" {
     struct terrain_type *next;
   } terrain_type;
 
-  extern terrain_type *terrain_get_or_create(const char *name);
+  extern terrain_type *get_or_create_terrain(const char *name);
   extern const terrain_type *terrains(void);
   extern const terrain_type *get_terrain(const char *name);
   extern const char *terrain_name(const struct region *r);

@@ -105,7 +105,7 @@ const terrain_type *get_terrain(const char *name) {
     return terrain_find_i(name);
 }
 
-terrain_type * terrain_get_or_create(const char *name) {
+terrain_type * get_or_create_terrain(const char *name) {
     terrain_type *terrain = terrain_find_i(name);
     if (!terrain) {
         terrain = (terrain_type *)calloc(sizeof(terrain_type), 1);

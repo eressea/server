@@ -1899,7 +1899,6 @@ static void init_locale(const struct locale *lang)
 
     init_translations(lang, UT_PARAMS, parameter_key, MAXPARAMS);
     init_translations(lang, UT_SKILLS, skill_key, MAXSKILLS);
-//  init_translations(lang, UT_KEYWORDS, keyword_key, MAXKEYWORDS);
 
     tokens = get_translations(lang, UT_OPTIONS);
     for (i = 0; i != MAXOPTIONS; ++i) {

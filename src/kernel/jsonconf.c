@@ -203,7 +203,7 @@ void json_terrains(cJSON *json) {
         return;
     }
     for (child=json->child;child;child=child->next) {
-        json_terrain(child, terrain_get_or_create(child->string));
+        json_terrain(child, get_or_create_terrain(child->string));
     }
 }
 
