@@ -1,10 +1,10 @@
 project(util C)
 
 SET(_TEST_FILES
-base36_test.c
-bsdstring_test.c
-functions_test.c
-umlaut_test.c
+base36.test.c
+bsdstring.test.c
+functions.test.c
+umlaut.test.c
 )
 
 SET(_FILES
