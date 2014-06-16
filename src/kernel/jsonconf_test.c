@@ -1,10 +1,13 @@
 #include <platform.h>
 #include "types.h"
 #include "jsonconf.h"
+
 #include "building.h"
+#include "direction.h"
 #include "race.h"
-#include "terrain.h"
 #include "ship.h"
+#include "terrain.h"
+#include "util/language.h"
 #include <CuTest.h>
 #include <cJSON.h>
 #include <tests.h>
@@ -142,9 +145,31 @@ static void test_terrains(CuTest * tc)
     test_cleanup();
 }
 
+static void test_directions(CuTest * tc)
+{
+    const char * data = "{\"directions\": { \"de\" : { \"east\" : \"osten\", \"northwest\" : [ \"nw\", \"nordwest\" ], \"pause\" : \"pause\" }}}";
+    const struct locale * lang;
+
+    cJSON *json = cJSON_Parse(data);
+
+    test_cleanup();
+    lang = get_or_create_locale("de");
+    CuAssertPtrNotNull(tc, json);
+    CuAssertIntEquals(tc, NODIRECTION, get_direction("ost", lang));
+
+    json_config(json);
+    CuAssertIntEquals(tc, D_EAST, get_direction("ost", lang));
+    CuAssertIntEquals(tc, D_NORTHWEST, get_direction("nw", lang));
+    CuAssertIntEquals(tc, D_NORTHWEST, get_direction("nordwest", lang));
+    CuAssertIntEquals(tc, D_PAUSE, get_direction("pause", lang));
+
+    test_cleanup();
+}
+
 CuSuite *get_jsonconf_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_directions);
     SUITE_ADD_TEST(suite, test_ships);
     SUITE_ADD_TEST(suite, test_buildings);
     SUITE_ADD_TEST(suite, test_terrains);

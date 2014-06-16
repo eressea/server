@@ -141,9 +141,6 @@ extern "C" {
   int skill_limit(struct faction *f, skill_t sk);
   int count_skill(struct faction *f, skill_t sk);
 
-/* direction, geography */
-  extern const char *directions[];
-
   int findoption(const char *s, const struct locale *lang);
 
 /* special units */

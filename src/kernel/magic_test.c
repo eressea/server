@@ -178,7 +178,7 @@ void test_getspell_unit(CuTest * tc)
 
   set_level(u, SK_MAGIC, 1);
 
-  lang = find_locale("de");
+  lang = get_locale("de");
   sp = create_spell("testspell", 0);
   locale_setstring(lang, mkname("spell", sp->sname), "Herp-a-derp");
 
@@ -207,7 +207,7 @@ void test_getspell_faction(CuTest * tc)
 
   set_level(u, SK_MAGIC, 1);
 
-  lang = find_locale("de");
+  lang = get_locale("de");
   sp = create_spell("testspell", 0);
   locale_setstring(lang, mkname("spell", sp->sname), "Herp-a-derp");
 
@@ -237,7 +237,7 @@ void test_getspell_school(CuTest * tc)
   skill_enabled[SK_MAGIC] = 1;
   set_level(u, SK_MAGIC, 1);
 
-  lang = find_locale("de");
+  lang = get_locale("de");
   sp = create_spell("testspell", 0);
   locale_setstring(lang, mkname("spell", sp->sname), "Herp-a-derp");
 

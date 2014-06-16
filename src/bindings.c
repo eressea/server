@@ -190,7 +190,7 @@ static int tolua_translate(lua_State * L)
 {
   const char *str = tolua_tostring(L, 1, 0);
   const char *lang = tolua_tostring(L, 2, 0);
-  struct locale *loc = lang ? find_locale(lang) : default_locale;
+  struct locale *loc = lang ? get_locale(lang) : default_locale;
   if (loc) {
     str = locale_string(loc, str);
     tolua_pushstring(L, str);

@@ -134,7 +134,7 @@ void test_create_world(void)
   int i;
   const char * names[] = { "horse", "horse_p", "boat", "boat_p", "iron", "iron_p", "stone", "stone_p" };
 
-  make_locale("de");
+  get_or_create_locale("de");
   init_resources();
   assert(!olditemtype[I_HORSE]);
 

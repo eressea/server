@@ -26,9 +26,23 @@ function setup()
     }]]
 
     eressea.config.parse(conf)
+    eressea.locale.create("en")
 end
 
-function test_landing1()
+function test_sail()
+    local r1 = region.create(0, 0, "ocean")
+    local r2 = region.create(1, 0, "ocean")
+    local f = faction.create("test@example.com", "human", "de")
+    local u = unit.create(f, r1, 1)
+    u.ship = ship.create(r1, "boat")
+    u:set_skill("sailing", 10)
+    u:add_order("NACH O")
+    process_orders()
+--    eressea.process.movement()
+    assert_equal(r2, u.region)
+end
+
+function notest_landing1()
   local ocean = region.create(1, 0, "ocean")
   local r = region.create(0, 0, "plain")
   local f = faction.create("noreply@eressea.de", "insect", "de")

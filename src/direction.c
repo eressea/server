@@ -5,6 +5,8 @@
 #include "util/language.h"
 #include "util/umlaut.h"
 
+#include <string.h>
+
 void init_direction(const struct locale *lang, direction_t dir, const char *str) {
     void **tokens = get_translations(lang, UT_DIRECTIONS);
     variant token;
@@ -45,7 +47,7 @@ void init_directions(const struct locale *lang) {
     }
 }
 
-direction_t finddirection(const char *s, const struct locale *lang)
+direction_t get_direction(const char *s, const struct locale *lang)
 {
     void **tokens = get_translations(lang, UT_DIRECTIONS);
     variant token;
@@ -55,4 +57,18 @@ direction_t finddirection(const char *s, const struct locale *lang)
     }
     return NODIRECTION;
 }
+
+direction_t finddirection(const char *str) {
+    int i;
+    for (i=0;i!=MAXDIRECTIONS+2;++i) {
+        if (directions[i] && strcmp(str, directions[i])==0) {
+            return (direction_t)i;
+        }
+    }
+    return NODIRECTION;
+}
+
+const char * directions[MAXDIRECTIONS+2] = {
+"northwest", "northeast", "east", "southeast", "southwest", "west", 0, "pause"
+};
 

@@ -1718,7 +1718,7 @@ int make_cmd(unit * u, struct order *ord)
     if (pl && fval(pl, PFL_NOBUILD)) {
       cmistake(u, ord, 275, MSG_PRODUCE);
     } else {
-      direction_t d = finddirection(getstrtoken(), u->faction->locale);
+      direction_t d = get_direction(getstrtoken(), u->faction->locale);
       if (d != NODIRECTION) {
         build_road(r, u, m, d);
       } else {

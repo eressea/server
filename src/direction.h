@@ -21,9 +21,13 @@ typedef enum {
     NODIRECTION = -1
 } direction_t; 
 
-direction_t finddirection(const char *s, const struct locale *);
+direction_t get_direction(const char *s, const struct locale *);
 void init_directions(const struct locale *lang);
 void init_direction(const struct locale *lang, direction_t dir, const char *str);
+
+direction_t finddirection(const char *str);
+
+extern const char * directions[];
 
 #ifdef __cplusplus
 #endif

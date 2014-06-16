@@ -344,7 +344,7 @@ static void guardian_faction(plane * pl, int id)
     f->name = _strdup("Igjarjuks Kundschafter");
     f->race = new_race[RC_ILLUSION];
     f->age = turn;
-    f->locale = find_locale("de");
+    f->locale = get_locale("de");
     f->options =
       want(O_COMPRESS) | want(O_REPORT) | want(O_COMPUTER) | want(O_ADRESSEN) |
       want(O_DEBUG);

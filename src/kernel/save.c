@@ -277,8 +277,8 @@ int readorders(const char *filename)
     case P_LOCALE:
       {
         const char *s = getstrtoken();
-        if (f && find_locale(s)) {
-          f->locale = find_locale(s);
+        if (f && get_locale(s)) {
+          f->locale = get_locale(s);
         }
       }
       b = getbuf(F, enc_gamedata);
@@ -1261,7 +1261,7 @@ faction *readfaction(struct gamedata * data)
   }
 
   READ_STR(data->store, name, sizeof(name));
-  f->locale = find_locale(name);
+  f->locale = get_locale(name);
   READ_INT(data->store, &f->lastorders);
   READ_INT(data->store, &f->age);
   READ_STR(data->store, name, sizeof(name));

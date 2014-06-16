@@ -12,12 +12,12 @@
 static void test_recreate_world(CuTest * tc)
 {
   test_cleanup();
-  CuAssertPtrEquals(tc, 0, find_locale("de"));
+  CuAssertPtrEquals(tc, 0, get_locale("de"));
   CuAssertPtrEquals(tc, 0, it_find("money"));
   CuAssertPtrEquals(tc, 0, it_find("horse"));
 
   test_create_world();
-  CuAssertPtrEquals(tc, default_locale, find_locale("de"));
+  CuAssertPtrEquals(tc, default_locale, get_locale("de"));
   CuAssertPtrNotNull(tc, default_locale);
   CuAssertPtrNotNull(tc, findregion(0, 0));
   CuAssertPtrNotNull(tc, it_find("money"));
@@ -31,7 +31,7 @@ static void test_recreate_world(CuTest * tc)
   CuAssertPtrNotNull(tc, rt_find("unit"));
 
   test_cleanup();
-  CuAssertPtrEquals(tc, 0, find_locale("de"));
+  CuAssertPtrEquals(tc, 0, get_locale("de"));
   CuAssertPtrEquals(tc, 0, it_find("money"));
   CuAssertPtrEquals(tc, 0, it_find("horse"));
   CuAssertPtrEquals(tc, 0, rt_find("horse"));

@@ -307,17 +307,6 @@ helpmode helpmodes[] = {
   {NULL, 0}
 };
 
-const char *directions[MAXDIRECTIONS + 2] = {
-  "northwest",
-  "northeast",
-  "east",
-  "southeast",
-  "southwest",
-  "west",
-  "",
-  "pause"
-};
-
 /** Returns the English name of the race, which is what the database uses.
  */
 const char *dbrace(const struct race *rc)
@@ -326,7 +315,7 @@ const char *dbrace(const struct race *rc)
   char *zPtr = zText;
 
   /* the english names are all in ASCII, so we don't need to worry about UTF8 */
-  strcpy(zText, (const char *)LOC(find_locale("en"), rc_name(rc, 0)));
+  strcpy(zText, (const char *)LOC(get_locale("en"), rc_name(rc, 0)));
   while (*zPtr) {
     *zPtr = (char)(toupper(*zPtr));
     ++zPtr;
@@ -2035,9 +2024,9 @@ void init_locales(void)
 {
     int l;
     for (l = 0; localenames[l]; ++l) {
-        const struct locale *lang = find_locale(localenames[l]);
+        const struct locale *lang = get_locale(localenames[l]);
         if (!lang) {
-            lang = make_locale(localenames[l]);
+            lang = get_or_create_locale(localenames[l]);
         }
         init_locale(lang);
     }
@@ -2704,7 +2693,7 @@ message *movement_error(unit * u, const char *token, order * ord,
   direction_t d;
   switch (error_code) {
   case E_MOVE_BLOCKED:
-    d = finddirection(token, u->faction->locale);
+    d = get_direction(token, u->faction->locale);
     return msg_message("moveblocked", "unit direction", u, d);
   case E_MOVE_NOREGION:
     return msg_feedback(u, ord, "unknowndirection", "dirname", token);
@@ -2722,7 +2711,7 @@ int movewhere(const unit * u, const char *token, region * r, region ** resultp)
     return E_MOVE_OK;
   }
 
-  d = finddirection(token, u->faction->locale);
+  d = get_direction(token, u->faction->locale);
   switch (d) {
   case D_PAUSE:
     *resultp = r;

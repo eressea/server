@@ -78,7 +78,7 @@ void test_finditemtype(CuTest * tc)
   test_cleanup();
   test_create_world();
 
-  lang = find_locale("de");
+  lang = get_locale("de");
   locale_setstring(lang, "horse", "Pferd");
   itype = it_find("horse");
   iresult = finditemtype("Pferd", lang);
@@ -94,7 +94,7 @@ void test_findresourcetype(CuTest * tc)
   test_cleanup();
   test_create_world();
 
-  lang = find_locale("de");
+  lang = get_locale("de");
   locale_setstring(lang, "horse", "Pferd");
   locale_setstring(lang, "peasant", "Bauer");
 

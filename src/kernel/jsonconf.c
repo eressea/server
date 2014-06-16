@@ -229,6 +229,42 @@ void json_ships(cJSON *json) {
     }
 }
 
+static void json_direction(cJSON *json, struct locale *lang) {
+    cJSON *child;
+    if (json->type!=cJSON_Object) {
+        log_error("directions for locale `%s` not a json object: %d\n", locale_name(lang), json->type);
+        return;
+    }
+    for (child=json->child;child;child=child->next) {
+        direction_t dir = finddirection(child->string);
+        if (dir!=NODIRECTION) {
+            if (child->type==cJSON_String) {
+                init_direction(lang, dir, child->valuestring);
+            }
+            else if (child->type==cJSON_Array) {
+                cJSON *entry;
+                for (entry=child->child;entry;entry=entry->next) {
+                    init_direction(lang, dir, entry->valuestring);
+                }
+            } else {
+                log_error("invalid type %d for direction `%s`\n", child->type, child->string);
+            }
+        }
+    }
+}
+
+void json_directions(cJSON *json) {
+    cJSON *child;
+    if (json->type!=cJSON_Object) {
+        log_error("directions is not a json object: %d\n", json->type);
+        return;
+    }
+    for (child=json->child;child;child=child->next) {
+        struct locale * lang = get_or_create_locale(child->string);
+        json_direction(child, lang);
+    }
+}
+
 void json_races(cJSON *json) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
@@ -252,6 +288,9 @@ void json_config(cJSON *json) {
         }
         else if (strcmp(child->string, "ships")==0) {
             json_ships(child);
+        }
+        else if (strcmp(child->string, "directions")==0) {
+            json_directions(child);
         }
         else if (strcmp(child->string, "buildings")==0) {
             json_buildings(child);

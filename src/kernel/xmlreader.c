@@ -58,10 +58,10 @@ static void xml_readtext(xmlNodePtr node, struct locale **lang, xmlChar ** text)
 {
   xmlChar *propValue = xmlGetProp(node, BAD_CAST "locale");
   assert(propValue != NULL);
-  *lang = find_locale((const char *)propValue);
+  *lang = get_locale((const char *)propValue);
 #ifdef MAKE_LOCALES
   if (*lang == NULL)
-    *lang = make_locale((const char *)propValue);
+    *lang = get_or_create_locale((const char *)propValue);
 #endif
   xmlFree(propValue);
 

@@ -18,5 +18,3 @@ function test_create()
     r = region.create(0, 0, "ocean")
     assert_not_nil(r)
 end
-
-

@@ -298,7 +298,7 @@ newfaction *read_newfactions(const char *filename)
         }
       }
     }
-    nf->lang = find_locale(lang);
+    nf->lang = get_locale(lang);
     nf->bonus = bonus;
     assert(nf->race && nf->email && nf->lang);
     nfi = &newfactions;

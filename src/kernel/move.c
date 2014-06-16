@@ -1022,7 +1022,7 @@ static void cycle_route(order * ord, unit * u, int gereist)
     pause = false;
     token = getstrtoken();
     if (token && *token) {
-      d = finddirection(token, lang);
+      d = get_direction(token, lang);
       if (d == D_PAUSE) {
         pause = true;
       } else if (d == NODIRECTION) {

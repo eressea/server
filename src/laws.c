@@ -1639,7 +1639,7 @@ static void init_prefixnames(void)
 {
   int i;
   for (i = 0; localenames[i]; ++i) {
-    const struct locale *lang = find_locale(localenames[i]);
+    const struct locale *lang = get_locale(localenames[i]);
     bool exist = false;
     struct local_names *in = pnames;
 

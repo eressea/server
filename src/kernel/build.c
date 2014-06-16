@@ -94,7 +94,7 @@ ship *getship(const struct region * r)
 
 static void destroy_road(unit * u, int nmax, struct order *ord)
 {
-  direction_t d = finddirection(getstrtoken(), u->faction->locale);
+  direction_t d = get_direction(getstrtoken(), u->faction->locale);
   unit *u2;
   region *r = u->region;
   short n = (short)nmax;

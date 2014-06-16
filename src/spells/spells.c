@@ -2608,7 +2608,7 @@ static int sp_firewall(castorder * co)
   direction_t dir;
   region *r2;
 
-  dir = finddirection(pa->param[0]->data.xs, mage->faction->locale);
+  dir = get_direction(pa->param[0]->data.xs, mage->faction->locale);
   if (dir < MAXDIRECTIONS && dir != NODIRECTION) {
     r2 = rconnect(r, dir);
   } else {
@@ -5862,7 +5862,7 @@ int sp_movecastle(castorder * co)
     return 0;
 
   b = pa->param[0]->data.b;
-  dir = finddirection(pa->param[1]->data.xs, mage->faction->locale);
+  dir = get_direction(pa->param[1]->data.xs, mage->faction->locale);
 
   if (dir == NODIRECTION) {
     /* Die Richtung wurde nicht erkannt */

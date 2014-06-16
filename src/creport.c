@@ -91,7 +91,7 @@ static const char *crtag(const char *key)
 {
   static const struct locale *lang = NULL;
   if (!lang)
-    lang = find_locale(TAG_LOCALE);
+    lang = get_locale(TAG_LOCALE);
   return locale_string(lang, key);
 }
 #else
