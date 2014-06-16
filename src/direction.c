@@ -40,10 +40,12 @@ void init_directions(const struct locale *lang) {
     void **tokens = get_translations(lang, UT_DIRECTIONS);
 
     for (i = 0; dirs[i].direction != NODIRECTION; ++i) {
-        variant token;
         const char *str = locale_string(lang, dirs[i].name);
-        token.i = dirs[i].direction;
-        addtoken(tokens, str, token);
+        if (str) {
+            variant token;
+            token.i = dirs[i].direction;
+            addtoken(tokens, str, token); 
+        }
     }
 }
 

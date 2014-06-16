@@ -36,6 +36,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "faction.h"
 #include "group.h"
 #include "item.h"
+#include "keyword.h"
 #include "magic.h"
 #include "messages.h"
 #include "move.h"
@@ -1878,6 +1879,7 @@ static void init_locale(const struct locale *lang)
     }
 
     init_directions(lang);
+    init_keywords(lang);
 
     tokens = get_translations(lang, UT_RACES);
     for (rc = races; rc; rc = rc->next) {

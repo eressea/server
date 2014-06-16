@@ -131,12 +131,11 @@ const char *locale_string(const locale * lang, const char *key)
     unsigned int id = hkey & (SMAXHASH - 1);
     struct locale_str *find;
 
-    if (*key == 0)
-      return NULL;
+    if (*key == 0) return 0;
     find = lang->strings[id];
     while (find) {
       if (find->hashkey == hkey) {
-        if (find->nexthash == NULL) {
+        if (!find->nexthash) {
           /* if this is the only entry with this hash, fine. */
           assert(strcmp(key, find->key) == 0);
           break;
@@ -151,11 +150,11 @@ const char *locale_string(const locale * lang, const char *key)
       if (lang->fallback) {
         return locale_string(lang->fallback, key);
       }
-      return key;
+      return 0;
     }
     return find->str;
   }
-  return NULL;
+  return 0;
 }
 
 void locale_setstring(locale * lang, const char *key, const char *value)

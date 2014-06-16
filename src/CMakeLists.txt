@@ -142,12 +142,13 @@ target_link_libraries(eressea
 set(TESTS_SRC
   test_eressea.c
   tests.c
-  tests_test.c
-  direction_test.c
-  json_test.c
-  economy_test.c
-  market_test.c
-  laws_test.c
+  tests.test.c
+  direction.test.c
+  keyword.test.c
+  json.test.c
+  economy.test.c
+  market.test.c
+  laws.test.c
   ${UTIL_TESTS}
   ${KERNEL_TESTS}
   ${ERESSEA_SRC}

@@ -16,11 +16,32 @@ static const char * keyword_key(int i)
   return keywords[i];
 }
 
-keyword_t findkeyword(const char *s, const struct locale *lang) {
+void init_keyword(const struct locale *lang, keyword_t kwd, const char *str) {
+    void **tokens = get_translations(lang, UT_KEYWORDS);
+    variant token;
+    token.i = kwd;
+    addtoken(tokens, str, token);
+}
+
+keyword_t findkeyword(const char *s) {
+    int i;
+    for (i=0;i!=MAXKEYWORDS;++i) {
+        if (strcmp(s, keywords[i])==0) {
+            return (keyword_t)i;
+        }
+    }
+    return NOKEYWORD;
+}
+
+
+void init_keywords(const struct locale *lang) {
+    init_translations(lang, UT_KEYWORDS, keyword_key, MAXKEYWORDS);
+}
+
+keyword_t get_keyword(const char *s, const struct locale *lang) {
     keyword_t result = NOKEYWORD;
     char buffer[64];
 
-    init_translations(lang, UT_KEYWORDS, keyword_key, MAXKEYWORDS);
     assert(lang);
     assert(s);
     while (*s == '@') ++s;

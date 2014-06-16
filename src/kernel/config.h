@@ -385,7 +385,6 @@ extern "C" {
     const char *gamename;
     struct attrib *attribs;
     unsigned int data_turn;
-//    bool disabled[MAXKEYWORDS];
     struct param *parameters;
     void *vm_state;
     float producexpchance;
@@ -413,8 +412,7 @@ extern "C" {
   void set_param(struct param **p, const char *name, const char *data);
   const char *get_param(const struct param *p, const char *name);
   int get_param_int(const struct param *p, const char *name, int def);
-  float get_param_flt(const struct param *p, const char *name,
-    float def);
+  float get_param_flt(const struct param *p, const char *name, float def);
 
   bool ExpensiveMigrants(void);
   int NMRTimeout(void);

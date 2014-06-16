@@ -298,7 +298,7 @@ int setstealth_cmd(unit * u, struct order *ord)
         }
       }
       if (rule&2) {
-        if (findkeyword(s, u->faction->locale) == K_NUMBER) {
+        if (get_keyword(s, u->faction->locale) == K_NUMBER) {
           const char *s2 = (const char *)getstrtoken();
           int nr = -1;
 
