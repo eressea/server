@@ -53,8 +53,7 @@ keyword_t get_keyword(const char *s, const struct locale *lang) {
             const void *match;
             void **tokens = get_translations(lang, UT_KEYWORDS);
             critbit_tree *cb = (critbit_tree *)*tokens;
-            assert(cb);
-            if (cb_find_prefix(cb, str, strlen(str), &match, 1, 0)) {
+            if (cb && cb_find_prefix(cb, str, strlen(str), &match, 1, 0)) {
                 cb_get_kv(match, &i, sizeof(int));
                 result = (keyword_t)i;
                 return keyword_disabled(result) ? NOKEYWORD : result;

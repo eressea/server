@@ -4,6 +4,7 @@
 
 #include "building.h"
 #include "direction.h"
+#include "keyword.h"
 #include "race.h"
 #include "ship.h"
 #include "terrain.h"
@@ -166,9 +167,29 @@ static void test_directions(CuTest * tc)
     test_cleanup();
 }
 
+static void test_keywords(CuTest * tc)
+{
+    const char * data = "{\"keywords\": { \"de\" : { \"NACH\" : \"nach\", \"LERNEN\" : \"lernen\" }}}";
+    const struct locale * lang;
+
+    cJSON *json = cJSON_Parse(data);
+
+    test_cleanup();
+    lang = get_or_create_locale("de");
+    CuAssertPtrNotNull(tc, json);
+    CuAssertIntEquals(tc, NOKEYWORD, get_keyword("potato", lang));
+
+    json_config(json);
+    CuAssertIntEquals(tc, K_STUDY, get_keyword("lerne", lang));
+    CuAssertIntEquals(tc, K_MOVE, get_keyword("nach", lang));
+
+    test_cleanup();
+}
+
 CuSuite *get_jsonconf_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_keywords);
     SUITE_ADD_TEST(suite, test_directions);
     SUITE_ADD_TEST(suite, test_ships);
     SUITE_ADD_TEST(suite, test_buildings);
