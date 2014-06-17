@@ -54,10 +54,6 @@
     <!-- Game specific settings -->
 
     <order name="BEZAHLEN" disable="yes"/>
-    <order name="FRIEDEN" disable="yes"/>
-    <order name="GM" disable="yes"/>
-    <order name="JIHAD" disable="yes"/>
-    <order name="KRIEG" disable="yes"/>
 
     <skill name="alchemy" enable="true"/>
     <skill name="crossbow" enable="true"/>

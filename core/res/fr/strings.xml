@@ -1393,184 +1393,169 @@
   <string name="//">
     <text locale="fr">//</text>
   </string>
-  <string name="ARBEITEN">
+  <string name="work">
     <text locale="fr">TRAVAILLER</text>
   </string>
-  <string name="ATTACKIEREN">
+  <string name="attack">
     <text locale="fr">ATTAQUER</text>
   </string>
-  <string name="BANNER">
+  <string name="banner">
     <text locale="fr">ANNONCE</text>
   </string>
-  <string name="BEKLAUEN">
+  <string name="steal">
     <text locale="fr">VOLER</text>
   </string>
-  <string name="BELAGERE">
+  <string name="besiege">
     <text locale="fr">ASSIEGER</text>
   </string>
-  <string name="BENENNEN">
+  <string name="name">
     <text locale="fr">NOMMER</text>
   </string>
-  <string name="BENUTZEN">
+  <string name="use">
     <text locale="fr">UTILISER</text>
   </string>
-  <string name="BESCHREIBEN">
+  <string name="describe">
     <text locale="fr">DECRIRE</text>
   </string>
-  <string name="BETEN">
-    <text locale="fr">PRIER</text>
-  </string>
-  <string name="BETRETEN">
+  <string name="enter">
     <text locale="fr">ENTRER</text>
   </string>
-  <string name="BEWACHEN">
+  <string name="guard">
     <text locale="fr">GUARDER</text>
   </string>
-  <string name="BIETEN">
-    <text locale="fr">OFFRIR</text>
-  </string>
-  <string name="BOTSCHAFT">
+  <string name="message">
     <text locale="fr">MESSAGE</text>
   </string>
-  <string name="DEFAULT">
+  <string name="default">
     <text locale="fr">DEFAUT</text>
   </string>
-  <string name="EMAIL">
+  <string name="email">
     <text locale="fr">EMAIL</text>
   </string>
-  <string name="ENDE">
+  <string name="end">
     <text locale="fr">FIN</text>
   </string>
-  <string name="FAHREN">
+  <string name="ride">
     <text locale="fr">CHEVAUCHER</text>
   </string>
-  <string name="FOLGEN">
+  <string name="follow">
     <text locale="fr">SUIVRE</text>
   </string>
-  <string name="FORSCHEN">
+  <string name="research">
     <text locale="fr">CHERCHER</text>
   </string>
-  <string name="GRUPPE">
+  <string name="group">
     <text locale="fr">GROUPER</text>
   </string>
-  <string name="HELFEN">
+  <string name="help">
     <text locale="fr">AIDER</text>
   </string>
-  <string name="KAMPFZAUBER">
+  <string name="ready">
     <text locale="fr">PREPARER</text>
   </string>
-  <string name="KAUFEN">
+  <string name="buy">
     <text locale="fr">ACHETER</text>
   </string>
-  <string name="KONTAKTIEREN">
+  <string name="contact">
     <text locale="fr">CONTACTER</text>
   </string>
-  <string name="KÄMPFEN">
+  <string name="fight">
     <text locale="fr">COMBATTRE</text>
   </string>
-  <string name="LEHREN">
+  <string name="teach">
     <text locale="fr">ENSEIGNER</text>
   </string>
-  <string name="LERNEN">
+  <string name="study">
     <text locale="fr">APPRENDRE</text>
   </string>
   <string name="LIEFERE">
     <text locale="fr">FOURNIR</text>
   </string>
-  <string name="LOCALE">
+  <string name="locale">
     <text locale="fr">LOCAL</text>
   </string>
-  <string name="MACHEN">
+  <string name="make">
     <text locale="fr">FAIRE</text>
   </string>
-  <string name="NACH">
+  <string name="move">
     <text locale="fr">ALLER</text>
   </string>
-  <string name="NEUSTART">
-    <text locale="fr">RECOMMENCER</text>
-  </string>
-  <string name="NUMMER">
+  <string name="number">
     <text locale="fr">NOMBRE</text>
   </string>
-  <string name="OPFERE">
-    <text locale="fr">SACRIFIER</text>
-  </string>
-  <string name="OPTION">
+  <string name="option">
     <text locale="fr">OPTION</text>
   </string>
-  <string name="PASSWORT">
+  <string name="password">
     <text locale="fr">PASSWORD</text>
   </string>
-  <string name="PFLANZEN">
+  <string name="plant">
     <text locale="fr">PLANTER</text>
   </string>
-  <string name="PIRATERIE">
+  <string name="piracy">
     <text locale="fr">PIRATERIE</text>
   </string>
-  <string name="PRÄFIX">
+  <string name="prefix">
     <text locale="fr">PREFIXE</text>
   </string>
-  <string name="REKRUTIEREN">
+  <string name="recruit">
     <text locale="fr">RECRUTER</text>
   </string>
-  <string name="REPORT">
+  <string name="report">
     <text locale="fr">RAPPORT</text>
   </string>
-  <string name="RESERVIEREN">
+  <string name="reserver">
     <text locale="fr">RESERVER</text>
   </string>
-  <string name="ROUTE">
+  <string name="route">
     <text locale="fr">TRAJET</text>
   </string>
-  <string name="SABOTIEREN">
+  <string name="sabotage">
     <text locale="fr">SABOTER</text>
   </string>
-  <string name="SORTIEREN">
+  <string name="sort">
     <text locale="fr">TRIER</text>
   </string>
-  <string name="SPIONIEREN">
+  <string name="spy">
     <text locale="fr">ESPIONNER</text>
   </string>
-  <string name="STIRB">
+  <string name="quit">
     <text locale="fr">ABANDONNER</text>
   </string>
-  <string name="SYNONYM">
-    <text locale="fr">SYNONYME</text>
-  </string>
-  <string name="TARNEN">
+  <string name="hide">
     <text locale="fr">CACHER</text>
   </string>
-  <string name="TRANSPORTIEREN">
+  <string name="transport">
     <text locale="fr">TRANSPORTER</text>
   </string>
-  <string name="TREIBEN">
+  <string name="tax">
     <text locale="fr">TAXER</text>
   </string>
-  <string name="UNTERHALTEN">
+  <string name="entertain">
     <text locale="fr">DIVERTIR</text>
   </string>
-  <string name="URSPRUNG">
+  <string name="origin">
     <text locale="fr">ORIGINE</text>
   </string>
-  <string name="VERGESSEN">
+  <string name="forget">
     <text locale="fr">OUBLIER</text>
   </string>
-  <string name="VERKAUFEN">
+  <string name="sell">
     <text locale="fr">VENDRE</text>
   </string>
-  <string name="VERLASSEN">
+  <string name="leave">
     <text locale="fr">SORTIR</text>
   </string>
-  <string name="ZAUBERE">
+  <string name="cast">
     <text locale="fr">INCANTER</text>
   </string>
-  <string name="ZEIGEN">
+  <string name="show">
     <text locale="fr">MONTRER</text>
   </string>
-  <string name="ZERSTÖREN">
+  <string name="destroy">
     <text locale="fr">DETRUIRE</text>
   </string>
-  <string name="ZÜCHTEN">
+  <string name="grow">
     <text locale="fr">ACCROITRE</text>
   </string>
   </namespace>

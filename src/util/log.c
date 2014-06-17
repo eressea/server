@@ -225,6 +225,35 @@ void log_warning(const char *format, ...)
   }
 }
 
+void log_error_n(const char *format, ...)
+{
+  const char * prefix = "ERROR";
+  const int mask = LOG_CPERROR;
+
+  /* write to the logfile, always */
+  if (logfile && (log_flags & mask)) {
+    va_list args;
+    va_start(args, format);
+    _log_write(logfile, 0, prefix, format, args);
+    va_end(args);
+  }
+
+  /* write to stderr, if that's not the logfile already */
+  if (logfile!=stderr && (log_stderr & mask)) {
+    int dupe = check_dupe(format, prefix);
+    if (!dupe) {
+      va_list args;
+      va_start(args, format);
+      _log_write(stderr, stdio_codepage, prefix, format, args);
+      fputc('\n', logfile);
+      va_end(args);
+    }
+  }
+  if (log_flags & LOG_FLUSH) {
+    log_flush();
+  }
+}
+
 void log_error(const char *format, ...)
 {
   const char * prefix = "ERROR";

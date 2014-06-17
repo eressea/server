@@ -11,7 +11,7 @@ static void test_init_keywords(CuTest *tc) {
 
     test_cleanup();
     lang = get_or_create_locale("en");
-    locale_setstring(lang, "keyword::NACH", "MOVE");
+    locale_setstring(lang, "keyword::move", "MOVE");
     init_keywords(lang);
     CuAssertIntEquals(tc, K_MOVE, get_keyword("move", lang));
     test_cleanup();
@@ -22,20 +22,22 @@ static void test_init_keyword(CuTest *tc) {
     test_cleanup();
 
     lang = get_or_create_locale("de");
-    init_keyword(lang, K_MOVE, "nach");
-    init_keyword(lang, K_STUDY, "lernen");
+    init_keyword(lang, K_MOVE, "NACH");
+    init_keyword(lang, K_STUDY, "LERNEN");
     init_keyword(lang, K_DESTROY, "ZERSTOEREN");
     CuAssertIntEquals(tc, K_MOVE, get_keyword("nach", lang));
+    CuAssertIntEquals(tc, K_STUDY, get_keyword("LERN", lang));
+    CuAssertIntEquals(tc, K_STUDY, get_keyword("LERNEN", lang));
     CuAssertIntEquals(tc, K_STUDY, get_keyword("lerne", lang));
-    CuAssertIntEquals(tc, K_DESTROY, get_keyword("ZERSTÖREN", lang));
+    CuAssertIntEquals(tc, K_DESTROY, get_keyword("zerst\xC3\xB6ren", lang));
     CuAssertIntEquals(tc, NOKEYWORD, get_keyword("potato", lang));
     test_cleanup();
 }
 
 static void test_findkeyword(CuTest *tc) {
     test_cleanup();
-    CuAssertIntEquals(tc, K_MOVE, findkeyword("NACH"));
-    CuAssertIntEquals(tc, K_STUDY, findkeyword("LERNEN"));
+    CuAssertIntEquals(tc, K_MOVE, findkeyword("move"));
+    CuAssertIntEquals(tc, K_STUDY, findkeyword("study"));
     CuAssertIntEquals(tc, NOKEYWORD, findkeyword(""));
     CuAssertIntEquals(tc, NOKEYWORD, findkeyword("potato"));
 }
@@ -45,8 +47,8 @@ static void test_get_keyword_default(CuTest *tc) {
     test_cleanup();
     lang = get_or_create_locale("en");
     CuAssertIntEquals(tc, NOKEYWORD, get_keyword("potato", lang));
-    CuAssertIntEquals(tc, K_MOVE, get_keyword("NACH", lang));
-    CuAssertIntEquals(tc, K_STUDY, get_keyword("LERNEN", lang));
+    CuAssertIntEquals(tc, K_MOVE, get_keyword("move", lang));
+    CuAssertIntEquals(tc, K_STUDY, get_keyword("study", lang));
 }
 
 #define SUITE_DISABLE_TEST(suite, test) (void)test

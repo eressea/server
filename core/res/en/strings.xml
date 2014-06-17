@@ -1385,181 +1385,178 @@
   <string name="//">
     <text locale="en">//</text>
   </string>
-  <string name="ARBEITEN">
+  <string name="work">
     <text locale="en">WORK</text>
   </string>
-  <string name="ATTACKIEREN">
+  <string name="attack">
     <text locale="en">ATTACK</text>
   </string>
-  <string name="BANNER">
+  <string name="banner">
     <text locale="en">BANNER</text>
   </string>
-  <string name="BEKLAUEN">
+  <string name="steal">
     <text locale="en">STEAL</text>
   </string>
-  <string name="BELAGERE">
+  <string name="besiege">
     <text locale="en">BESIEGE</text>
   </string>
-  <string name="BENENNEN">
+  <string name="name">
     <text locale="en">NAME</text>
   </string>
-  <string name="BENUTZEN">
+  <string name="use">
     <text locale="en">USE</text>
   </string>
-  <string name="BESCHREIBEN">
+  <string name="describe">
     <text locale="en">DESCRIBE</text>
   </string>
-  <string name="BETEN">
-    <text locale="en">PRAY</text>
-  </string>
-  <string name="BETRETEN">
+  <string name="enter">
     <text locale="en">ENTER</text>
   </string>
-  <string name="BEWACHEN">
+  <string name="guard">
     <text locale="en">GUARD</text>
   </string>
-  <string name="BIETEN">
+  <string name="bid">
     <text locale="en">BID</text>
   </string>
-  <string name="BOTSCHAFT">
+  <string name="message">
     <text locale="en">MESSAGE</text>
   </string>
-  <string name="DEFAULT">
+  <string name="default">
     <text locale="en">DEFAULT</text>
   </string>
-  <string name="EMAIL">
+  <string name="email">
     <text locale="en">EMAIL</text>
   </string>
-  <string name="ENDE">
+  <string name="end">
     <text locale="en">END</text>
   </string>
-  <string name="FAHREN">
+  <string name="ride">
     <text locale="en">RIDE</text>
   </string>
-  <string name="FOLGEN">
+  <string name="follow">
     <text locale="en">FOLLOW</text>
   </string>
-  <string name="FORSCHEN">
+  <string name="research">
     <text locale="en">RESEARCH</text>
   </string>
-  <string name="GRUPPE">
+  <string name="group">
     <text locale="en">GROUP</text>
   </string>
-  <string name="HELFEN">
+  <string name="help">
     <text locale="en">HELP</text>
   </string>
-  <string name="KAMPFZAUBER">
+  <string name="ready">
     <text locale="en">COMBATSPELL</text>
   </string>
-  <string name="KAUFEN">
+  <string name="buy">
     <text locale="en">BUY</text>
   </string>
-  <string name="KONTAKTIEREN">
+  <string name="contact">
     <text locale="en">CONTACT</text>
   </string>
-  <string name="KAEMPFEN">
+  <string name="combat">
     <text locale="en">COMBAT</text>
   </string>
-  <string name="LEHREN">
+  <string name="teach">
     <text locale="en">TEACH</text>
   </string>
-  <string name="LERNEN">
+  <string name="study">
     <text locale="en">LEARN</text>
   </string>
-  <string name="LIEFERE">
-    <text locale="en">SUPPLY</text>
-  </string>
-  <string name="LOCALE">
+  <string name="locale">
     <text locale="en">LOCALE</text>
   </string>
-  <string name="MACHEN">
+  <string name="make">
     <text locale="en">MAKE</text>
   </string>
-  <string name="NACH">
+  <string name="move">
     <text locale="en">MOVE</text>
   </string>
-  <string name="NEUSTART">
-    <text locale="en">RESTART</text>
-  </string>
-  <string name="NUMMER">
+  <string name="number">
     <text locale="en">NUMBER</text>
   </string>
-  <string name="OPFERE">
-    <text locale="en">SACRIFICE</text>
-  </string>
-  <string name="OPTION">
+  <string name="option">
     <text locale="en">OPTION</text>
   </string>
-  <string name="PASSWORT">
+  <string name="password">
     <text locale="en">PASSWORD</text>
   </string>
-  <string name="PFLANZEN">
+  <string name="plant">
     <text locale="en">PLANT</text>
   </string>
-  <string name="PIRATERIE">
+  <string name="piracy">
     <text locale="en">PIRACY</text>
   </string>
-  <string name="PRAEFIX">
+  <string name="prefix">
     <text locale="en">PREFIX</text>
   </string>
-  <string name="REKRUTIEREN">
+  <string name="alliance">
+    <text locale="en">ALLIANCE</text>
+  </string>
+  <string name="promote">
+    <text locale="en">PROMOTION</text>
+  </string>
+  <string name="claim">
+    <text locale="en">CLAIM</text>
+  </string>
+  <string name="recruit">
     <text locale="en">RECRUIT</text>
   </string>
-  <string name="REPORT">
+  <string name="report">
     <text locale="en">REPORT</text>
   </string>
-  <string name="RESERVIEREN">
+  <string name="reserve">
     <text locale="en">RESERVE</text>
   </string>
-  <string name="ROUTE">
+  <string name="route">
     <text locale="en">ROUTE</text>
   </string>
-  <string name="SABOTIEREN">
+  <string name="sabotage">
     <text locale="en">SABOTAGE</text>
   </string>
-  <string name="SORTIEREN">
+  <string name="sort">
     <text locale="en">SORT</text>
   </string>
-  <string name="SPIONIEREN">
+  <string name="spy">
     <text locale="en">SPY</text>
   </string>
-  <string name="STIRB">
+  <string name="quit">
     <text locale="en">QUIT</text>
   </string>
-  <string name="TARNEN">
+  <string name="hide">
     <text locale="en">HIDE</text>
   </string>
-  <string name="TRANSPORTIEREN">
+  <string name="carry">
     <text locale="en">CARRY</text>
   </string>
-  <string name="TREIBEN">
+  <string name="tax">
     <text locale="en">TAX</text>
   </string>
-  <string name="UNTERHALTEN">
+  <string name="entertain">
     <text locale="en">ENTERTAIN</text>
   </string>
-  <string name="URSPRUNG">
+  <string name="origin">
     <text locale="en">ORIGIN</text>
   </string>
-  <string name="VERGESSEN">
+  <string name="forget">
     <text locale="en">FORGET</text>
   </string>
-  <string name="VERKAUFEN">
+  <string name="sell">
     <text locale="en">SELL</text>
   </string>
-  <string name="VERLASSEN">
+  <string name="leave">
     <text locale="en">LEAVE</text>
   </string>
-  <string name="ZAUBERE">
+  <string name="cast">
     <text locale="en">CAST</text>
   </string>
-  <string name="ZEIGEN">
+  <string name="show">
     <text locale="en">SHOW</text>
   </string>
-  <string name="ZERSTOEREN">
+  <string name="destroy">
     <text locale="en">DESTROY</text>
   </string>
-  <string name="ZUECHTEN">
+  <string name="grow">
     <text locale="en">GROW</text>
   </string>
 </namespace>

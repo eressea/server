@@ -169,7 +169,7 @@ static void test_directions(CuTest * tc)
 
 static void test_keywords(CuTest * tc)
 {
-    const char * data = "{\"keywords\": { \"de\" : { \"NACH\" : \"nach\", \"LERNEN\" : \"lernen\" }}}";
+    const char * data = "{\"keywords\": { \"de\" : { \"move\" : \"nach\", \"study\" : \"lernen\" }}}";
     const struct locale * lang;
 
     cJSON *json = cJSON_Parse(data);
