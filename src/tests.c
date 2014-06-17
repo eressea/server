@@ -60,13 +60,6 @@ void test_cleanup(void)
     test_clear_resources();
     global.functions.maintenance = NULL;
     global.functions.wage = NULL;
-    default_locale = 0;
-    free_locales();
-    free_spells();
-    free_buildingtypes();
-    free_shiptypes();
-    free_races();
-    free_spellbooks();
     free_gamedata();
 }
 

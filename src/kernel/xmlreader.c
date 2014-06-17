@@ -1975,8 +1975,6 @@ static int parse_terrains(xmlDocPtr doc)
         terrain->flags |= WALK_INTO;
       if (xml_bvalue(node, "swim", false))
         terrain->flags |= SWIM_INTO;
-      if (xml_bvalue(node, "shallow", true))
-        terrain->flags |= LARGE_SHIPS;
       if (xml_bvalue(node, "cavalry", false))
         terrain->flags |= CAVALRY_REGION;
     }

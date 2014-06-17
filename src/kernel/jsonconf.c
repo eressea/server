@@ -86,7 +86,30 @@ void json_terrain(cJSON *json, terrain_type *ter) {
         return;
     }
     for (child=json->child;child;child=child->next) {
-        log_error_n("terrain %s contains unknown attribute %s", json->string, child->string);
+        switch(child->type) {
+        case cJSON_Array:
+            if (strcmp(child->string, "flags")==0) {
+                cJSON *entry;
+                const char * flags[] = {
+                    "land", "sea", "forest", "arctic", "cavalry", "forbidden", "sail", "fly", "swim", "walk", 0
+                };
+                for (entry=child->child;entry;entry=entry->next) {
+                    if (entry->type == cJSON_String) {
+                        int i;
+                        for (i = 0; flags[i]; ++i) {
+                            if (strcmp(flags[i], entry->valuestring)==0) {
+                                ter->flags |= (1<<i);
+                            }
+                        }
+                    }
+                }
+            } else {
+                log_error_n("terrain %s contains unknown attribute %s", json->string, child->string);
+            }
+            break;
+        default:
+            log_error_n("terrain %s contains unknown attribute %s", json->string, child->string);
+        }
     }
 }
 
@@ -120,6 +143,15 @@ void json_ship(cJSON *json, ship_type *st) {
         case cJSON_Object:
             if (strcmp(child->string, "construction")==0) {
                 json_construction(child, &st->construction);
+            } else {
+                log_error_n("ship %s contains unknown attribute %s", json->string, child->string);
+            }
+            break;
+        case cJSON_Number:
+            if (strcmp(child->string, "range")==0) {
+                st->range = child->valueint;
+            } else {
+                log_error_n("ship %s contains unknown attribute %s", json->string, child->string);
             }
             break;
         default:

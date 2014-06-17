@@ -14,25 +14,28 @@
 
 static void test_ship_not_allowed_in_coast(CuTest * tc)
 {
-  region *r;
+  region *r1, *r2;
   ship * sh;
-  terrain_type * ttype;
-  ship_type * stype;
+  terrain_type *ttype, *otype;
+  ship_type *stype;
   const char * names[] = { "derp", "derp_p" };
 
   test_cleanup();
   test_create_world();
 
   ttype = test_create_terrain("glacier", LAND_REGION|ARCTIC_REGION|WALK_INTO|SAIL_INTO);
+  otype = test_create_terrain("ocean", SEA_REGION|SAIL_INTO);
   stype = test_create_shiptype(names);
   stype->coasts = (const struct terrain_type **)calloc(2, sizeof(const struct terrain_type *));
 
-  r = test_create_region(0, 0, ttype);
+  r1 = test_create_region(0, 0, ttype);
+  r2 = test_create_region(1, 0, otype);
   sh = test_create_ship(0, stype);
 
-  CuAssertIntEquals(tc, SA_NO_COAST, check_ship_allowed(sh, r));
+  CuAssertIntEquals(tc, SA_COAST, check_ship_allowed(sh, r2));
+  CuAssertIntEquals(tc, SA_NO_COAST, check_ship_allowed(sh, r1));
   stype->coasts[0] = ttype;
-  CuAssertIntEquals(tc, SA_COAST, check_ship_allowed(sh, r));
+  CuAssertIntEquals(tc, SA_COAST, check_ship_allowed(sh, r1));
 }
 
 static void test_ship_allowed_with_harbor(CuTest * tc)

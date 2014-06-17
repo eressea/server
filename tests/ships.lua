@@ -6,22 +6,37 @@ function setup()
     eressea.free_game()
     eressea.settings.set("nmr.removenewbie", "0")
     eressea.settings.set("nmr.timeout", "0")
-    eressea.settings.set("NewbieImmunity", "0")
+    eressea.settings.set("rules.ships.storms", "0")
     conf = [[{
         "races": {
             "human" : {},
             "insect" : {}
         },
         "ships" : {
-            "boat" : {},
-            "longboat" : {}
+            "boat" : {
+                "construction" : {
+                    "maxsize" : 5
+                },
+                "range" : 3
+            }
         },
         "buildings" : {
             "harbour" : {}
         },
         "terrains" : {
-            "ocean": {},
-            "plain": {}
+            "ocean": { "flags" : [ "sea", "sail", "fly" ] },
+            "plain": { "flags" : [ "land", "walk", "sail", "fly" ] }
+        },
+        "directions" : {
+            "de" : {
+                "east" : "OSTEN",
+                "west" : "WESTEN"
+            }
+        },
+        "keywords" : {
+            "de" : {
+                "move" : "NACH"
+            }
         }
     }]]
 
@@ -35,6 +50,7 @@ function test_sail()
     local f = faction.create("test@example.com", "human", "de")
     local u = unit.create(f, r1, 1)
     u.ship = ship.create(r1, "boat")
+    u.ship.size = 5
     u:set_skill("sailing", 10)
     u:add_order("NACH O")
     process_orders()

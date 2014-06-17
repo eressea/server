@@ -654,8 +654,12 @@ int check_ship_allowed(struct ship *sh, const region * r)
     }
   }
 
-  if (bt_harbour && buildingtype_exists(r, bt_harbour, true))
+  if (bt_harbour && buildingtype_exists(r, bt_harbour, true)) {
     return SA_HARBOUR;
+  }
+  if (fval(r->terrain, SEA_REGION)) {
+    return SA_COAST;
+  }
   for (c = 0; sh->type->coasts[c] != NULL; ++c) {
     if (sh->type->coasts[c] == r->terrain)
       return SA_COAST;
@@ -1729,7 +1733,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
         if (storms_enabled) {
           gamedate date;
           get_gamedate(turn, &date);
-          stormyness = storms[date.month] * 5;
+          stormyness = storms ? storms[date.month] * 5 : 0;
         }
         gamecookie = global.cookie;
       }

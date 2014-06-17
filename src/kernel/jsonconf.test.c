@@ -132,7 +132,8 @@ static void test_buildings(CuTest * tc)
 
 static void test_terrains(CuTest * tc)
 {
-    const char * data = "{\"terrains\": { \"plain\" : {} }}";
+    const char * data = "{\"terrains\": { \"plain\" : { \"flags\" : [ \"land\", \"fly\", \"walk\" ] } }}";
+    const terrain_type *ter;
 
     cJSON *json = cJSON_Parse(data);
 
@@ -141,7 +142,9 @@ static void test_terrains(CuTest * tc)
     CuAssertPtrEquals(tc, 0, (void *)get_terrain("plain"));
 
     json_config(json);
-    CuAssertPtrNotNull(tc, get_terrain("plain"));
+    ter = get_terrain("plain");
+    CuAssertPtrNotNull(tc, ter);
+    CuAssertIntEquals(tc, ter->flags, LAND_REGION|FLY_INTO|WALK_INTO);
 
     test_cleanup();
 }
