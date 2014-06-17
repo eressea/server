@@ -52,6 +52,23 @@ without prior permission by the authors of Eressea.
 #include <stdlib.h>
 #include <string.h>
 
+int json_flags(cJSON *json, const char *flags[]) {
+    cJSON *entry;
+    int result = 0;
+    assert(json->type==cJSON_Array);
+    for (entry=json->child;entry;entry=entry->next) {
+        if (entry->type == cJSON_String) {
+            int i;
+            for (i = 0; flags[i]; ++i) {
+                if (strcmp(flags[i], entry->valuestring)==0) {
+                    result |= (1<<i);
+                }
+            }
+        }
+    }
+    return result;
+}
+
 void json_construction(cJSON *json, construction **consp) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
@@ -89,20 +106,10 @@ void json_terrain(cJSON *json, terrain_type *ter) {
         switch(child->type) {
         case cJSON_Array:
             if (strcmp(child->string, "flags")==0) {
-                cJSON *entry;
                 const char * flags[] = {
                     "land", "sea", "forest", "arctic", "cavalry", "forbidden", "sail", "fly", "swim", "walk", 0
                 };
-                for (entry=child->child;entry;entry=entry->next) {
-                    if (entry->type == cJSON_String) {
-                        int i;
-                        for (i = 0; flags[i]; ++i) {
-                            if (strcmp(flags[i], entry->valuestring)==0) {
-                                ter->flags |= (1<<i);
-                            }
-                        }
-                    }
-                }
+                ter->flags = json_flags(child, flags);
             } else {
                 log_error_n("terrain %s contains unknown attribute %s", json->string, child->string);
             }
@@ -162,6 +169,15 @@ void json_ship(cJSON *json, ship_type *st) {
 
 void json_race(cJSON *json, race *rc) {
     cJSON *child;
+    const char *flags[] = {
+        "playerrace", "killpeasants", "scarepeasants",
+        "cansteal", "moverandom", "cannotmove",
+        "learn", "fly", "swim", "walk", "nolearn",
+        "noteach", "horse", "desert",
+        "illusionary", "absorbpeasants", "noheal", 
+        "noweapons", "shapeshift", "", "undead", "dragon",
+        "coastal", "", "cansail", 0
+    };
     if (json->type!=cJSON_Object) {
         log_error_n("race %s is not a json object: %d", json->string, json->type);
         return;
@@ -206,26 +222,11 @@ void json_race(cJSON *json, race *rc) {
             }
             // TODO: studyspeed (orcs only)
             break;
-        case cJSON_True: {
-            const char *flags[] = {
-                "playerrace", "killpeasants", "scarepeasants",
-                "cansteal", "moverandom", "cannotmove",
-                "learn", "fly", "swim", "walk", "nolearn",
-                "noteach", "horse", "desert",
-                "illusionary", "absorbpeasants", "noheal", 
-                "noweapons", "shapeshift", "", "undead", "dragon",
-                "coastal", "", "cansail", 0
-            };
-            int i;
-            for(i=0;flags[i];++i) {
-                const char * flag = flags[i];
-                if (*flag && strcmp(child->string, flag)==0) {
-                    rc->flags |= (1<<i);
-                    break;
-                }
+        case cJSON_Array:
+            if (strcmp(child->string, "flags")==0) {
+                rc->flags = json_flags(child, flags);
             }
             break;
-        }
         }
     }
 }

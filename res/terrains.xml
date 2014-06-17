@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <terrains>
-    <!-- defaults: walk="yes" sail="yes" fly="yes" shallow="yes" swim="no" forest="no" sea="no" land="yes" forbidden="no" arctic="no" cavalry="no" size="0" -->
-    <terrain name="ocean" size="100" shallow="no" walk="no" swim="yes" land="no" sea="yes" />
-    <terrain name="plain" size="4000" road="50" shallow="no" forest="yes" cavalry="yes" seed="3">
+    <!-- defaults: walk="yes" sail="yes" fly="yes" swim="no" forest="no" sea="no" land="yes" forbidden="no" arctic="no" cavalry="no" size="0" -->
+    <terrain name="ocean" size="100" walk="no" swim="yes" land="no" sea="yes" />
+    <terrain name="plain" size="4000" road="50" forest="yes" cavalry="yes" seed="3">
         <resource name="iron" chance="0.1" level="2d4-1" base="5d8" div="2d20+10" />
         <resource name="stone" chance="0.15" level="1d4" base="5d8" div="2d30+20" />
         <resource name="laen" chance="0.01" level="1d4" base="1d4" div="2d20+50" />

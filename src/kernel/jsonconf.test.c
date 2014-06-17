@@ -18,7 +18,7 @@ static void check_flag(CuTest *tc, const char *name, int flag) {
     char data[1024];
     const struct race *rc;
     cJSON *json;
-    sprintf(data, "{\"races\" : { \"orc\": { \"%s\" : true }}}", name);
+    sprintf(data, "{\"races\" : { \"orc\": { \"flags\" : [ \"%s\"] }}}", name);
 
     json = cJSON_Parse(data);
     free_races();
@@ -52,7 +52,8 @@ static void test_races(CuTest * tc)
         "\"weight\" : 3,"
         "\"capacity\" : 4,"
         "\"hp\" : 5,"
-        "\"ac\" : 6"
+        "\"ac\" : 6,"
+        "\"flags\" : [ \"playerrace\", \"walk\", \"undead\" ]"
         "}}}";
     cJSON *json = cJSON_Parse(data);
     const struct race *rc;
@@ -66,6 +67,7 @@ static void test_races(CuTest * tc)
     CuAssertPtrNotNull(tc, races);
     rc = rc_find("orc");
     CuAssertPtrNotNull(tc, rc);
+    CuAssertIntEquals(tc, RCF_PLAYERRACE|RCF_WALK|RCF_UNDEAD, rc->flags);
     CuAssertStrEquals(tc, "1d4", rc->def_damage);
     CuAssertDblEquals(tc, 1.0, rc->magres, 0.0);
     CuAssertDblEquals(tc, 2.0, rc->maxaura, 0.0);
