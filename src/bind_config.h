@@ -4,6 +4,7 @@
 extern "C" {
 #endif
 
+void config_reset(void);
 int config_parse(const char *json);
 int config_read(const char *filename);
 

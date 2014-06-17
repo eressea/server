@@ -4,8 +4,26 @@
 #include <kernel/types.h>
 #include <kernel/jsonconf.h>
 #include <util/log.h>
+#include <util/language.h>
 #include <cJSON.h>
 #include <string.h>
+
+#include "kernel/building.h"
+#include "kernel/race.h"
+#include "kernel/ship.h"
+#include "kernel/spell.h"
+#include "kernel/spellbook.h"
+#include "kernel/terrain.h"
+
+void config_reset(void) {
+    default_locale = 0;
+    free_locales();
+    free_spells();
+    free_buildingtypes();
+    free_shiptypes();
+    free_races();
+    free_spellbooks();
+}
 
 int config_parse(const char *json)
 {
@@ -26,8 +44,8 @@ int config_parse(const char *json)
         strncpy(buffer, xp, sizeof(buffer));
         buffer[9] = 0;
         log_error("json parse error in line %d, position %d, near `%s`\n", line, ep-lp, buffer);
-        return 1;
     }
+    return 1;
 }
 
 int config_read(const char *filename)

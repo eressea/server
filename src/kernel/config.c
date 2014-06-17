@@ -2927,13 +2927,6 @@ void free_gamedata(void)
   free_units();
   free_regions();
   free_borders();
-  default_locale = 0;
-  free_locales();
-  free_spells();
-  free_buildingtypes();
-  free_shiptypes();
-  free_races();
-  free_spellbooks();
 
   for (i=0;i!=MAXLOCALES;++i) {
     if (defaults[i]) {

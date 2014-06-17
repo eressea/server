@@ -25,6 +25,30 @@ static void tolua_reg_types (lua_State* tolua_S)
 {
 }
 
+/* function: config_reset */
+static int tolua_config_eressea_config_reset00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+ {
+  config_reset();
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'reset'.",&tolua_err);
+ return 0;
+#endif
+}
+
 /* function: config_read */
 static int tolua_config_eressea_config_read00(lua_State* tolua_S)
 {
@@ -88,6 +112,7 @@ LUALIB_API int luaopen_config (lua_State* tolua_S)
  tolua_beginmodule(tolua_S,"eressea");
  tolua_module(tolua_S,"config",0);
  tolua_beginmodule(tolua_S,"config");
+ tolua_function(tolua_S,"reset",tolua_config_eressea_config_reset00);
  tolua_function(tolua_S,"read",tolua_config_eressea_config_read00);
  tolua_function(tolua_S,"parse",tolua_config_eressea_config_parse00);
  tolua_endmodule(tolua_S);

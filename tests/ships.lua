@@ -40,6 +40,7 @@ function setup()
         }
     }]]
 
+    eressea.config.reset()
     eressea.config.parse(conf)
     eressea.locale.create("en")
 end

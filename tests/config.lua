@@ -4,6 +4,7 @@ module("tests.eressea.config", package.seeall, lunit.testcase )
 
 function setup()
     eressea.free_game()
+    eressea.config.reset();
 end
 
 function test_read_race()
