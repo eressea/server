@@ -278,11 +278,15 @@ static void json_keyword(cJSON *json, struct locale *lang) {
         if (kwd!=NOKEYWORD) {
             if (child->type==cJSON_String) {
                 init_keyword(lang, kwd, child->valuestring);
+                locale_setstring(lang, mkname("keyword", keywords[kwd]), child->valuestring);
             }
             else if (child->type==cJSON_Array) {
                 cJSON *entry;
                 for (entry=child->child;entry;entry=entry->next) {
                     init_keyword(lang, kwd, entry->valuestring);
+                    if ((entry==child->child)) {
+                        locale_setstring(lang, mkname("keyword", keywords[kwd]), entry->valuestring); 
+                    }
                 }
             } else {
                 log_error_n("invalid type %d for keyword `%s`", child->type, child->string);

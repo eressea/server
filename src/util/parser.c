@@ -53,8 +53,9 @@ void init_tokens_str(const char *initstr, char *cmd)
 {
   if (states == NULL) {
     states = malloc(sizeof(parser_state));
-  } else if (states->current_cmd)
+  } else if (states->current_cmd) {
     free(states->current_cmd);
+  }
   states->current_cmd = cmd;
   states->current_token = initstr;
 }

@@ -169,7 +169,7 @@ static void test_directions(CuTest * tc)
 
 static void test_keywords(CuTest * tc)
 {
-    const char * data = "{\"keywords\": { \"de\" : { \"move\" : \"nach\", \"study\" : \"lernen\" }}}";
+    const char * data = "{\"keywords\": { \"de\" : { \"move\" : \"NACH\", \"study\" : [ \"LERNEN\", \"STUDIEREN\" ] }}}";
     const struct locale * lang;
 
     cJSON *json = cJSON_Parse(data);
@@ -180,8 +180,11 @@ static void test_keywords(CuTest * tc)
     CuAssertIntEquals(tc, NOKEYWORD, get_keyword("potato", lang));
 
     json_config(json);
+    CuAssertIntEquals(tc, K_STUDY, get_keyword("studiere", lang));
     CuAssertIntEquals(tc, K_STUDY, get_keyword("lerne", lang));
     CuAssertIntEquals(tc, K_MOVE, get_keyword("nach", lang));
+
+    CuAssertStrEquals(tc, "LERNEN", locale_string(lang, "keyword::study"));
 
     test_cleanup();
 }

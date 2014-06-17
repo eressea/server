@@ -105,7 +105,7 @@ static char* get_command(const order *ord, char *sbuffer, size_t size) {
     if (kwd != NOKEYWORD) {
         const struct locale *lang = ORD_LOCALE(ord);
         if (size > 0) {
-            const char *str = (const char *)LOC(lang, keywords[kwd]);
+            const char *str = (const char *)LOC(lang, mkname("keyword", keywords[kwd]));
             assert(str);
             if (text) --size;
             bytes = (int)strlcpy(bufp, str, size);
