@@ -80,6 +80,8 @@ void init_keywords(const struct locale *lang);
 void init_keyword(const struct locale *lang, keyword_t kwd, const char *str);
 bool keyword_disabled(keyword_t kwd);
 void enable_keyword(keyword_t kwd, bool enabled);
+#define keyword(kwd) mkname("keyword", keywords[kwd])
+  
 #ifdef __cplusplus
 #endif
 #endif

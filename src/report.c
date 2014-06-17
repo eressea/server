@@ -336,9 +336,9 @@ static void nr_spell(FILE * F, spellbook_entry * sbe, const struct locale *lang)
   size = sizeof(buf) - 1;
 
   if (sp->sptyp & ISCOMBATSPELL) {
-    bytes = (int)strlcpy(bufp, LOC(lang, keywords[K_COMBATSPELL]), size);
+    bytes = (int)strlcpy(bufp, LOC(lang, keyword(K_COMBATSPELL)), size);
   } else {
-    bytes = (int)strlcpy(bufp, LOC(lang, keywords[K_CAST]), size);
+    bytes = (int)strlcpy(bufp, LOC(lang, keyword(K_CAST)), size);
   }
   if (wrptr(&bufp, &size, bytes) != 0)
     WARN_STATIC_BUFFER();

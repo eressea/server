@@ -183,7 +183,6 @@ enum {
   O_BZIP2,                      /* 1024 - compress as bzip2 */
   O_SCORE,                      /* 2048 - punkte anzeigen? */
   O_SHOWSKCHANGE,               /* 4096 - Skillveränderungen anzeigen? */
-  O_XML,                        /* 8192 - XML report versenden */
   MAXOPTIONS
 };
 

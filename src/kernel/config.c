@@ -413,8 +413,7 @@ const char *options[MAXOPTIONS] = {
   "ADRESSEN",
   "BZIP2",
   "PUNKTE",
-  "SHOWSKCHANGE",
-  "XML"
+  "SHOWSKCHANGE"
 };
 
 static int allied_skillcount(const faction * f, skill_t sk)
