@@ -1380,6 +1380,7 @@
     </string>
   </namespace>
 
+<namespace name="keyword">
   <!--  Keywords -->
   <string name="//">
     <text locale="en">//</text>
@@ -1441,17 +1442,11 @@
   <string name="FORSCHEN">
     <text locale="en">RESEARCH</text>
   </string>
-  <string name="GM">
-    <text locale="en">GM</text>
-  </string>
   <string name="GRUPPE">
     <text locale="en">GROUP</text>
   </string>
   <string name="HELFEN">
     <text locale="en">HELP</text>
-  </string>
-  <string name="JIHAD">
-    <text locale="en">JIHAD</text>
   </string>
   <string name="KAMPFZAUBER">
     <text locale="en">COMBATSPELL</text>
@@ -1531,9 +1526,6 @@
   <string name="STIRB">
     <text locale="en">QUIT</text>
   </string>
-  <string name="SYNONYM">
-    <text locale="en">SYNONYM</text>
-  </string>
   <string name="TARNEN">
     <text locale="en">HIDE</text>
   </string>
@@ -1570,9 +1562,7 @@
   <string name="ZUECHTEN">
     <text locale="en">GROW</text>
   </string>
-  <string name="WERWESEN">
-    <text locale="en">LYCANTROPE</text>
-  </string>
+</namespace>
 
   <!--  NR generieren -->
   <string name="nr_options">

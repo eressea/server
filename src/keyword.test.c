@@ -11,7 +11,7 @@ static void test_init_keywords(CuTest *tc) {
 
     test_cleanup();
     lang = get_or_create_locale("en");
-    locale_setstring(lang, "NACH", "MOVE");
+    locale_setstring(lang, "keyword::NACH", "MOVE");
     init_keywords(lang);
     CuAssertIntEquals(tc, K_MOVE, get_keyword("move", lang));
     test_cleanup();

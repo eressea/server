@@ -2108,6 +2108,7 @@
     </string>
   </namespace>
 
+  <namespace name="keyword">
   <!--Befehle -->
   <string name="//">
     <text locale="de">//</text>
@@ -2206,10 +2207,6 @@
   <string name="NACH">
     <text locale="de">NACH</text>
   </string>
-  <string name="XONTORMIA">
-    <text locale="de">XONTORMIA</text>
-    <text locale="en">XONTORMIA</text>
-  </string>
   <string name="ALLIANZ">
     <text locale="de">ALLIANZ</text>
     <text locale="en">ALLIANCE</text>
@@ -2227,9 +2224,6 @@
   </string>
   <string name="PRAEFIX">
     <text locale="de">PRÄFIX</text>
-  </string>
-  <string name="SYNONYM">
-    <text locale="de">SYNONYM</text>
   </string>
   <string name="INFO">
     <text locale="de">INFO</text>
@@ -2328,15 +2322,7 @@
   <string name="SORTIEREN">
     <text locale="de">SORTIEREN</text>
   </string>
-  <string name="JIHAD">
-    <text locale="de">JIHAD</text>
-  </string>
-  <string name="GM">
-    <text locale="de">GM</text>
-  </string>
-  <string name="WERWESEN">
-    <text locale="de">WERWESEN</text>
-  </string>
+  </namespace>
 
   <!--NR generieren -->
   <string name="nr_options">

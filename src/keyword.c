@@ -13,7 +13,7 @@
 static const char * keyword_key(int i)
 {
   assert(i<MAXKEYWORDS&& i>=0);
-  return keywords[i];
+  return mkname("keyword", keywords[i]);
 }
 
 void init_keyword(const struct locale *lang, keyword_t kwd, const char *str) {
@@ -78,7 +78,7 @@ bool keyword_disabled(keyword_t kwd) {
 const char *keywords[MAXKEYWORDS] = {
   "//",
   "BANNER",
-  "ARBEITEN",
+  "work",
   "ATTACKIEREN",
   "BEKLAUEN",
   "BELAGERE",
