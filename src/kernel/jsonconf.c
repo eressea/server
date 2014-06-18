@@ -140,12 +140,13 @@ void json_building(cJSON *json, building_type *bt) {
 }
 
 void json_ship(cJSON *json, ship_type *st) {
-    cJSON *child;
+    cJSON *child, *iter;
     if (json->type!=cJSON_Object) {
         log_error_n("ship %s is not a json object: %d", json->string, json->type);
         return;
     }
     for (child=json->child;child;child=child->next) {
+        int i;
         switch(child->type) {
         case cJSON_Object:
             if (strcmp(child->string, "construction")==0) {
@@ -153,6 +154,19 @@ void json_ship(cJSON *json, ship_type *st) {
             } else {
                 log_error_n("ship %s contains unknown attribute %s", json->string, child->string);
             }
+            break;
+        case cJSON_Array:
+            st->coasts = (const terrain_type **)
+                malloc(sizeof(terrain_type *) * (1+cJSON_GetArraySize(child)));
+            for (i=0,iter=child->child;iter;iter=iter->next) {
+                if (iter->type==cJSON_String) {
+                    terrain_type *ter = get_or_create_terrain(iter->valuestring);
+                    if (ter) {
+                        st->coasts[i++] = ter;
+                    }
+                }
+            }
+            st->coasts[i] = 0;
             break;
         case cJSON_Number:
             if (strcmp(child->string, "range")==0) {

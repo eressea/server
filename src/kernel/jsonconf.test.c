@@ -85,11 +85,13 @@ static void test_races(CuTest * tc)
 static void test_ships(CuTest * tc)
 {
     const char * data = "{\"ships\": { \"boat\" : { "
-        "\"construction\" : { \"maxsize\" : 20, \"reqsize\" : 10, \"minskill\" : 1 }"
+        "\"construction\" : { \"maxsize\" : 20, \"reqsize\" : 10, \"minskill\" : 1 },"
+        "\"coasts\" : [ \"plain\" ]"
         "}}}";
 
     cJSON *json = cJSON_Parse(data);
-    const struct ship_type *st;
+    const ship_type *st;
+    const terrain_type *ter;
 
     test_cleanup();
 
@@ -104,6 +106,14 @@ static void test_ships(CuTest * tc)
     CuAssertIntEquals(tc, 10, st->construction->reqsize);
     CuAssertIntEquals(tc, 20, st->construction->maxsize);
     CuAssertIntEquals(tc, 1, st->construction->minskill);
+
+    ter = get_terrain("plain");
+    CuAssertPtrNotNull(tc, ter);
+
+    CuAssertPtrNotNull(tc, st->coasts);
+    CuAssertPtrEquals(tc, (void *)ter, (void *)st->coasts[0]);
+    CuAssertPtrEquals(tc, 0, (void *)st->coasts[1]);
+
     test_cleanup();
 }
 

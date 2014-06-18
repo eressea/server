@@ -660,11 +660,13 @@ int check_ship_allowed(struct ship *sh, const region * r)
   if (fval(r->terrain, SEA_REGION)) {
     return SA_COAST;
   }
-  for (c = 0; sh->type->coasts[c] != NULL; ++c) {
-    if (sh->type->coasts[c] == r->terrain)
-      return SA_COAST;
+  if (sh->type->coasts) {
+    for (c = 0; sh->type->coasts[c] != NULL; ++c) {
+      if (sh->type->coasts[c] == r->terrain) {
+        return SA_COAST;
+      }
+    }
   }
-
   return SA_NO_COAST;
 }
 

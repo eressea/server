@@ -36,9 +36,8 @@ int config_parse(const char *json)
         int line;
         char buffer[10];
         const char *xp = json, *lp, *ep = cJSON_GetErrorPtr();
-        for (line=0;xp && xp<ep;++line) {
-            lp = xp;
-            xp = strchr(xp, '\n');
+        for (line=0,lp=xp;xp && xp<ep;++line,lp=xp+1) {
+            xp = strchr(lp, '\n');
         }
         xp = (ep > json + 10) ? ep - 10 : json; 
         strncpy(buffer, xp, sizeof(buffer));
