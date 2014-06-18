@@ -1256,7 +1256,7 @@ skill_t findskill(const char *s, const struct locale * lang)
     const void * match;
     void **tokens = get_translations(lang, UT_SKILLS);
     struct critbit_tree *cb = (critbit_tree *)*tokens;
-    if (cb_find_prefix(cb, str, strlen(str), &match, 1, 0)) {
+    if (cb && cb_find_prefix(cb, str, strlen(str), &match, 1, 0)) {
       cb_get_kv(match, &i, sizeof(int));
       result = (skill_t)i;
     }

@@ -88,6 +88,7 @@ TOLUA_PKG(settings);
 TOLUA_PKG(config);
 TOLUA_PKG(locale);
 TOLUA_PKG(log);
+TOLUA_PKG(game);
 
 int log_lua_error(lua_State * L)
 {
@@ -1060,6 +1061,7 @@ int tolua_bindings_open(lua_State * L)
   tolua_eressea_open(L);
   tolua_process_open(L);
   tolua_settings_open(L);
+  tolua_game_open(L);
   tolua_config_open(L);
   tolua_locale_open(L);
   tolua_log_open(L);
