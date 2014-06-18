@@ -1,0 +1,13 @@
+$#include "config.h"
+$#include "bind_eressea.h"
+
+module eressea {
+  module game {
+    void eressea_free_game @ reset(void);
+    int eressea_read_game @ read(const char *filename);
+    int eressea_write_game @ write(const char *filename);
+    int eressea_export_json @ export(const char *filename, int flags);
+    int eressea_import_json @ import(const char *filename);
+  }
+}
+
