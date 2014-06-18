@@ -85,4 +85,18 @@ function test_sail_to_forbidden_shore()
   assert_equal(ocean, u.region)
 end
 
+function test_sail_into_harbour()
+  local ocean = region.create(1, 0, "ocean")
+  local shore = region.create(0, 0, "glacier")
+  local f = faction.create("noreply@eressea.de", "human", "de")
+  local u = unit.create(f, ocean, 1)
+  u.name = "Sailor"
+  u.ship = ship.create(ocean, "boat")
+  u:set_skill("sailing", 10)
+  u:add_order("NACH W")
+  local b = building.create(shore, "harbour")
+  assert_not_nil(b)
+  process_orders()
 
+  assert_equal(shore, u.region)
+end

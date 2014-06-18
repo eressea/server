@@ -203,29 +203,26 @@ attrib_type at_building_generic_type = {
 /* Returns the (internal) name for a building of given size and type. Especially, returns the correct
  * name if it depends on the size (as for Eressea castles).
  */
-const char *buildingtype(const building_type * btype, const building * b,
-  int bsize)
+const char *buildingtype(const building_type * btype, const building * b, int bsize)
 {
-  const char *s = NULL;
-  static bool init_generic = false;
-  static const struct building_type *bt_generic;
+    const char *s;
+    assert(btype);
 
-  if (!init_generic) {
-    init_generic = true;
-    bt_generic = bt_find("generic");
-  }
-
-  if (btype == bt_generic) {
-    const attrib *a = a_find(b->attribs, &at_building_generic_type);
-    if (a)
-      s = (const char *)a->data.v;
-  }
-
-  if (btype->name)
-    s = btype->name(btype, b, bsize);
-  if (s == NULL)
     s = btype->_name;
-  return s;
+    if (btype->name) {
+        s = btype->name(btype, b, bsize);
+    }
+    if (b && b->attribs) {
+        const struct building_type *bt_generic = bt_find("generic");
+
+        if (btype == bt_generic) {
+            const attrib *a = a_find(b->attribs, &at_building_generic_type);
+            if (a) {
+                s = (const char *)a->data.v;
+            }
+        }
+    }
+    return s;
 }
 
 #define BMAXHASH 7919
@@ -526,50 +523,45 @@ static building *deleted_buildings;
  */
 void remove_building(building ** blist, building * b)
 {
-  unit *u;
-  static const struct building_type *bt_caravan, *bt_dam, *bt_tunnel;
-  static bool init = false;
+    unit *u;
+    const struct building_type *bt_caravan, *bt_dam, *bt_tunnel;
 
-  if (!init) {
-    init = true;
+    assert(bfindhash(b->no));
+
     bt_caravan = bt_find("caravan");
     bt_dam = bt_find("dam");
     bt_tunnel = bt_find("tunnel");
-  }
 
-  assert(bfindhash(b->no));
+    handle_event(b->attribs, "destroy", b);
+    for (u = b->region->units; u; u = u->next) {
+        if (u->building == b) leave(u, true);
+    }
 
-  handle_event(b->attribs, "destroy", b);
-  for (u = b->region->units; u; u = u->next) {
-    if (u->building == b)
-      leave(u, true);
-  }
-
-  b->size = 0;
-  update_lighthouse(b);
-  bunhash(b);
+    b->size = 0;
+    update_lighthouse(b);
+    bunhash(b);
 
   /* Falls Karawanserei, Damm oder Tunnel einstürzen, wird die schon
    * gebaute Straße zur Hälfte vernichtet */
-  if (b->type == bt_caravan || b->type == bt_dam || b->type == bt_tunnel) {
-    region *r = b->region;
-    int d;
-    for (d = 0; d != MAXDIRECTIONS; ++d) {
-      direction_t dir = (direction_t)d;
-      if (rroad(r, dir) > 0) {
-        rsetroad(r, dir, rroad(r, dir) / 2);
-      }
+    if (b->type == bt_caravan || b->type == bt_dam || b->type == bt_tunnel) {
+        region *r = b->region;
+        int d;
+        for (d = 0; d != MAXDIRECTIONS; ++d) {
+            direction_t dir = (direction_t)d;
+            if (rroad(r, dir) > 0) {
+                rsetroad(r, dir, rroad(r, dir) / 2);
+            }
+        }
     }
-  }
-
-  /* Stattdessen nur aus Liste entfernen, aber im Speicher halten. */
-  while (*blist && *blist != b) {
-    blist = &(*blist)->next;
-  }
-  *blist = b->next;
-  b->region = NULL;
-  b->next = deleted_buildings;
-  deleted_buildings = b;
+    
+    /* Stattdessen nur aus Liste entfernen, aber im Speicher halten. */
+    while (*blist && *blist != b) {
+        blist = &(*blist)->next;
+    }
+    *blist = b->next;
+    b->region = NULL;
+    b->next = deleted_buildings;
+    deleted_buildings = b;
 }
 
 void free_building(building * b)

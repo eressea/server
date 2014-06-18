@@ -278,34 +278,25 @@ void build_road(region * r, unit * u, int size, direction_t d)
 
   if (r->terrain == newterrain(T_SWAMP)) {
     /* wenn kein Damm existiert */
-    static const struct building_type *bt_dam;
-    if (!bt_dam)
-      bt_dam = bt_find("dam");
-    assert(bt_dam);
-    if (!buildingtype_exists(r, bt_dam, true)) {
+    const struct building_type *bt_dam = bt_find("dam");
+    if (!bt_dam || !buildingtype_exists(r, bt_dam, true)) {
       cmistake(u, u->thisorder, 132, MSG_PRODUCE);
       return;
     }
   } else if (r->terrain == newterrain(T_DESERT)) {
-    static const struct building_type *bt_caravan;
-    if (!bt_caravan)
-      bt_caravan = bt_find("caravan");
-    assert(bt_caravan);
+    const struct building_type *bt_caravan = bt_find("caravan");
     /* wenn keine Karawanserei existiert */
-    if (!buildingtype_exists(r, bt_caravan, true)) {
+    if (!bt_caravan || !buildingtype_exists(r, bt_caravan, true)) {
       cmistake(u, u->thisorder, 133, MSG_PRODUCE);
       return;
     }
   } else if (r->terrain == newterrain(T_GLACIER)) {
-    static const struct building_type *bt_tunnel;
-    if (!bt_tunnel)
-      bt_tunnel = bt_find("tunnel");
-    assert(bt_tunnel);
-    /* wenn kein Tunnel existiert */
-    if (!buildingtype_exists(r, bt_tunnel, true)) {
-      cmistake(u, u->thisorder, 131, MSG_PRODUCE);
-      return;
-    }
+      const struct building_type *bt_tunnel = bt_find("tunnel");
+      /* wenn kein Tunnel existiert */
+      if (!bt_tunnel || !buildingtype_exists(r, bt_tunnel, true)) {
+          cmistake(u, u->thisorder, 131, MSG_PRODUCE);
+          return;
+      }
   }
 
   /* left kann man noch bauen */

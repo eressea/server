@@ -628,46 +628,45 @@ static bool is_freezing(const unit * u)
 
 int check_ship_allowed(struct ship *sh, const region * r)
 {
-  int c = 0;
-  static const building_type *bt_harbour = NULL;
-
-  if (bt_harbour == NULL)
+    int c = 0;
+    const building_type *bt_harbour = NULL;
     bt_harbour = bt_find("harbour");
 
-  if (sh->region && r_insectstalled(r)) {
-    /* insekten dürfen nicht hier rein. haben wir welche? */
-    unit *u;
-
-    for (u = sh->region->units; u != NULL; u = u->next) {
-      if (u->ship != sh)
-        continue;
-
-      if (is_freezing(u)) {
-        unit *captain = ship_owner(sh);
-        if (captain) {
-          ADDMSG(&captain->faction->msgs, msg_message("detectforbidden",
-              "unit region", u, r));
+    if (sh->region && r_insectstalled(r)) {
+        /* insekten dürfen nicht hier rein. haben wir welche? */
+        unit *u;
+        
+        for (u = sh->region->units; u != NULL; u = u->next) {
+            if (u->ship != sh) {
+                continue;
+            }
+            
+            if (is_freezing(u)) {
+                unit *captain = ship_owner(sh);
+                if (captain) {
+                    ADDMSG(&captain->faction->msgs,
+                           msg_message("detectforbidden", "unit region", u, r));
+                }
+                
+                return SA_NO_INSECT;
+            }
         }
-
-        return SA_NO_INSECT;
-      }
     }
-  }
-
-  if (bt_harbour && buildingtype_exists(r, bt_harbour, true)) {
-    return SA_HARBOUR;
-  }
-  if (fval(r->terrain, SEA_REGION)) {
-    return SA_COAST;
-  }
-  if (sh->type->coasts) {
-    for (c = 0; sh->type->coasts[c] != NULL; ++c) {
-      if (sh->type->coasts[c] == r->terrain) {
+    
+    if (bt_harbour && buildingtype_exists(r, bt_harbour, true)) {
+        return SA_HARBOUR;
+    }
+    if (fval(r->terrain, SEA_REGION)) {
         return SA_COAST;
-      }
     }
-  }
-  return SA_NO_COAST;
+    if (sh->type->coasts) {
+        for (c = 0; sh->type->coasts[c] != NULL; ++c) {
+            if (sh->type->coasts[c] == r->terrain) {
+                return SA_COAST;
+            }
+        }
+    }
+    return SA_NO_COAST;
 }
 
 static bool flying_ship(const ship * sh)

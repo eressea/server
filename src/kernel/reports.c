@@ -341,27 +341,23 @@ void
 report_building(const struct building *b, const char **name,
   const char **illusion)
 {
-  static int init;
-  static const struct building_type *bt_illusion;
+    const struct building_type *bt_illusion;
 
-  if (name) {
-    *name = buildingtype(b->type, b, b->size);
-  }
-  if (illusion) {
-    *illusion = NULL;
-
-    if (!init) {
-      bt_illusion = bt_find("illusioncastle");
-      init = 1;
+    if (name) {
+        *name = buildingtype(b->type, b, b->size);
     }
-    if (bt_illusion && b->type == bt_illusion) {
-      const attrib *a = a_findc(b->attribs, &at_icastle);
-      if (a != NULL) {
-        icastle_data *icastle = (icastle_data *) a->data.v;
-        *illusion = buildingtype(icastle->type, b, b->size);
-      }
+    if (illusion) {
+        *illusion = NULL;
+        
+        bt_illusion = bt_find("illusioncastle");
+        if (bt_illusion && b->type == bt_illusion) {
+            const attrib *a = a_findc(b->attribs, &at_icastle);
+            if (a != NULL) {
+                icastle_data *icastle = (icastle_data *) a->data.v;
+                *illusion = buildingtype(icastle->type, b, b->size);
+            }
+        }
     }
-  }
 }
 
 int
@@ -463,16 +459,12 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char *buf,
   faction *fv = visible_faction(f, u);
   char *bufp = buf;
   bool itemcloak = false;
-  static const curse_type *itemcloak_ct = 0;
-  static bool init = false;
+  const curse_type *itemcloak_ct = 0;
   int bytes;
   item result[MAX_INVENTORY];
 
-  if (!init) {
-    init = true;
-    itemcloak_ct = ct_find("itemcloak");
-  }
-  if (itemcloak_ct != NULL) {
+  itemcloak_ct = ct_find("itemcloak");
+  if (itemcloak_ct) {
     itemcloak = curse_active(get_curse(u->attribs, itemcloak_ct));
   }
 
@@ -1504,14 +1496,11 @@ static void prepare_reports(void)
 {
   region *r;
   faction *f;
-  static const struct building_type *bt_lighthouse = NULL;
-  if (bt_lighthouse == NULL) {
-    bt_lighthouse = bt_find("lighthouse");
-  }
+  const struct building_type *bt_lighthouse = bt_find("lighthouse");
+
   for (f = factions; f; f = f->next) {
-    if (f->seen)
-      seen_done(f->seen);
-    f->seen = seen_init();
+      if (f->seen) seen_done(f->seen);
+      f->seen = seen_init();
   }
 
   for (r = regions; r; r = r->next) {

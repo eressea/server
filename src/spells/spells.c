@@ -4391,24 +4391,22 @@ int sp_puttorest(castorder * co)
 
 int sp_icastle(castorder * co)
 {
-  building *b;
-  const building_type *type;
-  attrib *a;
-  region *r = co_get_region(co);
-  unit *mage = co->magician.u;
-  int cast_level = co->level;
-  float power = co->force;
-  spellparameter *pa = co->par;
-  icastle_data *data;
-  const char *bname;
-  message *msg;
-  static const building_type *bt_illusion;
+    building *b;
+    const building_type *type;
+    attrib *a;
+    region *r = co_get_region(co);
+    unit *mage = co->magician.u;
+    int cast_level = co->level;
+    float power = co->force;
+    spellparameter *pa = co->par;
+    icastle_data *data;
+    const char *bname;
+    message *msg;
+    const building_type *bt_illusion = bt_find("illusioncastle");
 
-  if (bt_illusion == NULL)
-    bt_illusion = bt_find("illusioncastle");
-  if (bt_illusion == NULL) {
-    return 0;
-  }
+    if (!bt_illusion) {
+        return 0;
+    }
 
   if ((type =
       findbuildingtype(pa->param[0]->data.xs, mage->faction->locale)) == NULL) {

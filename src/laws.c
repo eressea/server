@@ -3256,14 +3256,11 @@ int renumber_cmd(unit * u, order * ord)
 
 static building *age_building(building * b)
 {
-  static bool init = false;
-  static const building_type *bt_blessed;
-  static const curse_type *ct_astralblock;
-  if (!init) {
-    init = true;
+    const struct building_type *bt_blessed;
+    const struct curse_type *ct_astralblock;
+
     bt_blessed = bt_find("blessedstonecircle");
     ct_astralblock = ct_find("astralblock");
-  }
 
   /* blesses stone circles create an astral protection in the astral region 
    * above the shield, which prevents chaos suction and other spells. 

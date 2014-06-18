@@ -1075,53 +1075,42 @@ static attrib_type at_lighthouse = {
  */
 void update_lighthouse(building * lh)
 {
-  static bool init_lighthouse = false;
-  static const struct building_type *bt_lighthouse = 0;
+    const struct building_type *bt_lighthouse = bt_find("lighthouse");
+    if (bt_lighthouse && lh->type == bt_lighthouse) {
+        region *r = lh->region;
+        int d = (int)log10(lh->size) + 1;
+        int x;
 
-  if (!init_lighthouse) {
-    bt_lighthouse = bt_find("lighthouse");
-    if (bt_lighthouse == NULL)
-      return;
-    init_lighthouse = true;
-  }
-
-  if (lh->type == bt_lighthouse) {
-    region *r = lh->region;
-    int d = (int)log10(lh->size) + 1;
-    int x;
-
-    if (lh->size > 0) {
-      r->flags |= RF_LIGHTHOUSE;
-    }
-
-    for (x = -d; x <= d; ++x) {
-      int y;
-      for (y = -d; y <= d; ++y) {
-        attrib *a;
-        region *r2;
-        int px = r->x + x, py = r->y + y;
-        pnormalize(&px, &py, rplane(r));
-        r2 = findregion(px, py);
-        if (r2 == NULL)
-          continue;
-        if (!fval(r2->terrain, SEA_REGION))
-          continue;
-        if (distance(r, r2) > d)
-          continue;
-        a = a_find(r2->attribs, &at_lighthouse);
-        while (a && a->type == &at_lighthouse) {
-          building *b = (building *) a->data.v;
-          if (b == lh)
-            break;
-          a = a->next;
+        if (lh->size > 0) {
+            r->flags |= RF_LIGHTHOUSE;
         }
-        if (!a) {
-          a = a_add(&r2->attribs, a_new(&at_lighthouse));
-          a->data.v = (void *)lh;
+        
+        for (x = -d; x <= d; ++x) {
+            int y;
+            for (y = -d; y <= d; ++y) {
+                attrib *a;
+                region *r2;
+                int px = r->x + x, py = r->y + y;
+                pnormalize(&px, &py, rplane(r));
+                r2 = findregion(px, py);
+                if (!r2 || !fval(r2->terrain, SEA_REGION))
+                    continue;
+                if (distance(r, r2) > d)
+                    continue;
+                a = a_find(r2->attribs, &at_lighthouse);
+                while (a && a->type == &at_lighthouse) {
+                    building *b = (building *) a->data.v;
+                    if (b == lh)
+                        break;
+                    a = a->next;
+                }
+                if (!a) {
+                    a = a_add(&r2->attribs, a_new(&at_lighthouse));
+                    a->data.v = (void *)lh;
+                }
+            }
         }
-      }
     }
-  }
 }
 
 int count_faction(const faction * f, int flags)
@@ -2418,9 +2407,7 @@ static const int wagetable[7][4] = {
 
 int cmp_wage(const struct building *b, const building * a)
 {
-  static const struct building_type *bt_castle;
-  if (!bt_castle)
-    bt_castle = bt_find("castle");
+  const struct building_type *bt_castle = bt_find("castle");
   if (b->type == bt_castle) {
     if (!a)
       return 1;

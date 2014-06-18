@@ -1971,19 +1971,21 @@ static void buy(unit * u, request ** buyorders, struct order *ord)
       return;
     }
   } else {
-    /* ...oder in der Region muß es eine Burg geben. */
-    building *b;
-    static const struct building_type *bt_castle;
-    if (!bt_castle)
-      bt_castle = bt_find("castle");
-    for (b = r->buildings; b; b = b->next) {
-      if (b->type == bt_castle && b->size >= 2)
-        break;
-    }
-    if (b == NULL) {
-      cmistake(u, ord, 119, MSG_COMMERCE);
-      return;
-    }
+      /* ...oder in der Region muß es eine Burg geben. */
+      building *b = 0;
+      if (r->buildings) {
+          const struct building_type *bt_castle = bt_find("castle");
+
+          for (b = r->buildings; b; b = b->next) {
+              if (b->type == bt_castle && b->size >= 2) {
+                  break;
+              }
+          }
+      }
+      if (b == NULL) {
+          cmistake(u, ord, 119, MSG_COMMERCE);
+          return;
+      }
   }
 
   /* Ein Händler kann nur 10 Güter pro Talentpunkt handeln. */
@@ -2275,19 +2277,18 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
       return false;
     }
   } else {
-    /* ...oder in der Region muß es eine Burg geben. */
-    building *b;
-    static const struct building_type *bt_castle;
-    if (!bt_castle)
-      bt_castle = bt_find("castle");
-    for (b = r->buildings; b; b = b->next) {
-      if (b->type == bt_castle && b->size >= 2)
-        break;
-    }
-    if (b == NULL) {
-      cmistake(u, ord, 119, MSG_COMMERCE);
-      return false;
-    }
+      /* ...oder in der Region muß es eine Burg geben. */
+      building *b = 0;
+      if (r->buildings) {
+          const struct building_type *bt_castle = bt_find("castle");
+          for (b = r->buildings; b; b = b->next) {
+              if (b->type == bt_castle && b->size >= 2) break;
+          }
+      }
+      if (!b) {
+          cmistake(u, ord, 119, MSG_COMMERCE);
+          return false;
+      }
   }
 
   /* Ein Händler kann nur 10 Güter pro Talentpunkt verkaufen. */

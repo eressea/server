@@ -32,11 +32,9 @@ static unsigned int get_markets(region * r, unit ** results, size_t size)
 {
   unsigned int n = 0;
   building *b;
-  static const building_type *btype;
+  const building_type *btype = bt_find("market");
   if (!btype)
-    btype = bt_find("market");
-  if (!btype)
-    return 0;
+        return 0;
   for (b = r->buildings; n < size && b; b = b->next) {
     if (b->type == btype && (b->flags & BLD_WORKING)
       && b->size >= b->type->maxsize) {
