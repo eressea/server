@@ -1412,6 +1412,9 @@
   <string name="enter">
     <text locale="en">ENTER</text>
   </string>
+  <string name="give">
+    <text locale="en">GIVE</text>
+  </string>
   <string name="guard">
     <text locale="en">GUARD</text>
   </string>

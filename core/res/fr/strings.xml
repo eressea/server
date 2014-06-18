@@ -1420,6 +1420,9 @@
   <string name="enter">
     <text locale="fr">ENTRER</text>
   </string>
+  <string name="give">
+    <text locale="fr">DONNER</text>
+  </string>
   <string name="guard">
     <text locale="fr">GUARDER</text>
   </string>

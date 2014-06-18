@@ -2143,6 +2143,9 @@
   <string name="enter">
     <text locale="de">BETRETEN</text>
   </string>
+  <string name="give">
+    <text locale="de">GIB</text>
+  </string>
   <string name="guard">
     <text locale="de">BEWACHEN</text>
   </string>
