@@ -17,6 +17,7 @@ function setup()
                 "construction" : {
                     "maxsize" : 5
                 },
+                "coasts" : [ "plain" ],
                 "range" : 3
             }
         },
@@ -24,8 +25,9 @@ function setup()
             "harbour" : {}
         },
         "terrains" : {
-            "ocean": { "flags" : [ "sea", "sail", "fly" ] },
-            "plain": { "flags" : [ "land", "walk", "sail", "fly" ] }
+            "ocean": { "flags" : [ "sea", "sail" ] },
+            "plain": { "flags" : [ "land", "walk", "sail" ] },
+            "glacier": { "flags" : [ "land", "walk" ] }
         },
         "directions" : {
             "de" : {
@@ -42,10 +44,9 @@ function setup()
 
     eressea.config.reset()
     eressea.config.parse(conf)
-    eressea.locale.create("en")
 end
 
-function test_sail()
+function test_sail_oceans()
     local r1 = region.create(0, 0, "ocean")
     local r2 = region.create(1, 0, "ocean")
     local f = faction.create("test@example.com", "human", "de")
@@ -55,29 +56,33 @@ function test_sail()
     u:set_skill("sailing", 10)
     u:add_order("NACH O")
     process_orders()
---    eressea.process.movement()
     assert_equal(r2, u.region)
 end
 
-function notest_landing1()
+function test_sail_to_shore()
   local ocean = region.create(1, 0, "ocean")
-  local r = region.create(0, 0, "plain")
-  local f = faction.create("noreply@eressea.de", "insect", "de")
-  local f2 = faction.create("noreply@eressea.de", "human", "de")
-  local s = ship.create(ocean, "longboat")
-  local u1 = unit.create(f, ocean, 1)
-  local u2 = unit.create(f2, r, 1)
-  assert_not_nil(u2)
-  u1:add_item("money", 1000)
-  u2:add_item("money", 1000)
-
-  u1.ship = s
-  u1:set_skill("sailing", 10)
-  u1:clear_orders()
-  u1:add_order("NACH w")
+  local shore = region.create(0, 0, "plain")
+  local f = faction.create("noreply@eressea.de", "human", "de")
+  local u = unit.create(f, ocean, 1)
+  u.ship = ship.create(ocean, "boat")
+  u:set_skill("sailing", 10)
+  u:add_order("NACH W")
   process_orders()
 
-  assert_equal(r, u1.region) -- the plain case: okay
+  assert_equal(shore, u.region)
+end
+
+function test_sail_to_forbidden_shore()
+  local ocean = region.create(1, 0, "ocean")
+  local shore = region.create(0, 0, "glacier")
+  local f = faction.create("noreply@eressea.de", "human", "de")
+  local u = unit.create(f, ocean, 1)
+  u.ship = ship.create(ocean, "boat")
+  u:set_skill("sailing", 10)
+  u:add_order("NACH W")
+  process_orders()
+
+  assert_equal(ocean, u.region)
 end
 
 
