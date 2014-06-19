@@ -625,7 +625,7 @@ void write_borders(struct storage *store)
 int read_borders(struct storage *store)
 {
   for (;;) {
-    unsigned int bid = 0;
+    int bid = 0;
     char zText[32];
     connection *b;
     region *from, *to;
@@ -634,7 +634,7 @@ int read_borders(struct storage *store)
     READ_TOK(store, zText, sizeof(zText));
     if (!strcmp(zText, "end"))
       break;
-    READ_UINT(store, &bid);
+    READ_INT(store, &bid);
     if (global.data_version < UIDHASH_VERSION) {
       int fx, fy, tx, ty;
       READ_INT(store, &fx);
@@ -644,9 +644,9 @@ int read_borders(struct storage *store)
       from = findregion(fx, fy);
       to = findregion(tx, ty);
     } else {
-      unsigned int fid, tid;
-      READ_UINT(store, &fid);
-      READ_UINT(store, &tid);
+      int fid, tid;
+      READ_INT(store, &fid);
+      READ_INT(store, &tid);
       from = findregionbyid(fid);
       to = findregionbyid(tid);
     }

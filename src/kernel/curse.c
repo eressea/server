@@ -187,13 +187,13 @@ int curse_read(attrib * a, void *owner, struct storage *store)
   int ur;
   char cursename[64];
   int n;
-  unsigned int flags;
+  int flags;
   float flt;
 
   READ_INT(store, &c->no);
   chash(c);
   READ_TOK(store, cursename, sizeof(cursename));
-  READ_UINT(store, &flags);
+  READ_INT(store, &flags);
   READ_INT(store, &c->duration);
   if (global.data_version >= CURSEVIGOURISFLOAT_VERSION) {
     READ_FLT(store, &flt);

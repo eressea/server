@@ -46,7 +46,7 @@ void cw_write(const attrib * a, const void *target, storage * store)
 }
 
 typedef struct bresolve {
-  unsigned int id;
+  int id;
   curse *self;
 } bresolve;
 
@@ -61,7 +61,7 @@ static int cw_read(attrib * a, void *target, storage * store)
 
   curse_read(a, store, target);
   br->self = c;
-  READ_UINT(store, &br->id);
+  READ_INT(store, &br->id);
 
   var.i = br->id;
   ur_add(var, &wc->wall, resolve_borderid);
