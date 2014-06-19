@@ -26,7 +26,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "build.h"
 #include "curse.h"
 #include "faction.h"
-#include "message.h"
+#include "messages.h"
 #include "pool.h"
 #include "race.h"
 #include "region.h"
@@ -847,7 +847,7 @@ use_bloodpotion(struct unit *u, const struct item_type *itype, int amount,
   } else {
     const race *irace = u_irace(u);
     if (irace == u_race(u)) {
-      static race *rcfailure;
+      static const race *rcfailure;
       if (!rcfailure) {
         rcfailure = rc_find("smurf");
         if (!rcfailure)

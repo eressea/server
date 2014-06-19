@@ -98,36 +98,12 @@ void racelist_insert(struct race_list **rl, const struct race *r)
   *rl = rl2;
 }
 
-race *rc_new(const char *zName)
-{
-  char zBuffer[80];
-  race *rc = (race *)calloc(sizeof(race), 1);
-
-  rc->hitpoints = 1;
-  if (strchr(zName, ' ') != NULL) {
-    log_error("race '%s' has an invalid name. remove spaces\n", zName);
-    assert(strchr(zName, ' ') == NULL);
-  }
-  strcpy(zBuffer, zName);
-  rc->_name[0] = _strdup(zBuffer);
-  sprintf(zBuffer, "%s_p", zName);
-  rc->_name[1] = _strdup(zBuffer);
-  sprintf(zBuffer, "%s_d", zName);
-  rc->_name[2] = _strdup(zBuffer);
-  sprintf(zBuffer, "%s_x", zName);
-  rc->_name[3] = _strdup(zBuffer);
-  rc->precombatspell = NULL;
-
-  rc->attack[0].type = AT_COMBATSPELL;
-  rc->attack[1].type = AT_NONE;
-  return rc;
-}
-
-race *rc_add(race * rc)
-{
-  rc->index = num_races++;
-  rc->next = races;
-  return races = rc;
+void free_races(void) {
+    while (races) {
+        race * rc = races->next;
+        free(races);
+        races =rc;
+    }
 }
 
 static const char *racealias[][2] = {
@@ -136,7 +112,7 @@ static const char *racealias[][2] = {
   {NULL, NULL}
 };
 
-race *rc_find(const char *name)
+static race *rc_find_i(const char *name)
 {
   const char *rname = name;
   race *rc = races;
@@ -151,6 +127,41 @@ race *rc_find(const char *name)
   while (rc && !strcmp(rname, rc->_name[0]) == 0)
     rc = rc->next;
   return rc;
+}
+
+const race * rc_find(const char *name) {
+    return rc_find_i(name);
+}
+
+race *rc_get_or_create(const char *zName)
+{
+    race *rc = rc_find_i(zName);
+    if (!rc) {
+        char zBuffer[80]; 
+
+        rc = (race *)calloc(sizeof(race), 1);
+        rc->hitpoints = 1;
+        if (strchr(zName, ' ') != NULL) {
+            log_error("race '%s' has an invalid name. remove spaces\n", zName);
+            assert(strchr(zName, ' ') == NULL);
+        }
+        strcpy(zBuffer, zName);
+        rc->_name[0] = _strdup(zBuffer);
+        sprintf(zBuffer, "%s_p", zName);
+        rc->_name[1] = _strdup(zBuffer);
+        sprintf(zBuffer, "%s_d", zName);
+        rc->_name[2] = _strdup(zBuffer);
+        sprintf(zBuffer, "%s_x", zName);
+        rc->_name[3] = _strdup(zBuffer);
+        rc->precombatspell = NULL;
+
+        rc->attack[0].type = AT_COMBATSPELL;
+        rc->attack[1].type = AT_NONE;
+        rc->index = num_races++;
+        rc->next = races;
+        return races = rc;
+    }
+    return rc;
 }
 
 /** dragon movement **/
@@ -288,7 +299,7 @@ variant read_race_reference(struct storage *store)
     result.v = NULL;
     return result;
   } else {
-    result.v = rc_find(zName);
+    result.v = rc_find_i(zName);
   }
   assert(result.v != NULL);
   return result;

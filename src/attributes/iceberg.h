@@ -18,6 +18,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #ifndef H_ATTRIBUTE_ICEBERG
 #define H_ATTRIBUTE_ICEBERG
+
+#include "direction.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

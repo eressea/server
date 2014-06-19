@@ -200,3 +200,4 @@ function test_snowman()
     end
     assert_equal(nil, u)
 end
+

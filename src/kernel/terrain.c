@@ -78,33 +78,48 @@ void test_clear_terrains(void)
 
 const terrain_type *terrains(void)
 {
-  return registered_terrains;
+    return registered_terrains;
 }
 
 static const char *plain_name(const struct region *r)
 {
-  /* TODO: xml defined */
-  if (r_isforest(r))
-    return "forest";
-  return r->terrain->_name;
+    /* TODO: xml defined */
+    if (r_isforest(r)) {
+       return "forest";
+    }
+    return r->terrain->_name;
 }
 
-void register_terrain(struct terrain_type *terrain)
+static terrain_type *terrain_find_i(const char *name)
 {
-  assert(terrain->next == NULL), terrain->next = registered_terrains;
-  registered_terrains = terrain;
-  if (strcmp("plain", terrain->_name) == 0)
-    terrain->name = &plain_name;
+    terrain_type *terrain;
+    for (terrain = registered_terrains; terrain; terrain = terrain->next) {
+      if (strcmp(terrain->_name, name) == 0) {
+          break;
+      }
+    }
+    return terrain;
 }
 
-const struct terrain_type *get_terrain(const char *name)
-{
-  const struct terrain_type *terrain;
-  for (terrain = registered_terrains; terrain; terrain = terrain->next) {
-    if (strcmp(terrain->_name, name) == 0)
-      break;
-  }
-  return terrain;
+const terrain_type *get_terrain(const char *name) {
+    return terrain_find_i(name);
+}
+
+terrain_type * get_or_create_terrain(const char *name) {
+    terrain_type *terrain = terrain_find_i(name);
+    if (!terrain) {
+        terrain = (terrain_type *)calloc(sizeof(terrain_type), 1);
+        if (terrain) {
+            terrain->_name = _strdup(name); 
+            terrain->next = registered_terrains;
+            registered_terrains = terrain;
+            if (strcmp("plain", name) == 0) {
+                // TODO: this is awful, it belongs in config
+                terrain->name = &plain_name;
+            }
+        }
+    }
+    return terrain; 
 }
 
 static const terrain_type *newterrains[MAXTERRAINS];

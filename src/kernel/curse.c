@@ -24,7 +24,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "building.h"
 #include "faction.h"
 #include "magic.h"
-#include "message.h"
+#include "messages.h"
 #include "objtypes.h"
 #include "race.h"
 #include "region.h"

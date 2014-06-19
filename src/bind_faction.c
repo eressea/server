@@ -319,13 +319,9 @@ static int tolua_faction_create(lua_State * L)
   const char *email = tolua_tostring(L, 1, 0);
   const char *racename = tolua_tostring(L, 2, 0);
   const char *lang = tolua_tostring(L, 3, 0);
-  struct locale *loc = find_locale(lang);
+  struct locale *loc = get_locale(lang);
   faction *f = NULL;
   const struct race *frace = rc_find(racename);
-  if (frace == NULL)
-    frace = findrace(racename, find_locale("de"));
-  if (frace == NULL)
-    frace = findrace(racename, find_locale("en"));
   if (frace != NULL) {
     f = addfaction(email, NULL, frace, loc, 0);
   }
@@ -375,7 +371,7 @@ static int tolua_faction_set_locale(lua_State * L)
 {
   faction *self = (faction *) tolua_tousertype(L, 1, 0);
   const char *name = tolua_tostring(L, 2, 0);
-  const struct locale *loc = find_locale(name);
+  const struct locale *loc = get_locale(name);
   if (loc) {
       self->locale = loc;
   }
@@ -397,7 +393,7 @@ static int tolua_faction_set_race(lua_State * L)
 {
   faction *self = (faction *) tolua_tousertype(L, 1, 0);
   const char *name = tolua_tostring(L, 2, 0);
-  race *rc = rc_find(name);
+  const race *rc = rc_find(name);
   if (rc != NULL) {
     self->race = rc;
   }

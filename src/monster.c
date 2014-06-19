@@ -36,7 +36,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/equipment.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
-#include <kernel/message.h>
+#include <kernel/messages.h>
 #include <kernel/move.h>
 #include <kernel/names.h>
 #include <kernel/order.h>

@@ -2108,235 +2108,189 @@
     </string>
   </namespace>
 
+  <namespace name="keyword">
   <!--Befehle -->
   <string name="//">
     <text locale="de">//</text>
   </string>
-  <string name="BANNER">
+  <string name="banner">
     <text locale="de">BANNER</text>
   </string>
-  <string name="ARBEITEN">
+  <string name="work">
     <text locale="de">ARBEITEN</text>
   </string>
-  <string name="WARTEN">
-    <text locale="de">WARTEN</text>
-    <text locale="en">WAIT</text>
-  </string>
-  <string name="ATTACKIEREN">
+  <string name="attack">
     <text locale="de">ATTACKIEREN</text>
   </string>
-  <string name="BIETEN">
-    <text locale="de">BIETEN</text>
-  </string>
-  <string name="BEANSPRUCHEN">
-    <text locale="de">BEANSPRUCHEN</text>
+  <string name="claim">
     <text locale="en">CLAIM</text>
   </string>
-  <string name="BEKLAUEN">
+  <string name="steal">
     <text locale="de">BEKLAUEN</text>
   </string>
-  <string name="BELAGERE">
+  <string name="besiege">
     <text locale="de">BELAGERE</text>
   </string>
-  <string name="BENENNEN">
+  <string name="name">
     <text locale="de">BENENNEN</text>
   </string>
-  <string name="BENUTZEN">
+  <string name="use">
     <text locale="de">BENUTZEN</text>
   </string>
-  <string name="BESCHREIBEN">
+  <string name="describe">
     <text locale="de">BESCHREIBEN</text>
   </string>
-  <string name="BETRETEN">
+  <string name="enter">
     <text locale="de">BETRETEN</text>
   </string>
-  <string name="BEWACHEN">
+  <string name="give">
+    <text locale="de">GIB</text>
+  </string>
+  <string name="guard">
     <text locale="de">BEWACHEN</text>
   </string>
-  <string name="BOTSCHAFT">
+  <string name="message">
     <text locale="de">BOTSCHAFT</text>
   </string>
-  <string name="ENDE">
+  <string name="end">
     <text locale="de">ENDE</text>
   </string>
-  <string name="FAHREN">
+  <string name="ride">
     <text locale="de">FAHREN</text>
   </string>
-  <string name="NUMMER">
+  <string name="number">
     <text locale="de">NUMMER</text>
   </string>
-  <string name="FRIEDEN">
-    <text locale="de">FRIEDEN</text>
-    <text locale="en">PEACE</text>
-  </string>
-  <string name="KRIEG">
-    <text locale="de">KRIEG</text>
-    <text locale="en">WAR</text>
-  </string>
-  <string name="FOLGEN">
+  <string name="follow">
     <text locale="de">FOLGEN</text>
   </string>
-  <string name="FORSCHEN">
+  <string name="research">
     <text locale="de">FORSCHEN</text>
   </string>
-  <string name="HELFEN">
+  <string name="help">
     <text locale="de">HELFEN</text>
   </string>
-  <string name="KAEMPFEN">
+  <string name="fight">
     <text locale="de">KÄMPFEN</text>
   </string>
-  <string name="KAMPFZAUBER">
+  <string name="ready">
     <text locale="de">KAMPFZAUBER</text>
   </string>
-  <string name="KAUFEN">
+  <string name="buy">
     <text locale="de">KAUFEN</text>
   </string>
-  <string name="KONTAKTIEREN">
+  <string name="contact">
     <text locale="de">KONTAKTIEREN</text>
   </string>
-  <string name="LEHREN">
+  <string name="teach">
     <text locale="de">LEHREN</text>
   </string>
-  <string name="LERNEN">
+  <string name="study">
     <text locale="de">LERNEN</text>
   </string>
-  <string name="MACHEN">
+  <string name="make">
     <text locale="de">MACHEN</text>
   </string>
-  <string name="NACH">
+  <string name="move">
     <text locale="de">NACH</text>
   </string>
-  <string name="XONTORMIA">
-    <text locale="de">XONTORMIA</text>
-    <text locale="en">XONTORMIA</text>
-  </string>
-  <string name="ALLIANZ">
+  <string name="alliance">
     <text locale="de">ALLIANZ</text>
-    <text locale="en">ALLIANCE</text>
   </string>
-  <string name="PROMOTION">
+  <string name="promote">
     <text locale="de">BEFÖRDERUNG</text>
-    <text locale="en">PROMOTION</text>
   </string>
-  <string name="BEZAHLEN">
-    <text locale="de">BEZAHLEN</text>
-    <text locale="en">PAY</text>
-  </string>
-  <string name="PFLANZEN">
+  <string name="plant">
     <text locale="de">PFLANZEN</text>
   </string>
-  <string name="PRAEFIX">
+  <string name="prefix">
     <text locale="de">PRÄFIX</text>
   </string>
-  <string name="SYNONYM">
-    <text locale="de">SYNONYM</text>
-  </string>
-  <string name="INFO">
+  <string name="info">
     <text locale="de">INFO</text>
   </string>
-  <string name="PASSWORT">
+  <string name="password">
     <text locale="de">PASSWORT</text>
   </string>
-  <string name="REKRUTIEREN">
+  <string name="recruit">
     <text locale="de">REKRUTIEREN</text>
   </string>
-  <string name="RESERVIEREN">
+  <string name="reserve">
     <text locale="de">RESERVIEREN</text>
   </string>
-  <string name="ROUTE">
+  <string name="route">
     <text locale="de">ROUTE</text>
   </string>
-  <string name="SABOTIEREN">
+  <string name="sabotage">
     <text locale="de">SABOTIEREN</text>
   </string>
-  <string name="OPTION">
+  <string name="option">
     <text locale="de">OPTION</text>
   </string>
-  <string name="SPIONIEREN">
+  <string name="spy">
     <text locale="de">SPIONIEREN</text>
   </string>
-  <string name="STIRB">
+  <string name="quit">
     <text locale="de">STIRB</text>
   </string>
-  <string name="TARNEN">
+  <string name="hide">
     <text locale="de">TARNEN</text>
   </string>
-  <string name="TRANSPORTIEREN">
+  <string name="carry">
     <text locale="de">TRANSPORTIEREN</text>
   </string>
-  <string name="TREIBEN">
+  <string name="tax">
     <text locale="de">TREIBEN</text>
   </string>
-  <string name="UNTERHALTEN">
+  <string name="entertain">
     <text locale="de">UNTERHALTEN</text>
   </string>
-  <string name="VERKAUFEN">
+  <string name="sell">
     <text locale="de">VERKAUFEN</text>
   </string>
-  <string name="VERLASSEN">
+  <string name="leave">
     <text locale="de">VERLASSEN</text>
   </string>
-  <string name="VERGESSEN">
+  <string name="forget">
     <text locale="de">VERGESSEN</text>
   </string>
-  <string name="ZAUBERE">
+  <string name="cast">
     <text locale="de">ZAUBERE</text>
   </string>
-  <string name="ZEIGEN">
+  <string name="show">
     <text locale="de">ZEIGEN</text>
   </string>
-  <string name="ZERSTOEREN">
+  <string name="destroy">
     <text locale="de">ZERSTÖREN</text>
   </string>
-  <string name="ZUECHTEN">
+  <string name="grow">
     <text locale="de">ZÜCHTEN</text>
   </string>
-  <string name="DEFAULT">
+  <string name="default">
     <text locale="de">DEFAULT</text>
   </string>
-  <string name="REPORT">
+  <string name="report">
     <text locale="de">REPORT</text>
   </string>
-  <string name="XML">
-    <text locale="de">XML</text>
-    <text locale="en">XML</text>
-  </string>
-  <string name="URSPRUNG">
+  <string name="origin">
     <text locale="de">URSPRUNG</text>
   </string>
-  <string name="EMAIL">
+  <string name="email">
     <text locale="de">EMAIL</text>
   </string>
-  <string name="PIRATERIE">
+  <string name="piracy">
     <text locale="de">PIRATERIE</text>
   </string>
-  <string name="LOCALE">
+  <string name="locale">
     <text locale="de">LOCALE</text>
   </string>
-  <string name="NEUSTART">
-    <text locale="de">NEUSTART</text>
-  </string>
-  <string name="GRUPPE">
+  <string name="group">
     <text locale="de">GRUPPE</text>
   </string>
-  <string name="OPFERE">
-    <text locale="de">OPFERE</text>
-  </string>
-  <string name="BETEN">
-    <text locale="de">BETEN</text>
-  </string>
-  <string name="SORTIEREN">
+  <string name="sort">
     <text locale="de">SORTIEREN</text>
   </string>
-  <string name="JIHAD">
-    <text locale="de">JIHAD</text>
-  </string>
-  <string name="GM">
-    <text locale="de">GM</text>
-  </string>
-  <string name="WERWESEN">
-    <text locale="de">WERWESEN</text>
-  </string>
+  </namespace>
 
   <!--NR generieren -->
   <string name="nr_options">

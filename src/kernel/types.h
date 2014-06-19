@@ -73,73 +73,6 @@ typedef struct ursprung {
   int x, y;
 } ursprung;
 
-/* ----------------- Befehle ----------------------------------- */
-
-typedef enum {
-  K_KOMMENTAR,
-  K_BANNER,
-  K_WORK,
-  K_ATTACK,
-  K_STEAL,
-  K_BESIEGE,
-  K_NAME,
-  K_USE,
-  K_DISPLAY,
-  K_ENTER,
-  K_GUARD,
-  K_MAIL,
-  K_END,
-  K_DRIVE,
-  K_NUMBER,
-  K_FOLLOW,
-  K_RESEARCH,
-  K_GIVE,
-  K_ALLY,
-  K_STATUS,
-  K_COMBATSPELL,
-  K_BUY,
-  K_CONTACT,
-  K_TEACH,
-  K_STUDY,
-  K_MAKE,
-  K_MOVE,
-  K_PASSWORD,
-  K_RECRUIT,
-  K_RESERVE,
-  K_ROUTE,
-  K_SABOTAGE,
-  K_SEND,
-  K_SPY,
-  K_QUIT,
-  K_SETSTEALTH,
-  K_TRANSPORT,
-  K_TAX,
-  K_ENTERTAIN,
-  K_SELL,
-  K_LEAVE,
-  K_FORGET,
-  K_CAST,
-  K_RESHOW,
-  K_DESTROY,
-  K_BREED,
-  K_DEFAULT,
-  K_URSPRUNG,
-  K_EMAIL,
-  K_PIRACY,
-  K_GROUP,
-  K_SORT,
-  K_GM,                         /* perform GM commands */
-  K_INFO,                       /* set player-info */
-  K_PREFIX,
-  K_PLANT,
-  K_ALLIANCE,
-  K_CLAIM,
-  K_PROMOTION,
-  K_PAY,
-  MAXKEYWORDS,
-  NOKEYWORD = -1
-} keyword_t;
-
 /* ------------------ Status von Einheiten --------------------- */
 
 typedef unsigned char status_t;
@@ -250,7 +183,6 @@ enum {
   O_BZIP2,                      /* 1024 - compress as bzip2 */
   O_SCORE,                      /* 2048 - punkte anzeigen? */
   O_SHOWSKCHANGE,               /* 4096 - Skillveränderungen anzeigen? */
-  O_XML,                        /* 8192 - XML report versenden */
   MAXOPTIONS
 };
 
@@ -353,20 +285,6 @@ typedef enum {
   MAXRACES,
   NORACE = -1
 } race_t;
-
-/* Richtungen */
-typedef enum {
-  D_NORTHWEST,
-  D_NORTHEAST,
-  D_EAST,
-  D_SOUTHEAST,
-  D_SOUTHWEST,
-  D_WEST,
-  MAXDIRECTIONS,
-  D_PAUSE,
-  D_SPECIAL,
-  NODIRECTION = -1
-} direction_t;
 
 typedef enum {
   M_GRAY = 0,                 /* Gray */

@@ -24,7 +24,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/curse.h>
 #include <kernel/faction.h>
 #include <kernel/magic.h>
-#include <kernel/message.h>
+#include <kernel/messages.h>
 #include <kernel/skill.h>
 #include <kernel/spell.h>
 #include <kernel/unit.h>

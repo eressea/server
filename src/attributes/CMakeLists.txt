@@ -4,7 +4,6 @@ alliance.c
 attributes.c
 fleechance.c
 follow.c
-giveitem.c
 gm.c
 hate.c
 iceberg.c

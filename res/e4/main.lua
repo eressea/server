@@ -36,9 +36,6 @@ function process(orders)
   spawn_dragons()
   spawn_undead()
 
-  if get_turn()>=config.kill_after then
-    kill_nonstarters()
-  end
   -- post-turn updates:
   update_guards()
   update_scores()

@@ -19,7 +19,7 @@ without prior permission by the authors of Eressea.
 /* kernel includes */
 #include <kernel/building.h>
 #include <kernel/faction.h>
-#include <kernel/message.h>
+#include <kernel/messages.h>
 #include <kernel/order.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
@@ -290,7 +290,7 @@ static void execute(const struct syntaxtree *syntax, keyword_t kwd)
         void *root = stree_find(syntax, lang);
         order *ord;
         for (ord = u->orders; ord; ord = ord->next) {
-          if (get_keyword(ord) == kwd) {
+          if (getkeyword(ord) == kwd) {
             do_command(root, u, ord);
             run = 1;
           }

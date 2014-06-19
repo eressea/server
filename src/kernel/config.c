@@ -32,11 +32,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "building.h"
 #include "calendar.h"
 #include "curse.h"
+#include "direction.h"
 #include "faction.h"
 #include "group.h"
 #include "item.h"
+#include "keyword.h"
 #include "magic.h"
-#include "message.h"
+#include "messages.h"
 #include "move.h"
 #include "names.h"
 #include "objtypes.h"
@@ -51,33 +53,37 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "terrain.h"
 #include "unit.h"
 
+#include <kernel/spell.h>
+#include <kernel/spellbook.h>
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/bsdstring.h>
-#include <critbit.h>
 #include <util/crmessage.h>
 #include <util/event.h>
-#include <util/functions.h>
 #include <util/language.h>
+#include <util/filereader.h>
+#include <util/functions.h>
 #include <util/log.h>
 #include <util/lists.h>
 #include <util/parser.h>
 #include <quicklist.h>
 #include <util/rand.h>
 #include <util/rng.h>
-#include <util/sql.h>
 #include <util/translation.h>
 #include <util/unicode.h>
 #include <util/umlaut.h>
 #include <util/xml.h>
 
+#ifdef USE_LIBXML2
 /* libxml includes */
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
+#endif
 
 /* external libraries */
 #include <iniparser.h>
+#include <critbit.h>
 
 /* libc includes */
 #include <stdio.h>
@@ -97,7 +103,6 @@ bool lomem = false;
 FILE *logfile;
 FILE *updatelog;
 const struct race *new_race[MAXRACES];
-bool sqlpatch = false;
 bool battledebug = false;
 int turn = -1;
 
@@ -305,17 +310,6 @@ helpmode helpmodes[] = {
   {NULL, 0}
 };
 
-const char *directions[MAXDIRECTIONS + 2] = {
-  "northwest",
-  "northeast",
-  "east",
-  "southeast",
-  "southwest",
-  "west",
-  "",
-  "pause"
-};
-
 /** Returns the English name of the race, which is what the database uses.
  */
 const char *dbrace(const struct race *rc)
@@ -324,7 +318,7 @@ const char *dbrace(const struct race *rc)
   char *zPtr = zText;
 
   /* the english names are all in ASCII, so we don't need to worry about UTF8 */
-  strcpy(zText, (const char *)LOC(find_locale("en"), rc_name(rc, 0)));
+  strcpy(zText, (const char *)LOC(get_locale("en"), rc_name(rc, 0)));
   while (*zPtr) {
     *zPtr = (char)(toupper(*zPtr));
     ++zPtr;
@@ -385,69 +379,6 @@ const char *parameters[MAXPARAMS] = {
   "ALLIANZ"
 };
 
-const char *keywords[MAXKEYWORDS] = {
-  "//",
-  "BANNER",
-  "ARBEITEN",
-  "ATTACKIEREN",
-  "BEKLAUEN",
-  "BELAGERE",
-  "BENENNEN",
-  "BENUTZEN",
-  "BESCHREIBEN",
-  "BETRETEN",
-  "BEWACHEN",
-  "BOTSCHAFT",
-  "ENDE",
-  "FAHREN",
-  "NUMMER",
-  "FOLGEN",
-  "FORSCHEN",
-  "GIB",
-  "HELFEN",
-  "KAEMPFEN",
-  "KAMPFZAUBER",
-  "KAUFEN",
-  "KONTAKTIEREN",
-  "LEHREN",
-  "LERNEN",
-  "MACHEN",
-  "NACH",
-  "PASSWORT",
-  "REKRUTIEREN",
-  "RESERVIEREN",
-  "ROUTE",
-  "SABOTIEREN",
-  "OPTION",
-  "SPIONIEREN",
-  "STIRB",
-  "TARNEN",
-  "TRANSPORTIEREN",
-  "TREIBEN",
-  "UNTERHALTEN",
-  "VERKAUFEN",
-  "VERLASSEN",
-  "VERGESSEN",
-  "ZAUBERE",
-  "ZEIGEN",
-  "ZERSTOEREN",
-  "ZUECHTEN",
-  "DEFAULT",
-  "URSPRUNG",
-  "EMAIL",
-  "PIRATERIE",
-  "GRUPPE",
-  "SORTIEREN",
-  "GM",
-  "INFO",
-  "PRAEFIX",
-  "PFLANZEN",
-  "ALLIANZ",
-  "BEANSPRUCHEN",
-  "PROMOTION",
-  "BEZAHLEN",
-};
-
 const char *report_options[MAX_MSG] = {
   "Kampf",
   "Ereignisse",
@@ -482,8 +413,7 @@ const char *options[MAXOPTIONS] = {
   "ADRESSEN",
   "BZIP2",
   "PUNKTE",
-  "SHOWSKCHANGE",
-  "XML"
+  "SHOWSKCHANGE"
 };
 
 static int allied_skillcount(const faction * f, skill_t sk)
@@ -1145,53 +1075,42 @@ static attrib_type at_lighthouse = {
  */
 void update_lighthouse(building * lh)
 {
-  static bool init_lighthouse = false;
-  static const struct building_type *bt_lighthouse = 0;
+    const struct building_type *bt_lighthouse = bt_find("lighthouse");
+    if (bt_lighthouse && lh->type == bt_lighthouse) {
+        region *r = lh->region;
+        int d = (int)log10(lh->size) + 1;
+        int x;
 
-  if (!init_lighthouse) {
-    bt_lighthouse = bt_find("lighthouse");
-    if (bt_lighthouse == NULL)
-      return;
-    init_lighthouse = true;
-  }
-
-  if (lh->type == bt_lighthouse) {
-    region *r = lh->region;
-    int d = (int)log10(lh->size) + 1;
-    int x;
-
-    if (lh->size > 0) {
-      r->flags |= RF_LIGHTHOUSE;
-    }
-
-    for (x = -d; x <= d; ++x) {
-      int y;
-      for (y = -d; y <= d; ++y) {
-        attrib *a;
-        region *r2;
-        int px = r->x + x, py = r->y + y;
-        pnormalize(&px, &py, rplane(r));
-        r2 = findregion(px, py);
-        if (r2 == NULL)
-          continue;
-        if (!fval(r2->terrain, SEA_REGION))
-          continue;
-        if (distance(r, r2) > d)
-          continue;
-        a = a_find(r2->attribs, &at_lighthouse);
-        while (a && a->type == &at_lighthouse) {
-          building *b = (building *) a->data.v;
-          if (b == lh)
-            break;
-          a = a->next;
+        if (lh->size > 0) {
+            r->flags |= RF_LIGHTHOUSE;
         }
-        if (!a) {
-          a = a_add(&r2->attribs, a_new(&at_lighthouse));
-          a->data.v = (void *)lh;
+        
+        for (x = -d; x <= d; ++x) {
+            int y;
+            for (y = -d; y <= d; ++y) {
+                attrib *a;
+                region *r2;
+                int px = r->x + x, py = r->y + y;
+                pnormalize(&px, &py, rplane(r));
+                r2 = findregion(px, py);
+                if (!r2 || !fval(r2->terrain, SEA_REGION))
+                    continue;
+                if (distance(r, r2) > d)
+                    continue;
+                a = a_find(r2->attribs, &at_lighthouse);
+                while (a && a->type == &at_lighthouse) {
+                    building *b = (building *) a->data.v;
+                    if (b == lh)
+                        break;
+                    a = a->next;
+                }
+                if (!a) {
+                    a = a_add(&r2->attribs, a_new(&at_lighthouse));
+                    a->data.v = (void *)lh;
+                }
+            }
         }
-      }
     }
-  }
 }
 
 int count_faction(const faction * f, int flags)
@@ -1267,7 +1186,7 @@ parse(keyword_t kword, int (*dofun) (unit *, struct order *), bool thisorder)
         ordp = &u->thisorder;
       while (*ordp) {
         order *ord = *ordp;
-        if (get_keyword(ord) == kword) {
+        if (getkeyword(ord) == kword) {
           if (dofun(u, ord) != 0)
             break;
           if (u->orders == NULL)
@@ -1336,38 +1255,13 @@ skill_t findskill(const char *s, const struct locale * lang)
     int i;
     const void * match;
     void **tokens = get_translations(lang, UT_SKILLS);
-    critbit_tree *cb = (critbit_tree *)*tokens;
-    if (cb_find_prefix(cb, str, strlen(str), &match, 1, 0)) {
+    struct critbit_tree *cb = (critbit_tree *)*tokens;
+    if (cb && cb_find_prefix(cb, str, strlen(str), &match, 1, 0)) {
       cb_get_kv(match, &i, sizeof(int));
       result = (skill_t)i;
     }
   }
   return result;
-}
-
-keyword_t findkeyword(const char *s, const struct locale * lang)
-{
-  keyword_t result = NOKEYWORD;
-  char buffer[64];
-
-  while (*s == '@') ++s;
-
-  if (*s) {
-    char * str = transliterate(buffer, sizeof(buffer)-sizeof(int), s);
-
-    if (str) {
-      int i;
-      const void * match;
-      void **tokens = get_translations(lang, UT_KEYWORDS);
-      critbit_tree *cb = (critbit_tree *)*tokens;
-      if (cb_find_prefix(cb, str, strlen(str), &match, 1, 0)) {
-        cb_get_kv(match, &i, sizeof(int));
-        result = (keyword_t)i;
-        return global.disabled[result] ? NOKEYWORD : result;
-      }
-    }
-  }
-  return NOKEYWORD;
 }
 
 param_t findparam(const char *s, const struct locale * lang)
@@ -1902,59 +1796,24 @@ void *gc_add(void *p)
   return p;
 }
 
-static void init_directions(void ** root, const struct locale *lang)
-{
-  /* mit dieser routine kann man mehrere namen für eine direction geben,
-   * das ist für die hexes ideal. */
-  const struct {
-    const char *name;
-    int direction;
-  } dirs[] = {
-    {
-    "dir_ne", D_NORTHEAST}, {
-    "dir_nw", D_NORTHWEST}, {
-    "dir_se", D_SOUTHEAST}, {
-    "dir_sw", D_SOUTHWEST}, {
-    "dir_east", D_EAST}, {
-    "dir_west", D_WEST}, {
-    "northeast", D_NORTHEAST}, {
-    "northwest", D_NORTHWEST}, {
-    "southeast", D_SOUTHEAST}, {
-    "southwest", D_SOUTHWEST}, {
-    "east", D_EAST}, {
-    "west", D_WEST}, {
-    "PAUSE", D_PAUSE}, {
-    NULL, NODIRECTION}
-  };
-  int i;
-  void **tokens = get_translations(lang, UT_DIRECTIONS);
-
-  for (i = 0; dirs[i].direction != NODIRECTION; ++i) {
-    variant token;
-    token.i = dirs[i].direction;
-    addtoken(tokens, LOC(lang, dirs[i].name), token);
-  }
+void add_translation(critbit_tree **cbp, const char *key, int i) {
+    char buffer[256];
+    char * str = transliterate(buffer, sizeof(buffer)-sizeof(int), key);
+    critbit_tree * cb = *cbp;
+    if (str) {
+        size_t len = strlen(str);
+        if (!cb) {
+            *cbp = cb = (critbit_tree *)calloc(1, sizeof(critbit_tree *));
+        }
+        len = cb_new_kv(str, len, &i, sizeof(int), buffer);
+        cb_insert(cb, buffer, len);
+    } else {
+        log_error("could not transliterate '%s'\n", key);
+    }
 }
 
-direction_t finddirection(const char *s, const struct locale *lang)
+void init_translations(const struct locale *lang, int ut, const char * (*string_cb)(int i), int maxstrings)
 {
-  void **tokens = get_translations(lang, UT_DIRECTIONS);
-  variant token;
-
-  if (findtoken(*tokens, s, &token) == E_TOK_SUCCESS) {
-    return (direction_t) token.i;
-  }
-  return NODIRECTION;
-}
-
-direction_t getdirection(const struct locale * lang)
-{
-  return finddirection(getstrtoken(), lang);
-}
-
-static void init_translations(const struct locale *lang, int ut, const char * (*string_cb)(int i), int maxstrings)
-{
-  char buffer[256];
   void **tokens;
   int i;
 
@@ -1964,27 +1823,12 @@ static void init_translations(const struct locale *lang, int ut, const char * (*
   for (i = 0; i != maxstrings; ++i) {
     const char * s = string_cb(i);
     const char * key = s ? locale_string(lang, s) : 0;
+    key = key ? key : s;
     if (key) {
-      char * str = transliterate(buffer, sizeof(buffer)-sizeof(int), key);
-      if (str) {
-        critbit_tree * cb = (critbit_tree *)*tokens;
-		size_t len = strlen(str);
-		if (!cb) {
-          *tokens = cb = (critbit_tree *)calloc(1, sizeof(critbit_tree *));
-        }
-        len = cb_new_kv(str, len, &i, sizeof(int), buffer);
-        cb_insert(cb, buffer, len);
-      } else {
-        log_error("could not transliterate '%s'\n", key);
-      }
+      critbit_tree ** cb = (critbit_tree **)tokens;
+      add_translation(cb, key, i);
     }
   }
-}
-
-static const char * keyword_key(int i)
-{
-  assert(i<MAXKEYWORDS&& i>=0);
-  return keywords[i];
 }
 
 static const char * parameter_key(int i)
@@ -2001,61 +1845,58 @@ static const char * skill_key(int sk)
 
 static void init_locale(const struct locale *lang)
 {
-  variant var;
-  int i;
-  const struct race *rc;
-  const terrain_type *terrain;
-  void **tokens;
+    variant var;
+    int i;
+    const struct race *rc;
+    const terrain_type *terrain;
+    void **tokens;
 
-  tokens = get_translations(lang, UT_MAGIC);
-  if (tokens) {
-    const char *str = get_param(global.parameters, "rules.magic.playerschools");
-    char *sstr, *tok;
-    if (str == NULL) {
-      str = "gwyrrd illaun draig cerddor tybied";
+    tokens = get_translations(lang, UT_MAGIC);
+    if (tokens) {
+        const char *str = get_param(global.parameters, "rules.magic.playerschools");
+        char *sstr, *tok;
+        if (str == NULL) {
+            str = "gwyrrd illaun draig cerddor tybied";
+        }
+
+        sstr = _strdup(str);
+        tok = strtok(sstr, " ");
+        while (tok) {
+            for (i = 0; i != MAXMAGIETYP; ++i) {
+                if (strcmp(tok, magic_school[i]) == 0) break;
+            }
+            assert(i != MAXMAGIETYP);
+            var.i = i;
+            addtoken(tokens, LOC(lang, mkname("school", tok)), var);
+            tok = strtok(NULL, " ");
+        }
+        free(sstr);
     }
 
-    sstr = _strdup(str);
-    tok = strtok(sstr, " ");
-    while (tok) {
-      for (i = 0; i != MAXMAGIETYP; ++i) {
-        if (strcmp(tok, magic_school[i]) == 0)
-          break;
-      }
-      assert(i != MAXMAGIETYP);
-      var.i = i;
-      addtoken(tokens, LOC(lang, mkname("school", tok)), var);
-      tok = strtok(NULL, " ");
+    init_directions(lang);
+    init_keywords(lang);
+
+    tokens = get_translations(lang, UT_RACES);
+    for (rc = races; rc; rc = rc->next) {
+        var.v = (void *)rc;
+        addtoken(tokens, LOC(lang, rc_name(rc, 1)), var);
+        addtoken(tokens, LOC(lang, rc_name(rc, 0)), var);
     }
-    free(sstr);
-  }
 
-  tokens = get_translations(lang, UT_DIRECTIONS);
-  init_directions(tokens, lang);
+    init_translations(lang, UT_PARAMS, parameter_key, MAXPARAMS);
+    init_translations(lang, UT_SKILLS, skill_key, MAXSKILLS);
 
-  tokens = get_translations(lang, UT_RACES);
-  for (rc = races; rc; rc = rc->next) {
-    var.v = (void *)rc;
-    addtoken(tokens, LOC(lang, rc_name(rc, 1)), var);
-    addtoken(tokens, LOC(lang, rc_name(rc, 0)), var);
-  }
+    tokens = get_translations(lang, UT_OPTIONS);
+    for (i = 0; i != MAXOPTIONS; ++i) {
+        var.i = i;
+        if (options[i]) addtoken(tokens, LOC(lang, options[i]), var);
+    }
 
-  init_translations(lang, UT_PARAMS, parameter_key, MAXPARAMS);
-  init_translations(lang, UT_SKILLS, skill_key, MAXSKILLS);
-  init_translations(lang, UT_KEYWORDS, keyword_key, MAXKEYWORDS);
-
-  tokens = get_translations(lang, UT_OPTIONS);
-  for (i = 0; i != MAXOPTIONS; ++i) {
-    var.i = i;
-    if (options[i])
-      addtoken(tokens, LOC(lang, options[i]), var);
-  }
-
-  tokens = get_translations(lang, UT_TERRAINS);
-  for (terrain = terrains(); terrain != NULL; terrain = terrain->next) {
-    var.v = (void *)terrain;
-    addtoken(tokens, LOC(lang, terrain->_name), var);
-  }
+    tokens = get_translations(lang, UT_TERRAINS);
+    for (terrain = terrains(); terrain != NULL; terrain = terrain->next) {
+        var.v = (void *)terrain;
+        addtoken(tokens, LOC(lang, terrain->_name), var);
+    }
 }
 
 typedef struct param {
@@ -2169,7 +2010,6 @@ void kernel_done(void)
    */
   translation_done();
   gc_done();
-  sql_done();
 }
 
 const char *localenames[] = {
@@ -2179,12 +2019,14 @@ const char *localenames[] = {
 
 void init_locales(void)
 {
-  int l;
-  for (l = 0; localenames[l]; ++l) {
-    const struct locale *lang = find_locale(localenames[l]);
-    if (lang)
-      init_locale(lang);
-  }
+    int l;
+    for (l = 0; localenames[l]; ++l) {
+        const struct locale *lang = get_locale(localenames[l]);
+        if (!lang) {
+            lang = get_or_create_locale(localenames[l]);
+        }
+        init_locale(lang);
+    }
 }
 
 /* TODO: soll hier weg */
@@ -2313,10 +2155,6 @@ void remove_empty_factions(void)
           }
         }
       }
-      if (f->subscription) {
-        sql_print(("UPDATE subscriptions set status='DEAD' where id=%u;\n",
-            f->subscription));
-      }
 
       *fp = f->next;
       funhash(f);
@@ -2434,7 +2272,7 @@ void guard(unit * u, unsigned int mask)
 int besieged(const unit * u)
 {
   /* belagert kann man in schiffen und burgen werden */
-  return (u && !global.disabled[K_BESIEGE]
+  return (u && !keyword_disabled(K_BESIEGE)
     && u->building && u->building->besieged
     && u->building->besieged >= u->building->size * SIEGEFACTOR);
 }
@@ -2569,9 +2407,7 @@ static const int wagetable[7][4] = {
 
 int cmp_wage(const struct building *b, const building * a)
 {
-  static const struct building_type *bt_castle;
-  if (!bt_castle)
-    bt_castle = bt_find("castle");
+  const struct building_type *bt_castle = bt_find("castle");
   if (b->type == bt_castle) {
     if (!a)
       return 1;
@@ -2852,7 +2688,7 @@ message *movement_error(unit * u, const char *token, order * ord,
   direction_t d;
   switch (error_code) {
   case E_MOVE_BLOCKED:
-    d = finddirection(token, u->faction->locale);
+    d = get_direction(token, u->faction->locale);
     return msg_message("moveblocked", "unit direction", u, d);
   case E_MOVE_NOREGION:
     return msg_feedback(u, ord, "unknowndirection", "dirname", token);
@@ -2870,7 +2706,7 @@ int movewhere(const unit * u, const char *token, region * r, region ** resultp)
     return E_MOVE_OK;
   }
 
-  d = finddirection(token, u->faction->locale);
+  d = get_direction(token, u->faction->locale);
   switch (d) {
   case D_PAUSE:
     *resultp = r;
@@ -3009,14 +2845,8 @@ void attrib_init(void)
 
 void kernel_init(void)
 {
-  char zBuffer[MAX_PATH];
   attrib_init();
   translation_init();
-
-  if (sqlpatch) {
-    sprintf(zBuffer, "%s/patch-%d.sql", datapath(), turn);
-    sql_init(zBuffer);
-  }
 }
 
 static order * defaults[MAXLOCALES];
@@ -3139,11 +2969,11 @@ void load_inifile(dictionary * d)
   lomem = iniparser_getint(d, "eressea:lomem", lomem) ? 1 : 0;
 
   str = iniparser_getstring(d, "eressea:encoding", NULL);
-  if (str)
-    enc_gamedata = xmlParseCharEncoding(str);
+  if (str && (_strcmpl(str, "utf8")==0 || _strcmpl(str, "utf-8")==0)) {
+    enc_gamedata = ENCODING_UTF8;
+  }
 
   verbosity = iniparser_getint(d, "eressea:verbose", 2);
-  sqlpatch = iniparser_getint(d, "eressea:sqlpatch", false);
   battledebug = iniparser_getint(d, "eressea:debug", battledebug) ? 1 : 0;
 
   str = iniparser_getstring(d, "eressea:locales", "de,en");

@@ -1,20 +1,21 @@
 project(kernel C)
 
 SET(_TEST_FILES
-ship_test.c
-spell_test.c
-ally_test.c
-battle_test.c
-building_test.c
-magic_test.c
-equipment_test.c
-curse_test.c
-item_test.c
-move_test.c
-pool_test.c
-reports_test.c
-spellbook_test.c
-curse_test.c
+ship.test.c
+spell.test.c
+ally.test.c
+battle.test.c
+building.test.c
+magic.test.c
+equipment.test.c
+curse.test.c
+item.test.c
+move.test.c
+pool.test.c
+reports.test.c
+spellbook.test.c
+curse.test.c
+jsonconf.test.c
 )
 
 SET(_FILES
@@ -34,7 +35,7 @@ faction.c
 group.c
 item.c
 magic.c
-message.c
+messages.c
 move.c
 names.c
 order.c
@@ -51,11 +52,11 @@ ship.c
 skill.c
 spellbook.c
 spell.c
-sqlite.c
 teleport.c
 terrain.c
 unit.c
 xmlreader.c
+jsonconf.c
 )
 
 FOREACH(_FILE ${_FILES})

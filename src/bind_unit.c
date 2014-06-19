@@ -31,7 +31,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/group.h>
 #include <kernel/item.h>
 #include <kernel/magic.h>
-#include <kernel/message.h>
+#include <kernel/messages.h>
 #include <kernel/move.h>
 #include <kernel/order.h>
 #include <kernel/pool.h>
@@ -849,7 +849,7 @@ static int tolua_unit_set_race(lua_State * L)
 {
     unit *self = (unit *) tolua_tousertype(L, 1, 0);
     const char *rcname = tolua_tostring(L, 2, 0);
-    race *rc = rc_find(rcname);
+    const race *rc = rc_find(rcname);
     if (rc != NULL) {
         if (self->irace == u_race(self)) {
             self->irace = NULL;

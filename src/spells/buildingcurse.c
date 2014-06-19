@@ -16,7 +16,7 @@
 #include "buildingcurse.h"
 
 /* kernel includes */
-#include <kernel/message.h>
+#include <kernel/messages.h>
 #include <kernel/objtypes.h>
 #include <kernel/building.h>
 #include <kernel/ship.h>

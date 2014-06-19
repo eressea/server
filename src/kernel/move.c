@@ -26,10 +26,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "building.h"
 #include "calendar.h"
 #include "curse.h"
+#include "direction.h"
 #include "faction.h"
 #include "item.h"
 #include "magic.h"
-#include "message.h"
+#include "messages.h"
 #include "order.h"
 #include "plane.h"
 #include "race.h"
@@ -627,40 +628,45 @@ static bool is_freezing(const unit * u)
 
 int check_ship_allowed(struct ship *sh, const region * r)
 {
-  int c = 0;
-  static const building_type *bt_harbour = NULL;
-
-  if (bt_harbour == NULL)
+    int c = 0;
+    const building_type *bt_harbour = NULL;
     bt_harbour = bt_find("harbour");
 
-  if (sh->region && r_insectstalled(r)) {
-    /* insekten dürfen nicht hier rein. haben wir welche? */
-    unit *u;
-
-    for (u = sh->region->units; u != NULL; u = u->next) {
-      if (u->ship != sh)
-        continue;
-
-      if (is_freezing(u)) {
-        unit *captain = ship_owner(sh);
-        if (captain) {
-          ADDMSG(&captain->faction->msgs, msg_message("detectforbidden",
-              "unit region", u, r));
+    if (sh->region && r_insectstalled(r)) {
+        /* insekten dürfen nicht hier rein. haben wir welche? */
+        unit *u;
+        
+        for (u = sh->region->units; u != NULL; u = u->next) {
+            if (u->ship != sh) {
+                continue;
+            }
+            
+            if (is_freezing(u)) {
+                unit *captain = ship_owner(sh);
+                if (captain) {
+                    ADDMSG(&captain->faction->msgs,
+                           msg_message("detectforbidden", "unit region", u, r));
+                }
+                
+                return SA_NO_INSECT;
+            }
         }
-
-        return SA_NO_INSECT;
-      }
     }
-  }
-
-  if (bt_harbour && buildingtype_exists(r, bt_harbour, true))
-    return SA_HARBOUR;
-  for (c = 0; sh->type->coasts[c] != NULL; ++c) {
-    if (sh->type->coasts[c] == r->terrain)
-      return SA_COAST;
-  }
-
-  return SA_NO_COAST;
+    
+    if (bt_harbour && buildingtype_exists(r, bt_harbour, true)) {
+        return SA_HARBOUR;
+    }
+    if (fval(r->terrain, SEA_REGION)) {
+        return SA_COAST;
+    }
+    if (sh->type->coasts) {
+        for (c = 0; sh->type->coasts[c] != NULL; ++c) {
+            if (sh->type->coasts[c] == r->terrain) {
+                return SA_COAST;
+            }
+        }
+    }
+    return SA_NO_COAST;
 }
 
 static bool flying_ship(const ship * sh)
@@ -1008,7 +1014,7 @@ static void cycle_route(order * ord, unit * u, int gereist)
   order *norder;
   size_t size = sizeof(tail) - 1;
 
-  if (get_keyword(ord) != K_ROUTE)
+  if (getkeyword(ord) != K_ROUTE)
     return;
   tail[0] = '\0';
 
@@ -1021,7 +1027,7 @@ static void cycle_route(order * ord, unit * u, int gereist)
     pause = false;
     token = getstrtoken();
     if (token && *token) {
-      d = finddirection(token, lang);
+      d = get_direction(token, lang);
       if (d == D_PAUSE) {
         pause = true;
       } else if (d == NODIRECTION) {
@@ -1087,7 +1093,7 @@ static bool transport(unit * ut, unit * u)
   }
 
   for (ord = ut->orders; ord; ord = ord->next) {
-    if (get_keyword(ord) == K_TRANSPORT) {
+    if (getkeyword(ord) == K_TRANSPORT) {
       init_tokens(ord);
       skip_token();
       if (getunit(ut->region, ut->faction) == u) {
@@ -1118,7 +1124,7 @@ static void init_transportation(void)
      * K_DRIVE. This is time consuming for an error check, but there
      * doesn't seem to be an easy way to speed this up. */
     for (u = r->units; u; u = u->next) {
-      if (get_keyword(u->thisorder) == K_DRIVE && can_move(u)
+      if (getkeyword(u->thisorder) == K_DRIVE && can_move(u)
         && !fval(u, UFL_NOTMOVING) && !LongHunger(u)) {
         unit *ut;
 
@@ -1151,7 +1157,7 @@ static void init_transportation(void)
         int w = 0;
 
         for (ord = u->orders; ord; ord = ord->next) {
-          if (get_keyword(ord) == K_TRANSPORT) {
+          if (getkeyword(ord) == K_TRANSPORT) {
             init_tokens(ord);
             skip_token();
             for (;;) {
@@ -1159,7 +1165,7 @@ static void init_transportation(void)
 
               if (ut == NULL)
                 break;
-              if (get_keyword(ut->thisorder) == K_DRIVE && can_move(ut)
+              if (getkeyword(ut->thisorder) == K_DRIVE && can_move(ut)
                 && !fval(ut, UFL_NOTMOVING) && !LongHunger(ut)) {
                 init_tokens(ut->thisorder);
                 skip_token();
@@ -1728,7 +1734,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
         if (storms_enabled) {
           gamedate date;
           get_gamedate(turn, &date);
-          stormyness = storms[date.month] * 5;
+          stormyness = storms ? storms[date.month] * 5 : 0;
         }
         gamecookie = global.cookie;
       }
@@ -2016,14 +2022,14 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
   for (ord = u->orders; ord; ord = ord->next) {
     unit *ut;
 
-    if (get_keyword(ord) != K_TRANSPORT)
+    if (getkeyword(ord) != K_TRANSPORT)
       continue;
 
     init_tokens(ord);
     skip_token();
     ut = getunit(r, u->faction);
     if (ut != NULL) {
-      if (get_keyword(ut->thisorder) == K_DRIVE) {
+      if (getkeyword(ut->thisorder) == K_DRIVE) {
         if (ut->building && !can_leave(ut)) {
           cmistake(ut, ut->thisorder, 150, MSG_MOVE);
           cmistake(u, ord, 99, MSG_MOVE);
@@ -2394,7 +2400,7 @@ static int hunt(unit * u, order * ord)
   }
 
   bufp = command;
-  bytes = slprintf(bufp, size, "%s %s", LOC(u->faction->locale, keywords[K_MOVE]), LOC(u->faction->locale, directions[dir]));
+  bytes = slprintf(bufp, size, "%s %s", LOC(u->faction->locale, keyword(K_MOVE)), LOC(u->faction->locale, directions[dir]));
   if (wrptr(&bufp, &size, bytes) != 0)
     WARN_STATIC_BUFFER();
 
@@ -2466,7 +2472,7 @@ static void move_hunters(void)
         order *ord;
 
         for (ord = u->orders; ord; ord = ord->next) {
-          if (get_keyword(ord) == K_FOLLOW) {
+          if (getkeyword(ord) == K_FOLLOW) {
             param_t p;
 
             init_tokens(ord);
@@ -2515,7 +2521,7 @@ static void move_pirates(void)
     while (*up) {
       unit *u = *up;
 
-      if (!fval(u, UFL_NOTMOVING) && get_keyword(u->thisorder) == K_PIRACY) {
+      if (!fval(u, UFL_NOTMOVING) && getkeyword(u->thisorder) == K_PIRACY) {
         piracy_cmd(u, u->thisorder);
         fset(u, UFL_LONGACTION | UFL_NOTMOVING);
       }
@@ -2561,7 +2567,7 @@ void movement(void)
           up = &u->next;
           continue;
         }
-        kword = get_keyword(u->thisorder);
+        kword = getkeyword(u->thisorder);
 
         if (kword == K_ROUTE || kword == K_MOVE) {
           /* after moving, the unit has no thisorder. this prevents
@@ -2644,7 +2650,7 @@ void follow_unit(unit * u)
   for (ord = u->orders; ord; ord = ord->next) {
     const struct locale *lang = u->faction->locale;
 
-    if (get_keyword(ord) == K_FOLLOW) {
+    if (getkeyword(ord) == K_FOLLOW) {
       init_tokens(ord);
       skip_token();
       if (getparam(lang) == P_UNIT) {
@@ -2677,7 +2683,7 @@ void follow_unit(unit * u)
       return;
     }
 
-    switch (get_keyword(u2->thisorder)) {
+    switch (getkeyword(u2->thisorder)) {
     case K_MOVE:
     case K_ROUTE:
     case K_DRIVE:
@@ -2685,7 +2691,7 @@ void follow_unit(unit * u)
       break;
     default:
       for (ord = u2->orders; ord; ord = ord->next) {
-        switch (get_keyword(ord)) {
+        switch (getkeyword(ord)) {
         case K_FOLLOW:
         case K_PIRACY:
           follow = true;

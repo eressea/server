@@ -26,7 +26,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/item.h>
 #include <kernel/faction.h>
 #include <kernel/magic.h>
-#include <kernel/message.h>
+#include <kernel/messages.h>
 #include <kernel/move.h>
 #include <kernel/order.h>
 #include <kernel/race.h>
@@ -298,7 +298,7 @@ int setstealth_cmd(unit * u, struct order *ord)
         }
       }
       if (rule&2) {
-        if (findkeyword(s, u->faction->locale) == K_NUMBER) {
+        if (get_keyword(s, u->faction->locale) == K_NUMBER) {
           const char *s2 = (const char *)getstrtoken();
           int nr = -1;
 

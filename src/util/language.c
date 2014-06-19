@@ -40,7 +40,7 @@ unsigned int locale_index(const locale * lang)
   return lang->index;
 }
 
-locale *find_locale(const char *name)
+locale *get_locale(const char *name)
 {
   unsigned int hkey = hashstring(name);
   locale *l = locales;
@@ -51,31 +51,27 @@ locale *find_locale(const char *name)
 
 static unsigned int nextlocaleindex = 0;
 
-locale *make_locale(const char *name)
+locale *get_or_create_locale(const char *name)
 {
-  unsigned int hkey = hashstring(name);
-  locale *l = (locale *) calloc(sizeof(locale), 1);
-  locale **lp = &locales;
+    locale *l;
+    unsigned int hkey = hashstring(name);
+    locale **lp = &locales;
 
-  if (!locales) {
-    nextlocaleindex = 0;
-  }
-
-  while (*lp && (*lp)->hashkey != hkey)
-    lp = &(*lp)->next;
-  if (*lp) {
-    return *lp;
-  }
-
-  l->hashkey = hkey;
-  l->name = _strdup(name);
-  l->next = NULL;
-  l->index = nextlocaleindex++;
-  assert(nextlocaleindex <= MAXLOCALES);
-  *lp = l;
-  if (default_locale == NULL)
-    default_locale = l;
-  return l;
+    if (!locales) {
+        nextlocaleindex = 0;
+    } else {
+        while (*lp && (*lp)->hashkey != hkey) lp = &(*lp)->next;
+        if (*lp) {
+            return *lp;
+        }
+    }
+    *lp = l = (locale *)calloc(sizeof(locale), 1);
+    l->hashkey = hkey;
+    l->name = _strdup(name);
+    l->index = nextlocaleindex++;
+    assert(nextlocaleindex <= MAXLOCALES);
+    if (default_locale == NULL) default_locale = l;
+    return l;
 }
 
 /** creates a list of locales
@@ -92,7 +88,7 @@ void make_locales(const char *str)
       ++tok;
     strncpy(zText, str, tok - str);
     zText[tok - str] = 0;
-    make_locale(zText);
+    get_or_create_locale(zText);
     if (*tok) {
       str = ++tok;
     }
@@ -128,18 +124,18 @@ const char *locale_getstring(const locale * lang, const char *key)
 const char *locale_string(const locale * lang, const char *key)
 {
   assert(lang);
+  assert(key);
 
   if (key != NULL) {
     unsigned int hkey = hashstring(key);
     unsigned int id = hkey & (SMAXHASH - 1);
     struct locale_str *find;
 
-    if (*key == 0)
-      return NULL;
+    if (*key == 0) return 0;
     find = lang->strings[id];
     while (find) {
       if (find->hashkey == hkey) {
-        if (find->nexthash == NULL) {
+        if (!find->nexthash) {
           /* if this is the only entry with this hash, fine. */
           assert(strcmp(key, find->key) == 0);
           break;
@@ -158,7 +154,7 @@ const char *locale_string(const locale * lang, const char *key)
     }
     return find->str;
   }
-  return NULL;
+  return 0;
 }
 
 void locale_setstring(locale * lang, const char *key, const char *value)

@@ -16,7 +16,7 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#include <kernel/message.h>
+#include <kernel/messages.h>
 #include <util/nrmessage.h>
 #include <util/message.h>
 

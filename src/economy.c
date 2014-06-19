@@ -21,8 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/types.h>
 #include "economy.h"
 
-/* gamecode includes */
-#include "archetype.h"
+#include "direction.h"
 #include "give.h"
 #include "laws.h"
 #include "randenc.h"
@@ -37,7 +36,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/magic.h>
-#include <kernel/message.h>
+#include <kernel/messages.h>
 #include <kernel/move.h>
 #include <kernel/order.h>
 #include <kernel/plane.h>
@@ -61,7 +60,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/lists.h>
 #include <util/language.h>
 #include <util/lists.h>
-#include <util/message.h>
 #include <util/parser.h>
 #include <util/rng.h>
 
@@ -102,7 +100,6 @@ static request *oa;
 
 #define RECRUIT_MERGE 1
 #define RECRUIT_CLASSIC 2
-#define RECRUIT_ARCHETYPES 4
 static int rules_recruit = -1;
 
 static void recruit_init(void)
@@ -114,9 +111,6 @@ static void recruit_init(void)
     }
     if (get_param_int(global.parameters, "recruit.classic", 1)) {
       rules_recruit |= RECRUIT_CLASSIC;
-    }
-    if (get_param_int(global.parameters, "recruit.archetype", 0)) {
-      rules_recruit |= RECRUIT_ARCHETYPES;
     }
   }
 }
@@ -511,7 +505,7 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
   if (u->number == 0) {
     str = getstrtoken();
     if (str && str[0]) {
-      /* Monster dürfen REKRUTIERE 15 dracoid machen
+      /* Monsters can RECRUIT 15 DRACOID
        * also: secondary race */
       rc = findrace(str, f->locale);
       if (rc != NULL) {
@@ -1146,152 +1140,6 @@ void maintain_buildings(region * r, bool crash)
   }
 }
 
-static int recruit_archetype(unit * u, order * ord)
-{
-  bool merge = (u->number > 0);
-  int want;
-  const char *s;
-
-  if (rules_recruit < 0)
-    recruit_init();
-
-  init_tokens(ord);
-  skip_token();
-  want = getuint();
-  s = getstrtoken();
-  if (want > 0 && s && s[0]) {
-    int n = want;
-    const archetype *arch = find_archetype(s, u->faction->locale);
-    attrib *a = NULL;
-
-    if ((rules_recruit & RECRUIT_MERGE) == 0 && merge) {
-      ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "unit_must_be_new", ""));
-      /* TODO: error message */
-      return 0;
-    }
-
-    if (arch == NULL) {
-      ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "unknown_archetype",
-          "name", s));
-      /* TODO: error message */
-      return 0;
-    }
-    if (arch->rules) {
-      /* Simple allow/deny style restrictions for archetypes (let only humans 
-       * recruit gamedesigners, etc). These need to be more powerful to be 
-       * useful, and the current way they are implemented is not, but the 
-       * general idea strikes me as good. Also, feedback should be configurable
-       * for each failed rule.
-       */
-      int k;
-      for (k = 0; arch->rules[k].property; ++k) {
-        bool match = false;
-        if (arch->rules[k].value[0] == '*')
-          match = true;
-        else if (strcmp(arch->rules[k].property, "race") == 0) {
-          const race *rc = rc_find(arch->rules[k].value);
-          assert(rc);
-          if (rc == u_race(u))
-            match = true;
-        } else if (strcmp(arch->rules[k].property, "building") == 0) {
-          const building_type *btype = bt_find(arch->rules[k].value);
-          assert(btype);
-          if (u->building && u->building->type == btype)
-            match = true;
-        }
-        if (match) {
-          if (arch->rules[k].allow)
-            break;
-          else {
-            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "recruit_rule_fail",
-                "property value", arch->rules[k].property,
-                arch->rules[k].value));
-            /* TODO: error message */
-            return 0;
-          }
-        }
-      }
-    }
-    if (arch->btype) {
-      if (u->building == NULL || u->building->type != arch->btype) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
-            "unit_must_be_in_building", "type", arch->btype));
-        /* TODO: error message */
-        return 0;
-      }
-      if (arch->size) {
-        int maxsize = u->building->size;
-        attrib *a = a_find(u->building->attribs, &at_recruit);
-        if (a != NULL) {
-          maxsize -= a->data.i;
-        }
-        n = _min(maxsize / arch->size, n);
-        if (n <= 0) {
-          ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
-              "recruit_capacity_exhausted", "building", u->building));
-          /* TODO: error message */
-          return 0;
-        }
-      }
-    }
-
-    n = build(u, arch->ctype, 0, n);
-    if (n > 0) {
-      unit *u2;
-      if (merge) {
-        u2 = create_unit(u->region, u->faction, 0, u_race(u), 0, 0, u);
-      } else {
-        u2 = u;
-      }
-      if (arch->exec) {
-        n = arch->exec(u2, arch, n);
-      } else {
-        set_number(u2, n);
-        equip_unit(u2, arch->equip);
-        u2->hp = n * unit_max_hp(u2);
-        if (arch->size) {
-          if (a == NULL)
-            a = a_add(&u->building->attribs, a_new(&at_recruit));
-          a->data.i += n * arch->size;
-        }
-      }
-      ADDMSG(&u->faction->msgs, msg_message("recruit_archetype",
-          "unit amount archetype", u, n, arch->name[n == 1]));
-      if (u != u2 && u_race(u) == u_race(u2)) {
-        transfermen(u2, u, u2->number);
-      }
-      return n;
-    } else
-      switch (n) {
-      case ENOMATERIALS:
-        ADDMSG(&u->faction->msgs, msg_materials_required(u, ord, arch->ctype,
-            want));
-        break;
-      case ELOWSKILL:
-      case ENEEDSKILL:
-        /* no skill, or not enough skill points to build */
-        cmistake(u, ord, 50, MSG_PRODUCE);
-        break;
-      case EBUILDINGREQ:
-        ADDMSG(&u->faction->msgs,
-          msg_feedback(u, u->thisorder, "building_needed", "building",
-            arch->ctype->btype->_name));
-        break;
-      default:
-        assert(!"unhandled return value from build() in recruit_archetype");
-      }
-    return 0;
-  }
-  return -1;
-}
-
-int recruit_archetypes(void)
-{
-  if (rules_recruit < 0)
-    recruit_init();
-  return (rules_recruit & RECRUIT_ARCHETYPES) != 0;
-}
-
 void economics(region * r)
 {
   unit *u;
@@ -1306,7 +1154,7 @@ void economics(region * r)
     bool destroyed = false;
     if (u->number > 0) {
       for (ord = u->orders; ord; ord = ord->next) {
-        keyword_t kwd = get_keyword(ord);
+        keyword_t kwd = getkeyword(ord);
         if (kwd == K_DESTROY) {
           if (!destroyed) {
             if (destroy_cmd(u, ord) != 0)
@@ -1333,12 +1181,7 @@ void economics(region * r)
 
     if ((rules_recruit & RECRUIT_MERGE) || u->number == 0) {
       for (ord = u->orders; ord; ord = ord->next) {
-        if (get_keyword(ord) == K_RECRUIT) {
-          if (rules_recruit & RECRUIT_ARCHETYPES) {
-            if (recruit_archetype(u, ord) >= 0) {
-              continue;
-            }
-          }
+        if (getkeyword(ord) == K_RECRUIT) {
           if (rules_recruit & RECRUIT_CLASSIC) {
             recruit(u, ord, &recruitorders);
           }
@@ -1875,7 +1718,7 @@ int make_cmd(unit * u, struct order *ord)
     if (pl && fval(pl, PFL_NOBUILD)) {
       cmistake(u, ord, 275, MSG_PRODUCE);
     } else {
-      direction_t d = finddirection(getstrtoken(), u->faction->locale);
+      direction_t d = get_direction(getstrtoken(), u->faction->locale);
       if (d != NODIRECTION) {
         build_road(r, u, m, d);
       } else {
@@ -1910,7 +1753,7 @@ int make_cmd(unit * u, struct order *ord)
       /* if the item cannot be made, we probably didn't mean to make it */
       itype = NULL;
     } else if (stype != NULL) {
-      const char *sname = LOC(lang, stype->name[0]);
+      const char *sname = LOC(lang, stype->_name);
       const char *iname = LOC(lang, resourcename(itype->rtype, 0));
       if (strlen(iname) < strlen(sname))
         stype = NULL;
@@ -1928,7 +1771,7 @@ int make_cmd(unit * u, struct order *ord)
 
   if (btype != NULL && stype != NULL) {
     const char *bname = LOC(lang, btype->_name);
-    const char *sname = LOC(lang, stype->name[0]);
+    const char *sname = LOC(lang, stype->_name);
     if (strlen(sname) < strlen(bname))
       btype = NULL;
     else
@@ -2128,19 +1971,21 @@ static void buy(unit * u, request ** buyorders, struct order *ord)
       return;
     }
   } else {
-    /* ...oder in der Region muß es eine Burg geben. */
-    building *b;
-    static const struct building_type *bt_castle;
-    if (!bt_castle)
-      bt_castle = bt_find("castle");
-    for (b = r->buildings; b; b = b->next) {
-      if (b->type == bt_castle && b->size >= 2)
-        break;
-    }
-    if (b == NULL) {
-      cmistake(u, ord, 119, MSG_COMMERCE);
-      return;
-    }
+      /* ...oder in der Region muß es eine Burg geben. */
+      building *b = 0;
+      if (r->buildings) {
+          const struct building_type *bt_castle = bt_find("castle");
+
+          for (b = r->buildings; b; b = b->next) {
+              if (b->type == bt_castle && b->size >= 2) {
+                  break;
+              }
+          }
+      }
+      if (b == NULL) {
+          cmistake(u, ord, 119, MSG_COMMERCE);
+          return;
+      }
   }
 
   /* Ein Händler kann nur 10 Güter pro Talentpunkt handeln. */
@@ -2432,19 +2277,18 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
       return false;
     }
   } else {
-    /* ...oder in der Region muß es eine Burg geben. */
-    building *b;
-    static const struct building_type *bt_castle;
-    if (!bt_castle)
-      bt_castle = bt_find("castle");
-    for (b = r->buildings; b; b = b->next) {
-      if (b->type == bt_castle && b->size >= 2)
-        break;
-    }
-    if (b == NULL) {
-      cmistake(u, ord, 119, MSG_COMMERCE);
-      return false;
-    }
+      /* ...oder in der Region muß es eine Burg geben. */
+      building *b = 0;
+      if (r->buildings) {
+          const struct building_type *bt_castle = bt_find("castle");
+          for (b = r->buildings; b; b = b->next) {
+              if (b->type == bt_castle && b->size >= 2) break;
+          }
+      }
+      if (!b) {
+          cmistake(u, ord, 119, MSG_COMMERCE);
+          return false;
+      }
   }
 
   /* Ein Händler kann nur 10 Güter pro Talentpunkt verkaufen. */
@@ -3402,7 +3246,7 @@ void produce(struct region *r)
     }
 
     for (ord = u->orders; ord; ord = ord->next) {
-      keyword_t kwd = get_keyword(ord);
+      keyword_t kwd = getkeyword(ord);
       if (kwd == K_BUY) {
         buy(u, &buyorders, ord);
         trader = true;
@@ -3422,7 +3266,7 @@ void produce(struct region *r)
       continue;
     }
 
-    todo = get_keyword(u->thisorder);
+    todo = getkeyword(u->thisorder);
     if (todo == NOKEYWORD)
       continue;
 

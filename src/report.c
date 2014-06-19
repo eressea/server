@@ -47,7 +47,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/faction.h>
 #include <kernel/group.h>
 #include <kernel/item.h>
-#include <kernel/message.h>
+#include <kernel/messages.h>
 #include <kernel/move.h>
 #include <kernel/objtypes.h>
 #include <kernel/order.h>
@@ -81,8 +81,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/nrmessage.h>
 #include <quicklist.h>
 #include <util/rng.h>
-
-#include <libxml/encoding.h>
 
 /* libc includes */
 #include <assert.h>
@@ -338,9 +336,9 @@ static void nr_spell(FILE * F, spellbook_entry * sbe, const struct locale *lang)
   size = sizeof(buf) - 1;
 
   if (sp->sptyp & ISCOMBATSPELL) {
-    bytes = (int)strlcpy(bufp, LOC(lang, keywords[K_COMBATSPELL]), size);
+    bytes = (int)strlcpy(bufp, LOC(lang, keyword(K_COMBATSPELL)), size);
   } else {
-    bytes = (int)strlcpy(bufp, LOC(lang, keywords[K_CAST]), size);
+    bytes = (int)strlcpy(bufp, LOC(lang, keyword(K_CAST)), size);
   }
   if (wrptr(&bufp, &size, bytes) != 0)
     WARN_STATIC_BUFFER();
@@ -1472,15 +1470,14 @@ report_template(const char *filename, report_context * ctx, const char *charset)
   char buf[8192], *bufp;
   size_t size;
   int bytes;
-
-  int enc = xmlParseCharEncoding(charset);
+  bool utf8 = _strcmpl(charset, "utf8")==0 || _strcmpl(charset, "utf-8")==0;
 
   if (F == NULL) {
     perror(filename);
     return -1;
   }
 
-  if (enc == XML_CHAR_ENCODING_UTF8) {
+  if (utf8) {
     const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
     fwrite(utf8_bom, 1, 3, F);
   }
@@ -1882,11 +1879,11 @@ nr_ship(FILE * F, const seen_region * sr, const ship * sh, const faction * f,
     n = (n + 99) / 100;         /* 1 Silber = 1 GE */
 
     bytes = _snprintf(bufp, size, "%s, %s, (%d/%d)", shipname(sh),
-      LOC(f->locale, sh->type->name[0]), n, shipcapacity(sh) / 100);
+      LOC(f->locale, sh->type->_name), n, shipcapacity(sh) / 100);
   } else {
     bytes =
       _snprintf(bufp, size, "%s, %s", shipname(sh), LOC(f->locale,
-        sh->type->name[0]));
+        sh->type->_name));
   }
   if (wrptr(&bufp, &size, bytes) != 0)
     WARN_STATIC_BUFFER();
@@ -2106,7 +2103,7 @@ report_plaintext(const char *filename, report_context * ctx,
   seen_region *sr = NULL;
   char buf[8192];
   char *bufp;
-  int enc = xmlParseCharEncoding(charset);
+  bool utf8 = _strcmpl(charset, "utf8")==0 || _strcmpl(charset, "utf-8")==0;
   size_t size;
 
   /* static variables can cope with writing for different turns */
@@ -2126,7 +2123,7 @@ report_plaintext(const char *filename, report_context * ctx,
     perror(filename);
     return -1;
   }
-  if (enc == XML_CHAR_ENCODING_UTF8) {
+  if (utf8) {
     const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
     fwrite(utf8_bom, 1, 3, F);
   }

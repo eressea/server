@@ -1,17 +1,16 @@
 project(util C)
 
 SET(_TEST_FILES
-base36_test.c
-bsdstring_test.c
-functions_test.c
-umlaut_test.c
+base36.test.c
+bsdstring.test.c
+functions.test.c
+umlaut.test.c
 )
 
 SET(_FILES
 attrib.c
 base36.c
 bsdstring.c
-console.c
 crmessage.c
 dice.c
 event.c
@@ -19,7 +18,6 @@ filereader.c
 functions.c
 goodies.c
 language.c
-listbox.c
 lists.c
 log.c
 message.c
@@ -27,7 +25,6 @@ nrmessage.c
 parser.c
 rand.c
 resolve.c
-sql.c
 strings.c
 translation.c
 umlaut.c

@@ -770,10 +770,10 @@ function test_hero_hero_transfer()
   u1:add_order("GIB " .. itoa36(u2.id) .. " 1 PERSONEN")
   u1:add_order("REKRUTIEREN 1")
   process_orders()
-  assert_equal(1, u1.number)
   assert_equal(2, u2.number)
-  assert_false(is_flag_set(u1.flags, 128), 128, "recruiting into an empty hero unit should not create a hero")
   assert_true(is_flag_set(u2.flags, 128), 128, "unit is not a hero?")
+  assert_equal(1, u1.number)
+  assert_false(is_flag_set(u1.flags, 128), 128, "recruiting into an empty hero unit should not create a hero")
 end
 
 function test_hero_normal_transfer()

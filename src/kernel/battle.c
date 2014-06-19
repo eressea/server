@@ -30,7 +30,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "group.h"
 #include "item.h"
 #include "magic.h"
-#include "message.h"
+#include "messages.h"
 #include "move.h"
 #include "names.h"
 #include "order.h"
@@ -74,7 +74,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 static FILE *bdebug;
 
 #define TACTICS_BONUS 1         /* when undefined, we have a tactics round. else this is the bonus tactics give */
-#define TACTICS_MODIFIER 1      /* modifier for generals in the fromt/rear */
+#define TACTICS_MODIFIER 1      /* modifier for generals in the front/rear */
 
 #define CATAPULT_INITIAL_RELOAD 4       /* erster schuss in runde 1 + rng_int() % INITIAL */
 #define CATAPULT_STRUCTURAL_DAMAGE
@@ -3921,7 +3921,7 @@ static bool start_battle(region * r, battle ** bp)
           slave_ct = ct_find("slavery");
           calm_ct = ct_find("calmmonster");
         }
-        if (get_keyword(ord) == K_ATTACK) {
+        if (getkeyword(ord) == K_ATTACK) {
           unit *u2;
           fighter *c1, *c2;
           ship *lsh = NULL;

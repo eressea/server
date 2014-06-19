@@ -7,7 +7,7 @@
 #include <kernel/curse.h>
 #include <kernel/config.h>
 #include <kernel/faction.h>
-#include <kernel/message.h>
+#include <kernel/messages.h>
 #include <kernel/region.h>
 #include <kernel/save.h>
 #include <kernel/terrain.h>

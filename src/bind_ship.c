@@ -21,6 +21,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/build.h>
 
 #include <util/language.h>
+#include <util/log.h>
 
 #include <tolua.h>
 #include <string.h>
@@ -126,9 +127,11 @@ static int tolua_ship_create(lua_State * L)
     const ship_type *stype = st_find(sname);
     if (stype) {
       ship *sh = new_ship(stype, r, default_locale);
-      sh->size = stype->construction->maxsize;
+      sh->size = stype->construction ? stype->construction->maxsize : 1;
       tolua_pushusertype(L, (void *)sh, TOLUA_CAST "ship");
       return 1;
+    } else {
+        log_error("Unknown ship type '%s'\n", sname);
     }
   }
   return 0;
@@ -180,7 +183,7 @@ static int tolua_ship_get_coast(lua_State * L)
 static int tolua_ship_get_type(lua_State * L)
 {
     ship *self = (ship *) tolua_tousertype(L, 1, 0);
-    tolua_pushstring(L, self->type->name[0]);
+    tolua_pushstring(L, self->type->_name);
     return 1;
 }
 

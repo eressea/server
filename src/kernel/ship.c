@@ -72,7 +72,7 @@ const ship_type *findshiptype(const char *name, const struct locale *lang)
     for (qi = 0, ql = shiptypes; ql; ql_advance(&ql, &qi, 1)) {
       ship_type *stype = (ship_type *) ql_get(ql, qi);
       variant var2;
-      const char *n = locale_string(lang, stype->name[0]);
+      const char *n = locale_string(lang, stype->_name);
       var2.v = (void *)stype;
       addtoken(&sn->names, n, var2);
     }
@@ -83,23 +83,32 @@ const ship_type *findshiptype(const char *name, const struct locale *lang)
   return (const ship_type *)var.v;
 }
 
-const ship_type *st_find(const char *name)
+static ship_type *st_find_i(const char *name)
 {
   quicklist *ql;
   int qi;
 
   for (qi = 0, ql = shiptypes; ql; ql_advance(&ql, &qi, 1)) {
     ship_type *stype = (ship_type *) ql_get(ql, qi);
-    if (strcmp(stype->name[0], name) == 0) {
+    if (strcmp(stype->_name, name) == 0) {
       return stype;
     }
   }
   return NULL;
 }
 
-void st_register(const ship_type * type)
-{
-  ql_push(&shiptypes, (void *)type);
+const ship_type *st_find(const char *name) {
+    return st_find_i(name);
+}
+
+ship_type *st_get_or_create(const char * name) {
+    ship_type * st = st_find_i(name);
+    if (!st) {
+        st = (ship_type *)calloc(sizeof(ship_type), 1);
+        st->_name = _strdup(name);
+        ql_push(&shiptypes, (void *)st);
+    }
+    return st;
 }
 
 #define MAXSHIPHASH 7919
@@ -177,7 +186,7 @@ ship *new_ship(const ship_type * stype, region * r, const struct locale *lang)
   sh->type = stype;
   sh->region = r;
 
-  sname = LOC(lang, stype->name[0]);
+  sname = LOC(lang, stype->_name);
   if (!sname) {
     sname = LOC(lang, parameters[P_SHIP]);
     if (!sname) {
@@ -223,6 +232,12 @@ void free_ship(ship * s)
   free(s->name);
   free(s->display);
   free(s);
+}
+
+void free_shiptypes(void) {
+    ql_foreach(shiptypes, free);
+    ql_free(shiptypes);
+    shiptypes = 0;
 }
 
 void free_ships(void)

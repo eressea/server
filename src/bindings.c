@@ -23,6 +23,7 @@ without prior permission by the authors of Eressea.
 #include "bind_gmtool.h"
 #include "bind_region.h"
 #include "helpers.h"
+#include "console.h"
 
 #include <kernel/config.h>
 
@@ -34,7 +35,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/calendar.h>
 #include <kernel/unit.h>
 #include <kernel/terrain.h>
-#include <kernel/message.h>
+#include <kernel/messages.h>
 #include <kernel/region.h>
 #include <kernel/reports.h>
 #include <kernel/building.h>
@@ -61,7 +62,6 @@ without prior permission by the authors of Eressea.
 
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/console.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
@@ -85,6 +85,10 @@ without prior permission by the authors of Eressea.
 TOLUA_PKG(eressea);
 TOLUA_PKG(process);
 TOLUA_PKG(settings);
+TOLUA_PKG(config);
+TOLUA_PKG(locale);
+TOLUA_PKG(log);
+TOLUA_PKG(game);
 
 int log_lua_error(lua_State * L)
 {
@@ -187,7 +191,7 @@ static int tolua_translate(lua_State * L)
 {
   const char *str = tolua_tostring(L, 1, 0);
   const char *lang = tolua_tostring(L, 2, 0);
-  struct locale *loc = lang ? find_locale(lang) : default_locale;
+  struct locale *loc = lang ? get_locale(lang) : default_locale;
   if (loc) {
     str = locale_string(loc, str);
     tolua_pushstring(L, str);
@@ -757,7 +761,7 @@ static int config_get_ships(lua_State * L)
   lua_createtable(L, ql_length(shiptypes), 0);
   for (qi = 0, ql = shiptypes; ql; ql_advance(&ql, &qi, 1)) {
     ship_type *stype = (ship_type *) ql_get(ql, qi);
-    tolua_pushstring(L, TOLUA_CAST stype->name[0]);
+    tolua_pushstring(L, TOLUA_CAST stype->_name);
     lua_rawseti(L, -2, ++i);
   }
   return 1;
@@ -778,16 +782,15 @@ static int config_get_buildings(lua_State * L)
 
 static int config_get_locales(lua_State * L)
 {
-  const struct locale *lang;
-  int i = 0, n = 0;
-  for (lang = locales; lang; lang = nextlocale(lang))
-    ++n;
-  lua_createtable(L, n, 0);
-  for (lang = locales; lang; lang = nextlocale(lang)) {
-    tolua_pushstring(L, TOLUA_CAST locale_name(lang));
-    lua_rawseti(L, -2, ++i);
-  }
-  return 1;
+    const struct locale *lang;
+    int i = 0, n = 0;
+    for (lang = locales; lang; lang = nextlocale(lang)) ++n;
+    lua_createtable(L, n, 0);
+    for (lang = locales; lang; lang = nextlocale(lang)) {
+        tolua_pushstring(L, TOLUA_CAST locale_name(lang));
+        lua_rawseti(L, -2, ++i);
+    }
+    return 1;
 }
 
 static int config_get_resource(lua_State * L)
@@ -1058,6 +1061,10 @@ int tolua_bindings_open(lua_State * L)
   tolua_eressea_open(L);
   tolua_process_open(L);
   tolua_settings_open(L);
+  tolua_game_open(L);
+  tolua_config_open(L);
+  tolua_locale_open(L);
+  tolua_log_open(L);
 
   /* register user types */
   tolua_usertype(L, TOLUA_CAST "spell");
@@ -1179,25 +1186,24 @@ lua_State *lua_init(void) {
   lua_State *L = luaL_newstate();
 
   openlibs(L);
-#ifdef BINDINGS_TOLUA
   register_tolua_helpers();
   tolua_bindings_open(L);
   tolua_eressea_open(L);
+#ifdef USE_SQLITE
   tolua_sqlite_open(L);
+#endif
   tolua_unit_open(L);
   tolua_building_open(L);
   tolua_ship_open(L);
   tolua_region_open(L);
   tolua_faction_open(L);
-#ifdef BSON_ATTRIB
-  tolua_attrib_open(L);
-#endif
   tolua_unit_open(L);
   tolua_message_open(L);
   tolua_hashtable_open(L);
+#ifdef USE_CURSES
   tolua_gmtool_open(L);
-  tolua_storage_open(L);
 #endif
+  tolua_storage_open(L);
   return L;
 }
 

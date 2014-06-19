@@ -9,16 +9,14 @@
  This program may not be used, modified or distributed 
  without prior permission by the authors of Eressea.
 */
-#ifndef UTIL_MESSAGE_H
-#define UTIL_MESSAGE_H
+#ifndef H_MESSAGE_H
+#define H_MESSAGE_H
 
 #include "variant.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-  struct locale;
 
   typedef struct arg_type {
     struct arg_type *next;
@@ -71,3 +69,4 @@ extern "C" {
 }
 #endif
 #endif
+

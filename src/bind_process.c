@@ -15,6 +15,7 @@
 #include "laws.h"
 #include "market.h"
 #include "study.h"
+#include "keyword.h"
 
 #define PROC_LAND_REGION 0x0001
 #define PROC_LONG_ORDER 0x0002
@@ -36,13 +37,13 @@ static void process_cmd(keyword_t kwd, int (*callback)(unit *, order *), int fla
 
     for (u=r->units; u; u=u->next) {
       if (flags & PROC_LONG_ORDER) {
-        if (kwd == get_keyword(u->thisorder)) {
+        if (kwd == getkeyword(u->thisorder)) {
           callback(u, u->thisorder);
         }
       } else {
         order * ord;
         for (ord=u->orders; ord; ord=ord->next) {
-          if (kwd == get_keyword(ord)) {
+          if (kwd == getkeyword(ord)) {
             callback(u, ord);
           }
         }
@@ -58,7 +59,7 @@ void process_produce(void) {
     for (u=r->units; u; u=u->next) {
       order * ord;
       for (ord=u->orders; ord; ord=ord->next) {
-        if (K_MAKE == get_keyword(ord)) {
+        if (K_MAKE == getkeyword(ord)) {
           make_cmd(u, ord);
         }
       }
@@ -104,7 +105,7 @@ void process_settings(void) {
     for (u=r->units; u; u=u->next) {
       order * ord;
       for (ord=u->orders; ord; ord=ord->next) {
-        keyword_t kwd = get_keyword(ord);
+        keyword_t kwd = getkeyword(ord);
         if (kwd==K_BANNER) {
           banner_cmd(u, ord);
         }
@@ -144,151 +145,152 @@ void process_name(void) {
 }
 
 void process_group(void) {
-  process_cmd(K_GROUP, group_cmd, 0);
+    process_cmd(K_GROUP, group_cmd, 0);
 }
 
 void process_origin(void) {
-  process_cmd(K_URSPRUNG, origin_cmd, 0);
+    process_cmd(K_URSPRUNG, origin_cmd, 0);
 }
 
 void process_quit(void) {
-  process_cmd(K_QUIT, quit_cmd, 0);
-  quit();
+    process_cmd(K_QUIT, quit_cmd, 0);
+    quit();
 }
 
 void process_study(void) {
-  process_cmd(K_TEACH, teach_cmd, PROC_LONG_ORDER);
-  process_cmd(K_STUDY, learn_cmd, PROC_LONG_ORDER);
+    process_cmd(K_TEACH, teach_cmd, PROC_LONG_ORDER);
+    process_cmd(K_STUDY, learn_cmd, PROC_LONG_ORDER);
 }
 
 void process_movement(void) {
-  region * r;
+    region *r;
 
-  movement();
-  for (r=regions; r; r=r->next) {
-    if (r->ships) {
-      sinkships(r);
+    movement();
+    for (r = regions; r; r = r->next) {
+        if (r->ships) {
+            sinkships(r);
+        }
     }
-  }
 }
 
 void process_use(void) {
-  process_cmd(K_USE, use_cmd, 0);
+    process_cmd(K_USE, use_cmd, 0);
 }
 
 void process_leave(void) {
-  process_cmd(K_LEAVE, leave_cmd, 0);
+    process_cmd(K_LEAVE, leave_cmd, 0);
 }
 
 void process_promote(void) {
-  process_cmd(K_PROMOTION, promotion_cmd, 0);
+    process_cmd(K_PROMOTION, promotion_cmd, 0);
 }
 
 void process_renumber(void) {
-  process_cmd(K_NUMBER, renumber_cmd, 0);
-  renumber_factions();
+    process_cmd(K_NUMBER, renumber_cmd, 0);
+    renumber_factions();
 }
 
 void process_restack(void) {
-  restack_units();
+    restack_units();
 }
 
 void process_setspells(void) {
-  process_cmd(K_COMBATSPELL, combatspell_cmd, 0);
+    process_cmd(K_COMBATSPELL, combatspell_cmd, 0);
 }
 
 void process_sethelp(void) {
-  process_cmd(K_ALLY, ally_cmd, 0);
+    process_cmd(K_ALLY, ally_cmd, 0);
 }
 
 void process_contact(void) {
-  process_cmd(K_CONTACT, contact_cmd, 0);
+    process_cmd(K_CONTACT, contact_cmd, 0);
 }
 
 void process_magic(void) {
-  magic();
+    magic();
 }
 
 void process_give_control(void) {
-  process_cmd(K_CONTACT, give_control_cmd, 0);
+    process_cmd(K_CONTACT, give_control_cmd, 0);
 }
 
 void process_guard_on(void) {
-  process_cmd(K_GUARD, guard_on_cmd, PROC_LAND_REGION);
+    process_cmd(K_GUARD, guard_on_cmd, PROC_LAND_REGION);
 }
 
 void process_explain(void) {
-  process_cmd(K_RESHOW, reshow_cmd, 0);
+    process_cmd(K_RESHOW, reshow_cmd, 0);
 }
 
 void process_reserve(void) {
-  process_cmd(K_RESERVE, reserve_cmd, 0);
+    process_cmd(K_RESERVE, reserve_cmd, 0);
 }
 
 void process_claim(void) {
-  process_cmd(K_CLAIM, claim_cmd, 0);
+    process_cmd(K_CLAIM, claim_cmd, 0);
 }
 
 void process_follow(void) {
-  struct region *r;
-  for (r = regions; r; r = r->next) {
-    unit * u;
-    for (u=r->units; u; u=u->next) {
-      follow_unit(u);
+    struct region *r;
+    for (r = regions; r; r = r->next) {
+        unit *u;
+        for (u = r->units; u; u = u->next) {
+            follow_unit(u);
+        }
     }
-  }
 }
 
 void process_messages(void) {
-  process_cmd(K_MAIL, mail_cmd, 0);
+    process_cmd(K_MAIL, mail_cmd, 0);
 }
 
 void process_guard_off(void) {
-  process_cmd(K_GUARD, guard_off_cmd, PROC_LAND_REGION);
+    process_cmd(K_GUARD, guard_off_cmd, PROC_LAND_REGION);
 }
 
 void process_regeneration(void) {
-  monthly_healing();
-  regenerate_aura();
+    monthly_healing();
+    regenerate_aura();
 }
 
 void process_enter(int final) {
-  region * r;
-  for (r=regions; r; r=r->next) {
-    do_enter(r, final);
-  }
+    region *r;
+    for (r = regions; r; r = r->next) {
+        do_enter(r, final);
+    }
 }
 
 void process_maintenance(void) {
-  region * r;
-  for (r=regions; r; r=r->next) {
-    unit * u;
-    for (u=r->units; u; u=u->next) {
-      order * ord;
-      for (ord=u->orders; ord; ord=ord->next) {
-        keyword_t kwd = get_keyword(ord);
-        if (kwd==K_PAY) {
-          pay_cmd(u, ord);
+    region *r;
+    for (r = regions; r; r = r->next) {
+        unit *u;
+        for (u = r->units; u; u = u->next) {
+            order *ord;
+            for (ord = u->orders; ord; ord = ord->next) {
+                keyword_t kwd = getkeyword(ord);
+                if (kwd == K_PAY) {
+                    pay_cmd(u, ord);
+                }
+            }
         }
-      }
+        maintain_buildings(r, 0);
     }
-    maintain_buildings(r, 0);
-  }
 }
 
 void process_alliance(void) {
-  alliance_cmd();
+    alliance_cmd();
 }
 
 void process_idle(void) {
-  region * r;
-  for (r=regions; r; r=r->next) {
-    auto_work(r);
-  }
+    region *r;
+    for (r = regions; r; r = r->next) {
+        auto_work(r);
+    }
 }
 
 void process_set_default(void) {
-  if (!global.disabled[K_DEFAULT]) {
-    defaultorders();
-  }
+    if (!keyword_disabled(K_DEFAULT)) {
+        defaultorders();
+    }
 }
+

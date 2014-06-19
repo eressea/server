@@ -24,7 +24,7 @@
 
 struct race *test_create_race(const char *name)
 {
-  race *rc = rc_add(rc_new(name));
+  race *rc = rc_get_or_create(name);
   rc->flags |= RCF_PLAYERRACE;
   rc->maintenance = 10;
   return rc;
@@ -56,27 +56,26 @@ struct unit *test_create_unit(struct faction *f, struct region *r)
 
 void test_cleanup(void)
 {
-  test_clear_terrains();
-  test_clear_resources();
-  global.functions.maintenance = NULL;
-  global.functions.wage = NULL;
-  default_locale = 0;
-  free_locales();
-  free_spells();
-  free_spellbooks();
-  free_gamedata();
+    test_clear_terrains();
+    test_clear_resources();
+    global.functions.maintenance = NULL;
+    global.functions.wage = NULL;
+    default_locale = 0;
+    free_locales();
+    free_spells();
+    free_buildingtypes();
+    free_shiptypes();
+    free_races();
+    free_spellbooks();
+    free_gamedata();
 }
 
 terrain_type *
 test_create_terrain(const char * name, unsigned int flags)
 {
-  terrain_type * t;
-
-  assert(!get_terrain(name));
-  t = (terrain_type*)calloc(1, sizeof(terrain_type));
+  terrain_type * t = get_or_create_terrain(name);
   t->_name = _strdup(name);
   t->flags = flags;
-  register_terrain(t);
   return t;
 }
 
@@ -96,11 +95,8 @@ ship * test_create_ship(region * r, const ship_type * stype)
 
 ship_type * test_create_shiptype(const char ** names)
 {
-  ship_type * stype = (ship_type*)calloc(sizeof(ship_type), 1);
-  stype->name[0] = _strdup(names[0]);
-  stype->name[1] = _strdup(names[1]);
+  ship_type * stype = st_get_or_create(names[0]);
   locale_setstring(default_locale, names[0], names[0]);
-  st_register(stype);
   return stype;
 }
 
@@ -138,7 +134,7 @@ void test_create_world(void)
   int i;
   const char * names[] = { "horse", "horse_p", "boat", "boat_p", "iron", "iron_p", "stone", "stone_p" };
 
-  make_locale("de");
+  get_or_create_locale("de");
   init_resources();
   assert(!olditemtype[I_HORSE]);
 

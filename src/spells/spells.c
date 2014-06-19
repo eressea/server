@@ -20,6 +20,7 @@
 #include "spells.h"
 #include "borders.h"
 #include "buildingcurse.h"
+#include "direction.h"
 #include "regioncurse.h"
 #include "unitcurse.h"
 #include "shipcurse.h"
@@ -36,7 +37,7 @@
 #include <kernel/reports.h>
 #include <kernel/item.h>
 #include <kernel/magic.h>
-#include <kernel/message.h>
+#include <kernel/messages.h>
 #include <kernel/objtypes.h>
 #include <kernel/order.h>
 #include <kernel/plane.h>
@@ -2607,7 +2608,7 @@ static int sp_firewall(castorder * co)
   direction_t dir;
   region *r2;
 
-  dir = finddirection(pa->param[0]->data.xs, mage->faction->locale);
+  dir = get_direction(pa->param[0]->data.xs, mage->faction->locale);
   if (dir < MAXDIRECTIONS && dir != NODIRECTION) {
     r2 = rconnect(r, dir);
   } else {
@@ -4390,24 +4391,22 @@ int sp_puttorest(castorder * co)
 
 int sp_icastle(castorder * co)
 {
-  building *b;
-  const building_type *type;
-  attrib *a;
-  region *r = co_get_region(co);
-  unit *mage = co->magician.u;
-  int cast_level = co->level;
-  float power = co->force;
-  spellparameter *pa = co->par;
-  icastle_data *data;
-  const char *bname;
-  message *msg;
-  static const building_type *bt_illusion;
+    building *b;
+    const building_type *type;
+    attrib *a;
+    region *r = co_get_region(co);
+    unit *mage = co->magician.u;
+    int cast_level = co->level;
+    float power = co->force;
+    spellparameter *pa = co->par;
+    icastle_data *data;
+    const char *bname;
+    message *msg;
+    const building_type *bt_illusion = bt_find("illusioncastle");
 
-  if (bt_illusion == NULL)
-    bt_illusion = bt_find("illusioncastle");
-  if (bt_illusion == NULL) {
-    return 0;
-  }
+    if (!bt_illusion) {
+        return 0;
+    }
 
   if ((type =
       findbuildingtype(pa->param[0]->data.xs, mage->faction->locale)) == NULL) {
@@ -5861,7 +5860,7 @@ int sp_movecastle(castorder * co)
     return 0;
 
   b = pa->param[0]->data.b;
-  dir = finddirection(pa->param[1]->data.xs, mage->faction->locale);
+  dir = get_direction(pa->param[1]->data.xs, mage->faction->locale);
 
   if (dir == NODIRECTION) {
     /* Die Richtung wurde nicht erkannt */

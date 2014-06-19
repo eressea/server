@@ -28,7 +28,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "equipment.h"
 #include "faction.h"
 #include "item.h"
-#include "message.h"
+#include "messages.h"
 #include "plane.h"
 #include "region.h"
 #include "resources.h"

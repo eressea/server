@@ -24,13 +24,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "alchemy.h"
 #include "alliance.h"
 #include "connection.h"
+#include "direction.h"
 #include "building.h"
 #include "curse.h"
 #include "faction.h"
 #include "group.h"
 #include "item.h"
 #include "magic.h"
-#include "message.h"
+#include "messages.h"
 #include "move.h"
 #include "order.h"
 #include "pool.h"
@@ -93,7 +94,7 @@ ship *getship(const struct region * r)
 
 static void destroy_road(unit * u, int nmax, struct order *ord)
 {
-  direction_t d = getdirection(u->faction->locale);
+  direction_t d = get_direction(getstrtoken(), u->faction->locale);
   unit *u2;
   region *r = u->region;
   short n = (short)nmax;
@@ -277,34 +278,25 @@ void build_road(region * r, unit * u, int size, direction_t d)
 
   if (r->terrain == newterrain(T_SWAMP)) {
     /* wenn kein Damm existiert */
-    static const struct building_type *bt_dam;
-    if (!bt_dam)
-      bt_dam = bt_find("dam");
-    assert(bt_dam);
-    if (!buildingtype_exists(r, bt_dam, true)) {
+    const struct building_type *bt_dam = bt_find("dam");
+    if (!bt_dam || !buildingtype_exists(r, bt_dam, true)) {
       cmistake(u, u->thisorder, 132, MSG_PRODUCE);
       return;
     }
   } else if (r->terrain == newterrain(T_DESERT)) {
-    static const struct building_type *bt_caravan;
-    if (!bt_caravan)
-      bt_caravan = bt_find("caravan");
-    assert(bt_caravan);
+    const struct building_type *bt_caravan = bt_find("caravan");
     /* wenn keine Karawanserei existiert */
-    if (!buildingtype_exists(r, bt_caravan, true)) {
+    if (!bt_caravan || !buildingtype_exists(r, bt_caravan, true)) {
       cmistake(u, u->thisorder, 133, MSG_PRODUCE);
       return;
     }
   } else if (r->terrain == newterrain(T_GLACIER)) {
-    static const struct building_type *bt_tunnel;
-    if (!bt_tunnel)
-      bt_tunnel = bt_find("tunnel");
-    assert(bt_tunnel);
-    /* wenn kein Tunnel existiert */
-    if (!buildingtype_exists(r, bt_tunnel, true)) {
-      cmistake(u, u->thisorder, 131, MSG_PRODUCE);
-      return;
-    }
+      const struct building_type *bt_tunnel = bt_find("tunnel");
+      /* wenn kein Tunnel existiert */
+      if (!bt_tunnel || !buildingtype_exists(r, bt_tunnel, true)) {
+          cmistake(u, u->thisorder, 131, MSG_PRODUCE);
+          return;
+      }
   }
 
   /* left kann man noch bauen */
@@ -886,8 +878,7 @@ create_ship(region * r, unit * u, const struct ship_type *newtype, int want,
   /* check if skill and material for 1 size is available */
   if (eff_skill(u, cons->skill, r) < cons->minskill) {
     ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
-        "error_build_skill_low", "value name", cons->minskill,
-        newtype->name[1]));
+        "error_build_skill_low", "value", cons->minskill));
     return;
   }
 
@@ -946,8 +937,7 @@ void continue_ship(region * r, unit * u, int want)
   }
   if (eff_skill(u, cons->skill, r) < cons->minskill) {
     ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
-        "error_build_skill_low", "value name", cons->minskill,
-        sh->type->name[1]));
+        "error_build_skill_low", "value", cons->minskill));
     return;
   }
   msize = maxbuild(u, cons);

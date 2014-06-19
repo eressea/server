@@ -1,0 +1,558 @@
+<!DOCTYPE Project SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpj.dtd">
+<Project
+    Version="10.0"
+    VendorName="SlickEdit"
+    TemplateName="GNU C/C++"
+    WorkingDir="."
+    BuildSystem="vsbuild"
+    VCSProject="Git:">
+    <Config
+        Name="Debug"
+        Type="gnuc"
+        DebugCallbackName="gdb"
+        Version="1"
+        OutputFile="%bderessea.a"
+        CompilerConfigName="Latest Version"
+        Defines='"/DUSE_AUTOCONF"'>
+        <Menu>
+            <Target
+                Name="Compile"
+                MenuCaption="&amp;Compile"
+                Dialog="_gnuc_options_form Compile"
+                CaptureOutputWith="ProcessBuffer"
+                Deletable="0"
+                OutputExts="*.o"
+                SaveOption="SaveCurrent"
+                RunFromDir="%rw">
+                <Exec
+                    CmdLine='gcc -c %xup -ansi %defd -g %~other -o "%bd%n%oe" %i "%f"'
+                    OtherOptions="-std=c99"/>
+            </Target>
+            <Target
+                Name="Link"
+                MenuCaption="&amp;Link"
+                ShowOnMenu="Never"
+                Dialog="_gnuc_options_form Link"
+                CaptureOutputWith="ProcessBuffer"
+                Deletable="0"
+                SaveOption="SaveCurrent"
+                RunFromDir="%rw">
+                <Exec CmdLine='ar -rs %xup "%o" %f'/>
+            </Target>
+            <Target
+                Name="Build"
+                MenuCaption="&amp;Build"
+                Dialog="_gnuc_options_form Compile"
+                CaptureOutputWith="ProcessBuffer"
+                Deletable="0"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec CmdLine='"%(VSLICKBIN1)vsbuild" "%w" "%r" -t build'/>
+            </Target>
+            <Target
+                Name="Rebuild"
+                MenuCaption="&amp;Rebuild"
+                Dialog="_gnuc_options_form Compile"
+                CaptureOutputWith="ProcessBuffer"
+                Deletable="0"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec CmdLine='"%(VSLICKBIN1)vsbuild" "%w" "%r" -t rebuild'/>
+            </Target>
+            <Target
+                Name="Debug"
+                MenuCaption="&amp;Debug"
+                Dialog="_gnuc_options_form Run/Debug"
+                BuildFirst="1"
+                CaptureOutputWith="ProcessBuffer"
+                Deletable="0"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec CmdLine='"%o" "%o"'/>
+            </Target>
+            <Target
+                Name="Execute"
+                MenuCaption="E&amp;xecute"
+                Dialog="_gnuc_options_form Run/Debug"
+                BuildFirst="1"
+                CaptureOutputWith="ProcessBuffer"
+                Deletable="0"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec CmdLine='"%o"'/>
+            </Target>
+            <Target
+                Name="dash"
+                MenuCaption="-"
+                Deletable="0">
+                <Exec/>
+            </Target>
+            <Target
+                Name="GNU C Options"
+                MenuCaption="GNU C &amp;Options..."
+                ShowOnMenu="HideIfNoCmdLine"
+                Deletable="0"
+                SaveOption="SaveNone">
+                <Exec
+                    CmdLine="gnucoptions"
+                    Type="Slick-C"/>
+            </Target>
+        </Menu>
+        <List Name="GNUC Options">
+            <Item
+                Name="LinkerOutputType"
+                Value="StaticLibrary"/>
+        </List>
+        <Includes>
+            <Include Dir="../src"/>
+            <Include Dir="../cJSON"/>
+            <Include Dir="../critbit"/>
+            <Include Dir="../crypto"/>
+            <Include Dir="../iniparser"/>
+            <Include Dir="../quicklist"/>
+            <Include Dir="../build-i686-gcc-Debug/include/"/>
+            <Include Dir="../storage"/>
+        </Includes>
+    </Config>
+    <Config
+        Name="Release"
+        Type="gnuc"
+        DebugCallbackName="gdb"
+        Version="1"
+        OutputFile="%bderessea.a"
+        CompilerConfigName="Latest Version"
+        Defines='"/DUSE_AUTOCONF"'>
+        <Menu>
+            <Target
+                Name="Compile"
+                MenuCaption="&amp;Compile"
+                Dialog="_gnuc_options_form Compile"
+                CaptureOutputWith="ProcessBuffer"
+                Deletable="0"
+                OutputExts="*.o"
+                SaveOption="SaveCurrent"
+                RunFromDir="%rw">
+                <Exec
+                    CmdLine='gcc -c %xup -ansi %defd %~other -o "%bd%n%oe" %i "%f"'
+                    OtherOptions="-std=c99"/>
+            </Target>
+            <Target
+                Name="Link"
+                MenuCaption="&amp;Link"
+                ShowOnMenu="Never"
+                Dialog="_gnuc_options_form Link"
+                CaptureOutputWith="ProcessBuffer"
+                Deletable="0"
+                SaveOption="SaveCurrent"
+                RunFromDir="%rw">
+                <Exec CmdLine='ar -rs %xup "%o" %f'/>
+            </Target>
+            <Target
+                Name="Build"
+                MenuCaption="&amp;Build"
+                Dialog="_gnuc_options_form Compile"
+                CaptureOutputWith="ProcessBuffer"
+                Deletable="0"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec CmdLine='"%(VSLICKBIN1)vsbuild" "%w" "%r" -t build'/>
+            </Target>
+            <Target
+                Name="Rebuild"
+                MenuCaption="&amp;Rebuild"
+                Dialog="_gnuc_options_form Compile"
+                CaptureOutputWith="ProcessBuffer"
+                Deletable="0"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec CmdLine='"%(VSLICKBIN1)vsbuild" "%w" "%r" -t rebuild'/>
+            </Target>
+            <Target
+                Name="Debug"
+                MenuCaption="&amp;Debug"
+                Dialog="_gnuc_options_form Run/Debug"
+                BuildFirst="1"
+                CaptureOutputWith="ProcessBuffer"
+                Deletable="0"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec CmdLine='"%o" "%o"'/>
+            </Target>
+            <Target
+                Name="Execute"
+                MenuCaption="E&amp;xecute"
+                Dialog="_gnuc_options_form Run/Debug"
+                BuildFirst="1"
+                CaptureOutputWith="ProcessBuffer"
+                Deletable="0"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec CmdLine='"%o"'/>
+            </Target>
+            <Target
+                Name="dash"
+                MenuCaption="-"
+                Deletable="0">
+                <Exec/>
+            </Target>
+            <Target
+                Name="GNU C Options"
+                MenuCaption="GNU C &amp;Options..."
+                ShowOnMenu="HideIfNoCmdLine"
+                Deletable="0"
+                SaveOption="SaveNone">
+                <Exec
+                    CmdLine="gnucoptions"
+                    Type="Slick-C"/>
+            </Target>
+        </Menu>
+        <List Name="GNUC Options">
+            <Item
+                Name="LinkerOutputType"
+                Value="StaticLibrary"/>
+        </List>
+        <Includes>
+            <Include Dir="../src"/>
+            <Include Dir="../cJSON"/>
+            <Include Dir="../critbit"/>
+            <Include Dir="../crypto"/>
+            <Include Dir="../iniparser"/>
+            <Include Dir="../quicklist"/>
+            <Include Dir="../build-i686-gcc-Debug/include/"/>
+            <Include Dir="../storage"/>
+        </Includes>
+    </Config>
+    <Files>
+        <Folder
+            Name="Source Files"
+            Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm;*.go">
+            <F N="../src/kernel/alchemy.c"/>
+            <F N="../src/attributes/alliance.c"/>
+            <F N="../src/kernel/alliance.c"/>
+            <F N="../src/kernel/ally.c"/>
+            <F N="../src/spells/alp.c"/>
+            <F N="../src/modules/arena.c"/>
+            <F N="../src/items/artrewards.c"/>
+            <F N="../src/util/attrib.c"/>
+            <F N="../src/attributes/attributes.c"/>
+            <F N="../src/modules/autoseed.c"/>
+            <F N="../src/util/base36.c"/>
+            <F N="../src/kernel/battle.c"/>
+            <F N="../storage/binarystore.c"/>
+            <F N="../src/spells/borders.c"/>
+            <F N="../src/util/bsdstring.c"/>
+            <F N="../src/kernel/build.c"/>
+            <F N="../src/kernel/building.c"/>
+            <F N="../src/spells/buildingcurse.c"/>
+            <F N="../cJSON/cJSON.c"/>
+            <F N="../src/kernel/calendar.c"/>
+            <F N="../src/triggers/changefaction.c"/>
+            <F N="../src/triggers/changerace.c"/>
+            <F N="../src/triggers/clonedied.c"/>
+            <F N="../src/spells/combatspells.c"/>
+            <F N="../src/kernel/command.c"/>
+            <F N="../src/kernel/config.c"/>
+            <F N="../src/kernel/connection.c"/>
+            <F N="../src/triggers/createcurse.c"/>
+            <F N="../src/triggers/createunit.c"/>
+            <F N="../src/creation.c"/>
+            <F N="../src/creport.c"/>
+            <F N="../critbit/critbit.c"/>
+            <F N="../src/util/crmessage.c"/>
+            <F N="../src/kernel/curse.c"/>
+            <F N="../src/items/demonseye.c"/>
+            <F N="../src/util/dice.c"/>
+            <F N="../src/direction.c"/>
+            <F N="../src/races/dragons.c"/>
+            <F N="../src/modules/dungeon.c"/>
+            <F N="../src/economy.c"/>
+            <F N="../src/kernel/equipment.c"/>
+            <F N="../src/eressea.c"/>
+            <F N="../src/util/event.c"/>
+            <F N="../src/kernel/faction.c"/>
+            <F N="../src/util/filereader.c"/>
+            <F N="../storage/filestream.c"/>
+            <F N="../src/attributes/fleechance.c"/>
+            <F N="../src/attributes/follow.c"/>
+            <F N="../src/util/functions.c"/>
+            <F N="../src/triggers/gate.c"/>
+            <F N="../src/give.c"/>
+            <F N="../src/triggers/giveitem.c"/>
+            <F N="../src/attributes/gm.c"/>
+            <F N="../src/modules/gmcmd.c"/>
+            <F N="../src/util/goodies.c"/>
+            <F N="../src/kernel/group.c"/>
+            <F N="../src/attributes/hate.c"/>
+            <F N="../src/attributes/iceberg.c"/>
+            <F N="../src/races/illusion.c"/>
+            <F N="../iniparser/iniparser.c"/>
+            <F N="../src/kernel/item.c"/>
+            <F N="../src/items.c"/>
+            <F N="../src/items/itemtypes.c"/>
+            <F N="../src/json.c"/>
+            <F N="../src/kernel/jsonconf.c"/>
+            <F N="../src/attributes/key.c"/>
+            <F N="../src/keyword.c"/>
+            <F N="../src/triggers/killunit.c"/>
+            <F N="../src/util/language.c"/>
+            <F N="../src/laws.c"/>
+            <F N="../src/util/lists.c"/>
+            <F N="../src/util/log.c"/>
+            <F N="../src/kernel/magic.c"/>
+            <F N="../src/market.c"/>
+            <F N="../src/attributes/matmod.c"/>
+            <F N="../crypto/md5.c"/>
+            <F N="../storage/memstream.c"/>
+            <F N="../src/util/message.c"/>
+            <F N="../src/kernel/messages.c"/>
+            <F N="../src/monster.c"/>
+            <F N="../src/monsters.c"/>
+            <F N="../src/kernel/move.c"/>
+            <F N="../src/attributes/moved.c"/>
+            <F N="../src/attributes/movement.c"/>
+            <F N="../crypto/mt19937ar.c"/>
+            <F N="../src/modules/museum.c"/>
+            <F N="../src/kernel/names.c"/>
+            <F N="../src/util/nrmessage.c"/>
+            <F N="../src/attributes/object.c"/>
+            <F N="../src/attributes/orcification.c"/>
+            <F N="../src/kernel/order.c"/>
+            <F N="../src/attributes/otherfaction.c"/>
+            <F N="../src/attributes/overrideroads.c"/>
+            <F N="../src/util/parser.c"/>
+            <F N="../src/kernel/pathfinder.c"/>
+            <F N="../src/items/phoenixcompass.c"/>
+            <F N="../src/kernel/plane.c"/>
+            <F N="../src/kernel/player.c"/>
+            <F N="../src/kernel/pool.c"/>
+            <F N="../quicklist/quicklist.c"/>
+            <F N="../src/kernel/race.c"/>
+            <F N="../src/attributes/racename.c"/>
+            <F N="../src/attributes/raceprefix.c"/>
+            <F N="../src/races/races.c"/>
+            <F N="../src/util/rand.c"/>
+            <F N="../src/randenc.c"/>
+            <F N="../src/attributes/reduceproduction.c"/>
+            <F N="../src/kernel/region.c"/>
+            <F N="../src/spells/regioncurse.c"/>
+            <F N="../src/triggers/removecurse.c"/>
+            <F N="../src/report.c"/>
+            <F N="../src/kernel/reports.c"/>
+            <F N="../src/util/resolve.c"/>
+            <F N="../src/kernel/resources.c"/>
+            <F N="../src/kernel/save.c"/>
+            <F N="../src/modules/score.c"/>
+            <F N="../src/items/seed.c"/>
+            <F N="../src/kernel/ship.c"/>
+            <F N="../src/spells/shipcurse.c"/>
+            <F N="../src/triggers/shock.c"/>
+            <F N="../src/kernel/skill.c"/>
+            <F N="../src/items/speedsail.c"/>
+            <F N="../src/kernel/spell.c"/>
+            <F N="../src/kernel/spellbook.c"/>
+            <F N="../src/spells/spells.c"/>
+            <F N="../src/spy.c"/>
+            <F N="../src/util/strings.c"/>
+            <F N="../critbit/strtolh.c"/>
+            <F N="../src/study.c"/>
+            <F N="../src/summary.c"/>
+            <F N="../src/attributes/targetregion.c"/>
+            <F N="../src/kernel/teleport.c"/>
+            <F N="../src/kernel/terrain.c"/>
+            <F N="../storage/textstore.c"/>
+            <F N="../src/triggers/timeout.c"/>
+            <F N="../src/util/translation.c"/>
+            <F N="../src/triggers/triggers.c"/>
+            <F N="../src/util/umlaut.c"/>
+            <F N="../src/triggers/unguard.c"/>
+            <F N="../src/util/unicode.c"/>
+            <F N="../src/kernel/unit.c"/>
+            <F N="../src/spells/unitcurse.c"/>
+            <F N="../src/triggers/unitmessage.c"/>
+            <F N="../src/items/weapons.c"/>
+            <F N="../src/modules/weather.c"/>
+            <F N="../src/modules/wormhole.c"/>
+            <F N="../src/items/xerewards.c"/>
+            <F N="../src/modules/xmas.c"/>
+            <F N="../src/util/xml.c"/>
+            <F N="../src/kernel/xmlreader.c"/>
+            <F N="../src/races/zombies.c"/>
+        </Folder>
+        <Folder
+            Name="Header Files"
+            Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.inc;*.sh;*.cpy;*.if">
+            <F N="../src/attributes/aggressive.h"/>
+            <F N="../src/kernel/alchemy.h"/>
+            <F N="../src/attributes/alliance.h"/>
+            <F N="../src/kernel/alliance.h"/>
+            <F N="../src/kernel/ally.h"/>
+            <F N="../src/spells/alp.h"/>
+            <F N="../src/modules/arena.h"/>
+            <F N="../src/items/artrewards.h"/>
+            <F N="../src/util/attrib.h"/>
+            <F N="../src/attributes/attributes.h"/>
+            <F N="../src/modules/autoseed.h"/>
+            <F N="../src/util/base36.h"/>
+            <F N="../src/kernel/battle.h"/>
+            <F N="../storage/binarystore.h"/>
+            <F N="../src/spells/borders.h"/>
+            <F N="../src/util/bsdstring.h"/>
+            <F N="../src/kernel/build.h"/>
+            <F N="../src/kernel/building.h"/>
+            <F N="../src/spells/buildingcurse.h"/>
+            <F N="../cJSON/cJSON.h"/>
+            <F N="../src/kernel/calendar.h"/>
+            <F N="../src/triggers/changefaction.h"/>
+            <F N="../src/triggers/changerace.h"/>
+            <F N="../src/triggers/clonedied.h"/>
+            <F N="../src/spells/combatspells.h"/>
+            <F N="../src/kernel/command.h"/>
+            <F N="../src/kernel/config.h"/>
+            <F N="../src/kernel/connection.h"/>
+            <F N="../src/triggers/createcurse.h"/>
+            <F N="../src/triggers/createunit.h"/>
+            <F N="../src/creation.h"/>
+            <F N="../src/creport.h"/>
+            <F N="../critbit/critbit.h"/>
+            <F N="../src/util/crmessage.h"/>
+            <F N="../src/kernel/curse.h"/>
+            <F N="../src/items/demonseye.h"/>
+            <F N="../src/direction.h"/>
+            <F N="../src/modules/dungeon.h"/>
+            <F N="../src/economy.h"/>
+            <F N="../src/util/encoding.h"/>
+            <F N="../src/kernel/equipment.h"/>
+            <F N="../src/eressea.h"/>
+            <F N="../src/util/event.h"/>
+            <F N="../src/kernel/faction.h"/>
+            <F N="../src/util/filereader.h"/>
+            <F N="../storage/filestream.h"/>
+            <F N="../src/attributes/fleechance.h"/>
+            <F N="../src/attributes/follow.h"/>
+            <F N="../src/util/functions.h"/>
+            <F N="../src/triggers/gate.h"/>
+            <F N="../src/give.h"/>
+            <F N="../src/triggers/giveitem.h"/>
+            <F N="../src/attributes/gm.h"/>
+            <F N="../src/modules/gmcmd.h"/>
+            <F N="../src/util/goodies.h"/>
+            <F N="../src/kernel/group.h"/>
+            <F N="../src/attributes/hate.h"/>
+            <F N="../src/attributes/iceberg.h"/>
+            <F N="../src/kernel/item.h"/>
+            <F N="../src/items.h"/>
+            <F N="../src/items/itemtypes.h"/>
+            <F N="../src/json.h"/>
+            <F N="../src/kernel/jsonconf.h"/>
+            <F N="../src/attributes/key.h"/>
+            <F N="../src/keyword.h"/>
+            <F N="../src/triggers/killunit.h"/>
+            <F N="../src/util/language.h"/>
+            <F N="../src/util/language_struct.h"/>
+            <F N="../src/laws.h"/>
+            <F N="../src/util/lists.h"/>
+            <F N="../src/util/log.h"/>
+            <F N="../src/kernel/magic.h"/>
+            <F N="../src/market.h"/>
+            <F N="../src/attributes/matmod.h"/>
+            <F N="../crypto/md5.h"/>
+            <F N="../storage/memstream.h"/>
+            <F N="../src/util/message.h"/>
+            <F N="../src/kernel/messages.h"/>
+            <F N="../src/monster.h"/>
+            <F N="../src/kernel/move.h"/>
+            <F N="../src/attributes/moved.h"/>
+            <F N="../src/attributes/movement.h"/>
+            <F N="../crypto/mtrand.h"/>
+            <F N="../src/modules/museum.h"/>
+            <F N="../src/kernel/names.h"/>
+            <F N="../src/util/nrmessage.h"/>
+            <F N="../src/util/nrmessage_struct.h"/>
+            <F N="../src/attributes/object.h"/>
+            <F N="../src/kernel/objtypes.h"/>
+            <F N="../src/attributes/orcification.h"/>
+            <F N="../src/kernel/order.h"/>
+            <F N="../src/attributes/otherfaction.h"/>
+            <F N="../src/attributes/overrideroads.h"/>
+            <F N="../src/util/parser.h"/>
+            <F N="../src/kernel/pathfinder.h"/>
+            <F N="../src/items/phoenixcompass.h"/>
+            <F N="../src/kernel/plane.h"/>
+            <F N="../src/platform.h"/>
+            <F N="../src/kernel/player.h"/>
+            <F N="../src/kernel/pool.h"/>
+            <F N="../quicklist/quicklist.h"/>
+            <F N="../src/kernel/race.h"/>
+            <F N="../src/attributes/racename.h"/>
+            <F N="../src/attributes/raceprefix.h"/>
+            <F N="../src/races/races.h"/>
+            <F N="../src/util/rand.h"/>
+            <F N="../src/randenc.h"/>
+            <F N="../src/attributes/reduceproduction.h"/>
+            <F N="../src/kernel/region.h"/>
+            <F N="../src/spells/regioncurse.h"/>
+            <F N="../src/triggers/removecurse.h"/>
+            <F N="../src/kernel/render.h"/>
+            <F N="../src/report.h"/>
+            <F N="../src/kernel/reports.h"/>
+            <F N="../src/util/resolve.h"/>
+            <F N="../src/kernel/resources.h"/>
+            <F N="../src/util/rng.h"/>
+            <F N="../src/kernel/save.h"/>
+            <F N="../src/modules/score.h"/>
+            <F N="../src/items/seed.h"/>
+            <F N="../src/settings.h"/>
+            <F N="../src/kernel/ship.h"/>
+            <F N="../src/spells/shipcurse.h"/>
+            <F N="../src/triggers/shock.h"/>
+            <F N="../src/kernel/skill.h"/>
+            <F N="../src/items/speedsail.h"/>
+            <F N="../src/kernel/spell.h"/>
+            <F N="../src/kernel/spellbook.h"/>
+            <F N="../src/kernel/spellid.h"/>
+            <F N="../src/spells/spells.h"/>
+            <F N="../src/spy.h"/>
+            <F N="../src/stdafx.h"/>
+            <F N="../storage/storage.h"/>
+            <F N="../storage/stream.h"/>
+            <F N="../critbit/strtolh.h"/>
+            <F N="../src/study.h"/>
+            <F N="../src/summary.h"/>
+            <F N="../src/attributes/targetregion.h"/>
+            <F N="../src/kernel/teleport.h"/>
+            <F N="../src/kernel/terrain.h"/>
+            <F N="../src/kernel/terrainid.h"/>
+            <F N="../storage/textstore.h"/>
+            <F N="../src/triggers/timeout.h"/>
+            <F N="../src/util/translation.h"/>
+            <F N="../src/triggers/triggers.h"/>
+            <F N="../src/kernel/types.h"/>
+            <F N="../src/util/umlaut.h"/>
+            <F N="../src/triggers/unguard.h"/>
+            <F N="../src/util/unicode.h"/>
+            <F N="../src/kernel/unit.h"/>
+            <F N="../src/spells/unitcurse.h"/>
+            <F N="../src/triggers/unitmessage.h"/>
+            <F N="../src/util/variant.h"/>
+            <F N="../src/kernel/version.h"/>
+            <F N="../src/items/weapons.h"/>
+            <F N="../src/modules/weather.h"/>
+            <F N="../src/modules/wormhole.h"/>
+            <F N="../src/items/xerewards.h"/>
+            <F N="../src/modules/xmas.h"/>
+            <F N="../src/util/xml.h"/>
+            <F N="../src/kernel/xmlreader.h"/>
+        </Folder>
+        <Folder
+            Name="Resource Files"
+            Filters="*.ico;*.cur;*.dlg"/>
+        <Folder
+            Name="Bitmaps"
+            Filters="*.bmp"/>
+        <Folder
+            Name="Other Files"
+            Filters="">
+            <F N="../src/log.pkg"/>
+        </Folder>
+    </Files>
+</Project>

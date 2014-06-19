@@ -78,7 +78,7 @@ extern "C" {
     int df_bonus;               /* Verändert den Verteidigungskill (default: 0) */
     const struct spell *precombatspell;
     struct att attack[10];
-    char bonus[MAXSKILLS];
+    signed char bonus[MAXSKILLS];
     signed char *study_speed;   /* study-speed-bonus in points/turn (0=30 Tage) */
     bool __remove_me_nonplayer;
     int flags;
@@ -109,12 +109,12 @@ extern "C" {
   extern struct race_list *get_familiarraces(void);
   extern struct race *races;
 
-  extern struct race *rc_find(const char *);
-  extern const char *rc_name(const struct race *, int);
-  extern struct race *rc_add(struct race *);
-  extern struct race *rc_new(const char *zName);
+  extern race *rc_get_or_create(const char *name);
+  extern const race *rc_find(const char *);
+  extern const char *rc_name(const race *, int);
   extern int rc_specialdamage(const race *, const race *,
     const struct weapon_type *);
+  void free_races(void);
 
 /* Flags */
 #define RCF_PLAYERRACE     (1<<0)       /* can be played by a player. */

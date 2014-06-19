@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define H_KRNL_BUILD
 
 #include "types.h"
+#include "direction.h"
 
 #ifdef __cplusplus
 extern "C" {

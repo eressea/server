@@ -24,11 +24,9 @@
 #include <modules/xmas.h>
 #include <items/itemtypes.h>
 #include <attributes/attributes.h>
-#include "archetype.h"
 #include "report.h"
 #include "items.h"
 #include "creport.h"
-#include "xmlreport.h"
 
 void game_done(void)
 {
@@ -58,7 +56,6 @@ void game_init(void)
   register_reports();
   register_nr();
   register_cr();
-  register_xr();
 
   register_names();
   register_resources();
@@ -76,10 +73,9 @@ void game_init(void)
   register_wormholes();
 
   register_itemtypes();
+#ifdef USE_LIBXML2
   register_xmlreader();
-  register_archetypes();
-  enable_xml_gamecode();
-
+#endif
   register_attributes();
   register_gmcmd();
 

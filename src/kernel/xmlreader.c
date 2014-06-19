@@ -14,11 +14,11 @@ without prior permission by the authors of Eressea.
 #include <kernel/config.h>
 #include "xmlreader.h"
 
-/* kernel includes */
 #include "building.h"
 #include "equipment.h"
 #include "item.h"
-#include "message.h"
+#include "keyword.h"
+#include "messages.h"
 #include "race.h"
 #include "region.h"
 #include "resources.h"
@@ -40,10 +40,12 @@ without prior permission by the authors of Eressea.
 #include <util/nrmessage.h>
 #include <util/xml.h>
 
+#ifdef USE_LIBXML2
 /* libxml includes */
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxml/encoding.h>
+#endif
 
 /* libc includes */
 #include <assert.h>
@@ -51,35 +53,15 @@ without prior permission by the authors of Eressea.
 #include <limits.h>
 #include <string.h>
 
-static bool gamecode_enabled = false;
-
-static building_type *bt_get_or_create(const char *name)
-{
-  if (name != NULL) {
-    building_type *btype = bt_find(name);
-    if (btype == NULL) {
-      btype = calloc(sizeof(building_type), 1);
-      btype->_name = _strdup(name);
-      bt_register(btype);
-    }
-    return btype;
-  }
-  return NULL;
-}
-
-void enable_xml_gamecode(void)
-{
-  gamecode_enabled = true;
-}
-
+#ifdef USE_LIBXML2
 static void xml_readtext(xmlNodePtr node, struct locale **lang, xmlChar ** text)
 {
   xmlChar *propValue = xmlGetProp(node, BAD_CAST "locale");
   assert(propValue != NULL);
-  *lang = find_locale((const char *)propValue);
+  *lang = get_locale((const char *)propValue);
 #ifdef MAKE_LOCALES
   if (*lang == NULL)
-    *lang = make_locale((const char *)propValue);
+    *lang = get_or_create_locale((const char *)propValue);
 #endif
   xmlFree(propValue);
 
@@ -304,11 +286,10 @@ static int parse_buildings(xmlDocPtr doc)
       xml_readconstruction(xpath, result->nodesetval, &btype->construction);
       xmlXPathFreeObject(result);
 
-      if (gamecode_enabled) {
-        /* reading eressea/buildings/building/function */
-        xpath->node = node;
-        result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
-        for (k = 0; k != result->nodesetval->nodeNr; ++k) {
+      /* reading eressea/buildings/building/function */
+      xpath->node = node;
+      result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
+      for (k = 0; k != result->nodesetval->nodeNr; ++k) {
           xmlNodePtr node = result->nodesetval->nodeTab[k];
           pf_generic fun;
           parse_function(node, &fun, &propValue);
@@ -337,9 +318,8 @@ static int parse_buildings(xmlDocPtr doc)
             log_error("unknown function type '%s' for building %s\n", (const char *)propValue, btype->_name);
           }
           xmlFree(propValue);
-        }
-        xmlXPathFreeObject(result);
       }
+      xmlXPathFreeObject(result);
 
       /* reading eressea/buildings/building/maintenance */
       result = xmlXPathEvalExpression(BAD_CAST "maintenance", xpath);
@@ -536,15 +516,13 @@ static int parse_ships(xmlDocPtr doc)
     for (i = 0; i != nodes->nodeNr; ++i) {
       xmlNodePtr child, node = nodes->nodeTab[i];
       xmlChar *propValue;
-      ship_type *st = (ship_type *)calloc(sizeof(ship_type), 1);
+      ship_type *st;
       xmlXPathObjectPtr result;
       int k, c;
 
       propValue = xmlGetProp(node, BAD_CAST "name");
       assert(propValue != NULL);
-      st->name[0] = _strdup((const char *)propValue);
-      st->name[1] =
-        strcat(strcpy(malloc(strlen(st->name[0]) + 3), st->name[0]), "_a");
+      st = st_get_or_create((const char *)propValue);
       xmlFree(propValue);
 
       st->cabins = xml_ivalue(node, "cabins", 0) * PERSON_WEIGHT;
@@ -603,14 +581,11 @@ static int parse_ships(xmlDocPtr doc)
         if (st->coasts[c] != NULL)
           ++c;
         else {
-          log_warning("ship %s mentions a non-existing terrain %s.\n", st->name[0], propValue);
+          log_warning("ship %s mentions a non-existing terrain %s.\n", st->_name, propValue);
         }
         xmlFree(propValue);
       }
       xmlXPathFreeObject(result);
-
-      /* finally, register the new building type */
-      st_register(st);
     }
   }
   xmlXPathFreeObject(ships);
@@ -642,7 +617,7 @@ static void race_compat(void)
     if (rcname == NULL) {
       new_race[i] = NULL;
     } else {
-      race *rc = rc_find(oldracenames[i]);
+      race *rc = rc_get_or_create(oldracenames[i]);
       if (rc) {
         new_race[i] = rc;
         if (rc == new_race[RC_TROLL]) {
@@ -797,7 +772,7 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
       if (propValue != NULL) {
         const race *rc = rc_find((const char *)propValue);
         if (rc == NULL)
-          rc = rc_add(rc_new((const char *)propValue));
+          rc = rc_get_or_create((const char *)propValue);
         racelist_insert(&wtype->modifiers[k].races, rc);
         xmlFree(propValue);
       }
@@ -806,11 +781,10 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
   }
   xmlXPathFreeObject(result);
 
-  if (gamecode_enabled) {
-    /* reading weapon/function */
-    xpath->node = node;
-    result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
-    for (k = 0; k != result->nodesetval->nodeNr; ++k) {
+  /* reading weapon/function */
+  xpath->node = node;
+  result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
+  for (k = 0; k != result->nodesetval->nodeNr; ++k) {
       xmlNodePtr node = result->nodesetval->nodeTab[k];
       xmlChar *propValue;
       pf_generic fun;
@@ -830,9 +804,8 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
         log_error("unknown function type '%s' for item '%s'\n", (const char *)propValue, itype->rtype->_name[0]);
       }
       xmlFree(propValue);
-    }
-    xmlXPathFreeObject(result);
   }
+  xmlXPathFreeObject(result);
 
   xpath->node = node;
   return wtype;
@@ -912,11 +885,10 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
   }
   xmlXPathFreeObject(result);
 
-  if (gamecode_enabled) {
-    /* reading item/function */
-    xpath->node = node;
-    result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
-    for (k = 0; k != result->nodesetval->nodeNr; ++k) {
+  /* reading item/function */
+  xpath->node = node;
+  result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
+  for (k = 0; k != result->nodesetval->nodeNr; ++k) {
       xmlNodePtr node = result->nodesetval->nodeTab[k];
       xmlChar *propValue;
       pf_generic fun;
@@ -947,9 +919,8 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
         log_error("unknown function type '%s' for item '%s'\n", (const char *)propValue, rtype->_name[0]);
       }
       xmlFree(propValue);
-    }
-    xmlXPathFreeObject(result);
   }
+  xmlXPathFreeObject(result);
 
   return itype;
 }
@@ -1068,11 +1039,10 @@ static int parse_resources(xmlDocPtr doc)
       xmlFree(name);
     }
 
-    if (gamecode_enabled) {
-      /* reading eressea/resources/resource/function */
-      xpath->node = node;
-      result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
-      if (result->nodesetval != NULL)
+    /* reading eressea/resources/resource/function */
+    xpath->node = node;
+    result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
+    if (result->nodesetval != NULL)
         for (k = 0; k != result->nodesetval->nodeNr; ++k) {
           xmlNodePtr node = result->nodesetval->nodeTab[k];
           pf_generic fun;
@@ -1096,8 +1066,7 @@ static int parse_resources(xmlDocPtr doc)
           }
           xmlFree(propValue);
         }
-      xmlXPathFreeObject(result);
-    }
+    xmlXPathFreeObject(result);
 
     /* reading eressea/resources/resource/resourcelimit */
     xpath->node = node;
@@ -1128,7 +1097,7 @@ static int parse_resources(xmlDocPtr doc)
           if (propValue != NULL) {
             rc = rc_find((const char *)propValue);
             if (rc == NULL)
-              rc = rc_add(rc_new((const char *)propValue));
+              rc = rc_get_or_create((const char *)propValue);
             xmlFree(propValue);
           }
           rdata->modifiers[k].race = rc;
@@ -1585,22 +1554,21 @@ static int parse_spells(xmlDocPtr doc)
       if (k >= 0 && k <= 3)
         sp->sptyp |= modes[k];
 
-      if (gamecode_enabled) {
-        /* reading eressea/spells/spell/function */
-        pf_generic cast = 0;
-        pf_generic fumble = 0;
+      /* reading eressea/spells/spell/function */
+      pf_generic cast = 0;
+      pf_generic fumble = 0;
 
-        xpath->node = node;
-        result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
+      xpath->node = node;
+      result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
 
-        if (result->nodesetval->nodeNr == 0) {
+      if (result->nodesetval->nodeNr == 0) {
           cast = get_function(sp->sname);
           if (!cast) {
             log_error("no spell cast function registered for '%s'\n", sp->sname);
           }
           strlcpy(zText+7, sp->sname, sizeof(zText)-7);
           fumble = get_function(zText);
-        } else {
+      } else {
           for (k = 0; k != result->nodesetval->nodeNr; ++k) {
             xmlNodePtr node = result->nodesetval->nodeTab[k];
             pf_generic fun;
@@ -1620,11 +1588,10 @@ static int parse_spells(xmlDocPtr doc)
             }
             xmlFree(propValue);
           }
-        }
-        sp->cast = (spell_f)cast;
-        sp->fumble = (fumble_f)fumble;
-        xmlXPathFreeObject(result);
       }
+      sp->cast = (spell_f)cast;
+      sp->fumble = (fumble_f)fumble;
+      xmlXPathFreeObject(result);
 
       /* reading eressea/spells/spell/resource */
       xpath->node = node;
@@ -1723,9 +1690,7 @@ static int parse_races(xmlDocPtr doc)
 
     propValue = xmlGetProp(node, BAD_CAST "name");
     assert(propValue != NULL);
-    rc = rc_find((const char *)propValue);
-    if (rc == NULL)
-      rc = rc_add(rc_new((const char *)propValue));
+    rc = rc_get_or_create((const char *)propValue);
     xmlFree(propValue);
 
     propValue = xmlGetProp(node, BAD_CAST "damage");
@@ -1869,11 +1834,10 @@ static int parse_races(xmlDocPtr doc)
     }
     xmlXPathFreeObject(result);
 
-    if (gamecode_enabled) {
-      /* reading eressea/races/race/function */
-      xpath->node = node;
-      result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
-      for (k = 0; k != result->nodesetval->nodeNr; ++k) {
+    /* reading eressea/races/race/function */
+    xpath->node = node;
+    result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
+    for (k = 0; k != result->nodesetval->nodeNr; ++k) {
         xmlNodePtr node = result->nodesetval->nodeTab[k];
         pf_generic fun;
 
@@ -1902,9 +1866,8 @@ static int parse_races(xmlDocPtr doc)
           log_error("unknown function type '%s' for race %s\n", (const char *)propValue, rc->_name[0]);
         }
         xmlFree(propValue);
-      }
-      xmlXPathFreeObject(result);
     }
+    xmlXPathFreeObject(result);
 
     /* reading eressea/races/race/familiar */
     xpath->node = node;
@@ -1915,10 +1878,7 @@ static int parse_races(xmlDocPtr doc)
 
       propValue = xmlGetProp(node, BAD_CAST "race");
       assert(propValue != NULL);
-      frc = rc_find((const char *)propValue);
-      if (!frc) {
-        frc = rc_add(rc_new((const char *)propValue));
-      }
+      frc = rc_get_or_create((const char *)propValue);
       if (xml_bvalue(node, "default", false)) {
         rc->familiars[k] = rc->familiars[0];
         rc->familiars[0] = frc;
@@ -1990,14 +1950,14 @@ static int parse_terrains(xmlDocPtr doc)
   nodes = terrains->nodesetval;
   for (i = 0; i != nodes->nodeNr; ++i) {
     xmlNodePtr node = nodes->nodeTab[i];
-    terrain_type *terrain = calloc(1, sizeof(terrain_type));
+    terrain_type *terrain;
     xmlChar *propValue;
     xmlXPathObjectPtr xpathChildren;
     xmlNodeSetPtr children;
 
     propValue = xmlGetProp(node, BAD_CAST "name");
     assert(propValue != NULL);
-    terrain->_name = _strdup((const char *)propValue);
+    terrain = get_or_create_terrain((const char *)propValue);
     xmlFree(propValue);
 
     terrain->max_road = (short)xml_ivalue(node, "road", 0);
@@ -2015,8 +1975,6 @@ static int parse_terrains(xmlDocPtr doc)
         terrain->flags |= WALK_INTO;
       if (xml_bvalue(node, "swim", false))
         terrain->flags |= SWIM_INTO;
-      if (xml_bvalue(node, "shallow", true))
-        terrain->flags |= LARGE_SHIPS;
       if (xml_bvalue(node, "cavalry", false))
         terrain->flags |= CAVALRY_REGION;
     }
@@ -2093,7 +2051,6 @@ static int parse_terrains(xmlDocPtr doc)
     }
     xmlXPathFreeObject(xpathChildren);
 
-    register_terrain(terrain);
   }
   xmlXPathFreeObject(terrains);
 
@@ -2109,9 +2066,6 @@ static int parse_messages(xmlDocPtr doc)
   xmlXPathObjectPtr messages;
   xmlNodeSetPtr nodes;
   int i;
-
-  if (!gamecode_enabled)
-    return 0;
 
   xpath = xmlXPathNewContext(doc);
 
@@ -2269,6 +2223,7 @@ static int parse_strings(xmlDocPtr doc)
   xmlXPathFreeObject(strings);
 
   xmlXPathFreeContext(xpath);
+  init_locales();
   return 0;
 }
 
@@ -2350,7 +2305,7 @@ static int parse_main(xmlDocPtr doc)
         int k;
         for (k = 0; k != MAXKEYWORDS; ++k) {
           if (strcmp(keywords[k], (const char *)propName) == 0) {
-            global.disabled[k] = 1;
+            enable_keyword(k, false);
             break;
           }
         }
@@ -2400,3 +2355,4 @@ void register_xmlreader(void)
   xml_register_callback(parse_calendar);
   xml_register_callback(parse_directions);
 }
+#endif

@@ -15,6 +15,7 @@
 #include "order.h"
 
 #include "skill.h"
+#include "keyword.h"
 
 #include <util/base36.h>
 #include <util/bsdstring.h>
@@ -75,7 +76,7 @@ void replace_order(order ** dlist, order * orig, const order * src)
   }
 }
 
-keyword_t get_keyword(const order * ord)
+keyword_t getkeyword(const order * ord)
 {
   if (ord == NULL) {
     return NOKEYWORD;
@@ -87,53 +88,50 @@ keyword_t get_keyword(const order * ord)
  * This is the inverse function to the parse_order command. Note that
  * keywords are expanded to their full length.
  */
-static char *get_command(const order * ord, char *sbuffer, size_t size)
-{
-  char *bufp = sbuffer;
-  const char *text = ORD_STRING(ord);
-  keyword_t kwd = ORD_KEYWORD(ord);
-  int bytes;
+static char* get_command(const order *ord, char *sbuffer, size_t size) {
+    char *bufp = sbuffer;
+    const char *text = ORD_STRING(ord);
+    keyword_t kwd = ORD_KEYWORD(ord);
+    int bytes;
 
-  if (ord->_persistent) {
-    if (size > 0) {
-      *bufp++ = '@';
-      --size;
-    } else {
-      WARN_STATIC_BUFFER();
-    }
-  }
-  if (kwd != NOKEYWORD) {
-    const struct locale *lang = ORD_LOCALE(ord);
-    if (size > 0) {
-      if (text)
-        --size;
-      bytes = (int)strlcpy(bufp, (const char *)LOC(lang, keywords[kwd]), size);
-      if (wrptr(&bufp, &size, bytes) != 0)
-        WARN_STATIC_BUFFER();
-      if (text)
-        *bufp++ = ' ';
-    } else {
-      WARN_STATIC_BUFFER();
-    }
-  }
-  if (text) {
-    bytes = (int)strlcpy(bufp, (const char *)text, size);
-    if (wrptr(&bufp, &size, bytes) != 0) {
-      WARN_STATIC_BUFFER();
-      if (bufp - sbuffer >= 6) {
-        bufp -= 6;
-        while (bufp > sbuffer && (*bufp & 0x80) != 0) {
-          ++size;
-          --bufp;
+    if (ord->_persistent) {
+        if (size > 0) {
+            *bufp++ = '@';
+            --size;
+        } else {
+            WARN_STATIC_BUFFER();
         }
-        memcpy(bufp, "[...]", 6);   /* TODO: make sure this only happens in eval_command */
-        bufp += 6;
-      }
     }
-  }
-  if (size > 0)
-    *bufp = 0;
-  return sbuffer;
+    if (kwd != NOKEYWORD) {
+        const struct locale *lang = ORD_LOCALE(ord);
+        if (size > 0) {
+            const char *str = (const char *)LOC(lang, keyword(kwd));
+            assert(str);
+            if (text) --size;
+            bytes = (int)strlcpy(bufp, str, size);
+            if (wrptr(&bufp, &size, bytes) != 0) WARN_STATIC_BUFFER();
+            if (text) *bufp++ = ' ';
+        } else {
+            WARN_STATIC_BUFFER();
+        }
+    }
+    if (text) {
+        bytes = (int)strlcpy(bufp, (const char *)text, size);
+        if (wrptr(&bufp, &size, bytes) != 0) {
+            WARN_STATIC_BUFFER();
+            if (bufp - sbuffer >= 6) {
+                bufp -= 6;
+                while (bufp > sbuffer && (*bufp & 0x80) != 0) {
+                    ++size;
+                    --bufp;
+                }
+                memcpy(bufp, "[...]", 6);   /* TODO: make sure this only happens in eval_command */
+                bufp += 6;
+            }
+        }
+    }
+    if (size > 0) *bufp = 0;
+    return sbuffer;
 }
 
 char *getcommand(const order * ord)
@@ -338,27 +336,29 @@ order *create_order(keyword_t kwd, const struct locale * lang,
 
 order *parse_order(const char *s, const struct locale * lang)
 {
-  while (*s && !isalnum(*(unsigned char *)s) && !ispunct(*(unsigned char *)s))
-    ++s;
-  if (*s != 0) {
-    keyword_t kwd;
-    const char *sptr;
-    int persistent = 0;
+    assert(lang);
+    assert(s);
+    while (*s && !isalnum(*(unsigned char *)s) && !ispunct(*(unsigned char *)s)) {
+        ++s;
+    }
+    if (*s != 0) {
+        keyword_t kwd;
+        const char *sptr;
+        int persistent = 0; 
 
-    while (*s == '@') {
-      persistent = 1;
-      ++s;
+        while (*s == '@') {
+            persistent = 1;
+            ++s;
+        }
+        sptr = s;
+        kwd = get_keyword(parse_token(&sptr), lang);
+        if (kwd != NOKEYWORD) {
+            while (isxspace(*(unsigned char *)sptr)) ++sptr;
+            s = sptr;
+        }
+        return create_order_i(kwd, s, persistent, lang);
     }
-    sptr = s;
-    kwd = findkeyword(parse_token(&sptr), lang);
-    if (kwd != NOKEYWORD) {
-      while (isxspace(*(unsigned char *)sptr))
-        ++sptr;
-      s = sptr;
-    }
-    return create_order_i(kwd, s, persistent, lang);
-  }
-  return NULL;
+    return NULL;
 }
 
 /**

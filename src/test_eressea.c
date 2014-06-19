@@ -3,6 +3,7 @@
 #include <util/log.h>
 
 CuSuite *get_tests_suite(void);
+CuSuite *get_jsonconf_suite(void);
 CuSuite *get_json_suite(void);
 CuSuite *get_economy_suite(void);
 CuSuite *get_laws_suite(void);
@@ -24,6 +25,8 @@ CuSuite *get_bsdstring_suite(void);
 CuSuite *get_functions_suite(void);
 CuSuite *get_umlaut_suite(void);
 CuSuite *get_ally_suite(void);
+CuSuite *get_direction_suite(void);
+CuSuite *get_keyword_suite(void);
 
 int RunAllTests(void)
 {
@@ -36,6 +39,9 @@ int RunAllTests(void)
   /* self-test */
   CuSuiteAddSuite(suite, get_tests_suite());
   CuSuiteAddSuite(suite, get_json_suite());
+  CuSuiteAddSuite(suite, get_jsonconf_suite());
+  CuSuiteAddSuite(suite, get_direction_suite());
+  CuSuiteAddSuite(suite, get_keyword_suite());
   /* util */
   CuSuiteAddSuite(suite, get_base36_suite());
   CuSuiteAddSuite(suite, get_bsdstring_suite());
@@ -70,5 +76,6 @@ int RunAllTests(void)
 }
 
 int main(int argc, char ** argv) {
-  return RunAllTests();
+    log_stderr = 0;
+    return RunAllTests();
 }

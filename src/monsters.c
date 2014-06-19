@@ -39,7 +39,7 @@
 #include <kernel/equipment.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
-#include <kernel/message.h>
+#include <kernel/messages.h>
 #include <kernel/move.h>
 #include <kernel/names.h>
 #include <kernel/order.h>
@@ -445,7 +445,7 @@ static order *make_movement_order(unit * u, const region * target, int moves,
 
   bytes =
     (int)strlcpy(bufp,
-    (const char *)LOC(u->faction->locale, keywords[K_MOVE]), size);
+    (const char *)LOC(u->faction->locale, keyword(K_MOVE)), size);
   if (wrptr(&bufp, &size, bytes) != 0)
     WARN_STATIC_BUFFER();
 

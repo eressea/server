@@ -29,7 +29,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "group.h"
 #include "item.h"
 #include "magic.h"
-#include "message.h"
+#include "messages.h"
 #include "move.h"
 #include "objtypes.h"
 #include "order.h"
@@ -66,14 +66,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/rand.h>
 #include <util/resolve.h>
 #include <util/rng.h>
-#include <util/sql.h>
 #include <util/umlaut.h>
 #include <util/unicode.h>
 
 #include <storage.h>
 #include <binarystore.h>
-
-#include <libxml/encoding.h>
 
 /* libc includes */
 #include <string.h>
@@ -92,7 +89,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* exported symbols symbols */
 const char *game_name = "eressea";
 int firstx = 0, firsty = 0;
-int enc_gamedata = XML_CHAR_ENCODING_UTF8;
+int enc_gamedata = ENCODING_UTF8;
 
 /* local symbols */
 static region *current_region;
@@ -280,8 +277,8 @@ int readorders(const char *filename)
     case P_LOCALE:
       {
         const char *s = getstrtoken();
-        if (f && find_locale(s)) {
-          f->locale = find_locale(s);
+        if (f && get_locale(s)) {
+          f->locale = get_locale(s);
         }
       }
       b = getbuf(F, enc_gamedata);
@@ -1264,7 +1261,7 @@ faction *readfaction(struct gamedata * data)
   }
 
   READ_STR(data->store, name, sizeof(name));
-  f->locale = find_locale(name);
+  f->locale = get_locale(name);
   READ_INT(data->store, &f->lastorders);
   READ_INT(data->store, &f->age);
   READ_STR(data->store, name, sizeof(name));
@@ -1884,7 +1881,7 @@ int writegame(const char *filename)
       write_ship_reference(sh, &store);
       WRITE_STR(&store, (const char *)sh->name);
       WRITE_STR(&store, sh->display ? (const char *)sh->display : "");
-      WRITE_TOK(&store, sh->type->name[0]);
+      WRITE_TOK(&store, sh->type->_name);
       WRITE_INT(&store, sh->size);
       WRITE_INT(&store, sh->damage);
       WRITE_INT(&store, sh->flags & SFL_SAVEMASK);

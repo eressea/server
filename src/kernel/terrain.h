@@ -35,7 +35,6 @@ extern "C" {
 #define FLY_INTO		     (1<<7)     /* man darf hierhin fliegen */
 #define SWIM_INTO		     (1<<8)     /* man darf hierhin schwimmen */
 #define WALK_INTO		     (1<<9)     /* man darf hierhin laufen */
-#define LARGE_SHIPS		   (1<<10)      /* grosse Schiffe dürfen hinfahren */
 
   typedef struct production_rule {
     char *name;
@@ -70,9 +69,9 @@ extern "C" {
     struct terrain_type *next;
   } terrain_type;
 
+  extern terrain_type *get_or_create_terrain(const char *name);
   extern const terrain_type *terrains(void);
-  extern void register_terrain(struct terrain_type *terrain);
-  extern const struct terrain_type *get_terrain(const char *name);
+  extern const terrain_type *get_terrain(const char *name);
   extern const char *terrain_name(const struct region *r);
 
   extern void init_terrains(void);

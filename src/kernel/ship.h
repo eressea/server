@@ -23,6 +23,7 @@ extern "C" {
 #endif
 
 #include "types.h"
+#include "direction.h"
 
 #define DAMAGE_SCALE 100        /* multiplier for sh->damage */
 
@@ -32,7 +33,7 @@ extern "C" {
 #define SFL_NOCOAST 0x04
 
   typedef struct ship_type {
-    const char *name[2];
+    const char *_name;
 
     int range;                  /* range in regions */
     int flags;                  /* flags */
@@ -63,8 +64,9 @@ extern "C" {
 
 /* Alte Schiffstypen: */
 
-  extern const ship_type *st_find(const char *name);
-  extern void st_register(const ship_type * type);
+  const ship_type *st_find(const char *name);
+  ship_type *st_get_or_create(const char *name);
+  void free_shiptypes(void);
 
 #define NOSHIP NULL
 
@@ -94,10 +96,10 @@ extern "C" {
     direction_t coast;
   } ship;
 
-  extern void damage_ship(struct ship * sh, double percent);
-  extern void ship_set_owner(struct unit * u);
-  extern struct unit *ship_owner(const struct ship *sh);
-  extern void ship_update_owner(struct ship * sh);
+  void damage_ship(struct ship * sh, double percent);
+  void ship_set_owner(struct unit * u);
+  struct unit *ship_owner(const struct ship *sh);
+  void ship_update_owner(struct ship * sh);
 
   extern const char *shipname(const struct ship *self);
   extern int shipcapacity(const struct ship *sh);

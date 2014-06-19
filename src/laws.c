@@ -23,14 +23,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <modules/gmcmd.h>
 #include <modules/wormhole.h>
 
-/* gamecode includes */
 #include "economy.h"
-#include "archetype.h"
 #include "monster.h"
 #include "randenc.h"
 #include "spy.h"
 #include "study.h"
 #include "market.h"
+#include "keyword.h"
 
 /* kernel includes */
 #include <kernel/alchemy.h>
@@ -45,7 +44,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/group.h>
 #include <kernel/item.h>
 #include <kernel/magic.h>
-#include <kernel/message.h>
+#include <kernel/messages.h>
 #include <kernel/move.h>
 #include <kernel/order.h>
 #include <kernel/plane.h>
@@ -81,7 +80,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <quicklist.h>
 #include <util/rand.h>
 #include <util/rng.h>
-#include <util/sql.h>
 #include <util/umlaut.h>
 #include <util/message.h>
 #include <util/rng.h>
@@ -1323,7 +1321,7 @@ static void do_contact(region * r)
   for (u = r->units; u; u = u->next) {
     order *ord;
     for (ord = u->orders; ord; ord = ord->next) {
-      keyword_t kwd = get_keyword(ord);
+      keyword_t kwd = getkeyword(ord);
       if (kwd == K_CONTACT) {
         contact_cmd(u, ord);
       }
@@ -1341,7 +1339,7 @@ void do_enter(struct region *r, bool is_final_attempt)
 
     while (*ordp) {
       order *ord = *ordp;
-      if (get_keyword(ord) == K_ENTER) {
+      if (getkeyword(ord) == K_ENTER) {
         param_t p;
         int id;
         unit *ulast = NULL;
@@ -1449,17 +1447,6 @@ static void remove_idle_players(void)
       char info[256];
       sprintf(info, "%d Einheiten, %d Personen, %d Silber",
         f->no_units, f->num_total, f->money);
-      if (f->subscription) {
-        sql_print(
-          ("UPDATE subscriptions SET lastturn=%d, info='%s' WHERE id=%u;\n",
-            f->lastorders, info, f->subscription));
-      }
-    } else {
-      if (f->subscription) {
-        sql_print(
-          ("UPDATE subscriptions SET status='ACTIVE', lastturn=%d, firstturn=greatest(firstturn,%d) WHERE id=%u;\n",
-            f->lastorders, f->lastorders - f->age, f->subscription));
-      }
     }
 
     if (NMRTimeout() > 0 && turn - f->lastorders >= (NMRTimeout() - 1)) {
@@ -1652,7 +1639,7 @@ static void init_prefixnames(void)
 {
   int i;
   for (i = 0; localenames[i]; ++i) {
-    const struct locale *lang = find_locale(localenames[i]);
+    const struct locale *lang = get_locale(localenames[i]);
     bool exist = false;
     struct local_names *in = pnames;
 
@@ -2001,7 +1988,7 @@ int name_cmd(struct unit *u, struct order *ord)
       } else {
         const struct locale *lang = locales;
         for (; lang; lang = nextlocale(lang)) {
-          const char *sdname = LOC(lang, sh->type->name[0]);
+          const char *sdname = LOC(lang, sh->type->_name);
           size_t sdlen = strlen(sdname);
           if (strlen(sh->name) >= sdlen
             && strncmp(sh->name, sdname, sdlen) == 0) {
@@ -2769,7 +2756,7 @@ int origin_cmd(unit * u, struct order *ord)
 
 int guard_off_cmd(unit * u, struct order *ord)
 {
-  assert(get_keyword(ord) == K_GUARD);
+  assert(getkeyword(ord) == K_GUARD);
   init_tokens(ord);
   skip_token();
 
@@ -2930,7 +2917,7 @@ void update_guards(void)
 
 int guard_on_cmd(unit * u, struct order *ord)
 {
-  assert(get_keyword(ord) == K_GUARD);
+  assert(getkeyword(ord) == K_GUARD);
 
   init_tokens(ord);
   skip_token();
@@ -3080,7 +3067,7 @@ void restack_units(void)
       if (!fval(u, UFL_MARK)) {
         struct order *ord;
         for (ord = u->orders; ord; ord = ord->next) {
-          if (get_keyword(ord) == K_SORT) {
+          if (getkeyword(ord) == K_SORT) {
             const char *s;
             param_t p;
             int id;
@@ -3269,14 +3256,11 @@ int renumber_cmd(unit * u, order * ord)
 
 static building *age_building(building * b)
 {
-  static bool init = false;
-  static const building_type *bt_blessed;
-  static const curse_type *ct_astralblock;
-  if (!init) {
-    init = true;
+    const struct building_type *bt_blessed;
+    const struct curse_type *ct_astralblock;
+
     bt_blessed = bt_find("blessedstonecircle");
     ct_astralblock = ct_find("astralblock");
-  }
 
   /* blesses stone circles create an astral protection in the astral region 
    * above the shield, which prevents chaos suction and other spells. 
@@ -3537,7 +3521,7 @@ void new_units(void)
 
       while (*ordp) {
         order *makeord = *ordp;
-        if (get_keyword(makeord) == K_MAKE) {
+        if (getkeyword(makeord) == K_MAKE) {
           init_tokens(makeord);
           skip_token();
           if (isparam(getstrtoken(), u->faction->locale, P_TEMP)) {
@@ -3564,7 +3548,7 @@ void new_units(void)
 
               while (*ordp) {
                 order *ord = *ordp;
-                if (get_keyword(ord) == K_END)
+                if (getkeyword(ord) == K_END)
                   break;
                 *ordp = ord->next;
                 ord->next = NULL;
@@ -3594,7 +3578,7 @@ void new_units(void)
             newordersp = &u2->orders;
             while (*ordp) {
               order *ord = *ordp;
-              if (get_keyword(ord) == K_END)
+              if (getkeyword(ord) == K_END)
                 break;
               *ordp = ord->next;
               ord->next = NULL;
@@ -3618,10 +3602,10 @@ void check_long_orders(unit * u)
   keyword_t otherorder = MAXKEYWORDS;
 
   for (ord = u->orders; ord; ord = ord->next) {
-    if (get_keyword(ord) == NOKEYWORD) {
+    if (getkeyword(ord) == NOKEYWORD) {
       cmistake(u, ord, 22, MSG_EVENT);
     } else if (is_long(ord)) {
-      keyword_t longorder = get_keyword(ord);
+      keyword_t longorder = getkeyword(ord);
       if (otherorder != MAXKEYWORDS) {
         switch (longorder) {
         case K_CAST:
@@ -3667,7 +3651,7 @@ void update_long_order(unit * u)
   }
   /* check all orders for a potential new long order this round: */
   for (ord = u->orders; ord; ord = ord->next) {
-    if (get_keyword(ord) == NOKEYWORD)
+    if (getkeyword(ord) == NOKEYWORD)
       continue;
 
     if (u->old_orders && is_repeated(ord)) {
@@ -3688,7 +3672,7 @@ void update_long_order(unit * u)
       }
       break;
     } else {
-      keyword_t keyword = get_keyword(ord);
+      keyword_t keyword = getkeyword(ord);
       switch (keyword) {
         /* Wenn gehandelt wird, darf kein langer Befehl ausgeführt
          * werden. Da Handel erst nach anderen langen Befehlen kommt,
@@ -3868,7 +3852,7 @@ void defaultorders(void)
 {
   region *r;
 
-  assert(!global.disabled[K_DEFAULT]);
+  assert(!keyword_disabled(K_DEFAULT));
   for (r = regions; r; r = r->next) {
     unit *u;
     for (u = r->units; u; u = u->next) {
@@ -3876,7 +3860,7 @@ void defaultorders(void)
       order **ordp = &u->orders;
       while (*ordp != NULL) {
         order *ord = *ordp;
-        if (get_keyword(ord) == K_DEFAULT) {
+        if (getkeyword(ord) == K_DEFAULT) {
           char lbuf[8192];
           order *new_order;
           init_tokens(ord);
@@ -4175,7 +4159,7 @@ void
 add_proc_order(int priority, keyword_t kword, int (*parser) (struct unit *,
     struct order *), unsigned int flags, const char *name)
 {
-  if (!global.disabled[kword]) {
+  if (!keyword_disabled(kword)) {
     processor *proc = add_proc(priority, name, PR_ORDER);
     if (proc) {
       proc->data.per_order.process = parser;
@@ -4274,7 +4258,7 @@ void process(void)
               ordp = &u->thisorder;
             while (*ordp) {
               order *ord = *ordp;
-              if (get_keyword(ord) == porder->data.per_order.kword) {
+              if (getkeyword(ord) == porder->data.per_order.kword) {
                 if (porder->flags & PROC_LONGORDER) {
                   if (u->number == 0) {
                     ord = NULL;
@@ -4431,7 +4415,7 @@ void do_siege(region * r)
     unit *u;
 
     for (u = r->units; u; u = u->next) {
-      if (get_keyword(u->thisorder) == K_BESIEGE) {
+      if (getkeyword(u->thisorder) == K_BESIEGE) {
         siege_cmd(u, u->thisorder);
       }
     }
@@ -4529,7 +4513,7 @@ void init_processor(void)
 
   add_proc_region(p, &do_battle, "Attackieren");
 
-  if (!global.disabled[K_BESIEGE]) {
+  if (!keyword_disabled(K_BESIEGE)) {
     p += 10;
     add_proc_region(p, &do_siege, "Belagern");
   }
@@ -4544,7 +4528,7 @@ void init_processor(void)
   add_proc_region(p, &economics, "Zerstoeren, Geben, Rekrutieren, Vergessen");
 
   p += 10;
-  if (!global.disabled[K_PAY]) {
+  if (!keyword_disabled(K_PAY)) {
     add_proc_order(p, K_PAY, &pay_cmd, 0, "Gebaeudeunterhalt (disable)");
   }
   add_proc_postregion(p, &maintain_buildings_1,
@@ -4553,7 +4537,7 @@ void init_processor(void)
   p += 10;                      /* QUIT fuer sich alleine */
   add_proc_global(p, quit, "Sterben");
 
-  if (!global.disabled[K_CAST]) {
+  if (!keyword_disabled(K_CAST)) {
     p += 10;
     add_proc_global(p, &magic, "Zaubern");
   }
@@ -4604,17 +4588,17 @@ void init_processor(void)
 
   add_proc_global(p, &monthly_healing, "Regeneration (HP)");
   add_proc_global(p, &regenerate_aura, "Regeneration (Aura)");
-  if (!global.disabled[K_DEFAULT]) {
+  if (!keyword_disabled(K_DEFAULT)) {
     add_proc_global(p, &defaultorders, "Defaults setzen");
   }
   add_proc_global(p, &demographics, "Nahrung, Seuchen, Wachstum, Wanderung");
 
-  if (!global.disabled[K_SORT]) {
+  if (!keyword_disabled(K_SORT)) {
     p += 10;
     add_proc_global(p, restack_units, "Einheiten sortieren");
   }
   add_proc_order(p, K_PROMOTION, &promotion_cmd, 0, "Heldenbefoerderung");
-  if (!global.disabled[K_NUMBER]) {
+  if (!keyword_disabled(K_NUMBER)) {
     add_proc_order(p, K_NUMBER, &renumber_cmd, 0, "Neue Nummern (Einheiten)");
     p += 10;
     add_proc_global(p, &renumber_factions, "Neue Nummern");
@@ -4715,9 +4699,6 @@ int init_data(const char *filename, const char *catalog)
   l = read_xml(filename, catalog);
   if (l)
     return l;
-
-  init_locales();
-  init_archetypes();
 
   if (turn < 0) {
     turn = first_turn;

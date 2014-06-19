@@ -25,9 +25,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* modules include */
 #include "score.h"
 
-/* attributes include */
-#include <attributes/giveitem.h>
-
 /* items include */
 #include <items/demonseye.h>
 
@@ -36,7 +33,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/magic.h>
-#include <kernel/message.h>
+#include <kernel/messages.h>
 #include <kernel/move.h>
 #include <kernel/order.h>
 #include <kernel/plane.h>
@@ -347,7 +344,7 @@ static void guardian_faction(plane * pl, int id)
     f->name = _strdup("Igjarjuks Kundschafter");
     f->race = new_race[RC_ILLUSION];
     f->age = turn;
-    f->locale = find_locale("de");
+    f->locale = get_locale("de");
     f->options =
       want(O_COMPRESS) | want(O_REPORT) | want(O_COMPUTER) | want(O_ADRESSEN) |
       want(O_DEBUG);
