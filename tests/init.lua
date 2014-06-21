@@ -5,4 +5,5 @@ require "tests.config"
 require "tests.locale"
 require "tests.regions"
 require "tests.ships"
+require "tests.study"
 
