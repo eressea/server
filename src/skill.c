@@ -90,7 +90,7 @@ skill_t findskill(const char *name)
 
 skill_t get_skill(const char *s, const struct locale * lang)
 {
-    param_t result = NOSKILL;
+    skill_t result = NOSKILL;
     char buffer[64];
     char * str = transliterate(buffer, sizeof(buffer)-sizeof(int), s);
     
