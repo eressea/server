@@ -50,7 +50,6 @@ without prior permission by the authors of Eressea.
 #include <kernel/reports.h>
 #include <kernel/resources.h>
 #include <kernel/ship.h>
-#include <kernel/skill.h>
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
 #include <kernel/teleport.h>
@@ -827,7 +826,7 @@ static void cr_output_unit(FILE * F, const region * r, const faction * f,       
     fprintf(F, "\"%s\";Typ\n",
       translate(zRace, locale_string(f->locale, zRace)));
     if (u->faction == f && irace != u_race(u)) {
-      assert(skill_enabled[SK_STEALTH]
+      assert(skill_enabled(SK_STEALTH)
         || !"we're resetting this on load, so.. ircase should never be used");
       zRace = rc_name(u_race(u), 1);
       fprintf(F, "\"%s\";wahrerTyp\n",
@@ -1298,7 +1297,7 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
           }
         }
         fprintf(F, "%d;Silber\n", rmoney(r));
-        if (skill_enabled[SK_ENTERTAINMENT]) {
+        if (skill_enabled(SK_ENTERTAINMENT)) {
           fprintf(F, "%d;Unterh\n", entertainmoney(r));
         }
         if (is_cursed(r->attribs, C_RIOT, 0)) {

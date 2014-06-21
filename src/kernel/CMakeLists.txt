@@ -49,7 +49,7 @@ reports.c
 resources.c
 save.c
 ship.c
-skill.c
+skills.c
 spellbook.c
 spell.c
 teleport.c

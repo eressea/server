@@ -5,7 +5,6 @@
 #include <kernel/item.h>
 #include <kernel/unit.h>
 #include <kernel/magic.h>
-#include <kernel/skill.h>
 #include <kernel/spell.h>
 
 #include <quicklist.h>
@@ -24,7 +23,7 @@ void test_equipment(CuTest * tc)
   
   test_cleanup();
   test_create_race("human");
-  skill_enabled[SK_MAGIC] = 1;
+  enable_skill(SK_MAGIC, true);
   it_horses = test_create_itemtype(names);
   CuAssertPtrNotNull(tc, it_horses);
   sp = create_spell("testspell", 0);

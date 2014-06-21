@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define H_KRNL_ITEM
 
 #include <util/variant.h>
+#include "skill.h"
 
 #ifdef __cplusplus
 extern "C" {

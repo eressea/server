@@ -416,29 +416,6 @@ const char *options[MAXOPTIONS] = {
   "SHOWSKCHANGE"
 };
 
-static int allied_skillcount(const faction * f, skill_t sk)
-{
-  int num = 0;
-  alliance *a = f_get_alliance(f);
-  quicklist *members = a->members;
-  int qi;
-
-  for (qi = 0; members; ql_advance(&members, &qi, 1)) {
-    faction *m = (faction *) ql_get(members, qi);
-    num += count_skill(m, sk);
-  }
-  return num;
-}
-
-static int allied_skilllimit(const faction * f, skill_t sk)
-{
-  static int value = -1;
-  if (value < 0) {
-    value = get_param_int(global.parameters, "alliance.skilllimit", 0);
-  }
-  return value;
-}
-
 static void init_maxmagicians(struct attrib *a)
 {
   a->data.i = MAXMAGICIANS;
@@ -447,21 +424,6 @@ static void init_maxmagicians(struct attrib *a)
 static attrib_type at_maxmagicians = {
   "maxmagicians",
   init_maxmagicians,
-  NULL,
-  NULL,
-  a_writeint,
-  a_readint,
-  ATF_UNIQUE
-};
-
-static void init_npcfaction(struct attrib *a)
-{
-  a->data.i = 1;
-}
-
-static attrib_type at_npcfaction = {
-  "npcfaction",
-  init_npcfaction,
   NULL,
   NULL,
   a_writeint,
@@ -483,46 +445,20 @@ int max_magicians(const faction * f)
   return m;
 }
 
-int skill_limit(faction * f, skill_t sk)
+static void init_npcfaction(struct attrib *a)
 {
-  int m = INT_MAX;
-  int al = allied_skilllimit(f, sk);
-  if (al > 0) {
-    if (sk != SK_ALCHEMY && sk != SK_MAGIC)
-      return INT_MAX;
-    if (f_get_alliance(f)) {
-      int ac = listlen(f->alliance->members);   /* number of factions */
-      int fl = (al + ac - 1) / ac;      /* faction limit, rounded up */
-      /* the faction limit may not be achievable because it would break the alliance-limit */
-      int sc = al - allied_skillcount(f, sk);
-      if (sc <= 0)
-        return 0;
-      return fl;
-    }
-  }
-  if (sk == SK_MAGIC) {
-    m = max_magicians(f);
-  } else if (sk == SK_ALCHEMY) {
-    m = get_param_int(global.parameters, "rules.maxskills.alchemy",
-      MAXALCHEMISTS);
-  }
-  return m;
+  a->data.i = 1;
 }
 
-int count_skill(faction * f, skill_t sk)
-{
-  int n = 0;
-  unit *u;
-
-  for (u = f->units; u; u = u->nextF) {
-    if (has_skill(u, sk)) {
-      if (!is_familiar(u)) {
-        n += u->number;
-      }
-    }
-  }
-  return n;
-}
+static attrib_type at_npcfaction = {
+  "npcfaction",
+  init_npcfaction,
+  NULL,
+  NULL,
+  a_writeint,
+  a_readint,
+  ATF_UNIQUE
+};
 
 int verbosity = 1;
 
@@ -738,17 +674,12 @@ region *findunitregion(const unit * su)
 #endif
 }
 
-int effskill(const unit * u, skill_t sk)
-{
-  return eff_skill(u, sk, u->region);
-}
-
 int eff_stealth(const unit * u, const region * r)
 {
   int e = 0;
 
   /* Auf Schiffen keine Tarnung! */
-  if (!u->ship && skill_enabled[SK_STEALTH]) {
+  if (!u->ship && skill_enabled(SK_STEALTH)) {
     e = eff_skill(u, SK_STEALTH, r);
 
     if (fval(u, UFL_STEALTH)) {
@@ -949,7 +880,7 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
 
   while (u2) {
     if (rings < u->number || invisible(u, u2) < u->number) {
-      if (skill_enabled[SK_PERCEPTION]) {
+      if (skill_enabled(SK_PERCEPTION)) {
         int observation = eff_skill(u2, SK_PERCEPTION, r);
 
         if (observation >= stealth) {
@@ -992,7 +923,7 @@ bool cansee_unit(const unit * u, const unit * target, int modifier)
     if (rings && invisible(target, u) >= target->number) {
       return false;
     }
-    if (skill_enabled[SK_PERCEPTION]) {
+    if (skill_enabled(SK_PERCEPTION)) {
       o = eff_skill(u, SK_PERCEPTION, target->region);
       if (o >= n) {
         return true;
@@ -1243,25 +1174,6 @@ int findoption(const char *s, const struct locale *lang)
     return (direction_t) token.i;
   }
   return NODIRECTION;
-}
-
-skill_t findskill(const char *s, const struct locale * lang)
-{
-  param_t result = NOSKILL;
-  char buffer[64];
-  char * str = transliterate(buffer, sizeof(buffer)-sizeof(int), s);
-
-  if (str) {
-    int i;
-    const void * match;
-    void **tokens = get_translations(lang, UT_SKILLS);
-    struct critbit_tree *cb = (critbit_tree *)*tokens;
-    if (cb && cb_find_prefix(cb, str, strlen(str), &match, 1, 0)) {
-      cb_get_kv(match, &i, sizeof(int));
-      result = (skill_t)i;
-    }
-  }
-  return result;
 }
 
 param_t findparam(const char *s, const struct locale * lang)
@@ -1626,7 +1538,7 @@ int lighthouse_range(const building * b, const faction * f)
   if (fval(b, BLD_WORKING) && b->size >= 10) {
     int maxd = (int)log10(b->size) + 1;
 
-    if (skill_enabled[SK_PERCEPTION]) {
+    if (skill_enabled(SK_PERCEPTION)) {
       region *r = b->region;
       int c = 0;
       unit *u;
@@ -1668,7 +1580,7 @@ bool check_leuchtturm(region * r, faction * f)
     if (fval(b, BLD_WORKING) && b->size >= 10) {
       int maxd = (int)log10(b->size) + 1;
 
-      if (skill_enabled[SK_PERCEPTION]) {
+      if (skill_enabled(SK_PERCEPTION)) {
         region *r2 = b->region;
         unit *u;
         int c = 0;
@@ -1837,12 +1749,6 @@ static const char * parameter_key(int i)
   return parameters[i];
 }
 
-static const char * skill_key(int sk)
-{
-  assert(sk<MAXPARAMS && sk>=0);
-  return skill_enabled[sk] ? mkname("skill", skillnames[sk]) : 0;
-}
-
 static void init_locale(const struct locale *lang)
 {
     variant var;
@@ -1884,7 +1790,6 @@ static void init_locale(const struct locale *lang)
     }
 
     init_translations(lang, UT_PARAMS, parameter_key, MAXPARAMS);
-    init_translations(lang, UT_SKILLS, skill_key, MAXSKILLS);
 
     tokens = get_translations(lang, UT_OPTIONS);
     for (i = 0; i != MAXOPTIONS; ++i) {

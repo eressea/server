@@ -192,7 +192,7 @@ static order_data *create_data(keyword_t kwd, const char *sptr, int lindex)
 
   /* learning, only one order_data per skill required */
   if (kwd == K_STUDY) {
-    skill_t sk = findskill(parse_token(&sptr), lang);
+    skill_t sk = get_skill(parse_token(&sptr), lang);
     switch (sk) {
     case NOSKILL:              /* fehler */
       break;

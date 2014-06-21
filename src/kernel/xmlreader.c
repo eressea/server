@@ -24,7 +24,7 @@ without prior permission by the authors of Eressea.
 #include "resources.h"
 #include "ship.h"
 #include "terrain.h"
-#include "skill.h"
+#include "skills.h"
 #include "spell.h"
 #include "spellbook.h"
 #include "calendar.h"
@@ -164,7 +164,7 @@ xml_readconstruction(xmlXPathContextPtr xpath, xmlNodeSetPtr nodeSet,
 
     propValue = xmlGetProp(node, BAD_CAST "skill");
     if (propValue != NULL) {
-      sk = sk_find((const char *)propValue);
+      sk = findskill((const char *)propValue);
       if (sk == NOSKILL) {
         log_error("construction requires skill '%s' that does not exist.\n", (const char *)propValue);
         xmlFree(propValue);
@@ -698,7 +698,7 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
 
   propValue = xmlGetProp(node, BAD_CAST "skill");
   assert(propValue != NULL);
-  sk = sk_find((const char *)propValue);
+  sk = findskill((const char *)propValue);
   assert(sk != NOSKILL);
   xmlFree(propValue);
 
@@ -1295,7 +1295,7 @@ static void add_skills(equipment * eq, xmlNodeSetPtr nsetSkills)
 
       propValue = xmlGetProp(node, BAD_CAST "name");
       assert(propValue != NULL);
-      sk = sk_find((const char *)propValue);
+      sk = findskill((const char *)propValue);
       if (sk == NOSKILL) {
         log_error("unknown skill '%s' in equipment-set %s\n", (const char *)propValue, eq->name);
         xmlFree(propValue);
@@ -1819,7 +1819,7 @@ static int parse_races(xmlDocPtr doc)
 
       propValue = xmlGetProp(node, BAD_CAST "name");
       assert(propValue != NULL);
-      sk = sk_find((const char *)propValue);
+      sk = findskill((const char *)propValue);
       if (sk != NOSKILL) {
         rc->bonus[sk] = (char)mod;
         if (speed) {
@@ -2324,8 +2324,11 @@ static int parse_main(xmlDocPtr doc)
     for (i = 0; i != nodes->nodeNr; ++i) {
       xmlNodePtr node = nodes->nodeTab[i];
       xmlChar *propName = xmlGetProp(node, BAD_CAST "name");
-      bool enable = xml_bvalue(node, "enable", true);
-      enable_skill((const char *)propName, enable);
+      skill_t sk = findskill((const char *)propName);
+      if (sk!=NOSKILL) {
+          bool enable = xml_bvalue(node, "enable", true);
+          enable_skill(sk, enable);
+      }
       xmlFree(propName);
     }
   }

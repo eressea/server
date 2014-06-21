@@ -21,7 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <util/variant.h>
 #include "types.h"
-
+#include "skills.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -155,11 +155,14 @@ extern "C" {
   struct unit *findnewunit(const struct region *r, const struct faction *f,
     int alias);
 
-  extern const char *u_description(const unit * u, const struct locale *lang);
-  extern struct skill *add_skill(struct unit *u, skill_t id);
-  extern void remove_skill(struct unit *u, skill_t sk);
-  extern struct skill *get_skill(const struct unit *u, skill_t id);
-  extern bool has_skill(const unit * u, skill_t sk);
+  const char *u_description(const unit * u, const struct locale *lang);
+  struct skill *add_skill(struct unit *u, skill_t id);
+  void remove_skill(struct unit *u, skill_t sk);
+  struct skill *unit_skill(const struct unit *u, skill_t id);
+  bool has_skill(const unit * u, skill_t sk);
+  int effskill(const struct unit *u, skill_t sk);
+  int produceexp(struct unit *u, skill_t sk, int n);
+  int SkillCap(skill_t sk);
 
   extern void set_level(struct unit *u, skill_t id, int level);
   extern int get_level(const struct unit *u, skill_t id);

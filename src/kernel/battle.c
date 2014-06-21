@@ -980,7 +980,7 @@ void drain_exp(struct unit *u, int n)
     }
   }
   if (sk != NOSKILL) {
-    skill *sv = get_skill(u, sk);
+    skill *sv = unit_skill(u, sk);
     while (n > 0) {
       if (n >= 30 * u->number) {
         reduce_skill(u, sv, 1);

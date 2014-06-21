@@ -16,7 +16,6 @@
 #include <kernel/pool.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
-#include <kernel/skill.h>
 #include <kernel/spell.h>
 #include <kernel/unit.h>
 
@@ -41,8 +40,8 @@ use_studypotion(struct unit *u, const struct item_type *itype, int amount,
 
     init_tokens(u->thisorder);
     skip_token();
-    sk = findskill(getstrtoken(), u->faction->locale);
-    sv = get_skill(u, sk);
+    sk = get_skill(getstrtoken(), u->faction->locale);
+    sv = unit_skill(u, sk);
 
     if (sv && sv->level > 2) {
       /* TODO: message */

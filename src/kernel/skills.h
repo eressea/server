@@ -12,6 +12,9 @@
 
 #ifndef H_KRNL_SKILL
 #define H_KRNL_SKILL
+
+#include <skill.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -46,9 +49,6 @@ extern "C" {
   extern struct attrib *make_skillmod(skill_t sk, unsigned int flags,
     skillmod_fun special, double multiplier, int bonus);
 
-  extern const char *skillname(skill_t, const struct locale *);
-  extern skill_t sk_find(const char *name);
-  extern void enable_skill(const char *name, bool value);
   extern int level_days(int level);
   extern int level(int days);
 
@@ -58,9 +58,6 @@ extern "C" {
   extern int skill_compare(const skill * sk, const skill * sc);
 
   extern void sk_set(skill * sv, int level);
-
-  extern const char *skillnames[];
-  extern bool skill_enabled[];
 
 #ifdef __cplusplus
 }

@@ -132,15 +132,12 @@ extern "C" {
 /* parteinummern */
   bool faction_id_is_unused(int);
 
+int max_magicians(const struct faction * f);
 /* leuchtturm */
   bool check_leuchtturm(struct region *r, struct faction *f);
   void update_lighthouse(struct building *lh);
   int lighthouse_range(const struct building *b,
     const struct faction *f);
-
-/* skills */
-  int skill_limit(struct faction *f, skill_t sk);
-  int count_skill(struct faction *f, skill_t sk);
 
   int findoption(const char *s, const struct locale *lang);
 
@@ -156,8 +153,6 @@ extern "C" {
   int getint(void);
 
   const char *igetstrtoken(const char *s);
-
-  skill_t findskill(const char *s, const struct locale *lang);
 
   param_t findparam(const char *s, const struct locale *lang);
   param_t findparam_ex(const char *s, const struct locale * lang);
@@ -183,7 +178,6 @@ extern "C" {
     int modifier);
   bool seefaction(const struct faction *f, const struct region *r,
     const struct unit *u, int modifier);
-  int effskill(const struct unit *u, skill_t sk);
 
   int lovar(double xpct_x2);
   /* returns a value between [0..xpct_2], generated with two dice */
@@ -402,8 +396,6 @@ extern "C" {
   } settings;
   extern settings global;
 
-  int produceexp(struct unit *u, skill_t sk, int n);
-
   extern bool battledebug;
   extern bool sqlpatch;
   extern bool lomem;         /* save memory */
@@ -418,7 +410,6 @@ extern "C" {
   bool ExpensiveMigrants(void);
   int NMRTimeout(void);
   int LongHunger(const struct unit *u);
-  int SkillCap(skill_t sk);
   int NewbieImmunity(void);
   bool IsImmune(const struct faction *f);
   int AllianceAuto(void);        /* flags that allied factions get automatically */

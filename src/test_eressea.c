@@ -26,6 +26,7 @@ CuSuite *get_functions_suite(void);
 CuSuite *get_umlaut_suite(void);
 CuSuite *get_ally_suite(void);
 CuSuite *get_direction_suite(void);
+CuSuite *get_skill_suite(void);
 CuSuite *get_keyword_suite(void);
 
 int RunAllTests(void)
@@ -41,6 +42,7 @@ int RunAllTests(void)
   CuSuiteAddSuite(suite, get_json_suite());
   CuSuiteAddSuite(suite, get_jsonconf_suite());
   CuSuiteAddSuite(suite, get_direction_suite());
+  CuSuiteAddSuite(suite, get_skill_suite());
   CuSuiteAddSuite(suite, get_keyword_suite());
   /* util */
   CuSuiteAddSuite(suite, get_base36_suite());

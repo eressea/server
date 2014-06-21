@@ -57,6 +57,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <limits.h>
 
 faction *factions;
 
@@ -518,3 +519,68 @@ struct spellbook * faction_get_spellbook(struct faction *f)
   }
   return 0;
 }
+
+static int allied_skillcount(const faction * f, skill_t sk)
+{
+  int num = 0;
+  alliance *a = f_get_alliance(f);
+  quicklist *members = a->members;
+  int qi;
+
+  for (qi = 0; members; ql_advance(&members, &qi, 1)) {
+    faction *m = (faction *) ql_get(members, qi);
+    num += count_skill(m, sk);
+  }
+  return num;
+}
+
+static int allied_skilllimit(const faction * f, skill_t sk)
+{
+  static int value = -1;
+  if (value < 0) {
+    value = get_param_int(global.parameters, "alliance.skilllimit", 0);
+  }
+  return value;
+}
+
+int count_skill(faction * f, skill_t sk)
+{
+  int n = 0;
+  unit *u;
+
+  for (u = f->units; u; u = u->nextF) {
+    if (has_skill(u, sk)) {
+      if (!is_familiar(u)) {
+        n += u->number;
+      }
+    }
+  }
+  return n;
+}
+
+int skill_limit(faction * f, skill_t sk)
+{
+  int m = INT_MAX;
+  int al = allied_skilllimit(f, sk);
+  if (al > 0) {
+    if (sk != SK_ALCHEMY && sk != SK_MAGIC)
+      return INT_MAX;
+    if (f_get_alliance(f)) {
+      int ac = listlen(f->alliance->members);   /* number of factions */
+      int fl = (al + ac - 1) / ac;      /* faction limit, rounded up */
+      /* the faction limit may not be achievable because it would break the alliance-limit */
+      int sc = al - allied_skillcount(f, sk);
+      if (sc <= 0)
+        return 0;
+      return fl;
+    }
+  }
+  if (sk == SK_MAGIC) {
+    m = max_magicians(f);
+  } else if (sk == SK_ALCHEMY) {
+    m = get_param_int(global.parameters, "rules.maxskills.alchemy",
+      MAXALCHEMISTS);
+  }
+  return m;
+}
+

@@ -19,6 +19,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifndef H_KRNL_STUDY
 #define H_KRNL_STUDY
 
+#include "skill.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

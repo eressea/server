@@ -60,7 +60,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/resources.h>
 #include <kernel/save.h>
 #include <kernel/ship.h>
-#include <kernel/skill.h>
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
 #include <kernel/teleport.h>
@@ -1292,7 +1291,7 @@ static void statistics(FILE * F, const region * r, const faction * f)
   rnl(F);
 
   /* Region */
-  if (skill_enabled[SK_ENTERTAINMENT] && fval(r->terrain, LAND_REGION)
+  if (skill_enabled(SK_ENTERTAINMENT) && fval(r->terrain, LAND_REGION)
     && rmoney(r)) {
     m = msg_message("nr_stat_maxentertainment", "max", entertainmoney(r));
     nr_render(m, f->locale, buf, sizeof(buf), f);

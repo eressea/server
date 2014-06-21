@@ -21,6 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "types.h"
 #include "direction.h"
+#include "skill.h"
 
 #ifdef __cplusplus
 extern "C" {

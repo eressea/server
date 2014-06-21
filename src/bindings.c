@@ -30,7 +30,6 @@ without prior permission by the authors of Eressea.
 #include <kernel/alliance.h>
 #include <kernel/building.h>
 #include <kernel/curse.h>
-#include <kernel/skill.h>
 #include <kernel/equipment.h>
 #include <kernel/calendar.h>
 #include <kernel/unit.h>
@@ -376,7 +375,7 @@ static int tolua_learn_skill(lua_State * L)
   unit *u = (unit *) tolua_tousertype(L, 1, 0);
   const char *skname = tolua_tostring(L, 2, 0);
   float chances = (float)tolua_tonumber(L, 3, 0);
-  skill_t sk = sk_find(skname);
+  skill_t sk = findskill(skname);
   if (sk != NOSKILL) {
     learn_skill(u, sk, chances);
   }

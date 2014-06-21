@@ -25,7 +25,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/faction.h>
 #include <kernel/magic.h>
 #include <kernel/messages.h>
-#include <kernel/skill.h>
 #include <kernel/spell.h>
 #include <kernel/unit.h>
 

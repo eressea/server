@@ -206,7 +206,7 @@ static int tagbegin(xml_stack * stack)
   } else {
     dungeon *d = (dungeon *) stack->state;
     if (strcmp(tag->name, "skilllimit") == 0) {
-      skill_t sk = sk_find(xml_value(tag, "name"));
+      skill_t sk = findskill(xml_value(tag, "name"));
       if (sk != NOSKILL) {
         skilllimit *skl = calloc(sizeof(skilllimit), 1);
         skl->skill = sk;

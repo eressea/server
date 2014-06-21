@@ -22,6 +22,10 @@ void init_keyword(const struct locale *lang, keyword_t kwd, const char *str) {
     add_translation(cb, str, (int)kwd);
 }
 
+void init_keywords(const struct locale *lang) {
+    init_translations(lang, UT_KEYWORDS, keyword_key, MAXKEYWORDS);
+}
+
 keyword_t findkeyword(const char *s) {
     int i;
     for (i=0;i!=MAXKEYWORDS;++i) {
@@ -30,11 +34,6 @@ keyword_t findkeyword(const char *s) {
         }
     }
     return NOKEYWORD;
-}
-
-
-void init_keywords(const struct locale *lang) {
-    init_translations(lang, UT_KEYWORDS, keyword_key, MAXKEYWORDS);
 }
 
 keyword_t get_keyword(const char *s, const struct locale *lang) {

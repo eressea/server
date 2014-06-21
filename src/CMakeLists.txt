@@ -60,6 +60,7 @@ set (ERESSEA_SRC
   eressea.c
   direction.c
   keyword.c
+  skill.c
   json.c
   creation.c
   creport.c
@@ -146,6 +147,7 @@ set(TESTS_SRC
   tests.test.c
   direction.test.c
   keyword.test.c
+  skill.test.c
   json.test.c
   economy.test.c
   market.test.c

@@ -21,7 +21,6 @@
 #include <kernel/messages.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/skill.h>
 #include <kernel/unit.h>
 
 /* util includes */

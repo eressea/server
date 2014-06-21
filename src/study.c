@@ -36,7 +36,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/pool.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/skill.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 
@@ -60,7 +59,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 static skill_t getskill(const struct locale *lang)
 {
-  return findskill(getstrtoken(), lang);
+  return get_skill(getstrtoken(), lang);
 }
 
 magic_t getmagicskill(const struct locale * lang)
@@ -163,7 +162,7 @@ static int study_days(unit * student, skill_t sk)
   if (u_race(student)->study_speed) {
     speed += u_race(student)->study_speed[sk];
     if (speed < 30) {
-      skill *sv = get_skill(student, sk);
+      skill *sv = unit_skill(student, sk);
       if (sv == 0) {
         speed = 30;
       }
@@ -566,7 +565,7 @@ int learn_cmd(unit * u, order * ord)
     return 0;
   }
   if (learn_newskills == 0) {
-    skill *sv = get_skill(u, sk);
+    skill *sv = unit_skill(u, sk);
     if (sv == NULL) {
       /* we can only learn skills we already have */
       cmistake(u, ord, 771, MSG_EVENT);

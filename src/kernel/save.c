@@ -664,7 +664,7 @@ unit *read_unit(struct gamedata *data)
   } else {
     READ_TOK(data->store, rname, sizeof(rname));
   }
-  if (rname[0] && skill_enabled[SK_STEALTH])
+  if (rname[0] && skill_enabled(SK_STEALTH))
     u->irace = rc_find(rname);
   else
     u->irace = NULL;

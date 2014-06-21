@@ -18,6 +18,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #ifndef H_KRNL_FACTION
 #define H_KRNL_FACTION
+
+#include "skill.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -111,6 +114,8 @@ extern "C" {
 
   extern struct faction *factions;
 
+  int max_magicians(const faction * f);
+
   extern const struct unit *random_unit_in_faction(const struct faction *f);
   extern const char *factionname(const struct faction *f);
   extern struct unit *addplayer(struct region *r, faction * f);
@@ -151,6 +156,11 @@ extern "C" {
   bool valid_race(const struct faction *f, const struct race *rc);
 
   struct spellbook * faction_get_spellbook(struct faction *f);
+
+/* skills */
+  int skill_limit(struct faction *f, skill_t sk);
+  int count_skill(struct faction *f, skill_t sk);
+
 #ifdef __cplusplus
 }
 #endif

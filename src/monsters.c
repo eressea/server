@@ -48,7 +48,6 @@
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/reports.h>
-#include <kernel/skill.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
@@ -729,7 +728,7 @@ static order *plan_dragon(unit * u)
   if (long_order == NULL) {
     skill_t sk = SK_PERCEPTION;
     /* study perception (or a random useful skill) */
-    while (!skill_enabled[sk] || u_race(u)->bonus[sk] < -5) {
+    while (!skill_enabled(sk) || u_race(u)->bonus[sk] < -5) {
       sk = (skill_t) (rng_int() % MAXSKILLS);
     }
     long_order = create_order(K_STUDY, u->faction->locale, "'%s'",
@@ -768,7 +767,7 @@ void plan_monsters(faction * f)
         setstatus(u, ST_FIGHT);
         /* all monsters fight */
       }
-      if (skill_enabled[SK_PERCEPTION]) {
+      if (skill_enabled(SK_PERCEPTION)) {
         /* Monster bekommen jede Runde ein paar Tage Wahrnehmung dazu */
         /* TODO: this only works for playerrace */
         produceexp(u, SK_PERCEPTION, u->number);

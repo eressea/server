@@ -46,7 +46,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/reports.h>
 #include <kernel/resources.h>
 #include <kernel/ship.h>
-#include <kernel/skill.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
@@ -192,7 +191,7 @@ static void expandorders(region * r, request * requests)
 
 static void change_level(unit * u, skill_t sk, int bylevel)
 {
-  skill *sv = get_skill(u, sk);
+  skill *sv = unit_skill(u, sk);
   assert(bylevel > 0);
   if (sv == 0)
     sv = add_skill(u, sk);
@@ -968,7 +967,7 @@ static int forget_cmd(unit * u, order * ord)
   skip_token();
   s = getstrtoken();
 
-  if ((sk = findskill(s, u->faction->locale)) != NOSKILL) {
+  if ((sk = get_skill(s, u->faction->locale)) != NOSKILL) {
     ADDMSG(&u->faction->msgs, msg_message("forget", "unit skill", u, sk));
     set_level(u, sk, 0);
   }
@@ -2762,7 +2761,7 @@ static void steal_cmd(unit * u, struct order *ord, request ** stealorders)
   faction *f = NULL;
   plane *pl;
 
-  assert(skill_enabled[SK_PERCEPTION] && skill_enabled[SK_STEALTH]);
+  assert(skill_enabled(SK_PERCEPTION) && skill_enabled(SK_STEALTH));
 
   if (!fval(u_race(u), RCF_CANSTEAL)) {
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "race_nosteal", "race",

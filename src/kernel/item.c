@@ -919,7 +919,7 @@ use_magicboost(struct unit *user, const struct item_type *itype, int amount,
     user->number);
 
   a_add(&f->attribs, make_key(atoi36("mbst")));
-  set_level(user, sk_find("magic"), 3);
+  set_level(user, findskill("magic"), 3);
 
   ADDMSG(&user->faction->msgs, msg_message("use_item",
       "unit item", user, itype->rtype));

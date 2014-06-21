@@ -19,7 +19,6 @@
 #include <kernel/curse.h>
 #include <kernel/messages.h>
 #include <kernel/race.h>
-#include <kernel/skill.h>
 #include <kernel/unit.h>
 #include <kernel/faction.h>
 #include <kernel/objtypes.h>

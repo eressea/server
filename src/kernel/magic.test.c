@@ -5,7 +5,6 @@
 #include <kernel/item.h>
 #include <kernel/magic.h>
 #include <kernel/region.h>
-#include <kernel/skill.h>
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
 #include <kernel/unit.h>
@@ -174,7 +173,7 @@ void test_getspell_unit(CuTest * tc)
   f = test_create_faction(0);
   u = test_create_unit(f, r);
   create_mage(u, M_GRAY);
-  skill_enabled[SK_MAGIC] = 1;
+  enable_skill(SK_MAGIC, true);
 
   set_level(u, SK_MAGIC, 1);
 
@@ -203,7 +202,7 @@ void test_getspell_faction(CuTest * tc)
   f->magiegebiet = M_TYBIED;
   u = test_create_unit(f, r);
   create_mage(u, f->magiegebiet);
-  skill_enabled[SK_MAGIC] = 1;
+  enable_skill(SK_MAGIC, true);
 
   set_level(u, SK_MAGIC, 1);
 
@@ -234,7 +233,7 @@ void test_getspell_school(CuTest * tc)
   f->magiegebiet = M_TYBIED;
   u = test_create_unit(f, r);
   create_mage(u, f->magiegebiet);
-  skill_enabled[SK_MAGIC] = 1;
+  enable_skill(SK_MAGIC, true);
   set_level(u, SK_MAGIC, 1);
 
   lang = get_locale("de");
@@ -263,7 +262,7 @@ void test_set_pre_combatspell(CuTest * tc)
   f = test_create_faction(0);
   f->magiegebiet = M_TYBIED;
   u = test_create_unit(f, r);
-  skill_enabled[SK_MAGIC] = 1;
+  enable_skill(SK_MAGIC, true);
   set_level(u, SK_MAGIC, 1);
   sp = create_spell("testspell", 0);
   sp->sptyp |= PRECOMBATSPELL;
@@ -295,7 +294,7 @@ void test_set_main_combatspell(CuTest * tc)
   f = test_create_faction(0);
   f->magiegebiet = M_TYBIED;
   u = test_create_unit(f, r);
-  skill_enabled[SK_MAGIC] = 1;
+  enable_skill(SK_MAGIC, true);
   set_level(u, SK_MAGIC, 1);
   sp = create_spell("testspell", 0);
   sp->sptyp |= COMBATSPELL;
@@ -327,7 +326,7 @@ void test_set_post_combatspell(CuTest * tc)
   f = test_create_faction(0);
   f->magiegebiet = M_TYBIED;
   u = test_create_unit(f, r);
-  skill_enabled[SK_MAGIC] = 1;
+  enable_skill(SK_MAGIC, true);
   set_level(u, SK_MAGIC, 1);
   sp = create_spell("testspell", 0);
   sp->sptyp |= POSTCOMBATSPELL;
@@ -358,7 +357,7 @@ void test_hasspell(CuTest * tc)
   f = test_create_faction(0);
   f->magiegebiet = M_TYBIED;
   u = test_create_unit(f, r);
-  skill_enabled[SK_MAGIC] = 1;
+  enable_skill(SK_MAGIC, true);
   sp = create_spell("testspell", 0);
   sp->sptyp |= POSTCOMBATSPELL;
 

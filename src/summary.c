@@ -24,7 +24,6 @@
 #include <kernel/region.h>
 #include <kernel/reports.h>
 #include <kernel/save.h>
-#include <kernel/skill.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>

@@ -41,76 +41,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 
-const char *skillnames[MAXSKILLS] = {
-  "alchemy",
-  "crossbow",
-  "mining",
-  "bow",
-  "building",
-  "trade",
-  "forestry",
-  "catapult",
-  "herbalism",
-  "magic",
-  "training",
-  "riding",
-  "armorer",
-  "shipcraft",
-  "melee",
-  "sailing",
-  "polearm",
-  "espionage",
-  "quarrying",
-  "roadwork",
-  "tactics",
-  "stealth",
-  "entertainment",
-  "weaponsmithing",
-  "cartmaking",
-  "perception",
-  "taxation",
-  "stamina",
-  "unarmed"
-};
-
-bool skill_enabled[MAXSKILLS];
-
-const char *skillname(skill_t sk, const struct locale *lang)
-{
-  if (skill_enabled[sk]) {
-    return locale_string(lang, mkname("skill", skillnames[sk]));
-  }
-  return NULL;
-}
-
-void enable_skill(const char *skname, bool value)
-{
-  skill_t sk;
-  for (sk = 0; sk != MAXSKILLS; ++sk) {
-    if (strcmp(skillnames[sk], skname) == 0) {
-      skill_enabled[sk] = value;
-      return;
-    }
-  }
-  log_error("Trying to set unknown skill %s to %u", skname, value);
-}
-
-skill_t sk_find(const char *name)
-{
-  skill_t i;
-  if (name == NULL)
-    return NOSKILL;
-  if (strncmp(name, "sk_", 3) == 0)
-    name += 3;
-  for (i = 0; i != MAXSKILLS; ++i) {
-    if (skill_enabled[i]) {
-      if (strcmp(name, skillnames[i]) == 0)
-        return i;
-    }
-  }
-  return NOSKILL;
-}
-
 /** skillmod attribut **/
 static void init_skillmod(attrib * a)
 {
@@ -223,7 +153,7 @@ int rc_skillmod(const struct race *rc, const region * r, skill_t sk)
 {
   int mods = 0;
 
-  if (!skill_enabled[sk]) {
+  if (!skill_enabled(sk)) {
     return 0;
   }
 #ifdef FASTER_SKILLMOD

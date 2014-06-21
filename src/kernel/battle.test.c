@@ -26,8 +26,8 @@ static void test_make_fighter(CuTest * tc)
   r = findregion(0, 0);
   f = test_create_faction(rc_find("human"));
   au = test_create_unit(f, r);
-  skill_enabled[SK_MAGIC] = 1;
-  skill_enabled[SK_RIDING] = 1;
+  enable_skill(SK_MAGIC, true);
+  enable_skill(SK_RIDING, true);
   set_level(au, SK_MAGIC, 3);
   set_level(au, SK_RIDING, 3);
   au->status = ST_BEHIND;

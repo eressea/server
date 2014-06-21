@@ -23,7 +23,8 @@ extern "C" {
 #endif
 
 #include "magic.h"              /* wegen MAXMAGIETYP */
-
+#include "skill.h"
+    
 #define AT_NONE 0
 #define AT_STANDARD	1
 #define AT_DRAIN_EXP 2

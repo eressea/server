@@ -46,7 +46,6 @@
 #include <kernel/region.h>
 #include <kernel/save.h>
 #include <kernel/ship.h>
-#include <kernel/skill.h>
 #include <kernel/spell.h>
 #include <kernel/teleport.h>
 #include <kernel/terrain.h>
@@ -562,12 +561,12 @@ static int sp_summon_familiar(castorder * co)
   dh = 0;
   dh1 = 0;
   for (sk = 0; sk < MAXSKILLS; ++sk) {
-    if (skill_enabled[sk] && rc->bonus[sk] > -5)
+    if (skill_enabled(sk) && rc->bonus[sk] > -5)
       dh++;
   }
 
   for (sk = 0; sk < MAXSKILLS; sk++) {
-    if (skill_enabled[sk] && rc->bonus[sk] > -5) {
+    if (skill_enabled(sk) && rc->bonus[sk] > -5) {
       dh--;
       if (dh1 == 0) {
         dh1 = 1;

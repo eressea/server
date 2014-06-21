@@ -31,7 +31,6 @@
 #include <kernel/spell.h>
 #include <kernel/spellid.h>
 #include <kernel/race.h>
-#include <kernel/skill.h>
 #include <kernel/terrain.h>
 
 /* util includes */
@@ -596,7 +595,7 @@ int sp_mindblast(struct castorder * co)
       if (!is_magic_resistant(mage, du, 0)) {
         skill_t sk = random_skill(du, false);
         if (sk != NOSKILL) {
-          skill *sv = get_skill(du, sk);
+          skill *sv = unit_skill(du, sk);
           int n = 1 + rng_int() % 3;
 
           reduce_skill(du, sv, n);

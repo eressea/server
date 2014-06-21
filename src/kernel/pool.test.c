@@ -21,7 +21,7 @@ void test_change_resource(CuTest * tc)
 
   test_cleanup();
   test_create_world();
-  skill_enabled[SK_MAGIC] = 1;
+  enable_skill(SK_MAGIC, true);
 
   r = findregion(0, 0);
   f = test_create_faction(0);

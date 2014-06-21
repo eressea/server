@@ -679,7 +679,7 @@ attrib_type at_stealth = {
 
 void u_seteffstealth(unit * u, int value)
 {
-  if (skill_enabled[SK_STEALTH]) {
+  if (skill_enabled(SK_STEALTH)) {
     attrib *a = NULL;
     if (fval(u, UFL_STEALTH)) {
       a = a_find(u->attribs, &at_stealth);
@@ -701,7 +701,7 @@ void u_seteffstealth(unit * u, int value)
 
 int u_geteffstealth(const struct unit *u)
 {
-  if (skill_enabled[SK_STEALTH]) {
+  if (skill_enabled(SK_STEALTH)) {
     if (fval(u, UFL_STEALTH)) {
       attrib *a = a_find(u->attribs, &at_stealth);
       if (a != NULL)
@@ -713,7 +713,7 @@ int u_geteffstealth(const struct unit *u)
 
 int get_level(const unit * u, skill_t id)
 {
-  if (skill_enabled[id]) {
+  if (skill_enabled(id)) {
     skill *sv = u->skills;
     while (sv != u->skills + u->skill_size) {
       if (sv->id == id) {
@@ -729,7 +729,7 @@ void set_level(unit * u, skill_t sk, int value)
 {
   skill *sv = u->skills;
 
-  if (!skill_enabled[sk])
+  if (!skill_enabled(sk))
     return;
 
   if (value == 0) {
@@ -939,8 +939,8 @@ void transfermen(unit * u, unit * u2, int n)
     for (sk = 0; sk != MAXSKILLS; ++sk) {
       int weeks, level = 0;
 
-      sv = get_skill(u, sk);
-      sn = get_skill(u2, sk);
+      sv = unit_skill(u, sk);
+      sn = unit_skill(u2, sk);
 
       if (sv == NULL && sn == NULL)
         continue;
@@ -1185,7 +1185,7 @@ skill *add_skill(unit * u, skill_t id)
   return sv;
 }
 
-skill *get_skill(const unit * u, skill_t sk)
+skill *unit_skill(const unit * u, skill_t sk)
 {
   skill *sv = u->skills;
   while (sv != u->skills + u->skill_size) {
@@ -1326,7 +1326,7 @@ get_modifier(const unit * u, skill_t sk, int level, const region * r,
 
 int eff_skill(const unit * u, skill_t sk, const region * r)
 {
-  if (skill_enabled[sk]) {
+  if (skill_enabled(sk)) {
     int level = get_level(u, sk);
     if (level > 0) {
       int mlevel = level + get_modifier(u, sk, level, r, false);
@@ -1740,7 +1740,7 @@ void scale_number(unit * u, int n)
 
 const struct race *u_irace(const struct unit *u)
 {
-  if (u->irace && skill_enabled[SK_STEALTH]) {
+  if (u->irace && skill_enabled(SK_STEALTH)) {
     return u->irace;
   }
   return u->race_;
@@ -1784,3 +1784,9 @@ struct spellbook * unit_get_spellbook(const struct unit * u)
   }
   return 0;
 }
+
+int effskill(const unit * u, skill_t sk)
+{
+  return eff_skill(u, sk, u->region);
+}
+
