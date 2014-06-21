@@ -1778,6 +1778,7 @@ static void init_locale(const struct locale *lang)
 
     init_directions(lang);
     init_keywords(lang);
+    init_skills(lang);
 
     tokens = get_translations(lang, UT_RACES);
     for (rc = races; rc; rc = rc->next) {
