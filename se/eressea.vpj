@@ -346,7 +346,8 @@
             <F N="../src/kernel/ship.c"/>
             <F N="../src/spells/shipcurse.c"/>
             <F N="../src/triggers/shock.c"/>
-            <F N="../src/kernel/skill.c"/>
+            <F N="../src/skill.c"/>
+            <F N="../src/kernel/skills.c"/>
             <F N="../src/items/speedsail.c"/>
             <F N="../src/kernel/spell.c"/>
             <F N="../src/kernel/spellbook.c"/>
@@ -505,7 +506,8 @@
             <F N="../src/kernel/ship.h"/>
             <F N="../src/spells/shipcurse.h"/>
             <F N="../src/triggers/shock.h"/>
-            <F N="../src/kernel/skill.h"/>
+            <F N="../src/skill.h"/>
+            <F N="../src/kernel/skills.h"/>
             <F N="../src/items/speedsail.h"/>
             <F N="../src/kernel/spell.h"/>
             <F N="../src/kernel/spellbook.h"/>

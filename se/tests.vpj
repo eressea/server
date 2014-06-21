@@ -248,12 +248,12 @@
             <F N="../src/kernel/curse.test.c"/>
             <F N="../src/direction.test.c"/>
             <F N="../src/economy.test.c"/>
-            <F N="../src/keyword.test.c"/>
             <F N="../src/kernel/equipment.test.c"/>
             <F N="../src/util/functions.test.c"/>
             <F N="../src/kernel/item.test.c"/>
             <F N="../src/json.test.c"/>
             <F N="../src/kernel/jsonconf.test.c"/>
+            <F N="../src/keyword.test.c"/>
             <F N="../src/laws.test.c"/>
             <F N="../src/kernel/magic.test.c"/>
             <F N="../src/market.test.c"/>
@@ -261,6 +261,7 @@
             <F N="../src/kernel/pool.test.c"/>
             <F N="../src/kernel/reports.test.c"/>
             <F N="../src/kernel/ship.test.c"/>
+            <F N="../src/skill.test.c"/>
             <F N="../src/kernel/spell.test.c"/>
             <F N="../src/kernel/spellbook.test.c"/>
             <F N="../src/test_eressea.c"/>
@@ -282,6 +283,7 @@
             Name="Other Files"
             Filters="">
             <F N="../tests/config.lua"/>
+            <F N="../src/game.pkg"/>
             <F N="../tests/init.lua"/>
             <F N="../tests/locale.lua"/>
             <F N="../tests/regions.lua"/>
