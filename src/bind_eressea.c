@@ -29,7 +29,7 @@ int eressea_read_orders(const char * filename) {
   return readorders(filename);
 }
 
-int eressea_export_json(const char * filename, unsigned int flags) {
+int eressea_export_json(const char * filename, int flags) {
     FILE *F = fopen(filename, "wt");
     if (F) {
         stream out = { 0 };

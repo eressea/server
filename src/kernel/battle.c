@@ -2616,7 +2616,6 @@ static void reorder_fleeing(region * r)
 
 static void aftermath(battle * b)
 {
-  int i;
   region *r = b->region;
   ship *sh;
   side *s;
@@ -2631,20 +2630,6 @@ static void aftermath(battle * b)
     for (df = s->fighters; df; df = df->next) {
       unit *du = df->unit;
       int dead = dead_fighters(df);
-      int pr_mercy = 0;
-
-      /* Regeneration durch PR_MERCY */
-      if (dead > 0 && pr_mercy) {
-        for (i = 0; i != dead; ++i) {
-          if (rng_int() % 100 < pr_mercy) {
-            ++df->alive;
-            ++s->alive;
-            ++s->battle->alive;
-            /* do not change dead here, or loop will not terminate! recalculate later */
-          }
-        }
-        dead = dead_fighters(df);
-      }
 
       /* tote insgesamt: */
       s->dead += dead;

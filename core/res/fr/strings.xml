@@ -1222,9 +1222,6 @@
   <string name="GIB">
     <text locale="fr">DONNER</text>
   </string>
-  <string name="GNADE">
-    <text locale="fr">PITIE</text>
-  </string>
   <string name="HELFE">
     <text locale="fr">AIDE</text>
   </string>
@@ -1284,9 +1281,6 @@
   </string>
   <string name="TRÄNKE">
     <text locale="fr">POTIONS</text>
-  </string>
-  <string name="UM">
-    <text locale="fr">POUR</text>
   </string>
   <string name="VOR">
     <text locale="fr">AVANT</text>

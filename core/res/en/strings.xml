@@ -1214,9 +1214,6 @@
   <string name="GIB">
     <text locale="en">GIVE</text>
   </string>
-  <string name="GNADE">
-    <text locale="en">MERCY</text>
-  </string>
   <string name="HELFE">
     <text locale="en">HELP</text>
   </string>
@@ -1276,9 +1273,6 @@
   </string>
   <string name="TRAENKE">
     <text locale="en">POTIONS</text>
-  </string>
-  <string name="UM">
-    <text locale="en">FOR</text>
   </string>
   <string name="VOR">
     <text locale="en">BEFORE</text>

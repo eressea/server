@@ -7,7 +7,7 @@
 #define EXPORT_UNITS    1<<2
 
 struct stream;
-int json_export(struct stream * out, unsigned int flags);
+int json_export(struct stream * out, int flags);
 int json_import(struct stream * out);
 
 #endif

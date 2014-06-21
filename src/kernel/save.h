@@ -34,7 +34,7 @@ extern "C" {
 
   int readorders(const char *filename);
   int creategame(void);
-  extern int readgame(const char *filename, int backup);
+  int readgame(const char *filename, int backup);
   int writegame(const char *filename);
 
 /* Versionsänderungen: */

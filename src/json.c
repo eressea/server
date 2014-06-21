@@ -55,7 +55,7 @@ int json_import(struct stream * out) {
     return 0;
 }
 
-int json_export(stream * out, unsigned int flags) {
+int json_export(stream * out, int flags) {
     cJSON *json, *root = cJSON_CreateObject();
     assert(out && out->api);
     if (regions && (flags & EXPORT_REGIONS)) {
