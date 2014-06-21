@@ -182,6 +182,30 @@ static void test_directions(CuTest * tc)
     test_cleanup();
 }
 
+static void test_skills(CuTest * tc)
+{
+    const char * data = "{\"skills\": { \"de\" : { \"alchemy\" : \"ALCHEMIE\", \"crossbow\" : [ \"ARMBRUST\", \"KREUZBOGEN\" ] }}}";
+    const struct locale * lang;
+
+    cJSON *json = cJSON_Parse(data);
+
+    test_cleanup();
+    lang = get_or_create_locale("de");
+    CuAssertPtrNotNull(tc, json);
+    CuAssertIntEquals(tc, NOSKILL, get_skill("potato", lang));
+
+    json_config(json);
+    CuAssertIntEquals(tc, NOSKILL, get_skill("potato", lang));
+    CuAssertIntEquals(tc, SK_CROSSBOW, get_skill("armbrust", lang));
+    CuAssertIntEquals(tc, SK_CROSSBOW, get_skill("kreuz", lang));
+    CuAssertIntEquals(tc, SK_ALCHEMY, get_skill("alchemie", lang));
+
+    CuAssertStrEquals(tc, "ALCHEMIE", locale_string(lang, "skill::alchemy"));
+    CuAssertStrEquals(tc, "ARMBRUST", locale_string(lang, "skill::crossbow"));
+
+    test_cleanup();
+}
+
 static void test_keywords(CuTest * tc)
 {
     const char * data = "{\"keywords\": { \"de\" : { \"move\" : \"NACH\", \"study\" : [ \"LERNEN\", \"STUDIEREN\" ] }}}";
@@ -208,6 +232,7 @@ CuSuite *get_jsonconf_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_keywords);
+    SUITE_ADD_TEST(suite, test_skills);
     SUITE_ADD_TEST(suite, test_directions);
     SUITE_ADD_TEST(suite, test_ships);
     SUITE_ADD_TEST(suite, test_buildings);

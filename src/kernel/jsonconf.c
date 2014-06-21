@@ -314,6 +314,36 @@ void json_directions(cJSON *json) {
     }
 }
 
+static void json_skill(cJSON *json, struct locale *lang) {
+    cJSON *child;
+    if (json->type!=cJSON_Object) {
+        log_error_n("skill for locale `%s` not a json object: %d", locale_name(lang), json->type);
+        return;
+    }
+    for (child=json->child;child;child=child->next) {
+        skill_t sk = findskill(child->string);
+        if (sk!=NOSKILL) {
+            if (child->type==cJSON_String) {
+                init_skill(lang, sk, child->valuestring);
+                locale_setstring(lang, mkname("skill", skillnames[sk]), child->valuestring);
+            }
+            else if (child->type==cJSON_Array) {
+                cJSON *entry;
+                for (entry=child->child;entry;entry=entry->next) {
+                    init_skill(lang, sk, entry->valuestring);
+                    if ((entry==child->child)) {
+                        locale_setstring(lang, mkname("skill", skillnames[sk]), entry->valuestring); 
+                    }
+                }
+            } else {
+                log_error_n("invalid type %d for skill `%s`", child->type, child->string);
+            }
+        } else {
+            log_error_n("unknown skill `%s` for locale `%s`", child->string, locale_name(lang));
+        }
+    }
+}
+
 static void json_keyword(cJSON *json, struct locale *lang) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
@@ -341,6 +371,18 @@ static void json_keyword(cJSON *json, struct locale *lang) {
         } else {
             log_error_n("unknown keyword `%s` for locale `%s`", child->string, locale_name(lang));
         }
+    }
+}
+
+void json_skills(cJSON *json) {
+    cJSON *child;
+    if (json->type!=cJSON_Object) {
+        log_error_n("skills is not a json object: %d", json->type);
+        return;
+    }
+    for (child=json->child;child;child=child->next) {
+        struct locale * lang = get_or_create_locale(child->string);
+        json_skill(child, lang);
     }
 }
 
@@ -385,6 +427,9 @@ void json_config(cJSON *json) {
         }
         else if (strcmp(child->string, "keywords")==0) {
             json_keywords(child);
+        }
+        else if (strcmp(child->string, "skills")==0) {
+            json_skills(child);
         }
         else if (strcmp(child->string, "buildings")==0) {
             json_buildings(child);
