@@ -300,7 +300,7 @@ extern "C" {
     MAX_ITEMS                   /* do not use outside item.c ! */
   };
 
-  enum {
+  typedef enum {
     /* ITEMS: */
     R_IRON,
     R_STONE,
@@ -332,11 +332,11 @@ extern "C" {
 
     MAX_RESOURCES,              /* do not use outside item.c ! */
     NORESOURCE = -1
-  };
+  } resource_t;
 
   extern const struct potion_type *oldpotiontype[];
   extern const struct item_type *olditemtype[];
-  extern const struct resource_type *oldresourcetype[];
+  const struct resource_type *get_resourcetype(resource_t type);
 
   int get_item(const struct unit *, item_t);
   int set_item(struct unit *, item_t, int);

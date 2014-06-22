@@ -133,7 +133,7 @@ enter_arena(unit * u, const item_type * itype, int amount, order * ord)
     return -1;
   if (u->number != 1 && enter_fail(u))
     return -1;
-  if (get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, fee) < fee
+  if (get_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT, fee) < fee
     && enter_fail(u))
     return -1;
   for (sk = 0; sk != MAXSKILLS; ++sk) {
@@ -166,7 +166,7 @@ enter_arena(unit * u, const item_type * itype, int amount, order * ord)
   ADDMSG(&u->faction->msgs, msg_message("arena_enter_fail", "region unit",
       u->region, u));
   use_pooled(u, itype->rtype, GET_SLACK | GET_RESERVE, 1);
-  use_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, fee);
+  use_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT, fee);
   set_money(u, 109);
   fset(u, UFL_ANON_FACTION);
   move_unit(u, start_region[rng_int() % 6], NULL);

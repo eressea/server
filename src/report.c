@@ -1035,7 +1035,7 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
     if (wrptr(&bufp, &size, bytes) != 0)
       WARN_STATIC_BUFFER();
     bytes =
-      (int)strlcpy(bufp, LOC(f->locale, resourcename(oldresourcetype[R_SILVER],
+      (int)strlcpy(bufp, LOC(f->locale, resourcename(get_resourcetype(R_SILVER),
           rmoney(r) != 1)), size);
     if (wrptr(&bufp, &size, bytes) != 0)
       WARN_STATIC_BUFFER();
@@ -1047,7 +1047,7 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
     if (wrptr(&bufp, &size, bytes) != 0)
       WARN_STATIC_BUFFER();
     bytes =
-      (int)strlcpy(bufp, LOC(f->locale, resourcename(oldresourcetype[R_HORSE],
+      (int)strlcpy(bufp, LOC(f->locale, resourcename(get_resourcetype(R_HORSE),
           (rhorses(r) > 1) ? GR_PLURAL : 0)), size);
     if (wrptr(&bufp, &size, bytes) != 0)
       WARN_STATIC_BUFFER();

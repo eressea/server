@@ -326,7 +326,7 @@ int sp_combatrosthauch(struct castorder * co)
           requirement *mat = wp->type->itype->construction->materials;
           bool iron = false;
           while (mat && mat->number > 0) {
-            if (mat->rtype == oldresourcetype[R_IRON]) {
+            if (mat->rtype == get_resourcetype(R_IRON)) {
               iron = true;
               break;
             }
@@ -1578,7 +1578,7 @@ int sp_reanimate(struct castorder * co)
   if (use_item) {
     msg =
       msg_message("reanimate_effect_1", "mage amount item", mage, j,
-      oldresourcetype[R_AMULET_OF_HEALING]);
+      get_resourcetype(R_AMULET_OF_HEALING));
   } else {
     msg = msg_message("reanimate_effect_0", "mage amount", mage, j);
   }
@@ -1682,7 +1682,7 @@ int sp_healing(struct castorder * co)
   if (use_item) {
     msg =
       msg_message("healing_effect_1", "mage amount item", mage, j,
-      oldresourcetype[R_AMULET_OF_HEALING]);
+      get_resourcetype(R_AMULET_OF_HEALING));
   } else {
     msg = msg_message("healing_effect_0", "mage amount", mage, j);
   }

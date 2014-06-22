@@ -360,7 +360,7 @@ static int do_recruiting(recruitment * recruits, int available)
 
       number = _min(req->qty, (int)(get / multi));
       if (rc->recruitcost) {
-        int afford = get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT,
+        int afford = get_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT,
           number * rc->recruitcost) / rc->recruitcost;
         number = _min(number, afford);
       }
@@ -371,7 +371,7 @@ static int do_recruiting(recruitment * recruits, int available)
         assert(number >= 0);
       }
       if (rc->recruitcost) {
-        use_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT,
+        use_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT,
           rc->recruitcost * number);
       }
       add_recruits(u, number, req->qty);
@@ -578,7 +578,7 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
       return;
     }
 
-    if (get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT,
+    if (get_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT,
         recruitcost) < recruitcost) {
       cmistake(u, ord, 142, MSG_EVENT);
       return;
@@ -603,7 +603,7 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
   }
   if (recruitcost > 0) {
     int pooled =
-      get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, recruitcost * n);
+      get_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT, recruitcost * n);
     n = _min(n, pooled / recruitcost);
   }
 
@@ -1866,7 +1866,7 @@ static void expandbuying(region * r, request * buyorders)
       multi = trade->multi;
       price = ltype->price * multi;
 
-      if (get_pooled(oa[j].unit, oldresourcetype[R_SILVER], GET_DEFAULT,
+      if (get_pooled(oa[j].unit, get_resourcetype(R_SILVER), GET_DEFAULT,
           price) >= price) {
         unit *u = oa[j].unit;
         item *items;
@@ -1883,7 +1883,7 @@ static void expandbuying(region * r, request * buyorders)
         i_change(&items, ltype->itype, 1);
         a->data.v = items;
         i_change(&oa[j].unit->items, ltype->itype, 1);
-        use_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, price);
+        use_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT, price);
         if (u->n < 0)
           u->n = 0;
         u->n += price;
@@ -2674,7 +2674,7 @@ static void breed_cmd(unit * u, struct order *ord)
       if (rtype == rt_mallornseed || rtype == rt_seed) {
         breedtrees(r, u, m);
         break;
-      } else if (rtype != oldresourcetype[R_HORSE]) {
+      } else if (rtype != get_resourcetype(R_HORSE)) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_cannotmake", ""));
         break;
       }

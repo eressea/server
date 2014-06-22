@@ -104,14 +104,14 @@ static int res_changepeasants(unit * u, const resource_type * rtype, int delta)
 static int res_changeitem(unit * u, const resource_type * rtype, int delta)
 {
   int num;
-  if (rtype == oldresourcetype[R_STONE] && u_race(u) == new_race[RC_STONEGOLEM]
+  if (rtype == get_resourcetype(R_STONE) && u_race(u) == new_race[RC_STONEGOLEM]
     && delta <= 0) {
     int reduce = delta / GOLEM_STONE;
     if (delta % GOLEM_STONE != 0)
       --reduce;
     scale_number(u, u->number + reduce);
     num = u->number;
-  } else if (rtype == oldresourcetype[R_IRON]
+  } else if (rtype == get_resourcetype(R_IRON)
     && u_race(u) == new_race[RC_IRONGOLEM] && delta <= 0) {
     int reduce = delta / GOLEM_IRON;
     if (delta % GOLEM_IRON != 0)
@@ -598,10 +598,23 @@ give_money(unit * s, unit * d, const item_type * itype, int n,
 #define MAXLUXURIES (LASTLUXURY - FIRSTLUXURY)
 
 const item_type *olditemtype[MAXITEMS + 1];
-const resource_type *oldresourcetype[MAXRESOURCES + 1];
 const potion_type *oldpotiontype[MAXPOTIONS + 1];
 
 /*** alte items ***/
+
+const char *itemnames[MAX_RESOURCES] = {
+  "iron", "stone", "horse", "ao_healing",
+  "aots", "roi", "rop", "ao_chastity",
+  "laen", "fairyboot", "aoc", "pegasus",
+  "elvenhorse", "dolphin", "roqf", "trollbelt",
+  "presspass", "aurafocus", "sphereofinv", "magicbag",
+  "magicherbbag", "dreameye", "money", "aura", "permaura"
+};
+
+const resource_type *get_resourcetype(resource_t type) {
+    const resource_type *rtype = rt_find(itemnames[type]);
+    return rtype;
+}
 
 int get_item(const unit * u, item_t it)
 {
@@ -698,15 +711,6 @@ typedef struct t_item {
     struct order *);
 } t_item;
 
-const char *itemnames[MAXITEMS] = {
-  "iron", "stone", "horse", "ao_healing",
-  "aots", "roi", "rop", "ao_chastity",
-  "laen", "fairyboot", "aoc", "pegasus",
-  "elvenhorse", "dolphin", "roqf", "trollbelt",
-  "presspass", "aurafocus", "sphereofinv", "magicbag",
-  "magicherbbag", "dreameye"
-};
-
 #include "move.h"
 
 static int
@@ -737,7 +741,6 @@ static void init_olditems(void)
 
     if (itype) {
       olditemtype[i] = itype;
-      oldresourcetype[i] = itype->rtype;
     }
   }
 }
@@ -970,26 +973,25 @@ static const char *names[] = {
 
 void init_resources(void)
 {
-  resource_type *rtype;
-  if (r_hp) {
-    return;
-  }
+    resource_type *rtype;
+    if (r_hp) {
+        // we have done this already
+        return;
+    }
 
   rtype = new_resourcetype(names + 8, NULL, RTF_NONE);
   rtype->uchange = res_changepeasants;
   rt_register(rtype);
 
-  /* silver was never an item: */
   r_silver = new_resourcetype(&names[0], NULL, RTF_ITEM | RTF_POOLED);
   i_silver = new_itemtype(r_silver, ITF_NONE, 1 /*weight */ , 0);
   r_silver->uchange = res_changeitem;
   i_silver->give = give_money;
-  oldresourcetype[R_SILVER] = r_silver;
+  rt_register(r_silver);
 
   r_permaura = new_resourcetype(&names[4], NULL, RTF_NONE);
   r_permaura->uchange = res_changepermaura;
   rt_register(r_permaura);
-  oldresourcetype[R_PERMAURA] = r_permaura;
 
   r_hp = new_resourcetype(&names[6], NULL, RTF_NONE);
   r_hp->uchange = res_changehp;
@@ -998,7 +1000,6 @@ void init_resources(void)
   r_aura = new_resourcetype(&names[10], NULL, RTF_NONE);
   r_aura->uchange = res_changeaura;
   rt_register(r_aura);
-  oldresourcetype[R_AURA] = r_aura;
 
   r_unit = new_resourcetype(&names[12], NULL, RTF_NONE);
   r_unit->uchange = res_changeperson;
@@ -1211,7 +1212,6 @@ void test_clear_resources(void)
   int i;
 
   memset((void *)olditemtype, 0, sizeof(olditemtype));
-  memset((void *)oldresourcetype, 0, sizeof(oldresourcetype));
   memset((void *)oldpotiontype, 0, sizeof(oldpotiontype));
 
   cb_foreach(&cb_items, "", 0, free_itype_cb, 0);

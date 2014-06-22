@@ -278,7 +278,7 @@ static int sm_smithy(const unit * u, const region * r, skill_t sk, int value)
 
 static int mm_smithy(const unit * u, const resource_type * rtype, int value)
 {                               /* material-mod */
-  if (rtype == oldresourcetype[R_IRON])
+  if (rtype == get_resourcetype(R_IRON))
     return value * 2;
   return value;
 }

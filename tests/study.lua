@@ -23,11 +23,15 @@ function test_study()
     assert_equal(1, u:get_skill("crossbow"))
 end
 
-function dsabled_test_study_expensive()
+function test_study_expensive()
     local r = region.create(0, 0, "plain")
     local f = faction.create("test@example.com", "human", "de")
     local u = unit.create(f, r, 1)
+    eressea.settings.set("skills.cost.alchemy", "50")
+    eressea.settings.set("rules.encounters", "0")
     u:add_order("LERNEN Alchemie")
+    u:add_item("money", 50)
     process_orders()
     assert_equal(1, u:get_skill("alchemy"))
+    assert_equal(0, u:get_item("money"))
 end

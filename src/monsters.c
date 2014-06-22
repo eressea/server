@@ -78,11 +78,11 @@ static void reduce_weight(unit * u)
 {
   int capacity, weight = 0;
   item **itmp = &u->items;
-  int horses = get_resource(u, oldresourcetype[R_HORSE]);
+  int horses = get_resource(u, get_resourcetype(R_HORSE));
 
   if (horses > 0) {
     horses = _min(horses, (u->number * 2));
-    change_resource(u, oldresourcetype[R_HORSE], -horses);
+    change_resource(u, get_resourcetype(R_HORSE), -horses);
   }
 
   /* 0. ditch any vehicles */

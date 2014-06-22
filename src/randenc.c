@@ -240,8 +240,10 @@ void find_manual(region * r, unit * u)
   slprintf(zBook, sizeof(zLocation), "manual_title_%s", skillnames[skill]);
 
   msg = msg_message("find_manual", "unit location book", u, zLocation, zBook);
-  r_addmessage(r, u->faction, msg);
-  msg_release(msg);
+  if (msg) {
+      r_addmessage(r, u->faction, msg); 
+      msg_release(msg);
+  }
 
   if (improve_all(u->faction, skill, 3) == 3) {
     int i;

@@ -66,9 +66,9 @@ int get_resource(const unit * u, const resource_type * rtype)
       return 0;
     }
   }
-  if (rtype == oldresourcetype[R_AURA])
+  if (rtype == get_resourcetype(R_AURA))
     return get_spellpoints(u);
-  if (rtype == oldresourcetype[R_PERMAURA])
+  if (rtype == get_resourcetype(R_PERMAURA))
     return max_spellpoints(u->region, u);
   log_error("trying to get unknown resource '%s'.\n", rtype->_name[0]);
   return 0;
@@ -80,9 +80,9 @@ int change_resource(unit * u, const resource_type * rtype, int change)
 
   if (rtype->uchange)
     i = rtype->uchange(u, rtype, change);
-  else if (rtype == oldresourcetype[R_AURA])
+  else if (rtype == get_resourcetype(R_AURA))
     i = change_spellpoints(u, change);
-  else if (rtype == oldresourcetype[R_PERMAURA])
+  else if (rtype == get_resourcetype(R_PERMAURA))
     i = change_maxspellpoints(u, change);
   else
     assert(!"undefined resource detected. rtype->uchange not initialized.");
@@ -98,9 +98,9 @@ int get_reservation(const unit * u, const resource_type * rtype)
 {
   reservation *res = u->reservations;
 
-  if (rtype == oldresourcetype[R_STONE] && (u_race(u)->flags & RCF_STONEGOLEM))
+  if (rtype == get_resourcetype(R_STONE) && (u_race(u)->flags & RCF_STONEGOLEM))
     return (u->number * GOLEM_STONE);
-  if (rtype == oldresourcetype[R_IRON] && (u_race(u)->flags & RCF_IRONGOLEM))
+  if (rtype == get_resourcetype(R_IRON) && (u_race(u)->flags & RCF_IRONGOLEM))
     return (u->number * GOLEM_IRON);
   while (res && res->type != rtype)
     res = res->next;

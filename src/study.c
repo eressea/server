@@ -225,7 +225,7 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
       int j = study_cost(student, sk);
       j = _max(50, j * 2);
       /* kann Einheit das zahlen? */
-      if (get_pooled(student, oldresourcetype[R_SILVER], GET_DEFAULT, j) >= j) {
+      if (get_pooled(student, get_resourcetype(R_SILVER), GET_DEFAULT, j) >= j) {
         /* Jeder Schueler zusaetzlich +10 Tage wenn in Uni. */
         teach->value += (n / 30) * 10;  /* learning erhoehen */
         /* Lehrer zusaetzlich +1 Tag pro Schueler. */
@@ -684,7 +684,7 @@ int learn_cmd(unit * u, order * ord)
   }
   if (studycost) {
     int cost = studycost * u->number;
-    money = get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, cost);
+    money = get_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT, cost);
     money = _min(money, cost);
   }
   if (money < studycost * u->number) {
@@ -702,7 +702,7 @@ int learn_cmd(unit * u, order * ord)
     teach->teachers[0] = 0;
   }
   if (money > 0) {
-    use_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, money);
+    use_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT, money);
     ADDMSG(&u->faction->msgs, msg_message("studycost",
         "unit region cost skill", u, u->region, money, sk));
   }
