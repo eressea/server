@@ -1196,6 +1196,12 @@
   <string name="EINHEIT">
     <text locale="en">UNIT</text>
   </string>
+  <string name="GRUPPE">
+    <text locale="en">GROUP</text>
+  </string>
+  <string name="LOCALE">
+    <text locale="en">LOCALE</text>
+  </string>
   <string name="ERESSEA">
     <text locale="en">ERESSEA</text>
   </string>
@@ -1442,6 +1448,9 @@
   <string name="help">
     <text locale="en">HELP</text>
   </string>
+  <string name="fight">
+    <text locale="en">FIGHT</text>
+  </string>
   <string name="ready">
     <text locale="en">COMBATSPELL</text>
   </string>
@@ -1469,6 +1478,9 @@
   <string name="move">
     <text locale="en">MOVE</text>
   </string>
+  <string name="alliance">
+    <text locale="en">ALLIANCE</text>
+  </string>
   <string name="number">
     <text locale="en">NUMBER</text>
   </string>
@@ -1478,6 +1490,9 @@
   <string name="password">
     <text locale="en">PASSWORD</text>
   </string>
+  <string name="pay">
+    <text locale="en">PAY</text>
+  </string>
   <string name="plant">
     <text locale="en">PLANT</text>
   </string>
@@ -1486,9 +1501,6 @@
   </string>
   <string name="prefix">
     <text locale="en">PREFIX</text>
-  </string>
-  <string name="alliance">
-    <text locale="en">ALLIANCE</text>
   </string>
   <string name="promote">
     <text locale="en">PROMOTION</text>

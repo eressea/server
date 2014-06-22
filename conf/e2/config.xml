@@ -53,7 +53,7 @@
   <game name="Eressea">
     <!-- Game specific settings -->
 
-    <order name="BEZAHLEN" disable="yes"/>
+    <order name="pay" disable="yes"/>
 
     <skill name="alchemy" enable="true"/>
     <skill name="crossbow" enable="true"/>

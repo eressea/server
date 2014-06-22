@@ -50,15 +50,15 @@
     <!-- Game specific settings -->
     <param name="database.gameid" value="7"></param>
 
-    <order name="BELAGERE" disable="yes"/>
-    <order name="BEKLAUEN" disable="yes"/>
-    <order name="KAUFEN" disable="yes"/>
-    <order name="LEHREN" disable="yes"/>
-    <order name="SABOTIEREN" disable="yes"/>
-    <order name="SPIONIEREN" disable="yes"/>
-    <order name="TREIBEN" disable="yes"/>
-    <order name="UNTERHALTEN" disable="yes"/>
-    <order name="VERKAUFEN" disable="yes"/>
+    <order name="besiege" disable="yes"/>
+    <order name="steal" disable="yes"/>
+    <order name="buy" disable="yes"/>
+    <order name="teach" disable="yes"/>
+    <order name="sabotage" disable="yes"/>
+    <order name="spy" disable="yes"/>
+    <order name="tax" disable="yes"/>
+    <order name="entertain" disable="yes"/>
+    <order name="sell" disable="yes"/>
 
     <skill name="armorer" enable="true"/>
     <skill name="bow" enable="true"/>

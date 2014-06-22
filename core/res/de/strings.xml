@@ -1907,6 +1907,12 @@
   <string name="EINHEIT">
     <text locale="de">EINHEIT</text>
   </string>
+  <string name="GRUPPE">
+    <text locale="de">GRUPPE</text>
+  </string>
+  <string name="LOCALE">
+    <text locale="de">LOCALE</text>
+  </string>
   <string name="ERESSEA">
     <text locale="de">ERESSEA</text>
   </string>
@@ -2120,7 +2126,7 @@
     <text locale="de">ATTACKIEREN</text>
   </string>
   <string name="claim">
-    <text locale="en">CLAIM</text>
+    <text locale="de">BEANSPRUCHEN</text>
   </string>
   <string name="steal">
     <text locale="de">BEKLAUEN</text>
@@ -2185,6 +2191,9 @@
   <string name="study">
     <text locale="de">LERNEN</text>
   </string>
+  <string name="locale">
+    <text locale="de">LOCALE</text>
+  </string>
   <string name="make">
     <text locale="de">MACHEN</text>
   </string>
@@ -2196,6 +2205,9 @@
   </string>
   <string name="promote">
     <text locale="de">BEFÖRDERUNG</text>
+  </string>
+  <string name="pay">
+    <text locale="de">BEZAHLEN</text>
   </string>
   <string name="plant">
     <text locale="de">PFLANZEN</text>
@@ -6437,10 +6449,6 @@
   <string name="nr_mallorntree_p">
     <text locale="de">Mallornbäume</text>
     <text locale="en">mallorn trees</text>
-  </string>
-  <string name="alliance">
-    <text locale="de">ALLIANZ</text>
-    <text locale="en">ALLIANCE</text>
   </string>
   <string name="kick">
     <text locale="de">AUSSTOSSEN</text>
