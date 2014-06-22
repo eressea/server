@@ -370,9 +370,6 @@ const char *parameters[MAXPARAMS] = {
   "GRUPPE",
   "PARTEITARNUNG",
   "BAEUME",
-  "XEPOTION",
-  "XEBALLOON",
-  "XELAEN",
   "ALLIANZ"
 };
 

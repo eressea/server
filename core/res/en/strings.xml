@@ -1181,8 +1181,8 @@
   <string name="BAUERN">
     <text locale="en">PEASANTS</text>
   </string>
-  <string name="BEISTAND">
-    <text locale="en">AID</text>
+  <string name="ALLIANZ">
+    <text locale="en">ALLIANCE</text>
   </string>
   <string name="BEWACHE">
     <text locale="en">GUARD</text>

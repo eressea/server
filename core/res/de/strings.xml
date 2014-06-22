@@ -1889,11 +1889,11 @@
   <string name="BAEUME">
     <text locale="de">BÄUME</text>
   </string>
+  <string name="ALLIANZ">
+    <text locale="de">ALLIANZ</text>
+  </string>
   <string name="BAUERN">
     <text locale="de">BAUERN</text>
-  </string>
-  <string name="BEISTAND">
-    <text locale="de">BEISTAND</text>
   </string>
   <string name="BEWACHE">
     <text locale="de">BEWACHEN</text>
