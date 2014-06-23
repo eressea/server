@@ -3257,6 +3257,7 @@ static building *age_building(building * b)
 {
     const struct building_type *bt_blessed;
     const struct curse_type *ct_astralblock;
+    const struct item_type *itype = it_find("elvenhorse");
 
     bt_blessed = bt_find("blessedstonecircle");
     ct_astralblock = ct_find("astralblock");
@@ -3268,7 +3269,7 @@ static building *age_building(building * b)
    *
    * TODO: this would be nicer in a btype->age function, but we don't have it.
    */
-  if (ct_astralblock && bt_blessed && b->type == bt_blessed) {
+  if (itype && ct_astralblock && bt_blessed && b->type == bt_blessed) {
     region *r = b->region;
     region *rt = r_standard_to_astral(r);
     unit *u, *mage = NULL;
@@ -3281,13 +3282,13 @@ static building *age_building(building * b)
           int n, unicorns = 0;
           for (n = 0; n != u->number; ++n) {
             if (chance(0.02)) {
-              i_change(&u->items, olditemtype[I_ELVENHORSE], 1);
+              i_change(&u->items, itype, 1);
               ++unicorns;
             }
             if (unicorns) {
               ADDMSG(&u->faction->msgs, msg_message("scunicorn",
                   "unit amount rtype",
-                  u, unicorns, olditemtype[I_ELVENHORSE]->rtype));
+                  u, unicorns, itype->rtype));
             }
           }
         }

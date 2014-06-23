@@ -193,12 +193,6 @@ extern void add_raceprefix(const char *prefix)
 
 /*                      "den Zwergen", "Halblingsparteien" */
 
-void set_show_item(faction * f, item_t i)
-{
-  attrib *a = a_add(&f->attribs, a_new(&at_showitem));
-  a->data.v = (void *)olditemtype[i];
-}
-
 bool r_insectstalled(const region * r)
 {
   return fval(r->terrain, ARCTIC_REGION);

@@ -1297,7 +1297,8 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
   allocation *al;
   attrib *a = a_find(rtype->attribs, &at_resourcelimit);
   resource_limit *rdata = (resource_limit *) a->data.v;
-  int amount, skill;
+    const resource_type *rring;
+    int amount, skill;
 
   /* momentan kann man keine ressourcen abbauen, wenn man dafür
    * Materialverbrauch hat: */
@@ -1347,7 +1348,7 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
    * Als magische Wesen 'sehen' Bergwächter alles und werden durch
    * Belagerung nicht aufgehalten.  (Ansonsten wie oben bei Elfen anpassen).
    */
-  if (itype == olditemtype[I_IRON] || itype == olditemtype[I_LAEN]) {
+  if (itype->rtype && (itype->rtype==get_resourcetype(R_IRON) || itype->rtype==rt_find("laen"))) {
     unit *u2;
     for (u2 = r->units; u2; u2 = u2->next) {
       if (is_guard(u, GUARD_MINING)
@@ -1397,16 +1398,18 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
   /* nun ist amount die Gesamtproduktion der Einheit (in punkten) */
 
   /* mit Flinkfingerring verzehnfacht sich die Produktion */
-  amount +=
-    skill * _min(u->number, get_item(u,
-      I_RING_OF_NIMBLEFINGER)) * (roqf_factor() - 1);
+    rring = get_resourcetype(R_RING_OF_NIMBLEFINGER);
+    if (rring) {
+        int dm = i_get(u->items, rring->itype);
+        amount += skill * _min(u->number, dm) * (roqf_factor() - 1);
+    }
 
-  /* Schaffenstrunk: */
-  if ((dm = get_effect(u, oldpotiontype[P_DOMORE])) != 0) {
-    dm = _min(dm, u->number);
-    change_effect(u, oldpotiontype[P_DOMORE], -dm);
-    amount += dm * skill;       /* dm Personen produzieren doppelt */
-  }
+    /* Schaffenstrunk: */
+    if ((dm = get_effect(u, oldpotiontype[P_DOMORE])) != 0) {
+        dm = _min(dm, u->number);
+        change_effect(u, oldpotiontype[P_DOMORE], -dm);
+        amount += dm * skill;       /* dm Personen produzieren doppelt */
+    }
 
   amount /= itype->construction->minskill;
 
@@ -2601,32 +2604,32 @@ static void breedtrees(region * r, unit * u, int raw)
 /* züchte pferde */
 static void breedhorses(region * r, unit * u)
 {
-  int n, c;
-  int gezuechtet = 0;
-  struct building *b = inside_building(u);
-  const struct building_type *btype = b ? b->type : NULL;
+    int n, c, breed = 0;
+    struct building *b = inside_building(u);
+    const struct building_type *btype = b ? b->type : NULL;
+    const struct item_type *ihorse = it_find("horse");
 
-  if (btype != bt_find("stables")) {
-    cmistake(u, u->thisorder, 122, MSG_PRODUCE);
-    return;
-  }
-  if (get_item(u, I_HORSE) < 2) {
-    cmistake(u, u->thisorder, 107, MSG_PRODUCE);
-    return;
-  }
-  n = _min(u->number * eff_skill(u, SK_HORSE_TRAINING, r), get_item(u, I_HORSE));
-
-  for (c = 0; c < n; c++) {
-    if (rng_int() % 100 < eff_skill(u, SK_HORSE_TRAINING, r)) {
-      i_change(&u->items, olditemtype[I_HORSE], 1);
-      gezuechtet++;
+    assert(ihorse);
+    if (btype != bt_find("stables")) {
+        cmistake(u, u->thisorder, 122, MSG_PRODUCE);
+        return;
     }
-  }
+    if (i_get(u->items, ihorse) < 2) {
+        cmistake(u, u->thisorder, 107, MSG_PRODUCE);
+        return;
+    }
+    n = _min(u->number * eff_skill(u, SK_HORSE_TRAINING, r), i_get(u->items, ihorse));
 
-  produceexp(u, SK_HORSE_TRAINING, u->number);
+    for (c = 0; c < n; c++) {
+        if (rng_int() % 100 < eff_skill(u, SK_HORSE_TRAINING, r)) {
+            i_change(&u->items, ihorse, 1);
+            ++breed;
+        }
+    }
 
-  ADDMSG(&u->faction->msgs, msg_message("raised",
-      "unit amount", u, gezuechtet));
+    produceexp(u, SK_HORSE_TRAINING, u->number);
+
+    ADDMSG(&u->faction->msgs, msg_message("raised", "unit amount", u, breed));
 }
 
 static void breed_cmd(unit * u, struct order *ord)
@@ -2753,6 +2756,7 @@ static int max_skill(region * r, faction * f, skill_t sk)
 
 static void steal_cmd(unit * u, struct order *ord, request ** stealorders)
 {
+  const resource_type *rring = get_resourcetype(R_RING_OF_NIMBLEFINGER);
   int n, i, id;
   bool goblin = false;
   request *o;
@@ -2842,7 +2846,7 @@ static void steal_cmd(unit * u, struct order *ord, request ** stealorders)
     }
   }
 
-  i = _min(u->number, get_item(u, I_RING_OF_NIMBLEFINGER));
+  i = _min(u->number, i_get(u->items, rring->itype));
   if (i > 0) {
     n *= STEALINCOME * (u->number + i * (roqf_factor() - 1));
   } else {

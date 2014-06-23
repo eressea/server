@@ -136,11 +136,10 @@ void test_create_world(void)
 
   get_or_create_locale("de");
   init_resources();
-  assert(!olditemtype[I_HORSE]);
 
-  olditemtype[I_HORSE] = test_create_itemtype(names+0);
-  olditemtype[I_IRON] = test_create_itemtype(names+4);
-  olditemtype[I_STONE] = test_create_itemtype(names+6);
+  test_create_itemtype(names+0);
+  test_create_itemtype(names+4);
+  test_create_itemtype(names+6);
 
   t_plain = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION);
   t_plain->size = 1000;

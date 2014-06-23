@@ -1079,8 +1079,12 @@ static void orc_growth(void)
         int increase = 0;
         int num = get_cursedmen(u, c);
         double prob = curse_geteffect(c);
+        const item_type * it_chastity = it_find("ao_chastity");
 
-        for (n = (num - get_item(u, I_CHASTITY_BELT)); n > 0; n--) {
+        if (it_chastity) {
+            num -= i_get(u->items, it_chastity); 
+        }
+        for (n = num; n > 0; n--) {
           if (chance(prob)) {
             ++increase;
           }
@@ -1169,41 +1173,41 @@ static void icebergs(void)
 #ifdef HERBS_ROT
 static void rotting_herbs(void)
 {
-  static int rule_rot = -1;
-  region *r;
+    static int rule_rot = -1;
+    region *r;
 
-  if (rule_rot < 0) {
-    rule_rot =
-      get_param_int(global.parameters, "rules.economy.herbrot", HERBROTCHANCE);
-  }
-  if (rule_rot == 0)
-    return;
-
-  for (r = regions; r; r = r->next) {
-    unit *u;
-    for (u = r->units; u; u = u->next) {
-      item **itmp = &u->items;
-      item *hbag = *i_find(itmp, olditemtype[I_SACK_OF_CONSERVATION]);
-      int rot_chance = rule_rot;
-
-      if (hbag)
-        rot_chance = (rot_chance * 2) / 5;
-      while (*itmp) {
-        item *itm = *itmp;
-        int n = itm->number;
-        double k = n * rot_chance / 100.0;
-        if (fval(itm->type, ITF_HERB)) {
-          double nv = normalvariate(k, k / 4);
-          int inv = (int)nv;
-          int delta = _min(n, inv);
-          if (i_change(itmp, itm->type, -delta) == NULL) {
-            continue;
-          }
-        }
-        itmp = &itm->next;
-      }
+    if (rule_rot < 0) {
+        rule_rot =
+            get_param_int(global.parameters, "rules.economy.herbrot", HERBROTCHANCE);
     }
-  }
+    if (rule_rot == 0) return;
+
+    for (r = regions; r; r = r->next) {
+        unit *u;
+        for (u = r->units; u; u = u->next) {
+            const struct item_type *it_bag = it_find("magicherbbag");
+            item **itmp = &u->items;
+            int rot_chance = rule_rot;
+
+            if (it_bag && *i_find(itmp, it_bag)) {
+                rot_chance = (rot_chance * 2) / 5;
+            }
+            while (*itmp) {
+                item *itm = *itmp;
+                int n = itm->number;
+                double k = n * rot_chance / 100.0;
+                if (fval(itm->type, ITF_HERB)) {
+                    double nv = normalvariate(k, k / 4);
+                    int inv = (int)nv;
+                    int delta = _min(n, inv);
+                    if (!i_change(itmp, itm->type, -delta)) {
+                        continue;
+                    }
+                }
+                itmp = &itm->next;
+            }
+        }
+    }
 }
 #endif
 

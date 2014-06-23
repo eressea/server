@@ -291,7 +291,6 @@ extern "C" {
     I_DOLPHIN,
     I_RING_OF_NIMBLEFINGER,
     I_TROLLBELT,
-    I_PRESSCARD,
     I_AURAKULUM,
     I_SPHERE_OF_INVISIBILITY,
     I_BAG_OF_HOLDING,
@@ -318,7 +317,6 @@ extern "C" {
     R_DOLPHIN,
     R_RING_OF_NIMBLEFINGER,
     R_TROLLBELT,
-    R_PRESSCARD,
     R_AURAKULUM,
     R_SPHERE_OF_INVISIBILITY,
     R_BAG_OF_HOLDING,
@@ -335,11 +333,7 @@ extern "C" {
   } resource_t;
 
   extern const struct potion_type *oldpotiontype[];
-  extern const struct item_type *olditemtype[];
-  const struct resource_type *get_resourcetype(resource_t type);
-
-  int get_item(const struct unit *, item_t);
-  int set_item(struct unit *, item_t, int);
+  const struct resource_type *get_resourcetype(resource_t rt);
 
   int get_money(const struct unit *);
   int set_money(struct unit *, int);

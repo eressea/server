@@ -303,11 +303,12 @@ int gift_items(unit * u, int flags)
 
     if (flags & GIFT_PEASANTS) {
       if (!fval(u->region->terrain, SEA_REGION)) {
-        if (itm->type == olditemtype[I_HORSE]) {
-          rsethorses(r, rhorses(r) + itm->number);
-          itm->number = 0;
-        } else if (itm->type == i_silver) {
+        if (itm->type == i_silver) {
           rsetmoney(r, rmoney(r) + itm->number);
+          itm->number = 0;
+        }
+        else if (itm->type == it_find("horse")) {
+          rsethorses(r, rhorses(r) + itm->number);
           itm->number = 0;
         }
       }
@@ -1210,23 +1211,17 @@ bool has_skill(const unit * u, skill_t sk)
 
 static int item_modification(const unit * u, skill_t sk, int val)
 {
-  /* Presseausweis: *2 Spionage, 0 Tarnung */
-  if (sk == SK_SPY && get_item(u, I_PRESSCARD) >= u->number) {
-    val = val * 2;
-  } else if (sk == SK_STEALTH) {
+  if (sk == SK_STEALTH) {
 #if NEWATSROI == 1
-    if (get_item(u, I_RING_OF_INVISIBILITY)
-      + 100 * get_item(u, I_SPHERE_OF_INVISIBILITY) >= u->number) {
+    if (i_get(u->items, it_find("roi"))
+      + 100 * i_get(u->items, it_find("sphereofinv")) >= u->number) {
       val += ROIBONUS;
     }
 #endif
-    if (get_item(u, I_PRESSCARD) >= u->number) {
-      val = 0;
-    }
   }
 #if NEWATSROI == 1
   if (sk == SK_PERCEPTION) {
-    if (get_item(u, I_AMULET_OF_TRUE_SEEING) >= u->number) {
+    if (i_get(u->items, it_find("aots")) >= u->number) {
       val += ATSBONUS;
     }
   }
@@ -1364,12 +1359,13 @@ int invisible(const unit * target, const unit * viewer)
     return 0;
   else {
     int hidden =
-      get_item(target, I_RING_OF_INVISIBILITY) + 100 * get_item(target,
-      I_SPHERE_OF_INVISIBILITY);
+      i_get(target->items, it_find("roi")) + 100 * i_get(target->items,
+      it_find("sphereofinv"));
     if (hidden) {
       hidden = _min(hidden, target->number);
-      if (viewer)
-        hidden -= get_item(viewer, I_AMULET_OF_TRUE_SEEING);
+      if (viewer) {
+        hidden -= i_get(viewer->items, it_find("aots"));
+      }
     }
     return hidden;
   }

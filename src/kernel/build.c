@@ -326,7 +326,8 @@ void build_road(region * r, unit * u, int size, direction_t d)
   /* n = maximum by skill. try to maximize it */
   n = u->number * eff_skill(u, SK_ROAD_BUILDING, r);
   if (n < left) {
-    item *itm = *i_find(&u->items, olditemtype[I_RING_OF_NIMBLEFINGER]);
+      const resource_type *ring = get_resourcetype(R_RING_OF_NIMBLEFINGER);
+    item *itm = ring ? *i_find(&u->items, ring->itype) : 0;
     if (itm != NULL && itm->number > 0) {
       int rings = _min(u->number, itm->number);
       n = n * ((roqf_factor() - 1) * rings + u->number) / u->number;
@@ -516,10 +517,9 @@ int build(unit * u, const construction * ctype, int completed, int want)
     /* Flinkfingerring wirkt nicht auf Mengenbegrenzte (magische)
      * Talente */
     if (skill_limit(u->faction, type->skill) == INT_MAX) {
-      int i = 0;
-      item *itm = *i_find(&u->items, olditemtype[I_RING_OF_NIMBLEFINGER]);
-      if (itm != NULL)
-        i = itm->number;
+        const resource_type *ring = get_resourcetype(R_RING_OF_NIMBLEFINGER);
+      item *itm = ring ? *i_find(&u->items, ring->itype) : 0;
+      int i = itm ? itm->number : 0;
       if (i > 0) {
         int rings = _min(u->number, i);
         n = n * ((roqf_factor() - 1) * rings + u->number) / u->number;

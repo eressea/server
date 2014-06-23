@@ -31,7 +31,7 @@ static void test_make_fighter(CuTest * tc)
   set_level(au, SK_MAGIC, 3);
   set_level(au, SK_RIDING, 3);
   au->status = ST_BEHIND;
-  set_item(au, I_HORSE, 1);
+  i_change(&au->items, it_find("horse"), 1);
 
   b = make_battle(r);
   as = make_side(b, au->faction, 0, 0, 0);

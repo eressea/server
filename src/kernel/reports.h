@@ -57,10 +57,6 @@ extern "C" {
   extern const struct unit *ucansee(const struct faction *f,
     const struct unit *u, const struct unit *x);
 
-  int hat_in_region(item_t itm, struct region *r, struct faction *f);
-
-/* für fast_region und neuen CR: */
-
   enum {
     see_none,
     see_neighbour,

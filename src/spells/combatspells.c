@@ -1527,6 +1527,10 @@ static int count_healable(battle * b, fighter * df)
   }
   return healable;
 }
+static bool has_ao_healing(const unit *u) {
+    item *const* iter = i_findc(&u->items, it_find("ao_healing"));
+    return (*iter && (*iter)->number>0);
+}
 
 /* wiederbeleben */
 int sp_reanimate(struct castorder * co)
@@ -1539,7 +1543,7 @@ int sp_reanimate(struct castorder * co)
   int healable, j = 0;
   double c = 0.50 + 0.02 * power;
   double k = EFFECT_HEALING_SPELL * power;
-  bool use_item = get_item(mage, I_AMULET_OF_HEALING) > 0;
+  bool use_item = has_ao_healing(mage);
   message *msg;
 
   if (use_item) {
@@ -1658,7 +1662,7 @@ int sp_healing(struct castorder * co)
   int healhp = (int)power * 200;
   quicklist *fgs;
   message *msg;
-  bool use_item = get_item(mage, I_AMULET_OF_HEALING) > 0;
+  bool use_item = has_ao_healing(mage);
 
   /* bis zu 11 Personen pro Stufe (einen HP müssen sie ja noch
    * haben, sonst wären sie tot) können geheilt werden */

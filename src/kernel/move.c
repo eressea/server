@@ -270,10 +270,12 @@ static int ridingcapacity(unit * u)
 
 int walkingcapacity(const struct unit *u)
 {
-  int n, tmp, people, pferde_fuer_wagen;
+  int n, people, pferde_fuer_wagen;
   int wagen_ohne_pferde, wagen_mit_pferden, wagen_mit_trollen;
   int vehicles = 0, vcap = 0;
   int animals = 0, acap = 0;
+  const struct item_type *ihorse = it_find("horse");
+  const struct item_type *ibelt = it_find("trollbelt");
 
   get_transporters(u->items, &animals, &acap, &vehicles, &vcap);
 
@@ -309,16 +311,20 @@ int walkingcapacity(const struct unit *u)
   n += animals * acap;
   n += people * personcapacity(u);
   /* Goliathwasser */
-  tmp = get_effect(u, oldpotiontype[P_STRONG]);
-  if (tmp > 0) {
-    int horsecap = olditemtype[I_HORSE]->capacity;
-    if (tmp > people)
-      tmp = people;
-    n += tmp * (horsecap - personcapacity(u));
+  if (ihorse) {
+    int tmp = get_effect(u, oldpotiontype[P_STRONG]);
+    if (tmp > 0) {
+      int horsecap = ihorse->capacity;
+      if (tmp > people) {
+        tmp = people;
+      }
+      n += tmp * (horsecap - personcapacity(u));
+    }
   }
-  /* change_effect wird in ageing gemacht */
-  tmp = get_item(u, I_TROLLBELT);
-  n += _min(people, tmp) * (STRENGTHMULTIPLIER - 1) * personcapacity(u);
+  if (ibelt) {
+    int tmp = i_get(u->items, ibelt);
+    n += _min(people, tmp) * (STRENGTHMULTIPLIER - 1) * personcapacity(u);
+  }
 
   return n;
 }
@@ -372,7 +378,7 @@ static int canwalk(unit * u)
 
 bool canfly(unit * u)
 {
-  if (get_item(u, I_PEGASUS) >= u->number && effskill(u, SK_RIDING) >= 4)
+  if (i_get(u->items, it_find("pegasus")) >= u->number && effskill(u, SK_RIDING) >= 4)
     return true;
 
   if (fval(u_race(u), RCF_FLY))
@@ -386,7 +392,7 @@ bool canfly(unit * u)
 
 bool canswim(unit * u)
 {
-  if (get_item(u, I_DOLPHIN) >= u->number && effskill(u, SK_RIDING) >= 4)
+  if (i_get(u->items, it_find("dolphin")) >= u->number && effskill(u, SK_RIDING) >= 4)
     return true;
 
   if (u_race(u)->flags & RCF_FLY)
@@ -860,7 +866,7 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
   if (!contact && guard) {
     double prob = 0.3;          /* 30% base chance */
     prob += 0.1 * (perception - eff_stealth(reisender, r));
-    prob += 0.1 * _min(guard->number, get_item(guard, I_AMULET_OF_TRUE_SEEING));
+    prob += 0.1 * _min(guard->number, i_get(guard->items, it_find("aots")));
 
     if (chance(prob)) {
       return guard;
@@ -1375,7 +1381,7 @@ static int movement_speed(unit * u)
     }
 
     /* unicorn in inventory */
-    if (u->number <= get_item(u, I_FEENSTIEFEL)) {
+    if (u->number <= i_get(u->items, it_find("fairyboot"))) {
       mp *= 2;
     }
 

@@ -723,7 +723,7 @@ int max_spellpoints(const region * r, const unit * u)
   sk = eff_skill(u, SK_MAGIC, r);
   msp = u_race(u)->maxaura * (pow(sk, potenz) / divisor + 1) + get_spchange(u);
 
-  if (get_item(u, I_AURAKULUM) > 0) {
+  if (i_get(u->items, it_find("aurafocus")) > 0) {
     msp += use_item_aura(r, u);
   }
   n = get_curseeffect(u->attribs, C_AURA, 0);
@@ -1022,7 +1022,7 @@ spellpower(region * r, unit * u, const spell * sp, int cast_level,
       ++force;
   }
 
-  if (get_item(u, I_RING_OF_POWER) > 0)
+  if (i_get(u->items, it_find("rop")) > 0)
     ++force;
   if (elf_power < 0) {
     elf_power = get_param_int(global.parameters, "rules.magic.elfpower", 0);
@@ -1125,7 +1125,7 @@ double magic_resistance(unit * target)
   }
 
   /* Unicorn +10 */
-  n = get_item(target, I_ELVENHORSE);
+  n = i_get(target->items, it_find("elvenhorse"));
   if (n)
     probability += n * 0.1 / target->number;
 

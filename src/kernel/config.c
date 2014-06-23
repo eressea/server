@@ -2120,7 +2120,7 @@ int weight(const unit * u)
 
   n += u->number * u_race(u)->weight;
 
-  w = get_item(u, I_BAG_OF_HOLDING) * BAGCAPACITY;
+  w = i_get(u->items, it_find("magicbag")) * BAGCAPACITY;
   if (w > in_bag)
     w = in_bag;
   n -= w;

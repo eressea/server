@@ -78,47 +78,46 @@ bool monster_is_waiting(const unit * u)
 
 static void eaten_by_monster(unit * u)
 {
-  /* adjustment for smaller worlds */
-  static double multi = 0.0;
-  int n = 0;
-  int horse = 0;
-
-  if (multi == 0.0) {
-    multi = RESOURCE_QUANTITY * newterrain(T_PLAIN)->size / 10000.0;
-  }
-
-  switch (old_race(u_race(u))) {
-    case RC_FIREDRAGON:
-      n = rng_int() % 80 * u->number;
-      horse = get_item(u, I_HORSE);
-      break;
-    case RC_DRAGON:
-      n = rng_int() % 200 * u->number;
-      horse = get_item(u, I_HORSE);
-      break;
-    case RC_WYRM:
-      n = rng_int() % 500 * u->number;
-      horse = get_item(u, I_HORSE);
-      break;
-    default:
-      n = rng_int() % (u->number / 20 + 1);
-  }
-
-  n = (int)(n * multi);
-  if (n > 0) {
-    n = lovar(n);
-    n = _min(rpeasants(u->region), n);
-
-    if (n > 0) {
-      deathcounts(u->region, n);
-      rsetpeasants(u->region, rpeasants(u->region) - n);
-      ADDMSG(&u->region->msgs, msg_message("eatpeasants", "unit amount", u, n));
+    /* adjustment for smaller worlds */
+    static double multi = 0.0;
+    int n = 0;
+    int horse = -1;
+    
+    if (multi == 0.0) {
+        multi = RESOURCE_QUANTITY * newterrain(T_PLAIN)->size / 10000.0;
     }
-  }
-  if (horse > 0) {
-    set_item(u, I_HORSE, 0);
-    ADDMSG(&u->region->msgs, msg_message("eathorse", "unit amount", u, horse));
-  }
+
+    switch (old_race(u_race(u))) {
+    case RC_FIREDRAGON:
+        n = rng_int() % 80 * u->number;
+        break;
+    case RC_DRAGON:
+        n = rng_int() % 200 * u->number;
+        break;
+    case RC_WYRM:
+        n = rng_int() % 500 * u->number;
+        break;
+    default:
+        n = rng_int() % (u->number / 20 + 1);
+        horse = 0;
+    }
+    horse = horse ? i_get(u->items, it_find("horse")) : 0;
+
+    n = (int)(n * multi);
+    if (n > 0) {
+        n = lovar(n);
+        n = _min(rpeasants(u->region), n);
+        
+        if (n > 0) {
+            deathcounts(u->region, n);
+            rsetpeasants(u->region, rpeasants(u->region) - n);
+            ADDMSG(&u->region->msgs, msg_message("eatpeasants", "unit amount", u, n));
+        }
+    }
+    if (horse > 0) {
+        i_change(&u->items, it_find("horse"), -horse);
+        ADDMSG(&u->region->msgs, msg_message("eathorse", "unit amount", u, horse));
+    }
 }
 
 static void absorbed_by_monster(unit * u)

@@ -839,15 +839,17 @@ static const armor_type *select_armor(troop t, bool shield)
  * - Artefakt I_TROLLBELT gibt Rüstung +1
  * - Zauber Rindenhaut gibt Rüstung +3
  */
+static int trollbelts(const unit *u) {
+    const struct item_type *belt = it_find("trollbelt");
+    return belt ? i_get(u->items, belt) : 0;
+}
+
 int select_magicarmor(troop t)
 {
   unit *u = t.fighter->unit;
-  int geschuetzt = 0;
   int ma = 0;
 
-  geschuetzt = _min(get_item(u, I_TROLLBELT), u->number);
-
-  if (geschuetzt > t.index)     /* unser Kandidat wird geschuetzt */
+  if (trollbelts(u) > t.index)     /* unser Kandidat wird geschuetzt */
     ma += 1;
 
   return ma;
@@ -3252,7 +3254,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
   /* change_effect wird in ageing gemacht */
 
   /* Effekte von Artefakten */
-  strongmen = _min(fig->unit->number, get_item(u, I_TROLLBELT));
+  strongmen = _min(fig->unit->number, trollbelts(u));
 
   /* Hitpoints, Attack- und Defence-Boni für alle Personen */
   for (i = 0; i < fig->alive; i++) {
@@ -3371,15 +3373,15 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     fig->horses = fig->unit->number;
     fig->elvenhorses = 0;
   } else {
-    static const item_type *it_charger = 0;
-    if (it_charger == 0) {
-      it_charger = it_find("charger");
-      if (!it_charger) {
-        it_charger = it_find("horse");
-      }
+    const item_type *it_horse = 0;
+    const item_type *it_elvenhorse = 0;
+    it_elvenhorse = it_find("elvenhorse");
+    it_horse = it_find("charger");
+    if (!it_horse) {
+      it_horse = it_find("horse");
     }
-    fig->horses = i_get(u->items, it_charger);
-    fig->elvenhorses = get_item(u, I_ELVENHORSE);
+    fig->horses = i_get(u->items, it_horse);
+    fig->elvenhorses = i_get(u->items, it_elvenhorse);
   }
 
   if (u_race(u)->battle_flags & BF_EQUIPMENT) {

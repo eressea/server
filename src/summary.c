@@ -310,10 +310,11 @@ void report_summary(summary * s, summary * o, bool full)
 
 summary *make_summary(void)
 {
-  faction *f;
-  region *r;
-  unit *u;
-  summary *s = calloc(1, sizeof(summary));
+    faction *f;
+    region *r;
+    unit *u;
+    summary *s = calloc(1, sizeof(summary));
+    const struct item_type *ihorse = it_find("horse");
 
   for (f = factions; f; f = f->next) {
     const struct locale *lang = f->locale;
@@ -383,7 +384,7 @@ summary *make_summary(void)
           if (u->flags & UFL_HERO) {
             s->heroes += u->number;
           }
-          s->spielerpferde += get_item(u, I_HORSE);
+          s->spielerpferde += i_get(u->items, ihorse);
           s->playermoney += get_money(u);
           s->armed_men += armedmen(u, true);
           for (itm = u->items; itm; itm = itm->next) {
@@ -395,7 +396,7 @@ summary *make_summary(void)
             }
           }
 
-          s->spielerpferde += get_item(u, I_HORSE);
+          s->spielerpferde += i_get(u->items, ihorse);
 
           for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
             skill_t sk = sv->id;

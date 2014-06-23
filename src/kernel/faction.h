@@ -54,10 +54,9 @@ extern "C" {
 
 #define FFL_SAVEMASK (FFL_DEFENDER|FFL_NEWID|FFL_GM|FFL_NPC|FFL_NOTIMEOUT|FFL_DBENTRY|FFL_NOIDLEOUT)
 
-  struct faction *get_monsters(void);
 #define is_monsters(f) ((f)->flags&FFL_NPC)
 
-  typedef struct faction {
+typedef struct faction {
     struct faction *next;
     struct faction *nexthash;
 
@@ -110,20 +109,21 @@ extern "C" {
     struct item *items;         /* items this faction can claim */
     struct seen_region **seen;
     struct quicklist *seen_factions;
-  } faction;
+} faction;
 
-  extern struct faction *factions;
+extern struct faction *factions;
 
-  int max_magicians(const faction * f);
+struct faction *get_monsters(void);
+int max_magicians(const faction * f);
+void set_show_item(faction * f, const struct item_type *itype);
 
-  extern const struct unit *random_unit_in_faction(const struct faction *f);
-  extern const char *factionname(const struct faction *f);
-  extern struct unit *addplayer(struct region *r, faction * f);
-  extern struct faction *addfaction(const char *email, const char *password,
+const struct unit *random_unit_in_faction(const struct faction *f);
+const char *factionname(const struct faction *f);
+struct unit *addplayer(struct region *r, faction * f);
+struct faction *addfaction(const char *email, const char *password,
     const struct race *frace, const struct locale *loc, int subscription);
-  extern bool checkpasswd(const faction * f, const char *passwd,
-    bool shortp);
-  extern void destroyfaction(faction * f);
+bool checkpasswd(const faction * f, const char *passwd, bool shortp);
+void destroyfaction(faction * f);
 
   extern void set_alliance(struct faction *a, struct faction *b, int status);
   extern int get_alliance(const struct faction *a, const struct faction *b);

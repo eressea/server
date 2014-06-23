@@ -39,8 +39,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 int get_resource(const unit * u, const resource_type * rtype)
 {
-  const item_type *itype = resource2item(rtype);
-
   assert(rtype);
   if (rtype->uget) {
     /* this resource is probably special */
@@ -54,16 +52,13 @@ int get_resource(const unit * u, const resource_type * rtype)
     if (i >= 0)
       return i;
   }
-  if (itype != NULL) {
-    if (itype == olditemtype[R_STONE] && (u_race(u)->flags & RCF_STONEGOLEM)) {
+  if (rtype->itype) {
+    if (rtype == rt_find("stone") && (u_race(u)->flags & RCF_STONEGOLEM)) {
       return u->number * GOLEM_STONE;
-    } else if (itype == olditemtype[R_IRON] && (u_race(u)->flags & RCF_IRONGOLEM)) {
+    } else if (rtype->itype == it_find("iron") && (u_race(u)->flags & RCF_IRONGOLEM)) {
       return u->number * GOLEM_IRON;
     } else {
-      const item *i = *i_findc(&u->items, itype);
-      if (i)
-        return i->number;
-      return 0;
+      return i_get(u->items, rtype->itype);
     }
   }
   if (rtype == get_resourcetype(R_AURA))

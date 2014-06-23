@@ -48,22 +48,16 @@ static void oldfamiliars(unit * u)
   equip_unit(u, get_equipment(fname));
 }
 
-static void set_show_item(faction * f, item_t i)
-{
-  attrib *a = a_add(&f->attribs, a_new(&at_showitem));
-  a->data.v = (void *)olditemtype[i];
-}
-
 static void equip_newunits(const struct equipment *eq, struct unit *u)
 {
   struct region *r = u->region;
 
   switch (old_race(u_race(u))) {
   case RC_ELF:
-    set_show_item(u->faction, I_FEENSTIEFEL);
+    set_show_item(u->faction, it_find("fairyboot"));
     break;
   case RC_GOBLIN:
-    set_show_item(u->faction, I_RING_OF_INVISIBILITY);
+    set_show_item(u->faction, it_find("roi"));
     set_number(u, 10);
     break;
   case RC_HUMAN:
@@ -78,7 +72,7 @@ static void equip_newunits(const struct equipment *eq, struct unit *u)
     }
     break;
   case RC_CAT:
-    set_show_item(u->faction, I_RING_OF_INVISIBILITY);
+    set_show_item(u->faction, it_find("roi"));
     break;
   case RC_AQUARIAN:
   {

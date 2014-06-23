@@ -31,7 +31,7 @@ void test_change_item(CuTest * tc)
   test_create_world();
 
   u = test_create_unit(0, 0);
-  test_uchange(tc, u, olditemtype[I_IRON]->rtype);
+  test_uchange(tc, u, get_resourcetype(R_IRON));
 }
 
 void test_change_person(CuTest * tc)

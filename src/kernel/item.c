@@ -399,12 +399,12 @@ item **i_find(item ** i, const item_type * it)
   return i;
 }
 
-item *const *i_findc(item * const *i, const item_type * it)
+item *const* i_findc(item *const* iter, const item_type * it)
 {
-  while (*i && (*i)->type != it) {
-    i = &(*i)->next;
+  while (*iter && (*iter)->type != it) {
+    iter = &(*iter)->next;
   }
-  return i;
+  return iter;
 }
 
 int i_get(const item * i, const item_type * it)
@@ -597,7 +597,6 @@ give_money(unit * s, unit * d, const item_type * itype, int n,
 #define LASTLUXURY      (I_INCENSE +1)
 #define MAXLUXURIES (LASTLUXURY - FIRSTLUXURY)
 
-const item_type *olditemtype[MAXITEMS + 1];
 const potion_type *oldpotiontype[MAXPOTIONS + 1];
 
 /*** alte items ***/
@@ -607,7 +606,7 @@ const char *itemnames[MAX_RESOURCES] = {
   "aots", "roi", "rop", "ao_chastity",
   "laen", "fairyboot", "aoc", "pegasus",
   "elvenhorse", "dolphin", "roqf", "trollbelt",
-  "presspass", "aurafocus", "sphereofinv", "magicbag",
+  "aurafocus", "sphereofinv", "magicbag",
   "magicherbbag", "dreameye", "money", "aura", "permaura"
 };
 
@@ -616,24 +615,21 @@ const resource_type *get_resourcetype(resource_t type) {
     return rtype;
 }
 
-int get_item(const unit * u, item_t it)
+int get_item(const unit * u, const item_type *itype)
 {
-  const item_type *type = olditemtype[it];
-  const item *i = *i_findc(&u->items, type);
-  if (i)
-    assert(i->number >= 0);
+  const item *i = *i_findc(&u->items, itype);
+  assert(!i || i->number >= 0);
   return i ? i->number : 0;
 }
 
-int set_item(unit * u, item_t it, int value)
+int set_item(unit * u, const item_type *itype, int value)
 {
-  const item_type *type = olditemtype[it];
   item *i;
 
-  assert(type);
-  i = *i_find(&u->items, type);
+  assert(itype);
+  i = *i_find(&u->items, itype);
   if (!i) {
-    i = i_add(&u->items, i_new(type, value));
+    i = i_add(&u->items, i_new(itype, value));
   } else {
     i->number = value;
     assert(i->number >= 0);
@@ -729,20 +725,6 @@ mod_dwarves_only(const unit * u, const region * r, skill_t sk, int value)
     return value;
   unused_arg(r);
   return -118;
-}
-
-static void init_olditems(void)
-{
-  item_t i;
-
-  for (i = 0; i != MAXITEMS; ++i) {
-    /* item is defined in XML file, but IT_XYZ enum still in use */
-    const item_type *itype = it_find(itemnames[i]);
-
-    if (itype) {
-      olditemtype[i] = itype;
-    }
-  }
 }
 
 static int heal(unit * user, int effect)
@@ -1006,7 +988,6 @@ void init_resources(void)
   rt_register(r_unit);
 
   /* alte typen registrieren: */
-  init_olditems();
   init_oldpotions();
 }
 
@@ -1211,7 +1192,6 @@ void test_clear_resources(void)
 {
   int i;
 
-  memset((void *)olditemtype, 0, sizeof(olditemtype));
   memset((void *)oldpotiontype, 0, sizeof(oldpotiontype));
 
   cb_foreach(&cb_items, "", 0, free_itype_cb, 0);

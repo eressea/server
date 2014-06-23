@@ -547,18 +547,6 @@ void sparagraph(strlist ** SP, const char *s, int indent, char mark)
   }
 }
 
-int hat_in_region(item_t it, region * r, faction * f)
-{
-  unit *u;
-
-  for (u = r->units; u; u = u->next) {
-    if (u->faction == f && get_item(u, it) > 0) {
-      return 1;
-    }
-  }
-  return 0;
-}
-
 static void
 nr_curses(FILE * F, const faction * viewer, const void *obj, objtype_t typ,
   int indent)
