@@ -370,7 +370,7 @@ static void guardian_faction(plane * pl, int id)
         continue;
       u = createunit(r, f, 1, new_race[RC_GOBLIN]);
       set_string(&u->name, "Igjarjuks Auge");
-      set_item(u, I_RING_OF_INVISIBILITY, 1);
+      i_change(&u->items, it_find("roi"), 1);
       set_order(&u->thisorder, NULL);
       fset(u, UFL_ANON_FACTION);
       set_money(u, 1000);

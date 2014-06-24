@@ -836,7 +836,7 @@ static const armor_type *select_armor(troop t, bool shield)
 
 /* Hier ist zu beachten, ob und wie sich Zauber und Artefakte, die
  * Rüstungschutz geben, addieren.
- * - Artefakt I_TROLLBELT gibt Rüstung +1
+ * - Artefakt "trollbelt" gibt Rüstung +1
  * - Zauber Rindenhaut gibt Rüstung +3
  */
 static int trollbelts(const unit *u) {

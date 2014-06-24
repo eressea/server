@@ -273,32 +273,6 @@ extern "C" {
   extern resource_type *r_permaura;
   extern resource_type *r_unit;
 
-  enum {
-    I_IRON,                     /* 0 */
-    I_STONE,
-    I_HORSE,
-    /* alte Artefakte */
-    I_AMULET_OF_HEALING,
-    I_AMULET_OF_TRUE_SEEING,
-    I_RING_OF_INVISIBILITY,
-    I_RING_OF_POWER,
-    I_CHASTITY_BELT,            /* bleibt */
-    I_LAEN,
-    I_FEENSTIEFEL,
-    I_BIRTHDAYAMULET,
-    I_PEGASUS,
-    I_ELVENHORSE,
-    I_DOLPHIN,
-    I_RING_OF_NIMBLEFINGER,
-    I_TROLLBELT,
-    I_AURAKULUM,
-    I_SPHERE_OF_INVISIBILITY,
-    I_BAG_OF_HOLDING,
-    I_SACK_OF_CONSERVATION,
-    I_TACTICCRYSTAL,
-    MAX_ITEMS                   /* do not use outside item.c ! */
-  };
-
   typedef enum {
     /* ITEMS: */
     R_IRON,

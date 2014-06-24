@@ -593,9 +593,6 @@ give_money(unit * s, unit * d, const item_type * itype, int n,
 #define MAXHERBS MAX_HERBS
 #define MAXPOTIONS MAX_POTIONS
 #define MAXHERBSPERPOTION 6
-#define FIRSTLUXURY     (I_BALM)
-#define LASTLUXURY      (I_INCENSE +1)
-#define MAXLUXURIES (LASTLUXURY - FIRSTLUXURY)
 
 const potion_type *oldpotiontype[MAXPOTIONS + 1];
 
@@ -1237,7 +1234,4 @@ void register_resources(void)
   register_item_use(use_snowball, "usesnowball");
 
   register_item_give(give_horses, "givehorses");
-
-  /* make sure noone has deleted an I_ tpe without deleting the R_ type that goes with it! */
-  assert((int)I_TACTICCRYSTAL == (int)R_TACTICCRYSTAL);
 }
