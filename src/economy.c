@@ -66,8 +66,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/racename.h>
 #include <attributes/orcification.h>
 
-#include <items/seed.h>
-
 /* libs includes */
 #include <math.h>
 #include <stdio.h>
@@ -2493,11 +2491,7 @@ static void planttrees(region * r, unit * u, int raw)
   }
 
   /* Mallornbäume kann man nur in Mallornregionen züchten */
-  if (fval(r, RF_MALLORN)) {
-    rtype = rt_mallornseed;
-  } else {
-    rtype = rt_seed;
-  }
+  rtype = get_resourcetype(fval(r, RF_MALLORN) ? R_MALLORNSEED : R_SEED);
 
   /* Skill prüfen */
   skill = eff_skill(u, SK_HERBALISM, r);
@@ -2565,11 +2559,7 @@ static void breedtrees(region * r, unit * u, int raw)
   }
 
   /* Mallornbäume kann man nur in Mallornregionen züchten */
-  if (fval(r, RF_MALLORN)) {
-    rtype = rt_mallornseed;
-  } else {
-    rtype = rt_seed;
-  }
+  rtype = get_resourcetype(fval(r, RF_MALLORN) ? R_MALLORNSEED : R_SEED);
 
   /* Skill prüfen */
   skill = eff_skill(u, SK_HERBALISM, r);
@@ -2679,7 +2669,7 @@ static void breed_cmd(unit * u, struct order *ord)
   default:
     if (p != P_ANY) {
       rtype = findresourcetype(s, u->faction->locale);
-      if (rtype == rt_mallornseed || rtype == rt_seed) {
+      if (rtype == get_resourcetype(R_SEED) || rtype == get_resourcetype(R_MALLORNSEED)) {
         breedtrees(r, u, m);
         break;
       } else if (rtype != get_resourcetype(R_HORSE)) {

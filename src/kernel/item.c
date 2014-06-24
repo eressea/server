@@ -609,7 +609,8 @@ const char *itemnames[MAX_RESOURCES] = {
   "laen", "fairyboot", "aoc", "pegasus",
   "elvenhorse", "charger", "dolphin", "roqf", "trollbelt",
   "aurafocus", "sphereofinv", "magicbag",
-  "magicherbbag", "dreameye", "p2", "money", "aura", "permaura",
+  "magicherbbag", "dreameye", "p2", "seed", "mallornseed",
+  "money", "aura", "permaura",
   "hp", "unit", "peasant"
 };
 

@@ -28,35 +28,33 @@
 /* libc includes */
 #include <assert.h>
 
-resource_type *rt_seed = 0;
-resource_type *rt_mallornseed = 0;
-
 static void produce_seeds(region * r, const resource_type * rtype, int norders)
 {
-  assert(rtype == rt_seed && r->land && r->land->trees[0] >= norders);
-  r->land->trees[0] -= norders;
+    assert(r->land && r->land->trees[0] >= norders);
+    r->land->trees[0] -= norders;
 }
 
 static int limit_seeds(const region * r, const resource_type * rtype)
 {
-  assert(rtype == rt_seed);
-  if (fval(r, RF_MALLORN))
-    return 0;
-  return r->land ? r->land->trees[0] : 0;
+    if (fval(r, RF_MALLORN)) {
+        return 0;
+    }
+    return r->land ? r->land->trees[0] : 0;
 }
 
 void init_seed(void)
 {
-  attrib *a;
-  resource_limit *rdata;
-
-  rt_seed = rt_find("seed");
-  if (rt_seed != NULL) {
-    a = a_add(&rt_seed->attribs, a_new(&at_resourcelimit));
-    rdata = (resource_limit *) a->data.v;
-    rdata->limit = limit_seeds;
-    rdata->produce = produce_seeds;
-  }
+    attrib *a;
+    resource_limit *rdata;
+    resource_type *rtype;
+  
+    rtype = rt_find("seed");
+    if (rtype != NULL) {
+        a = a_add(&rtype->attribs, a_new(&at_resourcelimit));
+        rdata = (resource_limit *) a->data.v;
+        rdata->limit = limit_seeds;
+        rdata->produce = produce_seeds;
+    }
 }
 
 /* mallorn */
@@ -64,14 +62,12 @@ void init_seed(void)
 static void
 produce_mallornseeds(region * r, const resource_type * rtype, int norders)
 {
-  assert(rtype == rt_mallornseed && r->land && r->land->trees[0] >= norders);
   assert(fval(r, RF_MALLORN));
   r->land->trees[0] -= norders;
 }
 
 static int limit_mallornseeds(const region * r, const resource_type * rtype)
 {
-  assert(rtype == rt_mallornseed);
   if (!fval(r, RF_MALLORN)) {
     return 0;
   }
@@ -80,17 +76,18 @@ static int limit_mallornseeds(const region * r, const resource_type * rtype)
 
 void init_mallornseed(void)
 {
-  attrib *a;
-  resource_limit *rdata;
+    attrib *a;
+    resource_limit *rdata;
+    resource_type *rtype;
 
-  rt_mallornseed = rt_find("mallornseed");
-  if (rt_mallornseed != NULL) {
-    rt_mallornseed->flags |= RTF_LIMITED;
-    rt_mallornseed->flags |= RTF_POOLED;
-
-    a = a_add(&rt_mallornseed->attribs, a_new(&at_resourcelimit));
-    rdata = (resource_limit *) a->data.v;
-    rdata->limit = limit_mallornseeds;
-    rdata->produce = produce_mallornseeds;
-  }
+    rtype = rt_find("mallornseed");
+    if (rtype != NULL) {
+        rtype->flags |= RTF_LIMITED;
+        rtype->flags |= RTF_POOLED;
+        
+        a = a_add(&rtype->attribs, a_new(&at_resourcelimit));
+        rdata = (resource_limit *) a->data.v;
+        rdata->limit = limit_mallornseeds;
+        rdata->produce = produce_mallornseeds;
+    }
 }

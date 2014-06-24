@@ -290,7 +290,8 @@ extern "C" {
     R_SACK_OF_CONSERVATION,
     R_TACTICCRYSTAL,
     R_WATER_OF_LIFE,
-
+    R_SEED,
+    R_MALLORNSEED,
     /* SONSTIGE */
     R_SILVER,
     R_AURA,                     /* Aura */

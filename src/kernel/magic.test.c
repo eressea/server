@@ -78,13 +78,13 @@ static spell * test_magic_create_spell(void)
 
   sp->components = (spell_component *) calloc(4, sizeof(spell_component));
   sp->components[0].amount = 1;
-  sp->components[0].type = rt_find("money");
+  sp->components[0].type = get_resourcetype(R_SILVER);
   sp->components[0].cost = SPC_FIX;
   sp->components[1].amount = 1;
-  sp->components[1].type = rt_find("aura");
+  sp->components[1].type = get_resourcetype(R_AURA);
   sp->components[1].cost = SPC_LEVEL;
   sp->components[2].amount = 1;
-  sp->components[2].type = rt_find("horse");
+  sp->components[2].type = get_resourcetype(R_HORSE);
   sp->components[2].cost = SPC_LINEAR;
   return sp;
 }
@@ -110,16 +110,16 @@ void test_pay_spell(CuTest * tc)
   set_level(u, SK_MAGIC, 5);
   unit_add_spell(u, 0, sp, 1);
 
-  change_resource(u, rt_find("money"), 1);
-  change_resource(u, rt_find("aura"), 3);
-  change_resource(u, rt_find("horse"), 3);
+  change_resource(u, get_resourcetype(R_SILVER), 1);
+  change_resource(u, get_resourcetype(R_AURA), 3);
+  change_resource(u, get_resourcetype(R_HORSE), 3);
 
   level = eff_spelllevel(u, sp, 3, 1);
   CuAssertIntEquals(tc, 3, level);
   pay_spell(u, sp, level, 1);
-  CuAssertIntEquals(tc, 0, get_resource(u, rt_find("money")));
-  CuAssertIntEquals(tc, 0, get_resource(u, rt_find("aura")));
-  CuAssertIntEquals(tc, 0, get_resource(u, rt_find("horse")));
+  CuAssertIntEquals(tc, 0, get_resource(u, get_resourcetype(R_SILVER)));
+  CuAssertIntEquals(tc, 0, get_resource(u, get_resourcetype(R_AURA)));
+  CuAssertIntEquals(tc, 0, get_resource(u, get_resourcetype(R_HORSE)));
 }
 
 void test_pay_spell_failure(CuTest * tc)
@@ -143,19 +143,19 @@ void test_pay_spell_failure(CuTest * tc)
   set_level(u, SK_MAGIC, 5);
   unit_add_spell(u, 0, sp, 1);
 
-  CuAssertIntEquals(tc, 1, change_resource(u, rt_find("money"), 1));
-  CuAssertIntEquals(tc, 2, change_resource(u, rt_find("aura"), 2));
-  CuAssertIntEquals(tc, 3, change_resource(u, rt_find("horse"), 3));
+  CuAssertIntEquals(tc, 1, change_resource(u, get_resourcetype(R_SILVER), 1));
+  CuAssertIntEquals(tc, 2, change_resource(u, get_resourcetype(R_AURA), 2));
+  CuAssertIntEquals(tc, 3, change_resource(u, get_resourcetype(R_HORSE), 3));
 
   level = eff_spelllevel(u, sp, 3, 1);
   CuAssertIntEquals(tc, 2, level);
   pay_spell(u, sp, level, 1);
-  CuAssertIntEquals(tc, 1, change_resource(u, rt_find("money"), 1));
-  CuAssertIntEquals(tc, 3, change_resource(u, rt_find("aura"), 3));
-  CuAssertIntEquals(tc, 2, change_resource(u, rt_find("horse"), 1));
+  CuAssertIntEquals(tc, 1, change_resource(u, get_resourcetype(R_SILVER), 1));
+  CuAssertIntEquals(tc, 3, change_resource(u, get_resourcetype(R_AURA), 3));
+  CuAssertIntEquals(tc, 2, change_resource(u, get_resourcetype(R_HORSE), 1));
 
   CuAssertIntEquals(tc, 0, eff_spelllevel(u, sp, 3, 1));
-  CuAssertIntEquals(tc, 0, change_resource(u, rt_find("money"), -1));
+  CuAssertIntEquals(tc, 0, change_resource(u, get_resourcetype(R_SILVER), -1));
   CuAssertIntEquals(tc, 0, eff_spelllevel(u, sp, 2, 1));
 }
 

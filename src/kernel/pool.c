@@ -53,9 +53,9 @@ int get_resource(const unit * u, const resource_type * rtype)
       return i;
   }
   if (rtype->itype) {
-    if (rtype == rt_find("stone") && (u_race(u)->flags & RCF_STONEGOLEM)) {
+    if (rtype == get_resourcetype(R_STONE) && (u_race(u)->flags & RCF_STONEGOLEM)) {
       return u->number * GOLEM_STONE;
-    } else if (rtype->itype == it_find("iron") && (u_race(u)->flags & RCF_IRONGOLEM)) {
+    } else if (rtype == get_resourcetype(R_IRON) && (u_race(u)->flags & RCF_IRONGOLEM)) {
       return u->number * GOLEM_IRON;
     } else {
       return i_get(u->items, rtype->itype);
