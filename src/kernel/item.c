@@ -190,22 +190,24 @@ void it_register(item_type * itype)
 item_type *new_itemtype(resource_type * rtype,
   int iflags, int weight, int capacity)
 {
-  item_type *itype;
-  assert(resource2item(rtype) == NULL);
-  assert(rtype->flags & RTF_ITEM);
+    item_type *itype;
 
-  itype = calloc(sizeof(item_type), 1);
-
-  itype->rtype = rtype;
-  rtype->itype = itype;
-  itype->weight = weight;
-  itype->capacity = capacity;
-  itype->flags |= iflags;
-  it_register(itype);
-
-  rtype->uchange = res_changeitem;
-
-  return itype;
+    assert(!rtype->itype);
+    assert(!rtype->uchange || rtype->uchange==res_changeitem);
+    
+    itype = calloc(sizeof(item_type), 1);
+    
+    itype->rtype = rtype;
+    itype->weight = weight;
+    itype->capacity = capacity;
+    itype->flags |= iflags;
+    it_register(itype);
+    
+    rtype->itype = itype;
+    rtype->flags |= RTF_ITEM;
+    rtype->uchange = res_changeitem;
+    
+    return itype;
 }
 
 static void lt_register(luxury_type * ltype)
@@ -295,15 +297,18 @@ potion_type *new_potiontype(item_type * itype, int level)
   return ptype;
 }
 
+static int num_resources;
+
 void rt_register(resource_type * rtype)
 {
-  char buffer[64];
-  const char * name = rtype->_name[0];
-  size_t len = strlen(name);
-
-  assert(len<sizeof(buffer)-sizeof(rtype));
-  len = cb_new_kv(name, len, &rtype, sizeof(rtype), buffer);
-  cb_insert(&cb_resources, buffer, len);
+    char buffer[64];
+    const char * name = rtype->_name[0];
+    size_t len = strlen(name);
+    
+    assert(len<sizeof(buffer)-sizeof(rtype));
+    len = cb_new_kv(name, len, &rtype, sizeof(rtype), buffer);
+    cb_insert(&cb_resources, buffer, len);
+    ++num_resources;
 }
 
 const resource_type *item2resource(const item_type * itype)
@@ -602,13 +607,23 @@ const char *itemnames[MAX_RESOURCES] = {
   "iron", "stone", "horse", "ao_healing",
   "aots", "roi", "rop", "ao_chastity",
   "laen", "fairyboot", "aoc", "pegasus",
-  "elvenhorse", "dolphin", "roqf", "trollbelt",
+  "elvenhorse", "charger", "dolphin", "roqf", "trollbelt",
   "aurafocus", "sphereofinv", "magicbag",
-  "magicherbbag", "dreameye", "money", "aura", "permaura"
+  "magicherbbag", "dreameye", "p2", "money", "aura", "permaura",
+  "hp", "unit", "peasant"
 };
 
 const resource_type *get_resourcetype(resource_t type) {
-    const resource_type *rtype = rt_find(itemnames[type]);
+    static int update;
+    static const struct resource_type *rtypes[MAX_RESOURCES];
+    if (update!=num_resources) {
+        memset(rtypes, 0, sizeof(rtypes));
+        update = num_resources;
+    }
+    const resource_type *rtype = rtypes[type];
+    if (!rtype) {
+        rtype = rtypes[type] = rt_find(itemnames[type]);
+    }
     return rtype;
 }
 
@@ -932,14 +947,6 @@ static void init_oldpotions(void)
   }
 }
 
-resource_type *r_silver;
-resource_type *r_aura;
-resource_type *r_permaura;
-resource_type *r_unit;
-static resource_type *r_hp;
-
-item_type *i_silver;
-
 static const char *names[] = {
   "money", "money_p",
   "person", "person_p",
@@ -953,89 +960,118 @@ static const char *names[] = {
 void init_resources(void)
 {
     resource_type *rtype;
-    if (r_hp) {
-        // we have done this already
-        return;
+    item_type *itype;
+
+    rtype = rt_find(names[8]);
+    if (!rtype) {
+        rtype = new_resourcetype(names + 8, NULL, RTF_NONE);
+        rt_register(rtype);
     }
+    rtype->uchange = res_changepeasants;
+    
+    // R_SILVER
+    rtype = rt_find(names[0]);
+    if (!rtype) {
+        rtype = new_resourcetype(&names[0], NULL, RTF_ITEM | RTF_POOLED);
+        rt_register(rtype);
+    }
+    rtype->uchange = res_changeitem;
+    itype = rtype->itype;
+    if (!itype) {
+        itype = new_itemtype(rtype, ITF_NONE, 1 /*weight */ , 0);
+    }
+    itype->give = give_money;
 
-  rtype = new_resourcetype(names + 8, NULL, RTF_NONE);
-  rtype->uchange = res_changepeasants;
-  rt_register(rtype);
+    // R_PERMAURA
+    rtype = rt_find(names[4]);
+    if (!rtype) {
+        rtype = new_resourcetype(&names[4], NULL, RTF_NONE);
+        rt_register(rtype);
+    }
+    rtype->uchange = res_changepermaura;
+    
+    // R_LIFE
+    rtype = rt_find(names[6]);
+    if (!rtype) {
+        rtype = new_resourcetype(&names[6], NULL, RTF_NONE);
+        rt_register(rtype);
+    }
+    rtype->uchange = res_changehp;
+    
+    // R_AURA
+    rtype = rt_find(names[10]);
+    if (!rtype) {
+        rtype = new_resourcetype(&names[10], NULL, RTF_NONE);
+        rt_register(rtype);
+    }
+    rtype->uchange = res_changeaura;
 
-  r_silver = new_resourcetype(&names[0], NULL, RTF_ITEM | RTF_POOLED);
-  i_silver = new_itemtype(r_silver, ITF_NONE, 1 /*weight */ , 0);
-  r_silver->uchange = res_changeitem;
-  i_silver->give = give_money;
-  rt_register(r_silver);
-
-  r_permaura = new_resourcetype(&names[4], NULL, RTF_NONE);
-  r_permaura->uchange = res_changepermaura;
-  rt_register(r_permaura);
-
-  r_hp = new_resourcetype(&names[6], NULL, RTF_NONE);
-  r_hp->uchange = res_changehp;
-  rt_register(r_hp);
-
-  r_aura = new_resourcetype(&names[10], NULL, RTF_NONE);
-  r_aura->uchange = res_changeaura;
-  rt_register(r_aura);
-
-  r_unit = new_resourcetype(&names[12], NULL, RTF_NONE);
-  r_unit->uchange = res_changeperson;
-  rt_register(r_unit);
-
-  /* alte typen registrieren: */
-  init_oldpotions();
+    // R_UNIT
+    rtype = rt_find(names[12]);
+    if (!rtype) {
+        rtype = new_resourcetype(&names[12], NULL, RTF_NONE);
+        rt_register(rtype);
+    }
+    rtype->uchange = res_changeperson;
+    
+    /* alte typen registrieren: */
+    init_oldpotions();
 }
 
 int get_money(const unit * u)
 {
-  const item *i = u->items;
-  while (i && i->type != i_silver)
-    i = i->next;
-  if (i == NULL)
-    return 0;
-  return i->number;
+    const struct resource_type *rtype = get_resourcetype(R_SILVER);
+    const item *i = u->items;
+    while (i && i->type->rtype != rtype) {
+        i = i->next;
+    }
+    return i ? i->number : 0;
 }
 
 int set_money(unit * u, int v)
 {
-  item **ip = &u->items;
-  while (*ip && (*ip)->type != i_silver)
-    ip = &(*ip)->next;
-  if ((*ip) == NULL && v) {
-    i_add(&u->items, i_new(i_silver, v));
+    const struct resource_type *rtype = get_resourcetype(R_SILVER);
+    item **ip = &u->items;
+    while (*ip && (*ip)->type->rtype != rtype) {
+        ip = &(*ip)->next;
+    }
+    if ((*ip) == NULL && v) {
+        i_add(&u->items, i_new(rtype->itype, v));
+        return v;
+    }
+    if ((*ip) != NULL) {
+        if (v) {
+            (*ip)->number = v;
+            assert((*ip)->number >= 0);
+        } else {
+            i_remove(ip, *ip);
+        }
+    }
     return v;
-  }
-  if ((*ip) != NULL) {
-    if (v) {
-      (*ip)->number = v;
-      assert((*ip)->number >= 0);
-    } else
-      i_remove(ip, *ip);
-  }
-  return v;
 }
 
 int change_money(unit * u, int v)
 {
-  item **ip = &u->items;
-  while (*ip && (*ip)->type != i_silver)
-    ip = &(*ip)->next;
-  if ((*ip) == NULL && v) {
-    i_add(&u->items, i_new(i_silver, v));
-    return v;
-  }
-  if ((*ip) != NULL) {
-    item *i = *ip;
-    if (i->number + v != 0) {
-      i->number += v;
-      assert(i->number >= 0);
-      return i->number;
-    } else
-      i_free(i_remove(ip, *ip));
-  }
-  return 0;
+    const struct resource_type *rtype = get_resourcetype(R_SILVER);
+    item **ip = &u->items;
+    while (*ip && (*ip)->type->rtype != rtype) {
+        ip = &(*ip)->next;
+    }
+    if ((*ip) == NULL && v) {
+        i_add(&u->items, i_new(rtype->itype, v));
+        return v;
+    }
+    if ((*ip) != NULL) {
+        item *i = *ip;
+        if (i->number + v != 0) {
+            i->number += v;
+            assert(i->number >= 0);
+            return i->number;
+        } else {
+            i_free(i_remove(ip, *ip));
+        }
+    }
+    return 0;
 }
 
 static int add_resourcename_cb(const void * match, const void * key, size_t keylen, void *data)
@@ -1187,21 +1223,19 @@ int free_rtype_cb(const void * match, const void * key, size_t keylen, void *cbd
 
 void test_clear_resources(void)
 {
-  int i;
+    int i;
 
-  memset((void *)oldpotiontype, 0, sizeof(oldpotiontype));
-
-  cb_foreach(&cb_items, "", 0, free_itype_cb, 0);
-  cb_clear(&cb_items);
-  cb_foreach(&cb_resources, "", 0, free_rtype_cb, 0);
-  cb_clear(&cb_resources);
-
-  r_hp = r_silver = r_aura = r_permaura = r_unit = 0;
-  i_silver = 0;
-
-  for (i=0; i!=MAXLOCALES; ++i) {
-    cb_clear(inames+i);
-  }
+    memset((void *)oldpotiontype, 0, sizeof(oldpotiontype));
+    
+    cb_foreach(&cb_items, "", 0, free_itype_cb, 0);
+    cb_clear(&cb_items);
+    cb_foreach(&cb_resources, "", 0, free_rtype_cb, 0);
+    cb_clear(&cb_resources);
+    ++num_resources;
+    
+    for (i=0; i!=MAXLOCALES; ++i) {
+        cb_clear(inames+i);
+    }
 }
 #endif
 

@@ -140,7 +140,9 @@ void
 report_item(const unit * owner, const item * i, const faction * viewer,
   const char **name, const char **basename, int *number, bool singular)
 {
-  assert(!owner || owner->number);
+    const resource_type *rsilver = get_resourcetype(R_SILVER);
+
+    assert(!owner || owner->number);
   if (owner && owner->faction == viewer) {
     if (name)
       *name =
@@ -150,7 +152,7 @@ report_item(const unit * owner, const item * i, const faction * viewer,
       *basename = resourcename(i->type->rtype, 0);
     if (number)
       *number = i->number;
-  } else if (owner && i->type->rtype == r_silver) {
+  } else if (owner && i->type->rtype == rsilver) {
     int pp = i->number / owner->number;
     if (number)
       *number = 1;

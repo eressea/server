@@ -292,13 +292,12 @@ void get_food(region * r)
       int hungry = u->number;
 
       /* use peasantblood before eating the peasants themselves */
-      static const struct potion_type *pt_blood;
-      if (pt_blood == NULL) {
-        const item_type *it_blood = it_find("peasantblood");
-        if (it_blood)
+      const struct potion_type *pt_blood = 0;
+      const item_type *it_blood = it_find("peasantblood");
+      if (it_blood) {
           pt_blood = it_blood->rtype->ptype;
       }
-      if (pt_blood != NULL) {
+      if (pt_blood) {
         /* always start with the unit itself, then the first known unit that may have some blood */
         unit *donor = u;
         while (donor != NULL && hungry > 0) {
@@ -2694,6 +2693,7 @@ static void reshow(unit * u, struct order *ord, const char *s, param_t p)
 
 int promotion_cmd(unit * u, struct order *ord)
 {
+    const struct resource_type *rsilver = get_resourcetype(R_SILVER);
   int money, people;
 
   if (fval(u, UFL_HERO)) {
@@ -2713,14 +2713,14 @@ int promotion_cmd(unit * u, struct order *ord)
     return 0;
   }
   people = count_all(u->faction) * u->number;
-  money = get_pooled(u, i_silver->rtype, GET_ALL, people);
+  money = get_pooled(u, rsilver, GET_ALL, people);
 
   if (people > money) {
     ADDMSG(&u->faction->msgs,
       msg_feedback(u, ord, "heroes_cost", "cost have", people, money));
     return 0;
   }
-  use_pooled(u, i_silver->rtype, GET_ALL, people);
+  use_pooled(u, rsilver, GET_ALL, people);
   fset(u, UFL_HERO);
   ADDMSG(&u->faction->msgs, msg_message("hero_promotion", "unit cost",
       u, people));
@@ -4327,86 +4327,82 @@ void process(void)
 
 int siege_cmd(unit * u, order * ord)
 {
-  region *r = u->region;
-  building *b;
-  int d, pooled;
-  int bewaffnete, katapultiere = 0;
-  static bool init = false;
-  static const curse_type *magicwalls_ct;
-  static item_type *it_catapultammo = NULL;
-  static item_type *it_catapult = NULL;
-  if (!init) {
-    init = true;
+    region *r = u->region;
+    building *b;
+    int d, pooled;
+    int bewaffnete, katapultiere = 0;
+    const curse_type *magicwalls_ct;
+    item_type *it_catapultammo = NULL;
+    item_type *it_catapult = NULL;
+
+    init_tokens(ord);
+    skip_token();
+    b = getbuilding(r);
+    
+    if (!b) {
+        cmistake(u, ord, 31, MSG_BATTLE);
+        return 31;
+    }
+
+    if (!playerrace(u_race(u))) {
+        /* keine Drachen, Illusionen, Untote etc */
+        cmistake(u, ord, 166, MSG_BATTLE);
+        return 166;
+    }
+    /* schaden durch katapulte */
+
     magicwalls_ct = ct_find("magicwalls");
     it_catapultammo = it_find("catapultammo");
     it_catapult = it_find("catapult");
-  }
-  /* gibt es ueberhaupt Burgen? */
 
-  init_tokens(ord);
-  skip_token();
-  b = getbuilding(r);
-
-  if (!b) {
-    cmistake(u, ord, 31, MSG_BATTLE);
-    return 31;
-  }
-
-  if (!playerrace(u_race(u))) {
-    /* keine Drachen, Illusionen, Untote etc */
-    cmistake(u, ord, 166, MSG_BATTLE);
-    return 166;
-  }
-  /* schaden durch katapulte */
-
-  d = i_get(u->items, it_catapult);
-  d = _min(u->number, d);
-  pooled = get_pooled(u, it_catapultammo->rtype, GET_DEFAULT, d);
-  d = _min(pooled, d);
-  if (eff_skill(u, SK_CATAPULT, r) >= 1) {
-    katapultiere = d;
-    d *= eff_skill(u, SK_CATAPULT, r);
-  } else {
-    d = 0;
-  }
-
-  bewaffnete = armedmen(u, true);
-  if (d == 0 && bewaffnete == 0) {
-    /* abbruch, falls unbewaffnet oder unfaehig, katapulte zu benutzen */
-    cmistake(u, ord, 80, MSG_EVENT);
-    return 80;
-  }
-
-  if (!is_guard(u, GUARD_TRAVELTHRU)) {
-    /* abbruch, wenn die einheit nicht vorher die region bewacht - als
-     * warnung fuer alle anderen! */
-    cmistake(u, ord, 81, MSG_EVENT);
-    return 81;
-  }
-  /* einheit und burg markieren - spart zeit beim behandeln der einheiten
-   * in der burg, falls die burg auch markiert ist und nicht alle
-   * einheiten wieder abgesucht werden muessen! */
-
-  usetsiege(u, b);
-  b->besieged += _max(bewaffnete, katapultiere);
-
-  /* definitiver schaden eingeschraenkt */
-
-  d = _min(d, b->size - 1);
-
-  /* meldung, schaden anrichten */
-  if (d && !curse_active(get_curse(b->attribs, magicwalls_ct))) {
-    b->size -= d;
-    use_pooled(u, it_catapultammo->rtype,
-      GET_SLACK | GET_RESERVE | GET_POOLED_SLACK, d);
-    /* send message to the entire region */
-    ADDMSG(&r->msgs, msg_message("siege_catapults",
-        "unit building destruction", u, b, d));
-  } else {
-    /* send message to the entire region */
-    ADDMSG(&r->msgs, msg_message("siege", "unit building", u, b));
-  }
-  return 0;
+    d = i_get(u->items, it_catapult);
+    d = _min(u->number, d);
+    pooled = get_pooled(u, it_catapultammo->rtype, GET_DEFAULT, d);
+    d = _min(pooled, d);
+    if (eff_skill(u, SK_CATAPULT, r) >= 1) {
+        katapultiere = d;
+        d *= eff_skill(u, SK_CATAPULT, r);
+    } else {
+        d = 0;
+    }
+    
+    bewaffnete = armedmen(u, true);
+    if (d == 0 && bewaffnete == 0) {
+        /* abbruch, falls unbewaffnet oder unfaehig, katapulte zu benutzen */
+        cmistake(u, ord, 80, MSG_EVENT);
+        return 80;
+    }
+    
+    if (!is_guard(u, GUARD_TRAVELTHRU)) {
+        /* abbruch, wenn die einheit nicht vorher die region bewacht - als
+         * warnung fuer alle anderen! */
+        cmistake(u, ord, 81, MSG_EVENT);
+        return 81;
+    }
+    /* einheit und burg markieren - spart zeit beim behandeln der einheiten
+     * in der burg, falls die burg auch markiert ist und nicht alle
+     * einheiten wieder abgesucht werden muessen! */
+    
+    usetsiege(u, b);
+    b->besieged += _max(bewaffnete, katapultiere);
+    
+    /* definitiver schaden eingeschraenkt */
+    
+    d = _min(d, b->size - 1);
+    
+    /* meldung, schaden anrichten */
+    if (d && !curse_active(get_curse(b->attribs, magicwalls_ct))) {
+        b->size -= d;
+        use_pooled(u, it_catapultammo->rtype,
+                   GET_SLACK | GET_RESERVE | GET_POOLED_SLACK, d);
+        /* send message to the entire region */
+        ADDMSG(&r->msgs, msg_message("siege_catapults",
+                                     "unit building destruction", u, b, d));
+    } else {
+        /* send message to the entire region */
+        ADDMSG(&r->msgs, msg_message("siege", "unit building", u, b));
+    }
+    return 0;
 }
 
 void do_siege(region * r)

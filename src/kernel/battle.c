@@ -2314,40 +2314,35 @@ static void add_tactics(tactics * ta, fighter * fig, int value)
 
 static double horsebonus(const unit * u)
 {
-  static const item_type *it_horse = 0;
-  static const item_type *it_elvenhorse = 0;
-  static const item_type *it_charger = 0;
-  region *r = u->region;
-  int n1 = 0, n2 = 0, n3 = 0;
-  item *itm = u->items;
-  int skl = eff_skill(u, SK_RIDING, r);
+    const item_type *it_horse, *it_elvenhorse, *it_charger;
+    int n1 = 0, n2 = 0, n3 = 0;
+    item *itm;
+    int skl = eff_skill(u, SK_RIDING, u->region);
+    const resource_type *rtype;
+    
+    if (skl < 1) return 0.0;
+    
+    it_horse = (rtype = get_resourcetype(R_HORSE)) ? rtype->itype : 0;
+    it_elvenhorse = (rtype = get_resourcetype(R_UNICORN)) ? rtype->itype : 0;
+    it_charger = (rtype = get_resourcetype(R_CHARGER)) ? rtype->itype : 0;
 
-  if (skl < 1)
-    return 0.0;
-
-  if (it_horse == 0) {
-    it_horse = it_find("horse");
-    it_elvenhorse = it_find("elvenhorse");
-    it_charger = it_find("charger");
-  }
-
-  for (; itm; itm = itm->next) {
-    if (itm->type->flags & ITF_ANIMAL) {
-      if (itm->type == it_elvenhorse)
-        n3 += itm->number;
-      else if (itm->type == it_charger)
-        n2 += itm->number;
-      else if (itm->type == it_horse)
-        n1 += itm->number;
+    for (itm=u->items; itm; itm = itm->next) {
+        if (itm->type->flags & ITF_ANIMAL) {
+            if (itm->type == it_elvenhorse)
+                n3 += itm->number;
+            else if (itm->type == it_charger)
+                n2 += itm->number;
+            else if (itm->type == it_horse)
+                n1 += itm->number;
+        }
     }
-  }
-  if (skl >= 5 && n3 >= u->number)
-    return 0.30;
-  if (skl >= 3 && n2 + n3 >= u->number)
-    return 0.20;
-  if (skl >= 1 && n1 + n2 + n3 >= u->number)
-    return 0.10;
-  return 0.0F;
+    if (skl >= 5 && n3 >= u->number)
+        return 0.30;
+    if (skl >= 3 && n2 + n3 >= u->number)
+        return 0.20;
+    if (skl >= 1 && n1 + n2 + n3 >= u->number)
+        return 0.10;
+    return 0.0F;
 }
 
 double fleechance(unit * u)

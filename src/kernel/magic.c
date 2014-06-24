@@ -777,8 +777,9 @@ int countspells(unit * u, int step)
  */
 int spellcost(unit * u, const spell * sp)
 {
-  int k, aura = 0;
-  int count = countspells(u, 0);
+    int k, aura = 0;
+    int count = countspells(u, 0);
+    const resource_type *r_aura = get_resourcetype(R_AURA);
 
   for (k = 0; sp->components[k].type; k++) {
     if (sp->components[k].type == r_aura) {
@@ -826,8 +827,9 @@ static int spl_costtyp(const spell * sp)
  * */
 int eff_spelllevel(unit * u, const spell * sp, int cast_level, int range)
 {
-  int k, maxlevel, needplevel;
-  int costtyp = SPC_FIX;
+    const resource_type *r_aura = get_resourcetype(R_AURA);
+    int k, maxlevel, needplevel;
+    int costtyp = SPC_FIX;
 
   for (k = 0; sp->components[k].type; k++) {
     if (cast_level == 0)
@@ -888,8 +890,9 @@ int eff_spelllevel(unit * u, const spell * sp, int cast_level, int range)
  */
 void pay_spell(unit * u, const spell * sp, int cast_level, int range)
 {
-  int k;
-  int resuse;
+    const resource_type *r_aura = get_resourcetype(R_AURA);
+    int k;
+    int resuse;
 
   assert(cast_level>0);
   for (k = 0; sp->components[k].type; k++) {
@@ -934,9 +937,10 @@ bool knowsspell(const region * r, const unit * u, const spell * sp)
 bool
 cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
 {
-  int k;
-  int itemanz;
-  resource *reslist = NULL;
+    const resource_type *r_aura = get_resourcetype(R_AURA);
+    int k;
+    int itemanz;
+    resource *reslist = NULL;
 
   if (!knowsspell(u->region, u, sp)) {
     /* Diesen Zauber kennt die Einheit nicht */

@@ -220,28 +220,29 @@ static buddy *get_friends(const unit * u, int *numfriends)
  */
 int gift_items(unit * u, int flags)
 {
-  region *r = u->region;
-  item **itm_p = &u->items;
-  int retval = 0;
-  int rule = rule_give();
+    const struct resource_type *rsilver = get_resourcetype(R_SILVER);
+    region *r = u->region;
+    item **itm_p = &u->items;
+    int retval = 0;
+    int rule = rule_give();
+    
+    assert(u->region);
+    assert(u->faction);
 
-  assert(u->region);
-  assert(u->faction);
+    if ((u->faction->flags & FFL_QUIT) == 0 || (rule & GIVE_ONDEATH) == 0) {
+        if ((rule & GIVE_ALLITEMS) == 0 && (flags & GIFT_FRIENDS))
+            flags -= GIFT_FRIENDS;
+        if ((rule & GIVE_PEASANTS) == 0 && (flags & GIFT_PEASANTS))
+            flags -= GIFT_PEASANTS;
+        if ((rule & GIVE_SELF) == 0 && (flags & GIFT_SELF))
+            flags -= GIFT_SELF;
+    }
 
-  if ((u->faction->flags & FFL_QUIT) == 0 || (rule & GIVE_ONDEATH) == 0) {
-    if ((rule & GIVE_ALLITEMS) == 0 && (flags & GIFT_FRIENDS))
-      flags -= GIFT_FRIENDS;
-    if ((rule & GIVE_PEASANTS) == 0 && (flags & GIFT_PEASANTS))
-      flags -= GIFT_PEASANTS;
-    if ((rule & GIVE_SELF) == 0 && (flags & GIFT_SELF))
-      flags -= GIFT_SELF;
-  }
-
-  if (u->items == NULL || fval(u_race(u), RCF_ILLUSIONARY))
-    return 0;
-  if ((u_race(u)->ec_flags & GIVEITEM) == 0)
-    return 0;
-
+    if (u->items == NULL || fval(u_race(u), RCF_ILLUSIONARY))
+        return 0;
+    if ((u_race(u)->ec_flags & GIVEITEM) == 0)
+        return 0;
+    
   /* at first, I should try giving my crap to my own units in this region */
   if (u->faction && (u->faction->flags & FFL_QUIT) == 0 && (flags & GIFT_SELF)) {
     unit *u2, *u3 = NULL;
@@ -303,7 +304,7 @@ int gift_items(unit * u, int flags)
 
     if (flags & GIFT_PEASANTS) {
       if (!fval(u->region->terrain, SEA_REGION)) {
-        if (itm->type == i_silver) {
+        if (itm->type->rtype == rsilver) {
           rsetmoney(r, rmoney(r) + itm->number);
           itm->number = 0;
         }
@@ -1220,13 +1221,14 @@ static int item_modification(const unit * u, skill_t sk, int val)
 #endif
   }
 #if NEWATSROI == 1
-  if (sk == SK_PERCEPTION) {
-    if (i_get(u->items, it_find("aots")) >= u->number) {
-      val += ATSBONUS;
+    if (sk == SK_PERCEPTION) {
+        const struct resource_type *rtype = get_resourcetype(R_AMULET_OF_TRUE_SEEING);
+        if (i_get(u->items, rtype->itype) >= u->number) {
+            val += ATSBONUS;
+        }
     }
-  }
 #endif
-  return val;
+    return val;
 }
 
 static int att_modification(const unit * u, skill_t sk)

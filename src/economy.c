@@ -999,10 +999,12 @@ void add_spende(faction * f1, faction * f2, int amount, region * r)
 static bool maintain(building * b, bool first)
 /* first==false -> take money from wherever you can */
 {
-  int c;
-  region *r = b->region;
-  bool paid = true, work = first;
-  unit *u;
+    const resource_type *rsilver = get_resourcetype(R_SILVER);
+    int c;
+    region *r = b->region;
+    bool paid = true, work = first;
+    unit *u;
+    
   if (fval(b, BLD_MAINTAINED) || b->type == NULL || b->type->maintenance == NULL
     || is_cursed(b->attribs, C_NOCOST, 0)) {
     fset(b, BLD_MAINTAINED);
@@ -1094,7 +1096,7 @@ static bool maintain(building * b, bool first)
               continue;
             cost -= give;
             fset(ua->faction, FFL_SELECT);
-            if (m->rtype == r_silver)
+            if (m->rtype == rsilver)
               add_spende(ua->faction, u->faction, give, r);
             if (cost <= 0)
               break;
@@ -1818,16 +1820,17 @@ const attrib_type at_luxuries = {
 
 static void expandbuying(region * r, request * buyorders)
 {
-  int max_products;
-  unit *u;
-  static struct trade {
-    const luxury_type *type;
-    int number;
-    int multi;
-  } *trades, *trade;
-  static int ntrades = 0;
-  int i, j;
-  const luxury_type *ltype;
+    const resource_type *rsilver = get_resourcetype(R_SILVER);
+    int max_products;
+    unit *u;
+    static struct trade {
+        const luxury_type *type;
+        int number;
+        int multi;
+    } *trades, *trade;
+    static int ntrades = 0;
+    int i, j;
+    const luxury_type *ltype;
 
   if (ntrades == 0) {
     for (ltype = luxurytypes; ltype; ltype = ltype->next)
@@ -1869,7 +1872,7 @@ static void expandbuying(region * r, request * buyorders)
       multi = trade->multi;
       price = ltype->price * multi;
 
-      if (get_pooled(oa[j].unit, get_resourcetype(R_SILVER), GET_DEFAULT,
+      if (get_pooled(oa[j].unit, rsilver, GET_DEFAULT,
           price) >= price) {
         unit *u = oa[j].unit;
         item *items;
@@ -1886,7 +1889,7 @@ static void expandbuying(region * r, request * buyorders)
         i_change(&items, ltype->itype, 1);
         a->data.v = items;
         i_change(&oa[j].unit->items, ltype->itype, 1);
-        use_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT, price);
+        use_pooled(u, rsilver, GET_DEFAULT, price);
         if (u->n < 0)
           u->n = 0;
         u->n += price;
@@ -2371,11 +2374,13 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
 
 static void expandstealing(region * r, request * stealorders)
 {
-  int i;
+    const resource_type *rsilver = get_resourcetype(R_SILVER);
+    int i;
+    
+    assert(rsilver);
 
-  expandorders(r, stealorders);
-  if (!norders)
-    return;
+    expandorders(r, stealorders);
+    if (!norders) return;
 
   /* Für jede unit in der Region wird Geld geklaut, wenn sie Opfer eines
    * Beklauen-Orders ist. Jedes Opfer muß einzeln behandelt werden.
@@ -2387,7 +2392,7 @@ static void expandstealing(region * r, request * stealorders)
     unit *u = findunitg(oa[i].no, r);
     int n = 0;
     if (u && u->region == r) {
-      n = get_pooled(u, r_silver, GET_ALL, INT_MAX);
+      n = get_pooled(u, rsilver, GET_ALL, INT_MAX);
     }
 #ifndef GOBLINKILL
     if (oa[i].type.goblin) {    /* Goblin-Spezialklau */
@@ -2409,7 +2414,7 @@ static void expandstealing(region * r, request * stealorders)
     }
     if (n > 0) {
       n = _min(n, oa[i].unit->wants);
-      use_pooled(u, r_silver, GET_ALL, n);
+      use_pooled(u, rsilver, GET_ALL, n);
       oa[i].unit->n = n;
       change_money(oa[i].unit, n);
       ADDMSG(&u->faction->msgs, msg_message("stealeffect", "unit region amount",
@@ -2424,60 +2429,58 @@ static void expandstealing(region * r, request * stealorders)
 /* ------------------------------------------------------------- */
 static void plant(region * r, unit * u, int raw)
 {
-  int n, i, skill, planted = 0;
-  const item_type *itype;
-  static const resource_type *rt_water = NULL;
-  if (rt_water == NULL)
-    rt_water = rt_find("p2");
+    int n, i, skill, planted = 0;
+    const item_type *itype;
+    const resource_type *rt_water = get_resourcetype(R_WATER_OF_LIFE);
 
-  assert(rt_water != NULL);
-  if (!fval(r->terrain, LAND_REGION)) {
-    return;
-  }
-  if (rherbtype(r) == NULL) {
-    cmistake(u, u->thisorder, 108, MSG_PRODUCE);
-    return;
-  }
-
-  /* Skill prüfen */
-  skill = eff_skill(u, SK_HERBALISM, r);
-  itype = rherbtype(r);
-  if (skill < 6) {
-    ADDMSG(&u->faction->msgs,
-      msg_feedback(u, u->thisorder, "plant_skills",
-        "skill minskill product", SK_HERBALISM, 6, itype->rtype, 1));
-    return;
-  }
-  /* Wasser des Lebens prüfen */
-  if (get_pooled(u, rt_water, GET_DEFAULT, 1) == 0) {
-    ADDMSG(&u->faction->msgs,
-      msg_feedback(u, u->thisorder, "resource_missing", "missing", rt_water));
-    return;
-  }
-  n = get_pooled(u, itype->rtype, GET_DEFAULT, skill * u->number);
-  /* Kräuter prüfen */
-  if (n == 0) {
-    ADDMSG(&u->faction->msgs,
-      msg_feedback(u, u->thisorder, "resource_missing", "missing",
-        itype->rtype));
-    return;
-  }
-
-  n = _min(skill * u->number, n);
-  n = _min(raw, n);
-  /* Für jedes Kraut Talent*10% Erfolgschance. */
-  for (i = n; i > 0; i--) {
-    if (rng_int() % 10 < skill)
-      planted++;
-  }
-  produceexp(u, SK_HERBALISM, u->number);
-
-  /* Alles ok. Abziehen. */
-  use_pooled(u, rt_water, GET_DEFAULT, 1);
-  use_pooled(u, itype->rtype, GET_DEFAULT, n);
-  rsetherbs(r, rherbs(r) + planted);
-  ADDMSG(&u->faction->msgs, msg_message("plant", "unit region amount herb",
-      u, r, planted, itype->rtype));
+    assert(rt_water != NULL);
+    if (!fval(r->terrain, LAND_REGION)) {
+        return;
+    }
+    if (rherbtype(r) == NULL) {
+        cmistake(u, u->thisorder, 108, MSG_PRODUCE);
+        return;
+    }
+    
+    /* Skill prüfen */
+    skill = eff_skill(u, SK_HERBALISM, r);
+    itype = rherbtype(r);
+    if (skill < 6) {
+        ADDMSG(&u->faction->msgs,
+               msg_feedback(u, u->thisorder, "plant_skills",
+                            "skill minskill product", SK_HERBALISM, 6, itype->rtype, 1));
+        return;
+    }
+    /* Wasser des Lebens prüfen */
+    if (get_pooled(u, rt_water, GET_DEFAULT, 1) == 0) {
+        ADDMSG(&u->faction->msgs,
+               msg_feedback(u, u->thisorder, "resource_missing", "missing", rt_water));
+        return;
+    }
+    n = get_pooled(u, itype->rtype, GET_DEFAULT, skill * u->number);
+    /* Kräuter prüfen */
+    if (n == 0) {
+        ADDMSG(&u->faction->msgs,
+               msg_feedback(u, u->thisorder, "resource_missing", "missing",
+                            itype->rtype));
+        return;
+    }
+    
+    n = _min(skill * u->number, n);
+    n = _min(raw, n);
+    /* Für jedes Kraut Talent*10% Erfolgschance. */
+    for (i = n; i > 0; i--) {
+        if (rng_int() % 10 < skill)
+            planted++;
+    }
+    produceexp(u, SK_HERBALISM, u->number);
+    
+    /* Alles ok. Abziehen. */
+    use_pooled(u, rt_water, GET_DEFAULT, 1);
+    use_pooled(u, itype->rtype, GET_DEFAULT, n);
+    rsetherbs(r, rherbs(r) + planted);
+    ADDMSG(&u->faction->msgs, msg_message("plant", "unit region amount herb",
+                                          u, r, planted, itype->rtype));
 }
 
 static void planttrees(region * r, unit * u, int raw)
@@ -2607,22 +2610,24 @@ static void breedhorses(region * r, unit * u)
     int n, c, breed = 0;
     struct building *b = inside_building(u);
     const struct building_type *btype = b ? b->type : NULL;
-    const struct item_type *ihorse = it_find("horse");
-
-    assert(ihorse);
+    const struct resource_type *rhorse = get_resourcetype(R_HORSE);
+    int horses;
+    assert(rhorse && rhorse->itype);
     if (btype != bt_find("stables")) {
         cmistake(u, u->thisorder, 122, MSG_PRODUCE);
         return;
     }
-    if (i_get(u->items, ihorse) < 2) {
+    horses = i_get(u->items, rhorse->itype);
+    if (horses < 2) {
         cmistake(u, u->thisorder, 107, MSG_PRODUCE);
         return;
     }
-    n = _min(u->number * eff_skill(u, SK_HORSE_TRAINING, r), i_get(u->items, ihorse));
+    n = u->number * eff_skill(u, SK_HORSE_TRAINING, r);
+    n = _min(n, horses);
 
     for (c = 0; c < n; c++) {
         if (rng_int() % 100 < eff_skill(u, SK_HORSE_TRAINING, r)) {
-            i_change(&u->items, ihorse, 1);
+            i_change(&u->items, rhorse->itype, 1);
             ++breed;
         }
     }

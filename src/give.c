@@ -89,7 +89,7 @@ add_give(unit * u, unit * u2, int given, int received,
 static bool limited_give(const item_type * type)
 {
   /* trade only money 2:1, if at all */
-  return (type == i_silver);
+  return (type->rtype == get_resourcetype(R_SILVER));
 }
 
 int give_quota(const unit * src, const unit * dst, const item_type * type,
@@ -426,7 +426,7 @@ void give_unit(unit * u, unit * u2, order * ord)
     cmistake(u, ord, 156, MSG_COMMERCE);
     return;
   }
-  add_give(u, u2, 1, 1, r_unit, ord, 0);
+  add_give(u, u2, 1, 1, get_resourcetype(R_UNIT), ord, 0);
   u_setfaction(u, u2->faction);
   u2->faction->newbies += n;
 }

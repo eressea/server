@@ -830,15 +830,8 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
   /* und es muss niemand aus f in der region sein, wenn sie vom Turm
    * erblickt wird */
 {
-  int stealth, rings;
-  unit *u2 = r->units;
-  static const item_type *itype_grail;
-  static bool init;
-
-  if (!init) {
-    init = true;
-    itype_grail = it_find("grail");
-  }
+    int stealth, rings;
+    unit *u2 = r->units;
 
   if (u->faction == f || omniscient(f)) {
     return true;
@@ -855,8 +848,6 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
   }
 
   if (leftship(u))
-    return true;
-  if (itype_grail != NULL && i_get(u->items, itype_grail))
     return true;
 
   while (u2 && u2->faction != f)

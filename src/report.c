@@ -1450,6 +1450,7 @@ static int buildingmaintenance(const building * b, const resource_type * rtype)
 static int
 report_template(const char *filename, report_context * ctx, const char *charset)
 {
+    const resource_type *rsilver = get_resourcetype(R_SILVER);
   faction *f = ctx->f;
   region *r;
   FILE *F = fopen(filename, "wt");
@@ -1538,7 +1539,7 @@ report_template(const char *filename, report_context * ctx, const char *charset)
           WARN_STATIC_BUFFER();
         if (u->building && building_owner(u->building)==u) {
           building *b = u->building;
-          int cost = buildingmaintenance(b, r_silver);
+          int cost = buildingmaintenance(b, rsilver);
 
           if (cost > 0) {
             bytes = (int)strlcpy(bufp, ",U", size);

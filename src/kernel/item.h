@@ -265,20 +265,12 @@ extern "C" {
     double magres, int prot, unsigned int flags);
   extern potion_type *new_potiontype(item_type * itype, int level);
 
-/* for lack of another file: */
-
-/* sonstige resourcen */
-  extern resource_type *r_silver;
-  extern resource_type *r_aura;
-  extern resource_type *r_permaura;
-  extern resource_type *r_unit;
-
   typedef enum {
     /* ITEMS: */
     R_IRON,
     R_STONE,
     R_HORSE,
-     /**/ R_AMULET_OF_HEALING,
+    R_AMULET_OF_HEALING,
     R_AMULET_OF_TRUE_SEEING,
     R_RING_OF_INVISIBILITY,
     R_RING_OF_POWER,
@@ -288,6 +280,7 @@ extern "C" {
     R_BIRTHDAYAMULET,
     R_PEGASUS,
     R_UNICORN,
+    R_CHARGER,
     R_DOLPHIN,
     R_RING_OF_NIMBLEFINGER,
     R_TROLLBELT,
@@ -296,11 +289,15 @@ extern "C" {
     R_BAG_OF_HOLDING,
     R_SACK_OF_CONSERVATION,
     R_TACTICCRYSTAL,
+    R_WATER_OF_LIFE,
 
     /* SONSTIGE */
     R_SILVER,
     R_AURA,                     /* Aura */
     R_PERMAURA,                 /* Permanente Aura */
+    R_LIFE,
+    R_UNIT,
+    R_PEASANT,
 
     MAX_RESOURCES,              /* do not use outside item.c ! */
     NORESOURCE = -1
@@ -325,8 +322,6 @@ extern "C" {
       const struct item_type *, int, struct order *), const char *name);
   extern void register_item_useonother(int (*foo) (struct unit *, int,
       const struct item_type *, int, struct order *), const char *name);
-
-  extern struct item_type *i_silver;
 
 #ifndef DISABLE_TESTS
   void test_clear_resources(void);

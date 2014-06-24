@@ -45,7 +45,7 @@ void test_change_person(CuTest * tc)
   test_create_world();
 
   u = test_create_unit(0, 0);
-  test_uchange(tc, u, r_unit);
+  test_uchange(tc, u, get_resourcetype(R_UNIT));
 }
 
 void test_resource_type(CuTest * tc)

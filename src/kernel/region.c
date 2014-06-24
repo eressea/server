@@ -1015,11 +1015,11 @@ void region_setresource(region * r, const resource_type * rtype, int value)
     rm = rm->next;
   }
   if (!rm) {
-    if (rtype == rt_find("money"))
+    if (rtype == get_resourcetype(R_SILVER))
       rsetmoney(r, value);
-    else if (rtype == rt_find("peasant"))
+    else if (rtype == get_resourcetype(R_PEASANT))
       rsetpeasants(r, value);
-    else if (rtype == rt_find("horse"))
+    else if (rtype == get_resourcetype(R_HORSE))
       rsethorses(r, value);
     else {
       int i;
@@ -1042,11 +1042,11 @@ int region_getresource(const region * r, const resource_type * rtype)
       return rm->amount;
     }
   }
-  if (rtype == rt_find("money"))
+  if (rtype == get_resourcetype(R_SILVER))
     return rmoney(r);
-  if (rtype == rt_find("horse"))
+  if (rtype == get_resourcetype(R_HORSE))
     return rhorses(r);
-  if (rtype == rt_find("peasant"))
+  if (rtype == get_resourcetype(R_PEASANT))
     return rpeasants(r);
   return 0;
 }

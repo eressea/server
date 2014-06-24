@@ -4087,13 +4087,13 @@ static int sp_pump(castorder * co)
  */
 static int sp_seduce(castorder * co)
 {
-  item *items = NULL;
-  unit *target;
-  item **itmp;
-  unit *mage = co->magician.u;
-  spellparameter *pa = co->par;
-  int cast_level = co->level;
-  float force = co->force;
+    const resource_type *rsilver = get_resourcetype(R_SILVER);
+    unit *target;
+    item **itmp, *items = 0;;
+    unit *mage = co->magician.u;
+    spellparameter *pa = co->par;
+    int cast_level = co->level;
+    float force = co->force;
 
   /* wenn kein Ziel gefunden, Zauber abbrechen */
   if (pa->param[0]->flag == TARGET_NOTFOUND)
@@ -4113,7 +4113,7 @@ static int sp_seduce(castorder * co)
   while (*itmp) {
     item *itm = *itmp;
     int loot;
-    if (itm->type == i_silver) {
+    if (itm->type->rtype == rsilver) {
       loot =
         _min(cast_level * 1000, get_money(target) - (maintenance_cost(target)));
       loot = _max(loot, 0);

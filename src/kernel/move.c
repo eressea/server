@@ -412,18 +412,15 @@ bool canswim(unit * u)
 
 static int canride(unit * u)
 {
-  int horses = 0, maxhorses, unicorns = 0, maxunicorns;
-  int skill = effskill(u, SK_RIDING);
-  item *itm;
-  static const item_type *it_horse = 0;
-  static const item_type *it_elvenhorse = 0;
-  static const item_type *it_charger = 0;
+    int horses = 0, maxhorses, unicorns = 0, maxunicorns;
+    int skill = effskill(u, SK_RIDING);
+    item *itm;
+    const item_type *it_horse, *it_elvenhorse, *it_charger;
+    const resource_type *rtype;
 
-  if (it_horse == 0) {
-    it_horse = it_find("horse");
-    it_elvenhorse = it_find("elvenhorse");
-    it_charger = it_find("charger");
-  }
+    it_horse = (rtype = get_resourcetype(R_HORSE)) ? rtype->itype : 0;
+    it_elvenhorse = (rtype = get_resourcetype(R_UNICORN)) ? rtype->itype : 0;
+    it_charger = (rtype = get_resourcetype(R_CHARGER)) ? rtype->itype : 0;
 
   for (itm = u->items; itm; itm = itm->next) {
     if (itm->type == it_horse || itm->type == it_charger) {
@@ -839,26 +836,26 @@ static void caught_target(region * r, unit * u)
 
 static unit *bewegung_blockiert_von(unit * reisender, region * r)
 {
-  unit *u;
-  double prob = 0.0;
-  bool contact = false;
-  unit *guard = NULL;
-  int stealth = eff_stealth(reisender, r);
-  static int gamecookie = -1;
-  static double base_prob = -999;
-  static double skill_prob = -999;
-  static double amulet_prob = -999;
-  const struct item_type *iamulet = it_find("aots");
+    unit *u;
+    double prob = 0.0;
+    bool contact = false;
+    unit *guard = NULL;
+    int stealth = eff_stealth(reisender, r);
+    static int gamecookie = -1;
+    static double base_prob = -999;
+    static double skill_prob = -999;
+    static double amulet_prob = -999;
+    const struct resource_type *ramulet = get_resourcetype(R_AMULET_OF_TRUE_SEEING);
 
-  if (gamecookie < 0 || gamecookie != global.cookie) {
-    base_prob =
-      get_param_flt(global.parameters, "rules.guard.base_stop_prob", .3);
-    skill_prob =
-      get_param_flt(global.parameters, "rules.guard.skill_stop_prob", .1);
-    amulet_prob =
-      get_param_flt(global.parameters, "rules.guard.amulet_stop_prob", .1);
-    gamecookie = global.cookie;
-  }
+    if (gamecookie < 0 || gamecookie != global.cookie) {
+        base_prob =
+            get_param_flt(global.parameters, "rules.guard.base_stop_prob", .3);
+        skill_prob =
+            get_param_flt(global.parameters, "rules.guard.skill_stop_prob", .1);
+        amulet_prob =
+            get_param_flt(global.parameters, "rules.guard.amulet_stop_prob", .1);
+        gamecookie = global.cookie;
+    }
 
   if (fval(u_race(reisender), RCF_ILLUSIONARY))
     return NULL;
@@ -876,7 +873,7 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
       else if (sk >= stealth) {
     	  double prob_u = (sk - stealth) * skill_prob;
     	  /* amulet counts at most once */
-    	  prob_u += _min (1, _min(u->number, i_get(u->items, iamulet))) * amulet_prob;
+    	  prob_u += _min (1, _min(u->number, i_get(u->items, ramulet->itype))) * amulet_prob;
     	  if (prob_u >= prob) {
     		  prob = prob_u;
     		  guard = u;
