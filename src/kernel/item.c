@@ -753,7 +753,7 @@ mod_elves_only(const unit * u, const region * r, skill_t sk, int value)
 static int
 mod_dwarves_only(const unit * u, const region * r, skill_t sk, int value)
 {
-  if (u_race(u) == new_race[RC_DWARF])
+  if (u_race(u) == new_race[RC_DWARF] || (u_race(u)->flags & RCF_IRONGOLEM))
     return value;
   unused_arg(r);
   return -118;
