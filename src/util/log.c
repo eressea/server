@@ -235,6 +235,7 @@ void log_error_n(const char *format, ...)
     va_list args;
     va_start(args, format);
     _log_write(logfile, 0, prefix, format, args);
+    fputc('\n', logfile);
     va_end(args);
   }
 
@@ -245,7 +246,7 @@ void log_error_n(const char *format, ...)
       va_list args;
       va_start(args, format);
       _log_write(stderr, stdio_codepage, prefix, format, args);
-      fputc('\n', logfile);
+      fputc('\n', stderr);
       va_end(args);
     }
   }

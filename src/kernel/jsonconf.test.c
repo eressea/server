@@ -86,10 +86,11 @@ static void test_races(CuTest * tc)
 static void test_items(CuTest * tc)
 {
     const char * data = "{\"items\": { "
-        "\"axe\" : {},"
-        "\"horse\" : {}"
+        "\"axe\" : { \"weight\" : 2},"
+        "\"horse\" : { \"flags\" : [ \"animal\", \"big\" ], \"capacity\" : 20 }"
         "}}";
     cJSON *json = cJSON_Parse(data);
+    const item_type * itype;
 
     test_cleanup();
 
@@ -99,7 +100,17 @@ static void test_items(CuTest * tc)
     CuAssertPtrEquals(tc, 0, (void *)get_resourcetype(R_HORSE));
 
     json_config(json);
-    CuAssertPtrNotNull(tc, it_find("axe"));
+
+    itype = it_find("axe");
+    CuAssertPtrNotNull(tc, itype);
+    CuAssertIntEquals(tc, 2, itype->weight);
+    CuAssertIntEquals(tc, 0, itype->flags);
+
+    itype = it_find("horse");
+    CuAssertPtrNotNull(tc, itype);
+    CuAssertIntEquals(tc, 20, itype->capacity);
+    CuAssertIntEquals(tc, ITF_ANIMAL|ITF_BIG, itype->flags);
+
     CuAssertPtrNotNull(tc, rt_find("axe"));
     CuAssertPtrNotNull(tc, (void *)get_resourcetype(R_HORSE));
 }

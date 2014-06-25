@@ -139,14 +139,34 @@ void json_building(cJSON *json, building_type *bt) {
     }
 }
 
-void json_item(cJSON *json, item_type *st) {
+void json_item(cJSON *json, item_type *itype) {
     cJSON *child;
+    const char *flags[] = {
+        "herb", "cursed", "nodrop", "big", "animal", "vehicle", 0
+    };
     if (json->type!=cJSON_Object) {
         log_error_n("ship %s is not a json object: %d", json->string, json->type);
         return;
     }
     for (child=json->child;child;child=child->next) {
         switch(child->type) {
+        case cJSON_Number:
+            if (strcmp(child->string, "weight")==0) {
+                itype->weight = child->valueint;
+                break;
+            }
+            if (strcmp(child->string, "capacity")==0) {
+                itype->capacity = child->valueint;
+                break;
+            }
+            log_error_n("item %s contains unknown attribute %s", json->string, child->string);
+            break;
+        case cJSON_Array:
+            if (strcmp(child->string, "flags")==0) {
+                itype->flags = json_flags(child, flags);
+                break;
+            }
+            log_error_n("item %s contains unknown attribute %s", json->string, child->string);
         case cJSON_Object:
         default:
             log_error_n("item %s contains unknown attribute %s", json->string, child->string);

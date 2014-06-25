@@ -113,11 +113,11 @@ extern "C" {
 /* bitfield values for item_type::flags */
 #define ITF_NONE             0x0000
 #define ITF_HERB             0x0001     /* this item is a herb */
-#define ITF_CURSED           0x0010     /* cursed object, cannot be given away */
-#define ITF_NOTLOST          0x0020     /* special object (quests), cannot be lost through death etc. */
-#define ITF_BIG              0x0040     /* big item, e.g. does not fit in a bag of holding */
-#define ITF_ANIMAL           0x0080     /* an animal */
-#define ITF_VEHICLE          0x0100     /* a vehicle, drawn by two animals */
+#define ITF_CURSED           0x0002     /* cursed object, cannot be given away */
+#define ITF_NOTLOST          0x0004     /* special object (quests), cannot be lost through death etc. */
+#define ITF_BIG              0x0008     /* big item, e.g. does not fit in a bag of holding */
+#define ITF_ANIMAL           0x0010     /* an animal */
+#define ITF_VEHICLE          0x0020     /* a vehicle, drawn by two animals */
 
 /* error codes for item_type::use */
 #define ECUSTOM   -1
