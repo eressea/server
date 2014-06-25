@@ -110,14 +110,14 @@ static int res_changeitem(unit * u, const resource_type * rtype, int delta)
     if (delta % GOLEM_STONE != 0)
       --reduce;
     scale_number(u, u->number + reduce);
-    num = u->number;
+    num = u->number * GOLEM_STONE;
   } else if (rtype == get_resourcetype(R_IRON)
     && u_race(u) == new_race[RC_IRONGOLEM] && delta <= 0) {
     int reduce = delta / GOLEM_IRON;
     if (delta % GOLEM_IRON != 0)
       --reduce;
     scale_number(u, u->number + reduce);
-    num = u->number;
+    num = u->number * GOLEM_IRON;
   } else {
     const item_type *itype = resource2item(rtype);
     item *i;
