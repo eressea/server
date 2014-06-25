@@ -306,3 +306,32 @@ function test_block_movement_aots()
   assert_equal(r1, u21.region, "unit with amulet should stop me")
   assert_equal(r2, u22.region, "nobody should see me")
 end
+
+function test_stonegolems()
+  local r0 = region.create(0, 0, "plain")
+  local f1 = faction.create("noreply@eressea.de", "stonegolem", "de")
+  local u1 = unit.create(f1, r0, 1)
+  local u2 = unit.create(f1, r0, 2)
+  local c1 = building.create(r0, "castle")
+
+  c1.size = 226
+
+  u1:set_skill("building", 1)
+  u2:set_skill("building", 1)
+
+-- test that no server crash occur
+  u1:clear_orders()
+  u1:add_order("Mache Burg")
+  process_orders()
+  assert_equal(0 ,u1.number, "There shoud be no Stone Golems")
+-- end test server crash
+
+-- test that Stone Golems build for four stones
+  u2:clear_orders()
+  u2:add_order("MACHE 4 BURG " .. itoa36(c1.id))
+  process_orders()
+  assert_equal(230, c1.size, "resulting size should be 230")
+  assert_equal(1 ,u2.number, "There shoud be one Stone Golems")
+-- end test Stone Golems four stones
+end
+
