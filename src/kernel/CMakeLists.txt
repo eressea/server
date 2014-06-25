@@ -1,6 +1,7 @@
 project(kernel C)
 
 SET(_TEST_FILES
+config.test.c
 ship.test.c
 spell.test.c
 ally.test.c
