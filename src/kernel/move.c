@@ -274,8 +274,8 @@ int walkingcapacity(const struct unit *u)
   int wagen_ohne_pferde, wagen_mit_pferden, wagen_mit_trollen;
   int vehicles = 0, vcap = 0;
   int animals = 0, acap = 0;
-  const struct item_type *ihorse = it_find("horse");
-  const struct item_type *ibelt = it_find("trollbelt");
+  const struct resource_type *rhorse = rt_find("horse");
+  const struct resource_type *rbelt = rt_find("trollbelt");
 
   get_transporters(u->items, &animals, &acap, &vehicles, &vcap);
 
@@ -311,18 +311,18 @@ int walkingcapacity(const struct unit *u)
   n += animals * acap;
   n += people * personcapacity(u);
   /* Goliathwasser */
-  if (ihorse) {
+  if (rhorse) {
     int tmp = get_effect(u, oldpotiontype[P_STRONG]);
     if (tmp > 0) {
-      int horsecap = ihorse->capacity;
+      int horsecap = rhorse->itype->capacity;
       if (tmp > people) {
         tmp = people;
       }
       n += tmp * (horsecap - personcapacity(u));
     }
   }
-  if (ibelt) {
-    int tmp = i_get(u->items, ibelt);
+  if (rbelt) {
+    int tmp = i_get(u->items, rbelt->itype);
     n += _min(people, tmp) * (STRENGTHMULTIPLIER - 1) * personcapacity(u);
   }
 

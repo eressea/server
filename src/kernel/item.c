@@ -148,6 +148,18 @@ const char *resourcename(const resource_type * rtype, int flags)
   return "none";
 }
 
+resource_type *rt_get_or_create(const char *name) {
+    resource_type *rtype = rt_find(name);
+    if (!rtype) {
+        rtype = (resource_type *)calloc(sizeof(resource_type), 1);
+        rtype->_name[0] = _strdup(name);
+        rtype->_name[1] = (char *)malloc(strlen(name)+3);
+        sprintf(rtype->_name[1], "%s_p", name);
+        rt_register(rtype);
+    }
+    return rtype;
+}
+
 resource_type *new_resourcetype(const char **names, const char **appearances,
   int flags)
 {
@@ -185,6 +197,49 @@ void it_register(item_type * itype)
   if (cb_insert(&cb_items, buffer, len)) {
     rt_register(itype->rtype);
   }
+}
+
+static const char *it_aliases[][2] = {
+  {"Runenschwert", "runesword"},
+  {"p12", "truthpotion"},
+  {"p1", "goliathwater"},
+  {"p4", "ointment"},
+  {"p5", "peasantblood"},
+  {"p8", "nestwarmth"},
+  {"diamond", "adamantium"},
+  {"diamondaxe", "adamantiumaxe"},
+  {"diamondplate", "adamantiumplate"},
+  {"aoh", "ao_healing"},
+  {NULL, NULL},
+};
+
+static const char *it_alias(const char *zname)
+{
+  int i;
+  for (i = 0; it_aliases[i][0]; ++i) {
+    if (strcmp(it_aliases[i][0], zname) == 0)
+      return it_aliases[i][1];
+  }
+  return zname;
+}
+
+item_type *it_find(const char *zname)
+{
+    const char *name = it_alias(zname);
+    resource_type *result = rt_find(name);
+    return result ? result->itype : 0;
+}
+
+item_type *it_get_or_create(resource_type *rtype) {
+    item_type * itype;
+    assert(rtype);
+    itype = it_find(rtype->_name[0]);
+    assert(!itype);
+    itype = (item_type *)calloc(sizeof(item_type), 1);
+    itype->rtype = rtype;
+    rtype->flags |= RTF_ITEM;
+    it_register(itype);
+    return itype;
 }
 
 item_type *new_itemtype(resource_type * rtype,
@@ -356,42 +411,6 @@ resource_type *rt_find(const char *name)
   resource_type *result = 0;
 
   if (cb_find_prefix(&cb_resources, name, strlen(name)+1, &matches, 1, 0)) {
-    cb_get_kv(matches, &result, sizeof(result));
-  }
-  return result;
-}
-
-static const char *it_aliases[][2] = {
-  {"Runenschwert", "runesword"},
-  {"p12", "truthpotion"},
-  {"p1", "goliathwater"},
-  {"p4", "ointment"},
-  {"p5", "peasantblood"},
-  {"p8", "nestwarmth"},
-  {"diamond", "adamantium"},
-  {"diamondaxe", "adamantiumaxe"},
-  {"diamondplate", "adamantiumplate"},
-  {"aoh", "ao_healing"},
-  {NULL, NULL},
-};
-
-static const char *it_alias(const char *zname)
-{
-  int i;
-  for (i = 0; it_aliases[i][0]; ++i) {
-    if (strcmp(it_aliases[i][0], zname) == 0)
-      return it_aliases[i][1];
-  }
-  return zname;
-}
-
-item_type *it_find(const char *zname)
-{
-  const char *name = it_alias(zname);
-  const void * matches;
-  item_type *result = 0;
-
-  if (cb_find_prefix(&cb_items, name, strlen(name)+1, &matches, 1, 0)) {
     cb_get_kv(matches, &result, sizeof(result));
   }
   return result;

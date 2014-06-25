@@ -84,36 +84,37 @@ static void test_rename_building_twice(CuTest * tc)
 
 static void test_fishing_feeds_2_people(CuTest * tc)
 {
-  region *r;
-  faction *f;
-  unit *u;
-  ship *sh;
+    const resource_type *rtype;
+    region *r;
+    faction *f;
+    unit *u;
+    ship *sh;
+    
+    test_cleanup();
+    test_create_world();
+    r = findregion(-1, 0);
+    CuAssertStrEquals(tc, "ocean", r->terrain->_name);    /* test_create_world needs coverage */
+    f = test_create_faction(rc_find("human"));
+    u = test_create_unit(f, r);
+    sh = new_ship(st_find("boat"), r, 0);
+    u_set_ship(u, sh);
+    rtype = get_resourcetype(R_SILVER);
+    i_change(&u->items, rtype->itype, 42);
+    
+    scale_number(u, 1);
+    sh->flags |= SF_FISHING;
+    get_food(r);
+    CuAssertIntEquals(tc, 42, i_get(u->items, rtype->itype));
 
-  test_cleanup();
-  test_create_world();
-  r = findregion(-1, 0);
-  CuAssertStrEquals(tc, "ocean", r->terrain->_name);    /* test_create_world needs coverage */
-  f = test_create_faction(rc_find("human"));
-  u = test_create_unit(f, r);
-  sh = new_ship(st_find("boat"), r, 0);
-  u_set_ship(u, sh);
-  i_change(&u->items, it_find("money"), 42);
+    scale_number(u, 2);
+    sh->flags |= SF_FISHING;
+    get_food(r);
+    CuAssertIntEquals(tc, 42, i_get(u->items, rtype->itype));
 
-  scale_number(u, 1);
-  sh->flags |= SF_FISHING;
-  get_food(r);
-  CuAssertIntEquals(tc, 42, i_get(u->items, it_find("money")));
-
-  scale_number(u, 2);
-  sh->flags |= SF_FISHING;
-  get_food(r);
-  CuAssertIntEquals(tc, 42, i_get(u->items, it_find("money")));
-
-  scale_number(u, 3);
-  sh->flags |= SF_FISHING;
-  get_food(r);
-  CuAssertIntEquals(tc, 32, i_get(u->items, it_find("money")));
-
+    scale_number(u, 3);
+    sh->flags |= SF_FISHING;
+    get_food(r);
+    CuAssertIntEquals(tc, 32, i_get(u->items, rtype->itype));
 }
 
 static int not_so_hungry(const unit * u)
@@ -123,56 +124,58 @@ static int not_so_hungry(const unit * u)
 
 static void test_fishing_does_not_give_goblins_money(CuTest * tc)
 {
-  region *r;
-  faction *f;
-  unit *u;
-  ship *sh;
+    const resource_type *rtype;
+    region *r;
+    faction *f;
+    unit *u;
+    ship *sh;
+    
+    test_cleanup();
+    test_create_world();
+    rtype = get_resourcetype(R_SILVER);
+    
+    r = findregion(-1, 0);
+    CuAssertStrEquals(tc, "ocean", r->terrain->_name);    /* test_create_world needs coverage */
+    f = test_create_faction(rc_find("human"));
+    u = test_create_unit(f, r);
+    sh = new_ship(st_find("boat"), r, 0);
+    u_set_ship(u, sh);
+    i_change(&u->items, rtype->itype, 42);
 
-  test_cleanup();
-  test_create_world();
-
-  r = findregion(-1, 0);
-  CuAssertStrEquals(tc, "ocean", r->terrain->_name);    /* test_create_world needs coverage */
-  f = test_create_faction(rc_find("human"));
-  u = test_create_unit(f, r);
-  sh = new_ship(st_find("boat"), r, 0);
-  u_set_ship(u, sh);
-  i_change(&u->items, it_find("money"), 42);
-
-  global.functions.maintenance = not_so_hungry;
-  scale_number(u, 2);
-  sh->flags |= SF_FISHING;
-  get_food(r);
-  CuAssertIntEquals(tc, 42, i_get(u->items, it_find("money")));
-
+    global.functions.maintenance = not_so_hungry;
+    scale_number(u, 2);
+    sh->flags |= SF_FISHING;
+    get_food(r);
+    CuAssertIntEquals(tc, 42, i_get(u->items, rtype->itype));
 }
 
 static void test_fishing_gets_reset(CuTest * tc)
 {
-  region *r;
-  faction *f;
-  unit *u;
-  ship *sh;
-
-  test_cleanup();
-  test_create_world();
-  r = findregion(-1, 0);
-  CuAssertStrEquals(tc, "ocean", r->terrain->_name);    /* test_create_world needs coverage */
-  f = test_create_faction(rc_find("human"));
-  u = test_create_unit(f, r);
-  sh = new_ship(st_find("boat"), r, 0);
-  u_set_ship(u, sh);
-  i_change(&u->items, it_find("money"), 42);
-
-  scale_number(u, 1);
-  sh->flags |= SF_FISHING;
-  get_food(r);
-  CuAssertIntEquals(tc, 42, i_get(u->items, it_find("money")));
-
-  scale_number(u, 1);
-  get_food(r);
-  CuAssertIntEquals(tc, 32, i_get(u->items, it_find("money")));
-
+    const resource_type *rtype;
+    region *r;
+    faction *f;
+    unit *u;
+    ship *sh;
+    
+    test_cleanup();
+    test_create_world();
+    rtype = get_resourcetype(R_SILVER);
+    r = findregion(-1, 0);
+    CuAssertStrEquals(tc, "ocean", r->terrain->_name);    /* test_create_world needs coverage */
+    f = test_create_faction(rc_find("human"));
+    u = test_create_unit(f, r);
+    sh = new_ship(st_find("boat"), r, 0);
+    u_set_ship(u, sh);
+    i_change(&u->items, rtype->itype, 42);
+    
+    scale_number(u, 1);
+    sh->flags |= SF_FISHING;
+    get_food(r);
+    CuAssertIntEquals(tc, 42, i_get(u->items, rtype->itype));
+    
+    scale_number(u, 1);
+    get_food(r);
+    CuAssertIntEquals(tc, 32, i_get(u->items, rtype->itype));
 }
 
 static void test_unit_limit(CuTest * tc)

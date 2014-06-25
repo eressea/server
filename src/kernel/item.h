@@ -226,8 +226,8 @@ extern "C" {
   } weapon_type;
 
   extern void rt_register(resource_type * it);
-  extern resource_type *rt_find(const char *name);
-  extern item_type *it_find(const char *name);
+  resource_type *rt_find(const char *name);
+  item_type *it_find(const char *name);
 
   extern void it_register(item_type * it);
   extern void wt_register(weapon_type * wt);
@@ -253,8 +253,9 @@ extern "C" {
   extern int i_get(const item * i, const item_type * it);
 
 /* creation */
-  extern resource_type *new_resourcetype(const char **names,
-    const char **appearances, int flags);
+    resource_type *rt_get_or_create(const char *name);
+    resource_type *new_resourcetype(const char **names, const char **appearances, int flags);
+    item_type *it_get_or_create(resource_type *rtype);
   extern item_type *new_itemtype(resource_type * rtype, int iflags, int weight,
     int capacity);
   extern luxury_type *new_luxurytype(item_type * itype, int price);

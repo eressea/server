@@ -14,42 +14,44 @@
 
 static void test_make_fighter(CuTest * tc)
 {
-  unit *au;
-  region *r;
-  fighter *af;
-  battle *b;
-  side *as;
-  faction * f;
+    unit *au;
+    region *r;
+    fighter *af;
+    battle *b;
+    side *as;
+    faction * f;
+    const resource_type *rtype;
 
-  test_cleanup();
-  test_create_world();
-  r = findregion(0, 0);
-  f = test_create_faction(rc_find("human"));
-  au = test_create_unit(f, r);
-  enable_skill(SK_MAGIC, true);
-  enable_skill(SK_RIDING, true);
-  set_level(au, SK_MAGIC, 3);
-  set_level(au, SK_RIDING, 3);
-  au->status = ST_BEHIND;
-  i_change(&au->items, it_find("horse"), 1);
-
-  b = make_battle(r);
-  as = make_side(b, au->faction, 0, 0, 0);
-  af = make_fighter(b, au, as, false);
-
-  CuAssertIntEquals(tc, 1, b->nfighters);
-  CuAssertPtrEquals(tc, 0, af->building);
-  CuAssertPtrEquals(tc, as, af->side);
-  CuAssertIntEquals(tc, 0, af->run.hp);
-  CuAssertIntEquals(tc, ST_BEHIND, af->status);
-  CuAssertIntEquals(tc, 0, af->run.number);
-  CuAssertIntEquals(tc, au->hp, af->person[0].hp);
-  CuAssertIntEquals(tc, 1, af->person[0].speed);
-  CuAssertIntEquals(tc, au->number, af->alive);
-  CuAssertIntEquals(tc, 0, af->removed);
-  CuAssertIntEquals(tc, 3, af->magic);
-  CuAssertIntEquals(tc, 1, af->horses);
-  CuAssertIntEquals(tc, 0, af->elvenhorses);
+    test_cleanup();
+    test_create_world();
+    r = findregion(0, 0);
+    f = test_create_faction(rc_find("human"));
+    au = test_create_unit(f, r);
+    enable_skill(SK_MAGIC, true);
+    enable_skill(SK_RIDING, true);
+    set_level(au, SK_MAGIC, 3);
+    set_level(au, SK_RIDING, 3);
+    au->status = ST_BEHIND;
+    rtype = get_resourcetype(R_HORSE);
+    i_change(&au->items, rtype->itype, 1);
+    
+    b = make_battle(r);
+    as = make_side(b, au->faction, 0, 0, 0);
+    af = make_fighter(b, au, as, false);
+    
+    CuAssertIntEquals(tc, 1, b->nfighters);
+    CuAssertPtrEquals(tc, 0, af->building);
+    CuAssertPtrEquals(tc, as, af->side);
+    CuAssertIntEquals(tc, 0, af->run.hp);
+    CuAssertIntEquals(tc, ST_BEHIND, af->status);
+    CuAssertIntEquals(tc, 0, af->run.number);
+    CuAssertIntEquals(tc, au->hp, af->person[0].hp);
+    CuAssertIntEquals(tc, 1, af->person[0].speed);
+    CuAssertIntEquals(tc, au->number, af->alive);
+    CuAssertIntEquals(tc, 0, af->removed);
+    CuAssertIntEquals(tc, 3, af->magic);
+    CuAssertIntEquals(tc, 1, af->horses);
+    CuAssertIntEquals(tc, 0, af->elvenhorses);
 }
 
 static int add_two(building * b, unit * u) {

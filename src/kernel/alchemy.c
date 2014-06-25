@@ -278,19 +278,18 @@ a_writeeffect(const attrib * a, const void *owner, struct storage *store)
 static int a_readeffect(attrib * a, void *owner, struct storage *store)
 {
   int power;
-  const item_type *itype;
+  const resource_type *rtype;
   effect_data *edata = (effect_data *) a->data.v;
   char zText[32];
 
   READ_TOK(store, zText, sizeof(zText));
-  itype = it_find(zText);
+  rtype = rt_find(zText);
 
   READ_INT(store, &power);
-  if (itype == NULL || itype->rtype == NULL || itype->rtype->ptype == NULL
-    || power <= 0) {
+  if (rtype == NULL || rtype->ptype == NULL || power <= 0) {
     return AT_READ_FAIL;
   }
-  edata->type = itype->rtype->ptype;
+  edata->type = rtype->ptype;
   edata->value = power;
   return AT_READ_OK;
 }

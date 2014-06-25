@@ -445,18 +445,18 @@ int victorycondition(const alliance * al, const char *name)
     const char **igem;
 
     for (igem = gems; *igem; ++igem) {
-      const struct item_type *itype = it_find(*igem);
+      const struct resource_type *rtype = rt_find(*igem);
       quicklist *flist = al->members;
       int qi;
       bool found = false;
 
-      assert(itype != NULL);
+      assert(rtype);
       for (qi = 0; flist && !found; ql_advance(&flist, &qi, 1)) {
         faction *f = (faction *) ql_get(flist, 0);
         unit *u;
 
         for (u = f->units; u; u = u->nextF) {
-          if (i_get(u->items, itype) > 0) {
+          if (i_get(u->items, rtype->itype) > 0) {
             found = true;
             break;
           }

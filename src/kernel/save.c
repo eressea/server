@@ -399,23 +399,23 @@ void read_items(struct storage *store, item ** ilist)
 {
     for (;;) {
         char ibuf[32];
-        const item_type *itype;
+        const resource_type *rtype;
         int i;
         READ_STR(store, ibuf, sizeof(ibuf));
         if (!strcmp("end", ibuf)) {
             break;
         }
-        itype = it_find(ibuf);
+        rtype = rt_find(ibuf);
         READ_INT(store, &i);
         if (i <= 0) {
-            log_error("data contains an entry with %d %s\n", i, itype->rtype->_name[1]);
+            log_error("data contains an entry with %d %s\n", i, rtype->_name[1]);
         } else {
-            if (itype != NULL) {
-                i_change(ilist, itype, i);
+            if (rtype && rtype->itype) {
+                i_change(ilist, rtype->itype, i);
             } else {
                 log_error("data contains unknown item type %s.\n", ibuf);
             }
-            assert(itype != NULL);
+            assert(rtype && rtype->itype);
         }
     }
 }
@@ -991,33 +991,32 @@ static region *readregion(struct gamedata *data, int x, int y)
   assert(rpeasants(r) >= 0);
   assert(rmoney(r) >= 0);
 
-  if (r->land) {
-    int n;
-    for (;;) {
-      const struct item_type *itype;
-      READ_STR(data->store, token, sizeof(token));
-      if (!strcmp(token, "end"))
-        break;
-      itype = it_find(token);
-      assert(itype->rtype->ltype);
-      READ_INT(data->store, &n);
-      r_setdemand(r, itype->rtype->ltype, n);
+    if (r->land) {
+        int n;
+        for (;;) {
+            const struct resource_type *rtype;
+            READ_STR(data->store, token, sizeof(token));
+            if (!strcmp(token, "end"))
+                break;
+            rtype = rt_find(token);
+            assert(rtype && rtype->ltype);
+            READ_INT(data->store, &n);
+            r_setdemand(r, rtype->ltype, n);
+        }
+        if (data->version >= REGIONITEMS_VERSION) {
+            read_items(data->store, &r->land->items);
+        }
+        if (data->version >= REGIONOWNER_VERSION) {
+            READ_INT(data->store, &n);
+            r->land->morale = (short)n;
+            if (r->land->morale < 0) {
+                r->land->morale = 0;
+            }
+            read_owner(data, &r->land->ownership);
+        }
     }
-    if (data->version >= REGIONITEMS_VERSION) {
-      read_items(data->store, &r->land->items);
-    }
-    if (data->version >= REGIONOWNER_VERSION) {
-      READ_INT(data->store, &n);
-      r->land->morale = (short)n;
-      if (r->land->morale < 0) {
-        r->land->morale = 0;
-      }
-      read_owner(data, &r->land->ownership);
-    }
-  }
-  a_read(data->store, &r->attribs, r);
-
-  return r;
+    a_read(data->store, &r->attribs, r);
+    return r;
 }
 
 void writeregion(struct gamedata *data, const region * r)

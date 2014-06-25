@@ -50,42 +50,45 @@ static void oldfamiliars(unit * u)
 
 static void equip_newunits(const struct equipment *eq, struct unit *u)
 {
-  struct region *r = u->region;
-
-  switch (old_race(u_race(u))) {
-  case RC_ELF:
-    set_show_item(u->faction, it_find("fairyboot"));
+    struct region *r = u->region;
+    const struct resource_type *rtype;
+    switch (old_race(u_race(u))) {
+    case RC_ELF:
+        rtype = rt_find("fairyboot");
+        set_show_item(u->faction, rtype->itype);
+        break;
+    case RC_GOBLIN:
+        rtype = rt_find("roi");
+        set_show_item(u->faction, rtype->itype);
+        set_number(u, 10);
     break;
-  case RC_GOBLIN:
-    set_show_item(u->faction, it_find("roi"));
-    set_number(u, 10);
-    break;
-  case RC_HUMAN:
-    if (u->building == NULL) {
-      const building_type *btype = bt_find("castle");
-      if (btype != NULL) {
-        building *b = new_building(btype, r, u->faction->locale);
-        b->size = 10;
-        u_set_building(u, b);
-        building_set_owner(u);
-      }
-    }
-    break;
-  case RC_CAT:
-    set_show_item(u->faction, it_find("roi"));
-    break;
-  case RC_AQUARIAN:
-  {
-    ship *sh = new_ship(st_find("boat"), r, u->faction->locale);
-    sh->size = sh->type->construction->maxsize;
-    u_set_ship(u, sh);
-  }
-    break;
-  case RC_CENTAUR:
-    rsethorses(r, 250 + rng_int() % 51 + rng_int() % 51);
-    break;
-  default:
-    break;
+    case RC_HUMAN:
+        if (u->building == NULL) {
+            const building_type *btype = bt_find("castle");
+            if (btype != NULL) {
+                building *b = new_building(btype, r, u->faction->locale);
+                b->size = 10;
+                u_set_building(u, b);
+                building_set_owner(u);
+            }
+        }
+        break;
+    case RC_CAT:
+        rtype = rt_find("roi");
+        set_show_item(u->faction, rtype->itype);
+        break;
+    case RC_AQUARIAN:
+        {
+            ship *sh = new_ship(st_find("boat"), r, u->faction->locale);
+            sh->size = sh->type->construction->maxsize;
+            u_set_ship(u, sh);
+        }
+        break;
+    case RC_CENTAUR:
+        rsethorses(r, 250 + rng_int() % 51 + rng_int() % 51);
+        break;
+    default:
+        break;
   }
 }
 

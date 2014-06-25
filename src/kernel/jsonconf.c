@@ -139,6 +139,21 @@ void json_building(cJSON *json, building_type *bt) {
     }
 }
 
+void json_item(cJSON *json, item_type *st) {
+    cJSON *child;
+    if (json->type!=cJSON_Object) {
+        log_error_n("ship %s is not a json object: %d", json->string, json->type);
+        return;
+    }
+    for (child=json->child;child;child=child->next) {
+        switch(child->type) {
+        case cJSON_Object:
+        default:
+            log_error_n("item %s contains unknown attribute %s", json->string, child->string);
+        }
+    }
+}
+
 void json_ship(cJSON *json, ship_type *st) {
     cJSON *child, *iter;
     if (json->type!=cJSON_Object) {
@@ -264,6 +279,22 @@ void json_buildings(cJSON *json) {
     }
     for (child=json->child;child;child=child->next) {
         json_building(child, bt_get_or_create(child->string));
+    }
+}
+
+void json_items(cJSON *json) {
+    cJSON *child;
+    if (json->type!=cJSON_Object) {
+        log_error_n("items is not a json object: %d", json->type);
+        return;
+    }
+    for (child=json->child;child;child=child->next) {
+        resource_type *rtype = rt_get_or_create(child->string);
+        item_type *itype = rtype->itype;
+        if (!itype) {
+            rtype->itype = itype = it_get_or_create(rtype);
+        }
+        json_item(child, itype);
     }
 }
 

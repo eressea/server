@@ -2099,24 +2099,27 @@ bool faction_id_is_unused(int id)
 
 int weight(const unit * u)
 {
-  int w, n = 0, in_bag = 0;
-
-  item *itm;
-  for (itm = u->items; itm; itm = itm->next) {
-    w = itm->type->weight * itm->number;
-    n += w;
-    if (!fval(itm->type, ITF_BIG))
-      in_bag += w;
-  }
-
-  n += u->number * u_race(u)->weight;
-
-  w = i_get(u->items, it_find("magicbag")) * BAGCAPACITY;
-  if (w > in_bag)
-    w = in_bag;
-  n -= w;
-
-  return n;
+    int w, n = 0, in_bag = 0;
+    const resource_type *rtype = get_resourcetype(R_SACK_OF_CONSERVATION);
+    item *itm;
+    
+    for (itm = u->items; itm; itm = itm->next) {
+        w = itm->type->weight * itm->number;
+        n += w;
+        if (rtype && !fval(itm->type, ITF_BIG)) {
+            in_bag += w;
+        }
+    }
+    
+    n += u->number * u_race(u)->weight;
+    
+    if (rtype) {
+        w = i_get(u->items, rtype->itype) * BAGCAPACITY;
+        if (w > in_bag) w = in_bag;
+    }
+    n -= w;
+    
+    return n;
 }
 
 void make_undead_unit(unit * u)

@@ -293,9 +293,9 @@ void get_food(region * r)
 
       /* use peasantblood before eating the peasants themselves */
       const struct potion_type *pt_blood = 0;
-      const item_type *it_blood = it_find("peasantblood");
-      if (it_blood) {
-          pt_blood = it_blood->rtype->ptype;
+      const resource_type *rt_blood = rt_find("peasantblood");
+      if (rt_blood) {
+          pt_blood = rt_blood->ptype;
       }
       if (pt_blood) {
         /* always start with the unit itself, then the first known unit that may have some blood */
@@ -3257,7 +3257,7 @@ static building *age_building(building * b)
 {
     const struct building_type *bt_blessed;
     const struct curse_type *ct_astralblock;
-    const struct item_type *itype = it_find("elvenhorse");
+    const struct resource_type *rtype = get_resourcetype(R_UNICORN);
 
     bt_blessed = bt_find("blessedstonecircle");
     ct_astralblock = ct_find("astralblock");
@@ -3269,7 +3269,7 @@ static building *age_building(building * b)
    *
    * TODO: this would be nicer in a btype->age function, but we don't have it.
    */
-  if (itype && ct_astralblock && bt_blessed && b->type == bt_blessed) {
+  if (rtype && ct_astralblock && bt_blessed && b->type == bt_blessed) {
     region *r = b->region;
     region *rt = r_standard_to_astral(r);
     unit *u, *mage = NULL;
@@ -3282,13 +3282,13 @@ static building *age_building(building * b)
           int n, unicorns = 0;
           for (n = 0; n != u->number; ++n) {
             if (chance(0.02)) {
-              i_change(&u->items, itype, 1);
+              i_change(&u->items, rtype->itype, 1);
               ++unicorns;
             }
             if (unicorns) {
               ADDMSG(&u->faction->msgs, msg_message("scunicorn",
                   "unit amount rtype",
-                  u, unicorns, itype->rtype));
+                  u, unicorns, rtype));
             }
           }
         }
@@ -4332,8 +4332,8 @@ int siege_cmd(unit * u, order * ord)
     int d, pooled;
     int bewaffnete, katapultiere = 0;
     const curse_type *magicwalls_ct;
-    item_type *it_catapultammo = NULL;
-    item_type *it_catapult = NULL;
+    resource_type *rt_catapultammo = NULL;
+    resource_type *rt_catapult = NULL;
 
     init_tokens(ord);
     skip_token();
@@ -4352,12 +4352,12 @@ int siege_cmd(unit * u, order * ord)
     /* schaden durch katapulte */
 
     magicwalls_ct = ct_find("magicwalls");
-    it_catapultammo = it_find("catapultammo");
-    it_catapult = it_find("catapult");
+    rt_catapultammo = rt_find("catapultammo");
+    rt_catapult = rt_find("catapult");
 
-    d = i_get(u->items, it_catapult);
+    d = i_get(u->items, rt_catapult->itype);
     d = _min(u->number, d);
-    pooled = get_pooled(u, it_catapultammo->rtype, GET_DEFAULT, d);
+    pooled = get_pooled(u, rt_catapultammo, GET_DEFAULT, d);
     d = _min(pooled, d);
     if (eff_skill(u, SK_CATAPULT, r) >= 1) {
         katapultiere = d;
@@ -4393,7 +4393,7 @@ int siege_cmd(unit * u, order * ord)
     /* meldung, schaden anrichten */
     if (d && !curse_active(get_curse(b->attribs, magicwalls_ct))) {
         b->size -= d;
-        use_pooled(u, it_catapultammo->rtype,
+        use_pooled(u, rt_catapultammo,
                    GET_SLACK | GET_RESERVE | GET_POOLED_SLACK, d);
         /* send message to the entire region */
         ADDMSG(&r->msgs, msg_message("siege_catapults",

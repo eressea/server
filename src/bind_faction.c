@@ -66,9 +66,9 @@ int tolua_faction_add_item(lua_State * L)
   int result = -1;
 
   if (iname != NULL) {
-    const item_type *itype = it_find(iname);
-    if (itype != NULL) {
-      item *i = i_change(&self->items, itype, number);
+    const resource_type *rtype = rt_find(iname);
+    if (rtype && rtype->itype) {
+      item *i = i_change(&self->items, rtype->itype, number);
       result = i ? i->number : 0;
     }                           /* if (itype!=NULL) */
   }

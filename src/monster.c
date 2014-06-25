@@ -82,7 +82,7 @@ static void eaten_by_monster(unit * u)
     static double multi = 0.0;
     int n = 0;
     int horse = -1;
-    
+    const resource_type *rhorse = get_resourcetype(R_HORSE);
     if (multi == 0.0) {
         multi = RESOURCE_QUANTITY * newterrain(T_PLAIN)->size / 10000.0;
     }
@@ -101,7 +101,7 @@ static void eaten_by_monster(unit * u)
         n = rng_int() % (u->number / 20 + 1);
         horse = 0;
     }
-    horse = horse ? i_get(u->items, it_find("horse")) : 0;
+    horse = horse ? i_get(u->items, rhorse->itype) : 0;
 
     n = (int)(n * multi);
     if (n > 0) {
@@ -115,7 +115,7 @@ static void eaten_by_monster(unit * u)
         }
     }
     if (horse > 0) {
-        i_change(&u->items, it_find("horse"), -horse);
+        i_change(&u->items, rhorse->itype, -horse);
         ADDMSG(&u->region->msgs, msg_message("eathorse", "unit amount", u, horse));
     }
 }

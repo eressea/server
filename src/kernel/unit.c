@@ -221,6 +221,7 @@ static buddy *get_friends(const unit * u, int *numfriends)
 int gift_items(unit * u, int flags)
 {
     const struct resource_type *rsilver = get_resourcetype(R_SILVER);
+    const struct resource_type *rhorse = get_resourcetype(R_HORSE);
     region *r = u->region;
     item **itm_p = &u->items;
     int retval = 0;
@@ -308,7 +309,7 @@ int gift_items(unit * u, int flags)
           rsetmoney(r, rmoney(r) + itm->number);
           itm->number = 0;
         }
-        else if (itm->type == it_find("horse")) {
+        else if (itm->type->rtype == rhorse) {
           rsethorses(r, rhorses(r) + itm->number);
           itm->number = 0;
         }
@@ -1210,16 +1211,22 @@ bool has_skill(const unit * u, skill_t sk)
   return false;
 }
 
+static int item_invis(const unit *u) {
+    const struct resource_type *rring = get_resourcetype(R_RING_OF_INVISIBILITY);
+    const struct resource_type *rsphere = get_resourcetype(R_SPHERE_OF_INVISIBILITY);
+    return i_get(u->items, rring->itype)
+        + i_get(u->items, rsphere->itype) * 100;
+}
+
 static int item_modification(const unit * u, skill_t sk, int val)
 {
-  if (sk == SK_STEALTH) {
+    if (sk == SK_STEALTH) {
 #if NEWATSROI == 1
-    if (i_get(u->items, it_find("roi"))
-      + 100 * i_get(u->items, it_find("sphereofinv")) >= u->number) {
-      val += ROIBONUS;
-    }
+        if (item_invis(u) >= u->number) {
+            val += ROIBONUS;
+        }
 #endif
-  }
+    }
 #if NEWATSROI == 1
     if (sk == SK_PERCEPTION) {
         const struct resource_type *rtype = get_resourcetype(R_AMULET_OF_TRUE_SEEING);
@@ -1355,22 +1362,21 @@ int eff_skill_study(const unit * u, skill_t sk, const region * r)
 int invisible(const unit * target, const unit * viewer)
 {
 #if NEWATSROI == 1
-  return 0;
-#else
-  if (viewer && viewer->faction == target->faction)
     return 0;
-  else {
-    int hidden =
-      i_get(target->items, it_find("roi")) + 100 * i_get(target->items,
-      it_find("sphereofinv"));
-    if (hidden) {
-      hidden = _min(hidden, target->number);
-      if (viewer) {
-        hidden -= i_get(viewer->items, it_find("aots"));
-      }
+#else
+    if (viewer && viewer->faction == target->faction)
+        return 0;
+    else {
+        int hidden = item_invis(target);
+        if (hidden) {
+            hidden = _min(hidden, target->number);
+            if (viewer) {
+                const resource_type *rtype = get_resourcetype(R_AMULET_OF_TRUE_SEEING);
+                hidden -= i_get(viewer->items, rtype->itype);
+            }
+        }
+        return hidden;
     }
-    return hidden;
-  }
 #endif
 }
 

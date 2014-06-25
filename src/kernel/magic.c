@@ -715,34 +715,36 @@ static int use_item_aura(const region * r, const unit * u)
 
 int max_spellpoints(const region * r, const unit * u)
 {
-  int sk;
-  double n, msp;
-  double potenz = 2.1;
-  double divisor = 1.2;
+    int sk;
+    double n, msp;
+    double potenz = 2.1;
+    double divisor = 1.2;
+    const struct resource_type *rtype;
 
-  sk = eff_skill(u, SK_MAGIC, r);
-  msp = u_race(u)->maxaura * (pow(sk, potenz) / divisor + 1) + get_spchange(u);
-
-  if (i_get(u->items, it_find("aurafocus")) > 0) {
-    msp += use_item_aura(r, u);
-  }
-  n = get_curseeffect(u->attribs, C_AURA, 0);
-  if (n > 0)
-    msp = (msp * n) / 100;
-
-  return _max((int)msp, 0);
+    sk = eff_skill(u, SK_MAGIC, r);
+    msp = u_race(u)->maxaura * (pow(sk, potenz) / divisor + 1) + get_spchange(u);
+    
+    rtype = rt_find("aurafocus");
+    if (rtype && i_get(u->items, rtype->itype) > 0) {
+        msp += use_item_aura(r, u);
+    }
+    n = get_curseeffect(u->attribs, C_AURA, 0);
+    if (n > 0) {
+        msp = (msp * n) / 100;
+    }
+    return _max((int)msp, 0);
 }
 
 int change_maxspellpoints(unit * u, int csp)
 {
-  sc_mage *m;
+    sc_mage *m;
 
-  m = get_mage(u);
-  if (!m)
-    return 0;
-
-  m->spchange += csp;
-  return max_spellpoints(u->region, u);
+    m = get_mage(u);
+    if (!m) {
+        return 0;
+    }
+    m->spchange += csp;
+    return max_spellpoints(u->region, u);
 }
 
 /* ------------------------------------------------------------- */
@@ -1009,31 +1011,31 @@ cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
  */
 
 float
-spellpower(region * r, unit * u, const spell * sp, int cast_level,
-  struct order *ord)
+spellpower(region * r, unit * u, const spell * sp, int cast_level, struct order *ord)
 {
-  curse *c;
-  float force = (float)cast_level;
-  int elf_power = -1;
+    curse *c;
+    float force = (float)cast_level;
+    int elf_power;
+    const struct resource_type *rtype;
 
-  if (sp == NULL) {
-    return 0;
-  } else {
-    /* Bonus durch Magieturm und gesegneten Steinkreis */
-    struct building *b = inside_building(u);
-    const struct building_type *btype = b ? b->type : NULL;
-    if (btype && btype->flags & BTF_MAGIC)
-      ++force;
-  }
+    if (sp == NULL) {
+        return 0;
+    } else {
+        /* Bonus durch Magieturm und gesegneten Steinkreis */
+        struct building *b = inside_building(u);
+        const struct building_type *btype = b ? b->type : NULL;
+        if (btype && btype->flags & BTF_MAGIC) ++force;
+    }
 
-  if (i_get(u->items, it_find("rop")) > 0)
-    ++force;
-  if (elf_power < 0) {
     elf_power = get_param_int(global.parameters, "rules.magic.elfpower", 0);
-  }
-  if (elf_power && u_race(u) == new_race[RC_ELF] && r_isforest(r)) {
-    ++force;
-  }
+
+    if (elf_power && u_race(u) == new_race[RC_ELF] && r_isforest(r)) {
+        ++force;
+    }
+    rtype = rt_find("rop");
+    if (rtype && i_get(u->items, rtype->itype) > 0) {
+        ++force;
+    }
 
   /* Antimagie in der Zielregion */
   c = get_curse(r->attribs, ct_find("antimagiczone"));
@@ -1110,67 +1112,68 @@ static int farcasting(unit * magician, region * r)
  * reduziert magischen Schaden */
 double magic_resistance(unit * target)
 {
-  attrib *a;
-  curse *c;
-  int n;
-  const curse_type * ct_goodresist = 0, * ct_badresist = 0;
+    attrib *a;
+    curse *c;
+    int n;
+    const curse_type * ct_goodresist = 0, * ct_badresist = 0;
+    const resource_type *rtype;
+    double probability = u_race(target)->magres;
 
-  /* Bonus durch Rassenmagieresistenz */
-  double probability = u_race(target)->magres;
-  assert(target->number > 0);
+    assert(target->number > 0);
+    /* Magier haben einen Resistenzbonus vom Magietalent * 5% */
+    probability += effskill(target, SK_MAGIC) * 0.05;
 
-  /* Magier haben einen Resistenzbonus vom Magietalent * 5% */
-  probability += effskill(target, SK_MAGIC) * 0.05;
-
-  /* Auswirkungen von Zaubern auf der Einheit */
-  c = get_curse(target->attribs, ct_find("magicresistance"));
-  if (c) {
-    probability += 0.01 * curse_geteffect(c) * get_cursedmen(target, c);
-  }
-
-  /* Unicorn +10 */
-  n = i_get(target->items, it_find("elvenhorse"));
-  if (n)
-    probability += n * 0.1 / target->number;
-
-  /* Auswirkungen von Zaubern auf der Region */
-  a = a_find(target->region->attribs, &at_curse);
-  if (a) {
-    ct_badresist = ct_find("badmagicresistancezone");
-    ct_goodresist = ct_find("goodmagicresistancezone");
-  }
-  while (a && a->type == &at_curse) {
-    curse *c = (curse *) a->data.v;
-    unit *mage = c->magician;
-
-    if (mage != NULL) {
-      if (ct_goodresist && c->type == ct_goodresist) {
-        if (alliedunit(mage, target->faction, HELP_GUARD)) {
-          probability += curse_geteffect(c) * 0.01;
-          ct_goodresist = 0; /* only one effect per region */
-        }
-      } else if (ct_badresist && c->type == ct_badresist) {
-        if (!alliedunit(mage, target->faction, HELP_GUARD)) {
-          probability -= curse_geteffect(c) * 0.01;
-          ct_badresist = 0; /* only one effect per region */
-        }
-      }
+    /* Auswirkungen von Zaubern auf der Einheit */
+    c = get_curse(target->attribs, ct_find("magicresistance"));
+    if (c) {
+        probability += 0.01 * curse_geteffect(c) * get_cursedmen(target, c);
     }
-    a = a->next;
-  }
-  /* Bonus durch Artefakte */
-  /* TODO (noch gibs keine) */
 
-  /* Bonus durch Gebäude */
-  {
-    struct building *b = inside_building(target);
-    const struct building_type *btype = b ? b->type : NULL;
-
-    /* gesegneter Steinkreis gibt 30% dazu */
-    if (btype)
-      probability += btype->magresbonus * 0.01;
-  }
-  return probability;
+    /* Unicorn +10 */
+    rtype = get_resourcetype(R_UNICORN);
+    n = i_get(target->items, rtype->itype);
+    if (n) {
+        probability += n * 0.1 / target->number;
+    }
+    
+    /* Auswirkungen von Zaubern auf der Region */
+    a = a_find(target->region->attribs, &at_curse);
+    if (a) {
+        ct_badresist = ct_find("badmagicresistancezone");
+        ct_goodresist = ct_find("goodmagicresistancezone");
+    }
+    while (a && a->type == &at_curse) {
+        curse *c = (curse *) a->data.v;
+        unit *mage = c->magician;
+        
+        if (mage != NULL) {
+            if (ct_goodresist && c->type == ct_goodresist) {
+                if (alliedunit(mage, target->faction, HELP_GUARD)) {
+                    probability += curse_geteffect(c) * 0.01;
+                    ct_goodresist = 0; /* only one effect per region */
+                }
+            } else if (ct_badresist && c->type == ct_badresist) {
+                if (!alliedunit(mage, target->faction, HELP_GUARD)) {
+                    probability -= curse_geteffect(c) * 0.01;
+                    ct_badresist = 0; /* only one effect per region */
+                }
+            }
+        }
+        a = a->next;
+    }
+    /* Bonus durch Artefakte */
+    /* TODO (noch gibs keine) */
+    
+    /* Bonus durch Gebäude */
+    {
+        struct building *b = inside_building(target);
+        const struct building_type *btype = b ? b->type : NULL;
+        
+        /* gesegneter Steinkreis gibt 30% dazu */
+        if (btype)
+            probability += btype->magresbonus * 0.01;
+    }
+    return probability;
 }
 
 /* ------------------------------------------------------------- */
@@ -1329,94 +1332,87 @@ static void fumble_default(castorder * co)
 
 static void do_fumble(castorder * co)
 {
-  curse *c;
-  region *r = co_get_region(co);
-  unit *u = co->magician.u;
-  const spell *sp = co->sp;
-  int level = co->level;
-  int duration;
-  float effect;
-
-  ADDMSG(&u->faction->msgs, msg_message("patzer", "unit region spell",
-      u, r, sp));
-  switch (rng_int() % 10) {
-  case 0:
-    /* wenn vorhanden spezieller Patzer, ansonsten nix */
-    if (sp->fumble) {
-      sp->fumble(co);
-    } 
-    else {
-      fumble_default(co);
+    curse *c;
+    region *r = co_get_region(co);
+    unit *u = co->magician.u;
+    const spell *sp = co->sp;
+    int level = co->level;
+    int duration;
+    float effect;
+    
+    ADDMSG(&u->faction->msgs, 
+           msg_message("patzer", "unit region spell", u, r, sp));
+    switch (rng_int() % 10) {
+    case 0:
+        /* wenn vorhanden spezieller Patzer, ansonsten nix */
+        if (sp->fumble) {
+            sp->fumble(co);
+        } 
+        else {
+            fumble_default(co);
+        }
+        break;
+        
+    case 1: /* toad */
+        {
+            /* one or two things will happen: the toad changes her race back,
+             * and may or may not get toadslime.
+             * The list of things to happen are attached to a timeout
+             * trigger and that's added to the triggerlit of the mage gone toad.
+             */
+            trigger *trestore = trigger_changerace(u, u_race(u), u->irace);
+            if (chance(0.7)) {
+                const resource_type *rtype = rt_find("toadslime");
+                if (rtype) {
+                    t_add(&trestore, trigger_giveitem(u, rtype->itype, 1));
+                }
+            }
+            duration = rng_int() % level / 2;
+            if (duration < 2) duration = 2;
+            add_trigger(&u->attribs, "timer", trigger_timeout(duration, trestore));
+            u_setrace(u, new_race[RC_TOAD]);
+            u->irace = NULL;
+            ADDMSG(&r->msgs, msg_message("patzer6", "unit region spell", u, r, sp));
+            break;
+        }
+        /* fall-through is intentional! */
+        
+    case 2:
+        /* temporary skill loss */
+        duration = _max(rng_int() % level / 2, 2);
+        effect = -(float)level/2;
+        c = create_curse(u, &u->attribs, ct_find("skillmod"), (float)level,
+                         duration, effect, 1);
+        c->data.i = SK_MAGIC;
+        ADDMSG(&u->faction->msgs, msg_message("patzer2", "unit region", u, r));
+        break;
+    case 3:
+    case 4:
+        /* Spruch schlägt fehl, alle Magiepunkte weg */
+        set_spellpoints(u, 0);
+        ADDMSG(&u->faction->msgs, msg_message("patzer3", "unit region spell",
+                                              u, r, sp));
+        break;
+        
+    case 5:
+    case 6:
+        /* Spruch gelingt, aber alle Magiepunkte weg */
+        co->level = sp->cast(co);
+        set_spellpoints(u, 0);
+        ADDMSG(&u->faction->msgs, msg_message("patzer4", "unit region spell",
+                                              u, r, sp));
+        break;
+        
+    case 7:
+    case 8:
+    case 9:
+    default:
+        /* Spruch gelingt, alle nachfolgenden Sprüche werden 2^4 so teuer */
+        co->level = sp->cast(co);
+        ADDMSG(&u->faction->msgs, msg_message("patzer5", "unit region spell",
+                                              u, r, sp));
+        countspells(u, 3);
     }
-    break;
-
-  case 1:
-    /* Kröte */
-  {
-    /* one or two things will happen: the toad changes her race back,
-     * and may or may not get toadslime.
-     * The list of things to happen are attached to a timeout
-     * trigger and that's added to the triggerlit of the mage gone toad.
-     */
-    trigger *trestore = trigger_changerace(u, u_race(u), u->irace);
-
-    if (chance(0.7)) {
-      const item_type *it_toadslime = it_find("toadslime");
-      if (it_toadslime != NULL) {
-        t_add(&trestore, trigger_giveitem(u, it_toadslime, 1));
-      }
-    }
-
-    duration = rng_int() % level / 2;
-    if (duration < 2)
-      duration = 2;
-    add_trigger(&u->attribs, "timer", trigger_timeout(duration, trestore));
-    u_setrace(u, new_race[RC_TOAD]);
-    u->irace = NULL;
-    ADDMSG(&r->msgs, msg_message("patzer6", "unit region spell", u, r, sp));
-    break;
-  }
-    /* fall-through is intentional! */
-
-  case 2:
-    /* temporärer Stufenverlust */
-    duration = _max(rng_int() % level / 2, 2);
-    effect = -(float)level/2;
-    c =
-      create_curse(u, &u->attribs, ct_find("skillmod"), (float)level,
-      duration, effect, 1);
-    c->data.i = SK_MAGIC;
-    ADDMSG(&u->faction->msgs, msg_message("patzer2", "unit region", u, r));
-    break;
-  case 3:
-  case 4:
-    /* Spruch schlägt fehl, alle Magiepunkte weg */
-    set_spellpoints(u, 0);
-    ADDMSG(&u->faction->msgs, msg_message("patzer3", "unit region spell",
-        u, r, sp));
-    break;
-
-  case 5:
-  case 6:
-    /* Spruch gelingt, aber alle Magiepunkte weg */
-    co->level = sp->cast(co);
-    set_spellpoints(u, 0);
-    ADDMSG(&u->faction->msgs, msg_message("patzer4", "unit region spell",
-        u, r, sp));
-    break;
-
-  case 7:
-  case 8:
-  case 9:
-  default:
-    /* Spruch gelingt, alle nachfolgenden Sprüche werden 2^4 so teuer */
-    co->level = sp->cast(co);
-    ADDMSG(&u->faction->msgs, msg_message("patzer5", "unit region spell",
-        u, r, sp));
-    countspells(u, 3);
-  }
-
-  return;
 }
 
 /* ------------------------------------------------------------- */

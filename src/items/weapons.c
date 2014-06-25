@@ -94,15 +94,13 @@ attack_catapult(const troop * at, const struct weapon_type *wtype,
     troop dt;
     int d = 0, enemies;
     weapon *wp = af->person[at->index].missile;
-    item_type *it_catapultammo = NULL;
+    const resource_type *rtype = rt_find("catapultammo");
 
     assert(wp->type == wtype);
     assert(af->person[at->index].reload == 0);
     
-    it_catapultammo = it_find("catapultammo");
-    if (it_catapultammo != NULL) {
-        if (get_pooled(au, it_catapultammo->rtype,
-                       GET_SLACK | GET_RESERVE | GET_POOLED_SLACK, 1) <= 0) {
+    if (rtype) {
+        if (get_pooled(au, rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, 1) <= 0) {
             /* No ammo. Use other weapon if available. */
             return true;
         }
@@ -128,9 +126,8 @@ attack_catapult(const troop * at, const struct weapon_type *wtype,
         af->catmsg = 0;
     }
     
-    if (it_catapultammo != NULL) {
-        use_pooled(au, it_catapultammo->rtype,
-                   GET_SLACK | GET_RESERVE | GET_POOLED_SLACK, 1);
+    if (rtype) {
+        use_pooled(au, rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, 1);
     }
     
     while (--enemies >= 0) {

@@ -840,8 +840,8 @@ static const armor_type *select_armor(troop t, bool shield)
  * - Zauber Rindenhaut gibt Rüstung +3
  */
 static int trollbelts(const unit *u) {
-    const struct item_type *belt = it_find("trollbelt");
-    return belt ? i_get(u->items, belt) : 0;
+    const struct resource_type *belt = rt_find("trollbelt");
+    return belt ? i_get(u->items, belt->itype) : 0;
 }
 
 int select_magicarmor(troop t)
@@ -3368,15 +3368,15 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     fig->horses = fig->unit->number;
     fig->elvenhorses = 0;
   } else {
-    const item_type *it_horse = 0;
-    const item_type *it_elvenhorse = 0;
-    it_elvenhorse = it_find("elvenhorse");
-    it_horse = it_find("charger");
-    if (!it_horse) {
-      it_horse = it_find("horse");
-    }
-    fig->horses = i_get(u->items, it_horse);
-    fig->elvenhorses = i_get(u->items, it_elvenhorse);
+      const resource_type *rt_horse = 0;
+      const resource_type *rt_elvenhorse = 0;
+      rt_elvenhorse = get_resourcetype(R_UNICORN);
+      rt_horse = get_resourcetype(R_CHARGER);
+      if (!rt_horse) {
+          rt_horse = get_resourcetype(R_HORSE);
+      }
+      fig->horses = rt_horse ? i_get(u->items, rt_horse->itype) : 0;
+      fig->elvenhorses = rt_elvenhorse ? i_get(u->items, rt_elvenhorse->itype) : 0;
   }
 
   if (u_race(u)->battle_flags & BF_EQUIPMENT) {
