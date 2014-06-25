@@ -450,6 +450,9 @@ void json_config(cJSON *json) {
         if (strcmp(child->string, "races")==0) {
             json_races(child);
         }
+        else if (strcmp(child->string, "items")==0) {
+            json_items(child);
+        }
         else if (strcmp(child->string, "ships")==0) {
             json_ships(child);
         }

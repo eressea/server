@@ -4,6 +4,7 @@
 
 #include "building.h"
 #include "direction.h"
+#include "item.h"
 #include "keyword.h"
 #include "race.h"
 #include "ship.h"
@@ -80,6 +81,27 @@ static void test_races(CuTest * tc)
     CuAssertIntEquals(tc, 5, rc->hitpoints);
     CuAssertIntEquals(tc, 6, rc->armor);
     test_cleanup();
+}
+
+static void test_items(CuTest * tc)
+{
+    const char * data = "{\"items\": { "
+        "\"axe\" : {},"
+        "\"horse\" : {}"
+        "}}";
+    cJSON *json = cJSON_Parse(data);
+
+    test_cleanup();
+
+    CuAssertPtrNotNull(tc, json);
+    CuAssertPtrEquals(tc, 0, it_find("axe"));
+    CuAssertPtrEquals(tc, 0, rt_find("axe"));
+    CuAssertPtrEquals(tc, 0, (void *)get_resourcetype(R_HORSE));
+
+    json_config(json);
+    CuAssertPtrNotNull(tc, it_find("axe"));
+    CuAssertPtrNotNull(tc, rt_find("axe"));
+    CuAssertPtrNotNull(tc, (void *)get_resourcetype(R_HORSE));
 }
 
 static void test_ships(CuTest * tc)
@@ -234,6 +256,7 @@ CuSuite *get_jsonconf_suite(void)
     SUITE_ADD_TEST(suite, test_keywords);
     SUITE_ADD_TEST(suite, test_skills);
     SUITE_ADD_TEST(suite, test_directions);
+    SUITE_ADD_TEST(suite, test_items);
     SUITE_ADD_TEST(suite, test_ships);
     SUITE_ADD_TEST(suite, test_buildings);
     SUITE_ADD_TEST(suite, test_terrains);
