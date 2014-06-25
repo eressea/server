@@ -648,6 +648,8 @@ static void rps_nowrap(FILE * F, const char *s)
   const char *x = s;
   size_t indent = 0;
 
+  if (!x) return;
+
   while (*x++ == ' ') ;
   indent = x - s - 1;
   if (*(x - 1) && indent && *x == ' ')

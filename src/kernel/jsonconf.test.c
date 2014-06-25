@@ -19,7 +19,7 @@ static void check_flag(CuTest *tc, const char *name, int flag) {
     char data[1024];
     const struct race *rc;
     cJSON *json;
-    sprintf(data, "{\"races\" : { \"orc\": { \"flags\" : [ \"%s\"] }}}", name);
+    sprintf(data, "{\"races\" : { \"orc\": { \"speed\" : 1, \"flags\" : [ \"%s\"] }}}", name);
 
     json = cJSON_Parse(data);
     free_races();
@@ -27,6 +27,7 @@ static void check_flag(CuTest *tc, const char *name, int flag) {
     rc = rc_find("orc");
     CuAssertPtrNotNull(tc, rc);
     CuAssertIntEquals(tc, flag, rc->flags);
+    CuAssertIntEquals(tc, 1, rc->speed);
 }
 
 static void test_flags(CuTest *tc) {

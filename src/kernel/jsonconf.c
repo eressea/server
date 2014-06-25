@@ -260,6 +260,9 @@ void json_race(cJSON *json, race *rc) {
             else if (strcmp(child->string, "weight")==0) {
                 rc->weight = child->valueint;
             }
+            else if (strcmp(child->string, "speed")==0) {
+                rc->speed = child->valueint;
+            }
             else if (strcmp(child->string, "capacity")==0) {
                 rc->capacity = child->valueint;
             }
