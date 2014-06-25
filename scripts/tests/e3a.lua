@@ -693,3 +693,22 @@ function disabled_test_bug_1738_build_castle_e3()
   -- does not have the needed minimum skill.
   assert_equal(c.size, 250)
 end
+
+function test_golem_use_four_iron()
+
+  local r0 = region.create(0, 0, "plain")
+  local f1 = faction.create("noreply@eressea.de", "irongolem", "de")
+  local u1 = unit.create(f1, r0, 3)
+  u1:set_skill("weaponsmithing", 1)
+  u1:set_skill("armorer", 1)
+  u1:clear_orders()
+  u1:add_order("Mache 4 Turmschild")
+
+  process_orders()
+
+  assert_equal(4 ,u1:get_item("towershield"), "I shoud have 4 towershields")
+  assert_equal(2 ,u1.number, "There shoud be 2 Irongolems left")
+
+
+end
+
