@@ -1870,12 +1870,8 @@ void set_basepath(const char *path)
 
 float get_param_flt(const struct param *p, const char *key, float def)
 {
-  while (p != NULL) {
-    if (strcmp(p->name, key) == 0)
-      return (float)atof(p->data);
-    p = p->next;
-  }
-  return def;
+    const char *str = get_param(p, key);
+    return str ? (float)atof(str) : def;
 }
 
 void set_param(struct param **p, const char *key, const char *data)
