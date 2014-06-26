@@ -1487,6 +1487,8 @@ static int parse_spells(xmlDocPtr doc)
   xmlXPathObjectPtr spells;
   char zText[32];
   strcpy(zText, "fumble_");
+  pf_generic cast = 0;
+  pf_generic fumble = 0;
 
   /* reading eressea/spells/spell */
   spells = xmlXPathEvalExpression(BAD_CAST "/eressea/spells/spell", xpath);
@@ -1555,8 +1557,6 @@ static int parse_spells(xmlDocPtr doc)
         sp->sptyp |= modes[k];
 
       /* reading eressea/spells/spell/function */
-      pf_generic cast = 0;
-      pf_generic fumble = 0;
 
       xpath->node = node;
       result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
