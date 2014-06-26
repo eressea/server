@@ -1808,22 +1808,23 @@ int getid(void)
 
 const char *get_param(const struct param *p, const char *key)
 {
-  while (p != NULL) {
-    if (strcmp(p->name, key) == 0)
-      return p->data;
-    p = p->next;
-  }
-  return NULL;
+    while (p != NULL) {
+        int cmp = strcmp(p->name, key);
+        if (cmp == 0) {
+            return p->data;
+        } 
+        else if (cmp>0) {
+            break;
+        }
+        p = p->next;
+    }
+    return NULL;
 }
 
 int get_param_int(const struct param *p, const char *key, int def)
 {
-  while (p != NULL) {
-    if (strcmp(p->name, key) == 0)
-      return atoi(p->data);
-    p = p->next;
-  }
-  return def;
+    const char * str = get_param(p, key);
+    return str ? atoi(str) : def;
 }
 
 static const char *g_datadir;
@@ -1869,29 +1870,32 @@ void set_basepath(const char *path)
 
 float get_param_flt(const struct param *p, const char *key, float def)
 {
-  while (p != NULL) {
-    if (strcmp(p->name, key) == 0)
-      return (float)atof(p->data);
-    p = p->next;
-  }
-  return def;
+    const char *str = get_param(p, key);
+    return str ? (float)atof(str) : def;
 }
 
 void set_param(struct param **p, const char *key, const char *data)
 {
-  ++global.cookie;
-  while (*p != NULL) {
-    if (strcmp((*p)->name, key) == 0) {
-      free((*p)->data);
-      (*p)->data = _strdup(data);
-      return;
+    struct param *par;
+
+    ++global.cookie;
+    while (*p != NULL) {
+        int cmp = strcmp((*p)->name, key);
+        if (cmp == 0) {
+            free((*p)->data);
+            (*p)->data = _strdup(data);
+            return;
+        }
+        else if (cmp>0) {
+            break;
+        }
+        p = &(*p)->next;
     }
-    p = &(*p)->next;
-  }
-  *p = malloc(sizeof(param));
-  (*p)->name = _strdup(key);
-  (*p)->data = _strdup(data);
-  (*p)->next = NULL;
+    par = malloc(sizeof(param));
+    par->name = _strdup(key);
+    par->data = _strdup(data);
+    par->next = *p;
+    *p = par;
 }
 
 void kernel_done(void)

@@ -19,7 +19,7 @@ static void check_flag(CuTest *tc, const char *name, int flag) {
     char data[1024];
     const struct race *rc;
     cJSON *json;
-    sprintf(data, "{\"races\" : { \"orc\": { \"flags\" : [ \"%s\"] }}}", name);
+    sprintf(data, "{\"races\" : { \"orc\": { \"speed\" : 1, \"flags\" : [ \"%s\"] }}}", name);
 
     json = cJSON_Parse(data);
     free_races();
@@ -27,6 +27,7 @@ static void check_flag(CuTest *tc, const char *name, int flag) {
     rc = rc_find("orc");
     CuAssertPtrNotNull(tc, rc);
     CuAssertIntEquals(tc, flag, rc->flags);
+    CuAssertIntEquals(tc, 1, rc->speed);
 }
 
 static void test_flags(CuTest *tc) {
@@ -86,10 +87,11 @@ static void test_races(CuTest * tc)
 static void test_items(CuTest * tc)
 {
     const char * data = "{\"items\": { "
-        "\"axe\" : {},"
-        "\"horse\" : {}"
+        "\"axe\" : { \"weight\" : 2},"
+        "\"horse\" : { \"flags\" : [ \"animal\", \"big\" ], \"capacity\" : 20 }"
         "}}";
     cJSON *json = cJSON_Parse(data);
+    const item_type * itype;
 
     test_cleanup();
 
@@ -99,7 +101,17 @@ static void test_items(CuTest * tc)
     CuAssertPtrEquals(tc, 0, (void *)get_resourcetype(R_HORSE));
 
     json_config(json);
-    CuAssertPtrNotNull(tc, it_find("axe"));
+
+    itype = it_find("axe");
+    CuAssertPtrNotNull(tc, itype);
+    CuAssertIntEquals(tc, 2, itype->weight);
+    CuAssertIntEquals(tc, 0, itype->flags);
+
+    itype = it_find("horse");
+    CuAssertPtrNotNull(tc, itype);
+    CuAssertIntEquals(tc, 20, itype->capacity);
+    CuAssertIntEquals(tc, ITF_ANIMAL|ITF_BIG, itype->flags);
+
     CuAssertPtrNotNull(tc, rt_find("axe"));
     CuAssertPtrNotNull(tc, (void *)get_resourcetype(R_HORSE));
 }
