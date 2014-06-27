@@ -3,7 +3,7 @@
     Version="10.0"
     VendorName="SlickEdit"
     TemplateName="GNU C/C++"
-    WorkingDir="."
+    WorkingDir=".."
     BuildSystem="vsbuild">
     <Config
         Name="Debug"
@@ -245,6 +245,7 @@
             <F N="../src/kernel/battle.test.c"/>
             <F N="../src/util/bsdstring.test.c"/>
             <F N="../src/kernel/building.test.c"/>
+            <F N="../src/kernel/config.test.c"/>
             <F N="../src/kernel/curse.test.c"/>
             <F N="../src/direction.test.c"/>
             <F N="../src/economy.test.c"/>
@@ -283,7 +284,6 @@
             Name="Other Files"
             Filters="">
             <F N="../tests/config.lua"/>
-            <F N="../src/game.pkg"/>
             <F N="../tests/init.lua"/>
             <F N="../tests/locale.lua"/>
             <F N="../tests/regions.lua"/>
