@@ -207,6 +207,7 @@ static order_data *create_data(keyword_t kwd, const char *sptr, int lindex)
         locale_array[lindex]->study_orders[sk] = data;
         data->_keyword = kwd;
         data->_lindex = lindex;
+        assert(data->_lindex>=0);
         if (strchr(skname, ' ') != NULL) {
           size_t len = strlen(skname);
           data->_str = malloc(len + 3);
@@ -232,6 +233,7 @@ static order_data *create_data(keyword_t kwd, const char *sptr, int lindex)
       locale_array[lindex]->short_orders[kwd] = data;
       data->_keyword = kwd;
       data->_lindex = lindex;
+      assert(data->_lindex>=0);
       data->_str = NULL;
       data->_refcount = 1;
     }
@@ -241,6 +243,7 @@ static order_data *create_data(keyword_t kwd, const char *sptr, int lindex)
   data = (order_data *) malloc(sizeof(order_data));
   data->_keyword = kwd;
   data->_lindex = lindex;
+  assert(data->_lindex>=0);
   data->_str = s ? _strdup(s) : NULL;
   data->_refcount = 1;
   return data;
