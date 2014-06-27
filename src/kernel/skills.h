@@ -25,10 +25,17 @@ extern "C" {
 #define SMF_RIDING     (1<<2)   /* Bonus für berittene - an der rasse */
 
   typedef struct skill {
+#ifdef LOMEM
     int id:8;
     unsigned int level:8;
     unsigned int weeks:8;
     unsigned int old:8;
+#else
+    int id;
+    unsigned int level;
+    unsigned int weeks;
+    unsigned int old;
+#endif
   } skill;
 
   typedef int (*skillmod_fun) (const struct unit *, const struct region *,

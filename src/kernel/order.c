@@ -45,8 +45,13 @@ static int nlocales = 0;
 
 typedef struct order_data {
   char *_str;
+# ifdef LOMEM
   int _refcount:20;
   int _lindex:4;
+# else
+  int _refcount;
+  int _lindex;
+# endif
   keyword_t _keyword;
 } order_data;
 

@@ -22,12 +22,21 @@ extern "C" {
 
   typedef struct rawmaterial {
     const struct rawmaterial_type *type;
+#ifdef LOMEM
     int amount:16;
     int level:8;
     int flags:8;
     int base:8;
     int divisor:8;
     int startlevel:8;
+#else
+    int amount;
+    int level;
+    int flags;
+    int base;
+    int divisor;
+    int startlevel;
+#endif
     struct rawmaterial *next;
   } rawmaterial;
 

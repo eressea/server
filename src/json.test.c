@@ -21,7 +21,9 @@ static char *strip(char *str) {
     for (; *b && isspace(*b); ++b) {};
     for (e = b; *e && !isspace(*e); ++e) {};
     while (*b) {
-        memcpy(s, b, e - b);
+        if (s!=b) {
+            memcpy(s, b, e - b);
+        }
         s += e - b;
         for (b = e; *b && isspace(*b); ++b) {};
         for (e = b; *e && !isspace(*e); ++e) {};
