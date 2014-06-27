@@ -9,7 +9,12 @@ function setup()
     eressea.settings.set("rules.ships.storms", "0")
     conf = [[{
         "races": {
-            "human" : { "speed" : 1, "flags" : [ "walk" ] },
+            "human" : {
+                "speed" : 1,
+                "weight" : 1000,
+                "capacity" : 1500,
+                "flags" : [ "walk" ]
+            },
             "troll" : {}
         },
         "items" : {
@@ -44,7 +49,7 @@ end
 function test_walk_to_land()
     local r1 = region.create(0, 0, "plain")
     local r2 = region.create(1, 0, "plain")
-    local f = faction.create("test@example.com", "human", "de")
+    local f = faction.create("walk@example.com", "human", "de")
     local u = unit.create(f, r1, 1)
     u:add_order("NACH O")
     process_orders()
