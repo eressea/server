@@ -117,8 +117,13 @@ extern "C" {
   typedef struct weapon {
     int count, used;
     const struct weapon_type *type;
+# ifdef LOMEM
     int attackskill:8;
     int defenseskill:8;
+# else
+    int attackskill;
+    int defenseskill;
+# endif
   } weapon;
 
   /*** fighter::person::flags ***/
@@ -165,6 +170,7 @@ extern "C" {
     int catmsg;                 /* Merkt sich, ob Katapultmessage schon generiert. */
     struct person {
       int hp;                   /* Trefferpunkte der Personen */
+#ifdef LOMEM
       int attack:8;             /* (Magie) Attackenbonus der Personen */
       int defence:8;            /* (Magie) Paradenbonus der Personen */
       int damage:8;             /* (Magie) Schadensbonus der Personen im Nahkampf */
@@ -174,6 +180,16 @@ extern "C" {
       int reload:4;             /* Anzahl Runden, die die Waffe x noch laden muss.
                                  * dahinter steckt ein array[RL_MAX] wenn er min. eine hat. */
       int last_action:4;        /* In welcher Runde haben wir zuletzt etwas getan */
+#else
+      int attack;
+      int defence;
+      int damage;
+      int damage_rear;
+      int flags;
+      int speed;
+      int reload;
+      int last_action;
+#endif
       struct weapon *missile;   /* missile weapon */
       struct weapon *melee;     /* melee weapon */
     } *person;
