@@ -64,10 +64,11 @@ static int tolua_config_eressea_config_read00(lua_State* tolua_S)
  {
   const char* filename = ((const char*)  tolua_tostring(tolua_S,1,0));
  {
-  config_read(filename);
+  int tolua_ret = (int)  config_read(filename);
+ tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
  }
  }
- return 0;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'read'.",&tolua_err);
@@ -90,10 +91,11 @@ static int tolua_config_eressea_config_parse00(lua_State* tolua_S)
  {
   const char* json = ((const char*)  tolua_tostring(tolua_S,1,0));
  {
-  config_parse(json);
+  int tolua_ret = (int)  config_parse(json);
+ tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
  }
  }
- return 0;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'parse'.",&tolua_err);
