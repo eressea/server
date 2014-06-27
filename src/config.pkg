@@ -3,8 +3,8 @@ $#include "bind_config.h"
 module eressea {
   module config {
     void config_reset @ reset(void);
-    void config_read @ read(const char *filename);
-    void config_parse @ parse(const char *json);
+    int config_read @ read(const char *filename);
+    int config_parse @ parse(const char *json);
   }
 }
 

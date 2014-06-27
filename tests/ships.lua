@@ -3,7 +3,7 @@ require "lunit"
 module("tests.ships", package.seeall, lunit.testcase)
 
 function setup()
-    eressea.free_game()
+    eressea.game.reset()
     eressea.settings.set("nmr.removenewbie", "0")
     eressea.settings.set("nmr.timeout", "0")
     eressea.settings.set("rules.ships.storms", "0")
@@ -39,11 +39,16 @@ function setup()
             "de" : {
                 "move" : "NACH"
             }
+        },
+        "strings" : {
+            "de" : {
+                "harbour" : "Hafen"
+            }
         }
     }]]
 
     eressea.config.reset()
-    eressea.config.parse(conf)
+    assert(eressea.config.parse(conf)==0)
 end
 
 function test_sail_oceans()
