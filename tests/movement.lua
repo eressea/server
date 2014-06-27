@@ -9,7 +9,12 @@ function setup()
     eressea.settings.set("rules.ships.storms", "0")
     conf = [[{
         "races": {
-            "human" : { "speed" : 1, "flags" : [ "walk" ] },
+            "human" : {
+                "speed" : 1,
+                "weight" : 1000,
+                "capacity" : 1500,
+                "flags" : [ "walk" ]
+            },
             "troll" : {}
         },
         "items" : {
