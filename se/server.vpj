@@ -3,7 +3,7 @@
     Version="10.0"
     VendorName="SlickEdit"
     TemplateName="GNU C/C++"
-    WorkingDir="."
+    WorkingDir="../"
     BuildSystem="vsbuild">
     <Config
         Name="Debug"
@@ -69,7 +69,9 @@
                 Deletable="0"
                 SaveOption="SaveNone"
                 RunFromDir="%rw">
-                <Exec CmdLine='vsdebugio -prog "%o"'/>
+                <Exec
+                    CmdLine='vsdebugio -prog "%o" %~other'
+                    OtherOptions="scripts/runtests.lua"/>
             </Target>
             <Target
                 Name="Execute"
@@ -79,9 +81,10 @@
                 CaptureOutputWith="ProcessBuffer"
                 Deletable="0"
                 SaveOption="SaveWorkspaceFiles"
-                RunFromDir="%rw"
-                RunInXterm="1">
-                <Exec CmdLine='"%o"'/>
+                RunFromDir="%rw">
+                <Exec
+                    CmdLine='"%o" %~other'
+                    OtherOptions="scripts/runtests.lua"/>
             </Target>
             <Target
                 Name="dash"
@@ -194,7 +197,9 @@
                 Deletable="0"
                 SaveOption="SaveNone"
                 RunFromDir="%rw">
-                <Exec CmdLine='vsdebugio -prog "%o"'/>
+                <Exec
+                    CmdLine='vsdebugio -prog "%o" %~other'
+                    OtherOptions="scripts/runtests.lua"/>
             </Target>
             <Target
                 Name="Execute"
@@ -204,9 +209,10 @@
                 CaptureOutputWith="ProcessBuffer"
                 Deletable="0"
                 SaveOption="SaveWorkspaceFiles"
-                RunFromDir="%rw"
-                RunInXterm="1">
-                <Exec CmdLine='"%o"'/>
+                RunFromDir="%rw">
+                <Exec
+                    CmdLine='"%o" %~other'
+                    OtherOptions="scripts/runtests.lua"/>
             </Target>
             <Target
                 Name="dash"
@@ -282,6 +288,7 @@
             <F N="../src/config.pkg.c"/>
             <F N="../src/console.c"/>
             <F N="../src/eressea.pkg.c"/>
+            <F N="../src/game.pkg.c"/>
             <F N="../src/gmtool.c"/>
             <F N="../src/helpers.c"/>
             <F N="../src/listbox.c"/>

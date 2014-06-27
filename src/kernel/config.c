@@ -2103,7 +2103,7 @@ bool faction_id_is_unused(int id)
 
 int weight(const unit * u)
 {
-    int w, n = 0, in_bag = 0;
+    int w = 0, n = 0, in_bag = 0;
     const resource_type *rtype = get_resourcetype(R_SACK_OF_CONSERVATION);
     item *itm;
     
@@ -2120,8 +2120,8 @@ int weight(const unit * u)
     if (rtype) {
         w = i_get(u->items, rtype->itype) * BAGCAPACITY;
         if (w > in_bag) w = in_bag;
+        n -= w;
     }
-    n -= w;
     
     return n;
 }
