@@ -4,11 +4,12 @@ while [ ! -d $ROOT/.git ]; do
   ROOT=$(dirname $ROOT)
 done
 
+[ -z $BUILD ] && BUILD=Debug
 MACHINE=`uname -m`
 [ -z "$CC" ] && [ ! -z `which gcc` ] && CC="gcc"
 [ -z "$CC" ] && [ ! -z `which tcc` ] && CC="tcc"
 [ -z "$CC" ] && [ ! -z `which cc` ] && CC="cc"
-BIN_DIR="build-$MACHINE-$CC-Debug"
+BIN_DIR="build-$MACHINE-$CC-$BUILD"
 
 [ -z "$JOBS" ] && JOBS=$(nproc)
 DISTCC=`which distcc`

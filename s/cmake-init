@@ -8,11 +8,13 @@ while [ ! -d $ROOT/.git ]; do
   fi
 done
 
+[ -z $BUILD ] && BUILD=Debug
 MACHINE=`uname -m`
 [ -z "$CC" ] && [ ! -z `which gcc` ] && CC="gcc"
 [ -z "$CC" ] && [ ! -z `which tcc` ] && CC="tcc"
 [ -z "$CC" ] && [ ! -z `which cc` ] && CC="cc"
-BIN_DIR="build-$MACHINE-$CC-Debug"
+BIN_DIR="build-$MACHINE-$CC-$BUILD"
+mkdir -p $BIN_DIR
 cd $BIN_DIR
 
 if [ ! -e ../CMakeLists.txt ]; then
@@ -37,7 +39,7 @@ fi
 
 cmake .. \
  -DCMAKE_MODULE_PATH=$PWD/../cmake/Modules \
- -DCMAKE_BUILD_TYPE=Debug \
+ -DCMAKE_BUILD_TYPE=$BUILD \
  -DCMAKE_LIBRARY_PATH=$LIBRARY_PATH \
  -DCMAKE_INCLUDE_PATH=$INCLUDE_PATH \
  -DCMAKE_PREFIX_PATH=$PREFIX_PATH \
