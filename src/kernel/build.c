@@ -775,7 +775,7 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
 
     /* Die Einheit befindet sich automatisch im Inneren der neuen Burg. */
     /* Check if unit still have member, as stonegolems are destroyed during construction*/
-    if (leave(u, false) && u->number >> 0) {     
+    if (leave(u, false) && u->number>0) {     
       u_set_building(u, b);
       assert(building_owner(b)==u);
     }
