@@ -262,6 +262,23 @@ static void test_keywords(CuTest * tc)
     test_cleanup();
 }
 
+static void test_strings(CuTest * tc)
+{
+    const char * data = "{\"strings\": { \"de\" : { \"move\" : \"NACH\", \"study\" : \"LERNEN\" }}}";
+    const struct locale * lang;
+
+    cJSON *json = cJSON_Parse(data);
+    CuAssertPtrNotNull(tc, json);
+
+    test_cleanup();
+    lang = get_or_create_locale("de");
+    CuAssertPtrNotNull(tc, lang);
+    CuAssertPtrEquals(tc, NULL, (void *)locale_string(lang, "move"));
+    json_config(json);
+    CuAssertStrEquals(tc, "NACH", locale_string(lang, "move"));
+    CuAssertStrEquals(tc, "LERNEN", locale_string(lang, "study"));
+}
+
 CuSuite *get_jsonconf_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -273,6 +290,7 @@ CuSuite *get_jsonconf_suite(void)
     SUITE_ADD_TEST(suite, test_buildings);
     SUITE_ADD_TEST(suite, test_terrains);
     SUITE_ADD_TEST(suite, test_races);
+    SUITE_ADD_TEST(suite, test_strings);
     SUITE_ADD_TEST(suite, test_flags);
     return suite;
 }

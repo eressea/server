@@ -424,7 +424,7 @@ int build(unit * u, const construction * ctype, int completed, int want)
   if (want <= 0)
     return 0;
   if (type == NULL)
-    return 0;
+    return ENOMATERIALS;
   if (type->improvement == NULL && completed == type->maxsize)
     return ECOMPLETE;
   if (type->btype != NULL) {
@@ -616,7 +616,7 @@ message *msg_materials_required(unit * u, order * ord,
 
   if (multi <= 0 || multi == INT_MAX)
     multi = 1;
-  for (c = 0; ctype->materials[c].number; ++c) {
+  for (c = 0; ctype && ctype->materials[c].number; ++c) {
     resource *res = malloc(sizeof(resource));
     res->number = multi * ctype->materials[c].number / ctype->reqsize;
     res->type = ctype->materials[c].rtype;
@@ -646,11 +646,11 @@ int maxbuild(const unit * u, const construction * cons)
 
 /** old build routines */
 
-void
-build_building(unit * u, const building_type * btype, int want, order * ord)
+int
+build_building(unit * u, const building_type * btype, int id, int want, order * ord)
 {
   region *r = u->region;
-  int n = want, built = 0, id;
+  int n = want, built = 0;
   building *b = NULL;
   /* einmalige Korrektur */
   const char *btname;
@@ -659,9 +659,10 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
   static int rule_other = -1;
 
   assert(u->number);
+  assert(btype->construction);
   if (eff_skill(u, SK_BUILDING, r) == 0) {
     cmistake(u, ord, 101, MSG_PRODUCE);
-    return;
+    return 0;
   }
 
   /* Falls eine Nummer angegeben worden ist, und ein Gebaeude mit der
@@ -670,7 +671,6 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
    * baut man an der eigenen burg weiter. */
 
   /* Wenn die angegebene Nummer falsch ist, KEINE Burg bauen! */
-  id = getid();
   if (id > 0) {                 /* eine Nummer angegeben, keine neue Burg bauen */
     b = findbuilding(id);
     if (!b || b->region != u->region) { /* eine Burg mit dieser Nummer gibt es hier nicht */
@@ -680,7 +680,7 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
       } else {
         /* keine neue Burg anfangen wenn eine Nummer angegeben war */
         cmistake(u, ord, 6, MSG_PRODUCE);
-        return;
+        return 0;
       }
     }
   } else if (u->building && u->building->type == btype) {
@@ -693,27 +693,27 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
   if (fval(btype, BTF_UNIQUE) && buildingtype_exists(r, btype, false)) {
     /* only one of these per region */
     cmistake(u, ord, 93, MSG_PRODUCE);
-    return;
+    return 0;
   }
   if (besieged(u)) {
     /* units under siege can not build */
     cmistake(u, ord, 60, MSG_PRODUCE);
-    return;
+    return 0;
   }
   if (btype->flags & BTF_NOBUILD) {
     /* special building, cannot be built */
     cmistake(u, ord, 221, MSG_PRODUCE);
-    return;
+    return 0;
   }
-  if (r->terrain->max_road <= 0) {
+  if ((r->terrain->flags & LAND_REGION) == 0) {
     /* special terrain, cannot build */
     cmistake(u, ord, 221, MSG_PRODUCE);
-    return;
+    return 0;
   }
   if (btype->flags & BTF_ONEPERTURN) {
     if (b && fval(b, BLD_EXPANDED)) {
       cmistake(u, ord, 318, MSG_PRODUCE);
-      return;
+      return 0;
     }
     n = 1;
   }
@@ -726,7 +726,7 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
       unit *owner = building_owner(b);
       if (!owner || owner->faction != u->faction) {
         cmistake(u, ord, 1222, MSG_PRODUCE);
-        return;
+        return 0;
       }
     }
   }
@@ -754,18 +754,20 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
   case ECOMPLETE:
     /* the building is already complete */
     cmistake(u, ord, 4, MSG_PRODUCE);
-    return;
+    break;
   case ENOMATERIALS:
-    ADDMSG(&u->faction->msgs, msg_materials_required(u, ord,
+    ADDMSG(&u->faction->msgs, msg_materials_required(u, ord, 
         btype->construction, want));
-    return;
+    break;
   case ELOWSKILL:
   case ENEEDSKILL:
     /* no skill, or not enough skill points to build */
     cmistake(u, ord, 50, MSG_PRODUCE);
-    return;
+    break;
   }
-
+  if (built<=0) {
+    return built;
+  }
   /* at this point, the building size is increased. */
   if (b == NULL) {
     /* build a new building */
@@ -784,7 +786,6 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
       a->data.i = u->faction->alliance->id;
     }
 #endif
-
   }
 
   btname = LOC(lang, btype->_name);
@@ -817,13 +818,14 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
     free_order(new_order);
   }
 
-  b->size += built;
+  b->size += built; 
   fset(b, BLD_EXPANDED);
 
   update_lighthouse(b);
 
   ADDMSG(&u->faction->msgs, msg_message("buildbuilding",
       "building unit size", b, u, built));
+  return built;
 }
 
 static void build_ship(unit * u, ship * sh, int want)

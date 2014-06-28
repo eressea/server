@@ -1792,7 +1792,8 @@ int make_cmd(unit * u, struct order *ord)
     if (pl && fval(pl, PFL_NOBUILD)) {
       cmistake(u, ord, 94, MSG_PRODUCE);
     } else {
-      build_building(u, btype, m, ord);
+      int id = getid();
+      build_building(u, btype, id, m, ord);
     }
   } else if (itype != NULL) {
     create_item(u, itype, m);

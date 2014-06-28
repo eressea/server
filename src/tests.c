@@ -102,12 +102,20 @@ ship_type * test_create_shiptype(const char ** names)
 
 building_type * test_create_buildingtype(const char * name)
 {
-  building_type * btype = (building_type*)calloc(sizeof(building_type), 1);
-  btype->flags = BTF_NAMECHANGE;
-  btype->_name = _strdup(name);
-  locale_setstring(default_locale, name, name);
-  bt_register(btype);
-  return btype;
+    building_type *btype = (building_type *)calloc(sizeof(building_type), 1);
+    btype->flags = BTF_NAMECHANGE;
+    btype->_name = _strdup(name);
+    btype->construction = (construction *)calloc(sizeof(construction), 1);
+    btype->construction->skill = SK_BUILDING;
+    btype->construction->maxsize = -1;
+    btype->construction->minskill = 1;
+    btype->construction->reqsize = 1;
+    btype->construction->materials = (requirement *)calloc(sizeof(requirement), 1);
+    btype->construction->materials->number = 1;
+    btype->construction->materials->rtype = get_resourcetype(R_STONE);
+    locale_setstring(default_locale, name, name);
+    bt_register(btype);
+    return btype;
 }
 
 item_type * test_create_itemtype(const char ** names) {
@@ -143,6 +151,7 @@ void test_create_world(void)
 
   t_plain = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION);
   t_plain->size = 1000;
+  t_plain->max_road = 100;
   t_ocean = test_create_terrain("ocean", SEA_REGION | SAIL_INTO | SWIM_INTO);
   t_ocean->size = 0;
 

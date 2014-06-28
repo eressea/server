@@ -125,8 +125,8 @@ extern "C" {
   extern int buildingcapacity(const struct building *b);
   extern struct building *new_building(const struct building_type *typ,
     struct region *r, const struct locale *lang);
-  void build_building(struct unit *u, const struct building_type *typ, int size,
-    struct order *ord);
+  int build_building(struct unit *u, const struct building_type *typ, 
+                      int id, int size, struct order *ord);
 
 /* Alte Gebäudetypen: */
 
