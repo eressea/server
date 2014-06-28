@@ -16,6 +16,7 @@ CuSuite *get_item_suite(void);
 CuSuite *get_magic_suite(void);
 CuSuite *get_move_suite(void);
 CuSuite *get_pool_suite(void);
+CuSuite *get_build_suite(void);
 CuSuite *get_reports_suite(void);
 CuSuite *get_ship_suite(void);
 CuSuite *get_spellbook_suite(void);
@@ -52,6 +53,7 @@ int RunAllTests(void)
   CuSuiteAddSuite(suite, get_functions_suite());
   CuSuiteAddSuite(suite, get_umlaut_suite());
   /* kernel */
+  CuSuiteAddSuite(suite, get_build_suite());
   CuSuiteAddSuite(suite, get_pool_suite());
   CuSuiteAddSuite(suite, get_curse_suite());
   CuSuiteAddSuite(suite, get_equipment_suite());

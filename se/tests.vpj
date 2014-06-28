@@ -244,6 +244,7 @@
             <F N="../src/util/base36.test.c"/>
             <F N="../src/kernel/battle.test.c"/>
             <F N="../src/util/bsdstring.test.c"/>
+            <F N="../src/kernel/build.test.c"/>
             <F N="../src/kernel/building.test.c"/>
             <F N="../src/kernel/config.test.c"/>
             <F N="../src/kernel/curse.test.c"/>
@@ -283,12 +284,15 @@
         <Folder
             Name="Other Files"
             Filters="">
+            <F N="../tests/castles.lua"/>
             <F N="../tests/config.lua"/>
             <F N="../tests/init.lua"/>
             <F N="../tests/locale.lua"/>
+            <F N="../tests/movement.lua"/>
             <F N="../tests/regions.lua"/>
             <F N="../tests/settings.lua"/>
             <F N="../tests/ships.lua"/>
+            <F N="../tests/study.lua"/>
         </Folder>
     </Files>
 </Project>
