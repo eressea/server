@@ -7,4 +7,5 @@ require "tests.castles"
 require "tests.ships"
 require "tests.study"
 require "tests.movement"
+-- require "tests.castles"
 

@@ -36,7 +36,7 @@ function setup()
     assert(eressea.config.parse(conf)==0)
 end
 
-function disable_test_small_castles()
+function test_small_castles()
   local r = region.create(0, 0, "plain")
   local f1 = faction.create("test@eressea.de", "human", "de")
   local u1 = unit.create(f1, r, 1)
