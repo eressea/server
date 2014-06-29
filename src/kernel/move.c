@@ -849,11 +849,11 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
 
     if (gamecookie < 0 || gamecookie != global.cookie) {
         base_prob =
-            get_param_flt(global.parameters, "rules.guard.base_stop_prob", .3);
+            get_param_flt(global.parameters, "rules.guard.base_stop_prob", .3f);
         skill_prob =
-            get_param_flt(global.parameters, "rules.guard.skill_stop_prob", .1);
+            get_param_flt(global.parameters, "rules.guard.skill_stop_prob", .1f);
         amulet_prob =
-            get_param_flt(global.parameters, "rules.guard.amulet_stop_prob", .1);
+            get_param_flt(global.parameters, "rules.guard.amulet_stop_prob", .1f);
         gamecookie = global.cookie;
     }
 

@@ -622,7 +622,7 @@ const potion_type *oldpotiontype[MAXPOTIONS + 1];
 
 /*** alte items ***/
 
-const char *itemnames[MAX_RESOURCES] = {
+static const char *resourcenames[MAX_RESOURCES] = {
   "iron", "stone", "horse", "ao_healing",
   "aots", "roi", "rop", "ao_chastity",
   "laen", "fairyboot", "aoc", "pegasus",
@@ -635,14 +635,14 @@ const char *itemnames[MAX_RESOURCES] = {
 
 const resource_type *get_resourcetype(resource_t type) {
     static int update;
-    static const struct resource_type *rtypes[MAX_RESOURCES];
+    static struct resource_type * rtypes[MAX_RESOURCES];
     if (update!=num_resources) {
         memset(rtypes, 0, sizeof(rtypes));
         update = num_resources;
     }
     const resource_type *rtype = rtypes[type];
     if (!rtype) {
-        rtype = rtypes[type] = rt_find(itemnames[type]);
+        rtype = rtypes[type] = rt_find(resourcenames[type]);
     }
     return rtype;
 }

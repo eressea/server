@@ -27,7 +27,7 @@ static void check_flag(CuTest *tc, const char *name, int flag) {
     rc = rc_find("orc");
     CuAssertPtrNotNull(tc, rc);
     CuAssertIntEquals(tc, flag, rc->flags);
-    CuAssertIntEquals(tc, 1, rc->speed);
+    CuAssertDblEquals(tc, 1.0f, rc->speed, 0.0f);
 }
 
 static void test_flags(CuTest *tc) {
