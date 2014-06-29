@@ -1145,24 +1145,26 @@ attrib_type at_showitem = {
 
 static int add_itemname_cb(const void * match, const void * key, size_t keylen, void *data)
 {
-  struct locale * lang = (struct locale *)data;
-  int i = locale_index(lang);
-  critbit_tree * cb = inames+i;
-  item_type *itype;
+    struct locale * lang = (struct locale *)data;
+    critbit_tree * cb = inames + locale_index(lang);
+    resource_type *rtype;
 
-  cb_get_kv(match, &itype, sizeof(itype));
-  for (i = 0; i!=2;++i) {
-    char buffer[128];
-    const char * name = locale_string(lang, itype->rtype->_name[i]);
-    
-    if (name && transliterate(buffer, sizeof(buffer), name)) {
-      size_t len = strlen(buffer);
-      assert(len+sizeof(itype)<sizeof(buffer));
-      len = cb_new_kv(buffer, len, &itype, sizeof(itype), buffer);
-      cb_insert(cb, buffer, len);
+    cb_get_kv(match, &rtype, sizeof(rtype));
+    if (rtype->itype) {
+        int i;
+        for (i = 0; i != 2; ++i) {
+            char buffer[128];
+            const char * name = locale_string(lang, rtype->_name[i]);
+
+            if (name && transliterate(buffer, sizeof(buffer), name)) {
+                size_t len = strlen(buffer);
+                assert(len + sizeof(rtype->itype) < sizeof(buffer));
+                len = cb_new_kv(buffer, len, &rtype->itype, sizeof(rtype->itype), buffer);
+                cb_insert(cb, buffer, len);
+            }
+        }
     }
-  }
-  return 0;
+    return 0;
 }
 
 const item_type *finditemtype(const char *name, const struct locale *lang)
@@ -1175,7 +1177,7 @@ const item_type *finditemtype(const char *name, const struct locale *lang)
     const void * match;
     if (!cb->root) {
       /* first-time initialization  of item names for this locale */
-      cb_foreach(&cb_items, "", 0, add_itemname_cb, (void *)lang);
+      cb_foreach(&cb_resources, "", 0, add_itemname_cb, (void *)lang);
     }
     if (cb_find_prefix(cb, buffer, strlen(buffer), &match, 1, 0)) {
       const item_type * itype = 0;
