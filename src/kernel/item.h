@@ -225,7 +225,7 @@ extern "C" {
       int *deaths);
   } weapon_type;
 
-  extern void rt_register(resource_type * it);
+  void rt_register(resource_type * it);
   resource_type *rt_find(const char *name);
   item_type *it_find(const char *name);
 

@@ -193,7 +193,6 @@ void it_register(item_type * itype)
 
   assert(len<sizeof(buffer)-sizeof(itype));
   len = cb_new_kv(name, len, &itype, sizeof(itype), buffer);
-  rt_register(itype->rtype);
 }
 
 static const char *it_aliases[][2] = {

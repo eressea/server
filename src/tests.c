@@ -124,7 +124,8 @@ item_type * test_create_itemtype(const char ** names) {
   item_type * itype;
 
   rtype = new_resourcetype(names, NULL, RTF_ITEM);
-  itype = new_itemtype(rtype, ITF_ANIMAL|ITF_BIG, 5000, 7000);
+  rt_register(rtype);
+  itype = new_itemtype(rtype, ITF_ANIMAL | ITF_BIG, 5000, 7000);
 
   return itype;
 }
@@ -148,7 +149,7 @@ void test_create_world(void)
 
   test_create_itemtype(names+0);
   test_create_itemtype(names+4);
-  test_create_itemtype(names+6);
+  test_create_itemtype(names + 6);
 
   t_plain = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION);
   t_plain->size = 1000;
