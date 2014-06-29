@@ -60,7 +60,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 static critbit_tree inames[MAXLOCALES];
 static critbit_tree rnames[MAXLOCALES];
 static critbit_tree cb_resources;
-static critbit_tree cb_items;
 luxury_type *luxurytypes;
 potion_type *potiontypes;
 
@@ -194,9 +193,7 @@ void it_register(item_type * itype)
 
   assert(len<sizeof(buffer)-sizeof(itype));
   len = cb_new_kv(name, len, &itype, sizeof(itype), buffer);
-  if (cb_insert(&cb_items, buffer, len)) {
-    rt_register(itype->rtype);
-  }
+  rt_register(itype->rtype);
 }
 
 static const char *it_aliases[][2] = {
@@ -1249,8 +1246,6 @@ void test_clear_resources(void)
 
     memset((void *)oldpotiontype, 0, sizeof(oldpotiontype));
     
-    cb_foreach(&cb_items, "", 0, free_itype_cb, 0);
-    cb_clear(&cb_items);
     cb_foreach(&cb_resources, "", 0, free_rtype_cb, 0);
     cb_clear(&cb_resources);
     ++num_resources;
