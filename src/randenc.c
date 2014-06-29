@@ -393,7 +393,7 @@ void encounters(void)
   region *r;
 
   for (r = regions; r; r = r->next) {
-    if (!fval(r->terrain, SEA_REGION) && fval(r, RF_ENCOUNTER)) {
+    if (fval(r->terrain, LAND_REGION) && fval(r, RF_ENCOUNTER)) {
       int c = 0;
       unit *u;
       for (u = r->units; u; u = u->next) {
