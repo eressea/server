@@ -1,4 +1,5 @@
 #include <platform.h>
+#include <kernel/config.h>
 #include "types.h"
 #include "build.h"
 #include "order.h"
@@ -37,6 +38,35 @@ static void test_build_building_no_materials(CuTest *tc) {
     CuAssertPtrEquals(tc, 0, u->building);
 }
 
+static void test_build_building_with_golem(CuTest *tc) {
+    unit *u;
+    region *r;
+    faction *f;
+    race *rc;
+    const building_type *btype;
+
+    test_cleanup();
+    test_create_world();
+
+    rc = test_create_race("stonegolem");
+    new_race[RC_STONEGOLEM] = rc;
+    rc->flags |= RCF_STONEGOLEM;
+    btype = bt_find("castle");
+    assert(btype && rc);
+    assert(btype->construction);
+    r = findregion(0, 0);
+    assert(!r->buildings);
+    f = test_create_faction(rc);
+    assert(r && f);
+    u  = test_create_unit(f, r);
+    assert(u);
+    set_level(u, SK_BUILDING, 1);
+    CuAssertIntEquals(tc, 1, build_building(u, btype, 0, 4, 0));
+    CuAssertPtrNotNull(tc, r->buildings);
+    CuAssertIntEquals(tc, 1, r->buildings->size);
+    CuAssertIntEquals(tc, 0, u->number);
+}
+
 static void test_build_building_success(CuTest *tc) {
     unit *u;
     region *r;
@@ -52,7 +82,7 @@ static void test_build_building_success(CuTest *tc) {
     rtype = get_resourcetype(R_STONE);
     btype = bt_find("castle");
     assert(btype && rc && rtype && rtype->itype);
-// TODO:    assert(btype->construction);
+    assert(btype->construction);
     r = findregion(0, 0);
     assert(!r->buildings);
     f = test_create_faction(rc);
@@ -72,6 +102,7 @@ CuSuite *get_build_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_build_building_success);
+    SUITE_ADD_TEST(suite, test_build_building_with_golem);
     SUITE_ADD_TEST(suite, test_build_building_no_materials);
     return suite;
 }

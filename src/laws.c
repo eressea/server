@@ -4568,7 +4568,7 @@ void init_processor(void)
   p += 10;
   add_proc_order(p, K_GUARD, &guard_on_cmd, 0, "Bewache (an)");
 
-  if (get_param_int(global.parameters, "rules.encounters", 1)) {
+  if (get_param_int(global.parameters, "rules.encounters", 0)) {
     p += 10;
     add_proc_global(p, &encounters, "Zufallsbegegnungen");
   }

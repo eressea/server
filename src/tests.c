@@ -110,9 +110,10 @@ building_type * test_create_buildingtype(const char * name)
     btype->construction->maxsize = -1;
     btype->construction->minskill = 1;
     btype->construction->reqsize = 1;
-    btype->construction->materials = (requirement *)calloc(sizeof(requirement), 1);
-    btype->construction->materials->number = 1;
-    btype->construction->materials->rtype = get_resourcetype(R_STONE);
+    btype->construction->materials = (requirement *)calloc(sizeof(requirement), 2);
+    btype->construction->materials[1].number = 0;
+    btype->construction->materials[0].number = 1;
+    btype->construction->materials[0].rtype = get_resourcetype(R_STONE);
     locale_setstring(default_locale, name, name);
     bt_register(btype);
     return btype;

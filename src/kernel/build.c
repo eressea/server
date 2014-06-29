@@ -776,7 +776,7 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
     fset(b, BLD_MAINTAINED);
 
     /* Die Einheit befindet sich automatisch im Inneren der neuen Burg. */
-    if (leave(u, false)) {
+    if (u->number && leave(u, false)) {
       u_set_building(u, b);
       assert(building_owner(b)==u);
     }
