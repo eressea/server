@@ -225,12 +225,12 @@ extern "C" {
       int *deaths);
   } weapon_type;
 
-  void rt_register(resource_type * it);
   resource_type *rt_find(const char *name);
   item_type *it_find(const char *name);
 
-  extern void it_register(item_type * it);
-  extern void wt_register(weapon_type * wt);
+  void it_set_appearance(item_type *itype, const char *appearance);
+  void it_register(item_type * it);
+  void wt_register(weapon_type * wt);
 
   extern const item_type *resource2item(const resource_type * rtype);
   extern const resource_type *item2resource(const item_type * i);
@@ -254,7 +254,7 @@ extern "C" {
 
 /* creation */
     resource_type *rt_get_or_create(const char *name);
-    resource_type *new_resourcetype(const char **names, const char **appearances, int flags);
+//    resource_type *new_resourcetype(const char **names, const char **appearances, int flags);
     item_type *it_get_or_create(resource_type *rtype);
   extern item_type *new_itemtype(resource_type * rtype, int iflags, int weight,
     int capacity);

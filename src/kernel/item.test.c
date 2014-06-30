@@ -51,20 +51,14 @@ void test_change_person(CuTest * tc)
 void test_resource_type(CuTest * tc)
 {
   struct item_type *itype;
-  const char *names[2] = { 0 , 0 };
 
   test_cleanup();
 
   CuAssertPtrEquals(tc, 0, rt_find("herpderp"));
 
-  names[0] = names[1] = "herpderp";
-  test_create_itemtype(names);
-
-  names[0] = names[1] = "herp";
-  itype = test_create_itemtype(names);
-
-  names[0] = names[1] = "herpes";
-  test_create_itemtype(names);
+  test_create_itemtype("herpderp");
+  test_create_itemtype("herpes");
+  itype = test_create_itemtype("herp");
 
   CuAssertPtrEquals(tc, itype->rtype, rt_find("herp"));
 }

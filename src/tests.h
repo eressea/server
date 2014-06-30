@@ -15,8 +15,8 @@ extern "C" {
   void test_create_world(void);
   struct building * test_create_building(struct region * r, const struct building_type * btype);
   struct ship * test_create_ship(struct region * r, const struct ship_type * stype);
-  struct item_type * test_create_itemtype(const char ** names);
-  struct ship_type *test_create_shiptype(const char **names);
+  struct item_type * test_create_itemtype(const char * name);
+  struct ship_type *test_create_shiptype(const char * name);
   struct building_type *test_create_buildingtype(const char *name);
 
   int RunAllTests(void);

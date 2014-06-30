@@ -10,21 +10,27 @@
 #include <tests.h>
 
 static void test_resources(CuTest *tc) {
-    const char *names[] = { "horse", "horse_p" };
     resource_type *rtype;
     test_cleanup();
-    CuAssertPtrEquals(tc, 0, rt_find("horse"));
-    rtype = new_resourcetype(names, 0, 0);
-    CuAssertPtrEquals(tc, 0, (void *)get_resourcetype(R_HORSE));
-    rt_register(rtype);
-    CuAssertPtrEquals(tc, (void *)rtype, (void *)rt_find("horse"));
-    CuAssertPtrEquals(tc, (void *)rtype, (void *)get_resourcetype(R_HORSE));
+    CuAssertPtrNotNull(tc, rt_find("hp"));
+    CuAssertPtrEquals(tc, rt_find("hp"), (void *)get_resourcetype(R_LIFE));
+    CuAssertPtrNotNull(tc, rt_find("peasant"));
+    CuAssertPtrEquals(tc, rt_find("peasant"), (void *)get_resourcetype(R_PEASANT));
+    CuAssertPtrNotNull(tc, rt_find("aura"));
+    CuAssertPtrEquals(tc, rt_find("aura"), (void *)get_resourcetype(R_AURA));
+    CuAssertPtrNotNull(tc, rt_find("permaura"));
+    CuAssertPtrEquals(tc, rt_find("permaura"), (void *)get_resourcetype(R_PERMAURA));
+    CuAssertPtrNotNull(tc, rt_find("unit"));
+    CuAssertPtrEquals(tc, rt_find("unit"), (void *)get_resourcetype(R_UNIT));
+
+    CuAssertPtrEquals(tc, 0, rt_find("stone"));
+    rtype = rt_get_or_create("stone");
+    CuAssertPtrEquals(tc, (void *)rtype, (void *)rt_find("stone"));
+    CuAssertPtrEquals(tc, (void *)rtype, (void *)get_resourcetype(R_STONE));
     test_cleanup();
-    CuAssertPtrEquals(tc, 0, rt_find("horse"));
-    rtype = new_resourcetype(names, 0, 0);
-    CuAssertPtrEquals(tc, 0, (void *)get_resourcetype(R_HORSE));
-    rt_register(rtype);
-    CuAssertPtrEquals(tc, (void *)rtype, (void *)get_resourcetype(R_HORSE));
+    CuAssertPtrEquals(tc, 0, rt_find("stone"));
+    rtype = rt_get_or_create("stone");
+    CuAssertPtrEquals(tc, (void *)rtype, (void *)get_resourcetype(R_STONE));
 }
 
 static void test_recreate_world(CuTest * tc)

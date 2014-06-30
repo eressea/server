@@ -93,10 +93,10 @@ ship * test_create_ship(region * r, const ship_type * stype)
   return s;
 }
 
-ship_type * test_create_shiptype(const char ** names)
+ship_type * test_create_shiptype(const char * name)
 {
-  ship_type * stype = st_get_or_create(names[0]);
-  locale_setstring(default_locale, names[0], names[0]);
+  ship_type * stype = st_get_or_create(name);
+  locale_setstring(default_locale, name, name);
   return stype;
 }
 
@@ -119,13 +119,12 @@ building_type * test_create_buildingtype(const char * name)
     return btype;
 }
 
-item_type * test_create_itemtype(const char ** names) {
+item_type * test_create_itemtype(const char * name) {
   resource_type * rtype;
   item_type * itype;
 
-  rtype = new_resourcetype(names, NULL, RTF_ITEM);
-  rt_register(rtype);
-  itype = new_itemtype(rtype, ITF_ANIMAL | ITF_BIG, 5000, 7000);
+  rtype = rt_get_or_create(name);
+  itype = it_get_or_create(rtype);
 
   return itype;
 }
@@ -142,14 +141,18 @@ void test_create_world(void)
   terrain_type *t_plain, *t_ocean;
   region *island[2];
   int i;
-  const char * names[] = { "horse", "horse_p", "boat", "boat_p", "iron", "iron_p", "stone", "stone_p" };
+  item_type * itype;
 
   get_or_create_locale("de");
   init_resources();
 
-  test_create_itemtype(names+0);
-  test_create_itemtype(names+4);
-  test_create_itemtype(names + 6);
+  itype = test_create_itemtype("horse");
+  itype->flags |= ITF_BIG | ITF_ANIMAL;
+  itype->weight = 5000;
+  itype->capacity = 7000;
+
+  test_create_itemtype("iron");
+  test_create_itemtype("stone");
 
   t_plain = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION);
   t_plain->size = 1000;
@@ -173,6 +176,6 @@ void test_create_world(void)
   test_create_race("human");
 
   test_create_buildingtype("castle");
-  test_create_shiptype(names+2);
+  test_create_shiptype("boat");
 }
 

@@ -26,7 +26,6 @@ static void test_market_curse(CuTest * tc)
   unit *u;
   faction *f;
   int x, y;
-  const char *names[4] = { "herb", "herbs", "balm", "balms" };
   const terrain_type *terrain;
   item_type *htype, *ltype;
   luxury_type *lux;
@@ -36,11 +35,11 @@ static void test_market_curse(CuTest * tc)
   test_cleanup();
   test_create_world();
 
-  htype = test_create_itemtype(names);
+  htype = test_create_itemtype("herb");
   htype->flags |= ITF_HERB;
   htype->rtype->flags |= (RTF_ITEM | RTF_POOLED);
 
-  ltype = test_create_itemtype(names + 2);
+  ltype = test_create_itemtype("balm");
   ltype->rtype->flags |= (RTF_ITEM | RTF_POOLED);
   lux = new_luxurytype(ltype, 0);
 

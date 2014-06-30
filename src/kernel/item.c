@@ -147,6 +147,20 @@ const char *resourcename(const resource_type * rtype, int flags)
   return "none";
 }
 
+static int num_resources;
+
+static void rt_register(resource_type * rtype)
+{
+    char buffer[64];
+    const char * name = rtype->_name[0];
+    size_t len = strlen(name);
+
+    assert(len<sizeof(buffer) - sizeof(rtype));
+    len = cb_new_kv(name, len, &rtype, sizeof(rtype), buffer);
+    cb_insert(&cb_resources, buffer, len);
+    ++num_resources;
+}
+
 resource_type *rt_get_or_create(const char *name) {
     resource_type *rtype = rt_find(name);
     if (!rtype) {
@@ -157,32 +171,6 @@ resource_type *rt_get_or_create(const char *name) {
         rt_register(rtype);
     }
     return rtype;
-}
-
-resource_type *new_resourcetype(const char **names, const char **appearances,
-  int flags)
-{
-  resource_type *rtype = rt_find(names[0]);
-
-  if (rtype == NULL) {
-    int i;
-    rtype = (resource_type *)calloc(sizeof(resource_type), 1);
-
-    for (i = 0; i != 2; ++i) {
-      rtype->_name[i] = _strdup(names[i]);
-      if (appearances)
-        rtype->_appearance[i] = _strdup(appearances[i]);
-      else
-        rtype->_appearance[i] = NULL;
-    }
-  }
-#ifndef NDEBUG
-  else {
-    /* TODO: check that this is the same type */
-  }
-#endif
-  rtype->flags |= flags;
-  return rtype;
 }
 
 void it_register(item_type * itype)
@@ -230,9 +218,13 @@ item_type *it_get_or_create(resource_type *rtype) {
     item_type * itype;
     assert(rtype);
     itype = it_find(rtype->_name[0]);
-    assert(!itype);
-    itype = (item_type *)calloc(sizeof(item_type), 1);
+    assert(!itype || !itype->rtype || itype->rtype == rtype);
+    if (!itype) {
+        itype = (item_type *)calloc(sizeof(item_type), 1);
+    }
     itype->rtype = rtype;
+    rtype->uchange = res_changeitem;
+    rtype->itype = itype;
     rtype->flags |= RTF_ITEM;
     it_register(itype);
     return itype;
@@ -348,18 +340,11 @@ potion_type *new_potiontype(item_type * itype, int level)
   return ptype;
 }
 
-static int num_resources;
-
-void rt_register(resource_type * rtype)
-{
-    char buffer[64];
-    const char * name = rtype->_name[0];
-    size_t len = strlen(name);
-    
-    assert(len<sizeof(buffer)-sizeof(rtype));
-    len = cb_new_kv(name, len, &rtype, sizeof(rtype), buffer);
-    cb_insert(&cb_resources, buffer, len);
-    ++num_resources;
+void it_set_appearance(item_type *itype, const char *appearance) {
+    assert(itype && itype->rtype);
+    itype->rtype->_appearance[0] = _strdup(appearance);
+    itype->rtype->_appearance[1] = appearance ?
+        strcat(strcpy((char *)malloc(strlen((char *)appearance) + 3), (char *)appearance), "_p") : 0;
 }
 
 const resource_type *item2resource(const item_type * itype)
@@ -964,70 +949,37 @@ static void init_oldpotions(void)
 }
 
 static const char *names[] = {
-  "money", "money_p",
-  "person", "person_p",
-  "permaura", "permaura_p",
-  "hp", "hp_p",
-  "peasant", "peasant_p",
-  "aura", "aura_p",
-  "unit", "unit_p"
+  "money", "person", "permaura", "hp", "peasant", "aura", "unit",
 };
 
 void init_resources(void)
 {
     resource_type *rtype;
-    item_type *itype;
 
-    rtype = rt_find(names[8]);
-    if (!rtype) {
-        rtype = new_resourcetype(names + 8, NULL, RTF_NONE);
-        rt_register(rtype);
-    }
+    rtype = rt_get_or_create(resourcenames[R_PEASANT]);
     rtype->uchange = res_changepeasants;
     
     // R_SILVER
-    rtype = rt_find(names[0]);
-    if (!rtype) {
-        rtype = new_resourcetype(&names[0], NULL, RTF_ITEM | RTF_POOLED);
-        rt_register(rtype);
-    }
+    rtype = rt_get_or_create(resourcenames[R_SILVER]);
+    rtype->flags |= RTF_ITEM | RTF_POOLED;
     rtype->uchange = res_changeitem;
-    itype = rtype->itype;
-    if (!itype) {
-        itype = new_itemtype(rtype, ITF_NONE, 1 /*weight */ , 0);
-    }
-    itype->give = give_money;
+    rtype->itype = it_get_or_create(rtype);
+    rtype->itype->give = give_money;
 
     // R_PERMAURA
-    rtype = rt_find(names[4]);
-    if (!rtype) {
-        rtype = new_resourcetype(&names[4], NULL, RTF_NONE);
-        rt_register(rtype);
-    }
+    rtype = rt_get_or_create(resourcenames[R_PERMAURA]);
     rtype->uchange = res_changepermaura;
     
     // R_LIFE
-    rtype = rt_find(names[6]);
-    if (!rtype) {
-        rtype = new_resourcetype(&names[6], NULL, RTF_NONE);
-        rt_register(rtype);
-    }
+    rtype = rt_get_or_create(resourcenames[R_LIFE]);
     rtype->uchange = res_changehp;
     
     // R_AURA
-    rtype = rt_find(names[10]);
-    if (!rtype) {
-        rtype = new_resourcetype(&names[10], NULL, RTF_NONE);
-        rt_register(rtype);
-    }
+    rtype = rt_get_or_create(resourcenames[R_AURA]);
     rtype->uchange = res_changeaura;
 
     // R_UNIT
-    rtype = rt_find(names[12]);
-    if (!rtype) {
-        rtype = new_resourcetype(&names[12], NULL, RTF_NONE);
-        rt_register(rtype);
-    }
+    rtype = rt_get_or_create(resourcenames[R_UNIT]);
     rtype->uchange = res_changeperson;
     
     /* alte typen registrieren: */
@@ -1250,7 +1202,8 @@ void test_clear_resources(void)
     ++num_resources;
     
     for (i=0; i!=MAXLOCALES; ++i) {
-        cb_clear(inames+i);
+        cb_clear(inames + i);
+        cb_clear(rnames + i);
     }
 }
 #endif

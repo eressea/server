@@ -17,14 +17,13 @@ void test_equipment(CuTest * tc)
   equipment * eq;
   unit * u;
   const item_type * it_horses;
-  const char * names[] = {"horse", "horse_p"};
   spell *sp;
   sc_mage * mage;
   
   test_cleanup();
   test_create_race("human");
   enable_skill(SK_MAGIC, true);
-  it_horses = test_create_itemtype(names);
+  it_horses = test_create_itemtype("horse");
   CuAssertPtrNotNull(tc, it_horses);
   sp = create_spell("testspell", 0);
   CuAssertPtrNotNull(tc, sp);

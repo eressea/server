@@ -105,22 +105,6 @@ static xmlChar *xml_cleanup_string(xmlChar * str)
   return str;
 }
 
-static const resource_type *rt_findorcreate(const char *name)
-{
-  resource_type *rtype = rt_find(name);
-  if (rtype == NULL) {
-    const char *names[2];
-    char *namep = strcat(strcpy((char *)malloc(strlen(name) + 3), name), "_p");
-    /* we'll make a placeholder */
-    names[0] = name;
-    names[1] = namep;
-    rtype = new_resourcetype(names, NULL, RTF_NONE);
-    rt_register(rtype);
-    free(namep);
-  }
-  return rtype;
-}
-
 static void
 xml_readrequirements(xmlNodePtr * nodeTab, int nodeNr, requirement ** reqArray)
 {
@@ -141,7 +125,7 @@ xml_readrequirements(xmlNodePtr * nodeTab, int nodeNr, requirement ** reqArray)
     radd->recycle = xml_fvalue(node, "recycle", 0.5);
 
     propValue = xmlGetProp(node, BAD_CAST "type");
-    radd->rtype = rt_findorcreate((const char *)propValue);
+    radd->rtype = rt_get_or_create((const char *)propValue);
     xmlFree(propValue);
 
     ++radd;
@@ -978,10 +962,9 @@ static int parse_resources(xmlDocPtr doc)
   for (i = 0; i != nodes->nodeNr; ++i) {
     xmlNodePtr node = nodes->nodeTab[i];
     xmlChar *propValue, *name, *appearance;
-    const char *names[2], *appearances[2];
-    char *namep = NULL, *appearancep = NULL;
     resource_type *rtype;
-    unsigned int flags = RTF_NONE;
+    item_type *itype;
+    unsigned int flags = RTF_ITEM;
     xmlXPathObjectPtr result;
     int k;
 
@@ -994,44 +977,15 @@ static int parse_resources(xmlDocPtr doc)
     appearance = xmlGetProp(node, BAD_CAST "appearance");
     assert(name != NULL);
 
-    if (appearance != NULL) {
-      appearancep =
-        strcat(strcpy((char *)malloc(strlen((char *)appearance) + 3),
-          (char *)appearance), "_p");
+    rtype = rt_get_or_create((const char *)name);
+    rtype->flags |= flags;
+    itype = rtype->itype ? rtype->itype : it_get_or_create(rtype);
+    if (appearance) {
+        it_set_appearance(itype, (const char *)appearance);
     }
 
-    rtype = rt_find((const char *)name);
-    if (rtype != NULL) {
-      /* dependency from another item, was created earlier */
-      rtype->flags |= flags;
-      if (appearance) {
-        rtype->_appearance[0] = _strdup((const char *)appearance);
-        rtype->_appearance[1] = appearancep;
-        free(appearancep);
-      }
-    } else {
-      namep =
-        strcat(strcpy((char *)malloc(strlen((char *)name) + 3), (char *)name),
-        "_p");
-      names[0] = (const char *)name;
-      names[1] = namep;
-      if (appearance) {
-        appearances[0] = (const char *)appearance;
-        appearances[1] = appearancep;
-        rtype = new_resourcetype((const char **)names, (const char **)appearances, flags);
-        rt_register(rtype);
-        free(appearancep);
-      } else {
-        rtype = new_resourcetype(names, NULL, flags);
-        rt_register(rtype);
-      }
-      free(namep);
-    }
-
-    if (name)
-      xmlFree(name);
-    if (appearance)
-      xmlFree(appearance);
+    if (name) xmlFree(name);
+    if (appearance) xmlFree(appearance);
 
     name = xmlGetProp(node, BAD_CAST "material");
     if (name) {
