@@ -803,9 +803,6 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
   xmlXPathObjectPtr result;
   int k;
 
-  int weight = xml_ivalue(node, "weight", 0);
-  int capacity = xml_ivalue(node, "capacity", 0);
-
   if (xml_bvalue(node, "cursed", false))
     flags |= ITF_CURSED;
   if (xml_bvalue(node, "notlost", false))
@@ -818,7 +815,10 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
     flags |= ITF_ANIMAL;
   if (xml_bvalue(node, "vehicle", false))
     flags |= ITF_VEHICLE;
-  itype = new_itemtype(rtype, flags, weight, capacity);
+  itype = rtype->itype ? rtype->itype : it_get_or_create(rtype);
+  itype->weight = xml_ivalue(node, "weight", 0);
+  itype->capacity = xml_ivalue(node, "capacity", 0);
+  itype->flags |= flags;
 #if SCORE_MODULE
   itype->score = xml_ivalue(node, "score", 0);
 #endif
@@ -963,8 +963,7 @@ static int parse_resources(xmlDocPtr doc)
     xmlNodePtr node = nodes->nodeTab[i];
     xmlChar *propValue, *name, *appearance;
     resource_type *rtype;
-    item_type *itype;
-    unsigned int flags = RTF_ITEM;
+    unsigned int flags = RTF_NONE;
     xmlXPathObjectPtr result;
     int k;
 
@@ -974,18 +973,12 @@ static int parse_resources(xmlDocPtr doc)
       flags |= RTF_LIMITED;
 
     name = xmlGetProp(node, BAD_CAST "name");
-    appearance = xmlGetProp(node, BAD_CAST "appearance");
     assert(name != NULL);
 
     rtype = rt_get_or_create((const char *)name);
     rtype->flags |= flags;
-    itype = rtype->itype ? rtype->itype : it_get_or_create(rtype);
-    if (appearance) {
-        it_set_appearance(itype, (const char *)appearance);
-    }
 
     if (name) xmlFree(name);
-    if (appearance) xmlFree(appearance);
 
     name = xmlGetProp(node, BAD_CAST "material");
     if (name) {
@@ -1151,6 +1144,11 @@ static int parse_resources(xmlDocPtr doc)
       rtype->flags |= RTF_ITEM;
       xpath->node = result->nodesetval->nodeTab[0];
       rtype->itype = xml_readitem(xpath, rtype);
+      appearance = xmlGetProp(node, BAD_CAST "appearance");
+      if (appearance) {
+          it_set_appearance(rtype->itype, (const char *)appearance);
+          xmlFree(appearance);
+      }
     }
     xmlXPathFreeObject(result);
   }
