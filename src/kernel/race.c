@@ -81,17 +81,21 @@ static race * race_cache[MAXRACES];
 
 struct race *get_race(race_t rt) {
     static int cache = -1;
+    const char * name;
+    
+    assert(rt < MAXRACES);
+    name = racenames[rt];
+    if (!name) {
+        return 0;
+    }
     if (cache_breaker != cache) {
         cache = cache_breaker;
         memset(race_cache, 0, sizeof(race_cache));
-        assert(rt < MAXRACES);
-        if (racenames[rt]) {
-            return race_cache[rt] = rc_get_or_create(racenames[rt]);
-        }
+        return race_cache[rt] = rc_get_or_create(name);
     } else {
         race * result = race_cache[rt];
         if (!result) {
-            result = race_cache[rt] = rc_get_or_create(racenames[rt]);
+            result = race_cache[rt] = rc_get_or_create(name);
         }
         return result;
     }
@@ -171,7 +175,10 @@ const race * rc_find(const char *name) {
 
 race *rc_get_or_create(const char *zName)
 {
-    race *rc = rc_find_i(zName);
+    race *rc;
+
+    assert(zName);
+    rc = rc_find_i(zName);
     if (!rc) {
         char zBuffer[80]; 
 
