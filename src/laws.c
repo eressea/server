@@ -288,7 +288,7 @@ void get_food(region * r)
    * bei fehlenden Bauern den Dämon hungern lassen
    */
   for (u = r->units; u; u = u->next) {
-    if (u_race(u) == new_race[RC_DAEMON]) {
+      if (u_race(u) == get_race(RC_DAEMON)) {
       int hungry = u->number;
 
       /* use peasantblood before eating the peasants themselves */
@@ -310,7 +310,7 @@ void get_food(region * r)
           if (donor == u)
             donor = r->units;
           while (donor != NULL) {
-            if (u_race(donor) == new_race[RC_DAEMON] && donor!=u) {
+              if (u_race(donor) == get_race(RC_DAEMON) && donor != u) {
               if (get_effect(donor, pt_blood)) {
                 /* if he's in our faction, drain him: */
                 if (donor->faction == u->faction)
@@ -358,7 +358,7 @@ void get_food(region * r)
 
 static void age_unit(region * r, unit * u)
 {
-  if (u_race(u) == new_race[RC_SPELL]) {
+    if (u_race(u) == get_race(RC_SPELL)) {
     if (--u->age <= 0) {
       remove_unit(&r->units, u);
     }
@@ -749,7 +749,7 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
 
   if (current_season == SEASON_SUMMER || current_season == SEASON_AUTUMN) {
     double seedchance = 0.01F * RESOURCE_QUANTITY;
-    int elves = count_race(r, new_race[RC_ELF]);
+    int elves = count_race(r, get_race(RC_ELF));
 
     a = a_find(r->attribs, &at_germs);
     if (a && last_weeks_season == SEASON_SPRING) {
@@ -2931,7 +2931,7 @@ int guard_on_cmd(unit * u, struct order *ord)
     if (fval(u, UFL_MOVED)) {
       cmistake(u, ord, 187, MSG_EVENT);
     } else if (fval(u_race(u), RCF_ILLUSIONARY)
-      || u_race(u) == new_race[RC_SPELL]) {
+        || u_race(u) == get_race(RC_SPELL)) {
       cmistake(u, ord, 95, MSG_EVENT);
     } else {
       /* Monster der Monsterpartei dürfen immer bewachen */
@@ -3395,7 +3395,7 @@ static void ageing(void)
       if (is_cursed(u->attribs, C_OLDRACE, 0)) {
         curse *c = get_curse(u->attribs, ct_find("oldrace"));
         if (c->duration == 1 && !(c_flags(c) & CURSE_NOAGE)) {
-          u_setrace(u, new_race[curse_geteffect_int(c)]);
+            u_setrace(u, get_race(curse_geteffect_int(c)));
           u->irace = NULL;
         }
       }
@@ -4262,7 +4262,8 @@ void process(void)
                 if (porder->flags & PROC_LONGORDER) {
                   if (u->number == 0) {
                     ord = NULL;
-                  } else if (u_race(u) == new_race[RC_INSECT]
+                  }
+                  else if (u_race(u) == get_race(RC_INSECT)
                     && r_insectstalled(r)
                     && !is_cursed(u->attribs, C_KAELTESCHUTZ, 0)) {
                     ord = NULL;
@@ -4275,7 +4276,7 @@ void process(void)
                      */
                     ord = NULL;
                   } else if (fval(r->terrain, SEA_REGION)
-                    && u_race(u) != new_race[RC_AQUARIAN]
+                      && u_race(u) != get_race(RC_AQUARIAN)
                     && !(u_race(u)->flags & RCF_SWIM)) {
                     /* error message disabled by popular demand */
                     ord = NULL;

@@ -620,7 +620,7 @@ weapon_skill(const weapon_type * wtype, const unit * u, bool attacking)
     skill = effskill(u, SK_WEAPONLESS);
     if (skill <= 0) {
       /* wenn kein waffenloser kampf, dann den rassen-defaultwert */
-      if (u_race(u) == new_race[RC_ORC]) {
+        if (u_race(u) == get_race(RC_ORC)) {
         int sword = effskill(u, SK_MELEE);
         int spear = effskill(u, SK_SPEAR);
         skill = _max(sword, spear) - 3;
@@ -709,7 +709,7 @@ static int CavalryBonus(const unit * u, troop enemy, int type)
     if (skl > 0) {
       if (type == BONUS_DAMAGE) {
         int dmg = _min(skl, 8);
-        if (u_race(enemy.fighter->unit) == new_race[RC_TROLL]) {
+        if (u_race(enemy.fighter->unit) == get_race(RC_TROLL)) {
           dmg = dmg / 4;
         } else {
           dmg = dmg / 2;
@@ -1264,7 +1264,7 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
 
   assert(dt.index < du->number);
   df->person[dt.index].hp -= rda;
-  if (u_race(au) == new_race[RC_DAEMON]) {
+  if (u_race(au) == get_race(RC_DAEMON)) {
     vampirism(at, rda);
   }
 
@@ -1273,7 +1273,7 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
       fprintf(bdebug, "Damage %d, armor %d: %d -> %d HP\n",
         da, ar, df->person[dt.index].hp + rda, df->person[dt.index].hp);
     }
-    if (u_race(au) == new_race[RC_DAEMON]) {
+    if (u_race(au) == get_race(RC_DAEMON)) {
 #ifdef TODO_RUNESWORD
       if (select_weapon(dt, 0, -1) == WP_RUNESWORD)
         continue;
@@ -1288,7 +1288,7 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
   }
 
   /* Sieben Leben */
-  if (u_race(du) == new_race[RC_CAT] && (chance(1.0 / 7))) {
+  if (u_race(du) == get_race(RC_CAT) && (chance(1.0 / 7))) {
     assert(dt.index >= 0 && dt.index < du->number);
     df->person[dt.index].hp = unit_max_hp(du);
     return false;
@@ -1847,11 +1847,11 @@ int skilldiff(troop at, troop dt, int dist)
     skdiff += 2;
 
   /* Effekte durch Rassen */
-  if (awp != NULL && u_race(au) == new_race[RC_HALFLING] && dragonrace(u_race(du))) {
+  if (awp != NULL && u_race(au) == get_race(RC_HALFLING) && dragonrace(u_race(du))) {
     skdiff += 5;
   }
 
-  if (u_race(au) == new_race[RC_GOBLIN]) {
+  if (u_race(au) == get_race(RC_GOBLIN)) {
     static int goblin_bonus = -1;
     if (goblin_bonus < 0)
       goblin_bonus =
@@ -2355,7 +2355,7 @@ double fleechance(unit * u)
   c += (eff_skill(u, SK_STEALTH, r) * 0.05);
   c += horsebonus(u);
 
-  if (u_race(u) == new_race[RC_HALFLING]) {
+  if (u_race(u) == get_race(RC_HALFLING)) {
     c += 0.20;
     c = _min(c, 0.90);
   } else {
@@ -3408,18 +3408,18 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
   if (fig->horses) {
     if (!fval(r->terrain, CAVALRY_REGION) || r_isforest(r)
       || eff_skill(u, SK_RIDING, r) < CavalrySkill()
-      || u_race(u) == new_race[RC_TROLL] || fval(u, UFL_WERE))
+      || u_race(u) == get_race(RC_TROLL) || fval(u, UFL_WERE))
       fig->horses = 0;
   }
 
   if (fig->elvenhorses) {
-    if (eff_skill(u, SK_RIDING, r) < 5 || u_race(u) == new_race[RC_TROLL]
+      if (eff_skill(u, SK_RIDING, r) < 5 || u_race(u) == get_race(RC_TROLL)
       || fval(u, UFL_WERE))
       fig->elvenhorses = 0;
   }
 
   /* Schauen, wie gut wir in Taktik sind. */
-  if (tactics > 0 && u_race(u) == new_race[RC_INSECT])
+  if (tactics > 0 && u_race(u) == get_race(RC_INSECT))
     tactics -= 1 - (int)log10(fig->side->size[SUM_ROW]);
 #ifdef TACTICS_MODIFIER
   if (tactics > 0 && statusrow(fig->status) == FIGHT_ROW)
@@ -4187,7 +4187,7 @@ static void battle_flee(battle * b)
           /* keine Flucht von Schiffen auf hoher See */
           continue;
         }
-        if (fval(u_race(u), RCF_UNDEAD) || u_race(u) == new_race[RC_SHADOWKNIGHT]) {
+        if (fval(u_race(u), RCF_UNDEAD) || u_race(u) == get_race(RC_SHADOWKNIGHT)) {
           /* Untote fliehen nicht. Warum eigentlich? */
           continue;
         }

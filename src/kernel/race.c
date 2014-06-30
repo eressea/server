@@ -62,6 +62,28 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 race *races;
 int num_races = 0;
 
+static const char *racenames[MAXRACES] = {
+    "dwarf", "elf", NULL, "goblin", "human", "troll", "demon", "insect",
+    "halfling", "cat", "aquarian", "orc", "snotling", "undead", "illusion",
+    "youngdragon", "dragon", "wyrm", "ent", "catdragon", "dracoid",
+    "special", "spell", "irongolem", "stonegolem", "shadowdemon",
+    "shadowmaster", "mountainguard", "alp", "toad", "braineater", "peasant",
+    "wolf", NULL, NULL, NULL, NULL, "songdragon", NULL,
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL, "seaserpent",
+    "shadowknight", "centaur", "skeleton", "skeletonlord", "zombie",
+    "juju-zombie", "ghoul", "ghast", "museumghost", "gnome", "template",
+    "clone"
+};
+
+struct race *get_race(race_t rt) {
+    assert(rt < MAXRACES);
+    if (racenames[rt]) {
+        return rc_get_or_create(racenames[rt]);
+    }
+    return 0;
+}
+
 race_list *get_familiarraces(void)
 {
   static int init = 0;

@@ -181,13 +181,14 @@ void report_summary(summary * s, summary * o, bool full)
   }
 
   for (i = 0; i < MAXRACES; i++) {
-    const race *rc = new_race[i];
-    if (s->factionrace[i] && rc && playerrace(rc)
-      && i != RC_TEMPLATE && i != RC_CLONE) {
-      fprintf(F, "%13s%s: %s\n", LOC(default_locale, rc_name(rc, 3)),
-        LOC(default_locale, "stat_tribe_p"), pcomp(s->factionrace[i],
-          o->factionrace[i]));
-    }
+      if (i != RC_TEMPLATE && i != RC_CLONE && s->factionrace[i]) {
+          const race *rc = get_race(i);
+          if (rc && playerrace(rc)) {
+              fprintf(F, "%13s%s: %s\n", LOC(default_locale, rc_name(rc, 3)),
+                  LOC(default_locale, "stat_tribe_p"), pcomp(s->factionrace[i],
+                  o->factionrace[i]));
+          }
+      }
   }
 
   if (full) {
@@ -211,22 +212,23 @@ void report_summary(summary * s, summary * o, bool full)
   fprintf(F, "\n");
   if (full) {
     for (i = 0; i < MAXRACES; i++) {
-      const race *rc = new_race[i];
       if (s->poprace[i]) {
-        fprintf(F, "%20s: %s\n", LOC(default_locale, rc_name(rc, 1)),
+          const race *rc = get_race(i);
+          fprintf(F, "%20s: %s\n", LOC(default_locale, rc_name(rc, 1)),
           rcomp(s->poprace[i], o->poprace[i]));
       }
     }
   } else {
-    for (i = 0; i < MAXRACES; i++) {
-      const race *rc = new_race[i];
-      if (s->poprace[i] && playerrace(rc)
-        && i != RC_TEMPLATE && i != RC_CLONE) {
-        fprintf(F, "%20s: %s\n", LOC(default_locale, rc_name(rc, 1)),
-          rcomp(s->poprace[i], o->poprace[i]));
+      for (i = 0; i < MAXRACES; i++) {
+          if (i != RC_TEMPLATE && i != RC_CLONE && s->poprace[i]) {
+              const race *rc = get_race(i);
+              if (playerrace(rc)) {
+                  fprintf(F, "%20s: %s\n", LOC(default_locale, rc_name(rc, 1)),
+                      rcomp(s->poprace[i], o->poprace[i]));
+              }
+          }
       }
     }
-  }
 
   if (full) {
     fprintf(F, "\nWaffen:               %s\n", pcomp(s->waffen, o->waffen));

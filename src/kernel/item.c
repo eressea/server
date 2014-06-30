@@ -103,7 +103,7 @@ static int res_changepeasants(unit * u, const resource_type * rtype, int delta)
 static int res_changeitem(unit * u, const resource_type * rtype, int delta)
 {
   int num;
-  if (rtype == get_resourcetype(R_STONE) && u_race(u) == new_race[RC_STONEGOLEM]
+  if (rtype == get_resourcetype(R_STONE) && u_race(u) == get_race(RC_STONEGOLEM)
     && delta <= 0) {
     int reduce = delta / GOLEM_STONE;
     if (delta % GOLEM_STONE != 0)
@@ -111,7 +111,7 @@ static int res_changeitem(unit * u, const resource_type * rtype, int delta)
     scale_number(u, u->number + reduce);
     num = u->number;
   } else if (rtype == get_resourcetype(R_IRON)
-    && u_race(u) == new_race[RC_IRONGOLEM] && delta <= 0) {
+      && u_race(u) == get_race(RC_IRONGOLEM) && delta <= 0) {
     int reduce = delta / GOLEM_IRON;
     if (delta % GOLEM_IRON != 0)
       --reduce;
@@ -725,7 +725,7 @@ typedef struct t_item {
 static int
 mod_elves_only(const unit * u, const region * r, skill_t sk, int value)
 {
-  if (u_race(u) == new_race[RC_ELF])
+    if (u_race(u) == get_race(RC_ELF))
     return value;
   unused_arg(r);
   return -118;
@@ -734,8 +734,8 @@ mod_elves_only(const unit * u, const region * r, skill_t sk, int value)
 static int
 mod_dwarves_only(const unit * u, const region * r, skill_t sk, int value)
 {
-  if (u_race(u) == new_race[RC_DWARF])
-    return value;
+    if (u_race(u) == get_race(RC_DWARF))
+        return value;
   unused_arg(r);
   return -118;
 }
@@ -798,7 +798,7 @@ static int
 use_warmthpotion(struct unit *u, const struct item_type *itype, int amount,
   struct order *ord)
 {
-  if (u->faction->race == new_race[RC_INSECT]) {
+    if (u->faction->race == get_race(RC_INSECT)) {
     fset(u, UFL_WARMTH);
   } else {
     /* nur für insekten: */
@@ -840,7 +840,7 @@ static int
 use_bloodpotion(struct unit *u, const struct item_type *itype, int amount,
   struct order *ord)
 {
-  if (u_race(u) == new_race[RC_DAEMON]) {
+    if (u_race(u) == get_race(RC_DAEMON)) {
     change_effect(u, itype->rtype->ptype, 100 * amount);
   } else {
     const race *irace = u_irace(u);

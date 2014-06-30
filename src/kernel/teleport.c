@@ -158,7 +158,7 @@ void spawn_braineaters(float chance)
     if (next-- == 0) {
       unit *u =
         createunit(r, f0, 1 + rng_int() % 10 + rng_int() % 10,
-        new_race[RC_HIRNTOETER]);
+        get_race(RC_HIRNTOETER));
       equip_unit(u, get_equipment("monster_braineater"));
 
       next = rng_int() % (int)(chance * 100);

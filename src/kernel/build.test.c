@@ -49,7 +49,6 @@ static void test_build_building_with_golem(CuTest *tc) {
     test_create_world();
 
     rc = test_create_race("stonegolem");
-    new_race[RC_STONEGOLEM] = rc;
     rc->flags |= RCF_STONEGOLEM;
     btype = bt_find("castle");
     assert(btype && rc);

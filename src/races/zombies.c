@@ -16,6 +16,7 @@
 #include <kernel/config.h>
 
 /* kernel includes */
+#include <kernel/race.h>
 #include <kernel/unit.h>
 #include <kernel/faction.h>
 #include <kernel/region.h>
@@ -51,7 +52,7 @@ void age_undead(unit * u)
       if (rng_int() % 100 < UNDEAD_BREAKUP_FRACTION)
         ++n;
     }
-    u2 = create_unit(r, get_monsters(), 0, new_race[RC_UNDEAD], 0, NULL, u);
+    u2 = create_unit(r, get_monsters(), 0, get_race(RC_UNDEAD), 0, NULL, u);
     make_undead_unit(u2);
     transfermen(u, u2, u->number - n);
   }
@@ -62,7 +63,7 @@ void age_skeleton(unit * u)
   if (is_monsters(u->faction) && rng_int() % 100 < age_chance(u->age, 27, 1)) {
     int n = _max(1, u->number / 2);
     double q = (double)u->hp / (double)(unit_max_hp(u) * u->number);
-    u_setrace(u, new_race[RC_SKELETON_LORD]);
+    u_setrace(u, get_race(RC_SKELETON_LORD));
     u->irace = NULL;
     scale_number(u, n);
     u->hp = (int)(unit_max_hp(u) * u->number * q);
@@ -74,7 +75,7 @@ void age_zombie(unit * u)
   if (is_monsters(u->faction) && rng_int() % 100 < age_chance(u->age, 27, 1)) {
     int n = _max(1, u->number / 2);
     double q = (double)u->hp / (double)(unit_max_hp(u) * u->number);
-    u_setrace(u, new_race[RC_ZOMBIE_LORD]);
+    u_setrace(u, get_race(RC_ZOMBIE_LORD));
     u->irace = NULL;
     scale_number(u, n);
     u->hp = (int)(unit_max_hp(u) * u->number * q);
@@ -86,7 +87,7 @@ void age_ghoul(unit * u)
   if (is_monsters(u->faction) && rng_int() % 100 < age_chance(u->age, 27, 1)) {
     int n = _max(1, u->number / 2);
     double q = (double)u->hp / (double)(unit_max_hp(u) * u->number);
-    u_setrace(u, new_race[RC_GHOUL_LORD]);
+    u_setrace(u, get_race(RC_GHOUL_LORD));
     u->irace = NULL;
     scale_number(u, n);
     u->hp = (int)(unit_max_hp(u) * u->number * q);

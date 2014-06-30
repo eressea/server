@@ -341,7 +341,7 @@ static void guardian_faction(plane * pl, int id)
     f->passw = _strdup(itoa36(rng_int()));
     set_email(&f->email, "igjarjuk@eressea.de");
     f->name = _strdup("Igjarjuks Kundschafter");
-    f->race = new_race[RC_ILLUSION];
+    f->race = get_race(RC_ILLUSION);
     f->age = turn;
     f->locale = get_locale("de");
     f->options =
@@ -352,7 +352,7 @@ static void guardian_faction(plane * pl, int id)
     addlist(&factions, f);
     fhash(f);
   }
-  if (f->race != new_race[RC_ILLUSION]) {
+  if (f->race != get_race(RC_ILLUSION)) {
     assert(!"guardian id vergeben");
     exit(0);
   }
@@ -368,7 +368,7 @@ static void guardian_faction(plane * pl, int id)
       }
       if (u)
         continue;
-      u = createunit(r, f, 1, new_race[RC_GOBLIN]);
+      u = createunit(r, f, 1, get_race(RC_GOBLIN));
       set_string(&u->name, "Igjarjuks Auge");
       i_change(&u->items, it_find("roi"), 1);
       set_order(&u->thisorder, NULL);

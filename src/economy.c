@@ -530,7 +530,7 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
   }
 #endif
 
-  if (rc == new_race[RC_INSECT]) {
+  if (rc == get_race(RC_INSECT)) {
     gamedate date;
     get_gamedate(turn, &date);
     if (date.season == 0 && r->terrain != newterrain(T_DESERT)) {
@@ -563,7 +563,7 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
   }
 
   if (!(rc->ec_flags & ECF_REC_HORSES) && fval(r, RF_ORCIFIED)) {
-    if (rc != new_race[RC_ORC]) {
+      if (rc != get_race(RC_ORC)) {
       cmistake(u, ord, 238, MSG_EVENT);
       return;
     }
@@ -755,7 +755,7 @@ static void give_cmd(unit * u, order * ord)
     return;
   }
 
-  if (u2 && u_race(u2) == new_race[RC_SPELL]) {
+  if (u2 && u_race(u2) == get_race(RC_SPELL)) {
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found",
         ""));
     return;
@@ -1967,7 +1967,7 @@ static void buy(unit * u, request ** buyorders, struct order *ord)
     return;
   }
 
-  if (u_race(u) == new_race[RC_INSECT]) {
+  if (u_race(u) == get_race(RC_INSECT)) {
     /* entweder man ist insekt, oder... */
     if (r->terrain != newterrain(T_SWAMP) && r->terrain != newterrain(T_DESERT)
       && !rbuildings(r)) {
@@ -2271,7 +2271,7 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
   }
   /* In der Region muß es eine Burg geben. */
 
-  if (u_race(u) == new_race[RC_INSECT]) {
+  if (u_race(u) == get_race(RC_INSECT)) {
     if (r->terrain != newterrain(T_SWAMP) && r->terrain != newterrain(T_DESERT)
       && !rbuildings(r)) {
       cmistake(u, ord, 119, MSG_COMMERCE);
@@ -2766,7 +2766,7 @@ static void steal_cmd(unit * u, struct order *ord, request ** stealorders)
     return;
   }
 
-  if (fval(r->terrain, SEA_REGION) && u_race(u) != new_race[RC_AQUARIAN]) {
+  if (fval(r->terrain, SEA_REGION) && u_race(u) != get_race(RC_AQUARIAN)) {
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_onlandonly", ""));
     return;
   }
@@ -2820,7 +2820,7 @@ static void steal_cmd(unit * u, struct order *ord, request ** stealorders)
 
   if (n <= 0) {
     /* Wahrnehmung == Tarnung */
-    if (u_race(u) != new_race[RC_GOBLIN] || eff_skill(u, SK_STEALTH, r) <= 3) {
+      if (u_race(u) != get_race(RC_GOBLIN) || eff_skill(u, SK_STEALTH, r) <= 3) {
       ADDMSG(&u->faction->msgs, msg_message("stealfail", "unit target", u, u2));
       if (n == 0) {
         ADDMSG(&u2->faction->msgs, msg_message("stealdetect", "unit", u2));
@@ -3227,10 +3227,10 @@ void produce(struct region *r)
     order *ord;
     bool trader = false;
 
-    if (u_race(u) == new_race[RC_SPELL] || fval(u, UFL_LONGACTION))
+    if (u_race(u) == get_race(RC_SPELL) || fval(u, UFL_LONGACTION))
       continue;
 
-    if (u_race(u) == new_race[RC_INSECT] && r_insectstalled(r) &&
+    if (u_race(u) == get_race(RC_INSECT) && r_insectstalled(r) &&
       !is_cursed(u->attribs, C_KAELTESCHUTZ, 0))
       continue;
 
@@ -3266,7 +3266,7 @@ void produce(struct region *r)
     if (todo == NOKEYWORD)
       continue;
 
-    if (fval(r->terrain, SEA_REGION) && u_race(u) != new_race[RC_AQUARIAN]
+    if (fval(r->terrain, SEA_REGION) && u_race(u) != get_race(RC_AQUARIAN)
       && !(u_race(u)->flags & RCF_SWIM)
       && todo != K_STEAL && todo != K_SPY && todo != K_SABOTAGE)
       continue;

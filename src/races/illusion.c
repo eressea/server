@@ -16,6 +16,7 @@
 #include <kernel/config.h>
 
 /* kernel includes */
+#include <kernel/race.h>
 #include <kernel/unit.h>
 #include <kernel/faction.h>
 #include <kernel/messages.h>
@@ -28,7 +29,7 @@
 
 void age_illusion(unit * u)
 {
-  if (u->faction->race != new_race[RC_ILLUSION]) {
+  if (u->faction->race != get_race(RC_ILLUSION)) {
     if (u->age == ILLUSIONMAX) {
       ADDMSG(&u->faction->msgs, msg_message("warnillusiondissolve", "unit", u));
     } else if (u->age > ILLUSIONMAX) {

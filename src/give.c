@@ -188,7 +188,8 @@ void give_men(int n, unit * u, unit * u2, struct order *ord)
     return;
   } else if (u == u2) {
     error = 10;
-  } else if (!u2 && u_race(u) == new_race[RC_SNOTLING]) {
+  }
+  else if (!u2 && u_race(u) == get_race(RC_SNOTLING)) {
     /* snotlings may not be given to the peasants. */
     error = 307;
   } else if (u2 && u2->number && (fval(u, UFL_HERO) != fval(u2, UFL_HERO))) {
@@ -236,7 +237,7 @@ void give_men(int n, unit * u, unit * u2, struct order *ord)
       if (u2->faction->newbies + n > MAXNEWBIES) {
         error = 129;
       } else if (u_race(u) != u2->faction->race) {
-        if (u2->faction->race != new_race[RC_HUMAN]) {
+          if (u2->faction->race != get_race(RC_HUMAN)) {
           error = 120;
         } else if (count_migrants(u2->faction) + n >
           count_maxmigrants(u2->faction)) {
@@ -298,7 +299,7 @@ void give_men(int n, unit * u, unit * u2, struct order *ord)
     } else {
       if (getunitpeasants) {
 #ifdef ORCIFICATION
-        if (u_race(u) == new_race[RC_SNOTLING] && !fval(u->region, RF_ORCIFIED)) {
+          if (u_race(u) == get_race(RC_SNOTLING) && !fval(u->region, RF_ORCIFIED)) {
           attrib *a = a_find(u->region->attribs, &at_orcification);
           if (!a)
             a = a_add(&u->region->attribs, a_new(&at_orcification));
@@ -393,7 +394,7 @@ void give_unit(unit * u, unit * u2, order * ord)
     return;
   }
   if (u_race(u) != u2->faction->race) {
-    if (u2->faction->race != new_race[RC_HUMAN]) {
+      if (u2->faction->race != get_race(RC_HUMAN)) {
       cmistake(u, ord, 120, MSG_COMMERCE);
       return;
     }

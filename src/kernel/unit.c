@@ -330,7 +330,7 @@ void make_zombie(unit * u)
 {
   u_setfaction(u, get_monsters());
   scale_number(u, 1);
-  u_setrace(u, new_race[RC_ZOMBIE]);
+  u_setrace(u, get_race(RC_ZOMBIE));
   u->irace = NULL;
 }
 

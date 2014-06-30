@@ -389,7 +389,7 @@ static int dragon_affinity_value(region * r, unit * u)
 {
   int m = all_money(r, u->faction);
 
-  if (u_race(u) == new_race[RC_FIREDRAGON]) {
+  if (u_race(u) == get_race(RC_FIREDRAGON)) {
     return (int)(normalvariate(m, m / 2));
   } else {
     return (int)(normalvariate(m, m / 4));
@@ -497,7 +497,7 @@ static order *monster_seeks_target(region * r, unit * u)
   }
 
   if (r == target->region) {    /* Wir haben ihn! */
-    if (u_race(u) == new_race[RC_ALP]) {
+      if (u_race(u) == get_race(RC_ALP)) {
       alp_findet_opfer(u, r);
     } else {
       assert(!"Seeker-Monster hat keine Aktion fuer Ziel");
@@ -614,7 +614,7 @@ static void recruit_dracoids(unit * dragon, int size)
   region *r = dragon->region;
   const struct item *weapon = NULL;
   order *new_order = NULL;
-  unit *un = createunit(r, f, size, new_race[RC_DRACOID]);
+  unit *un = createunit(r, f, size, get_race(RC_DRACOID));
 
   fset(un, UFL_ISNEW | UFL_MOVED);
 
@@ -653,7 +653,7 @@ static order *plan_dragon(unit * u)
   }
   move |= chance(0.04);         /* 4% chance to change your mind */
 
-  if (u_race(u) == new_race[RC_WYRM] && !move) {
+  if (u_race(u) == get_race(RC_WYRM) && !move) {
     unit *u2;
     for (u2 = r->units; u2; u2 = u2->next) {
       /* wyrme sind einzelgänger */
@@ -715,7 +715,8 @@ static order *plan_dragon(unit * u)
     if (long_order == NULL) {
       /* money is gone, need a new target */
       set_new_dragon_target(u, u->region, DRAGON_RANGE);
-    } else if (u_race(u) != new_race[RC_FIREDRAGON]) {
+    }
+    else if (u_race(u) != get_race(RC_FIREDRAGON)) {
       /* neue dracoiden! */
       if (r->land && !fval(r->terrain, FORBIDDEN_REGION)) {
         int ra = 20 + rng_int() % 100;
@@ -894,7 +895,7 @@ void spawn_dragons(void)
     unit *u;
 
     if (fval(r->terrain, SEA_REGION) && rng_int() % 10000 < 1) {
-      u = createunit(r, monsters, 1, new_race[RC_SEASERPENT]);
+        u = createunit(r, monsters, 1, get_race(RC_SEASERPENT));
       fset(u, UFL_ISNEW | UFL_MOVED);
       equip_unit(u, get_equipment("monster_seaserpent"));
     }
@@ -904,9 +905,9 @@ void spawn_dragons(void)
         || r->terrain == newterrain(T_DESERT))
       && rng_int() % 10000 < (5 + 100 * chaosfactor(r))) {
       if (chance(0.80)) {
-        u = createunit(r, monsters, nrand(60, 20) + 1, new_race[RC_FIREDRAGON]);
+          u = createunit(r, monsters, nrand(60, 20) + 1, get_race(RC_FIREDRAGON));
       } else {
-        u = createunit(r, monsters, nrand(30, 20) + 1, new_race[RC_DRAGON]);
+          u = createunit(r, monsters, nrand(30, 20) + 1, get_race(RC_DRAGON));
       }
       fset(u, UFL_ISNEW | UFL_MOVED);
       equip_unit(u, get_equipment("monster_dragon"));
@@ -959,19 +960,19 @@ void spawn_undead(void)
 
       switch (rng_int() % 3) {
       case 0:
-        rc = new_race[RC_SKELETON];
+          rc = get_race(RC_SKELETON);
         break;
       case 1:
-        rc = new_race[RC_ZOMBIE];
+          rc = get_race(RC_ZOMBIE);
         break;
       default:
-        rc = new_race[RC_GHOUL];
+          rc = get_race(RC_GHOUL);
         break;
       }
 
       u = createunit(r, monsters, undead, rc);
       fset(u, UFL_ISNEW | UFL_MOVED);
-      if ((rc == new_race[RC_SKELETON] || rc == new_race[RC_ZOMBIE])
+      if ((rc == get_race(RC_SKELETON) || rc == get_race(RC_ZOMBIE))
         && rng_int() % 10 < 4) {
         equip_unit(u, get_equipment("rising_undead"));
       }

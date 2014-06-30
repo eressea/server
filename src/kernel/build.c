@@ -312,7 +312,7 @@ void build_road(region * r, unit * u, int size, direction_t d)
   if (size > 0)
     left = _min(size, left);
   /* baumaximum anhand der rohstoffe */
-  if (u_race(u) == new_race[RC_STONEGOLEM]) {
+  if (u_race(u) == get_race(RC_STONEGOLEM)) {
     n = u->number * GOLEM_STONE;
   } else {
     n = get_pooled(u, get_resourcetype(R_STONE), GET_DEFAULT, left);
@@ -353,7 +353,7 @@ void build_road(region * r, unit * u, int size, direction_t d)
    * maximum. */
   rsetroad(r, d, rroad(r, d) + (short)n);
 
-  if (u_race(u) == new_race[RC_STONEGOLEM]) {
+  if (u_race(u) == get_race(RC_STONEGOLEM)) {
     int golemsused = n / GOLEM_STONE;
     if (n % GOLEM_STONE != 0) {
       ++golemsused;

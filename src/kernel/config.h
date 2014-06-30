@@ -371,10 +371,6 @@ int max_magicians(const struct faction * f);
 
   extern const char *localenames[];
 
-/** compatibility: **/
-  race_t old_race(const struct race *);
-  extern const struct race *new_race[];
-
 /* globale settings des Spieles */
   typedef struct settings {
     const char *gamename;

@@ -238,16 +238,16 @@ int setstealth_cmd(unit * u, struct order *ord)
   trace = findrace(s, u->faction->locale);
   if (trace) {
     /* demons can cloak as other player-races */
-    if (u_race(u) == new_race[RC_DAEMON]) {
+      if (u_race(u) == get_race(RC_DAEMON)) {
       race_t allowed[] = { RC_DWARF, RC_ELF, RC_ORC, RC_GOBLIN, RC_HUMAN,
         RC_TROLL, RC_DAEMON, RC_INSECT, RC_HALFLING, RC_CAT, RC_AQUARIAN,
         NORACE
       };
       int i;
       for (i = 0; allowed[i] != NORACE; ++i)
-        if (new_race[allowed[i]] == trace)
+          if (get_race(allowed[i]) == trace)
           break;
-      if (new_race[allowed[i]] == trace) {
+      if (get_race(allowed[i]) == trace) {
         u->irace = trace;
         if (u_race(u)->flags & RCF_SHAPESHIFTANY && get_racename(u->attribs))
           set_racename(&u->attribs, NULL);
@@ -256,10 +256,10 @@ int setstealth_cmd(unit * u, struct order *ord)
     }
 
     /* Singdrachen koennen sich nur als Drachen tarnen */
-    if (u_race(u) == new_race[RC_SONGDRAGON]
-      || u_race(u) == new_race[RC_BIRTHDAYDRAGON]) {
-      if (trace == new_race[RC_SONGDRAGON] || trace == new_race[RC_FIREDRAGON]
-        || trace == new_race[RC_DRAGON] || trace == new_race[RC_WYRM]) {
+      if (u_race(u) == get_race(RC_SONGDRAGON)
+          || u_race(u) == get_race(RC_BIRTHDAYDRAGON)) {
+          if (trace == get_race(RC_SONGDRAGON) || trace == get_race(RC_FIREDRAGON)
+              || trace == get_race(RC_DRAGON) || trace == get_race(RC_WYRM)) {
         u->irace = trace;
         if (u_race(u)->flags & RCF_SHAPESHIFTANY && get_racename(u->attribs))
           set_racename(&u->attribs, NULL);

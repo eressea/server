@@ -127,8 +127,8 @@ static void dissolve_units(void)
             }
             break;
           default:
-            if (u_race(u) == new_race[RC_STONEGOLEM]
-              || u_race(u) == new_race[RC_IRONGOLEM]) {
+              if (u_race(u) == get_race(RC_STONEGOLEM)
+                  || u_race(u) == get_race(RC_IRONGOLEM)) {
               msg =
                 msg_message("dissolve_units_4", "unit region number race", u, r,
                 n, u_race(u));
@@ -446,7 +446,7 @@ static unit *random_unit(const region * r)
   unit *u;
 
   for (u = r->units; u; u = u->next) {
-    if (u_race(u) != new_race[RC_SPELL]) {
+      if (u_race(u) != get_race(RC_SPELL)) {
       c += u->number;
     }
   }
@@ -459,7 +459,7 @@ static unit *random_unit(const region * r)
   u = r->units;
 
   while (u && c < n) {
-    if (u_race(u) != new_race[RC_SPELL]) {
+      if (u_race(u) != get_race(RC_SPELL)) {
       c += u->number;
     }
     u = u->next;
@@ -478,7 +478,7 @@ void chaos(region * r)
           if (u && playerrace(u_race(u))) {
             ADDMSG(&u->faction->msgs, msg_message("chaos_disease", "unit", u));
             u_setfaction(u, get_monsters());
-            u_setrace(u, new_race[RC_GHOUL]);
+            u_setrace(u, get_race(RC_GHOUL));
           }
         }
         break;
@@ -491,19 +491,19 @@ void chaos(region * r)
               mfac = 100;
               u =
                 createunit(r, get_monsters(), rng_int() % 8 + 1,
-                new_race[RC_FIREDRAGON]);
+                get_race(RC_FIREDRAGON));
               break;
             case 1:
               mfac = 500;
               u =
                 createunit(r, get_monsters(), rng_int() % 4 + 1,
-                new_race[RC_DRAGON]);
+                get_race(RC_DRAGON));
               break;
             default:
               mfac = 1000;
               u =
                 createunit(r, get_monsters(), rng_int() % 2 + 1,
-                new_race[RC_WYRM]);
+                get_race(RC_WYRM));
               break;
           }
           if (mfac)
@@ -537,7 +537,7 @@ void chaos(region * r)
 
               for (up = &r->units; *up;) {
                 unit *u = *up;
-                if (u_race(u) != new_race[RC_SPELL] && u->ship == 0 && !canfly(u)) {
+                if (u_race(u) != get_race(RC_SPELL) && u->ship == 0 && !canfly(u)) {
                   ADDMSG(&u->faction->msgs, msg_message("tidalwave_kill",
                       "region unit", r, u));
                   remove_unit(up, u);
@@ -605,7 +605,7 @@ damage_unit(unit * u, const char *dam, bool physical, bool magic)
   double magres = magic_resistance(u);
 
   assert(u->number);
-  if (fval(u_race(u), RCF_ILLUSIONARY) || u_race(u) == new_race[RC_SPELL]) {
+  if (fval(u_race(u), RCF_ILLUSIONARY) || u_race(u) == get_race(RC_SPELL)) {
     return 0;
   }
 
@@ -676,7 +676,7 @@ void drown(region * r)
     while (*up) {
       unit *u = *up;
       int amphibian_level = 0;
-      if (u->ship || u_race(u) == new_race[RC_SPELL] || u->number == 0) {
+      if (u->ship || u_race(u) == get_race(RC_SPELL) || u->number == 0) {
         up = &u->next;
         continue;
       }
@@ -1110,7 +1110,7 @@ static void demon_skillchanges(void)
   for (r = regions; r; r = r->next) {
     unit *u;
     for (u = r->units; u; u = u->next) {
-      if (u_race(u) == new_race[RC_DAEMON]) {
+        if (u_race(u) == get_race(RC_DAEMON)) {
         skill *sv = u->skills;
         int upchance = 15;
         int downchance = 10;

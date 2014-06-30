@@ -43,6 +43,68 @@ extern "C" {
   struct param;
   struct spell;
 
+  typedef enum {
+      RC_DWARF,                     /* 0 - Zwerg */
+      RC_ELF,
+      RC_GOBLIN = 3,
+      RC_HUMAN,
+
+      RC_TROLL,
+      RC_DAEMON,
+      RC_INSECT,
+      RC_HALFLING,
+      RC_CAT,
+
+      RC_AQUARIAN,
+      RC_ORC,
+      RC_SNOTLING,
+      RC_UNDEAD,
+      RC_ILLUSION,
+
+      RC_FIREDRAGON,
+      RC_DRAGON,
+      RC_WYRM,
+      RC_TREEMAN,
+      RC_BIRTHDAYDRAGON,
+
+      RC_DRACOID,
+      RC_SPECIAL,
+      RC_SPELL,
+      RC_IRONGOLEM,
+      RC_STONEGOLEM,
+
+      RC_SHADOW,
+      RC_SHADOWLORD,
+      RC_IRONKEEPER,
+      RC_ALP,
+      RC_TOAD,
+
+      RC_HIRNTOETER,
+      RC_PEASANT,
+      RC_WOLF = 32,
+
+      RC_SONGDRAGON = 37,
+
+      RC_SEASERPENT = 51,
+      RC_SHADOWKNIGHT,
+      RC_CENTAUR,
+      RC_SKELETON,
+
+      RC_SKELETON_LORD,
+      RC_ZOMBIE,
+      RC_ZOMBIE_LORD,
+      RC_GHOUL,
+      RC_GHOUL_LORD,
+
+      RC_MUS_SPIRIT,
+      RC_GNOME,
+      RC_TEMPLATE,
+      RC_CLONE,
+
+      MAXRACES,
+      NORACE = -1
+  } race_t;
+
   typedef struct att {
     int type;
     union {
@@ -107,8 +169,12 @@ extern "C" {
   extern void racelist_clear(struct race_list **rl);
   extern void racelist_insert(struct race_list **rl, const struct race *r);
 
-  extern struct race_list *get_familiarraces(void);
-  extern struct race *races;
+
+  struct race_list *get_familiarraces(void);
+  struct race *races;
+  struct race *get_race(race_t rt);
+  /** TODO: compatibility hacks: **/
+  race_t old_race(const struct race *);
 
   extern race *rc_get_or_create(const char *name);
   extern const race *rc_find(const char *);
@@ -170,11 +236,11 @@ extern "C" {
   extern const char *racename(const struct locale *lang, const struct unit *u,
     const race * rc);
 
-#define omniscient(f) (((f)->race)==new_race[RC_ILLUSION] || ((f)->race)==new_race[RC_TEMPLATE])
+#define omniscient(f) ((f)->race==get_race(RC_ILLUSION) || (f)->race==get_race(RC_TEMPLATE))
 
 #define playerrace(rc) (fval((rc), RCF_PLAYERRACE))
-#define dragonrace(rc) ((rc) == new_race[RC_FIREDRAGON] || (rc) == new_race[RC_DRAGON] || (rc) == new_race[RC_WYRM] || (rc) == new_race[RC_BIRTHDAYDRAGON])
-#define humanoidrace(rc) (fval((rc), RCF_UNDEAD) || (rc)==new_race[RC_DRACOID] || playerrace(rc))
+#define dragonrace(rc) ((rc) == get_race(RC_FIREDRAGON) || (rc) == get_race(RC_DRAGON) || (rc) == get_race(RC_WYRM) || (rc) == get_race(RC_BIRTHDAYDRAGON))
+#define humanoidrace(rc) (fval((rc), RCF_UNDEAD) || (rc)==get_race(RC_DRACOID) || playerrace(rc))
 #define illusionaryrace(rc) (fval(rc, RCF_ILLUSIONARY))
 
   extern bool allowed_dragon(const struct region *src,

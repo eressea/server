@@ -26,6 +26,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "curse.h"              /* für C_NOCOST */
 #include "unit.h"
 #include "faction.h"
+#include "race.h"
 #include "region.h"
 #include "skill.h"
 #include "magic.h"
@@ -612,7 +613,7 @@ int bt_effsize(const building_type * btype, const building * b, int bsize)
   if (b && get_param_int(global.parameters, "rules.dwarf_castles", 0)
     && strcmp(btype->_name, "castle") == 0) {
     unit *u = building_owner(b);
-    if (u && u->faction->race == new_race[RC_HALFLING]) {
+    if (u && u->faction->race == get_race(RC_HALFLING)) {
       i = bsize * 10 / 8;
     }
   }

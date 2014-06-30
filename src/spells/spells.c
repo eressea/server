@@ -881,7 +881,7 @@ static int sp_summonent(castorder * co)
 
   ents = (int)_min(power * power, rtrees(r, 2));
 
-  u = create_unit(r, mage->faction, ents, new_race[RC_TREEMAN], 0, NULL, mage);
+  u = create_unit(r, mage->faction, ents, get_race(RC_TREEMAN), 0, NULL, mage);
 
   a = a_new(&at_unitdissolve);
   a->data.ca[0] = 2;            /* An r->trees. */
@@ -1182,7 +1182,7 @@ static void fumble_ents(const castorder * co)
   }
 
   ents = (int)(force * 10);
-  u = create_unit(r, get_monsters(), ents, new_race[RC_TREEMAN], 0, NULL, NULL);
+  u = create_unit(r, get_monsters(), ents, get_race(RC_TREEMAN), 0, NULL, NULL);
 
   if (u) {
     message *unseen;
@@ -1634,7 +1634,7 @@ static int sp_great_drought(castorder * co)
           rsetterrain(r, T_OCEAN);
           /* Einheiten duerfen hier auf keinen Fall geloescht werden! */
           for (u = r->units; u; u = u->next) {
-            if (u_race(u) != new_race[RC_SPELL] && u->ship == 0) {
+              if (u_race(u) != get_race(RC_SPELL) && u->ship == 0) {
               set_number(u, 0);
             }
           }
@@ -2131,7 +2131,7 @@ static int sp_ironkeeper(castorder * co)
   }
 
   keeper =
-    create_unit(r, mage->faction, 1, new_race[RC_IRONKEEPER], 0, NULL, mage);
+      create_unit(r, mage->faction, 1, get_race(RC_IRONKEEPER), 0, NULL, mage);
 
   /*keeper->age = cast_level + 2; */
   setstatus(keeper, ST_AVOID);  /* kaempft nicht */
@@ -2322,7 +2322,7 @@ void patzer_peasantmob(const castorder * co)
     assert(rpeasants(r) >= 0);
 
     u =
-      create_unit(r, f, n, new_race[RC_PEASANT], 0, LOC(f->locale, "angry_mob"),
+        create_unit(r, f, n, get_race(RC_PEASANT), 0, LOC(f->locale, "angry_mob"),
       NULL);
     fset(u, UFL_ISNEW);
     /* guard(u, GUARD_ALL);  hier zu frueh! Befehl BEWACHE setzten */
@@ -2548,23 +2548,23 @@ static int sp_summondragon(castorder * co)
 
   for (time = 1; time < 7; time++) {
     if (rng_int() % 100 < 25) {
-      switch (rng_int() % 3) {
+        switch (rng_int() % 3) {
         case 0:
-          race = new_race[RC_WYRM];
-          number = 1;
-          break;
+            race = get_race(RC_WYRM);
+            number = 1;
+            break;
 
         case 1:
-          race = new_race[RC_DRAGON];
-          number = 2;
-          break;
+            race = get_race(RC_DRAGON);
+            number = 2;
+            break;
 
         case 2:
         default:
-          race = new_race[RC_FIREDRAGON];
-          number = 6;
-          break;
-      }
+            race = get_race(RC_FIREDRAGON);
+            number = 6;
+            break;
+        }
       {
         trigger *tsummon = trigger_createunit(r, f, race, number);
         add_trigger(&r->attribs, "timer", trigger_timeout(time, tsummon));
@@ -2577,7 +2577,7 @@ static int sp_summondragon(castorder * co)
   for (rl2 = rl; rl2; rl2 = rl2->next) {
     region *r2 = rl2->data;
     for (u = r2->units; u; u = u->next) {
-      if (u_race(u) == new_race[RC_WYRM] || u_race(u) == new_race[RC_DRAGON]) {
+        if (u_race(u) == get_race(RC_WYRM) || u_race(u) == get_race(RC_DRAGON)) {
         attrib *a = a_find(u->attribs, &at_targetregion);
         if (!a) {
           a = a_add(&u->attribs, make_targetregion(r));
@@ -2689,13 +2689,13 @@ static int sp_unholypower(castorder * co)
 
     switch (old_race(u_race(u))) {
       case RC_SKELETON:
-        target_race = new_race[RC_SKELETON_LORD];
+          target_race = get_race(RC_SKELETON_LORD);
         break;
       case RC_ZOMBIE:
-        target_race = new_race[RC_ZOMBIE_LORD];
+          target_race = get_race(RC_ZOMBIE_LORD);
         break;
       case RC_GHOUL:
-        target_race = new_race[RC_GHOUL_LORD];
+          target_race = get_race(RC_GHOUL_LORD);
         break;
       default:
         cmistake(mage, co->order, 284, MSG_MAGIC);
@@ -2963,7 +2963,7 @@ static int sp_summonshadow(castorder * co)
   unit *u;
   int val, number = (int)(force * force);
 
-  u = create_unit(r, mage->faction, number, new_race[RC_SHADOW], 0, NULL, mage);
+  u = create_unit(r, mage->faction, number, get_race(RC_SHADOW), 0, NULL, mage);
 
   /* Bekommen Tarnung = (Magie+Tarnung)/2 und Wahrnehmung 1. */
   val = get_level(mage, SK_MAGIC) + get_level(mage, SK_STEALTH);
@@ -3004,7 +3004,7 @@ static int sp_summonshadowlords(castorder * co)
   int amount = (int)(force * force);
 
   u =
-    create_unit(r, mage->faction, amount, new_race[RC_SHADOWLORD], 0, NULL,
+      create_unit(r, mage->faction, amount, get_race(RC_SHADOWLORD), 0, NULL,
     mage);
 
   /* Bekommen Tarnung = Magie und Wahrnehmung 5. */
@@ -3257,7 +3257,7 @@ static int sp_summonundead(castorder * co)
   unit *mage = co->magician.u;
   int cast_level = co->level;
   int force = (int)(co->force * 10);
-  const race *race = new_race[RC_SKELETON];
+  const race *race = get_race(RC_SKELETON);
 
   if (!r->land || deathcount(r) == 0) {
     ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "error_nograves",
@@ -3268,11 +3268,11 @@ static int sp_summonundead(castorder * co)
   undead = _min(deathcount(r), 2 + lovar(force));
 
   if (cast_level <= 8) {
-    race = new_race[RC_SKELETON];
+      race = get_race(RC_SKELETON);
   } else if (cast_level <= 12) {
-    race = new_race[RC_ZOMBIE];
+      race = get_race(RC_ZOMBIE);
   } else {
-    race = new_race[RC_GHOUL];
+      race = get_race(RC_GHOUL);
   }
 
   u = create_unit(r, mage->faction, undead, race, 0, NULL, mage);
@@ -3641,7 +3641,7 @@ static int sp_rallypeasantmob(castorder * co)
 
   for (u = r->units; u; u = un) {
     un = u->next;
-    if (is_monsters(u->faction) && u_race(u) == new_race[RC_PEASANT]) {
+    if (is_monsters(u->faction) && u_race(u) == get_race(RC_PEASANT)) {
       rsetpeasants(r, rpeasants(r) + u->number);
       rsetmoney(r, rmoney(r) + get_money(u));
       set_money(u, 0);
@@ -3709,7 +3709,7 @@ static int sp_raisepeasantmob(castorder * co)
   assert(rpeasants(r) >= 0);
 
   u =
-    create_unit(r, monsters, n, new_race[RC_PEASANT], 0, LOC(monsters->locale,
+      create_unit(r, monsters, n, get_race(RC_PEASANT), 0, LOC(monsters->locale,
       "furious_mob"), NULL);
   fset(u, UFL_ISNEW);
   guard(u, GUARD_ALL);
@@ -3984,7 +3984,7 @@ static int sp_bigrecruit(castorder * co)
    * Rekrutierungskosten mit einfliessen lassen. */
 
   n = (int)force + lovar((force * force * 1000) / f->race->recruitcost);
-  if (f->race == new_race[RC_ORC]) {
+  if (f->race == get_race(RC_ORC)) {
     n = _min(2 * maxp, n);
     n = _max(n, 1);
     rsetpeasants(r, maxp - (n + 1) / 2);
@@ -4062,7 +4062,7 @@ static int sp_pump(castorder * co)
   }
 
   u =
-    create_unit(rt, mage->faction, RS_FARVISION, new_race[RC_SPELL], 0,
+      create_unit(rt, mage->faction, RS_FARVISION, get_race(RC_SPELL), 0,
     "spell/pump", NULL);
   u->age = 2;
   set_level(u, SK_PERCEPTION, eff_skill(target, SK_PERCEPTION, u->region));
@@ -4288,7 +4288,7 @@ static int sp_raisepeasants(castorder * co)
   rsetpeasants(r, rpeasants(r) - bauern);
 
   u2 =
-    create_unit(r, mage->faction, bauern, new_race[RC_PEASANT], 0,
+      create_unit(r, mage->faction, bauern, get_race(RC_PEASANT), 0,
     LOC(mage->faction->locale, "furious_mob"), mage);
 
   fset(u2, UFL_LOCKED);
@@ -4672,7 +4672,7 @@ int sp_clonecopy(castorder * co)
   _snprintf(name, sizeof(name), (const char *)LOC(mage->faction->locale,
       "clone_of"), unitname(mage));
   clone =
-    create_unit(target_region, mage->faction, 1, new_race[RC_CLONE], 0, name,
+      create_unit(target_region, mage->faction, 1, get_race(RC_CLONE), 0, name,
     mage);
   setstatus(clone, ST_FLEE);
   fset(clone, UFL_LOCKED);
@@ -4723,7 +4723,7 @@ int sp_dreamreading(castorder * co)
   }
 
   u2 =
-    create_unit(u->region, mage->faction, RS_FARVISION, new_race[RC_SPELL], 0,
+      create_unit(u->region, mage->faction, RS_FARVISION, get_race(RC_SPELL), 0,
     "spell/dreamreading", NULL);
   set_number(u2, 1);
   u2->age = 2;                  /* Nur fuer diese Runde. */
@@ -5518,7 +5518,7 @@ int sp_showastral(castorder * co)
     region *r2 = rl2->data;
     if (!is_cursed(r2->attribs, C_ASTRALBLOCK, 0)) {
       for (u = r2->units; u; u = u->next) {
-        if (u_race(u) != new_race[RC_SPECIAL] && u_race(u) != new_race[RC_SPELL])
+          if (u_race(u) != get_race(RC_SPECIAL) && u_race(u) != get_race(RC_SPELL))
           n++;
       }
     }
@@ -5538,7 +5538,7 @@ int sp_showastral(castorder * co)
     for (rl2 = rl; rl2; rl2 = rl2->next) {
       if (!is_cursed(rl2->data->attribs, C_ASTRALBLOCK, 0)) {
         for (u = rl2->data->units; u; u = u->next) {
-          if (u_race(u) != new_race[RC_SPECIAL] && u_race(u) != new_race[RC_SPELL]) {
+            if (u_race(u) != get_race(RC_SPECIAL) && u_race(u) != get_race(RC_SPELL)) {
             c++;
             scat(unitname(u));
             scat(" (");
@@ -5596,7 +5596,7 @@ int sp_viewreality(castorder * co)
     region *rt = rl2->data;
     if (!is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
       u =
-        create_unit(rt, mage->faction, RS_FARVISION, new_race[RC_SPELL], 0,
+          create_unit(rt, mage->faction, RS_FARVISION, get_race(RC_SPELL), 0,
         "spell/viewreality", NULL);
       set_level(u, SK_PERCEPTION, co->level / 2);
       u->age = 2;
@@ -5678,7 +5678,7 @@ int sp_disruptastral(castorder * co)
 
     if (trl != NULL) {
       for (u = r2->units; u; u = u->next) {
-        if (u_race(u) != new_race[RC_SPELL]) {
+          if (u_race(u) != get_race(RC_SPELL)) {
           region_list *trl2 = trl;
           region *tr;
           int c = rng_int() % inhab_regions;

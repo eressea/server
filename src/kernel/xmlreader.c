@@ -578,6 +578,7 @@ static int parse_ships(xmlDocPtr doc)
   return 0;
 }
 
+#if 0
 static void race_compat(void)
 {
   /* required for old_race, do not change order! */
@@ -612,6 +613,7 @@ static void race_compat(void)
     }
   }
 }
+#endif
 
 static potion_type *xml_readpotion(xmlXPathContextPtr xpath, item_type * itype)
 {
@@ -1883,7 +1885,6 @@ static int parse_races(xmlDocPtr doc)
 
   xmlXPathFreeContext(xpath);
 
-  race_compat();
   return 0;
 }
 

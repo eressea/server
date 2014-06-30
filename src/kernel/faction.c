@@ -252,13 +252,14 @@ unit *addplayer(region * r, faction * f)
   equip_unit(u, get_equipment(buffer));
   u->hp = unit_max_hp(u) * u->number;
   fset(u, UFL_ISNEW);
-  if (f->race == new_race[RC_DAEMON]) {
+  if (f->race == get_race(RC_DAEMON)) {
     race_t urc;
+    race *rc;
     do {
       urc = (race_t) (rng_int() % MAXRACES);
-    } while (new_race[urc] == NULL || urc == RC_DAEMON
-      || !playerrace(new_race[urc]));
-    u->irace = new_race[urc];
+      rc = get_race(urc);
+    } while (rc == NULL || urc == RC_DAEMON || !playerrace(rc));
+    u->irace = rc;
   }
 
   return u;

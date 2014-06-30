@@ -126,7 +126,7 @@ static unit *unitorders(FILE * F, int enc, struct faction *f)
   i = getid();
   u = findunitg(i, NULL);
 
-  if (u && u_race(u) == new_race[RC_SPELL])
+  if (u && u_race(u) == get_race(RC_SPELL))
     return NULL;
   if (u && u->faction == f) {
     order **ordp;

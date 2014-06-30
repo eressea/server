@@ -95,7 +95,7 @@ bool is_migrant(unit * u)
     return false;
   if (is_familiar(u))
     return false;
-  if (u_race(u) == new_race[RC_TOAD])
+  if (u_race(u) == get_race(RC_TOAD))
     return false;
 
   return true;
@@ -104,7 +104,7 @@ bool is_migrant(unit * u)
 /* ------------------------------------------------------------- */
 bool magic_lowskill(unit * u)
 {
-  return (u_race(u) == new_race[RC_TOAD]) ? true : false;
+  return (u_race(u) == get_race(RC_TOAD)) ? true : false;
 }
 
 /* ------------------------------------------------------------- */
@@ -574,7 +574,7 @@ int learn_cmd(unit * u, order * ord)
   }
 
   /* snotlings koennen Talente nur bis T8 lernen */
-  if (u_race(u) == new_race[RC_SNOTLING]) {
+  if (u_race(u) == get_race(RC_SNOTLING)) {
     if (get_level(u, sk) >= 8) {
       cmistake(u, ord, 308, MSG_EVENT);
       return 0;

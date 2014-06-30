@@ -102,7 +102,6 @@ struct settings global = {
 bool lomem = false;
 FILE *logfile;
 FILE *updatelog;
-const struct race *new_race[MAXRACES];
 bool battledebug = false;
 int turn = -1;
 
@@ -245,7 +244,7 @@ int LongHunger(const struct unit *u)
     if (!fval(u, UFL_HUNGER))
       return false;
 #ifdef NEW_DAEMONHUNGER_RULE
-    if (u_race(u) == new_race[RC_DAEMON])
+    if (u_race(u) == get_race(RC_DAEMON))
       return false;
 #endif
   }
@@ -284,8 +283,7 @@ race_t old_race(const struct race * rc)
 {
   race_t i;
   for (i = 0; i != MAXRACES; ++i) {
-    if (new_race[i] == rc)
-      return i;
+      if (get_race(i) == rc)  return i;
   }
   return NORACE;
 }
@@ -434,7 +432,7 @@ int max_magicians(const faction * f)
   if ((a = a_find(f->attribs, &at_maxmagicians)) != NULL) {
     m = a->data.i;
   }
-  if (f->race == new_race[RC_ELF])
+  if (f->race == get_race(RC_ELF))
     ++m;
   return m;
 }
@@ -591,7 +589,7 @@ void verify_data(void)
         log_warning("Einheit %s hat %d Personen\n", unitid(u), u->number);
       }
     }
-    if (f->no != 0 && ((mage > 3 && f->race != new_race[RC_ELF]) || mage > 4))
+    if (f->no != 0 && ((mage > 3 && f->race != get_race(RC_ELF)) || mage > 4))
       log_error("Partei %s hat %d Magier.\n", factionid(f), mage);
     if (alchemist > 3)
       log_error("Partei %s hat %d Alchemisten.\n", factionid(f), alchemist);
@@ -1075,7 +1073,7 @@ int count_maxmigrants(const faction * f)
   }
   if (migrants == INT_MAX) {
     int x = 0;
-    if (f->race == new_race[RC_HUMAN]) {
+    if (f->race == get_race(RC_HUMAN)) {
       int nsize = count_all(f);
       if (nsize > 0) {
         x = (int)(log10(nsize / 50.0) * 20);
@@ -2078,8 +2076,8 @@ void remove_empty_units_in_region(region * r)
         }
       }
     }
-    if ((u->number == 0 && u_race(u) != new_race[RC_SPELL]) || (u->age <= 0
-        && u_race(u) == new_race[RC_SPELL])) {
+    if ((u->number == 0 && u_race(u) != get_race(RC_SPELL)) || (u->age <= 0
+        && u_race(u) == get_race(RC_SPELL))) {
       remove_unit(up, u);
     }
     if (*up == u)
@@ -2502,7 +2500,7 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
 
   if (f != NULL) {
     int index = 0;
-    if (rc == new_race[RC_ORC] || rc == new_race[RC_SNOTLING]) {
+    if (rc == get_race(RC_ORC) || rc == get_race(RC_SNOTLING)) {
       index = 1;
     }
     wage = wagetable[esize][index];

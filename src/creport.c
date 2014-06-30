@@ -1534,7 +1534,7 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
   fprintf(F, "%d;Anzahl Personen\n", count_all(f));
   fprintf(F, "\"%s\";Magiegebiet\n", magic_school[f->magiegebiet]);
 
-  if (f->race == new_race[RC_HUMAN]) {
+  if (f->race == get_race(RC_HUMAN)) {
     fprintf(F, "%d;Anzahl Immigranten\n", count_migrants(f));
     fprintf(F, "%d;Max. Immigranten\n", count_maxmigrants(f));
   }

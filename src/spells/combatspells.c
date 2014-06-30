@@ -832,7 +832,7 @@ int sp_wolfhowl(struct castorder * co)
   attrib *a;
   message *msg;
   int force = (int)(get_force(power, 3) / 2);
-  const race * rc = new_race[RC_WOLF];
+  const race * rc = get_race(RC_WOLF);
   if (force>0) {
     unit *u =
       create_unit(r, mage->faction, force, rc, 0, NULL, mage);
@@ -876,7 +876,7 @@ int sp_shadowknights(struct castorder * co)
   message *msg;
 
   u =
-    create_unit(r, mage->faction, force, new_race[RC_SHADOWKNIGHT], 0, NULL,
+      create_unit(r, mage->faction, force, get_race(RC_SHADOWKNIGHT), 0, NULL,
     mage);
   setstatus(u, ST_FIGHT);
 
@@ -1556,7 +1556,7 @@ int sp_reanimate(struct castorder * co)
   while (healable--) {
     fighter *tf = select_corpse(b, fi);
     if (tf != NULL && tf->side->casualties > 0
-      && u_race(tf->unit) != new_race[RC_DAEMON]
+        && u_race(tf->unit) != get_race(RC_DAEMON)
       && (chance(c))) {
       assert(tf->alive < tf->unit->number);
       /* t.fighter->person[].hp beginnt mit t.index = 0 zu zählen,
@@ -1739,7 +1739,7 @@ int sp_undeadhero(struct castorder * co)
 
       if (j > 0) {
         unit *u =
-          create_unit(r, mage->faction, 0, new_race[RC_UNDEAD], 0, du->name,
+            create_unit(r, mage->faction, 0, get_race(RC_UNDEAD), 0, du->name,
           du);
 
         /* new units gets some stats from old unit */

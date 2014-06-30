@@ -295,7 +295,7 @@ int walkingcapacity(const struct unit *u)
 
   n = wagen_mit_pferden * vcap;
 
-  if (u_race(u) == new_race[RC_TROLL]) {
+  if (u_race(u) == get_race(RC_TROLL)) {
     /* 4 Trolle ziehen einen Wagen. */
     /* Unbesetzte Wagen feststellen */
     wagen_ohne_pferde = vehicles - wagen_mit_pferden;
@@ -351,7 +351,7 @@ static int canwalk(unit * u)
   get_transporters(u->items, &animals, &acap, &vehicles, &vcap);
 
   maxwagen = effskill(u, SK_RIDING) * u->number * 2;
-  if (u_race(u) == new_race[RC_TROLL]) {
+  if (u_race(u) == get_race(RC_TROLL)) {
     maxwagen = _max(maxwagen, u->number / 4);
   }
   maxpferde = effskill(u, SK_RIDING) * u->number * 4 + u->number;
@@ -622,7 +622,7 @@ ship *move_ship(ship * sh, region * from, region * to, region_list * route)
 
 static bool is_freezing(const unit * u)
 {
-  if (u_race(u) != new_race[RC_INSECT])
+    if (u_race(u) != get_race(RC_INSECT))
     return false;
   if (is_cursed(u->attribs, C_KAELTESCHUTZ, 0))
     return false;
@@ -1547,7 +1547,7 @@ static const region_list *travel_route(unit * u,
     }
 
     /* unit is an insect and cannot move into a glacier */
-    if (u_race(u) == new_race[RC_INSECT]) {
+    if (u_race(u) == get_race(RC_INSECT)) {
       if (r_insectstalled(next) && is_freezing(u)) {
         ADDMSG(&u->faction->msgs, msg_message("detectforbidden",
             "unit region", u, next));

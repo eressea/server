@@ -1289,7 +1289,7 @@ static void statistics(FILE * F, const region * r, const faction * f)
     msg_release(m);
   }
   if (production(r) && (!fval(r->terrain, SEA_REGION)
-      || f->race == new_race[RC_AQUARIAN])) {
+      || f->race == get_race(RC_AQUARIAN))) {
     if (markets_module()) {     /* hack */
       m =
         msg_message("nr_stat_salary_new", "max", wage(r, NULL, NULL, turn + 1));
@@ -2199,7 +2199,7 @@ report_plaintext(const char *filename, report_context * ctx,
   nr_render(m, f->locale, buf, sizeof(buf), f);
   msg_release(m);
   centre(F, buf, true);
-  if (f->race == new_race[RC_HUMAN]) {
+  if (f->race == get_race(RC_HUMAN)) {
     int maxmig = count_maxmigrants(f);
     if (maxmig > 0) {
       m =
@@ -2238,7 +2238,7 @@ report_plaintext(const char *filename, report_context * ctx,
   }
 
   /* Insekten-Winter-Warnung */
-  if (f->race == new_race[RC_INSECT]) {
+  if (f->race == get_race(RC_INSECT)) {
     if (thisseason == 0) {
       centre(F, LOC(f->locale, "nr_insectwinter"), true);
       rnl(F);

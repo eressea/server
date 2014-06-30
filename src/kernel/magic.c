@@ -1029,7 +1029,7 @@ spellpower(region * r, unit * u, const spell * sp, int cast_level, struct order 
 
     elf_power = get_param_int(global.parameters, "rules.magic.elfpower", 0);
 
-    if (elf_power && u_race(u) == new_race[RC_ELF] && r_isforest(r)) {
+    if (elf_power && u_race(u) == get_race(RC_ELF) && r_isforest(r)) {
         ++force;
     }
     rtype = rt_find("rop");
@@ -1370,7 +1370,7 @@ static void do_fumble(castorder * co)
             duration = rng_int() % level / 2;
             if (duration < 2) duration = 2;
             add_trigger(&u->attribs, "timer", trigger_timeout(duration, trestore));
-            u_setrace(u, new_race[RC_TOAD]);
+            u_setrace(u, get_race(RC_TOAD));
             u->irace = NULL;
             ADDMSG(&r->msgs, msg_message("patzer6", "unit region spell", u, r, sp));
             break;
@@ -2594,7 +2594,7 @@ static castorder *cast_cmd(unit * u, order * ord)
    * normalerweise nur Meermenschen, ausgenommen explizit als
    * OCEANCASTABLE deklarierte Sprüche */
   if (fval(r->terrain, SEA_REGION)) {
-    if (u_race(u) != new_race[RC_AQUARIAN]
+      if (u_race(u) != get_race(RC_AQUARIAN)
       && !fval(u_race(u), RCF_SWIM)
       && !(sp->sptyp & OCEANCASTABLE)) {
       /* Fehlermeldung */
@@ -2732,10 +2732,10 @@ void magic(void)
     for (u = r->units; u; u = u->next) {
       order *ord;
 
-      if (u->number <= 0 || u_race(u) == new_race[RC_SPELL])
+      if (u->number <= 0 || u_race(u) == get_race(RC_SPELL))
         continue;
 
-      if (u_race(u) == new_race[RC_INSECT] && r_insectstalled(r) &&
+      if (u_race(u) == get_race(RC_INSECT) && r_insectstalled(r) &&
         !is_cursed(u->attribs, C_KAELTESCHUTZ, 0))
         continue;
 

@@ -1527,7 +1527,7 @@ static void prepare_reports(void)
         prepare_lighthouse(u->building, u->faction);
       }
 
-      if (u_race(u) != new_race[RC_SPELL] || u->number == RS_FARVISION) {
+      if (u_race(u) != get_race(RC_SPELL) || u->number == RS_FARVISION) {
         if (fval(u, UFL_DISBELIEVES)) {
           add_seen(u->faction->seen, r, see_unit, true);
         } else {
