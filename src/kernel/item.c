@@ -109,14 +109,14 @@ static int res_changeitem(unit * u, const resource_type * rtype, int delta)
     if (delta % GOLEM_STONE != 0)
       --reduce;
     scale_number(u, u->number + reduce);
-    num = u->number;
+    num = u->number * GOLEM_STONE;
   } else if (rtype == get_resourcetype(R_IRON)
       && u_race(u) == get_race(RC_IRONGOLEM) && delta <= 0) {
     int reduce = delta / GOLEM_IRON;
     if (delta % GOLEM_IRON != 0)
       --reduce;
     scale_number(u, u->number + reduce);
-    num = u->number;
+    num = u->number * GOLEM_IRON;
   } else {
     const item_type *itype = resource2item(rtype);
     item *i;
@@ -711,10 +711,11 @@ mod_elves_only(const unit * u, const region * r, skill_t sk, int value)
 static int
 mod_dwarves_only(const unit * u, const region * r, skill_t sk, int value)
 {
-    if (u_race(u) == get_race(RC_DWARF))
+    unused_arg(r);
+    if (u->faction->race == get_race(RC_DWARF)) {
         return value;
-  unused_arg(r);
-  return -118;
+    }
+    return -118;
 }
 
 static int heal(unit * user, int effect)
