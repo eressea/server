@@ -1437,12 +1437,12 @@ static int parse_spellbooks(xmlDocPtr doc)
 
 static int parse_spells(xmlDocPtr doc)
 {
+  pf_generic cast = 0;
+  pf_generic fumble = 0;
   xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
   xmlXPathObjectPtr spells;
   char zText[32];
   strcpy(zText, "fumble_");
-  pf_generic cast = 0;
-  pf_generic fumble = 0;
 
   /* reading eressea/spells/spell */
   spells = xmlXPathEvalExpression(BAD_CAST "/eressea/spells/spell", xpath);
