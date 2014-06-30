@@ -230,29 +230,6 @@ item_type *it_get_or_create(resource_type *rtype) {
     return itype;
 }
 
-item_type *new_itemtype(resource_type * rtype,
-  int iflags, int weight, int capacity)
-{
-    item_type *itype;
-
-    assert(!rtype->itype);
-    assert(!rtype->uchange || rtype->uchange==res_changeitem);
-    
-    itype = calloc(sizeof(item_type), 1);
-    
-    itype->rtype = rtype;
-    itype->weight = weight;
-    itype->capacity = capacity;
-    itype->flags |= iflags;
-    it_register(itype);
-    
-    rtype->itype = itype;
-    rtype->flags |= RTF_ITEM;
-    rtype->uchange = res_changeitem;
-    
-    return itype;
-}
-
 static void lt_register(luxury_type * ltype)
 {
   ltype->itype->rtype->ltype = ltype;
