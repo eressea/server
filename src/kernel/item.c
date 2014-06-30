@@ -948,10 +948,6 @@ static void init_oldpotions(void)
   }
 }
 
-static const char *names[] = {
-  "money", "person", "permaura", "hp", "peasant", "aura", "unit",
-};
-
 void init_resources(void)
 {
     resource_type *rtype;
