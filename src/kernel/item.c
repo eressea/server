@@ -139,8 +139,8 @@ const char *resourcename(const resource_type * rtype, int flags)
 
     if (flags & NMF_PLURAL)
       i = 1;
-    if (flags & NMF_APPEARANCE && rtype->_appearance[i]) {
-      return rtype->_appearance[i];
+    if (flags & NMF_APPEARANCE && rtype->itype && rtype->itype->_appearance[i]) {
+      return rtype->itype->_appearance[i];
     }
     return rtype->_name[i];
   }
@@ -342,8 +342,8 @@ potion_type *new_potiontype(item_type * itype, int level)
 
 void it_set_appearance(item_type *itype, const char *appearance) {
     assert(itype && itype->rtype);
-    itype->rtype->_appearance[0] = _strdup(appearance);
-    itype->rtype->_appearance[1] = appearance ?
+    itype->_appearance[0] = _strdup(appearance);
+    itype->_appearance[1] = appearance ?
         strcat(strcpy((char *)malloc(strlen((char *)appearance) + 3), (char *)appearance), "_p") : 0;
 }
 
@@ -1172,6 +1172,8 @@ int free_itype_cb(const void * match, const void * key, size_t keylen, void *cbd
   item_type *itype;
   cb_get_kv(match, &itype, sizeof(itype));
   free(itype->construction);
+  free(itype->_appearance[0]);
+  free(itype->_appearance[1]);
   free(itype);
   return 0;
 }
@@ -1181,8 +1183,6 @@ int free_rtype_cb(const void * match, const void * key, size_t keylen, void *cbd
   cb_get_kv(match, &rtype, sizeof(rtype));
   free(rtype->_name[0]);
   free(rtype->_name[1]);
-  free(rtype->_appearance[0]);
-  free(rtype->_appearance[1]);
   free(rtype);
   return 0;
 }

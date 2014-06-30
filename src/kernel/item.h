@@ -65,7 +65,6 @@ extern "C" {
   typedef struct resource_type {
     /* --- constants --- */
     char *_name[2];             /* wie es heißt */
-    char *_appearance[2];       /* wie es für andere aussieht */
     unsigned int flags;
     /* --- functions --- */
     rtype_uchange uchange;
@@ -132,6 +131,7 @@ extern "C" {
     int weight;
     int capacity;
     struct construction *construction;
+    char *_appearance[2];       /* wie es für andere aussieht */
     /* --- functions --- */
      bool(*canuse) (const struct unit * user,
       const struct item_type * itype);
