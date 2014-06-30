@@ -777,13 +777,12 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
 
     /* Die Einheit befindet sich automatisch im Inneren der neuen Burg. */
     if (u->number && leave(u, false)) {
-      u_set_building(u, b);
-      assert(building_owner(b)==u);
+        u_set_building(u, b);
     }
 #ifdef WDW_PYRAMID
     if (b->type == bt_find("pyramid") && f_get_alliance(u->faction) != NULL) {
-      attrib *a = a_add(&b->attribs, a_new(&at_alliance));
-      a->data.i = u->faction->alliance->id;
+        attrib *a = a_add(&b->attribs, a_new(&at_alliance));
+        a->data.i = u->faction->alliance->id;
     }
 #endif
   }
