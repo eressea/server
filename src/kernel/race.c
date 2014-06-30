@@ -61,6 +61,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /** external variables **/
 race *races;
 int num_races = 0;
+static int cache_breaker;
 
 static const char *racenames[MAXRACES] = {
     "dwarf", "elf", NULL, "goblin", "human", "troll", "demon", "insect",
@@ -76,10 +77,23 @@ static const char *racenames[MAXRACES] = {
     "clone"
 };
 
+static race * race_cache[MAXRACES];
+
 struct race *get_race(race_t rt) {
-    assert(rt < MAXRACES);
-    if (racenames[rt]) {
-        return rc_get_or_create(racenames[rt]);
+    static int cache = -1;
+    if (cache_breaker != cache) {
+        cache = cache_breaker;
+        memset(race_cache, 0, sizeof(race_cache));
+        assert(rt < MAXRACES);
+        if (racenames[rt]) {
+            return race_cache[rt] = rc_get_or_create(racenames[rt]);
+        }
+    } else {
+        race * result = race_cache[rt];
+        if (!result) {
+            result = race_cache[rt] = rc_get_or_create(racenames[rt]);
+        }
+        return result;
     }
     return 0;
 }
@@ -180,6 +194,7 @@ race *rc_get_or_create(const char *zName)
         rc->attack[0].type = AT_COMBATSPELL;
         rc->attack[1].type = AT_NONE;
         rc->index = num_races++;
+        ++cache_breaker;
         rc->next = races;
         return races = rc;
     }
