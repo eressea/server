@@ -204,6 +204,7 @@ static void test_buildings(CuTest * tc)
     CuAssertPtrNotNull(tc, bt->construction);
     CuAssertPtrNotNull(tc, bt->construction->materials);
     CuAssertIntEquals(tc, 2, bt->construction->materials[0].number);
+    CuAssertDblEquals(tc, 0.5f, bt->construction->materials[0].recycle, 0.0f);
     CuAssertPtrEquals(tc, (void *)get_resourcetype(R_STONE), (void *)bt->construction->materials[0].rtype);
     CuAssertIntEquals(tc, 1, bt->construction->materials[1].number);
     CuAssertPtrEquals(tc, (void *)get_resourcetype(R_IRON), (void *)bt->construction->materials[1].rtype);
