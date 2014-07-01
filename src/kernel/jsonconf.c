@@ -52,7 +52,7 @@ without prior permission by the authors of Eressea.
 #include <stdlib.h>
 #include <string.h>
 
-int json_flags(cJSON *json, const char *flags[]) {
+static int json_flags(cJSON *json, const char *flags[]) {
     cJSON *entry;
     int result = 0;
     assert(json->type==cJSON_Array);
@@ -69,15 +69,46 @@ int json_flags(cJSON *json, const char *flags[]) {
     return result;
 }
 
-void json_construction(cJSON *json, construction **consp) {
+static void json_requirements(cJSON *json, requirement **matp) {
     cJSON *child;
-    if (json->type!=cJSON_Object) {
+    int i;
+    requirement *mat = calloc(sizeof(requirement), 1+cJSON_GetArraySize(json));
+    for (i=0,child=json->child;child;child=child->next,++i) {
+        mat[i].number = child->valueint;
+        mat[i].recycle = 0.5f;
+        mat[i].rtype = rt_get_or_create(child->string);
+    }
+    *matp = mat;
+}
+
+static void json_construction(cJSON *json, construction **consp) {
+    cJSON *child;
+    if (json->type==cJSON_Array) {
+        int size = 0;
+        for (child=json->child;child;child=child->next) {
+            construction *cons = 0;
+            json_construction(child, &cons);
+            if (cons) {
+                cons->maxsize -= size;
+                size += cons->maxsize + size;
+                *consp = cons;
+                consp = &cons->improvement;
+            }
+        }
+        return;
+    }
+    if (json->type != cJSON_Object) {
         log_error_n("building %s is not a json object: %d", json->string, json->type);
         return;
     }
     construction * cons = (construction *)calloc(sizeof(construction), 1);
     for (child=json->child;child;child=child->next) {
         switch(child->type) {
+        case cJSON_Object:
+            if (strcmp(child->string, "materials")==0) {
+                json_requirements(child, &cons->materials);
+            }
+            break;
         case cJSON_Number:
             if (strcmp(child->string, "maxsize")==0) {
                 cons->maxsize = child->valueint;
@@ -96,7 +127,7 @@ void json_construction(cJSON *json, construction **consp) {
     *consp = cons;
 }
 
-void json_terrain(cJSON *json, terrain_type *ter) {
+static void json_terrain(cJSON *json, terrain_type *ter) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
         log_error_n("terrain %s is not a json object: %d", json->string, json->type);
@@ -120,7 +151,7 @@ void json_terrain(cJSON *json, terrain_type *ter) {
     }
 }
 
-void json_building(cJSON *json, building_type *bt) {
+static void json_building(cJSON *json, building_type *bt) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
         log_error_n("building %s is not a json object: %d", json->string, json->type);
@@ -128,6 +159,11 @@ void json_building(cJSON *json, building_type *bt) {
     }
     for (child=json->child;child;child=child->next) {
         switch(child->type) {
+        case cJSON_Array:
+            if (strcmp(child->string, "construction")==0) {
+                json_construction(child, &bt->construction);
+            }
+            break;
         case cJSON_Object:
             if (strcmp(child->string, "construction")==0) {
                 json_construction(child, &bt->construction);
@@ -147,7 +183,7 @@ void json_building(cJSON *json, building_type *bt) {
     }
 }
 
-void json_item(cJSON *json, item_type *itype) {
+static void json_item(cJSON *json, item_type *itype) {
     cJSON *child;
     const char *flags[] = {
         "herb", "cursed", "nodrop", "big", "animal", "vehicle", 0
@@ -182,7 +218,7 @@ void json_item(cJSON *json, item_type *itype) {
     }
 }
 
-void json_ship(cJSON *json, ship_type *st) {
+static void json_ship(cJSON *json, ship_type *st) {
     cJSON *child, *iter;
     if (json->type!=cJSON_Object) {
         log_error_n("ship %s is not a json object: %d", json->string, json->type);
@@ -224,7 +260,7 @@ void json_ship(cJSON *json, ship_type *st) {
     }
 }
 
-void json_race(cJSON *json, race *rc) {
+static void json_race(cJSON *json, race *rc) {
     cJSON *child;
     const char *flags[] = {
         "playerrace", "killpeasants", "scarepeasants",
@@ -288,7 +324,7 @@ void json_race(cJSON *json, race *rc) {
     }
 }
 
-void json_terrains(cJSON *json) {
+static void json_terrains(cJSON *json) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
         log_error_n("terrains is not a json object: %d", json->type);
@@ -299,7 +335,7 @@ void json_terrains(cJSON *json) {
     }
 }
 
-void json_buildings(cJSON *json) {
+static void json_buildings(cJSON *json) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
         log_error_n("buildings is not a json object: %d", json->type);
@@ -310,7 +346,7 @@ void json_buildings(cJSON *json) {
     }
 }
 
-void json_items(cJSON *json) {
+static void json_items(cJSON *json) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
         log_error_n("items is not a json object: %d", json->type);
@@ -326,7 +362,7 @@ void json_items(cJSON *json) {
     }
 }
 
-void json_ships(cJSON *json) {
+static void json_ships(cJSON *json) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
         log_error_n("ships is not a json object: %d", json->type);
@@ -337,7 +373,7 @@ void json_ships(cJSON *json) {
     }
 }
 
-void json_locale(cJSON *json, struct locale *lang) {
+static void json_locale(cJSON *json, struct locale *lang) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
         log_error_n("strings is not a json object: %d", json->type);
@@ -350,7 +386,7 @@ void json_locale(cJSON *json, struct locale *lang) {
     }
 }
 
-void json_strings(cJSON *json) {
+static void json_strings(cJSON *json) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
         log_error_n("strings is not a json object: %d", json->type);
@@ -390,7 +426,7 @@ static void json_direction(cJSON *json, struct locale *lang) {
     }
 }
 
-void json_directions(cJSON *json) {
+static void json_directions(cJSON *json) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
         log_error_n("directions is not a json object: %d", json->type);
@@ -462,7 +498,7 @@ static void json_keyword(cJSON *json, struct locale *lang) {
     }
 }
 
-void json_skills(cJSON *json) {
+static void json_skills(cJSON *json) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
         log_error_n("skills is not a json object: %d", json->type);
@@ -474,7 +510,7 @@ void json_skills(cJSON *json) {
     }
 }
 
-void json_keywords(cJSON *json) {
+static void json_keywords(cJSON *json) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
         log_error_n("keywords is not a json object: %d", json->type);
@@ -486,7 +522,7 @@ void json_keywords(cJSON *json) {
     }
 }
 
-void json_races(cJSON *json) {
+static void json_races(cJSON *json) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
         log_error_n("races is not a json object: %d", json->type);
