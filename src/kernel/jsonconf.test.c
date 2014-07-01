@@ -151,11 +151,43 @@ static void test_ships(CuTest * tc)
     test_cleanup();
 }
 
+static void test_castles(CuTest *tc) {
+    const char * data = "{\"buildings\": { \"castle\" : { "
+        "\"construction\" : ["
+        "{ \"maxsize\" : 2 },"
+        "{ \"maxsize\" : 8 }"
+        "]}}}";
+
+    cJSON *json = cJSON_Parse(data);
+    const building_type *bt;
+
+    test_cleanup();
+
+    CuAssertPtrNotNull(tc, json);
+    CuAssertPtrEquals(tc, 0, buildingtypes);
+    json_config(json);
+
+    CuAssertPtrNotNull(tc, buildingtypes);
+    bt = bt_find("castle");
+    CuAssertPtrNotNull(tc, bt);
+    CuAssertPtrNotNull(tc, bt->construction);
+    CuAssertIntEquals(tc, 2, bt->construction->maxsize);
+    CuAssertPtrNotNull(tc, bt->construction->improvement);
+    CuAssertIntEquals(tc, 6, bt->construction->improvement->maxsize);
+    CuAssertPtrEquals(tc, 0, bt->construction->improvement->improvement);
+}
+
 static void test_buildings(CuTest * tc)
 {
     const char * data = "{\"buildings\": { \"house\" : { "
-        "\"construction\" : { \"maxsize\" : 20, \"reqsize\" : 10, \"minskill\" : 1 }"
-        "}}}";
+        "\"construction\" : {"
+        "\"maxsize\" : 20,"
+        "\"reqsize\" : 10,"
+        "\"minskill\" : 1,"
+        "\"materials\" : {"
+        "\"stone\" : 2,"
+        "\"iron\" : 1"
+        "}}}}}";
 
     cJSON *json = cJSON_Parse(data);
     const building_type *bt;
@@ -170,9 +202,16 @@ static void test_buildings(CuTest * tc)
     bt = bt_find("house");
     CuAssertPtrNotNull(tc, bt);
     CuAssertPtrNotNull(tc, bt->construction);
+    CuAssertPtrNotNull(tc, bt->construction->materials);
+    CuAssertIntEquals(tc, 2, bt->construction->materials[0].number);
+    CuAssertPtrEquals(tc, (void *)get_resourcetype(R_STONE), (void *)bt->construction->materials[0].rtype);
+    CuAssertIntEquals(tc, 1, bt->construction->materials[1].number);
+    CuAssertPtrEquals(tc, (void *)get_resourcetype(R_IRON), (void *)bt->construction->materials[1].rtype);
+    CuAssertIntEquals(tc, 0, bt->construction->materials[2].number);
     CuAssertIntEquals(tc, 10, bt->construction->reqsize);
     CuAssertIntEquals(tc, 20, bt->construction->maxsize);
     CuAssertIntEquals(tc, 1, bt->construction->minskill);
+    CuAssertPtrEquals(tc, 0, bt->construction->improvement);
     test_cleanup();
 }
 
@@ -288,6 +327,7 @@ CuSuite *get_jsonconf_suite(void)
     SUITE_ADD_TEST(suite, test_items);
     SUITE_ADD_TEST(suite, test_ships);
     SUITE_ADD_TEST(suite, test_buildings);
+    SUITE_ADD_TEST(suite, test_castles);
     SUITE_ADD_TEST(suite, test_terrains);
     SUITE_ADD_TEST(suite, test_races);
     SUITE_ADD_TEST(suite, test_strings);
