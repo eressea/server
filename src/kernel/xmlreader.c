@@ -122,7 +122,6 @@ xml_readrequirements(xmlNodePtr * nodeTab, int nodeNr, requirement ** reqArray)
     xmlChar *propValue;
 
     radd->number = xml_ivalue(node, "quantity", 1);
-    radd->recycle = xml_fvalue(node, "recycle", 0.5);
 
     propValue = xmlGetProp(node, BAD_CAST "type");
     radd->rtype = rt_get_or_create((const char *)propValue);

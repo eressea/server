@@ -75,7 +75,6 @@ static void json_requirements(cJSON *json, requirement **matp) {
     requirement *mat = calloc(sizeof(requirement), 1+cJSON_GetArraySize(json));
     for (i=0,child=json->child;child;child=child->next,++i) {
         mat[i].number = child->valueint;
-        mat[i].recycle = 0.5f;
         mat[i].rtype = rt_get_or_create(child->string);
     }
     *matp = mat;
