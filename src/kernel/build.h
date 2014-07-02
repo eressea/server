@@ -37,7 +37,6 @@ extern "C" {
   typedef struct requirement {
     const struct resource_type *rtype;
     int number;
-    double recycle;             /* recycling quota */
   } requirement;
 
   typedef struct construction {

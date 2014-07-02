@@ -66,10 +66,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/matmod.h>
 #include <attributes/alliance.h>
 
-#define STONERECYCLE 50
-/* Name, MaxGroesse, MinBauTalent, Kapazitaet, {Eisen, Holz, Stein, BauSilber,
- * Laen, Mallorn}, UnterSilber, UnterSpezialTyp, UnterSpezial */
-
 struct building *getbuilding(const struct region *r)
 {
   building *b = findbuilding(getid());
@@ -240,7 +236,7 @@ int destroy_cmd(unit * u, struct order *ord)
     int c;
     for (c = 0; con->materials[c].number; ++c) {
       const requirement *rq = con->materials + c;
-      int recycle = (int)(rq->recycle * rq->number * size / con->reqsize);
+      int recycle = (rq->number * size / con->reqsize)/2;
       if (recycle) {
         change_resource(u, rq->rtype, recycle);
       }
