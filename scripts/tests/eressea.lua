@@ -347,13 +347,15 @@ function test_only_building_ownwer_can_set_not_paid()
   u2.building = mine
   u1:clear_orders()
   u2:clear_orders()
-  u2:add_order("Bezahle nicht")
-  process_orders()
-  assert_equal(0, u1:get_item("money"))
-  u2:clear_orders()
-  u1:add_item("money", 500)
+-- Test that Bezahle nicht is working  
   u1:add_order("Bezahle nicht")
   process_orders()
   assert_equal(500, u1:get_item("money"))
+  u1:clear_orders()
+-- Test that bug fix 0001976 is working 
+-- Bezahle nicht is not working
+  u2:add_order("Bezahle nicht")
+  process_orders()
+  assert_equal(0, u1:get_item("money"))
 end
 
