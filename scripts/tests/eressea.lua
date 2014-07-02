@@ -335,3 +335,25 @@ function test_stonegolems()
 -- end test Stone Golems four stones
 end
 
+function test_only_building_ownwer_can_set_not_paid()
+  local r = region.create(0, 0, "plain")
+  local f = faction.create("noreply@eressea.de", "human", "de")
+  local u1 = unit.create(f, r, 1)
+  local u2 = unit.create(f, r, 1)
+  local mine = building.create(r, "mine")
+  mine.size = 2
+  u1:add_item("money", 500)
+  u1.building = mine
+  u2.building = mine
+  u1:clear_orders()
+  u2:clear_orders()
+  u2:add_order("Bezahle nicht")
+  process_orders()
+  assert_equal(0, u1:get_item("money"))
+  u2:clear_orders()
+  u1:add_item("money", 500)
+  u1:add_order("Bezahle nicht")
+  process_orders()
+  assert_equal(500, u1:get_item("money"))
+end
+
