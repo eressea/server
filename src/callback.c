@@ -1,3 +1,5 @@
+#include <config.h>
+#include <platform.h>
 #include "callback.h"
 #include <stdlib.h>
 #include <string.h>
@@ -5,7 +7,7 @@
 static struct reg {
     struct reg * next;
     CALLBACK cb;
-    const char *name;
+    char *name;
 } *registry;
 
 CALLBACK create_callback(void (*cbv)(va_list va)) {
@@ -15,6 +17,12 @@ CALLBACK create_callback(void (*cbv)(va_list va)) {
 }
 
 void reset_callbacks(void) {
+    while(registry) {
+        struct reg *r = registry;
+        registry = r->next;
+        free(r->name);
+        free(r);
+    }
     registry = 0;
 }
 
@@ -22,7 +30,7 @@ CALLBACK register_callback(const char *name, void (*cbv)(va_list va))
 {
     struct reg * r = (struct reg *)malloc(sizeof(struct reg));
     r->next = registry;
-    r->name = name;
+    r->name = _strdup(name);
     r->cb.cbv = cbv;
     registry = r;
     return r->cb;
