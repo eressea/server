@@ -8,6 +8,7 @@
 #include "keyword.h"
 #include "race.h"
 #include "ship.h"
+#include "spell.h"
 #include "terrain.h"
 #include "util/language.h"
 #include <CuTest.h>
@@ -177,6 +178,26 @@ static void test_castles(CuTest *tc) {
     CuAssertPtrEquals(tc, 0, bt->construction->improvement->improvement);
 }
 
+static void test_spells(CuTest * tc)
+{
+    const char * data = "{\"spells\": { \"fireball\" : { \"syntax\" : \"u+\" } } }";
+
+    cJSON *json = cJSON_Parse(data);
+    const spell *sp;
+
+    test_cleanup();
+    CuAssertPtrNotNull(tc, json);
+    CuAssertPtrEquals(tc, 0, find_spell("fireball"));
+
+    json_config(json);
+    sp = find_spell("fireball");
+    CuAssertPtrNotNull(tc, sp);
+    CuAssertStrEquals(tc, "u+", sp->syntax);
+
+    test_cleanup();
+    CuAssertPtrEquals(tc, 0, find_spell("fireball"));
+}
+
 static void test_buildings(CuTest * tc)
 {
     const char * data = "{\"buildings\": { \"house\" : { "
@@ -331,6 +352,7 @@ CuSuite *get_jsonconf_suite(void)
     SUITE_ADD_TEST(suite, test_terrains);
     SUITE_ADD_TEST(suite, test_races);
     SUITE_ADD_TEST(suite, test_strings);
+    SUITE_ADD_TEST(suite, test_spells);
     SUITE_ADD_TEST(suite, test_flags);
     return suite;
 }
