@@ -1161,21 +1161,24 @@ int findoption(const char *s, const struct locale *lang)
 
 param_t findparam(const char *s, const struct locale * lang)
 {
-  param_t result = NOPARAM;
-  char buffer[64];
-  char * str = transliterate(buffer, sizeof(buffer)-sizeof(int), s);
-
-  if (str && *str) {
-    int i;
-    const void * match;
-    void **tokens = get_translations(lang, UT_PARAMS);
-    critbit_tree *cb = (critbit_tree *)*tokens;
-    if (cb_find_prefix(cb, str, strlen(str), &match, 1, 0)) {
-      cb_get_kv(match, &i, sizeof(int));
-      result = (param_t)i;
+    param_t result = NOPARAM;
+    char buffer[64];
+    char * str = transliterate(buffer, sizeof(buffer)-sizeof(int), s);
+    
+    if (str && *str) {
+        int i;
+        const void * match;
+        void **tokens = get_translations(lang, UT_PARAMS);
+        critbit_tree *cb = (critbit_tree *)*tokens;
+        if (!cb) {
+            log_error_n("no parameters defined in locale %s", locale_name(lang));
+        }
+        else if (cb_find_prefix(cb, str, strlen(str), &match, 1, 0)) {
+            cb_get_kv(match, &i, sizeof(int));
+            result = (param_t)i;
+        }
     }
-  }
-  return result;
+    return result;
 }
 
 param_t findparam_ex(const char *s, const struct locale * lang)

@@ -1,12 +1,6 @@
 #!/bin/sh
 git submodule update --init
-MACHINE=`uname -m`
-[ -z "$CC" ] && [ ! -z `which gcc` ] && CC="gcc"
-[ -z "$CC" ] && [ ! -z `which tcc` ] && CC="tcc"
-[ -z "$CC" ] && [ ! -z `which cc` ] && CC="cc"
-[ -z "$JOBS" ] && JOBS=$(nproc)
 
-BIN_DIR="build-$MACHINE-$CC-Debug"
 DISTCC=`which distcc`
 if [ ! -z "$DISTCC" ] ; then
 JOBS=`distcc -j`
@@ -19,8 +13,6 @@ fi
 fi
 echo "Building with $CC and $JOBS jobs"
 
-mkdir -p $BIN_DIR
-cd $BIN_DIR
-CC="$CC" ../s/cmake-init
+CC="$CC" s/cmake-init
 make -j$JOBS
 make test
