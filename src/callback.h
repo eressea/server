@@ -5,12 +5,12 @@
 
 typedef struct {
     void (*cbv)(va_list va);
-} CALLBACK;
+} HCALLBACK;
 
-CALLBACK register_callback(const char *name, void (*cbv)(va_list va));
-CALLBACK create_callback(void (*cbv)(va_list va));
-int find_callback(const char *name, CALLBACK *result);
-int call_callback(CALLBACK cb, const char *name, ...);
+HCALLBACK register_callback(const char *name, void(*cbv)(va_list va));
+HCALLBACK create_callback(void(*cbv)(va_list va));
+int find_callback(const char *name, HCALLBACK *result);
+int call_callback(HCALLBACK cb, const char *name, ...);
 void reset_callbacks(void);
 
 #endif

@@ -6,12 +6,12 @@
 
 static struct reg {
     struct reg * next;
-    CALLBACK cb;
+    HCALLBACK cb;
     char *name;
 } *registry;
 
-CALLBACK create_callback(void (*cbv)(va_list va)) {
-    CALLBACK cb;
+HCALLBACK create_callback(void(*cbv)(va_list va)) {
+    HCALLBACK cb;
     cb.cbv = cbv;
     return cb;
 }
@@ -26,7 +26,7 @@ void reset_callbacks(void) {
     registry = 0;
 }
 
-CALLBACK register_callback(const char *name, void (*cbv)(va_list va))
+HCALLBACK register_callback(const char *name, void(*cbv)(va_list va))
 {
     struct reg * r = (struct reg *)malloc(sizeof(struct reg));
     r->next = registry;
@@ -36,7 +36,7 @@ CALLBACK register_callback(const char *name, void (*cbv)(va_list va))
     return r->cb;
 }
 
-int find_callback(const char *name, CALLBACK *result) {
+int find_callback(const char *name, HCALLBACK *result) {
     if (result && name) {
         struct reg *r;
         for (r=registry;r;r=r->next) {
@@ -49,7 +49,7 @@ int find_callback(const char *name, CALLBACK *result) {
     return -1;
 }
 
-int call_callback(CALLBACK cb, const char *name, ... ) {
+int call_callback(HCALLBACK cb, const char *name, ...) {
     va_list ap;
     if (name) {
         int err = find_callback(name, &cb);

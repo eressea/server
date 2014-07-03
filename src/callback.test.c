@@ -9,7 +9,7 @@ void callback(va_list ap) {
 }
 
 static void test_find_callback(CuTest *tc) {
-    CALLBACK cb;
+    HCALLBACK cb;
     reset_callbacks();
     CuAssertIntEquals(tc, -1, find_callback("test", &cb));
     cb = register_callback("test", callback);
@@ -18,7 +18,7 @@ static void test_find_callback(CuTest *tc) {
 }
 
 static void test_call_by_handle(CuTest *tc) {
-    CALLBACK cb;
+    HCALLBACK cb;
     int x = 0;
     reset_callbacks();
     cb = create_callback(callback);
@@ -28,7 +28,8 @@ static void test_call_by_handle(CuTest *tc) {
 }
 
 static void test_call_by_name(CuTest *tc) {
-    CALLBACK cb, ca;
+    HCALLBACK cb = { 0 };
+    HCALLBACK ca = { 0 };
     int x = 0;
     reset_callbacks();
     CuAssertIntEquals(tc, -1, call_callback(cb, "test", 42, &x));
