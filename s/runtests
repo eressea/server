@@ -18,4 +18,4 @@ fi
 $ROOT/$BIN_DIR/eressea/test_eressea
 cd $ROOT
 $ROOT/$BIN_DIR/eressea/eressea -v0 scripts/runtests.lua
-cd -
+cd $OLDWPD

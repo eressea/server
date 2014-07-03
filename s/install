@@ -16,4 +16,4 @@ BIN_DIR="build-$MACHINE-$CC-Debug"
 
 cd $ROOT/$BIN_DIR
 make install
-cd -
+cd $OLDPWD
