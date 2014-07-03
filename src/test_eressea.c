@@ -3,6 +3,7 @@
 #include <util/log.h>
 
 CuSuite *get_tests_suite(void);
+CuSuite *get_callback_suite(void);
 CuSuite *get_jsonconf_suite(void);
 CuSuite *get_json_suite(void);
 CuSuite *get_economy_suite(void);
@@ -41,6 +42,7 @@ int RunAllTests(void)
 
   /* self-test */
   CuSuiteAddSuite(suite, get_tests_suite());
+  CuSuiteAddSuite(suite, get_callback_suite());
   CuSuiteAddSuite(suite, get_json_suite());
   CuSuiteAddSuite(suite, get_jsonconf_suite());
   CuSuiteAddSuite(suite, get_direction_suite());
