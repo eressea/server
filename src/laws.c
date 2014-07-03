@@ -1259,10 +1259,11 @@ int enter_ship(unit * u, struct order *ord, int id, int report)
   if (leave(u, false)) {
     u_set_ship(u, sh);
     fset(u, UFL_ENTER);
+    return 1;
   } else if (report) {
     cmistake(u, ord, 150, MSG_MOVE);
   }
-  return 1;
+  return 0;
 }
 
 int enter_building(unit * u, order * ord, int id, int report)
