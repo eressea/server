@@ -710,3 +710,25 @@ function test_golem_use_four_iron()
   assert_equal(4, u1:get_item("towershield"))
 end
 
+function test_building_owner_can_enter_ship()
+  local r1 = region.create(1, 2, "plain")    
+  local f1 = faction.create("noreply@tteessttiinngg.de", "human", "de")
+  local b1 = building.create(r1, "castle")    
+  b1.size = 10    
+  local s1 = ship.create(r1, "cutter")	    
+
+  local u1 = unit.create(f1, r1, 10)    
+  u1.building = b1    
+  u1:add_item("money", u1.number * 100)    
+  u1:clear_orders()    
+  u1:add_order("VERLASSEN")	
+  u1:add_order("BETRETE SCHIFF " .. itoa36(s1.id))    
+   
+  local u2 = unit.create(f1, r1, 10)    
+  u2.ship = s1    
+  u2:add_item("money", u1.number * 100)    
+  u2:clear_orders()    
+  process_orders()
+  assert_equal(s1.id, u1.ship.id)
+  assert_not_equal(b1.id, u1.ship.id, "BUG owner of the building can not go into a ship")
+end
