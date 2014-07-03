@@ -345,6 +345,35 @@ static void json_buildings(cJSON *json) {
     }
 }
 
+static void json_spells(cJSON *json) {
+    cJSON *child;
+    if (json->type != cJSON_Object) {
+        log_error_n("spells is not a json object: %d", json->type);
+        return;
+    }
+    for (child = json->child; child; child = child->next) {
+        if (child->type == cJSON_Object) {
+            spell *sp;
+            cJSON * item = cJSON_GetObjectItem(child, "index");
+            sp = create_spell(child->string, item ? item->valueint : 0);
+            for (item = child->child; item; item = item->next) {
+                if (strcmp(item->string, "index") == 0) {
+                    continue;
+                }
+                else if (strcmp(item->string, "cast") == 0) {
+                    sp->cast = (spell_f)get_function(item->valuestring);
+                }
+                else if (strcmp(item->string, "fumble") == 0) {
+                    sp->fumble = (fumble_f)get_function(item->valuestring);
+                }
+                else if (strcmp(item->string, "syntax") == 0) {
+                    sp->syntax = _strdup(item->valuestring);
+                }
+            }
+        }
+    }
+}
+
 static void json_items(cJSON *json) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
@@ -560,10 +589,13 @@ void json_config(cJSON *json) {
         else if (strcmp(child->string, "skills")==0) {
             json_skills(child);
         }
-        else if (strcmp(child->string, "buildings")==0) {
+        else if (strcmp(child->string, "buildings") == 0) {
             json_buildings(child);
         }
-        else if (strcmp(child->string, "terrains")==0) {
+        else if (strcmp(child->string, "spells") == 0) {
+            json_spells(child);
+        }
+        else if (strcmp(child->string, "terrains") == 0) {
             json_terrains(child);
         } else {
             log_error_n("config contains unknown attribute %s", child->string);
