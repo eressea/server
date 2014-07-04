@@ -59,6 +59,7 @@ ENDIF()
 
 set (ERESSEA_SRC
   eressea.c
+  callback.c
   direction.c
   keyword.c
   skill.c
@@ -146,6 +147,7 @@ set(TESTS_SRC
   test_eressea.c
   tests.c
   tests.test.c
+  callback.test.c
   direction.test.c
   keyword.test.c
   skill.test.c

@@ -14,11 +14,6 @@ done
 [ -z "$CC" ] && [ ! -z `which tcc` ] && CC="tcc"
 [ -z "$CC" ] && [ ! -z `which cc` ] && CC="cc"
 
-if [ ! -e ../CMakeLists.txt ]; then
-  echo "are you sure you are in the build directory?"
-  exit
-fi
-
 MACHINE=$(gcc -dumpmachine)
 rm -f CMakeCache.txt
 
@@ -41,4 +36,4 @@ cmake .. \
  -DCMAKE_INCLUDE_PATH=$INCLUDE_PATH \
  -DCMAKE_PREFIX_PATH=$PREFIX_PATH \
  -DCMAKE_INSTALL_PREFIX=$HOME/eressea $*
-cd -
+cd $OLDPWD

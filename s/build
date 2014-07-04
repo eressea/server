@@ -31,4 +31,4 @@ fi
 
 cd $ROOT/$BIN_DIR
 make $MAKEOPTS && make test
-cd -
+cd $OLDPWD
