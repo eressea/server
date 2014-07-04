@@ -9,10 +9,13 @@ while [ ! -d $ROOT/.git ]; do
 done
 
 [ -z $BUILD ] && BUILD=Debug
-
+MACHINE=`uname -m`
 [ -z "$CC" ] && [ ! -z `which gcc` ] && CC="gcc"
 [ -z "$CC" ] && [ ! -z `which tcc` ] && CC="tcc"
 [ -z "$CC" ] && [ ! -z `which cc` ] && CC="cc"
+BIN_DIR="build-$MACHINE-$CC-$BUILD"
+mkdir -p $BIN_DIR
+cd $BIN_DIR
 
 MACHINE=$(gcc -dumpmachine)
 rm -f CMakeCache.txt
@@ -37,3 +40,4 @@ cmake .. \
  -DCMAKE_PREFIX_PATH=$PREFIX_PATH \
  -DCMAKE_INSTALL_PREFIX=$HOME/eressea $*
 cd $OLDPWD
+
