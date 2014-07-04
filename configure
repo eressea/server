@@ -1,18 +1,4 @@
 #!/bin/sh
 git submodule update --init
-
-DISTCC=`which distcc`
-if [ ! -z "$DISTCC" ] ; then
-JOBS=`distcc -j`
-if [ -z "$JOBS" ] ; then
-JOBS=1
-elif [ $JOBS -gt 1 ] ; then
-CC="$DISTCC $CC"
-MAKEOPTS=-j$JOBS
-fi
-fi
-echo "Building with $CC and $JOBS jobs"
-
-CC="$CC" s/cmake-init
-make -j$JOBS
-make test
+s/cmake-init
+echo "configuration complete. run s/build to build the server"

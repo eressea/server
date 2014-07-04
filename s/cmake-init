@@ -17,11 +17,6 @@ BIN_DIR="build-$MACHINE-$CC-$BUILD"
 mkdir -p $BIN_DIR
 cd $BIN_DIR
 
-if [ ! -e ../CMakeLists.txt ]; then
-  echo "are you sure you are in the build directory?"
-  exit
-fi
-
 MACHINE=$(gcc -dumpmachine)
 rm -f CMakeCache.txt
 
