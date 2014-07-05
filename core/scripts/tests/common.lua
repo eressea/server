@@ -1074,6 +1074,7 @@ function test_lighthouse()
     local u = unit.create(f, r, 1)
     local b = building.create(r, "lighthouse")
     b.size = 100
+    b.working = true
     u.building = b
     u:set_skill("perception", 9)
     u:add_item("money", 1000)

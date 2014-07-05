@@ -43,6 +43,7 @@ static void test_ship_allowed_with_harbor(CuTest * tc)
   ship * sh;
   terrain_type * ttype;
   building_type * btype;
+  building * b;
 
   test_cleanup();
   test_create_world();
@@ -53,7 +54,8 @@ static void test_ship_allowed_with_harbor(CuTest * tc)
   r = test_create_region(0, 0, ttype);
   sh = test_create_ship(0, 0);
 
-  test_create_building(r, btype);
+  b = test_create_building(r, btype);
+  b->flags |= BLD_WORKING;
   CuAssertIntEquals(tc, SA_HARBOUR, check_ship_allowed(sh, r));
 }
 
@@ -73,9 +75,9 @@ static void test_building_type_exists(CuTest * tc)
   b = new_building(btype, r, default_locale);
 
   CuAssertPtrNotNull(tc, b);
-  CuAssertTrue(tc, !buildingtype_exists(r, NULL, true));
-  CuAssertTrue(tc, buildingtype_exists(r, btype, true));
-  CuAssertTrue(tc, !buildingtype_exists(r, btype2, true));
+  CuAssertTrue(tc, !buildingtype_exists(r, NULL, false));
+  CuAssertTrue(tc, buildingtype_exists(r, btype, false));
+  CuAssertTrue(tc, !buildingtype_exists(r, btype2, false));
 }
 
 CuSuite *get_move_suite(void)

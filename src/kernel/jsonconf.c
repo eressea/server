@@ -80,6 +80,63 @@ static void json_requirements(cJSON *json, requirement **matp) {
     *matp = mat;
 }
 
+static void json_maintenance_i(cJSON *json, maintenance *mt) {
+    cJSON *child;
+    for (child = json->child; child; child = child->next) {
+        switch (child->type) {
+        case cJSON_Number:
+            if (strcmp(child->string, "amount") == 0) {
+                mt->number = child->valueint;
+            }
+            else {
+                log_error_n("maintenance contains unknown attribute %s", child->string);
+            }
+            break;
+        case cJSON_String:
+            if (strcmp(child->string, "type") == 0) {
+                mt->rtype = rt_get_or_create(child->valuestring);
+            }
+            else {
+                log_error_n("maintenance contains unknown attribute %s", child->string);
+            }
+            break;
+        case cJSON_Array:
+            if (strcmp(child->string, "flags") == 0) {
+                const char * flags[] = { "variable", "required", 0 };
+                mt->flags = json_flags(child, flags);
+            }
+            else {
+                log_error_n("maintenance contains unknown attribute %s", child->string);
+            }
+        default:
+            log_error_n("maintenance contains unknown attribute %s", child->string);
+        }
+    }
+}
+
+static void json_maintenance(cJSON *json, maintenance **mtp) {
+    cJSON *child;
+    maintenance *mt;
+    int i, size = 1;
+
+    if (json->type == cJSON_Array) {
+        size = cJSON_GetArraySize(json);
+    }
+    else if (json->type != cJSON_Object) {
+        log_error_n("maintenance is not a json object or array (%d)", json->type);
+        return;
+    }
+    *mtp = mt = (struct maintenance *) calloc(sizeof(struct maintenance), size + 1);
+    if (json->type == cJSON_Array) {
+        for (i = 0, child = json->child; child; child = child->next, ++i) {
+            if (child->type == cJSON_Object) {
+                json_maintenance_i(child, mt+i);
+            }
+        }
+    }
+    json_maintenance_i(json, mt);
+}
+
 static void json_construction(cJSON *json, construction **consp) {
     cJSON *child;
     if (json->type==cJSON_Array) {
@@ -159,13 +216,19 @@ static void json_building(cJSON *json, building_type *bt) {
     for (child=json->child;child;child=child->next) {
         switch(child->type) {
         case cJSON_Array:
-            if (strcmp(child->string, "construction")==0) {
+            if (strcmp(child->string, "construction") == 0) {
                 json_construction(child, &bt->construction);
+            }
+            else if (strcmp(child->string, "maintenance") == 0) {
+                json_maintenance(child, &bt->maintenance);
             }
             break;
         case cJSON_Object:
             if (strcmp(child->string, "construction")==0) {
                 json_construction(child, &bt->construction);
+            }
+            else if (strcmp(child->string, "maintenance") == 0) {
+                json_maintenance(child, &bt->maintenance);
             }
             break;
         case cJSON_String:
