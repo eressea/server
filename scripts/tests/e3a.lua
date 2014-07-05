@@ -283,6 +283,7 @@ function test_market()
   for i = 0, 5 do
     local rn = r:next(i)
   end
+  b.working = true
   eressea.process.markets()
   u:add_item("money", -u:get_item("money")) -- now we only have herbs
   local len = 0
