@@ -1259,10 +1259,11 @@ int enter_ship(unit * u, struct order *ord, int id, int report)
   if (leave(u, false)) {
     u_set_ship(u, sh);
     fset(u, UFL_ENTER);
+    return 1;
   } else if (report) {
     cmistake(u, ord, 150, MSG_MOVE);
   }
-  return 1;
+  return 0;
 }
 
 int enter_building(unit * u, order * ord, int id, int report)
@@ -4027,7 +4028,7 @@ int pay_cmd(unit * u, struct order *ord)
     p = getparam(u->faction->locale);
     if (p == P_NOT) {
       unit *owner = building_owner(u->building);
-      if (owner->faction != u->faction) {
+      if (owner->no != u->no) {
         cmistake(u, ord, 1222, MSG_EVENT);
       } else {
         u->building->flags |= BLD_DONTPAY;
