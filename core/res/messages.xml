@@ -8305,14 +8305,6 @@
     <text locale="en">"Meeoooooow..."</text>
   </message>
 
-  <message name="migrant_conversion" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-    </type>
-    <text locale="de">"Die Götter segnen $unit($unit) mit der richtigen Rasse."</text>
-    <text locale="en">"The gods are blessing $unit($unit) with the correct race."</text>
-  </message>
-
   <message name="arena_leave_fail" section="events">
     <type>
       <arg name="unit" type="unit"/>
