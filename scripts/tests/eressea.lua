@@ -335,7 +335,7 @@ function test_stonegolems()
 -- end test Stone Golems four stones
 end
 
-function test_only_building_ownwer_can_set_not_paid()
+function test_only_building_owner_can_set_not_paid()
   local r = region.create(0, 0, "plain")
   local f = faction.create("noreply@eressea.de", "human", "de")
   local u1 = unit.create(f, r, 1)
