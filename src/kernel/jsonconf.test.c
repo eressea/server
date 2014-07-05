@@ -200,7 +200,11 @@ static void test_spells(CuTest * tc)
 
 static void test_buildings(CuTest * tc)
 {
-    const char * data = "{\"buildings\": { \"house\" : { "
+    const char * data = "{\"buildings\": { "
+        "\"house\" : { "
+        "\"maintenance\" : "
+        "{ \"type\" : \"iron\", \"amount\" : 1, \"flags\" : [ \"required\", \"variable\" ] }"
+        ","
         "\"construction\" : {"
         "\"maxsize\" : 20,"
         "\"reqsize\" : 10,"
@@ -208,7 +212,13 @@ static void test_buildings(CuTest * tc)
         "\"materials\" : {"
         "\"stone\" : 2,"
         "\"iron\" : 1"
-        "}}}}}";
+        "}}},"
+        "\"shed\" : {"
+        "\"maintenance\" : ["
+        "{ \"type\" : \"iron\", \"amount\" : 1 },"
+        "{ \"type\" : \"stone\", \"amount\" : 2 }"
+        "]}"
+        "}}";
 
     cJSON *json = cJSON_Parse(data);
     const building_type *bt;
@@ -220,8 +230,24 @@ static void test_buildings(CuTest * tc)
     json_config(json);
 
     CuAssertPtrNotNull(tc, buildingtypes);
+    bt = bt_find("shed");
+    CuAssertPtrNotNull(tc, bt);
+    CuAssertPtrNotNull(tc, bt->maintenance);
+    CuAssertPtrEquals(tc, (void *)get_resourcetype(R_IRON), (void *)bt->maintenance[0].rtype);
+    CuAssertPtrEquals(tc, (void *)get_resourcetype(R_STONE), (void *)bt->maintenance[1].rtype);
+    CuAssertIntEquals(tc, 1, bt->maintenance[0].number);
+    CuAssertIntEquals(tc, 2, bt->maintenance[1].number);
+    CuAssertIntEquals(tc, 0, bt->maintenance[2].number);
+
     bt = bt_find("house");
     CuAssertPtrNotNull(tc, bt);
+
+    CuAssertPtrNotNull(tc, bt->maintenance);
+    CuAssertIntEquals(tc, 1, bt->maintenance[0].number);
+    CuAssertPtrEquals(tc, (void *)get_resourcetype(R_IRON), (void *)bt->maintenance[0].rtype);
+    CuAssertIntEquals(tc, MTF_VARIABLE|MTF_VITAL, bt->maintenance[0].flags);
+    CuAssertIntEquals(tc, 0, bt->maintenance[1].number);
+
     CuAssertPtrNotNull(tc, bt->construction);
     CuAssertPtrNotNull(tc, bt->construction->materials);
     CuAssertIntEquals(tc, 2, bt->construction->materials[0].number);
