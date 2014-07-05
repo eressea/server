@@ -730,6 +730,6 @@ function test_building_owner_can_enter_ship()
   u2:add_item("money", u1.number * 100)    
   u2:clear_orders()    
   process_orders()
-  assert_equal(s1.id, u1.ship.id)
-  assert_not_equal(b1.id, u1.ship.id, "BUG owner of the building can not go into a ship")
+  assert_equal(s1, u1.ship)
+  assert_equal(null, u1.building, "owner of the building can not go into a ship")
 end
