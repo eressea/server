@@ -2661,6 +2661,7 @@ static void aftermath(battle * b)
       int dead = dead_fighters(df);
       int sum_hp = 0;
       int n;
+      int flags = 0;
 
       for (n = 0; n != df->alive; ++n) {
         if (df->person[n].hp > 0) {
@@ -2669,11 +2670,16 @@ static void aftermath(battle * b)
       }
       snumber += du->number;
       if (relevant) {
-        int flags = UFL_LONGACTION | UFL_NOTMOVING;
+        flags = UFL_LONGACTION | UFL_NOTMOVING;
         if (du->status == ST_FLEE) {
           flags -= UFL_NOTMOVING;
         }
-        fset(du, flags);
+      }
+      if (df->alive == 0) {
+          flags |= UFL_DEAD;
+      }
+      if (flags) {
+          fset(du, flags);
       }
       if (sum_hp + df->run.hp < du->hp) {
         /* someone on the ship got damaged, damage the ship */

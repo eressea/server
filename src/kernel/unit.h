@@ -30,7 +30,7 @@ extern "C" {
   struct item;
   struct sc_mage;
 
-#define UFL_DEBUG         (1<<0)
+#define UFL_DEAD          (1<<0)
 #define UFL_ISNEW         (1<<1)        /* 2 */
 #define UFL_LONGACTION    (1<<2)        /* 4 */
 #define UFL_OWNER         (1<<3)        /* 8 */

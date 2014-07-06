@@ -372,8 +372,8 @@ static int do_recruiting(recruitment * recruits, int available)
         use_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT,
           rc->recruitcost * number);
       }
-      if (u->number == 0 && !fval(u, UFL_ISNEW)) {
-          /* unit is empty, and not a TEMP => it is dead, and cannot recruit */
+      if (u->number == 0 && fval(u, UFL_DEAD)) {
+          /* unit is empty, dead, and cannot recruit */
           number = 0;
       }
       if (number > 0) {
