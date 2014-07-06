@@ -246,6 +246,7 @@
             <F N="../src/spells/buildingcurse.c"/>
             <F N="../cJSON/cJSON.c"/>
             <F N="../src/kernel/calendar.c"/>
+            <F N="../src/callback.c"/>
             <F N="../src/triggers/changefaction.c"/>
             <F N="../src/triggers/changerace.c"/>
             <F N="../src/triggers/clonedied.c"/>
@@ -403,6 +404,7 @@
             <F N="../src/spells/buildingcurse.h"/>
             <F N="../cJSON/cJSON.h"/>
             <F N="../src/kernel/calendar.h"/>
+            <F N="../src/callback.h"/>
             <F N="../src/triggers/changefaction.h"/>
             <F N="../src/triggers/changerace.h"/>
             <F N="../src/triggers/clonedied.h"/>

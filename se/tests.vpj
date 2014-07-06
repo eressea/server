@@ -246,6 +246,7 @@
             <F N="../src/util/bsdstring.test.c"/>
             <F N="../src/kernel/build.test.c"/>
             <F N="../src/kernel/building.test.c"/>
+            <F N="../src/callback.test.c"/>
             <F N="../src/kernel/config.test.c"/>
             <F N="../src/kernel/curse.test.c"/>
             <F N="../src/direction.test.c"/>

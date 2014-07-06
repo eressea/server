@@ -106,8 +106,9 @@ static void json_maintenance_i(cJSON *json, maintenance *mt) {
                 mt->flags = json_flags(child, flags);
             }
             else {
-                log_error_n("maintenance contains unknown attribute %s", child->string);
+                log_error_n("maintenance contains unknown array %s", child->string);
             }
+            break;
         default:
             log_error_n("maintenance contains unknown attribute %s", child->string);
         }
