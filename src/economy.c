@@ -2760,7 +2760,7 @@ static void steal_cmd(unit * u, struct order *ord, request ** stealorders)
 
   assert(skill_enabled(SK_PERCEPTION) && skill_enabled(SK_STEALTH));
 
-  if (!fval(u_race(u), RCF_CANSTEAL)) {
+  if (fval(u_race(u), RCF_NOSTEAL)) {
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "race_nosteal", "race",
         u_race(u)));
     return;

@@ -326,8 +326,8 @@ static void json_ship(cJSON *json, ship_type *st) {
 static void json_race(cJSON *json, race *rc) {
     cJSON *child;
     const char *flags[] = {
-        "playerrace", "killpeasants", "scarepeasants",
-        "cansteal", "moverandom", "cannotmove",
+        "npc", "killpeasants", "scarepeasants",
+        "nosteal", "moverandom", "cannotmove",
         "learn", "fly", "swim", "walk", "nolearn",
         "noteach", "horse", "desert",
         "illusionary", "absorbpeasants", "noheal", 

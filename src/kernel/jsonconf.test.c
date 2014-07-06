@@ -34,7 +34,7 @@ static void check_flag(CuTest *tc, const char *name, int flag) {
 static void test_flags(CuTest *tc) {
     check_flag(tc, "npc", RCF_NPC);
     check_flag(tc, "scarepeasants", RCF_SCAREPEASANTS);
-    check_flag(tc, "cansteal", RCF_CANSTEAL);
+    check_flag(tc, "nosteal", RCF_NOSTEAL);
     check_flag(tc, "noheal", RCF_NOHEAL);
     check_flag(tc, "undead", RCF_UNDEAD);
     check_flag(tc, "dragon", RCF_DRAGON);

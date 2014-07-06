@@ -1672,8 +1672,8 @@ static int parse_races(xmlDocPtr doc)
       rc->flags |= RCF_NPC;
     if (xml_bvalue(node, "scarepeasants", false))
       rc->flags |= RCF_SCAREPEASANTS;
-    if (xml_bvalue(node, "cansteal", true))
-      rc->flags |= RCF_CANSTEAL;
+    if (!xml_bvalue(node, "cansteal", true))
+      rc->flags |= RCF_NOSTEAL;
     if (xml_bvalue(node, "cansail", true))
       rc->flags |= RCF_CANSAIL;
     if (xml_bvalue(node, "cannotmove", false))

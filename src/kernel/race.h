@@ -183,11 +183,11 @@ extern "C" {
     const struct weapon_type *);
   void free_races(void);
 
-/* Flags */
-#define RCF_NPC            (1<<0)       /* can be played by a player. */
-#define RCF_KILLPEASANTS   (1<<1)       /* Töten Bauern. Dämonen werden nicht über dieses Flag, sondern in randenc() behandelt. */
-#define RCF_SCAREPEASANTS  (1<<2)
-#define RCF_CANSTEAL       (1<<3)
+/* Flags. Do not reorder these without changing json_race() in jsonconf.c */
+#define RCF_NPC            (1<<0)   /* cannot be the race for a player faction (and other limits?) */
+#define RCF_KILLPEASANTS   (1<<1)   /* a monster that eats peasants */
+#define RCF_SCAREPEASANTS  (1<<2)   /* a monster that scares peasants out of the hex */
+#define RCF_NOSTEAL        (1<<3)   /* this race has high stealth, but is not allowed to steal */
 #define RCF_MOVERANDOM     (1<<4)
 #define RCF_CANNOTMOVE     (1<<5)
 #define RCF_LEARN          (1<<6)       /* Lernt automatisch wenn struct faction == 0 */
