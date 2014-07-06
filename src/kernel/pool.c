@@ -182,7 +182,7 @@ get_pooled(const unit * u, const resource_type * rtype, unsigned int mode,
 
         if (v->items == NULL && rtype->uget == NULL)
           continue;
-        if ((urace(v)->ec_flags & GIVEITEM) == 0)
+        if (fval(u_race(v), RCF_NOGIVE))
           continue;
 
         if (v->faction == f) {
@@ -232,7 +232,7 @@ use_pooled(unit * u, const resource_type * rtype, unsigned int mode, int count)
     for (v = r->units; use > 0 && v != NULL; v = v->next)
       if (u != v) {
         int mask;
-        if ((urace(v)->ec_flags & GIVEITEM) == 0)
+        if (fval(u_race(v), RCF_NOGIVE))
           continue;
         if (v->items == NULL && rtype->uget == NULL)
           continue;

@@ -196,10 +196,9 @@ static buddy *get_friends(const unit * u, int *numfriends)
             nf->unit = u2;
             nf->number = 0;
             *fr = nf;
-          } else if (nf->faction == u2->faction
-            && (u_race(u2)->ec_flags & GIVEITEM)) {
+          } else if (nf->faction == u2->faction && !fval(u_race(u2), RCF_NOGIVE)) {
             /* we don't like to gift it to units that won't give it back */
-            if ((u_race(nf->unit)->ec_flags & GIVEITEM) == 0) {
+            if (fval(u_race(nf->unit), RCF_NOGIVE)) {
               nf->unit = u2;
             }
           }
@@ -226,7 +225,7 @@ int gift_items(unit * u, int flags)
     item **itm_p = &u->items;
     int retval = 0;
     int rule = rule_give();
-    
+
     assert(u->region);
     assert(u->faction);
 
@@ -239,20 +238,20 @@ int gift_items(unit * u, int flags)
             flags -= GIFT_SELF;
     }
 
-    if (u->items == NULL || fval(u_race(u), RCF_ILLUSIONARY))
+    if (u->items == NULL || fval(u_race(u), RCF_ILLUSIONARY) || fval(u_race(u), RCF_NOGIVE)) {
         return 0;
-    if ((u_race(u)->ec_flags & GIVEITEM) == 0)
-        return 0;
+    }
     
   /* at first, I should try giving my crap to my own units in this region */
   if (u->faction && (u->faction->flags & FFL_QUIT) == 0 && (flags & GIFT_SELF)) {
     unit *u2, *u3 = NULL;
     for (u2 = r->units; u2; u2 = u2->next) {
       if (u2 != u && u2->faction == u->faction && u2->number > 0) {
+        const race * rc = u_race(u2);
         /* some units won't take stuff: */
-        if (u_race(u2)->ec_flags & GETITEM) {
+        if (rc->ec_flags & GETITEM) {
           /* we don't like to gift it to units that won't give it back */
-          if (u_race(u2)->ec_flags & GIVEITEM) {
+          if (!fval(rc, RCF_NOGIVE)) {
             i_merge(&u2->items, &u->items);
             u->items = NULL;
             break;
@@ -859,11 +858,6 @@ bool leave(unit * u, bool force)
     leave_ship(u);
   }
   return true;
-}
-
-const struct race *urace(const struct unit *u)
-{
-  return u->race_;
 }
 
 bool can_survive(const unit * u, const region * r)

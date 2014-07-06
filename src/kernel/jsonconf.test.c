@@ -39,6 +39,7 @@ static void test_flags(CuTest *tc) {
     check_flag(tc, "undead", RCF_UNDEAD);
     check_flag(tc, "dragon", RCF_DRAGON);
     check_flag(tc, "fly", RCF_FLY);
+    check_flag(tc, "nogive", RCF_NOGIVE);
     test_cleanup();
 }
 
