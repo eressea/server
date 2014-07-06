@@ -189,8 +189,7 @@ void locale_setstring(locale * lang, const char *key, const char *value)
 
 const char *locale_name(const locale * lang)
 {
-  assert(lang);
-  return lang->name;
+  return lang ? lang->name : "(null)";
 }
 
 char *mkname_buf(const char *space, const char *name, char *buffer)
