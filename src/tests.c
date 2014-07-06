@@ -25,7 +25,6 @@
 struct race *test_create_race(const char *name)
 {
   race *rc = rc_get_or_create(name);
-  rc->flags |= RCF_PLAYERRACE;
   rc->maintenance = 10;
   return rc;
 }

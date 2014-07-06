@@ -184,7 +184,7 @@ extern "C" {
   void free_races(void);
 
 /* Flags */
-#define RCF_PLAYERRACE     (1<<0)       /* can be played by a player. */
+#define RCF_NPC            (1<<0)       /* can be played by a player. */
 #define RCF_KILLPEASANTS   (1<<1)       /* Töten Bauern. Dämonen werden nicht über dieses Flag, sondern in randenc() behandelt. */
 #define RCF_SCAREPEASANTS  (1<<2)
 #define RCF_CANSTEAL       (1<<3)
@@ -238,7 +238,7 @@ extern "C" {
 
 #define omniscient(f) ((f)->race==get_race(RC_ILLUSION) || (f)->race==get_race(RC_TEMPLATE))
 
-#define playerrace(rc) (fval((rc), RCF_PLAYERRACE))
+#define playerrace(rc) (!fval((rc), RCF_NPC))
 #define dragonrace(rc) ((rc) == get_race(RC_FIREDRAGON) || (rc) == get_race(RC_DRAGON) || (rc) == get_race(RC_WYRM) || (rc) == get_race(RC_BIRTHDAYDRAGON))
 #define humanoidrace(rc) (fval((rc), RCF_UNDEAD) || (rc)==get_race(RC_DRACOID) || playerrace(rc))
 #define illusionaryrace(rc) (fval(rc, RCF_ILLUSIONARY))
