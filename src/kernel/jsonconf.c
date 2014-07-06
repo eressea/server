@@ -334,7 +334,11 @@ static void json_race(cJSON *json, race *rc) {
         "noweapons", "shapeshift", "", "undead", "dragon",
         "coastal", "", "cansail", 0
     };
-    if (json->type!=cJSON_Object) {
+    const char *ecflags[] = {
+        "", "giveitem", "giveperson",
+        "giveunit", "getitem", 0
+    };
+    if (json->type != cJSON_Object) {
         log_error_n("race %s is not a json object: %d", json->string, json->type);
         return;
     }
@@ -381,6 +385,7 @@ static void json_race(cJSON *json, race *rc) {
         case cJSON_Array:
             if (strcmp(child->string, "flags")==0) {
                 rc->flags = json_flags(child, flags);
+                rc->ec_flags = json_flags(child, ecflags);
             }
             break;
         }
