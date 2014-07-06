@@ -10,7 +10,7 @@ function setup()
     eressea.settings.set("nmr.timeout", "0")
     conf = [[{
         "races": {
-            "human" : {}
+            "human" : { "flags" : [ "giveitem", "getitem" ] }
         },
         "terrains" : {
             "plain": { "flags" : [ "land" ] }
@@ -18,6 +18,11 @@ function setup()
         "keywords" : {
             "de" : {
                 "give" : "GIB"
+            }
+        },
+        "strings" : {
+            "de" : {
+                "money" : "Silber"
             }
         }
     }]]
@@ -31,8 +36,23 @@ function test_give_nopool()
     local u1 = unit.create(f, r, 1)
     local u2 = unit.create(f, r, 1)
     u1:add_item("money", 100)
-    u1:add_order("GIB " .. itoa36(u2.id) .. " 100 SILBER")
+    u1:add_order("GIB " .. itoa36(u2.id) .. " 50 SILBER")
+    process_orders()
+    assert_equal(50, u1:get_item("money"))
+    assert_equal(50, u2:get_item("money"))
+end
+
+function test_give_from_faction()
+    local r = region.create(1, 1, "plain")
+    local f = faction.create("test@example.com", "human", "de")
+    local u1 = unit.create(f, r, 1)
+    local u2 = unit.create(f, r, 1)
+    local u3 = unit.create(f, r, 1)
+    u1:add_item("money", 50)
+    u2:add_item("money", 50)
+    u1:add_order("GIB " .. itoa36(u3.id) .. " 100 SILBER")
     process_orders()
     assert_equal(0, u1:get_item("money"))
-    assert_equal(100, u2:get_item("money"))
+    assert_equal(0, u2:get_item("money"))
+    assert_equal(100, u3:get_item("money"))
 end
