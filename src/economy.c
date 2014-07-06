@@ -390,8 +390,7 @@ static void feedback_give_not_allowed(unit * u, order * ord)
       ""));
 }
 
-static bool check_give(unit * u, unit * u2, const item_type * itype,
-  int mask)
+static bool can_give(const unit * u, const unit * u2, const item_type * itype, int mask)
 {
   if (u2) {
     if (u->faction != u2->faction) {
@@ -700,6 +699,14 @@ int give_control_cmd(unit * u, order * ord)
   return 0;
 }
 
+message *check_give(const unit *u, const unit *u2, order * ord) {
+    if (!can_give(u, u2, NULL, GIVE_ALLITEMS)) {
+        return msg_feedback(u, ord, "feedback_give_forbidden", "");
+    }
+
+    return 0;
+}
+
 static void give_cmd(unit * u, order * ord)
 {
   region *r = u->region;
@@ -709,6 +716,7 @@ static void give_cmd(unit * u, order * ord)
   const item_type *itype;
   param_t p;
   plane *pl;
+  message *msg;
 
   init_tokens(ord);
   skip_token();
@@ -729,9 +737,10 @@ static void give_cmd(unit * u, order * ord)
     return;
   }
 
-  if (!check_give(u, u2, NULL, GIVE_ALLITEMS)) {
-    feedback_give_not_allowed(u, ord);
-    return;
+  msg = check_give(u, u2, ord);
+  if (msg) {
+      ADDMSG(&u->faction->msgs, msg);
+      return;
   }
 
   /* Damit Tarner nicht durch die Fehlermeldung enttarnt werden können */
@@ -773,7 +782,7 @@ static void give_cmd(unit * u, order * ord)
         msg_feedback(u, ord, "race_nogive", "race", u_race(u)));
       return;
     }
-    if (!check_give(u, u2, NULL, GIVE_HERBS)) {
+    if (!can_give(u, u2, NULL, GIVE_HERBS)) {
       feedback_give_not_allowed(u, ord);
       return;
     }
@@ -831,7 +840,7 @@ static void give_cmd(unit * u, order * ord)
   else if (p == P_ANY) {
     const char *s;
 
-    if (!check_give(u, u2, NULL, GIVE_ALLITEMS)) {
+    if (!can_give(u, u2, NULL, GIVE_ALLITEMS)) {
       feedback_give_not_allowed(u, ord);
       return;
     }
@@ -888,7 +897,7 @@ static void give_cmd(unit * u, order * ord)
         if (itype != NULL) {
           item *i = *i_find(&u->items, itype);
           if (i != NULL) {
-            if (check_give(u, u2, itype, 0)) {
+              if (can_give(u, u2, itype, 0)) {
               n = i->number - get_reservation(u, itype->rtype);
               give_item(n, itype, u, u2, ord);
             } else {
@@ -941,7 +950,7 @@ static void give_cmd(unit * u, order * ord)
 
   itype = finditemtype(s, u->faction->locale);
   if (itype != NULL) {
-    if (check_give(u, u2, itype, 0)) {
+      if (can_give(u, u2, itype, 0)) {
       give_item(n, itype, u, u2, ord);
     } else {
       feedback_give_not_allowed(u, ord);
@@ -2747,7 +2756,7 @@ static int max_skill(region * r, faction * f, skill_t sk)
   return w;
 }
 
-message * can_steal(const unit * u, struct order *ord) {
+message * check_steal(const unit * u, struct order *ord) {
     plane *pl;
 
     if (fval(u_race(u), RCF_NOSTEAL)) {
@@ -2778,7 +2787,7 @@ static void steal_cmd(unit * u, struct order *ord, request ** stealorders)
 
   assert(skill_enabled(SK_PERCEPTION) && skill_enabled(SK_STEALTH));
 
-  msg = can_steal(u, ord);
+  msg = check_steal(u, ord);
   if (msg) {
       ADDMSG(&u->faction->msgs, msg);
       return;

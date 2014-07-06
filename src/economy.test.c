@@ -57,19 +57,20 @@ static void test_give_control_ship(CuTest * tc)
     test_cleanup();
 }
 
-static struct {
+struct steal {
     struct unit *u;
     struct region *r;
     struct faction *f;
-} steal;
+};
 
-static void setup_steal(terrain_type *ter, race *rc) {
-    steal.r = test_create_region(0, 0, ter);
-    steal.f = test_create_faction(0);
-    steal.u = test_create_unit(steal.f, steal.r);
+static void setup_steal(struct steal *env, terrain_type *ter, race *rc) {
+    env->r = test_create_region(0, 0, ter);
+    env->f = test_create_faction(rc);
+    env->u = test_create_unit(env->f, env->r);
 }
 
 static void test_steal_okay(CuTest * tc) {
+    struct steal env;
     race *rc;
     terrain_type *ter;
 
@@ -77,12 +78,13 @@ static void test_steal_okay(CuTest * tc) {
     ter = test_create_terrain("plain", LAND_REGION);
     rc = test_create_race("human");
     rc->flags = 0;
-    setup_steal(ter, rc);
-    CuAssertPtrEquals(tc, 0, can_steal(steal.u, 0));
+    setup_steal(&env, ter, rc);
+    CuAssertPtrEquals(tc, 0, check_steal(env.u, 0));
     test_cleanup();
 }
 
 static void test_steal_nosteal(CuTest * tc) {
+    struct steal env;
     race *rc;
     terrain_type *ter;
     message *msg;
@@ -91,13 +93,14 @@ static void test_steal_nosteal(CuTest * tc) {
     ter = test_create_terrain("plain", LAND_REGION);
     rc = test_create_race("human");
     rc->flags = RCF_NOSTEAL;
-    setup_steal(ter, rc);
-    CuAssertPtrNotNull(tc, msg=can_steal(steal.u, 0));
+    setup_steal(&env, ter, rc);
+    CuAssertPtrNotNull(tc, msg = check_steal(env.u, 0));
     msg_release(msg);
     test_cleanup();
 }
 
 static void test_steal_ocean(CuTest * tc) {
+    struct steal env;
     race *rc;
     terrain_type *ter;
     message *msg;
@@ -105,9 +108,33 @@ static void test_steal_ocean(CuTest * tc) {
     test_cleanup();
     ter = test_create_terrain("ocean", SEA_REGION);
     rc = test_create_race("human");
-    setup_steal(ter, rc);
-    CuAssertPtrNotNull(tc, msg = can_steal(steal.u, 0));
+    setup_steal(&env, ter, rc);
+    CuAssertPtrNotNull(tc, msg = check_steal(env.u, 0));
     msg_release(msg);
+    test_cleanup();
+}
+
+struct give {
+    struct unit *src, *dst;
+    struct region *r;
+    struct faction *f;
+};
+
+static void setup_give(struct give *env) {
+    terrain_type *ter = test_create_terrain("plain", LAND_REGION);
+    struct race * rc = test_create_race("human");
+    env->r = test_create_region(0, 0, ter);
+    env->f = test_create_faction(0);
+    env->src = test_create_unit(env->f, env->r);
+    env->dst = test_create_unit(env->f, env->r);
+}
+
+static void test_give_okay(CuTest * tc) {
+    struct give env;
+    test_cleanup();
+    setup_give(&env);
+
+    CuAssertPtrEquals(tc, 0, check_give(env.src, env.dst, 0));
     test_cleanup();
 }
 
@@ -119,5 +146,6 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_steal_okay);
     SUITE_ADD_TEST(suite, test_steal_ocean);
     SUITE_ADD_TEST(suite, test_steal_nosteal);
+    SUITE_ADD_TEST(suite, test_give_okay);
     return suite;
 }
