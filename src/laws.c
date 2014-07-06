@@ -138,7 +138,9 @@ static void checkorders(void)
 
 static bool help_money(const unit * u)
 {
-    return !fval(u_race(u), RCF_NOGIVE);
+  if (u_race(u)->ec_flags & GIVEITEM)
+    return true;
+  return false;
 }
 
 static void help_feed(unit * donor, unit * u, int *need_p)
@@ -3261,7 +3263,7 @@ static building *age_building(building * b)
     bt_blessed = bt_find("blessedstonecircle");
     ct_astralblock = ct_find("astralblock");
 
-  /* blessed stone circles create an astral protection in the astral region 
+  /* blesses stone circles create an astral protection in the astral region 
    * above the shield, which prevents chaos suction and other spells. 
    * The shield is created when a magician enters the blessed stone circle,
    * and lasts for as long as his skill level / 2 is, at no mana cost.
@@ -3277,7 +3279,7 @@ static building *age_building(building * b)
      * find out if there's a magician in there. */
     for (u = r->units; u; u = u->next) {
       if (b == u->building && inside_building(u)) {
-        if (!fval(u_race(u), RCF_NOGIVE)) {
+        if (!(u_race(u)->ec_flags & GIVEITEM) == 0) {
           int n, unicorns = 0;
           for (n = 0; n != u->number; ++n) {
             if (chance(0.02)) {
@@ -4039,7 +4041,7 @@ int pay_cmd(unit * u, struct order *ord)
 
 int reserve_cmd(unit * u, struct order *ord)
 {
-  if (u->number > 0 && (u_race(u)->ec_flags & GETITEM)) {
+  if (u->number > 0 && (urace(u)->ec_flags & GETITEM)) {
     int use, count;
     const resource_type *rtype;
     const char *s;

@@ -213,7 +213,6 @@ extern "C" {
 #define RCF_SHIPSPEED      (1<<26)      /* race gets +1 on shipspeed */
 #define RCF_STONEGOLEM     (1<<27)      /* race gets stonegolem properties */
 #define RCF_IRONGOLEM      (1<<28)      /* race gets irongolem properties */
-#define RCF_NOGIVE         (1<<29)      /* will not GIVE anything away */
 
 /* Economic flags */
 #define GIVEITEM       (1<<1)   /* gibt Gegenstände weg */

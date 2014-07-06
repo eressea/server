@@ -214,7 +214,7 @@ int armedmen(const unit * u, bool siege_weapons)
 {
   item *itm;
   int n = 0;
-  if (!fval(u_race(u), RCF_NOWEAPONS)) {
+  if (!(urace(u)->flags & RCF_NOWEAPONS)) {
     if (effskill(u, SK_WEAPONLESS) >= 1) {
       /* kann ohne waffen bewachen: fuer drachen */
       n = u->number;
@@ -784,7 +784,7 @@ weapon_effskill(troop t, troop enemy, const weapon * w, bool attacking,
     skill += CavalryBonus(tu, enemy, BONUS_SKILL);
     if (wtype)
       skill =
-        skillmod(u_race(tu)->attribs, tu, tu->region, wtype->skill, skill,
+        skillmod(urace(tu)->attribs, tu, tu->region, wtype->skill, skill,
         SMF_RIDING);
   }
 

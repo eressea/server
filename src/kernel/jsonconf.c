@@ -332,8 +332,7 @@ static void json_race(cJSON *json, race *rc) {
         "noteach", "horse", "desert",
         "illusionary", "absorbpeasants", "noheal", 
         "noweapons", "shapeshift", "", "undead", "dragon",
-        "coastal", "", "cansail", "invisible", "shipspeed",
-        "stonegolem", "irongolem", "nogive", 0
+        "coastal", "", "cansail", 0
     };
     if (json->type!=cJSON_Object) {
         log_error_n("race %s is not a json object: %d", json->string, json->type);

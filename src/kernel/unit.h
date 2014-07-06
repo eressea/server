@@ -141,6 +141,8 @@ extern "C" {
   struct unit *utarget(const struct unit *u);
   void usettarget(struct unit *u, const struct unit *b);
 
+  extern const struct race *urace(const struct unit *u);
+
   const char *uprivate(const struct unit *u);
   void usetprivate(struct unit *u, const char *c);
 
