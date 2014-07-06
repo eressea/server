@@ -57,6 +57,8 @@ extern "C" {
   extern int give_control_cmd(struct unit *u, struct order *ord);
   extern void give_control(struct unit * u, struct unit * u2);
 
+  struct message * can_steal(const struct unit * u, struct order *ord);
+
 #ifdef __cplusplus
 }
 #endif

@@ -2747,6 +2747,24 @@ static int max_skill(region * r, faction * f, skill_t sk)
   return w;
 }
 
+message * can_steal(const unit * u, struct order *ord) {
+    plane *pl;
+
+    if (fval(u_race(u), RCF_NOSTEAL)) {
+        return msg_feedback(u, ord, "race_nosteal", "race", u_race(u));
+    }
+
+    if (fval(u->region->terrain, SEA_REGION) && u_race(u) != get_race(RC_AQUARIAN)) {
+        return msg_feedback(u, ord, "error_onlandonly", "");
+    }
+
+    pl = rplane(u->region);
+    if (pl && fval(pl, PFL_NOATTACK)) {
+        return msg_feedback(u, ord, "error270", "");
+    }
+    return 0;
+}
+
 static void steal_cmd(unit * u, struct order *ord, request ** stealorders)
 {
   const resource_type *rring = get_resourcetype(R_RING_OF_NIMBLEFINGER);
@@ -2756,27 +2774,15 @@ static void steal_cmd(unit * u, struct order *ord, request ** stealorders)
   unit *u2 = NULL;
   region *r = u->region;
   faction *f = NULL;
-  plane *pl;
+  message * msg;
 
   assert(skill_enabled(SK_PERCEPTION) && skill_enabled(SK_STEALTH));
 
-  if (fval(u_race(u), RCF_NOSTEAL)) {
-    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "race_nosteal", "race",
-        u_race(u)));
-    return;
+  msg = can_steal(u, ord);
+  if (msg) {
+      ADDMSG(&u->faction->msgs, msg);
+      return;
   }
-
-  if (fval(r->terrain, SEA_REGION) && u_race(u) != get_race(RC_AQUARIAN)) {
-    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_onlandonly", ""));
-    return;
-  }
-
-  pl = rplane(r);
-  if (pl && fval(pl, PFL_NOATTACK)) {
-    cmistake(u, ord, 270, MSG_INCOME);
-    return;
-  }
-
   init_tokens(ord);
   skip_token();
   id = read_unitid(u->faction, r);

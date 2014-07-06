@@ -46,6 +46,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "plane.h"
 #include "pool.h"
 #include "race.h"
+#include "reports.h"
 #include "region.h"
 #include "save.h"
 #include "ship.h"
@@ -2744,8 +2745,12 @@ void attrib_init(void)
 
 void kernel_init(void)
 {
-  attrib_init();
-  translation_init();
+    register_reports();
+    if (!mt_find("missing_message")) {
+        mt_register(mt_new_va("missing_message", "name:string", 0));
+    }
+    attrib_init();
+    translation_init();
 }
 
 static order * defaults[MAXLOCALES];
