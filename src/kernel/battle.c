@@ -2661,6 +2661,7 @@ static void aftermath(battle * b)
       int dead = dead_fighters(df);
       int sum_hp = 0;
       int n;
+      int flags = 0;
 
       for (n = 0; n != df->alive; ++n) {
         if (df->person[n].hp > 0) {
@@ -2669,11 +2670,16 @@ static void aftermath(battle * b)
       }
       snumber += du->number;
       if (relevant) {
-        int flags = UFL_LONGACTION | UFL_NOTMOVING;
+        flags = UFL_LONGACTION | UFL_NOTMOVING;
         if (du->status == ST_FLEE) {
           flags -= UFL_NOTMOVING;
         }
-        fset(du, flags);
+      }
+      if (df->alive == 0) {
+          flags |= UFL_DEAD;
+      }
+      if (flags) {
+          fset(du, flags);
       }
       if (sum_hp + df->run.hp < du->hp) {
         /* someone on the ship got damaged, damage the ship */
@@ -4057,70 +4063,6 @@ static bool start_battle(region * r, battle ** bp)
   return fighting;
 }
 
-static void battle_stats(FILE * F, battle * b)
-{
-  typedef struct stat_info {
-    struct stat_info *next;
-    const weapon_type *wtype;
-    int level;
-    int number;
-  } stat_info;
-  side *s;
-
-  for (s = b->sides; s != b->sides + b->nsides; ++s) {
-    fighter *df;
-    stat_info *stats = NULL, *stat;
-
-    for (df = s->fighters; df; df = df->next) {
-      unit *du = df->unit;
-      troop dt;
-      stat_info *slast = NULL;
-
-      dt.fighter = df;
-      for (dt.index = 0; dt.index != du->number; ++dt.index) {
-        weapon *wp = preferred_weapon(dt, true);
-        int level = wp ? wp->attackskill : 0;
-        const weapon_type *wtype = wp ? wp->type : NULL;
-        stat_info **slist = &stats;
-
-        if (slast && slast->wtype == wtype && slast->level == level) {
-          ++slast->number;
-          continue;
-        }
-        while (*slist && (*slist)->wtype != wtype) {
-          slist = &(*slist)->next;
-        }
-        while (*slist && (*slist)->wtype == wtype && (*slist)->level > level) {
-          slist = &(*slist)->next;
-        }
-        stat = *slist;
-        if (stat == NULL || stat->wtype != wtype || stat->level != level) {
-          stat = (stat_info*)calloc(1, sizeof(stat_info));
-          stat->wtype = wtype;
-          stat->level = level;
-          stat->next = *slist;
-          *slist = stat;
-        }
-        slast = stat;
-        ++slast->number;
-      }
-    }
-
-    fprintf(F, "##STATS## Heer %u - %s:\n", army_index(s),
-      factionname(s->faction));
-    for (stat = stats; stat != NULL; stat = stat->next) {
-      fprintf(F, "%s %u : %u\n",
-        stat->wtype ? stat->wtype->itype->rtype->_name[0] : "none", stat->level,
-        stat->number);
-    }
-    while (stats) {
-      stat_info *stat = stats;
-      stats = stat->next;
-      free(stat);
-    }
-  }
-}
-
 /** execute one round of attacks
  * fig->fighting is used to determine who attacks, not fig->alive, since
  * the latter may be influenced by attacks that already took place.
@@ -4288,9 +4230,6 @@ void do_battle(region * r)
     b->turn = 1;
     b->has_tactics_turn = false;
   }
-
-  if (b->region->flags & RF_COMBATDEBUG)
-    battle_stats(bdebug, b);
 
   /* PRECOMBATSPELLS */
   do_combatmagic(b, DO_PRECOMBATSPELL);

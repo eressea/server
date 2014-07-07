@@ -62,6 +62,22 @@ static int tolua_region_get_id(lua_State * L)
   return 1;
 }
 
+static int tolua_region_get_blocked(lua_State * L)
+{
+    region *self = (region *)tolua_tousertype(L, 1, 0);
+    lua_pushboolean(L, (self->flags&RF_BLOCKED)!=0);
+    return 1;
+}
+
+static int tolua_region_set_blocked(lua_State * L)
+{
+    region *self = (region *)tolua_tousertype(L, 1, 0);
+    bool flag = !!tolua_toboolean(L, 2, 1);
+    if (flag) self->flags |= BLD_WORKING;
+    else self->flags &= ~BLD_WORKING;
+    return 0;
+}
+
 static int tolua_region_get_x(lua_State * L)
 {
   region *self = (region *) tolua_tousertype(L, 1, 0);
@@ -651,6 +667,9 @@ void tolua_region_open(lua_State * L)
       tolua_function(L, TOLUA_CAST "create", tolua_region_create);
       tolua_function(L, TOLUA_CAST "destroy", tolua_region_destroy);
       tolua_function(L, TOLUA_CAST "__tostring", tolua_region_tostring);
+
+      /* flags */
+      tolua_variable(L, TOLUA_CAST "blocked", tolua_region_get_blocked, tolua_region_set_blocked);
 
       tolua_variable(L, TOLUA_CAST "id", tolua_region_get_id, NULL);
       tolua_variable(L, TOLUA_CAST "x", tolua_region_get_x, NULL);

@@ -429,7 +429,7 @@ function test_canoe_passes_through_land()
 end
 
 function test_give_50_percent_of_money()
-  local r = region.create(0, 0, "plain")
+    local r = region.create(0, 0, "plain")
   local u1 = unit.create(faction.create("noreply@eressea.de", "human", "de"), r, 1)
   local u2 = unit.create(faction.create("noreply@eressea.de", "orc", "de"), r, 1)
   u1.faction.age = 10

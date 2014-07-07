@@ -106,8 +106,9 @@ static void json_maintenance_i(cJSON *json, maintenance *mt) {
                 mt->flags = json_flags(child, flags);
             }
             else {
-                log_error_n("maintenance contains unknown attribute %s", child->string);
+                log_error_n("maintenance contains unknown array %s", child->string);
             }
+            break;
         default:
             log_error_n("maintenance contains unknown attribute %s", child->string);
         }
@@ -325,15 +326,19 @@ static void json_ship(cJSON *json, ship_type *st) {
 static void json_race(cJSON *json, race *rc) {
     cJSON *child;
     const char *flags[] = {
-        "playerrace", "killpeasants", "scarepeasants",
-        "cansteal", "moverandom", "cannotmove",
+        "npc", "killpeasants", "scarepeasants",
+        "nosteal", "moverandom", "cannotmove",
         "learn", "fly", "swim", "walk", "nolearn",
         "noteach", "horse", "desert",
         "illusionary", "absorbpeasants", "noheal", 
         "noweapons", "shapeshift", "", "undead", "dragon",
         "coastal", "", "cansail", 0
     };
-    if (json->type!=cJSON_Object) {
+    const char *ecflags[] = {
+        "", "giveitem", "giveperson",
+        "giveunit", "getitem", 0
+    };
+    if (json->type != cJSON_Object) {
         log_error_n("race %s is not a json object: %d", json->string, json->type);
         return;
     }
@@ -380,6 +385,7 @@ static void json_race(cJSON *json, race *rc) {
         case cJSON_Array:
             if (strcmp(child->string, "flags")==0) {
                 rc->flags = json_flags(child, flags);
+                rc->ec_flags = json_flags(child, ecflags);
             }
             break;
         }

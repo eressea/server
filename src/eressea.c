@@ -49,11 +49,10 @@ void game_done(void)
 
 void game_init(void)
 {
-  kernel_init();
+    kernel_init();
   register_triggers();
   register_xmas();
 
-  register_reports();
   register_nr();
   register_cr();
 

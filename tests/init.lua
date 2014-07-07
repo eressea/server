@@ -1,4 +1,5 @@
 -- new tests 2014-06-11
+require "tests.pool"
 require "tests.settings"
 require "tests.config"
 require "tests.locale"
@@ -8,3 +9,4 @@ require "tests.castles"
 require "tests.spells"
 require "tests.movement"
 require "tests.ships"
+require "tests.pool"

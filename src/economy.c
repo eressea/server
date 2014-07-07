@@ -372,13 +372,19 @@ static int do_recruiting(recruitment * recruits, int available)
         use_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT,
           rc->recruitcost * number);
       }
-      add_recruits(u, number, req->qty);
-      dec = (int)(number * multi);
-      if ((rc->ec_flags & ECF_REC_ETHEREAL) == 0) {
-        recruited += dec;
+      if (u->number == 0 && fval(u, UFL_DEAD)) {
+          /* unit is empty, dead, and cannot recruit */
+          number = 0;
       }
+      if (number > 0) {
+          add_recruits(u, number, req->qty);
+          dec = (int)(number * multi);
+          if ((rc->ec_flags & ECF_REC_ETHEREAL) == 0) {
+              recruited += dec;
+          }
 
-      get -= dec;
+          get -= dec;
+      }
     }
   }
   return recruited;
@@ -390,8 +396,7 @@ static void feedback_give_not_allowed(unit * u, order * ord)
       ""));
 }
 
-static bool check_give(unit * u, unit * u2, const item_type * itype,
-  int mask)
+static bool can_give(const unit * u, const unit * u2, const item_type * itype, int mask)
 {
   if (u2) {
     if (u->faction != u2->faction) {
@@ -700,6 +705,13 @@ int give_control_cmd(unit * u, order * ord)
   return 0;
 }
 
+message *check_give(const unit *u, const unit *u2, order * ord) {
+    if (!can_give(u, u2, NULL, GIVE_ALLITEMS)) {
+        return msg_feedback(u, ord, "feedback_give_forbidden", "");
+    }
+    return 0;
+}
+
 static void give_cmd(unit * u, order * ord)
 {
   region *r = u->region;
@@ -709,6 +721,7 @@ static void give_cmd(unit * u, order * ord)
   const item_type *itype;
   param_t p;
   plane *pl;
+  message *msg;
 
   init_tokens(ord);
   skip_token();
@@ -729,9 +742,10 @@ static void give_cmd(unit * u, order * ord)
     return;
   }
 
-  if (!check_give(u, u2, NULL, GIVE_ALLITEMS)) {
-    feedback_give_not_allowed(u, ord);
-    return;
+  msg = check_give(u, u2, ord);
+  if (msg) {
+      ADDMSG(&u->faction->msgs, msg);
+      return;
   }
 
   /* Damit Tarner nicht durch die Fehlermeldung enttarnt werden können */
@@ -773,7 +787,7 @@ static void give_cmd(unit * u, order * ord)
         msg_feedback(u, ord, "race_nogive", "race", u_race(u)));
       return;
     }
-    if (!check_give(u, u2, NULL, GIVE_HERBS)) {
+    if (!can_give(u, u2, NULL, GIVE_HERBS)) {
       feedback_give_not_allowed(u, ord);
       return;
     }
@@ -831,7 +845,7 @@ static void give_cmd(unit * u, order * ord)
   else if (p == P_ANY) {
     const char *s;
 
-    if (!check_give(u, u2, NULL, GIVE_ALLITEMS)) {
+    if (!can_give(u, u2, NULL, GIVE_ALLITEMS)) {
       feedback_give_not_allowed(u, ord);
       return;
     }
@@ -888,7 +902,7 @@ static void give_cmd(unit * u, order * ord)
         if (itype != NULL) {
           item *i = *i_find(&u->items, itype);
           if (i != NULL) {
-            if (check_give(u, u2, itype, 0)) {
+              if (can_give(u, u2, itype, 0)) {
               n = i->number - get_reservation(u, itype->rtype);
               give_item(n, itype, u, u2, ord);
             } else {
@@ -941,7 +955,7 @@ static void give_cmd(unit * u, order * ord)
 
   itype = finditemtype(s, u->faction->locale);
   if (itype != NULL) {
-    if (check_give(u, u2, itype, 0)) {
+      if (can_give(u, u2, itype, 0)) {
       give_item(n, itype, u, u2, ord);
     } else {
       feedback_give_not_allowed(u, ord);
@@ -2747,6 +2761,24 @@ static int max_skill(region * r, faction * f, skill_t sk)
   return w;
 }
 
+message * check_steal(const unit * u, struct order *ord) {
+    plane *pl;
+
+    if (fval(u_race(u), RCF_NOSTEAL)) {
+        return msg_feedback(u, ord, "race_nosteal", "race", u_race(u));
+    }
+
+    if (fval(u->region->terrain, SEA_REGION) && u_race(u) != get_race(RC_AQUARIAN)) {
+        return msg_feedback(u, ord, "error_onlandonly", "");
+    }
+
+    pl = rplane(u->region);
+    if (pl && fval(pl, PFL_NOATTACK)) {
+        return msg_feedback(u, ord, "error270", "");
+    }
+    return 0;
+}
+
 static void steal_cmd(unit * u, struct order *ord, request ** stealorders)
 {
   const resource_type *rring = get_resourcetype(R_RING_OF_NIMBLEFINGER);
@@ -2756,27 +2788,15 @@ static void steal_cmd(unit * u, struct order *ord, request ** stealorders)
   unit *u2 = NULL;
   region *r = u->region;
   faction *f = NULL;
-  plane *pl;
+  message * msg;
 
   assert(skill_enabled(SK_PERCEPTION) && skill_enabled(SK_STEALTH));
 
-  if (!fval(u_race(u), RCF_CANSTEAL)) {
-    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "race_nosteal", "race",
-        u_race(u)));
-    return;
+  msg = check_steal(u, ord);
+  if (msg) {
+      ADDMSG(&u->faction->msgs, msg);
+      return;
   }
-
-  if (fval(r->terrain, SEA_REGION) && u_race(u) != get_race(RC_AQUARIAN)) {
-    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_onlandonly", ""));
-    return;
-  }
-
-  pl = rplane(r);
-  if (pl && fval(pl, PFL_NOATTACK)) {
-    cmistake(u, ord, 270, MSG_INCOME);
-    return;
-  }
-
   init_tokens(ord);
   skip_token();
   id = read_unitid(u->faction, r);

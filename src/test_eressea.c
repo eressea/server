@@ -1,6 +1,9 @@
+#include <platform.h>
+#include <kernel/config.h>
 #include <CuTest.h>
 #include <stdio.h>
 #include <util/log.h>
+
 
 CuSuite *get_tests_suite(void);
 CuSuite *get_callback_suite(void);
@@ -39,6 +42,7 @@ int RunAllTests(void)
   int flags = log_flags;
 
   log_flags = LOG_FLUSH | LOG_CPERROR;
+  kernel_init();
 
   /* self-test */
   CuSuiteAddSuite(suite, get_tests_suite());

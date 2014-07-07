@@ -27,41 +27,38 @@ extern "C" {
 #include "direction.h"
 
 /* FAST_CONNECT: regions are directly connected to neighbours, saves doing
-   a hash-access each time a neighbour is needed */
+   a hash-access each time a neighbour is needed, 6 extra pointers per hex */
 #define FAST_CONNECT
 
-#define RF_CHAOTIC     (1<<0)
-#define RF_MALLORN     (1<<1)
-#define RF_BLOCKED     (1<<2)
+#define RF_CHAOTIC     (1<<0) /* persistent */
+#define RF_MALLORN     (1<<1) /* persistent */
+#define RF_BLOCKED     (1<<2) /* persistent */
 
-#define RF_BLOCK_NORTHWEST  (1<<3)
-#define RF_BLOCK_NORTHEAST  (1<<4)
-#define RF_BLOCK_EAST       (1<<5)
-#define RF_BLOCK_SOUTHEAST  (1<<6)
-#define RF_BLOCK_SOUTHWEST  (1<<7)
-#define RF_BLOCK_WEST       (1<<8)
+#define RF_UNUSED_3  (1<<3)
+#define RF_UNUSED_4  (1<<4)
+#define RF_UNUSED_5  (1<<5)
+#define RF_UNUSED_6  (1<<6)
+#define RF_UNUSED_7  (1<<7)
+#define RF_UNUSED_8  (1<<8)
 
-#define RF_ENCOUNTER   (1<<9)
-#define RF_MIGRATION   (1<<10)
-#define RF_UNUSED_1    (1<<11)
-#define RF_ORCIFIED    (1<<12)
-#define RF_CURSED      (1<<13)
+#define RF_ENCOUNTER   (1<<9) /* persistent */
+#define RF_MAPPER_HIGHLIGHT (1<<10)
+#define RF_LIGHTHOUSE  (1<<11) /* this region may contain a lighthouse */
+#define RF_ORCIFIED    (1<<12) /* persistent */
+#define RF_MIGRATION   (1<<13)
 
-  /* debug flags */
-#define RF_COMBATDEBUG (1<<14)
-#define RF_MAPPER_HIGHLIGHT (1<<14)     /* only used by mapper, not stored */
-#define RF_LIGHTHOUSE (1<<15)   /* this region may contain a lighthouse */
+#define RF_UNUSED_14 (1<<14)
+#define RF_UNUSED_15   (1<<15)
+#define RF_UNUSED_16   (1<<16)
 
 #define RF_SELECT      (1<<17)
 #define RF_MARK        (1<<18)
-
-/* flags that speed up attribute access: */
 #define RF_TRAVELUNIT    (1<<19)
-#define RF_GUARDED       (1<<20)
+#define RF_GUARDED       (1<<20) /* persistent */
 
 #define RF_ALL 0xFFFFFF
 
-#define RF_SAVEMASK (RF_GUARDED|RF_CHAOTIC|RF_MALLORN|RF_BLOCKED|RF_BLOCK_NORTHWEST|RF_BLOCK_NORTHEAST|RF_BLOCK_EAST|RF_BLOCK_SOUTHEAST|RF_BLOCK_SOUTHWEST|RF_BLOCK_WEST|RF_ENCOUNTER|RF_ORCIFIED)
+#define RF_SAVEMASK (RF_CHAOTIC|RF_MALLORN|RF_BLOCKED|RF_ENCOUNTER|RF_ORCIFIED|RF_GUARDED)
   struct message;
   struct message_list;
   struct rawmaterial;

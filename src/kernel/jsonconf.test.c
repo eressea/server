@@ -16,29 +16,41 @@
 #include <tests.h>
 #include <stdio.h>
 
-static void check_flag(CuTest *tc, const char *name, int flag) {
+static const struct race * race_with_flag(const char * name) {
     char data[1024];
-    const struct race *rc;
     cJSON *json;
     sprintf(data, "{\"races\" : { \"orc\": { \"speed\" : 1, \"flags\" : [ \"%s\"] }}}", name);
 
     json = cJSON_Parse(data);
     free_races();
     json_config(json);
-    rc = rc_find("orc");
+    return rc_find("orc");
+}
+
+static void check_ec_flag(CuTest *tc, const char *name, int flag) {
+    const struct race *rc = race_with_flag(name);
+    CuAssertPtrNotNull(tc, rc);
+    CuAssertIntEquals(tc, flag, rc->ec_flags);
+}
+
+static void check_flag(CuTest *tc, const char *name, int flag) {
+    const struct race *rc = race_with_flag(name);
     CuAssertPtrNotNull(tc, rc);
     CuAssertIntEquals(tc, flag, rc->flags);
-    CuAssertDblEquals(tc, 1.0f, rc->speed, 0.0f);
 }
 
 static void test_flags(CuTest *tc) {
-    check_flag(tc, "playerrace", RCF_PLAYERRACE);
+    check_flag(tc, "npc", RCF_NPC);
     check_flag(tc, "scarepeasants", RCF_SCAREPEASANTS);
-    check_flag(tc, "cansteal", RCF_CANSTEAL);
+    check_flag(tc, "nosteal", RCF_NOSTEAL);
     check_flag(tc, "noheal", RCF_NOHEAL);
     check_flag(tc, "undead", RCF_UNDEAD);
     check_flag(tc, "dragon", RCF_DRAGON);
     check_flag(tc, "fly", RCF_FLY);
+    check_ec_flag(tc, "getitem", GETITEM);
+    check_ec_flag(tc, "giveitem", GIVEITEM);
+    check_ec_flag(tc, "giveperson", GIVEPERSON);
+    check_ec_flag(tc, "giveunit", GIVEUNIT);
     test_cleanup();
 }
 
@@ -56,7 +68,7 @@ static void test_races(CuTest * tc)
         "\"capacity\" : 4,"
         "\"hp\" : 5,"
         "\"ac\" : 6,"
-        "\"flags\" : [ \"playerrace\", \"walk\", \"undead\" ]"
+        "\"flags\" : [ \"npc\", \"walk\", \"undead\" ]"
         "}}}";
     cJSON *json = cJSON_Parse(data);
     const struct race *rc;
@@ -70,7 +82,7 @@ static void test_races(CuTest * tc)
     CuAssertPtrNotNull(tc, races);
     rc = rc_find("orc");
     CuAssertPtrNotNull(tc, rc);
-    CuAssertIntEquals(tc, RCF_PLAYERRACE|RCF_WALK|RCF_UNDEAD, rc->flags);
+    CuAssertIntEquals(tc, RCF_NPC|RCF_WALK|RCF_UNDEAD, rc->flags);
     CuAssertStrEquals(tc, "1d4", rc->def_damage);
     CuAssertDblEquals(tc, 1.0, rc->magres, 0.0);
     CuAssertDblEquals(tc, 2.0, rc->maxaura, 0.0);
