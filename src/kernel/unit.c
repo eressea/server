@@ -1214,8 +1214,8 @@ bool has_skill(const unit * u, skill_t sk)
 static int item_invis(const unit *u) {
     const struct resource_type *rring = get_resourcetype(R_RING_OF_INVISIBILITY);
     const struct resource_type *rsphere = get_resourcetype(R_SPHERE_OF_INVISIBILITY);
-    return i_get(u->items, rring->itype)
-        + i_get(u->items, rsphere->itype) * 100;
+    return (rring ? i_get(u->items, rring->itype) : 0)
+      + (rsphere ? i_get(u->items, rsphere->itype) * 100 : 0);
 }
 
 static int item_modification(const unit * u, skill_t sk, int val)

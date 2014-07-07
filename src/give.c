@@ -95,21 +95,19 @@ static bool limited_give(const item_type * type)
 int give_quota(const unit * src, const unit * dst, const item_type * type,
   int n)
 {
-  static float divisor = -1;
+  float divisor;
 
-  if (divisor == 0 || !limited_give(type)) {
+  if (!limited_give(type)) {
     return n;
   }
   if (dst && src && src->faction != dst->faction) {
-    if (divisor < 0) {
       divisor = get_param_flt(global.parameters, "rules.items.give_divisor", 1);
       assert(divisor == 0 || divisor >= 1);
-    }
-    if (divisor >= 1) {
-      /* predictable > correct: */
-      int x = (int)(n / divisor);
-      return x;
-    }
+      if (divisor >= 1) {
+          /* predictable > correct: */
+          int x = (int)(n / divisor);
+          return x;
+      }
   }
   return n;
 }
