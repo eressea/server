@@ -697,7 +697,7 @@ end
 
 function test_golem_use_four_iron()
   local r0 = region.create(0, 0, "plain")
-  local f1 = faction.create("noreply@eressea.de", "dwarf", "de")
+  local f1 = faction.create("noreply@eressea.de", "halfling", "de")
   local u1 = unit.create(f1, r0, 3)
   u1.race = "irongolem"
   u1:set_skill("weaponsmithing", 1)
