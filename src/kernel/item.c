@@ -656,7 +656,7 @@ use_birthdayamulet(unit * u, const struct item_type *itype, int amount,
 #define FL_ITEM_MOUNT ((1<<4) | FL_ITEM_ANIMAL) /* ist ein Reittier */
 
 /* ------------------------------------------------------------- */
-/* Kann auch von Nichtmagier benutzt werden, modifiziert Taktik für diese
+/* Kann auch von Nichtmagier benutzt werden, modifiziert Taktik fï¿½r diese
  * Runde um -1 - 4 Punkte. */
 static int
 use_tacticcrystal(unit * u, const struct item_type *itype, int amount,
@@ -667,8 +667,8 @@ use_tacticcrystal(unit * u, const struct item_type *itype, int amount,
     int duration = 1;           /* wirkt nur eine Runde */
     curse *c;
     float effect;
-    float power = 5;            /* Widerstand gegen Antimagiesprüche, ist in diesem
-                                   Fall egal, da der curse für den Kampf gelten soll,
+    float power = 5;            /* Widerstand gegen Antimagiesprï¿½che, ist in diesem
+                                   Fall egal, da der curse fï¿½r den Kampf gelten soll,
                                    der vor den Antimagiezaubern passiert */
 
     effect = (float)(rng_int() % 6 - 1);
@@ -685,8 +685,8 @@ use_tacticcrystal(unit * u, const struct item_type *itype, int amount,
 
 typedef struct t_item {
   const char *name;
-  /* [0]: Einzahl für eigene; [1]: Mehrzahl für eigene;
-   * [2]: Einzahl für Fremde; [3]: Mehrzahl für Fremde */
+  /* [0]: Einzahl fï¿½r eigene; [1]: Mehrzahl fï¿½r eigene;
+   * [2]: Einzahl fï¿½r Fremde; [3]: Mehrzahl fï¿½r Fremde */
   bool is_resource;
   skill_t skill;
   int minskill;
@@ -712,7 +712,7 @@ static int
 mod_dwarves_only(const unit * u, const region * r, skill_t sk, int value)
 {
     unused_arg(r);
-    if (u->faction->race == get_race(RC_DWARF)) {
+    if (u_race(u) == new_race[RC_DWARF] || (u_race(u)->flags & RCF_IRONGOLEM)) {
         return value;
     }
     return -118;
@@ -779,7 +779,7 @@ use_warmthpotion(struct unit *u, const struct item_type *itype, int amount,
     if (u->faction->race == get_race(RC_INSECT)) {
     fset(u, UFL_WARMTH);
   } else {
-    /* nur für insekten: */
+    /* nur fï¿½r insekten: */
     cmistake(u, ord, 163, MSG_EVENT);
     return ECUSTOM;
   }
