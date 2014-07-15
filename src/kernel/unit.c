@@ -69,7 +69,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 attrib_type at_creator = {
   "creator"
-    /* Rest ist NULL; tempor�res, nicht alterndes Attribut */
+    /* Rest ist NULL; temporaeres, nicht alterndes Attribut */
 };
 
 #define UMAXHASH MAXUNITS
@@ -619,7 +619,7 @@ void usetcontact(unit * u, const unit * u2)
 }
 
 bool ucontact(const unit * u, const unit * u2)
-/* Pr�ft, ob u den Kontaktiere-Befehl zu u2 gesetzt hat. */
+/* Prueft, ob u den Kontaktiere-Befehl zu u2 gesetzt hat. */
 {
   attrib *ru;
   if (u->faction == u2->faction)
@@ -776,7 +776,7 @@ ship *leftship(const unit * u)
 {
   attrib *a = a_find(u->attribs, &at_leftship);
 
-  /* Achtung: Es ist nicht garantiert, da� der R�ckgabewert zu jedem
+  /* Achtung: Es ist nicht garantiert, dass der Rueckgabewert zu jedem
    * Zeitpunkt noch auf ein existierendes Schiff zeigt! */
 
   if (a)
@@ -930,7 +930,7 @@ void transfermen(unit * u, unit * u2, int n)
   if (n == 0)
     return;
   assert(n > 0);
-  /* "hat attackiert"-status wird �bergeben */
+  /* "hat attackiert"-status wird uebergeben */
 
   if (u2) {
     skill *sv, *sn;
@@ -1016,7 +1016,7 @@ void transfermen(unit * u, unit * u2, int n)
     set_number(u2, u2->number + n);
     hp -= u->hp;
     u2->hp += hp;
-    /* TODO: Das ist schnarchlahm! und geh�rt nicht hierhin */
+    /* TODO: Das ist schnarchlahm! und gehoert nicht hierhin */
     a = a_find(u2->attribs, &at_effect);
     while (a && a->type == &at_effect) {
       attrib *an = a->next;
@@ -1050,7 +1050,7 @@ struct building *inside_building(const struct unit *u)
     /* Unterhalt nicht bezahlt */
     return NULL;
   } else if (u->building->size < u->building->type->maxsize) {
-    /* Geb�ude noch nicht fertig */
+    /* Gebaeude noch nicht fertig */
     return NULL;
   } else {
     int p = 0, cap = buildingcapacity(u->building);
@@ -1118,7 +1118,7 @@ void u_setfaction(unit * u, faction * f)
     }
 }
 
-/* vorsicht Spr�che k�nnen u->number == RS_FARVISION haben! */
+/* vorsicht Sprueche koennen u->number == RS_FARVISION haben! */
 void set_number(unit * u, int count)
 {
   assert(count >= 0);
@@ -1268,8 +1268,8 @@ static int att_modification(const unit * u, skill_t sk)
   }
 
   /* TODO hier kann nicht mit get/iscursed gearbeitet werden, da nur der
-   * jeweils erste vom Typ C_GBDREAM zur�ckgegen wird, wir aber alle
-   * durchsuchen und aufaddieren m�ssen */
+   * jeweils erste vom Typ C_GBDREAM zurueckgegen wird, wir aber alle
+   * durchsuchen und aufaddieren muessen */
   if (u->region) {
     double bonus = 0, malus = 0;
     attrib *a = a_find(u->region->attribs, &at_curse);
@@ -1278,7 +1278,7 @@ static int att_modification(const unit * u, skill_t sk)
       if (curse_active(c) && c->type == gbdream_ct) {
         double mod = curse_geteffect(c);
         unit *mage = c->magician;
-        /* wir suchen jeweils den gr��ten Bonus und den gr��ten Malus */
+        /* wir suchen jeweils den groesten Bonus und den groesten Malus */
         if (mod > bonus) {
           if (mage == NULL || mage->number == 0
             || alliedunit(mage, u->faction, HELP_GUARD)) {
@@ -1489,7 +1489,7 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
   if (r)
     move_unit(u, r, NULL);
 
-  /* u->race muss bereits gesetzt sein, wird f�r default-hp gebraucht */
+  /* u->race muss bereits gesetzt sein, wird fuer default-hp gebraucht */
   /* u->region auch */
   u->hp = unit_max_hp(u) * number;
 
@@ -1505,7 +1505,7 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
     /* erbt Kampfstatus */
     setstatus(u, creator->status);
 
-    /* erbt Geb�ude/Schiff */
+    /* erbt Gebaeude/Schiff */
     if (creator->region == r) {
       if (creator->building) {
         u_set_building(u, creator->building);
@@ -1686,7 +1686,7 @@ int unit_max_hp(const unit * u)
     p = pow(effskill(u, SK_STAMINA) / 2.0, 1.5) * 0.2;
     h += (int)(h * p + 0.5);
   }
-  /* der healing curse ver�ndert die maximalen hp */
+  /* der healing curse veraendert die maximalen hp */
   if (heal_ct) {
     curse *c = get_curse(u->region->attribs, heal_ct);
     if (c) {
