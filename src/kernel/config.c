@@ -1736,12 +1736,51 @@ static const char * parameter_key(int i)
   return parameters[i];
 }
 
+
+void init_terrains_translation(const struct locale *lang) {
+    void **tokens;
+    const terrain_type *terrain;
+    
+    tokens = get_translations(lang, UT_TERRAINS);
+    for (terrain = terrains(); terrain != NULL; terrain = terrain->next) {
+        variant var;
+        const char *name;
+        var.v = (void *)terrain;
+        name = LOC(lang, terrain->_name);
+        if (name) {
+            addtoken(tokens, name, var);
+        }
+        else {
+            log_error_n("no translation for terrain %s in locale %s", terrain->_name, locale_name(lang));
+        }
+    }
+}
+
+void init_options_translation(const struct locale * lang) {
+    void **tokens;
+    int i;
+
+    tokens = get_translations(lang, UT_OPTIONS);
+    for (i = 0; i != MAXOPTIONS; ++i) {
+        variant var;
+        var.i = i;
+        if (options[i]) {
+            const char *name = LOC(lang, options[i]);
+            if (name) {
+                addtoken(tokens, name, var);
+            }
+            else {
+                log_error_n("no translation for OPTION %s in locale %s", options[i], locale_name(lang));
+            }
+        }
+    }
+}
+
 static void init_locale(const struct locale *lang)
 {
     variant var;
     int i;
     const struct race *rc;
-    const terrain_type *terrain;
     void **tokens;
 
     tokens = get_translations(lang, UT_MAGIC);
@@ -1755,12 +1794,19 @@ static void init_locale(const struct locale *lang)
         sstr = _strdup(str);
         tok = strtok(sstr, " ");
         while (tok) {
+            const char *name;
             for (i = 0; i != MAXMAGIETYP; ++i) {
                 if (strcmp(tok, magic_school[i]) == 0) break;
             }
             assert(i != MAXMAGIETYP);
             var.i = i;
-            addtoken(tokens, LOC(lang, mkname("school", tok)), var);
+            name = LOC(lang, mkname("school", tok));
+            if (name) {
+                addtoken(tokens, name, var);
+            }
+            else {
+                log_error_n("no translation for magic school %s in locale %s", tok, locale_name(lang));
+            }
             tok = strtok(NULL, " ");
         }
         free(sstr);
@@ -1772,24 +1818,18 @@ static void init_locale(const struct locale *lang)
 
     tokens = get_translations(lang, UT_RACES);
     for (rc = races; rc; rc = rc->next) {
+        const char *name;
         var.v = (void *)rc;
-        addtoken(tokens, LOC(lang, rc_name(rc, 1)), var);
-        addtoken(tokens, LOC(lang, rc_name(rc, 0)), var);
+        name = LOC(lang, rc_name(rc, 1));
+        if (name) addtoken(tokens, name, var);
+        name = LOC(lang, rc_name(rc, 0));
+        if (name) addtoken(tokens, name, var);
     }
 
     init_translations(lang, UT_PARAMS, parameter_key, MAXPARAMS);
 
-    tokens = get_translations(lang, UT_OPTIONS);
-    for (i = 0; i != MAXOPTIONS; ++i) {
-        var.i = i;
-        if (options[i]) addtoken(tokens, LOC(lang, options[i]), var);
-    }
-
-    tokens = get_translations(lang, UT_TERRAINS);
-    for (terrain = terrains(); terrain != NULL; terrain = terrain->next) {
-        var.v = (void *)terrain;
-        addtoken(tokens, LOC(lang, terrain->_name), var);
-    }
+    init_options_translation(lang);
+    init_terrains_translation(lang);
 }
 
 typedef struct param {
@@ -1918,10 +1958,7 @@ void init_locales(void)
 {
     int l;
     for (l = 0; localenames[l]; ++l) {
-        const struct locale *lang = get_locale(localenames[l]);
-        if (!lang) {
-            lang = get_or_create_locale(localenames[l]);
-        }
+        const struct locale *lang = get_or_create_locale(localenames[l]);
         init_locale(lang);
     }
 }

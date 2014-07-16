@@ -670,5 +670,6 @@ void json_config(cJSON *json) {
             log_error_n("config contains unknown attribute %s", child->string);
         }
     }
+    init_locales();
 }
 

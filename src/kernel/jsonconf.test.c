@@ -2,6 +2,7 @@
 #include "types.h"
 #include "jsonconf.h"
 
+#include "config.h"
 #include "building.h"
 #include "direction.h"
 #include "item.h"
@@ -95,6 +96,23 @@ static void test_races(CuTest * tc)
     CuAssertIntEquals(tc, 5, rc->hitpoints);
     CuAssertIntEquals(tc, 6, rc->armor);
     test_cleanup();
+}
+
+static void test_findrace(CuTest *tc) {
+    const char * data = "{\"races\": { \"dwarf\": {} }, \"strings\": { \"de\" : { \"race::dwarf\" : \"Zwerg\" } } }";
+    cJSON *json = cJSON_Parse(data);
+    const struct locale *lang;
+    const race *rc;
+
+    CuAssertPtrNotNull(tc, json);
+    test_cleanup();
+    lang = get_or_create_locale("de");
+    CuAssertPtrEquals(tc, 0, (void *)findrace("Zwerg", lang));
+
+    json_config(json);
+    rc = findrace("Zwerg", lang);
+    CuAssertPtrNotNull(tc, rc);
+    CuAssertStrEquals(tc, "dwarf", rc->_name[0]);
 }
 
 static void test_items(CuTest * tc)
@@ -389,6 +407,7 @@ CuSuite *get_jsonconf_suite(void)
     SUITE_ADD_TEST(suite, test_castles);
     SUITE_ADD_TEST(suite, test_terrains);
     SUITE_ADD_TEST(suite, test_races);
+    SUITE_ADD_TEST(suite, test_findrace);
     SUITE_ADD_TEST(suite, test_strings);
     SUITE_ADD_TEST(suite, test_spells);
     SUITE_ADD_TEST(suite, test_flags);

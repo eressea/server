@@ -2175,7 +2175,6 @@ static int parse_strings(xmlDocPtr doc)
   xmlXPathFreeObject(strings);
 
   xmlXPathFreeContext(xpath);
-  init_locales();
   return 0;
 }
 
