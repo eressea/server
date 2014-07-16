@@ -364,7 +364,7 @@ use_museumticket(unit * u, const struct item_type *itype, int amount,
 
   unused_arg(amount);
 
-  /* Prüfen ob in normaler Plane und nur eine Person */
+  /* Pruefen ob in normaler Plane und nur eine Person */
   if (pl != get_homeplane()) {
     cmistake(u, ord, 265, MSG_MAGIC);
     return 0;
