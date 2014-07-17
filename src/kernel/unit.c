@@ -798,7 +798,7 @@ void u_set_ship(unit * u, ship * sh)
 {
   assert(!u->ship); /* you must leave_ship */
   u->ship = sh;
-  if (sh && !sh->_owner || sh->_owner->number <= 0) {
+  if (sh && (!sh->_owner || sh->_owner->number <= 0)) {
     ship_set_owner(u);
   }
 }
