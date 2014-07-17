@@ -136,7 +136,6 @@ int read_xml(const char *filename, const char *catalog)
       result = 0;
   }
   xmlFreeDoc(doc);
-  init_locales();
   return result;
 #else
     log_error("LIBXML2 disabled, cannot read %s.\n", filename);

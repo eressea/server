@@ -4695,6 +4695,7 @@ int init_data(const char *filename, const char *catalog)
   int l;
 
   l = read_xml(filename, catalog);
+  init_locales();
   if (l)
     return l;
 
