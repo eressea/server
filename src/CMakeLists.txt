@@ -184,7 +184,7 @@ add_test(
   COMMAND $<TARGET_FILE:eressea> runtests.lua
   )
 
-install(TARGETS eressea DESTINATION bin)
+install(TARGETS eressea DESTINATION "bin")
 
 if (SQLITE3_FOUND)
 target_link_libraries(eressea ${SQLITE3_LIBRARIES})
