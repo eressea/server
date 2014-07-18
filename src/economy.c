@@ -1164,17 +1164,10 @@ void economics(region * r)
 
   for (u = r->units; u; u = u->next) {
     order *ord;
-    bool destroyed = false;
     if (u->number > 0) {
       for (ord = u->orders; ord; ord = ord->next) {
         keyword_t kwd = getkeyword(ord);
-        if (kwd == K_DESTROY) {
-          if (!destroyed) {
-            if (destroy_cmd(u, ord) != 0)
-              ord = NULL;
-            destroyed = true;
-          }
-        } else if (kwd == K_GIVE) {
+		if (kwd == K_GIVE) {
           give_cmd(u, ord);
         } else if (kwd == K_FORGET) {
           forget_cmd(u, ord);
@@ -1207,6 +1200,27 @@ void economics(region * r)
   if (recruitorders)
     expandrecruit(r, recruitorders);
   remove_empty_units_in_region(r);
+
+  for (u = r->units; u; u = u->next) {
+	  order *ord;
+	  bool destroyed = false;
+	  if (u->number > 0) {
+		  for (ord = u->orders; ord; ord = ord->next) {
+			  keyword_t kwd = getkeyword(ord);
+			  if (kwd == K_DESTROY) {
+				  if (!destroyed) {
+					  if (destroy_cmd(u, ord) != 0)
+						  ord = NULL;
+					  destroyed = true;
+					}
+			  }
+			  if (u->orders == NULL) {
+				  break;
+			  }
+		  }
+	  }
+  }
+
 }
 
 /* ------------------------------------------------------------- */
