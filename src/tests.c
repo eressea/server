@@ -1,6 +1,7 @@
 #include <platform.h>
 #include <kernel/types.h>
 #include "tests.h"
+#include "keyword.h"
 
 #include <kernel/config.h>
 #include <kernel/region.h>
@@ -26,6 +27,7 @@ struct race *test_create_race(const char *name)
 {
   race *rc = rc_get_or_create(name);
   rc->maintenance = 10;
+  rc->ec_flags |= GETITEM | GIVEITEM;
   return rc;
 }
 
@@ -141,8 +143,11 @@ void test_create_world(void)
   region *island[2];
   int i;
   item_type * itype;
+  struct locale * loc;
 
-  get_or_create_locale("de");
+  loc = get_or_create_locale("de");
+  locale_setstring(loc, keyword(K_RESERVE), "RESERVIEREN");
+  locale_setstring(loc, "money", "SILBER");
   init_resources();
 
   itype = test_create_itemtype("horse");

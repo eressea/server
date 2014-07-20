@@ -111,7 +111,7 @@ static char* get_command(const order *ord, char *sbuffer, size_t size) {
         const struct locale *lang = ORD_LOCALE(ord);
         if (size > 0) {
             const char *str = (const char *)LOC(lang, keyword(kwd));
-            assert(str);
+                assert(str);
             if (text) --size;
             bytes = (int)strlcpy(bufp, str, size);
             if (wrptr(&bufp, &size, bytes) != 0) WARN_STATIC_BUFFER();
