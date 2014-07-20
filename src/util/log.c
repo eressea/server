@@ -35,7 +35,7 @@ static FILE *logfile;
 #define LOG_MAXBACKUPS 5
 void log_flush(void)
 {
-  fflush(logfile);
+  if (logfile) fflush(logfile);
 }
 
 void log_puts(const char *str)

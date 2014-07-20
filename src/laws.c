@@ -4038,8 +4038,7 @@ int pay_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-
-int reserve_cmd(unit * u, struct order *ord)
+static int reserve_i(unit * u, struct order *ord, int flags)
 {
   if (u->number > 0 && (urace(u)->ec_flags & GETITEM)) {
     int use, count;
@@ -4060,7 +4059,7 @@ int reserve_cmd(unit * u, struct order *ord)
       return 0;
 
     set_resvalue(u, rtype, 0);      /* make sure the pool is empty */
-    use = use_pooled(u, rtype, GET_DEFAULT, count);
+    use = use_pooled(u, rtype, flags, count);
     if (use) {
       set_resvalue(u, rtype, use);
       change_resource(u, rtype, use);
@@ -4068,6 +4067,14 @@ int reserve_cmd(unit * u, struct order *ord)
     }
   }
   return 0;
+}
+
+int reserve_cmd(unit * u, struct order *ord) {
+    return reserve_i(u, ord, GET_DEFAULT);
+}
+
+int reserve_self(unit * u, struct order *ord) {
+    return reserve_i(u, ord, GET_RESERVE | GET_SLACK);
 }
 
 int claim_cmd(unit * u, struct order *ord)

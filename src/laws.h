@@ -85,6 +85,7 @@ extern "C" {
   extern int reshow_cmd(struct unit *u, struct order *ord);
   extern int mail_cmd(struct unit *u, struct order *ord);
   extern int reserve_cmd(struct unit *u, struct order *ord);
+  extern int reserve_self(struct unit *u, struct order *ord);
   extern int claim_cmd(struct unit *u, struct order *ord);
   extern int follow_cmd(struct unit *u, struct order *ord);
 

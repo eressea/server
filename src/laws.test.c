@@ -6,6 +6,7 @@
 #include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
+#include <kernel/order.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
@@ -16,6 +17,8 @@
 
 #include <CuTest.h>
 #include <tests.h>
+
+#include <assert.h>
 
 static void test_new_building_can_be_renamed(CuTest * tc)
 {
@@ -209,6 +212,68 @@ static void test_cannot_create_unit_above_limit(CuTest * tc)
   CuAssertIntEquals(tc, 1, checkunitnumber(f, 4));
 }
 
+static void test_reserve_cmd(CuTest *tc) {
+    unit *u1, *u2;
+    faction *f;
+    region *r;
+    order *ord;
+    const resource_type *rtype;
+    const struct locale *loc;
+
+    test_cleanup();
+    test_create_world();
+
+    rtype = get_resourcetype(R_SILVER);
+    assert(rtype && rtype->itype);
+    f = test_create_faction(rc_find("human"));
+    r = findregion(0, 0);
+    assert(r && f);
+    u1 = test_create_unit(f, r);
+    u2 = test_create_unit(f, r);
+    assert(u1 && u2);
+    loc = get_locale("de");
+    assert(loc);
+    ord = create_order(K_RESERVE, loc, "200 SILBER");
+    assert(ord);
+    i_change(&u1->items, rtype->itype, 100);
+    i_change(&u2->items, rtype->itype, 100);
+    CuAssertIntEquals(tc, 200, reserve_cmd(u1, ord));
+    CuAssertIntEquals(tc, 200, i_get(u1->items, rtype->itype));
+    CuAssertIntEquals(tc, 0, i_get(u2->items, rtype->itype));
+    test_cleanup();
+}
+
+static void test_reserve_self(CuTest *tc) {
+    unit *u1, *u2;
+    faction *f;
+    region *r;
+    order *ord;
+    const resource_type *rtype;
+    const struct locale *loc;
+
+    test_cleanup();
+    test_create_world();
+
+    rtype = get_resourcetype(R_SILVER);
+    assert(rtype && rtype->itype);
+    f = test_create_faction(rc_find("human"));
+    r = findregion(0, 0);
+    assert(r && f);
+    u1 = test_create_unit(f, r);
+    u2 = test_create_unit(f, r);
+    assert(u1 && u2);
+    loc = get_locale("de");
+    assert(loc);
+    ord = create_order(K_RESERVE, loc, "200 SILBER");
+    assert(ord);
+    i_change(&u1->items, rtype->itype, 100);
+    i_change(&u2->items, rtype->itype, 100);
+    CuAssertIntEquals(tc, 100, reserve_self(u1, ord));
+    CuAssertIntEquals(tc, 100, i_get(u1->items, rtype->itype));
+    CuAssertIntEquals(tc, 100, i_get(u2->items, rtype->itype));
+    test_cleanup();
+}
+
 CuSuite *get_laws_suite(void)
 {
   CuSuite *suite = CuSuiteNew();
@@ -219,6 +284,8 @@ CuSuite *get_laws_suite(void)
   SUITE_ADD_TEST(suite, test_fishing_does_not_give_goblins_money);
   SUITE_ADD_TEST(suite, test_fishing_gets_reset);
   SUITE_ADD_TEST(suite, test_unit_limit);
+  SUITE_ADD_TEST(suite, test_reserve_self);
+  SUITE_ADD_TEST(suite, test_reserve_cmd);
   SUITE_ADD_TEST(suite, test_cannot_create_unit_above_limit);
   return suite;
 }
