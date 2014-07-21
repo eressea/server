@@ -87,16 +87,41 @@ connection *find_border(unsigned int id)
 
 int resolve_borderid(variant id, void *addr)
 {
-  int result = 0;
-  connection *b = NULL;
-  if (id.i != 0) {
-    b = find_border(id.i);
-    if (b == NULL) {
-      result = -1;
+    int result = 0;
+    connection *b = NULL;
+    if (id.i != 0) {
+        b = find_border(id.i);
+        if (b == NULL) {
+            result = -1;
+        }
     }
-  }
-  *(connection **) addr = b;
-  return result;
+    *(connection **)addr = b;
+    return result;
+}
+
+static void walk_i(region *r, connection *b, void(*cb)(connection *, void *), void *data) {
+    for (; b; b = b->nexthash) {
+        if (b->from == r || b->to == r) {
+            connection *bn;
+            for (bn = b; bn; bn = bn->next) {
+                cb(b, data);
+            }
+        }
+    }
+}
+
+void walk_connections(region *r, void(*cb)(connection *, void *), void *data) {
+    int key = reg_hashkey(r);
+    int d;
+
+    walk_i(r, borders[key], cb, data);
+    for (d = 0; d != MAXDIRECTIONS; ++d) {
+        region *rn = r_connect(r, d);
+        int k = reg_hashkey(rn);
+        if (k < key) {
+            walk_i(r, borders[k], cb, data);
+        }
+    }
 }
 
 static connection **get_borders_i(const region * r1, const region * r2)

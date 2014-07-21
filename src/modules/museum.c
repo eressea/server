@@ -455,6 +455,35 @@ border_type bt_questportal = {
     b_uvisible,                   /* uvisible */
 };
 
+static void use_key1(connection *b, void *data) {
+    unit * u = (unit *)data;
+    if (b->type == &bt_questportal) {
+        int lock = b->data.i;
+        b->data.i &= 0xFE;
+    }
+}
+
+static void use_key2(connection *b, void *data) {
+    unit * u = (unit *)data;
+    if (b->type == &bt_questportal) {
+        int lock = b->data.i;
+        b->data.i &= 0xFD;
+    }
+}
+
+static int
+use_museumkey(unit * u, const struct item_type *itype, int amount,
+order * ord)
+{
+    const struct item_type *ikey = it_find("questkey1");
+    assert(u);
+    assert(itype && ikey);
+    assert(amount >= 1);
+
+    walk_connections(u->region, itype==ikey ? use_key1 : use_key2, u);
+    return 0;
+}
+
 void register_museum(void)
 {
     register_bordertype(&bt_questportal);
@@ -465,6 +494,7 @@ void register_museum(void)
     at_register(&at_museumgiveback);
 
     register_item_use(use_museumticket, "use_museumticket");
+    register_item_use(use_museumkey, "use_museumkey");
     register_item_use(use_museumexitticket, "use_museumexitticket");
 }
 

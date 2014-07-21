@@ -93,7 +93,8 @@ extern "C" {
   int resolve_borderid(variant data, void *addr);
   extern void free_borders(void);
 
-  extern connection *get_borders(const struct region *r1,
+  void walk_connections(struct region *r, void(*cb)(struct connection *, void *), void *data);
+  connection *get_borders(const struct region *r1,
     const struct region *r2);
   /* returns the list of borders between r1 and r2 or r2 and r1 */
   extern connection *new_border(border_type * type, struct region *from,
