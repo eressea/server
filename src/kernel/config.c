@@ -2769,7 +2769,6 @@ void attrib_init(void)
   register_bordertype(&bt_wall);
   register_bordertype(&bt_illusionwall);
   register_bordertype(&bt_road);
-  register_bordertype(&bt_questportal);
 
   register_function((pf_generic) & minimum_wage, "minimum_wage");
 

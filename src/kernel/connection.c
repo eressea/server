@@ -459,58 +459,6 @@ border_type bt_illusionwall = {
 };
 
 /***
- * special quest door
- ***/
-
-bool b_blockquestportal(const connection * b, const unit * u,
-  const region * r)
-{
-  if (b->data.i > 0)
-    return true;
-  return false;
-}
-
-static const char *b_namequestportal(const connection * b, const region * r,
-  const struct faction *f, int gflags)
-{
-  const char *bname;
-  int lock = b->data.i;
-  unused_arg(b);
-  unused_arg(r);
-
-  if (gflags & GF_ARTICLE) {
-    if (lock > 0) {
-      bname = "a_gate_locked";
-    } else {
-      bname = "a_gate_open";
-    }
-  } else {
-    if (lock > 0) {
-      bname = "gate_locked";
-    } else {
-      bname = "gate_open";
-    }
-  }
-  if (gflags & GF_PURE)
-    return bname;
-  return LOC(f->locale, mkname("border", bname));
-}
-
-border_type bt_questportal = {
-  "questportal", VAR_INT,
-  b_opaque,
-  NULL,                         /* init */
-  NULL,                         /* destroy */
-  b_read,                       /* read */
-  b_write,                      /* write */
-  b_blockquestportal,           /* block */
-  b_namequestportal,            /* name */
-  b_rvisible,                   /* rvisible */
-  b_fvisible,                   /* fvisible */
-  b_uvisible,                   /* uvisible */
-};
-
-/***
  * roads. meant to replace the old at_road or r->road attribute
  ***/
 
