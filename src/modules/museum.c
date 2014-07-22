@@ -458,7 +458,9 @@ border_type bt_questportal = {
 static void use_key1(connection *b, void *data) {
     unit * u = (unit *)data;
     if (b->type == &bt_questportal) {
-        int lock = b->data.i;
+        const struct item_type *itype = it_find("questkey1");
+        ADDMSG(&u->faction->msgs,
+            msg_message("use_item", "unit item", u, itype->rtype));
         b->data.i &= 0xFE;
     }
 }
@@ -466,7 +468,9 @@ static void use_key1(connection *b, void *data) {
 static void use_key2(connection *b, void *data) {
     unit * u = (unit *)data;
     if (b->type == &bt_questportal) {
-        int lock = b->data.i;
+        const struct item_type *itype = it_find("questkey2");
+        ADDMSG(&u->faction->msgs,
+            msg_message("use_item", "unit item", u, itype->rtype));
         b->data.i &= 0xFD;
     }
 }
