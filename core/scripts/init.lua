@@ -34,7 +34,7 @@ function run_turn()
   end
 
   orderfile = orderfile or config.basepath .. '/orders.' .. turn
-  print("executing turn " .. get_turn() .. " with " .. orderfile)
+  print("executing turn " .. get_turn() .. " with " .. orderfile .. " with rules=" .. config.rules)
   local result = process(orderfile)
   if result==0 then
     dbupdate()

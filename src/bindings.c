@@ -1026,31 +1026,40 @@ static int tolua_report_unit(lua_State * L)
 
 static void parse_inifile(lua_State * L, dictionary * d, const char *section)
 {
-  int i;
-  size_t len = strlen(section);
-  for (i = 0; d && i != d->n; ++i) {
-    const char *key = d->key[i];
-    if (strncmp(section, key, len) == 0 && key[len] == ':') {
-      const char *str_value = d->val[i];
-      char *endp;
-      double num_value = strtod(str_value, &endp);
-      lua_pushstring(L, key + len + 1);
-      if (*endp) {
-        tolua_pushstring(L, str_value);
-      } else {
-        tolua_pushnumber(L, num_value);
-      }
-      lua_rawset(L, -3);
-    }
-  }
+    int i;
+    const char *arg;
+    size_t len = strlen(section);
 
-  /* special case */
-  lua_pushstring(L, "basepath");
-  lua_pushstring(L, basepath());
-  lua_rawset(L, -3);
-  lua_pushstring(L, "reportpath");
-  lua_pushstring(L, reportpath());
-  lua_rawset(L, -3);
+    for (i = 0; d && i != d->n; ++i) {
+        const char *key = d->key[i];
+        if (strncmp(section, key, len) == 0 && key[len] == ':') {
+            const char *str_value = d->val[i];
+            char *endp;
+            double num_value = strtod(str_value, &endp);
+            lua_pushstring(L, key + len + 1);
+            if (*endp) {
+                tolua_pushstring(L, str_value);
+            }
+            else {
+                tolua_pushnumber(L, num_value);
+            }
+            lua_rawset(L, -3);
+        }
+    }
+
+    /* special case */
+    lua_pushstring(L, "basepath");
+    lua_pushstring(L, basepath());
+    lua_rawset(L, -3);
+    lua_pushstring(L, "reportpath");
+    lua_pushstring(L, reportpath());
+    lua_rawset(L, -3);
+    arg = get_param(global.parameters, "config.rules");
+    if (arg) {
+        lua_pushstring(L, "rules");
+        lua_pushstring(L, arg);
+        lua_rawset(L, -3);
+    }
 }
 
 int tolua_bindings_open(lua_State * L)

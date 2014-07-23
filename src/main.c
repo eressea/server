@@ -121,6 +121,10 @@ static int parse_args(int argc, char **argv, int *exitcode)
         else {
             const char *arg;
             switch (argv[i][1]) {
+            case 'r':
+                i = get_arg(argc, argv, 2, i, &arg, 0);
+                set_param(&global.parameters, "config.rules", arg);
+                break;
             case 'c':
                 i = get_arg(argc, argv, 2, i, &confpath, 0);
                 break;
@@ -136,10 +140,6 @@ static int parse_args(int argc, char **argv, int *exitcode)
                 break;
             case 'q':
                 verbosity = 0;
-                break;
-            case 'r':
-                i = get_arg(argc, argv, 2, i, &arg, 0);
-                turn = atoi(arg);
                 break;
             case 'v':
                 i = get_arg(argc, argv, 2, i, &arg, 0);
