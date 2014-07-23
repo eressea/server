@@ -2,7 +2,7 @@ require "multis"
 
 function apply_fixes()
   local turn = get_turn()
-  if config.game=="eressea" and turn>654 and turn<662 then
+  if config.rules=="eressea" and turn>654 and turn<662 then
     print("Fixing familiars")
     fix_familiars()
   end

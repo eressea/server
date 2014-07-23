@@ -1,6 +1,6 @@
 local srcpath = config.source_dir
-local respath = srcpath .. '/' .. config.game .. '/res/'
-local paths = { config.game..'/scripts/?.lua';'lunit/?.lua','external/lunit/?.lua','scripts/?.lua';'scripts/?' }
+local respath = srcpath .. '/' .. config.rules .. '/res/'
+local paths = { config.rules..'/scripts/?.lua';'lunit/?.lua','external/lunit/?.lua','scripts/?.lua';'scripts/?' }
 
 tests = {'common'}
 for idx, test in pairs(tests) do
@@ -11,6 +11,6 @@ for idx, path in pairs(paths) do
   package.path = srcpath .. '/' .. path .. ';' .. package.path
 end
 
-read_xml(respath..'config-'..config.game..'.xml', respath..'catalog-'..config.game..'.xml')
+read_xml('config.xml', 'catalog.xml')
 
 require "init"

@@ -1,4 +1,4 @@
-require(config.game .. ".modules")
+require(config.rules .. ".modules")
 require "default"
 require "resources"
 
@@ -25,7 +25,7 @@ function run_tests()
 end
 
 function run_turn()
-  require(config.game .. ".main")
+  require(config.rules .. ".main")
 
   local turn = get_turn()
   if turn<0 then
