@@ -161,7 +161,7 @@ void report_summary(summary * s, summary * o, bool full)
   }
 #endif
   printf("Schreibe Zusammenfassung (parteien)...\n");
-  fprintf(F, "%s\n%s\n\n", global.gamename, gamedate2(default_locale));
+  fprintf(F, "%s\n%s\n\n", game_name(), gamedate2(default_locale));
   fprintf(F, "Auswertung Nr:         %d\n\n", turn);
   fprintf(F, "Parteien:              %s\n", pcomp(s->factions, o->factions));
   fprintf(F, "Einheiten:             %s\n", pcomp(s->nunits, o->nunits));

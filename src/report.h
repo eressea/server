@@ -15,8 +15,8 @@
 extern "C" {
 #endif
 
-  extern void register_nr(void);
-  extern void report_cleanup(void);
+  void register_nr(void);
+  void report_cleanup(void);
 
 #ifdef __cplusplus
 }

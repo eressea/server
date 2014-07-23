@@ -71,8 +71,9 @@
 #define SPELLBOOK_VERSION 340        /* turn 775, full spellbooks are stored for factions */
 #define NOOVERRIDE_VERSION 341        /* turn 775, full spellbooks are stored for factions */
 #define INTFLAGS_VERSION 342   /* turn 876, FFL_NPC is now bit 25, flags is an int */
+#define SAVEGAMEID_VERSION 343 /* instead of XMLNAME, save the game.id parameter from the config */
 
 #define MIN_VERSION CURSETYPE_VERSION      /* minimal datafile we support */
-#define RELEASE_VERSION INTFLAGS_VERSION /* current datafile */
+#define RELEASE_VERSION SAVEGAMEID_VERSION /* current datafile */
 
 #define STREAM_VERSION 2 /* internal encoding of binary files */

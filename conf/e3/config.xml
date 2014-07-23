@@ -158,6 +158,8 @@
     <param name="movement.shipspeed.skillbonus" value="6"/>
     <param name="alliance.auto" value="fight"/>
     <param name="alliance.restricted" value="fight"/>
+    <param name="game.id" value="3"/>
+    <param name="game.name" value="E3"/>
   </game>
   <rules>
     <function name="wage" value="minimum_wage"/>

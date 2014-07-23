@@ -39,7 +39,6 @@ extern "C" {
 
 /* Versionsänderungen: */
   extern int data_version;
-  extern const char *game_name;
   extern int enc_gamedata;
 
   extern int current_turn(void);

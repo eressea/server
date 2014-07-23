@@ -2119,7 +2119,7 @@ report_plaintext(const char *filename, report_context * ctx,
   }
 
   strftime(pzTime, 64, "%A, %d. %B %Y, %H:%M", localtime(&ctx->report_time));
-  m = msg_message("nr_header_date", "game date", global.gamename, pzTime);
+  m = msg_message("nr_header_date", "game date", game_name(), pzTime);
   nr_render(m, f->locale, buf, sizeof(buf), f);
   msg_release(m);
   centre(F, buf, true);

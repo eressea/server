@@ -59,13 +59,7 @@ static void parse_config(const char *filename)
         /* only one value in the [editor] section */
         force_color = iniparser_getint(d, "editor:color", force_color);
 #endif
-        /* excerpt from [config] (the rest is used in bindings.c) */
-        game_name = iniparser_getstring(d, "config:game", game_name);
     }
-    else {
-        log_error("could not open configuration file %s\n", filename);
-    }
-    global.inifile = d;
 }
 
 static int usage(const char *prog, const char *arg)
@@ -109,7 +103,7 @@ static int parse_args(int argc, char **argv, int *exitcode)
                 printf("\n%s PBEM host\n"
                     "Copyright (C) 1996-2005 C. Schlittchen, K. Zedel, E. Rehling, H. Peters.\n\n"
                     "Compilation: " __DATE__ " at " __TIME__ "\nVersion: %d.%d.%d\n\n",
-                    global.gamename, VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD);
+                    game_name(), VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD);
 #ifdef USE_CURSES          
             }
             else if (strcmp(argv[i] + 2, "color") == 0) {
@@ -261,12 +255,13 @@ int main(int argc, char **argv)
         return err;
     }
     /* ini file sets defaults for arguments*/
-    if (confpath) {
+    parse_config(inifile);
+    if (!global.inifile && confpath) {
         _snprintf(inipath, sizeof(inipath), "%s/%s", confpath, inifile);
         parse_config(inipath);
     }
-    else {
-        parse_config(inifile);
+    if (!global.inifile) {
+        log_error("could not open ini configuration %s\n", inifile);
     }
     /* parse arguments again, to override ini file */
     parse_args(argc, argv, &err);

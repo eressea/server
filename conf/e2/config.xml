@@ -97,6 +97,8 @@
     <param name="rules.check_overload" value="0"/>
     <param name="rules.limit.faction" value="2500"/>
     <param name="rules.maxskills.magic" value="5"/>
+    <param name="game.id" value="2"/>
+    <param name="game.name" value="Eressea"/>
   </game>
   <strings>
     <string name="mailto">
