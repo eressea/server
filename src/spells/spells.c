@@ -4929,7 +4929,7 @@ int sp_resist_magic_bonus(castorder * co)
   float power = co->force;
   spellparameter *pa = co->par;
   /* Pro Stufe koennen bis zu 5 Personen verzaubert werden */
-  double maxvictims = 5;
+  double maxvictims = 5 * power;
   int victims = (int)maxvictims;
 
   /* Schleife ueber alle angegebenen Einheiten */
