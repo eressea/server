@@ -3226,16 +3226,18 @@ static int sp_bloodsacrifice(castorder * co)
  */
 static void skill_summoned(unit * u, int level)
 {
-  if (level > 0) {
-    const race *rc = u_race(u);
-    skill_t sk;
-    for (sk = 0; sk != MAXSKILLS; ++sk) {
-      if (rc->bonus[sk] > 0) {
-        set_level(u, sk, level);
-      }
+    if (level > 0) {
+        const race *rc = u_race(u);
+        skill_t sk;
+        for (sk = 0; sk != MAXSKILLS; ++sk) {
+            if (rc->bonus[sk] > 0) {
+                set_level(u, sk, level);
+            }
+        }
+        if (rc->bonus[SK_STAMINA]) {
+            u->hp = unit_max_hp(u) * u->number;
+        }
     }
-  }
-  u->hp = unit_max_hp(u) * u->number;    // Bring the unit to max HitPoints just for the case stamina was changed
 }
 
 /* ------------------------------------------------------------- */
