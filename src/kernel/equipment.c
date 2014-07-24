@@ -139,6 +139,7 @@ void equip_unit_mask(struct unit *u, const struct equipment *eq, int mask)
             set_level(u, (skill_t)sk, i);
         }
       }
+	  u->hp = unit_max_hp(u) * u->number;    // Bring the unit to max HitPoints just for the case stamina was changed
     }
 
     if (mask & EQUIP_SPELLS) {

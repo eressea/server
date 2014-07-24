@@ -3235,6 +3235,7 @@ static void skill_summoned(unit * u, int level)
       }
     }
   }
+  u->hp = unit_max_hp(u) * u->number;    // Bring the unit to max HitPoints just for the case stamina was changed
 }
 
 /* ------------------------------------------------------------- */
