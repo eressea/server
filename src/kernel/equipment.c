@@ -128,64 +128,68 @@ void equip_unit(struct unit *u, const struct equipment *eq)
 
 void equip_unit_mask(struct unit *u, const struct equipment *eq, int mask)
 {
-  if (eq) {
-
-    if (mask & EQUIP_SKILLS) {
-      int sk;
-      for (sk = 0; sk != MAXSKILLS; ++sk) {
-        if (eq->skills[sk] != NULL) {
-          int i = dice_rand(eq->skills[sk]);
-          if (i > 0)
-            set_level(u, (skill_t)sk, i);
-        }
-      }
-    }
-
-    if (mask & EQUIP_SPELLS) {
-      if (eq->spellbook) {
-        quicklist * ql = eq->spellbook->spells;
-        int qi;
-        sc_mage * mage = get_mage(u);
-
-        for (qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-          spellbook_entry *sbe = (spellbook_entry *) ql_get(ql, qi);
-          unit_add_spell(u, mage, sbe->sp, sbe->level);
-        }
-      }
-    }
-
-    if (mask & EQUIP_ITEMS) {
-      itemdata *idata;
-      for (idata = eq->items; idata != NULL; idata = idata->next) {
-        int i = u->number * dice_rand(idata->value);
-        if (i > 0) {
-          i_add(&u->items, i_new(idata->itype, i));
-        }
-      }
-    }
-
-    if (eq->subsets) {
-      int i;
-      for (i = 0; eq->subsets[i].sets; ++i) {
-        if (chance(eq->subsets[i].chance)) {
-          float rnd = (1 + rng_int() % 1000) / 1000.0f;
-          int k;
-          for (k = 0; eq->subsets[i].sets[k].set; ++k) {
-            if (rnd <= eq->subsets[i].sets[k].chance) {
-              equip_unit_mask(u, eq->subsets[i].sets[k].set, mask);
-              break;
+    if (eq) {
+        
+        if (mask & EQUIP_SKILLS) {
+            int sk;
+            for (sk = 0; sk != MAXSKILLS; ++sk) {
+                if (eq->skills[sk] != NULL) {
+                    int i = dice_rand(eq->skills[sk]);
+                    if (i > 0) {
+                        set_level(u, (skill_t)sk, i);
+                        if (sk==SK_STAMINA) {
+                            u->hp = unit_max_hp(u) * u->number;
+                        }
+                    }
+                }
             }
-            rnd -= eq->subsets[i].sets[k].chance;
-          }
         }
-      }
+        
+        if (mask & EQUIP_SPELLS) {
+            if (eq->spellbook) {
+                quicklist * ql = eq->spellbook->spells;
+                int qi;
+                sc_mage * mage = get_mage(u);
+                
+                for (qi = 0; ql; ql_advance(&ql, &qi, 1)) {
+                    spellbook_entry *sbe = (spellbook_entry *) ql_get(ql, qi);
+                    unit_add_spell(u, mage, sbe->sp, sbe->level);
+                }
+            }
+        }
+        
+        if (mask & EQUIP_ITEMS) {
+            itemdata *idata;
+            for (idata = eq->items; idata != NULL; idata = idata->next) {
+                int i = u->number * dice_rand(idata->value);
+                if (i > 0) {
+                    i_add(&u->items, i_new(idata->itype, i));
+                }
+            }
+        }
+        
+        if (eq->subsets) {
+            int i;
+            for (i = 0; eq->subsets[i].sets; ++i) {
+                if (chance(eq->subsets[i].chance)) {
+                    float rnd = (1 + rng_int() % 1000) / 1000.0f;
+                    int k;
+                    for (k = 0; eq->subsets[i].sets[k].set; ++k) {
+                        if (rnd <= eq->subsets[i].sets[k].chance) {
+                            equip_unit_mask(u, eq->subsets[i].sets[k].set, mask);
+                            break;
+                        }
+                        rnd -= eq->subsets[i].sets[k].chance;
+                    }
+                }
+            }
+        }
+        
+        if (mask & EQUIP_SPECIAL) {
+            if (eq->callback)
+              eq->callback(eq, u);
+        }
     }
-
-    if (mask & EQUIP_SPECIAL) {
-      if (eq->callback)
-        eq->callback(eq, u);
-    }
-  }
 }
 
 void equip_items(struct item **items, const struct equipment *eq)

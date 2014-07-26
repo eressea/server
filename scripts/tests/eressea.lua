@@ -137,9 +137,9 @@ function test_ship_capacity()
     process_orders()
 
 --    print(s.region, u.region, r2)
-    assert_equal(r2.id, u1.region.id, "boat with 5 humans did not move")
-    assert_not_equal(r2.id, u2.region.id, "boat with too many people has moved")
-    assert_not_equal(r2.id, u4.region.id, "boat with too much cargo has moved")
+    assert_equal(r2, u1.region, "boat with 5 humans did not move")
+    assert_not_equal(r2, u2.region, "boat with too many people has moved")
+    assert_not_equal(r2, u4.region, "boat with too much cargo has moved")
 end
 
 function test_levitate()
