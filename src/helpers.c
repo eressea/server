@@ -18,6 +18,7 @@ without prior permission by the authors of Eressea.
 #include <util/bsdstring.h>
 #include <util/functions.h>
 #include <util/log.h>
+#include <util/resolve.h>
 
 #include <kernel/config.h>
 #include <kernel/equipment.h>
@@ -28,12 +29,16 @@ without prior permission by the authors of Eressea.
 #include <kernel/building.h>
 #include <kernel/item.h>
 #include <kernel/region.h>
+#include <kernel/version.h>
+
+#include <storage.h>
 
 #include <tolua.h>
 #include <lua.h>
 
 #include <assert.h>
 #include <string.h>
+#include <stdlib.h>
 
 static int
 lua_giveitem(unit * s, unit * d, const item_type * itype, int n, struct order *ord)
@@ -122,41 +127,6 @@ produce_resource(region * r, const resource_type * rtype, int norders)
     log_error("produce(%s) calling '%s': not a function.\n", regionname(r, NULL), fname);
     lua_pop(L, 1);
   }
-}
-
-static int lc_age(struct attrib *a)
-{
-  building_action *data = (building_action *) a->data.v;
-  const char *fname = data->fname;
-  const char *fparam = data->param;
-  building *b = data->b;
-  int result = -1;
-
-  assert(b != NULL);
-  if (fname != NULL) {
-    lua_State *L = (lua_State *) global.vm_state;
-
-    lua_getglobal(L, fname);
-    if (lua_isfunction(L, -1)) {
-      tolua_pushusertype(L, (void *)b, TOLUA_CAST "building");
-      if (fparam) {
-        tolua_pushstring(L, fparam);
-      }
-
-      if (lua_pcall(L, fparam ? 2 : 1, 1, 0) != 0) {
-        const char *error = lua_tostring(L, -1);
-        log_error("lc_age(%s) calling '%s': %s.\n", buildingname(b), fname, error);
-        lua_pop(L, 1);
-      } else {
-        result = (int)lua_tonumber(L, -1);
-        lua_pop(L, 1);
-      }
-    } else {
-      log_error("lc_age(%s) calling '%s': not a function.\n", buildingname(b), fname);
-      lua_pop(L, 1);
-    }
-  }
-  return (result != 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
 }
 
 static void push_param(lua_State * L, char c, spllprm * param)
@@ -571,7 +541,7 @@ int tolua_toid(lua_State * L, int idx, int def)
 
 void register_tolua_helpers(void)
 {
-  at_building_action.age = lc_age;
+    at_register(&at_building_action);
 
   register_function((pf_generic) & lua_building_protection,
     TOLUA_CAST "lua_building_protection");

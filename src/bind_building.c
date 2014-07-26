@@ -38,17 +38,6 @@ int tolua_buildinglist_next(lua_State * L)
     return 0;                   /* no more values to return */
 }
 
-static int tolua_building_addaction(lua_State * L)
-{
-  building *self = (building *) tolua_tousertype(L, 1, 0);
-  const char *fname = tolua_tostring(L, 2, 0);
-  const char *param = tolua_tostring(L, 3, 0);
-
-  building_addaction(self, fname, param);
-
-  return 0;
-}
-
 static int tolua_building_get_objects(lua_State * L)
 {
   building *self = (building *) tolua_tousertype(L, 1, 0);
@@ -253,7 +242,6 @@ void tolua_building_open(lua_State * L)
         tolua_building_set_region);
       tolua_variable(L, TOLUA_CAST "size", tolua_building_get_size,
         tolua_building_set_size);
-      tolua_function(L, TOLUA_CAST "add_action", tolua_building_addaction);
       tolua_function(L, TOLUA_CAST "get_typename", tolua_building_get_typename);
 #ifdef TODO
       .property("type", &building_gettype)

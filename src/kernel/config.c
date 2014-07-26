@@ -2802,7 +2802,6 @@ void attrib_init(void)
 
     at_deprecate("xontormiaexpress", a_readint);    /* required for old datafiles */
     at_register(&at_speedup);
-    at_register(&at_building_action);
 }
 
 void kernel_init(void)

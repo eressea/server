@@ -1222,6 +1222,12 @@ int eressea_run(lua_State *L, const char *luafile)
     global.vm_state = L;
     /* run the main script */
     if (luafile) {
+        const char * install = iniparser_getstring(global.inifile, "eressea:install", 0);
+        char path[MAX_PATH];
+        if (install) {
+            _snprintf(path, sizeof(path), "%s/%s", install, luafile);
+            luafile = path;
+        }
         log_debug("executing script %s\n", luafile);
 
         lua_getglobal(L, "debug");

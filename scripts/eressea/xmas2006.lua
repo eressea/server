@@ -8,11 +8,13 @@ function use_xmastree(u, amount)
   return 0
 end
 
-function update_xmas2006()
+local self = {}
+
+function self.update()
   local turn = get_turn()
   local season = get_season(turn)
   if season == "calendar::winter" then
-    print("it is " .. season .. ", the christmas trees do their magic")
+    eressea.log.debug("it is " .. season .. ", the christmas trees do their magic")
     local msg = message.create("xmastree_effect")
     for r in regions() do
       if r:get_key("xm06") then
@@ -38,17 +40,15 @@ function update_xmas2006()
   end
 end
 
-function xmas2006()
-  if get_gamename() == "Eressea" then
+function self.init()
     if not get_key("xm06") then
-      print("Es weihnachtet sehr (2006)")
-      set_key("xm06", true)
-      for f in factions() do
-        f:add_item("xmastree", 1)
-        f:add_notice("santa2006")
-      end
+        print("Es weihnachtet sehr (2006)")
+        set_key("xm06", true)
+        for f in factions() do
+            f:add_item("xmastree", 1)
+            f:add_notice("santa2006")
+        end
     end
-  end
 end
 
--- xmas2006()
+return self

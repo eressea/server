@@ -86,6 +86,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <attributes/otherfaction.h>
 
+#include <iniparser.h>
 /* libc includes */
 #include <assert.h>
 #include <stdio.h>
@@ -4796,16 +4797,29 @@ const char *confpath = 0;
 
 int init_data(const char *filename, const char *catalog)
 {
+    const char * install = iniparser_getstring(global.inifile, "eressea:install", 0);
     char filepath[MAX_PATH], catpath[MAX_PATH];
     int l;
 
-    if (confpath) {
+    if (install || confpath) {
+        if (install && confpath) {
+            _snprintf(filepath, sizeof(filepath), "%s/%s/", install, confpath);
+            _snprintf(catpath, sizeof(catpath), "%s/%s/", install, confpath);
+        }
+        else if (confpath) {
+            _snprintf(filepath, sizeof(filepath), "%s/", confpath);
+            _snprintf(catpath, sizeof(catpath), "%s/", confpath);
+        }
+        else if (install) {
+            _snprintf(filepath, sizeof(filepath), "%s/", install);
+            _snprintf(catpath, sizeof(catpath), "%s/", install);
+        }
         if (filename) {
-            _snprintf(filepath, sizeof(filepath), "%s/%s", confpath, filename);
+            strncat(filepath, filename, sizeof(filepath));
             filename = filepath;
         }
         if (catalog) {
-            _snprintf(catpath, sizeof(catpath), "%s/%s", confpath, catalog);
+            strncat(catpath, catalog, sizeof(catpath));
             catalog = catpath;
         }
     }

@@ -1,18 +1,36 @@
-require "gates"
+-- DEPRECATED
 
-local function eternath_exchange(b1, b2, size)
-  local units1 = gate_units(b1, size)
-  local units2 = gate_units(b2, size)
+-- implements parts of a quest in E2
+-- this module is deprecated, because it puts functions in the global environment for at_building_action
 
-  gate_travel(b2, units1)
-  gate_travel(b1, units2)
-end
+local gates = require('eressea.gates')
+
+local b1 = nil
+local b2 = nil
 
 function eternathgate_action(b)
-  if eternathgate == nil then
-    eternathgate = b
+  if b1 == nil then
+    b1 = b
+  elseif b2 == nil then
+    b2 = b
   else
-    eternath_exchange(eternathgate, b, 10)
+    eressea.log.error("data contains more than two Ethernath gates")
   end
   return 1
 end
+
+local eternath = {}
+
+function eternath.update()
+    if b1 and b2 then
+        local units1 = gates.units(b1, size)
+        local units2 = gates.units(b2, size)
+
+        gates.travel(b2, units1)
+        gates.travel(b1, units2)
+    else
+        eressea.log.error("data contains fewer than two Ethernath gates")
+    end
+end
+
+return eternath
