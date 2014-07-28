@@ -210,7 +210,10 @@ static void json_terrain(cJSON *json, terrain_type *ter) {
 
 static void json_building(cJSON *json, building_type *bt) {
     cJSON *child;
-    if (json->type!=cJSON_Object) {
+    const char *flags[] = {
+        "nodestroy", "nobuild", "unique", "decay", "dynamic", "magic", "oneperturn", "namechange", 0
+    };
+    if (json->type != cJSON_Object) {
         log_error_n("building %s is not a json object: %d", json->string, json->type);
         return;
     }
@@ -222,6 +225,9 @@ static void json_building(cJSON *json, building_type *bt) {
             }
             else if (strcmp(child->string, "maintenance") == 0) {
                 json_maintenance(child, &bt->maintenance);
+            }
+            else if (strcmp(child->string, "flags") == 0) {
+                json_flags(child, flags);
             }
             break;
         case cJSON_Object:
