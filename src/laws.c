@@ -4610,6 +4610,7 @@ void init_processor(void)
     p += 10;                      /* in case it has any effects on alliance victories */
     add_proc_order(p, K_LEAVE, &leave_cmd, 0, "Verlassen");
 
+	p += 10;
     add_proc_region(p, &do_battle, "Attackieren");
 
     if (!keyword_disabled(K_BESIEGE)) {
