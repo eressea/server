@@ -120,7 +120,7 @@ give_item(int want, const item_type * itype, unit * src, unit * dest,
   int n, r;
 
   assert(itype != NULL);
-  n = get_pooled(src, item2resource(itype), GET_DEFAULT, want);
+  n = get_pooled(src, item2resource(itype), GET_SLACK | GET_POOLED_SLACK, want);
   n = _min(want, n);
   r = n;
   if (dest && src->faction != dest->faction
@@ -144,7 +144,7 @@ give_item(int want, const item_type * itype, unit * src, unit * dest,
     int use = use_pooled(src, item2resource(itype), GET_SLACK, n);
     if (use < n)
       use +=
-        use_pooled(src, item2resource(itype), GET_RESERVE | GET_POOLED_SLACK,
+        use_pooled(src, item2resource(itype), GET_POOLED_SLACK,
         n - use);
     if (dest) {
       r = give_quota(src, dest, itype, n);
