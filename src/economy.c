@@ -1059,9 +1059,9 @@ static bool maintain(building * b, bool first)
         }
       }
       if (need > 0) {
-        if (!fval(m, MTF_VITAL))
-          work = false;
-        else {
+		  work = false;
+		  if (fval(m, MTF_VITAL))
+			{
           paid = false;
           break;
         }
@@ -1070,16 +1070,21 @@ static bool maintain(building * b, bool first)
   }
   if (paid && c > 0) {
     /* TODO: wieviel von was wurde bezahlt */
-    if (first) {
-      ADDMSG(&u->faction->msgs, msg_message("maintenance", "unit building", u,
-          b));
-    } else {
+    if (first && work) {
+      ADDMSG(&u->faction->msgs, msg_message("maintenance", "unit building", u, b));
+	  fset(b, BLD_WORKING);
+	  fset(b, BLD_MAINTAINED);
+    } 
+	if (!first) {
       ADDMSG(&u->faction->msgs, msg_message("maintenance_late", "building", b));
+	  fset(b, BLD_MAINTAINED);
     }
-    fset(b, BLD_MAINTAINED);
-    if (work) {
-      fset(b, BLD_WORKING);
-    }
+
+	if (first && !work) {
+		ADDMSG(&u->faction->msgs, msg_message("maintenancefail", "unit building", u, b));
+		return false;
+	}
+
     for (c = 0; b->type->maintenance[c].number; ++c) {
       const maintenance *m = b->type->maintenance + c;
       int cost = m->number;
@@ -1118,8 +1123,7 @@ static bool maintain(building * b, bool first)
       assert(cost == 0);
     }
   } else {
-    ADDMSG(&u->faction->msgs,
-      msg_message("maintenancefail", "unit building", u, b));
+    ADDMSG(&u->faction->msgs, msg_message("maintenancefail", "unit building", u, b));
     return false;
   }
   return true;
