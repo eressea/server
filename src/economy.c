@@ -1029,6 +1029,14 @@ static bool maintain(building * b, bool first)
   u = building_owner(b);
   if (u == NULL)
     return false;
+	 /* If the owner is the region owner, check if biggest castle has the dontpay flag */
+  if (get_param(global.parameters, "rules.region_owner_pay_building")) {
+	  if (u == building_owner(largestbuilding(r, &cmp_taxes, false))) {
+		  if (fval(u->building, BLD_DONTPAY)) {
+			  return false;
+		  }
+	  }
+  }
   for (c = 0; b->type->maintenance[c].number; ++c) {
     const maintenance *m = b->type->maintenance + c;
     int need = m->number;
