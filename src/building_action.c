@@ -25,6 +25,7 @@ without prior permission by the authors of Eressea.
 
 #include <assert.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct building_action {
     struct building *b;
