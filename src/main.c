@@ -41,7 +41,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <wctype.h>
 #include <iniparser.h>
 
-extern const char *confpath;
 static const char *logfile = "eressea.log";
 static const char *luafile = 0;
 static const char *inifile = "eressea.ini";
@@ -124,9 +123,6 @@ static int parse_args(int argc, char **argv, int *exitcode)
             case 'r':
                 i = get_arg(argc, argv, 2, i, &arg, 0);
                 set_param(&global.parameters, "config.rules", arg);
-                break;
-            case 'c':
-                i = get_arg(argc, argv, 2, i, &confpath, 0);
                 break;
             case 'f':
                 i = get_arg(argc, argv, 2, i, &luafile, 0);
@@ -245,7 +241,6 @@ extern void bind_monsters(struct lua_State *L);
 
 int main(int argc, char **argv)
 {
-    char inipath[MAX_PATH];
     int err = 0;
     lua_State *L;
     setup_signal_handler();
@@ -256,10 +251,6 @@ int main(int argc, char **argv)
     }
     /* ini file sets defaults for arguments*/
     parse_config(inifile);
-    if (!global.inifile && confpath) {
-        _snprintf(inipath, sizeof(inipath), "%s/%s", confpath, inifile);
-        parse_config(inipath);
-    }
     if (!global.inifile) {
         log_error("could not open ini configuration %s\n", inifile);
     }

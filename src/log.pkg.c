@@ -40,7 +40,7 @@ static int tolua_log_eressea_log_error00(lua_State* tolua_S)
  {
   const char* message = ((const char*)  tolua_tostring(tolua_S,1,0));
  {
-  log_error(message);
+  log_error_n(message);
  }
  }
  return 0;
@@ -103,6 +103,32 @@ static int tolua_log_eressea_log_debug00(lua_State* tolua_S)
 #endif
 }
 
+/* function: log_info */
+static int tolua_log_eressea_log_info00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+    tolua_Error tolua_err;
+    if (
+        !tolua_isstring(tolua_S, 1, 0, &tolua_err) ||
+        !tolua_isnoobj(tolua_S, 2, &tolua_err)
+        )
+        goto tolua_lerror;
+    else
+#endif
+    {
+        const char* message = ((const char*)tolua_tostring(tolua_S, 1, 0));
+        {
+            log_info(message);
+        }
+    }
+    return 0;
+#ifndef TOLUA_RELEASE
+tolua_lerror :
+    tolua_error(tolua_S, "#ferror in function 'info'.", &tolua_err);
+    return 0;
+#endif
+}
+
 /* Open lib function */
 LUALIB_API int luaopen_log (lua_State* tolua_S)
 {
@@ -116,7 +142,8 @@ LUALIB_API int luaopen_log (lua_State* tolua_S)
  tolua_beginmodule(tolua_S,"log");
  tolua_function(tolua_S,"error",tolua_log_eressea_log_error00);
  tolua_function(tolua_S,"warning",tolua_log_eressea_log_warning00);
- tolua_function(tolua_S,"debug",tolua_log_eressea_log_debug00);
+ tolua_function(tolua_S, "debug",tolua_log_eressea_log_debug00);
+ tolua_function(tolua_S, "info",tolua_log_eressea_log_info00);
  tolua_endmodule(tolua_S);
  tolua_endmodule(tolua_S);
  tolua_endmodule(tolua_S);

@@ -181,13 +181,29 @@ function run_turn(rules)
   return result
 end
 
-path = 'scripts'
-if config.source_dir ~= nil then
-	path = config.source_dir .. '/' .. path
+local confdir = 'conf/'
+
+if config.rules then
+    confdir = confdir .. config.rules .. '/'
+end
+if config.install then
+    confdir = config.install .. '/' .. confdir
+end
+read_xml(confdir .. 'config.xml', confdir .. 'catalog.xml')
+
+local path = 'scripts'
+if config.install then
+	path = config.install .. '/' .. path
 end
 package.path = package.path .. ';' .. path .. '/?.lua;' .. path .. '/?/init.lua'
 
-rules = require('eressea.' .. config.rules)
-read_xml()
+require 'eressea'
+local rules = {}
+if config.rules then
+    rules = require('eressea.' .. config.rules)
+    eressea.log.info('loaded ' .. table.getn(rules) .. ' modules for ' .. config.rules)
+else
+    eressea.log.warning('no rule modules loaded, specify a game in eressea.ini or with -r')
+end
 
 run_turn(rules)

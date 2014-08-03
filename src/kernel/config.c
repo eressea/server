@@ -2922,7 +2922,7 @@ const char * game_name(void) {
 }
 
 int game_id(void) {
-    return get_param_int(global.parameters, "game.id", global.game_id);
+    return get_param_int(global.parameters, "game.id", 0);
 }
 
 void load_inifile(dictionary * d)
@@ -2959,9 +2959,6 @@ void load_inifile(dictionary * d)
 
     str = iniparser_getstring(d, "eressea:locales", "de,en");
     make_locales(str);
-
-    /* excerpt from [config] (the rest is used in bindings.c) */
-    global.game_id = iniparser_getint(d, "config:game_id", 0);
 
     if (global.inifile) iniparser_free(global.inifile);
     global.inifile = d;

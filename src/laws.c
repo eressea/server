@@ -4796,41 +4796,14 @@ void update_subscriptions(void)
     fclose(F);
 }
 
-const char *confpath = 0;
-
 int init_data(const char *filename, const char *catalog)
 {
-    const char * install = iniparser_getstring(global.inifile, "eressea:install", 0);
-    char filepath[MAX_PATH], catpath[MAX_PATH];
     int l;
-
-    if (install || confpath) {
-        if (install && confpath) {
-            _snprintf(filepath, sizeof(filepath), "%s/%s/", install, confpath);
-            _snprintf(catpath, sizeof(catpath), "%s/%s/", install, confpath);
-        }
-        else if (confpath) {
-            _snprintf(filepath, sizeof(filepath), "%s/", confpath);
-            _snprintf(catpath, sizeof(catpath), "%s/", confpath);
-        }
-        else if (install) {
-            _snprintf(filepath, sizeof(filepath), "%s/", install);
-            _snprintf(catpath, sizeof(catpath), "%s/", install);
-        }
-        if (filename) {
-            strncat(filepath, filename, sizeof(filepath));
-            filename = filepath;
-        }
-        if (catalog) {
-            strncat(catpath, catalog, sizeof(catpath));
-            catalog = catpath;
-        }
-    }
     l = read_xml(filename, catalog);
-    init_locales();
-    if (l)
+    if (l) {
         return l;
-
+    }
+    init_locales();
     if (turn < 0) {
         turn = first_turn;
     }

@@ -1116,7 +1116,7 @@ int tolua_bindings_open(lua_State * L)
     tolua_module(L, TOLUA_CAST "config", 1);
     tolua_beginmodule(L, TOLUA_CAST "config");
     {
-      parse_inifile(L, global.inifile, "config");
+      parse_inifile(L, global.inifile, "lua");
       tolua_variable(L, TOLUA_CAST "locales", &config_get_locales, 0);
       tolua_function(L, TOLUA_CAST "get_resource", &config_get_resource);
       tolua_variable(L, TOLUA_CAST "buildings", &config_get_buildings, 0);
@@ -1222,12 +1222,6 @@ int eressea_run(lua_State *L, const char *luafile)
     global.vm_state = L;
     /* run the main script */
     if (luafile) {
-        const char * install = iniparser_getstring(global.inifile, "eressea:install", 0);
-        char path[MAX_PATH];
-        if (install) {
-            _snprintf(path, sizeof(path), "%s/%s", install, luafile);
-            luafile = path;
-        }
         log_debug("executing script %s\n", luafile);
 
         lua_getglobal(L, "debug");
