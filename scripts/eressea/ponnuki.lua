@@ -9,7 +9,7 @@ local jokes = {
 }
 
 local function ponnuki_brain(u)
-  local i = math.random(table.getn(jokes))
+  local i = math.random(#jokes)
   u:add_notice("Eine Botschaft von " .. tostring(u) .. ": " ..jokes[i])
   local d = math.random(6)
   local r = u.region:next(d-1)

@@ -189,6 +189,7 @@ end
 if config.install then
     confdir = config.install .. '/' .. confdir
 end
+print(confdir)
 read_xml(confdir .. 'config.xml', confdir .. 'catalog.xml')
 
 local path = 'scripts'
@@ -201,7 +202,7 @@ require 'eressea'
 local rules = {}
 if config.rules then
     rules = require('eressea.' .. config.rules)
-    eressea.log.info('loaded ' .. table.getn(rules) .. ' modules for ' .. config.rules)
+    eressea.log.info('loaded ' .. #rules .. ' modules for ' .. config.rules)
 else
     eressea.log.warning('no rule modules loaded, specify a game in eressea.ini or with -r')
 end

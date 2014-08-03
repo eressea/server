@@ -80,7 +80,8 @@ local function market_action(r)
 end
 
 local markets = {}
-local function markets.update()
+
+function markets.update()
   local r
   for r in regions() do
     market_action(r)
