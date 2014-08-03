@@ -183,9 +183,9 @@ end
 
 path = 'scripts'
 if config.source_dir ~= nil then
-	path = config.source_dir .. '\\' .. path
+	path = config.source_dir .. '/' .. path
 end
-package.path = package.path .. ';' .. path .. '\\?.lua;' .. path .. '\\?\\init.lua'
+package.path = package.path .. ';' .. path .. '/?.lua;' .. path .. '/?/init.lua'
 
 rules = require('eressea.' .. config.rules)
 read_xml()
