@@ -96,7 +96,6 @@ static int norders;
 static request *oa;
 
 #define RECRUIT_MERGE 1
-#define RECRUIT_CLASSIC 2
 static int rules_recruit = -1;
 
 static void recruit_init(void)
@@ -105,9 +104,6 @@ static void recruit_init(void)
     rules_recruit = 0;
     if (get_param_int(global.parameters, "recruit.allow_merge", 1)) {
       rules_recruit |= RECRUIT_MERGE;
-    }
-    if (get_param_int(global.parameters, "recruit.classic", 1)) {
-      rules_recruit |= RECRUIT_CLASSIC;
     }
   }
 }
@@ -1188,10 +1184,8 @@ void economics(region * r)
     if ((rules_recruit & RECRUIT_MERGE) || u->number == 0) {
       for (ord = u->orders; ord; ord = ord->next) {
         if (getkeyword(ord) == K_RECRUIT) {
-          if (rules_recruit & RECRUIT_CLASSIC) {
             recruit(u, ord, &recruitorders);
-          }
-          break;
+            break;
         }
       }
     }
