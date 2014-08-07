@@ -2320,7 +2320,7 @@ static void piracy_cmd(unit * u, struct order *ord)
     if (saff != 0) {
       saff = rng_int() % saff;
       for (dir = 0; dir != MAXDIRECTIONS; ++dir) {
-        if (saff != aff[dir].value)
+        if (saff < aff[dir].value)
           break;
         saff -= aff[dir].value;
       }
