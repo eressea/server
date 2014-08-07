@@ -682,6 +682,9 @@ static unit *building_owner_ex(const building * bld, const struct faction * last
 
 unit *building_owner(const building * bld)
 {
+  if (!bld) {
+		return NULL;
+	}
   unit *owner = bld->_owner;
   if (!owner || (owner->building!=bld || owner->number<=0)) {
     unit * heir = building_owner_ex(bld, owner?owner->faction:0);
