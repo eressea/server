@@ -2843,11 +2843,11 @@ void magic(void)
         }
       }
       /* erst bezahlen, dann Kostenzähler erhöhen */
-	  if (co->level>0) {
-		  pay_spell(u, sp, co->level, co->distance);
-	  }
-	  if (fumbled) {
-        do_fumble(co);
+      if (co->level>0) {
+          pay_spell(u, sp, co->level, co->distance);
+      }
+      if (fumbled) {
+          do_fumble(co);
       }
       countspells(u, 1);
     }
