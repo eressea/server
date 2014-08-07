@@ -1577,7 +1577,7 @@ bool check_leuchtturm(region * r, faction * f)
         if (fval(b, BLD_WORKING) && b->size >= 10) {
             int maxd = (int)log10(b->size) + 1;
 
-            if (skill_enabled(SK_PERCEPTION)) {
+            if (skill_enabled(SK_PERCEPTION) && f) {
                 region *r2 = b->region;
                 unit *u;
                 int c = 0;
