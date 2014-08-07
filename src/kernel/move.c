@@ -2396,15 +2396,12 @@ static int hunt(unit * u, order * ord)
     return 0;
   } else if (!u->ship) {
     cmistake(u, ord, 144, MSG_MOVE);
-    fset(u, UFL_LONGACTION | UFL_NOTMOVING);    /* FOLGE SCHIFF ist immer lang */
     return 0;
   } else if (u!=ship_owner(u->ship)) {
     cmistake(u, ord, 146, MSG_MOVE);
-    fset(u, UFL_LONGACTION | UFL_NOTMOVING);    /* FOLGE SCHIFF ist immer lang */
     return 0;
   } else if (!can_move(u)) {
     cmistake(u, ord, 55, MSG_MOVE);
-    fset(u, UFL_LONGACTION | UFL_NOTMOVING);    /* FOLGE SCHIFF ist immer lang */
     return 0;
   }
 
@@ -2412,7 +2409,6 @@ static int hunt(unit * u, order * ord)
 
   if (id <= 0) {
     cmistake(u, ord, 20, MSG_MOVE);
-    fset(u, UFL_LONGACTION | UFL_NOTMOVING);    /* FOLGE SCHIFF ist immer lang */
     return 0;
   }
 
@@ -2423,7 +2419,6 @@ static int hunt(unit * u, order * ord)
     if (sh == NULL || sh->region != rc) {
       cmistake(u, ord, 20, MSG_MOVE);
     }
-    fset(u, UFL_LONGACTION | UFL_NOTMOVING);    /* FOLGE SCHIFF ist immer lang */
     return 0;
   }
 
@@ -2523,7 +2518,7 @@ static void move_hunters(void)
               break;
             }
 
-            if (!fval(u, UFL_NOTMOVING) && !LongHunger(u) && hunt(u, ord)) {
+            if (!fval(u, UFL_LONGACTION) && !LongHunger(u) && hunt(u, ord)) {
               up = &r->units;
               break;
             }
@@ -2663,7 +2658,6 @@ void movement(void)
 }
 
 /** Overrides long orders with a FOLLOW order if the target is moving.
- * FOLLOW SHIP is a long order, and doesn't need to be treated in here.
  * BUGS: http://bugs.eressea.de/view.php?id=1444 (A folgt B folgt C)
  */
 void follow_unit(unit * u)
@@ -2671,18 +2665,22 @@ void follow_unit(unit * u)
   region *r = u->region;
   attrib *a = NULL;
   order *ord;
+  unit *u2 = NULL;
+  int followship = false;
 
   if (fval(u, UFL_NOTMOVING) || LongHunger(u))
     return;
 
-  for (ord = u->orders; ord; ord = ord->next) {
+  for (ord = u->orders; ord; ord = ord->next) { 
     const struct locale *lang = u->faction->locale;
 
     if (getkeyword(ord) == K_FOLLOW) {
       init_tokens(ord);
       skip_token();
-      if (getparam(lang) == P_UNIT) {
-        int id = read_unitid(u->faction, r);
+	  int id;
+	  param_t p = getparam(lang);
+      if (p == P_UNIT) {
+        id = read_unitid(u->faction, r);
 
         if (a != NULL) {
           a = a_find(u->attribs, &at_follow);
@@ -2699,32 +2697,71 @@ void follow_unit(unit * u)
           a_remove(&u->attribs, a);
           a = NULL;
         }
-      }
+	}
+		if (p == P_SHIP) {
+			id = getshipid();
+			if (id <= 0) {
+			/*	cmistake(u, ord, 20, MSG_MOVE); */
+			}
+			else  {
+				ship *sh = findship(id);
+				if (sh == NULL || (sh->region != r && hunted_dir(r->attribs, id) == NODIRECTION)) {
+					cmistake(u, ord, 20, MSG_MOVE);
+				}
+				else if (!u->ship) {
+				/*	cmistake(u, ord, 144, MSG_MOVE); */
+				}
+				else if (u != ship_owner(u->ship)) {
+				/*	cmistake(u, ord, 146, MSG_MOVE); */
+				}
+				else if (!can_move(u)) {
+				/*	cmistake(u, ord, 55, MSG_MOVE); */
+				}
+				else {
+					u2 = ship_owner(sh);
+					followship = true;
+				}
+			}
+		}
     }
   }
 
-  if (a && !fval(u, UFL_MOVED | UFL_NOTMOVING)) {
-    unit *u2 = a->data.v;
+  if ((a || followship )&& !fval(u, UFL_MOVED | UFL_NOTMOVING)) {
+	  if (!followship) {
+		  u2 = a->data.v;
+	  }
     bool follow = false;
 
-    if (!u2 || u2->region != r || !cansee(u->faction, r, u2, 0)) {
+    if (!u2 || (u2->region != r || !cansee(u->faction, r, u2, 0)) && !followship) {
       return;
     }
 
     switch (getkeyword(u2->thisorder)) {
     case K_MOVE:
     case K_ROUTE:
+		follow = true;
+		break;
     case K_DRIVE:
-      follow = true;
+		if (!followship) {
+			follow = true;
+		}
       break;
     default:
       for (ord = u2->orders; ord; ord = ord->next) {
         switch (getkeyword(ord)) {
         case K_FOLLOW:
+			follow = true;
+			break;
         case K_PIRACY:
-          follow = true;
+			if (followship) {
+				follow = true;
+			}
           break;
         default:
+			if (followship && u2->region != r) {
+				follow = true;
+				break;
+			}
           continue;
         }
         break;
