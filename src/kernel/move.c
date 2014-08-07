@@ -1763,9 +1763,15 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
 
       /* storms should be the first thing we do. */
       stormchance = stormyness / shipspeed(sh, u);
-      if (check_leuchtturm(next_point, NULL))
-        stormchance /= 3;
-
+	  if (check_leuchtturm(next_point, NULL)) {
+		  int param = get_param_int(global.parameters, "rules.lighthous.stormchancedevisor", 0);
+		  if (param > 0) {
+			  stormchance /= param;
+		  }
+		  else {
+			  stormchance = 0;
+		  }
+	  }
       if (rng_int() % 10000 < stormchance * sh->type->storm
         && fval(current_point->terrain, SEA_REGION)) {
         if (!is_cursed(sh->attribs, C_SHIP_NODRIFT, 0)) {
