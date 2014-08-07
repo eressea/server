@@ -406,16 +406,6 @@ bool is_repeated(const order * ord)
     result = 1;
     break;
 
-  case K_FOLLOW:
-    /* FOLLOW is only a long order if we are following a ship. */
-    parser_pushstate();
-    init_tokens(ord);
-    skip_token();
-    s = getstrtoken();
-    result = isparam(s, lang, P_SHIP);
-    parser_popstate();
-    break;
-
   case K_MAKE:
     /* Falls wir MACHE TEMP haben, ignorieren wir es. Alle anderen
      * Arten von MACHE zaehlen aber als neue defaults und werden
@@ -467,15 +457,6 @@ bool is_exclusive(const order * ord)
   case K_PIRACY:
   case K_PLANT:
     result = 1;
-    break;
-
-  case K_FOLLOW:
-    /* FOLLOW is only a long order if we are following a ship. */
-    parser_pushstate();
-    init_tokens(ord);
-    skip_token();
-    result = isparam(getstrtoken(), lang, P_SHIP);
-    parser_popstate();
     break;
 
   case K_MAKE:
@@ -531,15 +512,6 @@ bool is_long(const order * ord)
   case K_PIRACY:
   case K_PLANT:
     return true;
-
-  case K_FOLLOW:
-    /* FOLLOW is only a long order if we are following a ship. */
-    parser_pushstate();
-    init_tokens(ord);
-    skip_token();
-    result = isparam(getstrtoken(), lang, P_SHIP);
-    parser_popstate();
-    break;
 
   case K_MAKE:
     /* Falls wir MACHE TEMP haben, ignorieren wir es. Alle anderen
