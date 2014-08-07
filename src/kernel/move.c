@@ -2775,7 +2775,7 @@ void follow_unit(unit * u)
         }
         bool follow = false;
 
-        if (!u2 || (u2->region != r || !cansee(u->faction, r, u2, 0)) && !followship) {
+        if (!followship && (!u2 || (u2->region != r || !cansee(u->faction, r, u2, 0)))) {
             return;
         }
 
