@@ -3,4 +3,4 @@ if config.paths ~= nil then
         package.path = package.path .. ';' .. path .. '/?.lua;' .. path .. '/?/init.lua'
     end
 end
-print(package.path)
+-- print(package.path)
