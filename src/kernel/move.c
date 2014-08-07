@@ -1,5 +1,6 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2014,
+Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -2722,7 +2723,6 @@ void follow_unit(unit * u)
             param_t p = getparam(lang);
             if (p == P_UNIT) {
                 id = read_unitid(u->faction, r);
-
                 if (a != NULL) {
                     a = a_find(u->attribs, &at_follow);
                 }
