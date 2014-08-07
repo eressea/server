@@ -4128,7 +4128,7 @@ int pay_cmd(unit * u, struct order *ord)
 static int reserve_i(unit * u, struct order *ord, int flags)
 {
     if (u->number > 0 && (urace(u)->ec_flags & GETITEM)) {
-        int use, count;
+        int use, count, para;
         const resource_type *rtype;
         const char *s;
 
@@ -4136,16 +4136,20 @@ static int reserve_i(unit * u, struct order *ord, int flags)
         skip_token();
         s = getstrtoken();
         count = atoip((const char *)s);
+        para = findparam(s, u->faction->locale);
 
-        if (count == 0 && findparam(s, u->faction->locale) == P_EACH) {
+        if (count == 0 && para == P_EACH) {
             count = getint() * u->number;
         }
-
         rtype = findresourcetype(getstrtoken(), u->faction->locale);
         if (rtype == NULL)
             return 0;
 
         set_resvalue(u, rtype, 0);      /* make sure the pool is empty */
+
+        if (count == 0 && para == P_ANY) {
+            count = get_resource(u, rtype);
+        }
         use = use_pooled(u, rtype, flags, count);
         if (use) {
             set_resvalue(u, rtype, use);
@@ -4622,6 +4626,7 @@ void init_processor(void)
     add_proc_region(p, &enter_1, "Betreten (2. Versuch)");
     if (get_param_int(global.parameters, "rules.reserve.twophase", 0)) {
         add_proc_order(p, K_RESERVE, &reserve_self, 0, "RESERVE (self)");
+        p += 10;
     }
     add_proc_order(p, K_RESERVE, &reserve_cmd, 0, "RESERVE (all)");
     add_proc_order(p, K_CLAIM, &claim_cmd, 0, NULL);
