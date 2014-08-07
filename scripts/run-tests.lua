@@ -7,7 +7,7 @@ end
 package.path = package.path .. ';' .. path .. '/?.lua;' .. path .. '/?/init.lua'
 
 require 'eressea'
-require 'eressea.tests'
+require 'eressea.path'
+require 'tests'
 require 'lunit'
-read_xml()
 lunit.main()

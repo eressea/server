@@ -1,0 +1,15 @@
+-- new tests 2014-06-11
+require 'tests.pool'
+require 'tests.settings'
+require 'tests.config'
+require 'tests.faction'
+require 'tests.locale'
+require 'tests.regions'
+require 'tests.study'
+require 'tests.movement'
+
+-- require 'tests.bugs'
+-- require 'tests.building'
+-- require 'tests.castles'
+-- require 'tests.spells'
+-- require 'tests.ships'
