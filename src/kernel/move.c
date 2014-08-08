@@ -2770,12 +2770,12 @@ void follow_unit(unit * u)
     }
 
     if ((a || followship) && !fval(u, UFL_MOVED | UFL_NOTMOVING)) {
+        bool follow = false;
         if (!followship) {
             u2 = a->data.v;
         }
-        bool follow = false;
 
-        if (!followship && (!u2 || (u2->region != r || !cansee(u->faction, r, u2, 0)))) {
+        if (!u2 || (!followship && (u2->region != r || !cansee(u->faction, r, u2, 0)))) {
             return;
         }
 
