@@ -1526,8 +1526,7 @@ static void prepare_reports(void)
         if (check_param(global.parameters, "rules.region_owner_pay_building", bt_lighthouse->_name)) {
             for (b = rbuildings(r); b; b = b->next) {
                 if (b && b->type == bt_lighthouse) {
-                    u = building_owner(largestbuilding(r, &cmp_taxes, false));
-                    /* alternativ: u = building_owner(b); if not all region owners should see */
+                    u = building_owner(b);
                     if (u) {
                         prepare_lighthouse(b, u->faction);
                         if (u_race(u) != get_race(RC_SPELL) || u->number == RS_FARVISION) {
