@@ -1498,7 +1498,6 @@ static void prepare_reports(void)
   region *r;
   faction *f;
   building *b;
-  const char *btypes;
   const struct building_type *bt_lighthouse = bt_find("lighthouse");
 
   for (f = factions; f; f = f->next) {
@@ -1523,44 +1522,43 @@ static void prepare_reports(void)
       }
     }
 
-	/* Region owner get always the Lighthouse report */
-	btypes = get_param(global.parameters, "rules.region_owner_pay_building");
-	if (btypes && strstr(btypes, bt_lighthouse->_name) != NULL) {
-		for (b = rbuildings(r); b; b = b->next) {
-			if (b && b->type == bt_lighthouse) {
-				u = building_owner(largestbuilding(r, &cmp_taxes, false));
-				/* alternativ: u = building_owner(b); if not all region owners should see */
-				if (u) {
-					prepare_lighthouse(b, u->faction);
-					if (u_race(u) != get_race(RC_SPELL) || u->number == RS_FARVISION) {
-						if (fval(u, UFL_DISBELIEVES)) {
-							add_seen(u->faction->seen, r, see_unit, true);
-						}
-						else {
-							add_seen(u->faction->seen, r, see_unit, false);
-						}
-					}
-				}
-			}
-		}
-	}
-	
-		for (u = r->units; u; u = u->next) {
-			if (u->building && u->building->type == bt_lighthouse) {
-				/* we are in a lighthouse. add the regions we can see from here! */
-				prepare_lighthouse(u->building, u->faction);
-			}
+        /* Region owner get always the Lighthouse report */
+        if (check_param(global.parameters, "rules.region_owner_pay_building", bt_lighthouse->_name)) {
+            for (b = rbuildings(r); b; b = b->next) {
+                if (b && b->type == bt_lighthouse) {
+                    u = building_owner(largestbuilding(r, &cmp_taxes, false));
+                    /* alternativ: u = building_owner(b); if not all region owners should see */
+                    if (u) {
+                        prepare_lighthouse(b, u->faction);
+                        if (u_race(u) != get_race(RC_SPELL) || u->number == RS_FARVISION) {
+                            if (fval(u, UFL_DISBELIEVES)) {
+                                add_seen(u->faction->seen, r, see_unit, true);
+                            }
+                            else {
+                                add_seen(u->faction->seen, r, see_unit, false);
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
-			if (u_race(u) != get_race(RC_SPELL) || u->number == RS_FARVISION) {
-				if (fval(u, UFL_DISBELIEVES)) {
-					add_seen(u->faction->seen, r, see_unit, true);
-				}
-				else {
-					add_seen(u->faction->seen, r, see_unit, false);
-				}
-			}
-		}
-	
+        for (u = r->units; u; u = u->next) {
+            if (u->building && u->building->type == bt_lighthouse) {
+                /* we are in a lighthouse. add the regions we can see from here! */
+                prepare_lighthouse(u->building, u->faction);
+            }
+
+            if (u_race(u) != get_race(RC_SPELL) || u->number == RS_FARVISION) {
+                if (fval(u, UFL_DISBELIEVES)) {
+                    add_seen(u->faction->seen, r, see_unit, true);
+                }
+                else {
+                    add_seen(u->faction->seen, r, see_unit, false);
+                }
+            }
+        }
+
 
     if (fval(r, RF_TRAVELUNIT)) {
       for (ru = a_find(r->attribs, &at_travelunit);

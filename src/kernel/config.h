@@ -390,10 +390,11 @@ extern "C" {
 
     const char *dbrace(const struct race *rc);
 
-    void set_param(struct param **p, const char *name, const char *data);
-    const char *get_param(const struct param *p, const char *name);
-    int get_param_int(const struct param *p, const char *name, int def);
-    float get_param_flt(const struct param *p, const char *name, float def);
+    void set_param(struct param **p, const char *key, const char *data);
+    const char *get_param(const struct param *p, const char *key);
+    int get_param_int(const struct param *p, const char *key, int def);
+    int check_param(const struct param *p, const char *key, const char *searchvalue);
+    float get_param_flt(const struct param *p, const char *key, float def);
 
     bool ExpensiveMigrants(void);
     int NMRTimeout(void);
