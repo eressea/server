@@ -8,8 +8,3 @@ require 'tests.regions'
 require 'tests.study'
 require 'tests.movement'
 
--- require 'tests.bugs'
--- require 'tests.building'
--- require 'tests.castles'
--- require 'tests.spells'
--- require 'tests.ships'
