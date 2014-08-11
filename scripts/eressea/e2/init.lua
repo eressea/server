@@ -1,5 +1,5 @@
 require 'eressea.spells'
-print("rules for game E2")
+eressea.log.debug("rules for game E2")
 
 return {
     require('eressea'),

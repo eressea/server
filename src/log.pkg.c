@@ -25,7 +25,7 @@ static void tolua_reg_types (lua_State* tolua_S)
 {
 }
 
-/* function: log_error_n */
+/* function: log_error */
 static int tolua_log_eressea_log_error00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
@@ -40,7 +40,7 @@ static int tolua_log_eressea_log_error00(lua_State* tolua_S)
  {
   const char* message = ((const char*)  tolua_tostring(tolua_S,1,0));
  {
-  log_error_n(message);
+  log_error(message);
  }
  }
  return 0;

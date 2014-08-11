@@ -1618,19 +1618,17 @@ int write_reports(faction * f, time_t ltime)
 
     if (errno) {
       char zText[64];
-      puts(" ERROR");
-      sprintf(zText, "Waiting %u seconds before we retry", backup/1000);
+      log_warning("retrying, error %d during reports for faction %s", errno, factionname(f));
+      sprintf(zText, "waiting %u seconds before we retry", backup/1000);
       perror(zText);
       _sleep(backup);
       if (backup < maxbackup) {
         backup *= 2;
       }
-    } else if (verbosity >= 2) {
-      puts(" DONE");
     }
   } while (errno);
   if (!gotit) {
-    log_warning("No report for faction %s!\n", factionid(f));
+    log_warning("No report for faction %s!", factionid(f));
   }
   ql_free(ctx.addresses);
   seen_done(ctx.seen);

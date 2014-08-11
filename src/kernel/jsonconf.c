@@ -89,7 +89,7 @@ static void json_maintenance_i(cJSON *json, maintenance *mt) {
                 mt->number = child->valueint;
             }
             else {
-                log_error_n("maintenance contains unknown attribute %s", child->string);
+                log_error("maintenance contains unknown attribute %s", child->string);
             }
             break;
         case cJSON_String:
@@ -97,7 +97,7 @@ static void json_maintenance_i(cJSON *json, maintenance *mt) {
                 mt->rtype = rt_get_or_create(child->valuestring);
             }
             else {
-                log_error_n("maintenance contains unknown attribute %s", child->string);
+                log_error("maintenance contains unknown attribute %s", child->string);
             }
             break;
         case cJSON_Array:
@@ -106,11 +106,11 @@ static void json_maintenance_i(cJSON *json, maintenance *mt) {
                 mt->flags = json_flags(child, flags);
             }
             else {
-                log_error_n("maintenance contains unknown array %s", child->string);
+                log_error("maintenance contains unknown array %s", child->string);
             }
             break;
         default:
-            log_error_n("maintenance contains unknown attribute %s", child->string);
+            log_error("maintenance contains unknown attribute %s", child->string);
         }
     }
 }
@@ -124,7 +124,7 @@ static void json_maintenance(cJSON *json, maintenance **mtp) {
         size = cJSON_GetArraySize(json);
     }
     else if (json->type != cJSON_Object) {
-        log_error_n("maintenance is not a json object or array (%d)", json->type);
+        log_error("maintenance is not a json object or array (%d)", json->type);
         return;
     }
     *mtp = mt = (struct maintenance *) calloc(sizeof(struct maintenance), size + 1);
@@ -155,7 +155,7 @@ static void json_construction(cJSON *json, construction **consp) {
         return;
     }
     if (json->type != cJSON_Object) {
-        log_error_n("building %s is not a json object: %d", json->string, json->type);
+        log_error("building %s is not a json object: %d", json->string, json->type);
         return;
     }
     construction * cons = (construction *)calloc(sizeof(construction), 1);
@@ -178,7 +178,7 @@ static void json_construction(cJSON *json, construction **consp) {
             }
             break; 
         default:
-            log_error_n("building %s contains unknown attribute %s", json->string, child->string);
+            log_error("building %s contains unknown attribute %s", json->string, child->string);
         }
     }
     *consp = cons;
@@ -187,7 +187,7 @@ static void json_construction(cJSON *json, construction **consp) {
 static void json_terrain(cJSON *json, terrain_type *ter) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
-        log_error_n("terrain %s is not a json object: %d", json->string, json->type);
+        log_error("terrain %s is not a json object: %d", json->string, json->type);
         return;
     }
     for (child=json->child;child;child=child->next) {
@@ -199,11 +199,11 @@ static void json_terrain(cJSON *json, terrain_type *ter) {
                 };
                 ter->flags = json_flags(child, flags);
             } else {
-                log_error_n("terrain %s contains unknown attribute %s", json->string, child->string);
+                log_error("terrain %s contains unknown attribute %s", json->string, child->string);
             }
             break;
         default:
-            log_error_n("terrain %s contains unknown attribute %s", json->string, child->string);
+            log_error("terrain %s contains unknown attribute %s", json->string, child->string);
         }
     }
 }
@@ -214,7 +214,7 @@ static void json_building(cJSON *json, building_type *bt) {
         "nodestroy", "nobuild", "unique", "decay", "dynamic", "magic", "oneperturn", "namechange", 0
     };
     if (json->type != cJSON_Object) {
-        log_error_n("building %s is not a json object: %d", json->string, json->type);
+        log_error("building %s is not a json object: %d", json->string, json->type);
         return;
     }
     for (child=json->child;child;child=child->next) {
@@ -244,10 +244,10 @@ static void json_building(cJSON *json, building_type *bt) {
                                             const struct building *, int))get_function(child->valuestring);
                 break;
             }
-            log_error_n("building %s contains unknown attribute %s", json->string, child->string);
+            log_error("building %s contains unknown attribute %s", json->string, child->string);
             break;
         default:
-            log_error_n("building %s contains unknown attribute %s", json->string, child->string);
+            log_error("building %s contains unknown attribute %s", json->string, child->string);
         }
     }
 }
@@ -258,7 +258,7 @@ static void json_item(cJSON *json, item_type *itype) {
         "herb", "cursed", "nodrop", "big", "animal", "vehicle", 0
     };
     if (json->type!=cJSON_Object) {
-        log_error_n("ship %s is not a json object: %d", json->string, json->type);
+        log_error("ship %s is not a json object: %d", json->string, json->type);
         return;
     }
     for (child=json->child;child;child=child->next) {
@@ -272,17 +272,17 @@ static void json_item(cJSON *json, item_type *itype) {
                 itype->capacity = child->valueint;
                 break;
             }
-            log_error_n("item %s contains unknown attribute %s", json->string, child->string);
+            log_error("item %s contains unknown attribute %s", json->string, child->string);
             break;
         case cJSON_Array:
             if (strcmp(child->string, "flags")==0) {
                 itype->flags = json_flags(child, flags);
                 break;
             }
-            log_error_n("item %s contains unknown attribute %s", json->string, child->string);
+            log_error("item %s contains unknown attribute %s", json->string, child->string);
         case cJSON_Object:
         default:
-            log_error_n("item %s contains unknown attribute %s", json->string, child->string);
+            log_error("item %s contains unknown attribute %s", json->string, child->string);
         }
     }
 }
@@ -290,7 +290,7 @@ static void json_item(cJSON *json, item_type *itype) {
 static void json_ship(cJSON *json, ship_type *st) {
     cJSON *child, *iter;
     if (json->type!=cJSON_Object) {
-        log_error_n("ship %s is not a json object: %d", json->string, json->type);
+        log_error("ship %s is not a json object: %d", json->string, json->type);
         return;
     }
     for (child=json->child;child;child=child->next) {
@@ -300,7 +300,7 @@ static void json_ship(cJSON *json, ship_type *st) {
             if (strcmp(child->string, "construction")==0) {
                 json_construction(child, &st->construction);
             } else {
-                log_error_n("ship %s contains unknown attribute %s", json->string, child->string);
+                log_error("ship %s contains unknown attribute %s", json->string, child->string);
             }
             break;
         case cJSON_Array:
@@ -320,11 +320,11 @@ static void json_ship(cJSON *json, ship_type *st) {
             if (strcmp(child->string, "range")==0) {
                 st->range = child->valueint;
             } else {
-                log_error_n("ship %s contains unknown attribute %s", json->string, child->string);
+                log_error("ship %s contains unknown attribute %s", json->string, child->string);
             }
             break;
         default:
-            log_error_n("ship %s contains unknown attribute %s", json->string, child->string);
+            log_error("ship %s contains unknown attribute %s", json->string, child->string);
         }
     }
 }
@@ -345,7 +345,7 @@ static void json_race(cJSON *json, race *rc) {
         "giveunit", "getitem", 0
     };
     if (json->type != cJSON_Object) {
-        log_error_n("race %s is not a json object: %d", json->string, json->type);
+        log_error("race %s is not a json object: %d", json->string, json->type);
         return;
     }
     for (child=json->child;child;child=child->next) {
@@ -401,7 +401,7 @@ static void json_race(cJSON *json, race *rc) {
 static void json_terrains(cJSON *json) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
-        log_error_n("terrains is not a json object: %d", json->type);
+        log_error("terrains is not a json object: %d", json->type);
         return;
     }
     for (child=json->child;child;child=child->next) {
@@ -412,7 +412,7 @@ static void json_terrains(cJSON *json) {
 static void json_buildings(cJSON *json) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
-        log_error_n("buildings is not a json object: %d", json->type);
+        log_error("buildings is not a json object: %d", json->type);
         return;
     }
     for (child=json->child;child;child=child->next) {
@@ -423,7 +423,7 @@ static void json_buildings(cJSON *json) {
 static void json_spells(cJSON *json) {
     cJSON *child;
     if (json->type != cJSON_Object) {
-        log_error_n("spells is not a json object: %d", json->type);
+        log_error("spells is not a json object: %d", json->type);
         return;
     }
     for (child = json->child; child; child = child->next) {
@@ -452,7 +452,7 @@ static void json_spells(cJSON *json) {
 static void json_items(cJSON *json) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
-        log_error_n("items is not a json object: %d", json->type);
+        log_error("items is not a json object: %d", json->type);
         return;
     }
     for (child=json->child;child;child=child->next) {
@@ -468,7 +468,7 @@ static void json_items(cJSON *json) {
 static void json_ships(cJSON *json) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
-        log_error_n("ships is not a json object: %d", json->type);
+        log_error("ships is not a json object: %d", json->type);
         return;
     }
     for (child=json->child;child;child=child->next) {
@@ -479,7 +479,7 @@ static void json_ships(cJSON *json) {
 static void json_locale(cJSON *json, struct locale *lang) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
-        log_error_n("strings is not a json object: %d", json->type);
+        log_error("strings is not a json object: %d", json->type);
         return;
     }
     for (child=json->child;child;child=child->next) {
@@ -492,7 +492,7 @@ static void json_locale(cJSON *json, struct locale *lang) {
 static void json_strings(cJSON *json) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
-        log_error_n("strings is not a json object: %d", json->type);
+        log_error("strings is not a json object: %d", json->type);
         return;
     }
     for (child=json->child;child;child=child->next) {
@@ -500,7 +500,7 @@ static void json_strings(cJSON *json) {
             struct locale *lang = get_or_create_locale(child->string); 
             json_locale(child, lang);
         } else {
-            log_error_n("strings for locale `%s` are not a json object: %d", child->string, child->type);
+            log_error("strings for locale `%s` are not a json object: %d", child->string, child->type);
         }
     }
 }
@@ -508,7 +508,7 @@ static void json_strings(cJSON *json) {
 static void json_direction(cJSON *json, struct locale *lang) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
-        log_error_n("directions for locale `%s` not a json object: %d", locale_name(lang), json->type);
+        log_error("directions for locale `%s` not a json object: %d", locale_name(lang), json->type);
         return;
     }
     for (child=json->child;child;child=child->next) {
@@ -523,7 +523,7 @@ static void json_direction(cJSON *json, struct locale *lang) {
                     init_direction(lang, dir, entry->valuestring);
                 }
             } else {
-                log_error_n("invalid type %d for direction `%s`", child->type, child->string);
+                log_error("invalid type %d for direction `%s`", child->type, child->string);
             }
         }
     }
@@ -532,7 +532,7 @@ static void json_direction(cJSON *json, struct locale *lang) {
 static void json_directions(cJSON *json) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
-        log_error_n("directions is not a json object: %d", json->type);
+        log_error("directions is not a json object: %d", json->type);
         return;
     }
     for (child=json->child;child;child=child->next) {
@@ -544,7 +544,7 @@ static void json_directions(cJSON *json) {
 static void json_skill(cJSON *json, struct locale *lang) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
-        log_error_n("skill for locale `%s` not a json object: %d", locale_name(lang), json->type);
+        log_error("skill for locale `%s` not a json object: %d", locale_name(lang), json->type);
         return;
     }
     for (child=json->child;child;child=child->next) {
@@ -563,10 +563,10 @@ static void json_skill(cJSON *json, struct locale *lang) {
                     }
                 }
             } else {
-                log_error_n("invalid type %d for skill `%s`", child->type, child->string);
+                log_error("invalid type %d for skill `%s`", child->type, child->string);
             }
         } else {
-            log_error_n("unknown skill `%s` for locale `%s`", child->string, locale_name(lang));
+            log_error("unknown skill `%s` for locale `%s`", child->string, locale_name(lang));
         }
     }
 }
@@ -574,7 +574,7 @@ static void json_skill(cJSON *json, struct locale *lang) {
 static void json_keyword(cJSON *json, struct locale *lang) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
-        log_error_n("keywords for locale `%s` not a json object: %d", locale_name(lang), json->type);
+        log_error("keywords for locale `%s` not a json object: %d", locale_name(lang), json->type);
         return;
     }
     for (child=json->child;child;child=child->next) {
@@ -593,10 +593,10 @@ static void json_keyword(cJSON *json, struct locale *lang) {
                     }
                 }
             } else {
-                log_error_n("invalid type %d for keyword `%s`", child->type, child->string);
+                log_error("invalid type %d for keyword `%s`", child->type, child->string);
             }
         } else {
-            log_error_n("unknown keyword `%s` for locale `%s`", child->string, locale_name(lang));
+            log_error("unknown keyword `%s` for locale `%s`", child->string, locale_name(lang));
         }
     }
 }
@@ -604,7 +604,7 @@ static void json_keyword(cJSON *json, struct locale *lang) {
 static void json_skills(cJSON *json) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
-        log_error_n("skills is not a json object: %d", json->type);
+        log_error("skills is not a json object: %d", json->type);
         return;
     }
     for (child=json->child;child;child=child->next) {
@@ -616,7 +616,7 @@ static void json_skills(cJSON *json) {
 static void json_keywords(cJSON *json) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
-        log_error_n("keywords is not a json object: %d", json->type);
+        log_error("keywords is not a json object: %d", json->type);
         return;
     }
     for (child=json->child;child;child=child->next) {
@@ -628,7 +628,7 @@ static void json_keywords(cJSON *json) {
 static void json_races(cJSON *json) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
-        log_error_n("races is not a json object: %d", json->type);
+        log_error("races is not a json object: %d", json->type);
         return;
     }
     for (child=json->child;child;child=child->next) {
@@ -639,7 +639,7 @@ static void json_races(cJSON *json) {
 void json_config(cJSON *json) {
     cJSON *child;
     if (json->type!=cJSON_Object) {
-        log_error_n("config is not a json object: %d", json->type);
+        log_error("config is not a json object: %d", json->type);
         return;
     }
     for (child=json->child;child;child=child->next) {
@@ -673,7 +673,7 @@ void json_config(cJSON *json) {
         else if (strcmp(child->string, "terrains") == 0) {
             json_terrains(child);
         } else {
-            log_error_n("config contains unknown attribute %s", child->string);
+            log_error("config contains unknown attribute %s", child->string);
         }
     }
     init_locales();

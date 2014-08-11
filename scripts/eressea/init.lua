@@ -5,9 +5,9 @@ require 'eressea.spells'
 local self = {}
 
 function self.update()
-    print('spawn dragons')
+    eressea.log.info('spawn dragons')
     spawn_dragons()
-    print('spawn undead')
+    eressea.log.info('spawn undead')
     spawn_undead()
 
     update_guards()

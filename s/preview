@@ -1,0 +1,58 @@
+#!/bin/bash
+
+usage() {
+  echo "usage: $0 game-id"
+  exit 1
+}
+
+abort() {
+  echo $1
+  [ -z $2 ] && exit -1
+  exit $2 # otherwise
+}
+
+[ -d $ERESSEA ] || abort "Invalid env variable ERESSEA ($ERESSEA)"
+
+GAME=$1
+LIVE=$ERESSEA/game-$GAME
+SOURCE=$ERESSEA/git
+TESTROOT=$LIVE/test
+REBUILD=0
+
+[ -d $LIVE ] || usage
+[ -d $SOURCE ] || abort "missing source directory: $SOURCE"
+
+[ -f $LIVE/turn ] || abort "missing turn file"
+let TURN=$(cat $LIVE/turn)-1
+
+if [ $REBUILD ] ; then
+cd $SOURCE
+git pull || abort "failed to update source. do you have local changes?"
+BUILD=$(grep BUILD src/build.h | awk '{ print $3 }')
+s/build || abort "build failed."
+fi
+
+echo "testing turn $TURN of game $GAME with build $BUILD"
+mkdir -p $TESTROOT
+cd $TESTROOT
+
+if [ ! -e eressea.ini ] ; then
+cat >| eressea.ini <<HEREDOC
+[lua]
+dbname = preview.db
+install = $SOURCE
+paths = $SOURCE/lunit:$SOURCE/git/scripts
+rules = e$GAME
+HEREDOC
+fi
+
+[ -d data ] || mkdir data
+cp $LIVE/eressea.db preview.db
+ln -f $LIVE/orders.$TURN
+ln -f $LIVE/data/$TURN.dat data/
+rm -rf reports
+mkdir -p reports
+
+$SOURCE/build-x86_64-gcc-Debug/eressea/eressea -v1 -t$TURN -re$GAME $SOURCE/scripts/run-turn.lua
+let TURN=$TURN+1
+[ -e data/$TURN.dat ] || abort "no data file created"

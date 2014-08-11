@@ -3,7 +3,7 @@
 astral = {}
 
 function astral.update()
-    print('spawn braineaters')
+    eressea.log.info('spawn braineaters')
     spawn_braineaters(0.25)
 end
 

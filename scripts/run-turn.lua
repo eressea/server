@@ -31,8 +31,8 @@ local function change_locales(localechange)
     for index, name in pairs(flist) do
       f = get_faction(atoi36(name))
       if f ~= nil and f.locale ~= loc then
+        print("LOCALECHANGE ", f, f.locale, loc)
         f.locale = loc
-        print("LOCALECHANGE ", f, loc)
       end
     end
   end
@@ -40,12 +40,13 @@ end
 
 local function dbupdate()
   update_scores()
-  edb = db.open(config.basepath.."/eressea.db")
+  dbname = config.dbname or 'eressea.db'
+  edb = db.open(config.basepath..'/'..dbname)
   if edb~=nil then
     edb:update_factions()
     edb:update_scores()
   else
-    eressea.log.error("could not open "..config.basepath.."/eressea.db")
+    eressea.log.error("could not open "..config.basepath..'/'..dbname)
   end
 end
 
@@ -189,7 +190,6 @@ end
 if config.install then
     confdir = config.install .. '/' .. confdir
 end
-print(confdir)
 read_xml(confdir .. 'config.xml', confdir .. 'catalog.xml')
 
 local path = 'scripts'
