@@ -965,8 +965,6 @@ void demographics(void)
         free(free_migrants);
         free_migrants = m;
     };
-    if (verbosity >= 1)
-        putchar('\n');
 
     remove_empty_units();
 
