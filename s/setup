@@ -18,17 +18,10 @@ Usage: $u [-hf] [-d DIR] [-g <game>] [-r <rules>] [-s DIR]
 USAGE
 }
 
-function ini_section() {
-$SOURCE/bin/inifile eressea.ini add $1
-}
-
-function ini_add() {
-$SOURCE/bin/inifile eressea.ini add $1 $2
-}
-
 game=0
 force=0
 src=server
+
 while getopts :d:g:r:s:hf o; do
   case "${o}" in
   h) usage ; exit 0 ;;
@@ -47,6 +40,11 @@ done
 [ -d $SOURCE ] || abort "invalid source directory $SOURCE"
 [ -z $rules ] && rules=e$game
 [ -z $dir ] && dir=game-$game
+[ -z $TOOLS ] && TOOLS=$SOURCE/build-x86_64-gcc-Debug
+[ -e $TOOLS ] || TOOLS=$SOURCE/bin
+[ -z $INIFILE ] && INIFILE=$TOOLS/inifile
+[ -e $INIFILE ] || INIFILE=$TOOLS/iniparser/inifile
+[ -e $INIFILE ] || abort "tool is not installed: $INIFILE"
 
 cd $ERESSEA
 if [ -d $dir ] ; then
@@ -56,10 +54,16 @@ mkdir -p $dir
 cd $dir || abort "could not chdir to game-$game"
 mkdir -p data reports
 
+function ini_sec() {
+$INIFILE eressea.ini add $1
+}
+function ini_add() {
+$INIFILE eressea.ini add $1 $2
+}
 touch eressea.ini
-ini_section eressea
+ini_sec eressea
 ini_add eressea:locales de,en
-ini_section lua
+ini_sec lua
 ini_add lua:install $SOURCE
 ini_add lua:install $SOURCE
 ini_add lua:paths $SOURCE/scripts:$SOURCE/lunit

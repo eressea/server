@@ -182,16 +182,6 @@ function run_turn(rules)
   return result
 end
 
-local confdir = 'conf/'
-
-if config.rules then
-    confdir = confdir .. config.rules .. '/'
-end
-if config.install then
-    confdir = config.install .. '/' .. confdir
-end
-read_xml(confdir .. 'config.xml', confdir .. 'catalog.xml')
-
 local path = 'scripts'
 if config.install then
 	path = config.install .. '/' .. path
@@ -199,6 +189,8 @@ end
 package.path = package.path .. ';' .. path .. '/?.lua;' .. path .. '/?/init.lua'
 
 require 'eressea'
+require 'eressea.xmlconf' -- read xml data
+
 local rules = {}
 if config.rules then
     rules = require('eressea.' .. config.rules)
@@ -206,5 +198,4 @@ if config.rules then
 else
     eressea.log.warning('no rule modules loaded, specify a game in eressea.ini or with -r')
 end
-
 run_turn(rules)
