@@ -1,0 +1,58 @@
+#!/bin/bash
+
+function abort() {
+echo $1
+[ -z $2 ] && exit -1
+exit $2 # otherwise
+}
+
+function usage() {
+cat <<USAGE
+Usage: $u [-hf] [-d DIR] [-g <game>] [-r <rules>] [-s DIR]
+  -h   print this message
+  -f   force overwrite of existing game
+  -g   game id
+  -r   name of ruleset
+  -s   server installation directory
+  -d   override directory name
+USAGE
+}
+
+game=0
+force=0
+src=server
+while getopts :d:g:r:s:hf o; do
+  case "${o}" in
+  h) usage ;;
+  s) src=${OPTARG} ;;
+  d) dir=${OPTARG} ;;
+  f) force=1 ;;
+  g) game=${OPTARG} ;;
+  r) rules=${OPTARG} ;;
+  *) echo "not implemented ${o} ${OPTARG}" ;;
+  esac
+done
+
+[ -d $ERESSEA ] || abort "invalid or missing env variable ERESSEA ($ERESSEA)"
+[ -z $SOURCE ] && SOURCE=$ERESSEA/$src
+[ -d $SOURCE ] || abort "invalid source directory $SOURCE"
+[ -z $rules ] && rules=e$game
+[ -z $dir ] && dir=game-$game
+
+cd $ERESSEA
+if [ -d $dir ] ; then
+  [ $force -eq 1 ] || abort "$dir directory exists. Use -f to force"
+fi
+mkdir -p $dir
+cd $dir || abort "could not chdir to game-$game"
+mkdir -p data reports
+cat > eressea.ini <<ERESSEAINI
+[eressea]
+locales = de,en
+
+[lua]
+install=$SOURCE
+paths=$SOURCE/scripts:$SOURCE/lunit
+rules = $rules
+ERESSEAINI
+ln -f $SOURCE/scripts/run-turn.lua
