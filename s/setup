@@ -18,12 +18,20 @@ Usage: $u [-hf] [-d DIR] [-g <game>] [-r <rules>] [-s DIR]
 USAGE
 }
 
+function ini_section() {
+$SOURCE/bin/inifile eressea.ini add $1
+}
+
+function ini_add() {
+$SOURCE/bin/inifile eressea.ini add $1 $2
+}
+
 game=0
 force=0
 src=server
 while getopts :d:g:r:s:hf o; do
   case "${o}" in
-  h) usage ;;
+  h) usage ; exit 0 ;;
   s) src=${OPTARG} ;;
   d) dir=${OPTARG} ;;
   f) force=1 ;;
@@ -33,6 +41,7 @@ while getopts :d:g:r:s:hf o; do
   esac
 done
 
+[ $game -gt 0 ] || abort "must use a positive integer for game id"
 [ -d $ERESSEA ] || abort "invalid or missing env variable ERESSEA ($ERESSEA)"
 [ -z $SOURCE ] && SOURCE=$ERESSEA/$src
 [ -d $SOURCE ] || abort "invalid source directory $SOURCE"
@@ -46,13 +55,14 @@ fi
 mkdir -p $dir
 cd $dir || abort "could not chdir to game-$game"
 mkdir -p data reports
-cat > eressea.ini <<ERESSEAINI
-[eressea]
-locales = de,en
 
-[lua]
-install=$SOURCE
-paths=$SOURCE/scripts:$SOURCE/lunit
-rules = $rules
-ERESSEAINI
+touch eressea.ini
+ini_section eressea
+ini_add eressea:locales de,en
+ini_section lua
+ini_add lua:install $SOURCE
+ini_add lua:install $SOURCE
+ini_add lua:paths $SOURCE/scripts:$SOURCE/lunit
+ini_add lua:rules $rules
+
 ln -f $SOURCE/scripts/run-turn.lua
