@@ -1032,11 +1032,62 @@ static bool maintain(building * b, bool first)
     bool paid = true, work = first;
     unit *u;
 
-    if (fval(b, BLD_MAINTAINED) || b->type == NULL || b->type->maintenance == NULL
-        || is_cursed(b->attribs, C_NOCOST, 0)) {
+    if (fval(b, BLD_MAINTAINED) || b->type == NULL || b->type->maintenance == NULL || is_cursed(b->attribs, C_NOCOST, 0)) {
         fset(b, BLD_MAINTAINED);
         fset(b, BLD_WORKING);
         return true;
+    }
+    if (fval(b, BLD_DONTPAY)) {
+        return false;
+    }
+    u = building_owner(b);
+    if (u == NULL)
+        return false;
+    /* If the owner is the region owner, check if biggest castle has the dontpay flag */
+    if (check_param(global.parameters, "rules.region_owner_pay_building", b->type->_name)) {
+        if (u == building_owner(largestbuilding(r, &cmp_taxes, false))) {
+            if (fval(u->building, BLD_DONTPAY)) {
+                return false;
+            }
+        }
+    }
+  for (c = 0; b->type->maintenance[c].number; ++c) {
+    const maintenance *m = b->type->maintenance + c;
+    int need = m->number;
+
+    if (fval(m, MTF_VARIABLE))
+      need = need * b->size;
+    if (u) {
+      /* first ist im ersten versuch true, im zweiten aber false! Das
+       * bedeutet, das in der Runde in die Region geschafften Resourcen
+       * nicht genutzt werden können, weil die reserviert sind! */
+      if (!first)
+        need -= get_pooled(u, m->rtype, GET_ALL, need);
+      else
+        need -= get_pooled(u, m->rtype, GET_DEFAULT, need);
+      if (!first && need > 0) {
+        unit *ua;
+        for (ua = r->units; ua; ua = ua->next)
+          freset(ua->faction, FFL_SELECT);
+        fset(u->faction, FFL_SELECT);   /* hat schon */
+        for (ua = r->units; ua; ua = ua->next) {
+          if (!fval(ua->faction, FFL_SELECT) && (ua->faction == u->faction
+              || alliedunit(ua, u->faction, HELP_MONEY))) {
+            need -= get_pooled(ua, m->rtype, GET_ALL, need);
+            fset(ua->faction, FFL_SELECT);
+            if (need <= 0)
+              break;
+          }
+        }
+      }
+      if (need > 0) {
+        if (!fval(m, MTF_VITAL))
+          work = false;
+        else {
+          paid = false;
+          break;
+        }
+      }
     }
     if (fval(b, BLD_DONTPAY)) {
         return false;
