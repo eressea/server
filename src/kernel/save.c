@@ -263,8 +263,7 @@ int readorders(const char *filename)
         perror(filename);
         return -1;
     }
-    if (verbosity >= 1)
-        puts(" - lese Befehlsdatei...\n");
+    log_info("reading orders from %s", filename);
 
     /* TODO: recognize UTF8 BOM */
     b = getbuf(F, enc_gamedata);
@@ -333,9 +332,7 @@ int readorders(const char *filename)
     }
 
     fclose(F);
-    if (verbosity >= 1)
-        puts("\n");
-    log_printf(stdout, "   %d Befehlsdateien gelesen\n", nfactions);
+    log_info("done reading orders for %d factions", nfactions);
     return 0;
 }
 

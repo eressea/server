@@ -6,7 +6,7 @@
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
     <rewriteURI
         uriStartString="config:///core/"
-        rewritePrefix="../../core/res/" />
+        rewritePrefix="../../res/core/" />
     <rewriteURI
         uriStartString="config:///game/"
         rewritePrefix="../../res/e3a/" />

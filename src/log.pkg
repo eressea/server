@@ -3,7 +3,8 @@ $#include <util/log.h>
 module eressea {
   module log {
     void log_error @ error(const char *message);
+    void log_debug @ debug(const char *message);
     void log_warning @ warning(const char *message);
+    void log_info @ info(const char *message);
   }
 }
-

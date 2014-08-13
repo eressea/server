@@ -1,5 +1,6 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2014,
+Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -86,6 +87,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <attributes/otherfaction.h>
 
+#include <iniparser.h>
 /* libc includes */
 #include <assert.h>
 #include <stdio.h>
@@ -963,8 +965,6 @@ void demographics(void)
         free(free_migrants);
         free_migrants = m;
     };
-    if (verbosity >= 1)
-        putchar('\n');
 
     remove_empty_units();
 
@@ -4135,7 +4135,7 @@ static int reserve_i(unit * u, struct order *ord, int flags)
         skip_token();
         s = getstrtoken();
         count = atoip((const char *)s);
-		para = findparam(s, u->faction->locale);
+        para = findparam(s, u->faction->locale);
 
         if (count == 0 && para == P_EACH) {
             count = getint() * u->number;
@@ -4146,9 +4146,9 @@ static int reserve_i(unit * u, struct order *ord, int flags)
 
         set_resvalue(u, rtype, 0);      /* make sure the pool is empty */
 
-		if (count == 0 && para == P_ANY) {
-			count = get_resource(u, rtype);
-		}
+        if (count == 0 && para == P_ANY) {
+            count = get_resource(u, rtype);
+        }
         use = use_pooled(u, rtype, flags, count);
         if (use) {
             set_resvalue(u, rtype, use);
@@ -4614,10 +4614,10 @@ void init_processor(void)
     p += 10;                      /* in case it has any effects on alliance victories */
     add_proc_order(p, K_LEAVE, &leave_cmd, 0, "Verlassen");
 
-	p += 10; 	
+    p += 10;
     add_proc_region(p, &enter_1, "Betreten (2. Versuch)"); /* to allow a buildingowner to enter the castle pre combat */
 
-	p += 10;
+    p += 10;
     add_proc_region(p, &do_battle, "Attackieren");
 
     if (!keyword_disabled(K_BESIEGE)) {
@@ -4804,28 +4804,14 @@ void update_subscriptions(void)
     fclose(F);
 }
 
-const char *confpath = 0;
-
 int init_data(const char *filename, const char *catalog)
 {
-    char filepath[MAX_PATH], catpath[MAX_PATH];
     int l;
-
-    if (confpath) {
-        if (filename) {
-            _snprintf(filepath, sizeof(filepath), "%s/%s", confpath, filename);
-            filename = filepath;
-        }
-        if (catalog) {
-            _snprintf(catpath, sizeof(catpath), "%s/%s", confpath, catalog);
-            catalog = catpath;
-        }
-    }
     l = read_xml(filename, catalog);
-    init_locales();
-    if (l)
+    if (l) {
         return l;
-
+    }
+    init_locales();
     if (turn < 0) {
         turn = first_turn;
     }

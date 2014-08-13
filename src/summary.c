@@ -31,6 +31,7 @@
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/lists.h>
+#include <util/log.h>
 
 #include <string.h>
 #include <stdlib.h>
@@ -160,7 +161,7 @@ void report_summary(summary * s, summary * o, bool full)
     fwrite(utf8_bom, 1, 3, F);
   }
 #endif
-  printf("Schreibe Zusammenfassung (parteien)...\n");
+  log_info("writing summary to file: parteien.\n");
   fprintf(F, "%s\n%s\n\n", game_name(), gamedate2(default_locale));
   fprintf(F, "Auswertung Nr:         %d\n\n", turn);
   fprintf(F, "Parteien:              %s\n", pcomp(s->factions, o->factions));
@@ -303,7 +304,7 @@ void report_summary(summary * s, summary * o, bool full)
   fclose(F);
 
   if (full) {
-    printf("writing date & turn\n");
+    log_info("writing date & turn\n");
     writeturn();
   }
   free(nmrs);

@@ -15,17 +15,17 @@ function use_stardust(u, amount)
   return 0
 end
 
-function xmas2005()
-  if get_gamename() == "Eressea" then
-    if not get_flag("xm05") then
-      print("Es weihnachtet sehr (2005)")
-      set_flag("xm05", true)
-      for f in factions() do
-        f:add_item("stardust", 1)
-        f:add_notice("santa2005")
-      end
+local self = {}
+
+function self.update()
+    if not get_key("xm05") then
+        print("Es weihnachtet sehr (2005)")
+        set_key("xm05", true)
+        for f in factions() do
+            f:add_item("stardust", 1)
+            f:add_notice("santa2005")
+        end
     end
-  end
 end
 
--- xmas2005()
+return self

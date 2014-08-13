@@ -56,74 +56,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* attributes includes */
 #include <attributes/matmod.h>
 
-static const char *NULLSTRING = "(null)";
-
-static void lc_init(struct attrib *a)
-{
-  a->data.v = calloc(1, sizeof(building_action));
-}
-
-static void lc_done(struct attrib *a)
-{
-  building_action *data = (building_action *) a->data.v;
-  if (data->fname)
-    free(data->fname);
-  if (data->param)
-    free(data->param);
-  free(data);
-}
-
-static void
-lc_write(const struct attrib *a, const void *owner, struct storage *store)
-{
-  building_action *data = (building_action *) a->data.v;
-  const char *fname = data->fname;
-  const char *fparam = data->param;
-  building *b = data->b;
-
-  write_building_reference(b, store);
-  WRITE_TOK(store, fname);
-  WRITE_TOK(store, fparam ? fparam : NULLSTRING);
-}
-
-static int lc_read(struct attrib *a, void *owner, struct storage *store)
-{
-  char name[NAMESIZE];
-  building_action *data = (building_action *) a->data.v;
-  int result =
-    read_reference(&data->b, store, read_building_reference, resolve_building);
-  if (global.data_version < UNICODE_VERSION) {
-    READ_STR(store, name, sizeof(name));
-  } else {
-    READ_TOK(store, name, sizeof(name));
-  }
-  data->fname = _strdup(name);
-  if (global.data_version >= BACTION_VERSION) {
-    if (global.data_version < UNICODE_VERSION) {
-      READ_STR(store, name, sizeof(name));
-    } else {
-      READ_TOK(store, name, sizeof(name));
-    }
-    if (strcmp(name, NULLSTRING) == 0)
-      data->param = 0;
-    else
-      data->param = _strdup(name);
-  } else {
-    data->param = 0;
-  }
-  if (result == 0 && !data->b) {
-    return AT_READ_FAIL;
-  }
-  return AT_READ_OK;
-}
-
-attrib_type at_building_action = {
-  "lcbuilding",
-  lc_init, lc_done,
-  NULL,
-  lc_write, lc_read
-};
-
 typedef struct building_typelist {
   struct building_typelist *next;
   building_type *type;
@@ -713,17 +645,6 @@ void building_setname(building * self, const char *name)
     self->name = _strdup(name);
   else
     self->name = NULL;
-}
-
-void building_addaction(building * b, const char *fname, const char *param)
-{
-  attrib *a = a_add(&b->attribs, a_new(&at_building_action));
-  building_action *data = (building_action *) a->data.v;
-  data->b = b;
-  data->fname = _strdup(fname);
-  if (param) {
-    data->param = _strdup(param);
-  }
 }
 
 region *building_getregion(const building * b)

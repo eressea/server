@@ -1,0 +1,158 @@
+#!/bin/bash
+
+function usage() {
+cat <<HEREDOC
+usage: $0 [-t <turn>] [-g <game>] [-f <file>] command [args]
+commands:
+  build -- pull and rebuild the code
+  version -- print the current build number
+  setup -- create base directory and config files
+  run -- run a turn
+  send [id ...] -- send reports to one or more factions, or to all ids in <file>
+HEREDOC
+exit 1
+}
+
+function abort() {
+echo $1
+[ -z $2 ] && exit -1
+exit $2 # otherwise
+}
+
+function build() {
+assert_dir $SOURCE
+cd $SOURCE
+git pull || abort "failed to update source. do you have local changes?"
+s/build || abort "build failed."
+}
+
+function assert_file() {
+[ -e $1 ] || abort "missing file: $1"
+}
+
+function assert_files() {
+while [ ! -z $1 ] ; do
+assert_file $1
+shift
+done
+}
+
+function assert_dir() {
+[ -d $1 ] || abort "missing directory: $1"
+}
+
+function version() {
+assert_dir $SOURCE
+cd $SOURCE
+build=$(grep BUILD src/build.h | awk '{ print $3 }')
+echo "eressea build $build"
+}
+
+function setup() {
+assert_dir $SOURCE
+assert_dir $LIVE
+mkdir -p $TESTROOT
+assert_dir $TESTROOT
+cd $TESTROOT
+
+cat >| eressea.ini <<HEREDOC
+[lua]
+dbname = preview.db
+install = $SOURCE
+paths = $SOURCE/lunit:$SOURCE/git/scripts
+rules = e$game
+HEREDOC
+}
+
+function run() {
+echo "testing turn $turn of game $game"
+assert_dir $TESTROOT
+cd $TESTROOT
+[ -d data ] || mkdir data
+assert_dir data
+assert_files $LIVE/orders.$turn $LIVE/data/$turn.dat
+cp $LIVE/eressea.db preview.db
+ln -f $LIVE/orders.$turn
+ln -f $LIVE/data/$turn.dat data/
+rm -rf reports
+mkdir -p reports
+
+$SOURCE/build-x86_64-gcc-Debug/eressea/eressea -v$verbose -t$turn -re$game $SOURCE/scripts/run-turn.lua
+let turn=$turn+1
+[ -e data/$turn.dat ] || abort "no data file created"
+}
+
+function send() {
+echo "sending reports to $1"
+zip="$turn-$1.zip"
+zip -q -u $yip $turn-$1.?r
+email=$(grep "faction=$1:" reports.txt | cut -d: -f2 | sed 's/email=//')
+cat /dev/null | mutt -F $ERESSEA/etc/muttrc -s "Testauswertung Spiel $GAME Partei $1" -a $zip -- $email
+}
+
+game=0
+turn=0
+verbose=1
+factions="testers.txt"
+while getopts :g:t:f:v: o; do
+  case "${o}" in
+  f)
+    factions=${OPTARG}
+    ;;
+  v)
+    verbose=${OPTARG}
+    ;;
+  g)
+    game=${OPTARG}
+    ;;
+  t)
+    turn=${OPTARG}
+    ;;
+  *)
+    usage
+    ;;
+  esac
+done
+shift $((OPTIND-1))
+
+[ -d $ERESSEA ] || echo "invalid or missing env variable ERESSEA ($ERESSEA)"
+[ -z $1 ] && usage
+[ -z $SOURCE ] && SOURCE=$ERESSEA/git
+[ -d $SOURCE ] || abort "missing source directory: $SOURCE"
+[ -d LIVE ] || LIVE=$ERESSEA/game-$game
+[ -d TESTROOT ] || TESTROOT=$LIVE/test
+
+while [ ! -z $1 ]; do
+case "$1" in
+"version")
+  version
+  ;;
+"build")
+  build
+  ;;
+"setup")
+  setup
+  ;;
+"run")
+  if [ $turn -eq 0 ]; then
+    [ -f $LIVE/turn ] || abort "missing turn file, and no turn specified"
+    let turn=$(cat $LIVE/turn)-1
+  fi
+  run
+  ;;
+"send")
+  shift
+  for faction in $* ; do
+    send $faction
+  done
+  cd $TESTROOT
+  if [ -e $factions ]; then
+    for faction in $(cat $factions) ; do
+      send $faction
+    done
+  fi
+  break
+  ;;
+esac
+shift
+done

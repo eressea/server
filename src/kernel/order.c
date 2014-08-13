@@ -1,14 +1,14 @@
 /* vi: set ts=2:
- +-------------------+  
+ +-------------------+
  |                   |  Christian Schlittchen <corwin@amber.kn-bremen.de>
  | Eressea PBEM host |  Enno Rehling <enno@eressea.de>
  | (c) 1998 - 2004   |  Katja Zedel <katze@felidae.kn-bremen.de>
  |                   |
- +-------------------+  
+ +-------------------+
 
  This program may not be used, modified or distributed
  without prior permission by the authors of Eressea.
-*/
+ */
 
 #include <platform.h>
 #include <kernel/config.h>
@@ -35,58 +35,58 @@
 # define ORD_STRING(ord) (ord)->data->_str
 
 typedef struct locale_data {
-  struct order_data *short_orders[MAXKEYWORDS];
-  struct order_data *study_orders[MAXSKILLS];
-  const struct locale *lang;
+    struct order_data *short_orders[MAXKEYWORDS];
+    struct order_data *study_orders[MAXSKILLS];
+    const struct locale *lang;
 } locale_data;
 
 static struct locale_data *locale_array[16];
 static int nlocales = 0;
 
 typedef struct order_data {
-  char *_str;
+    char *_str;
 # ifdef LOMEM
-  int _refcount:20;
-  int _lindex:4;
+    int _refcount:20;
+    int _lindex:4;
 # else
-  int _refcount;
-  int _lindex;
+    int _refcount;
+    int _lindex;
 # endif
-  keyword_t _keyword;
+    keyword_t _keyword;
 } order_data;
 
 static void release_data(order_data * data)
 {
-  if (data) {
-    if (--data->_refcount == 0) {
-      if (data->_str)
-        free(data->_str);
-      free(data);
+    if (data) {
+        if (--data->_refcount == 0) {
+            if (data->_str)
+                free(data->_str);
+            free(data);
+        }
     }
-  }
 }
 
 void replace_order(order ** dlist, order * orig, const order * src)
 {
-  while (*dlist != NULL) {
-    order *dst = *dlist;
-    if (dst->data == orig->data) {
-      order *cpy = copy_order(src);
-      *dlist = cpy;
-      cpy->next = dst->next;
-      dst->next = 0;
-      free_order(dst);
+    while (*dlist != NULL) {
+        order *dst = *dlist;
+        if (dst->data == orig->data) {
+            order *cpy = copy_order(src);
+            *dlist = cpy;
+            cpy->next = dst->next;
+            dst->next = 0;
+            free_order(dst);
+        }
+        dlist = &(*dlist)->next;
     }
-    dlist = &(*dlist)->next;
-  }
 }
 
 keyword_t getkeyword(const order * ord)
 {
-  if (ord == NULL) {
-    return NOKEYWORD;
-  }
-  return ORD_KEYWORD(ord);
+    if (ord == NULL) {
+        return NOKEYWORD;
+    }
+    return ORD_KEYWORD(ord);
 }
 
 /** returns a plain-text representation of the order.
@@ -103,7 +103,8 @@ static char* get_command(const order *ord, char *sbuffer, size_t size) {
         if (size > 0) {
             *bufp++ = '@';
             --size;
-        } else {
+        }
+        else {
             WARN_STATIC_BUFFER();
         }
     }
@@ -111,12 +112,13 @@ static char* get_command(const order *ord, char *sbuffer, size_t size) {
         const struct locale *lang = ORD_LOCALE(ord);
         if (size > 0) {
             const char *str = (const char *)LOC(lang, keyword(kwd));
-                assert(str);
+            assert(str);
             if (text) --size;
             bytes = (int)strlcpy(bufp, str, size);
             if (wrptr(&bufp, &size, bytes) != 0) WARN_STATIC_BUFFER();
             if (text) *bufp++ = ' ';
-        } else {
+        }
+        else {
             WARN_STATIC_BUFFER();
         }
     }
@@ -141,205 +143,208 @@ static char* get_command(const order *ord, char *sbuffer, size_t size) {
 
 char *getcommand(const order * ord)
 {
-  char sbuffer[DISPLAYSIZE * 2];
-  return _strdup(get_command(ord, sbuffer, sizeof(sbuffer)));
+    char sbuffer[DISPLAYSIZE * 2];
+    return _strdup(get_command(ord, sbuffer, sizeof(sbuffer)));
 }
 
 void free_order(order * ord)
 {
-  if (ord != NULL) {
-    assert(ord->next == 0);
+    if (ord != NULL) {
+        assert(ord->next == 0);
 
-    release_data(ord->data);
-    free(ord);
-  }
+        release_data(ord->data);
+        free(ord);
+    }
 }
 
 order *copy_order(const order * src)
 {
-  if (src != NULL) {
-    order *ord = (order *) malloc(sizeof(order));
-    ord->next = NULL;
-    ord->_persistent = src->_persistent;
-    ord->data = src->data;
-    ++ord->data->_refcount;
-    return ord;
-  }
-  return NULL;
+    if (src != NULL) {
+        order *ord = (order *)malloc(sizeof(order));
+        ord->next = NULL;
+        ord->_persistent = src->_persistent;
+        ord->data = src->data;
+        ++ord->data->_refcount;
+        return ord;
+    }
+    return NULL;
 }
 
 void set_order(struct order **destp, struct order *src)
 {
-  if (*destp == src)
-    return;
-  free_order(*destp);
-  *destp = src;
+    if (*destp == src)
+        return;
+    free_order(*destp);
+    *destp = src;
 }
 
 void free_orders(order ** olist)
 {
-  while (*olist) {
-    order *ord = *olist;
-    *olist = ord->next;
-    ord->next = NULL;
-    free_order(ord);
-  }
+    while (*olist) {
+        order *ord = *olist;
+        *olist = ord->next;
+        ord->next = NULL;
+        free_order(ord);
+    }
 }
 
 static order_data *create_data(keyword_t kwd, const char *sptr, int lindex)
 {
-  const char *s = sptr;
-  order_data *data;
-  const struct locale *lang = locale_array[lindex]->lang;
+    const char *s = sptr;
+    order_data *data;
+    const struct locale *lang = locale_array[lindex]->lang;
 
-  if (kwd != NOKEYWORD)
-    s = (*sptr) ? sptr : NULL;
+    if (kwd != NOKEYWORD)
+        s = (*sptr) ? sptr : NULL;
 
-  /* learning, only one order_data per skill required */
-  if (kwd == K_STUDY) {
-    skill_t sk = get_skill(parse_token(&sptr), lang);
-    switch (sk) {
-    case NOSKILL:              /* fehler */
-      break;
-    case SK_MAGIC:             /* kann parameter haben */
-      if (*sptr != 0)
-        break;
-    default:                   /* nur skill als Parameter, keine extras */
-      data = locale_array[lindex]->study_orders[sk];
-      if (data == NULL) {
-        const char *skname = skillname(sk, lang);
-        data = (order_data *) malloc(sizeof(order_data));
-        locale_array[lindex]->study_orders[sk] = data;
-        data->_keyword = kwd;
-        data->_lindex = lindex;
-        assert(data->_lindex>=0);
-        if (strchr(skname, ' ') != NULL) {
-          size_t len = strlen(skname);
-          data->_str = malloc(len + 3);
-          data->_str[0] = '\"';
-          memcpy(data->_str + 1, skname, len);
-          data->_str[len + 1] = '\"';
-          data->_str[len + 2] = '\0';
-        } else {
-          data->_str = _strdup(skname);
+    /* learning, only one order_data per skill required */
+    if (kwd == K_STUDY) {
+        skill_t sk = get_skill(parse_token(&sptr), lang);
+        switch (sk) {
+        case NOSKILL:              /* fehler */
+            break;
+        case SK_MAGIC:             /* kann parameter haben */
+            if (*sptr != 0)
+                break;
+        default:                   /* nur skill als Parameter, keine extras */
+            data = locale_array[lindex]->study_orders[sk];
+            if (data == NULL) {
+                const char *skname = skillname(sk, lang);
+                data = (order_data *)malloc(sizeof(order_data));
+                locale_array[lindex]->study_orders[sk] = data;
+                data->_keyword = kwd;
+                data->_lindex = lindex;
+                assert(data->_lindex >= 0);
+                if (strchr(skname, ' ') != NULL) {
+                    size_t len = strlen(skname);
+                    data->_str = malloc(len + 3);
+                    data->_str[0] = '\"';
+                    memcpy(data->_str + 1, skname, len);
+                    data->_str[len + 1] = '\"';
+                    data->_str[len + 2] = '\0';
+                }
+                else {
+                    data->_str = _strdup(skname);
+                }
+                data->_refcount = 1;
+            }
+            ++data->_refcount;
+            return data;
         }
-        data->_refcount = 1;
-      }
-      ++data->_refcount;
-      return data;
     }
-  }
 
-  /* orders with no parameter, only one order_data per order required */
-  else if (kwd != NOKEYWORD && *sptr == 0) {
-    data = locale_array[lindex]->short_orders[kwd];
-    if (data == NULL) {
-      data = (order_data *) malloc(sizeof(order_data));
-      locale_array[lindex]->short_orders[kwd] = data;
-      data->_keyword = kwd;
-      data->_lindex = lindex;
-      assert(data->_lindex>=0);
-      data->_str = NULL;
-      data->_refcount = 1;
+    /* orders with no parameter, only one order_data per order required */
+    else if (kwd != NOKEYWORD && *sptr == 0) {
+        data = locale_array[lindex]->short_orders[kwd];
+        if (data == NULL) {
+            data = (order_data *)malloc(sizeof(order_data));
+            locale_array[lindex]->short_orders[kwd] = data;
+            data->_keyword = kwd;
+            data->_lindex = lindex;
+            assert(data->_lindex >= 0);
+            data->_str = NULL;
+            data->_refcount = 1;
+        }
+        ++data->_refcount;
+        return data;
     }
-    ++data->_refcount;
+    data = (order_data *)malloc(sizeof(order_data));
+    data->_keyword = kwd;
+    data->_lindex = lindex;
+    assert(data->_lindex >= 0);
+    data->_str = s ? _strdup(s) : NULL;
+    data->_refcount = 1;
     return data;
-  }
-  data = (order_data *) malloc(sizeof(order_data));
-  data->_keyword = kwd;
-  data->_lindex = lindex;
-  assert(data->_lindex>=0);
-  data->_str = s ? _strdup(s) : NULL;
-  data->_refcount = 1;
-  return data;
 }
 
 static order *create_order_i(keyword_t kwd, const char *sptr, int persistent,
-  const struct locale *lang)
+    const struct locale *lang)
 {
-  order *ord = NULL;
-  int lindex;
+    order *ord = NULL;
+    int lindex;
 
-  /* if this is just nonsense, then we skip it. */
-  if (lomem) {
-    switch (kwd) {
-    case K_KOMMENTAR:
-    case NOKEYWORD:
-      return NULL;
-    default:
-      break;
+    /* if this is just nonsense, then we skip it. */
+    if (lomem) {
+        switch (kwd) {
+        case K_KOMMENTAR:
+        case NOKEYWORD:
+            return NULL;
+        default:
+            break;
+        }
     }
-  }
 
-  for (lindex = 0; lindex != nlocales; ++lindex) {
-    if (locale_array[lindex]->lang == lang)
-      break;
-  }
-  if (lindex == nlocales) {
-    locale_array[nlocales] = (locale_data *) calloc(1, sizeof(locale_data));
-    locale_array[nlocales]->lang = lang;
-    ++nlocales;
-  }
+    for (lindex = 0; lindex != nlocales; ++lindex) {
+        if (locale_array[lindex]->lang == lang)
+            break;
+    }
+    if (lindex == nlocales) {
+        locale_array[nlocales] = (locale_data *)calloc(1, sizeof(locale_data));
+        locale_array[nlocales]->lang = lang;
+        ++nlocales;
+    }
 
-  ord = (order *) malloc(sizeof(order));
-  ord->_persistent = persistent;
-  ord->next = NULL;
+    ord = (order *)malloc(sizeof(order));
+    ord->_persistent = persistent;
+    ord->next = NULL;
 
-  ord->data = create_data(kwd, sptr, lindex);
+    ord->data = create_data(kwd, sptr, lindex);
 
-  return ord;
+    return ord;
 }
 
 order *create_order(keyword_t kwd, const struct locale * lang,
-  const char *params, ...)
+    const char *params, ...)
 {
-  char zBuffer[DISPLAYSIZE];
-  if (params) {
-    char *bufp = zBuffer;
-    int bytes;
-    size_t size = sizeof(zBuffer) - 1;
-    va_list marker;
+    char zBuffer[DISPLAYSIZE];
+    if (params) {
+        char *bufp = zBuffer;
+        int bytes;
+        size_t size = sizeof(zBuffer) - 1;
+        va_list marker;
 
-    va_start(marker, params);
-    while (*params) {
-      if (*params == '%') {
-        int i;
-        const char *s;
-        ++params;
-        switch (*params) {
-        case 's':
-          s = va_arg(marker, const char *);
-          bytes = (int)strlcpy(bufp, s, size);
-          if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
-          break;
-        case 'd':
-          i = va_arg(marker, int);
-          bytes = (int)strlcpy(bufp, itoa10(i), size);
-          if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
-          break;
-        case 'i':
-          i = va_arg(marker, int);
-          bytes = (int)strlcpy(bufp, itoa36(i), size);
-          if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
-          break;
-        default:
-          assert(!"unknown format-character in create_order");
+        va_start(marker, params);
+        while (*params) {
+            if (*params == '%') {
+                int i;
+                const char *s;
+                ++params;
+                switch (*params) {
+                case 's':
+                    s = va_arg(marker, const char *);
+                    bytes = (int)strlcpy(bufp, s, size);
+                    if (wrptr(&bufp, &size, bytes) != 0)
+                        WARN_STATIC_BUFFER();
+                    break;
+                case 'd':
+                    i = va_arg(marker, int);
+                    bytes = (int)strlcpy(bufp, itoa10(i), size);
+                    if (wrptr(&bufp, &size, bytes) != 0)
+                        WARN_STATIC_BUFFER();
+                    break;
+                case 'i':
+                    i = va_arg(marker, int);
+                    bytes = (int)strlcpy(bufp, itoa36(i), size);
+                    if (wrptr(&bufp, &size, bytes) != 0)
+                        WARN_STATIC_BUFFER();
+                    break;
+                default:
+                    assert(!"unknown format-character in create_order");
+                }
+            }
+            else if (size > 0) {
+                *bufp++ = *params;
+                --size;
+            }
+            ++params;
         }
-      } else if (size > 0) {
-        *bufp++ = *params;
-        --size;
-      }
-      ++params;
+        va_end(marker);
+        *bufp = 0;
     }
-    va_end(marker);
-    *bufp = 0;
-  } else {
-    zBuffer[0] = 0;
-  }
-  return create_order_i(kwd, zBuffer, 0, lang);
+    else {
+        zBuffer[0] = 0;
+    }
+    return create_order_i(kwd, zBuffer, 0, lang);
 }
 
 order *parse_order(const char *s, const struct locale * lang)
@@ -352,7 +357,7 @@ order *parse_order(const char *s, const struct locale * lang)
     if (*s != 0) {
         keyword_t kwd;
         const char *sptr;
-        int persistent = 0; 
+        int persistent = 0;
 
         while (*s == '@') {
             persistent = 1;
@@ -379,50 +384,50 @@ order *parse_order(const char *s, const struct locale * lang)
  */
 bool is_repeated(const order * ord)
 {
-  keyword_t kwd = ORD_KEYWORD(ord);
-  const struct locale *lang = ORD_LOCALE(ord);
-  const char * s;
-  int result = 0;
+    keyword_t kwd = ORD_KEYWORD(ord);
+    const struct locale *lang = ORD_LOCALE(ord);
+    const char * s;
+    int result = 0;
 
-  switch (kwd) {
-  case K_CAST:
-  case K_BUY:
-  case K_SELL:
-  case K_ROUTE:
-  case K_DRIVE:
-  case K_WORK:
-  case K_BESIEGE:
-  case K_ENTERTAIN:
-  case K_TAX:
-  case K_RESEARCH:
-  case K_SPY:
-  case K_STEAL:
-  case K_SABOTAGE:
-  case K_STUDY:
-  case K_TEACH:
-  case K_BREED:
-  case K_PIRACY:
-  case K_PLANT:
-    result = 1;
-    break;
+    switch (kwd) {
+    case K_CAST:
+    case K_BUY:
+    case K_SELL:
+    case K_ROUTE:
+    case K_DRIVE:
+    case K_WORK:
+    case K_BESIEGE:
+    case K_ENTERTAIN:
+    case K_TAX:
+    case K_RESEARCH:
+    case K_SPY:
+    case K_STEAL:
+    case K_SABOTAGE:
+    case K_STUDY:
+    case K_TEACH:
+    case K_BREED:
+    case K_PIRACY:
+    case K_PLANT:
+        result = 1;
+        break;
 
-  case K_MAKE:
-    /* Falls wir MACHE TEMP haben, ignorieren wir es. Alle anderen
-     * Arten von MACHE zaehlen aber als neue defaults und werden
-     * behandelt wie die anderen (deswegen kein break nach case
-     * K_MAKE) - und in thisorder (der aktuelle 30-Tage Befehl)
-     * abgespeichert). */
-    parser_pushstate();
-    init_tokens(ord);           /* initialize token-parser */
-    skip_token();
-    s = getstrtoken();
-    result = !isparam(s, lang, P_TEMP);
-    parser_popstate();
-    break;
-  default:
-    result = 0;
-  }
-  return result;
+    case K_MAKE:
+        /* Falls wir MACHE TEMP haben, ignorieren wir es. Alle anderen
+         * Arten von MACHE zaehlen aber als neue defaults und werden
+         * behandelt wie die anderen (deswegen kein break nach case
+         * K_MAKE) - und in thisorder (der aktuelle 30-Tage Befehl)
+         * abgespeichert). */
+        parser_pushstate();
+        init_tokens(ord);           /* initialize token-parser */
+        skip_token();
+        s = getstrtoken();
+        result = !isparam(s, lang, P_TEMP);
+        parser_popstate();
+        break;
+    default:
+        result = 0;
+    }
+    return result;
 }
 
 /**
@@ -435,46 +440,46 @@ bool is_repeated(const order * ord)
  */
 bool is_exclusive(const order * ord)
 {
-  keyword_t kwd = ORD_KEYWORD(ord);
-  const struct locale *lang = ORD_LOCALE(ord);
-  int result = 0;
+    keyword_t kwd = ORD_KEYWORD(ord);
+    const struct locale *lang = ORD_LOCALE(ord);
+    int result = 0;
 
-  switch (kwd) {
-  case K_MOVE:
-  case K_ROUTE:
-  case K_DRIVE:
-  case K_WORK:
-  case K_BESIEGE:
-  case K_ENTERTAIN:
-  case K_TAX:
-  case K_RESEARCH:
-  case K_SPY:
-  case K_STEAL:
-  case K_SABOTAGE:
-  case K_STUDY:
-  case K_TEACH:
-  case K_BREED:
-  case K_PIRACY:
-  case K_PLANT:
-    result = 1;
-    break;
+    switch (kwd) {
+    case K_MOVE:
+    case K_ROUTE:
+    case K_DRIVE:
+    case K_WORK:
+    case K_BESIEGE:
+    case K_ENTERTAIN:
+    case K_TAX:
+    case K_RESEARCH:
+    case K_SPY:
+    case K_STEAL:
+    case K_SABOTAGE:
+    case K_STUDY:
+    case K_TEACH:
+    case K_BREED:
+    case K_PIRACY:
+    case K_PLANT:
+        result = 1;
+        break;
 
-  case K_MAKE:
-    /* Falls wir MACHE TEMP haben, ignorieren wir es. Alle anderen
-     * Arten von MACHE zaehlen aber als neue defaults und werden
-     * behandelt wie die anderen (deswegen kein break nach case
-     * K_MAKE) - und in thisorder (der aktuelle 30-Tage Befehl)
-     * abgespeichert). */
-    parser_pushstate();
-    init_tokens(ord);           /* initialize token-parser */
-    skip_token();
-    result = !isparam(getstrtoken(), lang, P_TEMP);
-    parser_popstate();
-    break;
-  default:
-    result = 0;
-  }
-  return result;
+    case K_MAKE:
+        /* Falls wir MACHE TEMP haben, ignorieren wir es. Alle anderen
+         * Arten von MACHE zaehlen aber als neue defaults und werden
+         * behandelt wie die anderen (deswegen kein break nach case
+         * K_MAKE) - und in thisorder (der aktuelle 30-Tage Befehl)
+         * abgespeichert). */
+        parser_pushstate();
+        init_tokens(ord);           /* initialize token-parser */
+        skip_token();
+        result = !isparam(getstrtoken(), lang, P_TEMP);
+        parser_popstate();
+        break;
+    default:
+        result = 0;
+    }
+    return result;
 }
 
 /**
@@ -487,48 +492,48 @@ bool is_exclusive(const order * ord)
  */
 bool is_long(const order * ord)
 {
-  keyword_t kwd = ORD_KEYWORD(ord);
-  const struct locale *lang = ORD_LOCALE(ord);
-  bool result = false;
+    keyword_t kwd = ORD_KEYWORD(ord);
+    const struct locale *lang = ORD_LOCALE(ord);
+    bool result = false;
 
-  switch (kwd) {
-  case K_CAST:
-  case K_BUY:
-  case K_SELL:
-  case K_MOVE:
-  case K_ROUTE:
-  case K_DRIVE:
-  case K_WORK:
-  case K_BESIEGE:
-  case K_ENTERTAIN:
-  case K_TAX:
-  case K_RESEARCH:
-  case K_SPY:
-  case K_STEAL:
-  case K_SABOTAGE:
-  case K_STUDY:
-  case K_TEACH:
-  case K_BREED:
-  case K_PIRACY:
-  case K_PLANT:
-    return true;
+    switch (kwd) {
+    case K_CAST:
+    case K_BUY:
+    case K_SELL:
+    case K_MOVE:
+    case K_ROUTE:
+    case K_DRIVE:
+    case K_WORK:
+    case K_BESIEGE:
+    case K_ENTERTAIN:
+    case K_TAX:
+    case K_RESEARCH:
+    case K_SPY:
+    case K_STEAL:
+    case K_SABOTAGE:
+    case K_STUDY:
+    case K_TEACH:
+    case K_BREED:
+    case K_PIRACY:
+    case K_PLANT:
+        return true;
 
-  case K_MAKE:
-    /* Falls wir MACHE TEMP haben, ignorieren wir es. Alle anderen
-     * Arten von MACHE zaehlen aber als neue defaults und werden
-     * behandelt wie die anderen (deswegen kein break nach case
-     * K_MAKE) - und in thisorder (der aktuelle 30-Tage Befehl)
-     * abgespeichert). */
-    parser_pushstate();
-    init_tokens(ord);           /* initialize token-parser */
-    skip_token();
-    result = !isparam(getstrtoken(), lang, P_TEMP);
-    parser_popstate();
-    break;
-  default:
-    result = false;
-  }
-  return result;
+    case K_MAKE:
+        /* Falls wir MACHE TEMP haben, ignorieren wir es. Alle anderen
+         * Arten von MACHE zaehlen aber als neue defaults und werden
+         * behandelt wie die anderen (deswegen kein break nach case
+         * K_MAKE) - und in thisorder (der aktuelle 30-Tage Befehl)
+         * abgespeichert). */
+        parser_pushstate();
+        init_tokens(ord);           /* initialize token-parser */
+        skip_token();
+        result = !isparam(getstrtoken(), lang, P_TEMP);
+        parser_popstate();
+        break;
+    default:
+        result = false;
+    }
+    return result;
 }
 
 /**
@@ -542,48 +547,50 @@ bool is_long(const order * ord)
  */
 bool is_persistent(const order * ord)
 {
-  keyword_t kwd = ORD_KEYWORD(ord);
-  int persist = ord->_persistent != 0;
-  switch (kwd) {
-  case K_MOVE:
-  case NOKEYWORD:
-    /* lang, aber niemals persistent! */
-    return false;
+    keyword_t kwd = ORD_KEYWORD(ord);
+    int persist = ord->_persistent != 0;
+    switch (kwd) {
+    case K_MOVE:
+    case NOKEYWORD:
+        /* lang, aber niemals persistent! */
+        return false;
 
-  case K_KOMMENTAR:
-    return true;
+    case K_KOMMENTAR:
+        return true;
 
-  default:
-    return persist || is_repeated(ord);
-  }
+    default:
+        return persist || is_repeated(ord);
+    }
 
 }
 
 char *write_order(const order * ord, char *buffer, size_t size)
 {
-  if (ord == 0) {
-    buffer[0] = 0;
-  } else {
-    keyword_t kwd = ORD_KEYWORD(ord);
-    if (kwd == NOKEYWORD) {
-      const char *text = ORD_STRING(ord);
-      strlcpy(buffer, (const char *)text, size);
-    } else {
-      get_command(ord, buffer, size);
+    if (ord == 0) {
+        buffer[0] = 0;
     }
-  }
-  return buffer;
+    else {
+        keyword_t kwd = ORD_KEYWORD(ord);
+        if (kwd == NOKEYWORD) {
+            const char *text = ORD_STRING(ord);
+            strlcpy(buffer, (const char *)text, size);
+        }
+        else {
+            get_command(ord, buffer, size);
+        }
+    }
+    return buffer;
 }
 
 void push_order(order ** ordp, order * ord)
 {
-  while (*ordp)
-    ordp = &(*ordp)->next;
-  *ordp = ord;
+    while (*ordp)
+        ordp = &(*ordp)->next;
+    *ordp = ord;
 }
 
 void init_tokens(const struct order *ord)
 {
-  char *cmd = getcommand(ord);
-  init_tokens_str(cmd, cmd);
+    char *cmd = getcommand(ord);
+    init_tokens_str(cmd, cmd);
 }

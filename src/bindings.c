@@ -1116,7 +1116,7 @@ int tolua_bindings_open(lua_State * L)
     tolua_module(L, TOLUA_CAST "config", 1);
     tolua_beginmodule(L, TOLUA_CAST "config");
     {
-      parse_inifile(L, global.inifile, "config");
+      parse_inifile(L, global.inifile, "lua");
       tolua_variable(L, TOLUA_CAST "locales", &config_get_locales, 0);
       tolua_function(L, TOLUA_CAST "get_resource", &config_get_resource);
       tolua_variable(L, TOLUA_CAST "buildings", &config_get_buildings, 0);

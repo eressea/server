@@ -61,7 +61,6 @@ end
 function clean()
   for r in regions() do
     if r.terrain=="ocean" then
-      -- print(r)
       region.destroy(r)
     end
   end

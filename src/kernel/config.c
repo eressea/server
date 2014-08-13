@@ -1180,7 +1180,7 @@ param_t findparam(const char *s, const struct locale * lang)
         void **tokens = get_translations(lang, UT_PARAMS);
         critbit_tree *cb = (critbit_tree *)*tokens;
         if (!cb) {
-            log_error_n("no parameters defined in locale %s", locale_name(lang));
+            log_error("no parameters defined in locale %s", locale_name(lang));
         }
         else if (cb_find_prefix(cb, str, strlen(str), &match, 1, 0)) {
             cb_get_kv(match, &i, sizeof(int));
@@ -1766,7 +1766,7 @@ void init_terrains_translation(const struct locale *lang) {
             addtoken(tokens, name, var);
         }
         else {
-            log_error_n("no translation for terrain %s in locale %s", terrain->_name, locale_name(lang));
+            log_error("no translation for terrain %s in locale %s", terrain->_name, locale_name(lang));
         }
     }
 }
@@ -1785,7 +1785,7 @@ void init_options_translation(const struct locale * lang) {
                 addtoken(tokens, name, var);
             }
             else {
-                log_error_n("no translation for OPTION %s in locale %s", options[i], locale_name(lang));
+                log_error("no translation for OPTION %s in locale %s", options[i], locale_name(lang));
             }
         }
     }
@@ -1820,7 +1820,7 @@ static void init_locale(const struct locale *lang)
                 addtoken(tokens, name, var);
             }
             else {
-                log_error_n("no translation for magic school %s in locale %s", tok, locale_name(lang));
+                log_error("no translation for magic school %s in locale %s", tok, locale_name(lang));
             }
             tok = strtok(NULL, " ");
         }
@@ -2825,7 +2825,6 @@ void attrib_init(void)
 
     at_deprecate("xontormiaexpress", a_readint);    /* required for old datafiles */
     at_register(&at_speedup);
-    at_register(&at_building_action);
 }
 
 void kernel_init(void)
@@ -2946,7 +2945,7 @@ const char * game_name(void) {
 }
 
 int game_id(void) {
-    return get_param_int(global.parameters, "game.id", global.game_id);
+    return get_param_int(global.parameters, "game.id", 0);
 }
 
 void load_inifile(dictionary * d)
@@ -2983,9 +2982,6 @@ void load_inifile(dictionary * d)
 
     str = iniparser_getstring(d, "eressea:locales", "de,en");
     make_locales(str);
-
-    /* excerpt from [config] (the rest is used in bindings.c) */
-    global.game_id = iniparser_getint(d, "config:game_id", 0);
 
     if (global.inifile) iniparser_free(global.inifile);
     global.inifile = d;

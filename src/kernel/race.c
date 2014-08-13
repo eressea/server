@@ -146,26 +146,14 @@ void free_races(void) {
     }
 }
 
-static const char *racealias[][2] = {
-  {"uruk", "orc"},              /* there was a time when the orc race was called uruk (and there were other orcs). That was really confusing */
-  {"skeletton lord", "skeleton lord"},  /* we once had a typo here. it is fixed */
-  {NULL, NULL}
-};
-
 static race *rc_find_i(const char *name)
 {
   const char *rname = name;
   race *rc = races;
-  int i;
 
-  for (i = 0; racealias[i][0]; ++i) {
-    if (strcmp(racealias[i][0], name) == 0) {
-      rname = racealias[i][1];
-      break;
-    }
+  while (rc && !strcmp(rname, rc->_name[0]) == 0) {
+      rc = rc->next;
   }
-  while (rc && !strcmp(rname, rc->_name[0]) == 0)
-    rc = rc->next;
   return rc;
 }
 
@@ -261,7 +249,7 @@ const char *raceprefix(const unit * u)
 
 const char *racename(const struct locale *loc, const unit * u, const race * rc)
 {
-  const char *prefix = raceprefix(u);
+  const char *str, *prefix = raceprefix(u);
 
   if (prefix != NULL) {
     static char lbuf[80];
@@ -283,7 +271,8 @@ const char *racename(const struct locale *loc, const unit * u, const race * rc)
 
     return lbuf;
   }
-  return LOC(loc, rc_name(rc, u->number != 1));
+  str = LOC(loc, rc_name(rc, u->number != 1));
+  return str ? str : rc->_name[0];
 }
 
 int

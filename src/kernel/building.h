@@ -158,18 +158,10 @@ extern "C" {
   extern void building_update_owner(struct building * bld);
 
   extern struct attrib_type at_building_action;
-  void building_addaction(struct building *b, const char *fname,
-    const char *param);
 
 #ifdef WDW_PYRAMID
   extern int wdw_pyramid_level(const struct building *b);
 #endif
-
-  typedef struct building_action {
-    building *b;
-    char *fname;
-    char *param;
-  } building_action;
 
   extern const char *buildingname(const struct building *b);
 
