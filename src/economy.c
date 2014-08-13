@@ -1051,43 +1051,44 @@ static bool maintain(building * b, bool first)
             }
         }
     }
-  for (c = 0; b->type->maintenance[c].number; ++c) {
-    const maintenance *m = b->type->maintenance + c;
-    int need = m->number;
+    for (c = 0; b->type->maintenance[c].number; ++c) {
+        const maintenance *m = b->type->maintenance + c;
+        int need = m->number;
 
-    if (fval(m, MTF_VARIABLE))
-      need = need * b->size;
-    if (u) {
-      /* first ist im ersten versuch true, im zweiten aber false! Das
-       * bedeutet, das in der Runde in die Region geschafften Resourcen
-       * nicht genutzt werden können, weil die reserviert sind! */
-      if (!first)
-        need -= get_pooled(u, m->rtype, GET_ALL, need);
-      else
-        need -= get_pooled(u, m->rtype, GET_DEFAULT, need);
-      if (!first && need > 0) {
-        unit *ua;
-        for (ua = r->units; ua; ua = ua->next)
-          freset(ua->faction, FFL_SELECT);
-        fset(u->faction, FFL_SELECT);   /* hat schon */
-        for (ua = r->units; ua; ua = ua->next) {
-          if (!fval(ua->faction, FFL_SELECT) && (ua->faction == u->faction
-              || alliedunit(ua, u->faction, HELP_MONEY))) {
-            need -= get_pooled(ua, m->rtype, GET_ALL, need);
-            fset(ua->faction, FFL_SELECT);
-            if (need <= 0)
-              break;
-          }
+        if (fval(m, MTF_VARIABLE))
+            need = need * b->size;
+        if (u) {
+            /* first ist im ersten versuch true, im zweiten aber false! Das
+             * bedeutet, das in der Runde in die Region geschafften Resourcen
+             * nicht genutzt werden können, weil die reserviert sind! */
+            if (!first)
+                need -= get_pooled(u, m->rtype, GET_ALL, need);
+            else
+                need -= get_pooled(u, m->rtype, GET_DEFAULT, need);
+            if (!first && need > 0) {
+                unit *ua;
+                for (ua = r->units; ua; ua = ua->next)
+                    freset(ua->faction, FFL_SELECT);
+                fset(u->faction, FFL_SELECT);   /* hat schon */
+                for (ua = r->units; ua; ua = ua->next) {
+                    if (!fval(ua->faction, FFL_SELECT) && (ua->faction == u->faction
+                        || alliedunit(ua, u->faction, HELP_MONEY))) {
+                        need -= get_pooled(ua, m->rtype, GET_ALL, need);
+                        fset(ua->faction, FFL_SELECT);
+                        if (need <= 0)
+                            break;
+                    }
+                }
+            }
         }
-      }
-      if (need > 0) {
-        if (!fval(m, MTF_VITAL))
-          work = false;
-        else {
-          paid = false;
-          break;
+        if (need > 0) {
+            if (!fval(m, MTF_VITAL))
+                work = false;
+            else {
+                paid = false;
+                break;
+            }
         }
-      }
     }
     if (fval(b, BLD_DONTPAY)) {
         return false;
@@ -2299,7 +2300,7 @@ static void expandselling(region * r, request * sellorders, int limit)
                 }
                 counter[i] = 0;
             }
-            }
+        }
         if (use > 0) {
 #ifdef NDEBUG
             use_pooled(oa[j].unit, ltype->itype->rtype, GET_DEFAULT, use);
@@ -2309,7 +2310,7 @@ static void expandselling(region * r, request * sellorders, int limit)
             /* assert(i==use); */
 #endif
         }
-        }
+    }
     free(oa);
 
     /* Steuern. Hier werden die Steuern dem Besitzer der größten Burg gegeben. */
@@ -2345,7 +2346,7 @@ static void expandselling(region * r, request * sellorders, int limit)
         a_remove(&u->attribs, a);
         add_income(u, IC_TRADE, u->n, u->n);
     }
-    }
+}
 
 static bool sell(unit * u, request ** sellorders, struct order *ord)
 {
@@ -2524,10 +2525,10 @@ static void expandstealing(region * r, request * stealorders)
             for (u2 = r->units; u2; u2 = u2->next) {
                 if (u2->faction == u->faction) {
                     uct += maintenance_cost(u2);
-    }
-}
+                }
+            }
             n -= uct * 2;
-}
+        }
 #endif
         if (n > 10 && rplane(r) && (rplane(r)->flags & PFL_NOALLIANCES)) {
             /* In Questen nur reduziertes Klauen */
@@ -2543,7 +2544,7 @@ static void expandstealing(region * r, request * stealorders)
         }
         add_income(oa[i].unit, IC_STEAL, oa[i].unit->wants, oa[i].unit->n);
         fset(oa[i].unit, UFL_LONGACTION | UFL_NOTMOVING);
-  }
+    }
     free(oa);
 }
 
