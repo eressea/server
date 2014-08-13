@@ -4605,7 +4605,7 @@ void init_processor(void)
     add_proc_order(p, K_MAIL, &mail_cmd, 0, "Botschaften");
 
     p += 10;                      /* all claims must be done before we can USE */
-    add_proc_region(p, &enter_1, "Betreten (1. Versuch)");
+    add_proc_region(p, &enter_1, "Betreten (1. Versuch)");     /* for GIVE CONTROL */
     add_proc_order(p, K_USE, &use_cmd, 0, "Benutzen");
 
     p += 10;                      /* in case it has any effects on alliance victories */
@@ -4614,6 +4614,10 @@ void init_processor(void)
     p += 10;                      /* in case it has any effects on alliance victories */
     add_proc_order(p, K_LEAVE, &leave_cmd, 0, "Verlassen");
 
+	p += 10; 	
+    add_proc_region(p, &enter_1, "Betreten (2. Versuch)"); /* to allow a buildingowner to enter the castle pre combat */
+
+	p += 10;
     add_proc_region(p, &do_battle, "Attackieren");
 
     if (!keyword_disabled(K_BESIEGE)) {
@@ -4622,11 +4626,11 @@ void init_processor(void)
     }
 
     p += 10;                      /* can't allow reserve before siege (weapons) */
-    add_proc_region(p, &enter_1, "Betreten (2. Versuch)");
 	if (get_param_int(global.parameters, "rules.reserve.twophase", 0)) {
 		add_proc_order(p, K_RESERVE, &reserve_self, 0, "Selbst_Reservieren");
 		p += 10;
 	}
+    add_proc_region(p, &enter_1, "Betreten (3. Versuch)");    /* to claim a castle after a victory and to be able to DESTROY it in the same turn */
     add_proc_order(p, K_RESERVE, &reserve_cmd, 0, "Reservieren");
     add_proc_order(p, K_CLAIM, &claim_cmd, 0, NULL);
     add_proc_unit(p, &follow_unit, "Folge auf Einheiten setzen");
@@ -4663,7 +4667,7 @@ void init_processor(void)
     add_proc_postregion(p, &split_allocations, "Produktion II");
 
     p += 10;
-    add_proc_region(p, &enter_2, "Betreten (3. Versuch)");
+    add_proc_region(p, &enter_2, "Betreten (4. Versuch)"); /* Once again after QUIT */
 
     p += 10;
     add_proc_region(p, &sinkships, "Schiffe sinken");
