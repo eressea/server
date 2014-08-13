@@ -1538,8 +1538,10 @@ int lighthouse_range(const building * b, const faction * f)
             int c = 0;
             unit *u;
             for (u = r->units; u; u = u->next) {
-                if (u->building == b) {
-                    c += u->number;
+                if (u->building == b || u == building_owner(b)) {
+                    if (u->building == b) {
+                        c += u->number;
+                    }
                     if (c > buildingcapacity(b))
                         break;
                     if (f == NULL || u->faction == f) {
@@ -1880,6 +1882,27 @@ int get_param_int(const struct param *p, const char *key, int def)
 {
     const char * str = get_param(p, key);
     return str ? atoi(str) : def;
+}
+
+int check_param(const struct param *p, const char *key, const char *searchvalue)
+{
+    const char *value = get_param(p, key);
+    if (!value) {
+        return 0;
+    }
+    char *p_value = malloc(sizeof(char)* (strlen(value) + 1));
+    strcpy(p_value, value);
+    const char *delimiter = " ,;";
+    char *v = strtok(p_value, delimiter);
+
+    while (v != NULL) {
+        if (strcmp(v, searchvalue) == 0)
+        {
+            return 1;
+        }
+        v = strtok(NULL, delimiter);
+    }
+    return 0;
 }
 
 static const char *g_datadir;

@@ -586,7 +586,6 @@ void building_set_owner(struct unit * owner)
 static unit *building_owner_ex(const building * bld, const struct faction * last_owner)
 {
   unit *u, *heir = 0;
-
   /* Eigentümer tot oder kein Eigentümer vorhanden. Erste lebende Einheit
     * nehmen. */
   for (u = bld->region->units; u; u = u->next) {
@@ -602,11 +601,25 @@ static unit *building_owner_ex(const building * bld, const struct faction * last
       }
     }
   }
-  return heir;
+    if (!heir && check_param(global.parameters, "rules.region_owner_pay_building", bld->type->_name)) {
+        if (rule_region_owners()) {
+            u = building_owner(largestbuilding(bld->region, &cmp_taxes, false));
+        }
+        else {
+            u = building_owner(largestbuilding(bld->region, &cmp_wage, false));
+        }
+        if (u) {
+            heir = u;
+        }
+    }
+    return heir;
 }
 
 unit *building_owner(const building * bld)
 {
+  if (!bld) {
+		return NULL;
+	}
   unit *owner = bld->_owner;
   if (!owner || (owner->building!=bld || owner->number<=0)) {
     unit * heir = building_owner_ex(bld, owner?owner->faction:0);
