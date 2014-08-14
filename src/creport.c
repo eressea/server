@@ -391,8 +391,6 @@ static int cr_order(variant var, char *buffer, const void *userdata)
         }
         *wp++ = '\"';
         *wp++ = 0;
-
-        free(cmd);
     }
     else
         strcpy(buffer, "\"\"");

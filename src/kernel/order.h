@@ -52,7 +52,6 @@ extern "C" {
 /* access functions for orders */
   keyword_t getkeyword(const order * ord);
   void set_order(order ** destp, order * src);
-  char *getcommand(const order * ord);
   char* get_command(const order *ord, char *buffer, size_t size);
   bool is_persistent(const order * ord);
   bool is_exclusive(const order * ord);
