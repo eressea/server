@@ -4626,12 +4626,12 @@ void init_processor(void)
     }
 
     p += 10;                      /* can't allow reserve before siege (weapons) */
-	if (get_param_int(global.parameters, "rules.reserve.twophase", 0)) {
-		add_proc_order(p, K_RESERVE, &reserve_self, 0, "Selbst_Reservieren");
-		p += 10;
-	}
-    add_proc_region(p, &enter_1, "Betreten (3. Versuch)");    /* to claim a castle after a victory and to be able to DESTROY it in the same turn */
-    add_proc_order(p, K_RESERVE, &reserve_cmd, 0, "Reservieren");
+    add_proc_region(p, &enter_1, "Betreten (3. Versuch)");  /* to claim a castle after a victory and to be able to DESTROY it in the same turn */
+    if (get_param_int(global.parameters, "rules.reserve.twophase", 0)) {
+        add_proc_order(p, K_RESERVE, &reserve_self, 0, "RESERVE (self)");
+        p += 10;
+    }
+    add_proc_order(p, K_RESERVE, &reserve_cmd, 0, "RESERVE (all)");
     add_proc_order(p, K_CLAIM, &claim_cmd, 0, NULL);
     add_proc_unit(p, &follow_unit, "Folge auf Einheiten setzen");
 
