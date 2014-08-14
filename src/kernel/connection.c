@@ -69,7 +69,7 @@ void free_borders(void)
   }
 }
 
-connection *find_border(unsigned int id)
+connection *find_border(int id)
 {
   int key;
   for (key = 0; key != BORDER_MAXHASH; key++) {

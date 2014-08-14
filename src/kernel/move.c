@@ -420,9 +420,9 @@ static int canride(unit * u)
     const item_type *it_horse, *it_elvenhorse, *it_charger;
     const resource_type *rtype;
 
-    it_horse = (rtype = get_resourcetype(R_HORSE)) ? rtype->itype : 0;
-    it_elvenhorse = (rtype = get_resourcetype(R_UNICORN)) ? rtype->itype : 0;
-    it_charger = (rtype = get_resourcetype(R_CHARGER)) ? rtype->itype : 0;
+    it_horse = ((rtype = get_resourcetype(R_HORSE))!=NULL) ? rtype->itype : 0;
+    it_elvenhorse = ((rtype = get_resourcetype(R_UNICORN)) != NULL) ? rtype->itype : 0;
+    it_charger = ((rtype = get_resourcetype(R_CHARGER)) != NULL) ? rtype->itype : 0;
 
     for (itm = u->items; itm; itm = itm->next) {
         if (itm->type == it_horse || itm->type == it_charger) {

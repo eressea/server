@@ -89,7 +89,7 @@ extern "C" {
     struct border_type *next;   /* for internal use only */
   } border_type;
 
-  extern connection *find_border(unsigned int id);
+  extern connection *find_border(int id);
   int resolve_borderid(variant data, void *addr);
   extern void free_borders(void);
 
