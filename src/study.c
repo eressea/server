@@ -494,29 +494,35 @@ int teach_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-static double study_speedup(unit * u)
+static double study_speedup(unit * u, skill_t s, int rule_type)
 {
-#define MINTURN 5               /* 5 */
-#define OFSTURN 2               /* 2 */
-  if (turn > MINTURN) {
-    static int speed_rule = -1;
-    if (speed_rule < 0) {
-      speed_rule = get_param_int(global.parameters, "study.speedup", 0);
+#define MINTURN 16
+    double learnweeks = 0;
+    int i;
+    if (turn > MINTURN) {
+        if (rule_type == 1) {
+            for (i = 0; i != u->skill_size; ++i) {
+                skill *sv = u->skills + i;
+                if (sv->id == s){
+                    learnweeks = sv->level * (sv->level + 1) / 2.0;
+                    if (learnweeks < turn / 3) {
+                        return 2.0;
+                    }
+                }
+            }
+            return 2.0; /* If the skill was not found it is the first study. */
+        }
+        if (rule_type == 2) {
+            for (i = 0; i != u->skill_size; ++i) {
+                skill *sv = u->skills + i;
+                learnweeks = +(sv->level * (sv->level + 1) / 2.0);
+            }
+            if (learnweeks < turn / 3) {
+                return 2.0;
+            }
+        }
     }
-    if (speed_rule == 1) {
-      double learn_age = OFSTURN;
-      int i;
-      for (i = 0; i != u->skill_size; ++i) {
-        skill *sv = u->skills + i;
-        double learn_time = sv->level * (sv->level + 1) / 2.0;
-        learn_age += learn_time;
-      }
-      if (learn_age < turn) {
-        return 2.0 - learn_age / turn;
-      }
-    }
-  }
-  return 1.0;
+    return 1.0;
 }
 
 int learn_cmd(unit * u, order * ord)
@@ -532,6 +538,7 @@ int learn_cmd(unit * u, order * ord)
   int money = 0;
   skill_t sk;
   int maxalchemy = 0;
+  int speed_rule = get_param_int(global.parameters, "study.speedup", 0);
   static int learn_newskills = -1;
   if (learn_newskills < 0) {
     const char *str = get_param(global.parameters, "study.newskills");
@@ -730,7 +737,7 @@ int learn_cmd(unit * u, order * ord)
     teach->value -= u->number * 10;
   }
 
-  multi *= study_speedup(u);
+  multi *= study_speedup(u, sk, speed_rule);
   days = study_days(u, sk);
   days = (int)((days + teach->value) * multi);
 
