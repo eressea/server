@@ -18,6 +18,8 @@
 TOLUA_API int tolua_settings_open (lua_State* tolua_S);
 LUALIB_API int luaopen_settings (lua_State* tolua_S);
 
+#undef tolua_reg_types
+#define tolua_reg_types tolua_reg_types_settings
 #include "bind_settings.h"
 
 /* function to register type */

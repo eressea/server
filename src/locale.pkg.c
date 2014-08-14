@@ -18,6 +18,9 @@
 TOLUA_API int tolua_locale_open (lua_State* tolua_S);
 LUALIB_API int luaopen_locale (lua_State* tolua_S);
 
+#undef tolua_reg_types
+#define tolua_reg_types tolua_reg_types_locale
+#include "bind_tolua.h"
 #include "bind_locale.h"
 
 /* function to register type */

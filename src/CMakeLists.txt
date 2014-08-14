@@ -93,13 +93,7 @@ set(SERVER_SRC
   building_action.c
   console.c
   helpers.c
-  config.pkg.c
-  eressea.pkg.c
-  game.pkg.c
-  locale.pkg.c
-  log.pkg.c
-  process.pkg.c
-  settings.pkg.c
+  bind_tolua.c
   bind_building.c
   bind_config.c
   bind_locale.c

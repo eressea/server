@@ -18,6 +18,8 @@
 TOLUA_API int tolua_process_open (lua_State* tolua_S);
 LUALIB_API int luaopen_process (lua_State* tolua_S);
 
+#undef tolua_reg_types
+#define tolua_reg_types tolua_reg_types_process
 #include "bind_process.h"
 
 /* function to register type */

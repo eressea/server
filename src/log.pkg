@@ -1,3 +1,5 @@
+$#undef tolua_reg_types
+$#define tolua_reg_types tolua_reg_types_log
 $#include <util/log.h>
 
 module eressea {

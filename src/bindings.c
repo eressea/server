@@ -1062,17 +1062,13 @@ static void parse_inifile(lua_State * L, dictionary * d, const char *section)
     }
 }
 
+void tolua_bind_open(lua_State * L);
+
 int tolua_bindings_open(lua_State * L)
 {
   tolua_open(L);
 
-  tolua_eressea_open(L);
-  tolua_process_open(L);
-  tolua_settings_open(L);
-  tolua_game_open(L);
-  tolua_config_open(L);
-  tolua_locale_open(L);
-  tolua_log_open(L);
+  tolua_bind_open(L);
 
   /* register user types */
   tolua_usertype(L, TOLUA_CAST "spell");

@@ -18,6 +18,8 @@
 TOLUA_API int tolua_game_open (lua_State* tolua_S);
 LUALIB_API int luaopen_game (lua_State* tolua_S);
 
+#undef tolua_reg_types
+#define tolua_reg_types tolua_reg_types_game
 #include "config.h"
 #include "bind_eressea.h"
 
