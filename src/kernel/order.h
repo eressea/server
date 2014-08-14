@@ -50,13 +50,14 @@ extern "C" {
   extern void push_order(struct order **olist, struct order *ord);
 
 /* access functions for orders */
-  extern keyword_t getkeyword(const order * ord);
-  extern void set_order(order ** destp, order * src);
-  extern char *getcommand(const order * ord);
-  extern bool is_persistent(const order * ord);
-  extern bool is_exclusive(const order * ord);
-  extern bool is_repeated(const order * ord);
-  extern bool is_long(const order * ord);
+  keyword_t getkeyword(const order * ord);
+  void set_order(order ** destp, order * src);
+  char *getcommand(const order * ord);
+  char* get_command(const order *ord, char *buffer, size_t size);
+  bool is_persistent(const order * ord);
+  bool is_exclusive(const order * ord);
+  bool is_repeated(const order * ord);
+  bool is_long(const order * ord);
 
   extern char *write_order(const order * ord, char *buffer, size_t size);
   extern void init_tokens(const struct order *ord);     /* initialize token parsing */

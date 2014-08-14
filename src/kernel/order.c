@@ -93,7 +93,7 @@ keyword_t getkeyword(const order * ord)
  * This is the inverse function to the parse_order command. Note that
  * keywords are expanded to their full length.
  */
-static char* get_command(const order *ord, char *sbuffer, size_t size) {
+char* get_command(const order *ord, char *sbuffer, size_t size) {
     char *bufp = sbuffer;
     const char *text = ORD_STRING(ord);
     keyword_t kwd = ORD_KEYWORD(ord);
@@ -139,12 +139,6 @@ static char* get_command(const order *ord, char *sbuffer, size_t size) {
     }
     if (size > 0) *bufp = 0;
     return sbuffer;
-}
-
-char *getcommand(const order * ord)
-{
-    char sbuffer[DISPLAYSIZE * 2];
-    return _strdup(get_command(ord, sbuffer, sizeof(sbuffer)));
 }
 
 void free_order(order * ord)
@@ -423,6 +417,7 @@ bool is_repeated(const order * ord)
         s = getstrtoken();
         result = !isparam(s, lang, P_TEMP);
         parser_popstate();
+        // TODO: push/popstate is slow, we can do better.
         break;
     default:
         result = 0;
@@ -587,6 +582,12 @@ void push_order(order ** ordp, order * ord)
     while (*ordp)
         ordp = &(*ordp)->next;
     *ordp = ord;
+}
+
+static char *getcommand(const order * ord)
+{
+    char cmd[ORDERSIZE];
+    return _strdup(get_command(ord, cmd, sizeof(cmd)));
 }
 
 void init_tokens(const struct order *ord)

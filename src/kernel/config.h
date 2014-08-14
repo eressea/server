@@ -88,6 +88,7 @@ extern "C" {
 #define ENCCHANCE           10  /* %-Chance für einmalige Zufallsbegegnung */
 
 #define DISPLAYSIZE         8192        /* max. Länge einer Beschreibung, incl trailing 0 */
+#define ORDERSIZE           (DISPLAYSIZE*2) /* max. length of an order */
 #define NAMESIZE            128 /* max. Länge eines Namens, incl trailing 0 */
 #define IDSIZE              16  /* max. Länge einer no (als String), incl trailing 0 */
 #define KEYWORDSIZE         16  /* max. Länge eines Keyword, incl trailing 0 */

@@ -10,10 +10,19 @@
 #include <assert.h>
 #include <string.h>
 
-static const char * keyword_key(int i)
+const char * keyword(keyword_t kwd)
 {
-  assert(i<MAXKEYWORDS&& i>=0);
-  return mkname("keyword", keywords[i]);
+    static char result[KEYWORDSIZE];
+    if (!result[0]) {
+        strcpy(result, "keyword::");
+    }
+    strcpy(result+9, keywords[kwd]);
+    return result;
+}
+
+static const char * keyword_key(int kwd) {
+    assert(kwd < MAXKEYWORDS && kwd >= 0);
+    return keyword((keyword_t)kwd);
 }
 
 void init_keyword(const struct locale *lang, keyword_t kwd, const char *str) {
@@ -28,8 +37,8 @@ void init_keywords(const struct locale *lang) {
 
 keyword_t findkeyword(const char *s) {
     int i;
-    for (i=0;i!=MAXKEYWORDS;++i) {
-        if (strcmp(s, keywords[i])==0) {
+    for (i = 0; i != MAXKEYWORDS; ++i) {
+        if (strcmp(s, keywords[i]) == 0) {
             return (keyword_t)i;
         }
     }
@@ -65,73 +74,73 @@ keyword_t get_keyword(const char *s, const struct locale *lang) {
 static bool disabled_kwd[MAXKEYWORDS];
 
 void enable_keyword(keyword_t kwd, bool enabled) {
-    assert(kwd<MAXKEYWORDS);
+    assert(kwd < MAXKEYWORDS);
     disabled_kwd[kwd] = !enabled;
 }
 
 bool keyword_disabled(keyword_t kwd) {
-    assert(kwd<MAXKEYWORDS);
+    assert(kwd < MAXKEYWORDS);
     return disabled_kwd[kwd];
 }
 
 const char *keywords[MAXKEYWORDS] = {
-  "//",
-  "banner",
-  "work",
-  "attack",
-  "steal",
-  "besiege",
-  "name",
-  "use",
-  "describe",
-  "enter",
-  "guard",
-  "message",
-  "end",
-  "ride",
-  "number",
-  "follow",
-  "research",
-  "give",
-  "help",
-  "fight",
-  "ready",
-  "buy",
-  "contact",
-  "teach",
-  "study",
-  "make",
-  "move",
-  "password",
-  "recruit",
-  "reserve",
-  "route",
-  "sabotage",
-  "option",
-  "spy",
-  "quit",
-  "hide",
-  "carry",
-  "tax",
-  "entertain",
-  "sell",
-  "leave",
-  "forget",
-  "cast",
-  "show",
-  "destroy",
-  "grow",
-  "default",
-  "origin",
-  "email",
-  "piracy",
-  "group",
-  "sort",
-  "prefix",
-  "plant",
-  "alliance",
-  "claim",
-  "promote",
-  "pay",
+    "//",
+    "banner",
+    "work",
+    "attack",
+    "steal",
+    "besiege",
+    "name",
+    "use",
+    "describe",
+    "enter",
+    "guard",
+    "message",
+    "end",
+    "ride",
+    "number",
+    "follow",
+    "research",
+    "give",
+    "help",
+    "fight",
+    "ready",
+    "buy",
+    "contact",
+    "teach",
+    "study",
+    "make",
+    "move",
+    "password",
+    "recruit",
+    "reserve",
+    "route",
+    "sabotage",
+    "option",
+    "spy",
+    "quit",
+    "hide",
+    "carry",
+    "tax",
+    "entertain",
+    "sell",
+    "leave",
+    "forget",
+    "cast",
+    "show",
+    "destroy",
+    "grow",
+    "default",
+    "origin",
+    "email",
+    "piracy",
+    "group",
+    "sort",
+    "prefix",
+    "plant",
+    "alliance",
+    "claim",
+    "promote",
+    "pay",
 };
 
