@@ -516,7 +516,7 @@ static double study_speedup(unit * u, skill_t s, int rule_type)
                 skill *sv = u->skills + i;
                 learnweeks = +(sv->level * (sv->level + 1) / 2.0);
             }
-            if (learnweeks < turn / 3) {
+            if (learnweeks < turn / 2) {
                 return 2.0;
             }
         }
