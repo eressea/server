@@ -892,15 +892,15 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
     if (guard) {
         prob += base_prob;          /* 30% base chance */
         prob = +guard_count*guard_number_prob;
-        if (r->terrain = newterrain(T_GLACIER))
+        if (r->terrain == newterrain(T_GLACIER))
             prob = +region_type_prob*2;
-        if (r->terrain = newterrain(T_SWAMP))
+        if (r->terrain == newterrain(T_SWAMP))
             prob = +region_type_prob*2;
-        if (r->terrain = newterrain(T_MOUNTAIN))
+        if (r->terrain == newterrain(T_MOUNTAIN))
             prob = +region_type_prob;
-        if (r->terrain = newterrain(T_VOLCANO))
+        if (r->terrain == newterrain(T_VOLCANO))
             prob = +region_type_prob;
-        if (r->terrain = newterrain(T_VOLCANO_SMOKING))
+        if (r->terrain == newterrain(T_VOLCANO_SMOKING))
             prob = +region_type_prob;
 
         if (prob > 0 && chance(prob)) {
