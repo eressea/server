@@ -36,8 +36,8 @@
 #define INTERIM_VERSION 309
 #define NEWSKILL_VERSION 309
 #define WATCHERS_VERSION 310
-*/
 #define OVERRIDE_VERSION 311
+*/
 #define CURSETYPE_VERSION 312   /* turn 287 */
 #define ALLIANCES_VERSION 313
 #define DBLINK_VERSION 314
@@ -72,8 +72,9 @@
 #define NOOVERRIDE_VERSION 341        /* turn 775, full spellbooks are stored for factions */
 #define INTFLAGS_VERSION 342   /* turn 876, FFL_NPC is now bit 25, flags is an int */
 #define SAVEGAMEID_VERSION 343 /* instead of XMLNAME, save the game.id parameter from the config */
+#define BUILDNO_VERSION 344 /* storing the build number in the save */
 
 #define MIN_VERSION CURSETYPE_VERSION      /* minimal datafile we support */
-#define RELEASE_VERSION SAVEGAMEID_VERSION /* current datafile */
+#define RELEASE_VERSION BUILDNO_VERSION /* current datafile */
 
 #define STREAM_VERSION 2 /* internal encoding of binary files */

@@ -20,6 +20,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "save.h"
 
+#include "../build.h"
+
 #include "alchemy.h"
 #include "alliance.h"
 #include "ally.h"
@@ -1285,7 +1287,7 @@ faction *readfaction(struct gamedata * data)
 
     READ_STR(data->store, name, sizeof(name));
     f->passw = _strdup(name);
-    if (data->version < NOOVERRIDE_VERSION && data->version >= OVERRIDE_VERSION) {
+    if (data->version < NOOVERRIDE_VERSION) {
         READ_STR(data->store, 0, 0);
     }
 
@@ -1487,6 +1489,11 @@ int readgame(const char *filename, int backup)
     gdata.store = &store;
     global.data_version = gdata.version; /* HACK: attribute::read does not have access to gamedata, only storage */
 
+    if (gdata.version >= BUILDNO_VERSION) {
+        int build;
+        READ_INT(&store, &build);
+        log_debug("data in %s created with build %d.", filename, build);
+    }
     if (gdata.version >= SAVEGAMEID_VERSION) {
         int gameid;
 
@@ -1824,6 +1831,7 @@ int writegame(const char *filename)
 
     /* globale Variablen */
 
+    WRITE_INT(&store, VERSION_BUILD);
     WRITE_INT(&store, game_id());
     WRITE_SECTION(&store);
 
