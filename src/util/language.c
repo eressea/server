@@ -181,9 +181,10 @@ void locale_setstring(locale * lang, const char *key, const char *value)
     find->str = _strdup(value);
   } else {
     if (strcmp(find->str, value) != 0) {
-      log_error("duplicate translation '%s' for key %s\n", value, key);
+      log_warning("multiple translations for key %s\n", key);
     }
-    assert(!strcmp(find->str, value) || !"duplicate string for key");
+    free(find->str);
+    find->str = _strdup(value);
   }
 }
 
