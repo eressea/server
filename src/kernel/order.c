@@ -385,7 +385,6 @@ order *parse_order(const char *s, const struct locale * lang)
 bool is_repeated(const order * ord)
 {
     keyword_t kwd = ORD_KEYWORD(ord);
-    const struct locale *lang = ORD_LOCALE(ord);
     int result = 0;
 
     switch (kwd) {
@@ -428,7 +427,6 @@ bool is_repeated(const order * ord)
 bool is_exclusive(const order * ord)
 {
     keyword_t kwd = ORD_KEYWORD(ord);
-    const struct locale *lang = ORD_LOCALE(ord);
     int result = 0;
 
     switch (kwd) {
@@ -469,7 +467,6 @@ bool is_exclusive(const order * ord)
 bool is_long(const order * ord)
 {
     keyword_t kwd = ORD_KEYWORD(ord);
-    const struct locale *lang = ORD_LOCALE(ord);
     bool result = false;
 
     switch (kwd) {
