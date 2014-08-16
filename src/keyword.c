@@ -110,6 +110,7 @@ const char *keywords[MAXKEYWORDS] = {
     "teach",
     "study",
     "make",
+    "maketemp",
     "move",
     "password",
     "recruit",

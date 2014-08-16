@@ -1412,13 +1412,16 @@ static void durchreisende(FILE * F, const region * r, const faction * f)
       }
     }
     /* TODO: finish localization */
-    if (maxtravel == 1) {
-      bytes = _snprintf(bufp, size, " %s", LOC(f->locale, "has_moved_one"));
-    } else {
-      bytes = _snprintf(bufp, size, " %s", LOC(f->locale, "has_moved_many"));
+    if (size>0) {
+        if (maxtravel == 1) {
+            bytes = _snprintf(bufp, size, " %s", LOC(f->locale, "has_moved_one"));
+        }
+        else {
+            bytes = _snprintf(bufp, size, " %s", LOC(f->locale, "has_moved_many"));
+        }
+        if (wrptr(&bufp, &size, bytes) != 0)
+            WARN_STATIC_BUFFER();
     }
-    if (wrptr(&bufp, &size, bytes) != 0)
-      WARN_STATIC_BUFFER();
     *bufp = 0;
     rparagraph(F, buf, 0, 0, 0);
   }
@@ -1648,7 +1651,7 @@ show_allies(const faction * f, const ally * allies, char *buf, size_t size)
     if (wrptr(&bufp, &size, bytes) != 0)
       WARN_STATIC_BUFFER();
     if ((mode & HELP_ALL) == HELP_ALL) {
-      bytes = (int)strlcpy(bufp, "Alles", size);
+      bytes = (int)strlcpy(bufp, locale_string(f->locale, parameters[P_ANY]), size);
       if (wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
     } else {

@@ -4262,11 +4262,6 @@ void do_battle(region * r)
   }
 }
 
-void battle_init(battle * b) {
-  assert(b);
-  memset(b, 0, sizeof(battle));
-}
-
 void battle_free(battle * b) {
   side *s;
 

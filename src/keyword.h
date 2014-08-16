@@ -36,6 +36,7 @@ typedef enum {
     K_TEACH,
     K_STUDY,
     K_MAKE,
+    K_MAKETEMP,
     K_MOVE,
     K_PASSWORD,
     K_RECRUIT,
