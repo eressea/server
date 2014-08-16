@@ -9,36 +9,6 @@
 CuSuite *get_##name##_suite(void); \
 CuSuiteAddSuite(suite, get_##name##_suite())
 
-CuSuite *get_tests_suite(void);
-CuSuite *get_callback_suite(void);
-CuSuite *get_jsonconf_suite(void);
-CuSuite *get_json_suite(void);
-CuSuite *get_economy_suite(void);
-CuSuite *get_laws_suite(void);
-CuSuite *get_market_suite(void);
-CuSuite *get_battle_suite(void);
-CuSuite *get_building_suite(void);
-CuSuite *get_curse_suite(void);
-CuSuite *get_equipment_suite(void);
-CuSuite *get_item_suite(void);
-CuSuite *get_magic_suite(void);
-CuSuite *get_move_suite(void);
-CuSuite *get_pool_suite(void);
-CuSuite *get_build_suite(void);
-CuSuite *get_reports_suite(void);
-CuSuite *get_ship_suite(void);
-CuSuite *get_spellbook_suite(void);
-CuSuite *get_spell_suite(void);
-CuSuite *get_base36_suite(void);
-CuSuite *get_config_suite(void);
-CuSuite *get_bsdstring_suite(void);
-CuSuite *get_functions_suite(void);
-CuSuite *get_umlaut_suite(void);
-CuSuite *get_ally_suite(void);
-CuSuite *get_direction_suite(void);
-CuSuite *get_skill_suite(void);
-CuSuite *get_keyword_suite(void);
-
 int RunAllTests(void)
 {
   CuString *output = CuStringNew();
@@ -56,6 +26,7 @@ int RunAllTests(void)
   ADD_TESTS(suite, direction);
   ADD_TESTS(suite, skill);
   ADD_TESTS(suite, keyword);
+  ADD_TESTS(suite, order);
   /* util */
   ADD_TESTS(suite, config);
   ADD_TESTS(suite, base36);

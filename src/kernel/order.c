@@ -2,7 +2,7 @@
  +-------------------+
  |                   |  Christian Schlittchen <corwin@amber.kn-bremen.de>
  | Eressea PBEM host |  Enno Rehling <enno@eressea.de>
- | (c) 1998 - 2004   |  Katja Zedel <katze@felidae.kn-bremen.de>
+ | (c) 1998 - 2014   |  Katja Zedel <katze@felidae.kn-bremen.de>
  |                   |
  +-------------------+
 
@@ -44,7 +44,7 @@ static struct locale_data *locale_array[16];
 static int nlocales = 0;
 
 typedef struct order_data {
-    char *_str;
+    const char *_str;
 # ifdef LOMEM
     int _refcount:20;
     int _lindex:4;
@@ -59,8 +59,6 @@ static void release_data(order_data * data)
 {
     if (data) {
         if (--data->_refcount == 0) {
-            if (data->_str)
-                free(data->_str);
             free(data);
         }
     }
@@ -182,6 +180,22 @@ void free_orders(order ** olist)
     }
 }
 
+static char *mkdata(order_data **pdata, size_t len, keyword_t kwd, int lindex, const char *str)
+{
+    order_data *data;
+    char *result;
+    data = malloc(sizeof(order_data) + len +1);
+    result = (char *)(data + 1);
+    data->_keyword = kwd;
+    data->_lindex = lindex;
+    data->_refcount = 0;
+    data->_str = 0;
+    data->_str = (len > 0) ? result : 0;
+    if (str) strcpy(result, str);
+    if (pdata) *pdata = data;
+    return result;
+}
+
 static order_data *create_data(keyword_t kwd, const char *sptr, int lindex)
 {
     const char *s = sptr;
@@ -204,21 +218,15 @@ static order_data *create_data(keyword_t kwd, const char *sptr, int lindex)
             data = locale_array[lindex]->study_orders[sk];
             if (data == NULL) {
                 const char *skname = skillname(sk, lang);
-                data = (order_data *)malloc(sizeof(order_data));
+                const char *spc = strchr(skname, ' ');
+                size_t len = strlen(skname);
+                char *dst = mkdata(&data, len + (spc ? 3 : 0), kwd, lindex, spc ? 0 : skname);
                 locale_array[lindex]->study_orders[sk] = data;
-                data->_keyword = kwd;
-                data->_lindex = lindex;
-                assert(data->_lindex >= 0);
-                if (strchr(skname, ' ') != NULL) {
-                    size_t len = strlen(skname);
-                    data->_str = malloc(len + 3);
-                    data->_str[0] = '\"';
-                    memcpy(data->_str + 1, skname, len);
-                    data->_str[len + 1] = '\"';
-                    data->_str[len + 2] = '\0';
-                }
-                else {
-                    data->_str = _strdup(skname);
+                if (spc) {
+                    dst[0] = '\"';
+                    memcpy(dst + 1, skname, len);
+                    dst[len + 1] = '\"';
+                    dst[len + 2] = '\0';
                 }
                 data->_refcount = 1;
             }
@@ -231,22 +239,13 @@ static order_data *create_data(keyword_t kwd, const char *sptr, int lindex)
     else if (kwd != NOKEYWORD && *sptr == 0) {
         data = locale_array[lindex]->short_orders[kwd];
         if (data == NULL) {
-            data = (order_data *)malloc(sizeof(order_data));
-            locale_array[lindex]->short_orders[kwd] = data;
-            data->_keyword = kwd;
-            data->_lindex = lindex;
-            assert(data->_lindex >= 0);
-            data->_str = NULL;
+            mkdata(&data, 0, kwd, lindex, 0);
             data->_refcount = 1;
         }
         ++data->_refcount;
         return data;
     }
-    data = (order_data *)malloc(sizeof(order_data));
-    data->_keyword = kwd;
-    data->_lindex = lindex;
-    assert(data->_lindex >= 0);
-    data->_str = s ? _strdup(s) : NULL;
+    mkdata(&data, s ? strlen(s) : 0, kwd, lindex, s);
     data->_refcount = 1;
     return data;
 }
