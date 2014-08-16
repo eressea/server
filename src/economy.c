@@ -1817,10 +1817,6 @@ int make_cmd(unit * u, struct order *ord)
 
     p = findparam(s, u->faction->locale);
 
-    /* MACHE TEMP kann hier schon gar nicht auftauchen, weil diese nicht in
-     * thisorder abgespeichert werden - und auf den ist getstrtoken() beim
-     * aufruf von make geeicht */
-
     if (p == P_ROAD) {
         plane *pl = rplane(r);
         if (pl && fval(pl, PFL_NOBUILD)) {
@@ -1905,11 +1901,14 @@ int make_cmd(unit * u, struct order *ord)
     else if (btype != NOBUILDING) {
         plane *pl = rplane(r);
         if (pl && fval(pl, PFL_NOBUILD)) {
-            cmistake(u, ord, 94, MSG_PRODUCE);
+            cmistake(u, ord, 275, MSG_PRODUCE);
         }
-        else {
+        else if (btype->construction) {
             int id = getid();
             build_building(u, btype, id, m, ord);
+        }
+        else {
+            cmistake(u, ord, 275, MSG_PRODUCE);
         }
     }
     else if (itype != NULL) {

@@ -2197,6 +2197,9 @@
   <string name="make">
     <text locale="de">MACHEN</text>
   </string>
+  <string name="maketemp">
+    <text locale="de">MACHE TEMP</text>
+  </string>
   <string name="move">
     <text locale="de">NACH</text>
   </string>

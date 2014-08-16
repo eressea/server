@@ -1571,16 +1571,17 @@ message *msg_unitnotfound(const struct unit * mage, struct order * ord,
 {
     /* Einheit nicht gefunden */
     char tbuf[20];
-    const char *uid;
+    const char *uid = 0;
 
-    if (spobj->typ == SPP_UNIT) {
-        uid = itoa36(spobj->data.i);
-    }
-    else {
+    if (spobj->typ == SPP_TEMP) {
         sprintf(tbuf, "%s %s", LOC(mage->faction->locale,
             parameters[P_TEMP]), itoa36(spobj->data.i));
         uid = tbuf;
     }
+    else if (spobj->typ == SPP_UNIT) {
+        uid = itoa36(spobj->data.i);
+    }
+    assert(uid);
     return msg_message("unitnotfound_id",
         "unit region command id", mage, mage->region, ord, uid);
 }

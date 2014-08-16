@@ -359,6 +359,12 @@ order *parse_order(const char *s, const struct locale * lang)
         }
         sptr = s;
         kwd = get_keyword(parse_token(&sptr), lang);
+        if (kwd == K_MAKE) {
+            const char *s = parse_token(&sptr);
+            if (isparam(s, lang, P_TEMP)) {
+                kwd = K_MAKETEMP;
+            }
+        }
         if (kwd != NOKEYWORD) {
             while (isxspace(*(unsigned char *)sptr)) ++sptr;
             s = sptr;
@@ -380,7 +386,6 @@ bool is_repeated(const order * ord)
 {
     keyword_t kwd = ORD_KEYWORD(ord);
     const struct locale *lang = ORD_LOCALE(ord);
-    const char * s;
     int result = 0;
 
     switch (kwd) {
@@ -402,23 +407,10 @@ bool is_repeated(const order * ord)
     case K_BREED:
     case K_PIRACY:
     case K_PLANT:
+    case K_MAKE:
         result = 1;
         break;
 
-    case K_MAKE:
-        /* Falls wir MACHE TEMP haben, ignorieren wir es. Alle anderen
-         * Arten von MACHE zaehlen aber als neue defaults und werden
-         * behandelt wie die anderen (deswegen kein break nach case
-         * K_MAKE) - und in thisorder (der aktuelle 30-Tage Befehl)
-         * abgespeichert). */
-        parser_pushstate();
-        init_tokens(ord);           /* initialize token-parser */
-        skip_token();
-        s = getstrtoken();
-        result = !isparam(s, lang, P_TEMP);
-        parser_popstate();
-        // TODO: push/popstate is slow, we can do better.
-        break;
     default:
         result = 0;
     }
@@ -456,21 +448,10 @@ bool is_exclusive(const order * ord)
     case K_BREED:
     case K_PIRACY:
     case K_PLANT:
+    case K_MAKE:
         result = 1;
         break;
 
-    case K_MAKE:
-        /* Falls wir MACHE TEMP haben, ignorieren wir es. Alle anderen
-         * Arten von MACHE zaehlen aber als neue defaults und werden
-         * behandelt wie die anderen (deswegen kein break nach case
-         * K_MAKE) - und in thisorder (der aktuelle 30-Tage Befehl)
-         * abgespeichert). */
-        parser_pushstate();
-        init_tokens(ord);           /* initialize token-parser */
-        skip_token();
-        result = !isparam(getstrtoken(), lang, P_TEMP);
-        parser_popstate();
-        break;
     default:
         result = 0;
     }
@@ -511,20 +492,9 @@ bool is_long(const order * ord)
     case K_BREED:
     case K_PIRACY:
     case K_PLANT:
+    case K_MAKE:
         return true;
 
-    case K_MAKE:
-        /* Falls wir MACHE TEMP haben, ignorieren wir es. Alle anderen
-         * Arten von MACHE zaehlen aber als neue defaults und werden
-         * behandelt wie die anderen (deswegen kein break nach case
-         * K_MAKE) - und in thisorder (der aktuelle 30-Tage Befehl)
-         * abgespeichert). */
-        parser_pushstate();
-        init_tokens(ord);           /* initialize token-parser */
-        skip_token();
-        result = !isparam(getstrtoken(), lang, P_TEMP);
-        parser_popstate();
-        break;
     default:
         result = false;
     }
