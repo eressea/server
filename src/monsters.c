@@ -889,7 +889,7 @@ static int nrand(int start, int sub)
 void spawn_dragons(void)
 {
   region *r;
-  faction *monsters = get_monsters();
+  faction *monsters = get_or_create_monsters();
 
   for (r = regions; r; r = r->next) {
     unit *u;
