@@ -144,6 +144,10 @@ case "$1" in
   shift
   sent=0
   cd $TESTROOT/reports
+  if [ $turn -eq 0 ]; then
+    [ -f $TESTROOT/turn ] || abort "missing turn file, and no turn specified"
+    let turn=$(cat $TESTROOT/turn)
+  fi
   for faction in $* ; do
     send $faction
     sent=1
