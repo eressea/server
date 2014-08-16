@@ -4622,7 +4622,7 @@ void init_processor(void)
     }
 
     p += 10;                      /* can't allow reserve before siege (weapons) */
-    add_proc_region(p, &enter_1, "Betreten (3. Versuch)");
+    add_proc_region(p, &enter_1, "Betreten (3. Versuch)");  /* to claim a castle after a victory and to be able to DESTROY it in the same turn */
     if (get_param_int(global.parameters, "rules.reserve.twophase", 0)) {
         add_proc_order(p, K_RESERVE, &reserve_self, 0, "RESERVE (self)");
         p += 10;

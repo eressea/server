@@ -42,6 +42,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "ship.h"
 #include "skill.h"
 #include "terrain.h"
+#include "terrainid.h"
 #include "teleport.h"
 #include "unit.h"
 
@@ -839,48 +840,48 @@ static void caught_target(region * r, unit * u)
     }
 }
 
-/* TODO: Unsichtbarkeit bedenken ! */
-
 static unit *bewegung_blockiert_von(unit * reisender, region * r)
 {
     unit *u;
     double prob = 0.0;
-    bool contact = false;
     unit *guard = NULL;
+    int guard_count = 0;
     int stealth = eff_stealth(reisender, r);
     static int gamecookie = -1;
     static double base_prob = -999;
     static double skill_prob = -999;
     static double amulet_prob = -999;
+    static double guard_number_prob = -999;
+    static double castle_prob = -999;
+    static double region_type_prob = -999;
     const struct resource_type *ramulet = get_resourcetype(R_AMULET_OF_TRUE_SEEING);
 
     if (gamecookie < 0 || gamecookie != global.cookie) {
-        base_prob =
-            get_param_flt(global.parameters, "rules.guard.base_stop_prob", .3f);
-        skill_prob =
-            get_param_flt(global.parameters, "rules.guard.skill_stop_prob", .1f);
-        amulet_prob =
-            get_param_flt(global.parameters, "rules.guard.amulet_stop_prob", .1f);
+        base_prob = get_param_flt(global.parameters, "rules.guard.base_stop_prob", .3f);
+        skill_prob = get_param_flt(global.parameters, "rules.guard.skill_stop_prob", .1f);
+        amulet_prob = get_param_flt(global.parameters, "rules.guard.amulet_stop_prob", .1f);
+        guard_number_prob = get_param_flt(global.parameters, "rules.guard.guard_number_stop_prob", .001f);
+        castle_prob = get_param_flt(global.parameters, "rules.guard.castle_stop_prob", .1f);
+        region_type_prob = get_param_flt(global.parameters, "rules.guard.region_type_stop_prob", .1f);
         gamecookie = global.cookie;
     }
 
     if (fval(u_race(reisender), RCF_ILLUSIONARY))
         return NULL;
-    for (u = r->units; u && !contact; u = u->next) {
+    for (u = r->units; u; u = u->next) {
         if (is_guard(u, GUARD_TRAVELTHRU)) {
             int sk = eff_skill(u, SK_PERCEPTION, r);
             if (invisible(reisender, u) >= reisender->number)
                 continue;
-            if (u->faction == reisender->faction)
-                contact = true;
-            else if (ucontact(u, reisender))
-                contact = true;
-            else if (alliedunit(u, reisender->faction, HELP_GUARD))
-                contact = true;
+            if ((u->faction == reisender->faction) || (ucontact(u, reisender)) || (alliedunit(u, reisender->faction, HELP_GUARD)))
+                guard_count = guard_count - u->number;
             else if (sk >= stealth) {
+                guard_count =+ u->number;
                 double prob_u = (sk - stealth) * skill_prob;
                 /* amulet counts at most once */
-                prob_u += _min(1, _min(u->number, i_get(u->items, ramulet->itype))) * amulet_prob;
+                prob_u += _min (1, _min(u->number, i_get(u->items, ramulet->itype))) * amulet_prob;
+                if (u->building && (u->building->type == bt_find("castle")) && u == building_owner(u->building))
+                    prob_u += castle_prob*buildingeffsize(u->building, 0);
                 if (prob_u >= prob) {
                     prob = prob_u;
                     guard = u;
@@ -888,14 +889,25 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
             }
         }
     }
-    if (!contact && guard) {
+    if (guard) {
         prob += base_prob;          /* 30% base chance */
+        prob = +guard_count*guard_number_prob;
+        if (r->terrain == newterrain(T_GLACIER))
+            prob = +region_type_prob*2;
+        if (r->terrain == newterrain(T_SWAMP))
+            prob = +region_type_prob*2;
+        if (r->terrain == newterrain(T_MOUNTAIN))
+            prob = +region_type_prob;
+        if (r->terrain == newterrain(T_VOLCANO))
+            prob = +region_type_prob;
+        if (r->terrain == newterrain(T_VOLCANO_SMOKING))
+            prob = +region_type_prob;
 
-        if (chance(prob)) {
+        if (prob > 0 && chance(prob)) {
             return guard;
         }
     }
-    return NULL;
+  return NULL;
 }
 
 static bool is_guardian_u(const unit * guard, unit * u, unsigned int mask)
