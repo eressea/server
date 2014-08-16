@@ -126,6 +126,14 @@ faction *get_monsters(void)
       /* shit! */
       monsters = findfaction(666);
     }
+    if (!monsters) {
+        const race *rc = rc_find("dragon");
+        faction *f = addfaction("noreply@eressea.de", NULL, rc, NULL, 0);
+        renumber_faction(f, 666);
+        faction_setname(f, "Monster");
+        f->options = 0;
+        monsters = f;
+    }
     if (monsters) {
       fset(monsters, FFL_NPC | FFL_NOIDLEOUT);
     }
@@ -203,8 +211,7 @@ faction *addfaction(const char *email, const char *password,
   faction *f = calloc(sizeof(faction), 1);
   char buf[128];
 
-  assert(frace);
-
+  assert(frace || !"cannot create a faction that has no race");
   if (set_email(&f->email, email) != 0) {
     log_error("Invalid email address for faction %s: %s\n", itoa36(f->no), email);
   }
