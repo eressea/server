@@ -890,7 +890,6 @@ void move_unit(unit * u, region * r, unit ** ulist)
 {
   assert(u && r);
 
-  assert(u->faction || !"this unit is dead");
   if (u->region == r)
     return;
   if (!ulist)
