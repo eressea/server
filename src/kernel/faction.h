@@ -114,6 +114,7 @@ typedef struct faction {
 extern struct faction *factions;
 
 struct faction *get_monsters(void);
+struct faction *get_or_create_monsters(void);
 int max_magicians(const faction * f);
 void set_show_item(faction * f, const struct item_type *itype);
 
