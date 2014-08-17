@@ -1,4 +1,6 @@
 eressea.ini
+Debug
+Release
 
 # SlickEdit
 *.vtg

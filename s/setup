@@ -8,10 +8,11 @@ exit $2 # otherwise
 
 function usage() {
 cat <<USAGE
-Usage: $u [-hf] [-d DIR] [-g <game>] [-r <rules>] [-s DIR]
+Usage: $u [-hfn] [-d DIR] [-g <game>] [-r <rules>] [-s DIR]
   -h   print this message
   -f   force overwrite of existing game
   -g   game id
+  -n   create new eressea.ini file
   -r   name of ruleset
   -s   server installation directory
   -d   override directory name
@@ -21,13 +22,14 @@ USAGE
 game=0
 force=0
 src=server
-
-while getopts :d:g:r:s:hf o; do
+edit=1
+while getopts :d:g:r:s:hfn o; do
   case "${o}" in
   h) usage ; exit 0 ;;
   s) src=${OPTARG} ;;
   d) dir=${OPTARG} ;;
   f) force=1 ;;
+  n) edit=0 ;;
   g) game=${OPTARG} ;;
   r) rules=${OPTARG} ;;
   *) echo "not implemented ${o} ${OPTARG}" ;;
@@ -44,7 +46,7 @@ done
 [ -e $TOOLS ] || TOOLS=$SOURCE/bin
 [ -z $INIFILE ] && INIFILE=$TOOLS/inifile
 [ -e $INIFILE ] || INIFILE=$TOOLS/iniparser/inifile
-[ -e $INIFILE ] || abort "tool is not installed: $INIFILE"
+#[ -e $INIFILE ] || abort "tool is not installed: $INIFILE"
 
 cd $ERESSEA
 if [ -d $dir ] ; then
@@ -55,18 +57,38 @@ cd $dir || abort "could not chdir to game-$game"
 mkdir -p data reports
 
 function ini_sec() {
+if [ $edit -eq 1 ]; then
 $INIFILE eressea.ini add $1
+else
+echo "[$1]" >> eressea.ini
+fi
 }
 function ini_add() {
-$INIFILE eressea.ini add $1 $2
+if [ $edit -eq 1 ]; then
+$INIFILE eressea.ini add $1:$2 $3
+else
+echo "$2 = $3" >> eressea.ini
+fi
 }
+function ini_start() {
+if [ -e eressea.ini ]; then
+if [ ! -e $INIFILE ] && [ $edit -eq 1 ]; then
+abort "missing editor for eressea.ini. use -n to create new file."
+fi
+rm -f eressea.ini
+edit=0
+else
+edit=0
+fi
 touch eressea.ini
+}
+
+ini_start
 ini_sec eressea
-ini_add eressea:locales de,en
+ini_add eressea locales de,en
 ini_sec lua
-ini_add lua:install $SOURCE
-ini_add lua:install $SOURCE
-ini_add lua:paths $SOURCE/scripts:$SOURCE/lunit
-ini_add lua:rules $rules
+ini_add lua install $SOURCE
+ini_add lua paths $SOURCE/scripts:$SOURCE/lunit
+ini_add lua rules $rules
 
 ln -f $SOURCE/scripts/run-turn.lua
