@@ -177,6 +177,7 @@ extern "C" {
 
     int distribute(int old, int new_value, int n);
     void init_locales(void);
+    void init_locale(const struct locale *lang);
 
     int newunitid(void);
     int forbiddenid(int id);

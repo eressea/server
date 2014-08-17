@@ -1989,8 +1989,8 @@
   <string name="STUFE">
     <text locale="de">STUFE</text>
   </string>
-  <string name="TEMPORAERE">
-    <text locale="de">TEMPORÄRE</text>
+  <string name="TEMP">
+    <text locale="de">TEMP</text>
   </string>
   <string name="TRAENKE">
     <text locale="de">TRÄNKE</text>
@@ -2198,7 +2198,7 @@
     <text locale="de">MACHEN</text>
   </string>
   <string name="maketemp">
-    <text locale="de">MACHE TEMP</text>
+    <text locale="de">MACHETEMP</text>
   </string>
   <string name="move">
     <text locale="de">NACH</text>
