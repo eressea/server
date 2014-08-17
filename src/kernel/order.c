@@ -359,9 +359,11 @@ order *parse_order(const char *s, const struct locale * lang)
         sptr = s;
         kwd = get_keyword(parse_token(&sptr), lang);
         if (kwd == K_MAKE) {
-            const char *s = parse_token(&sptr);
+            const char *s, *sp = sptr;
+            s = parse_token(&sp);
             if (isparam(s, lang, P_TEMP)) {
                 kwd = K_MAKETEMP;
+                sptr = sp;
             }
         }
         if (kwd != NOKEYWORD) {

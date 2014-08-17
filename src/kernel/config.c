@@ -346,7 +346,7 @@ const char *parameters[MAXPARAMS] = {
     "SCHIFF",
     "SILBER",
     "STRASSEN",
-    "TEMPORAERE",
+    "TEMP",
     "FLIEHE",
     "GEBAEUDE",
     "GIB",                        /* Für HELFE */
@@ -1791,7 +1791,7 @@ void init_options_translation(const struct locale * lang) {
     }
 }
 
-static void init_locale(const struct locale *lang)
+void init_locale(const struct locale *lang)
 {
     variant var;
     int i;
