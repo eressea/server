@@ -105,14 +105,12 @@ void set_show_item(faction * f, const struct item_type *itype)
     a->data.v = (void *)itype;
 }
 
-static faction *monsters;
-
 faction *get_monsters(void) {
     faction *f;
 
     for (f = factions; f; f = f->next) {
         if ((f->flags & FFL_NPC) && !(f->flags & FFL_DEFENDER)) {
-            return monsters = f;
+            return f;
         }
     }
     return 0;
@@ -121,12 +119,6 @@ faction *get_monsters(void) {
 faction *get_or_create_monsters(void)
 {
     faction *f = get_monsters();
-    static int gamecookie = -1;
-    if (gamecookie != global.cookie) {
-        monsters = NULL;
-        gamecookie = global.cookie;
-    }
-
     if (!f) {
         /* shit! */
         f = findfaction(666);
@@ -142,7 +134,7 @@ faction *get_or_create_monsters(void)
     if (f) {
         fset(f, FFL_NPC | FFL_NOIDLEOUT);
     }
-    return monsters = f;
+    return f;
 }
 
 const unit *random_unit_in_faction(const faction * f)
