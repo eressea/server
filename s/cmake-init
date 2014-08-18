@@ -15,6 +15,7 @@ MACHINE=`uname -m`
 [ -z "$CC" ] && [ ! -z `which cc` ] && CC="cc"
 BIN_DIR="build-$MACHINE-$CC-$BUILD"
 mkdir -p $BIN_DIR
+ln -sf $BIN_DIR $BUILD
 cd $BIN_DIR
 
 MACHINE=$(gcc -dumpmachine)

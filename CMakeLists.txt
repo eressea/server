@@ -79,6 +79,6 @@ add_subdirectory (iniparser)
 add_subdirectory (quicklist)
 add_subdirectory (critbit)
 add_subdirectory (src eressea)
-install(DIRECTORY res core conf DESTINATION ${CMAKE_INSTALL_PREFIX} FILES_MATCHING PATTERN "*.xml")
+install(DIRECTORY res conf DESTINATION ${CMAKE_INSTALL_PREFIX} FILES_MATCHING PATTERN "*.xml")
 install(DIRECTORY scripts DESTINATION ${CMAKE_INSTALL_PREFIX} FILES_MATCHING PATTERN "*.lua")
-install(DIRECTORY core/scripts DESTINATION core FILES_MATCHING PATTERN "*.lua")
+

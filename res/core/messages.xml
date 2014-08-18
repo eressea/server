@@ -3729,8 +3729,8 @@
       <arg name="want" type="int"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region) rekrutiert $int($amount) von $int($want) Personen."</text>
-    <text locale="fr">"$unit($unit) in $region($region) recruits $int($amount) $int($want) people."</text>
-    <text locale="en">"$unit($unit) in $region($region) recruits $int($amount) $int($want) people."</text>
+    <text locale="en">"$unit($unit) in $region($region) recruits
+    $int($amount) of $int($want) people."</text>
   </message>
   <message name="siege_catapults" section="events">
     <type>
@@ -8054,7 +8054,8 @@
       <arg name="race" type="race"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): $int($number) $race($race,$number) $if($eq($number,1),"verschwand", "verschwanden") über Nacht."</text>
-    <text locale="en">"$unit($unit) in $region($region): $int($number) $race($race,$number) disappearedin the night."</text>
+    <text locale="en">"$unit($unit) in $region($region): $int($number)
+    $race($race,$number) disappeared in the night."</text>
   </message>
 
   <message name="forestfire_spread" section="events">
