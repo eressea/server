@@ -6944,34 +6944,24 @@
     <text locale="en">none</text>
   </string>
 
-  <string name="faction_help_one">
-    <text locale="de">Wir helfen der Partei</text>
-    <text locale="en">We are helping the faction</text>
+  <string name="faction_help">
+    <text locale="de">Wir helfen</text>
+    <text locale="en">We are helping</text>
   </string>
 
-  <string name="faction_help_many">
-    <text locale="de">Wir helfen den Parteien</text>
-    <text locale="en">We are helping the factions</text>
-  </string>
-
-  <string name="group_help_one">
-    <text locale="de">hilft der Partei</text>
-    <text locale="en">is helping the faction</text>
-  </string>
-
-  <string name="group_help_many">
-    <text locale="de">hilft den Parteien</text>
-    <text locale="en">is helping the factions</text>
+  <string name="group_help">
+    <text locale="de">hilft</text>
+    <text locale="en">is helping</text>
   </string>
 
   <string name="has_moved_one">
-    <text locale="de">hat die Region durchquert</text>
-    <text locale="en">has traveled through the region</text>
+    <text locale="de">hat die Region durchquert.</text>
+    <text locale="en">passed through the region.</text>
   </string>
 
   <string name="has_moved_many">
-    <text locale="de">haben die Region durchquert</text>
-    <text locale="en">have traveled through the region</text>
+    <text locale="de">haben die Region durchquert.</text>
+    <text locale="en">passed through the region.</text>
   </string>
 
   <string name="see_travel">

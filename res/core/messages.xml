@@ -804,51 +804,49 @@
       <arg name="max" type="int"/>
     </type>
     <text locale="de">"Unterhaltung: max. $int($max) Silber"</text>
-    <text locale="en">"Entertainment: max. $int($max) silver"</text>
+    <text locale="en">"entertainment: max. $int($max) silver"</text>
   </message>
   <message name="nr_stat_morale" section="nr">
     <type>
       <arg name="morale" type="int"/>
     </type>
     <text locale="de">"Moral der Bauern: $int($morale)"</text>
-    <text locale="en">"Peasant morale: $int($morale)"</text>
+    <text locale="en">"peasant morale: $int($morale)"</text>
   </message>
   <message name="nr_stat_luxuries" section="nr">
     <type>
       <arg name="max" type="int"/>
     </type>
     <text locale="de">"Luxusgüter zum angegebenen Preis: $int($max)"</text>
-    <text locale="en">"Luxury goods at this price: $int($max)"</text>
+    <text locale="en">"luxury goods at this price: $int($max)"</text>
   </message>
   <message name="nr_stat_salary" section="nr">
     <type>
       <arg name="max" type="int"/>
     </type>
     <text locale="de">"Lohn für Arbeit: $int($max) Silber"</text>
-    <text locale="en">"Worker salary: $int($max) silver"</text>
+    <text locale="en">"worker salary: $int($max) silver"</text>
   </message>
   <message name="nr_stat_salary_new" section="nr">
     <type>
       <arg name="max" type="int"/>
     </type>
     <text locale="de">"Bauerneinnahmen: $int($max) Silber"</text>
-    <text locale="en">"Peasant wages: $int($max) silver"</text>
+    <text locale="en">"peasant wages: $int($max) silver"</text>
   </message>
   <message name="nr_stat_people" section="nr">
     <type>
       <arg name="max" type="int"/>
     </type>
     <text locale="de">"Personen: $int($max)"</text>
-    <text locale="en">"People: $int($max)"</text>
-    <text locale="fr">"People: $int($max)"</text>
+    <text locale="en">"people: $int($max)"</text>
   </message>
   <message name="nr_stat_recruits" section="nr">
     <type>
       <arg name="max" type="int"/>
     </type>
     <text locale="de">"Rekruten: max. $int($max) Bauern"</text>
-    <text locale="en">"Recruits: $int($max) peasants"</text>
-    <text locale="fr">"Recruits: $int($max) peasants"</text>
+    <text locale="en">"recruits: $int($max) peasants"</text>
   </message>
   <message name="nr_score" section="nr">
     <type>
@@ -857,7 +855,6 @@
     </type>
     <text locale="de">"Deine Partei hat $int($score) Punkte. Der Durchschnitt für Parteien ähnlichen Alters ist $int($average) Punkte."</text>
     <text locale="fr">"Your faction has a score of $int($score). The average score for similar factions is $int($average)."</text>
-    <text locale="en">"Your faction has a score of $int($score). The average score for similar factions is $int($average)."</text>
   </message>
   <message name="nr_header_date" section="nr">
     <type>
@@ -3732,8 +3729,8 @@
       <arg name="want" type="int"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region) rekrutiert $int($amount) von $int($want) Personen."</text>
-    <text locale="fr">"$unit($unit) in $region($region) recruits $int($amount) $int($want) people."</text>
-    <text locale="en">"$unit($unit) in $region($region) recruits $int($amount) $int($want) people."</text>
+    <text locale="en">"$unit($unit) in $region($region) recruits
+    $int($amount) of $int($want) people."</text>
   </message>
   <message name="siege_catapults" section="events">
     <type>
@@ -8057,7 +8054,8 @@
       <arg name="race" type="race"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): $int($number) $race($race,$number) $if($eq($number,1),"verschwand", "verschwanden") über Nacht."</text>
-    <text locale="en">"$unit($unit) in $region($region): $int($number) $race($race,$number) disappearedin the night."</text>
+    <text locale="en">"$unit($unit) in $region($region): $int($number)
+    $race($race,$number) disappeared in the night."</text>
   </message>
 
   <message name="forestfire_spread" section="events">
