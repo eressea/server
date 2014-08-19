@@ -132,6 +132,10 @@ static void reduce_weight(unit * u)
   }
 }
 
+static float monster_attack_chance(void) {
+    return get_param_flt(global.parameters, "rules.monsters.attack_chance", 0.4f);
+}
+
 static order *monster_attack(unit * u, const unit * target)
 {
   if (u->region != target->region)
@@ -747,7 +751,7 @@ void plan_monsters(faction * f)
 
   for (r = regions; r; r = r->next) {
     unit *u;
-    double attack_chance = MONSTERATTACK;
+    double attack_chance = monster_attack_chance();
     bool attacking = false;
 
     for (u = r->units; u; u = u->next) {
