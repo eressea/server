@@ -65,9 +65,6 @@ extern "C" {
 #define PLAGUE_HEALCHANCE  0.25F        /* Wahrscheinlichkeit Heilung */
 #define PLAGUE_HEALCOST    30   /* Heilkosten */
 
-    /* Chance of a monster attack */
-#define MONSTERATTACK  0.4F
-
     /* Bewegungsweiten: */
 #define BP_WALKING 4
 #define BP_RIDING  6
