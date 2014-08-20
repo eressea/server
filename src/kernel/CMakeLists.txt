@@ -3,6 +3,7 @@ project(kernel C)
 SET(_TEST_FILES
 build.test.c
 config.test.c
+faction.test.c
 save.test.c
 ship.test.c
 spell.test.c

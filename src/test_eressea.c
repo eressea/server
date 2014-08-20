@@ -63,6 +63,7 @@ int RunAllTests(void)
   ADD_TESTS(suite, functions);
   ADD_TESTS(suite, umlaut);
   /* kernel */
+  ADD_TESTS(suite, faction);
   ADD_TESTS(suite, build);
   ADD_TESTS(suite, pool);
   ADD_TESTS(suite, curse);
