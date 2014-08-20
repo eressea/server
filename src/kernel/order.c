@@ -256,6 +256,11 @@ static order *create_order_i(keyword_t kwd, const char *sptr, int persistent,
     order *ord = NULL;
     int lindex;
 
+    if (keyword_disabled(kwd)) {
+        log_error("trying to create an order for disabled keyword %s.", keyword(kwd));
+        return NULL;
+    }
+
     /* if this is just nonsense, then we skip it. */
     if (lomem) {
         switch (kwd) {

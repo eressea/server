@@ -46,7 +46,6 @@ names.c
 order.c
 pathfinder.c
 plane.c
-player.c
 pool.c
 race.c
 region.c
