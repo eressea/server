@@ -1476,7 +1476,7 @@
     <text locale="en">MAKE</text>
   </string>
   <string name="maketemp">
-    <text locale="de">MAKETEMP</text>
+    <text locale="en">MAKETEMP</text>
   </string>
   <string name="move">
     <text locale="en">MOVE</text>
