@@ -23,6 +23,7 @@ function build() {
 assert_dir $SOURCE
 cd $SOURCE
 git pull || abort "failed to update source. do you have local changes?"
+[ -z $1 ] || git checkout $1
 s/build || abort "build failed."
 }
 
@@ -128,7 +129,8 @@ case "$1" in
   version
   ;;
 "build")
-  build
+  shift
+  build $*
   ;;
 "setup")
   setup
