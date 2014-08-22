@@ -87,7 +87,7 @@ zip="$turn-$1.zip"
 zip -q -u $zip $turn-$1.?r
 email=$(grep "faction=$1:" reports.txt | cut -d: -f2 | sed 's/email=//')
 echo "sending reports to $1 / $email"
-cat /dev/null | mutt -F $ERESSEA/etc/muttrc -s "Testauswertung Spiel $GAME Partei $1" -a $zip -- $email
+cat /dev/null | mutt -F $ERESSEA/etc/muttrc -s "Testauswertung Spiel $game Partei $1" -a $zip -- $email
 }
 
 game=0
