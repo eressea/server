@@ -83,10 +83,10 @@ let turn=$turn+1
 }
 
 function send() {
-echo "sending reports to $1"
 zip="$turn-$1.zip"
 zip -q -u $zip $turn-$1.?r
 email=$(grep "faction=$1:" reports.txt | cut -d: -f2 | sed 's/email=//')
+echo "sending reports to $1 / $email"
 cat /dev/null | mutt -F $ERESSEA/etc/muttrc -s "Testauswertung Spiel $GAME Partei $1" -a $zip -- $email
 }
 
@@ -153,8 +153,8 @@ case "$1" in
     sent=1
   done
   if [ $sent -eq 0 ]; then
-    if [ -e $factions ]; then
-      for faction in $(cat $factions) ; do
+    if [ -e ../$factions ]; then
+      for faction in $(cat ../$factions) ; do
         send $faction
       done
     fi
