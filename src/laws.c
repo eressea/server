@@ -3627,8 +3627,7 @@ void new_units(void)
                         }
                         continue;
                     }
-                    init_tokens(makeord);
-                    skip_token();
+                    init_order(makeord);
                     alias = getid();
 
                     token = getstrtoken();

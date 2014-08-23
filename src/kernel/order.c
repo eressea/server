@@ -256,7 +256,7 @@ static order *create_order_i(keyword_t kwd, const char *sptr, int persistent,
     order *ord = NULL;
     int lindex;
 
-    if (keyword_disabled(kwd)) {
+    if ((int)kwd>0 && keyword_disabled(kwd)) {
         log_error("trying to create an order for disabled keyword %s.", keyword(kwd));
         return NULL;
     }
@@ -295,6 +295,7 @@ order *create_order(keyword_t kwd, const struct locale * lang,
     const char *params, ...)
 {
     char zBuffer[DISPLAYSIZE];
+    assert(lang);
     if (params) {
         char *bufp = zBuffer;
         int bytes;
@@ -567,4 +568,11 @@ void init_tokens(const struct order *ord)
 {
     char *cmd = getcommand(ord);
     init_tokens_str(cmd, cmd);
+}
+
+keyword_t init_order(const struct order *ord)
+{
+    char *cmd = _strdup(ord->data->_str);
+    init_tokens_str(cmd, cmd);
+    return ord->data->_keyword;
 }

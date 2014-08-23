@@ -58,8 +58,9 @@ extern "C" {
   bool is_repeated(const order * ord);
   bool is_long(const order * ord);
 
-  extern char *write_order(const order * ord, char *buffer, size_t size);
-  extern void init_tokens(const struct order *ord);     /* initialize token parsing */
+  char *write_order(const order * ord, char *buffer, size_t size);
+  void init_tokens(const struct order *ord);     /* initialize token parsing */
+  keyword_t init_order(const struct order *ord);
 
 #ifdef __cplusplus
 }

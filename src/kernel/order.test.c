@@ -98,6 +98,27 @@ static void test_parse_maketemp(CuTest *tc) {
     free_order(ord);
 }
 
+static void test_init_tokens(CuTest *tc) {
+    order *ord;
+    struct locale * lang = get_or_create_locale("en");
+
+    ord = create_order(K_MAKETEMP, lang, "hurr durr");
+    init_tokens(ord);
+    skip_token();
+    CuAssertStrEquals(tc, "hurr", getstrtoken());
+    CuAssertStrEquals(tc, "durr", getstrtoken());
+}
+
+static void test_init_order(CuTest *tc) {
+    order *ord;
+    struct locale * lang = get_or_create_locale("en");
+
+    ord = create_order(K_MAKETEMP, lang, "hurr durr");
+    CuAssertIntEquals(tc, K_MAKETEMP, init_order(ord));
+    CuAssertStrEquals(tc, "hurr", getstrtoken());
+    CuAssertStrEquals(tc, "durr", getstrtoken());
+}
+
 CuSuite *get_order_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -106,5 +127,7 @@ CuSuite *get_order_suite(void)
     SUITE_ADD_TEST(suite, test_parse_make);
     SUITE_ADD_TEST(suite, test_parse_make_temp);
     SUITE_ADD_TEST(suite, test_parse_maketemp);
+    SUITE_ADD_TEST(suite, test_init_tokens);
+    SUITE_ADD_TEST(suite, test_init_order);
     return suite;
 }
