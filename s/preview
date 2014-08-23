@@ -23,6 +23,7 @@ function build() {
 assert_dir $SOURCE
 cd $SOURCE
 git pull || abort "failed to update source. do you have local changes?"
+[ -z $1 ] || git checkout $1
 s/build || abort "build failed."
 }
 
@@ -83,11 +84,11 @@ let turn=$turn+1
 }
 
 function send() {
-echo "sending reports to $1"
 zip="$turn-$1.zip"
 zip -q -u $zip $turn-$1.?r
 email=$(grep "faction=$1:" reports.txt | cut -d: -f2 | sed 's/email=//')
-cat /dev/null | mutt -F $ERESSEA/etc/muttrc -s "Testauswertung Spiel $GAME Partei $1" -a $zip -- $email
+echo "sending reports to $1 / $email"
+cat /dev/null | mutt -F $ERESSEA/etc/muttrc -s "Testauswertung Spiel $game Partei $1" -a $zip -- $email
 }
 
 game=0
@@ -128,7 +129,8 @@ case "$1" in
   version
   ;;
 "build")
-  build
+  shift
+  build $*
   ;;
 "setup")
   setup
@@ -153,8 +155,8 @@ case "$1" in
     sent=1
   done
   if [ $sent -eq 0 ]; then
-    if [ -e $factions ]; then
-      for faction in $(cat $factions) ; do
+    if [ -e ../$factions ]; then
+      for faction in $(cat ../$factions) ; do
         send $faction
       done
     fi
