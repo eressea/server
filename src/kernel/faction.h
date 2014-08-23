@@ -25,7 +25,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-  struct player;
   struct alliance;
   struct item;
   struct seen_region;
@@ -60,7 +59,6 @@ typedef struct faction {
     struct faction *next;
     struct faction *nexthash;
 
-    struct player *owner;
 #ifdef SMART_INTERVALS
     struct region *first;
     struct region *last;

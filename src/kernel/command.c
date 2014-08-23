@@ -92,8 +92,7 @@ static int do_command_i(const void *keys, struct unit *u, struct order *ord)
 
 void do_command(const void *keys, struct unit *u, struct order *ord)
 {
-    init_tokens(ord);
-    skip_token();
+    init_order(ord);
     if (do_command_i(keys, u, ord) != E_TOK_SUCCESS) {
         char cmd[ORDERSIZE];
         get_command(ord, cmd, sizeof(cmd));

@@ -16,7 +16,7 @@ const char * keyword(keyword_t kwd)
     if (!result[0]) {
         strcpy(result, "keyword::");
     }
-    strcpy(result+9, keywords[kwd]);
+    strcpy(result + 9, keywords[kwd]);
     return result;
 }
 

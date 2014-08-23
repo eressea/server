@@ -1090,8 +1090,7 @@ int contact_cmd(unit * u, order * ord)
     unit *u2;
     region *r = u->region;
 
-    init_tokens(ord);
-    skip_token();
+    init_order(ord);
     u2 = getunitg(r, u->faction);
 
     if (u2 != NULL) {
@@ -1147,10 +1146,10 @@ int quit_cmd(unit * u, struct order *ord)
 {
     faction *f = u->faction;
     const char *passwd;
-
-    init_tokens(ord);
-    skip_token();                 /* skip keyword */
-
+    keyword_t kwd;
+    
+    kwd = init_order(ord);
+    assert(kwd == K_PASSWORD);
     passwd = getstrtoken();
     if (checkpasswd(f, (const char *)passwd, false)) {
         if (EnhancedQuit()) {
@@ -1359,8 +1358,7 @@ void do_enter(struct region *r, bool is_final_attempt)
                 unit *ulast = NULL;
                 const char * s;
 
-                init_tokens(ord);
-                skip_token();
+                init_order(ord);
                 s = getstrtoken();
                 p = findparam_ex(s, u->faction->locale);
                 id = getid();
@@ -1540,8 +1538,7 @@ int ally_cmd(unit * u, struct order *ord)
     int keyword, not_kw;
     const char *s;
 
-    init_tokens(ord);
-    skip_token();
+    init_order(ord);
     f = getfaction();
 
     if (f == NULL || is_monsters(f)) {
@@ -1707,8 +1704,7 @@ int prefix_cmd(unit * u, struct order *ord)
         for (in = pnames; in->lang != lang; in = in->next);
     }
 
-    init_tokens(ord);
-    skip_token();
+    init_order(ord);
     s = getstrtoken();
 
     if (!*s) {
@@ -1761,8 +1757,7 @@ int display_cmd(unit * u, struct order *ord)
     const char *str;
     region *r = u->region;
 
-    init_tokens(ord);
-    skip_token();
+    init_order(ord);
 
     str = getstrtoken();
     switch (findparam_ex(str, u->faction->locale)) {
@@ -1933,8 +1928,7 @@ int name_cmd(struct unit *u, struct order *ord)
     bool foreign = false;
     const char *str;
 
-    init_tokens(ord);
-    skip_token();
+    init_order(ord);
     str = getstrtoken();
     p = findparam_ex(str, u->faction->locale);
 
@@ -2193,8 +2187,7 @@ int mail_cmd(unit * u, struct order *ord)
     const char *s;
     int n, cont;
 
-    init_tokens(ord);
-    skip_token();                 /* skip the keyword */
+    init_order(ord);
     s = getstrtoken();
 
     /* Falls kein Parameter, ist das eine Einheitsnummer;
@@ -2357,8 +2350,7 @@ int mail_cmd(unit * u, struct order *ord)
 
 int banner_cmd(unit * u, struct order *ord)
 {
-    init_tokens(ord);
-    skip_token();
+    init_order(ord);
 
     free(u->faction->banner);
     u->faction->banner = _strdup(getstrtoken());
@@ -2372,8 +2364,7 @@ int email_cmd(unit * u, struct order *ord)
 {
     const char *s;
 
-    init_tokens(ord);
-    skip_token();
+    init_order(ord);
     s = getstrtoken();
 
     if (!s[0]) {
@@ -2399,8 +2390,7 @@ int password_cmd(unit * u, struct order *ord)
     const char *s;
     bool pwok = true;
 
-    init_tokens(ord);
-    skip_token();
+    init_order(ord);
     s = getstrtoken();
 
     if (!s || !*s) {
@@ -2438,8 +2428,7 @@ int send_cmd(unit * u, struct order *ord)
     const char *s;
     int option;
 
-    init_tokens(ord);
-    skip_token();
+    init_order(ord);
     s = getstrtoken();
 
     option = findoption(s, u->faction->locale);
@@ -2778,9 +2767,10 @@ int promotion_cmd(unit * u, struct order *ord)
 int group_cmd(unit * u, struct order *ord)
 {
     const char *s;
+    keyword_t kwd;
 
-    init_tokens(ord);
-    skip_token();
+    kwd = init_order(ord);
+    assert(kwd == K_GROUP);
     s = getstrtoken();
 
     join_group(u, s);
@@ -2791,8 +2781,7 @@ int origin_cmd(unit * u, struct order *ord)
 {
     short px, py;
 
-    init_tokens(ord);
-    skip_token();
+    init_order(ord);
 
     px = (short)getint();
     py = (short)getint();
@@ -2804,8 +2793,7 @@ int origin_cmd(unit * u, struct order *ord)
 int guard_off_cmd(unit * u, struct order *ord)
 {
     assert(getkeyword(ord) == K_GUARD);
-    init_tokens(ord);
-    skip_token();
+    init_order(ord);
 
     if (getparam(u->faction->locale) == P_NOT) {
         setguard(u, GUARD_NONE);
@@ -2818,8 +2806,7 @@ int reshow_cmd(unit * u, struct order *ord)
     const char *s;
     param_t p = NOPARAM;
 
-    init_tokens(ord);
-    skip_token();
+    init_order(ord);
     s = getstrtoken();
 
     if (isparam(s, u->faction->locale, P_ANY)) {
@@ -2835,8 +2822,7 @@ int status_cmd(unit * u, struct order *ord)
 {
     const char *param;
 
-    init_tokens(ord);
-    skip_token();
+    init_order(ord);
 
     param = getstrtoken();
     switch (findparam(param, u->faction->locale)) {
@@ -2867,7 +2853,7 @@ int status_cmd(unit * u, struct order *ord)
         }
         break;
     default:
-        if (param[0]) {
+        if (param && param[0]) {
             add_message(&u->faction->msgs,
                 msg_feedback(u, ord, "unknown_status", ""));
         }
@@ -2884,8 +2870,7 @@ int combatspell_cmd(unit * u, struct order *ord)
     int level = 0;
     spell *sp = 0;
 
-    init_tokens(ord);
-    skip_token();
+    init_order(ord);
     s = getstrtoken();
 
     /* KAMPFZAUBER [NICHT] löscht alle gesetzten Kampfzauber */
@@ -2970,8 +2955,7 @@ int guard_on_cmd(unit * u, struct order *ord)
 {
     assert(getkeyword(ord) == K_GUARD);
 
-    init_tokens(ord);
-    skip_token();
+    init_order(ord);
 
     /* GUARD NOT is handled in goard_off_cmd earlier in the turn */
     if (getparam(u->faction->locale) == P_NOT)
@@ -3132,8 +3116,7 @@ void restack_units(void)
                         int id;
                         unit *v;
 
-                        init_tokens(ord);
-                        skip_token();
+                        init_order(ord);
                         s = getstrtoken();
                         p = findparam(s, u->faction->locale);
                         id = getid();
@@ -3208,8 +3191,7 @@ int renumber_cmd(unit * u, order * ord)
     int i;
     faction *f = u->faction;
 
-    init_tokens(ord);
-    skip_token();
+    init_order(ord);
     s = getstrtoken();
     switch (findparam_ex(s, u->faction->locale)) {
 
@@ -3627,8 +3609,7 @@ void new_units(void)
                         }
                         continue;
                     }
-                    init_tokens(makeord);
-                    skip_token();
+                    init_order(makeord);
                     alias = getid();
 
                     token = getstrtoken();
@@ -3943,8 +3924,7 @@ void defaultorders(void)
                 if (getkeyword(ord) == K_DEFAULT) {
                     char lbuf[8192];
                     order *new_order;
-                    init_tokens(ord);
-                    skip_token();         /* skip the keyword */
+                    init_order(ord);
                     strcpy(lbuf, getstrtoken());
                     new_order = parse_order(lbuf, u->faction->locale);
                     *ordp = ord->next;
@@ -4056,8 +4036,7 @@ int use_cmd(unit * u, struct order *ord)
     int n, err = ENOITEM;
     const item_type *itype;
 
-    init_tokens(ord);
-    skip_token();
+    init_order(ord);
 
     t = getstrtoken();
     n = atoi((const char *)t);
@@ -4106,8 +4085,7 @@ int pay_cmd(unit * u, struct order *ord)
     }
     else {
         param_t p;
-        init_tokens(ord);
-        skip_token();
+        init_order(ord);
         p = getparam(u->faction->locale);
         if (p == P_NOT) {
             unit *owner = building_owner(u->building);
@@ -4129,16 +4107,16 @@ static int reserve_i(unit * u, struct order *ord, int flags)
         const resource_type *rtype;
         const char *s;
 
-        init_tokens(ord);
-        skip_token();
+        init_order(ord);
         s = getstrtoken();
-        count = atoip((const char *)s);
+        count = s ? atoip(s) : 0;
         para = findparam(s, u->faction->locale);
 
         if (count == 0 && para == P_EACH) {
             count = getint() * u->number;
         }
-        rtype = findresourcetype(getstrtoken(), u->faction->locale);
+        s = getstrtoken();
+        rtype = s ? findresourcetype(s, u->faction->locale) : 0;
         if (rtype == NULL)
             return 0;
 
@@ -4171,8 +4149,7 @@ int claim_cmd(unit * u, struct order *ord)
     int n;
     const item_type *itype;
 
-    init_tokens(ord);
-    skip_token();
+    init_order(ord);
 
     t = getstrtoken();
     n = atoi((const char *)t);
@@ -4438,8 +4415,7 @@ int siege_cmd(unit * u, order * ord)
     resource_type *rt_catapultammo = NULL;
     resource_type *rt_catapult = NULL;
 
-    init_tokens(ord);
-    skip_token();
+    init_order(ord);
     b = getbuilding(r);
 
     if (!b) {

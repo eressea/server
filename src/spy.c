@@ -120,8 +120,7 @@ int spy_cmd(unit * u, struct order *ord)
   double spychance, observechance;
   region *r = u->region;
 
-  init_tokens(ord);
-  skip_token();
+  init_order(ord);
   target = getunit(r, u->faction);
 
   if (!target) {
@@ -213,8 +212,7 @@ int setstealth_cmd(unit * u, struct order *ord)
   int level, rule;
   const race *trace;
 
-  init_tokens(ord);
-  skip_token();
+  init_order(ord);
   s = getstrtoken();
 
   /* Tarne ohne Parameter: Setzt maximale Tarnung */
@@ -298,7 +296,7 @@ int setstealth_cmd(unit * u, struct order *ord)
       }
       if (rule&2) {
         if (get_keyword(s, u->faction->locale) == K_NUMBER) {
-          const char *s2 = (const char *)getstrtoken();
+          const char *s2 = getstrtoken();
           int nr = -1;
 
           if (s2) {
@@ -484,8 +482,7 @@ int sabotage_cmd(unit * u, struct order *ord)
   region *r = u->region;
   int skdiff;
 
-  init_tokens(ord);
-  skip_token();
+  init_order(ord);
   s = getstrtoken();
 
   i = findparam(s, u->faction->locale);

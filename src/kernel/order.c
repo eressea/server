@@ -256,11 +256,11 @@ static order *create_order_i(keyword_t kwd, const char *sptr, int persistent,
     order *ord = NULL;
     int lindex;
 
-    if (keyword_disabled(kwd)) {
+    if ((int)kwd>0 && keyword_disabled(kwd)) {
         log_error("trying to create an order for disabled keyword %s.", keyword(kwd));
         return NULL;
     }
-    
+
     /* if this is just nonsense, then we skip it. */
     if (lomem) {
         switch (kwd) {
@@ -295,6 +295,7 @@ order *create_order(keyword_t kwd, const struct locale * lang,
     const char *params, ...)
 {
     char zBuffer[DISPLAYSIZE];
+    assert(lang);
     if (params) {
         char *bufp = zBuffer;
         int bytes;
@@ -356,17 +357,19 @@ order *parse_order(const char *s, const struct locale * lang)
         keyword_t kwd;
         const char *sptr;
         int persistent = 0;
+        const char * p;
 
         while (*s == '@') {
             persistent = 1;
             ++s;
         }
         sptr = s;
-        kwd = get_keyword(parse_token(&sptr), lang);
+        p = *sptr ? parse_token(&sptr) : 0;
+        kwd = p ? get_keyword(p, lang) : NOKEYWORD;
         if (kwd == K_MAKE) {
             const char *s, *sp = sptr;
             s = parse_token(&sp);
-            if (isparam(s, lang, P_TEMP)) {
+            if (s && isparam(s, lang, P_TEMP)) {
                 kwd = K_MAKETEMP;
                 sptr = sp;
             }
@@ -563,8 +566,11 @@ static char *getcommand(const order * ord)
     return _strdup(get_command(ord, cmd, sizeof(cmd)));
 }
 
-void init_tokens(const struct order *ord)
+keyword_t init_order(const struct order *ord)
 {
-    char *cmd = getcommand(ord);
+    char *cmd = 0;
+
+    if (ord->data->_str) cmd = _strdup(ord->data->_str);
     init_tokens_str(cmd, cmd);
+    return ord->data->_keyword;
 }
