@@ -544,7 +544,8 @@ char *write_order(const order * ord, char *buffer, size_t size)
         keyword_t kwd = ORD_KEYWORD(ord);
         if (kwd == NOKEYWORD) {
             const char *text = ORD_STRING(ord);
-            strlcpy(buffer, (const char *)text, size);
+            if (text) strlcpy(buffer, (const char *)text, size);
+            else buffer[0] = 0;
         }
         else {
             get_command(ord, buffer, size);
