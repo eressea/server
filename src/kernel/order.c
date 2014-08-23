@@ -560,12 +560,6 @@ void push_order(order ** ordp, order * ord)
     *ordp = ord;
 }
 
-static char *getcommand(const order * ord)
-{
-    char cmd[ORDERSIZE];
-    return _strdup(get_command(ord, cmd, sizeof(cmd)));
-}
-
 keyword_t init_order(const struct order *ord)
 {
     char *cmd = 0;

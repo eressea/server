@@ -1,3 +1,4 @@
+#include <platform.h>
 #include <config.h>
 #include <kernel/config.h>
 #include "order.h"
@@ -7,6 +8,7 @@
 
 #include <CuTest.h>
 #include <stdlib.h>
+#include <string.h>
 
 static void test_create_order(CuTest *tc) {
     char cmd[32];
