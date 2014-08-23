@@ -1060,8 +1060,7 @@ static void cycle_route(order * ord, unit * u, int gereist)
         return;
     tail[0] = '\0';
 
-    init_tokens(ord);
-    skip_token();
+    init_order(ord);
 
     neworder[0] = 0;
     for (cm = 0;; ++cm) {
@@ -1142,8 +1141,7 @@ static bool transport(unit * ut, unit * u)
 
     for (ord = ut->orders; ord; ord = ord->next) {
         if (getkeyword(ord) == K_TRANSPORT) {
-            init_tokens(ord);
-            skip_token();
+            init_order(ord);
             if (getunit(ut->region, ut->faction) == u) {
                 return true;
             }
@@ -1176,8 +1174,7 @@ static void init_transportation(void)
                 && !fval(u, UFL_NOTMOVING) && !LongHunger(u)) {
                 unit *ut;
 
-                init_tokens(u->thisorder);
-                skip_token();
+                init_order(u->thisorder);
                 ut = getunit(r, u->faction);
                 if (ut == NULL) {
                     ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
@@ -1207,8 +1204,7 @@ static void init_transportation(void)
 
                 for (ord = u->orders; ord; ord = ord->next) {
                     if (getkeyword(ord) == K_TRANSPORT) {
-                        init_tokens(ord);
-                        skip_token();
+                        init_order(ord);
                         for (;;) {
                             unit *ut = getunit(r, u->faction);
 
@@ -1216,8 +1212,7 @@ static void init_transportation(void)
                                 break;
                             if (getkeyword(ut->thisorder) == K_DRIVE && can_move(ut)
                                 && !fval(ut, UFL_NOTMOVING) && !LongHunger(ut)) {
-                                init_tokens(ut->thisorder);
-                                skip_token();
+                                init_order(ut->thisorder);
                                 if (getunit(r, ut->faction) == u) {
                                     w += weight(ut);
                                 }
@@ -2088,8 +2083,7 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
         if (getkeyword(ord) != K_TRANSPORT)
             continue;
 
-        init_tokens(ord);
-        skip_token();
+        init_order(ord);
         ut = getunit(r, u->faction);
         if (ut != NULL) {
             if (getkeyword(ut->thisorder) == K_DRIVE) {
@@ -2104,8 +2098,7 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
                     bool found = false;
 
                     if (!fval(ut, UFL_NOTMOVING) && !LongHunger(ut)) {
-                        init_tokens(ut->thisorder);
-                        skip_token();
+                        init_order(ut->thisorder);
                         if (getunit(u->region, ut->faction) == u) {
                             const region_list *route_to =
                                 travel_route(ut, route_begin, route_end, ord,
@@ -2301,8 +2294,7 @@ static void piracy_cmd(unit * u, struct order *ord)
     /* Feststellen, ob schon ein anderer alliierter Pirat ein
      * Ziel gefunden hat. */
 
-    init_tokens(ord);
-    skip_token();
+    init_order(ord);
     s = getstrtoken();
     if (s != NULL && *s) {
         il = intlist_init();
@@ -2389,8 +2381,7 @@ static void piracy_cmd(unit * u, struct order *ord)
         LOC(u->faction->locale, directions[target_dir])));
 
     /* Bewegung ausführen */
-    init_tokens(u->thisorder);
-    skip_token();
+    init_order(u->thisorder);
     move(u, true);
 }
 
@@ -2543,8 +2534,7 @@ static void move_hunters(void)
                     if (getkeyword(ord) == K_FOLLOW) {
                         param_t p;
 
-                        init_tokens(ord);
-                        skip_token();
+                        init_order(ord);
                         p = getparam(u->faction->locale);
                         if (p != P_SHIP) {
                             if (p != P_UNIT) {
@@ -2666,15 +2656,13 @@ void movement(void)
                     else {
                         if (ships) {
                             if (u->ship && ship_owner(u->ship) == u) {
-                                init_tokens(u->thisorder);
-                                skip_token();
+                                init_order(u->thisorder);
                                 move(u, false);
                             }
                         }
                         else {
                             if (!u->ship || ship_owner(u->ship) != u) {
-                                init_tokens(u->thisorder);
-                                skip_token();
+                                init_order(u->thisorder);
                                 move(u, false);
                             }
                         }
@@ -2729,10 +2717,10 @@ void follow_unit(unit * u)
         const struct locale *lang = u->faction->locale;
 
         if (getkeyword(ord) == K_FOLLOW) {
-            init_tokens(ord);
-            skip_token();
             int id;
-            param_t p = getparam(lang);
+            param_t p;
+            init_order(ord);
+            p = getparam(lang);
             if (p == P_UNIT) {
                 id = read_unitid(u->faction, r);
                 if (a != NULL) {
@@ -2753,7 +2741,7 @@ void follow_unit(unit * u)
                     a = NULL;
                 }
             }
-            if (p == P_SHIP) {
+            else if (p == P_SHIP) {
                 id = getshipid();
                 if (id <= 0) {
                     /*	cmistake(u, ord, 20, MSG_MOVE); */

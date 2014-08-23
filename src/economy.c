@@ -502,8 +502,7 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
     const struct race *rc = u_race(u);
     const char *str;
 
-    init_tokens(ord);
-    skip_token();
+    init_order(ord);
     n = getuint();
 
     if (u->number == 0) {
@@ -666,8 +665,7 @@ int give_control_cmd(unit * u, order * ord)
     const char *s;
     param_t p;
 
-    init_tokens(ord);
-    skip_token();
+    init_order(ord);
     u2 = getunit(r, u->faction);
     s = getstrtoken();
     p = findparam(s, u->faction->locale);
@@ -730,11 +728,10 @@ static void give_cmd(unit * u, order * ord)
     plane *pl;
     message *msg;
 
-    init_tokens(ord);
-    skip_token();
+    init_order(ord);
     u2 = getunit(r, u->faction);
     s = getstrtoken();
-    n = atoip(s);
+    n = s ? atoip(s) : 0;
     p = (n > 0) ? NOPARAM : findparam(s, u->faction->locale);
 
     /* first, do all the ones that do not require HELP_GIVE or CONTACT */
@@ -857,7 +854,7 @@ static void give_cmd(unit * u, order * ord)
             return;
         }
         s = getstrtoken();
-        if (*s == 0) {              /* GIVE ALL items that you have */
+        if (!s || *s == 0) {              /* GIVE ALL items that you have */
 
             /* do these checks once, not for each item we have: */
             if (!(u_race(u)->ec_flags & GIVEITEM) && u2 != NULL) {
@@ -990,8 +987,7 @@ static int forget_cmd(unit * u, order * ord)
         return 0;
     }
 
-    init_tokens(ord);
-    skip_token();
+    init_order(ord);
     s = getstrtoken();
 
     if ((sk = get_skill(s, u->faction->locale)) != NOSKILL) {
@@ -1800,9 +1796,10 @@ int make_cmd(unit * u, struct order *ord)
     const char *s;
     const struct locale *lang = u->faction->locale;
     char ibuf[16];
+    keyword_t kwd;
 
-    init_tokens(ord);
-    skip_token();
+    kwd = init_order(ord);
+    assert(kwd == K_MAKE);
     s = getstrtoken();
 
     m = atoi((const char *)s);
@@ -2060,6 +2057,8 @@ static void buy(unit * u, request ** buyorders, struct order *ord)
     attrib *a;
     const item_type *itype = NULL;
     const luxury_type *ltype = NULL;
+    keyword_t kwd;
+
     if (u->ship && is_guarded(r, u, GUARD_CREWS)) {
         cmistake(u, ord, 69, MSG_INCOME);
         return;
@@ -2071,8 +2070,8 @@ static void buy(unit * u, request ** buyorders, struct order *ord)
     /* Im Augenblick kann man nur 1 Produkt kaufen. expandbuying ist aber
      * schon dafür ausgerüstet, mehrere Produkte zu kaufen. */
 
-    init_tokens(ord);
-    skip_token();
+    kwd = init_order(ord);
+    assert(kwd == K_BUY);
     n = getuint();
     if (!n) {
         cmistake(u, ord, 26, MSG_COMMERCE);
@@ -2351,10 +2350,11 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
 {
     bool unlimited = true;
     const item_type *itype;
-    const luxury_type *ltype = NULL;
+    const luxury_type *ltype;
     int n;
     region *r = u->region;
     const char *s;
+    keyword_t kwd;
 
     if (u->ship && is_guarded(r, u, GUARD_CREWS)) {
         cmistake(u, ord, 69, MSG_INCOME);
@@ -2363,8 +2363,8 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
     /* sellorders sind KEIN array, weil für alle items DIE SELBE resource
      * (das geld der region) aufgebraucht wird. */
 
-    init_tokens(ord);
-    skip_token();
+    kwd = init_order(ord);
+    assert(kwd == K_SELL);
     s = getstrtoken();
 
     if (findparam(s, u->faction->locale) == P_ANY) {
@@ -2424,9 +2424,8 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
         return false;
     }
     s = getstrtoken();
-    itype = finditemtype(s, u->faction->locale);
-    if (itype != NULL)
-        ltype = resource2luxury(itype->rtype);
+    itype = s ? finditemtype(s, u->faction->locale) : 0;
+    ltype = itype ? resource2luxury(itype->rtype) : 0;
     if (ltype == NULL) {
         cmistake(u, ord, 126, MSG_COMMERCE);
         return false;
@@ -2764,8 +2763,7 @@ static void breed_cmd(unit * u, struct order *ord)
     }
 
     /* züchte [<anzahl>] <parameter> */
-    init_tokens(ord);
-    skip_token();
+    (void)init_order(ord);
     s = getstrtoken();
 
     m = atoi((const char *)s);
@@ -2830,9 +2828,10 @@ static const char *rough_amount(int a, int m)
 static void research_cmd(unit * u, struct order *ord)
 {
     region *r = u->region;
+    keyword_t kwd;
 
-    init_tokens(ord);
-    skip_token();
+    kwd = init_order(ord);
+    assert(kwd == K_RESEARCH);
     /*
        const char *s = getstrtoken();
 
@@ -2908,6 +2907,10 @@ static void steal_cmd(unit * u, struct order *ord, request ** stealorders)
     region *r = u->region;
     faction *f = NULL;
     message * msg;
+    keyword_t kwd;
+
+    kwd = init_order(ord);
+    assert(kwd == K_STEAL);
 
     assert(skill_enabled(SK_PERCEPTION) && skill_enabled(SK_STEALTH));
 
@@ -2916,8 +2919,6 @@ static void steal_cmd(unit * u, struct order *ord, request ** stealorders)
         ADDMSG(&u->faction->msgs, msg);
         return;
     }
-    init_tokens(ord);
-    skip_token();
     id = read_unitid(u->faction, r);
     u2 = findunitr(r, id);
 
@@ -3040,7 +3041,10 @@ void entertain_cmd(unit * u, struct order *ord)
     request *o;
     static int entertainbase = 0;
     static int entertainperlevel = 0;
+    keyword_t kwd;
 
+    kwd = init_order(ord);
+    assert(kwd == K_ENTERTAIN);
     if (!entertainbase) {
         const char *str = get_param(global.parameters, "entertain.base");
         entertainbase = str ? atoi(str) : 0;
@@ -3073,8 +3077,6 @@ void entertain_cmd(unit * u, struct order *ord)
     u->wants = u->number * (entertainbase + effskill(u, SK_ENTERTAINMENT)
         * entertainperlevel);
 
-    init_tokens(ord);
-    skip_token();
     max_e = getuint();
     if (max_e != 0) {
         u->wants = _min(u->wants, max_e);
@@ -3214,6 +3216,10 @@ void tax_cmd(unit * u, struct order *ord, request ** taxorders)
     int n;
     request *o;
     int max;
+    keyword_t kwd;
+
+    kwd = init_order(ord);
+    assert(kwd == K_TAX);
 
     if (!humanoidrace(u_race(u)) && !is_monsters(u->faction)) {
         cmistake(u, ord, 228, MSG_INCOME);
@@ -3236,8 +3242,6 @@ void tax_cmd(unit * u, struct order *ord, request ** taxorders)
         return;
     }
 
-    init_tokens(ord);
-    skip_token();
     max = getuint();
 
     if (max == 0)

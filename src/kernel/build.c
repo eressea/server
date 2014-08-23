@@ -146,8 +146,7 @@ int destroy_cmd(unit * u, struct order *ord)
   if (u->number < 1)
     return 0;
 
-  init_tokens(ord);
-  skip_token();
+  init_order(ord);
   s = getstrtoken();
 
   if (findparam(s, u->faction->locale) == P_ROAD) {

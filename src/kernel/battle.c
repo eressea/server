@@ -3967,8 +3967,7 @@ static bool start_battle(region * r, battle ** bp)
 
           /* Ende Fehlerbehandlung Angreifer */
 
-          init_tokens(ord);
-          skip_token();
+          init_order(ord);
           /* attackierte Einheit ermitteln */
           u2 = getunit(r, u->faction);
 

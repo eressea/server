@@ -637,6 +637,7 @@ unsigned int atoip(const char *s)
 {
     int n;
 
+    assert(s);
     n = atoi(s);
 
     if (n < 0)
@@ -1137,12 +1138,13 @@ const char *igetstrtoken(const char *initstr)
 
 unsigned int getuint(void)
 {
-    return atoip((const char *)getstrtoken());
+    const char *s = getstrtoken();
+    return s ? atoip(s) : 0;
 }
 
 int getint(void)
 {
-    return atoi((const char *)getstrtoken());
+    return atoi(getstrtoken());
 }
 
 const struct race *findrace(const char *s, const struct locale *lang)
@@ -1172,7 +1174,7 @@ param_t findparam(const char *s, const struct locale * lang)
 {
     param_t result = NOPARAM;
     char buffer[64];
-    char * str = transliterate(buffer, sizeof(buffer) - sizeof(int), s);
+    char * str = s ? transliterate(buffer, sizeof(buffer) - sizeof(int), s) : 0;
 
     if (str && *str) {
         int i;
@@ -1204,6 +1206,7 @@ param_t findparam_ex(const char *s, const struct locale * lang)
 
 bool isparam(const char *s, const struct locale * lang, param_t param)
 {
+    assert(s);
     if (s[0] > '@') {
         param_t p = (param == P_GEBAEUDE) ? findparam_ex(s, lang) : findparam(s, lang);
         return p == param;
@@ -1855,8 +1858,8 @@ typedef struct param {
 
 int getid(void)
 {
-    const char *str = (const char *)getstrtoken();
-    int i = atoi36(str);
+    const char *str = getstrtoken();
+    int i = str ? atoi36(str) : 0;
     if (i < 0) {
         return -1;
     }
@@ -2686,7 +2689,7 @@ int movewhere(const unit * u, const char *token, region * r, region ** resultp)
     region *r2;
     direction_t d;
 
-    if (*token == '\0') {
+    if (!token || *token == '\0') {
         *resultp = NULL;
         return E_MOVE_OK;
     }

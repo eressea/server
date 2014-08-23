@@ -315,8 +315,7 @@ int teach_cmd(unit * u, struct order *ord)
 
     count = 0;
 
-    init_tokens(ord);
-    skip_token();
+    init_order(ord);
 
 #if TEACH_ALL
     if (getparam(u->faction->locale) == P_ANY) {
@@ -338,8 +337,7 @@ int teach_cmd(unit * u, struct order *ord)
 #endif
                 if (getkeyword(student->thisorder) == K_STUDY) {
                     /* Input ist nun von student->thisorder !! */
-                    init_tokens(student->thisorder);
-                    skip_token();
+                    init_order(student->thisorder);
                     sk = getskill(student->faction->locale);
                     if (sk != NOSKILL && teachskill[0] != NOSKILL) {
                         for (i = 0; teachskill[i] != NOSKILL; ++i)
@@ -369,8 +367,7 @@ int teach_cmd(unit * u, struct order *ord)
 #endif
                 if (getkeyword(student->thisorder) == K_STUDY) {
                     /* Input ist nun von student->thisorder !! */
-                    init_tokens(student->thisorder);
-                    skip_token();
+                    init_order(student->thisorder);
                     sk = getskill(student->faction->locale);
                     if (sk != NOSKILL
                         && eff_skill_study(u, sk, r) - TEACHDIFFERENCE >= eff_skill(student,
@@ -390,8 +387,7 @@ int teach_cmd(unit * u, struct order *ord)
         order *new_order;
 
         zOrder[0] = '\0';
-        init_tokens(ord);
-        skip_token();
+        init_order(ord);
 
         while (!parser_end()) {
             unit *u2 = getunit(r, u->faction);
@@ -406,8 +402,7 @@ int teach_cmd(unit * u, struct order *ord)
                 const char *token;
                 /* Finde den string, der den Fehler verursacht hat */
                 parser_pushstate();
-                init_tokens(ord);
-                skip_token();
+                init_order(ord);
 
                 for (j = 0; j != count - 1; ++j) {
                     /* skip over the first 'count' units */
@@ -450,8 +445,7 @@ int teach_cmd(unit * u, struct order *ord)
 
             /* Input ist nun von u2->thisorder !! */
             parser_pushstate();
-            init_tokens(u2->thisorder);
-            skip_token();
+            init_order(u2->thisorder);
             sk = getskill(u2->faction->locale);
             parser_popstate();
 
@@ -551,8 +545,7 @@ int learn_cmd(unit * u, order * ord)
         return 0;
     }
 
-    init_tokens(ord);
-    skip_token();
+    init_order(ord);
     sk = getskill(u->faction->locale);
 
     if (sk < 0) {

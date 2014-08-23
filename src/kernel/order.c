@@ -357,17 +357,19 @@ order *parse_order(const char *s, const struct locale * lang)
         keyword_t kwd;
         const char *sptr;
         int persistent = 0;
+        const char * p;
 
         while (*s == '@') {
             persistent = 1;
             ++s;
         }
         sptr = s;
-        kwd = get_keyword(parse_token(&sptr), lang);
+        p = *sptr ? parse_token(&sptr) : 0;
+        kwd = p ? get_keyword(p, lang) : NOKEYWORD;
         if (kwd == K_MAKE) {
             const char *s, *sp = sptr;
             s = parse_token(&sp);
-            if (isparam(s, lang, P_TEMP)) {
+            if (s && isparam(s, lang, P_TEMP)) {
                 kwd = K_MAKETEMP;
                 sptr = sp;
             }
@@ -564,15 +566,11 @@ static char *getcommand(const order * ord)
     return _strdup(get_command(ord, cmd, sizeof(cmd)));
 }
 
-void init_tokens(const struct order *ord)
-{
-    char *cmd = getcommand(ord);
-    init_tokens_str(cmd, cmd);
-}
-
 keyword_t init_order(const struct order *ord)
 {
-    char *cmd = _strdup(ord->data->_str);
+    char *cmd = 0;
+
+    if (ord->data->_str) cmd = _strdup(ord->data->_str);
     init_tokens_str(cmd, cmd);
     return ord->data->_keyword;
 }

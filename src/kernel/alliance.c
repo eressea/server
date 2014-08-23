@@ -158,8 +158,7 @@ static void perform_kick(void)
 
     if (al && alliance_get_leader(al) == ta->u->faction) {
       faction *f;
-      init_tokens(ta->ord);
-      skip_token();
+      init_order(ta->ord);
       skip_token();
       f = getfaction();
       if (f && f_get_alliance(f) == al) {
@@ -180,8 +179,7 @@ static void perform_new(void)
     int id;
     faction *f = ta->u->faction;
 
-    init_tokens(ta->ord);
-    skip_token();
+    init_order(ta->ord);
     skip_token();
     id = getid();
 
@@ -216,8 +214,7 @@ static void perform_transfer(void)
 
     if (al && alliance_get_leader(al) == ta->u->faction) {
       faction *f;
-      init_tokens(ta->ord);
-      skip_token();
+      init_order(ta->ord);
       skip_token();
       f = getfaction();
       if (f && f_get_alliance(f) == al) {
@@ -237,8 +234,7 @@ static void perform_join(void)
     faction *fj = ta->u->faction;
     int aid;
 
-    init_tokens(ta->ord);
-    skip_token();
+    init_order(ta->ord);
     skip_token();
     aid = getid();
     if (aid) {
@@ -250,8 +246,7 @@ static void perform_join(void)
           faction *fi = ti->u->faction;
           if (fi && f_get_alliance(fi) == al) {
             int fid;
-            init_tokens(ti->ord);
-            skip_token();
+            init_order(ti->ord);
             skip_token();
             fid = getid();
             if (fid == fj->no) {
