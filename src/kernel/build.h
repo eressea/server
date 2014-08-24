@@ -79,8 +79,7 @@ extern "C" {
   void sunhash(struct ship *sh);
   extern int roqf_factor(void);
 
-  extern int build(struct unit *u, const construction * ctype, int completed,
-    int want);
+  int build(struct unit *u, const construction * ctype, int completed, int want);
   extern int maxbuild(const struct unit *u, const construction * cons);
   extern struct message *msg_materials_required(struct unit *u,
     struct order *ord, const struct construction *ctype, int multi);

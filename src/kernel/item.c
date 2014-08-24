@@ -101,24 +101,29 @@ static int res_changepeasants(unit * u, const resource_type * rtype, int delta)
     return u->region->land->peasants;
 }
 
+static int golem_factor(const unit *u, const resource_type *rtype) {
+    if (rtype == get_resourcetype(R_STONE) && (u_race(u)->flags & RCF_STONEGOLEM)) {
+        return GOLEM_STONE;
+    }
+    if (rtype == get_resourcetype(R_IRON) && (u_race(u)->flags & RCF_IRONGOLEM)) {
+        return GOLEM_IRON;
+    }
+    return 0;
+}
+
 static int res_changeitem(unit * u, const resource_type * rtype, int delta)
 {
     int num;
-    if (rtype == get_resourcetype(R_STONE) && u_race(u) == get_race(RC_STONEGOLEM)
-        && delta <= 0) {
-        int reduce = delta / GOLEM_STONE;
-        if (delta % GOLEM_STONE != 0)
-            --reduce;
-        scale_number(u, u->number + reduce);
-        num = u->number * GOLEM_STONE;
-    }
-    else if (rtype == get_resourcetype(R_IRON)
-        && u_race(u) == get_race(RC_IRONGOLEM) && delta <= 0) {
-        int reduce = delta / GOLEM_IRON;
-        if (delta % GOLEM_IRON != 0)
-            --reduce;
-        scale_number(u, u->number + reduce);
-        num = u->number * GOLEM_IRON;
+    int gf = (delta>0) ? 0 : golem_factor(u, rtype);
+    if (gf>0) {
+        if (delta != 0) {
+            int reduce = delta / gf;
+            if (delta % gf != 0) {
+                --reduce;
+            }
+            if (reduce) scale_number(u, u->number + reduce);
+        }
+        num = u->number * gf;
     }
     else {
         const item_type *itype = resource2item(rtype);
