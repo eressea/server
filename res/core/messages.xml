@@ -3606,7 +3606,7 @@
       <arg name="weeks" type="int"/>
       <arg name="skill" type="skill"/>
     </type>
-    <text locale="de">"$unit($unit) vergiﬂt durch Dumpfbackenbrot $int($weeks) Wochen des Talentes $skill($skill)."</text>
+    <text locale="de">"$unit($unit) vergisst durch Dumpfbackenbrot $int($weeks) Wochen des Talentes $skill($skill)."</text>
     <text locale="fr">"$unit($unit) eats a Dumpfbackenbrot and forgets $int($weeks) weeks worth of $skill($skill)."</text>
     <text locale="en">"$unit($unit) eats a Dumpfbackenbrot and forgets $int($weeks) weeks worth of $skill($skill)."</text>
   </message>
@@ -3699,7 +3699,7 @@
       <arg name="unit" type="unit"/>
       <arg name="skill" type="skill"/>
     </type>
-    <text locale="de">"$unit($unit) vergiﬂt $skill($skill)."</text>
+    <text locale="de">"$unit($unit) vergisst $skill($skill)."</text>
     <text locale="fr">"$unit($unit) forgets $skill($skill)."</text>
     <text locale="en">"$unit($unit) forgets $skill($skill)."</text>
   </message>

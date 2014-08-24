@@ -76,7 +76,7 @@ void spy_message(int spy, const unit * u, const unit * target)
       /* true faction */
       ADDMSG(&u->faction->msgs, msg_message("spyreport_faction",
           "target faction", target, target->faction));
-      ql_set_insert(&u->faction->seen_factions, target->faction);
+      add_seen_faction(u->faction, target->faction);
     }
   }
   if (spy > 0) {

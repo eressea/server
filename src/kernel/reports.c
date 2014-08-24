@@ -1048,6 +1048,23 @@ void transfer_seen(quicklist ** dst, quicklist ** src)
     *src = NULL;
 }
 
+int cmp_faction(const void *lhs, const void *rhs) {
+    const faction *lhf = (const faction *)lhs;
+    const faction *rhf = (const faction *)rhs;
+    if (lhf->no == rhf->no) return 0;
+    if (lhf->no > rhf->no) return 1;
+    return -1;
+}
+
+static void add_seen_faction_i(struct quicklist **flist, faction *f) {
+    ql_set_insert_ex(flist, f, cmp_faction);
+}
+
+void add_seen_faction(faction *self, faction *seen) {
+    add_seen_faction_i(&self->seen_factions, seen);
+}
+
+
 static void get_addresses(report_context * ctx)
 {
     /* "TODO: travelthru" */
@@ -1065,7 +1082,7 @@ static void get_addresses(report_context * ctx)
         quicklist *ql = ctx->f->alliance->members;
         int qi;
         for (qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-            ql_set_insert(&flist, ql_get(ql, qi));
+            add_seen_faction_i(&flist, (faction *)ql_get(ql, qi));
         }
     }
 
@@ -1084,7 +1101,7 @@ static void get_addresses(report_context * ctx)
                 if (lastf != sf) {
                     if (u->building || u->ship || (stealthmod > INT_MIN
                         && cansee(ctx->f, r, u, stealthmod))) {
-                        ql_set_insert(&flist, sf);
+                        add_seen_faction_i(&flist, sf);
                         lastf = sf;
                     }
                 }
@@ -1101,7 +1118,7 @@ static void get_addresses(report_context * ctx)
                         unit *u2 = (unit *)a->data.v;
                         if (u2->faction == ctx->f) {
                             if (cansee_unit(u2, u, stealthmod)) {
-                                ql_set_insert(&flist, sf);
+                                add_seen_faction_i(&flist, sf);
                                 lastf = sf;
                                 break;
                             }
@@ -1120,7 +1137,7 @@ static void get_addresses(report_context * ctx)
                     bool ballied = sf && sf != ctx->f && sf != lastf
                         && !fval(u, UFL_ANON_FACTION) && cansee(ctx->f, r, u, stealthmod);
                     if (ballied || ALLIED(ctx->f, sf)) {
-                        ql_set_insert(&flist, sf);
+                        add_seen_faction_i(&flist, sf);
                         lastf = sf;
                     }
                 }
@@ -1133,7 +1150,7 @@ static void get_addresses(report_context * ctx)
         faction *f2;
         for (f2 = factions; f2; f2 = f2->next) {
             if (f2->alliance == ctx->f->alliance) {
-                ql_set_insert(&flist, f2);
+                add_seen_faction_i(&flist, f2);
             }
         }
     }
