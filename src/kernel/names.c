@@ -54,7 +54,7 @@ static const char *make_names(const char *monster, int *num_postfix,
     int pprefix, int *num_name, int *num_prefix, int ppostfix)
 {
     int uv, uu, un;
-    static char name[NAMESIZE + 1];
+    static char name[NAMESIZE + 1]; // FIXME: static return value
     char zText[32];
     const char *str;
 
@@ -222,7 +222,7 @@ static const char *generic_name(const unit * u)
 
 static const char *dragon_name(const unit * u)
 {
-    static char name[NAMESIZE + 1];
+    static char name[NAMESIZE + 1]; // FIXME: static return value
     int rnd, ter = 0;
     int anzahl = 1;
     static int num_postfix;
@@ -355,7 +355,7 @@ static const char *drac_suf[DRAC_SUF] = {
 
 static const char *dracoid_name(const unit * u)
 {
-    static char name[NAMESIZE + 1];
+    static char name[NAMESIZE + 1]; // FIXME: static return value
     int mid_syllabels;
 
     u = u;

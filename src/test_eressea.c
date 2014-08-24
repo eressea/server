@@ -34,6 +34,7 @@ int RunAllTests(void)
   ADD_TESTS(suite, bsdstring);
   ADD_TESTS(suite, functions);
   ADD_TESTS(suite, umlaut);
+  ADD_TESTS(suite, strings);
   /* kernel */
   ADD_TESTS(suite, faction);
   ADD_TESTS(suite, build);

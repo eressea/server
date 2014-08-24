@@ -241,7 +241,7 @@ static faction *factionorders(void)
 
     }
     else {
-        log_warning("orders for invalid faction %s\n", itoa36(fid));
+        log_debug("orders for invalid faction %s\n", itoa36(fid));
     }
     return f;
 }

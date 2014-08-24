@@ -107,7 +107,7 @@ const char *combatstatus[] = {
 
 const char *report_kampfstatus(const unit * u, const struct locale *lang)
 {
-    static char fsbuf[64];
+    static char fsbuf[64]; // FIXME: static return value
 
     strlcpy(fsbuf, LOC(lang, combatstatus[u->status]), sizeof(fsbuf));
     if (fval(u, UFL_NOAID)) {
@@ -1928,7 +1928,7 @@ f_regionid(const region * r, const faction * f, char *buffer, size_t size)
 static char *f_regionid_s(const region * r, const faction * f)
 {
     static int i = 0;
-    static char bufs[4][NAMESIZE + 20];
+    static char bufs[4][NAMESIZE + 20]; // FIXME: static return value
     char *buf = bufs[(++i) % 4];
 
     f_regionid(r, f, buf, NAMESIZE + 20);
@@ -2177,7 +2177,7 @@ static void eval_race(struct opstack **stack, const void *userdata)
 static void eval_order(struct opstack **stack, const void *userdata)
 {                               /* order -> string */
     const struct order *ord = (const struct order *)opop(stack).v;
-    static char buf[512];
+    char buf[512];
     size_t len;
     variant var;
 
@@ -2193,7 +2193,7 @@ static void eval_resources(struct opstack **stack, const void *userdata)
     const faction *report = (const faction *)userdata;
     const struct locale *lang = report ? report->locale : default_locale;
     const struct resource *res = (const struct resource *)opop(stack).v;
-    static char buf[1024];        /* but we only use about half of this */
+    char buf[1024];        /* but we only use about half of this */
     size_t size = sizeof(buf) - 1;
     variant var;
 
@@ -2225,7 +2225,7 @@ static void eval_regions(struct opstack **stack, const void *userdata)
     int i = opop(stack).i;
     int end, begin = opop(stack).i;
     const arg_regions *regions = (const arg_regions *)opop(stack).v;
-    static char buf[256];
+    char buf[256];
     size_t size = sizeof(buf) - 1;
     variant var;
     char *bufp = buf;
@@ -2262,7 +2262,7 @@ static void eval_trail(struct opstack **stack, const void *userdata)
     const struct locale *lang = report ? report->locale : default_locale;
     int i, end = 0, begin = 0;
     const arg_regions *regions = (const arg_regions *)opop(stack).v;
-    static char buf[512];
+    char buf[512];
     size_t size = sizeof(buf) - 1;
     variant var;
     char *bufp = buf;

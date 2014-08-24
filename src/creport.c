@@ -490,11 +490,12 @@ static void report_crtypes(FILE * F, const struct locale *lang)
         for (kmt = mtypehash[i]; kmt; kmt = kmt->nexthash) {
             const struct nrmessage_type *nrt = nrt_find(lang, kmt->mtype);
             if (nrt) {
+                char buffer[DISPLAYSIZE];
                 unsigned int hash = kmt->mtype->key;
                 assert(hash > 0);
                 fprintf(F, "MESSAGETYPE %u\n", hash);
                 fputc('\"', F);
-                fputs(escape_string(nrt_string(nrt), NULL, 0), F);
+                fputs(escape_string(nrt_string(nrt), buffer, sizeof(buffer)), F);
                 fputs("\";text\n", F);
                 fprintf(F, "\"%s\";section\n", nrt_section(nrt));
             }

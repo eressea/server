@@ -100,7 +100,7 @@ extern int months_per_year;
 
 static char *gamedate_season(const struct locale *lang)
 {
-    static char buf[256];
+    static char buf[256]; // FIXME: static return value
     gamedate gd;
 
     get_gamedate(turn, &gd);
@@ -517,7 +517,7 @@ void sparagraph(strlist ** SP, const char *s, int indent, char mark)
 
     int i, j, width;
     int firstline;
-    static char buf[REPORTWIDTH + 1];
+    static char buf[REPORTWIDTH + 1]; // FIXME: static return value
 
     width = REPORTWIDTH - indent;
     firstline = 1;

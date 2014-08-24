@@ -314,7 +314,7 @@ helpmode helpmodes[] = {
  */
 const char *dbrace(const struct race *rc)
 {
-    static char zText[32];
+    static char zText[32]; // FIXME: static return value
     char *zPtr = zText;
 
     /* the english names are all in ASCII, so we don't need to worry about UTF8 */
@@ -974,7 +974,7 @@ int modifier)
 #ifndef NDEBUG
 const char *strcheck(const char *s, size_t maxlen)
 {
-    static char buffer[16 * 1024];
+    static char buffer[16 * 1024]; // FIXME: static return value
     if (strlen(s) > maxlen) {
         assert(maxlen < 16 * 1024);
         log_warning("[strcheck] String wurde auf %d Zeichen verkürzt:\n%s\n", (int)maxlen, s);
@@ -1911,7 +1911,7 @@ int check_param(const struct param *p, const char *key, const char *searchvalue)
 static const char *g_datadir;
 const char *datapath(void)
 {
-    static char zText[MAX_PATH];
+    static char zText[MAX_PATH]; // FIXME: static return value
     if (g_datadir)
         return g_datadir;
     return strcat(strcpy(zText, basepath()), "/data");
@@ -1925,7 +1925,7 @@ void set_datapath(const char *path)
 static const char *g_reportdir;
 const char *reportpath(void)
 {
-    static char zText[MAX_PATH];
+    static char zText[MAX_PATH]; // FIXME: static return value
     if (g_reportdir)
         return g_reportdir;
     return strcat(strcpy(zText, basepath()), "/reports");

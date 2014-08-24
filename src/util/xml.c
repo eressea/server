@@ -30,7 +30,7 @@
 #ifdef USE_LIBXML2
 const xmlChar *xml_i(double number)
 {
-    static char buffer[128];
+    static char buffer[128]; // FIXME: static return value
     _snprintf(buffer, sizeof(buffer), "%.0f", number);
     return (const xmlChar *)buffer;
 }

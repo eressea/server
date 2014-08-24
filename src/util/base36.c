@@ -56,7 +56,7 @@ int atoi36(const char *str)
 
 const char *itoab(int i, int base)
 {
-    static char **as = NULL;      /* STATIC_RETURN: used for return, not across calls */
+    static char **as = NULL; // FIXME: static return value
     char *s, *dst;
     static int index = 0;         /* STATIC_XCALL: used across calls */
     int neg = 0;
