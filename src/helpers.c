@@ -46,7 +46,7 @@ lua_giveitem(unit * s, unit * d, const item_type * itype, int n, struct order *o
   lua_State *L = (lua_State *) global.vm_state;
   char fname[64];
   int result = -1;
-  const char *iname = itype->rtype->_name[0];
+  const char *iname = itype->rtype->_name;
 
   assert(s != NULL);
   strlcpy(fname, iname, sizeof(fname));
@@ -81,7 +81,7 @@ static int limit_resource(const region * r, const resource_type * rtype)
   int result = -1;
   lua_State *L = (lua_State *) global.vm_state;
 
-  strlcpy(fname, rtype->_name[0], sizeof(fname));
+  strlcpy(fname, rtype->_name, sizeof(fname));
   strlcat(fname, "_limit", sizeof(fname));
 
   lua_getglobal(L, fname);
@@ -110,7 +110,7 @@ produce_resource(region * r, const resource_type * rtype, int norders)
   lua_State *L = (lua_State *) global.vm_state;
   char fname[64];
 
-  strlcpy(fname, rtype->_name[0], sizeof(fname));
+  strlcpy(fname, rtype->_name, sizeof(fname));
   strlcat(fname, "_produce", sizeof(fname));
 
   lua_getglobal(L, fname);
@@ -250,7 +250,7 @@ lua_changeresource(unit * u, const struct resource_type *rtype, int delta)
   int result = -1;
   char fname[64];
 
-  strlcpy(fname, rtype->_name[0], sizeof(fname));
+  strlcpy(fname, rtype->_name, sizeof(fname));
   strlcat(fname, "_changeresource", sizeof(fname));
 
   lua_getglobal(L, fname);
@@ -280,7 +280,7 @@ static int lua_getresource(unit * u, const struct resource_type *rtype)
   int result = -1;
   char fname[64];
 
-  strlcpy(fname, rtype->_name[0], sizeof(fname));
+  strlcpy(fname, rtype->_name, sizeof(fname));
   strlcat(fname, "_getresource", sizeof(fname));
 
   lua_getglobal(L, fname);
@@ -315,7 +315,7 @@ static bool lua_canuse_item(const unit * u, const struct item_type *itype)
     lua_getglobal(L, fname);
     if (lua_isfunction(L, -1)) {
       tolua_pushusertype(L, (void *)u, TOLUA_CAST "unit");
-      tolua_pushstring(L, itype->rtype->_name[0]);
+      tolua_pushstring(L, itype->rtype->_name);
 
       if (lua_pcall(L, 2, 1, 0) != 0) {
         const char *error = lua_tostring(L, -1);
@@ -503,7 +503,7 @@ lua_useitem(struct unit *u, const struct item_type *itype, int amount,
   char fname[64];
 
   strlcpy(fname, "use_", sizeof(fname));
-  strlcat(fname, itype->rtype->_name[0], sizeof(fname));
+  strlcat(fname, itype->rtype->_name, sizeof(fname));
 
   lua_getglobal(L, fname);
   if (lua_isfunction(L, -1)) {

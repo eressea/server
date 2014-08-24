@@ -776,7 +776,7 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
 
       parse_function(node, &fun, &propValue);
       if (fun == NULL) {
-        log_error("unknown function name '%s' for item '%s'\n", (const char *)propValue, itype->rtype->_name[0]);
+        log_error("unknown function name '%s' for item '%s'\n", (const char *)propValue, itype->rtype->_name);
         xmlFree(propValue);
         continue;
       }
@@ -786,7 +786,7 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
           (bool(*)(const struct troop *, const struct weapon_type *,
             int *))fun;
       } else {
-        log_error("unknown function type '%s' for item '%s'\n", (const char *)propValue, itype->rtype->_name[0]);
+        log_error("unknown function type '%s' for item '%s'\n", (const char *)propValue, itype->rtype->_name);
       }
       xmlFree(propValue);
   }
@@ -880,7 +880,7 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
 
       parse_function(node, &fun, &propValue);
       if (fun == NULL) {
-        log_error("unknown function name '%s' for item '%s'\n", (const char *)propValue, rtype->_name[0]);
+        log_error("unknown function name '%s' for item '%s'\n", (const char *)propValue, rtype->_name);
         xmlFree(propValue);
         continue;
       }
@@ -901,7 +901,7 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
           (int (*)(struct unit *, int, const struct item_type *, int,
             struct order *))fun;
       } else {
-        log_error("unknown function type '%s' for item '%s'\n", (const char *)propValue, rtype->_name[0]);
+        log_error("unknown function type '%s' for item '%s'\n", (const char *)propValue, rtype->_name);
       }
       xmlFree(propValue);
   }
@@ -997,7 +997,7 @@ static int parse_resources(xmlDocPtr doc)
 
           parse_function(node, &fun, &propValue);
           if (fun == NULL) {
-            log_error("unknown function name '%s' for resource %s\n", (const char *)propValue, rtype->_name[0]);
+            log_error("unknown function name '%s' for resource %s\n", (const char *)propValue, rtype->_name);
             xmlFree(propValue);
             continue;
           }
@@ -1010,7 +1010,7 @@ static int parse_resources(xmlDocPtr doc)
           } else if (strcmp((const char *)propValue, "name") == 0) {
             rtype->name = (rtype_name) fun;
           } else {
-            log_error("unknown function type '%s' for resource %s\n", (const char *)propValue, rtype->_name[0]);
+            log_error("unknown function type '%s' for resource %s\n", (const char *)propValue, rtype->_name);
           }
           xmlFree(propValue);
         }
@@ -1077,7 +1077,7 @@ static int parse_resources(xmlDocPtr doc)
               xmlFree(propBldg);
             }
           } else {
-            log_error("unknown type '%s' for resourcelimit-modifier '%s'\n", (const char *)propValue, rtype->_name[0]);
+            log_error("unknown type '%s' for resourcelimit-modifier '%s'\n", (const char *)propValue, rtype->_name);
           }
           xmlFree(propValue);
         }
@@ -1112,7 +1112,7 @@ static int parse_resources(xmlDocPtr doc)
           assert(propValue != NULL);
           fun = get_function((const char *)propValue);
           if (fun == NULL) {
-            log_error("unknown limit '%s' for resource %s\n", (const char *)propValue, rtype->_name[0]);
+            log_error("unknown limit '%s' for resource %s\n", (const char *)propValue, rtype->_name);
             xmlFree(propValue);
             continue;
           }
@@ -1125,7 +1125,7 @@ static int parse_resources(xmlDocPtr doc)
           } else if (strcmp((const char *)propValue, "limit") == 0) {
             rdata->limit = (rlimit_limit) fun;
           } else {
-            log_error("unknown limit '%s' for resource %s\n", (const char *)propValue, rtype->_name[0]);
+            log_error("unknown limit '%s' for resource %s\n", (const char *)propValue, rtype->_name);
           }
           xmlFree(propValue);
         }

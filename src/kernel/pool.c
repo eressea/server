@@ -61,7 +61,7 @@ int get_resource(const unit * u, const resource_type * rtype)
     if (rtype == get_resourcetype(R_PERMAURA)) {
         return max_spellpoints(u->region, u);
     }
-    log_error("trying to get unknown resource '%s'.\n", rtype->_name[0]);
+    log_error("trying to get unknown resource '%s'.\n", rtype->_name);
     return 0;
 }
 
@@ -80,7 +80,7 @@ int change_resource(unit * u, const resource_type * rtype, int change)
     assert(i == get_resource(u, rtype));
     assert(i >= 0);
     if (i >= 100000000) {
-        log_warning("%s has %d %s\n", unitname(u), i, rtype->_name[0]);
+        log_warning("%s has %d %s\n", unitname(u), i, rtype->_name);
     }
     return i;
 }

@@ -411,7 +411,7 @@ void read_items(struct storage *store, item ** ilist)
         rtype = rt_find(ibuf);
         READ_INT(store, &i);
         if (i <= 0) {
-            log_error("data contains an entry with %d %s\n", i, rtype->_name[1]);
+            log_error("data contains an entry with %d %s\n", i, resourcename(rtype, NMF_PLURAL));
         }
         else {
             if (rtype && rtype->itype) {
