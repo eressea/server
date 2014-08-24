@@ -2777,7 +2777,7 @@ static void breed_cmd(unit * u, struct order *ord)
         m = INT_MAX;
     }
 
-    if (!s[0]) {
+    if (!s || !s[0]) {
         p = P_ANY;
     }
     else {
