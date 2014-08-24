@@ -120,7 +120,7 @@ extern "C" {
     /* an ascending number, to improve the speed of determining the interval in 
        which a faction has its units. See the implementations of firstregion 
        and lastregion */
-    unsigned int uid;           /* a unique id */
+    int uid;           /* a unique id */
     int x, y;
     struct plane *_plane;       /* to access, use rplane(r) */
     char *display;
@@ -171,7 +171,7 @@ extern "C" {
   int koor_distance(int ax, int ay, int bx, int by);
   direction_t reldirection(const struct region *from, const struct region *to);
   struct region *findregion(int x, int y);
-  struct region *findregionbyid(unsigned int uid);
+  struct region *findregionbyid(int uid);
 
   extern struct attrib_type at_direction;
   extern struct attrib_type at_moveblock;
@@ -251,7 +251,7 @@ extern "C" {
   const char *write_regionname(const struct region *r, const struct faction *f,
     char *buffer, size_t size);
 
-  struct region *new_region(int x, int y, struct plane *pl, unsigned int uid);
+  struct region *new_region(int x, int y, struct plane *pl, int uid);
   void remove_region(region ** rlist, region * r);
   void terraform_region(struct region *r, const struct terrain_type *terrain);
   bool pnormalize(int *x, int *y, const struct plane *pl);

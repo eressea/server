@@ -810,8 +810,8 @@ void write_unit(struct gamedata *data, const unit * u)
     WRITE_STR(data->store, u->display ? (const char *)u->display : "");
     WRITE_INT(data->store, u->number);
     WRITE_INT(data->store, u->age);
-    WRITE_TOK(data->store, u_race(u)->_name[0]);
-    WRITE_TOK(data->store, (irace && irace != u_race(u)) ? irace->_name[0] : "");
+    WRITE_TOK(data->store, u_race(u)->_name);
+    WRITE_TOK(data->store, (irace && irace != u_race(u)) ? irace->_name : "");
     write_building_reference(u->building, data->store);
     write_ship_reference(u->ship, data->store);
     WRITE_INT(data->store, u->status);
@@ -1412,7 +1412,7 @@ void writefaction(struct gamedata *data, const faction * f)
     WRITE_TOK(data->store, locale_name(f->locale));
     WRITE_INT(data->store, f->lastorders);
     WRITE_INT(data->store, f->age);
-    WRITE_TOK(data->store, f->race->_name[0]);
+    WRITE_TOK(data->store, f->race->_name);
     WRITE_SECTION(data->store);
     WRITE_INT(data->store, f->magiegebiet);
 

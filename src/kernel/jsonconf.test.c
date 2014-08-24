@@ -112,7 +112,7 @@ static void test_findrace(CuTest *tc) {
     json_config(json);
     rc = findrace("Zwerg", lang);
     CuAssertPtrNotNull(tc, rc);
-    CuAssertStrEquals(tc, "dwarf", rc->_name[0]);
+    CuAssertStrEquals(tc, "dwarf", rc->_name);
 }
 
 static void test_items(CuTest * tc)

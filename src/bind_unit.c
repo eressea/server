@@ -840,7 +840,7 @@ static int tolua_unit_set_faction(lua_State * L)
 static int tolua_unit_get_race(lua_State * L)
 {
   unit *self = (unit *) tolua_tousertype(L, 1, 0);
-  tolua_pushstring(L, u_race(self)->_name[0]);
+  tolua_pushstring(L, u_race(self)->_name);
   return 1;
 }
 

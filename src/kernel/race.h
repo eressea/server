@@ -119,7 +119,7 @@ extern "C" {
 
   typedef struct race {
     struct param *parameters;
-    const char *_name[4];       /* neu: name[4]völker */
+    const char *_name;       /* neu: name[4]völker */
     float magres;
     float maxaura;              /* Faktor auf Maximale Aura */
     float regaura;              /* Faktor auf Regeneration */
@@ -134,7 +134,7 @@ extern "C" {
     float aggression;           /* chance that a monster will attack */
     int hitpoints;
     const char *def_damage;
-    char armor;
+    int armor;
     int at_default;             /* Angriffsskill Unbewaffnet (default: -2) */
     int df_default;             /* Verteidigungsskill Unbewaffnet (default: -2) */
     int at_bonus;               /* Verändert den Angriffsskill (default: 0) */
@@ -178,10 +178,12 @@ extern "C" {
 
   extern race *rc_get_or_create(const char *name);
   extern const race *rc_find(const char *);
-  extern const char *rc_name(const race *, int);
   extern int rc_specialdamage(const race *, const race *,
     const struct weapon_type *);
   void free_races(void);
+
+  typedef enum name_t { NAME_SINGULAR, NAME_PLURAL, NAME_DEFINITIVE, NAME_CATEGORY } name_t;
+  const char *rc_name(const race *, name_t);
 
 /* Flags. Do not reorder these without changing json_race() in jsonconf.c */
 #define RCF_NPC            (1<<0)   /* cannot be the race for a player faction (and other limits?) */

@@ -158,7 +158,7 @@ int rc_skillmod(const struct race *rc, const region * r, skill_t sk)
     return 0;
   }
 #ifdef FASTER_SKILLMOD
-  unsigned int index = hashstring(rc->_name[0]) % RCMODMAXHASH;
+  unsigned int index = hashstring(rc->_name) % RCMODMAXHASH;
   struct skillmods **imods = &modhash[index];
   while (*imods && (*imods)->race != rc) {
     imods = &(*imods)->next;

@@ -331,14 +331,14 @@ void report_race(const struct unit *u, const char **name, const char **illusion)
     if (illusion) {
         const race *irace = u_irace(u);
         if (irace && irace != u_race(u)) {
-            *illusion = irace->_name[0];
+            *illusion = irace->_name;
         }
         else {
             *illusion = NULL;
         }
     }
     if (name) {
-        *name = u_race(u)->_name[0];
+        *name = u_race(u)->_name;
         if (fval(u_race(u), RCF_SHAPESHIFTANY)) {
             const char *str = get_racename(u->attribs);
             if (str)
@@ -2166,7 +2166,7 @@ static void eval_race(struct opstack **stack, const void *userdata)
     const struct locale *lang = report ? report->locale : default_locale;
     int j = opop(stack).i;
     const race *r = (const race *)opop(stack).v;
-    const char *c = LOC(lang, rc_name(r, j != 1));
+    const char *c = LOC(lang, rc_name(r, (j == 1) ? NAME_SINGULAR : NAME_PLURAL));
     size_t len = strlen(c);
     variant var;
 

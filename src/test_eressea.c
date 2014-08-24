@@ -27,6 +27,7 @@ int RunAllTests(void)
   ADD_TESTS(suite, skill);
   ADD_TESTS(suite, keyword);
   ADD_TESTS(suite, order);
+  ADD_TESTS(suite, race);
   /* util */
   ADD_TESTS(suite, config);
   ADD_TESTS(suite, base36);

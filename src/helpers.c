@@ -216,7 +216,7 @@ static int lua_initfamiliar(unit * u)
   int result = -1;
 
   strlcpy(fname, "initfamiliar_", sizeof(fname));
-  strlcat(fname, u_race(u)->_name[0], sizeof(fname));
+  strlcat(fname, u_race(u)->_name, sizeof(fname));
 
   lua_getglobal(L, fname);
   if (lua_isfunction(L, -1)) {
@@ -237,7 +237,7 @@ static int lua_initfamiliar(unit * u)
 
   create_mage(u, M_GRAY);
 
-  strlcpy(fname, u_race(u)->_name[0], sizeof(fname));
+  strlcpy(fname, u_race(u)->_name, sizeof(fname));
   strlcat(fname, "_familiar", sizeof(fname));
   equip_unit(u, get_equipment(fname));
   return result;
@@ -345,7 +345,7 @@ lua_wage(const region * r, const faction * f, const race * rc, int in_turn)
   if (lua_isfunction(L, -1)) {
     tolua_pushusertype(L, (void *)r, TOLUA_CAST "region");
     tolua_pushusertype(L, (void *)f, TOLUA_CAST "faction");
-    tolua_pushstring(L, rc ? rc->_name[0] : 0);
+    tolua_pushstring(L, rc ? rc->_name : 0);
     tolua_pushnumber(L, (lua_Number) in_turn);
 
     if (lua_pcall(L, 3, 1, 0) != 0) {

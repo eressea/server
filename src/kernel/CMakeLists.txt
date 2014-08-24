@@ -17,6 +17,7 @@ item.test.c
 move.test.c
 order.test.c
 pool.test.c
+race.test.c
 reports.test.c
 spellbook.test.c
 curse.test.c

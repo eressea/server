@@ -1781,7 +1781,7 @@ static int parse_races(xmlDocPtr doc)
           rc->study_speed[sk] = (char)speed;
         }
       } else {
-        log_error("unknown skill '%s' in race '%s'\n", (const char *)propValue, rc->_name[0]);
+        log_error("unknown skill '%s' in race '%s'\n", (const char *)propValue, rc->_name);
       }
       xmlFree(propValue);
     }
@@ -1796,7 +1796,7 @@ static int parse_races(xmlDocPtr doc)
 
         parse_function(node, &fun, &propValue);
         if (fun == NULL) {
-          log_error("unknown function name '%s' for race %s\n", (const char *)propValue, rc->_name[0]);
+          log_error("unknown function name '%s' for race %s\n", (const char *)propValue, rc->_name);
           xmlFree(propValue);
           continue;
         }
@@ -1816,7 +1816,7 @@ static int parse_races(xmlDocPtr doc)
         } else if (strcmp((const char *)propValue, "initfamiliar") == 0) {
           rc->init_familiar = (void (*)(struct unit *))fun;
         } else {
-          log_error("unknown function type '%s' for race %s\n", (const char *)propValue, rc->_name[0]);
+          log_error("unknown function type '%s' for race %s\n", (const char *)propValue, rc->_name);
         }
         xmlFree(propValue);
     }
@@ -1871,7 +1871,7 @@ static int parse_races(xmlDocPtr doc)
         if (attack->data.sp) {
           attack->level = xml_ivalue(node, "level", 0);
           if (attack->level <= 0) {
-            log_error("magical attack '%s' for race '%s' needs a level: %d\n", attack->data.sp->sname, rc->_name[0], attack->level);
+            log_error("magical attack '%s' for race '%s' needs a level: %d\n", attack->data.sp->sname, rc->_name, attack->level);
           }
         }
       }

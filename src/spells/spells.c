@@ -480,7 +480,7 @@ static const race *select_familiar(const race * magerace, magic_t magiegebiet)
     retval = magerace->familiars[0];
   }
   if (!retval) {
-    log_error("select_familiar: No familiar (not even a default) defined for %s.\n", magerace->_name[0]);
+    log_error("select_familiar: No familiar (not even a default) defined for %s.\n", magerace->_name);
   }
   return retval;
 }
@@ -494,7 +494,7 @@ static void make_familiar(unit * familiar, unit * mage)
   if (u_race(familiar)->init_familiar != NULL) {
     u_race(familiar)->init_familiar(familiar);
   } else {
-    log_error("could not perform initialization for familiar %s.\n", familiar->faction->race->_name[0]);
+    log_error("could not perform initialization for familiar %s.\n", familiar->faction->race->_name);
   }
 
   /* triggers: */
@@ -524,7 +524,7 @@ static int sp_summon_familiar(castorder * co)
   }
   rc = select_familiar(mage->faction->race, mage->faction->magiegebiet);
   if (rc == NULL) {
-    log_error("could not find suitable familiar for %s.\n", mage->faction->race->_name[0]);
+    log_error("could not find suitable familiar for %s.\n", mage->faction->race->_name);
     return 0;
   }
 
@@ -1482,7 +1482,7 @@ static int sp_create_irongolem(castorder * co)
   ADDMSG(&mage->faction->msgs,
     msg_message("magiccreate_effect", "region command unit amount object",
       mage->region, co->order, mage, number,
-      LOC(mage->faction->locale, rc_name(rc_find("irongolem"), 1))));
+      LOC(mage->faction->locale, rc_name(rc_find("irongolem"), (u2->number == 1) ? NAME_SINGULAR : NAME_PLURAL))));
 
   return cast_level;
 }
@@ -1543,7 +1543,7 @@ static int sp_create_stonegolem(castorder * co)
   ADDMSG(&mage->faction->msgs,
     msg_message("magiccreate_effect", "region command unit amount object",
       mage->region, co->order, mage, number,
-      LOC(mage->faction->locale, rc_name(rc_find("stonegolem"), 1))));
+      LOC(mage->faction->locale, rc_name(rc_find("stonegolem"), (u2->number == 1) ? NAME_SINGULAR : NAME_PLURAL))));
 
   return cast_level;
 }
@@ -5551,7 +5551,7 @@ int sp_showastral(castorder * co)
             }
             icat(u->number);
             scat(" ");
-            scat(LOC(mage->faction->locale, rc_name(u_race(u), u->number != 1)));
+            scat(LOC(mage->faction->locale, rc_name(u_race(u), (u->number==1) ? NAME_SINGULAR:NAME_PLURAL)));
             scat(", Entfernung ");
             icat(distance(rl2->data, rt));
             scat(")");

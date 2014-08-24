@@ -1006,7 +1006,7 @@ static void inactivefaction(faction * f)
     if (inactiveFILE) {
         fprintf(inactiveFILE, "%s:%s:%d:%d\n",
             factionid(f),
-            LOC(default_locale, rc_name(f->race, 1)),
+            LOC(default_locale, rc_name(f->race, NAME_PLURAL)),
             modify(count_all(f)), turn - f->lastorders);
 
         fclose(inactiveFILE);
@@ -1707,7 +1707,7 @@ int prefix_cmd(unit * u, struct order *ord)
     init_order(ord);
     s = getstrtoken();
 
-    if (!*s) {
+    if (!s || !*s) {
         attrib *a = NULL;
         if (fval(u, UFL_GROUP)) {
             a = a_find(u->attribs, &at_group);
@@ -1721,8 +1721,7 @@ int prefix_cmd(unit * u, struct order *ord)
         }
         return 0;
     }
-
-    if (findtoken(in->names, s, &var) == E_TOK_NOMATCH) {
+    else if (findtoken(in->names, s, &var) == E_TOK_NOMATCH) {
         return 0;
     }
     else if (race_prefixes[var.i] == NULL) {
@@ -2524,13 +2523,13 @@ static bool display_race(faction * f, unit * u, const race * rc)
 
     if (u && u_race(u) != rc)
         return false;
-    name = rc_name(rc, 0);
+    name = rc_name(rc, NAME_SINGULAR);
 
     bytes = slprintf(bufp, size, "%s: ", LOC(f->locale, name));
     if (wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
 
-    key = mkname("raceinfo", rc->_name[0]);
+    key = mkname("raceinfo", rc->_name);
     info = locale_getstring(f->locale, key);
     if (info == NULL) {
         info = locale_string(f->locale, mkname("raceinfo", "no_info"));

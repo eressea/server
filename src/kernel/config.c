@@ -318,7 +318,7 @@ const char *dbrace(const struct race *rc)
     char *zPtr = zText;
 
     /* the english names are all in ASCII, so we don't need to worry about UTF8 */
-    strcpy(zText, (const char *)LOC(get_locale("en"), rc_name(rc, 0)));
+    strcpy(zText, (const char *)LOC(get_locale("en"), rc_name(rc, NAME_SINGULAR)));
     while (*zPtr) {
         *zPtr = (char)(toupper(*zPtr));
         ++zPtr;
@@ -1838,9 +1838,9 @@ void init_locale(const struct locale *lang)
     for (rc = races; rc; rc = rc->next) {
         const char *name;
         var.v = (void *)rc;
-        name = LOC(lang, rc_name(rc, 1));
+        name = LOC(lang, rc_name(rc, NAME_PLURAL));
         if (name) addtoken(tokens, name, var);
-        name = LOC(lang, rc_name(rc, 0));
+        name = LOC(lang, rc_name(rc, NAME_SINGULAR));
         if (name) addtoken(tokens, name, var);
     }
 

@@ -386,12 +386,12 @@ static int dummy_data;
 static region *dummy_ptr = (region *) & dummy_data;     /* a funny hack */
 
 typedef struct uidhashentry {
-  unsigned int uid;
+  int uid;
   region *r;
 } uidhashentry;
 static uidhashentry uidhash[MAXREGIONS];
 
-struct region *findregionbyid(unsigned int uid)
+struct region *findregionbyid(int uid)
 {
   int key = uid % MAXREGIONS;
   while (uidhash[key].uid != 0 && uidhash[key].uid != uid)
@@ -413,7 +413,7 @@ static void unhash_uid(region * r)
 
 static void hash_uid(region * r)
 {
-  unsigned int uid = r->uid;
+  int uid = r->uid;
   for (;;) {
     if (uid != 0) {
       int key = uid % MAXREGIONS;
@@ -940,7 +940,7 @@ static region *last;
 
 static unsigned int max_index = 0;
 
-region *new_region(int x, int y, struct plane *pl, unsigned int uid)
+region *new_region(int x, int y, struct plane *pl, int uid)
 {
   region *r;
 
@@ -1409,7 +1409,7 @@ int resolve_region_id(variant id, void *address)
 {
   region *r = NULL;
   if (id.i != 0) {
-    r = findregionbyid((unsigned int)id.i);
+    r = findregionbyid(id.i);
     if (r == NULL) {
       *(region **) address = NULL;
       return -1;

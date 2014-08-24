@@ -1157,7 +1157,7 @@ static item *default_spoil(const struct race *rc, int size)
         char spoilname[32];
         const item_type *itype;
 
-        sprintf(spoilname, "%sspoil", rc->_name[0]);
+        sprintf(spoilname, "%sspoil", rc->_name);
         itype = it_find(spoilname);
         if (itype != NULL) {
             i_add(&itm, i_new(itype, size));

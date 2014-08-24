@@ -711,7 +711,7 @@ static int tolua_write_spells(lua_State * L)
         for (; comp->type != 0; ++comp) {
           static const char *costs[] = { "fixed", "level", "linear" };
           xmlNodePtr cnode = xmlNewNode(NULL, BAD_CAST "resource");
-          xmlNewProp(cnode, BAD_CAST "name", BAD_CAST comp->type->_name[0]);
+          xmlNewProp(cnode, BAD_CAST "name", BAD_CAST comp->type->_name);
           xmlNewProp(cnode, BAD_CAST "amount", xml_i(comp->amount));
           xmlNewProp(cnode, BAD_CAST "cost", BAD_CAST costs[comp->cost]);
           xmlAddChild(node, cnode);

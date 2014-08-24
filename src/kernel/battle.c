@@ -954,7 +954,7 @@ void kill_troop(troop dt)
         i_merge(&du->items, &drops);
       }
     }
-    sprintf(eqname, "%s_spoils", u_race(du)->_name[0]);
+    sprintf(eqname, "%s_spoils", u_race(du)->_name);
     eq = get_equipment(eqname);
     if (eq != NULL) {
       equip_items(&du->items, eq);
@@ -2066,7 +2066,7 @@ static void make_heroes(battle * b)
       if (fval(u, UFL_HERO)) {
         int i;
         if (!playerrace(u_race(u))) {
-          log_error("Hero %s is a %s.\n", unitname(u), u_race(u)->_name[0]);
+          log_error("Hero %s is a %s.\n", unitname(u), u_race(u)->_name);
         }
         for (i = 0; i != u->number; ++i) {
           fig->person[i].speed += (hero_speed - 1);

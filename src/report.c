@@ -2174,7 +2174,7 @@ const char *charset)
     centre(F, gamedate_season(f->locale), true);
     rnl(F);
     sprintf(buf, "%s, %s/%s (%s)", factionname(f),
-        LOC(f->locale, rc_name(f->race, 1)),
+        LOC(f->locale, rc_name(f->race, NAME_PLURAL)),
         LOC(f->locale, mkname("school", magic_school[f->magiegebiet])), f->email);
     centre(F, buf, true);
     if (f_get_alliance(f)) {
