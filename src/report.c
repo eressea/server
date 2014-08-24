@@ -1417,6 +1417,7 @@ static void durchreisende(FILE * F, const region * r, const faction * f)
                 if (cansee_durchgezogen(f, r, u, 0)) {
                     ++counter;
                     if (u->ship != NULL) {
+#ifdef GERMAN_FLUFF_DISABLED
                         if (counter == 1) {
                             bytes = (int)strlcpy(bufp, "Die ", size);
                         }
@@ -1427,6 +1428,7 @@ static void durchreisende(FILE * F, const region * r, const faction * f)
                             WARN_STATIC_BUFFER();
                             break;
                         }
+#endif
                         bytes = (int)strlcpy(bufp, shipname(u->ship), size);
                     }
                     else {

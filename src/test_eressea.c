@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <util/log.h>
 
-
+#pragma warning(disable: 4210)
 #define ADD_TESTS(suite, name) \
 CuSuite *get_##name##_suite(void); \
 CuSuiteAddSuite(suite, get_##name##_suite())

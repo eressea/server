@@ -854,7 +854,7 @@
       <arg name="average" type="int"/>
     </type>
     <text locale="de">"Deine Partei hat $int($score) Punkte. Der Durchschnitt für Parteien ähnlichen Alters ist $int($average) Punkte."</text>
-    <text locale="fr">"Your faction has a score of $int($score). The average score for similar factions is $int($average)."</text>
+    <text locale="en">"Your faction has a score of $int($score). The average score for similar factions is $int($average)."</text>
   </message>
   <message name="nr_header_date" section="nr">
     <type>
@@ -862,7 +862,6 @@
       <arg name="date" type="string"/>
     </type>
     <text locale="de">"Report für $game, $date"</text>
-    <text locale="fr">"Report for $game, $date"</text>
     <text locale="en">"Report for $game, $date"</text>
   </message>
   <message name="nr_vicinitystart" section="nr">
