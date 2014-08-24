@@ -3942,11 +3942,14 @@ void defaultorders(void)
                 order *ord = *ordp;
                 if (getkeyword(ord) == K_DEFAULT) {
                     char lbuf[8192];
-                    order *new_order;
-                    init_tokens(ord);
-                    skip_token();         /* skip the keyword */
-                    strcpy(lbuf, getstrtoken());
-                    new_order = parse_order(lbuf, u->faction->locale);
+                    order *new_order = 0;
+                    const char *s;
+                    init_order(ord);
+                    s = getstrtoken();
+                    if (s) {
+                        strcpy(lbuf, s);
+                        new_order = parse_order(lbuf, u->faction->locale);
+                    }
                     *ordp = ord->next;
                     ord->next = NULL;
                     free_order(ord);
