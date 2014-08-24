@@ -2766,7 +2766,7 @@ static void breed_cmd(unit * u, struct order *ord)
     (void)init_order(ord);
     s = getstrtoken();
 
-    m = atoi((const char *)s);
+    m = s ? atoi((const char *)s) : 0;
     if (m != 0) {
         /* first came a want-paramter */
         s = getstrtoken();
