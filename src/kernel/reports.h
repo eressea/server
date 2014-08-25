@@ -37,6 +37,7 @@ extern "C" {
     extern bool nonr;
     extern bool nocr;
     extern bool noreports;
+    extern const char *visibility[];
 
     /* kann_finden speedups */
     bool kann_finden(struct faction *f1, struct faction *f2);
@@ -86,7 +87,6 @@ extern "C" {
     void free_seen(void);
     void link_seen(seen_region * seehash[], const struct region *first,
         const struct region *last);
-    const char *visibility[];
 
     typedef struct report_context {
         struct faction *f;

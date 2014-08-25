@@ -74,10 +74,10 @@ static void test_build_building_no_materials(CuTest *tc) {
     u = setup_build(&bf);
     btype = bt_find("castle");
     assert(btype);
-    set_level(bf.u, SK_BUILDING, 1);
-    CuAssertIntEquals(tc, ENOMATERIALS, build_building(bf.u, btype, 0, 4, 0));
-    CuAssertPtrEquals(tc, 0, bf.r->buildings);
-    CuAssertPtrEquals(tc, 0, bf.u->building);
+    set_level(u, SK_BUILDING, 1);
+    CuAssertIntEquals(tc, ENOMATERIALS, build_building(u, btype, 0, 4, 0));
+    CuAssertPtrEquals(tc, 0, u->region->buildings);
+    CuAssertPtrEquals(tc, 0, u->building);
 }
 
 static void test_build_building_with_golem(CuTest *tc) {
