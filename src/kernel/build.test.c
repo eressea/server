@@ -1,5 +1,6 @@
 #include <platform.h>
 #include <kernel/config.h>
+#include <kernel/alchemy.h>
 #include "types.h"
 #include "build.h"
 #include "order.h"
@@ -21,6 +22,7 @@ typedef struct build_fixture {
     unit *u;
     region *r;
     race *rc;
+    construction cons;
 } build_fixture;
 
 static unit * setup_build(build_fixture *bf) {
@@ -32,37 +34,159 @@ static unit * setup_build(build_fixture *bf) {
     assert(bf->rc && bf->f && bf->r);
     bf->u = test_create_unit(bf->f, bf->r);
     assert(bf->u);
+
+    bf->cons.materials = calloc(2, sizeof(requirement));
+    bf->cons.materials[0].number = 1;
+    bf->cons.materials[0].rtype = get_resourcetype(R_SILVER);
+    bf->cons.skill = SK_ARMORER;
+    bf->cons.minskill = 2;
+    bf->cons.maxsize = -1;
+    bf->cons.reqsize = 1;
     return bf->u;
 }
 
-static void test_build(CuTest *tc) {
-    build_fixture bf;
+static void test_build_requires_materials(CuTest *tc) {
+    build_fixture bf = { 0 };
     unit *u;
-    construction cons = { 0 };
+    const struct item_type *itype;
+
+    u = setup_build(&bf);
+    set_level(u, SK_ARMORER, 2);
+    CuAssertIntEquals(tc, ENOMATERIALS, build(u, &bf.cons, 0, 1));
+    itype = bf.cons.materials[0].rtype->itype;
+    i_change(&u->items, itype, 2);
+    CuAssertIntEquals(tc, 1, build(u, &bf.cons, 0, 1));
+    CuAssertIntEquals(tc, 1, i_get(u->items, itype));
+}
+
+static void test_build_requires_building(CuTest *tc) {
+    build_fixture bf = { 0 };
+    unit *u;
+    const struct resource_type *rtype;
+    building_type *btype;
+
+    u = setup_build(&bf);
+    rtype = bf.cons.materials[0].rtype;
+    i_change(&u->items, rtype->itype, 1);
+    set_level(u, SK_ARMORER, 2);
+    bf.cons.btype = btype = bt_get_or_create("hodor");
+    btype->maxcapacity = 1;
+    btype->capacity = 1;
+    CuAssertIntEquals_Msg(tc, "must be inside a production building", EBUILDINGREQ, build(u, &bf.cons, 0, 1));
+    u->building = test_create_building(u->region, btype);
+    fset(u->building, BLD_WORKING);
+    CuAssertIntEquals(tc, 1, build(u, &bf.cons, 0, 1));
+    btype->maxcapacity = 0;
+    CuAssertIntEquals_Msg(tc, "cannot build when production building capacity exceeded", EBUILDINGREQ, build(u, &bf.cons, 0, 1));
+}
+
+static void test_build_failure_missing_skill(CuTest *tc) {
+    build_fixture bf = { 0 };
+    unit *u;
     const struct resource_type *rtype;
 
     u = setup_build(&bf);
-    rtype = get_resourcetype(R_SILVER);
-    assert(rtype);
-
-    cons.materials = calloc(2, sizeof(requirement));
-    cons.materials[0].number = 1;
-    cons.materials[0].rtype = rtype;
-    cons.skill = SK_ARMORER;
-    cons.minskill = 2;
-    cons.reqsize = 1;
-    CuAssertIntEquals(tc, ENEEDSKILL, build(u, &cons, 1, 1));
-    set_level(u, SK_ARMORER, 1);
-    CuAssertIntEquals(tc, ELOWSKILL, build(u, &cons, 1, 1));
-    set_level(u, SK_ARMORER, 2);
-    CuAssertIntEquals(tc, ENOMATERIALS, build(u, &cons, 1, 1));
+    rtype = bf.cons.materials[0].rtype;
     i_change(&u->items, rtype->itype, 1);
-    CuAssertIntEquals(tc, 1, build(u, &cons, 1, 1));
+    CuAssertIntEquals(tc, ENEEDSKILL, build(u, &bf.cons, 1, 1));
+}
+
+static void test_build_failure_low_skill(CuTest *tc) {
+    build_fixture bf = { 0 };
+    unit *u;
+    const struct resource_type *rtype;
+
+    u = setup_build(&bf);
+    rtype = bf.cons.materials[0].rtype;
+    i_change(&u->items, rtype->itype, 1);
+    set_level(u, SK_ARMORER, bf.cons.minskill-1);
+    CuAssertIntEquals(tc, ELOWSKILL, build(u, &bf.cons, 0, 10));
+}
+
+static void test_build_failure_completed(CuTest *tc) {
+    build_fixture bf = { 0 };
+    unit *u;
+    const struct resource_type *rtype;
+
+    u = setup_build(&bf);
+    rtype = bf.cons.materials[0].rtype;
+    i_change(&u->items, rtype->itype, 1);
+    set_level(u, SK_ARMORER, bf.cons.minskill);
+    bf.cons.maxsize = 1;
+    CuAssertIntEquals(tc, ECOMPLETE, build(u, &bf.cons, bf.cons.maxsize, 10));
+    CuAssertIntEquals(tc, 1, i_get(u->items, rtype->itype));
+}
+
+static void test_build_limits(CuTest *tc) {
+    build_fixture bf = { 0 };
+    unit *u;
+    const struct resource_type *rtype;
+
+    u = setup_build(&bf);
+    rtype = bf.cons.materials[0].rtype;
+    i_change(&u->items, rtype->itype, 1);
+    set_level(u, SK_ARMORER, bf.cons.minskill);
+    CuAssertIntEquals(tc, 1, build(u, &bf.cons, 0, 10));
     CuAssertIntEquals(tc, 0, i_get(u->items, rtype->itype));
+
     scale_number(u, 2);
+    set_level(u, SK_ARMORER, bf.cons.minskill);
     i_change(&u->items, rtype->itype, 2);
-    CuAssertIntEquals(tc, 2, build(u, &cons, 2, 2));
+    CuAssertIntEquals(tc, 2, build(u, &bf.cons, 0, 10));
     CuAssertIntEquals(tc, 0, i_get(u->items, rtype->itype));
+
+    scale_number(u, 2);
+    set_level(u, SK_ARMORER, bf.cons.minskill * 2);
+    i_change(&u->items, rtype->itype, 4);
+    CuAssertIntEquals(tc, 4, build(u, &bf.cons, 0, 10));
+    CuAssertIntEquals(tc, 0, i_get(u->items, rtype->itype));
+    test_cleanup();
+}
+
+static void test_build_with_ring(CuTest *tc) {
+    build_fixture bf = { 0 };
+    unit *u;
+    item_type *ring;
+    const struct resource_type *rtype;
+
+    u = setup_build(&bf);
+    rtype = bf.cons.materials[0].rtype;
+    ring = it_get_or_create(rt_get_or_create("roqf"));
+    assert(rtype && ring);
+
+    set_level(u, SK_ARMORER, bf.cons.minskill);
+    i_change(&u->items, rtype->itype, 20);
+    i_change(&u->items, ring, 1);
+    CuAssertIntEquals(tc, 10, build(u, &bf.cons, 0, 20));
+    CuAssertIntEquals(tc, 10, i_get(u->items, rtype->itype));
+    test_cleanup();
+}
+
+static void test_build_with_potion(CuTest *tc) {
+    build_fixture bf = { 0 };
+    unit *u;
+    const potion_type *ptype;
+    const struct resource_type *rtype;
+
+    u = setup_build(&bf);
+    rtype = bf.cons.materials[0].rtype;
+    oldpotiontype[P_DOMORE] = ptype = new_potiontype(it_get_or_create(rt_get_or_create("hodor")), 1);
+    assert(rtype && ptype);
+
+    i_change(&u->items, rtype->itype, 20);
+    change_effect(u, ptype, 4);
+    set_level(u, SK_ARMORER, bf.cons.minskill);
+    CuAssertIntEquals(tc, 2, build(u, &bf.cons, 0, 20));
+    CuAssertIntEquals(tc, 18, i_get(u->items, rtype->itype));
+    CuAssertIntEquals(tc, 3, get_effect(u, ptype));
+    set_level(u, SK_ARMORER, bf.cons.minskill*2);
+    CuAssertIntEquals(tc, 4, build(u, &bf.cons, 0, 20));
+    CuAssertIntEquals(tc, 2, get_effect(u, ptype));
+    set_level(u, SK_ARMORER, bf.cons.minskill);
+    scale_number(u, 2); // OBS: this scales the effects, too:
+    CuAssertIntEquals(tc, 4, get_effect(u, ptype));
+    CuAssertIntEquals(tc, 4, build(u, &bf.cons, 0, 20));
+    CuAssertIntEquals(tc, 2, get_effect(u, ptype));
     test_cleanup();
 }
 
@@ -82,7 +206,7 @@ static void test_build_building_no_materials(CuTest *tc) {
 
 static void test_build_building_with_golem(CuTest *tc) {
     unit *u;
-    build_fixture bf;
+    build_fixture bf = { 0 };
     const building_type *btype;
 
     u = setup_build(&bf);
@@ -92,7 +216,7 @@ static void test_build_building_with_golem(CuTest *tc) {
     assert(btype->construction);
 
     set_level(bf.u, SK_BUILDING, 1);
-    CuAssertIntEquals(tc, 1, build_building(u, btype, 0, 4, 0));
+    CuAssertIntEquals(tc, 1, build_building(u, btype, 0, 1, 0));
     CuAssertPtrNotNull(tc, u->region->buildings);
     CuAssertIntEquals(tc, 1, u->region->buildings->size);
     CuAssertIntEquals(tc, 0, u->number);
@@ -124,7 +248,14 @@ static void test_build_building_success(CuTest *tc) {
 CuSuite *get_build_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
-    SUITE_ADD_TEST(suite, test_build);
+    SUITE_ADD_TEST(suite, test_build_limits);
+    SUITE_ADD_TEST(suite, test_build_failure_low_skill);
+    SUITE_ADD_TEST(suite, test_build_failure_missing_skill);
+    SUITE_ADD_TEST(suite, test_build_requires_materials);
+    SUITE_ADD_TEST(suite, test_build_requires_building);
+    SUITE_ADD_TEST(suite, test_build_failure_completed);
+    SUITE_ADD_TEST(suite, test_build_with_ring);
+    SUITE_ADD_TEST(suite, test_build_with_potion);
     SUITE_ADD_TEST(suite, test_build_building_success);
     SUITE_ADD_TEST(suite, test_build_building_with_golem);
     SUITE_ADD_TEST(suite, test_build_building_no_materials);

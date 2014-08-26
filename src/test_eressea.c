@@ -36,6 +36,7 @@ int RunAllTests(void)
   ADD_TESTS(suite, umlaut);
   ADD_TESTS(suite, strings);
   /* kernel */
+  ADD_TESTS(suite, unit);
   ADD_TESTS(suite, faction);
   ADD_TESTS(suite, build);
   ADD_TESTS(suite, pool);

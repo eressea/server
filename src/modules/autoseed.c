@@ -515,6 +515,7 @@ int autoseed(newfaction ** players, int nsize, int max_agediff)
   static const terrain_type **terrainarr = 0;
   static int *distribution;
 
+  assert(players);
   if (nterrains < 0) {
     int n = 0;
     const terrain_type *terrain = terrains();
