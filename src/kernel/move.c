@@ -662,7 +662,10 @@ int check_ship_allowed(struct ship *sh, const region * r)
     }
 
     if (bt_harbour && buildingtype_exists(r, bt_harbour, true)) {
-        return SA_HARBOUR;
+        unit* hafenmeister = NULL;
+        hafenmeister = owner_buildingtyp(r, bt_harbour);
+        if ((sh->_owner->faction == hafenmeister->faction) || (ucontact(sh->_owner, hafenmeister)) || (alliedunit(sh->_owner, hafenmeister->faction, HELP_GUARD)))
+            return SA_HARBOUR;
     }
     if (fval(r->terrain, SEA_REGION)) {
         return SA_COAST;
