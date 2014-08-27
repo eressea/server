@@ -24,11 +24,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
-#include <kernel/move.h>
 #include <kernel/plane.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
 #include <kernel/unit.h>
+
+#include <move.h>
 
 /* util includes */
 #include <util/attrib.h>

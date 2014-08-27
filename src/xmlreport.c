@@ -27,6 +27,7 @@ without prior permission by the authors of Eressea.
 /* gamecode includes */
 #include "laws.h"
 #include "economy.h"
+#include "move.h"
 
 /* kernel includes */
 #include <kernel/alchemy.h>
@@ -40,7 +41,6 @@ without prior permission by the authors of Eressea.
 #include <kernel/item.h>
 #include <kernel/magic.h>
 #include <kernel/messages.h>
-#include <kernel/move.h>
 #include <kernel/order.h>
 #include <kernel/plane.h>
 #include <kernel/race.h>

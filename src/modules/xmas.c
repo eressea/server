@@ -18,10 +18,11 @@
 #include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
-#include <kernel/move.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
+
+#include <move.h>
 
 /* util includes */
 #include <util/attrib.h>

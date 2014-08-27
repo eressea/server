@@ -54,6 +54,7 @@ int RunAllTests(void)
   ADD_TESTS(suite, battle);
   ADD_TESTS(suite, ally);
   /* gamecode */
+  ADD_TESTS(suite, stealth);
   ADD_TESTS(suite, market);
   ADD_TESTS(suite, laws);
   ADD_TESTS(suite, economy);

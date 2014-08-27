@@ -1,6 +1,6 @@
 #include <platform.h>
 #include <kernel/config.h>
-#include <kernel/alchemy.h>
+#include "alchemy.h"
 #include "types.h"
 #include "build.h"
 #include "order.h"

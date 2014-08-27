@@ -55,8 +55,10 @@ INCLUDE_DIRECTORIES (${CMAKE_BINARY_DIR}/include)
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DUSE_AUTOCONF")
 
 IF(CMAKE_COMPILER_IS_GNUCC)
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long")
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -DHAVE__BOOL")
 elseif(MSVC)
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W4 /WX /MP")
     set(CMAKE_EXE_LINKER_FLAGS_DEBUG
         "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:libc.lib /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:libcd.lib /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:msvcrt.lib")
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE

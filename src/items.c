@@ -3,6 +3,7 @@
 #include "items.h"
 
 #include "study.h"
+#include "move.h"
 
 #include <kernel/curse.h>
 #include <kernel/building.h>
@@ -10,7 +11,6 @@
 #include <kernel/item.h>
 #include <kernel/magic.h>
 #include <kernel/messages.h>
-#include <kernel/move.h>
 #include <kernel/order.h>
 #include <kernel/plane.h>
 #include <kernel/pool.h>

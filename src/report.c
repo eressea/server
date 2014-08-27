@@ -21,6 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include <kernel/config.h>
 
+#include "reports.h"
 /* modules includes */
 #include <modules/score.h>
 
@@ -35,9 +36,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "economy.h"
 #include "monster.h"
 #include "laws.h"
+#include "move.h"
+#include "alchemy.h"
 
 /* kernel includes */
-#include <kernel/alchemy.h>
 #include <kernel/ally.h>
 #include <kernel/connection.h>
 #include <kernel/build.h>
@@ -48,7 +50,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/group.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
-#include <kernel/move.h>
 #include <kernel/objtypes.h>
 #include <kernel/order.h>
 #include <kernel/plane.h>
@@ -56,7 +57,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/render.h>
-#include <kernel/reports.h>
 #include <kernel/resources.h>
 #include <kernel/save.h>
 #include <kernel/ship.h>

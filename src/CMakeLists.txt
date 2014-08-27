@@ -1,14 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 project (server C)
 
-IF(CMAKE_COMPILER_IS_GNUCC)
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long")
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -DHAVE__BOOL")
-ELSEIF(MSVC)
-ELSE(CMAKE_COMPILER_IS_GNUCC)
-    MESSAGE(STATUS "Unknown compiler ${CMAKE_C_COMPILER_ID}")
-ENDIF(CMAKE_COMPILER_IS_GNUCC)
-
 include_directories (${CMAKE_CURRENT_SOURCE_DIR})
 include_directories (${CRITBIT_INCLUDE_DIR})
 include_directories (${CJSON_INCLUDE_DIR})
@@ -58,6 +50,12 @@ TOLUA_BINDING(settings.pkg bind_settings.h)
 ENDIF()
 
 set (ERESSEA_SRC
+  move.c
+  battle.c
+  alchemy.c
+  stealth.c
+  names.c
+  reports.c
   eressea.c
   callback.c
   direction.c
@@ -141,7 +139,11 @@ target_link_libraries(eressea
 set(TESTS_SRC
   test_eressea.c
   tests.c
+  battle.test.c
   tests.test.c
+  reports.test.c
+  stealth.test.c
+  move.test.c
   callback.test.c
   direction.test.c
   keyword.test.c

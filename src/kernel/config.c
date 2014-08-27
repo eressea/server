@@ -27,7 +27,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "alliance.h"
 #include "ally.h"
 #include "alchemy.h"
-#include "battle.h"
 #include "connection.h"
 #include "building.h"
 #include "calendar.h"
@@ -40,7 +39,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "magic.h"
 #include "messages.h"
 #include "move.h"
-#include "names.h"
 #include "objtypes.h"
 #include "order.h"
 #include "plane.h"
@@ -75,6 +73,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/unicode.h>
 #include <util/umlaut.h>
 #include <util/xml.h>
+
+#include <stealth.h>
 
 #ifdef USE_LIBXML2
 /* libxml includes */
@@ -667,23 +667,6 @@ region *findunitregion(const unit * su)
 
     return (region *) NULL;
 #endif
-}
-
-int eff_stealth(const unit * u, const region * r)
-{
-    int e = 0;
-
-    /* Auf Schiffen keine Tarnung! */
-    if (!u->ship && skill_enabled(SK_STEALTH)) {
-        e = eff_skill(u, SK_STEALTH, r);
-
-        if (fval(u, UFL_STEALTH)) {
-            int es = u_geteffstealth(u);
-            if (es >= 0 && es < e)
-                return es;
-        }
-    }
-    return e;
 }
 
 bool unit_has_cursed_item(unit * u)

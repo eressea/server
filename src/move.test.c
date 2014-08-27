@@ -1,8 +1,8 @@
 #include <platform.h>
 #include <stdlib.h>
+#include "move.h"
 
 #include <kernel/building.h>
-#include <kernel/move.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
 #include <kernel/terrain.h>

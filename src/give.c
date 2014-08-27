@@ -26,7 +26,6 @@
 #include <kernel/pool.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/reports.h>
 #include <kernel/ship.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>

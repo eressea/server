@@ -21,13 +21,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "names.h"
 
 /* kernel includes */
-#include "unit.h"
-#include "region.h"
-#include "faction.h"
-#include "magic.h"
-#include "race.h"
-#include "terrain.h"
-#include "terrainid.h"
+#include <kernel/unit.h>
+#include <kernel/region.h>
+#include <kernel/faction.h>
+#include <kernel/magic.h>
+#include <kernel/race.h>
+#include <kernel/terrain.h>
+#include <kernel/terrainid.h>
 
 /* util includes */
 #include <util/base36.h>

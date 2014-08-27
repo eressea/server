@@ -22,14 +22,16 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/types.h>
 #include "economy.h"
 
+#include "alchemy.h"
 #include "direction.h"
 #include "give.h"
 #include "laws.h"
 #include "randenc.h"
 #include "spy.h"
+#include "move.h"
+#include "reports.h"
 
 /* kernel includes */
-#include <kernel/alchemy.h>
 #include <kernel/building.h>
 #include <kernel/calendar.h>
 #include <kernel/curse.h>
@@ -38,13 +40,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/item.h>
 #include <kernel/magic.h>
 #include <kernel/messages.h>
-#include <kernel/move.h>
 #include <kernel/order.h>
 #include <kernel/plane.h>
 #include <kernel/pool.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/reports.h>
 #include <kernel/resources.h>
 #include <kernel/ship.h>
 #include <kernel/terrain.h>

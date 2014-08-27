@@ -1,9 +1,10 @@
-#include <platform.h>
+#include <config.h>
+#include <kernel/types.h>
+#include "reports.h"
 
 #include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/race.h>
-#include <kernel/reports.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
 #include <kernel/unit.h>

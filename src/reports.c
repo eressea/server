@@ -29,7 +29,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/group.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
-#include <kernel/move.h>
 #include <kernel/order.h>
 #include <kernel/plane.h>
 #include <kernel/race.h>
@@ -65,6 +64,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/follow.h>
 #include <attributes/otherfaction.h>
 #include <attributes/racename.h>
+
+#include "move.h"
+#include "stealth.h"
 
 bool nocr = false;
 bool nonr = false;
@@ -198,37 +200,6 @@ const char **name, const char **basename, int *number, bool singular)
                 *number = i->number;
         }
     }
-}
-
-int *nmrs = NULL;
-
-int update_nmrs(void)
-{
-    int i, newplayers = 0;
-    faction *f;
-    int turn = global.data_turn;
-
-    if (nmrs == NULL)
-        nmrs = malloc(sizeof(int) * (NMRTimeout() + 1));
-    for (i = 0; i <= NMRTimeout(); ++i) {
-        nmrs[i] = 0;
-    }
-
-    for (f = factions; f; f = f->next) {
-        if (fval(f, FFL_ISNEW)) {
-            ++newplayers;
-        }
-        else if (!is_monsters(f) && f->alive) {
-            int nmr = turn - f->lastorders + 1;
-            if (nmr < 0 || nmr > NMRTimeout()) {
-                log_error("faction %s has %d NMRS\n", factionid(f), nmr);
-                nmr = _max(0, nmr);
-                nmr = _min(nmr, NMRTimeout());
-            }
-            ++nmrs[nmr];
-        }
-    }
-    return newplayers;
 }
 
 #define ORDERS_IN_NR 1
@@ -2377,54 +2348,6 @@ static void log_orders(const struct message *msg)
             break;
         }
     }
-}
-
-int report_action(region * r, unit * actor, message * msg, int flags)
-{
-    int result = 0;
-    unit *u;
-    int view = flags & (ACTION_CANSEE | ACTION_CANNOTSEE);
-
-    /* melden, 1x pro Partei */
-    if (flags & ACTION_RESET) {
-        freset(actor->faction, FFL_SELECT);
-        for (u = r->units; u; u = u->next)
-            freset(u->faction, FFL_SELECT);
-    }
-    if (view) {
-        for (u = r->units; u; u = u->next) {
-            if (!fval(u->faction, FFL_SELECT)) {
-                bool show = u->faction == actor->faction;
-                fset(u->faction, FFL_SELECT);
-                if (view == ACTION_CANSEE) {
-                    /* Bei Fernzaubern sieht nur die eigene Partei den Magier */
-                    show = show || (r == actor->region
-                        && cansee(u->faction, r, actor, 0));
-                }
-                else if (view == ACTION_CANNOTSEE) {
-                    show = !show && !(r == actor->region
-                        && cansee(u->faction, r, actor, 0));
-                }
-                else {
-                    /* the unliely (or lazy) case */
-                    show = true;
-                }
-
-                if (show) {
-                    r_addmessage(r, u->faction, msg);
-                }
-                else {                /* Partei des Magiers, sieht diesen immer */
-                    result = 1;
-                }
-            }
-        }
-        /* Ist niemand von der Partei des Magiers in der Region, dem Magier
-         * nochmal gesondert melden */
-        if ((flags & ACTION_CANSEE) && !fval(actor->faction, FFL_SELECT)) {
-            add_message(&actor->faction->msgs, msg);
-        }
-    }
-    return result;
 }
 
 void register_reports(void)

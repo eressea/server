@@ -22,15 +22,15 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include <kernel/config.h>
 #include "study.h"
+#include "move.h"
+#include "alchemy.h"
 
-#include <kernel/alchemy.h>
 #include <kernel/building.h>
 #include <kernel/curse.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/magic.h>
 #include <kernel/messages.h>
-#include <kernel/move.h>
 #include <kernel/order.h>
 #include <kernel/plane.h>
 #include <kernel/pool.h>

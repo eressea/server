@@ -24,6 +24,7 @@ without prior permission by the authors of Eressea.
 #include "bind_region.h"
 #include "helpers.h"
 #include "console.h"
+#include "reports.h"
 
 #include <kernel/config.h>
 
@@ -36,7 +37,6 @@ without prior permission by the authors of Eressea.
 #include <kernel/terrain.h>
 #include <kernel/messages.h>
 #include <kernel/region.h>
-#include <kernel/reports.h>
 #include <kernel/building.h>
 #include <kernel/plane.h>
 #include <kernel/race.h>

@@ -23,7 +23,6 @@
 
 /* kernel includes */
 #include <kernel/building.h>
-#include <kernel/reports.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>

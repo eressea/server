@@ -23,6 +23,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* gamecode includes */
 #include "economy.h"
 #include "give.h"
+#include "move.h"
 
 /* triggers includes */
 #include <triggers/removecurse.h>
@@ -37,14 +38,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
-#include <kernel/move.h>
-#include <kernel/names.h>
 #include <kernel/order.h>
 #include <kernel/pathfinder.h>
 #include <kernel/pool.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/reports.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>

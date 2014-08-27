@@ -251,7 +251,6 @@ extern "C" {
     bool has_limited_skills(const struct unit *u);
     const struct race *findrace(const char *, const struct locale *);
 
-    int eff_stealth(const struct unit *u, const struct region *r);
     int ispresent(const struct faction *f, const struct region *r);
 
     int check_option(struct faction *f, int option);

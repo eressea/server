@@ -20,31 +20,32 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include <kernel/config.h>
 #include "move.h"
-
-#include "alchemy.h"
-#include "connection.h"
-#include "build.h"
-#include "building.h"
-#include "calendar.h"
-#include "curse.h"
-#include "direction.h"
-#include "faction.h"
-#include "item.h"
-#include "magic.h"
-#include "messages.h"
-#include "order.h"
-#include "plane.h"
-#include "race.h"
-#include "region.h"
-#include "render.h"
 #include "reports.h"
-#include "save.h"
-#include "ship.h"
+#include "alchemy.h"
+
+#include <kernel/build.h>
+#include <kernel/building.h>
+#include <kernel/calendar.h>
+#include <kernel/connection.h>
+#include <kernel/curse.h>
+#include <kernel/faction.h>
+#include <kernel/item.h>
+#include <kernel/magic.h>
+#include <kernel/messages.h>
+#include <kernel/order.h>
+#include <kernel/plane.h>
+#include <kernel/race.h>
+#include <kernel/region.h>
+#include <kernel/render.h>
+#include <kernel/save.h>
+#include <kernel/ship.h>
+#include <kernel/teleport.h>
+#include <kernel/terrain.h>
+#include <kernel/terrainid.h>
+#include <kernel/unit.h>
+
+#include "direction.h"
 #include "skill.h"
-#include "terrain.h"
-#include "terrainid.h"
-#include "teleport.h"
-#include "unit.h"
 
 /* util includes */
 #include <util/attrib.h>
@@ -57,6 +58,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/rng.h>
+
+#include <stealth.h>
 
 #include <storage.h>
 

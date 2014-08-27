@@ -28,7 +28,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/connection.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
-#include <kernel/move.h>
 #include <kernel/messages.h>
 #include <kernel/order.h>
 #include <kernel/plane.h>
@@ -37,6 +36,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 #include <kernel/faction.h>
+
+#include <move.h>
 
 /* util includes */
 #include <util/attrib.h>

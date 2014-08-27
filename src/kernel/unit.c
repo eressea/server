@@ -56,6 +56,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/rng.h>
 #include <util/variant.h>
 
+#include <stealth.h>
+
 #include <storage.h>
 
 /* libc includes */
@@ -681,44 +683,6 @@ variant read_unit_reference(struct storage * store)
     variant var;
     READ_INT(store, &var.i);
     return var;
-}
-
-attrib_type at_stealth = {
-    "stealth", NULL, NULL, NULL, a_writeint, a_readint
-};
-
-void u_seteffstealth(unit * u, int value)
-{
-    if (skill_enabled(SK_STEALTH)) {
-        attrib *a = NULL;
-        if (fval(u, UFL_STEALTH)) {
-            a = a_find(u->attribs, &at_stealth);
-        }
-        if (value < 0) {
-            if (a != NULL) {
-                freset(u, UFL_STEALTH);
-                a_remove(&u->attribs, a);
-            }
-            return;
-        }
-        if (a == NULL) {
-            a = a_add(&u->attribs, a_new(&at_stealth));
-            fset(u, UFL_STEALTH);
-        }
-        a->data.i = value;
-    }
-}
-
-int u_geteffstealth(const struct unit *u)
-{
-    if (skill_enabled(SK_STEALTH)) {
-        if (fval(u, UFL_STEALTH)) {
-            attrib *a = a_find(u->attribs, &at_stealth);
-            if (a != NULL)
-                return a->data.i;
-        }
-    }
-    return -1;
 }
 
 int get_level(const unit * u, skill_t id)
@@ -1495,7 +1459,6 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
             }
         }
     }
-    u_seteffstealth(u, -1);
     u_setrace(u, urace);
     u->irace = NULL;
 
