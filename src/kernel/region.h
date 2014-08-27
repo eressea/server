@@ -195,7 +195,7 @@ extern "C" {
   struct spec_direction *special_direction(const region * from,
     const region * to);
   struct attrib *create_special_direction(struct region *r, struct region *rt,
-    int duration, const char *desc, const char *keyword);
+    int duration, const char *desc, const char *keyword, bool active);
 
   int deathcount(const struct region *r);
   int chaoscount(const struct region *r);

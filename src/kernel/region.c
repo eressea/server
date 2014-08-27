@@ -331,12 +331,12 @@ region *find_special_direction(const region * r, const char *token,
 }
 
 attrib *create_special_direction(region * r, region * rt, int duration,
-  const char *desc, const char *keyword)
+  const char *desc, const char *keyword, bool active)
 {
   attrib *a = a_add(&r->attribs, a_new(&at_direction));
   spec_direction *d = (spec_direction *) (a->data.v);
 
-  d->active = false;
+  d->active = active;
   d->x = rt->x;
   d->y = rt->y;
   d->duration = duration;
