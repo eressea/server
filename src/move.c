@@ -22,6 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "move.h"
 #include "reports.h"
 #include "alchemy.h"
+#include "vortex.h"
 
 #include <kernel/build.h>
 #include <kernel/building.h>
@@ -543,6 +544,36 @@ void travelthru(const unit * u, region * r)
 #endif
 }
 
+static direction_t
+koor_reldirection(int ax, int ay, int bx, int by, const struct plane *pl)
+{
+    int dir;
+    for (dir = 0; dir != MAXDIRECTIONS; ++dir) {
+        int x = ax + delta_x[dir];
+        int y = ay + delta_y[dir];
+        pnormalize(&x, &y, pl);
+        if (bx == x && by == y)
+            return (direction_t)dir;
+    }
+    return NODIRECTION;
+}
+
+direction_t reldirection(const region * from, const region * to)
+{
+    plane *pl = rplane(from);
+    if (pl == rplane(to)) {
+        direction_t dir = koor_reldirection(from->x, from->y, to->x, to->y, pl);
+
+        if (dir == NODIRECTION) {
+            spec_direction *sd = special_direction(from, to);
+            if (sd != NULL && sd->active)
+                return D_SPECIAL;
+        }
+        return dir;
+    }
+    return NODIRECTION;
+}
+
 static void leave_trail(ship * sh, region * from, region_list * route)
 {
     region *r = from;
@@ -1036,6 +1067,40 @@ unit *is_guarded(region * r, unit * u, unsigned int mask)
         freset(r, RF_GUARDED);
     }
     return NULL;
+}
+
+int movewhere(const unit * u, const char *token, region * r, region ** resultp)
+{
+    region *r2;
+    direction_t d;
+
+    if (!token || *token == '\0') {
+        *resultp = NULL;
+        return E_MOVE_OK;
+    }
+
+    d = get_direction(token, u->faction->locale);
+    switch (d) {
+    case D_PAUSE:
+        *resultp = r;
+        break;
+
+    case NODIRECTION:
+        r2 = find_special_direction(r, token, u->faction->locale);
+        if (r2 == NULL) {
+            return E_MOVE_NOREGION;
+        }
+        *resultp = r2;
+        break;
+
+    default:
+        r2 = rconnect(r, d);
+        if (r2 == NULL || move_blocked(u, r, r2)) {
+            return E_MOVE_BLOCKED;
+        }
+        *resultp = r2;
+    }
+    return E_MOVE_OK;
 }
 
 static const char *shortdirections[MAXDIRECTIONS] = {

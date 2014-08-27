@@ -2667,40 +2667,6 @@ message *movement_error(unit * u, const char *token, order * ord,
     return NULL;
 }
 
-int movewhere(const unit * u, const char *token, region * r, region ** resultp)
-{
-    region *r2;
-    direction_t d;
-
-    if (!token || *token == '\0') {
-        *resultp = NULL;
-        return E_MOVE_OK;
-    }
-
-    d = get_direction(token, u->faction->locale);
-    switch (d) {
-    case D_PAUSE:
-        *resultp = r;
-        break;
-
-    case NODIRECTION:
-        r2 = find_special_direction(r, token, u->faction->locale);
-        if (r2 == NULL) {
-            return E_MOVE_NOREGION;
-        }
-        *resultp = r2;
-        break;
-
-    default:
-        r2 = rconnect(r, d);
-        if (r2 == NULL || move_blocked(u, r, r2)) {
-            return E_MOVE_BLOCKED;
-        }
-        *resultp = r2;
-    }
-    return E_MOVE_OK;
-}
-
 bool move_blocked(const unit * u, const region * r, const region * r2)
 {
     connection *b;
@@ -2779,7 +2745,6 @@ void attrib_init(void)
     at_register(&at_seenspell);
 
     /* neue REGION-Attribute */
-    at_register(&at_direction);
     at_register(&at_moveblock);
     at_register(&at_deathcount);
     at_register(&at_chaoscount);

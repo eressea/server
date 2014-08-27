@@ -29,6 +29,8 @@ without prior permission by the authors of Eressea.
 #include "spellbook.h"
 #include "calendar.h"
 
+#include "vortex.h"
+
 /* util includes */
 #include <util/attrib.h>
 #include <util/bsdstring.h>

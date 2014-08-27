@@ -44,20 +44,21 @@ int RunAllTests(void)
   ADD_TESTS(suite, equipment);
   ADD_TESTS(suite, item);
   ADD_TESTS(suite, magic);
-  ADD_TESTS(suite, move);
   ADD_TESTS(suite, reports);
   ADD_TESTS(suite, save);
   ADD_TESTS(suite, ship);
   ADD_TESTS(suite, spellbook);
   ADD_TESTS(suite, building);
   ADD_TESTS(suite, spell);
-  ADD_TESTS(suite, battle);
   ADD_TESTS(suite, ally);
   /* gamecode */
-  ADD_TESTS(suite, stealth);
-  ADD_TESTS(suite, market);
-  ADD_TESTS(suite, laws);
+  ADD_TESTS(suite, battle);
   ADD_TESTS(suite, economy);
+  ADD_TESTS(suite, laws);
+  ADD_TESTS(suite, market);
+  ADD_TESTS(suite, move);
+  ADD_TESTS(suite, stealth);
+  ADD_TESTS(suite, vortex);
 
   CuSuiteRun(suite);
   CuSuiteSummary(suite, output);

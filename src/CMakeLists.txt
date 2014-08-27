@@ -51,9 +51,11 @@ ENDIF()
 
 set (ERESSEA_SRC
   move.c
+  spells.c
   battle.c
   alchemy.c
   stealth.c
+  vortex.c
   names.c
   reports.c
   eressea.c

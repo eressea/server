@@ -339,15 +339,6 @@ extern "C" {
         const struct region *dest);
     void add_income(struct unit *u, int type, int want, int qty);
 
-    /* movewhere error codes */
-    enum {
-        E_MOVE_OK = 0,              /* possible to move */
-        E_MOVE_NOREGION,            /* no region exists in this direction */
-        E_MOVE_BLOCKED              /* cannot see this region, there is a blocking connection. */
-    };
-    int movewhere(const struct unit *u, const char *token,
-    struct region *r, struct region **resultp);
-
     const char *datapath(void);
     void set_datapath(const char *path);
 
