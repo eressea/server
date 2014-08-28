@@ -838,7 +838,7 @@ static int
 use_bloodpotion(struct unit *u, const struct item_type *itype, int amount,
 struct order *ord)
 {
-    if (u_race(u) == get_race(RC_DAEMON)) {
+    if (u->number == 0 || u_race(u) == get_race(RC_DAEMON)) {
         change_effect(u, itype->rtype->ptype, 100 * amount);
     }
     else {
