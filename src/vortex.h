@@ -6,7 +6,6 @@ extern "C" {
 
     struct region;
     struct attrib;
-    struct locale;
 
     typedef struct spec_direction {
         int x, y;
@@ -19,7 +18,7 @@ extern "C" {
     extern struct attrib_type at_direction;
 
     struct region *find_special_direction(const struct region *r,
-        const char *token, const struct locale *lang);
+        const char *token);
     void register_special_direction(const char *name);
     struct spec_direction *special_direction(const struct region * from,
         const struct region * to);

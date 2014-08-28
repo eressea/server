@@ -65,7 +65,8 @@ extern "C" {
     UT_MAX
   };
 
-  void ** get_translations(const struct locale *lang, int index);
+  void ** get_translations(const struct locale *lang, int type);
+  void * get_translation(const struct locale *lang, const char *str, int type);
 
 #ifdef __cplusplus
 }

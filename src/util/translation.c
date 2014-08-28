@@ -48,7 +48,7 @@ void opstack_push(opstack ** stackp, variant data)
   opstack *stack = *stackp;
   if (stack == NULL) {
     stack = (opstack *) malloc(sizeof(opstack));
-    stack->size = 1;
+    stack->size = 2;
     stack->begin = malloc(sizeof(variant) * stack->size);
     stack->top = stack->begin;
     *stackp = stack;

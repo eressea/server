@@ -1086,7 +1086,11 @@ int movewhere(const unit * u, const char *token, region * r, region ** resultp)
         break;
 
     case NODIRECTION:
-        r2 = find_special_direction(r, token, u->faction->locale);
+        token = (const char *)get_translation(u->faction->locale, token, UT_SPECDIR);
+        if (!token) {
+            return E_MOVE_NOREGION;
+        }
+        r2 = find_special_direction(r, token);
         if (r2 == NULL) {
             return E_MOVE_NOREGION;
         }

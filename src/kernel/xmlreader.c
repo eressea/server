@@ -461,33 +461,6 @@ static int parse_calendar(xmlDocPtr doc)
   return rv;
 }
 
-static int parse_directions(xmlDocPtr doc)
-{
-  xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
-  xmlXPathObjectPtr xpathDirections;
-  xmlNodeSetPtr nsetDirections;
-  int rv = 0;
-
-  /* reading eressea/directions/dir */
-  xpathDirections =
-    xmlXPathEvalExpression(BAD_CAST "/eressea/directions/dir", xpath);
-  nsetDirections = xpathDirections->nodesetval;
-  if (nsetDirections != NULL) {
-    int k;
-    for (k = 0; k != nsetDirections->nodeNr; ++k) {
-      xmlNodePtr dir = nsetDirections->nodeTab[k];
-      xmlChar *propValue = xmlGetProp(dir, BAD_CAST "name");
-
-      register_special_direction((const char *)propValue);
-      xmlFree(propValue);
-    }
-  }
-  xmlXPathFreeObject(xpathDirections);
-  xmlXPathFreeContext(xpath);
-
-  return rv;
-}
-
 static int parse_ships(xmlDocPtr doc)
 {
   xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
@@ -2309,6 +2282,5 @@ void register_xmlreader(void)
   xml_register_callback(parse_equipment);       /* requires spells */
   xml_register_callback(parse_races);   /* requires spells */
   xml_register_callback(parse_calendar);
-  xml_register_callback(parse_directions);
 }
 #endif

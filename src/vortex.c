@@ -39,7 +39,7 @@ void register_special_direction(const char *name)
             var.v = str;
             addtoken(tokens, token, var);
 
-            if (lang == default_locale) {
+            if (lang == locales) {
                 dir_lookup *dl = malloc(sizeof(dir_lookup));
                 dl->name = str;
                 dl->oldname = token;
@@ -134,8 +134,7 @@ attrib_type at_direction = {
     a_readdirection
 };
 
-region *find_special_direction(const region * r, const char *token,
-    const struct locale *lang)
+region *find_special_direction(const region * r, const char *token)
 {
     attrib *a;
     spec_direction *d;
@@ -146,14 +145,8 @@ region *find_special_direction(const region * r, const char *token,
         a = a->next) {
         d = (spec_direction *)(a->data.v);
 
-        if (d->active) {
-            void **tokens = get_translations(lang, UT_SPECDIR);
-            variant var;
-            if (findtoken(*tokens, token, &var) == E_TOK_SUCCESS) {
-                if (strcmp((const char *)var.v, d->keyword) == 0) {
-                    return findregion(d->x, d->y);
-                }
-            }
+        if (d->active && strcmp(token, d->keyword) == 0) {
+            return findregion(d->x, d->y);
         }
     }
 

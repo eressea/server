@@ -10,7 +10,6 @@
   <xi:include href="config:///core/common/buildings.xml"/>
   <xi:include href="config:///game/familiars.xml"/>
 
-  <xi:include href="config:///default/directions.xml"/>
   <xi:include href="config:///default/adamantium.xml" />
 
   <xi:include href="config:///game/ships.xml"/>

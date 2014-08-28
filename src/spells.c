@@ -6868,6 +6868,7 @@ void register_spells(void)
     register_function((pf_generic)sp_kampfzauber, "combat_spell");
 
     register_spelldata();
+    register_special_direction("vortex");
 
     register_unitcurse();
     register_regioncurse();
