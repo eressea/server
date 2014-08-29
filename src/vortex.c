@@ -15,6 +15,8 @@
 #include <storage.h>
 
 #include <assert.h>
+#include <string.h>
+#include <stdlib.h>
 
 typedef struct dir_lookup {
     char *name;
@@ -77,7 +79,7 @@ static int a_readdirection(attrib * a, void *owner, struct storage *store)
 {
     spec_direction *d = (spec_direction *)(a->data.v);
 
-    _CRT_UNUSED(owner);
+    (void) owner;
     READ_INT(store, &d->x);
     READ_INT(store, &d->y);
     READ_INT(store, &d->duration);
@@ -118,7 +120,7 @@ a_writedirection(const attrib * a, const void *owner, struct storage *store)
 {
     spec_direction *d = (spec_direction *)(a->data.v);
 
-    _CRT_UNUSED(owner);
+    (void)owner;
     WRITE_INT(store, d->x);
     WRITE_INT(store, d->y);
     WRITE_INT(store, d->duration);
