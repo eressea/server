@@ -1069,6 +1069,29 @@ unit *is_guarded(region * r, unit * u, unsigned int mask)
     return NULL;
 }
 
+bool move_blocked(const unit * u, const region * r, const region * r2)
+{
+    connection *b;
+    curse *c;
+    static const curse_type *fogtrap_ct = NULL;
+
+    if (r2 == NULL)
+        return true;
+    b = get_borders(r, r2);
+    while (b) {
+        if (b->type->block && b->type->block(b, u, r))
+            return true;
+        b = b->next;
+    }
+
+    if (fogtrap_ct == NULL)
+        fogtrap_ct = ct_find("fogtrap");
+    c = get_curse(r->attribs, fogtrap_ct);
+    if (curse_active(c))
+        return true;
+    return false;
+}
+
 int movewhere(const unit * u, const char *token, region * r, region ** resultp)
 {
     region *r2;
@@ -1387,6 +1410,20 @@ static const region_list *reroute(unit * u, const region_list * route,
         route = route->next;
     }
     return route;
+}
+
+static message *movement_error(unit * u, const char *token, order * ord,
+    int error_code)
+{
+    direction_t d;
+    switch (error_code) {
+    case E_MOVE_BLOCKED:
+        d = get_direction(token, u->faction->locale);
+        return msg_message("moveblocked", "unit direction", u, d);
+    case E_MOVE_NOREGION:
+        return msg_feedback(u, ord, "unknowndirection", "dirname", token);
+    }
+    return NULL;
 }
 
 static void make_route(unit * u, order * ord, region_list ** routep)

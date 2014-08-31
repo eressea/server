@@ -2154,6 +2154,13 @@ static void buy(unit * u, request ** buyorders, struct order *ord)
 }
 
 /* ------------------------------------------------------------- */
+static void add_income(unit * u, int type, int want, int qty)
+{
+    if (want == INT_MAX)
+        want = qty;
+    ADDMSG(&u->faction->msgs, msg_message("income",
+        "unit region mode wanted amount", u, u->region, type, want, qty));
+}
 
 /* Steuersätze in % bei Burggröße */
 static int tax_per_size[7] = { 0, 6, 12, 18, 24, 30, 36 };

@@ -32,12 +32,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/reduceproduction.h>
 
 /* gamecode includes */
-#include "creport.h"
-#include "economy.h"
-#include "monster.h"
-#include "laws.h"
-#include "move.h"
 #include "alchemy.h"
+#include "economy.h"
+#include "move.h"
+#include "upkeep.h"
 #include "vortex.h"
 
 /* kernel includes */

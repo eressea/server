@@ -324,8 +324,6 @@ extern "C" {
      */
     unsigned int guard_flags(const struct unit *u);
 
-    bool hunger(int number, struct unit *u);
-    int lifestyle(const struct unit *);
     int besieged(const struct unit *u);
     int maxworkingpeasants(const struct region *r);
     bool has_horses(const struct unit *u);
@@ -333,11 +331,6 @@ extern "C" {
     int wage(const struct region *r, const struct faction *f,
         const struct race *rc, int in_turn);
     int maintenance_cost(const struct unit *u);
-    struct message *movement_error(struct unit *u, const char *token,
-    struct order *ord, int error_code);
-    bool move_blocked(const struct unit *u, const struct region *src,
-        const struct region *dest);
-    void add_income(struct unit *u, int type, int want, int qty);
 
     const char *datapath(void);
     void set_datapath(const char *path);

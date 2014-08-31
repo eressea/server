@@ -277,7 +277,7 @@ rel_to_abs(const struct plane *pl, const struct faction *f, int rel,
   return (rel + ursprung_y(f, pl, NULL) + plane_center_y(pl));
 }
 
-int resolve_plane(variant id, void *addr)
+static int resolve_plane(variant id, void *addr)
 {
   int result = 0;
   plane *pl = NULL;
