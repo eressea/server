@@ -16,9 +16,13 @@ extern "C" {
 #endif
 
   struct summary;
-  extern void report_summary(struct summary *n, struct summary *o,
-    bool full);
-  extern struct summary *make_summary(void);
+
+  void report_summary(struct summary *n, struct summary *o, bool full);
+  struct summary *make_summary(void);
+
+  int update_nmrs(void);
+  extern int* nmrs;
+
 
 #ifdef __cplusplus
 }

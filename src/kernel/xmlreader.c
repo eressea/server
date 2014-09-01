@@ -29,6 +29,8 @@ without prior permission by the authors of Eressea.
 #include "spellbook.h"
 #include "calendar.h"
 
+#include "vortex.h"
+
 /* util includes */
 #include <util/attrib.h>
 #include <util/bsdstring.h>
@@ -454,33 +456,6 @@ static int parse_calendar(xmlDocPtr doc)
       xmlXPathFreeObject(xpathSeasons);
     }
   xmlXPathFreeObject(xpathCalendars);
-  xmlXPathFreeContext(xpath);
-
-  return rv;
-}
-
-static int parse_directions(xmlDocPtr doc)
-{
-  xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
-  xmlXPathObjectPtr xpathDirections;
-  xmlNodeSetPtr nsetDirections;
-  int rv = 0;
-
-  /* reading eressea/directions/dir */
-  xpathDirections =
-    xmlXPathEvalExpression(BAD_CAST "/eressea/directions/dir", xpath);
-  nsetDirections = xpathDirections->nodesetval;
-  if (nsetDirections != NULL) {
-    int k;
-    for (k = 0; k != nsetDirections->nodeNr; ++k) {
-      xmlNodePtr dir = nsetDirections->nodeTab[k];
-      xmlChar *propValue = xmlGetProp(dir, BAD_CAST "name");
-
-      register_special_direction((const char *)propValue);
-      xmlFree(propValue);
-    }
-  }
-  xmlXPathFreeObject(xpathDirections);
   xmlXPathFreeContext(xpath);
 
   return rv;
@@ -2307,6 +2282,5 @@ void register_xmlreader(void)
   xml_register_callback(parse_equipment);       /* requires spells */
   xml_register_callback(parse_races);   /* requires spells */
   xml_register_callback(parse_calendar);
-  xml_register_callback(parse_directions);
 }
 #endif

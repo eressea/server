@@ -21,6 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include <kernel/config.h>
 
+#include "reports.h"
 /* modules includes */
 #include <modules/score.h>
 
@@ -35,9 +36,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "economy.h"
 #include "monster.h"
 #include "laws.h"
+#include "move.h"
+#include "alchemy.h"
+#include "vortex.h"
 
 /* kernel includes */
-#include <kernel/alchemy.h>
 #include <kernel/ally.h>
 #include <kernel/connection.h>
 #include <kernel/build.h>
@@ -48,7 +51,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/group.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
-#include <kernel/move.h>
 #include <kernel/objtypes.h>
 #include <kernel/order.h>
 #include <kernel/plane.h>
@@ -56,7 +58,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/render.h>
-#include <kernel/reports.h>
 #include <kernel/resources.h>
 #include <kernel/save.h>
 #include <kernel/ship.h>
@@ -1127,46 +1128,47 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
         /* list directions */
 
         dh = false;
-        for (d = 0; d != MAXDIRECTIONS; d++)
+        for (d = 0; d != MAXDIRECTIONS; d++) {
             if (see[d]) {
-            region *r2 = rconnect(r, d);
-            if (!r2)
-                continue;
-            nrd--;
-            if (dh) {
-                char regname[4096];
-                if (nrd == 0) {
+                region *r2 = rconnect(r, d);
+                if (!r2)
+                    continue;
+                nrd--;
+                if (dh) {
+                    char regname[4096];
+                    if (nrd == 0) {
+                        bytes = (int)strlcpy(bufp, " ", size);
+                        if (wrptr(&bufp, &size, bytes) != 0)
+                            WARN_STATIC_BUFFER();
+                        bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_nb_final"), size);
+                    }
+                    else {
+                        bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_nb_next"), size);
+                    }
+                    if (wrptr(&bufp, &size, bytes) != 0)
+                        WARN_STATIC_BUFFER();
+                    bytes = (int)strlcpy(bufp, LOC(f->locale, directions[d]), size);
+                    if (wrptr(&bufp, &size, bytes) != 0)
+                        WARN_STATIC_BUFFER();
                     bytes = (int)strlcpy(bufp, " ", size);
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
-                    bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_nb_final"), size);
+                    f_regionid(r2, f, regname, sizeof(regname));
+                    bytes = _snprintf(bufp, size, trailinto(r2, f->locale), regname);
+                    if (wrptr(&bufp, &size, bytes) != 0)
+                        WARN_STATIC_BUFFER();
                 }
                 else {
-                    bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_nb_next"), size);
+                    bytes = (int)strlcpy(bufp, " ", size);
+                    if (wrptr(&bufp, &size, bytes) != 0)
+                        WARN_STATIC_BUFFER();
+                    MSG(("nr_vicinitystart", "dir region", d, r2), bufp, size, f->locale,
+                        f);
+                    bufp += strlen(bufp);
+                    dh = true;
                 }
-                if (wrptr(&bufp, &size, bytes) != 0)
-                    WARN_STATIC_BUFFER();
-                bytes = (int)strlcpy(bufp, LOC(f->locale, directions[d]), size);
-                if (wrptr(&bufp, &size, bytes) != 0)
-                    WARN_STATIC_BUFFER();
-                bytes = (int)strlcpy(bufp, " ", size);
-                if (wrptr(&bufp, &size, bytes) != 0)
-                    WARN_STATIC_BUFFER();
-                f_regionid(r2, f, regname, sizeof(regname));
-                bytes = _snprintf(bufp, size, trailinto(r2, f->locale), regname);
-                if (wrptr(&bufp, &size, bytes) != 0)
-                    WARN_STATIC_BUFFER();
             }
-            else {
-                bytes = (int)strlcpy(bufp, " ", size);
-                if (wrptr(&bufp, &size, bytes) != 0)
-                    WARN_STATIC_BUFFER();
-                MSG(("nr_vicinitystart", "dir region", d, r2), bufp, size, f->locale,
-                    f);
-                bufp += strlen(bufp);
-                dh = true;
-            }
-            }
+        }
         /* Spezielle Richtungen */
         for (a = a_find(r->attribs, &at_direction); a && a->type == &at_direction;
             a = a->next) {

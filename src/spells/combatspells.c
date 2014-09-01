@@ -15,7 +15,6 @@
 #include "combatspells.h"
 
 /* kernel includes */
-#include <kernel/battle.h>
 #include <kernel/build.h>
 #include <kernel/building.h>
 #include <kernel/curse.h>
@@ -27,11 +26,13 @@
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
-#include <kernel/move.h>
 #include <kernel/spell.h>
 #include <kernel/spellid.h>
 #include <kernel/race.h>
 #include <kernel/terrain.h>
+
+#include <battle.h>
+#include <move.h>
 
 /* util includes */
 #include <util/attrib.h>

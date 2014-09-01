@@ -27,7 +27,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "alliance.h"
 #include "ally.h"
 #include "alchemy.h"
-#include "battle.h"
 #include "connection.h"
 #include "building.h"
 #include "calendar.h"
@@ -40,7 +39,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "magic.h"
 #include "messages.h"
 #include "move.h"
-#include "names.h"
 #include "objtypes.h"
 #include "order.h"
 #include "plane.h"
@@ -75,6 +73,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/unicode.h>
 #include <util/umlaut.h>
 #include <util/xml.h>
+
+#include <stealth.h>
 
 #ifdef USE_LIBXML2
 /* libxml includes */
@@ -667,23 +667,6 @@ region *findunitregion(const unit * su)
 
     return (region *) NULL;
 #endif
-}
-
-int eff_stealth(const unit * u, const region * r)
-{
-    int e = 0;
-
-    /* Auf Schiffen keine Tarnung! */
-    if (!u->ship && skill_enabled(SK_STEALTH)) {
-        e = eff_skill(u, SK_STEALTH, r);
-
-        if (fval(u, UFL_STEALTH)) {
-            int es = u_geteffstealth(u);
-            if (es >= 0 && es < e)
-                return es;
-        }
-    }
-    return e;
 }
 
 bool unit_has_cursed_item(unit * u)
@@ -2684,40 +2667,6 @@ message *movement_error(unit * u, const char *token, order * ord,
     return NULL;
 }
 
-int movewhere(const unit * u, const char *token, region * r, region ** resultp)
-{
-    region *r2;
-    direction_t d;
-
-    if (!token || *token == '\0') {
-        *resultp = NULL;
-        return E_MOVE_OK;
-    }
-
-    d = get_direction(token, u->faction->locale);
-    switch (d) {
-    case D_PAUSE:
-        *resultp = r;
-        break;
-
-    case NODIRECTION:
-        r2 = find_special_direction(r, token, u->faction->locale);
-        if (r2 == NULL) {
-            return E_MOVE_NOREGION;
-        }
-        *resultp = r2;
-        break;
-
-    default:
-        r2 = rconnect(r, d);
-        if (r2 == NULL || move_blocked(u, r, r2)) {
-            return E_MOVE_BLOCKED;
-        }
-        *resultp = r2;
-    }
-    return E_MOVE_OK;
-}
-
 bool move_blocked(const unit * u, const region * r, const region * r2)
 {
     connection *b;
@@ -2796,7 +2745,6 @@ void attrib_init(void)
     at_register(&at_seenspell);
 
     /* neue REGION-Attribute */
-    at_register(&at_direction);
     at_register(&at_moveblock);
     at_register(&at_deathcount);
     at_register(&at_chaoscount);

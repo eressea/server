@@ -30,9 +30,12 @@ without prior permission by the authors of Eressea.
 /* gamecode includes */
 #include "laws.h"
 #include "economy.h"
+#include "stealth.h"
+#include "move.h"
+#include "reports.h"
+#include "alchemy.h"
 
 /* kernel includes */
-#include <kernel/alchemy.h>
 #include <kernel/alliance.h>
 #include <kernel/ally.h>
 #include <kernel/connection.h>
@@ -42,12 +45,10 @@ without prior permission by the authors of Eressea.
 #include <kernel/group.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
-#include <kernel/move.h>
 #include <kernel/order.h>
 #include <kernel/plane.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/reports.h>
 #include <kernel/resources.h>
 #include <kernel/ship.h>
 #include <kernel/spell.h>

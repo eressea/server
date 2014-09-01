@@ -22,10 +22,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "economy.h"
 #include "monster.h"
+#include "move.h"
+#include "alchemy.h"
 
 /* kernel includes */
-#include <kernel/alchemy.h>
-#include <kernel/battle.h>
 #include <kernel/building.h>
 #include <kernel/curse.h>
 #include <kernel/equipment.h>
@@ -33,8 +33,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/item.h>
 #include <kernel/magic.h>
 #include <kernel/messages.h>
-#include <kernel/move.h>
-#include <kernel/names.h>
 #include <kernel/order.h>
 #include <kernel/plane.h>
 #include <kernel/pool.h>

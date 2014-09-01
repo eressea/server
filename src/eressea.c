@@ -14,10 +14,7 @@
 #include <triggers/triggers.h>
 #include <util/language.h>
 #include <kernel/xmlreader.h>
-#include <kernel/reports.h>
 #include <kernel/item.h>
-#include <kernel/names.h>
-#include <kernel/reports.h>
 #include <kernel/building.h>
 #include <modules/wormhole.h>
 #include <modules/gmcmd.h>
@@ -27,6 +24,7 @@
 #include "report.h"
 #include "items.h"
 #include "creport.h"
+#include "names.h"
 
 void game_done(void)
 {

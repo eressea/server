@@ -10,8 +10,9 @@ This program may not be used, modified or distributed
 without prior permission by the authors of Eressea.
 */
 
-#include "helpers.h"
 #include <platform.h>
+#include "helpers.h"
+#include "vortex.h"
 
 #include <util/attrib.h>
 #include <util/base36.h>
@@ -541,6 +542,7 @@ int tolua_toid(lua_State * L, int idx, int def)
 
 void register_tolua_helpers(void)
 {
+    at_register(&at_direction);
     at_register(&at_building_action);
 
   register_function((pf_generic) & lua_building_protection,

@@ -521,9 +521,7 @@ int build(unit * u, const construction * ctype, int completed, int want)
       }
     }
 
-    if (want > 0) {
-      n = _min(want, n);
-    }
+    if (want < n) n = want;
 
     if (type->maxsize > 0) {
       n = _min(type->maxsize - completed, n);

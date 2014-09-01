@@ -31,8 +31,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "build.h"
 #include "bindings.h"
 #include "races/races.h"
-#include "spells/spells.h"
-#include "spells/borders.h"
+#include "spells.h"
 
 #include <lua.h>
 #include <assert.h>
@@ -266,7 +265,6 @@ int main(int argc, char **argv)
     L = lua_init();
     game_init();
     register_races();
-    register_borders();
     register_spells();
     bind_monsters(L);
     err = eressea_run(L, luafile);

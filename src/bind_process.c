@@ -6,11 +6,11 @@
 #include <kernel/config.h>
 #include <kernel/magic.h>
 #include <kernel/order.h>
-#include <kernel/battle.h>
 #include <kernel/region.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
-#include <kernel/move.h>
+#include "battle.h"
+#include "move.h"
 #include "economy.h"
 #include "laws.h"
 #include "market.h"

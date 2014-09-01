@@ -19,18 +19,18 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include <kernel/config.h>
 #include "alchemy.h"
-
-#include "item.h"
-#include "faction.h"
-#include "messages.h"
-#include "build.h"
-#include "magic.h"
-#include "region.h"
-#include "pool.h"
-#include "race.h"
-#include "unit.h"
-#include "skill.h"
 #include "move.h"
+#include "skill.h"
+
+#include <kernel/item.h>
+#include <kernel/faction.h>
+#include <kernel/messages.h>
+#include <kernel/build.h>
+#include <kernel/magic.h>
+#include <kernel/region.h>
+#include <kernel/pool.h>
+#include <kernel/race.h>
+#include <kernel/unit.h>
 
 /* util includes */
 #include <util/attrib.h>

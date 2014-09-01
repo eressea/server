@@ -251,7 +251,6 @@ extern "C" {
     bool has_limited_skills(const struct unit *u);
     const struct race *findrace(const char *, const struct locale *);
 
-    int eff_stealth(const struct unit *u, const struct region *r);
     int ispresent(const struct faction *f, const struct region *r);
 
     int check_option(struct faction *f, int option);
@@ -339,15 +338,6 @@ extern "C" {
     bool move_blocked(const struct unit *u, const struct region *src,
         const struct region *dest);
     void add_income(struct unit *u, int type, int want, int qty);
-
-    /* movewhere error codes */
-    enum {
-        E_MOVE_OK = 0,              /* possible to move */
-        E_MOVE_NOREGION,            /* no region exists in this direction */
-        E_MOVE_BLOCKED              /* cannot see this region, there is a blocking connection. */
-    };
-    int movewhere(const struct unit *u, const char *token,
-    struct region *r, struct region **resultp);
 
     const char *datapath(void);
     void set_datapath(const char *path);

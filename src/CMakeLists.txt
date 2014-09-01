@@ -1,14 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 project (server C)
 
-IF(CMAKE_COMPILER_IS_GNUCC)
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long")
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -DHAVE__BOOL")
-ELSEIF(MSVC)
-ELSE(CMAKE_COMPILER_IS_GNUCC)
-    MESSAGE(STATUS "Unknown compiler ${CMAKE_C_COMPILER_ID}")
-ENDIF(CMAKE_COMPILER_IS_GNUCC)
-
 include_directories (${CMAKE_CURRENT_SOURCE_DIR})
 include_directories (${CRITBIT_INCLUDE_DIR})
 include_directories (${CJSON_INCLUDE_DIR})
@@ -19,6 +11,19 @@ include_directories (${CUTEST_INCLUDE_DIR})
 include_directories (${LUA_INCLUDE_DIR})
 include_directories (${BSON_INCLUDE_DIR})
 include_directories (${INIPARSER_INCLUDE_DIR})
+
+IF(CMAKE_COMPILER_IS_GNUCC)
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long")
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -DHAVE__BOOL")
+elseif(MSVC)
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W4 /WX /MP")
+    set(CMAKE_EXE_LINKER_FLAGS_DEBUG
+        "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:libc.lib /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:libcd.lib /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:msvcrt.lib")
+    set(CMAKE_EXE_LINKER_FLAGS_RELEASE
+        "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /NODEFAULTLIB:libc.lib /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:libcd.lib /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:msvcrtd.lib")
+ELSE(CMAKE_COMPILER_IS_GNUCC)
+    MESSAGE(STATUS "Unknown compiler ${CMAKE_C_COMPILER_ID}")
+ENDIF(CMAKE_COMPILER_IS_GNUCC)
 
 add_subdirectory(util)
 add_subdirectory(kernel)
@@ -58,6 +63,14 @@ TOLUA_BINDING(settings.pkg bind_settings.h)
 ENDIF()
 
 set (ERESSEA_SRC
+  move.c
+  spells.c
+  battle.c
+  alchemy.c
+  stealth.c
+  vortex.c
+  names.c
+  reports.c
   eressea.c
   callback.c
   direction.c
@@ -141,7 +154,12 @@ target_link_libraries(eressea
 set(TESTS_SRC
   test_eressea.c
   tests.c
+  battle.test.c
+  vortex.test.c
   tests.test.c
+  reports.test.c
+  stealth.test.c
+  move.test.c
   callback.test.c
   direction.test.c
   keyword.test.c

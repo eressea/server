@@ -20,14 +20,15 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "spy.h"
 #include "laws.h"
+#include "stealth.h"
+#include "move.h"
+#include "reports.h"
 
 /* kernel includes */
-#include <kernel/reports.h>
 #include <kernel/item.h>
 #include <kernel/faction.h>
 #include <kernel/magic.h>
 #include <kernel/messages.h>
-#include <kernel/move.h>
 #include <kernel/order.h>
 #include <kernel/race.h>
 #include <kernel/region.h>

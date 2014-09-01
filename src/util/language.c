@@ -234,6 +234,15 @@ void ** get_translations(const struct locale *lang, int index)
     return lstrs[0].tokens + index;
 }
 
+void *get_translation(const struct locale *lang, const char *str, int index) {
+    void **tokens = get_translations(lang, index);
+    variant var;
+    if (findtoken(*tokens, str, &var) == E_TOK_SUCCESS) {
+        return var.v;
+    }
+    return NULL;
+}
+
 void free_locales(void)
 {
     while (locales) {

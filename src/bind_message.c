@@ -1,11 +1,12 @@
 #include <platform.h>
 #include <kernel/config.h>
 
+#include "spells.h"
+
 /* kernel includes */
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
-#include <kernel/reports.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
 

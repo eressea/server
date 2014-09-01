@@ -20,7 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define H_KRNL_REPORTS
 
 #include <time.h>
-#include "objtypes.h"
+#include <kernel/objtypes.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -112,9 +112,6 @@ extern "C" {
 
     void register_reports(void);
 
-    int update_nmrs(void);
-    int *nmrs;
-
     struct message *msg_curse(const struct curse *c, const void *obj,
         objtype_t typ, int slef);
 
@@ -141,12 +138,6 @@ extern "C" {
         const char **rcillusion);
 
     void add_seen_faction(struct faction *self, struct faction *seen);
-#define ACTION_RESET      0x01  /* reset the one-time-flag FFL_SELECT (on first pass) */
-#define ACTION_CANSEE     0x02  /* to people who can see the actor */
-#define ACTION_CANNOTSEE  0x04  /* to people who can not see the actor */
-    int report_action(struct region *r, struct unit *actor,
-    struct message *msg, int flags);
-
     size_t f_regionid(const struct region *r, const struct faction *f,
         char *buffer, size_t size);
 

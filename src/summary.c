@@ -13,7 +13,6 @@
 #include <kernel/config.h>
 
 #include "summary.h"
-
 #include "laws.h"
 
 #include <kernel/alliance.h>
@@ -22,7 +21,6 @@
 #include <kernel/item.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/reports.h>
 #include <kernel/save.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
@@ -70,6 +68,38 @@ typedef struct summary {
     const struct locale *locale;
   } *languages;
 } summary;
+
+
+int *nmrs = NULL;
+
+int update_nmrs(void)
+{
+    int i, newplayers = 0;
+    faction *f;
+    int turn = global.data_turn;
+
+    if (nmrs == NULL)
+        nmrs = malloc(sizeof(int) * (NMRTimeout() + 1));
+    for (i = 0; i <= NMRTimeout(); ++i) {
+        nmrs[i] = 0;
+    }
+
+    for (f = factions; f; f = f->next) {
+        if (fval(f, FFL_ISNEW)) {
+            ++newplayers;
+        }
+        else if (!is_monsters(f) && f->alive) {
+            int nmr = turn - f->lastorders + 1;
+            if (nmr < 0 || nmr > NMRTimeout()) {
+                log_error("faction %s has %d NMRS\n", factionid(f), nmr);
+                nmr = _max(0, nmr);
+                nmr = _min(nmr, NMRTimeout());
+            }
+            ++nmrs[nmr];
+        }
+    }
+    return newplayers;
+}
 
 static char *pcomp(double i, double j)
 {

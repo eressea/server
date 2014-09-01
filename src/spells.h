@@ -21,10 +21,15 @@ extern "C" {
   struct ship;
   struct curse;
   struct unit;
+  struct message;
 
-  extern void register_spells(void);
-
+  void register_spells(void);
   void set_spelldata(struct spell *sp);
+
+#define ACTION_RESET      0x01  /* reset the one-time-flag FFL_SELECT (on first pass) */
+#define ACTION_CANSEE     0x02  /* to people who can see the actor */
+#define ACTION_CANNOTSEE  0x04  /* to people who can not see the actor */
+  int report_action(struct region *r, struct unit *actor, struct message *msg, int flags);
 
 #ifdef __cplusplus
 }

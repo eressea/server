@@ -31,12 +31,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "study.h"
 #include "market.h"
 #include "keyword.h"
+#include "move.h"
+#include "battle.h"
+#include "alchemy.h"
 
 /* kernel includes */
-#include <kernel/alchemy.h>
 #include <kernel/alliance.h>
 #include <kernel/ally.h>
-#include <kernel/battle.h>
 #include <kernel/connection.h>
 #include <kernel/curse.h>
 #include <kernel/building.h>
@@ -46,7 +47,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/item.h>
 #include <kernel/magic.h>
 #include <kernel/messages.h>
-#include <kernel/move.h>
 #include <kernel/order.h>
 #include <kernel/plane.h>
 #include <kernel/pool.h>

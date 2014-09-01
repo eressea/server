@@ -1,13 +1,15 @@
 #include <kernel/types.h>
 #include <platform.h>
+
 #include "battle.h"
-#include "building.h"
-#include "faction.h"
-#include "item.h"
-#include "race.h"
-#include "region.h"
 #include "skill.h"
-#include "unit.h"
+
+#include <kernel/building.h>
+#include <kernel/faction.h>
+#include <kernel/item.h>
+#include <kernel/race.h>
+#include <kernel/region.h>
+#include <kernel/unit.h>
 
 #include <CuTest.h>
 #include "tests.h"

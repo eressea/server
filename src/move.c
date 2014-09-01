@@ -20,31 +20,33 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include <kernel/config.h>
 #include "move.h"
-
-#include "alchemy.h"
-#include "connection.h"
-#include "build.h"
-#include "building.h"
-#include "calendar.h"
-#include "curse.h"
-#include "direction.h"
-#include "faction.h"
-#include "item.h"
-#include "magic.h"
-#include "messages.h"
-#include "order.h"
-#include "plane.h"
-#include "race.h"
-#include "region.h"
-#include "render.h"
 #include "reports.h"
-#include "save.h"
-#include "ship.h"
+#include "alchemy.h"
+#include "vortex.h"
+
+#include <kernel/build.h>
+#include <kernel/building.h>
+#include <kernel/calendar.h>
+#include <kernel/connection.h>
+#include <kernel/curse.h>
+#include <kernel/faction.h>
+#include <kernel/item.h>
+#include <kernel/magic.h>
+#include <kernel/messages.h>
+#include <kernel/order.h>
+#include <kernel/plane.h>
+#include <kernel/race.h>
+#include <kernel/region.h>
+#include <kernel/render.h>
+#include <kernel/save.h>
+#include <kernel/ship.h>
+#include <kernel/teleport.h>
+#include <kernel/terrain.h>
+#include <kernel/terrainid.h>
+#include <kernel/unit.h>
+
+#include "direction.h"
 #include "skill.h"
-#include "terrain.h"
-#include "terrainid.h"
-#include "teleport.h"
-#include "unit.h"
 
 /* util includes */
 #include <util/attrib.h>
@@ -57,6 +59,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/rng.h>
+
+#include <stealth.h>
 
 #include <storage.h>
 
@@ -538,6 +542,36 @@ void travelthru(const unit * u, region * r)
 #ifdef SMART_INTERVALS
     update_interval(u->faction, r);
 #endif
+}
+
+static direction_t
+koor_reldirection(int ax, int ay, int bx, int by, const struct plane *pl)
+{
+    int dir;
+    for (dir = 0; dir != MAXDIRECTIONS; ++dir) {
+        int x = ax + delta_x[dir];
+        int y = ay + delta_y[dir];
+        pnormalize(&x, &y, pl);
+        if (bx == x && by == y)
+            return (direction_t)dir;
+    }
+    return NODIRECTION;
+}
+
+direction_t reldirection(const region * from, const region * to)
+{
+    plane *pl = rplane(from);
+    if (pl == rplane(to)) {
+        direction_t dir = koor_reldirection(from->x, from->y, to->x, to->y, pl);
+
+        if (dir == NODIRECTION) {
+            spec_direction *sd = special_direction(from, to);
+            if (sd != NULL && sd->active)
+                return D_SPECIAL;
+        }
+        return dir;
+    }
+    return NODIRECTION;
 }
 
 static void leave_trail(ship * sh, region * from, region_list * route)
@@ -1033,6 +1067,44 @@ unit *is_guarded(region * r, unit * u, unsigned int mask)
         freset(r, RF_GUARDED);
     }
     return NULL;
+}
+
+int movewhere(const unit * u, const char *token, region * r, region ** resultp)
+{
+    region *r2;
+    direction_t d;
+
+    if (!token || *token == '\0') {
+        *resultp = NULL;
+        return E_MOVE_OK;
+    }
+
+    d = get_direction(token, u->faction->locale);
+    switch (d) {
+    case D_PAUSE:
+        *resultp = r;
+        break;
+
+    case NODIRECTION:
+        token = (const char *)get_translation(u->faction->locale, token, UT_SPECDIR);
+        if (!token) {
+            return E_MOVE_NOREGION;
+        }
+        r2 = find_special_direction(r, token);
+        if (r2 == NULL) {
+            return E_MOVE_NOREGION;
+        }
+        *resultp = r2;
+        break;
+
+    default:
+        r2 = rconnect(r, d);
+        if (r2 == NULL || move_blocked(u, r, r2)) {
+            return E_MOVE_BLOCKED;
+        }
+        *resultp = r2;
+    }
+    return E_MOVE_OK;
 }
 
 static const char *shortdirections[MAXDIRECTIONS] = {

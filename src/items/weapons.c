@@ -19,13 +19,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include <kernel/config.h>
 #include "weapons.h"
+#include "battle.h"
 
 #include <kernel/unit.h>
 #include <kernel/build.h>
 #include <kernel/race.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
-#include <kernel/battle.h>
 #include <kernel/pool.h>
 
 /* util includes */
