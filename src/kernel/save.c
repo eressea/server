@@ -1571,7 +1571,9 @@ int readgame(const char *filename, int backup)
             }
         }
         a_read(&store, &pl->attribs, pl);
-        addlist(&planes, pl);
+        if (pl->id != 1094969858) { // Regatta
+            addlist(&planes, pl);
+        }
     }
 
     /* Read factions */
