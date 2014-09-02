@@ -3944,7 +3944,8 @@ void defaultorders(void)
                     char lbuf[8192];
                     order *new_order = 0;
                     const char *s;
-                    init_order(ord);
+                    init_tokens(ord);
+                    skip_token();
                     s = getstrtoken();
                     if (s) {
                         strcpy(lbuf, s);
