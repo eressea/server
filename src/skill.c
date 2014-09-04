@@ -92,9 +92,9 @@ skill_t get_skill(const char *s, const struct locale * lang)
 {
     skill_t result = NOSKILL;
     char buffer[64];
-    char * str = transliterate(buffer, sizeof(buffer)-sizeof(int), s);
     
-    if (str) {
+    if (s) {
+        char * str = transliterate(buffer, sizeof(buffer) - sizeof(int), s);
         int i;
         const void * match;
         void **tokens = get_translations(lang, UT_SKILLS);

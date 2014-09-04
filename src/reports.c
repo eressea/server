@@ -29,7 +29,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/group.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
-#include <kernel/move.h>
 #include <kernel/order.h>
 #include <kernel/plane.h>
 #include <kernel/race.h>
@@ -65,6 +64,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/follow.h>
 #include <attributes/otherfaction.h>
 #include <attributes/racename.h>
+
+#include "move.h"
+#include "stealth.h"
 
 bool nocr = false;
 bool nonr = false;
@@ -107,7 +109,7 @@ const char *combatstatus[] = {
 
 const char *report_kampfstatus(const unit * u, const struct locale *lang)
 {
-    static char fsbuf[64];
+    static char fsbuf[64]; // FIXME: static return value
 
     strlcpy(fsbuf, LOC(lang, combatstatus[u->status]), sizeof(fsbuf));
     if (fval(u, UFL_NOAID)) {
@@ -198,37 +200,6 @@ const char **name, const char **basename, int *number, bool singular)
                 *number = i->number;
         }
     }
-}
-
-int *nmrs = NULL;
-
-int update_nmrs(void)
-{
-    int i, newplayers = 0;
-    faction *f;
-    int turn = global.data_turn;
-
-    if (nmrs == NULL)
-        nmrs = malloc(sizeof(int) * (NMRTimeout() + 1));
-    for (i = 0; i <= NMRTimeout(); ++i) {
-        nmrs[i] = 0;
-    }
-
-    for (f = factions; f; f = f->next) {
-        if (fval(f, FFL_ISNEW)) {
-            ++newplayers;
-        }
-        else if (!is_monsters(f) && f->alive) {
-            int nmr = turn - f->lastorders + 1;
-            if (nmr < 0 || nmr > NMRTimeout()) {
-                log_error("faction %s has %d NMRS\n", factionid(f), nmr);
-                nmr = _max(0, nmr);
-                nmr = _min(nmr, NMRTimeout());
-            }
-            ++nmrs[nmr];
-        }
-    }
-    return newplayers;
 }
 
 #define ORDERS_IN_NR 1
@@ -331,14 +302,14 @@ void report_race(const struct unit *u, const char **name, const char **illusion)
     if (illusion) {
         const race *irace = u_irace(u);
         if (irace && irace != u_race(u)) {
-            *illusion = irace->_name[0];
+            *illusion = irace->_name;
         }
         else {
             *illusion = NULL;
         }
     }
     if (name) {
-        *name = u_race(u)->_name[0];
+        *name = u_race(u)->_name;
         if (fval(u_race(u), RCF_SHAPESHIFTANY)) {
             const char *str = get_racename(u->attribs);
             if (str)
@@ -1048,6 +1019,23 @@ void transfer_seen(quicklist ** dst, quicklist ** src)
     *src = NULL;
 }
 
+int cmp_faction(const void *lhs, const void *rhs) {
+    const faction *lhf = (const faction *)lhs;
+    const faction *rhf = (const faction *)rhs;
+    if (lhf->no == rhf->no) return 0;
+    if (lhf->no > rhf->no) return 1;
+    return -1;
+}
+
+static void add_seen_faction_i(struct quicklist **flist, faction *f) {
+    ql_set_insert_ex(flist, f, cmp_faction);
+}
+
+void add_seen_faction(faction *self, faction *seen) {
+    add_seen_faction_i(&self->seen_factions, seen);
+}
+
+
 static void get_addresses(report_context * ctx)
 {
     /* "TODO: travelthru" */
@@ -1065,7 +1053,7 @@ static void get_addresses(report_context * ctx)
         quicklist *ql = ctx->f->alliance->members;
         int qi;
         for (qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-            ql_set_insert(&flist, ql_get(ql, qi));
+            add_seen_faction_i(&flist, (faction *)ql_get(ql, qi));
         }
     }
 
@@ -1084,7 +1072,7 @@ static void get_addresses(report_context * ctx)
                 if (lastf != sf) {
                     if (u->building || u->ship || (stealthmod > INT_MIN
                         && cansee(ctx->f, r, u, stealthmod))) {
-                        ql_set_insert(&flist, sf);
+                        add_seen_faction_i(&flist, sf);
                         lastf = sf;
                     }
                 }
@@ -1101,7 +1089,7 @@ static void get_addresses(report_context * ctx)
                         unit *u2 = (unit *)a->data.v;
                         if (u2->faction == ctx->f) {
                             if (cansee_unit(u2, u, stealthmod)) {
-                                ql_set_insert(&flist, sf);
+                                add_seen_faction_i(&flist, sf);
                                 lastf = sf;
                                 break;
                             }
@@ -1120,7 +1108,7 @@ static void get_addresses(report_context * ctx)
                     bool ballied = sf && sf != ctx->f && sf != lastf
                         && !fval(u, UFL_ANON_FACTION) && cansee(ctx->f, r, u, stealthmod);
                     if (ballied || ALLIED(ctx->f, sf)) {
-                        ql_set_insert(&flist, sf);
+                        add_seen_faction_i(&flist, sf);
                         lastf = sf;
                     }
                 }
@@ -1133,7 +1121,7 @@ static void get_addresses(report_context * ctx)
         faction *f2;
         for (f2 = factions; f2; f2 = f2->next) {
             if (f2->alliance == ctx->f->alliance) {
-                ql_set_insert(&flist, f2);
+                add_seen_faction_i(&flist, f2);
             }
         }
     }
@@ -1928,7 +1916,7 @@ f_regionid(const region * r, const faction * f, char *buffer, size_t size)
 static char *f_regionid_s(const region * r, const faction * f)
 {
     static int i = 0;
-    static char bufs[4][NAMESIZE + 20];
+    static char bufs[4][NAMESIZE + 20]; // FIXME: static return value
     char *buf = bufs[(++i) % 4];
 
     f_regionid(r, f, buf, NAMESIZE + 20);
@@ -2166,7 +2154,7 @@ static void eval_race(struct opstack **stack, const void *userdata)
     const struct locale *lang = report ? report->locale : default_locale;
     int j = opop(stack).i;
     const race *r = (const race *)opop(stack).v;
-    const char *c = LOC(lang, rc_name(r, j != 1));
+    const char *c = LOC(lang, rc_name(r, (j == 1) ? NAME_SINGULAR : NAME_PLURAL));
     size_t len = strlen(c);
     variant var;
 
@@ -2177,7 +2165,7 @@ static void eval_race(struct opstack **stack, const void *userdata)
 static void eval_order(struct opstack **stack, const void *userdata)
 {                               /* order -> string */
     const struct order *ord = (const struct order *)opop(stack).v;
-    static char buf[512];
+    char buf[512];
     size_t len;
     variant var;
 
@@ -2193,7 +2181,7 @@ static void eval_resources(struct opstack **stack, const void *userdata)
     const faction *report = (const faction *)userdata;
     const struct locale *lang = report ? report->locale : default_locale;
     const struct resource *res = (const struct resource *)opop(stack).v;
-    static char buf[1024];        /* but we only use about half of this */
+    char buf[1024];        /* but we only use about half of this */
     size_t size = sizeof(buf) - 1;
     variant var;
 
@@ -2225,7 +2213,7 @@ static void eval_regions(struct opstack **stack, const void *userdata)
     int i = opop(stack).i;
     int end, begin = opop(stack).i;
     const arg_regions *regions = (const arg_regions *)opop(stack).v;
-    static char buf[256];
+    char buf[256];
     size_t size = sizeof(buf) - 1;
     variant var;
     char *bufp = buf;
@@ -2262,7 +2250,7 @@ static void eval_trail(struct opstack **stack, const void *userdata)
     const struct locale *lang = report ? report->locale : default_locale;
     int i, end = 0, begin = 0;
     const arg_regions *regions = (const arg_regions *)opop(stack).v;
-    static char buf[512];
+    char buf[512];
     size_t size = sizeof(buf) - 1;
     variant var;
     char *bufp = buf;
@@ -2360,54 +2348,6 @@ static void log_orders(const struct message *msg)
             break;
         }
     }
-}
-
-int report_action(region * r, unit * actor, message * msg, int flags)
-{
-    int result = 0;
-    unit *u;
-    int view = flags & (ACTION_CANSEE | ACTION_CANNOTSEE);
-
-    /* melden, 1x pro Partei */
-    if (flags & ACTION_RESET) {
-        freset(actor->faction, FFL_SELECT);
-        for (u = r->units; u; u = u->next)
-            freset(u->faction, FFL_SELECT);
-    }
-    if (view) {
-        for (u = r->units; u; u = u->next) {
-            if (!fval(u->faction, FFL_SELECT)) {
-                bool show = u->faction == actor->faction;
-                fset(u->faction, FFL_SELECT);
-                if (view == ACTION_CANSEE) {
-                    /* Bei Fernzaubern sieht nur die eigene Partei den Magier */
-                    show = show || (r == actor->region
-                        && cansee(u->faction, r, actor, 0));
-                }
-                else if (view == ACTION_CANNOTSEE) {
-                    show = !show && !(r == actor->region
-                        && cansee(u->faction, r, actor, 0));
-                }
-                else {
-                    /* the unliely (or lazy) case */
-                    show = true;
-                }
-
-                if (show) {
-                    r_addmessage(r, u->faction, msg);
-                }
-                else {                /* Partei des Magiers, sieht diesen immer */
-                    result = 1;
-                }
-            }
-        }
-        /* Ist niemand von der Partei des Magiers in der Region, dem Magier
-         * nochmal gesondert melden */
-        if ((flags & ACTION_CANSEE) && !fval(actor->faction, FFL_SELECT)) {
-            add_message(&actor->faction->msgs, msg);
-        }
-    }
-    return result;
 }
 
 void register_reports(void)

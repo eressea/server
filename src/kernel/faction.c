@@ -255,7 +255,7 @@ unit *addplayer(region * r, faction * f)
     u = createunit(r, f, 1, f->race);
     equip_items(&u->faction->items, get_equipment("new_faction"));
     equip_unit(u, get_equipment("first_unit"));
-    sprintf(buffer, "first_%s", u_race(u)->_name[0]);
+    sprintf(buffer, "first_%s", u_race(u)->_name);
     equip_unit(u, get_equipment(buffer));
     u->hp = unit_max_hp(u) * u->number;
     fset(u, UFL_ISNEW);

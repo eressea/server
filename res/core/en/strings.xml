@@ -176,6 +176,9 @@
   <string name="wall1">
     <text locale="en">Wall</text>
   </string>
+  <string name="wall1_trail">
+    <text locale="de">a solid wall</text>
+  </string>
   <string name="hall1_trail">
     <text locale="en">the %s</text>
   </string>
@@ -1274,7 +1277,7 @@
   <string name="STUFE">
     <text locale="en">LEVEL</text>
   </string>
-  <string name="TEMPORAERE">
+  <string name="TEMP">
     <text locale="en">TEMPORARY</text>
   </string>
   <string name="TRAENKE">
@@ -1476,7 +1479,7 @@
     <text locale="en">MAKE</text>
   </string>
   <string name="maketemp">
-    <text locale="de">MAKE TEMP</text>
+    <text locale="en">MAKETEMP</text>
   </string>
   <string name="move">
     <text locale="en">MOVE</text>

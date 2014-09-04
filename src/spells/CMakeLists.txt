@@ -6,7 +6,6 @@ buildingcurse.c
 combatspells.c
 regioncurse.c
 shipcurse.c
-spells.c
 unitcurse.c
 )
 FOREACH(_FILE ${_FILES})

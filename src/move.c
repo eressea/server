@@ -20,31 +20,33 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include <kernel/config.h>
 #include "move.h"
-
-#include "alchemy.h"
-#include "connection.h"
-#include "build.h"
-#include "building.h"
-#include "calendar.h"
-#include "curse.h"
-#include "direction.h"
-#include "faction.h"
-#include "item.h"
-#include "magic.h"
-#include "messages.h"
-#include "order.h"
-#include "plane.h"
-#include "race.h"
-#include "region.h"
-#include "render.h"
 #include "reports.h"
-#include "save.h"
-#include "ship.h"
+#include "alchemy.h"
+#include "vortex.h"
+
+#include <kernel/build.h>
+#include <kernel/building.h>
+#include <kernel/calendar.h>
+#include <kernel/connection.h>
+#include <kernel/curse.h>
+#include <kernel/faction.h>
+#include <kernel/item.h>
+#include <kernel/magic.h>
+#include <kernel/messages.h>
+#include <kernel/order.h>
+#include <kernel/plane.h>
+#include <kernel/race.h>
+#include <kernel/region.h>
+#include <kernel/render.h>
+#include <kernel/save.h>
+#include <kernel/ship.h>
+#include <kernel/teleport.h>
+#include <kernel/terrain.h>
+#include <kernel/terrainid.h>
+#include <kernel/unit.h>
+
+#include "direction.h"
 #include "skill.h"
-#include "terrain.h"
-#include "terrainid.h"
-#include "teleport.h"
-#include "unit.h"
 
 /* util includes */
 #include <util/attrib.h>
@@ -57,6 +59,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/rng.h>
+
+#include <stealth.h>
 
 #include <storage.h>
 
@@ -538,6 +542,36 @@ void travelthru(const unit * u, region * r)
 #ifdef SMART_INTERVALS
     update_interval(u->faction, r);
 #endif
+}
+
+static direction_t
+koor_reldirection(int ax, int ay, int bx, int by, const struct plane *pl)
+{
+    int dir;
+    for (dir = 0; dir != MAXDIRECTIONS; ++dir) {
+        int x = ax + delta_x[dir];
+        int y = ay + delta_y[dir];
+        pnormalize(&x, &y, pl);
+        if (bx == x && by == y)
+            return (direction_t)dir;
+    }
+    return NODIRECTION;
+}
+
+direction_t reldirection(const region * from, const region * to)
+{
+    plane *pl = rplane(from);
+    if (pl == rplane(to)) {
+        direction_t dir = koor_reldirection(from->x, from->y, to->x, to->y, pl);
+
+        if (dir == NODIRECTION) {
+            spec_direction *sd = special_direction(from, to);
+            if (sd != NULL && sd->active)
+                return D_SPECIAL;
+        }
+        return dir;
+    }
+    return NODIRECTION;
 }
 
 static void leave_trail(ship * sh, region * from, region_list * route)
@@ -1035,6 +1069,44 @@ unit *is_guarded(region * r, unit * u, unsigned int mask)
     return NULL;
 }
 
+int movewhere(const unit * u, const char *token, region * r, region ** resultp)
+{
+    region *r2;
+    direction_t d;
+
+    if (!token || *token == '\0') {
+        *resultp = NULL;
+        return E_MOVE_OK;
+    }
+
+    d = get_direction(token, u->faction->locale);
+    switch (d) {
+    case D_PAUSE:
+        *resultp = r;
+        break;
+
+    case NODIRECTION:
+        token = (const char *)get_translation(u->faction->locale, token, UT_SPECDIR);
+        if (!token) {
+            return E_MOVE_NOREGION;
+        }
+        r2 = find_special_direction(r, token);
+        if (r2 == NULL) {
+            return E_MOVE_NOREGION;
+        }
+        *resultp = r2;
+        break;
+
+    default:
+        r2 = rconnect(r, d);
+        if (r2 == NULL || move_blocked(u, r, r2)) {
+            return E_MOVE_BLOCKED;
+        }
+        *resultp = r2;
+    }
+    return E_MOVE_OK;
+}
+
 static const char *shortdirections[MAXDIRECTIONS] = {
     "dir_nw",
     "dir_ne",
@@ -1060,8 +1132,7 @@ static void cycle_route(order * ord, unit * u, int gereist)
         return;
     tail[0] = '\0';
 
-    init_tokens(ord);
-    skip_token();
+    init_order(ord);
 
     neworder[0] = 0;
     for (cm = 0;; ++cm) {
@@ -1142,8 +1213,7 @@ static bool transport(unit * ut, unit * u)
 
     for (ord = ut->orders; ord; ord = ord->next) {
         if (getkeyword(ord) == K_TRANSPORT) {
-            init_tokens(ord);
-            skip_token();
+            init_order(ord);
             if (getunit(ut->region, ut->faction) == u) {
                 return true;
             }
@@ -1176,8 +1246,7 @@ static void init_transportation(void)
                 && !fval(u, UFL_NOTMOVING) && !LongHunger(u)) {
                 unit *ut;
 
-                init_tokens(u->thisorder);
-                skip_token();
+                init_order(u->thisorder);
                 ut = getunit(r, u->faction);
                 if (ut == NULL) {
                     ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
@@ -1207,8 +1276,7 @@ static void init_transportation(void)
 
                 for (ord = u->orders; ord; ord = ord->next) {
                     if (getkeyword(ord) == K_TRANSPORT) {
-                        init_tokens(ord);
-                        skip_token();
+                        init_order(ord);
                         for (;;) {
                             unit *ut = getunit(r, u->faction);
 
@@ -1216,8 +1284,7 @@ static void init_transportation(void)
                                 break;
                             if (getkeyword(ut->thisorder) == K_DRIVE && can_move(ut)
                                 && !fval(ut, UFL_NOTMOVING) && !LongHunger(ut)) {
-                                init_tokens(ut->thisorder);
-                                skip_token();
+                                init_order(ut->thisorder);
                                 if (getunit(r, ut->faction) == u) {
                                     w += weight(ut);
                                 }
@@ -2088,8 +2155,7 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
         if (getkeyword(ord) != K_TRANSPORT)
             continue;
 
-        init_tokens(ord);
-        skip_token();
+        init_order(ord);
         ut = getunit(r, u->faction);
         if (ut != NULL) {
             if (getkeyword(ut->thisorder) == K_DRIVE) {
@@ -2104,8 +2170,7 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
                     bool found = false;
 
                     if (!fval(ut, UFL_NOTMOVING) && !LongHunger(ut)) {
-                        init_tokens(ut->thisorder);
-                        skip_token();
+                        init_order(ut->thisorder);
                         if (getunit(u->region, ut->faction) == u) {
                             const region_list *route_to =
                                 travel_route(ut, route_begin, route_end, ord,
@@ -2301,8 +2366,7 @@ static void piracy_cmd(unit * u, struct order *ord)
     /* Feststellen, ob schon ein anderer alliierter Pirat ein
      * Ziel gefunden hat. */
 
-    init_tokens(ord);
-    skip_token();
+    init_order(ord);
     s = getstrtoken();
     if (s != NULL && *s) {
         il = intlist_init();
@@ -2389,8 +2453,7 @@ static void piracy_cmd(unit * u, struct order *ord)
         LOC(u->faction->locale, directions[target_dir])));
 
     /* Bewegung ausführen */
-    init_tokens(u->thisorder);
-    skip_token();
+    init_order(u->thisorder);
     move(u, true);
 }
 
@@ -2543,8 +2606,7 @@ static void move_hunters(void)
                     if (getkeyword(ord) == K_FOLLOW) {
                         param_t p;
 
-                        init_tokens(ord);
-                        skip_token();
+                        init_order(ord);
                         p = getparam(u->faction->locale);
                         if (p != P_SHIP) {
                             if (p != P_UNIT) {
@@ -2666,15 +2728,13 @@ void movement(void)
                     else {
                         if (ships) {
                             if (u->ship && ship_owner(u->ship) == u) {
-                                init_tokens(u->thisorder);
-                                skip_token();
+                                init_order(u->thisorder);
                                 move(u, false);
                             }
                         }
                         else {
                             if (!u->ship || ship_owner(u->ship) != u) {
-                                init_tokens(u->thisorder);
-                                skip_token();
+                                init_order(u->thisorder);
                                 move(u, false);
                             }
                         }
@@ -2729,10 +2789,10 @@ void follow_unit(unit * u)
         const struct locale *lang = u->faction->locale;
 
         if (getkeyword(ord) == K_FOLLOW) {
-            init_tokens(ord);
-            skip_token();
             int id;
-            param_t p = getparam(lang);
+            param_t p;
+            init_order(ord);
+            p = getparam(lang);
             if (p == P_UNIT) {
                 id = read_unitid(u->faction, r);
                 if (a != NULL) {
@@ -2753,7 +2813,7 @@ void follow_unit(unit * u)
                     a = NULL;
                 }
             }
-            if (p == P_SHIP) {
+            else if (p == P_SHIP) {
                 id = getshipid();
                 if (id <= 0) {
                     /*	cmistake(u, ord, 20, MSG_MOVE); */

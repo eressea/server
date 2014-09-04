@@ -29,6 +29,8 @@ without prior permission by the authors of Eressea.
 #include "spellbook.h"
 #include "calendar.h"
 
+#include "vortex.h"
+
 /* util includes */
 #include <util/attrib.h>
 #include <util/bsdstring.h>
@@ -459,33 +461,6 @@ static int parse_calendar(xmlDocPtr doc)
   return rv;
 }
 
-static int parse_directions(xmlDocPtr doc)
-{
-  xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
-  xmlXPathObjectPtr xpathDirections;
-  xmlNodeSetPtr nsetDirections;
-  int rv = 0;
-
-  /* reading eressea/directions/dir */
-  xpathDirections =
-    xmlXPathEvalExpression(BAD_CAST "/eressea/directions/dir", xpath);
-  nsetDirections = xpathDirections->nodesetval;
-  if (nsetDirections != NULL) {
-    int k;
-    for (k = 0; k != nsetDirections->nodeNr; ++k) {
-      xmlNodePtr dir = nsetDirections->nodeTab[k];
-      xmlChar *propValue = xmlGetProp(dir, BAD_CAST "name");
-
-      register_special_direction((const char *)propValue);
-      xmlFree(propValue);
-    }
-  }
-  xmlXPathFreeObject(xpathDirections);
-  xmlXPathFreeContext(xpath);
-
-  return rv;
-}
-
 static int parse_ships(xmlDocPtr doc)
 {
   xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
@@ -776,7 +751,7 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
 
       parse_function(node, &fun, &propValue);
       if (fun == NULL) {
-        log_error("unknown function name '%s' for item '%s'\n", (const char *)propValue, itype->rtype->_name[0]);
+        log_error("unknown function name '%s' for item '%s'\n", (const char *)propValue, itype->rtype->_name);
         xmlFree(propValue);
         continue;
       }
@@ -786,7 +761,7 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
           (bool(*)(const struct troop *, const struct weapon_type *,
             int *))fun;
       } else {
-        log_error("unknown function type '%s' for item '%s'\n", (const char *)propValue, itype->rtype->_name[0]);
+        log_error("unknown function type '%s' for item '%s'\n", (const char *)propValue, itype->rtype->_name);
       }
       xmlFree(propValue);
   }
@@ -880,7 +855,7 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
 
       parse_function(node, &fun, &propValue);
       if (fun == NULL) {
-        log_error("unknown function name '%s' for item '%s'\n", (const char *)propValue, rtype->_name[0]);
+        log_error("unknown function name '%s' for item '%s'\n", (const char *)propValue, rtype->_name);
         xmlFree(propValue);
         continue;
       }
@@ -901,7 +876,7 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
           (int (*)(struct unit *, int, const struct item_type *, int,
             struct order *))fun;
       } else {
-        log_error("unknown function type '%s' for item '%s'\n", (const char *)propValue, rtype->_name[0]);
+        log_error("unknown function type '%s' for item '%s'\n", (const char *)propValue, rtype->_name);
       }
       xmlFree(propValue);
   }
@@ -997,7 +972,7 @@ static int parse_resources(xmlDocPtr doc)
 
           parse_function(node, &fun, &propValue);
           if (fun == NULL) {
-            log_error("unknown function name '%s' for resource %s\n", (const char *)propValue, rtype->_name[0]);
+            log_error("unknown function name '%s' for resource %s\n", (const char *)propValue, rtype->_name);
             xmlFree(propValue);
             continue;
           }
@@ -1010,7 +985,7 @@ static int parse_resources(xmlDocPtr doc)
           } else if (strcmp((const char *)propValue, "name") == 0) {
             rtype->name = (rtype_name) fun;
           } else {
-            log_error("unknown function type '%s' for resource %s\n", (const char *)propValue, rtype->_name[0]);
+            log_error("unknown function type '%s' for resource %s\n", (const char *)propValue, rtype->_name);
           }
           xmlFree(propValue);
         }
@@ -1077,7 +1052,7 @@ static int parse_resources(xmlDocPtr doc)
               xmlFree(propBldg);
             }
           } else {
-            log_error("unknown type '%s' for resourcelimit-modifier '%s'\n", (const char *)propValue, rtype->_name[0]);
+            log_error("unknown type '%s' for resourcelimit-modifier '%s'\n", (const char *)propValue, rtype->_name);
           }
           xmlFree(propValue);
         }
@@ -1112,7 +1087,7 @@ static int parse_resources(xmlDocPtr doc)
           assert(propValue != NULL);
           fun = get_function((const char *)propValue);
           if (fun == NULL) {
-            log_error("unknown limit '%s' for resource %s\n", (const char *)propValue, rtype->_name[0]);
+            log_error("unknown limit '%s' for resource %s\n", (const char *)propValue, rtype->_name);
             xmlFree(propValue);
             continue;
           }
@@ -1125,7 +1100,7 @@ static int parse_resources(xmlDocPtr doc)
           } else if (strcmp((const char *)propValue, "limit") == 0) {
             rdata->limit = (rlimit_limit) fun;
           } else {
-            log_error("unknown limit '%s' for resource %s\n", (const char *)propValue, rtype->_name[0]);
+            log_error("unknown limit '%s' for resource %s\n", (const char *)propValue, rtype->_name);
           }
           xmlFree(propValue);
         }
@@ -1781,7 +1756,7 @@ static int parse_races(xmlDocPtr doc)
           rc->study_speed[sk] = (char)speed;
         }
       } else {
-        log_error("unknown skill '%s' in race '%s'\n", (const char *)propValue, rc->_name[0]);
+        log_error("unknown skill '%s' in race '%s'\n", (const char *)propValue, rc->_name);
       }
       xmlFree(propValue);
     }
@@ -1796,7 +1771,7 @@ static int parse_races(xmlDocPtr doc)
 
         parse_function(node, &fun, &propValue);
         if (fun == NULL) {
-          log_error("unknown function name '%s' for race %s\n", (const char *)propValue, rc->_name[0]);
+          log_error("unknown function name '%s' for race %s\n", (const char *)propValue, rc->_name);
           xmlFree(propValue);
           continue;
         }
@@ -1816,7 +1791,7 @@ static int parse_races(xmlDocPtr doc)
         } else if (strcmp((const char *)propValue, "initfamiliar") == 0) {
           rc->init_familiar = (void (*)(struct unit *))fun;
         } else {
-          log_error("unknown function type '%s' for race %s\n", (const char *)propValue, rc->_name[0]);
+          log_error("unknown function type '%s' for race %s\n", (const char *)propValue, rc->_name);
         }
         xmlFree(propValue);
     }
@@ -1871,7 +1846,7 @@ static int parse_races(xmlDocPtr doc)
         if (attack->data.sp) {
           attack->level = xml_ivalue(node, "level", 0);
           if (attack->level <= 0) {
-            log_error("magical attack '%s' for race '%s' needs a level: %d\n", attack->data.sp->sname, rc->_name[0], attack->level);
+            log_error("magical attack '%s' for race '%s' needs a level: %d\n", attack->data.sp->sname, rc->_name, attack->level);
           }
         }
       }
@@ -2307,6 +2282,5 @@ void register_xmlreader(void)
   xml_register_callback(parse_equipment);       /* requires spells */
   xml_register_callback(parse_races);   /* requires spells */
   xml_register_callback(parse_calendar);
-  xml_register_callback(parse_directions);
 }
 #endif

@@ -1,10 +1,15 @@
-#include <platform.h>
+#include <config.h>
+#include <kernel/types.h>
+#include "reports.h"
 
 #include <kernel/building.h>
-#include <kernel/reports.h>
+#include <kernel/faction.h>
+#include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
 #include <kernel/unit.h>
+
+#include <quicklist.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -76,10 +81,28 @@ static void test_regionid(CuTest * tc) {
   CuAssertIntEquals(tc, 0x7d, buffer[11]);
 }
 
+static void test_seen_faction(CuTest *tc) {
+    faction *f1, *f2;
+    race *rc = test_create_race("human");
+    f1 = test_create_faction(rc);
+    f2 = test_create_faction(rc);
+    add_seen_faction(f1, f2);
+    CuAssertPtrEquals(tc, f2, ql_get(f1->seen_factions, 0));
+    CuAssertIntEquals(tc, 1, ql_length(f1->seen_factions));
+    add_seen_faction(f1, f2);
+    CuAssertIntEquals(tc, 1, ql_length(f1->seen_factions));
+    add_seen_faction(f1, f1);
+    CuAssertIntEquals(tc, 2, ql_length(f1->seen_factions));
+    f2 = (faction *)ql_get(f1->seen_factions, 1);
+    f1 = (faction *)ql_get(f1->seen_factions, 0);
+    CuAssertTrue(tc, f1->no<f2->no);
+}
+
 CuSuite *get_reports_suite(void)
 {
   CuSuite *suite = CuSuiteNew();
   SUITE_ADD_TEST(suite, test_reorder_units);
+  SUITE_ADD_TEST(suite, test_seen_faction);
   SUITE_ADD_TEST(suite, test_regionid);
   return suite;
 }

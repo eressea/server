@@ -64,7 +64,7 @@ extern "C" {
   typedef char *(*rtype_name) (const struct resource_type * rtype, int flags);
   typedef struct resource_type {
     /* --- constants --- */
-    char *_name[2];             /* wie es heiﬂt */
+    char *_name;             /* wie es heiﬂt */
     unsigned int flags;
     /* --- functions --- */
     rtype_uchange uchange;
@@ -254,7 +254,6 @@ extern "C" {
 
 /* creation */
     resource_type *rt_get_or_create(const char *name);
-//    resource_type *new_resourcetype(const char **names, const char **appearances, int flags);
     item_type *it_get_or_create(resource_type *rtype);
   extern item_type *new_itemtype(resource_type * rtype, int iflags, int weight,
     int capacity);

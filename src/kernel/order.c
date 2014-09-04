@@ -256,6 +256,11 @@ static order *create_order_i(keyword_t kwd, const char *sptr, int persistent,
     order *ord = NULL;
     int lindex;
 
+    if ((int)kwd>0 && keyword_disabled(kwd)) {
+        log_error("trying to create an order for disabled keyword %s.", keyword(kwd));
+        return NULL;
+    }
+
     /* if this is just nonsense, then we skip it. */
     if (lomem) {
         switch (kwd) {
@@ -290,6 +295,7 @@ order *create_order(keyword_t kwd, const struct locale * lang,
     const char *params, ...)
 {
     char zBuffer[DISPLAYSIZE];
+    assert(lang);
     if (params) {
         char *bufp = zBuffer;
         int bytes;
@@ -351,17 +357,21 @@ order *parse_order(const char *s, const struct locale * lang)
         keyword_t kwd;
         const char *sptr;
         int persistent = 0;
+        const char * p;
 
         while (*s == '@') {
             persistent = 1;
             ++s;
         }
         sptr = s;
-        kwd = get_keyword(parse_token(&sptr), lang);
+        p = *sptr ? parse_token(&sptr) : 0;
+        kwd = p ? get_keyword(p, lang) : NOKEYWORD;
         if (kwd == K_MAKE) {
-            const char *s = parse_token(&sptr);
-            if (isparam(s, lang, P_TEMP)) {
+            const char *s, *sp = sptr;
+            s = parse_token(&sp);
+            if (s && isparam(s, lang, P_TEMP)) {
                 kwd = K_MAKETEMP;
+                sptr = sp;
             }
         }
         if (kwd != NOKEYWORD) {
@@ -534,7 +544,8 @@ char *write_order(const order * ord, char *buffer, size_t size)
         keyword_t kwd = ORD_KEYWORD(ord);
         if (kwd == NOKEYWORD) {
             const char *text = ORD_STRING(ord);
-            strlcpy(buffer, (const char *)text, size);
+            if (text) strlcpy(buffer, (const char *)text, size);
+            else buffer[0] = 0;
         }
         else {
             get_command(ord, buffer, size);
@@ -550,14 +561,11 @@ void push_order(order ** ordp, order * ord)
     *ordp = ord;
 }
 
-static char *getcommand(const order * ord)
+keyword_t init_order(const struct order *ord)
 {
-    char cmd[ORDERSIZE];
-    return _strdup(get_command(ord, cmd, sizeof(cmd)));
-}
+    char *cmd = 0;
 
-void init_tokens(const struct order *ord)
-{
-    char *cmd = getcommand(ord);
+    if (ord->data->_str) cmd = _strdup(ord->data->_str);
     init_tokens_str(cmd, cmd);
+    return ord->data->_keyword;
 }

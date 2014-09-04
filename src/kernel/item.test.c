@@ -10,6 +10,38 @@
 #include <CuTest.h>
 #include <tests.h>
 
+#include <assert.h>
+
+static void test_resourcename_no_appearance(CuTest *tc) {
+    const resource_type *rtype;
+
+    test_cleanup();
+    init_resources(); // creates R_SILVER
+    rtype = get_resourcetype(R_SILVER);
+    assert(rtype && rtype->itype);
+    assert(rtype->itype->_appearance[0] == 0);
+    assert(rtype->itype->_appearance[1] == 0);
+    CuAssertStrEquals(tc, "money", resourcename(rtype, 0));
+    CuAssertStrEquals(tc, "money_p", resourcename(rtype, NMF_PLURAL));
+    CuAssertStrEquals(tc, "money", resourcename(rtype, NMF_APPEARANCE));
+    CuAssertStrEquals(tc, "money_p", resourcename(rtype, NMF_APPEARANCE|NMF_PLURAL));
+    test_cleanup();
+}
+
+static void test_resourcename_with_appearance(CuTest *tc) {
+    item_type *itype;
+
+    test_cleanup();
+    itype = it_get_or_create(rt_get_or_create("foo"));
+    assert(itype && itype->rtype);
+    it_set_appearance(itype, "bar");
+    CuAssertStrEquals(tc, "foo", resourcename(itype->rtype, 0));
+    CuAssertStrEquals(tc, "foo_p", resourcename(itype->rtype, NMF_PLURAL));
+    CuAssertStrEquals(tc, "bar", resourcename(itype->rtype, NMF_APPEARANCE));
+    CuAssertStrEquals(tc, "bar_p", resourcename(itype->rtype, NMF_APPEARANCE | NMF_PLURAL));
+    test_cleanup();
+}
+
 static void test_uchange(CuTest * tc, unit * u, const resource_type * rtype) {
   int n;
   change_resource(u, rtype, 4);
@@ -26,7 +58,6 @@ void test_change_item(CuTest * tc)
   unit * u;
 
   test_cleanup();
-  register_resources();
   init_resources();
   test_create_world();
 
@@ -103,6 +134,8 @@ void test_findresourcetype(CuTest * tc)
 CuSuite *get_item_suite(void)
 {
   CuSuite *suite = CuSuiteNew();
+  SUITE_ADD_TEST(suite, test_resourcename_no_appearance);
+  SUITE_ADD_TEST(suite, test_resourcename_with_appearance);
   SUITE_ADD_TEST(suite, test_change_item);
   SUITE_ADD_TEST(suite, test_change_person);
   SUITE_ADD_TEST(suite, test_resource_type);

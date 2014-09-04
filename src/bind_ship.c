@@ -11,12 +11,14 @@ without prior permission by the authors of Eressea.
 */
 
 #include <platform.h>
+#include <kernel/types.h>
 #include "bind_ship.h"
 #include "bind_unit.h"
 
+#include "move.h"
+
 #include <kernel/region.h>
 #include <kernel/unit.h>
-#include <kernel/move.h>
 #include <kernel/ship.h>
 #include <kernel/build.h>
 

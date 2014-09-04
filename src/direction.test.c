@@ -1,8 +1,10 @@
 #include <platform.h>
-#include "kernel/types.h"
+#include <kernel/types.h>
+
 #include "direction.h"
-#include "util/language.h"
 #include "tests.h"
+
+#include <util/language.h>
 
 #include <CuTest.h>
 

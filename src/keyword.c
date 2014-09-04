@@ -12,11 +12,11 @@
 
 const char * keyword(keyword_t kwd)
 {
-    static char result[KEYWORDSIZE];
+    static char result[KEYWORDSIZE]; // FIXME: static return value
     if (!result[0]) {
         strcpy(result, "keyword::");
     }
-    strcpy(result+9, keywords[kwd]);
+    strcpy(result + 9, keywords[kwd]);
     return result;
 }
 

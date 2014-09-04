@@ -228,7 +228,7 @@ static int tolua_region_get_luxury(lua_State * L)
   if (r->land) {
     const item_type *lux = r_luxury(r);
     if (lux) {
-      const char *name = lux->rtype->_name[0];
+      const char *name = lux->rtype->_name;
       tolua_pushstring(L, name);
       return 1;
     }
@@ -268,7 +268,7 @@ static int tolua_region_get_herb(lua_State * L)
 {
   region *r = (region *) tolua_tousertype(L, 1, 0);
   if (r->land && r->land->herbtype) {
-    const char *name = r->land->herbtype->rtype->_name[0];
+    const char *name = r->land->herbtype->rtype->_name;
     tolua_pushstring(L, name);
     return 1;
   }

@@ -1,7 +1,7 @@
 /*
 Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -82,7 +82,8 @@ static race * race_cache[MAXRACES];
 struct race *get_race(race_t rt) {
     static int cache = -1;
     const char * name;
-    
+    race * result = 0;
+
     assert(rt < MAXRACES);
     name = racenames[rt];
     if (!name) {
@@ -92,69 +93,69 @@ struct race *get_race(race_t rt) {
         cache = cache_breaker;
         memset(race_cache, 0, sizeof(race_cache));
         return race_cache[rt] = rc_get_or_create(name);
-    } else {
-        race * result = race_cache[rt];
+    }
+    else {
+        result = race_cache[rt];
         if (!result) {
             result = race_cache[rt] = rc_get_or_create(name);
         }
-        return result;
     }
-    return 0;
+    return result;
 }
 
 race_list *get_familiarraces(void)
 {
-  static int init = 0;
-  static race_list *familiarraces;
+    static int init = 0;
+    static race_list *familiarraces;
 
-  if (!init) {
-    race *rc = races;
-    for (; rc != NULL; rc = rc->next) {
-      if (rc->init_familiar != NULL) {
-        racelist_insert(&familiarraces, rc);
-      }
+    if (!init) {
+        race *rc = races;
+        for (; rc != NULL; rc = rc->next) {
+            if (rc->init_familiar != NULL) {
+                racelist_insert(&familiarraces, rc);
+            }
+        }
+        init = false;
     }
-    init = false;
-  }
-  return familiarraces;
+    return familiarraces;
 }
 
 void racelist_clear(struct race_list **rl)
 {
-  while (*rl) {
-    race_list *rl2 = (*rl)->next;
-    free(*rl);
-    *rl = rl2;
-  }
+    while (*rl) {
+        race_list *rl2 = (*rl)->next;
+        free(*rl);
+        *rl = rl2;
+    }
 }
 
 void racelist_insert(struct race_list **rl, const struct race *r)
 {
-  race_list *rl2 = (race_list *) malloc(sizeof(race_list));
+    race_list *rl2 = (race_list *)malloc(sizeof(race_list));
 
-  rl2->data = r;
-  rl2->next = *rl;
+    rl2->data = r;
+    rl2->next = *rl;
 
-  *rl = rl2;
+    *rl = rl2;
 }
 
 void free_races(void) {
     while (races) {
         race * rc = races->next;
         free(races);
-        races =rc;
+        races = rc;
     }
 }
 
 static race *rc_find_i(const char *name)
 {
-  const char *rname = name;
-  race *rc = races;
+    const char *rname = name;
+    race *rc = races;
 
-  while (rc && !strcmp(rname, rc->_name[0]) == 0) {
-      rc = rc->next;
-  }
-  return rc;
+    while (rc && !strcmp(rname, rc->_name) == 0) {
+        rc = rc->next;
+    }
+    return rc;
 }
 
 const race * rc_find(const char *name) {
@@ -168,7 +169,7 @@ race *rc_get_or_create(const char *zName)
     assert(zName);
     rc = rc_find_i(zName);
     if (!rc) {
-        char zBuffer[80]; 
+        char zBuffer[80];
 
         rc = (race *)calloc(sizeof(race), 1);
         rc->hitpoints = 1;
@@ -177,13 +178,7 @@ race *rc_get_or_create(const char *zName)
             assert(strchr(zName, ' ') == NULL);
         }
         strcpy(zBuffer, zName);
-        rc->_name[0] = _strdup(zBuffer);
-        sprintf(zBuffer, "%s_p", zName);
-        rc->_name[1] = _strdup(zBuffer);
-        sprintf(zBuffer, "%s_d", zName);
-        rc->_name[2] = _strdup(zBuffer);
-        sprintf(zBuffer, "%s_x", zName);
-        rc->_name[3] = _strdup(zBuffer);
+        rc->_name = _strdup(zBuffer);
         rc->precombatspell = NULL;
 
         rc->attack[0].type = AT_COMBATSPELL;
@@ -199,135 +194,147 @@ race *rc_get_or_create(const char *zName)
 /** dragon movement **/
 bool allowed_dragon(const region * src, const region * target)
 {
-  if (fval(src->terrain, ARCTIC_REGION) && fval(target->terrain, SEA_REGION))
-    return false;
-  return allowed_fly(src, target);
+    if (fval(src->terrain, ARCTIC_REGION) && fval(target->terrain, SEA_REGION))
+        return false;
+    return allowed_fly(src, target);
 }
 
 char **race_prefixes = NULL;
 
 extern void add_raceprefix(const char *prefix)
 {
-  static size_t size = 4;
-  static unsigned int next = 0;
-  if (race_prefixes == NULL)
-    race_prefixes = malloc(size * sizeof(char *));
-  if (next + 1 == size) {
-    size *= 2;
-    race_prefixes = realloc(race_prefixes, size * sizeof(char *));
-  }
-  race_prefixes[next++] = _strdup(prefix);
-  race_prefixes[next] = NULL;
+    static size_t size = 4;
+    static unsigned int next = 0;
+    if (race_prefixes == NULL)
+        race_prefixes = malloc(size * sizeof(char *));
+    if (next + 1 == size) {
+        size *= 2;
+        race_prefixes = realloc(race_prefixes, size * sizeof(char *));
+    }
+    race_prefixes[next++] = _strdup(prefix);
+    race_prefixes[next] = NULL;
 }
-
-/* Die Bezeichnungen dürfen wegen der Art des Speicherns keine
- * Leerzeichen enthalten! */
-
-/*                      "den Zwergen", "Halblingsparteien" */
 
 bool r_insectstalled(const region * r)
 {
-  return fval(r->terrain, ARCTIC_REGION);
+    return fval(r->terrain, ARCTIC_REGION);
 }
 
-const char *rc_name(const race * rc, int n)
+const char *rc_name(const race * rc, name_t n)
 {
-  return rc ? mkname("race", rc->_name[n]) : NULL;
+    const char * postfix = 0;
+    if (!rc) {
+        return NULL;
+    }
+    switch (n) {
+    case NAME_SINGULAR: postfix = ""; break;
+    case NAME_PLURAL: postfix = "_p"; break;
+    case NAME_DEFINITIVE: postfix = "_d"; break;
+    case NAME_CATEGORY: postfix = "_x"; break;
+    default: assert(!"invalid name_t enum in rc_name");
+    }
+    if (postfix) {
+        static char name[64];  // FIXME: static return value
+        sprintf(name, "race::%s%s", rc->_name, postfix);
+        return name;
+    }
+    return NULL;
 }
 
 const char *raceprefix(const unit * u)
 {
-  const attrib *asource = u->faction->attribs;
+    const attrib *asource = u->faction->attribs;
 
-  if (fval(u, UFL_GROUP)) {
-    const attrib *agroup = agroup = a_findc(u->attribs, &at_group);
-    if (agroup != NULL)
-      asource = ((const group *)(agroup->data.v))->attribs;
-  }
-  return get_prefix(asource);
+    if (fval(u, UFL_GROUP)) {
+        const attrib *agroup = agroup = a_findc(u->attribs, &at_group);
+        if (agroup != NULL)
+            asource = ((const group *)(agroup->data.v))->attribs;
+    }
+    return get_prefix(asource);
 }
 
 const char *racename(const struct locale *loc, const unit * u, const race * rc)
 {
-  const char *str, *prefix = raceprefix(u);
+    const char *str, *prefix = raceprefix(u);
 
-  if (prefix != NULL) {
-    static char lbuf[80];
-    char *bufp = lbuf;
-    size_t size = sizeof(lbuf) - 1;
-    int ch, bytes;
+    if (prefix != NULL) {
+        static char lbuf[80]; // FIXME: static return value
+        char *bufp = lbuf;
+        size_t size = sizeof(lbuf) - 1;
+        int ch, bytes;
 
-    bytes = (int)strlcpy(bufp, LOC(loc, mkname("prefix", prefix)), size);
-    if (wrptr(&bufp, &size, bytes) != 0)
-      WARN_STATIC_BUFFER();
+        bytes = (int)strlcpy(bufp, LOC(loc, mkname("prefix", prefix)), size);
+        if (wrptr(&bufp, &size, bytes) != 0)
+            WARN_STATIC_BUFFER();
 
-    bytes = (int)strlcpy(bufp, LOC(loc, rc_name(rc, u->number != 1)), size);
-    assert(~bufp[0] & 0x80 || !"unicode/not implemented");
-    ch = tolower(*(unsigned char *)bufp);
-    bufp[0] = (char)ch;
-    if (wrptr(&bufp, &size, bytes) != 0)
-      WARN_STATIC_BUFFER();
-    *bufp = 0;
+        bytes = (int)strlcpy(bufp, LOC(loc, rc_name(rc, u->number != 1)), size);
+        assert(~bufp[0] & 0x80 || !"unicode/not implemented");
+        ch = tolower(*(unsigned char *)bufp);
+        bufp[0] = (char)ch;
+        if (wrptr(&bufp, &size, bytes) != 0)
+            WARN_STATIC_BUFFER();
+        *bufp = 0;
 
-    return lbuf;
-  }
-  str = LOC(loc, rc_name(rc, u->number != 1));
-  return str ? str : rc->_name[0];
+        return lbuf;
+    }
+    str = LOC(loc, rc_name(rc, (u->number == 1) ? NAME_SINGULAR : NAME_PLURAL));
+    return str ? str : rc->_name;
 }
 
 int
 rc_specialdamage(const race * ar, const race * dr,
-  const struct weapon_type *wtype)
+const struct weapon_type *wtype)
 {
-  race_t art = old_race(ar);
-  int m, modifier = 0;
+    race_t art = old_race(ar);
+    int m, modifier = 0;
 
-  if (wtype != NULL && wtype->modifiers != NULL)
-    for (m = 0; wtype->modifiers[m].value; ++m) {
-      /* weapon damage for this weapon, possibly by race */
-      if (wtype->modifiers[m].flags & WMF_DAMAGE) {
-        race_list *rlist = wtype->modifiers[m].races;
-        if (rlist != NULL) {
-          while (rlist) {
-            if (rlist->data == ar)
-              break;
-            rlist = rlist->next;
-          }
-          if (rlist == NULL)
-            continue;
+    if (wtype != NULL && wtype->modifiers != NULL)
+        for (m = 0; wtype->modifiers[m].value; ++m) {
+        /* weapon damage for this weapon, possibly by race */
+        if (wtype->modifiers[m].flags & WMF_DAMAGE) {
+            race_list *rlist = wtype->modifiers[m].races;
+            if (rlist != NULL) {
+                while (rlist) {
+                    if (rlist->data == ar)
+                        break;
+                    rlist = rlist->next;
+                }
+                if (rlist == NULL)
+                    continue;
+            }
+            modifier += wtype->modifiers[m].value;
         }
-        modifier += wtype->modifiers[m].value;
-      }
-    }
-  switch (art) {
+        }
+    switch (art) {
     case RC_HALFLING:
-      if (wtype != NULL && dragonrace(dr)) {
-        modifier += 5;
-      }
-      break;
+        if (wtype != NULL && dragonrace(dr)) {
+            modifier += 5;
+        }
+        break;
     default:
-      break;
-  }
-  return modifier;
+        break;
+    }
+    return modifier;
 }
 
 void write_race_reference(const race * rc, struct storage *store)
 {
-  WRITE_TOK(store, rc ? rc->_name[0] : "none");
+    WRITE_TOK(store, rc ? rc->_name : "none");
 }
 
 variant read_race_reference(struct storage *store)
 {
-  variant result;
-  char zName[20];
-  READ_TOK(store, zName, sizeof(zName));
+    variant result;
+    char zName[20];
+    READ_TOK(store, zName, sizeof(zName));
 
-  if (strcmp(zName, "none") == 0) {
-    result.v = NULL;
+    if (strcmp(zName, "none") == 0) {
+        result.v = NULL;
+        return result;
+    }
+    else {
+        result.v = rc_find_i(zName);
+    }
+    assert(result.v != NULL);
     return result;
-  } else {
-    result.v = rc_find_i(zName);
-  }
-  assert(result.v != NULL);
-  return result;
 }

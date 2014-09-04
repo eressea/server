@@ -30,9 +30,12 @@ without prior permission by the authors of Eressea.
 /* gamecode includes */
 #include "laws.h"
 #include "economy.h"
+#include "stealth.h"
+#include "move.h"
+#include "reports.h"
+#include "alchemy.h"
 
 /* kernel includes */
-#include <kernel/alchemy.h>
 #include <kernel/alliance.h>
 #include <kernel/ally.h>
 #include <kernel/connection.h>
@@ -42,12 +45,10 @@ without prior permission by the authors of Eressea.
 #include <kernel/group.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
-#include <kernel/move.h>
 #include <kernel/order.h>
 #include <kernel/plane.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/reports.h>
 #include <kernel/resources.h>
 #include <kernel/ship.h>
 #include <kernel/spell.h>
@@ -340,7 +341,7 @@ static int cr_race(variant var, char *buffer, const void *userdata)
 {
     const faction *report = (const faction *)userdata;
     const struct race *rc = (const race *)var.v;
-    const char *key = rc_name(rc, 0);
+    const char *key = rc_name(rc, NAME_SINGULAR);
     sprintf(buffer, "\"%s\"",
         translate(key, locale_string(report->locale, key)));
     return 0;
@@ -490,11 +491,12 @@ static void report_crtypes(FILE * F, const struct locale *lang)
         for (kmt = mtypehash[i]; kmt; kmt = kmt->nexthash) {
             const struct nrmessage_type *nrt = nrt_find(lang, kmt->mtype);
             if (nrt) {
+                char buffer[DISPLAYSIZE];
                 unsigned int hash = kmt->mtype->key;
                 assert(hash > 0);
                 fprintf(F, "MESSAGETYPE %u\n", hash);
                 fputc('\"', F);
-                fputs(escape_string(nrt_string(nrt), NULL, 0), F);
+                fputs(escape_string(nrt_string(nrt), buffer, sizeof(buffer)), F);
                 fputs("\";text\n", F);
                 fprintf(F, "\"%s\";section\n", nrt_section(nrt));
             }
@@ -832,20 +834,20 @@ static void cr_output_unit(FILE * F, const region * r, const faction * f,       
     if (pzTmp) {
         fprintf(F, "\"%s\";Typ\n", pzTmp);
         if (u->faction == f && fval(u_race(u), RCF_SHAPESHIFTANY)) {
-            const char *zRace = rc_name(u_race(u), 1);
+            const char *zRace = rc_name(u_race(u), NAME_PLURAL);
             fprintf(F, "\"%s\";wahrerTyp\n",
                 translate(zRace, locale_string(f->locale, zRace)));
         }
     }
     else {
         const race *irace = u_irace(u);
-        const char *zRace = rc_name(irace, 1);
+        const char *zRace = rc_name(irace, NAME_PLURAL);
         fprintf(F, "\"%s\";Typ\n",
             translate(zRace, locale_string(f->locale, zRace)));
         if (u->faction == f && irace != u_race(u)) {
             assert(skill_enabled(SK_STEALTH)
                 || !"we're resetting this on load, so.. ircase should never be used");
-            zRace = rc_name(u_race(u), 1);
+            zRace = rc_name(u_race(u), NAME_PLURAL);
             fprintf(F, "\"%s\";wahrerTyp\n",
                 translate(zRace, locale_string(f->locale, zRace)));
         }
@@ -1546,7 +1548,7 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
     fprintf(F, "%d;Punktedurchschnitt\n", avgscore);
 #endif
     {
-        const char *zRace = rc_name(f->race, 1);
+        const char *zRace = rc_name(f->race, NAME_PLURAL);
         fprintf(F, "\"%s\";Typ\n", translate(zRace, LOC(f->locale, zRace)));
     }
     prefix = get_prefix(f->attribs);

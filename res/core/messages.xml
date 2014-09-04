@@ -854,7 +854,7 @@
       <arg name="average" type="int"/>
     </type>
     <text locale="de">"Deine Partei hat $int($score) Punkte. Der Durchschnitt für Parteien ähnlichen Alters ist $int($average) Punkte."</text>
-    <text locale="fr">"Your faction has a score of $int($score). The average score for similar factions is $int($average)."</text>
+    <text locale="en">"Your faction has a score of $int($score). The average score for similar factions is $int($average)."</text>
   </message>
   <message name="nr_header_date" section="nr">
     <type>
@@ -862,7 +862,6 @@
       <arg name="date" type="string"/>
     </type>
     <text locale="de">"Report für $game, $date"</text>
-    <text locale="fr">"Report for $game, $date"</text>
     <text locale="en">"Report for $game, $date"</text>
   </message>
   <message name="nr_vicinitystart" section="nr">
@@ -3606,7 +3605,7 @@
       <arg name="weeks" type="int"/>
       <arg name="skill" type="skill"/>
     </type>
-    <text locale="de">"$unit($unit) vergißt durch Dumpfbackenbrot $int($weeks) Wochen des Talentes $skill($skill)."</text>
+    <text locale="de">"$unit($unit) vergisst durch Dumpfbackenbrot $int($weeks) Wochen des Talentes $skill($skill)."</text>
     <text locale="fr">"$unit($unit) eats a Dumpfbackenbrot and forgets $int($weeks) weeks worth of $skill($skill)."</text>
     <text locale="en">"$unit($unit) eats a Dumpfbackenbrot and forgets $int($weeks) weeks worth of $skill($skill)."</text>
   </message>
@@ -3699,7 +3698,7 @@
       <arg name="unit" type="unit"/>
       <arg name="skill" type="skill"/>
     </type>
-    <text locale="de">"$unit($unit) vergißt $skill($skill)."</text>
+    <text locale="de">"$unit($unit) vergisst $skill($skill)."</text>
     <text locale="fr">"$unit($unit) forgets $skill($skill)."</text>
     <text locale="en">"$unit($unit) forgets $skill($skill)."</text>
   </message>

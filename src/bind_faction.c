@@ -385,7 +385,7 @@ static int tolua_faction_set_locale(lua_State * L)
 static int tolua_faction_get_race(lua_State * L)
 {
   faction *self = (faction *) tolua_tousertype(L, 1, 0);
-  tolua_pushstring(L, self->race->_name[0]);
+  tolua_pushstring(L, self->race->_name);
   return 1;
 }
 

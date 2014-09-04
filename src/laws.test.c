@@ -243,6 +243,29 @@ static void test_reserve_cmd(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_new_units(CuTest *tc) {
+    unit *u;
+    faction *f;
+    region *r;
+    order *ord;
+    const struct locale *loc;
+    test_cleanup();
+    test_create_world();
+    f = test_create_faction(rc_find("human"));
+    r = findregion(0, 0);
+    assert(r && f);
+    u = test_create_unit(f, r);
+    assert(u && !u->next);
+    loc = get_locale("de");
+    assert(loc);
+    ord = create_order(K_MAKETEMP, loc, "hurr");
+    assert(ord);
+    u->orders = ord;
+    new_units();
+    CuAssertPtrNotNull(tc, u->next);
+    test_cleanup();
+}
+
 static void test_reserve_self(CuTest *tc) {
     unit *u1, *u2;
     faction *f;
@@ -286,6 +309,7 @@ CuSuite *get_laws_suite(void)
   SUITE_ADD_TEST(suite, test_unit_limit);
   SUITE_ADD_TEST(suite, test_reserve_self);
   SUITE_ADD_TEST(suite, test_reserve_cmd);
+  SUITE_ADD_TEST(suite, test_new_units);
   SUITE_ADD_TEST(suite, test_cannot_create_unit_above_limit);
   return suite;
 }

@@ -39,7 +39,6 @@
 #include <kernel/plane.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/names.h>
 #include <kernel/teleport.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>

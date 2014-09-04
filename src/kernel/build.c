@@ -146,8 +146,7 @@ int destroy_cmd(unit * u, struct order *ord)
   if (u->number < 1)
     return 0;
 
-  init_tokens(ord);
-  skip_token();
+  init_order(ord);
   s = getstrtoken();
 
   if (findparam(s, u->faction->locale) == P_ROAD) {
@@ -522,9 +521,7 @@ int build(unit * u, const construction * ctype, int completed, int want)
       }
     }
 
-    if (want > 0) {
-      n = _min(want, n);
-    }
+    if (want < n) n = want;
 
     if (type->maxsize > 0) {
       n = _min(type->maxsize - completed, n);

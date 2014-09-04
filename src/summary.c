@@ -13,7 +13,6 @@
 #include <kernel/config.h>
 
 #include "summary.h"
-
 #include "laws.h"
 
 #include <kernel/alliance.h>
@@ -22,7 +21,6 @@
 #include <kernel/item.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/reports.h>
 #include <kernel/save.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
@@ -71,6 +69,38 @@ typedef struct summary {
   } *languages;
 } summary;
 
+
+int *nmrs = NULL;
+
+int update_nmrs(void)
+{
+    int i, newplayers = 0;
+    faction *f;
+    int turn = global.data_turn;
+
+    if (nmrs == NULL)
+        nmrs = malloc(sizeof(int) * (NMRTimeout() + 1));
+    for (i = 0; i <= NMRTimeout(); ++i) {
+        nmrs[i] = 0;
+    }
+
+    for (f = factions; f; f = f->next) {
+        if (fval(f, FFL_ISNEW)) {
+            ++newplayers;
+        }
+        else if (!is_monsters(f) && f->alive) {
+            int nmr = turn - f->lastorders + 1;
+            if (nmr < 0 || nmr > NMRTimeout()) {
+                log_error("faction %s has %d NMRS\n", factionid(f), nmr);
+                nmr = _max(0, nmr);
+                nmr = _min(nmr, NMRTimeout());
+            }
+            ++nmrs[nmr];
+        }
+    }
+    return newplayers;
+}
+
 static char *pcomp(double i, double j)
 {
   static char buf[32];
@@ -92,11 +122,11 @@ static void out_faction(FILE * file, const struct faction *f)
   if (alliances != NULL) {
     fprintf(file, "%s (%s/%d) (%.3s/%.3s), %d Einh., %d Pers., $%d, %d NMR\n",
       f->name, itoa36(f->no), f_get_alliance(f) ? f->alliance->id : 0,
-      LOC(default_locale, rc_name(f->race, 0)), magic_school[f->magiegebiet],
+      LOC(default_locale, rc_name(f->race, NAME_SINGULAR)), magic_school[f->magiegebiet],
       count_units(f), f->num_total, f->money, turn - f->lastorders);
   } else {
     fprintf(file, "%s (%.3s/%.3s), %d Einh., %d Pers., $%d, %d NMR\n",
-      factionname(f), LOC(default_locale, rc_name(f->race, 0)),
+      factionname(f), LOC(default_locale, rc_name(f->race, NAME_SINGULAR)),
       magic_school[f->magiegebiet], count_units(f), f->num_total, f->money,
       turn - f->lastorders);
   }
@@ -185,7 +215,7 @@ void report_summary(summary * s, summary * o, bool full)
       if (i != RC_TEMPLATE && i != RC_CLONE && s->factionrace[i]) {
           const race *rc = get_race(i);
           if (rc && playerrace(rc)) {
-              fprintf(F, "%13s%s: %s\n", LOC(default_locale, rc_name(rc, 3)),
+              fprintf(F, "%13s%s: %s\n", LOC(default_locale, rc_name(rc, NAME_CATEGORY)),
                   LOC(default_locale, "stat_tribe_p"), pcomp(s->factionrace[i],
                   o->factionrace[i]));
           }
@@ -215,7 +245,7 @@ void report_summary(summary * s, summary * o, bool full)
     for (i = 0; i < MAXRACES; i++) {
       if (s->poprace[i]) {
           const race *rc = get_race(i);
-          fprintf(F, "%20s: %s\n", LOC(default_locale, rc_name(rc, 1)),
+          fprintf(F, "%20s: %s\n", LOC(default_locale, rc_name(rc, NAME_PLURAL)),
           rcomp(s->poprace[i], o->poprace[i]));
       }
     }
@@ -224,7 +254,7 @@ void report_summary(summary * s, summary * o, bool full)
           if (i != RC_TEMPLATE && i != RC_CLONE && s->poprace[i]) {
               const race *rc = get_race(i);
               if (playerrace(rc)) {
-                  fprintf(F, "%20s: %s\n", LOC(default_locale, rc_name(rc, 1)),
+                  fprintf(F, "%20s: %s\n", LOC(default_locale, rc_name(rc, NAME_PLURAL)),
                       rcomp(s->poprace[i], o->poprace[i]));
               }
           }

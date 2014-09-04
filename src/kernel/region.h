@@ -120,7 +120,7 @@ extern "C" {
     /* an ascending number, to improve the speed of determining the interval in 
        which a faction has its units. See the implementations of firstregion 
        and lastregion */
-    unsigned int uid;           /* a unique id */
+    int uid;           /* a unique id */
     int x, y;
     struct plane *_plane;       /* to access, use rplane(r) */
     char *display;
@@ -153,14 +153,6 @@ extern "C" {
   struct message *r_addmessage(struct region *r, const struct faction *viewer,
     struct message *msg);
 
-  typedef struct spec_direction {
-    int x, y;
-    int duration;
-    bool active;
-    char *desc;
-    char *keyword;
-  } spec_direction;
-
   typedef struct {
     direction_t dir;
   } moveblock;
@@ -169,11 +161,9 @@ extern "C" {
 
   int distance(const struct region *, const struct region *);
   int koor_distance(int ax, int ay, int bx, int by);
-  direction_t reldirection(const struct region *from, const struct region *to);
   struct region *findregion(int x, int y);
-  struct region *findregionbyid(unsigned int uid);
+  struct region *findregionbyid(int uid);
 
-  extern struct attrib_type at_direction;
   extern struct attrib_type at_moveblock;
   extern struct attrib_type at_peasantluck;
   extern struct attrib_type at_horseluck;
@@ -188,14 +178,6 @@ extern "C" {
 
   void free_regionlist(region_list * rl);
   void add_regionlist(region_list ** rl, struct region *r);
-
-  struct region *find_special_direction(const struct region *r,
-    const char *token, const struct locale *lang);
-  void register_special_direction(const char *name);
-  struct spec_direction *special_direction(const region * from,
-    const region * to);
-  struct attrib *create_special_direction(struct region *r, struct region *rt,
-    int duration, const char *desc, const char *keyword);
 
   int deathcount(const struct region *r);
   int chaoscount(const struct region *r);
@@ -251,7 +233,7 @@ extern "C" {
   const char *write_regionname(const struct region *r, const struct faction *f,
     char *buffer, size_t size);
 
-  struct region *new_region(int x, int y, struct plane *pl, unsigned int uid);
+  struct region *new_region(int x, int y, struct plane *pl, int uid);
   void remove_region(region ** rlist, region * r);
   void terraform_region(struct region *r, const struct terrain_type *terrain);
   bool pnormalize(int *x, int *y, const struct plane *pl);

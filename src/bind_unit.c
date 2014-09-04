@@ -17,14 +17,15 @@ without prior permission by the authors of Eressea.
 #ifdef BSON_ATTRIB
 # include "bind_attrib.h"
 #endif
+#include "alchemy.h"
 #include "bindings.h"
+#include "move.h"
 
 /*  attributes includes */
 #include <attributes/racename.h>
 #include <attributes/key.h>
 
 /*  kernel includes */
-#include <kernel/alchemy.h>
 #include <kernel/building.h>
 #include <kernel/config.h>
 #include <kernel/faction.h>
@@ -32,7 +33,6 @@ without prior permission by the authors of Eressea.
 #include <kernel/item.h>
 #include <kernel/magic.h>
 #include <kernel/messages.h>
-#include <kernel/move.h>
 #include <kernel/order.h>
 #include <kernel/pool.h>
 #include <kernel/race.h>
@@ -840,7 +840,7 @@ static int tolua_unit_set_faction(lua_State * L)
 static int tolua_unit_get_race(lua_State * L)
 {
   unit *self = (unit *) tolua_tousertype(L, 1, 0);
-  tolua_pushstring(L, u_race(self)->_name[0]);
+  tolua_pushstring(L, u_race(self)->_name);
   return 1;
 }
 

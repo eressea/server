@@ -111,7 +111,7 @@ static int insert_faction(sqlite3 *db, int game_id, faction *f) {
   sqlite3_stmt *stmt = 0;
   sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
   sqlite3_bind_int(stmt, 1, game_id);
-  sqlite3_bind_text(stmt, 2, f->race->_name[0], -1, SQLITE_STATIC);
+  sqlite3_bind_text(stmt, 2, f->race->_name, -1, SQLITE_STATIC);
   sqlite3_step(stmt);
   sqlite3_finalize(stmt);
   return (int)sqlite3_last_insert_rowid(db);

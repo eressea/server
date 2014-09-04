@@ -78,7 +78,7 @@ static void giveitem_write(const trigger * t, struct storage *store)
   giveitem_data *td = (giveitem_data *) t->data.v;
   write_unit_reference(td->u, store);
   WRITE_INT(store, td->number);
-  WRITE_TOK(store, td->itype->rtype->_name[0]);
+  WRITE_TOK(store, td->itype->rtype->_name);
 }
 
 static int giveitem_read(trigger * t, struct storage *store)

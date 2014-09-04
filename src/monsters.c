@@ -40,17 +40,16 @@
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
-#include <kernel/move.h>
-#include <kernel/names.h>
 #include <kernel/order.h>
 #include <kernel/pathfinder.h>
 #include <kernel/pool.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/reports.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
+
+#include <move.h>
 
 /* util includes */
 #include <util/attrib.h>
@@ -132,6 +131,10 @@ static void reduce_weight(unit * u)
   }
 }
 
+static float monster_attack_chance(void) {
+    return get_param_flt(global.parameters, "rules.monsters.attack_chance", 0.4f);
+}
+
 static order *monster_attack(unit * u, const unit * target)
 {
   if (u->region != target->region)
@@ -171,7 +174,7 @@ static order *get_money_for_dragon(region * r, unit * u, int wanted)
   /* falls der drache launisch ist, oder das regionssilber knapp, greift er alle an */
   n = 0;
   for (u2 = r->units; u2; u2 = u2->next) {
-    if (u2->faction != u->faction && cansee(u->faction, r, u2, 0)) {
+    if (inside_building(u2)!=u->building && u2->faction != u->faction && cansee(u->faction, r, u2, 0)) {
       int m = get_money(u2);
       if (m == 0 || is_guard(u2, GUARD_TAX))
         continue;
@@ -533,7 +536,7 @@ static void monster_attacks(unit * u)
   unit *u2;
 
   for (u2 = r->units; u2; u2 = u2->next) {
-    if (cansee(u->faction, r, u2, 0) && u2->faction != u->faction
+      if (cansee(u->faction, r, u2, 0) && u2->faction != u->faction && inside_building(u2)!=u->building
       && chance(0.75)) {
       order *ord = monster_attack(u, u2);
       if (ord)
@@ -747,7 +750,7 @@ void plan_monsters(faction * f)
 
   for (r = regions; r; r = r->next) {
     unit *u;
-    double attack_chance = MONSTERATTACK;
+    double attack_chance = monster_attack_chance();
     bool attacking = false;
 
     for (u = r->units; u; u = u->next) {
@@ -915,7 +918,7 @@ void spawn_dragons(void)
       if (verbosity >= 2) {
         log_printf(stdout, "%d %s in %s.\n", u->number,
           LOC(default_locale,
-            rc_name(u_race(u), u->number != 1)), regionname(r, NULL));
+            rc_name(u_race(u), (u->number==1) ? NAME_SINGULAR:NAME_PLURAL)), regionname(r, NULL));
       }
 
       name_unit(u);
@@ -990,7 +993,7 @@ void spawn_undead(void)
       if (verbosity >= 2) {
         log_printf(stdout, "%d %s in %s.\n", u->number,
           LOC(default_locale,
-            rc_name(u_race(u), u->number != 1)), regionname(r, NULL));
+          rc_name(u_race(u), (u->number == 1) ? NAME_SINGULAR : NAME_PLURAL)), regionname(r, NULL));
       }
 
       {

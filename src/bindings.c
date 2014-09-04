@@ -11,6 +11,7 @@ without prior permission by the authors of Eressea.
 */
 
 #include <platform.h>
+#include <kernel/types.h>
 #include "bindings.h"
 #include "bind_unit.h"
 #include "bind_storage.h"
@@ -24,6 +25,7 @@ without prior permission by the authors of Eressea.
 #include "bind_region.h"
 #include "helpers.h"
 #include "console.h"
+#include "reports.h"
 
 #include <kernel/config.h>
 
@@ -36,7 +38,6 @@ without prior permission by the authors of Eressea.
 #include <kernel/terrain.h>
 #include <kernel/messages.h>
 #include <kernel/region.h>
-#include <kernel/reports.h>
 #include <kernel/building.h>
 #include <kernel/plane.h>
 #include <kernel/race.h>
@@ -151,7 +152,7 @@ int tolua_itemlist_next(lua_State * L)
   item **item_ptr = (item **) lua_touserdata(L, lua_upvalueindex(1));
   item *itm = *item_ptr;
   if (itm != NULL) {
-    tolua_pushstring(L, itm->type->rtype->_name[0]);
+    tolua_pushstring(L, itm->type->rtype->_name);
     *item_ptr = itm->next;
     return 1;
   }
@@ -711,7 +712,7 @@ static int tolua_write_spells(lua_State * L)
         for (; comp->type != 0; ++comp) {
           static const char *costs[] = { "fixed", "level", "linear" };
           xmlNodePtr cnode = xmlNewNode(NULL, BAD_CAST "resource");
-          xmlNewProp(cnode, BAD_CAST "name", BAD_CAST comp->type->_name[0]);
+          xmlNewProp(cnode, BAD_CAST "name", BAD_CAST comp->type->_name);
           xmlNewProp(cnode, BAD_CAST "amount", xml_i(comp->amount));
           xmlNewProp(cnode, BAD_CAST "cost", BAD_CAST costs[comp->cost]);
           xmlAddChild(node, cnode);
@@ -820,7 +821,7 @@ static int config_get_resource(lua_State * L)
           lua_newtable(L);
           for (i = 0; itype->construction->materials[i].number; ++i) {
             lua_pushstring(L,
-              itype->construction->materials[i].rtype->_name[0]);
+              itype->construction->materials[i].rtype->_name);
             lua_pushinteger(L, itype->construction->materials[i].number);
             lua_settable(L, -3);
           }
@@ -865,7 +866,7 @@ static int config_get_btype(lua_State * L)
         lua_newtable(L);
         for (i = 0; btype->maintenance[i].number; ++i) {
           lua_pushstring(L,
-              btype->maintenance[i].rtype->_name[0]);
+              btype->maintenance[i].rtype->_name);
           lua_pushinteger(L, btype->maintenance[i].number);
           lua_settable(L, -3);
         }
@@ -884,7 +885,7 @@ static int config_get_btype(lua_State * L)
           lua_newtable(L);
           for (i = 0; btype->construction->materials[i].number; ++i) {
             lua_pushstring(L,
-              btype->construction->materials[i].rtype->_name[0]);
+              btype->construction->materials[i].rtype->_name);
             lua_pushinteger(L, btype->construction->materials[i].number);
             lua_settable(L, -3);
           }
@@ -950,7 +951,7 @@ static int config_get_stype(lua_State * L)
           lua_newtable(L);
           for (i = 0; stype->construction->materials[i].number; ++i) {
             lua_pushstring(L,
-              stype->construction->materials[i].rtype->_name[0]);
+              stype->construction->materials[i].rtype->_name);
             lua_pushinteger(L, stype->construction->materials[i].number);
             lua_settable(L, -3);
           }

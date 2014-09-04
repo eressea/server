@@ -189,163 +189,6 @@ void chaoscounts(region * r, int fallen)
     a_remove(&r->attribs, a);
 }
 
-/********************/
-/*   at_direction   */
-/********************/
-static void a_initdirection(attrib * a)
-{
-  a->data.v = calloc(1, sizeof(spec_direction));
-}
-
-static void a_freedirection(attrib * a)
-{
-  free(a->data.v);
-}
-
-static int a_agedirection(attrib * a)
-{
-  spec_direction *d = (spec_direction *) (a->data.v);
-  --d->duration;
-  return (d->duration > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
-}
-
-typedef struct dir_lookup {
-  char *name;
-  const char *oldname;
-  struct dir_lookup *next;
-} dir_lookup;
-
-static dir_lookup *dir_name_lookup;
-
-void register_special_direction(const char *name)
-{
-  struct locale *lang;
-  char *str = _strdup(name);
-
-  for (lang = locales; lang; lang = nextlocale(lang)) {
-    void **tokens = get_translations(lang, UT_SPECDIR);
-    const char *token = LOC(lang, name);
-
-    if (token) {
-      variant var;
-
-      var.v = str;
-      addtoken(tokens, token, var);
-
-      if (lang == default_locale) {
-        dir_lookup *dl = malloc(sizeof(dir_lookup));
-        dl->name = str;
-        dl->oldname = token;
-        dl->next = dir_name_lookup;
-        dir_name_lookup = dl;
-      }
-    } else {
-      log_error("no translation for spec_direction '%s' in locale '%s'\n", name, locale_name(lang));
-    }
-  }
-}
-
-static int a_readdirection(attrib * a, void *owner, struct storage *store)
-{
-  spec_direction *d = (spec_direction *) (a->data.v);
-
-  READ_INT(store, &d->x);
-  READ_INT(store, &d->y);
-  READ_INT(store, &d->duration);
-  if (global.data_version < UNICODE_VERSION) {
-    char lbuf[16];
-    dir_lookup *dl = dir_name_lookup;
-
-    READ_TOK(store, NULL, 0);
-    READ_TOK(store, lbuf, sizeof(lbuf));
-
-    cstring_i(lbuf);
-    for (; dl; dl = dl->next) {
-      if (strcmp(lbuf, dl->oldname) == 0) {
-        d->keyword = _strdup(dl->name);
-        sprintf(lbuf, "%s_desc", d->keyword);
-        d->desc = _strdup(dl->name);
-        break;
-      }
-    }
-    if (dl == NULL) {
-      log_error("unknown spec_direction '%s'\n", lbuf);
-      assert(!"not implemented");
-    }
-  } else {
-    char lbuf[32];
-    READ_TOK(store, lbuf, sizeof(lbuf));
-    d->desc = _strdup(lbuf);
-    READ_TOK(store, lbuf, sizeof(lbuf));
-    d->keyword = _strdup(lbuf);
-  }
-  d->active = true;
-  return AT_READ_OK;
-}
-
-static void
-a_writedirection(const attrib * a, const void *owner, struct storage *store)
-{
-  spec_direction *d = (spec_direction *) (a->data.v);
-
-  WRITE_INT(store, d->x);
-  WRITE_INT(store, d->y);
-  WRITE_INT(store, d->duration);
-  WRITE_TOK(store, d->desc);
-  WRITE_TOK(store, d->keyword);
-}
-
-attrib_type at_direction = {
-  "direction",
-  a_initdirection,
-  a_freedirection,
-  a_agedirection,
-  a_writedirection,
-  a_readdirection
-};
-
-region *find_special_direction(const region * r, const char *token,
-  const struct locale *lang)
-{
-  attrib *a;
-  spec_direction *d;
-
-  if (strlen(token) == 0)
-    return NULL;
-  for (a = a_find(r->attribs, &at_direction); a && a->type == &at_direction;
-    a = a->next) {
-    d = (spec_direction *) (a->data.v);
-
-    if (d->active) {
-      void **tokens = get_translations(lang, UT_SPECDIR);
-      variant var;
-      if (findtoken(*tokens, token, &var) == E_TOK_SUCCESS) {
-        if (strcmp((const char *)var.v, d->keyword) == 0) {
-          return findregion(d->x, d->y);
-        }
-      }
-    }
-  }
-
-  return NULL;
-}
-
-attrib *create_special_direction(region * r, region * rt, int duration,
-  const char *desc, const char *keyword)
-{
-  attrib *a = a_add(&r->attribs, a_new(&at_direction));
-  spec_direction *d = (spec_direction *) (a->data.v);
-
-  d->active = false;
-  d->x = rt->x;
-  d->y = rt->y;
-  d->duration = duration;
-  d->desc = _strdup(desc);
-  d->keyword = _strdup(keyword);
-
-  return a;
-}
-
 /* Moveblock wird zur Zeit nicht über Attribute, sondern ein Bitfeld
    r->moveblock gemacht. Sollte umgestellt werden, wenn kompliziertere
    Dinge gefragt werden. */
@@ -386,12 +229,12 @@ static int dummy_data;
 static region *dummy_ptr = (region *) & dummy_data;     /* a funny hack */
 
 typedef struct uidhashentry {
-  unsigned int uid;
+  int uid;
   region *r;
 } uidhashentry;
 static uidhashentry uidhash[MAXREGIONS];
 
-struct region *findregionbyid(unsigned int uid)
+struct region *findregionbyid(int uid)
 {
   int key = uid % MAXREGIONS;
   while (uidhash[key].uid != 0 && uidhash[key].uid != uid)
@@ -413,7 +256,7 @@ static void unhash_uid(region * r)
 
 static void hash_uid(region * r)
 {
-  unsigned int uid = r->uid;
+  int uid = r->uid;
   for (;;) {
     if (uid != 0) {
       int key = uid % MAXREGIONS;
@@ -628,49 +471,6 @@ int koor_distance(int x1, int y1, int x2, int y2)
 int distance(const region * r1, const region * r2)
 {
   return koor_distance(r1->x, r1->y, r2->x, r2->y);
-}
-
-static direction_t
-koor_reldirection(int ax, int ay, int bx, int by, const struct plane *pl)
-{
-  int dir;
-  for (dir = 0; dir != MAXDIRECTIONS; ++dir) {
-    int x = ax + delta_x[dir];
-    int y = ay + delta_y[dir];
-    pnormalize(&x, &y, pl);
-    if (bx == x && by == y)
-      return (direction_t)dir;
-  }
-  return NODIRECTION;
-}
-
-spec_direction *special_direction(const region * from, const region * to)
-{
-  const attrib *a = a_findc(from->attribs, &at_direction);
-
-  while (a != NULL && a->type == &at_direction) {
-    spec_direction *sd = (spec_direction *) a->data.v;
-    if (sd->x == to->x && sd->y == to->y)
-      return sd;
-    a = a->next;
-  }
-  return NULL;
-}
-
-direction_t reldirection(const region * from, const region * to)
-{
-  plane *pl = rplane(from);
-  if (pl == rplane(to)) {
-    direction_t dir = koor_reldirection(from->x, from->y, to->x, to->y, pl);
-
-    if (dir == NODIRECTION) {
-      spec_direction *sd = special_direction(from, to);
-      if (sd != NULL && sd->active)
-        return D_SPECIAL;
-    }
-    return dir;
-  }
-  return NODIRECTION;
 }
 
 void free_regionlist(region_list * rl)
@@ -940,7 +740,7 @@ static region *last;
 
 static unsigned int max_index = 0;
 
-region *new_region(int x, int y, struct plane *pl, unsigned int uid)
+region *new_region(int x, int y, struct plane *pl, int uid)
 {
   region *r;
 
@@ -1409,7 +1209,7 @@ int resolve_region_id(variant id, void *address)
 {
   region *r = NULL;
   if (id.i != 0) {
-    r = findregionbyid((unsigned int)id.i);
+    r = findregionbyid(id.i);
     if (r == NULL) {
       *(region **) address = NULL;
       return -1;

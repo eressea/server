@@ -20,9 +20,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "creation.h"
 #include "monster.h"
+#include "alchemy.h"
 
 /* kernel includes */
-#include <kernel/alchemy.h>
 #include <kernel/build.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>

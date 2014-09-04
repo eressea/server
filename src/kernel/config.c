@@ -27,7 +27,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "alliance.h"
 #include "ally.h"
 #include "alchemy.h"
-#include "battle.h"
 #include "connection.h"
 #include "building.h"
 #include "calendar.h"
@@ -40,7 +39,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "magic.h"
 #include "messages.h"
 #include "move.h"
-#include "names.h"
 #include "objtypes.h"
 #include "order.h"
 #include "plane.h"
@@ -75,6 +73,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/unicode.h>
 #include <util/umlaut.h>
 #include <util/xml.h>
+
+#include <stealth.h>
 
 #ifdef USE_LIBXML2
 /* libxml includes */
@@ -314,11 +314,11 @@ helpmode helpmodes[] = {
  */
 const char *dbrace(const struct race *rc)
 {
-    static char zText[32];
+    static char zText[32]; // FIXME: static return value
     char *zPtr = zText;
 
     /* the english names are all in ASCII, so we don't need to worry about UTF8 */
-    strcpy(zText, (const char *)LOC(get_locale("en"), rc_name(rc, 0)));
+    strcpy(zText, (const char *)LOC(get_locale("en"), rc_name(rc, NAME_SINGULAR)));
     while (*zPtr) {
         *zPtr = (char)(toupper(*zPtr));
         ++zPtr;
@@ -346,7 +346,7 @@ const char *parameters[MAXPARAMS] = {
     "SCHIFF",
     "SILBER",
     "STRASSEN",
-    "TEMPORAERE",
+    "TEMP",
     "FLIEHE",
     "GEBAEUDE",
     "GIB",                        /* Für HELFE */
@@ -637,6 +637,7 @@ unsigned int atoip(const char *s)
 {
     int n;
 
+    assert(s);
     n = atoi(s);
 
     if (n < 0)
@@ -666,23 +667,6 @@ region *findunitregion(const unit * su)
 
     return (region *) NULL;
 #endif
-}
-
-int eff_stealth(const unit * u, const region * r)
-{
-    int e = 0;
-
-    /* Auf Schiffen keine Tarnung! */
-    if (!u->ship && skill_enabled(SK_STEALTH)) {
-        e = eff_skill(u, SK_STEALTH, r);
-
-        if (fval(u, UFL_STEALTH)) {
-            int es = u_geteffstealth(u);
-            if (es >= 0 && es < e)
-                return es;
-        }
-    }
-    return e;
 }
 
 bool unit_has_cursed_item(unit * u)
@@ -973,7 +957,7 @@ int modifier)
 #ifndef NDEBUG
 const char *strcheck(const char *s, size_t maxlen)
 {
-    static char buffer[16 * 1024];
+    static char buffer[16 * 1024]; // FIXME: static return value
     if (strlen(s) > maxlen) {
         assert(maxlen < 16 * 1024);
         log_warning("[strcheck] String wurde auf %d Zeichen verkürzt:\n%s\n", (int)maxlen, s);
@@ -1137,12 +1121,13 @@ const char *igetstrtoken(const char *initstr)
 
 unsigned int getuint(void)
 {
-    return atoip((const char *)getstrtoken());
+    const char *s = getstrtoken();
+    return s ? atoip(s) : 0;
 }
 
 int getint(void)
 {
-    return atoi((const char *)getstrtoken());
+    return atoi(getstrtoken());
 }
 
 const struct race *findrace(const char *s, const struct locale *lang)
@@ -1172,7 +1157,7 @@ param_t findparam(const char *s, const struct locale * lang)
 {
     param_t result = NOPARAM;
     char buffer[64];
-    char * str = transliterate(buffer, sizeof(buffer) - sizeof(int), s);
+    char * str = s ? transliterate(buffer, sizeof(buffer) - sizeof(int), s) : 0;
 
     if (str && *str) {
         int i;
@@ -1204,6 +1189,7 @@ param_t findparam_ex(const char *s, const struct locale * lang)
 
 bool isparam(const char *s, const struct locale * lang, param_t param)
 {
+    assert(s);
     if (s[0] > '@') {
         param_t p = (param == P_GEBAEUDE) ? findparam_ex(s, lang) : findparam(s, lang);
         return p == param;
@@ -1791,7 +1777,7 @@ void init_options_translation(const struct locale * lang) {
     }
 }
 
-static void init_locale(const struct locale *lang)
+void init_locale(const struct locale *lang)
 {
     variant var;
     int i;
@@ -1835,9 +1821,9 @@ static void init_locale(const struct locale *lang)
     for (rc = races; rc; rc = rc->next) {
         const char *name;
         var.v = (void *)rc;
-        name = LOC(lang, rc_name(rc, 1));
+        name = LOC(lang, rc_name(rc, NAME_PLURAL));
         if (name) addtoken(tokens, name, var);
-        name = LOC(lang, rc_name(rc, 0));
+        name = LOC(lang, rc_name(rc, NAME_SINGULAR));
         if (name) addtoken(tokens, name, var);
     }
 
@@ -1855,8 +1841,8 @@ typedef struct param {
 
 int getid(void)
 {
-    const char *str = (const char *)getstrtoken();
-    int i = atoi36(str);
+    const char *str = getstrtoken();
+    int i = str ? atoi36(str) : 0;
     if (i < 0) {
         return -1;
     }
@@ -1908,7 +1894,7 @@ int check_param(const struct param *p, const char *key, const char *searchvalue)
 static const char *g_datadir;
 const char *datapath(void)
 {
-    static char zText[MAX_PATH];
+    static char zText[MAX_PATH]; // FIXME: static return value
     if (g_datadir)
         return g_datadir;
     return strcat(strcpy(zText, basepath()), "/data");
@@ -1922,7 +1908,7 @@ void set_datapath(const char *path)
 static const char *g_reportdir;
 const char *reportpath(void)
 {
-    static char zText[MAX_PATH];
+    static char zText[MAX_PATH]; // FIXME: static return value
     if (g_reportdir)
         return g_reportdir;
     return strcat(strcpy(zText, basepath()), "/reports");
@@ -2681,40 +2667,6 @@ message *movement_error(unit * u, const char *token, order * ord,
     return NULL;
 }
 
-int movewhere(const unit * u, const char *token, region * r, region ** resultp)
-{
-    region *r2;
-    direction_t d;
-
-    if (*token == '\0') {
-        *resultp = NULL;
-        return E_MOVE_OK;
-    }
-
-    d = get_direction(token, u->faction->locale);
-    switch (d) {
-    case D_PAUSE:
-        *resultp = r;
-        break;
-
-    case NODIRECTION:
-        r2 = find_special_direction(r, token, u->faction->locale);
-        if (r2 == NULL) {
-            return E_MOVE_NOREGION;
-        }
-        *resultp = r2;
-        break;
-
-    default:
-        r2 = rconnect(r, d);
-        if (r2 == NULL || move_blocked(u, r, r2)) {
-            return E_MOVE_BLOCKED;
-        }
-        *resultp = r2;
-    }
-    return E_MOVE_OK;
-}
-
 bool move_blocked(const unit * u, const region * r, const region * r2)
 {
     connection *b;
@@ -2793,7 +2745,6 @@ void attrib_init(void)
     at_register(&at_seenspell);
 
     /* neue REGION-Attribute */
-    at_register(&at_direction);
     at_register(&at_moveblock);
     at_register(&at_deathcount);
     at_register(&at_chaoscount);

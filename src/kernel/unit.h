@@ -125,10 +125,6 @@ extern "C" {
 
   int ualias(const struct unit *u);
 
-  extern struct attrib_type at_stealth;
-
-  void u_seteffstealth(struct unit *u, int value);
-  int u_geteffstealth(const struct unit *u);
   const struct race *u_irace(const struct unit *u);
   const struct race *u_race(const struct unit *u);
   void u_setrace(struct unit *u, const struct race *);

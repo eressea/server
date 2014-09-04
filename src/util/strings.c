@@ -1,7 +1,7 @@
 /*
 Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -20,73 +20,72 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* libc includes */
 #include <string.h>
+#include <assert.h>
 
 unsigned int hashstring(const char *s)
 {
-  unsigned int key = 0;
-  while (*s) {
-    key = key * 37 + *s++;
-  }
-  return key & 0x7FFFFFFF;
+    unsigned int key = 0;
+    while (*s) {
+        key = key * 37 + *s++;
+    }
+    return key & 0x7FFFFFFF;
 }
 
 const char *escape_string(const char *str, char *buffer,
-  unsigned int len)
+    unsigned int len)
 {
-  const char *start = strchr(str, '\"');
-  if (start) {
-    static char s_buffer[4096]; /* STATIC_RESULT: used for return, not across calls */
-    const char *p;
-    char *o;
-    size_t skip = start - str;
+    const char *start = strchr(str, '\"');
+    if (!start) start = strchr(str, '\\');
+    assert(buffer);
+    if (start) {
+        const char *p;
+        char *o;
+        size_t skip = start - str;
 
-    if (buffer == NULL) {
-      buffer = s_buffer;
-      len = sizeof(s_buffer);
+        memcpy(buffer, str, skip);
+        o = buffer + skip;
+        p = str + skip;
+        do {
+            if (*p == '\"' || *p == '\\') {
+                if (len < 2) {
+                    *o = '\0';
+                    break;
+                }
+                (*o++) = '\\';
+                len -= 2;
+            }
+            else {
+                if (len < 1) {
+                    *o = '\0';
+                    break;
+                }
+                --len;
+            }
+            (*o++) = (*p);
+        } while (*p++);
+        return buffer;
     }
-    memcpy(buffer, str, skip);
-    o = buffer + skip;
-    p = str + skip;
-    do {
-      if (*p == '\"' || *p == '\\') {
-        if (len < 2) {
-          *o = '\0';
-          break;
-        }
-        (*o++) = '\\';
-        len -= 2;
-      } else {
-        if (len < 1) {
-          *o = '\0';
-          break;
-        }
-        --len;
-      }
-      (*o++) = (*p);
-    } while (*p++);
-    return buffer;
-  }
-  return str;
+    return str;
 }
 
 unsigned int jenkins_hash(unsigned int a)
 {
-  a = (a + 0x7ed55d16) + (a << 12);
-  a = (a ^ 0xc761c23c) ^ (a >> 19);
-  a = (a + 0x165667b1) + (a << 5);
-  a = (a + 0xd3a2646c) ^ (a << 9);
-  a = (a + 0xfd7046c5) + (a << 3);
-  a = (a ^ 0xb55a4f09) ^ (a >> 16);
-  return a;
+    a = (a + 0x7ed55d16) + (a << 12);
+    a = (a ^ 0xc761c23c) ^ (a >> 19);
+    a = (a + 0x165667b1) + (a << 5);
+    a = (a + 0xd3a2646c) ^ (a << 9);
+    a = (a + 0xfd7046c5) + (a << 3);
+    a = (a ^ 0xb55a4f09) ^ (a >> 16);
+    return a;
 }
 
 unsigned int wang_hash(unsigned int a)
 {
-  a = ~a + (a << 15);           /*  a = (a << 15) - a - 1; */
-  a = a ^ (a >> 12);
-  a = a + (a << 2);
-  a = a ^ (a >> 4);
-  a = a * 2057;                 /*  a = (a + (a << 3)) + (a << 11); */
-  a = a ^ (a >> 16);
-  return a;
+    a = ~a + (a << 15);           /*  a = (a << 15) - a - 1; */
+    a = a ^ (a >> 12);
+    a = a + (a << 2);
+    a = a ^ (a >> 4);
+    a = a * 2057;                 /*  a = (a + (a << 3)) + (a << 11); */
+    a = a ^ (a >> 16);
+    return a;
 }

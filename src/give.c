@@ -26,7 +26,6 @@
 #include <kernel/pool.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/reports.h>
 #include <kernel/ship.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
@@ -228,7 +227,7 @@ void give_men(int n, unit * u, unit * u2, struct order *ord)
         error = 312;
     }
     else if (u2 && u2->number != 0 && u_race(u2) != u_race(u)) {
-        log_debug("faction %s attempts to give %s to %s.\n", itoa36(u->faction->no), u_race(u)->_name[0], u_race(u2)->_name[0]);
+        log_debug("faction %s attempts to give %s to %s.\n", itoa36(u->faction->no), u_race(u)->_name, u_race(u2)->_name);
         error = 139;
     }
     else if (u2 != NULL && (get_racename(u2->attribs)
