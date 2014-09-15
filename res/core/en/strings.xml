@@ -1574,6 +1574,9 @@
   <string name="grow">
     <text locale="en">GROW</text>
   </string>
+  <string name="loot">
+    <text locale="en">loot</text>
+  </string>
 </namespace>
 
   <!--  NR generieren -->

@@ -2302,6 +2302,9 @@
   <string name="sort">
     <text locale="de">SORTIEREN</text>
   </string>
+  <string name="loot">
+    <text locale="de">Plündere</text>
+  </string>
   </namespace>
 
   <!--NR generieren -->

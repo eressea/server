@@ -3194,6 +3194,43 @@ static int do_work(unit * u, order * ord, request * o)
     return -1;
 }
 
+static void expandloot(region * r, request * lootorders)
+{
+    unit *u;
+    int i;
+    int looted = 0;
+    int startmoney = rmoney(r);
+
+    expandorders(r, lootorders);
+    if (!norders)
+        return;
+
+    for (i = 0; i != norders && rmoney(r) > TAXFRACTION * 2; i++) {
+        change_money(oa[i].unit, TAXFRACTION);
+        oa[i].unit->n += TAXFRACTION;
+        /*Looting destroys double the money*/
+        rsetmoney(r, rmoney(r) - TAXFRACTION * 2);
+        looted = looted + TAXFRACTION * 2;
+    }
+    free(oa);
+    
+    /* Lowering morale by 1 depending on the looted money (+20%) */
+    if (chance(looted / startmoney + 0.2)) {
+        int m = region_get_morale(r);
+        if (m) {
+            /*Nur Moral -1, turns is not changed, so the first time nothing happens if the morale is good*/
+            region_set_morale(r, m-1, -1);
+        }
+    }
+    
+    for (u = r->units; u; u = u->next) {
+        if (u->n >= 0) {
+            add_income(u, IC_LOOT, u->wants, u->n);
+            fset(u, UFL_LONGACTION | UFL_NOTMOVING);
+        }
+    }
+}
+
 static void expandtax(region * r, request * taxorders)
 {
     unit *u;
@@ -3281,6 +3318,71 @@ void tax_cmd(unit * u, struct order *ord, request ** taxorders)
     return;
 }
 
+void loot_cmd(unit * u, struct order *ord, request ** lootorders)
+{
+    region *r = u->region;
+    unit *u2;
+    int n;
+    int max;
+    request *o;
+    keyword_t kwd;
+
+    kwd = init_order(ord);
+    assert(kwd == K_LOOT);
+
+    if (get_param_int(global.parameters, "rules.enable_loot", 0) == 0 && !is_monsters(u->faction)) {
+        return;
+    }
+
+    if (!humanoidrace(u_race(u)) && !is_monsters(u->faction)) {
+        cmistake(u, ord, 228, MSG_INCOME);
+        return;
+    }
+
+    if (fval(u, UFL_WERE)) {
+        cmistake(u, ord, 228, MSG_INCOME);
+        return;
+    }
+
+    if (besieged(u)) {
+        cmistake(u, ord, 60, MSG_INCOME);
+        return;
+    }
+    n = armedmen(u, false);
+
+    if (!n) {
+        cmistake(u, ord, 48, MSG_INCOME);
+        return;
+    }
+
+    u2 = is_guarded(r, u, GUARD_TAX);
+    if (u2) {
+        ADDMSG(&u->faction->msgs,
+            msg_feedback(u, ord, "region_guarded", "guard", u2));
+        return;
+    }
+
+    max = getuint();
+
+    if (max == 0)
+        max = INT_MAX;
+    if (!playerrace(u_race(u))) {
+        u->wants = _min(income(u), max);
+    }
+    else {
+        /* For player start with 20 Silver +10 every 5 level of close combat skill*/
+        int skbonus = (max(eff_skill(u, SK_MELEE, r), eff_skill(u, SK_SPEAR, r)) * 2 / 10) + 2;
+        u->wants = _min(n * skbonus * 10, max);
+    }
+
+    o = (request *)calloc(1, sizeof(request));
+    o->qty = u->wants / TAXFRACTION;
+    o->unit = u;
+    addlist(lootorders, o);
+
+    return;
+}
+
 #define MAX_WORKERS 2048
 void auto_work(region * r)
 {
@@ -3344,7 +3446,7 @@ static void peasant_taxes(region * r)
 void produce(struct region *r)
 {
     request workers[MAX_WORKERS];
-    request *taxorders, *sellorders, *stealorders, *buyorders;
+    request *taxorders, *lootorders, *sellorders, *stealorders, *buyorders;
     unit *u;
     int todo;
     static int rule_autowork = -1;
@@ -3380,6 +3482,7 @@ void produce(struct region *r)
     nextentertainer = &entertainers[0];
     entertaining = 0;
     taxorders = 0;
+    lootorders = 0;
     stealorders = 0;
 
     for (u = r->units; u; u = u->next) {
@@ -3448,6 +3551,10 @@ void produce(struct region *r)
             tax_cmd(u, u->thisorder, &taxorders);
             break;
 
+        case K_LOOT:
+            loot_cmd(u, u->thisorder, &lootorders);
+            break;
+
         case K_STEAL:
             steal_cmd(u, u->thisorder, &stealorders);
             break;
@@ -3482,6 +3589,9 @@ void produce(struct region *r)
     }
     if (taxorders)
         expandtax(r, taxorders);
+
+    if (lootorders)
+        expandloot(r, lootorders);
 
     /* An erster Stelle Kaufen (expandbuying), die Bauern so Geld bekommen, um
      * nachher zu beim Verkaufen (expandselling) den Spielern abkaufen zu
