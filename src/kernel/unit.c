@@ -1304,7 +1304,12 @@ bool noitem)
 
 #ifdef HUNGER_REDUCES_SKILL
     if (fval(u, UFL_HUNGER)) {
-        skill = skill / 2;
+        if (sk == SK_SAILING && skill > 2) {
+            skill = skill - 1;
+        }
+        else {
+            skill = skill / 2;
+        }
     }
 #endif
     return skill - bskill;
