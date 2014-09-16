@@ -126,7 +126,15 @@ faction *get_or_create_monsters(void)
     if (!f) {
         const race *rc = rc_find("dragon");
             
-        f = addfaction("noreply@eressea.de", NULL, rc, NULL, 0);
+        const char *email = get_param(global.parameters, "monster.email");
+        if (email)
+        {
+            f = addfaction(email, NULL, rc, NULL, 0);
+        }
+        else
+        {
+            f = addfaction("noreply@eressea.de", NULL, rc, NULL, 0);
+        }
         renumber_faction(f, 666);
         faction_setname(f, "Monster");
         f->options = 0;
