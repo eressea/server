@@ -1508,9 +1508,9 @@ bool idle(faction * f)
 
 int maxworkingpeasants(const struct region *r)
 {
-    int i = production(r) * MAXPEASANTS_PER_AREA
-        - ((rtrees(r, 2) + rtrees(r, 1) / 2) * TREESIZE);
-    return _max(i, 0);
+    int size = production(r);
+    int treespace = (rtrees(r, 2) + rtrees(r, 1) / 2) * TREESIZE;
+    return _max(size-treespace, _min(size / 10 , 200));
 }
 
 int lighthouse_range(const building * b, const faction * f)
