@@ -151,51 +151,56 @@ static order *monster_attack(unit * u, const unit * target)
 
 static order *get_money_for_dragon(region * r, unit * u, int wanted)
 {
-  unit *u2;
-  int n;
-
-  /* attackiere bewachende einheiten */
-  for (u2 = r->units; u2; u2 = u2->next) {
-    if (u2 != u && is_guard(u2, GUARD_TAX)) {
-      order *ord = monster_attack(u, u2);
-      if (ord)
-        addlist(&u->orders, ord);
-    }
-  }
-
-  /* falls genug geld in der region ist, treiben wir steuern ein. */
-  if (rmoney(r) >= wanted) {
-    /* 5% chance, dass der drache aus einer laune raus attackiert */
-    if (chance(1.0 - u_race(u)->aggression)) {
-      return create_order(K_TAX, default_locale, NULL);
-    }
-  }
-
-  /* falls der drache launisch ist, oder das regionssilber knapp, greift er alle an */
-  n = 0;
-  for (u2 = r->units; u2; u2 = u2->next) {
-    if (inside_building(u2)!=u->building && u2->faction != u->faction && cansee(u->faction, r, u2, 0)) {
-      int m = get_money(u2);
-      if (m == 0 || is_guard(u2, GUARD_TAX))
-        continue;
-      else {
-        order *ord = monster_attack(u, u2);
-        if (ord) {
-          addlist(&u->orders, ord);
-          n += m;
+    unit *u2;
+    int n;
+    double attack_chance = monster_attack_chance();
+   
+    if (attack_chance > 0.0 && is_guard(u, GUARD_TAX)) {
+        /* attackiere bewachende Einheiten nur wenn wir selbst schon bewachen */
+        for (u2 = r->units; u2; u2 = u2->next) {
+            if (u2 != u && is_guard(u2, GUARD_TAX)) {
+                /*In E3 + E4 etwas problematisch, da der Regionsbesitzer immer bewacht. Der Drache greift also immer die Burg an!*/
+                order *ord = monster_attack(u, u2);
+                if (ord)
+                    addlist(&u->orders, ord);
+            }
         }
-      }
     }
-  }
 
-  /* falls die einnahmen erreicht werden, bleibt das monster noch eine
-   * runde hier. */
-  if (n + rmoney(r) >= wanted) {
-    return create_order(K_TAX, default_locale, NULL);
-  }
+    /* falls genug geld in der region ist, treiben wir steuern ein. */
+    if (rmoney(r) >= wanted) {
+        /* 5% chance, dass der drache aus einer laune raus attackiert */
+        if (attack_chance <= 0.0 || chance(1.0 - u_race(u)->aggression)) {
+            /* Drachen haben in E3 und E4 keine Einnahmen. Neuer Befehl Pluendern erstmal nur fuer Monster?*/
+            return create_order(K_TAX, default_locale, NULL);
+        }
+    }
 
-  /* wenn wir NULL zurückliefern, macht der drache was anderes, z.b. weggehen */
-  return NULL;
+    /* falls der drache launisch ist, oder das regionssilber knapp, greift er alle an */
+    n = 0;
+    for (u2 = r->units; u2; u2 = u2->next) {
+        if (inside_building(u2) != u->building && is_guard(u, GUARD_TAX) && u2->faction != u->faction && cansee(u->faction, r, u2, 0)) {
+            int m = get_money(u2);
+            if (m == 0 || is_guard(u2, GUARD_TAX) || attack_chance <= 0.0)
+                continue;
+            else {
+                order *ord = monster_attack(u, u2);
+                if (ord) {
+                    addlist(&u->orders, ord);
+                    n += m;
+                }
+            }
+        }
+    }
+
+    /* falls die einnahmen erreicht werden, bleibt das monster noch eine */
+    /* runde hier. */
+    if (n + rmoney(r) >= wanted) {
+        return create_order(K_TAX, default_locale, NULL);
+    }
+
+    /* wenn wir NULL zurueckliefern, macht der drache was anderes, z.b. weggehen */
+    return NULL;
 }
 
 static int all_money(region * r, faction * f)
@@ -780,7 +785,7 @@ void plan_monsters(faction * f)
       /* Befehle müssen jede Runde neu gegeben werden: */
       free_orders(&u->orders);
 
-      if (attacking) {
+      if (attacking && is_guard(u, GUARD_TAX)) {
         monster_attacks(u);
       }
       /* units with a plan to kill get ATTACK orders: */
