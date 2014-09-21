@@ -58,6 +58,7 @@ int RunAllTests(void)
   ADD_TESTS(suite, market);
   ADD_TESTS(suite, move);
   ADD_TESTS(suite, stealth);
+  ADD_TESTS(suite, upkeep);
   ADD_TESTS(suite, vortex);
 
   CuSuiteRun(suite);

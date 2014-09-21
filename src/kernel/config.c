@@ -2240,27 +2240,6 @@ int besieged(const unit * u)
         && u->building->besieged >= u->building->size * SIEGEFACTOR);
 }
 
-int lifestyle(const unit * u)
-{
-    int need;
-    plane *pl;
-    static int gamecookie = -1;
-    if (gamecookie != global.cookie) {
-        gamecookie = global.cookie;
-    }
-
-    if (is_monsters(u->faction))
-        return 0;
-
-    need = maintenance_cost(u);
-
-    pl = rplane(u->region);
-    if (pl && fval(pl, PFL_NOFEED))
-        return 0;
-
-    return need;
-}
-
 bool has_horses(const struct unit * u)
 {
     item *itm = u->items;
@@ -2269,56 +2248,6 @@ bool has_horses(const struct unit * u)
             return true;
     }
     return false;
-}
-
-bool hunger(int number, unit * u)
-{
-    region *r = u->region;
-    int dead = 0, hpsub = 0;
-    int hp = u->hp / u->number;
-    static const char *damage = 0;
-    static const char *rcdamage = 0;
-    static const race *rc = 0;
-
-    if (!damage) {
-        damage = get_param(global.parameters, "hunger.damage");
-        if (damage == NULL)
-            damage = "1d12+12";
-    }
-    if (rc != u_race(u)) {
-        rcdamage = get_param(u_race(u)->parameters, "hunger.damage");
-        rc = u_race(u);
-    }
-
-    while (number--) {
-        int dam = dice_rand(rcdamage ? rcdamage : damage);
-        if (dam >= hp) {
-            ++dead;
-        }
-        else {
-            hpsub += dam;
-        }
-    }
-
-    if (dead) {
-        /* Gestorbene aus der Einheit nehmen,
-         * Sie bekommen keine Beerdingung. */
-        ADDMSG(&u->faction->msgs, msg_message("starvation",
-            "unit region dead live", u, r, dead, u->number - dead));
-
-        scale_number(u, u->number - dead);
-        deathcounts(r, dead);
-    }
-    if (hpsub > 0) {
-        /* Jetzt die Schäden der nicht gestorbenen abziehen. */
-        u->hp -= hpsub;
-        /* Meldung nur, wenn noch keine für Tote generiert. */
-        if (dead == 0) {
-            /* Durch unzureichende Ernährung wird %s geschwächt */
-            ADDMSG(&u->faction->msgs, msg_message("malnourish", "unit region", u, r));
-        }
-    }
-    return (dead || hpsub);
 }
 
 void plagues(region * r, bool ismagic)
@@ -2651,51 +2580,6 @@ int maintenance_cost(const struct unit *u)
             return retval;
     }
     return u_race(u)->maintenance * u->number;
-}
-
-message *movement_error(unit * u, const char *token, order * ord,
-    int error_code)
-{
-    direction_t d;
-    switch (error_code) {
-    case E_MOVE_BLOCKED:
-        d = get_direction(token, u->faction->locale);
-        return msg_message("moveblocked", "unit direction", u, d);
-    case E_MOVE_NOREGION:
-        return msg_feedback(u, ord, "unknowndirection", "dirname", token);
-    }
-    return NULL;
-}
-
-bool move_blocked(const unit * u, const region * r, const region * r2)
-{
-    connection *b;
-    curse *c;
-    static const curse_type *fogtrap_ct = NULL;
-
-    if (r2 == NULL)
-        return true;
-    b = get_borders(r, r2);
-    while (b) {
-        if (b->type->block && b->type->block(b, u, r))
-            return true;
-        b = b->next;
-    }
-
-    if (fogtrap_ct == NULL)
-        fogtrap_ct = ct_find("fogtrap");
-    c = get_curse(r->attribs, fogtrap_ct);
-    if (curse_active(c))
-        return true;
-    return false;
-}
-
-void add_income(unit * u, int type, int want, int qty)
-{
-    if (want == INT_MAX)
-        want = qty;
-    ADDMSG(&u->faction->msgs, msg_message("income",
-        "unit region mode wanted amount", u, u->region, type, want, qty));
 }
 
 int produceexp(struct unit *u, skill_t sk, int n)

@@ -11,11 +11,13 @@ without prior permission by the authors of Eressea.
 */
 
 #include <platform.h>
+#include <kernel/types.h>
 #include "bind_faction.h"
 #include "bind_unit.h"
 #include "bindings.h"
 
 #include <kernel/alliance.h>
+#include <kernel/faction.h>
 #include <kernel/config.h>
 #include <kernel/unit.h>
 #include <kernel/item.h>
@@ -452,8 +454,8 @@ static int tolua_faction_get_alliance(lua_State * L)
 
 static int tolua_faction_set_alliance(lua_State * L)
 {
-  faction *self = (faction *) tolua_tousertype(L, 1, 0);
-  alliance *alli = (alliance *) tolua_tousertype(L, 2, 0);
+    struct faction *self = (struct faction *)tolua_tousertype(L, 1, 0);
+    struct alliance *alli = (struct alliance *) tolua_tousertype(L, 2, 0);
 
   setalliance(self, alli);
 
