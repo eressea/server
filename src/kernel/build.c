@@ -90,47 +90,49 @@ ship *getship(const struct region * r)
 
 static void destroy_road(unit * u, int nmax, struct order *ord)
 {
-  direction_t d = get_direction(getstrtoken(), u->faction->locale);
-  unit *u2;
-  region *r = u->region;
-  short n = (short)nmax;
+    const char *s = getstrtoken();
+    direction_t d = s ? get_direction(s, u->faction->locale) : NODIRECTION;
+    if (d == NODIRECTION) {
+        /* Die Richtung wurde nicht erkannt */
+        cmistake(u, ord, 71, MSG_PRODUCE);
+    } else {
+        unit *u2;
+        region *r = u->region;
+        short road, n = (short)nmax;
+        
+        if (nmax > SHRT_MAX) {
+            n = SHRT_MAX;
+        } else if (nmax < 0) {
+            n = 0;
+        }
 
-  if (nmax > SHRT_MAX)
-    n = SHRT_MAX;
-  else if (nmax < 0)
-    n = 0;
+        for (u2 = r->units; u2; u2 = u2->next) {
+            if (u2->faction != u->faction && is_guard(u2, GUARD_TAX)
+                && cansee(u2->faction, u->region, u, 0)
+                && !alliedunit(u, u2->faction, HELP_GUARD)) {
+                cmistake(u, ord, 70, MSG_EVENT);
+                return;
+            }
+        }
 
-  for (u2 = r->units; u2; u2 = u2->next) {
-    if (u2->faction != u->faction && is_guard(u2, GUARD_TAX)
-      && cansee(u2->faction, u->region, u, 0)
-      && !alliedunit(u, u2->faction, HELP_GUARD)) {
-      cmistake(u, ord, 70, MSG_EVENT);
-      return;
+        road = rroad(r, d);
+        n = _min(n, road);
+        if (n != 0) {
+            region *r2 = rconnect(r, d);
+            int willdo = eff_skill(u, SK_ROAD_BUILDING, r) * u->number;
+            willdo = _min(willdo, n);
+            if (willdo == 0) {
+                /* TODO: error message */
+            }
+            if (willdo > SHRT_MAX)
+              road = 0;
+            else
+              road = road - (short)willdo;
+            rsetroad(r, d, road);
+            ADDMSG(&u->faction->msgs, msg_message("destroy_road",
+                                                  "unit from to", u, r, r2));
+        }
     }
-  }
-
-  if (d == NODIRECTION) {
-    /* Die Richtung wurde nicht erkannt */
-    cmistake(u, ord, 71, MSG_PRODUCE);
-  } else {
-    short road = rroad(r, d);
-    n = _min(n, road);
-    if (n != 0) {
-      region *r2 = rconnect(r, d);
-      int willdo = eff_skill(u, SK_ROAD_BUILDING, r) * u->number;
-      willdo = _min(willdo, n);
-      if (willdo == 0) {
-        /* TODO: error message */
-      }
-      if (willdo > SHRT_MAX)
-        road = 0;
-      else
-        road = road - (short)willdo;
-      rsetroad(r, d, road);
-      ADDMSG(&u->faction->msgs, msg_message("destroy_road",
-          "unit from to", u, r, r2));
-    }
-  }
 }
 
 int destroy_cmd(unit * u, struct order *ord)
