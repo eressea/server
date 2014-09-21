@@ -1,5 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 
+cd $ERESSEA/git
 s/preview build
 s/preview version
 for game in 2 3 4 ; do
