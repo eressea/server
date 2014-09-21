@@ -2359,9 +2359,10 @@ int banner_cmd(unit * u, struct order *ord)
 {
     init_tokens(ord);
     skip_token();
+    const char * s = getstrtoken();
 
     free(u->faction->banner);
-    u->faction->banner = _strdup(getstrtoken());
+    u->faction->banner = s ? _strdup(s) : 0;
     add_message(&u->faction->msgs, msg_message("changebanner", "value",
         u->faction->banner));
 

@@ -1142,7 +1142,8 @@ unsigned int getuint(void)
 
 int getint(void)
 {
-    return atoi((const char *)getstrtoken());
+    const char * s = getstrtoken();
+    return s ? atoi(s) : 0;
 }
 
 const struct race *findrace(const char *s, const struct locale *lang)
@@ -1213,7 +1214,8 @@ bool isparam(const char *s, const struct locale * lang, param_t param)
 
 param_t getparam(const struct locale * lang)
 {
-    return findparam(getstrtoken(), lang);
+    const char *s = getstrtoken();
+    return s ? findparam(s, lang) : NOPARAM;
 }
 
 faction *findfaction(int n)

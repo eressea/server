@@ -32,39 +32,48 @@
 #define MAXGAIN 15
 static int
 use_studypotion(struct unit *u, const struct item_type *itype, int amount,
-  struct order *ord)
-{
-  if (getkeyword(u->thisorder) == K_STUDY) {
-    skill_t sk;
-    skill *sv;
-
-    init_tokens(u->thisorder);
-    skip_token();
-    sk = get_skill(getstrtoken(), u->faction->locale);
-    sv = unit_skill(u, sk);
-
-    if (sv && sv->level > 2) {
-      /* TODO: message */
-    } else if (study_cost(u, sk) > 0) {
-      /* TODO: message */
-    } else {
-      attrib *a = a_find(u->attribs, &at_learning);
-      teaching_info *teach;
-      if (a == NULL) {
-        a = a_add(&u->attribs, a_new(&at_learning));
-      }
-      teach = (teaching_info *) a->data.v;
-      if (amount > MAXGAIN)
-        amount = MAXGAIN;
-      teach->value += amount * 30;
-      if (teach->value > MAXGAIN * 30) {
-        teach->value = MAXGAIN * 30;
-      }
-      i_change(&u->items, itype, -amount);
-      return 0;
+                struct order *ord)
+{   
+    if (getkeyword(u->thisorder) == K_STUDY) {
+        skill_t sk = NOSKILL;
+        skill *sv = 0;
+        const char * s = getstrtoken();
+        attrib *a;
+        teaching_info *teach;
+        
+        init_tokens(u->thisorder);
+        skip_token();
+        if (s) {
+            sk = get_skill(s, u->faction->locale);
+            sv = unit_skill(u, sk);
+        }
+        if (sv) {
+            if (sv->level > 2) {
+                /* TODO: message */
+                return EUNUSABLE;
+            } else if (study_cost(u, sk) > 0) {
+                /* TODO: message */
+                return EUNUSABLE;
+            }
+        }
+        
+        a = a_find(u->attribs, &at_learning);
+        if (a == NULL) {
+            a = a_add(&u->attribs, a_new(&at_learning));
+        }
+        
+        teach = (teaching_info *) a->data.v;
+        if (amount > MAXGAIN) {
+            amount = MAXGAIN;
+        }
+        teach->value += amount * 30;
+        if (teach->value > MAXGAIN * 30) {
+            teach->value = MAXGAIN * 30;
+        }
+        i_change(&u->items, itype, -amount);
+        return 0;
     }
-  }
-  return EUNUSABLE;
+    return EUNUSABLE;
 }
 
 /* END studypotion */

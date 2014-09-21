@@ -1823,7 +1823,8 @@ int make_cmd(unit * u, struct order *ord)
             cmistake(u, ord, 275, MSG_PRODUCE);
         }
         else {
-            direction_t d = get_direction(getstrtoken(), u->faction->locale);
+            const char * s = getstrtoken();
+            direction_t d = s ? get_direction(s, u->faction->locale) : NODIRECTION;
             if (d != NODIRECTION) {
                 build_road(r, u, m, d);
             }
@@ -2060,6 +2061,8 @@ static void buy(unit * u, request ** buyorders, struct order *ord)
     attrib *a;
     const item_type *itype = NULL;
     const luxury_type *ltype = NULL;
+    const char *s;
+
     if (u->ship && is_guarded(r, u, GUARD_CREWS)) {
         cmistake(u, ord, 69, MSG_INCOME);
         return;
@@ -2134,7 +2137,8 @@ static void buy(unit * u, request ** buyorders, struct order *ord)
     /* die Menge der verkauften Güter merken */
     a->data.i += n;
 
-    itype = finditemtype(getstrtoken(), u->faction->locale);
+    s = getstrtoken();
+    itype = s ? finditemtype(s, u->faction->locale) : 0;
     if (itype != NULL) {
         ltype = resource2luxury(itype->rtype);
         if (ltype == NULL) {
