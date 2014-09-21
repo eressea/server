@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 [ -z $ERESSEA ] && ERESSEA=$HOME/eressea
 SRC=$ERESSEA/git
 $SRC/s/preview build master
