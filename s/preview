@@ -118,7 +118,8 @@ while getopts :g:t:f:v: o; do
 done
 shift $((OPTIND-1))
 
-[ -d $ERESSEA ] || echo "invalid or missing env variable ERESSEA ($ERESSEA)"
+[ -z $ERESSEA ] && ERESSEA=$HOME/eressea
+[ -d $ERESSEA ] || abort "invalid or missing env variable ERESSEA ($ERESSEA)"
 [ -z $1 ] && usage
 [ -z $SOURCE ] && SOURCE=$ERESSEA/git
 [ -d $SOURCE ] || abort "missing source directory: $SOURCE"
