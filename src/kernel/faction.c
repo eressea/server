@@ -127,12 +127,10 @@ faction *get_or_create_monsters(void)
         const race *rc = rc_find("dragon");
             
         const char *email = get_param(global.parameters, "monster.email");
-        if (email)
-        {
+        if (email) {
             f = addfaction(email, NULL, rc, NULL, 0);
-        }
-        else
-        {
+        } 
+        else {
             f = addfaction("noreply@eressea.de", NULL, rc, NULL, 0);
         }
         renumber_faction(f, 666);
@@ -348,7 +346,7 @@ void destroyfaction(faction * f)
                     if (rc->ec_flags & ECF_REC_HORSES) {  /* Zentauren an die Pferde */
                         h += u->number;
                     }
-                    else {              /* Orks zählen nur zur Hälfte */
+                    else {              /* Orks zÃ¤hlen nur zur HÃ¤lfte */
                         p += (int)(u->number * rc->recruit_multi);
                     }
                     for (itm = u->items; itm; itm = itm->next) {
@@ -373,7 +371,7 @@ void destroyfaction(faction * f)
         group *g;
         ally *sf, *sfn;
 
-        /* Alle HELFE für die Partei löschen */
+        /* Alle HELFE fÃ¼r die Partei lÃ¶schen */
         for (sf = ff->allies; sf; sf = sf->next) {
             if (sf->faction == f) {
                 removelist(&ff->allies, sf);
