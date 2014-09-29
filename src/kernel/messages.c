@@ -69,7 +69,7 @@ arg_set(variant args[], const message_type * mtype, const char *buffer,
   if (i != mtype->nparameters) {
     args[i] = v;
   } else {
-    fprintf(stderr, "invalid parameter %s for message type %s\n", buffer,
+    log_error("invalid parameter %s for message type %s\n", buffer,
       mtype->name);
     assert(!"program aborted.");
   }
