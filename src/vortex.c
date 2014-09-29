@@ -26,32 +26,28 @@ typedef struct dir_lookup {
 
 static dir_lookup *dir_name_lookup;
 
-void register_special_direction(const char *name)
+void register_special_direction(struct locale *lang, const char *name)
 {
-    struct locale *lang;
-    char *str = _strdup(name);
+    const char *token = LOC(lang, name);
 
-    for (lang = locales; lang; lang = nextlocale(lang)) {
+    if (token) {
         void **tokens = get_translations(lang, UT_SPECDIR);
-        const char *token = LOC(lang, name);
+        variant var;
+        char *str = _strdup(name);
 
-        if (token) {
-            variant var;
+        var.v = str;
+        addtoken(tokens, token, var);
 
-            var.v = str;
-            addtoken(tokens, token, var);
-
-            if (lang == locales) {
-                dir_lookup *dl = malloc(sizeof(dir_lookup));
-                dl->name = str;
-                dl->oldname = token;
-                dl->next = dir_name_lookup;
-                dir_name_lookup = dl;
-            }
+        if (lang == locales) {
+            dir_lookup *dl = malloc(sizeof(dir_lookup));
+            dl->name = str;
+            dl->oldname = token;
+            dl->next = dir_name_lookup;
+            dir_name_lookup = dl;
         }
-        else {
-            log_error("no translation for spec_direction '%s' in locale '%s'\n", name, locale_name(lang));
-        }
+    }
+    else {
+        log_error("no translation for spec_direction '%s' in locale '%s'\n", name, locale_name(lang));
     }
 }
 

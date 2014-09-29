@@ -25,7 +25,6 @@ static void test_move_to_vortex(CuTest *tc) {
     lang = get_or_create_locale("en");
     locale_setstring(lang, "vortex", "wirbel");
     init_locale(lang);
-    register_special_direction("vortex");
     t_plain = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION);
     r1 = test_create_region(0, 0, t_plain);
     r2 = test_create_region(5, 0, t_plain);

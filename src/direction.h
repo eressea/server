@@ -22,7 +22,7 @@ typedef enum {
 } direction_t; 
 
 direction_t get_direction(const char *s, const struct locale *);
-void init_directions(const struct locale *lang);
+void init_directions(struct locale *lang);
 void init_direction(const struct locale *lang, direction_t dir, const char *str);
 
 direction_t finddirection(const char *str);

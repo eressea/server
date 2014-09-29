@@ -1779,7 +1779,7 @@ void init_options_translation(const struct locale * lang) {
     }
 }
 
-void init_locale(const struct locale *lang)
+void init_locale(struct locale *lang)
 {
     variant var;
     int i;
@@ -1982,7 +1982,7 @@ void init_locales(void)
 {
     int l;
     for (l = 0; localenames[l]; ++l) {
-        const struct locale *lang = get_or_create_locale(localenames[l]);
+        struct locale *lang = get_or_create_locale(localenames[l]);
         init_locale(lang);
     }
 }

@@ -19,7 +19,7 @@ extern "C" {
 
     struct region *find_special_direction(const struct region *r,
         const char *token);
-    void register_special_direction(const char *name);
+    void register_special_direction(struct locale *lang, const char *name);
     struct spec_direction *special_direction(const struct region * from,
         const struct region * to);
     struct attrib *create_special_direction(struct region *r, struct region *rt,

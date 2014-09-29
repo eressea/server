@@ -4771,6 +4771,10 @@
       Strudel, einen Mahlstrom, welcher alle Schiffe, die ihn passieren,
       schwer beschädigen kann.      
       </text>
+      <text locale="en">
+      This ritual summons a mighty water elemental from the depths of the ocean.
+      The elemental creates an enormous maelstrom which damages any passing ships.
+      </text>
     </string>
     <string name="wyrm_transformation">
       <text locale="de">
