@@ -6,6 +6,7 @@ extern "C" {
 
     struct region;
     struct attrib;
+    struct locale;
 
     typedef struct spec_direction {
         int x, y;
