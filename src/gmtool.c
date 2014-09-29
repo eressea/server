@@ -17,6 +17,7 @@
 #include "gmtool_structs.h"
 #include "console.h"
 #include "listbox.h"
+#include "wormhole.h"
 
 #include <modules/xmas.h>
 #include <modules/gmcmd.h>
@@ -26,7 +27,6 @@
 #if ARENA_MODULE
 #include <modules/arena.h>
 #endif
-#include <modules/wormhole.h>
 #include <modules/autoseed.h>
 #if DUNGEON_MODULE
 #include <modules/dungeon.h>

@@ -92,6 +92,7 @@ set (ERESSEA_SRC
   study.c
   summary.c
   monsters.c
+  wormhole.c
   ${SPELLS_SRC}
   ${RACES_SRC}
   ${ITEMS_SRC}
@@ -153,6 +154,7 @@ target_link_libraries(eressea
 )
 
 set(TESTS_SRC
+  wormhole.test.c
   test_eressea.c
   tests.c
   battle.test.c

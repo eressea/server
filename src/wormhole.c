@@ -173,20 +173,13 @@ make_wormhole(const building_type * bt_wormhole, region * r1, region * r2)
     ADDMSG(&r2->msgs, msg_message("wormhole_appear", "region", r2));
 }
 
-void create_wormholes(void)
-{
 #define WORMHOLE_CHANCE 10000
-    const building_type *bt_wormhole = bt_find("wormhole");
-    quicklist *ql, *rlist = 0;
-    region *r = regions;
-    int qi, i = 0, count = 0;
-    region **match;
 
-    if (bt_wormhole == NULL)
-        return;
-    /*
-     * select a list of regions. we'll sort them by age later.
-     */
+void select_wormhole_regions(quicklist **rlistp, int *countp) {
+    quicklist *rlist = 0;
+    region *r = regions;
+    int count = 0;
+
     while (r != NULL) {
         int next = rng_int() % (2 * WORMHOLE_CHANCE);
         while (r != NULL && (next != 0 || !good_region(r))) {
@@ -202,21 +195,47 @@ void create_wormholes(void)
         r = r->next;
     }
 
-    if (count < 2)
-        return;
+    *countp = count;
+    *rlistp = rlist;
+}
 
-    match = (region **)malloc(sizeof(region *) * count);
+void sort_wormhole_regions(quicklist *rlist, region **match, int count) {
+    quicklist *ql;
+    int qi, i = 0;
 
     for (ql = rlist, qi = 0; i != count; ql_advance(&ql, &qi, 1)) {
         match[i++] = (region *)ql_get(ql, qi);
     }
     qsort(match, count, sizeof(region *), cmp_age);
-    ql_free(rlist);
+}
 
+void make_wormholes(region **match, int count, const building_type *bt_wormhole) {
+    int i;
     count /= 2;
     for (i = 0; i != count; ++i) {
         make_wormhole(bt_wormhole, match[i], match[i + count]);
     }
+}
+
+void create_wormholes(void)
+{
+    const building_type *bt_wormhole = bt_find("wormhole");
+    quicklist *rlist = 0;
+    int count = 0;
+    region **match;
+
+    if (bt_wormhole == NULL) {
+        return;
+    }
+
+    select_wormhole_regions(&rlist, &count);
+    if (count < 2) {
+        return;
+    }
+    match = (region **)malloc(sizeof(region *) * count);
+    sort_wormhole_regions(rlist, match, count);
+    ql_free(rlist);
+    make_wormholes(match, count, bt_wormhole);
     free(match);
 }
 

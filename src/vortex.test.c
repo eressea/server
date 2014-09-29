@@ -35,13 +35,9 @@ static void test_move_to_vortex(CuTest *tc) {
     CuAssertPtrEquals(tc, r2, r);
 }
 
-static void test_vortex(CuTest *tc) {
-}
-
 CuSuite *get_vortex_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
-    SUITE_ADD_TEST(suite, test_vortex);
     SUITE_ADD_TEST(suite, test_move_to_vortex);
     return suite;
 }

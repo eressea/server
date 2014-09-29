@@ -60,6 +60,7 @@ int RunAllTests(void)
   ADD_TESTS(suite, stealth);
   ADD_TESTS(suite, upkeep);
   ADD_TESTS(suite, vortex);
+  ADD_TESTS(suite, wormhole);
 
   CuSuiteRun(suite);
   CuSuiteSummary(suite, output);

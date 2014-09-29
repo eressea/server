@@ -115,7 +115,9 @@ building_type * test_create_buildingtype(const char * name)
     btype->construction->materials[1].number = 0;
     btype->construction->materials[0].number = 1;
     btype->construction->materials[0].rtype = get_resourcetype(R_STONE);
-    locale_setstring(default_locale, name, name);
+    if (default_locale) {
+        locale_setstring(default_locale, name, name);
+    }
     bt_register(btype);
     return btype;
 }

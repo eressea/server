@@ -22,18 +22,18 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "laws.h"
 
 #include <modules/gmcmd.h>
-#include <modules/wormhole.h>
 
+#include "alchemy.h"
+#include "battle.h"
 #include "economy.h"
+#include "keyword.h"
+#include "market.h"
 #include "monster.h"
+#include "move.h"
 #include "randenc.h"
 #include "spy.h"
 #include "study.h"
-#include "market.h"
-#include "keyword.h"
-#include "move.h"
-#include "battle.h"
-#include "alchemy.h"
+#include "wormhole.h"
 
 /* kernel includes */
 #include <kernel/alliance.h>
