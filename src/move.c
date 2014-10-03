@@ -696,10 +696,14 @@ int check_ship_allowed(struct ship *sh, const region * r)
     }
 
     if (bt_harbour && buildingtype_exists(r, bt_harbour, true)) {
-        unit* hafenmeister = NULL;
-        hafenmeister = owner_buildingtyp(r, bt_harbour);
-        if ((sh->_owner->faction == hafenmeister->faction) || (ucontact(sh->_owner, hafenmeister)) || (alliedunit(sh->_owner, hafenmeister->faction, HELP_GUARD)))
+        unit* harbourmaster = NULL;
+        harbourmaster = owner_buildingtyp(r, bt_harbour);
+        if (!harbourmaster || !sh->_owner) {
             return SA_HARBOUR;
+        }
+        else if ((sh->_owner->faction == harbourmaster->faction) || (ucontact(harbourmaster, sh->_owner)) || (alliedunit(harbourmaster, sh->_owner->faction, HELP_GUARD))) {
+            return SA_HARBOUR;
+        }
     }
     if (fval(r->terrain, SEA_REGION)) {
         return SA_COAST;
@@ -2060,7 +2064,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
      * Inland zu segeln versuchte */
 
     if (sh != NULL && fval(sh, SF_MOVED)) {
-        unit *hafenmeister;
+        unit *harbourmaster;
         /* nachdem alle Richtungen abgearbeitet wurden, und alle Einheiten
          * transferiert wurden, kann der aktuelle Befehl gelöscht werden. */
         cycle_route(ord, u, step);
@@ -2089,25 +2093,25 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
 
         /* Hafengebühren ? */
 
-        hafenmeister = owner_buildingtyp(current_point, bt_find("harbour"));
-        if (sh && hafenmeister != NULL) {
+        harbourmaster = owner_buildingtyp(current_point, bt_find("harbour"));
+        if (sh && harbourmaster != NULL) {
             item *itm;
             unit *u2;
             item *trans = NULL;
 
             for (u2 = current_point->units; u2; u2 = u2->next) {
-                if (u2->ship == sh && !alliedunit(hafenmeister, u->faction, HELP_GUARD)) {
+                if (u2->ship == sh && !alliedunit(harbourmaster, u->faction, HELP_GUARD)) {
 
-                    if (effskill(hafenmeister, SK_PERCEPTION) > effskill(u2, SK_STEALTH)) {
+                    if (effskill(harbourmaster, SK_PERCEPTION) > effskill(u2, SK_STEALTH)) {
                         for (itm = u2->items; itm; itm = itm->next) {
                             const luxury_type *ltype = resource2luxury(itm->type->rtype);
                             if (ltype != NULL && itm->number > 0) {
-                                int st = itm->number * effskill(hafenmeister, SK_TRADE) / 50;
+                                int st = itm->number * effskill(harbourmaster, SK_TRADE) / 50;
                                 st = _min(itm->number, st);
 
                                 if (st > 0) {
                                     i_change(&u2->items, itm->type, -st);
-                                    i_change(&hafenmeister->items, itm->type, st);
+                                    i_change(&harbourmaster->items, itm->type, st);
                                     i_add(&trans, i_new(itm->type, st));
                                 }
                             }
@@ -2117,10 +2121,10 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
             }
             if (trans) {
                 message *msg =
-                    msg_message("harbor_trade", "unit items ship", hafenmeister, trans,
+                    msg_message("harbor_trade", "unit items ship", harbourmaster, trans,
                     u->ship);
                 add_message(&u->faction->msgs, msg);
-                add_message(&hafenmeister->faction->msgs, msg);
+                add_message(&harbourmaster->faction->msgs, msg);
                 msg_release(msg);
                 while (trans)
                     i_remove(&trans, trans);
