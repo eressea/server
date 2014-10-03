@@ -29,9 +29,6 @@
 #define BATTLE_KILLS_PEASANTS 20
 #define PEASANTLUCK			10
 
-#define HUNGER_REDUCES_SKILL    /* Hunger reduziert den Talentwert
-                                   auf die Hälfte */
-
 #define ASTRAL_ITEM_RESTRICTIONS        /* keine grossen dinge im astralraum */
 #define NEW_DAEMONHUNGER_RULE
 #define NEW_COMBATSKILLS_RULE

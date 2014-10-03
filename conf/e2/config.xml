@@ -93,9 +93,17 @@
     <param name="GiveRestriction" value="3"/>
     <param name="hunger.long" value="1"/>
     <param name="init_spells" value="0"/>
+    <param name="rules.reserve.twophase" value="1"/>
     <param name="rules.check_overload" value="0"/>
     <param name="rules.limit.faction" value="2500"/>
     <param name="rules.maxskills.magic" value="5"/>
+    <param name="rules.guard.base_stop_prob" value="0.30"/>
+    <param name="rules.guard.skill_stop_prob" value="0.05"/>
+    <param name="rules.guard.amulet_stop_prob" value="0.10"/>
+    <param name="rules.guard.guard_number_stop_prob" value="0.001"/>
+    <param name="rules.guard.castle_stop_prob" value="0.05"/>
+    <param name="rules.guard.region_type_stop_prob" value="0.05"/>
+    <param name="rules.region_owner_pay_building" value="harbour lighthouse"/>
     <param name="game.id" value="2"/>
     <param name="game.name" value="Eressea"/>
   </game>
@@ -113,6 +121,11 @@
     <string name="mailcmd">
       <text locale="de">ERESSEA 2 BEFEHLE</text>
       <text locale="en">ERESSEA 2 ORDERS</text>
+    </string>
+    </string>
+      <string name="defaultorder">
+      <text locale="de">ARBEITEN</text>
+      <text locale="en">WORK</text>
     </string>
   </strings>
 </eressea>

@@ -1280,12 +1280,11 @@ static int att_modification(const unit * u, skill_t sk)
     return (int)result;
 }
 
-int
-get_modifier(const unit * u, skill_t sk, int level, const region * r,
-bool noitem)
+int get_modifier(const unit * u, skill_t sk, int level, const region * r, bool noitem)
 {
     int bskill = level;
     int skill = bskill;
+    int hunger_red_skill = -1;
 
     if (r && sk == SK_STEALTH) {
         plane *pl = rplane(r);
@@ -1302,11 +1301,18 @@ bool noitem)
     }
     skill = skillmod(u->attribs, u, r, sk, skill, SMF_ALWAYS);
 
-#ifdef HUNGER_REDUCES_SKILL
-    if (fval(u, UFL_HUNGER)) {
-        skill = skill / 2;
+    if (hunger_red_skill == -1) {
+        hunger_red_skill = get_param_int(global.parameters, "rules.hunger.reduces_skill", 2);
     }
-#endif
+
+    if (fval(u, UFL_HUNGER) && hunger_red_skill) {
+        if (sk == SK_SAILING && skill > 2 && hunger_red_skill == 2) {
+            skill = skill - 1;
+        }
+        else {
+            skill = skill / 2;
+        }
+    }
     return skill - bskill;
 }
 

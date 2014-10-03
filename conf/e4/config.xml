@@ -114,7 +114,7 @@
     <param name="init_spells" value="0"/>
     <param name="recruit.allow_merge" value="1"/>
     <param name="study.expensivemigrants" value="1"/>
-    <param name="study.speedup" value="0"/>
+    <param name="study.speedup" value="2"/>
     <param name="world.era" value="3"/>
     <param name="rules.migrants" value="0"/>
     <param name="rules.reserve.twophase" value="1"/>
@@ -128,6 +128,7 @@
     <param name="rules.combat.herospeed" value="3"/>
     <param name="rules.combat.demon_vampire" value="5"/> <!-- regen 1 hp per X points of damage done -->
     <param name="rules.combat.skill_bonus" value="0"/>
+    <param name="rules.combat.nat_armor" value="1"/>
     <!--param name="rules.combat.loot" value="5"/--> <!-- only self + others - keeploot -->
     <param name="rules.items.loot_divisor" value="2"/> <!-- damage skims off 1/2 of goods transfers -->
     <param name="rules.items.give_divisor" value="2"/> <!-- corruption skims off 1/2 of goods transfers -->
@@ -148,6 +149,7 @@
     <param name="rules.economy.wages" value="1"/>
     <param name="rules.economy.roqf" value="5"/>
     <param name="rules.economy.herbrot" value="0"/>
+    <param name="rules.region_owner_pay_building" value="market harbour lighthouse"/>
     <param name="rules.dwarf_castles" value="1"/>
     <!-- param name="rules.nmr.destroy" value="1"/ -->
     <param name="rules.limit.faction" value="250"/>
@@ -178,6 +180,11 @@
     <string name="mailcmd">
       <text locale="de">ERESSEA 4 BEFEHLE</text>
       <text locale="en">ERESSEA 4 ORDERS</text>
+    </string>
+    </string>
+      <string name="defaultorder">
+      <text locale="de">ARBEITEN</text>
+      <text locale="en">WORK</text>
     </string>
   </strings>
 </eressea>
