@@ -122,8 +122,7 @@
       <text locale="de">ERESSEA 2 BEFEHLE</text>
       <text locale="en">ERESSEA 2 ORDERS</text>
     </string>
-    </string>
-      <string name="defaultorder">
+    <string name="defaultorder">
       <text locale="de">ARBEITEN</text>
       <text locale="en">WORK</text>
     </string>

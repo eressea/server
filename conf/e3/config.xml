@@ -182,8 +182,7 @@
       <text locale="de">E3 BEFEHLE</text>
       <text locale="en">E3 ORDERS</text>
     </string>
-    </string>
-      <string name="defaultorder">
+    <string name="defaultorder">
       <text locale="de">ARBEITEN</text>
       <text locale="en">WORK</text>
     </string> 
