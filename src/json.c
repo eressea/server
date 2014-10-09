@@ -71,7 +71,7 @@ int json_export(stream * out, int flags) {
            cJSON_AddNumberToObject(data, "y", p->miny);
            cJSON_AddNumberToObject(data, "width", p->maxx-p->minx);
            cJSON_AddNumberToObject(data, "height", p->maxy-p->miny);
-           cJSON_AddStringToObject(data, "name", p->name);
+           if (p->name) cJSON_AddStringToObject(data, "name", p->name);
         }
 
         cJSON_AddItemToObject(root, "regions", json = cJSON_CreateObject());
