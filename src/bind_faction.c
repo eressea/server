@@ -22,6 +22,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/unit.h>
 #include <kernel/item.h>
 #include <kernel/faction.h>
+#include <kernel/messages.h>
 #include <kernel/plane.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
@@ -209,6 +210,15 @@ static int tolua_faction_renumber(lua_State * L)
 
   renumber_faction(self, no);
   return 0;
+}
+
+static int tolua_faction_addnotice(lua_State * L)
+{
+    faction *self = (faction *)tolua_tousertype(L, 1, 0);
+    const char *str = tolua_tostring(L, 2, 0);
+
+    addmessage(NULL, self, str, MSG_MESSAGE, ML_IMPORTANT);
+    return 0;
 }
 
 static int tolua_faction_get_objects(lua_State * L)
@@ -563,9 +573,10 @@ void tolua_faction_open(lua_State * L)
         .property("x", &faction_getorigin_x, &faction_setorigin_x)
         .property("y", &faction_getorigin_y, &faction_setorigin_y)
 
-        .def("add_notice", &faction_addnotice)
 #endif
-        tolua_variable(L, TOLUA_CAST "objects", tolua_faction_get_objects,
+      tolua_function(L, TOLUA_CAST "add_notice", &tolua_faction_addnotice);
+
+      tolua_variable(L, TOLUA_CAST "objects", tolua_faction_get_objects,
         NULL);
     }
     tolua_endmodule(L);
