@@ -229,8 +229,6 @@ extern "C" {
   item_type *it_find(const char *name);
 
   void it_set_appearance(item_type *itype, const char *appearance);
-  void it_register(item_type * it);
-  void wt_register(weapon_type * wt);
 
   extern const item_type *resource2item(const resource_type * rtype);
   extern const resource_type *item2resource(const item_type * i);
