@@ -1,0 +1,10 @@
+#!/bin/sh
+
+ln -sf conf/eressea.ini
+[ -d build ] || mkdir build 
+cd build && cmake .. \
+ -DCMAKE_MODULE_PATH=$PWD/../cmake/Modules \
+ -DCMAKE_BUILD_TYPE=Debug .. && \
+make && cd .. &&
+build/eressea/test_eressea &&
+build/eressea/eressea -v0 scripts/run-tests.lua

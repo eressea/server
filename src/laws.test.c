@@ -287,9 +287,8 @@ void setup_guard(guard_fixture *fix, bool armed) {
 
     if (armed) {
         item_type *itype;
-        weapon_type *wtype;
         itype = it_get_or_create(rt_get_or_create("sword"));
-        wtype = new_weapontype(itype, 0, 0.0, NULL, 0, 0, 0, SK_MELEE, 2);
+        new_weapontype(itype, 0, 0.0, NULL, 0, 0, 0, SK_MELEE, 2);
         i_change(&u->items, itype, 1);
         set_level(u, SK_MELEE, 2);
     }
