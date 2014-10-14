@@ -118,8 +118,8 @@
       eresseahl@gmail.com with the subject DONERESSEA ORDERS.</text>
     </string>
     <string name="mailcmd">
-      <text locale="de">ERESSEADON BEFEHLE</text>
-      <text locale="en">ERESSEADON ORDERS</text>
+      <text locale="de">DONERESSEA BEFEHLE</text>
+      <text locale="en">DONERESSEA ORDERS</text>
     </string>
     <string name="defaultorder">
       <text locale="de">ARBEITEN</text>
