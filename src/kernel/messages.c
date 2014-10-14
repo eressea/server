@@ -208,7 +208,7 @@ caddmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
       m = add_message(&f->msgs, msg_message("msg_economy", "string", s));
       break;
     case MSG_BATTLE:
-      assert(0 || !"battle-meldungen nicht über addmessage machen");
+      assert(0 || !"battle messages must not use addmessage");
       break;
     case MSG_MOVE:
       assert(f);
@@ -240,7 +240,7 @@ caddmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
       }
       break;
     default:
-      assert(!"Ungültige Msg-Klasse!");
+      assert(!"invalid message class");
   }
   if (m)
     msg_release(m);

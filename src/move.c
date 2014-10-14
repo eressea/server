@@ -917,7 +917,7 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
             if ((u->faction == reisender->faction) || (ucontact(u, reisender)) || (alliedunit(u, reisender->faction, HELP_GUARD)))
                 guard_count = guard_count - u->number;
             else if (sk >= stealth) {
-                guard_count =+ u->number;
+                guard_count += u->number;
                 double prob_u = (sk - stealth) * skill_prob;
                 /* amulet counts at most once */
                 prob_u += _min (1, _min(u->number, i_get(u->items, ramulet->itype))) * amulet_prob;

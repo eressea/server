@@ -572,7 +572,7 @@ void verify_data(void)
     int mage, alchemist;
 
     if (verbosity >= 1)
-        puts(" - Überprüfe Daten auf Korrektheit...");
+        puts(" - checking data for correctness...");
 
     for (f = factions; f; f = f->next) {
         mage = 0;
@@ -960,7 +960,7 @@ const char *strcheck(const char *s, size_t maxlen)
     static char buffer[16 * 1024]; // FIXME: static return value
     if (strlen(s) > maxlen) {
         assert(maxlen < 16 * 1024);
-        log_warning("[strcheck] String wurde auf %d Zeichen verkürzt:\n%s\n", (int)maxlen, s);
+        log_warning("[strcheck] string was shortened to %d bytes:\n%s\n", (int)maxlen, s);
         strlcpy(buffer, s, maxlen);
         return buffer;
     }

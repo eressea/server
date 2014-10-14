@@ -93,13 +93,13 @@ void spy_message(int spy, const unit * u, const unit * target)
         if (first == 1) {
           first = 0;
         } else {
-          strncat(buf, ", ", sizeof(buf));
+          strncat(buf, ", ", sizeof(buf)-1);
         }
         strncat(buf, (const char *)skillname((skill_t)sv->id, u->faction->locale),
-          sizeof(buf));
-        strncat(buf, " ", sizeof(buf));
+          sizeof(buf)-1);
+        strncat(buf, " ", sizeof(buf)-1);
         strncat(buf, itoa10(eff_skill(target, (skill_t)sv->id, target->region)),
-          sizeof(buf));
+          sizeof(buf)-1);
       }
     }
     if (found) {
