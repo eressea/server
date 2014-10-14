@@ -1,6 +1,10 @@
 #!/bin/sh
 
-ln -sf conf/eressea.ini
+if [ ! -e eressea.ini ]; then
+cp conf/eressea.ini .
+build/iniparser/inifile eressea.ini add lua:paths lunit:scripts
+fi
+
 [ -d build ] || mkdir build 
 cd build && cmake .. \
  -DCMAKE_MODULE_PATH=$PWD/../cmake/Modules \
