@@ -693,7 +693,6 @@ void demographics(void)
     for (r = regions; r; r = r->next) {
         ++r->age;                   /* also oceans. no idea why we didn't always do that */
         live(r);
-        /* check_split_dragons(); */
 
         if (!fval(r->terrain, SEA_REGION)) {
             /* die Nachfrage nach Produkten steigt. */
