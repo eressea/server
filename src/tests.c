@@ -51,8 +51,8 @@ struct faction *test_create_faction(const struct race *rc)
 
 struct unit *test_create_unit(struct faction *f, struct region *r)
 {
-  unit *u = create_unit(r, f, 1, f?f->race:rc_find("human"), 0, 0, 0);
-  return u;
+    assert(f || !r);
+    return create_unit(r, f, 1, f ? f->race : rc_find("human"), 0, 0, 0);
 }
 
 void test_cleanup(void)

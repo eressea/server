@@ -232,9 +232,8 @@ int gift_items(unit * u, int flags)
     int rule = rule_give();
 
     assert(u->region);
-    assert(u->faction);
 
-    if ((u->faction->flags & FFL_QUIT) == 0 || (rule & GIVE_ONDEATH) == 0) {
+    if ((rule & GIVE_ONDEATH) == 0 || !u->faction || (u->faction->flags & FFL_QUIT) == 0) {
         if ((rule & GIVE_ALLITEMS) == 0 && (flags & GIFT_FRIENDS))
             flags -= GIFT_FRIENDS;
         if ((rule & GIVE_PEASANTS) == 0 && (flags & GIFT_PEASANTS))
