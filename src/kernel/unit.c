@@ -1786,3 +1786,50 @@ int effskill(const unit * u, skill_t sk)
     return eff_skill(u, sk, u->region);
 }
 
+static int MaxAge(void)
+{
+    static int value = -1;
+    static int gamecookie = -1;
+    if (value < 0 || gamecookie != global.cookie) {
+        gamecookie = global.cookie;
+        value = get_param_int(global.parameters, "MaxAge", 0);
+    }
+    return value;
+}
+
+void remove_empty_units_in_region(region * r)
+{
+    unit **up = &r->units;
+    int max_age = MaxAge();
+
+    while (*up) {
+        unit *u = *up;
+
+        if (u->number) {
+            faction *f = u->faction;
+            if (f == NULL || !f->alive) {
+                set_number(u, 0);
+            }
+            if (max_age > 0) {
+                if ((!fval(f, FFL_NOTIMEOUT) && f->age > max_age)) {
+                    set_number(u, 0);
+                }
+            }
+        }
+        if ((u->number == 0 && u_race(u) != get_race(RC_SPELL)) || (u->age <= 0
+            && u_race(u) == get_race(RC_SPELL))) {
+            remove_unit(up, u);
+        }
+        if (*up == u)
+            up = &u->next;
+    }
+}
+
+void remove_empty_units(void)
+{
+    region *r;
+
+    for (r = regions; r; r = r->next) {
+        remove_empty_units_in_region(r);
+    }
+}

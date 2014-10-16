@@ -107,10 +107,6 @@ extern "C" {
 
 #define i2b(i) ((bool)((i)?(true):(false)))
 
-    void remove_empty_units_in_region(struct region *r);
-    void remove_empty_units(void);
-    void remove_empty_factions(void);
-
     typedef struct strlist {
         struct strlist *next;
         char *s;

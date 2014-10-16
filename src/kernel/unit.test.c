@@ -11,6 +11,42 @@
 #include <stdlib.h>
 #include <assert.h>
 
+static void test_remove_empty_units(CuTest *tc) {
+    unit *u;
+    int uid;
+
+    test_cleanup();
+    test_create_world();
+
+    u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
+    uid = u->no;
+    remove_empty_units();
+    CuAssertPtrNotNull(tc, findunit(uid));
+    u->number = 0;
+    remove_empty_units();
+    CuAssertPtrEquals(tc, 0, findunit(uid));
+    test_cleanup();
+}
+
+static void test_remove_empty_units_in_region(CuTest *tc) {
+    unit *u;
+    int uid;
+
+    test_cleanup();
+    test_create_world();
+
+    u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
+    uid = u->no;
+    remove_empty_units_in_region(u->region);
+    CuAssertPtrNotNull(tc, findunit(uid));
+    u->number = 0;
+    remove_empty_units_in_region(u->region);
+    CuAssertPtrEquals(tc, 0, findunit(uid));
+    CuAssertPtrEquals(tc, 0, u->region);
+    CuAssertPtrEquals(tc, 0, u->faction);
+    test_cleanup();
+}
+
 static void test_scale_number(CuTest *tc) {
     unit *u;
     const struct potion_type *ptype;
@@ -37,5 +73,7 @@ CuSuite *get_unit_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_scale_number);
+    SUITE_ADD_TEST(suite, test_remove_empty_units);
+    SUITE_ADD_TEST(suite, test_remove_empty_units_in_region);
     return suite;
 }

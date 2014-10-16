@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define H_KRNL_FACTION
 
 #include "skill.h"
+#include "types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -136,6 +137,7 @@ void destroyfaction(faction * f);
 
   extern void renumber_faction(faction * f, int no);
   void free_faction(struct faction *f);
+  void remove_empty_factions(void);
 
 #ifdef SMART_INTERVALS
   extern void update_interval(struct faction *f, struct region *r);
