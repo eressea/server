@@ -46,8 +46,7 @@ extern "C" {
 # define MAXUNITS 1048573       /* must be prime for hashing. 524287 was >90% full */
 #endif
 
-#define MAXPEASANTS_PER_AREA 10 /* number of peasants per region-size */
-#define TREESIZE (MAXPEASANTS_PER_AREA-2)       /* space used by trees (in #peasants) */
+#define TREESIZE (8)            /* space used by trees (in #peasants) */
 
 #define PEASANTFORCE 0.75       /* Chance einer Vermehrung trotz 90% Auslastung */
 #define HERBROTCHANCE 5         /* Verrottchance für Kräuter (ifdef HERBS_ROT) */
