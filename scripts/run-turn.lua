@@ -98,7 +98,7 @@ local function write_aliases()
       end
     end
   end
- 
+
   file:close()
 end
 
@@ -134,7 +134,7 @@ function process(rules, orders)
     eressea.log.error("could not read game")
     return -1
   end
-  
+
   callbacks(rules, 'init')
   init_summary()
 
@@ -173,7 +173,7 @@ function run_turn(rules)
     set_turn(turn)
   end
 
-  orderfile = orderfile or config.basepath .. '/orders.' .. turn
+  orderfile = orderfile or config.basepath .. '/orders/orders.' .. turn
   eressea.log.debug("executing turn " .. get_turn() .. " with " .. orderfile .. " with rules=" .. config.rules)
   local result = process(rules, orderfile)
   if result==0 then
