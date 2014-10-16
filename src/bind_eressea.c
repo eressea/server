@@ -4,6 +4,7 @@
 
 #include "json.h"
 
+#include <kernel/faction.h>
 #include <kernel/types.h>
 #include <kernel/config.h>
 #include <kernel/save.h>

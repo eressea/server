@@ -34,25 +34,26 @@ struct race *test_create_race(const char *name)
 struct region *test_create_region(int x, int y, const terrain_type *terrain)
 {
   region *r = new_region(x, y, NULL, 0);
-  terraform_region(r, terrain);
+  terraform_region(r, terrain ? terrain : get_or_create_terrain("plain"));
   rsettrees(r, 0, 0);
   rsettrees(r, 1, 0);
   rsettrees(r, 2, 0);
   rsethorses(r, 0);
-  rsetpeasants(r, terrain->size);
+  rsetpeasants(r, r->terrain->size);
   return r;
 }
 
 struct faction *test_create_faction(const struct race *rc)
 {
-  faction *f = addfaction("nobody@eressea.de", NULL, rc?rc:rc_find("human"), default_locale, 0);
+  faction *f = addfaction("nobody@eressea.de", NULL, rc?rc:rc_get_or_create("human"), default_locale, 0);
   return f;
 }
 
 struct unit *test_create_unit(struct faction *f, struct region *r)
 {
-  unit *u = create_unit(r, f, 1, f?f->race:rc_find("human"), 0, 0, 0);
-  return u;
+    const struct race * rc = f ? f->race : 0;
+    assert(f || !r);
+    return create_unit(r, f, 1, rc ? rc : rc_get_or_create("human"), 0, 0, 0);
 }
 
 void test_cleanup(void)

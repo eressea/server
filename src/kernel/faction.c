@@ -601,3 +601,57 @@ int skill_limit(faction * f, skill_t sk)
     return m;
 }
 
+void remove_empty_factions(void)
+{
+    faction **fp, *f3;
+
+    for (fp = &factions; *fp;) {
+        faction *f = *fp;
+        /* monster (0) werden nicht entfernt. alive kann beim readgame
+        * () auf 0 gesetzt werden, wenn monsters keine einheiten mehr
+        * haben. */
+        if ((f->units == NULL || f->alive == 0) && !is_monsters(f)) {
+            ursprung *ur = f->ursprung;
+            while (ur && ur->id != 0)
+                ur = ur->next;
+            if (verbosity >= 2)
+                log_printf(stdout, "\t%s\n", factionname(f));
+
+            /* Einfach in eine Datei schreiben und später vermailen */
+
+            for (f3 = factions; f3; f3 = f3->next) {
+                ally *sf;
+                group *g;
+                ally **sfp = &f3->allies;
+                while (*sfp) {
+                    sf = *sfp;
+                    if (sf->faction == f || sf->faction == NULL) {
+                        *sfp = sf->next;
+                        free(sf);
+                    }
+                    else
+                        sfp = &(*sfp)->next;
+                }
+                for (g = f3->groups; g; g = g->next) {
+                    sfp = &g->allies;
+                    while (*sfp) {
+                        sf = *sfp;
+                        if (sf->faction == f || sf->faction == NULL) {
+                            *sfp = sf->next;
+                            free(sf);
+                        }
+                        else
+                            sfp = &(*sfp)->next;
+                    }
+                }
+            }
+
+            *fp = f->next;
+            funhash(f);
+            free_faction(f);
+            free(f);
+        }
+        else
+            fp = &(*fp)->next;
+    }
+}

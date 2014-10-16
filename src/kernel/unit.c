@@ -232,9 +232,8 @@ int gift_items(unit * u, int flags)
     int rule = rule_give();
 
     assert(u->region);
-    assert(u->faction);
 
-    if ((u->faction->flags & FFL_QUIT) == 0 || (rule & GIVE_ONDEATH) == 0) {
+    if ((rule & GIVE_ONDEATH) == 0 || !u->faction || (u->faction->flags & FFL_QUIT) == 0) {
         if ((rule & GIVE_ALLITEMS) == 0 && (flags & GIFT_FRIENDS))
             flags -= GIFT_FRIENDS;
         if ((rule & GIVE_PEASANTS) == 0 && (flags & GIFT_PEASANTS))
@@ -1786,3 +1785,33 @@ int effskill(const unit * u, skill_t sk)
     return eff_skill(u, sk, u->region);
 }
 
+void remove_empty_units_in_region(region * r)
+{
+    unit **up = &r->units;
+
+    while (*up) {
+        unit *u = *up;
+
+        if (u->number) {
+            faction *f = u->faction;
+            if (f == NULL || !f->alive) {
+                set_number(u, 0);
+            }
+        }
+        if ((u->number == 0 && u_race(u) != get_race(RC_SPELL)) || (u->age <= 0
+            && u_race(u) == get_race(RC_SPELL))) {
+            remove_unit(up, u);
+        }
+        if (*up == u)
+            up = &u->next;
+    }
+}
+
+void remove_empty_units(void)
+{
+    region *r;
+
+    for (r = regions; r; r = r->next) {
+        remove_empty_units_in_region(r);
+    }
+}

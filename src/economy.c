@@ -57,9 +57,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/goodies.h>
-#include <util/lists.h>
 #include <util/language.h>
 #include <util/lists.h>
+#include <util/log.h>
 #include <util/parser.h>
 #include <util/rng.h>
 
