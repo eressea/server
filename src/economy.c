@@ -3215,7 +3215,7 @@ static void expandloot(region * r, request * lootorders)
     free(oa);
     
     /* Lowering morale by 1 depending on the looted money (+20%) */
-    if (chance(looted / startmoney + 0.2)) {
+    if (rng_int() % 100 < ((looted / startmoney) + 0.2)) {
         int m = region_get_morale(r);
         if (m) {
             /*Nur Moral -1, turns is not changed, so the first time nothing happens if the morale is good*/
@@ -3371,7 +3371,7 @@ void loot_cmd(unit * u, struct order *ord, request ** lootorders)
     }
     else {
         /* For player start with 20 Silver +10 every 5 level of close combat skill*/
-        int skbonus = (max(eff_skill(u, SK_MELEE, r), eff_skill(u, SK_SPEAR, r)) * 2 / 10) + 2;
+        int skbonus = (_max(eff_skill(u, SK_MELEE, r), eff_skill(u, SK_SPEAR, r)) * 2 / 10) + 2;
         u->wants = _min(n * skbonus * 10, max);
     }
 
