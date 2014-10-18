@@ -113,8 +113,6 @@ char *rns(FILE * f, char *c, size_t size)
     return c;
 }
 
-extern unsigned int __at_hashkey(const char *s);
-
 
 static unit *unitorders(FILE * F, int enc, struct faction *f)
 {
