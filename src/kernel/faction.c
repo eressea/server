@@ -126,7 +126,13 @@ faction *get_or_create_monsters(void)
     if (!f) {
         const race *rc = rc_find("dragon");
             
-        f = addfaction("noreply@eressea.de", NULL, rc, NULL, 0);
+        const char *email = get_param(global.parameters, "monster.email");
+        if (email) {
+            f = addfaction(email, NULL, rc, NULL, 0);
+        } 
+        else {
+            f = addfaction("noreply@eressea.de", NULL, rc, NULL, 0);
+        }
         renumber_faction(f, 666);
         faction_setname(f, "Monster");
         f->options = 0;
@@ -340,7 +346,7 @@ void destroyfaction(faction * f)
                     if (rc->ec_flags & ECF_REC_HORSES) {  /* Zentauren an die Pferde */
                         h += u->number;
                     }
-                    else {              /* Orks zählen nur zur Hälfte */
+                    else {              /* Orks zÃ¤hlen nur zur HÃ¤lfte */
                         p += (int)(u->number * rc->recruit_multi);
                     }
                     for (itm = u->items; itm; itm = itm->next) {
@@ -365,7 +371,7 @@ void destroyfaction(faction * f)
         group *g;
         ally *sf, *sfn;
 
-        /* Alle HELFE für die Partei löschen */
+        /* Alle HELFE fÃ¼r die Partei lÃ¶schen */
         for (sf = ff->allies; sf; sf = sf->next) {
             if (sf->faction == f) {
                 removelist(&ff->allies, sf);
@@ -601,3 +607,57 @@ int skill_limit(faction * f, skill_t sk)
     return m;
 }
 
+void remove_empty_factions(void)
+{
+    faction **fp, *f3;
+
+    for (fp = &factions; *fp;) {
+        faction *f = *fp;
+        /* monster (0) werden nicht entfernt. alive kann beim readgame
+        * () auf 0 gesetzt werden, wenn monsters keine einheiten mehr
+        * haben. */
+        if ((f->units == NULL || f->alive == 0) && !is_monsters(f)) {
+            ursprung *ur = f->ursprung;
+            while (ur && ur->id != 0)
+                ur = ur->next;
+            if (verbosity >= 2)
+                log_printf(stdout, "\t%s\n", factionname(f));
+
+            /* Einfach in eine Datei schreiben und später vermailen */
+
+            for (f3 = factions; f3; f3 = f3->next) {
+                ally *sf;
+                group *g;
+                ally **sfp = &f3->allies;
+                while (*sfp) {
+                    sf = *sfp;
+                    if (sf->faction == f || sf->faction == NULL) {
+                        *sfp = sf->next;
+                        free(sf);
+                    }
+                    else
+                        sfp = &(*sfp)->next;
+                }
+                for (g = f3->groups; g; g = g->next) {
+                    sfp = &g->allies;
+                    while (*sfp) {
+                        sf = *sfp;
+                        if (sf->faction == f || sf->faction == NULL) {
+                            *sfp = sf->next;
+                            free(sf);
+                        }
+                        else
+                            sfp = &(*sfp)->next;
+                    }
+                }
+            }
+
+            *fp = f->next;
+            funhash(f);
+            free_faction(f);
+            free(f);
+        }
+        else
+            fp = &(*fp)->next;
+    }
+}

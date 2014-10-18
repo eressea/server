@@ -57,9 +57,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/goodies.h>
-#include <util/lists.h>
 #include <util/language.h>
 #include <util/lists.h>
+#include <util/log.h>
 #include <util/parser.h>
 #include <util/rng.h>
 
@@ -1039,12 +1039,10 @@ static bool maintain(building * b, bool first)
     u = building_owner(b);
     if (u == NULL)
         return false;
-    /* If the owner is the region owner, check if biggest castle has the dontpay flag */
+    /* If the owner is the region owner, check if dontpay flag is set for the building where he is in */
     if (check_param(global.parameters, "rules.region_owner_pay_building", b->type->_name)) {
-        if (u == building_owner(largestbuilding(r, &cmp_taxes, false))) {
-            if (fval(u->building, BLD_DONTPAY)) {
-                return false;
-            }
+        if (fval(u->building, BLD_DONTPAY)) {
+            return false;
         }
     }
     for (c = 0; b->type->maintenance[c].number; ++c) {

@@ -102,7 +102,6 @@ struct settings global = {
 
 bool lomem = false;
 FILE *logfile;
-FILE *updatelog;
 bool battledebug = false;
 int turn = -1;
 
@@ -120,17 +119,6 @@ int NewbieImmunity(void)
 bool IsImmune(const faction * f)
 {
     return !fval(f, FFL_NPC) && f->age < NewbieImmunity();
-}
-
-static int MaxAge(void)
-{
-    static int value = -1;
-    static int gamecookie = -1;
-    if (value < 0 || gamecookie != global.cookie) {
-        gamecookie = global.cookie;
-        value = get_param_int(global.parameters, "MaxAge", 0);
-    }
-    return value;
 }
 
 static int ally_flag(const char *s, int help_mask)
@@ -1510,9 +1498,9 @@ bool idle(faction * f)
 
 int maxworkingpeasants(const struct region *r)
 {
-    int i = production(r) * MAXPEASANTS_PER_AREA
-        - ((rtrees(r, 2) + rtrees(r, 1) / 2) * TREESIZE);
-    return _max(i, 0);
+    int size = production(r);
+    int treespace = (rtrees(r, 2) + rtrees(r, 1) / 2) * TREESIZE;
+    return _max(size-treespace, _min(size / 10 , 200));
 }
 
 int lighthouse_range(const building * b, const faction * f)
@@ -2069,100 +2057,6 @@ char *_strdup(const char *s)
 }
 #endif
 
-void remove_empty_factions(void)
-{
-    faction **fp, *f3;
-
-    for (fp = &factions; *fp;) {
-        faction *f = *fp;
-        /* monster (0) werden nicht entfernt. alive kann beim readgame
-         * () auf 0 gesetzt werden, wenn monsters keine einheiten mehr
-         * haben. */
-        if ((f->units == NULL || f->alive == 0) && !is_monsters(f)) {
-            ursprung *ur = f->ursprung;
-            while (ur && ur->id != 0)
-                ur = ur->next;
-            if (verbosity >= 2)
-                log_printf(stdout, "\t%s\n", factionname(f));
-
-            /* Einfach in eine Datei schreiben und später vermailen */
-
-            if (updatelog)
-                fprintf(updatelog, "dropout %s\n", itoa36(f->no));
-
-            for (f3 = factions; f3; f3 = f3->next) {
-                ally *sf;
-                group *g;
-                ally **sfp = &f3->allies;
-                while (*sfp) {
-                    sf = *sfp;
-                    if (sf->faction == f || sf->faction == NULL) {
-                        *sfp = sf->next;
-                        free(sf);
-                    }
-                    else
-                        sfp = &(*sfp)->next;
-                }
-                for (g = f3->groups; g; g = g->next) {
-                    sfp = &g->allies;
-                    while (*sfp) {
-                        sf = *sfp;
-                        if (sf->faction == f || sf->faction == NULL) {
-                            *sfp = sf->next;
-                            free(sf);
-                        }
-                        else
-                            sfp = &(*sfp)->next;
-                    }
-                }
-            }
-
-            *fp = f->next;
-            funhash(f);
-            free_faction(f);
-            free(f);
-        }
-        else
-            fp = &(*fp)->next;
-    }
-}
-
-void remove_empty_units_in_region(region * r)
-{
-    unit **up = &r->units;
-
-    while (*up) {
-        unit *u = *up;
-
-        if (u->number) {
-            faction *f = u->faction;
-            if (f == NULL || !f->alive) {
-                set_number(u, 0);
-            }
-            if (MaxAge() > 0) {
-                if ((!fval(f, FFL_NOTIMEOUT) && f->age > MaxAge())) {
-                    set_number(u, 0);
-                }
-            }
-        }
-        if ((u->number == 0 && u_race(u) != get_race(RC_SPELL)) || (u->age <= 0
-            && u_race(u) == get_race(RC_SPELL))) {
-            remove_unit(up, u);
-        }
-        if (*up == u)
-            up = &u->next;
-    }
-}
-
-void remove_empty_units(void)
-{
-    region *r;
-
-    for (r = regions; r; r = r->next) {
-        remove_empty_units_in_region(r);
-    }
-}
-
 bool faction_id_is_unused(int id)
 {
     return findfaction(id) == NULL;
@@ -2715,20 +2609,12 @@ int entertainmoney(const region * r)
 
 int rule_give(void)
 {
-    static int value = -1;
-    if (value < 0) {
-        value = get_param_int(global.parameters, "rules.give", GIVE_DEFAULT);
-    }
-    return value;
+    return get_param_int(global.parameters, "rules.give", GIVE_DEFAULT);
 }
 
 int markets_module(void)
 {
-    static int value = -1;
-    if (value < 0) {
-        value = get_param_int(global.parameters, "modules.markets", 0);
-    }
-    return value;
+    return get_param_int(global.parameters, "modules.markets", 0);
 }
 
 /** releases all memory associated with the game state.

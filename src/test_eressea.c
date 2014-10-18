@@ -30,6 +30,7 @@ int RunAllTests(void)
   ADD_TESTS(suite, race);
   /* util */
   ADD_TESTS(suite, config);
+  ADD_TESTS(suite, attrib);
   ADD_TESTS(suite, base36);
   ADD_TESTS(suite, bsdstring);
   ADD_TESTS(suite, functions);

@@ -238,6 +238,8 @@ extern "C" {
 
   struct spellbook * unit_get_spellbook(const struct unit * u);
   void unit_add_spell(struct unit * u, struct sc_mage * m, struct spell * sp, int level);
+  void remove_empty_units_in_region(struct region * r);
+  void remove_empty_units(void);
 
   extern struct attrib_type at_creator;
 #ifdef __cplusplus
