@@ -12,7 +12,8 @@ static void test_attrib_new(CuTest * tc)
     CuAssertPtrEquals(tc, 0, a->next);
     CuAssertPtrEquals(tc, 0, a->nexttype);
     CuAssertPtrEquals(tc, (void *)a->type, (void *)&at_test);
-    a_free(a);
+    a_remove(&a, a);
+    CuAssertPtrEquals(tc, 0, a);
 }
 
 
