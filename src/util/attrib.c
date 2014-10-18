@@ -151,14 +151,6 @@ attrib *a_add(attrib ** pa, attrib * a)
     return a;
 }
 
-void a_free(attrib * a)
-{
-    const attrib_type *at = a->type;
-    if (at->finalize)
-        at->finalize(a);
-    free(a);
-}
-
 static int a_unlink(attrib ** pa, attrib * a)
 {
     attrib **pnexttype = pa;
@@ -195,6 +187,14 @@ static int a_unlink(attrib ** pa, attrib * a)
         }
     }
     return 0;
+}
+
+static void a_free(attrib * a)
+{
+    const attrib_type *at = a->type;
+    if (at->finalize)
+        at->finalize(a);
+    free(a);
 }
 
 int a_remove(attrib ** pa, attrib * a)

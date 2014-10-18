@@ -1313,7 +1313,6 @@ faction *readfaction(struct gamedata * data)
             f->flags = FFL_NPC | FFL_NOIDLEOUT;
         }
     }
-    assert((f->flags&FFL_SAVEMASK) == f->flags);
 
     a_read(data->store, &f->attribs, f);
     if (data->version >= CLAIM_VERSION) {
