@@ -35,16 +35,6 @@
 
 /* util includes */
 #include <util/attrib.h>
-#include <util/base36.h>
-#include <util/event.h>
-#include <util/goodies.h>
-#include <util/language.h>
-#include <util/lists.h>
-#include <util/log.h>
-#include <util/umlaut.h>
-#include <util/parser.h>
-#include <util/rng.h>
-
 #include <storage.h>
 
 /* libc includes */
@@ -56,17 +46,10 @@
 static int read_permissions(attrib * a, void *owner, struct storage *store)
 {
   attrib *attr = NULL;
-  a_read(store, &attr, NULL);
-  a_free(attr);
+  a_read(store, &attr, owner);
+  a_remove(&attr, a);
   return AT_READ_OK;
 }
-
-struct attrib_type at_permissions = {
-  "GM:permissions",
-  NULL, NULL, NULL,
-  NULL, read_permissions,
-  ATF_UNIQUE
-};
 
 static int read_gmcreate(attrib * a, void *owner, struct storage *store)
 {
@@ -75,15 +58,8 @@ static int read_gmcreate(attrib * a, void *owner, struct storage *store)
   return AT_READ_OK;
 }
 
-/* at_gmcreate specifies that the owner can create items of a particular type */
-attrib_type at_gmcreate = {
-  "GM:create",
-  NULL, NULL, NULL,
-  NULL, read_gmcreate
-};
-
 void register_gmcmd(void)
 {
-  at_register(&at_gmcreate);
-  at_register(&at_permissions);
+    at_deprecate("GM:create", read_gmcreate);
+    at_deprecate("GM:permissions", read_permissions);
 }

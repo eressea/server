@@ -1,5 +1,6 @@
 #include <platform.h>
 
+#include <kernel/ally.h>
 #include <kernel/faction.h>
 #include <kernel/types.h>
 #include <kernel/race.h>
@@ -12,6 +13,21 @@
 
 #include <assert.h>
 #include <stdio.h>
+
+static void test_remove_empty_factions_allies(CuTest *tc) {
+    faction *f1, *f2;
+    region *r;
+
+    test_cleanup();
+    r = test_create_region(0, 0, 0);
+    f1 = test_create_faction(0);
+    test_create_unit(f1, r);
+    f2 = test_create_faction(0);
+    ally_add(&f1->allies, f2);
+    remove_empty_factions();
+    CuAssertPtrEquals(tc, 0, f1->allies);
+    test_cleanup();
+}
 
 static void test_remove_empty_factions(CuTest *tc) {
     faction *f, *fm;
@@ -95,6 +111,7 @@ CuSuite *get_faction_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_addfaction);
     SUITE_ADD_TEST(suite, test_remove_empty_factions);
+    SUITE_ADD_TEST(suite, test_remove_empty_factions_allies);
     SUITE_ADD_TEST(suite, test_remove_dead_factions);
     SUITE_ADD_TEST(suite, test_get_monsters);
     return suite;
