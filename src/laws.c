@@ -2586,7 +2586,7 @@ int reshow_cmd(unit * u, struct order *ord)
     init_order(ord);
     s = getstrtoken();
 
-    if (isparam(s, u->faction->locale, P_ANY)) {
+    if (s && isparam(s, u->faction->locale, P_ANY)) {
         p = getparam(u->faction->locale);
         s = NULL;
     }
