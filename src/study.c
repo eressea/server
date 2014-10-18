@@ -493,25 +493,37 @@ int teach_cmd(unit * u, struct order *ord)
     return 0;
 }
 
-static double study_speedup(unit * u)
+typedef enum study_rule_t {
+    STUDY_DEFAULT = 0,
+    STUDY_FASTER = 1,
+    STUDY_AUTOTEACH = 2
+} study_rule_t;
+
+static double study_speedup(unit * u, skill_t s, study_rule_t rule)
 {
-#define MINTURN 5               /* 5 */
-#define OFSTURN 2               /* 2 */
+#define MINTURN 16
+    double learnweeks = 0;
+    int i;
     if (turn > MINTURN) {
-        static int speed_rule = -1;
-        if (speed_rule < 0) {
-            speed_rule = get_param_int(global.parameters, "study.speedup", 0);
-        }
-        if (speed_rule == 1) {
-            double learn_age = OFSTURN;
-            int i;
+        if (rule == STUDY_FASTER) {
             for (i = 0; i != u->skill_size; ++i) {
                 skill *sv = u->skills + i;
-                double learn_time = sv->level * (sv->level + 1) / 2.0;
-                learn_age += learn_time;
+                if (sv->id == s){
+                    learnweeks = sv->level * (sv->level + 1) / 2.0;
+                    if (learnweeks < turn / 3) {
+                        return 2.0;
+                    }
+                }
             }
-            if (learn_age < turn) {
-                return 2.0 - learn_age / turn;
+            return 2.0; /* If the skill was not found it is the first study. */
+        }
+        if (rule == STUDY_AUTOTEACH) {
+            for (i = 0; i != u->skill_size; ++i) {
+                skill *sv = u->skills + i;
+                learnweeks = +(sv->level * (sv->level + 1) / 2.0);
+            }
+            if (learnweeks < turn / 2) {
+                return 2.0;
             }
         }
     }
@@ -531,6 +543,7 @@ int learn_cmd(unit * u, order * ord)
     int money = 0;
     skill_t sk;
     int maxalchemy = 0;
+    int speed_rule = (study_rule_t)get_param_int(global.parameters, "study.speedup", 0);
     static int learn_newskills = -1;
     if (learn_newskills < 0) {
         const char *str = get_param(global.parameters, "study.newskills");
@@ -539,7 +552,6 @@ int learn_cmd(unit * u, order * ord)
         else
             learn_newskills = 1;
     }
-
     if ((u_race(u)->flags & RCF_NOLEARN) || fval(u, UFL_WERE)) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_race_nolearn", "race",
             u_race(u)));
@@ -732,7 +744,7 @@ int learn_cmd(unit * u, order * ord)
         teach->value -= u->number * 10;
     }
 
-    multi *= study_speedup(u);
+    multi *= study_speedup(u, sk, speed_rule);
     days = study_days(u, sk);
     days = (int)((days + teach->value) * multi);
 
