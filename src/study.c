@@ -493,13 +493,19 @@ int teach_cmd(unit * u, struct order *ord)
     return 0;
 }
 
-static double study_speedup(unit * u, skill_t s, int rule_type)
+typedef enum study_rule_t {
+    STUDY_DEFAULT = 0,
+    STUDY_FASTER = 1,
+    STUDY_AUTOTEACH = 2
+} study_rule_t;
+
+static double study_speedup(unit * u, skill_t s, study_rule_t rule)
 {
 #define MINTURN 16
     double learnweeks = 0;
     int i;
     if (turn > MINTURN) {
-        if (rule_type == 1) {
+        if (rule == STUDY_FASTER) {
             for (i = 0; i != u->skill_size; ++i) {
                 skill *sv = u->skills + i;
                 if (sv->id == s){
@@ -511,7 +517,7 @@ static double study_speedup(unit * u, skill_t s, int rule_type)
             }
             return 2.0; /* If the skill was not found it is the first study. */
         }
-        if (rule_type == 2) {
+        if (rule == STUDY_AUTOTEACH) {
             for (i = 0; i != u->skill_size; ++i) {
                 skill *sv = u->skills + i;
                 learnweeks = +(sv->level * (sv->level + 1) / 2.0);
@@ -537,7 +543,7 @@ int learn_cmd(unit * u, order * ord)
     int money = 0;
     skill_t sk;
     int maxalchemy = 0;
-    int speed_rule = get_param_int(global.parameters, "study.speedup", 0);
+    int speed_rule = (study_rule_t)get_param_int(global.parameters, "study.speedup", 0);
     static int learn_newskills = -1;
     if (learn_newskills < 0) {
         const char *str = get_param(global.parameters, "study.newskills");
