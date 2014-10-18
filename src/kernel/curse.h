@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2014, Enno Rehling <enno@eressea.de>
                          Katja Zedel <katze@felidae.kn-bremen.de
                          Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -251,7 +251,7 @@ extern "C" {
   bool is_cursed_internal(struct attrib *ap, const curse_type * ctype);
   /* ignoriert CURSE_ISNEW */
 
-  extern void remove_curse(struct attrib **ap, const struct curse *c);
+  bool remove_curse(struct attrib **ap, const struct curse *c);
   /* löscht einen konkreten Spruch auf einem Objekt.
    */
 
@@ -280,11 +280,6 @@ extern "C" {
    * unterschiedlich gewünscht sein
    * */
 
-  extern struct curse *get_cursex(struct attrib *ap, const curse_type * ctype,
-    variant data, bool(*compare) (const struct curse *, variant));
-  /* gibt pointer auf die erste curse-struct zurück, deren Typ ctype ist,
-   * und für die compare() true liefert, oder einen NULL-pointer.
-   * */
   extern struct curse *get_curse(struct attrib *ap, const curse_type * ctype);
   /* gibt pointer auf die erste curse-struct zurück, deren Typ ctype ist,
    * oder einen NULL-pointer
@@ -302,9 +297,6 @@ extern "C" {
   extern void curse_init(struct attrib *a);
   extern void curse_done(struct attrib *a);
   extern int curse_age(struct attrib *a);
-
-  extern bool cmp_curse(const struct attrib *a, const void *data);
-  extern bool cmp_cursetype(const struct attrib *a, const void *data);
 
   extern float destr_curse(struct curse *c, int cast_level, float force);
 
