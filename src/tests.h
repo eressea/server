@@ -7,6 +7,15 @@
 extern "C" {
 #endif
 
+    struct region;
+    struct unit;
+    struct faction;
+    struct building;
+    struct ship;
+    struct item_type;
+    struct building_type;
+    struct terrain_type;
+
     void test_cleanup(void);
 
     struct terrain_type * test_create_terrain(const char * name, unsigned int flags);
