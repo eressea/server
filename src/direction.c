@@ -1,6 +1,7 @@
 #include <platform.h>
 #include <kernel/config.h>
 #include "direction.h"
+#include "vortex.h"
 
 #include "util/language.h"
 #include "util/umlaut.h"
@@ -14,7 +15,7 @@ void init_direction(const struct locale *lang, direction_t dir, const char *str)
     addtoken(tokens, str, token);
 }
 
-void init_directions(const struct locale *lang) {
+void init_directions(struct locale *lang) {
     /* mit dieser routine kann man mehrere namen für eine direction geben,
      * das ist für die hexes ideal. */
     const struct {
@@ -38,6 +39,8 @@ void init_directions(const struct locale *lang) {
     };
     int i;
     void **tokens = get_translations(lang, UT_DIRECTIONS);
+
+    register_special_direction(lang, "vortex");
 
     for (i = 0; dirs[i].direction != NODIRECTION; ++i) {
         const char *str = locale_string(lang, dirs[i].name);

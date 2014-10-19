@@ -116,22 +116,8 @@ void addtoken(void ** root, const char *str, variant id)
         const char str[3];
     } replace[] = {
         /* match lower-case (!) umlauts and others to transcriptions */
-            {
-                228, "AE" },                 /* auml */
-                {
-                    246, "OE" },                 /* ouml */
-                    {
-                        252, "UE" },                 /* uuml */
-                        {
-                            223, "SS" },                 /* szlig */
-                            {
-                                230, "AE" },                 /* norsk */
-                                {
-                                    248, "OE" },                 /* norsk */
-                                    {
-                                        229, "AA" },                 /* norsk */
-                                        {
-                                            0, "" }
+        { 228, "AE" }, { 246, "OE" }, { 252, "UE" }, { 223, "SS" },
+        { 230, "AE" }, { 248, "OE" }, { 229, "AA" }, { 0, "" }
     };
 
     assert(root && str);

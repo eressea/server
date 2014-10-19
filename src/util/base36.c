@@ -18,6 +18,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <platform.h>
 #include "base36.h"
+#include "log.h"
 
 #include <stdlib.h>
 #include <assert.h>
@@ -56,6 +57,7 @@ int atoi36(const char *str)
 
 const char *itoab(int i, int base)
 {
+    const int maxlen = 20;
     static char **as = NULL; // FIXME: static return value
     char *s, *dst;
     static int index = 0;         /* STATIC_XCALL: used across calls */
@@ -63,34 +65,45 @@ const char *itoab(int i, int base)
 
     if (!as) {
         int j;
-        char *x = (char *)calloc(sizeof(char), 8 * 4);      /* STATIC_LEAK: malloc in static variable */
+        char *x = (char *)calloc(sizeof(char), maxlen * 4);      /* STATIC_LEAK: malloc in static variable */
         as = (char **)calloc(sizeof(char *), 4);
         for (j = 0; j != 4; ++j)
-            as[j] = x + j * 8;
+            as[j] = x + j * maxlen;
     }
     s = as[index];
     index = (index + 1) & 3;      /* quick for % 4 */
-    dst = s + 7;
+    dst = s + maxlen - 1;
     (*dst--) = 0;
     if (i != 0) {
         if (i < 0) {
             i = -i;
             neg = 1;
         }
-        while (i) {
+        while (i && dst>=s) {
             int x = i % base;
             i = i / base;
-            if (x < 10)
+            if (x < 10) {
                 *(dst--) = (char)('0' + x);
-            else if ('a' + x - 10 == 'l')
+            }
+            else if ('a' + x - 10 == 'l') {
                 *(dst--) = 'L';
-            else
+            } 
+            else {
                 *(dst--) = (char)('a' + (x - 10));
+            }
         }
-        if (neg)
-            *(dst) = '-';
-        else
-            ++dst;
+        if (dst > s) {
+            if (neg) {
+                *(dst) = '-';
+            }
+            else {
+                ++dst;
+            }
+        }
+        else {
+            log_error("static buffer exhauset, itoab(%d, %d)", i, base);
+            assert(i == 0 || !"itoab: static buffer exhausted");
+        }
     }
     else
         *dst = '0';

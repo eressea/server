@@ -7,7 +7,6 @@ gmcmd.c
 museum.c
 score.c
 weather.c
-wormhole.c
 xmas.c
 )
 FOREACH(_FILE ${_FILES})

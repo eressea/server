@@ -22,8 +22,8 @@ exit $2 # otherwise
 function build() {
 assert_dir $SOURCE
 cd $SOURCE
-git pull || abort "failed to update source. do you have local changes?"
 [ -z $1 ] || git checkout $1
+git pull || abort "failed to update source. do you have local changes?"
 s/build || abort "build failed."
 }
 
@@ -118,7 +118,8 @@ while getopts :g:t:f:v: o; do
 done
 shift $((OPTIND-1))
 
-[ -d $ERESSEA ] || echo "invalid or missing env variable ERESSEA ($ERESSEA)"
+[ -z $ERESSEA ] && ERESSEA=$HOME/eressea
+[ -d $ERESSEA ] || abort "invalid or missing env variable ERESSEA ($ERESSEA)"
 [ -z $1 ] && usage
 [ -z $SOURCE ] && SOURCE=$ERESSEA/git
 [ -d $SOURCE ] || abort "missing source directory: $SOURCE"

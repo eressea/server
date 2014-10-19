@@ -22,18 +22,18 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "laws.h"
 
 #include <modules/gmcmd.h>
-#include <modules/wormhole.h>
 
+#include "alchemy.h"
+#include "battle.h"
 #include "economy.h"
+#include "keyword.h"
+#include "market.h"
 #include "monster.h"
+#include "move.h"
 #include "randenc.h"
 #include "spy.h"
 #include "study.h"
-#include "market.h"
-#include "keyword.h"
-#include "move.h"
-#include "battle.h"
-#include "alchemy.h"
+#include "wormhole.h"
 
 /* kernel includes */
 #include <kernel/alliance.h>
@@ -136,229 +136,6 @@ static void checkorders(void)
     for (f = factions; f; f = f->next)
         if (!is_monsters(f) && turn - f->lastorders == NMRTimeout() - 1)
             ADDMSG(&f->msgs, msg_message("turnreminder", ""));
-}
-
-static bool help_money(const unit * u)
-{
-    if (u_race(u)->ec_flags & GIVEITEM)
-        return true;
-    return false;
-}
-
-static void help_feed(unit * donor, unit * u, int *need_p)
-{
-    int need = *need_p;
-    int give = get_money(donor) - lifestyle(donor);
-    give = _min(need, give);
-
-    if (give > 0) {
-        change_money(donor, -give);
-        change_money(u, give);
-        need -= give;
-        add_spende(donor->faction, u->faction, give, donor->region);
-    }
-    *need_p = need;
-}
-
-enum {
-    FOOD_FROM_PEASANTS = 1,
-    FOOD_FROM_OWNER = 2,
-    FOOD_IS_FREE = 4
-};
-
-void get_food(region * r)
-{
-    plane *pl = rplane(r);
-    unit *u;
-    int peasantfood = rpeasants(r) * 10;
-    static int food_rules = -1;
-    static int gamecookie = -1;
-
-    if (food_rules < 0 || gamecookie != global.cookie) {
-        gamecookie = global.cookie;
-        food_rules = get_param_int(global.parameters, "rules.economy.food", 0);
-    }
-
-    if (food_rules & FOOD_IS_FREE) {
-        return;
-    }
-    /* 1. Versorgung von eigenen Einheiten. Das vorhandene Silber
-     * wird zunächst so auf die Einheiten aufgeteilt, dass idealerweise
-     * jede Einheit genug Silber für ihren Unterhalt hat. */
-
-    for (u = r->units; u; u = u->next) {
-        int need = lifestyle(u);
-
-        /* Erstmal zurücksetzen */
-        freset(u, UFL_HUNGER);
-
-        if (u->ship && (u->ship->flags & SF_FISHING)) {
-            unit *v;
-            int c = 2;
-            for (v = u; c > 0 && v; v = v->next) {
-                if (v->ship == u->ship) {
-                    int get = 0;
-                    if (v->number <= c) {
-                        get = lifestyle(v);
-                    }
-                    else {
-                        get = lifestyle(v) * c / v->number;
-                    }
-                    if (get) {
-                        change_money(v, get);
-                    }
-                }
-                c -= v->number;
-            }
-            u->ship->flags -= SF_FISHING;
-        }
-
-        if (food_rules & FOOD_FROM_PEASANTS) {
-            faction *owner = region_get_owner(r);
-            /* if the region is owned, and the owner is nice, then we'll get
-             * food from the peasants - should not be used with WORK */
-            if (owner != NULL && (get_alliance(owner, u->faction) & HELP_MONEY)) {
-                int rm = rmoney(r);
-                int use = _min(rm, need);
-                rsetmoney(r, rm - use);
-                need -= use;
-            }
-        }
-
-        need -= get_money(u);
-        if (need > 0) {
-            unit *v;
-
-            for (v = r->units; need && v; v = v->next) {
-                if (v->faction == u->faction && help_money(v)) {
-                    int give = get_money(v) - lifestyle(v);
-                    give = _min(need, give);
-                    if (give > 0) {
-                        change_money(v, -give);
-                        change_money(u, give);
-                        need -= give;
-                    }
-                }
-            }
-        }
-    }
-
-    /* 2. Versorgung durch Fremde. Das Silber alliierter Einheiten wird
-     * entsprechend verteilt. */
-    for (u = r->units; u; u = u->next) {
-        int need = lifestyle(u);
-        faction *f = u->faction;
-
-        need -= _max(0, get_money(u));
-
-        if (need > 0) {
-            unit *v;
-
-            if (food_rules & FOOD_FROM_OWNER) {
-                /* the owner of the region is the first faction to help out when you're hungry */
-                faction *owner = region_get_owner(r);
-                if (owner && owner != u->faction) {
-                    for (v = r->units; v; v = v->next) {
-                        if (v->faction == owner && alliedunit(v, f, HELP_MONEY)
-                            && help_money(v)) {
-                            help_feed(v, u, &need);
-                            break;
-                        }
-                    }
-                }
-            }
-            for (v = r->units; need && v; v = v->next) {
-                if (v->faction != f && alliedunit(v, f, HELP_MONEY)
-                    && help_money(v)) {
-                    help_feed(v, u, &need);
-                }
-            }
-
-            /* Die Einheit hat nicht genug Geld zusammengekratzt und
-             * nimmt Schaden: */
-            if (need > 0) {
-                int lspp = lifestyle(u) / u->number;
-                if (lspp > 0) {
-                    int number = (need + lspp - 1) / lspp;
-                    if (hunger(number, u))
-                        fset(u, UFL_HUNGER);
-                }
-            }
-        }
-    }
-
-    /* 3. bestimmen, wie viele Bauern gefressen werden.
-     * bei fehlenden Bauern den Dämon hungern lassen
-     */
-    for (u = r->units; u; u = u->next) {
-        if (u_race(u) == get_race(RC_DAEMON)) {
-            int hungry = u->number;
-
-            /* use peasantblood before eating the peasants themselves */
-            const struct potion_type *pt_blood = 0;
-            const resource_type *rt_blood = rt_find("peasantblood");
-            if (rt_blood) {
-                pt_blood = rt_blood->ptype;
-            }
-            if (pt_blood) {
-                /* always start with the unit itself, then the first known unit that may have some blood */
-                unit *donor = u;
-                while (donor != NULL && hungry > 0) {
-                    int blut = get_effect(donor, pt_blood);
-                    blut = _min(blut, hungry);
-                    if (blut) {
-                        change_effect(donor, pt_blood, -blut);
-                        hungry -= blut;
-                    }
-                    if (donor == u)
-                        donor = r->units;
-                    while (donor != NULL) {
-                        if (u_race(donor) == get_race(RC_DAEMON) && donor != u) {
-                            if (get_effect(donor, pt_blood)) {
-                                /* if he's in our faction, drain him: */
-                                if (donor->faction == u->faction)
-                                    break;
-                            }
-                        }
-                        donor = donor->next;
-                    }
-                }
-            }
-            /* remaining demons feed on peasants */
-            if (pl == NULL || !fval(pl, PFL_NOFEED)) {
-                if (peasantfood >= hungry) {
-                    peasantfood -= hungry;
-                    hungry = 0;
-                }
-                else {
-                    hungry -= peasantfood;
-                    peasantfood = 0;
-                }
-                if (hungry > 0) {
-                    static int demon_hunger = -1;
-                    if (demon_hunger < 0) {
-                        demon_hunger = get_param_int(global.parameters, "hunger.demons", 0);
-                    }
-                    if (demon_hunger == 0) {
-                        /* demons who don't feed are hungry */
-                        if (hunger(hungry, u))
-                            fset(u, UFL_HUNGER);
-                    }
-                    else {
-                        /* no damage, but set the hungry-flag */
-                        fset(u, UFL_HUNGER);
-                    }
-                }
-            }
-        }
-    }
-    rsetpeasants(r, peasantfood / 10);
-
-    /* 3. Von den überlebenden das Geld abziehen: */
-    for (u = r->units; u; u = u->next) {
-        int need = _min(get_money(u), lifestyle(u));
-        change_money(u, -need);
-    }
 }
 
 static void age_unit(region * r, unit * u)
@@ -490,7 +267,7 @@ static void peasants(region * r)
 {
     int peasants = rpeasants(r);
     int money = rmoney(r);
-    int maxp = production(r) * MAXPEASANTS_PER_AREA;
+    int maxp = production(r);
     int n, satiated;
     int dead = 0;
 
@@ -781,7 +558,7 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
 
         /* Grundchance 1.0% */
         /* Jeder Elf in der Region erhöht die Chance marginal */
-        elves = _min(elves, (production(r) * MAXPEASANTS_PER_AREA) / 8);
+        elves = _min(elves, production(r) / 8);
         if (elves) {
             seedchance += 1.0 - pow(0.99999, elves * RESOURCE_QUANTITY);
         }
@@ -916,7 +693,6 @@ void demographics(void)
     for (r = regions; r; r = r->next) {
         ++r->age;                   /* also oceans. no idea why we didn't always do that */
         live(r);
-        /* check_split_dragons(); */
 
         if (!fval(r->terrain, SEA_REGION)) {
             /* die Nachfrage nach Produkten steigt. */
@@ -2350,9 +2126,10 @@ int mail_cmd(unit * u, struct order *ord)
 int banner_cmd(unit * u, struct order *ord)
 {
     init_order(ord);
+    const char * s = getstrtoken();
 
     free(u->faction->banner);
-    u->faction->banner = _strdup(getstrtoken());
+    u->faction->banner = s ? _strdup(s) : 0;
     add_message(&u->faction->msgs, msg_message("changebanner", "value",
         u->faction->banner));
 
@@ -2808,7 +2585,7 @@ int reshow_cmd(unit * u, struct order *ord)
     init_order(ord);
     s = getstrtoken();
 
-    if (isparam(s, u->faction->locale, P_ANY)) {
+    if (s && isparam(s, u->faction->locale, P_ANY)) {
         p = getparam(u->faction->locale);
         s = NULL;
     }

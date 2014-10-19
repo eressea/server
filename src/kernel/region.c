@@ -1187,7 +1187,7 @@ void terraform_region(region * r, const terrain_type * terrain)
 int production(const region * r)
 {
   /* muß rterrain(r) sein, nicht rterrain() wegen rekursion */
-  int p = r->terrain->size / MAXPEASANTS_PER_AREA;
+  int p = r->terrain->size;
   if (curse_active(get_curse(r->attribs, ct_find("drought"))))
     p /= 2;
 

@@ -79,6 +79,8 @@ extern "C" {
         const struct building_type *bt, bool working);
     struct unit *owner_buildingtyp(const struct region *r,
         const struct building_type *bt);
+    bool move_blocked(const struct unit *u, const struct region *src,
+        const struct region *dest);
 
 #define SA_HARBOUR 2
 #define SA_COAST 1

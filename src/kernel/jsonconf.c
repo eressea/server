@@ -496,7 +496,7 @@ static void json_strings(cJSON *json) {
         return;
     }
     for (child=json->child;child;child=child->next) {
-        if ((child->type==cJSON_Object)) {
+        if (child->type==cJSON_Object) {
             struct locale *lang = get_or_create_locale(child->string); 
             json_locale(child, lang);
         } else {
@@ -558,7 +558,7 @@ static void json_skill(cJSON *json, struct locale *lang) {
                 cJSON *entry;
                 for (entry=child->child;entry;entry=entry->next) {
                     init_skill(lang, sk, entry->valuestring);
-                    if ((entry==child->child)) {
+                    if (entry==child->child) {
                         locale_setstring(lang, mkname("skill", skillnames[sk]), entry->valuestring); 
                     }
                 }
@@ -588,7 +588,7 @@ static void json_keyword(cJSON *json, struct locale *lang) {
                 cJSON *entry;
                 for (entry=child->child;entry;entry=entry->next) {
                     init_keyword(lang, kwd, entry->valuestring);
-                    if ((entry==child->child)) {
+                    if (entry==child->child) {
                         locale_setstring(lang, mkname("keyword", keywords[kwd]), entry->valuestring); 
                     }
                 }

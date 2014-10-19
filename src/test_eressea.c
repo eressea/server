@@ -30,6 +30,7 @@ int RunAllTests(void)
   ADD_TESTS(suite, race);
   /* util */
   ADD_TESTS(suite, config);
+  ADD_TESTS(suite, attrib);
   ADD_TESTS(suite, base36);
   ADD_TESTS(suite, bsdstring);
   ADD_TESTS(suite, functions);
@@ -58,7 +59,9 @@ int RunAllTests(void)
   ADD_TESTS(suite, market);
   ADD_TESTS(suite, move);
   ADD_TESTS(suite, stealth);
+  ADD_TESTS(suite, upkeep);
   ADD_TESTS(suite, vortex);
+  ADD_TESTS(suite, wormhole);
 
   CuSuiteRun(suite);
   CuSuiteSummary(suite, output);

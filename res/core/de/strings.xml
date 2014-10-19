@@ -4754,6 +4754,11 @@
       Der Landstrich kann über Jahre hinaus von den Folgen einer 
       solchen Dürre betroffen sein.
       </text>
+      <text locale="en">This powerful ritual opens a gate to the elemental plane of 
+      fire. A great drought comes over the land. Farmers, animals and 
+      plants of the region are fighting for survival, but only half of 
+      all living things will be able to survive a drought like this. 
+      The region will suffer the consequences of such a drought for years to come.</text>
     </string>
     <string name="magic_roots">
       <text locale="de">
@@ -4770,6 +4775,10 @@
       Tiefen des Ozeans. Der Elementar erzeugt einen gewaltigen
       Strudel, einen Mahlstrom, welcher alle Schiffe, die ihn passieren,
       schwer beschädigen kann.      
+      </text>
+      <text locale="en">
+      This ritual summons a mighty water elemental from the depths of the ocean.
+      The elemental creates an enormous maelstrom which damages any passing ships.
       </text>
     </string>
     <string name="wyrm_transformation">

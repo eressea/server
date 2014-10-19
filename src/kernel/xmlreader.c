@@ -631,7 +631,7 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
   xmlChar *propValue;
   int k;
   skill_t sk;
-  int minskill = xml_ivalue(node, "minskill", 0);
+  int minskill = xml_ivalue(node, "minskill", 1);
   int offmod = xml_ivalue(node, "offmod", 0);
   int defmod = xml_ivalue(node, "defmod", 0);
   int reload = xml_ivalue(node, "reload", 0);

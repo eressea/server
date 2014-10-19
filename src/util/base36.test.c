@@ -17,6 +17,8 @@ static void test_itoa36(CuTest * tc)
 {
   CuAssertStrEquals(tc, itoa36(0), "0");
   CuAssertStrEquals(tc, itoa10(INT_MAX), "2147483647");
+  CuAssertStrEquals(tc, itoab(INT_MAX, 8), "17777777777");
+  CuAssertStrEquals(tc, itoab(INT_MAX, 4), "1333333333333333");
   CuAssertStrEquals(tc, itoab(-1, 5), "-1");
   CuAssertStrEquals(tc, itoa36(-1), "-1");
   CuAssertStrEquals(tc, itoa36(-10), "-a");

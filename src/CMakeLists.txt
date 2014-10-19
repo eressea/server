@@ -68,6 +68,7 @@ set (ERESSEA_SRC
   battle.c
   alchemy.c
   stealth.c
+  upkeep.c
   vortex.c
   names.c
   reports.c
@@ -91,6 +92,7 @@ set (ERESSEA_SRC
   study.c
   summary.c
   monsters.c
+  wormhole.c
   ${SPELLS_SRC}
   ${RACES_SRC}
   ${ITEMS_SRC}
@@ -152,6 +154,7 @@ target_link_libraries(eressea
 )
 
 set(TESTS_SRC
+  wormhole.test.c
   test_eressea.c
   tests.c
   battle.test.c
@@ -159,15 +162,16 @@ set(TESTS_SRC
   tests.test.c
   reports.test.c
   stealth.test.c
-  move.test.c
   callback.test.c
   direction.test.c
-  keyword.test.c
-  skill.test.c
-  json.test.c
   economy.test.c
-  market.test.c
+  json.test.c
+  keyword.test.c
   laws.test.c
+  market.test.c
+  move.test.c
+  skill.test.c
+  upkeep.test.c
   ${UTIL_TESTS}
   ${KERNEL_TESTS}
   ${ERESSEA_SRC}

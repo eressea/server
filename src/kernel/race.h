@@ -119,7 +119,7 @@ extern "C" {
 
   typedef struct race {
     struct param *parameters;
-    const char *_name;       /* neu: name[4]völker */
+    const char *_name;
     float magres;
     float maxaura;              /* Faktor auf Maximale Aura */
     float regaura;              /* Faktor auf Regeneration */

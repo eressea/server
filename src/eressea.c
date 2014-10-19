@@ -16,7 +16,6 @@
 #include <kernel/xmlreader.h>
 #include <kernel/item.h>
 #include <kernel/building.h>
-#include <modules/wormhole.h>
 #include <modules/gmcmd.h>
 #include <modules/xmas.h>
 #include <items/itemtypes.h>
@@ -25,6 +24,7 @@
 #include "items.h"
 #include "creport.h"
 #include "names.h"
+#include "wormhole.h"
 
 void game_done(void)
 {

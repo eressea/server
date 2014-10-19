@@ -177,7 +177,7 @@
     <text locale="en">Wall</text>
   </string>
   <string name="wall1_trail">
-    <text locale="de">a solid wall</text>
+    <text locale="en">a solid wall</text>
   </string>
   <string name="hall1_trail">
     <text locale="en">the %s</text>

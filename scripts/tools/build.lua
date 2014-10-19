@@ -3,7 +3,7 @@ function new_faction(email, race, lang, r)
     u = unit.create(f, r, 10)
     u:add_item("log", 5);
     u:add_item("horse", 2);
-    u:add_item("silver", 1000);
+    u:add_item("money", 1000);
     u:add_item("adamantium", 1);
 end
 

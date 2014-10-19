@@ -113,8 +113,6 @@ char *rns(FILE * f, char *c, size_t size)
     return c;
 }
 
-extern unsigned int __at_hashkey(const char *s);
-
 
 static unit *unitorders(FILE * F, int enc, struct faction *f)
 {
@@ -1312,10 +1310,9 @@ faction *readfaction(struct gamedata * data)
     READ_INT(data->store, &f->flags);
     if (data->version < INTFLAGS_VERSION) {
         if (f->no == 0 || f->no == 666) {
-            f->flags = FFL_NPC | FFL_NOTIMEOUT | FFL_NOIDLEOUT;
+            f->flags = FFL_NPC | FFL_NOIDLEOUT;
         }
     }
-    assert((f->flags&FFL_SAVEMASK) == f->flags);
 
     a_read(data->store, &f->attribs, f);
     if (data->version >= CLAIM_VERSION) {

@@ -46,8 +46,7 @@ extern "C" {
 # define MAXUNITS 1048573       /* must be prime for hashing. 524287 was >90% full */
 #endif
 
-#define MAXPEASANTS_PER_AREA 10 /* number of peasants per region-size */
-#define TREESIZE (MAXPEASANTS_PER_AREA-2)       /* space used by trees (in #peasants) */
+#define TREESIZE (8)            /* space used by trees (in #peasants) */
 
 #define PEASANTFORCE 0.75       /* Chance einer Vermehrung trotz 90% Auslastung */
 #define HERBROTCHANCE 5         /* Verrottchance für Kräuter (ifdef HERBS_ROT) */
@@ -106,10 +105,6 @@ extern "C" {
     int shipspeed(const struct ship *sh, const struct unit *u);
 
 #define i2b(i) ((bool)((i)?(true):(false)))
-
-    void remove_empty_units_in_region(struct region *r);
-    void remove_empty_units(void);
-    void remove_empty_factions(void);
 
     typedef struct strlist {
         struct strlist *next;
@@ -177,7 +172,7 @@ extern "C" {
 
     int distribute(int old, int new_value, int n);
     void init_locales(void);
-    void init_locale(const struct locale *lang);
+    void init_locale(struct locale *lang);
 
     int newunitid(void);
     int forbiddenid(int id);
@@ -324,8 +319,6 @@ extern "C" {
      */
     unsigned int guard_flags(const struct unit *u);
 
-    bool hunger(int number, struct unit *u);
-    int lifestyle(const struct unit *);
     int besieged(const struct unit *u);
     int maxworkingpeasants(const struct region *r);
     bool has_horses(const struct unit *u);
@@ -333,11 +326,6 @@ extern "C" {
     int wage(const struct region *r, const struct faction *f,
         const struct race *rc, int in_turn);
     int maintenance_cost(const struct unit *u);
-    struct message *movement_error(struct unit *u, const char *token,
-    struct order *ord, int error_code);
-    bool move_blocked(const struct unit *u, const struct region *src,
-        const struct region *dest);
-    void add_income(struct unit *u, int type, int want, int qty);
 
     const char *datapath(void);
     void set_datapath(const char *path);

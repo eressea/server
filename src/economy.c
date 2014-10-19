@@ -57,9 +57,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/goodies.h>
-#include <util/lists.h>
 #include <util/language.h>
 #include <util/lists.h>
+#include <util/log.h>
 #include <util/parser.h>
 #include <util/rng.h>
 
@@ -1039,12 +1039,10 @@ static bool maintain(building * b, bool first)
     u = building_owner(b);
     if (u == NULL)
         return false;
-    /* If the owner is the region owner, check if biggest castle has the dontpay flag */
+    /* If the owner is the region owner, check if dontpay flag is set for the building where he is in */
     if (check_param(global.parameters, "rules.region_owner_pay_building", b->type->_name)) {
-        if (u == building_owner(largestbuilding(r, &cmp_taxes, false))) {
-            if (fval(u->building, BLD_DONTPAY)) {
-                return false;
-            }
+        if (fval(u->building, BLD_DONTPAY)) {
+            return false;
         }
     }
     for (c = 0; b->type->maintenance[c].number; ++c) {
@@ -1820,7 +1818,8 @@ int make_cmd(unit * u, struct order *ord)
             cmistake(u, ord, 275, MSG_PRODUCE);
         }
         else {
-            direction_t d = get_direction(getstrtoken(), u->faction->locale);
+            const char * s = getstrtoken();
+            direction_t d = s ? get_direction(s, u->faction->locale) : NODIRECTION;
             if (d != NODIRECTION) {
                 build_road(r, u, m, d);
             }
@@ -2058,6 +2057,7 @@ static void buy(unit * u, request ** buyorders, struct order *ord)
     const item_type *itype = NULL;
     const luxury_type *ltype = NULL;
     keyword_t kwd;
+    const char *s;
 
     if (u->ship && is_guarded(r, u, GUARD_CREWS)) {
         cmistake(u, ord, 69, MSG_INCOME);
@@ -2133,7 +2133,8 @@ static void buy(unit * u, request ** buyorders, struct order *ord)
     /* die Menge der verkauften Güter merken */
     a->data.i += n;
 
-    itype = finditemtype(getstrtoken(), u->faction->locale);
+    s = getstrtoken();
+    itype = s ? finditemtype(s, u->faction->locale) : 0;
     if (itype != NULL) {
         ltype = resource2luxury(itype->rtype);
         if (ltype == NULL) {
@@ -2154,6 +2155,13 @@ static void buy(unit * u, request ** buyorders, struct order *ord)
 }
 
 /* ------------------------------------------------------------- */
+static void add_income(unit * u, int type, int want, int qty)
+{
+    if (want == INT_MAX)
+        want = qty;
+    ADDMSG(&u->faction->msgs, msg_message("income",
+        "unit region mode wanted amount", u, u->region, type, want, qty));
+}
 
 /* Steuersätze in % bei Burggröße */
 static int tax_per_size[7] = { 0, 6, 12, 18, 24, 30, 36 };

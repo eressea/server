@@ -186,7 +186,7 @@ resource_type *rt_get_or_create(const char *name) {
     return rtype;
 }
 
-void it_register(item_type * itype)
+static void it_register(item_type * itype)
 {
     char buffer[64];
     const char * name = itype->rtype->_name;
@@ -270,6 +270,7 @@ weapon_type *new_weapontype(item_type * itype,
 {
     weapon_type *wtype;
 
+    assert(minskill > 0);
     assert(resource2weapon(itype->rtype) == NULL);
 
     wtype = calloc(sizeof(weapon_type), 1);

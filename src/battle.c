@@ -226,7 +226,7 @@ int armedmen(const unit * u, bool siege_weapons)
                 const weapon_type *wtype = resource2weapon(itm->type->rtype);
                 if (wtype == NULL || (!siege_weapons && (wtype->flags & WTF_SIEGE)))
                     continue;
-                if (effskill(u, wtype->skill) >= 1)
+                if (effskill(u, wtype->skill) >= wtype->minskill)
                     n += itm->number;
                 /* if (effskill(u, wtype->skill) >= wtype->minskill) n += itm->number; */
                 if (n > u->number)

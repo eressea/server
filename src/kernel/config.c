@@ -102,7 +102,6 @@ struct settings global = {
 
 bool lomem = false;
 FILE *logfile;
-FILE *updatelog;
 bool battledebug = false;
 int turn = -1;
 
@@ -120,17 +119,6 @@ int NewbieImmunity(void)
 bool IsImmune(const faction * f)
 {
     return !fval(f, FFL_NPC) && f->age < NewbieImmunity();
-}
-
-static int MaxAge(void)
-{
-    static int value = -1;
-    static int gamecookie = -1;
-    if (value < 0 || gamecookie != global.cookie) {
-        gamecookie = global.cookie;
-        value = get_param_int(global.parameters, "MaxAge", 0);
-    }
-    return value;
 }
 
 static int ally_flag(const char *s, int help_mask)
@@ -572,7 +560,7 @@ void verify_data(void)
     int mage, alchemist;
 
     if (verbosity >= 1)
-        puts(" - Überprüfe Daten auf Korrektheit...");
+        puts(" - checking data for correctness...");
 
     for (f = factions; f; f = f->next) {
         mage = 0;
@@ -960,7 +948,7 @@ const char *strcheck(const char *s, size_t maxlen)
     static char buffer[16 * 1024]; // FIXME: static return value
     if (strlen(s) > maxlen) {
         assert(maxlen < 16 * 1024);
-        log_warning("[strcheck] String wurde auf %d Zeichen verkürzt:\n%s\n", (int)maxlen, s);
+        log_warning("[strcheck] string was shortened to %d bytes:\n%s\n", (int)maxlen, s);
         strlcpy(buffer, s, maxlen);
         return buffer;
     }
@@ -1127,7 +1115,8 @@ unsigned int getuint(void)
 
 int getint(void)
 {
-    return atoi(getstrtoken());
+    const char * s = getstrtoken();
+    return s ? atoi(s) : 0;
 }
 
 const struct race *findrace(const char *s, const struct locale *lang)
@@ -1199,7 +1188,8 @@ bool isparam(const char *s, const struct locale * lang, param_t param)
 
 param_t getparam(const struct locale * lang)
 {
-    return findparam(getstrtoken(), lang);
+    const char *s = getstrtoken();
+    return s ? findparam(s, lang) : NOPARAM;
 }
 
 faction *findfaction(int n)
@@ -1508,9 +1498,9 @@ bool idle(faction * f)
 
 int maxworkingpeasants(const struct region *r)
 {
-    int i = production(r) * MAXPEASANTS_PER_AREA
-        - ((rtrees(r, 2) + rtrees(r, 1) / 2) * TREESIZE);
-    return _max(i, 0);
+    int size = production(r);
+    int treespace = (rtrees(r, 2) + rtrees(r, 1) / 2) * TREESIZE;
+    return _max(size-treespace, _min(size / 10 , 200));
 }
 
 int lighthouse_range(const building * b, const faction * f)
@@ -1777,7 +1767,7 @@ void init_options_translation(const struct locale * lang) {
     }
 }
 
-void init_locale(const struct locale *lang)
+void init_locale(struct locale *lang)
 {
     variant var;
     int i;
@@ -1980,7 +1970,7 @@ void init_locales(void)
 {
     int l;
     for (l = 0; localenames[l]; ++l) {
-        const struct locale *lang = get_or_create_locale(localenames[l]);
+        struct locale *lang = get_or_create_locale(localenames[l]);
         init_locale(lang);
     }
 }
@@ -2067,100 +2057,6 @@ char *_strdup(const char *s)
 }
 #endif
 
-void remove_empty_factions(void)
-{
-    faction **fp, *f3;
-
-    for (fp = &factions; *fp;) {
-        faction *f = *fp;
-        /* monster (0) werden nicht entfernt. alive kann beim readgame
-         * () auf 0 gesetzt werden, wenn monsters keine einheiten mehr
-         * haben. */
-        if ((f->units == NULL || f->alive == 0) && !is_monsters(f)) {
-            ursprung *ur = f->ursprung;
-            while (ur && ur->id != 0)
-                ur = ur->next;
-            if (verbosity >= 2)
-                log_printf(stdout, "\t%s\n", factionname(f));
-
-            /* Einfach in eine Datei schreiben und später vermailen */
-
-            if (updatelog)
-                fprintf(updatelog, "dropout %s\n", itoa36(f->no));
-
-            for (f3 = factions; f3; f3 = f3->next) {
-                ally *sf;
-                group *g;
-                ally **sfp = &f3->allies;
-                while (*sfp) {
-                    sf = *sfp;
-                    if (sf->faction == f || sf->faction == NULL) {
-                        *sfp = sf->next;
-                        free(sf);
-                    }
-                    else
-                        sfp = &(*sfp)->next;
-                }
-                for (g = f3->groups; g; g = g->next) {
-                    sfp = &g->allies;
-                    while (*sfp) {
-                        sf = *sfp;
-                        if (sf->faction == f || sf->faction == NULL) {
-                            *sfp = sf->next;
-                            free(sf);
-                        }
-                        else
-                            sfp = &(*sfp)->next;
-                    }
-                }
-            }
-
-            *fp = f->next;
-            funhash(f);
-            free_faction(f);
-            free(f);
-        }
-        else
-            fp = &(*fp)->next;
-    }
-}
-
-void remove_empty_units_in_region(region * r)
-{
-    unit **up = &r->units;
-
-    while (*up) {
-        unit *u = *up;
-
-        if (u->number) {
-            faction *f = u->faction;
-            if (f == NULL || !f->alive) {
-                set_number(u, 0);
-            }
-            if (MaxAge() > 0) {
-                if ((!fval(f, FFL_NOTIMEOUT) && f->age > MaxAge())) {
-                    set_number(u, 0);
-                }
-            }
-        }
-        if ((u->number == 0 && u_race(u) != get_race(RC_SPELL)) || (u->age <= 0
-            && u_race(u) == get_race(RC_SPELL))) {
-            remove_unit(up, u);
-        }
-        if (*up == u)
-            up = &u->next;
-    }
-}
-
-void remove_empty_units(void)
-{
-    region *r;
-
-    for (r = regions; r; r = r->next) {
-        remove_empty_units_in_region(r);
-    }
-}
-
 bool faction_id_is_unused(int id)
 {
     return findfaction(id) == NULL;
@@ -2240,27 +2136,6 @@ int besieged(const unit * u)
         && u->building->besieged >= u->building->size * SIEGEFACTOR);
 }
 
-int lifestyle(const unit * u)
-{
-    int need;
-    plane *pl;
-    static int gamecookie = -1;
-    if (gamecookie != global.cookie) {
-        gamecookie = global.cookie;
-    }
-
-    if (is_monsters(u->faction))
-        return 0;
-
-    need = maintenance_cost(u);
-
-    pl = rplane(u->region);
-    if (pl && fval(pl, PFL_NOFEED))
-        return 0;
-
-    return need;
-}
-
 bool has_horses(const struct unit * u)
 {
     item *itm = u->items;
@@ -2269,56 +2144,6 @@ bool has_horses(const struct unit * u)
             return true;
     }
     return false;
-}
-
-bool hunger(int number, unit * u)
-{
-    region *r = u->region;
-    int dead = 0, hpsub = 0;
-    int hp = u->hp / u->number;
-    static const char *damage = 0;
-    static const char *rcdamage = 0;
-    static const race *rc = 0;
-
-    if (!damage) {
-        damage = get_param(global.parameters, "hunger.damage");
-        if (damage == NULL)
-            damage = "1d12+12";
-    }
-    if (rc != u_race(u)) {
-        rcdamage = get_param(u_race(u)->parameters, "hunger.damage");
-        rc = u_race(u);
-    }
-
-    while (number--) {
-        int dam = dice_rand(rcdamage ? rcdamage : damage);
-        if (dam >= hp) {
-            ++dead;
-        }
-        else {
-            hpsub += dam;
-        }
-    }
-
-    if (dead) {
-        /* Gestorbene aus der Einheit nehmen,
-         * Sie bekommen keine Beerdingung. */
-        ADDMSG(&u->faction->msgs, msg_message("starvation",
-            "unit region dead live", u, r, dead, u->number - dead));
-
-        scale_number(u, u->number - dead);
-        deathcounts(r, dead);
-    }
-    if (hpsub > 0) {
-        /* Jetzt die Schäden der nicht gestorbenen abziehen. */
-        u->hp -= hpsub;
-        /* Meldung nur, wenn noch keine für Tote generiert. */
-        if (dead == 0) {
-            /* Durch unzureichende Ernährung wird %s geschwächt */
-            ADDMSG(&u->faction->msgs, msg_message("malnourish", "unit region", u, r));
-        }
-    }
-    return (dead || hpsub);
 }
 
 void plagues(region * r, bool ismagic)
@@ -2653,51 +2478,6 @@ int maintenance_cost(const struct unit *u)
     return u_race(u)->maintenance * u->number;
 }
 
-message *movement_error(unit * u, const char *token, order * ord,
-    int error_code)
-{
-    direction_t d;
-    switch (error_code) {
-    case E_MOVE_BLOCKED:
-        d = get_direction(token, u->faction->locale);
-        return msg_message("moveblocked", "unit direction", u, d);
-    case E_MOVE_NOREGION:
-        return msg_feedback(u, ord, "unknowndirection", "dirname", token);
-    }
-    return NULL;
-}
-
-bool move_blocked(const unit * u, const region * r, const region * r2)
-{
-    connection *b;
-    curse *c;
-    static const curse_type *fogtrap_ct = NULL;
-
-    if (r2 == NULL)
-        return true;
-    b = get_borders(r, r2);
-    while (b) {
-        if (b->type->block && b->type->block(b, u, r))
-            return true;
-        b = b->next;
-    }
-
-    if (fogtrap_ct == NULL)
-        fogtrap_ct = ct_find("fogtrap");
-    c = get_curse(r->attribs, fogtrap_ct);
-    if (curse_active(c))
-        return true;
-    return false;
-}
-
-void add_income(unit * u, int type, int want, int qty)
-{
-    if (want == INT_MAX)
-        want = qty;
-    ADDMSG(&u->faction->msgs, msg_message("income",
-        "unit region mode wanted amount", u, u->region, type, want, qty));
-}
-
 int produceexp(struct unit *u, skill_t sk, int n)
 {
     if (global.producexpchance > 0.0F) {
@@ -2829,20 +2609,12 @@ int entertainmoney(const region * r)
 
 int rule_give(void)
 {
-    static int value = -1;
-    if (value < 0) {
-        value = get_param_int(global.parameters, "rules.give", GIVE_DEFAULT);
-    }
-    return value;
+    return get_param_int(global.parameters, "rules.give", GIVE_DEFAULT);
 }
 
 int markets_module(void)
 {
-    static int value = -1;
-    if (value < 0) {
-        value = get_param_int(global.parameters, "modules.markets", 0);
-    }
-    return value;
+    return get_param_int(global.parameters, "modules.markets", 0);
 }
 
 /** releases all memory associated with the game state.
