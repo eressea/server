@@ -35,6 +35,7 @@ int RunAllTests(void)
   ADD_TESTS(suite, bsdstring);
   ADD_TESTS(suite, functions);
   ADD_TESTS(suite, umlaut);
+  ADD_TESTS(suite, unicode);
   ADD_TESTS(suite, strings);
   /* kernel */
   ADD_TESTS(suite, unit);
