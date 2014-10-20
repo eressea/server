@@ -103,7 +103,7 @@ const char *keywords[MAXKEYWORDS] = {
     "research",
     "give",
     "help",
-    "fight",
+    "combat",
     "ready",
     "buy",
     "contact",

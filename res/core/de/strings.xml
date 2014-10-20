@@ -2173,7 +2173,7 @@
   <string name="help">
     <text locale="de">HELFEN</text>
   </string>
-  <string name="fight">
+  <string name="combat">
     <text locale="de">KÄMPFEN</text>
   </string>
   <string name="ready">
