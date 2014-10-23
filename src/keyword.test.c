@@ -1,6 +1,7 @@
 #include <platform.h>
 #include "kernel/types.h"
 #include "kernel/config.h"
+#include "kernel/order.h"
 #include "keyword.h"
 #include "util/language.h"
 #include "tests.h"
@@ -20,14 +21,21 @@ static void test_init_keywords(CuTest *tc) {
 }
 
 static void test_infinitive(CuTest *tc) {
+    char buffer[32];
     struct locale *lang;
+    struct order *ord;
     test_cleanup();
 
     lang = get_or_create_locale("de");
+    locale_setstring(lang, "keyword::study", "LERNE");
+    init_keyword(lang, K_STUDY, "LERNE");
     init_keyword(lang, K_STUDY, "LERNEN");
     CuAssertIntEquals(tc, K_STUDY, get_keyword("LERN", lang));
     CuAssertIntEquals(tc, K_STUDY, get_keyword("LERNE", lang));
     CuAssertIntEquals(tc, K_STUDY, get_keyword("LERNEN", lang));
+
+    ord = create_order(K_STUDY, lang, "");
+    CuAssertStrEquals(tc, "LERNE", get_command(ord, buffer, sizeof(buffer)));
     test_cleanup();
 }
 
