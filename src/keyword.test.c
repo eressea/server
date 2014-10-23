@@ -19,6 +19,18 @@ static void test_init_keywords(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_infinitive(CuTest *tc) {
+    struct locale *lang;
+    test_cleanup();
+
+    lang = get_or_create_locale("de");
+    init_keyword(lang, K_STUDY, "LERNEN");
+    CuAssertIntEquals(tc, K_STUDY, get_keyword("LERN", lang));
+    CuAssertIntEquals(tc, K_STUDY, get_keyword("LERNE", lang));
+    CuAssertIntEquals(tc, K_STUDY, get_keyword("LERNEN", lang));
+    test_cleanup();
+}
+
 static void test_init_keyword(CuTest *tc) {
     struct locale *lang;
     test_cleanup();
@@ -76,6 +88,7 @@ static void test_get_shortest_match(CuTest *tc) {
 CuSuite *get_keyword_suite(void)
 {
   CuSuite *suite = CuSuiteNew();
+  SUITE_ADD_TEST(suite, test_infinitive);
   SUITE_ADD_TEST(suite, test_init_keyword);
   SUITE_ADD_TEST(suite, test_init_keywords);
   SUITE_ADD_TEST(suite, test_findkeyword);
@@ -83,4 +96,3 @@ CuSuite *get_keyword_suite(void)
   SUITE_DISABLE_TEST(suite, test_get_keyword_default);
   return suite;
 }
-

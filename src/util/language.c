@@ -261,4 +261,5 @@ void free_locales(void)
         free(locales);
         locales = next;
     }
+    memset(lstrs, 0, sizeof(lstrs)); // TODO: does this data need to be free'd?
 }

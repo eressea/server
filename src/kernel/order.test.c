@@ -32,6 +32,7 @@ static void test_parse_order(CuTest *tc) {
     struct locale * lang = get_or_create_locale("en");
 
     locale_setstring(lang, "keyword::move", "MOVE");
+    init_keyword(lang, K_MOVE, "MOVE");
     ord = parse_order("MOVE NORTH", lang);
     CuAssertPtrNotNull(tc, ord);
     CuAssertIntEquals(tc, K_MOVE, getkeyword(ord));

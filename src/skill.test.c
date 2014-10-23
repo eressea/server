@@ -11,8 +11,8 @@ static void test_init_skills(CuTest *tc) {
 
     test_cleanup();
     lang = get_or_create_locale("de");
-    locale_setstring(lang, "alchemy", "Alchemie");
-    init_skills(lang);
+//    locale_setstring(lang, "alchemy", "Alchemie");
+    init_skill(lang, SK_ALCHEMY, "Alchemie");
     CuAssertIntEquals(tc, SK_ALCHEMY, get_skill("alchemie", lang));
     test_cleanup();
 }
