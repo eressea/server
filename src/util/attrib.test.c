@@ -69,6 +69,13 @@ static void test_attrib_nexttype(CuTest * tc)
     CuAssertPtrEquals(tc, a, alist->nexttype);
     CuAssertPtrEquals(tc, 0, a->nexttype);
 
+    a_remove(&alist, alist);
+    CuAssertPtrEquals(tc, a, alist->nexttype);
+
+    CuAssertPtrNotNull(tc, (a = a_add(&alist, a_new(&at_bar))));
+    a_remove(&alist, alist->nexttype);
+    CuAssertPtrEquals(tc, a, alist->nexttype);
+
     a_removeall(&alist, &at_foo);
     a_removeall(&alist, &at_bar);
 }

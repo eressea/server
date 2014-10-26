@@ -673,7 +673,7 @@ static void init_gms(void)
     faction *f;
 
     for (f = factions; f; f = f->next) {
-        const attrib *a = a_findc(f->attribs, &at_gm);
+        attrib *a = a_find(f->attribs, &at_gm);
 
         if (a != NULL)
             fset(f, FFL_GM);
