@@ -101,7 +101,6 @@ extern "C" {
     /* ------------------------------------------------------------- */
     void add_translation(struct critbit_tree **cb, const char *str, int i);
     void init_translations(const struct locale *lang, int ut, const char * (*string_cb)(int i), int maxstrings);
-    void init_locales(void);
     int shipspeed(const struct ship *sh, const struct unit *u);
 
 #define i2b(i) ((bool)((i)?(true):(false)))
@@ -171,7 +170,6 @@ extern "C" {
     /* returns a value between [0..xpct_2], generated with two dice */
 
     int distribute(int old, int new_value, int n);
-    void init_locales(void);
     void init_locale(struct locale *lang);
 
     int newunitid(void);

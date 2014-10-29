@@ -10,11 +10,13 @@
 #include "race.h"
 #include "ship.h"
 #include "spell.h"
+#include "order.h"
 #include "terrain.h"
 #include "util/language.h"
 #include <CuTest.h>
 #include <cJSON.h>
 #include <tests.h>
+#include <string.h>
 #include <stdio.h>
 
 static const struct race * race_with_flag(const char * name) {
@@ -101,7 +103,7 @@ static void test_races(CuTest * tc)
 static void test_findrace(CuTest *tc) {
     const char * data = "{\"races\": { \"dwarf\": {} }, \"strings\": { \"de\" : { \"race::dwarf\" : \"Zwerg\" } } }";
     cJSON *json = cJSON_Parse(data);
-    const struct locale *lang;
+    struct locale *lang;
     const race *rc;
 
     CuAssertPtrNotNull(tc, json);
@@ -110,6 +112,7 @@ static void test_findrace(CuTest *tc) {
     CuAssertPtrEquals(tc, 0, (void *)findrace("Zwerg", lang));
 
     json_config(json);
+    init_locale(lang);
     rc = findrace("Zwerg", lang);
     CuAssertPtrNotNull(tc, rc);
     CuAssertStrEquals(tc, "dwarf", rc->_name);
@@ -228,29 +231,29 @@ static void test_spells(CuTest * tc)
     CuAssertPtrEquals(tc, 0, find_spell("fireball"));
 }
 
+static const char * building_data = "{\"buildings\": { "
+"\"house\" : { "
+"\"maintenance\" : "
+"{ \"type\" : \"iron\", \"amount\" : 1, \"flags\" : [ \"required\", \"variable\" ] }"
+","
+"\"construction\" : {"
+"\"maxsize\" : 20,"
+"\"reqsize\" : 10,"
+"\"minskill\" : 1,"
+"\"materials\" : {"
+"\"stone\" : 2,"
+"\"iron\" : 1"
+"}}},"
+"\"shed\" : {"
+"\"maintenance\" : ["
+"{ \"type\" : \"iron\", \"amount\" : 1 },"
+"{ \"type\" : \"stone\", \"amount\" : 2 }"
+"]}"
+"}}";
+
 static void test_buildings(CuTest * tc)
 {
-    const char * data = "{\"buildings\": { "
-        "\"house\" : { "
-        "\"maintenance\" : "
-        "{ \"type\" : \"iron\", \"amount\" : 1, \"flags\" : [ \"required\", \"variable\" ] }"
-        ","
-        "\"construction\" : {"
-        "\"maxsize\" : 20,"
-        "\"reqsize\" : 10,"
-        "\"minskill\" : 1,"
-        "\"materials\" : {"
-        "\"stone\" : 2,"
-        "\"iron\" : 1"
-        "}}},"
-        "\"shed\" : {"
-        "\"maintenance\" : ["
-        "{ \"type\" : \"iron\", \"amount\" : 1 },"
-        "{ \"type\" : \"stone\", \"amount\" : 2 }"
-        "]}"
-        "}}";
-
-    cJSON *json = cJSON_Parse(data);
+    cJSON *json = cJSON_Parse(building_data);
     const building_type *bt;
 
     test_cleanup();
@@ -289,6 +292,25 @@ static void test_buildings(CuTest * tc)
     CuAssertIntEquals(tc, 20, bt->construction->maxsize);
     CuAssertIntEquals(tc, 1, bt->construction->minskill);
     CuAssertPtrEquals(tc, 0, bt->construction->improvement);
+    test_cleanup();
+}
+
+static void test_configs(CuTest * tc)
+{
+    const char * data = "{\"include\": [ \"test.json\" ] }";
+    FILE *F;
+    cJSON *json = cJSON_Parse(data);
+
+    test_cleanup();
+
+    F = fopen("test.json", "wt");
+    fwrite(building_data, 1, strlen(building_data), F);
+    fclose(F);
+    CuAssertPtrNotNull(tc, json);
+    CuAssertPtrEquals(tc, 0, buildingtypes);
+    json_config(json);
+    CuAssertPtrNotNull(tc, buildingtypes);
+    unlink("test.json");
     test_cleanup();
 }
 
@@ -374,6 +396,7 @@ static void test_keywords(CuTest * tc)
     CuAssertIntEquals(tc, K_MOVE, get_keyword("nach", lang));
 
     CuAssertStrEquals(tc, "LERNEN", locale_string(lang, "keyword::study"));
+    CuAssertStrEquals(tc, "NACH", locale_string(lang, "keyword::move"));
 
     test_cleanup();
 }
@@ -395,6 +418,26 @@ static void test_strings(CuTest * tc)
     CuAssertStrEquals(tc, "LERNEN", locale_string(lang, "study"));
 }
 
+static void test_infinitive_from_config(CuTest *tc) {
+    char buffer[32];
+    struct locale *lang;
+    struct order *ord;
+    const char * data = "{\"keywords\": { \"de\" : { \"study\" : [ \"LERNE\", \"LERNEN\" ] }}}";
+
+    cJSON *json = cJSON_Parse(data);
+    CuAssertPtrNotNull(tc, json);
+    json_config(json);
+
+    lang = get_or_create_locale("de");
+    CuAssertIntEquals(tc, K_STUDY, get_keyword("LERN", lang));
+    CuAssertIntEquals(tc, K_STUDY, get_keyword("LERNE", lang));
+    CuAssertIntEquals(tc, K_STUDY, get_keyword("LERNEN", lang));
+
+    ord = create_order(K_STUDY, lang, "");
+    CuAssertStrEquals(tc, "LERNE", get_command(ord, buffer, sizeof(buffer)));
+    test_cleanup();
+}
+
 CuSuite *get_jsonconf_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -404,6 +447,7 @@ CuSuite *get_jsonconf_suite(void)
     SUITE_ADD_TEST(suite, test_items);
     SUITE_ADD_TEST(suite, test_ships);
     SUITE_ADD_TEST(suite, test_buildings);
+    SUITE_ADD_TEST(suite, test_configs);
     SUITE_ADD_TEST(suite, test_castles);
     SUITE_ADD_TEST(suite, test_terrains);
     SUITE_ADD_TEST(suite, test_races);
@@ -411,6 +455,7 @@ CuSuite *get_jsonconf_suite(void)
     SUITE_ADD_TEST(suite, test_strings);
     SUITE_ADD_TEST(suite, test_spells);
     SUITE_ADD_TEST(suite, test_flags);
+    SUITE_ADD_TEST(suite, test_infinitive_from_config);
     return suite;
 }
 

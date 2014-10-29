@@ -4562,10 +4562,10 @@ int init_data(const char *filename, const char *catalog)
 {
     int l;
     l = read_xml(filename, catalog);
+    reset_locales();
     if (l) {
         return l;
     }
-    init_locales();
     if (turn < 0) {
         turn = first_turn;
     }

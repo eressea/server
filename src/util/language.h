@@ -29,7 +29,9 @@ extern "C" {
 /** managing multiple locales: **/
   extern struct locale *get_locale(const char *name);
   extern struct locale *get_or_create_locale(const char *key);
-  extern void free_locales(void);
+  void init_locales(void);
+  void free_locales(void);
+  void reset_locales(void);
 
   /** operations on locales: **/
   extern void locale_setstring(struct locale *lang, const char *key,
