@@ -57,6 +57,7 @@ static void test_rename_building(CuTest * tc)
 
     rename_building(u, NULL, b, "Villa Nagel");
     CuAssertStrEquals(tc, "Villa Nagel", b->name);
+    CuAssertTrue(tc, renamed_building(b));
 }
 
 static void test_rename_building_twice(CuTest * tc)

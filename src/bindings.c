@@ -68,6 +68,7 @@ without prior permission by the authors of Eressea.
 #include <quicklist.h>
 #include <util/rand.h>
 #include <util/rng.h>
+#include <util/xml.h>
 
 #include <storage.h>
 
@@ -1000,6 +1001,21 @@ static int tolua_get_spells(lua_State * L)
 {
   return tolua_quicklist_push(L, "spell_list", "spell", spells);
 }
+
+static int init_data(const char *filename, const char *catalog)
+{
+    int l;
+    l = read_xml(filename, catalog);
+    reset_locales();
+    if (l) {
+        return l;
+    }
+    if (turn < 0) {
+        turn = first_turn;
+    }
+    return 0;
+}
+
 
 int tolua_read_xml(lua_State * L)
 {
