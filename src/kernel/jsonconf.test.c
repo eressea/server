@@ -228,29 +228,29 @@ static void test_spells(CuTest * tc)
     CuAssertPtrEquals(tc, 0, find_spell("fireball"));
 }
 
+static const char * building_data = "{\"buildings\": { "
+"\"house\" : { "
+"\"maintenance\" : "
+"{ \"type\" : \"iron\", \"amount\" : 1, \"flags\" : [ \"required\", \"variable\" ] }"
+","
+"\"construction\" : {"
+"\"maxsize\" : 20,"
+"\"reqsize\" : 10,"
+"\"minskill\" : 1,"
+"\"materials\" : {"
+"\"stone\" : 2,"
+"\"iron\" : 1"
+"}}},"
+"\"shed\" : {"
+"\"maintenance\" : ["
+"{ \"type\" : \"iron\", \"amount\" : 1 },"
+"{ \"type\" : \"stone\", \"amount\" : 2 }"
+"]}"
+"}}";
+
 static void test_buildings(CuTest * tc)
 {
-    const char * data = "{\"buildings\": { "
-        "\"house\" : { "
-        "\"maintenance\" : "
-        "{ \"type\" : \"iron\", \"amount\" : 1, \"flags\" : [ \"required\", \"variable\" ] }"
-        ","
-        "\"construction\" : {"
-        "\"maxsize\" : 20,"
-        "\"reqsize\" : 10,"
-        "\"minskill\" : 1,"
-        "\"materials\" : {"
-        "\"stone\" : 2,"
-        "\"iron\" : 1"
-        "}}},"
-        "\"shed\" : {"
-        "\"maintenance\" : ["
-        "{ \"type\" : \"iron\", \"amount\" : 1 },"
-        "{ \"type\" : \"stone\", \"amount\" : 2 }"
-        "]}"
-        "}}";
-
-    cJSON *json = cJSON_Parse(data);
+    cJSON *json = cJSON_Parse(building_data);
     const building_type *bt;
 
     test_cleanup();
@@ -289,6 +289,25 @@ static void test_buildings(CuTest * tc)
     CuAssertIntEquals(tc, 20, bt->construction->maxsize);
     CuAssertIntEquals(tc, 1, bt->construction->minskill);
     CuAssertPtrEquals(tc, 0, bt->construction->improvement);
+    test_cleanup();
+}
+
+static void test_configs(CuTest * tc)
+{
+    const char * data = "{\"config\": [ \"test.json\" ] }";
+    FILE *F;
+    cJSON *json = cJSON_Parse(data);
+
+    test_cleanup();
+
+    F = fopen("test.json", "wt");
+    fwrite(building_data, 1, strlen(building_data), F);
+    fclose(F);
+    CuAssertPtrNotNull(tc, json);
+    CuAssertPtrEquals(tc, 0, buildingtypes);
+    json_config(json);
+    CuAssertPtrNotNull(tc, buildingtypes);
+    unlink("test.json");
     test_cleanup();
 }
 
@@ -404,6 +423,7 @@ CuSuite *get_jsonconf_suite(void)
     SUITE_ADD_TEST(suite, test_items);
     SUITE_ADD_TEST(suite, test_ships);
     SUITE_ADD_TEST(suite, test_buildings);
+    SUITE_ADD_TEST(suite, test_configs);
     SUITE_ADD_TEST(suite, test_castles);
     SUITE_ADD_TEST(suite, test_terrains);
     SUITE_ADD_TEST(suite, test_races);

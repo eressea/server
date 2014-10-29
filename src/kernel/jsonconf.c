@@ -627,12 +627,37 @@ static void json_keywords(cJSON *json) {
 
 static void json_races(cJSON *json) {
     cJSON *child;
-    if (json->type!=cJSON_Object) {
+    if (json->type != cJSON_Object) {
         log_error("races is not a json object: %d", json->type);
         return;
     }
-    for (child=json->child;child;child=child->next) {
+    for (child = json->child; child; child = child->next) {
         json_race(child, rc_get_or_create(child->string));
+    }
+}
+
+static void json_configs(cJSON *json) {
+    cJSON *child;
+    if (json->type != cJSON_Array) {
+        log_error("config is not a json array: %d", json->type);
+        return;
+    }
+    for (child = json->child; child; child = child->next) {
+        cJSON *config;
+        char *data;
+        FILE *F = fopen(child->valuestring, "rt");
+        if (F) {
+            size_t sz;
+            fseek(F, 0, SEEK_END);
+            sz = ftell(F);
+            rewind(F);
+            data = malloc(sz);
+            fread(data, 1, sz, F);
+            fclose(F);
+            config = cJSON_Parse(data);
+            free(data);
+            json_config(config);
+        }
     }
 }
 
@@ -646,10 +671,13 @@ void json_config(cJSON *json) {
         if (strcmp(child->string, "races")==0) {
             json_races(child);
         }
-        else if (strcmp(child->string, "items")==0) {
+        else if (strcmp(child->string, "items") == 0) {
             json_items(child);
         }
-        else if (strcmp(child->string, "ships")==0) {
+        else if (strcmp(child->string, "config") == 0) {
+            json_configs(child);
+        }
+        else if (strcmp(child->string, "ships") == 0) {
             json_ships(child);
         }
         else if (strcmp(child->string, "strings")==0) {
