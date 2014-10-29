@@ -1961,20 +1961,6 @@ void kernel_done(void)
     gc_done();
 }
 
-const char *localenames[] = {
-    "de", "en",
-    NULL
-};
-
-void init_locales(void)
-{
-    int l;
-    for (l = 0; localenames[l]; ++l) {
-        struct locale *lang = get_or_create_locale(localenames[l]);
-        init_locale(lang);
-    }
-}
-
 /* TODO: soll hier weg */
 extern struct attrib_type at_shiptrail;
 

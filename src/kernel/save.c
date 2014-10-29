@@ -1460,6 +1460,7 @@ int readgame(const char *filename, int backup)
     storage store;
     FILE *F;
 
+    init_locales();
     log_printf(stdout, "- reading game data from %s\n", filename);
     sprintf(path, "%s/%s", datapath(), filename);
 

@@ -10,6 +10,7 @@
 #include "race.h"
 #include "ship.h"
 #include "spell.h"
+#include "order.h"
 #include "terrain.h"
 #include "util/language.h"
 #include <CuTest.h>
@@ -295,7 +296,7 @@ static void test_buildings(CuTest * tc)
 
 static void test_configs(CuTest * tc)
 {
-    const char * data = "{\"config\": [ \"test.json\" ] }";
+    const char * data = "{\"include\": [ \"test.json\" ] }";
     FILE *F;
     cJSON *json = cJSON_Parse(data);
 
@@ -416,6 +417,26 @@ static void test_strings(CuTest * tc)
     CuAssertStrEquals(tc, "LERNEN", locale_string(lang, "study"));
 }
 
+static void test_infinitive_from_config(CuTest *tc) {
+    char buffer[32];
+    struct locale *lang;
+    struct order *ord;
+    const char * data = "{\"keywords\": { \"de\" : { \"study\" : [ \"LERNE\", \"LERNEN\" ] }}}";
+
+    cJSON *json = cJSON_Parse(data);
+    CuAssertPtrNotNull(tc, json);
+    json_config(json);
+
+    lang = get_or_create_locale("de");
+    CuAssertIntEquals(tc, K_STUDY, get_keyword("LERN", lang));
+    CuAssertIntEquals(tc, K_STUDY, get_keyword("LERNE", lang));
+    CuAssertIntEquals(tc, K_STUDY, get_keyword("LERNEN", lang));
+
+    ord = create_order(K_STUDY, lang, "");
+    CuAssertStrEquals(tc, "LERNE", get_command(ord, buffer, sizeof(buffer)));
+    test_cleanup();
+}
+
 CuSuite *get_jsonconf_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -433,6 +454,7 @@ CuSuite *get_jsonconf_suite(void)
     SUITE_ADD_TEST(suite, test_strings);
     SUITE_ADD_TEST(suite, test_spells);
     SUITE_ADD_TEST(suite, test_flags);
+    SUITE_ADD_TEST(suite, test_infinitive_from_config);
     return suite;
 }
 

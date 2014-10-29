@@ -50,9 +50,19 @@ int config_parse(const char *json)
     return 1;
 }
 
-int config_read(const char *filename)
+int config_read(const char *filename, const char * relpath)
 {
-    FILE *F = fopen(filename, "rt");
+    char name[MAX_PATH];
+    FILE *F;
+
+    json_relpath = relpath;
+    if (relpath) {
+        _snprintf(name, sizeof(name), "%s/%s", relpath, filename);
+        F = fopen(name, "rt");
+    }
+    else {
+        F = fopen(filename, "rt");
+    }
     if (F) {
         int result;
         char *data;
