@@ -103,7 +103,7 @@ static void test_races(CuTest * tc)
 static void test_findrace(CuTest *tc) {
     const char * data = "{\"races\": { \"dwarf\": {} }, \"strings\": { \"de\" : { \"race::dwarf\" : \"Zwerg\" } } }";
     cJSON *json = cJSON_Parse(data);
-    const struct locale *lang;
+    struct locale *lang;
     const race *rc;
 
     CuAssertPtrNotNull(tc, json);
@@ -112,6 +112,7 @@ static void test_findrace(CuTest *tc) {
     CuAssertPtrEquals(tc, 0, (void *)findrace("Zwerg", lang));
 
     json_config(json);
+    init_locale(lang);
     rc = findrace("Zwerg", lang);
     CuAssertPtrNotNull(tc, rc);
     CuAssertStrEquals(tc, "dwarf", rc->_name);
