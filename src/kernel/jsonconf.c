@@ -643,10 +643,10 @@ static void json_configs(cJSON *json) {
         return;
     }
     for (child = json->child; child; child = child->next) {
-        cJSON *config;
-        char *data;
         FILE *F = fopen(child->valuestring, "rt");
         if (F) {
+            cJSON *config;
+            char *data;
             size_t sz;
             fseek(F, 0, SEEK_END);
             sz = ftell(F);
@@ -657,6 +657,7 @@ static void json_configs(cJSON *json) {
             config = cJSON_Parse(data);
             free(data);
             json_config(config);
+            cJSON_Delete(config);
         }
     }
 }

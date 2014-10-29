@@ -7,6 +7,8 @@
 #include <util/language.h>
 #include <cJSON.h>
 #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "kernel/building.h"
 #include "kernel/race.h"
@@ -50,6 +52,22 @@ int config_parse(const char *json)
 
 int config_read(const char *filename)
 {
+    FILE *F = fopen(filename, "rt");
+    if (F) {
+        int result;
+        char *data;
+        size_t sz;
+
+        fseek(F, 0, SEEK_END);
+        sz = ftell(F);
+        rewind(F);
+        data = malloc(sz);
+        fread(data, 1, sz, F);
+        fclose(F);
+        result = config_parse(data);
+        free(data);
+        return result;
+    }
     return 1;
 }
 

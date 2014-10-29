@@ -6,3 +6,4 @@ if config.install then
     confdir = config.install .. '/' .. confdir
 end
 read_xml(confdir .. 'config.xml', confdir .. 'catalog.xml')
+eressea.config.read(confdir .. 'config.json')

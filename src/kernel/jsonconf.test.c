@@ -15,6 +15,7 @@
 #include <CuTest.h>
 #include <cJSON.h>
 #include <tests.h>
+#include <string.h>
 #include <stdio.h>
 
 static const struct race * race_with_flag(const char * name) {
@@ -393,6 +394,7 @@ static void test_keywords(CuTest * tc)
     CuAssertIntEquals(tc, K_MOVE, get_keyword("nach", lang));
 
     CuAssertStrEquals(tc, "LERNEN", locale_string(lang, "keyword::study"));
+    CuAssertStrEquals(tc, "NACH", locale_string(lang, "keyword::move"));
 
     test_cleanup();
 }
