@@ -2,6 +2,7 @@
 #include <kernel/types.h>
 #include "laws.h"
 
+#include <kernel/ally.h>
 #include <kernel/config.h>
 #include <kernel/building.h>
 #include <kernel/faction.h>
@@ -63,9 +64,9 @@ static void test_rename_building(CuTest * tc)
 static void test_rename_building_twice(CuTest * tc)
 {
     region *r;
-    building *b;
     unit *u;
     faction *f;
+    building *b;
     building_type *btype;
 
     test_cleanup();
@@ -84,6 +85,37 @@ static void test_rename_building_twice(CuTest * tc)
 
     rename_building(u, NULL, b, "Villa Kunterbunt");
     CuAssertStrEquals(tc, "Villa Kunterbunt", b->name);
+}
+
+static void test_contact(CuTest * tc)
+{
+    region *r;
+    unit *u1, *u2, *u3;
+    building *b;
+    building_type *btype;
+
+    test_cleanup();
+    test_create_world();
+
+    btype = bt_get_or_create("castle");
+    r = findregion(0, 0);
+    b = new_building(btype, r, default_locale);
+    u1 = test_create_unit(test_create_faction(0), r);
+    u2 = test_create_unit(test_create_faction(0), r);
+    u3 = test_create_unit(test_create_faction(0), r);
+    set_level(u3, SK_PERCEPTION, 2);
+    usetsiege(u3, b);
+    b->besieged = 1;
+    CuAssertIntEquals(tc, 1, can_contact(r, u1, u2));
+
+    u_set_building(u1, b);
+    CuAssertIntEquals(tc, 0, can_contact(r, u1, u2));
+    u1->faction->allies = calloc(1, sizeof(ally));
+    u1->faction->allies->faction = u2->faction;
+    u1->faction->allies->status = HELP_ALL;
+    CuAssertIntEquals(tc, HELP_GIVE, can_contact(r, u1, u2));
+    u_set_building(u2, b);
+    CuAssertIntEquals(tc, 1, can_contact(r, u1, u2));
 }
 
 static void test_fishing_feeds_2_people(CuTest * tc)
@@ -413,5 +445,6 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_reserve_cmd);
     SUITE_ADD_TEST(suite, test_new_units);
     SUITE_ADD_TEST(suite, test_cannot_create_unit_above_limit);
+    SUITE_ADD_TEST(suite, test_contact);
     return suite;
 }
