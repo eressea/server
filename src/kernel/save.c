@@ -1119,6 +1119,10 @@ static ally **addally(const faction * f, ally ** sfp, int aid, int state)
     if (state == 0)
         return sfp;
 
+    while (*sfp) {
+        sfp = &(*sfp)->next;
+    }
+
     sf = ally_add(sfp, af);
     if (!sf->faction) {
         variant id;
@@ -1127,9 +1131,6 @@ static ally **addally(const faction * f, ally ** sfp, int aid, int state)
     }
     sf->status = state & HELP_ALL;
 
-    while (*sfp)
-        sfp = &(*sfp)->next;
-    *sfp = sf;
     return &sf->next;
 }
 
