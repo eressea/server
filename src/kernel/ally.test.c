@@ -37,6 +37,7 @@ CuSuite *get_ally_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_ally);
+    SUITE_ADD_TEST(suite, test_ally_null);
     return suite;
 }
 
