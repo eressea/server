@@ -167,7 +167,7 @@ int count)
 
     if ((mode & GET_SLACK) && (mode & GET_RESERVE))
         use = have;
-    else {
+    else if (mode & (GET_SLACK|GET_RESERVE)) {
         int reserve = get_reservation(u, rtype);
         int slack = _max(0, have - reserve);
         if (mode & GET_RESERVE)
