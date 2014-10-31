@@ -13,6 +13,7 @@
 #include <CuTest.h>
 #include <tests.h>
 #include <assert.h>
+#include <limits.h>
 
 void test_pool(CuTest *tc) {
     unit *u1, *u2, *u3;
