@@ -19,6 +19,7 @@ void test_pool(CuTest *tc) {
     faction *f;
     region *r;
     struct resource_type *rtype;
+    ally *al;
 
     test_cleanup();
     test_create_world();
@@ -45,11 +46,10 @@ void test_pool(CuTest *tc) {
     CuAssertIntEquals(tc, 100, get_pooled(u1, rtype, GET_POOLED_SLACK, INT_MAX));
     CuAssertIntEquals(tc, 200, get_pooled(u1, rtype, GET_POOLED_SLACK | GET_POOLED_RESERVE, INT_MAX));
 
-    u3->faction->allies = calloc(1, sizeof(ally));
-    u3->faction->allies->faction = f;
-    u3->faction->allies->status = HELP_GUARD;
+    al = ally_add(&u3->faction->allies, f);
+    al->status = HELP_GUARD;
     CuAssertIntEquals(tc, 0, get_pooled(u1, rtype, GET_ALLIED_SLACK | GET_ALLIED_RESERVE, INT_MAX));
-    u3->faction->allies->status = HELP_MONEY;
+    al->status = HELP_MONEY;
     CuAssertIntEquals(tc, 200, get_pooled(u1, rtype, GET_ALLIED_SLACK, INT_MAX));
     CuAssertIntEquals(tc, 200, get_pooled(u1, rtype, GET_ALLIED_RESERVE, INT_MAX));
     CuAssertIntEquals(tc, 400, get_pooled(u1, rtype, GET_ALLIED_SLACK | GET_ALLIED_RESERVE, INT_MAX));

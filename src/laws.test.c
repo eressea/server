@@ -93,6 +93,7 @@ static void test_contact(CuTest * tc)
     unit *u1, *u2, *u3;
     building *b;
     building_type *btype;
+    ally *al;
 
     test_cleanup();
     test_create_world();
@@ -110,9 +111,8 @@ static void test_contact(CuTest * tc)
 
     u_set_building(u1, b);
     CuAssertIntEquals(tc, 0, can_contact(r, u1, u2));
-    u1->faction->allies = calloc(1, sizeof(ally));
-    u1->faction->allies->faction = u2->faction;
-    u1->faction->allies->status = HELP_ALL;
+    al = ally_add(&u1->faction->allies, u2->faction);
+    al->status = HELP_ALL;
     CuAssertIntEquals(tc, HELP_GIVE, can_contact(r, u1, u2));
     u_set_building(u2, b);
     CuAssertIntEquals(tc, 1, can_contact(r, u1, u2));

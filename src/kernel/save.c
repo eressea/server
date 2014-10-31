@@ -1119,8 +1119,7 @@ static ally **addally(const faction * f, ally ** sfp, int aid, int state)
     if (state == 0)
         return sfp;
 
-    sf = calloc(1, sizeof(ally));
-    sf->faction = af;
+    sf = ally_add(sfp, af);
     if (!sf->faction) {
         variant id;
         id.i = aid;

@@ -1348,10 +1348,8 @@ int ally_cmd(unit * u, struct order *ord)
             return 0;
         }
         else {
-            sf = calloc(1, sizeof(ally));
-            sf->faction = f;
+            sf = ally_add(sfp, f);
             sf->status = 0;
-            addlist(sfp, sf);
         }
     }
     switch (keyword) {

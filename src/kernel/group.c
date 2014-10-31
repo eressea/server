@@ -1,7 +1,7 @@
 /*
 Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -50,203 +50,200 @@ static int maxgid;
 
 static group *new_group(faction * f, const char *name, int gid)
 {
-  group **gp = &f->groups;
-  int index = gid % GMAXHASH;
-  group *g = calloc(sizeof(group), 1);
+    group **gp = &f->groups;
+    int index = gid % GMAXHASH;
+    group *g = calloc(sizeof(group), 1);
 
-  while (*gp)
-    gp = &(*gp)->next;
-  *gp = g;
+    while (*gp)
+        gp = &(*gp)->next;
+    *gp = g;
 
-  maxgid = _max(gid, maxgid);
-  g->name = _strdup(name);
-  g->gid = gid;
+    maxgid = _max(gid, maxgid);
+    g->name = _strdup(name);
+    g->gid = gid;
 
-  g->nexthash = ghash[index];
-  return ghash[index] = g;
+    g->nexthash = ghash[index];
+    return ghash[index] = g;
 }
 
 static void init_group(faction * f, group * g)
 {
-  ally *a, **an;
+    ally *a, **an;
 
-  an = &g->allies;
-  for (a = f->allies; a; a = a->next)
-    if (a->faction) {
-      ally *ga = calloc(sizeof(ally), 1);
-      *ga = *a;
-      *an = ga;
-      an = &ga->next;
-    }
+    an = &g->allies;
+    for (a = f->allies; a; a = a->next)
+        if (a->faction) {
+            ally *ga = ally_add(an, a->faction);
+            ga->status = a->status;
+            an = &ga->next;
+        }
 }
 
 static group *find_groupbyname(group * g, const char *name)
 {
-  while (g && unicode_utf8_strcasecmp(name, g->name) != 0)
-    g = g->next;
-  return g;
+    while (g && unicode_utf8_strcasecmp(name, g->name) != 0)
+        g = g->next;
+    return g;
 }
 
 static group *find_group(int gid)
 {
-  int index = gid % GMAXHASH;
-  group *g = ghash[index];
-  while (g && g->gid != gid)
-    g = g->nexthash;
-  return g;
+    int index = gid % GMAXHASH;
+    group *g = ghash[index];
+    while (g && g->gid != gid)
+        g = g->nexthash;
+    return g;
 }
 
 static int read_group(attrib * a, void *owner, struct storage *store)
 {
-  group *g;
-  int gid;
+    group *g;
+    int gid;
 
-  READ_INT(store, &gid);
-  a->data.v = g = find_group(gid);
-  if (g != 0) {
-    g->members++;
-    return AT_READ_OK;
-  }
-  return AT_READ_FAIL;
+    READ_INT(store, &gid);
+    a->data.v = g = find_group(gid);
+    if (g != 0) {
+        g->members++;
+        return AT_READ_OK;
+    }
+    return AT_READ_FAIL;
 }
 
 static void
 write_group(const attrib * a, const void *owner, struct storage *store)
 {
-  group *g = (group *) a->data.v;
-  WRITE_INT(store, g->gid);
+    group *g = (group *)a->data.v;
+    WRITE_INT(store, g->gid);
 }
 
 attrib_type at_group = {        /* attribute for units assigned to a group */
-"grp",
+    "grp",
     DEFAULT_INIT,
-    DEFAULT_FINALIZE, DEFAULT_AGE, write_group, read_group, ATF_UNIQUE};
+    DEFAULT_FINALIZE, DEFAULT_AGE, write_group, read_group, ATF_UNIQUE };
 
 void free_group(group * g)
 {
-  int index = g->gid % GMAXHASH;
-  group **g_ptr = ghash + index;
-  while (*g_ptr && (*g_ptr)->gid != g->gid)
-    g_ptr = &(*g_ptr)->nexthash;
-  assert(*g_ptr == g);
-  *g_ptr = g->nexthash;
+    int index = g->gid % GMAXHASH;
+    group **g_ptr = ghash + index;
+    while (*g_ptr && (*g_ptr)->gid != g->gid)
+        g_ptr = &(*g_ptr)->nexthash;
+    assert(*g_ptr == g);
+    *g_ptr = g->nexthash;
 
-  while (g->allies) {
-    ally *a = g->allies;
-    g->allies = a->next;
-    free(a);
-  }
-  free(g->name);
-  free(g);
+    while (g->allies) {
+        ally *a = g->allies;
+        g->allies = a->next;
+        free(a);
+    }
+    free(g->name);
+    free(g);
 }
 
 group * get_group(const struct unit *u)
 {
-  if (fval(u, UFL_GROUP)) {
-    attrib * a = a_find(u->attribs, &at_group);
-    if (a) {
-      return (group *) a->data.v;
+    if (fval(u, UFL_GROUP)) {
+        attrib * a = a_find(u->attribs, &at_group);
+        if (a) {
+            return (group *)a->data.v;
+        }
     }
-  }
-  return 0;
+    return 0;
 }
 
 void set_group(struct unit *u, struct group *g)
 {
-  attrib *a = NULL;
+    attrib *a = NULL;
 
-  if (fval(u, UFL_GROUP)) {
-    a = a_find(u->attribs, &at_group);
-  }
-
-  if (a) {
-    group *og = (group *) a->data.v;
-    if (og == g)
-      return;
-    --og->members;
-  }
-
-  if (g) {
-    if (!a) {
-      a = a_add(&u->attribs, a_new(&at_group));
-      fset(u, UFL_GROUP);
+    if (fval(u, UFL_GROUP)) {
+        a = a_find(u->attribs, &at_group);
     }
-    a->data.v = g;
-    g->members++;
-  } else if (a) {
-    a_remove(&u->attribs, a);
-    freset(u, UFL_GROUP);
-  }
+
+    if (a) {
+        group *og = (group *)a->data.v;
+        if (og == g)
+            return;
+        --og->members;
+    }
+
+    if (g) {
+        if (!a) {
+            a = a_add(&u->attribs, a_new(&at_group));
+            fset(u, UFL_GROUP);
+        }
+        a->data.v = g;
+        g->members++;
+    }
+    else if (a) {
+        a_remove(&u->attribs, a);
+        freset(u, UFL_GROUP);
+    }
 }
 
 bool join_group(unit * u, const char *name)
 {
-  group *g = NULL;
+    group *g = NULL;
 
-  if (name && name[0]) {
-    g = find_groupbyname(u->faction->groups, name);
-    if (g == NULL) {
-      g = new_group(u->faction, name, ++maxgid);
-      init_group(u->faction, g);
+    if (name && name[0]) {
+        g = find_groupbyname(u->faction->groups, name);
+        if (g == NULL) {
+            g = new_group(u->faction, name, ++maxgid);
+            init_group(u->faction, g);
+        }
     }
-  }
 
-  set_group(u, g);
-  return true;
+    set_group(u, g);
+    return true;
 }
 
 void write_groups(struct storage *store, group * g)
 {
-  while (g) {
-    ally *a;
-    WRITE_INT(store, g->gid);
-    WRITE_STR(store, g->name);
-    for (a = g->allies; a; a = a->next) {
-      if (a->faction) {
-        write_faction_reference(a->faction, store);
-        WRITE_INT(store, a->status);
-      }
+    while (g) {
+        ally *a;
+        WRITE_INT(store, g->gid);
+        WRITE_STR(store, g->name);
+        for (a = g->allies; a; a = a->next) {
+            if (a->faction) {
+                write_faction_reference(a->faction, store);
+                WRITE_INT(store, a->status);
+            }
+        }
+        WRITE_INT(store, 0);
+        a_write(store, g->attribs, g);
+        WRITE_SECTION(store);
+        g = g->next;
     }
     WRITE_INT(store, 0);
-    a_write(store, g->attribs, g);
-    WRITE_SECTION(store);
-    g = g->next;
-  }
-  WRITE_INT(store, 0);
 }
 
 void read_groups(struct storage *store, faction * f)
 {
-  for (;;) {
-    ally **pa;
-    group *g;
-    int gid;
-    char buf[1024];
-
-    READ_INT(store, &gid);
-    if (gid == 0)
-      break;
-    READ_STR(store, buf, sizeof(buf));
-    g = new_group(f, buf, gid);
-    pa = &g->allies;
     for (;;) {
-      ally *a;
-      variant fid;
-      READ_INT(store, &fid.i);
-      if (fid.i <= 0)
-        break;
-      if (global.data_version < STORAGE_VERSION && fid.i == 0)
-        break;
-      a = malloc(sizeof(ally));
-      *pa = a;
-      pa = &a->next;
-      READ_INT(store, &a->status);
+        ally **pa;
+        group *g;
+        int gid;
+        char buf[1024];
 
-      a->faction = findfaction(fid.i);
-      if (!a->faction)
-        ur_add(fid, &a->faction, resolve_faction);
+        READ_INT(store, &gid);
+        if (gid == 0)
+            break;
+        READ_STR(store, buf, sizeof(buf));
+        g = new_group(f, buf, gid);
+        pa = &g->allies;
+        for (;;) {
+            ally *a;
+            variant fid;
+
+            READ_INT(store, &fid.i);
+            if (fid.i <= 0)
+                break;
+            if (global.data_version < STORAGE_VERSION && fid.i == 0)
+                break;
+            a = ally_add(pa, findfaction(fid.i));
+            READ_INT(store, &a->status);
+            if (!a->faction)
+                ur_add(fid, &a->faction, resolve_faction);
+        }
+        *pa = 0;
+        a_read(store, &g->attribs, g);
     }
-    *pa = 0;
-    a_read(store, &g->attribs, g);
-  }
 }
