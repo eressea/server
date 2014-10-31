@@ -24,13 +24,10 @@ extern "C" {
 
   extern int writepasswd(void);
   void demographics(void);
-  void last_orders(void);
-  void find_address(void);
   void update_guards(void);
   void update_subscriptions(void);
   void deliverMail(struct faction *f, struct region *r, struct unit *u,
     const char *s, struct unit *receiver);
-  int init_data(const char *filename, const char *catalog);
 
   bool renamed_building(const struct building * b);
   int rename_building(struct unit * u, struct order * ord, struct building * b, const char *name);

@@ -83,7 +83,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/umlaut.h>
 #include <util/message.h>
 #include <util/rng.h>
-#include <util/xml.h>
 
 #include <attributes/otherfaction.h>
 
@@ -1349,10 +1348,8 @@ int ally_cmd(unit * u, struct order *ord)
             return 0;
         }
         else {
-            sf = calloc(1, sizeof(ally));
-            sf->faction = f;
+            sf = ally_add(sfp, f);
             sf->status = 0;
-            addlist(sfp, sf);
         }
     }
     switch (keyword) {
@@ -4556,18 +4553,4 @@ void update_subscriptions(void)
             itoa36(f->no), f->subscription, f->email, dbrace(f->race), f->lastorders);
     }
     fclose(F);
-}
-
-int init_data(const char *filename, const char *catalog)
-{
-    int l;
-    l = read_xml(filename, catalog);
-    reset_locales();
-    if (l) {
-        return l;
-    }
-    if (turn < 0) {
-        turn = first_turn;
-    }
-    return 0;
 }

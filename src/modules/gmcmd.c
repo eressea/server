@@ -45,9 +45,9 @@
 
 static int read_permissions(attrib * a, void *owner, struct storage *store)
 {
-  attrib *attr = NULL;
-  a_read(store, &attr, owner);
-  a_remove(&attr, a);
+  assert(!a);
+  a_read(store, &a, owner);
+  a_remove(&a, a);
   return AT_READ_OK;
 }
 
