@@ -702,7 +702,7 @@ void set_level(unit * u, skill_t sk, int value)
 {
     skill *sv = u->skills;
 
-    assert(sk != SK_MAGIC || is_monsters(u->faction) || u->number == 1);
+    assert(sk != SK_MAGIC || !u->faction || is_monsters(u->faction) || u->number == 1);
     if (!skill_enabled(sk))
         return;
 
