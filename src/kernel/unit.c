@@ -702,6 +702,7 @@ void set_level(unit * u, skill_t sk, int value)
 {
     skill *sv = u->skills;
 
+    assert(sk != SK_MAGIC || is_monsters(u->faction) || u->number == 1);
     if (!skill_enabled(sk))
         return;
 
@@ -1165,8 +1166,8 @@ skill *add_skill(unit * u, skill_t id)
     sv->weeks = 1;
     sv->old = 0;
     sv->id = id;
-    if (id == SK_MAGIC && u->faction) {
-        assert(max_magicians(u->faction) >= u->number);
+    if (id == SK_MAGIC && u->faction && !is_monsters(u->faction)) {
+        assert(u->number==1 && max_magicians(u->faction) >= u->number);
     }
     return sv;
 }
