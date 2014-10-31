@@ -1183,7 +1183,7 @@ link_seen(seen_region * seehash[], const region * first, const region * last)
         }
         r = r->next;
     }
-    sr->next = 0;
+    if (sr) sr->next = 0;
 }
 
 seen_region *find_seen(struct seen_region *seehash[], const region * r)

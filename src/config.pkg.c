@@ -57,16 +57,18 @@ static int tolua_config_eressea_config_read00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
- !tolua_isstring(tolua_S,1,0,&tolua_err) || 
- !tolua_isnoobj(tolua_S,2,&tolua_err)
+ !tolua_isstring(tolua_S, 1, 0, &tolua_err) ||
+ !tolua_isstring(tolua_S, 2, 0, &tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
  goto tolua_lerror;
  else
 #endif
  {
-  const char* filename = ((const char*)  tolua_tostring(tolua_S,1,0));
+     const char* filename = ((const char*)tolua_tostring(tolua_S, 1, 0));
+     const char* relpath = ((const char*)tolua_tostring(tolua_S, 2, 0));
  {
-  int tolua_ret = (int)  config_read(filename);
+  int tolua_ret = (int)  config_read(filename, relpath);
  tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
  }
  }

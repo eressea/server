@@ -6,7 +6,7 @@ extern "C" {
 
 void config_reset(void);
 int config_parse(const char *json);
-int config_read(const char *filename);
+int config_read(const char *filename, const char * relpath);
 
 #ifdef __cplusplus
 }

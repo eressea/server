@@ -35,10 +35,12 @@ int RunAllTests(void)
   ADD_TESTS(suite, bsdstring);
   ADD_TESTS(suite, functions);
   ADD_TESTS(suite, umlaut);
+  ADD_TESTS(suite, unicode);
   ADD_TESTS(suite, strings);
   /* kernel */
   ADD_TESTS(suite, unit);
   ADD_TESTS(suite, faction);
+  ADD_TESTS(suite, group);
   ADD_TESTS(suite, build);
   ADD_TESTS(suite, pool);
   ADD_TESTS(suite, curse);

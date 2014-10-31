@@ -243,8 +243,32 @@ void *get_translation(const struct locale *lang, const char *str, int index) {
     return NULL;
 }
 
-void free_locales(void)
+const char *localenames[] = {
+    "de", "en",
+    NULL
+};
+
+extern void init_locale(struct locale *lang);
+
+static int locale_init = 0;
+
+void init_locales(void)
 {
+    int l;
+    if (locale_init) return;
+    for (l = 0; localenames[l]; ++l) {
+        struct locale *lang = get_or_create_locale(localenames[l]);
+        init_locale(lang);
+    }
+    locale_init = 1;
+}
+
+void reset_locales(void) {
+    locale_init = 0;
+}
+
+void free_locales(void) {
+    locale_init = 0;
     while (locales) {
         int i;
         locale * next = locales->next;
@@ -261,4 +285,5 @@ void free_locales(void)
         free(locales);
         locales = next;
     }
+    memset(lstrs, 0, sizeof(lstrs)); // TODO: does this data need to be free'd?
 }

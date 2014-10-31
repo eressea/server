@@ -1119,8 +1119,11 @@ static ally **addally(const faction * f, ally ** sfp, int aid, int state)
     if (state == 0)
         return sfp;
 
-    sf = calloc(1, sizeof(ally));
-    sf->faction = af;
+    while (*sfp) {
+        sfp = &(*sfp)->next;
+    }
+
+    sf = ally_add(sfp, af);
     if (!sf->faction) {
         variant id;
         id.i = aid;
@@ -1128,9 +1131,6 @@ static ally **addally(const faction * f, ally ** sfp, int aid, int state)
     }
     sf->status = state & HELP_ALL;
 
-    while (*sfp)
-        sfp = &(*sfp)->next;
-    *sfp = sf;
     return &sf->next;
 }
 
@@ -1460,6 +1460,7 @@ int readgame(const char *filename, int backup)
     storage store;
     FILE *F;
 
+    init_locales();
     log_printf(stdout, "- reading game data from %s\n", filename);
     sprintf(path, "%s/%s", datapath(), filename);
 

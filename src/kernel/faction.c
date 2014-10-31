@@ -430,10 +430,8 @@ void set_alliance(faction * a, faction * b, int status)
         sfp = &sf->next;
     }
     if (*sfp == NULL) {
-        ally *sf = *sfp = malloc(sizeof(ally));
-        sf->next = NULL;
+        ally *sf = ally_add(sfp, b);
         sf->status = status;
-        sf->faction = b;
         return;
     }
     (*sfp)->status |= status;

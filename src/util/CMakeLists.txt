@@ -7,6 +7,7 @@ strings.test.c
 bsdstring.test.c
 functions.test.c
 umlaut.test.c
+unicode.test.c
 )
 
 SET(_FILES

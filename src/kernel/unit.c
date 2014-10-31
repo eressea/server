@@ -702,6 +702,7 @@ void set_level(unit * u, skill_t sk, int value)
 {
     skill *sv = u->skills;
 
+    assert(sk != SK_MAGIC || is_monsters(u->faction) || u->number == 1);
     if (!skill_enabled(sk))
         return;
 
@@ -1161,10 +1162,13 @@ skill *add_skill(unit * u, skill_t id)
     ++u->skill_size;
     u->skills = realloc(u->skills, u->skill_size * sizeof(skill));
     sv = (u->skills + u->skill_size - 1);
-    sv->level = (unsigned char)0;
-    sv->weeks = (unsigned char)1;
-    sv->old = (unsigned char)0;
-    sv->id = (unsigned char)id;
+    sv->level = 0;
+    sv->weeks = 1;
+    sv->old = 0;
+    sv->id = id;
+    if (id == SK_MAGIC && u->faction && !is_monsters(u->faction)) {
+        assert(u->number==1 && max_magicians(u->faction) >= u->number);
+    }
     return sv;
 }
 

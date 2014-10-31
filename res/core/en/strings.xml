@@ -1451,9 +1451,6 @@
   <string name="help">
     <text locale="en">HELP</text>
   </string>
-  <string name="fight">
-    <text locale="en">FIGHT</text>
-  </string>
   <string name="ready">
     <text locale="en">COMBATSPELL</text>
   </string>

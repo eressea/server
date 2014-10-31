@@ -673,7 +673,7 @@ static void init_gms(void)
     faction *f;
 
     for (f = factions; f; f = f->next) {
-        const attrib *a = a_findc(f->attribs, &at_gm);
+        attrib *a = a_find(f->attribs, &at_gm);
 
         if (a != NULL)
             fset(f, FFL_GM);
@@ -1959,20 +1959,6 @@ void kernel_done(void)
      */
     translation_done();
     gc_done();
-}
-
-const char *localenames[] = {
-    "de", "en",
-    NULL
-};
-
-void init_locales(void)
-{
-    int l;
-    for (l = 0; localenames[l]; ++l) {
-        struct locale *lang = get_or_create_locale(localenames[l]);
-        init_locale(lang);
-    }
 }
 
 /* TODO: soll hier weg */

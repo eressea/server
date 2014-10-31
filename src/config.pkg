@@ -5,7 +5,7 @@ $#include "bind_config.h"
 module eressea {
   module config {
     void config_reset @ reset(void);
-    int config_read @ read(const char *filename);
+    int config_read @ read(const char *filename, const char *relpath);
     int config_parse @ parse(const char *json);
   }
 }

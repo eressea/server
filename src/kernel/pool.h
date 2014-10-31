@@ -29,8 +29,8 @@ extern "C" {
 #define GET_POOLED_SLACK    0x08
 #define GET_POOLED_RESERVE  0x10
 #define GET_POOLED_FORCE    0x20        /* ignore f->options pools */
-#define GET_ALLIED_SLACK    0x30
-#define GET_ALLIED_RESERVE  0x40
+#define GET_ALLIED_SLACK    0x40
+#define GET_ALLIED_RESERVE  0x80
 
 /* for convenience: */
 #define GET_DEFAULT (GET_RESERVE|GET_SLACK|GET_POOLED_SLACK)

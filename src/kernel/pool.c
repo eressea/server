@@ -167,7 +167,7 @@ int count)
 
     if ((mode & GET_SLACK) && (mode & GET_RESERVE))
         use = have;
-    else {
+    else if (mode & (GET_SLACK|GET_RESERVE)) {
         int reserve = get_reservation(u, rtype);
         int slack = _max(0, have - reserve);
         if (mode & GET_RESERVE)
@@ -177,11 +177,9 @@ int count)
     }
     if (rtype->flags & RTF_POOLED && mode & ~(GET_SLACK | GET_RESERVE)) {
         for (v = r->units; v && use < count; v = v->next)
-            if (u != v) {
+            if (u != v && (u->items || rtype->uget)) {
             int mask;
 
-            if (v->items == NULL && rtype->uget == NULL)
-                continue;
             if ((urace(v)->ec_flags & GIVEITEM) == 0)
                 continue;
 

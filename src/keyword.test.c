@@ -1,6 +1,7 @@
 #include <platform.h>
 #include "kernel/types.h"
 #include "kernel/config.h"
+#include "kernel/order.h"
 #include "keyword.h"
 #include "util/language.h"
 #include "tests.h"
@@ -16,6 +17,25 @@ static void test_init_keywords(CuTest *tc) {
     locale_setstring(lang, "keyword::move", "MOVE");
     init_keywords(lang);
     CuAssertIntEquals(tc, K_MOVE, get_keyword("move", lang));
+    test_cleanup();
+}
+
+static void test_infinitive(CuTest *tc) {
+    char buffer[32];
+    struct locale *lang;
+    struct order *ord;
+    test_cleanup();
+
+    lang = get_or_create_locale("de");
+    locale_setstring(lang, "keyword::study", "LERNE");
+    init_keyword(lang, K_STUDY, "LERNE");
+    init_keyword(lang, K_STUDY, "LERNEN");
+    CuAssertIntEquals(tc, K_STUDY, get_keyword("LERN", lang));
+    CuAssertIntEquals(tc, K_STUDY, get_keyword("LERNE", lang));
+    CuAssertIntEquals(tc, K_STUDY, get_keyword("LERNEN", lang));
+
+    ord = create_order(K_STUDY, lang, "");
+    CuAssertStrEquals(tc, "LERNE", get_command(ord, buffer, sizeof(buffer)));
     test_cleanup();
 }
 
@@ -76,6 +96,7 @@ static void test_get_shortest_match(CuTest *tc) {
 CuSuite *get_keyword_suite(void)
 {
   CuSuite *suite = CuSuiteNew();
+  SUITE_ADD_TEST(suite, test_infinitive);
   SUITE_ADD_TEST(suite, test_init_keyword);
   SUITE_ADD_TEST(suite, test_init_keywords);
   SUITE_ADD_TEST(suite, test_findkeyword);
@@ -83,4 +104,3 @@ CuSuite *get_keyword_suite(void)
   SUITE_DISABLE_TEST(suite, test_get_keyword_default);
   return suite;
 }
-

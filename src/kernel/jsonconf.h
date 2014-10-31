@@ -18,7 +18,8 @@ extern "C" {
 
     struct cJSON;
     void json_config(struct cJSON *str);
-    
+    extern const char * json_relpath;
+
 #ifdef __cplusplus
 }
 #endif

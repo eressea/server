@@ -3767,8 +3767,9 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann nicht bewachen, da sie versucht zu fliehen."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit cannot guard the region because it's trying to flee."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit cannot guard the region because it's trying to flee."</text>
+    <text locale="en">"$unit($unit) in $region($region):
+    '$order($command)' - The unit cannot guard the region because it
+    is trying to flee."</text>
   </message>
 
   <message name="error319" section="errors">
@@ -3778,7 +3779,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann den Befehl in dieser Runde nicht ausführen, da sie an einem Kampf teilgenommen hat."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit cannot execute this command because it has been in combat."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit cannot execute this command because it has been in combat."</text>
   </message>
 
@@ -8364,8 +8364,9 @@
       <arg name="unit" type="unit"/>
       <arg name="command" type="order"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Es ist so schön friedlich, man möchte hier niemanden angreifen."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - It's so quiet and peaceful, nobody wants to attack anybody right now."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Es ist so schön friedlich, man möchte hier niemanden angreifen."</text>  
+    <text locale="en">"$unit($unit) in $region($region):
+    '$order($command)' - It is so quiet and peaceful, nobody wants to attack anybody right now."</text>
   </message>
 
   <message name="error_race_nolearn" section="errors">
