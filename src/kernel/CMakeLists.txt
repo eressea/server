@@ -3,6 +3,7 @@ project(kernel C)
 SET(_TEST_FILES
 build.test.c
 config.test.c
+group.test.c
 faction.test.c
 unit.test.c
 save.test.c

@@ -40,6 +40,7 @@ int RunAllTests(void)
   /* kernel */
   ADD_TESTS(suite, unit);
   ADD_TESTS(suite, faction);
+  ADD_TESTS(suite, group);
   ADD_TESTS(suite, build);
   ADD_TESTS(suite, pool);
   ADD_TESTS(suite, curse);
