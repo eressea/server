@@ -20,15 +20,19 @@
 extern "C" {
 #endif
 
-  struct locale;
-  struct message;
-  extern struct message *cinfo_ship(const void *obj, objtype_t typ,
-    const struct curse *c, int self);
-  extern void register_shipcurse(void);
-  extern struct curse *shipcurse_flyingship(struct ship *sh, struct unit *mage,
-    float power, int duration);
-  int levitate_ship(struct ship *sh, struct unit *mage, float power,
-    int duration);
+    struct locale;
+    struct message;
+    struct ship;
+    struct unit;
+    struct curse;
+
+    struct message *cinfo_ship(const void *obj, objtype_t typ,
+                               const struct curse *c, int self);
+    void register_shipcurse(void);
+    struct curse *shipcurse_flyingship(struct ship *sh, struct unit *mage,
+                                       float power, int duration);
+    int levitate_ship(struct ship *sh, struct unit *mage, float power,
+                      int duration);
 
 #ifdef __cplusplus
 }

@@ -26,13 +26,15 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-  struct unit;
-  struct attrib;
-  struct attrib_type;
-  struct region;
-  struct resource_type;
-  struct locale;
-  struct troop;
+    struct unit;
+    struct attrib;
+    struct attrib_type;
+    struct region;
+    struct resource_type;
+    struct locale;
+    struct troop;
+    struct item;
+    struct order;
 
   typedef struct item {
     struct item *next;

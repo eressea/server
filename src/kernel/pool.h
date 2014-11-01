@@ -22,6 +22,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
+    struct unit;
+    struct resource_type;
+    struct region;
+
 /* bitfield values for get/use/change operations */
 #define GET_SLACK      0x01
 #define GET_RESERVE    0x02

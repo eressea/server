@@ -23,6 +23,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
+    struct potion_type;
+    struct unit;
+    struct region;
+    struct item_type;
+    struct order;
+    
   enum {
     /* Stufe 1 */
     P_FAST,

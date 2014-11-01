@@ -22,7 +22,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-  struct castorder;
+    struct castorder;
+    struct unit;
+    struct region;
+    struct spell;
+    struct spell_component;
+    struct quicklist;
+    struct attrib_type;
+
   typedef int (*spell_f)(struct castorder * co);
   typedef void(*fumble_f)(const struct castorder * co);
 
