@@ -20,7 +20,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "spy.h"
 #include "laws.h"
-#include "stealth.h"
 #include "move.h"
 #include "reports.h"
 
@@ -37,8 +36,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/unit.h>
 
 /* attributes includes */
-#include <attributes/racename.h>
 #include <attributes/otherfaction.h>
+#include <attributes/racename.h>
+#include <attributes/stealth.h>
 
 /* util includes */
 #include <util/attrib.h>

@@ -9,7 +9,7 @@ without prior permission by the authors of Eressea.
 
 #include <platform.h>
 #include <kernel/config.h>
-#include "build.h"
+#include "buildno.h"
 #include "creport.h"
 
 /* tweakable features */
@@ -22,15 +22,15 @@ without prior permission by the authors of Eressea.
 
 /* attributes include */
 #include <attributes/follow.h>
-#include <attributes/racename.h>
 #include <attributes/orcification.h>
 #include <attributes/otherfaction.h>
+#include <attributes/racename.h>
 #include <attributes/raceprefix.h>
+#include <attributes/stealth.h>
 
 /* gamecode includes */
 #include "laws.h"
 #include "economy.h"
-#include "stealth.h"
 #include "move.h"
 #include "reports.h"
 #include "alchemy.h"

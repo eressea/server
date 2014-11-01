@@ -19,6 +19,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include <kernel/config.h>
 #include "reports.h"
+#include "laws.h"
 
 /* kernel includes */
 #include <kernel/alliance.h>
@@ -64,9 +65,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/follow.h>
 #include <attributes/otherfaction.h>
 #include <attributes/racename.h>
+#include <attributes/stealth.h>
 
 #include "move.h"
-#include "stealth.h"
 
 bool nocr = false;
 bool nonr = false;

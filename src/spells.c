@@ -18,6 +18,7 @@
 
 #include "spy.h"
 #include "vortex.h"
+#include "laws.h"
 #include "spells.h"
 #include "direction.h"
 

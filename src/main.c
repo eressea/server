@@ -28,7 +28,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "gmtool.h"
 #endif
 
-#include "build.h"
+#include "buildno.h"
 #include "bindings.h"
 #include "races/races.h"
 #include "spells.h"

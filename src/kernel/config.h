@@ -27,7 +27,6 @@ extern "C" {
 #include "types.h"
 
     struct _dictionary_;
-    struct critbit_tree;
     /* experimental gameplay features (that don't affect the savefile) */
     /* TODO: move these settings to settings.h or into configuration files */
 #define GOBLINKILL              /* Goblin-Spezialklau kann tödlich enden */
@@ -91,16 +90,14 @@ extern "C" {
 #define OBJECTIDSIZE        (NAMESIZE+5+IDSIZE) /* max. Länge der Strings, die
      * von struct unitname, etc. zurückgegeben werden. ohne die 0 */
 
-#define BAGCAPACITY		20000   /* soviel paßt in einen Bag of Holding */
-#define STRENGTHCAPACITY	50000   /* zusätzliche Tragkraft beim Kraftzauber (deprecated) */
-#define STRENGTHMULTIPLIER 50   /* multiplier for trollbelt */
+#define BAGCAPACITY         20000   /* soviel paßt in einen Bag of Holding */
+#define STRENGTHCAPACITY    50000   /* zusätzliche Tragkraft beim Kraftzauber (deprecated) */
+#define STRENGTHMULTIPLIER  50   /* multiplier for trollbelt */
 
     /* ----------------- Befehle ----------------------------------- */
 
 #define want(option) (1<<option)
     /* ------------------------------------------------------------- */
-    void add_translation(struct critbit_tree **cb, const char *str, int i);
-    void init_translations(const struct locale *lang, int ut, const char * (*string_cb)(int i), int maxstrings);
     int shipspeed(const struct ship *sh, const struct unit *u);
 
 #define i2b(i) ((bool)((i)?(true):(false)))
@@ -154,15 +151,6 @@ extern "C" {
 #define shipid(x) itoa36((x)->no)
 #define factionid(x) itoa36((x)->no)
 #define curseid(x) itoa36((x)->no)
-
-    bool cansee(const struct faction *f, const struct region *r,
-        const struct unit *u, int modifier);
-    bool cansee_durchgezogen(const struct faction *f, const struct region *r,
-        const struct unit *u, int modifier);
-    bool cansee_unit(const struct unit *u, const struct unit *target,
-        int modifier);
-    bool seefaction(const struct faction *f, const struct region *r,
-        const struct unit *u, int modifier);
 
     const char * game_name(void);
     int game_id(void);

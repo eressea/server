@@ -25,6 +25,7 @@
 #include "economy.h"
 #include "give.h"
 #include "monster.h"
+#include "laws.h"
 
 /* triggers includes */
 #include <triggers/removecurse.h>

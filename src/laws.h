@@ -84,6 +84,16 @@ extern "C" {
   extern int claim_cmd(struct unit *u, struct order *ord);
   extern int follow_cmd(struct unit *u, struct order *ord);
 
+  bool cansee(const struct faction *f, const struct region *r,
+      const struct unit *u, int modifier);
+  bool cansee_durchgezogen(const struct faction *f, const struct region *r,
+      const struct unit *u, int modifier);
+  bool cansee_unit(const struct unit *u, const struct unit *target,
+      int modifier);
+  bool seefaction(const struct faction *f, const struct region *r,
+      const struct unit *u, int modifier);
+
+
 #ifdef __cplusplus
 }
 #endif

@@ -1,7 +1,6 @@
 #include <platform.h>
 #include <kernel/config.h>
 #include <kernel/spell.h>
-#include <kernel/magic.h>
 #include <quicklist.h>
 #include <util/log.h>
 

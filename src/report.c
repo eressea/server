@@ -22,6 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 
 #include "reports.h"
+#include "laws.h"
 /* modules includes */
 #include <modules/score.h>
 

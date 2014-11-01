@@ -42,6 +42,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/moved.h>
 #include <attributes/otherfaction.h>
 #include <attributes/racename.h>
+#include <attributes/stealth.h>
 
 /* util includes */
 #include <util/attrib.h>
@@ -55,8 +56,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/resolve.h>
 #include <util/rng.h>
 #include <util/variant.h>
-
-#include <stealth.h>
 
 #include <storage.h>
 

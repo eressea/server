@@ -22,7 +22,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "faction.h"
 #include "item.h"
-#include "magic.h"
 #include "order.h"
 #include "region.h"
 #include "race.h"

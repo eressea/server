@@ -36,7 +36,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "group.h"
 #include "item.h"
 #include "keyword.h"
-#include "magic.h"
 #include "messages.h"
 #include "move.h"
 #include "objtypes.h"
@@ -50,10 +49,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "ship.h"
 #include "skill.h"
 #include "terrain.h"
+#include "types.h"
 #include "unit.h"
 
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
+
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
@@ -73,8 +74,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/unicode.h>
 #include <util/umlaut.h>
 #include <util/xml.h>
-
-#include <stealth.h>
 
 #ifdef USE_LIBXML2
 /* libxml includes */
@@ -785,161 +784,6 @@ int alliedunit(const unit * u, const faction * f2, int mode)
         return alliedgroup(pl, u->faction, f2, sf, mode);
     }
     return 0;
-}
-
-bool
-seefaction(const faction * f, const region * r, const unit * u, int modifier)
-{
-    if (((f == u->faction) || !fval(u, UFL_ANON_FACTION))
-        && cansee(f, r, u, modifier))
-        return true;
-    return false;
-}
-
-bool
-cansee(const faction * f, const region * r, const unit * u, int modifier)
-/* r kann != u->region sein, wenn es um durchreisen geht */
-/* und es muss niemand aus f in der region sein, wenn sie vom Turm
- * erblickt wird */
-{
-    int stealth, rings;
-    unit *u2 = r->units;
-
-    if (u->faction == f || omniscient(f)) {
-        return true;
-    }
-    else if (fval(u_race(u), RCF_INVISIBLE)) {
-        return false;
-    }
-    else if (u->number == 0) {
-        attrib *a = a_find(u->attribs, &at_creator);
-        if (a) {                    /* u is an empty temporary unit. In this special case
-                                       we look at the creating unit. */
-            u = (unit *)a->data.v;
-        }
-        else {
-            return false;
-        }
-    }
-
-    if (leftship(u))
-        return true;
-
-    while (u2 && u2->faction != f)
-        u2 = u2->next;
-    if (u2 == NULL)
-        return false;
-
-    /* simple visibility, just gotta have a unit in the region to see 'em */
-    if (is_guard(u, GUARD_ALL) != 0 || usiege(u) || u->building || u->ship) {
-        return true;
-    }
-
-    rings = invisible(u, NULL);
-    stealth = eff_stealth(u, r) - modifier;
-
-    while (u2) {
-        if (rings < u->number || invisible(u, u2) < u->number) {
-            if (skill_enabled(SK_PERCEPTION)) {
-                int observation = eff_skill(u2, SK_PERCEPTION, r);
-
-                if (observation >= stealth) {
-                    return true;
-                }
-            }
-            else {
-                return true;
-            }
-        }
-
-        /* find next unit in our faction */
-        do {
-            u2 = u2->next;
-        } while (u2 && u2->faction != f);
-    }
-    return false;
-}
-
-bool cansee_unit(const unit * u, const unit * target, int modifier)
-/* target->region kann != u->region sein, wenn es um durchreisen geht */
-{
-    if (fval(u_race(target), RCF_INVISIBLE) || target->number == 0)
-        return false;
-    else if (target->faction == u->faction)
-        return true;
-    else {
-        int n, rings, o;
-
-        if (is_guard(target, GUARD_ALL) != 0 || usiege(target) || target->building
-            || target->ship) {
-            return true;
-        }
-
-        n = eff_stealth(target, target->region) - modifier;
-        rings = invisible(target, NULL);
-        if (rings == 0 && n <= 0) {
-            return true;
-        }
-
-        if (rings && invisible(target, u) >= target->number) {
-            return false;
-        }
-        if (skill_enabled(SK_PERCEPTION)) {
-            o = eff_skill(u, SK_PERCEPTION, target->region);
-            if (o >= n) {
-                return true;
-            }
-        }
-        else {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool
-cansee_durchgezogen(const faction * f, const region * r, const unit * u,
-int modifier)
-/* r kann != u->region sein, wenn es um durchreisen geht */
-/* und es muss niemand aus f in der region sein, wenn sie vom Turm
- * erblickt wird */
-{
-    int n;
-    unit *u2;
-
-    if (fval(u_race(u), RCF_INVISIBLE) || u->number == 0)
-        return false;
-    else if (u->faction == f)
-        return true;
-    else {
-        int rings;
-
-        if (is_guard(u, GUARD_ALL) != 0 || usiege(u) || u->building || u->ship) {
-            return true;
-        }
-
-        n = eff_stealth(u, r) - modifier;
-        rings = invisible(u, NULL);
-        if (rings == 0 && n <= 0) {
-            return true;
-        }
-
-        for (u2 = r->units; u2; u2 = u2->next) {
-            if (u2->faction == f) {
-                int o;
-
-                if (rings && invisible(u, u2) >= u->number)
-                    continue;
-
-                o = eff_skill(u2, SK_PERCEPTION, r);
-
-                if (o >= n) {
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
 }
 
 #ifndef NDEBUG
@@ -1683,42 +1527,6 @@ void *gc_add(void *p)
     if (!blk_index)
         ++list_index;
     return p;
-}
-
-void add_translation(critbit_tree **cbp, const char *key, int i) {
-    char buffer[256];
-    char * str = transliterate(buffer, sizeof(buffer) - sizeof(int), key);
-    critbit_tree * cb = *cbp;
-    if (str) {
-        size_t len = strlen(str);
-        if (!cb) {
-            *cbp = cb = (critbit_tree *)calloc(1, sizeof(critbit_tree *));
-        }
-        len = cb_new_kv(str, len, &i, sizeof(int), buffer);
-        cb_insert(cb, buffer, len);
-    }
-    else {
-        log_error("could not transliterate '%s'\n", key);
-    }
-}
-
-void init_translations(const struct locale *lang, int ut, const char * (*string_cb)(int i), int maxstrings)
-{
-    void **tokens;
-    int i;
-
-    assert(string_cb);
-    assert(maxstrings > 0);
-    tokens = get_translations(lang, ut);
-    for (i = 0; i != maxstrings; ++i) {
-        const char * s = string_cb(i);
-        const char * key = s ? locale_string(lang, s) : 0;
-        key = key ? key : s;
-        if (key) {
-            critbit_tree ** cb = (critbit_tree **)tokens;
-            add_translation(cb, key, i);
-        }
-    }
 }
 
 static const char * parameter_key(int i)
@@ -2503,7 +2311,6 @@ void attrib_init(void)
     at_register(&at_clone);
     at_register(&at_clonemage);
     at_register(&at_eventhandler);
-    at_register(&at_stealth);
     at_register(&at_mage);
     at_register(&at_countdown);
     at_register(&at_curse);

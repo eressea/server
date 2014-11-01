@@ -21,6 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "battle.h"
 #include "alchemy.h"
 #include "move.h"
+#include "laws.h"
 #include "skill.h"
 
 #include <kernel/alliance.h>

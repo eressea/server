@@ -25,6 +25,7 @@ extern "C" {
 #define MAXLOCALES 3
 
   struct locale;
+  struct critbit_tree;
 
 /** managing multiple locales: **/
   extern struct locale *get_locale(const char *name);
@@ -69,6 +70,8 @@ extern "C" {
 
   void ** get_translations(const struct locale *lang, int type);
   void * get_translation(const struct locale *lang, const char *str, int type);
+  void init_translations(const struct locale *lang, int ut, const char * (*string_cb)(int i), int maxstrings);
+  void add_translation(struct critbit_tree **cb, const char *str, int i);
 
 #ifdef __cplusplus
 }
