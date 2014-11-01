@@ -924,7 +924,7 @@ int quit_cmd(unit * u, struct order *ord)
     keyword_t kwd;
     
     kwd = init_order(ord);
-    assert(kwd == K_PASSWORD);
+    assert(kwd == K_QUIT);
     passwd = getstrtoken();
     if (checkpasswd(f, (const char *)passwd, false)) {
         if (EnhancedQuit()) {

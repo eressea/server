@@ -2385,7 +2385,7 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
         }
     }
     else {
-        n = atoi((const char *)s);
+        n = s ? atoi(s) : 0;
         if (n == 0) {
             cmistake(u, ord, 27, MSG_COMMERCE);
             return false;
