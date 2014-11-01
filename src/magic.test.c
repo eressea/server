@@ -1,9 +1,9 @@
 #include <platform.h>
 
-#include <kernel/types.h>
+#include "magic.h"
+
 #include <kernel/faction.h>
 #include <kernel/item.h>
-#include <kernel/magic.h>
 #include <kernel/region.h>
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>

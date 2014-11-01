@@ -2,7 +2,6 @@
 
 #include <kernel/ally.h>
 #include <kernel/faction.h>
-#include <kernel/types.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/config.h>

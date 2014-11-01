@@ -3,7 +3,6 @@
 
 #include "json.h"
 
-#include <kernel/types.h>
 #include <kernel/plane.h>
 #include <kernel/region.h>
 #include <kernel/faction.h>

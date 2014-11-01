@@ -20,7 +20,6 @@
 #include <kernel/curse.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
-#include <kernel/magic.h>
 #include <kernel/messages.h>
 #include <kernel/order.h>
 #include <kernel/pool.h>

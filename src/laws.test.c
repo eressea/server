@@ -1,5 +1,4 @@
 #include <platform.h>
-#include <kernel/types.h>
 #include "laws.h"
 
 #include <kernel/ally.h>

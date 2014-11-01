@@ -4,12 +4,12 @@
 
 #include "study.h"
 #include "move.h"
+#include "magic.h"
 
 #include <kernel/curse.h>
 #include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
-#include <kernel/magic.h>
 #include <kernel/messages.h>
 #include <kernel/order.h>
 #include <kernel/plane.h>

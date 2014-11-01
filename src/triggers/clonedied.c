@@ -20,9 +20,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "clonedied.h"
 
+#include "magic.h"
+
 /* kernel includes */
 #include <kernel/spell.h>
-#include <kernel/magic.h>
 #include <kernel/unit.h>
 
 /* util includes */

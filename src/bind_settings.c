@@ -1,7 +1,6 @@
 #include "bind_settings.h"
 
 #include <platform.h>
-#include <kernel/types.h>
 #include <kernel/config.h>
 
 const char * settings_get(const char *key)

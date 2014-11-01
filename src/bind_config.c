@@ -1,7 +1,6 @@
 #include "bind_config.h"
 
 #include <platform.h>
-#include <kernel/types.h>
 #include <kernel/jsonconf.h>
 #include <util/log.h>
 #include <util/language.h>

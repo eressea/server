@@ -11,7 +11,6 @@
 */
 #include <platform.h>
 #include <kernel/config.h>
-#include <kernel/types.h>
 #include "combatspells.h"
 
 /* kernel includes */
@@ -20,7 +19,6 @@
 #include <kernel/curse.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
-#include <kernel/magic.h>
 #include <kernel/messages.h>
 #include <kernel/order.h>
 #include <kernel/race.h>

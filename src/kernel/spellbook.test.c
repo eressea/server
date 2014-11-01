@@ -1,7 +1,5 @@
 #include <platform.h>
 
-#include <kernel/types.h>
-#include <kernel/magic.h>
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
 #include <quicklist.h>

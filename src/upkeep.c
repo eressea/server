@@ -1,7 +1,6 @@
 #include <platform.h>
 #include "upkeep.h"
 
-#include <kernel/types.h>
 #include <kernel/faction.h>
 #include <kernel/config.h>
 #include <kernel/item.h>

@@ -11,7 +11,6 @@ ship.test.c
 spell.test.c
 ally.test.c
 building.test.c
-magic.test.c
 equipment.test.c
 curse.test.c
 item.test.c
@@ -37,7 +36,6 @@ equipment.c
 faction.c
 group.c
 item.c
-magic.c
 messages.c
 order.c
 pathfinder.c

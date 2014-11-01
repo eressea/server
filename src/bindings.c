@@ -11,7 +11,6 @@ without prior permission by the authors of Eressea.
 */
 
 #include <platform.h>
-#include <kernel/types.h>
 #include "bindings.h"
 #include "bind_unit.h"
 #include "bind_storage.h"

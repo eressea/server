@@ -1,10 +1,10 @@
 #include <platform.h>
 
-#include <kernel/types.h>
+#include "magic.h"
+
 #include <kernel/equipment.h>
 #include <kernel/item.h>
 #include <kernel/unit.h>
-#include <kernel/magic.h>
 #include <kernel/spell.h>
 
 #include <quicklist.h>

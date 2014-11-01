@@ -1,6 +1,5 @@
 #include <platform.h>
 #include <kernel/config.h>
-#include <kernel/types.h>
 #include "economy.h"
 
 #include <util/message.h>

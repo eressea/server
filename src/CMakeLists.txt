@@ -83,6 +83,7 @@ set (ERESSEA_SRC
   give.c
   items.c
   laws.c
+  magic.c
   market.c
   monster.c
   randenc.c
@@ -166,6 +167,7 @@ set(TESTS_SRC
   json.test.c
   keyword.test.c
   laws.test.c
+  magic.test.c
   market.test.c
   move.test.c
   skill.test.c

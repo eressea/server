@@ -24,7 +24,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/unit.h>
 #include <kernel/region.h>
 #include <kernel/faction.h>
-#include <kernel/magic.h>
 #include <kernel/race.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>

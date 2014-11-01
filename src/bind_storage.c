@@ -12,7 +12,6 @@ without prior permission by the authors of Eressea.
 
 #include <platform.h>
 #include <kernel/config.h>
-#include <kernel/types.h>
 #include "bind_storage.h"
 
 #include <kernel/save.h>
