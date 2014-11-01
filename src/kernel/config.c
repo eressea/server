@@ -520,34 +520,6 @@ int shipspeed(const ship * sh, const unit * u)
     return (int)k;
 }
 
-#define FMAXHASH 2039
-faction *factionhash[FMAXHASH];
-
-void fhash(faction * f)
-{
-    int index = f->no % FMAXHASH;
-    f->nexthash = factionhash[index];
-    factionhash[index] = f;
-}
-
-void funhash(faction * f)
-{
-    int index = f->no % FMAXHASH;
-    faction **fp = factionhash + index;
-    while (*fp && (*fp) != f)
-        fp = &(*fp)->nexthash;
-    *fp = f->nexthash;
-}
-
-static faction *ffindhash(int no)
-{
-    int index = no % FMAXHASH;
-    faction *f = factionhash[index];
-    while (f && f->no != no)
-        f = f->nexthash;
-    return f;
-}
-
 /* ----------------------------------------------------------------------- */
 
 void verify_data(void)
@@ -631,29 +603,6 @@ unsigned int atoip(const char *s)
         n = 0;
 
     return n;
-}
-
-region *findunitregion(const unit * su)
-{
-#ifndef SLOW_REGION
-    return su->region;
-#else
-    region *r;
-    const unit *u;
-
-    for (r = regions; r; r = r->next) {
-        for (u = r->units; u; u = u->next) {
-            if (su == u) {
-                return r;
-            }
-        }
-    }
-
-    /* This should never happen */
-    assert(!"Die unit wurde nicht gefunden");
-
-    return (region *) NULL;
-#endif
 }
 
 bool unit_has_cursed_item(unit * u)
@@ -1036,48 +985,9 @@ param_t getparam(const struct locale * lang)
     return s ? findparam(s, lang) : NOPARAM;
 }
 
-faction *findfaction(int n)
-{
-    faction *f = ffindhash(n);
-    return f;
-}
-
 faction *getfaction(void)
 {
     return findfaction(getid());
-}
-
-unit *findunitr(const region * r, int n)
-{
-    unit *u;
-
-    /* findunit regional! */
-
-    for (u = r->units; u; u = u->next)
-        if (u->no == n)
-            return u;
-
-    return 0;
-}
-
-unit *findunit(int n)
-{
-    if (n <= 0) {
-        return NULL;
-    }
-    return ufindhash(n);
-}
-
-unit *findunitg(int n, const region * hint)
-{
-
-    /* Abfangen von Syntaxfehlern. */
-    if (n <= 0)
-        return NULL;
-
-    /* findunit global! */
-    hint = 0;
-    return ufindhash(n);
 }
 
 unit *getnewunit(const region * r, const faction * f)

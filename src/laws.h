@@ -99,6 +99,7 @@ extern "C" {
       int modifier);
   bool seefaction(const struct faction *f, const struct region *r,
       const struct unit *u, int modifier);
+  int armedmen(const struct unit *u, bool siege_weapons);
 
 
 #ifdef __cplusplus

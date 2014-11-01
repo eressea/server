@@ -102,11 +102,6 @@ extern "C" {
 
 #define i2b(i) ((bool)((i)?(true):(false)))
 
-    typedef struct strlist {
-        struct strlist *next;
-        char *s;
-    } strlist;
-
 #define fval(u, i) ((u)->flags & (i))
 #define fset(u, i) ((u)->flags |= (i))
 #define freset(u, i) ((u)->flags &= ~(i))
@@ -126,9 +121,13 @@ extern "C" {
     /* special units */
     void make_undead_unit(struct unit *);
 
-    void addstrlist(strlist ** SP, const char *s);
+    typedef struct strlist {
+        struct strlist *next;
+        char *s;
+    } strlist;
 
-    int armedmen(const struct unit *u, bool siege_weapons);
+    void addstrlist(strlist ** SP, const char *s);
+    void freestrlist(strlist * s);
 
     unsigned int atoip(const char *s);
     unsigned int getuint(void);
@@ -179,14 +178,7 @@ extern "C" {
     int alliedgroup(const struct plane *pl, const struct faction *f,
         const struct faction *f2, const struct ally *sf, int mode);
 
-    struct faction *findfaction(int n);
     struct faction *getfaction(void);
-
-    struct unit *findunitg(int n, const struct region *hint);
-    struct unit *findunit(int n);
-
-    struct unit *findunitr(const struct region *r, int n);
-    struct region *findunitregion(const struct unit *su);
 
     char *estring(const char *s);
     char *estring_i(char *s);
@@ -240,7 +232,6 @@ extern "C" {
      * sonst großes Unglück. Durch asserts an ein paar Stellen abgesichert. */
     void verify_data(void);
 
-    void freestrlist(strlist * s);
 
     int change_hitpoints(struct unit *u, int value);
 
@@ -250,9 +241,6 @@ extern "C" {
     /* intervall, in dem die regionen der partei zu finden sind */
     struct region *firstregion(struct faction *f);
     struct region *lastregion(struct faction *f);
-
-    void fhash(struct faction *f);
-    void funhash(struct faction *f);
 
     bool idle(struct faction *f);
     bool unit_has_cursed_item(struct unit *u);

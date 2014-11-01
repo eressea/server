@@ -99,6 +99,40 @@ void free_faction(faction * f)
     freelist(f->ursprung);
 }
 
+#define FMAXHASH 2039
+faction *factionhash[FMAXHASH];
+
+void fhash(faction * f)
+{
+    int index = f->no % FMAXHASH;
+    f->nexthash = factionhash[index];
+    factionhash[index] = f;
+}
+
+void funhash(faction * f)
+{
+    int index = f->no % FMAXHASH;
+    faction **fp = factionhash + index;
+    while (*fp && (*fp) != f)
+        fp = &(*fp)->nexthash;
+    *fp = f->nexthash;
+}
+
+static faction *ffindhash(int no)
+{
+    int index = no % FMAXHASH;
+    faction *f = factionhash[index];
+    while (f && f->no != no)
+        f = f->nexthash;
+    return f;
+}
+
+faction *findfaction(int n)
+{
+    faction *f = ffindhash(n);
+    return f;
+}
+
 void set_show_item(faction * f, const struct item_type *itype)
 {
     attrib *a = a_add(&f->attribs, a_new(&at_showitem));

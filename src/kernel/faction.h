@@ -112,6 +112,10 @@ typedef struct faction {
 
 extern struct faction *factions;
 
+void fhash(struct faction *f);
+void funhash(struct faction *f);
+
+struct faction *findfaction(int n);
 struct faction *get_monsters(void);
 struct faction *get_or_create_monsters(void);
 int max_magicians(const faction * f);

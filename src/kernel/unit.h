@@ -114,6 +114,7 @@ extern "C" {
     int wants;                  /* enno: attribut? */
   } unit;
 
+  extern struct attrib_type at_creator;
   extern struct attrib_type at_alias;
   extern struct attrib_type at_siege;
   extern struct attrib_type at_target;
@@ -216,9 +217,9 @@ extern "C" {
     int number, const struct race *rc, int id, const char *dname,
     struct unit *creator);
 
-  extern void uhash(struct unit *u);
-  extern void uunhash(struct unit *u);
-  extern struct unit *ufindhash(int i);
+  void uhash(struct unit *u);
+  void uunhash(struct unit *u);
+  struct unit *ufindhash(int i);
 
   const char *unit_getname(const struct unit *u);
   void unit_setname(struct unit *u, const char *name);
@@ -241,7 +242,11 @@ extern "C" {
   void remove_empty_units_in_region(struct region * r);
   void remove_empty_units(void);
 
-  extern struct attrib_type at_creator;
+  struct unit *findunitg(int n, const struct region *hint);
+  struct unit *findunit(int n);
+
+  struct unit *findunitr(const struct region *r, int n);
+
 #ifdef __cplusplus
 }
 #endif
