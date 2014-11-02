@@ -20,6 +20,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "xerewards.h"
 
+#include "magic.h"
+
 /* kernel includes */
 #include <kernel/item.h>
 #include <kernel/region.h>
@@ -27,7 +29,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/unit.h>
 #include <kernel/curse.h>
 #include <kernel/messages.h>
-#include <kernel/magic.h>
 #include <kernel/pool.h>
 
 /* util includes */

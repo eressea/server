@@ -1,5 +1,4 @@
 #include <platform.h>
-#include <kernel/types.h>
 #include "tests.h"
 #include "keyword.h"
 

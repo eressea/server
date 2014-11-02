@@ -11,7 +11,6 @@ without prior permission by the authors of Eressea.
 */
 
 #include <platform.h>
-#include <kernel/types.h>
 
 #include "bind_unit.h"
 #ifdef BSON_ATTRIB
@@ -31,7 +30,6 @@ without prior permission by the authors of Eressea.
 #include <kernel/faction.h>
 #include <kernel/group.h>
 #include <kernel/item.h>
-#include <kernel/magic.h>
 #include <kernel/messages.h>
 #include <kernel/order.h>
 #include <kernel/pool.h>

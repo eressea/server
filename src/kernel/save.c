@@ -20,7 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "save.h"
 
-#include "../build.h"
+#include "../buildno.h"
 
 #include "alchemy.h"
 #include "alliance.h"
@@ -30,7 +30,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "faction.h"
 #include "group.h"
 #include "item.h"
-#include "magic.h"
 #include "messages.h"
 #include "move.h"
 #include "objtypes.h"

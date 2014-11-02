@@ -18,6 +18,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #ifndef H_KRNL_MAGIC
 #define H_KRNL_MAGIC
+
+#include <kernel/types.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

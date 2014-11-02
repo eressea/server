@@ -22,6 +22,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
+    struct region;
+    struct plane;
+    struct storage;
+
 #define PFL_NOCOORDS        1   /* not in use */
 #define PFL_NORECRUITS      2
 #define PFL_NOALLIANCES     4

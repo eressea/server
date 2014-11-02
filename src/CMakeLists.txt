@@ -67,7 +67,6 @@ set (ERESSEA_SRC
   spells.c
   battle.c
   alchemy.c
-  stealth.c
   upkeep.c
   vortex.c
   names.c
@@ -84,6 +83,7 @@ set (ERESSEA_SRC
   give.c
   items.c
   laws.c
+  magic.c
   market.c
   monster.c
   randenc.c
@@ -161,17 +161,18 @@ set(TESTS_SRC
   vortex.test.c
   tests.test.c
   reports.test.c
-  stealth.test.c
   callback.test.c
   direction.test.c
   economy.test.c
   json.test.c
   keyword.test.c
   laws.test.c
+  magic.test.c
   market.test.c
   move.test.c
   skill.test.c
   upkeep.test.c
+  ${ATTRIBUTES_TESTS}
   ${UTIL_TESTS}
   ${KERNEL_TESTS}
   ${ERESSEA_SRC}

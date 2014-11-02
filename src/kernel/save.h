@@ -22,6 +22,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
+    struct attrib;
+    struct item;
+    struct storage;
+    struct spell;
+    struct spellbook;
+    struct unit;
+    
   typedef struct gamedata {
     struct storage *store;
     int version;

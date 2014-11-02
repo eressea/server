@@ -24,34 +24,36 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifdef __cplusplus
 extern "C" {
 #endif
-  struct spell;
+    struct spell;
+    struct item;
+    struct unit;
 
-  typedef struct itemdata {
-    const struct item_type *itype;
-    char *value;
-    struct itemdata *next;
-  } itemdata;
+    typedef struct itemdata {
+        const struct item_type *itype;
+        char *value;
+        struct itemdata *next;
+    } itemdata;
 
-  typedef struct subsetitem {
-    struct equipment *set;
-    float chance;
-  } subsetitem;
-
-  typedef struct subset {
-    float chance;
-    subsetitem *sets;
-  } subset;
-
-  typedef struct equipment {
-    char *name;
-    struct itemdata *items;
-    char *skills[MAXSKILLS];
-    struct spellbook *spellbook;
-    struct subset *subsets;
-    struct equipment *next;
-    void (*callback) (const struct equipment *, struct unit *);
-  } equipment;
-
+    typedef struct subsetitem {
+        struct equipment *set;
+        float chance;
+    } subsetitem;
+    
+    typedef struct subset {
+        float chance;
+        subsetitem *sets;
+    } subset;
+    
+    typedef struct equipment {
+        char *name;
+        struct itemdata *items;
+        char *skills[MAXSKILLS];
+        struct spellbook *spellbook;
+        struct subset *subsets;
+        struct equipment *next;
+        void (*callback) (const struct equipment *, struct unit *);
+    } equipment;
+    
   extern struct equipment *create_equipment(const char *eqname);
   extern struct equipment *get_equipment(const char *eqname);
 

@@ -2,7 +2,6 @@
 
 #include <kernel/ally.h>
 #include <kernel/faction.h>
-#include <kernel/types.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/config.h>
@@ -47,6 +46,7 @@ static void test_remove_empty_factions(CuTest *tc) {
 static void test_remove_dead_factions(CuTest *tc) {
     faction *f, *fm;
     region *r;
+    int fno;
 
     test_cleanup();
     r = test_create_region(0, 0, 0);
@@ -60,8 +60,9 @@ static void test_remove_dead_factions(CuTest *tc) {
     CuAssertPtrNotNull(tc, get_monsters());
     fm->alive = 0;
     f->alive = 0;
+    fno = f->no;
     remove_empty_factions();
-    CuAssertPtrEquals(tc, 0, findfaction(f->no));
+    CuAssertPtrEquals(tc, 0, findfaction(fno));
     CuAssertPtrEquals(tc, fm, get_monsters());
     test_cleanup();
 }

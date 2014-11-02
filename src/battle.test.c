@@ -1,4 +1,3 @@
-#include <kernel/types.h>
 #include <platform.h>
 
 #include "battle.h"

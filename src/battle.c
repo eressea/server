@@ -21,6 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "battle.h"
 #include "alchemy.h"
 #include "move.h"
+#include "laws.h"
 #include "skill.h"
 
 #include <kernel/alliance.h>
@@ -31,7 +32,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/faction.h>
 #include <kernel/group.h>
 #include <kernel/item.h>
-#include <kernel/magic.h>
 #include <kernel/messages.h>
 #include <kernel/order.h>
 #include <kernel/plane.h>
@@ -208,34 +208,6 @@ static void message_faction(battle * b, faction * f, struct message *m)
         bm->r = r;
     }
     add_message(&f->battles->msgs, m);
-}
-
-int armedmen(const unit * u, bool siege_weapons)
-{
-    item *itm;
-    int n = 0;
-    if (!(urace(u)->flags & RCF_NOWEAPONS)) {
-        if (effskill(u, SK_WEAPONLESS) >= 1) {
-            /* kann ohne waffen bewachen: fuer drachen */
-            n = u->number;
-        }
-        else {
-            /* alle Waffen werden gezaehlt, und dann wird auf die Anzahl
-             * Personen minimiert */
-            for (itm = u->items; itm; itm = itm->next) {
-                const weapon_type *wtype = resource2weapon(itm->type->rtype);
-                if (wtype == NULL || (!siege_weapons && (wtype->flags & WTF_SIEGE)))
-                    continue;
-                if (effskill(u, wtype->skill) >= wtype->minskill)
-                    n += itm->number;
-                /* if (effskill(u, wtype->skill) >= wtype->minskill) n += itm->number; */
-                if (n > u->number)
-                    break;
-            }
-            n = _min(n, u->number);
-        }
-    }
-    return n;
 }
 
 void message_all(battle * b, message * m)

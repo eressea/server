@@ -26,6 +26,8 @@ extern "C" {
 #endif
 
     struct unit;
+    struct region;
+    struct region_list;
     struct ship;
     struct building_type;
 

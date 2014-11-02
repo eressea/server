@@ -14,10 +14,10 @@
 #include <platform.h>
 #include <kernel/config.h>
 #include "regioncurse.h"
+#include "magic.h"
 
 /* kernel includes */
 #include <kernel/curse.h>
-#include <kernel/magic.h>
 #include <kernel/messages.h>
 #include <kernel/objtypes.h>
 #include <kernel/region.h>

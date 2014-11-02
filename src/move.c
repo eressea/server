@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include <kernel/config.h>
 #include "move.h"
+#include "laws.h"
 #include "reports.h"
 #include "alchemy.h"
 #include "vortex.h"
@@ -31,7 +32,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/curse.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
-#include <kernel/magic.h>
 #include <kernel/messages.h>
 #include <kernel/order.h>
 #include <kernel/plane.h>
@@ -60,15 +60,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/rand.h>
 #include <util/rng.h>
 
-#include <stealth.h>
-
 #include <storage.h>
 
 /* attributes includes */
 #include <attributes/follow.h>
-#include <attributes/targetregion.h>
 #include <attributes/movement.h>
 #include <attributes/otherfaction.h>
+#include <attributes/stealth.h>
+#include <attributes/targetregion.h>
 
 /* libc includes */
 #include <assert.h>

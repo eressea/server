@@ -20,28 +20,29 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "build.h"
 
-/* kernel includes */
 #include "alchemy.h"
-#include "alliance.h"
-#include "connection.h"
 #include "direction.h"
-#include "building.h"
-#include "curse.h"
-#include "faction.h"
-#include "group.h"
-#include "item.h"
-#include "magic.h"
-#include "messages.h"
 #include "move.h"
-#include "order.h"
-#include "pool.h"
-#include "race.h"
-#include "region.h"
-#include "ship.h"
+#include "laws.h"
 #include "skill.h"
-#include "terrain.h"
-#include "terrainid.h"
-#include "unit.h"
+
+/* kernel includes */
+#include <kernel/alliance.h>
+#include <kernel/connection.h>
+#include <kernel/building.h>
+#include <kernel/curse.h>
+#include <kernel/faction.h>
+#include <kernel/group.h>
+#include <kernel/item.h>
+#include <kernel/messages.h>
+#include <kernel/order.h>
+#include <kernel/pool.h>
+#include <kernel/race.h>
+#include <kernel/region.h>
+#include <kernel/ship.h>
+#include <kernel/terrain.h>
+#include <kernel/terrainid.h>
+#include <kernel/unit.h>
 
 /* from libutil */
 #include <util/attrib.h>

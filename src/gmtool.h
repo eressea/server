@@ -14,10 +14,12 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-  struct lua_State;
-  struct selection;
-  struct state;
-  struct region;
+
+    struct lua_State;
+    struct selection;
+    struct state;
+    struct region;
+    struct terrain_type;
 
   int gmmain(int argc, char *argv[]);
   int curses_readline(struct lua_State *L, char *buffer, size_t size,

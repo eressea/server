@@ -28,6 +28,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <critbit.h>
 
 /** importing **/
 
@@ -232,6 +233,42 @@ void ** get_translations(const struct locale *lang, int index)
         return lstrs[lang->index].tokens + index;
     }
     return lstrs[0].tokens + index;
+}
+
+void add_translation(struct critbit_tree **cbp, const char *key, int i) {
+    char buffer[256];
+    char * str = transliterate(buffer, sizeof(buffer) - sizeof(int), key);
+    struct critbit_tree * cb = *cbp;
+    if (str) {
+        size_t len = strlen(str);
+        if (!cb) {
+            *cbp = cb = (struct critbit_tree *)calloc(1, sizeof(struct critbit_tree *));
+        }
+        len = cb_new_kv(str, len, &i, sizeof(int), buffer);
+        cb_insert(cb, buffer, len);
+    }
+    else {
+        log_error("could not transliterate '%s'\n", key);
+    }
+}
+
+void init_translations(const struct locale *lang, int ut, const char * (*string_cb)(int i), int maxstrings)
+{
+    void **tokens;
+    int i;
+
+    assert(string_cb);
+    assert(maxstrings > 0);
+    tokens = get_translations(lang, ut);
+    for (i = 0; i != maxstrings; ++i) {
+        const char * s = string_cb(i);
+        const char * key = s ? locale_string(lang, s) : 0;
+        key = key ? key : s;
+        if (key) {
+            struct critbit_tree ** cb = (struct critbit_tree **)tokens;
+            add_translation(cb, key, i);
+        }
+    }
 }
 
 void *get_translation(const struct locale *lang, const char *str, int index) {

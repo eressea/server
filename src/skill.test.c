@@ -1,5 +1,4 @@
 #include <platform.h>
-#include "kernel/types.h"
 #include "skill.h"
 #include "util/language.h"
 #include "tests.h"

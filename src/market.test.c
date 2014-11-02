@@ -1,5 +1,4 @@
 #include <platform.h>
-#include <kernel/types.h>
 #include "market.h"
 #include "tests.h"
 

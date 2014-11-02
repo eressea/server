@@ -1,6 +1,5 @@
 #include <platform.h>
 
-#include <kernel/types.h>
 #include <kernel/item.h>
 #include <kernel/pool.h>
 #include <kernel/unit.h>

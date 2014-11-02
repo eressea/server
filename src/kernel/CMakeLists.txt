@@ -3,6 +3,7 @@ project(kernel C)
 SET(_TEST_FILES
 build.test.c
 config.test.c
+group.test.c
 faction.test.c
 unit.test.c
 save.test.c
@@ -10,7 +11,6 @@ ship.test.c
 spell.test.c
 ally.test.c
 building.test.c
-magic.test.c
 equipment.test.c
 curse.test.c
 item.test.c
@@ -36,7 +36,6 @@ equipment.c
 faction.c
 group.c
 item.c
-magic.c
 messages.c
 order.c
 pathfinder.c

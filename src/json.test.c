@@ -3,7 +3,6 @@
 #include <stream.h>
 #include <memstream.h>
 
-#include <kernel/types.h>
 #include <kernel/region.h>
 #include <kernel/terrain.h>
 

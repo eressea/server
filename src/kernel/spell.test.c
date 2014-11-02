@@ -1,9 +1,7 @@
 #include <platform.h>
 
 #include <quicklist.h>
-#include <kernel/types.h>
 #include <kernel/spell.h>
-#include <kernel/magic.h>
 
 #include <CuTest.h>
 #include <tests.h>

@@ -26,6 +26,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "hate.h"
 #include "iceberg.h"
 #include "key.h"
+#include "stealth.h"
 #include "moved.h"
 #include "movement.h"
 #include "object.h"
@@ -57,7 +58,8 @@ attrib_type at_unitdissolve = {
 
 void register_attributes(void)
 {
-  at_register(&at_object);
+    at_register(&at_stealth);
+    at_register(&at_object);
   at_register(&at_unitdissolve);
   at_register(&at_overrideroads);
   at_register(&at_raceprefix);

@@ -13,11 +13,11 @@
  */
 
 #include <platform.h>
-#include <kernel/types.h>
 #include <kernel/config.h>
 
 #include "spy.h"
 #include "vortex.h"
+#include "laws.h"
 #include "spells.h"
 #include "direction.h"
 
@@ -37,7 +37,6 @@
 #include <kernel/spellid.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
-#include <kernel/magic.h>
 #include <kernel/messages.h>
 #include <kernel/objtypes.h>
 #include <kernel/order.h>

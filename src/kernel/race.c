@@ -27,7 +27,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "faction.h"
 #include "group.h"
 #include "item.h"
-#include "magic.h"
 #include "names.h"
 #include "pathfinder.h"
 #include "region.h"

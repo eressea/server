@@ -27,7 +27,6 @@ extern "C" {
 #include "types.h"
 
     struct _dictionary_;
-    struct critbit_tree;
     /* experimental gameplay features (that don't affect the savefile) */
     /* TODO: move these settings to settings.h or into configuration files */
 #define GOBLINKILL              /* Goblin-Spezialklau kann tödlich enden */
@@ -91,24 +90,17 @@ extern "C" {
 #define OBJECTIDSIZE        (NAMESIZE+5+IDSIZE) /* max. Länge der Strings, die
      * von struct unitname, etc. zurückgegeben werden. ohne die 0 */
 
-#define BAGCAPACITY		20000   /* soviel paßt in einen Bag of Holding */
-#define STRENGTHCAPACITY	50000   /* zusätzliche Tragkraft beim Kraftzauber (deprecated) */
-#define STRENGTHMULTIPLIER 50   /* multiplier for trollbelt */
+#define BAGCAPACITY         20000   /* soviel paßt in einen Bag of Holding */
+#define STRENGTHCAPACITY    50000   /* zusätzliche Tragkraft beim Kraftzauber (deprecated) */
+#define STRENGTHMULTIPLIER  50   /* multiplier for trollbelt */
 
     /* ----------------- Befehle ----------------------------------- */
 
 #define want(option) (1<<option)
     /* ------------------------------------------------------------- */
-    void add_translation(struct critbit_tree **cb, const char *str, int i);
-    void init_translations(const struct locale *lang, int ut, const char * (*string_cb)(int i), int maxstrings);
     int shipspeed(const struct ship *sh, const struct unit *u);
 
 #define i2b(i) ((bool)((i)?(true):(false)))
-
-    typedef struct strlist {
-        struct strlist *next;
-        char *s;
-    } strlist;
 
 #define fval(u, i) ((u)->flags & (i))
 #define fset(u, i) ((u)->flags |= (i))
@@ -129,9 +121,13 @@ extern "C" {
     /* special units */
     void make_undead_unit(struct unit *);
 
-    void addstrlist(strlist ** SP, const char *s);
+    typedef struct strlist {
+        struct strlist *next;
+        char *s;
+    } strlist;
 
-    int armedmen(const struct unit *u, bool siege_weapons);
+    void addstrlist(strlist ** SP, const char *s);
+    void freestrlist(strlist * s);
 
     unsigned int atoip(const char *s);
     unsigned int getuint(void);
@@ -154,15 +150,6 @@ extern "C" {
 #define shipid(x) itoa36((x)->no)
 #define factionid(x) itoa36((x)->no)
 #define curseid(x) itoa36((x)->no)
-
-    bool cansee(const struct faction *f, const struct region *r,
-        const struct unit *u, int modifier);
-    bool cansee_durchgezogen(const struct faction *f, const struct region *r,
-        const struct unit *u, int modifier);
-    bool cansee_unit(const struct unit *u, const struct unit *target,
-        int modifier);
-    bool seefaction(const struct faction *f, const struct region *r,
-        const struct unit *u, int modifier);
 
     const char * game_name(void);
     int game_id(void);
@@ -191,14 +178,7 @@ extern "C" {
     int alliedgroup(const struct plane *pl, const struct faction *f,
         const struct faction *f2, const struct ally *sf, int mode);
 
-    struct faction *findfaction(int n);
     struct faction *getfaction(void);
-
-    struct unit *findunitg(int n, const struct region *hint);
-    struct unit *findunit(int n);
-
-    struct unit *findunitr(const struct region *r, int n);
-    struct region *findunitregion(const struct unit *su);
 
     char *estring(const char *s);
     char *estring_i(char *s);
@@ -252,7 +232,6 @@ extern "C" {
      * sonst großes Unglück. Durch asserts an ein paar Stellen abgesichert. */
     void verify_data(void);
 
-    void freestrlist(strlist * s);
 
     int change_hitpoints(struct unit *u, int value);
 
@@ -262,9 +241,6 @@ extern "C" {
     /* intervall, in dem die regionen der partei zu finden sind */
     struct region *firstregion(struct faction *f);
     struct region *lastregion(struct faction *f);
-
-    void fhash(struct faction *f);
-    void funhash(struct faction *f);
 
     bool idle(struct faction *f);
     bool unit_has_cursed_item(struct unit *u);

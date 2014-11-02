@@ -1,6 +1,5 @@
 #include <platform.h>
 #include <curses.h>
-#include <kernel/types.h>
 
 #include "bind_gmtool.h"
 #include "gmtool.h"

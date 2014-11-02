@@ -20,14 +20,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "spy.h"
 #include "laws.h"
-#include "stealth.h"
 #include "move.h"
 #include "reports.h"
 
 /* kernel includes */
 #include <kernel/item.h>
 #include <kernel/faction.h>
-#include <kernel/magic.h>
 #include <kernel/messages.h>
 #include <kernel/order.h>
 #include <kernel/race.h>
@@ -37,8 +35,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/unit.h>
 
 /* attributes includes */
-#include <attributes/racename.h>
 #include <attributes/otherfaction.h>
+#include <attributes/racename.h>
+#include <attributes/stealth.h>
 
 /* util includes */
 #include <util/attrib.h>

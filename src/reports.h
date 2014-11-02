@@ -21,6 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <time.h>
 #include <kernel/objtypes.h>
+#include <kernel/types.h>
 
 #ifdef __cplusplus
 extern "C" {

@@ -22,17 +22,24 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-  extern int writepasswd(void);
-  void demographics(void);
-  void update_guards(void);
-  void update_subscriptions(void);
-  void deliverMail(struct faction *f, struct region *r, struct unit *u,
-    const char *s, struct unit *receiver);
+    struct unit;
+    struct region;
+    struct building;
+    struct faction;
+    struct order;
+    struct attrib_type;
 
-  bool renamed_building(const struct building * b);
-  int rename_building(struct unit * u, struct order * ord, struct building * b, const char *name);
-  void get_food(struct region * r);
-  extern int can_contact(const struct region *r, const struct unit *u, const struct unit *u2);
+    int writepasswd(void);
+    void demographics(void);
+    void update_guards(void);
+    void update_subscriptions(void);
+    void deliverMail(struct faction *f, struct region *r, struct unit *u,
+                     const char *s, struct unit *receiver);
+
+    bool renamed_building(const struct building * b);
+    int rename_building(struct unit * u, struct order * ord, struct building * b, const char *name);
+    void get_food(struct region * r);
+    int can_contact(const struct region *r, const struct unit *u, const struct unit *u2);
 
 /* eressea-specific. put somewhere else, please. */
   void processorders(void);
@@ -83,6 +90,17 @@ extern "C" {
   extern int reserve_self(struct unit *u, struct order *ord);
   extern int claim_cmd(struct unit *u, struct order *ord);
   extern int follow_cmd(struct unit *u, struct order *ord);
+
+  bool cansee(const struct faction *f, const struct region *r,
+      const struct unit *u, int modifier);
+  bool cansee_durchgezogen(const struct faction *f, const struct region *r,
+      const struct unit *u, int modifier);
+  bool cansee_unit(const struct unit *u, const struct unit *target,
+      int modifier);
+  bool seefaction(const struct faction *f, const struct region *r,
+      const struct unit *u, int modifier);
+  int armedmen(const struct unit *u, bool siege_weapons);
+
 
 #ifdef __cplusplus
 }

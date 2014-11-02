@@ -1,7 +1,6 @@
 #include <platform.h>
 
 #include <kernel/config.h>
-#include <kernel/types.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>

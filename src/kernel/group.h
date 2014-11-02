@@ -22,9 +22,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-/* bitfield value for group::flags */
-#define GFL_ALIVE 0x01          /* There is at least one struct unit in the group */
-
   struct gamedata;
 
   typedef struct group {
@@ -34,7 +31,6 @@ extern "C" {
     struct attrib *attribs;
     char *name;
     struct ally *allies;
-    int flags;
     int gid;
     int members;
   } group;

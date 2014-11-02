@@ -18,7 +18,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <platform.h>
 #include <kernel/config.h>
-#include <kernel/types.h>
 #include "unit.h"
 
 #include "building.h"
@@ -42,6 +41,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/moved.h>
 #include <attributes/otherfaction.h>
 #include <attributes/racename.h>
+#include <attributes/stealth.h>
 
 /* util includes */
 #include <util/attrib.h>
@@ -55,8 +55,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/resolve.h>
 #include <util/rng.h>
 #include <util/variant.h>
-
-#include <stealth.h>
 
 #include <storage.h>
 
@@ -73,6 +71,39 @@ attrib_type at_creator = {
     "creator"
     /* Rest ist NULL; temporaeres, nicht alterndes Attribut */
 };
+
+unit *findunitr(const region * r, int n)
+{
+    unit *u;
+
+    /* findunit regional! */
+
+    for (u = r->units; u; u = u->next)
+        if (u->no == n)
+            return u;
+
+    return 0;
+}
+
+unit *findunit(int n)
+{
+    if (n <= 0) {
+        return NULL;
+    }
+    return ufindhash(n);
+}
+
+unit *findunitg(int n, const region * hint)
+{
+
+    /* Abfangen von Syntaxfehlern. */
+    if (n <= 0)
+        return NULL;
+
+    /* findunit global! */
+    hint = 0;
+    return ufindhash(n);
+}
 
 #define UMAXHASH MAXUNITS
 static unit *unithash[UMAXHASH];
@@ -702,6 +733,7 @@ void set_level(unit * u, skill_t sk, int value)
 {
     skill *sv = u->skills;
 
+    assert(sk != SK_MAGIC || !u->faction || is_monsters(u->faction) || u->number == 1);
     if (!skill_enabled(sk))
         return;
 
@@ -1165,8 +1197,8 @@ skill *add_skill(unit * u, skill_t id)
     sv->weeks = 1;
     sv->old = 0;
     sv->id = id;
-    if (id == SK_MAGIC && u->faction) {
-        assert(max_magicians(u->faction) >= u->number);
+    if (id == SK_MAGIC && u->faction && !is_monsters(u->faction)) {
+        assert(u->number==1 && max_magicians(u->faction) >= u->number);
     }
     return sv;
 }

@@ -20,7 +20,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 
 #include <kernel/config.h>
-#include <kernel/types.h>
 #include <kernel/save.h>
 #include <kernel/version.h>
 #include "eressea.h"
@@ -28,7 +27,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "gmtool.h"
 #endif
 
-#include "build.h"
+#include "buildno.h"
 #include "bindings.h"
 #include "races/races.h"
 #include "spells.h"

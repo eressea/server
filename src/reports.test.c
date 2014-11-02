@@ -1,5 +1,4 @@
 #include <config.h>
-#include <kernel/types.h>
 #include "reports.h"
 
 #include <kernel/building.h>

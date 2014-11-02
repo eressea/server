@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2014, Enno Rehling <enno@eressea.de>
                          Katja Zedel <katze@felidae.kn-bremen.de
                          Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -26,7 +26,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/build.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
-#include <kernel/magic.h>
 #include <kernel/plane.h>
 #include <kernel/race.h>
 #include <kernel/region.h>

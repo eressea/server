@@ -45,7 +45,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/faction.h>
 #include <kernel/group.h>
 #include <kernel/item.h>
-#include <kernel/magic.h>
 #include <kernel/messages.h>
 #include <kernel/order.h>
 #include <kernel/plane.h>
@@ -63,9 +62,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/unit.h>
 
 /* attributes includes */
+#include <attributes/object.h>
 #include <attributes/racename.h>
 #include <attributes/raceprefix.h>
-#include <attributes/object.h>
+#include <attributes/stealth.h>
 
 /* util includes */
 #include <util/attrib.h>
@@ -4182,6 +4182,34 @@ void process(void)
 
 }
 
+int armedmen(const unit * u, bool siege_weapons)
+{
+    item *itm;
+    int n = 0;
+    if (!(urace(u)->flags & RCF_NOWEAPONS)) {
+        if (effskill(u, SK_WEAPONLESS) >= 1) {
+            /* kann ohne waffen bewachen: fuer drachen */
+            n = u->number;
+        }
+        else {
+            /* alle Waffen werden gezaehlt, und dann wird auf die Anzahl
+            * Personen minimiert */
+            for (itm = u->items; itm; itm = itm->next) {
+                const weapon_type *wtype = resource2weapon(itm->type->rtype);
+                if (wtype == NULL || (!siege_weapons && (wtype->flags & WTF_SIEGE)))
+                    continue;
+                if (effskill(u, wtype->skill) >= wtype->minskill)
+                    n += itm->number;
+                /* if (effskill(u, wtype->skill) >= wtype->minskill) n += itm->number; */
+                if (n > u->number)
+                    break;
+            }
+            n = _min(n, u->number);
+        }
+    }
+    return n;
+}
+
 int siege_cmd(unit * u, order * ord)
 {
     region *r = u->region;
@@ -4553,4 +4581,159 @@ void update_subscriptions(void)
             itoa36(f->no), f->subscription, f->email, dbrace(f->race), f->lastorders);
     }
     fclose(F);
+}
+
+bool
+cansee(const faction * f, const region * r, const unit * u, int modifier)
+/* r kann != u->region sein, wenn es um durchreisen geht */
+/* und es muss niemand aus f in der region sein, wenn sie vom Turm
+* erblickt wird */
+{
+    int stealth, rings;
+    unit *u2 = r->units;
+
+    if (u->faction == f || omniscient(f)) {
+        return true;
+    }
+    else if (fval(u_race(u), RCF_INVISIBLE)) {
+        return false;
+    }
+    else if (u->number == 0) {
+        attrib *a = a_find(u->attribs, &at_creator);
+        if (a) {                    /* u is an empty temporary unit. In this special case
+                                    we look at the creating unit. */
+            u = (unit *)a->data.v;
+        }
+        else {
+            return false;
+        }
+    }
+
+    if (leftship(u))
+        return true;
+
+    while (u2 && u2->faction != f)
+        u2 = u2->next;
+    if (u2 == NULL)
+        return false;
+
+    /* simple visibility, just gotta have a unit in the region to see 'em */
+    if (is_guard(u, GUARD_ALL) != 0 || usiege(u) || u->building || u->ship) {
+        return true;
+    }
+
+    rings = invisible(u, NULL);
+    stealth = eff_stealth(u, r) - modifier;
+
+    while (u2) {
+        if (rings < u->number || invisible(u, u2) < u->number) {
+            if (skill_enabled(SK_PERCEPTION)) {
+                int observation = eff_skill(u2, SK_PERCEPTION, r);
+
+                if (observation >= stealth) {
+                    return true;
+                }
+            }
+            else {
+                return true;
+            }
+        }
+
+        /* find next unit in our faction */
+        do {
+            u2 = u2->next;
+        } while (u2 && u2->faction != f);
+    }
+    return false;
+}
+
+bool cansee_unit(const unit * u, const unit * target, int modifier)
+/* target->region kann != u->region sein, wenn es um durchreisen geht */
+{
+    if (fval(u_race(target), RCF_INVISIBLE) || target->number == 0)
+        return false;
+    else if (target->faction == u->faction)
+        return true;
+    else {
+        int n, rings, o;
+
+        if (is_guard(target, GUARD_ALL) != 0 || usiege(target) || target->building
+            || target->ship) {
+            return true;
+        }
+
+        n = eff_stealth(target, target->region) - modifier;
+        rings = invisible(target, NULL);
+        if (rings == 0 && n <= 0) {
+            return true;
+        }
+
+        if (rings && invisible(target, u) >= target->number) {
+            return false;
+        }
+        if (skill_enabled(SK_PERCEPTION)) {
+            o = eff_skill(u, SK_PERCEPTION, target->region);
+            if (o >= n) {
+                return true;
+            }
+        }
+        else {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool
+cansee_durchgezogen(const faction * f, const region * r, const unit * u,
+int modifier)
+/* r kann != u->region sein, wenn es um durchreisen geht */
+/* und es muss niemand aus f in der region sein, wenn sie vom Turm
+* erblickt wird */
+{
+    int n;
+    unit *u2;
+
+    if (fval(u_race(u), RCF_INVISIBLE) || u->number == 0)
+        return false;
+    else if (u->faction == f)
+        return true;
+    else {
+        int rings;
+
+        if (is_guard(u, GUARD_ALL) != 0 || usiege(u) || u->building || u->ship) {
+            return true;
+        }
+
+        n = eff_stealth(u, r) - modifier;
+        rings = invisible(u, NULL);
+        if (rings == 0 && n <= 0) {
+            return true;
+        }
+
+        for (u2 = r->units; u2; u2 = u2->next) {
+            if (u2->faction == f) {
+                int o;
+
+                if (rings && invisible(u, u2) >= u->number)
+                    continue;
+
+                o = eff_skill(u2, SK_PERCEPTION, r);
+
+                if (o >= n) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+bool
+seefaction(const faction * f, const region * r, const unit * u, int modifier)
+{
+    if (((f == u->faction) || !fval(u, UFL_ANON_FACTION))
+        && cansee(f, r, u, modifier))
+        return true;
+    return false;
 }

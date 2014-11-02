@@ -20,10 +20,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "shock.h"
 
+#include "magic.h"
+
 /* kernel includes */
 #include <kernel/curse.h>
 #include <kernel/faction.h>
-#include <kernel/magic.h>
 #include <kernel/messages.h>
 #include <kernel/spell.h>
 #include <kernel/unit.h>
