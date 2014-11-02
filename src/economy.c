@@ -3444,7 +3444,6 @@ void produce(struct region *r)
     request workers[MAX_WORKERS];
     request *taxorders, *lootorders, *sellorders, *stealorders, *buyorders;
     unit *u;
-    int todo;
     static int rule_autowork = -1;
     bool limited = true;
     request *nextworker = workers;
@@ -3484,6 +3483,7 @@ void produce(struct region *r)
     for (u = r->units; u; u = u->next) {
         order *ord;
         bool trader = false;
+        keyword_t todo;
 
         if (u_race(u) == get_race(RC_SPELL) || fval(u, UFL_LONGACTION))
             continue;
