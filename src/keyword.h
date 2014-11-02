@@ -69,6 +69,7 @@ typedef enum {
     K_CLAIM,
     K_PROMOTION,
     K_PAY,
+    K_LOOT,
     MAXKEYWORDS,
     NOKEYWORD = -1
 } keyword_t;

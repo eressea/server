@@ -30,6 +30,7 @@
 			"maketemp": ["MACHE TEMP", "MACHETEMP"],
 			"move" : "NACH",
 			"password" : "PASSWORD",
+			"loot" : ["PLÜNDERE", "PLÜNDERN"],
 			"recruit": ["REKRUTIERE", "REKRUTIEREN"],
 			"reserve": ["RESERVIERE", "RESERVIEREN"],
 			"route": "ROUTE",

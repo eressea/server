@@ -143,5 +143,6 @@ const char *keywords[MAXKEYWORDS] = {
     "claim",
     "promote",
     "pay",
+    "loot",
 };
 
