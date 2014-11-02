@@ -26,6 +26,7 @@
 #include "give.h"
 #include "monster.h"
 #include "laws.h"
+#include "keyword.h"
 
 /* triggers includes */
 #include <triggers/removecurse.h>
@@ -173,7 +174,7 @@ static order *get_money_for_dragon(region * r, unit * u, int wanted)
         /* 5% chance, dass der drache aus einer laune raus attackiert */
         if (attack_chance <= 0.0 || chance(1.0 - u_race(u)->aggression)) {
             /* Drachen haben in E3 und E4 keine Einnahmen. Neuer Befehl Pluendern erstmal nur fuer Monster?*/
-            return create_order(K_TAX, default_locale, NULL);
+            return create_order(K_LOOT, default_locale, NULL);
         }
     }
 
@@ -866,6 +867,7 @@ void plan_monsters(faction * f)
       }
       if (long_order) {
         addlist(&u->orders, long_order);
+//        u->thisorder = long_order;
       }
     }
   }
