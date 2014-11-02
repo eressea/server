@@ -3571,7 +3571,8 @@ void produce(struct region *r)
             research_cmd(u, u->thisorder);
             break;
         default:
-            assert(!"should not happen");
+            /* not handled here */
+            break;
         }
     }
 
