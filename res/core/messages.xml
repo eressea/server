@@ -2754,7 +2754,7 @@
       <arg name="wanted" type="int"/>
       <arg name="mode" type="int"/>
     </type>
-    <text locale="de">"$unit($unit) verdient$if($eq($mode,4)," am Handel","") in $region($region) $int($amount)$if($eq($wanted,$amount),""," statt $int($wanted)") Silber$if($eq($mode,1)," durch Unterhaltung",$if($eq($mode,2)," durch Steuern",$if($eq($mode,3)," durch Handel",$if($eq($mode,5)," durch Diebstahl",$if($eq($mode,6)," durch Zauberei","")))))."</text>
+    <text locale="de">"$unit($unit) verdient$if($eq($mode,4)," am Handel","") in $region($region) $int($amount)$if($eq($wanted,$amount),""," statt $int($wanted)") Silber$if($eq($mode,1)," durch Unterhaltung",$if($eq($mode,2)," durch Steuern",$if($eq($mode,3)," durch Handel",$if($eq($mode,5)," durch Diebstahl",$if($eq($mode,6)," durch Zauberei",$if($eq($mode,7)," durch Pluendern","")))))."</text>
     <text locale="fr">"$unit($unit) earns $int($amount)$if($eq($wanted,$amount),""," of $int($wanted)") in $region($region)."</text>
     <text locale="en">"$unit($unit) earns $int($amount)$if($eq($wanted,$amount),""," of $int($wanted)") in $region($region)."</text>
   </message>
