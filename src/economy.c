@@ -3531,7 +3531,6 @@ void produce(struct region *r)
             continue;
 
         switch (todo) {
-
         case K_ENTERTAIN:
             entertain_cmd(u, u->thisorder);
             break;
@@ -3571,6 +3570,8 @@ void produce(struct region *r)
         case K_RESEARCH:
             research_cmd(u, u->thisorder);
             break;
+        default:
+            assert(!"should not happen");
         }
     }
 
