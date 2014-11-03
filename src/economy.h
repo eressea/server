@@ -37,10 +37,13 @@ extern "C" {
 
 #define TRADE_FRACTION          100
 
-    extern int income(const struct unit *u);
-
 /* Wieviel Fremde eine Partei pro Woche aufnehmen kann */
 #define MAXNEWBIES								5
+
+    struct unit;
+    struct region;
+    struct faction;
+    int income(const struct unit *u);
 
     void economics(struct region *r);
     void produce(struct region *r);
