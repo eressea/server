@@ -166,6 +166,7 @@ set(TESTS_SRC
   economy.test.c
   json.test.c
   keyword.test.c
+  give.test.c
   laws.test.c
   magic.test.c
   market.test.c
