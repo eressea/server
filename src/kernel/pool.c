@@ -176,7 +176,7 @@ int count)
     }
     if (rtype->flags & RTF_POOLED && mode & ~(GET_SLACK | GET_RESERVE)) {
         for (v = r->units; v && use < count; v = v->next)
-            if (u != v && (u->items || rtype->uget)) {
+            if (u != v && (v->items || rtype->uget)) {
             int mask;
 
             if ((urace(v)->ec_flags & GIVEITEM) == 0)

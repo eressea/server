@@ -16,11 +16,17 @@
 extern "C" {
 #endif
 
-  extern int give_item(int want, const struct item_type *itype,
+    struct item_type;
+    struct order;
+    struct unit;
+
+  int give_item(int want, const struct item_type *itype,
     struct unit *src, struct unit *dest, struct order *ord);
-  extern void give_men(int n, struct unit *u, struct unit *u2,
+  void give_men(int n, struct unit *u, struct unit *u2,
     struct order *ord);
-  extern void give_unit(struct unit *u, struct unit *u2, struct order *ord);
+  void give_unit(struct unit *u, struct unit *u2, struct order *ord);
+  void give_cmd(struct unit * u, struct order * ord);
+  struct message * check_give(const struct unit * u, const struct unit * u2, struct order *ord);
 
 #ifdef __cplusplus
 }

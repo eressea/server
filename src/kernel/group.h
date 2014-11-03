@@ -40,8 +40,9 @@ extern "C" {
   extern void set_group(struct unit *u, struct group *g);
   extern struct group * get_group(const struct unit *u);
   extern void free_group(struct group *g);
+  struct group *new_group(struct faction * f, const char *name, int gid);
 
-  extern void write_groups(struct storage *data, struct group *g);
+  extern void write_groups(struct storage *data, const struct faction *f);
   extern void read_groups(struct storage *data, struct faction *f);
 
 #ifdef __cplusplus

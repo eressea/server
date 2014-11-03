@@ -87,6 +87,27 @@ void test_pool(CuTest *tc) {
     CuAssertIntEquals(tc, 300, get_pooled(u1, rtype, GET_ALL, INT_MAX));
 }
 
+void test_pool_bug_2042(CuTest *tc) {
+    unit *u1, *u2;
+    faction *f;
+    region *r;
+    struct resource_type *rtype;
+
+    test_cleanup();
+    test_create_world();
+    rtype = rt_get_or_create("money");
+    it_get_or_create(rtype);
+    f = test_create_faction(0);
+    r = findregion(0, 0);
+    assert(r && f && rtype && rtype->itype);
+    u1 = test_create_unit(f, r);
+    u2 = test_create_unit(f, r);
+    assert(u1 && u2);
+    i_change(&u2->items, rtype->itype, 100);
+
+    CuAssertIntEquals(tc, 100, get_pooled(u1, rtype, GET_SLACK | GET_POOLED_SLACK, 100));
+}
+
 void test_pool_use(CuTest *tc) {
     unit *u1, *u2, *u3;
     faction *f;
@@ -165,6 +186,7 @@ CuSuite *get_pool_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_reservation);
     SUITE_ADD_TEST(suite, test_pool);
+    SUITE_ADD_TEST(suite, test_pool_bug_2042);
     SUITE_ADD_TEST(suite, test_pool_use);
     SUITE_ADD_TEST(suite, test_change_resource);
     return suite;
