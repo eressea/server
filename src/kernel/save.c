@@ -70,6 +70,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/umlaut.h>
 #include <util/unicode.h>
 
+#include <stream.h>
+#include <filestream.h>
 #include <storage.h>
 #include <binarystore.h>
 
@@ -1457,6 +1459,7 @@ int readgame(const char *filename, int backup)
     const struct building_type *bt_lighthouse = bt_find("lighthouse");
     gamedata gdata = { 0 };
     storage store;
+    stream strm;
     FILE *F;
 
     init_locales();
@@ -1482,7 +1485,8 @@ int readgame(const char *filename, int backup)
     assert(gdata.version <= RELEASE_VERSION || !"unsupported data format");
 
     gdata.encoding = enc_gamedata;
-    binstore_init(&store, F);
+    fstream_init(&strm, F);
+    binstore_init(&store, &strm);
     gdata.store = &store;
     global.data_version = gdata.version; /* HACK: attribute::read does not have access to gamedata, only storage */
 
@@ -1733,7 +1737,7 @@ int readgame(const char *filename, int backup)
     read_borders(&store);
 
     binstore_done(&store);
-
+    fstream_done(&strm);
     /* Unaufgeloeste Zeiger initialisieren */
     log_printf(stdout, "fixing unresolved references.\n");
     resolve();
@@ -1797,6 +1801,7 @@ int writegame(const char *filename)
     char path[MAX_PATH];
     gamedata gdata;
     storage store;
+    stream strm;
     FILE *F;
 
     clear_monster_orders();
@@ -1826,7 +1831,8 @@ int writegame(const char *filename)
     fwrite(&gdata.version, sizeof(int), 1, F);
     fwrite(&n, sizeof(int), 1, F);
 
-    binstore_init(&store, F);
+    fstream_init(&strm, F);
+    binstore_init(&store, &strm);
 
     /* globale Variablen */
 
@@ -1942,6 +1948,7 @@ int writegame(const char *filename)
     WRITE_SECTION(&store);
 
     binstore_done(&store);
+    fstream_done(&strm);
 
     log_printf(stdout, "\nOk.\n");
     return 0;

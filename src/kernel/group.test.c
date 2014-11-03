@@ -5,6 +5,8 @@
 #include "faction.h"
 #include "unit.h"
 #include "region.h"
+#include <stream.h>
+#include <filestream.h>
 #include <storage.h>
 #include <binarystore.h>
 
@@ -19,9 +21,11 @@ static void test_group_readwrite(CuTest * tc)
     ally *al;
     storage store;
     FILE *F;
+    stream strm;
 
     F = fopen("test.dat", "wb");
-    binstore_init(&store, F);
+    fstream_init(&strm, F);
+    binstore_init(&store, &strm);
     test_cleanup();
     test_create_world();
     f = test_create_faction(0);
@@ -30,13 +34,16 @@ static void test_group_readwrite(CuTest * tc)
     al->status = HELP_GIVE;
     write_groups(&store, f);
     binstore_done(&store);
+    fstream_done(&strm);
 
     F = fopen("test.dat", "rb");
-    binstore_init(&store, F);
+    fstream_init(&strm, F);
+    binstore_init(&store, &strm);
     f->groups = 0;
     free_group(g);
     read_groups(&store, f);
     binstore_done(&store);
+    fstream_done(&strm);
 
     CuAssertPtrNotNull(tc, f->groups);
     CuAssertPtrNotNull(tc, f->groups->allies);
