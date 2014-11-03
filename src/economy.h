@@ -43,6 +43,9 @@ extern "C" {
     struct unit;
     struct region;
     struct faction;
+    struct order;
+    struct message;
+
     int income(const struct unit *u);
 
     void economics(struct region *r);
