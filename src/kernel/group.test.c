@@ -30,7 +30,6 @@ static void test_group_readwrite(CuTest * tc)
     al->status = HELP_GIVE;
     write_groups(&store, f);
     binstore_done(&store);
-    fclose(F);
 
     F = fopen("test.dat", "rb");
     binstore_init(&store, F);
@@ -38,7 +37,6 @@ static void test_group_readwrite(CuTest * tc)
     free_group(g);
     read_groups(&store, f);
     binstore_done(&store);
-    fclose(F);
 
     CuAssertPtrNotNull(tc, f->groups);
     CuAssertPtrNotNull(tc, f->groups->allies);
