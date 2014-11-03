@@ -16,6 +16,10 @@
 extern "C" {
 #endif
 
+    struct item_type;
+    struct order;
+    struct unit;
+
   extern int give_item(int want, const struct item_type *itype,
     struct unit *src, struct unit *dest, struct order *ord);
   extern void give_men(int n, struct unit *u, struct unit *u2,

@@ -715,7 +715,7 @@ message *check_give(const unit *u, const unit *u2, order * ord) {
     return 0;
 }
 
-static void give_cmd(unit * u, order * ord)
+void give_cmd(unit * u, order * ord)
 {
     region *r = u->region;
     unit *u2;
@@ -725,8 +725,10 @@ static void give_cmd(unit * u, order * ord)
     param_t p;
     plane *pl;
     message *msg;
+    keyword_t kwd;
 
-    init_order(ord);
+    kwd = init_order(ord);
+    assert(kwd == K_GIVE);
     u2 = getunit(r, u->faction);
     s = getstrtoken();
     n = s ? atoip(s) : 0;

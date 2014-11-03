@@ -18,6 +18,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #ifndef H_GC_LAWS
 #define H_GC_LAWS
+
+#include <kernel/types.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

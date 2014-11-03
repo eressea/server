@@ -63,7 +63,7 @@ struct steal {
     struct faction *f;
 };
 
-static void setup_steal(struct steal *env, terrain_type *ter, race *rc) {
+static void setup_steal(struct steal *env, struct terrain_type *ter, struct race *rc) {
     env->r = test_create_region(0, 0, ter);
     env->f = test_create_faction(rc);
     env->u = test_create_unit(env->f, env->r);
@@ -72,7 +72,7 @@ static void setup_steal(struct steal *env, terrain_type *ter, race *rc) {
 static void test_steal_okay(CuTest * tc) {
     struct steal env;
     race *rc;
-    terrain_type *ter;
+    struct terrain_type *ter;
 
     test_cleanup();
     ter = test_create_terrain("plain", LAND_REGION);
@@ -114,50 +114,6 @@ static void test_steal_ocean(CuTest * tc) {
     test_cleanup();
 }
 
-struct give {
-    struct unit *src, *dst;
-    struct region *r;
-    struct faction *f1, *f2;
-};
-
-static void setup_give(struct give *env) {
-    terrain_type *ter = test_create_terrain("plain", LAND_REGION);
-    env->r = test_create_region(0, 0, ter);
-    env->src = test_create_unit(env->f1, env->r);
-    env->dst = test_create_unit(env->f2, env->r);
-}
-
-static void test_give_okay(CuTest * tc) {
-    struct give env;
-    struct race * rc;
-
-    test_cleanup();
-    rc = test_create_race("human");
-    env.f2 = env.f1 = test_create_faction(rc);
-    setup_give(&env);
-
-    set_param(&global.parameters, "rules.give", "0");
-    CuAssertPtrEquals(tc, 0, check_give(env.src, env.dst, 0));
-    test_cleanup();
-}
-
-static void test_give_denied_by_rules(CuTest * tc) {
-    struct give env;
-    struct race * rc;
-    struct message *msg;
-
-    test_cleanup();
-    rc = test_create_race("human");
-    env.f1 = test_create_faction(rc);
-    env.f2 = test_create_faction(rc);
-    setup_give(&env);
-
-    set_param(&global.parameters, "rules.give", "0");
-    CuAssertPtrNotNull(tc, msg=check_give(env.src, env.dst, 0));
-    msg_release(msg);
-    test_cleanup();
-}
-
 CuSuite *get_economy_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -166,7 +122,5 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_steal_okay);
     SUITE_ADD_TEST(suite, test_steal_ocean);
     SUITE_ADD_TEST(suite, test_steal_nosteal);
-    SUITE_ADD_TEST(suite, test_give_okay);
-    SUITE_ADD_TEST(suite, test_give_denied_by_rules);
     return suite;
 }

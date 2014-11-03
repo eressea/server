@@ -54,6 +54,7 @@ extern "C" {
     extern int recruit_archetypes(void);
     extern int give_control_cmd(struct unit *u, struct order *ord);
     extern void give_control(struct unit * u, struct unit * u2);
+    void give_cmd(struct unit * u, struct order * ord);
 
     struct message * check_steal(const struct unit * u, struct order *ord);
     struct message * check_give(const struct unit * u, const struct unit * u2, struct order *ord);

@@ -57,6 +57,7 @@ int RunAllTests(void)
   /* gamecode */
   ADD_TESTS(suite, battle);
   ADD_TESTS(suite, economy);
+  ADD_TESTS(suite, give);
   ADD_TESTS(suite, laws);
   ADD_TESTS(suite, market);
   ADD_TESTS(suite, move);
