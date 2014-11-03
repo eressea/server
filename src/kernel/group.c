@@ -48,7 +48,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 static group *ghash[GMAXHASH];
 static int maxgid;
 
-static group *new_group(faction * f, const char *name, int gid)
+group *new_group(faction * f, const char *name, int gid)
 {
     group **gp = &f->groups;
     int index = gid % GMAXHASH;
@@ -195,9 +195,10 @@ bool join_group(unit * u, const char *name)
     return true;
 }
 
-void write_groups(struct storage *store, group * g)
+void write_groups(struct storage *store, const faction * f)
 {
-    while (g) {
+    group *g;
+    for (g = f->groups; g; g=g->next) {
         ally *a;
         WRITE_INT(store, g->gid);
         WRITE_STR(store, g->name);
@@ -210,7 +211,6 @@ void write_groups(struct storage *store, group * g)
         WRITE_INT(store, 0);
         a_write(store, g->attribs, g);
         WRITE_SECTION(store);
-        g = g->next;
     }
     WRITE_INT(store, 0);
 }
@@ -243,7 +243,6 @@ void read_groups(struct storage *store, faction * f)
             if (!a->faction)
                 ur_add(fid, &a->faction, resolve_faction);
         }
-        *pa = 0;
         a_read(store, &g->attribs, g);
     }
 }

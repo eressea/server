@@ -1439,7 +1439,7 @@ void writefaction(struct gamedata *data, const faction * f)
     }
     WRITE_INT(data->store, 0);
     WRITE_SECTION(data->store);
-    write_groups(data->store, f->groups);
+    write_groups(data->store, f);
     write_spellbook(f->spellbook, data->store);
 }
 
