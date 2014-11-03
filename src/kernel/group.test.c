@@ -27,7 +27,7 @@ static void test_group_readwrite(CuTest * tc)
     f = test_create_faction(0);
     g = new_group(f, "test", 42);
     al = ally_add(&g->allies, f);
-    al->status = HELP_COMMAND;
+    al->status = HELP_GIVE;
     write_groups(&store, f);
     binstore_done(&store);
     fclose(F);
@@ -44,7 +44,7 @@ static void test_group_readwrite(CuTest * tc)
     CuAssertPtrNotNull(tc, f->groups->allies);
     CuAssertPtrEquals(tc, 0, f->groups->allies->next);
     CuAssertPtrEquals(tc, f, f->groups->allies->faction);
-    CuAssertIntEquals(tc, HELP_COMMAND, f->groups->allies->status);
+    CuAssertIntEquals(tc, HELP_GIVE, f->groups->allies->status);
     test_cleanup();
 }
 
