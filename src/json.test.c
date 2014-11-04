@@ -107,12 +107,14 @@ static void test_export_no_factions(CuTest * tc) {
     char buf[1024];
     stream out = { 0 };
     int err;
+    size_t len;
 
     mstream_init(&out);
     err = json_export(&out, EXPORT_FACTIONS);
     CuAssertIntEquals(tc, 0, err);
     out.api->rewind(out.handle);
-    out.api->read(out.handle, buf, sizeof(buf));
+    len = out.api->read(out.handle, buf, sizeof(buf));
+    buf[len]=0;
     CuAssertStrEquals(tc, "{}", strip(buf));
     mstream_done(&out);
 }
