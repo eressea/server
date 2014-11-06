@@ -10,11 +10,11 @@ local function change_locales(localechange)
   end
 end
 
-local package = {}
+local pkg = {}
 
-function pacakge.update()
+function pkg.update()
   local localechange = { de = { 'ii' } }
   change_locales(localechange)
 end
 
-return package
+return pkg

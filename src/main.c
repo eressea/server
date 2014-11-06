@@ -268,7 +268,7 @@ int main(int argc, char **argv)
     bind_monsters(L);
     err = eressea_run(L, luafile);
     if (err) {
-        log_error("server execution failed with code %d\n", err);
+        log_error("script %s failed with code %d\n", luafile, err);
         return err;
     }
 #ifdef MSPACES
