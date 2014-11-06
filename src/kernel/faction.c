@@ -169,7 +169,6 @@ faction *get_or_create_monsters(void)
         }
         renumber_faction(f, 666);
         faction_setname(f, "Monster");
-        f->options = 0;
     }
     if (f) {
         fset(f, FFL_NPC | FFL_NOIDLEOUT);
