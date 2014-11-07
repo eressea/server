@@ -91,20 +91,18 @@ static void test_addfaction(CuTest *tc) {
     CuAssertIntEquals(tc, M_GRAY, f->magiegebiet);
     CuAssertIntEquals(tc, turn, f->lastorders);
     CuAssertPtrEquals(tc, f, findfaction(f->no));
+    test_cleanup();
 }
 
 static void test_get_monsters(CuTest *tc) {
     faction *f;
-    CuAssertPtrEquals(tc, NULL, get_monsters());
-    f = get_or_create_monsters();
+
+    free_gamedata();
+    CuAssertPtrNotNull(tc, (f = get_monsters()));
     CuAssertPtrEquals(tc, f, get_monsters());
     CuAssertIntEquals(tc, 666, f->no);
     CuAssertStrEquals(tc, "Monster", f->name);
-    free_gamedata();
-    CuAssertPtrEquals(tc, NULL, get_monsters());
-    f = get_or_create_monsters();
-    CuAssertPtrEquals(tc, f, get_monsters());
-    CuAssertIntEquals(tc, 666, f->no);
+    test_cleanup();
 }
 
 CuSuite *get_faction_suite(void)

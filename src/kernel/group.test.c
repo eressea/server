@@ -50,6 +50,7 @@ static void test_group_readwrite(CuTest * tc)
     CuAssertPtrEquals(tc, 0, f->groups->allies->next);
     CuAssertPtrEquals(tc, f, f->groups->allies->faction);
     CuAssertIntEquals(tc, HELP_GIVE, f->groups->allies->status);
+    remove("test.dat");
     test_cleanup();
 }
 
