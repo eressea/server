@@ -139,41 +139,22 @@ void set_show_item(faction * f, const struct item_type *itype)
     a->data.v = (void *)itype;
 }
 
-faction *get_monsters(void) {
-    faction *f;
-
-    for (f = factions; f; f = f->next) {
-        if ((f->flags & FFL_NPC) && !(f->flags & FFL_DEFENDER)) {
-            return f;
-        }
-    }
-    return 0;
-}
-
 faction *get_or_create_monsters(void)
 {
-    faction *f = get_monsters();
+    faction *f = findfaction(666);
     if (!f) {
-        /* shit! */
-        f = findfaction(666);
-    }
-    if (!f) {
-        const race *rc = rc_find("dragon");
-            
+        const race *rc = rc_get_or_create("dragon");
         const char *email = get_param(global.parameters, "monster.email");
-        if (email) {
-            f = addfaction(email, NULL, rc, NULL, 0);
-        } 
-        else {
-            f = addfaction("noreply@eressea.de", NULL, rc, NULL, 0);
-        }
+        f = addfaction(email ? email : "noreply@eressea.de", NULL, rc, NULL, 0);
         renumber_faction(f, 666);
         faction_setname(f, "Monster");
-    }
-    if (f) {
         fset(f, FFL_NPC | FFL_NOIDLEOUT);
     }
     return f;
+}
+
+faction *get_monsters(void) {
+    return get_or_create_monsters();
 }
 
 const unit *random_unit_in_faction(const faction * f)
