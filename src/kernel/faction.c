@@ -68,6 +68,7 @@ faction *factions;
  */
 void free_faction(faction * f)
 {
+    funhash(f);
     if (f->msgs)
         free_messagelist(f->msgs);
     while (f->battles) {
@@ -113,9 +114,12 @@ void funhash(faction * f)
 {
     int index = f->no % FMAXHASH;
     faction **fp = factionhash + index;
-    while (*fp && (*fp) != f)
+    while (*fp && (*fp) != f) {
         fp = &(*fp)->nexthash;
-    *fp = f->nexthash;
+    }
+    if (*fp == f) {
+        *fp = f->nexthash;
+    }
 }
 
 static faction *ffindhash(int no)

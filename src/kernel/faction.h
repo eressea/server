@@ -54,7 +54,7 @@ extern "C" {
 
 #define FFL_SAVEMASK (FFL_DEFENDER|FFL_NEWID|FFL_GM|FFL_NPC|FFL_DBENTRY|FFL_NOIDLEOUT)
 
-#define is_monsters(f) (f && f==get_monsters())
+#define is_monsters(f) (f && fval(f, FFL_NPC) && f==get_monsters())
 
 typedef struct faction {
     struct faction *next;
