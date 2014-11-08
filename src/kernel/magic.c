@@ -2579,7 +2579,7 @@ static castorder *cast_cmd(unit * u, order * ord)
         }
         s = getstrtoken();
     }
-    if (!s[0] || strlen(s) == 0) {
+    if (!s || !s[0] || strlen(s) == 0) {
         /* Fehler "Es wurde kein Zauber angegeben" */
         cmistake(u, ord, 172, MSG_MAGIC);
         return 0;
