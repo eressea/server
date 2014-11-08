@@ -2337,14 +2337,13 @@ static void eval_int36(struct opstack **stack, const void *userdata)
 
 static void log_orders(const struct message *msg)
 {
-    faction *f = get_monsters();
     char buffer[4096];
     int i;
 
     for (i = 0; i != msg->type->nparameters; ++i) {
         if (msg->type->types[i]->copy == &var_copy_order) {
             const char *section = nr_section(msg);
-            nr_render(msg, f ? f->locale : default_locale, buffer, sizeof(buffer), f);
+            nr_render(msg, default_locale, buffer, sizeof(buffer), NULL);
             log_debug("MESSAGE [%s]: %s\n", section, buffer);
             break;
         }

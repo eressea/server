@@ -77,7 +77,6 @@ set (ERESSEA_SRC
   keyword.c
   skill.c
   json.c
-  creation.c
   creport.c
   economy.c
   give.c

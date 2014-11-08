@@ -45,6 +45,7 @@ function test_flags()
     eressea.write_game("test.dat")
     eressea.free_game()
     eressea.read_game("test.dat")
+    os.remove('test.dat')
     f = get_faction(no)
     assert_equal(flags, f.flags)
 end

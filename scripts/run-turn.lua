@@ -26,18 +26,6 @@ function callbacks(rules, name, ...)
 	end
 end
 
-local function change_locales(localechange)
-  for loc, flist in pairs(localechange) do
-    for index, name in pairs(flist) do
-      f = get_faction(atoi36(name))
-      if f ~= nil and f.locale ~= loc then
-        print("LOCALECHANGE ", f, f.locale, loc)
-        f.locale = loc
-      end
-    end
-  end
-end
-
 local function dbupdate()
   update_scores()
   dbname = config.dbname or 'eressea.db'
@@ -152,9 +140,6 @@ function process(rules, orders)
 
 	process_orders()
 	callbacks(rules, 'update')
-
-  local localechange = { de = { 'ii' } }
-  change_locales(localechange)
 
   write_files(config.locales)
 
