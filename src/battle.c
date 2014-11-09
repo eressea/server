@@ -1042,6 +1042,41 @@ static int natural_armor(unit * du)
     return an;
 }
 
+static int rc_specialdamage(const unit *au, const unit *du, const struct weapon_type *wtype)
+{
+    const race *ar = u_race(au);
+    int m, modifier = 0;
+
+    switch (old_race(ar)) {
+    case RC_HALFLING:
+        if (wtype != NULL && dragonrace(u_race(du))) {
+            modifier += 5;
+        }
+        break;
+    default:
+        break;
+    }
+    if (wtype != NULL && wtype->modifiers != NULL) {
+        for (m = 0; wtype->modifiers[m].value; ++m) {
+            /* weapon damage for this weapon, possibly by race */
+            if (wtype->modifiers[m].flags & WMF_DAMAGE) {
+                race_list *rlist = wtype->modifiers[m].races;
+                if (rlist != NULL) {
+                    while (rlist) {
+                        if (rlist->data == ar)
+                            break;
+                        rlist = rlist->next;
+                    }
+                    if (rlist == NULL)
+                        continue;
+                }
+                modifier += wtype->modifiers[m].value;
+            }
+        }
+    }
+    return modifier;
+}
+
 bool
 terminate(troop dt, troop at, int type, const char *damage, bool missile)
 {
@@ -1163,7 +1198,7 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
             }
         }
 
-        da += rc_specialdamage(u_race(au), u_race(du), awtype);
+        da += rc_specialdamage(au, du, awtype);
 
         if (awtype != NULL && fval(awtype, WTF_MISSILE)) {
             /* missile weapon bonus */
