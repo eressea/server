@@ -1418,7 +1418,7 @@ static void durchreisende(FILE * F, const region * r, const faction * f)
                 if (cansee_durchgezogen(f, r, u, 0)) {
                     ++counter;
                     if (u->ship != NULL) {
-#ifdef GERMAN_FLUFF_DISABLED
+#ifdef GERMAN_FLUFF_ENABLED
                         if (counter == 1) {
                             bytes = (int)strlcpy(bufp, "Die ", size);
                         }

@@ -1059,8 +1059,8 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
     int hp;
 
     int ar = 0, an, am;
-    const armor_type *armor = select_armor(dt, true);
-    const armor_type *shield = select_armor(dt, false);
+    const armor_type *armor = select_armor(dt, false);
+    const armor_type *shield = select_armor(dt, true);
 
     const weapon_type *dwtype = NULL;
     const weapon_type *awtype = NULL;
@@ -2554,16 +2554,7 @@ static void loot_items(fighter * corpse)
                             mustloot ? loot : loot_quota(corpse->unit, fig->unit, itm->type,
                             loot);
                         if (trueloot > 0) {
-                            item *l = fig->loot;
-                            while (l && l->type != itm->type)
-                                l = l->next;
-                            if (!l) {
-                                l = calloc(sizeof(item), 1);
-                                l->next = fig->loot;
-                                fig->loot = l;
-                                l->type = itm->type;
-                            }
-                            l->number += trueloot;
+                            i_change(&fig->loot, itm->type, trueloot);
                         }
                     }
                 }
