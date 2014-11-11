@@ -913,7 +913,7 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
             int sk = eff_skill(u, SK_PERCEPTION, r);
             if (invisible(reisender, u) >= reisender->number)
                 continue;
-            if (!u_race(u)->flags & RCF_FLY && u_race(reisender)->flags & RCF_FLY)
+            if (!(u_race(u)->flags & RCF_FLY) && u_race(reisender)->flags & RCF_FLY)
                 continue;
             if ((u->faction == reisender->faction) || (ucontact(u, reisender)) || (alliedunit(u, reisender->faction, HELP_GUARD)))
                 guard_count = guard_count - u->number;
@@ -964,7 +964,7 @@ static bool is_guardian_u(const unit * guard, unit * u, unsigned int mask)
         return false;
     if (!cansee(guard->faction, u->region, u, 0))
         return false;
-    if (!u_race(guard)->flags & RCF_FLY && u_race(u)->flags & RCF_FLY)
+    if (!(u_race(guard)->flags & RCF_FLY) && u_race(u)->flags & RCF_FLY)
         return false;
 
     return true;
