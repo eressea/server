@@ -132,7 +132,6 @@ static int skill_formula = 0;
 #define DAMAGE_CRITICAL      (1<<0)
 #define DAMAGE_MELEE_BONUS   (1<<1)
 #define DAMAGE_MISSILE_BONUS (1<<2)
-#define DAMAGE_UNARMED_BONUS (1<<3)
 #define DAMAGE_SKILL_BONUS   (1<<4)
 /** initialize rules from configuration.
  */
@@ -157,9 +156,6 @@ static void static_rules(void)
     }
     if (get_param_int(global.parameters, "rules.combat.missile_bonus", 1)) {
         damage_rules |= DAMAGE_MISSILE_BONUS;
-    }
-    if (get_param_int(global.parameters, "rules.combat.unarmed_bonus", 1)) {
-        damage_rules |= DAMAGE_UNARMED_BONUS;
     }
     if (get_param_int(global.parameters, "rules.combat.skill_bonus", 1)) {
         damage_rules |= DAMAGE_SKILL_BONUS;
@@ -1204,12 +1200,6 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
             /* missile weapon bonus */
             if (damage_rules & DAMAGE_MISSILE_BONUS) {
                 da += af->person[at.index].damage_rear;
-            }
-        }
-        else if (awtype == NULL) {
-            /* skill bonus for unarmed combat */
-            if (damage_rules & DAMAGE_UNARMED_BONUS) {
-                da += effskill(au, SK_WEAPONLESS);
             }
         }
         else {
