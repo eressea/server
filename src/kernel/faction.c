@@ -143,24 +143,6 @@ void set_show_item(faction * f, const struct item_type *itype)
     a->data.v = (void *)itype;
 }
 
-faction *get_or_create_monsters(void)
-{
-    faction *f = findfaction(666);
-    if (!f) {
-        const race *rc = rc_get_or_create("dragon");
-        const char *email = get_param(global.parameters, "monster.email");
-        f = addfaction(email ? email : "noreply@eressea.de", NULL, rc, NULL, 0);
-        renumber_faction(f, 666);
-        faction_setname(f, "Monster");
-        fset(f, FFL_NPC | FFL_NOIDLEOUT);
-    }
-    return f;
-}
-
-faction *get_monsters(void) {
-    return get_or_create_monsters();
-}
-
 const unit *random_unit_in_faction(const faction * f)
 {
     unit *u;
@@ -632,7 +614,7 @@ void remove_empty_factions(void)
         /* monster (0) werden nicht entfernt. alive kann beim readgame
         * () auf 0 gesetzt werden, wenn monsters keine einheiten mehr
         * haben. */
-        if ((f->units == NULL || f->alive == 0) && !is_monsters(f)) {
+        if ((f->units == NULL || f->alive == 0) && !fval(f, FFL_NOIDLEOUT)) {
             ursprung *ur = f->ursprung;
             while (ur && ur->id != 0)
                 ur = ur->next;

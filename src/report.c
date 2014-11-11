@@ -23,6 +23,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "reports.h"
 #include "laws.h"
+#include "monster.h"
+
 /* modules includes */
 #include <modules/score.h>
 

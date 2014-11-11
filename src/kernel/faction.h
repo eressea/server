@@ -54,8 +54,6 @@ extern "C" {
 
 #define FFL_SAVEMASK (FFL_DEFENDER|FFL_NEWID|FFL_GM|FFL_NPC|FFL_DBENTRY|FFL_NOIDLEOUT)
 
-#define is_monsters(f) (f && fval(f, FFL_NPC) && f==get_monsters())
-
 typedef struct faction {
     struct faction *next;
     struct faction *nexthash;
@@ -116,8 +114,6 @@ void fhash(struct faction *f);
 void funhash(struct faction *f);
 
 struct faction *findfaction(int n);
-struct faction *get_monsters(void);
-struct faction *get_or_create_monsters(void);
 int max_magicians(const faction * f);
 void set_show_item(faction * f, const struct item_type *itype);
 

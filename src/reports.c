@@ -1688,7 +1688,7 @@ static void nmr_warnings(void)
     faction *f, *fa;
 #define FRIEND (HELP_GUARD|HELP_MONEY)
     for (f = factions; f; f = f->next) {
-        if (!is_monsters(f) && (turn - f->lastorders) >= 2) {
+        if (!fval(f, FFL_NOIDLEOUT) && (turn - f->lastorders) >= 2) {
             message *msg = NULL;
             for (fa = factions; fa; fa = fa->next) {
                 int warn = 0;

@@ -14,6 +14,7 @@ without prior permission by the authors of Eressea.
 #include "bind_faction.h"
 #include "bind_unit.h"
 #include "bindings.h"
+#include "helpers.h"
 
 #include <kernel/alliance.h>
 #include <kernel/faction.h>
@@ -325,6 +326,14 @@ static int tolua_faction_destroy(lua_State * L)
   return 0;
 }
 
+static int tolua_faction_get(lua_State * L)
+{
+    int no = tolua_toid(L, 1, 0);
+    faction *f = findfaction(no);
+    tolua_pushusertype(L, f, TOLUA_CAST "faction");
+    return 1;
+}
+
 static int tolua_faction_create(lua_State * L)
 {
   const char *email = tolua_tostring(L, 1, 0);
@@ -510,7 +519,10 @@ void tolua_faction_open(lua_State * L)
   tolua_module(L, NULL, 0);
   tolua_beginmodule(L, NULL);
   {
-    tolua_cclass(L, TOLUA_CAST "faction", TOLUA_CAST "faction", TOLUA_CAST "",
+      tolua_beginmodule(L, TOLUA_CAST "eressea");
+      tolua_function(L, TOLUA_CAST "get_faction", tolua_faction_get);
+      tolua_endmodule(L);
+      tolua_cclass(L, TOLUA_CAST "faction", TOLUA_CAST "faction", TOLUA_CAST "",
       NULL);
     tolua_beginmodule(L, TOLUA_CAST "faction");
     {
@@ -561,9 +573,10 @@ void tolua_faction_open(lua_State * L)
       tolua_function(L, TOLUA_CAST "add_item", tolua_faction_add_item);
       tolua_variable(L, TOLUA_CAST "items", tolua_faction_get_items, NULL);
 
-      tolua_function(L, TOLUA_CAST "renumber", &tolua_faction_renumber);
-      tolua_function(L, TOLUA_CAST "create", &tolua_faction_create);
-      tolua_function(L, TOLUA_CAST "destroy", &tolua_faction_destroy);
+      tolua_function(L, TOLUA_CAST "renumber", tolua_faction_renumber);
+      tolua_function(L, TOLUA_CAST "create", tolua_faction_create);
+      tolua_function(L, TOLUA_CAST "get", tolua_faction_get);
+      tolua_function(L, TOLUA_CAST "destroy", tolua_faction_destroy);
 #ifdef TODO
       def("faction_origin", &faction_getorigin,
         pure_out_value(_2) + pure_out_value(_3)),.def_readwrite("subscription",

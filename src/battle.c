@@ -23,6 +23,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "move.h"
 #include "laws.h"
 #include "skill.h"
+#include "monster.h"
 
 #include <kernel/alliance.h>
 #include <kernel/build.h>

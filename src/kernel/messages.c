@@ -257,7 +257,7 @@ message * cmistake(const unit * u, struct order *ord, int mno, int mtype)
   static char msgname[20];
   unused_arg(mtype);
 
-  if (is_monsters(u->faction))
+  if (fval(u->faction, FFL_NPC))
     return 0;
   sprintf(msgname, "error%d", mno);
   result = msg_feedback(u, ord, msgname, "");

@@ -565,14 +565,6 @@ static int tolua_read_turn(lua_State * L)
   return 1;
 }
 
-static int tolua_get_faction(lua_State * L)
-{
-  int no = tolua_toid(L, 1, 0);
-  faction *f = findfaction(no);
-  tolua_pushusertype(L, f, TOLUA_CAST "faction");
-  return 1;
-}
-
 static int tolua_get_region(lua_State * L)
 {
   int x = (int)tolua_tonumber(L, 1, 0);
@@ -1137,7 +1129,6 @@ int tolua_bindings_open(lua_State * L)
       tolua_function(L, TOLUA_CAST "get_ship", &config_get_stype);
     } tolua_endmodule(L);
     tolua_function(L, TOLUA_CAST "get_region_by_id", tolua_get_region_byid);
-    tolua_function(L, TOLUA_CAST "get_faction", tolua_get_faction);
     tolua_function(L, TOLUA_CAST "get_unit", tolua_get_unit);
     tolua_function(L, TOLUA_CAST "get_alliance", tolua_get_alliance);
     tolua_function(L, TOLUA_CAST "get_ship", tolua_get_ship);

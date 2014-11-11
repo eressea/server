@@ -24,6 +24,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "reports.h"
 #include "alchemy.h"
 #include "vortex.h"
+#include "monster.h"
 
 #include <kernel/build.h>
 #include <kernel/building.h>

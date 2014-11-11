@@ -362,14 +362,6 @@ int gift_items(unit * u, int flags)
     return retval;
 }
 
-void make_zombie(unit * u)
-{
-    u_setfaction(u, get_monsters());
-    scale_number(u, 1);
-    u_setrace(u, get_race(RC_ZOMBIE));
-    u->irace = NULL;
-}
-
 /** remove the unit from the list of active units.
  * the unit is not actually freed, because there may still be references
  * dangling to it (from messages, for example). To free all removed units,
@@ -733,7 +725,7 @@ void set_level(unit * u, skill_t sk, int value)
 {
     skill *sv = u->skills;
 
-    assert(sk != SK_MAGIC || !u->faction || u->number == 1 || is_monsters(u->faction));
+    assert(sk != SK_MAGIC || !u->faction || u->number == 1 || fval(u->faction, FFL_NPC));
     if (!skill_enabled(sk))
         return;
 
@@ -1197,7 +1189,7 @@ skill *add_skill(unit * u, skill_t id)
     sv->weeks = 1;
     sv->old = 0;
     sv->id = id;
-    if (id == SK_MAGIC && u->faction && !is_monsters(u->faction)) {
+    if (id == SK_MAGIC && u->faction && !fval(u->faction, FFL_NPC)) {
         assert(u->number==1 && max_magicians(u->faction) >= u->number);
     }
     return sv;

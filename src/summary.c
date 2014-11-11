@@ -14,6 +14,7 @@
 
 #include "summary.h"
 #include "laws.h"
+#include "monster.h"
 
 #include <kernel/alliance.h>
 #include <kernel/calendar.h>
@@ -88,7 +89,7 @@ int update_nmrs(void)
         if (fval(f, FFL_ISNEW)) {
             ++newplayers;
         }
-        else if (!is_monsters(f) && f->alive) {
+        else if (!fval(f, FFL_NOIDLEOUT) && f->alive) {
             int nmr = turn - f->lastorders + 1;
             if (nmr < 0 || nmr > NMRTimeout()) {
                 log_error("faction %s has %d NMRS\n", factionid(f), nmr);

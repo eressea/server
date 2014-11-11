@@ -1,5 +1,6 @@
 #include <platform.h>
 #include "spells/shipcurse.h"
+#include "monster.h"
 
 #include <kernel/equipment.h>
 #include <kernel/faction.h>

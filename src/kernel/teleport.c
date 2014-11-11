@@ -34,6 +34,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 #include <util/rng.h>
 
+#include "monster.h"
+
 /* libc includes */
 #include <assert.h>
 
