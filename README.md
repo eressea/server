@@ -15,5 +15,6 @@ This repository relies heavily on the use of submodules, and it pulls in most of
     git clone --recursive git://github.com/eressea/server.git
     cd server
     ./configure
+    ./s/build
 
 If you got this far and all went well, you have built a server (it is linked from the `game` subdirectory), and it will have passed some basic functionality tests.
