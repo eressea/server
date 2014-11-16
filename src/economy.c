@@ -1488,11 +1488,11 @@ static void create_item(unit * u, const item_type * itype, int want)
 int make_cmd(unit * u, struct order *ord)
 {
     region *r = u->region;
-    const building_type *btype;
-    const ship_type *stype;
-    param_t p;
-    int m;
-    const item_type *itype;
+    const building_type *btype = 0;
+    const ship_type *stype = 0;
+    const item_type *itype = 0;
+    param_t p = NOPARAM;
+    int m = INT_MAX;
     const char *s;
     const struct locale *lang = u->faction->locale;
     char ibuf[16];
@@ -1502,17 +1502,19 @@ int make_cmd(unit * u, struct order *ord)
     assert(kwd == K_MAKE);
     s = getstrtoken();
 
-    m = atoi((const char *)s);
-    sprintf(ibuf, "%d", m);
-    if (!strcmp(ibuf, (const char *)s)) {
-        /* first came a want-paramter */
-        s = getstrtoken();
+    if (s) {
+        m = atoi((const char *)s);
+        sprintf(ibuf, "%d", m);
+        if (!strcmp(ibuf, (const char *)s)) {
+            /* a quantity was given */
+            s = getstrtoken();
+        } else {
+            m = INT_MAX;
+        }
+        if (s) {
+            p = findparam(s, u->faction->locale);
+        }
     }
-    else {
-        m = INT_MAX;
-    }
-
-    p = findparam(s, u->faction->locale);
 
     if (p == P_ROAD) {
         plane *pl = rplane(r);
@@ -1551,10 +1553,11 @@ int make_cmd(unit * u, struct order *ord)
      * 'academy of arts', we need to figure out what the player meant.
      * This is not 100% safe.
      */
-    stype = findshiptype(s, lang);
-    btype = findbuildingtype(s, lang);
-    itype = finditemtype(s, lang);
-
+    if (s) {
+        stype = findshiptype(s, lang);
+        btype = findbuildingtype(s, lang);
+        itype = finditemtype(s, lang);
+    }
     if (itype != NULL && (btype != NULL || stype != NULL)) {
         if (itype->construction == NULL) {
             /* if the item cannot be made, we probably didn't mean to make it */
