@@ -45,7 +45,7 @@ function assert_dir() {
 function version() {
 assert_dir $SOURCE
 cd $SOURCE
-build=$(grep BUILD src/build.h | awk '{ print $3 }')
+build=$(grep BUILD src/buildno.h | awk '{ print $3 }')
 echo "eressea build $build"
 }
 
