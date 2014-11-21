@@ -1054,7 +1054,7 @@ int enter_ship(unit * u, struct order *ord, int id, int report)
     return 0;
 }
 
-int enter_building(unit * u, order * ord, int id, int report)
+int enter_building(unit * u, order * ord, int id, bool report)
 {
     region *r = u->region;
     building *b;

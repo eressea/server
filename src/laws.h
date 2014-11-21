@@ -51,7 +51,7 @@ extern "C" {
   extern int dropouts[2];
   extern int *age;
 
-  extern int enter_building(struct unit *u, struct order *ord, int id, int report);
+  extern int enter_building(struct unit *u, struct order *ord, int id, bool report);
   extern int enter_ship(struct unit *u, struct order *ord, int id, int report);
 
   extern void new_units(void);
