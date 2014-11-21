@@ -134,18 +134,64 @@ static void test_enter_building(CuTest * tc)
 
     rc->flags = RCF_WALK;
     u->building = 0;
-    enter_building(u, NULL, b->no, false);
+    CuAssertIntEquals(tc, 1, enter_building(u, NULL, b->no, false));
     CuAssertPtrEquals(tc, b, u->building);
 
     rc->flags = RCF_FLY;
     u->building = 0;
-    enter_building(u, NULL, b->no, false);
+    CuAssertIntEquals(tc, 1, enter_building(u, NULL, b->no, false));
     CuAssertPtrEquals(tc, b, u->building);
 
     rc->flags = RCF_SWIM;
     u->building = 0;
-    enter_building(u, NULL, b->no, false);
+    CuAssertIntEquals(tc, 0, enter_building(u, NULL, b->no, false));
     CuAssertPtrEquals(tc, 0, u->building);
+    CuAssertPtrEquals(tc, 0, u->faction->msgs);
+
+    CuAssertIntEquals(tc, 0, enter_building(u, NULL, b->no, true));
+    CuAssertPtrNotNull(tc, u->faction->msgs);
+
+    test_cleanup();
+}
+
+static void test_enter_ship(CuTest * tc)
+{
+    unit *u;
+    region *r;
+    ship *sh;
+    race * rc;
+
+    test_cleanup();
+    test_create_world();
+
+    r = findregion(0, 0);
+    rc = rc_get_or_create("human");
+    u = test_create_unit(test_create_faction(rc), r);
+    sh = test_create_ship(r, st_get_or_create("boat"));
+
+    rc->flags = RCF_WALK;
+    u->ship = 0;
+    CuAssertIntEquals(tc, 1, enter_ship(u, NULL, sh->no, false));
+    CuAssertPtrEquals(tc, sh, u->ship);
+
+    rc->flags = RCF_FLY;
+    u->ship = 0;
+    CuAssertIntEquals(tc, 1, enter_ship(u, NULL, sh->no, false));
+    CuAssertPtrEquals(tc, sh, u->ship);
+
+    rc->flags = RCF_CANSAIL;
+    u->ship = 0;
+    CuAssertIntEquals(tc, 1, enter_ship(u, NULL, sh->no, false));
+    CuAssertPtrEquals(tc, sh, u->ship);
+
+    rc->flags = RCF_SWIM;
+    u->ship = 0;
+    CuAssertIntEquals(tc, 0, enter_ship(u, NULL, sh->no, false));
+    CuAssertPtrEquals(tc, 0, u->ship);
+    CuAssertPtrEquals(tc, 0, u->faction->msgs);
+
+    CuAssertIntEquals(tc, 0, enter_ship(u, NULL, sh->no, true));
+    CuAssertPtrNotNull(tc, u->faction->msgs);
 
     test_cleanup();
 }
@@ -479,5 +525,6 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_cannot_create_unit_above_limit);
     SUITE_ADD_TEST(suite, test_contact);
     SUITE_ADD_TEST(suite, test_enter_building);
+    SUITE_ADD_TEST(suite, test_enter_ship);
     return suite;
 }
