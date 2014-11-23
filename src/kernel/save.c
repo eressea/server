@@ -1291,6 +1291,7 @@ faction *readfaction(struct gamedata * data)
 
     READ_STR(data->store, name, sizeof(name));
     f->locale = get_locale(name);
+    if (!f->locale) f->locale = default_locale;
     READ_INT(data->store, &f->lastorders);
     READ_INT(data->store, &f->age);
     READ_STR(data->store, name, sizeof(name));
