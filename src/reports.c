@@ -1204,6 +1204,8 @@ static void get_seen_interval(report_context * ctx)
     /* this is required to find the neighbour regions of the ones we are in,
      * which may well be outside of [firstregion, lastregion) */
     int i;
+
+    assert(ctx->seen);
     for (i = 0; i != MAXSEEHASH; ++i) {
         seen_region *sr = ctx->seen[i];
         while (sr != NULL) {
@@ -1643,7 +1645,9 @@ int write_reports(faction * f, time_t ltime)
     ctx.last = lastregion(f);
     ctx.addresses = NULL;
     ctx.userdata = NULL;
-    get_seen_interval(&ctx);
+    if (ctx.seen) {
+        get_seen_interval(&ctx);
+    }
     get_addresses(&ctx);
     _mkdir(reportpath());
     do {
@@ -1679,7 +1683,9 @@ int write_reports(faction * f, time_t ltime)
         log_warning("No report for faction %s!", factionid(f));
     }
     ql_free(ctx.addresses);
-    seen_done(ctx.seen);
+    if (ctx.seen) {
+        seen_done(ctx.seen);
+    }
     return 0;
 }
 
