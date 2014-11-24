@@ -178,8 +178,6 @@ extern "C" {
 
   extern race *rc_get_or_create(const char *name);
   extern const race *rc_find(const char *);
-  extern int rc_specialdamage(const race *, const race *,
-    const struct weapon_type *);
   void free_races(void);
 
   typedef enum name_t { NAME_SINGULAR, NAME_PLURAL, NAME_DEFINITIVE, NAME_CATEGORY } name_t;

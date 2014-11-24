@@ -404,7 +404,7 @@ get_island_info(region * root, int *size_p, int *inhabited_p, int *maxage_p)
     if (r->units) {
       unit *u;
       for (u = r->units; u; u = u->next) {
-        if (!is_monsters(u->faction) && u->faction->age > maxage) {
+        if (!fval(u->faction, FFL_NOIDLEOUT) && u->faction->age > maxage) {
           maxage = u->faction->age;
         }
       }

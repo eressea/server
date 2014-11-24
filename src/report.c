@@ -23,6 +23,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "reports.h"
 #include "laws.h"
+#include "monster.h"
+
 /* modules includes */
 #include <modules/score.h>
 
@@ -1418,7 +1420,7 @@ static void durchreisende(FILE * F, const region * r, const faction * f)
                 if (cansee_durchgezogen(f, r, u, 0)) {
                     ++counter;
                     if (u->ship != NULL) {
-#ifdef GERMAN_FLUFF_DISABLED
+#ifdef GERMAN_FLUFF_ENABLED
                         if (counter == 1) {
                             bytes = (int)strlcpy(bufp, "Die ", size);
                         }

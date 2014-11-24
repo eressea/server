@@ -23,6 +23,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "move.h"
 #include "laws.h"
 #include "skill.h"
+#include "monster.h"
 
 #include <kernel/alliance.h>
 #include <kernel/build.h>
@@ -132,7 +133,6 @@ static int skill_formula = 0;
 #define DAMAGE_CRITICAL      (1<<0)
 #define DAMAGE_MELEE_BONUS   (1<<1)
 #define DAMAGE_MISSILE_BONUS (1<<2)
-#define DAMAGE_UNARMED_BONUS (1<<3)
 #define DAMAGE_SKILL_BONUS   (1<<4)
 /** initialize rules from configuration.
  */
@@ -157,9 +157,6 @@ static void static_rules(void)
     }
     if (get_param_int(global.parameters, "rules.combat.missile_bonus", 1)) {
         damage_rules |= DAMAGE_MISSILE_BONUS;
-    }
-    if (get_param_int(global.parameters, "rules.combat.unarmed_bonus", 1)) {
-        damage_rules |= DAMAGE_UNARMED_BONUS;
     }
     if (get_param_int(global.parameters, "rules.combat.skill_bonus", 1)) {
         damage_rules |= DAMAGE_SKILL_BONUS;
@@ -1042,6 +1039,41 @@ static int natural_armor(unit * du)
     return an;
 }
 
+static int rc_specialdamage(const unit *au, const unit *du, const struct weapon_type *wtype)
+{
+    const race *ar = u_race(au);
+    int m, modifier = 0;
+
+    switch (old_race(ar)) {
+    case RC_HALFLING:
+        if (wtype != NULL && dragonrace(u_race(du))) {
+            modifier += 5;
+        }
+        break;
+    default:
+        break;
+    }
+    if (wtype != NULL && wtype->modifiers != NULL) {
+        for (m = 0; wtype->modifiers[m].value; ++m) {
+            /* weapon damage for this weapon, possibly by race */
+            if (wtype->modifiers[m].flags & WMF_DAMAGE) {
+                race_list *rlist = wtype->modifiers[m].races;
+                if (rlist != NULL) {
+                    while (rlist) {
+                        if (rlist->data == ar)
+                            break;
+                        rlist = rlist->next;
+                    }
+                    if (rlist == NULL)
+                        continue;
+                }
+                modifier += wtype->modifiers[m].value;
+            }
+        }
+    }
+    return modifier;
+}
+
 bool
 terminate(troop dt, troop at, int type, const char *damage, bool missile)
 {
@@ -1059,8 +1091,8 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
     int hp;
 
     int ar = 0, an, am;
-    const armor_type *armor = select_armor(dt, true);
-    const armor_type *shield = select_armor(dt, false);
+    const armor_type *armor = select_armor(dt, false);
+    const armor_type *shield = select_armor(dt, true);
 
     const weapon_type *dwtype = NULL;
     const weapon_type *awtype = NULL;
@@ -1163,18 +1195,12 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
             }
         }
 
-        da += rc_specialdamage(u_race(au), u_race(du), awtype);
+        da += rc_specialdamage(au, du, awtype);
 
         if (awtype != NULL && fval(awtype, WTF_MISSILE)) {
             /* missile weapon bonus */
             if (damage_rules & DAMAGE_MISSILE_BONUS) {
                 da += af->person[at.index].damage_rear;
-            }
-        }
-        else if (awtype == NULL) {
-            /* skill bonus for unarmed combat */
-            if (damage_rules & DAMAGE_UNARMED_BONUS) {
-                da += effskill(au, SK_WEAPONLESS);
             }
         }
         else {
@@ -2554,16 +2580,7 @@ static void loot_items(fighter * corpse)
                             mustloot ? loot : loot_quota(corpse->unit, fig->unit, itm->type,
                             loot);
                         if (trueloot > 0) {
-                            item *l = fig->loot;
-                            while (l && l->type != itm->type)
-                                l = l->next;
-                            if (!l) {
-                                l = calloc(sizeof(item), 1);
-                                l->next = fig->loot;
-                                fig->loot = l;
-                                l->type = itm->type;
-                            }
-                            l->number += trueloot;
+                            i_change(&fig->loot, itm->type, trueloot);
                         }
                     }
                 }

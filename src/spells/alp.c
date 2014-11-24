@@ -28,6 +28,8 @@
 #include <util/resolve.h>
 #include <util/umlaut.h>
 
+#include "monster.h"
+
 #include <storage.h>
 
 #include <triggers/createcurse.h>

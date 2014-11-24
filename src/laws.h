@@ -44,15 +44,16 @@ extern "C" {
     void get_food(struct region * r);
     int can_contact(const struct region *r, const struct unit *u, const struct unit *u2);
 
-/* eressea-specific. put somewhere else, please. */
+    int enter_building(struct unit *u, struct order *ord, int id, bool report);
+    int enter_ship(struct unit *u, struct order *ord, int id, bool report);
+
+    /* eressea-specific. put somewhere else, please. */
   void processorders(void);
   extern struct attrib_type at_germs;
 
   extern int dropouts[2];
   extern int *age;
 
-  extern int enter_building(struct unit *u, struct order *ord, int id, int report);
-  extern int enter_ship(struct unit *u, struct order *ord, int id, int report);
 
   extern void new_units(void);
   extern void defaultorders(void);

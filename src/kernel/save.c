@@ -222,7 +222,7 @@ static faction *factionorders(void)
 
     f = findfaction(fid);
 
-    if (f != NULL && !is_monsters(f)) {
+    if (f != NULL && !fval(f, FFL_NPC)) {
         const char *pass = getstrtoken();
 
         if (!checkpasswd(f, (const char *)pass, true)) {
@@ -499,7 +499,6 @@ static int resolve_owner(variant id, void *address)
         f = findfaction(id.i);
         if (f == NULL) {
             log_error("region has an invalid owner (%s)\n", itoa36(id.i));
-            f = get_monsters();
         }
     }
     owner->owner = f;
@@ -1292,6 +1291,7 @@ faction *readfaction(struct gamedata * data)
 
     READ_STR(data->store, name, sizeof(name));
     f->locale = get_locale(name);
+    if (!f->locale) f->locale = default_locale;
     READ_INT(data->store, &f->lastorders);
     READ_INT(data->store, &f->age);
     READ_STR(data->store, name, sizeof(name));
@@ -1338,9 +1338,10 @@ faction *readfaction(struct gamedata * data)
     READ_INT(data->store, &n);
     f->options = n;
 
-    if ((n & (want(O_REPORT) | want(O_COMPUTER))) == 0 && !is_monsters(f)) {
+    n = want(O_REPORT) | want(O_COMPUTER);
+    if ((f->options & n) == 0) {
         /* Kein Report eingestellt, Fehler */
-        f->options |= (want(O_REPORT) | want(O_ZUGVORLAGE));
+        f->options |= n;
     }
 
     sfp = &f->allies;
@@ -1720,7 +1721,7 @@ int readgame(const char *filename, int backup)
             if (mage) {
                 faction *f = u->faction;
                 int skl = effskill(u, SK_MAGIC);
-                if (!is_monsters(f) && f->magiegebiet == M_GRAY) {
+                if (!fval(f, FFL_NPC) && f->magiegebiet == M_GRAY) {
                     log_error("faction %s had magic=gray, fixing (%s)\n", factionname(f), magic_school[mage->magietyp]);
                     f->magiegebiet = mage->magietyp;
                 }
@@ -1778,9 +1779,8 @@ int readgame(const char *filename, int backup)
     return 0;
 }
 
-static void clear_monster_orders(void)
+static void clear_npc_orders(faction *f)
 {
-    faction *f = get_monsters();
     if (f) {
         unit *u;
         for (u = f->units; u; u = u->nextF) {
@@ -1804,7 +1804,6 @@ int writegame(const char *filename)
     stream strm;
     FILE *F;
 
-    clear_monster_orders();
     sprintf(path, "%s/%s", datapath(), filename);
 #ifdef HAVE_UNISTD_H
     if (access(path, R_OK) == 0) {
@@ -1884,6 +1883,9 @@ int writegame(const char *filename)
 
     log_printf(stdout, " - Schreibe %d Parteien...\n", n);
     for (f = factions; f; f = f->next) {
+        if (fval(f, FFL_NPC)) {
+            clear_npc_orders(f);
+        }
         writefaction(&gdata, f);
         WRITE_SECTION(&store);
     }

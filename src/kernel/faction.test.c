@@ -7,6 +7,7 @@
 #include <kernel/config.h>
 #include <util/language.h>
 
+#include "monster.h"
 #include <CuTest.h>
 #include <tests.h>
 

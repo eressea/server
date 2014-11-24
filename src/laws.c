@@ -993,31 +993,35 @@ static bool CheckOverload(void)
     return value;
 }
 
-int enter_ship(unit * u, struct order *ord, int id, int report)
+int enter_ship(unit * u, struct order *ord, int id, bool report)
 {
     region *r = u->region;
     ship *sh;
+    const race * rc = u_race(u);
 
     /* Muss abgefangen werden, sonst koennten Schwimmer an
      * Bord von Schiffen an Land gelangen. */
-    if (!fval(u_race(u), RCF_CANSAIL) || (!fval(u_race(u), RCF_WALK)
-        && !fval(u_race(u), RCF_FLY))) {
-        cmistake(u, ord, 233, MSG_MOVE);
+    if (!(rc->flags & (RCF_CANSAIL|RCF_WALK|RCF_FLY))) {
+        if (report) {
+            cmistake(u, ord, 233, MSG_MOVE);
+        }
         return 0;
     }
 
     sh = findship(id);
     if (sh == NULL || sh->region != r) {
-        if (report)
+        if (report) {
             cmistake(u, ord, 20, MSG_MOVE);
+        }
         return 0;
     }
     if (sh == u->ship) {
         return 1;
     }
     if (!mayboard(u, sh)) {
-        if (report)
+        if (report) {
             cmistake(u, ord, 34, MSG_MOVE);
+        }
         return 0;
     }
     if (CheckOverload()) {
@@ -1054,7 +1058,7 @@ int enter_ship(unit * u, struct order *ord, int id, int report)
     return 0;
 }
 
-int enter_building(unit * u, order * ord, int id, int report)
+int enter_building(unit * u, order * ord, int id, bool report)
 {
     region *r = u->region;
     building *b;

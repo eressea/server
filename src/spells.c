@@ -20,6 +20,7 @@
 #include "laws.h"
 #include "spells.h"
 #include "direction.h"
+#include "monster.h"
 
 #include <spells/borders.h>
 #include <spells/buildingcurse.h>

@@ -280,42 +280,6 @@ const char *racename(const struct locale *loc, const unit * u, const race * rc)
     return str ? str : rc->_name;
 }
 
-int
-rc_specialdamage(const race * ar, const race * dr,
-const struct weapon_type *wtype)
-{
-    race_t art = old_race(ar);
-    int m, modifier = 0;
-
-    if (wtype != NULL && wtype->modifiers != NULL)
-        for (m = 0; wtype->modifiers[m].value; ++m) {
-        /* weapon damage for this weapon, possibly by race */
-        if (wtype->modifiers[m].flags & WMF_DAMAGE) {
-            race_list *rlist = wtype->modifiers[m].races;
-            if (rlist != NULL) {
-                while (rlist) {
-                    if (rlist->data == ar)
-                        break;
-                    rlist = rlist->next;
-                }
-                if (rlist == NULL)
-                    continue;
-            }
-            modifier += wtype->modifiers[m].value;
-        }
-        }
-    switch (art) {
-    case RC_HALFLING:
-        if (wtype != NULL && dragonrace(dr)) {
-            modifier += 5;
-        }
-        break;
-    default:
-        break;
-    }
-    return modifier;
-}
-
 void write_race_reference(const race * rc, struct storage *store)
 {
     WRITE_TOK(store, rc ? rc->_name : "none");
