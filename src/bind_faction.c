@@ -519,8 +519,9 @@ void tolua_faction_open(lua_State * L)
   tolua_module(L, NULL, 0);
   tolua_beginmodule(L, NULL);
   {
-      tolua_beginmodule(L, TOLUA_CAST "eressea");
       tolua_function(L, TOLUA_CAST "get_faction", tolua_faction_get);
+      tolua_beginmodule(L, TOLUA_CAST "eressea");
+      tolua_function(L, TOLUA_CAST "faction", tolua_faction_get);
       tolua_endmodule(L);
       tolua_cclass(L, TOLUA_CAST "faction", TOLUA_CAST "faction", TOLUA_CAST "",
       NULL);
