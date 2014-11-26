@@ -18,3 +18,11 @@ function test_faction_flags()
 	f.flags = 42
 	assert_equal(42, f.flags)
 end
+
+function test_get_faction()
+	assert_equal(f, get_faction(f.id))
+	assert_equal(f, faction.get(f.id))
+	local nf = f.id
+	if nf>1 then nf = nf - 1 else nf = 1 end
+	assert_equal(nil, faction.get(nf))
+end

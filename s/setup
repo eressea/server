@@ -91,4 +91,7 @@ ini_add lua install $SOURCE
 ini_add lua paths $SOURCE/scripts:$SOURCE/lunit
 ini_add lua rules $rules
 
+ln -f $SOURCE/bin/eressea
 ln -f $SOURCE/scripts/run-turn.lua
+ln -f $SOURCE/scripts/reports.lua
+ln -f $SOURCE/scripts/config.lua
