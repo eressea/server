@@ -1190,7 +1190,8 @@ skill *add_skill(unit * u, skill_t id)
     sv->old = 0;
     sv->id = id;
     if (id == SK_MAGIC && u->faction && !fval(u->faction, FFL_NPC)) {
-        assert(u->number==1 && max_magicians(u->faction) >= u->number);
+        assert(u->number<=1);
+        assert(max_magicians(u->faction) >= u->number);
     }
     return sv;
 }
