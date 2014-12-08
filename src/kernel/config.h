@@ -26,7 +26,6 @@ extern "C" {
     /* this should always be the first thing included after platform.h */
 #include "types.h"
 
-    struct _dictionary_;
     /* experimental gameplay features (that don't affect the savefile) */
     /* TODO: move these settings to settings.h or into configuration files */
 #define GOBLINKILL              /* Goblin-Spezialklau kann tödlich enden */

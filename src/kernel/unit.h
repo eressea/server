@@ -104,7 +104,7 @@ extern "C" {
     struct order *old_orders;
 
     /* race and illusionary race */
-    const struct race *race_;
+    const struct race *_race;
     const struct race *irace;
 
     int flags;
