@@ -62,7 +62,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/crmessage.h>
 #include <util/event.h>
 #include <util/language.h>
-#include <util/filereader.h>
 #include <util/functions.h>
 #include <util/log.h>
 #include <util/lists.h>
@@ -2332,41 +2331,3 @@ int game_id(void) {
     return get_param_int(global.parameters, "game.id", 0);
 }
 
-void load_inifile(dictionary * d)
-{
-    const char *reportdir = reportpath();
-    const char *datadir = datapath();
-    const char *basedir = basepath();
-    const char *str;
-
-    assert(d);
-
-    str = iniparser_getstring(d, "eressea:base", basedir);
-    if (str != basedir) {
-        set_basepath(str);
-    }
-    str = iniparser_getstring(d, "eressea:report", reportdir);
-    if (str != reportdir) {
-        set_reportpath(str);
-    }
-    str = iniparser_getstring(d, "eressea:data", datadir);
-    if (str != datadir) {
-        set_datapath(str);
-    }
-
-    lomem = iniparser_getint(d, "eressea:lomem", lomem) ? 1 : 0;
-
-    str = iniparser_getstring(d, "eressea:encoding", NULL);
-    if (str && (_strcmpl(str, "utf8") == 0 || _strcmpl(str, "utf-8") == 0)) {
-        enc_gamedata = ENCODING_UTF8;
-    }
-
-    verbosity = iniparser_getint(d, "eressea:verbose", 2);
-    battledebug = iniparser_getint(d, "eressea:debug", battledebug) ? 1 : 0;
-
-    str = iniparser_getstring(d, "eressea:locales", "de,en");
-    make_locales(str);
-
-    if (global.inifile) iniparser_free(global.inifile);
-    global.inifile = d;
-}

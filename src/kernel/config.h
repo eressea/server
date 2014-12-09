@@ -301,7 +301,6 @@ extern "C" {
 
     const char *basepath(void);
     void set_basepath(const char *);
-    void load_inifile(struct _dictionary_ *d);
 
     const char *reportpath(void);
     void set_reportpath(const char *);
