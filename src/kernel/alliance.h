@@ -60,6 +60,7 @@ extern "C" {
   void free_alliance(struct alliance *al);
   extern struct faction *alliance_get_leader(struct alliance *al);
   extern void alliance_cmd(void);
+  bool is_allied(const struct faction *f1, const struct faction *f2);
 
   void alliance_setname(alliance * self, const char *name);
 /* execute commands */

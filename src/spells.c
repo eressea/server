@@ -6526,54 +6526,6 @@ int sp_becomewyrm(castorder * co)
     return 0;
 }
 
-/* ------------------------------------------------------------- */
-/* Name:       WDW-Pyramidenfindezauber
- * Stufe:      unterschiedlich
- * Gebiet:     alle
- * Wirkung:
- *             gibt die ungefaehre Entfernung zur naechstgelegenen Pyramiden-
- *             region an.
- *
- * Flags:
- */
-static int sp_wdwpyramid(castorder * co)
-{
-    region *r = co_get_region(co);
-    unit *mage = co->magician.u;
-    int cast_level = co->level;
-
-    if (a_find(r->attribs, &at_wdwpyramid) != NULL) {
-        ADDMSG(&mage->faction->msgs, msg_message("wdw_pyramidspell_found",
-            "unit region command", mage, r, co->order));
-    }
-    else {
-        region *r2;
-        int mindist = INT_MAX;
-        int minshowdist;
-        int maxshowdist;
-
-        for (r2 = regions; r2; r2 = r2->next) {
-            if (a_find(r2->attribs, &at_wdwpyramid) != NULL) {
-                int dist = distance(mage->region, r2);
-                if (dist < mindist) {
-                    mindist = dist;
-                }
-            }
-        }
-
-        assert(mindist >= 1);
-
-        minshowdist = mindist - rng_int() % 5;
-        maxshowdist = minshowdist + 4;
-
-        ADDMSG(&mage->faction->msgs, msg_message("wdw_pyramidspell_notfound",
-            "unit region command mindist maxdist", mage, r, co->order,
-            _max(1, minshowdist), maxshowdist));
-    }
-
-    return cast_level;
-}
-
 typedef struct spelldata {
     const char *sname;
     spell_f cast;
@@ -6861,7 +6813,6 @@ void register_spells(void)
     ct_register(&ct_deathcloud);
 
     register_function((pf_generic)sp_blessedharvest, "cast_blessedharvest");
-    register_function((pf_generic)sp_wdwpyramid, "wdwpyramid");
     register_function((pf_generic)sp_summon_familiar, "cast_familiar");
     register_function((pf_generic)sp_babbler, "cast_babbler");
     register_function((pf_generic)sp_readmind, "cast_readmind");

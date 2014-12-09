@@ -513,3 +513,7 @@ void alliance_setname(alliance * self, const char *name)
   else
     self->name = NULL;
 }
+
+bool is_allied(const struct faction *f1, const struct faction *f2) {
+    return (f1 == f2 || (f1->alliance && f1->alliance == f2->alliance));
+}

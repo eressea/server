@@ -34,9 +34,6 @@ extern "C" {
 #define INSECT_POTION           /* Spezialtrank für Insekten */
 #define ORCIFICATION            /* giving snotlings to the peasants gets counted */
 
-// TODO: remove macro, move all alliance code into a module.
-#define ALLIED(f1, f2) (f1==f2 || (f1->alliance && f1->alliance==f2->alliance))
-
     /* for some good prime numbers, check http://www.math.niu.edu/~rusin/known-math/98/pi_x */
 #ifndef MAXREGIONS
 # define MAXREGIONS 524287      /* must be prime for hashing. 262139 was a little small */
