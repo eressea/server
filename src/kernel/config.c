@@ -1632,9 +1632,6 @@ void kernel_done(void)
     gc_done();
 }
 
-/* TODO: soll hier weg */
-extern struct attrib_type at_shiptrail;
-
 attrib_type at_germs = {
     "germs",
     DEFAULT_INIT,
@@ -2168,6 +2165,7 @@ bool has_limited_skills(const struct unit * u)
 void attrib_init(void)
 {
     /* Alle speicherbaren Attribute müssen hier registriert werden */
+    at_register(&at_speedup);
     at_register(&at_shiptrail);
     at_register(&at_familiar);
     at_register(&at_familiarmage);
@@ -2211,7 +2209,6 @@ void attrib_init(void)
     at_register(&at_germs);
 
     at_deprecate("xontormiaexpress", a_readint);    /* required for old datafiles */
-    at_register(&at_speedup);
 }
 
 void kernel_init(void)
