@@ -1843,3 +1843,21 @@ void remove_empty_units(void)
         remove_empty_units_in_region(r);
     }
 }
+
+typedef char name[OBJECTIDSIZE + 1];
+static name idbuf[8];
+static int nextbuf = 0;
+
+char *write_unitname(const unit * u, char *buffer, size_t size)
+{
+    slprintf(buffer, size, "%s (%s)", (const char *)u->name, itoa36(u->no));
+    buffer[size - 1] = 0;
+    return buffer;
+}
+
+const char *unitname(const unit * u)
+{
+    char *ubuf = idbuf[(++nextbuf) % 8];
+    return write_unitname(u, ubuf, sizeof(name));
+}
+

@@ -1097,28 +1097,7 @@ typedef char name[OBJECTIDSIZE + 1];
 static name idbuf[8];
 static int nextbuf = 0;
 
-char *estring_i(char *ibuf)
-{
-    char *p = ibuf;
-
-    while (*p) {
-        if (isxspace(*(unsigned *)p) == ' ') {
-            *p = '~';
-        }
-        ++p;
-    }
-    return ibuf;
-}
-
-char *estring(const char *s)
-{
-    char *ibuf = idbuf[(++nextbuf) % 8];
-
-    strlcpy(ibuf, s, sizeof(name));
-    return estring_i(ibuf);
-}
-
-char *cstring_i(char *ibuf)
+char *untilde(char *ibuf)
 {
     char *p = ibuf;
 
@@ -1129,14 +1108,6 @@ char *cstring_i(char *ibuf)
         ++p;
     }
     return ibuf;
-}
-
-char *cstring(const char *s)
-{
-    char *ibuf = idbuf[(++nextbuf) % 8];
-
-    strlcpy(ibuf, s, sizeof(name));
-    return cstring_i(ibuf);
 }
 
 building *largestbuilding(const region * r, cmp_building_cb cmp_gt,
@@ -1155,19 +1126,6 @@ building *largestbuilding(const region * r, cmp_building_cb cmp_gt,
         best = b;
     }
     return best;
-}
-
-char *write_unitname(const unit * u, char *buffer, size_t size)
-{
-    slprintf(buffer, size, "%s (%s)", (const char *)u->name, itoa36(u->no));
-    buffer[size - 1] = 0;
-    return buffer;
-}
-
-const char *unitname(const unit * u)
-{
-    char *ubuf = idbuf[(++nextbuf) % 8];
-    return write_unitname(u, ubuf, sizeof(name));
 }
 
 /* -- Erschaffung neuer Einheiten ------------------------------ */

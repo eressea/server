@@ -247,6 +247,9 @@ extern "C" {
 
   struct unit *findunitr(const struct region *r, int n);
 
+  const char *unitname(const struct unit *u);
+  char *write_unitname(const struct unit *u, char *buffer, size_t size);
+
 #ifdef __cplusplus
 }
 #endif
