@@ -1850,7 +1850,12 @@ static int nextbuf = 0;
 
 char *write_unitname(const unit * u, char *buffer, size_t size)
 {
-    slprintf(buffer, size, "%s (%s)", (const char *)u->name, itoa36(u->no));
+    if (u->name) {
+        slprintf(buffer, size, "%s (%s)", u->name, itoa36(u->no));
+    } else {
+        const char * name = rc_name(u->_race, u->number == 1 ? NAME_SINGULAR : NAME_PLURAL);
+        slprintf(buffer, size, "%s (%s)", locale_string(u->faction->locale, name), itoa36(u->no));
+    }
     buffer[size - 1] = 0;
     return buffer;
 }
