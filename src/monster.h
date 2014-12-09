@@ -1,7 +1,7 @@
 /*
 Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -22,14 +22,15 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
+    struct unit;
+
+    void monster_kills_peasants(struct unit *u);
+    bool monster_is_waiting(const struct unit *u);
+    struct faction *get_monsters(void);
+    struct faction *get_or_create_monsters(void);
+    void make_zombie(struct unit * u);
+
 #define MONSTER_ID 666
-
-  void monster_kills_peasants(struct unit *u);
-  bool monster_is_waiting(const struct unit *u);
-  struct faction *get_monsters(void);
-  struct faction *get_or_create_monsters(void);
-  void make_zombie(struct unit * u);
-
 #define is_monsters(f) (f && fval(f, FFL_NPC) && f==get_monsters())
 
 

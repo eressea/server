@@ -163,7 +163,7 @@ void score(void)
           f->score, f->score - average_score_of_age(f->age, f->age / 24 + 1),
           ((float)f->score / (float)allscores) * 100.0,
           (float)f->score / f->num_total,
-          f->name, LOC(default_locale, rc_name(f->race, NAME_SINGULAR)), factionid(f),
+          f->name, LOC(default_locale, rc_name_s(f->race, NAME_SINGULAR)), factionid(f),
           f->age);
       }
     fclose(scoreFP);

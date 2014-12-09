@@ -781,7 +781,7 @@ static void inactivefaction(faction * f)
     if (inactiveFILE) {
         fprintf(inactiveFILE, "%s:%s:%d:%d\n",
             factionid(f),
-            LOC(default_locale, rc_name(f->race, NAME_PLURAL)),
+            LOC(default_locale, rc_name_s(f->race, NAME_PLURAL)),
             modify(count_all(f)), turn - f->lastorders);
 
         fclose(inactiveFILE);
@@ -2301,7 +2301,7 @@ static bool display_race(faction * f, unit * u, const race * rc)
 
     if (u && u_race(u) != rc)
         return false;
-    name = rc_name(rc, NAME_SINGULAR);
+    name = rc_name_s(rc, NAME_SINGULAR);
 
     bytes = slprintf(bufp, size, "%s: ", LOC(f->locale, name));
     if (wrptr(&bufp, &size, bytes) != 0)

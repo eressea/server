@@ -150,8 +150,8 @@ static void test_unit_name_from_race(CuTest *tc) {
     u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
     unit_setname(u, NULL);
     lang = get_or_create_locale("de");
-    locale_setstring(lang, rc_name(u->_race, NAME_SINGULAR), "Mensch");
-    locale_setstring(lang, rc_name(u->_race, NAME_PLURAL), "Menschen");
+    locale_setstring(lang, rc_name_s(u->_race, NAME_SINGULAR), "Mensch");
+    locale_setstring(lang, rc_name_s(u->_race, NAME_PLURAL), "Menschen");
 
     _snprintf(name, sizeof(name), "Mensch (%s)", itoa36(u->no));
     CuAssertStrEquals(tc, name, unitname(u));
@@ -163,12 +163,39 @@ static void test_unit_name_from_race(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_update_monster_name(CuTest *tc) {
+    unit *u;
+    struct locale *lang;
+
+    test_cleanup();
+    test_create_world();
+    u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
+    lang = get_or_create_locale("de");
+    locale_setstring(lang, rc_name_s(u->_race, NAME_SINGULAR), "Mensch");
+    locale_setstring(lang, rc_name_s(u->_race, NAME_PLURAL), "Menschen");
+
+    unit_setname(u, "Hodor");
+    update_monster_name(u);
+    CuAssertStrEquals(tc, "Hodor", u->name);
+
+    unit_setname(u, "Mensch");
+    update_monster_name(u);
+    CuAssertPtrEquals(tc, 0, u->name);
+
+    unit_setname(u, "Menschen");
+    update_monster_name(u);
+    CuAssertPtrEquals(tc, 0, u->name);
+
+    test_cleanup();
+}
+
 CuSuite *get_unit_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_scale_number);
     SUITE_ADD_TEST(suite, test_unit_name);
     SUITE_ADD_TEST(suite, test_unit_name_from_race);
+    SUITE_ADD_TEST(suite, test_update_monster_name);
     SUITE_ADD_TEST(suite, test_remove_empty_units);
     SUITE_ADD_TEST(suite, test_remove_units_ignores_spells);
     SUITE_ADD_TEST(suite, test_remove_units_without_faction);

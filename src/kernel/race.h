@@ -1,7 +1,7 @@
 /*
 Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -24,7 +24,7 @@ extern "C" {
 
 #include "magic.h"              /* wegen MAXMAGIETYP */
 #include "skill.h"
-    
+
 #define AT_NONE 0
 #define AT_STANDARD	1
 #define AT_DRAIN_EXP 2
@@ -40,150 +40,151 @@ extern "C" {
 
 #define RACESPOILCHANCE 5       /* Chance auf rassentypische Beute */
 
-  struct param;
-  struct spell;
+    struct param;
+    struct spell;
 
-  typedef enum {
-      RC_DWARF,                     /* 0 - Zwerg */
-      RC_ELF,
-      RC_GOBLIN = 3,
-      RC_HUMAN,
+    typedef enum {
+        RC_DWARF,                     /* 0 - Zwerg */
+        RC_ELF,
+        RC_GOBLIN = 3,
+        RC_HUMAN,
 
-      RC_TROLL,
-      RC_DAEMON,
-      RC_INSECT,
-      RC_HALFLING,
-      RC_CAT,
+        RC_TROLL,
+        RC_DAEMON,
+        RC_INSECT,
+        RC_HALFLING,
+        RC_CAT,
 
-      RC_AQUARIAN,
-      RC_ORC,
-      RC_SNOTLING,
-      RC_UNDEAD,
-      RC_ILLUSION,
+        RC_AQUARIAN,
+        RC_ORC,
+        RC_SNOTLING,
+        RC_UNDEAD,
+        RC_ILLUSION,
 
-      RC_FIREDRAGON,
-      RC_DRAGON,
-      RC_WYRM,
-      RC_TREEMAN,
-      RC_BIRTHDAYDRAGON,
+        RC_FIREDRAGON,
+        RC_DRAGON,
+        RC_WYRM,
+        RC_TREEMAN,
+        RC_BIRTHDAYDRAGON,
 
-      RC_DRACOID,
-      RC_SPECIAL,
-      RC_SPELL,
-      RC_IRONGOLEM,
-      RC_STONEGOLEM,
+        RC_DRACOID,
+        RC_SPECIAL,
+        RC_SPELL,
+        RC_IRONGOLEM,
+        RC_STONEGOLEM,
 
-      RC_SHADOW,
-      RC_SHADOWLORD,
-      RC_IRONKEEPER,
-      RC_ALP,
-      RC_TOAD,
+        RC_SHADOW,
+        RC_SHADOWLORD,
+        RC_IRONKEEPER,
+        RC_ALP,
+        RC_TOAD,
 
-      RC_HIRNTOETER,
-      RC_PEASANT,
-      RC_WOLF = 32,
+        RC_HIRNTOETER,
+        RC_PEASANT,
+        RC_WOLF = 32,
 
-      RC_SONGDRAGON = 37,
+        RC_SONGDRAGON = 37,
 
-      RC_SEASERPENT = 51,
-      RC_SHADOWKNIGHT,
-      RC_CENTAUR,
-      RC_SKELETON,
+        RC_SEASERPENT = 51,
+        RC_SHADOWKNIGHT,
+        RC_CENTAUR,
+        RC_SKELETON,
 
-      RC_SKELETON_LORD,
-      RC_ZOMBIE,
-      RC_ZOMBIE_LORD,
-      RC_GHOUL,
-      RC_GHOUL_LORD,
+        RC_SKELETON_LORD,
+        RC_ZOMBIE,
+        RC_ZOMBIE_LORD,
+        RC_GHOUL,
+        RC_GHOUL_LORD,
 
-      RC_MUS_SPIRIT,
-      RC_GNOME,
-      RC_TEMPLATE,
-      RC_CLONE,
+        RC_MUS_SPIRIT,
+        RC_GNOME,
+        RC_TEMPLATE,
+        RC_CLONE,
 
-      MAXRACES,
-      NORACE = -1
-  } race_t;
+        MAXRACES,
+        NORACE = -1
+    } race_t;
 
-  typedef struct att {
-    int type;
-    union {
-      const char *dice;
-      const struct spell *sp;
-    } data;
-    int flags;
-    int level;
-  } att;
+    typedef struct att {
+        int type;
+        union {
+            const char *dice;
+            const struct spell *sp;
+        } data;
+        int flags;
+        int level;
+    } att;
 
-  extern int num_races;
+    extern int num_races;
 
-  typedef struct race {
-    struct param *parameters;
-    const char *_name;
-    float magres;
-    float maxaura;              /* Faktor auf Maximale Aura */
-    float regaura;              /* Faktor auf Regeneration */
-    float recruit_multi;        /* Faktor für Bauernverbrauch */
-    int index;
-    int recruitcost;
-    int maintenance;
-    int splitsize;
-    int weight;
-    int capacity;
-    float speed;
-    float aggression;           /* chance that a monster will attack */
-    int hitpoints;
-    const char *def_damage;
-    int armor;
-    int at_default;             /* Angriffsskill Unbewaffnet (default: -2) */
-    int df_default;             /* Verteidigungsskill Unbewaffnet (default: -2) */
-    int at_bonus;               /* Verändert den Angriffsskill (default: 0) */
-    int df_bonus;               /* Verändert den Verteidigungskill (default: 0) */
-    const struct spell *precombatspell;
-    struct att attack[10];
-    signed char bonus[MAXSKILLS];
-    signed char *study_speed;   /* study-speed-bonus in points/turn (0=30 Tage) */
-    bool __remove_me_nonplayer;
-    int flags;
-    int battle_flags;
-    int ec_flags;
-    race_t oldfamiliars[MAXMAGIETYP];
+    typedef struct race {
+        struct param *parameters;
+        const char *_name;
+        float magres;
+        float maxaura;              /* Faktor auf Maximale Aura */
+        float regaura;              /* Faktor auf Regeneration */
+        float recruit_multi;        /* Faktor für Bauernverbrauch */
+        int index;
+        int recruitcost;
+        int maintenance;
+        int splitsize;
+        int weight;
+        int capacity;
+        float speed;
+        float aggression;           /* chance that a monster will attack */
+        int hitpoints;
+        const char *def_damage;
+        int armor;
+        int at_default;             /* Angriffsskill Unbewaffnet (default: -2) */
+        int df_default;             /* Verteidigungsskill Unbewaffnet (default: -2) */
+        int at_bonus;               /* Verändert den Angriffsskill (default: 0) */
+        int df_bonus;               /* Verändert den Verteidigungskill (default: 0) */
+        const struct spell *precombatspell;
+        struct att attack[10];
+        signed char bonus[MAXSKILLS];
+        signed char *study_speed;   /* study-speed-bonus in points/turn (0=30 Tage) */
+        bool __remove_me_nonplayer;
+        int flags;
+        int battle_flags;
+        int ec_flags;
+        race_t oldfamiliars[MAXMAGIETYP];
 
-    const char *(*generate_name) (const struct unit *);
-    const char *(*describe) (const struct unit *, const struct locale *);
-    void (*age) (struct unit * u);
-     bool(*move_allowed) (const struct region *, const struct region *);
-    struct item *(*itemdrop) (const struct race *, int size);
-    void (*init_familiar) (struct unit *);
+        const char *(*generate_name) (const struct unit *);
+        const char *(*describe) (const struct unit *, const struct locale *);
+        void(*age) (struct unit * u);
+        bool(*move_allowed) (const struct region *, const struct region *);
+        struct item *(*itemdrop) (const struct race *, int size);
+        void(*init_familiar) (struct unit *);
 
-    const struct race *familiars[MAXMAGIETYP];
-    struct attrib *attribs;
-    struct race *next;
-  } race;
+        const struct race *familiars[MAXMAGIETYP];
+        struct attrib *attribs;
+        struct race *next;
+    } race;
 
-  typedef struct race_list {
-    struct race_list *next;
-    const struct race *data;
-  } race_list;
+    typedef struct race_list {
+        struct race_list *next;
+        const struct race *data;
+    } race_list;
 
-  extern void racelist_clear(struct race_list **rl);
-  extern void racelist_insert(struct race_list **rl, const struct race *r);
+    extern void racelist_clear(struct race_list **rl);
+    extern void racelist_insert(struct race_list **rl, const struct race *r);
 
 
-  struct race_list *get_familiarraces(void);
-  struct race *races;
-  struct race *get_race(race_t rt);
-  /** TODO: compatibility hacks: **/
-  race_t old_race(const struct race *);
+    struct race_list *get_familiarraces(void);
+    struct race *races;
+    struct race *get_race(race_t rt);
+    /** TODO: compatibility hacks: **/
+    race_t old_race(const struct race *);
 
-  extern race *rc_get_or_create(const char *name);
-  extern const race *rc_find(const char *);
-  void free_races(void);
+    extern race *rc_get_or_create(const char *name);
+    extern const race *rc_find(const char *);
+    void free_races(void);
 
-  typedef enum name_t { NAME_SINGULAR, NAME_PLURAL, NAME_DEFINITIVE, NAME_CATEGORY } name_t;
-  const char *rc_name(const race *, name_t);
+    typedef enum name_t { NAME_SINGULAR, NAME_PLURAL, NAME_DEFINITIVE, NAME_CATEGORY } name_t;
+    const char * rc_name_s(const race *rc, name_t n);
+    const char * rc_name(const race *rc, name_t n, char *name, size_t size);
 
-/* Flags. Do not reorder these without changing json_race() in jsonconf.c */
+    /* Flags. Do not reorder these without changing json_race() in jsonconf.c */
 #define RCF_NPC            (1<<0)   /* cannot be the race for a player faction (and other limits?) */
 #define RCF_KILLPEASANTS   (1<<1)   /* a monster that eats peasants */
 #define RCF_SCAREPEASANTS  (1<<2)   /* a monster that scares peasants out of the hex */
@@ -214,7 +215,7 @@ extern "C" {
 #define RCF_STONEGOLEM     (1<<27)      /* race gets stonegolem properties */
 #define RCF_IRONGOLEM      (1<<28)      /* race gets irongolem properties */
 
-/* Economic flags */
+    /* Economic flags */
 #define GIVEITEM       (1<<1)   /* gibt Gegenstände weg */
 #define GIVEPERSON     (1<<2)   /* übergibt Personen */
 #define GIVEUNIT       (1<<3)   /* Einheiten an andere Partei übergeben */
@@ -223,7 +224,7 @@ extern "C" {
 #define ECF_REC_ETHEREAL   (1<<7)       /* Rekrutiert aus dem Nichts */
 #define ECF_REC_UNLIMITED  (1<<8)       /* Rekrutiert ohne Limit */
 
-/* Battle-Flags */
+    /* Battle-Flags */
 #define BF_EQUIPMENT    (1<<0)  /* Kann Ausrüstung benutzen */
 #define BF_NOBLOCK      (1<<1)  /* Wird in die Rückzugsberechnung nicht einbezogen */
 #define BF_RES_PIERCE   (1<<2)  /* Halber Schaden durch PIERCE */
@@ -232,9 +233,9 @@ extern "C" {
 #define BF_INV_NONMAGIC (1<<5)  /* Immun gegen nichtmagischen Schaden */
 #define BF_CANATTACK    (1<<6)  /* Kann keine ATTACKIERE Befehle ausfuehren */
 
-  extern int unit_old_max_hp(struct unit *u);
-  extern const char *racename(const struct locale *lang, const struct unit *u,
-    const race * rc);
+    extern int unit_old_max_hp(struct unit *u);
+    extern const char *racename(const struct locale *lang, const struct unit *u,
+        const race * rc);
 
 #define omniscient(f) ((f)->race==get_race(RC_ILLUSION) || (f)->race==get_race(RC_TEMPLATE))
 
@@ -243,21 +244,21 @@ extern "C" {
 #define humanoidrace(rc) (fval((rc), RCF_UNDEAD) || (rc)==get_race(RC_DRACOID) || playerrace(rc))
 #define illusionaryrace(rc) (fval(rc, RCF_ILLUSIONARY))
 
-  extern bool allowed_dragon(const struct region *src,
-    const struct region *target);
+    extern bool allowed_dragon(const struct region *src,
+        const struct region *target);
 
-  extern bool r_insectstalled(const struct region *r);
+    extern bool r_insectstalled(const struct region *r);
 
-  extern void add_raceprefix(const char *);
-  extern char **race_prefixes;
+    extern void add_raceprefix(const char *);
+    extern char **race_prefixes;
 
-  extern void write_race_reference(const struct race *rc,
+    extern void write_race_reference(const struct race *rc,
     struct storage *store);
-  extern variant read_race_reference(struct storage *store);
+    extern variant read_race_reference(struct storage *store);
 
-  extern const char *raceprefix(const struct unit *u);
+    extern const char *raceprefix(const struct unit *u);
 
-  extern void give_starting_equipment(const struct equipment *eq,
+    extern void give_starting_equipment(const struct equipment *eq,
     struct unit *u);
 
 #ifdef __cplusplus

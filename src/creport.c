@@ -341,7 +341,7 @@ static int cr_race(variant var, char *buffer, const void *userdata)
 {
     const faction *report = (const faction *)userdata;
     const struct race *rc = (const race *)var.v;
-    const char *key = rc_name(rc, NAME_SINGULAR);
+    const char *key = rc_name_s(rc, NAME_SINGULAR);
     sprintf(buffer, "\"%s\"",
         translate(key, locale_string(report->locale, key)));
     return 0;
@@ -834,20 +834,20 @@ static void cr_output_unit(FILE * F, const region * r, const faction * f,       
     if (pzTmp) {
         fprintf(F, "\"%s\";Typ\n", pzTmp);
         if (u->faction == f && fval(u_race(u), RCF_SHAPESHIFTANY)) {
-            const char *zRace = rc_name(u_race(u), NAME_PLURAL);
+            const char *zRace = rc_name_s(u_race(u), NAME_PLURAL);
             fprintf(F, "\"%s\";wahrerTyp\n",
                 translate(zRace, locale_string(f->locale, zRace)));
         }
     }
     else {
         const race *irace = u_irace(u);
-        const char *zRace = rc_name(irace, NAME_PLURAL);
+        const char *zRace = rc_name_s(irace, NAME_PLURAL);
         fprintf(F, "\"%s\";Typ\n",
             translate(zRace, locale_string(f->locale, zRace)));
         if (u->faction == f && irace != u_race(u)) {
             assert(skill_enabled(SK_STEALTH)
                 || !"we're resetting this on load, so.. ircase should never be used");
-            zRace = rc_name(u_race(u), NAME_PLURAL);
+            zRace = rc_name_s(u_race(u), NAME_PLURAL);
             fprintf(F, "\"%s\";wahrerTyp\n",
                 translate(zRace, locale_string(f->locale, zRace)));
         }
@@ -1548,7 +1548,7 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
     fprintf(F, "%d;Punktedurchschnitt\n", avgscore);
 #endif
     {
-        const char *zRace = rc_name(f->race, NAME_PLURAL);
+        const char *zRace = rc_name_s(f->race, NAME_PLURAL);
         fprintf(F, "\"%s\";Typ\n", translate(zRace, LOC(f->locale, zRace)));
     }
     prefix = get_prefix(f->attribs);

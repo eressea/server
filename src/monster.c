@@ -243,4 +243,3 @@ void make_zombie(unit * u)
     u_setrace(u, get_race(RC_ZOMBIE));
     u->irace = NULL;
 }
-

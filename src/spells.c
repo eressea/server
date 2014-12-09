@@ -1546,7 +1546,7 @@ static int sp_create_irongolem(castorder * co)
     ADDMSG(&mage->faction->msgs,
         msg_message("magiccreate_effect", "region command unit amount object",
         mage->region, co->order, mage, number,
-        LOC(mage->faction->locale, rc_name(rc_find("irongolem"), (u2->number == 1) ? NAME_SINGULAR : NAME_PLURAL))));
+        LOC(mage->faction->locale, rc_name_s(rc_find("irongolem"), (u2->number == 1) ? NAME_SINGULAR : NAME_PLURAL))));
 
     return cast_level;
 }
@@ -1607,7 +1607,7 @@ static int sp_create_stonegolem(castorder * co)
     ADDMSG(&mage->faction->msgs,
         msg_message("magiccreate_effect", "region command unit amount object",
         mage->region, co->order, mage, number,
-        LOC(mage->faction->locale, rc_name(rc_find("stonegolem"), (u2->number == 1) ? NAME_SINGULAR : NAME_PLURAL))));
+        LOC(mage->faction->locale, rc_name_s(rc_find("stonegolem"), (u2->number == 1) ? NAME_SINGULAR : NAME_PLURAL))));
 
     return cast_level;
 }
@@ -5657,7 +5657,7 @@ int sp_showastral(castorder * co)
                         }
                         icat(u->number);
                         scat(" ");
-                        scat(LOC(mage->faction->locale, rc_name(u_race(u), (u->number==1) ? NAME_SINGULAR:NAME_PLURAL)));
+                        scat(LOC(mage->faction->locale, rc_name_s(u_race(u), (u->number==1) ? NAME_SINGULAR:NAME_PLURAL)));
                         scat(", Entfernung ");
                         icat(distance(rl2->data, rt));
                         scat(")");

@@ -2161,7 +2161,7 @@ static void eval_race(struct opstack **stack, const void *userdata)
     const struct locale *lang = report ? report->locale : default_locale;
     int j = opop(stack).i;
     const race *r = (const race *)opop(stack).v;
-    const char *c = LOC(lang, rc_name(r, (j == 1) ? NAME_SINGULAR : NAME_PLURAL));
+    const char *c = LOC(lang, rc_name_s(r, (j == 1) ? NAME_SINGULAR : NAME_PLURAL));
     size_t len = strlen(c);
     variant var;
 

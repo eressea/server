@@ -926,7 +926,7 @@ void spawn_dragons(void)
       if (verbosity >= 2) {
         log_printf(stdout, "%d %s in %s.\n", u->number,
           LOC(default_locale,
-            rc_name(u_race(u), (u->number==1) ? NAME_SINGULAR:NAME_PLURAL)), regionname(r, NULL));
+            rc_name_s(u_race(u), (u->number==1) ? NAME_SINGULAR:NAME_PLURAL)), regionname(r, NULL));
       }
 
       name_unit(u);
@@ -1001,7 +1001,7 @@ void spawn_undead(void)
       if (verbosity >= 2) {
         log_printf(stdout, "%d %s in %s.\n", u->number,
           LOC(default_locale,
-          rc_name(u_race(u), (u->number == 1) ? NAME_SINGULAR : NAME_PLURAL)), regionname(r, NULL));
+          rc_name_s(u_race(u), (u->number == 1) ? NAME_SINGULAR : NAME_PLURAL)), regionname(r, NULL));
       }
 
       {
