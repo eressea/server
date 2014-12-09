@@ -2290,11 +2290,7 @@ void free_gamedata(void)
             defaults[i] = 0;
         }
     }
-    while (alliances) {
-        alliance *al = alliances;
-        alliances = al->next;
-        free_alliance(al);
-    }
+    free_alliances();
     while (factions) {
         faction *f = factions;
         factions = f->next;
