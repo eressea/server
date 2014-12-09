@@ -1853,8 +1853,9 @@ char *write_unitname(const unit * u, char *buffer, size_t size)
     if (u->name) {
         slprintf(buffer, size, "%s (%s)", u->name, itoa36(u->no));
     } else {
+        const struct locale * lang = u->faction ? u->faction->locale : default_locale;
         const char * name = rc_name_s(u->_race, u->number == 1 ? NAME_SINGULAR : NAME_PLURAL);
-        slprintf(buffer, size, "%s (%s)", locale_string(u->faction->locale, name), itoa36(u->no));
+        slprintf(buffer, size, "%s (%s)", locale_string(lang, name), itoa36(u->no));
     }
     buffer[size - 1] = 0;
     return buffer;
@@ -1866,15 +1867,17 @@ const char *unitname(const unit * u)
     return write_unitname(u, ubuf, sizeof(name));
 }
 
-void update_monster_name(unit *u) {
-    char sing[32], plur[32];
-    const struct locale *lang = u->faction->locale;
-    if (!u->name) return;
-    rc_name(u->_race, NAME_SINGULAR, sing, sizeof(sing));
-    rc_name(u->_race, NAME_PLURAL, plur, sizeof(plur));
-    if (strcmp(u->name, sing) == 0 || strcmp(u->name, plur) == 0 ||
-        strcmp(u->name, locale_string(lang, sing)) == 0 ||
-        strcmp(u->name, locale_string(lang, plur)) == 0) {
-        unit_setname(u, 0);
+bool unit_name_equals_race(const unit *u) {
+    if (u->name) {
+        char sing[32], plur[32];
+        const struct locale *lang = u->faction->locale;
+        rc_name(u->_race, NAME_SINGULAR, sing, sizeof(sing));
+        rc_name(u->_race, NAME_PLURAL, plur, sizeof(plur));
+        if (strcmp(u->name, sing) == 0 || strcmp(u->name, plur) == 0 ||
+            strcmp(u->name, locale_string(lang, sing)) == 0 ||
+            strcmp(u->name, locale_string(lang, plur)) == 0) {
+            return true;
+        }
     }
+    return false;
 }

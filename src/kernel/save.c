@@ -642,9 +642,6 @@ unit *read_unit(struct gamedata *data)
     READ_INT(data->store, &number);
     set_number(u, number);
 
-
-
-
     READ_INT(data->store, &n);
     u->age = (short)n;
 
@@ -1711,6 +1708,13 @@ int readgame(const char *filename, int backup)
             unit *u = read_unit(&gdata);
             sc_mage *mage;
 
+            if (gdata.version < AUTO_RACENAME_VERSION) {
+                if (u->name && fval(u->faction, FFL_NPC)) {
+                    if (unit_name_equals_race(u)) {
+                        unit_setname(u, NULL);
+                    }
+                }
+            }
             assert(u->region == NULL);
             u->region = r;
             *up = u;

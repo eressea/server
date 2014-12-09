@@ -175,16 +175,22 @@ static void test_update_monster_name(CuTest *tc) {
     locale_setstring(lang, rc_name_s(u->_race, NAME_PLURAL), "Menschen");
 
     unit_setname(u, "Hodor");
-    update_monster_name(u);
-    CuAssertStrEquals(tc, "Hodor", u->name);
+    CuAssertTrue(tc, !unit_name_equals_race(u));
+
+    unit_setname(u, "Menschling");
+    CuAssertTrue(tc, !unit_name_equals_race(u));
+
+    unit_setname(u, rc_name_s(u->_race, NAME_SINGULAR));
+    CuAssertTrue(tc, unit_name_equals_race(u));
+
+    unit_setname(u, rc_name_s(u->_race, NAME_PLURAL));
+    CuAssertTrue(tc, unit_name_equals_race(u));
 
     unit_setname(u, "Mensch");
-    update_monster_name(u);
-    CuAssertPtrEquals(tc, 0, u->name);
+    CuAssertTrue(tc, unit_name_equals_race(u));
 
     unit_setname(u, "Menschen");
-    update_monster_name(u);
-    CuAssertPtrEquals(tc, 0, u->name);
+    CuAssertTrue(tc, unit_name_equals_race(u));
 
     test_cleanup();
 }
