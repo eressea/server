@@ -86,7 +86,7 @@ static int a_readdirection(attrib * a, void *owner, struct storage *store)
         READ_TOK(store, NULL, 0);
         READ_TOK(store, lbuf, sizeof(lbuf));
 
-        cstring_i(lbuf);
+        untilde(lbuf);
         for (; dl; dl = dl->next) {
             if (strcmp(lbuf, dl->oldname) == 0) {
                 d->keyword = _strdup(dl->name);

@@ -62,7 +62,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/crmessage.h>
 #include <util/event.h>
 #include <util/language.h>
-#include <util/filereader.h>
 #include <util/functions.h>
 #include <util/log.h>
 #include <util/lists.h>
@@ -305,7 +304,7 @@ const char *dbrace(const struct race *rc)
     char *zPtr = zText;
 
     /* the english names are all in ASCII, so we don't need to worry about UTF8 */
-    strcpy(zText, (const char *)LOC(get_locale("en"), rc_name(rc, NAME_SINGULAR)));
+    strcpy(zText, (const char *)LOC(get_locale("en"), rc_name_s(rc, NAME_SINGULAR)));
     while (*zPtr) {
         *zPtr = (char)(toupper(*zPtr));
         ++zPtr;
@@ -1093,32 +1092,7 @@ void freestrlist(strlist * s)
 }
 
 /* - Namen der Strukturen -------------------------------------- */
-typedef char name[OBJECTIDSIZE + 1];
-static name idbuf[8];
-static int nextbuf = 0;
-
-char *estring_i(char *ibuf)
-{
-    char *p = ibuf;
-
-    while (*p) {
-        if (isxspace(*(unsigned *)p) == ' ') {
-            *p = '~';
-        }
-        ++p;
-    }
-    return ibuf;
-}
-
-char *estring(const char *s)
-{
-    char *ibuf = idbuf[(++nextbuf) % 8];
-
-    strlcpy(ibuf, s, sizeof(name));
-    return estring_i(ibuf);
-}
-
-char *cstring_i(char *ibuf)
+char *untilde(char *ibuf)
 {
     char *p = ibuf;
 
@@ -1129,14 +1103,6 @@ char *cstring_i(char *ibuf)
         ++p;
     }
     return ibuf;
-}
-
-char *cstring(const char *s)
-{
-    char *ibuf = idbuf[(++nextbuf) % 8];
-
-    strlcpy(ibuf, s, sizeof(name));
-    return cstring_i(ibuf);
 }
 
 building *largestbuilding(const region * r, cmp_building_cb cmp_gt,
@@ -1155,19 +1121,6 @@ building *largestbuilding(const region * r, cmp_building_cb cmp_gt,
         best = b;
     }
     return best;
-}
-
-char *write_unitname(const unit * u, char *buffer, size_t size)
-{
-    slprintf(buffer, size, "%s (%s)", (const char *)u->name, itoa36(u->no));
-    buffer[size - 1] = 0;
-    return buffer;
-}
-
-const char *unitname(const unit * u)
-{
-    char *ubuf = idbuf[(++nextbuf) % 8];
-    return write_unitname(u, ubuf, sizeof(name));
 }
 
 /* -- Erschaffung neuer Einheiten ------------------------------ */
@@ -1529,9 +1482,9 @@ void init_locale(struct locale *lang)
     for (rc = races; rc; rc = rc->next) {
         const char *name;
         var.v = (void *)rc;
-        name = LOC(lang, rc_name(rc, NAME_PLURAL));
+        name = LOC(lang, rc_name_s(rc, NAME_PLURAL));
         if (name) addtoken(tokens, name, var);
-        name = LOC(lang, rc_name(rc, NAME_SINGULAR));
+        name = LOC(lang, rc_name_s(rc, NAME_SINGULAR));
         if (name) addtoken(tokens, name, var);
     }
 
@@ -2374,41 +2327,3 @@ int game_id(void) {
     return get_param_int(global.parameters, "game.id", 0);
 }
 
-void load_inifile(dictionary * d)
-{
-    const char *reportdir = reportpath();
-    const char *datadir = datapath();
-    const char *basedir = basepath();
-    const char *str;
-
-    assert(d);
-
-    str = iniparser_getstring(d, "eressea:base", basedir);
-    if (str != basedir) {
-        set_basepath(str);
-    }
-    str = iniparser_getstring(d, "eressea:report", reportdir);
-    if (str != reportdir) {
-        set_reportpath(str);
-    }
-    str = iniparser_getstring(d, "eressea:data", datadir);
-    if (str != datadir) {
-        set_datapath(str);
-    }
-
-    lomem = iniparser_getint(d, "eressea:lomem", lomem) ? 1 : 0;
-
-    str = iniparser_getstring(d, "eressea:encoding", NULL);
-    if (str && (_strcmpl(str, "utf8") == 0 || _strcmpl(str, "utf-8") == 0)) {
-        enc_gamedata = ENCODING_UTF8;
-    }
-
-    verbosity = iniparser_getint(d, "eressea:verbose", 2);
-    battledebug = iniparser_getint(d, "eressea:debug", battledebug) ? 1 : 0;
-
-    str = iniparser_getstring(d, "eressea:locales", "de,en");
-    make_locales(str);
-
-    if (global.inifile) iniparser_free(global.inifile);
-    global.inifile = d;
-}

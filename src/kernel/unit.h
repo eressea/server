@@ -104,7 +104,7 @@ extern "C" {
     struct order *old_orders;
 
     /* race and illusionary race */
-    const struct race *race_;
+    const struct race *_race;
     const struct race *irace;
 
     int flags;
@@ -246,6 +246,10 @@ extern "C" {
   struct unit *findunit(int n);
 
   struct unit *findunitr(const struct region *r, int n);
+
+  const char *unitname(const struct unit *u);
+  char *write_unitname(const struct unit *u, char *buffer, size_t size);
+  bool unit_name_equals_race(const struct unit *u);
 
 #ifdef __cplusplus
 }

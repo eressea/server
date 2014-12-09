@@ -858,7 +858,7 @@ bool leave(unit * u, bool force)
 
 const struct race *urace(const struct unit *u)
 {
-    return u->race_;
+    return u->_race;
 }
 
 bool can_survive(const unit * u, const region * r)
@@ -1766,18 +1766,18 @@ const struct race *u_irace(const struct unit *u)
     if (u->irace && skill_enabled(SK_STEALTH)) {
         return u->irace;
     }
-    return u->race_;
+    return u->_race;
 }
 
 const struct race *u_race(const struct unit *u)
 {
-    return u->race_;
+    return u->_race;
 }
 
 void u_setrace(struct unit *u, const struct race *rc)
 {
     assert(rc);
-    u->race_ = rc;
+    u->_race = rc;
 }
 
 void unit_add_spell(unit * u, sc_mage * m, struct spell * sp, int level)
@@ -1842,4 +1842,42 @@ void remove_empty_units(void)
     for (r = regions; r; r = r->next) {
         remove_empty_units_in_region(r);
     }
+}
+
+typedef char name[OBJECTIDSIZE + 1];
+static name idbuf[8];
+static int nextbuf = 0;
+
+char *write_unitname(const unit * u, char *buffer, size_t size)
+{
+    if (u->name) {
+        slprintf(buffer, size, "%s (%s)", u->name, itoa36(u->no));
+    } else {
+        const struct locale * lang = u->faction ? u->faction->locale : default_locale;
+        const char * name = rc_name_s(u->_race, u->number == 1 ? NAME_SINGULAR : NAME_PLURAL);
+        slprintf(buffer, size, "%s (%s)", locale_string(lang, name), itoa36(u->no));
+    }
+    buffer[size - 1] = 0;
+    return buffer;
+}
+
+const char *unitname(const unit * u)
+{
+    char *ubuf = idbuf[(++nextbuf) % 8];
+    return write_unitname(u, ubuf, sizeof(name));
+}
+
+bool unit_name_equals_race(const unit *u) {
+    if (u->name) {
+        char sing[32], plur[32];
+        const struct locale *lang = u->faction->locale;
+        rc_name(u->_race, NAME_SINGULAR, sing, sizeof(sing));
+        rc_name(u->_race, NAME_PLURAL, plur, sizeof(plur));
+        if (strcmp(u->name, sing) == 0 || strcmp(u->name, plur) == 0 ||
+            strcmp(u->name, locale_string(lang, sing)) == 0 ||
+            strcmp(u->name, locale_string(lang, plur)) == 0) {
+            return true;
+        }
+    }
+    return false;
 }

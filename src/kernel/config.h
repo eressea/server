@@ -26,7 +26,6 @@ extern "C" {
     /* this should always be the first thing included after platform.h */
 #include "types.h"
 
-    struct _dictionary_;
     /* experimental gameplay features (that don't affect the savefile) */
     /* TODO: move these settings to settings.h or into configuration files */
 #define GOBLINKILL              /* Goblin-Spezialklau kann tödlich enden */
@@ -35,6 +34,7 @@ extern "C" {
 #define INSECT_POTION           /* Spezialtrank für Insekten */
 #define ORCIFICATION            /* giving snotlings to the peasants gets counted */
 
+// TODO: remove macro, move all alliance code into a module.
 #define ALLIED(f1, f2) (f1==f2 || (f1->alliance && f1->alliance==f2->alliance))
 
     /* for some good prime numbers, check http://www.math.niu.edu/~rusin/known-math/98/pi_x */
@@ -180,12 +180,7 @@ extern "C" {
 
     struct faction *getfaction(void);
 
-    char *estring(const char *s);
-    char *estring_i(char *s);
-    char *cstring(const char *s);
-    char *cstring_i(char *s);
-    const char *unitname(const struct unit *u);
-    char *write_unitname(const struct unit *u, char *buffer, size_t size);
+    char *untilde(char *s);
 
     typedef int(*cmp_building_cb) (const struct building * b,
         const struct building * a);
@@ -306,7 +301,6 @@ extern "C" {
 
     const char *basepath(void);
     void set_basepath(const char *);
-    void load_inifile(struct _dictionary_ *d);
 
     const char *reportpath(void);
     void set_reportpath(const char *);

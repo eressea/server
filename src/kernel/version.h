@@ -73,8 +73,8 @@
 #define INTFLAGS_VERSION 342   /* turn 876, FFL_NPC is now bit 25, flags is an int */
 #define SAVEGAMEID_VERSION 343 /* instead of XMLNAME, save the game.id parameter from the config */
 #define BUILDNO_VERSION 344 /* storing the build number in the save */
-
+#define AUTO_RACENAME_VERSION 345 /* NPC units with name==NULL will automatically get their race for a name */
 #define MIN_VERSION CURSETYPE_VERSION      /* minimal datafile we support */
-#define RELEASE_VERSION BUILDNO_VERSION /* current datafile */
+#define RELEASE_VERSION AUTO_RACENAME_VERSION /* current datafile */
 
 #define STREAM_VERSION 2 /* internal encoding of binary files */

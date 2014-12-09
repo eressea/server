@@ -9,10 +9,10 @@
 
 static void test_rc_name(CuTest *tc) {
     struct race *rc = test_create_race("human");
-    CuAssertStrEquals(tc, "race::human", rc_name(rc, NAME_SINGULAR));
-    CuAssertStrEquals(tc, "race::human_p", rc_name(rc, NAME_PLURAL));
-    CuAssertStrEquals(tc, "race::human_d", rc_name(rc, NAME_DEFINITIVE));
-    CuAssertStrEquals(tc, "race::human_x", rc_name(rc, NAME_CATEGORY));
+    CuAssertStrEquals(tc, "race::human", rc_name_s(rc, NAME_SINGULAR));
+    CuAssertStrEquals(tc, "race::human_p", rc_name_s(rc, NAME_PLURAL));
+    CuAssertStrEquals(tc, "race::human_d", rc_name_s(rc, NAME_DEFINITIVE));
+    CuAssertStrEquals(tc, "race::human_x", rc_name_s(rc, NAME_CATEGORY));
 }
 
 CuSuite *get_race_suite(void)

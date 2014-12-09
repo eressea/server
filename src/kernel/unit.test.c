@@ -1,5 +1,7 @@
 #include <platform.h>
 #include <kernel/config.h>
+#include <util/base36.h>
+#include <util/language.h>
 #include "alchemy.h"
 #include "faction.h"
 #include "unit.h"
@@ -10,7 +12,9 @@
 #include <CuTest.h>
 #include <tests.h>
 
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 
 static void test_remove_empty_units(CuTest *tc) {
@@ -123,10 +127,81 @@ static void test_scale_number(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_unit_name(CuTest *tc) {
+    unit *u;
+    char name[32];
+
+    test_cleanup();
+    test_create_world();
+    u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
+    unit_setname(u, "Hodor");
+    _snprintf(name, sizeof(name), "Hodor (%s)", itoa36(u->no));
+    CuAssertStrEquals(tc, name, unitname(u));
+    test_cleanup();
+}
+
+static void test_unit_name_from_race(CuTest *tc) {
+    unit *u;
+    char name[32];
+    struct locale *lang;
+
+    test_cleanup();
+    test_create_world();
+    u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
+    unit_setname(u, NULL);
+    lang = get_or_create_locale("de");
+    locale_setstring(lang, rc_name_s(u->_race, NAME_SINGULAR), "Mensch");
+    locale_setstring(lang, rc_name_s(u->_race, NAME_PLURAL), "Menschen");
+
+    _snprintf(name, sizeof(name), "Mensch (%s)", itoa36(u->no));
+    CuAssertStrEquals(tc, name, unitname(u));
+
+    u->number = 2;
+    _snprintf(name, sizeof(name), "Menschen (%s)", itoa36(u->no));
+    CuAssertStrEquals(tc, name, unitname(u));
+
+    test_cleanup();
+}
+
+static void test_update_monster_name(CuTest *tc) {
+    unit *u;
+    struct locale *lang;
+
+    test_cleanup();
+    test_create_world();
+    u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
+    lang = get_or_create_locale("de");
+    locale_setstring(lang, rc_name_s(u->_race, NAME_SINGULAR), "Mensch");
+    locale_setstring(lang, rc_name_s(u->_race, NAME_PLURAL), "Menschen");
+
+    unit_setname(u, "Hodor");
+    CuAssertTrue(tc, !unit_name_equals_race(u));
+
+    unit_setname(u, "Menschling");
+    CuAssertTrue(tc, !unit_name_equals_race(u));
+
+    unit_setname(u, rc_name_s(u->_race, NAME_SINGULAR));
+    CuAssertTrue(tc, unit_name_equals_race(u));
+
+    unit_setname(u, rc_name_s(u->_race, NAME_PLURAL));
+    CuAssertTrue(tc, unit_name_equals_race(u));
+
+    unit_setname(u, "Mensch");
+    CuAssertTrue(tc, unit_name_equals_race(u));
+
+    unit_setname(u, "Menschen");
+    CuAssertTrue(tc, unit_name_equals_race(u));
+
+    test_cleanup();
+}
+
 CuSuite *get_unit_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_scale_number);
+    SUITE_ADD_TEST(suite, test_unit_name);
+    SUITE_ADD_TEST(suite, test_unit_name_from_race);
+    SUITE_ADD_TEST(suite, test_update_monster_name);
     SUITE_ADD_TEST(suite, test_remove_empty_units);
     SUITE_ADD_TEST(suite, test_remove_units_ignores_spells);
     SUITE_ADD_TEST(suite, test_remove_units_without_faction);
