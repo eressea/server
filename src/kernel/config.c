@@ -1092,10 +1092,6 @@ void freestrlist(strlist * s)
 }
 
 /* - Namen der Strukturen -------------------------------------- */
-typedef char name[OBJECTIDSIZE + 1];
-static name idbuf[8];
-static int nextbuf = 0;
-
 char *untilde(char *ibuf)
 {
     char *p = ibuf;
