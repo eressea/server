@@ -604,7 +604,7 @@ unsigned int atoip(const char *s)
     return n;
 }
 
-bool unit_has_cursed_item(unit * u)
+bool unit_has_cursed_item(const unit * u)
 {
     item *itm = u->items;
     while (itm) {

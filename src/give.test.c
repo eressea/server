@@ -124,7 +124,6 @@ static void test_give_peasants(CuTest * tc) {
     env.f2 = 0;
     setup_give(&env);
     peasants = env.r->land->peasants;
-    getunitpeasants = 1;
     msg = disband_men(1, env.src, NULL);
     CuAssertStrEquals(tc, "give_person_peasants", (const char*)msg->parameters[0].v);
     CuAssertIntEquals(tc, 0, env.src->number);
