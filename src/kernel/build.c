@@ -65,7 +65,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* attributes inclues */
 #include <attributes/matmod.h>
-#include <attributes/alliance.h>
 
 struct building *getbuilding(const struct region *r)
 {
@@ -775,12 +774,6 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
     if (u->number && leave(u, false)) {
         u_set_building(u, b);
     }
-#ifdef WDW_PYRAMID
-    if (b->type == bt_find("pyramid") && f_get_alliance(u->faction) != NULL) {
-        attrib *a = a_add(&b->attribs, a_new(&at_alliance));
-        a->data.i = u->faction->alliance->id;
-    }
-#endif
   }
 
   btname = LOC(lang, btype->_name);

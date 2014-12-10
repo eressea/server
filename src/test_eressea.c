@@ -38,6 +38,7 @@ int RunAllTests(void)
   ADD_TESTS(suite, unicode);
   ADD_TESTS(suite, strings);
   /* kernel */
+  ADD_TESTS(suite, alliance);
   ADD_TESTS(suite, unit);
   ADD_TESTS(suite, faction);
   ADD_TESTS(suite, group);

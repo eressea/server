@@ -16,18 +16,20 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#include <platform.h>
-#include "alliance.h"
+#ifndef H_GC_MORALE
+#define H_GC_MORALE
 
-#include <kernel/save.h>
-#include <util/attrib.h>
+#include <kernel/types.h>
 
-attrib_type at_alliance = {
-  "alliance",
-  NULL,
-  NULL,
-  NULL,
-  a_writeint,
-  a_readint,
-  ATF_UNIQUE
-};
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+    struct region;
+    void morale_update(struct region *r);
+    void morale_change(struct region *r, int value);
+
+#ifdef __cplusplus
+}
+#endif
+#endif

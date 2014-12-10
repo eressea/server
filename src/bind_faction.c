@@ -578,15 +578,6 @@ void tolua_faction_open(lua_State * L)
       tolua_function(L, TOLUA_CAST "create", tolua_faction_create);
       tolua_function(L, TOLUA_CAST "get", tolua_faction_get);
       tolua_function(L, TOLUA_CAST "destroy", tolua_faction_destroy);
-#ifdef TODO
-      def("faction_origin", &faction_getorigin,
-        pure_out_value(_2) + pure_out_value(_3)),.def_readwrite("subscription",
-        &faction::subscription)
-
-        .property("x", &faction_getorigin_x, &faction_setorigin_x)
-        .property("y", &faction_getorigin_y, &faction_setorigin_y)
-
-#endif
       tolua_function(L, TOLUA_CAST "add_notice", &tolua_faction_addnotice);
 
       tolua_variable(L, TOLUA_CAST "objects", tolua_faction_get_objects,

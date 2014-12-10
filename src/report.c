@@ -31,7 +31,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* attributes includes */
 #include <attributes/overrideroads.h>
 #include <attributes/otherfaction.h>
-#include <attributes/alliance.h>
 #include <attributes/reduceproduction.h>
 
 /* gamecode includes */
@@ -711,8 +710,7 @@ nr_unit(FILE * F, const faction * f, const unit * u, int indent, int mode)
     if (u->faction == f) {
         marker = '*';
     }
-    else if ALLIED
-        (u->faction, f) {
+    else if (is_allied(u->faction, f)) {
         marker = 'o';
     }
     else if (a_otherfaction && f != u->faction
@@ -1889,7 +1887,7 @@ static void list_address(FILE * F, const faction * uf, quicklist * seenfactions)
                 f->banner ? f->banner : "");
             if (uf == f)
                 label = '*';
-            else if (ALLIED(uf, f))
+            else if (is_allied(uf, f))
                 label = 'o';
             else if (alliedfaction(NULL, uf, f, HELP_ALL))
                 label = '+';
@@ -2046,62 +2044,12 @@ const faction * f)
             WARN_STATIC_BUFFER();
         i = b->display[strlen(b->display) - 1];
     }
-#ifdef WDW_PYRAMID
-
-    if (i != '!' && i != '?' && i != '.') {
-        scat(", ");
-    }
-
-    if (b->type == bt_find("pyramid")) {
-        unit *owner = building_owner(b);
-        scat("Größenstufe ");
-        icat(wdw_pyramid_level(b));
-        scat(".");
-
-        if (owner && owner->faction == f) {
-            const construction *ctype = b->type->construction;
-            int completed = b->size;
-            int c;
-
-            scat(" Baukosten pro Größenpunkt: ");
-
-            while (ctype->improvement != NULL &&
-                ctype->improvement != ctype &&
-                ctype->maxsize > 0 && ctype->maxsize <= completed) {
-                completed -= ctype->maxsize;
-                ctype = ctype->improvement;
-            }
-
-            assert(ctype->materials != NULL);
-
-            for (c = 0; ctype->materials[c].number; c++) {
-                const resource_type *rtype = ctype->materials[c].rtype;
-                int number = ctype->materials[c].number;
-
-                if (c > 0) {
-                    scat(", ");
-                }
-                icat(number);
-                scat(" ");
-                scat(locale_string(lang, resourcename(rtype,
-                    number != 1 ? GR_PLURAL : 0)));
-            }
-
-            scat(".");
-
-            scat(" Erforderlicher Talentwert: ");
-            icat(b->type->construction->minskill);
-            scat(".");
-        }
-    }
-#else
 
     if (i != '!' && i != '?' && i != '.') {
         bytes = (int)strlcpy(bufp, ".", size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
     }
-#endif
     *bufp = 0;
     rparagraph(F, buffer, 2, 0, 0);
 

@@ -23,7 +23,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* kernel includes */
 #include <kernel/unit.h>
 #include <kernel/save.h>
-#include <kernel/faction.h>     /* FIXME: resolve_faction */
+#include <kernel/faction.h>
 
 /* util includes */
 #include <util/attrib.h>
