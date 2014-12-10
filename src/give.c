@@ -210,16 +210,15 @@ struct order *ord)
     return 0;
 }
 
-void give_men(int n, unit * u, unit * u2, struct order *ord)
+message * give_men(int n, unit * u, unit * u2, struct order *ord)
 {
     ship *sh;
     int k = 0;
     int error = 0;
 
     if (u2 && u->faction != u2->faction && u->faction->age < GiveRestriction()) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "giverestriction",
-            "turns", GiveRestriction()));
-        return;
+        return msg_feedback(u, ord, "giverestriction",
+            "turns", GiveRestriction());
     }
     else if (u == u2) {
         error = 10;
@@ -246,9 +245,8 @@ void give_men(int n, unit * u, unit * u2, struct order *ord)
         error = 75;
     }
     else if (u2 && !ucontact(u2, u)) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_no_contact",
-            "target", u2));
-        error = -1;
+        return msg_feedback(u, ord, "feedback_no_contact",
+            "target", u2);
     }
     else if (u2 && (has_skill(u, SK_MAGIC) || has_skill(u2, SK_MAGIC))) {
         /* cannot give units to and from magicians */
@@ -367,18 +365,17 @@ void give_men(int n, unit * u, unit * u2, struct order *ord)
         }
     }
     if (error > 0) {
-        cmistake(u, ord, error, MSG_COMMERCE);
+        return msg_error(u, ord, error);
     }
     else if (!u2) {
-        ADDMSG(&u->faction->msgs,
-            msg_message("give_person_peasants", "unit amount", u, n));
+        return msg_message("give_person_peasants", "unit amount", u, n);
     }
     else if (u2->faction != u->faction) {
         message *msg = msg_message("give_person", "unit target amount", u, u2, n);
-        add_message(&u->faction->msgs, msg);
         add_message(&u2->faction->msgs, msg);
-        msg_release(msg);
+        return msg;
     }
+    return NULL;
 }
 
 void give_unit(unit * u, unit * u2, order * ord)
@@ -411,6 +408,7 @@ void give_unit(unit * u, unit * u2, order * ord)
         }
         else if (getunitpeasants) {
             unit *u3;
+            message *msg;
 
             for (u3 = r->units; u3; u3 = u3->next)
                 if (u3->faction == u->faction && u != u3)
@@ -428,8 +426,13 @@ void give_unit(unit * u, unit * u2, order * ord)
                     }
                 }
             }
-            give_men(u->number, u, NULL, ord);
-            cmistake(u, ord, 153, MSG_COMMERCE);
+            msg = give_men(u->number, u, NULL, ord);
+            if (msg) {
+                ADDMSG(&u->faction->msgs, msg);
+            }
+            else {
+                cmistake(u, ord, 153, MSG_COMMERCE);
+            }
         }
         else {
             ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found",
@@ -669,8 +672,11 @@ void give_cmd(unit * u, order * ord)
                         msg_feedback(u, ord, "race_noregroup", "race", u_race(u)));
                 }
                 else {
-                    n = u->number;
-                    give_men(n, u, u2, ord);
+                    message * msg;
+                    msg = give_men(u->number, u, u2, ord);
+                    if (msg) {
+                        ADDMSG(&u->faction->msgs, msg);
+                    }
                 }
             }
             else if (!(u_race(u)->ec_flags & GIVEITEM) && u2 != NULL) {
@@ -717,12 +723,16 @@ void give_cmd(unit * u, order * ord)
     }
 
     if (isparam(s, u->faction->locale, P_PERSON)) {
+        message * msg;
         if (!(u_race(u)->ec_flags & GIVEPERSON)) {
             ADDMSG(&u->faction->msgs,
                 msg_feedback(u, ord, "race_noregroup", "race", u_race(u)));
             return;
         }
-        give_men(n, u, u2, ord);
+        msg = give_men(u->number, u, u2, ord);
+        if (msg) {
+            ADDMSG(&u->faction->msgs, msg);
+        }
         return;
     }
 

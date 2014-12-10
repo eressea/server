@@ -41,21 +41,66 @@ static void test_give_men(CuTest * tc) {
     test_cleanup();
     env.f2 = env.f1 = test_create_faction(0);
     setup_give(&env);
-    give_men(1, env.src, env.dst, NULL);
+    CuAssertPtrEquals(tc, 0, give_men(1, env.src, env.dst, NULL));
     CuAssertIntEquals(tc, 2, env.dst->number);
     CuAssertIntEquals(tc, 0, env.src->number);
     test_cleanup();
 }
 
+static void test_give_men_other_faction(CuTest * tc) {
+    struct give env;
+    message * msg;
+
+    test_cleanup();
+    env.f1 = test_create_faction(0);
+    env.f2 = test_create_faction(0);
+    setup_give(&env);
+    usetcontact(env.dst, env.src);
+    msg = give_men(1, env.src, env.dst, NULL);
+    CuAssertStrEquals(tc, "give_person", (const char *)msg->parameters[0].v);
+    CuAssertIntEquals(tc, 2, env.dst->number);
+    CuAssertIntEquals(tc, 0, env.src->number);
+    test_cleanup();
+}
+
+static void test_give_men_requires_contact(CuTest * tc) {
+    struct give env;
+    message * msg;
+
+    test_cleanup();
+    env.f1 = test_create_faction(0);
+    env.f2 = test_create_faction(0);
+    setup_give(&env);
+    msg = give_men(1, env.src, env.dst, NULL);
+    CuAssertStrEquals(tc, "feedback_no_contact", (const char *)msg->parameters[3].v);
+    CuAssertIntEquals(tc, 1, env.dst->number);
+    CuAssertIntEquals(tc, 1, env.src->number);
+    test_cleanup();
+}
+
+static void test_give_men_not_to_self(CuTest * tc) {
+    struct give env;
+    message * msg;
+    test_cleanup();
+    env.f2 = env.f1 = test_create_faction(0);
+    setup_give(&env);
+    msg = give_men(1, env.src, NULL, NULL);
+    CuAssertStrEquals(tc, "error159", (const char *)msg->parameters[3].v);
+    CuAssertIntEquals(tc, 1, env.src->number);
+    test_cleanup();
+}
+
 static void test_give_peasants(CuTest * tc) {
     struct give env;
+    message * msg;
     int peasants;
     test_cleanup();
     env.f2 = env.f1 = test_create_faction(0);
     setup_give(&env);
     peasants = env.r->land->peasants;
     getunitpeasants = 1;
-    give_men(1, env.src, NULL, NULL);
+    msg = give_men(1, env.src, NULL, NULL);
+    CuAssertStrEquals(tc, "give_person_peasants", (const char*)msg->parameters[0].v);
     CuAssertIntEquals(tc, 0, env.src->number);
     CuAssertIntEquals(tc, peasants+1, env.r->land->peasants);
     test_cleanup();
@@ -137,6 +182,9 @@ CuSuite *get_give_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_give);
     SUITE_ADD_TEST(suite, test_give_men);
+    SUITE_ADD_TEST(suite, test_give_men_other_faction);
+    SUITE_ADD_TEST(suite, test_give_men_requires_contact);
+    SUITE_ADD_TEST(suite, test_give_men_not_to_self);
     SUITE_ADD_TEST(suite, test_give_peasants);
     SUITE_ADD_TEST(suite, test_give_herbs);
     SUITE_ADD_TEST(suite, test_give_okay);
