@@ -34,9 +34,6 @@ extern "C" {
 #define INSECT_POTION           /* Spezialtrank für Insekten */
 #define ORCIFICATION            /* giving snotlings to the peasants gets counted */
 
-// TODO: remove macro, move all alliance code into a module.
-#define ALLIED(f1, f2) (f1==f2 || (f1->alliance && f1->alliance==f2->alliance))
-
     /* for some good prime numbers, check http://www.math.niu.edu/~rusin/known-math/98/pi_x */
 #ifndef MAXREGIONS
 # define MAXREGIONS 524287      /* must be prime for hashing. 262139 was a little small */
@@ -166,7 +163,6 @@ extern "C" {
     struct unit *createunit(struct region *r, struct faction *f,
         int number, const struct race *rc);
     void create_unitid(struct unit *u, int id);
-    struct unit *getunitg(const struct region *r, const struct faction *f);
     struct unit *getunit(const struct region *r, const struct faction *f);
 
     int read_unitid(const struct faction *f, const struct region *r);
@@ -238,7 +234,7 @@ extern "C" {
     struct region *lastregion(struct faction *f);
 
     bool idle(struct faction *f);
-    bool unit_has_cursed_item(struct unit *u);
+    bool unit_has_cursed_item(const struct unit *u);
 
     /* simple garbage collection: */
     void *gc_add(void *p);

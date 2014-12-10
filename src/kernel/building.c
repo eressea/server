@@ -270,45 +270,6 @@ static const char *fort_name(const struct building_type *btype,
   return castle_name_i(btype, b, bsize, fname);
 }
 
-#ifdef WDW_PYRAMID
-
-static const char *pyramid_name(const struct building_type *btype, int bsize)
-{
-  static char p_name_buf[32];
-  int level = 0;
-  const construction *ctype;
-
-  ctype = btype->construction;
-
-  while (ctype && ctype->maxsize != -1 && ctype->maxsize <= bsize) {
-    bsize -= ctype->maxsize;
-    ctype = ctype->improvement;
-    ++level;
-  }
-
-  sprintf(p_name_buf, "pyramid%d", level);
-
-  return p_name_buf;
-}
-
-int wdw_pyramid_level(const struct building *b)
-{
-  const construction *ctype = b->type->construction;
-  int completed = b->size;
-  int level = 0;
-
-  while (ctype->improvement != NULL &&
-    ctype->improvement != ctype &&
-    ctype->maxsize > 0 && ctype->maxsize <= completed) {
-    ++level;
-    completed -= ctype->maxsize;
-    ctype = ctype->improvement;
-  }
-
-  return level;
-}
-#endif
-
 /* for finding out what was meant by a particular building string */
 
 static local_names *bnames;
@@ -371,9 +332,6 @@ void register_buildings(void)
   register_function((pf_generic) & castle_name, "castle_name");
   register_function((pf_generic) & castle_name_2, "castle_name_2");
   register_function((pf_generic) & fort_name, "fort_name");
-#ifdef WDW_PYRAMID
-  register_function((pf_generic) & pyramid_name, "pyramid_name");
-#endif
 }
 
 void write_building_reference(const struct building *b, struct storage *store)

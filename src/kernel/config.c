@@ -604,7 +604,7 @@ unsigned int atoip(const char *s)
     return n;
 }
 
-bool unit_has_cursed_item(unit * u)
+bool unit_has_cursed_item(const unit * u)
 {
     item *itm = u->items;
     while (itm) {
@@ -733,20 +733,6 @@ int alliedunit(const unit * u, const faction * f2, int mode)
     }
     return 0;
 }
-
-#ifndef NDEBUG
-const char *strcheck(const char *s, size_t maxlen)
-{
-    static char buffer[16 * 1024]; // FIXME: static return value
-    if (strlen(s) > maxlen) {
-        assert(maxlen < 16 * 1024);
-        log_warning("[strcheck] string was shortened to %d bytes:\n%s\n", (int)maxlen, s);
-        strlcpy(buffer, s, maxlen);
-        return buffer;
-    }
-    return s;
-}
-#endif
 
 static attrib_type at_lighthouse = {
     "lighthouse"
@@ -1031,20 +1017,6 @@ int read_unitid(const faction * f, const region * r)
 
 /* exported symbol */
 bool getunitpeasants;
-unit *getunitg(const region * r, const faction * f)
-{
-    int n = read_unitid(f, r);
-
-    if (n == 0) {
-        getunitpeasants = 1;
-        return NULL;
-    }
-    getunitpeasants = 0;
-    if (n < 0)
-        return 0;
-
-    return findunit(n);
-}
 
 unit *getunit(const region * r, const faction * f)
 {
@@ -1632,9 +1604,6 @@ void kernel_done(void)
     gc_done();
 }
 
-/* TODO: soll hier weg */
-extern struct attrib_type at_shiptrail;
-
 attrib_type at_germs = {
     "germs",
     DEFAULT_INIT,
@@ -2168,6 +2137,7 @@ bool has_limited_skills(const struct unit * u)
 void attrib_init(void)
 {
     /* Alle speicherbaren Attribute müssen hier registriert werden */
+    at_register(&at_speedup);
     at_register(&at_shiptrail);
     at_register(&at_familiar);
     at_register(&at_familiarmage);
@@ -2211,7 +2181,6 @@ void attrib_init(void)
     at_register(&at_germs);
 
     at_deprecate("xontormiaexpress", a_readint);    /* required for old datafiles */
-    at_register(&at_speedup);
 }
 
 void kernel_init(void)
@@ -2290,11 +2259,7 @@ void free_gamedata(void)
             defaults[i] = 0;
         }
     }
-    while (alliances) {
-        alliance *al = alliances;
-        alliances = al->next;
-        free_alliance(al);
-    }
+    free_alliances();
     while (factions) {
         faction *f = factions;
         factions = f->next;

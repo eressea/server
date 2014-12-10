@@ -29,6 +29,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "spy.h"
 #include "move.h"
 #include "monster.h"
+#include "morale.h"
 #include "reports.h"
 
 /* kernel includes */
@@ -596,12 +597,8 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
 
 static void friendly_takeover(region * r, faction * f)
 {
-    int morale = region_get_morale(r);
     region_set_owner(r, f, turn);
-    if (morale > 0) {
-        morale = _max(0, morale - MORALE_TRANSFER);
-        region_set_morale(r, morale, turn);
-    }
+    morale_change(r, MORALE_TRANSFER);
 }
 
 void give_control(unit * u, unit * u2)
