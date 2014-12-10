@@ -6,6 +6,7 @@
 #include <kernel/config.h>
 #include <kernel/item.h>
 #include <kernel/terrain.h>
+#include <kernel/region.h>
 #include <kernel/order.h>
 #include <kernel/unit.h>
 #include <kernel/faction.h>
@@ -33,6 +34,31 @@ static void setup_give(struct give *env) {
     env->dst = test_create_unit(env->f2, env->r);
     env->itype = it_get_or_create(rt_get_or_create("money"));
     env->itype->flags |= ITF_HERB;
+}
+
+static void test_give_men(CuTest * tc) {
+    struct give env;
+    test_cleanup();
+    env.f2 = env.f1 = test_create_faction(0);
+    setup_give(&env);
+    give_men(1, env.src, env.dst, NULL);
+    CuAssertIntEquals(tc, 2, env.dst->number);
+    CuAssertIntEquals(tc, 0, env.src->number);
+    test_cleanup();
+}
+
+static void test_give_peasants(CuTest * tc) {
+    struct give env;
+    int peasants;
+    test_cleanup();
+    env.f2 = env.f1 = test_create_faction(0);
+    setup_give(&env);
+    peasants = env.r->land->peasants;
+    getunitpeasants = 1;
+    give_men(1, env.src, NULL, NULL);
+    CuAssertIntEquals(tc, 0, env.src->number);
+    CuAssertIntEquals(tc, peasants+1, env.r->land->peasants);
+    test_cleanup();
 }
 
 static void test_give(CuTest * tc) {
@@ -110,6 +136,8 @@ CuSuite *get_give_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_give);
+    SUITE_ADD_TEST(suite, test_give_men);
+    SUITE_ADD_TEST(suite, test_give_peasants);
     SUITE_ADD_TEST(suite, test_give_herbs);
     SUITE_ADD_TEST(suite, test_give_okay);
     SUITE_ADD_TEST(suite, test_give_denied_by_rules);
