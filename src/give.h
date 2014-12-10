@@ -23,6 +23,7 @@ extern "C" {
 
   int give_item(int want, const struct item_type *itype,
     struct unit *src, struct unit *dest, struct order *ord);
+  struct message * disband_men(int n, struct unit * u, struct order *ord);
   struct message * give_men(int n, struct unit *u, struct unit *u2,
     struct order *ord);
   void give_unit(struct unit *u, struct unit *u2, struct order *ord);

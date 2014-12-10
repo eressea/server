@@ -30,8 +30,8 @@ struct give {
 static void setup_give(struct give *env) {
     struct terrain_type *ter = test_create_terrain("plain", LAND_REGION);
     env->r = test_create_region(0, 0, ter);
-    env->src = test_create_unit(env->f1, env->r);
-    env->dst = test_create_unit(env->f2, env->r);
+    env->src = env->f1 ? test_create_unit(env->f1, env->r) : 0;
+    env->dst = env->f2 ? test_create_unit(env->f2, env->r) : 0;
     env->itype = it_get_or_create(rt_get_or_create("money"));
     env->itype->flags |= ITF_HERB;
 }
@@ -44,6 +44,31 @@ static void test_give_men(CuTest * tc) {
     CuAssertPtrEquals(tc, 0, give_men(1, env.src, env.dst, NULL));
     CuAssertIntEquals(tc, 2, env.dst->number);
     CuAssertIntEquals(tc, 0, env.src->number);
+    test_cleanup();
+}
+
+static void test_give_men_too_many(CuTest * tc) {
+    struct give env;
+    test_cleanup();
+    env.f2 = env.f1 = test_create_faction(0);
+    setup_give(&env);
+    CuAssertPtrEquals(tc, 0, give_men(2, env.src, env.dst, NULL));
+    CuAssertIntEquals(tc, 2, env.dst->number);
+    CuAssertIntEquals(tc, 0, env.src->number);
+    test_cleanup();
+}
+
+static void test_give_men_none(CuTest * tc) {
+    struct give env;
+    message * msg;
+
+    test_cleanup();
+    env.f2 = env.f1 = test_create_faction(0);
+    setup_give(&env);
+    msg = give_men(0, env.src, env.dst, NULL);
+    CuAssertStrEquals(tc, "error96", (const char *)msg->parameters[3].v);
+    CuAssertIntEquals(tc, 1, env.dst->number);
+    CuAssertIntEquals(tc, 1, env.src->number);
     test_cleanup();
 }
 
@@ -84,8 +109,8 @@ static void test_give_men_not_to_self(CuTest * tc) {
     test_cleanup();
     env.f2 = env.f1 = test_create_faction(0);
     setup_give(&env);
-    msg = give_men(1, env.src, NULL, NULL);
-    CuAssertStrEquals(tc, "error159", (const char *)msg->parameters[3].v);
+    msg = give_men(1, env.src, env.src, NULL);
+    CuAssertStrEquals(tc, "error10", (const char *)msg->parameters[3].v);
     CuAssertIntEquals(tc, 1, env.src->number);
     test_cleanup();
 }
@@ -95,11 +120,12 @@ static void test_give_peasants(CuTest * tc) {
     message * msg;
     int peasants;
     test_cleanup();
-    env.f2 = env.f1 = test_create_faction(0);
+    env.f1 = test_create_faction(0);
+    env.f2 = 0;
     setup_give(&env);
     peasants = env.r->land->peasants;
     getunitpeasants = 1;
-    msg = give_men(1, env.src, NULL, NULL);
+    msg = disband_men(1, env.src, NULL);
     CuAssertStrEquals(tc, "give_person_peasants", (const char*)msg->parameters[0].v);
     CuAssertIntEquals(tc, 0, env.src->number);
     CuAssertIntEquals(tc, peasants+1, env.r->land->peasants);
@@ -182,6 +208,8 @@ CuSuite *get_give_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_give);
     SUITE_ADD_TEST(suite, test_give_men);
+    SUITE_ADD_TEST(suite, test_give_men_none);
+    SUITE_ADD_TEST(suite, test_give_men_too_many);
     SUITE_ADD_TEST(suite, test_give_men_other_faction);
     SUITE_ADD_TEST(suite, test_give_men_requires_contact);
     SUITE_ADD_TEST(suite, test_give_men_not_to_self);

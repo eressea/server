@@ -378,6 +378,11 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
     return NULL;
 }
 
+message * disband_men(int n, unit * u, struct order *ord) {
+    getunitpeasants = true;
+    return give_men(n, u, NULL, ord);
+}
+
 void give_unit(unit * u, unit * u2, order * ord)
 {
     region *r = u->region;
@@ -426,7 +431,7 @@ void give_unit(unit * u, unit * u2, order * ord)
                     }
                 }
             }
-            msg = give_men(u->number, u, NULL, ord);
+            msg = disband_men(u->number, u, ord);
             if (msg) {
                 ADDMSG(&u->faction->msgs, msg);
             }
