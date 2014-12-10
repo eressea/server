@@ -163,7 +163,6 @@ extern "C" {
     struct unit *createunit(struct region *r, struct faction *f,
         int number, const struct race *rc);
     void create_unitid(struct unit *u, int id);
-    struct unit *getunitg(const struct region *r, const struct faction *f);
     struct unit *getunit(const struct region *r, const struct faction *f);
 
     int read_unitid(const struct faction *f, const struct region *r);

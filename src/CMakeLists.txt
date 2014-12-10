@@ -84,6 +84,7 @@ set (ERESSEA_SRC
   laws.c
   magic.c
   market.c
+  morale.c
   monster.c
   randenc.c
   report.c

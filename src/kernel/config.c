@@ -1017,20 +1017,6 @@ int read_unitid(const faction * f, const region * r)
 
 /* exported symbol */
 bool getunitpeasants;
-unit *getunitg(const region * r, const faction * f)
-{
-    int n = read_unitid(f, r);
-
-    if (n == 0) {
-        getunitpeasants = 1;
-        return NULL;
-    }
-    getunitpeasants = 0;
-    if (n < 0)
-        return 0;
-
-    return findunit(n);
-}
 
 unit *getunit(const region * r, const faction * f)
 {

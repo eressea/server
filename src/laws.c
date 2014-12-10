@@ -28,6 +28,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "economy.h"
 #include "keyword.h"
 #include "market.h"
+#include "morale.h"
 #include "monster.h"
 #include "move.h"
 #include "randenc.h"
@@ -857,19 +858,15 @@ int can_contact(const region * r, const unit * u, const unit * u2) {
 
 int contact_cmd(unit * u, order * ord)
 {
-    /* unit u kontaktiert unit u2. Dies setzt den contact einfach auf 1 -
-     * ein richtiger toggle ist (noch?) nicht noetig. die region als
-     * parameter ist nur deswegen wichtig, weil er an getunit ()
-     * weitergegeben wird. dies wird fuer das auffinden von tempunits in
-     * getnewunit () verwendet! */
     unit *u2;
-    region *r = u->region;
+    int n;
 
     init_order(ord);
-    u2 = getunitg(r, u->faction);
+    n = read_unitid(u->faction, u->region);
+    u2 = findunit(n);
 
     if (u2 != NULL) {
-        if (!can_contact(r, u, u2)) {
+        if (!can_contact(u->region, u, u2)) {
             cmistake(u, u->thisorder, 23, MSG_EVENT);
             return -1;
         }
@@ -3160,12 +3157,6 @@ static building *age_building(building * b)
     return b;
 }
 
-static double rc_popularity(const struct race *rc)
-{
-    int pop = get_param_int(rc->parameters, "morale", MORALE_AVERAGE);
-    return 1.0 / (pop - MORALE_COOLDOWN); /* 10 turns average */
-}
-
 static void age_region(region * r)
 {
     a_age(&r->attribs);
@@ -3174,33 +3165,7 @@ static void age_region(region * r)
     if (!r->land)
         return;
 
-    if (r->land->ownership && r->land->ownership->owner) {
-        int stability = turn - r->land->ownership->morale_turn;
-        int maxmorale = MORALE_DEFAULT;
-        building *b = largestbuilding(r, &cmp_taxes, false);
-        if (b) {
-            int bsize = buildingeffsize(b, false);
-            maxmorale = (int)(0.5 + b->type->taxes(b, bsize + 1) / MORALE_TAX_FACTOR);
-        }
-        if (r->land->morale < maxmorale) {
-            if (stability > MORALE_COOLDOWN && r->land->ownership->owner
-                && r->land->morale < MORALE_MAX) {
-                double ch = rc_popularity(r->land->ownership->owner->race);
-                if (is_cursed(r->attribs, C_GENEROUS, 0)) {
-                    ch *= 1.2;            /* 20% improvement */
-                }
-                if (stability >= MORALE_AVERAGE * 2 || chance(ch)) {
-                    region_set_morale(r, r->land->morale + 1, turn);
-                }
-            }
-        }
-        else if (r->land->morale > maxmorale) {
-            region_set_morale(r, r->land->morale - 1, turn);
-        }
-    }
-    else if (r->land->morale > MORALE_DEFAULT) {
-        region_set_morale(r, r->land->morale - 1, turn);
-    }
+    morale_update(r);
 }
 
 static void ageing(void)
