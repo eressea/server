@@ -734,20 +734,6 @@ int alliedunit(const unit * u, const faction * f2, int mode)
     return 0;
 }
 
-#ifndef NDEBUG
-const char *strcheck(const char *s, size_t maxlen)
-{
-    static char buffer[16 * 1024]; // FIXME: static return value
-    if (strlen(s) > maxlen) {
-        assert(maxlen < 16 * 1024);
-        log_warning("[strcheck] string was shortened to %d bytes:\n%s\n", (int)maxlen, s);
-        strlcpy(buffer, s, maxlen);
-        return buffer;
-    }
-    return s;
-}
-#endif
-
 static attrib_type at_lighthouse = {
     "lighthouse"
     /* Rest ist NULL; temporäres, nicht alterndes Attribut */

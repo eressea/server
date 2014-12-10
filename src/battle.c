@@ -2052,9 +2052,6 @@ void dazzle(battle * b, troop * td)
     td->fighter->person[td->index].defence--;
 }
 
-/* TODO: Gebäude/Schiffe sollten auch zerstörbar sein. Schwierig im Kampf,
- * besonders bei Schiffen. */
-
 void damage_building(battle * b, building * bldg, int damage_abs)
 {
     bldg->size = _max(1, bldg->size - damage_abs);
@@ -2262,9 +2259,9 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
             ta.fighter->person[ta.index].last_action = b->turn;
         }
         if (td.fighter->unit->ship) {
-            /* FIXME should use damage_ship here? */
-            td.fighter->unit->ship->damage +=
-                DAMAGE_SCALE * dice_rand(a->data.dice);
+            int dice = dice_rand(a->data.dice);
+            ship * sh = td.fighter->unit->ship;
+            damage_ship(sh, dice / sh->type->damage / sh->size);
         }
         else if (td.fighter->unit->building) {
             damage_building(b, td.fighter->unit->building, dice_rand(a->data.dice));
@@ -3689,18 +3686,6 @@ static void free_battle(battle * b)
 
 static int *get_alive(side * s)
 {
-#if 0
-    static int alive[NUMROWS];
-    fighter *fig;
-    memset(alive, 0, NUMROWS * sizeof(int));
-    for (fig = s->fighters; fig; fig = fig->next) {
-        if (fig->alive > 0) {
-            int row = statusrow(fig);
-            alive[row] += fig->alive;
-        }
-    }
-    return alive;
-#endif
     return s->size;
 }
 

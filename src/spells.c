@@ -394,46 +394,10 @@ int report_action(region * r, unit * actor, message * msg, int flags)
 static void
 report_effect(region * r, unit * mage, message * seen, message * unseen)
 {
-#if 0
-    unit *u;
-
-    /* melden, 1x pro Partei */
-    freset(mage->faction, FFL_SELECT);
-    for (u = r->units; u; u = u->next)
-        freset(u->faction, FFL_SELECT);
-    for (u = r->units; u; u = u->next) {
-        if (!fval(u->faction, FFL_SELECT)) {
-            fset(u->faction, FFL_SELECT);
-
-            /* Bei Fernzaubern sieht nur die eigene Partei den Magier */
-            if (u->faction != mage->faction) {
-                if (r == mage->region) {
-                    /* kein Fernzauber, pruefe, ob der Magier ueberhaupt gesehen
-                     * wird */
-                    if (cansee(u->faction, r, mage, 0)) {
-                        r_addmessage(r, u->faction, seen);
-                    } else {
-                        r_addmessage(r, u->faction, unseen);
-                    }
-                } else {                /* Fernzauber, fremde Partei sieht den Magier niemals */
-                    r_addmessage(r, u->faction, unseen);
-                }
-            } else {                  /* Partei des Magiers, sieht diesen immer */
-                r_addmessage(r, u->faction, seen);
-            }
-        }
-    }
-    /* Ist niemand von der Partei des Magiers in der Region, dem Magier
-     * nochmal gesondert melden */
-    if (!fval(mage->faction, FFL_SELECT)) {
-        add_message(&mage->faction->msgs, seen);
-    }
-#else
     int err = report_action(r, mage, seen, ACTION_RESET | ACTION_CANSEE);
     if (err) {
         report_action(r, mage, seen, ACTION_CANNOTSEE);
     }
-#endif
 }
 
 /* ------------------------------------------------------------- */
@@ -3613,11 +3577,6 @@ static int sp_charmingsong(castorder * co)
     /* Magieresistenz */
     if (target_resists_magic(mage, target, TYP_UNIT, resist_bonus)) {
         report_failure(mage, co->order);
-#if 0
-        sprintf(buf, "%s fuehlt sich einen Moment lang benommen und desorientiert.",
-            unitname(target));
-        addmessage(target->region, target->faction, buf, MSG_EVENT, ML_WARN);
-#endif
         return 0;
     }
 
