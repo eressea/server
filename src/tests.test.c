@@ -20,8 +20,6 @@ static void test_resources(CuTest *tc) {
     CuAssertPtrEquals(tc, rt_find("aura"), (void *)get_resourcetype(R_AURA));
     CuAssertPtrNotNull(tc, rt_find("permaura"));
     CuAssertPtrEquals(tc, rt_find("permaura"), (void *)get_resourcetype(R_PERMAURA));
-    CuAssertPtrNotNull(tc, rt_find("unit"));
-    CuAssertPtrEquals(tc, rt_find("unit"), (void *)get_resourcetype(R_UNIT));
 
     CuAssertPtrEquals(tc, 0, rt_find("stone"));
     rtype = rt_get_or_create("stone");
@@ -55,7 +53,6 @@ static void test_recreate_world(CuTest * tc)
   CuAssertPtrNotNull(tc, get_resourcetype(R_AURA));
   CuAssertPtrNotNull(tc, get_resourcetype(R_PERMAURA));
   CuAssertPtrNotNull(tc, get_resourcetype(R_PEASANT));
-  CuAssertPtrNotNull(tc, get_resourcetype(R_UNIT));
 
   test_cleanup();
   CuAssertPtrEquals(tc, 0, get_locale("de"));
@@ -67,7 +64,6 @@ static void test_recreate_world(CuTest * tc)
   CuAssertPtrNotNull(tc, get_resourcetype(R_AURA));
   CuAssertPtrNotNull(tc, get_resourcetype(R_PERMAURA));
   CuAssertPtrNotNull(tc, get_resourcetype(R_PEASANT));
-  CuAssertPtrNotNull(tc, get_resourcetype(R_UNIT));
   CuAssertPtrEquals(tc, 0, findregion(0, 0));
 }
 

@@ -516,7 +516,7 @@ void give_unit(unit * u, unit * u2, order * ord)
         cmistake(u, ord, 156, MSG_COMMERCE);
         return;
     }
-    add_give(u, u2, 1, 1, get_resourcetype(R_UNIT), ord, 0);
+// TODO:    add_give(u, u2, 1, 1, get_resourcetype(R_UNIT), ord, 0);
     u_setfaction(u, u2->faction);
     u2->faction->newbies += n;
 }

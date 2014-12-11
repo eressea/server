@@ -128,7 +128,7 @@ int change_reservation(unit * u, const resource_type * rtype, int value)
 int set_resvalue(unit * u, const resource_type * rtype, int value)
 {
     reservation *res, **rp = &u->reservations;
-
+    assert(rtype->itype);
     while (*rp && (*rp)->type != rtype)
         rp = &(*rp)->next;
     res = *rp;

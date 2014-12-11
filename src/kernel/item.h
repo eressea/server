@@ -297,7 +297,6 @@ extern "C" {
     R_AURA,                     /* Aura */
     R_PERMAURA,                 /* Permanente Aura */
     R_LIFE,
-    R_UNIT,
     R_PEASANT,
 
     MAX_RESOURCES,              /* do not use outside item.c ! */
