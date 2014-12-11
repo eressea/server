@@ -7112,6 +7112,15 @@
     <text locale="en">"$unit($target) receives $int($amount) $resource($resource,$amount) from $unit($unit)."</text>
   </message>
 
+  <message name="give_person_ocean" section="economy">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="amount" type="int"/>
+    </type>
+    <text locale="de">"$unit($unit) ertränkt $int($amount) Person$if($eq($amount,1),"","en")."</text>
+    <text locale="en">"$unit($unit) drowns $int($amount)."</text>
+  </message>
+
   <message name="give_person_peasants" section="economy">
     <type>
       <arg name="unit" type="unit"/>

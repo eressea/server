@@ -4385,6 +4385,7 @@ void init_processor(void)
 
     p += 10;                      /* rest rng again before economics */
     add_proc_region(p, &economics, "Zerstoeren, Geben, Rekrutieren, Vergessen");
+    add_proc_order(p, K_PROMOTION, &promotion_cmd, 0, "Heldenbefoerderung");
 
     p += 10;
     if (!keyword_disabled(K_PAY)) {
@@ -4456,7 +4457,6 @@ void init_processor(void)
         p += 10;
         add_proc_global(p, restack_units, "Einheiten sortieren");
     }
-    add_proc_order(p, K_PROMOTION, &promotion_cmd, 0, "Heldenbefoerderung");
     if (!keyword_disabled(K_NUMBER)) {
         add_proc_order(p, K_NUMBER, &renumber_cmd, 0, "Neue Nummern (Einheiten)");
         p += 10;

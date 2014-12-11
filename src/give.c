@@ -210,63 +210,81 @@ struct order *ord)
     return 0;
 }
 
-void give_men(int n, unit * u, unit * u2, struct order *ord)
+static bool can_give_men(const unit *u, order *ord, message **msg) {
+    if (u_race(u) == get_race(RC_SNOTLING)) {
+        /* snotlings may not be given to the peasants. */
+        if (msg) *msg = msg_error(u, ord, 307);
+    }
+    else if (unit_has_cursed_item(u)) {
+        if (msg) *msg = msg_error(u, ord, 78);
+    }
+    else if (has_skill(u, SK_MAGIC)) {
+        /* cannot give units to and from magicians */
+        if (msg) *msg = msg_error(u, ord, 158);
+    }
+    else if (fval(u, UFL_HUNGER)) {
+        /* hungry people cannot be given away */
+        if (msg) *msg = msg_error(u, ord, 73);
+    }
+    else if (fval(u, UFL_LOCKED) || is_cursed(u->attribs, C_SLAVE, 0)) {
+        if (msg) *msg = msg_error(u, ord, 74);
+    }
+    else {
+        return true;
+    }
+    return false;
+}
+
+message * give_men(int n, unit * u, unit * u2, struct order *ord)
 {
     ship *sh;
     int k = 0;
     int error = 0;
+    message * msg;
 
-    if (u2 && u->faction != u2->faction && u->faction->age < GiveRestriction()) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "giverestriction",
-            "turns", GiveRestriction()));
-        return;
+    assert(u2);
+
+    if (!can_give_men(u, ord, &msg)) {
+        return msg;
+    }
+
+    if (u->faction != u2->faction && u->faction->age < GiveRestriction()) {
+        return msg_feedback(u, ord, "giverestriction",
+            "turns", GiveRestriction());
     }
     else if (u == u2) {
         error = 10;
     }
-    else if (!u2 && u_race(u) == get_race(RC_SNOTLING)) {
-        /* snotlings may not be given to the peasants. */
-        error = 307;
-    }
-    else if (u2 && u2->number && (fval(u, UFL_HERO) != fval(u2, UFL_HERO))) {
+    else if (u2->number && (fval(u, UFL_HERO) != fval(u2, UFL_HERO))) {
         /* heroes may not be given to non-heroes and vice versa */
         error = 75;
     }
-    else if (unit_has_cursed_item(u) || (u2 && unit_has_cursed_item(u2))) {
+    else if (unit_has_cursed_item(u2)) {
         error = 78;
     }
-    else if (fval(u, UFL_LOCKED) || is_cursed(u->attribs, C_SLAVE, 0)) {
-        error = 74;
-    }
-    else if (u2 && fval(u, UFL_HUNGER)) {
-        /* hungry people cannot be given away */
-        error = 73;
-    }
-    else if (u2 && (fval(u2, UFL_LOCKED) || is_cursed(u2->attribs, C_SLAVE, 0))) {
+    else if (fval(u2, UFL_LOCKED) || is_cursed(u2->attribs, C_SLAVE, 0)) {
         error = 75;
     }
-    else if (u2 && !ucontact(u2, u)) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_no_contact",
-            "target", u2));
-        error = -1;
+    else if (!ucontact(u2, u)) {
+        return msg_feedback(u, ord, "feedback_no_contact",
+            "target", u2);
     }
-    else if (u2 && (has_skill(u, SK_MAGIC) || has_skill(u2, SK_MAGIC))) {
+    else if (has_skill(u2, SK_MAGIC)) {
         /* cannot give units to and from magicians */
         error = 158;
     }
-    else if (u2 && (fval(u, UFL_WERE) != fval(u2, UFL_WERE))) {
+    else if (fval(u, UFL_WERE) != fval(u2, UFL_WERE)) {
         /* werewolves can't be given to non-werewolves and vice-versa */
         error = 312;
     }
-    else if (u2 && u2->number != 0 && u_race(u2) != u_race(u)) {
+    else if (u2->number != 0 && u_race(u2) != u_race(u)) {
         log_debug("faction %s attempts to give %s to %s.\n", itoa36(u->faction->no), u_race(u)->_name, u_race(u2)->_name);
         error = 139;
     }
-    else if (u2 != NULL && (get_racename(u2->attribs)
-        || get_racename(u->attribs))) {
+    else if (get_racename(u2->attribs) || get_racename(u->attribs)) {
         error = 139;
     }
-    else if (u2 && u2->faction != u->faction && !rule_transfermen()) {
+    else if (u2->faction != u->faction && !rule_transfermen()) {
         error = 74;
     }
     else {
@@ -281,7 +299,7 @@ void give_men(int n, unit * u, unit * u2, struct order *ord)
         if (n == 0) {
             error = 96;
         }
-        else if (u2 && u->faction != u2->faction) {
+        else if (u->faction != u2->faction) {
             if (u2->faction->newbies + n > MAXNEWBIES) {
                 error = 129;
             }
@@ -303,7 +321,7 @@ void give_men(int n, unit * u, unit * u2, struct order *ord)
         }
     }
 
-    if (u2 && (has_skill(u, SK_ALCHEMY) || has_skill(u2, SK_ALCHEMY))) {
+    if (has_skill(u, SK_ALCHEMY) || has_skill(u2, SK_ALCHEMY)) {
         k = count_skill(u2->faction, SK_ALCHEMY);
 
         /* Falls die Zieleinheit keine Alchemisten sind, werden sie nun
@@ -327,7 +345,7 @@ void give_men(int n, unit * u, unit * u2, struct order *ord)
     }
 
     if (error == 0) {
-        if (u2 && u2->number == 0) {
+        if (u2->number == 0) {
             set_racename(&u2->attribs, get_racename(u->attribs));
             u_setrace(u2, u_race(u));
             u2->irace = u->irace;
@@ -337,48 +355,48 @@ void give_men(int n, unit * u, unit * u2, struct order *ord)
                 freset(u2, UFL_HERO);
         }
 
-        if (u2) {
-            /* Einheiten von Schiffen können nicht NACH in von
-             * Nicht-alliierten bewachten Regionen ausführen */
-            sh = leftship(u);
-            if (sh) {
-                set_leftship(u2, sh);
-            }
-            transfermen(u, u2, n);
-            if (u->faction != u2->faction) {
-                u2->faction->newbies += n;
-            }
+        /* Einheiten von Schiffen können nicht NACH in von
+            * Nicht-alliierten bewachten Regionen ausführen */
+        sh = leftship(u);
+        if (sh) {
+            set_leftship(u2, sh);
         }
-        else {
-            if (getunitpeasants) {
-#ifdef ORCIFICATION
-                if (u_race(u) == get_race(RC_SNOTLING) && !fval(u->region, RF_ORCIFIED)) {
-                    attrib *a = a_find(u->region->attribs, &at_orcification);
-                    if (!a)
-                        a = a_add(&u->region->attribs, a_new(&at_orcification));
-                    a->data.i += n;
-                }
-#endif
-                transfermen(u, NULL, n);
-            }
-            else {
-                error = 159;
-            }
+        transfermen(u, u2, n);
+        if (u->faction != u2->faction) {
+            u2->faction->newbies += n;
         }
     }
     if (error > 0) {
-        cmistake(u, ord, error, MSG_COMMERCE);
-    }
-    else if (!u2) {
-        ADDMSG(&u->faction->msgs,
-            msg_message("give_person_peasants", "unit amount", u, n));
+        return msg_error(u, ord, error);
     }
     else if (u2->faction != u->faction) {
         message *msg = msg_message("give_person", "unit target amount", u, u2, n);
-        add_message(&u->faction->msgs, msg);
         add_message(&u2->faction->msgs, msg);
-        msg_release(msg);
+        return msg;
     }
+    return NULL;
+}
+
+message * disband_men(int n, unit * u, struct order *ord) {
+    message * msg;
+
+    if (!can_give_men(u, ord, &msg)) {
+        return msg;
+    }
+    transfermen(u, NULL, n);
+#ifdef ORCIFICATION
+    if (u_race(u) == get_race(RC_SNOTLING) && !fval(u->region, RF_ORCIFIED)) {
+        attrib *a = a_find(u->region->attribs, &at_orcification);
+        if (!a) {
+            a = a_add(&u->region->attribs, a_new(&at_orcification));
+        }
+        a->data.i += n;
+    }
+#endif
+    if (fval(u->region->terrain, SEA_REGION)) {
+        return msg_message("give_person_ocean", "unit amount", u, n);
+    }
+    return msg_message("give_person_peasants", "unit amount", u, n);
 }
 
 void give_unit(unit * u, unit * u2, order * ord)
@@ -406,8 +424,16 @@ void give_unit(unit * u, unit * u2, order * ord)
     }
 
     if (u2 == NULL) {
+        message *msg;
         if (fval(r->terrain, SEA_REGION)) {
-            cmistake(u, ord, 152, MSG_COMMERCE);
+            /* TODO: why is this here, but the unit does not actually seem to lose any men? */
+            msg = disband_men(u->number, u, ord);
+            if (msg) {
+                ADDMSG(&u->faction->msgs, msg);
+            }
+            else {
+                cmistake(u, ord, 152, MSG_COMMERCE);
+            }
         }
         else if (getunitpeasants) {
             unit *u3;
@@ -428,8 +454,13 @@ void give_unit(unit * u, unit * u2, order * ord)
                     }
                 }
             }
-            give_men(u->number, u, NULL, ord);
-            cmistake(u, ord, 153, MSG_COMMERCE);
+            msg = disband_men(u->number, u, ord);
+            if (msg) {
+                ADDMSG(&u->faction->msgs, msg);
+            }
+            else {
+                cmistake(u, ord, 153, MSG_COMMERCE);
+            }
         }
         else {
             ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found",
@@ -575,12 +606,10 @@ void give_cmd(unit * u, order * ord)
                 msg_feedback(u, ord, "race_notake", "race", u_race(u2)));
             return;
         }
-        if (!u2) {
-            if (!getunitpeasants) {
-                ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
-                    "feedback_unit_not_found", ""));
-                return;
-            }
+        if (!u2 && !getunitpeasants) {
+            ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
+                "feedback_unit_not_found", ""));
+            return;
         }
         if (u->items) {
             item **itmp = &u->items;
@@ -669,8 +698,11 @@ void give_cmd(unit * u, order * ord)
                         msg_feedback(u, ord, "race_noregroup", "race", u_race(u)));
                 }
                 else {
-                    n = u->number;
-                    give_men(n, u, u2, ord);
+                    message * msg;
+                    msg = u2 ? give_men(u->number, u, u2, ord) : disband_men(u->number, u, ord);
+                    if (msg) {
+                        ADDMSG(&u->faction->msgs, msg);
+                    }
                 }
             }
             else if (!(u_race(u)->ec_flags & GIVEITEM) && u2 != NULL) {
@@ -717,12 +749,16 @@ void give_cmd(unit * u, order * ord)
     }
 
     if (isparam(s, u->faction->locale, P_PERSON)) {
+        message * msg;
         if (!(u_race(u)->ec_flags & GIVEPERSON)) {
             ADDMSG(&u->faction->msgs,
                 msg_feedback(u, ord, "race_noregroup", "race", u_race(u)));
             return;
         }
-        give_men(n, u, u2, ord);
+        msg = u2 ? give_men(u->number, u, u2, ord) : disband_men(u->number, u, ord);
+        if (msg) {
+            ADDMSG(&u->faction->msgs, msg);
+        }
         return;
     }
 

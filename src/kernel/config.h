@@ -234,7 +234,7 @@ extern "C" {
     struct region *lastregion(struct faction *f);
 
     bool idle(struct faction *f);
-    bool unit_has_cursed_item(struct unit *u);
+    bool unit_has_cursed_item(const struct unit *u);
 
     /* simple garbage collection: */
     void *gc_add(void *p);

@@ -172,6 +172,7 @@ race *rc_get_or_create(const char *zName)
 
         rc = (race *)calloc(sizeof(race), 1);
         rc->hitpoints = 1;
+        rc->recruit_multi = 1.0F;
         if (strchr(zName, ' ') != NULL) {
             log_error("race '%s' has an invalid name. remove spaces\n", zName);
             assert(strchr(zName, ' ') == NULL);

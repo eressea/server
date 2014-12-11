@@ -19,10 +19,12 @@ extern "C" {
     struct item_type;
     struct order;
     struct unit;
+    struct message;
 
   int give_item(int want, const struct item_type *itype,
     struct unit *src, struct unit *dest, struct order *ord);
-  void give_men(int n, struct unit *u, struct unit *u2,
+  struct message * disband_men(int n, struct unit * u, struct order *ord);
+  struct message * give_men(int n, struct unit *u, struct unit *u2,
     struct order *ord);
   void give_unit(struct unit *u, struct unit *u2, struct order *ord);
   void give_cmd(struct unit * u, struct order * ord);
