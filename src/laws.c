@@ -2141,7 +2141,7 @@ int email_cmd(unit * u, struct order *ord)
     init_order(ord);
     s = getstrtoken();
 
-    if (!s[0]) {
+    if (!s || !s[0]) {
         cmistake(u, ord, 85, MSG_EVENT);
     }
     else {
