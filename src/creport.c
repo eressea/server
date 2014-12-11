@@ -1523,7 +1523,7 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
     fprintf(F, "%d;Basis\n", 36);
     fprintf(F, "%d;Runde\n", turn);
     fprintf(F, "%d;Zeitalter\n", era);
-    fprintf(F, "%d;Build\n", VERSION_BUILD);
+    fprintf(F, "%d.%d.%d;Build\n", VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD);
     if (mailto != NULL) {
         fprintf(F, "\"%s\";mailto\n", mailto);
         fprintf(F, "\"%s\";mailcmd\n", locale_string(f->locale, "mailcmd"));
