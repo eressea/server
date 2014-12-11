@@ -393,6 +393,9 @@ message * disband_men(int n, unit * u, struct order *ord) {
         a->data.i += n;
     }
 #endif
+    if (fval(u->region->terrain, SEA_REGION)) {
+        return msg_message("give_person_ocean", "unit amount", u, n);
+    }
     return msg_message("give_person_peasants", "unit amount", u, n);
 }
 
@@ -421,12 +424,19 @@ void give_unit(unit * u, unit * u2, order * ord)
     }
 
     if (u2 == NULL) {
+        message *msg;
         if (fval(r->terrain, SEA_REGION)) {
-            cmistake(u, ord, 152, MSG_COMMERCE);
+            /* TODO: why is this here, but the unit does not actually seem to lose any men? */
+            msg = disband_men(u->number, u, ord);
+            if (msg) {
+                ADDMSG(&u->faction->msgs, msg);
+            }
+            else {
+                cmistake(u, ord, 152, MSG_COMMERCE);
+            }
         }
         else if (getunitpeasants) {
             unit *u3;
-            message *msg;
 
             for (u3 = r->units; u3; u3 = u3->next)
                 if (u3->faction == u->faction && u != u3)
@@ -596,12 +606,10 @@ void give_cmd(unit * u, order * ord)
                 msg_feedback(u, ord, "race_notake", "race", u_race(u2)));
             return;
         }
-        if (!u2) {
-            if (!getunitpeasants) {
-                ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
-                    "feedback_unit_not_found", ""));
-                return;
-            }
+        if (!u2 && !getunitpeasants) {
+            ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
+                "feedback_unit_not_found", ""));
+            return;
         }
         if (u->items) {
             item **itmp = &u->items;
@@ -691,7 +699,7 @@ void give_cmd(unit * u, order * ord)
                 }
                 else {
                     message * msg;
-                    msg = getunitpeasants ? disband_men(u->number, u, ord) : give_men(u->number, u, u2, ord);
+                    msg = u2 ? give_men(u->number, u, u2, ord) : disband_men(u->number, u, ord);
                     if (msg) {
                         ADDMSG(&u->faction->msgs, msg);
                     }
@@ -747,7 +755,7 @@ void give_cmd(unit * u, order * ord)
                 msg_feedback(u, ord, "race_noregroup", "race", u_race(u)));
             return;
         }
-        msg = getunitpeasants ? disband_men(u->number, u, ord) : give_men(u->number, u, u2, ord);
+        msg = u2 ? give_men(u->number, u, u2, ord) : disband_men(u->number, u, ord);
         if (msg) {
             ADDMSG(&u->faction->msgs, msg);
         }
