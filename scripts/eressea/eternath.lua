@@ -23,6 +23,7 @@ local eternath = {}
 
 function eternath.update()
     if b1 and b2 then
+		local size = 5
         local units1 = gates.units(b1, size)
         local units2 = gates.units(b2, size)
 

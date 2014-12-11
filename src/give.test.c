@@ -36,6 +36,33 @@ static void setup_give(struct give *env) {
     env->itype->flags |= ITF_HERB;
 }
 
+static void test_give_unit_to_peasants(CuTest * tc) {
+    struct give env;
+    test_cleanup();
+    env.f1 = test_create_faction(0);
+    env.f2 = 0;
+    setup_give(&env);
+    rsetpeasants(env.r, 0);
+    getunitpeasants = true;
+    give_unit(env.src, NULL, NULL);
+    CuAssertIntEquals(tc, 0, env.src->number);
+    CuAssertIntEquals(tc, 1, env.r->land->peasants);
+    test_cleanup();
+}
+
+static void test_give_unit_in_ocean(CuTest * tc) {
+    struct give env;
+    test_cleanup();
+    env.f1 = test_create_faction(0);
+    env.f2 = 0;
+    setup_give(&env);
+    env.r->terrain = test_create_terrain("ocean", SEA_REGION);
+    getunitpeasants = true;
+    give_unit(env.src, NULL, NULL);
+    CuAssertIntEquals(tc, 0, env.src->number);
+    test_cleanup();
+}
+
 static void test_give_men(CuTest * tc) {
     struct give env;
     test_cleanup();
@@ -43,6 +70,21 @@ static void test_give_men(CuTest * tc) {
     setup_give(&env);
     CuAssertPtrEquals(tc, 0, give_men(1, env.src, env.dst, NULL));
     CuAssertIntEquals(tc, 2, env.dst->number);
+    CuAssertIntEquals(tc, 0, env.src->number);
+    test_cleanup();
+}
+
+static void test_give_men_in_ocean(CuTest * tc) {
+    struct give env;
+    message * msg;
+
+    test_cleanup();
+    env.f1 = test_create_faction(0);
+    env.f2 = 0;
+    setup_give(&env);
+    env.r->terrain = test_create_terrain("ocean", SEA_REGION);
+    msg = disband_men(1, env.src, NULL);
+    CuAssertStrEquals(tc, "give_person_ocean", (const char *)msg->parameters[0].v);
     CuAssertIntEquals(tc, 0, env.src->number);
     test_cleanup();
 }
@@ -118,16 +160,16 @@ static void test_give_men_not_to_self(CuTest * tc) {
 static void test_give_peasants(CuTest * tc) {
     struct give env;
     message * msg;
-    int peasants;
+
     test_cleanup();
     env.f1 = test_create_faction(0);
     env.f2 = 0;
     setup_give(&env);
-    peasants = env.r->land->peasants;
+    rsetpeasants(env.r, 0);
     msg = disband_men(1, env.src, NULL);
     CuAssertStrEquals(tc, "give_person_peasants", (const char*)msg->parameters[0].v);
     CuAssertIntEquals(tc, 0, env.src->number);
-    CuAssertIntEquals(tc, peasants+1, env.r->land->peasants);
+    CuAssertIntEquals(tc, 1, env.r->land->peasants);
     test_cleanup();
 }
 
@@ -207,11 +249,14 @@ CuSuite *get_give_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_give);
     SUITE_ADD_TEST(suite, test_give_men);
+    SUITE_ADD_TEST(suite, test_give_men_in_ocean);
     SUITE_ADD_TEST(suite, test_give_men_none);
     SUITE_ADD_TEST(suite, test_give_men_too_many);
     SUITE_ADD_TEST(suite, test_give_men_other_faction);
     SUITE_ADD_TEST(suite, test_give_men_requires_contact);
     SUITE_ADD_TEST(suite, test_give_men_not_to_self);
+    SUITE_ADD_TEST(suite, test_give_unit_in_ocean);
+    SUITE_ADD_TEST(suite, test_give_unit_to_peasants);
     SUITE_ADD_TEST(suite, test_give_peasants);
     SUITE_ADD_TEST(suite, test_give_herbs);
     SUITE_ADD_TEST(suite, test_give_okay);

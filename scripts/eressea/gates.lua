@@ -13,7 +13,7 @@ function gates.travel(b, units)
 end
 
 function gates.units(b, maxsize)
-  local size = maxsize
+  local size = maxsize or 1
   local units = {}
   local u
 
