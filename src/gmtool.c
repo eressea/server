@@ -28,9 +28,6 @@
 #include <modules/arena.h>
 #endif
 #include <modules/autoseed.h>
-#if DUNGEON_MODULE
-#include <modules/dungeon.h>
-#endif
 
 #include <kernel/building.h>
 #include <kernel/calendar.h>
