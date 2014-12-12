@@ -426,7 +426,6 @@ void give_unit(unit * u, unit * u2, order * ord)
     if (u2 == NULL) {
         message *msg;
         if (fval(r->terrain, SEA_REGION)) {
-            /* TODO: why is this here, but the unit does not actually seem to lose any men? */
             msg = disband_men(u->number, u, ord);
             if (msg) {
                 ADDMSG(&u->faction->msgs, msg);
@@ -755,7 +754,7 @@ void give_cmd(unit * u, order * ord)
                 msg_feedback(u, ord, "race_noregroup", "race", u_race(u)));
             return;
         }
-        msg = u2 ? give_men(u->number, u, u2, ord) : disband_men(u->number, u, ord);
+        msg = u2 ? give_men(n, u, u2, ord) : disband_men(n, u, ord);
         if (msg) {
             ADDMSG(&u->faction->msgs, msg);
         }
