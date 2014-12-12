@@ -640,7 +640,7 @@ int give_control_cmd(unit * u, order * ord)
         if (!can_give_to(u, u2)) {
             ADDMSG(&u->faction->msgs,
                 msg_feedback(u, ord, "feedback_unit_not_found", ""));
-            return;
+            return 0;
         }
         else if (!u->building && !u->ship) {
             msg = cmistake(u, ord, 140, MSG_EVENT);

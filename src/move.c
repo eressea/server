@@ -1247,8 +1247,10 @@ static bool transport(unit * ut, unit * u)
 
     for (ord = ut->orders; ord; ord = ord->next) {
         if (getkeyword(ord) == K_TRANSPORT) {
+            unit *u2;
             init_order(ord);
-            if (getunit_deprecated(ut->region, ut->faction) == u) {
+            getunit(ut->region, ut->faction, &u2);
+            if (u2 == u) {
                 return true;
             }
         }
@@ -1278,11 +1280,10 @@ static void init_transportation(void)
         for (u = r->units; u; u = u->next) {
             if (getkeyword(u->thisorder) == K_DRIVE && can_move(u)
                 && !fval(u, UFL_NOTMOVING) && !LongHunger(u)) {
-                unit *ut;
+                unit *ut = 0;
 
                 init_order(u->thisorder);
-                ut = getunit_deprecated(r, u->faction);
-                if (ut == NULL) {
+                if (getunit(r, u->faction, &ut) != GET_UNIT) {
                     ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
                         "feedback_unit_not_found", ""));
                     continue;
@@ -1312,14 +1313,18 @@ static void init_transportation(void)
                     if (getkeyword(ord) == K_TRANSPORT) {
                         init_order(ord);
                         for (;;) {
-                            unit *ut = getunit_deprecated(r, u->faction);
+                            unit *ut = 0;
 
-                            if (ut == NULL)
+                            if (getunit(r, u->faction, &ut) != GET_UNIT) {
                                 break;
-                            if (getkeyword(ut->thisorder) == K_DRIVE && can_move(ut)
-                                && !fval(ut, UFL_NOTMOVING) && !LongHunger(ut)) {
+                            }
+                            if (getkeyword(ut->thisorder) == K_DRIVE &&
+                                    can_move(ut) && !fval(ut, UFL_NOTMOVING) &&
+                                    !LongHunger(ut)) {
+                                unit *u2;
                                 init_order(ut->thisorder);
-                                if (getunit_deprecated(r, ut->faction) == u) {
+                                getunit(r, ut->faction, &u2);
+                                if (u2 == u) {
                                     w += weight(ut);
                                 }
                             }
@@ -2198,14 +2203,13 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
 
     /* transportation */
     for (ord = u->orders; ord; ord = ord->next) {
-        unit *ut;
+        unit *ut = 0;
 
         if (getkeyword(ord) != K_TRANSPORT)
             continue;
 
         init_order(ord);
-        ut = getunit_deprecated(r, u->faction);
-        if (ut != NULL) {
+        if (getunit(r, u->faction, &ut) == GET_UNIT) {
             if (getkeyword(ut->thisorder) == K_DRIVE) {
                 if (ut->building && !can_leave(ut)) {
                     cmistake(ut, ut->thisorder, 150, MSG_MOVE);
@@ -2218,8 +2222,10 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
                     bool found = false;
 
                     if (!fval(ut, UFL_NOTMOVING) && !LongHunger(ut)) {
+                        unit *u2;
                         init_order(ut->thisorder);
-                        if (getunit_deprecated(u->region, ut->faction) == u) {
+                        getunit(u->region, ut->faction, &u2);
+                        if (u2 == u) {
                             const region_list *route_to =
                                 travel_route(ut, route_begin, route_end, ord,
                                 TRAVEL_TRANSPORTED);

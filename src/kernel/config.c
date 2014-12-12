@@ -1021,13 +1021,18 @@ int getunit(const region * r, const faction * f, unit **uresult)
     unit *u2;
 
     if (n == 0) {
-        *uresult = 0;
+        if (uresult) {
+            *uresult = 0;
+        }
         return GET_PEASANTS;
     }
     if (n < 0)
-        return 0;
+        return GET_NOTFOUND;
 
-    *uresult = u2 = findunit(n);
+    u2 = findunit(n);
+    if (uresult) {
+        *uresult = u2;
+    }
     if (u2 != NULL && u2->region == r) {
         /* there used to be a 'u2->flags & UFL_ISNEW || u2->number>0' condition
         * here, but it got removed because of a bug that made units disappear:
@@ -1037,29 +1042,6 @@ int getunit(const region * r, const faction * f, unit **uresult)
     }
 
     return GET_NOTFOUND;
-}
-
-unit *getunit_deprecated(const region * r, const faction * f)
-{
-    int n = read_unitid(f, r);
-    unit *u2;
-
-    if (n == 0) {
-        return NULL;
-    }
-    if (n < 0)
-        return 0;
-
-    u2 = findunit(n);
-    if (u2 != NULL && u2->region == r) {
-        /* there used to be a 'u2->flags & UFL_ISNEW || u2->number>0' condition
-         * here, but it got removed because of a bug that made units disappear:
-         * http://eressea.upb.de/mantis/bug_view_page.php?bug_id=0000172
-         */
-        return u2;
-    }
-
-    return NULL;
 }
 
 /* - String Listen --------------------------------------------- */

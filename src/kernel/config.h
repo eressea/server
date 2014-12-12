@@ -168,7 +168,6 @@ extern "C" {
     struct unit *createunit(struct region *r, struct faction *f,
         int number, const struct race *rc);
     void create_unitid(struct unit *u, int id);
-    struct unit *getunit_deprecated(const struct region *r, const struct faction *f);
     int getunit(const struct region * r, const struct faction * f, struct unit **uresult);
 
     int read_unitid(const struct faction *f, const struct region *r);
