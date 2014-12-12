@@ -750,8 +750,27 @@ void demographics(void)
             int rp = rpeasants(r) + r->land->newpeasants;
             rsetpeasants(r, _max(0, rp));
         }
+        /* Genereate some (0-2 to 0-6 depending on the income) peasants out of nothing */
+        /*if less then 50 are in the region and there is space and no monster or deamon units in the region */
+        int peasants = rpeasants(r);
+        if (r->land && (peasants < 50) && maxworkingpeasants(r) > (peasants+30)*2)
+        {
+            int badunit = 0;
+            unit *u;
+            for (u = r->units; u; u = u->next) {
+                if (!playerrace(u_race(u)) || u_race(u) == get_race(RC_DAEMON))
+                {
+                    badunit = 1;
+                    break;
+                }
+            }
+            if (badunit == 0)
+            {
+                peasants += (int)(rng_double()*(wage(r, NULL, NULL, turn) - 9));
+                rsetpeasants(r, peasants);
+            }
+        }
     }
-
     checkorders();
 }
 
