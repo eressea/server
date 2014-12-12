@@ -6,6 +6,7 @@
 #include <util/parser.h>
 #include <util/language.h>
 
+#include <tests.h>
 #include <CuTest.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,7 +14,10 @@
 static void test_create_order(CuTest *tc) {
     char cmd[32];
     order *ord;
-    struct locale * lang = get_or_create_locale("en");
+    struct locale * lang;
+
+    test_cleanup();
+    lang = get_or_create_locale("en");
 
     locale_setstring(lang, "keyword::move", "MOVE");
     ord = create_order(K_MOVE, lang, "NORTH");
@@ -24,12 +28,16 @@ static void test_create_order(CuTest *tc) {
     CuAssertIntEquals(tc, K_MOVE, init_order(ord));
     CuAssertStrEquals(tc, "NORTH", getstrtoken());
     free_order(ord);
+    test_cleanup();
 }
 
 static void test_parse_order(CuTest *tc) {
     char cmd[32];
     order *ord;
-    struct locale * lang = get_or_create_locale("en");
+    struct locale * lang;
+    
+    test_cleanup();
+    lang = get_or_create_locale("en");
 
     locale_setstring(lang, "keyword::move", "MOVE");
     ord = parse_order("MOVE NORTH", lang);
@@ -40,12 +48,16 @@ static void test_parse_order(CuTest *tc) {
     CuAssertIntEquals(tc, K_MOVE, init_order(ord));
     CuAssertStrEquals(tc, "NORTH", getstrtoken());
     free_order(ord);
+    test_cleanup();
 }
 
 static void test_parse_make(CuTest *tc) {
     char cmd[32];
     order *ord;
-    struct locale * lang = get_or_create_locale("en");
+    struct locale * lang;
+
+    test_cleanup();
+    lang = get_or_create_locale("en");
 
     locale_setstring(lang, keyword(K_MAKE), "MAKE");
     locale_setstring(lang, keyword(K_MAKETEMP), "MAKETEMP");
@@ -58,13 +70,16 @@ static void test_parse_make(CuTest *tc) {
     CuAssertIntEquals(tc, K_MAKE, init_order(ord));
     CuAssertStrEquals(tc, "hurrdurr", getstrtoken());
     free_order(ord);
+    test_cleanup();
 }
 
 static void test_parse_make_temp(CuTest *tc) {
     char cmd[32];
     order *ord;
-    struct locale * lang = get_or_create_locale("en");
+    struct locale * lang;
 
+    test_cleanup();
+    lang = get_or_create_locale("en");
     locale_setstring(lang, keyword(K_MAKE), "MAKE");
     locale_setstring(lang, keyword(K_MAKETEMP), "MAKETEMP");
     locale_setstring(lang, "TEMP", "TEMP");
@@ -78,6 +93,7 @@ static void test_parse_make_temp(CuTest *tc) {
     CuAssertIntEquals(tc, K_MAKETEMP, init_order(ord));
     CuAssertStrEquals(tc, "herp", getstrtoken());
     free_order(ord);
+    test_cleanup();
 }
 
 static void test_parse_maketemp(CuTest *tc) {

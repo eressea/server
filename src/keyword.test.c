@@ -42,6 +42,7 @@ static void test_findkeyword(CuTest *tc) {
     CuAssertIntEquals(tc, K_STUDY, findkeyword("study"));
     CuAssertIntEquals(tc, NOKEYWORD, findkeyword(""));
     CuAssertIntEquals(tc, NOKEYWORD, findkeyword("potato"));
+    test_cleanup();
 }
 
 static void test_get_keyword_default(CuTest *tc) {
@@ -51,6 +52,7 @@ static void test_get_keyword_default(CuTest *tc) {
     CuAssertIntEquals(tc, NOKEYWORD, get_keyword("potato", lang));
     CuAssertIntEquals(tc, K_MOVE, get_keyword("move", lang));
     CuAssertIntEquals(tc, K_STUDY, get_keyword("study", lang));
+    test_cleanup();
 }
 
 static void test_get_shortest_match(CuTest *tc) {
@@ -69,6 +71,7 @@ static void test_get_shortest_match(CuTest *tc) {
     CuAssertIntEquals(tc, K_STATUS, get_keyword("COM", lang));
     CuAssertIntEquals(tc, K_STATUS, get_keyword("COMBAT", lang));
     CuAssertIntEquals(tc, K_COMBATSPELL, get_keyword("COMBATS", lang));
+    test_cleanup();
 }
 
 #define SUITE_DISABLE_TEST(suite, test) (void)test

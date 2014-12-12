@@ -6,14 +6,15 @@
 
 #pragma warning(disable: 4210)
 #define ADD_TESTS(suite, name) \
-CuSuite *get_##name##_suite(void); \
-CuSuiteAddSuite(suite, get_##name##_suite())
+   CuSuite *get_##name##_suite(void); \
+   CuSuite *name = get_##name##_suite(); \
+   CuSuiteAddSuite(suite, name);
 
 int RunAllTests(void)
 {
   CuString *output = CuStringNew();
   CuSuite *suite = CuSuiteNew();
-  int flags = log_flags;
+  int result, flags = log_flags;
 
   log_flags = LOG_FLUSH | LOG_CPERROR;
   kernel_init();
@@ -66,8 +67,10 @@ int RunAllTests(void)
   CuSuiteDetails(suite, output);
   printf("%s\n", output->buffer);
 
-  log_flags = flags;
-  return suite->failCount;
+    log_flags = flags;
+    result = suite->failCount;
+    CuSuiteDelete(suite);
+    return result;
 }
 
 int main(int argc, char ** argv) {

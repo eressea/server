@@ -3675,7 +3675,7 @@ static void free_fighter(fighter * fig)
 
 }
 
-static void free_battle(battle * b)
+void free_battle(battle * b)
 {
     int max_fac_no = 0;
 
@@ -4338,5 +4338,6 @@ void battle_free(battle * b) {
         }
         free_side(s);
     }
+    free(b);
 }
 
