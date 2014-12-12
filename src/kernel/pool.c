@@ -84,34 +84,34 @@ int change_resource(unit * u, const resource_type * rtype, int change)
     return i;
 }
 
-int get_reservation(const unit * u, const resource_type * rtype)
+int get_reservation(const unit * u, const item_type * itype)
 {
     reservation *res = u->reservations;
 
-    if (rtype == get_resourcetype(R_STONE) && (u_race(u)->flags & RCF_STONEGOLEM))
+    if (itype->rtype == get_resourcetype(R_STONE) && (u_race(u)->flags & RCF_STONEGOLEM))
         return (u->number * GOLEM_STONE);
-    if (rtype == get_resourcetype(R_IRON) && (u_race(u)->flags & RCF_IRONGOLEM))
+    if (itype->rtype == get_resourcetype(R_IRON) && (u_race(u)->flags & RCF_IRONGOLEM))
         return (u->number * GOLEM_IRON);
-    while (res && res->type != rtype)
+    while (res && res->type != itype)
         res = res->next;
     if (res)
         return res->value;
     return 0;
 }
 
-int change_reservation(unit * u, const resource_type * rtype, int value)
+int change_reservation(unit * u, const item_type * itype, int value)
 {
     reservation *res, **rp = &u->reservations;
 
     if (!value)
         return 0;
 
-    while (*rp && (*rp)->type != rtype)
+    while (*rp && (*rp)->type != itype)
         rp = &(*rp)->next;
     res = *rp;
     if (!res) {
         *rp = res = calloc(sizeof(reservation), 1);
-        res->type = rtype;
+        res->type = itype;
         res->value = value;
     }
     else if (res && res->value + value <= 0) {
@@ -125,18 +125,18 @@ int change_reservation(unit * u, const resource_type * rtype, int value)
     return res->value;
 }
 
-int set_resvalue(unit * u, const resource_type * rtype, int value)
+int set_resvalue(unit * u, const item_type * itype, int value)
 {
     reservation *res, **rp = &u->reservations;
-    assert(rtype->itype);
-    while (*rp && (*rp)->type != rtype)
+
+    while (*rp && (*rp)->type != itype)
         rp = &(*rp)->next;
     res = *rp;
     if (!res) {
         if (!value)
             return 0;
         *rp = res = calloc(sizeof(reservation), 1);
-        res->type = rtype;
+        res->type = itype;
         res->value = value;
     }
     else if (res && value <= 0) {
@@ -166,8 +166,8 @@ int count)
 
     if ((mode & GET_SLACK) && (mode & GET_RESERVE))
         use = have;
-    else if (mode & (GET_SLACK|GET_RESERVE)) {
-        int reserve = get_reservation(u, rtype);
+    else if (rtype->itype && mode & (GET_SLACK | GET_RESERVE)) {
+        int reserve = get_reservation(u, rtype->itype);
         int slack = _max(0, have - reserve);
         if (mode & GET_RESERVE)
             use = have - slack;
@@ -211,13 +211,13 @@ use_pooled(unit * u, const resource_type * rtype, unsigned int mode, int count)
     if ((mode & GET_SLACK) && (mode & GET_RESERVE)) {
         n = _min(use, have);
     }
-    else {
-        int reserve = get_reservation(u, rtype);
+    else if (rtype->itype) {
+        int reserve = get_reservation(u, rtype->itype);
         int slack = _max(0, have - reserve);
         if (mode & GET_RESERVE) {
             n = have - slack;
             n = _min(use, n);
-            change_reservation(u, rtype, -n);
+            change_reservation(u, rtype->itype, -n);
         }
         else if (mode & GET_SLACK) {
             n = _min(use, slack);
@@ -229,23 +229,24 @@ use_pooled(unit * u, const resource_type * rtype, unsigned int mode, int count)
     }
 
     if (rtype->flags & RTF_POOLED && mode & ~(GET_SLACK | GET_RESERVE)) {
-        for (v = r->units; use > 0 && v != NULL; v = v->next)
+        for (v = r->units; use > 0 && v != NULL; v = v->next) {
             if (u != v) {
-            int mask;
-            if ((urace(v)->ec_flags & GIVEITEM) == 0)
-                continue;
-            if (v->items == NULL && rtype->uget == NULL)
-                continue;
+                int mask;
+                if ((urace(v)->ec_flags & GIVEITEM) == 0)
+                    continue;
+                if (v->items == NULL && rtype->uget == NULL)
+                    continue;
 
-            if (v->faction == f) {
-                mask = (mode >> 3) & (GET_SLACK | GET_RESERVE);
+                if (v->faction == f) {
+                    mask = (mode >> 3) & (GET_SLACK | GET_RESERVE);
+                }
+                else if (alliedunit(v, f, HELP_MONEY))
+                    mask = (mode >> 6) & (GET_SLACK | GET_RESERVE);
+                else
+                    continue;
+                use -= use_pooled(v, rtype, mask, use);
             }
-            else if (alliedunit(v, f, HELP_MONEY))
-                mask = (mode >> 6) & (GET_SLACK | GET_RESERVE);
-            else
-                continue;
-            use -= use_pooled(v, rtype, mask, use);
-            }
+        }
     }
     return count - use;
 }

@@ -298,6 +298,7 @@ extern "C" {
     R_PERMAURA,                 /* Permanente Aura */
     R_LIFE,
     R_PEASANT,
+    R_PERSON,
 
     MAX_RESOURCES,              /* do not use outside item.c ! */
     NORESOURCE = -1

@@ -73,7 +73,7 @@ extern "C" {
 
   typedef struct reservation {
     struct reservation *next;
-    const struct resource_type *type;
+    const struct item_type *type;
     int value;
   } reservation;
 

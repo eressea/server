@@ -401,25 +401,25 @@ void read_items(struct storage *store, item ** ilist)
 {
     for (;;) {
         char ibuf[32];
-        const resource_type *rtype;
+        const item_type *itype;
         int i;
         READ_STR(store, ibuf, sizeof(ibuf));
         if (!strcmp("end", ibuf)) {
             break;
         }
-        rtype = rt_find(ibuf);
+        itype = it_find(ibuf);
         READ_INT(store, &i);
         if (i <= 0) {
-            log_error("data contains an entry with %d %s\n", i, resourcename(rtype, NMF_PLURAL));
+            log_error("data contains an entry with %d %s\n", i, resourcename(itype->rtype, NMF_PLURAL));
         }
         else {
-            if (rtype && rtype->itype) {
-                i_change(ilist, rtype->itype, i);
+            if (itype && itype->rtype) {
+                i_change(ilist, itype, i);
             }
             else {
                 log_error("data contains unknown item type %s.\n", ibuf);
             }
-            assert(rtype && rtype->itype);
+            assert(itype && itype->rtype);
         }
     }
 }

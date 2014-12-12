@@ -604,7 +604,7 @@ static const char *resourcenames[MAX_RESOURCES] = {
     "aurafocus", "sphereofinv", "magicbag",
     "magicherbbag", "dreameye", "p2", "seed", "mallornseed",
     "money", "aura", "permaura",
-    "hp", "peasant"
+    "hp", "peasant", "person"
 };
 
 const resource_type *get_resourcetype(resource_t type) {
@@ -948,6 +948,8 @@ static void init_oldpotions(void)
 void init_resources(void)
 {
     resource_type *rtype;
+
+    rtype = rt_get_or_create(resourcenames[R_PERSON]); // lousy hack
 
     rtype = rt_get_or_create(resourcenames[R_PEASANT]);
     rtype->uchange = res_changepeasants;

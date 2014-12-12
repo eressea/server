@@ -685,13 +685,16 @@ static void
 fwriteorder(FILE * F, const struct order *ord, const struct locale *lang,
 bool escape)
 {
-    char ebuf[1024];
+    char ebuf[1025];
     char obuf[1024];
     const char *str = obuf;
     fputc('"', F);
     write_order(ord, obuf, sizeof(obuf));
     if (escape) {
         str = escape_string(obuf, ebuf, sizeof(ebuf));
+        if (str == ebuf) {
+            ebuf[1024] = 0;
+        }
     }
     if (str[0])
         fputs(str, F);
