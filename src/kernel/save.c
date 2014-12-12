@@ -645,36 +645,10 @@ unit *read_unit(struct gamedata *data)
     READ_INT(data->store, &n);
     u->age = (short)n;
 
-    if (data->version < STORAGE_VERSION) {
-        char *space;
-        READ_STR(data->store, rname, sizeof(rname));
-        space = strchr(rname, ' ');
-        if (space != NULL) {
-            char *inc = space + 1;
-            char *outc = space;
-            do {
-                while (*inc == ' ')
-                    ++inc;
-                while (*inc) {
-                    *outc++ = *inc++;
-                    if (*inc == ' ')
-                        break;
-                }
-            } while (*inc);
-            *outc = 0;
-        }
-    }
-    else {
-        READ_TOK(data->store, rname, sizeof(rname));
-    }
+    READ_TOK(data->store, rname, sizeof(rname));
     u_setrace(u, rc_find(rname));
 
-    if (data->version < STORAGE_VERSION) {
-        READ_STR(data->store, rname, sizeof(rname));
-    }
-    else {
-        READ_TOK(data->store, rname, sizeof(rname));
-    }
+    READ_TOK(data->store, rname, sizeof(rname));
     if (rname[0] && skill_enabled(SK_STEALTH))
         u->irace = rc_find(rname);
     else
@@ -869,13 +843,11 @@ static region *readregion(struct gamedata *data, int x, int y)
 {
     region *r = findregion(x, y);
     const terrain_type *terrain;
-    char token[32];
+    char name[NAMESIZE];
     int uid = 0;
     int n;
 
-    if (data->version >= UID_VERSION) {
-        READ_INT(data->store, &uid);
-    }
+    READ_INT(data->store, &uid);
 
     if (r == NULL) {
         plane *pl = findplane(x, y);
@@ -906,23 +878,11 @@ static region *readregion(struct gamedata *data, int x, int y)
         region_setinfo(r, info);
     }
 
-    if (data->version < TERRAIN_VERSION) {
-        int ter;
-        READ_INT(data->store, &ter);
-        terrain = newterrain((terrain_t)ter);
-        if (terrain == NULL) {
-            log_error("while reading datafile from pre-TERRAIN_VERSION, could not find terrain #%d.\n", ter);
-            terrain = newterrain(T_PLAIN);
-        }
-    }
-    else {
-        char name[64];
-        READ_STR(data->store, name, sizeof(name));
-        terrain = get_terrain(name);
-        if (terrain == NULL) {
-            log_error("Unknown terrain '%s'\n", name);
-            assert(!"unknown terrain");
-        }
+    READ_STR(data->store, name, sizeof(name));
+    terrain = get_terrain(name);
+    if (terrain == NULL) {
+        log_error("Unknown terrain '%s'\n", name);
+        assert(!"unknown terrain");
     }
     r->terrain = terrain;
     READ_INT(data->store, &r->flags);
@@ -930,7 +890,6 @@ static region *readregion(struct gamedata *data, int x, int y)
     r->age = (unsigned short)n;
 
     if (fval(r->terrain, LAND_REGION)) {
-        char name[NAMESIZE];
         r->land = calloc(1, sizeof(land_region));
         READ_STR(data->store, name, sizeof(name));
         r->land->name = _strdup(name);
@@ -963,13 +922,13 @@ static region *readregion(struct gamedata *data, int x, int y)
         assert(*pres == NULL);
         for (;;) {
             rawmaterial *res;
-            READ_STR(data->store, token, sizeof(token));
-            if (strcmp(token, "end") == 0)
+            READ_STR(data->store, name, sizeof(name));
+            if (strcmp(name, "end") == 0)
                 break;
             res = malloc(sizeof(rawmaterial));
-            res->type = rmt_find(token);
+            res->type = rmt_find(name);
             if (res->type == NULL) {
-                log_error("invalid resourcetype %s in data.\n", token);
+                log_error("invalid resourcetype %s in data.\n", name);
             }
             assert(res->type != NULL);
             READ_INT(data->store, &n);
@@ -990,9 +949,9 @@ static region *readregion(struct gamedata *data, int x, int y)
         }
         *pres = NULL;
 
-        READ_STR(data->store, token, sizeof(token));
-        if (strcmp(token, "noherb") != 0) {
-            const resource_type *rtype = rt_find(token);
+        READ_STR(data->store, name, sizeof(name));
+        if (strcmp(name, "noherb") != 0) {
+            const resource_type *rtype = rt_find(name);
             assert(rtype && rtype->itype && fval(rtype->itype, ITF_HERB));
             rsetherbtype(r, rtype->itype);
         }
@@ -1016,17 +975,15 @@ static region *readregion(struct gamedata *data, int x, int y)
         int n;
         for (;;) {
             const struct resource_type *rtype;
-            READ_STR(data->store, token, sizeof(token));
-            if (!strcmp(token, "end"))
+            READ_STR(data->store, name, sizeof(name));
+            if (!strcmp(name, "end"))
                 break;
-            rtype = rt_find(token);
+            rtype = rt_find(name);
             assert(rtype && rtype->ltype);
             READ_INT(data->store, &n);
             r_setdemand(r, rtype->ltype, n);
         }
-        if (data->version >= REGIONITEMS_VERSION) {
-            read_items(data->store, &r->land->items);
-        }
+        read_items(data->store, &r->land->items);
         if (data->version >= REGIONOWNER_VERSION) {
             READ_INT(data->store, &n);
             r->land->morale = (short)n;
@@ -1088,10 +1045,8 @@ void writeregion(struct gamedata *data, const region * r)
             WRITE_INT(data->store, demand->value);
             }
         WRITE_TOK(data->store, "end");
-#if RELEASE_VERSION>=REGIONITEMS_VERSION
         write_items(data->store, r->land->items);
         WRITE_SECTION(data->store);
-#endif
 #if RELEASE_VERSION>=REGIONOWNER_VERSION
         WRITE_INT(data->store, r->land->morale);
         write_owner(data, r->land->ownership);
@@ -1163,24 +1118,13 @@ void read_spellbook(spellbook **bookp, struct storage *store, int(*get_level)(co
         char spname[64];
         int level = 0;
 
-        if (global.data_version < SPELLNAME_VERSION) {
-            int i;
-            READ_INT(store, &i);
-            if (i < 0)
-                break;
-            if (bookp) {
-                sp = find_spellbyid((unsigned int)i);
-            }
-        }
-        else {
-            READ_TOK(store, spname, sizeof(spname));
-            if (strcmp(spname, "end") == 0)
-                break;
-            if (bookp) {
-                sp = find_spell(spname);
-                if (!sp) {
-                    log_error("read_spells: could not find spell '%s'\n", spname);
-                }
+        READ_TOK(store, spname, sizeof(spname));
+        if (strcmp(spname, "end") == 0)
+            break;
+        if (bookp) {
+            sp = find_spell(spname);
+            if (!sp) {
+                log_error("read_spells: could not find spell '%s'\n", spname);
             }
         }
         if (global.data_version >= SPELLBOOK_VERSION) {
@@ -1355,15 +1299,7 @@ faction *readfaction(struct gamedata * data)
     else {
         for (;;) {
             int aid = 0;
-            if (data->version < STORAGE_VERSION) {
-                READ_TOK(data->store, name, sizeof(name));
-                if (strcmp(name, "end") != 0) {
-                    aid = atoi36(name);
-                }
-            }
-            else {
-                READ_INT(data->store, &aid);
-            }
+            READ_INT(data->store, &aid);
             if (aid > 0) {
                 int state;
                 READ_INT(data->store, &state);
@@ -1445,7 +1381,7 @@ void writefaction(struct gamedata *data, const faction * f)
 
 int readgame(const char *filename, int backup)
 {
-    int i, n, p, nread;
+    int n, p, nread;
     faction *f, **fp;
     region *r;
     building *b, **bp;
@@ -1593,14 +1529,6 @@ int readgame(const char *filename, int backup)
         fhash(f);
     }
     *fp = 0;
-
-    /* ignore the obsolete list of "used" faction ids */
-    if (gdata.version < STORAGE_VERSION) {
-        READ_INT(&store, &i);
-        while (i--) {
-            READ_INT(&store, &n);
-        }
-    }
 
     /* Regionen */
 
@@ -1975,9 +1903,6 @@ void a_writeint(const attrib * a, const void *owner, struct storage *store)
 int a_readshorts(attrib * a, void *owner, struct storage *store)
 {
     int n;
-    if (global.data_version < ATTRIBREAD_VERSION) {
-        return a_readint(a, store, owner);
-    }
     READ_INT(store, &n);
     a->data.sa[0] = (short)n;
     READ_INT(store, &n);
@@ -1994,9 +1919,6 @@ void a_writeshorts(const attrib * a, const void *owner, struct storage *store)
 int a_readchars(attrib * a, void *owner, struct storage *store)
 {
     int i;
-    if (global.data_version < ATTRIBREAD_VERSION) {
-        return a_readint(a, store, owner);
-    }
     for (i = 0; i != 4; ++i) {
         int n;
         READ_INT(store, &n);
@@ -2016,9 +1938,6 @@ void a_writechars(const attrib * a, const void *owner, struct storage *store)
 
 int a_readvoid(attrib * a, void *owner, struct storage *store)
 {
-    if (global.data_version < ATTRIBREAD_VERSION) {
-        return a_readint(a, store, owner);
-    }
     return AT_READ_OK;
 }
 

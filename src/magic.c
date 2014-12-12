@@ -229,21 +229,12 @@ struct storage *store)
         spell *sp;
         char spname[64];
 
-        if (global.data_version < SPELLNAME_VERSION) {
-            int i;
-            READ_INT(store, &i);
-            if (i < 0)
-                break;
-            sp = find_spellbyid((unsigned int)i);
-        }
-        else {
-            READ_TOK(store, spname, sizeof(spname));
-            if (strcmp(spname, "end") == 0)
-                break;
-            sp = find_spell(spname);
-            if (!sp) {
-                log_error("read_spells: could not find spell '%s' in school '%s'\n", spname, magic_school[mtype]);
-            }
+        READ_TOK(store, spname, sizeof(spname));
+        if (strcmp(spname, "end") == 0)
+            break;
+        sp = find_spell(spname);
+        if (!sp) {
+            log_error("read_spells: could not find spell '%s' in school '%s'\n", spname, magic_school[mtype]);
         }
         if (sp) {
             add_spell(slistp, sp);
@@ -272,23 +263,13 @@ static int read_mage(attrib * a, void *owner, struct storage *store)
     for (i = 0; i != MAXCOMBATSPELLS; ++i) {
         spell *sp = NULL;
         int level = 0;
-        if (global.data_version < SPELLNAME_VERSION) {
-            int spid;
-            READ_INT(store, &spid);
-            READ_INT(store, &level);
-            if (spid >= 0) {
-                sp = find_spellbyid((unsigned int)spid);
-            }
-        }
-        else {
-            READ_TOK(store, spname, sizeof(spname));
-            READ_INT(store, &level);
+        READ_TOK(store, spname, sizeof(spname));
+        READ_INT(store, &level);
 
-            if (strcmp("none", spname) != 0) {
-                sp = find_spell(spname);
-                if (!sp) {
-                    log_error("read_mage: could not find combat spell '%s' in school '%s'\n", spname, magic_school[mage->magietyp]);
-                }
+        if (strcmp("none", spname) != 0) {
+            sp = find_spell(spname);
+            if (!sp) {
+                log_error("read_mage: could not find combat spell '%s' in school '%s'\n", spname, magic_school[mage->magietyp]);
             }
         }
         if (sp && level >= 0) {

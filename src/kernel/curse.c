@@ -226,12 +226,7 @@ int curse_read(attrib * a, void *owner, struct storage *store)
         assert(result == 0);
         return AT_READ_FAIL;
     }
-    if (global.data_version < CURSEFLAGS_VERSION) {
-        c_setflag(c, flags);
-    }
-    else {
-        c->flags = flags;
-    }
+    c->flags = flags;
     c_clearflag(c, CURSE_ISNEW);
 
     if (c->type->read)

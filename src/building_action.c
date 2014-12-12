@@ -104,12 +104,7 @@ static int lc_read(struct attrib *a, void *owner, struct storage *store)
     building_action *data = (building_action *)a->data.v;
     int result =
         read_reference(&data->b, store, read_building_reference, resolve_building);
-    if (global.data_version < UNICODE_VERSION) {
-        READ_STR(store, name, sizeof(name));
-    }
-    else {
-        READ_TOK(store, name, sizeof(name));
-    }
+    READ_TOK(store, name, sizeof(name));
     if (strcmp(name, "tunnel_action") == 0) {
         /* E2: Weltentor has a new module, doesn't need this any longer */
         result = 0;
@@ -119,16 +114,11 @@ static int lc_read(struct attrib *a, void *owner, struct storage *store)
         data->fname = _strdup(name);
     }
     if (global.data_version >= BACTION_VERSION) {
-        if (global.data_version < UNICODE_VERSION) {
-            READ_STR(store, name, sizeof(name));
-        }
-        else {
-            READ_TOK(store, name, sizeof(name));
-            if (strcmp(name, "tnnL") == 0) {
-                /* tunnel_action was the old Weltentore, their code has changed. ignore this object */
-                result = 0;
-                data->b = 0;
-            }
+        READ_TOK(store, name, sizeof(name));
+        if (strcmp(name, "tnnL") == 0) {
+            /* tunnel_action was the old Weltentore, their code has changed. ignore this object */
+            result = 0;
+            data->b = 0;
         }
         if (strcmp(name, NULLSTRING) == 0)
             data->param = 0;

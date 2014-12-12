@@ -174,17 +174,8 @@ static void wall_read(connection * b, storage * store)
 {
   static wall_data dummy;
   wall_data *fd = b->data.v ? (wall_data *) b->data.v : &dummy;
-  variant mno;
 
-  if (global.data_version < STORAGE_VERSION) {
-    READ_INT(store, &mno.i);
-    fd->mage = findunit(mno.i);
-    if (!fd->mage && b->data.v) {
-      ur_add(mno, &fd->mage, resolve_unit);
-    }
-  } else {
-    read_reference(&fd->mage, store, read_unit_reference, resolve_unit);
-  }
+  read_reference(&fd->mage, store, read_unit_reference, resolve_unit);
   READ_INT(store, &fd->force);
   if (global.data_version >= NOBORDERATTRIBS_VERSION) {
     READ_INT(store, &fd->countdown);

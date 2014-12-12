@@ -74,39 +74,16 @@ static int a_agedirection(attrib * a)
 static int a_readdirection(attrib * a, void *owner, struct storage *store)
 {
     spec_direction *d = (spec_direction *)(a->data.v);
+    char lbuf[32];
 
     (void) owner;
     READ_INT(store, &d->x);
     READ_INT(store, &d->y);
     READ_INT(store, &d->duration);
-    if (global.data_version < UNICODE_VERSION) {
-        char lbuf[16];
-        dir_lookup *dl = dir_name_lookup;
-
-        READ_TOK(store, NULL, 0);
-        READ_TOK(store, lbuf, sizeof(lbuf));
-
-        untilde(lbuf);
-        for (; dl; dl = dl->next) {
-            if (strcmp(lbuf, dl->oldname) == 0) {
-                d->keyword = _strdup(dl->name);
-                _snprintf(lbuf, sizeof(lbuf), "%s_desc", d->keyword);
-                d->desc = _strdup(dl->name);
-                break;
-            }
-        }
-        if (dl == NULL) {
-            log_error("unknown spec_direction '%s'\n", lbuf);
-            assert(!"not implemented");
-        }
-    }
-    else {
-        char lbuf[32];
-        READ_TOK(store, lbuf, sizeof(lbuf));
-        d->desc = _strdup(lbuf);
-        READ_TOK(store, lbuf, sizeof(lbuf));
-        d->keyword = _strdup(lbuf);
-    }
+    READ_TOK(store, lbuf, sizeof(lbuf));
+    d->desc = _strdup(lbuf);
+    READ_TOK(store, lbuf, sizeof(lbuf));
+    d->keyword = _strdup(lbuf);
     d->active = true;
     return AT_READ_OK;
 }
