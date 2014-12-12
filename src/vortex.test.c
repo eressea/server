@@ -33,6 +33,7 @@ static void test_move_to_vortex(CuTest *tc) {
     CuAssertIntEquals(tc, E_MOVE_NOREGION, movewhere(u, "barf", r1, &r));
     CuAssertIntEquals(tc, E_MOVE_OK, movewhere(u, "wirbel", r1, &r));
     CuAssertPtrEquals(tc, r2, r);
+    test_cleanup();
 }
 
 CuSuite *get_vortex_suite(void)

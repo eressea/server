@@ -78,7 +78,12 @@ ln -f $LIVE/data/$turn.dat data/
 rm -rf reports
 mkdir -p reports
 
-$SOURCE/build-x86_64-gcc-Debug/eressea/eressea -v$verbose -t$turn -re$game $SOURCE/scripts/run-turn.lua
+SERVER="$SOURCE/build-x86_64-gcc-Debug/eressea/eressea"
+VALGRIND=$(which valgrind)
+if [ ! -z $VALGRIND ]; then
+SERVER="$VALGRIND --leak-check=no $SERVER"
+fi
+$SERVER -v$verbose -t$turn -re$game $SOURCE/scripts/run-turn.lua
 let turn=$turn+1
 [ -e data/$turn.dat ] || abort "no data file created"
 }

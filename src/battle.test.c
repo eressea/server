@@ -53,6 +53,8 @@ static void test_make_fighter(CuTest * tc)
     CuAssertIntEquals(tc, 3, af->magic);
     CuAssertIntEquals(tc, 1, af->horses);
     CuAssertIntEquals(tc, 0, af->elvenhorses);
+    free_battle(b);
+    test_cleanup();
 }
 
 static int add_two(building * b, unit * u) {
@@ -102,6 +104,8 @@ static void test_defenders_get_building_bonus(CuTest * tc)
 
   diff = skilldiff(dt, at, 0);
   CuAssertIntEquals(tc, 0, diff);
+    free_battle(b);
+    test_cleanup();
 }
 
 static void test_attackers_get_no_building_bonus(CuTest * tc)
@@ -130,6 +134,8 @@ static void test_attackers_get_no_building_bonus(CuTest * tc)
   af = make_fighter(b, au, as, true);
 
   CuAssertPtrEquals(tc, 0, af->building);
+    free_battle(b);
+    test_cleanup();
 }
 
 static void test_building_bonus_respects_size(CuTest * tc)
@@ -166,6 +172,8 @@ static void test_building_bonus_respects_size(CuTest * tc)
 
   CuAssertPtrEquals(tc, bld, af->building);
   CuAssertPtrEquals(tc, 0, df->building);
+    free_battle(b);
+    test_cleanup();
 }
 
 CuSuite *get_battle_suite(void)
