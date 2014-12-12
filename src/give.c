@@ -434,7 +434,7 @@ void give_unit(unit * u, unit * u2, order * ord)
                 cmistake(u, ord, 152, MSG_COMMERCE);
             }
         }
-        else if (getunitpeasants) {
+        else {
             unit *u3;
 
             for (u3 = r->units; u3; u3 = u3->next)
@@ -460,10 +460,6 @@ void give_unit(unit * u, unit * u2, order * ord)
             else {
                 cmistake(u, ord, 153, MSG_COMMERCE);
             }
-        }
-        else {
-            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found",
-                ""));
         }
         return;
     }
@@ -520,12 +516,25 @@ void give_unit(unit * u, unit * u2, order * ord)
     u2->faction->newbies += n;
 }
 
+bool can_give_to(unit *u, unit *u2) {
+    /* Damit Tarner nicht durch die Fehlermeldung enttarnt werden können */
+    if (!u2 || u2->number == 0) {
+        return false;
+    }
+    if (u2 && !alliedunit(u2, u->faction, HELP_GIVE)
+        && !cansee(u->faction, u->region, u2, 0) && !ucontact(u2, u)
+        && !fval(u2, UFL_TAKEALL)) {
+        return false;
+    }
+    return true;
+}
+
 void give_cmd(unit * u, order * ord)
 {
     region *r = u->region;
     unit *u2;
     const char *s;
-    int n;
+    int err, n;
     const item_type *itype;
     param_t p;
     plane *pl;
@@ -534,7 +543,7 @@ void give_cmd(unit * u, order * ord)
 
     kwd = init_order(ord);
     assert(kwd == K_GIVE);
-    u2 = getunit(r, u->faction);
+    err = getunit(r, u->faction, &u2);
     s = getstrtoken();
     n = s ? atoip(s) : 0;
     p = (n > 0) ? NOPARAM : findparam(s, u->faction->locale);
@@ -545,28 +554,19 @@ void give_cmd(unit * u, order * ord)
         return;
     }
 
-    if (!u2 && !getunitpeasants) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found",
-            ""));
+    if (err == GET_NOTFOUND || (err != GET_PEASANTS && !can_give_to(u, u2))) {
+        ADDMSG(&u->faction->msgs,
+            msg_feedback(u, ord, "feedback_unit_not_found", ""));
+        return;
+    }
+    if (u == u2) {
+        cmistake(u, ord, 8, MSG_COMMERCE);
         return;
     }
 
     msg = check_give(u, u2, ord);
     if (msg) {
         ADDMSG(&u->faction->msgs, msg);
-        return;
-    }
-
-    /* Damit Tarner nicht durch die Fehlermeldung enttarnt werden können */
-    if (u2 && !alliedunit(u2, u->faction, HELP_GIVE)
-        && !cansee(u->faction, r, u2, 0) && !ucontact(u2, u)
-        && !fval(u2, UFL_TAKEALL)) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found",
-            ""));
-        return;
-    }
-    if (u == u2) {
-        cmistake(u, ord, 8, MSG_COMMERCE);
         return;
     }
 
@@ -605,11 +605,6 @@ void give_cmd(unit * u, order * ord)
                 msg_feedback(u, ord, "race_notake", "race", u_race(u2)));
             return;
         }
-        if (!u2 && !getunitpeasants) {
-            ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
-                "feedback_unit_not_found", ""));
-            return;
-        }
         if (u->items) {
             item **itmp = &u->items;
             while (*itmp) {
@@ -628,8 +623,9 @@ void give_cmd(unit * u, order * ord)
                 itmp = &itm->next;
             }
         }
-        if (!given)
+        if (!given) {
             cmistake(u, ord, 38, MSG_COMMERCE);
+        }
         return;
     }
 

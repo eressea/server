@@ -121,7 +121,7 @@ int spy_cmd(unit * u, struct order *ord)
   region *r = u->region;
 
   init_order(ord);
-  target = getunit(r, u->faction);
+  target = getunit_deprecated(r, u->faction);
 
   if (!target) {
     ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,

@@ -1830,7 +1830,7 @@ int name_cmd(struct unit *u, struct order *ord)
 
     case P_UNIT:
         if (foreign) {
-            unit *u2 = getunit(r, u->faction);
+            unit *u2 = getunit_deprecated(r, u->faction);
 
             if (!u2 || !cansee(u->faction, r, u2, 0)) {
                 ADDMSG(&u->faction->msgs, msg_feedback(u, ord,

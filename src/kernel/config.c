@@ -1015,19 +1015,38 @@ int read_unitid(const faction * f, const region * r)
     return atoi36((const char *)s);
 }
 
-/* exported symbol */
-bool getunitpeasants;
-
-unit *getunit(const region * r, const faction * f)
+int getunit(const region * r, const faction * f, unit **uresult)
 {
     int n = read_unitid(f, r);
     unit *u2;
 
     if (n == 0) {
-        getunitpeasants = 1;
+        *uresult = 0;
+        return GET_PEASANTS;
+    }
+    if (n < 0)
+        return 0;
+
+    *uresult = u2 = findunit(n);
+    if (u2 != NULL && u2->region == r) {
+        /* there used to be a 'u2->flags & UFL_ISNEW || u2->number>0' condition
+        * here, but it got removed because of a bug that made units disappear:
+        * http://eressea.upb.de/mantis/bug_view_page.php?bug_id=0000172
+        */
+        return GET_UNIT;
+    }
+
+    return GET_NOTFOUND;
+}
+
+unit *getunit_deprecated(const region * r, const faction * f)
+{
+    int n = read_unitid(f, r);
+    unit *u2;
+
+    if (n == 0) {
         return NULL;
     }
-    getunitpeasants = 0;
     if (n < 0)
         return 0;
 

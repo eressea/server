@@ -1248,7 +1248,7 @@ static bool transport(unit * ut, unit * u)
     for (ord = ut->orders; ord; ord = ord->next) {
         if (getkeyword(ord) == K_TRANSPORT) {
             init_order(ord);
-            if (getunit(ut->region, ut->faction) == u) {
+            if (getunit_deprecated(ut->region, ut->faction) == u) {
                 return true;
             }
         }
@@ -1281,7 +1281,7 @@ static void init_transportation(void)
                 unit *ut;
 
                 init_order(u->thisorder);
-                ut = getunit(r, u->faction);
+                ut = getunit_deprecated(r, u->faction);
                 if (ut == NULL) {
                     ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
                         "feedback_unit_not_found", ""));
@@ -1312,14 +1312,14 @@ static void init_transportation(void)
                     if (getkeyword(ord) == K_TRANSPORT) {
                         init_order(ord);
                         for (;;) {
-                            unit *ut = getunit(r, u->faction);
+                            unit *ut = getunit_deprecated(r, u->faction);
 
                             if (ut == NULL)
                                 break;
                             if (getkeyword(ut->thisorder) == K_DRIVE && can_move(ut)
                                 && !fval(ut, UFL_NOTMOVING) && !LongHunger(ut)) {
                                 init_order(ut->thisorder);
-                                if (getunit(r, ut->faction) == u) {
+                                if (getunit_deprecated(r, ut->faction) == u) {
                                     w += weight(ut);
                                 }
                             }
@@ -2204,7 +2204,7 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
             continue;
 
         init_order(ord);
-        ut = getunit(r, u->faction);
+        ut = getunit_deprecated(r, u->faction);
         if (ut != NULL) {
             if (getkeyword(ut->thisorder) == K_DRIVE) {
                 if (ut->building && !can_leave(ut)) {
@@ -2219,7 +2219,7 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
 
                     if (!fval(ut, UFL_NOTMOVING) && !LongHunger(ut)) {
                         init_order(ut->thisorder);
-                        if (getunit(u->region, ut->faction) == u) {
+                        if (getunit_deprecated(u->region, ut->faction) == u) {
                             const region_list *route_to =
                                 travel_route(ut, route_begin, route_end, ord,
                                 TRAVEL_TRANSPORTED);

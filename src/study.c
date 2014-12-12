@@ -390,7 +390,7 @@ int teach_cmd(unit * u, struct order *ord)
         init_order(ord);
 
         while (!parser_end()) {
-            unit *u2 = getunit(r, u->faction);
+            unit *u2 = getunit_deprecated(r, u->faction);
             bool feedback;
             ++count;
 
@@ -406,7 +406,7 @@ int teach_cmd(unit * u, struct order *ord)
 
                 for (j = 0; j != count - 1; ++j) {
                     /* skip over the first 'count' units */
-                    getunit(r, u->faction);
+                    getunit_deprecated(r, u->faction);
                 }
 
                 token = getstrtoken();

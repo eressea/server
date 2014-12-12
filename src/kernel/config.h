@@ -60,6 +60,11 @@ extern "C" {
 #define PLAGUE_HEALCHANCE  0.25F        /* Wahrscheinlichkeit Heilung */
 #define PLAGUE_HEALCOST    30   /* Heilkosten */
 
+
+    /* getunit results: */
+#define GET_UNIT 0
+#define GET_NOTFOUND 1
+#define GET_PEASANTS 2
     /* Bewegungsweiten: */
 #define BP_WALKING 4
 #define BP_RIDING  6
@@ -163,7 +168,8 @@ extern "C" {
     struct unit *createunit(struct region *r, struct faction *f,
         int number, const struct race *rc);
     void create_unitid(struct unit *u, int id);
-    struct unit *getunit(const struct region *r, const struct faction *f);
+    struct unit *getunit_deprecated(const struct region *r, const struct faction *f);
+    int getunit(const struct region * r, const struct faction * f, struct unit **uresult);
 
     int read_unitid(const struct faction *f, const struct region *r);
 
@@ -371,7 +377,6 @@ extern "C" {
 
     extern int turn;
     extern int verbosity;
-    extern bool getunitpeasants;
 
     /** report options **/
     extern const char *options[MAXOPTIONS];
