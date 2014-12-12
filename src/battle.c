@@ -3661,7 +3661,7 @@ static void free_fighter(fighter * fig)
 
 }
 
-static void free_battle(battle * b)
+void free_battle(battle * b)
 {
     int max_fac_no = 0;
 
@@ -4246,7 +4246,6 @@ void do_battle(region * r)
         message_all(b, m);
         msg_release(m);
         free_battle(b);
-        free(b);
         return;
     }
     join_allies(b);
@@ -4293,7 +4292,6 @@ void do_battle(region * r)
 
     if (b) {
         free_battle(b);
-        free(b);
     }
 }
 
@@ -4312,5 +4310,6 @@ void battle_free(battle * b) {
         }
         free_side(s);
     }
+    free(b);
 }
 

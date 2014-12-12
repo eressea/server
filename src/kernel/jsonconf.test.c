@@ -116,6 +116,7 @@ static void test_findrace(CuTest *tc) {
     rc = findrace("Zwerg", lang);
     CuAssertPtrNotNull(tc, rc);
     CuAssertStrEquals(tc, "dwarf", rc->_name);
+    test_cleanup();
 }
 
 static void test_items(CuTest * tc)

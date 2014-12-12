@@ -26,6 +26,18 @@ function callbacks(rules, name, ...)
 	end
 end
 
+local function change_locales(localechange)
+  for loc, flist in pairs(localechange) do
+    for index, name in pairs(flist) do
+      f = get_faction(atoi36(name))
+      if f ~= nil and f.locale ~= loc then
+        print("LOCALECHANGE ", f, f.locale, loc)
+        f.locale = loc
+      end
+    end
+  end
+end
+
 local function dbupdate()
   update_scores()
   dbname = config.dbname or 'eressea.db'
@@ -141,6 +153,9 @@ function process(rules, orders)
 	process_orders()
 	callbacks(rules, 'update')
 
+  local localechange = { de = { 'ii' } }
+  change_locales(localechange)
+
   write_files(config.locales)
 
   file = '' .. get_turn() .. '.dat'
@@ -167,6 +182,16 @@ function run_turn(rules)
   return result
 end
 
+function file_exists(name)
+    local f=io.open(name,"r")
+    if f~=nil then io.close(f) return true else return false end
+end
+
+if file_exists('execute.lock') then
+    eressea.log.error("Lockfile exists, aborting.")
+    assert(false)
+end
+
 local path = 'scripts'
 if config.install then
     path = config.install .. '/' .. path
@@ -174,6 +199,12 @@ end
 package.path = package.path .. ';' .. path .. '/?.lua;' .. path .. '/?/init.lua'
 require 'eressea'
 require 'eressea.xmlconf' -- read xml data
-local rules = require('eressea.rules')
 
+local rules = {}
+if config.rules then
+    rules = require('eressea.' .. config.rules)
+    eressea.log.info('loaded ' .. #rules .. ' modules for ' .. config.rules)
+else
+    eressea.log.warning('no rule modules loaded, specify a game in eressea.ini or with -r')
+end
 run_turn(rules)

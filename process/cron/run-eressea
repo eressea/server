@@ -13,7 +13,12 @@ if [ -d $REPORTS ]; then
 fi
 mkdir $REPORTS
 $BIN/backup-eressea $GAME
+if [ -d test ]; then
+  touch test/execute.lock
+fi
+rm -f execute.lock
 $BIN/run-turn $GAME
+touch execute.lock
 if [ ! -s $ERESSEA/game-$GAME/orders.$TURN ]; then
   echo "server did not create orders for turn $TURN in game $GAME"
   exit 2
@@ -29,5 +34,6 @@ if [ ! -s $REPORTS/reports.txt ]; then
 fi
 $BIN/compress.sh $GAME $TURN
 $BIN/sendreports.sh $GAME
-$BIN/backup-eressea $GAME
+$BIN/backup-eressea $GAME $TURN
 [ $GAME -lt 4 ] && $BIN/send-summary $GAME
+rm -f test/execute.lock
