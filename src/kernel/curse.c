@@ -195,14 +195,8 @@ int curse_read(attrib * a, void *owner, struct storage *store)
     READ_TOK(store, cursename, sizeof(cursename));
     READ_INT(store, &flags);
     READ_INT(store, &c->duration);
-    if (global.data_version >= CURSEVIGOURISFLOAT_VERSION) {
-        READ_FLT(store, &flt);
-        c->vigour = flt;
-    }
-    else {
-        READ_INT(store, &n);
-        c->vigour = (float)n;
-    }
+    READ_FLT(store, &flt);
+    c->vigour = flt;
     if (global.data_version < INTPAK_VERSION) {
         ur = read_reference(&c->magician, store, read_int, resolve_unit);
     }

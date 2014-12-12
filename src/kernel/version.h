@@ -10,16 +10,6 @@
  without prior permission by the authors of Eressea.
  
  */
-#define CURSETYPE_VERSION 312   /* turn 287 */
-#define ALLIANCES_VERSION 313
-#define DBLINK_VERSION 314
-#define CURSEVIGOURISFLOAT_VERSION 315
-#define SAVEXMLNAME_VERSION 316
-#define SAVEALLIANCE_VERSION 317
-#define CLAIM_VERSION 318
-/* 319 is the HSE4 data version */
-#define BACTION_VERSION 319     /* building action gets a param string */
-#define NOLASTORDER_VERSION 320 /* do not use lastorder */
 #define INTPAK_VERSION 329      /* in binary, ints can get packed */
 #define NOZEROIDS_VERSION 330   /* 2008-05-16 zero is not a valid ID for anything (including factions) */
 #define NOBORDERATTRIBS_VERSION 331     /* 2008-05-17 connection::attribs has been moved to userdata */
@@ -38,6 +28,7 @@
 #define SAVEGAMEID_VERSION 343 /* instead of XMLNAME, save the game.id parameter from the config */
 #define BUILDNO_VERSION 344 /* storing the build number in the save */
 #define AUTO_RACENAME_VERSION 345 /* NPC units with name==NULL will automatically get their race for a name */
+
 #define MIN_VERSION INTPAK_VERSION      /* minimal datafile we support */
 #define RELEASE_VERSION AUTO_RACENAME_VERSION /* current datafile */
 

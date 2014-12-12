@@ -113,21 +113,16 @@ static int lc_read(struct attrib *a, void *owner, struct storage *store)
     else {
         data->fname = _strdup(name);
     }
-    if (global.data_version >= BACTION_VERSION) {
-        READ_TOK(store, name, sizeof(name));
-        if (strcmp(name, "tnnL") == 0) {
-            /* tunnel_action was the old Weltentore, their code has changed. ignore this object */
-            result = 0;
-            data->b = 0;
-        }
-        if (strcmp(name, NULLSTRING) == 0)
-            data->param = 0;
-        else {
-            data->param = _strdup(name);
-        }
+    READ_TOK(store, name, sizeof(name));
+    if (strcmp(name, "tnnL") == 0) {
+        /* tunnel_action was the old Weltentore, their code has changed. ignore this object */
+        result = 0;
+        data->b = 0;
     }
-    else {
+    if (strcmp(name, NULLSTRING) == 0)
         data->param = 0;
+    else {
+        data->param = _strdup(name);
     }
     if (result == 0 && !data->b) {
         return AT_READ_FAIL;

@@ -428,10 +428,6 @@ static void read_alliances(struct storage *store)
 {
     char pbuf[8];
     int id, terminator = 0;
-    if (global.data_version < SAVEALLIANCE_VERSION) {
-        if (!AllianceRestricted() && !AllianceAuto())
-            return;
-    }
     if (global.data_version < ALLIANCELEADER_VERSION) {
         terminator = atoi36("end");
         READ_STR(store, pbuf, sizeof(pbuf));
@@ -729,14 +725,6 @@ unit *read_unit(struct gamedata *data)
             }
         }
         READ_STR(data->store, obuf, sizeof(obuf));
-    }
-    if (data->version < NOLASTORDER_VERSION) {
-        order *ord;
-        READ_STR(data->store, obuf, sizeof(obuf));
-        ord = parse_order(obuf, u->faction->locale);
-        if (ord != NULL) {
-            addlist(&u->orders, ord);
-        }
     }
     set_order(&u->thisorder, NULL);
 
@@ -1257,9 +1245,7 @@ faction *readfaction(struct gamedata * data)
     }
 
     a_read(data->store, &f->attribs, f);
-    if (data->version >= CLAIM_VERSION) {
-        read_items(data->store, &f->items);
-    }
+    read_items(data->store, &f->items);
     for (;;) {
         READ_TOK(data->store, name, sizeof(name));
         if (strcmp("end", name) == 0)
@@ -1286,28 +1272,16 @@ faction *readfaction(struct gamedata * data)
     }
 
     sfp = &f->allies;
-    if (data->version < ALLIANCES_VERSION) {
-        int p;
-        READ_INT(data->store, &p);
-        while (--p >= 0) {
-            int aid, state;
-            READ_INT(data->store, &aid);
+    for (;;) {
+        int aid = 0;
+        READ_INT(data->store, &aid);
+        if (aid > 0) {
+            int state;
             READ_INT(data->store, &state);
             sfp = addally(f, sfp, aid, state);
         }
-    }
-    else {
-        for (;;) {
-            int aid = 0;
-            READ_INT(data->store, &aid);
-            if (aid > 0) {
-                int state;
-                READ_INT(data->store, &state);
-                sfp = addally(f, sfp, aid, state);
-            }
-            else {
-                break;
-            }
+        else {
+            break;
         }
     }
     read_groups(data->store, f);
@@ -1439,9 +1413,8 @@ int readgame(const char *filename, int backup)
             getchar();
         }
     }
-    else if (gdata.version >= SAVEXMLNAME_VERSION) {
-        char basefile[32];
-        READ_STR(&store, basefile, sizeof(basefile));
+    else {
+        READ_STR(&store, NULL, 0);
     }
     a_read(&store, &global.attribs, NULL);
     READ_INT(&store, &turn);
@@ -1512,9 +1485,7 @@ int readgame(const char *filename, int backup)
     }
 
     /* Read factions */
-    if (gdata.version >= ALLIANCES_VERSION) {
-        read_alliances(&store);
-    }
+    read_alliances(&store);
     READ_INT(&store, &nread);
     log_printf(stdout, " - Einzulesende Parteien: %d\n", nread);
     fp = &factions;
@@ -1806,9 +1777,7 @@ int writegame(const char *filename)
     }
 
     /* Write factions */
-#if RELEASE_VERSION>=ALLIANCES_VERSION
     write_alliances(&gdata);
-#endif
     n = listlen(factions);
     WRITE_INT(&store, n);
     WRITE_SECTION(&store);
