@@ -1,0 +1,5 @@
+#!/bin/sh
+if [ ! -z $1 ]; then
+  git checkout $1
+fi
+git pull && git submodule update
