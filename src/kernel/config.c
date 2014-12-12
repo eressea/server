@@ -1018,30 +1018,29 @@ int read_unitid(const faction * f, const region * r)
 int getunit(const region * r, const faction * f, unit **uresult)
 {
     int n = read_unitid(f, r);
-    unit *u2;
+    int result = GET_NOTFOUND;
+    unit *u2 = NULL;
 
     if (n == 0) {
-        if (uresult) {
-            *uresult = 0;
-        }
-        return GET_PEASANTS;
+        result = GET_PEASANTS;
     }
-    if (n < 0)
-        return GET_NOTFOUND;
-
-    u2 = findunit(n);
+    else if (n>0) {
+        u2 = findunit(n);
+        if (u2 != NULL && u2->region == r) {
+            /* there used to be a 'u2->flags & UFL_ISNEW || u2->number>0' condition
+            * here, but it got removed because of a bug that made units disappear:
+            * http://eressea.upb.de/mantis/bug_view_page.php?bug_id=0000172
+            */
+            result = GET_UNIT;
+        }
+        else {
+            u2 = NULL;
+        }
+    }
     if (uresult) {
         *uresult = u2;
     }
-    if (u2 != NULL && u2->region == r) {
-        /* there used to be a 'u2->flags & UFL_ISNEW || u2->number>0' condition
-        * here, but it got removed because of a bug that made units disappear:
-        * http://eressea.upb.de/mantis/bug_view_page.php?bug_id=0000172
-        */
-        return GET_UNIT;
-    }
-
-    return GET_NOTFOUND;
+    return result;
 }
 
 /* - String Listen --------------------------------------------- */
