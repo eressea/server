@@ -4272,7 +4272,6 @@ void do_battle(region * r)
         message_all(b, m);
         msg_release(m);
         free_battle(b);
-        free(b);
         return;
     }
     join_allies(b);
@@ -4319,7 +4318,6 @@ void do_battle(region * r)
 
     if (b) {
         free_battle(b);
-        free(b);
     }
 }
 
