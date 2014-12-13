@@ -64,7 +64,7 @@ void game_init(void)
 #if ARENA_MODULE
     register_arena();
 #endif
-    register_wormholes();
+    wormholes_register();
 
     register_itemtypes();
 #ifdef USE_LIBXML2
