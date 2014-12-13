@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "battle.h"
 #include "alchemy.h"
+#include "chaos.h"
 #include "move.h"
 #include "laws.h"
 #include "skill.h"
@@ -81,13 +82,8 @@ static FILE *bdebug;
 #define CATAPULT_STRUCTURAL_DAMAGE
 
 #define BASE_CHANCE    70       /* 70% Basis-Überlebenschance */
-#ifdef NEW_COMBATSKILLS_RULE
 #define TDIFF_CHANGE    5       /* 5% höher pro Stufe */
 #define DAMAGE_QUOTIENT 2       /* damage += skilldiff/DAMAGE_QUOTIENT */
-#else
-#define TDIFF_CHANGE 10
-# define DAMAGE_QUOTIENT 1      /* damage += skilldiff/DAMAGE_QUOTIENT */
-#endif
 
 #undef DEBUG_FAST               /* should be disabled when b->fast and b->rowcache works */
 #define DEBUG_SELECT            /* should be disabled if select_enemy works */
@@ -2615,7 +2611,7 @@ static void battle_effects(battle * b, int dead_players)
         _min(rpeasants(r), (int)(dead_players * PopulationDamage()));
     if (dead_peasants) {
         deathcounts(r, dead_peasants + dead_players);
-        chaoscounts(r, dead_peasants / 2);
+        add_chaoscount(r, dead_peasants / 2);
         rsetpeasants(r, rpeasants(r) - dead_peasants);
     }
 }
@@ -2899,12 +2895,11 @@ static void aftermath(battle * b)
 static void battle_punit(unit * u, battle * b)
 {
     bfaction *bf;
-    strlist *S, *x;
 
     for (bf = b->factions; bf; bf = bf->next) {
         faction *f = bf->faction;
+        strlist *S = 0, *x;
 
-        S = 0;
         spunit(&S, f, u, 4, see_battle);
         for (x = S; x; x = x->next) {
             fbattlerecord(b, f, x->s);

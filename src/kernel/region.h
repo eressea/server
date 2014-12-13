@@ -167,7 +167,6 @@ extern "C" {
   extern struct attrib_type at_moveblock;
   extern struct attrib_type at_peasantluck;
   extern struct attrib_type at_horseluck;
-  extern struct attrib_type at_chaoscount;
   extern struct attrib_type at_woodcount;
   extern struct attrib_type at_deathcount;
   extern struct attrib_type at_travelunit;

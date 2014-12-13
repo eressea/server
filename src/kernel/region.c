@@ -144,14 +144,6 @@ int deathcount(const region * r)
   return a->data.i;
 }
 
-int chaoscount(const region * r)
-{
-  attrib *a = a_find(r->attribs, &at_chaoscount);
-  if (!a)
-    return 0;
-  return a->data.i;
-}
-
 void deathcounts(region * r, int fallen)
 {
   attrib *a;
@@ -167,22 +159,6 @@ void deathcounts(region * r, int fallen)
   a = a_find(r->attribs, &at_deathcount);
   if (!a)
     a = a_add(&r->attribs, a_new(&at_deathcount));
-  a->data.i += fallen;
-
-  if (a->data.i <= 0)
-    a_remove(&r->attribs, a);
-}
-
-void chaoscounts(region * r, int fallen)
-{
-  attrib *a;
-
-  if (fallen == 0)
-    return;
-
-  a = a_find(r->attribs, &at_chaoscount);
-  if (!a)
-    a = a_add(&r->attribs, a_new(&at_chaoscount));
   a->data.i += fallen;
 
   if (a->data.i <= 0)
@@ -237,8 +213,9 @@ static uidhashentry uidhash[MAXREGIONS];
 struct region *findregionbyid(int uid)
 {
   int key = uid % MAXREGIONS;
-  while (uidhash[key].uid != 0 && uidhash[key].uid != uid)
-    ++key;
+  while (uidhash[key].uid != 0 && uidhash[key].uid != uid) {
+      if (++key==MAXREGIONS) key = 0;
+  }
   return uidhash[key].r;
 }
 
@@ -248,8 +225,9 @@ static void unhash_uid(region * r)
 {
   int key = r->uid % MAXREGIONS;
   assert(r->uid);
-  while (uidhash[key].uid != 0 && uidhash[key].uid != r->uid)
-    ++key;
+  while (uidhash[key].uid != 0 && uidhash[key].uid != r->uid) {
+      if (++key == MAXREGIONS) key = 0;
+  }
   assert(uidhash[key].r == r);
   uidhash[key].r = NULL;
 }
@@ -260,8 +238,9 @@ static void hash_uid(region * r)
   for (;;) {
     if (uid != 0) {
       int key = uid % MAXREGIONS;
-      while (uidhash[key].uid != 0 && uidhash[key].uid != uid)
-        ++key;
+      while (uidhash[key].uid != 0 && uidhash[key].uid != uid) {
+          if (++key == MAXREGIONS) key = 0;
+      }
       if (uidhash[key].uid == 0) {
         uidhash[key].uid = uid;
         uidhash[key].r = r;
@@ -515,19 +494,6 @@ attrib_type at_peasantluck = {
   DEFAULT_AGE,
   NO_WRITE,
   NO_READ,
-  ATF_UNIQUE
-};
-
-/*********************/
-/*   at_chaoscount   */
-/*********************/
-attrib_type at_chaoscount = {
-  "chaoscount",
-  DEFAULT_INIT,
-  DEFAULT_FINALIZE,
-  DEFAULT_AGE,
-  a_writeint,
-  a_readint,
   ATF_UNIQUE
 };
 
