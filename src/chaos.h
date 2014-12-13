@@ -26,7 +26,7 @@ extern "C" {
 
     extern struct attrib_type at_chaoscount;
 
-    void chaos_init(void);
+    void chaos_register(void);
     void chaos_update(void);
 
     int get_chaoscount(const struct region * r);
