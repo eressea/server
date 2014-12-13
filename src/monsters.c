@@ -23,6 +23,7 @@
 #include <kernel/config.h>
 
 #include "economy.h"
+#include "chaos.h"
 #include "give.h"
 #include "monster.h"
 #include "laws.h"
@@ -867,7 +868,6 @@ void plan_monsters(faction * f)
       }
       if (long_order) {
         addlist(&u->orders, long_order);
-//        u->thisorder = long_order;
       }
     }
   }
@@ -876,10 +876,7 @@ void plan_monsters(faction * f)
 
 static double chaosfactor(region * r)
 {
-  attrib *a = a_find(r->attribs, &at_chaoscount);
-  if (!a)
-    return 0;
-  return ((double)a->data.i / 1000.0);
+    return fval(r, RF_CHAOTIC) ? ((double)(1 + get_chaoscount(r)) / 1000.0) : 0.0;
 }
 
 static int nrand(int start, int sub)

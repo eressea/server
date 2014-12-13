@@ -87,6 +87,7 @@ set (ERESSEA_SRC
   morale.c
   monster.c
   randenc.c
+  chaos.c
   report.c
   spy.c
   study.c
