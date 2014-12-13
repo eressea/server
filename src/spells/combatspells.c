@@ -1737,6 +1737,7 @@ int sp_undeadhero(struct castorder * co)
       }
 
       if (j > 0) {
+          item **ilist;
         unit *u =
             create_unit(r, mage->faction, 0, get_race(RC_UNDEAD), 0, du->name,
           du);
@@ -1750,6 +1751,21 @@ int sp_undeadhero(struct castorder * co)
         }
         setstatus(u, du->status);
         setguard(u, GUARD_NONE);
+        for (ilist = &du->items; *ilist;) {
+            item *itm = *ilist;
+            int loot = itm->number * j / du->number;
+            if (loot != itm->number) {
+                int split = itm->number * j % du->number;
+                if (split > 0 && (rng_int() % du->number) < split) {
+                    ++loot;
+                }
+            }
+            i_change(&u->items, itm->type, loot);
+            i_change(ilist, itm->type, -loot);
+            if (*ilist == itm) {
+                ilist = &itm->next;
+            }
+        }
 
         /* inherit stealth from magician */
         if (fval(mage, UFL_ANON_FACTION)) {

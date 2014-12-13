@@ -2719,7 +2719,7 @@ static void aftermath(battle * b)
                     fset(sh, SF_DAMAGED);
             }
 
-            if (df->alive == du->number) {
+            if (df->alive && df->alive == du->number) {
                 du->hp = sum_hp;
                 continue;               /* nichts passiert */
             }
