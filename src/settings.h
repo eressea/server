@@ -24,14 +24,11 @@
 #define NEWATSROI 0
 
 /* Vermehrungsrate Bauern in 1/10000.
-* Evt. Berechnungsfehler, reale Vermehrungsraten scheinen höher. */
+* TODO: Evt. Berechnungsfehler, reale Vermehrungsraten scheinen höher. */
 #define PEASANTGROWTH		10
 #define BATTLE_KILLS_PEASANTS 20
 #define PEASANTLUCK			10
 
-#define ASTRAL_ITEM_RESTRICTIONS        /* keine grossen dinge im astralraum */
-#define NEW_DAEMONHUNGER_RULE
-#define NEW_COMBATSKILLS_RULE
 #define ROW_FACTOR 3            /* factor for combat row advancement rule */
 
 /* optional game components. TODO: These should either be 
@@ -42,14 +39,5 @@
 #define MUSEUM_MODULE 1
 #define ARENA_MODULE 1
 #define CHANGED_CROSSBOWS 0     /* use the WTF_ARMORPIERCING flag */
-#undef GLOBAL_WARMING           /* number of turns before global warming sets in */
-
-#if defined(BINDINGS_LUABIND)
-# undef BINDINGS_TOLUA
-#elif defined(BINDINGS_TOLUA)
-# undef BINDINGS_LUABIND
-#else
-# define BINDINGS_TOLUA         /* new default */
-#endif
 
 #undef REGIONOWNERS             /* (WIP) region-owner uses HELP_TRAVEL to control entry to region */

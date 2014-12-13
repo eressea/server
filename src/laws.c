@@ -151,7 +151,6 @@ static void age_unit(region * r, unit * u)
             u_race(u)->age(u);
         }
     }
-#ifdef ASTRAL_ITEM_RESTRICTIONS
     if (u->region && is_astral(u->region)) {
         item **itemp = &u->items;
         while (*itemp) {
@@ -168,7 +167,6 @@ static void age_unit(region * r, unit * u)
             itemp = &itm->next;
         }
     }
-#endif
 }
 
 static void live(region * r)
@@ -3606,11 +3604,7 @@ void monthly_healing(void)
 
             p *= heal_factor(u);
             if (u->hp < umhp) {
-#ifdef NEW_DAEMONHUNGER_RULE
                 double maxheal = _max(u->number, umhp / 20.0);
-#else
-                double maxheal = _max(u->number, umhp / 10.0);
-#endif
                 int addhp;
                 struct building *b = inside_building(u);
                 const struct building_type *btype = b ? b->type : NULL;

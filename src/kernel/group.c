@@ -236,8 +236,6 @@ void read_groups(struct storage *store, faction * f)
             READ_INT(store, &fid.i);
             if (fid.i <= 0)
                 break;
-            if (global.data_version < STORAGE_VERSION && fid.i == 0)
-                break;
             a = ally_add(pa, findfaction(fid.i));
             READ_INT(store, &a->status);
             if (!a->faction)
