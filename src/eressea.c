@@ -20,6 +20,7 @@
 #include <modules/xmas.h>
 #include <items/itemtypes.h>
 #include <attributes/attributes.h>
+#include "chaos.h"
 #include "report.h"
 #include "items.h"
 #include "creport.h"
@@ -73,4 +74,5 @@ void game_init(void)
     register_attributes();
     register_gmcmd();
 
+    chaos_register();
 }

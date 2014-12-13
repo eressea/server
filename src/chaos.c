@@ -44,7 +44,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /*   at_chaoscount   */
 /*********************/
 attrib_type at_chaoscount = {
-    "get_chaoscount",
+    "chaoscount",
     DEFAULT_INIT,
     DEFAULT_FINALIZE,
     DEFAULT_AGE,
@@ -251,6 +251,6 @@ void chaos_update(void) {
     }
 }
 
-void chaos_init(void) {
+void chaos_register(void) {
     at_register(&at_chaoscount);
 }
