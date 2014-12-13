@@ -634,7 +634,7 @@ int give_control_cmd(unit * u, order * ord)
     getunit(r, u->faction, &u2);
 
     s = getstrtoken();
-    if (isparam(s, u->faction->locale, P_CONTROL)) {
+    if (s && isparam(s, u->faction->locale, P_CONTROL)) {
         message *msg = 0;
 
         if (!can_give_to(u, u2)) {

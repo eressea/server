@@ -459,7 +459,7 @@ damage_unit(unit * u, const char *dam, bool physical, bool magic)
         return 0;
     }
 
-    assert(u->number > u->hp);
+    assert(u->number <= u->hp);
     h = u->hp / u->number;
     /* HP verteilen */
     for (i = 0; i < u->number; i++)
