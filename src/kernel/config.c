@@ -81,6 +81,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #endif
 
 /* external libraries */
+#include <storage.h>
 #include <iniparser.h>
 #include <critbit.h>
 
@@ -2132,6 +2133,16 @@ bool has_limited_skills(const struct unit * u)
     }
 }
 
+static int read_ext(attrib * a, void *owner, struct storage *store)
+{
+    int len;
+
+    READ_INT(store, &len);
+    store->api->r_bin(store->handle, NULL, (size_t)len);
+    return AT_READ_OK;
+}
+
+
 void attrib_init(void)
 {
     /* Alle speicherbaren Attribute müssen hier registriert werden */
@@ -2178,6 +2189,7 @@ void attrib_init(void)
     at_register(&at_germs);
 
     at_deprecate("xontormiaexpress", a_readint);    /* required for old datafiles */
+    at_deprecate("lua", read_ext);    /* required for old datafiles */
 }
 
 void kernel_init(void)
