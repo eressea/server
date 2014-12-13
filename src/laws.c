@@ -4481,7 +4481,7 @@ void processorders(void)
 
     /* must happen AFTER age, because that would destroy them right away */
     if (get_param_int(global.parameters, "modules.wormholes", 0)) {
-        create_wormholes();
+        wormholes_update();
     }
 
     /* immer ausführen, wenn neue Sprüche dazugekommen sind, oder sich
