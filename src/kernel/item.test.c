@@ -64,20 +64,6 @@ void test_change_item(CuTest * tc)
   test_uchange(tc, u, get_resourcetype(R_IRON));
 }
 
-void test_change_person(CuTest * tc)
-{
-  unit * u;
-
-  test_cleanup();
-
-  register_resources();
-  init_resources();
-  test_create_world();
-
-  u = test_create_unit(0, 0);
-  test_uchange(tc, u, get_resourcetype(R_UNIT));
-}
-
 void test_resource_type(CuTest * tc)
 {
   struct item_type *itype;
@@ -136,7 +122,6 @@ CuSuite *get_item_suite(void)
   SUITE_ADD_TEST(suite, test_resourcename_no_appearance);
   SUITE_ADD_TEST(suite, test_resourcename_with_appearance);
   SUITE_ADD_TEST(suite, test_change_item);
-  SUITE_ADD_TEST(suite, test_change_person);
   SUITE_ADD_TEST(suite, test_resource_type);
   SUITE_ADD_TEST(suite, test_finditemtype);
   SUITE_ADD_TEST(suite, test_findresourcetype);

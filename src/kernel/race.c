@@ -154,6 +154,9 @@ static race *rc_find_i(const char *name)
     while (rc && !strcmp(rname, rc->_name) == 0) {
         rc = rc->next;
     }
+    if (!rc && strcmp(name, "uruk") == 0) {
+        rc = rc_find_i("orc");
+    }
     return rc;
 }
 

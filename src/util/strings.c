@@ -42,9 +42,13 @@ const char *escape_string(const char *str, char *buffer,
         char *o;
         size_t skip = start - str;
 
+        if (skip > len) {
+            skip = len;
+        }
         memcpy(buffer, str, skip);
         o = buffer + skip;
         p = str + skip;
+        len -= skip;
         do {
             if (*p == '\"' || *p == '\\') {
                 if (len < 2) {

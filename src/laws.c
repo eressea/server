@@ -1972,7 +1972,7 @@ int mail_cmd(unit * u, struct order *ord)
         case P_REGION:
             /* können alle Einheiten in der Region sehen */
             s = getstrtoken();
-            if (!s[0]) {
+            if (!s || !s[0]) {
                 cmistake(u, ord, 30, MSG_MESSAGE);
                 break;
             }
@@ -2141,7 +2141,7 @@ int email_cmd(unit * u, struct order *ord)
     init_order(ord);
     s = getstrtoken();
 
-    if (!s[0]) {
+    if (!s || !s[0]) {
         cmistake(u, ord, 85, MSG_EVENT);
     }
     else {
@@ -3850,7 +3850,7 @@ static int reserve_i(unit * u, struct order *ord, int flags)
 {
     if (u->number > 0 && (urace(u)->ec_flags & GETITEM)) {
         int use, count, para;
-        const resource_type *rtype;
+        const item_type *itype;
         const char *s;
 
         init_order(ord);
@@ -3862,19 +3862,19 @@ static int reserve_i(unit * u, struct order *ord, int flags)
             count = getint() * u->number;
         }
         s = getstrtoken();
-        rtype = s ? findresourcetype(s, u->faction->locale) : 0;
-        if (rtype == NULL)
+        itype = s ? finditemtype(s, u->faction->locale) : 0;
+        if (itype == NULL)
             return 0;
 
-        set_resvalue(u, rtype, 0);      /* make sure the pool is empty */
+        set_resvalue(u, itype, 0);      /* make sure the pool is empty */
 
         if (count == 0 && para == P_ANY) {
-            count = get_resource(u, rtype);
+            count = get_resource(u, itype->rtype);
         }
-        use = use_pooled(u, rtype, flags, count);
+        use = use_pooled(u, itype->rtype, flags, count);
         if (use) {
-            set_resvalue(u, rtype, use);
-            change_resource(u, rtype, use);
+            set_resvalue(u, itype, use);
+            change_resource(u, itype->rtype, use);
             return use;
         }
     }

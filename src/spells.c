@@ -4736,7 +4736,7 @@ int sp_clonecopy(castorder * co)
 
     create_newclone(mage, clone);
 
-    msg = msg_message("sp_clone_effet", "mage", mage);
+    msg = msg_message("sp_clone_effect", "mage", mage);
     r_addmessage(r, mage->faction, msg);
     msg_release(msg);
 

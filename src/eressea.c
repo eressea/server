@@ -58,9 +58,6 @@ void game_init(void)
     register_resources();
     register_buildings();
     register_itemfunctions();
-#if DUNGEON_MODULE
-    register_dungeon();
-#endif
 #if MUSEUM_MODULE
     register_museum();
 #endif

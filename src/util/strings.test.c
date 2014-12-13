@@ -7,6 +7,9 @@
 static void test_escape_string(CuTest * tc)
 {
     char scratch[64];
+    CuAssertStrEquals(tc, "12345678901234567890", escape_string("12345678901234567890", scratch, 16));
+    CuAssertStrEquals(tc, "123456789\\\"12345", escape_string("123456789\"1234567890", scratch, 16));
+    CuAssertStrEquals(tc, "1234567890123456", escape_string("1234567890123456\"890", scratch, 16));
     CuAssertStrEquals(tc, "hello world", escape_string("hello world", scratch, sizeof(scratch)));
     CuAssertStrEquals(tc, "hello \\\"world\\\"", escape_string("hello \"world\"", scratch, sizeof(scratch)));
     CuAssertStrEquals(tc, "\\\"\\\\", escape_string("\"\\", scratch, sizeof(scratch)));

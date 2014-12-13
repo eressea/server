@@ -165,7 +165,7 @@ struct order *ord)
         return -1;
     }
     else if (n == 0) {
-        int reserve = get_reservation(src, itype->rtype);
+        int reserve = get_reservation(src, itype);
         if (reserve) {
             msg_feedback(src, ord, "nogive_reserved", "resource reservation",
                 itype->rtype, reserve);
@@ -187,7 +187,7 @@ struct order *ord)
             i_change(&dest->items, itype, r);
 #ifdef RESERVE_GIVE
 #ifdef RESERVE_DONATIONS
-            change_reservation(dest, item2resource(itype), r);
+            change_reservation(dest, itype, r);
 #else
             if (src->faction == dest->faction) {
                 change_reservation(dest, item2resource(itype), r);
@@ -426,7 +426,6 @@ void give_unit(unit * u, unit * u2, order * ord)
     if (u2 == NULL) {
         message *msg;
         if (fval(r->terrain, SEA_REGION)) {
-            /* TODO: why is this here, but the unit does not actually seem to lose any men? */
             msg = disband_men(u->number, u, ord);
             if (msg) {
                 ADDMSG(&u->faction->msgs, msg);
@@ -516,7 +515,7 @@ void give_unit(unit * u, unit * u2, order * ord)
         cmistake(u, ord, 156, MSG_COMMERCE);
         return;
     }
-    add_give(u, u2, 1, 1, get_resourcetype(R_UNIT), ord, 0);
+    add_give(u, u2, n, n, get_resourcetype(R_PERSON), ord, 0);
     u_setfaction(u, u2->faction);
     u2->faction->newbies += n;
 }
@@ -680,8 +679,8 @@ void give_cmd(unit * u, order * ord)
                     item *itm = *itmp;
                     const item_type *itype = itm->type;
                     if (itm->number > 0
-                        && itm->number - get_reservation(u, itype->rtype) > 0) {
-                        n = itm->number - get_reservation(u, itype->rtype);
+                        && itm->number - get_reservation(u, itype) > 0) {
+                        n = itm->number - get_reservation(u, itype);
                         if (give_item(n, itype, u, u2, ord) == 0) {
                             if (*itmp != itm)
                                 continue;
@@ -719,7 +718,7 @@ void give_cmd(unit * u, order * ord)
                     item *i = *i_find(&u->items, itype);
                     if (i != NULL) {
                         if (can_give(u, u2, itype, 0)) {
-                            n = i->number - get_reservation(u, itype->rtype);
+                            n = i->number - get_reservation(u, itype);
                             give_item(n, itype, u, u2, ord);
                         }
                         else {
@@ -755,7 +754,7 @@ void give_cmd(unit * u, order * ord)
                 msg_feedback(u, ord, "race_noregroup", "race", u_race(u)));
             return;
         }
-        msg = u2 ? give_men(u->number, u, u2, ord) : disband_men(u->number, u, ord);
+        msg = u2 ? give_men(n, u, u2, ord) : disband_men(n, u, ord);
         if (msg) {
             ADDMSG(&u->faction->msgs, msg);
         }

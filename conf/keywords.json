@@ -1,5 +1,8 @@
 {
 	"keywords": {
+		"en" : {
+			"combat": [ "COMBAT", "FIGHT" ]
+		},
 		"de": {
 			"//" : "//",
 			"banner": "BANNER",
@@ -14,7 +17,7 @@
 			"guard": ["BEWACHE", "BEWACHEN"],
 			"message": "BOTSCHAFT",
 			"end": "ENDE",
-			"ride": ["REITE", "REITEN"],
+			"ride": ["FAHRE", "FAHREN"],
 			"number": "NUMMER",
 			"follow": ["FOLGE","FOLGEN"],
 			"research": ["FORSCHE", "FORSCHEN"],
@@ -29,7 +32,7 @@
 			"make": ["MACHE", "MACHEN"],
 			"maketemp": ["MACHE TEMP", "MACHETEMP"],
 			"move" : "NACH",
-			"password" : "PASSWORD",
+			"password" : "PASSWORT",
 			"loot" : ["PLÜNDERE", "PLÜNDERN"],
 			"recruit": ["REKRUTIERE", "REKRUTIEREN"],
 			"reserve": ["RESERVIERE", "RESERVIEREN"],
