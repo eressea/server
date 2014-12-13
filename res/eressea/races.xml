@@ -981,7 +981,7 @@
     <familiar race="rat"/>
     <familiar race="imp"/>
   </race>
-  <race name="clone" magres="0.900000" maxaura="0.000000" regaura="0.000000" recruitcost="0" weight="1000" capacity="540" speed="1.000000" hp="40" damage="0d0" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" canlearn="no" teach="no" noheal="yes">
+  <race name="clone" magres="0.900000" maxaura="0.000000" regaura="0.000000" recruitcost="0" weight="1000" capacity="540" speed="1.000000" hp="40" damage="0d0" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" canlearn="no" teach="no" noheal="yes" giveitem="yes">
     <ai splitsize="10000"/>
     <skill name="alchemy" modifier="-99"/>
     <skill name="crossbow" modifier="-99"/>
