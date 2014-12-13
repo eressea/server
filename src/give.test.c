@@ -43,7 +43,6 @@ static void test_give_unit_to_peasants(CuTest * tc) {
     env.f2 = 0;
     setup_give(&env);
     rsetpeasants(env.r, 0);
-    getunitpeasants = true;
     give_unit(env.src, NULL, NULL);
     CuAssertIntEquals(tc, 0, env.src->number);
     CuAssertIntEquals(tc, 1, env.r->land->peasants);
@@ -57,7 +56,6 @@ static void test_give_unit_in_ocean(CuTest * tc) {
     env.f2 = 0;
     setup_give(&env);
     env.r->terrain = test_create_terrain("ocean", SEA_REGION);
-    getunitpeasants = true;
     give_unit(env.src, NULL, NULL);
     CuAssertIntEquals(tc, 0, env.src->number);
     test_cleanup();

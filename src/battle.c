@@ -4004,7 +4004,7 @@ static bool start_battle(region * r, battle ** bp)
 
                     init_order(ord);
                     /* attackierte Einheit ermitteln */
-                    u2 = getunit(r, u->faction);
+                    getunit(r, u->faction, &u2);
 
                     /* Beginn Fehlerbehandlung */
                     /* Fehler: "Die Einheit wurde nicht gefunden" */

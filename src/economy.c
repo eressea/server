@@ -629,20 +629,18 @@ int give_control_cmd(unit * u, order * ord)
     region *r = u->region;
     unit *u2;
     const char *s;
-    param_t p;
 
     init_order(ord);
-    u2 = getunit(r, u->faction);
-    s = getstrtoken();
-    p = findparam(s, u->faction->locale);
+    getunit(r, u->faction, &u2);
 
-    /* first, do all the ones that do not require HELP_GIVE or CONTACT */
-    if (p == P_CONTROL) {
+    s = getstrtoken();
+    if (isparam(s, u->faction->locale, P_CONTROL)) {
         message *msg = 0;
 
-        if (!u2 || u2->number == 0) {
-            msg = msg_feedback(u, ord, "feedback_unit_not_found", "");
-            ADDMSG(&u->faction->msgs, msg);
+        if (!can_give_to(u, u2)) {
+            ADDMSG(&u->faction->msgs,
+                msg_feedback(u, ord, "feedback_unit_not_found", ""));
+            return 0;
         }
         else if (!u->building && !u->ship) {
             msg = cmistake(u, ord, 140, MSG_EVENT);

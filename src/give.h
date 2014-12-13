@@ -29,6 +29,7 @@ extern "C" {
   void give_unit(struct unit *u, struct unit *u2, struct order *ord);
   void give_cmd(struct unit * u, struct order * ord);
   struct message * check_give(const struct unit * u, const struct unit * u2, struct order *ord);
+  bool can_give_to(struct unit *u, struct unit *u2);
 
 #ifdef __cplusplus
 }

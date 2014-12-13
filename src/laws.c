@@ -1828,8 +1828,9 @@ int name_cmd(struct unit *u, struct order *ord)
 
     case P_UNIT:
         if (foreign) {
-            unit *u2 = getunit(r, u->faction);
+            unit *u2 = 0;
 
+            getunit(r, u->faction, &u2);
             if (!u2 || !cansee(u->faction, r, u2, 0)) {
                 ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
                     "feedback_unit_not_found", ""));
