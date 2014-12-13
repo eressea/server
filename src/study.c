@@ -328,13 +328,8 @@ int teach_cmd(unit * u, struct order *ord)
         } while (sk != NOSKILL);
         while (teaching && student) {
             if (student->faction == u->faction) {
-#ifdef NEW_DAEMONHUNGER_RULE
                 if (LongHunger(student))
                     continue;
-#else
-                if (fval(student, UFL_HUNGER))
-                    continue;
-#endif
                 if (getkeyword(student->thisorder) == K_STUDY) {
                     /* Input ist nun von student->thisorder !! */
                     init_order(student->thisorder);
@@ -358,13 +353,8 @@ int teach_cmd(unit * u, struct order *ord)
         while (teaching && student) {
             if (student->faction != u->faction
                 && alliedunit(u, student->faction, HELP_GUARD)) {
-#ifdef NEW_DAEMONHUNGER_RULE
                 if (LongHunger(student))
                     continue;
-#else
-                if (fval(student, UFL_HUNGER))
-                    continue;
-#endif
                 if (getkeyword(student->thisorder) == K_STUDY) {
                     /* Input ist nun von student->thisorder !! */
                     init_order(student->thisorder);

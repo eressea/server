@@ -231,10 +231,8 @@ int LongHunger(const struct unit *u)
     if (u != NULL) {
         if (!fval(u, UFL_HUNGER))
             return false;
-#ifdef NEW_DAEMONHUNGER_RULE
         if (u_race(u) == get_race(RC_DAEMON))
             return false;
-#endif
     }
     if (rule < 0 || gamecookie != global.cookie) {
         gamecookie = global.cookie;
