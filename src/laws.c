@@ -3796,7 +3796,7 @@ int use_cmd(unit * u, struct order *ord)
         /* BENUTZE 42 Yanxspirit */
         t = getstrtoken();
     }
-    itype = finditemtype(t, u->faction->locale);
+    itype = t ? finditemtype(t, u->faction->locale) : NULL;
 
     if (itype != NULL) {
         err = use_item(u, itype, n, ord);
