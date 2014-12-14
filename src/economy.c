@@ -734,8 +734,11 @@ static bool maintain(building * b, bool first)
         return false;
     }
     u = building_owner(b);
-    if (u == NULL)
+    if (u == NULL) {
+        /* no owner - send a message to the entire region */
+        ADDMSG(&r->msgs, msg_message("maintenance_noowner", "building", b));
         return false;
+    }
     /* If the owner is the region owner, check if dontpay flag is set for the building where he is in */
     if (check_param(global.parameters, "rules.region_owner_pay_building", b->type->_name)) {
         if (fval(u->building, BLD_DONTPAY)) {

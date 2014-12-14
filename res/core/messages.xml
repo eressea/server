@@ -7164,15 +7164,20 @@
       <arg name="building" type="building"/>
     </type>
     <text locale="de">"$unit($unit) kann den Unterhalt von $building($building) nicht bezahlen."</text>
-    <text locale="fr">"$unit($unit) cannot pay the maintenance for $building($building)."</text>
     <text locale="en">"$unit($unit) cannot pay the maintenance for $building($building)."</text>
+  </message>
+  <message name="maintenance_noowner" section="errors">
+    <type>
+      <arg name="building" type="building"/>
+    </type>
+    <text locale="de">"Der Unterhalt von $building($building) konnte nicht gezahlt werden, das Gebäude war diese Woche nicht funktionstüchtig."</text>
+    <text locale="en">"The upkeep for $building($building) was not paid, the building was not operational this week."</text>
   </message>
   <message name="maintenance_late" section="errors">
     <type>
       <arg name="building" type="building"/>
     </type>
     <text locale="de">"Der Unterhalt von $building($building) konnte nur verspätet gezahlt werden, das Gebäude war diese Woche nicht funktionstüchtig."</text>
-    <text locale="fr">"The upkeep for $building($building) was paid late, the building was not operational this week."</text>
     <text locale="en">"The upkeep for $building($building) was paid late, the building was not operational this week."</text>
   </message>
   <message name="income_tradetax" section="economy">
