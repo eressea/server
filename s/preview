@@ -158,6 +158,7 @@ case "$1" in
     [ -f $TESTROOT/turn ] || abort "missing turn file, and no turn specified"
     let turn=$(cat $TESTROOT/turn)
   fi
+  [ -f reports.txt ] || abort "missing reports.txt for game $game"
   for faction in $* ; do
     send $faction
     sent=1
