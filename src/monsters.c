@@ -579,9 +579,13 @@ static order *monster_learn(unit * u)
   skill *sv;
   const struct locale *lang = u->faction->locale;
 
+  /* can these monsters even study? */
+  if ((u_race(u)->flags & RCF_NOLEARN) || fval(u, UFL_WERE)) {
+      return NULL;
+  }
+
   /* Monster lernt ein zufälliges Talent aus allen, in denen es schon
    * Lerntage hat. */
-
   for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
     if (sv->level > 0)
       ++c;
