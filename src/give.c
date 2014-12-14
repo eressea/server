@@ -518,7 +518,7 @@ void give_unit(unit * u, unit * u2, order * ord)
 
 bool can_give_to(unit *u, unit *u2) {
     /* Damit Tarner nicht durch die Fehlermeldung enttarnt werden können */
-    if (!u2 || u2->number == 0) {
+    if (!u2) {
         return false;
     }
     if (u2 && !alliedunit(u2, u->faction, HELP_GIVE)
