@@ -580,7 +580,7 @@ static order *monster_learn(unit * u)
   const struct locale *lang = u->faction->locale;
 
   /* can these monsters even study? */
-  if ((u_race(u)->flags & RCF_NOLEARN) || fval(u, UFL_WERE)) {
+  if (!unit_can_study(u)) {
       return NULL;
   }
 
@@ -830,7 +830,7 @@ void plan_monsters(faction * f)
         }
       }
 
-      if (long_order == NULL) {
+      if (long_order == NULL && unit_can_study(u)) {
         /* Einheiten, die Waffenlosen Kampf lernen könnten, lernen es um 
          * zu bewachen: */
         if (u_race(u)->bonus[SK_WEAPONLESS] != -99) {

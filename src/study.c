@@ -543,7 +543,7 @@ int learn_cmd(unit * u, order * ord)
         else
             learn_newskills = 1;
     }
-    if ((u_race(u)->flags & RCF_NOLEARN) || fval(u, UFL_WERE)) {
+    if (!unit_can_study(u)) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_race_nolearn", "race",
             u_race(u)));
         return 0;
