@@ -4701,7 +4701,7 @@ int sp_gooddreams(castorder * co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:
+/* Name: Seelenkopie / Doppelganger
  * Stufe:      9
  * Kategorie:
  * Wirkung:
