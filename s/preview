@@ -69,6 +69,7 @@ function run() {
 echo "testing turn $turn of game $game"
 assert_dir $TESTROOT
 cd $TESTROOT
+[ ! -e execute.lock ] || abort "lockfile prevents running game $game"
 [ -d data ] || mkdir data
 assert_dir data
 assert_files $LIVE/orders.$turn $LIVE/data/$turn.dat
