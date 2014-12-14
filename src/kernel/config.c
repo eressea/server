@@ -1016,9 +1016,9 @@ int read_unitid(const faction * f, const region * r)
 
 int getunit(const region * r, const faction * f, unit **uresult)
 {
+    unit *u2 = NULL;
     int n = read_unitid(f, r);
     int result = GET_NOTFOUND;
-    unit *u2 = NULL;
 
     if (n == 0) {
         result = GET_PEASANTS;
