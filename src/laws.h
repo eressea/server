@@ -34,6 +34,7 @@ extern "C" {
 
     int writepasswd(void);
     void demographics(void);
+    void immigration(void);
     void update_guards(void);
     void update_subscriptions(void);
     void deliverMail(struct faction *f, struct region *r, struct unit *u,
