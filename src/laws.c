@@ -717,7 +717,14 @@ void demographics(void)
                 calculate_emigration(r);
                 peasants(r);
                 if (r->age > 20) {
-                    plagues(r, false);
+                    double mwp = _max(maxworkingpeasants(r), 1);
+                    double prob =
+                        pow(rpeasants(r) / (mwp * wage(r, NULL, NULL, turn) * 0.13), 4.0)
+                        * PLAGUE_CHANCE;
+
+                    if (rng_double() < prob) {
+                        plagues(r);
+                    }
                 }
                 horses(r);
                 if (plant_rules == 0) { /* E1 */

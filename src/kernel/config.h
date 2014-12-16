@@ -54,13 +54,6 @@ extern "C" {
 #define MAXMAGICIANS    3
 #define MAXALCHEMISTS   3
 
-    /** Plagues **/
-#define PLAGUE_CHANCE      0.1F /* Seuchenwahrscheinlichkeit (siehe plagues()) */
-#define PLAGUE_VICTIMS     0.2F /* % Betroffene */
-#define PLAGUE_HEALCHANCE  0.25F        /* Wahrscheinlichkeit Heilung */
-#define PLAGUE_HEALCOST    30   /* Heilkosten */
-
-
     /* getunit results: */
 #define GET_UNIT 0
 #define GET_NOTFOUND 1
@@ -352,7 +345,6 @@ extern "C" {
     struct order *default_order(const struct locale *lang);
     int entertainmoney(const struct region *r);
 
-    void plagues(struct region *r, bool ismagic);
     void free_gamedata(void);
 
 #define GIVE_SELF 1

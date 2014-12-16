@@ -1771,41 +1771,6 @@ bool has_horses(const struct unit * u)
     return false;
 }
 
-void plagues(region * r, bool ismagic)
-{
-    int peasants;
-    int i;
-    int dead = 0;
-
-    /* Seuchenwahrscheinlichkeit in % */
-
-    if (!ismagic) {
-        double mwp = _max(maxworkingpeasants(r), 1);
-        double prob =
-            pow(rpeasants(r) / (mwp * wage(r, NULL, NULL, turn) * 0.13), 4.0)
-            * PLAGUE_CHANCE;
-
-        if (rng_double() >= prob)
-            return;
-    }
-
-    peasants = rpeasants(r);
-    dead = (int)(0.5F + PLAGUE_VICTIMS * peasants);
-    for (i = dead; i != 0; i--) {
-        if (rng_double() < PLAGUE_HEALCHANCE && rmoney(r) >= PLAGUE_HEALCOST) {
-            rsetmoney(r, rmoney(r) - PLAGUE_HEALCOST);
-            --dead;
-        }
-    }
-
-    if (dead > 0) {
-        message *msg = add_message(&r->msgs, msg_message("pest", "dead", dead));
-        msg_release(msg);
-        deathcounts(r, dead);
-        rsetpeasants(r, peasants - dead);
-    }
-}
-
 /* Lohn bei den einzelnen Burgstufen für Normale Typen, Orks, Bauern,
  * Modifikation für Städter. */
 
