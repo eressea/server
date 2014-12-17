@@ -3833,15 +3833,48 @@ int pay_cmd(unit * u, struct order *ord)
     }
     else {
         param_t p;
+        int id;
         init_order(ord);
         p = getparam(u->faction->locale);
+        id = getid();
+        building *b = NULL;
         if (p == P_NOT) {
             unit *owner = building_owner(u->building);
+            /* If the unit is not the owner of the building: error */
             if (owner->no != u->no) {
+                /* The building is not ours error */
                 cmistake(u, ord, 1222, MSG_EVENT);
             }
             else {
-                u->building->flags |= BLD_DONTPAY;
+                /* If no building id is given or it is the id of our building, just set the do-not-pay flag */
+                if (id == 0 || id == u->building->no)
+                {
+                    u->building->flags |= BLD_DONTPAY;
+                }
+                else {
+                    /* Find the building that matches to the given id*/
+                    b = findbuilding(id);
+                    /* If there is a building and it is in the same region as the unit continue, else: error */
+                    if (b && b->region == u->region)
+                    {
+                        /* If the unit is also the building owner (this is true if rules.region_owner_pay_building */
+                        /* is set and no one is in the building) set the do-not-pay flag for this building, else: error */
+                        if (building_owner(b) == u) {
+                            b->flags |= BLD_DONTPAY;
+                        }
+                        else
+                        {
+                            /* The building is not ours error */
+                            cmistake(u, ord, 1222, MSG_EVENT);
+                        }
+
+                    }
+                    else
+                    {
+                        /* Building not found error */
+                        cmistake(u, ord, 6, MSG_PRODUCE);
+                    }
+                }
             }
         }
     }
