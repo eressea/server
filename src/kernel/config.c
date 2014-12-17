@@ -961,26 +961,6 @@ int getunit(const region * r, const faction * f, unit **uresult)
     return result;
 }
 
-/* - String Listen --------------------------------------------- */
-void addstrlist(strlist ** SP, const char *s)
-{
-    strlist *slist = malloc(sizeof(strlist));
-    slist->next = NULL;
-    slist->s = _strdup(s);
-    addlist(SP, slist);
-}
-
-void freestrlist(strlist * s)
-{
-    strlist *q, *p = s;
-    while (p) {
-        q = p->next;
-        free(p->s);
-        free(p);
-        p = q;
-    }
-}
-
 /* - Namen der Strukturen -------------------------------------- */
 char *untilde(char *ibuf)
 {

@@ -2406,6 +2406,26 @@ static void eval_int36(struct opstack **stack, const void *userdata)
 
 /*** END MESSAGE RENDERING ***/
 
+/* - String Listen --------------------------------------------- */
+void addstrlist(strlist ** SP, const char *s)
+{
+    strlist *slist = malloc(sizeof(strlist));
+    slist->next = NULL;
+    slist->s = _strdup(s);
+    addlist(SP, slist);
+}
+
+void freestrlist(strlist * s)
+{
+    strlist *q, *p = s;
+    while (p) {
+        q = p->next;
+        free(p->s);
+        free(p);
+        p = q;
+    }
+}
+
 #include <util/nrmessage.h>
 
 static void log_orders(const struct message *msg)

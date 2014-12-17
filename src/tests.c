@@ -132,6 +132,14 @@ item_type * test_create_itemtype(const char * name) {
   return itype;
 }
 
+void test_translate_param(const struct locale *lang, param_t param, const char *text) {
+    struct critbit_tree **cb;
+    
+    assert(lang && text);
+    cb = (struct critbit_tree **)get_translations(lang, UT_PARAMS);
+    add_translation(cb, text, param);
+}
+
 /** creates a small world and some stuff in it.
  * two terrains: 'plain' and 'ocean'
  * one race: 'human'
