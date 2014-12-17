@@ -21,12 +21,10 @@ static void test_getunit(CuTest *tc) {
     struct region *r;
     struct locale *lang;
     struct terrain_type *t_plain;
-    struct critbit_tree ** cb;
 
     test_cleanup();
     lang = get_or_create_locale("de");
-    cb = (struct critbit_tree **)get_translations(lang, UT_PARAMS);
-    add_translation(cb, "TEMP", P_TEMP);
+    test_translate_param(lang, P_TEMP, "TEMP");
     /* note that the english order is FIGHT, not COMBAT, so this is a poor example */
     t_plain = test_create_terrain("plain", LAND_REGION);
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, t_plain));

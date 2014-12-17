@@ -1,6 +1,7 @@
 #ifndef ERESSEA_TESTS_H
 #define ERESSEA_TESTS_H
 
+#include <kernel/types.h>
 #include <stdlib.h>
 
 #ifdef __cplusplus
@@ -33,6 +34,7 @@ extern "C" {
     struct building_type *test_create_buildingtype(const char *name);
 
     int RunAllTests(void);
+    void test_translate_param(const struct locale *lang, param_t param, const char *text);
 
 #ifdef __cplusplus
 }
