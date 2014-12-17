@@ -508,12 +508,10 @@ int shipspeed(const ship * sh, const unit * u)
     k *= SHIPSPEED;
 #endif
 
-#ifdef SHIPDAMAGE
     if (sh->damage)
         k =
         (k * (sh->size * DAMAGE_SCALE - sh->damage) + sh->size * DAMAGE_SCALE -
         1) / (sh->size * DAMAGE_SCALE);
-#endif
 
     return (int)k;
 }
@@ -731,56 +729,6 @@ int alliedunit(const unit * u, const faction * f2, int mode)
         return alliedgroup(pl, u->faction, f2, sf, mode);
     }
     return 0;
-}
-
-static attrib_type at_lighthouse = {
-    "lighthouse"
-    /* Rest ist NULL; temporäres, nicht alterndes Attribut */
-};
-
-/* update_lighthouse: call this function whenever the size of a lighthouse changes
- * it adds temporary markers to the surrounding regions.
- * The existence of markers says nothing about the quality of the observer in
- * the lighthouse, for this may change more frequently.
- */
-void update_lighthouse(building * lh)
-{
-    const struct building_type *bt_lighthouse = bt_find("lighthouse");
-    if (bt_lighthouse && lh->type == bt_lighthouse) {
-        region *r = lh->region;
-        int d = (int)log10(lh->size) + 1;
-        int x;
-
-        if (lh->size > 0) {
-            r->flags |= RF_LIGHTHOUSE;
-        }
-
-        for (x = -d; x <= d; ++x) {
-            int y;
-            for (y = -d; y <= d; ++y) {
-                attrib *a;
-                region *r2;
-                int px = r->x + x, py = r->y + y;
-                pnormalize(&px, &py, rplane(r));
-                r2 = findregion(px, py);
-                if (!r2 || !fval(r2->terrain, SEA_REGION))
-                    continue;
-                if (distance(r, r2) > d)
-                    continue;
-                a = a_find(r2->attribs, &at_lighthouse);
-                while (a && a->type == &at_lighthouse) {
-                    building *b = (building *)a->data.v;
-                    if (b == lh)
-                        break;
-                    a = a->next;
-                }
-                if (!a) {
-                    a = a_add(&r2->attribs, a_new(&at_lighthouse));
-                    a->data.v = (void *)lh;
-                }
-            }
-        }
-    }
 }
 
 int count_faction(const faction * f, int flags)
@@ -1179,158 +1127,6 @@ int maxworkingpeasants(const struct region *r)
     int size = production(r);
     int treespace = (rtrees(r, 2) + rtrees(r, 1) / 2) * TREESIZE;
     return _max(size-treespace, _min(size / 10 , 200));
-}
-
-int lighthouse_range(const building * b, const faction * f)
-{
-    int d = 0;
-    if (fval(b, BLD_WORKING) && b->size >= 10) {
-        int maxd = (int)log10(b->size) + 1;
-
-        if (skill_enabled(SK_PERCEPTION)) {
-            region *r = b->region;
-            int c = 0;
-            unit *u;
-            for (u = r->units; u; u = u->next) {
-                if (u->building == b || u == building_owner(b)) {
-                    if (u->building == b) {
-                        c += u->number;
-                    }
-                    if (c > buildingcapacity(b))
-                        break;
-                    if (f == NULL || u->faction == f) {
-                        int sk = eff_skill(u, SK_PERCEPTION, r) / 3;
-                        d = _max(d, sk);
-                        d = _min(maxd, d);
-                        if (d == maxd)
-                            break;
-                    }
-                }
-                else if (c)
-                    break;                /* first unit that's no longer in the house ends the search */
-            }
-        }
-        else {
-            /* E3A rule: no perception req'd */
-            return maxd;
-        }
-    }
-    return d;
-}
-
-bool check_leuchtturm(region * r, faction * f)
-{
-    attrib *a;
-
-    if (!fval(r->terrain, SEA_REGION))
-        return false;
-
-    for (a = a_find(r->attribs, &at_lighthouse); a && a->type == &at_lighthouse;
-        a = a->next) {
-        building *b = (building *)a->data.v;
-
-        assert(b->type == bt_find("lighthouse"));
-        if (fval(b, BLD_WORKING) && b->size >= 10) {
-            int maxd = (int)log10(b->size) + 1;
-
-            if (skill_enabled(SK_PERCEPTION) && f) {
-                region *r2 = b->region;
-                unit *u;
-                int c = 0;
-                int d = 0;
-
-                for (u = r2->units; u; u = u->next) {
-                    if (u->building == b) {
-                        c += u->number;
-                        if (c > buildingcapacity(b))
-                            break;
-                        if (f == NULL || u->faction == f) {
-                            if (!d)
-                                d = distance(r, r2);
-                            if (maxd < d)
-                                break;
-                            if (eff_skill(u, SK_PERCEPTION, r) >= d * 3)
-                                return true;
-                        }
-                    }
-                    else if (c)
-                        break;              /* first unit that's no longer in the house ends the search */
-                }
-            }
-            else {
-                /* E3A rule: no perception req'd */
-                return maxd;
-            }
-        }
-    }
-
-    return false;
-}
-
-region *lastregion(faction * f)
-{
-#ifdef SMART_INTERVALS
-    unit *u = f->units;
-    region *r = f->last;
-
-    if (u == NULL)
-        return NULL;
-    if (r != NULL)
-        return r->next;
-
-    /* it is safe to start in the region of the first unit. */
-    f->last = u->region;
-    /* if regions have indices, we can skip ahead: */
-    for (u = u->nextF; u != NULL; u = u->nextF) {
-        r = u->region;
-        if (r->index > f->last->index)
-            f->last = r;
-    }
-
-    /* we continue from the best region and look for travelthru etc. */
-    for (r = f->last->next; r; r = r->next) {
-        plane *p = rplane(r);
-
-        /* search the region for travelthru-attributes: */
-        if (fval(r, RF_TRAVELUNIT)) {
-            attrib *ru = a_find(r->attribs, &at_travelunit);
-            while (ru && ru->type == &at_travelunit) {
-                u = (unit *)ru->data.v;
-                if (u->faction == f) {
-                    f->last = r;
-                    break;
-                }
-                ru = ru->next;
-            }
-        }
-        if (f->last == r)
-            continue;
-        if (check_leuchtturm(r, f))
-            f->last = r;
-        if (p && is_watcher(p, f)) {
-            f->last = r;
-        }
-    }
-    return f->last->next;
-#else
-    return NULL;
-#endif
-}
-
-region *firstregion(faction * f)
-{
-#ifdef SMART_INTERVALS
-    region *r = f->first;
-
-    if (f->units == NULL)
-        return NULL;
-    if (r != NULL)
-        return r;
-
-    return f->first = regions;
-#else
-    return regions;
-#endif
 }
 
 void **blk_list[1024];

@@ -30,6 +30,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "region.h"
 #include "skill.h"
 #include "save.h"
+#include "lighthouse.h"
 #include "version.h"
 
 /* util includes */

@@ -200,9 +200,9 @@ static int unused_faction_id(void)
     int id = rng_int() % MAX_FACTION_ID;
 
     while (!faction_id_is_unused(id)) {
-        id++;
-        if (id == MAX_FACTION_ID)
+        if (++id == MAX_FACTION_ID) {
             id = 0;
+        }
     }
 
     return id;
