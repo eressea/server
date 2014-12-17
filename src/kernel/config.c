@@ -21,7 +21,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* attributes includes */
 #include <attributes/reduceproduction.h>
-#include <attributes/gm.h>
 
 /* kernel includes */
 #include "alliance.h"
@@ -612,39 +611,11 @@ bool unit_has_cursed_item(const unit * u)
     return false;
 }
 
-static void init_gms(void)
-{
-    faction *f;
-
-    for (f = factions; f; f = f->next) {
-        attrib *a = a_find(f->attribs, &at_gm);
-
-        if (a != NULL)
-            fset(f, FFL_GM);
-    }
-}
-
 static int
 autoalliance(const plane * pl, const faction * sf, const faction * f2)
 {
-    static bool init = false;
-    if (!init) {
-        init_gms();
-        init = true;
-    }
     if (pl && (pl->flags & PFL_FRIENDLY))
         return HELP_ALL;
-    /* if f2 is a gm in this plane, everyone has an auto-help to it */
-    if (fval(f2, FFL_GM)) {
-        attrib *a = a_find(f2->attribs, &at_gm);
-
-        while (a) {
-            const plane *p = (const plane *)a->data.v;
-            if (p == pl)
-                return HELP_ALL;
-            a = a->next;
-        }
-    }
 
     if (f_get_alliance(sf) != NULL && AllianceAuto()) {
         if (sf->alliance == f2->alliance)
