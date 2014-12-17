@@ -13,12 +13,14 @@
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 
+#include <util/base36.h>
 #include <util/language.h>
 
 #include <CuTest.h>
 #include <tests.h>
 
 #include <assert.h>
+#include <stdio.h>
 
 static void test_new_building_can_be_renamed(CuTest * tc)
 {
@@ -356,16 +358,23 @@ struct pay_fixture {
     unit *u2;
 };
 
+static double level_taxes(const building * b, int level) {
+    return b->size*level*2.0;
+}
+
 static void setup_pay_cmd(struct pay_fixture *fix) {
     faction *f;
     region *r;
     building *b;
+    building_type *btcastle;
 
     test_create_world();
     f = test_create_faction(NULL);
     r = findregion(0, 0);
     assert(r && f);
-    b = test_create_building(r, bt_get_or_create("lighthouse"));
+    btcastle = bt_get_or_create("castle");
+    btcastle->taxes = level_taxes;
+    b = test_create_building(r, btcastle);
     assert(b);
     fix->u1 = test_create_unit(f, r);
     fix->u2 = test_create_unit(f, r);
@@ -394,6 +403,30 @@ static void test_pay_cmd(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_pay_cmd_other_building(CuTest *tc) {
+    struct pay_fixture fix;
+    order *ord;
+    faction *f;
+    building *b;
+    char cmd[32];
+
+    test_cleanup();
+    setup_pay_cmd(&fix);
+    f = fix.u1->faction;
+    b = test_create_building(fix.u1->region, bt_get_or_create("lighthouse"));
+    set_param(&global.parameters, "rules.region_owners", "1");
+    set_param(&global.parameters, "rules.region_owner_pay_building", "lighthouse");
+    update_owners(b->region);
+
+    _snprintf(cmd, sizeof(cmd), "NOT %s", itoa36(b->no));
+    ord = create_order(K_PAY, f->locale, cmd);
+    assert(ord);
+    CuAssertPtrEquals(tc, fix.u1, building_owner(b));
+    CuAssertIntEquals(tc, 0, pay_cmd(fix.u1, ord));
+    CuAssertIntEquals(tc, BLD_DONTPAY, b->flags&BLD_DONTPAY);
+    test_cleanup();
+}
+
 static void test_pay_cmd_must_be_owner(CuTest *tc) {
     struct pay_fixture fix;
     order *ord;
@@ -411,7 +444,6 @@ static void test_pay_cmd_must_be_owner(CuTest *tc) {
     CuAssertIntEquals(tc, 0, b->flags&BLD_DONTPAY);
     test_cleanup();
 }
-
 
 static void test_new_units(CuTest *tc) {
     unit *u;
@@ -581,6 +613,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_reserve_self);
     SUITE_ADD_TEST(suite, test_reserve_cmd);
     SUITE_ADD_TEST(suite, test_pay_cmd);
+    SUITE_ADD_TEST(suite, test_pay_cmd_other_building);
     SUITE_ADD_TEST(suite, test_pay_cmd_must_be_owner);
     SUITE_ADD_TEST(suite, test_new_units);
     SUITE_ADD_TEST(suite, test_cannot_create_unit_above_limit);
