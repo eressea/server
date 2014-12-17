@@ -23,6 +23,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
+
+    struct faction;
+    struct region;
+    struct building;
     /* leuchtturm */
     bool check_leuchtturm(struct region *r, struct faction *f);
     void update_lighthouse(struct building *lh);
