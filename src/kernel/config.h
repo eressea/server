@@ -108,14 +108,6 @@ extern "C" {
     /* special units */
     void make_undead_unit(struct unit *);
 
-    typedef struct strlist {
-        struct strlist *next;
-        char *s;
-    } strlist;
-
-    void addstrlist(strlist ** SP, const char *s);
-    void freestrlist(strlist * s);
-
     unsigned int atoip(const char *s);
     unsigned int getuint(void);
     int getint(void);
