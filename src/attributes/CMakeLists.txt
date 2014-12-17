@@ -7,7 +7,6 @@ SET(_FILES
 attributes.c
 fleechance.c
 follow.c
-gm.c
 hate.c
 iceberg.c
 key.c

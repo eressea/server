@@ -1181,3 +1181,26 @@ void randomevents(void)
 
     dissolve_units();
 }
+
+void plagues(region * r)
+{
+    int peasants;
+    int i;
+    int dead = 0;
+
+    peasants = rpeasants(r);
+    dead = (int)(0.5F + PLAGUE_VICTIMS * peasants);
+    for (i = dead; i != 0; i--) {
+        if (rng_double() < PLAGUE_HEALCHANCE && rmoney(r) >= PLAGUE_HEALCOST) {
+            rsetmoney(r, rmoney(r) - PLAGUE_HEALCOST);
+            --dead;
+        }
+    }
+
+    if (dead > 0) {
+        message *msg = add_message(&r->msgs, msg_message("pest", "dead", dead));
+        msg_release(msg);
+        deathcounts(r, dead);
+        rsetpeasants(r, peasants - dead);
+    }
+}

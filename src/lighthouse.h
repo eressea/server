@@ -1,7 +1,7 @@
 /*
 Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -16,15 +16,23 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#ifndef H_ATTRIBUTE_AGGRESSIVE
-#define H_ATTRIBUTE_AGGRESSIVE
+#ifndef LIGHTHOUSE_H
+#define LIGHTHOUSE_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-  extern struct attrib_type at_aggressive;
-  extern struct attrib *make_aggressive(double probability);
-  extern void init_aggressive(void);
+
+    struct faction;
+    struct region;
+    struct building;
+    /* leuchtturm */
+    bool check_leuchtturm(struct region *r, struct faction *f);
+    void update_lighthouse(struct building *lh);
+    int lighthouse_range(const struct building *b,
+        const struct faction *f);
+
 
 #ifdef __cplusplus
 }

@@ -20,6 +20,7 @@
 #include "laws.h"
 #include "spells.h"
 #include "direction.h"
+#include "randenc.h"
 #include "monster.h"
 
 #include <spells/borders.h>
@@ -2974,7 +2975,7 @@ static int sp_plague(castorder * co)
     unit *mage = co->magician.u;
     int cast_level = co->level;
 
-    plagues(r, true);
+    plagues(r);
 
     ADDMSG(&mage->faction->msgs, msg_message("plague_spell",
         "region mage", r, mage));

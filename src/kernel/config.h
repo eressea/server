@@ -30,7 +30,6 @@ extern "C" {
     /* TODO: move these settings to settings.h or into configuration files */
 #define GOBLINKILL              /* Goblin-Spezialklau kann tödlich enden */
 #define HERBS_ROT               /* herbs owned by units have a chance to rot. */
-#define SHIPDAMAGE              /* Schiffsbeschädigungen */
 #define INSECT_POTION           /* Spezialtrank für Insekten */
 #define ORCIFICATION            /* giving snotlings to the peasants gets counted */
 
@@ -53,13 +52,6 @@ extern "C" {
     /** Magic */
 #define MAXMAGICIANS    3
 #define MAXALCHEMISTS   3
-
-    /** Plagues **/
-#define PLAGUE_CHANCE      0.1F /* Seuchenwahrscheinlichkeit (siehe plagues()) */
-#define PLAGUE_VICTIMS     0.2F /* % Betroffene */
-#define PLAGUE_HEALCHANCE  0.25F        /* Wahrscheinlichkeit Heilung */
-#define PLAGUE_HEALCOST    30   /* Heilkosten */
-
 
     /* getunit results: */
 #define GET_UNIT 0
@@ -93,7 +85,6 @@ extern "C" {
      * von struct unitname, etc. zurückgegeben werden. ohne die 0 */
 
 #define BAGCAPACITY         20000   /* soviel paßt in einen Bag of Holding */
-#define STRENGTHCAPACITY    50000   /* zusätzliche Tragkraft beim Kraftzauber (deprecated) */
 #define STRENGTHMULTIPLIER  50   /* multiplier for trollbelt */
 
     /* ----------------- Befehle ----------------------------------- */
@@ -112,12 +103,6 @@ extern "C" {
     bool faction_id_is_unused(int);
 
     int max_magicians(const struct faction * f);
-    /* leuchtturm */
-    bool check_leuchtturm(struct region *r, struct faction *f);
-    void update_lighthouse(struct building *lh);
-    int lighthouse_range(const struct building *b,
-        const struct faction *f);
-
     int findoption(const char *s, const struct locale *lang);
 
     /* special units */
@@ -234,10 +219,6 @@ extern "C" {
     int weight(const struct unit *u);
     void changeblockchaos(void);
 
-    /* intervall, in dem die regionen der partei zu finden sind */
-    struct region *firstregion(struct faction *f);
-    struct region *lastregion(struct faction *f);
-
     bool idle(struct faction *f);
     bool unit_has_cursed_item(const struct unit *u);
 
@@ -352,7 +333,6 @@ extern "C" {
     struct order *default_order(const struct locale *lang);
     int entertainmoney(const struct region *r);
 
-    void plagues(struct region *r, bool ismagic);
     void free_gamedata(void);
 
 #define GIVE_SELF 1

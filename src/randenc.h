@@ -1,7 +1,7 @@
 /*
 Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -22,8 +22,16 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-  extern void encounters(void);
-  extern void randomevents(void);
+    struct region;
+
+    /** Plagues **/
+#define PLAGUE_CHANCE      0.1F /* Seuchenwahrscheinlichkeit (siehe plagues()) */
+#define PLAGUE_VICTIMS     0.2F /* % Betroffene */
+#define PLAGUE_HEALCHANCE  0.25F        /* Wahrscheinlichkeit Heilung */
+#define PLAGUE_HEALCOST    30   /* Heilkosten */
+    void plagues(struct region *r);
+    void encounters(void);
+    void randomevents(void);
 
 #ifdef __cplusplus
 }

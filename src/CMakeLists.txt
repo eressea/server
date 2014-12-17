@@ -70,6 +70,7 @@ set (ERESSEA_SRC
   upkeep.c
   vortex.c
   names.c
+  lighthouse.c
   reports.c
   eressea.c
   callback.c

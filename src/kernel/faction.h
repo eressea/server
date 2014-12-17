@@ -50,9 +50,7 @@ extern "C" {
 #define FFL_NPC           (1<<25)       /* eine Partei mit Monstern */
 #define FFL_DBENTRY       (1<<28)       /* Partei ist in Datenbank eingetragen */
 
-#define FFL_GM            (1<<30)       /* eine Partei mit Sonderrechten */
-
-#define FFL_SAVEMASK (FFL_DEFENDER|FFL_NEWID|FFL_GM|FFL_NPC|FFL_DBENTRY|FFL_NOIDLEOUT)
+#define FFL_SAVEMASK (FFL_DEFENDER|FFL_NEWID|FFL_NPC|FFL_DBENTRY|FFL_NOIDLEOUT)
 
 typedef struct faction {
     struct faction *next;

@@ -25,6 +25,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "move.h"
 #include "laws.h"
 #include "skill.h"
+#include "lighthouse.h"
 
 /* kernel includes */
 #include <kernel/alliance.h>
