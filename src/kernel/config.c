@@ -794,15 +794,6 @@ parse(keyword_t kword, int(*dofun) (unit *, struct order *), bool thisorder)
     }
 }
 
-const char *igetstrtoken(const char *initstr)
-{
-    if (initstr != NULL) {
-        init_tokens_str(initstr, NULL);
-    }
-
-    return getstrtoken();
-}
-
 unsigned int getuint(void)
 {
     const char *s = getstrtoken();

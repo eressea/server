@@ -112,8 +112,6 @@ extern "C" {
     unsigned int getuint(void);
     int getint(void);
 
-    const char *igetstrtoken(const char *s);
-
     param_t findparam(const char *s, const struct locale *lang);
     param_t findparam_ex(const char *s, const struct locale * lang);
     bool isparam(const char *s, const struct locale * lang, param_t param);

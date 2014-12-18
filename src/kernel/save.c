@@ -246,13 +246,6 @@ static faction *factionorders(void)
     return f;
 }
 
-/* ------------------------------------------------------------- */
-
-static param_t igetparam(const char *s, const struct locale *lang)
-{
-    return findparam(igetstrtoken(s), lang);
-}
-
 int readorders(const char *filename)
 {
     FILE *F = NULL;
@@ -275,8 +268,12 @@ int readorders(const char *filename)
 
     while (b) {
         const struct locale *lang = f ? f->locale : default_locale;
-        int p;
-        switch (igetparam(b, lang)) {
+        param_t p;
+        const char *s;
+        init_tokens_str(b, NULL);
+        s = getstrtoken();
+        p = s ? findparam(s, lang) : NOPARAM;
+        switch (p) {
 #undef LOCALE_CHANGE
 #ifdef LOCALE_CHANGE
         case P_LOCALE:
@@ -286,8 +283,8 @@ int readorders(const char *filename)
                 f->locale = get_locale(s);
             }
         }
-            b = getbuf(F, enc_gamedata);
-            break;
+        b = getbuf(F, enc_gamedata);
+        break;
 #endif
         case P_GAMENAME:
         case P_FACTION:
@@ -307,10 +304,13 @@ int readorders(const char *filename)
         case P_UNIT:
             if (!f || !unitorders(F, enc_gamedata, f))
                 do {
-                b = getbuf(F, enc_gamedata);
-                if (!b)
-                    break;
-                p = (b[0] == '@') ? NOPARAM : igetparam(b, lang);
+                    b = getbuf(F, enc_gamedata);
+                    if (!b) {
+                        break;
+                    }
+                    init_tokens_str(b, NULL);
+                    b = getstrtoken();
+                    p = (!b || b[0] == '@') ? NOPARAM : findparam(b, lang);
                 } while ((p != P_UNIT || !f) && p != P_FACTION && p != P_NEXT
                     && p != P_GAMENAME);
                 break;
@@ -1030,8 +1030,8 @@ void writeregion(struct gamedata *data, const region * r)
         WRITE_INT(data->store, rmoney(r));
         if (r->land)
             for (demand = r->land->demands; demand; demand = demand->next) {
-            WRITE_TOK(data->store, resourcename(demand->type->itype->rtype, 0));
-            WRITE_INT(data->store, demand->value);
+                WRITE_TOK(data->store, resourcename(demand->type->itype->rtype, 0));
+                WRITE_INT(data->store, demand->value);
             }
         WRITE_TOK(data->store, "end");
         write_items(data->store, r->land->items);
@@ -1856,7 +1856,7 @@ int writegame(const char *filename)
 
     log_printf(stdout, "\nOk.\n");
     return 0;
-}
+    }
 
 int a_readint(attrib * a, void *owner, struct storage *store)
 {
