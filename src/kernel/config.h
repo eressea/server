@@ -119,11 +119,7 @@ extern "C" {
     bool isparam(const char *s, const struct locale * lang, param_t param);
     param_t getparam(const struct locale *lang);
 
-    int getid(void);
 #define unitid(x) itoa36((x)->no)
-
-#define getshipid() getid()
-#define getfactionid() getid()
 
 #define buildingid(x) itoa36((x)->no)
 #define shipid(x) itoa36((x)->no)

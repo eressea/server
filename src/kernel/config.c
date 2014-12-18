@@ -1218,16 +1218,6 @@ typedef struct param {
     char *data;
 } param;
 
-int getid(void)
-{
-    const char *str = getstrtoken();
-    int i = str ? atoi36(str) : 0;
-    if (i < 0) {
-        return -1;
-    }
-    return i;
-}
-
 const char *get_param(const struct param *p, const char *key)
 {
     while (p != NULL) {
