@@ -112,18 +112,12 @@ extern "C" {
     unsigned int getuint(void);
     int getint(void);
 
-    const char *igetstrtoken(const char *s);
-
     param_t findparam(const char *s, const struct locale *lang);
     param_t findparam_ex(const char *s, const struct locale * lang);
     bool isparam(const char *s, const struct locale * lang, param_t param);
     param_t getparam(const struct locale *lang);
 
-    int getid(void);
 #define unitid(x) itoa36((x)->no)
-
-#define getshipid() getid()
-#define getfactionid() getid()
 
 #define buildingid(x) itoa36((x)->no)
 #define shipid(x) itoa36((x)->no)

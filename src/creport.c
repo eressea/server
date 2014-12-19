@@ -1523,6 +1523,7 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
     fprintf(F, "\"%s\";Spiel\n", game_name());
     fprintf(F, "\"%s\";Konfiguration\n", "Standard");
     fprintf(F, "\"%s\";Koordinaten\n", "Hex");
+    fprintf(F, "%d;max_units\n", rule_faction_limit());
     fprintf(F, "%d;Basis\n", 36);
     fprintf(F, "%d;Runde\n", turn);
     fprintf(F, "%d;Zeitalter\n", era);

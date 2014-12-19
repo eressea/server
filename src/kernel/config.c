@@ -794,15 +794,6 @@ parse(keyword_t kword, int(*dofun) (unit *, struct order *), bool thisorder)
     }
 }
 
-const char *igetstrtoken(const char *initstr)
-{
-    if (initstr != NULL) {
-        init_tokens_str(initstr, NULL);
-    }
-
-    return getstrtoken();
-}
-
 unsigned int getuint(void)
 {
     const char *s = getstrtoken();
@@ -1217,16 +1208,6 @@ typedef struct param {
     char *name;
     char *data;
 } param;
-
-int getid(void)
-{
-    const char *str = getstrtoken();
-    int i = str ? atoi36(str) : 0;
-    if (i < 0) {
-        return -1;
-    }
-    return i;
-}
 
 const char *get_param(const struct param *p, const char *key)
 {
