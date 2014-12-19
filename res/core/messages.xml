@@ -787,10 +787,11 @@
   <message name="nr_population" section="nr">
     <type>
       <arg name="population" type="int"/>
+      <arg name="limit" type="int"/>
       <arg name="units" type="int"/>
     </type>
-    <text locale="de">"Deine Partei hat $int($population) Personen in $int($units) Einheiten."</text>
-    <text locale="en">"Your faction has $int($population) people in $int($units) units."</text>
+    <text locale="de">"Deine Partei hat $int($population) Personen in $int($units) von maximal $int($limit) Einheiten."</text>
+    <text locale="en">"Your faction has $int($population) people in $int($units) of $int($limit) possible units."</text>
   </message>
   <message name="nr_stat_header" section="nr">
     <type>

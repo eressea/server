@@ -2195,7 +2195,7 @@ const char *charset)
         no_people = f->num_people;
     }
 #endif
-    m = msg_message("nr_population", "population units", no_people, no_units);
+    m = msg_message("nr_population", "population units limit", no_people, no_units, rule_faction_limit());
     nr_render(m, f->locale, buf, sizeof(buf), f);
     msg_release(m);
     centre(F, buf, true);
