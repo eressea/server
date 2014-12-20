@@ -198,6 +198,34 @@ static void test_enter_ship(CuTest * tc)
     test_cleanup();
 }
 
+static void test_display_cmd(CuTest *tc) {
+    unit *u;
+    faction *f;
+    region *r;
+    order *ord;
+
+    test_cleanup();
+    r = test_create_region(0, 0, test_create_terrain("plain", LAND_REGION));
+    f = test_create_faction(0);
+    f->locale = get_or_create_locale("de");
+    assert(r && f);
+    test_translate_param(f->locale, P_UNIT, "EINHEIT");
+    u = test_create_unit(f, r);
+    assert(u);
+
+    ord = create_order(K_DISPLAY, f->locale, "EINHEIT Hodor");
+    CuAssertIntEquals(tc, 0, display_cmd(u, ord));
+    CuAssertStrEquals(tc, "Hodor", u->display);
+    free_order(ord);
+
+    ord = create_order(K_DISPLAY, f->locale, "EINHEIT");
+    CuAssertIntEquals(tc, 0, display_cmd(u, ord));
+    CuAssertPtrEquals(tc, NULL, u->display);
+    free_order(ord);
+
+    test_cleanup();
+}
+
 static void test_fishing_feeds_2_people(CuTest * tc)
 {
     const resource_type *rtype;
@@ -620,5 +648,6 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_contact);
     SUITE_ADD_TEST(suite, test_enter_building);
     SUITE_ADD_TEST(suite, test_enter_ship);
+    SUITE_ADD_TEST(suite, test_display_cmd);
     return suite;
 }

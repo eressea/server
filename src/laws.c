@@ -1634,9 +1634,14 @@ int display_cmd(unit * u, struct order *ord)
         const char *s2 = getstrtoken();
 
         free(*s);
-        *s = _strdup(s2);
-        if (strlen(s2) >= DISPLAYSIZE) {
-            (*s)[DISPLAYSIZE] = 0;
+        if (s2) {
+            *s = _strdup(s2);
+            if (strlen(s2) >= DISPLAYSIZE) {
+                (*s)[DISPLAYSIZE] = 0;
+            }
+        }
+        else {
+            *s = 0;
         }
     }
 
