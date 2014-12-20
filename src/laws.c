@@ -674,6 +674,39 @@ growing_herbs(region * r, const int current_season, const int last_weeks_season)
     }
 }
 
+void immigration(void)
+{
+    region *r;
+    log_info(" - Einwanderung...");
+    int repopulate=get_param_int(global.parameters, "rules.economy.repopulate_maximum", 90);
+    for (r = regions; r; r = r->next) {
+        if (r->land && r->land->newpeasants) {
+            int rp = rpeasants(r) + r->land->newpeasants;
+            rsetpeasants(r, _max(0, rp));
+        }
+        /* Genereate some (0-2 to 0-6 depending on the income) peasants out of nothing */
+        /*if less then 50 are in the region and there is space and no monster or deamon units in the region */
+        int peasants = rpeasants(r);
+        if (repopulate && r->land && (peasants < repopulate) && maxworkingpeasants(r) > (peasants+30)*2)
+        {
+            int badunit = 0;
+            unit *u;
+            for (u = r->units; u; u = u->next) {
+                if (!playerrace(u_race(u)) || u_race(u) == get_race(RC_DAEMON))
+                {
+                    badunit = 1;
+                    break;
+                }
+            }
+            if (badunit == 0)
+            {
+                peasants += (int)(rng_double()*(wage(r, NULL, NULL, turn) - 9));
+                rsetpeasants(r, peasants);
+            }
+        }
+    }
+}
+
 void demographics(void)
 {
     region *r;
@@ -748,15 +781,7 @@ void demographics(void)
     };
 
     remove_empty_units();
-
-    log_info(" - Einwanderung...");
-    for (r = regions; r; r = r->next) {
-        if (r->land && r->land->newpeasants) {
-            int rp = rpeasants(r) + r->land->newpeasants;
-            rsetpeasants(r, _max(0, rp));
-        }
-    }
-
+    immigration();
     checkorders();
 }
 
