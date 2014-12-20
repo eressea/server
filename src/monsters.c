@@ -199,7 +199,8 @@ static order *get_money_for_dragon(region * r, unit * u, int wanted)
     /* falls die einnahmen erreicht werden, bleibt das monster noch eine */
     /* runde hier. */
     if (n + rmoney(r) >= wanted) {
-        return create_order(K_TAX, default_locale, NULL);
+        keyword_t kwd = keyword_disabled(K_TAX) ? K_LOOT : K_TAX;
+        return create_order(kwd, default_locale, NULL);
     }
 
     /* wenn wir NULL zurueckliefern, macht der drache was anderes, z.b. weggehen */
