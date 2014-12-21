@@ -12,7 +12,7 @@ if [ -d $REPORTS ]; then
   rm -rf $REPORTS
 fi
 mkdir $REPORTS
-$BIN/backup-eressea $GAME
+$BIN/backup-eressea $GAME $TURN
 
 cd $ERESSEA/game-$GAME
 if [ -d test ]; then
