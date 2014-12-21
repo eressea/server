@@ -22,8 +22,8 @@ exit $2 # otherwise
 function build() {
 assert_dir $SOURCE
 cd $SOURCE
-[ -z $1 ] || ( git checkout $1 && git submodule update )
-git pull || abort "failed to update source. do you have local changes?"
+[ -z $1 ] || git checkout $1
+( git pull && git submodule update ) || abort "failed to update source. do you have local changes?"
 s/build || abort "build failed."
 }
 
