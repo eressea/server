@@ -2615,7 +2615,7 @@ static int hunt(unit * u, order * ord)
     /* In command steht jetzt das NACH-Kommando. */
 
     /* NACH ignorieren und Parsing initialisieren. */
-    init_tokens_str(command, NULL);
+    init_tokens_str(command);
     getstrtoken();
     /* NACH ausführen */
     move(u, false);

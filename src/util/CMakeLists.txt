@@ -2,6 +2,7 @@ project(util C)
 
 SET(_TEST_FILES
 base36.test.c
+parser.test.c
 attrib.test.c
 strings.test.c
 bsdstring.test.c

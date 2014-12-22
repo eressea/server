@@ -15,7 +15,6 @@
 
 typedef struct parser_state {
   const char *current_token;
-  char *current_cmd;
   struct parser_state *next;
 } parser_state;
 
@@ -50,22 +49,17 @@ static int eatwhitespace_c(const char **str_p)
   return ret;
 }
 
-void init_tokens_str(const char *initstr, char *cmd)
+void init_tokens_str(const char *initstr)
 {
   if (states == NULL) {
     states = malloc(sizeof(parser_state));
   }
-  else if (states->current_cmd && states->current_cmd!=cmd) {
-    free(states->current_cmd);
-  }
-  states->current_cmd = cmd;
   states->current_token = initstr;
 }
 
 void parser_pushstate(void)
 {
   parser_state *new_state = malloc(sizeof(parser_state));
-  new_state->current_cmd = NULL;
   new_state->current_token = NULL;
   new_state->next = states;
   states = new_state;
@@ -74,8 +68,6 @@ void parser_pushstate(void)
 void parser_popstate(void)
 {
   parser_state *new_state = states->next;
-  if (states->current_cmd != NULL)
-    free(states->current_cmd);
   free(states);
   states = new_state;
 }
@@ -128,83 +120,104 @@ void skip_token(void)
   }
 }
 
-const char *parse_token(const char **str)
+char *parse_token(const char **str, char *lbuf, size_t len)
+{
+    char *cursor = lbuf;
+    char quotechar = 0;
+    bool escape = false;
+    const char *ctoken = *str;
+
+    if (!ctoken) {
+        return 0;
+    }
+    eatwhitespace_c(&ctoken);
+    if (!*ctoken) {
+        return 0;
+    }
+    while (*ctoken && cursor-len < lbuf-1) {
+        ucs4_t ucs;
+        size_t len;
+        bool copy = false;
+
+        unsigned char utf8_character = *(unsigned char *)ctoken;
+        if (~utf8_character & 0x80) {
+            ucs = utf8_character;
+            len = 1;
+        }
+        else {
+            int ret = unicode_utf8_to_ucs4(&ucs, ctoken, &len);
+            if (ret != 0) {
+                log_warning("illegal character sequence in UTF8 string: %s\n", ctoken);
+                break;
+            }
+        }
+        if (escape) {
+            copy = true;
+            escape = false;
+        }
+        else if (iswxspace((wint_t)ucs)) {
+            if (quotechar == 0)
+                break;
+            copy = true;
+        }
+        else if (utf8_character == '"' || utf8_character == '\'') {
+            if (utf8_character == quotechar) {
+                ++ctoken;
+                break;
+            }
+            else if (quotechar == 0) {
+                quotechar = utf8_character;
+                ++ctoken;
+            }
+            else {
+                *cursor++ = *ctoken++;
+            }
+        }
+        else if (utf8_character == SPACE_REPLACEMENT) {
+            *cursor++ = ' ';
+            ++ctoken;
+        }
+        else if (utf8_character == ESCAPE_CHAR) {
+            escape = true;
+            ++ctoken;
+        }
+        else {
+            copy = true;
+        }
+        if (copy) {
+            memcpy(cursor, ctoken, len);
+            cursor += len;
+            ctoken += len;
+        }
+    }
+
+    assert(cursor - len < lbuf - 1); // TODO: handle too-small buffers
+    *cursor = '\0';
+    *str = ctoken;
+    return lbuf;
+}
+
+const char *parse_token_depr(const char **str)
 {
   static char lbuf[MAXTOKENSIZE];       /* STATIC_RESULT: used for return, not across calls */
-  char *cursor = lbuf;
-  char quotechar = 0;
-  bool escape = false;
-  const char *ctoken = *str;
-
-  if (!ctoken) {
-      return 0;
-  }
-  eatwhitespace_c(&ctoken);
-  if (!*ctoken) {
-      return 0;
-  }
-  while (*ctoken && cursor - lbuf < MAXTOKENSIZE - 1) {
-    ucs4_t ucs;
-    size_t len;
-    bool copy = false;
-
-    unsigned char utf8_character = *(unsigned char *)ctoken;
-    if (~utf8_character & 0x80) {
-      ucs = utf8_character;
-      len = 1;
-    } else {
-      int ret = unicode_utf8_to_ucs4(&ucs, ctoken, &len);
-      if (ret != 0) {
-        log_warning("illegal character sequence in UTF8 string: %s\n", ctoken);
-        break;
-      }
-    }
-    if (escape) {
-      copy = true;
-      escape = false;
-    } else if (iswxspace((wint_t) ucs)) {
-      if (quotechar == 0)
-        break;
-      copy = true;
-    } else if (utf8_character == '"' || utf8_character == '\'') {
-      if (utf8_character == quotechar) {
-        ++ctoken;
-        break;
-      } else if (quotechar == 0) {
-        quotechar = utf8_character;
-        ++ctoken;
-      } else {
-        *cursor++ = *ctoken++;
-      }
-    } else if (utf8_character == SPACE_REPLACEMENT) {
-      *cursor++ = ' ';
-      ++ctoken;
-    } else if (utf8_character == ESCAPE_CHAR) {
-      escape = true;
-      ++ctoken;
-    } else {
-      copy = true;
-    }
-    if (copy) {
-      memcpy(cursor, ctoken, len);
-      cursor += len;
-      ctoken += len;
-    }
-  }
-
-  *cursor = '\0';
-  *str = ctoken;
-  return lbuf;
+  return parse_token(str, lbuf, MAXTOKENSIZE);
 }
 
 const char *getstrtoken(void)
 {
-  return parse_token((const char **)&states->current_token);
+    char lbuf[MAXTOKENSIZE];
+    return parse_token((const char **)&states->current_token, lbuf, MAXTOKENSIZE);
+}
+
+const char *getstrtok(char *lbuf, size_t bufsize)
+{
+    return parse_token((const char **)&states->current_token, lbuf, bufsize);
 }
 
 int getid(void)
 {
-    const char *str = getstrtoken();
+    char token[16];
+    const char *str = getstrtok(token, sizeof(token));
     int i = str ? atoi36(str) : 0;
     if (i < 0) {
         return -1;

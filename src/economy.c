@@ -1485,6 +1485,7 @@ static void create_item(unit * u, const item_type * itype, int want)
 
 int make_cmd(unit * u, struct order *ord)
 {
+    char token[128];
     region *r = u->region;
     const building_type *btype = 0;
     const ship_type *stype = 0;
@@ -1498,15 +1499,16 @@ int make_cmd(unit * u, struct order *ord)
 
     kwd = init_order(ord);
     assert(kwd == K_MAKE);
-    s = getstrtoken();
+    s = getstrtok(token, sizeof(token));
 
     if (s) {
         m = atoi((const char *)s);
         sprintf(ibuf, "%d", m);
         if (!strcmp(ibuf, (const char *)s)) {
             /* a quantity was given */
-            s = getstrtoken();
-        } else {
+            s = getstrtok(token, sizeof(token));
+        }
+        else {
             m = INT_MAX;
         }
         if (s) {
@@ -1520,7 +1522,7 @@ int make_cmd(unit * u, struct order *ord)
             cmistake(u, ord, 275, MSG_PRODUCE);
         }
         else {
-            const char * s = getstrtoken();
+            const char * s = getstrtok(token, sizeof(token));
             direction_t d = s ? get_direction(s, u->faction->locale) : NODIRECTION;
             if (d != NODIRECTION) {
                 build_road(r, u, m, d);
