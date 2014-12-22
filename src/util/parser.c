@@ -132,6 +132,9 @@ char *parse_token(const char **str, char *lbuf, size_t len)
     }
     eatwhitespace_c(&ctoken);
     if (!*ctoken) {
+        if (len > 0) {
+            *cursor = 0;
+        }
         return 0;
     }
     while (*ctoken && cursor-len < lbuf-1) {
@@ -209,7 +212,7 @@ const char *getstrtoken(void)
     return parse_token((const char **)&states->current_token, lbuf, MAXTOKENSIZE);
 }
 
-const char *getstrtok(char *lbuf, size_t bufsize)
+const char *gettoken(char *lbuf, size_t bufsize)
 {
     return parse_token((const char **)&states->current_token, lbuf, bufsize);
 }
@@ -217,7 +220,7 @@ const char *getstrtok(char *lbuf, size_t bufsize)
 int getid(void)
 {
     char token[16];
-    const char *str = getstrtok(token, sizeof(token));
+    const char *str = gettoken(token, sizeof(token));
     int i = str ? atoi36(str) : 0;
     if (i < 0) {
         return -1;

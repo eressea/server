@@ -2519,7 +2519,7 @@ static castorder *cast_cmd(unit * u, order * ord)
     level = eff_skill(u, SK_MAGIC, r);
 
     init_order(ord);
-    s = getstrtok(token, sizeof(token));
+    s = gettoken(token, sizeof(token));
     param = findparam(s, u->faction->locale);
     /* für Syntax ' STUFE x REGION y z ' */
     if (param == P_LEVEL) {
@@ -2530,7 +2530,7 @@ static castorder *cast_cmd(unit * u, order * ord)
             cmistake(u, ord, 10, MSG_MAGIC);
             return 0;
         }
-        s = getstrtok(token, sizeof(token));
+        s = gettoken(token, sizeof(token));
         param = findparam(s, u->faction->locale);
     }
     if (param == P_REGION) {
@@ -2547,7 +2547,7 @@ static castorder *cast_cmd(unit * u, order * ord)
                 "unit region command", u, u->region, ord));
             return 0;
         }
-        s = getstrtok(token, sizeof(token));
+        s = gettoken(token, sizeof(token));
         param = findparam(s, u->faction->locale);
     }
     /* für Syntax ' REGION x y STUFE z '
@@ -2560,7 +2560,7 @@ static castorder *cast_cmd(unit * u, order * ord)
             cmistake(u, ord, 10, MSG_MAGIC);
             return 0;
         }
-        s = getstrtok(token, sizeof(token));
+        s = gettoken(token, sizeof(token));
     }
     if (!s || !s[0] || strlen(s) == 0) {
         /* Fehler "Es wurde kein Zauber angegeben" */
@@ -2693,7 +2693,7 @@ static castorder *cast_cmd(unit * u, order * ord)
         char **params = (char**)malloc(2 * sizeof(char *));
         int p = 0, size = 2;
         for (;;) {
-            s = getstrtoken();
+            s = gettoken(token, sizeof(token));
             if (!s || *s == 0)
                 break;
             if (p + 1 >= size) {

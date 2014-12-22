@@ -225,7 +225,7 @@ static faction *factionorders(void)
 
     if (f != NULL && !fval(f, FFL_NPC)) {
         char token[128];
-        const char *pass = getstrtok(token, sizeof(token));
+        const char *pass = gettoken(token, sizeof(token));
 
         if (!checkpasswd(f, (const char *)pass)) {
             log_debug("Invalid password for faction %s\n", itoa36(fid));
@@ -273,7 +273,7 @@ int readorders(const char *filename)
         param_t p;
         const char *s;
         init_tokens_str(b);
-        s = getstrtok(token, sizeof(token));
+        s = gettoken(token, sizeof(token));
         p = s ? findparam(s, lang) : NOPARAM;
         switch (p) {
 #undef LOCALE_CHANGE

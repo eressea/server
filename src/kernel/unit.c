@@ -491,16 +491,19 @@ void usetprivate(unit * u, const char *str)
 {
     attrib *a = a_find(u->attribs, &at_private);
 
-    if (str == NULL) {
-        if (a)
+    if (str == NULL || *str == 0) {
+        if (a) {
             a_remove(&u->attribs, a);
+        }
         return;
     }
-    if (!a)
+    if (!a) {
         a = a_add(&u->attribs, a_new(&at_private));
-    if (a->data.v)
+    }
+    if (a->data.v) {
         free(a->data.v);
-    a->data.v = _strdup((const char *)str);
+    }
+    a->data.v = _strdup(str);
 }
 
 /*********************/

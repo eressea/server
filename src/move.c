@@ -1156,7 +1156,7 @@ static void cycle_route(order * ord, unit * u, int gereist)
     int bytes, cm = 0;
     char tail[1024], *bufp = tail;
     char neworder[2048];
-    const char *token;
+    char token[128];
     direction_t d = NODIRECTION;
     bool paused = false;
     bool pause;
@@ -1171,11 +1171,12 @@ static void cycle_route(order * ord, unit * u, int gereist)
 
     neworder[0] = 0;
     for (cm = 0;; ++cm) {
+        const char *s;
         const struct locale *lang = u->faction->locale;
         pause = false;
-        token = getstrtoken();
-        if (token && *token) {
-            d = get_direction(token, lang);
+        s = gettoken(token, sizeof(token));
+        if (s && *s) {
+            d = get_direction(s, lang);
             if (d == D_PAUSE) {
                 pause = true;
             }
@@ -1448,11 +1449,12 @@ static void make_route(unit * u, order * ord, region_list ** routep)
     region_list **iroute = routep;
     region *current = u->region;
     region *next = NULL;
-    const char *token = getstrtoken();
-    int error = movewhere(u, token, current, &next);
+    char token[128];
+    const char *s = gettoken(token, sizeof(token));
+    int error = movewhere(u, s, current, &next);
 
     if (error != E_MOVE_OK) {
-        message *msg = movement_error(u, token, ord, error);
+        message *msg = movement_error(u, s, ord, error);
         if (msg != NULL) {
             add_message(&u->faction->msgs, msg);
             msg_release(msg);
@@ -1471,10 +1473,10 @@ static void make_route(unit * u, order * ord, region_list ** routep)
         iroute = &(*iroute)->next;
 
         current = next;
-        token = getstrtoken();
-        error = movewhere(u, token, current, &next);
+        s = gettoken(token, sizeof(token));
+        error = movewhere(u, s, current, &next);
         if (error) {
-            message *msg = movement_error(u, token, ord, error);
+            message *msg = movement_error(u, s, ord, error);
             if (msg != NULL) {
                 add_message(&u->faction->msgs, msg);
                 msg_release(msg);

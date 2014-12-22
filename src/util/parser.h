@@ -22,7 +22,7 @@ extern "C" {
     void parser_popstate(void);
     bool parser_end(void);
     const char *getstrtoken(void);
-    const char *getstrtok(char *lbuf, size_t bufsize);
+    const char *gettoken(char *lbuf, size_t bufsize);
     int getid(void);
 #define getshipid() getid()
 #define getfactionid() getid()
