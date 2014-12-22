@@ -217,6 +217,19 @@ const char *gettoken(char *lbuf, size_t bufsize)
     return parse_token((const char **)&states->current_token, lbuf, bufsize);
 }
 
+int getint(void)
+{
+    char token[16];
+    const char * s = gettoken(token, sizeof(token));
+    return s ? atoi(s) : 0;
+}
+
+unsigned int getuint(void)
+{
+    int n = getint();
+    return (n < 0) ? 0 : n;
+}
+
 int getid(void)
 {
     char token[16];

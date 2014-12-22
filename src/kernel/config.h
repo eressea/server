@@ -109,8 +109,6 @@ extern "C" {
     void make_undead_unit(struct unit *);
 
     unsigned int atoip(const char *s);
-    unsigned int getuint(void);
-    int getint(void);
 
     param_t findparam(const char *s, const struct locale *lang);
     param_t findparam_ex(const char *s, const struct locale * lang);

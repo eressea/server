@@ -794,20 +794,6 @@ parse(keyword_t kword, int(*dofun) (unit *, struct order *), bool thisorder)
     }
 }
 
-unsigned int getuint(void)
-{
-    char token[16];
-    const char *s = gettoken(token, sizeof(token));
-    return s ? atoip(s) : 0;
-}
-
-int getint(void)
-{
-    char token[16];
-    const char * s = gettoken(token, sizeof(token));
-    return s ? atoi(s) : 0;
-}
-
 const struct race *findrace(const char *s, const struct locale *lang)
 {
     void **tokens = get_translations(lang, UT_RACES);
