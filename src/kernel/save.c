@@ -224,9 +224,10 @@ static faction *factionorders(void)
     f = findfaction(fid);
 
     if (f != NULL && !fval(f, FFL_NPC)) {
-        const char *pass = getstrtoken();
+        char token[128];
+        const char *pass = getstrtok(token, sizeof(token));
 
-        if (!checkpasswd(f, (const char *)pass, true)) {
+        if (!checkpasswd(f, (const char *)pass)) {
             log_debug("Invalid password for faction %s\n", itoa36(fid));
             ADDMSG(&f->msgs, msg_message("wrongpasswd", "faction password",
                 f->no, pass));

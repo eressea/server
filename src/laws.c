@@ -946,14 +946,15 @@ static bool EnhancedQuit(void)
 
 int quit_cmd(unit * u, struct order *ord)
 {
+    char token[128];
     faction *f = u->faction;
     const char *passwd;
     keyword_t kwd;
     
     kwd = init_order(ord);
     assert(kwd == K_QUIT);
-    passwd = getstrtoken();
-    if (checkpasswd(f, (const char *)passwd, false)) {
+    passwd = getstrtok(token, sizeof(token));
+    if (checkpasswd(f, (const char *)passwd)) {
         if (EnhancedQuit()) {
             int f2_id = getid();
             if (f2_id > 0) {
@@ -1340,6 +1341,7 @@ void quit(void)
 
 int ally_cmd(unit * u, struct order *ord)
 {
+    char token[128];
     ally *sf, **sfp;
     faction *f;
     int keyword, not_kw;
@@ -1355,7 +1357,7 @@ int ally_cmd(unit * u, struct order *ord)
     if (f == u->faction)
         return 0;
 
-    s = getstrtoken();
+    s = getstrtok(token, sizeof(token));
 
     if (!s[0])
         keyword = P_ANY;
@@ -2924,13 +2926,14 @@ void restack_units(void)
                 struct order *ord;
                 for (ord = u->orders; ord; ord = ord->next) {
                     if (getkeyword(ord) == K_SORT) {
+                        char token[128];
                         const char *s;
                         param_t p;
                         int id;
                         unit *v;
 
                         init_order(ord);
-                        s = getstrtoken();
+                        s = getstrtok(token, sizeof(token));
                         p = findparam(s, u->faction->locale);
                         id = getid();
                         v = findunit(id);
@@ -3000,16 +3003,17 @@ void restack_units(void)
 
 int renumber_cmd(unit * u, order * ord)
 {
+    char token[128];
     const char *s;
     int i;
     faction *f = u->faction;
 
     init_order(ord);
-    s = getstrtoken();
+    s = getstrtok(token, sizeof(token));
     switch (findparam_ex(s, u->faction->locale)) {
 
     case P_FACTION:
-        s = getstrtoken();
+        s = getstrtok(token, sizeof(token));
         if (s && *s) {
             int id = atoi36((const char *)s);
             attrib *a = a_find(f->attribs, &at_number);
@@ -3020,7 +3024,7 @@ int renumber_cmd(unit * u, order * ord)
         break;
 
     case P_UNIT:
-        s = getstrtoken();
+        s = getstrtok(token, sizeof(token));
         if (s == NULL || *s == 0) {
             i = newunitid();
         }
@@ -3063,7 +3067,7 @@ int renumber_cmd(unit * u, order * ord)
             cmistake(u, ord, 116, MSG_EVENT);
             break;
         }
-        s = getstrtoken();
+        s = getstrtok(token, sizeof(token));
         if (s == NULL || *s == 0) {
             i = newcontainerid();
         }
@@ -3092,7 +3096,7 @@ int renumber_cmd(unit * u, order * ord)
             cmistake(u, ord, 148, MSG_EVENT);
             break;
         }
-        s = getstrtoken();
+        s = getstrtok(token, sizeof(token));
         if (*s == 0) {
             i = newcontainerid();
         }
@@ -3358,8 +3362,8 @@ void new_units(void)
             while (*ordp) {
                 order *makeord = *ordp;
                 if (getkeyword(makeord) == K_MAKETEMP) {
-                    const char *token;
-                    char *name = NULL;
+                    char token[128], *name = NULL;
+                    const char *s;
                     int alias;
                     ship *sh;
                     order **newordersp;
@@ -3393,9 +3397,9 @@ void new_units(void)
                     init_order(makeord);
                     alias = getid();
 
-                    token = getstrtoken();
-                    if (token && token[0]) {
-                        name = _strdup(token);
+                    s = getstrtok(token, sizeof(token));
+                    if (s && s[0]) {
+                        name = _strdup(s);
                     }
                     u2 = create_unit(r, u->faction, 0, u->faction->race, alias, name, u);
                     if (name != NULL)
@@ -3703,10 +3707,9 @@ void defaultorders(void)
                     order *new_order = 0;
                     const char *s;
                     init_order(ord);
-                    s = getstrtoken();
+                    s = getstrtok(lbuf, sizeof(lbuf));
                     if (s) {
-                        strcpy(lbuf, s);
-                        new_order = parse_order(lbuf, u->faction->locale);
+                        new_order = parse_order(s, u->faction->locale);
                     }
                     *ordp = ord->next;
                     ord->next = NULL;
@@ -3813,19 +3816,20 @@ static void update_spells(void)
 
 int use_cmd(unit * u, struct order *ord)
 {
+    char token[128];
     const char *t;
     int n, err = ENOITEM;
     const item_type *itype;
 
     init_order(ord);
 
-    t = getstrtoken();
+    t = getstrtok(token, sizeof(token));
     n = atoi((const char *)t);
     if (n == 0) {
         if (isparam(t, u->faction->locale, P_ANY)) {
             /* BENUTZE ALLES Yanxspirit */
             n = INT_MAX;
-            t = getstrtoken();
+            t = getstrtok(token, sizeof(token));
         }
         else {
             /* BENUTZE Yanxspirit */
@@ -3834,7 +3838,7 @@ int use_cmd(unit * u, struct order *ord)
     }
     else {
         /* BENUTZE 42 Yanxspirit */
-        t = getstrtoken();
+        t = getstrtok(token, sizeof(token));
     }
     itype = t ? finditemtype(t, u->faction->locale) : NULL;
 
