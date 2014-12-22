@@ -1,7 +1,7 @@
 /*
 Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -22,7 +22,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* attributes includes */
 #include "follow.h"
-#include "gm.h"
 #include "hate.h"
 #include "iceberg.h"
 #include "key.h"
@@ -37,9 +36,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "raceprefix.h"
 #include "reduceproduction.h"
 #include "targetregion.h"
-#ifdef WDW_PYRAMID
-# include "alliance.h"
-#endif
 
 /* kernel includes */
 #include <kernel/unit.h>
@@ -53,30 +49,26 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 
 attrib_type at_unitdissolve = {
-  "unitdissolve", NULL, NULL, NULL, a_writechars, a_readchars
+    "unitdissolve", NULL, NULL, NULL, a_writechars, a_readchars
 };
 
 void register_attributes(void)
 {
     at_register(&at_stealth);
     at_register(&at_object);
-  at_register(&at_unitdissolve);
-  at_register(&at_overrideroads);
-  at_register(&at_raceprefix);
-  at_register(&at_iceberg);
-  at_register(&at_key);
-  at_register(&at_gm);
-  at_register(&at_follow);
-  at_register(&at_targetregion);
-  at_register(&at_orcification);
-  at_register(&at_hate);
-  at_register(&at_reduceproduction);
-  at_register(&at_otherfaction);
-  at_register(&at_racename);
-  at_register(&at_movement);
-  at_register(&at_moved);
-
-#ifdef WDW_PYRAMID
-  at_register(&at_alliance);
-#endif /* WDW_PYRAMID */
+    at_register(&at_unitdissolve);
+    at_register(&at_overrideroads);
+    at_register(&at_raceprefix);
+    at_register(&at_iceberg);
+    at_register(&at_key);
+    at_deprecate("gm", a_readint);
+    at_register(&at_follow);
+    at_register(&at_targetregion);
+    at_register(&at_orcification);
+    at_register(&at_hate);
+    at_register(&at_reduceproduction);
+    at_register(&at_otherfaction);
+    at_register(&at_racename);
+    at_register(&at_movement);
+    at_register(&at_moved);
 }

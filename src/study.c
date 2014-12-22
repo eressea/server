@@ -328,13 +328,8 @@ int teach_cmd(unit * u, struct order *ord)
         } while (sk != NOSKILL);
         while (teaching && student) {
             if (student->faction == u->faction) {
-#ifdef NEW_DAEMONHUNGER_RULE
                 if (LongHunger(student))
                     continue;
-#else
-                if (fval(student, UFL_HUNGER))
-                    continue;
-#endif
                 if (getkeyword(student->thisorder) == K_STUDY) {
                     /* Input ist nun von student->thisorder !! */
                     init_order(student->thisorder);
@@ -358,13 +353,8 @@ int teach_cmd(unit * u, struct order *ord)
         while (teaching && student) {
             if (student->faction != u->faction
                 && alliedunit(u, student->faction, HELP_GUARD)) {
-#ifdef NEW_DAEMONHUNGER_RULE
                 if (LongHunger(student))
                     continue;
-#else
-                if (fval(student, UFL_HUNGER))
-                    continue;
-#endif
                 if (getkeyword(student->thisorder) == K_STUDY) {
                     /* Input ist nun von student->thisorder !! */
                     init_order(student->thisorder);
@@ -390,8 +380,10 @@ int teach_cmd(unit * u, struct order *ord)
         init_order(ord);
 
         while (!parser_end()) {
-            unit *u2 = getunit(r, u->faction);
+            unit *u2;
             bool feedback;
+
+            getunit(r, u->faction, &u2);
             ++count;
 
             /* Falls die Unit nicht gefunden wird, Fehler melden */
@@ -406,7 +398,7 @@ int teach_cmd(unit * u, struct order *ord)
 
                 for (j = 0; j != count - 1; ++j) {
                     /* skip over the first 'count' units */
-                    getunit(r, u->faction);
+                    getunit(r, u->faction, NULL);
                 }
 
                 token = getstrtoken();
@@ -551,7 +543,7 @@ int learn_cmd(unit * u, order * ord)
         else
             learn_newskills = 1;
     }
-    if ((u_race(u)->flags & RCF_NOLEARN) || fval(u, UFL_WERE)) {
+    if (!unit_can_study(u)) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_race_nolearn", "race",
             u_race(u)));
         return 0;

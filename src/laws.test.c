@@ -13,12 +13,14 @@
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 
+#include <util/base36.h>
 #include <util/language.h>
 
 #include <CuTest.h>
 #include <tests.h>
 
 #include <assert.h>
+#include <stdio.h>
 
 static void test_new_building_can_be_renamed(CuTest * tc)
 {
@@ -196,6 +198,34 @@ static void test_enter_ship(CuTest * tc)
     test_cleanup();
 }
 
+static void test_display_cmd(CuTest *tc) {
+    unit *u;
+    faction *f;
+    region *r;
+    order *ord;
+
+    test_cleanup();
+    r = test_create_region(0, 0, test_create_terrain("plain", LAND_REGION));
+    f = test_create_faction(0);
+    f->locale = get_or_create_locale("de");
+    assert(r && f);
+    test_translate_param(f->locale, P_UNIT, "EINHEIT");
+    u = test_create_unit(f, r);
+    assert(u);
+
+    ord = create_order(K_DISPLAY, f->locale, "EINHEIT Hodor");
+    CuAssertIntEquals(tc, 0, display_cmd(u, ord));
+    CuAssertStrEquals(tc, "Hodor", u->display);
+    free_order(ord);
+
+    ord = create_order(K_DISPLAY, f->locale, "EINHEIT");
+    CuAssertIntEquals(tc, 0, display_cmd(u, ord));
+    CuAssertPtrEquals(tc, NULL, u->display);
+    free_order(ord);
+
+    test_cleanup();
+}
+
 static void test_fishing_feeds_2_people(CuTest * tc)
 {
     const resource_type *rtype;
@@ -329,7 +359,6 @@ static void test_reserve_cmd(CuTest *tc) {
     region *r;
     order *ord;
     const resource_type *rtype;
-    const struct locale *loc;
 
     test_cleanup();
     test_create_world();
@@ -342,15 +371,105 @@ static void test_reserve_cmd(CuTest *tc) {
     u1 = test_create_unit(f, r);
     u2 = test_create_unit(f, r);
     assert(u1 && u2);
-    loc = get_locale("de");
-    assert(loc);
-    ord = create_order(K_RESERVE, loc, "200 SILBER");
+    ord = create_order(K_RESERVE, f->locale, "200 SILBER");
     assert(ord);
     i_change(&u1->items, rtype->itype, 100);
     i_change(&u2->items, rtype->itype, 100);
     CuAssertIntEquals(tc, 200, reserve_cmd(u1, ord));
     CuAssertIntEquals(tc, 200, i_get(u1->items, rtype->itype));
     CuAssertIntEquals(tc, 0, i_get(u2->items, rtype->itype));
+    test_cleanup();
+}
+
+struct pay_fixture {
+    unit *u1;
+    unit *u2;
+};
+
+static double level_taxes(const building * b, int level) {
+    return b->size*level*2.0;
+}
+
+static void setup_pay_cmd(struct pay_fixture *fix) {
+    faction *f;
+    region *r;
+    building *b;
+    building_type *btcastle;
+
+    test_create_world();
+    f = test_create_faction(NULL);
+    r = findregion(0, 0);
+    assert(r && f);
+    btcastle = bt_get_or_create("castle");
+    btcastle->taxes = level_taxes;
+    b = test_create_building(r, btcastle);
+    assert(b);
+    fix->u1 = test_create_unit(f, r);
+    fix->u2 = test_create_unit(f, r);
+    assert(fix->u1 && fix->u2);
+    u_set_building(fix->u1, b);
+    u_set_building(fix->u2, b);
+    assert(building_owner(b) == fix->u1);
+    test_translate_param(f->locale, P_NOT, "NOT");
+}
+
+static void test_pay_cmd(CuTest *tc) {
+    struct pay_fixture fix;
+    order *ord;
+    faction *f;
+    building *b;
+
+    test_cleanup();
+    setup_pay_cmd(&fix);
+    b = fix.u1->building;
+    f = fix.u1->faction;
+
+    ord = create_order(K_PAY, f->locale, "NOT");
+    assert(ord);
+    CuAssertIntEquals(tc, 0, pay_cmd(fix.u1, ord));
+    CuAssertIntEquals(tc, BLD_DONTPAY, b->flags&BLD_DONTPAY);
+    test_cleanup();
+}
+
+static void test_pay_cmd_other_building(CuTest *tc) {
+    struct pay_fixture fix;
+    order *ord;
+    faction *f;
+    building *b;
+    char cmd[32];
+
+    test_cleanup();
+    setup_pay_cmd(&fix);
+    f = fix.u1->faction;
+    b = test_create_building(fix.u1->region, bt_get_or_create("lighthouse"));
+    set_param(&global.parameters, "rules.region_owners", "1");
+    set_param(&global.parameters, "rules.region_owner_pay_building", "lighthouse");
+    update_owners(b->region);
+
+    _snprintf(cmd, sizeof(cmd), "NOT %s", itoa36(b->no));
+    ord = create_order(K_PAY, f->locale, cmd);
+    assert(ord);
+    CuAssertPtrEquals(tc, fix.u1, building_owner(b));
+    CuAssertIntEquals(tc, 0, pay_cmd(fix.u1, ord));
+    CuAssertIntEquals(tc, BLD_DONTPAY, b->flags&BLD_DONTPAY);
+    test_cleanup();
+}
+
+static void test_pay_cmd_must_be_owner(CuTest *tc) {
+    struct pay_fixture fix;
+    order *ord;
+    faction *f;
+    building *b;
+
+    test_cleanup();
+    setup_pay_cmd(&fix);
+    b = fix.u1->building;
+    f = fix.u1->faction;
+
+    ord = create_order(K_PAY, f->locale, "NOT");
+    assert(ord);
+    CuAssertIntEquals(tc, 0, pay_cmd(fix.u2, ord));
+    CuAssertIntEquals(tc, 0, b->flags&BLD_DONTPAY);
     test_cleanup();
 }
 
@@ -444,7 +563,7 @@ static void test_unarmed_races_can_guard(CuTest *tc) {
     race * rc;
 
     setup_guard(&fix, false);
-    rc = rc_get_or_create(fix.u->race_->_name);
+    rc = rc_get_or_create(fix.u->_race->_name);
     rc->flags |= RCF_UNARMEDGUARD;
     update_guards();
     CuAssertTrue(tc, fval(fix.u, UFL_GUARD));
@@ -521,10 +640,14 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_low_skill_cannot_guard);
     SUITE_ADD_TEST(suite, test_reserve_self);
     SUITE_ADD_TEST(suite, test_reserve_cmd);
+    SUITE_ADD_TEST(suite, test_pay_cmd);
+    SUITE_ADD_TEST(suite, test_pay_cmd_other_building);
+    SUITE_ADD_TEST(suite, test_pay_cmd_must_be_owner);
     SUITE_ADD_TEST(suite, test_new_units);
     SUITE_ADD_TEST(suite, test_cannot_create_unit_above_limit);
     SUITE_ADD_TEST(suite, test_contact);
     SUITE_ADD_TEST(suite, test_enter_building);
     SUITE_ADD_TEST(suite, test_enter_ship);
+    SUITE_ADD_TEST(suite, test_display_cmd);
     return suite;
 }

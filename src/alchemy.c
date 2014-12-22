@@ -215,10 +215,6 @@ static int age_potiondelay(attrib * a)
   return AT_AGE_REMOVE;
 }
 
-/* TODO:
- * - this should be a more general item_delay
- * - it should not just happen in age(), but be done with eventhandling
- */
 attrib_type at_potiondelay = {
   "potiondelay",
   init_potiondelay,

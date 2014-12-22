@@ -229,21 +229,12 @@ struct storage *store)
         spell *sp;
         char spname[64];
 
-        if (global.data_version < SPELLNAME_VERSION) {
-            int i;
-            READ_INT(store, &i);
-            if (i < 0)
-                break;
-            sp = find_spellbyid((unsigned int)i);
-        }
-        else {
-            READ_TOK(store, spname, sizeof(spname));
-            if (strcmp(spname, "end") == 0)
-                break;
-            sp = find_spell(spname);
-            if (!sp) {
-                log_error("read_spells: could not find spell '%s' in school '%s'\n", spname, magic_school[mtype]);
-            }
+        READ_TOK(store, spname, sizeof(spname));
+        if (strcmp(spname, "end") == 0)
+            break;
+        sp = find_spell(spname);
+        if (!sp) {
+            log_error("read_spells: could not find spell '%s' in school '%s'\n", spname, magic_school[mtype]);
         }
         if (sp) {
             add_spell(slistp, sp);
@@ -272,23 +263,13 @@ static int read_mage(attrib * a, void *owner, struct storage *store)
     for (i = 0; i != MAXCOMBATSPELLS; ++i) {
         spell *sp = NULL;
         int level = 0;
-        if (global.data_version < SPELLNAME_VERSION) {
-            int spid;
-            READ_INT(store, &spid);
-            READ_INT(store, &level);
-            if (spid >= 0) {
-                sp = find_spellbyid((unsigned int)spid);
-            }
-        }
-        else {
-            READ_TOK(store, spname, sizeof(spname));
-            READ_INT(store, &level);
+        READ_TOK(store, spname, sizeof(spname));
+        READ_INT(store, &level);
 
-            if (strcmp("none", spname) != 0) {
-                sp = find_spell(spname);
-                if (!sp) {
-                    log_error("read_mage: could not find combat spell '%s' in school '%s'\n", spname, magic_school[mage->magietyp]);
-                }
+        if (strcmp("none", spname) != 0) {
+            sp = find_spell(spname);
+            if (!sp) {
+                log_error("read_mage: could not find combat spell '%s' in school '%s'\n", spname, magic_school[mage->magietyp]);
             }
         }
         if (sp && level >= 0) {
@@ -2922,40 +2903,56 @@ const char *curse_name(const curse_type * ctype, const struct locale *lang)
     return LOC(lang, mkname("spell", ctype->cname));
 }
 
-spell *unit_getspell(struct unit *u, const char *name, const struct locale * lang)
-{
-    sc_mage * mage = get_mage(u);
-    if (mage) {
-        variant token;
-        void * tokens = 0;
-        spellbook *sb = unit_get_spellbook(u);
+static void select_spellbook(void **tokens, spellbook *sb, const struct locale * lang) {
+    quicklist * ql;
+    int qi;
 
-        if (sb) {
-            quicklist * ql;
-            int qi;
+    assert(sb);
+    assert(lang);
 
-            for (qi = 0, ql = sb->spells; ql; ql_advance(&ql, &qi, 1)) {
-                spellbook_entry *sbe = (spellbook_entry *)ql_get(ql, qi);
-                spell *sp = sbe->sp;
-                const char *n = spell_name(sp, lang);
-                if (!n) {
-                    log_error("no translation in locale %s for spell %s\n", locale_name(lang), sp->sname);
-                }
-                else {
-                    token.v = sp;
-                    addtoken(&tokens, n, token);
-                }
-            }
+    for (qi = 0, ql = sb->spells; ql; ql_advance(&ql, &qi, 1)) {
+        spellbook_entry *sbe = (spellbook_entry *)ql_get(ql, qi);
+        spell *sp = sbe->sp;
+
+        const char *n = spell_name(sp, lang);
+        if (!n) {
+            log_error("no translation in locale %s for spell %s\n", locale_name(lang), sp->sname);
         }
-
-        if (tokens) {
-            if (findtoken(tokens, name, &token) != E_TOK_NOMATCH) {
-                freetokens(tokens);
-                return (spell *)token.v;
-            }
-            freetokens(tokens);
+        else {
+            variant token;
+            token.v = sp;
+            addtoken(tokens, n, token);
         }
     }
+}
+
+spell *unit_getspell(struct unit *u, const char *name, const struct locale * lang)
+{
+    void * tokens = 0;
+    spellbook *sb;
+
+    sb = unit_get_spellbook(u);
+    if (sb) {
+        select_spellbook(&tokens, sb, lang);
+    }
+
+    u = get_familiar_mage(u);
+    if (u) {
+        sb = unit_get_spellbook(u);
+        if (sb) {
+            select_spellbook(&tokens, sb, lang);
+        }
+    }
+
+    if (tokens) {
+        variant token;
+        if (findtoken(tokens, name, &token) != E_TOK_NOMATCH) {
+            freetokens(tokens);
+            return (spell *)token.v;
+        }
+        freetokens(tokens);
+    }
+
     return 0;
 }
 

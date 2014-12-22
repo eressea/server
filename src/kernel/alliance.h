@@ -57,9 +57,10 @@ extern "C" {
   extern alliance *makealliance(int id, const char *name);
   extern const char *alliancename(const struct alliance *al);
   extern void setalliance(struct faction *f, alliance * al);
-  void free_alliance(struct alliance *al);
+  void free_alliances(void);
   extern struct faction *alliance_get_leader(struct alliance *al);
   extern void alliance_cmd(void);
+  bool is_allied(const struct faction *f1, const struct faction *f2);
 
   void alliance_setname(alliance * self, const char *name);
 /* execute commands */

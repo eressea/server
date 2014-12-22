@@ -239,7 +239,7 @@ void make_zombie(unit * u)
 {
     u_setfaction(u, get_monsters());
     scale_number(u, 1);
+    u->hp = unit_max_hp(u) * u->number;
     u_setrace(u, get_race(RC_ZOMBIE));
     u->irace = NULL;
 }
-

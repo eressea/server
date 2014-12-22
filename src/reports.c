@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "reports.h"
 #include "laws.h"
+#include "lighthouse.h"
 
 /* kernel includes */
 #include <kernel/alliance.h>
@@ -1108,7 +1109,7 @@ static void get_addresses(report_context * ctx)
                     faction *sf = visible_faction(ctx->f, u);
                     bool ballied = sf && sf != ctx->f && sf != lastf
                         && !fval(u, UFL_ANON_FACTION) && cansee(ctx->f, r, u, stealthmod);
-                    if (ballied || ALLIED(ctx->f, sf)) {
+                    if (ballied || is_allied(ctx->f, sf)) {
                         add_seen_faction_i(&flist, sf);
                         lastf = sf;
                     }
@@ -1598,6 +1599,72 @@ static void prepare_reports(void)
             }
         }
     }
+}
+
+static region *lastregion(faction * f)
+{
+#ifdef SMART_INTERVALS
+    unit *u = f->units;
+    region *r = f->last;
+
+    if (u == NULL)
+        return NULL;
+    if (r != NULL)
+        return r->next;
+
+    /* it is safe to start in the region of the first unit. */
+    f->last = u->region;
+    /* if regions have indices, we can skip ahead: */
+    for (u = u->nextF; u != NULL; u = u->nextF) {
+        r = u->region;
+        if (r->index > f->last->index)
+            f->last = r;
+    }
+
+    /* we continue from the best region and look for travelthru etc. */
+    for (r = f->last->next; r; r = r->next) {
+        plane *p = rplane(r);
+
+        /* search the region for travelthru-attributes: */
+        if (fval(r, RF_TRAVELUNIT)) {
+            attrib *ru = a_find(r->attribs, &at_travelunit);
+            while (ru && ru->type == &at_travelunit) {
+                u = (unit *)ru->data.v;
+                if (u->faction == f) {
+                    f->last = r;
+                    break;
+                }
+                ru = ru->next;
+            }
+        }
+        if (f->last == r)
+            continue;
+        if (check_leuchtturm(r, f))
+            f->last = r;
+        if (p && is_watcher(p, f)) {
+            f->last = r;
+        }
+    }
+    return f->last->next;
+#else
+    return NULL;
+#endif
+}
+
+static region *firstregion(faction * f)
+{
+#ifdef SMART_INTERVALS
+    region *r = f->first;
+
+    if (f->units == NULL)
+        return NULL;
+    if (r != NULL)
+        return r;
+
+    return f->first = regions;
+#else
+    return regions;
+#endif
 }
 
 static seen_region **prepare_report(faction * f)
@@ -2161,7 +2228,7 @@ static void eval_race(struct opstack **stack, const void *userdata)
     const struct locale *lang = report ? report->locale : default_locale;
     int j = opop(stack).i;
     const race *r = (const race *)opop(stack).v;
-    const char *c = LOC(lang, rc_name(r, (j == 1) ? NAME_SINGULAR : NAME_PLURAL));
+    const char *c = LOC(lang, rc_name_s(r, (j == 1) ? NAME_SINGULAR : NAME_PLURAL));
     size_t len = strlen(c);
     variant var;
 
@@ -2338,6 +2405,26 @@ static void eval_int36(struct opstack **stack, const void *userdata)
 }
 
 /*** END MESSAGE RENDERING ***/
+
+/* - String Listen --------------------------------------------- */
+void addstrlist(strlist ** SP, const char *s)
+{
+    strlist *slist = malloc(sizeof(strlist));
+    slist->next = NULL;
+    slist->s = _strdup(s);
+    addlist(SP, slist);
+}
+
+void freestrlist(strlist * s)
+{
+    strlist *q, *p = s;
+    while (p) {
+        q = p->next;
+        free(p->s);
+        free(p);
+        p = q;
+    }
+}
 
 #include <util/nrmessage.h>
 

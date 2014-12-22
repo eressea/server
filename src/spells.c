@@ -20,6 +20,7 @@
 #include "laws.h"
 #include "spells.h"
 #include "direction.h"
+#include "randenc.h"
 #include "monster.h"
 
 #include <spells/borders.h>
@@ -394,46 +395,10 @@ int report_action(region * r, unit * actor, message * msg, int flags)
 static void
 report_effect(region * r, unit * mage, message * seen, message * unseen)
 {
-#if 0
-    unit *u;
-
-    /* melden, 1x pro Partei */
-    freset(mage->faction, FFL_SELECT);
-    for (u = r->units; u; u = u->next)
-        freset(u->faction, FFL_SELECT);
-    for (u = r->units; u; u = u->next) {
-        if (!fval(u->faction, FFL_SELECT)) {
-            fset(u->faction, FFL_SELECT);
-
-            /* Bei Fernzaubern sieht nur die eigene Partei den Magier */
-            if (u->faction != mage->faction) {
-                if (r == mage->region) {
-                    /* kein Fernzauber, pruefe, ob der Magier ueberhaupt gesehen
-                     * wird */
-                    if (cansee(u->faction, r, mage, 0)) {
-                        r_addmessage(r, u->faction, seen);
-                    } else {
-                        r_addmessage(r, u->faction, unseen);
-                    }
-                } else {                /* Fernzauber, fremde Partei sieht den Magier niemals */
-                    r_addmessage(r, u->faction, unseen);
-                }
-            } else {                  /* Partei des Magiers, sieht diesen immer */
-                r_addmessage(r, u->faction, seen);
-            }
-        }
-    }
-    /* Ist niemand von der Partei des Magiers in der Region, dem Magier
-     * nochmal gesondert melden */
-    if (!fval(mage->faction, FFL_SELECT)) {
-        add_message(&mage->faction->msgs, seen);
-    }
-#else
     int err = report_action(r, mage, seen, ACTION_RESET | ACTION_CANSEE);
     if (err) {
         report_action(r, mage, seen, ACTION_CANNOTSEE);
     }
-#endif
 }
 
 /* ------------------------------------------------------------- */
@@ -1546,7 +1511,7 @@ static int sp_create_irongolem(castorder * co)
     ADDMSG(&mage->faction->msgs,
         msg_message("magiccreate_effect", "region command unit amount object",
         mage->region, co->order, mage, number,
-        LOC(mage->faction->locale, rc_name(rc_find("irongolem"), (u2->number == 1) ? NAME_SINGULAR : NAME_PLURAL))));
+        LOC(mage->faction->locale, rc_name_s(rc_find("irongolem"), (u2->number == 1) ? NAME_SINGULAR : NAME_PLURAL))));
 
     return cast_level;
 }
@@ -1607,7 +1572,7 @@ static int sp_create_stonegolem(castorder * co)
     ADDMSG(&mage->faction->msgs,
         msg_message("magiccreate_effect", "region command unit amount object",
         mage->region, co->order, mage, number,
-        LOC(mage->faction->locale, rc_name(rc_find("stonegolem"), (u2->number == 1) ? NAME_SINGULAR : NAME_PLURAL))));
+        LOC(mage->faction->locale, rc_name_s(rc_find("stonegolem"), (u2->number == 1) ? NAME_SINGULAR : NAME_PLURAL))));
 
     return cast_level;
 }
@@ -3010,7 +2975,7 @@ static int sp_plague(castorder * co)
     unit *mage = co->magician.u;
     int cast_level = co->level;
 
-    plagues(r, true);
+    plagues(r);
 
     ADDMSG(&mage->faction->msgs, msg_message("plague_spell",
         "region mage", r, mage));
@@ -3613,11 +3578,6 @@ static int sp_charmingsong(castorder * co)
     /* Magieresistenz */
     if (target_resists_magic(mage, target, TYP_UNIT, resist_bonus)) {
         report_failure(mage, co->order);
-#if 0
-        sprintf(buf, "%s fuehlt sich einen Moment lang benommen und desorientiert.",
-            unitname(target));
-        addmessage(target->region, target->faction, buf, MSG_EVENT, ML_WARN);
-#endif
         return 0;
     }
 
@@ -4742,7 +4702,7 @@ int sp_gooddreams(castorder * co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:
+/* Name: Seelenkopie / Doppelganger
  * Stufe:      9
  * Kategorie:
  * Wirkung:
@@ -4777,7 +4737,7 @@ int sp_clonecopy(castorder * co)
 
     create_newclone(mage, clone);
 
-    msg = msg_message("sp_clone_effet", "mage", mage);
+    msg = msg_message("sp_clone_effect", "mage", mage);
     r_addmessage(r, mage->faction, msg);
     msg_release(msg);
 
@@ -5657,7 +5617,7 @@ int sp_showastral(castorder * co)
                         }
                         icat(u->number);
                         scat(" ");
-                        scat(LOC(mage->faction->locale, rc_name(u_race(u), (u->number==1) ? NAME_SINGULAR:NAME_PLURAL)));
+                        scat(LOC(mage->faction->locale, rc_name_s(u_race(u), (u->number==1) ? NAME_SINGULAR:NAME_PLURAL)));
                         scat(", Entfernung ");
                         icat(distance(rl2->data, rt));
                         scat(")");
@@ -6526,54 +6486,6 @@ int sp_becomewyrm(castorder * co)
     return 0;
 }
 
-/* ------------------------------------------------------------- */
-/* Name:       WDW-Pyramidenfindezauber
- * Stufe:      unterschiedlich
- * Gebiet:     alle
- * Wirkung:
- *             gibt die ungefaehre Entfernung zur naechstgelegenen Pyramiden-
- *             region an.
- *
- * Flags:
- */
-static int sp_wdwpyramid(castorder * co)
-{
-    region *r = co_get_region(co);
-    unit *mage = co->magician.u;
-    int cast_level = co->level;
-
-    if (a_find(r->attribs, &at_wdwpyramid) != NULL) {
-        ADDMSG(&mage->faction->msgs, msg_message("wdw_pyramidspell_found",
-            "unit region command", mage, r, co->order));
-    }
-    else {
-        region *r2;
-        int mindist = INT_MAX;
-        int minshowdist;
-        int maxshowdist;
-
-        for (r2 = regions; r2; r2 = r2->next) {
-            if (a_find(r2->attribs, &at_wdwpyramid) != NULL) {
-                int dist = distance(mage->region, r2);
-                if (dist < mindist) {
-                    mindist = dist;
-                }
-            }
-        }
-
-        assert(mindist >= 1);
-
-        minshowdist = mindist - rng_int() % 5;
-        maxshowdist = minshowdist + 4;
-
-        ADDMSG(&mage->faction->msgs, msg_message("wdw_pyramidspell_notfound",
-            "unit region command mindist maxdist", mage, r, co->order,
-            _max(1, minshowdist), maxshowdist));
-    }
-
-    return cast_level;
-}
-
 typedef struct spelldata {
     const char *sname;
     spell_f cast;
@@ -6861,7 +6773,6 @@ void register_spells(void)
     ct_register(&ct_deathcloud);
 
     register_function((pf_generic)sp_blessedharvest, "cast_blessedharvest");
-    register_function((pf_generic)sp_wdwpyramid, "wdwpyramid");
     register_function((pf_generic)sp_summon_familiar, "cast_familiar");
     register_function((pf_generic)sp_babbler, "cast_babbler");
     register_function((pf_generic)sp_readmind, "cast_readmind");

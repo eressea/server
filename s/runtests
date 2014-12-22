@@ -17,5 +17,6 @@ fi
 
 $ROOT/$BIN_DIR/eressea/test_eressea
 cd $ROOT
+[ -e eressea.ini ] || ln -sf conf/eressea.ini
 $ROOT/$BIN_DIR/eressea/eressea -v0 scripts/run-tests.lua
 cd $OLDWPD

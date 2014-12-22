@@ -263,15 +263,16 @@ extern "C" {
   extern void drain_exp(struct unit *u, int d);
   extern void kill_troop(troop dt);
   extern void remove_troop(troop dt);   /* not the same as the badly named rmtroop */
-  extern bool is_attacker(const fighter * fig);
-
-  extern struct battle *make_battle(struct region * r);
-  extern fighter *make_fighter(struct battle *b, struct unit *u, side * s,
-    bool attack);
-  extern struct side *make_side(struct battle * b, const struct faction * f,
-    const struct group * g, unsigned int flags, 
-    const struct faction * stealthfaction);
-  extern int skilldiff(troop at, troop dt, int dist);
+  
+    bool is_attacker(const fighter * fig);
+    struct battle *make_battle(struct region * r);
+    void free_battle(struct battle * b);
+    struct fighter *make_fighter(struct battle *b, struct unit *u,
+                                 struct side * s, bool attack);
+    struct side *make_side(struct battle * b, const struct faction * f,
+                           const struct group * g, unsigned int flags, 
+                           const struct faction * stealthfaction);
+    int skilldiff(troop at, troop dt, int dist);
 
 #ifdef __cplusplus
 }

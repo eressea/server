@@ -243,10 +243,6 @@ void tolua_building_open(lua_State * L)
       tolua_variable(L, TOLUA_CAST "size", tolua_building_get_size,
         tolua_building_set_size);
       tolua_function(L, TOLUA_CAST "get_typename", tolua_building_get_typename);
-#ifdef TODO
-      .property("type", &building_gettype)
-        .def_readwrite("size", &building::size)
-#endif
       tolua_variable(L, TOLUA_CAST "objects", tolua_building_get_objects, 0);
       tolua_variable(L, TOLUA_CAST "working", tolua_building_get_working, tolua_building_set_working);
 

@@ -4,11 +4,9 @@ stealth.test.c
 )
 
 SET(_FILES
-alliance.c
 attributes.c
 fleechance.c
 follow.c
-gm.c
 hate.c
 iceberg.c
 key.c

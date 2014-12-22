@@ -1,6 +1,7 @@
 project(kernel C)
 
 SET(_TEST_FILES
+alliance.test.c
 build.test.c
 config.test.c
 group.test.c

@@ -1,7 +1,7 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Copyright (c) 1998-2014, Enno Rehling <enno@eressea.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -16,18 +16,23 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#include <platform.h>
-#include "alliance.h"
+#ifndef H_GC_CHAOS
+#define H_GC_CHAOS
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#include <kernel/save.h>
-#include <util/attrib.h>
+    struct region;
 
-attrib_type at_alliance = {
-  "alliance",
-  NULL,
-  NULL,
-  NULL,
-  a_writeint,
-  a_readint,
-  ATF_UNIQUE
-};
+    extern struct attrib_type at_chaoscount;
+
+    void chaos_register(void);
+    void chaos_update(void);
+
+    int get_chaoscount(const struct region * r);
+    void add_chaoscount(struct region * r, int deaths);
+
+#ifdef __cplusplus
+}
+#endif
+#endif

@@ -251,18 +251,22 @@ void addmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
   caddmessage(r, f, s, mtype, level);
 }
 
+message * msg_error(const unit * u, struct order *ord, int mno) {
+    static char msgname[20];
+
+    if (fval(u->faction, FFL_NPC))
+        return 0;
+    sprintf(msgname, "error%d", mno);
+    return msg_feedback(u, ord, msgname, "");
+}
+
 message * cmistake(const unit * u, struct order *ord, int mno, int mtype)
 {
-  message * result;
-  static char msgname[20];
-  unused_arg(mtype);
-
-  if (fval(u->faction, FFL_NPC))
-    return 0;
-  sprintf(msgname, "error%d", mno);
-  result = msg_feedback(u, ord, msgname, "");
-  ADDMSG(&u->faction->msgs, result);
-  return result;
+    message * result;
+    unused_arg(mtype);
+    result = msg_error(u, ord, mno);
+    ADDMSG(&u->faction->msgs, result);
+    return result;
 }
 
 extern unsigned int new_hashstring(const char *s);

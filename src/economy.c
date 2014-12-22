@@ -29,6 +29,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "spy.h"
 #include "move.h"
 #include "monster.h"
+#include "morale.h"
 #include "reports.h"
 
 /* kernel includes */
@@ -596,12 +597,8 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
 
 static void friendly_takeover(region * r, faction * f)
 {
-    int morale = region_get_morale(r);
     region_set_owner(r, f, turn);
-    if (morale > 0) {
-        morale = _max(0, morale - MORALE_TRANSFER);
-        region_set_morale(r, morale, turn);
-    }
+    morale_change(r, MORALE_TRANSFER);
 }
 
 void give_control(unit * u, unit * u2)
@@ -632,20 +629,18 @@ int give_control_cmd(unit * u, order * ord)
     region *r = u->region;
     unit *u2;
     const char *s;
-    param_t p;
 
     init_order(ord);
-    u2 = getunit(r, u->faction);
-    s = getstrtoken();
-    p = findparam(s, u->faction->locale);
+    getunit(r, u->faction, &u2);
 
-    /* first, do all the ones that do not require HELP_GIVE or CONTACT */
-    if (p == P_CONTROL) {
+    s = getstrtoken();
+    if (s && isparam(s, u->faction->locale, P_CONTROL)) {
         message *msg = 0;
 
-        if (!u2 || u2->number == 0) {
-            msg = msg_feedback(u, ord, "feedback_unit_not_found", "");
-            ADDMSG(&u->faction->msgs, msg);
+        if (!can_give_to(u, u2)) {
+            ADDMSG(&u->faction->msgs,
+                msg_feedback(u, ord, "feedback_unit_not_found", ""));
+            return 0;
         }
         else if (!u->building && !u->ship) {
             msg = cmistake(u, ord, 140, MSG_EVENT);
@@ -739,8 +734,11 @@ static bool maintain(building * b, bool first)
         return false;
     }
     u = building_owner(b);
-    if (u == NULL)
+    if (u == NULL) {
+        /* no owner - send a message to the entire region */
+        ADDMSG(&r->msgs, msg_message("maintenance_noowner", "building", b));
         return false;
+    }
     /* If the owner is the region owner, check if dontpay flag is set for the building where he is in */
     if (check_param(global.parameters, "rules.region_owner_pay_building", b->type->_name)) {
         if (fval(u->building, BLD_DONTPAY)) {

@@ -43,12 +43,17 @@ without prior permission by the authors of Eressea.
 
 alliance *alliances = NULL;
 
-void free_alliance(alliance * al)
+void free_alliances(void)
 {
-  free(al->name);
-  if (al->members)
-    ql_free(al->members);
-  free(al);
+    while (alliances) {
+        alliance *al = alliances;
+        alliances = al->next;
+        free(al->name);
+        if (al->members) {
+            ql_free(al->members);
+        }
+        free(al);
+    }
 }
 
 alliance *makealliance(int id, const char *name)
@@ -512,4 +517,8 @@ void alliance_setname(alliance * self, const char *name)
     self->name = _strdup(name);
   else
     self->name = NULL;
+}
+
+bool is_allied(const struct faction *f1, const struct faction *f2) {
+    return (f1 == f2 || (f1->alliance && f1->alliance == f2->alliance));
 }

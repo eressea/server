@@ -16,6 +16,8 @@ without prior permission by the authors of Eressea.
 #include "bind_ship.h"
 #include "bind_building.h"
 
+#include "chaos.h"
+
 #include <kernel/config.h>
 #include <kernel/region.h>
 #include <kernel/resources.h>
@@ -370,7 +372,7 @@ static int tolua_region_get_resource(lua_State * L)
       result = deathcount(r);
       break;
     case 4:
-      result = chaoscount(r);
+      result = get_chaoscount(r);
       break;
     }
   } else {
@@ -406,7 +408,7 @@ static int tolua_region_set_resource(lua_State * L)
       deathcounts(r, value - deathcount(r));
       break;
     case 4:
-      chaoscounts(r, value - chaoscount(r));
+        add_chaoscount(r, value - get_chaoscount(r));
       break;
     }
   } else {

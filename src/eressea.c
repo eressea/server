@@ -20,6 +20,7 @@
 #include <modules/xmas.h>
 #include <items/itemtypes.h>
 #include <attributes/attributes.h>
+#include "chaos.h"
 #include "report.h"
 #include "items.h"
 #include "creport.h"
@@ -58,16 +59,13 @@ void game_init(void)
     register_resources();
     register_buildings();
     register_itemfunctions();
-#if DUNGEON_MODULE
-    register_dungeon();
-#endif
 #if MUSEUM_MODULE
     register_museum();
 #endif
 #if ARENA_MODULE
     register_arena();
 #endif
-    register_wormholes();
+    wormholes_register();
 
     register_itemtypes();
 #ifdef USE_LIBXML2
@@ -76,4 +74,5 @@ void game_init(void)
     register_attributes();
     register_gmcmd();
 
+    chaos_register();
 }

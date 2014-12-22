@@ -22,8 +22,8 @@ exit $2 # otherwise
 function build() {
 assert_dir $SOURCE
 cd $SOURCE
-[ -z $1 ] || ( git checkout $1 && git submodule update )
-git pull || abort "failed to update source. do you have local changes?"
+[ -z $1 ] || git checkout $1
+( git pull && git submodule update ) || abort "failed to update source. do you have local changes?"
 s/build || abort "build failed."
 }
 
@@ -69,6 +69,7 @@ function run() {
 echo "testing turn $turn of game $game"
 assert_dir $TESTROOT
 cd $TESTROOT
+[ ! -e execute.lock ] || abort "lockfile prevents running game $game"
 [ -d data ] || mkdir data
 assert_dir data
 assert_files $LIVE/orders.$turn $LIVE/data/$turn.dat
@@ -78,7 +79,12 @@ ln -f $LIVE/data/$turn.dat data/
 rm -rf reports
 mkdir -p reports
 
-$SOURCE/build-x86_64-gcc-Debug/eressea/eressea -v$verbose -t$turn -re$game $SOURCE/scripts/run-turn.lua
+SERVER="$SOURCE/build-x86_64-gcc-Debug/eressea/eressea"
+VALGRIND=$(which valgrind)
+if [ ! -z $VALGRIND ]; then
+SERVER="$VALGRIND --leak-check=no $SERVER"
+fi
+$SERVER -v$verbose -t$turn -re$game $SOURCE/scripts/run-turn.lua
 let turn=$turn+1
 [ -e data/$turn.dat ] || abort "no data file created"
 }
@@ -153,6 +159,7 @@ case "$1" in
     [ -f $TESTROOT/turn ] || abort "missing turn file, and no turn specified"
     let turn=$(cat $TESTROOT/turn)
   fi
+  [ -f reports.txt ] || abort "missing reports.txt for game $game"
   for faction in $* ; do
     send $faction
     sent=1

@@ -1,6 +1,7 @@
 #include <platform.h>
 #include "parser.h"
 #include "unicode.h"
+#include "base36.h"
 #include "log.h"
 
 #include <assert.h>
@@ -199,4 +200,14 @@ const char *parse_token(const char **str)
 const char *getstrtoken(void)
 {
   return parse_token((const char **)&states->current_token);
+}
+
+int getid(void)
+{
+    const char *str = getstrtoken();
+    int i = str ? atoi36(str) : 0;
+    if (i < 0) {
+        return -1;
+    }
+    return i;
 }

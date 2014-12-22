@@ -103,8 +103,7 @@ static int wormhole_age(struct attrib *a)
     return AT_AGE_KEEP;
 }
 
-static void
-wormhole_write(const struct attrib *a, const void *owner, struct storage *store)
+static void wormhole_write(const struct attrib *a, const void *owner, struct storage *store)
 {
     wormhole_data *data = (wormhole_data *)a->data.v;
     write_building_reference(data->entry, store);
@@ -175,7 +174,7 @@ make_wormhole(const building_type * bt_wormhole, region * r1, region * r2)
 
 #define WORMHOLE_CHANCE 10000
 
-void select_wormhole_regions(quicklist **rlistp, int *countp) {
+static void select_wormhole_regions(quicklist **rlistp, int *countp) {
     quicklist *rlist = 0;
     region *r = regions;
     int count = 0;
@@ -217,7 +216,7 @@ void make_wormholes(region **match, int count, const building_type *bt_wormhole)
     }
 }
 
-void create_wormholes(void)
+void wormholes_update(void)
 {
     const building_type *bt_wormhole = bt_find("wormhole");
     quicklist *rlist = 0;
@@ -239,7 +238,7 @@ void create_wormholes(void)
     free(match);
 }
 
-void register_wormholes(void)
+void wormholes_register(void)
 {
     at_register(&at_wormhole);
 }

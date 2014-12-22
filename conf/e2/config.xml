@@ -103,6 +103,7 @@
     <param name="rules.guard.guard_number_stop_prob" value="0.001"/>
     <param name="rules.guard.castle_stop_prob" value="0.05"/>
     <param name="rules.guard.region_type_stop_prob" value="0.05"/>
+    <param name="rules.economy.repopulate_maximum" value="500"/>
     <param name="game.id" value="2"/>
     <param name="game.name" value="Eressea"/>
   </game>

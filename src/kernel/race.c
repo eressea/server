@@ -154,6 +154,9 @@ static race *rc_find_i(const char *name)
     while (rc && !strcmp(rname, rc->_name) == 0) {
         rc = rc->next;
     }
+    if (!rc && strcmp(name, "uruk") == 0) {
+        rc = rc_find_i("orc");
+    }
     return rc;
 }
 
@@ -172,6 +175,7 @@ race *rc_get_or_create(const char *zName)
 
         rc = (race *)calloc(sizeof(race), 1);
         rc->hitpoints = 1;
+        rc->recruit_multi = 1.0F;
         if (strchr(zName, ' ') != NULL) {
             log_error("race '%s' has an invalid name. remove spaces\n", zName);
             assert(strchr(zName, ' ') == NULL);
@@ -219,8 +223,7 @@ bool r_insectstalled(const region * r)
     return fval(r->terrain, ARCTIC_REGION);
 }
 
-const char *rc_name(const race * rc, name_t n)
-{
+const char* rc_name(const race * rc, name_t n, char *name, size_t size) {
     const char * postfix = 0;
     if (!rc) {
         return NULL;
@@ -230,14 +233,19 @@ const char *rc_name(const race * rc, name_t n)
     case NAME_PLURAL: postfix = "_p"; break;
     case NAME_DEFINITIVE: postfix = "_d"; break;
     case NAME_CATEGORY: postfix = "_x"; break;
-    default: assert(!"invalid name_t enum in rc_name");
+    default: assert(!"invalid name_t enum in rc_name_s");
     }
     if (postfix) {
-        static char name[64];  // FIXME: static return value
-        sprintf(name, "race::%s%s", rc->_name, postfix);
+        _snprintf(name, size, "race::%s%s", rc->_name, postfix);
         return name;
     }
     return NULL;
+}
+
+const char *rc_name_s(const race * rc, name_t n)
+{
+    static char name[64];  // FIXME: static return value
+    return rc_name(rc, n, name, sizeof(name));
 }
 
 const char *raceprefix(const unit * u)
@@ -266,7 +274,7 @@ const char *racename(const struct locale *loc, const unit * u, const race * rc)
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
 
-        bytes = (int)strlcpy(bufp, LOC(loc, rc_name(rc, u->number != 1)), size);
+        bytes = (int)strlcpy(bufp, LOC(loc, rc_name_s(rc, u->number != 1)), size);
         assert(~bufp[0] & 0x80 || !"unicode/not implemented");
         ch = tolower(*(unsigned char *)bufp);
         bufp[0] = (char)ch;
@@ -276,7 +284,7 @@ const char *racename(const struct locale *loc, const unit * u, const race * rc)
 
         return lbuf;
     }
-    str = LOC(loc, rc_name(rc, (u->number == 1) ? NAME_SINGULAR : NAME_PLURAL));
+    str = LOC(loc, rc_name_s(rc, (u->number == 1) ? NAME_SINGULAR : NAME_PLURAL));
     return str ? str : rc->_name;
 }
 

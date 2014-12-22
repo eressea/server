@@ -15,6 +15,7 @@
 #include "command.h"
 
 #include <kernel/order.h>
+#include <kernel/unit.h>
 
 #include <util/umlaut.h>
 #include <util/language.h>

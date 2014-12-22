@@ -274,11 +274,9 @@ int shipcapacity(const ship * sh)
   if (sh->type->construction && sh->size != sh->type->construction->maxsize)
     return 0;
 
-#ifdef SHIPDAMAGE
   if (sh->damage) {
     i = (int)ceil(i * (1.0 - sh->damage / sh->size / (double)DAMAGE_SCALE));
   }
-#endif
   return i;
 }
 

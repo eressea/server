@@ -5,7 +5,7 @@
         regaura="0.000000" weight="500" capacity="200" equipment="no"
         speed="1.000000" hp="1000" ac="4" damage="2d4" unarmedattack="10"
         unarmeddefense="10" attackmodifier="8" defensemodifier="8"
-        fly="no" walk="no" canteach="no" getitem="yes">
+        fly="no" walk="no" canteach="no" getitem="yes" giveitem="yes">
     <attack type="4" damage="2d6+2"/>
     <attack type="3" damage="2d6+2"/>
   </race>
@@ -981,7 +981,7 @@
     <familiar race="rat"/>
     <familiar race="imp"/>
   </race>
-  <race name="clone" magres="0.900000" maxaura="0.000000" regaura="0.000000" recruitcost="0" weight="1000" capacity="540" speed="1.000000" hp="40" damage="0d0" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" canlearn="no" teach="no" noheal="yes">
+  <race name="clone" magres="0.900000" maxaura="0.000000" regaura="0.000000" recruitcost="0" weight="1000" capacity="540" speed="1.000000" hp="40" damage="0d0" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" canlearn="no" teach="no" noheal="yes" giveitem="yes">
     <ai splitsize="10000"/>
     <skill name="alchemy" modifier="-99"/>
     <skill name="crossbow" modifier="-99"/>

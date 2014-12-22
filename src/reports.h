@@ -142,6 +142,15 @@ extern "C" {
     size_t f_regionid(const struct region *r, const struct faction *f,
         char *buffer, size_t size);
 
+    typedef struct strlist {
+        struct strlist *next;
+        char *s;
+    } strlist;
+
+    void addstrlist(strlist ** SP, const char *s);
+    void freestrlist(strlist * s);
+
+
 #define GR_PLURAL     0x01      /* grammar: plural */
 #define MAX_INVENTORY 128       /* maimum number of different items in an inventory */
 #define MAX_RAWMATERIALS 8      /* maximum kinds of raw materials in a regions */

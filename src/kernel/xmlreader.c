@@ -552,43 +552,6 @@ static int parse_ships(xmlDocPtr doc)
   return 0;
 }
 
-#if 0
-static void race_compat(void)
-{
-  /* required for old_race, do not change order! */
-  const char *oldracenames[MAXRACES] = {
-    "dwarf", "elf", NULL, "goblin", "human", "troll", "demon", "insect",
-    "halfling", "cat", "aquarian", "orc", "snotling", "undead", "illusion",
-    "youngdragon", "dragon", "wyrm", "ent", "catdragon", "dracoid",
-    "special", "spell", "irongolem", "stonegolem", "shadowdemon",
-    "shadowmaster", "mountainguard", "alp", "toad", "braineater", "peasant",
-    "wolf", NULL, NULL, NULL, NULL, "songdragon", NULL,
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL, "seaserpent",
-    "shadowknight", "centaur", "skeleton", "skeletonlord", "zombie",
-    "juju-zombie", "ghoul", "ghast", "museumghost", "gnome", "template",
-    "clone"
-  };
-  int i;
-
-  for (i = 0; i != MAXRACES; ++i) {
-    const char *rcname = oldracenames[i];
-    if (rcname == NULL) {
-      new_race[i] = NULL;
-    } else {
-      race *rc = rc_get_or_create(oldracenames[i]);
-      if (rc) {
-        new_race[i] = rc;
-        if (rc == new_race[RC_TROLL]) {
-          a_add(&rc->attribs, make_skillmod(NOSKILL, SMF_RIDING, NULL, 0.0,
-              -1));
-        }
-      }
-    }
-  }
-}
-#endif
-
 static potion_type *xml_readpotion(xmlXPathContextPtr xpath, item_type * itype)
 {
   int level = xml_ivalue(xpath->node, "level", 0);

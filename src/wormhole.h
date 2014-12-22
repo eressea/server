@@ -22,8 +22,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-  extern void create_wormholes(void);
-  extern void register_wormholes(void);
+  extern void wormholes_update(void);
+  extern void wormholes_register(void);
 
 #ifdef __cplusplus
 }

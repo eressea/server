@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "battle.h"
 #include "alchemy.h"
+#include "chaos.h"
 #include "move.h"
 #include "laws.h"
 #include "skill.h"
@@ -81,13 +82,8 @@ static FILE *bdebug;
 #define CATAPULT_STRUCTURAL_DAMAGE
 
 #define BASE_CHANCE    70       /* 70% Basis-Überlebenschance */
-#ifdef NEW_COMBATSKILLS_RULE
 #define TDIFF_CHANGE    5       /* 5% höher pro Stufe */
 #define DAMAGE_QUOTIENT 2       /* damage += skilldiff/DAMAGE_QUOTIENT */
-#else
-#define TDIFF_CHANGE 10
-# define DAMAGE_QUOTIENT 1      /* damage += skilldiff/DAMAGE_QUOTIENT */
-#endif
 
 #undef DEBUG_FAST               /* should be disabled when b->fast and b->rowcache works */
 #define DEBUG_SELECT            /* should be disabled if select_enemy works */
@@ -2052,9 +2048,6 @@ void dazzle(battle * b, troop * td)
     td->fighter->person[td->index].defence--;
 }
 
-/* TODO: Gebäude/Schiffe sollten auch zerstörbar sein. Schwierig im Kampf,
- * besonders bei Schiffen. */
-
 void damage_building(battle * b, building * bldg, int damage_abs)
 {
     bldg->size = _max(1, bldg->size - damage_abs);
@@ -2262,9 +2255,9 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
             ta.fighter->person[ta.index].last_action = b->turn;
         }
         if (td.fighter->unit->ship) {
-            /* FIXME should use damage_ship here? */
-            td.fighter->unit->ship->damage +=
-                DAMAGE_SCALE * dice_rand(a->data.dice);
+            int dice = dice_rand(a->data.dice);
+            ship * sh = td.fighter->unit->ship;
+            damage_ship(sh, dice / sh->type->damage / sh->size);
         }
         else if (td.fighter->unit->building) {
             damage_building(b, td.fighter->unit->building, dice_rand(a->data.dice));
@@ -2618,7 +2611,7 @@ static void battle_effects(battle * b, int dead_players)
         _min(rpeasants(r), (int)(dead_players * PopulationDamage()));
     if (dead_peasants) {
         deathcounts(r, dead_peasants + dead_players);
-        chaoscounts(r, dead_peasants / 2);
+        add_chaoscount(r, dead_peasants / 2);
         rsetpeasants(r, rpeasants(r) - dead_peasants);
     }
 }
@@ -2726,7 +2719,7 @@ static void aftermath(battle * b)
                     fset(sh, SF_DAMAGED);
             }
 
-            if (df->alive == du->number) {
+            if (df->alive && df->alive == du->number) {
                 du->hp = sum_hp;
                 continue;               /* nichts passiert */
             }
@@ -2902,12 +2895,11 @@ static void aftermath(battle * b)
 static void battle_punit(unit * u, battle * b)
 {
     bfaction *bf;
-    strlist *S, *x;
 
     for (bf = b->factions; bf; bf = bf->next) {
         faction *f = bf->faction;
+        strlist *S = 0, *x;
 
-        S = 0;
         spunit(&S, f, u, 4, see_battle);
         for (x = S; x; x = x->next) {
             fbattlerecord(b, f, x->s);
@@ -3664,7 +3656,7 @@ static void free_fighter(fighter * fig)
 
 }
 
-static void free_battle(battle * b)
+void free_battle(battle * b)
 {
     int max_fac_no = 0;
 
@@ -3689,18 +3681,6 @@ static void free_battle(battle * b)
 
 static int *get_alive(side * s)
 {
-#if 0
-    static int alive[NUMROWS];
-    fighter *fig;
-    memset(alive, 0, NUMROWS * sizeof(int));
-    for (fig = s->fighters; fig; fig = fig->next) {
-        if (fig->alive > 0) {
-            int row = statusrow(fig);
-            alive[row] += fig->alive;
-        }
-    }
-    return alive;
-#endif
     return s->size;
 }
 
@@ -4019,7 +3999,7 @@ static bool start_battle(region * r, battle ** bp)
 
                     init_order(ord);
                     /* attackierte Einheit ermitteln */
-                    u2 = getunit(r, u->faction);
+                    getunit(r, u->faction, &u2);
 
                     /* Beginn Fehlerbehandlung */
                     /* Fehler: "Die Einheit wurde nicht gefunden" */
@@ -4261,7 +4241,6 @@ void do_battle(region * r)
         message_all(b, m);
         msg_release(m);
         free_battle(b);
-        free(b);
         return;
     }
     join_allies(b);
@@ -4308,7 +4287,6 @@ void do_battle(region * r)
 
     if (b) {
         free_battle(b);
-        free(b);
     }
 }
 
@@ -4327,5 +4305,6 @@ void battle_free(battle * b) {
         }
         free_side(s);
     }
+    free(b);
 }
 

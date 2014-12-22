@@ -28,6 +28,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "economy.h"
 #include "keyword.h"
 #include "market.h"
+#include "morale.h"
 #include "monster.h"
 #include "move.h"
 #include "randenc.h"
@@ -150,7 +151,6 @@ static void age_unit(region * r, unit * u)
             u_race(u)->age(u);
         }
     }
-#ifdef ASTRAL_ITEM_RESTRICTIONS
     if (u->region && is_astral(u->region)) {
         item **itemp = &u->items;
         while (*itemp) {
@@ -167,7 +167,6 @@ static void age_unit(region * r, unit * u)
             itemp = &itm->next;
         }
     }
-#endif
 }
 
 static void live(region * r)
@@ -675,6 +674,39 @@ growing_herbs(region * r, const int current_season, const int last_weeks_season)
     }
 }
 
+void immigration(void)
+{
+    region *r;
+    log_info(" - Einwanderung...");
+    int repopulate=get_param_int(global.parameters, "rules.economy.repopulate_maximum", 90);
+    for (r = regions; r; r = r->next) {
+        if (r->land && r->land->newpeasants) {
+            int rp = rpeasants(r) + r->land->newpeasants;
+            rsetpeasants(r, _max(0, rp));
+        }
+        /* Genereate some (0-2 to 0-6 depending on the income) peasants out of nothing */
+        /*if less then 50 are in the region and there is space and no monster or deamon units in the region */
+        int peasants = rpeasants(r);
+        if (repopulate && r->land && (peasants < repopulate) && maxworkingpeasants(r) > (peasants+30)*2)
+        {
+            int badunit = 0;
+            unit *u;
+            for (u = r->units; u; u = u->next) {
+                if (!playerrace(u_race(u)) || u_race(u) == get_race(RC_DAEMON))
+                {
+                    badunit = 1;
+                    break;
+                }
+            }
+            if (badunit == 0)
+            {
+                peasants += (int)(rng_double()*(wage(r, NULL, NULL, turn) - 9));
+                rsetpeasants(r, peasants);
+            }
+        }
+    }
+}
+
 void demographics(void)
 {
     region *r;
@@ -718,7 +750,14 @@ void demographics(void)
                 calculate_emigration(r);
                 peasants(r);
                 if (r->age > 20) {
-                    plagues(r, false);
+                    double mwp = _max(maxworkingpeasants(r), 1);
+                    double prob =
+                        pow(rpeasants(r) / (mwp * wage(r, NULL, NULL, turn) * 0.13), 4.0)
+                        * PLAGUE_CHANCE;
+
+                    if (rng_double() < prob) {
+                        plagues(r);
+                    }
                 }
                 horses(r);
                 if (plant_rules == 0) { /* E1 */
@@ -742,15 +781,7 @@ void demographics(void)
     };
 
     remove_empty_units();
-
-    log_info(" - Einwanderung...");
-    for (r = regions; r; r = r->next) {
-        if (r->land && r->land->newpeasants) {
-            int rp = rpeasants(r) + r->land->newpeasants;
-            rsetpeasants(r, _max(0, rp));
-        }
-    }
-
+    immigration();
     checkorders();
 }
 
@@ -781,7 +812,7 @@ static void inactivefaction(faction * f)
     if (inactiveFILE) {
         fprintf(inactiveFILE, "%s:%s:%d:%d\n",
             factionid(f),
-            LOC(default_locale, rc_name(f->race, NAME_PLURAL)),
+            LOC(default_locale, rc_name_s(f->race, NAME_PLURAL)),
             modify(count_all(f)), turn - f->lastorders);
 
         fclose(inactiveFILE);
@@ -857,19 +888,15 @@ int can_contact(const region * r, const unit * u, const unit * u2) {
 
 int contact_cmd(unit * u, order * ord)
 {
-    /* unit u kontaktiert unit u2. Dies setzt den contact einfach auf 1 -
-     * ein richtiger toggle ist (noch?) nicht noetig. die region als
-     * parameter ist nur deswegen wichtig, weil er an getunit ()
-     * weitergegeben wird. dies wird fuer das auffinden von tempunits in
-     * getnewunit () verwendet! */
     unit *u2;
-    region *r = u->region;
+    int n;
 
     init_order(ord);
-    u2 = getunitg(r, u->faction);
+    n = read_unitid(u->faction, u->region);
+    u2 = findunit(n);
 
     if (u2 != NULL) {
-        if (!can_contact(r, u, u2)) {
+        if (!can_contact(u->region, u, u2)) {
             cmistake(u, u->thisorder, 23, MSG_EVENT);
             return -1;
         }
@@ -1607,9 +1634,14 @@ int display_cmd(unit * u, struct order *ord)
         const char *s2 = getstrtoken();
 
         free(*s);
-        *s = _strdup(s2);
-        if (strlen(s2) >= DISPLAYSIZE) {
-            (*s)[DISPLAYSIZE] = 0;
+        if (s2) {
+            *s = _strdup(s2);
+            if (strlen(s2) >= DISPLAYSIZE) {
+                (*s)[DISPLAYSIZE] = 0;
+            }
+        }
+        else {
+            *s = 0;
         }
     }
 
@@ -1833,8 +1865,9 @@ int name_cmd(struct unit *u, struct order *ord)
 
     case P_UNIT:
         if (foreign) {
-            unit *u2 = getunit(r, u->faction);
+            unit *u2 = 0;
 
+            getunit(r, u->faction, &u2);
             if (!u2 || !cansee(u->faction, r, u2, 0)) {
                 ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
                     "feedback_unit_not_found", ""));
@@ -1975,7 +2008,7 @@ int mail_cmd(unit * u, struct order *ord)
         case P_REGION:
             /* können alle Einheiten in der Region sehen */
             s = getstrtoken();
-            if (!s[0]) {
+            if (!s || !s[0]) {
                 cmistake(u, ord, 30, MSG_MESSAGE);
                 break;
             }
@@ -2144,7 +2177,7 @@ int email_cmd(unit * u, struct order *ord)
     init_order(ord);
     s = getstrtoken();
 
-    if (!s[0]) {
+    if (!s || !s[0]) {
         cmistake(u, ord, 85, MSG_EVENT);
     }
     else {
@@ -2301,7 +2334,7 @@ static bool display_race(faction * f, unit * u, const race * rc)
 
     if (u && u_race(u) != rc)
         return false;
-    name = rc_name(rc, NAME_SINGULAR);
+    name = rc_name_s(rc, NAME_SINGULAR);
 
     bytes = slprintf(bufp, size, "%s: ", LOC(f->locale, name));
     if (wrptr(&bufp, &size, bytes) != 0)
@@ -3160,12 +3193,6 @@ static building *age_building(building * b)
     return b;
 }
 
-static double rc_popularity(const struct race *rc)
-{
-    int pop = get_param_int(rc->parameters, "morale", MORALE_AVERAGE);
-    return 1.0 / (pop - MORALE_COOLDOWN); /* 10 turns average */
-}
-
 static void age_region(region * r)
 {
     a_age(&r->attribs);
@@ -3174,33 +3201,7 @@ static void age_region(region * r)
     if (!r->land)
         return;
 
-    if (r->land->ownership && r->land->ownership->owner) {
-        int stability = turn - r->land->ownership->morale_turn;
-        int maxmorale = MORALE_DEFAULT;
-        building *b = largestbuilding(r, &cmp_taxes, false);
-        if (b) {
-            int bsize = buildingeffsize(b, false);
-            maxmorale = (int)(0.5 + b->type->taxes(b, bsize + 1) / MORALE_TAX_FACTOR);
-        }
-        if (r->land->morale < maxmorale) {
-            if (stability > MORALE_COOLDOWN && r->land->ownership->owner
-                && r->land->morale < MORALE_MAX) {
-                double ch = rc_popularity(r->land->ownership->owner->race);
-                if (is_cursed(r->attribs, C_GENEROUS, 0)) {
-                    ch *= 1.2;            /* 20% improvement */
-                }
-                if (stability >= MORALE_AVERAGE * 2 || chance(ch)) {
-                    region_set_morale(r, r->land->morale + 1, turn);
-                }
-            }
-        }
-        else if (r->land->morale > maxmorale) {
-            region_set_morale(r, r->land->morale - 1, turn);
-        }
-    }
-    else if (r->land->morale > MORALE_DEFAULT) {
-        region_set_morale(r, r->land->morale - 1, turn);
-    }
+    morale_update(r);
 }
 
 static void ageing(void)
@@ -3641,11 +3642,7 @@ void monthly_healing(void)
 
             p *= heal_factor(u);
             if (u->hp < umhp) {
-#ifdef NEW_DAEMONHUNGER_RULE
                 double maxheal = _max(u->number, umhp / 20.0);
-#else
-                double maxheal = _max(u->number, umhp / 10.0);
-#endif
                 int addhp;
                 struct building *b = inside_building(u);
                 const struct building_type *btype = b ? b->type : NULL;
@@ -3836,7 +3833,7 @@ int use_cmd(unit * u, struct order *ord)
         /* BENUTZE 42 Yanxspirit */
         t = getstrtoken();
     }
-    itype = finditemtype(t, u->faction->locale);
+    itype = t ? finditemtype(t, u->faction->locale) : NULL;
 
     if (itype != NULL) {
         err = use_item(u, itype, n, ord);
@@ -3866,15 +3863,48 @@ int pay_cmd(unit * u, struct order *ord)
     }
     else {
         param_t p;
+        int id;
         init_order(ord);
         p = getparam(u->faction->locale);
+        id = getid();
+        building *b = NULL;
         if (p == P_NOT) {
             unit *owner = building_owner(u->building);
+            /* If the unit is not the owner of the building: error */
             if (owner->no != u->no) {
+                /* The building is not ours error */
                 cmistake(u, ord, 1222, MSG_EVENT);
             }
             else {
-                u->building->flags |= BLD_DONTPAY;
+                /* If no building id is given or it is the id of our building, just set the do-not-pay flag */
+                if (id == 0 || id == u->building->no)
+                {
+                    u->building->flags |= BLD_DONTPAY;
+                }
+                else {
+                    /* Find the building that matches to the given id*/
+                    b = findbuilding(id);
+                    /* If there is a building and it is in the same region as the unit continue, else: error */
+                    if (b && b->region == u->region)
+                    {
+                        /* If the unit is also the building owner (this is true if rules.region_owner_pay_building */
+                        /* is set and no one is in the building) set the do-not-pay flag for this building, else: error */
+                        if (building_owner(b) == u) {
+                            b->flags |= BLD_DONTPAY;
+                        }
+                        else
+                        {
+                            /* The building is not ours error */
+                            cmistake(u, ord, 1222, MSG_EVENT);
+                        }
+
+                    }
+                    else
+                    {
+                        /* Building not found error */
+                        cmistake(u, ord, 6, MSG_PRODUCE);
+                    }
+                }
             }
         }
     }
@@ -3885,7 +3915,7 @@ static int reserve_i(unit * u, struct order *ord, int flags)
 {
     if (u->number > 0 && (urace(u)->ec_flags & GETITEM)) {
         int use, count, para;
-        const resource_type *rtype;
+        const item_type *itype;
         const char *s;
 
         init_order(ord);
@@ -3897,19 +3927,19 @@ static int reserve_i(unit * u, struct order *ord, int flags)
             count = getint() * u->number;
         }
         s = getstrtoken();
-        rtype = s ? findresourcetype(s, u->faction->locale) : 0;
-        if (rtype == NULL)
+        itype = s ? finditemtype(s, u->faction->locale) : 0;
+        if (itype == NULL)
             return 0;
 
-        set_resvalue(u, rtype, 0);      /* make sure the pool is empty */
+        set_resvalue(u, itype, 0);      /* make sure the pool is empty */
 
         if (count == 0 && para == P_ANY) {
-            count = get_resource(u, rtype);
+            count = get_resource(u, itype->rtype);
         }
-        use = use_pooled(u, rtype, flags, count);
+        use = use_pooled(u, itype->rtype, flags, count);
         if (use) {
-            set_resvalue(u, rtype, use);
-            change_resource(u, rtype, use);
+            set_resvalue(u, itype, use);
+            change_resource(u, itype->rtype, use);
             return use;
         }
     }
@@ -4420,6 +4450,7 @@ void init_processor(void)
 
     p += 10;                      /* rest rng again before economics */
     add_proc_region(p, &economics, "Zerstoeren, Geben, Rekrutieren, Vergessen");
+    add_proc_order(p, K_PROMOTION, &promotion_cmd, 0, "Heldenbefoerderung");
 
     p += 10;
     if (!keyword_disabled(K_PAY)) {
@@ -4491,7 +4522,6 @@ void init_processor(void)
         p += 10;
         add_proc_global(p, restack_units, "Einheiten sortieren");
     }
-    add_proc_order(p, K_PROMOTION, &promotion_cmd, 0, "Heldenbefoerderung");
     if (!keyword_disabled(K_NUMBER)) {
         add_proc_order(p, K_NUMBER, &renumber_cmd, 0, "Neue Nummern (Einheiten)");
         p += 10;
@@ -4521,7 +4551,7 @@ void processorders(void)
 
     /* must happen AFTER age, because that would destroy them right away */
     if (get_param_int(global.parameters, "modules.wormholes", 0)) {
-        create_wormholes();
+        wormholes_update();
     }
 
     /* immer ausführen, wenn neue Sprüche dazugekommen sind, oder sich

@@ -219,7 +219,6 @@ void tolua_ship_open(lua_State * L)
         .property("maxsize", &ship_maxsize)
         .def_readwrite("damage", &ship::damage)
         .def_readwrite("size", &ship::size)
-        .def_readwrite("coast", &ship::coast)
 #endif
         tolua_variable(L, TOLUA_CAST "objects", tolua_ship_get_objects, 0);
 

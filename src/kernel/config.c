@@ -21,7 +21,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* attributes includes */
 #include <attributes/reduceproduction.h>
-#include <attributes/gm.h>
 
 /* kernel includes */
 #include "alliance.h"
@@ -62,7 +61,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/crmessage.h>
 #include <util/event.h>
 #include <util/language.h>
-#include <util/filereader.h>
 #include <util/functions.h>
 #include <util/log.h>
 #include <util/lists.h>
@@ -82,6 +80,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #endif
 
 /* external libraries */
+#include <storage.h>
 #include <iniparser.h>
 #include <critbit.h>
 
@@ -232,10 +231,8 @@ int LongHunger(const struct unit *u)
     if (u != NULL) {
         if (!fval(u, UFL_HUNGER))
             return false;
-#ifdef NEW_DAEMONHUNGER_RULE
         if (u_race(u) == get_race(RC_DAEMON))
             return false;
-#endif
     }
     if (rule < 0 || gamecookie != global.cookie) {
         gamecookie = global.cookie;
@@ -305,7 +302,7 @@ const char *dbrace(const struct race *rc)
     char *zPtr = zText;
 
     /* the english names are all in ASCII, so we don't need to worry about UTF8 */
-    strcpy(zText, (const char *)LOC(get_locale("en"), rc_name(rc, NAME_SINGULAR)));
+    strcpy(zText, (const char *)LOC(get_locale("en"), rc_name_s(rc, NAME_SINGULAR)));
     while (*zPtr) {
         *zPtr = (char)(toupper(*zPtr));
         ++zPtr;
@@ -510,12 +507,10 @@ int shipspeed(const ship * sh, const unit * u)
     k *= SHIPSPEED;
 #endif
 
-#ifdef SHIPDAMAGE
     if (sh->damage)
         k =
         (k * (sh->size * DAMAGE_SCALE - sh->damage) + sh->size * DAMAGE_SCALE -
         1) / (sh->size * DAMAGE_SCALE);
-#endif
 
     return (int)k;
 }
@@ -605,7 +600,7 @@ unsigned int atoip(const char *s)
     return n;
 }
 
-bool unit_has_cursed_item(unit * u)
+bool unit_has_cursed_item(const unit * u)
 {
     item *itm = u->items;
     while (itm) {
@@ -616,39 +611,11 @@ bool unit_has_cursed_item(unit * u)
     return false;
 }
 
-static void init_gms(void)
-{
-    faction *f;
-
-    for (f = factions; f; f = f->next) {
-        attrib *a = a_find(f->attribs, &at_gm);
-
-        if (a != NULL)
-            fset(f, FFL_GM);
-    }
-}
-
 static int
 autoalliance(const plane * pl, const faction * sf, const faction * f2)
 {
-    static bool init = false;
-    if (!init) {
-        init_gms();
-        init = true;
-    }
     if (pl && (pl->flags & PFL_FRIENDLY))
         return HELP_ALL;
-    /* if f2 is a gm in this plane, everyone has an auto-help to it */
-    if (fval(f2, FFL_GM)) {
-        attrib *a = a_find(f2->attribs, &at_gm);
-
-        while (a) {
-            const plane *p = (const plane *)a->data.v;
-            if (p == pl)
-                return HELP_ALL;
-            a = a->next;
-        }
-    }
 
     if (f_get_alliance(sf) != NULL && AllianceAuto()) {
         if (sf->alliance == f2->alliance)
@@ -733,70 +700,6 @@ int alliedunit(const unit * u, const faction * f2, int mode)
         return alliedgroup(pl, u->faction, f2, sf, mode);
     }
     return 0;
-}
-
-#ifndef NDEBUG
-const char *strcheck(const char *s, size_t maxlen)
-{
-    static char buffer[16 * 1024]; // FIXME: static return value
-    if (strlen(s) > maxlen) {
-        assert(maxlen < 16 * 1024);
-        log_warning("[strcheck] string was shortened to %d bytes:\n%s\n", (int)maxlen, s);
-        strlcpy(buffer, s, maxlen);
-        return buffer;
-    }
-    return s;
-}
-#endif
-
-static attrib_type at_lighthouse = {
-    "lighthouse"
-    /* Rest ist NULL; temporäres, nicht alterndes Attribut */
-};
-
-/* update_lighthouse: call this function whenever the size of a lighthouse changes
- * it adds temporary markers to the surrounding regions.
- * The existence of markers says nothing about the quality of the observer in
- * the lighthouse, for this may change more frequently.
- */
-void update_lighthouse(building * lh)
-{
-    const struct building_type *bt_lighthouse = bt_find("lighthouse");
-    if (bt_lighthouse && lh->type == bt_lighthouse) {
-        region *r = lh->region;
-        int d = (int)log10(lh->size) + 1;
-        int x;
-
-        if (lh->size > 0) {
-            r->flags |= RF_LIGHTHOUSE;
-        }
-
-        for (x = -d; x <= d; ++x) {
-            int y;
-            for (y = -d; y <= d; ++y) {
-                attrib *a;
-                region *r2;
-                int px = r->x + x, py = r->y + y;
-                pnormalize(&px, &py, rplane(r));
-                r2 = findregion(px, py);
-                if (!r2 || !fval(r2->terrain, SEA_REGION))
-                    continue;
-                if (distance(r, r2) > d)
-                    continue;
-                a = a_find(r2->attribs, &at_lighthouse);
-                while (a && a->type == &at_lighthouse) {
-                    building *b = (building *)a->data.v;
-                    if (b == lh)
-                        break;
-                    a = a->next;
-                }
-                if (!a) {
-                    a = a_add(&r2->attribs, a_new(&at_lighthouse));
-                    a->data.v = (void *)lh;
-                }
-            }
-        }
-    }
 }
 
 int count_faction(const faction * f, int flags)
@@ -889,15 +792,6 @@ parse(keyword_t kword, int(*dofun) (unit *, struct order *), bool thisorder)
                 up = &u->next;
         }
     }
-}
-
-const char *igetstrtoken(const char *initstr)
-{
-    if (initstr != NULL) {
-        init_tokens_str(initstr, NULL);
-    }
-
-    return getstrtoken();
 }
 
 unsigned int getuint(void)
@@ -1030,95 +924,36 @@ int read_unitid(const faction * f, const region * r)
     return atoi36((const char *)s);
 }
 
-/* exported symbol */
-bool getunitpeasants;
-unit *getunitg(const region * r, const faction * f)
+int getunit(const region * r, const faction * f, unit **uresult)
 {
+    unit *u2 = NULL;
     int n = read_unitid(f, r);
+    int result = GET_NOTFOUND;
 
     if (n == 0) {
-        getunitpeasants = 1;
-        return NULL;
+        result = GET_PEASANTS;
     }
-    getunitpeasants = 0;
-    if (n < 0)
-        return 0;
-
-    return findunit(n);
-}
-
-unit *getunit(const region * r, const faction * f)
-{
-    int n = read_unitid(f, r);
-    unit *u2;
-
-    if (n == 0) {
-        getunitpeasants = 1;
-        return NULL;
+    else if (n>0) {
+        u2 = findunit(n);
+        if (u2 != NULL && u2->region == r) {
+            /* there used to be a 'u2->flags & UFL_ISNEW || u2->number>0' condition
+            * here, but it got removed because of a bug that made units disappear:
+            * http://eressea.upb.de/mantis/bug_view_page.php?bug_id=0000172
+            */
+            result = GET_UNIT;
+        }
+        else {
+            u2 = NULL;
+        }
     }
-    getunitpeasants = 0;
-    if (n < 0)
-        return 0;
-
-    u2 = findunit(n);
-    if (u2 != NULL && u2->region == r) {
-        /* there used to be a 'u2->flags & UFL_ISNEW || u2->number>0' condition
-         * here, but it got removed because of a bug that made units disappear:
-         * http://eressea.upb.de/mantis/bug_view_page.php?bug_id=0000172
-         */
-        return u2;
+    if (uresult) {
+        *uresult = u2;
     }
-
-    return NULL;
-}
-
-/* - String Listen --------------------------------------------- */
-void addstrlist(strlist ** SP, const char *s)
-{
-    strlist *slist = malloc(sizeof(strlist));
-    slist->next = NULL;
-    slist->s = _strdup(s);
-    addlist(SP, slist);
-}
-
-void freestrlist(strlist * s)
-{
-    strlist *q, *p = s;
-    while (p) {
-        q = p->next;
-        free(p->s);
-        free(p);
-        p = q;
-    }
+    return result;
 }
 
 /* - Namen der Strukturen -------------------------------------- */
-typedef char name[OBJECTIDSIZE + 1];
-static name idbuf[8];
-static int nextbuf = 0;
-
-char *estring_i(char *ibuf)
-{
-    char *p = ibuf;
-
-    while (*p) {
-        if (isxspace(*(unsigned *)p) == ' ') {
-            *p = '~';
-        }
-        ++p;
-    }
-    return ibuf;
-}
-
-char *estring(const char *s)
-{
-    char *ibuf = idbuf[(++nextbuf) % 8];
-
-    strlcpy(ibuf, s, sizeof(name));
-    return estring_i(ibuf);
-}
-
-char *cstring_i(char *ibuf)
+char *untilde(char *ibuf)
 {
     char *p = ibuf;
 
@@ -1129,14 +964,6 @@ char *cstring_i(char *ibuf)
         ++p;
     }
     return ibuf;
-}
-
-char *cstring(const char *s)
-{
-    char *ibuf = idbuf[(++nextbuf) % 8];
-
-    strlcpy(ibuf, s, sizeof(name));
-    return cstring_i(ibuf);
 }
 
 building *largestbuilding(const region * r, cmp_building_cb cmp_gt,
@@ -1155,19 +982,6 @@ building *largestbuilding(const region * r, cmp_building_cb cmp_gt,
         best = b;
     }
     return best;
-}
-
-char *write_unitname(const unit * u, char *buffer, size_t size)
-{
-    slprintf(buffer, size, "%s (%s)", (const char *)u->name, itoa36(u->no));
-    buffer[size - 1] = 0;
-    return buffer;
-}
-
-const char *unitname(const unit * u)
-{
-    char *ubuf = idbuf[(++nextbuf) % 8];
-    return write_unitname(u, ubuf, sizeof(name));
 }
 
 /* -- Erschaffung neuer Einheiten ------------------------------ */
@@ -1255,158 +1069,6 @@ int maxworkingpeasants(const struct region *r)
     int size = production(r);
     int treespace = (rtrees(r, 2) + rtrees(r, 1) / 2) * TREESIZE;
     return _max(size-treespace, _min(size / 10 , 200));
-}
-
-int lighthouse_range(const building * b, const faction * f)
-{
-    int d = 0;
-    if (fval(b, BLD_WORKING) && b->size >= 10) {
-        int maxd = (int)log10(b->size) + 1;
-
-        if (skill_enabled(SK_PERCEPTION)) {
-            region *r = b->region;
-            int c = 0;
-            unit *u;
-            for (u = r->units; u; u = u->next) {
-                if (u->building == b || u == building_owner(b)) {
-                    if (u->building == b) {
-                        c += u->number;
-                    }
-                    if (c > buildingcapacity(b))
-                        break;
-                    if (f == NULL || u->faction == f) {
-                        int sk = eff_skill(u, SK_PERCEPTION, r) / 3;
-                        d = _max(d, sk);
-                        d = _min(maxd, d);
-                        if (d == maxd)
-                            break;
-                    }
-                }
-                else if (c)
-                    break;                /* first unit that's no longer in the house ends the search */
-            }
-        }
-        else {
-            /* E3A rule: no perception req'd */
-            return maxd;
-        }
-    }
-    return d;
-}
-
-bool check_leuchtturm(region * r, faction * f)
-{
-    attrib *a;
-
-    if (!fval(r->terrain, SEA_REGION))
-        return false;
-
-    for (a = a_find(r->attribs, &at_lighthouse); a && a->type == &at_lighthouse;
-        a = a->next) {
-        building *b = (building *)a->data.v;
-
-        assert(b->type == bt_find("lighthouse"));
-        if (fval(b, BLD_WORKING) && b->size >= 10) {
-            int maxd = (int)log10(b->size) + 1;
-
-            if (skill_enabled(SK_PERCEPTION) && f) {
-                region *r2 = b->region;
-                unit *u;
-                int c = 0;
-                int d = 0;
-
-                for (u = r2->units; u; u = u->next) {
-                    if (u->building == b) {
-                        c += u->number;
-                        if (c > buildingcapacity(b))
-                            break;
-                        if (f == NULL || u->faction == f) {
-                            if (!d)
-                                d = distance(r, r2);
-                            if (maxd < d)
-                                break;
-                            if (eff_skill(u, SK_PERCEPTION, r) >= d * 3)
-                                return true;
-                        }
-                    }
-                    else if (c)
-                        break;              /* first unit that's no longer in the house ends the search */
-                }
-            }
-            else {
-                /* E3A rule: no perception req'd */
-                return maxd;
-            }
-        }
-    }
-
-    return false;
-}
-
-region *lastregion(faction * f)
-{
-#ifdef SMART_INTERVALS
-    unit *u = f->units;
-    region *r = f->last;
-
-    if (u == NULL)
-        return NULL;
-    if (r != NULL)
-        return r->next;
-
-    /* it is safe to start in the region of the first unit. */
-    f->last = u->region;
-    /* if regions have indices, we can skip ahead: */
-    for (u = u->nextF; u != NULL; u = u->nextF) {
-        r = u->region;
-        if (r->index > f->last->index)
-            f->last = r;
-    }
-
-    /* we continue from the best region and look for travelthru etc. */
-    for (r = f->last->next; r; r = r->next) {
-        plane *p = rplane(r);
-
-        /* search the region for travelthru-attributes: */
-        if (fval(r, RF_TRAVELUNIT)) {
-            attrib *ru = a_find(r->attribs, &at_travelunit);
-            while (ru && ru->type == &at_travelunit) {
-                u = (unit *)ru->data.v;
-                if (u->faction == f) {
-                    f->last = r;
-                    break;
-                }
-                ru = ru->next;
-            }
-        }
-        if (f->last == r)
-            continue;
-        if (check_leuchtturm(r, f))
-            f->last = r;
-        if (p && is_watcher(p, f)) {
-            f->last = r;
-        }
-    }
-    return f->last->next;
-#else
-    return NULL;
-#endif
-}
-
-region *firstregion(faction * f)
-{
-#ifdef SMART_INTERVALS
-    region *r = f->first;
-
-    if (f->units == NULL)
-        return NULL;
-    if (r != NULL)
-        return r;
-
-    return f->first = regions;
-#else
-    return regions;
-#endif
 }
 
 void **blk_list[1024];
@@ -1529,9 +1191,9 @@ void init_locale(struct locale *lang)
     for (rc = races; rc; rc = rc->next) {
         const char *name;
         var.v = (void *)rc;
-        name = LOC(lang, rc_name(rc, NAME_PLURAL));
+        name = LOC(lang, rc_name_s(rc, NAME_PLURAL));
         if (name) addtoken(tokens, name, var);
-        name = LOC(lang, rc_name(rc, NAME_SINGULAR));
+        name = LOC(lang, rc_name_s(rc, NAME_SINGULAR));
         if (name) addtoken(tokens, name, var);
     }
 
@@ -1546,16 +1208,6 @@ typedef struct param {
     char *name;
     char *data;
 } param;
-
-int getid(void)
-{
-    const char *str = getstrtoken();
-    int i = str ? atoi36(str) : 0;
-    if (i < 0) {
-        return -1;
-    }
-    return i;
-}
 
 const char *get_param(const struct param *p, const char *key)
 {
@@ -1678,9 +1330,6 @@ void kernel_done(void)
     translation_done();
     gc_done();
 }
-
-/* TODO: soll hier weg */
-extern struct attrib_type at_shiptrail;
 
 attrib_type at_germs = {
     "germs",
@@ -1848,41 +1497,6 @@ bool has_horses(const struct unit * u)
             return true;
     }
     return false;
-}
-
-void plagues(region * r, bool ismagic)
-{
-    int peasants;
-    int i;
-    int dead = 0;
-
-    /* Seuchenwahrscheinlichkeit in % */
-
-    if (!ismagic) {
-        double mwp = _max(maxworkingpeasants(r), 1);
-        double prob =
-            pow(rpeasants(r) / (mwp * wage(r, NULL, NULL, turn) * 0.13), 4.0)
-            * PLAGUE_CHANCE;
-
-        if (rng_double() >= prob)
-            return;
-    }
-
-    peasants = rpeasants(r);
-    dead = (int)(0.5F + PLAGUE_VICTIMS * peasants);
-    for (i = dead; i != 0; i--) {
-        if (rng_double() < PLAGUE_HEALCHANCE && rmoney(r) >= PLAGUE_HEALCOST) {
-            rsetmoney(r, rmoney(r) - PLAGUE_HEALCOST);
-            --dead;
-        }
-    }
-
-    if (dead > 0) {
-        message *msg = add_message(&r->msgs, msg_message("pest", "dead", dead));
-        msg_release(msg);
-        deathcounts(r, dead);
-        rsetpeasants(r, peasants - dead);
-    }
 }
 
 /* Lohn bei den einzelnen Burgstufen für Normale Typen, Orks, Bauern,
@@ -2212,9 +1826,20 @@ bool has_limited_skills(const struct unit * u)
     }
 }
 
+static int read_ext(attrib * a, void *owner, struct storage *store)
+{
+    int len;
+
+    READ_INT(store, &len);
+    store->api->r_bin(store->handle, NULL, (size_t)len);
+    return AT_READ_OK;
+}
+
+
 void attrib_init(void)
 {
     /* Alle speicherbaren Attribute müssen hier registriert werden */
+    at_register(&at_speedup);
     at_register(&at_shiptrail);
     at_register(&at_familiar);
     at_register(&at_familiarmage);
@@ -2230,7 +1855,6 @@ void attrib_init(void)
     /* neue REGION-Attribute */
     at_register(&at_moveblock);
     at_register(&at_deathcount);
-    at_register(&at_chaoscount);
     at_register(&at_woodcount);
 
     /* neue UNIT-Attribute */
@@ -2258,7 +1882,7 @@ void attrib_init(void)
     at_register(&at_germs);
 
     at_deprecate("xontormiaexpress", a_readint);    /* required for old datafiles */
-    at_register(&at_speedup);
+    at_deprecate("lua", read_ext);    /* required for old datafiles */
 }
 
 void kernel_init(void)
@@ -2337,11 +1961,7 @@ void free_gamedata(void)
             defaults[i] = 0;
         }
     }
-    while (alliances) {
-        alliance *al = alliances;
-        alliances = al->next;
-        free_alliance(al);
-    }
+    free_alliances();
     while (factions) {
         faction *f = factions;
         factions = f->next;
@@ -2374,41 +1994,3 @@ int game_id(void) {
     return get_param_int(global.parameters, "game.id", 0);
 }
 
-void load_inifile(dictionary * d)
-{
-    const char *reportdir = reportpath();
-    const char *datadir = datapath();
-    const char *basedir = basepath();
-    const char *str;
-
-    assert(d);
-
-    str = iniparser_getstring(d, "eressea:base", basedir);
-    if (str != basedir) {
-        set_basepath(str);
-    }
-    str = iniparser_getstring(d, "eressea:report", reportdir);
-    if (str != reportdir) {
-        set_reportpath(str);
-    }
-    str = iniparser_getstring(d, "eressea:data", datadir);
-    if (str != datadir) {
-        set_datapath(str);
-    }
-
-    lomem = iniparser_getint(d, "eressea:lomem", lomem) ? 1 : 0;
-
-    str = iniparser_getstring(d, "eressea:encoding", NULL);
-    if (str && (_strcmpl(str, "utf8") == 0 || _strcmpl(str, "utf-8") == 0)) {
-        enc_gamedata = ENCODING_UTF8;
-    }
-
-    verbosity = iniparser_getint(d, "eressea:verbose", 2);
-    battledebug = iniparser_getint(d, "eressea:debug", battledebug) ? 1 : 0;
-
-    str = iniparser_getstring(d, "eressea:locales", "de,en");
-    make_locales(str);
-
-    if (global.inifile) iniparser_free(global.inifile);
-    global.inifile = d;
-}

@@ -70,6 +70,7 @@ set (ERESSEA_SRC
   upkeep.c
   vortex.c
   names.c
+  lighthouse.c
   reports.c
   eressea.c
   callback.c
@@ -84,8 +85,10 @@ set (ERESSEA_SRC
   laws.c
   magic.c
   market.c
+  morale.c
   monster.c
   randenc.c
+  chaos.c
   report.c
   spy.c
   study.c

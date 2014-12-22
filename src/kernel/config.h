@@ -26,16 +26,12 @@ extern "C" {
     /* this should always be the first thing included after platform.h */
 #include "types.h"
 
-    struct _dictionary_;
     /* experimental gameplay features (that don't affect the savefile) */
     /* TODO: move these settings to settings.h or into configuration files */
 #define GOBLINKILL              /* Goblin-Spezialklau kann tödlich enden */
 #define HERBS_ROT               /* herbs owned by units have a chance to rot. */
-#define SHIPDAMAGE              /* Schiffsbeschädigungen */
 #define INSECT_POTION           /* Spezialtrank für Insekten */
 #define ORCIFICATION            /* giving snotlings to the peasants gets counted */
-
-#define ALLIED(f1, f2) (f1==f2 || (f1->alliance && f1->alliance==f2->alliance))
 
     /* for some good prime numbers, check http://www.math.niu.edu/~rusin/known-math/98/pi_x */
 #ifndef MAXREGIONS
@@ -57,12 +53,10 @@ extern "C" {
 #define MAXMAGICIANS    3
 #define MAXALCHEMISTS   3
 
-    /** Plagues **/
-#define PLAGUE_CHANCE      0.1F /* Seuchenwahrscheinlichkeit (siehe plagues()) */
-#define PLAGUE_VICTIMS     0.2F /* % Betroffene */
-#define PLAGUE_HEALCHANCE  0.25F        /* Wahrscheinlichkeit Heilung */
-#define PLAGUE_HEALCOST    30   /* Heilkosten */
-
+    /* getunit results: */
+#define GET_UNIT 0
+#define GET_NOTFOUND 1
+#define GET_PEASANTS 2
     /* Bewegungsweiten: */
 #define BP_WALKING 4
 #define BP_RIDING  6
@@ -91,7 +85,6 @@ extern "C" {
      * von struct unitname, etc. zurückgegeben werden. ohne die 0 */
 
 #define BAGCAPACITY         20000   /* soviel paßt in einen Bag of Holding */
-#define STRENGTHCAPACITY    50000   /* zusätzliche Tragkraft beim Kraftzauber (deprecated) */
 #define STRENGTHMULTIPLIER  50   /* multiplier for trollbelt */
 
     /* ----------------- Befehle ----------------------------------- */
@@ -110,41 +103,21 @@ extern "C" {
     bool faction_id_is_unused(int);
 
     int max_magicians(const struct faction * f);
-    /* leuchtturm */
-    bool check_leuchtturm(struct region *r, struct faction *f);
-    void update_lighthouse(struct building *lh);
-    int lighthouse_range(const struct building *b,
-        const struct faction *f);
-
     int findoption(const char *s, const struct locale *lang);
 
     /* special units */
     void make_undead_unit(struct unit *);
 
-    typedef struct strlist {
-        struct strlist *next;
-        char *s;
-    } strlist;
-
-    void addstrlist(strlist ** SP, const char *s);
-    void freestrlist(strlist * s);
-
     unsigned int atoip(const char *s);
     unsigned int getuint(void);
     int getint(void);
-
-    const char *igetstrtoken(const char *s);
 
     param_t findparam(const char *s, const struct locale *lang);
     param_t findparam_ex(const char *s, const struct locale * lang);
     bool isparam(const char *s, const struct locale * lang, param_t param);
     param_t getparam(const struct locale *lang);
 
-    int getid(void);
 #define unitid(x) itoa36((x)->no)
-
-#define getshipid() getid()
-#define getfactionid() getid()
 
 #define buildingid(x) itoa36((x)->no)
 #define shipid(x) itoa36((x)->no)
@@ -166,8 +139,7 @@ extern "C" {
     struct unit *createunit(struct region *r, struct faction *f,
         int number, const struct race *rc);
     void create_unitid(struct unit *u, int id);
-    struct unit *getunitg(const struct region *r, const struct faction *f);
-    struct unit *getunit(const struct region *r, const struct faction *f);
+    int getunit(const struct region * r, const struct faction * f, struct unit **uresult);
 
     int read_unitid(const struct faction *f, const struct region *r);
 
@@ -180,12 +152,7 @@ extern "C" {
 
     struct faction *getfaction(void);
 
-    char *estring(const char *s);
-    char *estring_i(char *s);
-    char *cstring(const char *s);
-    char *cstring_i(char *s);
-    const char *unitname(const struct unit *u);
-    char *write_unitname(const struct unit *u, char *buffer, size_t size);
+    char *untilde(char *s);
 
     typedef int(*cmp_building_cb) (const struct building * b,
         const struct building * a);
@@ -238,12 +205,8 @@ extern "C" {
     int weight(const struct unit *u);
     void changeblockchaos(void);
 
-    /* intervall, in dem die regionen der partei zu finden sind */
-    struct region *firstregion(struct faction *f);
-    struct region *lastregion(struct faction *f);
-
     bool idle(struct faction *f);
-    bool unit_has_cursed_item(struct unit *u);
+    bool unit_has_cursed_item(const struct unit *u);
 
     /* simple garbage collection: */
     void *gc_add(void *p);
@@ -306,7 +269,6 @@ extern "C" {
 
     const char *basepath(void);
     void set_basepath(const char *);
-    void load_inifile(struct _dictionary_ *d);
 
     const char *reportpath(void);
     void set_reportpath(const char *);
@@ -357,7 +319,6 @@ extern "C" {
     struct order *default_order(const struct locale *lang);
     int entertainmoney(const struct region *r);
 
-    void plagues(struct region *r, bool ismagic);
     void free_gamedata(void);
 
 #define GIVE_SELF 1
@@ -381,7 +342,6 @@ extern "C" {
 
     extern int turn;
     extern int verbosity;
-    extern bool getunitpeasants;
 
     /** report options **/
     extern const char *options[MAXOPTIONS];

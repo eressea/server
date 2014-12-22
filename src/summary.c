@@ -123,11 +123,11 @@ static void out_faction(FILE * file, const struct faction *f)
   if (alliances != NULL) {
     fprintf(file, "%s (%s/%d) (%.3s/%.3s), %d Einh., %d Pers., $%d, %d NMR\n",
       f->name, itoa36(f->no), f_get_alliance(f) ? f->alliance->id : 0,
-      LOC(default_locale, rc_name(f->race, NAME_SINGULAR)), magic_school[f->magiegebiet],
+      LOC(default_locale, rc_name_s(f->race, NAME_SINGULAR)), magic_school[f->magiegebiet],
       count_units(f), f->num_total, f->money, turn - f->lastorders);
   } else {
     fprintf(file, "%s (%.3s/%.3s), %d Einh., %d Pers., $%d, %d NMR\n",
-      factionname(f), LOC(default_locale, rc_name(f->race, NAME_SINGULAR)),
+      factionname(f), LOC(default_locale, rc_name_s(f->race, NAME_SINGULAR)),
       magic_school[f->magiegebiet], count_units(f), f->num_total, f->money,
       turn - f->lastorders);
   }
@@ -216,7 +216,7 @@ void report_summary(summary * s, summary * o, bool full)
       if (i != RC_TEMPLATE && i != RC_CLONE && s->factionrace[i]) {
           const race *rc = get_race(i);
           if (rc && playerrace(rc)) {
-              fprintf(F, "%13s%s: %s\n", LOC(default_locale, rc_name(rc, NAME_CATEGORY)),
+              fprintf(F, "%13s%s: %s\n", LOC(default_locale, rc_name_s(rc, NAME_CATEGORY)),
                   LOC(default_locale, "stat_tribe_p"), pcomp(s->factionrace[i],
                   o->factionrace[i]));
           }
@@ -246,7 +246,7 @@ void report_summary(summary * s, summary * o, bool full)
     for (i = 0; i < MAXRACES; i++) {
       if (s->poprace[i]) {
           const race *rc = get_race(i);
-          fprintf(F, "%20s: %s\n", LOC(default_locale, rc_name(rc, NAME_PLURAL)),
+          fprintf(F, "%20s: %s\n", LOC(default_locale, rc_name_s(rc, NAME_PLURAL)),
           rcomp(s->poprace[i], o->poprace[i]));
       }
     }
@@ -255,7 +255,7 @@ void report_summary(summary * s, summary * o, bool full)
           if (i != RC_TEMPLATE && i != RC_CLONE && s->poprace[i]) {
               const race *rc = get_race(i);
               if (playerrace(rc)) {
-                  fprintf(F, "%20s: %s\n", LOC(default_locale, rc_name(rc, NAME_PLURAL)),
+                  fprintf(F, "%20s: %s\n", LOC(default_locale, rc_name_s(rc, NAME_PLURAL)),
                       rcomp(s->poprace[i], o->poprace[i]));
               }
           }

@@ -23,6 +23,7 @@
 #include <kernel/config.h>
 
 #include "economy.h"
+#include "chaos.h"
 #include "give.h"
 #include "monster.h"
 #include "laws.h"
@@ -198,7 +199,8 @@ static order *get_money_for_dragon(region * r, unit * u, int wanted)
     /* falls die einnahmen erreicht werden, bleibt das monster noch eine */
     /* runde hier. */
     if (n + rmoney(r) >= wanted) {
-        return create_order(K_TAX, default_locale, NULL);
+        keyword_t kwd = keyword_disabled(K_TAX) ? K_LOOT : K_TAX;
+        return create_order(kwd, default_locale, NULL);
     }
 
     /* wenn wir NULL zurueckliefern, macht der drache was anderes, z.b. weggehen */
@@ -578,9 +580,13 @@ static order *monster_learn(unit * u)
   skill *sv;
   const struct locale *lang = u->faction->locale;
 
+  /* can these monsters even study? */
+  if (!unit_can_study(u)) {
+      return NULL;
+  }
+
   /* Monster lernt ein zufälliges Talent aus allen, in denen es schon
    * Lerntage hat. */
-
   for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
     if (sv->level > 0)
       ++c;
@@ -825,7 +831,7 @@ void plan_monsters(faction * f)
         }
       }
 
-      if (long_order == NULL) {
+      if (long_order == NULL && unit_can_study(u)) {
         /* Einheiten, die Waffenlosen Kampf lernen könnten, lernen es um 
          * zu bewachen: */
         if (u_race(u)->bonus[SK_WEAPONLESS] != -99) {
@@ -867,7 +873,6 @@ void plan_monsters(faction * f)
       }
       if (long_order) {
         addlist(&u->orders, long_order);
-//        u->thisorder = long_order;
       }
     }
   }
@@ -876,10 +881,7 @@ void plan_monsters(faction * f)
 
 static double chaosfactor(region * r)
 {
-  attrib *a = a_find(r->attribs, &at_chaoscount);
-  if (!a)
-    return 0;
-  return ((double)a->data.i / 1000.0);
+    return fval(r, RF_CHAOTIC) ? ((double)(1 + get_chaoscount(r)) / 1000.0) : 0.0;
 }
 
 static int nrand(int start, int sub)
@@ -926,7 +928,7 @@ void spawn_dragons(void)
       if (verbosity >= 2) {
         log_printf(stdout, "%d %s in %s.\n", u->number,
           LOC(default_locale,
-            rc_name(u_race(u), (u->number==1) ? NAME_SINGULAR:NAME_PLURAL)), regionname(r, NULL));
+            rc_name_s(u_race(u), (u->number==1) ? NAME_SINGULAR:NAME_PLURAL)), regionname(r, NULL));
       }
 
       name_unit(u);
@@ -1001,7 +1003,7 @@ void spawn_undead(void)
       if (verbosity >= 2) {
         log_printf(stdout, "%d %s in %s.\n", u->number,
           LOC(default_locale,
-          rc_name(u_race(u), (u->number == 1) ? NAME_SINGULAR : NAME_PLURAL)), regionname(r, NULL));
+          rc_name_s(u_race(u), (u->number == 1) ? NAME_SINGULAR : NAME_PLURAL)), regionname(r, NULL));
       }
 
       {

@@ -5,74 +5,87 @@
 #include <util/log.h>
 
 #pragma warning(disable: 4210)
-#define ADD_TESTS(suite, name) \
-CuSuite *get_##name##_suite(void); \
-CuSuiteAddSuite(suite, get_##name##_suite())
+
+void RunTests(CuSuite * suite, const char *name) {
+    CuString *output = CuStringNew();
+
+    CuSuiteRun(suite);
+    CuSuiteDetails(suite, output);
+    if (suite->failCount) CuSuiteSummary(suite, output);
+    printf("%s: %s", name, output->buffer);
+    CuStringDelete(output);
+}
+
+#define RUN_TESTS(suite, name) \
+    CuSuite *get_##name##_suite(void); \
+    CuSuite *name = get_##name##_suite(); \
+    RunTests(name, #name); \
+    suite->failCount += name->failCount; \
+    suite->count += name->count; \
+    CuSuiteDelete(name);
 
 int RunAllTests(void)
 {
-  CuString *output = CuStringNew();
   CuSuite *suite = CuSuiteNew();
-  int flags = log_flags;
+  int fail_count, flags = log_flags;
 
   log_flags = LOG_FLUSH | LOG_CPERROR;
   kernel_init();
 
   /* self-test */
-  ADD_TESTS(suite, tests);
-  ADD_TESTS(suite, callback);
-  ADD_TESTS(suite, json);
-  ADD_TESTS(suite, jsonconf);
-  ADD_TESTS(suite, direction);
-  ADD_TESTS(suite, skill);
-  ADD_TESTS(suite, keyword);
-  ADD_TESTS(suite, order);
-  ADD_TESTS(suite, race);
+  RUN_TESTS(suite, tests);
+  RUN_TESTS(suite, callback);
+  RUN_TESTS(suite, json);
+  RUN_TESTS(suite, jsonconf);
+  RUN_TESTS(suite, direction);
+  RUN_TESTS(suite, skill);
+  RUN_TESTS(suite, keyword);
+  RUN_TESTS(suite, order);
+  RUN_TESTS(suite, race);
   /* util */
-  ADD_TESTS(suite, config);
-  ADD_TESTS(suite, attrib);
-  ADD_TESTS(suite, base36);
-  ADD_TESTS(suite, bsdstring);
-  ADD_TESTS(suite, functions);
-  ADD_TESTS(suite, umlaut);
-  ADD_TESTS(suite, unicode);
-  ADD_TESTS(suite, strings);
+  RUN_TESTS(suite, config);
+  RUN_TESTS(suite, attrib);
+  RUN_TESTS(suite, base36);
+  RUN_TESTS(suite, bsdstring);
+  RUN_TESTS(suite, functions);
+  RUN_TESTS(suite, umlaut);
+  RUN_TESTS(suite, unicode);
+  RUN_TESTS(suite, strings);
   /* kernel */
-  ADD_TESTS(suite, unit);
-  ADD_TESTS(suite, faction);
-  ADD_TESTS(suite, group);
-  ADD_TESTS(suite, build);
-  ADD_TESTS(suite, pool);
-  ADD_TESTS(suite, curse);
-  ADD_TESTS(suite, equipment);
-  ADD_TESTS(suite, item);
-  ADD_TESTS(suite, magic);
-  ADD_TESTS(suite, reports);
-  ADD_TESTS(suite, save);
-  ADD_TESTS(suite, ship);
-  ADD_TESTS(suite, spellbook);
-  ADD_TESTS(suite, building);
-  ADD_TESTS(suite, spell);
-  ADD_TESTS(suite, ally);
+  RUN_TESTS(suite, alliance);
+  RUN_TESTS(suite, unit);
+  RUN_TESTS(suite, faction);
+  RUN_TESTS(suite, group);
+  RUN_TESTS(suite, build);
+  RUN_TESTS(suite, pool);
+  RUN_TESTS(suite, curse);
+  RUN_TESTS(suite, equipment);
+  RUN_TESTS(suite, item);
+  RUN_TESTS(suite, magic);
+  RUN_TESTS(suite, reports);
+  RUN_TESTS(suite, save);
+  RUN_TESTS(suite, ship);
+  RUN_TESTS(suite, spellbook);
+  RUN_TESTS(suite, building);
+  RUN_TESTS(suite, spell);
+  RUN_TESTS(suite, ally);
   /* gamecode */
-  ADD_TESTS(suite, battle);
-  ADD_TESTS(suite, economy);
-  ADD_TESTS(suite, give);
-  ADD_TESTS(suite, laws);
-  ADD_TESTS(suite, market);
-  ADD_TESTS(suite, move);
-  ADD_TESTS(suite, stealth);
-  ADD_TESTS(suite, upkeep);
-  ADD_TESTS(suite, vortex);
-  ADD_TESTS(suite, wormhole);
+  RUN_TESTS(suite, battle);
+  RUN_TESTS(suite, economy);
+  RUN_TESTS(suite, give);
+  RUN_TESTS(suite, laws);
+  RUN_TESTS(suite, market);
+  RUN_TESTS(suite, move);
+  RUN_TESTS(suite, stealth);
+  RUN_TESTS(suite, upkeep);
+  RUN_TESTS(suite, vortex);
+  RUN_TESTS(suite, wormhole);
 
-  CuSuiteRun(suite);
-  CuSuiteSummary(suite, output);
-  CuSuiteDetails(suite, output);
-  printf("%s\n", output->buffer);
-
+  printf("\ntest summary: %d tests, %d failed\n", suite->count, suite->failCount);
   log_flags = flags;
-  return suite->failCount;
+  fail_count = suite->failCount;
+  CuSuiteDelete(suite);
+  return fail_count;
 }
 
 int main(int argc, char ** argv) {

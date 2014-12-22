@@ -480,9 +480,6 @@ item *i_change(item ** pi, const item_type * itype, int delta)
         i->number += delta;
         if (i->number < 0) {
             log_error("serious accounting error. number of items is %d.\n", i->number);
-            /* FIXME what's this supposed to mean??
-            assert(i >= 0);
-            */
             i->number = 0;
         }
         if (i->number == 0) {
@@ -607,7 +604,7 @@ static const char *resourcenames[MAX_RESOURCES] = {
     "aurafocus", "sphereofinv", "magicbag",
     "magicherbbag", "dreameye", "p2", "seed", "mallornseed",
     "money", "aura", "permaura",
-    "hp", "unit", "peasant"
+    "hp", "peasant", "person"
 };
 
 const resource_type *get_resourcetype(resource_t type) {
@@ -952,6 +949,8 @@ void init_resources(void)
 {
     resource_type *rtype;
 
+    rtype = rt_get_or_create(resourcenames[R_PERSON]); // lousy hack
+
     rtype = rt_get_or_create(resourcenames[R_PEASANT]);
     rtype->uchange = res_changepeasants;
 
@@ -973,10 +972,6 @@ void init_resources(void)
     // R_AURA
     rtype = rt_get_or_create(resourcenames[R_AURA]);
     rtype->uchange = res_changeaura;
-
-    // R_UNIT
-    rtype = rt_get_or_create(resourcenames[R_UNIT]);
-    rtype->uchange = res_changeperson;
 
     /* alte typen registrieren: */
     init_oldpotions();

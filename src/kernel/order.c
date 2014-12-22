@@ -568,6 +568,7 @@ keyword_t init_order(const struct order *ord)
 {
     char *cmd = 0;
 
+    assert(ord && ord->data);
     if (ord->data->_str) cmd = _strdup(ord->data->_str);
     init_tokens_str(cmd, cmd);
     return ord->data->_keyword;

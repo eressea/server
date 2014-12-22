@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2014, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -235,8 +235,6 @@ void read_groups(struct storage *store, faction * f)
 
             READ_INT(store, &fid.i);
             if (fid.i <= 0)
-                break;
-            if (global.data_version < STORAGE_VERSION && fid.i == 0)
                 break;
             a = ally_add(pa, findfaction(fid.i));
             READ_INT(store, &a->status);

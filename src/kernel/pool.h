@@ -24,6 +24,7 @@ extern "C" {
 
     struct unit;
     struct resource_type;
+    struct item_type;
     struct region;
 
 /* bitfield values for get/use/change operations */
@@ -54,11 +55,11 @@ extern "C" {
   int change_resource(struct unit *u, const struct resource_type *res,
     int change);
 
-  int get_reservation(const struct unit *u, const struct resource_type *res);
-  int change_reservation(struct unit *u, const struct resource_type *res,
+  int get_reservation(const struct unit *u, const struct item_type *res);
+  int change_reservation(struct unit *u, const struct item_type *res,
     int value);
 
-  int set_resvalue(struct unit * u, const struct resource_type * rtype, int value);
+  int set_resvalue(struct unit * u, const struct item_type * rtype, int value);
 
 #ifdef __cplusplus
 }

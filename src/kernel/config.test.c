@@ -2,9 +2,65 @@
 #include <stdlib.h>
 
 #include <kernel/config.h>
+#include <kernel/terrain.h>
+#include <kernel/unit.h>
+#include <kernel/order.h>
+#include <util/language.h>
+#include <util/base36.h>
+#include <util/attrib.h>
 
 #include <CuTest.h>
 #include <tests.h>
+
+struct critbit_tree;
+
+static void test_getunit(CuTest *tc) {
+    unit *u, *u2;
+    order *ord;
+    attrib *a;
+    struct region *r;
+    struct locale *lang;
+    struct terrain_type *t_plain;
+
+    test_cleanup();
+    lang = get_or_create_locale("de");
+    test_translate_param(lang, P_TEMP, "TEMP");
+    /* note that the english order is FIGHT, not COMBAT, so this is a poor example */
+    t_plain = test_create_terrain("plain", LAND_REGION);
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, t_plain));
+    a = a_add(&u->attribs, a_new(&at_alias));
+    a->data.i = atoi36("42"); /* this unit is also TEMP 42 */
+    r = test_create_region(1, 0, t_plain);
+
+    ord = create_order(K_GIVE, lang, itoa36(u->no));
+    init_order(ord);
+    CuAssertIntEquals(tc, GET_UNIT, getunit(u->region, u->faction, &u2));
+    CuAssertPtrEquals(tc, u, u2);
+    init_order(ord);
+    CuAssertIntEquals(tc, GET_NOTFOUND, getunit(r, u->faction, &u2));
+    CuAssertPtrEquals(tc, NULL, u2);
+    free_order(ord);
+
+    ord = create_order(K_GIVE, lang, itoa36(u->no+1));
+    init_order(ord);
+    CuAssertIntEquals(tc, GET_NOTFOUND, getunit(u->region, u->faction, &u2));
+    CuAssertPtrEquals(tc, NULL, u2);
+    free_order(ord);
+
+    ord = create_order(K_GIVE, lang, "0");
+    init_order(ord);
+    CuAssertIntEquals(tc, GET_PEASANTS, getunit(u->region, u->faction, &u2));
+    CuAssertPtrEquals(tc, NULL, u2);
+    free_order(ord);
+
+    ord = create_order(K_GIVE, lang, "TEMP 42");
+    init_order(ord);
+    CuAssertIntEquals(tc, GET_UNIT, getunit(u->region, u->faction, &u2));
+    CuAssertPtrEquals(tc, u, u2);
+    free_order(ord);
+
+    test_cleanup();
+}
 
 static void test_get_set_param(CuTest * tc)
 {
@@ -42,6 +98,7 @@ static void test_param_flt(CuTest * tc)
 CuSuite *get_config_suite(void)
 {
   CuSuite *suite = CuSuiteNew();
+  SUITE_ADD_TEST(suite, test_getunit);
   SUITE_ADD_TEST(suite, test_get_set_param);
   SUITE_ADD_TEST(suite, test_param_int);
   SUITE_ADD_TEST(suite, test_param_flt);
