@@ -2017,19 +2017,15 @@ int mail_cmd(unit * u, struct order *ord)
             }
 
         case P_FACTION:
-        {
-            bool see = false;
-
             n = getfactionid();
 
             for (u2 = r->units; u2; u2 = u2->next) {
                 if (u2->faction->no == n && seefaction(u->faction, r, u2, 0)) {
-                    see = true;
                     break;
                 }
             }
 
-            if (!see) {
+            if (!u2) {
                 cmistake(u, ord, 66, MSG_MESSAGE);
                 break;
             }
@@ -2041,21 +2037,17 @@ int mail_cmd(unit * u, struct order *ord)
             }
             mailfaction(u, n, ord, s);
             return 0;
-        }
 
         case P_UNIT:
-        {
-            bool see = false;
             n = getid();
 
             for (u2 = r->units; u2; u2 = u2->next) {
                 if (u2->no == n && cansee(u->faction, r, u2, 0)) {
-                    see = true;
                     break;
                 }
             }
 
-            if (!see) {
+            if (!u2) {
                 ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
                     "feedback_unit_not_found", ""));
                 return 0;
@@ -2081,7 +2073,6 @@ int mail_cmd(unit * u, struct order *ord)
                 mailunit(r, u, n, ord, s);
             }
             return 0;
-        }
 
         case P_BUILDING:
         case P_GEBAEUDE:

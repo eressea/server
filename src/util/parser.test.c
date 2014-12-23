@@ -41,9 +41,16 @@ static void test_getstrtoken(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, (void *)getstrtoken());
 }
 
+static void test_atoip(CuTest *tc) {
+    CuAssertIntEquals(tc, 42, atoip("42"));
+    CuAssertIntEquals(tc, 0, atoip("-42"));
+    CuAssertIntEquals(tc, 0, atoip("NOPE"));
+}
+
 CuSuite *get_parser_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_atoip);
     SUITE_ADD_TEST(suite, test_skip_token);
     SUITE_ADD_TEST(suite, test_gettoken);
     SUITE_ADD_TEST(suite, test_getintegers);

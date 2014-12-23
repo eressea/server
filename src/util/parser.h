@@ -26,6 +26,8 @@ extern "C" {
     unsigned int getuint(void);
     int getint(void);
     int getid(void);
+    unsigned int atoip(const char *s);
+
 #define getshipid() getid()
 #define getfactionid() getid()
 

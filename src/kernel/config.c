@@ -587,19 +587,6 @@ int change_hitpoints(unit * u, int value)
     return hp;
 }
 
-unsigned int atoip(const char *s)
-{
-    int n;
-
-    assert(s);
-    n = atoi(s);
-
-    if (n < 0)
-        n = 0;
-
-    return n;
-}
-
 bool unit_has_cursed_item(const unit * u)
 {
     item *itm = u->items;
