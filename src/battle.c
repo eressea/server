@@ -1918,7 +1918,7 @@ int skilldiff(troop at, troop dt, int dist)
         if (magicwalls_ct
             && curse_active(get_curse(df->building->attribs, magicwalls_ct))) {
             /* Verdoppelt Burgenbonus */
-            skdiff -= buildingeffsize(df->building, false);
+            skdiff -= df->building->type->protection(df->building, du);
         }
     }
     /* Goblin-Verteidigung
@@ -2048,6 +2048,25 @@ void dazzle(battle * b, troop * td)
     td->fighter->person[td->index].defence--;
 }
 
+static int new_castle_rule()
+{
+    int value = -1;
+    if (value < 0) {
+        /* If the parameter is 0, use old rules. Else use size * capacity (from xml building config) * 1000 */
+        /* and use Race-GE to calculate how many fighter a castle can hold */
+        value = get_param_int(global.parameters, "rules.castles.new_size", 1);
+    }
+    return value;    
+}
+
+static int castle_capacity(building * b)
+{
+    if (new_castle_rule()) {
+        return buildingcapacity(b) * 1000;  /* CTD Using Race-GE like E3-ships*/
+    }
+    return b->size;
+}
+
 void damage_building(battle * b, building * bldg, int damage_abs)
 {
     bldg->size = _max(1, bldg->size - damage_abs);
@@ -2057,7 +2076,7 @@ void damage_building(battle * b, building * bldg, int damage_abs)
     if (bldg->type->protection) {
         side *s;
 
-        bldg->sizeleft = bldg->size;
+        bldg->sizeleft = castle_capacity(bldg);  
 
         for (s = b->sides; s != b->sides + b->nsides; ++s) {
             fighter *fig;
@@ -3255,9 +3274,18 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     }
     else {
         building *bld = u->building;
-        if (bld && bld->sizeleft >= u->number && playerrace(u_race(u))) {
-            fig->building = bld;
-            fig->building->sizeleft -= u->number;
+
+        if (new_castle_rule()) {
+            if (bld && bld->sizeleft >= u->number * u_race(u)->weight && playerrace(u_race(u))) { /* CTD Using Race-GE like ships*/
+                fig->building = bld;
+                fig->building->sizeleft -= u->number * u_race(u)->weight;
+            }
+        }
+        else {
+            if (bld && bld->sizeleft >= u->number && playerrace(u_race(u))) {
+                fig->building = bld;
+                fig->building->sizeleft -= u->number;
+            }
         }
     }
     fig->status = u->status;
@@ -3586,7 +3614,7 @@ battle *make_battle(region * r)
 
     /* Alle Mann raus aus der Burg! */
     for (bld = r->buildings; bld != NULL; bld = bld->next)
-        bld->sizeleft = bld->size;
+        bld->sizeleft = castle_capacity(bld);
 
     if (battledebug) {
         char zText[MAX_PATH];
