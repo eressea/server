@@ -58,7 +58,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 static skill_t getskill(const struct locale *lang)
 {
-    const char * s = getstrtoken();
+    char token[128];
+    const char * s = gettoken(token, sizeof(token));
     return s ? get_skill(s, lang) : NOSKILL;
 }
 

@@ -2,7 +2,7 @@
  * +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  * |                   |  Enno Rehling <enno@eressea.de>
  * | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- * | (c) 1998 - 2007   |  
+ * | (c) 1998 - 2007   |
  * |                   |  This program may not be used, modified or distributed
  * +-------------------+  without prior permission by the authors of Eressea.
  *
@@ -14,14 +14,20 @@
 extern "C" {
 #endif
 
-  void init_tokens_str(const char *initstr, char *cmd);  /* initialize token parsing, take ownership of cmd */
-  void skip_token(void);
-  const char *parse_token(const char **str);
-  void parser_pushstate(void);
-  void parser_popstate(void);
-  bool parser_end(void);
-  const char *getstrtoken(void);
-  int getid(void);
+    void init_tokens_str(const char *initstr);  /* initialize token parsing */
+    void skip_token(void);
+    const char *parse_token_depr(const char **str);
+    char *parse_token(const char **str, char *buffer, size_t bufsize);
+    void parser_pushstate(void);
+    void parser_popstate(void);
+    bool parser_end(void);
+    const char *getstrtoken(void);
+    const char *gettoken(char *lbuf, size_t bufsize);
+    unsigned int getuint(void);
+    int getint(void);
+    int getid(void);
+    unsigned int atoip(const char *s);
+
 #define getshipid() getid()
 #define getfactionid() getid()
 

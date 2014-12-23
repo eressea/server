@@ -120,7 +120,7 @@ const char *factionname(const struct faction *f);
 struct unit *addplayer(struct region *r, faction * f);
 struct faction *addfaction(const char *email, const char *password,
     const struct race *frace, const struct locale *loc, int subscription);
-bool checkpasswd(const faction * f, const char *passwd, bool shortp);
+bool checkpasswd(const faction * f, const char *passwd);
 void destroyfaction(faction * f);
 
   extern void set_alliance(struct faction *a, struct faction *b, int status);

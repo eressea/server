@@ -207,7 +207,7 @@ static order_data *create_data(keyword_t kwd, const char *sptr, int lindex)
 
     /* learning, only one order_data per skill required */
     if (kwd == K_STUDY) {
-        skill_t sk = get_skill(parse_token(&sptr), lang);
+        skill_t sk = get_skill(parse_token_depr(&sptr), lang);
         switch (sk) {
         case NOSKILL:              /* fehler */
             break;
@@ -364,11 +364,11 @@ order *parse_order(const char *s, const struct locale * lang)
             ++s;
         }
         sptr = s;
-        p = *sptr ? parse_token(&sptr) : 0;
+        p = *sptr ? parse_token_depr(&sptr) : 0;
         kwd = p ? get_keyword(p, lang) : NOKEYWORD;
         if (kwd == K_MAKE) {
             const char *s, *sp = sptr;
-            s = parse_token(&sp);
+            s = parse_token_depr(&sp);
             if (s && isparam(s, lang, P_TEMP)) {
                 kwd = K_MAKETEMP;
                 sptr = sp;
@@ -570,6 +570,6 @@ keyword_t init_order(const struct order *ord)
 
     assert(ord && ord->data);
     if (ord->data->_str) cmd = _strdup(ord->data->_str);
-    init_tokens_str(cmd, cmd);
+    init_tokens_str(cmd);
     return ord->data->_keyword;
 }

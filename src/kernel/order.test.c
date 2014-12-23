@@ -128,19 +128,19 @@ static void test_init_order(CuTest *tc) {
 
 static void test_getstrtoken(CuTest *tc) {
     char *cmd = _strdup("hurr \"durr\" \"\" \'\'");
-    init_tokens_str(cmd, cmd);
+    init_tokens_str(cmd);
     CuAssertStrEquals(tc, "hurr", getstrtoken());
     CuAssertStrEquals(tc, "durr", getstrtoken());
     CuAssertStrEquals(tc, "", getstrtoken());
     CuAssertStrEquals(tc, "", getstrtoken());
     CuAssertStrEquals(tc, 0, getstrtoken());
-    init_tokens_str(0, 0);
+    init_tokens_str(0);
     CuAssertStrEquals(tc, 0, getstrtoken());
 }
 
 static void test_skip_token(CuTest *tc) {
     char *cmd = _strdup("hurr \"durr\"");
-    init_tokens_str(cmd, cmd);
+    init_tokens_str(cmd);
     skip_token();
     CuAssertStrEquals(tc, "durr", getstrtoken());
     CuAssertStrEquals(tc, 0, getstrtoken());

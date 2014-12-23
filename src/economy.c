@@ -476,7 +476,8 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
     n = getuint();
 
     if (u->number == 0) {
-        str = getstrtoken();
+        char token[128];
+        str = gettoken(token, sizeof(token));
         if (str && str[0]) {
             /* Monsters can RECRUIT 15 DRACOID
              * also: secondary race */
@@ -626,6 +627,7 @@ void give_control(unit * u, unit * u2)
 
 int give_control_cmd(unit * u, order * ord)
 {
+    char token[128];
     region *r = u->region;
     unit *u2;
     const char *s;
@@ -633,7 +635,7 @@ int give_control_cmd(unit * u, order * ord)
     init_order(ord);
     getunit(r, u->faction, &u2);
 
-    s = getstrtoken();
+    s = gettoken(token, sizeof(token));
     if (s && isparam(s, u->faction->locale, P_CONTROL)) {
         message *msg = 0;
 
@@ -676,6 +678,7 @@ int give_control_cmd(unit * u, order * ord)
 
 static int forget_cmd(unit * u, order * ord)
 {
+    char token[128];
     skill_t sk;
     const char *s;
 
@@ -685,7 +688,7 @@ static int forget_cmd(unit * u, order * ord)
     }
 
     init_order(ord);
-    s = getstrtoken();
+    s = gettoken(token, sizeof(token));
 
     if ((sk = get_skill(s, u->faction->locale)) != NOSKILL) {
         ADDMSG(&u->faction->msgs, msg_message("forget", "unit skill", u, sk));
@@ -1485,6 +1488,7 @@ static void create_item(unit * u, const item_type * itype, int want)
 
 int make_cmd(unit * u, struct order *ord)
 {
+    char token[128];
     region *r = u->region;
     const building_type *btype = 0;
     const ship_type *stype = 0;
@@ -1498,15 +1502,16 @@ int make_cmd(unit * u, struct order *ord)
 
     kwd = init_order(ord);
     assert(kwd == K_MAKE);
-    s = getstrtoken();
+    s = gettoken(token, sizeof(token));
 
     if (s) {
         m = atoi((const char *)s);
         sprintf(ibuf, "%d", m);
         if (!strcmp(ibuf, (const char *)s)) {
             /* a quantity was given */
-            s = getstrtoken();
-        } else {
+            s = gettoken(token, sizeof(token));
+        }
+        else {
             m = INT_MAX;
         }
         if (s) {
@@ -1520,7 +1525,7 @@ int make_cmd(unit * u, struct order *ord)
             cmistake(u, ord, 275, MSG_PRODUCE);
         }
         else {
-            const char * s = getstrtoken();
+            const char * s = gettoken(token, sizeof(token));
             direction_t d = s ? get_direction(s, u->faction->locale) : NODIRECTION;
             if (d != NODIRECTION) {
                 build_road(r, u, m, d);
@@ -1753,6 +1758,7 @@ attrib_type at_trades = {
 
 static void buy(unit * u, request ** buyorders, struct order *ord)
 {
+    char token[128];
     region *r = u->region;
     int n, k;
     request *o;
@@ -1836,7 +1842,7 @@ static void buy(unit * u, request ** buyorders, struct order *ord)
     /* die Menge der verkauften Güter merken */
     a->data.i += n;
 
-    s = getstrtoken();
+    s = gettoken(token, sizeof(token));
     itype = s ? finditemtype(s, u->faction->locale) : 0;
     if (itype != NULL) {
         ltype = resource2luxury(itype->rtype);
@@ -2059,6 +2065,7 @@ static void expandselling(region * r, request * sellorders, int limit)
 
 static bool sell(unit * u, request ** sellorders, struct order *ord)
 {
+    char token[128];
     bool unlimited = true;
     const item_type *itype;
     const luxury_type *ltype;
@@ -2076,7 +2083,7 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
 
     kwd = init_order(ord);
     assert(kwd == K_SELL);
-    s = getstrtoken();
+    s = gettoken(token, sizeof(token));
 
     if (findparam(s, u->faction->locale) == P_ANY) {
         unlimited = false;
@@ -2134,7 +2141,7 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
         cmistake(u, ord, 54, MSG_COMMERCE);
         return false;
     }
-    s = getstrtoken();
+    s = gettoken(token, sizeof(token));
     itype = s ? finditemtype(s, u->faction->locale) : 0;
     ltype = itype ? resource2luxury(itype->rtype) : 0;
     if (ltype == NULL) {
@@ -2462,6 +2469,7 @@ static void breedhorses(region * r, unit * u)
 
 static void breed_cmd(unit * u, struct order *ord)
 {
+    char token[128];
     int m;
     const char *s;
     param_t p;
@@ -2475,12 +2483,12 @@ static void breed_cmd(unit * u, struct order *ord)
 
     /* züchte [<anzahl>] <parameter> */
     (void)init_order(ord);
-    s = getstrtoken();
+    s = gettoken(token, sizeof(token));
 
     m = s ? atoi((const char *)s) : 0;
     if (m != 0) {
         /* first came a want-paramter */
-        s = getstrtoken();
+        s = gettoken(token, sizeof(token));
     }
     else {
         m = INT_MAX;
@@ -2543,10 +2551,6 @@ static void research_cmd(unit * u, struct order *ord)
 
     kwd = init_order(ord);
     assert(kwd == K_RESEARCH);
-    /*
-       const char *s = getstrtoken();
-
-       if (findparam(s, u->faction->locale) == P_HERBS) { */
 
     if (eff_skill(u, SK_HERBALISM, r) < 7) {
         cmistake(u, ord, 227, MSG_EVENT);

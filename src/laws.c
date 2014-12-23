@@ -946,14 +946,15 @@ static bool EnhancedQuit(void)
 
 int quit_cmd(unit * u, struct order *ord)
 {
+    char token[128];
     faction *f = u->faction;
     const char *passwd;
     keyword_t kwd;
     
     kwd = init_order(ord);
     assert(kwd == K_QUIT);
-    passwd = getstrtoken();
-    if (checkpasswd(f, (const char *)passwd, false)) {
+    passwd = gettoken(token, sizeof(token));
+    if (checkpasswd(f, (const char *)passwd)) {
         if (EnhancedQuit()) {
             int f2_id = getid();
             if (f2_id > 0) {
@@ -1159,13 +1160,14 @@ void do_enter(struct region *r, bool is_final_attempt)
         while (*ordp) {
             order *ord = *ordp;
             if (getkeyword(ord) == K_ENTER) {
+                char token[128];
                 param_t p;
                 int id;
                 unit *ulast = NULL;
                 const char * s;
 
                 init_order(ord);
-                s = getstrtoken();
+                s = gettoken(token, sizeof(token));
                 p = findparam_ex(s, u->faction->locale);
                 id = getid();
 
@@ -1339,6 +1341,7 @@ void quit(void)
 
 int ally_cmd(unit * u, struct order *ord)
 {
+    char token[128];
     ally *sf, **sfp;
     faction *f;
     int keyword, not_kw;
@@ -1354,7 +1357,7 @@ int ally_cmd(unit * u, struct order *ord)
     if (f == u->faction)
         return 0;
 
-    s = getstrtoken();
+    s = gettoken(token, sizeof(token));
 
     if (!s[0])
         keyword = P_ANY;
@@ -1492,6 +1495,7 @@ static void init_prefixnames(void)
 
 int prefix_cmd(unit * u, struct order *ord)
 {
+    char token[128];
     attrib **ap;
     const char *s;
     local_names *in = pnames;
@@ -1509,7 +1513,7 @@ int prefix_cmd(unit * u, struct order *ord)
     }
 
     init_order(ord);
-    s = getstrtoken();
+    s = gettoken(token, sizeof(token));
 
     if (!s || !*s) {
         attrib *a = NULL;
@@ -1556,13 +1560,14 @@ static cmp_building_cb get_cmp_region_owner(void)
 
 int display_cmd(unit * u, struct order *ord)
 {
+    char token[128];
     char **s = NULL;
     const char *str;
     region *r = u->region;
 
     init_order(ord);
 
-    str = getstrtoken();
+    str = gettoken(token, sizeof(token));
     switch (findparam_ex(str, u->faction->locale)) {
     case P_BUILDING:
     case P_GEBAEUDE:
@@ -1598,15 +1603,7 @@ int display_cmd(unit * u, struct order *ord)
         break;
 
     case P_PRIVAT:
-    {
-        const char *d = getstrtoken();
-        if (d == NULL || *d == 0) {
-            usetprivate(u, NULL);
-        }
-        else {
-            usetprivate(u, d);
-        }
-    }
+        usetprivate(u, getstrtoken());
         break;
 
     case P_REGION:
@@ -1729,6 +1726,7 @@ rename_building(unit * u, order * ord, building * b, const char *name)
 
 int name_cmd(struct unit *u, struct order *ord)
 {
+    char token[128];
     building *b = u->building;
     region *r = u->region;
     char **s = NULL;
@@ -1737,11 +1735,11 @@ int name_cmd(struct unit *u, struct order *ord)
     const char *str;
 
     init_order(ord);
-    str = getstrtoken();
+    str = gettoken(token, sizeof(token));
     p = findparam_ex(str, u->faction->locale);
 
     if (p == P_FOREIGN) {
-        str = getstrtoken();
+        str = gettoken(token, sizeof(token));
         foreign = true;
         p = findparam_ex(str, u->faction->locale);
     }
@@ -1991,13 +1989,14 @@ static void mailfaction(unit * u, int n, struct order *ord, const char *s)
 
 int mail_cmd(unit * u, struct order *ord)
 {
+    char token[128];
     region *r = u->region;
     unit *u2;
     const char *s;
     int n, cont;
 
     init_order(ord);
-    s = getstrtoken();
+    s = gettoken(token, sizeof(token));
 
     /* Falls kein Parameter, ist das eine Einheitsnummer;
      * das Füllwort "AN" muß wegfallen, da gültige Nummer! */
@@ -2018,19 +2017,15 @@ int mail_cmd(unit * u, struct order *ord)
             }
 
         case P_FACTION:
-        {
-            bool see = false;
-
             n = getfactionid();
 
             for (u2 = r->units; u2; u2 = u2->next) {
                 if (u2->faction->no == n && seefaction(u->faction, r, u2, 0)) {
-                    see = true;
                     break;
                 }
             }
 
-            if (!see) {
+            if (!u2) {
                 cmistake(u, ord, 66, MSG_MESSAGE);
                 break;
             }
@@ -2042,21 +2037,17 @@ int mail_cmd(unit * u, struct order *ord)
             }
             mailfaction(u, n, ord, s);
             return 0;
-        }
 
         case P_UNIT:
-        {
-            bool see = false;
             n = getid();
 
             for (u2 = r->units; u2; u2 = u2->next) {
                 if (u2->no == n && cansee(u->faction, r, u2, 0)) {
-                    see = true;
                     break;
                 }
             }
 
-            if (!see) {
+            if (!u2) {
                 ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
                     "feedback_unit_not_found", ""));
                 return 0;
@@ -2082,7 +2073,6 @@ int mail_cmd(unit * u, struct order *ord)
                 mailunit(r, u, n, ord, s);
             }
             return 0;
-        }
 
         case P_BUILDING:
         case P_GEBAEUDE:
@@ -2182,7 +2172,7 @@ int email_cmd(unit * u, struct order *ord)
     }
     else {
         faction *f = u->faction;
-        if (set_email(&f->email, (const char *)s) != 0) {
+        if (set_email(&f->email, s) != 0) {
             log_error("Invalid email address for faction %s: %s\n", itoa36(f->no), s);
             ADDMSG(&f->msgs, msg_message("changemail_invalid", "value", s));
         }
@@ -2201,7 +2191,7 @@ int password_cmd(unit * u, struct order *ord)
     bool pwok = true;
 
     init_order(ord);
-    s = getstrtoken();
+    s = gettoken(pwbuf, sizeof(pwbuf));
 
     if (!s || !*s) {
         for (i = 0; i < 6; i++)
@@ -2210,14 +2200,10 @@ int password_cmd(unit * u, struct order *ord)
     }
     else {
         char *c;
-
-        strlcpy(pwbuf, (const char *)s, 31);
-        pwbuf[31] = 0;
-        c = pwbuf;
-        while (*c && pwok) {
-            if (!isalnum(*(unsigned char *)c))
+        for (c = pwbuf; *c && pwok; ++c) {
+            if (!isalnum(*(unsigned char *)c)) {
                 pwok = false;
-            c++;
+            }
         }
     }
     free(u->faction->passw);
@@ -2235,11 +2221,12 @@ int password_cmd(unit * u, struct order *ord)
 
 int send_cmd(unit * u, struct order *ord)
 {
+    char token[128];
     const char *s;
     int option;
 
     init_order(ord);
-    s = getstrtoken();
+    s = gettoken(token, sizeof(token));
 
     option = findoption(s, u->faction->locale);
 
@@ -2576,14 +2563,11 @@ int promotion_cmd(unit * u, struct order *ord)
 
 int group_cmd(unit * u, struct order *ord)
 {
-    const char *s;
     keyword_t kwd;
 
     kwd = init_order(ord);
     assert(kwd == K_GROUP);
-    s = getstrtoken();
-
-    join_group(u, s);
+    join_group(u, getstrtoken());
     return 0;
 }
 
@@ -2613,11 +2597,12 @@ int guard_off_cmd(unit * u, struct order *ord)
 
 int reshow_cmd(unit * u, struct order *ord)
 {
+    char lbuf[64];
     const char *s;
     param_t p = NOPARAM;
 
     init_order(ord);
-    s = getstrtoken();
+    s = gettoken(lbuf, sizeof(lbuf));
 
     if (s && isparam(s, u->faction->locale, P_ANY)) {
         p = getparam(u->faction->locale);
@@ -2630,12 +2615,12 @@ int reshow_cmd(unit * u, struct order *ord)
 
 int status_cmd(unit * u, struct order *ord)
 {
-    const char *param;
+    char token[128];
+    const char *s;
 
     init_order(ord);
-
-    param = getstrtoken();
-    switch (findparam(param, u->faction->locale)) {
+    s = gettoken(token, sizeof(token));
+    switch (findparam(s, u->faction->locale)) {
     case P_NOT:
         setstatus(u, ST_AVOID);
         break;
@@ -2663,7 +2648,7 @@ int status_cmd(unit * u, struct order *ord)
         }
         break;
     default:
-        if (param && param[0]) {
+        if (s && s[0]) {
             add_message(&u->faction->msgs,
                 msg_feedback(u, ord, "unknown_status", ""));
         }
@@ -2676,12 +2661,13 @@ int status_cmd(unit * u, struct order *ord)
 
 int combatspell_cmd(unit * u, struct order *ord)
 {
+    char token[128];
     const char *s;
     int level = 0;
     spell *sp = 0;
 
     init_order(ord);
-    s = getstrtoken();
+    s = gettoken(token, sizeof(token));
 
     /* KAMPFZAUBER [NICHT] löscht alle gesetzten Kampfzauber */
     if (!s || *s == 0 || findparam(s, u->faction->locale) == P_NOT) {
@@ -2694,7 +2680,7 @@ int combatspell_cmd(unit * u, struct order *ord)
         /* Merken, setzen kommt erst später */
         level = getint();
         level = _max(0, level);
-        s = getstrtoken();
+        s = gettoken(token, sizeof(token));
     }
 
     sp = unit_getspell(u, s, u->faction->locale);
@@ -2703,7 +2689,7 @@ int combatspell_cmd(unit * u, struct order *ord)
         return 0;
     }
 
-    s = getstrtoken();
+    s = gettoken(token, sizeof(token));
 
     if (findparam(s, u->faction->locale) == P_NOT) {
         /* KAMPFZAUBER "<Spruchname>" NICHT  löscht diesen speziellen
@@ -2921,13 +2907,14 @@ void restack_units(void)
                 struct order *ord;
                 for (ord = u->orders; ord; ord = ord->next) {
                     if (getkeyword(ord) == K_SORT) {
+                        char token[128];
                         const char *s;
                         param_t p;
                         int id;
                         unit *v;
 
                         init_order(ord);
-                        s = getstrtoken();
+                        s = gettoken(token, sizeof(token));
                         p = findparam(s, u->faction->locale);
                         id = getid();
                         v = findunit(id);
@@ -2997,16 +2984,17 @@ void restack_units(void)
 
 int renumber_cmd(unit * u, order * ord)
 {
+    char token[128];
     const char *s;
     int i;
     faction *f = u->faction;
 
     init_order(ord);
-    s = getstrtoken();
+    s = gettoken(token, sizeof(token));
     switch (findparam_ex(s, u->faction->locale)) {
 
     case P_FACTION:
-        s = getstrtoken();
+        s = gettoken(token, sizeof(token));
         if (s && *s) {
             int id = atoi36((const char *)s);
             attrib *a = a_find(f->attribs, &at_number);
@@ -3017,7 +3005,7 @@ int renumber_cmd(unit * u, order * ord)
         break;
 
     case P_UNIT:
-        s = getstrtoken();
+        s = gettoken(token, sizeof(token));
         if (s == NULL || *s == 0) {
             i = newunitid();
         }
@@ -3060,7 +3048,7 @@ int renumber_cmd(unit * u, order * ord)
             cmistake(u, ord, 116, MSG_EVENT);
             break;
         }
-        s = getstrtoken();
+        s = gettoken(token, sizeof(token));
         if (s == NULL || *s == 0) {
             i = newcontainerid();
         }
@@ -3089,7 +3077,7 @@ int renumber_cmd(unit * u, order * ord)
             cmistake(u, ord, 148, MSG_EVENT);
             break;
         }
-        s = getstrtoken();
+        s = gettoken(token, sizeof(token));
         if (*s == 0) {
             i = newcontainerid();
         }
@@ -3355,8 +3343,8 @@ void new_units(void)
             while (*ordp) {
                 order *makeord = *ordp;
                 if (getkeyword(makeord) == K_MAKETEMP) {
-                    const char *token;
-                    char *name = NULL;
+                    char token[128], *name = NULL;
+                    const char *s;
                     int alias;
                     ship *sh;
                     order **newordersp;
@@ -3390,9 +3378,9 @@ void new_units(void)
                     init_order(makeord);
                     alias = getid();
 
-                    token = getstrtoken();
-                    if (token && token[0]) {
-                        name = _strdup(token);
+                    s = gettoken(token, sizeof(token));
+                    if (s && s[0]) {
+                        name = _strdup(s);
                     }
                     u2 = create_unit(r, u->faction, 0, u->faction->race, alias, name, u);
                     if (name != NULL)
@@ -3700,10 +3688,9 @@ void defaultorders(void)
                     order *new_order = 0;
                     const char *s;
                     init_order(ord);
-                    s = getstrtoken();
+                    s = gettoken(lbuf, sizeof(lbuf));
                     if (s) {
-                        strcpy(lbuf, s);
-                        new_order = parse_order(lbuf, u->faction->locale);
+                        new_order = parse_order(s, u->faction->locale);
                     }
                     *ordp = ord->next;
                     ord->next = NULL;
@@ -3810,19 +3797,20 @@ static void update_spells(void)
 
 int use_cmd(unit * u, struct order *ord)
 {
+    char token[128];
     const char *t;
     int n, err = ENOITEM;
     const item_type *itype;
 
     init_order(ord);
 
-    t = getstrtoken();
+    t = gettoken(token, sizeof(token));
     n = atoi((const char *)t);
     if (n == 0) {
         if (isparam(t, u->faction->locale, P_ANY)) {
             /* BENUTZE ALLES Yanxspirit */
             n = INT_MAX;
-            t = getstrtoken();
+            t = gettoken(token, sizeof(token));
         }
         else {
             /* BENUTZE Yanxspirit */
@@ -3831,7 +3819,7 @@ int use_cmd(unit * u, struct order *ord)
     }
     else {
         /* BENUTZE 42 Yanxspirit */
-        t = getstrtoken();
+        t = gettoken(token, sizeof(token));
     }
     itype = t ? finditemtype(t, u->faction->locale) : NULL;
 
@@ -3913,20 +3901,21 @@ int pay_cmd(unit * u, struct order *ord)
 
 static int reserve_i(unit * u, struct order *ord, int flags)
 {
+    char token[128];
     if (u->number > 0 && (urace(u)->ec_flags & GETITEM)) {
         int use, count, para;
         const item_type *itype;
         const char *s;
 
         init_order(ord);
-        s = getstrtoken();
+        s = gettoken(token, sizeof(token));
         count = s ? atoip(s) : 0;
         para = findparam(s, u->faction->locale);
 
         if (count == 0 && para == P_EACH) {
             count = getint() * u->number;
         }
-        s = getstrtoken();
+        s = gettoken(token, sizeof(token));
         itype = s ? finditemtype(s, u->faction->locale) : 0;
         if (itype == NULL)
             return 0;
@@ -3956,19 +3945,20 @@ int reserve_self(unit * u, struct order *ord) {
 
 int claim_cmd(unit * u, struct order *ord)
 {
+    char token[128];
     const char *t;
     int n;
     const item_type *itype;
 
     init_order(ord);
 
-    t = getstrtoken();
+    t = gettoken(token, sizeof(token));
     n = atoi((const char *)t);
     if (n == 0) {
         n = 1;
     }
     else {
-        t = getstrtoken();
+        t = gettoken(token, sizeof(token));
     }
     itype = finditemtype(t, u->faction->locale);
 

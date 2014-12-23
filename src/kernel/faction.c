@@ -278,9 +278,9 @@ unit *addplayer(region * r, faction * f)
     return u;
 }
 
-bool checkpasswd(const faction * f, const char *passwd, bool shortp)
+bool checkpasswd(const faction * f, const char *passwd)
 {
-    if (unicode_utf8_strcasecmp(f->passw, passwd) == 0)
+    if (passwd && unicode_utf8_strcasecmp(f->passw, passwd) == 0)
         return true;
     return false;
 }

@@ -48,6 +48,7 @@ int RunAllTests(void)
   RUN_TESTS(suite, base36);
   RUN_TESTS(suite, bsdstring);
   RUN_TESTS(suite, functions);
+  RUN_TESTS(suite, parser);
   RUN_TESTS(suite, umlaut);
   RUN_TESTS(suite, unicode);
   RUN_TESTS(suite, strings);

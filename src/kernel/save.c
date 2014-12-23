@@ -169,7 +169,7 @@ static unit *unitorders(FILE * F, int enc, struct faction *f)
             if (s[0]) {
                 if (s[0] != '@') {
                     const char *stok = s;
-                    stok = parse_token(&stok);
+                    stok = parse_token_depr(&stok);
 
                     if (stok) {
                         bool quit = false;
@@ -224,9 +224,10 @@ static faction *factionorders(void)
     f = findfaction(fid);
 
     if (f != NULL && !fval(f, FFL_NPC)) {
-        const char *pass = getstrtoken();
+        char token[128];
+        const char *pass = gettoken(token, sizeof(token));
 
-        if (!checkpasswd(f, (const char *)pass, true)) {
+        if (!checkpasswd(f, (const char *)pass)) {
             log_debug("Invalid password for faction %s\n", itoa36(fid));
             ADDMSG(&f->msgs, msg_message("wrongpasswd", "faction password",
                 f->no, pass));
@@ -267,11 +268,12 @@ int readorders(const char *filename)
      * Partei */
 
     while (b) {
+        char token[128];
         const struct locale *lang = f ? f->locale : default_locale;
         param_t p;
         const char *s;
-        init_tokens_str(b, NULL);
-        s = getstrtoken();
+        init_tokens_str(b);
+        s = gettoken(token, sizeof(token));
         p = s ? findparam(s, lang) : NOPARAM;
         switch (p) {
 #undef LOCALE_CHANGE
@@ -308,7 +310,7 @@ int readorders(const char *filename)
                     if (!b) {
                         break;
                     }
-                    init_tokens_str(b, NULL);
+                    init_tokens_str(b);
                     b = getstrtoken();
                     p = (!b || b[0] == '@') ? NOPARAM : findparam(b, lang);
                 } while ((p != P_UNIT || !f) && p != P_FACTION && p != P_NEXT

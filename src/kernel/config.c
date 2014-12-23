@@ -587,19 +587,6 @@ int change_hitpoints(unit * u, int value)
     return hp;
 }
 
-unsigned int atoip(const char *s)
-{
-    int n;
-
-    assert(s);
-    n = atoi(s);
-
-    if (n < 0)
-        n = 0;
-
-    return n;
-}
-
 bool unit_has_cursed_item(const unit * u)
 {
     item *itm = u->items;
@@ -794,18 +781,6 @@ parse(keyword_t kword, int(*dofun) (unit *, struct order *), bool thisorder)
     }
 }
 
-unsigned int getuint(void)
-{
-    const char *s = getstrtoken();
-    return s ? atoip(s) : 0;
-}
-
-int getint(void)
-{
-    const char * s = getstrtoken();
-    return s ? atoi(s) : 0;
-}
-
 const struct race *findrace(const char *s, const struct locale *lang)
 {
     void **tokens = get_translations(lang, UT_RACES);
@@ -875,7 +850,8 @@ bool isparam(const char *s, const struct locale * lang, param_t param)
 
 param_t getparam(const struct locale * lang)
 {
-    const char *s = getstrtoken();
+    char token[64];
+    const char *s = gettoken(token, sizeof(token));
     return s ? findparam(s, lang) : NOPARAM;
 }
 
@@ -909,7 +885,8 @@ static int read_newunitid(const faction * f, const region * r)
 
 int read_unitid(const faction * f, const region * r)
 {
-    const char *s = getstrtoken();
+    char token[8];
+    const char *s = gettoken(token, sizeof(token));
 
     /* Da s nun nur einen string enthaelt, suchen wir ihn direkt in der
      * paramliste. machen wir das nicht, dann wird getnewunit in s nach der
