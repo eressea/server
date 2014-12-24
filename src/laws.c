@@ -63,7 +63,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/unit.h>
 
 /* attributes includes */
-#include <attributes/object.h>
 #include <attributes/racename.h>
 #include <attributes/raceprefix.h>
 #include <attributes/stealth.h>
@@ -825,8 +824,8 @@ static void transfer_faction(faction * f, faction * f2)
 
     for (u = f->units; u;) {
         un = u->nextF;
-        if (!unit_has_cursed_item(u)
-            && !has_skill(u, SK_MAGIC) && !has_skill(u, SK_ALCHEMY)) {
+        if (!unit_has_cursed_item(u) &&
+                !has_skill(u, SK_MAGIC) && !has_skill(u, SK_ALCHEMY)) {
             u_setfaction(u, f2);
         }
         u = un;
@@ -934,16 +933,6 @@ int leave_cmd(unit * u, struct order *ord)
     return 0;
 }
 
-static bool EnhancedQuit(void)
-{
-    static int value = -1;
-    if (value < 0) {
-        const char *str = get_param(global.parameters, "alliance.transferquit");
-        value = (str != 0 && strcmp(str, "true") == 0);
-    }
-    return value;
-}
-
 int quit_cmd(unit * u, struct order *ord)
 {
     char token[128];
@@ -955,31 +944,6 @@ int quit_cmd(unit * u, struct order *ord)
     assert(kwd == K_QUIT);
     passwd = gettoken(token, sizeof(token));
     if (checkpasswd(f, (const char *)passwd)) {
-        if (EnhancedQuit()) {
-            int f2_id = getid();
-            if (f2_id > 0) {
-                faction *f2 = findfaction(f2_id);
-
-                if (f2 == NULL) {
-                    cmistake(u, ord, 66, MSG_EVENT);
-                    return 0;
-                }
-                else if (!u->faction->alliance
-                    || u->faction->alliance != f2->alliance) {
-                    cmistake(u, ord, 315, MSG_EVENT);
-                    return 0;
-                }
-                else if (!alliedfaction(NULL, f, f2, HELP_MONEY)) {
-                    cmistake(u, ord, 316, MSG_EVENT);
-                    return 0;
-                }
-                else {
-                    variant var;
-                    var.i = f2_id;
-                    a_add(&f->attribs, object_create("quit", TINTEGER, var));
-                }
-            }
-        }
         fset(f, FFL_QUIT);
     }
     else {
@@ -1299,25 +1263,6 @@ void quit(void)
     while (*fptr) {
         faction *f = *fptr;
         if (f->flags & FFL_QUIT) {
-            if (EnhancedQuit()) {
-                /* this doesn't work well (use object_name()) */
-                attrib *a = a_find(f->attribs, &at_object);
-                if (a) {
-                    variant var;
-                    object_type type;
-                    var.i = 0;
-                    object_get(a, &type, &var);
-                    assert(var.i && type == TINTEGER);
-                    if (var.i) {
-                        int f2_id = var.i;
-                        faction *f2 = findfaction(f2_id);
-
-                        assert(f2_id > 0);
-                        assert(f2 != NULL);
-                        transfer_faction(f, f2);
-                    }
-                }
-            }
             destroyfaction(f);
         }
         else {
