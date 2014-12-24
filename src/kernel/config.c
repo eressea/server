@@ -885,7 +885,7 @@ static int read_newunitid(const faction * f, const region * r)
 
 int read_unitid(const faction * f, const region * r)
 {
-    char token[8];
+    char token[16];
     const char *s = gettoken(token, sizeof(token));
 
     /* Da s nun nur einen string enthaelt, suchen wir ihn direkt in der

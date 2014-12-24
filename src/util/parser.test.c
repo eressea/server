@@ -15,6 +15,18 @@ static void test_gettoken(CuTest *tc) {
     CuAssertStrEquals(tc, "", token);
 }
 
+static void test_gettoken_short(CuTest *tc) {
+    char token[3];
+    init_tokens_str("HELP ONE TWO THREE");
+    CuAssertStrEquals(tc, "HE", gettoken(token, sizeof(token)));
+    CuAssertStrEquals(tc, "HE", token);
+    CuAssertStrEquals(tc, "ON", gettoken(token, sizeof(token)));
+    CuAssertStrEquals(tc, "TW", gettoken(token, sizeof(token)));
+    CuAssertStrEquals(tc, "TH", gettoken(token, sizeof(token)));
+    CuAssertPtrEquals(tc, NULL, (void *)gettoken(token, sizeof(token)));
+    CuAssertStrEquals(tc, "", token);
+}
+
 static void test_skip_token(CuTest *tc) {
     char token[128];
     init_tokens_str("HELP ONE TWO THREE");
@@ -53,6 +65,7 @@ CuSuite *get_parser_suite(void)
     SUITE_ADD_TEST(suite, test_atoip);
     SUITE_ADD_TEST(suite, test_skip_token);
     SUITE_ADD_TEST(suite, test_gettoken);
+    SUITE_ADD_TEST(suite, test_gettoken_short);
     SUITE_ADD_TEST(suite, test_getintegers);
     SUITE_ADD_TEST(suite, test_getstrtoken);
     return suite;
