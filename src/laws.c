@@ -818,20 +818,6 @@ static void inactivefaction(faction * f)
     }
 }
 
-static void transfer_faction(faction * f, faction * f2)
-{
-    unit *u, *un;
-
-    for (u = f->units; u;) {
-        un = u->nextF;
-        if (!unit_has_cursed_item(u) &&
-                !has_skill(u, SK_MAGIC) && !has_skill(u, SK_ALCHEMY)) {
-            u_setfaction(u, f2);
-        }
-        u = un;
-    }
-}
-
 /* test if the unit can slip through a siege undetected.
  * returns 0 if siege is successful, or 1 if the building is either
  * not besieged or the unit can slip through the siege due to better stealth.
