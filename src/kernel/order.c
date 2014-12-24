@@ -417,6 +417,7 @@ bool is_repeated(const order * ord)
     case K_PLANT:
     case K_MAKE:
     case K_LOOT:
+    case K_DESTROY:
         result = 1;
         break;
 
@@ -458,6 +459,7 @@ bool is_exclusive(const order * ord)
     case K_PLANT:
     case K_MAKE:
     case K_LOOT:
+    case K_DESTROY:
         result = 1;
         break;
 
@@ -502,6 +504,7 @@ bool is_long(const order * ord)
     case K_PLANT:
     case K_MAKE:
     case K_LOOT:
+    case K_DESTROY:
         return true;
 
     default:
