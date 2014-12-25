@@ -1647,17 +1647,16 @@ static void expandbuying(region * r, request * buyorders)
         const luxury_type *type;
         int number;
         int multi;
-    } *trades, *trade;
+    } trades[MAXLUXURIES], *trade;
     static int ntrades = 0;
     int i, j;
     const luxury_type *ltype;
 
     if (ntrades == 0) {
-        for (ltype = luxurytypes; ltype; ltype = ltype->next)
-            ++ntrades;
-        trades = gc_add(calloc(sizeof(struct trade), ntrades));
-        for (i = 0, ltype = luxurytypes; i != ntrades; ++i, ltype = ltype->next)
-            trades[i].type = ltype;
+        for (ntrades = 0, ltype = luxurytypes; ltype; ltype = ltype->next) {
+            assert(ntrades < MAXLUXURIES);
+            trades[ntrades++].type = ltype;
+        }
     }
     for (i = 0; i != ntrades; ++i) {
         trades[i].number = 0;
@@ -1887,18 +1886,17 @@ static void expandselling(region * r, request * sellorders, int limit)
     building *b;
     unit *u;
     unit *hafenowner;
-    static int *counter;
+    static int counter[MAXLUXURIES];
     static int ncounter = 0;
 
     if (ncounter == 0) {
         const luxury_type *ltype;
-        for (ltype = luxurytypes; ltype; ltype = ltype->next)
+        for (ltype = luxurytypes; ltype; ltype = ltype->next) {
+            assert(ncounter < MAXLUXURIES);
             ++ncounter;
-        counter = (int *)gc_add(calloc(sizeof(int), ncounter));
+        }
     }
-    else {
-        memset(counter, 0, sizeof(int) * ncounter);
-    }
+    memset(counter, 0, sizeof(int) * ncounter);
 
     if (!sellorders) {            /* NEIN, denn Insekten können in   || !r->buildings) */
         return;                     /* Sümpfen und Wüsten auch so handeln */
@@ -1958,6 +1956,7 @@ static void expandselling(region * r, request * sellorders, int limit)
         int i;
         int use = 0;
         for (i = 0, search = luxurytypes; search != ltype; search = search->next) {
+            // TODO: this is slow and lame!
             ++i;
         }
         if (counter[i] >= limit)

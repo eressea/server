@@ -916,36 +916,6 @@ int maxworkingpeasants(const struct region *r)
     return _max(size-treespace, _min(size / 10 , 200));
 }
 
-void **blk_list[1024];
-int list_index;
-int blk_index;
-
-static void gc_done(void)
-{
-    int i, k;
-    for (i = 0; i != list_index; ++i) {
-        for (k = 0; k != 1024; ++k)
-            free(blk_list[i][k]);
-        free(blk_list[i]);
-    }
-    for (k = 0; k != blk_index; ++k)
-        free(blk_list[list_index][k]);
-    free(blk_list[list_index]);
-
-}
-
-void *gc_add(void *p)
-{
-    if (blk_index == 0) {
-        blk_list[list_index] = (void **)malloc(1024 * sizeof(void *));
-    }
-    blk_list[list_index][blk_index] = p;
-    blk_index = (blk_index + 1) % 1024;
-    if (!blk_index)
-        ++list_index;
-    return p;
-}
-
 static const char * parameter_key(int i)
 {
     assert(i < MAXPARAMS && i >= 0);
@@ -1173,7 +1143,6 @@ void kernel_done(void)
      * calling it is optional, e.g. a release server will most likely not do it.
      */
     translation_done();
-    gc_done();
 }
 
 attrib_type at_germs = {
@@ -1186,9 +1155,6 @@ attrib_type at_germs = {
     ATF_UNIQUE
 };
 
-/*********************/
-/*   at_guard   */
-/*********************/
 attrib_type at_guard = {
     "guard",
     DEFAULT_INIT,

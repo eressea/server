@@ -1030,11 +1030,12 @@ void writeregion(struct gamedata *data, const region * r)
         WRITE_INT(data->store, rherbs(r));
         WRITE_INT(data->store, rpeasants(r));
         WRITE_INT(data->store, rmoney(r));
-        if (r->land)
+        if (r->land) {
             for (demand = r->land->demands; demand; demand = demand->next) {
                 WRITE_TOK(data->store, resourcename(demand->type->itype->rtype, 0));
                 WRITE_INT(data->store, demand->value);
             }
+        }
         WRITE_TOK(data->store, "end");
         write_items(data->store, r->land->items);
         WRITE_SECTION(data->store);

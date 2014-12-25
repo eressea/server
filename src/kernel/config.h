@@ -40,6 +40,7 @@ extern "C" {
 #ifndef MAXUNITS
 # define MAXUNITS 1048573       /* must be prime for hashing. 524287 was >90% full */
 #endif
+#define MAXLUXURIES 16 /* there must be no more than MAXLUXURIES kinds of luxury goods in any game */
 
 #define TREESIZE (8)            /* space used by trees (in #peasants) */
 
@@ -182,9 +183,6 @@ extern "C" {
 
     bool idle(struct faction *f);
     bool unit_has_cursed_item(const struct unit *u);
-
-    /* simple garbage collection: */
-    void *gc_add(void *p);
 
     /* grammatik-flags: */
 #define GF_NONE 0
