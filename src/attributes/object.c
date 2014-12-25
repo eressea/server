@@ -112,7 +112,13 @@ static int object_read(attrib * a, void *owner, struct storage *store)
       break;
     case TREAL:
       READ_FLT(store, &flt);
-      data->data.real = flt;
+      if ((int)flt == flt) {
+          data->type = TINTEGER;
+          data->data.i = (int)flt;
+      }
+      else {
+          data->data.real = flt;
+      }
       break;
     case TSTRING:
       READ_STR(store, name, sizeof(name));
