@@ -2784,6 +2784,23 @@ static int sp_unholypower(castorder * co)
     return cast_level;
 }
 
+static int change_hitpoints(unit * u, int value)
+{
+    int hp = u->hp;
+
+    hp += value;
+
+    /* Jede Person benötigt mindestens 1 HP */
+    if (hp < u->number) {
+        if (hp < 0) {               /* Einheit tot */
+            hp = 0;
+        }
+        scale_number(u, hp);
+    }
+    u->hp = hp;
+    return hp;
+}
+
 static int dc_age(struct curse *c)
 /* age returns 0 if the attribute needs to be removed, !=0 otherwise */
 {

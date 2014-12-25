@@ -444,42 +444,6 @@ FILE *debug;
 
 /* ----------------------------------------------------------------------- */
 
-void verify_data(void)
-{
-#ifndef NDEBUG
-    int lf = -1;
-    faction *f;
-    unit *u;
-    int mage, alchemist;
-
-    if (verbosity >= 1)
-        puts(" - checking data for correctness...");
-
-    for (f = factions; f; f = f->next) {
-        mage = 0;
-        alchemist = 0;
-        for (u = f->units; u; u = u->nextF) {
-            if (eff_skill(u, SK_MAGIC, u->region)) {
-                mage += u->number;
-            }
-            if (eff_skill(u, SK_ALCHEMY, u->region))
-                alchemist += u->number;
-            if (u->number > UNIT_MAXSIZE) {
-                if (lf != f->no) {
-                    lf = f->no;
-                    log_printf(stdout, "Partei %s:\n", factionid(f));
-                }
-                log_warning("Einheit %s hat %d Personen\n", unitid(u), u->number);
-            }
-        }
-        if (f->no != 0 && ((mage > 3 && f->race != get_race(RC_ELF)) || mage > 4))
-            log_error("Partei %s hat %d Magier.\n", factionid(f), mage);
-        if (alchemist > 3)
-            log_error("Partei %s hat %d Alchemisten.\n", factionid(f), alchemist);
-    }
-#endif
-}
-
 int distribute(int old, int new_value, int n)
 {
     int i;
@@ -495,23 +459,6 @@ int distribute(int old, int new_value, int n)
             t++;
 
     return t;
-}
-
-int change_hitpoints(unit * u, int value)
-{
-    int hp = u->hp;
-
-    hp += value;
-
-    /* Jede Person benötigt mindestens 1 HP */
-    if (hp < u->number) {
-        if (hp < 0) {               /* Einheit tot */
-            hp = 0;
-        }
-        scale_number(u, hp);
-    }
-    u->hp = hp;
-    return hp;
 }
 
 bool unit_has_cursed_item(const unit * u)
@@ -1311,31 +1258,6 @@ char *_strdup(const char *s)
 bool faction_id_is_unused(int id)
 {
     return findfaction(id) == NULL;
-}
-
-int weight(const unit * u)
-{
-    int w = 0, n = 0, in_bag = 0;
-    const resource_type *rtype = get_resourcetype(R_BAG_OF_HOLDING);
-    item *itm;
-
-    for (itm = u->items; itm; itm = itm->next) {
-        w = itm->type->weight * itm->number;
-        n += w;
-        if (rtype && !fval(itm->type, ITF_BIG)) {
-            in_bag += w;
-        }
-    }
-
-    n += u->number * u_race(u)->weight;
-
-    if (rtype) {
-        w = i_get(u->items, rtype->itype) * BAGCAPACITY;
-        if (w > in_bag) w = in_bag;
-        n -= w;
-    }
-
-    return n;
 }
 
 unsigned int guard_flags(const unit * u)

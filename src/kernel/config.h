@@ -180,20 +180,6 @@ extern "C" {
     bool has_limited_skills(const struct unit *u);
     const struct race *findrace(const char *, const struct locale *);
 
-    int ispresent(const struct faction *f, const struct region *r);
-
-    int check_option(struct faction *f, int option);
-
-    /* Anzahl Personen in einer Einheit festlegen. NUR (!) mit dieser Routine,
-     * sonst großes Unglück. Durch asserts an ein paar Stellen abgesichert. */
-    void verify_data(void);
-
-
-    int change_hitpoints(struct unit *u, int value);
-
-    int weight(const struct unit *u);
-    void changeblockchaos(void);
-
     bool idle(struct faction *f);
     bool unit_has_cursed_item(const struct unit *u);
 
