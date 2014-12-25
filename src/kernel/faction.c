@@ -258,7 +258,7 @@ unit *addplayer(region * r, faction * f)
 
     assert(f->units == NULL);
     set_ursprung(f, 0, r->x, r->y);
-    u = createunit(r, f, 1, f->race);
+    u = create_unit(r, f, 1, f->race, 0, NULL, NULL);
     equip_items(&u->faction->items, get_equipment("new_faction"));
     equip_unit(u, get_equipment("first_unit"));
     sprintf(buffer, "first_%s", u_race(u)->_name);

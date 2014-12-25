@@ -15,7 +15,8 @@
 extern "C" {
 #endif
 
-  extern void register_races(void);
+  void register_races(void);
+  void make_undead_unit(struct unit *);
 
 #ifdef __cplusplus
 }

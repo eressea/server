@@ -104,9 +104,6 @@ extern "C" {
     int max_magicians(const struct faction * f);
     int findoption(const char *s, const struct locale *lang);
 
-    /* special units */
-    void make_undead_unit(struct unit *);
-
     param_t findparam(const char *s, const struct locale *lang);
     param_t findparam_ex(const char *s, const struct locale * lang);
     bool isparam(const char *s, const struct locale * lang, param_t param);
@@ -131,9 +128,6 @@ extern "C" {
     int forbiddenid(int id);
     int newcontainerid(void);
 
-    struct unit *createunit(struct region *r, struct faction *f,
-        int number, const struct race *rc);
-    void create_unitid(struct unit *u, int id);
     int getunit(const struct region * r, const struct faction * f, struct unit **uresult);
 
     int read_unitid(const struct faction *f, const struct region *r);

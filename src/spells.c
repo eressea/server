@@ -56,6 +56,8 @@
 #include <kernel/xmlreader.h>
 #include <kernel/version.h>
 
+#include <races/races.h>
+
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>

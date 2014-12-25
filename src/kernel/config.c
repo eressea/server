@@ -957,12 +957,6 @@ int newcontainerid(void)
     return random_no;
 }
 
-unit *createunit(region * r, faction * f, int number, const struct race * rc)
-{
-    assert(rc);
-    return create_unit(r, f, number, rc, 0, NULL, NULL);
-}
-
 bool idle(faction * f)
 {
     return (bool)(f ? false : true);
@@ -1342,13 +1336,6 @@ int weight(const unit * u)
     }
 
     return n;
-}
-
-void make_undead_unit(unit * u)
-{
-    free_orders(&u->orders);
-    name_unit(u);
-    fset(u, UFL_ISNEW);
 }
 
 unsigned int guard_flags(const unit * u)
