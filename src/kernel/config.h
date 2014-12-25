@@ -91,7 +91,6 @@ extern "C" {
 
 #define want(option) (1<<option)
     /* ------------------------------------------------------------- */
-    int shipspeed(const struct ship *sh, const struct unit *u);
 
 #define i2b(i) ((bool)((i)?(true):(false)))
 

@@ -29,7 +29,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/ship.h>
 #include <kernel/unit.h>
 
-#include <move.h>
+#include <attributes/movement.h>
 
 /* util includes */
 #include <util/attrib.h>

@@ -31,7 +31,6 @@ extern "C" {
     struct ship;
     struct building_type;
 
-    extern struct attrib_type at_speedup;
     extern struct attrib_type at_shiptrail;
 
     /* die Zahlen sind genau äquivalent zu den race Flags */

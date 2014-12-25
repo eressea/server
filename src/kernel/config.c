@@ -26,10 +26,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "alliance.h"
 #include "ally.h"
 #include "alchemy.h"
+#include "curse.h"
 #include "connection.h"
 #include "building.h"
 #include "calendar.h"
-#include "curse.h"
 #include "direction.h"
 #include "faction.h"
 #include "group.h"
@@ -441,79 +441,6 @@ static attrib_type at_npcfaction = {
 int verbosity = 1;
 
 FILE *debug;
-
-static int ShipSpeedBonus(const unit * u)
-{
-    static int level = -1;
-    if (level == -1) {
-        level =
-            get_param_int(global.parameters, "movement.shipspeed.skillbonus", 0);
-    }
-    if (level > 0) {
-        ship *sh = u->ship;
-        int skl = effskill(u, SK_SAILING);
-        int minsk = (sh->type->cptskill + 1) / 2;
-        return (skl - minsk) / level;
-    }
-    return 0;
-}
-
-int shipspeed(const ship * sh, const unit * u)
-{
-    double k = sh->type->range;
-    static const curse_type *stormwind_ct, *nodrift_ct;
-    static bool init;
-    attrib *a;
-    curse *c;
-
-    if (!init) {
-        init = true;
-        stormwind_ct = ct_find("stormwind");
-        nodrift_ct = ct_find("nodrift");
-    }
-
-    assert(u->ship == sh);
-    assert(sh->type->construction->improvement == NULL);  /* sonst ist construction::size nicht ship_type::maxsize */
-    if (sh->size != sh->type->construction->maxsize)
-        return 0;
-
-    if (curse_active(get_curse(sh->attribs, stormwind_ct)))
-        k *= 2;
-    if (curse_active(get_curse(sh->attribs, nodrift_ct)))
-        k += 1;
-
-    if (u->faction->race == u_race(u)) {
-        /* race bonus for this faction? */
-        if (fval(u_race(u), RCF_SHIPSPEED)) {
-            k += 1;
-        }
-    }
-
-    k += ShipSpeedBonus(u);
-
-    a = a_find(sh->attribs, &at_speedup);
-    while (a != NULL && a->type == &at_speedup) {
-        k += a->data.sa[0];
-        a = a->next;
-    }
-
-    c = get_curse(sh->attribs, ct_find("shipspeedup"));
-    while (c) {
-        k += curse_geteffect(c);
-        c = c->nexthash;
-    }
-
-#ifdef SHIPSPEED
-    k *= SHIPSPEED;
-#endif
-
-    if (sh->damage)
-        k =
-        (k * (sh->size * DAMAGE_SCALE - sh->damage) + sh->size * DAMAGE_SCALE -
-        1) / (sh->size * DAMAGE_SCALE);
-
-    return (int)k;
-}
 
 /* ----------------------------------------------------------------------- */
 
@@ -1816,7 +1743,6 @@ static int read_ext(attrib * a, void *owner, struct storage *store)
 void attrib_init(void)
 {
     /* Alle speicherbaren Attribute müssen hier registriert werden */
-    at_register(&at_speedup);
     at_register(&at_shiptrail);
     at_register(&at_familiar);
     at_register(&at_familiarmage);

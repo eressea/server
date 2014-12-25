@@ -124,6 +124,7 @@ extern "C" {
 
   extern const char *ship_getname(const struct ship *self);
   extern void ship_setname(struct ship *self, const char *name);
+  int shipspeed(const struct ship *sh, const struct unit *u);
 
 #ifdef __cplusplus
 }
