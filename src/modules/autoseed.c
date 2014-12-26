@@ -139,16 +139,19 @@ int fix_demand(region * rd)
     const luxury_type *ltypes[MAXLUXURIES];
     const luxury_type *sale = NULL;
     int maxlux = 0;
-    static int maxluxuries = 0;
+    static int maxluxuries = -1;
 
+    // TODO: this entire function is impossible to understand
     recurse_regions(rd, &rlist, f_nolux);
-    if (maxluxuries == 0) {
+    if (maxluxuries < 0) {
         int i = 0;
         for (sale = luxurytypes; sale; sale = sale->next) {
-            mlux[i] = 0;
             ltypes[i++] = sale;
         }
         maxluxuries = i;
+    }
+    if (maxluxuries == 0) {
+        return -1;
     }
     else {
         int i;
