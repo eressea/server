@@ -274,20 +274,8 @@ int readorders(const char *filename)
         const char *s;
         init_tokens_str(b);
         s = gettoken(token, sizeof(token));
-        p = s ? findparam(s, lang) : NOPARAM;
+        p = (s && s[0] != '@') ? findparam(s, lang) : NOPARAM;
         switch (p) {
-#undef LOCALE_CHANGE
-#ifdef LOCALE_CHANGE
-        case P_LOCALE:
-        {
-            const char *s = getstrtoken();
-            if (f && get_locale(s)) {
-                f->locale = get_locale(s);
-            }
-        }
-        b = getbuf(F, enc_gamedata);
-        break;
-#endif
         case P_GAMENAME:
         case P_FACTION:
             f = factionorders();
@@ -311,8 +299,8 @@ int readorders(const char *filename)
                         break;
                     }
                     init_tokens_str(b);
-                    b = getstrtoken();
-                    p = (!b || b[0] == '@') ? NOPARAM : findparam(b, lang);
+                    s = gettoken(token, sizeof(token));
+                    p = (s && s[0] != '@') ? findparam(s, lang) : NOPARAM;
                 } while ((p != P_UNIT || !f) && p != P_FACTION && p != P_NEXT
                     && p != P_GAMENAME);
                 break;
