@@ -26,15 +26,17 @@ if [ ! -s $ERESSEA/game-$GAME/orders.$TURN ]; then
   echo "server did not create orders for turn $TURN in game $GAME"
   exit 2
 fi
+if [ ! -s $REPORTS/reports.txt ]; then
+  echo "server did not create reports.txt in game $GAME"
+  exit 4
+fi
+$BIN/backup-eressea $GAME $TURN
 let TURN=$TURN+1
 if [ ! -s $ERESSEA/game-$GAME/data/$TURN.dat ]; then
   echo "server did not create data for turn $TURN in game $GAME"
   exit 3
 fi
-if [ ! -s $REPORTS/reports.txt ]; then
-  echo "server did not create reports.txt for turn $TURN in game $GAME"
-  exit 4
-fi
+echo "sending reports for game $GAME, turn $TURN"
 $BIN/compress.sh $GAME $TURN
 $BIN/sendreports.sh $GAME
 $BIN/backup-eressea $GAME $TURN
