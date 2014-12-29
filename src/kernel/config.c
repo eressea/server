@@ -26,10 +26,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "alliance.h"
 #include "ally.h"
 #include "alchemy.h"
+#include "curse.h"
 #include "connection.h"
 #include "building.h"
 #include "calendar.h"
-#include "curse.h"
 #include "direction.h"
 #include "faction.h"
 #include "group.h"
@@ -442,116 +442,7 @@ int verbosity = 1;
 
 FILE *debug;
 
-static int ShipSpeedBonus(const unit * u)
-{
-    static int level = -1;
-    if (level == -1) {
-        level =
-            get_param_int(global.parameters, "movement.shipspeed.skillbonus", 0);
-    }
-    if (level > 0) {
-        ship *sh = u->ship;
-        int skl = effskill(u, SK_SAILING);
-        int minsk = (sh->type->cptskill + 1) / 2;
-        return (skl - minsk) / level;
-    }
-    return 0;
-}
-
-int shipspeed(const ship * sh, const unit * u)
-{
-    double k = sh->type->range;
-    static const curse_type *stormwind_ct, *nodrift_ct;
-    static bool init;
-    attrib *a;
-    curse *c;
-
-    if (!init) {
-        init = true;
-        stormwind_ct = ct_find("stormwind");
-        nodrift_ct = ct_find("nodrift");
-    }
-
-    assert(u->ship == sh);
-    assert(sh->type->construction->improvement == NULL);  /* sonst ist construction::size nicht ship_type::maxsize */
-    if (sh->size != sh->type->construction->maxsize)
-        return 0;
-
-    if (curse_active(get_curse(sh->attribs, stormwind_ct)))
-        k *= 2;
-    if (curse_active(get_curse(sh->attribs, nodrift_ct)))
-        k += 1;
-
-    if (u->faction->race == u_race(u)) {
-        /* race bonus for this faction? */
-        if (fval(u_race(u), RCF_SHIPSPEED)) {
-            k += 1;
-        }
-    }
-
-    k += ShipSpeedBonus(u);
-
-    a = a_find(sh->attribs, &at_speedup);
-    while (a != NULL && a->type == &at_speedup) {
-        k += a->data.sa[0];
-        a = a->next;
-    }
-
-    c = get_curse(sh->attribs, ct_find("shipspeedup"));
-    while (c) {
-        k += curse_geteffect(c);
-        c = c->nexthash;
-    }
-
-#ifdef SHIPSPEED
-    k *= SHIPSPEED;
-#endif
-
-    if (sh->damage)
-        k =
-        (k * (sh->size * DAMAGE_SCALE - sh->damage) + sh->size * DAMAGE_SCALE -
-        1) / (sh->size * DAMAGE_SCALE);
-
-    return (int)k;
-}
-
 /* ----------------------------------------------------------------------- */
-
-void verify_data(void)
-{
-#ifndef NDEBUG
-    int lf = -1;
-    faction *f;
-    unit *u;
-    int mage, alchemist;
-
-    if (verbosity >= 1)
-        puts(" - checking data for correctness...");
-
-    for (f = factions; f; f = f->next) {
-        mage = 0;
-        alchemist = 0;
-        for (u = f->units; u; u = u->nextF) {
-            if (eff_skill(u, SK_MAGIC, u->region)) {
-                mage += u->number;
-            }
-            if (eff_skill(u, SK_ALCHEMY, u->region))
-                alchemist += u->number;
-            if (u->number > UNIT_MAXSIZE) {
-                if (lf != f->no) {
-                    lf = f->no;
-                    log_printf(stdout, "Partei %s:\n", factionid(f));
-                }
-                log_warning("Einheit %s hat %d Personen\n", unitid(u), u->number);
-            }
-        }
-        if (f->no != 0 && ((mage > 3 && f->race != get_race(RC_ELF)) || mage > 4))
-            log_error("Partei %s hat %d Magier.\n", factionid(f), mage);
-        if (alchemist > 3)
-            log_error("Partei %s hat %d Alchemisten.\n", factionid(f), alchemist);
-    }
-#endif
-}
 
 int distribute(int old, int new_value, int n)
 {
@@ -568,23 +459,6 @@ int distribute(int old, int new_value, int n)
             t++;
 
     return t;
-}
-
-int change_hitpoints(unit * u, int value)
-{
-    int hp = u->hp;
-
-    hp += value;
-
-    /* Jede Person benötigt mindestens 1 HP */
-    if (hp < u->number) {
-        if (hp < 0) {               /* Einheit tot */
-            hp = 0;
-        }
-        scale_number(u, hp);
-    }
-    u->hp = hp;
-    return hp;
 }
 
 bool unit_has_cursed_item(const unit * u)
@@ -1030,12 +904,6 @@ int newcontainerid(void)
     return random_no;
 }
 
-unit *createunit(region * r, faction * f, int number, const struct race * rc)
-{
-    assert(rc);
-    return create_unit(r, f, number, rc, 0, NULL, NULL);
-}
-
 bool idle(faction * f)
 {
     return (bool)(f ? false : true);
@@ -1046,36 +914,6 @@ int maxworkingpeasants(const struct region *r)
     int size = production(r);
     int treespace = (rtrees(r, 2) + rtrees(r, 1) / 2) * TREESIZE;
     return _max(size-treespace, _min(size / 10 , 200));
-}
-
-void **blk_list[1024];
-int list_index;
-int blk_index;
-
-static void gc_done(void)
-{
-    int i, k;
-    for (i = 0; i != list_index; ++i) {
-        for (k = 0; k != 1024; ++k)
-            free(blk_list[i][k]);
-        free(blk_list[i]);
-    }
-    for (k = 0; k != blk_index; ++k)
-        free(blk_list[list_index][k]);
-    free(blk_list[list_index]);
-
-}
-
-void *gc_add(void *p)
-{
-    if (blk_index == 0) {
-        blk_list[list_index] = (void **)malloc(1024 * sizeof(void *));
-    }
-    blk_list[list_index][blk_index] = p;
-    blk_index = (blk_index + 1) % 1024;
-    if (!blk_index)
-        ++list_index;
-    return p;
 }
 
 static const char * parameter_key(int i)
@@ -1305,7 +1143,6 @@ void kernel_done(void)
      * calling it is optional, e.g. a release server will most likely not do it.
      */
     translation_done();
-    gc_done();
 }
 
 attrib_type at_germs = {
@@ -1318,9 +1155,6 @@ attrib_type at_germs = {
     ATF_UNIQUE
 };
 
-/*********************/
-/*   at_guard   */
-/*********************/
 attrib_type at_guard = {
     "guard",
     DEFAULT_INIT,
@@ -1390,38 +1224,6 @@ char *_strdup(const char *s)
 bool faction_id_is_unused(int id)
 {
     return findfaction(id) == NULL;
-}
-
-int weight(const unit * u)
-{
-    int w = 0, n = 0, in_bag = 0;
-    const resource_type *rtype = get_resourcetype(R_BAG_OF_HOLDING);
-    item *itm;
-
-    for (itm = u->items; itm; itm = itm->next) {
-        w = itm->type->weight * itm->number;
-        n += w;
-        if (rtype && !fval(itm->type, ITF_BIG)) {
-            in_bag += w;
-        }
-    }
-
-    n += u->number * u_race(u)->weight;
-
-    if (rtype) {
-        w = i_get(u->items, rtype->itype) * BAGCAPACITY;
-        if (w > in_bag) w = in_bag;
-        n -= w;
-    }
-
-    return n;
-}
-
-void make_undead_unit(unit * u)
-{
-    free_orders(&u->orders);
-    name_unit(u);
-    fset(u, UFL_ISNEW);
 }
 
 unsigned int guard_flags(const unit * u)
@@ -1816,7 +1618,6 @@ static int read_ext(attrib * a, void *owner, struct storage *store)
 void attrib_init(void)
 {
     /* Alle speicherbaren Attribute müssen hier registriert werden */
-    at_register(&at_speedup);
     at_register(&at_shiptrail);
     at_register(&at_familiar);
     at_register(&at_familiarmage);

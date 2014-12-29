@@ -156,20 +156,20 @@ static void chaos(region * r)
                 case 0:
                     mfac = 100;
                     u =
-                        createunit(r, get_monsters(), rng_int() % 8 + 1,
-                        get_race(RC_FIREDRAGON));
+                        create_unit(r, get_monsters(), rng_int() % 8 + 1,
+                        get_race(RC_FIREDRAGON), 0, NULL, NULL);
                     break;
                 case 1:
                     mfac = 500;
                     u =
-                        createunit(r, get_monsters(), rng_int() % 4 + 1,
-                        get_race(RC_DRAGON));
+                        create_unit(r, get_monsters(), rng_int() % 4 + 1,
+                        get_race(RC_DRAGON), 0, NULL, NULL);
                     break;
                 default:
                     mfac = 1000;
                     u =
-                        createunit(r, get_monsters(), rng_int() % 2 + 1,
-                        get_race(RC_WYRM));
+                        create_unit(r, get_monsters(), rng_int() % 2 + 1,
+                        get_race(RC_WYRM), 0, NULL, NULL);
                     break;
                 }
                 if (mfac)
