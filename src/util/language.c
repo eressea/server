@@ -319,6 +319,7 @@ void free_locales(void) {
                 free(strings);
             }
         }
+        free(locales->name);
         free(locales);
         locales = next;
     }

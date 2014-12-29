@@ -563,10 +563,7 @@ void push_order(order ** ordp, order * ord)
 
 keyword_t init_order(const struct order *ord)
 {
-    char *cmd = 0;
-
     assert(ord && ord->data);
-    if (ord->data->_str) cmd = _strdup(ord->data->_str);
-    init_tokens_str(cmd);
+    init_tokens_str(ord->data->_str);
     return ord->data->_keyword;
 }
