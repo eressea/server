@@ -201,16 +201,15 @@ char *parse_token(const char **str, char *lbuf, size_t buflen)
     return lbuf;
 }
 
+static char pbuf[MAXTOKENSIZE];       /* STATIC_RESULT: used for return, not across calls */
 const char *parse_token_depr(const char **str)
 {
-  static char lbuf[MAXTOKENSIZE];       /* STATIC_RESULT: used for return, not across calls */
-  return parse_token(str, lbuf, MAXTOKENSIZE);
+  return parse_token(str, pbuf, MAXTOKENSIZE);
 }
 
 const char *getstrtoken(void)
 {
-    char lbuf[MAXTOKENSIZE];
-    return parse_token((const char **)&states->current_token, lbuf, MAXTOKENSIZE);
+    return parse_token((const char **)&states->current_token, pbuf, MAXTOKENSIZE);
 }
 
 const char *gettoken(char *lbuf, size_t bufsize)
