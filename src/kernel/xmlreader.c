@@ -644,7 +644,7 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
     xmlFree(propValue);
 
     propValue = xmlGetProp(node, BAD_CAST "value");
-    wtype->damage[pos] = gc_add(_strdup((const char *)propValue));
+    wtype->damage[pos] = _strdup((const char *)propValue); // TODO: this is a memory leak
     if (k == 0)
       wtype->damage[1 - pos] = wtype->damage[pos];
     xmlFree(propValue);

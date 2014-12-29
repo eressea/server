@@ -54,6 +54,7 @@ attrib_type at_unitdissolve = {
 
 void register_attributes(void)
 {
+    at_deprecate("gm", a_readint);
     at_register(&at_stealth);
     at_register(&at_object);
     at_register(&at_unitdissolve);
@@ -61,7 +62,6 @@ void register_attributes(void)
     at_register(&at_raceprefix);
     at_register(&at_iceberg);
     at_register(&at_key);
-    at_deprecate("gm", a_readint);
     at_register(&at_follow);
     at_register(&at_targetregion);
     at_register(&at_orcification);
@@ -69,6 +69,7 @@ void register_attributes(void)
     at_register(&at_reduceproduction);
     at_register(&at_otherfaction);
     at_register(&at_racename);
+    at_register(&at_speedup);
     at_register(&at_movement);
     at_register(&at_moved);
 }

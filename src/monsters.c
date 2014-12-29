@@ -630,7 +630,7 @@ static void recruit_dracoids(unit * dragon, int size)
   region *r = dragon->region;
   const struct item *weapon = NULL;
   order *new_order = NULL;
-  unit *un = createunit(r, f, size, get_race(RC_DRACOID));
+  unit *un = create_unit(r, f, size, get_race(RC_DRACOID), 0, NULL, NULL);
 
   fset(un, UFL_ISNEW | UFL_MOVED);
 
@@ -908,7 +908,7 @@ void spawn_dragons(void)
     unit *u;
 
     if (fval(r->terrain, SEA_REGION) && rng_int() % 10000 < 1) {
-        u = createunit(r, monsters, 1, get_race(RC_SEASERPENT));
+        u = create_unit(r, monsters, 1, get_race(RC_SEASERPENT), 0, NULL, NULL);
       fset(u, UFL_ISNEW | UFL_MOVED);
       equip_unit(u, get_equipment("monster_seaserpent"));
     }
@@ -918,9 +918,9 @@ void spawn_dragons(void)
         || r->terrain == newterrain(T_DESERT))
       && rng_int() % 10000 < (5 + 100 * chaosfactor(r))) {
       if (chance(0.80)) {
-          u = createunit(r, monsters, nrand(60, 20) + 1, get_race(RC_FIREDRAGON));
+          u = create_unit(r, monsters, nrand(60, 20) + 1, get_race(RC_FIREDRAGON), 0, NULL, NULL);
       } else {
-          u = createunit(r, monsters, nrand(30, 20) + 1, get_race(RC_DRAGON));
+          u = create_unit(r, monsters, nrand(30, 20) + 1, get_race(RC_DRAGON), 0, NULL, NULL);
       }
       fset(u, UFL_ISNEW | UFL_MOVED);
       equip_unit(u, get_equipment("monster_dragon"));
@@ -983,7 +983,7 @@ void spawn_undead(void)
         break;
       }
 
-      u = createunit(r, monsters, undead, rc);
+      u = create_unit(r, monsters, undead, rc, 0, NULL, NULL);
       fset(u, UFL_ISNEW | UFL_MOVED);
       if ((rc == get_race(RC_SKELETON) || rc == get_race(RC_ZOMBIE))
         && rng_int() % 10 < 4) {

@@ -17,6 +17,7 @@
 
 /* kernel includes */
 #include <kernel/race.h>
+#include <kernel/order.h>
 #include <kernel/unit.h>
 #include <kernel/faction.h>
 #include <kernel/region.h>
@@ -34,6 +35,13 @@
 #define UNDEAD_BREAKUP_FRACTION     (25+rng_int()%70)   /* anteil der weg geht */
 
 #define age_chance(a,b,p) (_max(0,a-b)*p)
+
+void make_undead_unit(unit * u)
+{
+    free_orders(&u->orders);
+    name_unit(u);
+    fset(u, UFL_ISNEW);
+}
 
 void age_undead(unit * u)
 {

@@ -22,11 +22,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-  extern bool get_movement(struct attrib *const *alist, int type);
-  extern void set_movement(struct attrib **alist, int type);
+  bool get_movement(struct attrib *const *alist, int type);
+  void set_movement(struct attrib **alist, int type);
 
   extern struct attrib_type at_movement;
-
+  extern struct attrib_type at_speedup;
+  
 #ifdef __cplusplus
 }
 #endif
