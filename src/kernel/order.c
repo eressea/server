@@ -40,8 +40,7 @@ typedef struct locale_data {
     const struct locale *lang;
 } locale_data;
 
-static struct locale_data *locale_array[16];
-static int nlocales = 0;
+static struct locale_data *locale_array[MAXLOCALES];
 
 typedef struct order_data {
     const char *_str;
@@ -272,15 +271,10 @@ static order *create_order_i(keyword_t kwd, const char *sptr, int persistent,
         }
     }
 
-    for (lindex = 0; lindex != nlocales; ++lindex) {
-        if (locale_array[lindex]->lang == lang)
-            break;
-    }
-    if (lindex == nlocales) {
-        locale_array[nlocales] = (locale_data *)calloc(1, sizeof(locale_data));
-        locale_array[nlocales]->lang = lang;
-        ++nlocales;
-    }
+    lindex = locale_index(lang);
+    assert(lindex < MAXLOCALES);
+    locale_array[lindex] = (locale_data *)calloc(1, sizeof(locale_data));
+    locale_array[lindex]->lang = lang;
 
     ord = (order *)malloc(sizeof(order));
     ord->_persistent = persistent;
