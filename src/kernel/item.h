@@ -313,9 +313,9 @@ extern "C" {
 
   extern struct attrib_type at_showitem;        /* show this potion's description */
 
-  extern void register_resources(void);
-  extern void init_resources(void);
-  extern void init_itemtypes(void);
+  void register_resources(void);
+  void init_resources(void);
+  void init_itemtypes(void);
 
   extern void register_item_give(int (*foo) (struct unit *, struct unit *,
       const struct item_type *, int, struct order *), const char *name);
