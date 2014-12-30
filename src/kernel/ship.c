@@ -238,8 +238,13 @@ void free_ship(ship * s)
     free(s);
 }
 
+static void free_shiptype(ship_type *stype) {
+    free(stype->_name);
+    free(stype);
+}
+
 void free_shiptypes(void) {
-    ql_foreach(shiptypes, free);
+    ql_foreach(shiptypes, free_shiptype);
     ql_free(shiptypes);
     shiptypes = 0;
 }

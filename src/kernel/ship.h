@@ -33,7 +33,7 @@ extern "C" {
 #define SFL_NOCOAST 0x04
 
   typedef struct ship_type {
-    const char *_name;
+    char *_name;
 
     int range;                  /* range in regions */
     int flags;                  /* flags */
