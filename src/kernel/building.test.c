@@ -22,6 +22,8 @@ static void test_register_building(CuTest * tc)
   bt_register(btype);
 
   CuAssertPtrNotNull(tc, bt_find("herp"));
+//    free(btype->_name);
+//    free(btype);
   test_cleanup();
 }
 

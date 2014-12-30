@@ -238,7 +238,8 @@ void free_ship(ship * s)
     free(s);
 }
 
-static void free_shiptype(ship_type *stype) {
+static void free_shiptype(void *ptr) {
+    ship_type *stype = (ship_type *)ptr;
     free(stype->_name);
     free(stype);
 }
