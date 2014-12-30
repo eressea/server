@@ -3,6 +3,7 @@
 #include <kernel/types.h>
 #include <kernel/item.h>
 #include <kernel/region.h>
+#include <kernel/terrain.h>
 
 #include <util/language.h>
 
@@ -45,6 +46,8 @@ static void test_recreate_world(CuTest * tc)
   CuAssertPtrEquals(tc, default_locale, get_locale("de"));
   CuAssertPtrNotNull(tc, default_locale);
   CuAssertPtrNotNull(tc, findregion(0, 0));
+  CuAssertPtrNotNull(tc, get_terrain("plain"));
+  CuAssertPtrNotNull(tc, get_terrain("ocean"));
   CuAssertPtrNotNull(tc, (void *)rt_find("horse"));
   CuAssertPtrNotNull(tc, get_resourcetype(R_HORSE));
   CuAssertPtrNotNull(tc, (void *)rt_find("money"));
@@ -56,6 +59,8 @@ static void test_recreate_world(CuTest * tc)
 
   test_cleanup();
   CuAssertPtrEquals(tc, 0, get_locale("de"));
+  CuAssertPtrEquals(tc, 0, (void*)get_terrain("plain"));
+  CuAssertPtrEquals(tc, 0, (void*)get_terrain("ocean"));
   CuAssertPtrEquals(tc, 0, (void*)rt_find("horse"));
   CuAssertPtrEquals(tc, 0, (void*)get_resourcetype(R_HORSE));
   CuAssertPtrNotNull(tc, (void *)rt_find("money"));

@@ -17,6 +17,7 @@
 #include <tests.h>
 
 #include <stdlib.h>
+#include <string.h>
 
 static void test_market_curse(CuTest * tc)
 {
@@ -45,7 +46,7 @@ static void test_market_curse(CuTest * tc)
   set_param(&global.parameters, "rules.region_owners", "1");
 
   btype = (building_type *)calloc(1, sizeof(building_type));
-  btype->_name = "market";
+  btype->_name = _strdup("market");
   bt_register(btype);
 
   terrain = get_terrain("plain");
