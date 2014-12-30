@@ -58,7 +58,7 @@ struct unit *test_create_unit(struct faction *f, struct region *r)
 void test_cleanup(void)
 {
     free_terrains();
-    test_clear_resources();
+    free_resources();
     global.functions.maintenance = NULL;
     global.functions.wage = NULL;
     default_locale = 0;
@@ -75,7 +75,6 @@ terrain_type *
 test_create_terrain(const char * name, unsigned int flags)
 {
   terrain_type * t = get_or_create_terrain(name);
-  t->_name = _strdup(name);
   t->flags = flags;
   return t;
 }

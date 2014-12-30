@@ -324,9 +324,7 @@ extern "C" {
   extern void register_item_useonother(int (*foo) (struct unit *, int,
       const struct item_type *, int, struct order *), const char *name);
 
-#ifndef DISABLE_TESTS
-  void test_clear_resources(void);
-#endif
+  void free_resources(void);
 
 #ifdef __cplusplus
 }
