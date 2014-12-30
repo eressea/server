@@ -1759,8 +1759,6 @@ void free_gamedata(void)
         a_remove(&global.attribs, global.attribs);
     }
     ++global.cookie;              /* readgame() already does this, but sjust in case */
-
-    init_resources();
 }
 
 const char * game_name(void) {
