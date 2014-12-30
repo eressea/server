@@ -22,6 +22,7 @@ static void test_register_building(CuTest * tc)
   bt_register(btype);
 
   CuAssertPtrNotNull(tc, bt_find("herp"));
+  test_cleanup();
 }
 
 static void test_building_set_owner(CuTest * tc)
@@ -51,6 +52,7 @@ static void test_building_set_owner(CuTest * tc)
   CuAssertPtrEquals(tc, u1, building_owner(bld));
   building_set_owner(u2);
   CuAssertPtrEquals(tc, u2, building_owner(bld));
+  test_cleanup();
 }
 
 static void test_buildingowner_goes_to_next_when_empty(CuTest * tc)
@@ -85,6 +87,7 @@ static void test_buildingowner_goes_to_next_when_empty(CuTest * tc)
   CuAssertPtrEquals(tc, u, building_owner(bld));
   u->number = 0;
   CuAssertPtrEquals(tc, u2, building_owner(bld));
+  test_cleanup();
 }
 
 static void test_buildingowner_goes_to_other_when_empty(CuTest * tc)
@@ -120,6 +123,7 @@ static void test_buildingowner_goes_to_other_when_empty(CuTest * tc)
   CuAssertPtrEquals(tc, u, building_owner(bld));
   u->number = 0;
   CuAssertPtrEquals(tc, u2, building_owner(bld));
+  test_cleanup();
 }
 
 static void test_buildingowner_goes_to_same_faction_when_empty(CuTest * tc)
@@ -159,6 +163,7 @@ static void test_buildingowner_goes_to_same_faction_when_empty(CuTest * tc)
   CuAssertPtrEquals(tc, u3, building_owner(bld));
   u3->number = 0;
   CuAssertPtrEquals(tc, u2, building_owner(bld));
+  test_cleanup();
 }
 
 static void test_buildingowner_goes_to_next_after_leave(CuTest * tc)
@@ -193,6 +198,7 @@ static void test_buildingowner_goes_to_next_after_leave(CuTest * tc)
   CuAssertPtrEquals(tc, u, building_owner(bld));
   leave_building(u);
   CuAssertPtrEquals(tc, u2, building_owner(bld));
+  test_cleanup();
 }
 
 static void test_buildingowner_goes_to_other_after_leave(CuTest * tc)
@@ -227,6 +233,7 @@ static void test_buildingowner_goes_to_other_after_leave(CuTest * tc)
   CuAssertPtrEquals(tc, u, building_owner(bld));
   leave_building(u);
   CuAssertPtrEquals(tc, u2, building_owner(bld));
+  test_cleanup();
 }
 
 static void test_buildingowner_goes_to_same_faction_after_leave(CuTest * tc)
@@ -268,6 +275,7 @@ static void test_buildingowner_goes_to_same_faction_after_leave(CuTest * tc)
   CuAssertPtrEquals(tc, u2, building_owner(bld));
   leave_building(u2);
   CuAssertPtrEquals(tc, 0, building_owner(bld));
+  test_cleanup();
 }
 
 static void test_buildingowner_resets_when_empty(CuTest * tc)
@@ -302,6 +310,7 @@ static void test_buildingowner_resets_when_empty(CuTest * tc)
   CuAssertPtrEquals(tc, 0, building_owner(bld));
   u->number = 1;
   CuAssertPtrEquals(tc, u, building_owner(bld));
+  test_cleanup();
 }
 
 void test_buildingowner_goes_to_empty_unit_after_leave(CuTest * tc)
@@ -343,6 +352,7 @@ void test_buildingowner_goes_to_empty_unit_after_leave(CuTest * tc)
   CuAssertPtrEquals(tc, 0, building_owner(bld));
   u2->number = 1;
   CuAssertPtrEquals(tc, u2, building_owner(bld));
+  test_cleanup();
 }
 
 CuSuite *get_building_suite(void)

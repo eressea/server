@@ -57,7 +57,7 @@ struct unit *test_create_unit(struct faction *f, struct region *r)
 
 void test_cleanup(void)
 {
-    test_clear_terrains();
+    free_terrains();
     test_clear_resources();
     global.functions.maintenance = NULL;
     global.functions.wage = NULL;
