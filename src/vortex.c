@@ -63,6 +63,7 @@ static void a_freedirection(attrib * a)
 {
     spec_direction *d = (spec_direction *)(a->data.v);
     free(d->desc);
+    free(d->keyword);
     free(d);
 }
 
