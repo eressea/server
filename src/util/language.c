@@ -242,6 +242,7 @@ void add_translation(struct critbit_tree **cbp, const char *key, int i) {
     if (str) {
         size_t len = strlen(str);
         if (!cb) {
+            // TODO: this will leak, because we do not know how to clean it up */
             *cbp = cb = (struct critbit_tree *)calloc(1, sizeof(struct critbit_tree *));
         }
         len = cb_new_kv(str, len, &i, sizeof(int), buffer);
