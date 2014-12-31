@@ -155,7 +155,7 @@ const char *locale_string(const locale * lang, const char *key)
             return locale_string(lang->fallback, key);
         }
     }
-    return key;
+    return 0;
 }
 
 void locale_setstring(locale * lang, const char *key, const char *value)
