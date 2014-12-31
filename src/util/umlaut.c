@@ -211,8 +211,13 @@ void freetokens(void * root)
     int i;
     for (i = 0; node && i != NODEHASHSIZE; ++i) {
         if (node->next[i]) {
+            tref ** refs = &node->next[i];
             freetokens(node->next[i]->node);
-            free(node->next[i]);
+            while (*refs) {
+                tref * ref = *refs;
+                *refs = ref->nexthash;
+                free(ref);
+            }
         }
     }
     free(node);
