@@ -147,16 +147,15 @@ const char *locale_string(const locale * lang, const char *key)
             }
             find = find->nexthash;
         }
-        if (!find) {
-            log_warning("missing translation for \"%s\" in locale %s\n", key, lang->name);
-            if (lang->fallback) {
-                return locale_string(lang->fallback, key);
-            }
-            return 0;
+        if (find) {
+            return find->str;
         }
-        return find->str;
+        log_error("missing translation for \"%s\" in locale %s\n", key, lang->name);
+        if (lang->fallback) {
+            return locale_string(lang->fallback, key);
+        }
     }
-    return 0;
+    return key;
 }
 
 void locale_setstring(locale * lang, const char *key, const char *value)
