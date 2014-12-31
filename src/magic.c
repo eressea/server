@@ -2979,7 +2979,16 @@ spellbook * get_spellbook(const char * name)
     return result;
 }
 
+int free_spellbook_cb(const void *match, const void *key, size_t keylen, void *data) {
+    spellbook *sb;
+    cb_get_kv(match, &sb, sizeof(sb));
+    spellbook_clear(sb);
+    free(sb);
+    return 0;
+}
+
 void free_spellbooks(void)
 {
+    cb_foreach(&cb_spellbooks, "", 0, free_spellbook_cb, NULL);
     cb_clear(&cb_spellbooks);
 }

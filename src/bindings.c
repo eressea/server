@@ -514,6 +514,7 @@ static void reset_game(void)
   for (f = factions; f; f = f->next) {
     f->flags &= FFL_SAVEMASK;
   }
+  init_locales();
 }
 
 static int tolua_process_orders(lua_State * L)

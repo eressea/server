@@ -355,3 +355,7 @@ void a_write(struct storage *store, const attrib * attribs, const void *owner)
     }
     WRITE_TOK(store, "end");
 }
+
+void free_attribs(void) {
+    cb_clear(&cb_deprecated);
+}

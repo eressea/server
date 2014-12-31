@@ -155,7 +155,7 @@ static void json_construction(cJSON *json, construction **consp) {
         return;
     }
     if (json->type != cJSON_Object) {
-        log_error("building %s is not a json object: %d", json->string, json->type);
+        log_error("construction %s is not a json object: %d", json->string, json->type);
         return;
     }
     construction * cons = (construction *)calloc(sizeof(construction), 1);
@@ -178,7 +178,7 @@ static void json_construction(cJSON *json, construction **consp) {
             }
             break; 
         default:
-            log_error("building %s contains unknown attribute %s", json->string, child->string);
+            log_error("construction %s contains unknown attribute %s", json->string, child->string);
         }
     }
     *consp = cons;
@@ -304,7 +304,7 @@ static void json_ship(cJSON *json, ship_type *st) {
             }
             break;
         case cJSON_Array:
-            st->coasts = (const terrain_type **)
+            st->coasts = (terrain_type **)
                 malloc(sizeof(terrain_type *) * (1+cJSON_GetArraySize(child)));
             for (i=0,iter=child->child;iter;iter=iter->next) {
                 if (iter->type==cJSON_String) {

@@ -69,12 +69,10 @@ region *regions;
 
 int get_maxluxuries(void)
 {
-    static int maxluxuries = -1;
-    if (maxluxuries == -1) {
-        const luxury_type *ltype;
-        maxluxuries = 0;
-        for (ltype = luxurytypes; ltype; ltype = ltype->next)
-            ++maxluxuries;
+    const luxury_type *ltype;
+    int maxluxuries = 0;
+    for (ltype = luxurytypes; ltype; ltype = ltype->next) {
+        ++maxluxuries;
     }
     return maxluxuries;
 }

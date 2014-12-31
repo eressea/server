@@ -7,4 +7,3 @@ require 'tests.locale'
 require 'tests.regions'
 require 'tests.study'
 require 'tests.movement'
-

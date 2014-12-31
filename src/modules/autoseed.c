@@ -127,90 +127,32 @@ bool(*fun) (const region * r))
 
 static bool f_nolux(const region * r)
 {
-    if (r->land && count_demand(r) != get_maxluxuries())
-        return true;
-    return false;
+    return (r->land && count_demand(r) != get_maxluxuries());
 }
 
-int fix_demand(region * rd)
-{
-    region_list *rl, *rlist = NULL;
-    static const luxury_type *mlux[MAXLUXURIES];
-    const luxury_type *ltypes[MAXLUXURIES];
-    const luxury_type *sale = NULL;
-    int maxlux = 0;
-    static int maxluxuries = -1;
+int fix_demand(region * rd) {
+    luxury_type * ltype;
+    int maxluxuries = get_maxluxuries();
+    if (maxluxuries > 0) {
+        int sale = rng_int() % maxluxuries;
+        for (ltype = luxurytypes; sale != 0 && ltype; ltype = ltype->next) {
+            --sale;
+        }
+        setluxuries(rd, ltype);
+        return 0;
+    }
+    return -1;
+}
 
-    // TODO: this entire function is impossible to understand
+int fix_all_demand(region *rd) {
+    region_list *rl, *rlist = NULL;
     recurse_regions(rd, &rlist, f_nolux);
-    if (maxluxuries < 0) {
-        int i = 0;
-        for (sale = luxurytypes; sale; sale = sale->next) {
-            ltypes[i++] = sale;
-        }
-        maxluxuries = i;
-    }
-    if (maxluxuries == 0) {
-        return -1;
-    }
-    else {
-        int i;
-        for (i = 0; i != maxluxuries; ++i) {
-            mlux[i] = 0;
-        }
-    }
     for (rl = rlist; rl; rl = rl->next) {
         region *r = rl->data;
-        direction_t d;
-        for (d = 0; d != MAXDIRECTIONS; ++d) {
-            region *nr = rconnect(r, d);
-            if (nr && nr->land && nr->land->demands) {
-                struct demand *dmd;
-                for (dmd = nr->land->demands; dmd; dmd = dmd->next) {
-                    if (dmd->value == 0) {
-                        int i;
-                        for (i = 0; i != maxluxuries; ++i) {
-                            if (mlux[i] == NULL) {
-                                maxlux = i;
-                                mlux[i] = dmd->type;
-                                break;
-                            }
-                            else if (mlux[i] == dmd->type) {
-                                break;
-                            }
-                        }
-                        break;
-                    }
-                }
-            }
-        }
         freset(r, RF_MARK);         /* undo recursive marker */
-    }
-    if (maxlux < 2) {
-        int i;
-        for (i = maxlux; i != 2; ++i) {
-            int j;
-            do {
-                int k = rng_int() % maxluxuries;
-                mlux[i] = ltypes[k];
-                for (j = 0; j != i; ++j) {
-                    if (mlux[j] == mlux[i])
-                        break;
-                }
-            } while (j != i);
+        if (!fix_demand(r)) {
+            return -1;
         }
-        maxlux = 2;
-    }
-    for (rl = rlist; rl; rl = rl->next) {
-        region *r = rl->data;
-        sale = mlux[rng_int() % maxlux];
-        if (sale)
-            setluxuries(r, sale);
-    }
-    while (rlist) {
-        rl = rlist->next;
-        free(rlist);
-        rlist = rl;
     }
     return 0;
 }

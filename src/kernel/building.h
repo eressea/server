@@ -49,7 +49,7 @@ extern "C" {
 #define BTF_NAMECHANGE    0x100 /* name and description can be changed more than once */
 
   typedef struct building_type {
-    const char *_name;
+    char *_name;
 
     int flags;                  /* flags */
     int capacity;               /* Kapazität pro Größenpunkt */

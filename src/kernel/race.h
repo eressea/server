@@ -119,7 +119,7 @@ extern "C" {
 
     typedef struct race {
         struct param *parameters;
-        const char *_name;
+        char *_name;
         float magres;
         float maxaura;              /* Faktor auf Maximale Aura */
         float regaura;              /* Faktor auf Regeneration */
@@ -133,7 +133,7 @@ extern "C" {
         float speed;
         float aggression;           /* chance that a monster will attack */
         int hitpoints;
-        const char *def_damage;
+        char *def_damage;
         int armor;
         int at_default;             /* Angriffsskill Unbewaffnet (default: -2) */
         int df_default;             /* Verteidigungsskill Unbewaffnet (default: -2) */

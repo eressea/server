@@ -45,6 +45,7 @@ void spellbook_clear(spellbook *sb)
     free(sbe);
   }
   ql_free(sb->spells);
+  free(sb->name);
 }
 
 int spellbook_foreach(spellbook *sb, int (*callback)(spellbook_entry *, void *), void * data)

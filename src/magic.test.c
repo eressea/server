@@ -39,6 +39,7 @@ void test_updatespells(CuTest * tc)
   CuAssertPtrNotNull(tc, f->spellbook);
   CuAssertIntEquals(tc, 1, ql_length(f->spellbook->spells));
   CuAssertPtrNotNull(tc, spellbook_get(f->spellbook, sp));
+  test_cleanup();
 }
 
 void test_spellbooks(CuTest * tc)
@@ -63,12 +64,11 @@ void test_spellbooks(CuTest * tc)
   entry = spellbook_get(herp, sp);
   CuAssertPtrNotNull(tc, entry);
   CuAssertPtrEquals(tc, sp, entry->sp);
-  /* CuAssertPtrEquals(tc, 0, spellbook_get(derp, sname)); */
 
   test_cleanup();
   herp = get_spellbook("herp");
   CuAssertPtrNotNull(tc, herp);
-  /* CuAssertPtrEquals(tc, 0, spellbook_get(herp, sname)); */
+  test_cleanup();
 }
 
 static spell * test_magic_create_spell(void)
@@ -120,6 +120,7 @@ void test_pay_spell(CuTest * tc)
   CuAssertIntEquals(tc, 0, get_resource(u, get_resourcetype(R_SILVER)));
   CuAssertIntEquals(tc, 0, get_resource(u, get_resourcetype(R_AURA)));
   CuAssertIntEquals(tc, 0, get_resource(u, get_resourcetype(R_HORSE)));
+  test_cleanup();
 }
 
 void test_pay_spell_failure(CuTest * tc)
@@ -157,6 +158,7 @@ void test_pay_spell_failure(CuTest * tc)
   CuAssertIntEquals(tc, 0, eff_spelllevel(u, sp, 3, 1));
   CuAssertIntEquals(tc, 0, change_resource(u, get_resourcetype(R_SILVER), -1));
   CuAssertIntEquals(tc, 0, eff_spelllevel(u, sp, 2, 1));
+  test_cleanup();
 }
 
 void test_getspell_unit(CuTest * tc)
@@ -185,6 +187,7 @@ void test_getspell_unit(CuTest * tc)
 
   unit_add_spell(u, 0, sp, 1);
   CuAssertPtrNotNull(tc, unit_getspell(u, "Herp-a-derp", lang));
+  test_cleanup();
 }
 
 void test_getspell_faction(CuTest * tc)
@@ -215,6 +218,7 @@ void test_getspell_faction(CuTest * tc)
   f->spellbook = create_spellbook(0);
   spellbook_add(f->spellbook, sp, 1);
   CuAssertPtrEquals(tc, sp, unit_getspell(u, "Herp-a-derp", lang));
+  test_cleanup();
 }
 
 void test_getspell_school(CuTest * tc)
@@ -246,6 +250,7 @@ void test_getspell_school(CuTest * tc)
   CuAssertPtrNotNull(tc, book);
   spellbook_add(book, sp, 1);
   CuAssertPtrEquals(tc, sp, unit_getspell(u, "Herp-a-derp", lang));
+  test_cleanup();
 }
 
 void test_set_pre_combatspell(CuTest * tc)
@@ -278,6 +283,7 @@ void test_set_pre_combatspell(CuTest * tc)
   unset_combatspell(u, sp);
   CuAssertIntEquals(tc, 0, get_combatspelllevel(u, index));
   CuAssertPtrEquals(tc, 0, (spell *)get_combatspell(u, index));
+  test_cleanup();
 }
 
 void test_set_main_combatspell(CuTest * tc)
@@ -310,6 +316,7 @@ void test_set_main_combatspell(CuTest * tc)
   unset_combatspell(u, sp);
   CuAssertIntEquals(tc, 0, get_combatspelllevel(u, index));
   CuAssertPtrEquals(tc, 0, (spell *)get_combatspell(u, index));
+  test_cleanup();
 }
 
 void test_set_post_combatspell(CuTest * tc)
@@ -342,6 +349,7 @@ void test_set_post_combatspell(CuTest * tc)
   unset_combatspell(u, sp);
   CuAssertIntEquals(tc, 0, get_combatspelllevel(u, index));
   CuAssertPtrEquals(tc, 0, (spell *)get_combatspell(u, index));
+  test_cleanup();
 }
 
 void test_hasspell(CuTest * tc)
@@ -371,6 +379,7 @@ void test_hasspell(CuTest * tc)
 
   set_level(u, SK_MAGIC, 1);
   CuAssertTrue(tc, !u_hasspell(u, sp));
+  test_cleanup();
 }
 
 CuSuite *get_magic_suite(void)

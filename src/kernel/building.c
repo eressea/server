@@ -92,8 +92,14 @@ void bt_register(building_type * type)
     ql_push(&buildingtypes, (void *)type);
 }
 
+void free_buildingtype(void *ptr) {
+    building_type *btype =(building_type *)ptr;
+    free(btype->_name);
+    free(btype);
+}
+
 void free_buildingtypes(void) {
-    ql_foreach(buildingtypes, free);
+    ql_foreach(buildingtypes, free_buildingtype);
     ql_free(buildingtypes);
     buildingtypes = 0;
 }

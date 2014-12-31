@@ -9,7 +9,6 @@
 #include <tests.h>
 #include <CuTest.h>
 #include <stdlib.h>
-#include <string.h>
 
 static void test_create_order(CuTest *tc) {
     char cmd[32];
@@ -127,8 +126,7 @@ static void test_init_order(CuTest *tc) {
 }
 
 static void test_getstrtoken(CuTest *tc) {
-    char *cmd = _strdup("hurr \"durr\" \"\" \'\'");
-    init_tokens_str(cmd);
+    init_tokens_str("hurr \"durr\" \"\" \'\'");
     CuAssertStrEquals(tc, "hurr", getstrtoken());
     CuAssertStrEquals(tc, "durr", getstrtoken());
     CuAssertStrEquals(tc, "", getstrtoken());
@@ -139,8 +137,7 @@ static void test_getstrtoken(CuTest *tc) {
 }
 
 static void test_skip_token(CuTest *tc) {
-    char *cmd = _strdup("hurr \"durr\"");
-    init_tokens_str(cmd);
+    init_tokens_str("hurr \"durr\"");
     skip_token();
     CuAssertStrEquals(tc, "durr", getstrtoken());
     CuAssertStrEquals(tc, 0, getstrtoken());
