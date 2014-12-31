@@ -120,6 +120,7 @@ void test_pay_spell(CuTest * tc)
   CuAssertIntEquals(tc, 0, get_resource(u, get_resourcetype(R_SILVER)));
   CuAssertIntEquals(tc, 0, get_resource(u, get_resourcetype(R_AURA)));
   CuAssertIntEquals(tc, 0, get_resource(u, get_resourcetype(R_HORSE)));
+  test_cleanup();
 }
 
 void test_pay_spell_failure(CuTest * tc)
@@ -157,6 +158,7 @@ void test_pay_spell_failure(CuTest * tc)
   CuAssertIntEquals(tc, 0, eff_spelllevel(u, sp, 3, 1));
   CuAssertIntEquals(tc, 0, change_resource(u, get_resourcetype(R_SILVER), -1));
   CuAssertIntEquals(tc, 0, eff_spelllevel(u, sp, 2, 1));
+  test_cleanup();
 }
 
 void test_getspell_unit(CuTest * tc)
@@ -185,6 +187,7 @@ void test_getspell_unit(CuTest * tc)
 
   unit_add_spell(u, 0, sp, 1);
   CuAssertPtrNotNull(tc, unit_getspell(u, "Herp-a-derp", lang));
+  test_cleanup();
 }
 
 void test_getspell_faction(CuTest * tc)
