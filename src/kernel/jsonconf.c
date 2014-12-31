@@ -304,7 +304,7 @@ static void json_ship(cJSON *json, ship_type *st) {
             }
             break;
         case cJSON_Array:
-            st->coasts = (const terrain_type **)
+            st->coasts = (terrain_type **)
                 malloc(sizeof(terrain_type *) * (1+cJSON_GetArraySize(child)));
             for (i=0,iter=child->child;iter;iter=iter->next) {
                 if (iter->type==cJSON_String) {

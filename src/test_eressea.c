@@ -86,6 +86,7 @@ int RunAllTests(void)
   log_flags = flags;
   fail_count = suite->failCount;
   CuSuiteDelete(suite);
+  kernel_done();
   return fail_count;
 }
 

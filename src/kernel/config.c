@@ -1047,23 +1047,24 @@ int get_param_int(const struct param *p, const char *key, int def)
 
 int check_param(const struct param *p, const char *key, const char *searchvalue)
 {
+    int result = 0;
     const char *value = get_param(p, key);
     if (!value) {
         return 0;
     }
-    char *p_value = malloc(sizeof(char)* (strlen(value) + 1));
-    strcpy(p_value, value);
+    char *p_value = _strdup(value);
     const char *delimiter = " ,;";
     char *v = strtok(p_value, delimiter);
 
     while (v != NULL) {
-        if (strcmp(v, searchvalue) == 0)
-        {
-            return 1;
+        if (strcmp(v, searchvalue) == 0) {
+            result = 1;
+            break;
         }
         v = strtok(NULL, delimiter);
     }
-    return 0;
+    free(p_value);
+    return result;
 }
 
 static const char *g_datadir;
