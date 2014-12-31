@@ -1191,7 +1191,11 @@ void free_resources(void)
     int i;
 
     memset((void *)oldpotiontype, 0, sizeof(oldpotiontype));
-
+    while (luxurytypes) {
+        luxury_type * next = luxurytypes->next;
+        free(luxurytypes);
+        luxurytypes = next;
+    }
     cb_foreach(&cb_resources, "", 0, free_rtype_cb, 0);
     cb_clear(&cb_resources);
     ++num_resources;

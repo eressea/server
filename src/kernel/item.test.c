@@ -2,6 +2,8 @@
 
 #include <kernel/item.h>
 #include <kernel/pool.h>
+#include <kernel/region.h>
+#include <kernel/terrain.h>
 #include <kernel/unit.h>
 #include <util/language.h>
 #include <util/functions.h>
@@ -116,6 +118,32 @@ void test_findresourcetype(CuTest * tc)
   CuAssertPtrNotNull(tc, findresourcetype("Bauer", lang));
 }
 
+#include <modules/autoseed.h>
+static void test_fix_demand(CuTest *tc) {
+    region *r;
+    terrain_type *tplain;
+    item_type *ltype;
+    luxury_type *lux;
+
+    test_cleanup();
+    ltype = test_create_itemtype("balm");
+    ltype->rtype->flags |= (RTF_ITEM | RTF_POOLED);
+    lux = new_luxurytype(ltype, 0);
+    ltype = test_create_itemtype("oint");
+    ltype->rtype->flags |= (RTF_ITEM | RTF_POOLED);
+    lux = new_luxurytype(ltype, 0);
+    tplain = test_create_terrain("plain", LAND_REGION);
+    r = new_region(0, 0, NULL, 0);
+    CuAssertPtrNotNull(tc, r);
+    terraform_region(r, tplain);
+    CuAssertPtrNotNull(tc, r->land);
+    CuAssertIntEquals(tc, 0, fix_demand(r));
+    CuAssertPtrNotNull(tc, r->land->demands);
+    CuAssertPtrNotNull(tc, r->land->demands->next);
+    CuAssertPtrNotNull(tc, r_luxury(r));
+    test_cleanup();
+}
+
 CuSuite *get_item_suite(void)
 {
   CuSuite *suite = CuSuiteNew();
@@ -125,5 +153,6 @@ CuSuite *get_item_suite(void)
   SUITE_ADD_TEST(suite, test_resource_type);
   SUITE_ADD_TEST(suite, test_finditemtype);
   SUITE_ADD_TEST(suite, test_findresourcetype);
+  SUITE_ADD_TEST(suite, test_fix_demand);
   return suite;
 }
