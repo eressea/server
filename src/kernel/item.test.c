@@ -123,15 +123,14 @@ static void test_fix_demand(CuTest *tc) {
     region *r;
     terrain_type *tplain;
     item_type *ltype;
-    luxury_type *lux;
 
     test_cleanup();
     ltype = test_create_itemtype("balm");
     ltype->rtype->flags |= (RTF_ITEM | RTF_POOLED);
-    lux = new_luxurytype(ltype, 0);
+    new_luxurytype(ltype, 0);
     ltype = test_create_itemtype("oint");
     ltype->rtype->flags |= (RTF_ITEM | RTF_POOLED);
-    lux = new_luxurytype(ltype, 0);
+    new_luxurytype(ltype, 0);
     tplain = test_create_terrain("plain", LAND_REGION);
     r = new_region(0, 0, NULL, 0);
     CuAssertPtrNotNull(tc, r);
