@@ -1144,6 +1144,7 @@ void kernel_done(void)
      * calling it is optional, e.g. a release server will most likely not do it.
      */
     translation_done();
+    free_attribs();
 }
 
 attrib_type at_germs = {
