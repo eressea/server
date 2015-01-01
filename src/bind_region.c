@@ -459,7 +459,9 @@ static int tolua_region_create(lua_State * L)
     if (result) {
       terraform_region(result, terrain);
     }
-    fix_demand(result);
+    if (result->land) {
+        fix_demand(result);
+    }
 
     tolua_pushusertype(L, result, TOLUA_CAST "region");
     return 1;
