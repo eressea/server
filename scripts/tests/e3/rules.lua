@@ -2,9 +2,31 @@ require "lunit"
 
 module("tests.e3.e3features", package.seeall, lunit.testcase)
 
+local settings
+
+local function set_rule(key, value)
+    if value==nil then
+        eressea.settings.set(key, settings[key])
+    else
+        settings[key] = settings[key] or eressea.settings.get(key)
+        eressea.settings.set(key, value)
+    end
+end
+
 function setup()
     eressea.game.reset()
-    eressea.settings.set("rules.economy.food", "4")
+    settings = {}
+    set_rule("rules.move.owner_leave", "1")
+    set_rule("rules.economy.food", "4")
+    set_rule("rules.ship.drifting", "0")
+    set_rule("rules.ship.storms", "0")
+end
+
+function teardown()
+    set_rule("rules.move.owner_leave")
+    set_rule("rules.economy.food")
+    set_rule("rules.ship.drifting")
+    set_rule("rules.ship.storms")
 end
 
 function disable_test_bug_1738_build_castle_e3()
@@ -235,8 +257,6 @@ function test_fishing()
 end
 
 function test_ship_capacity()
-    eressea.settings.set("rules.ship.drifting", "0")
-    eressea.settings.set("rules.ship.storms", "0")
     local r = region.create(0,0, "ocean")
     region.create(1,0, "ocean")
     local r2 = region.create(2,0, "ocean")
@@ -342,7 +362,6 @@ function test_taxes()
 end
 
 function test_region_owner_cannot_leave_castle()
-    eressea.settings.set("rules.move.owner_leave", "1")
     local r = region.create(0, 0, "plain")
     local f = faction.create("noreply@eressea.de", "human", "de")
     f.id = 42
@@ -703,7 +722,7 @@ end
 
 function test_building_owner_can_enter_ship()
     local r1 = region.create(1, 2, "plain")    
-    local f1 = faction.create("noreply@tteessttiinngg.de", "human", "de")
+    local f1 = faction.create("noreply@eressea.de", "human", "de")
     local b1 = building.create(r1, "castle")    
     b1.size = 10    
     local s1 = ship.create(r1, "cutter")        
