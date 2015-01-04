@@ -1122,8 +1122,15 @@ void set_param(struct param **p, const char *key, const char *data)
     while (*p != NULL) {
         int cmp = strcmp((*p)->name, key);
         if (cmp == 0) {
-            free((*p)->data);
-            (*p)->data = _strdup(data);
+            par = *p;
+            free(par->data);
+            if (data) {
+                par->data = _strdup(data);
+            }
+            else {
+                *p = par->next;
+                free(par);
+            }
             return;
         }
         else if (cmp > 0) {
