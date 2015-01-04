@@ -408,7 +408,6 @@ bool is_repeated(const order * ord)
     case K_TEACH:
     case K_BREED:
     case K_PIRACY:
-    case K_PLANT:
     case K_MAKE:
     case K_LOOT:
     case K_DESTROY:
@@ -450,7 +449,6 @@ bool is_exclusive(const order * ord)
     case K_TEACH:
     case K_BREED:
     case K_PIRACY:
-    case K_PLANT:
     case K_MAKE:
     case K_LOOT:
     case K_DESTROY:
@@ -495,7 +493,6 @@ bool is_long(const order * ord)
     case K_TEACH:
     case K_BREED:
     case K_PIRACY:
-    case K_PLANT:
     case K_MAKE:
     case K_LOOT:
     case K_DESTROY:

@@ -138,7 +138,6 @@ const char *keywords[MAXKEYWORDS] = {
     "group",
     "sort",
     "prefix",
-    "plant",
     "alliance",
     "claim",
     "promote",
