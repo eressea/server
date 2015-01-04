@@ -168,8 +168,9 @@ static unit *unitorders(FILE * F, int enc, struct faction *f)
 
             if (s[0]) {
                 if (s[0] != '@') {
+                    char token[128];
                     const char *stok = s;
-                    stok = parse_token_depr(&stok);
+                    stok = parse_token(&stok, token, sizeof(token));
 
                     if (stok) {
                         bool quit = false;
@@ -192,7 +193,6 @@ static unit *unitorders(FILE * F, int enc, struct faction *f)
                             }
                             break;
                         default:
-                            /* TODO: syntax error message */
                             break;
                         }
                         if (quit) {

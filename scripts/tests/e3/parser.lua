@@ -32,3 +32,26 @@ function test_set_status_de()
     assert_equal(u.status, 0)
 end
 
+function test_breed_horses()
+    local r = region.create(0, 0, "plain")    
+    local f = faction.create("bug_1886@eressea.de", "human", "en")
+    local u = unit.create(f, r, 1)
+    local b = building.create(r, "stables")
+    b.size = 10
+    u.building = b
+    u:add_item("horse", 2)
+    u:add_item("money", 2000)
+    u:set_skill("training", 100) -- 100% chance to duplicate each horse
+    u:clear_orders()
+    u:add_order("GROW horses")
+    process_orders()
+    assert_equal(4, u:get_item("horse"))
+    u:clear_orders()
+    u:add_order("BREED horses")
+    process_orders()
+    assert_equal(8, u:get_item("horse"))
+    u:clear_orders()
+    u:add_order("PLANT horses")
+    process_orders()
+    assert_equal(16, u:get_item("horse"))
+end
