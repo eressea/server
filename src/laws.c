@@ -4280,7 +4280,7 @@ void force_leave(region *r) {
         if (u->building) {
             uo = building_owner(u->building);
         }
-        if (u->ship) {
+        if (u->ship && r->land) {
             uo = ship_owner(u->ship);
         }
         if (uo && !help_enter(uo, u)) {

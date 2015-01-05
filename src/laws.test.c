@@ -271,6 +271,23 @@ static void test_force_leave_ships(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_force_leave_ships_on_ocean(CuTest *tc) {
+    region *r;
+    unit *u1, *u2;
+    ship *sh;
+    test_cleanup();
+    r = test_create_region(0, 0, test_create_terrain("ocean", SEA_REGION));
+    u1 = test_create_unit(test_create_faction(NULL), r);
+    u2 = test_create_unit(test_create_faction(NULL), r);
+    sh = test_create_ship(r, NULL);
+    u_set_ship(u1, sh);
+    u_set_ship(u2, sh);
+    ship_set_owner(u1);
+    force_leave(r);
+    CuAssertPtrEquals_Msg(tc, "no forcing out of ships on oceans", sh, u2->ship);
+    test_cleanup();
+}
+
 static void test_fishing_feeds_2_people(CuTest * tc)
 {
     const resource_type *rtype;
@@ -696,5 +713,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_display_cmd);
     SUITE_ADD_TEST(suite, test_force_leave_buildings);
     SUITE_ADD_TEST(suite, test_force_leave_ships);
+    SUITE_ADD_TEST(suite, test_force_leave_ships_on_ocean);
+
     return suite;
 }
