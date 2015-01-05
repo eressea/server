@@ -273,7 +273,7 @@ extern "C" {
                            const struct group * g, unsigned int flags, 
                            const struct faction * stealthfaction);
     int skilldiff(troop at, troop dt, int dist);
-    int new_castle_rule();
+    int new_castle_rule(void);
     int castle_capacity(struct building * b);
 
 #ifdef __cplusplus

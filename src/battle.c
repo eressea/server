@@ -2048,7 +2048,7 @@ void dazzle(battle * b, troop * td)
     td->fighter->person[td->index].defence--;
 }
 
-int new_castle_rule()
+int new_castle_rule(void)
 {
     int value = -1;
     if (value < 0) {
