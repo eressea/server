@@ -2061,7 +2061,7 @@ int new_castle_rule(void)
 
 int castle_capacity(building * b)
 {
-    if (new_castle_rule(void)) {
+    if (new_castle_rule()) {
         return buildingcapacity(b) * 1000;  /* CTD Using Race-GE like E3-ships*/
     }
     return b->size;
@@ -2082,7 +2082,7 @@ void damage_building(battle * b, building * bldg, int damage_abs)
             fighter *fig;
             for (fig = s->fighters; fig; fig = fig->next) {
                 if (fig->building == bldg) {
-                    if (new_castle_rule(void)) {
+                    if (new_castle_rule()) {
                         if (bldg->sizeleft >= (fig->unit->number * u_race(fig->unit)->weight)) {
                             fig->building = bldg;
                             bldg->sizeleft -= (fig->unit->number * u_race(fig->unit)->weight);
@@ -3286,7 +3286,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     else {
         building *bld = u->building;
 
-        if (new_castle_rule(void)) {
+        if (new_castle_rule()) {
             if (bld && bld->sizeleft >= u->number * u_race(u)->weight && playerrace(u_race(u))) { /* CTD Using Race-GE like ships*/
                 fig->building = bld;
                 fig->building->sizeleft -= u->number * u_race(u)->weight;
