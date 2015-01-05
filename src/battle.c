@@ -2054,7 +2054,7 @@ static int new_castle_rule()
     if (value < 0) {
         /* If the parameter is 0, use old rules. Else use size * capacity (from xml building config) * 1000 */
         /* and use Race-GE to calculate how many fighter a castle can hold */
-        value = get_param_int(global.parameters, "rules.castles.new_size", 1);
+        value = get_param_int(global.parameters, "rules.castles.use_unit_weigth", 1);
     }
     return value;    
 }
@@ -2082,12 +2082,23 @@ void damage_building(battle * b, building * bldg, int damage_abs)
             fighter *fig;
             for (fig = s->fighters; fig; fig = fig->next) {
                 if (fig->building == bldg) {
-                    if (bldg->sizeleft >= fig->unit->number) {
-                        fig->building = bldg;
-                        bldg->sizeleft -= fig->unit->number;
-                    }
+                    if (new_castle_rule) {
+                        if (bldg->sizeleft >= (fig->unit->number * u_race(fig->unit)->weight)) {
+                            fig->building = bldg;
+                            bldg->sizeleft -= (fig->unit->number * u_race(fig->unit)->weight);
+                        }
+                        else {
+                            fig->building = NULL;
+                        }
+                    } 
                     else {
-                        fig->building = NULL;
+                        if (bldg->sizeleft >= fig->unit->number) {
+                            fig->building = bldg;
+                            bldg->sizeleft -= fig->unit->number;
+                        }
+                        else {
+                            fig->building = NULL;
+                        }
                     }
                 }
             }
