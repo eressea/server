@@ -2048,7 +2048,7 @@ void dazzle(battle * b, troop * td)
     td->fighter->person[td->index].defence--;
 }
 
-static int new_castle_rule()
+int new_castle_rule()
 {
     int value = -1;
     if (value < 0) {
@@ -2059,7 +2059,7 @@ static int new_castle_rule()
     return value;    
 }
 
-static int castle_capacity(building * b)
+int castle_capacity(building * b)
 {
     if (new_castle_rule()) {
         return buildingcapacity(b) * 1000;  /* CTD Using Race-GE like E3-ships*/
