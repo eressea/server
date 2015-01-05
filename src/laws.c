@@ -4269,6 +4269,26 @@ static void enter_2(region * r)
     do_enter(r, 1);
 }
 
+static bool help_enter(unit *uo, unit *u) {
+    return uo->faction == u->faction || alliedunit(uo, u->faction, HELP_GUARD);
+}
+
+void force_leave(region *r) {
+    unit *u;
+    for (u = r->units; u; u = u->next) {
+        unit *uo = NULL;
+        if (u->building) {
+            uo = building_owner(u->building);
+        }
+        if (u->ship) {
+            uo = ship_owner(u->ship);
+        }
+        if (uo && !help_enter(uo, u)) {
+            leave(u, false);
+        }
+    }
+}
+
 static void maintain_buildings_1(region * r)
 {
     maintain_buildings(r, false);
@@ -4306,71 +4326,72 @@ void init_processor(void)
     int p;
 
     p = 10;
-    add_proc_global(p, &new_units, "Neue Einheiten erschaffen");
+    add_proc_global(p, new_units, "Neue Einheiten erschaffen");
 
     p += 10;
     add_proc_unit(p, update_long_order, "Langen Befehl aktualisieren");
     add_proc_order(p, K_BANNER, banner_cmd, 0, NULL);
-    add_proc_order(p, K_EMAIL, &email_cmd, 0, NULL);
-    add_proc_order(p, K_PASSWORD, &password_cmd, 0, NULL);
-    add_proc_order(p, K_SEND, &send_cmd, 0, NULL);
-    add_proc_order(p, K_GROUP, &group_cmd, 0, NULL);
+    add_proc_order(p, K_EMAIL, email_cmd, 0, NULL);
+    add_proc_order(p, K_PASSWORD, password_cmd, 0, NULL);
+    add_proc_order(p, K_SEND, send_cmd, 0, NULL);
+    add_proc_order(p, K_GROUP, group_cmd, 0, NULL);
 
     p += 10;
-    add_proc_order(p, K_QUIT, &quit_cmd, 0, NULL);
-    add_proc_order(p, K_URSPRUNG, &origin_cmd, 0, NULL);
-    add_proc_order(p, K_ALLY, &ally_cmd, 0, NULL);
-    add_proc_order(p, K_PREFIX, &prefix_cmd, 0, NULL);
-    add_proc_order(p, K_SETSTEALTH, &setstealth_cmd, 0, NULL);
-    add_proc_order(p, K_STATUS, &status_cmd, 0, NULL);
-    add_proc_order(p, K_COMBATSPELL, &combatspell_cmd, 0, NULL);
-    add_proc_order(p, K_DISPLAY, &display_cmd, 0, NULL);
-    add_proc_order(p, K_NAME, &name_cmd, 0, NULL);
-    add_proc_order(p, K_GUARD, &guard_off_cmd, 0, NULL);
-    add_proc_order(p, K_RESHOW, &reshow_cmd, 0, NULL);
+    add_proc_order(p, K_QUIT, quit_cmd, 0, NULL);
+    add_proc_order(p, K_URSPRUNG, origin_cmd, 0, NULL);
+    add_proc_order(p, K_ALLY, ally_cmd, 0, NULL);
+    add_proc_order(p, K_PREFIX, prefix_cmd, 0, NULL);
+    add_proc_order(p, K_SETSTEALTH, setstealth_cmd, 0, NULL);
+    add_proc_order(p, K_STATUS, status_cmd, 0, NULL);
+    add_proc_order(p, K_COMBATSPELL, combatspell_cmd, 0, NULL);
+    add_proc_order(p, K_DISPLAY, display_cmd, 0, NULL);
+    add_proc_order(p, K_NAME, name_cmd, 0, NULL);
+    add_proc_order(p, K_GUARD, guard_off_cmd, 0, NULL);
+    add_proc_order(p, K_RESHOW, reshow_cmd, 0, NULL);
 
     if (get_param_int(global.parameters, "rules.alliances", 0) == 1) {
         p += 10;
-        add_proc_global(p, &alliance_cmd, NULL);
+        add_proc_global(p, alliance_cmd, NULL);
     }
 
     p += 10;
     add_proc_region(p, do_contact, "Kontaktieren");
-    add_proc_order(p, K_MAIL, &mail_cmd, 0, "Botschaften");
+    add_proc_order(p, K_MAIL, mail_cmd, 0, "Botschaften");
 
     p += 10;                      /* all claims must be done before we can USE */
     add_proc_region(p, &enter_1, "Betreten (1. Versuch)");     /* for GIVE CONTROL */
-    add_proc_order(p, K_USE, &use_cmd, 0, "Benutzen");
+    add_proc_order(p, K_USE, use_cmd, 0, "Benutzen");
 
     p += 10;                      /* in case it has any effects on alliance victories */
-    add_proc_order(p, K_GIVE, &give_control_cmd, 0, "GIB KOMMANDO");
+    add_proc_order(p, K_GIVE, give_control_cmd, 0, "GIB KOMMANDO");
 
     p += 10;                      /* in case it has any effects on alliance victories */
-    add_proc_order(p, K_LEAVE, &leave_cmd, 0, "Verlassen");
+    add_proc_order(p, K_LEAVE, leave_cmd, 0, "Verlassen");
 
     p += 10;
-    add_proc_region(p, &enter_1, "Betreten (2. Versuch)"); /* to allow a buildingowner to enter the castle pre combat */
+    add_proc_region(p, enter_1, "Betreten (2. Versuch)"); /* to allow a buildingowner to enter the castle pre combat */
 
     p += 10;
-    add_proc_region(p, &do_battle, "Attackieren");
+    add_proc_region(p, do_battle, "Attackieren");
 
     if (!keyword_disabled(K_BESIEGE)) {
         p += 10;
-        add_proc_region(p, &do_siege, "Belagern");
+        add_proc_region(p, do_siege, "Belagern");
     }
 
     p += 10;                      /* can't allow reserve before siege (weapons) */
-    add_proc_region(p, &enter_1, "Betreten (3. Versuch)");  /* to claim a castle after a victory and to be able to DESTROY it in the same turn */
+    add_proc_region(p, enter_1, "Betreten (3. Versuch)");  /* to claim a castle after a victory and to be able to DESTROY it in the same turn */
     if (get_param_int(global.parameters, "rules.reserve.twophase", 0)) {
         add_proc_order(p, K_RESERVE, &reserve_self, 0, "RESERVE (self)");
         p += 10;
     }
     add_proc_order(p, K_RESERVE, &reserve_cmd, 0, "RESERVE (all)");
     add_proc_order(p, K_CLAIM, &claim_cmd, 0, NULL);
-    add_proc_unit(p, &follow_unit, "Folge auf Einheiten setzen");
+    add_proc_unit(p, follow_unit, "Folge auf Einheiten setzen");
 
     p += 10;                      /* rest rng again before economics */
-    add_proc_region(p, &economics, "Zerstoeren, Geben, Rekrutieren, Vergessen");
+    add_proc_region(p, force_leave, "kick non-allies out of buildings/ships");
+    add_proc_region(p, economics, "Zerstoeren, Geben, Rekrutieren, Vergessen");
     add_proc_order(p, K_PROMOTION, &promotion_cmd, 0, "Heldenbefoerderung");
 
     p += 10;

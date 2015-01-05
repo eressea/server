@@ -81,14 +81,14 @@ test_create_terrain(const char * name, unsigned int flags)
 
 building * test_create_building(region * r, const building_type * btype)
 {
-  building * b = new_building(btype?btype:bt_find("castle"), r, default_locale);
+  building * b = new_building(btype?btype:bt_get_or_create("castle"), r, default_locale);
   b->size = b->type->maxsize>0?b->type->maxsize:1;
   return b;
 }
 
 ship * test_create_ship(region * r, const ship_type * stype)
 {
-  ship * s = new_ship(stype?stype:st_find("boat"), r, default_locale);
+  ship * s = new_ship(stype?stype:st_get_or_create("boat"), r, default_locale);
   s->size = s->type->construction?s->type->construction->maxsize:1;
   return s;
 }

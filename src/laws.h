@@ -105,6 +105,7 @@ extern "C" {
   bool seefaction(const struct faction *f, const struct region *r,
       const struct unit *u, int modifier);
   int armedmen(const struct unit *u, bool siege_weapons);
+  void force_leave(struct region *r);
 
 
 #ifdef __cplusplus
