@@ -1045,7 +1045,7 @@ static int add_resourcename_cb(const void * match, const void * key, size_t keyl
     cb_get_kv(match, &rtype, sizeof(rtype));
     for (i = 0; i != 2; ++i) {
         char buffer[128];
-        const char * name = locale_string(lang, resourcename(rtype, (i==0) ? 0 : NMF_PLURAL));
+        const char * name = LOC(lang, resourcename(rtype, (i == 0) ? 0 : NMF_PLURAL));
 
         if (name && transliterate(buffer, sizeof(buffer), name)) {
             size_t len = strlen(buffer);
@@ -1096,7 +1096,7 @@ static int add_itemname_cb(const void * match, const void * key, size_t keylen, 
         int i;
         for (i = 0; i != 2; ++i) {
             char buffer[128];
-            const char * name = locale_string(lang, resourcename(rtype, (i == 0) ? 0 : NMF_PLURAL));
+            const char * name = LOC(lang, resourcename(rtype, (i == 0) ? 0 : NMF_PLURAL));
 
             if (name && transliterate(buffer, sizeof(buffer), name)) {
                 size_t len = strlen(buffer);

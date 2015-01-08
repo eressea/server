@@ -66,7 +66,7 @@ void init_skills(const struct locale *lang) {
 const char *skillname(skill_t sk, const struct locale *lang)
 {
     if (skill_disabled[sk]) return 0;
-    return locale_string(lang, mkname("skill", skillnames[sk]));
+    return LOC(lang, mkname("skill", skillnames[sk]));
 
 }
 

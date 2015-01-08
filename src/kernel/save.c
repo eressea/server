@@ -1568,7 +1568,7 @@ int readgame(const char *filename, int backup)
             sh->type = st_find(name);
             if (sh->type == NULL) {
                 /* old datafiles */
-                sh->type = st_find((const char *)locale_string(default_locale, name));
+                sh->type = st_find((const char *)LOC(default_locale, name));
             }
             assert(sh->type || !"ship_type not registered!");
 

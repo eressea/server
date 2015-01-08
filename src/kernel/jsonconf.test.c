@@ -373,8 +373,8 @@ static void test_skills(CuTest * tc)
     CuAssertIntEquals(tc, SK_CROSSBOW, get_skill("kreuz", lang));
     CuAssertIntEquals(tc, SK_ALCHEMY, get_skill("alchemie", lang));
 
-    CuAssertStrEquals(tc, "ALCHEMIE", locale_string(lang, "skill::alchemy"));
-    CuAssertStrEquals(tc, "ARMBRUST", locale_string(lang, "skill::crossbow"));
+    CuAssertStrEquals(tc, "ALCHEMIE", LOC(lang, "skill::alchemy"));
+    CuAssertStrEquals(tc, "ARMBRUST", LOC(lang, "skill::crossbow"));
 
     test_cleanup();
 }
@@ -396,8 +396,8 @@ static void test_keywords(CuTest * tc)
     CuAssertIntEquals(tc, K_STUDY, get_keyword("lerne", lang));
     CuAssertIntEquals(tc, K_MOVE, get_keyword("nach", lang));
 
-    CuAssertStrEquals(tc, "LERNEN", locale_string(lang, "keyword::study"));
-    CuAssertStrEquals(tc, "NACH", locale_string(lang, "keyword::move"));
+    CuAssertStrEquals(tc, "LERNEN", LOC(lang, "keyword::study"));
+    CuAssertStrEquals(tc, "NACH", LOC(lang, "keyword::move"));
 
     test_cleanup();
 }
@@ -413,10 +413,10 @@ static void test_strings(CuTest * tc)
     test_cleanup();
     lang = get_or_create_locale("de");
     CuAssertPtrNotNull(tc, lang);
-    CuAssertPtrEquals(tc, NULL, (void *)locale_string(lang, "move"));
+    CuAssertPtrEquals(tc, NULL, (void *)LOC(lang, "move"));
     json_config(json);
-    CuAssertStrEquals(tc, "NACH", locale_string(lang, "move"));
-    CuAssertStrEquals(tc, "LERNEN", locale_string(lang, "study"));
+    CuAssertStrEquals(tc, "NACH", LOC(lang, "move"));
+    CuAssertStrEquals(tc, "LERNEN", LOC(lang, "study"));
 }
 
 static void test_infinitive_from_config(CuTest *tc) {
