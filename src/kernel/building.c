@@ -305,7 +305,7 @@ const building_type *findbuildingtype(const char *name,
         for (qi = 0, ql = buildingtypes; ql; ql_advance(&ql, &qi, 1)) {
             building_type *btype = (building_type *)ql_get(ql, qi);
 
-            const char *n = locale_string(lang, btype->_name);
+            const char *n = LOC(lang, btype->_name);
             type.v = (void *)btype;
             addtoken(&bn->names, n, type);
         }

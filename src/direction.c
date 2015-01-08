@@ -43,7 +43,7 @@ void init_directions(struct locale *lang) {
     register_special_direction(lang, "vortex");
 
     for (i = 0; dirs[i].direction != NODIRECTION; ++i) {
-        const char *str = locale_string(lang, dirs[i].name);
+        const char *str = locale_string(lang, dirs[i].name, false);
         if (str) {
             variant token;
             token.i = dirs[i].direction;

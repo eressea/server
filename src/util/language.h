@@ -18,6 +18,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #ifndef MY_LOCALE_H
 #define MY_LOCALE_H
+
+#include <platform.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -39,7 +42,7 @@ extern "C" {
     const char *value);
   extern const char *locale_getstring(const struct locale *lang,
     const char *key);
-  extern const char *locale_string(const struct locale *lang, const char *key); /* does fallback */
+  extern const char *locale_string(const struct locale *lang, const char *key, bool warn); /* does fallback */
   extern unsigned int locale_index(const struct locale *lang);
   extern const char *locale_name(const struct locale *lang);
 
@@ -48,7 +51,7 @@ extern "C" {
 
   extern void make_locales(const char *str);
 
-#define LOC(lang, s) (lang?locale_string(lang, s):s)
+#define LOC(lang, s) (lang?locale_string(lang, s, true):s)
 
   extern struct locale *default_locale;
   extern struct locale *locales;

@@ -92,7 +92,7 @@ static const char *crtag(const char *key)
     static const struct locale *lang = NULL;
     if (!lang)
         lang = get_locale(TAG_LOCALE);
-    return locale_string(lang, key);
+    return LOC(lang, key);
 }
 #else
 #define crtag(x) (x)
@@ -274,7 +274,7 @@ cr_output_curses(FILE * F, const faction * viewer, const void *obj, objtype_t ty
                     fputs("EFFECTS\n", F);
                 }
                 fprintf(F, "\"%d %s\"\n", data->value, translate(key,
-                    locale_string(default_locale, key)));
+                    LOC(default_locale, key)));
             }
         }
         a = a->next;
@@ -331,7 +331,7 @@ static int cr_resource(variant var, char *buffer, const void *userdata)
     if (r) {
         const char *key = resourcename(r, 0);
         sprintf(buffer, "\"%s\"",
-            translate(key, locale_string(report->locale, key)));
+            translate(key, LOC(report->locale, key)));
         return 0;
     }
     return -1;
@@ -343,7 +343,7 @@ static int cr_race(variant var, char *buffer, const void *userdata)
     const struct race *rc = (const race *)var.v;
     const char *key = rc_name_s(rc, NAME_SINGULAR);
     sprintf(buffer, "\"%s\"",
-        translate(key, locale_string(report->locale, key)));
+        translate(key, LOC(report->locale, key)));
     return 0;
 }
 
@@ -649,7 +649,7 @@ const faction * f, const region * r)
     if (sh->display && sh->display[0])
         fprintf(F, "\"%s\";Beschr\n", sh->display);
     fprintf(F, "\"%s\";Typ\n", translate(sh->type->_name,
-        locale_string(f->locale, sh->type->_name)));
+        LOC(f->locale, sh->type->_name)));
     fprintf(F, "%d;Groesse\n", sh->size);
     if (sh->damage) {
         int percent =
@@ -839,20 +839,20 @@ static void cr_output_unit(FILE * F, const region * r, const faction * f,       
         if (u->faction == f && fval(u_race(u), RCF_SHAPESHIFTANY)) {
             const char *zRace = rc_name_s(u_race(u), NAME_PLURAL);
             fprintf(F, "\"%s\";wahrerTyp\n",
-                translate(zRace, locale_string(f->locale, zRace)));
+                translate(zRace, LOC(f->locale, zRace)));
         }
     }
     else {
         const race *irace = u_irace(u);
         const char *zRace = rc_name_s(irace, NAME_PLURAL);
         fprintf(F, "\"%s\";Typ\n",
-            translate(zRace, locale_string(f->locale, zRace)));
+            translate(zRace, LOC(f->locale, zRace)));
         if (u->faction == f && irace != u_race(u)) {
             assert(skill_enabled(SK_STEALTH)
                 || !"we're resetting this on load, so.. ircase should never be used");
             zRace = rc_name_s(u_race(u), NAME_PLURAL);
             fprintf(F, "\"%s\";wahrerTyp\n",
-                translate(zRace, locale_string(f->locale, zRace)));
+                translate(zRace, LOC(f->locale, zRace)));
         }
     }
 
@@ -902,7 +902,7 @@ static void cr_output_unit(FILE * F, const region * r, const faction * f,       
         c = hp_status(u);
         if (c && *c && (u->faction == f || omniscient(f))) {
             fprintf(F, "\"%s\";hp\n", translate(c,
-                locale_string(u->faction->locale, c)));
+                LOC(u->faction->locale, c)));
         }
         if (fval(u, UFL_HERO)) {
             fputs("1;hero\n", F);
@@ -998,8 +998,7 @@ static void cr_output_unit(FILE * F, const region * r, const faction * f,       
             pr = 1;
             fputs("GEGENSTAENDE\n", F);
         }
-        fprintf(F, "%d;%s\n", in, translate(ic, locale_string(f->locale,
-            ic)));
+        fprintf(F, "%d;%s\n", in, translate(ic, LOC(f->locale, ic)));
     }
 
     cr_output_curses(F, f, u, TYP_UNIT);
@@ -1294,8 +1293,7 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
     }
     tname = terrain_name(r);
 
-    fprintf(F, "\"%s\";Terrain\n", translate(tname, locale_string(f->locale,
-        tname)));
+    fprintf(F, "\"%s\";Terrain\n", translate(tname, LOC(f->locale, tname)));
     if (sr->mode != see_unit)
         fprintf(F, "\"%s\";visibility\n", visibility[sr->mode]);
     if (sr->mode == see_neighbour) {
@@ -1359,12 +1357,12 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
                         if (lux) {
                             const char *ch = resourcename(lux->rtype, 0);
                             fprintf(F, "%d;%s\n", 1, translate(ch,
-                                locale_string(f->locale, ch)));
+                                LOC(f->locale, ch)));
                         }
                         if (herb) {
                             const char *ch = resourcename(herb->rtype, 0);
                             fprintf(F, "%d;%s\n", 1, translate(ch,
-                                locale_string(f->locale, ch)));
+                                LOC(f->locale, ch)));
                         }
                     }
                 }
@@ -1376,7 +1374,7 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
                         fprintf(F, "%d;%s\n", (dmd->value
                             ? dmd->value * dmd->type->price
                             : -dmd->type->price),
-                            translate(ch, locale_string(f->locale, ch)));
+                            translate(ch, LOC(f->locale, ch)));
                         dmd = dmd->next;
                     }
                 }
@@ -1491,7 +1489,7 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
     faction *f = ctx->f;
     const char *prefix;
     region *r;
-    const char *mailto = locale_string(f->locale, "mailto");
+    const char *mailto = LOC(f->locale, "mailto");
     const attrib *a;
     seen_region *sr = NULL;
 #if SCORE_MODULE
@@ -1530,7 +1528,7 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
     fprintf(F, "%d.%d.%d;Build\n", VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD);
     if (mailto != NULL) {
         fprintf(F, "\"%s\";mailto\n", mailto);
-        fprintf(F, "\"%s\";mailcmd\n", locale_string(f->locale, "mailcmd"));
+        fprintf(F, "\"%s\";mailcmd\n", LOC(f->locale, "mailcmd"));
     }
 
     show_alliances_cr(F, f);
@@ -1651,8 +1649,7 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
             continue;
         ch = resourcename(ptype->itype->rtype, 0);
         fprintf(F, "TRANK %d\n", hashstring(ch));
-        fprintf(F, "\"%s\";Name\n", translate(ch, locale_string(f->locale,
-            ch)));
+        fprintf(F, "\"%s\";Name\n", translate(ch, LOC(f->locale, ch)));
         fprintf(F, "%d;Stufe\n", ptype->level);
 
         if (description == NULL) {
@@ -1669,8 +1666,7 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
 
             while (m->number) {
                 ch = resourcename(m->rtype, 0);
-                fprintf(F, "\"%s\"\n", translate(ch, locale_string(f->locale,
-                    ch)));
+                fprintf(F, "\"%s\"\n", translate(ch, LOC(f->locale, ch)));
                 m++;
             }
         }

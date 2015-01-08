@@ -968,7 +968,7 @@ static bool CheckOverload(void)
     if (value < 0) {
         value = get_param_int(global.parameters, "rules.check_overload", 0);
     }
-    return value;
+    return value!=0;
 }
 
 int enter_ship(unit * u, struct order *ord, int id, bool report)
@@ -1411,11 +1411,11 @@ static void init_prefixnames(void)
             for (key = 0; race_prefixes[key]; ++key) {
                 variant var;
                 const char *pname =
-                    locale_string(lang, mkname("prefix", race_prefixes[key]));
+                    LOC(lang, mkname("prefix", race_prefixes[key]));
                 if (findtoken(in->names, pname, &var) == E_TOK_NOMATCH || var.i != key) {
                     var.i = key;
                     addtoken(&in->names, pname, var);
-                    addtoken(&in->names, locale_string(lang, mkname("prefix",
+                    addtoken(&in->names, LOC(lang, mkname("prefix",
                         race_prefixes[key])), var);
                 }
             }
@@ -2209,7 +2209,7 @@ static bool display_item(faction * f, unit * u, const item_type * itype)
     info = locale_getstring(f->locale, key);
 
     if (info == NULL) {
-        info = locale_string(f->locale, mkname("iteminfo", "no_info"));
+        info = LOC(f->locale, mkname("iteminfo", "no_info"));
     }
     ADDMSG(&f->msgs, msg_message("displayitem", "weight item description",
         itype->weight, itype->rtype, info));
@@ -2261,7 +2261,7 @@ static bool display_race(faction * f, unit * u, const race * rc)
     key = mkname("raceinfo", rc->_name);
     info = locale_getstring(f->locale, key);
     if (info == NULL) {
-        info = locale_string(f->locale, mkname("raceinfo", "no_info"));
+        info = LOC(f->locale, mkname("raceinfo", "no_info"));
     }
 
     bytes = (int)strlcpy(bufp, info, size);

@@ -1883,7 +1883,7 @@ char *write_unitname(const unit * u, char *buffer, size_t size)
     } else {
         const struct locale * lang = u->faction ? u->faction->locale : default_locale;
         const char * name = rc_name_s(u->_race, u->number == 1 ? NAME_SINGULAR : NAME_PLURAL);
-        slprintf(buffer, size, "%s (%s)", locale_string(lang, name), itoa36(u->no));
+        slprintf(buffer, size, "%s (%s)", LOC(lang, name), itoa36(u->no));
     }
     buffer[size - 1] = 0;
     return buffer;
@@ -1902,8 +1902,8 @@ bool unit_name_equals_race(const unit *u) {
         rc_name(u->_race, NAME_SINGULAR, sing, sizeof(sing));
         rc_name(u->_race, NAME_PLURAL, plur, sizeof(plur));
         if (strcmp(u->name, sing) == 0 || strcmp(u->name, plur) == 0 ||
-            strcmp(u->name, locale_string(lang, sing)) == 0 ||
-            strcmp(u->name, locale_string(lang, plur)) == 0) {
+            strcmp(u->name, LOC(lang, sing)) == 0 ||
+            strcmp(u->name, LOC(lang, plur)) == 0) {
             return true;
         }
     }

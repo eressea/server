@@ -1025,7 +1025,7 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
 
         if (r->land->ownership) {
             const char *str =
-                locale_string(f->locale, mkname("morale", itoa10(r->land->morale)));
+                LOC(f->locale, mkname("morale", itoa10(r->land->morale)));
             bytes = _snprintf(bufp, size, " %s", str);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
@@ -1701,7 +1701,7 @@ show_allies(const faction * f, const ally * allies, char *buf, size_t size)
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
         if ((mode & HELP_ALL) == HELP_ALL) {
-            bytes = (int)strlcpy(bufp, locale_string(f->locale, parameters[P_ANY]), size);
+            bytes = (int)strlcpy(bufp, LOC(f->locale, parameters[P_ANY]), size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
         }
@@ -1736,7 +1736,7 @@ show_allies(const faction * f, const ally * allies, char *buf, size_t size)
                         if (wrptr(&bufp, &size, bytes) != 0)
                             WARN_STATIC_BUFFER();
                     }
-                    bytes = (int)strlcpy(bufp, locale_string(f->locale, parameters[p]), size);
+                    bytes = (int)strlcpy(bufp, LOC(f->locale, parameters[p]), size);
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
                     hh = 1;

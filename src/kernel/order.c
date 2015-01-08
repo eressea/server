@@ -388,8 +388,6 @@ order *parse_order(const char *s, const struct locale * lang)
 bool is_repeated(const order * ord)
 {
     keyword_t kwd = ORD_KEYWORD(ord);
-    int result = 0;
-
     switch (kwd) {
     case K_CAST:
     case K_BUY:
@@ -411,13 +409,12 @@ bool is_repeated(const order * ord)
     case K_MAKE:
     case K_LOOT:
     case K_DESTROY:
-        result = 1;
-        break;
+        return true;
 
     default:
-        result = 0;
+        break;
     }
-    return result;
+    return false;
 }
 
 /**
@@ -431,7 +428,6 @@ bool is_repeated(const order * ord)
 bool is_exclusive(const order * ord)
 {
     keyword_t kwd = ORD_KEYWORD(ord);
-    int result = 0;
 
     switch (kwd) {
     case K_MOVE:
@@ -452,13 +448,12 @@ bool is_exclusive(const order * ord)
     case K_MAKE:
     case K_LOOT:
     case K_DESTROY:
-        result = 1;
-        break;
+        return true;
 
     default:
-        result = 0;
+        break;
     }
-    return result;
+    return false;
 }
 
 /**

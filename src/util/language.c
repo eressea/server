@@ -123,7 +123,7 @@ const char *locale_getstring(const locale * lang, const char *key)
     return NULL;
 }
 
-const char *locale_string(const locale * lang, const char *key)
+const char *locale_string(const locale * lang, const char *key, bool warn)
 {
     assert(lang);
     assert(key);
@@ -150,9 +150,11 @@ const char *locale_string(const locale * lang, const char *key)
         if (find) {
             return find->str;
         }
-        log_error("missing translation for \"%s\" in locale %s\n", key, lang->name);
+        if (warn) {
+            log_warning("missing translation for \"%s\" in locale %s\n", key, lang->name);
+        }
         if (lang->fallback) {
-            return locale_string(lang->fallback, key);
+            return locale_string(lang->fallback, key, warn);
         }
     }
     return 0;
@@ -262,7 +264,7 @@ void init_translations(const struct locale *lang, int ut, const char * (*string_
     tokens = get_translations(lang, ut);
     for (i = 0; i != maxstrings; ++i) {
         const char * s = string_cb(i);
-        const char * key = s ? locale_string(lang, s) : 0;
+        const char * key = s ? locale_string(lang, s, false) : 0;
         key = key ? key : s;
         if (key) {
             struct critbit_tree ** cb = (struct critbit_tree **)tokens;
