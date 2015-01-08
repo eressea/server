@@ -14,7 +14,7 @@ typedef struct locale_str {
 } locale_str;
 
 typedef struct locale {
-    const char *name;
+    char *name;
     unsigned int index;
     struct locale *next;
     unsigned int hashkey;

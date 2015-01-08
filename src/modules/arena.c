@@ -367,7 +367,7 @@ static void guardian_faction(plane * pl, int id)
       }
       if (u)
         continue;
-      u = createunit(r, f, 1, get_race(RC_GOBLIN));
+      u = create_unit(r, f, 1, get_race(RC_GOBLIN), 0, NULL, NULL);
       set_string(&u->name, "Igjarjuks Auge");
       i_change(&u->items, it_find("roi"), 1);
       set_order(&u->thisorder, NULL);

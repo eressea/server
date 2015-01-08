@@ -79,6 +79,8 @@ extern "C" {
     extern void a_write(struct storage *store, const attrib * attribs,
         const void *owner);
 
+    void free_attribs(void);
+
 #define DEFAULT_AGE NULL
 #define DEFAULT_INIT NULL
 #define DEFAULT_FINALIZE NULL

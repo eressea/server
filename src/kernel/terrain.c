@@ -63,8 +63,7 @@ const char *terraindata[MAXTERRAINS] = {
 
 static terrain_type *registered_terrains;
 
-#ifndef DISABLE_TESTS
-void test_clear_terrains(void)
+void free_terrains(void)
 {
   while (registered_terrains) {
     terrain_type * t = registered_terrains;
@@ -74,7 +73,6 @@ void test_clear_terrains(void)
     free(t);
   }
 }
-#endif
 
 const terrain_type *terrains(void)
 {

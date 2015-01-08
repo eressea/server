@@ -168,8 +168,9 @@ static unit *unitorders(FILE * F, int enc, struct faction *f)
 
             if (s[0]) {
                 if (s[0] != '@') {
+                    char token[128];
                     const char *stok = s;
-                    stok = parse_token_depr(&stok);
+                    stok = parse_token(&stok, token, sizeof(token));
 
                     if (stok) {
                         bool quit = false;
@@ -192,7 +193,6 @@ static unit *unitorders(FILE * F, int enc, struct faction *f)
                             }
                             break;
                         default:
-                            /* TODO: syntax error message */
                             break;
                         }
                         if (quit) {
@@ -274,20 +274,8 @@ int readorders(const char *filename)
         const char *s;
         init_tokens_str(b);
         s = gettoken(token, sizeof(token));
-        p = s ? findparam(s, lang) : NOPARAM;
+        p = (s && s[0] != '@') ? findparam(s, lang) : NOPARAM;
         switch (p) {
-#undef LOCALE_CHANGE
-#ifdef LOCALE_CHANGE
-        case P_LOCALE:
-        {
-            const char *s = getstrtoken();
-            if (f && get_locale(s)) {
-                f->locale = get_locale(s);
-            }
-        }
-        b = getbuf(F, enc_gamedata);
-        break;
-#endif
         case P_GAMENAME:
         case P_FACTION:
             f = factionorders();
@@ -311,8 +299,8 @@ int readorders(const char *filename)
                         break;
                     }
                     init_tokens_str(b);
-                    b = getstrtoken();
-                    p = (!b || b[0] == '@') ? NOPARAM : findparam(b, lang);
+                    s = gettoken(token, sizeof(token));
+                    p = (s && s[0] != '@') ? findparam(s, lang) : NOPARAM;
                 } while ((p != P_UNIT || !f) && p != P_FACTION && p != P_NEXT
                     && p != P_GAMENAME);
                 break;
@@ -1030,11 +1018,12 @@ void writeregion(struct gamedata *data, const region * r)
         WRITE_INT(data->store, rherbs(r));
         WRITE_INT(data->store, rpeasants(r));
         WRITE_INT(data->store, rmoney(r));
-        if (r->land)
+        if (r->land) {
             for (demand = r->land->demands; demand; demand = demand->next) {
                 WRITE_TOK(data->store, resourcename(demand->type->itype->rtype, 0));
                 WRITE_INT(data->store, demand->value);
             }
+        }
         WRITE_TOK(data->store, "end");
         write_items(data->store, r->land->items);
         WRITE_SECTION(data->store);

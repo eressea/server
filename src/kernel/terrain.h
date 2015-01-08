@@ -75,10 +75,7 @@ extern "C" {
   extern const char *terrain_name(const struct region *r);
 
   extern void init_terrains(void);
-
-#ifndef DISABLE_TESTS
-  void test_clear_terrains(void);
-#endif
+  void free_terrains(void);
 
 #ifdef __cplusplus
 }

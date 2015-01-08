@@ -45,6 +45,7 @@ static void test_export_no_regions(CuTest * tc) {
     buf[len] = '\0';
     CuAssertStrEquals(tc, "{}", strip(buf));
     mstream_done(&out);
+    test_cleanup();
 }
 
 static cJSON *export_a_region(CuTest * tc, const struct terrain_type *terrain, region **_r) {
@@ -93,6 +94,7 @@ static void test_export_land_region(CuTest * tc) {
     CuAssertPtrNotNull(tc, attr = cJSON_GetObjectItem(json, "name"));
     CuAssertStrEquals(tc, r->land->name, attr->valuestring);
     cJSON_Delete(json);
+    test_cleanup();
 }
 
 static void test_export_ocean_region(CuTest * tc) {
@@ -103,6 +105,7 @@ static void test_export_ocean_region(CuTest * tc) {
     json = export_a_region(tc, terrain, 0);
     CuAssertPtrEquals(tc, 0, cJSON_GetObjectItem(json, "name"));
     cJSON_Delete(json);
+    test_cleanup();
 }
 
 static void test_export_no_factions(CuTest * tc) {
@@ -119,6 +122,7 @@ static void test_export_no_factions(CuTest * tc) {
     buf[len]=0;
     CuAssertStrEquals(tc, "{}", strip(buf));
     mstream_done(&out);
+    test_cleanup();
 }
 
 CuSuite *get_json_suite(void) {

@@ -120,7 +120,7 @@ void skip_token(void)
   }
 }
 
-char *parse_token(const char **str, char *lbuf, size_t len)
+char *parse_token(const char **str, char *lbuf, size_t buflen)
 {
     char *cursor = lbuf;
     char quotechar = 0;
@@ -132,12 +132,12 @@ char *parse_token(const char **str, char *lbuf, size_t len)
     }
     eatwhitespace_c(&ctoken);
     if (!*ctoken) {
-        if (len > 0) {
+        if (buflen > 0) {
             *cursor = 0;
         }
         return 0;
     }
-    while (*ctoken && cursor-len < lbuf-1) {
+    while (*ctoken) {
         ucs4_t ucs;
         size_t len;
         bool copy = false;
@@ -188,28 +188,28 @@ char *parse_token(const char **str, char *lbuf, size_t len)
             copy = true;
         }
         if (copy) {
-            memcpy(cursor, ctoken, len);
-            cursor += len;
+            if (cursor - buflen < lbuf - 1) {
+                memcpy(cursor, ctoken, len);
+                cursor += len;
+            }
             ctoken += len;
         }
     }
 
-    assert(cursor - len < lbuf - 1); // TODO: handle too-small buffers
     *cursor = '\0';
     *str = ctoken;
     return lbuf;
 }
 
+static char pbuf[MAXTOKENSIZE];       /* STATIC_RESULT: used for return, not across calls */
 const char *parse_token_depr(const char **str)
 {
-  static char lbuf[MAXTOKENSIZE];       /* STATIC_RESULT: used for return, not across calls */
-  return parse_token(str, lbuf, MAXTOKENSIZE);
+  return parse_token(str, pbuf, MAXTOKENSIZE);
 }
 
 const char *getstrtoken(void)
 {
-    char lbuf[MAXTOKENSIZE];
-    return parse_token((const char **)&states->current_token, lbuf, MAXTOKENSIZE);
+    return parse_token((const char **)&states->current_token, pbuf, MAXTOKENSIZE);
 }
 
 const char *gettoken(char *lbuf, size_t bufsize)
@@ -232,7 +232,7 @@ unsigned int getuint(void)
 
 int getid(void)
 {
-    char token[16];
+    char token[8];
     const char *str = gettoken(token, sizeof(token));
     int i = str ? atoi36(str) : 0;
     if (i < 0) {

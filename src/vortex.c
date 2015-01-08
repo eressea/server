@@ -61,7 +61,10 @@ static void a_initdirection(attrib * a)
 
 static void a_freedirection(attrib * a)
 {
-    free(a->data.v);
+    spec_direction *d = (spec_direction *)(a->data.v);
+    free(d->desc);
+    free(d->keyword);
+    free(d);
 }
 
 static int a_agedirection(attrib * a)

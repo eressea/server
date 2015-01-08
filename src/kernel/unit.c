@@ -67,6 +67,31 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #define FIND_FOREIGN_TEMP
 
+int weight(const unit * u)
+{
+    int w = 0, n = 0, in_bag = 0;
+    const resource_type *rtype = get_resourcetype(R_BAG_OF_HOLDING);
+    item *itm;
+
+    for (itm = u->items; itm; itm = itm->next) {
+        w = itm->type->weight * itm->number;
+        n += w;
+        if (rtype && !fval(itm->type, ITF_BIG)) {
+            in_bag += w;
+        }
+    }
+
+    n += u->number * u_race(u)->weight;
+
+    if (rtype) {
+        w = i_get(u->items, rtype->itype) * BAGCAPACITY;
+        if (w > in_bag) w = in_bag;
+        n -= w;
+    }
+
+    return n;
+}
+
 attrib_type at_creator = {
     "creator"
     /* Rest ist NULL; temporaeres, nicht alterndes Attribut */

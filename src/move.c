@@ -170,22 +170,6 @@ attrib_type at_shiptrail = {
     shiptrail_read
 };
 
-static int age_speedup(attrib * a)
-{
-    if (a->data.sa[0] > 0) {
-        a->data.sa[0] = a->data.sa[0] - a->data.sa[1];
-    }
-    return (a->data.sa[0] > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
-}
-
-attrib_type at_speedup = {
-    "speedup",
-    NULL, NULL,
-    age_speedup,
-    a_writeint,
-    a_readint
-};
-
 /* ------------------------------------------------------------- */
 
 static attrib_type at_driveweight = {

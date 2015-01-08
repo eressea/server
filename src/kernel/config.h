@@ -40,6 +40,7 @@ extern "C" {
 #ifndef MAXUNITS
 # define MAXUNITS 1048573       /* must be prime for hashing. 524287 was >90% full */
 #endif
+#define MAXLUXURIES 16 /* there must be no more than MAXLUXURIES kinds of luxury goods in any game */
 
 #define TREESIZE (8)            /* space used by trees (in #peasants) */
 
@@ -91,7 +92,6 @@ extern "C" {
 
 #define want(option) (1<<option)
     /* ------------------------------------------------------------- */
-    int shipspeed(const struct ship *sh, const struct unit *u);
 
 #define i2b(i) ((bool)((i)?(true):(false)))
 
@@ -104,9 +104,6 @@ extern "C" {
 
     int max_magicians(const struct faction * f);
     int findoption(const char *s, const struct locale *lang);
-
-    /* special units */
-    void make_undead_unit(struct unit *);
 
     param_t findparam(const char *s, const struct locale *lang);
     param_t findparam_ex(const char *s, const struct locale * lang);
@@ -132,9 +129,6 @@ extern "C" {
     int forbiddenid(int id);
     int newcontainerid(void);
 
-    struct unit *createunit(struct region *r, struct faction *f,
-        int number, const struct race *rc);
-    void create_unitid(struct unit *u, int id);
     int getunit(const struct region * r, const struct faction * f, struct unit **uresult);
 
     int read_unitid(const struct faction *f, const struct region *r);
@@ -187,25 +181,8 @@ extern "C" {
     bool has_limited_skills(const struct unit *u);
     const struct race *findrace(const char *, const struct locale *);
 
-    int ispresent(const struct faction *f, const struct region *r);
-
-    int check_option(struct faction *f, int option);
-
-    /* Anzahl Personen in einer Einheit festlegen. NUR (!) mit dieser Routine,
-     * sonst großes Unglück. Durch asserts an ein paar Stellen abgesichert. */
-    void verify_data(void);
-
-
-    int change_hitpoints(struct unit *u, int value);
-
-    int weight(const struct unit *u);
-    void changeblockchaos(void);
-
     bool idle(struct faction *f);
     bool unit_has_cursed_item(const struct unit *u);
-
-    /* simple garbage collection: */
-    void *gc_add(void *p);
 
     /* grammatik-flags: */
 #define GF_NONE 0

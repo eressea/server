@@ -5,6 +5,7 @@
 #include "json.h"
 
 #include <kernel/faction.h>
+#include <kernel/item.h>
 #include <kernel/config.h>
 #include <kernel/save.h>
 
@@ -14,6 +15,7 @@
 
 void eressea_free_game(void) {
   free_gamedata();
+  init_resources();
 }
 
 int eressea_read_game(const char * filename) {

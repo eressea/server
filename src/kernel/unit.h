@@ -125,6 +125,7 @@ extern "C" {
   extern struct attrib_type at_showskchange;
 
   int ualias(const struct unit *u);
+  int weight(const struct unit *u);
 
   const struct race *u_irace(const struct unit *u);
   const struct race *u_race(const struct unit *u);

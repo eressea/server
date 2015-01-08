@@ -147,14 +147,13 @@ const char *locale_string(const locale * lang, const char *key)
             }
             find = find->nexthash;
         }
-        if (!find) {
-            log_warning("missing translation for \"%s\" in locale %s\n", key, lang->name);
-            if (lang->fallback) {
-                return locale_string(lang->fallback, key);
-            }
-            return 0;
+        if (find) {
+            return find->str;
         }
-        return find->str;
+        log_error("missing translation for \"%s\" in locale %s\n", key, lang->name);
+        if (lang->fallback) {
+            return locale_string(lang->fallback, key);
+        }
     }
     return 0;
 }
@@ -242,6 +241,7 @@ void add_translation(struct critbit_tree **cbp, const char *key, int i) {
     if (str) {
         size_t len = strlen(str);
         if (!cb) {
+            // TODO: this will leak, because we do not know how to clean it up */
             *cbp = cb = (struct critbit_tree *)calloc(1, sizeof(struct critbit_tree *));
         }
         len = cb_new_kv(str, len, &i, sizeof(int), buffer);
@@ -319,6 +319,7 @@ void free_locales(void) {
                 free(strings);
             }
         }
+        free(locales->name);
         free(locales);
         locales = next;
     }

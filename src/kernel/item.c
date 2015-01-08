@@ -1167,10 +1167,7 @@ static item *default_spoil(const struct race *rc, int size)
     return itm;
 }
 
-#ifndef DISABLE_TESTS
-int free_itype_cb(const void * match, const void * key, size_t keylen, void *cbdata) {
-    item_type *itype;
-    cb_get_kv(match, &itype, sizeof(itype));
+int free_itype(item_type *itype) {
     free(itype->construction);
     free(itype->_appearance[0]);
     free(itype->_appearance[1]);
@@ -1182,16 +1179,23 @@ int free_rtype_cb(const void * match, const void * key, size_t keylen, void *cbd
     resource_type *rtype;
     cb_get_kv(match, &rtype, sizeof(rtype));
     free(rtype->_name);
+    if (rtype->itype) {
+        free_itype(rtype->itype);
+    }
     free(rtype);
     return 0;
 }
 
-void test_clear_resources(void)
+void free_resources(void)
 {
     int i;
 
     memset((void *)oldpotiontype, 0, sizeof(oldpotiontype));
-
+    while (luxurytypes) {
+        luxury_type * next = luxurytypes->next;
+        free(luxurytypes);
+        luxurytypes = next;
+    }
     cb_foreach(&cb_resources, "", 0, free_rtype_cb, 0);
     cb_clear(&cb_resources);
     ++num_resources;
@@ -1201,7 +1205,6 @@ void test_clear_resources(void)
         cb_clear(rnames + i);
     }
 }
-#endif
 
 void register_resources(void)
 {
