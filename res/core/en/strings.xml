@@ -1496,9 +1496,6 @@
   <string name="pay">
     <text locale="en">PAY</text>
   </string>
-  <string name="plant">
-    <text locale="en">PLANT</text>
-  </string>
   <string name="piracy">
     <text locale="en">PIRACY</text>
   </string>
@@ -1567,9 +1564,6 @@
   </string>
   <string name="destroy">
     <text locale="en">DESTROY</text>
-  </string>
-  <string name="grow">
-    <text locale="en">GROW</text>
   </string>
   <string name="loot">
     <text locale="en">loot</text>

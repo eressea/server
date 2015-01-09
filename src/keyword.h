@@ -64,7 +64,6 @@ typedef enum {
     K_GROUP,
     K_SORT,
     K_PREFIX,
-    K_PLANT,
     K_ALLIANCE,
     K_CLAIM,
     K_PROMOTION,

@@ -71,6 +71,8 @@ static void test_get_set_param(CuTest * tc)
     set_param(&par, "bar", "foo");
     CuAssertStrEquals(tc, "bar", get_param(par, "foo"));
     CuAssertStrEquals(tc, "foo", get_param(par, "bar"));
+    set_param(&par, "bar", NULL);
+    CuAssertPtrEquals(tc, NULL, (void *)get_param(par, "bar"));
 }
 
 static void test_param_int(CuTest * tc)

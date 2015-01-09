@@ -32,6 +32,7 @@ int config_parse(const char *json)
     if (conf) {
         json_config(conf); 
         cJSON_Delete(conf);
+        init_locales();
         return 0;
     } else {
         int line;

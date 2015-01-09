@@ -150,7 +150,7 @@ const char **name, const char **basename, int *number, bool singular)
     if (owner && owner->faction == viewer) {
         if (name)
             *name =
-            locale_string(viewer->locale, resourcename(i->type->rtype,
+            LOC(viewer->locale, resourcename(i->type->rtype,
             ((i->number != 1 && !singular) ? GR_PLURAL : 0)));
         if (basename)
             *basename = resourcename(i->type->rtype, 0);
@@ -163,19 +163,19 @@ const char **name, const char **basename, int *number, bool singular)
             *number = 1;
         if (pp > 50000 && dragonrace(u_race(owner))) {
             if (name)
-                *name = locale_string(viewer->locale, "dragonhoard");
+                *name = LOC(viewer->locale, "dragonhoard");
             if (basename)
                 *basename = "dragonhoard";
         }
         else if (pp > 5000) {
             if (name)
-                *name = locale_string(viewer->locale, "moneychest");
+                *name = LOC(viewer->locale, "moneychest");
             if (basename)
                 *basename = "moneychest";
         }
         else if (pp > 500) {
             if (name)
-                *name = locale_string(viewer->locale, "moneybag");
+                *name = LOC(viewer->locale, "moneybag");
             if (basename)
                 *basename = "moneybag";
         }
@@ -191,7 +191,7 @@ const char **name, const char **basename, int *number, bool singular)
     else {
         if (name)
             *name =
-            locale_string(viewer->locale, resourcename(i->type->rtype,
+            LOC(viewer->locale, resourcename(i->type->rtype,
             NMF_APPEARANCE | ((i->number != 1 && !singular) ? GR_PLURAL : 0)));
         if (basename)
             *basename = resourcename(i->type->rtype, NMF_APPEARANCE);
@@ -584,7 +584,7 @@ size_t size)
 
     if (u->number && (u->faction == f || telepath_see || isbattle)) {
         const char *c = hp_status(u);
-        c = c ? locale_string(f->locale, c) : 0;
+        c = c ? LOC(f->locale, c) : 0;
         bytes = (int)strlcpy(bufp, ", ", size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
@@ -1956,7 +1956,7 @@ const char *trailinto(const region * r, const struct locale *lang)
     if (r) {
         const char *tname = terrain_name(r);
         strcat(strcpy(ref, tname), "_trail");
-        s = locale_string(lang, ref);
+        s = LOC(lang, ref);
         if (s && *s) {
             if (strstr(s, "%s"))
                 return s;
@@ -2003,7 +2003,7 @@ static void eval_localize(struct opstack **stack, const void *userdata)
     const struct faction *f = (const struct faction *)userdata;
     const struct locale *lang = f ? f->locale : default_locale;
     const char *c = (const char *)opop_v(stack);
-    c = locale_string(lang, c);
+    c = LOC(lang, c);
     opush_v(stack, strcpy(balloc(strlen(c) + 1), c));
 }
 

@@ -54,10 +54,6 @@ function disable_test_bug_1738_build_castle_e3()
     -- 33/4 makes 8 points, resulting size is 258.
 
     process_orders()
-    --[[
-    init_reports()
-    write_report(f)
-    ]]--
     -- resulting size should be 250 because unit 2
     -- does not have the needed minimum skill.
     assert_equal(c.size, 250)
@@ -302,13 +298,11 @@ function test_ship_capacity()
     process_orders()
     if r2~=u1.region then
         print(get_turn(), u1, u1.faction)
-        write_reports()
     end
     assert_equal(r2, u1.region)
     assert_not_equal(r2.id, u2.region.id)
     if r2~=u3.region then
         print(get_turn(), u3, u3.faction)
-        write_reports()
     end
     assert_equal(r2, u3.region)
     assert_not_equal(r2.id, u4.region.id)
@@ -375,8 +369,6 @@ function test_region_owner_cannot_leave_castle()
     u:clear_orders()
     u:add_order("BETRETE BURG " .. itoa36(b2.id))
     process_orders()
-    init_reports()
-    write_report(u.faction)
     assert_equal(b1, u.building, "region owner has left the building") -- region owners may not leave
 end
 
