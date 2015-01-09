@@ -519,8 +519,6 @@ void register_tolua_helpers(void)
     at_register(&at_direction);
     at_register(&at_building_action);
 
-  register_function((pf_generic) & lua_building_protection,
-    TOLUA_CAST "lua_building_protection");
   register_function((pf_generic) & lua_building_taxes,
     TOLUA_CAST "lua_building_taxes");
   register_function((pf_generic) & lua_agebuilding,
