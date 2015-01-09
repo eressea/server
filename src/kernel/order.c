@@ -467,7 +467,6 @@ bool is_exclusive(const order * ord)
 bool is_long(const order * ord)
 {
     keyword_t kwd = ORD_KEYWORD(ord);
-    bool result = false;
 
     switch (kwd) {
     case K_CAST:
@@ -494,9 +493,9 @@ bool is_long(const order * ord)
         return true;
 
     default:
-        result = false;
+        break;
     }
-    return result;
+    return false;
 }
 
 /**
@@ -524,7 +523,6 @@ bool is_persistent(const order * ord)
     default:
         return persist || is_repeated(ord);
     }
-
 }
 
 char *write_order(const order * ord, char *buffer, size_t size)
