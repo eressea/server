@@ -48,6 +48,12 @@ extern "C" {
 #define BTF_ONEPERTURN     0x80 /* one one sizepoint can be added per turn */
 #define BTF_NAMECHANGE    0x100 /* name and description can be changed more than once */
 
+  typedef enum {
+      DEFENSE_BONUS,
+      CC_ATTACK_BONUS,
+      RANGED_ATTACK_BONUS,
+  } buildingbonus;
+
   typedef struct building_type {
     char *_name;
 
@@ -66,7 +72,7 @@ extern "C" {
       const struct building * b, int size);
     void (*init) (struct building_type *);
     void (*age) (struct building *);
-    int (*protection) (struct building *, struct unit *);
+    int (*protection) (struct building *, struct unit *, buildingbonus);
     double (*taxes) (const struct building *, int size);
     struct attrib *attribs;
   } building_type;

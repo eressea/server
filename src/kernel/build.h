@@ -45,6 +45,9 @@ extern "C" {
 
     int maxsize;                /* maximum size of this type */
     int reqsize;                /* size of object using up 1 set of requirement. */
+    int prot;                   /* protection bonus (defense) during combat */
+    int ccbonus;                /* close combat attack bonus*/
+    int rangedbonus;            /* ranged attack bonus */
     requirement *materials;     /* material req'd to build one object */
     const struct building_type *btype;
     /* building type required to make this thing */

@@ -388,32 +388,6 @@ static void lua_agebuilding(building * b)
   }
 }
 
-static int lua_building_protection(building * b, unit * u)
-{
-  lua_State *L = (lua_State *) global.vm_state;
-  const char *fname = "building_protection";
-  int result = 0;
-
-  lua_getglobal(L, fname);
-  if (lua_isfunction(L, -1)) {
-    tolua_pushusertype(L, (void *)b, TOLUA_CAST "building");
-    tolua_pushusertype(L, (void *)u, TOLUA_CAST "unit");
-
-    if (lua_pcall(L, 2, 1, 0) != 0) {
-      const char *error = lua_tostring(L, -1);
-      log_error("building_protection(%s, %s) calling '%s': %s.\n", buildingname(b), unitname(u), fname, error);
-      lua_pop(L, 1);
-    } else {
-      result = (int)lua_tonumber(L, -1);
-      lua_pop(L, 1);
-    }
-  } else {
-    log_error("building_protection(%s, %s) calling '%s': not a function.\n", buildingname(b), unitname(u), fname);
-    lua_pop(L, 1);
-  }
-  return result;
-}
-
 static double lua_building_taxes(building * b, int level)
 {
   lua_State *L = (lua_State *) global.vm_state;

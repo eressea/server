@@ -57,7 +57,7 @@ static void test_make_fighter(CuTest * tc)
     test_cleanup();
 }
 
-static int add_two(building * b, unit * u) {
+static int add_two(building * b, unit * u, buildingbonus bonus) {
   return 2;
 }
 
