@@ -126,25 +126,27 @@ set(SERVER_SRC
   bind_ship.c
   bind_storage.c
   bind_unit.c
-  ${ERESSEA_SRC})
+)
 
 if (SQLITE3_FOUND)
-set (SERVER_SRC
+set (SERVER_SRC ${SERVER_SRC}
   sqlite.c
   bind_sqlite.c
-  ${SERVER_SRC})
+)
 endif (SQLITE3_FOUND)
 
 if (CURSES_FOUND)
-set (SERVER_SRC
+set (SERVER_SRC ${SERVER_SRC}
   gmtool.c
   listbox.c
   bind_gmtool.c
-  ${SERVER_SRC})
+)
 endif(CURSES_FOUND)
 
+add_library(game ${ERESSEA_SRC})
 add_executable(eressea ${SERVER_SRC})
 target_link_libraries(eressea
+  game
   ${TOLUA_LIBRARIES}
   ${LUA_LIBRARIES}
   ${QUICKLIST_LIBRARIES}
@@ -178,12 +180,12 @@ set(TESTS_SRC
   ${ATTRIBUTES_TESTS}
   ${UTIL_TESTS}
   ${KERNEL_TESTS}
-  ${ERESSEA_SRC}
 )
 
 add_executable(test_eressea ${TESTS_SRC})
-target_link_libraries(test_eressea ${CUTEST_LIBRARIES})
 target_link_libraries(test_eressea
+  game
+  ${CUTEST_LIBRARIES}
   ${LUA_LIBRARIES}
   ${QUICKLIST_LIBRARIES}
   ${STORAGE_LIBRARIES}
