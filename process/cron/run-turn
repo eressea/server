@@ -1,0 +1,14 @@
+GAME=$1
+TURN=$2
+
+if [ ! -d $ERESSEA/game-$GAME ] ; then
+  echo "No such game: $GAME"
+  exit 1
+fi
+
+cd $ERESSEA/game-$GAME
+
+echo "running turn $TURN, game $GAME"
+$ERESSEA/server/bin/eressea -v1 -t $TURN run-turn.lua
+mkdir -p log
+ln -f eressea.log log/eressea.log.$TURN
