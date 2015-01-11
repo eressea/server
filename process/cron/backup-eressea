@@ -1,0 +1,31 @@
+#!/bin/bash
+if [ -z $ERESSEA ] ; then
+  ERESSEA=$HOME/eressea
+  echo "The ERESSEA environment variable is not set. Assuming $ERESSEA."
+fi
+GAME=$1
+if [ ! -d $ERESSEA/game-$GAME ]; then
+  echo "No such game: game-$GAME."
+  exit 1
+fi
+cd $ERESSEA/game-$GAME
+TURN=$2
+if [ -z $TURN ]; then
+  TURN=$(cat turn)
+fi
+if [ ! -e data/$TURN.dat ]; then
+  echo "No data for turn $TURN in game $GAME."
+  exit 2
+fi
+if [ ! -d backup ] ; then
+  echo "creating missing backup directory for game $GAME."
+  mkdir -p ~/backup/eressea/game-$GAME
+  ln -sf ~/backup/eressea/game-$GAME backup
+fi
+
+files="data/$TURN.dat parteien.full parteien"
+if [ -e orders.$TURN ]; then
+files="$files orders.$TURN"
+fi
+echo "backup turn $TURN, game $GAME, files: $files"
+tar cjf backup/$TURN.tar.bz2 $files
