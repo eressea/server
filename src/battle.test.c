@@ -159,7 +159,7 @@ static void test_building_bonus_respects_size(CuTest * tc)
 
   f = test_create_faction(rc_find("human"));
   au = test_create_unit(f, r);
-  scale_number(au, 9);
+  scale_number(au, 39);
   u_set_building(au, bld);
   du = test_create_unit(f, r);
   u_set_building(du, bld);

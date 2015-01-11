@@ -237,26 +237,11 @@ static const char *castle_name_i(const struct building_type *btype,
     return fname[i];
 }
 
-static const char *castle_name_2(const struct building_type *btype,
-    const struct building *b, int bsize)
-{
-    const char *fname[] = {
-        "site",
-        "fortification",
-        "tower",
-        "castle",
-        "fortress",
-        "citadel"
-    };
-    return castle_name_i(btype, b, bsize, fname);
-}
-
 static const char *castle_name(const struct building_type *btype,
     const struct building *b, int bsize)
 {
     const char *fname[] = {
         "site",
-        "tradepost",
         "fortification",
         "tower",
         "castle",
@@ -316,12 +301,47 @@ const building_type *findbuildingtype(const char *name,
     return (const building_type *)type.v;
 }
 
-static int eressea_building_protection(building * b, unit * u)
+static int building_protection(building * b, unit * u)
 {
-    int beff = buildingeffsize(b, false) - 1;
-    /* -1 because the tradepost has no protection value */
-
-    return beff;
+    int site = -1, fortificaton =-1, tower = -1, castle = -1, fortress = -1, citadel = -1;
+    if (site < 0 || fortificaton < 0 || tower < 0 || castle < 0 || fortress < 0 || citadel < 0 ) {
+        site = get_param_int(global.parameters, "rules.castles.site_protection", 0);
+        fortificaton = get_param_int(global.parameters, "rules.castles.fortificaton_protection", 1);
+        tower = get_param_int(global.parameters, "rules.castles.tower_protection", 3);
+        castle = get_param_int(global.parameters, "rules.castles.castle_protection", 5);
+        fortress = get_param_int(global.parameters, "rules.castles.fortress_protection", 8);
+        citadel = get_param_int(global.parameters, "rules.castles.citadel_protection", 12);
+    }
+    int beff = buildingeffsize(b, false);
+    switch (beff)
+    {
+    case 0: {
+                /*CTD site or scaffolding 0*/
+                return site;
+    }
+    case 1: {
+                /* fortification or guardhouse 1*/
+                return fortificaton;
+    }
+    case 2: {
+                /* tower or guardtower 3*/
+                return tower;
+    }
+    case 3: {
+                /* castle 5*/
+                return castle;
+    }
+    case 4: {
+                /* fortress 8*/
+                return fortress;
+    }
+    case 5: {
+                /* citadel 12*/
+                return citadel;
+    }
+    default:
+        return 0;
+    }
 }
 
 static int meropis_building_protection(building * b, unit * u)
@@ -331,13 +351,12 @@ static int meropis_building_protection(building * b, unit * u)
 
 void register_buildings(void)
 {
-    register_function((pf_generic)& eressea_building_protection,
+    register_function((pf_generic)& building_protection,
         "eressea_building_protection");
     register_function((pf_generic)& meropis_building_protection,
         "meropis_building_protection");
     register_function((pf_generic)& init_smithy, "init_smithy");
     register_function((pf_generic)& castle_name, "castle_name");
-    register_function((pf_generic)& castle_name_2, "castle_name_2");
     register_function((pf_generic)& fort_name, "fort_name");
 }
 

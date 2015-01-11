@@ -1,11 +1,9 @@
 <?xml version="1.0"?>
-<building name="castle" capacity="1">
+<building name="castle" capacity="4">
   <function name="name" value="castle_name"/>
-  <function name="protection" value="eressea_building_protection"/>
-  <construction skill="building" minskill="1" maxsize="2" reqsize="1">
-    <requirement type="stone" quantity="1"/>
-  </construction>
-  <construction skill="building" minskill="1" maxsize="8" reqsize="1">
+  <function name="protection" value="building_protection"/>
+  <function name="taxes" value="lua_building_taxes"/>
+  <construction skill="building" minskill="1" maxsize="10" reqsize="1">
     <requirement type="stone" quantity="1"/>
   </construction>
   <construction skill="building" minskill="2" maxsize="40" reqsize="1">

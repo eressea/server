@@ -1872,7 +1872,7 @@ static void add_income(unit * u, int type, int want, int qty)
 }
 
 /* Steuersätze in % bei Burggröße */
-static int tax_per_size[7] = { 0, 6, 12, 18, 24, 30, 36 };
+static int tax_per_size[6] = { 0, 12, 18, 24, 30, 36 };
 
 static void expandselling(region * r, request * sellorders, int limit)
 {
