@@ -13,6 +13,7 @@ extern "C" {
     struct faction;
     struct building;
     struct ship;
+    struct message;
     struct item_type;
     struct building_type;
     struct ship_type;
