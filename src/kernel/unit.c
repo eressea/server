@@ -1725,21 +1725,23 @@ int unit_max_hp(const unit * u)
             get_param_int(global.parameters, "rules.stamina", STAMINA_AFFECTS_HP);
     }
     h = u_race(u)->hitpoints;
-    if (heal_ct == NULL)
-        heal_ct = ct_find("healingzone");
 
     if (rules_stamina & 1) {
         p = pow(effskill(u, SK_STAMINA) / 2.0, 1.5) * 0.2;
         h += (int)(h * p + 0.5);
     }
+
     /* der healing curse veraendert die maximalen hp */
-    if (heal_ct) {
-        curse *c = get_curse(u->region->attribs, heal_ct);
-        if (c) {
-            h = (int)(h * (1.0 + (curse_geteffect(c) / 100)));
+    if (u->region) {
+        if (heal_ct == NULL)
+            heal_ct = ct_find("healingzone");
+        if (heal_ct) {
+            curse *c = get_curse(u->region->attribs, heal_ct);
+            if (c) {
+                h = (int)(h * (1.0 + (curse_geteffect(c) / 100)));
+            }
         }
     }
-
     return h;
 }
 
