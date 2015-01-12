@@ -43,7 +43,7 @@ static void test_magicstreet(CuTest *tc) {
     curse_fixture fix;
     message *msg;
     setup_curse(&fix, "magicstreet");
-    fix.c->duration = 3;
+    fix.c->duration = 2;
     msg = fix.c->type->curseinfo(fix.r, TYP_REGION, fix.c, 0);
     CuAssertStrEquals(tc, "curseinfo::magicstreet", test_get_messagetype(msg));
     msg_release(msg);
@@ -54,9 +54,31 @@ static void test_magicstreet_warning(CuTest *tc) {
     curse_fixture fix;
     message *msg;
     setup_curse(&fix, "magicstreet");
-    fix.c->duration = 2;
+    fix.c->duration = 1;
     msg = fix.c->type->curseinfo(fix.r, TYP_REGION, fix.c, 0);
     CuAssertStrEquals(tc, "curseinfo::magicstreetwarn", test_get_messagetype(msg));
+    msg_release(msg);
+    test_cleanup();
+}
+
+static void test_good_dreams(CuTest *tc) {
+    curse_fixture fix;
+    message *msg;
+    setup_curse(&fix, "gbdream");
+    fix.c->effect = 1;
+    msg = fix.c->type->curseinfo(fix.r, TYP_REGION, fix.c, 0);
+    CuAssertStrEquals(tc, "curseinfo::gooddream", test_get_messagetype(msg));
+    msg_release(msg);
+    test_cleanup();
+}
+
+static void test_bad_dreams(CuTest *tc) {
+    curse_fixture fix;
+    message *msg;
+    setup_curse(&fix, "gbdream");
+    fix.c->effect = -1;
+    msg = fix.c->type->curseinfo(fix.r, TYP_REGION, fix.c, 0);
+    CuAssertStrEquals(tc, "curseinfo::baddream", test_get_messagetype(msg));
     msg_release(msg);
     test_cleanup();
 }
@@ -67,5 +89,7 @@ CuSuite *get_curse_suite(void)
   SUITE_ADD_TEST(suite, test_curse);
   SUITE_ADD_TEST(suite, test_magicstreet);
   SUITE_ADD_TEST(suite, test_magicstreet_warning);
+  SUITE_ADD_TEST(suite, test_good_dreams);
+  SUITE_ADD_TEST(suite, test_bad_dreams);
   return suite;
 }
