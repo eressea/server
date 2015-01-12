@@ -99,7 +99,7 @@ static message *cinfo_magicstreet(const void *obj, objtype_t typ, const curse * 
   assert(typ == TYP_REGION);
 
   /* Warnung vor Auflösung */
-  if (c->duration <= 2) {
+  if (c->duration >= 2) {
     return msg_message("curseinfo::magicstreet", "id", c->no);
   }
   return msg_message("curseinfo::magicstreetwarn", "id", c->no);
