@@ -2,7 +2,11 @@
 #include "types.h"
 #include "curse.h"
 
+#include <kernel/region.h>
+#include <kernel/unit.h>
 #include <util/attrib.h>
+#include <util/message.h>
+#include <tests.h>
 
 #include <CuTest.h>
 
@@ -22,9 +26,46 @@ static void test_curse(CuTest * tc)
   CuAssertPtrEquals(tc, NULL, result);
 }
 
+typedef struct {
+    curse *c;
+    region *r;
+    unit *u;
+} curse_fixture;
+
+static void setup_curse(curse_fixture *fix, const char *name) {
+    test_cleanup();
+    fix->r = test_create_region(0, 0, NULL);
+    fix->u = test_create_unit(test_create_faction(NULL), fix->r);
+    fix->c = create_curse(fix->u, &fix->r->attribs, ct_find(name), 1.0, 1, 1.0, 0);
+}
+
+static void test_magicstreet(CuTest *tc) {
+    curse_fixture fix;
+    message *msg;
+    setup_curse(&fix, "magicstreet");
+    fix.c->duration = 3;
+    msg = fix.c->type->curseinfo(fix.r, TYP_REGION, fix.c, 0);
+    CuAssertStrEquals(tc, "curseinfo::magicstreet", test_get_messagetype(msg));
+    msg_release(msg);
+    test_cleanup();
+}
+
+static void test_magicstreet_warning(CuTest *tc) {
+    curse_fixture fix;
+    message *msg;
+    setup_curse(&fix, "magicstreet");
+    fix.c->duration = 2;
+    msg = fix.c->type->curseinfo(fix.r, TYP_REGION, fix.c, 0);
+    CuAssertStrEquals(tc, "curseinfo::magicstreetwarn", test_get_messagetype(msg));
+    msg_release(msg);
+    test_cleanup();
+}
+
 CuSuite *get_curse_suite(void)
 {
   CuSuite *suite = CuSuiteNew();
   SUITE_ADD_TEST(suite, test_curse);
+  SUITE_ADD_TEST(suite, test_magicstreet);
+  SUITE_ADD_TEST(suite, test_magicstreet_warning);
   return suite;
 }

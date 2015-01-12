@@ -20,12 +20,14 @@
 #include <modules/xmas.h>
 #include <items/itemtypes.h>
 #include <attributes/attributes.h>
+#include <races/races.h>
 #include "chaos.h"
 #include "report.h"
 #include "items.h"
 #include "creport.h"
 #include "names.h"
 #include "wormhole.h"
+#include "spells.h"
 
 void game_done(void)
 {
@@ -55,6 +57,8 @@ void game_init(void)
     register_nr();
     register_cr();
 
+    register_races();
+    register_spells();
     register_names();
     register_resources();
     register_buildings();

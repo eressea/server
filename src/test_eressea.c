@@ -1,4 +1,5 @@
 #include <platform.h>
+#include <eressea.h>
 #include <kernel/config.h>
 #include <CuTest.h>
 #include <stdio.h>
@@ -30,7 +31,7 @@ int RunAllTests(void)
   int fail_count, flags = log_flags;
 
   log_flags = LOG_FLUSH | LOG_CPERROR;
-  kernel_init();
+  game_init();
 
   /* self-test */
   RUN_TESTS(suite, tests);
@@ -86,7 +87,7 @@ int RunAllTests(void)
   log_flags = flags;
   fail_count = suite->failCount;
   CuSuiteDelete(suite);
-  kernel_done();
+  game_done();
   return fail_count;
 }
 
