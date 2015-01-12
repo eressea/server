@@ -316,7 +316,7 @@ const building_type *findbuildingtype(const char *name,
     return (const building_type *)type.v;
 }
 
-static int building_protection(building * b, unit * u, buildingbonus bonus)
+static int building_protection(building * b, unit * u, building_bonus bonus)
 {
 
     int i = 0;
@@ -334,11 +334,11 @@ static int building_protection(building * b, unit * u, buildingbonus bonus)
     switch (bonus)
     {
     case DEFENSE_BONUS:
-        return cons->prot;
-    case CC_ATTACK_BONUS:
-        return cons->ccbonus;
+        return cons->defense_bonus;
+    case CLOSE_COMBAT_ATTACK_BONUS:
+        return cons->close_combat_bonus;
     case RANGED_ATTACK_BONUS:
-        return cons->rangedbonus;
+        return cons->ranged_bonus;
     default:
         return 0;
     }
