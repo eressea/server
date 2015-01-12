@@ -74,10 +74,11 @@ static message *cinfo_dreamcurse(const void *obj, objtype_t typ, const curse * c
   unused_arg(obj);
   assert(typ == TYP_REGION);
 
-  if (curse_geteffect(c) > 0) {
+  if (c->effect > 0) {
     return msg_message("curseinfo::gooddream", "id", c->no);
+  } else {
+    return msg_message("curseinfo::baddream", "id", c->no);
   }
-  return msg_message("curseinfo::baddream", "id", c->no);
 }
 
 static struct curse_type ct_gbdream = {
