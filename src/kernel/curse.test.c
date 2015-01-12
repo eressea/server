@@ -45,7 +45,7 @@ static void test_magicstreet(CuTest *tc) {
     setup_curse(&fix, "magicstreet");
     fix.c->duration = 3;
     msg = fix.c->type->curseinfo(fix.r, TYP_REGION, fix.c, 0);
-    CuAssertStrEquals(tc, "curseinfo::magicstreet", (const char *)msg->parameters[0].v);
+    CuAssertStrEquals(tc, "curseinfo::magicstreet", test_get_messagetype(msg));
     msg_release(msg);
     test_cleanup();
 }
@@ -56,7 +56,7 @@ static void test_magicstreet_warning(CuTest *tc) {
     setup_curse(&fix, "magicstreet");
     fix.c->duration = 2;
     msg = fix.c->type->curseinfo(fix.r, TYP_REGION, fix.c, 0);
-    CuAssertStrEquals(tc, "curseinfo::magicstreetwarn", (const char *)msg->parameters[0].v);
+    CuAssertStrEquals(tc, "curseinfo::magicstreetwarn", test_get_messagetype(msg));
     msg_release(msg);
     test_cleanup();
 }

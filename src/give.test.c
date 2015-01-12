@@ -106,7 +106,7 @@ static void test_give_men_none(CuTest * tc) {
     env.f2 = env.f1 = test_create_faction(0);
     setup_give(&env);
     msg = give_men(0, env.src, env.dst, NULL);
-    CuAssertStrEquals(tc, "error96", (const char *)msg->parameters[3].v);
+    CuAssertStrEquals(tc, "error96", test_get_messagetype(msg));
     CuAssertIntEquals(tc, 1, env.dst->number);
     CuAssertIntEquals(tc, 1, env.src->number);
     test_cleanup();
@@ -137,7 +137,7 @@ static void test_give_men_requires_contact(CuTest * tc) {
     env.f2 = test_create_faction(0);
     setup_give(&env);
     msg = give_men(1, env.src, env.dst, NULL);
-    CuAssertStrEquals(tc, "feedback_no_contact", (const char *)msg->parameters[3].v);
+    CuAssertStrEquals(tc, "feedback_no_contact", test_get_messagetype(msg));
     CuAssertIntEquals(tc, 1, env.dst->number);
     CuAssertIntEquals(tc, 1, env.src->number);
     test_cleanup();
@@ -150,7 +150,7 @@ static void test_give_men_not_to_self(CuTest * tc) {
     env.f2 = env.f1 = test_create_faction(0);
     setup_give(&env);
     msg = give_men(1, env.src, env.src, NULL);
-    CuAssertStrEquals(tc, "error10", (const char *)msg->parameters[3].v);
+    CuAssertStrEquals(tc, "error10", test_get_messagetype(msg));
     CuAssertIntEquals(tc, 1, env.src->number);
     test_cleanup();
 }
