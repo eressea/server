@@ -16,6 +16,7 @@
 #include <kernel/terrain.h>
 #include <util/functions.h>
 #include <util/language.h>
+#include <util/message.h>
 #include <util/log.h>
 
 #include <assert.h>
@@ -190,5 +191,16 @@ void test_create_world(void)
 
   test_create_buildingtype("castle");
   test_create_shiptype("boat");
+}
+
+const char * test_get_messagetype(const message *msg) {
+    const char * name = msg->type->name;
+    if (strcmp(name, "missing_message") == 0) {
+        name = (const char *)msg->parameters[0].v;
+    }
+    else if (strcmp(name, "missing_feedback") == 0) {
+        name = (const char *)msg->parameters[3].v;
+    }
+    return name;
 }
 
