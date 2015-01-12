@@ -9,6 +9,7 @@
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
+#include <util/functions.h>
 
 #include <CuTest.h>
 #include "tests.h"
@@ -26,7 +27,7 @@ static void test_make_fighter(CuTest * tc)
     test_cleanup();
     test_create_world();
     r = findregion(0, 0);
-    f = test_create_faction(rc_find("human"));
+    f = test_create_faction(NULL);
     au = test_create_unit(f, r);
     enable_skill(SK_MAGIC, true);
     enable_skill(SK_RIDING, true);
@@ -81,8 +82,8 @@ static void test_defenders_get_building_bonus(CuTest * tc)
     bld = test_create_building(r, btype);
     bld->size = 10;
 
-    du = test_create_unit(test_create_faction(rc_find("human")), r);
-    au = test_create_unit(test_create_faction(rc_find("human")), r);
+    du = test_create_unit(test_create_faction(NULL), r);
+    au = test_create_unit(test_create_faction(NULL), r);
     u_set_building(du, bld);
 
     b = make_battle(r);
@@ -126,7 +127,7 @@ static void test_attackers_get_no_building_bonus(CuTest * tc)
     bld = test_create_building(r, btype);
     bld->size = 10;
 
-    au = test_create_unit(test_create_faction(rc_find("human")), r);
+    au = test_create_unit(test_create_faction(NULL), r);
     u_set_building(au, bld);
 
     b = make_battle(r);
@@ -157,7 +158,7 @@ static void test_building_bonus_respects_size(CuTest * tc)
     bld = test_create_building(r, btype);
     bld->size = 10;
 
-    f = test_create_faction(rc_find("human"));
+    f = test_create_faction(NULL);
     au = test_create_unit(f, r);
     scale_number(au, 9);
     u_set_building(au, bld);
@@ -189,12 +190,12 @@ static void test_building_defence_bonus(CuTest * tc)
     r = findregion(0, 0);
     register_buildings();
     btype = bt_get_or_create("castle");
-    btype->protection = get_function("building_protection");
+    btype->protection = (int (*)(struct building *, struct unit *, building_bonus))get_function("building_protection");
     btype->construction->defense_bonus = 3;
     bld = test_create_building(r, btype);
     bld->size = 1;
     
-    f = test_create_faction(rc_find("human"));
+    f = test_create_faction(NULL);
     au = test_create_unit(f, r);
     scale_number(au, 1);
     u_set_building(au, bld);
