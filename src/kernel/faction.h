@@ -82,7 +82,6 @@ typedef struct faction {
     int no_units;
     struct ally *allies;
     struct group *groups;
-    bool alive;              /* enno: sollte ein flag werden */
     int nregions;
     int money;
 #if SCORE_MODULE
@@ -104,6 +103,7 @@ typedef struct faction {
     struct item *items;         /* items this faction can claim */
     struct seen_region **seen;
     struct quicklist *seen_factions;
+    bool alive;              /* enno: sollte ein flag werden */
 } faction;
 
 extern struct faction *factions;
