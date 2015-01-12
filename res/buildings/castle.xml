@@ -1,26 +1,26 @@
 <?xml version="1.0"?>
 <building name="castle" capacity="1">
   <function name="name" value="castle_name"/>
-  <function name="protection" value="eressea_building_protection"/>
-  <construction skill="building" minskill="1" maxsize="2" reqsize="1">
+  <function name="protection" value="building_protection"/>
+  <construction skill="building" minskill="1" maxsize="2" reqsize="1" defense_bonus="0">
     <requirement type="stone" quantity="1"/>
   </construction>
-  <construction skill="building" minskill="1" maxsize="8" reqsize="1">
+  <construction skill="building" minskill="1" maxsize="8" reqsize="1" defense_bonus="0">
     <requirement type="stone" quantity="1"/>
   </construction>
-  <construction skill="building" minskill="2" maxsize="40" reqsize="1">
+  <construction skill="building" minskill="2" maxsize="40" reqsize="1" defense_bonus="1">
     <requirement type="stone" quantity="1"/>
   </construction>
-  <construction skill="building" minskill="3" maxsize="200" reqsize="1">
+  <construction skill="building" minskill="3" maxsize="200" reqsize="1" defense_bonus="3">
     <requirement type="stone" quantity="1"/>
   </construction>
-  <construction skill="building" minskill="4" maxsize="1000" reqsize="1">
+  <construction skill="building" minskill="4" maxsize="1000" reqsize="1" defense_bonus="5">
     <requirement type="stone" quantity="1"/>
   </construction>
-  <construction skill="building" minskill="5" maxsize="5000" reqsize="1">
+  <construction skill="building" minskill="5" maxsize="5000" reqsize="1" defense_bonus="8">
     <requirement type="stone" quantity="1"/>
   </construction>
-  <construction skill="building" minskill="6" reqsize="1">
+  <construction skill="building" minskill="6" reqsize="1" defense_bonus="12">
     <requirement type="stone" quantity="1"/>
   </construction>
 </building>

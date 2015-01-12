@@ -26,10 +26,6 @@ function item_canuse(u, iname)
   return true
 end
 
-function building_protection(b, u)
-  return 1
-end
-
 function building_taxes(b, blevel)
   btype = b.type
   if btype=="castle" then
