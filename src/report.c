@@ -286,7 +286,7 @@ static void nr_spell(FILE * F, spellbook_entry * sbe, const struct locale *lang)
             if (sp->sptyp & SPELLLEVEL) {
                 bytes =
                     _snprintf(bufp, size, "  %d %s", itemanz, LOC(lang, resourcename(rtype,
-                    itemanz != 1)));
+                        itemanz != 1)));
                 if (wrptr(&bufp, &size, bytes) != 0)
                     WARN_STATIC_BUFFER();
                 if (costtyp == SPC_LEVEL || costtyp == SPC_LINEAR) {
@@ -446,24 +446,24 @@ static void nr_spell(FILE * F, spellbook_entry * sbe, const struct locale *lang)
                 if (sp->sptyp & targetp->flag)
                     ++maxparam;
             }
-            if (maxparam > 1) {
+            if (!maxparam || maxparam > 1) {
                 bytes = (int)strlcpy(bufp, " (", size);
                 if (wrptr(&bufp, &size, bytes) != 0)
                     WARN_STATIC_BUFFER();
             }
             i = 0;
             for (targetp = targets; targetp->flag; ++targetp) {
-                if (sp->sptyp & targetp->flag) {
+                if (!maxparam || sp->sptyp & targetp->flag) {
                     if (i++ != 0) {
                         bytes = (int)strlcpy(bufp, " |", size);
                         if (wrptr(&bufp, &size, bytes) != 0)
                             WARN_STATIC_BUFFER();
                     }
-                    if (targetp->param) {
+                    if (targetp->param && targetp->vars) {
                         locp = LOC(lang, targetp->vars);
                         bytes =
                             (int)_snprintf(bufp, size, " %s <%s>", parameters[targetp->param],
-                            locp);
+                                locp);
                         if (*params == '+') {
                             ++params;
                             if (wrptr(&bufp, &size, bytes) != 0)
@@ -479,7 +479,7 @@ static void nr_spell(FILE * F, spellbook_entry * sbe, const struct locale *lang)
                         WARN_STATIC_BUFFER();
                 }
             }
-            if (maxparam > 1) {
+            if (!maxparam || maxparam > 1) {
                 bytes = (int)strlcpy(bufp, " )", size);
                 if (wrptr(&bufp, &size, bytes) != 0)
                     WARN_STATIC_BUFFER();

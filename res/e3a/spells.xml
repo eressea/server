@@ -585,7 +585,7 @@
     <!-- Schutzzauber -->
     <resource name="aura" amount="5" cost="level"/>
   </spell>
-  <spell name="protective_runes" rank="2" index="99" parameters="kc" ship="true">
+  <spell name="protective_runes" rank="2" index="99" parameters="kc" regiontarget="false" unittarget="false" buildingtarget="true" shiptarget="true" ship="true">
     <resource name="aura" amount="20" cost="fixed"/>
   </spell>
   <spell name="analyze_magic" rank="5" index="102" parameters="kc?" los="true" ship="true" variable="true">
