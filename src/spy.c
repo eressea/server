@@ -58,15 +58,15 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 * Spionage des Spions */
 void spy_message(int spy, const unit * u, const unit * target)
 {
-    const char *str = report_kampfstatus(target, u->faction->locale);
+  /*    const char *str = report_kampfstatus(target, u->faction->locale);*/
 
     ADDMSG(&u->faction->msgs, msg_message("spyreport", "spy target status", u,
-        target, str));
+        target));
     if (spy > 20) {
         sc_mage *mage = get_mage(target);
         /* for mages, spells and magic school */
         if (mage) {
-            ADDMSG(&u->faction->msgs, msg_message("spyreport_mage", "target type",
+            ADDMSG(&u->faction->msgs, msg_message("spyreport_mage", "spy target type", u,
                 target, magic_school[mage->magietyp]));
         }
     }
@@ -75,7 +75,7 @@ void spy_message(int spy, const unit * u, const unit * target)
         if (fv && fv != target->faction) {
             /* true faction */
             ADDMSG(&u->faction->msgs, msg_message("spyreport_faction",
-                "target faction", target, target->faction));
+                "spy target faction", u, target, target->faction));
             add_seen_faction(u->faction, target->faction);
         }
     }
@@ -103,12 +103,12 @@ void spy_message(int spy, const unit * u, const unit * target)
             }
         }
         if (found) {
-            ADDMSG(&u->faction->msgs, msg_message("spyreport_skills", "target skills",
+            ADDMSG(&u->faction->msgs, msg_message("spyreport_skills", "spy target skills", u,
                 target, buf));
         }
 
         if (target->items) {
-            ADDMSG(&u->faction->msgs, msg_message("spyreport_items", "target items",
+            ADDMSG(&u->faction->msgs, msg_message("spyreport_items", "target items", u,
                 target, target->items));
         }
     }

@@ -22,6 +22,7 @@ spellbook.test.c
 curse.test.c
 jsonconf.test.c
 messages.test.c
+spy.test.c
 )
 
 SET(_FILES
