@@ -285,7 +285,7 @@ static void peasants(region * r)
             glueck = a->data.i * 1000;
         }
 
-        for (n = peasants; n; --n) {
+        for (n = peasants; n && glueck; --n) {
             int chances = 0;
 
             if (glueck > 0) {
