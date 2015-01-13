@@ -3568,6 +3568,7 @@
   </message>
   <message name="spyreport_mage" section="events">
     <type>
+      <arg name="spy" type="unit"/>
       <arg name="target" type="unit"/>
       <arg name="type" type="string"/>
     </type>
@@ -3576,6 +3577,7 @@
   </message>
   <message name="spyreport_skills" section="events">
     <type>
+      <arg name="spy" type="unit"/>
       <arg name="target" type="unit"/>
       <arg name="skills" type="string"/>
     </type>
@@ -3584,6 +3586,7 @@
   </message>
   <message name="spyreport_items" section="events">
     <type>
+      <arg name="spy" type="unit"/>
       <arg name="target" type="unit"/>
       <arg name="items" type="items"/>
     </type>

@@ -21,6 +21,7 @@ race.test.c
 spellbook.test.c
 curse.test.c
 jsonconf.test.c
+spy.test.c
 )
 
 SET(_FILES
