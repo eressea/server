@@ -4277,14 +4277,20 @@ void force_leave(region *r) {
     unit *u;
     for (u = r->units; u; u = u->next) {
         unit *uo = NULL;
+        message *msg = NULL;
         if (u->building) {
             uo = building_owner(u->building);
+            msg = msg_message("force_leave_building", "unit owner building", u, uo, u->building);
         }
         if (u->ship && r->land) {
             uo = ship_owner(u->ship);
+            msg = msg_message("force_leave_ship", "unit owner ship", u, uo, u->ship);
         }
         if (uo && !help_enter(uo, u)) {
             leave(u, false);
+            if (msg) {
+                ADDMSG(&u->faction->msgs, msg);
+            }
         }
     }
 }

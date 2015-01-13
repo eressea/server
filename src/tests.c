@@ -14,6 +14,7 @@
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
 #include <kernel/terrain.h>
+#include <kernel/messages.h>
 #include <util/functions.h>
 #include <util/language.h>
 #include <util/message.h>
@@ -191,6 +192,14 @@ void test_create_world(void)
 
   test_create_buildingtype("castle");
   test_create_shiptype("boat");
+}
+
+message * test_get_last_message(message_list *msgs) {
+    struct mlist *iter = msgs->begin;
+    while (iter->next) {
+        iter = iter->next;
+    }
+    return iter->msg;
 }
 
 const char * test_get_messagetype(const message *msg) {

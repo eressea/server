@@ -1,5 +1,23 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <messages>
+  <message name="force_leave_ship" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="owner" type="unit"/>
+      <arg name="ship" type="ship"/>
+    </type>
+    <text locale="de">$unit($owner) bittet $unit($unit), $ship($ship) zu verlassen.</text>
+    <text locale="en">$unit($owner) asks $unit($unit) to leave $ship($ship).</text>
+  </message>
+  <message name="force_leave_building" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="owner" type="unit"/>
+      <arg name="building" type="building"/>
+    </type>
+    <text locale="de">$unit($owner) bittet $unit($unit), $building($building) zu verlassen.</text>
+    <text locale="en">$unit($owner) asks $unit($unit) to leave $building($building).</text>
+  </message>
   <message name="alp_destroyed" section="events">
     <type>
       <arg name="region" type="region"/>
