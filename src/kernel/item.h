@@ -193,11 +193,11 @@ extern "C" {
 
   typedef struct armor_type {
     const item_type *itype;
+    unsigned int flags;
     double penalty;
     double magres;
     int prot;
     float projectile;           /* chance, dass ein projektil abprallt */
-    unsigned int flags;
   } armor_type;
 
 #define WTF_NONE          0x00
@@ -223,7 +223,7 @@ extern "C" {
     int reload;                 /* time to reload this weapon */
     weapon_mod *modifiers;
     /* --- functions --- */
-     bool(*attack) (const struct troop *, const struct weapon_type *,
+    bool(*attack) (const struct troop *, const struct weapon_type *,
       int *deaths);
   } weapon_type;
 

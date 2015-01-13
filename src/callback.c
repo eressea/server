@@ -1,4 +1,3 @@
-#include <config.h>
 #include <platform.h>
 #include "callback.h"
 #include <stdlib.h>

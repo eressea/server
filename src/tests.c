@@ -14,6 +14,7 @@
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
 #include <kernel/terrain.h>
+#include <kernel/messages.h>
 #include <util/functions.h>
 #include <util/language.h>
 #include <util/message.h>
@@ -82,14 +83,14 @@ test_create_terrain(const char * name, unsigned int flags)
 
 building * test_create_building(region * r, const building_type * btype)
 {
-  building * b = new_building(btype?btype:bt_find("castle"), r, default_locale);
+  building * b = new_building(btype?btype:bt_get_or_create("castle"), r, default_locale);
   b->size = b->type->maxsize>0?b->type->maxsize:1;
   return b;
 }
 
 ship * test_create_ship(region * r, const ship_type * stype)
 {
-  ship * s = new_ship(stype?stype:st_find("boat"), r, default_locale);
+  ship * s = new_ship(stype?stype:st_get_or_create("boat"), r, default_locale);
   s->size = s->type->construction?s->type->construction->maxsize:1;
   return s;
 }
@@ -191,6 +192,14 @@ void test_create_world(void)
 
   test_create_buildingtype("castle");
   test_create_shiptype("boat");
+}
+
+message * test_get_last_message(message_list *msgs) {
+    struct mlist *iter = msgs->begin;
+    while (iter->next) {
+        iter = iter->next;
+    }
+    return iter->msg;
 }
 
 const char * test_get_messagetype(const message *msg) {

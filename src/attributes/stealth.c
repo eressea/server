@@ -1,4 +1,3 @@
-#include <config.h>
 #include <platform.h>
 #include <kernel/unit.h>
 #include <kernel/region.h>
