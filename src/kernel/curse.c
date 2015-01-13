@@ -316,6 +316,20 @@ const curse_type *ct_find(const char *c)
     return NULL;
 }
 
+void ct_checknames() {
+    int i, qi;
+    quicklist *ctl;
+
+    for (i = 0; i < 256; ++i) {
+        ctl = cursetypes[i];
+        for (qi = 0; ctl; ql_advance(&ctl, &qi, 1)) {
+            curse_type *type = (curse_type *)ql_get(ctl, qi);
+            curse_name(type, default_locale);
+
+        }
+    }
+}
+
 /* ------------------------------------------------------------- */
 /* get_curse identifiziert eine Verzauberung über die ID und gibt
  * einen pointer auf die struct zurück.

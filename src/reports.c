@@ -1841,8 +1841,14 @@ static void write_script(FILE * F, const faction * f)
     fputc('\n', F);
 }
 
+static void check_messages_exist(void) {
+    ct_checknames();
+}
+
 int init_reports(void)
 {
+    check_messages_exist();
+
     prepare_reports();
     {
         if (_access(reportpath(), 0) != 0) {
