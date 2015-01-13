@@ -129,6 +129,7 @@
     <param name="rules.combat.demon_vampire" value="5"/> <!-- regen 1 hp per X points of damage done -->
     <param name="rules.combat.skill_bonus" value="0"/>
     <param name="rules.combat.nat_armor" value="1"/>
+    <param name="rules.combat.castles_use_unit_weigth" value="1"/>
     <!--param name="rules.combat.loot" value="5"/--> <!-- only self + others - keeploot -->
     <param name="rules.items.loot_divisor" value="2"/> <!-- damage skims off 1/2 of goods transfers -->
     <param name="rules.items.give_divisor" value="2"/> <!-- corruption skims off 1/2 of goods transfers -->
