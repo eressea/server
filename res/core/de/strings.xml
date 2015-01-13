@@ -731,7 +731,7 @@
     <text locale="en">an unknown building</text>
   </string>
   <string name="an_unknown_spell">
-    <text locale="de">ein unbekannter zauber</text>
+    <text locale="de">ein unbekannter Zauber</text>
     <text locale="en">an unknown spell</text>
   </string>
   <string name="an_unknown_ship">
@@ -745,6 +745,14 @@
   <string name="unknown_unit_dative">
     <text locale="de">einer unbekannten Einheit</text>
     <text locale="en">an unknown unit</text>
+  </string>
+  <string name="an_unknown_curse">
+    <text locale="de">ein unbekannter Zauber</text>
+    <text locale="en">an unknown curse</text>
+  </string>
+  <string name="missing_key">
+    <text locale="de">Fehler: Unbekannter Schlüssel</text>
+    <text locale="en">Fehler: Unbekannter Schlüssel</text>
   </string>
 
   <!--Meldungssektionen -->
@@ -3901,17 +3909,9 @@
       <text locale="de">Magie analysieren</text>
       <text locale="en">Analyze Magic</text>
     </string>
-    <string name="generous">
-      <text locale="de">Hohes Lied der Gaukelei</text>
-      <text locale="en">Song of Generosity</text>
-    </string>
     <string name="courting">
       <text locale="de">Gesang des Werbens</text>
       <text locale="en">Song of Courting</text>
-    </string>
-    <string name="itemcloak">
-      <text locale="de">Schleieraura</text>
-      <text locale="en">Veil</text>
     </string>
     <string name="song_of_healing">
       <text locale="de">Lied der Heilung</text>
@@ -4342,6 +4342,150 @@
     <string name="wdwpyramid_draig">
       <text locale="de">Göttliche Macht</text>
       <text locale="en">Power of the Gods</text>
+    </string>
+    <string name="magicrunes">
+      <text locale="de">Runen des Schutzes</text>
+      <text locale="en">Protective Runes</text>
+    </string>
+    <string name="astralblock">
+      <text locale="de">Störe Astrale Integrität</text>
+      <text locale="en">Astral Disruption</text>
+    </string>
+    <string name="auraboost">
+      <text locale="de">Gabe des Chaos</text>
+      <text locale="en">Chaos Gift</text>
+    </string>
+    <string name="badlearn">
+      <text locale="de">Schlechter Schlaf</text>
+      <text locale="en">Insomnia</text>
+    </string>
+    <string name="badmagicresistancezone">
+      <text locale="de">Gesang des schwachen Geistes</text>
+      <text locale="en">Song of the Aging Spirit</text>
+    </string>
+    <string name="calmmonster">
+      <text locale="de">Monster friedlich stimmen</text>
+      <text locale="en">Calm Monster</text>
+    </string>
+    <string name="depression">
+      <text locale="de">Gesang der Melancholie</text>
+      <text locale="en">Song of Melancholy</text>
+    </string>
+    <string name="drought">
+      <text locale="de">Beschwörung eines Hitzeelementar</text>
+      <text locale="en">Summon Fire Elemental</text>
+    </string>
+    <string name="farvision">
+    <text locale="de">ein unbekannter Zauber</text>
+    <text locale="en">an unknown spell</text>
+    </string>
+    <string name="flyingship">
+      <text locale="de">Luftschiff</text>
+      <text locale="en">Airship</text>
+    </string>
+    <string name="fogtrap">
+    <text locale="de">ein unbekannter Zauber</text>
+    <text locale="en">an unknown spell</text>
+    </string>
+    <string name="fumble">
+      <text locale="de">Chaosfluch</text>
+      <text locale="en">Chaos Curse</text>
+    </string>
+    <string name="gbdream">
+      <text locale="de">Schöne Träume oder Schlechte Träume</text>
+      <text locale="en">Good Dreams or Bad Dreams</text>
+    </string>
+    <string name="generous">
+      <text locale="de">Hohes Lied der Gaukelei</text>
+      <text locale="en">Song of Generosity</text>
+    </string>
+    <string name="godcursezone">
+      <text locale="de">Fluch der Götter</text>
+      <text locale="en">Curse of the Gods</text>
+    </string>
+    <string name="goodmagicresistancezone">
+      <text locale="de">Gesang des wachen Geistes</text>
+      <text locale="en">Song Of The Youthful Spirit</text>
+    </string>
+    <string name="insectfur">
+      <text locale="de">Firuns Fell</text>
+      <text locale="en">Firun's Coat</text>
+    </string>
+    <string name="itemcloak">
+      <text locale="de">Schleieraura</text>
+      <text locale="en">Concealing Aura</text>
+    </string>
+    <string name="magicresistance">
+      <text locale="de">Magieresistenz</text>
+      <text locale="en">Magic Resistance</text>
+    </string>
+    <string name="magicwalls">
+      <text locale="de">Heimstein</text>
+      <text locale="en">Homestone</text>
+    </string>
+    <string name="nocostbuilding">
+      <text locale="de">Mauern der Ewigkeit</text>
+      <text locale="en">Eternal Walls</text>
+    </string>
+    <string name="nodrift">
+      <text locale="de">Wasserelementar</text>
+      <text locale="en">Water Elemental</text>
+    </string>
+    <string name="oldrace">
+      <text locale="de">Unbekannter Effekt</text>
+      <text locale="en">Unknown Effect</text>
+    </string>
+    <string name="orcish">
+      <text locale="de">Unbekannter Effekt</text>
+      <text locale="en">Unknown Effect</text>
+    </string>
+    <string name="peacezone">
+      <text locale="de">Gesang der Friedfertigkeit</text>
+      <text locale="en">Song of Peace</text>
+    </string>
+    <string name="riotzone">
+      <text locale="de">Aufruhr</text>
+      <text locale="en">Riot</text>
+    </string>
+    <string name="skillmod">
+      <text locale="de">Unbekannter Effekt</text>
+      <text locale="en">Unknown Effect</text>
+    </string>
+    <string name="slavery">
+      <text locale="de">Gesang der Versklavung</text>
+      <text locale="en">Song of Slavery</text>
+    </string>
+    <string name="sparkle">
+      <text locale="de">Unbekannter Effekt</text>
+      <text locale="en">Unknown Effect</text>
+    </string>
+    <string name="speed">
+      <text locale="de">Zeitdehnung</text>
+      <text locale="en">Double Time</text>
+    </string>
+    <string name="stormwind">
+      <text locale="de">Sturmelementar</text>
+      <text locale="en">Storm Elemental</text>
+    </string>
+    <string name="strength">
+      <text locale="de">Unbekannter Effekt</text>
+      <text locale="en">Unknown Effect</text>
+    </string>
+    <string name="worse">
+      <text locale="de">Alp</text>
+      <text locale="en">Nightmare</text>
+    </string>
+    <string name="Feuerwand">
+      <text locale="de">Feuerwand</text>
+      <text locale="en">Firewall</text>
+    </string>
+    <string name="healingzone">
+      <text locale="de">Zone der Heilung</text>
+      <text locale="en">Zone of Healing</text>
+    </string>
+    <string name="shipspeedup">
+      <text locale="de">Beschleunigung</text>
+      <text locale="en">Acceleration</text>
     </string>
   </namespace>
   <namespace name="spellinfo">
