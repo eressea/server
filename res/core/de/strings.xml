@@ -364,6 +364,43 @@
     <text locale="de">und im </text>
     <text locale="en">and to the </text>
   </string>
+  <string name="nr_schemes_prefix">
+    <text locale="de">Schemen der Regionen </text>
+    <text locale="en">Schemes of </text>
+  </string>
+  <string name="nr_schemes_postfix">
+    <text locale="de"> sind erkennbar.</text>
+    <text locale="en"> can be discerned.</text>
+  </string>
+  <string name="nr_borderlist_prefix">
+    <text locale="de">Im </text>
+    <text locale="en">To the </text>
+  </string>
+  <string name="nr_borderlist_lastfix">
+    <text locale="de"> und im </text>
+    <text locale="en">, and to the </text>
+  </string>
+  <string name="nr_borderlist_infix">
+    <text locale="de">, im </text>
+    <text locale="en">, to the </text>
+  </string>
+  <string name="nr_guarding_prefix">
+    <text locale="de">Die Region wird von </text>
+    <text locale="en">The region is guarded by </text>
+  </string>
+  <string name="nr_guarding_unknown">
+    <text locale="de">unbekannten Einheiten</text>
+    <text locale="en">unknown units</text>
+  </string>
+  <string name="nr_guarding_postfix">
+    <text locale="de"> bewacht.</text>
+    <text locale="en">.</text>
+  </string>
+  <string name="nr_building_inprogress">
+    <text locale="de"> (im Bau)</text>
+    <text locale="en"> (under construction)</text>
+  </string>
+
   <string name="unitdefault">
     <text locale="de">Einheit</text>
     <text locale="en">Unit</text>
