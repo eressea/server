@@ -729,6 +729,25 @@ function test_silver_weight_stops_movement()
     assert_equal(r2, u1.region)
 end
 
+function test_silver_weight_stops_ship()
+    local r1 = region.create(1, 1, "ocean")
+    local r2 = region.create(2, 1, "ocean")
+    region.create(3, 1, "ocean")
+    local f1 = faction.create("noreply@eressea.de", "human", "de")    
+    local u1 = unit.create(f1, r1, 1)
+    u1:set_skill("sailing", 3)
+    local s1 = ship.create(r1, "canoe")
+    u1.ship = s1
+    u1:clear_orders()
+    u1:add_order("NACH OST")
+    u1:add_item("money", 2000)
+    process_orders()
+    assert_equal(r2, u1.region)
+    u1:add_item("money", 1)
+    process_orders()
+    assert_equal(r2, u1.region)
+end
+
 function test_building_owner_can_enter_ship()
     local r1 = region.create(1, 2, "plain")    
     local f1 = faction.create("noreply@eressea.de", "human", "de")
