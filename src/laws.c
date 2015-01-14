@@ -259,6 +259,40 @@ static void calculate_emigration(region * r)
 }
 
 /** Bauern vermehren sich */
+int fast_peasant_luck_effect(int peasants, int luck, int maxp) {
+    int births=0;
+    double mean = _min(luck, peasants) * PEASANTLUCK * PEASANTGROWTH / (float) 10000 * ((peasants/(float)maxp < .9)?1:PEASANTFORCE);
+    
+    births = RAND_ROUND(normalvariate(mean, mean/2+1));
+    if (births <= 0)
+	births = 1;
+    if (births>peasants/2)
+	births=peasants/2+1;
+    return (int)births;
+}
+
+int peasant_luck_effect(int peasants, int luck, int maxp) {
+    int n, births=0;
+    for (n = peasants; n && luck; --n) {
+	int chances = 0;
+
+	if (luck > 0) {
+	    --luck;
+	    chances += PEASANTLUCK;
+	}
+
+	while (chances--) {
+	    if (rng_int() % 10000 < PEASANTGROWTH) {
+		/* Only raise with 75% chance if peasants have
+		 * reached 90% of maxpopulation */
+		if (peasants / (float)maxp < 0.9 || chance(PEASANTFORCE)) {
+		    ++births;
+		}
+	    }
+	}
+    }
+    return births;
+}
 
 static void peasants(region * r)
 {
@@ -272,37 +306,16 @@ static void peasants(region * r)
      * wollen nicht! */
 
     if (peasants > 0 && get_param_int(global.parameters, "rules.peasants.growth", 1)) {
-        int glueck = 0;
+        int luck = 0;
         double fraction = peasants * 0.0001F * PEASANTGROWTH;
-        int births = (int)fraction;
+        int births = RAND_ROUND(fraction);
         attrib *a = a_find(r->attribs, &at_peasantluck);
 
-        if (rng_double() < (fraction - births)) {
-            /* because we don't want regions that never grow pga. rounding. */
-            ++births;
-        }
         if (a != NULL) {
-            glueck = a->data.i * 1000;
+            luck = a->data.i * 1000;
         }
 
-        for (n = peasants; n && glueck; --n) {
-            int chances = 0;
-
-            if (glueck > 0) {
-                --glueck;
-                chances += PEASANTLUCK;
-            }
-
-            while (chances--) {
-                if (rng_int() % 10000 < PEASANTGROWTH) {
-                    /* Only raise with 75% chance if peasants have
-                     * reached 90% of maxpopulation */
-                    if (peasants / (float)maxp < 0.9 || chance(PEASANTFORCE)) {
-                        ++births;
-                    }
-                }
-            }
-        }
+	births += peasant_luck_effect(peasants, luck, maxp);
         peasants += births;
     }
 

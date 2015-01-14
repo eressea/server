@@ -16,6 +16,7 @@
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/message.h>
+#include <util/rand.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -691,6 +692,35 @@ static void test_reserve_self(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_peasant_luck(CuTest *tc) {
+    int p, l, max, n=0, wrong=0, total=0;
+    for (p=1; p<10000; p = (int)(_max(p*1.2+1, p+50))) {
+	for (l=1; l<2000; l=(int)(_max(l*1.5+1, l+10))) {
+	    for (max=p/5; max<7*p; max=(int)(max*2+1)) {
+		double births = 0, births2=0, bsum1, bsum2;
+		double birthsm =  l * PEASANTLUCK * PEASANTGROWTH / (float) 10000 * ((p/(float)max < .9)?1:PEASANTFORCE);
+		for (n=0;n<10;++n) {
+		    births = peasant_luck_effect(p, l, max);
+		    births2 = fast_peasant_luck_effect(p,l,max);
+		    bsum1 += births;
+		    bsum2 += births2;
+		    printf("%f\t%f\t%f\t%d\t%d\t%d\t1#\n", birthsm, births2, births, p,l,max);
+		}
+		bsum1 /= 50;
+		bsum2 /= 50;
+		if ((bsum1-bsum2>.5 || bsum2-bsum1>.5) && (bsum1/bsum2>1.1 || bsum2/bsum1>1.1)){
+		    ++wrong;
+		}
+		++total;
+	    }
+	}
+	printf("#\n");
+    }
+    printf("%d / %d\n", wrong, total);
+
+}
+
+
 CuSuite *get_laws_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -721,6 +751,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_force_leave_buildings);
     SUITE_ADD_TEST(suite, test_force_leave_ships);
     SUITE_ADD_TEST(suite, test_force_leave_ships_on_ocean);
+    SUITE_ADD_TEST(suite, test_peasant_luck);
 
     return suite;
 }
