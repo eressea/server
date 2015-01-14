@@ -960,6 +960,7 @@ void init_resources(void)
     rtype->uchange = res_changeitem;
     rtype->itype = it_get_or_create(rtype);
     rtype->itype->give = give_money;
+    rtype->itype->weight = 1;
 
     // R_PERMAURA
     rtype = rt_get_or_create(resourcenames[R_PERMAURA]);

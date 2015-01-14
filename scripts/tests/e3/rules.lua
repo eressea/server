@@ -712,6 +712,23 @@ function test_golem_use_four_iron()
     assert_equal(4, u1:get_item("towershield"))
 end
 
+function test_silver_weight_stops_movement()
+    local r1 = region.create(1, 1, "plain")
+    local r2 = region.create(2, 1, "plain")
+    region.create(3, 1, "plain")
+    local f1 = faction.create("noreply@eressea.de", "human", "de")    
+    local u1 = unit.create(f1, r1, 1)
+    u1:clear_orders()
+    u1:add_order("NACH OST")
+    u1:add_item("money", 540)
+    assert_equal(1540, u1.weight)
+    process_orders()
+    assert_equal(r2, u1.region)
+    u1:add_item("money", 1)
+    process_orders()
+    assert_equal(r2, u1.region)
+end
+
 function test_building_owner_can_enter_ship()
     local r1 = region.create(1, 2, "plain")    
     local f1 = faction.create("noreply@eressea.de", "human", "de")
