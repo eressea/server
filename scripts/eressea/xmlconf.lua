@@ -1,6 +1,8 @@
 local confdir = 'conf/'
 if config.install then
     confdir = config.install .. '/' .. confdir
+    else
+    confdir = '../' .. confdir
 end
 rules=''
 if config.rules then
