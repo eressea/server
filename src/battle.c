@@ -755,7 +755,8 @@ bool missile)
                         if (rlist == NULL)
                             continue;
                     }
-                    skill += wtype->modifiers[m].value;
+                    if (attacking || !missile)   /* Weaponbonus only if Attacking or Defending in close combat -> no bonus for halberds against Archer */
+                        skill += wtype->modifiers[m].value;
                 }
             }
         }
@@ -1904,7 +1905,7 @@ int skilldiff(troop at, troop dt, int dist)
             int beff = df->building->type->protection(df->building, du, DEFENSE_BONUS);
             if (beff) {
                 skdiff -= beff;
-                is_protected = 2;
+                is_protected += beff/2;
             }
         }
         if (strongwall_ct) {
@@ -1912,13 +1913,14 @@ int skilldiff(troop at, troop dt, int dist)
             if (curse_active(c)) {
                 /* wirkt auf alle Gebäude */
                 skdiff -= curse_geteffect_int(c);
-                is_protected = 2;
+                is_protected += curse_geteffect_int(c)/2;
             }
         }
         if (magicwalls_ct
             && curse_active(get_curse(df->building->attribs, magicwalls_ct))) {
             /* Verdoppelt Burgenbonus */
             skdiff -= df->building->type->protection(df->building, du, DEFENSE_BONUS);
+            is_protected += df->building->type->protection(df->building, du, DEFENSE_BONUS) / 2;
         }
     }
     /* Goblin-Verteidigung
@@ -1943,6 +1945,22 @@ int skilldiff(troop at, troop dt, int dist)
     if (skill_formula == FORMULA_ORIG) {
         weapon *dwp = select_weapon(dt, false, dist > 1);
         skdiff -= weapon_effskill(dt, at, dwp, false, dist > 1);
+    }
+
+    /* Defender in a building get attack bonus */
+    if (af->building->type->protection) {
+        int castle_attack_bonus = 0;
+        if (awp && fval(awp->type, WTF_MISSILE))
+        {
+            castle_attack_bonus = df->building->type->protection(df->building, du, RANGED_ATTACK_BONUS);
+        }
+        else
+        {
+            castle_attack_bonus = df->building->type->protection(df->building, du, CLOSE_COMBAT_ATTACK_BONUS);
+        }
+        if (castle_attack_bonus) {
+            skdiff += castle_attack_bonus;
+        }
     }
     return skdiff;
 }
