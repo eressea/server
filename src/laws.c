@@ -305,9 +305,6 @@ static void peasants(region * r)
     int n, satiated;
     int dead = 0;
 
-    /* Bis zu 1000 Bauern können Zwillinge bekommen oder 1000 Bauern
-     * wollen nicht! */
-
     if (peasants > 0 && get_param_int(global.parameters, "rules.peasants.growth", 1)) {
         int luck = 0;
         double fraction = peasants * 0.0001F * PEASANTGROWTH;
@@ -318,8 +315,10 @@ static void peasants(region * r)
             luck = a->data.i * 1000;
         }
 
-	births += peasant_luck_effect(peasants, luck, maxp);
-        peasants += births;
+	luck = peasant_luck_effect(peasants, luck, maxp);
+	ADDMSG(&r->msgs, msg_message("peasantluck_success", "births", luck));
+
+        peasants += births + luck;
     }
 
     /* Alle werden satt, oder halt soviele für die es auch Geld gibt */

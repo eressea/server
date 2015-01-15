@@ -3658,6 +3658,13 @@
     <text locale="fr">"$unit($unit): '$order($command)' - The unit already uses $resource($using,0)."</text>
     <text locale="en">"$unit($unit): '$order($command)' - The unit already uses $resource($using,0)."</text>
   </message>
+  <message name="peasantluck_success" section="events">
+    <type>
+      <arg name="births" type="int"/>
+    </type>
+    <text locale="de">"$if($eq($births,1),"Einen Bauern","$int($births) Bauern") besucht unverhofft der Storch."</text>
+    <text locale="en">"The stork paid an unexpected visit to $if($eq($births,1),"one peasant","$int($births) peasants")."</text>
+  </message>
   <message name="shipsink" section="events">
     <type>
       <arg name="ship" type="ship"/>
