@@ -16,6 +16,7 @@
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/message.h>
+#include <util/rand.h>
 
 #include <CuTest.h>
 #include <tests.h>

@@ -39,6 +39,7 @@ extern "C" {
 # define rng_double ((rand()%RAND_MAX)/(double)RAND_MAX)
 # define RNG_RAND_MAX RAND_MAX
 #endif
+#define RAND_ROUND(fractional) ((rng_double() < fractional-(int)fractional)?((int)fractional+1):((int)fractional))
 #ifdef __cplusplus
 }
 #endif

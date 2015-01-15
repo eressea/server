@@ -258,7 +258,53 @@ static void calculate_emigration(region * r)
     }
 }
 
+
+static float peasant_growth_factor(void) {
+    return get_param_flt(global.parameters, "rules.peasants.growth.factor", 
+			 0.0001F * PEASANTGROWTH);
+}
+
 /** Bauern vermehren sich */
+#ifndef SLOWLUCK
+int peasant_luck_effect(int peasants, int luck, int maxp) {
+    int births=0;
+    double mean = _min(luck, peasants)
+	* get_param_int(global.parameters, "rules.peasants.peasantluck.factor", PEASANTLUCK)
+	* peasant_growth_factor()
+	* ((peasants/(float)maxp < .9)?1:PEASANTFORCE);
+    
+    births = RAND_ROUND(normalvariate(mean, mean/2+1));
+    if (births <= 0)
+	births = 1;
+    if (births>peasants/2)
+	births=peasants/2+1;
+    return (int)births;
+}
+
+#else
+int peasant_luck_effect(int peasants, int luck, int maxp) {
+    int n, births=0;
+    for (n = peasants; n && luck; --n) {
+	int chances = 0;
+
+	if (luck > 0) {
+	    --luck;
+	    chances += PEASANTLUCK;
+	}
+
+	while (chances--) {
+	    if (rng_double() < peasant_growth_factor()) {
+		/* Only raise with 75% chance if peasants have
+		 * reached 90% of maxpopulation */
+		if (peasants / (float)maxp < 0.9 || chance(PEASANTFORCE)) {
+		    ++births;
+		}
+	    }
+	}
+    }
+    return births;
+}
+#endif
 
 static void peasants(region * r)
 {
@@ -268,42 +314,20 @@ static void peasants(region * r)
     int n, satiated;
     int dead = 0;
 
-    /* Bis zu 1000 Bauern können Zwillinge bekommen oder 1000 Bauern
-     * wollen nicht! */
-
     if (peasants > 0 && get_param_int(global.parameters, "rules.peasants.growth", 1)) {
-        int glueck = 0;
-        double fraction = peasants * 0.0001F * PEASANTGROWTH;
-        int births = (int)fraction;
+        int luck = 0;
+        double fraction = peasants * peasant_growth_factor();
+        int births = RAND_ROUND(fraction);
         attrib *a = a_find(r->attribs, &at_peasantluck);
 
-        if (rng_double() < (fraction - births)) {
-            /* because we don't want regions that never grow pga. rounding. */
-            ++births;
-        }
         if (a != NULL) {
-            glueck = a->data.i * 1000;
+            luck = a->data.i * 1000;
         }
 
-        for (n = peasants; n; --n) {
-            int chances = 0;
+	luck = peasant_luck_effect(peasants, luck, maxp);
+	ADDMSG(&r->msgs, msg_message("peasantluck_success", "births", luck));
 
-            if (glueck > 0) {
-                --glueck;
-                chances += PEASANTLUCK;
-            }
-
-            while (chances--) {
-                if (rng_int() % 10000 < PEASANTGROWTH) {
-                    /* Only raise with 75% chance if peasants have
-                     * reached 90% of maxpopulation */
-                    if (peasants / (float)maxp < 0.9 || chance(PEASANTFORCE)) {
-                        ++births;
-                    }
-                }
-            }
-        }
-        peasants += births;
+        peasants += births + luck;
     }
 
     /* Alle werden satt, oder halt soviele für die es auch Geld gibt */
