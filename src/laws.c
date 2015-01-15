@@ -259,7 +259,8 @@ static void calculate_emigration(region * r)
 }
 
 /** Bauern vermehren sich */
-int fast_peasant_luck_effect(int peasants, int luck, int maxp) {
+#ifndef SLOWLUCK
+int peasant_luck_effect(int peasants, int luck, int maxp) {
     int births=0;
     double mean = _min(luck, peasants) * PEASANTLUCK * PEASANTGROWTH / (float) 10000 * ((peasants/(float)maxp < .9)?1:PEASANTFORCE);
     
@@ -271,6 +272,7 @@ int fast_peasant_luck_effect(int peasants, int luck, int maxp) {
     return (int)births;
 }
 
+#else
 int peasant_luck_effect(int peasants, int luck, int maxp) {
     int n, births=0;
     for (n = peasants; n && luck; --n) {
@@ -293,6 +295,7 @@ int peasant_luck_effect(int peasants, int luck, int maxp) {
     }
     return births;
 }
+#endif
 
 static void peasants(region * r)
 {

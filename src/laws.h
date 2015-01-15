@@ -107,9 +107,6 @@ extern "C" {
   int armedmen(const struct unit *u, bool siege_weapons);
   void force_leave(struct region *r);
 
-    int peasant_luck_effect(int peasants, int luck, int maxp);
-    int fast_peasant_luck_effect(int peasants, int luck, int maxp);
-
 
 #ifdef __cplusplus
 }
