@@ -146,7 +146,7 @@ message *msg_create(const struct message_type *mtype, variant args[])
     return NULL;
   }
   msg->type = mtype;
-  msg->parameters = (variant *)mtype->nparameters ? calloc(mtype->nparameters, sizeof(variant)) : NULL;
+  msg->parameters = (variant *)(mtype->nparameters ? calloc(mtype->nparameters, sizeof(variant)) : NULL);
   msg->refcount = 1;
   for (i = 0; i != mtype->nparameters; ++i) {
     msg->parameters[i] = copy_arg(mtype->types[i], args[i]);
