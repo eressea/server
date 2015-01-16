@@ -1948,15 +1948,15 @@ int skilldiff(troop at, troop dt, int dist)
     }
 
     /* Defender in a building get attack bonus */
-    if (af->building->type->protection) {
+    if (af->building && af->building->type->protection) {
         int castle_attack_bonus = 0;
         if (awp && fval(awp->type, WTF_MISSILE))
         {
-            castle_attack_bonus = df->building->type->protection(df->building, du, RANGED_ATTACK_BONUS);
+            castle_attack_bonus = af->building->type->protection(df->building, du, RANGED_ATTACK_BONUS);
         }
         else
         {
-            castle_attack_bonus = df->building->type->protection(df->building, du, CLOSE_COMBAT_ATTACK_BONUS);
+            castle_attack_bonus = af->building->type->protection(df->building, du, CLOSE_COMBAT_ATTACK_BONUS);
         }
         if (castle_attack_bonus) {
             skdiff += castle_attack_bonus;
@@ -2066,7 +2066,7 @@ void dazzle(battle * b, troop * td)
     td->fighter->person[td->index].defence--;
 }
 
-int new_castle_rule(void)
+int castles_use_unit_weigth(void)
 {
     int value = -1;
     if (value < 0) {
@@ -2079,7 +2079,7 @@ int new_castle_rule(void)
 
 int castle_capacity(building * b)
 {
-    if (new_castle_rule()) {
+    if (castles_use_unit_weigth()) {
         return buildingcapacity(b) * 1000;  /* CTD Using race weight like E3-ships*/
     }
     return buildingcapacity(b);
@@ -2100,7 +2100,7 @@ void damage_building(battle * b, building * bldg, int damage_abs)
             fighter *fig;
             for (fig = s->fighters; fig; fig = fig->next) {
                 if (fig->building == bldg) {
-                    if (new_castle_rule()) {
+                    if (castles_use_unit_weigth()) {
                         if (bldg->sizeleft >= (fig->unit->number * u_race(fig->unit)->weight)) {
                             fig->building = bldg;
                             bldg->sizeleft -= (fig->unit->number * u_race(fig->unit)->weight);
@@ -3303,7 +3303,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     }
     else {
         building *bld = u->building;
-        if (new_castle_rule()) {
+        if (castles_use_unit_weigth()) {
             if (bld && bld->sizeleft >= u->number * u_race(u)->weight && playerrace(u_race(u))) { /* CTD Using race weight like E3-ships*/
                 fig->building = bld;
                 fig->building->sizeleft -= u->number * u_race(u)->weight;
