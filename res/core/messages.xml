@@ -5858,8 +5858,8 @@
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Laen kann nur in einem Bergwerk abgebaut werden."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Laen can be excavated only in a mine."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Dieses Metall kann nur in einem Bergwerk abgebaut werden."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This metal can be excavated only in a mine."</text>
   </message>
   <message name="error103" section="errors">
     <type>
