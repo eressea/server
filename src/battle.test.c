@@ -59,9 +59,18 @@ static void test_make_fighter(CuTest * tc)
 }
 
 static int add_two(building * b, unit * u, building_bonus bonus) {
-  return 2;
+    switch (bonus)
+    {
+    case DEFENSE_BONUS:
+        return 2;
+    case CLOSE_COMBAT_ATTACK_BONUS:
+        return 1;
+    case RANGED_ATTACK_BONUS:
+        return 3;
+    default:
+        return 2;
+    }
 }
-
 static void test_defenders_get_building_bonus(CuTest * tc)
 {
     unit *du, *au;
@@ -106,7 +115,7 @@ static void test_defenders_get_building_bonus(CuTest * tc)
     CuAssertIntEquals(tc, -2, diff);
 
     diff = skilldiff(dt, at, 0);
-    CuAssertIntEquals(tc, 0, diff);
+    CuAssertIntEquals(tc, 1, diff);
     free_battle(b);
     test_cleanup();
 }
