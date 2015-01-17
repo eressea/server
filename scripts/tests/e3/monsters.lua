@@ -33,7 +33,7 @@ function test_monster_attack()
     process_orders()
     plan_monsters()
     process_orders()
-    write_reports()
+--    write_reports()
     
     assert_equal(0, u1.number)
 
