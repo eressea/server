@@ -28,7 +28,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "stealth.h"
 #include "moved.h"
 #include "movement.h"
-#include "object.h"
+#include "dict.h"
 #include "orcification.h"
 #include "otherfaction.h"
 #include "overrideroads.h"
@@ -56,7 +56,7 @@ void register_attributes(void)
 {
     at_deprecate("gm", a_readint);
     at_register(&at_stealth);
-    at_register(&at_object);
+    at_register(&at_dict);
     at_register(&at_unitdissolve);
     at_register(&at_overrideroads);
     at_register(&at_raceprefix);

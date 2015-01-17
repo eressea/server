@@ -15,7 +15,7 @@ without prior permission by the authors of Eressea.
 #include "bind_unit.h"
 #include "bind_storage.h"
 #include "bind_building.h"
-#include "bind_hashtable.h"
+#include "bind_dict.h"
 #include "bind_message.h"
 #include "bind_building.h"
 #include "bind_faction.h"
@@ -1211,7 +1211,7 @@ lua_State *lua_init(void) {
   tolua_faction_open(L);
   tolua_unit_open(L);
   tolua_message_open(L);
-  tolua_hashtable_open(L);
+  tolua_dict_open(L);
 #ifdef USE_CURSES
   tolua_gmtool_open(L);
 #endif

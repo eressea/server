@@ -14,10 +14,10 @@ without prior permission by the authors of Eressea.
 extern "C" {
 #endif
 
-  struct lua_State;
-  void tolua_hashtable_open(struct lua_State *L);
+    struct lua_State;
+    void tolua_dict_open(struct lua_State *L);
 
-  typedef struct attrib **hashtable;
+    typedef struct attrib **dict;
 
 #ifdef __cplusplus
 }

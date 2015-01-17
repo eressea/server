@@ -116,7 +116,7 @@ set(SERVER_SRC
   bind_locale.c
   bind_eressea.c
   bind_faction.c
-  bind_hashtable.c
+  bind_dict.c
   bindings.c
   bind_message.c
   bind_monsters.c
