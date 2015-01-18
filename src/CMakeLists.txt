@@ -177,6 +177,7 @@ set(TESTS_SRC
   move.test.c
   skill.test.c
   upkeep.test.c
+  spy.test.c
   ${ATTRIBUTES_TESTS}
   ${UTIL_TESTS}
   ${KERNEL_TESTS}
