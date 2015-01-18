@@ -108,7 +108,7 @@ void spy_message(int spy, const unit * u, const unit * target)
         }
 
         if (target->items) {
-            ADDMSG(&u->faction->msgs, msg_message("spyreport_items", "target items", u,
+            ADDMSG(&u->faction->msgs, msg_message("spyreport_items", "spy target items", u,
                 target, target->items));
         }
     }
