@@ -50,9 +50,8 @@ static void test_spy_message(CuTest *tc) {
     spy_fixture fix;
     struct mlist *msglist;
     struct message *msg;
-    int m, p;
+    int m;
     const message_type *expected[3];
-    variant v;
 
     setup_spy(&fix);
     enable_skill(SK_MAGIC, true);
@@ -72,12 +71,6 @@ static void test_spy_message(CuTest *tc) {
     while (msglist) {
 	msg = msglist->msg;
 	CuAssertStrEquals(tc, expected[m]->name, msg->type->name);
-	/* I'm not sure how to test for correct number and maybe even type of parameters */
-	for (p = 0; p != msg->type->nparameters; ++p) {
-	    v = msg->parameters[p];
-	    if (v.v || !v.v)
-		v = msg->parameters[p];
-	}
 	msglist = msglist->next;
 	++m;
     }
