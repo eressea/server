@@ -40,6 +40,8 @@ extern "C" {
 
 #define RACESPOILCHANCE 5       /* Chance auf rassentypische Beute */
 
+#define RACE_ATTACKS 10         /* maximum number of attacks */
+
     struct param;
     struct spell;
 
@@ -145,7 +147,7 @@ extern "C" {
         int battle_flags;
         int ec_flags;
         race_t oldfamiliars[MAXMAGIETYP];
-        struct att attack[10];
+        struct att attack[RACE_ATTACKS];
         signed char bonus[MAXSKILLS];
 
         const char *(*generate_name) (const struct unit *);

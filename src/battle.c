@@ -2294,16 +2294,18 @@ void do_attack(fighter * af)
         /* Wir suchen eine beliebige Feind-Einheit aus. An der können
          * wir feststellen, ob noch jemand da ist. */
         int apr, attacks = attacks_per_round(ta);
+        assert(attacks <= RACE_ATTACKS);
         if (!count_enemies(b, af, FIGHT_ROW, LAST_ROW, SELECT_FIND))
             break;
 
         for (apr = 0; apr != attacks; ++apr) {
             int a;
-            for (a = 0; a != 10 && u_race(au)->attack[a].type != AT_NONE; ++a) {
+            for (a = 0; a < RACE_ATTACKS && u_race(au)->attack[a].type != AT_NONE; ++a) {
                 if (apr > 0) {
                     /* Wenn die Waffe nachladen muss, oder es sich nicht um einen
                      * Waffen-Angriff handelt, dann gilt der Speed nicht. */
-                    if (u_race(au)->attack[a].type != AT_STANDARD)
+                    /* FIXME allow multiple AT_NATURAL attacks? */
+                    if (u_race(au)->attack[a].type != AT_STANDARD) 
                         continue;
                     else {
                         weapon *wp = preferred_weapon(ta, true);
