@@ -13,6 +13,7 @@
 
 #include <CuTest.h>
 #include "tests.h"
+#include <assert.h>
 
 static void test_make_fighter(CuTest * tc)
 {
@@ -59,6 +60,7 @@ static void test_make_fighter(CuTest * tc)
 }
 
 static int add_two(building * b, unit * u, building_bonus bonus) {
+    assert(b);
     switch (bonus)
     {
     case DEFENSE_BONUS:

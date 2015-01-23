@@ -1952,11 +1952,11 @@ int skilldiff(troop at, troop dt, int dist)
         int castle_attack_bonus = 0;
         if (awp && fval(awp->type, WTF_MISSILE))
         {
-            castle_attack_bonus = af->building->type->protection(df->building, du, RANGED_ATTACK_BONUS);
+            castle_attack_bonus = af->building->type->protection(af->building, au, RANGED_ATTACK_BONUS);
         }
         else
         {
-            castle_attack_bonus = af->building->type->protection(df->building, du, CLOSE_COMBAT_ATTACK_BONUS);
+            castle_attack_bonus = af->building->type->protection(af->building, au, CLOSE_COMBAT_ATTACK_BONUS);
         }
         if (castle_attack_bonus) {
             skdiff += castle_attack_bonus;
