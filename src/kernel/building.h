@@ -118,6 +118,7 @@ extern "C" {
     struct attrib *attribs;
     int no;
     int size;
+    int damage;
     int sizeleft;               /* is only used during battle. should be a temporary attribute */
     int besieged;               /* should be an attribute */
     int flags;
