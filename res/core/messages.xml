@@ -3663,7 +3663,7 @@
       <arg name="births" type="int"/>
     </type>
     <text locale="de">"$if($eq($births,1),"Einen Bauern","$int($births) Bauern") besucht unverhofft der Storch."</text>
-    <text locale="en">"The stork paid an unexpected visit to $if($eq($births,1),"one peasant","$int($births) peasants")."</text>
+    <text locale="en">"The stork paid an unexpected visit to $if($eq($births,1),"a peasant","$int($births) peasants")."</text>
   </message>
   <message name="shipsink" section="events">
     <type>

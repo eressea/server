@@ -259,9 +259,21 @@ static void calculate_emigration(region * r)
 }
 
 
+static float peasant_luck_factor(void) {
+    static float factor = -1;
+
+    if (factor < 0)
+	get_param_int(global.parameters, "rules.peasants.peasantluck.factor", PEASANTLUCK);
+    return factor;
+}
+
 static float peasant_growth_factor(void) {
-    return get_param_flt(global.parameters, "rules.peasants.growth.factor", 
+    static float factor = -1;
+
+    if (factor < 0)
+	factor = get_param_flt(global.parameters, "rules.peasants.growth.factor", 
 			 0.0001F * PEASANTGROWTH);
+    return factor;
 }
 
 /** Bauern vermehren sich */
@@ -269,7 +281,7 @@ static float peasant_growth_factor(void) {
 int peasant_luck_effect(int peasants, int luck, int maxp) {
     int births=0;
     double mean = _min(luck, peasants)
-	* get_param_int(global.parameters, "rules.peasants.peasantluck.factor", PEASANTLUCK)
+	* peasant_luck_factor()
 	* peasant_growth_factor()
 	* ((peasants/(float)maxp < .9)?1:PEASANTFORCE);
     
