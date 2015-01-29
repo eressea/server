@@ -755,7 +755,8 @@ bool missile)
                         if (rlist == NULL)
                             continue;
                     }
-                    skill += wtype->modifiers[m].value;
+                    if (attacking || !missile)   /* Weaponbonus only if Attacking or Defending in close combat -> no bonus for halberds against Archer */
+                        skill += wtype->modifiers[m].value;
                 }
             }
         }
@@ -1904,7 +1905,7 @@ int skilldiff(troop at, troop dt, int dist)
             int beff = df->building->type->protection(df->building, du, DEFENSE_BONUS);
             if (beff) {
                 skdiff -= beff;
-                is_protected = 2;
+                is_protected += beff/2;
             }
         }
         if (strongwall_ct) {
@@ -1912,13 +1913,14 @@ int skilldiff(troop at, troop dt, int dist)
             if (curse_active(c)) {
                 /* wirkt auf alle Gebäude */
                 skdiff -= curse_geteffect_int(c);
-                is_protected = 2;
+                is_protected += curse_geteffect_int(c)/2;
             }
         }
         if (magicwalls_ct
             && curse_active(get_curse(df->building->attribs, magicwalls_ct))) {
             /* Verdoppelt Burgenbonus */
             skdiff -= df->building->type->protection(df->building, du, DEFENSE_BONUS);
+            is_protected += df->building->type->protection(df->building, du, DEFENSE_BONUS) / 2;
         }
     }
     /* Goblin-Verteidigung
@@ -1943,6 +1945,22 @@ int skilldiff(troop at, troop dt, int dist)
     if (skill_formula == FORMULA_ORIG) {
         weapon *dwp = select_weapon(dt, false, dist > 1);
         skdiff -= weapon_effskill(dt, at, dwp, false, dist > 1);
+    }
+
+    /* Defender in a building get attack bonus */
+    if (af->building && af->building->type->protection) {
+        int castle_attack_bonus = 0;
+        if (awp && fval(awp->type, WTF_MISSILE))
+        {
+            castle_attack_bonus = af->building->type->protection(af->building, au, RANGED_ATTACK_BONUS);
+        }
+        else
+        {
+            castle_attack_bonus = af->building->type->protection(af->building, au, CLOSE_COMBAT_ATTACK_BONUS);
+        }
+        if (castle_attack_bonus) {
+            skdiff += castle_attack_bonus;
+        }
     }
     return skdiff;
 }
@@ -2048,6 +2066,25 @@ void dazzle(battle * b, troop * td)
     td->fighter->person[td->index].defence--;
 }
 
+int castles_use_unit_weigth(void)
+{
+    int value = -1;
+    if (value < 0) {
+        /* If the parameter is 0, use old rules. Else use size * capacity (from xml building config) * 1000 */
+        /* and use race weight to calculate how many fighter a castle can hold */
+        value = get_param_int(global.parameters, "rules.combat.castles_use_unit_weigth", 0);
+    }
+    return value;    
+}
+
+int castle_capacity(building * b)
+{
+    if (castles_use_unit_weigth()) {
+        return buildingcapacity(b) * 1000;  /* CTD Using race weight like E3-ships*/
+    }
+    return buildingcapacity(b);
+}
+
 void damage_building(battle * b, building * bldg, int damage_abs)
 {
     bldg->size = _max(1, bldg->size - damage_abs);
@@ -2057,18 +2094,29 @@ void damage_building(battle * b, building * bldg, int damage_abs)
     if (bldg->type->protection) {
         side *s;
 
-        bldg->sizeleft = bldg->size;
+        bldg->sizeleft = castle_capacity(bldg);
 
         for (s = b->sides; s != b->sides + b->nsides; ++s) {
             fighter *fig;
             for (fig = s->fighters; fig; fig = fig->next) {
                 if (fig->building == bldg) {
-                    if (bldg->sizeleft >= fig->unit->number) {
-                        fig->building = bldg;
-                        bldg->sizeleft -= fig->unit->number;
-                    }
+                    if (castles_use_unit_weigth()) {
+                        if (bldg->sizeleft >= (fig->unit->number * u_race(fig->unit)->weight)) {
+                            fig->building = bldg;
+                            bldg->sizeleft -= (fig->unit->number * u_race(fig->unit)->weight);
+                        }
+                        else {
+                            fig->building = NULL;
+                        }
+                    } 
                     else {
-                        fig->building = NULL;
+                        if (bldg->sizeleft >= fig->unit->number) {
+                            fig->building = bldg;
+                            bldg->sizeleft -= fig->unit->number;
+                        }
+                        else {
+                            fig->building = NULL;
+                        }
                     }
                 }
             }
@@ -3255,9 +3303,17 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     }
     else {
         building *bld = u->building;
-        if (bld && bld->sizeleft >= u->number && playerrace(u_race(u))) {
-            fig->building = bld;
-            fig->building->sizeleft -= u->number;
+        if (castles_use_unit_weigth()) {
+            if (bld && bld->sizeleft >= u->number * u_race(u)->weight && playerrace(u_race(u))) { /* CTD Using race weight like E3-ships*/
+                fig->building = bld;
+                fig->building->sizeleft -= u->number * u_race(u)->weight;
+            }
+        }
+        else {
+            if (bld && bld->sizeleft >= u->number && playerrace(u_race(u))) {
+                fig->building = bld;
+                fig->building->sizeleft -= u->number;
+            }
         }
     }
     fig->status = u->status;
@@ -3586,7 +3642,7 @@ battle *make_battle(region * r)
 
     /* Alle Mann raus aus der Burg! */
     for (bld = r->buildings; bld != NULL; bld = bld->next)
-        bld->sizeleft = bld->size;
+        bld->sizeleft = castle_capacity(bld);
 
     if (battledebug) {
         char zText[MAX_PATH];
