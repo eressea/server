@@ -152,6 +152,13 @@ static order *monster_attack(unit * u, const unit * target)
   return create_order(K_ATTACK, u->faction->locale, "%i", target->no);
 }
 
+static bool attackable(const unit *u, const unit *u2) {
+  const struct building *inside = inside_building(u2);
+
+  return cansee(u->faction, u->region, u2, 0) && u2->faction != u->faction 
+    && (inside == NULL || inside == u->building);
+}
+
 static order *get_money_for_dragon(region * r, unit * u, int wanted)
 {
     unit *u2;
@@ -181,16 +188,18 @@ static order *get_money_for_dragon(region * r, unit * u, int wanted)
 
     /* falls der drache launisch ist, oder das regionssilber knapp, greift er alle an */
     n = 0;
-    for (u2 = r->units; u2; u2 = u2->next) {
-        if (inside_building(u2) != u->building && is_guard(u, GUARD_TAX) && u2->faction != u->faction && cansee(u->faction, r, u2, 0)) {
-            int m = get_money(u2);
-            if (m == 0 || is_guard(u2, GUARD_TAX) || attack_chance <= 0.0)
-                continue;
-            else {
-                order *ord = monster_attack(u, u2);
-                if (ord) {
-                    addlist(&u->orders, ord);
-                    n += m;
+    if (is_guard(u, GUARD_TAX)) {
+        for (u2 = r->units; u2; u2 = u2->next) {
+            if (attackable(u, u2)) {
+                int m = get_money(u2);
+                if (m == 0 || attack_chance <= 0.0)
+                    continue;
+                else {
+                    order *ord = monster_attack(u, u2);
+                    if (ord) {
+                        addlist(&u->orders, ord);
+                        n += m;
+                    }
                 }
             }
         }
@@ -545,8 +554,7 @@ static void monster_attacks(unit * u)
   unit *u2;
 
   for (u2 = r->units; u2; u2 = u2->next) {
-      if (cansee(u->faction, r, u2, 0) && u2->faction != u->faction && inside_building(u2)!=u->building
-      && chance(0.75)) {
+    if (attackable(u, u2)) {
       order *ord = monster_attack(u, u2);
       if (ord)
         addlist(&u->orders, ord);
@@ -793,9 +801,10 @@ void plan_monsters(faction * f)
       /* Befehle müssen jede Runde neu gegeben werden: */
       free_orders(&u->orders);
 
-      if (attacking && is_guard(u, GUARD_TAX)) {
+      if (attacking && (is_guard(u, GUARD_TAX) || !r->land)) {
         monster_attacks(u);
       }
+
       /* units with a plan to kill get ATTACK orders: */
       ta = a_find(u->attribs, &at_hate);
       if (ta && !monster_is_waiting(u)) {
