@@ -712,7 +712,7 @@ function test_golem_use_four_iron()
     assert_equal(4, u1:get_item("towershield"))
 end
 
-function test_silver_weight_stops_movement()
+function skip_test_silver_weight_stops_movement()
     local r1 = region.create(1, 1, "plain")
     local r2 = region.create(2, 1, "plain")
     region.create(3, 1, "plain")
@@ -729,7 +729,7 @@ function test_silver_weight_stops_movement()
     assert_equal(r2, u1.region)
 end
 
-function test_silver_weight_stops_ship()
+function skip_test_silver_weight_stops_ship()
     local r1 = region.create(1, 1, "ocean")
     local r2 = region.create(2, 1, "ocean")
     region.create(3, 1, "ocean")
@@ -769,4 +769,13 @@ function test_building_owner_can_enter_ship()
     process_orders()
     assert_equal(s1, u1.ship)
     assert_equal(null, u1.building, "owner of the building can not go into a ship")
+end
+
+function test_weightless_silver()
+    local r1 = region.create(1, 2, "plain")    
+    local f1 = faction.create("noreply@eressea.de", "human", "de")
+    local u1 = unit.create(f1, r1, 1)
+    assert_equal(1000, u1.weight)
+    u1:add_item("money", 540)
+    assert_equal(1000, u1.weight)
 end
