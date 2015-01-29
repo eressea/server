@@ -1,3 +1,4 @@
+#include <platform.h>
 #pragma warning(push)
 #pragma warning(disable: 4100)
 #include "config.pkg.c"

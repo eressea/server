@@ -1,6 +1,10 @@
 <?xml version="1.0"?>
 <resources>
 
+  <resource name="money">
+    <item weight="0"/>
+  </resource>
+
   <resource name="ao_healing" appearance="amulet">
     <item weight="0" score="6000"/>
   </resource>

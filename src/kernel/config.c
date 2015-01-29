@@ -144,7 +144,7 @@ bool ExpensiveMigrants(void)
         gamecookie = global.cookie;
         value = get_param_int(global.parameters, "study.expensivemigrants", 0);
     }
-    return value;
+    return value!=0;
 }
 
 /** Specifies automatic alliance modes.
@@ -932,12 +932,12 @@ void init_terrains_translation(const struct locale *lang) {
         variant var;
         const char *name;
         var.v = (void *)terrain;
-        name = LOC(lang, terrain->_name);
+        name = locale_string(lang, terrain->_name, false);
         if (name) {
             addtoken(tokens, name, var);
         }
         else {
-            log_error("no translation for terrain %s in locale %s", terrain->_name, locale_name(lang));
+            log_debug("no translation for terrain %s in locale %s", terrain->_name, locale_name(lang));
         }
     }
 }
@@ -951,12 +951,12 @@ void init_options_translation(const struct locale * lang) {
         variant var;
         var.i = i;
         if (options[i]) {
-            const char *name = LOC(lang, options[i]);
+            const char *name = locale_string(lang, options[i], false);
             if (name) {
                 addtoken(tokens, name, var);
             }
             else {
-                log_error("no translation for OPTION %s in locale %s", options[i], locale_name(lang));
+                log_debug("no translation for OPTION %s in locale %s", options[i], locale_name(lang));
             }
         }
     }
@@ -1006,9 +1006,9 @@ void init_locale(struct locale *lang)
     for (rc = races; rc; rc = rc->next) {
         const char *name;
         var.v = (void *)rc;
-        name = LOC(lang, rc_name_s(rc, NAME_PLURAL));
+        name = locale_string(lang, rc_name_s(rc, NAME_PLURAL), false);
         if (name) addtoken(tokens, name, var);
-        name = LOC(lang, rc_name_s(rc, NAME_SINGULAR));
+        name = locale_string(lang, rc_name_s(rc, NAME_SINGULAR), false);
         if (name) addtoken(tokens, name, var);
     }
 
@@ -1693,7 +1693,7 @@ order *default_order(const struct locale *lang)
     assert(i < MAXLOCALES);
     result = defaults[i];
     if (!result && usedefault) {
-        const char * str = locale_string(lang, "defaultorder");
+        const char * str = LOC(lang, "defaultorder");
         if (str) {
             result = defaults[i] = parse_order(str, lang);
         }

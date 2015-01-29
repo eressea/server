@@ -1901,7 +1901,7 @@ int skilldiff(troop at, troop dt, int dist)
             init = true;
         }
         if (df->building->type->protection) {
-            int beff = df->building->type->protection(df->building, du);
+            int beff = df->building->type->protection(df->building, du, DEFENSE_BONUS);
             if (beff) {
                 skdiff -= beff;
                 is_protected = 2;
@@ -1918,7 +1918,7 @@ int skilldiff(troop at, troop dt, int dist)
         if (magicwalls_ct
             && curse_active(get_curse(df->building->attribs, magicwalls_ct))) {
             /* Verdoppelt Burgenbonus */
-            skdiff -= buildingeffsize(df->building, false);
+            skdiff -= df->building->type->protection(df->building, du, DEFENSE_BONUS);
         }
     }
     /* Goblin-Verteidigung

@@ -140,14 +140,13 @@ extern "C" {
         int at_bonus;               /* Verändert den Angriffsskill (default: 0) */
         int df_bonus;               /* Verändert den Verteidigungskill (default: 0) */
         const struct spell *precombatspell;
-        struct att attack[10];
-        signed char bonus[MAXSKILLS];
         signed char *study_speed;   /* study-speed-bonus in points/turn (0=30 Tage) */
-        bool __remove_me_nonplayer;
         int flags;
         int battle_flags;
         int ec_flags;
         race_t oldfamiliars[MAXMAGIETYP];
+        struct att attack[10];
+        signed char bonus[MAXSKILLS];
 
         const char *(*generate_name) (const struct unit *);
         const char *(*describe) (const struct unit *, const struct locale *);

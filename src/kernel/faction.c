@@ -280,9 +280,7 @@ unit *addplayer(region * r, faction * f)
 
 bool checkpasswd(const faction * f, const char *passwd)
 {
-    if (passwd && unicode_utf8_strcasecmp(f->passw, passwd) == 0)
-        return true;
-    return false;
+    return (passwd && unicode_utf8_strcasecmp(f->passw, passwd) == 0);
 }
 
 variant read_faction_reference(struct storage * store)

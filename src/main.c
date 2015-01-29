@@ -304,8 +304,6 @@ int main(int argc, char **argv)
 
     L = lua_init();
     game_init();
-    register_races();
-    register_spells();
     bind_monsters(L);
     err = eressea_run(L, luafile);
     if (err) {

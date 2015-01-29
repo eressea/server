@@ -167,7 +167,10 @@ construction ** consPtr)
         con->maxsize = xml_ivalue(node, "maxsize", -1);
         con->minskill = xml_ivalue(node, "minskill", -1);
         con->reqsize = xml_ivalue(node, "reqsize", -1);
-
+        con->defense_bonus = xml_ivalue(node, "defense_bonus", 0);
+        con->close_combat_bonus = xml_ivalue(node, "close_combat_bonus", 0);
+        con->ranged_bonus = xml_ivalue(node, "ranged_bonus", 0);
+        
         propValue = xmlGetProp(node, BAD_CAST "building");
         if (propValue != NULL) {
             con->btype = bt_get_or_create((const char *)propValue);
@@ -297,7 +300,7 @@ static int parse_buildings(xmlDocPtr doc)
                     btype->age = (void(*)(struct building *))fun;
                 }
                 else if (strcmp((const char *)propValue, "protection") == 0) {
-                    btype->protection = (int(*)(struct building *, struct unit *))fun;
+                    btype->protection = (int(*)(struct building *, struct unit *, building_bonus))fun;
                 }
                 else if (strcmp((const char *)propValue, "taxes") == 0) {
                     btype->taxes = (double(*)(const struct building *, int))fun;
@@ -1623,22 +1626,22 @@ static int parse_races(xmlDocPtr doc)
         rc->def_damage = _strdup((const char *)propValue);
         xmlFree(propValue);
 
-        rc->magres = (float)xml_fvalue(node, "magres", 0.0);
-        rc->maxaura = (float)xml_fvalue(node, "maxaura", 0.0);
-        rc->regaura = (float)xml_fvalue(node, "regaura", 1.0);
-        rc->recruitcost = xml_ivalue(node, "recruitcost", 0);
-        rc->maintenance = xml_ivalue(node, "maintenance", 0);
-        rc->weight = xml_ivalue(node, "weight", PERSON_WEIGHT);
-        rc->capacity = xml_ivalue(node, "capacity", 540);
-        rc->speed = (float)xml_fvalue(node, "speed", 1.0F);
-        rc->hitpoints = xml_ivalue(node, "hp", 0);
-        rc->armor = (char)xml_ivalue(node, "ac", 0);
+        rc->magres = (float)xml_fvalue(node, "magres", rc->magres);
+        rc->maxaura = (float)xml_fvalue(node, "maxaura", rc->maxaura);
+        rc->regaura = (float)xml_fvalue(node, "regaura", rc->regaura);
+        rc->recruitcost = xml_ivalue(node, "recruitcost", rc->recruitcost);
+        rc->maintenance = xml_ivalue(node, "maintenance", rc->maintenance);
+        rc->weight = xml_ivalue(node, "weight", rc->weight);
+        rc->capacity = xml_ivalue(node, "capacity", rc->capacity);
+        rc->speed = (float)xml_fvalue(node, "speed", rc->speed);
+        rc->hitpoints = xml_ivalue(node, "hp", rc->hitpoints);
+        rc->armor = (char)xml_ivalue(node, "ac", rc->armor);
         study_speed_base = xml_ivalue(node, "studyspeed", 0);
 
         rc->at_default = (char)xml_ivalue(node, "unarmedattack", -2);
         rc->df_default = (char)xml_ivalue(node, "unarmeddefense", -2);
-        rc->at_bonus = (char)xml_ivalue(node, "attackmodifier", 0);
-        rc->df_bonus = (char)xml_ivalue(node, "defensemodifier", 0);
+        rc->at_bonus = (char)xml_ivalue(node, "attackmodifier", rc->at_bonus);
+        rc->df_bonus = (char)xml_ivalue(node, "defensemodifier", rc->df_bonus);
 
         if (!xml_bvalue(node, "playerrace", false))
             rc->flags |= RCF_NPC;

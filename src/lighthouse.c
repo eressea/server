@@ -104,9 +104,9 @@ bool check_leuchtturm(region * r, faction * f)
 {
     attrib *a;
 
-    if (!fval(r->terrain, SEA_REGION))
+    if (!fval(r->terrain, SEA_REGION)) {
         return false;
-
+    }
     for (a = a_find(r->attribs, &at_lighthouse); a && a->type == &at_lighthouse;
         a = a->next) {
         building *b = (building *)a->data.v;
@@ -141,7 +141,7 @@ bool check_leuchtturm(region * r, faction * f)
             }
             else {
                 /* E3A rule: no perception req'd */
-                return maxd;
+                return true;
             }
         }
     }

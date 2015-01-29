@@ -1,4 +1,3 @@
-#include <config.h>
 #include <platform.h>
 #include "vortex.h"
 
@@ -28,7 +27,7 @@ static dir_lookup *dir_name_lookup;
 
 void register_special_direction(struct locale *lang, const char *name)
 {
-    const char *token = LOC(lang, name);
+    const char *token = locale_string(lang, name, false);
 
     if (token) {
         void **tokens = get_translations(lang, UT_SPECDIR);
@@ -47,7 +46,7 @@ void register_special_direction(struct locale *lang, const char *name)
         }
     }
     else {
-        log_error("no translation for spec_direction '%s' in locale '%s'\n", name, locale_name(lang));
+        log_debug("no translation for spec_direction '%s' in locale '%s'\n", name, locale_name(lang));
     }
 }
 

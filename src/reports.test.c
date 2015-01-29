@@ -1,3 +1,4 @@
+#include <platform.h>
 #include <config.h>
 #include "reports.h"
 

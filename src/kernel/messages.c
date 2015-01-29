@@ -17,7 +17,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
 #include <platform.h>
-#include <kernel/config.h>
 #include "messages.h"
 
 /* kernel includes */
@@ -140,7 +139,7 @@ struct message *msg_feedback(const struct unit *u, struct order *ord,
 message *msg_message(const char *name, const char *sig, ...)
         /* msg_message("oops_error", "unit region command", u, r, cmd) */
 {
-  va_list marker;
+  va_list vargs;
   const message_type *mtype = mt_find(name);
   char paramname[64];
   const char *ic = sig;
@@ -155,7 +154,7 @@ message *msg_message(const char *name, const char *sig, ...)
     return NULL;
   }
 
-  va_start(marker, sig);
+  va_start(vargs, sig);
   while (*ic && !isalnum(*ic))
     ic++;
   while (*ic) {
@@ -172,9 +171,9 @@ message *msg_message(const char *name, const char *sig, ...)
     }
     if (i != mtype->nparameters) {
       if (mtype->types[i]->vtype == VAR_VOIDPTR) {
-        args[i].v = va_arg(marker, void *);
+          args[i].v = va_arg(vargs, void *);
       } else if (mtype->types[i]->vtype == VAR_INT) {
-        args[i].i = va_arg(marker, int);
+          args[i].i = va_arg(vargs, int);
       } else {
         assert(!"unknown variant type");
       }
@@ -185,7 +184,7 @@ message *msg_message(const char *name, const char *sig, ...)
     while (*ic && !isalnum(*ic))
       ic++;
   }
-  va_end(marker);
+  va_end(vargs);
 
   return msg_create(mtype, args);
 }

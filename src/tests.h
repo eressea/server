@@ -13,6 +13,8 @@ extern "C" {
     struct faction;
     struct building;
     struct ship;
+    struct message;
+    struct message_list;
     struct item_type;
     struct building_type;
     struct ship_type;
@@ -35,6 +37,8 @@ extern "C" {
 
     int RunAllTests(void);
     void test_translate_param(const struct locale *lang, param_t param, const char *text);
+    const char * test_get_messagetype(const struct message *msg);
+    struct message * test_get_last_message(struct message_list *mlist);
 
 #ifdef __cplusplus
 }
