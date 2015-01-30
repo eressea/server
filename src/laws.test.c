@@ -1,5 +1,5 @@
 #include <platform.h>
-#include "laws.h"
+#include "laws.c"
 
 #include <kernel/ally.h>
 #include <kernel/config.h>
@@ -16,6 +16,7 @@
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/message.h>
+#include <util/rand.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -691,6 +692,32 @@ static void test_reserve_self(CuTest *tc) {
     test_cleanup();
 }
 
+static void statistic_test(CuTest *tc, int peasants, int luck, int maxp,
+  float variance, int min_value, int max_value)
+{
+  int effect, i;
+  for (i = 0; i < 1000; ++i) {
+    effect = peasant_luck_effect(peasants, luck, maxp, variance);
+    CuAssertTrue(tc, min_value <= effect);
+    CuAssertTrue(tc, max_value >= effect);
+  }
+}
+
+static void test_peasant_luck_effect(CuTest *tc)
+{
+
+  set_param(&global.parameters, "rules.peasants.peasantluck.factor", "10");
+  set_param(&global.parameters, "rules.peasants.growth.factor", "0.001");
+
+  statistic_test(tc, 100, 2, 1000, 0, 1, 1);
+  statistic_test(tc, 1000, 400, 1000, 0, 400 * 10 * 0.001 * .75,
+    400 * 10 * 0.001 * .75);
+  statistic_test(tc, 1000, 1000, 2000, .5, 1, 501);
+
+  set_param(&global.parameters, "rules.peasants.growth.factor", "1");
+  statistic_test(tc, 1000, 1000, 1000, 0, 501, 501);
+}
+
 CuSuite *get_laws_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -721,6 +748,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_force_leave_buildings);
     SUITE_ADD_TEST(suite, test_force_leave_ships);
     SUITE_ADD_TEST(suite, test_force_leave_ships_on_ocean);
+    SUITE_ADD_TEST(suite, test_peasant_luck_effect);
 
     return suite;
 }
