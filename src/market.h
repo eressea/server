@@ -1,4 +1,4 @@
-/* vi: set ts=2:
+/*
 +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
 |                   |  Enno Rehling <enno@eressea.de>
 | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
@@ -6,7 +6,7 @@
 |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
 +-------------------+  Stefan Reich <reich@halbling.de>
 
-This program may not be used, modified or distributed 
+This program may not be used, modified or distributed
 without prior permission by the authors of Eressea.
 
 */
@@ -15,9 +15,9 @@ without prior permission by the authors of Eressea.
 #ifdef __cplusplus
 extern "C" {
 #endif
-  struct building;
+    struct building;
 
-  extern void do_markets(void);
+    extern void do_markets(void);
 
 #ifdef __cplusplus
 }

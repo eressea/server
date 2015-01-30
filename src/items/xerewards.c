@@ -1,7 +1,7 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Copyright (c) 1998-2015, Enno Rehling Rehling <enno@eressea.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -41,53 +41,53 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 static int
 use_skillpotion(struct unit *u, const struct item_type *itype, int amount,
-  struct order *ord)
+struct order *ord)
 {
-  /* the problem with making this a lua function is that there's no way
-   * to get the list of skills for a unit. and with the way skills are 
-   * currently saved, it doesn't look likely (can't make eressea::list 
-   * from them)
-   */
-  int n;
-  for (n = 0; n != amount; ++n) {
-    skill *sv = u->skills;
-    while (sv != u->skills + u->skill_size) {
-      int i;
-      for (i = 0; i != 3; ++i)
-        learn_skill(u, (skill_t)sv->id, 1.0);
-      ++sv;
+    /* the problem with making this a lua function is that there's no way
+     * to get the list of skills for a unit. and with the way skills are
+     * currently saved, it doesn't look likely (can't make eressea::list
+     * from them)
+     */
+    int n;
+    for (n = 0; n != amount; ++n) {
+        skill *sv = u->skills;
+        while (sv != u->skills + u->skill_size) {
+            int i;
+            for (i = 0; i != 3; ++i)
+                learn_skill(u, (skill_t)sv->id, 1.0);
+            ++sv;
+        }
     }
-  }
-  ADDMSG(&u->faction->msgs, msg_message("skillpotion_use", "unit", u));
+    ADDMSG(&u->faction->msgs, msg_message("skillpotion_use", "unit", u));
 
-  change_resource(u, itype->rtype, -amount);
-  return 0;
+    change_resource(u, itype->rtype, -amount);
+    return 0;
 }
 
 static int
 use_manacrystal(struct unit *u, const struct item_type *itype, int amount,
-  struct order *ord)
+struct order *ord)
 {
-  int i, sp = 0;
+    int i, sp = 0;
 
-  if (!is_mage(u)) {
-    cmistake(u, u->thisorder, 295, MSG_EVENT);
-    return -1;
-  }
+    if (!is_mage(u)) {
+        cmistake(u, u->thisorder, 295, MSG_EVENT);
+        return -1;
+    }
 
-  for (i = 0; i != amount; ++i) {
-    sp += _max(25, max_spellpoints(u->region, u) / 2);
-    change_spellpoints(u, sp);
-  }
+    for (i = 0; i != amount; ++i) {
+        sp += _max(25, max_spellpoints(u->region, u) / 2);
+        change_spellpoints(u, sp);
+    }
 
-  ADDMSG(&u->faction->msgs, msg_message("manacrystal_use", "unit aura", u, sp));
+    ADDMSG(&u->faction->msgs, msg_message("manacrystal_use", "unit aura", u, sp));
 
-  change_resource(u, itype->rtype, -amount);
-  return 0;
+    change_resource(u, itype->rtype, -amount);
+    return 0;
 }
 
 void register_xerewards(void)
 {
-  register_item_use(use_skillpotion, "use_skillpotion");
-  register_item_use(use_manacrystal, "use_manacrystal");
+    register_item_use(use_skillpotion, "use_skillpotion");
+    register_item_use(use_manacrystal, "use_manacrystal");
 }

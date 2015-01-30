@@ -1,7 +1,7 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Copyright (c) 1998-2015, Enno Rehling Rehling <enno@eressea.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -28,29 +28,31 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <string.h>
 
 attrib_type at_racename = {
-  "racename", NULL, a_finalizestring, NULL, a_writestring, a_readstring
+    "racename", NULL, a_finalizestring, NULL, a_writestring, a_readstring
 };
 
 const char *get_racename(attrib * alist)
 {
-  attrib *a = a_find(alist, &at_racename);
-  if (a)
-    return (const char *)a->data.v;
-  return NULL;
+    attrib *a = a_find(alist, &at_racename);
+    if (a)
+        return (const char *)a->data.v;
+    return NULL;
 }
 
 void set_racename(attrib ** palist, const char *name)
 {
-  attrib *a = a_find(*palist, &at_racename);
-  if (!a && name) {
-    a = a_add(palist, a_new(&at_racename));
-    a->data.v = _strdup(name);
-  } else if (a && !name) {
-    a_remove(palist, a);
-  } else if (a) {
-    if (strcmp(a->data.v, name) != 0) {
-      free(a->data.v);
-      a->data.v = _strdup(name);
+    attrib *a = a_find(*palist, &at_racename);
+    if (!a && name) {
+        a = a_add(palist, a_new(&at_racename));
+        a->data.v = _strdup(name);
     }
-  }
+    else if (a && !name) {
+        a_remove(palist, a);
+    }
+    else if (a) {
+        if (strcmp(a->data.v, name) != 0) {
+            free(a->data.v);
+            a->data.v = _strdup(name);
+        }
+    }
 }

@@ -1,4 +1,4 @@
-/* vi: set ts=2:
+/* 
 +-------------------+
 |                   |  Enno Rehling <enno@eressea.de>
 | Eressea PBEM host |  Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -14,22 +14,22 @@ without prior permission by the authors of Eressea.
 extern "C" {
 #endif
 
-  struct lua_State;
-  struct quicklist;
+    struct lua_State;
+    struct quicklist;
 
-  int tolua_sqlite_open(struct lua_State *L);
-  int tolua_bindings_open(struct lua_State *L);
-  int tolua_spelllist_next(struct lua_State *L);
-  int tolua_itemlist_next(struct lua_State *L);
-  int tolua_orderlist_next(struct lua_State *L);
-  int tolua_quicklist_push(struct lua_State *L, const char *list_type,
-    const char *elem_type, struct quicklist *list);
+    int tolua_sqlite_open(struct lua_State *L);
+    int tolua_bindings_open(struct lua_State *L);
+    int tolua_spelllist_next(struct lua_State *L);
+    int tolua_itemlist_next(struct lua_State *L);
+    int tolua_orderlist_next(struct lua_State *L);
+    int tolua_quicklist_push(struct lua_State *L, const char *list_type,
+        const char *elem_type, struct quicklist *list);
 
-  int log_lua_error(struct lua_State *L);
+    int log_lua_error(struct lua_State *L);
 
-  void lua_done(struct lua_State *L);
-  struct lua_State *lua_init(void);
-  int eressea_run(struct lua_State *L, const char *luafile);
+    void lua_done(struct lua_State *L);
+    struct lua_State *lua_init(void);
+    int eressea_run(struct lua_State *L, const char *luafile);
 
 #ifdef __cplusplus
 }

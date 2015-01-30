@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2015, Enno Rehling Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -1218,7 +1218,7 @@ skill *add_skill(unit * u, skill_t id)
     sv->old = 0;
     sv->id = id;
     if (id == SK_MAGIC && u->faction && !fval(u->faction, FFL_NPC)) {
-        assert(u->number<=1);
+        assert(u->number <= 1);
         assert(max_magicians(u->faction) >= u->number);
     }
     return sv;
@@ -1882,7 +1882,8 @@ char *write_unitname(const unit * u, char *buffer, size_t size)
 {
     if (u->name) {
         slprintf(buffer, size, "%s (%s)", u->name, itoa36(u->no));
-    } else {
+    }
+    else {
         const struct locale * lang = u->faction ? u->faction->locale : default_locale;
         const char * name = rc_name_s(u->_race, u->number == 1 ? NAME_SINGULAR : NAME_PLURAL);
         slprintf(buffer, size, "%s (%s)", LOC(lang, name), itoa36(u->no));

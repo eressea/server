@@ -1,4 +1,4 @@
-/* vi: set ts=2:
+/*
  +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  |                   |  Enno Rehling <enno@eressea.de>
  | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
@@ -8,7 +8,7 @@
 
  This program may not be used, modified or distributed
  without prior permission by the authors of Eressea.
-*/
+ */
 
 #include <platform.h>
 #include <kernel/config.h>
@@ -45,17 +45,17 @@
 
 static int read_permissions(attrib * a, void *owner, struct storage *store)
 {
-  assert(!a);
-  a_read(store, &a, owner);
-  a_remove(&a, a);
-  return AT_READ_OK;
+    assert(!a);
+    a_read(store, &a, owner);
+    a_remove(&a, a);
+    return AT_READ_OK;
 }
 
 static int read_gmcreate(attrib * a, void *owner, struct storage *store)
 {
-  char zText[32];
-  READ_TOK(store, zText, sizeof(zText));
-  return AT_READ_OK;
+    char zText[32];
+    READ_TOK(store, zText, sizeof(zText));
+    return AT_READ_OK;
 }
 
 void register_gmcmd(void)

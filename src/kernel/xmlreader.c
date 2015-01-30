@@ -1,4 +1,4 @@
-/* vi: set ts=2:
+/* 
 +-------------------+
 |                   |  Enno Rehling <enno@eressea.de>
 | Eressea PBEM host |  Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -170,7 +170,7 @@ construction ** consPtr)
         con->defense_bonus = xml_ivalue(node, "defense_bonus", 0);
         con->close_combat_bonus = xml_ivalue(node, "close_combat_bonus", 0);
         con->ranged_bonus = xml_ivalue(node, "ranged_bonus", 0);
-        
+
         propValue = xmlGetProp(node, BAD_CAST "building");
         if (propValue != NULL) {
             con->btype = bt_get_or_create((const char *)propValue);

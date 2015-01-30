@@ -1,7 +1,7 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Copyright (c) 1998-2015, Enno Rehling Rehling <enno@eressea.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -22,16 +22,16 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-/* all types we use are defined here to reduce dependencies */
-  struct trigger_type;
-  struct trigger;
-  struct unit;
-  struct item_type;
+    /* all types we use are defined here to reduce dependencies */
+    struct trigger_type;
+    struct trigger;
+    struct unit;
+    struct item_type;
 
-  extern struct trigger_type tt_giveitem;
+    extern struct trigger_type tt_giveitem;
 
-  extern struct trigger *trigger_giveitem(struct unit *mage,
-    const struct item_type *itype, int number);
+    struct trigger *trigger_giveitem(struct unit *mage,
+        const struct item_type *itype, int number);
 
 #ifdef __cplusplus
 }

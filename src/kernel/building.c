@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2015, Enno Rehling Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -93,7 +93,7 @@ void bt_register(building_type * type)
 }
 
 void free_buildingtype(void *ptr) {
-    building_type *btype =(building_type *)ptr;
+    building_type *btype = (building_type *)ptr;
     free(btype->_name);
     free(btype);
 }
@@ -330,7 +330,7 @@ static int building_protection(building * b, unit * u, building_bonus bonus)
     {
         cons = cons->improvement;
     }
-    
+
     switch (bonus)
     {
     case DEFENSE_BONUS:

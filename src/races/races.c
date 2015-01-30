@@ -1,4 +1,4 @@
-/* vi: set ts=2:
+/*
  * +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  * |                   |  Enno Rehling <enno@eressea.de>
  * | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
@@ -40,12 +40,12 @@ void age_ghoul(struct unit *u);
 
 static void oldfamiliars(unit * u)
 {
-  char fname[64];
-  /* these familiars have no special skills.
-   */
-  _snprintf(fname, sizeof(fname), "%s_familiar", u_race(u)->_name);
-  create_mage(u, M_GRAY);
-  equip_unit(u, get_equipment(fname));
+    char fname[64];
+    /* these familiars have no special skills.
+     */
+    _snprintf(fname, sizeof(fname), "%s_familiar", u_race(u)->_name);
+    create_mage(u, M_GRAY);
+    equip_unit(u, get_equipment(fname));
 }
 
 static void equip_newunits(const struct equipment *eq, struct unit *u)
@@ -61,7 +61,7 @@ static void equip_newunits(const struct equipment *eq, struct unit *u)
         rtype = rt_find("roi");
         set_show_item(u->faction, rtype->itype);
         set_number(u, 10);
-    break;
+        break;
     case RC_HUMAN:
         if (u->building == NULL) {
             const building_type *btype = bt_find("castle");
@@ -78,44 +78,44 @@ static void equip_newunits(const struct equipment *eq, struct unit *u)
         set_show_item(u->faction, rtype->itype);
         break;
     case RC_AQUARIAN:
-        {
-            ship *sh = new_ship(st_find("boat"), r, u->faction->locale);
-            sh->size = sh->type->construction->maxsize;
-            u_set_ship(u, sh);
-        }
-        break;
+    {
+        ship *sh = new_ship(st_find("boat"), r, u->faction->locale);
+        sh->size = sh->type->construction->maxsize;
+        u_set_ship(u, sh);
+    }
+    break;
     case RC_CENTAUR:
         rsethorses(r, 250 + rng_int() % 51 + rng_int() % 51);
         break;
     default:
         break;
-  }
+    }
 }
 
 /* Die Funktionen werden über den hier registrierten Namen in races.xml
  * in die jeweilige Rassendefiniton eingebunden */
 void register_races(void)
 {
-  /* function initfamiliar */
-  register_function((pf_generic) oldfamiliars, "oldfamiliars");
+    /* function initfamiliar */
+    register_function((pf_generic)oldfamiliars, "oldfamiliars");
 
-  register_function((pf_generic) allowed_dragon, "movedragon");
+    register_function((pf_generic)allowed_dragon, "movedragon");
 
-  register_function((pf_generic) allowed_swim, "moveswimming");
-  register_function((pf_generic) allowed_fly, "moveflying");
-  register_function((pf_generic) allowed_walk, "movewalking");
+    register_function((pf_generic)allowed_swim, "moveswimming");
+    register_function((pf_generic)allowed_fly, "moveflying");
+    register_function((pf_generic)allowed_walk, "movewalking");
 
-  /* function age for race->age() */
-  register_function((pf_generic) age_undead, "ageundead");
-  register_function((pf_generic) age_illusion, "ageillusion");
-  register_function((pf_generic) age_skeleton, "ageskeleton");
-  register_function((pf_generic) age_zombie, "agezombie");
-  register_function((pf_generic) age_ghoul, "ageghoul");
-  register_function((pf_generic) age_dragon, "agedragon");
-  register_function((pf_generic) age_firedragon, "agefiredragon");
+    /* function age for race->age() */
+    register_function((pf_generic)age_undead, "ageundead");
+    register_function((pf_generic)age_illusion, "ageillusion");
+    register_function((pf_generic)age_skeleton, "ageskeleton");
+    register_function((pf_generic)age_zombie, "agezombie");
+    register_function((pf_generic)age_ghoul, "ageghoul");
+    register_function((pf_generic)age_dragon, "agedragon");
+    register_function((pf_generic)age_firedragon, "agefiredragon");
 
-  /* function itemdrop
-   * to generate battle spoils
-   * race->itemdrop() */
-  register_function((pf_generic) equip_newunits, "equip_newunits");
+    /* function itemdrop
+     * to generate battle spoils
+     * race->itemdrop() */
+    register_function((pf_generic)equip_newunits, "equip_newunits");
 }

@@ -1,7 +1,7 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Copyright (c) 1998-2015, Enno Rehling Rehling <enno@eressea.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -45,64 +45,65 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  **/
 
 typedef struct changefaction_data {
-  struct unit *unit;
-  struct faction *faction;
+    struct unit *unit;
+    struct faction *faction;
 } changefaction_data;
 
 static void changefaction_init(trigger * t)
 {
-  t->data.v = calloc(sizeof(changefaction_data), 1);
+    t->data.v = calloc(sizeof(changefaction_data), 1);
 }
 
 static void changefaction_free(trigger * t)
 {
-  free(t->data.v);
+    free(t->data.v);
 }
 
 static int changefaction_handle(trigger * t, void *data)
 {
-  /* call an event handler on changefaction.
-   * data.v -> ( variant event, int timer )
-   */
-  changefaction_data *td = (changefaction_data *) t->data.v;
-  if (td->unit && td->faction) {
-    u_setfaction(td->unit, td->faction);
-  } else {
-    log_error("could not perform changefaction::handle()\n");
-  }
-  unused_arg(data);
-  return 0;
+    /* call an event handler on changefaction.
+     * data.v -> ( variant event, int timer )
+     */
+    changefaction_data *td = (changefaction_data *)t->data.v;
+    if (td->unit && td->faction) {
+        u_setfaction(td->unit, td->faction);
+    }
+    else {
+        log_error("could not perform changefaction::handle()\n");
+    }
+    unused_arg(data);
+    return 0;
 }
 
 static void changefaction_write(const trigger * t, struct storage *store)
 {
-  changefaction_data *td = (changefaction_data *) t->data.v;
-  write_unit_reference(td->unit, store);
-  write_faction_reference(td->faction, store);
+    changefaction_data *td = (changefaction_data *)t->data.v;
+    write_unit_reference(td->unit, store);
+    write_faction_reference(td->faction, store);
 }
 
 static int changefaction_read(trigger * t, struct storage *store)
 {
-  changefaction_data *td = (changefaction_data *) t->data.v;
-  read_reference(&td->unit, store, read_unit_reference, resolve_unit);
-  read_reference(&td->faction, store, read_faction_reference, resolve_faction);
-  return AT_READ_OK;
+    changefaction_data *td = (changefaction_data *)t->data.v;
+    read_reference(&td->unit, store, read_unit_reference, resolve_unit);
+    read_reference(&td->faction, store, read_faction_reference, resolve_faction);
+    return AT_READ_OK;
 }
 
 trigger_type tt_changefaction = {
-  "changefaction",
-  changefaction_init,
-  changefaction_free,
-  changefaction_handle,
-  changefaction_write,
-  changefaction_read
+    "changefaction",
+    changefaction_init,
+    changefaction_free,
+    changefaction_handle,
+    changefaction_write,
+    changefaction_read
 };
 
 trigger *trigger_changefaction(unit * u, struct faction * f)
 {
-  trigger *t = t_new(&tt_changefaction);
-  changefaction_data *td = (changefaction_data *) t->data.v;
-  td->unit = u;
-  td->faction = f;
-  return t;
+    trigger *t = t_new(&tt_changefaction);
+    changefaction_data *td = (changefaction_data *)t->data.v;
+    td->unit = u;
+    td->faction = f;
+    return t;
 }

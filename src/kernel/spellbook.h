@@ -1,7 +1,7 @@
 /*
-Copyright (c) 1998-2012, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Copyright (c) 1998-2015, Enno Rehling Rehling <enno@eressea.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -23,26 +23,26 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-struct spell;
-struct quicklist;
+    struct spell;
+    struct quicklist;
 
-typedef struct spellbook_entry {
-  struct spell * sp;
-  int level;
-} spellbook_entry;
+    typedef struct spellbook_entry {
+        struct spell * sp;
+        int level;
+    } spellbook_entry;
 
-typedef struct spellbook
-{
-  char * name;
-  struct quicklist * spells;
-} spellbook;
+    typedef struct spellbook
+    {
+        char * name;
+        struct quicklist * spells;
+    } spellbook;
 
-spellbook * create_spellbook(const char * name);
+    spellbook * create_spellbook(const char * name);
 
-void spellbook_add(spellbook *sbp, struct spell * sp, int level);
-int spellbook_foreach(spellbook *sb, int (*callback)(spellbook_entry *, void *), void * data);
-void spellbook_clear(spellbook *sb);
-spellbook_entry * spellbook_get(spellbook *sb, const struct spell * sp);
+    void spellbook_add(spellbook *sbp, struct spell * sp, int level);
+    int spellbook_foreach(spellbook *sb, int(*callback)(spellbook_entry *, void *), void * data);
+    void spellbook_clear(spellbook *sb);
+    spellbook_entry * spellbook_get(spellbook *sb, const struct spell * sp);
 
 #ifdef __cplusplus
 }

@@ -1,7 +1,7 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Copyright (c) 1998-2015, Enno Rehling Rehling <enno@eressea.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -38,40 +38,40 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define MAXTERRAINS 20
 
 const char *terraindata[MAXTERRAINS] = {
-  "ocean",
-  "plain",
-  "swamp",
-  "desert",
-  "highland",
-  "mountain",
-  "glacier",
-  "firewall",
-  NULL,                         /* dungeon module */
-  NULL,                         /* former grassland */
-  "fog",
-  "thickfog",
-  "volcano",
-  "activevolcano",
-  "iceberg_sleep",
-  "iceberg",
+    "ocean",
+    "plain",
+    "swamp",
+    "desert",
+    "highland",
+    "mountain",
+    "glacier",
+    "firewall",
+    NULL,                         /* dungeon module */
+    NULL,                         /* former grassland */
+    "fog",
+    "thickfog",
+    "volcano",
+    "activevolcano",
+    "iceberg_sleep",
+    "iceberg",
 
-  NULL,                         /* museum module */
-  NULL,                         /* museum module */
-  NULL,                         /* former magicstorm */
-  NULL                          /* museum module */
+    NULL,                         /* museum module */
+    NULL,                         /* museum module */
+    NULL,                         /* former magicstorm */
+    NULL                          /* museum module */
 };
 
 static terrain_type *registered_terrains;
 
 void free_terrains(void)
 {
-  while (registered_terrains) {
-    terrain_type * t = registered_terrains;
-    registered_terrains = t->next;
-    free(t->_name);
-    free(t->production);
-    free(t);
-  }
+    while (registered_terrains) {
+        terrain_type * t = registered_terrains;
+        registered_terrains = t->next;
+        free(t->_name);
+        free(t->production);
+        free(t);
+    }
 }
 
 const terrain_type *terrains(void)
@@ -83,7 +83,7 @@ static const char *plain_name(const struct region *r)
 {
     /* TODO: xml defined */
     if (r_isforest(r)) {
-       return "forest";
+        return "forest";
     }
     return r->terrain->_name;
 }
@@ -92,9 +92,9 @@ static terrain_type *terrain_find_i(const char *name)
 {
     terrain_type *terrain;
     for (terrain = registered_terrains; terrain; terrain = terrain->next) {
-      if (strcmp(terrain->_name, name) == 0) {
-          break;
-      }
+        if (strcmp(terrain->_name, name) == 0) {
+            break;
+        }
     }
     return terrain;
 }
@@ -108,7 +108,7 @@ terrain_type * get_or_create_terrain(const char *name) {
     if (!terrain) {
         terrain = (terrain_type *)calloc(sizeof(terrain_type), 1);
         if (terrain) {
-            terrain->_name = _strdup(name); 
+            terrain->_name = _strdup(name);
             terrain->next = registered_terrains;
             registered_terrains = terrain;
             if (strcmp("plain", name) == 0) {
@@ -117,66 +117,67 @@ terrain_type * get_or_create_terrain(const char *name) {
             }
         }
     }
-    return terrain; 
+    return terrain;
 }
 
 static const terrain_type *newterrains[MAXTERRAINS];
 
 const struct terrain_type *newterrain(terrain_t t)
 {
-  if (t == NOTERRAIN)
-    return NULL;
-  assert(t >= 0);
-  assert(t < MAXTERRAINS);
-  return newterrains[t];
+    if (t == NOTERRAIN)
+        return NULL;
+    assert(t >= 0);
+    assert(t < MAXTERRAINS);
+    return newterrains[t];
 }
 
 terrain_t oldterrain(const struct terrain_type * terrain)
 {
-  terrain_t t;
-  if (terrain == NULL)
+    terrain_t t;
+    if (terrain == NULL)
+        return NOTERRAIN;
+    for (t = 0; t != MAXTERRAINS; ++t) {
+        if (newterrains[t] == terrain)
+            return t;
+    }
+    log_warning("%s is not a classic terrain.\n", terrain->_name);
     return NOTERRAIN;
-  for (t = 0; t != MAXTERRAINS; ++t) {
-    if (newterrains[t] == terrain)
-      return t;
-  }
-  log_warning("%s is not a classic terrain.\n", terrain->_name);
-  return NOTERRAIN;
 }
 
 const char *terrain_name(const struct region *r)
 {
-  if (r->attribs) {
-    attrib *a = a_find(r->attribs, &at_racename);
-    if (a) {
-      const char *str = get_racename(a);
-      if (str)
-        return str;
+    if (r->attribs) {
+        attrib *a = a_find(r->attribs, &at_racename);
+        if (a) {
+            const char *str = get_racename(a);
+            if (str)
+                return str;
+        }
     }
-  }
 
-  if (r->terrain->name != NULL) {
-    return r->terrain->name(r);
-  } else if (fval(r->terrain, SEA_REGION)) {
-    if (curse_active(get_curse(r->attribs, ct_find("maelstrom")))) {
-      return "maelstrom";
+    if (r->terrain->name != NULL) {
+        return r->terrain->name(r);
     }
-  }
-  return r->terrain->_name;
+    else if (fval(r->terrain, SEA_REGION)) {
+        if (curse_active(get_curse(r->attribs, ct_find("maelstrom")))) {
+            return "maelstrom";
+        }
+    }
+    return r->terrain->_name;
 }
 
 void init_terrains(void)
 {
-  terrain_t t;
-  for (t = 0; t != MAXTERRAINS; ++t) {
-    const terrain_type *newterrain = newterrains[t];
-    if (newterrain != NULL)
-      continue;
-    if (terraindata[t] != NULL) {
-      newterrain = get_terrain(terraindata[t]);
-      if (newterrain != NULL) {
-        newterrains[t] = newterrain;
-      }
+    terrain_t t;
+    for (t = 0; t != MAXTERRAINS; ++t) {
+        const terrain_type *newterrain = newterrains[t];
+        if (newterrain != NULL)
+            continue;
+        if (terraindata[t] != NULL) {
+            newterrain = get_terrain(terraindata[t]);
+            if (newterrain != NULL) {
+                newterrains[t] = newterrain;
+            }
+        }
     }
-  }
 }

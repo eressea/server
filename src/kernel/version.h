@@ -1,4 +1,4 @@
-/* vi: set ts=2:
+/* 
  +-------------------+  
  |                   |  Enno Rehling <enno@eressea.de>
  | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>

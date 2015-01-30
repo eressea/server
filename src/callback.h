@@ -4,7 +4,7 @@
 #include <stdarg.h>
 
 typedef struct {
-    void (*cbv)(va_list va);
+    void(*cbv)(va_list va);
 } HCALLBACK;
 
 HCALLBACK register_callback(const char *name, void(*cbv)(va_list va));

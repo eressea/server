@@ -1,4 +1,4 @@
-/* vi: set ts=2:
+/* 
  +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  |                   |  Enno Rehling <enno@eressea.de>
  | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
@@ -26,12 +26,12 @@ extern "C" {
 
     extern struct attrib_type at_dict;
 
-    extern struct attrib *dict_create(const char *name, dict_type type,
+    struct attrib *dict_create(const char *name, dict_type type,
         variant value);
-    extern void dict_get(const struct attrib *a, dict_type * type,
+    void dict_get(const struct attrib *a, dict_type * type,
         variant * value);
-    extern void dict_set(struct attrib *a, dict_type type, variant value);
-    extern const char *dict_name(const struct attrib *a);
+    void dict_set(struct attrib *a, dict_type type, variant value);
+    const char *dict_name(const struct attrib *a);
 
 #ifdef __cplusplus
 }

@@ -1,4 +1,4 @@
-/* vi: set ts=2:
+/*
 +-------------------+
 |                   |  Enno Rehling <enno@eressea.de>
 | Eressea PBEM host |  Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -17,8 +17,10 @@ extern "C" {
 #endif
 
     struct cJSON;
-    void json_config(struct cJSON *str);
+
     extern const char * json_relpath;
+
+    void json_config(struct cJSON *str);
 
 #ifdef __cplusplus
 }

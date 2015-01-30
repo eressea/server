@@ -1,7 +1,5 @@
-/* vi: set ts=2:
- *
- * 
- * Eressea PB(E)M host Copyright (C) 1998-2003
+/*
+ * Eressea PB(E)M host Copyright (C) 1998-2015
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -29,12 +27,13 @@
 
 void age_illusion(unit * u)
 {
-  if (u->faction->race != get_race(RC_ILLUSION)) {
-    if (u->age == ILLUSIONMAX) {
-      ADDMSG(&u->faction->msgs, msg_message("warnillusiondissolve", "unit", u));
-    } else if (u->age > ILLUSIONMAX) {
-      set_number(u, 0);
-      ADDMSG(&u->faction->msgs, msg_message("illusiondissolve", "unit", u));
+    if (u->faction->race != get_race(RC_ILLUSION)) {
+        if (u->age == ILLUSIONMAX) {
+            ADDMSG(&u->faction->msgs, msg_message("warnillusiondissolve", "unit", u));
+        }
+        else if (u->age > ILLUSIONMAX) {
+            set_number(u, 0);
+            ADDMSG(&u->faction->msgs, msg_message("illusiondissolve", "unit", u));
+        }
     }
-  }
 }

@@ -97,12 +97,12 @@ static void test_get_shortest_match(CuTest *tc) {
 
 CuSuite *get_keyword_suite(void)
 {
-  CuSuite *suite = CuSuiteNew();
-  SUITE_ADD_TEST(suite, test_infinitive);
-  SUITE_ADD_TEST(suite, test_init_keyword);
-  SUITE_ADD_TEST(suite, test_init_keywords);
-  SUITE_ADD_TEST(suite, test_findkeyword);
-  SUITE_ADD_TEST(suite, test_get_shortest_match);
-  SUITE_DISABLE_TEST(suite, test_get_keyword_default);
-  return suite;
+    CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_infinitive);
+    SUITE_ADD_TEST(suite, test_init_keyword);
+    SUITE_ADD_TEST(suite, test_init_keywords);
+    SUITE_ADD_TEST(suite, test_findkeyword);
+    SUITE_ADD_TEST(suite, test_get_shortest_match);
+    SUITE_DISABLE_TEST(suite, test_get_keyword_default);
+    return suite;
 }

@@ -20,7 +20,7 @@ static char *strip(char *str) {
     for (; *b && isspace(*b); ++b) {};
     for (e = b; *e && !isspace(*e); ++e) {};
     while (*b) {
-        if (s!=b) {
+        if (s != b) {
             memcpy(s, b, e - b);
         }
         s += e - b;
@@ -119,7 +119,7 @@ static void test_export_no_factions(CuTest * tc) {
     CuAssertIntEquals(tc, 0, err);
     out.api->rewind(out.handle);
     len = out.api->read(out.handle, buf, sizeof(buf));
-    buf[len]=0;
+    buf[len] = 0;
     CuAssertStrEquals(tc, "{}", strip(buf));
     mstream_done(&out);
     test_cleanup();

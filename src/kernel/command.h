@@ -1,4 +1,4 @@
-/* vi: set ts=2:
+/*
  +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  |                   |  Enno Rehling <enno@eressea.de>
  | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
@@ -6,9 +6,9 @@
  |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
  +-------------------+  Stefan Reich <reich@halbling.de>
 
- This program may not be used, modified or distributed 
+ This program may not be used, modified or distributed
  without prior permission by the authors of Eressea.
- 
+
  */
 #ifndef H_UTIL_COMMAND_H
 #define H_UTIL_COMMAND_H
@@ -16,24 +16,24 @@
 extern "C" {
 #endif
 
-  struct locale;
-  struct order;
-  struct unit;
+    struct locale;
+    struct order;
+    struct unit;
 
-  typedef struct syntaxtree {
-    const struct locale *lang;
-    void *root;
-    struct syntaxtree *next;
-  } syntaxtree;
+    typedef struct syntaxtree {
+        const struct locale *lang;
+        void *root;
+        struct syntaxtree *next;
+    } syntaxtree;
 
-  typedef void (*parser) (const void *nodes, struct unit * u, struct order *);
-  extern void add_command(void **troot, void *tnext,
-    const char *str, parser fun);
-  extern void do_command(const void *troot, struct unit *u, struct order *);
+    typedef void(*parser) (const void *nodes, struct unit * u, struct order *);
+    void add_command(void **troot, void *tnext,
+        const char *str, parser fun);
+    void do_command(const void *troot, struct unit *u, struct order *);
 
-  extern struct syntaxtree *stree_create(void);
-  extern void *stree_find(const struct syntaxtree *stree,
-    const struct locale *lang);
+    struct syntaxtree *stree_create(void);
+    void *stree_find(const struct syntaxtree *stree,
+        const struct locale *lang);
 
 #ifdef __cplusplus
 }

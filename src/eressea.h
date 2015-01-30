@@ -4,8 +4,8 @@
 extern "C" {
 #endif
 
-  void game_init(void);
-  void game_done(void);
+    void game_init(void);
+    void game_done(void);
 
 #ifdef __cplusplus
 }

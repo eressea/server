@@ -1,7 +1,7 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Copyright (c) 1998-2015, Enno Rehling Rehling <enno@eressea.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -40,46 +40,46 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 static int killunit_handle(trigger * t, void *data)
 {
-  /* call an event handler on killunit.
-   * data.v -> ( variant event, int timer )
-   */
-  unit *u = (unit *) t->data.v;
-  if (u) {
-    /* we can't remove_unit() here, because that's what's calling us. */
-    set_number(u, 0);
-  }
-  unused_arg(data);
-  return 0;
+    /* call an event handler on killunit.
+     * data.v -> ( variant event, int timer )
+     */
+    unit *u = (unit *)t->data.v;
+    if (u) {
+        /* we can't remove_unit() here, because that's what's calling us. */
+        set_number(u, 0);
+    }
+    unused_arg(data);
+    return 0;
 }
 
 static void killunit_write(const trigger * t, struct storage *store)
 {
-  unit *u = (unit *) t->data.v;
-  write_unit_reference(u, store);
+    unit *u = (unit *)t->data.v;
+    write_unit_reference(u, store);
 }
 
 static int killunit_read(trigger * t, struct storage *store)
 {
-  int result =
-    read_reference(&t->data.v, store, read_unit_reference, resolve_unit);
-  if (result == 0 && t->data.v == NULL) {
-    return AT_READ_FAIL;
-  }
-  return AT_READ_OK;
+    int result =
+        read_reference(&t->data.v, store, read_unit_reference, resolve_unit);
+    if (result == 0 && t->data.v == NULL) {
+        return AT_READ_FAIL;
+    }
+    return AT_READ_OK;
 }
 
 trigger_type tt_killunit = {
-  "killunit",
-  NULL,
-  NULL,
-  killunit_handle,
-  killunit_write,
-  killunit_read
+    "killunit",
+    NULL,
+    NULL,
+    killunit_handle,
+    killunit_write,
+    killunit_read
 };
 
 trigger *trigger_killunit(unit * u)
 {
-  trigger *t = t_new(&tt_killunit);
-  t->data.v = (void *)u;
-  return t;
+    trigger *t = t_new(&tt_killunit);
+    t->data.v = (void *)u;
+    return t;
 }

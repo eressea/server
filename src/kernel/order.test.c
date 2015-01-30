@@ -34,7 +34,7 @@ static void test_parse_order(CuTest *tc) {
     char cmd[32];
     order *ord;
     struct locale * lang;
-    
+
     test_cleanup();
     lang = get_or_create_locale("en");
 

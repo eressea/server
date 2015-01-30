@@ -15,8 +15,8 @@ void test_missing_message(CuTest *tc) {
 
 void test_message(CuTest *tc) {
     message *msg;
-//    const char * args[] = { }
     message_type *mtype = mt_new("custom", NULL);
+
     mt_register(mtype);
     CuAssertPtrEquals(tc, mtype, (void *)mt_find("custom"));
     CuAssertIntEquals(tc, 0, mtype->nparameters);

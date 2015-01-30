@@ -61,11 +61,11 @@ static void test_get_direction_default(CuTest *tc) {
 
 CuSuite *get_direction_suite(void)
 {
-  CuSuite *suite = CuSuiteNew();
-  SUITE_ADD_TEST(suite, test_init_direction);
-  SUITE_ADD_TEST(suite, test_init_directions);
-  SUITE_ADD_TEST(suite, test_finddirection);
-  SUITE_DISABLE_TEST(suite, test_get_direction_default);
-  return suite;
+    CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_init_direction);
+    SUITE_ADD_TEST(suite, test_init_directions);
+    SUITE_ADD_TEST(suite, test_finddirection);
+    SUITE_DISABLE_TEST(suite, test_get_direction_default);
+    return suite;
 }
 

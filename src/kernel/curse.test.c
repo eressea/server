@@ -12,18 +12,18 @@
 
 static void test_curse(CuTest * tc)
 {
-  attrib *attrs = NULL;
-  curse *c, *result;
-  int cid;
+    attrib *attrs = NULL;
+    curse *c, *result;
+    int cid;
 
-  curse_type ct_dummy = { "dummy", CURSETYP_NORM, 0, M_SUMEFFECT, NULL };
-  c = create_curse(NULL, &attrs, &ct_dummy, 1.0, 1, 1, 1);
-  cid = c->no;
-  result = findcurse(cid);
-  CuAssertPtrEquals(tc, c, result);
-  destroy_curse(c);
-  result = findcurse(cid);
-  CuAssertPtrEquals(tc, NULL, result);
+    curse_type ct_dummy = { "dummy", CURSETYP_NORM, 0, M_SUMEFFECT, NULL };
+    c = create_curse(NULL, &attrs, &ct_dummy, 1.0, 1, 1, 1);
+    cid = c->no;
+    result = findcurse(cid);
+    CuAssertPtrEquals(tc, c, result);
+    destroy_curse(c);
+    result = findcurse(cid);
+    CuAssertPtrEquals(tc, NULL, result);
 }
 
 typedef struct {
@@ -85,11 +85,11 @@ static void test_bad_dreams(CuTest *tc) {
 
 CuSuite *get_curse_suite(void)
 {
-  CuSuite *suite = CuSuiteNew();
-  SUITE_ADD_TEST(suite, test_curse);
-  SUITE_ADD_TEST(suite, test_magicstreet);
-  SUITE_ADD_TEST(suite, test_magicstreet_warning);
-  SUITE_ADD_TEST(suite, test_good_dreams);
-  SUITE_ADD_TEST(suite, test_bad_dreams);
-  return suite;
+    CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_curse);
+    SUITE_ADD_TEST(suite, test_magicstreet);
+    SUITE_ADD_TEST(suite, test_magicstreet_warning);
+    SUITE_ADD_TEST(suite, test_good_dreams);
+    SUITE_ADD_TEST(suite, test_bad_dreams);
+    return suite;
 }
