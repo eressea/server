@@ -102,7 +102,7 @@ static void test_build_failure_low_skill(CuTest *tc) {
     u = setup_build(&bf);
     rtype = bf.cons.materials[0].rtype;
     i_change(&u->items, rtype->itype, 1);
-    set_level(u, SK_ARMORER, bf.cons.minskill-1);
+    set_level(u, SK_ARMORER, bf.cons.minskill - 1);
     CuAssertIntEquals(tc, ELOWSKILL, build(u, &bf.cons, 0, 10));
     test_cleanup();
 }
@@ -184,7 +184,7 @@ static void test_build_with_potion(CuTest *tc) {
     CuAssertIntEquals(tc, 2, build(u, &bf.cons, 0, 20));
     CuAssertIntEquals(tc, 18, i_get(u->items, rtype->itype));
     CuAssertIntEquals(tc, 3, get_effect(u, ptype));
-    set_level(u, SK_ARMORER, bf.cons.minskill*2);
+    set_level(u, SK_ARMORER, bf.cons.minskill * 2);
     CuAssertIntEquals(tc, 4, build(u, &bf.cons, 0, 20));
     CuAssertIntEquals(tc, 2, get_effect(u, ptype));
     set_level(u, SK_ARMORER, bf.cons.minskill);
@@ -242,7 +242,7 @@ static void test_build_building_success(CuTest *tc) {
     assert(btype && rtype && rtype->itype);
     assert(btype->construction);
     assert(!u->region->buildings);
-    
+
     i_change(&bf.u->items, rtype->itype, 1);
     set_level(u, SK_BUILDING, 1);
     CuAssertIntEquals(tc, 1, build_building(u, btype, 0, 4, 0));

@@ -64,7 +64,7 @@ void test_upkeep_hunger_damage(CuTest * tc)
     u1->hp = 100;
     get_food(r);
     // since u1 and u2 are not allied, u1 should not help u2 with upkeep
-    CuAssertTrue(tc, u1->hp<100);
+    CuAssertTrue(tc, u1->hp < 100);
 
     test_cleanup();
 }

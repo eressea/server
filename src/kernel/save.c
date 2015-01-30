@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2015, Enno Rehling Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -1847,7 +1847,7 @@ int writegame(const char *filename)
 
     log_printf(stdout, "\nOk.\n");
     return 0;
-    }
+}
 
 int a_readint(attrib * a, void *owner, struct storage *store)
 {

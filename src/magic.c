@@ -1377,7 +1377,7 @@ static void do_fumble(castorder * co)
         ADDMSG(&r->msgs, msg_message("patzer6", "unit region spell", u, r, sp));
         break;
     }
-        /* fall-through is intentional! */
+    /* fall-through is intentional! */
 
     case 2:
         /* temporary skill loss */

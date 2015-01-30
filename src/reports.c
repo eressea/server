@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2015, Enno Rehling Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -778,15 +778,15 @@ size_t size)
             }
             if (printed < ORDERS_IN_NR)
                 for (ord = u->orders; ord; ord = ord->next) {
-                if (is_repeated(ord)) {
-                    if (printed < ORDERS_IN_NR) {
-                        bytes = (int)buforder(bufp, size, ord, printed++);
-                        if (wrptr(&bufp, &size, bytes) != 0)
-                            WARN_STATIC_BUFFER();
+                    if (is_repeated(ord)) {
+                        if (printed < ORDERS_IN_NR) {
+                            bytes = (int)buforder(bufp, size, ord, printed++);
+                            if (wrptr(&bufp, &size, bytes) != 0)
+                                WARN_STATIC_BUFFER();
+                        }
+                        else
+                            break;
                     }
-                    else
-                        break;
-                }
                 }
         }
     }

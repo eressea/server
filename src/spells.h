@@ -1,4 +1,4 @@
-/* vi: set ts=2:
+/* 
  *
  *
  * Eressea PB(E)M host Copyright (C) 1998-2003
@@ -18,18 +18,18 @@
 extern "C" {
 #endif
 
-  struct ship;
-  struct curse;
-  struct unit;
-  struct message;
+    struct ship;
+    struct curse;
+    struct unit;
+    struct message;
 
-  void register_spells(void);
-  void set_spelldata(struct spell *sp);
+    void register_spells(void);
+    void set_spelldata(struct spell *sp);
 
 #define ACTION_RESET      0x01  /* reset the one-time-flag FFL_SELECT (on first pass) */
 #define ACTION_CANSEE     0x02  /* to people who can see the actor */
 #define ACTION_CANNOTSEE  0x04  /* to people who can not see the actor */
-  int report_action(struct region *r, struct unit *actor, struct message *msg, int flags);
+    int report_action(struct region *r, struct unit *actor, struct message *msg, int flags);
 
 #ifdef __cplusplus
 }

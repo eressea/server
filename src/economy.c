@@ -517,8 +517,8 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
 
             for (u2 = r->units; u2; u2 = u2->next)
                 if (fval(u2, UFL_WARMTH)) {
-                usepotion = true;
-                break;
+                    usepotion = true;
+                    break;
                 }
             if (!usepotion)
 #endif
@@ -1282,22 +1282,22 @@ leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
 
             for (al = alist; al; al = al->next)
                 if (!fval(al, AFL_DONE)) {
-                int req = required(al->want - al->get, al->save);
-                assert(al->get <= al->want && al->get >= 0);
-                if (eff_skill(al->unit, itype->construction->skill, r)
-                    >= rm->level + itype->construction->minskill - 1) {
-                    if (req) {
-                        norders += req;
+                    int req = required(al->want - al->get, al->save);
+                    assert(al->get <= al->want && al->get >= 0);
+                    if (eff_skill(al->unit, itype->construction->skill, r)
+                        >= rm->level + itype->construction->minskill - 1) {
+                        if (req) {
+                            norders += req;
+                        }
+                        else {
+                            fset(al, AFL_DONE);
+                        }
                     }
                     else {
                         fset(al, AFL_DONE);
+                        if (first)
+                            fset(al, AFL_LOWSKILL);
                     }
-                }
-                else {
-                    fset(al, AFL_DONE);
-                    if (first)
-                        fset(al, AFL_LOWSKILL);
-                }
                 }
             need = norders;
 
@@ -1306,18 +1306,18 @@ leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
                 int use = 0;
                 for (al = alist; al; al = al->next)
                     if (!fval(al, AFL_DONE)) {
-                    if (avail > 0) {
-                        int want = required(al->want - al->get, al->save);
-                        int x = avail * want / norders;
-                        /* Wenn Rest, dann würfeln, ob ich was bekomme: */
-                        if (rng_int() % norders < (avail * want) % norders)
-                            ++x;
-                        avail -= x;
-                        use += x;
-                        norders -= want;
-                        need -= x;
-                        al->get = _min(al->want, al->get + (int)(x / al->save));
-                    }
+                        if (avail > 0) {
+                            int want = required(al->want - al->get, al->save);
+                            int x = avail * want / norders;
+                            /* Wenn Rest, dann würfeln, ob ich was bekomme: */
+                            if (rng_int() % norders < (avail * want) % norders)
+                                ++x;
+                            avail -= x;
+                            use += x;
+                            norders -= want;
+                            need -= x;
+                            al->get = _min(al->want, al->get + (int)(x / al->save));
+                        }
                     }
                 if (use) {
                     assert(use <= rm->amount);
@@ -2917,16 +2917,16 @@ static void expandloot(region * r, request * lootorders)
         looted = looted + TAXFRACTION * 2;
     }
     free(oa);
-    
+
     /* Lowering morale by 1 depending on the looted money (+20%) */
     if (rng_int() % 100 < ((looted / startmoney) + 0.2)) {
         int m = region_get_morale(r);
         if (m) {
             /*Nur Moral -1, turns is not changed, so the first time nothing happens if the morale is good*/
-            region_set_morale(r, m-1, -1);
+            region_set_morale(r, m - 1, -1);
         }
     }
-    
+
     for (u = r->units; u; u = u->next) {
         if (u->n >= 0) {
             add_income(u, IC_LOOT, u->wants, u->n);

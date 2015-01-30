@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2015, Enno Rehling Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -60,7 +60,7 @@ extern "C" {
         E_MOVE_BLOCKED              /* cannot see this region, there is a blocking connection. */
     };
     int movewhere(const struct unit *u, const char *token,
-        struct region *r, struct region **resultp);
+    struct region *r, struct region **resultp);
     direction_t reldirection(const struct region *from, const struct region *to);
 
     int personcapacity(const struct unit *u);
@@ -74,7 +74,7 @@ extern "C" {
     struct unit *get_captain(const struct ship *sh);
     void travelthru(const struct unit *u, struct region *r);
     struct ship *move_ship(struct ship *sh, struct region *from,
-        struct region *to, struct region_list *route);
+    struct region *to, struct region_list *route);
     int walkingcapacity(const struct unit *u);
     void follow_unit(struct unit *u);
     bool buildingtype_exists(const struct region *r,

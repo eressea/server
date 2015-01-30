@@ -23,17 +23,17 @@ void init_directions(struct locale *lang) {
         direction_t direction;
     } dirs[] = {
         { "dir_ne", D_NORTHEAST },
-        { "dir_nw", D_NORTHWEST }, 
-        { "dir_se", D_SOUTHEAST }, 
-        { "dir_sw", D_SOUTHWEST }, 
-        { "dir_east", D_EAST }, 
-        { "dir_west", D_WEST }, 
+        { "dir_nw", D_NORTHWEST },
+        { "dir_se", D_SOUTHEAST },
+        { "dir_sw", D_SOUTHWEST },
+        { "dir_east", D_EAST },
+        { "dir_west", D_WEST },
         { "northeast", D_NORTHEAST },
         { "northwest", D_NORTHWEST },
         { "southeast", D_SOUTHEAST },
         { "southwest", D_SOUTHWEST },
         { "east", D_EAST },
-        { "west", D_WEST }, 
+        { "west", D_WEST },
         { "PAUSE", D_PAUSE },
         { NULL, NODIRECTION }
     };
@@ -47,7 +47,7 @@ void init_directions(struct locale *lang) {
         if (str) {
             variant token;
             token.i = dirs[i].direction;
-            addtoken(tokens, str, token); 
+            addtoken(tokens, str, token);
         }
     }
 }
@@ -65,15 +65,15 @@ direction_t get_direction(const char *s, const struct locale *lang)
 
 direction_t finddirection(const char *str) {
     int i;
-    for (i=0;i!=MAXDIRECTIONS+2;++i) {
-        if (directions[i] && strcmp(str, directions[i])==0) {
+    for (i = 0; i != MAXDIRECTIONS + 2; ++i) {
+        if (directions[i] && strcmp(str, directions[i]) == 0) {
             return (direction_t)i;
         }
     }
     return NODIRECTION;
 }
 
-const char * directions[MAXDIRECTIONS+2] = {
-"northwest", "northeast", "east", "southeast", "southwest", "west", 0, "pause"
+const char * directions[MAXDIRECTIONS + 2] = {
+    "northwest", "northeast", "east", "southeast", "southwest", "west", 0, "pause"
 };
 

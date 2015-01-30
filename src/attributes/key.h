@@ -1,7 +1,7 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Copyright (c) 1998-2015, Enno Rehling Rehling <enno@eressea.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -22,11 +22,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-  extern struct attrib_type at_key;
+    extern struct attrib_type at_key;
 
-  extern struct attrib *make_key(int key);
-  extern struct attrib *find_key(struct attrib *alist, int key);
-  extern struct attrib *add_key(struct attrib **alist, int key);
+    struct attrib *make_key(int key);
+    struct attrib *find_key(struct attrib *alist, int key);
+    struct attrib *add_key(struct attrib **alist, int key);
 
 #ifdef __cplusplus
 }

@@ -1,4 +1,4 @@
-/* vi: set ts=2:
+/* 
  *
  * Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
@@ -19,12 +19,12 @@
 extern "C" {
 #endif
 
-  struct curse;
-  struct message;
-  extern struct message *cinfo_unit(const void *obj, objtype_t typ,
-    const struct curse *c, int self);
+    struct curse;
+    struct message;
+    extern struct message *cinfo_unit(const void *obj, objtype_t typ,
+        const struct curse *c, int self);
 
-  extern void register_unitcurse(void);
+    extern void register_unitcurse(void);
 
 #ifdef __cplusplus
 }

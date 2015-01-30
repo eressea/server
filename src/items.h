@@ -1,4 +1,4 @@
-/* vi: set ts=2:
+/* 
 +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
 |                   |  Enno Rehling <enno@eressea.de>
 | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
@@ -6,7 +6,7 @@
 |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
 +-------------------+  Stefan Reich <reich@halbling.de>
 
-This program may not be used, modified or distributed 
+This program may not be used, modified or distributed
 without prior permission by the authors of Eressea.
 */
 
@@ -16,7 +16,7 @@ without prior permission by the authors of Eressea.
 extern "C" {
 #endif
 
-  extern void register_itemfunctions(void);
+    extern void register_itemfunctions(void);
 
 #ifdef __cplusplus
 }

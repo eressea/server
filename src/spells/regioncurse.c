@@ -1,6 +1,6 @@
-/* vi: set ts=2:
+/*
  *
- * Eressea PB(E)M host Copyright (C) 1998-2003
+ * Eressea PB(E)M host Copyright (C) 1998-2015
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -35,30 +35,30 @@
 #include <assert.h>
 
 /* --------------------------------------------------------------------- */
-/* CurseInfo mit Spezialabfragen 
+/* CurseInfo mit Spezialabfragen
  */
 
 /*
  * godcursezone
  */
 static message *cinfo_cursed_by_the_gods(const void *obj, objtype_t typ,
-  const curse * c, int self)
+    const curse * c, int self)
 {
-  region *r = (region *) obj;
+    region *r = (region *)obj;
 
-  unused_arg(typ);
-  unused_arg(self);
-  assert(typ == TYP_REGION);
+    unused_arg(typ);
+    unused_arg(self);
+    assert(typ == TYP_REGION);
 
-  if (fval(r->terrain, SEA_REGION)) {
-    return msg_message("curseinfo::godcurseocean", "id", c->no);
-  }
-  return msg_message("curseinfo::godcurse", "id", c->no);
+    if (fval(r->terrain, SEA_REGION)) {
+        return msg_message("curseinfo::godcurseocean", "id", c->no);
+    }
+    return msg_message("curseinfo::godcurse", "id", c->no);
 }
 
 static struct curse_type ct_godcursezone = {
-  "godcursezone",
-  CURSETYP_NORM, CURSE_IMMUNE | CURSE_ISNEW, (NO_MERGE),
+    "godcursezone",
+    CURSETYP_NORM, CURSE_IMMUNE | CURSE_ISNEW, (NO_MERGE),
     cinfo_cursed_by_the_gods,
 };
 
@@ -67,23 +67,24 @@ static struct curse_type ct_godcursezone = {
  * C_GBDREAM
  */
 static message *cinfo_dreamcurse(const void *obj, objtype_t typ, const curse * c,
-  int self)
+    int self)
 {
-  unused_arg(self);
-  unused_arg(typ);
-  unused_arg(obj);
-  assert(typ == TYP_REGION);
+    unused_arg(self);
+    unused_arg(typ);
+    unused_arg(obj);
+    assert(typ == TYP_REGION);
 
-  if (c->effect > 0) {
-    return msg_message("curseinfo::gooddream", "id", c->no);
-  } else {
-    return msg_message("curseinfo::baddream", "id", c->no);
-  }
+    if (c->effect > 0) {
+        return msg_message("curseinfo::gooddream", "id", c->no);
+    }
+    else {
+        return msg_message("curseinfo::baddream", "id", c->no);
+    }
 }
 
 static struct curse_type ct_gbdream = {
-  "gbdream",
-  CURSETYP_NORM, CURSE_ISNEW, (NO_MERGE), cinfo_dreamcurse
+    "gbdream",
+    CURSETYP_NORM, CURSE_ISNEW, (NO_MERGE), cinfo_dreamcurse
 };
 
 /* --------------------------------------------------------------------- */
@@ -92,213 +93,213 @@ static struct curse_type ct_gbdream = {
  *  erzeugt Straßennetz
  */
 static message *cinfo_magicstreet(const void *obj, objtype_t typ, const curse * c,
-  int self)
+    int self)
 {
-  unused_arg(typ);
-  unused_arg(self);
-  unused_arg(obj);
-  assert(typ == TYP_REGION);
+    unused_arg(typ);
+    unused_arg(self);
+    unused_arg(obj);
+    assert(typ == TYP_REGION);
 
-  /* Warnung vor Auflösung */
-  if (c->duration >= 2) {
-    return msg_message("curseinfo::magicstreet", "id", c->no);
-  }
-  return msg_message("curseinfo::magicstreetwarn", "id", c->no);
+    /* Warnung vor Auflösung */
+    if (c->duration >= 2) {
+        return msg_message("curseinfo::magicstreet", "id", c->no);
+    }
+    return msg_message("curseinfo::magicstreetwarn", "id", c->no);
 }
 
 static struct curse_type ct_magicstreet = {
-  "magicstreet",
-  CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
-  cinfo_magicstreet
+    "magicstreet",
+    CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
+    cinfo_magicstreet
 };
 
 /* --------------------------------------------------------------------- */
 
 static message *cinfo_antimagiczone(const void *obj, objtype_t typ, const curse * c,
-  int self)
+    int self)
 {
-  unused_arg(typ);
-  unused_arg(self);
-  unused_arg(obj);
-  assert(typ == TYP_REGION);
+    unused_arg(typ);
+    unused_arg(self);
+    unused_arg(obj);
+    assert(typ == TYP_REGION);
 
-  /* Magier spüren eine Antimagiezone */
-  if (self != 0) {
-    return msg_message("curseinfo::antimagiczone", "id", c->no);
-  }
+    /* Magier spüren eine Antimagiezone */
+    if (self != 0) {
+        return msg_message("curseinfo::antimagiczone", "id", c->no);
+    }
 
-  return NULL;
+    return NULL;
 }
 
 /* alle Magier können eine Antimagiezone wahrnehmen */
 static int
 cansee_antimagiczone(const struct faction *viewer, const void *obj, objtype_t typ,
-  const curse * c, int self)
+const curse * c, int self)
 {
-  region *r;
-  unit *u = NULL;
-  unit *mage = c->magician;
+    region *r;
+    unit *u = NULL;
+    unit *mage = c->magician;
 
-  unused_arg(typ);
+    unused_arg(typ);
 
-  assert(typ == TYP_REGION);
-  r = (region *) obj;
-  for (u = r->units; u; u = u->next) {
-    if (u->faction == viewer) {
-      if (u == mage) {
-        self = 2;
-        break;
-      }
-      if (is_mage(u)) {
-        self = 1;
-      }
+    assert(typ == TYP_REGION);
+    r = (region *)obj;
+    for (u = r->units; u; u = u->next) {
+        if (u->faction == viewer) {
+            if (u == mage) {
+                self = 2;
+                break;
+            }
+            if (is_mage(u)) {
+                self = 1;
+            }
+        }
     }
-  }
-  return self;
+    return self;
 }
 
 static struct curse_type ct_antimagiczone = {
-  "antimagiczone",
-  CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
-  cinfo_antimagiczone, NULL, NULL, NULL, cansee_antimagiczone
+    "antimagiczone",
+    CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
+    cinfo_antimagiczone, NULL, NULL, NULL, cansee_antimagiczone
 };
 
 /* --------------------------------------------------------------------- */
 static message *cinfo_farvision(const void *obj, objtype_t typ, const curse * c,
-  int self)
+    int self)
 {
-  unused_arg(typ);
-  unused_arg(obj);
+    unused_arg(typ);
+    unused_arg(obj);
 
-  assert(typ == TYP_REGION);
+    assert(typ == TYP_REGION);
 
-  /* Magier spüren eine farvision */
-  if (self != 0) {
-    return msg_message("curseinfo::farvision", "id", c->no);
-  }
+    /* Magier spüren eine farvision */
+    if (self != 0) {
+        return msg_message("curseinfo::farvision", "id", c->no);
+    }
 
-  return 0;
+    return 0;
 }
 
 static struct curse_type ct_farvision = {
-  "farvision",
-  CURSETYP_NORM, 0, (NO_MERGE),
-  cinfo_farvision
+    "farvision",
+    CURSETYP_NORM, 0, (NO_MERGE),
+    cinfo_farvision
 };
 
 /* --------------------------------------------------------------------- */
 
 static struct curse_type ct_fogtrap = {
-  "fogtrap",
-  CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
-  cinfo_simple
+    "fogtrap",
+    CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
+    cinfo_simple
 };
 
 static struct curse_type ct_maelstrom = {
-  "maelstrom",
-  CURSETYP_NORM, CURSE_ISNEW, (M_DURATION | M_VIGOUR),
-  cinfo_simple
+    "maelstrom",
+    CURSETYP_NORM, CURSE_ISNEW, (M_DURATION | M_VIGOUR),
+    cinfo_simple
 };
 
 static struct curse_type ct_blessedharvest = {
-  "blessedharvest",
-  CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
-  cinfo_simple
+    "blessedharvest",
+    CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
+    cinfo_simple
 };
 
 static struct curse_type ct_drought = {
-  "drought",
-  CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
-  cinfo_simple
+    "drought",
+    CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
+    cinfo_simple
 };
 
 static struct curse_type ct_badlearn = {
-  "badlearn",
-  CURSETYP_NORM, CURSE_ISNEW, (M_DURATION | M_VIGOUR),
-  cinfo_simple
+    "badlearn",
+    CURSETYP_NORM, CURSE_ISNEW, (M_DURATION | M_VIGOUR),
+    cinfo_simple
 };
 
 /*  Trübsal-Zauber */
 static struct curse_type ct_depression = {
-  "depression",
-  CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
-  cinfo_simple
+    "depression",
+    CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
+    cinfo_simple
 };
 
 /* Astralblock, auf Astralregion */
 static struct curse_type ct_astralblock = {
-  "astralblock",
-  CURSETYP_NORM, 0, NO_MERGE,
-  cinfo_simple
+    "astralblock",
+    CURSETYP_NORM, 0, NO_MERGE,
+    cinfo_simple
 };
 
 /* Unterhaltungsanteil vermehren */
 static struct curse_type ct_generous = {
-  "generous",
-  CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR | M_MAXEFFECT),
-  cinfo_simple
+    "generous",
+    CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR | M_MAXEFFECT),
+    cinfo_simple
 };
 
 /* verhindert Attackiere regional */
 static struct curse_type ct_peacezone = {
-  "peacezone",
-  CURSETYP_NORM, 0, NO_MERGE,
-  cinfo_simple
+    "peacezone",
+    CURSETYP_NORM, 0, NO_MERGE,
+    cinfo_simple
 };
 
 /*  erniedigt Magieresistenz von nicht-aliierten Einheiten, wirkt nur 1x
 *  pro Einheit */
 static struct curse_type ct_badmagicresistancezone = {
-  "badmagicresistancezone",
-  CURSETYP_NORM, 0, NO_MERGE,
-  cinfo_simple
+    "badmagicresistancezone",
+    CURSETYP_NORM, 0, NO_MERGE,
+    cinfo_simple
 };
 
 /* erhöht Magieresistenz von aliierten Einheiten, wirkt nur 1x pro
 * Einheit */
 static struct curse_type ct_goodmagicresistancezone = {
-  "goodmagicresistancezone",
-  CURSETYP_NORM, 0, NO_MERGE,
-  cinfo_simple
+    "goodmagicresistancezone",
+    CURSETYP_NORM, 0, NO_MERGE,
+    cinfo_simple
 };
 
 static struct curse_type ct_riotzone = {
-  "riotzone",
-  CURSETYP_NORM, 0, (M_DURATION),
-  cinfo_simple
+    "riotzone",
+    CURSETYP_NORM, 0, (M_DURATION),
+    cinfo_simple
 };
 
 static struct curse_type ct_holyground = {
-  "holyground",
-  CURSETYP_NORM, CURSE_NOAGE, (M_VIGOUR_ADD),
-  cinfo_simple
+    "holyground",
+    CURSETYP_NORM, CURSE_NOAGE, (M_VIGOUR_ADD),
+    cinfo_simple
 };
 
 static struct curse_type ct_healing = {
-  "healingzone",
-  CURSETYP_NORM, 0, (M_VIGOUR | M_DURATION),
-  cinfo_simple
+    "healingzone",
+    CURSETYP_NORM, 0, (M_VIGOUR | M_DURATION),
+    cinfo_simple
 };
 
 void register_regioncurse(void)
 {
-  ct_register(&ct_fogtrap);
-  ct_register(&ct_antimagiczone);
-  ct_register(&ct_farvision);
-  ct_register(&ct_gbdream);
-  ct_register(&ct_maelstrom);
-  ct_register(&ct_blessedharvest);
-  ct_register(&ct_drought);
-  ct_register(&ct_badlearn);
-  ct_register(&ct_depression);
-  ct_register(&ct_astralblock);
-  ct_register(&ct_generous);
-  ct_register(&ct_peacezone);
-  ct_register(&ct_magicstreet);
-  ct_register(&ct_badmagicresistancezone);
-  ct_register(&ct_goodmagicresistancezone);
-  ct_register(&ct_riotzone);
-  ct_register(&ct_godcursezone);
-  ct_register(&ct_holyground);
-  ct_register(&ct_healing);
+    ct_register(&ct_fogtrap);
+    ct_register(&ct_antimagiczone);
+    ct_register(&ct_farvision);
+    ct_register(&ct_gbdream);
+    ct_register(&ct_maelstrom);
+    ct_register(&ct_blessedharvest);
+    ct_register(&ct_drought);
+    ct_register(&ct_badlearn);
+    ct_register(&ct_depression);
+    ct_register(&ct_astralblock);
+    ct_register(&ct_generous);
+    ct_register(&ct_peacezone);
+    ct_register(&ct_magicstreet);
+    ct_register(&ct_badmagicresistancezone);
+    ct_register(&ct_goodmagicresistancezone);
+    ct_register(&ct_riotzone);
+    ct_register(&ct_godcursezone);
+    ct_register(&ct_holyground);
+    ct_register(&ct_healing);
 }

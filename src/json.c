@@ -29,7 +29,7 @@ int json_import(struct stream * out) {
     }
     json = cJSON_Parse(data);
     child = cJSON_GetObjectItem(json, "regions");
-    if (child && child->type==cJSON_Object) {
+    if (child && child->type == cJSON_Object) {
         cJSON *j;
         for (j = child->child; j; j = j->next) {
             cJSON *attr;
@@ -62,15 +62,15 @@ int json_export(stream * out, int flags) {
         region * r;
         plane * p;
         cJSON_AddItemToObject(root, "planes", json = cJSON_CreateObject());
-        for (p=planes;p;p=p->next) {
-           cJSON *data;
-           _snprintf(id, sizeof(id), "%u", p->id);
-           cJSON_AddItemToObject(json, id, data = cJSON_CreateObject());
-           cJSON_AddNumberToObject(data, "x", p->minx);
-           cJSON_AddNumberToObject(data, "y", p->miny);
-           cJSON_AddNumberToObject(data, "width", p->maxx-p->minx);
-           cJSON_AddNumberToObject(data, "height", p->maxy-p->miny);
-           if (p->name) cJSON_AddStringToObject(data, "name", p->name);
+        for (p = planes; p; p = p->next) {
+            cJSON *data;
+            _snprintf(id, sizeof(id), "%u", p->id);
+            cJSON_AddItemToObject(json, id, data = cJSON_CreateObject());
+            cJSON_AddNumberToObject(data, "x", p->minx);
+            cJSON_AddNumberToObject(data, "y", p->miny);
+            cJSON_AddNumberToObject(data, "width", p->maxx - p->minx);
+            cJSON_AddNumberToObject(data, "height", p->maxy - p->miny);
+            if (p->name) cJSON_AddStringToObject(data, "name", p->name);
         }
 
         cJSON_AddItemToObject(root, "regions", json = cJSON_CreateObject());

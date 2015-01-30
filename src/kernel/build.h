@@ -1,7 +1,7 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Copyright (c) 1998-2015, Enno Rehling Rehling <enno@eressea.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -27,66 +27,66 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-/* Die enums fuer Gebauede werden nie gebraucht, nur bei der Bestimmung
- * des Schutzes durch eine Burg wird die Reihenfolge und MAXBUILDINGS
- * wichtig
- */
-
-  struct xml_tag;
-
-  typedef struct requirement {
-    const struct resource_type *rtype;
-    int number;
-  } requirement;
-
-  typedef struct construction {
-    skill_t skill;              /* skill req'd per point of size */
-    int minskill;               /* skill req'd per point of size */
-
-    int maxsize;                /* maximum size of this type */
-    int reqsize;                /* size of object using up 1 set of requirement. */
-    int defense_bonus;          /* protection bonus (defense) during combat */
-    int close_combat_bonus;     /* close combat attack bonus*/
-    int ranged_bonus;           /* ranged attack bonus */
-    requirement *materials;     /* material req'd to build one object */
-    const struct building_type *btype;
-    /* building type required to make this thing */
-
-    struct construction *improvement;
-    /* next level, if upgradable. if more than one of these items
-     * can be built (weapons, armour) per turn, must not be NULL,
-     * but point to the same type again:
-     *   const_sword.improvement = &const_sword
-     * last level of a building points to NULL, as do objects of
-     * an unlimited size.
+    /* Die enums fuer Gebauede werden nie gebraucht, nur bei der Bestimmung
+     * des Schutzes durch eine Burg wird die Reihenfolge und MAXBUILDINGS
+     * wichtig
      */
-    struct attrib *attribs;
-    /* stores skill modifiers and other attributes */
 
-  } construction;
+    struct xml_tag;
 
-  extern int destroy_cmd(struct unit *u, struct order *ord);
-  extern int leave_cmd(struct unit *u, struct order *ord);
+    typedef struct requirement {
+        const struct resource_type *rtype;
+        int number;
+    } requirement;
 
-  void build_road(struct region *r, struct unit *u, int size, direction_t d);
-  void create_ship(struct region *r, struct unit *u,
-    const struct ship_type *newtype, int size, struct order *ord);
-  void continue_ship(struct region *r, struct unit *u, int size);
+    typedef struct construction {
+        skill_t skill;              /* skill req'd per point of size */
+        int minskill;               /* skill req'd per point of size */
 
-  struct building *getbuilding(const struct region *r);
-  struct ship *getship(const struct region *r);
+        int maxsize;                /* maximum size of this type */
+        int reqsize;                /* size of object using up 1 set of requirement. */
+        int defense_bonus;          /* protection bonus (defense) during combat */
+        int close_combat_bonus;     /* close combat attack bonus*/
+        int ranged_bonus;           /* ranged attack bonus */
+        requirement *materials;     /* material req'd to build one object */
+        const struct building_type *btype;
+        /* building type required to make this thing */
 
-  void reportevent(struct region *r, char *s);
+        struct construction *improvement;
+        /* next level, if upgradable. if more than one of these items
+         * can be built (weapons, armour) per turn, must not be NULL,
+         * but point to the same type again:
+         *   const_sword.improvement = &const_sword
+         * last level of a building points to NULL, as do objects of
+         * an unlimited size.
+         */
+        struct attrib *attribs;
+        /* stores skill modifiers and other attributes */
 
-  void shash(struct ship *sh);
-  void sunhash(struct ship *sh);
-  extern int roqf_factor(void);
+    } construction;
 
-  int build(struct unit *u, const construction * ctype, int completed, int want);
-  extern int maxbuild(const struct unit *u, const construction * cons);
-  extern struct message *msg_materials_required(struct unit *u,
+    extern int destroy_cmd(struct unit *u, struct order *ord);
+    extern int leave_cmd(struct unit *u, struct order *ord);
+
+    void build_road(struct region *r, struct unit *u, int size, direction_t d);
+    void create_ship(struct region *r, struct unit *u,
+        const struct ship_type *newtype, int size, struct order *ord);
+    void continue_ship(struct region *r, struct unit *u, int size);
+
+    struct building *getbuilding(const struct region *r);
+    struct ship *getship(const struct region *r);
+
+    void reportevent(struct region *r, char *s);
+
+    void shash(struct ship *sh);
+    void sunhash(struct ship *sh);
+    extern int roqf_factor(void);
+
+    int build(struct unit *u, const construction * ctype, int completed, int want);
+    extern int maxbuild(const struct unit *u, const construction * cons);
+    extern struct message *msg_materials_required(struct unit *u,
     struct order *ord, const struct construction *ctype, int multi);
-/** error messages that build may return: */
+    /** error messages that build may return: */
 #define ELOWSKILL -1
 #define ENEEDSKILL -2
 #define ECOMPLETE -3

@@ -16,7 +16,7 @@ HCALLBACK create_callback(void(*cbv)(va_list va)) {
 }
 
 void reset_callbacks(void) {
-    while(registry) {
+    while (registry) {
         struct reg *r = registry;
         registry = r->next;
         free(r->name);
@@ -38,8 +38,8 @@ HCALLBACK register_callback(const char *name, void(*cbv)(va_list va))
 int find_callback(const char *name, HCALLBACK *result) {
     if (result && name) {
         struct reg *r;
-        for (r=registry;r;r=r->next) {
-            if (strcmp(r->name, name)==0) {
+        for (r = registry; r; r = r->next) {
+            if (strcmp(r->name, name) == 0) {
                 *result = r->cb;
                 return 0;
             }

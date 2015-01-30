@@ -1,7 +1,7 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Copyright (c) 1998-2015, Enno Rehling Rehling <enno@eressea.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -30,40 +30,40 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 static int verify_hate(attrib * a)
 {
-  if (a->data.v == NULL) {
-    return 0;
-  }
-  return 1;
+    if (a->data.v == NULL) {
+        return 0;
+    }
+    return 1;
 }
 
 static void
 write_hate(const attrib * a, const void *owner, struct storage *store)
 {
-  write_unit_reference((unit *) a->data.v, store);
+    write_unit_reference((unit *)a->data.v, store);
 }
 
 static int read_hate(attrib * a, void *owner, struct storage *store)
 {
-  int result =
-    read_reference(&a->data.v, store, read_unit_reference, resolve_unit);
-  if (result == 0 && !a->data.v) {
-    return AT_READ_FAIL;
-  }
-  return AT_READ_OK;
+    int result =
+        read_reference(&a->data.v, store, read_unit_reference, resolve_unit);
+    if (result == 0 && !a->data.v) {
+        return AT_READ_FAIL;
+    }
+    return AT_READ_OK;
 }
 
 attrib_type at_hate = {
-  "hates",
-  NULL,
-  NULL,
-  verify_hate,
-  write_hate,
-  read_hate,
+    "hates",
+    NULL,
+    NULL,
+    verify_hate,
+    write_hate,
+    read_hate,
 };
 
 attrib *make_hate(struct unit * u)
 {
-  attrib *a = a_new(&at_hate);
-  a->data.v = u;
-  return a;
+    attrib *a = a_new(&at_hate);
+    a->data.v = u;
+    return a;
 }

@@ -36,11 +36,11 @@ static void test_make_fighter(CuTest * tc)
     au->status = ST_BEHIND;
     rtype = get_resourcetype(R_HORSE);
     i_change(&au->items, rtype->itype, 1);
-    
+
     b = make_battle(r);
     as = make_side(b, au->faction, 0, 0, 0);
     af = make_fighter(b, au, as, false);
-    
+
     CuAssertIntEquals(tc, 1, b->nfighters);
     CuAssertPtrEquals(tc, 0, af->building);
     CuAssertPtrEquals(tc, as, af->side);
@@ -59,7 +59,7 @@ static void test_make_fighter(CuTest * tc)
 }
 
 static int add_two(building * b, unit * u, building_bonus bonus) {
-  return 2;
+    return 2;
 }
 
 static void test_defenders_get_building_bonus(CuTest * tc)
@@ -190,11 +190,11 @@ static void test_building_defence_bonus(CuTest * tc)
     r = findregion(0, 0);
     register_buildings();
     btype = bt_get_or_create("castle");
-    btype->protection = (int (*)(struct building *, struct unit *, building_bonus))get_function("building_protection");
+    btype->protection = (int(*)(struct building *, struct unit *, building_bonus))get_function("building_protection");
     btype->construction->defense_bonus = 3;
     bld = test_create_building(r, btype);
     bld->size = 1;
-    
+
     f = test_create_faction(NULL);
     au = test_create_unit(f, r);
     scale_number(au, 1);

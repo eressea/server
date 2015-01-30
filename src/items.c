@@ -48,7 +48,7 @@ struct order *ord)
         if (sv && sv->level > 2) {
             /* TODO: message */
         }
-        else if (sk!=NOSKILL && study_cost(u, sk) > 0) {
+        else if (sk != NOSKILL && study_cost(u, sk) > 0) {
             /* TODO: message */
         }
         else {

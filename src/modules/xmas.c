@@ -1,4 +1,4 @@
-/* vi: set ts=2:
+/* 
  +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  |                   |  Enno Rehling <enno@eressea.de>
  | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
@@ -6,9 +6,9 @@
  |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
  +-------------------+  Stefan Reich <reich@halbling.de>
 
- This program may not be used, modified or distributed 
+ This program may not be used, modified or distributed
  without prior permission by the authors of Eressea.
-*/
+ */
 
 #include <platform.h>
 #include <kernel/config.h>
@@ -38,43 +38,43 @@
 
 static int xmasgate_handle(trigger * t, void *data)
 {
-  return -1;
+    return -1;
 }
 
 static void xmasgate_write(const trigger * t, struct storage *store)
 {
-  building *b = (building *) t->data.v;
-  WRITE_TOK(store, itoa36(b->no));
+    building *b = (building *)t->data.v;
+    WRITE_TOK(store, itoa36(b->no));
 }
 
 static int xmasgate_read(trigger * t, struct storage *store)
 {
-  int bc =
-    read_reference(&t->data.v, store, read_building_reference,
-    resolve_building);
-  if (bc == 0 && !t->data.v) {
-    return AT_READ_FAIL;
-  }
-  return AT_READ_OK;
+    int bc =
+        read_reference(&t->data.v, store, read_building_reference,
+        resolve_building);
+    if (bc == 0 && !t->data.v) {
+        return AT_READ_FAIL;
+    }
+    return AT_READ_OK;
 }
 
 struct trigger_type tt_xmasgate = {
-  "xmasgate",
-  NULL,
-  NULL,
-  xmasgate_handle,
-  xmasgate_write,
-  xmasgate_read
+    "xmasgate",
+    NULL,
+    NULL,
+    xmasgate_handle,
+    xmasgate_write,
+    xmasgate_read
 };
 
 trigger *trigger_xmasgate(building * b)
 {
-  trigger *t = t_new(&tt_xmasgate);
-  t->data.v = b;
-  return t;
+    trigger *t = t_new(&tt_xmasgate);
+    t->data.v = b;
+    return t;
 }
 
 void register_xmas(void)
 {
-  tt_register(&tt_xmasgate);
+    tt_register(&tt_xmasgate);
 }

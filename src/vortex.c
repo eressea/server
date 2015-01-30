@@ -78,7 +78,7 @@ static int a_readdirection(attrib * a, void *owner, struct storage *store)
     spec_direction *d = (spec_direction *)(a->data.v);
     char lbuf[32];
 
-    (void) owner;
+    (void)owner;
     READ_INT(store, &d->x);
     READ_INT(store, &d->y);
     READ_INT(store, &d->duration);

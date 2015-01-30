@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2015, Enno Rehling Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -144,7 +144,7 @@ bool ExpensiveMigrants(void)
         gamecookie = global.cookie;
         value = get_param_int(global.parameters, "study.expensivemigrants", 0);
     }
-    return value!=0;
+    return value != 0;
 }
 
 /** Specifies automatic alliance modes.
@@ -275,23 +275,23 @@ race_t old_race(const struct race * rc)
 }
 
 helpmode helpmodes[] = {
-        { "all", HELP_ALL }
-        ,
-        { "money", HELP_MONEY }
-        ,
-        { "fight", HELP_FIGHT }
-        ,
-        { "observe", HELP_OBSERVE }
-        ,
-        { "give", HELP_GIVE }
-        ,
-        { "guard", HELP_GUARD }
-        ,
-        { "stealth", HELP_FSTEALTH }
-        ,
-        { "travel", HELP_TRAVEL }
-        ,
-        { NULL, 0 }
+    { "all", HELP_ALL }
+    ,
+    { "money", HELP_MONEY }
+    ,
+    { "fight", HELP_FIGHT }
+    ,
+    { "observe", HELP_OBSERVE }
+    ,
+    { "give", HELP_GIVE }
+    ,
+    { "guard", HELP_GUARD }
+    ,
+    { "stealth", HELP_FSTEALTH }
+    ,
+    { "travel", HELP_TRAVEL }
+    ,
+    { NULL, 0 }
 };
 
 /** Returns the English name of the race, which is what the database uses.
@@ -784,7 +784,7 @@ int getunit(const region * r, const faction * f, unit **uresult)
     if (n == 0) {
         result = GET_PEASANTS;
     }
-    else if (n>0) {
+    else if (n > 0) {
         u2 = findunit(n);
         if (u2 != NULL && u2->region == r) {
             /* there used to be a 'u2->flags & UFL_ISNEW || u2->number>0' condition
@@ -913,7 +913,7 @@ int maxworkingpeasants(const struct region *r)
 {
     int size = production(r);
     int treespace = (rtrees(r, 2) + rtrees(r, 1) / 2) * TREESIZE;
-    return _max(size-treespace, _min(size / 10 , 200));
+    return _max(size - treespace, _min(size / 10, 200));
 }
 
 static const char * parameter_key(int i)
@@ -1291,13 +1291,13 @@ bool has_horses(const struct unit * u)
  * Modifikation für Städter. */
 
 static const int wagetable[7][4] = {
-        { 10, 10, 11, -7 },             /* Baustelle */
-        { 10, 10, 11, -5 },             /* Handelsposten */
-        { 11, 11, 12, -3 },             /* Befestigung */
-        { 12, 11, 13, -1 },             /* Turm */
-        { 13, 12, 14, 0 },              /* Burg */
-        { 14, 12, 15, 1 },              /* Festung */
-        { 15, 13, 16, 2 }               /* Zitadelle */
+    { 10, 10, 11, -7 },             /* Baustelle */
+    { 10, 10, 11, -5 },             /* Handelsposten */
+    { 11, 11, 12, -3 },             /* Befestigung */
+    { 12, 11, 13, -1 },             /* Turm */
+    { 13, 12, 14, 0 },              /* Burg */
+    { 14, 12, 15, 1 },              /* Festung */
+    { 15, 13, 16, 2 }               /* Zitadelle */
 };
 
 int cmp_wage(const struct building *b, const building * a)

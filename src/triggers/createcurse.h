@@ -1,7 +1,7 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Copyright (c) 1998-2015, Enno Rehling Rehling <enno@eressea.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -22,19 +22,19 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-/* all types we use are defined here to reduce dependencies */
-  struct curse_type;
-  struct trigger_type;
-  struct trigger;
-  struct region;
-  struct faction;
-  struct unit;
+    /* all types we use are defined here to reduce dependencies */
+    struct curse_type;
+    struct trigger_type;
+    struct trigger;
+    struct region;
+    struct faction;
+    struct unit;
 
-  extern struct trigger_type tt_createcurse;
+    extern struct trigger_type tt_createcurse;
 
-  extern struct trigger *trigger_createcurse(struct unit *mage,
+    struct trigger *trigger_createcurse(struct unit *mage,
     struct unit *target, const struct curse_type *ct, float vigour,
-    int duration, float effect, int men);
+        int duration, float effect, int men);
 
 #ifdef __cplusplus
 }

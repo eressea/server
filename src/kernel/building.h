@@ -1,7 +1,7 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Copyright (c) 1998-2015, Enno Rehling Rehling <enno@eressea.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -26,18 +26,18 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-/* maintenance::flags */
+    /* maintenance::flags */
 #define MTF_NONE     0x00
 #define MTF_VARIABLE 0x01       /* resource usage scales with size */
 #define MTF_VITAL    0x02       /* if resource missing, building may crash */
 
-  typedef struct maintenance {
-    const struct resource_type *rtype;  /* type of resource required */
-    int number;                 /* amount of resources */
-    int flags;         /* misc. flags */
-  } maintenance;
+    typedef struct maintenance {
+        const struct resource_type *rtype;  /* type of resource required */
+        int number;                 /* amount of resources */
+        int flags;         /* misc. flags */
+    } maintenance;
 
-/* building_type::flags */
+    /* building_type::flags */
 #define BTF_NONE           0x00
 #define BTF_INDESTRUCTIBLE 0x01 /* cannot be torm down */
 #define BTF_NOBUILD        0x02 /* special, can't be built */
@@ -48,54 +48,54 @@ extern "C" {
 #define BTF_ONEPERTURN     0x80 /* one one sizepoint can be added per turn */
 #define BTF_NAMECHANGE    0x100 /* name and description can be changed more than once */
 
-  typedef enum {
-      DEFENSE_BONUS,
-      CLOSE_COMBAT_ATTACK_BONUS,
-      RANGED_ATTACK_BONUS,
-  } building_bonus;
+    typedef enum {
+        DEFENSE_BONUS,
+        CLOSE_COMBAT_ATTACK_BONUS,
+        RANGED_ATTACK_BONUS,
+    } building_bonus;
 
-  typedef struct building_type {
-    char *_name;
+    typedef struct building_type {
+        char *_name;
 
-    int flags;                  /* flags */
-    int capacity;               /* Kapazität pro Größenpunkt */
-    int maxcapacity;            /* Max. Kapazität */
-    int maxsize;                /* how big can it get, with all the extensions? */
-    int magres;                 /* how well it resists against spells */
-    int magresbonus;            /* bonus it gives the target against spells */
-    int fumblebonus;            /* bonus that reduces fumbling */
-    double auraregen;           /* modifier for aura regeneration inside building */
-    struct maintenance *maintenance;    /* array of requirements */
-    struct construction *construction;  /* construction of 1 building-level */
+        int flags;                  /* flags */
+        int capacity;               /* Kapazität pro Größenpunkt */
+        int maxcapacity;            /* Max. Kapazität */
+        int maxsize;                /* how big can it get, with all the extensions? */
+        int magres;                 /* how well it resists against spells */
+        int magresbonus;            /* bonus it gives the target against spells */
+        int fumblebonus;            /* bonus that reduces fumbling */
+        double auraregen;           /* modifier for aura regeneration inside building */
+        struct maintenance *maintenance;    /* array of requirements */
+        struct construction *construction;  /* construction of 1 building-level */
 
-    const char *(*name) (const struct building_type *,
-      const struct building * b, int size);
-    void (*init) (struct building_type *);
-    void (*age) (struct building *);
-    int (*protection) (struct building *, struct unit *, building_bonus);
-    double (*taxes) (const struct building *, int size);
-    struct attrib *attribs;
-  } building_type;
+        const char *(*name) (const struct building_type *,
+            const struct building * b, int size);
+        void(*init) (struct building_type *);
+        void(*age) (struct building *);
+        int(*protection) (struct building *, struct unit *, building_bonus);
+        double(*taxes) (const struct building *, int size);
+        struct attrib *attribs;
+    } building_type;
 
-  extern struct quicklist *buildingtypes;
+    extern struct quicklist *buildingtypes;
 
-  building_type *bt_get_or_create(const char *name);
-  const building_type *bt_find(const char *name);
-  void free_buildingtypes(void);
-  void register_buildings(void);
-  void bt_register(struct building_type *type);
-  int bt_effsize(const struct building_type *btype,
-    const struct building *b, int bsize);
+    building_type *bt_get_or_create(const char *name);
+    const building_type *bt_find(const char *name);
+    void free_buildingtypes(void);
+    void register_buildings(void);
+    void bt_register(struct building_type *type);
+    int bt_effsize(const struct building_type *btype,
+        const struct building *b, int bsize);
 
-/* buildingt => building_type
- * Name => locale_string(name)
- * MaxGroesse => levels
- * MinBauTalent => construction->minskill
- * Kapazitaet => capacity, maxcapacity
- * Materialien => construction->materials
- * UnterSilber, UnterSpezialTyp, UnterSpezial => maintenance
- * per_size => !maintenance->fixed
- */
+    /* buildingt => building_type
+     * Name => locale_string(name)
+     * MaxGroesse => levels
+     * MinBauTalent => construction->minskill
+     * Kapazitaet => capacity, maxcapacity
+     * Materialien => construction->materials
+     * UnterSilber, UnterSpezialTyp, UnterSpezial => maintenance
+     * per_size => !maintenance->fixed
+     */
 #define BFL_NONE           0x00
 #define BLD_MAINTAINED     0x01 /* vital maintenance paid for */
 #define BLD_WORKING        0x02 /* full maintenance paid, it works */
@@ -106,76 +106,76 @@ extern "C" {
 
 #define BLD_SAVEMASK       0x00 /* mask for persistent flags */
 
-  typedef struct building {
-    struct building *next;
-    struct building *nexthash;
+    typedef struct building {
+        struct building *next;
+        struct building *nexthash;
 
-    const struct building_type *type;
-    struct region *region;
-    struct unit *_owner; /* you should always use building_owner(), never this naked pointer */
-    char *name;
-    char *display;
-    struct attrib *attribs;
-    int no;
-    int size;
-    int sizeleft;               /* is only used during battle. should be a temporary attribute */
-    int besieged;               /* should be an attribute */
-    int flags;
-  } building;
+        const struct building_type *type;
+        struct region *region;
+        struct unit *_owner; /* you should always use building_owner(), never this naked pointer */
+        char *name;
+        char *display;
+        struct attrib *attribs;
+        int no;
+        int size;
+        int sizeleft;               /* is only used during battle. should be a temporary attribute */
+        int besieged;               /* should be an attribute */
+        int flags;
+    } building;
 
-  extern struct attrib_type at_building_generic_type;
-  extern const char *buildingtype(const building_type * btype,
-    const struct building *b, int bsize);
-  extern const char *write_buildingname(const building * b, char *ibuf,
-    size_t size);
-  extern int buildingcapacity(const struct building *b);
-  extern struct building *new_building(const struct building_type *typ,
+    extern struct attrib_type at_building_generic_type;
+    extern const char *buildingtype(const building_type * btype,
+        const struct building *b, int bsize);
+    extern const char *write_buildingname(const building * b, char *ibuf,
+        size_t size);
+    extern int buildingcapacity(const struct building *b);
+    extern struct building *new_building(const struct building_type *typ,
     struct region *r, const struct locale *lang);
-  int build_building(struct unit *u, const struct building_type *typ, 
-                      int id, int size, struct order *ord);
+    int build_building(struct unit *u, const struct building_type *typ,
+        int id, int size, struct order *ord);
 
-/* Alte Gebäudetypen: */
+    /* Alte Gebäudetypen: */
 
-/* old functions, still in build.c: */
-  int buildingeffsize(const building * b, int imaginary);
-  void bhash(struct building *b);
-  void bunhash(struct building *b);
-  int buildingcapacity(const struct building *b);
+    /* old functions, still in build.c: */
+    int buildingeffsize(const building * b, int imaginary);
+    void bhash(struct building *b);
+    void bunhash(struct building *b);
+    int buildingcapacity(const struct building *b);
 
-  extern void remove_building(struct building **blist, struct building *b);
-  extern void free_building(struct building *b);
-  extern void free_buildings(void);
+    extern void remove_building(struct building **blist, struct building *b);
+    extern void free_building(struct building *b);
+    extern void free_buildings(void);
 
-  const struct building_type *findbuildingtype(const char *name,
-    const struct locale *lang);
+    const struct building_type *findbuildingtype(const char *name,
+        const struct locale *lang);
 
 #include "build.h"
 #define NOBUILDING NULL
 
-  extern int resolve_building(variant data, void *address);
-  extern void write_building_reference(const struct building *b,
+    extern int resolve_building(variant data, void *address);
+    extern void write_building_reference(const struct building *b,
     struct storage *store);
-  extern variant read_building_reference(struct storage *store);
+    extern variant read_building_reference(struct storage *store);
 
-  extern struct building *findbuilding(int n);
+    extern struct building *findbuilding(int n);
 
-  extern struct unit *building_owner(const struct building *b);
-  extern void building_set_owner(struct unit * u);
-  extern void building_update_owner(struct building * bld);
+    extern struct unit *building_owner(const struct building *b);
+    extern void building_set_owner(struct unit * u);
+    extern void building_update_owner(struct building * bld);
 
-  extern struct attrib_type at_building_action;
+    extern struct attrib_type at_building_action;
 
 #ifdef WDW_PYRAMID
-  extern int wdw_pyramid_level(const struct building *b);
+    extern int wdw_pyramid_level(const struct building *b);
 #endif
 
-  extern const char *buildingname(const struct building *b);
+    extern const char *buildingname(const struct building *b);
 
-  extern const char *building_getname(const struct building *b);
-  extern void building_setname(struct building *self, const char *name);
+    extern const char *building_getname(const struct building *b);
+    extern void building_setname(struct building *self, const char *name);
 
-  struct region *building_getregion(const struct building *b);
-  void building_setregion(struct building *bld, struct region *r);
+    struct region *building_getregion(const struct building *b);
+    void building_setregion(struct building *bld, struct region *r);
 
 #ifdef __cplusplus
 }

@@ -1,4 +1,4 @@
-/* vi: set ts=2:
+/*
  +-------------------+
  |                   |  Christian Schlittchen <corwin@amber.kn-bremen.de>
  | Eressea PBEM host |  Enno Rehling <enno@eressea.de>
@@ -183,7 +183,7 @@ static char *mkdata(order_data **pdata, size_t len, keyword_t kwd, int lindex, c
 {
     order_data *data;
     char *result;
-    data = malloc(sizeof(order_data) + len +1);
+    data = malloc(sizeof(order_data) + len + 1);
     result = (char *)(data + 1);
     data->_keyword = kwd;
     data->_lindex = lindex;
@@ -255,7 +255,7 @@ static order *create_order_i(keyword_t kwd, const char *sptr, int persistent,
     order *ord = NULL;
     int lindex;
 
-    if ((int)kwd>0 && keyword_disabled(kwd)) {
+    if ((int)kwd > 0 && keyword_disabled(kwd)) {
         log_error("trying to create an order for disabled keyword %s.", keyword(kwd));
         return NULL;
     }

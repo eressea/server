@@ -1,4 +1,4 @@
-/* vi: set ts=2:
+/*
 +-------------------+  Enno Rehling <enno@eressea.de>
 | Eressea PBEM host |  Christian Schlittchen <corwin@amber.kn-bremen.de>
 | (c) 1998 - 2008   |  Katja Zedel <katze@felidae.kn-bremen.de>
@@ -525,23 +525,23 @@ static int fwritestr(FILE * F, const char *str)
     fputc('\"', F);
     if (str)
         while (*str) {
-        int c = (int)(unsigned char)*str++;
-        switch (c) {
-        case '"':
-        case '\\':
-            fputc('\\', F);
-            fputc(c, F);
-            nwrite += 2;
-            break;
-        case '\n':
-            fputc('\\', F);
-            fputc('n', F);
-            nwrite += 2;
-            break;
-        default:
-            fputc(c, F);
-            ++nwrite;
-        }
+            int c = (int)(unsigned char)*str++;
+            switch (c) {
+            case '"':
+            case '\\':
+                fputc('\\', F);
+                fputc(c, F);
+                nwrite += 2;
+                break;
+            case '\n':
+                fputc('\\', F);
+                fputc('n', F);
+                nwrite += 2;
+                break;
+            default:
+                fputc(c, F);
+                ++nwrite;
+            }
         }
     fputc('\"', F);
     return nwrite + 2;
@@ -825,183 +825,183 @@ static void cr_output_unit(FILE * F, const region * r, const faction * f,       
               prefix)));
       }
   }
-    if (u->faction != f && a_fshidden
-        && a_fshidden->data.ca[0] == 1 && effskill(u, SK_STEALTH) >= 6) {
-        fprintf(F, "-1;Anzahl\n");
-    }
-    else {
-        fprintf(F, "%d;Anzahl\n", u->number);
-    }
+  if (u->faction != f && a_fshidden
+      && a_fshidden->data.ca[0] == 1 && effskill(u, SK_STEALTH) >= 6) {
+      fprintf(F, "-1;Anzahl\n");
+  }
+  else {
+      fprintf(F, "%d;Anzahl\n", u->number);
+  }
 
-    pzTmp = get_racename(u->attribs);
-    if (pzTmp) {
-        fprintf(F, "\"%s\";Typ\n", pzTmp);
-        if (u->faction == f && fval(u_race(u), RCF_SHAPESHIFTANY)) {
-            const char *zRace = rc_name_s(u_race(u), NAME_PLURAL);
-            fprintf(F, "\"%s\";wahrerTyp\n",
-                translate(zRace, LOC(f->locale, zRace)));
-        }
-    }
-    else {
-        const race *irace = u_irace(u);
-        const char *zRace = rc_name_s(irace, NAME_PLURAL);
-        fprintf(F, "\"%s\";Typ\n",
-            translate(zRace, LOC(f->locale, zRace)));
-        if (u->faction == f && irace != u_race(u)) {
-            assert(skill_enabled(SK_STEALTH)
-                || !"we're resetting this on load, so.. ircase should never be used");
-            zRace = rc_name_s(u_race(u), NAME_PLURAL);
-            fprintf(F, "\"%s\";wahrerTyp\n",
-                translate(zRace, LOC(f->locale, zRace)));
-        }
-    }
+  pzTmp = get_racename(u->attribs);
+  if (pzTmp) {
+      fprintf(F, "\"%s\";Typ\n", pzTmp);
+      if (u->faction == f && fval(u_race(u), RCF_SHAPESHIFTANY)) {
+          const char *zRace = rc_name_s(u_race(u), NAME_PLURAL);
+          fprintf(F, "\"%s\";wahrerTyp\n",
+              translate(zRace, LOC(f->locale, zRace)));
+      }
+  }
+  else {
+      const race *irace = u_irace(u);
+      const char *zRace = rc_name_s(irace, NAME_PLURAL);
+      fprintf(F, "\"%s\";Typ\n",
+          translate(zRace, LOC(f->locale, zRace)));
+      if (u->faction == f && irace != u_race(u)) {
+          assert(skill_enabled(SK_STEALTH)
+              || !"we're resetting this on load, so.. ircase should never be used");
+          zRace = rc_name_s(u_race(u), NAME_PLURAL);
+          fprintf(F, "\"%s\";wahrerTyp\n",
+              translate(zRace, LOC(f->locale, zRace)));
+      }
+  }
 
-    if (u->building) {
-        assert(u->building->region);
-        fprintf(F, "%d;Burg\n", u->building->no);
-    }
-    if (u->ship) {
-        assert(u->ship->region);
-        fprintf(F, "%d;Schiff\n", u->ship->no);
-    }
-    if (is_guard(u, GUARD_ALL) != 0) {
-        fprintf(F, "%d;bewacht\n", 1);
-    }
-    if ((b = usiege(u)) != NULL) {
-        fprintf(F, "%d;belagert\n", b->no);
-    }
-    /* additional information for own units */
-    if (u->faction == f || omniscient(f)) {
-        order *ord;
-        const char *xc;
-        const char *c;
-        int i;
-        sc_mage *mage;
+  if (u->building) {
+      assert(u->building->region);
+      fprintf(F, "%d;Burg\n", u->building->no);
+  }
+  if (u->ship) {
+      assert(u->ship->region);
+      fprintf(F, "%d;Schiff\n", u->ship->no);
+  }
+  if (is_guard(u, GUARD_ALL) != 0) {
+      fprintf(F, "%d;bewacht\n", 1);
+  }
+  if ((b = usiege(u)) != NULL) {
+      fprintf(F, "%d;belagert\n", b->no);
+  }
+  /* additional information for own units */
+  if (u->faction == f || omniscient(f)) {
+      order *ord;
+      const char *xc;
+      const char *c;
+      int i;
+      sc_mage *mage;
 
-        i = ualias(u);
-        if (i > 0)
-            fprintf(F, "%d;temp\n", i);
-        else if (i < 0)
-            fprintf(F, "%d;alias\n", -i);
-        i = get_money(u);
-        fprintf(F, "%d;Kampfstatus\n", u->status);
-        fprintf(F, "%d;weight\n", weight(u));
-        if (fval(u, UFL_NOAID)) {
-            fputs("1;unaided\n", F);
-        }
-        if (fval(u, UFL_STEALTH)) {
-            i = u_geteffstealth(u);
-            if (i >= 0) {
-                fprintf(F, "%d;Tarnung\n", i);
-            }
-        }
-        xc = uprivate(u);
-        if (xc) {
-            fprintf(F, "\"%s\";privat\n", xc);
-        }
-        c = hp_status(u);
-        if (c && *c && (u->faction == f || omniscient(f))) {
-            fprintf(F, "\"%s\";hp\n", translate(c,
-                LOC(u->faction->locale, c)));
-        }
-        if (fval(u, UFL_HERO)) {
-            fputs("1;hero\n", F);
-        }
+      i = ualias(u);
+      if (i > 0)
+          fprintf(F, "%d;temp\n", i);
+      else if (i < 0)
+          fprintf(F, "%d;alias\n", -i);
+      i = get_money(u);
+      fprintf(F, "%d;Kampfstatus\n", u->status);
+      fprintf(F, "%d;weight\n", weight(u));
+      if (fval(u, UFL_NOAID)) {
+          fputs("1;unaided\n", F);
+      }
+      if (fval(u, UFL_STEALTH)) {
+          i = u_geteffstealth(u);
+          if (i >= 0) {
+              fprintf(F, "%d;Tarnung\n", i);
+          }
+      }
+      xc = uprivate(u);
+      if (xc) {
+          fprintf(F, "\"%s\";privat\n", xc);
+      }
+      c = hp_status(u);
+      if (c && *c && (u->faction == f || omniscient(f))) {
+          fprintf(F, "\"%s\";hp\n", translate(c,
+              LOC(u->faction->locale, c)));
+      }
+      if (fval(u, UFL_HERO)) {
+          fputs("1;hero\n", F);
+      }
 
-        if (fval(u, UFL_HUNGER) && (u->faction == f)) {
-            fputs("1;hunger\n", F);
-        }
-        if (is_mage(u)) {
-            fprintf(F, "%d;Aura\n", get_spellpoints(u));
-            fprintf(F, "%d;Auramax\n", max_spellpoints(u->region, u));
-        }
-        /* default commands */
-        fprintf(F, "COMMANDS\n");
-        for (ord = u->old_orders; ord; ord = ord->next) {
-            /* this new order will replace the old defaults */
-            if (is_persistent(ord)) {
-                fwriteorder(F, ord, f->locale, true);
-                fputc('\n', F);
-            }
-        }
-        for (ord = u->orders; ord; ord = ord->next) {
-            if (u->old_orders && is_repeated(ord))
-                continue;               /* unit has defaults */
-            if (is_persistent(ord)) {
-                fwriteorder(F, ord, f->locale, true);
-                fputc('\n', F);
-            }
-        }
+      if (fval(u, UFL_HUNGER) && (u->faction == f)) {
+          fputs("1;hunger\n", F);
+      }
+      if (is_mage(u)) {
+          fprintf(F, "%d;Aura\n", get_spellpoints(u));
+          fprintf(F, "%d;Auramax\n", max_spellpoints(u->region, u));
+      }
+      /* default commands */
+      fprintf(F, "COMMANDS\n");
+      for (ord = u->old_orders; ord; ord = ord->next) {
+          /* this new order will replace the old defaults */
+          if (is_persistent(ord)) {
+              fwriteorder(F, ord, f->locale, true);
+              fputc('\n', F);
+          }
+      }
+      for (ord = u->orders; ord; ord = ord->next) {
+          if (u->old_orders && is_repeated(ord))
+              continue;               /* unit has defaults */
+          if (is_persistent(ord)) {
+              fwriteorder(F, ord, f->locale, true);
+              fputc('\n', F);
+          }
+      }
 
-        /* talents */
-        pr = 0;
-        for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
-            if (sv->level > 0) {
-                skill_t sk = sv->id;
-                int esk = eff_skill(u, sk, r);
-                if (!pr) {
-                    pr = 1;
-                    fprintf(F, "TALENTE\n");
-                }
-                fprintf(F, "%d %d;%s\n", u->number * level_days(sv->level), esk,
-                    translate(mkname("skill", skillnames[sk]), skillname(sk,
-                    f->locale)));
-            }
-        }
+      /* talents */
+      pr = 0;
+      for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
+          if (sv->level > 0) {
+              skill_t sk = sv->id;
+              int esk = eff_skill(u, sk, r);
+              if (!pr) {
+                  pr = 1;
+                  fprintf(F, "TALENTE\n");
+              }
+              fprintf(F, "%d %d;%s\n", u->number * level_days(sv->level), esk,
+                  translate(mkname("skill", skillnames[sk]), skillname(sk,
+                  f->locale)));
+          }
+      }
 
-        /* spells that this unit can cast */
-        mage = get_mage(u);
-        if (mage) {
-            int i, maxlevel = effskill(u, SK_MAGIC);
-            cr_output_spells(F, u, maxlevel);
+      /* spells that this unit can cast */
+      mage = get_mage(u);
+      if (mage) {
+          int i, maxlevel = effskill(u, SK_MAGIC);
+          cr_output_spells(F, u, maxlevel);
 
-            for (i = 0; i != MAXCOMBATSPELLS; ++i) {
-                const spell *sp = mage->combatspells[i].sp;
-                if (sp) {
-                    const char *name =
-                        translate(mkname("spell", sp->sname), spell_name(sp,
-                        f->locale));
-                    fprintf(F, "KAMPFZAUBER %d\n", i);
-                    fprintf(F, "\"%s\";name\n", name);
-                    fprintf(F, "%d;level\n", mage->combatspells[i].level);
-                }
-            }
-        }
-    }
-    /* items */
-    pr = 0;
-    if (f == u->faction || omniscient(f)) {
-        show = u->items;
-    }
-    else if (!itemcloak && mode >= see_unit && !(a_fshidden
-        && a_fshidden->data.ca[1] == 1 && effskill(u, SK_STEALTH) >= 3)) {
-        int n = report_items(u->items, result, MAX_INVENTORY, u, f);
-        assert(n >= 0);
-        if (n > 0)
-            show = result;
-        else
-            show = NULL;
-    }
-    else {
-        show = NULL;
-    }
-    lasttype = NULL;
-    for (itm = show; itm; itm = itm->next) {
-        const char *ic;
-        int in;
-        assert(itm->type != lasttype
-            || !"error: list contains two objects of the same item");
-        report_item(u, itm, f, NULL, &ic, &in, true);
-        if (in == 0)
-            continue;
-        if (!pr) {
-            pr = 1;
-            fputs("GEGENSTAENDE\n", F);
-        }
-        fprintf(F, "%d;%s\n", in, translate(ic, LOC(f->locale, ic)));
-    }
+          for (i = 0; i != MAXCOMBATSPELLS; ++i) {
+              const spell *sp = mage->combatspells[i].sp;
+              if (sp) {
+                  const char *name =
+                      translate(mkname("spell", sp->sname), spell_name(sp,
+                      f->locale));
+                  fprintf(F, "KAMPFZAUBER %d\n", i);
+                  fprintf(F, "\"%s\";name\n", name);
+                  fprintf(F, "%d;level\n", mage->combatspells[i].level);
+              }
+          }
+      }
+  }
+  /* items */
+  pr = 0;
+  if (f == u->faction || omniscient(f)) {
+      show = u->items;
+  }
+  else if (!itemcloak && mode >= see_unit && !(a_fshidden
+      && a_fshidden->data.ca[1] == 1 && effskill(u, SK_STEALTH) >= 3)) {
+      int n = report_items(u->items, result, MAX_INVENTORY, u, f);
+      assert(n >= 0);
+      if (n > 0)
+          show = result;
+      else
+          show = NULL;
+  }
+  else {
+      show = NULL;
+  }
+  lasttype = NULL;
+  for (itm = show; itm; itm = itm->next) {
+      const char *ic;
+      int in;
+      assert(itm->type != lasttype
+          || !"error: list contains two objects of the same item");
+      report_item(u, itm, f, NULL, &ic, &in, true);
+      if (in == 0)
+          continue;
+      if (!pr) {
+          pr = 1;
+          fputs("GEGENSTAENDE\n", F);
+      }
+      fprintf(F, "%d;%s\n", in, translate(ic, LOC(f->locale, ic)));
+  }
 
-    cr_output_curses(F, f, u, TYP_UNIT);
+  cr_output_curses(F, f, u, TYP_UNIT);
 }
 
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
@@ -1011,12 +1011,12 @@ static void show_allies_cr(FILE * F, const faction * f, const ally * sf)
 {
     for (; sf; sf = sf->next)
         if (sf->faction) {
-        int mode = alliedgroup(NULL, f, sf->faction, sf, HELP_ALL);
-        if (mode != 0 && sf->status > 0) {
-            fprintf(F, "ALLIANZ %d\n", sf->faction->no);
-            fprintf(F, "\"%s\";Parteiname\n", sf->faction->name);
-            fprintf(F, "%d;Status\n", sf->status & HELP_ALL);
-        }
+            int mode = alliedgroup(NULL, f, sf->faction, sf, HELP_ALL);
+            if (mode != 0 && sf->status > 0) {
+                fprintf(F, "ALLIANZ %d\n", sf->faction->no);
+                fprintf(F, "\"%s\";Parteiname\n", sf->faction->name);
+                fprintf(F, "%d;Status\n", sf->status & HELP_ALL);
+            }
         }
 }
 

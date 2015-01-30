@@ -470,10 +470,10 @@ growing_trees_e3(region * r, const int current_season,
 const int last_weeks_season)
 {
     static const int transform[4][3] = {
-            { -1, -1, 0 },
-            { TREE_SEED, TREE_SAPLING, 2 },
-            { TREE_SAPLING, TREE_TREE, 2 },
-            { TREE_TREE, TREE_SEED, 2 }
+        { -1, -1, 0 },
+        { TREE_SEED, TREE_SAPLING, 2 },
+        { TREE_SAPLING, TREE_TREE, 2 },
+        { TREE_TREE, TREE_SEED, 2 }
     };
 
     if (r->land && current_season != last_weeks_season
@@ -677,7 +677,7 @@ void immigration(void)
 {
     region *r;
     log_info(" - Einwanderung...");
-    int repopulate=get_param_int(global.parameters, "rules.economy.repopulate_maximum", 90);
+    int repopulate = get_param_int(global.parameters, "rules.economy.repopulate_maximum", 90);
     for (r = regions; r; r = r->next) {
         if (r->land && r->land->newpeasants) {
             int rp = rpeasants(r) + r->land->newpeasants;
@@ -686,7 +686,7 @@ void immigration(void)
         /* Genereate some (0-2 to 0-6 depending on the income) peasants out of nothing */
         /*if less then 50 are in the region and there is space and no monster or deamon units in the region */
         int peasants = rpeasants(r);
-        if (repopulate && r->land && (peasants < repopulate) && maxworkingpeasants(r) > (peasants+30)*2)
+        if (repopulate && r->land && (peasants < repopulate) && maxworkingpeasants(r) >(peasants + 30) * 2)
         {
             int badunit = 0;
             unit *u;
@@ -925,7 +925,7 @@ int quit_cmd(unit * u, struct order *ord)
     faction *f = u->faction;
     const char *passwd;
     keyword_t kwd;
-    
+
     kwd = init_order(ord);
     assert(kwd == K_QUIT);
     passwd = gettoken(token, sizeof(token));
@@ -968,7 +968,7 @@ static bool CheckOverload(void)
     if (value < 0) {
         value = get_param_int(global.parameters, "rules.check_overload", 0);
     }
-    return value!=0;
+    return value != 0;
 }
 
 int enter_ship(unit * u, struct order *ord, int id, bool report)
@@ -979,7 +979,7 @@ int enter_ship(unit * u, struct order *ord, int id, bool report)
 
     /* Muss abgefangen werden, sonst koennten Schwimmer an
      * Bord von Schiffen an Land gelangen. */
-    if (!(rc->flags & (RCF_CANSAIL|RCF_WALK|RCF_FLY))) {
+    if (!(rc->flags & (RCF_CANSAIL | RCF_WALK | RCF_FLY))) {
         if (report) {
             cmistake(u, ord, 233, MSG_MOVE);
         }
@@ -1229,17 +1229,17 @@ static void remove_idle_players(void)
     age = calloc(_max(4, turn + 1), sizeof(int));
     for (f = factions; f; f = f->next)
         if (!is_monsters(f)) {
-        if (RemoveNMRNewbie() && !fval(f, FFL_NOIDLEOUT)) {
-            if (f->age >= 0 && f->age <= turn)
-                ++age[f->age];
-            if (f->age == 2 || f->age == 3) {
-                if (f->lastorders == turn - 2) {
-                    destroyfaction(f);
-                    ++dropouts[f->age - 2];
-                    continue;
+            if (RemoveNMRNewbie() && !fval(f, FFL_NOIDLEOUT)) {
+                if (f->age >= 0 && f->age <= turn)
+                    ++age[f->age];
+                if (f->age == 2 || f->age == 3) {
+                    if (f->lastorders == turn - 2) {
+                        destroyfaction(f);
+                        ++dropouts[f->age - 2];
+                        continue;
+                    }
                 }
             }
-        }
         }
 }
 
@@ -1858,7 +1858,7 @@ int name_cmd(struct unit *u, struct order *ord)
             break;
         }
     }
-        break;
+    break;
     default:
         cmistake(u, ord, 109, MSG_EVENT);
         break;

@@ -1,7 +1,7 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Copyright (c) 1998-2015, Enno Rehling Rehling <enno@eressea.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -24,27 +24,27 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 static int age_reduceproduction(attrib * a)
 {
-  int reduce = 100 - (5 * --a->data.sa[1]);
-  if (reduce < 10)
-    reduce = 10;
-  a->data.sa[0] = (short)reduce;
-  return (a->data.sa[1] > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
+    int reduce = 100 - (5 * --a->data.sa[1]);
+    if (reduce < 10)
+        reduce = 10;
+    a->data.sa[0] = (short)reduce;
+    return (a->data.sa[1] > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
 }
 
 attrib_type at_reduceproduction = {
-  "reduceproduction",
-  NULL,
-  NULL,
-  age_reduceproduction,
-  a_writeshorts,
-  a_readshorts,
-  ATF_UNIQUE
+    "reduceproduction",
+    NULL,
+    NULL,
+    age_reduceproduction,
+    a_writeshorts,
+    a_readshorts,
+    ATF_UNIQUE
 };
 
 attrib *make_reduceproduction(int percent, int time)
 {
-  attrib *a = a_new(&at_reduceproduction);
-  a->data.sa[0] = (short)percent;
-  a->data.sa[1] = (short)time;
-  return a;
+    attrib *a = a_new(&at_reduceproduction);
+    a->data.sa[0] = (short)percent;
+    a->data.sa[1] = (short)time;
+    return a;
 }

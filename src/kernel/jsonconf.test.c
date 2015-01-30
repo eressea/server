@@ -85,7 +85,7 @@ static void test_races(CuTest * tc)
     CuAssertPtrNotNull(tc, races);
     rc = rc_find("orc");
     CuAssertPtrNotNull(tc, rc);
-    CuAssertIntEquals(tc, RCF_NPC|RCF_WALK|RCF_UNDEAD, rc->flags);
+    CuAssertIntEquals(tc, RCF_NPC | RCF_WALK | RCF_UNDEAD, rc->flags);
     CuAssertStrEquals(tc, "1d4", rc->def_damage);
     CuAssertDblEquals(tc, 1.0, rc->magres, 0.0);
     CuAssertDblEquals(tc, 2.0, rc->maxaura, 0.0);
@@ -145,7 +145,7 @@ static void test_items(CuTest * tc)
     itype = it_find("horse");
     CuAssertPtrNotNull(tc, itype);
     CuAssertIntEquals(tc, 20, itype->capacity);
-    CuAssertIntEquals(tc, ITF_ANIMAL|ITF_BIG, itype->flags);
+    CuAssertIntEquals(tc, ITF_ANIMAL | ITF_BIG, itype->flags);
 
     CuAssertPtrNotNull(tc, rt_find("axe"));
     CuAssertPtrNotNull(tc, (void *)get_resourcetype(R_HORSE));
@@ -279,7 +279,7 @@ static void test_buildings(CuTest * tc)
     CuAssertPtrNotNull(tc, bt->maintenance);
     CuAssertIntEquals(tc, 1, bt->maintenance[0].number);
     CuAssertPtrEquals(tc, (void *)get_resourcetype(R_IRON), (void *)bt->maintenance[0].rtype);
-    CuAssertIntEquals(tc, MTF_VARIABLE|MTF_VITAL, bt->maintenance[0].flags);
+    CuAssertIntEquals(tc, MTF_VARIABLE | MTF_VITAL, bt->maintenance[0].flags);
     CuAssertIntEquals(tc, 0, bt->maintenance[1].number);
 
     CuAssertPtrNotNull(tc, bt->construction);
@@ -329,7 +329,7 @@ static void test_terrains(CuTest * tc)
     json_config(json);
     ter = get_terrain("plain");
     CuAssertPtrNotNull(tc, ter);
-    CuAssertIntEquals(tc, ter->flags, LAND_REGION|FLY_INTO|WALK_INTO);
+    CuAssertIntEquals(tc, ter->flags, LAND_REGION | FLY_INTO | WALK_INTO);
 
     test_cleanup();
 }

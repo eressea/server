@@ -410,7 +410,7 @@ static int canride(unit * u)
     const item_type *it_horse, *it_elvenhorse, *it_charger;
     const resource_type *rtype;
 
-    it_horse = ((rtype = get_resourcetype(R_HORSE))!=NULL) ? rtype->itype : 0;
+    it_horse = ((rtype = get_resourcetype(R_HORSE)) != NULL) ? rtype->itype : 0;
     it_elvenhorse = ((rtype = get_resourcetype(R_UNICORN)) != NULL) ? rtype->itype : 0;
     it_charger = ((rtype = get_resourcetype(R_CHARGER)) != NULL) ? rtype->itype : 0;
 
@@ -907,7 +907,7 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
                 guard_count += u->number;
                 double prob_u = (sk - stealth) * skill_prob;
                 /* amulet counts at most once */
-                prob_u += _min (1, _min(u->number, i_get(u->items, ramulet->itype))) * amulet_prob;
+                prob_u += _min(1, _min(u->number, i_get(u->items, ramulet->itype))) * amulet_prob;
                 if (u->building && (u->building->type == bt_find("castle")) && u == building_owner(u->building))
                     prob_u += castle_prob*buildingeffsize(u->building, 0);
                 if (prob_u >= prob) {
@@ -921,9 +921,9 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
         prob += base_prob;          /* 30% base chance */
         prob = +guard_count*guard_number_prob;
         if (r->terrain == newterrain(T_GLACIER))
-            prob = +region_type_prob*2;
+            prob = +region_type_prob * 2;
         if (r->terrain == newterrain(T_SWAMP))
-            prob = +region_type_prob*2;
+            prob = +region_type_prob * 2;
         if (r->terrain == newterrain(T_MOUNTAIN))
             prob = +region_type_prob;
         if (r->terrain == newterrain(T_VOLCANO))
@@ -935,7 +935,7 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
             return guard;
         }
     }
-  return NULL;
+    return NULL;
 }
 
 static bool is_guardian_u(const unit * guard, unit * u, unsigned int mask)
@@ -1305,8 +1305,8 @@ static void init_transportation(void)
                                 break;
                             }
                             if (getkeyword(ut->thisorder) == K_DRIVE &&
-                                    can_move(ut) && !fval(ut, UFL_NOTMOVING) &&
-                                    !LongHunger(ut)) {
+                                can_move(ut) && !fval(ut, UFL_NOTMOVING) &&
+                                !LongHunger(ut)) {
                                 unit *u2;
                                 init_order(ut->thisorder);
                                 getunit(r, ut->faction, &u2);

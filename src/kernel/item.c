@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2015, Enno Rehling Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -114,8 +114,8 @@ static int golem_factor(const unit *u, const resource_type *rtype) {
 static int res_changeitem(unit * u, const resource_type * rtype, int delta)
 {
     int num;
-    int gf = (delta>0) ? 0 : golem_factor(u, rtype);
-    if (gf>0) {
+    int gf = (delta > 0) ? 0 : golem_factor(u, rtype);
+    if (gf > 0) {
         if (delta != 0) {
             int reduce = delta / gf;
             if (delta % gf != 0) {
@@ -140,7 +140,7 @@ static int res_changeitem(unit * u, const resource_type * rtype, int delta)
 const char *resourcename(const resource_type * rtype, int flags)
 {
     if (!rtype)
-    assert(rtype);
+        assert(rtype);
     if (rtype) {
         if (rtype->name)
             return rtype->name(rtype, flags);
@@ -197,17 +197,17 @@ static void it_register(item_type * itype)
 }
 
 static const char *it_aliases[][2] = {
-        { "Runenschwert", "runesword" },
-        { "p12", "truthpotion" },
-        { "p1", "goliathwater" },
-        { "p4", "ointment" },
-        { "p5", "peasantblood" },
-        { "p8", "nestwarmth" },
-        { "diamond", "adamantium" },
-        { "diamondaxe", "adamantiumaxe" },
-        { "diamondplate", "adamantiumplate" },
-        { "aoh", "ao_healing" },
-        { NULL, NULL },
+    { "Runenschwert", "runesword" },
+    { "p12", "truthpotion" },
+    { "p1", "goliathwater" },
+    { "p4", "ointment" },
+    { "p5", "peasantblood" },
+    { "p8", "nestwarmth" },
+    { "diamond", "adamantium" },
+    { "diamondaxe", "adamantiumaxe" },
+    { "diamondplate", "adamantiumplate" },
+    { "aoh", "ao_healing" },
+    { NULL, NULL },
 };
 
 static const char *it_alias(const char *zname)

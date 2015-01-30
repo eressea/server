@@ -1,7 +1,7 @@
-/* vi: set ts=2:
+/* 
  *
  *
- * Eressea PB(E)M host Copyright (C) 1998-2003
+ * Eressea PB(E)M host Copyright (C) 1998-2015
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -2188,11 +2188,11 @@ static int sp_ironkeeper(castorder * co)
           tkill));
   }
 
-    msg = msg_message("summon_effect", "mage amount race", mage, 1, u_race(keeper));
-    r_addmessage(r, NULL, msg);
-    msg_release(msg);
+  msg = msg_message("summon_effect", "mage amount race", mage, 1, u_race(keeper));
+  r_addmessage(r, NULL, msg);
+  msg_release(msg);
 
-    return cast_level;
+  return cast_level;
 }
 
 /* ------------------------------------------------------------- */
@@ -2692,7 +2692,7 @@ static int sp_firewall(castorder * co)
       msg_release(unseen);
   }
 
-    return cast_level;
+  return cast_level;
 }
 
 /* ------------------------------------------------------------- */
@@ -2816,21 +2816,21 @@ static int dc_age(struct curse *c)
     up = &r->units;
     if (curse_active(c))
         while (*up != NULL) {
-        unit *u = *up;
-        double damage = c->effect * u->number;
+            unit *u = *up;
+            double damage = c->effect * u->number;
 
-        freset(u->faction, FFL_SELECT);
-        if (u->number <= 0 || target_resists_magic(mage, u, TYP_UNIT, 0)) {
-            up = &u->next;
-            continue;
-        }
+            freset(u->faction, FFL_SELECT);
+            if (u->number <= 0 || target_resists_magic(mage, u, TYP_UNIT, 0)) {
+                up = &u->next;
+                continue;
+            }
 
-        /* Reduziert durch Magieresistenz */
-        damage *= (1.0 - magic_resistance(u));
-        change_hitpoints(u, -(int)damage);
+            /* Reduziert durch Magieresistenz */
+            damage *= (1.0 - magic_resistance(u));
+            change_hitpoints(u, -(int)damage);
 
-        if (*up == u)
-            up = &u->next;
+            if (*up == u)
+                up = &u->next;
         }
 
     return AT_AGE_KEEP;
@@ -3089,7 +3089,7 @@ static bool chaosgate_valid(const connection * b)
 }
 
 static struct region *chaosgate_move(const connection * b, struct unit *u,
-    struct region *from, struct region *to, bool routing)
+struct region *from, struct region *to, bool routing)
 {
     if (!routing) {
         int maxhp = u->hp / 4;
@@ -6513,158 +6513,158 @@ typedef struct spelldata {
 
 static spelldata spell_functions[] = {
     /* M_GWYRRD */
-        { "stonegolem", sp_create_stonegolem, 0 },
-        { "irongolem", sp_create_irongolem, 0 },
-        { "treegrow", sp_hain, fumble_ents },
-        { "rustweapon", sp_rosthauch, 0 },
-        { "cold_protection", sp_kaelteschutz, 0 },
-        { "ironkeeper", sp_ironkeeper, 0 },
-        { "magicstreet", sp_magicstreet, 0 },
-        { "windshield", sp_windshield, 0 },
-        { "mallorntreegrow", sp_mallornhain, fumble_ents },
-        { "goodwinds", sp_goodwinds, 0 },
-        { "healing", sp_healing, 0 },
-        { "reelingarrows", sp_reeling_arrows, 0 },
-        { "gwyrrdfumbleshield", sp_fumbleshield, 0 },
-        { "transferauradruide", sp_transferaura, 0 },
-        { "earthquake", sp_earthquake, 0 },
-        { "stormwinds", sp_stormwinds, 0 },
-        { "homestone", sp_homestone, 0 },
-        { "wolfhowl", sp_wolfhowl, 0 },
-        { "versteinern", sp_petrify, 0 },
-        { "strongwall", sp_strong_wall, 0 },
-        { "gwyrrddestroymagic", sp_destroy_magic, 0 },
-        { "treewalkenter", sp_treewalkenter, 0 },
-        { "treewalkexit", sp_treewalkexit, 0 },
-        { "holyground", sp_holyground, 0 },
-        { "summonent", sp_summonent, 0 },
-        { "blessstonecircle", sp_blessstonecircle, 0 },
-        { "barkskin", sp_armorshield, 0 },
-        { "summonfireelemental", sp_drought, 0 },
-        { "maelstrom", sp_maelstrom, 0 },
-        { "magic_roots", sp_mallorn, 0 },
-        { "great_drought", sp_great_drought, 0 },
-        /* M_DRAIG */
-        { "sparklechaos", sp_sparkle, 0 },
-        { "magicboost", sp_magicboost, 0 },
-        { "bloodsacrifice", sp_bloodsacrifice, 0 },
-        { "berserk", sp_berserk, 0 },
-        { "fumblecurse", sp_fumblecurse, patzer_fumblecurse },
-        { "summonundead", sp_summonundead, patzer_peasantmob },
-        { "combatrust", sp_combatrosthauch, 0 },
-        { "transferaurachaos", sp_transferaura, 0 },
-        { "firewall", sp_firewall, patzer_peasantmob },
-        { "plague", sp_plague, patzer_peasantmob },
-        { "chaosrow", sp_chaosrow, 0 },
-        { "summonshadow", sp_summonshadow, patzer_peasantmob },
-        { "undeadhero", sp_undeadhero, 0 },
-        { "auraleak", sp_auraleak, 0 },
-        { "draigfumbleshield", sp_fumbleshield, 0 },
-        { "forestfire", sp_forest_fire, patzer_peasantmob },
-        { "draigdestroymagic", sp_destroy_magic, 0 },
-        { "unholypower", sp_unholypower, 0 },
-        { "deathcloud", sp_deathcloud, patzer_peasantmob },
-        { "summondragon", sp_summondragon, patzer_peasantmob },
-        { "summonshadowlords", sp_summonshadowlords, patzer_peasantmob },
-        { "chaossuction", sp_chaossuction, patzer_peasantmob },
-        /* M_ILLAUN */
-        { "sparkledream", sp_sparkle, 0 },
-        { "shadowknights", sp_shadowknights, 0 },
-        { "flee", sp_flee, 0 },
-        { "puttorest", sp_puttorest, 0 },
-        { "icastle", sp_icastle, 0 },
-        { "transferauratraum", sp_transferaura, 0 },
-        { "shapeshift", sp_illusionary_shapeshift, 0 },
-        { "dreamreading", sp_dreamreading, 0 },
-        { "tiredsoldiers", sp_tiredsoldiers, 0 },
-        { "reanimate", sp_reanimate, 0 },
-        { "analysedream", sp_analysedream, 0 },
-        { "disturbingdreams", sp_disturbingdreams, 0 },
-        { "sleep", sp_sleep, 0 },
-        { "wisps", 0, 0 }, /* this spell is gone */
-        { "gooddreams", sp_gooddreams, 0 },
-        { "illaundestroymagic", sp_destroy_magic, 0 },
-        { "clone", sp_clonecopy, 0 },
-        { "bad_dreams", sp_baddreams, 0 },
-        { "mindblast", sp_mindblast_temp, 0 },
-        { "orkdream", sp_sweetdreams, 0 },
-        { "summon_alp", sp_summon_alp, 0 },
-        /* M_CERDDOR */
-        { "appeasement", sp_denyattack, 0 },
-        { "song_of_healing", sp_healing, 0 },
-        { "generous", sp_generous, 0 },
-        { "song_of_fear", sp_flee, 0 },
-        { "courting", sp_recruit, 0 },
-        { "song_of_confusion", sp_chaosrow, 0 },
-        { "heroic_song", sp_hero, 0 },
-        { "transfer_aura_song", sp_transferaura, 0 },
-        { "analysesong_unit", sp_analysesong_unit, 0 },
-        { "cerrdorfumbleshield", sp_fumbleshield, 0 },
-        { "calm_monster", sp_calm_monster, 0 },
-        { "seduction", sp_seduce, 0 },
-        { "headache", sp_headache, 0 },
-        { "sound_out", sp_pump, 0 },
-        { "bloodthirst", sp_berserk, 0 },
-        { "frighten", sp_frighten, 0 },
-        { "analyse_object", sp_analysesong_obj, 0 },
-        { "cerddor_destroymagic", sp_destroy_magic, 0 },
-        { "migration", sp_migranten, 0 },
-        { "summon_familiar", sp_summon_familiar, 0 },
-        { "raise_mob", sp_raisepeasants, 0 },
-        { "song_resist_magic", sp_song_resistmagic, 0 },
-        { "melancholy", sp_depression, 0 },
-        { "song_suscept_magic", sp_song_susceptmagic, 0 },
-        { "song_of_peace", sp_song_of_peace, 0 },
-        { "song_of_slavery", sp_charmingsong, 0 },
-        { "big_recruit", sp_bigrecruit, 0 },
-        { "calm_riot", sp_rallypeasantmob, 0 },
-        { "incite_riot", sp_raisepeasantmob, 0 },
-        /* M_TYBIED */
-        { "analyze_magic", sp_analysemagic, 0 },
-        { "concealing_aura", sp_itemcloak, 0 },
-        { "tybiedfumbleshield", sp_fumbleshield, 0 },
+    { "stonegolem", sp_create_stonegolem, 0 },
+    { "irongolem", sp_create_irongolem, 0 },
+    { "treegrow", sp_hain, fumble_ents },
+    { "rustweapon", sp_rosthauch, 0 },
+    { "cold_protection", sp_kaelteschutz, 0 },
+    { "ironkeeper", sp_ironkeeper, 0 },
+    { "magicstreet", sp_magicstreet, 0 },
+    { "windshield", sp_windshield, 0 },
+    { "mallorntreegrow", sp_mallornhain, fumble_ents },
+    { "goodwinds", sp_goodwinds, 0 },
+    { "healing", sp_healing, 0 },
+    { "reelingarrows", sp_reeling_arrows, 0 },
+    { "gwyrrdfumbleshield", sp_fumbleshield, 0 },
+    { "transferauradruide", sp_transferaura, 0 },
+    { "earthquake", sp_earthquake, 0 },
+    { "stormwinds", sp_stormwinds, 0 },
+    { "homestone", sp_homestone, 0 },
+    { "wolfhowl", sp_wolfhowl, 0 },
+    { "versteinern", sp_petrify, 0 },
+    { "strongwall", sp_strong_wall, 0 },
+    { "gwyrrddestroymagic", sp_destroy_magic, 0 },
+    { "treewalkenter", sp_treewalkenter, 0 },
+    { "treewalkexit", sp_treewalkexit, 0 },
+    { "holyground", sp_holyground, 0 },
+    { "summonent", sp_summonent, 0 },
+    { "blessstonecircle", sp_blessstonecircle, 0 },
+    { "barkskin", sp_armorshield, 0 },
+    { "summonfireelemental", sp_drought, 0 },
+    { "maelstrom", sp_maelstrom, 0 },
+    { "magic_roots", sp_mallorn, 0 },
+    { "great_drought", sp_great_drought, 0 },
+    /* M_DRAIG */
+    { "sparklechaos", sp_sparkle, 0 },
+    { "magicboost", sp_magicboost, 0 },
+    { "bloodsacrifice", sp_bloodsacrifice, 0 },
+    { "berserk", sp_berserk, 0 },
+    { "fumblecurse", sp_fumblecurse, patzer_fumblecurse },
+    { "summonundead", sp_summonundead, patzer_peasantmob },
+    { "combatrust", sp_combatrosthauch, 0 },
+    { "transferaurachaos", sp_transferaura, 0 },
+    { "firewall", sp_firewall, patzer_peasantmob },
+    { "plague", sp_plague, patzer_peasantmob },
+    { "chaosrow", sp_chaosrow, 0 },
+    { "summonshadow", sp_summonshadow, patzer_peasantmob },
+    { "undeadhero", sp_undeadhero, 0 },
+    { "auraleak", sp_auraleak, 0 },
+    { "draigfumbleshield", sp_fumbleshield, 0 },
+    { "forestfire", sp_forest_fire, patzer_peasantmob },
+    { "draigdestroymagic", sp_destroy_magic, 0 },
+    { "unholypower", sp_unholypower, 0 },
+    { "deathcloud", sp_deathcloud, patzer_peasantmob },
+    { "summondragon", sp_summondragon, patzer_peasantmob },
+    { "summonshadowlords", sp_summonshadowlords, patzer_peasantmob },
+    { "chaossuction", sp_chaossuction, patzer_peasantmob },
+    /* M_ILLAUN */
+    { "sparkledream", sp_sparkle, 0 },
+    { "shadowknights", sp_shadowknights, 0 },
+    { "flee", sp_flee, 0 },
+    { "puttorest", sp_puttorest, 0 },
+    { "icastle", sp_icastle, 0 },
+    { "transferauratraum", sp_transferaura, 0 },
+    { "shapeshift", sp_illusionary_shapeshift, 0 },
+    { "dreamreading", sp_dreamreading, 0 },
+    { "tiredsoldiers", sp_tiredsoldiers, 0 },
+    { "reanimate", sp_reanimate, 0 },
+    { "analysedream", sp_analysedream, 0 },
+    { "disturbingdreams", sp_disturbingdreams, 0 },
+    { "sleep", sp_sleep, 0 },
+    { "wisps", 0, 0 }, /* this spell is gone */
+    { "gooddreams", sp_gooddreams, 0 },
+    { "illaundestroymagic", sp_destroy_magic, 0 },
+    { "clone", sp_clonecopy, 0 },
+    { "bad_dreams", sp_baddreams, 0 },
+    { "mindblast", sp_mindblast_temp, 0 },
+    { "orkdream", sp_sweetdreams, 0 },
+    { "summon_alp", sp_summon_alp, 0 },
+    /* M_CERDDOR */
+    { "appeasement", sp_denyattack, 0 },
+    { "song_of_healing", sp_healing, 0 },
+    { "generous", sp_generous, 0 },
+    { "song_of_fear", sp_flee, 0 },
+    { "courting", sp_recruit, 0 },
+    { "song_of_confusion", sp_chaosrow, 0 },
+    { "heroic_song", sp_hero, 0 },
+    { "transfer_aura_song", sp_transferaura, 0 },
+    { "analysesong_unit", sp_analysesong_unit, 0 },
+    { "cerrdorfumbleshield", sp_fumbleshield, 0 },
+    { "calm_monster", sp_calm_monster, 0 },
+    { "seduction", sp_seduce, 0 },
+    { "headache", sp_headache, 0 },
+    { "sound_out", sp_pump, 0 },
+    { "bloodthirst", sp_berserk, 0 },
+    { "frighten", sp_frighten, 0 },
+    { "analyse_object", sp_analysesong_obj, 0 },
+    { "cerddor_destroymagic", sp_destroy_magic, 0 },
+    { "migration", sp_migranten, 0 },
+    { "summon_familiar", sp_summon_familiar, 0 },
+    { "raise_mob", sp_raisepeasants, 0 },
+    { "song_resist_magic", sp_song_resistmagic, 0 },
+    { "melancholy", sp_depression, 0 },
+    { "song_suscept_magic", sp_song_susceptmagic, 0 },
+    { "song_of_peace", sp_song_of_peace, 0 },
+    { "song_of_slavery", sp_charmingsong, 0 },
+    { "big_recruit", sp_bigrecruit, 0 },
+    { "calm_riot", sp_rallypeasantmob, 0 },
+    { "incite_riot", sp_raisepeasantmob, 0 },
+    /* M_TYBIED */
+    { "analyze_magic", sp_analysemagic, 0 },
+    { "concealing_aura", sp_itemcloak, 0 },
+    { "tybiedfumbleshield", sp_fumbleshield, 0 },
 #ifdef SHOWASTRAL_NOT_BORKED
-        { "show_astral", sp_showastral, 0},
+    { "show_astral", sp_showastral, 0},
 #endif
-        { "resist_magic", sp_resist_magic_bonus, 0 },
-        { "keeploot", sp_keeploot, 0 },
-        { "enterastral", sp_enterastral, 0 },
-        { "leaveastral", sp_leaveastral, 0 },
-        { "auratransfer", sp_transferaura, 0 },
-        { "shockwave", sp_stun, 0 },
-        { "antimagiczone", sp_antimagiczone, 0 },
-        { "destroy_magic", sp_destroy_magic, 0 },
-        { "pull_astral", sp_pullastral, 0 },
-        { "fetch_astral", sp_fetchastral, 0 },
-        { "steal_aura", sp_stealaura, 0 },
-        { "airship", sp_flying_ship, 0 },
-        { "break_curse", sp_break_curse, 0 },
-        { "eternal_walls", sp_eternizewall, 0 },
-        { "protective_runes", sp_magicrunes, 0 },
-        { "fish_shield", sp_reduceshield, 0 },
-        { "combat_speed", sp_speed, 0 },
-        { "view_reality", sp_viewreality, 0 },
-        { "double_time", sp_speed2, 0 },
-        { "armor_shield", sp_armorshield, 0 },
-        { "living_rock", sp_movecastle, 0 },
-        { "astral_disruption", sp_disruptastral, 0 },
-        { "sacrifice_strength", sp_permtransfer, 0 },
-        /* M_GRAY */
-        /*  Definitionen von Create_Artefaktspruechen    */
-        { "wyrm_transformation", sp_becomewyrm, 0 },
-        /* Monstersprueche */
-        { "fiery_dragonbreath", sp_dragonodem, 0 },
-        { "icy_dragonbreath", sp_dragonodem, 0 },
-        { "powerful_dragonbreath", sp_dragonodem, 0 },
-        { "drain_skills", sp_dragonodem, 0 },
-        { "aura_of_fear", sp_flee, 0 },
-        { "shadowcall", sp_shadowcall, 0 },
-        { "immolation", sp_immolation, 0 },
-        { "firestorm", sp_immolation, 0 },
-        { "coldfront", sp_immolation, 0 },
-        { "acidrain", sp_immolation, 0 },
-        /* SPL_NOSPELL  MUSS der letzte Spruch der Liste sein */
-        { 0, 0, 0 }
+    { "resist_magic", sp_resist_magic_bonus, 0 },
+    { "keeploot", sp_keeploot, 0 },
+    { "enterastral", sp_enterastral, 0 },
+    { "leaveastral", sp_leaveastral, 0 },
+    { "auratransfer", sp_transferaura, 0 },
+    { "shockwave", sp_stun, 0 },
+    { "antimagiczone", sp_antimagiczone, 0 },
+    { "destroy_magic", sp_destroy_magic, 0 },
+    { "pull_astral", sp_pullastral, 0 },
+    { "fetch_astral", sp_fetchastral, 0 },
+    { "steal_aura", sp_stealaura, 0 },
+    { "airship", sp_flying_ship, 0 },
+    { "break_curse", sp_break_curse, 0 },
+    { "eternal_walls", sp_eternizewall, 0 },
+    { "protective_runes", sp_magicrunes, 0 },
+    { "fish_shield", sp_reduceshield, 0 },
+    { "combat_speed", sp_speed, 0 },
+    { "view_reality", sp_viewreality, 0 },
+    { "double_time", sp_speed2, 0 },
+    { "armor_shield", sp_armorshield, 0 },
+    { "living_rock", sp_movecastle, 0 },
+    { "astral_disruption", sp_disruptastral, 0 },
+    { "sacrifice_strength", sp_permtransfer, 0 },
+    /* M_GRAY */
+    /*  Definitionen von Create_Artefaktspruechen    */
+    { "wyrm_transformation", sp_becomewyrm, 0 },
+    /* Monstersprueche */
+    { "fiery_dragonbreath", sp_dragonodem, 0 },
+    { "icy_dragonbreath", sp_dragonodem, 0 },
+    { "powerful_dragonbreath", sp_dragonodem, 0 },
+    { "drain_skills", sp_dragonodem, 0 },
+    { "aura_of_fear", sp_flee, 0 },
+    { "shadowcall", sp_shadowcall, 0 },
+    { "immolation", sp_immolation, 0 },
+    { "firestorm", sp_immolation, 0 },
+    { "coldfront", sp_immolation, 0 },
+    { "acidrain", sp_immolation, 0 },
+    /* SPL_NOSPELL  MUSS der letzte Spruch der Liste sein */
+    { 0, 0, 0 }
 };
 
 static void register_spelldata(void)

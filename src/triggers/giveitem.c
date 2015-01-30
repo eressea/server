@@ -1,7 +1,7 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Copyright (c) 1998-2015, Enno Rehling Rehling <enno@eressea.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -43,77 +43,78 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  **/
 
 typedef struct giveitem_data {
-  struct unit *u;
-  const struct item_type *itype;
-  int number;
+    struct unit *u;
+    const struct item_type *itype;
+    int number;
 } giveitem_data;
 
 static void giveitem_init(trigger * t)
 {
-  t->data.v = calloc(sizeof(giveitem_data), 1);
+    t->data.v = calloc(sizeof(giveitem_data), 1);
 }
 
 static void giveitem_free(trigger * t)
 {
-  free(t->data.v);
+    free(t->data.v);
 }
 
 static int giveitem_handle(trigger * t, void *data)
 {
-  /* call an event handler on giveitem.
-   * data.v -> ( variant event, int timer )
-   */
-  giveitem_data *td = (giveitem_data *) t->data.v;
-  if (td->u && td->u->number) {
-    i_change(&td->u->items, td->itype, td->number);
-  } else {
-    log_error("could not perform giveitem::handle()\n");
-  }
-  unused_arg(data);
-  return 0;
+    /* call an event handler on giveitem.
+     * data.v -> ( variant event, int timer )
+     */
+    giveitem_data *td = (giveitem_data *)t->data.v;
+    if (td->u && td->u->number) {
+        i_change(&td->u->items, td->itype, td->number);
+    }
+    else {
+        log_error("could not perform giveitem::handle()\n");
+    }
+    unused_arg(data);
+    return 0;
 }
 
 static void giveitem_write(const trigger * t, struct storage *store)
 {
-  giveitem_data *td = (giveitem_data *) t->data.v;
-  write_unit_reference(td->u, store);
-  WRITE_INT(store, td->number);
-  WRITE_TOK(store, td->itype->rtype->_name);
+    giveitem_data *td = (giveitem_data *)t->data.v;
+    write_unit_reference(td->u, store);
+    WRITE_INT(store, td->number);
+    WRITE_TOK(store, td->itype->rtype->_name);
 }
 
 static int giveitem_read(trigger * t, struct storage *store)
 {
-  giveitem_data *td = (giveitem_data *) t->data.v;
-  char zText[128];
+    giveitem_data *td = (giveitem_data *)t->data.v;
+    char zText[128];
 
-  int result = read_reference(&td->u, store, read_unit_reference, resolve_unit);
+    int result = read_reference(&td->u, store, read_unit_reference, resolve_unit);
 
-  READ_INT(store, &td->number);
-  READ_TOK(store, zText, sizeof(zText));
-  td->itype = it_find(zText);
-  assert(td->itype);
+    READ_INT(store, &td->number);
+    READ_TOK(store, zText, sizeof(zText));
+    td->itype = it_find(zText);
+    assert(td->itype);
 
-  if (result == 0 && td->u == NULL) {
-    return AT_READ_FAIL;
-  }
-  return AT_READ_OK;
+    if (result == 0 && td->u == NULL) {
+        return AT_READ_FAIL;
+    }
+    return AT_READ_OK;
 }
 
 trigger_type tt_giveitem = {
-  "giveitem",
-  giveitem_init,
-  giveitem_free,
-  giveitem_handle,
-  giveitem_write,
-  giveitem_read
+    "giveitem",
+    giveitem_init,
+    giveitem_free,
+    giveitem_handle,
+    giveitem_write,
+    giveitem_read
 };
 
 trigger *trigger_giveitem(unit * u, const item_type * itype, int number)
 {
-  trigger *t = t_new(&tt_giveitem);
-  giveitem_data *td = (giveitem_data *) t->data.v;
-  td->number = number;
-  td->u = u;
-  td->itype = itype;
-  return t;
+    trigger *t = t_new(&tt_giveitem);
+    giveitem_data *td = (giveitem_data *)t->data.v;
+    td->number = number;
+    td->u = u;
+    td->itype = itype;
+    return t;
 }

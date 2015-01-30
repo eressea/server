@@ -10,7 +10,6 @@ static void test_init_skills(CuTest *tc) {
 
     test_cleanup();
     lang = get_or_create_locale("de");
-//    locale_setstring(lang, "alchemy", "Alchemie");
     init_skill(lang, SK_ALCHEMY, "Alchemie");
     CuAssertIntEquals(tc, SK_ALCHEMY, get_skill("alchemie", lang));
     test_cleanup();
@@ -48,11 +47,11 @@ static void test_get_skill_default(CuTest *tc) {
 
 CuSuite *get_skill_suite(void)
 {
-  CuSuite *suite = CuSuiteNew();
-  SUITE_ADD_TEST(suite, test_init_skill);
-  SUITE_ADD_TEST(suite, test_init_skills);
-  SUITE_ADD_TEST(suite, test_get_skill);
-  SUITE_DISABLE_TEST(suite, test_get_skill_default);
-  return suite;
+    CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_init_skill);
+    SUITE_ADD_TEST(suite, test_init_skills);
+    SUITE_ADD_TEST(suite, test_get_skill);
+    SUITE_DISABLE_TEST(suite, test_get_skill_default);
+    return suite;
 }
 
