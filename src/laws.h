@@ -106,7 +106,7 @@ extern "C" {
         const struct unit *u, int modifier);
     int armedmen(const struct unit *u, bool siege_weapons);
     void force_leave(struct region *r);
-
+    int peasant_luck_effect(int peasants, int luck, int maxp, float variance);
 
 #ifdef __cplusplus
 }

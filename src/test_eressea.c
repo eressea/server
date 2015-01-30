@@ -53,6 +53,7 @@ int RunAllTests(void)
   RUN_TESTS(suite, umlaut);
   RUN_TESTS(suite, unicode);
   RUN_TESTS(suite, strings);
+  RUN_TESTS(suite, rng);
   /* kernel */
   RUN_TESTS(suite, alliance);
   RUN_TESTS(suite, unit);
