@@ -259,62 +259,58 @@ static void calculate_emigration(region * r)
 }
 
 
-static float peasant_luck_factor(void) {
-    static float factor = -1;
-
-    if (factor < 0)
-	get_param_int(global.parameters, "rules.peasants.peasantluck.factor", PEASANTLUCK);
-    return factor;
+static float peasant_growth_factor(void)
+{
+  return get_param_flt(global.parameters, "rules.peasants.growth.factor",
+    0.0001F * PEASANTGROWTH);
 }
 
-static float peasant_growth_factor(void) {
-    static float factor = -1;
-
-    if (factor < 0)
-	factor = get_param_flt(global.parameters, "rules.peasants.growth.factor", 
-			 0.0001F * PEASANTGROWTH);
-    return factor;
-}
-
-/** Bauern vermehren sich */
 #ifndef SLOWLUCK
-int peasant_luck_effect(int peasants, int luck, int maxp) {
-    int births=0;
-    double mean = _min(luck, peasants)
-	* peasant_luck_factor()
-	* peasant_growth_factor()
-	* ((peasants/(float)maxp < .9)?1:PEASANTFORCE);
-    
-    births = RAND_ROUND(normalvariate(mean, mean/2+1));
-    if (births <= 0)
-	births = 1;
-    if (births>peasants/2)
-	births=peasants/2+1;
-    return (int)births;
+static float peasant_luck_factor(void)
+{
+  return get_param_int(global.parameters, "rules.peasants.peasantluck.factor",
+    PEASANTLUCK);
+}
+
+static
+int peasant_luck_effect(int peasants, int luck, int maxp, float variance)
+{
+  int births = 0;
+  double mean = _min(luck, peasants) * peasant_luck_factor()
+    * peasant_growth_factor() * ((peasants / (float)maxp < .9) ? 1 :
+      PEASANTFORCE);
+
+  births = RAND_ROUND(normalvariate(mean, variance * mean));
+  if (births <= 0)
+    births = 1;
+  if (births > peasants / 2)
+    births = peasants / 2 + 1;
+  return (int)births;
 }
 
 #else
-int peasant_luck_effect(int peasants, int luck, int maxp) {
-    int n, births=0;
-    for (n = peasants; n && luck; --n) {
-	int chances = 0;
+int peasant_luck_effect(int peasants, int luck, int maxp, float variance) {
+  int n, births=0;
+  float factor = peasant_growth_factor();
+  for (n = peasants; n && luck; --n) {
+    int chances = 0;
 
-	if (luck > 0) {
-	    --luck;
-	    chances += PEASANTLUCK;
-	}
-
-	while (chances--) {
-	    if (rng_double() < peasant_growth_factor()) {
-		/* Only raise with 75% chance if peasants have
-		 * reached 90% of maxpopulation */
-		if (peasants / (float)maxp < 0.9 || chance(PEASANTFORCE)) {
-		    ++births;
-		}
-	    }
-	}
+    if (luck > 0) {
+      --luck;
+      chances += PEASANTLUCK;
     }
-    return births;
+
+    while (chances--) {
+      if (rng_double() < factor) {
+        /* Only raise with 75% chance if peasants have
+         * reached 90% of maxpopulation */
+        if (peasants / (float)maxp < 0.9 || chance(PEASANTFORCE)) {
+          ++births;
+        }
+      }
+    }
+  }
+  return births;
 }
 #endif
 
@@ -336,8 +332,8 @@ static void peasants(region * r)
             luck = a->data.i * 1000;
         }
 
-	luck = peasant_luck_effect(peasants, luck, maxp);
-	ADDMSG(&r->msgs, msg_message("peasantluck_success", "births", luck));
+        luck = peasant_luck_effect(peasants, luck, maxp, .5);
+        ADDMSG(&r->msgs, msg_message("peasantluck_success", "births", luck));
 
         peasants += births + luck;
     }
