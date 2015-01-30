@@ -143,6 +143,27 @@ static void test_fix_demand(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_core_resources(CuTest *tc) {
+    resource_type * rtype;
+    test_cleanup();
+    init_resources();
+    CuAssertPtrNotNull(tc, rtype = rt_find("money"));
+    CuAssertPtrNotNull(tc, rtype->itype);
+    CuAssertPtrNotNull(tc, rtype->uchange);
+    CuAssertPtrNotNull(tc, rtype->itype->give);
+    CuAssertPtrNotNull(tc, rtype = rt_find("peasant"));
+    CuAssertPtrEquals(tc, 0, rtype->itype);
+    CuAssertPtrNotNull(tc, rtype = rt_find("person"));
+    CuAssertPtrEquals(tc, 0, rtype->itype);
+    CuAssertPtrNotNull(tc, rtype = rt_find("permaura"));
+    CuAssertPtrEquals(tc, 0, rtype->itype);
+    CuAssertPtrNotNull(tc, rtype = rt_find("hp"));
+    CuAssertPtrEquals(tc, 0, rtype->itype);
+    CuAssertPtrNotNull(tc, rtype = rt_find("aura"));
+    CuAssertPtrEquals(tc, 0, rtype->itype);
+    test_cleanup();
+}
+
 CuSuite *get_item_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -153,5 +174,6 @@ CuSuite *get_item_suite(void)
     SUITE_ADD_TEST(suite, test_finditemtype);
     SUITE_ADD_TEST(suite, test_findresourcetype);
     SUITE_ADD_TEST(suite, test_fix_demand);
+    SUITE_ADD_TEST(suite, test_core_resources);
     return suite;
 }

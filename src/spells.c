@@ -1044,11 +1044,11 @@ static int sp_mallorn(castorder * co)
     unit *mage = co->magician.u;
 
     if (!fval(r->terrain, LAND_REGION)) {
-        cmistake(mage, co->order, 290, MSG_MAGIC);
+        cmistake(mage, co->order, 186, MSG_MAGIC);
         return 0;
     }
     if (fval(r, RF_MALLORN)) {
-        cmistake(mage, co->order, 291, MSG_MAGIC);
+        cmistake(mage, co->order, 191, MSG_MAGIC);
         return 0;
     }
 

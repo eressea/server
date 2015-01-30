@@ -4347,17 +4347,17 @@ void init_processor(void)
     add_proc_order(p, K_GROUP, group_cmd, 0, NULL);
 
     p += 10;
-    add_proc_order(p, K_QUIT, quit_cmd, 0, NULL);
-    add_proc_order(p, K_URSPRUNG, origin_cmd, 0, NULL);
-    add_proc_order(p, K_ALLY, ally_cmd, 0, NULL);
-    add_proc_order(p, K_PREFIX, prefix_cmd, 0, NULL);
-    add_proc_order(p, K_SETSTEALTH, setstealth_cmd, 0, NULL);
-    add_proc_order(p, K_STATUS, status_cmd, 0, NULL);
-    add_proc_order(p, K_COMBATSPELL, combatspell_cmd, 0, NULL);
-    add_proc_order(p, K_DISPLAY, display_cmd, 0, NULL);
-    add_proc_order(p, K_NAME, name_cmd, 0, NULL);
-    add_proc_order(p, K_GUARD, guard_off_cmd, 0, NULL);
-    add_proc_order(p, K_RESHOW, reshow_cmd, 0, NULL);
+    add_proc_order(p, K_QUIT, &quit_cmd, 0, NULL);
+    add_proc_order(p, K_URSPRUNG, &origin_cmd, 0, NULL);
+    add_proc_order(p, K_ALLY, &ally_cmd, 0, NULL);
+    add_proc_order(p, K_PREFIX, &prefix_cmd, 0, NULL);
+    add_proc_order(p, K_SETSTEALTH, &setstealth_cmd, 0, NULL);
+    add_proc_order(p, K_STATUS, &status_cmd, 0, NULL);
+    add_proc_order(p, K_COMBATSPELL, &combatspell_cmd, 0, NULL);
+    add_proc_order(p, K_DISPLAY, &display_cmd, 0, NULL);
+    add_proc_order(p, K_NAME, &name_cmd, 0, NULL);
+    add_proc_order(p, K_GUARD, &guard_off_cmd, 0, NULL);
+    add_proc_order(p, K_RESHOW, &reshow_cmd, 0, NULL);
 
     if (get_param_int(global.parameters, "rules.alliances", 0) == 1) {
         p += 10;
