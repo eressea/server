@@ -14,6 +14,8 @@ without prior permission by the authors of Eressea.
 extern "C" {
 #endif
 
+#define USERTYPE_DICT ((char *)"dict")
+
     struct lua_State;
     void tolua_dict_open(struct lua_State *L);
 

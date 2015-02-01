@@ -13,6 +13,7 @@ without prior permission by the authors of Eressea.
 #include <platform.h>
 #include "bind_ship.h"
 #include "bind_unit.h"
+#include "bind_dict.h"
 
 #include "move.h"
 
@@ -117,7 +118,7 @@ static int tolua_ship_get_units(lua_State * L)
 static int tolua_ship_get_objects(lua_State * L)
 {
     ship *self = (ship *)tolua_tousertype(L, 1, 0);
-    tolua_pushusertype(L, (void *)&self->attribs, TOLUA_CAST "hashtable");
+    tolua_pushusertype(L, (void *)&self->attribs, USERTYPE_DICT);
     return 1;
 }
 
