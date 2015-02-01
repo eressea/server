@@ -330,8 +330,9 @@ static void peasants(region * r)
         }
 
         luck = peasant_luck_effect(peasants, luck, maxp, .5);
+#ifdef STORCH_SPAM_BUG_2072
         ADDMSG(&r->msgs, msg_message("peasantluck_success", "births", luck));
-
+#endif
         peasants += births + luck;
     }
 
