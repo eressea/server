@@ -14,6 +14,7 @@ without prior permission by the authors of Eressea.
 #include "bind_region.h"
 #include "bind_unit.h"
 #include "bind_ship.h"
+#include "bind_dict.h"
 #include "bind_building.h"
 
 #include "chaos.h"
@@ -428,7 +429,7 @@ static int tolua_region_set_resource(lua_State * L)
 static int tolua_region_get_objects(lua_State * L)
 {
     region *self = (region *)tolua_tousertype(L, 1, 0);
-    tolua_pushusertype(L, (void *)&self->attribs, TOLUA_CAST "hashtable");
+    tolua_pushusertype(L, (void *)&self->attribs, USERTYPE_DICT);
     return 1;
 }
 

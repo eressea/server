@@ -167,14 +167,14 @@ static int tolua_dict_set(lua_State * L)
 void tolua_dict_open(lua_State * L)
 {
     /* register user types */
-    tolua_usertype(L, TOLUA_CAST "dict");
+    tolua_usertype(L, USERTYPE_DICT);
 
     tolua_module(L, NULL, 0);
     tolua_beginmodule(L, NULL);
     {
-        tolua_cclass(L, TOLUA_CAST "dict", TOLUA_CAST "dict",
+        tolua_cclass(L, USERTYPE_DICT, USERTYPE_DICT,
             TOLUA_CAST "", NULL);
-        tolua_beginmodule(L, TOLUA_CAST "dict");
+        tolua_beginmodule(L, USERTYPE_DICT);
         {
             tolua_function(L, TOLUA_CAST "get", tolua_dict_get);
             tolua_function(L, TOLUA_CAST "set", tolua_dict_set);

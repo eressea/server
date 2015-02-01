@@ -13,6 +13,7 @@ without prior permission by the authors of Eressea.
 #include <platform.h>
 
 #include "bind_unit.h"
+#include "bind_dict.h"
 #ifdef BSON_ATTRIB
 # include "bind_attrib.h"
 #endif
@@ -59,7 +60,7 @@ without prior permission by the authors of Eressea.
 static int tolua_unit_get_objects(lua_State * L)
 {
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
-    tolua_pushusertype(L, (void *)&self->attribs, TOLUA_CAST "hashtable");
+    tolua_pushusertype(L, (void *)&self->attribs, USERTYPE_DICT);
     return 1;
 }
 
