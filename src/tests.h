@@ -15,10 +15,13 @@ extern "C" {
     struct ship;
     struct message;
     struct message_list;
+    struct mlist;
     struct item_type;
     struct building_type;
     struct ship_type;
     struct terrain_type;
+
+    struct CuTest;
 
     void test_cleanup(void);
 
@@ -39,6 +42,10 @@ extern "C" {
     void test_translate_param(const struct locale *lang, param_t param, const char *text);
     const char * test_get_messagetype(const struct message *msg);
     struct message * test_get_last_message(struct message_list *mlist);
+
+    const struct message_type *register_msg(const char *type, int n_param, ...);
+    void assert_messages(struct CuTest * tc, struct mlist *msglist, const struct message_type **types,
+        int num_msgs, bool exact_match, ...);
 
 #ifdef __cplusplus
 }
