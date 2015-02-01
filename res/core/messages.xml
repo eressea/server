@@ -924,6 +924,38 @@
     <text locale="de">"Auf dem Markt wird $resource($p1,0) feilgeboten."</text>
     <text locale="en">"The local market offers $resource($p1,0)."</text>
   </message>
+  <message name="nr_potion_effect" section="nr">
+    <type>
+      <arg name="potion" type="resource"/>
+      <arg name="left" type="int"/>
+    </type>
+    <text locale="de">"Auf der Einheit $if($eq($left,1),"liegt","liegen") $int($left) Wirkung$if($eq($left,1),"","en") $resource($potion,1)."</text>
+    <text locale="en">"There are $int($left) use($eq($left,1),"s","") of $resource($potion,1) left."</text>
+  </message>
+  <message name="nr_region_owner" section="nr">
+    <type>
+      <arg name="faction" type="faction"/>
+    </type>
+    <text locale="de">"Die Region ist im Besitz von $faction($faction)."</text>
+    <text locale="en">"The region is owned by $faction($faction)."</text>
+  </message>
+  <message name="nr_borderlist_postfix" section="nr">
+    <type>
+      <arg name="transparent" type="int"/>
+      <arg name="object" type="string"/>
+    </type>
+    <text locale="de">"$if($transparent," befindet sich"," versperrt") ${object} $if($transparent,""," die Sicht")."</text>
+    <text locale="en">"$if($transparent," there is"," sight is blocked by ") ${object}."</text>
+  </message>
+  <message name="nr_building_besieged" section="nr">
+    <type>
+      <arg name="soldiers" type="int"/>
+      <arg name="diff" type="int"/>
+    </type>
+    <text locale="de">", belagert von $int($soldiers) Personen$if($lt($diff,0),""," (abgeschnitten)")"</text>
+    <text locale="en">", besieged by $int($soldiers) soldiers$if($lt($diff,0),""," (cut off)")"</text>
+  </message>
+
   <message name="newbie_password" section="events">
     <type>
       <arg name="password" type="string"/>
