@@ -3212,8 +3212,7 @@
     <type>
       <arg name="dead" type="int"/>
     </type>
-    <text locale="de">"$if($eq($dead,1),"Ein Bauer","$int($dead) Bauern") verhungert."</text>
-    <text locale="fr">"$if($eq($dead,1),"One peasant starves","$int($dead) peasants starve")."</text>
+    <text locale="de">"$if($eq($dead,1),"Ein Bauer verhungert","$int($dead) Bauern verhungern")."</text>
     <text locale="en">"$if($eq($dead,1),"One peasant starves","$int($dead) peasants starve")."</text>
   </message>
   <message name="volcanooutbreaknn" section="events">

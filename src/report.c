@@ -2416,6 +2416,7 @@ const char *charset)
       /* Nachrichten an REGION in der Region */
 
       if (sr->mode == see_unit || sr->mode == see_travel) {
+          // TODO: Bug 2073
           message_list *mlist = r_getmessages(r, f);
           rp_messages(F, r->msgs, f, 0, true);
           if (mlist)
