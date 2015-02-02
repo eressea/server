@@ -942,8 +942,8 @@
     <type>
       <arg name="faction" type="faction"/>
     </type>
-    <text locale="de">"Die Region ist im Besitz von $faction($faction)."</text>
-    <text locale="en">"The region is owned by $faction($faction)."</text>
+    <text locale="de">" Die Region ist im Besitz von $faction($faction)."</text>
+    <text locale="en">" The region is owned by $faction($faction)."</text>
   </message>
   <message name="nr_borderlist_postfix" section="nr">
     <type>
