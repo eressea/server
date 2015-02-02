@@ -20,6 +20,8 @@
 #include <util/message.h>
 #include <util/log.h>
 
+#include <CuTest.h>
+
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
@@ -35,7 +37,13 @@ struct race *test_create_race(const char *name)
 struct region *test_create_region(int x, int y, const terrain_type *terrain)
 {
     region *r = new_region(x, y, NULL, 0);
-    terraform_region(r, terrain ? terrain : get_or_create_terrain("plain"));
+    if (!terrain) {
+        terrain_type *t = get_or_create_terrain("plain");
+        t->size = 1000;
+        fset(t, LAND_REGION);
+        terraform_region(r, t);
+    } else
+        terraform_region(r, terrain);
     rsettrees(r, 0, 0);
     rsettrees(r, 1, 0);
     rsettrees(r, 2, 0);
@@ -213,3 +221,54 @@ const char * test_get_messagetype(const message *msg) {
     return name;
 }
 
+const message_type *register_msg(const char *type, int n_param, ...) {
+    char **argv;
+    va_list args;
+    int i;
+
+    va_start(args, n_param);
+
+    argv = malloc(sizeof(char *) * (n_param + 1));
+    for (i = 0; i < n_param; ++i) {
+        argv[i] = va_arg(args, char *);
+    }
+    argv[n_param] = 0;
+    va_end(args);
+    return mt_register(mt_new(type, (const char **)argv));
+}
+
+void assert_messages(struct CuTest * tc, struct mlist *msglist, const message_type **types,
+    int num_msgs, bool exact_match, ...) {
+    va_list args;
+    int found, argc;
+    struct message *msg;
+    bool match = true;
+
+    va_start(args, exact_match);
+
+    found = 0;
+    while (msglist) {
+        if (found >= num_msgs) {
+            if (exact_match) {
+                CuFail(tc, "too many messages");
+            } else {
+                break;
+            }
+        }
+        msg = msglist->msg;
+        if (exact_match || match)
+            argc = va_arg(args, int);
+
+        match = strcmp(types[argc]->name, msg->type->name) == 0;
+        if (match)
+            ++found;
+        else if (exact_match)
+            CuAssertStrEquals(tc, types[argc]->name, msg->type->name);
+
+        msglist = msglist->next;
+    }
+
+    CuAssertIntEquals_Msg(tc, "not enough messages", num_msgs, found);
+
+    va_end(args);
+}
