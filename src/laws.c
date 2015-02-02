@@ -97,8 +97,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <ctype.h>
 #include <limits.h>
 
-#include <tests.h>
-
 /* chance that a peasant dies of starvation: */
 #define PEASANT_STARVATION_CHANCE 0.9F
 /* Pferdevermehrung */
@@ -240,7 +238,7 @@ static void calculate_emigration(region * r)
     }
 
     for (i = 0; max_immigrants > 0 && i != MAXDIRECTIONS; i++) {
-        int dir = (turn + i) % MAXDIRECTIONS;
+        int dir = (turn + 1 + i) % MAXDIRECTIONS;
         region *rc = rconnect(r, (direction_t)dir);
 
         if (rc != NULL && fval(rc->terrain, LAND_REGION)) {
@@ -265,7 +263,7 @@ static float peasant_growth_factor(void)
 }
 
 #ifdef SLOWLUCK
-int peasant_luck_effect(int peasants, int luck, int maxp, float variance) {
+int peasant_luck_effect(int peasants, int luck, int maxp, double variance) {
     int n, births=0;
     float factor = peasant_growth_factor();
     for (n = peasants; n && luck; --n) {
@@ -294,11 +292,15 @@ static float peasant_luck_factor(void)
     return get_param_flt(global.parameters, "rules.peasants.peasantluck.factor", PEASANTLUCK);
 }
 
-int peasant_luck_effect(int peasants, int luck, int maxp, float variance)
+int peasant_luck_effect(int peasants, int luck, int maxp, double variance)
 {
     int births = 0;
-    double mean = _min(luck, peasants) * peasant_luck_factor()
-        * peasant_growth_factor() * ((peasants / (float)maxp < .9) ? 1 :
+    double mean;
+
+    if (luck == 0) return 0;
+
+    mean = _min(luck, peasants) * peasant_luck_factor()
+        * peasant_growth_factor() * ((peasants / (double)maxp < .9) ? 1 :
         PEASANTFORCE);
 
     births = RAND_ROUND(normalvariate(mean, variance * mean));
@@ -330,9 +332,8 @@ static void peasants(region * r)
         }
 
         luck = peasant_luck_effect(peasants, luck, maxp, .5);
-#ifdef STORCH_SPAM_BUG_2072
-        ADDMSG(&r->msgs, msg_message("peasantluck_success", "births", luck));
-#endif
+        if (luck > 0)
+            ADDMSG(&r->msgs, msg_message("peasantluck_success", "births", luck));
         peasants += births + luck;
     }
 
