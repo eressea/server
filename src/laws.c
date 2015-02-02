@@ -330,8 +330,9 @@ static void peasants(region * r)
         }
 
         luck = peasant_luck_effect(peasants, luck, maxp, .5);
+#ifdef STORCH_SPAM_BUG_2072
         ADDMSG(&r->msgs, msg_message("peasantluck_success", "births", luck));
-
+#endif
         peasants += births + luck;
     }
 
@@ -4429,7 +4430,9 @@ void init_processor(void)
     add_proc_unit(p, follow_unit, "Folge auf Einheiten setzen");
 
     p += 10;                      /* rest rng again before economics */
-    add_proc_region(p, force_leave, "kick non-allies out of buildings/ships");
+    if (get_param_int(global.parameters, "rules.owners.force_leave", 0)) {
+        add_proc_region(p, force_leave, "kick non-allies out of buildings/ships");
+    }
     add_proc_region(p, economics, "Zerstoeren, Geben, Rekrutieren, Vergessen");
     add_proc_order(p, K_PROMOTION, &promotion_cmd, 0, "Heldenbefoerderung");
 
