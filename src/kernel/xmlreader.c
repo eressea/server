@@ -491,21 +491,21 @@ static int parse_ships(xmlDocPtr doc)
             xmlFree(propValue);
 
             st->cabins = xml_ivalue(node, "cabins", 0) * PERSON_WEIGHT;
-            st->cargo = xml_ivalue(node, "cargo", 0);
-            st->combat = xml_ivalue(node, "combat", 0);
-            st->cptskill = xml_ivalue(node, "cptskill", 0);
-            st->damage = xml_fvalue(node, "damage", 0.0);
+            st->cargo = xml_ivalue(node, "cargo", st->cargo);
+            st->combat = xml_ivalue(node, "combat", st->combat);
+            st->damage = xml_fvalue(node, "damage", st->damage);
             if (xml_bvalue(node, "nocoast", false))
                 st->flags |= SFL_NOCOAST;
             if (xml_bvalue(node, "fly", false))
                 st->flags |= SFL_FLY;
             if (xml_bvalue(node, "opensea", false))
                 st->flags |= SFL_OPENSEA;
-            st->fishing = xml_ivalue(node, "fishing", 0);
-            st->minskill = xml_ivalue(node, "minskill", 0);
-            st->range = xml_ivalue(node, "range", 0);
-            st->storm = xml_fvalue(node, "storm", 1.0);
-            st->sumskill = xml_ivalue(node, "sumskill", 0);
+            st->fishing = xml_ivalue(node, "fishing", st->fishing);
+            st->cptskill = xml_ivalue(node, "cptskill", st->cptskill);
+            st->minskill = xml_ivalue(node, "minskill", st->minskill);
+            st->sumskill = xml_ivalue(node, "sumskill", st->sumskill);
+            st->range = xml_ivalue(node, "range", st->range);
+            st->storm = xml_fvalue(node, "storm", st->storm);
 
             /* reading eressea/ships/ship/construction */
             xpath->node = node;

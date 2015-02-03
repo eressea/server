@@ -363,6 +363,7 @@ static void test_btype_defaults(CuTest *tc) {
 
     btype = bt_get_or_create("hodor");
     CuAssertPtrNotNull(tc, btype);
+    CuAssertStrEquals(tc, "hodor", btype->_name);
     CuAssertPtrEquals(tc, 0, btype->maintenance);
     CuAssertPtrEquals(tc, 0, btype->construction);
     CuAssertTrue(tc, !btype->name);
@@ -370,7 +371,6 @@ static void test_btype_defaults(CuTest *tc) {
     CuAssertTrue(tc, !btype->age);
     CuAssertTrue(tc, !btype->protection);
     CuAssertTrue(tc, !btype->taxes);
-    CuAssertStrEquals(tc, "hodor", btype->_name);
     CuAssertDblEquals(tc, 1.0, btype->auraregen, 0.0);
     CuAssertIntEquals(tc, -1, btype->maxsize);
     CuAssertIntEquals(tc, -1, btype->capacity);

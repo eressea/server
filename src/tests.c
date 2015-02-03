@@ -240,13 +240,12 @@ const message_type *register_msg(const char *type, int n_param, ...) {
 void assert_messages(struct CuTest * tc, struct mlist *msglist, const message_type **types,
     int num_msgs, bool exact_match, ...) {
     va_list args;
-    int found, argc;
+    int found = 0, argc = 0;
     struct message *msg;
     bool match = true;
 
     va_start(args, exact_match);
 
-    found = 0;
     while (msglist) {
         if (found >= num_msgs) {
             if (exact_match) {
