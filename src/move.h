@@ -66,7 +66,8 @@ extern "C" {
     int personcapacity(const struct unit *u);
     void movement(void);
     void run_to(struct unit *u, struct region *to);
-    struct unit *is_guarded(struct region *r, struct unit *u, unsigned int mask);
+    bool is_guardian_u(const struct unit * guard, const struct unit * u, unsigned int mask);
+    struct unit *is_guarded(struct region *r, const struct unit *u, unsigned int mask);
     bool is_guard(const struct unit *u, int mask);
     int enoughsailors(const struct ship *sh, const struct region *r);
     bool canswim(struct unit *u);

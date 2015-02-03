@@ -10,6 +10,7 @@
 #include <kernel/race.h>
 #include <kernel/faction.h>
 #include <kernel/building.h>
+#include <kernel/order.h>
 #include <kernel/ship.h>
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
@@ -149,6 +150,37 @@ void test_translate_param(const struct locale *lang, param_t param, const char *
     add_translation(cb, text, param);
 }
 
+world_fixture *test_create_essential(void) {
+    struct world_fixture *fix = calloc(1, sizeof(world_fixture));
+
+    fix->loc = get_or_create_locale("de");
+    locale_setstring(fix->loc, keyword(K_RESERVE), "RESERVIEREN");
+    locale_setstring(fix->loc, "money", "SILBER");
+    init_resources();
+
+    fix->horse_type = test_create_itemtype("horse");
+    fix->horse_type->flags |= ITF_BIG | ITF_ANIMAL;
+    fix->horse_type->weight = 5000;
+    fix->horse_type->capacity = 7000;
+
+    test_create_itemtype("iron");
+    test_create_itemtype("stone");
+
+    fix->t_plain = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION | FLY_INTO);
+    fix->t_plain->size = 1000;
+    fix->t_plain->max_road = 100;
+    fix->t_ocean = test_create_terrain("ocean", SEA_REGION | SAIL_INTO | SWIM_INTO  | FLY_INTO);
+    fix->t_ocean->size = 0;
+
+
+    test_create_race("human");
+
+    test_create_buildingtype("castle");
+    test_create_shiptype("boat");
+
+    return fix;
+}
+
 /** creates a small world and some stuff in it.
  * two terrains: 'plain' and 'ocean'
  * one race: 'human'
@@ -156,50 +188,25 @@ void test_translate_param(const struct locale *lang, param_t param, const char *
  * one building_type: 'castle'
  * in 0.0 and 1.0 is an island of two plains, around it is ocean.
  */
-void test_create_world(void)
+world_fixture *test_create_world(void)
 {
-    terrain_type *t_plain, *t_ocean;
-    region *island[2];
+    struct world_fixture *fix = test_create_essential();
     int i;
-    item_type * itype;
-    struct locale * loc;
 
-    loc = get_or_create_locale("de");
-    locale_setstring(loc, keyword(K_RESERVE), "RESERVIEREN");
-    locale_setstring(loc, "money", "SILBER");
-    init_resources();
-
-    itype = test_create_itemtype("horse");
-    itype->flags |= ITF_BIG | ITF_ANIMAL;
-    itype->weight = 5000;
-    itype->capacity = 7000;
-
-    test_create_itemtype("iron");
-    test_create_itemtype("stone");
-
-    t_plain = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION);
-    t_plain->size = 1000;
-    t_plain->max_road = 100;
-    t_ocean = test_create_terrain("ocean", SEA_REGION | SAIL_INTO | SWIM_INTO);
-    t_ocean->size = 0;
-
-    island[0] = test_create_region(0, 0, t_plain);
-    island[1] = test_create_region(1, 0, t_plain);
+    fix->island[0] = test_create_region(0, 0, fix->t_plain);
+    fix->island[1] = test_create_region(1, 0, fix->t_plain);
     for (i = 0; i != 2; ++i) {
         int j;
-        region *r = island[i];
+        region *r = fix->island[i];
         for (j = 0; j != MAXDIRECTIONS; ++j) {
             region *rn = r_connect(r, (direction_t)j);
             if (!rn) {
-                rn = test_create_region(r->x + delta_x[j], r->y + delta_y[j], t_ocean);
+                rn = test_create_region(r->x + delta_x[j], r->y + delta_y[j], fix->t_ocean);
             }
         }
     }
 
-    test_create_race("human");
-
-    test_create_buildingtype("castle");
-    test_create_shiptype("boat");
+    return fix;
 }
 
 message * test_get_last_message(message_list *msgs) {
@@ -272,3 +279,20 @@ void assert_messages(struct CuTest * tc, struct mlist *msglist, const message_ty
 
     va_end(args);
 }
+
+
+void assert_order(CuTest *tc, const char *expected, const unit *unit, bool has)
+{
+    char cmd[32];
+    order *order;
+    for (order = unit->orders; order; order = order->next) {
+        if (strcmp(expected, get_command(order, cmd, sizeof(cmd))) == 0) {
+            if (has)
+                return;
+            CuAssertStrEquals(tc, "", expected);
+        }
+    }
+    if (has)
+        CuAssertStrEquals(tc, expected, "");
+}
+

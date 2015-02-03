@@ -938,7 +938,7 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
     return NULL;
 }
 
-static bool is_guardian_u(const unit * guard, unit * u, unsigned int mask)
+bool is_guardian_u(const unit * guard, const unit * u, unsigned int mask)
 {
     if (guard->faction == u->faction)
         return false;
@@ -989,7 +989,7 @@ bool is_guard(const struct unit * u, int mask)
 #define MAXGUARDCACHE 16
 /** returns the guard which prevents 'u' from doing 'mask' actions in 'r'.
 */
-unit *is_guarded(region * r, unit * u, unsigned int mask)
+unit *is_guarded(region * r, const unit * u, unsigned int mask)
 {
     unit *u2 = NULL;
     int i, noguards = 1;
