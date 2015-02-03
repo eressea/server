@@ -2066,20 +2066,20 @@ void dazzle(battle * b, troop * td)
     td->fighter->person[td->index].defence--;
 }
 
-int castles_use_unit_weigth(void)
+int castles_use_unit_weight(void)
 {
     int value = -1;
     if (value < 0) {
         /* If the parameter is 0, use old rules. Else use size * capacity (from xml building config) * 1000 */
         /* and use race weight to calculate how many fighter a castle can hold */
-        value = get_param_int(global.parameters, "rules.combat.castles_use_unit_weigth", 0);
+        value = get_param_int(global.parameters, "rules.combat.castles_use_unit_weight", 0);
     }
     return value;    
 }
 
 int castle_capacity(building * b)
 {
-    if (castles_use_unit_weigth()) {
+    if (castles_use_unit_weight()) {
         return buildingcapacity(b) * 1000;  /* CTD Using race weight like E3-ships*/
     }
     return buildingcapacity(b);
@@ -2100,7 +2100,7 @@ void damage_building(battle * b, building * bldg, int damage_abs)
             fighter *fig;
             for (fig = s->fighters; fig; fig = fig->next) {
                 if (fig->building == bldg) {
-                    if (castles_use_unit_weigth()) {
+                    if (castles_use_unit_weight()) {
                         if (bldg->sizeleft >= (fig->unit->number * u_race(fig->unit)->weight)) {
                             fig->building = bldg;
                             bldg->sizeleft -= (fig->unit->number * u_race(fig->unit)->weight);
@@ -3303,7 +3303,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     }
     else {
         building *bld = u->building;
-        if (castles_use_unit_weigth()) {
+        if (castles_use_unit_weight()) {
             if (bld && bld->sizeleft >= u->number * u_race(u)->weight && playerrace(u_race(u))) { /* CTD Using race weight like E3-ships*/
                 fig->building = bld;
                 fig->building->sizeleft -= u->number * u_race(u)->weight;
