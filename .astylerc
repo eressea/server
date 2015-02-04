@@ -1,0 +1,5 @@
+# four spaces, and spaces only
+-s4
+--convert-tabs
+# don't break before opening bracket
+--style=attach
