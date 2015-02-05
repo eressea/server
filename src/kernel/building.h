@@ -118,6 +118,7 @@ extern "C" {
         struct attrib *attribs;
         int no;
         int size;
+        int damage;
         int sizeleft;               /* is only used during battle. should be a temporary attribute */
         int besieged;               /* should be an attribute */
         int flags;
@@ -130,6 +131,7 @@ extern "C" {
         size_t size);
     extern int buildingcapacity(const struct building *b);
     extern struct building *new_building(const struct building_type *typ,
+
     struct region *r, const struct locale *lang);
     int build_building(struct unit *u, const struct building_type *typ,
         int id, int size, struct order *ord);
