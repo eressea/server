@@ -79,6 +79,8 @@ static void test_defenders_get_building_bonus(CuTest * tc)
     r = findregion(0, 0);
     btype = bt_get_or_create("castle");
     btype->protection = &add_two;
+    btype->capacity = 1;
+    btype->maxcapacity = -1;
     bld = test_create_building(r, btype);
     bld->size = 10;
 
@@ -124,6 +126,8 @@ static void test_attackers_get_no_building_bonus(CuTest * tc)
     r = findregion(0, 0);
     btype = bt_get_or_create("castle");
     btype->protection = &add_two;
+    btype->capacity = 1;
+    btype->maxcapacity = -1;
     bld = test_create_building(r, btype);
     bld->size = 10;
 
@@ -155,6 +159,8 @@ static void test_building_bonus_respects_size(CuTest * tc)
     r = findregion(0, 0);
     btype = bt_get_or_create("castle");
     btype->protection = &add_two;
+    btype->capacity = 1;
+    btype->maxcapacity = -1;
     bld = test_create_building(r, btype);
     bld->size = 10;
 
@@ -192,6 +198,8 @@ static void test_building_defence_bonus(CuTest * tc)
     btype = bt_get_or_create("castle");
     btype->protection = (int(*)(struct building *, struct unit *, building_bonus))get_function("building_protection");
     btype->construction->defense_bonus = 3;
+    btype->capacity = 1;
+    btype->maxcapacity = -1;
     bld = test_create_building(r, btype);
     bld->size = 1;
 
