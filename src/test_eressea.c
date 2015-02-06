@@ -79,6 +79,7 @@ int RunAllTests(void)
   RUN_TESTS(suite, give);
   RUN_TESTS(suite, laws);
   RUN_TESTS(suite, market);
+  RUN_TESTS(suite, monsters);
   RUN_TESTS(suite, move);
   RUN_TESTS(suite, stealth);
   RUN_TESTS(suite, upkeep);

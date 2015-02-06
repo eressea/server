@@ -174,6 +174,7 @@ set(TESTS_SRC
   laws.test.c
   magic.test.c
   market.test.c
+  monsters.test.c
   move.test.c
   skill.test.c
   upkeep.test.c
