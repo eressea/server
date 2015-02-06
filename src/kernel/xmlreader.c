@@ -244,14 +244,14 @@ static int parse_buildings(xmlDocPtr doc)
             btype = bt_get_or_create((const char *)propValue);
             xmlFree(propValue);
 
-            btype->capacity = xml_ivalue(node, "capacity", -1);
-            btype->maxcapacity = xml_ivalue(node, "maxcapacity", -1);
-            btype->maxsize = xml_ivalue(node, "maxsize", -1);
+            btype->capacity = xml_ivalue(node, "capacity", btype->capacity);
+            btype->maxcapacity = xml_ivalue(node, "maxcapacity", btype->maxcapacity);
+            btype->maxsize = xml_ivalue(node, "maxsize", btype->maxsize);
 
-            btype->magres = xml_ivalue(node, "magres", 0);
-            btype->magresbonus = xml_ivalue(node, "magresbonus", 0);
-            btype->fumblebonus = xml_ivalue(node, "fumblebonus", 0);
-            btype->auraregen = xml_fvalue(node, "auraregen", 1.0);
+            btype->magres = xml_ivalue(node, "magres", btype->magres);
+            btype->magresbonus = xml_ivalue(node, "magresbonus", btype->magresbonus);
+            btype->fumblebonus = xml_ivalue(node, "fumblebonus", btype->fumblebonus);
+            btype->auraregen = xml_fvalue(node, "auraregen", btype->auraregen);
 
             if (xml_bvalue(node, "nodestroy", false))
                 btype->flags |= BTF_INDESTRUCTIBLE;
@@ -304,9 +304,6 @@ static int parse_buildings(xmlDocPtr doc)
                 }
                 else if (strcmp((const char *)propValue, "taxes") == 0) {
                     btype->taxes = (double(*)(const struct building *, int))fun;
-                }
-                else if (strcmp((const char *)propValue, "age") == 0) {
-                    btype->age = (void(*)(struct building *))fun;
                 }
                 else {
                     log_error("unknown function type '%s' for building %s\n", (const char *)propValue, btype->_name);
@@ -494,21 +491,21 @@ static int parse_ships(xmlDocPtr doc)
             xmlFree(propValue);
 
             st->cabins = xml_ivalue(node, "cabins", 0) * PERSON_WEIGHT;
-            st->cargo = xml_ivalue(node, "cargo", 0);
-            st->combat = xml_ivalue(node, "combat", 0);
-            st->cptskill = xml_ivalue(node, "cptskill", 0);
-            st->damage = xml_fvalue(node, "damage", 0.0);
+            st->cargo = xml_ivalue(node, "cargo", st->cargo);
+            st->combat = xml_ivalue(node, "combat", st->combat);
+            st->damage = xml_fvalue(node, "damage", st->damage);
             if (xml_bvalue(node, "nocoast", false))
                 st->flags |= SFL_NOCOAST;
             if (xml_bvalue(node, "fly", false))
                 st->flags |= SFL_FLY;
             if (xml_bvalue(node, "opensea", false))
                 st->flags |= SFL_OPENSEA;
-            st->fishing = xml_ivalue(node, "fishing", 0);
-            st->minskill = xml_ivalue(node, "minskill", 0);
-            st->range = xml_ivalue(node, "range", 0);
-            st->storm = xml_fvalue(node, "storm", 1.0);
-            st->sumskill = xml_ivalue(node, "sumskill", 0);
+            st->fishing = xml_ivalue(node, "fishing", st->fishing);
+            st->cptskill = xml_ivalue(node, "cptskill", st->cptskill);
+            st->minskill = xml_ivalue(node, "minskill", st->minskill);
+            st->sumskill = xml_ivalue(node, "sumskill", st->sumskill);
+            st->range = xml_ivalue(node, "range", st->range);
+            st->storm = xml_fvalue(node, "storm", st->storm);
 
             /* reading eressea/ships/ship/construction */
             xpath->node = node;

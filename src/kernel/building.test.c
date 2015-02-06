@@ -357,10 +357,36 @@ void test_buildingowner_goes_to_empty_unit_after_leave(CuTest * tc)
     test_cleanup();
 }
 
+static void test_btype_defaults(CuTest *tc) {
+    building_type * btype;
+    test_cleanup();
+
+    btype = bt_get_or_create("hodor");
+    CuAssertPtrNotNull(tc, btype);
+    CuAssertStrEquals(tc, "hodor", btype->_name);
+    CuAssertPtrEquals(tc, 0, btype->maintenance);
+    CuAssertPtrEquals(tc, 0, btype->construction);
+    CuAssertTrue(tc, !btype->name);
+    CuAssertTrue(tc, !btype->init);
+    CuAssertTrue(tc, !btype->age);
+    CuAssertTrue(tc, !btype->protection);
+    CuAssertTrue(tc, !btype->taxes);
+    CuAssertDblEquals(tc, 1.0, btype->auraregen, 0.0);
+    CuAssertIntEquals(tc, -1, btype->maxsize);
+    CuAssertIntEquals(tc, -1, btype->capacity);
+    CuAssertIntEquals(tc, -1, btype->maxcapacity);
+    CuAssertIntEquals(tc, 0, btype->magres);
+    CuAssertIntEquals(tc, 0, btype->magresbonus);
+    CuAssertIntEquals(tc, 0, btype->fumblebonus);
+    CuAssertIntEquals(tc, 0, btype->flags);
+    test_cleanup();
+}
+
 CuSuite *get_building_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_register_building);
+    SUITE_ADD_TEST(suite, test_btype_defaults);
     SUITE_ADD_TEST(suite, test_building_set_owner);
     SUITE_ADD_TEST(suite, test_buildingowner_resets_when_empty);
     SUITE_ADD_TEST(suite, test_buildingowner_goes_to_next_when_empty);
