@@ -110,6 +110,7 @@ ship_type *st_get_or_create(const char * name) {
     if (!st) {
         st = (ship_type *)calloc(sizeof(ship_type), 1);
         st->_name = _strdup(name);
+        st->storm = 1.0;
         ql_push(&shiptypes, (void *)st);
     }
     return st;
