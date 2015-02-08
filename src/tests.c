@@ -271,3 +271,8 @@ void assert_messages(struct CuTest * tc, struct mlist *msglist, const message_ty
 
     va_end(args);
 }
+
+void disabled_test(void *suite, void (*test)(CuTest *), const char *name) {
+    (void)test;
+    fprintf(stderr, "%s: SKIP\n", name);
+}
