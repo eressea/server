@@ -47,6 +47,10 @@ extern "C" {
     void assert_messages(struct CuTest * tc, struct mlist *msglist, const struct message_type **types,
         int num_msgs, bool exact_match, ...);
 
+    void disabled_test(void *suite, void (*)(struct CuTest *), const char *name);
+
+#define DISABLE_TEST(SUITE, TEST) disabled_test(SUITE, TEST, #TEST)
+
 #ifdef __cplusplus
 }
 #endif

@@ -889,7 +889,7 @@
       <arg name="left" type="int"/>
     </type>
     <text locale="de">"Auf der Einheit $if($eq($left,1),"liegt","liegen") $int($left) Wirkung$if($eq($left,1),"","en") $resource($potion,1)."</text>
-    <text locale="en">"There are $int($left) use($eq($left,1),"s","") of $resource($potion,1) left."</text>
+    <text locale="en">"There $if($eq($left,1),"is","are") $int($left) $if($eq($left,1),"use","uses") of $resource($potion,1) left."</text>
   </message>
   <message name="nr_region_owner" section="nr">
     <type>

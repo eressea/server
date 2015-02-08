@@ -240,7 +240,7 @@ const message_type *register_msg(const char *type, int n_param, ...) {
 void assert_messages(struct CuTest * tc, struct mlist *msglist, const message_type **types,
     int num_msgs, bool exact_match, ...) {
     va_list args;
-    int found = 0, argc = 0;
+    int found, argc = -1;
     struct message *msg;
     bool match = true;
 
@@ -270,4 +270,9 @@ void assert_messages(struct CuTest * tc, struct mlist *msglist, const message_ty
     CuAssertIntEquals_Msg(tc, "not enough messages", num_msgs, found);
 
     va_end(args);
+}
+
+void disabled_test(void *suite, void (*test)(CuTest *), const char *name) {
+    (void)test;
+    fprintf(stderr, "%s: SKIP\n", name);
 }

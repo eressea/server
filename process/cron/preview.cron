@@ -1,7 +1,7 @@
 #!/bin/bash
 
 [ -z ${ERESSEA} ] && ERESSEA=~/eressea
-branch="master"
+branch="develop"
 if [ -e ${ERESSEA}/build/.preview ]; then
     branch=`cat ${ERESSEA}/build/.preview`
 fi
