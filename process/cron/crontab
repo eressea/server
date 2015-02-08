@@ -11,8 +11,8 @@ CONFIRM=yes
 00 00 * * *          $HOME/bin/fetchmail.cron
 00 22 * * *          $HOME/bin/backup-db.sh
 
-15 21 * * Sat        [ "$ENABLED" = "yes" ] || $ERESSEA/server/bin/run-eressea.cron 3
-25 21 * * Sat        [ "$ENABLED" = "yes" ] || $ERESSEA/server/bin/run-eressea.cron 4
-35 21 * * Sat        [ "$ENABLED" = "yes" ] || $ERESSEA/server/bin/run-eressea.cron 2
-39 08 * * Sun        [ "$PREVIEW" = "yes" ] || $ERESSEA/server/bin/previews.cron
-*/5 * * * *          [ "$CONFIRM" = "yes" ] || $ERESSEA/server/bin/orders.cron 2 3 4
+15 21 * * Sat        [ "$ENABLED" = "yes" ] && $ERESSEA/server/bin/run-eressea.cron 3
+25 21 * * Sat        [ "$ENABLED" = "yes" ] && $ERESSEA/server/bin/run-eressea.cron 4
+35 21 * * Sat        [ "$ENABLED" = "yes" ] && $ERESSEA/server/bin/run-eressea.cron 2
+39 08 * * Sun        [ "$PREVIEW" = "yes" ] && $ERESSEA/server/bin/previews.cron
+*/5 * * * *          [ "$CONFIRM" = "yes" ] && $ERESSEA/server/bin/orders.cron 2 3 4
