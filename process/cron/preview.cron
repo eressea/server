@@ -5,10 +5,10 @@ branch="develop"
 if [ -e ${ERESSEA}/build/.preview ]; then
     branch=`cat ${ERESSEA}/build/.preview`
 fi
-SRC=${ERESSEA}/git
-${SRC}/s/preview build ${branch} || exit $?
-${SRC}/s/preview version
+BIN=${ERESSEA}/server/s
+${BIN}/preview build ${branch} || exit $?
+${BIN}/preview version
 for game in 2 3 4 ; do
-	${SRC}/s/preview -g ${game} run && \
-	${SRC}/s/preview -g ${game} send
+	${BIN}/preview -g ${game} run && \
+	${BIN}/preview -g ${game} send
 done
