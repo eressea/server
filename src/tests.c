@@ -15,6 +15,7 @@
 #include <kernel/spellbook.h>
 #include <kernel/terrain.h>
 #include <kernel/messages.h>
+#include <util/bsdstring.h>
 #include <util/functions.h>
 #include <util/language.h>
 #include <util/message.h>
@@ -239,22 +240,24 @@ const message_type *register_msg(const char *type, int n_param, ...) {
 
 void assert_messages(struct CuTest * tc, struct mlist *msglist, const message_type **types,
     int num_msgs, bool exact_match, ...) {
+    char buf[100];
     va_list args;
-    int found, argc = -1;
+    int found = 0, argc = -1;
     struct message *msg;
     bool match = true;
 
     va_start(args, exact_match);
 
     while (msglist) {
+        msg = msglist->msg;
         if (found >= num_msgs) {
             if (exact_match) {
-                CuFail(tc, "too many messages");
+                slprintf(buf, sizeof(buf), "too many messages: %s", msg->type->name);
+                CuFail(tc, buf);
             } else {
                 break;
             }
         }
-        msg = msglist->msg;
         if (exact_match || match)
             argc = va_arg(args, int);
 
