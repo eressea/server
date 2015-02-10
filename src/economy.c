@@ -564,6 +564,10 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
         return;
     }
 
+    if (fval(u, UFL_HERO)) {
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_herorecruit", ""));
+        return;
+    }
     if (has_skill(u, SK_MAGIC)) {
         /* error158;de;{unit} in {region}: '{command}' - Magier arbeiten
          * grundsätzlich nur alleine! */
