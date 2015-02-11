@@ -89,6 +89,21 @@ ship *getship(const struct region * r)
 
 /* ------------------------------------------------------------- */
 
+static void recycle(const construction *con, int size, unit * u)
+{
+    if (con && size > 0) {
+        int c;
+        for (c = 0; con->materials[c].number; ++c) {
+            const requirement *rq = con->materials + c;
+            /* Recycle 50% of the recources*/
+            int recycle = (rq->number * size / con->reqsize) / 2;
+            if (recycle) {
+                change_resource(u, rq->rtype, recycle);
+            }
+        }
+    }
+}
+
 static void destroy_road(unit * u, int nmax, struct order *ord)
 {
     char token[128];
@@ -123,18 +138,23 @@ static void destroy_road(unit * u, int nmax, struct order *ord)
         n = _min(n, road);
         if (n != 0) {
             region *r2 = rconnect(r, d);
-            int willdo = eff_skill(u, SK_ROAD_BUILDING, r) * u->number;
+            short willdo = (short)eff_skill(u, SK_ROAD_BUILDING, r) * u->number;
             willdo = _min(willdo, n);
-            if (willdo == 0) {
-                /* TODO: error message */
+            if (willdo <= 0) {
+                ADDMSG(&u->faction->msgs,
+                    msg_feedback(u, u->thisorder, "skill_needed", "skill", SK_ROAD_BUILDING));
+                return;
             }
-            if (willdo > SHRT_MAX)
+            if (willdo > road) {
+                willdo = road;
                 road = 0;
-            else
-                road = road - (short)willdo;
+            } else {
+                road = road - willdo;
+            }
             rsetroad(r, d, road);
             ADDMSG(&u->faction->msgs, msg_message("destroy_road",
                 "unit from to", u, r, r2));
+            change_resource(u, get_resourcetype(R_STONE), willdo / 2);
         }
     }
 }
@@ -145,7 +165,6 @@ int destroy_cmd(unit * u, struct order *ord)
     ship *sh;
     unit *u2;
     region *r = u->region;
-    const construction *con = NULL;
     int size = 0;
     const char *s;
     int n = INT_MAX;
@@ -185,21 +204,44 @@ int destroy_cmd(unit * u, struct order *ord)
             cmistake(u, ord, 138, MSG_PRODUCE);
             return 0;
         }
-        if (n >= b->size) {
-            /* destroy completly */
-            /* all units leave the building */
-            for (u2 = r->units; u2; u2 = u2->next) {
-                if (u2->building == b) {
-                    leave_building(u2);
-                }
+        if (b->damage >= b->size || strcmp(b->type->_name, "castle") != 0) {  
+            /* Reduce size*/
+            n = min(n, eff_skill(u, SK_BUILDING, r)* u->number);
+            if (n == 0) {
+                return 0;
             }
-            ADDMSG(&u->faction->msgs, msg_message("destroy", "building unit", b, u));
-            con = b->type->construction;
-            remove_building(&r->buildings, b);
-        }
-        else {
-            /* partial destroy */
-            b->size -= n;
+            if (n >= b->size)
+            {
+                /* destroy completly */
+                /* all units leave the building */
+                for (u2 = r->units; u2; u2 = u2->next) {
+                    if (u2->building == b) {
+                        leave_building(u2);
+                    }
+                }
+                ADDMSG(&u->faction->msgs, msg_message("destroy", "building unit", b, u));
+                recycle(b->type->construction, b->size, u);
+                remove_building(&r->buildings, b);
+            } else {
+                /* partial destroy */
+                b->size -= n;
+                ADDMSG(&u->faction->msgs, msg_message("destroy_partial",
+                    "building unit", b, u));
+                recycle(b->type->construction, n, u);
+            }
+        } else {
+            /* only Damage */
+            n = min(n, (eff_skill(u, SK_BUILDING, r) + 1)* u->number);
+            if (b->damage > 0) {
+                /* do damage depending on skill and number*/
+                b->damage += n;
+                if (b->damage > b->size) {
+                    b->damage = b->size;
+                }
+            } else {
+                /* first damage between 10% and 40% */
+                b->damage = (int)(b->size*(0.1 + lovar(0.3)));
+            }
             ADDMSG(&u->faction->msgs, msg_message("destroy_partial",
                 "building unit", b, u));
         }
@@ -215,7 +257,7 @@ int destroy_cmd(unit * u, struct order *ord)
             cmistake(u, ord, 14, MSG_EVENT);
             return 0;
         }
-
+        n = min(n, ((eff_skill(u, SK_SHIPBUILDING, r) + 1)* u->number * 100 / sh->type->construction->maxsize));
         if (n >= (sh->size * 100) / sh->type->construction->maxsize) {
             /* destroy completly */
             /* all units leave the ship */
@@ -226,14 +268,17 @@ int destroy_cmd(unit * u, struct order *ord)
             }
             ADDMSG(&u->faction->msgs, msg_message("shipdestroy",
                 "unit region ship", u, r, sh));
-            con = sh->type->construction;
+            size = (sh->size * DAMAGE_SCALE - sh->damage) / DAMAGE_SCALE;
+            recycle(sh->type->construction, size, u);
             remove_ship(&sh->region->ships, sh);
         }
         else {
             /* partial destroy */
-            sh->size -= (sh->type->construction->maxsize * n) / 100;
+            size = (sh->type->construction->maxsize * n) / 100;
+            sh->size -= size;
             ADDMSG(&u->faction->msgs, msg_message("shipdestroy_partial",
                 "unit region ship", u, r, sh));
+            recycle(sh->type->construction, size, u);
         }
     }
     else {
@@ -241,20 +286,8 @@ int destroy_cmd(unit * u, struct order *ord)
         return 0;
     }
 
-    if (con) {
-        /* TODO: Nicht an ZERSTÖRE mit Punktangabe angepaßt! */
-        int c;
-        for (c = 0; con->materials[c].number; ++c) {
-            const requirement *rq = con->materials + c;
-            int recycle = (rq->number * size / con->reqsize) / 2;
-            if (recycle) {
-                change_resource(u, rq->rtype, recycle);
-            }
-        }
-    }
     return 0;
 }
-
 /* ------------------------------------------------------------- */
 
 void build_road(region * r, unit * u, int size, direction_t d)
@@ -745,26 +778,28 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
         }
     }
 
-    if (b)
+    if (n <= 0) {
+        n = INT_MAX;
+    }
+    if (b) {
         built = b->size;
-    if (n <= 0 || n == INT_MAX) {
-        if (b == NULL) {
-            if (btype->maxsize > 0) {
-                n = btype->maxsize - built;
+        if (b->damage) {
+            /* Only repair damage */
+            int d = b->damage / 10;
+            if (b->damage % 10) {
+                d = +1;
             }
-            else {
-                n = INT_MAX;
-            }
-        }
-        else {
+            n = _min(d, n);
+        } else {
             if (b->type->maxsize > 0) {
-                n = b->type->maxsize - built;
-            }
-            else {
-                n = INT_MAX;
+                n = _min(n, b->type->maxsize - built);
             }
         }
     }
+    if (b == NULL && btype->maxsize > 0) {
+        n = _min(n, btype->maxsize - built);
+    }
+
     built = build(u, btype->construction, built, n);
 
     switch (built) {
@@ -800,8 +835,22 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
 
     btname = LOC(lang, btype->_name);
 
-    if (want - built <= 0) {
-        /* gebäude fertig */
+    if (b->damage) {
+        /* Only repair damage */
+        b->damage = -(built * 10);
+        if (b->damage < 0) {
+            b->damage = 0;
+        }
+    }
+    else {
+        /* Expand building */
+        b->size += built;
+    }
+    fset(b, BLD_EXPANDED);
+
+    /* update orders*/
+    if (want - built <= 0 || (b->size == b->type->maxsize && b->damage == 0)) {
+        /* building finished */
         new_order = default_order(lang);
     }
     else if (want != INT_MAX) {
@@ -831,9 +880,6 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
         replace_order(&u->orders, ord, new_order);
         free_order(new_order);
     }
-
-    b->size += built;
-    fset(b, BLD_EXPANDED);
 
     update_lighthouse(b);
 

@@ -131,7 +131,6 @@ extern "C" {
         size_t size);
     extern int buildingcapacity(const struct building *b);
     extern struct building *new_building(const struct building_type *typ,
-
     struct region *r, const struct locale *lang);
     int build_building(struct unit *u, const struct building_type *typ,
         int id, int size, struct order *ord);
