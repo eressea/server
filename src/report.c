@@ -2021,6 +2021,12 @@ const faction * f)
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
     }
+    if (b->damage) {
+        int percent = (b->damage * 100) / b->size;
+        bytes = _snprintf(bufp, size, ", %d%% %s", percent, LOC(f->locale, "nr_damaged"));
+        if (wrptr(&bufp, &size, bytes) != 0)
+            WARN_STATIC_BUFFER();
+    }
 
     if (b->besieged > 0 && sr->mode >= see_lighthouse) {
         msg = msg_message("nr_building_besieged", "soldiers diff", b->besieged,

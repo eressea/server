@@ -28,8 +28,9 @@
 #define SAVEGAMEID_VERSION 343 /* instead of XMLNAME, save the game.id parameter from the config */
 #define BUILDNO_VERSION 344 /* storing the build number in the save */
 #define AUTO_RACENAME_VERSION 345 /* NPC units with name==NULL will automatically get their race for a name */
+#define CASTLE_DAMAGE_VERSION 346 /* New value for building damage */
 
 #define MIN_VERSION INTPAK_VERSION      /* minimal datafile we support */
-#define RELEASE_VERSION AUTO_RACENAME_VERSION /* current datafile */
+#define RELEASE_VERSION CASTLE_DAMAGE_VERSION /* current datafile */
 
 #define STREAM_VERSION 2 /* internal encoding of binary files */
