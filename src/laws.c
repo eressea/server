@@ -1835,9 +1835,10 @@ int name_cmd(struct unit *u, struct order *ord)
             }
             else {
                 const char *udefault = LOC(u2->faction->locale, "unitdefault");
+                const char *uname = unit_getname(u2);
                 size_t udlen = strlen(udefault);
-                size_t unlen = strlen(u2->name);
-                if (unlen >= udlen && strncmp(u2->name, udefault, udlen) != 0) {
+                size_t unlen = strlen(uname);
+                if (unlen >= udlen && strncmp(uname, udefault, udlen) != 0) {
                     cmistake(u2, ord, 244, MSG_EVENT);
                     break;
                 }
@@ -1850,10 +1851,10 @@ int name_cmd(struct unit *u, struct order *ord)
                 ADDMSG(&u2->faction->msgs, msg_message("renamed_notseen",
                     "renamed region", u2, r));
             }
-            s = &u2->name;
+            s = &u2->_name;
         }
         else {
-            s = &u->name;
+            s = &u->_name;
         }
         break;
 
