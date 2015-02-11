@@ -197,6 +197,20 @@ static void test_update_monster_name(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_names(CuTest *tc) {
+    unit *u;
+
+    test_cleanup();
+    test_create_world();
+    u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
+
+    unit_setname(u, "Hodor");
+    unit_setid(u, 5);
+    CuAssertStrEquals(tc, "Hodor", unit_getname(u));
+    CuAssertStrEquals(tc, "Hodor (5)", unitname(u));
+    test_cleanup();
+}
+
 CuSuite *get_unit_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -209,5 +223,6 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_remove_units_without_faction);
     SUITE_ADD_TEST(suite, test_remove_units_with_dead_faction);
     SUITE_ADD_TEST(suite, test_remove_empty_units_in_region);
+    SUITE_ADD_TEST(suite, test_names);
     return suite;
 }

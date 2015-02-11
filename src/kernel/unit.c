@@ -1631,6 +1631,7 @@ int countheroes(const struct faction *f)
     return n;
 }
 
+/** Returns the raw unit name, like "Frodo", or "Seeschlange" */
 const char *unit_getname(const unit * u)
 {
     if (!u->_name) {
@@ -1883,6 +1884,7 @@ typedef char name[OBJECTIDSIZE + 1];
 static name idbuf[8];
 static int nextbuf = 0;
 
+/** Puts human-readable unit name, with number, like "Frodo (hobb)" into buffer */
 char *write_unitname(const unit * u, char *buffer, size_t size)
 {
     const char * name = unit_getname(u);
@@ -1891,6 +1893,7 @@ char *write_unitname(const unit * u, char *buffer, size_t size)
     return buffer;
 }
 
+/** Returns human-readable unit name, with number, like "Frodo (hobb)" */
 const char *unitname(const unit * u)
 {
     char *ubuf = idbuf[(++nextbuf) % 8];

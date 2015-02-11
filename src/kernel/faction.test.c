@@ -70,9 +70,12 @@ static void test_remove_dead_factions(CuTest *tc) {
 
 static void test_addfaction(CuTest *tc) {
     faction *f = 0;
-    const struct race *rc = rc_get_or_create("human");
-    const struct locale *lang = get_or_create_locale("en");
+    const struct race *rc;
+    const struct locale *lang;
 
+    test_cleanup();
+    rc = rc_get_or_create("human");
+    lang = get_or_create_locale("en");
     f = addfaction("test@eressea.de", "hurrdurr", rc, lang, 1234);
     CuAssertPtrNotNull(tc, f);
     CuAssertPtrNotNull(tc, f->name);
