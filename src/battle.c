@@ -2079,17 +2079,22 @@ int castles_use_unit_weight(void)
 
 int castle_capacity(building * b)
 {
-    if (castles_use_unit_weight()) {
-        return buildingcapacity(b) * 1000;  /* CTD Using race weight like E3-ships*/
+    if (new_castle_rule()) {
+        return (buildingcapacity(b) - b->damage) * 1000;  /* CTD Using race weight like E3-ships*/
     }
-    return buildingcapacity(b);
+    return buildingcapacity(b) - b->damage;
 }
 
 void damage_building(battle * b, building * bldg, int damage_abs)
 {
-    bldg->size = _max(1, bldg->size - damage_abs);
+    if (bldg->damage >= bldg->size || strcmp(bldg->type->_name, "castle") != 0) {
+        bldg->size = _max(1, bldg->size - damage_abs);
+    } else {
+        bldg->damage = _min(bldg->size, bldg->damage + damage_abs);
+    }
 
-    /* Wenn Burg, dann gucken, ob die Leute alle noch in das Gebäude passen. */
+    /* If a building with a protection value was damaged, recalculate capacity and check for all fighter if they still fit in */
+    /* ToDo? Check after each round, as dead fighter may free up space even if the castle was not damaged */
 
     if (bldg->type->protection) {
         side *s;
