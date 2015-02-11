@@ -1748,7 +1748,7 @@ int sp_undeadhero(struct castorder * co)
             if (j > 0) {
                 item **ilist;
                 unit *u =
-                    create_unit(r, mage->faction, 0, get_race(RC_UNDEAD), 0, du->name,
+                    create_unit(r, mage->faction, 0, get_race(RC_UNDEAD), 0, du->_name,
                     du);
 
                 /* new units gets some stats from old unit */

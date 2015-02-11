@@ -1430,7 +1430,7 @@ int invisible(const unit * target, const unit * viewer)
  */
 void free_unit(unit * u)
 {
-    free(u->name);
+    free(u->_name);
     free(u->display);
     free_order(u->thisorder);
     free_orders(&u->orders);
@@ -1542,7 +1542,7 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
         name_unit(u);
     }
     else {
-        u->name = _strdup(dname);
+        u->_name = _strdup(dname);
     }
 
     if (creator) {
@@ -1633,16 +1633,21 @@ int countheroes(const struct faction *f)
 
 const char *unit_getname(const unit * u)
 {
-    return (const char *)u->name;
+    if (!u->_name) {
+        const struct locale * lang = u->faction ? u->faction->locale : default_locale;
+        const char *rcname = rc_name_s(u->_race, u->number == 1 ? NAME_SINGULAR : NAME_PLURAL);
+        return LOC(lang, rcname);
+    }
+    return u->_name;
 }
 
 void unit_setname(unit * u, const char *name)
 {
-    free(u->name);
+    free(u->_name);
     if (name)
-        u->name = _strdup(name);
+        u->_name = _strdup(name);
     else
-        u->name = NULL;
+        u->_name = NULL;
 }
 
 const char *unit_getinfo(const unit * u)
@@ -1880,14 +1885,8 @@ static int nextbuf = 0;
 
 char *write_unitname(const unit * u, char *buffer, size_t size)
 {
-    if (u->name) {
-        slprintf(buffer, size, "%s (%s)", u->name, itoa36(u->no));
-    }
-    else {
-        const struct locale * lang = u->faction ? u->faction->locale : default_locale;
-        const char * name = rc_name_s(u->_race, u->number == 1 ? NAME_SINGULAR : NAME_PLURAL);
-        slprintf(buffer, size, "%s (%s)", LOC(lang, name), itoa36(u->no));
-    }
+    const char * name = unit_getname(u);
+    slprintf(buffer, size, "%s (%s)", name, itoa36(u->no));
     buffer[size - 1] = 0;
     return buffer;
 }
@@ -1899,14 +1898,14 @@ const char *unitname(const unit * u)
 }
 
 bool unit_name_equals_race(const unit *u) {
-    if (u->name) {
+    if (u->_name) {
         char sing[32], plur[32];
         const struct locale *lang = u->faction->locale;
         rc_name(u->_race, NAME_SINGULAR, sing, sizeof(sing));
         rc_name(u->_race, NAME_PLURAL, plur, sizeof(plur));
-        if (strcmp(u->name, sing) == 0 || strcmp(u->name, plur) == 0 ||
-            strcmp(u->name, LOC(lang, sing)) == 0 ||
-            strcmp(u->name, LOC(lang, plur)) == 0) {
+        if (strcmp(u->_name, sing) == 0 || strcmp(u->_name, plur) == 0 ||
+            strcmp(u->_name, LOC(lang, sing)) == 0 ||
+            strcmp(u->_name, LOC(lang, plur)) == 0) {
             return true;
         }
     }

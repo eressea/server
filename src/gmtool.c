@@ -423,7 +423,7 @@ static void paint_info_region(window * wnd, const state * st)
             wattroff(win, A_BOLD | COLOR_PAIR(COLOR_YELLOW));
             for (u = r->units; u && line < maxline; u = u->next) {
                 mvwprintw(win, line, 1, "%.4s ", itoa36(u->no));
-                mvwaddnstr(win, line++, 6, (char *)u->name, size - 5);
+                mvwaddnstr(win, line++, 6, unit_getname(u), size - 5);
             }
         }
     }

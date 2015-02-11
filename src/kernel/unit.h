@@ -84,7 +84,7 @@ extern "C" {
         struct region *region;
         int no;
         int hp;
-        char *name;
+        char *_name;
         char *display;
         struct faction *faction;
         struct building *building;
