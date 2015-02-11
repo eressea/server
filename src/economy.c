@@ -476,7 +476,8 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
     n = getuint();
 
     if (u->number == 0) {
-        str = getstrtoken();
+        char token[128];
+        str = gettoken(token, sizeof(token));
         if (str && str[0]) {
             /* Monsters can RECRUIT 15 DRACOID
              * also: secondary race */
@@ -516,8 +517,8 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
 
             for (u2 = r->units; u2; u2 = u2->next)
                 if (fval(u2, UFL_WARMTH)) {
-                usepotion = true;
-                break;
+                    usepotion = true;
+                    break;
                 }
             if (!usepotion)
 #endif
@@ -626,6 +627,7 @@ void give_control(unit * u, unit * u2)
 
 int give_control_cmd(unit * u, order * ord)
 {
+    char token[128];
     region *r = u->region;
     unit *u2;
     const char *s;
@@ -633,7 +635,7 @@ int give_control_cmd(unit * u, order * ord)
     init_order(ord);
     getunit(r, u->faction, &u2);
 
-    s = getstrtoken();
+    s = gettoken(token, sizeof(token));
     if (s && isparam(s, u->faction->locale, P_CONTROL)) {
         message *msg = 0;
 
@@ -676,6 +678,7 @@ int give_control_cmd(unit * u, order * ord)
 
 static int forget_cmd(unit * u, order * ord)
 {
+    char token[128];
     skill_t sk;
     const char *s;
 
@@ -685,7 +688,7 @@ static int forget_cmd(unit * u, order * ord)
     }
 
     init_order(ord);
-    s = getstrtoken();
+    s = gettoken(token, sizeof(token));
 
     if ((sk = get_skill(s, u->faction->locale)) != NOSKILL) {
         ADDMSG(&u->faction->msgs, msg_message("forget", "unit skill", u, sk));
@@ -1279,22 +1282,22 @@ leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
 
             for (al = alist; al; al = al->next)
                 if (!fval(al, AFL_DONE)) {
-                int req = required(al->want - al->get, al->save);
-                assert(al->get <= al->want && al->get >= 0);
-                if (eff_skill(al->unit, itype->construction->skill, r)
-                    >= rm->level + itype->construction->minskill - 1) {
-                    if (req) {
-                        norders += req;
+                    int req = required(al->want - al->get, al->save);
+                    assert(al->get <= al->want && al->get >= 0);
+                    if (eff_skill(al->unit, itype->construction->skill, r)
+                        >= rm->level + itype->construction->minskill - 1) {
+                        if (req) {
+                            norders += req;
+                        }
+                        else {
+                            fset(al, AFL_DONE);
+                        }
                     }
                     else {
                         fset(al, AFL_DONE);
+                        if (first)
+                            fset(al, AFL_LOWSKILL);
                     }
-                }
-                else {
-                    fset(al, AFL_DONE);
-                    if (first)
-                        fset(al, AFL_LOWSKILL);
-                }
                 }
             need = norders;
 
@@ -1303,18 +1306,18 @@ leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
                 int use = 0;
                 for (al = alist; al; al = al->next)
                     if (!fval(al, AFL_DONE)) {
-                    if (avail > 0) {
-                        int want = required(al->want - al->get, al->save);
-                        int x = avail * want / norders;
-                        /* Wenn Rest, dann würfeln, ob ich was bekomme: */
-                        if (rng_int() % norders < (avail * want) % norders)
-                            ++x;
-                        avail -= x;
-                        use += x;
-                        norders -= want;
-                        need -= x;
-                        al->get = _min(al->want, al->get + (int)(x / al->save));
-                    }
+                        if (avail > 0) {
+                            int want = required(al->want - al->get, al->save);
+                            int x = avail * want / norders;
+                            /* Wenn Rest, dann würfeln, ob ich was bekomme: */
+                            if (rng_int() % norders < (avail * want) % norders)
+                                ++x;
+                            avail -= x;
+                            use += x;
+                            norders -= want;
+                            need -= x;
+                            al->get = _min(al->want, al->get + (int)(x / al->save));
+                        }
                     }
                 if (use) {
                     assert(use <= rm->amount);
@@ -1485,6 +1488,7 @@ static void create_item(unit * u, const item_type * itype, int want)
 
 int make_cmd(unit * u, struct order *ord)
 {
+    char token[128];
     region *r = u->region;
     const building_type *btype = 0;
     const ship_type *stype = 0;
@@ -1498,15 +1502,16 @@ int make_cmd(unit * u, struct order *ord)
 
     kwd = init_order(ord);
     assert(kwd == K_MAKE);
-    s = getstrtoken();
+    s = gettoken(token, sizeof(token));
 
     if (s) {
         m = atoi((const char *)s);
         sprintf(ibuf, "%d", m);
         if (!strcmp(ibuf, (const char *)s)) {
             /* a quantity was given */
-            s = getstrtoken();
-        } else {
+            s = gettoken(token, sizeof(token));
+        }
+        else {
             m = INT_MAX;
         }
         if (s) {
@@ -1520,7 +1525,7 @@ int make_cmd(unit * u, struct order *ord)
             cmistake(u, ord, 275, MSG_PRODUCE);
         }
         else {
-            const char * s = getstrtoken();
+            const char * s = gettoken(token, sizeof(token));
             direction_t d = s ? get_direction(s, u->faction->locale) : NODIRECTION;
             if (d != NODIRECTION) {
                 build_road(r, u, m, d);
@@ -1642,17 +1647,16 @@ static void expandbuying(region * r, request * buyorders)
         const luxury_type *type;
         int number;
         int multi;
-    } *trades, *trade;
+    } trades[MAXLUXURIES], *trade;
     static int ntrades = 0;
     int i, j;
     const luxury_type *ltype;
 
     if (ntrades == 0) {
-        for (ltype = luxurytypes; ltype; ltype = ltype->next)
-            ++ntrades;
-        trades = gc_add(calloc(sizeof(struct trade), ntrades));
-        for (i = 0, ltype = luxurytypes; i != ntrades; ++i, ltype = ltype->next)
-            trades[i].type = ltype;
+        for (ntrades = 0, ltype = luxurytypes; ltype; ltype = ltype->next) {
+            assert(ntrades < MAXLUXURIES);
+            trades[ntrades++].type = ltype;
+        }
     }
     for (i = 0; i != ntrades; ++i) {
         trades[i].number = 0;
@@ -1753,6 +1757,7 @@ attrib_type at_trades = {
 
 static void buy(unit * u, request ** buyorders, struct order *ord)
 {
+    char token[128];
     region *r = u->region;
     int n, k;
     request *o;
@@ -1836,7 +1841,7 @@ static void buy(unit * u, request ** buyorders, struct order *ord)
     /* die Menge der verkauften Güter merken */
     a->data.i += n;
 
-    s = getstrtoken();
+    s = gettoken(token, sizeof(token));
     itype = s ? finditemtype(s, u->faction->locale) : 0;
     if (itype != NULL) {
         ltype = resource2luxury(itype->rtype);
@@ -1881,18 +1886,17 @@ static void expandselling(region * r, request * sellorders, int limit)
     building *b;
     unit *u;
     unit *hafenowner;
-    static int *counter;
+    static int counter[MAXLUXURIES];
     static int ncounter = 0;
 
     if (ncounter == 0) {
         const luxury_type *ltype;
-        for (ltype = luxurytypes; ltype; ltype = ltype->next)
+        for (ltype = luxurytypes; ltype; ltype = ltype->next) {
+            assert(ncounter < MAXLUXURIES);
             ++ncounter;
-        counter = (int *)gc_add(calloc(sizeof(int), ncounter));
+        }
     }
-    else {
-        memset(counter, 0, sizeof(int) * ncounter);
-    }
+    memset(counter, 0, sizeof(int) * ncounter);
 
     if (!sellorders) {            /* NEIN, denn Insekten können in   || !r->buildings) */
         return;                     /* Sümpfen und Wüsten auch so handeln */
@@ -1952,6 +1956,7 @@ static void expandselling(region * r, request * sellorders, int limit)
         int i;
         int use = 0;
         for (i = 0, search = luxurytypes; search != ltype; search = search->next) {
+            // TODO: this is slow and lame!
             ++i;
         }
         if (counter[i] >= limit)
@@ -2059,6 +2064,7 @@ static void expandselling(region * r, request * sellorders, int limit)
 
 static bool sell(unit * u, request ** sellorders, struct order *ord)
 {
+    char token[128];
     bool unlimited = true;
     const item_type *itype;
     const luxury_type *ltype;
@@ -2076,7 +2082,7 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
 
     kwd = init_order(ord);
     assert(kwd == K_SELL);
-    s = getstrtoken();
+    s = gettoken(token, sizeof(token));
 
     if (findparam(s, u->faction->locale) == P_ANY) {
         unlimited = false;
@@ -2134,7 +2140,7 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
         cmistake(u, ord, 54, MSG_COMMERCE);
         return false;
     }
-    s = getstrtoken();
+    s = gettoken(token, sizeof(token));
     itype = s ? finditemtype(s, u->faction->locale) : 0;
     ltype = itype ? resource2luxury(itype->rtype) : 0;
     if (ltype == NULL) {
@@ -2462,6 +2468,7 @@ static void breedhorses(region * r, unit * u)
 
 static void breed_cmd(unit * u, struct order *ord)
 {
+    char token[128];
     int m;
     const char *s;
     param_t p;
@@ -2475,12 +2482,12 @@ static void breed_cmd(unit * u, struct order *ord)
 
     /* züchte [<anzahl>] <parameter> */
     (void)init_order(ord);
-    s = getstrtoken();
+    s = gettoken(token, sizeof(token));
 
     m = s ? atoi((const char *)s) : 0;
     if (m != 0) {
         /* first came a want-paramter */
-        s = getstrtoken();
+        s = gettoken(token, sizeof(token));
     }
     else {
         m = INT_MAX;
@@ -2543,10 +2550,6 @@ static void research_cmd(unit * u, struct order *ord)
 
     kwd = init_order(ord);
     assert(kwd == K_RESEARCH);
-    /*
-       const char *s = getstrtoken();
-
-       if (findparam(s, u->faction->locale) == P_HERBS) { */
 
     if (eff_skill(u, SK_HERBALISM, r) < 7) {
         cmistake(u, ord, 227, MSG_EVENT);
@@ -2914,16 +2917,16 @@ static void expandloot(region * r, request * lootorders)
         looted = looted + TAXFRACTION * 2;
     }
     free(oa);
-    
+
     /* Lowering morale by 1 depending on the looted money (+20%) */
     if (rng_int() % 100 < ((looted / startmoney) + 0.2)) {
         int m = region_get_morale(r);
         if (m) {
             /*Nur Moral -1, turns is not changed, so the first time nothing happens if the morale is good*/
-            region_set_morale(r, m-1, -1);
+            region_set_morale(r, m - 1, -1);
         }
     }
-    
+
     for (u = r->units; u; u = u->next) {
         if (u->n >= 0) {
             add_income(u, IC_LOOT, u->wants, u->n);
@@ -3267,7 +3270,6 @@ void produce(struct region *r)
             sabotage_cmd(u, u->thisorder);
             break;
 
-        case K_PLANT:
         case K_BREED:
             breed_cmd(u, u->thisorder);
             break;

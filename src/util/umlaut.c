@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -211,7 +211,13 @@ void freetokens(void * root)
     int i;
     for (i = 0; node && i != NODEHASHSIZE; ++i) {
         if (node->next[i]) {
+            tref ** refs = &node->next[i];
             freetokens(node->next[i]->node);
+            while (*refs) {
+                tref * ref = *refs;
+                *refs = ref->nexthash;
+                free(ref);
+            }
         }
     }
     free(node);

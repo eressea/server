@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -123,7 +123,7 @@ const char *locale_getstring(const locale * lang, const char *key)
     return NULL;
 }
 
-const char *locale_string(const locale * lang, const char *key)
+const char *locale_string(const locale * lang, const char *key, bool warn)
 {
     assert(lang);
     assert(key);
@@ -147,14 +147,15 @@ const char *locale_string(const locale * lang, const char *key)
             }
             find = find->nexthash;
         }
-        if (!find) {
-            log_warning("missing translation for \"%s\" in locale %s\n", key, lang->name);
-            if (lang->fallback) {
-                return locale_string(lang->fallback, key);
-            }
-            return 0;
+        if (find) {
+            return find->str;
         }
-        return find->str;
+        if (warn) {
+            log_warning("missing translation for \"%s\" in locale %s\n", key, lang->name);
+        }
+        if (lang->fallback) {
+            return locale_string(lang->fallback, key, warn);
+        }
     }
     return 0;
 }
@@ -242,6 +243,7 @@ void add_translation(struct critbit_tree **cbp, const char *key, int i) {
     if (str) {
         size_t len = strlen(str);
         if (!cb) {
+            // TODO: this will leak, because we do not know how to clean it up */
             *cbp = cb = (struct critbit_tree *)calloc(1, sizeof(struct critbit_tree *));
         }
         len = cb_new_kv(str, len, &i, sizeof(int), buffer);
@@ -261,8 +263,9 @@ void init_translations(const struct locale *lang, int ut, const char * (*string_
     assert(maxstrings > 0);
     tokens = get_translations(lang, ut);
     for (i = 0; i != maxstrings; ++i) {
+        // TODO: swap the name of s and key
         const char * s = string_cb(i);
-        const char * key = s ? locale_string(lang, s) : 0;
+        const char * key = s ? locale_string(lang, s, false) : 0;
         key = key ? key : s;
         if (key) {
             struct critbit_tree ** cb = (struct critbit_tree **)tokens;
@@ -319,6 +322,7 @@ void free_locales(void) {
                 free(strings);
             }
         }
+        free(locales->name);
         free(locales);
         locales = next;
     }

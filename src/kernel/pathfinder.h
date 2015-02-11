@@ -1,7 +1,7 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -24,25 +24,25 @@ extern "C" {
 
 #define MAXDEPTH 1024
 
-  extern int search[MAXDEPTH][2];
-  extern int search_len;
+    extern int search[MAXDEPTH][2];
+    extern int search_len;
 
-  extern struct region **path_find(struct region *start,
-    const struct region *target, int maxlen,
-    bool(*allowed) (const struct region *, const struct region *));
-  extern bool path_exists(struct region *start, const struct region *target,
-    int maxlen, bool(*allowed) (const struct region *,
-      const struct region *));
-  extern bool allowed_swim(const struct region *src,
-    const struct region *target);
-  extern bool allowed_fly(const struct region *src,
-    const struct region *target);
-  extern bool allowed_walk(const struct region *src,
-    const struct region *target);
-  extern struct quicklist *regions_in_range(struct region *src, int maxdist,
-    bool(*allowed) (const struct region *, const struct region *));
+    extern struct region **path_find(struct region *start,
+        const struct region *target, int maxlen,
+        bool(*allowed) (const struct region *, const struct region *));
+    extern bool path_exists(struct region *start, const struct region *target,
+        int maxlen, bool(*allowed) (const struct region *,
+        const struct region *));
+    extern bool allowed_swim(const struct region *src,
+        const struct region *target);
+    extern bool allowed_fly(const struct region *src,
+        const struct region *target);
+    extern bool allowed_walk(const struct region *src,
+        const struct region *target);
+    extern struct quicklist *regions_in_range(struct region *src, int maxdist,
+        bool(*allowed) (const struct region *, const struct region *));
 
-  extern void pathfinder_cleanup(void);
+    extern void pathfinder_cleanup(void);
 
 #ifdef __cplusplus
 }

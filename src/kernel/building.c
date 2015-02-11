@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -92,8 +92,14 @@ void bt_register(building_type * type)
     ql_push(&buildingtypes, (void *)type);
 }
 
+void free_buildingtype(void *ptr) {
+    building_type *btype = (building_type *)ptr;
+    free(btype->_name);
+    free(btype);
+}
+
 void free_buildingtypes(void) {
-    ql_foreach(buildingtypes, free);
+    ql_foreach(buildingtypes, free_buildingtype);
     ql_free(buildingtypes);
     buildingtypes = 0;
 }
@@ -105,6 +111,10 @@ building_type *bt_get_or_create(const char *name)
         if (btype == NULL) {
             btype = calloc(sizeof(building_type), 1);
             btype->_name = _strdup(name);
+            btype->auraregen = 1.0;
+            btype->maxsize = -1;
+            btype->capacity = -1;
+            btype->maxcapacity = -1;
             bt_register(btype);
         }
         return btype;
@@ -299,7 +309,7 @@ const building_type *findbuildingtype(const char *name,
         for (qi = 0, ql = buildingtypes; ql; ql_advance(&ql, &qi, 1)) {
             building_type *btype = (building_type *)ql_get(ql, qi);
 
-            const char *n = locale_string(lang, btype->_name);
+            const char *n = LOC(lang, btype->_name);
             type.v = (void *)btype;
             addtoken(&bn->names, n, type);
         }
@@ -310,12 +320,32 @@ const building_type *findbuildingtype(const char *name,
     return (const building_type *)type.v;
 }
 
-static int eressea_building_protection(building * b, unit * u)
+static int building_protection(building * b, unit * u, building_bonus bonus)
 {
-    int beff = buildingeffsize(b, false) - 1;
-    /* -1 because the tradepost has no protection value */
 
-    return beff;
+    int i = 0;
+    int bsize = buildingeffsize(b, false);
+    const construction *cons = b->type->construction;
+    if (!cons) {
+        return 0;
+    }
+
+    for (i = 0; i < bsize; i++)
+    {
+        cons = cons->improvement;
+    }
+
+    switch (bonus)
+    {
+    case DEFENSE_BONUS:
+        return cons->defense_bonus;
+    case CLOSE_COMBAT_ATTACK_BONUS:
+        return cons->close_combat_bonus;
+    case RANGED_ATTACK_BONUS:
+        return cons->ranged_bonus;
+    default:
+        return 0;
+    }
 }
 
 static int meropis_building_protection(building * b, unit * u)
@@ -325,8 +355,8 @@ static int meropis_building_protection(building * b, unit * u)
 
 void register_buildings(void)
 {
-    register_function((pf_generic)& eressea_building_protection,
-        "eressea_building_protection");
+    register_function((pf_generic)& building_protection,
+        "building_protection");
     register_function((pf_generic)& meropis_building_protection,
         "meropis_building_protection");
     register_function((pf_generic)& init_smithy, "init_smithy");

@@ -1,4 +1,4 @@
-/* vi: set ts=2:
+/*
  +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  |                   |  Enno Rehling <enno@eressea.de>
  | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
@@ -531,6 +531,7 @@ bool can_give_to(unit *u, unit *u2) {
 
 void give_cmd(unit * u, order * ord)
 {
+    char token[128];
     region *r = u->region;
     unit *u2;
     const char *s;
@@ -544,7 +545,7 @@ void give_cmd(unit * u, order * ord)
     kwd = init_order(ord);
     assert(kwd == K_GIVE);
     err = getunit(r, u->faction, &u2);
-    s = getstrtoken();
+    s = gettoken(token, sizeof(token));
     n = s ? atoip(s) : 0;
     p = (n > 0) ? NOPARAM : findparam(s, u->faction->locale);
 
@@ -652,7 +653,7 @@ void give_cmd(unit * u, order * ord)
             feedback_give_not_allowed(u, ord);
             return;
         }
-        s = getstrtoken();
+        s = gettoken(token, sizeof(token));
         if (!s || *s == 0) {              /* GIVE ALL items that you have */
 
             /* do these checks once, not for each item we have: */
@@ -732,11 +733,11 @@ void give_cmd(unit * u, order * ord)
                 msg_feedback(u, ord, "peasants_give_invalid", ""));
             return;
         }
-        s = getstrtoken();          /* skip one ahead to get the amount. */
-        n = atoip(s);   /* n: Anzahl */
+        s = gettoken(token, sizeof(token));          /* skip one ahead to get the amount. */
+        n = s ? atoip(s) : 0;   /* n: Anzahl */
         n *= u2->number;
     }
-    s = getstrtoken();
+    s = gettoken(token, sizeof(token));
 
     if (s == NULL) {
         cmistake(u, ord, 113, MSG_COMMERCE);

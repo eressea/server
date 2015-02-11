@@ -1,7 +1,7 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -20,14 +20,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-  struct faction;
-  struct attrib;
-  extern struct attrib_type at_otherfaction;
+    struct faction;
+    struct attrib;
+    extern struct attrib_type at_otherfaction;
 
-  extern struct faction *get_otherfaction(const struct attrib *a);
-  extern struct attrib *make_otherfaction(struct faction *f);
-  extern struct faction *visible_faction(const struct faction *f,
-    const struct unit *u);
+    extern struct faction *get_otherfaction(const struct attrib *a);
+    extern struct attrib *make_otherfaction(struct faction *f);
+    extern struct faction *visible_faction(const struct faction *f,
+        const struct unit *u);
 
 #ifdef __cplusplus
 }

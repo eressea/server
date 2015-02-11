@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -68,9 +68,9 @@ void at_register(attrib_type * at)
 static attrib_type *at_find(unsigned int hk)
 {
     const char *translate[3][2] = {
-            { "zielregion", "targetregion" },     /* remapping: from 'zielregion, heute targetregion */
-            { "verzaubert", "curse" },    /* remapping: früher verzaubert, jetzt curse */
-            { NULL, NULL }
+        { "zielregion", "targetregion" },     /* remapping: from 'zielregion, heute targetregion */
+        { "verzaubert", "curse" },    /* remapping: früher verzaubert, jetzt curse */
+        { NULL, NULL }
     };
     attrib_type *find = at_hash[hk % MAXATHASH];
     while (find && hk != find->hashkey)
@@ -354,4 +354,8 @@ void a_write(struct storage *store, const attrib * attribs, const void *owner)
         }
     }
     WRITE_TOK(store, "end");
+}
+
+void free_attribs(void) {
+    cb_clear(&cb_deprecated);
 }

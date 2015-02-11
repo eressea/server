@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -114,8 +114,8 @@ static int golem_factor(const unit *u, const resource_type *rtype) {
 static int res_changeitem(unit * u, const resource_type * rtype, int delta)
 {
     int num;
-    int gf = (delta>0) ? 0 : golem_factor(u, rtype);
-    if (gf>0) {
+    int gf = (delta > 0) ? 0 : golem_factor(u, rtype);
+    if (gf > 0) {
         if (delta != 0) {
             int reduce = delta / gf;
             if (delta % gf != 0) {
@@ -140,7 +140,7 @@ static int res_changeitem(unit * u, const resource_type * rtype, int delta)
 const char *resourcename(const resource_type * rtype, int flags)
 {
     if (!rtype)
-    assert(rtype);
+        assert(rtype);
     if (rtype) {
         if (rtype->name)
             return rtype->name(rtype, flags);
@@ -197,17 +197,17 @@ static void it_register(item_type * itype)
 }
 
 static const char *it_aliases[][2] = {
-        { "Runenschwert", "runesword" },
-        { "p12", "truthpotion" },
-        { "p1", "goliathwater" },
-        { "p4", "ointment" },
-        { "p5", "peasantblood" },
-        { "p8", "nestwarmth" },
-        { "diamond", "adamantium" },
-        { "diamondaxe", "adamantiumaxe" },
-        { "diamondplate", "adamantiumplate" },
-        { "aoh", "ao_healing" },
-        { NULL, NULL },
+    { "Runenschwert", "runesword" },
+    { "p12", "truthpotion" },
+    { "p1", "goliathwater" },
+    { "p4", "ointment" },
+    { "p5", "peasantblood" },
+    { "p8", "nestwarmth" },
+    { "diamond", "adamantium" },
+    { "diamondaxe", "adamantiumaxe" },
+    { "diamondplate", "adamantiumplate" },
+    { "aoh", "ao_healing" },
+    { NULL, NULL },
 };
 
 static const char *it_alias(const char *zname)
@@ -1045,7 +1045,7 @@ static int add_resourcename_cb(const void * match, const void * key, size_t keyl
     cb_get_kv(match, &rtype, sizeof(rtype));
     for (i = 0; i != 2; ++i) {
         char buffer[128];
-        const char * name = locale_string(lang, resourcename(rtype, (i==0) ? 0 : NMF_PLURAL));
+        const char * name = LOC(lang, resourcename(rtype, (i == 0) ? 0 : NMF_PLURAL));
 
         if (name && transliterate(buffer, sizeof(buffer), name)) {
             size_t len = strlen(buffer);
@@ -1096,7 +1096,7 @@ static int add_itemname_cb(const void * match, const void * key, size_t keylen, 
         int i;
         for (i = 0; i != 2; ++i) {
             char buffer[128];
-            const char * name = locale_string(lang, resourcename(rtype, (i == 0) ? 0 : NMF_PLURAL));
+            const char * name = LOC(lang, resourcename(rtype, (i == 0) ? 0 : NMF_PLURAL));
 
             if (name && transliterate(buffer, sizeof(buffer), name)) {
                 size_t len = strlen(buffer);
@@ -1167,10 +1167,7 @@ static item *default_spoil(const struct race *rc, int size)
     return itm;
 }
 
-#ifndef DISABLE_TESTS
-int free_itype_cb(const void * match, const void * key, size_t keylen, void *cbdata) {
-    item_type *itype;
-    cb_get_kv(match, &itype, sizeof(itype));
+int free_itype(item_type *itype) {
     free(itype->construction);
     free(itype->_appearance[0]);
     free(itype->_appearance[1]);
@@ -1182,16 +1179,23 @@ int free_rtype_cb(const void * match, const void * key, size_t keylen, void *cbd
     resource_type *rtype;
     cb_get_kv(match, &rtype, sizeof(rtype));
     free(rtype->_name);
+    if (rtype->itype) {
+        free_itype(rtype->itype);
+    }
     free(rtype);
     return 0;
 }
 
-void test_clear_resources(void)
+void free_resources(void)
 {
     int i;
 
     memset((void *)oldpotiontype, 0, sizeof(oldpotiontype));
-
+    while (luxurytypes) {
+        luxury_type * next = luxurytypes->next;
+        free(luxurytypes);
+        luxurytypes = next;
+    }
     cb_foreach(&cb_resources, "", 0, free_rtype_cb, 0);
     cb_clear(&cb_resources);
     ++num_resources;
@@ -1201,7 +1205,6 @@ void test_clear_resources(void)
         cb_clear(rnames + i);
     }
 }
-#endif
 
 void register_resources(void)
 {

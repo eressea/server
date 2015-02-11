@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -78,6 +78,8 @@ extern "C" {
     extern int a_read(struct storage *store, attrib ** attribs, void *owner);
     extern void a_write(struct storage *store, const attrib * attribs,
         const void *owner);
+
+    void free_attribs(void);
 
 #define DEFAULT_AGE NULL
 #define DEFAULT_INIT NULL

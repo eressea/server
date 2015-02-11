@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2014, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -150,9 +150,9 @@ static int read_ccompat(const char *cursename, struct storage *store)
         const char *name;
         const char *tokens;
     } *seek, old_curses[] = { {
-        "disorientationzone", "" }, {
-            "shipdisorientation", "" }, {
-                NULL, NULL } };
+            "disorientationzone", "" }, {
+                "shipdisorientation", "" }, {
+                    NULL, NULL } };
     for (seek = old_curses; seek->name; ++seek) {
         if (strcmp(seek->tokens, cursename) == 0) {
             const char *p;

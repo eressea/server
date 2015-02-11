@@ -1,7 +1,7 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -69,9 +69,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 bool monster_is_waiting(const unit * u)
 {
-  if (fval(u, UFL_ISNEW | UFL_MOVED))
-    return true;
-  return false;
+    if (fval(u, UFL_ISNEW | UFL_MOVED))
+        return true;
+    return false;
 }
 
 static void eaten_by_monster(unit * u)
@@ -105,7 +105,7 @@ static void eaten_by_monster(unit * u)
     if (n > 0) {
         n = lovar(n);
         n = _min(rpeasants(u->region), n);
-        
+
         if (n > 0) {
             deathcounts(u->region, n);
             rsetpeasants(u->region, rpeasants(u->region) - n);
@@ -120,101 +120,101 @@ static void eaten_by_monster(unit * u)
 
 static void absorbed_by_monster(unit * u)
 {
-  int n;
+    int n;
 
-  switch (old_race(u_race(u))) {
+    switch (old_race(u_race(u))) {
     default:
-      n = rng_int() % (u->number / 20 + 1);
-  }
-
-  if (n > 0) {
-    n = lovar(n);
-    n = _min(rpeasants(u->region), n);
-    if (n > 0) {
-      rsetpeasants(u->region, rpeasants(u->region) - n);
-      scale_number(u, u->number + n);
-      ADDMSG(&u->region->msgs, msg_message("absorbpeasants",
-          "unit race amount", u, u_race(u), n));
+        n = rng_int() % (u->number / 20 + 1);
     }
-  }
+
+    if (n > 0) {
+        n = lovar(n);
+        n = _min(rpeasants(u->region), n);
+        if (n > 0) {
+            rsetpeasants(u->region, rpeasants(u->region) - n);
+            scale_number(u, u->number + n);
+            ADDMSG(&u->region->msgs, msg_message("absorbpeasants",
+                "unit race amount", u, u_race(u), n));
+        }
+    }
 }
 
 static int scareaway(region * r, int anzahl)
 {
-  int n, p, diff = 0, emigrants[MAXDIRECTIONS];
-  direction_t d;
+    int n, p, diff = 0, emigrants[MAXDIRECTIONS];
+    direction_t d;
 
-  anzahl = _min(_max(1, anzahl), rpeasants(r));
+    anzahl = _min(_max(1, anzahl), rpeasants(r));
 
-  /* Wandern am Ende der Woche (normal) oder wegen Monster. Die
-   * Wanderung wird erst am Ende von demographics () ausgefuehrt.
-   * emigrants[] ist local, weil r->newpeasants durch die Monster
-   * vielleicht schon hochgezaehlt worden ist. */
+    /* Wandern am Ende der Woche (normal) oder wegen Monster. Die
+     * Wanderung wird erst am Ende von demographics () ausgefuehrt.
+     * emigrants[] ist local, weil r->newpeasants durch die Monster
+     * vielleicht schon hochgezaehlt worden ist. */
 
-  for (d = 0; d != MAXDIRECTIONS; d++)
-    emigrants[d] = 0;
+    for (d = 0; d != MAXDIRECTIONS; d++)
+        emigrants[d] = 0;
 
-  p = rpeasants(r);
-  assert(p >= 0 && anzahl >= 0);
-  for (n = _min(p, anzahl); n; n--) {
-    direction_t dir = (direction_t) (rng_int() % MAXDIRECTIONS);
-    region *rc = rconnect(r, dir);
+    p = rpeasants(r);
+    assert(p >= 0 && anzahl >= 0);
+    for (n = _min(p, anzahl); n; n--) {
+        direction_t dir = (direction_t)(rng_int() % MAXDIRECTIONS);
+        region *rc = rconnect(r, dir);
 
-    if (rc && fval(rc->terrain, LAND_REGION)) {
-      ++diff;
-      rc->land->newpeasants++;
-      emigrants[dir]++;
+        if (rc && fval(rc->terrain, LAND_REGION)) {
+            ++diff;
+            rc->land->newpeasants++;
+            emigrants[dir]++;
+        }
     }
-  }
-  rsetpeasants(r, p - diff);
-  assert(p >= diff);
-  return diff;
+    rsetpeasants(r, p - diff);
+    assert(p >= diff);
+    return diff;
 }
 
 static void scared_by_monster(unit * u)
 {
-  int n;
+    int n;
 
-  switch (old_race(u_race(u))) {
+    switch (old_race(u_race(u))) {
     case RC_FIREDRAGON:
-      n = rng_int() % 160 * u->number;
-      break;
+        n = rng_int() % 160 * u->number;
+        break;
     case RC_DRAGON:
-      n = rng_int() % 400 * u->number;
-      break;
+        n = rng_int() % 400 * u->number;
+        break;
     case RC_WYRM:
-      n = rng_int() % 1000 * u->number;
-      break;
+        n = rng_int() % 1000 * u->number;
+        break;
     default:
-      n = rng_int() % (u->number / 4 + 1);
-  }
-
-  if (n > 0) {
-    n = lovar(n);
-    n = _min(rpeasants(u->region), n);
-    if (n > 0) {
-      n = scareaway(u->region, n);
-      if (n > 0) {
-        ADDMSG(&u->region->msgs, msg_message("fleescared",
-            "amount unit", n, u));
-      }
+        n = rng_int() % (u->number / 4 + 1);
     }
-  }
+
+    if (n > 0) {
+        n = lovar(n);
+        n = _min(rpeasants(u->region), n);
+        if (n > 0) {
+            n = scareaway(u->region, n);
+            if (n > 0) {
+                ADDMSG(&u->region->msgs, msg_message("fleescared",
+                    "amount unit", n, u));
+            }
+        }
+    }
 }
 
 void monster_kills_peasants(unit * u)
 {
-  if (!monster_is_waiting(u)) {
-    if (u_race(u)->flags & RCF_SCAREPEASANTS) {
-      scared_by_monster(u);
+    if (!monster_is_waiting(u)) {
+        if (u_race(u)->flags & RCF_SCAREPEASANTS) {
+            scared_by_monster(u);
+        }
+        if (u_race(u)->flags & RCF_KILLPEASANTS) {
+            eaten_by_monster(u);
+        }
+        if (u_race(u)->flags & RCF_ABSORBPEASANTS) {
+            absorbed_by_monster(u);
+        }
     }
-    if (u_race(u)->flags & RCF_KILLPEASANTS) {
-      eaten_by_monster(u);
-    }
-    if (u_race(u)->flags & RCF_ABSORBPEASANTS) {
-      absorbed_by_monster(u);
-    }
-  }
 }
 
 faction *get_or_create_monsters(void)

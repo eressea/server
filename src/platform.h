@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
                          Katja Zedel <katze@felidae.kn-bremen.de
                          Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -26,7 +26,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifdef _MSC_VER
 # define VC_EXTRALEAN
 # define WIN32_LEAN_AND_MEAN
+#pragma warning(push)
+#pragma warning(disable:4820 4255 4668)
 # include <windows.h>
+# include <io.h>
+#pragma warning(pop)
 # undef MOUSE_MOVED
 # define STDIO_CP 1252          /* log.c, convert to console character set */
 # pragma warning (disable: 4201 4214 4514 4115 4711)
@@ -41,6 +45,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 # pragma warning(disable: 4996)
 /* <name> is not defined as a preprocessor macro, replacing with '0' for '#if/#elif' */
 # pragma warning(disable: 4668)
+/* <type>: <num> bytes padding after data member <member> */
+# pragma warning(disable: 4820)
 
 /* warning C4100: <name> was declared deprecated */
 #ifndef _CRT_SECURE_NO_DEPRECATE
@@ -111,10 +117,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #ifdef HAVE_STRINGS_H
 #include <strings.h>
-#endif
-
-#ifdef HAVE_IO_H
-#include <io.h>
 #endif
 
 #endif

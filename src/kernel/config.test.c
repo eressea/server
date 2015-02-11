@@ -41,7 +41,7 @@ static void test_getunit(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, u2);
     free_order(ord);
 
-    ord = create_order(K_GIVE, lang, itoa36(u->no+1));
+    ord = create_order(K_GIVE, lang, itoa36(u->no + 1));
     init_order(ord);
     CuAssertIntEquals(tc, GET_NOTFOUND, getunit(u->region, u->faction, &u2));
     CuAssertPtrEquals(tc, NULL, u2);
@@ -71,6 +71,8 @@ static void test_get_set_param(CuTest * tc)
     set_param(&par, "bar", "foo");
     CuAssertStrEquals(tc, "bar", get_param(par, "foo"));
     CuAssertStrEquals(tc, "foo", get_param(par, "bar"));
+    set_param(&par, "bar", NULL);
+    CuAssertPtrEquals(tc, NULL, (void *)get_param(par, "bar"));
 }
 
 static void test_param_int(CuTest * tc)
@@ -97,10 +99,10 @@ static void test_param_flt(CuTest * tc)
 
 CuSuite *get_config_suite(void)
 {
-  CuSuite *suite = CuSuiteNew();
-  SUITE_ADD_TEST(suite, test_getunit);
-  SUITE_ADD_TEST(suite, test_get_set_param);
-  SUITE_ADD_TEST(suite, test_param_int);
-  SUITE_ADD_TEST(suite, test_param_flt);
-  return suite;
+    CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_getunit);
+    SUITE_ADD_TEST(suite, test_get_set_param);
+    SUITE_ADD_TEST(suite, test_param_int);
+    SUITE_ADD_TEST(suite, test_param_flt);
+    return suite;
 }

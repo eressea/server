@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2014, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -198,7 +198,7 @@ bool join_group(unit * u, const char *name)
 void write_groups(struct storage *store, const faction * f)
 {
     group *g;
-    for (g = f->groups; g; g=g->next) {
+    for (g = f->groups; g; g = g->next) {
         ally *a;
         WRITE_INT(store, g->gid);
         WRITE_STR(store, g->name);

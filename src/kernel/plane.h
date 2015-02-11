@@ -1,7 +1,7 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -43,47 +43,47 @@ extern "C" {
 #define PFL_NOMONSTERS  16384   /* no monster randenc */
 #define PFL_SEESPECIAL  32768   /* far seeing */
 
-  typedef struct watcher {
-    struct watcher *next;
-    struct faction *faction;
-    unsigned char mode;
-  } watcher;
+    typedef struct watcher {
+        struct watcher *next;
+        struct faction *faction;
+        unsigned char mode;
+    } watcher;
 
-  typedef struct plane {
-    struct plane *next;
-    struct watcher *watchers;
-    int id;
-    char *name;
-    int minx, maxx, miny, maxy;
-    int flags;
-    struct attrib *attribs;
-  } plane;
+    typedef struct plane {
+        struct plane *next;
+        struct watcher *watchers;
+        int id;
+        char *name;
+        int minx, maxx, miny, maxy;
+        int flags;
+        struct attrib *attribs;
+    } plane;
 
 #define plane_id(pl) ( (pl) ? (pl)->id : 0 )
 
-  extern struct plane *planes;
+    extern struct plane *planes;
 
-  struct plane *getplane(const struct region *r);
-  struct plane *findplane(int x, int y);
-  void init_planes(void);
-  int getplaneid(const struct region *r);
-  struct plane *getplanebyid(int id);
-  int plane_center_x(const struct plane *pl);
-  int plane_center_y(const struct plane *pl);
-  void set_ursprung(struct faction *f, int id, int x, int y);
-  struct plane *create_new_plane(int id, const char *name, int minx, int maxx,
-    int miny, int maxy, int flags);
-  struct plane *getplanebyname(const char *);
-  struct plane *get_homeplane(void);
-  extern int rel_to_abs(const struct plane *pl, const struct faction *f,
-    int rel, unsigned char index);
-  extern bool is_watcher(const struct plane *p, const struct faction *f);
-  extern void write_plane_reference(const plane * p, struct storage *store);
-  extern int read_plane_reference(plane ** pp, struct storage *store);
-  extern int plane_width(const plane * pl);
-  extern int plane_height(const plane * pl);
-  void adjust_coordinates(const struct faction *f, int *x, int *y,
-    const struct plane *pl, const struct region *r);
+    struct plane *getplane(const struct region *r);
+    struct plane *findplane(int x, int y);
+    void init_planes(void);
+    int getplaneid(const struct region *r);
+    struct plane *getplanebyid(int id);
+    int plane_center_x(const struct plane *pl);
+    int plane_center_y(const struct plane *pl);
+    void set_ursprung(struct faction *f, int id, int x, int y);
+    struct plane *create_new_plane(int id, const char *name, int minx, int maxx,
+        int miny, int maxy, int flags);
+    struct plane *getplanebyname(const char *);
+    struct plane *get_homeplane(void);
+    extern int rel_to_abs(const struct plane *pl, const struct faction *f,
+        int rel, unsigned char index);
+    extern bool is_watcher(const struct plane *p, const struct faction *f);
+    extern void write_plane_reference(const plane * p, struct storage *store);
+    extern int read_plane_reference(plane ** pp, struct storage *store);
+    extern int plane_width(const plane * pl);
+    extern int plane_height(const plane * pl);
+    void adjust_coordinates(const struct faction *f, int *x, int *y,
+        const struct plane *pl, const struct region *r);
 #ifdef __cplusplus
 }
 #endif

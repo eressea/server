@@ -1,7 +1,7 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -22,25 +22,25 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-  extern char *set_string(char **s, const char *neu);
-  extern int set_email(char **pemail, const char *newmail);
+    extern char *set_string(char **s, const char *neu);
+    extern int set_email(char **pemail, const char *newmail);
 
-  extern int *intlist_init(void);
-  extern int *intlist_add(int *i_p, int i);
-  extern int *intlist_find(int *i_p, int i);
+    extern int *intlist_init(void);
+    extern int *intlist_add(int *i_p, int i);
+    extern int *intlist_find(int *i_p, int i);
 
-  extern unsigned int hashstring(const char *s);
-  extern const char *escape_string(const char *str, char *buffer,
-    unsigned int len);
-  extern unsigned int jenkins_hash(unsigned int a);
-  extern unsigned int wang_hash(unsigned int a);
+    extern unsigned int hashstring(const char *s);
+    extern const char *escape_string(const char *str, char *buffer,
+        unsigned int len);
+    extern unsigned int jenkins_hash(unsigned int a);
+    extern unsigned int wang_hash(unsigned int a);
 
-/* benchmark for units: 
- * JENKINS_HASH: 5.25 misses/hit (with good cache behavior)
- * WANG_HASH:    5.33 misses/hit (with good cache behavior)
- * KNUTH_HASH:   1.93 misses/hit (with bad cache behavior)
- * CF_HASH:      fucking awful!
- */
+    /* benchmark for units:
+     * JENKINS_HASH: 5.25 misses/hit (with good cache behavior)
+     * WANG_HASH:    5.33 misses/hit (with good cache behavior)
+     * KNUTH_HASH:   1.93 misses/hit (with bad cache behavior)
+     * CF_HASH:      fucking awful!
+     */
 #define KNUTH_HASH1(a, m) ((a) % m)
 #define KNUTH_HASH2(a, m) (m - 2 - a % (m-2))
 #define CF_HASH1(a, m) ((a) % m)

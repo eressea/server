@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -258,7 +258,7 @@ unit *addplayer(region * r, faction * f)
 
     assert(f->units == NULL);
     set_ursprung(f, 0, r->x, r->y);
-    u = createunit(r, f, 1, f->race);
+    u = create_unit(r, f, 1, f->race, 0, NULL, NULL);
     equip_items(&u->faction->items, get_equipment("new_faction"));
     equip_unit(u, get_equipment("first_unit"));
     sprintf(buffer, "first_%s", u_race(u)->_name);
@@ -278,11 +278,9 @@ unit *addplayer(region * r, faction * f)
     return u;
 }
 
-bool checkpasswd(const faction * f, const char *passwd, bool shortp)
+bool checkpasswd(const faction * f, const char *passwd)
 {
-    if (unicode_utf8_strcasecmp(f->passw, passwd) == 0)
-        return true;
-    return false;
+    return (passwd && unicode_utf8_strcasecmp(f->passw, passwd) == 0);
 }
 
 variant read_faction_reference(struct storage * store)

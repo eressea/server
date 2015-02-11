@@ -1,4 +1,3 @@
-#include <config.h>
 #include <platform.h>
 #include "vortex.h"
 
@@ -28,7 +27,7 @@ static dir_lookup *dir_name_lookup;
 
 void register_special_direction(struct locale *lang, const char *name)
 {
-    const char *token = LOC(lang, name);
+    const char *token = locale_string(lang, name, false);
 
     if (token) {
         void **tokens = get_translations(lang, UT_SPECDIR);
@@ -47,7 +46,7 @@ void register_special_direction(struct locale *lang, const char *name)
         }
     }
     else {
-        log_error("no translation for spec_direction '%s' in locale '%s'\n", name, locale_name(lang));
+        log_debug("no translation for spec_direction '%s' in locale '%s'\n", name, locale_name(lang));
     }
 }
 
@@ -61,7 +60,10 @@ static void a_initdirection(attrib * a)
 
 static void a_freedirection(attrib * a)
 {
-    free(a->data.v);
+    spec_direction *d = (spec_direction *)(a->data.v);
+    free(d->desc);
+    free(d->keyword);
+    free(d);
 }
 
 static int a_agedirection(attrib * a)
@@ -76,7 +78,7 @@ static int a_readdirection(attrib * a, void *owner, struct storage *store)
     spec_direction *d = (spec_direction *)(a->data.v);
     char lbuf[32];
 
-    (void) owner;
+    (void)owner;
     READ_INT(store, &d->x);
     READ_INT(store, &d->y);
     READ_INT(store, &d->duration);

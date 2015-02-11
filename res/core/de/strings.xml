@@ -364,6 +364,43 @@
     <text locale="de">und im </text>
     <text locale="en">and to the </text>
   </string>
+  <string name="nr_schemes_prefix">
+    <text locale="de">Schemen der Regionen </text>
+    <text locale="en">Schemes of </text>
+  </string>
+  <string name="nr_schemes_postfix">
+    <text locale="de"> sind erkennbar.</text>
+    <text locale="en"> can be discerned.</text>
+  </string>
+  <string name="nr_borderlist_prefix">
+    <text locale="de">Im </text>
+    <text locale="en">To the </text>
+  </string>
+  <string name="nr_borderlist_lastfix">
+    <text locale="de"> und im </text>
+    <text locale="en">, and to the </text>
+  </string>
+  <string name="nr_borderlist_infix">
+    <text locale="de">, im </text>
+    <text locale="en">, to the </text>
+  </string>
+  <string name="nr_guarding_prefix">
+    <text locale="de">Die Region wird von </text>
+    <text locale="en">The region is guarded by </text>
+  </string>
+  <string name="nr_guarding_unknown">
+    <text locale="de">unbekannten Einheiten</text>
+    <text locale="en">unknown units</text>
+  </string>
+  <string name="nr_guarding_postfix">
+    <text locale="de"> bewacht.</text>
+    <text locale="en">.</text>
+  </string>
+  <string name="nr_building_inprogress">
+    <text locale="de"> (im Bau)</text>
+    <text locale="en"> (under construction)</text>
+  </string>
+
   <string name="unitdefault">
     <text locale="de">Einheit</text>
     <text locale="en">Unit</text>
@@ -4308,6 +4345,14 @@
     </string>
   </namespace>
   <namespace name="spellinfo">
+    <string name="create_ror">
+      <text locale="de">Erzeugt einen Ring der Regeneration.</text>
+      <text locale="en">Creates a ring of regeneration.</text>
+    </string>
+    <string name="create_focus">
+      <text locale="de">Erzeugt einen Aurafokus.</text>
+      <text locale="en">Creates an aurafocus crystal.</text>
+    </string>
     <string name="acidrain">
       <text locale="de">Tötet die Feinde mit Säure.</text>
       <text locale="en">Kills enemies with acid.</text>
@@ -6091,7 +6136,7 @@
     <string name="generous">
       <text locale="de">Dieser fröhliche Gesang wird sich wie
       ein Gerücht in der Region ausbreiten und alle Welt in
-      Feierlaune versetzten. Überall werden Tavernen und
+      Feierlaune versetzen. Überall werden Tavernen und
       Theater gut gefüllt sein und selbst die Bettler satt
       werden.</text>
       <text locale="en">This joyous song will spread like

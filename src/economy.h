@@ -1,7 +1,7 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -22,22 +22,22 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-/* Welchen Teil des Silbers die Bauern fuer Unterhaltung ausgeben (1/20), und
- * wiviel Silber ein Unterhalter pro Talentpunkt bekommt. */
+    /* Welchen Teil des Silbers die Bauern fuer Unterhaltung ausgeben (1/20), und
+     * wiviel Silber ein Unterhalter pro Talentpunkt bekommt. */
 
-/* Wieviele Silbermuenzen jeweils auf einmal "getaxed" werden. */
+    /* Wieviele Silbermuenzen jeweils auf einmal "getaxed" werden. */
 
 #define TAXFRACTION             10
 
-/* Wieviel Silber pro Talentpunkt geklaut wird. */
+    /* Wieviel Silber pro Talentpunkt geklaut wird. */
 
 #define STEALINCOME             50
 
-/* Teil der Bauern, welche Luxusgueter kaufen und verkaufen (1/100). */
+    /* Teil der Bauern, welche Luxusgueter kaufen und verkaufen (1/100). */
 
 #define TRADE_FRACTION          100
 
-/* Wieviel Fremde eine Partei pro Woche aufnehmen kann */
+    /* Wieviel Fremde eine Partei pro Woche aufnehmen kann */
 #define MAXNEWBIES								5
 
     struct unit;
@@ -54,12 +54,12 @@ extern "C" {
 
     enum { IC_WORK, IC_ENTERTAIN, IC_TAX, IC_TRADE, IC_TRADETAX, IC_STEAL, IC_MAGIC, IC_LOOT };
     void maintain_buildings(struct region *r, bool crash);
-    extern void add_spende(struct faction *f1, struct faction *f2, int betrag, struct region *r);
-    extern int make_cmd(struct unit *u, struct order *ord);
-    extern void split_allocations(struct region *r);
-    extern int recruit_archetypes(void);
-    extern int give_control_cmd(struct unit *u, struct order *ord);
-    extern void give_control(struct unit * u, struct unit * u2);
+    void add_spende(struct faction *f1, struct faction *f2, int betrag, struct region *r);
+    int make_cmd(struct unit *u, struct order *ord);
+    void split_allocations(struct region *r);
+    int recruit_archetypes(void);
+    int give_control_cmd(struct unit *u, struct order *ord);
+    void give_control(struct unit * u, struct unit * u2);
 
     struct message * check_steal(const struct unit * u, struct order *ord);
 

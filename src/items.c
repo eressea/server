@@ -35,9 +35,10 @@ use_studypotion(struct unit *u, const struct item_type *itype, int amount,
 struct order *ord)
 {
     if (init_order(u->thisorder) == K_STUDY) {
+        char token[128];
         skill_t sk = NOSKILL;
         skill *sv = 0;
-        const char * s = getstrtoken();
+        const char * s = gettoken(token, sizeof(token));
 
         if (s) {
             sk = get_skill(s, u->faction->locale);
@@ -47,7 +48,7 @@ struct order *ord)
         if (sv && sv->level > 2) {
             /* TODO: message */
         }
-        else if (sk!=NOSKILL && study_cost(u, sk) > 0) {
+        else if (sk != NOSKILL && study_cost(u, sk) > 0) {
             /* TODO: message */
         }
         else {

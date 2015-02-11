@@ -3,7 +3,7 @@ require "lunit"
 module("tests.e3.spells", package.seeall, lunit.testcase)
 
 function setup()
-    eressea.free_game()
+    eressea.game.reset()
     eressea.settings.set("magic.fumble.enable", "0")
     eressea.settings.set("nmr.removenewbie", "0")
     eressea.settings.set("nmr.timeout", "0")
@@ -11,7 +11,6 @@ function setup()
 end
 
 function test_blessedharvest_lasts_n_turn()
-    eressea.free_game()
     local r = region.create(0, 0, "plain")
     local f = faction.create("noreply@eressea.de", "halfling", "de")
     local u = unit.create(f, r)

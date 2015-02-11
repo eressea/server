@@ -43,9 +43,9 @@ static void test_call_by_name(CuTest *tc) {
 
 CuSuite *get_callback_suite(void)
 {
-  CuSuite *suite = CuSuiteNew();
-  SUITE_ADD_TEST(suite, test_find_callback);
-  SUITE_ADD_TEST(suite, test_call_by_name);
-  SUITE_ADD_TEST(suite, test_call_by_handle);
-  return suite;
+    CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_find_callback);
+    SUITE_ADD_TEST(suite, test_call_by_name);
+    SUITE_ADD_TEST(suite, test_call_by_handle);
+    return suite;
 }

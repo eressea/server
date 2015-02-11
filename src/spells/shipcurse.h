@@ -1,6 +1,5 @@
-/* vi: set ts=2:
- *
- * Eressea PB(E)M host Copyright (C) 1998-2003
+/*
+ * Eressea PB(E)M host Copyright (C) 1998-2015
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -27,12 +26,12 @@ extern "C" {
     struct curse;
 
     struct message *cinfo_ship(const void *obj, objtype_t typ,
-                               const struct curse *c, int self);
+        const struct curse *c, int self);
     void register_shipcurse(void);
     struct curse *shipcurse_flyingship(struct ship *sh, struct unit *mage,
-                                       float power, int duration);
+        float power, int duration);
     int levitate_ship(struct ship *sh, struct unit *mage, float power,
-                      int duration);
+        int duration);
 
 #ifdef __cplusplus
 }

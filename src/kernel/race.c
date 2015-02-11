@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -141,6 +141,8 @@ void racelist_insert(struct race_list **rl, const struct race *r)
 void free_races(void) {
     while (races) {
         race * rc = races->next;
+        free(races->_name);
+        free(races->def_damage);
         free(races);
         races = rc;
     }
@@ -175,7 +177,11 @@ race *rc_get_or_create(const char *zName)
 
         rc = (race *)calloc(sizeof(race), 1);
         rc->hitpoints = 1;
+        rc->weight = PERSON_WEIGHT;
+        rc->capacity = 540;
         rc->recruit_multi = 1.0F;
+        rc->regaura = 1.0F;
+        rc->speed = 1.0F;
         if (strchr(zName, ' ') != NULL) {
             log_error("race '%s' has an invalid name. remove spaces\n", zName);
             assert(strchr(zName, ' ') == NULL);

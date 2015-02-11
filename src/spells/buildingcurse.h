@@ -1,4 +1,4 @@
-/* vi: set ts=2:
+/* 
  *
  * Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
@@ -17,10 +17,10 @@
 extern "C" {
 #endif
 
-  struct locale;
-  struct curse;
+    struct locale;
+    struct curse;
 
-  extern void register_buildingcurse(void);
+    extern void register_buildingcurse(void);
 
 #ifdef __cplusplus
 }

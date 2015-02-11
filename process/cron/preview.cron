@@ -1,0 +1,14 @@
+#!/bin/bash
+
+[ -z ${ERESSEA} ] && ERESSEA=~/eressea
+branch="develop"
+if [ -e ${ERESSEA}/build/.preview ]; then
+    branch=`cat ${ERESSEA}/build/.preview`
+fi
+BIN=${ERESSEA}/server/s
+${BIN}/preview build ${branch} || exit $?
+${BIN}/preview version
+for game in 2 3 4 ; do
+	${BIN}/preview -g ${game} run && \
+	${BIN}/preview -g ${game} send
+done

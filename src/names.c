@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -275,7 +275,7 @@ static const char *dragon_name(const unit * u)
     if (anzahl > 1) {
         const char *no_article = strchr((const char *)str, ' ');
         assert(no_article);
-        /* TODO: GERMAN */
+        // TODO: localization
         sprintf(name, "Die %sn von %s", no_article + 1, rname(u->region,
             default_locale));
     }

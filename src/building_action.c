@@ -1,4 +1,4 @@
-/* vi: set ts=2:
+/* 
 +-------------------+
 |                   |  Enno Rehling <enno@eressea.de>
 | Eressea PBEM host |  Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -35,37 +35,39 @@ typedef struct building_action {
 
 static int lc_age(struct attrib *a)
 {
-  building_action *data = (building_action *) a->data.v;
-  const char *fname = data->fname;
-  const char *fparam = data->param;
-  building *b = data->b;
-  int result = -1;
+    building_action *data = (building_action *)a->data.v;
+    const char *fname = data->fname;
+    const char *fparam = data->param;
+    building *b = data->b;
+    int result = -1;
 
-  assert(b != NULL);
-  if (fname != NULL) {
-    lua_State *L = (lua_State *) global.vm_state;
+    assert(b != NULL);
+    if (fname != NULL) {
+        lua_State *L = (lua_State *)global.vm_state;
 
-    lua_getglobal(L, fname);
-    if (lua_isfunction(L, -1)) {
-      tolua_pushusertype(L, (void *)b, TOLUA_CAST "building");
-      if (fparam) {
-        tolua_pushstring(L, fparam);
-      }
+        lua_getglobal(L, fname);
+        if (lua_isfunction(L, -1)) {
+            tolua_pushusertype(L, (void *)b, TOLUA_CAST "building");
+            if (fparam) {
+                tolua_pushstring(L, fparam);
+            }
 
-      if (lua_pcall(L, fparam ? 2 : 1, 1, 0) != 0) {
-        const char *error = lua_tostring(L, -1);
-        log_error("lc_age(%s) calling '%s': %s.\n", buildingname(b), fname, error);
-        lua_pop(L, 1);
-      } else {
-        result = (int)lua_tonumber(L, -1);
-        lua_pop(L, 1);
-      }
-    } else {
-      log_error("lc_age(%s) calling '%s': not a function.\n", buildingname(b), fname);
-      lua_pop(L, 1);
+            if (lua_pcall(L, fparam ? 2 : 1, 1, 0) != 0) {
+                const char *error = lua_tostring(L, -1);
+                log_error("lc_age(%s) calling '%s': %s.\n", buildingname(b), fname, error);
+                lua_pop(L, 1);
+            }
+            else {
+                result = (int)lua_tonumber(L, -1);
+                lua_pop(L, 1);
+            }
+        }
+        else {
+            log_error("lc_age(%s) calling '%s': not a function.\n", buildingname(b), fname);
+            lua_pop(L, 1);
+        }
     }
-  }
-  return (result != 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
+    return (result != 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
 }
 
 static const char *NULLSTRING = "(null)";

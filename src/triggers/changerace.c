@@ -1,7 +1,7 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -44,74 +44,75 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  **/
 
 typedef struct changerace_data {
-  struct unit *u;
-  const struct race *race;
-  const struct race *irace;
+    struct unit *u;
+    const struct race *race;
+    const struct race *irace;
 } changerace_data;
 
 static void changerace_init(trigger * t)
 {
-  t->data.v = calloc(sizeof(changerace_data), 1);
+    t->data.v = calloc(sizeof(changerace_data), 1);
 }
 
 static void changerace_free(trigger * t)
 {
-  free(t->data.v);
+    free(t->data.v);
 }
 
 static int changerace_handle(trigger * t, void *data)
 {
-  /* call an event handler on changerace.
-   * data.v -> ( variant event, int timer )
-   */
-  changerace_data *td = (changerace_data *) t->data.v;
-  if (td->u) {
-    if (td->race != NULL)
-      u_setrace(td->u, td->race);
-    if (td->irace != NULL)
-      td->u->irace = td->irace;
-  } else {
-    log_error("could not perform changerace::handle()\n");
-  }
-  unused_arg(data);
-  return 0;
+    /* call an event handler on changerace.
+     * data.v -> ( variant event, int timer )
+     */
+    changerace_data *td = (changerace_data *)t->data.v;
+    if (td->u) {
+        if (td->race != NULL)
+            u_setrace(td->u, td->race);
+        if (td->irace != NULL)
+            td->u->irace = td->irace;
+    }
+    else {
+        log_error("could not perform changerace::handle()\n");
+    }
+    unused_arg(data);
+    return 0;
 }
 
 static void changerace_write(const trigger * t, struct storage *store)
 {
-  changerace_data *td = (changerace_data *) t->data.v;
-  write_unit_reference(td->u, store);
-  write_race_reference(td->race, store);
-  write_race_reference(td->irace, store);
+    changerace_data *td = (changerace_data *)t->data.v;
+    write_unit_reference(td->u, store);
+    write_race_reference(td->race, store);
+    write_race_reference(td->irace, store);
 }
 
 static int changerace_read(trigger * t, struct storage *store)
 {
-  changerace_data *td = (changerace_data *) t->data.v;
-  read_reference(&td->u, store, read_unit_reference, resolve_unit);
-  td->race = (const struct race *)read_race_reference(store).v;
-  td->irace = (const struct race *)read_race_reference(store).v;
-  return AT_READ_OK;
+    changerace_data *td = (changerace_data *)t->data.v;
+    read_reference(&td->u, store, read_unit_reference, resolve_unit);
+    td->race = (const struct race *)read_race_reference(store).v;
+    td->irace = (const struct race *)read_race_reference(store).v;
+    return AT_READ_OK;
 }
 
 trigger_type tt_changerace = {
-  "changerace",
-  changerace_init,
-  changerace_free,
-  changerace_handle,
-  changerace_write,
-  changerace_read
+    "changerace",
+    changerace_init,
+    changerace_free,
+    changerace_handle,
+    changerace_write,
+    changerace_read
 };
 
 trigger *trigger_changerace(struct unit * u, const struct race * prace,
-  const struct race * irace)
+    const struct race * irace)
 {
-  trigger *t = t_new(&tt_changerace);
-  changerace_data *td = (changerace_data *) t->data.v;
+    trigger *t = t_new(&tt_changerace);
+    changerace_data *td = (changerace_data *)t->data.v;
 
-  assert(u_race(u) == u_irace(u) || "!changerace-triggers cannot stack!");
-  td->u = u;
-  td->race = prace;
-  td->irace = irace;
-  return t;
+    assert(u_race(u) == u_irace(u) || "!changerace-triggers cannot stack!");
+    td->u = u;
+    td->race = prace;
+    td->irace = irace;
+    return t;
 }

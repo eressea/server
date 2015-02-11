@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -177,19 +177,19 @@ int count)
     if (rtype->flags & RTF_POOLED && mode & ~(GET_SLACK | GET_RESERVE)) {
         for (v = r->units; v && use < count; v = v->next)
             if (u != v && (v->items || rtype->uget)) {
-            int mask;
+                int mask;
 
-            if ((urace(v)->ec_flags & GIVEITEM) == 0)
-                continue;
+                if ((urace(v)->ec_flags & GIVEITEM) == 0)
+                    continue;
 
-            if (v->faction == f) {
-                mask = (mode >> 3) & (GET_SLACK | GET_RESERVE);
-            }
-            else if (alliedunit(v, f, HELP_MONEY))
-                mask = (mode >> 6) & (GET_SLACK | GET_RESERVE);
-            else
-                continue;
-            use += get_pooled(v, rtype, mask, count - use);
+                if (v->faction == f) {
+                    mask = (mode >> 3) & (GET_SLACK | GET_RESERVE);
+                }
+                else if (alliedunit(v, f, HELP_MONEY))
+                    mask = (mode >> 6) & (GET_SLACK | GET_RESERVE);
+                else
+                    continue;
+                use += get_pooled(v, rtype, mask, count - use);
             }
     }
     return use;

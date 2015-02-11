@@ -30,21 +30,23 @@ int config_parse(const char *json)
 {
     cJSON * conf = cJSON_Parse(json);
     if (conf) {
-        json_config(conf); 
+        json_config(conf);
         cJSON_Delete(conf);
+        init_locales();
         return 0;
-    } else {
+    }
+    else {
         int line;
         char buffer[10];
         const char *xp = json, *lp, *ep = cJSON_GetErrorPtr();
-        for (line=1,lp=xp;xp && xp<ep;++line,lp=xp+1) {
+        for (line = 1, lp = xp; xp && xp<ep; ++line, lp = xp + 1) {
             xp = strchr(lp, '\n');
-            if (xp>=ep) break;
+            if (xp >= ep) break;
         }
-        xp = (ep > json + 10) ? ep - 10 : json; 
+        xp = (ep > json + 10) ? ep - 10 : json;
         strncpy(buffer, xp, sizeof(buffer));
         buffer[9] = 0;
-        log_error("json parse error in line %d, position %d, near `%s`\n", line, ep-lp, buffer);
+        log_error("json parse error in line %d, position %d, near `%s`\n", line, ep - lp, buffer);
     }
     return 1;
 }

@@ -1,4 +1,4 @@
-/* vi: set ts=2:
+/*
  +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  |                   |  Enno Rehling <enno@eressea.de>
  | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
@@ -6,7 +6,7 @@
  |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
  +-------------------+  Stefan Reich <reich@halbling.de>
 
- This program may not be used, modified or distributed 
+ This program may not be used, modified or distributed
  without prior permission by the authors of Eressea.
 
  */
@@ -21,15 +21,15 @@ extern "C" {
     struct unit;
     struct message;
 
-  int give_item(int want, const struct item_type *itype,
+    int give_item(int want, const struct item_type *itype,
     struct unit *src, struct unit *dest, struct order *ord);
-  struct message * disband_men(int n, struct unit * u, struct order *ord);
-  struct message * give_men(int n, struct unit *u, struct unit *u2,
+    struct message * disband_men(int n, struct unit * u, struct order *ord);
+    struct message * give_men(int n, struct unit *u, struct unit *u2,
     struct order *ord);
-  void give_unit(struct unit *u, struct unit *u2, struct order *ord);
-  void give_cmd(struct unit * u, struct order * ord);
-  struct message * check_give(const struct unit * u, const struct unit * u2, struct order *ord);
-  bool can_give_to(struct unit *u, struct unit *u2);
+    void give_unit(struct unit *u, struct unit *u2, struct order *ord);
+    void give_cmd(struct unit * u, struct order * ord);
+    struct message * check_give(const struct unit * u, const struct unit * u2, struct order *ord);
+    bool can_give_to(struct unit *u, struct unit *u2);
 
 #ifdef __cplusplus
 }

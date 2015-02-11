@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -168,8 +168,9 @@ static unit *unitorders(FILE * F, int enc, struct faction *f)
 
             if (s[0]) {
                 if (s[0] != '@') {
+                    char token[128];
                     const char *stok = s;
-                    stok = parse_token(&stok);
+                    stok = parse_token(&stok, token, sizeof(token));
 
                     if (stok) {
                         bool quit = false;
@@ -192,7 +193,6 @@ static unit *unitorders(FILE * F, int enc, struct faction *f)
                             }
                             break;
                         default:
-                            /* TODO: syntax error message */
                             break;
                         }
                         if (quit) {
@@ -224,9 +224,10 @@ static faction *factionorders(void)
     f = findfaction(fid);
 
     if (f != NULL && !fval(f, FFL_NPC)) {
-        const char *pass = getstrtoken();
+        char token[128];
+        const char *pass = gettoken(token, sizeof(token));
 
-        if (!checkpasswd(f, (const char *)pass, true)) {
+        if (!checkpasswd(f, (const char *)pass)) {
             log_debug("Invalid password for faction %s\n", itoa36(fid));
             ADDMSG(&f->msgs, msg_message("wrongpasswd", "faction password",
                 f->no, pass));
@@ -267,25 +268,14 @@ int readorders(const char *filename)
      * Partei */
 
     while (b) {
+        char token[128];
         const struct locale *lang = f ? f->locale : default_locale;
         param_t p;
         const char *s;
-        init_tokens_str(b, NULL);
-        s = getstrtoken();
-        p = s ? findparam(s, lang) : NOPARAM;
+        init_tokens_str(b);
+        s = gettoken(token, sizeof(token));
+        p = (s && s[0] != '@') ? findparam(s, lang) : NOPARAM;
         switch (p) {
-#undef LOCALE_CHANGE
-#ifdef LOCALE_CHANGE
-        case P_LOCALE:
-        {
-            const char *s = getstrtoken();
-            if (f && get_locale(s)) {
-                f->locale = get_locale(s);
-            }
-        }
-        b = getbuf(F, enc_gamedata);
-        break;
-#endif
         case P_GAMENAME:
         case P_FACTION:
             f = factionorders();
@@ -308,9 +298,9 @@ int readorders(const char *filename)
                     if (!b) {
                         break;
                     }
-                    init_tokens_str(b, NULL);
-                    b = getstrtoken();
-                    p = (!b || b[0] == '@') ? NOPARAM : findparam(b, lang);
+                    init_tokens_str(b);
+                    s = gettoken(token, sizeof(token));
+                    p = (s && s[0] != '@') ? findparam(s, lang) : NOPARAM;
                 } while ((p != P_UNIT || !f) && p != P_FACTION && p != P_NEXT
                     && p != P_GAMENAME);
                 break;
@@ -1028,11 +1018,12 @@ void writeregion(struct gamedata *data, const region * r)
         WRITE_INT(data->store, rherbs(r));
         WRITE_INT(data->store, rpeasants(r));
         WRITE_INT(data->store, rmoney(r));
-        if (r->land)
+        if (r->land) {
             for (demand = r->land->demands; demand; demand = demand->next) {
                 WRITE_TOK(data->store, resourcename(demand->type->itype->rtype, 0));
                 WRITE_INT(data->store, demand->value);
             }
+        }
         WRITE_TOK(data->store, "end");
         write_items(data->store, r->land->items);
         WRITE_SECTION(data->store);
@@ -1577,7 +1568,7 @@ int readgame(const char *filename, int backup)
             sh->type = st_find(name);
             if (sh->type == NULL) {
                 /* old datafiles */
-                sh->type = st_find((const char *)locale_string(default_locale, name));
+                sh->type = st_find((const char *)LOC(default_locale, name));
             }
             assert(sh->type || !"ship_type not registered!");
 
@@ -1856,7 +1847,7 @@ int writegame(const char *filename)
 
     log_printf(stdout, "\nOk.\n");
     return 0;
-    }
+}
 
 int a_readint(attrib * a, void *owner, struct storage *store)
 {

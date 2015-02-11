@@ -1,7 +1,7 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -38,12 +38,12 @@ extern "C" {
         struct equipment *set;
         float chance;
     } subsetitem;
-    
+
     typedef struct subset {
         float chance;
         subsetitem *sets;
     } subset;
-    
+
     typedef struct equipment {
         char *name;
         struct itemdata *items;
@@ -51,29 +51,29 @@ extern "C" {
         struct spellbook *spellbook;
         struct subset *subsets;
         struct equipment *next;
-        void (*callback) (const struct equipment *, struct unit *);
+        void(*callback) (const struct equipment *, struct unit *);
     } equipment;
-    
-  extern struct equipment *create_equipment(const char *eqname);
-  extern struct equipment *get_equipment(const char *eqname);
 
-  extern void equipment_setitem(struct equipment *eq,
-    const struct item_type *itype, const char *value);
-  extern void equipment_setskill(struct equipment *eq, skill_t sk,
-    const char *value);
-  extern void equipment_addspell(struct equipment *eq, struct spell *sp, int level);
-  extern void equipment_setcallback(struct equipment *eq,
-    void (*callback) (const struct equipment *, struct unit *));
+    struct equipment *create_equipment(const char *eqname);
+    struct equipment *get_equipment(const char *eqname);
 
-  extern void equip_unit(struct unit *u, const struct equipment *eq);
+    void equipment_setitem(struct equipment *eq,
+        const struct item_type *itype, const char *value);
+    void equipment_setskill(struct equipment *eq, skill_t sk,
+        const char *value);
+    void equipment_addspell(struct equipment *eq, struct spell *sp, int level);
+    void equipment_setcallback(struct equipment *eq,
+        void(*callback) (const struct equipment *, struct unit *));
+
+    void equip_unit(struct unit *u, const struct equipment *eq);
 #define EQUIP_SKILLS  (1<<1)
 #define EQUIP_SPELLS  (1<<2)
 #define EQUIP_ITEMS   (1<<3)
 #define EQUIP_SPECIAL (1<<4)
 #define EQUIP_ALL     (0xFF)
-  extern void equip_unit_mask(struct unit *u, const struct equipment *eq,
-    int mask);
-  extern void equip_items(struct item **items, const struct equipment *eq);
+    void equip_unit_mask(struct unit *u, const struct equipment *eq,
+        int mask);
+    void equip_items(struct item **items, const struct equipment *eq);
 
 #ifdef __cplusplus
 }

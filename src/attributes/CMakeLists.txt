@@ -13,7 +13,7 @@ key.c
 matmod.c
 moved.c
 movement.c
-object.c
+dict.c
 orcification.c
 otherfaction.c
 overrideroads.c

@@ -1,4 +1,4 @@
-/* vi: set ts=2:
+/* 
  * +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  * |                   |  Enno Rehling <enno@eressea.de>
  * | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
@@ -39,6 +39,7 @@ extern "C" {
 # define rng_double ((rand()%RAND_MAX)/(double)RAND_MAX)
 # define RNG_RAND_MAX RAND_MAX
 #endif
+#define RAND_ROUND(fractional) ((rng_double() < fractional-(int)fractional)?((int)fractional+1):((int)fractional))
 #ifdef __cplusplus
 }
 #endif

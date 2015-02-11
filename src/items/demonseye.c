@@ -1,7 +1,7 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -36,30 +36,31 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 static int
 summon_igjarjuk(struct unit *u, const struct item_type *itype, int amount,
-  struct order *ord)
+struct order *ord)
 {
-  struct plane *p = rplane(u->region);
-  unused_arg(amount);
-  unused_arg(itype);
-  if (p != NULL) {
-    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "use_realworld_only", ""));
-    return EUNUSABLE;
-  } else {
-    assert(!"not implemented");
-    return EUNUSABLE;
-  }
+    struct plane *p = rplane(u->region);
+    unused_arg(amount);
+    unused_arg(itype);
+    if (p != NULL) {
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "use_realworld_only", ""));
+        return EUNUSABLE;
+    }
+    else {
+        assert(!"not implemented");
+        return EUNUSABLE;
+    }
 }
 
 static int
 give_igjarjuk(struct unit *src, struct unit *d, const struct item_type *itype,
-  int n, struct order *ord)
+int n, struct order *ord)
 {
-  ADDMSG(&src->faction->msgs, msg_feedback(src, ord, "error_giveeye", ""));
-  return 0;
+    ADDMSG(&src->faction->msgs, msg_feedback(src, ord, "error_giveeye", ""));
+    return 0;
 }
 
 void register_demonseye(void)
 {
-  register_item_use(summon_igjarjuk, "useigjarjuk");
-  register_item_give(give_igjarjuk, "giveigjarjuk");
+    register_item_use(summon_igjarjuk, "useigjarjuk");
+    register_item_give(give_igjarjuk, "giveigjarjuk");
 }

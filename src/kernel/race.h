@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -119,7 +119,7 @@ extern "C" {
 
     typedef struct race {
         struct param *parameters;
-        const char *_name;
+        char *_name;
         float magres;
         float maxaura;              /* Faktor auf Maximale Aura */
         float regaura;              /* Faktor auf Regeneration */
@@ -133,21 +133,20 @@ extern "C" {
         float speed;
         float aggression;           /* chance that a monster will attack */
         int hitpoints;
-        const char *def_damage;
+        char *def_damage;
         int armor;
         int at_default;             /* Angriffsskill Unbewaffnet (default: -2) */
         int df_default;             /* Verteidigungsskill Unbewaffnet (default: -2) */
         int at_bonus;               /* Verändert den Angriffsskill (default: 0) */
         int df_bonus;               /* Verändert den Verteidigungskill (default: 0) */
         const struct spell *precombatspell;
-        struct att attack[10];
-        signed char bonus[MAXSKILLS];
         signed char *study_speed;   /* study-speed-bonus in points/turn (0=30 Tage) */
-        bool __remove_me_nonplayer;
         int flags;
         int battle_flags;
         int ec_flags;
         race_t oldfamiliars[MAXMAGIETYP];
+        struct att attack[10];
+        signed char bonus[MAXSKILLS];
 
         const char *(*generate_name) (const struct unit *);
         const char *(*describe) (const struct unit *, const struct locale *);

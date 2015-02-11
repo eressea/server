@@ -85,7 +85,7 @@ static void test_races(CuTest * tc)
     CuAssertPtrNotNull(tc, races);
     rc = rc_find("orc");
     CuAssertPtrNotNull(tc, rc);
-    CuAssertIntEquals(tc, RCF_NPC|RCF_WALK|RCF_UNDEAD, rc->flags);
+    CuAssertIntEquals(tc, RCF_NPC | RCF_WALK | RCF_UNDEAD, rc->flags);
     CuAssertStrEquals(tc, "1d4", rc->def_damage);
     CuAssertDblEquals(tc, 1.0, rc->magres, 0.0);
     CuAssertDblEquals(tc, 2.0, rc->maxaura, 0.0);
@@ -145,7 +145,7 @@ static void test_items(CuTest * tc)
     itype = it_find("horse");
     CuAssertPtrNotNull(tc, itype);
     CuAssertIntEquals(tc, 20, itype->capacity);
-    CuAssertIntEquals(tc, ITF_ANIMAL|ITF_BIG, itype->flags);
+    CuAssertIntEquals(tc, ITF_ANIMAL | ITF_BIG, itype->flags);
 
     CuAssertPtrNotNull(tc, rt_find("axe"));
     CuAssertPtrNotNull(tc, (void *)get_resourcetype(R_HORSE));
@@ -279,7 +279,7 @@ static void test_buildings(CuTest * tc)
     CuAssertPtrNotNull(tc, bt->maintenance);
     CuAssertIntEquals(tc, 1, bt->maintenance[0].number);
     CuAssertPtrEquals(tc, (void *)get_resourcetype(R_IRON), (void *)bt->maintenance[0].rtype);
-    CuAssertIntEquals(tc, MTF_VARIABLE|MTF_VITAL, bt->maintenance[0].flags);
+    CuAssertIntEquals(tc, MTF_VARIABLE | MTF_VITAL, bt->maintenance[0].flags);
     CuAssertIntEquals(tc, 0, bt->maintenance[1].number);
 
     CuAssertPtrNotNull(tc, bt->construction);
@@ -293,6 +293,54 @@ static void test_buildings(CuTest * tc)
     CuAssertIntEquals(tc, 20, bt->construction->maxsize);
     CuAssertIntEquals(tc, 1, bt->construction->minskill);
     CuAssertPtrEquals(tc, 0, bt->construction->improvement);
+    test_cleanup();
+}
+
+static const char * building_defaults_data = "{\"buildings\": { "
+"\"house\" : { }"
+"}}";
+
+static void test_buildings_default(CuTest * tc)
+{
+    cJSON *json = cJSON_Parse(building_defaults_data);
+    const building_type *bt;
+    building_type clone;
+
+    test_cleanup();
+
+    bt = bt_get_or_create("house");
+    clone = *bt;
+
+    CuAssertIntEquals(tc, 0, memcmp(bt, &clone, sizeof(building_type)));
+    CuAssertPtrNotNull(tc, json);
+    json_config(json);
+
+    CuAssertPtrEquals(tc, (void *)bt, (void *)bt_find("house"));
+    CuAssertIntEquals(tc, 0, memcmp(bt, &clone, sizeof(building_type)));
+    test_cleanup();
+}
+
+static const char * ship_defaults_data = "{\"ships\": { "
+"\"hodor\" : { }"
+"}}";
+
+static void test_ships_default(CuTest * tc)
+{
+    cJSON *json = cJSON_Parse(ship_defaults_data);
+    const ship_type *st;
+    ship_type clone;
+
+    test_cleanup();
+
+    st = st_get_or_create("hodor");
+    clone = *st;
+
+    CuAssertIntEquals(tc, 0, memcmp(st, &clone, sizeof(ship_type)));
+    CuAssertPtrNotNull(tc, json);
+    json_config(json);
+
+    CuAssertPtrEquals(tc, (void *)st, (void *)st_find("hodor"));
+    CuAssertIntEquals(tc, 0, memcmp(st, &clone, sizeof(ship_type)));
     test_cleanup();
 }
 
@@ -329,7 +377,7 @@ static void test_terrains(CuTest * tc)
     json_config(json);
     ter = get_terrain("plain");
     CuAssertPtrNotNull(tc, ter);
-    CuAssertIntEquals(tc, ter->flags, LAND_REGION|FLY_INTO|WALK_INTO);
+    CuAssertIntEquals(tc, ter->flags, LAND_REGION | FLY_INTO | WALK_INTO);
 
     test_cleanup();
 }
@@ -373,8 +421,8 @@ static void test_skills(CuTest * tc)
     CuAssertIntEquals(tc, SK_CROSSBOW, get_skill("kreuz", lang));
     CuAssertIntEquals(tc, SK_ALCHEMY, get_skill("alchemie", lang));
 
-    CuAssertStrEquals(tc, "ALCHEMIE", locale_string(lang, "skill::alchemy"));
-    CuAssertStrEquals(tc, "ARMBRUST", locale_string(lang, "skill::crossbow"));
+    CuAssertStrEquals(tc, "ALCHEMIE", LOC(lang, "skill::alchemy"));
+    CuAssertStrEquals(tc, "ARMBRUST", LOC(lang, "skill::crossbow"));
 
     test_cleanup();
 }
@@ -396,8 +444,8 @@ static void test_keywords(CuTest * tc)
     CuAssertIntEquals(tc, K_STUDY, get_keyword("lerne", lang));
     CuAssertIntEquals(tc, K_MOVE, get_keyword("nach", lang));
 
-    CuAssertStrEquals(tc, "LERNEN", locale_string(lang, "keyword::study"));
-    CuAssertStrEquals(tc, "NACH", locale_string(lang, "keyword::move"));
+    CuAssertStrEquals(tc, "LERNEN", LOC(lang, "keyword::study"));
+    CuAssertStrEquals(tc, "NACH", LOC(lang, "keyword::move"));
 
     test_cleanup();
 }
@@ -413,10 +461,10 @@ static void test_strings(CuTest * tc)
     test_cleanup();
     lang = get_or_create_locale("de");
     CuAssertPtrNotNull(tc, lang);
-    CuAssertPtrEquals(tc, NULL, (void *)locale_string(lang, "move"));
+    CuAssertPtrEquals(tc, NULL, (void *)LOC(lang, "move"));
     json_config(json);
-    CuAssertStrEquals(tc, "NACH", locale_string(lang, "move"));
-    CuAssertStrEquals(tc, "LERNEN", locale_string(lang, "study"));
+    CuAssertStrEquals(tc, "NACH", LOC(lang, "move"));
+    CuAssertStrEquals(tc, "LERNEN", LOC(lang, "study"));
 }
 
 static void test_infinitive_from_config(CuTest *tc) {
@@ -446,8 +494,10 @@ CuSuite *get_jsonconf_suite(void)
     SUITE_ADD_TEST(suite, test_skills);
     SUITE_ADD_TEST(suite, test_directions);
     SUITE_ADD_TEST(suite, test_items);
+    SUITE_ADD_TEST(suite, test_ships_default);
     SUITE_ADD_TEST(suite, test_ships);
     SUITE_ADD_TEST(suite, test_buildings);
+    SUITE_ADD_TEST(suite, test_buildings_default);
     SUITE_ADD_TEST(suite, test_configs);
     SUITE_ADD_TEST(suite, test_castles);
     SUITE_ADD_TEST(suite, test_terrains);

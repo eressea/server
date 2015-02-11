@@ -1,4 +1,4 @@
-/* vi: set ts=2:
+/*
  +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  |                   |  Enno Rehling <enno@eressea.de>
  | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
@@ -73,10 +73,11 @@ const char *str, parser fun)
 
 static int do_command_i(const void *keys, struct unit *u, struct order *ord)
 {
+    char token[128];
     const char *c;
     variant var;
 
-    c = getstrtoken();
+    c = gettoken(token, sizeof(token));
     if (findtoken(keys, c, &var) == E_TOK_SUCCESS) {
         command *cmd = (command *)var.v;
         if (cmd->nodes && *c) {

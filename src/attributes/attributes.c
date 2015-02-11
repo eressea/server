@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -28,7 +28,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "stealth.h"
 #include "moved.h"
 #include "movement.h"
-#include "object.h"
+#include "dict.h"
 #include "orcification.h"
 #include "otherfaction.h"
 #include "overrideroads.h"
@@ -54,14 +54,14 @@ attrib_type at_unitdissolve = {
 
 void register_attributes(void)
 {
+    at_deprecate("gm", a_readint);
     at_register(&at_stealth);
-    at_register(&at_object);
+    at_register(&at_dict);
     at_register(&at_unitdissolve);
     at_register(&at_overrideroads);
     at_register(&at_raceprefix);
     at_register(&at_iceberg);
     at_register(&at_key);
-    at_deprecate("gm", a_readint);
     at_register(&at_follow);
     at_register(&at_targetregion);
     at_register(&at_orcification);
@@ -69,6 +69,7 @@ void register_attributes(void)
     at_register(&at_reduceproduction);
     at_register(&at_otherfaction);
     at_register(&at_racename);
+    at_register(&at_speedup);
     at_register(&at_movement);
     at_register(&at_moved);
 }

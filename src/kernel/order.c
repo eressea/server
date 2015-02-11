@@ -1,4 +1,4 @@
-/* vi: set ts=2:
+/*
  +-------------------+
  |                   |  Christian Schlittchen <corwin@amber.kn-bremen.de>
  | Eressea PBEM host |  Enno Rehling <enno@eressea.de>
@@ -40,8 +40,7 @@ typedef struct locale_data {
     const struct locale *lang;
 } locale_data;
 
-static struct locale_data *locale_array[16];
-static int nlocales = 0;
+static struct locale_data *locale_array[MAXLOCALES];
 
 typedef struct order_data {
     const char *_str;
@@ -184,7 +183,7 @@ static char *mkdata(order_data **pdata, size_t len, keyword_t kwd, int lindex, c
 {
     order_data *data;
     char *result;
-    data = malloc(sizeof(order_data) + len +1);
+    data = malloc(sizeof(order_data) + len + 1);
     result = (char *)(data + 1);
     data->_keyword = kwd;
     data->_lindex = lindex;
@@ -207,7 +206,7 @@ static order_data *create_data(keyword_t kwd, const char *sptr, int lindex)
 
     /* learning, only one order_data per skill required */
     if (kwd == K_STUDY) {
-        skill_t sk = get_skill(parse_token(&sptr), lang);
+        skill_t sk = get_skill(parse_token_depr(&sptr), lang);
         switch (sk) {
         case NOSKILL:              /* fehler */
             break;
@@ -256,7 +255,7 @@ static order *create_order_i(keyword_t kwd, const char *sptr, int persistent,
     order *ord = NULL;
     int lindex;
 
-    if ((int)kwd>0 && keyword_disabled(kwd)) {
+    if ((int)kwd > 0 && keyword_disabled(kwd)) {
         log_error("trying to create an order for disabled keyword %s.", keyword(kwd));
         return NULL;
     }
@@ -272,15 +271,10 @@ static order *create_order_i(keyword_t kwd, const char *sptr, int persistent,
         }
     }
 
-    for (lindex = 0; lindex != nlocales; ++lindex) {
-        if (locale_array[lindex]->lang == lang)
-            break;
-    }
-    if (lindex == nlocales) {
-        locale_array[nlocales] = (locale_data *)calloc(1, sizeof(locale_data));
-        locale_array[nlocales]->lang = lang;
-        ++nlocales;
-    }
+    lindex = locale_index(lang);
+    assert(lindex < MAXLOCALES);
+    locale_array[lindex] = (locale_data *)calloc(1, sizeof(locale_data));
+    locale_array[lindex]->lang = lang;
 
     ord = (order *)malloc(sizeof(order));
     ord->_persistent = persistent;
@@ -364,11 +358,11 @@ order *parse_order(const char *s, const struct locale * lang)
             ++s;
         }
         sptr = s;
-        p = *sptr ? parse_token(&sptr) : 0;
+        p = *sptr ? parse_token_depr(&sptr) : 0;
         kwd = p ? get_keyword(p, lang) : NOKEYWORD;
         if (kwd == K_MAKE) {
             const char *s, *sp = sptr;
-            s = parse_token(&sp);
+            s = parse_token_depr(&sp);
             if (s && isparam(s, lang, P_TEMP)) {
                 kwd = K_MAKETEMP;
                 sptr = sp;
@@ -394,8 +388,6 @@ order *parse_order(const char *s, const struct locale * lang)
 bool is_repeated(const order * ord)
 {
     keyword_t kwd = ORD_KEYWORD(ord);
-    int result = 0;
-
     switch (kwd) {
     case K_CAST:
     case K_BUY:
@@ -414,16 +406,15 @@ bool is_repeated(const order * ord)
     case K_TEACH:
     case K_BREED:
     case K_PIRACY:
-    case K_PLANT:
     case K_MAKE:
     case K_LOOT:
-        result = 1;
-        break;
+    case K_DESTROY:
+        return true;
 
     default:
-        result = 0;
+        break;
     }
-    return result;
+    return false;
 }
 
 /**
@@ -437,7 +428,6 @@ bool is_repeated(const order * ord)
 bool is_exclusive(const order * ord)
 {
     keyword_t kwd = ORD_KEYWORD(ord);
-    int result = 0;
 
     switch (kwd) {
     case K_MOVE:
@@ -455,16 +445,15 @@ bool is_exclusive(const order * ord)
     case K_TEACH:
     case K_BREED:
     case K_PIRACY:
-    case K_PLANT:
     case K_MAKE:
     case K_LOOT:
-        result = 1;
-        break;
+    case K_DESTROY:
+        return true;
 
     default:
-        result = 0;
+        break;
     }
-    return result;
+    return false;
 }
 
 /**
@@ -478,7 +467,6 @@ bool is_exclusive(const order * ord)
 bool is_long(const order * ord)
 {
     keyword_t kwd = ORD_KEYWORD(ord);
-    bool result = false;
 
     switch (kwd) {
     case K_CAST:
@@ -499,15 +487,15 @@ bool is_long(const order * ord)
     case K_TEACH:
     case K_BREED:
     case K_PIRACY:
-    case K_PLANT:
     case K_MAKE:
     case K_LOOT:
+    case K_DESTROY:
         return true;
 
     default:
-        result = false;
+        break;
     }
-    return result;
+    return false;
 }
 
 /**
@@ -535,7 +523,6 @@ bool is_persistent(const order * ord)
     default:
         return persist || is_repeated(ord);
     }
-
 }
 
 char *write_order(const order * ord, char *buffer, size_t size)
@@ -566,10 +553,7 @@ void push_order(order ** ordp, order * ord)
 
 keyword_t init_order(const struct order *ord)
 {
-    char *cmd = 0;
-
     assert(ord && ord->data);
-    if (ord->data->_str) cmd = _strdup(ord->data->_str);
-    init_tokens_str(cmd, cmd);
+    init_tokens_str(ord->data->_str);
     return ord->data->_keyword;
 }

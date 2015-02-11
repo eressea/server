@@ -1377,7 +1377,7 @@ static void do_fumble(castorder * co)
         ADDMSG(&r->msgs, msg_message("patzer6", "unit region spell", u, r, sp));
         break;
     }
-        /* fall-through is intentional! */
+    /* fall-through is intentional! */
 
     case 2:
         /* temporary skill loss */
@@ -2495,6 +2495,7 @@ static bool is_moving_ship(const region * r, ship * sh)
 
 static castorder *cast_cmd(unit * u, order * ord)
 {
+    char token[128];
     region *r = u->region;
     region *target_r = r;
     int level, range;
@@ -2518,7 +2519,7 @@ static castorder *cast_cmd(unit * u, order * ord)
     level = eff_skill(u, SK_MAGIC, r);
 
     init_order(ord);
-    s = getstrtoken();
+    s = gettoken(token, sizeof(token));
     param = findparam(s, u->faction->locale);
     /* für Syntax ' STUFE x REGION y z ' */
     if (param == P_LEVEL) {
@@ -2529,7 +2530,7 @@ static castorder *cast_cmd(unit * u, order * ord)
             cmistake(u, ord, 10, MSG_MAGIC);
             return 0;
         }
-        s = getstrtoken();
+        s = gettoken(token, sizeof(token));
         param = findparam(s, u->faction->locale);
     }
     if (param == P_REGION) {
@@ -2546,7 +2547,7 @@ static castorder *cast_cmd(unit * u, order * ord)
                 "unit region command", u, u->region, ord));
             return 0;
         }
-        s = getstrtoken();
+        s = gettoken(token, sizeof(token));
         param = findparam(s, u->faction->locale);
     }
     /* für Syntax ' REGION x y STUFE z '
@@ -2559,7 +2560,7 @@ static castorder *cast_cmd(unit * u, order * ord)
             cmistake(u, ord, 10, MSG_MAGIC);
             return 0;
         }
-        s = getstrtoken();
+        s = gettoken(token, sizeof(token));
     }
     if (!s || !s[0] || strlen(s) == 0) {
         /* Fehler "Es wurde kein Zauber angegeben" */
@@ -2692,7 +2693,7 @@ static castorder *cast_cmd(unit * u, order * ord)
         char **params = (char**)malloc(2 * sizeof(char *));
         int p = 0, size = 2;
         for (;;) {
-            s = getstrtoken();
+            s = gettoken(token, sizeof(token));
             if (!s || *s == 0)
                 break;
             if (p + 1 >= size) {
@@ -2935,7 +2936,7 @@ spell *unit_getspell(struct unit *u, const char *name, const struct locale * lan
     if (sb) {
         select_spellbook(&tokens, sb, lang);
     }
-
+#if 0 // TODO: some familiars can cast spells from the mage's spellbook?
     u = get_familiar_mage(u);
     if (u) {
         sb = unit_get_spellbook(u);
@@ -2943,6 +2944,7 @@ spell *unit_getspell(struct unit *u, const char *name, const struct locale * lan
             select_spellbook(&tokens, sb, lang);
         }
     }
+#endif
 
     if (tokens) {
         variant token;
@@ -2977,7 +2979,16 @@ spellbook * get_spellbook(const char * name)
     return result;
 }
 
+int free_spellbook_cb(const void *match, const void *key, size_t keylen, void *data) {
+    spellbook *sb;
+    cb_get_kv(match, &sb, sizeof(sb));
+    spellbook_clear(sb);
+    free(sb);
+    return 0;
+}
+
 void free_spellbooks(void)
 {
+    cb_foreach(&cb_spellbooks, "", 0, free_spellbook_cb, NULL);
     cb_clear(&cb_spellbooks);
 }

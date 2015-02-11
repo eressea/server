@@ -1,4 +1,4 @@
-/* vi: set ts=2:
+/* 
  +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  |                   |  Enno Rehling <enno@eressea.de>
  | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
@@ -8,7 +8,7 @@
 
  This program may not be used, modified or distributed
  without prior permission by the authors of Eressea.
-*/
+ */
 
 /*
  * Contains defines for the "free" game (Eressea) .
@@ -25,9 +25,9 @@
 
 /* Vermehrungsrate Bauern in 1/10000.
 * TODO: Evt. Berechnungsfehler, reale Vermehrungsraten scheinen höher. */
-#define PEASANTGROWTH		10
+#define PEASANTGROWTH 10
 #define BATTLE_KILLS_PEASANTS 20
-#define PEASANTLUCK			10
+#define PEASANTLUCK 10
 
 #define ROW_FACTOR 3            /* factor for combat row advancement rule */
 

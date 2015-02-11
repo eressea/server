@@ -1,7 +1,7 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -22,18 +22,18 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 
 attrib_type at_matmod = {
-  "matmod",
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  ATF_PRESERVE
+    "matmod",
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    ATF_PRESERVE
 };
 
 attrib *make_matmod(mm_fun function)
 {
-  attrib *a = a_new(&at_matmod);
-  a->data.f = (void (*)(void))function;
-  return a;
+    attrib *a = a_new(&at_matmod);
+    a->data.f = (void(*)(void))function;
+    return a;
 }

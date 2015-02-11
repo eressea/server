@@ -6,6 +6,7 @@
 #include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
+#include <kernel/messages.h>
 #include <kernel/order.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
@@ -13,8 +14,11 @@
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 
+#include <util/attrib.h>
 #include <util/base36.h>
 #include <util/language.h>
+#include <util/message.h>
+#include <util/rand.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -226,6 +230,74 @@ static void test_display_cmd(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_force_leave_buildings(CuTest *tc) {
+    ally *al;
+    region *r;
+    unit *u1, *u2, *u3;
+    building * b;
+    message *msg;
+    test_cleanup();
+    r = test_create_region(0, 0, test_create_terrain("plain", LAND_REGION));
+    u1 = test_create_unit(test_create_faction(NULL), r);
+    u2 = test_create_unit(u1->faction, r);
+    u3 = test_create_unit(test_create_faction(NULL), r);
+    b = test_create_building(r, NULL);
+    u_set_building(u1, b);
+    building_set_owner(u1);
+    u_set_building(u2, b);
+    u_set_building(u3, b);
+    force_leave(r);
+    CuAssertPtrEquals_Msg(tc, "owner should not be forecd to leave", b, u1->building);
+    CuAssertPtrEquals_Msg(tc, "same faction should not be forced to leave", b, u2->building);
+    CuAssertPtrEquals_Msg(tc, "non-allies should be forced to leave", NULL, u3->building);
+    msg = test_get_last_message(u3->faction->msgs);
+    CuAssertStrEquals(tc, "force_leave_building", test_get_messagetype(msg));
+
+    u_set_building(u3, b);
+    al = ally_add(&u1->faction->allies, u3->faction);
+    al->status = HELP_GUARD;
+    force_leave(r);
+    CuAssertPtrEquals_Msg(tc, "allies should not be forced to leave", b, u3->building);
+    test_cleanup();
+}
+
+static void test_force_leave_ships(CuTest *tc) {
+    region *r;
+    unit *u1, *u2;
+    ship *sh;
+    message *msg;
+    test_cleanup();
+    r = test_create_region(0, 0, test_create_terrain("plain", LAND_REGION));
+    u1 = test_create_unit(test_create_faction(NULL), r);
+    u2 = test_create_unit(test_create_faction(NULL), r);
+    sh = test_create_ship(r, NULL);
+    u_set_ship(u1, sh);
+    u_set_ship(u2, sh);
+    ship_set_owner(u1);
+    force_leave(r);
+    CuAssertPtrEquals_Msg(tc, "non-allies should be forced to leave", NULL, u2->ship);
+    msg = test_get_last_message(u2->faction->msgs);
+    CuAssertStrEquals(tc, "force_leave_ship", test_get_messagetype(msg));
+    test_cleanup();
+}
+
+static void test_force_leave_ships_on_ocean(CuTest *tc) {
+    region *r;
+    unit *u1, *u2;
+    ship *sh;
+    test_cleanup();
+    r = test_create_region(0, 0, test_create_terrain("ocean", SEA_REGION));
+    u1 = test_create_unit(test_create_faction(NULL), r);
+    u2 = test_create_unit(test_create_faction(NULL), r);
+    sh = test_create_ship(r, NULL);
+    u_set_ship(u1, sh);
+    u_set_ship(u2, sh);
+    ship_set_owner(u1);
+    force_leave(r);
+    CuAssertPtrEquals_Msg(tc, "no forcing out of ships on oceans", sh, u2->ship);
+    test_cleanup();
+}
+
 static void test_fishing_feeds_2_people(CuTest * tc)
 {
     const resource_type *rtype;
@@ -387,7 +459,7 @@ struct pay_fixture {
 };
 
 static double level_taxes(const building * b, int level) {
-    return b->size*level*2.0;
+    return b->size * level * 2.0;
 }
 
 static void setup_pay_cmd(struct pay_fixture *fix) {
@@ -622,6 +694,62 @@ static void test_reserve_self(CuTest *tc) {
     test_cleanup();
 }
 
+static void statistic_test(CuTest *tc, int peasants, int luck, int maxp,
+    double variance, int min_value, int max_value) {
+    int effect, i;
+    for (i = 0; i < 1000; ++i) {
+        effect = peasant_luck_effect(peasants, luck, maxp, variance);
+        CuAssertTrue(tc, min_value <= effect);
+        CuAssertTrue(tc, max_value >= effect);
+    }
+}
+
+static void test_peasant_luck_effect(CuTest *tc) {
+    const char *plf = get_param(global.parameters, "rules.peasants.peasantluck.factor");
+    const char *gf = get_param(global.parameters, "rules.peasants.growth.factor");
+
+    set_param(&global.parameters, "rules.peasants.peasantluck.factor", "10");
+    set_param(&global.parameters, "rules.peasants.growth.factor", "0.001");
+
+    statistic_test(tc, 100, 0, 1000, 0, 0, 0);
+    statistic_test(tc, 100, 2, 1000, 0, 1, 1);
+    statistic_test(tc, 1000, 400, 1000, 0, (int)(400 * 10 * 0.001 * .75),
+        (int)(400 * 10 * 0.001 * .75));
+    statistic_test(tc, 1000, 1000, 2000, .5, 1, 501);
+
+    set_param(&global.parameters, "rules.peasants.growth.factor", "1");
+    statistic_test(tc, 1000, 1000, 1000, 0, 501, 501);
+
+    set_param(&global.parameters, "rules.peasants.peasantluck.factor", plf);
+    set_param(&global.parameters, "rules.peasants.growth.factor", gf);
+}
+
+static void test_luck_message(CuTest *tc) {
+    region* r;
+    const message_type *msg_types[1];
+
+    test_cleanup();
+    r = test_create_region(0, 0, NULL);
+    rsetpeasants(r, 1);
+
+    msg_types[0] = register_msg("peasantluck_success", 1, "births:int");
+
+    demographics();
+
+    CuAssertPtrEquals_Msg(tc, "unexpected message", (void *)NULL, r->msgs);
+
+    attrib *a = (attrib *)a_find(r->attribs, &at_peasantluck);
+    if (!a)
+        a = a_add(&r->attribs, a_new(&at_peasantluck));
+    a->data.i += 10;
+
+    demographics();
+
+    assert_messages(tc, r->msgs->begin, msg_types, 1, true, 0);
+
+    test_cleanup();
+}
+
 CuSuite *get_laws_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -649,5 +777,11 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_enter_building);
     SUITE_ADD_TEST(suite, test_enter_ship);
     SUITE_ADD_TEST(suite, test_display_cmd);
+    SUITE_ADD_TEST(suite, test_force_leave_buildings);
+    SUITE_ADD_TEST(suite, test_force_leave_ships);
+    SUITE_ADD_TEST(suite, test_force_leave_ships_on_ocean);
+    SUITE_ADD_TEST(suite, test_peasant_luck_effect);
+    SUITE_ADD_TEST(suite, test_luck_message);
+
     return suite;
 }

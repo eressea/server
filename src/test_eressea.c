@@ -1,4 +1,5 @@
 #include <platform.h>
+#include <eressea.h>
 #include <kernel/config.h>
 #include <CuTest.h>
 #include <stdio.h>
@@ -30,7 +31,7 @@ int RunAllTests(void)
   int fail_count, flags = log_flags;
 
   log_flags = LOG_FLUSH | LOG_CPERROR;
-  kernel_init();
+  game_init();
 
   /* self-test */
   RUN_TESTS(suite, tests);
@@ -48,9 +49,11 @@ int RunAllTests(void)
   RUN_TESTS(suite, base36);
   RUN_TESTS(suite, bsdstring);
   RUN_TESTS(suite, functions);
+  RUN_TESTS(suite, parser);
   RUN_TESTS(suite, umlaut);
   RUN_TESTS(suite, unicode);
   RUN_TESTS(suite, strings);
+  RUN_TESTS(suite, rng);
   /* kernel */
   RUN_TESTS(suite, alliance);
   RUN_TESTS(suite, unit);
@@ -69,6 +72,7 @@ int RunAllTests(void)
   RUN_TESTS(suite, building);
   RUN_TESTS(suite, spell);
   RUN_TESTS(suite, ally);
+  RUN_TESTS(suite, messages);
   /* gamecode */
   RUN_TESTS(suite, battle);
   RUN_TESTS(suite, economy);
@@ -85,6 +89,7 @@ int RunAllTests(void)
   log_flags = flags;
   fail_count = suite->failCount;
   CuSuiteDelete(suite);
+  game_done();
   return fail_count;
 }
 

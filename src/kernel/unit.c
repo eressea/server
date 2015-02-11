@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -66,6 +66,31 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <math.h>
 
 #define FIND_FOREIGN_TEMP
+
+int weight(const unit * u)
+{
+    int w = 0, n = 0, in_bag = 0;
+    const resource_type *rtype = get_resourcetype(R_BAG_OF_HOLDING);
+    item *itm;
+
+    for (itm = u->items; itm; itm = itm->next) {
+        w = itm->type->weight * itm->number;
+        n += w;
+        if (rtype && !fval(itm->type, ITF_BIG)) {
+            in_bag += w;
+        }
+    }
+
+    n += u->number * u_race(u)->weight;
+
+    if (rtype) {
+        w = i_get(u->items, rtype->itype) * BAGCAPACITY;
+        if (w > in_bag) w = in_bag;
+        n -= w;
+    }
+
+    return n;
+}
 
 attrib_type at_creator = {
     "creator"
@@ -491,16 +516,19 @@ void usetprivate(unit * u, const char *str)
 {
     attrib *a = a_find(u->attribs, &at_private);
 
-    if (str == NULL) {
-        if (a)
+    if (str == NULL || *str == 0) {
+        if (a) {
             a_remove(&u->attribs, a);
+        }
         return;
     }
-    if (!a)
+    if (!a) {
         a = a_add(&u->attribs, a_new(&at_private));
-    if (a->data.v)
+    }
+    if (a->data.v) {
         free(a->data.v);
-    a->data.v = _strdup((const char *)str);
+    }
+    a->data.v = _strdup(str);
 }
 
 /*********************/
@@ -1190,7 +1218,7 @@ skill *add_skill(unit * u, skill_t id)
     sv->old = 0;
     sv->id = id;
     if (id == SK_MAGIC && u->faction && !fval(u->faction, FFL_NPC)) {
-        assert(u->number<=1);
+        assert(u->number <= 1);
         assert(max_magicians(u->faction) >= u->number);
     }
     return sv;
@@ -1697,21 +1725,23 @@ int unit_max_hp(const unit * u)
             get_param_int(global.parameters, "rules.stamina", STAMINA_AFFECTS_HP);
     }
     h = u_race(u)->hitpoints;
-    if (heal_ct == NULL)
-        heal_ct = ct_find("healingzone");
 
     if (rules_stamina & 1) {
         p = pow(effskill(u, SK_STAMINA) / 2.0, 1.5) * 0.2;
         h += (int)(h * p + 0.5);
     }
+
     /* der healing curse veraendert die maximalen hp */
-    if (heal_ct) {
-        curse *c = get_curse(u->region->attribs, heal_ct);
-        if (c) {
-            h = (int)(h * (1.0 + (curse_geteffect(c) / 100)));
+    if (u->region) {
+        if (heal_ct == NULL)
+            heal_ct = ct_find("healingzone");
+        if (heal_ct) {
+            curse *c = get_curse(u->region->attribs, heal_ct);
+            if (c) {
+                h = (int)(h * (1.0 + (curse_geteffect(c) / 100)));
+            }
         }
     }
-
     return h;
 }
 
@@ -1852,10 +1882,11 @@ char *write_unitname(const unit * u, char *buffer, size_t size)
 {
     if (u->name) {
         slprintf(buffer, size, "%s (%s)", u->name, itoa36(u->no));
-    } else {
+    }
+    else {
         const struct locale * lang = u->faction ? u->faction->locale : default_locale;
         const char * name = rc_name_s(u->_race, u->number == 1 ? NAME_SINGULAR : NAME_PLURAL);
-        slprintf(buffer, size, "%s (%s)", locale_string(lang, name), itoa36(u->no));
+        slprintf(buffer, size, "%s (%s)", LOC(lang, name), itoa36(u->no));
     }
     buffer[size - 1] = 0;
     return buffer;
@@ -1874,8 +1905,8 @@ bool unit_name_equals_race(const unit *u) {
         rc_name(u->_race, NAME_SINGULAR, sing, sizeof(sing));
         rc_name(u->_race, NAME_PLURAL, plur, sizeof(plur));
         if (strcmp(u->name, sing) == 0 || strcmp(u->name, plur) == 0 ||
-            strcmp(u->name, locale_string(lang, sing)) == 0 ||
-            strcmp(u->name, locale_string(lang, plur)) == 0) {
+            strcmp(u->name, LOC(lang, sing)) == 0 ||
+            strcmp(u->name, LOC(lang, plur)) == 0) {
             return true;
         }
     }

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -210,12 +210,13 @@ void set_factionstealth(unit * u, faction * f)
 
 int setstealth_cmd(unit * u, struct order *ord)
 {
+    char token[64];
     const char *s;
     int level, rule;
     const race *trace;
 
     init_order(ord);
-    s = getstrtoken();
+    s = gettoken(token, sizeof(token));
 
     /* Tarne ohne Parameter: Setzt maximale Tarnung */
 
@@ -286,7 +287,7 @@ int setstealth_cmd(unit * u, struct order *ord)
             /* TARNE PARTEI is disabled */
             break;
         }
-        s = getstrtoken();
+        s = gettoken(token, sizeof(token));
         if (rule & 1) {
             if (!s || *s == 0) {
                 fset(u, UFL_ANON_FACTION);
@@ -299,13 +300,13 @@ int setstealth_cmd(unit * u, struct order *ord)
         }
         if (rule & 2) {
             if (get_keyword(s, u->faction->locale) == K_NUMBER) {
-                const char *s2 = getstrtoken();
+                s = gettoken(token, sizeof(token));
                 int nr = -1;
 
-                if (s2) {
-                    nr = atoi36(s2);
+                if (s) {
+                    nr = atoi36(s);
                 }
-                if (!s2 || *s2 == 0 || nr == u->faction->no) {
+                if (!s || *s == 0 || nr == u->faction->no) {
                     a_removeall(&u->attribs, &at_otherfaction);
                     break;
                 }

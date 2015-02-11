@@ -1,4 +1,4 @@
-/* vi: set ts=2:
+/* 
 +-------------------+
 |                   |  Enno Rehling <enno@eressea.de>
 | Eressea PBEM host |  Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -14,10 +14,12 @@ without prior permission by the authors of Eressea.
 extern "C" {
 #endif
 
-  struct lua_State;
-  void tolua_hashtable_open(struct lua_State *L);
+#define USERTYPE_DICT ((char *)"dict")
 
-  typedef struct attrib **hashtable;
+    struct lua_State;
+    void tolua_dict_open(struct lua_State *L);
+
+    typedef struct attrib **dict;
 
 #ifdef __cplusplus
 }

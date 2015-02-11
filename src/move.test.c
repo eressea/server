@@ -28,7 +28,7 @@ static void test_ship_not_allowed_in_coast(CuTest * tc)
     ttype = test_create_terrain("glacier", LAND_REGION | ARCTIC_REGION | WALK_INTO | SAIL_INTO);
     otype = test_create_terrain("ocean", SEA_REGION | SAIL_INTO);
     stype = test_create_shiptype("derp");
-    stype->coasts = (const struct terrain_type **)calloc(2, sizeof(const struct terrain_type *));
+    stype->coasts = (struct terrain_type **)calloc(2, sizeof(struct terrain_type *));
 
     r1 = test_create_region(0, 0, ttype);
     r2 = test_create_region(1, 0, otype);

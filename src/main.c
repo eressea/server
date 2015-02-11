@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -304,8 +304,6 @@ int main(int argc, char **argv)
 
     L = lua_init();
     game_init();
-    register_races();
-    register_spells();
     bind_monsters(L);
     err = eressea_run(L, luafile);
     if (err) {

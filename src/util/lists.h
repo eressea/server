@@ -1,7 +1,7 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -24,17 +24,17 @@ extern "C" {
 
 #include <stddef.h>
 
-  void addlist(void *l1, void *p1);
-  void translist(void *l1, void *l2, void *p);
+    void addlist(void *l1, void *p1);
+    void translist(void *l1, void *l2, void *p);
 #ifndef MALLOCDBG
-  void freelist(void *p1);
-  void removelist(void *l, void *p);
+    void freelist(void *p1);
+    void removelist(void *l, void *p);
 #else
 #define freelist(p) { while (p) { void * p2 = p->next; free(p); p = p2; } }
 #define removelist(l,p) { choplist(l, p); free(p); }
 #endif
 
-  unsigned int listlen(void *l);
+    unsigned int listlen(void *l);
 
 #ifdef __cplusplus
 }

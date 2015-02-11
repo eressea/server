@@ -1,7 +1,7 @@
-/* vi: set ts=2:
+/*
  *
- * 
- * Eressea PB(E)M host Copyright (C) 1998-2003
+ *
+ * Eressea PB(E)M host Copyright (C) 1998-2015
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -30,21 +30,21 @@
 
 void age_firedragon(unit * u)
 {
-  if (u->number > 0 && rng_int() % 100 < age_chance(u->age, DRAGONAGE, 1)) {
-    double q = (double)u->hp / (double)(unit_max_hp(u) * u->number);
-    u_setrace(u, get_race(RC_DRAGON));
-    u->irace = NULL;
-    scale_number(u, 1);
-    u->hp = (int)(unit_max_hp(u) * u->number * q);
-  }
+    if (u->number > 0 && rng_int() % 100 < age_chance(u->age, DRAGONAGE, 1)) {
+        double q = (double)u->hp / (double)(unit_max_hp(u) * u->number);
+        u_setrace(u, get_race(RC_DRAGON));
+        u->irace = NULL;
+        scale_number(u, 1);
+        u->hp = (int)(unit_max_hp(u) * u->number * q);
+    }
 }
 
 void age_dragon(unit * u)
 {
-  if (u->number > 0 && rng_int() % 100 < age_chance(u->age, WYRMAGE, 1)) {
-    double q = (double)u->hp / (double)(unit_max_hp(u) * u->number);
-    u_setrace(u, get_race(RC_WYRM));
-    u->irace = NULL;
-    u->hp = (int)(unit_max_hp(u) * u->number * q);
-  }
+    if (u->number > 0 && rng_int() % 100 < age_chance(u->age, WYRMAGE, 1)) {
+        double q = (double)u->hp / (double)(unit_max_hp(u) * u->number);
+        u_setrace(u, get_race(RC_WYRM));
+        u->irace = NULL;
+        u->hp = (int)(unit_max_hp(u) * u->number * q);
+    }
 }

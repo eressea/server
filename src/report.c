@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -375,11 +375,11 @@ static void nr_spell(FILE * F, spellbook_entry * sbe, const struct locale *lang)
             const char *vars;
         } starget;
         starget targets[] = {
-                { P_REGION, REGIONSPELL, NULL },
-                { P_UNIT, UNITSPELL, "par_unit" },
-                { P_SHIP, SHIPSPELL, "par_ship" },
-                { P_BUILDING, BUILDINGSPELL, "par_building" },
-                { 0, 0, NULL }
+            { P_REGION, REGIONSPELL, NULL },
+            { P_UNIT, UNITSPELL, "par_unit" },
+            { P_SHIP, SHIPSPELL, "par_ship" },
+            { P_BUILDING, BUILDINGSPELL, "par_building" },
+            { 0, 0, NULL }
         };
         starget *targetp;
         char cp = *params++;
@@ -634,10 +634,10 @@ int indent)
 
     for (; a; a = a->next) {
         char buf[4096];
+        message *msg;
 
         if (fval(a->type, ATF_CURSE)) {
             curse *c = (curse *)a->data.v;
-            message *msg;
 
             if (c->type->cansee) {
                 self = c->type->cansee(viewer, obj, typ, c, self);
@@ -654,13 +654,11 @@ int indent)
         else if (a->type == &at_effect && self) {
             effect_data *data = (effect_data *)a->data.v;
             if (data->value > 0) {
-                sprintf(buf, "Auf der Einheit lieg%s %d Wirkung%s %s.",
-                    (data->value == 1 ? "t" : "en"),
-                    data->value,
-                    (data->value == 1 ? "" : "en"),
-                    LOC(default_locale, resourcename(data->type->itype->rtype, 0)));
-                rnl(F);
+                msg = msg_message("nr_potion_effect", "potion left",
+                    data->type->itype->rtype, data->value);
+                nr_render(msg, viewer->locale, buf, sizeof(buf), viewer);
                 rparagraph(F, buf, indent, 2, 0);
+                msg_release(msg);
             }
         }
     }
@@ -826,40 +824,42 @@ static void prices(FILE * F, const region * r, const faction * f)
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
 
-        for (dmd = r->land->demands; dmd; dmd = dmd->next)
+        for (dmd = r->land->demands; dmd; dmd = dmd->next){
             if (dmd->value > 0) {
-            m = msg_message("nr_market_price", "product price",
-                dmd->type->itype->rtype, dmd->value * dmd->type->price);
-            bytes = (int)nr_render(m, f->locale, bufp, size, f);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
-            msg_release(m);
-            n--;
-            if (n == 0) {
-                bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_trade_end"), size);
+                m = msg_message("nr_market_price", "product price",
+                    dmd->type->itype->rtype, dmd->value * dmd->type->price);
+                bytes = (int)nr_render(m, f->locale, bufp, size, f);
                 if (wrptr(&bufp, &size, bytes) != 0)
                     WARN_STATIC_BUFFER();
+                msg_release(m);
+                n--;
+                if (n == 0) {
+                    bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_trade_end"),
+                        size);
+                    if (wrptr(&bufp, &size, bytes) != 0)
+                        WARN_STATIC_BUFFER();
+                } else if (n == 1) {
+                    bytes = (int)strlcpy(bufp, " ", size);
+                    if (wrptr(&bufp, &size, bytes) != 0)
+                        WARN_STATIC_BUFFER();
+                    bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_trade_final"),
+                        size);
+                    if (wrptr(&bufp, &size, bytes) != 0)
+                        WARN_STATIC_BUFFER();
+                    bytes = (int)strlcpy(bufp, " ", size);
+                    if (wrptr(&bufp, &size, bytes) != 0)
+                        WARN_STATIC_BUFFER();
+                } else {
+                    bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_trade_next"),
+                        size);
+                    if (wrptr(&bufp, &size, bytes) != 0)
+                        WARN_STATIC_BUFFER();
+                    bytes = (int)strlcpy(bufp, " ", size);
+                    if (wrptr(&bufp, &size, bytes) != 0)
+                        WARN_STATIC_BUFFER();
+                }
             }
-            else if (n == 1) {
-                bytes = (int)strlcpy(bufp, " ", size);
-                if (wrptr(&bufp, &size, bytes) != 0)
-                    WARN_STATIC_BUFFER();
-                bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_trade_final"), size);
-                if (wrptr(&bufp, &size, bytes) != 0)
-                    WARN_STATIC_BUFFER();
-                bytes = (int)strlcpy(bufp, " ", size);
-                if (wrptr(&bufp, &size, bytes) != 0)
-                    WARN_STATIC_BUFFER();
-            }
-            else {
-                bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_trade_next"), size);
-                if (wrptr(&bufp, &size, bytes) != 0)
-                    WARN_STATIC_BUFFER();
-                bytes = (int)strlcpy(bufp, " ", size);
-                if (wrptr(&bufp, &size, bytes) != 0)
-                    WARN_STATIC_BUFFER();
-            }
-            }
+        }
     }
     /* Schreibe Paragraphen */
     *bufp = 0;
@@ -1025,7 +1025,7 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
 
         if (r->land->ownership) {
             const char *str =
-                locale_string(f->locale, mkname("morale", itoa10(r->land->morale)));
+                LOC(f->locale, mkname("morale", itoa10(r->land->morale)));
             bytes = _snprintf(bufp, size, " %s", str);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
@@ -1099,9 +1099,12 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
 
     if (rule_region_owners()) {
         const faction *owner = region_get_owner(r);
+        message *msg;
+
         if (owner != NULL) {
-            bytes = _snprintf(bufp, size, " Die Region ist im Besitz von %s.",
-                factionname(owner));
+            msg = msg_message("nr_region_owner", "faction", owner);
+            bytes = (int)nr_render(msg, f->locale, bufp, size, f);
+            msg_release(msg);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
         }
@@ -1206,7 +1209,9 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
         if (rl) {
             bufp = buf;
             size = sizeof(buf) - 1;
-            bytes = (int)strlcpy(bufp, "Schemen der Regionen ", size);
+
+            // this localization might not work for every language but is fine for de and en
+            bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_schemes_prefix"), size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
             rl2 = rl;
@@ -1221,7 +1226,7 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
                         WARN_STATIC_BUFFER();
                 }
             }
-            bytes = (int)strlcpy(bufp, " sind erkennbar.", size);
+            bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_schemes_postfix"), size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
             free_regionlist(rl);
@@ -1248,17 +1253,20 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
         rnl(F);
     for (e = edges; e; e = e->next) {
         bool first = true;
+        message *msg;
+
         bufp = buf;
         size = sizeof(buf) - 1;
         for (d = 0; d != MAXDIRECTIONS; ++d) {
             if (!e->exist[d])
                 continue;
+            // this localization might not work for every language but is fine for de and en
             if (first)
-                bytes = (int)strlcpy(bufp, "Im ", size);
+                bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_borderlist_prefix"), size);
             else if (e->lastd == d)
-                bytes = (int)strlcpy(bufp, " und im ", size);
+                bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_borderlist_lastfix"), size);
             else
-                bytes = (int)strlcpy(bufp, ", im ", size);
+                bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_borderlist_infix"), size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
             bytes = (int)strlcpy(bufp, LOC(f->locale, directions[d]), size);
@@ -1266,21 +1274,14 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
                 WARN_STATIC_BUFFER();
             first = false;
         }
-        if (!e->transparent)
-            bytes = (int)strlcpy(bufp, " versperrt ", size);
-        else
-            bytes = (int)strlcpy(bufp, " befindet sich ", size);
+        // TODO name is localized? Works for roads anyway...
+        msg = msg_message("nr_borderlist_postfix", "transparent object",
+            e->transparent, e->name);
+        bytes = (int)nr_render(msg, f->locale, bufp, size, f);
+        msg_release(msg);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
-        bytes = (int)strlcpy(bufp, e->name, size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
-        if (!e->transparent)
-            bytes = (int)strlcpy(bufp, " die Sicht.", size);
-        else
-            bytes = (int)strlcpy(bufp, ".", size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
+
         *bufp = 0;
         rparagraph(F, buf, 0, 0, 0);
     }
@@ -1419,15 +1420,17 @@ static void durchreisende(FILE * F, const region * r, const faction * f)
                     ++counter;
                     if (u->ship != NULL) {
 #ifdef GERMAN_FLUFF_ENABLED
-                        if (counter == 1) {
-                            bytes = (int)strlcpy(bufp, "Die ", size);
-                        }
-                        else {
-                            bytes = (int)strlcpy(bufp, "die ", size);
-                        }
-                        if (wrptr(&bufp, &size, bytes) != 0) {
-                            WARN_STATIC_BUFFER();
-                            break;
+                        if (strcmp("de", f->locale->name)==0) {
+                            if (counter == 1) {
+                                bytes = (int)strlcpy(bufp, "Die ", size);
+                            }
+                            else {
+                                bytes = (int)strlcpy(bufp, "die ", size);
+                            }
+                            if (wrptr(&bufp, &size, bytes) != 0) {
+                                WARN_STATIC_BUFFER();
+                                break;
+                            }
                         }
 #endif
                         bytes = (int)strlcpy(bufp, shipname(u->ship), size);
@@ -1701,7 +1704,7 @@ show_allies(const faction * f, const ally * allies, char *buf, size_t size)
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
         if ((mode & HELP_ALL) == HELP_ALL) {
-            bytes = (int)strlcpy(bufp, locale_string(f->locale, parameters[P_ANY]), size);
+            bytes = (int)strlcpy(bufp, LOC(f->locale, parameters[P_ANY]), size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
         }
@@ -1736,7 +1739,7 @@ show_allies(const faction * f, const ally * allies, char *buf, size_t size)
                         if (wrptr(&bufp, &size, bytes) != 0)
                             WARN_STATIC_BUFFER();
                     }
-                    bytes = (int)strlcpy(bufp, locale_string(f->locale, parameters[p]), size);
+                    bytes = (int)strlcpy(bufp, LOC(f->locale, parameters[p]), size);
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
                     hh = 1;
@@ -1826,7 +1829,7 @@ static void guards(FILE * F, const region * r, const faction * see)
         size_t size = sizeof(buf) - 1;
         int bytes;
 
-        bytes = (int)strlcpy(bufp, "Die Region wird von ", size);
+        bytes = (int)strlcpy(bufp, LOC(see->locale, "nr_guarding_prefix"), size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
 
@@ -1845,12 +1848,12 @@ static void guards(FILE * F, const region * r, const faction * see)
                 bytes = (int)strlcpy(bufp, factionname(guardians[i]), size);
             }
             else {
-                bytes = (int)strlcpy(bufp, "unbekannten Einheiten", size);
+                bytes = (int)strlcpy(bufp, LOC(see->locale, "nr_guarding_unknown"), size);
             }
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
         }
-        bytes = (int)strlcpy(bufp, " bewacht.", size);
+        bytes = (int)strlcpy(bufp, LOC(see->locale, "nr_guarding_postfix"), size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
         rnl(F);
@@ -1983,6 +1986,7 @@ const faction * f)
     const char *name, *bname, *billusion = NULL;
     const struct locale *lang = NULL;
     char buffer[8192], *bufp = buffer;
+    message *msg;
     size_t size = sizeof(buffer) - 1;
 
     rnl(F);
@@ -2013,26 +2017,18 @@ const faction * f)
     }
 
     if (b->size < b->type->maxsize) {
-        bytes = (int)strlcpy(bufp, " (im Bau)", size);
+        bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_building_inprogress"), size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
     }
 
     if (b->besieged > 0 && sr->mode >= see_lighthouse) {
-        bytes = (int)strlcpy(bufp, ", belagert von ", size);
+        msg = msg_message("nr_building_besieged", "soldiers diff", b->besieged,
+            b->besieged - b->size * SIEGEFACTOR);
+        bytes = (int)nr_render(msg, f->locale, bufp, size, f);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
-        bytes = (int)strlcpy(bufp, itoa10(b->besieged), size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
-        bytes = (int)strlcpy(bufp, " Personen ", size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
-        if (b->besieged >= b->size * SIEGEFACTOR) {
-            bytes = (int)strlcpy(bufp, "(abgeschnitten)", size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
-        }
+        msg_release(msg);
     }
     i = 0;
     if (b->display && b->display[0]) {
@@ -2229,254 +2225,255 @@ const char *charset)
       }
   }
 
-    if (f->items != NULL) {
-        message *msg = msg_message("nr_claims", "items", f->items);
-        nr_render(msg, f->locale, buf, sizeof(buf), f);
-        msg_release(msg);
-        rnl(F);
-        centre(F, buf, true);
-    }
+  if (f->items != NULL) {
+      message *msg = msg_message("nr_claims", "items", f->items);
+      nr_render(msg, f->locale, buf, sizeof(buf), f);
+      msg_release(msg);
+      rnl(F);
+      centre(F, buf, true);
+  }
 
-    /* Insekten-Winter-Warnung */
-    if (f->race == get_race(RC_INSECT)) {
-        if (thisseason == 0) {
-            centre(F, LOC(f->locale, "nr_insectwinter"), true);
-            rnl(F);
-        }
-        else {
-            if (nextseason == 0) {
-                centre(F, LOC(f->locale, "nr_insectfall"), true);
-                rnl(F);
-            }
-        }
-    }
+  /* Insekten-Winter-Warnung */
+  if (f->race == get_race(RC_INSECT)) {
+      if (thisseason == 0) {
+          centre(F, LOC(f->locale, "nr_insectwinter"), true);
+          rnl(F);
+      }
+      else {
+          if (nextseason == 0) {
+              centre(F, LOC(f->locale, "nr_insectfall"), true);
+              rnl(F);
+          }
+      }
+  }
 
-    bufp = buf;
-    size = sizeof(buf) - 1;
-    bytes = _snprintf(buf, size, "%s:", LOC(f->locale, "nr_options"));
-    if (wrptr(&bufp, &size, bytes) != 0)
-        WARN_STATIC_BUFFER();
-    for (op = 0; op != MAXOPTIONS; op++) {
-        if (f->options & want(op) && options[op]) {
-            bytes = (int)strlcpy(bufp, " ", size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
-            bytes = (int)strlcpy(bufp, LOC(f->locale, options[op]), size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
+  bufp = buf;
+  size = sizeof(buf) - 1;
+  bytes = _snprintf(buf, size, "%s:", LOC(f->locale, "nr_options"));
+  if (wrptr(&bufp, &size, bytes) != 0)
+      WARN_STATIC_BUFFER();
+  for (op = 0; op != MAXOPTIONS; op++) {
+      if (f->options & want(op) && options[op]) {
+          bytes = (int)strlcpy(bufp, " ", size);
+          if (wrptr(&bufp, &size, bytes) != 0)
+              WARN_STATIC_BUFFER();
+          bytes = (int)strlcpy(bufp, LOC(f->locale, options[op]), size);
+          if (wrptr(&bufp, &size, bytes) != 0)
+              WARN_STATIC_BUFFER();
 
-            flag++;
-        }
-    }
-    if (flag > 0) {
-        rnl(F);
-        *bufp = 0;
-        centre(F, buf, true);
-    }
+          flag++;
+      }
+  }
+  if (flag > 0) {
+      rnl(F);
+      *bufp = 0;
+      centre(F, buf, true);
+  }
 
-    rp_messages(F, f->msgs, f, 0, true);
-    rp_battles(F, f);
-    a = a_find(f->attribs, &at_reportspell);
-    if (a) {
-        rnl(F);
-        centre(F, LOC(f->locale, "section_newspells"), true);
-        while (a && a->type == &at_reportspell) {
-            spellbook_entry *sbe = (spellbook_entry *)a->data.v;
-            nr_spell(F, sbe, f->locale);
-            a = a->next;
-        }
-    }
+  rp_messages(F, f->msgs, f, 0, true);
+  rp_battles(F, f);
+  a = a_find(f->attribs, &at_reportspell);
+  if (a) {
+      rnl(F);
+      centre(F, LOC(f->locale, "section_newspells"), true);
+      while (a && a->type == &at_reportspell) {
+          spellbook_entry *sbe = (spellbook_entry *)a->data.v;
+          nr_spell(F, sbe, f->locale);
+          a = a->next;
+      }
+  }
 
-    ch = 0;
-    for (a = a_find(f->attribs, &at_showitem); a && a->type == &at_showitem;
-        a = a->next) {
-        const potion_type *ptype =
-            resource2potion(((const item_type *)a->data.v)->rtype);
-        const char *description = NULL;
-        if (ptype != NULL) {
-            const char *pname = resourcename(ptype->itype->rtype, 0);
+  ch = 0;
+  for (a = a_find(f->attribs, &at_showitem); a && a->type == &at_showitem;
+      a = a->next) {
+      const potion_type *ptype =
+          resource2potion(((const item_type *)a->data.v)->rtype);
+      const char *description = NULL;
+      if (ptype != NULL) {
+          const char *pname = resourcename(ptype->itype->rtype, 0);
 
-            if (ch == 0) {
-                rnl(F);
-                centre(F, LOC(f->locale, "section_newpotions"), true);
-                ch = 1;
-            }
+          if (ch == 0) {
+              rnl(F);
+              centre(F, LOC(f->locale, "section_newpotions"), true);
+              ch = 1;
+          }
 
-            rnl(F);
-            centre(F, LOC(f->locale, pname), true);
-            _snprintf(buf, sizeof(buf), "%s %d", LOC(f->locale, "nr_level"),
-                ptype->level);
-            centre(F, buf, true);
-            rnl(F);
+          rnl(F);
+          centre(F, LOC(f->locale, pname), true);
+          _snprintf(buf, sizeof(buf), "%s %d", LOC(f->locale, "nr_level"),
+              ptype->level);
+          centre(F, buf, true);
+          rnl(F);
 
-            bufp = buf;
-            size = sizeof(buf) - 1;
-            bytes = _snprintf(bufp, size, "%s: ", LOC(f->locale, "nr_herbsrequired"));
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
+          bufp = buf;
+          size = sizeof(buf) - 1;
+          bytes = _snprintf(bufp, size, "%s: ", LOC(f->locale, "nr_herbsrequired"));
+          if (wrptr(&bufp, &size, bytes) != 0)
+              WARN_STATIC_BUFFER();
 
-            if (ptype->itype->construction) {
-                requirement *m = ptype->itype->construction->materials;
-                while (m->number) {
-                    bytes =
-                        (int)strlcpy(bufp, LOC(f->locale, resourcename(m->rtype, 0)), size);
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
-                    ++m;
-                    if (m->number)
-                        bytes = (int)strlcpy(bufp, ", ", size);
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
-                }
-            }
-            *bufp = 0;
-            centre(F, buf, true);
-            rnl(F);
-            if (description == NULL) {
-                const char *potiontext = mkname("potion", pname);
-                description = LOC(f->locale, potiontext);
-            }
-            centre(F, description, true);
-        }
-    }
-    rnl(F);
-    centre(F, LOC(f->locale, "nr_alliances"), false);
-    rnl(F);
+          if (ptype->itype->construction) {
+              requirement *m = ptype->itype->construction->materials;
+              while (m->number) {
+                  bytes =
+                      (int)strlcpy(bufp, LOC(f->locale, resourcename(m->rtype, 0)), size);
+                  if (wrptr(&bufp, &size, bytes) != 0)
+                      WARN_STATIC_BUFFER();
+                  ++m;
+                  if (m->number)
+                      bytes = (int)strlcpy(bufp, ", ", size);
+                  if (wrptr(&bufp, &size, bytes) != 0)
+                      WARN_STATIC_BUFFER();
+              }
+          }
+          *bufp = 0;
+          centre(F, buf, true);
+          rnl(F);
+          if (description == NULL) {
+              const char *potiontext = mkname("potion", pname);
+              description = LOC(f->locale, potiontext);
+          }
+          centre(F, description, true);
+      }
+  }
+  rnl(F);
+  centre(F, LOC(f->locale, "nr_alliances"), false);
+  rnl(F);
 
-    allies(F, f);
+  allies(F, f);
 
-    rpline(F);
+  rpline(F);
 
-    anyunits = 0;
+  anyunits = 0;
 
-    for (r = ctx->first; sr == NULL && r != ctx->last; r = r->next) {
-        sr = find_seen(ctx->seen, r);
-    }
-    for (; sr != NULL; sr = sr->next) {
-        region *r = sr->r;
-        int stealthmod = stealth_modifier(sr->mode);
-        building *b = r->buildings;
-        ship *sh = r->ships;
+  for (r = ctx->first; sr == NULL && r != ctx->last; r = r->next) {
+      sr = find_seen(ctx->seen, r);
+  }
+  for (; sr != NULL; sr = sr->next) {
+      region *r = sr->r;
+      int stealthmod = stealth_modifier(sr->mode);
+      building *b = r->buildings;
+      ship *sh = r->ships;
 
-        if (sr->mode < see_lighthouse)
-            continue;
-        /* Beschreibung */
+      if (sr->mode < see_lighthouse)
+          continue;
+      /* Beschreibung */
 
-        if (sr->mode == see_unit) {
-            anyunits = 1;
-            describe(F, sr, f);
-            if (markets_module() && r->land) {
-                const item_type *lux = r_luxury(r);
-                const item_type *herb = r->land->herbtype;
-                message *m = 0;
-                if (herb && lux) {
-                    m = msg_message("nr_market_info_p", "p1 p2",
-                        lux ? lux->rtype : 0, herb ? herb->rtype : 0);
-                }
-                else if (lux || herb) {
-                    m = msg_message("nr_market_info_s", "p1",
-                        lux ? lux->rtype : herb->rtype);
-                }
-                if (m) {
-                    rnl(F);
-                    nr_paragraph(F, m, f);
-                }
-                /*  */
-            }
-            else {
-                if (!fval(r->terrain, SEA_REGION) && rpeasants(r) / TRADE_FRACTION > 0) {
-                    rnl(F);
-                    prices(F, r, f);
-                }
-            }
-            guards(F, r, f);
-            durchreisende(F, r, f);
-        }
-        else {
-            if (sr->mode == see_far) {
-                describe(F, sr, f);
-                guards(F, r, f);
-                durchreisende(F, r, f);
-            }
-            else if (sr->mode == see_lighthouse) {
-                describe(F, sr, f);
-                durchreisende(F, r, f);
-            }
-            else {
-                describe(F, sr, f);
-                durchreisende(F, r, f);
-            }
-        }
-        /* Statistik */
+      if (sr->mode == see_unit) {
+          anyunits = 1;
+          describe(F, sr, f);
+          if (markets_module() && r->land) {
+              const item_type *lux = r_luxury(r);
+              const item_type *herb = r->land->herbtype;
+              message *m = 0;
+              if (herb && lux) {
+                  m = msg_message("nr_market_info_p", "p1 p2",
+                      lux ? lux->rtype : 0, herb ? herb->rtype : 0);
+              }
+              else if (lux || herb) {
+                  m = msg_message("nr_market_info_s", "p1",
+                      lux ? lux->rtype : herb->rtype);
+              }
+              if (m) {
+                  rnl(F);
+                  nr_paragraph(F, m, f);
+              }
+              /*  */
+          }
+          else {
+              if (!fval(r->terrain, SEA_REGION) && rpeasants(r) / TRADE_FRACTION > 0) {
+                  rnl(F);
+                  prices(F, r, f);
+              }
+          }
+          guards(F, r, f);
+          durchreisende(F, r, f);
+      }
+      else {
+          if (sr->mode == see_far) {
+              describe(F, sr, f);
+              guards(F, r, f);
+              durchreisende(F, r, f);
+          }
+          else if (sr->mode == see_lighthouse) {
+              describe(F, sr, f);
+              durchreisende(F, r, f);
+          }
+          else {
+              describe(F, sr, f);
+              durchreisende(F, r, f);
+          }
+      }
+      /* Statistik */
 
-        if (wants_stats && sr->mode == see_unit)
-            statistics(F, r, f);
+      if (wants_stats && sr->mode == see_unit)
+          statistics(F, r, f);
 
-        /* Nachrichten an REGION in der Region */
+      /* Nachrichten an REGION in der Region */
 
-        if (sr->mode == see_unit || sr->mode == see_travel) {
-            message_list *mlist = r_getmessages(r, f);
-            rp_messages(F, r->msgs, f, 0, true);
-            if (mlist)
-                rp_messages(F, mlist, f, 0, true);
-        }
+      if (sr->mode == see_unit || sr->mode == see_travel) {
+          // TODO: Bug 2073
+          message_list *mlist = r_getmessages(r, f);
+          rp_messages(F, r->msgs, f, 0, true);
+          if (mlist)
+              rp_messages(F, mlist, f, 0, true);
+      }
 
-        /* report all units. they are pre-sorted in an efficient manner */
-        u = r->units;
-        while (b) {
-            while (b && (!u || u->building != b)) {
-                nr_building(F, sr, b, f);
-                b = b->next;
-            }
-            if (b) {
-                nr_building(F, sr, b, f);
-                while (u && u->building == b) {
-                    nr_unit(F, f, u, 6, sr->mode);
-                    u = u->next;
-                }
-                b = b->next;
-            }
-        }
-        while (u && !u->ship) {
-            if (stealthmod > INT_MIN) {
-                if (u->faction == f || cansee(f, r, u, stealthmod)) {
-                    nr_unit(F, f, u, 4, sr->mode);
-                }
-            }
-            assert(!u->building);
-            u = u->next;
-        }
-        while (sh) {
-            while (sh && (!u || u->ship != sh)) {
-                nr_ship(F, sr, sh, f, NULL);
-                sh = sh->next;
-            }
-            if (sh) {
-                nr_ship(F, sr, sh, f, u);
-                while (u && u->ship == sh) {
-                    nr_unit(F, f, u, 6, sr->mode);
-                    u = u->next;
-                }
-                sh = sh->next;
-            }
-        }
+      /* report all units. they are pre-sorted in an efficient manner */
+      u = r->units;
+      while (b) {
+          while (b && (!u || u->building != b)) {
+              nr_building(F, sr, b, f);
+              b = b->next;
+          }
+          if (b) {
+              nr_building(F, sr, b, f);
+              while (u && u->building == b) {
+                  nr_unit(F, f, u, 6, sr->mode);
+                  u = u->next;
+              }
+              b = b->next;
+          }
+      }
+      while (u && !u->ship) {
+          if (stealthmod > INT_MIN) {
+              if (u->faction == f || cansee(f, r, u, stealthmod)) {
+                  nr_unit(F, f, u, 4, sr->mode);
+              }
+          }
+          assert(!u->building);
+          u = u->next;
+      }
+      while (sh) {
+          while (sh && (!u || u->ship != sh)) {
+              nr_ship(F, sr, sh, f, NULL);
+              sh = sh->next;
+          }
+          if (sh) {
+              nr_ship(F, sr, sh, f, u);
+              while (u && u->ship == sh) {
+                  nr_unit(F, f, u, 6, sr->mode);
+                  u = u->next;
+              }
+              sh = sh->next;
+          }
+      }
 
-        assert(!u);
+      assert(!u);
 
-        rnl(F);
-        rpline(F);
-    }
-    if (!is_monsters(f)) {
-        if (!anyunits) {
-            rnl(F);
-            rparagraph(F, LOC(f->locale, "nr_youaredead"), 0, 2, 0);
-        }
-        else {
-            list_address(F, f, ctx->addresses);
-        }
-    }
-    fclose(F);
-    return 0;
+      rnl(F);
+      rpline(F);
+  }
+  if (!is_monsters(f)) {
+      if (!anyunits) {
+          rnl(F);
+          rparagraph(F, LOC(f->locale, "nr_youaredead"), 0, 2, 0);
+      }
+      else {
+          list_address(F, f, ctx->addresses);
+      }
+  }
+  fclose(F);
+  return 0;
 }
 
 void base36conversion(void)
@@ -2571,20 +2568,20 @@ static void update_find(void)
 
     if (initial)
         for (r = regions; r; r = r->next) {
-        unit *u;
-        for (u = r->units; u; u = u->next) {
-            faction *lastf = u->faction;
-            unit *u2;
-            for (u2 = r->units; u2; u2 = u2->next) {
-                if (u2->faction == lastf || u2->faction == u->faction)
-                    continue;
-                if (seefaction(u->faction, r, u2, 0)) {
-                    faction *fv = visible_faction(u->faction, u2);
-                    lastf = fv;
-                    add_find(u->faction, u2, fv);
+            unit *u;
+            for (u = r->units; u; u = u->next) {
+                faction *lastf = u->faction;
+                unit *u2;
+                for (u2 = r->units; u2; u2 = u2->next) {
+                    if (u2->faction == lastf || u2->faction == u->faction)
+                        continue;
+                    if (seefaction(u->faction, r, u2, 0)) {
+                        faction *fv = visible_faction(u->faction, u2);
+                        lastf = fv;
+                        add_find(u->faction, u2, fv);
+                    }
                 }
             }
-        }
         }
     initial = false;
 }

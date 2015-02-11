@@ -1,7 +1,7 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -32,32 +32,32 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 static void
 write_targetregion(const attrib * a, const void *owner, struct storage *store)
 {
-  write_region_reference((region *) a->data.v, store);
+    write_region_reference((region *)a->data.v, store);
 }
 
 static int read_targetregion(attrib * a, void *owner, struct storage *store)
 {
-  int result =
-    read_reference(&a->data.v, store, read_region_reference,
-    RESOLVE_REGION(global.data_version));
-  if (result == 0 && !a->data.v)
-    return AT_READ_FAIL;
-  return AT_READ_OK;
+    int result =
+        read_reference(&a->data.v, store, read_region_reference,
+        RESOLVE_REGION(global.data_version));
+    if (result == 0 && !a->data.v)
+        return AT_READ_FAIL;
+    return AT_READ_OK;
 }
 
 attrib_type at_targetregion = {
-  "targetregion",
-  NULL,
-  NULL,
-  NULL,
-  write_targetregion,
-  read_targetregion,
-  ATF_UNIQUE
+    "targetregion",
+    NULL,
+    NULL,
+    NULL,
+    write_targetregion,
+    read_targetregion,
+    ATF_UNIQUE
 };
 
 attrib *make_targetregion(struct region * r)
 {
-  attrib *a = a_new(&at_targetregion);
-  a->data.v = r;
-  return a;
+    attrib *a = a_new(&at_targetregion);
+    a->data.v = r;
+    return a;
 }

@@ -1,7 +1,7 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -47,83 +47,84 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  **/
 
 typedef struct createunit_data {
-  struct region *r;
-  struct faction *f;
-  const struct race *race;
-  int number;
+    struct region *r;
+    struct faction *f;
+    const struct race *race;
+    int number;
 } createunit_data;
 
 static void createunit_init(trigger * t)
 {
-  t->data.v = calloc(sizeof(createunit_data), 1);
+    t->data.v = calloc(sizeof(createunit_data), 1);
 }
 
 static void createunit_free(trigger * t)
 {
-  free(t->data.v);
+    free(t->data.v);
 }
 
 static int createunit_handle(trigger * t, void *data)
 {
-  /* call an event handler on createunit.
-   * data.v -> ( variant event, int timer )
-   */
-  createunit_data *td = (createunit_data *) t->data.v;
-  if (td->r != NULL && td->f != NULL) {
-    create_unit(td->r, td->f, td->number, td->race, 0, NULL, NULL);
-  } else {
-    log_error("could not perform createunit::handle()\n");
-  }
-  unused_arg(data);
-  return 0;
+    /* call an event handler on createunit.
+     * data.v -> ( variant event, int timer )
+     */
+    createunit_data *td = (createunit_data *)t->data.v;
+    if (td->r != NULL && td->f != NULL) {
+        create_unit(td->r, td->f, td->number, td->race, 0, NULL, NULL);
+    }
+    else {
+        log_error("could not perform createunit::handle()\n");
+    }
+    unused_arg(data);
+    return 0;
 }
 
 static void createunit_write(const trigger * t, struct storage *store)
 {
-  createunit_data *td = (createunit_data *) t->data.v;
-  write_faction_reference(td->f, store);
-  write_region_reference(td->r, store);
-  write_race_reference(td->race, store);
-  WRITE_INT(store, td->number);
+    createunit_data *td = (createunit_data *)t->data.v;
+    write_faction_reference(td->f, store);
+    write_region_reference(td->r, store);
+    write_race_reference(td->race, store);
+    WRITE_INT(store, td->number);
 }
 
 static int createunit_read(trigger * t, struct storage *store)
 {
-  createunit_data *td = (createunit_data *) t->data.v;
+    createunit_data *td = (createunit_data *)t->data.v;
 
-  int uc =
-    read_reference(&td->f, store, read_faction_reference, resolve_faction);
-  int rc =
-    read_reference(&td->r, store, read_region_reference,
-    RESOLVE_REGION(global.data_version));
-  td->race = (const struct race *)read_race_reference(store).v;
+    int uc =
+        read_reference(&td->f, store, read_faction_reference, resolve_faction);
+    int rc =
+        read_reference(&td->r, store, read_region_reference,
+        RESOLVE_REGION(global.data_version));
+    td->race = (const struct race *)read_race_reference(store).v;
 
-  if (uc == 0 && rc == 0) {
-    if (!td->f || !td->r)
-      return AT_READ_FAIL;
-  }
-  READ_INT(store, &td->number);
+    if (uc == 0 && rc == 0) {
+        if (!td->f || !td->r)
+            return AT_READ_FAIL;
+    }
+    READ_INT(store, &td->number);
 
-  return AT_READ_OK;
+    return AT_READ_OK;
 }
 
 trigger_type tt_createunit = {
-  "createunit",
-  createunit_init,
-  createunit_free,
-  createunit_handle,
-  createunit_write,
-  createunit_read
+    "createunit",
+    createunit_init,
+    createunit_free,
+    createunit_handle,
+    createunit_write,
+    createunit_read
 };
 
 trigger *trigger_createunit(region * r, struct faction * f,
-  const struct race * rc, int number)
+    const struct race * rc, int number)
 {
-  trigger *t = t_new(&tt_createunit);
-  createunit_data *td = (createunit_data *) t->data.v;
-  td->r = r;
-  td->f = f;
-  td->race = rc;
-  td->number = number;
-  return t;
+    trigger *t = t_new(&tt_createunit);
+    createunit_data *td = (createunit_data *)t->data.v;
+    td->r = r;
+    td->f = f;
+    td->race = rc;
+    td->number = number;
+    return t;
 }

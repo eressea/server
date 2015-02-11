@@ -170,22 +170,6 @@ attrib_type at_shiptrail = {
     shiptrail_read
 };
 
-static int age_speedup(attrib * a)
-{
-    if (a->data.sa[0] > 0) {
-        a->data.sa[0] = a->data.sa[0] - a->data.sa[1];
-    }
-    return (a->data.sa[0] > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
-}
-
-attrib_type at_speedup = {
-    "speedup",
-    NULL, NULL,
-    age_speedup,
-    a_writeint,
-    a_readint
-};
-
 /* ------------------------------------------------------------- */
 
 static attrib_type at_driveweight = {
@@ -426,7 +410,7 @@ static int canride(unit * u)
     const item_type *it_horse, *it_elvenhorse, *it_charger;
     const resource_type *rtype;
 
-    it_horse = ((rtype = get_resourcetype(R_HORSE))!=NULL) ? rtype->itype : 0;
+    it_horse = ((rtype = get_resourcetype(R_HORSE)) != NULL) ? rtype->itype : 0;
     it_elvenhorse = ((rtype = get_resourcetype(R_UNICORN)) != NULL) ? rtype->itype : 0;
     it_charger = ((rtype = get_resourcetype(R_CHARGER)) != NULL) ? rtype->itype : 0;
 
@@ -923,7 +907,7 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
                 guard_count += u->number;
                 double prob_u = (sk - stealth) * skill_prob;
                 /* amulet counts at most once */
-                prob_u += _min (1, _min(u->number, i_get(u->items, ramulet->itype))) * amulet_prob;
+                prob_u += _min(1, _min(u->number, i_get(u->items, ramulet->itype))) * amulet_prob;
                 if (u->building && (u->building->type == bt_find("castle")) && u == building_owner(u->building))
                     prob_u += castle_prob*buildingeffsize(u->building, 0);
                 if (prob_u >= prob) {
@@ -937,9 +921,9 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
         prob += base_prob;          /* 30% base chance */
         prob = +guard_count*guard_number_prob;
         if (r->terrain == newterrain(T_GLACIER))
-            prob = +region_type_prob*2;
+            prob = +region_type_prob * 2;
         if (r->terrain == newterrain(T_SWAMP))
-            prob = +region_type_prob*2;
+            prob = +region_type_prob * 2;
         if (r->terrain == newterrain(T_MOUNTAIN))
             prob = +region_type_prob;
         if (r->terrain == newterrain(T_VOLCANO))
@@ -951,7 +935,7 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
             return guard;
         }
     }
-  return NULL;
+    return NULL;
 }
 
 static bool is_guardian_u(const unit * guard, unit * u, unsigned int mask)
@@ -1156,7 +1140,7 @@ static void cycle_route(order * ord, unit * u, int gereist)
     int bytes, cm = 0;
     char tail[1024], *bufp = tail;
     char neworder[2048];
-    const char *token;
+    char token[128];
     direction_t d = NODIRECTION;
     bool paused = false;
     bool pause;
@@ -1171,11 +1155,12 @@ static void cycle_route(order * ord, unit * u, int gereist)
 
     neworder[0] = 0;
     for (cm = 0;; ++cm) {
+        const char *s;
         const struct locale *lang = u->faction->locale;
         pause = false;
-        token = getstrtoken();
-        if (token && *token) {
-            d = get_direction(token, lang);
+        s = gettoken(token, sizeof(token));
+        if (s && *s) {
+            d = get_direction(s, lang);
             if (d == D_PAUSE) {
                 pause = true;
             }
@@ -1320,8 +1305,8 @@ static void init_transportation(void)
                                 break;
                             }
                             if (getkeyword(ut->thisorder) == K_DRIVE &&
-                                    can_move(ut) && !fval(ut, UFL_NOTMOVING) &&
-                                    !LongHunger(ut)) {
+                                can_move(ut) && !fval(ut, UFL_NOTMOVING) &&
+                                !LongHunger(ut)) {
                                 unit *u2;
                                 init_order(ut->thisorder);
                                 getunit(r, ut->faction, &u2);
@@ -1448,11 +1433,12 @@ static void make_route(unit * u, order * ord, region_list ** routep)
     region_list **iroute = routep;
     region *current = u->region;
     region *next = NULL;
-    const char *token = getstrtoken();
-    int error = movewhere(u, token, current, &next);
+    char token[128];
+    const char *s = gettoken(token, sizeof(token));
+    int error = movewhere(u, s, current, &next);
 
     if (error != E_MOVE_OK) {
-        message *msg = movement_error(u, token, ord, error);
+        message *msg = movement_error(u, s, ord, error);
         if (msg != NULL) {
             add_message(&u->faction->msgs, msg);
             msg_release(msg);
@@ -1471,10 +1457,10 @@ static void make_route(unit * u, order * ord, region_list ** routep)
         iroute = &(*iroute)->next;
 
         current = next;
-        token = getstrtoken();
-        error = movewhere(u, token, current, &next);
+        s = gettoken(token, sizeof(token));
+        error = movewhere(u, s, current, &next);
         if (error) {
-            message *msg = movement_error(u, token, ord, error);
+            message *msg = movement_error(u, s, ord, error);
             if (msg != NULL) {
                 add_message(&u->faction->msgs, msg);
                 msg_release(msg);
@@ -2615,7 +2601,7 @@ static int hunt(unit * u, order * ord)
     /* In command steht jetzt das NACH-Kommando. */
 
     /* NACH ignorieren und Parsing initialisieren. */
-    init_tokens_str(command, NULL);
+    init_tokens_str(command);
     getstrtoken();
     /* NACH ausführen */
     move(u, false);

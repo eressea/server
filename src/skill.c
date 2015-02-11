@@ -11,35 +11,35 @@
 #include <assert.h>
 
 const char *skillnames[MAXSKILLS] = {
-  "alchemy",
-  "crossbow",
-  "mining",
-  "bow",
-  "building",
-  "trade",
-  "forestry",
-  "catapult",
-  "herbalism",
-  "magic",
-  "training",
-  "riding",
-  "armorer",
-  "shipcraft",
-  "melee",
-  "sailing",
-  "polearm",
-  "espionage",
-  "quarrying",
-  "roadwork",
-  "tactics",
-  "stealth",
-  "entertainment",
-  "weaponsmithing",
-  "cartmaking",
-  "perception",
-  "taxation",
-  "stamina",
-  "unarmed"
+    "alchemy",
+    "crossbow",
+    "mining",
+    "bow",
+    "building",
+    "trade",
+    "forestry",
+    "catapult",
+    "herbalism",
+    "magic",
+    "training",
+    "riding",
+    "armorer",
+    "shipcraft",
+    "melee",
+    "sailing",
+    "polearm",
+    "espionage",
+    "quarrying",
+    "roadwork",
+    "tactics",
+    "stealth",
+    "entertainment",
+    "weaponsmithing",
+    "cartmaking",
+    "perception",
+    "taxation",
+    "stamina",
+    "unarmed"
 };
 
 bool skill_disabled[MAXSKILLS];
@@ -49,7 +49,7 @@ bool skill_enabled(skill_t sk) {
 }
 
 static const char * skill_key(int sk) {
-    assert(sk<MAXPARAMS && sk>=0);
+    assert(sk < MAXPARAMS && sk >= 0);
     return skill_disabled[sk] ? 0 : mkname("skill", skillnames[sk]);
 }
 
@@ -66,7 +66,7 @@ void init_skills(const struct locale *lang) {
 const char *skillname(skill_t sk, const struct locale *lang)
 {
     if (skill_disabled[sk]) return 0;
-    return locale_string(lang, mkname("skill", skillnames[sk]));
+    return LOC(lang, mkname("skill", skillnames[sk]));
 
 }
 
@@ -92,7 +92,7 @@ skill_t get_skill(const char *s, const struct locale * lang)
 {
     skill_t result = NOSKILL;
     char buffer[64];
-    
+
     if (s) {
         char * str = transliterate(buffer, sizeof(buffer) - sizeof(int), s);
         if (str) {

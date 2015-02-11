@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -79,7 +79,7 @@ const char *itoab(int i, int base)
             i = -i;
             neg = 1;
         }
-        while (i && dst>=s) {
+        while (i && dst >= s) {
             int x = i % base;
             i = i / base;
             if (x < 10) {
@@ -87,7 +87,7 @@ const char *itoab(int i, int base)
             }
             else if ('a' + x - 10 == 'l') {
                 *(dst--) = 'L';
-            } 
+            }
             else {
                 *(dst--) = (char)('a' + (x - 10));
             }

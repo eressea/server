@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -26,10 +26,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "alliance.h"
 #include "ally.h"
 #include "alchemy.h"
+#include "curse.h"
 #include "connection.h"
 #include "building.h"
 #include "calendar.h"
-#include "curse.h"
 #include "direction.h"
 #include "faction.h"
 #include "group.h"
@@ -144,7 +144,7 @@ bool ExpensiveMigrants(void)
         gamecookie = global.cookie;
         value = get_param_int(global.parameters, "study.expensivemigrants", 0);
     }
-    return value;
+    return value != 0;
 }
 
 /** Specifies automatic alliance modes.
@@ -275,23 +275,23 @@ race_t old_race(const struct race * rc)
 }
 
 helpmode helpmodes[] = {
-        { "all", HELP_ALL }
-        ,
-        { "money", HELP_MONEY }
-        ,
-        { "fight", HELP_FIGHT }
-        ,
-        { "observe", HELP_OBSERVE }
-        ,
-        { "give", HELP_GIVE }
-        ,
-        { "guard", HELP_GUARD }
-        ,
-        { "stealth", HELP_FSTEALTH }
-        ,
-        { "travel", HELP_TRAVEL }
-        ,
-        { NULL, 0 }
+    { "all", HELP_ALL }
+    ,
+    { "money", HELP_MONEY }
+    ,
+    { "fight", HELP_FIGHT }
+    ,
+    { "observe", HELP_OBSERVE }
+    ,
+    { "give", HELP_GIVE }
+    ,
+    { "guard", HELP_GUARD }
+    ,
+    { "stealth", HELP_FSTEALTH }
+    ,
+    { "travel", HELP_TRAVEL }
+    ,
+    { NULL, 0 }
 };
 
 /** Returns the English name of the race, which is what the database uses.
@@ -442,116 +442,7 @@ int verbosity = 1;
 
 FILE *debug;
 
-static int ShipSpeedBonus(const unit * u)
-{
-    static int level = -1;
-    if (level == -1) {
-        level =
-            get_param_int(global.parameters, "movement.shipspeed.skillbonus", 0);
-    }
-    if (level > 0) {
-        ship *sh = u->ship;
-        int skl = effskill(u, SK_SAILING);
-        int minsk = (sh->type->cptskill + 1) / 2;
-        return (skl - minsk) / level;
-    }
-    return 0;
-}
-
-int shipspeed(const ship * sh, const unit * u)
-{
-    double k = sh->type->range;
-    static const curse_type *stormwind_ct, *nodrift_ct;
-    static bool init;
-    attrib *a;
-    curse *c;
-
-    if (!init) {
-        init = true;
-        stormwind_ct = ct_find("stormwind");
-        nodrift_ct = ct_find("nodrift");
-    }
-
-    assert(u->ship == sh);
-    assert(sh->type->construction->improvement == NULL);  /* sonst ist construction::size nicht ship_type::maxsize */
-    if (sh->size != sh->type->construction->maxsize)
-        return 0;
-
-    if (curse_active(get_curse(sh->attribs, stormwind_ct)))
-        k *= 2;
-    if (curse_active(get_curse(sh->attribs, nodrift_ct)))
-        k += 1;
-
-    if (u->faction->race == u_race(u)) {
-        /* race bonus for this faction? */
-        if (fval(u_race(u), RCF_SHIPSPEED)) {
-            k += 1;
-        }
-    }
-
-    k += ShipSpeedBonus(u);
-
-    a = a_find(sh->attribs, &at_speedup);
-    while (a != NULL && a->type == &at_speedup) {
-        k += a->data.sa[0];
-        a = a->next;
-    }
-
-    c = get_curse(sh->attribs, ct_find("shipspeedup"));
-    while (c) {
-        k += curse_geteffect(c);
-        c = c->nexthash;
-    }
-
-#ifdef SHIPSPEED
-    k *= SHIPSPEED;
-#endif
-
-    if (sh->damage)
-        k =
-        (k * (sh->size * DAMAGE_SCALE - sh->damage) + sh->size * DAMAGE_SCALE -
-        1) / (sh->size * DAMAGE_SCALE);
-
-    return (int)k;
-}
-
 /* ----------------------------------------------------------------------- */
-
-void verify_data(void)
-{
-#ifndef NDEBUG
-    int lf = -1;
-    faction *f;
-    unit *u;
-    int mage, alchemist;
-
-    if (verbosity >= 1)
-        puts(" - checking data for correctness...");
-
-    for (f = factions; f; f = f->next) {
-        mage = 0;
-        alchemist = 0;
-        for (u = f->units; u; u = u->nextF) {
-            if (eff_skill(u, SK_MAGIC, u->region)) {
-                mage += u->number;
-            }
-            if (eff_skill(u, SK_ALCHEMY, u->region))
-                alchemist += u->number;
-            if (u->number > UNIT_MAXSIZE) {
-                if (lf != f->no) {
-                    lf = f->no;
-                    log_printf(stdout, "Partei %s:\n", factionid(f));
-                }
-                log_warning("Einheit %s hat %d Personen\n", unitid(u), u->number);
-            }
-        }
-        if (f->no != 0 && ((mage > 3 && f->race != get_race(RC_ELF)) || mage > 4))
-            log_error("Partei %s hat %d Magier.\n", factionid(f), mage);
-        if (alchemist > 3)
-            log_error("Partei %s hat %d Alchemisten.\n", factionid(f), alchemist);
-    }
-#endif
-}
 
 int distribute(int old, int new_value, int n)
 {
@@ -568,36 +459,6 @@ int distribute(int old, int new_value, int n)
             t++;
 
     return t;
-}
-
-int change_hitpoints(unit * u, int value)
-{
-    int hp = u->hp;
-
-    hp += value;
-
-    /* Jede Person benötigt mindestens 1 HP */
-    if (hp < u->number) {
-        if (hp < 0) {               /* Einheit tot */
-            hp = 0;
-        }
-        scale_number(u, hp);
-    }
-    u->hp = hp;
-    return hp;
-}
-
-unsigned int atoip(const char *s)
-{
-    int n;
-
-    assert(s);
-    n = atoi(s);
-
-    if (n < 0)
-        n = 0;
-
-    return n;
 }
 
 bool unit_has_cursed_item(const unit * u)
@@ -794,18 +655,6 @@ parse(keyword_t kword, int(*dofun) (unit *, struct order *), bool thisorder)
     }
 }
 
-unsigned int getuint(void)
-{
-    const char *s = getstrtoken();
-    return s ? atoip(s) : 0;
-}
-
-int getint(void)
-{
-    const char * s = getstrtoken();
-    return s ? atoi(s) : 0;
-}
-
 const struct race *findrace(const char *s, const struct locale *lang)
 {
     void **tokens = get_translations(lang, UT_RACES);
@@ -875,7 +724,8 @@ bool isparam(const char *s, const struct locale * lang, param_t param)
 
 param_t getparam(const struct locale * lang)
 {
-    const char *s = getstrtoken();
+    char token[64];
+    const char *s = gettoken(token, sizeof(token));
     return s ? findparam(s, lang) : NOPARAM;
 }
 
@@ -909,7 +759,8 @@ static int read_newunitid(const faction * f, const region * r)
 
 int read_unitid(const faction * f, const region * r)
 {
-    const char *s = getstrtoken();
+    char token[16];
+    const char *s = gettoken(token, sizeof(token));
 
     /* Da s nun nur einen string enthaelt, suchen wir ihn direkt in der
      * paramliste. machen wir das nicht, dann wird getnewunit in s nach der
@@ -933,7 +784,7 @@ int getunit(const region * r, const faction * f, unit **uresult)
     if (n == 0) {
         result = GET_PEASANTS;
     }
-    else if (n>0) {
+    else if (n > 0) {
         u2 = findunit(n);
         if (u2 != NULL && u2->region == r) {
             /* there used to be a 'u2->flags & UFL_ISNEW || u2->number>0' condition
@@ -1053,12 +904,6 @@ int newcontainerid(void)
     return random_no;
 }
 
-unit *createunit(region * r, faction * f, int number, const struct race * rc)
-{
-    assert(rc);
-    return create_unit(r, f, number, rc, 0, NULL, NULL);
-}
-
 bool idle(faction * f)
 {
     return (bool)(f ? false : true);
@@ -1068,37 +913,7 @@ int maxworkingpeasants(const struct region *r)
 {
     int size = production(r);
     int treespace = (rtrees(r, 2) + rtrees(r, 1) / 2) * TREESIZE;
-    return _max(size-treespace, _min(size / 10 , 200));
-}
-
-void **blk_list[1024];
-int list_index;
-int blk_index;
-
-static void gc_done(void)
-{
-    int i, k;
-    for (i = 0; i != list_index; ++i) {
-        for (k = 0; k != 1024; ++k)
-            free(blk_list[i][k]);
-        free(blk_list[i]);
-    }
-    for (k = 0; k != blk_index; ++k)
-        free(blk_list[list_index][k]);
-    free(blk_list[list_index]);
-
-}
-
-void *gc_add(void *p)
-{
-    if (blk_index == 0) {
-        blk_list[list_index] = (void **)malloc(1024 * sizeof(void *));
-    }
-    blk_list[list_index][blk_index] = p;
-    blk_index = (blk_index + 1) % 1024;
-    if (!blk_index)
-        ++list_index;
-    return p;
+    return _max(size - treespace, _min(size / 10, 200));
 }
 
 static const char * parameter_key(int i)
@@ -1117,12 +932,12 @@ void init_terrains_translation(const struct locale *lang) {
         variant var;
         const char *name;
         var.v = (void *)terrain;
-        name = LOC(lang, terrain->_name);
+        name = locale_string(lang, terrain->_name, false);
         if (name) {
             addtoken(tokens, name, var);
         }
         else {
-            log_error("no translation for terrain %s in locale %s", terrain->_name, locale_name(lang));
+            log_debug("no translation for terrain %s in locale %s", terrain->_name, locale_name(lang));
         }
     }
 }
@@ -1136,12 +951,12 @@ void init_options_translation(const struct locale * lang) {
         variant var;
         var.i = i;
         if (options[i]) {
-            const char *name = LOC(lang, options[i]);
+            const char *name = locale_string(lang, options[i], false);
             if (name) {
                 addtoken(tokens, name, var);
             }
             else {
-                log_error("no translation for OPTION %s in locale %s", options[i], locale_name(lang));
+                log_debug("no translation for OPTION %s in locale %s", options[i], locale_name(lang));
             }
         }
     }
@@ -1191,9 +1006,9 @@ void init_locale(struct locale *lang)
     for (rc = races; rc; rc = rc->next) {
         const char *name;
         var.v = (void *)rc;
-        name = LOC(lang, rc_name_s(rc, NAME_PLURAL));
+        name = locale_string(lang, rc_name_s(rc, NAME_PLURAL), false);
         if (name) addtoken(tokens, name, var);
-        name = LOC(lang, rc_name_s(rc, NAME_SINGULAR));
+        name = locale_string(lang, rc_name_s(rc, NAME_SINGULAR), false);
         if (name) addtoken(tokens, name, var);
     }
 
@@ -1232,23 +1047,24 @@ int get_param_int(const struct param *p, const char *key, int def)
 
 int check_param(const struct param *p, const char *key, const char *searchvalue)
 {
+    int result = 0;
     const char *value = get_param(p, key);
     if (!value) {
         return 0;
     }
-    char *p_value = malloc(sizeof(char)* (strlen(value) + 1));
-    strcpy(p_value, value);
+    char *p_value = _strdup(value);
     const char *delimiter = " ,;";
     char *v = strtok(p_value, delimiter);
 
     while (v != NULL) {
-        if (strcmp(v, searchvalue) == 0)
-        {
-            return 1;
+        if (strcmp(v, searchvalue) == 0) {
+            result = 1;
+            break;
         }
         v = strtok(NULL, delimiter);
     }
-    return 0;
+    free(p_value);
+    return result;
 }
 
 static const char *g_datadir;
@@ -1306,8 +1122,15 @@ void set_param(struct param **p, const char *key, const char *data)
     while (*p != NULL) {
         int cmp = strcmp((*p)->name, key);
         if (cmp == 0) {
-            free((*p)->data);
-            (*p)->data = _strdup(data);
+            par = *p;
+            free(par->data);
+            if (data) {
+                par->data = _strdup(data);
+            }
+            else {
+                *p = par->next;
+                free(par);
+            }
             return;
         }
         else if (cmp > 0) {
@@ -1328,7 +1151,7 @@ void kernel_done(void)
      * calling it is optional, e.g. a release server will most likely not do it.
      */
     translation_done();
-    gc_done();
+    free_attribs();
 }
 
 attrib_type at_germs = {
@@ -1341,9 +1164,6 @@ attrib_type at_germs = {
     ATF_UNIQUE
 };
 
-/*********************/
-/*   at_guard   */
-/*********************/
 attrib_type at_guard = {
     "guard",
     DEFAULT_INIT,
@@ -1415,38 +1235,6 @@ bool faction_id_is_unused(int id)
     return findfaction(id) == NULL;
 }
 
-int weight(const unit * u)
-{
-    int w = 0, n = 0, in_bag = 0;
-    const resource_type *rtype = get_resourcetype(R_BAG_OF_HOLDING);
-    item *itm;
-
-    for (itm = u->items; itm; itm = itm->next) {
-        w = itm->type->weight * itm->number;
-        n += w;
-        if (rtype && !fval(itm->type, ITF_BIG)) {
-            in_bag += w;
-        }
-    }
-
-    n += u->number * u_race(u)->weight;
-
-    if (rtype) {
-        w = i_get(u->items, rtype->itype) * BAGCAPACITY;
-        if (w > in_bag) w = in_bag;
-        n -= w;
-    }
-
-    return n;
-}
-
-void make_undead_unit(unit * u)
-{
-    free_orders(&u->orders);
-    name_unit(u);
-    fset(u, UFL_ISNEW);
-}
-
 unsigned int guard_flags(const unit * u)
 {
     unsigned int flags =
@@ -1503,13 +1291,13 @@ bool has_horses(const struct unit * u)
  * Modifikation für Städter. */
 
 static const int wagetable[7][4] = {
-        { 10, 10, 11, -7 },             /* Baustelle */
-        { 10, 10, 11, -5 },             /* Handelsposten */
-        { 11, 11, 12, -3 },             /* Befestigung */
-        { 12, 11, 13, -1 },             /* Turm */
-        { 13, 12, 14, 0 },              /* Burg */
-        { 14, 12, 15, 1 },              /* Festung */
-        { 15, 13, 16, 2 }               /* Zitadelle */
+    { 10, 10, 11, -7 },             /* Baustelle */
+    { 10, 10, 11, -5 },             /* Handelsposten */
+    { 11, 11, 12, -3 },             /* Befestigung */
+    { 12, 11, 13, -1 },             /* Turm */
+    { 13, 12, 14, 0 },              /* Burg */
+    { 14, 12, 15, 1 },              /* Festung */
+    { 15, 13, 16, 2 }               /* Zitadelle */
 };
 
 int cmp_wage(const struct building *b, const building * a)
@@ -1839,7 +1627,6 @@ static int read_ext(attrib * a, void *owner, struct storage *store)
 void attrib_init(void)
 {
     /* Alle speicherbaren Attribute müssen hier registriert werden */
-    at_register(&at_speedup);
     at_register(&at_shiptrail);
     at_register(&at_familiar);
     at_register(&at_familiarmage);
@@ -1906,7 +1693,7 @@ order *default_order(const struct locale *lang)
     assert(i < MAXLOCALES);
     result = defaults[i];
     if (!result && usedefault) {
-        const char * str = locale_string(lang, "defaultorder");
+        const char * str = LOC(lang, "defaultorder");
         if (str) {
             result = defaults[i] = parse_order(str, lang);
         }
@@ -1981,8 +1768,6 @@ void free_gamedata(void)
         a_remove(&global.attribs, global.attribs);
     }
     ++global.cookie;              /* readgame() already does this, but sjust in case */
-
-    init_resources();
 }
 
 const char * game_name(void) {

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -214,11 +214,11 @@ void message_all(battle * b, message * m)
     }
     if (p)
         for (w = p->watchers; w; w = w->next) {
-        for (bf = b->factions; bf; bf = bf->next)
-            if (bf->faction == w->faction)
-                break;
-        if (bf == NULL)
-            message_faction(b, w->faction, m);
+            for (bf = b->factions; bf; bf = bf->next)
+                if (bf->faction == w->faction)
+                    break;
+            if (bf == NULL)
+                message_faction(b, w->faction, m);
         }
 }
 
@@ -458,7 +458,7 @@ int get_unitrow(const fighter * af, const side * vs)
         assert(i == b->rowcache.result);
     }
 #endif
-        return b->rowcache.result;
+    return b->rowcache.result;
     }
 }
 
@@ -1325,11 +1325,11 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
             heiltrank = 1;
         }
         if (heiltrank && (chance(0.50))) {
-                {
-                    message *m = msg_message("battle::potionsave", "unit", du);
-                    message_faction(b, du->faction, m);
-                    msg_release(m);
-                }
+            {
+                message *m = msg_message("battle::potionsave", "unit", du);
+                message_faction(b, du->faction, m);
+                msg_release(m);
+            }
             assert(dt.index >= 0 && dt.index < du->number);
             df->person[dt.index].hp = u_race(du)->hitpoints;
             return false;
@@ -1901,7 +1901,7 @@ int skilldiff(troop at, troop dt, int dist)
             init = true;
         }
         if (df->building->type->protection) {
-            int beff = df->building->type->protection(df->building, du);
+            int beff = df->building->type->protection(df->building, du, DEFENSE_BONUS);
             if (beff) {
                 skdiff -= beff;
                 is_protected = 2;
@@ -1918,7 +1918,7 @@ int skilldiff(troop at, troop dt, int dist)
         if (magicwalls_ct
             && curse_active(get_curse(df->building->attribs, magicwalls_ct))) {
             /* Verdoppelt Burgenbonus */
-            skdiff -= buildingeffsize(df->building, false);
+            skdiff -= df->building->type->protection(df->building, du, DEFENSE_BONUS);
         }
     }
     /* Goblin-Verteidigung
