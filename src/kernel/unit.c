@@ -1461,6 +1461,28 @@ static void createunitid(unit * u, int id)
     uhash(u);
 }
 
+void default_name(const unit *u, char name[], int len) {
+    const char * result;
+    const struct locale * lang = u->faction ? u->faction->locale : default_locale;
+    if (lang) {
+        static const char * prefix[MAXLOCALES];
+        int i = locale_index(lang);
+        /*if (!prefix[i]) {*/
+            prefix[i] = LOC(lang, "unitdefault");
+            if (!prefix[i]) {
+                prefix[i] = parameters[P_UNIT];
+            }
+        /*}*/
+        result = prefix[i];
+    }
+    else {
+        result = parameters[P_UNIT];
+    }
+    strlcpy(name, result, len);
+    strlcat(name, " ", len);
+    strlcat(name, itoa36(u->no), len);
+}
+
 void name_unit(unit * u)
 {
     if (u_race(u)->generate_name) {
@@ -1474,25 +1496,7 @@ void name_unit(unit * u)
     }
     else {
         char name[32];
-        const char * result;
-        const struct locale * lang = u->faction ? u->faction->locale : default_locale;
-        if (lang) {
-            static const char * prefix[MAXLOCALES];
-            int i = locale_index(lang);
-            if (!prefix[i]) {
-                prefix[i] = LOC(lang, "unitdefault");
-                if (!prefix[i]) {
-                    prefix[i] = parameters[P_UNIT];
-                }
-            }
-            result = prefix[i];
-        }
-        else {
-            result = parameters[P_UNIT];
-        }
-        strlcpy(name, result, sizeof(name));
-        strlcat(name, " ", sizeof(name));
-        strlcat(name, itoa36(u->no), sizeof(name));
+        default_name(u, name, sizeof(name));
         unit_setname(u, name);
     }
 }

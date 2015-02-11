@@ -248,6 +248,7 @@ extern "C" {
 
     struct unit *findunitr(const struct region *r, int n);
 
+    void default_name(const unit *u, char name[], int len);
     const char *unitname(const struct unit *u);
     char *write_unitname(const struct unit *u, char *buffer, size_t size);
     bool unit_name_equals_race(const struct unit *u);
