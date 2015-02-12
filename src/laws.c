@@ -1834,12 +1834,10 @@ int name_cmd(struct unit *u, struct order *ord)
                 break;
             }
             else {
-                const char *udefault = LOC(u2->faction->locale, "unitdefault");
-                const char *uname = unit_getname(u2);
-                size_t udlen = strlen(udefault);
-                size_t unlen = strlen(uname);
-                if (unlen >= udlen && strncmp(uname, udefault, udlen) != 0) {
-                    cmistake(u2, ord, 244, MSG_EVENT);
+                char udefault[32];
+                default_name(u2, udefault, sizeof(udefault));
+                if (strcmp(unit_getname(u2), udefault) != 0) {
+                    cmistake(u, ord, 244, MSG_EVENT);
                     break;
                 }
             }

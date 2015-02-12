@@ -82,14 +82,14 @@ extern "C" {
         struct unit *nextF;         /* nächste Einheit der Partei */
         struct unit *prevF;         /* vorherige Einheit der Partei */
         struct region *region;
-        int no;
+        int no;                     /* id */
         int hp;
         char *_name;
         char *display;
         struct faction *faction;
         struct building *building;
         struct ship *ship;
-        unsigned short number;
+        unsigned short number;      /* persons */
         short age;
 
         /* skill data */
@@ -110,7 +110,7 @@ extern "C" {
         int flags;
         struct attrib *attribs;
         status_t status;
-        int n;                      /* enno: attribut? */
+        int n;                      /* helper temporariy variable, used in econmy, enno: attribut? */
         int wants;                  /* enno: attribut? */
     } unit;
 
@@ -248,6 +248,7 @@ extern "C" {
 
     struct unit *findunitr(const struct region *r, int n);
 
+    void default_name(const unit *u, char name[], int len);
     const char *unitname(const struct unit *u);
     char *write_unitname(const struct unit *u, char *buffer, size_t size);
     bool unit_name_equals_race(const struct unit *u);

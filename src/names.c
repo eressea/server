@@ -215,7 +215,7 @@ const char *silbe3[SIL3] = {
 
 static const char *generic_name(const unit * u)
 {
-    const char * name = rc_name_s(u_race(u), (u->no == 1) ? NAME_SINGULAR : NAME_PLURAL);
+    const char * name = rc_name_s(u_race(u), (u->number == 1) ? NAME_SINGULAR : NAME_PLURAL);
     return LOC(u->faction->locale, name);
 }
 
