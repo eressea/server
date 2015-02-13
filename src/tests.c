@@ -116,6 +116,13 @@ building_type * test_create_buildingtype(const char * name)
     building_type *btype = (building_type *)calloc(sizeof(building_type), 1);
     btype->flags = BTF_NAMECHANGE;
     btype->_name = _strdup(name);
+    btype->capacity = -1;
+    btype->maxcapacity = -1;
+    btype->maxsize = -1;
+    btype->magres = 0;
+    btype->magresbonus = 0;
+    btype->fumblebonus = 0;
+    btype->auraregen = 1.0;
     btype->construction = (construction *)calloc(sizeof(construction), 1);
     btype->construction->skill = SK_BUILDING;
     btype->construction->maxsize = -1;

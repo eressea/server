@@ -626,6 +626,10 @@ faction * f)
         fprintf(F, "\"%s\";Beschr\n", b->display);
     if (b->size)
         fprintf(F, "%d;Groesse\n", b->size);
+    if (b->damage) {
+        int percent = (b->damage * 100) / b->size;
+        fprintf(F, "%d;Schaden\n", percent);
+    }
     if (owner)
         fprintf(F, "%d;Besitzer\n", owner ? owner->no : -1);
     if (fno >= 0)
@@ -758,7 +762,7 @@ static void cr_output_unit(FILE * F, const region * r, const faction * f,       
     assert(u && u->number);
 
     fprintf(F, "EINHEIT %d\n", u->no);
-    fprintf(F, "\"%s\";Name\n", u->name);
+    fprintf(F, "\"%s\";Name\n", unit_getname(u));
     str = u_description(u, f->locale);
     if (str) {
         fprintf(F, "\"%s\";Beschr\n", str);

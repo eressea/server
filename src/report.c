@@ -1589,7 +1589,7 @@ report_template(const char *filename, report_context * ctx, const char *charset)
                 size = sizeof(buf) - 1;
                 bytes = _snprintf(bufp, size, "%s %s;    %s [%d,%d$",
                     LOC(u->faction->locale, parameters[P_UNIT]),
-                    unitid(u), u->name, u->number, get_money(u));
+                    unitid(u), unit_getname(u), u->number, get_money(u));
                 if (wrptr(&bufp, &size, bytes) != 0)
                     WARN_STATIC_BUFFER();
                 if (u->building && building_owner(u->building) == u) {
@@ -2018,6 +2018,12 @@ const faction * f)
 
     if (b->size < b->type->maxsize) {
         bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_building_inprogress"), size);
+        if (wrptr(&bufp, &size, bytes) != 0)
+            WARN_STATIC_BUFFER();
+    }
+    if (b->damage) {
+        int percent = (b->damage * 100) / b->size;
+        bytes = _snprintf(bufp, size, ", %d%% %s", percent, LOC(f->locale, "nr_damaged"));
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
     }

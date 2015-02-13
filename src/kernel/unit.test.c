@@ -155,10 +155,12 @@ static void test_unit_name_from_race(CuTest *tc) {
 
     _snprintf(name, sizeof(name), "Mensch (%s)", itoa36(u->no));
     CuAssertStrEquals(tc, name, unitname(u));
+    CuAssertStrEquals(tc, "Mensch", unit_getname(u));
 
     u->number = 2;
     _snprintf(name, sizeof(name), "Menschen (%s)", itoa36(u->no));
     CuAssertStrEquals(tc, name, unitname(u));
+    CuAssertStrEquals(tc, "Menschen", unit_getname(u));
 
     test_cleanup();
 }

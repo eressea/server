@@ -13,6 +13,7 @@
 
 #include <CuTest.h>
 #include "tests.h"
+#include <assert.h>
 
 static void test_make_fighter(CuTest * tc)
 {
@@ -59,9 +60,19 @@ static void test_make_fighter(CuTest * tc)
 }
 
 static int add_two(building * b, unit * u, building_bonus bonus) {
-    return 2;
+    assert(b);
+    switch (bonus)
+    {
+    case DEFENSE_BONUS:
+        return 2;
+    case CLOSE_COMBAT_ATTACK_BONUS:
+        return 1;
+    case RANGED_ATTACK_BONUS:
+        return 3;
+    default:
+        return 2;
+    }
 }
-
 static void test_defenders_get_building_bonus(CuTest * tc)
 {
     unit *du, *au;
@@ -79,6 +90,7 @@ static void test_defenders_get_building_bonus(CuTest * tc)
     r = findregion(0, 0);
     btype = bt_get_or_create("castle");
     btype->protection = &add_two;
+    btype->capacity = 1;
     bld = test_create_building(r, btype);
     bld->size = 10;
 
@@ -104,7 +116,7 @@ static void test_defenders_get_building_bonus(CuTest * tc)
     CuAssertIntEquals(tc, -2, diff);
 
     diff = skilldiff(dt, at, 0);
-    CuAssertIntEquals(tc, 0, diff);
+    CuAssertIntEquals(tc, 1, diff);
     free_battle(b);
     test_cleanup();
 }
@@ -124,6 +136,7 @@ static void test_attackers_get_no_building_bonus(CuTest * tc)
     r = findregion(0, 0);
     btype = bt_get_or_create("castle");
     btype->protection = &add_two;
+    btype->capacity = 1;
     bld = test_create_building(r, btype);
     bld->size = 10;
 
@@ -155,6 +168,7 @@ static void test_building_bonus_respects_size(CuTest * tc)
     r = findregion(0, 0);
     btype = bt_get_or_create("castle");
     btype->protection = &add_two;
+    btype->capacity = 1;
     bld = test_create_building(r, btype);
     bld->size = 10;
 
@@ -192,6 +206,7 @@ static void test_building_defence_bonus(CuTest * tc)
     btype = bt_get_or_create("castle");
     btype->protection = (int(*)(struct building *, struct unit *, building_bonus))get_function("building_protection");
     btype->construction->defense_bonus = 3;
+    btype->capacity = 1;
     bld = test_create_building(r, btype);
     bld->size = 1;
 
