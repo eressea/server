@@ -919,17 +919,17 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
     }
     if (guard) {
         prob += base_prob;          /* 30% base chance */
-        prob = +guard_count*guard_number_prob;
+        prob += guard_count*guard_number_prob;
         if (r->terrain == newterrain(T_GLACIER))
-            prob = +region_type_prob * 2;
+            prob += region_type_prob * 2;
         if (r->terrain == newterrain(T_SWAMP))
-            prob = +region_type_prob * 2;
+            prob += region_type_prob * 2;
         if (r->terrain == newterrain(T_MOUNTAIN))
-            prob = +region_type_prob;
+            prob += region_type_prob;
         if (r->terrain == newterrain(T_VOLCANO))
-            prob = +region_type_prob;
+            prob += region_type_prob;
         if (r->terrain == newterrain(T_VOLCANO_SMOKING))
-            prob = +region_type_prob;
+            prob += region_type_prob;
 
         if (prob > 0 && chance(prob)) {
             return guard;
