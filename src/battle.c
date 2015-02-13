@@ -2079,7 +2079,7 @@ int castles_use_unit_weight(void)
 
 int castle_capacity(building * b)
 {
-    if (new_castle_rule()) {
+    if (castles_use_unit_weight()) {
         return (buildingcapacity(b) - b->damage) * 1000;  /* CTD Using race weight like E3-ships*/
     }
     return buildingcapacity(b) - b->damage;
