@@ -10,4 +10,5 @@ require 'eressea'
 require 'eressea.path'
 require 'tests'
 require 'lunit'
-lunit.main()
+result = lunit.main()
+return result.errors

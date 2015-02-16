@@ -167,7 +167,7 @@ static int tolua_unit_set_group(lua_State * L)
 static int tolua_unit_get_name(lua_State * L)
 {
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
-    tolua_pushstring(L, self->name);
+    tolua_pushstring(L, unit_getname(self));
     return 1;
 }
 

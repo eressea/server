@@ -2074,7 +2074,7 @@ static void eval_unitname(struct opstack **stack, const void *userdata)
 {                               /* unit -> string */
     const struct faction *f = (const struct faction *)userdata;
     const struct unit *u = (const struct unit *)opop(stack).v;
-    const char *c = u ? u->name : LOC(f->locale, "an_unknown_unit");
+    const char *c = u ? unit_getname(u) : LOC(f->locale, "an_unknown_unit");
     size_t len = strlen(c);
     variant var;
 
@@ -2086,7 +2086,7 @@ static void eval_unitid(struct opstack **stack, const void *userdata)
 {                               /* unit -> int */
     const struct faction *f = (const struct faction *)userdata;
     const struct unit *u = (const struct unit *)opop(stack).v;
-    const char *c = u ? u->name : LOC(f->locale, "an_unknown_unit");
+    const char *c = u ? unit_getname(u) : LOC(f->locale, "an_unknown_unit");
     size_t len = strlen(c);
     variant var;
 
