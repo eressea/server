@@ -3,12 +3,19 @@
 #include "economy.h"
 
 #include <util/message.h>
-#include <kernel/unit.h>
+#include <kernel/building.h>
+#include <kernel/item.h>
+#include <kernel/faction.h>
+#include <kernel/messages.h>
+#include <kernel/order.h>
+#include <kernel/pool.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/building.h>
 #include <kernel/ship.h>
 #include <kernel/terrain.h>
+#include <kernel/unit.h>
+
+#include <util/language.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -114,6 +121,62 @@ static void test_steal_ocean(CuTest * tc) {
     test_cleanup();
 }
 
+static struct unit *create_recruiter(void) {
+    region *r;
+    faction *f;
+    unit *u;
+    const resource_type* rtype;
+
+    test_cleanup();
+    test_create_world();
+
+    r=findregion(0, 0);
+    rsetpeasants(r, 999);
+    f = test_create_faction(rc_find("human"));
+    u = test_create_unit(f, r);
+    rtype = get_resourcetype(R_SILVER);
+    change_resource(u, rtype, 1000);
+    return u;
+}
+
+static void test_heroes_dont_recruit(CuTest * tc) {
+    unit *u;
+    order *ord;
+    const message_type *msg_types[1];
+
+    test_cleanup();
+    msg_types[0] = register_msg("error_herorecruit", 3, "unit:unit", "region:region", "command:order");
+
+    u = create_recruiter();
+    fset(u, UFL_HERO);
+    ord = create_order(K_RECRUIT, default_locale, "1");
+    unit_addorder(u, ord);
+
+    economics(u->region);
+
+    CuAssertIntEquals(tc, 1, u->number);
+    assert_messages(tc, u->faction->msgs->begin, msg_types, 1, true, 0);
+
+    test_cleanup();
+}
+
+static void test_normals_recruit(CuTest * tc) {
+    unit *u;
+    order *ord;
+
+    test_cleanup();
+
+    u = create_recruiter();
+    ord = create_order(K_RECRUIT, default_locale, "1");
+    unit_addorder(u, ord);
+
+    economics(u->region);
+
+    CuAssertIntEquals(tc, 2, u->number);
+
+    test_cleanup();
+}
+
 CuSuite *get_economy_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -122,5 +185,7 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_steal_okay);
     SUITE_ADD_TEST(suite, test_steal_ocean);
     SUITE_ADD_TEST(suite, test_steal_nosteal);
+    SUITE_ADD_TEST(suite, test_normals_recruit);
+    SUITE_ADD_TEST(suite, test_heroes_dont_recruit);
     return suite;
 }
