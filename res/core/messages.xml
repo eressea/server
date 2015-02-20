@@ -3156,7 +3156,7 @@
       <arg name="regionn" type="region"/>
     </type>
     <text locale="de">"Der Vulkan in $region($regionv) bricht aus. Die Lavamassen verwüsten $region($regionn)."</text>
-    <text locale="en">"The volcano in $region($regionv) erupts. The lava devastates $region($region)."</text>
+    <text locale="en">"The volcano in $region($regionv) erupts. The lava devastates $region($regionn)."</text>
   </message>
   <message name="volcano_dead" section="events">
     <type>
@@ -3461,16 +3461,16 @@
       <arg name="target" type="unit"/>
       <arg name="status" type="string"/>
     </type>
-    <text locale="de">"$unit($spy) gelang es, Informationen über $unit($target) herauszubekommen: Kampfstatus $status."</text>
-    <text locale="en">"$unit($spy) managed to gather information about $unit($target): combat status ($status)."</text>
+    <text locale="de">"$unit($spy) gelang es, Informationen über $unit($target) herauszubekommen: Kampfstatus ${status}."</text>
+    <text locale="en">"$unit($spy) managed to gather information about $unit($target): combat status ${status}."</text>
   </message>
   <message name="spyreport_mage" section="events">
     <type>
       <arg name="target" type="unit"/>
       <arg name="type" type="string"/>
     </type>
-    <text locale="de">"$unit($target) ist ein $type-Magier."</text>
-    <text locale="en">"$unit($target) is a $type-magician"</text>
+    <text locale="de">"$unit($target) ist ein ${type}-Magier."</text>
+    <text locale="en">"$unit($target) is a ${type}-magician"</text>
   </message>
   <message name="spyreport_skills" section="events">
     <type>
