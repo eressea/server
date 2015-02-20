@@ -1,5 +1,5 @@
--- Tests that work in E3. With game config of E3. 
--- Tests are under scripts/test/e3 and all files must be in scripts/test/e3/init.lua
+-- Tests that work in all games. With game config of E2. 
+-- Tests are under scripts/test/e2 and all files must be in scripts/test/e2/init.lua
 
 path = 'scripts'
 if config.install then
@@ -9,15 +9,14 @@ if config.install then
 end
 package.path = package.path .. ';' .. path .. '/?.lua;' .. path .. '/?/init.lua'
 
-config.rules = 'e3'
+config.rules = 'e2'
 
 require 'eressea'
-require 'eressea.path'
 require 'eressea.xmlconf'
-require 'tests.e3'
+require 'eressea.path'
+require 'tests.e2'
 require 'lunit'
 
-eressea.settings.set("rules.alliances", "0")
 rules = require('eressea.' .. config.rules)
 result = lunit.main()
 return result.errors
