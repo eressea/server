@@ -1,15 +1,10 @@
+require "lunit"
+
 module ('tests.eressea.faction', package.seeall, lunit.testcase)
 
 local f
 
 function setup()
-    conf = [[{
-        "races": {
-            "human" : {}
-        }
-    }]]
-    eressea.config.reset()
-    assert(eressea.config.parse(conf)==0)
 	f = faction.create("faction@eressea.de", "human", "de")
 end
 

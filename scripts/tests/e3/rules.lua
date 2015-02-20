@@ -779,3 +779,27 @@ function test_weightless_silver()
     u1:add_item("money", 540)
     assert_equal(1000, u1.weight)
 end
+
+function test_only_building_owner_can_set_not_paid()
+  local r = region.create(0, 0, "plain")
+  local f = faction.create("noreply@eressea.de", "human", "de")
+  local u1 = unit.create(f, r, 1)
+  local u2 = unit.create(f, r, 1)
+  local mine = building.create(r, "mine")
+  mine.size = 2
+  u1:add_item("money", 500)
+  u1.building = mine
+  u2.building = mine
+  u1:clear_orders()
+  u2:clear_orders()
+-- Test that Bezahle nicht is working
+  u1:add_order("Bezahle nicht")
+  process_orders()
+  assert_equal(500, u1:get_item("money"))
+  u1:clear_orders()
+-- Test that bug fix 0001976 is working 
+-- Bezahle nicht is not working
+  u2:add_order("Bezahle nicht")
+  process_orders()
+  assert_equal(0, u1:get_item("money"))
+end
