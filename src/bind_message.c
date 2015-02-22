@@ -11,7 +11,9 @@
 #include <kernel/unit.h>
 
 /* util includes */
+#include <util/language.h>
 #include <util/message.h>
+#include <util/nrmessage.h>
 
 /* lua includes */
 #include <tolua.h>
@@ -307,6 +309,21 @@ static int tolua_msg_send_faction(lua_State * L)
     return 0;
 }
 
+static int tolua_msg_render(lua_State * L)
+{
+    lua_message *lmsg = (lua_message *)tolua_tousertype(L, 1, 0);
+    const char * lname = tolua_tostring(L, 2, 0);
+    const struct locale * lang = lname ? get_locale(lname) : default_locale;
+    char name[64];
+
+    if (lmsg->msg == NULL) {
+        lmsg->msg = msg_create(lmsg->mtype, lmsg->args);
+    }
+    nr_render(lmsg->msg, lang, name, sizeof(name), NULL);
+    lua_pushstring(L, name);
+    return 1;
+}
+
 void tolua_message_open(lua_State * L)
 {
     /* register user types */
@@ -321,6 +338,7 @@ void tolua_message_open(lua_State * L)
             NULL);
         tolua_beginmodule(L, TOLUA_CAST "message");
         {
+            tolua_function(L, TOLUA_CAST "render", tolua_msg_render);
             tolua_function(L, TOLUA_CAST "set", tolua_msg_set);
             tolua_function(L, TOLUA_CAST "set_unit", tolua_msg_set_unit);
             tolua_function(L, TOLUA_CAST "set_region", tolua_msg_set_region);
