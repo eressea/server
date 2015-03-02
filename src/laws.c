@@ -1896,7 +1896,10 @@ int name_cmd(struct unit *u, struct order *ord)
     }
 
     if (s != NULL) {
-        return rename_cmd(u, ord, s, getstrtoken());
+        const char *name = getstrtoken();
+        if (name) {
+            rename_cmd(u, ord, s, name);
+        }
     }
 
     return 0;

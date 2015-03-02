@@ -263,6 +263,7 @@ void init_translations(const struct locale *lang, int ut, const char * (*string_
     assert(maxstrings > 0);
     tokens = get_translations(lang, ut);
     for (i = 0; i != maxstrings; ++i) {
+        // TODO: swap the name of s and key
         const char * s = string_cb(i);
         const char * key = s ? locale_string(lang, s, false) : 0;
         key = key ? key : s;

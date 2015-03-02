@@ -4345,6 +4345,14 @@
     </string>
   </namespace>
   <namespace name="spellinfo">
+    <string name="create_ror">
+      <text locale="de">Erzeugt einen Ring der Regeneration.</text>
+      <text locale="en">Creates a ring of regeneration.</text>
+    </string>
+    <string name="create_focus">
+      <text locale="de">Erzeugt einen Aurafokus.</text>
+      <text locale="en">Creates an aurafocus crystal.</text>
+    </string>
     <string name="acidrain">
       <text locale="de">Tötet die Feinde mit Säure.</text>
       <text locale="en">Kills enemies with acid.</text>
