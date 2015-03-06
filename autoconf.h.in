@@ -26,6 +26,9 @@
 #cmakedefine HAVE_MEMICMP 1
 #cmakedefine HAVE__STRLWR 1
 #cmakedefine HAVE_STRLWR 1
+#cmakedefine HAVE_STRLCPY 1
+#cmakedefine HAVE_STRLCAT 1
+#cmakedefine HAVE_SLPRINTF 1
 #cmakedefine HAVE_SYS_STAT_MKDIR 1
 #cmakedefine HAVE_DIRECT_MKDIR 1
 #cmakedefine HAVE_DIRECT__MKDIR 1
