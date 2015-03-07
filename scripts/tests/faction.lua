@@ -6,6 +6,7 @@ local f
 
 function setup()
     f = faction.create("faction@eressea.de", "human", "de")
+    assert(f~=nil)
 end
 
 function test_faction_flags()

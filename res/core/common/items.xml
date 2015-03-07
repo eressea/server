@@ -2,7 +2,7 @@
 <resources>
 
   <resource name="money">
-    <item weight="0"/>
+    <item weight="1"/>
   </resource>
 
   <resource name="ao_healing" appearance="amulet">
