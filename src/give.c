@@ -51,7 +51,7 @@
 #define RESERVE_DONATIONS       /* shall we reserve objects given to us by other factions? */
 #define RESERVE_GIVE            /* reserve anything that's given from one unit to another? */
 
-static int max_transfers() {
+static int max_transfers(void) {
     return get_param_int(global.parameters, "rules.give.max_men", 5);
 }
 
