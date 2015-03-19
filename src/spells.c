@@ -545,7 +545,7 @@ static int sp_summon_familiar(castorder * co)
         cmistake(mage, co->order, 199, MSG_MAGIC);
         return 0;
     }
-    rc = select_familiar(mage->faction->race, mage->faction->magiegebiet);
+    rc = select_familiar(mage->_race, mage->faction->magiegebiet);
     if (rc == NULL) {
         log_error("could not find suitable familiar for %s.\n", mage->faction->race->_name);
         return 0;

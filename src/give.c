@@ -48,9 +48,12 @@
 #include <stdlib.h>
 
 /* Wieviel Fremde eine Partei pro Woche aufnehmen kangiven */
-#define MAXNEWBIES								5
 #define RESERVE_DONATIONS       /* shall we reserve objects given to us by other factions? */
 #define RESERVE_GIVE            /* reserve anything that's given from one unit to another? */
+
+static int max_transfers(void) {
+    return get_param_int(global.parameters, "rules.give.max_men", 5);
+}
 
 static int GiveRestriction(void)
 {
@@ -300,7 +303,7 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
             error = 96;
         }
         else if (u->faction != u2->faction) {
-            if (u2->faction->newbies + n > MAXNEWBIES) {
+            if (u2->faction->newbies + n > max_transfers()) {
                 error = 129;
             }
             else if (u_race(u) != u2->faction->race) {
@@ -473,7 +476,7 @@ void give_unit(unit * u, unit * u2, order * ord)
         cmistake(u, ord, 105, MSG_COMMERCE);
         return;
     }
-    if (u2->faction->newbies + n > MAXNEWBIES) {
+    if (u2->faction->newbies + n > max_transfers()) {
         cmistake(u, ord, 129, MSG_COMMERCE);
         return;
     }
