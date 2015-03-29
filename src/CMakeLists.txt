@@ -79,6 +79,7 @@ set (ERESSEA_SRC
   skill.c
   json.c
   creport.c
+  jsreport.c
   economy.c
   give.c
   items.c

@@ -1262,7 +1262,10 @@ faction *readfaction(struct gamedata * data)
         /* Kein Report eingestellt, Fehler */
         f->options |= n;
     }
-
+    if (data->version < JSON_REPORT_VERSION) {
+        /* mistakes were made in the past*/
+        f->options &= ~want(O_JSON);
+    }
     sfp = &f->allies;
     for (;;) {
         int aid = 0;
