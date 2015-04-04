@@ -25,6 +25,7 @@
 #include "report.h"
 #include "items.h"
 #include "creport.h"
+#include "jsreport.h"
 #include "names.h"
 #include "wormhole.h"
 #include "spells.h"
@@ -56,6 +57,7 @@ void game_init(void)
 
     register_nr();
     register_cr();
+    register_jsreport();
 
     register_races();
     register_spells();
