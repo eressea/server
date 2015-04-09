@@ -3911,24 +3911,27 @@ int claim_cmd(unit * u, struct order *ord)
 {
     char token[128];
     const char *t;
-    int n;
-    const item_type *itype;
+    int n = 1;
+    const item_type *itype = 0;
 
     init_order(ord);
 
     t = gettoken(token, sizeof(token));
-    n = atoi((const char *)t);
-    if (n == 0) {
-        n = 1;
+    if (t) {
+        n = atoi((const char *)t);
+        if (n == 0) {
+            n = 1;
+        }
+        else {
+            t = gettoken(token, sizeof(token));
+        }
+        if (t) {
+            itype = finditemtype(t, u->faction->locale);
+        }
     }
-    else {
-        t = gettoken(token, sizeof(token));
-    }
-    itype = finditemtype(t, u->faction->locale);
-
-    if (itype != NULL) {
+    if (itype) {
         item **iclaim = i_find(&u->faction->items, itype);
-        if (iclaim != NULL && *iclaim != NULL) {
+        if (iclaim && *iclaim) {
             n = _min(n, (*iclaim)->number);
             i_change(iclaim, itype, -n);
             i_change(&u->items, itype, n);
