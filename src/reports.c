@@ -70,6 +70,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "move.h"
 
+#define SCALEWEIGHT      100    /* Faktor, um den die Anzeige von Gewichten skaliert wird */
+
 bool nocr = false;
 bool nonr = false;
 bool noreports = false;
