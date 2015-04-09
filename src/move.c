@@ -315,7 +315,7 @@ int walkingcapacity(const struct unit *u)
     }
     if (rbelt) {
         int tmp = i_get(u->items, rbelt->itype);
-        n += _min(people, tmp) * (STRENGTHMULTIPLIER - 1) * personcapacity(u);
+        n += _min(people, tmp) * (STRENGTHMULTIPLIER - 1) * u_race(u)->capacity;
     }
 
     return n;

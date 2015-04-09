@@ -39,14 +39,6 @@ extern "C" {
 #define MV_SWIM           (1<<8)        /* kann schwimmen */
 #define MV_WALK           (1<<9)        /* kann über Land gehen */
 
-    /* Die tragekapaz. ist hardcodiert mit defines, da es bis jetzt sowieso nur 2
-    ** objekte gibt, die etwas tragen. */
-#define SILVERWEIGHT       1
-#define SCALEWEIGHT      100    /* Faktor, um den die Anzeige von gewichten
-    * * skaliert wird */
-#define HORSECAPACITY   7000
-#define WAGONCAPACITY  14000
-
 #define HORSESNEEDED    2
 
     /* ein mensch wiegt 10, traegt also 5, ein pferd wiegt 50, traegt also 20. ein
