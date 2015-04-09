@@ -344,14 +344,14 @@ static int tolua_faction_create(lua_State * L)
     const char *email = tolua_tostring(L, 1, 0);
     const char *racename = tolua_tostring(L, 2, 0);
     const char *lang = tolua_tostring(L, 3, 0);
-    struct locale *loc = get_locale(lang);
+    struct locale *loc = lang ? get_locale(lang) : default_locale;
     faction *f = NULL;
-    const struct race *frace = rc_find(racename);
+    const struct race *frace = rc_find(racename ? racename : "human");
     if (frace != NULL) {
         f = addfaction(email, NULL, frace, loc, 0);
     }
     if (!f) {
-        log_error("faction.create(%s, %s, %s)\n", email, racename, lang);
+        log_error("faction.create(%s, %s, %s)\n", email, racename, locale_name(loc));
     }
     tolua_pushusertype(L, f, TOLUA_CAST "faction");
     return 1;

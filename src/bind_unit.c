@@ -167,7 +167,7 @@ static int tolua_unit_set_group(lua_State * L)
 static int tolua_unit_get_name(lua_State * L)
 {
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
-    tolua_pushstring(L, self->name);
+    tolua_pushstring(L, unit_getname(self));
     return 1;
 }
 
@@ -259,6 +259,24 @@ static int tolua_unit_set_flags(lua_State * L)
 {
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
     self->flags = (int)tolua_tonumber(L, 2, 0);
+    return 0;
+}
+
+static int tolua_unit_get_guard(lua_State * L)
+{
+    unit *self = (unit *)tolua_tousertype(L, 1, 0);
+    if (is_guard(self, GUARD_ALL)) {
+        lua_pushinteger(L, getguard(self));
+        return 1;
+    }
+    return 0;
+}
+
+static int tolua_unit_set_guard(lua_State * L)
+{
+    unit *self = (unit *)tolua_tousertype(L, 1, 0);
+    unsigned int flags = (unsigned int)tolua_tonumber(L, 2, 0);
+    setguard(self, flags);
     return 0;
 }
 
@@ -984,6 +1002,8 @@ void tolua_unit_open(lua_State * L)
             /*  key-attributes for named flags: */
             tolua_function(L, TOLUA_CAST "set_flag", &tolua_unit_set_flag);
             tolua_function(L, TOLUA_CAST "get_flag", &tolua_unit_get_flag);
+            tolua_variable(L, TOLUA_CAST "guard", &tolua_unit_get_guard,
+                &tolua_unit_set_guard);
             tolua_variable(L, TOLUA_CAST "flags", &tolua_unit_get_flags,
                 &tolua_unit_set_flags);
             tolua_variable(L, TOLUA_CAST "age", &tolua_unit_get_age,

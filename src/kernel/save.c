@@ -618,7 +618,7 @@ unit *read_unit(struct gamedata *data)
     }
 
     READ_STR(data->store, obuf, sizeof(obuf));
-    u->name = _strdup(obuf);
+    u->_name = _strdup(obuf);
     if (lomem) {
         READ_STR(data->store, NULL, 0);
     }
@@ -754,8 +754,8 @@ void write_unit(struct gamedata *data, const unit * u)
 
     write_unit_reference(u, data->store);
     write_faction_reference(u->faction, data->store);
-    WRITE_STR(data->store, (const char *)u->name);
-    WRITE_STR(data->store, u->display ? (const char *)u->display : "");
+    WRITE_STR(data->store, u->_name);
+    WRITE_STR(data->store, u->display ? u->display : "");
     WRITE_INT(data->store, u->number);
     WRITE_INT(data->store, u->age);
     WRITE_TOK(data->store, u_race(u)->_name);
@@ -1262,7 +1262,10 @@ faction *readfaction(struct gamedata * data)
         /* Kein Report eingestellt, Fehler */
         f->options |= n;
     }
-
+    if (data->version < JSON_REPORT_VERSION) {
+        /* mistakes were made in the past*/
+        f->options &= ~want(O_JSON);
+    }
     sfp = &f->allies;
     for (;;) {
         int aid = 0;
@@ -1600,7 +1603,7 @@ int readgame(const char *filename, int backup)
             sc_mage *mage;
 
             if (gdata.version < AUTO_RACENAME_VERSION) {
-                if (u->name && fval(u->faction, FFL_NPC)) {
+                if (u->_name && fval(u->faction, FFL_NPC)) {
                     if (unit_name_equals_race(u)) {
                         unit_setname(u, NULL);
                     }

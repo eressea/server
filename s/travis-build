@@ -13,4 +13,6 @@ cd build && cmake .. \
  -DCMAKE_BUILD_TYPE=Debug .. && \
 make && cd .. && inifile &&
 build/eressea/test_eressea &&
-build/eressea/eressea -v0 scripts/run-tests.lua
+build/eressea/eressea -v0 scripts/run-tests-basic.lua
+build/eressea/eressea -v0 scripts/run-tests-e2.lua
+build/eressea/eressea -v0 scripts/run-tests-e3.lua

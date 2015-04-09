@@ -1834,11 +1834,10 @@ int name_cmd(struct unit *u, struct order *ord)
                 break;
             }
             else {
-                const char *udefault = LOC(u2->faction->locale, "unitdefault");
-                size_t udlen = strlen(udefault);
-                size_t unlen = strlen(u2->name);
-                if (unlen >= udlen && strncmp(u2->name, udefault, udlen) != 0) {
-                    cmistake(u2, ord, 244, MSG_EVENT);
+                char udefault[32];
+                default_name(u2, udefault, sizeof(udefault));
+                if (strcmp(unit_getname(u2), udefault) != 0) {
+                    cmistake(u, ord, 244, MSG_EVENT);
                     break;
                 }
             }
@@ -1850,10 +1849,10 @@ int name_cmd(struct unit *u, struct order *ord)
                 ADDMSG(&u2->faction->msgs, msg_message("renamed_notseen",
                     "renamed region", u2, r));
             }
-            s = &u2->name;
+            s = &u2->_name;
         }
         else {
-            s = &u->name;
+            s = &u->_name;
         }
         break;
 
@@ -3912,24 +3911,27 @@ int claim_cmd(unit * u, struct order *ord)
 {
     char token[128];
     const char *t;
-    int n;
-    const item_type *itype;
+    int n = 1;
+    const item_type *itype = 0;
 
     init_order(ord);
 
     t = gettoken(token, sizeof(token));
-    n = atoi((const char *)t);
-    if (n == 0) {
-        n = 1;
+    if (t) {
+        n = atoi((const char *)t);
+        if (n == 0) {
+            n = 1;
+        }
+        else {
+            t = gettoken(token, sizeof(token));
+        }
+        if (t) {
+            itype = finditemtype(t, u->faction->locale);
+        }
     }
-    else {
-        t = gettoken(token, sizeof(token));
-    }
-    itype = finditemtype(t, u->faction->locale);
-
-    if (itype != NULL) {
+    if (itype) {
         item **iclaim = i_find(&u->faction->items, itype);
-        if (iclaim != NULL && *iclaim != NULL) {
+        if (iclaim && *iclaim) {
             n = _min(n, (*iclaim)->number);
             i_change(iclaim, itype, -n);
             i_change(&u->items, itype, n);

@@ -1282,11 +1282,19 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
     }
 
     assert(dt.index < du->number);
-    df->person[dt.index].hp -= rda;
-    if (u_race(au) == get_race(RC_DAEMON)) {
-        vampirism(at, rda);
-    }
+    if (rda>0) {
+        df->person[dt.index].hp -= rda;
+        if (u_race(au) == get_race(RC_DAEMON)) {
+            vampirism(at, rda);
+        }
+        if (b->turn>1) {
+            /* someone on the ship got damaged, damage the ship */
+            ship *sh = du->ship ? du->ship : leftship(du);
+            if (sh)
+                fset(sh, SF_DAMAGED);
+        }
 
+    }
     if (df->person[dt.index].hp > 0) {    /* Hat überlebt */
         if (bdebug) {
             fprintf(bdebug, "Damage %d, armor %d: %d -> %d HP\n",
@@ -2712,13 +2720,6 @@ static void aftermath(battle * b)
             if (flags) {
                 fset(du, flags);
             }
-            if (sum_hp + df->run.hp < du->hp) {
-                /* someone on the ship got damaged, damage the ship */
-                ship *sh = du->ship ? du->ship : leftship(du);
-                if (sh)
-                    fset(sh, SF_DAMAGED);
-            }
-
             if (df->alive && df->alive == du->number) {
                 du->hp = sum_hp;
                 continue;               /* nichts passiert */

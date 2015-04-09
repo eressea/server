@@ -1,7 +1,7 @@
 #!/bin/sh
-ROOT=$(pwd)
+ROOT=`pwd`
 while [ ! -d $ROOT/.git ]; do
-  ROOT=$(dirname $ROOT)
+  ROOT=`dirname $ROOT`
 done
 
 [ -z $BUILD ] && BUILD=Debug
@@ -11,7 +11,7 @@ MACHINE=`uname -m`
 [ -z "$CC" ] && [ ! -z `which cc` ] && CC="cc"
 BIN_DIR="build-$MACHINE-$CC-$BUILD"
 
-[ -z "$JOBS" ] && JOBS=$(nproc)
+[ -z "$JOBS" ] && [ "" != "which nproc" ] && JOBS=`nproc`
 DISTCC=`which distcc`
 if [ ! -z "$DISTCC" ] ; then
 JOBS=`distcc -j`

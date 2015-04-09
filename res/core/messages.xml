@@ -8375,4 +8375,14 @@
     orders for $int($turns) turns and may be leaving the game soon."</text>
   </message>
 
+  <message name="error_herorecruit" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Helden können nicht rekrutieren."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Heroes cannot recruit."</text>
+  </message>
+
 </messages>
