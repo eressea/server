@@ -794,3 +794,26 @@ function test_only_building_owner_can_set_not_paid()
   process_orders()
   assert_equal(0, u1:get_item("money"))
 end
+
+function test_spyreport_message()
+    local r1 = region.create(1, 2, "plain")    
+    local f1 = faction.create("noreply@eressea.de", "human", "de")
+    local u1 = unit.create(f1, r1, 1)
+    local u2 = unit.create(f1, r1, 1)
+    msg = message.create("spyreport")
+    msg:set_unit("spy", u1)
+    msg:set_unit("target", u2)
+    msg:set_string("status", "hodor")
+    assert_not_equal("", msg:render("de"))
+    assert_not_equal("", msg:render("en"))
+end
+
+function test_volcanooutbreak_message()
+    local r1 = region.create(1, 0, "plain")
+    local r2 = region.create(1, 1, "plain")
+    msg = message.create("volcanooutbreak")
+    msg:set_region("regionn", r1)
+    msg:set_region("regionv", r2)
+    assert_not_equal("", msg:render("de"))
+    assert_not_equal("", msg:render("en"))
+end
