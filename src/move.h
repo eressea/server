@@ -40,6 +40,7 @@ extern "C" {
 #define MV_WALK           (1<<9)        /* kann über Land gehen */
 
 #define HORSESNEEDED    2
+#define STRENGTHMULTIPLIER  50   /* multiplier for trollbelt */
 
     /* ein mensch wiegt 10, traegt also 5, ein pferd wiegt 50, traegt also 20. ein
     ** wagen wird von zwei pferden gezogen und traegt total 140, davon 40 die
