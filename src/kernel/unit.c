@@ -1807,7 +1807,7 @@ void scale_number(unit * u, int n)
 
 const struct race *u_irace(const struct unit *u)
 {
-    if (u->irace && skill_enabled(SK_STEALTH)) {
+    if (u->irace) {
         return u->irace;
     }
     return u->_race;
