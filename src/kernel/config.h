@@ -85,7 +85,6 @@ extern "C" {
      * von struct unitname, etc. zurückgegeben werden. ohne die 0 */
 
 #define BAGCAPACITY         20000   /* soviel paßt in einen Bag of Holding */
-#define STRENGTHMULTIPLIER  50   /* multiplier for trollbelt */
 
     /* ----------------- Befehle ----------------------------------- */
 

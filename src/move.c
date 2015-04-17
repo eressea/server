@@ -314,8 +314,11 @@ int walkingcapacity(const struct unit *u)
         }
     }
     if (rbelt) {
-        int tmp = i_get(u->items, rbelt->itype);
-        n += _min(people, tmp) * (STRENGTHMULTIPLIER - 1) * personcapacity(u);
+        int belts = i_get(u->items, rbelt->itype);
+        if (belts) {
+            int multi = get_param_flt(global.parameters, "rules.trollbelt.multiplier", STRENGTHMULTIPLIER);
+            n += _min(people, belts) * (multi - 1) * u_race(u)->capacity;
+        }
     }
 
     return n;

@@ -175,6 +175,11 @@ void test_create_world(void)
     itype->weight = 5000;
     itype->capacity = 7000;
 
+    itype = test_create_itemtype("cart");
+    itype->flags |= ITF_BIG | ITF_VEHICLE;
+    itype->weight = 4000;
+    itype->capacity = 14000;
+
     test_create_itemtype("iron");
     test_create_itemtype("stone");
 
