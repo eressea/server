@@ -2765,8 +2765,8 @@ void sinkships(struct region * r)
         ship *sh = *shp;
 
         if (!sh->type->construction || sh->size >= sh->type->construction->maxsize) {
-            if (fval(r->terrain, SEA_REGION) && (!enoughsailors(sh, r)
-                || get_captain(sh) == NULL)) {
+            if (fval(r->terrain, SEA_REGION) &&
+                !(enoughsailors(sh, ship_sailors(sh)) && get_captain(sh))) {
                 /* Schiff nicht seetüchtig */
                 float dmg = get_param_flt(global.parameters,
                     "rules.ship.damage.nocrewocean",

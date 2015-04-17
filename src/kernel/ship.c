@@ -327,10 +327,6 @@ int shipspeed(const ship * sh, const unit * u)
         c = c->nexthash;
     }
 
-#ifdef SHIPSPEED
-    k *= SHIPSPEED;
-#endif
-
     if (sh->damage)
         k =
         (k * (sh->size * DAMAGE_SCALE - sh->damage) + sh->size * DAMAGE_SCALE -

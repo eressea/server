@@ -469,18 +469,23 @@ static bool cansail(const region * r, ship * sh)
     return true;
 }
 
-int enoughsailors(const ship * sh, const region * r)
-{
-    int n;
+int ship_sailors(const ship *sh) {
+    int n = 0;
     unit *u;
 
     n = 0;
 
-    for (u = r->units; u; u = u->next) {
-        if (u->ship == sh)
-            n += eff_skill(u, SK_SAILING, r) * u->number;
+    for (u = sh->region->units; u; u = u->next) {
+        if (u->ship == sh) {
+            n += eff_skill(u, SK_SAILING, sh->region) * u->number;
+        }
     }
-    return n >= sh->type->sumskill;
+    return n;
+}
+
+int enoughsailors(const ship * sh, int ship_sailors)
+{
+    return ship_sailors >= sh->type->sumskill;
 }
 
 /* ------------------------------------------------------------- */
@@ -778,7 +783,7 @@ static void drifting_ships(region * r)
 
             assert(sh->type->construction->improvement == NULL);      /* sonst ist construction::size nicht ship_type::maxsize */
             if (captain && sh->size == sh->type->construction->maxsize
-                && enoughsailors(sh, r) && cansail(r, sh)) {
+                && enoughsailors(sh, ship_sailors(sh)) && cansail(r, sh)) {
                 shp = &sh->next;
                 continue;
             }
@@ -1764,7 +1769,7 @@ static bool ship_ready(const region * r, unit * u)
         cmistake(u, u->thisorder, 15, MSG_MOVE);
         return false;
     }
-    if (!enoughsailors(u->ship, r)) {
+    if (!enoughsailors(u->ship, ship_sailors(u->ship))) {
         cmistake(u, u->thisorder, 1, MSG_MOVE);
         /*		mistake(u, u->thisorder,
                                         "Auf dem Schiff befinden sich zuwenig erfahrene Seeleute.", MSG_MOVE); */

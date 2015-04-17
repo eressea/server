@@ -5721,11 +5721,10 @@
         das 50fache und auch im Kampf werden sich die
         erhöhte Kraft und die trollisch zähe Haut
         positiv auswirken.</text>
-      <text locale="en">This artifact gives the one wearing it
+      <text locale="en">This artifact gives the wearer
         the strength of a cavetroll. He will be able to
-        carry fifty times as much as normal and also in
-        combat his enhanced strength and tough troll
-        skin will serve him well.</text>
+        carry fifty times his normal load, as well as
+        gain strength and tough troll skin in combat.</text>
     </string>
     <string name="auraleak">
       <text locale="de">Der Schwarzmagier kann mit diesem
@@ -5735,7 +5734,7 @@
         Region werden einen Großteil ihrer Aura
         verlieren.</text>
       <text locale="en">With this dark ritual the
-        chaossorcerer causes a deep rift to appear in
+        chaos sorcerer causes a deep rift to appear in
         the astral balance that will tear all magical
         power from a region. All spellcasters in that
         region will lose most of their aura.</text>
