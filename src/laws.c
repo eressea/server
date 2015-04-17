@@ -1321,7 +1321,7 @@ int ally_cmd(unit * u, struct order *ord)
 
     s = gettoken(token, sizeof(token));
 
-    if (!s[0])
+    if (s && !s[0])
         keyword = P_ANY;
     else
         keyword = findparam(s, u->faction->locale);
