@@ -400,8 +400,6 @@ static ship *setup_ship(void) {
     ship_type *stype;
     ship *sh;
 
-    test_cleanup();
-    test_create_world();
     r = test_create_region(0, 0, test_create_terrain("ocean", 0));
     stype = test_create_shiptype("longboat");
     stype->cptskill = 1;
@@ -557,7 +555,6 @@ static void test_shipspeed(CuTest *tc) {
     set_level(crew, SK_SAILING, (stype->sumskill - stype->cptskill) * 11);
     set_level(cap, SK_SAILING, stype->cptskill + 10);
     CuAssertIntEquals_Msg(tc, "regular skills should not exceed sh.range", 2, shipspeed(sh, cap));
-
 }
 
 CuSuite *get_ship_suite(void)
@@ -574,6 +571,7 @@ CuSuite *get_ship_suite(void)
     SUITE_ADD_TEST(suite, test_shipowner_goes_to_other_after_leave);
     SUITE_ADD_TEST(suite, test_shipowner_goes_to_same_faction_after_leave);
     SUITE_ADD_TEST(suite, test_shipowner_goes_to_empty_unit_after_leave);
+    SUITE_ADD_TEST(suite, test_crew_skill);
     SUITE_ADD_TEST(suite, test_shipspeed);
     SUITE_ADD_TEST(suite, test_shipspeed_stormwind);
     SUITE_ADD_TEST(suite, test_shipspeed_nodrift);

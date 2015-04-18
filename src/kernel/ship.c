@@ -336,8 +336,11 @@ int shipspeed(const ship * sh, const unit * u)
     }
 
     bonus = ShipSpeedBonus(u);
-    if (bonus > 0) {
-        //
+    if (bonus > 0 && sh->type->range_max>sh->type->range) {
+        int crew = crew_skill(sh);
+        int crew_bonus = (crew / sh->type->sumskill / 2) - 1;
+        bonus = _min(bonus, crew_bonus);
+        bonus = _min(bonus, sh->type->range_max - sh->type->range);
     }
     k += bonus;
 
