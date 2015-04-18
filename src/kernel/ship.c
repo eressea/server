@@ -305,6 +305,7 @@ int shipspeed(const ship * sh, const unit * u)
     static bool init;
     attrib *a;
     struct curse *c;
+    int bonus;
 
     assert(sh);
     if (!u) u = ship_owner(sh);
@@ -334,7 +335,11 @@ int shipspeed(const ship * sh, const unit * u)
         }
     }
 
-    k += ShipSpeedBonus(u);
+    bonus = ShipSpeedBonus(u);
+    if (bonus > 0) {
+        //
+    }
+    k += bonus;
 
     a = a_find(sh->attribs, &at_speedup);
     while (a != NULL && a->type == &at_speedup) {
