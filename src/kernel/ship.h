@@ -36,6 +36,7 @@ extern "C" {
         char *_name;
 
         int range;                  /* range in regions */
+        int range_max;
         int flags;                  /* flags */
         int combat;                 /* modifier for combat */
         int fishing;                /* weekly income from fishing */

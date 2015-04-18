@@ -505,6 +505,7 @@ static int parse_ships(xmlDocPtr doc)
             st->minskill = xml_ivalue(node, "minskill", st->minskill);
             st->sumskill = xml_ivalue(node, "sumskill", st->sumskill);
             st->range = xml_ivalue(node, "range", st->range);
+            st->range_max = xml_ivalue(node, "range_max", st->range_max);
             st->storm = xml_fvalue(node, "storm", st->storm);
 
             /* reading eressea/ships/ship/construction */
