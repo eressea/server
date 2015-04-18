@@ -107,7 +107,17 @@ ship * test_create_ship(region * r, const ship_type * stype)
 ship_type * test_create_shiptype(const char * name)
 {
     ship_type * stype = st_get_or_create(name);
-    locale_setstring(default_locale, name, name);
+    stype->cptskill = 1;
+    stype->sumskill = 1;
+    stype->minskill = 1;
+    if (!stype->construction) {
+        stype->construction = calloc(1, sizeof(construction));
+        stype->construction->maxsize = 5;
+        stype->construction->minskill = 1;
+        stype->construction->reqsize = 1;
+        stype->construction->skill = SK_SHIPBUILDING;
+        locale_setstring(default_locale, name, name);
+    }
     return stype;
 }
 

@@ -282,6 +282,20 @@ static int ShipSpeedBonus(const unit * u)
     return 0;
 }
 
+int crew_skill(const ship *sh) {
+    int n = 0;
+    unit *u;
+
+    n = 0;
+
+    for (u = sh->region->units; u; u = u->next) {
+        if (u->ship == sh) {
+            n += eff_skill(u, SK_SAILING, sh->region) * u->number;
+        }
+    }
+    return n;
+}
+
 int shipspeed(const ship * sh, const unit * u)
 {
     double k = sh->type->range;
@@ -315,8 +329,11 @@ int shipspeed(const ship * sh, const unit * u)
     }
 
     bonus = ShipSpeedBonus(u);
-    if (bonus > 0) {
-        //
+    if (bonus > 0 && sh->type->range_max>sh->type->range) {
+        int crew = crew_skill(sh);
+        int crew_bonus = (crew / sh->type->sumskill / 2) - 1;
+        bonus = _min(bonus, crew_bonus);
+        bonus = _min(bonus, sh->type->range_max - sh->type->range);
     }
     k += bonus;
 

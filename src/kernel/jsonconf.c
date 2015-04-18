@@ -322,6 +322,9 @@ static void json_ship(cJSON *json, ship_type *st) {
             if (strcmp(child->string, "range") == 0) {
                 st->range = child->valueint;
             }
+            else if (strcmp(child->string, "maxrange") == 0) {
+                st->range_max = child->valueint;
+            }
             else {
                 log_error("ship %s contains unknown attribute %s", json->string, child->string);
             }

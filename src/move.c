@@ -469,20 +469,6 @@ static bool cansail(const region * r, ship * sh)
     return true;
 }
 
-int crew_skill(const ship *sh) {
-    int n = 0;
-    unit *u;
-
-    n = 0;
-
-    for (u = sh->region->units; u; u = u->next) {
-        if (u->ship == sh) {
-            n += eff_skill(u, SK_SAILING, sh->region) * u->number;
-        }
-    }
-    return n;
-}
-
 int enoughsailors(const ship * sh, int crew_skill)
 {
     return crew_skill >= sh->type->sumskill;
