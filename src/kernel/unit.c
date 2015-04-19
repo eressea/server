@@ -257,9 +257,9 @@ static buddy *get_friends(const unit * u, int *numfriends)
                         *fr = nf;
                     }
                     else if (nf->faction == u2->faction
-                        && (u_race(u2)->ec_flags & GIVEITEM)) {
+                        && !(u_race(u2)->ec_flags & ECF_KEEP_ITEM)) {
                         /* we don't like to gift it to units that won't give it back */
-                        if ((u_race(nf->unit)->ec_flags & GIVEITEM) == 0) {
+                        if ((u_race(nf->unit)->ec_flags & ECF_KEEP_ITEM)) {
                             nf->unit = u2;
                         }
                     }
@@ -300,7 +300,7 @@ int gift_items(unit * u, int flags)
 
     if (u->items == NULL || fval(u_race(u), RCF_ILLUSIONARY))
         return 0;
-    if ((u_race(u)->ec_flags & GIVEITEM) == 0)
+    if ((u_race(u)->ec_flags & ECF_KEEP_ITEM))
         return 0;
 
     /* at first, I should try giving my crap to my own units in this region */
@@ -311,7 +311,7 @@ int gift_items(unit * u, int flags)
                 /* some units won't take stuff: */
                 if (u_race(u2)->ec_flags & GETITEM) {
                     /* we don't like to gift it to units that won't give it back */
-                    if (u_race(u2)->ec_flags & GIVEITEM) {
+                    if (!(u_race(u2)->ec_flags & ECF_KEEP_ITEM)) {
                         i_merge(&u2->items, &u->items);
                         u->items = NULL;
                         break;

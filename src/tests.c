@@ -31,7 +31,7 @@ struct race *test_create_race(const char *name)
 {
     race *rc = rc_get_or_create(name);
     rc->maintenance = 10;
-    rc->ec_flags |= GETITEM | GIVEITEM;
+    rc->ec_flags |= GETITEM;
     return rc;
 }
 

@@ -179,7 +179,7 @@ int count)
             if (u != v && (v->items || rtype->uget)) {
                 int mask;
 
-                if ((urace(v)->ec_flags & GIVEITEM) == 0)
+                if ((urace(v)->ec_flags & ECF_KEEP_ITEM))
                     continue;
 
                 if (v->faction == f) {
@@ -232,7 +232,7 @@ use_pooled(unit * u, const resource_type * rtype, unsigned int mode, int count)
         for (v = r->units; use > 0 && v != NULL; v = v->next) {
             if (u != v) {
                 int mask;
-                if ((urace(v)->ec_flags & GIVEITEM) == 0)
+                if ((urace(v)->ec_flags & ECF_KEEP_ITEM))
                     continue;
                 if (v->items == NULL && rtype->uget == NULL)
                     continue;

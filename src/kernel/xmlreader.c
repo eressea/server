@@ -1693,8 +1693,8 @@ static int parse_races(xmlDocPtr doc)
         if (xml_bvalue(node, "irongolem", false))
             rc->flags |= RCF_IRONGOLEM;
 
-        if (xml_bvalue(node, "giveitem", true))
-            rc->ec_flags |= GIVEITEM;
+        if (!xml_bvalue(node, "keepitem", false))
+            rc->ec_flags |= ECF_KEEP_ITEM;
         if (xml_bvalue(node, "giveperson", false))
             rc->ec_flags |= GIVEPERSON;
         if (xml_bvalue(node, "giveunit", false))
