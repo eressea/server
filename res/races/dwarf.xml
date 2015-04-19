@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
-<race name="dwarf" magres="0.050000" maxaura="1.000000" regaura="0.500000" recruitcost="110" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="24" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
+<race name="dwarf" magres="0.050000" maxaura="1.000000" regaura="0.500000" recruitcost="110" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="24" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <function name="itemdrop" value="defaultdrops"/>
     <skill name="mining" modifier="2"/>
