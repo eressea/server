@@ -30,6 +30,7 @@
 #define AUTO_RACENAME_VERSION 345 /* NPC units with name==NULL will automatically get their race for a name */
 
 #define MIN_VERSION INTPAK_VERSION      /* minimal datafile we support */
+#define MAX_VERSION 346
 #define RELEASE_VERSION AUTO_RACENAME_VERSION /* current datafile */
 
 #define STREAM_VERSION 2 /* internal encoding of binary files */

@@ -1382,7 +1382,7 @@ int readgame(const char *filename, int backup)
         assert(stream_version == STREAM_VERSION || !"unsupported data format");
     }
     assert(gdata.version >= MIN_VERSION || !"unsupported data format");
-    assert(gdata.version <= RELEASE_VERSION || !"unsupported data format");
+    assert(gdata.version <= MAX_VERSION || !"unsupported data format");
 
     gdata.encoding = enc_gamedata;
     fstream_init(&strm, F);
