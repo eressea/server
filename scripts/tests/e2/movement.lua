@@ -44,3 +44,18 @@ function test_dolphin_in_ocean()
     process_orders()
     assert_equal(r2, u1.region)
 end
+
+function test_follow()
+    local r1 = region.create(0, 0, "plain")
+    local r2 = region.create(1, 0, "plain")
+    local f = faction.create("test@example.com", "human", "de")
+    local u1 = unit.create(f, r1, 1)
+    local u2 = unit.create(f, r1, 1)
+    u1:clear_orders()
+    u2:clear_orders()
+    u1:add_order("NACH O")
+    u2:add_order("FOLGE EINHEIT " .. itoa36(u1.id))
+    process_orders()
+    assert_equal(u1.region, r2)
+    assert_equal(u2.region, r2)
+end
