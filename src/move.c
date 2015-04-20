@@ -2313,10 +2313,11 @@ static void travel(unit * u, region_list ** routep)
         if (uf->region == r) {
             order *follow_order;
             const struct locale *lang = u->faction->locale;
-
+            const char *s = LOC(uf->faction->locale, parameters[P_UNIT]);
             /* construct an order */
+            assert(s || !"missing translation for UNIT keyword");
             follow_order = create_order(K_FOLLOW, lang, "%s %i",
-                LOC(uf->faction->locale, parameters[P_UNIT]), ut->no);
+                s, ut->no);
 
             route_end = reroute(uf, route_begin, route_end);
             travel_i(uf, route_begin, route_end, follow_order, TRAVEL_FOLLOWING,

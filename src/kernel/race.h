@@ -215,7 +215,7 @@ extern "C" {
 #define RCF_IRONGOLEM      (1<<28)      /* race gets irongolem properties */
 
     /* Economic flags */
-#define GIVEITEM       (1<<1)   /* gibt Gegenstände weg */
+#define ECF_KEEP_ITEM       (1<<1)   /* gibt Gegenstände weg */
 #define GIVEPERSON     (1<<2)   /* übergibt Personen */
 #define GIVEUNIT       (1<<3)   /* Einheiten an andere Partei übergeben */
 #define GETITEM        (1<<4)   /* nimmt Gegenstände an */

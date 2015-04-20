@@ -3092,7 +3092,7 @@ static building *age_building(building * b)
          * find out if there's a magician in there. */
         for (u = r->units; u; u = u->next) {
             if (b == u->building && inside_building(u)) {
-                if (!(u_race(u)->ec_flags & GIVEITEM) == 0) {
+                if ((u_race(u)->ec_flags & ECF_KEEP_ITEM) == 0) {
                     int n, unicorns = 0;
                     for (n = 0; n != u->number; ++n) {
                         if (chance(0.02)) {
