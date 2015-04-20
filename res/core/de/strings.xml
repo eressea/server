@@ -4422,7 +4422,7 @@
     </string>
     <string name="auratransfer">
       <text locale="de">
-        Mit Hilfe dieses Zauber kann der Magier eigene Aura im Verhältnis
+        Mit Hilfe dieses Zaubers kann der Magier eigene Aura im Verhältnis
         2:1 auf einen anderen Magier des gleichen Magiegebietes oder im
         Verhältnis 3:1 auf einen Magier eines anderen Magiegebietes
         übertragen.
@@ -4486,7 +4486,7 @@
       Dieses magische Lied wird, einmal mit Inbrunst gesungen, sich in der 
       Region fortpflanzen, von Mund zu Mund springen und eine Zeitlang 
       überall zu vernehmen sein. Nach wie vielen Wochen der Gesang aus dem 
-      Gedächnis der Region entschwunden ist, ist von dem Geschick des Barden 
+      Gedächtnis der Region entschwunden ist, ist von dem Geschick des Barden 
       abhängig. Bis das Lied ganz verklungen ist, wird seine Magie allen 
       Verbündeten des Barden (HELFE BEWACHE), und natürlich auch seinen 
       eigenem Volk, einen einmaligen Bonus von 15% 
@@ -4996,7 +4996,7 @@
     <string name="cerrdorfumbleshield">
       <text locale="de">Dieser schrille Gesang hallt über das
       ganze Schlachtfeld. Die besonderen Dissonanzen in den
-      Melodien machen es Magier fast unmöglich, sich auf ihre
+      Melodien machen es Magiern fast unmöglich, sich auf ihre
       Zauber zu konzentrieren.</text>
       <text locale="en">The screeching sounds of this melody
       can be heard across the whole battlefield. Wizards
@@ -5009,7 +5009,7 @@
       kann, was für Gegenstände sie mit sich führt und sollte
       sie magisch begabt sein, sogar welche Zauber sie
       beherrscht. Leider beeinflußt dieser Zauber nicht das
-      Gedächnis, und so wird sie sich im nachhinein wohl
+      Gedächtnis, und so wird sie sich im nachhinein wohl
       bewußt werden, dass sie zuviel erzählt hat.</text>
       <text locale="en">The persons of the bewitched unit
       starts to babble without control about what it is said,
