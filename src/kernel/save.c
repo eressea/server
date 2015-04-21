@@ -1602,9 +1602,9 @@ int readgame(const char *filename, int backup)
             unit *u = read_unit(&gdata);
             sc_mage *mage;
 
-            if (gdata.version < AUTO_RACENAME_VERSION) {
+            if (gdata.version < JSON_REPORT_VERSION) {
                 if (u->_name && fval(u->faction, FFL_NPC)) {
-                    if (unit_name_equals_race(u)) {
+                    if (!u->_name[0] || unit_name_equals_race(u)) {
                         unit_setname(u, NULL);
                     }
                 }

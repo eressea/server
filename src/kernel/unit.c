@@ -1649,7 +1649,7 @@ const char *unit_getname(const unit * u)
 void unit_setname(unit * u, const char *name)
 {
     free(u->_name);
-    if (name)
+    if (name && name[0])
         u->_name = _strdup(name);
     else
         u->_name = NULL;
