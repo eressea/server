@@ -1080,7 +1080,7 @@
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die einheit kann sich nicht so gut tarnen."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann sich nicht so gut tarnen."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' -The unit cannot hide that well."</text>
   </message>
 
