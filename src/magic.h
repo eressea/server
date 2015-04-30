@@ -360,7 +360,7 @@ extern "C" {
     extern void write_spells(struct quicklist *slist, struct storage *store);
     extern void read_spells(struct quicklist **slistp, magic_t mtype,
     struct storage *store);
-    extern float MagicPower(void);
+    float MagicPower(float force);
 
     extern struct spellbook * get_spellbook(const char * name);
     extern void free_spellbooks(void);

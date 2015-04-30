@@ -1868,7 +1868,7 @@ static void do_extra_spell(troop at, const att * a)
     else {
         int level = a->level;
         assert(a->level > 0);
-        cast_combatspell(at, sp, level, level * MagicPower());
+        cast_combatspell(at, sp, level, MagicPower((float)level));
     }
 }
 

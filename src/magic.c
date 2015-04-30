@@ -117,14 +117,17 @@ static float MagicRegeneration(void)
     return value;
 }
 
-float MagicPower(void)
+float MagicPower(float force)
 {
     static float value = -1.0;
+    if (force <= 0) {
+        return 0;
+    }
     if (value < 0) {
         const char *str = get_param(global.parameters, "magic.power");
         value = str ? (float)atof(str) : 1.0f;
     }
-    return value;
+    return _max(value * force, 1.0f);
 }
 
 static int a_readicastle(attrib * a, void *owner, struct storage *store)
@@ -1074,7 +1077,7 @@ spellpower(region * r, unit * u, const spell * sp, int cast_level, struct order 
         }
     }
 
-    force = force * MagicPower();
+    force = MagicPower(force);
 
     return _max(force, 0);
 }

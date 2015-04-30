@@ -20,6 +20,7 @@ without prior permission by the authors of Eressea.
 #include "alchemy.h"
 #include "bindings.h"
 #include "move.h"
+#include "reports.h"
 
 /*  attributes includes */
 #include <attributes/racename.h>
@@ -57,6 +58,17 @@ without prior permission by the authors of Eressea.
 #include <stdlib.h>
 #include <limits.h>
 
+static int tolua_bufunit(lua_State * L) {
+    char buf[8192];
+    unit *self = (unit *)tolua_tousertype(L, 1, 0);
+    int mode = (int)tolua_tonumber(L, 2, see_unit);
+    if (!self)  return 0;
+
+    bufunit(self->faction, self, 0, mode, buf, sizeof(buf));
+    tolua_pushstring(L, buf);
+    return 1;
+
+}
 static int tolua_unit_get_objects(lua_State * L)
 {
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
@@ -533,7 +545,7 @@ static void unit_castspell(unit * u, const char *name, int level)
             }
             else {
                 castorder co;
-                create_castorder(&co, u, 0, sp, u->region, level, level * MagicPower(), 0, 0, 0);
+                create_castorder(&co, u, 0, sp, u->region, level, MagicPower((float)level), 0, 0, 0);
                 sp->cast(&co);
                 free_castorder(&co);
             }
@@ -1058,6 +1070,7 @@ void tolua_unit_open(lua_State * L)
 #ifdef BSON_ATTRIB
             tolua_variable(L, TOLUA_CAST "attribs", &tolua_unit_get_attribs, 0);
 #endif
+            tolua_function(L, TOLUA_CAST "show", &tolua_bufunit);
         }
         tolua_endmodule(L);
     }
