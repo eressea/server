@@ -3569,13 +3569,13 @@
 
   </namespace>
   <namespace name="damage">
-    <string name="critical">
+    <string name="plusstrong">
       <text locale="de">sehr stark</text>
-      <text locale="en">critically wounded</text>
+      <text locale="en">super strong</text>
     </string>
-    <string name="heavily">
+    <string name="strong">
       <text locale="de">stark</text>
-      <text locale="en">heavily wounded</text>
+      <text locale="en">strong</text>
     </string>
     <string name="badly">
       <text locale="de">schwer verwundet</text>
