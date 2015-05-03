@@ -224,11 +224,13 @@ faction *get_or_create_monsters(void)
         race *rc = rc_get_or_create("dragon");
         const char *email = get_param(global.parameters, "monster.email");
         fset(rc, RCF_UNARMEDGUARD);
+        fset(rc, RCF_NPC);
         f = addfaction(email ? email : "noreply@eressea.de", NULL, rc, default_locale, 0);
         renumber_faction(f, MONSTER_ID);
         faction_setname(f, "Monster");
         fset(f, FFL_NPC | FFL_NOIDLEOUT);
     }
+    assert(fval(f, FFL_NPC) && fval(f->race, RCF_UNARMEDGUARD) && fval(f->race, RCF_NPC) && fval(f, FFL_NOIDLEOUT));
     return f;
 }
 

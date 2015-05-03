@@ -43,7 +43,7 @@ static void init_language(void)
     init_skills(lang);
 }
 
-static world_fixture *create_monsters(faction **f, faction **f2, region **r, unit **u, unit **m,
+static world_fixture *create_monsters(faction **player, faction **monsters, region **r, unit **u, unit **m,
     bool two_regions) {
     world_fixture *world;
 
@@ -57,15 +57,15 @@ static world_fixture *create_monsters(faction **f, faction **f2, region **r, uni
     }
     init_language();
 
-    *f = test_create_faction(NULL);
-    *f2 = get_or_create_monsters();
-    (*f2)->locale = default_locale;
+    *player = test_create_faction(NULL);
+    *monsters = get_or_create_monsters();
+    (*monsters)->locale = default_locale;
 
     *r = findregion(0, 0);
 
-    *u = test_create_unit(*f, *r);
+    *u = test_create_unit(*player, *r);
     unit_setid(*u, 1);
-    *m = test_create_unit(*f2, *r);
+    *m = test_create_unit(*monsters, *r);
 
     return world;
 }
@@ -183,6 +183,32 @@ static void test_dragon_moves(CuTest * tc)
     test_cleanup();
 }
 
+static void test_monsters_learn_exp(CuTest * tc)
+{
+    faction *f, *f2;
+    region *r;
+    unit *u, *m;
+    skill* sk;
+
+    float chance = global.producexpchance;
+    global.producexpchance = 1.0;
+
+    create_monsters(&f, &f2, &r, &u, &m, false);
+
+    u_setrace(u, u_race(m));
+    produceexp(u, SK_MELEE, u->number);
+    sk = unit_skill(u, SK_MELEE);
+    CuAssertTrue(tc, !sk);
+
+
+    produceexp(m, SK_MELEE, u->number);
+    sk = unit_skill(m, SK_MELEE);
+    CuAssertTrue(tc, sk && (sk->level>0 || (sk->level==0 && sk->weeks > 0)));
+
+    global.producexpchance = chance;
+    test_cleanup();
+}
+
 CuSuite *get_monsters_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -191,5 +217,6 @@ CuSuite *get_monsters_suite(void)
     SUITE_ADD_TEST(suite, test_dragon_attacks_guard);
     SUITE_ADD_TEST(suite, test_dragon_attacks_guard_not);
     SUITE_ADD_TEST(suite, test_dragon_moves);
+    SUITE_ADD_TEST(suite, test_monsters_learn_exp);
     return suite;
 }
