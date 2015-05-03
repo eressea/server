@@ -244,6 +244,7 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
     int k = 0;
     int error = 0;
     message * msg;
+    int maxt = max_transfers();
 
     assert(u2);
 
@@ -303,7 +304,7 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
             error = 96;
         }
         else if (u->faction != u2->faction) {
-            if (u2->faction->newbies + n > max_transfers()) {
+            if (maxt>=0 && u2->faction->newbies + n > maxt) {
                 error = 129;
             }
             else if (u_race(u) != u2->faction->race) {
@@ -365,7 +366,7 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
             set_leftship(u2, sh);
         }
         transfermen(u, u2, n);
-        if (u->faction != u2->faction) {
+        if (maxt>=0 && u->faction != u2->faction) {
             u2->faction->newbies += n;
         }
     }
