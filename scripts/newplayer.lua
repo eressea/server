@@ -2,18 +2,19 @@ function seed(r, email, race, lang)
     local f = faction.create(email, race, lang)
     local u = unit.create(f, r)
     u:set_skill("perception", 30)
-    u:add_item("money", 10000)
+    u:add_item("money", 20000)
     items = {
-    log = 50,
-    stone = 50,
-    iron = 50,
-    laen = 10,
-    mallorn = 10,
-    skillpotion = 5
+        log = 50,
+        stone = 50,
+        iron = 50,
+        laen = 10,
+        mallorn = 10,
+        skillpotion = 5
     }
     for it, num in pairs(items) do
         u:add_item(it, num)
     end
+    u = nil
     skills ={
     "crossbow",
     "mining",
@@ -35,15 +36,15 @@ function seed(r, email, race, lang)
     "roadwork",
     "tactics",
     "stealth",
-    "entertainment",
     "weaponsmithing",
     "cartmaking",
     "taxation",
     "stamina"
     }
+    unit.create(f, r, 50):set_skill("entertainment", 15)
     for _, sk in ipairs(skills) do
-        u = unit.create(f, r, 5)
-        u:set_skill(sk, 15)
+        u = u or unit.create(f, r, 5)
+        if u:set_skill(sk, 15)>0 then u=nil end
     end
     return f
 end
