@@ -36,6 +36,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "item.h"
 #include "keyword.h"
 #include "messages.h"
+#include "monster.h"
 #include "move.h"
 #include "objtypes.h"
 #include "order.h"
@@ -1587,7 +1588,7 @@ int maintenance_cost(const struct unit *u)
 int produceexp(struct unit *u, skill_t sk, int n)
 {
     if (global.producexpchance > 0.0F) {
-        if (n == 0 || !playerrace(u_race(u)))
+        if (n == 0 || (!is_monsters(u->faction) && !playerrace(u_race(u))))
             return 0;
         learn_skill(u, sk, global.producexpchance);
     }

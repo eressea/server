@@ -1072,6 +1072,7 @@ typedef struct allocation_list {
 
 static allocation_list *allocations;
 
+/* TODO unify this with move.c::is_guard* */
 static bool can_guard(const unit * guard, const unit * u)
 {
     if (fval(guard, UFL_ISNEW))
