@@ -70,7 +70,7 @@ math.randomseed(os.time())
 print(#sel, limit)
 
 players = {
-{ email = "Reinhardt.Karnapke@Freenet.de", race = "dwarf",  lang = "de" }
+{ email = "noreply@mailinator.com", race = "dwarf",  lang = "de" }
 }
 
 for _, p in ipairs(players) do
