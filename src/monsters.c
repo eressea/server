@@ -777,16 +777,8 @@ void plan_monsters(faction * f)
 
     for (r = regions; r; r = r->next) {
         unit *u;
-        bool guarding = false;
         bool attacking = chance(attack_chance);
-        if (r->land) {
-            for (u = r->units; u; u = u->next) {
-                if (is_monsters(u->faction) && is_guard(u, GUARD_TAX)) {
-                    guarding = true;
-                    break;
-                }
-            }
-        }
+
         for (u = r->units; u; u = u->next) {
             attrib *ta;
             order *long_order = NULL;
@@ -807,7 +799,7 @@ void plan_monsters(faction * f)
             /* Befehle müssen jede Runde neu gegeben werden: */
             free_orders(&u->orders);
 
-            if (attacking && (guarding || !r->land)) {
+            if (attacking && (is_guard(u, GUARD_TAX) || !r->land)) {
                 monster_attacks(u, true, false);
             }
 
