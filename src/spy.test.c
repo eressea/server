@@ -36,22 +36,6 @@ typedef struct {
     const message_type *msg_types[NUM_TYPES];
 } spy_fixture;
 
-static const message_type *register_msg(const char *type, int n_param, ...) {
-    char **argv;
-    va_list args;
-    int i;
-
-    va_start(args, n_param);
-
-    argv = malloc(sizeof(char *) * (n_param+1));
-    for (i=0; i<n_param; ++i) {
-	argv[i] = va_arg(args, char *);
-    }
-    argv[n_param] = 0;
-    va_end(args);
-    return mt_register(mt_new(type, (const char **)argv));
-}
-
 static void setup_spy(spy_fixture *fix) {
     test_cleanup();
     fix->r = test_create_region(0, 0, NULL);
@@ -65,26 +49,6 @@ static void setup_spy(spy_fixture *fix) {
 
 }
 
-static void assert_messages(CuTest * tc, struct mlist *msglist, const message_type **types, int num_msgs, ...) {
-    va_list args;
-    int m;
-    struct message *msg;
-
-    va_start(args, num_msgs);
-
-    m = 0;
-    while (msglist) {
-	int argc = va_arg(args, int);
-	msg = msglist->msg;
-	CuAssertStrEquals(tc, types[argc]->name, msg->type->name);
-	msglist = msglist->next;
-	++m;
-    }
-    CuAssertIntEquals(tc, num_msgs, m);
-
-    va_end(args);
-}
-
 static void test_simple_spy_message(CuTest *tc) {
     spy_fixture fix;
 
@@ -92,7 +56,7 @@ static void test_simple_spy_message(CuTest *tc) {
 
     spy_message(0, fix.spy, fix.victim);
 
-    assert_messages(tc, fix.spy->faction->msgs->begin, fix.msg_types, 1, M_BASE);
+    assert_messages(tc, fix.spy->faction->msgs->begin, fix.msg_types, 1, true, M_BASE);
 
 
     test_cleanup();
@@ -124,7 +88,7 @@ static void test_all_spy_message(CuTest *tc) {
 
     spy_message(99, fix.spy, fix.victim);
 
-    assert_messages(tc, fix.spy->faction->msgs->begin, fix.msg_types, 5,
+    assert_messages(tc, fix.spy->faction->msgs->begin, fix.msg_types, 5, true,
 		    M_BASE,
 		    M_MAGE,
 		    M_FACTION,
