@@ -507,14 +507,6 @@ static int tolua_faction_tostring(lua_State * L)
     return 1;
 }
 
-#ifdef TODO /* these usertypes are undefined */
-static int tolua_faction_get_spells(lua_State * L)
-{
-    faction *self = (faction *) tolua_tousertype(L, 1, 0);
-    return tolua_quicklist_push(L, "spellbook", "spellbook_entry", self->spellbook->spells);
-}
-#endif
-
 void tolua_faction_open(lua_State * L)
 {
     /* register user types */
@@ -544,9 +536,6 @@ void tolua_faction_open(lua_State * L)
                 &tolua_faction_set_info);
             tolua_variable(L, TOLUA_CAST "units", tolua_faction_get_units, NULL);
             tolua_variable(L, TOLUA_CAST "heroes", tolua_faction_get_heroes, NULL);
-#ifdef TODO
-            tolua_variable(L, TOLUA_CAST "spells", tolua_faction_get_spells, 0);
-#endif
             tolua_variable(L, TOLUA_CAST "maxheroes", tolua_faction_get_maxheroes,
                 NULL);
             tolua_variable(L, TOLUA_CAST "password", tolua_faction_get_password,
