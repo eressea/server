@@ -560,7 +560,7 @@ static int tolua_unit_addspell(lua_State * L)
     spell *sp = find_spell(str);
 
     if (!sp) {
-        log_error("spell %s could not be found\n", str);
+        log_warning("spell %s could not be found\n", str);
         return EINVAL;
     }
     else {
@@ -763,15 +763,14 @@ static int tolua_unit_get_spells(lua_State * L)
     unit *self = (unit *) tolua_tousertype(L, 1, 0);
     sc_mage *mage = self ? get_mage(self) : 0;
     spellbook *sb = mage ? mage->spellbook : 0;
+    quicklist *slist = 0;
     if (sb) {
-        quicklist *slist = 0;
         quicklist **slist_ptr = &sb->spells;
         if (slist_ptr) {
             slist = *slist_ptr;
         }
-        return tolua_quicklist_push(L, "spell_list", "spell", slist);
     }
-    return 0;
+    return tolua_quicklist_push(L, "spellbook", "spell_entry", slist);
 }
 
 #ifdef TODO /* spellbooks */
