@@ -297,7 +297,7 @@ static int tolua_faction_set_origin(lua_State * L)
     plane *pl = rplane(r);
     int id = pl ? pl->id : 0;
 
-    set_ursprung(f, id, r->x - plane_center_x(pl), r->y - plane_center_y(pl));
+    set_origin(f, id, r->x - plane_center_x(pl), r->y - plane_center_y(pl));
     return 0;
 }
 
