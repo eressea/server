@@ -147,6 +147,7 @@ message *msg_message(const char *name, const char *sig, ...)
     const message_type *mtype = mt_find(name);
     char paramname[64];
     const char *ic = sig;
+    int argnum=0;
     variant args[16];
     memset(args, 0, sizeof(args));
 
@@ -183,6 +184,7 @@ message *msg_message(const char *name, const char *sig, ...)
             else {
                 assert(!"unknown variant type");
             }
+            argnum++;
         }
         else {
             log_error("invalid parameter %s for message type %s\n", paramname, mtype->name);
@@ -192,6 +194,10 @@ message *msg_message(const char *name, const char *sig, ...)
             ic++;
     }
     va_end(vargs);
+    if (argnum !=  mtype->nparameters) {
+        log_error("not enough parameters for message type %s\n", mtype->name);
+        assert(!"program aborted.");
+    }
 
     return msg_create(mtype, args);
 }

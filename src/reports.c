@@ -126,18 +126,24 @@ const char *report_kampfstatus(const unit * u, const struct locale *lang)
 
 const char *hp_status(const unit * u)
 {
-    double p = (double)((double)u->hp / (double)(u->number * unit_max_hp(u)));
+    double p;
+    int max_hp = u->number * unit_max_hp(u);
 
-    if (p > 2.00)
-        return mkname("damage", "critical");
-    if (p > 1.50)
-        return mkname("damage", "heavily");
+    if (u->hp ==  max_hp)
+        return NULL;
+
+    p = (double)((double)u->hp / (double)(max_hp));
+
     if (p < 0.50)
         return mkname("damage", "badly");
     if (p < 0.75)
         return mkname("damage", "wounded");
     if (p < 0.99)
         return mkname("damage", "exhausted");
+    if (p > 2.00)
+        return mkname("damage", "plusstrong");
+    if (p > 1.50)
+        return mkname("damage", "strong");
 
     return NULL;
 }
