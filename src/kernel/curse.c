@@ -117,6 +117,8 @@ int curse_age(attrib * a)
     curse *c = (curse *)a->data.v;
     int result = 0;
 
+    c_clearflag(c, CURSE_ISNEW);
+
     if (c_flags(c) & CURSE_NOAGE) {
         c->duration = INT_MAX;
     }

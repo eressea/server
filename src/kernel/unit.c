@@ -1274,7 +1274,22 @@ static int item_modification(const unit * u, skill_t sk, int val)
     return val;
 }
 
-static int att_modification(const unit * u, skill_t sk)
+static int update_gbdream(const unit * u, int bonus, curse *c, const curse_type *gbdream_ct, int sign){
+    if (curse_active(c) && c->type == gbdream_ct) {
+        double effect = curse_geteffect(c);
+        unit *mage = c->magician;
+        /* wir suchen jeweils den groessten Bonus und den groestsen Malus */
+        if (sign * effect > sign * bonus) {
+            if (mage == NULL || mage->number == 0
+                || sign>0?alliedunit(mage, u->faction, HELP_GUARD):!alliedunit(mage, u->faction, HELP_GUARD)) {
+                bonus = effect;
+            }
+        }
+    }
+    return bonus;
+}
+
+int att_modification(const unit * u, skill_t sk)
 {
     double result = 0;
     static bool init = false;
@@ -1311,22 +1326,10 @@ static int att_modification(const unit * u, skill_t sk)
         attrib *a = a_find(u->region->attribs, &at_curse);
         while (a && a->type == &at_curse) {
             curse *c = (curse *)a->data.v;
-            if (curse_active(c) && c->type == gbdream_ct) {
-                double mod = curse_geteffect(c);
-                unit *mage = c->magician;
-                /* wir suchen jeweils den groesten Bonus und den groesten Malus */
-                if (mod > bonus) {
-                    if (mage == NULL || mage->number == 0
-                        || alliedunit(mage, u->faction, HELP_GUARD)) {
-                        bonus = mod;
-                    }
-                }
-                else if (mod < malus) {
-                    if (mage == NULL || !alliedunit(mage, u->faction, HELP_GUARD)) {
-                        malus = mod;
-                    }
-                }
-            }
+
+            bonus = update_gbdream(u, bonus, c, gbdream_ct, 1);
+            malus = update_gbdream(u, malus, c, gbdream_ct, -1);
+
             a = a->next;
         }
         result = result + bonus + malus;

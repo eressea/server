@@ -4645,6 +4645,8 @@ int sp_analysedream(castorder * co)
     return cast_level;
 }
 
+static int sp_gbdreams(castorder * co, const char *curse_name, int effect);
+
 /* ------------------------------------------------------------- */
 /* Name:       Schlechte Traeume
  * Stufe:      10
@@ -4660,28 +4662,7 @@ int sp_analysedream(castorder * co)
  * */
 int sp_baddreams(castorder * co)
 {
-    int duration;
-    unit *mage = co->magician.u;
-    int cast_level = co->level;
-    float power = co->force;
-    region *r = co_get_region(co);
-    curse *c;
-    float effect;
-
-    /* wirkt erst in der Folgerunde, soll mindestens eine Runde wirken,
-     * also duration+2 */
-    duration = (int)_max(1, power / 2);    /* Stufe 1 macht sonst mist */
-    duration = 2 + rng_int() % duration;
-
-    /* Nichts machen als ein entsprechendes Attribut in die Region legen. */
-    effect = -1;
-    c = create_curse(mage, &r->attribs, ct_find("gbdream"), power, duration, effect, 0);
-
-    /* Erfolg melden */
-    ADDMSG(&mage->faction->msgs, msg_message("regionmagic_effect",
-        "unit region command", c->magician, mage->region, co->order));
-
-    return cast_level;
+    return sp_gbdreams(co, "gbdream", -1);
 }
 
 /* ------------------------------------------------------------- */
@@ -4698,20 +4679,25 @@ int sp_baddreams(castorder * co)
  */
 int sp_gooddreams(castorder * co)
 {
+    return sp_gbdreams(co, "gbdream", 1);
+}
+
+static int sp_gbdreams(castorder * co, const char *curse_name, int effect)
+{
     int duration;
-    curse *c;
-    region *r = co_get_region(co);
     unit *mage = co->magician.u;
     int cast_level = co->level;
     float power = co->force;
-    float effect;
+    region *r = co_get_region(co);
+    curse *c;
 
     /* wirkt erst in der Folgerunde, soll mindestens eine Runde wirken,
      * also duration+2 */
     duration = (int)_max(1, power / 2);    /* Stufe 1 macht sonst mist */
     duration = 2 + rng_int() % duration;
-    effect = 1;
-    c = create_curse(mage, &r->attribs, ct_find("gbdream"), power, duration, effect, 0);
+
+    /* Nichts machen als ein entsprechendes Attribut in die Region legen. */
+    c = create_curse(mage, &r->attribs, ct_find(curse_name), power, duration, effect, 0);
 
     /* Erfolg melden */
     ADDMSG(&mage->faction->msgs, msg_message("regionmagic_effect",
