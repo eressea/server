@@ -177,8 +177,9 @@ set(TESTS_SRC
   market.test.c
   move.test.c
   skill.test.c
-  upkeep.test.c
+  spells.test.c
   spy.test.c
+  upkeep.test.c
   ${ATTRIBUTES_TESTS}
   ${UTIL_TESTS}
   ${KERNEL_TESTS}

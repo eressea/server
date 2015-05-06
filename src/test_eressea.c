@@ -71,6 +71,7 @@ int RunAllTests(void)
   RUN_TESTS(suite, spellbook);
   RUN_TESTS(suite, building);
   RUN_TESTS(suite, spell);
+  RUN_TESTS(suite, spells);
   RUN_TESTS(suite, ally);
   RUN_TESTS(suite, messages);
   /* gamecode */

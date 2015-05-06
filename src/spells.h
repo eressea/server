@@ -14,6 +14,10 @@
 
 #ifndef H_SPL_SPELLS
 #define H_SPL_SPELLS
+
+#include "magic.h"
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -25,6 +29,9 @@ extern "C" {
 
     void register_spells(void);
     void set_spelldata(struct spell *sp);
+
+    int sp_baddreams(castorder * co);
+    int sp_gooddreams(castorder * co);
 
 #define ACTION_RESET      0x01  /* reset the one-time-flag FFL_SELECT (on first pass) */
 #define ACTION_CANSEE     0x02  /* to people who can see the actor */
