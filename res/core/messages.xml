@@ -44,7 +44,6 @@
   <message name="mallorn_effect" section="magic">
     <type>
       <arg name="mage" type="unit"/>
-      <arg name="mage" type="unit"/>
     </type>
     <text locale="de">"$unit($mage) läßt einen Teil seiner selbst in die Erde fliessen. Die Bäume, die Transformation überlebt haben, erscheinen nun viel kräftiger."</text>
     <text locale="en">"The power of $unit($mage) flows into the ground and the trees which survived the spell appear much stronger now."</text>
