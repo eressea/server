@@ -571,6 +571,26 @@ static int tolua_unit_addspell(lua_State * L)
     return 1;
 }
 
+static int tolua_unit_addallspells(lua_State * L)
+{
+    unit *u = (unit *) tolua_tousertype(L, 1, 0);
+    const char *school = tolua_tostring(L, 2, 0);
+    spellbook *book = get_spellbook(school);
+
+    if (book && book->spells) {
+        quicklist *ql;
+        int qi;
+        for (qi = 0, ql = book->spells; ql; ql_advance(&ql, &qi, 1)) {
+            spellbook_entry * sbe = (spellbook_entry *)ql_get(ql, qi);
+            unit_add_spell(u, NULL, sbe->sp, sbe->level);
+        }
+    }
+
+    return 1;
+}
+
+
+
 static int tolua_unit_set_racename(lua_State * L)
 {
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
@@ -1032,6 +1052,7 @@ void tolua_unit_open(lua_State * L)
             tolua_variable(L, TOLUA_CAST "race_name", &tolua_unit_get_racename,
                 &tolua_unit_set_racename);
             tolua_function(L, TOLUA_CAST "add_spell", &tolua_unit_addspell);
+            tolua_function(L, TOLUA_CAST "add_all_spells", &tolua_unit_addallspells);
 #ifdef TODO /* spellbooks */
             tolua_function(L, TOLUA_CAST "remove_spell", &tolua_unit_removespell);
             tolua_variable(L, TOLUA_CAST "spells", &tolua_unit_get_spells, 0);
