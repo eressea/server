@@ -2339,7 +2339,7 @@ static bool display_race(faction * f, unit * u, const race * rc)
 
     /* b_damage : Schaden */
     at_count = 0;
-    for (a = 0; a < 6; a++) {
+    for (a = 0; a < RACE_ATTACKS; a++) {
         if (rc->attack[a].type != AT_NONE) {
             at_count++;
         }
@@ -2371,7 +2371,7 @@ static bool display_race(faction * f, unit * u, const race * rc)
     if (wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
 
-    for (a = 0; a < 6; a++) {
+    for (a = 0; a < RACE_ATTACKS; a++) {
         if (rc->attack[a].type != AT_NONE) {
             if (a != 0)
                 bytes = (int)strlcpy(bufp, ", ", size);
