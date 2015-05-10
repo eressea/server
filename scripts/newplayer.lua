@@ -4,7 +4,7 @@ p = require("populate")
 local function read_players()
 --    return {{ email = "noreply@mailinator.com", race = "dwarf",  lang = "de" }}
     local players =  {}
-    local input = open("players.txt", "r")
+    local input = open("newfactions", "r")
     while input do
         local str = input:read("*line")
         if str==nil then break end
