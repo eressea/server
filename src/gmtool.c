@@ -929,6 +929,7 @@ static void handlekey(state * st, int c)
             }
         }
         break;
+    case 'f':
     case 0x14:                 /* C-t */
         terraform_at(&st->cursor, select_terrain(st, NULL));
         st->modified = 1;
@@ -1011,6 +1012,7 @@ static void handlekey(state * st, int c)
         statusline(st->wnd_status->handle, "tag-");
         doupdate();
         switch (getch()) {
+        case 'f':
         case 't':
             terraform_selection(st->selected, select_terrain(st, NULL));
             st->modified = 1;
