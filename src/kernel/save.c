@@ -1250,7 +1250,7 @@ faction *readfaction(struct gamedata * data)
         READ_INT(data->store, &id);
         READ_INT(data->store, &ux);
         READ_INT(data->store, &uy);
-        set_ursprung(f, id, ux, uy);
+        set_origin(f, id, ux, uy);
     }
     f->newbies = 0;
 

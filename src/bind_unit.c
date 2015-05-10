@@ -560,7 +560,7 @@ static int tolua_unit_addspell(lua_State * L)
     spell *sp = find_spell(str);
 
     if (!sp) {
-        log_error("spell %s could not be found\n", str);
+        log_warning("spell %s could not be found\n", str);
         return EINVAL;
     }
     else {
@@ -758,23 +758,22 @@ static int tolua_unit_get_items(lua_State * L)
     return 1;
 }
 
-#ifdef TODO /* spellbooks */
 static int tolua_unit_get_spells(lua_State * L)
 {
     unit *self = (unit *) tolua_tousertype(L, 1, 0);
-    sc_mage *mage = get_mage(self);
+    sc_mage *mage = self ? get_mage(self) : 0;
+    spellbook *sb = mage ? mage->spellbook : 0;
     quicklist *slist = 0;
-
-    if (mage) {
-        quicklist **slist_ptr = get_spelllist(mage, self->faction);
+    if (sb) {
+        quicklist **slist_ptr = &sb->spells;
         if (slist_ptr) {
             slist = *slist_ptr;
         }
     }
-
-    return tolua_quicklist_push(L, "spell_list", "spell", slist);
+    return tolua_quicklist_push(L, "spellbook", "spell_entry", slist);
 }
 
+#ifdef TODO /* spellbooks */
 static void unit_removespell(unit * u, spell * sp)
 {
     quicklist **isptr;
@@ -1034,8 +1033,8 @@ void tolua_unit_open(lua_State * L)
             tolua_function(L, TOLUA_CAST "add_spell", &tolua_unit_addspell);
 #ifdef TODO /* spellbooks */
             tolua_function(L, TOLUA_CAST "remove_spell", &tolua_unit_removespell);
-            tolua_variable(L, TOLUA_CAST "spells", &tolua_unit_get_spells, 0);
 #endif
+            tolua_variable(L, TOLUA_CAST "spells", &tolua_unit_get_spells, 0);
             tolua_function(L, TOLUA_CAST "cast_spell", &tolua_unit_castspell);
 
             tolua_variable(L, TOLUA_CAST "magic", &tolua_unit_get_magic,

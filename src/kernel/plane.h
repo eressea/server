@@ -70,7 +70,7 @@ extern "C" {
     struct plane *getplanebyid(int id);
     int plane_center_x(const struct plane *pl);
     int plane_center_y(const struct plane *pl);
-    void set_ursprung(struct faction *f, int id, int x, int y);
+    void set_origin(struct faction *f, int id, int x, int y);
     struct plane *create_new_plane(int id, const char *name, int minx, int maxx,
         int miny, int maxy, int flags);
     struct plane *getplanebyname(const char *);

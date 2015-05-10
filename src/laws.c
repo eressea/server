@@ -2544,7 +2544,7 @@ int origin_cmd(unit * u, struct order *ord)
     px = (short)getint();
     py = (short)getint();
 
-    set_ursprung(u->faction, getplaneid(u->region), px, py);
+    set_origin(u->faction, getplaneid(u->region), px, py);
     return 0;
 }
 
