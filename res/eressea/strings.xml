@@ -1,12 +1,12 @@
-<?xml version="1.0" encoding="iso-8859-1" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <strings>
   <namespace name="spellinfo">
 	<string name="concealing_aura">
-		<text locale="de">Dieser Zauber wird die gesamte Ausrüstung der
-		Zieleinheit für
+		<text locale="de">Dieser Zauber wird die gesamte AusrÃ¼stung der
+		Zieleinheit fÃ¼r
 		einige Zeit vor den Blicken anderer verschleiern. Der
 		Zauber
-		schützt nicht vor Dieben und Spionen.</text>
+		schÃ¼tzt nicht vor Dieben und Spionen.</text>
 		<text locale="en">This spell will hide the whole equipment of a target
 		unit from the
 		looks of others. It will not protect against thieves or
@@ -15,29 +15,29 @@
   <string name="headache">
       <text locale="de">
       Aufzeichung des Vortrags von Selen Ard'Ragorn in Bar'Glingal: 
-      'Es heiss, dieser Spruch wäre wohl in den Spelunken der Westgassen 
+      'Es heiss, dieser Spruch wÃ¤re wohl in den Spelunken der Westgassen 
       entstanden, doch es kann genausogut in jedem andern verrufenen 
       Viertel gewesen sein. Seine wichtigste Zutat ist etwa ein Fass 
       schlechtesten Weines, je billiger und ungesunder, desto 
       wirkungsvoller wird die Essenz. Die Kunst, diesen Wein in pure 
       Essenz zu destillieren, die weitaus anspruchsvoller als das einfache 
       Rezeptmischen eines Alchemisten ist, und diese dergestalt zu binden 
-      und konservieren, das sie sich nicht gleich wieder verflüchtigt, wie 
-      es ihre Natur wäre, ja, dies ist etwas, das nur ein Meister des
+      und konservieren, das sie sich nicht gleich wieder verflÃ¼chtigt, wie 
+      es ihre Natur wÃ¤re, ja, dies ist etwas, das nur ein Meister des
       Cerddor vollbringen kann. Nun besitzt Ihr eine kleine Phiola mit 
-      einer rubinrotschimmernden - nun, nicht flüssig, doch auch nicht 
+      einer rubinrotschimmernden - nun, nicht flÃ¼ssig, doch auch nicht 
       ganz Dunst - nennen wir es einfach nur Elixier. Doch nicht dies ist 
       die wahre Herausforderung, sodann muss, da sich ihre Wirkung leicht 
-      verflüchtigt, diese innerhalb weniger Tage unbemerkt in das Getränk 
-      des Opfers geträufelt werden. Ihr Meister der Betöhrung und 
-      Verführung, hier nun könnt Ihr Eure ganze Kunst unter Beweis 
+      verflÃ¼chtigt, diese innerhalb weniger Tage unbemerkt in das GetrÃ¤nk 
+      des Opfers getrÃ¤ufelt werden. Ihr Meister der BetÃ¶hrung und 
+      VerfÃ¼hrung, hier nun kÃ¶nnt Ihr Eure ganze Kunst unter Beweis 
       stellen. Doch gebt Acht, nicht unbedacht selbst von dem Elixier zu 
       kosten, denn wer einmal gekostet hat, der kann vom Weine nicht mehr 
-      lassen, und er säuft sicherlich eine volle Woche lang. Jedoch nicht 
-      die Verführung zum Trunke ist die wahre Gefahr, die dem Elixier 
+      lassen, und er sÃ¤uft sicherlich eine volle Woche lang. Jedoch nicht 
+      die VerfÃ¼hrung zum Trunke ist die wahre Gefahr, die dem Elixier 
       innewohnt, sondern das der Trunkenheit so sicher ein gar 
-      fürchterliches Leid des Kopfes folgen wird, wie der Tag auf die 
-      Nacht folgt. Und er wird gar sicherlich von seiner besten Fähigkeit 
+      fÃ¼rchterliches Leid des Kopfes folgen wird, wie der Tag auf die 
+      Nacht folgt. Und er wird gar sicherlich von seiner besten FÃ¤higkeit 
       einige Tage bis hin zu den Studien zweier Wochen vergessen haben. 
       Noch ein Wort der Warnung: Dieses ist sehr aufwendig, und so Ihr 
       noch weitere Zauber in der selben Woche wirken wollt, so werden sie Euch 
@@ -47,11 +47,11 @@
     <string name="analysedream">
       <text locale="de">Mit diesem Spruch kann der Traumweber
         versuchen, die Verzauberungen einer einzelnen
-        Einheit zu erkennen. Von allen Sprüchen, die
-        seine eigenen Fähigkeiten nicht überschreiten,
+        Einheit zu erkennen. Von allen SprÃ¼chen, die
+        seine eigenen FÃ¤higkeiten nicht Ã¼berschreiten,
         wird er einen Eindruck ihres Wirkens erhalten
-        können. Bei stärkeren Sprüchen benötigt er ein
-        wenig Glück für eine gelungene Analyse.</text>
+        kÃ¶nnen. Bei stÃ¤rkeren SprÃ¼chen benÃ¶tigt er ein
+        wenig GlÃ¼ck fÃ¼r eine gelungene Analyse.</text>
       <text locale="en">With this spell the mentalist can
         attempt to detect enchantments on a target unit.
         He will get an idea of the effect of all spells
@@ -76,35 +76,35 @@
       <text locale="en">snowman</text>
     </string>
     <string name="snowman_p">
-      <text locale="de">Schneemänner</text>
+      <text locale="de">SchneemÃ¤nner</text>
       <text locale="en">snowmen</text>
     </string>
   </namespace>
   <namespace name="shipinfo">
     <!-- ship info is not implemented! -->
     <string name="no_info">
-      <text locale="de">Keine Informationen über diesen Schiffstyp verfügbar.</text>
+      <text locale="de">Keine Informationen Ã¼ber diesen Schiffstyp verfÃ¼gbar.</text>
       <text locale="en">No Information available for this type of ship.</text>
     </string>
     <string name="balloon">
-      <text locale="de">Der Sumpfgasballon besteht aus einem großen 
+      <text locale="de">Der Sumpfgasballon besteht aus einem groÃŸen 
         Weidenkorb, welcher Platz
-        für maximal 5 Personen oder 500 Gewichtseinheiten bietet, und einer
-        großen, mit Sumpfgas gefüllten Wyrmblase. Bei guten Winden kann sich
-        der Ballon zwei Regionen pro Woche fortbewegen. Das Führen eines
-        Ballons ist nicht einfach, und der Kapitän muss mindestens ein
+        fÃ¼r maximal 5 Personen oder 500 Gewichtseinheiten bietet, und einer
+        groÃŸen, mit Sumpfgas gefÃ¼llten Wyrmblase. Bei guten Winden kann sich
+        der Ballon zwei Regionen pro Woche fortbewegen. Das FÃ¼hren eines
+        Ballons ist nicht einfach, und der KapitÃ¤n muss mindestens ein
         Segeltalent von 6 besitzen. Diese neue Entwicklung auf Eressea wird
-        ausschließlich für den Xontormia-Expreß hergestellt und die Baupläne
+        ausschlieÃŸlich fÃ¼r den Xontormia-ExpreÃŸ hergestellt und die BauplÃ¤ne
         sind streng geheim. So ist es auch bisher noch niemandem gelungen, ein
         Exemplar nachzubauen.</text>
     </string>
   </namespace>
   <namespace name="iteminfo">
     <string name="ring_of_levitation">
-      <text locale="de">Benutzt der Kapitän des Schiffes diesen Talisman, so wird allen an Bord befindlichen Mallornsamen ihre magisch Energie entzogen, und das Schiff kann mit dieser Energie bis zu zwei Wochen lang fliegen.</text>
+      <text locale="de">Benutzt der KapitÃ¤n des Schiffes diesen Talisman, so wird allen an Bord befindlichen Mallornsamen ihre magisch Energie entzogen, und das Schiff kann mit dieser Energie bis zu zwei Wochen lang fliegen.</text>
     </string>
     <string name="birthdaycake">
-      <text locale="de">Eine Geburtstagstorte mit 10 Kerzen. Herzlichen Glückwunsch, Eressea!</text>
+      <text locale="de">Eine Geburtstagstorte mit 10 Kerzen. Herzlichen GlÃ¼ckwunsch, Eressea!</text>
       <text locale="en">A birthday cake with 10 candles. Happy Birthday, Eressea!</text>
     </string>
     <string name="no_info">
@@ -112,98 +112,98 @@
       <text locale="en">No Information available.</text>
     </string>
     <string name="griphonwing">
-      <text locale="de">Dieses Fluggerät aus der Schmiede der Zwerge von Celeband galt wie die
+      <text locale="de">Dieses FluggerÃ¤t aus der Schmiede der Zwerge von Celeband galt wie die
         'Ebene der Herausforderung' seit Urzeiten als verschollen, ja man
-        zweifelte seine Existenz an. Die Sage überliefert, das derjenige, der
+        zweifelte seine Existenz an. Die Sage Ã¼berliefert, das derjenige, der
         sie auf der Spitze des Turmes seiner Gesinnung benutzt, als einziger
         die 'Ebene der Herausforderungen' verlassen kann.</text>
     </string>
     <string name="ao_daemon">
-      <text locale="de">Glückwunsch, mein Kind. Du bist im Besitz des mächtigsten
+      <text locale="de">GlÃ¼ckwunsch, mein Kind. Du bist im Besitz des mÃ¤chtigsten
         Artefaktes Eresseas. Ein Fluch, sagt man, liege auf ihm, denn
         niemand hat es bisher lange sein Eigen genannt...</text>
     </string>
     <string name="cookie">
-      <text locale="de">Kleines trockenes Dauergebäck, m od. s; - u. -es, - u. -e</text>
+      <text locale="de">Kleines trockenes DauergebÃ¤ck, m od. s; - u. -es, - u. -e</text>
     </string>
     <string name="eyeofdragon">
       <text locale="de">So wisse denn, dass das Auge des Drachen den Weg zur Herausforderung
-        aufzeigt. Doch die Überlieferung sagt, das nur der Unschuldige und
-        Ungewappnete es benutzen kann. Sie sagt auch, daß er einen Beutel mit
-        einem Betrag von bis zu zweitausend Silber mit sich führen soll,
-        jedoch nicht mehr als einem Fünftel der Stärke seines Volkes
-        entsprechend - dem Torwächter zum Geschenke als Beweis seiner
+        aufzeigt. Doch die Ãœberlieferung sagt, das nur der Unschuldige und
+        Ungewappnete es benutzen kann. Sie sagt auch, daÃŸ er einen Beutel mit
+        einem Betrag von bis zu zweitausend Silber mit sich fÃ¼hren soll,
+        jedoch nicht mehr als einem FÃ¼nftel der StÃ¤rke seines Volkes
+        entsprechend - dem TorwÃ¤chter zum Geschenke als Beweis seiner
         asketischen Gesinnung. Die 5 scheidet ganz aus.</text>
     </string>
     <string name="almond">
-      <text locale="de">(Prunus dulcis) [...] Die Nüsse existieren in zwei Varianten, süß und
-        bitter. Süße Mandeln sind der bekannte eßbare Typ, der in Form von
-        Nüssen gegessen, beim Kochen verwandt oder zu Mandelöl und Mandelmehl
+      <text locale="de">(Prunus dulcis) [...] Die NÃ¼sse existieren in zwei Varianten, sÃ¼ÃŸ und
+        bitter. SÃ¼ÃŸe Mandeln sind der bekannte eÃŸbare Typ, der in Form von
+        NÃ¼ssen gegessen, beim Kochen verwandt oder zu MandelÃ¶l und Mandelmehl
         verarbeitet wird.</text>
     </string>
     <string name="apple">
       <text locale="en">A tasty fruit.</text>
-      <text locale="de">Frucht aus der Gattung Malus (ca. 25 Arten), gehört
+      <text locale="de">Frucht aus der Gattung Malus (ca. 25 Arten), gehÃ¶rt
         zur Familie der
-        Rosengewächse. Die am häufigsten kultivierte Baumfrucht. Der Apfel
-        gehört zu den fleischigen Früchten, in dem der gereifte Fruchtknoten
+        RosengewÃ¤chse. Die am hÃ¤ufigsten kultivierte Baumfrucht. Der Apfel
+        gehÃ¶rt zu den fleischigen FrÃ¼chten, in dem der gereifte Fruchtknoten
         und
-        das umgebende Gewebe fleischig und eßbar werden. Die Apfelblüte der
-        meisten Varianten erfordert Kreuzbestäubung zur Befruchtung. Form und
-        Größe des Apfels bei der Ernte variieren abhängig von kulturellen und
-        umweltbedingten Einflüssen in Größe, Form, Farbe und Geschmack, sind
-        jedoch nichtsdestotrotz üblicherweise rund, zwischen 50 und 100mm im
-        Durchmesser und weisen röt- oder gelbliche Farbtöne auf.</text>
+        das umgebende Gewebe fleischig und eÃŸbar werden. Die ApfelblÃ¼te der
+        meisten Varianten erfordert KreuzbestÃ¤ubung zur Befruchtung. Form und
+        GrÃ¶ÃŸe des Apfels bei der Ernte variieren abhÃ¤ngig von kulturellen und
+        umweltbedingten EinflÃ¼ssen in GrÃ¶ÃŸe, Form, Farbe und Geschmack, sind
+        jedoch nichtsdestotrotz Ã¼blicherweise rund, zwischen 50 und 100mm im
+        Durchmesser und weisen rÃ¶t- oder gelbliche FarbtÃ¶ne auf.</text>
     </string>
     <string name="nut">
-      <text locale="de">Nuß, im umgangssprachlichen Sinne alle trockenen,
+      <text locale="de">NuÃŸ, im umgangssprachlichen Sinne alle trockenen,
         hartschaligen
-        Früchte oder Samen, die eine Schale besitzen, die sich leicht
-        vom inneren, eßbaren Kern entfernen läßt. In der botanischen
-        Terminologie beschränkt sich die Bezeichnung Nuß auf eine
+        FrÃ¼chte oder Samen, die eine Schale besitzen, die sich leicht
+        vom inneren, eÃŸbaren Kern entfernen lÃ¤ÃŸt. In der botanischen
+        Terminologie beschrÃ¤nkt sich die Bezeichnung NuÃŸ auf eine
         einsamige Frucht, die aus einem Fruchtknoten (Ovarium)
-        entstanden ist, dessen äußere Wände sich verholzt haben und der
-        sich nicht öffnet, um seinen Samen zu entlassen. Solche echten
-        Nüsse können eßbar, aber auch ungenießbar sein. Bekannte
-        Beispiele sind Eicheln, Bucheckern, Kastanien und Haselnüsse.
-        Beispiele für Früchte oder Samen, die vom Volksmund fälschlich
-        als Nüsse bezeichnet werden, sind Mandeln und Walnüsse: Im
-        botanischen Sinne sind dies Steinfrüchte, denen die fleischige
-        äußere Schale entfernt wurde.  Andere Beispiele für unechte
-        Nüsse sind Erdnüsse - in Hülsen eingeschlossene Samen - sowie
-        Roßkastanien und Paranüsse, bei denen es sich um von Kapseln
-        umhüllte Samen handelt.</text>
+        entstanden ist, dessen Ã¤uÃŸere WÃ¤nde sich verholzt haben und der
+        sich nicht Ã¶ffnet, um seinen Samen zu entlassen. Solche echten
+        NÃ¼sse kÃ¶nnen eÃŸbar, aber auch ungenieÃŸbar sein. Bekannte
+        Beispiele sind Eicheln, Bucheckern, Kastanien und HaselnÃ¼sse.
+        Beispiele fÃ¼r FrÃ¼chte oder Samen, die vom Volksmund fÃ¤lschlich
+        als NÃ¼sse bezeichnet werden, sind Mandeln und WalnÃ¼sse: Im
+        botanischen Sinne sind dies SteinfrÃ¼chte, denen die fleischige
+        Ã¤uÃŸere Schale entfernt wurde.  Andere Beispiele fÃ¼r unechte
+        NÃ¼sse sind ErdnÃ¼sse - in HÃ¼lsen eingeschlossene Samen - sowie
+        RoÃŸkastanien und ParanÃ¼sse, bei denen es sich um von Kapseln
+        umhÃ¼llte Samen handelt.</text>
     </string>
     <string name="jadee_ring">
-      <text locale="de">Zwerge schufen diesen wunderschönen Ring aus Weissgold und Platin. Die
-        Oberfläche ist so glatt, dass man nur bei genauem Hinsehen entdeckt,
+      <text locale="de">Zwerge schufen diesen wunderschÃ¶nen Ring aus Weissgold und Platin. Die
+        OberflÃ¤che ist so glatt, dass man nur bei genauem Hinsehen entdeckt,
         dass hier eigentlich zwei Metalle ineinander verarbeitet worden sind.
         In der Innenseite des Rings ist eine Gravur zu lesen: "Wildente, 3.
         Woche Eiswind Jahr 8".</text>
     </string>
     <string name="jadee_dress">
-      <text locale="de">Dieses Brautkleid ist mit Abstand das schönste, was je jemand
+      <text locale="de">Dieses Brautkleid ist mit Abstand das schÃ¶nste, was je jemand
         irgendwie irgendwo gesehen hat. Auch wenn nur Wildente und Jadee das
-        finden müssten, wird jeder Bewohner Eresseas dies neidlos bestätigen.
-        Das sehr stilvolle Kleid lässt die zarten Schultern seiner Trägerin
-        frei und liegt am Oberkörper eng an. Dies betont atemberaubend die
-        zarten Kurven der Braut. Der Rock fällt leicht ausgestellt den ganzen
+        finden mÃ¼ssten, wird jeder Bewohner Eresseas dies neidlos bestÃ¤tigen.
+        Das sehr stilvolle Kleid lÃ¤sst die zarten Schultern seiner TrÃ¤gerin
+        frei und liegt am OberkÃ¶rper eng an. Dies betont atemberaubend die
+        zarten Kurven der Braut. Der Rock fÃ¤llt leicht ausgestellt den ganzen
         langen Weg an den Beinen herunter Richtung Boden, wo er sich in einer
         sehr stilvollen Schleppe ergiesst.</text>
     </string>
     <string name="wente_ring">
       <text locale="de">Dieser Ring ist ein wahres Meisterwerk. Obwohl er sehr gross ist
-        (weil auch sein Träger sehr gross ist), wirkt er filigran. Weissgold
+        (weil auch sein TrÃ¤ger sehr gross ist), wirkt er filigran. Weissgold
         und Platin verschmelzen in diesem Ring zu einer Einheit, die die
-        Schönheit der einzelnen Elemente nur noch unterstreich. In der
+        SchÃ¶nheit der einzelnen Elemente nur noch unterstreich. In der
         Innenseite des Rings ist eine Gravur zu lesen: 'Jadee, 3. Woche
         Eiswind Jahr 8'.</text>
     </string>
     <string name="wente_dress">
       <text locale="de">Hach! Sieht der Mann beeindruckend aus in diesem Frack! Und so
-        ordentlich! Und so ernst! Und so beeindruckend! Es fällt ein
-        wenig schwer, sich auf den Bräutigam zu konzentrieren, weil das
-        Brautkleid noch daneben strahlt, aber der Anzug des Bräutigams ist
+        ordentlich! Und so ernst! Und so beeindruckend! Es fÃ¤llt ein
+        wenig schwer, sich auf den BrÃ¤utigam zu konzentrieren, weil das
+        Brautkleid noch daneben strahlt, aber der Anzug des BrÃ¤utigams ist
         auf jeden Fall so, wie er sein soll und sieht toll aus und sehr
         geschmackvoll.</text>
     </string>
@@ -211,7 +211,7 @@
       <text locale="en">Orange nose, black hat, frosty character. A snowman.
         He'll make a fine guard if you use him in a cold place. (USE 1
         snowman)</text>
-      <text locale="de">Rübennase, schwarzer Hut, kaltes Herz. Ein Schneemann. Er gibt
+      <text locale="de">RÃ¼bennase, schwarzer Hut, kaltes Herz. Ein Schneemann. Er gibt
         einen prima Wachmann ab, wenn er in einem Gletscher belebt wird
         (BENUTZE 1 Schneemann).</text>
     </string>
@@ -219,12 +219,12 @@
       <text locale="en">These items stay frozen all year round. There seem to be bits of
         ice in them - in the right hands, these might put an eye out!</text>
       <text locale="de">Ein Schneeball. Es scheinen kleine Eissplitter darin zu sein. In
-        den richtigen Händen können sie sicher weh tun.</text>
+        den richtigen HÃ¤nden kÃ¶nnen sie sicher weh tun.</text>
     </string>
     <string name="seashell">
       <text locale="en">This badge pronounces its wearer an official visitor to the
          embassies of Muschelplateau.</text>
-      <text locale="de">Dieses Abzeichen identifiziert die Partei seines Trägers offiziell
+      <text locale="de">Dieses Abzeichen identifiziert die Partei seines TrÃ¤gers offiziell
         als einen Besucher der Botschafterregion 'Muschelplateau'.</text>
     </string>
     <string name="xmastree">
@@ -265,8 +265,8 @@
   </string>
 
   <string name="newbie_info_2">
-    <text locale="de">Die ersten beiden Züge mußt du abgeben, sonst wird deine
-    Partei sofort wieder gelöscht, um Karteileichen zu vermeiden.</text>
+    <text locale="de">Die ersten beiden ZÃ¼ge muÃŸt du abgeben, sonst wird deine
+    Partei sofort wieder gelÃ¶scht, um Karteileichen zu vermeiden.</text>
     <text locale="en">If you fail to send in orders for one of the first two turns, your faction will be erased from the game to reduce the number of inactive players in Eressea.</text>
   </string>
   <string name="newbie_info_3">
@@ -291,7 +291,7 @@
     <text locale="de">Seeschlangenkopf</text>
   </string>
   <string name="seaserpenthead_p">
-    <text locale="de">Seeschlangenköpfe</text>
+    <text locale="de">SeeschlangenkÃ¶pfe</text>
   </string>
 
   <!-- starting here: Wildente and Jadee's wedding  -->
@@ -341,7 +341,7 @@
   </string>
 
   <string name="wente_dress_p">
-    <text locale="de">Fräcke</text>
+    <text locale="de">FrÃ¤cke</text>
     <text locale="en">tuxedos</text>
   </string>
 
@@ -362,15 +362,15 @@
     <text locale="en">horn of dancing</text>
   </string>
   <string name="hornofdancing_p">
-    <text locale="de">Hörner des Tanzes</text>
+    <text locale="de">HÃ¶rner des Tanzes</text>
     <text locale="en">horns of dancing</text>
   </string>
   <string name="instantartacademy">
-    <text locale="de">Miniatur einer Akademie der Künste</text>
+    <text locale="de">Miniatur einer Akademie der KÃ¼nste</text>
     <text locale="en">academy of arts in a box</text>
   </string>
   <string name="instantartacademy_p">
-    <text locale="de">Miniaturen einer Akademie der Künste</text>
+    <text locale="de">Miniaturen einer Akademie der KÃ¼nste</text>
     <text locale="en">academies of arts in a box</text>
   </string>
   <string name="instantartsculpture">
@@ -394,7 +394,7 @@
     <text locale="en">aura potion</text>
   </string>
   <string name="aurapotion50_p">
-    <text locale="de">Auratränke</text>
+    <text locale="de">AuratrÃ¤nke</text>
     <text locale="en">aura potions</text>
   </string>
   <string name="bagpipeoffear">
@@ -402,21 +402,21 @@
     <text locale="en">bagpipe of fear</text>
   </string>
   <string name="bagpipeoffear_p">
-    <text locale="de">Dudelsäcke der Furcht</text>
+    <text locale="de">DudelsÃ¤cke der Furcht</text>
     <text locale="en">bagpipes of fear</text>
   </string>
   <!-- art rewards end -->
 
   <!-- igjarjuk queste begin -->
   <string name="ao_daemon">
-    <text locale="de">Auge des Dämon</text>
+    <text locale="de">Auge des DÃ¤mon</text>
     <text locale="en">eye of the demon</text>
-    <text locale="fr">oeil du démon</text>
+    <text locale="fr">oeil du dÃ©mon</text>
   </string>
   <string name="ao_daemon_p">
-    <text locale="de">Augen des Dämon</text>
+    <text locale="de">Augen des DÃ¤mon</text>
     <text locale="en">eyes of the demon</text>
-    <text locale="fr">oeil du démon</text>
+    <text locale="fr">oeil du dÃ©mon</text>
   </string>
   <string name="griphonwing">
     <text locale="de">Schwinge des Greifen</text>
@@ -448,16 +448,16 @@
     <text locale="en">adamantium axe</text>
   </string>
   <string name="adamantiumaxe_p">
-    <text locale="de">Adamantiumäxte</text>
+    <text locale="de">AdamantiumÃ¤xte</text>
     <text locale="en">adamantium axes</text>
   </string>
 
   <string name="adamantiumplate">
-    <text locale="de">Adamantiumrüstung</text>
+    <text locale="de">AdamantiumrÃ¼stung</text>
     <text locale="en">adamantium plate</text>
   </string>
   <string name="adamantiumplate_p">
-    <text locale="de">Adamantiumrüstungen</text>
+    <text locale="de">AdamantiumrÃ¼stungen</text>
     <text locale="en">adamantium plates</text>
   </string>
 
