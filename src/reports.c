@@ -1841,8 +1841,14 @@ static void write_script(FILE * F, const faction * f)
     fputc('\n', F);
 }
 
+static void check_messages_exist(void) {
+    ct_checknames();
+}
+
 int init_reports(void)
 {
+    check_messages_exist();
+
     prepare_reports();
     {
         if (_access(reportpath(), 0) != 0) {
@@ -2058,6 +2064,7 @@ static void eval_spell(struct opstack **stack, const void *userdata)
     const struct spell *sp = (const struct spell *)opop(stack).v;
     const char *c =
         sp ? spell_name(sp, f->locale) : LOC(f->locale, "an_unknown_spell");
+    assert(c || !"spell without description!");
     size_t len = strlen(c);
     variant var;
 
@@ -2071,6 +2078,7 @@ static void eval_curse(struct opstack **stack, const void *userdata)
     const struct curse_type *sp = (const struct curse_type *)opop(stack).v;
     const char *c =
         sp ? curse_name(sp, f->locale) : LOC(f->locale, "an_unknown_curse");
+    assert(c || !"spell effect without description!");
     size_t len = strlen(c);
     variant var;
 

@@ -44,7 +44,6 @@
   <message name="mallorn_effect" section="magic">
     <type>
       <arg name="mage" type="unit"/>
-      <arg name="mage" type="unit"/>
     </type>
     <text locale="de">"$unit($mage) läßt einen Teil seiner selbst in die Erde fliessen. Die Bäume, die Transformation überlebt haben, erscheinen nun viel kräftiger."</text>
     <text locale="en">"The power of $unit($mage) flows into the ground and the trees which survived the spell appear much stronger now."</text>
@@ -2104,8 +2103,8 @@
       <arg name="curse" type="curse"/>
       <arg name="months" type="int"/>
     </type>
-    <text locale="de">"$unit($mage) fand heraus, dass auf $ship($ship) der Zauber $curse($curse) liegt, der noch etwa $int($months) Wochen bestehen bleibt."</text>
-    <text locale="en">"$unit($mage) discovers that $ship($ship) is charmed with $curse($curse), which will last for, about $int($months) more weeks."</text>
+    <text locale="de">"$unit($mage) fand heraus, dass auf $ship($ship) der Zauber '$curse($curse)' liegt, der noch etwa $int($months) Wochen bestehen bleibt."</text>
+    <text locale="en">"$unit($mage) discovers that $ship($ship) is charmed with '$curse($curse)', which will last for, about $int($months) more weeks."</text>
   </message>
   <message name="analyse_building_age" section="magic">
     <type>
@@ -2114,8 +2113,8 @@
       <arg name="curse" type="curse"/>
       <arg name="months" type="int"/>
     </type>
-    <text locale="de">"$unit($mage) fand heraus, dass auf $building($building) der Zauber $curse($curse) liegt, der noch etwa $int($months) Wochen bestehen bleibt."</text>
-    <text locale="en">"$unit($mage) discovers that $building($building) is charmed with $curse($curse), which will last for about $int($months) more weeks."</text>
+    <text locale="de">"$unit($mage) fand heraus, dass auf $building($building) der Zauber '$curse($curse)' liegt, der noch etwa $int($months) Wochen bestehen bleibt."</text>
+    <text locale="en">"$unit($mage) discovers that $building($building) is charmed with '$curse($curse)', which will last for about $int($months) more weeks."</text>
   </message>
   <message name="analyse_unit_age" section="magic">
     <type>
@@ -2124,8 +2123,8 @@
       <arg name="curse" type="curse"/>
       <arg name="months" type="int"/>
     </type>
-    <text locale="de">"$unit($mage) fand heraus, dass auf $unit($unit) der Zauber $curse($curse) liegt, der noch etwa $int($months) Wochen bestehen bleibt."</text>
-    <text locale="en">"$unit($mage) discovers that $unit($unit) is charmed with $curse($curse) that will last for about $int($months) more weeks."</text>
+    <text locale="de">"$unit($mage) fand heraus, dass auf $unit($unit) der Zauber '$curse($curse)' liegt, der noch etwa $int($months) Wochen bestehen bleibt."</text>
+    <text locale="en">"$unit($mage) discovers that $unit($unit) is charmed with '$curse($curse)' that will last for about $int($months) more weeks."</text>
   </message>
   <message name="analyse_region_age" section="magic">
     <type>
@@ -2134,8 +2133,8 @@
       <arg name="curse" type="curse"/>
       <arg name="months" type="int"/>
     </type>
-    <text locale="de">"$unit($mage) fand heraus, dass auf $region($region) der Zauber $curse($curse) liegt, der noch etwa $int($months) Wochen bestehen bleibt."</text>
-    <text locale="en">"$unit($mage) discovers that $region($region) is charmed with $curse($curse), which will last for about $int($months) more weeks."</text>
+    <text locale="de">"$unit($mage) fand heraus, dass auf $region($region) der Zauber '$curse($curse)' liegt, der noch etwa $int($months) Wochen bestehen bleibt."</text>
+    <text locale="en">"$unit($mage) discovers that $region($region) is charmed with '$curse($curse)', which will last for about $int($months) more weeks."</text>
   </message>
   <message name="analyse_ship_noage" section="magic">
     <type>
@@ -2143,8 +2142,8 @@
       <arg name="ship" type="ship"/>
       <arg name="curse" type="curse"/>
     </type>
-    <text locale="de">"$unit($mage) fand heraus, dass auf $ship($ship) der Zauber $curse($curse) liegt, dessen Kraft ausreicht, um noch Jahrhunderte bestehen zu bleiben."</text>
-    <text locale="en">"$unit($mage) discovers that $ship($ship) is charmed with $curse($curse), which will last for centuries."</text>
+    <text locale="de">"$unit($mage) fand heraus, dass auf $ship($ship) der Zauber '$curse($curse)' liegt, dessen Kraft ausreicht, um noch Jahrhunderte bestehen zu bleiben."</text>
+    <text locale="en">"$unit($mage) discovers that $ship($ship) is charmed with '$curse($curse)', which will last for centuries."</text>
   </message>
   <message name="analyse_building_noage" section="magic">
     <type>
@@ -2152,8 +2151,8 @@
       <arg name="building" type="building"/>
       <arg name="curse" type="curse"/>
     </type>
-    <text locale="de">"$unit($mage) fand heraus, dass auf $building($building) der Zauber $curse($curse) liegt, dessen Kraft ausreicht, um noch Jahrhunderte bestehen zu bleiben."</text>
-    <text locale="en">"$unit($mage) discovers that $building($building) is charmed with $curse($curse), which will last for centuries."</text>
+    <text locale="de">"$unit($mage) fand heraus, dass auf $building($building) der Zauber '$curse($curse)' liegt, dessen Kraft ausreicht, um noch Jahrhunderte bestehen zu bleiben."</text>
+    <text locale="en">"$unit($mage) discovers that $building($building) is charmed with '$curse($curse)', which will last for centuries."</text>
   </message>
   <message name="analyse_unit_noage" section="magic">
     <type>
@@ -2161,8 +2160,8 @@
       <arg name="unit" type="unit"/>
       <arg name="curse" type="curse"/>
     </type>
-    <text locale="de">"$unit($mage) fand heraus, dass auf $unit($unit) der Zauber $curse($curse) liegt, dessen Kraft ausreicht, um noch Jahrhunderte bestehen zu bleiben."</text>
-    <text locale="en">"$unit($mage) discovers that $unit($unit) is charmed with $curse($curse), which will last for centuries."</text>
+    <text locale="de">"$unit($mage) fand heraus, dass auf $unit($unit) der Zauber '$curse($curse)' liegt, dessen Kraft ausreicht, um noch Jahrhunderte bestehen zu bleiben."</text>
+    <text locale="en">"$unit($mage) discovers that $unit($unit) is charmed with '$curse($curse)', which will last for centuries."</text>
   </message>
   <message name="analyse_region_noage" section="magic">
     <type>
@@ -2170,8 +2169,8 @@
       <arg name="region" type="region"/>
       <arg name="curse" type="curse"/>
     </type>
-    <text locale="de">"$unit($mage) fand heraus, dass auf $region($region) der Zauber $curse($curse) liegt, dessen Kraft ausreicht, um noch Jahrhunderte bestehen zu bleiben."</text>
-    <text locale="en">"$unit($mage) discovers that $region($region) is charmed with $curse($curse), which will last for centuries."</text>
+    <text locale="de">"$unit($mage) fand heraus, dass auf $region($region) der Zauber '$curse($curse)' liegt, dessen Kraft ausreicht, um noch Jahrhunderte bestehen zu bleiben."</text>
+    <text locale="en">"$unit($mage) discovers that $region($region) is charmed with '$curse($curse)', which will last for centuries."</text>
   </message>
   <message name="analyse_ship_fail" section="magic">
     <type>

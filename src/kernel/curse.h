@@ -248,47 +248,46 @@ extern "C" {
 
     void destroy_curse(curse * c);
 
-    bool is_cursed_internal(struct attrib *ap, const curse_type * ctype);
     /* ignoriert CURSE_ISNEW */
+    bool is_cursed_internal(struct attrib *ap, const curse_type * ctype);
 
+    /* löscht einen konkreten Spruch auf einem Objekt.  */
     bool remove_curse(struct attrib **ap, const struct curse *c);
-    /* löscht einen konkreten Spruch auf einem Objekt.
-     */
 
-    int curse_geteffect_int(const struct curse *c);
-    float curse_geteffect(const struct curse *c);
     /* gibt die Auswirkungen der Verzauberungen zurück. zB bei
      * Skillmodifiziernden Verzauberungen ist hier der Modifizierer
      * gespeichert. Wird automatisch beim Anlegen eines neuen curse
      * gesetzt. Gibt immer den ersten Treffer von ap aus zurück.
      */
+    int curse_geteffect_int(const struct curse *c);
+    float curse_geteffect(const struct curse *c);
 
-    float curse_changevigour(struct attrib **ap, curse * c, float i);
     /* verändert die Stärke der Verzauberung um i */
+    float curse_changevigour(struct attrib **ap, curse * c, float i);
 
-    int get_cursedmen(struct unit *u, const struct curse *c);
     /* gibt bei Personenbeschränkten Verzauberungen die Anzahl der
      * betroffenen Personen zurück. Ansonsten wird 0 zurückgegeben. */
+    int get_cursedmen(struct unit *u, const struct curse *c);
 
+    /* setzt/loescht Spezialflag einer Verzauberung (zB 'dauert ewig') */
     void c_setflag(curse * c, unsigned int flag);
     void c_clearflag(curse * c, unsigned int flags);
-    /* setzt/loescht Spezialflag einer Verzauberung (zB 'dauert ewig') */
 
-    void transfer_curse(struct unit *u, struct unit *u2, int n);
     /* sorgt dafür, das bei der Übergabe von Personen die curse-attribute
      * korrekt gehandhabt werden. Je nach internen Flag kann dies
      * unterschiedlich gewünscht sein
      * */
+    void transfer_curse(struct unit *u, struct unit *u2, int n);
 
-    struct curse *get_curse(struct attrib *ap, const curse_type * ctype);
     /* gibt pointer auf die erste curse-struct zurück, deren Typ ctype ist,
      * oder einen NULL-pointer
      * */
+    struct curse *get_curse(struct attrib *ap, const curse_type * ctype);
 
     int find_cursebyname(const char *c);
     const curse_type *ct_find(const char *c);
     void ct_register(const curse_type *);
-    /* Regionszauber */
+    void ct_checknames(void);
 
     curse *cfindhash(int i);
 
@@ -303,8 +302,8 @@ extern "C" {
     int resolve_curse(variant data, void *address);
     bool is_cursed_with(const struct attrib *ap, const struct curse *c);
 
-    bool curse_active(const struct curse *c);
     /* gibt true, wenn der Curse nicht NULL oder inaktiv ist */
+    bool curse_active(const struct curse *c);
 
     /*** COMPATIBILITY MACROS. DO NOT USE FOR NEW CODE, REPLACE IN OLD CODE: */
     const char *oldcursename(int id);
