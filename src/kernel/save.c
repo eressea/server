@@ -1724,6 +1724,7 @@ int writegame(const char *filename)
     gdata.store = &store;
     gdata.encoding = enc_gamedata;
     gdata.version = RELEASE_VERSION;
+    global.data_version = RELEASE_VERSION;
     n = STREAM_VERSION;
     fwrite(&gdata.version, sizeof(int), 1, F);
     fwrite(&n, sizeof(int), 1, F);
