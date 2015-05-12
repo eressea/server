@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="iso-8859-1" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <strings>
 <!--
   Due to extreme lazyness on Enno's part, this file doesn't contain everything.
@@ -87,7 +87,7 @@
     <text locale="fr">drakkar</text>
   </string>
   <string name="trireme">
-    <text locale="fr">galère</text>
+    <text locale="fr">galÄre</text>
   </string>
   <string name="balloon">
     <text locale="fr">ballon</text>
@@ -110,7 +110,7 @@
     <text locale="fr">un drakkar</text>
   </string>
   <string name="trireme_a">
-    <text locale="fr">une galère</text>
+    <text locale="fr">une galÄre</text>
   </string>
 
   <!--  Terraintypen -->
@@ -121,7 +121,7 @@
     <text locale="fr">couloir</text>
   </string>
   <string name="desert">
-    <text locale="fr">désert</text>
+    <text locale="fr">dÃ©sert</text>
   </string>
   <string name="firewall">
     <text locale="fr">mur de feu</text>
@@ -130,7 +130,7 @@
     <text locale="fr">brume</text>
   </string>
   <string name="forest">
-    <text locale="fr">forêt</text>
+    <text locale="fr">forÄ™t</text>
   </string>
   <string name="glacier">
     <text locale="fr">glacier</text>
@@ -148,13 +148,13 @@
     <text locale="fr">iceberg</text>
   </string>
   <string name="maelstrom">
-    <text locale="fr">maelström</text>
+    <text locale="fr">maelstrÃ¶m</text>
   </string>
   <string name="mountain">
     <text locale="fr">montagne</text>
   </string>
   <string name="ocean">
-    <text locale="fr">océan</text>
+    <text locale="fr">ocÃ©an</text>
   </string>
   <string name="plain">
     <text locale="fr">plaine</text>
@@ -169,7 +169,7 @@
     <text locale="fr">volcan</text>
   </string>
   <string name="magicstorm">
-    <text locale="fr">tempête magique</text>
+    <text locale="fr">tempÄ™te magique</text>
   </string>
 
   <string name="activevolcano_trail">
@@ -179,7 +179,7 @@
     <text locale="fr">un %s</text>
   </string>
   <string name="desert_trail">
-    <text locale="fr">le désert de %s</text>
+    <text locale="fr">le dÃ©sert de %s</text>
   </string>
   <string name="firewall_trail">
     <text locale="fr">un %s</text>
@@ -188,7 +188,7 @@
     <text locale="fr">fog_trail %s</text>
   </string>
   <string name="forest_trail">
-    <text locale="fr">la forêt de %s</text>
+    <text locale="fr">la forÄ™t de %s</text>
   </string>
   <string name="glacier_trail">
     <text locale="fr">le glacier de %s</text>
@@ -277,11 +277,11 @@
   </string>
 
   <string name="unknownunit">
-    <text locale="fr">une unité inconnue</text>
+    <text locale="fr">une unitÃ© inconnue</text>
   </string>
 
   <string name="section_events">
-    <text locale="fr">Messages et Evénements</text>
+    <text locale="fr">Messages et EvÃ©nements</text>
   </string>
   <string name="section_errors">
     <text locale="fr">Avertissements et Erreurs</text>
@@ -296,7 +296,7 @@
     <text locale="fr">Magie et Reliques</text>
   </string>
   <string name="section_movement">
-    <text locale="fr">Déplacements et Voyages</text>
+    <text locale="fr">DÃ©placements et Voyages</text>
   </string>
   <string name="section_study">
     <text locale="fr">Apprentissage et Enseignement</text>
@@ -313,25 +313,25 @@
 
   <!--  Building Types -->
   <string name="academy">
-    <text locale="fr">université</text>
+    <text locale="fr">universitÃ©</text>
   </string>
   <string name="blessedstonecircle">
-    <text locale="fr">cromlech sacré</text>
+    <text locale="fr">cromlech sacrÃ©</text>
   </string>
   <string name="caravan">
-    <text locale="fr">caravansérail</text>
+    <text locale="fr">caravansÃ©rail</text>
   </string>
   <string name="dam">
     <text locale="fr">barrage</text>
   </string>
   <string name="genericbuilding">
-    <text locale="fr">bâtiment</text>
+    <text locale="fr">bÃ¢timent</text>
   </string>
   <string name="harbour">
     <text locale="fr">port</text>
   </string>
   <string name="illusioncastle">
-    <text locale="fr">château illusoire</text>
+    <text locale="fr">chÃ¢teau illusoire</text>
   </string>
   <string name="inn">
     <text locale="fr">auberge</text>
@@ -349,7 +349,7 @@
     <text locale="fr">monument</text>
   </string>
   <string name="quarry">
-    <text locale="fr">carrière</text>
+    <text locale="fr">carriÄre</text>
   </string>
   <string name="sawmill">
     <text locale="fr">scierie</text>
@@ -358,7 +358,7 @@
     <text locale="fr">forge</text>
   </string>
   <string name="stables">
-    <text locale="fr">écurie</text>
+    <text locale="fr">Ã©curie</text>
   </string>
   <string name="stonecircle">
     <text locale="fr">cromlech</text>
@@ -381,7 +381,7 @@
     <text locale="fr">tour</text>
   </string>
   <string name="castle">
-    <text locale="fr">château</text>
+    <text locale="fr">chÃ¢teau</text>
   </string>
   <string name="fortress">
     <text locale="fr">place-forte</text>
@@ -403,10 +403,10 @@
 
   <!--  Resourcen -->
   <string name="money">
-    <text locale="fr">écu</text>
+    <text locale="fr">Ã©cu</text>
   </string>
   <string name="money_p">
-    <text locale="fr">écus</text>
+    <text locale="fr">Ã©cus</text>
   </string>
   <string name="hp">
     <text locale="fr">point de vie</text>
@@ -453,10 +453,10 @@
     <text locale="fr">cristaux antimagie</text>
   </string>
   <string name="ao_chastity">
-    <text locale="fr">amulette de chasteté</text>
+    <text locale="fr">amulette de chastetÃ©</text>
   </string>
   <string name="ao_chastity_p">
-    <text locale="fr">amulettes de chasteté</text>
+    <text locale="fr">amulettes de chastetÃ©</text>
   </string>
   <string name="aoc">
     <text locale="fr">amulette du chaton</text>
@@ -465,10 +465,10 @@
     <text locale="fr">amulettes du chaton</text>
   </string>
   <string name="aod">
-    <text locale="fr">amulette de ténèbres</text>
+    <text locale="fr">amulette de tÃ©nÄbres</text>
   </string>
   <string name="aod_p">
-    <text locale="fr">amulettes de ténèbres</text>
+    <text locale="fr">amulettes de tÃ©nÄbres</text>
   </string>
   <string name="aog">
     <text locale="fr">amulette de rassemblement</text>
@@ -483,10 +483,10 @@
     <text locale="fr">amulettes de soin</text>
   </string>
   <string name="aots">
-    <text locale="fr">amulette de vérité</text>
+    <text locale="fr">amulette de vÃ©ritÃ©</text>
   </string>
   <string name="aots_p">
-    <text locale="fr">amulettes de vérité</text>
+    <text locale="fr">amulettes de vÃ©ritÃ©</text>
   </string>
   <string name="apple">
     <text locale="fr">pomme</text>
@@ -531,16 +531,16 @@
     <text locale="fr">cottes de mailles</text>
   </string>
   <string name="cookie">
-    <text locale="fr">gâteau</text>
+    <text locale="fr">gÃ¢teau</text>
   </string>
   <string name="cookie_p">
-    <text locale="fr">gâteaux</text>
+    <text locale="fr">gÃ¢teaux</text>
   </string>
   <string name="crossbow">
-    <text locale="fr">arbalète</text>
+    <text locale="fr">arbalÄte</text>
   </string>
   <string name="crossbow_p">
-    <text locale="fr">arbalètes</text>
+    <text locale="fr">arbalÄtes</text>
   </string>
   <string name="dolphin">
     <text locale="fr">dauphin</text>
@@ -555,13 +555,13 @@
     <text locale="fr">sang de dragon</text>
   </string>
   <string name="dragonhead">
-    <text locale="fr">tête de dragon</text>
+    <text locale="fr">tÄ™te de dragon</text>
   </string>
   <string name="dragonhead_p">
-    <text locale="fr">têtes de dragons</text>
+    <text locale="fr">tÄ™tes de dragons</text>
   </string>
   <string name="dragonhoard">
-    <text locale="fr">trésor de dragon</text>
+    <text locale="fr">trÃ©sor de dragon</text>
   </string>
   <string name="dreameye">
     <text locale="fr">oniroeil</text>
@@ -588,10 +588,10 @@
     <text locale="fr">bottes elfiques</text>
   </string>
   <string name="firesword">
-    <text locale="fr">épée ardente</text>
+    <text locale="fr">Ã©pÃ©e ardente</text>
   </string>
   <string name="firesword_p">
-    <text locale="fr">épées ardentes</text>
+    <text locale="fr">Ã©pÃ©es ardentes</text>
   </string>
   <string name="greatbow">
     <text locale="fr">grand arc</text>
@@ -654,10 +654,10 @@
     <text locale="fr">boucliers en laen</text>
   </string>
   <string name="laensword">
-    <text locale="fr">épée en laen</text>
+    <text locale="fr">Ã©pÃ©e en laen</text>
   </string>
   <string name="laensword_p">
-    <text locale="fr">épées en laen</text>
+    <text locale="fr">Ã©pÃ©es en laen</text>
   </string>
   <string name="lance">
     <text locale="fr">lance</text>
@@ -666,10 +666,10 @@
     <text locale="fr">lances</text>
   </string>
   <string name="log">
-    <text locale="fr">stère</text>
+    <text locale="fr">stÄre</text>
   </string>
   <string name="log_p">
-    <text locale="fr">stères</text>
+    <text locale="fr">stÄres</text>
   </string>
   <string name="magicbag">
     <text locale="fr">sac magique</text>
@@ -696,10 +696,10 @@
     <text locale="fr">arcs en mallorn</text>
   </string>
   <string name="mallorncrossbow">
-    <text locale="fr">arbalète en mallorn</text>
+    <text locale="fr">arbalÄte en mallorn</text>
   </string>
   <string name="mallorncrossbow_p">
-    <text locale="fr">arbalètes en mallorn</text>
+    <text locale="fr">arbalÄtes en mallorn</text>
   </string>
   <string name="mallornlance">
     <text locale="fr">lance en mallorn</text>
@@ -708,10 +708,10 @@
     <text locale="fr">lances en mallorn</text>
   </string>
   <string name="mallornspear">
-    <text locale="fr">épieu en mallorn</text>
+    <text locale="fr">Ã©pieu en mallorn</text>
   </string>
   <string name="mallornspear_p">
-    <text locale="fr">épieux en mallorn</text>
+    <text locale="fr">Ã©pieux en mallorn</text>
   </string>
   <string name="moneybag">
     <text locale="fr">bourse</text>
@@ -738,10 +738,10 @@
     <text locale="fr">noix</text>
   </string>
   <string name="pegasus">
-    <text locale="fr">pégase</text>
+    <text locale="fr">pÃ©gase</text>
   </string>
   <string name="pegasus_p">
-    <text locale="fr">pégases</text>
+    <text locale="fr">pÃ©gases</text>
   </string>
   <string name="person">
     <text locale="fr">homme</text>
@@ -762,10 +762,10 @@
     <text locale="fr">cartes de presse</text>
   </string>
   <string name="roi">
-    <text locale="fr">anneau d'invisibilité</text>
+    <text locale="fr">anneau d'invisibilitÃ©</text>
   </string>
   <string name="roi_p">
-    <text locale="fr">anneaux d'invisibilité</text>
+    <text locale="fr">anneaux d'invisibilitÃ©</text>
   </string>
   <string name="rop">
     <text locale="fr">anneau de pouvoir</text>
@@ -774,46 +774,46 @@
     <text locale="fr">anneaux de pouvoir</text>
   </string>
   <string name="roqf">
-    <text locale="fr">anneau de dextérité</text>
+    <text locale="fr">anneau de dextÃ©ritÃ©</text>
   </string>
   <string name="roqf_p">
-    <text locale="fr">anneaux de dextérité</text>
+    <text locale="fr">anneaux de dextÃ©ritÃ©</text>
   </string>
   <string name="ror">
-    <text locale="fr">anneau de régénération</text>
+    <text locale="fr">anneau de rÃ©gÃ©nÃ©ration</text>
   </string>
   <string name="ror_p">
-    <text locale="fr">anneaux de régénération</text>
+    <text locale="fr">anneaux de rÃ©gÃ©nÃ©ration</text>
   </string>
   <string name="runesword">
-    <text locale="fr">épée runique</text>
+    <text locale="fr">Ã©pÃ©e runique</text>
   </string>
   <string name="runesword_p">
-    <text locale="fr">épées runiques</text>
+    <text locale="fr">Ã©pÃ©es runiques</text>
   </string>
   <string name="rustychainmail">
-    <text locale="fr">cotte de mailles rouillée</text>
+    <text locale="fr">cotte de mailles rouillÃ©e</text>
   </string>
   <string name="rustychainmail_p">
-    <text locale="fr">cottes de mailles rouillées</text>
+    <text locale="fr">cottes de mailles rouillÃ©es</text>
   </string>
   <string name="rustyshield">
-    <text locale="fr">bouclier rouillé</text>
+    <text locale="fr">bouclier rouillÃ©</text>
   </string>
   <string name="rustyshield_p">
-    <text locale="fr">boucliers rouillés</text>
+    <text locale="fr">boucliers rouillÃ©s</text>
   </string>
   <string name="rustysword">
-    <text locale="fr">épée rouillée</text>
+    <text locale="fr">Ã©pÃ©e rouillÃ©e</text>
   </string>
   <string name="rustysword_p">
-    <text locale="fr">épées rouillées</text>
+    <text locale="fr">Ã©pÃ©es rouillÃ©es</text>
   </string>
   <string name="seaserpenthead">
-    <text locale="fr">tête de serpent de mer</text>
+    <text locale="fr">tÄ™te de serpent de mer</text>
   </string>
   <string name="seaserpenthead_p">
-    <text locale="fr">têtes de serpents de mer</text>
+    <text locale="fr">tÄ™tes de serpents de mer</text>
   </string>
   <string name="shield">
     <text locale="fr">bouclier</text>
@@ -828,10 +828,10 @@
     <text locale="fr">sacs de contenance</text>
   </string>
   <string name="spear">
-    <text locale="fr">épieu</text>
+    <text locale="fr">Ã©pieu</text>
   </string>
   <string name="spear_p">
-    <text locale="fr">épieux</text>
+    <text locale="fr">Ã©pieux</text>
   </string>
   <string name="stone">
     <text locale="fr">pierre</text>
@@ -840,10 +840,10 @@
     <text locale="fr">pierres</text>
   </string>
   <string name="sword">
-    <text locale="fr">épée</text>
+    <text locale="fr">Ã©pÃ©e</text>
   </string>
   <string name="sword_p">
-    <text locale="fr">épées</text>
+    <text locale="fr">Ã©pÃ©es</text>
   </string>
   <string name="toadslime">
     <text locale="fr">pot de bave de crapaud</text>
@@ -858,16 +858,16 @@
     <text locale="fr">ceintures de trolls</text>
   </string>
   <string name="unit">
-    <text locale="fr">unité</text>
+    <text locale="fr">unitÃ©</text>
   </string>
   <string name="unit_p">
-    <text locale="fr">unités</text>
+    <text locale="fr">unitÃ©s</text>
   </string>
   <string name="skillpotion">
-    <text locale="fr">potion de compétences</text>
+    <text locale="fr">potion de compÃ©tences</text>
   </string>
   <string name="skillpotion_p">
-    <text locale="fr">potions de compétences</text>
+    <text locale="fr">potions de compÃ©tences</text>
   </string>
   <string name="manacrystal">
     <text locale="fr">cristal astral</text>
@@ -894,10 +894,10 @@
     <text locale="fr">feux d'artifice</text>
   </string>
   <string name="lebkuchenherz">
-    <text locale="fr">coeur de pain d'épices</text>
+    <text locale="fr">coeur de pain d'Ã©pices</text>
   </string>
   <string name="lebkuchenherz_p">
-    <text locale="fr">coeurs de pain d'épices</text>
+    <text locale="fr">coeurs de pain d'Ã©pices</text>
   </string>
 
   <!--  luxury goods -->
@@ -905,7 +905,7 @@
     <text locale="fr">baume</text>
   </string>
   <string name="spice">
-    <text locale="fr">épices</text>
+    <text locale="fr">Ã©pices</text>
   </string>
   <string name="jewel">
     <text locale="fr">joyau</text>
@@ -929,7 +929,7 @@
     <text locale="fr">baume</text>
   </string>
   <string name="spice_p">
-    <text locale="fr">épices</text>
+    <text locale="fr">Ã©pices</text>
   </string>
   <string name="myrrh_p">
     <text locale="fr">myrrhe</text>
@@ -946,10 +946,10 @@
 
   <!--  Spezialitems -->
   <string name="lmsreward">
-    <text locale="fr">Ceinture des Légendes</text>
+    <text locale="fr">Ceinture des LÃ©gendes</text>
   </string>
   <string name="lmsreward_p">
-    <text locale="fr">Ceintures des Légendes</text>
+    <text locale="fr">Ceintures des LÃ©gendes</text>
   </string>
 
   <!--  intranslatables: -->
@@ -960,10 +960,10 @@
     <text locale="fr">astragales</text>
   </string>
   <string name="h1">
-    <text locale="fr">méritoine</text>
+    <text locale="fr">mÃ©ritoine</text>
   </string>
   <string name="h1_p">
-    <text locale="fr">méritoines</text>
+    <text locale="fr">mÃ©ritoines</text>
   </string>
   <string name="h2">
     <text locale="fr">oeil de hibou</text>
@@ -972,10 +972,10 @@
     <text locale="fr">yeux de hibou</text>
   </string>
   <string name="h3">
-    <text locale="fr">soie d'araignée</text>
+    <text locale="fr">soie d'araignÃ©e</text>
   </string>
   <string name="h3_p">
-    <text locale="fr">soies d'araignée</text>
+    <text locale="fr">soies d'araignÃ©e</text>
   </string>
   <string name="h4">
     <text locale="fr">obbadion</text>
@@ -1026,16 +1026,16 @@
     <text locale="fr">fleurs de souffre</text>
   </string>
   <string name="h12">
-    <text locale="fr">feuille de Tshaï</text>
+    <text locale="fr">feuille de TshaÄ</text>
   </string>
   <string name="h12_p">
-    <text locale="fr">feuilles de Tshaï</text>
+    <text locale="fr">feuilles de TshaÄ</text>
   </string>
   <string name="h13">
-    <text locale="fr">bélidane</text>
+    <text locale="fr">bÃ©lidane</text>
   </string>
   <string name="h13_p">
-    <text locale="fr">bélidanes</text>
+    <text locale="fr">bÃ©lidanes</text>
   </string>
   <string name="h14">
     <text locale="fr">racine de mandragore</text>
@@ -1062,16 +1062,16 @@
     <text locale="fr">boralmes</text>
   </string>
   <string name="h18">
-    <text locale="fr">ficoïde à cristaux</text>
+    <text locale="fr">ficoÄde Å• cristaux</text>
   </string>
   <string name="h18_p">
-    <text locale="fr">ficoïdes à cristaux</text>
+    <text locale="fr">ficoÄdes Å• cristaux</text>
   </string>
   <string name="h19">
-    <text locale="fr">blémissure</text>
+    <text locale="fr">blÃ©missure</text>
   </string>
   <string name="h19_p">
-    <text locale="fr">blémissures</text>
+    <text locale="fr">blÃ©missures</text>
   </string>
   <string name="h20">
     <text locale="fr">rose des neiges</text>
@@ -1080,10 +1080,10 @@
     <text locale="fr">roses des neiges</text>
   </string>
   <string name="p0">
-    <text locale="fr">thé de sept lieues</text>
+    <text locale="fr">thÃ© de sept lieues</text>
   </string>
   <string name="p0_p">
-    <text locale="fr">thé de sept lieues</text>
+    <text locale="fr">thÃ© de sept lieues</text>
   </string>
   <string name="p1">
     <text locale="fr">breuvage de Goliath</text>
@@ -1092,16 +1092,16 @@
     <text locale="fr">breuvage de Goliath</text>
   </string>
   <string name="p2">
-    <text locale="fr">élixir de vie</text>
+    <text locale="fr">Ã©lixir de vie</text>
   </string>
   <string name="p2_p">
-    <text locale="fr">élixir de vie</text>
+    <text locale="fr">Ã©lixir de vie</text>
   </string>
   <string name="p3">
-    <text locale="fr">vin du travail acharné</text>
+    <text locale="fr">vin du travail acharnÃ©</text>
   </string>
   <string name="p3_p">
-    <text locale="fr">vin du travail acharné</text>
+    <text locale="fr">vin du travail acharnÃ©</text>
   </string>
   <string name="p4">
     <text locale="fr">onguent de soin</text>
@@ -1134,10 +1134,10 @@
     <text locale="fr">extraits de canicule</text>
   </string>
   <string name="p9">
-    <text locale="fr">fourrage de l'étalon</text>
+    <text locale="fr">fourrage de l'Ã©talon</text>
   </string>
   <string name="p9_p">
-    <text locale="fr">fourrage de l'étalon</text>
+    <text locale="fr">fourrage de l'Ã©talon</text>
   </string>
   <string name="p10">
     <text locale="fr">vin de folie</text>
@@ -1183,7 +1183,7 @@
   <string name="AURA">
     <text locale="fr">AURA</text>
   </string>
-  <string name="BÄUME">
+  <string name="BÃ„UME">
     <text locale="fr">ARBRES</text>
   </string>
   <string name="BAUERN">
@@ -1213,10 +1213,10 @@
   <string name="FREMDES">
     <text locale="fr">ETRANGER</text>
   </string>
-  <string name="GEBÄUDE">
+  <string name="GEBÃ„UDE">
     <text locale="fr">BATIMENT</text>
   </string>
-  <string name="GEGENSTÄNDE">
+  <string name="GEGENSTÃ„NDE">
     <text locale="fr">OBJETS</text>
   </string>
   <string name="GIB">
@@ -1234,16 +1234,16 @@
   <string name="KOMMANDO">
     <text locale="fr">CONTROLE</text>
   </string>
-  <string name="KRÄUTER">
+  <string name="KRÃ„UTER">
     <text locale="fr">PLANTES</text>
   </string>
-  <string name="KÄMPFE">
+  <string name="KÃ„MPFE">
     <text locale="fr">COMBAT</text>
   </string>
   <string name="NICHT">
     <text locale="fr">NON</text>
   </string>
-  <string name="NÄCHSTER">
+  <string name="NÃ„CHSTER">
     <text locale="fr">SUIVANT</text>
   </string>
   <string name="PARTEI">
@@ -1270,16 +1270,16 @@
   <string name="SILBER">
     <text locale="fr">ECUS</text>
   </string>
-  <string name="STRAßEN">
+  <string name="STRAÃŸEN">
     <text locale="fr">ROUTES</text>
   </string>
   <string name="STUFE">
     <text locale="fr">NIVEAU</text>
   </string>
-  <string name="TEMPORÄRE">
+  <string name="TEMPORÃ„RE">
     <text locale="fr">TEMPORAIRE</text>
   </string>
-  <string name="TRÄNKE">
+  <string name="TRÃ„NKE">
     <text locale="fr">POTIONS</text>
   </string>
   <string name="VOR">
@@ -1303,7 +1303,7 @@
       <text locale="fr">arc</text>
     </string>
     <string name="building">
-      <text locale="fr">maçon</text>
+      <text locale="fr">maÃ§on</text>
     </string>
     <string name="cartmaking">
       <text locale="fr">charron</text>
@@ -1312,7 +1312,7 @@
       <text locale="fr">catapulte</text>
     </string>
     <string name="crossbow">
-      <text locale="fr">arbalète</text>
+      <text locale="fr">arbalÄte</text>
     </string>
     <string name="entertainment">
       <text locale="fr">divertissement</text>
@@ -1330,7 +1330,7 @@
       <text locale="fr">magie</text>
     </string>
     <string name="melee">
-      <text locale="fr">mêlée</text>
+      <text locale="fr">mÄ™lÃ©e</text>
     </string>
     <string name="mining">
       <text locale="fr">mineur</text>
@@ -1345,7 +1345,7 @@
       <text locale="fr">perrayeur</text>
     </string>
     <string name="riding">
-      <text locale="fr">équitation</text>
+      <text locale="fr">Ã©quitation</text>
     </string>
     <string name="roadwork">
       <text locale="fr">cantonnier</text>
@@ -1360,7 +1360,7 @@
       <text locale="fr">endurance</text>
     </string>
     <string name="stealth">
-      <text locale="fr">discrétion</text>
+      <text locale="fr">discrÃ©tion</text>
     </string>
     <string name="tactics">
       <text locale="fr">tactique</text>
@@ -1625,10 +1625,10 @@
       <text locale="fr">troll</text>
     </string>
     <string name="demon_p">
-      <text locale="fr">démons</text>
+      <text locale="fr">dÃ©mons</text>
     </string>
     <string name="demon">
-      <text locale="fr">démons</text>
+      <text locale="fr">dÃ©mons</text>
     </string>
     <string name="insect_p">
       <text locale="fr">insectes</text>
@@ -1703,10 +1703,10 @@
       <text locale="fr">draconien</text>
     </string>
     <string name="special_p">
-      <text locale="fr">spéciaux</text>
+      <text locale="fr">spÃ©ciaux</text>
     </string>
     <string name="special">
-      <text locale="fr">spécial</text>
+      <text locale="fr">spÃ©cial</text>
     </string>
     <string name="spell_p">
       <text locale="fr">enchantements</text>
@@ -1733,16 +1733,16 @@
       <text locale="fr">ombre</text>
     </string>
     <string name="shadowmaster_p">
-      <text locale="fr">lémures</text>
+      <text locale="fr">lÃ©mures</text>
     </string>
     <string name="shadowmaster">
-      <text locale="fr">lémure</text>
+      <text locale="fr">lÃ©mure</text>
     </string>
     <string name="mountainguard_p">
-      <text locale="fr">yétis</text>
+      <text locale="fr">yÃ©tis</text>
     </string>
     <string name="mountainguard">
-      <text locale="fr">yéti</text>
+      <text locale="fr">yÃ©ti</text>
     </string>
     <string name="alp_p">
       <text locale="fr">quauquemaires</text>
@@ -1757,10 +1757,10 @@
       <text locale="fr">crapaud</text>
     </string>
     <string name="braineater_p">
-      <text locale="fr">céphalophages</text>
+      <text locale="fr">cÃ©phalophages</text>
     </string>
     <string name="braineater">
-      <text locale="fr">céphalophage</text>
+      <text locale="fr">cÃ©phalophage</text>
     </string>
     <string name="peasant_p">
       <text locale="fr">paysans</text>
@@ -1805,16 +1805,16 @@
       <text locale="fr">loup</text>
     </string>
     <string name="ghost_p">
-      <text locale="fr">fantômes</text>
+      <text locale="fr">fantÃ´mes</text>
     </string>
     <string name="ghost">
-      <text locale="fr">fantôme</text>
+      <text locale="fr">fantÃ´me</text>
     </string>
     <string name="dreamcat_p">
-      <text locale="fr">chats des rêves</text>
+      <text locale="fr">chats des rÄ™ves</text>
     </string>
     <string name="dreamcat">
-      <text locale="fr">chat des rêves</text>
+      <text locale="fr">chat des rÄ™ves</text>
     </string>
     <string name="hellcat_p">
       <text locale="fr">chats de l'Enfer</text>
@@ -1835,10 +1835,10 @@
       <text locale="fr">dauphin</text>
     </string>
     <string name="giantturtle_p">
-      <text locale="fr">tortues géantes</text>
+      <text locale="fr">tortues gÃ©antes</text>
     </string>
     <string name="giantturtle">
-      <text locale="fr">tortue géante</text>
+      <text locale="fr">tortue gÃ©ante</text>
     </string>
     <string name="kraken_p">
       <text locale="fr">krakens</text>
@@ -1883,10 +1883,10 @@
       <text locale="fr">hibou</text>
     </string>
     <string name="fairy_p">
-      <text locale="fr">fées</text>
+      <text locale="fr">fÃ©es</text>
     </string>
     <string name="fairy">
-      <text locale="fr">fée</text>
+      <text locale="fr">fÃ©e</text>
     </string>
     <string name="eagle_p">
       <text locale="fr">aigles</text>
@@ -1937,10 +1937,10 @@
       <text locale="fr">spectre</text>
     </string>
     <string name="museumghost_p">
-      <text locale="fr">fantômes du musée</text>
+      <text locale="fr">fantÃ´mes du musÃ©e</text>
     </string>
     <string name="museumghost">
-      <text locale="fr">fantôme du musée</text>
+      <text locale="fr">fantÃ´me du musÃ©e</text>
     </string>
     <string name="gnome_p">
       <text locale="fr">gnomes</text>
@@ -1949,16 +1949,16 @@
       <text locale="fr">gnome</text>
     </string>
     <string name="template_p">
-      <text locale="fr">modèles</text>
+      <text locale="fr">modÄles</text>
     </string>
     <string name="template">
-      <text locale="fr">modèle</text>
+      <text locale="fr">modÄle</text>
     </string>
     <string name="clone_p">
-      <text locale="fr">métamorphes</text>
+      <text locale="fr">mÃ©tamorphes</text>
     </string>
     <string name="clone">
-      <text locale="fr">métamorphe</text>
+      <text locale="fr">mÃ©tamorphe</text>
     </string>
   </namespace>
 
@@ -1973,20 +1973,20 @@
     <text locale="fr">Statut Politique</text>
   </string>
   <string name="nr_herbsrequired">
-    <text locale="fr">Plantes nécessaires</text>
+    <text locale="fr">Plantes nÃ©cessaires</text>
   </string>
   <string name="nr_undercons">
     <text locale="fr">en construction</text>
   </string>
   <string name="nr_damaged">
-    <text locale="fr">de dégâts</text>
+    <text locale="fr">de dÃ©gÃ¢ts</text>
   </string>
   <string name="nr_youaredead">
-    <text locale="fr">Votre faction a été éliminée. Nous espérons que vous vous êtes bien amusé malgré tout, et vous encourageons à vous réincrire pour une nouvelle partie.</text>
+    <text locale="fr">Votre faction a Ã©tÃ© Ã©liminÃ©e. Nous espÃ©rons que vous vous Ä™tes bien amusÃ© malgrÃ© tout, et vous encourageons Å• vous rÃ©incrire pour une nouvelle partie.</text>
   </string>
   <!-- TODO: calendar ist noch komplexer -->
   <string name="nr_skills">
-    <text locale="fr">compétences</text>
+    <text locale="fr">compÃ©tences</text>
   </string>
   <string name="nr_inventory">
     <text locale="fr">possessions</text>
@@ -2013,13 +2013,13 @@
     <text locale="fr">attaque</text>
   </string>
   <string name="b_defense">
-    <text locale="fr">défense</text>
+    <text locale="fr">dÃ©fense</text>
   </string>
   <string name="b_armor">
     <text locale="fr">armure</text>
   </string>
   <string name="b_damage">
-    <text locale="fr">dégâts</text>
+    <text locale="fr">dÃ©gÃ¢ts</text>
   </string>
 
   <!-- Testitem -->
@@ -2030,28 +2030,28 @@
     <text locale="fr">baguettes</text>
   </string>
 
-  <!--  Küsten -->
+  <!--  KÃ¼sten -->
   <namespace name="coast">
     <string name="nw">
-      <text locale="fr">côte nord-ouest</text>
+      <text locale="fr">cÃ´te nord-ouest</text>
     </string>
     <string name="ne">
-      <text locale="fr">côte nord-est</text>
+      <text locale="fr">cÃ´te nord-est</text>
     </string>
     <string name="e">
-      <text locale="fr">côte est</text>
+      <text locale="fr">cÃ´te est</text>
     </string>
     <string name="se">
-      <text locale="fr">côte sud-est</text>
+      <text locale="fr">cÃ´te sud-est</text>
     </string>
     <string name="sw">
-      <text locale="fr">côte sud-ouest</text>
+      <text locale="fr">cÃ´te sud-ouest</text>
     </string>
     <string name="w">
-      <text locale="fr">côte ouest</text>
+      <text locale="fr">cÃ´te ouest</text>
     </string>
   </namespace>
   <string name="nr_nmr">
-    <text locale="fr">Aucun ordre reçu pour votre faction !</text>
+    <text locale="fr">Aucun ordre reÃ§u pour votre faction !</text>
   </string>
 </strings>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" ?>
 <terrains>
     <!-- defaults: walk="yes" sail="yes" fly="yes" swim="no" forest="no" sea="no" land="yes" forbidden="no" arctic="no" cavalry="no" size="0" -->
     <terrain name="ocean" size="100" walk="no" swim="yes" land="no" sea="yes" />

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="iso-8859-1" ?>
+<?xml version="1.0" ?>
 <spellbook name="tybied">
     <entry spell="create_roi" level="6" />
     <entry spell="earn_silver#tybied" level="1" />

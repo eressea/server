@@ -4,7 +4,7 @@ p = require("populate")
 local function read_players()
 --    return {{ email = "noreply@mailinator.com", race = "dwarf",  lang = "de" }}
     local players =  {}
-    local input = open("newfactions", "r")
+    local input = io.open("newfactions", "r")
     while input do
         local str = input:read("*line")
         if str==nil then break end
@@ -84,7 +84,6 @@ local limit = 30000
 local turn = get_turn()
 local sel
 if #players > 0 then
-    read_game(turn)
     eressea.read_game(("%d.dat"):format(turn))
     sel = p.select(regions(), limit)
     if #sel > 0 then
