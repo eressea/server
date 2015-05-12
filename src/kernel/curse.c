@@ -325,7 +325,7 @@ const curse_type *ct_find(const char *c)
     return NULL;
 }
 
-void ct_checknames() {
+void ct_checknames(void) {
     int i, qi;
     quicklist *ctl;
 
