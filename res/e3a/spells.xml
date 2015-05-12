@@ -56,7 +56,7 @@
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="icastle" rank="5" index="137" syntax="buildingtype" parameters="c">
-    <!-- Traumschlößchen -->
+    <!-- TraumschlÃ¶ÃŸchen -->
     <resource name="aura" amount="3" cost="fixed"/>
   </spell>
   <spell name="dreamreading" rank="5" index="13" parameters="u" far="true">
@@ -82,7 +82,7 @@
     <!-- missing syntactical info: ONETARGET | UNITSPELL -->
   </spell>
   <spell name="gooddreams" rank="5" index="12" far="true">
-    <!-- Schöne Träume -->
+    <!-- SchÃ¶ne TrÃ¤ume -->
     <resource name="aura" amount="80" cost="fixed"/>
   </spell>
   <spell name="illaundestroymagic" rank="2" index="140" parameters="kc+" los="true" ship="true" far="true" variable="true">
@@ -97,7 +97,7 @@
     <resource name="silk" amount="20" cost="fixed"/>
   </spell>
   <spell name="bad_dreams" rank="5" index="11" far="true">
-    <!-- Schlechte Träume -->
+    <!-- Schlechte TrÃ¤ume -->
     <resource name="aura" amount="90" cost="fixed"/>
   </spell>
   <spell name="mindblast" rank="5" index="78" variable="true" combat="1">
@@ -114,11 +114,11 @@
 
   <!-- new draig -->
   <spell name="sparklechaos" rank="5" index="153" parameters="u" los="true" variable="true">
-    <!-- Verwünschung -->
+    <!-- VerwÃ¼nschung -->
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="earn_silver#draig" ship="true" variable="true" rank="5" index="159">
-    <!-- Kleine Flüche -->
+    <!-- Kleine FlÃ¼che -->
     <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="1" cost="level"/>
   </spell>
@@ -149,7 +149,7 @@
     <resource name="aura" amount="2" cost="level"/>
   </spell>
   <spell name="summonundead" rank="5" index="41" ship="true" far="true" variable="true">
-    <!-- Mächte des Todes -->
+    <!-- MÃ¤chte des Todes -->
     <resource name="aura" amount="5" cost="level"/>
   </spell>
   <spell name="firewall" rank="4" index="151" syntax="direction" parameters="c" variable="true">
@@ -162,7 +162,7 @@
     <resource name="peasant" amount="10" cost="fixed"/>
   </spell>
   <spell name="summonshadow" rank="5" index="34" variable="true">
-    <!-- Beschwöre Schattendämonen -->
+    <!-- BeschwÃ¶re SchattendÃ¤monen -->
     <resource name="aura" amount="3" cost="level"/>
   </spell>
   <spell name="undeadhero" rank="5" index="164" variable="true" combat="3">
@@ -184,7 +184,7 @@
     <resource name="dragonhead" amount="1" cost="fixed"/>
   </spell>
   <spell name="summonshadowlords" rank="5" index="35" variable="true">
-    <!-- Beschwöre Schattenmeister -->
+    <!-- BeschwÃ¶re Schattenmeister -->
     <resource name="aura" amount="7" cost="level"/>
   </spell>
   <spell name="create_firesword" ship="true" rank="5" index="148">
@@ -235,7 +235,7 @@
     <resource name="aura" amount="2" cost="level"/>
   </spell>
   <spell name="seduction" rank="5" index="73" parameters="u" los="true">
-    <!-- Lied der Verführung -->
+    <!-- Lied der VerfÃ¼hrung -->
     <resource name="aura" amount="12" cost="fixed"/>
   </spell>
   <spell name="calm_monster" rank="5" index="75" parameters="u" los="true" ship="true">
@@ -288,7 +288,7 @@
   </spell>
 <!-- TODO: exploitable (transfers items) -->
   <spell name="big_recruit" rank="5" index="179" variable="true">
-    <!-- Hohe Kunst der Überzeugung -->
+    <!-- Hohe Kunst der Ãœberzeugung -->
     <resource name="aura" amount="20" cost="level"/>
   </spell>
   <spell name="calm_riot" rank="5" index="91" far="true">
@@ -330,7 +330,7 @@
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="goodwinds" rank="5" index="56" parameters="s" ship="true" variable="true">
-    <!-- Beschwörung eines Wasserelementares -->
+    <!-- BeschwÃ¶rung eines Wasserelementares -->
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="windshield" rank="5" index="59" variable="true" combat="1">
@@ -342,12 +342,12 @@
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="earthquake" rank="5" index="53" far="true">
-    <!-- Beschwöre einen Erdelementar -->
+    <!-- BeschwÃ¶re einen Erdelementar -->
     <resource name="aura" amount="25" cost="fixed"/>
     <resource name="laen" amount="2" cost="fixed"/>
   </spell>
   <spell name="stormwinds" rank="5" index="55" parameters="s+" ship="true" ocean="true" variable="true">
-    <!-- Beschwöre einen Sturmelementar -->
+    <!-- BeschwÃ¶re einen Sturmelementar -->
     <resource name="aura" amount="6" cost="level"/>
   </spell>
   <spell name="wolfhowl" rank="5" index="94" variable="true" combat="1">
@@ -381,7 +381,7 @@
     <resource name="aura" amount="4" cost="level"/>
   </spell>
   <spell name="summonfireelemental" rank="5" index="46" far="true">
-    <!-- Beschwörung eines Hitzeelementar -->
+    <!-- BeschwÃ¶rung eines Hitzeelementar -->
     <resource name="aura" amount="600" cost="fixed"/>
   </spell>
   <spell name="maelstrom" rank="5" index="24" ship="true" ocean="true">
@@ -404,15 +404,15 @@
     <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="2" cost="linear"/>
     <resource name="h12" amount="1" cost="linear"/><!-- Windbeutel -->
-    <resource name="h17" amount="1" cost="linear"/><!-- Höhlenglimm -->
+    <resource name="h17" amount="1" cost="linear"/><!-- HÃ¶hlenglimm -->
   </spell>
   <spell name="create_potion_p9" ship="true" rank="5" variable="true">
-    <!-- Pferdeglück -->
+    <!-- PferdeglÃ¼ck -->
     <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="3" cost="linear"/>
     <resource name="h0" amount="1" cost="linear"/><!-- Flachwurz -->
     <resource name="h8" amount="1" cost="linear"/><!-- Blasenmorchel -->
-    <resource name="h15" amount="1" cost="linear"/><!-- Steinbeißer -->
+    <resource name="h15" amount="1" cost="linear"/><!-- SteinbeiÃŸer -->
   </spell>
   <spell name="create_potion_peasantblood" ship="true" rank="5" variable="true">
     <!-- Bauernblut -->
@@ -420,7 +420,7 @@
     <resource name="aura" amount="3" cost="linear"/>
     <resource name="h14" amount="1" cost="linear"/><!-- Alraune -->
     <resource name="h6" amount="1" cost="linear"/><!-- Gurgelkraut -->
-    <resource name="h17" amount="1" cost="linear"/><!-- Höhlenglimm -->
+    <resource name="h17" amount="1" cost="linear"/><!-- HÃ¶hlenglimm -->
     <resource name="peasant" amount="1" cost="fixed"/><!-- Bauer -->
   </spell>
 
@@ -429,9 +429,9 @@
     <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="4" cost="linear"/>
     <resource name="h4" amount="1" cost="linear"/><!-- Baumringel -->
-    <resource name="h15" amount="1" cost="linear"/><!-- Steinbeißer -->
+    <resource name="h15" amount="1" cost="linear"/><!-- SteinbeiÃŸer -->
     <resource name="h18" amount="1" cost="linear"/><!-- Eisblume -->
-    <resource name="h11" amount="1" cost="linear"/><!-- Sandfäule -->
+    <resource name="h11" amount="1" cost="linear"/><!-- SandfÃ¤ule -->
   </spell>
   <spell name="create_potion_p3" ship="true" rank="5" variable="true">
     <!-- Schaffenstrunk -->
@@ -448,7 +448,7 @@
     <resource name="aura" amount="5" cost="linear"/>
     <resource name="h0" amount="1" cost="linear"/><!-- Flachwurz -->
     <resource name="h8" amount="1" cost="linear"/><!-- Blasenmorchel -->
-    <resource name="h15" amount="1" cost="linear"/><!-- Steinbeißer -->
+    <resource name="h15" amount="1" cost="linear"/><!-- SteinbeiÃŸer -->
     <resource name="h18" amount="1" cost="linear"/><!-- Eisblume -->
     <resource name="h9" amount="1" cost="linear"/><!-- Wasserfinder -->
   </spell>
@@ -458,9 +458,9 @@
     <resource name="aura" amount="5" cost="linear"/>
     <resource name="h14" amount="1" cost="linear"/><!-- Alraune -->
     <resource name="h8" amount="1" cost="linear"/><!-- Blasenmorchel -->
-    <resource name="h17" amount="1" cost="linear"/><!-- Höhlenglimm -->
+    <resource name="h17" amount="1" cost="linear"/><!-- HÃ¶hlenglimm -->
     <resource name="h20" amount="1" cost="linear"/><!-- Schneekristall -->
-    <resource name="h11" amount="1" cost="linear"/><!-- Sandfäule -->
+    <resource name="h11" amount="1" cost="linear"/><!-- SandfÃ¤ule -->
     <resource name="dragonblood" amount="1" cost="fixed"/><!-- Drachenblut -->
   </spell>
 
