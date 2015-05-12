@@ -908,7 +908,7 @@ static int sp_summonent(castorder * co)
         return 0;
     }
 
-    ents = (int)_min(power * power, rtrees(r, 2));
+    ents = _min((int)(power * power), rtrees(r, 2));
 
     u = create_unit(r, mage->faction, ents, get_race(RC_TREEMAN), 0, NULL, mage);
 
