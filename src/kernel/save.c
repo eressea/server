@@ -1348,7 +1348,7 @@ void writefaction(struct gamedata *data, const faction * f)
     write_spellbook(f->spellbook, data->store);
 }
 
-int readgame(const char *filename, int backup)
+int readgame(const char *filename, bool backup)
 {
     int n, p, nread;
     faction *f, **fp;

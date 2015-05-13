@@ -15,7 +15,7 @@ static void test_readwrite_data(CuTest * tc)
     test_cleanup();
     sprintf(path, "%s/%s", datapath(), filename);
     CuAssertIntEquals(tc, 0, writegame(filename));
-    CuAssertIntEquals(tc, 0, readgame(filename, 0));
+    CuAssertIntEquals(tc, 0, readgame(filename, false));
     CuAssertIntEquals(tc, RELEASE_VERSION, global.data_version);
     CuAssertIntEquals(tc, 0, remove(path));
     test_cleanup();
