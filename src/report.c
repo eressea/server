@@ -860,7 +860,7 @@ static void rp_battles(FILE * F, faction * f)
     }
 }
 
-static void prices(FILE * F, const region * r, const faction * f)
+static void prices(stream *out, const region * r, const faction * f)
 {
     const luxury_type *sale = NULL;
     struct demand *dmd;
@@ -939,8 +939,7 @@ static void prices(FILE * F, const region * r, const faction * f)
     }
     /* Schreibe Paragraphen */
     *bufp = 0;
-    rparagraph(F, buf, 0, 0, 0);
-
+    paragraph(out, buf, 0, 0, 0);
 }
 
 bool see_border(const connection * b, const faction * f, const region * r)
@@ -986,7 +985,6 @@ static void describe(stream *out, const seen_region * sr, faction * f)
     char *bufp = buf;
     size_t size = sizeof(buf);
     int bytes;
-    FILE * F = fstream_file(out);
 
     for (d = 0; d != MAXDIRECTIONS; d++) {
         /* Nachbarregionen, die gesehen werden, ermitteln */
@@ -1273,9 +1271,9 @@ static void describe(stream *out, const seen_region * sr, faction * f)
             dh = 1;
         }
     }
-    rnl(F);
+    newline(out);
     *bufp = 0;
-    rparagraph(F, buf, 0, 0, 0);
+    paragraph(out, buf, 0, 0, 0);
 
     if (sr->mode == see_unit && is_astral(r) &&
         !is_cursed(r->attribs, C_ASTRALBLOCK, 0)) {
@@ -1308,9 +1306,9 @@ static void describe(stream *out, const seen_region * sr, faction * f)
                 WARN_STATIC_BUFFER();
             free_regionlist(rl);
             /* Schreibe Paragraphen */
-            rnl(F);
+            newline(out);
             *bufp = 0;
-            rparagraph(F, buf, 0, 0, 0);
+            paragraph(out, buf, 0, 0, 0);
         }
     }
 
@@ -1322,11 +1320,11 @@ static void describe(stream *out, const seen_region * sr, faction * f)
     a = a_find(r->attribs, &at_reduceproduction);
     if (a) {
         const char *str = LOC(f->locale, "nr_reduced_production");
-        rparagraph(F, str, 0, 0, 0);
+        paragraph(out, str, 0, 0, 0);
     }
 
     if (edges)
-        rnl(F);
+        newline(out);
     for (e = edges; e; e = e->next) {
         bool first = true;
         message *msg;
@@ -1359,7 +1357,7 @@ static void describe(stream *out, const seen_region * sr, faction * f)
             WARN_STATIC_BUFFER();
 
         *bufp = 0;
-        rparagraph(F, buf, 0, 0, 0);
+        paragraph(out, buf, 0, 0, 0);
     }
     if (edges) {
         while (edges) {
@@ -1988,9 +1986,8 @@ const unit * captain)
     size_t size = sizeof(buffer) - 1;
     int bytes;
     char ch;
-    FILE * F = fstream_file(out);
 
-    rnl(F);
+    newline(out);
 
     if (captain && captain->faction == f) {
         int n = 0, p = 0;
@@ -2050,7 +2047,7 @@ const unit * captain)
             WARN_STATIC_BUFFER();
     }
     *bufp = 0;
-    rparagraph(F, buffer, 2, 0, 0);
+    paragraph(out, buffer, 2, 0, 0);
 
     nr_curses(out, 4, f, TYP_SHIP, sh);
 }
@@ -2065,9 +2062,8 @@ const faction * f)
     char buffer[8192], *bufp = buffer;
     message *msg;
     size_t size = sizeof(buffer) - 1;
-    FILE * F = fstream_file(out);
 
-    rnl(F);
+    newline(out);
 
     if (f)
         lang = f->locale;
@@ -2125,7 +2121,7 @@ const faction * f)
             WARN_STATIC_BUFFER();
     }
     *bufp = 0;
-    rparagraph(F, buffer, 2, 0, 0);
+    paragraph(out, buffer, 2, 0, 0);
 
     if (sr->mode < see_lighthouse)
         return;
@@ -2134,11 +2130,12 @@ const faction * f)
     nr_curses(out, 4, f, TYP_BUILDING, b);
 }
 
-static void nr_paragraph(FILE * F, message * m, faction * f)
+static void nr_paragraph(stream *out, message * m, faction * f)
 {
     int bytes;
     char buf[4096], *bufp = buf;
     size_t size = sizeof(buf) - 1;
+    FILE * F = fstream_file(out);
 
     bytes = (int)nr_render(m, f->locale, bufp, size, f);
     if (wrptr(&bufp, &size, bytes) != 0)
@@ -2455,14 +2452,14 @@ const char *charset)
                 }
                 if (m) {
                     rnl(F);
-                    nr_paragraph(F, m, f);
+                    nr_paragraph(&out, m, f);
                 }
                 /*  */
             }
             else {
                 if (!fval(r->terrain, SEA_REGION) && rpeasants(r) / TRADE_FRACTION > 0) {
-                    rnl(F);
-                    prices(F, r, f);
+                    newline(&out);
+                    prices(&out, r, f);
                 }
             }
             guards(F, r, f);
