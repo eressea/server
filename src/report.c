@@ -81,6 +81,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/nrmessage.h>
 #include <quicklist.h>
 #include <util/rng.h>
+#include <filestream.h>
 
 /* libc includes */
 #include <assert.h>
@@ -126,6 +127,10 @@ void rpc(FILE * F, char c, size_t num)
 void rnl(FILE * F)
 {
     fputc('\n', F);
+}
+
+void newline(stream *out) {
+    sputs("", out);
 }
 
 static void centre(FILE * F, const char *s, bool breaking)
@@ -211,6 +216,71 @@ char mark)
         if (begin > end)
             begin = end;
         fputc('\n', F);
+    } while (*begin);
+}
+
+static void
+paragraph(stream *out, const char *str, ptrdiff_t indent, int hanging_indent,
+char marker)
+{
+    static const char *spaces = "                                ";
+    size_t length = REPORTWIDTH;
+    const char *end, *begin, *mark = 0;
+
+    if (!str) return;
+    /* find out if there's a mark + indent already encoded in the string. */
+    if (!marker) {
+        const char *x = str;
+        while (*x == ' ')
+            ++x;
+        indent += x - str;
+        if (x[0] && indent && x[1] == ' ') {
+            indent += 2;
+            mark = x;
+            str = x + 2;
+            hanging_indent -= 2;
+        }
+    } 
+    else {
+        mark = &marker;
+    }
+    begin = end = str;
+
+    do {
+        const char *last_space = begin;
+
+        if (mark && indent >= 2) {
+            swrite(spaces, sizeof(char), indent - 2, out);
+            swrite(mark, sizeof(char), 1, out);
+            swrite(spaces, sizeof(char), 1, out);
+            mark = 0;
+        }
+        else if (begin == str) {
+            swrite(spaces, sizeof(char), indent, out);
+        }
+        else {
+            swrite(spaces, sizeof(char), indent + hanging_indent, out);
+        }
+        while (*end && end <= begin + length - indent) {
+            if (*end == ' ') {
+                last_space = end;
+            }
+            ++end;
+        }
+        if (*end == 0)
+            last_space = end;
+        if (last_space == begin) {
+            /* there was no space in this line. clip it */
+            last_space = end;
+        }
+        swrite(begin, sizeof(char), last_space - begin, out);
+        begin = last_space;
+        while (*begin == ' ') {
+            ++begin;
+        }
+        if (begin > end)
+            begin = end;
+        sputs("", out);
     } while (*begin);
 }
 
@@ -564,18 +634,53 @@ void sparagraph(strlist ** SP, const char *s, int indent, char mark)
 }
 
 static void
-nr_curses(FILE * F, const faction * viewer, const void *obj, objtype_t typ,
-int indent)
+nr_curses_i(stream *out, int indent, const faction *viewer, objtype_t typ, const void *obj, attrib *a)
 {
-    attrib *a = NULL;
     int self = 0;
+
+    for (; a; a = a->next) {
+        char buf[4096];
+        message *msg;
+
+        if (fval(a->type, ATF_CURSE)) {
+            curse *c = (curse *)a->data.v;
+
+            if (c->type->cansee) {
+                self = c->type->cansee(viewer, obj, typ, c, self);
+            }
+            msg = msg_curse(c, obj, typ, self);
+
+            if (msg) {
+                newline(out);
+                nr_render(msg, viewer->locale, buf, sizeof(buf), viewer);
+                paragraph(out, buf, indent, 2, 0);
+                msg_release(msg);
+            }
+        }
+        else if (a->type == &at_effect && self) {
+            effect_data *data = (effect_data *)a->data.v;
+            if (data->value > 0) {
+                msg = msg_message("nr_potion_effect", "potion left",
+                    data->type->itype->rtype, data->value);
+                nr_render(msg, viewer->locale, buf, sizeof(buf), viewer);
+                paragraph(out, buf, indent, 2, 0);
+                msg_release(msg);
+            }
+        }
+    }
+}
+
+static void nr_curses(stream *out, int indent, const faction *viewer, objtype_t typ, const void *obj)
+{
+    int self = 0;
+    attrib *a = NULL;
     region *r;
 
     /* Die Sichtbarkeit eines Zaubers und die Zaubermeldung sind bei
-     * Gebäuden und Schiffen je nach, ob man Besitzer ist, verschieden.
-     * Bei Einheiten sieht man Wirkungen auf eigene Einheiten immer.
-     * Spezialfälle (besonderes Talent, verursachender Magier usw. werde
-     * bei jedem curse gesondert behandelt. */
+    * Gebäuden und Schiffen je nach, ob man Besitzer ist, verschieden.
+    * Bei Einheiten sieht man Wirkungen auf eigene Einheiten immer.
+    * Spezialfälle (besonderes Talent, verursachender Magier usw. werde
+    * bei jedem curse gesondert behandelt. */
     if (typ == TYP_SHIP) {
         ship *sh = (ship *)obj;
         unit *owner = ship_owner(sh);
@@ -629,39 +734,10 @@ int indent)
         a = r->attribs;
     }
     else {
-        /* fehler */
+        log_error("get_attribs: invalid object type %d", typ);
+        assert(!"invalid object type");
     }
-
-    for (; a; a = a->next) {
-        char buf[4096];
-        message *msg;
-
-        if (fval(a->type, ATF_CURSE)) {
-            curse *c = (curse *)a->data.v;
-
-            if (c->type->cansee) {
-                self = c->type->cansee(viewer, obj, typ, c, self);
-            }
-            msg = msg_curse(c, obj, typ, self);
-
-            if (msg) {
-                rnl(F);
-                nr_render(msg, viewer->locale, buf, sizeof(buf), viewer);
-                rparagraph(F, buf, indent, 2, 0);
-                msg_release(msg);
-            }
-        }
-        else if (a->type == &at_effect && self) {
-            effect_data *data = (effect_data *)a->data.v;
-            if (data->value > 0) {
-                msg = msg_message("nr_potion_effect", "potion left",
-                    data->type->itype->rtype, data->value);
-                nr_render(msg, viewer->locale, buf, sizeof(buf), viewer);
-                rparagraph(F, buf, indent, 2, 0);
-                msg_release(msg);
-            }
-        }
-    }
+    nr_curses_i(out, indent, viewer, typ, obj, a);
 }
 
 static void rps_nowrap(FILE * F, const char *s)
@@ -687,7 +763,7 @@ static void rps_nowrap(FILE * F, const char *s)
 }
 
 static void
-nr_unit(FILE * F, const faction * f, const unit * u, int indent, int mode)
+nr_unit(stream *out, const faction * f, const unit * u, int indent, int mode)
 {
     attrib *a_otherfaction;
     char marker;
@@ -698,10 +774,8 @@ nr_unit(FILE * F, const faction * f, const unit * u, int indent, int mode)
     if (fval(u_race(u), RCF_INVISIBLE))
         return;
 
-    {
-        rnl(F);
-        dh = bufunit(f, u, indent, mode, buf, sizeof(buf));
-    }
+    newline(out);
+    dh = bufunit(f, u, indent, mode, buf, sizeof(buf));
 
     a_otherfaction = a_find(u->attribs, &at_otherfaction);
 
@@ -723,10 +797,10 @@ nr_unit(FILE * F, const faction * f, const unit * u, int indent, int mode)
             marker = '-';
         }
     }
-    rparagraph(F, buf, indent, 0, marker);
+    paragraph(out, buf, indent, 0, marker);
 
     if (!isbattle) {
-        nr_curses(F, f, u, TYP_UNIT, indent);
+        nr_curses(out, indent, f, TYP_UNIT, u);
     }
 }
 
@@ -838,7 +912,8 @@ static void prices(FILE * F, const region * r, const faction * f)
                         size);
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
-                } else if (n == 1) {
+                }
+                else if (n == 1) {
                     bytes = (int)strlcpy(bufp, " ", size);
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
@@ -849,7 +924,8 @@ static void prices(FILE * F, const region * r, const faction * f)
                     bytes = (int)strlcpy(bufp, " ", size);
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
-                } else {
+                }
+                else {
                     bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_trade_next"),
                         size);
                     if (wrptr(&bufp, &size, bytes) != 0)
@@ -887,7 +963,7 @@ bool see_border(const connection * b, const faction * f, const region * r)
     return cs;
 }
 
-static void describe(FILE * F, const seen_region * sr, faction * f)
+static void describe(stream *out, const seen_region * sr, faction * f)
 {
     const region *r = sr->r;
     int n;
@@ -910,6 +986,7 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
     char *bufp = buf;
     size_t size = sizeof(buf);
     int bytes;
+    FILE * F = fstream_file(out);
 
     for (d = 0; d != MAXDIRECTIONS; d++) {
         /* Nachbarregionen, die gesehen werden, ermitteln */
@@ -1237,10 +1314,9 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
         }
     }
 
-    n = 0;
-
     /* Wirkungen permanenter Sprüche */
-    nr_curses(F, f, r, TYP_REGION, 0);
+    nr_curses(out, 0, f, TYP_REGION, r);
+    n = 0;
 
     /* Produktionsreduktion */
     a = a_find(r->attribs, &at_reduceproduction);
@@ -1904,7 +1980,7 @@ static void list_address(FILE * F, const faction * uf, quicklist * seenfactions)
 }
 
 static void
-nr_ship(FILE * F, const seen_region * sr, const ship * sh, const faction * f,
+nr_ship(stream *out, const seen_region * sr, const ship * sh, const faction * f,
 const unit * captain)
 {
     const region *r = sr->r;
@@ -1912,6 +1988,7 @@ const unit * captain)
     size_t size = sizeof(buffer) - 1;
     int bytes;
     char ch;
+    FILE * F = fstream_file(out);
 
     rnl(F);
 
@@ -1975,11 +2052,11 @@ const unit * captain)
     *bufp = 0;
     rparagraph(F, buffer, 2, 0, 0);
 
-    nr_curses(F, f, sh, TYP_SHIP, 4);
+    nr_curses(out, 4, f, TYP_SHIP, sh);
 }
 
 static void
-nr_building(FILE * F, const seen_region * sr, const building * b,
+nr_building(stream *out, const seen_region * sr, const building * b,
 const faction * f)
 {
     int i, bytes;
@@ -1988,6 +2065,7 @@ const faction * f)
     char buffer[8192], *bufp = buffer;
     message *msg;
     size_t size = sizeof(buffer) - 1;
+    FILE * F = fstream_file(out);
 
     rnl(F);
 
@@ -2052,7 +2130,8 @@ const faction * f)
     if (sr->mode < see_lighthouse)
         return;
 
-    nr_curses(F, f, b, TYP_BUILDING, 4);
+    i = 0;
+    nr_curses(out, 4, f, TYP_BUILDING, b);
 }
 
 static void nr_paragraph(FILE * F, message * m, faction * f)
@@ -2083,9 +2162,10 @@ const char *charset)
     attrib *a;
     message *m;
     unsigned char op;
-    int bytes, ix = want(O_STATISTICS);
+    int maxh, bytes, ix = want(O_STATISTICS);
     int wants_stats = (f->options & ix);
     FILE *F = fopen(filename, "wt");
+    stream out = { 0 };
     seen_region *sr = NULL;
     char buf[8192];
     char *bufp;
@@ -2109,6 +2189,8 @@ const char *charset)
         perror(filename);
         return -1;
     }
+    fstream_init(&out, F);
+
     if (utf8) {
         const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
         fwrite(utf8_bom, 1, 3, F);
@@ -2214,266 +2296,264 @@ const char *charset)
         msg_release(m);
         centre(F, buf, true);
     }
-  {
-      int maxh = maxheroes(f);
-      if (maxh) {
-          message *msg =
-              msg_message("nr_heroes", "units maxunits", countheroes(f), maxh);
-          nr_render(msg, f->locale, buf, sizeof(buf), f);
-          msg_release(msg);
-          centre(F, buf, true);
-      }
-  }
+    maxh = maxheroes(f);
+    if (maxh) {
+        message *msg =
+            msg_message("nr_heroes", "units maxunits", countheroes(f), maxh);
+        nr_render(msg, f->locale, buf, sizeof(buf), f);
+        msg_release(msg);
+        centre(F, buf, true);
+    }
 
-  if (f->items != NULL) {
-      message *msg = msg_message("nr_claims", "items", f->items);
-      nr_render(msg, f->locale, buf, sizeof(buf), f);
-      msg_release(msg);
-      rnl(F);
-      centre(F, buf, true);
-  }
+    if (f->items != NULL) {
+        message *msg = msg_message("nr_claims", "items", f->items);
+        nr_render(msg, f->locale, buf, sizeof(buf), f);
+        msg_release(msg);
+        rnl(F);
+        centre(F, buf, true);
+    }
 
-  /* Insekten-Winter-Warnung */
-  if (f->race == get_race(RC_INSECT)) {
-      if (thisseason == 0) {
-          centre(F, LOC(f->locale, "nr_insectwinter"), true);
-          rnl(F);
-      }
-      else {
-          if (nextseason == 0) {
-              centre(F, LOC(f->locale, "nr_insectfall"), true);
-              rnl(F);
-          }
-      }
-  }
+    /* Insekten-Winter-Warnung */
+    if (f->race == get_race(RC_INSECT)) {
+        if (thisseason == 0) {
+            centre(F, LOC(f->locale, "nr_insectwinter"), true);
+            rnl(F);
+        }
+        else {
+            if (nextseason == 0) {
+                centre(F, LOC(f->locale, "nr_insectfall"), true);
+                rnl(F);
+            }
+        }
+    }
 
-  bufp = buf;
-  size = sizeof(buf) - 1;
-  bytes = _snprintf(buf, size, "%s:", LOC(f->locale, "nr_options"));
-  if (wrptr(&bufp, &size, bytes) != 0)
-      WARN_STATIC_BUFFER();
-  for (op = 0; op != MAXOPTIONS; op++) {
-      if (f->options & want(op) && options[op]) {
-          bytes = (int)strlcpy(bufp, " ", size);
-          if (wrptr(&bufp, &size, bytes) != 0)
-              WARN_STATIC_BUFFER();
-          bytes = (int)strlcpy(bufp, LOC(f->locale, options[op]), size);
-          if (wrptr(&bufp, &size, bytes) != 0)
-              WARN_STATIC_BUFFER();
+    bufp = buf;
+    size = sizeof(buf) - 1;
+    bytes = _snprintf(buf, size, "%s:", LOC(f->locale, "nr_options"));
+    if (wrptr(&bufp, &size, bytes) != 0)
+        WARN_STATIC_BUFFER();
+    for (op = 0; op != MAXOPTIONS; op++) {
+        if (f->options & want(op) && options[op]) {
+            bytes = (int)strlcpy(bufp, " ", size);
+            if (wrptr(&bufp, &size, bytes) != 0)
+                WARN_STATIC_BUFFER();
+            bytes = (int)strlcpy(bufp, LOC(f->locale, options[op]), size);
+            if (wrptr(&bufp, &size, bytes) != 0)
+                WARN_STATIC_BUFFER();
 
-          flag++;
-      }
-  }
-  if (flag > 0) {
-      rnl(F);
-      *bufp = 0;
-      centre(F, buf, true);
-  }
+            flag++;
+        }
+    }
+    if (flag > 0) {
+        rnl(F);
+        *bufp = 0;
+        centre(F, buf, true);
+    }
 
-  rp_messages(F, f->msgs, f, 0, true);
-  rp_battles(F, f);
-  a = a_find(f->attribs, &at_reportspell);
-  if (a) {
-      rnl(F);
-      centre(F, LOC(f->locale, "section_newspells"), true);
-      while (a && a->type == &at_reportspell) {
-          spellbook_entry *sbe = (spellbook_entry *)a->data.v;
-          nr_spell(F, sbe, f->locale);
-          a = a->next;
-      }
-  }
+    rp_messages(F, f->msgs, f, 0, true);
+    rp_battles(F, f);
+    a = a_find(f->attribs, &at_reportspell);
+    if (a) {
+        rnl(F);
+        centre(F, LOC(f->locale, "section_newspells"), true);
+        while (a && a->type == &at_reportspell) {
+            spellbook_entry *sbe = (spellbook_entry *)a->data.v;
+            nr_spell(F, sbe, f->locale);
+            a = a->next;
+        }
+    }
 
-  ch = 0;
-  for (a = a_find(f->attribs, &at_showitem); a && a->type == &at_showitem;
-      a = a->next) {
-      const potion_type *ptype =
-          resource2potion(((const item_type *)a->data.v)->rtype);
-      const char *description = NULL;
-      if (ptype != NULL) {
-          const char *pname = resourcename(ptype->itype->rtype, 0);
+    ch = 0;
+    for (a = a_find(f->attribs, &at_showitem); a && a->type == &at_showitem;
+        a = a->next) {
+        const potion_type *ptype =
+            resource2potion(((const item_type *)a->data.v)->rtype);
+        const char *description = NULL;
+        if (ptype != NULL) {
+            const char *pname = resourcename(ptype->itype->rtype, 0);
 
-          if (ch == 0) {
-              rnl(F);
-              centre(F, LOC(f->locale, "section_newpotions"), true);
-              ch = 1;
-          }
+            if (ch == 0) {
+                rnl(F);
+                centre(F, LOC(f->locale, "section_newpotions"), true);
+                ch = 1;
+            }
 
-          rnl(F);
-          centre(F, LOC(f->locale, pname), true);
-          _snprintf(buf, sizeof(buf), "%s %d", LOC(f->locale, "nr_level"),
-              ptype->level);
-          centre(F, buf, true);
-          rnl(F);
+            rnl(F);
+            centre(F, LOC(f->locale, pname), true);
+            _snprintf(buf, sizeof(buf), "%s %d", LOC(f->locale, "nr_level"),
+                ptype->level);
+            centre(F, buf, true);
+            rnl(F);
 
-          bufp = buf;
-          size = sizeof(buf) - 1;
-          bytes = _snprintf(bufp, size, "%s: ", LOC(f->locale, "nr_herbsrequired"));
-          if (wrptr(&bufp, &size, bytes) != 0)
-              WARN_STATIC_BUFFER();
+            bufp = buf;
+            size = sizeof(buf) - 1;
+            bytes = _snprintf(bufp, size, "%s: ", LOC(f->locale, "nr_herbsrequired"));
+            if (wrptr(&bufp, &size, bytes) != 0)
+                WARN_STATIC_BUFFER();
 
-          if (ptype->itype->construction) {
-              requirement *m = ptype->itype->construction->materials;
-              while (m->number) {
-                  bytes =
-                      (int)strlcpy(bufp, LOC(f->locale, resourcename(m->rtype, 0)), size);
-                  if (wrptr(&bufp, &size, bytes) != 0)
-                      WARN_STATIC_BUFFER();
-                  ++m;
-                  if (m->number)
-                      bytes = (int)strlcpy(bufp, ", ", size);
-                  if (wrptr(&bufp, &size, bytes) != 0)
-                      WARN_STATIC_BUFFER();
-              }
-          }
-          *bufp = 0;
-          centre(F, buf, true);
-          rnl(F);
-          if (description == NULL) {
-              const char *potiontext = mkname("potion", pname);
-              description = LOC(f->locale, potiontext);
-          }
-          centre(F, description, true);
-      }
-  }
-  rnl(F);
-  centre(F, LOC(f->locale, "nr_alliances"), false);
-  rnl(F);
+            if (ptype->itype->construction) {
+                requirement *m = ptype->itype->construction->materials;
+                while (m->number) {
+                    bytes =
+                        (int)strlcpy(bufp, LOC(f->locale, resourcename(m->rtype, 0)), size);
+                    if (wrptr(&bufp, &size, bytes) != 0)
+                        WARN_STATIC_BUFFER();
+                    ++m;
+                    if (m->number)
+                        bytes = (int)strlcpy(bufp, ", ", size);
+                    if (wrptr(&bufp, &size, bytes) != 0)
+                        WARN_STATIC_BUFFER();
+                }
+            }
+            *bufp = 0;
+            centre(F, buf, true);
+            rnl(F);
+            if (description == NULL) {
+                const char *potiontext = mkname("potion", pname);
+                description = LOC(f->locale, potiontext);
+            }
+            centre(F, description, true);
+        }
+    }
+    rnl(F);
+    centre(F, LOC(f->locale, "nr_alliances"), false);
+    rnl(F);
 
-  allies(F, f);
+    allies(F, f);
 
-  rpline(F);
+    rpline(F);
 
-  anyunits = 0;
+    anyunits = 0;
 
-  for (r = ctx->first; sr == NULL && r != ctx->last; r = r->next) {
-      sr = find_seen(ctx->seen, r);
-  }
-  for (; sr != NULL; sr = sr->next) {
-      region *r = sr->r;
-      int stealthmod = stealth_modifier(sr->mode);
-      building *b = r->buildings;
-      ship *sh = r->ships;
+    for (r = ctx->first; sr == NULL && r != ctx->last; r = r->next) {
+        sr = find_seen(ctx->seen, r);
+    }
+    for (; sr != NULL; sr = sr->next) {
+        region *r = sr->r;
+        int stealthmod = stealth_modifier(sr->mode);
+        building *b = r->buildings;
+        ship *sh = r->ships;
 
-      if (sr->mode < see_lighthouse)
-          continue;
-      /* Beschreibung */
+        if (sr->mode < see_lighthouse)
+            continue;
+        /* Beschreibung */
 
-      if (sr->mode == see_unit) {
-          anyunits = 1;
-          describe(F, sr, f);
-          if (markets_module() && r->land) {
-              const item_type *lux = r_luxury(r);
-              const item_type *herb = r->land->herbtype;
-              message *m = 0;
-              if (herb && lux) {
-                  m = msg_message("nr_market_info_p", "p1 p2",
-                      lux ? lux->rtype : 0, herb ? herb->rtype : 0);
-              }
-              else if (lux || herb) {
-                  m = msg_message("nr_market_info_s", "p1",
-                      lux ? lux->rtype : herb->rtype);
-              }
-              if (m) {
-                  rnl(F);
-                  nr_paragraph(F, m, f);
-              }
-              /*  */
-          }
-          else {
-              if (!fval(r->terrain, SEA_REGION) && rpeasants(r) / TRADE_FRACTION > 0) {
-                  rnl(F);
-                  prices(F, r, f);
-              }
-          }
-          guards(F, r, f);
-          durchreisende(F, r, f);
-      }
-      else {
-          if (sr->mode == see_far) {
-              describe(F, sr, f);
-              guards(F, r, f);
-              durchreisende(F, r, f);
-          }
-          else if (sr->mode == see_lighthouse) {
-              describe(F, sr, f);
-              durchreisende(F, r, f);
-          }
-          else {
-              describe(F, sr, f);
-              durchreisende(F, r, f);
-          }
-      }
-      /* Statistik */
+        if (sr->mode == see_unit) {
+            anyunits = 1;
+            describe(&out, sr, f);
+            if (markets_module() && r->land) {
+                const item_type *lux = r_luxury(r);
+                const item_type *herb = r->land->herbtype;
+                message *m = 0;
+                if (herb && lux) {
+                    m = msg_message("nr_market_info_p", "p1 p2",
+                        lux ? lux->rtype : 0, herb ? herb->rtype : 0);
+                }
+                else if (lux || herb) {
+                    m = msg_message("nr_market_info_s", "p1",
+                        lux ? lux->rtype : herb->rtype);
+                }
+                if (m) {
+                    rnl(F);
+                    nr_paragraph(F, m, f);
+                }
+                /*  */
+            }
+            else {
+                if (!fval(r->terrain, SEA_REGION) && rpeasants(r) / TRADE_FRACTION > 0) {
+                    rnl(F);
+                    prices(F, r, f);
+                }
+            }
+            guards(F, r, f);
+            durchreisende(F, r, f);
+        }
+        else {
+            if (sr->mode == see_far) {
+                describe(&out, sr, f);
+                guards(F, r, f);
+                durchreisende(F, r, f);
+            }
+            else if (sr->mode == see_lighthouse) {
+                describe(&out, sr, f);
+                durchreisende(F, r, f);
+            }
+            else {
+                describe(&out, sr, f);
+                durchreisende(F, r, f);
+            }
+        }
+        /* Statistik */
 
-      if (wants_stats && sr->mode == see_unit)
-          statistics(F, r, f);
+        if (wants_stats && sr->mode == see_unit)
+            statistics(F, r, f);
 
-      /* Nachrichten an REGION in der Region */
+        /* Nachrichten an REGION in der Region */
 
-      if (sr->mode == see_unit || sr->mode == see_travel) {
-          // TODO: Bug 2073
-          message_list *mlist = r_getmessages(r, f);
-          rp_messages(F, r->msgs, f, 0, true);
-          if (mlist)
-              rp_messages(F, mlist, f, 0, true);
-      }
+        if (sr->mode == see_unit || sr->mode == see_travel) {
+            // TODO: Bug 2073
+            message_list *mlist = r_getmessages(r, f);
+            rp_messages(F, r->msgs, f, 0, true);
+            if (mlist)
+                rp_messages(F, mlist, f, 0, true);
+        }
 
-      /* report all units. they are pre-sorted in an efficient manner */
-      u = r->units;
-      while (b) {
-          while (b && (!u || u->building != b)) {
-              nr_building(F, sr, b, f);
-              b = b->next;
-          }
-          if (b) {
-              nr_building(F, sr, b, f);
-              while (u && u->building == b) {
-                  nr_unit(F, f, u, 6, sr->mode);
-                  u = u->next;
-              }
-              b = b->next;
-          }
-      }
-      while (u && !u->ship) {
-          if (stealthmod > INT_MIN) {
-              if (u->faction == f || cansee(f, r, u, stealthmod)) {
-                  nr_unit(F, f, u, 4, sr->mode);
-              }
-          }
-          assert(!u->building);
-          u = u->next;
-      }
-      while (sh) {
-          while (sh && (!u || u->ship != sh)) {
-              nr_ship(F, sr, sh, f, NULL);
-              sh = sh->next;
-          }
-          if (sh) {
-              nr_ship(F, sr, sh, f, u);
-              while (u && u->ship == sh) {
-                  nr_unit(F, f, u, 6, sr->mode);
-                  u = u->next;
-              }
-              sh = sh->next;
-          }
-      }
+        /* report all units. they are pre-sorted in an efficient manner */
+        u = r->units;
+        while (b) {
+            while (b && (!u || u->building != b)) {
+                nr_building(&out, sr, b, f);
+                b = b->next;
+            }
+            if (b) {
+                nr_building(&out, sr, b, f);
+                while (u && u->building == b) {
+                    nr_unit(&out, f, u, 6, sr->mode);
+                    u = u->next;
+                }
+                b = b->next;
+            }
+        }
+        while (u && !u->ship) {
+            if (stealthmod > INT_MIN) {
+                if (u->faction == f || cansee(f, r, u, stealthmod)) {
+                    nr_unit(&out, f, u, 4, sr->mode);
+                }
+            }
+            assert(!u->building);
+            u = u->next;
+        }
+        while (sh) {
+            while (sh && (!u || u->ship != sh)) {
+                nr_ship(&out, sr, sh, f, NULL);
+                sh = sh->next;
+            }
+            if (sh) {
+                nr_ship(&out, sr, sh, f, u);
+                while (u && u->ship == sh) {
+                    nr_unit(&out, f, u, 6, sr->mode);
+                    u = u->next;
+                }
+                sh = sh->next;
+            }
+        }
 
-      assert(!u);
+        assert(!u);
 
-      rnl(F);
-      rpline(F);
-  }
-  if (!is_monsters(f)) {
-      if (!anyunits) {
-          rnl(F);
-          rparagraph(F, LOC(f->locale, "nr_youaredead"), 0, 2, 0);
-      }
-      else {
-          list_address(F, f, ctx->addresses);
-      }
-  }
-  fclose(F);
-  return 0;
+        rnl(F);
+        rpline(F);
+    }
+    if (!is_monsters(f)) {
+        if (!anyunits) {
+            rnl(F);
+            rparagraph(F, LOC(f->locale, "nr_youaredead"), 0, 2, 0);
+        }
+        else {
+            list_address(F, f, ctx->addresses);
+        }
+    }
+    fstream_done(&out);
+    return 0;
 }
 
 void base36conversion(void)
