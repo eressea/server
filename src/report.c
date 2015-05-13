@@ -559,10 +559,8 @@ void sparagraph(strlist ** SP, const char *s, int indent, char mark)
 }
 
 static void
-nr_curses_i(stream *out, int indent, const faction *viewer, objtype_t typ, const void *obj, attrib *a)
+nr_curses_i(stream *out, int indent, const faction *viewer, objtype_t typ, const void *obj, attrib *a, int self)
 {
-    int self = 0;
-
     for (; a; a = a->next) {
         char buf[4096];
         message *msg;
@@ -662,7 +660,7 @@ static void nr_curses(stream *out, int indent, const faction *viewer, objtype_t 
         log_error("get_attribs: invalid object type %d", typ);
         assert(!"invalid object type");
     }
-    nr_curses_i(out, indent, viewer, typ, obj, a);
+    nr_curses_i(out, indent, viewer, typ, obj, a, self);
 }
 
 static void rps_nowrap(stream *out, const char *s)
