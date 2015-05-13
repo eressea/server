@@ -1282,7 +1282,7 @@ static int update_gbdream(const unit * u, int bonus, curse *c, const curse_type 
         if (sign * effect > sign * bonus) {
             if (mage == NULL || mage->number == 0
                 || sign>0?alliedunit(mage, u->faction, HELP_GUARD):!alliedunit(mage, u->faction, HELP_GUARD)) {
-                bonus = effect;
+                bonus = (int)effect;
             }
         }
     }
@@ -1322,7 +1322,7 @@ int att_modification(const unit * u, skill_t sk)
      * jeweils erste vom Typ C_GBDREAM zurueckgegen wird, wir aber alle
      * durchsuchen und aufaddieren muessen */
     if (u->region) {
-        double bonus = 0, malus = 0;
+        int bonus = 0, malus = 0;
         attrib *a = a_find(u->region->attribs, &at_curse);
         while (a && a->type == &at_curse) {
             curse *c = (curse *)a->data.v;

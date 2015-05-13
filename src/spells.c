@@ -4697,7 +4697,7 @@ static int sp_gbdreams(castorder * co, const char *curse_name, int effect)
     duration = 2 + rng_int() % duration;
 
     /* Nichts machen als ein entsprechendes Attribut in die Region legen. */
-    c = create_curse(mage, &r->attribs, ct_find(curse_name), power, duration, effect, 0);
+    c = create_curse(mage, &r->attribs, ct_find(curse_name), power, duration, (float)effect, 0);
 
     /* Erfolg melden */
     ADDMSG(&mage->faction->msgs, msg_message("regionmagic_effect",

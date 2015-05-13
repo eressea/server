@@ -255,6 +255,9 @@ void curse_write(const attrib * a, const void *owner, struct storage *store)
     if (global.data_version < EXPLICIT_CURSE_ISNEW_VERSION) {
         flags = (c->flags & ~CURSE_ISNEW) | (c->type->flags & CURSE_ISNEW);
     }
+    else {
+        flags = c->flags | c->type->flags;
+    }
 
     WRITE_INT(store, c->no);
     WRITE_TOK(store, ct->cname);
@@ -322,7 +325,7 @@ const curse_type *ct_find(const char *c)
     return NULL;
 }
 
-void ct_checknames() {
+void ct_checknames(void) {
     int i, qi;
     quicklist *ctl;
 

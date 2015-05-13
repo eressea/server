@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <strings>
   <!--
-    _d: dativ (wir erklären allen /Trollen/ den Krieg)
-    _p: plural (13 /Trolle/)
-    _x: preposition (15 /Troll/schwerter)
-    _a: including article (ein Troll, a troll)
+    _d: dativ (wir erklären allen /Schlümpfen/ den Krieg)
+    _p: plural (13 /Schlümpfe/)
+    _x: preposition (15 /Schlumpf/schwerter)
+    _a: including article (ein Schlumpf, a smurf)
    -->
   <string name="vortex">
     <text locale="de">Wirbel</text>
