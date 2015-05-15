@@ -392,15 +392,13 @@ bool remove_curse(attrib ** ap, const curse * c)
 /* gibt die allgemeine Stärke der Verzauberung zurück. id2 wird wie
  * oben benutzt. Dies ist nicht die Wirkung, sondern die Kraft und
  * damit der gegen Antimagie wirkende Widerstand einer Verzauberung */
-static float get_cursevigour(const curse * c)
+static double get_cursevigour(const curse * c)
 {
-    if (c)
-        return c->vigour;
-    return 0;
+    return c ? c->vigour : 0;
 }
 
 /* setzt die Stärke der Verzauberung auf i */
-static void set_cursevigour(curse * c, float vigour)
+static void set_cursevigour(curse * c, double vigour)
 {
     assert(c && vigour > 0);
     c->vigour = vigour;
@@ -410,7 +408,7 @@ static void set_cursevigour(curse * c, float vigour)
  * Stärke zurück. Sollte die Zauberstärke unter Null sinken, löst er
  * sich auf.
  */
-float curse_changevigour(attrib ** ap, curse * c, float vigour)
+double curse_changevigour(attrib ** ap, curse * c, double vigour)
 {
     vigour += get_cursevigour(c);
 
@@ -426,7 +424,7 @@ float curse_changevigour(attrib ** ap, curse * c, float vigour)
 
 /* ------------------------------------------------------------- */
 
-float curse_geteffect(const curse * c)
+double curse_geteffect(const curse * c)
 {
     if (c == NULL)
         return 0;
@@ -437,7 +435,7 @@ float curse_geteffect(const curse * c)
 
 int curse_geteffect_int(const curse * c)
 {
-    float effect = curse_geteffect(c);
+    double effect = curse_geteffect(c);
     if (effect - (int)effect != 0) {
         log_error("curse has an integer attribute with float value: '%s' = %lf",
             c->type->cname, effect);
@@ -491,7 +489,7 @@ static void set_cursedmen(curse * c, int cursedmen)
  * dieses Typs geben, gibt es den bestehenden zurück.
  */
 static curse *make_curse(unit * mage, attrib ** ap, const curse_type * ct,
-    float vigour, int duration, float effect, int men)
+    double vigour, int duration, double effect, int men)
 {
     curse *c;
     attrib *a;
@@ -528,7 +526,7 @@ static curse *make_curse(unit * mage, attrib ** ap, const curse_type * ct,
  * passenden Typ verzweigt und die relevanten Variablen weitergegeben.
  */
 curse *create_curse(unit * magician, attrib ** ap, const curse_type * ct,
-    float vigour, int duration, float effect, int men)
+    double vigour, int duration, double effect, int men)
 {
     curse *c;
 
@@ -785,7 +783,7 @@ message *cinfo_simple(const void *obj, objtype_t typ, const struct curse * c,
 * die Kraft des Curse um die halbe Stärke der Antimagie reduziert.
 * Zurückgegeben wird der noch unverbrauchte Rest von force.
 */
-float destr_curse(curse * c, int cast_level, float force)
+double destr_curse(curse * c, int cast_level, double force)
 {
     if (cast_level < c->vigour) { /* Zauber ist nicht stark genug */
         double probability = 0.1 + (cast_level - c->vigour) * 0.2;
@@ -793,7 +791,7 @@ float destr_curse(curse * c, int cast_level, float force)
         if (chance(probability)) {
             force -= c->vigour;
             if (c->type->change_vigour) {
-                c->type->change_vigour(c, -((float)cast_level + 1) / 2);
+                c->type->change_vigour(c, -(cast_level + 1) / 2);
             }
             else {
                 c->vigour -= cast_level + 1 / 2;

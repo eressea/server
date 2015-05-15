@@ -291,7 +291,7 @@ extern "C" {
 
     struct castorder *create_castorder(struct castorder * co, struct unit *caster,
     struct unit * familiar, const struct spell * sp, struct region * r,
-        int lev, float force, int range, struct order * ord, struct spellparameter * p);
+        int lev, double force, int range, struct order * ord, struct spellparameter * p);
     void free_castorder(struct castorder *co);
     /* Zwischenspreicher für Zauberbefehle, notwendig für Prioritäten */
     void add_castorder(struct spellrank *cll, struct castorder *co);
@@ -360,7 +360,7 @@ extern "C" {
     extern void write_spells(struct quicklist *slist, struct storage *store);
     extern void read_spells(struct quicklist **slistp, magic_t mtype,
     struct storage *store);
-    extern float MagicPower(void);
+    extern double MagicPower(void);
 
     extern struct spellbook * get_spellbook(const char * name);
     extern void free_spellbooks(void);

@@ -131,7 +131,7 @@ static bool limited_give(const item_type * type)
 int give_quota(const unit * src, const unit * dst, const item_type * type,
     int n)
 {
-    float divisor;
+    double divisor;
 
     if (!limited_give(type)) {
         return n;

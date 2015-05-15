@@ -1771,7 +1771,7 @@ void do_combatmagic(battle * b, combatmagic_t was)
     }
 }
 
-static int cast_combatspell(troop at, const spell * sp, int level, float force)
+static int cast_combatspell(troop at, const spell * sp, int level, double force)
 {
     castorder co;
 
@@ -1794,7 +1794,7 @@ static void do_combatspell(troop at)
     region *r = b->region;
     quicklist *ql;
     int level, qi;
-    float power;
+    double power;
     int fumblechance = 0;
     order *ord;
     int sl;
@@ -1867,7 +1867,7 @@ static void do_extra_spell(troop at, const att * a)
         log_error("spell '%s' has no function.\n", sp->sname);
     }
     else {
-        float force = (float)a->level * MagicPower();
+        double force = a->level * MagicPower();
         assert(a->level > 0);
         cast_combatspell(at, sp, a->level, force);
     }

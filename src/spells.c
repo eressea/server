@@ -298,7 +298,7 @@ static void magicanalyse_ship(ship * sh, unit * mage, double force)
 
 }
 
-static int break_curse(attrib ** alist, int cast_level, float force, curse * c)
+static int break_curse(attrib ** alist, int cast_level, double force, curse * c)
 {
     int succ = 0;
     /*  attrib **a = a_find(*ap, &at_curse); */
@@ -327,7 +327,7 @@ static int break_curse(attrib ** alist, int cast_level, float force, curse * c)
          * auf alle Verzauberungen wirken. Ansonsten pruefe, ob der Curse vom
          * richtigen Typ ist. */
         if (!c || c == c1) {
-            float remain = destr_curse(c1, cast_level, force);
+            double remain = destr_curse(c1, cast_level, force);
             if (remain < force) {
                 succ = cast_level;
                 force = remain;
