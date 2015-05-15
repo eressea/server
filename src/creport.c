@@ -1222,7 +1222,7 @@ cr_output_resources(FILE * F, report_context * ctx, seen_region * sr)
 }
 
 static void
-cr_region_header(FILE * F, int plid, int nx, int ny, unsigned int uid)
+cr_region_header(FILE * F, int plid, int nx, int ny, int uid)
 {
     if (plid == 0) {
         fprintf(F, "REGION %d %d\n", nx, ny);

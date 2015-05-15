@@ -307,7 +307,7 @@ fighter *select_corpse(battle * b, fighter * af)
             maxcasualties += s->casualties;
         }
     }
-    di = rng_int() % maxcasualties;
+    di = (int)(rng_int() % maxcasualties);
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
         for (df = s->fighters; df; df = df->next) {
             /* Geflohene haben auch 0 hp, dürfen hier aber nicht ausgewählt
@@ -487,7 +487,7 @@ contest_classic(int skilldiff, const armor_type * ar, const armor_type * sh)
     vw = (int)(100 - ((100 - vw) * mod));
 
     do {
-        p = rng_int() % 100;
+        p = (int)(rng_int() % 100);
         vw -= p;
     } while (vw >= 0 && p >= 90);
     return (vw <= 0);
@@ -1019,7 +1019,8 @@ static int natural_armor(unit * du)
     static int *bonus = 0;
     int an = u_race(du)->armor;
     if (bonus == 0) {
-        bonus = calloc(sizeof(int), num_races);
+        assert(num_races > 0);
+        bonus = calloc((size_t)num_races, sizeof(int));
     }
     if (bonus[u_race(du)->index] == 0) {
         bonus[u_race(du)->index] =
@@ -1506,7 +1507,7 @@ troop select_enemy(fighter * af, int minrow, int maxrow, int select)
     if (enemies <= 0)
         return no_troop;
 
-    selected = rng_int() % enemies;
+    selected = (int)(rng_int() % enemies);
     for (si = 0; as->enemies[si]; ++si) {
         side *ds = as->enemies[si];
         fighter *df;
@@ -1866,9 +1867,9 @@ static void do_extra_spell(troop at, const att * a)
         log_error("spell '%s' has no function.\n", sp->sname);
     }
     else {
-        int level = a->level;
+        float force = (float)a->level * MagicPower();
         assert(a->level > 0);
-        cast_combatspell(at, sp, level, level * MagicPower());
+        cast_combatspell(at, sp, a->level, force);
     }
 }
 
@@ -2468,7 +2469,7 @@ troop select_ally(fighter * af, int minrow, int maxrow, int allytype)
     if (!allies) {
         return no_troop;
     }
-    allies = rng_int() % allies;
+    allies = (int)(rng_int() % allies);
 
     for (ds = b->sides; ds != b->sides + b->nsides; ++ds) {
         if ((allytype == ALLY_ANY && helping(as, ds)) || (allytype == ALLY_SELF
@@ -2503,7 +2504,7 @@ static int loot_quota(const unit * src, const unit * dst,
             assert(divisor == 0 || divisor >= 1);
         }
         if (divisor >= 1) {
-            double r = n / divisor;
+            double r = (float)n / divisor;
             int x = (int)r;
 
             r = r - x;
@@ -2527,8 +2528,8 @@ static void loot_items(fighter * corpse)
         return;
 
     while (itm) {
-        float lootfactor = dead / (float)u->number; /* only loot the dead! */
-        int maxloot = (int)(itm->number * lootfactor);
+        float lootfactor = (float)dead / (float)u->number; /* only loot the dead! */
+        int maxloot = (int)((float)itm->number * lootfactor);
         if (maxloot > 0) {
             int i = _min(10, maxloot);
             for (; i != 0; --i) {
@@ -2863,7 +2864,7 @@ static void aftermath(battle * b)
                         float dmg =
                             get_param_flt(global.parameters, "rules.ship.damage.battleround",
                             0.05F);
-                        damage_ship(sh, dmg * n);
+                        damage_ship(sh, dmg * (float)n);
                         freset(sh, SF_DAMAGED);
                     }
                 }
@@ -2964,19 +2965,19 @@ static void print_header(battle * b)
         side *s;
         char *bufp = zText;
         size_t size = sizeof(zText) - 1;
-        int bytes;
+        size_t bytes;
 
         for (s = b->sides; s != b->sides + b->nsides; ++s) {
             fighter *df;
             for (df = s->fighters; df; df = df->next) {
                 if (is_attacker(df)) {
                     if (first) {
-                        bytes = (int)strlcpy(bufp, ", ", size);
+                        bytes = strlcpy(bufp, ", ", size);
                         if (wrptr(&bufp, &size, bytes) != 0)
                             WARN_STATIC_BUFFER();
                     }
                     if (lastf) {
-                        bytes = (int)strlcpy(bufp, (const char *)lastf, size);
+                        bytes = strlcpy(bufp, (const char *)lastf, size);
                         if (wrptr(&bufp, &size, bytes) != 0)
                             WARN_STATIC_BUFFER();
                         first = true;
@@ -2990,18 +2991,18 @@ static void print_header(battle * b)
             }
         }
         if (first) {
-            bytes = (int)strlcpy(bufp, " ", size);
+            bytes = strlcpy(bufp, " ", size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
-            bytes = (int)strlcpy(bufp, (const char *)LOC(f->locale, "and"), size);
+            bytes = strlcpy(bufp, (const char *)LOC(f->locale, "and"), size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
-            bytes = (int)strlcpy(bufp, " ", size);
+            bytes = strlcpy(bufp, " ", size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
         }
         if (lastf) {
-            bytes = (int)strlcpy(bufp, (const char *)lastf, size);
+            bytes = strlcpy(bufp, (const char *)lastf, size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
         }
@@ -3176,7 +3177,7 @@ side * get_side(battle * b, const struct unit * u)
     return 0;
 }
 
-side * find_side(battle * b, const faction * f, const group * g, int flags, const faction * stealthfaction)
+side * find_side(battle * b, const faction * f, const group * g, unsigned int flags, const faction * stealthfaction)
 {
     side * s;
     static int rule_anon_battle = -1;
@@ -3186,8 +3187,8 @@ side * find_side(battle * b, const faction * f, const group * g, int flags, cons
     }
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
         if (s->faction == f && s->group == g) {
-            int s1flags = flags | SIDE_HASGUARDS;
-            int s2flags = s->flags | SIDE_HASGUARDS;
+            unsigned int s1flags = flags | SIDE_HASGUARDS;
+            unsigned int s2flags = s->flags | SIDE_HASGUARDS;
             if (rule_anon_battle && s->stealthfaction != stealthfaction) {
                 continue;
             }
@@ -3205,7 +3206,6 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     weapon weapons[WMAX];
     int owp[WMAX];
     int dwp[WMAX];
-    int w = 0;
     region *r = b->region;
     item *itm;
     fighter *fig = NULL;
@@ -3271,7 +3271,8 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     fig->catmsg = -1;
 
     /* Freigeben nicht vergessen! */
-    fig->person = (struct person*)calloc(fig->alive, sizeof(struct person));
+    assert(fig->alive > 0);
+    fig->person = (struct person*)calloc((size_t)fig->alive, sizeof(struct person));
 
     h = u->hp / u->number;
     assert(h);
@@ -3330,7 +3331,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     /* Für alle Waffengattungen wird bestimmt, wie viele der Personen mit
      * ihr kämpfen könnten, und was ihr Wert darin ist. */
     if (u_race(u)->battle_flags & BF_EQUIPMENT) {
-        int oi = 0, di = 0;
+        int oi = 0, di = 0, w = 0;
         for (itm = u->items; itm && w != WMAX; itm = itm->next) {
             const weapon_type *wtype = resource2weapon(itm->type->rtype);
             if (wtype == NULL || itm->number == 0)
@@ -3345,8 +3346,9 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
             }
             assert(w != WMAX);
         }
-        fig->weapons = (weapon *)calloc(sizeof(weapon), w + 1);
-        memcpy(fig->weapons, weapons, w * sizeof(weapon));
+        assert(w >= 0);
+        fig->weapons = (weapon *)calloc(sizeof(weapon), (size_t)(w + 1));
+        memcpy(fig->weapons, weapons, (size_t)w * sizeof(weapon));
 
         for (i = 0; i != w; ++i) {
             int j, o = 0, d = 0;
@@ -3485,7 +3487,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
             int rnd;
 
             do {
-                rnd = rng_int() % 100;
+                rnd = (int)(rng_int() % 100);
                 if (rnd >= 40 && rnd <= 69)
                     p_bonus += 1;
                 else if (rnd <= 89)
@@ -3715,7 +3717,7 @@ static int battle_report(battle * b)
         faction *fac = bf->faction;
         char buf[32 * MAXSIDES];
         char *bufp = buf;
-        int bytes;
+        size_t bytes;
         size_t size = sizeof(buf) - 1;
         message *m;
 
@@ -3738,32 +3740,32 @@ static int battle_report(battle * b)
                 char buffer[32];
 
                 if (komma) {
-                    bytes = (int)strlcpy(bufp, ", ", size);
+                    bytes = strlcpy(bufp, ", ", size);
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
                 }
                 slprintf(buffer, sizeof(buffer), "%s %2d(%s): ",
                     loc_army, army_index(s), abbrev);
 
-                bytes = (int)strlcpy(bufp, buffer, size);
+                bytes = strlcpy(bufp, buffer, size);
                 if (wrptr(&bufp, &size, bytes) != 0)
                     WARN_STATIC_BUFFER();
 
                 for (r = FIGHT_ROW; r != NUMROWS; ++r) {
                     if (alive[r]) {
                         if (l != FIGHT_ROW) {
-                            bytes = (int)strlcpy(bufp, "+", size);
+                            bytes = strlcpy(bufp, "+", size);
                             if (wrptr(&bufp, &size, bytes) != 0)
                                 WARN_STATIC_BUFFER();
                         }
                         while (k--) {
-                            bytes = (int)strlcpy(bufp, "0+", size);
+                            bytes = strlcpy(bufp, "0+", size);
                             if (wrptr(&bufp, &size, bytes) != 0)
                                 WARN_STATIC_BUFFER();
                         }
                         sprintf(buffer, "%d", alive[r]);
 
-                        bytes = (int)strlcpy(bufp, buffer, size);
+                        bytes = strlcpy(bufp, buffer, size);
                         if (wrptr(&bufp, &size, bytes) != 0)
                             WARN_STATIC_BUFFER();
 

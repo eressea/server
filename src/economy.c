@@ -79,7 +79,7 @@ typedef struct request {
     struct request *next;
     struct unit *unit;
     struct order *ord;
-    int qty;
+    unsigned int qty;
     int no;
     union {
         bool goblin;             /* stealing */
@@ -91,9 +91,9 @@ static int working;
 
 static request entertainers[1024];
 static request *nextentertainer;
-static int entertaining;
+static unsigned int entertaining;
 
-static int norders;
+static unsigned int norders;
 static request *oa;
 
 #define RECRUIT_MERGE 1
@@ -123,13 +123,13 @@ int income(const unit * u)
     }
 }
 
-static void scramble(void *data, int n, size_t width)
+static void scramble(void *data, unsigned int n, size_t width)
 {
-    int j;
+    unsigned int j;
     char temp[64];
     assert(width <= sizeof(temp));
     for (j = 0; j != n; ++j) {
-        int k = rng_int() % n;
+        unsigned int k = rng_uint() % n;
         if (k == j)
             continue;
         memcpy(temp, (char *)data + j * width, width);
@@ -162,7 +162,7 @@ static void expandorders(region * r, request * requests)
         oa = (request *)calloc(norders, sizeof(request));
         for (o = requests; o; o = o->next) {
             if (o->qty > 0) {
-                int j;
+                unsigned int j;
                 for (j = o->qty; j; j--) {
                     oa[i] = *o;
                     oa[i].unit->n = 0;
@@ -297,7 +297,7 @@ static int horse_recruiters(const struct race *rc, int qty)
     if (rc->ec_flags & ECF_REC_ETHEREAL)
         return -1;
     if (rc->ec_flags & ECF_REC_HORSES)
-        return (int)(qty * 2 * rc->recruit_multi);
+        return (int)(qty * 2.0 * rc->recruit_multi);
     return -1;
 }
 
@@ -354,7 +354,7 @@ static int do_recruiting(recruitment * recruits, int available)
             unit *u = req->unit;
             const race *rc = u_race(u); /* race is set in recruit() */
             int number, dec;
-            float multi = 2.0F * rc->recruit_multi;
+            double multi = 2.0 * rc->recruit_multi;
 
             number = _min(req->qty, (int)(get / multi));
             if (rc->recruitcost) {
@@ -463,7 +463,6 @@ static int recruit_cost(const faction * f, const race * rc)
 
 static void recruit(unit * u, struct order *ord, request ** recruitorders)
 {
-    int n;
     region *r = u->region;
     plane *pl;
     request *o;
@@ -471,9 +470,14 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
     const faction *f = u->faction;
     const struct race *rc = u_race(u);
     const char *str;
+    int n;
 
     init_order(ord);
-    n = getuint();
+    n = getint();
+    if (n<=0) {
+        syntax_error(u, ord);
+        return;
+    }
 
     if (u->number == 0) {
         char token[128];
@@ -1784,8 +1788,8 @@ static void buy(unit * u, request ** buyorders, struct order *ord)
 
     kwd = init_order(ord);
     assert(kwd == K_BUY);
-    n = getuint();
-    if (!n) {
+    n = getint();
+    if (n<=0) {
         cmistake(u, ord, 26, MSG_COMMERCE);
         return;
     }
@@ -2997,10 +3001,11 @@ void tax_cmd(unit * u, struct order *ord, request ** taxorders)
         return;
     }
 
-    max = getuint();
+    max = getint();
 
-    if (max == 0)
+    if (max <= 0) {
         max = INT_MAX;
+    }
     if (!playerrace(u_race(u))) {
         u->wants = _min(income(u), max);
     }
@@ -3070,10 +3075,11 @@ void loot_cmd(unit * u, struct order *ord, request ** lootorders)
         return;
     }
 
-    max = getuint();
+    max = getint();
 
-    if (max == 0)
+    if (max <= 0) {
         max = INT_MAX;
+    }
     if (!playerrace(u_race(u))) {
         u->wants = _min(income(u), max);
     }
