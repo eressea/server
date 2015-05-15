@@ -131,7 +131,7 @@ extern "C" {
                                        den Vertrauten gezaubert wird */
         const struct spell *sp;     /* Spruch */
         int level;                  /* gewünschte Stufe oder Stufe des Magiers */
-        float force;               /* Stärke des Zaubers */
+        double force;               /* Stärke des Zaubers */
         struct region *_rtarget;     /* Zielregion des Spruchs */
         int distance;               /* Entfernung zur Zielregion */
         struct order *order;        /* Befehl */
@@ -277,7 +277,7 @@ extern "C" {
     /* verändert die maximalen Magiepunkte einer Einheit */
 
     /* Zaubern */
-    extern float spellpower(struct region *r, struct unit *u, const struct spell * sp,
+    extern double spellpower(struct region *r, struct unit *u, const struct spell * sp,
         int cast_level, struct order *ord);
     /*      ermittelt die Stärke eines Spruchs */
     bool fumble(struct region *r, struct unit *u, const struct spell * sp,

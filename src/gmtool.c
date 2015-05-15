@@ -77,7 +77,7 @@ static WINDOW *hstatus;
 
 static void init_curses(void)
 {
-    short fg, bg;
+    int fg, bg;
     initscr();
 
     if (has_colors() || force_color) {
@@ -93,7 +93,7 @@ static void init_curses(void)
 #endif
         for (fg = 0; fg != 8; ++fg) {
             for (bg = 0; bg != 2; ++bg) {
-                init_pair(fg + 8 * bg, fg, bg ? hcol : bcol);
+                init_pair((short)(fg + 8 * bg), (short)fg, (short)(bg ? hcol : bcol));
             }
         }
 

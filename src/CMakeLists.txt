@@ -16,8 +16,9 @@ if (CMAKE_COMPILER_IS_GNUCC)
     execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
         OUTPUT_VARIABLE GCC_VERSION)
     if (GCC_VERSION VERSION_GREATER 4.9)
-        message(STATUS "Version ${GCC_VERSION} >= 4.9")
         SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wfloat-conversion")
+    else()
+        SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wconversion -Wno-sign-conversion")
     endif()
 
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long")

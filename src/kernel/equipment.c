@@ -174,7 +174,7 @@ void equip_unit_mask(struct unit *u, const struct equipment *eq, int mask)
             int i;
             for (i = 0; eq->subsets[i].sets; ++i) {
                 if (chance(eq->subsets[i].chance)) {
-                    float rnd = (1 + rng_int() % 1000) / 1000.0f;
+                    double rnd = (1 + rng_int() % 1000) / 1000.0;
                     int k;
                     for (k = 0; eq->subsets[i].sets[k].set; ++k) {
                         if (rnd <= eq->subsets[i].sets[k].chance) {
@@ -209,7 +209,7 @@ void equip_items(struct item **items, const struct equipment *eq)
             int i;
             for (i = 0; eq->subsets[i].sets; ++i) {
                 if (chance(eq->subsets[i].chance)) {
-                    float rnd = (1 + rng_int() % 1000) / 1000.0f;
+                    double rnd = (1 + rng_int() % 1000) / 1000.0;
                     int k;
                     for (k = 0; eq->subsets[i].sets[k].set; ++k) {
                         if (rnd <= eq->subsets[i].sets[k].chance) {

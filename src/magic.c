@@ -1008,7 +1008,7 @@ cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
  * Spruchfunktionsroutine ermittelt.
  */
 
-float
+double
 spellpower(region * r, unit * u, const spell * sp, int cast_level, struct order *ord)
 {
     curse *c;
