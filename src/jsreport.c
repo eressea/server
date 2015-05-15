@@ -1,9 +1,11 @@
 #include "reports.h"
 #include "jsreport.h"
-#include "kernel/region.h"
-#include "kernel/terrain.h"
-#include "kernel/terrainid.h"
-#include "kernel/config.h"
+#include <kernel/region.h>
+#include <kernel/terrain.h>
+#include <kernel/terrainid.h>
+#include <kernel/config.h>
+
+#include <util/log.h>
 
 #include <limits.h>
 #include <stdio.h>
@@ -56,6 +58,9 @@ static int report_json(const char *filename, report_context * ctx, const char *c
                             sr = find_seen(ctx->seen, r);
                             if (sr) {
                                 terrain_t ter = oldterrain(r->terrain);
+                                if (ter != NOTERRAIN) {
+                                    log_warning("report_json: %s has no terrain id\n", r->terrain->_name);
+                                }
                                 data = 1 + (int)ter;
                             }
                         }
