@@ -79,7 +79,7 @@ typedef struct request {
     struct request *next;
     struct unit *unit;
     struct order *ord;
-    unsigned int qty;
+    int qty;
     int no;
     union {
         bool goblin;             /* stealing */
@@ -91,7 +91,7 @@ static int working;
 
 static request entertainers[1024];
 static request *nextentertainer;
-static unsigned int entertaining;
+static int entertaining;
 
 static unsigned int norders;
 static request *oa;
@@ -1657,7 +1657,7 @@ static void expandbuying(region * r, request * buyorders)
         int multi;
     } trades[MAXLUXURIES], *trade;
     static int ntrades = 0;
-    int i, j;
+    int i;
     const luxury_type *ltype;
 
     if (ntrades == 0) {
@@ -1686,6 +1686,7 @@ static void expandbuying(region * r, request * buyorders)
      * Güter pro Monat ist. j sind die Befehle, i der Index des
      * gehandelten Produktes. */
     if (max_products > 0) {
+        unsigned int j;
         expandorders(r, buyorders);
         if (!norders)
             return;
@@ -1884,7 +1885,8 @@ static int tax_per_size[7] = { 0, 6, 12, 18, 24, 30, 36 };
 
 static void expandselling(region * r, request * sellorders, int limit)
 {
-    int money, price, j, max_products;
+    int money, price, max_products;
+    unsigned int j;
     /* int m, n = 0; */
     int maxsize = 0, maxeffsize = 0;
     int taxcollected = 0;
@@ -2220,7 +2222,7 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
 static void expandstealing(region * r, request * stealorders)
 {
     const resource_type *rsilver = get_resourcetype(R_SILVER);
-    int i;
+    unsigned int j;
 
     assert(rsilver);
 
@@ -2233,8 +2235,8 @@ static void expandstealing(region * r, request * stealorders)
      * u ist die beklaute unit. oa.unit ist die klauende unit.
      */
 
-    for (i = 0; i != norders && oa[i].unit->n <= oa[i].unit->wants; i++) {
-        unit *u = findunitg(oa[i].no, r);
+    for (j = 0; j != norders && oa[j].unit->n <= oa[j].unit->wants; j++) {
+        unit *u = findunitg(oa[j].no, r);
         int n = 0;
         if (u && u->region == r) {
             n = get_pooled(u, rsilver, GET_ALL, INT_MAX);
@@ -2258,15 +2260,15 @@ static void expandstealing(region * r, request * stealorders)
             n = 10;
         }
         if (n > 0) {
-            n = _min(n, oa[i].unit->wants);
+            n = _min(n, oa[j].unit->wants);
             use_pooled(u, rsilver, GET_ALL, n);
-            oa[i].unit->n = n;
-            change_money(oa[i].unit, n);
+            oa[j].unit->n = n;
+            change_money(oa[j].unit, n);
             ADDMSG(&u->faction->msgs, msg_message("stealeffect", "unit region amount",
                 u, u->region, n));
         }
-        add_income(oa[i].unit, IC_STEAL, oa[i].unit->wants, oa[i].unit->n);
-        fset(oa[i].unit, UFL_LONGACTION | UFL_NOTMOVING);
+        add_income(oa[j].unit, IC_STEAL, oa[j].unit->wants, oa[j].unit->n);
+        fset(oa[j].unit, UFL_LONGACTION | UFL_NOTMOVING);
     }
     free(oa);
 }
@@ -2909,7 +2911,7 @@ static int do_work(unit * u, order * ord, request * o)
 static void expandloot(region * r, request * lootorders)
 {
     unit *u;
-    int i;
+    unsigned int i;
     int looted = 0;
     int startmoney = rmoney(r);
 
@@ -2946,7 +2948,7 @@ static void expandloot(region * r, request * lootorders)
 static void expandtax(region * r, request * taxorders)
 {
     unit *u;
-    int i;
+    unsigned int i;
 
     expandorders(r, taxorders);
     if (!norders)

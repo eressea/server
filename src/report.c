@@ -516,7 +516,7 @@ void sparagraph(strlist ** SP, const char *s, unsigned int indent, char mark)
      * mark, falls angegeben. SP wurde also auf 0 gesetzt vor dem Aufruf.
      * Vgl. spunit (). */
 
-    int i, j, width;
+    unsigned int width;
     int firstline;
     static char buf[REPORTWIDTH + 1]; // FIXME: static return value
 
@@ -524,10 +524,9 @@ void sparagraph(strlist ** SP, const char *s, unsigned int indent, char mark)
     firstline = 1;
 
     for (;;) {
-        i = 0;
+        unsigned int j = 0, i;
 
-        do {
-            j = i;
+        for (i=0; s[j]; j=i) {
             while (s[j] && s[j] != ' ')
                 j++;
             if (j > width) {

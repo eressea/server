@@ -16,7 +16,7 @@ int wrptr(char **ptr, size_t * size, size_t bytes)
         *size = 0;
         return EINVAL;
     }
-    if (bytes <= *(int *)size) {
+    if (bytes <= *size) {
         *ptr += bytes;
         *size -= bytes;
         return 0;
