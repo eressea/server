@@ -1867,7 +1867,7 @@ static void do_extra_spell(troop at, const att * a)
         log_error("spell '%s' has no function.\n", sp->sname);
     }
     else {
-        float force = (float)(a->level * MagicPower());
+        float force = (float)a->level * MagicPower();
         assert(a->level > 0);
         cast_combatspell(at, sp, a->level, force);
     }
@@ -2965,19 +2965,19 @@ static void print_header(battle * b)
         side *s;
         char *bufp = zText;
         size_t size = sizeof(zText) - 1;
-        int bytes;
+        size_t bytes;
 
         for (s = b->sides; s != b->sides + b->nsides; ++s) {
             fighter *df;
             for (df = s->fighters; df; df = df->next) {
                 if (is_attacker(df)) {
                     if (first) {
-                        bytes = (int)strlcpy(bufp, ", ", size);
+                        bytes = strlcpy(bufp, ", ", size);
                         if (wrptr(&bufp, &size, bytes) != 0)
                             WARN_STATIC_BUFFER();
                     }
                     if (lastf) {
-                        bytes = (int)strlcpy(bufp, (const char *)lastf, size);
+                        bytes = strlcpy(bufp, (const char *)lastf, size);
                         if (wrptr(&bufp, &size, bytes) != 0)
                             WARN_STATIC_BUFFER();
                         first = true;
@@ -2991,18 +2991,18 @@ static void print_header(battle * b)
             }
         }
         if (first) {
-            bytes = (int)strlcpy(bufp, " ", size);
+            bytes = strlcpy(bufp, " ", size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
-            bytes = (int)strlcpy(bufp, (const char *)LOC(f->locale, "and"), size);
+            bytes = strlcpy(bufp, (const char *)LOC(f->locale, "and"), size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
-            bytes = (int)strlcpy(bufp, " ", size);
+            bytes = strlcpy(bufp, " ", size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
         }
         if (lastf) {
-            bytes = (int)strlcpy(bufp, (const char *)lastf, size);
+            bytes = strlcpy(bufp, (const char *)lastf, size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
         }
@@ -3348,7 +3348,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
         }
         assert(w >= 0);
         fig->weapons = (weapon *)calloc(sizeof(weapon), (size_t)(w + 1));
-        memcpy(fig->weapons, weapons, (size_t)(w * sizeof(weapon)));
+        memcpy(fig->weapons, weapons, (size_t)w * sizeof(weapon));
 
         for (i = 0; i != w; ++i) {
             int j, o = 0, d = 0;
@@ -3717,7 +3717,7 @@ static int battle_report(battle * b)
         faction *fac = bf->faction;
         char buf[32 * MAXSIDES];
         char *bufp = buf;
-        int bytes;
+        size_t bytes;
         size_t size = sizeof(buf) - 1;
         message *m;
 
@@ -3740,32 +3740,32 @@ static int battle_report(battle * b)
                 char buffer[32];
 
                 if (komma) {
-                    bytes = (int)strlcpy(bufp, ", ", size);
+                    bytes = strlcpy(bufp, ", ", size);
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
                 }
                 slprintf(buffer, sizeof(buffer), "%s %2d(%s): ",
                     loc_army, army_index(s), abbrev);
 
-                bytes = (int)strlcpy(bufp, buffer, size);
+                bytes = strlcpy(bufp, buffer, size);
                 if (wrptr(&bufp, &size, bytes) != 0)
                     WARN_STATIC_BUFFER();
 
                 for (r = FIGHT_ROW; r != NUMROWS; ++r) {
                     if (alive[r]) {
                         if (l != FIGHT_ROW) {
-                            bytes = (int)strlcpy(bufp, "+", size);
+                            bytes = strlcpy(bufp, "+", size);
                             if (wrptr(&bufp, &size, bytes) != 0)
                                 WARN_STATIC_BUFFER();
                         }
                         while (k--) {
-                            bytes = (int)strlcpy(bufp, "0+", size);
+                            bytes = strlcpy(bufp, "0+", size);
                             if (wrptr(&bufp, &size, bytes) != 0)
                                 WARN_STATIC_BUFFER();
                         }
                         sprintf(buffer, "%d", alive[r]);
 
-                        bytes = (int)strlcpy(bufp, buffer, size);
+                        bytes = strlcpy(bufp, buffer, size);
                         if (wrptr(&bufp, &size, bytes) != 0)
                             WARN_STATIC_BUFFER();
 
