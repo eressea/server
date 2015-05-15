@@ -12,8 +12,15 @@ include_directories (${LUA_INCLUDE_DIR})
 include_directories (${BSON_INCLUDE_DIR})
 include_directories (${INIPARSER_INCLUDE_DIR})
 
-IF(CMAKE_COMPILER_IS_GNUCC)
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic -Wall -Wfloat-conversion -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long")
+if (CMAKE_COMPILER_IS_GNUCC)
+    execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
+        OUTPUT_VARIABLE GCC_VERSION)
+    if (GCC_VERSION VERSION_GREATER 4.9)
+        message(STATUS "Version ${GCC_VERSION} >= 4.9")
+        SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wfloat-conversion")
+    endif()
+
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long")
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -DHAVE__BOOL")
 elseif(MSVC)
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /Wall /WX /MP")
