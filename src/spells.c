@@ -490,7 +490,7 @@ static const race *select_familiar(const race * magerace, magic_t magiegebiet)
         unsigned int maxlen = listlen(familiarraces);
         if (maxlen > 0) {
             race_list *rclist = familiarraces;
-            int index = rng_int() % maxlen;
+            unsigned int index = rng_uint() % maxlen;
             while (index-- > 0) {
                 rclist = rclist->next;
             }
@@ -536,7 +536,8 @@ static int sp_summon_familiar(castorder * co)
     int cast_level = co->level;
     const race *rc;
     int sk;
-    int dh, dh1, bytes;
+    int dh, dh1;
+    size_t bytes;
     message *msg;
     char zText[2048], *bufp = zText;
     size_t size = sizeof(zText) - 1;
@@ -597,17 +598,17 @@ static int sp_summon_familiar(castorder * co)
             else {
                 if (dh == 0) {
                     bytes =
-                        (int)strlcpy(bufp, (const char *)LOC(mage->faction->locale,
+                        strlcpy(bufp, (const char *)LOC(mage->faction->locale,
                         "list_and"), size);
                 }
                 else {
-                    bytes = (int)strlcpy(bufp, (const char *)", ", size);
+                    bytes = strlcpy(bufp, (const char *)", ", size);
                 }
                 if (wrptr(&bufp, &size, bytes) != 0)
                     WARN_STATIC_BUFFER();
             }
             bytes =
-                (int)strlcpy(bufp, (const char *)skillname((skill_t)sk, mage->faction->locale),
+                strlcpy(bufp, (const char *)skillname((skill_t)sk, mage->faction->locale),
                 size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
@@ -1299,16 +1300,17 @@ static int sp_rosthauch(castorder * co)
         for (; iweapon != NULL; iweapon = iweapon->next) {
             item **ip = i_find(&u->items, iweapon->type);
             if (*ip) {
-                int i = _min((*ip)->number, force);
+                float chance = (float)_min((*ip)->number, force);
                 if (iweapon->chance < 1.0) {
-                    i = (int)(i * iweapon->chance);
+                    chance *= iweapon->chance;
                 }
-                if (i > 0) {
-                    force -= i;
-                    ironweapon += i;
-                    i_change(ip, iweapon->type, -i);
+                if (chance > 0) {
+                    int ichange = (int)chance;
+                    force -= ichange;
+                    ironweapon += ichange;
+                    i_change(ip, iweapon->type, -ichange);
                     if (iweapon->rusty) {
-                        i_change(&u->items, iweapon->rusty, i);
+                        i_change(&u->items, iweapon->rusty, ichange);
                     }
                 }
             }
@@ -4004,7 +4006,7 @@ static int sp_recruit(castorder * co)
      * Bauer, nur die Kosten steigen. */
     n = (pow(force, 1.6) * 100) / f->race->recruitcost;
     if (rc->recruit_multi != 0) {
-        double multp = maxp / rc->recruit_multi;
+        double multp = (double)maxp / rc->recruit_multi;
         n = _min(multp, n);
         n = _max(n, 1);
         rsetpeasants(r, maxp - (int)(n * rc->recruit_multi));
@@ -4054,7 +4056,7 @@ static int sp_bigrecruit(castorder * co)
     /* Fuer vergleichbare Erfolge bei unterschiedlichen Rassen die
      * Rekrutierungskosten mit einfliessen lassen. */
 
-    n = (int)force + lovar((force * force * 1000) / f->race->recruitcost);
+    n = (int)force + lovar((force * force * 1000) / (float)f->race->recruitcost);
     if (f->race == get_race(RC_ORC)) {
         n = _min(2 * maxp, n);
         n = _max(n, 1);
@@ -4197,7 +4199,7 @@ static int sp_seduce(castorder * co)
                 loot += rng_int() % 2;
             }
             if (loot > 0) {
-                loot = (int)_min(loot, force * 5);
+                loot = _min(loot, (int)(force * 5));
             }
         }
         if (loot > 0) {
@@ -4314,7 +4316,7 @@ static int sp_headache(castorder * co)
     }
     if (smax != NULL) {
         /* wirkt auf maximal 10 Personen */
-        int change = _min(10, target->number) * (rng_int() % 2 + 1) / target->number;
+        unsigned int change = _min(10, target->number) * (rng_uint() % 2 + 1) / target->number;
         reduce_skill(target, smax, change);
     }
     set_order(&target->thisorder, NULL);
@@ -4358,7 +4360,7 @@ static int sp_raisepeasants(castorder * co)
             "error_nopeasants", ""));
         return 0;
     }
-    bauern = (int)_min(rpeasants(r), power * 250);
+    bauern = _min(rpeasants(r), (int)(power * 250));
     rsetpeasants(r, rpeasants(r) - bauern);
 
     u2 =
