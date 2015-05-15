@@ -2,7 +2,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
-#include "goodies.h"
+#include "strings.h"
 
 static void test_escape_string(CuTest * tc)
 {

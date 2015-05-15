@@ -1695,7 +1695,7 @@ void do_combatmagic(battle * b, combatmagic_t was)
 
             level = eff_skill(mage, SK_MAGIC, r);
             if (level > 0) {
-                float power;
+                double power;
                 const spell *sp;
                 const struct locale *lang = mage->faction->locale;
                 order *ord;
@@ -1771,7 +1771,7 @@ void do_combatmagic(battle * b, combatmagic_t was)
     }
 }
 
-static int cast_combatspell(troop at, const spell * sp, int level, float force)
+static int cast_combatspell(troop at, const spell * sp, int level, double force)
 {
     castorder co;
 
@@ -1794,7 +1794,7 @@ static void do_combatspell(troop at)
     region *r = b->region;
     quicklist *ql;
     int level, qi;
-    float power;
+    double power;
     int fumblechance = 0;
     order *ord;
     int sl;
@@ -1867,7 +1867,7 @@ static void do_extra_spell(troop at, const att * a)
         log_error("spell '%s' has no function.\n", sp->sname);
     }
     else {
-        float force = (float)a->level * MagicPower();
+        double force = a->level * MagicPower();
         assert(a->level > 0);
         cast_combatspell(at, sp, a->level, force);
     }
@@ -2497,14 +2497,14 @@ troop select_ally(fighter * af, int minrow, int maxrow, int allytype)
 static int loot_quota(const unit * src, const unit * dst,
     const item_type * type, int n)
 {
-    static float divisor = -1;
+    static double divisor = -1;
     if (dst && src && src->faction != dst->faction) {
         if (divisor < 0) {
             divisor = get_param_flt(global.parameters, "rules.items.loot_divisor", 1);
             assert(divisor == 0 || divisor >= 1);
         }
         if (divisor >= 1) {
-            double r = (float)n / divisor;
+            double r = n / divisor;
             int x = (int)r;
 
             r = r - x;

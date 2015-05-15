@@ -71,12 +71,12 @@ static void test_regionid(CuTest * tc) {
 
     memset(buffer, 0x7d, sizeof(buffer));
     len = f_regionid(r, 0, buffer, sizeof(buffer));
-    CuAssertIntEquals(tc, 11, len);
+    CuAssertIntEquals(tc, 11, (int)len);
     CuAssertStrEquals(tc, "plain (0,0)", buffer);
 
     memset(buffer, 0x7d, sizeof(buffer));
     len = f_regionid(r, 0, buffer, 11);
-    CuAssertIntEquals(tc, 10, len);
+    CuAssertIntEquals(tc, 10, (int)len);
     CuAssertStrEquals(tc, "plain (0,0", buffer);
     CuAssertIntEquals(tc, 0x7d, buffer[11]);
 }

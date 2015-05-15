@@ -98,7 +98,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <limits.h>
 
 /* chance that a peasant dies of starvation: */
-#define PEASANT_STARVATION_CHANCE 0.9F
+#define PEASANT_STARVATION_CHANCE 0.9
 /* Pferdevermehrung */
 #define HORSEGROWTH 4
 /* Wanderungschance pro Pferd */
@@ -257,7 +257,7 @@ static void calculate_emigration(region * r)
 }
 
 
-static float peasant_growth_factor(void)
+static double peasant_growth_factor(void)
 {
     return get_param_flt(global.parameters, "rules.peasants.growth.factor", 0.0001F * PEASANTGROWTH);
 }
@@ -265,7 +265,7 @@ static float peasant_growth_factor(void)
 #ifdef SLOWLUCK
 int peasant_luck_effect(int peasants, int luck, int maxp, double variance) {
     int n, births=0;
-    float factor = peasant_growth_factor();
+    double factor = peasant_growth_factor();
     for (n = peasants; n && luck; --n) {
         int chances = 0;
 
@@ -287,7 +287,7 @@ int peasant_luck_effect(int peasants, int luck, int maxp, double variance) {
     return births;
 }
 #else
-static float peasant_luck_factor(void)
+static double peasant_luck_factor(void)
 {
     return get_param_flt(global.parameters, "rules.peasants.peasantluck.factor", PEASANTLUCK);
 }
@@ -296,12 +296,10 @@ int peasant_luck_effect(int peasants, int luck, int maxp, double variance)
 {
     int births = 0;
     double mean;
-
     if (luck == 0) return 0;
 
-    mean = _min(luck, peasants) * peasant_luck_factor()
-        * peasant_growth_factor() * ((peasants / (double)maxp < .9) ? 1 :
-        PEASANTFORCE);
+    mean = peasant_luck_factor() * peasant_growth_factor() * _min(luck, peasants);
+    mean *= ((peasants / (double)maxp < .9) ? 1 : PEASANTFORCE);
 
     births = RAND_ROUND(normalvariate(mean, variance * mean));
     if (births <= 0)
@@ -349,7 +347,7 @@ static void peasants(region * r)
     /* Es verhungert maximal die unterernährten Bevölkerung. */
 
     n = _min(peasants - satiated, rpeasants(r));
-    dead += (int)(0.5F + n * PEASANT_STARVATION_CHANCE);
+    dead += (int)(0.5 + n * PEASANT_STARVATION_CHANCE);
 
     if (dead > 0) {
         message *msg = add_message(&r->msgs, msg_message("phunger", "dead", dead));
@@ -433,7 +431,7 @@ static void horses(region * r)
     horses = rhorses(r);
     if (horses > 0) {
         if (is_cursed(r->attribs, C_CURSED_BY_THE_GODS, 0)) {
-            rsethorses(r, (int)(horses * 0.9F));
+            rsethorses(r, (int)(horses * 0.9));
         }
         else if (maxhorses) {
             int i;
@@ -445,7 +443,7 @@ static void horses(region * r)
                 if (a_find(r->attribs, &at_horseluck))
                     growth *= 2;
                 /* printf("Horses: <%d> %d -> ", growth, horses); */
-                i = (int)(0.5F + (horses * 0.0001F) * growth);
+                i = (int)(0.5 + (horses * 0.0001) * growth);
                 /* printf("%d\n", horses); */
                 rsethorses(r, horses + i);
             }
@@ -2281,7 +2279,7 @@ static bool display_race(faction * f, unit * u, const race * rc)
     int a, at_count;
     char buf[2048], *bufp = buf;
     size_t size = sizeof(buf) - 1;
-    int bytes;
+    size_t bytes;
 
     if (u && u_race(u) != rc)
         return false;
@@ -2297,7 +2295,7 @@ static bool display_race(faction * f, unit * u, const race * rc)
         info = LOC(f->locale, mkname("raceinfo", "no_info"));
     }
 
-    bytes = (int)strlcpy(bufp, info, size);
+    bytes = strlcpy(bufp, info, size);
     if (wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
 
@@ -2345,28 +2343,28 @@ static bool display_race(faction * f, unit * u, const race * rc)
         }
     }
     if (rc->battle_flags & BF_EQUIPMENT) {
-        bytes = _snprintf(bufp, size, " %s", LOC(f->locale, "stat_equipment"));
+        bytes = (size_t)_snprintf(bufp, size, " %s", LOC(f->locale, "stat_equipment"));
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
     }
     if (rc->battle_flags & BF_RES_PIERCE) {
-        bytes = _snprintf(bufp, size, " %s", LOC(f->locale, "stat_pierce"));
+        bytes = (size_t)_snprintf(bufp, size, " %s", LOC(f->locale, "stat_pierce"));
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
     }
     if (rc->battle_flags & BF_RES_CUT) {
-        bytes = _snprintf(bufp, size, " %s", LOC(f->locale, "stat_cut"));
+        bytes = (size_t)_snprintf(bufp, size, " %s", LOC(f->locale, "stat_cut"));
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
     }
     if (rc->battle_flags & BF_RES_BASH) {
-        bytes = _snprintf(bufp, size, " %s", LOC(f->locale, "stat_bash"));
+        bytes = (size_t)_snprintf(bufp, size, " %s", LOC(f->locale, "stat_bash"));
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
     }
 
     bytes =
-        _snprintf(bufp, size, " %d %s", at_count, LOC(f->locale,
+       (size_t)_snprintf(bufp, size, " %d %s", at_count, LOC(f->locale,
         (at_count == 1) ? "stat_attack" : "stat_attacks"));
     if (wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
@@ -2374,21 +2372,21 @@ static bool display_race(faction * f, unit * u, const race * rc)
     for (a = 0; a < RACE_ATTACKS; a++) {
         if (rc->attack[a].type != AT_NONE) {
             if (a != 0)
-                bytes = (int)strlcpy(bufp, ", ", size);
+                bytes = strlcpy(bufp, ", ", size);
             else
-                bytes = (int)strlcpy(bufp, ": ", size);
+                bytes = strlcpy(bufp, ": ", size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
 
             switch (rc->attack[a].type) {
             case AT_STANDARD:
                 bytes =
-                    _snprintf(bufp, size, "%s (%s)",
+                    (size_t)_snprintf(bufp, size, "%s (%s)",
                     LOC(f->locale, "attack_standard"), rc->def_damage);
                 break;
             case AT_NATURAL:
                 bytes =
-                    _snprintf(bufp, size, "%s (%s)",
+                    (size_t)_snprintf(bufp, size, "%s (%s)",
                     LOC(f->locale, "attack_natural"), rc->attack[a].data.dice);
                 break;
             case AT_SPELL:
@@ -2396,11 +2394,11 @@ static bool display_race(faction * f, unit * u, const race * rc)
             case AT_DRAIN_ST:
             case AT_DRAIN_EXP:
             case AT_DAZZLE:
-                bytes = _snprintf(bufp, size, "%s", LOC(f->locale, "attack_magical"));
+                bytes = (size_t)_snprintf(bufp, size, "%s", LOC(f->locale, "attack_magical"));
                 break;
             case AT_STRUCTURAL:
                 bytes =
-                    _snprintf(bufp, size, "%s (%s)",
+                    (size_t)_snprintf(bufp, size, "%s (%s)",
                     LOC(f->locale, "attack_structural"), rc->attack[a].data.dice);
                 break;
             default:
@@ -3130,7 +3128,7 @@ static building *age_building(building * b)
             else if (mage != NULL) {
                 int sk = effskill(mage, SK_MAGIC);
                 c->duration = _max(c->duration, sk / 2);
-                c->vigour = _max(c->vigour, sk);
+                c->vigour = _max(c->vigour, (float)sk);
             }
         }
     }

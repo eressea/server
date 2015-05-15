@@ -537,11 +537,12 @@ attrib_type at_travelunit = {
     NO_READ
 };
 
-void rsetroad(region * r, direction_t d, short val)
+void rsetroad(region * r, direction_t d, int val)
 {
     connection *b;
     region *r2 = rconnect(r, d);
 
+    assert(val>=SHRT_MIN && val<=SHRT_MAX);
     if (!r2) {
         return;
     }
@@ -554,14 +555,14 @@ void rsetroad(region * r, direction_t d, short val)
         b = new_border(&bt_road, r, r2);
     }
     if (r == b->from) {
-        b->data.sa[0] = val;
+        b->data.sa[0] = (short)val;
     }
     else {
-        b->data.sa[1] = val;
+        b->data.sa[1] = (short)val;
     }
 }
 
-short rroad(const region * r, direction_t d)
+int rroad(const region * r, direction_t d)
 {
     connection *b;
     region *r2 = rconnect(r, d);

@@ -908,11 +908,11 @@ int sp_strong_wall(struct castorder * co)
 {
     fighter * fi = co->magician.fig;
     int level = co->level;
-    float power = co->force;
+    double power = co->force;
     battle *b = fi->side->battle;
     unit *mage = fi->unit;
     building *burg;
-    float effect;
+    double effect;
     static bool init = false;
     message *msg;
     static const curse_type *strongwall_ct;
