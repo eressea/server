@@ -509,7 +509,7 @@ static void nr_spell(FILE * F, spellbook_entry * sbe, const struct locale *lang)
     rnl(F);
 }
 
-void sparagraph(strlist ** SP, const char *s, int indent, char mark)
+void sparagraph(strlist ** SP, const char *s, unsigned int indent, char mark)
 {
 
     /* Die Liste SP wird mit dem String s aufgefuellt, mit indent und einer

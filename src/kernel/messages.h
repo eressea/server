@@ -56,6 +56,7 @@ extern "C" {
 
 #define ADDMSG(msgs, mcreate) { message * m = mcreate; if (m) { assert(m->refcount>=1); add_message(msgs, m); msg_release(m); } }
 
+    void syntax_error(const struct unit *u, struct order *ord);
     struct message * cmistake(const struct unit *u, struct order *ord, int mno, int mtype);
     struct message * msg_error(const struct unit * u, struct order *ord, int mno);
 #ifdef __cplusplus

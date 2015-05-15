@@ -282,6 +282,14 @@ message * cmistake(const unit * u, struct order *ord, int mno, int mtype)
     return result;
 }
 
+void syntax_error(const struct unit *u, struct order *ord)
+{
+    message * result;
+    result = msg_error(u, ord, 10);
+    ADDMSG(&u->faction->msgs, result);
+    msg_release(result);
+}
+
 extern unsigned int new_hashstring(const char *s);
 
 void free_messagelist(message_list * msgs)
