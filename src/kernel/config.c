@@ -1199,7 +1199,7 @@ void setguard(unit * u, unsigned int flags)
     }
     fset(u, UFL_GUARD);
     fset(u->region, RF_GUARDED);
-    if ((int)flags == guard_flags(u)) {
+    if (flags == guard_flags(u)) {
         if (a)
             a_remove(&u->attribs, a);
     }
