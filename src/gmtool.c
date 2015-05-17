@@ -761,6 +761,29 @@ static void select_regions(state * st, int selectmode)
     st->wnd_map->update |= 3;
 }
 
+void loaddata(state *st)  {
+    char datafile[MAX_PATH];
+
+    askstring(st->wnd_status->handle, "save as:", datafile, sizeof(datafile));
+    if (strlen(datafile) > 0) {
+        create_backup(datafile);
+        readgame(datafile, false);
+        st->modified = 0;
+    }
+}
+
+void savedata(state *st)  {
+    char datafile[MAX_PATH];
+
+    askstring(st->wnd_status->handle, "save as:", datafile, sizeof(datafile));
+    if (strlen(datafile) > 0) {
+        create_backup(datafile);
+        remove_empty_units();
+        writegame(datafile);
+        st->modified = 0;
+    }
+}
+
 static void handlekey(state * st, int c)
 {
     window *wnd;
@@ -816,17 +839,11 @@ static void handlekey(state * st, int c)
     case 'S':
     case KEY_SAVE:
     case KEY_F(2):
-        /* if (st->modified) */  {
-            char datafile[MAX_PATH];
-
-            askstring(st->wnd_status->handle, "save as:", datafile, sizeof(datafile));
-            if (strlen(datafile) > 0) {
-                create_backup(datafile);
-                remove_empty_units();
-                writegame(datafile);
-                st->modified = 0;
-            }
-    }
+        savedata(st);
+        break;
+    case KEY_F(3):
+    case KEY_OPEN:
+        loaddata(st);
         break;
     case 'B':
         /*
