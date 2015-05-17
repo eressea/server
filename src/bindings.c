@@ -118,7 +118,7 @@ static int tolua_quicklist_iter(lua_State * L)
     quicklist **qlp = (quicklist **)lua_touserdata(L, lua_upvalueindex(1));
     quicklist *ql = *qlp;
     if (ql != NULL) {
-        int index = lua_tointeger(L, lua_upvalueindex(2));
+        int index = (int)lua_tointeger(L, lua_upvalueindex(2));
         const char *type = lua_tostring(L, lua_upvalueindex(3));
         void *data = ql_get(ql, index);
         tolua_pushusertype(L, data, TOLUA_CAST type);

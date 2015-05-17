@@ -48,9 +48,9 @@ typedef struct createcurse_data {
     struct unit *mage;
     struct unit *target;
     const curse_type *type;
-    float vigour;
+    double vigour;
     int duration;
-    float effect;
+    double effect;
     int men;
 } createcurse_data;
 
@@ -97,13 +97,15 @@ static int createcurse_read(trigger * t, struct storage *store)
 {
     createcurse_data *td = (createcurse_data *)t->data.v;
     char zText[128];
+    float flt;
 
     read_reference(&td->mage, store, read_unit_reference, resolve_unit);
     read_reference(&td->target, store, read_unit_reference, resolve_unit);
 
     READ_TOK(store, zText, sizeof(zText));
     td->type = ct_find(zText);
-    READ_FLT(store, &td->vigour);
+    READ_FLT(store, &flt);
+    td->vigour = flt;
     READ_INT(store, &td->duration);
     if (global.data_version < CURSEFLOAT_VERSION) {
         int n;
@@ -111,7 +113,8 @@ static int createcurse_read(trigger * t, struct storage *store)
         td->effect = (float)n;
     }
     else {
-        READ_FLT(store, &td->effect);
+        READ_FLT(store, &flt);
+        td->effect = flt;
     }
     READ_INT(store, &td->men);
     return AT_READ_OK;
@@ -127,7 +130,7 @@ trigger_type tt_createcurse = {
 };
 
 trigger *trigger_createcurse(struct unit * mage, struct unit * target,
-    const curse_type * ct, float vigour, int duration, float effect, int men)
+    const curse_type * ct, double vigour, int duration, double effect, int men)
 {
     trigger *t = t_new(&tt_createcurse);
     createcurse_data *td = (createcurse_data *)t->data.v;

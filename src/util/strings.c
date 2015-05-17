@@ -32,7 +32,7 @@ unsigned int hashstring(const char *s)
 }
 
 const char *escape_string(const char *str, char *buffer,
-    unsigned int len)
+    size_t len)
 {
     const char *start = strchr(str, '\"');
     if (!start) start = strchr(str, '\\');

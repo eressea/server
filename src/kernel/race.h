@@ -123,9 +123,9 @@ extern "C" {
         struct param *parameters;
         char *_name;
         float magres;
-        float maxaura;              /* Faktor auf Maximale Aura */
-        float regaura;              /* Faktor auf Regeneration */
-        float recruit_multi;        /* Faktor für Bauernverbrauch */
+        double maxaura;            /* Faktor auf Maximale Aura */
+        double regaura;            /* Faktor auf Regeneration */
+        double recruit_multi;      /* Faktor für Bauernverbrauch */
         int index;
         int recruitcost;
         int maintenance;

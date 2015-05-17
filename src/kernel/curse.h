@@ -194,9 +194,9 @@ extern "C" {
         const struct curse_type *type;      /* Zeiger auf ein curse_type-struct */
         int flags;         /* WARNING: these are XORed with type->flags! */
         int duration;               /* Dauer der Verzauberung. Wird jede Runde vermindert */
-        float vigour;              /* Stärke der Verzauberung, Widerstand gegen Antimagie */
+        double vigour;              /* Stärke der Verzauberung, Widerstand gegen Antimagie */
         struct unit *magician;      /* Pointer auf den Magier, der den Spruch gewirkt hat */
-        float effect;
+        double effect;
         variant data;               /* pointer auf spezielle curse-unterstructs */
     } curse;
 
@@ -211,7 +211,7 @@ extern "C" {
         int mergeflags;
         struct message *(*curseinfo) (const void *, objtype_t, const struct curse *,
             int);
-        void(*change_vigour) (curse *, float);
+        void(*change_vigour) (curse *, double);
         int(*read) (struct storage * store, curse * c, void *target);
         int(*write) (struct storage * store, const struct curse * c,
             const void *target);
@@ -238,7 +238,7 @@ extern "C" {
      */
 
     curse *create_curse(struct unit *magician, struct attrib **ap,
-        const curse_type * ctype, float vigour, int duration, float ceffect,
+        const curse_type * ctype, double vigour, int duration, double ceffect,
         int men);
     /* Verzweigt automatisch zum passenden struct-typ. Sollte es schon
      * einen Zauber dieses Typs geben, so wird der neue dazuaddiert. Die
@@ -260,10 +260,10 @@ extern "C" {
      * gesetzt. Gibt immer den ersten Treffer von ap aus zurück.
      */
     int curse_geteffect_int(const struct curse *c);
-    float curse_geteffect(const struct curse *c);
+    double curse_geteffect(const struct curse *c);
 
     /* verändert die Stärke der Verzauberung um i */
-    float curse_changevigour(struct attrib **ap, curse * c, float i);
+    double curse_changevigour(struct attrib **ap, curse * c, double delta);
 
     /* gibt bei Personenbeschränkten Verzauberungen die Anzahl der
      * betroffenen Personen zurück. Ansonsten wird 0 zurückgegeben. */
@@ -297,7 +297,7 @@ extern "C" {
     void curse_done(struct attrib *a);
     int curse_age(struct attrib *a);
 
-    float destr_curse(struct curse *c, int cast_level, float force);
+    double destr_curse(struct curse *c, int cast_level, double force);
 
     int resolve_curse(variant data, void *address);
     bool is_cursed_with(const struct attrib *ap, const struct curse *c);

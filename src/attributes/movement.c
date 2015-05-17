@@ -25,6 +25,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <storage.h>
 
+#include <limits.h>
+#include <assert.h>
+
 static void
 write_movement(const attrib * a, const void *owner, struct storage *store)
 {
@@ -65,7 +68,9 @@ void set_movement(attrib ** alist, int type)
 static int age_speedup(attrib * a)
 {
     if (a->data.sa[0] > 0) {
-        a->data.sa[0] = a->data.sa[0] - a->data.sa[1];
+        assert(a->data.sa[0] - a->data.sa[1] >= SHRT_MIN);
+        assert(a->data.sa[0] - a->data.sa[1] <= SHRT_MAX);
+        a->data.sa[0] = (short)(a->data.sa[0] - a->data.sa[1]);
     }
     return (a->data.sa[0] > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
 }

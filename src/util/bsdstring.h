@@ -2,7 +2,7 @@
 #define UTIL_BSDSTRING_H
 
 #include <stddef.h>
-extern int wrptr(char **ptr, size_t * size, int bytes);
+extern int wrptr(char **ptr, size_t * size, size_t bytes);
 
 #ifndef HAVE_STRLCPY
 extern size_t strlcpy(char *dst, const char *src, size_t siz);

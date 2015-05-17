@@ -81,7 +81,7 @@ use_speedsail(struct unit *u, const struct item_type *itype, int amount,
 struct order *ord)
 {
     curse *c;
-    float effect;
+    double effect;
     ship *sh = u->ship;
     if (!sh) {
         cmistake(u, ord, 20, MSG_MOVE);
@@ -120,7 +120,7 @@ struct order *ord)
     }
     for (i = 0; i != amount; ++i) {
         int effect, duration = 2;
-        float force;
+        double force;
         spell *sp = find_spell("antimagiczone");
         attrib **ap = &r->attribs;
         unused_arg(ord);
@@ -132,7 +132,7 @@ struct order *ord)
         /* Hält Sprüche bis zu einem summierten Gesamtlevel von power aus.
          * Jeder Zauber reduziert die 'Lebenskraft' (vigour) der Antimagiezone
          * um seine Stufe */
-        force = (float)effect * 20;     /* Stufe 5 =~ 100 */
+        force = effect * 20;     /* Stufe 5 =~ 100 */
 
         /* Regionszauber auflösen */
         while (*ap && force > 0) {
@@ -163,8 +163,8 @@ struct order *ord)
         }
 
         if (force > 0) {
-            create_curse(u, &r->attribs, ct_find("antimagiczone"), (float)force, duration,
-                (float)effect, 0);
+            create_curse(u, &r->attribs, ct_find("antimagiczone"), force, duration,
+                effect, 0);
         }
     }
     use_pooled(u, rt_crystal, GET_DEFAULT, amount);

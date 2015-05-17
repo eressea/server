@@ -853,7 +853,7 @@ int forbiddenid(int id)
             ++len;
         forbid = calloc(len, sizeof(int));
         for (i = 0; i != len; ++i) {
-            forbid[i] = strtol(forbidden[i], NULL, 36);
+            forbid[i] = atoi36(forbidden[i]);
         }
     }
     for (i = 0; i != len; ++i)

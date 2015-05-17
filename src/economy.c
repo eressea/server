@@ -93,7 +93,7 @@ static request entertainers[1024];
 static request *nextentertainer;
 static int entertaining;
 
-static int norders;
+static unsigned int norders;
 static request *oa;
 
 #define RECRUIT_MERGE 1
@@ -123,13 +123,13 @@ int income(const unit * u)
     }
 }
 
-static void scramble(void *data, int n, size_t width)
+static void scramble(void *data, unsigned int n, size_t width)
 {
-    int j;
+    unsigned int j;
     char temp[64];
     assert(width <= sizeof(temp));
     for (j = 0; j != n; ++j) {
-        int k = rng_int() % n;
+        unsigned int k = rng_uint() % n;
         if (k == j)
             continue;
         memcpy(temp, (char *)data + j * width, width);
@@ -162,7 +162,7 @@ static void expandorders(region * r, request * requests)
         oa = (request *)calloc(norders, sizeof(request));
         for (o = requests; o; o = o->next) {
             if (o->qty > 0) {
-                int j;
+                unsigned int j;
                 for (j = o->qty; j; j--) {
                     oa[i] = *o;
                     oa[i].unit->n = 0;
@@ -297,7 +297,7 @@ static int horse_recruiters(const struct race *rc, int qty)
     if (rc->ec_flags & ECF_REC_ETHEREAL)
         return -1;
     if (rc->ec_flags & ECF_REC_HORSES)
-        return (int)(qty * 2 * rc->recruit_multi);
+        return (int)(qty * 2.0 * rc->recruit_multi);
     return -1;
 }
 
@@ -354,7 +354,7 @@ static int do_recruiting(recruitment * recruits, int available)
             unit *u = req->unit;
             const race *rc = u_race(u); /* race is set in recruit() */
             int number, dec;
-            float multi = 2.0F * rc->recruit_multi;
+            double multi = 2.0 * rc->recruit_multi;
 
             number = _min(req->qty, (int)(get / multi));
             if (rc->recruitcost) {
@@ -463,7 +463,6 @@ static int recruit_cost(const faction * f, const race * rc)
 
 static void recruit(unit * u, struct order *ord, request ** recruitorders)
 {
-    int n;
     region *r = u->region;
     plane *pl;
     request *o;
@@ -471,9 +470,14 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
     const faction *f = u->faction;
     const struct race *rc = u_race(u);
     const char *str;
+    int n;
 
     init_order(ord);
-    n = getuint();
+    n = getint();
+    if (n<=0) {
+        syntax_error(u, ord);
+        return;
+    }
 
     if (u->number == 0) {
         char token[128];
@@ -1653,7 +1657,7 @@ static void expandbuying(region * r, request * buyorders)
         int multi;
     } trades[MAXLUXURIES], *trade;
     static int ntrades = 0;
-    int i, j;
+    int i;
     const luxury_type *ltype;
 
     if (ntrades == 0) {
@@ -1682,6 +1686,7 @@ static void expandbuying(region * r, request * buyorders)
      * Güter pro Monat ist. j sind die Befehle, i der Index des
      * gehandelten Produktes. */
     if (max_products > 0) {
+        unsigned int j;
         expandorders(r, buyorders);
         if (!norders)
             return;
@@ -1784,8 +1789,8 @@ static void buy(unit * u, request ** buyorders, struct order *ord)
 
     kwd = init_order(ord);
     assert(kwd == K_BUY);
-    n = getuint();
-    if (!n) {
+    n = getint();
+    if (n<=0) {
         cmistake(u, ord, 26, MSG_COMMERCE);
         return;
     }
@@ -1880,7 +1885,8 @@ static int tax_per_size[7] = { 0, 6, 12, 18, 24, 30, 36 };
 
 static void expandselling(region * r, request * sellorders, int limit)
 {
-    int money, price, j, max_products;
+    int money, price, max_products;
+    unsigned int j;
     /* int m, n = 0; */
     int maxsize = 0, maxeffsize = 0;
     int taxcollected = 0;
@@ -2216,7 +2222,7 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
 static void expandstealing(region * r, request * stealorders)
 {
     const resource_type *rsilver = get_resourcetype(R_SILVER);
-    int i;
+    unsigned int j;
 
     assert(rsilver);
 
@@ -2229,8 +2235,8 @@ static void expandstealing(region * r, request * stealorders)
      * u ist die beklaute unit. oa.unit ist die klauende unit.
      */
 
-    for (i = 0; i != norders && oa[i].unit->n <= oa[i].unit->wants; i++) {
-        unit *u = findunitg(oa[i].no, r);
+    for (j = 0; j != norders && oa[j].unit->n <= oa[j].unit->wants; j++) {
+        unit *u = findunitg(oa[j].no, r);
         int n = 0;
         if (u && u->region == r) {
             n = get_pooled(u, rsilver, GET_ALL, INT_MAX);
@@ -2254,15 +2260,15 @@ static void expandstealing(region * r, request * stealorders)
             n = 10;
         }
         if (n > 0) {
-            n = _min(n, oa[i].unit->wants);
+            n = _min(n, oa[j].unit->wants);
             use_pooled(u, rsilver, GET_ALL, n);
-            oa[i].unit->n = n;
-            change_money(oa[i].unit, n);
+            oa[j].unit->n = n;
+            change_money(oa[j].unit, n);
             ADDMSG(&u->faction->msgs, msg_message("stealeffect", "unit region amount",
                 u, u->region, n));
         }
-        add_income(oa[i].unit, IC_STEAL, oa[i].unit->wants, oa[i].unit->n);
-        fset(oa[i].unit, UFL_LONGACTION | UFL_NOTMOVING);
+        add_income(oa[j].unit, IC_STEAL, oa[j].unit->wants, oa[j].unit->n);
+        fset(oa[j].unit, UFL_LONGACTION | UFL_NOTMOVING);
     }
     free(oa);
 }
@@ -2905,7 +2911,7 @@ static int do_work(unit * u, order * ord, request * o)
 static void expandloot(region * r, request * lootorders)
 {
     unit *u;
-    int i;
+    unsigned int i;
     int looted = 0;
     int startmoney = rmoney(r);
 
@@ -2942,7 +2948,7 @@ static void expandloot(region * r, request * lootorders)
 static void expandtax(region * r, request * taxorders)
 {
     unit *u;
-    int i;
+    unsigned int i;
 
     expandorders(r, taxorders);
     if (!norders)
@@ -2997,10 +3003,11 @@ void tax_cmd(unit * u, struct order *ord, request ** taxorders)
         return;
     }
 
-    max = getuint();
+    max = getint();
 
-    if (max == 0)
+    if (max <= 0) {
         max = INT_MAX;
+    }
     if (!playerrace(u_race(u))) {
         u->wants = _min(income(u), max);
     }
@@ -3070,10 +3077,11 @@ void loot_cmd(unit * u, struct order *ord, request ** lootorders)
         return;
     }
 
-    max = getuint();
+    max = getint();
 
-    if (max == 0)
+    if (max <= 0) {
         max = INT_MAX;
+    }
     if (!playerrace(u_race(u))) {
         u->wants = _min(income(u), max);
     }

@@ -62,7 +62,7 @@ without prior permission by the authors of Eressea.
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/crmessage.h>
-#include <util/goodies.h>
+#include <util/strings.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/message.h>
@@ -1222,7 +1222,7 @@ cr_output_resources(FILE * F, report_context * ctx, seen_region * sr)
 }
 
 static void
-cr_region_header(FILE * F, int plid, int nx, int ny, unsigned int uid)
+cr_region_header(FILE * F, int plid, int nx, int ny, int uid)
 {
     if (plid == 0) {
         fprintf(F, "REGION %d %d\n", nx, ny);

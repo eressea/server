@@ -86,7 +86,7 @@ static int cw_read(attrib * a, void *target, storage * store)
  *   Was fuer eine Wirkung hat die?
  */
 
-void wall_vigour(curse * c, float delta)
+void wall_vigour(curse * c, double delta)
 {
     wallcurse *wc = (wallcurse *)c->data.v;
     assert(wc->buddy->vigour == c->vigour);
