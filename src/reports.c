@@ -671,7 +671,6 @@ size_t size)
     for (itm = show; itm; itm = itm->next) {
         const char *ic;
         int in;
-        size_t bytes;
         report_item(u, itm, f, &ic, NULL, &in, false);
         if (in == 0 || ic == NULL)
             continue;
@@ -731,9 +730,10 @@ size_t size)
                     break;
             }
             if (i != MAXCOMBATSPELLS) {
-                bytes =
-                    (size_t)_snprintf(bufp, size, ", %s: ", LOC(f->locale, "nr_combatspells"));
-                if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0)
+                int result =
+                    _snprintf(bufp, size, ", %s: ", LOC(f->locale, "nr_combatspells"));
+                size_t bytes = (size_t)result;
+                if (result < 0 || wrptr(&bufp, &size, bytes) != 0)
                     WARN_STATIC_BUFFER();
 
                 dh = 0;
@@ -757,8 +757,9 @@ size_t size)
                         }
 
                         if (sl > 0) {
-                            bytes = (size_t)_snprintf(bufp, size, " (%d)", sl);
-                            if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0)
+                            int result = _snprintf(bufp, size, " (%d)", sl);
+                            size_t bytes = (size_t)result;
+                            if (result < 0 || wrptr(&bufp, &size, bytes) != 0)
                                 WARN_STATIC_BUFFER();
                         }
                     }
@@ -2279,8 +2280,9 @@ static void eval_resources(struct opstack **stack, const void *userdata)
     while (res != NULL && size > 4) {
         const char *rname =
             resourcename(res->type, (res->number != 1) ? NMF_PLURAL : 0);
-        size_t bytes = (size_t)_snprintf(bufp, size, "%d %s", res->number, LOC(lang, rname));
-        if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0 || size < sizeof(buf) / 2) {
+        int result = _snprintf(bufp, size, "%d %s", res->number, LOC(lang, rname));
+        size_t bytes = (size_t)result;
+        if (result < 0 || wrptr(&bufp, &size, bytes) != 0 || size < sizeof(buf) / 2) {
             WARN_STATIC_BUFFER();
             break;
         }
@@ -2355,8 +2357,9 @@ static void eval_trail(struct opstack **stack, const void *userdata)
             region *r = regions->regions[i];
             const char *trail = trailinto(r, lang);
             const char *rn = f_regionid_s(r, report);
-            size_t bytes = (size_t)_snprintf(bufp, size, trail, rn);
-            if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0)
+            int result = _snprintf(bufp, size, trail, rn);
+            size_t bytes = (size_t)result;
+            if (result < 0 || wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
 
             if (i + 2 < end) {
