@@ -452,8 +452,9 @@ size_t size)
     char *bufp = buf;
     bool itemcloak = false;
     const curse_type *itemcloak_ct = 0;
+    int result = 0;
     size_t bytes;
-    item result[MAX_INVENTORY];
+    item results[MAX_INVENTORY];
 
     itemcloak_ct = ct_find("itemcloak");
     if (itemcloak_ct) {
@@ -511,10 +512,11 @@ size_t size)
             else {
                 if (a_otherfaction && alliedunit(u, f, HELP_FSTEALTH)) {
                     faction *f = get_otherfaction(a_otherfaction);
-                    bytes =
+                    int result =
                         (size_t)_snprintf(bufp, size, ", %s (%s)", factionname(f),
                         factionname(u->faction));
-                    if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0)
+                    bytes = (size_t)result;
+                    if (result < 0 || wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
                 }
                 else {
@@ -538,9 +540,10 @@ size_t size)
         bytes = strlcpy(bufp, "? ", size);
     }
     else {
-        bytes = (size_t)_snprintf(bufp, size, "%d ", u->number);
+        result = _snprintf(bufp, size, "%d ", u->number);
+        bytes = (size_t)result;
     }
-    if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0)
+    if (result < 0 || wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
 
     pzTmp = get_racename(u->attribs);
@@ -658,10 +661,10 @@ size_t size)
     }
     else if (!itemcloak && mode >= see_unit && !(a_fshidden
         && a_fshidden->data.ca[1] == 1 && effskill(u, SK_STEALTH) >= 3)) {
-        int n = report_items(u->items, result, MAX_INVENTORY, u, f);
+        int n = report_items(u->items, results, MAX_INVENTORY, u, f);
         assert(n >= 0);
         if (n > 0)
-            show = result;
+            show = results;
         else
             show = NULL;
     }
@@ -679,8 +682,9 @@ size_t size)
             WARN_STATIC_BUFFER();
 
         if (!dh) {
-            bytes = (size_t)_snprintf(bufp, size, "%s: ", LOC(f->locale, "nr_inventory"));
-            if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0)
+            result = _snprintf(bufp, size, "%s: ", LOC(f->locale, "nr_inventory"));
+            bytes = (size_t)result;
+            if (result < 0 || wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
             dh = 1;
         }
@@ -688,9 +692,10 @@ size_t size)
             bytes = strlcpy(bufp, ic, size);
         }
         else {
-            bytes = (size_t)_snprintf(bufp, size, "%d %s", in, ic);
+            result = _snprintf(bufp, size, "%d %s", in, ic);
+            bytes = (size_t)result;
         }
-        if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0)
+        if (result < 0 || wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
     }
 
@@ -700,26 +705,29 @@ size_t size)
         if (book) {
             quicklist *ql = book->spells;
             int qi, header, maxlevel = effskill(u, SK_MAGIC);
-            size_t bytes = (size_t)_snprintf(bufp, size, ". Aura %d/%d", get_spellpoints(u), max_spellpoints(u->region, u));
-            if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0) {
+            int result = _snprintf(bufp, size, ". Aura %d/%d", get_spellpoints(u), max_spellpoints(u->region, u));
+            size_t bytes = (size_t)result;
+            if (result < 0 || wrptr(&bufp, &size, bytes) != 0) {
                 WARN_STATIC_BUFFER();
             }
 
             for (header = 0, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
                 spellbook_entry * sbe = (spellbook_entry *)ql_get(ql, qi);
                 if (sbe->level <= maxlevel) {
+                    int result = 0;
                     if (!header) {
-                        bytes = (size_t)_snprintf(bufp, size, ", %s: ", LOC(f->locale, "nr_spells"));
+                        result = _snprintf(bufp, size, ", %s: ", LOC(f->locale, "nr_spells"));
+                        bytes = (size_t)result;
                         header = 1;
                     }
                     else {
                         bytes = strlcpy(bufp, ", ", size);
                     }
-                    if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0) {
+                    if (result < 0 || wrptr(&bufp, &size, bytes) != 0) {
                         WARN_STATIC_BUFFER();
                     }
                     bytes = strlcpy(bufp, spell_name(sbe->sp, f->locale), size);
-                    if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0) {
+                    if (wrptr(&bufp, &size, bytes) != 0) {
                         WARN_STATIC_BUFFER();
                     }
                 }
@@ -757,8 +765,8 @@ size_t size)
                         }
 
                         if (sl > 0) {
-                            int result = _snprintf(bufp, size, " (%d)", sl);
-                            size_t bytes = (size_t)result;
+                            result = _snprintf(bufp, size, " (%d)", sl);
+                            bytes = (size_t)result;
                             if (result < 0 || wrptr(&bufp, &size, bytes) != 0)
                                 WARN_STATIC_BUFFER();
                         }
