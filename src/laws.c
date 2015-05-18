@@ -4381,17 +4381,17 @@ void init_processor(void)
     add_proc_order(p, K_GROUP, group_cmd, 0, NULL);
 
     p += 10;
-    add_proc_order(p, K_QUIT, &quit_cmd, 0, NULL);
-//    add_proc_order(p, K_URSPRUNG, &origin_cmd, 0, NULL);
-    add_proc_order(p, K_ALLY, &ally_cmd, 0, NULL);
-    add_proc_order(p, K_PREFIX, &prefix_cmd, 0, NULL);
-    add_proc_order(p, K_SETSTEALTH, &setstealth_cmd, 0, NULL);
-    add_proc_order(p, K_STATUS, &status_cmd, 0, NULL);
-    add_proc_order(p, K_COMBATSPELL, &combatspell_cmd, 0, NULL);
-    add_proc_order(p, K_DISPLAY, &display_cmd, 0, NULL);
-    add_proc_order(p, K_NAME, &name_cmd, 0, NULL);
-    add_proc_order(p, K_GUARD, &guard_off_cmd, 0, NULL);
-    add_proc_order(p, K_RESHOW, &reshow_cmd, 0, NULL);
+    add_proc_order(p, K_QUIT, quit_cmd, 0, NULL);
+//    add_proc_order(p, K_URSPRUNG, origin_cmd, 0, NULL);
+    add_proc_order(p, K_ALLY, ally_cmd, 0, NULL);
+    add_proc_order(p, K_PREFIX, prefix_cmd, 0, NULL);
+    add_proc_order(p, K_SETSTEALTH, setstealth_cmd, 0, NULL);
+    add_proc_order(p, K_STATUS, status_cmd, 0, NULL);
+    add_proc_order(p, K_COMBATSPELL, combatspell_cmd, 0, NULL);
+    add_proc_order(p, K_DISPLAY, display_cmd, 0, NULL);
+    add_proc_order(p, K_NAME, name_cmd, 0, NULL);
+    add_proc_order(p, K_GUARD, guard_off_cmd, 0, NULL);
+    add_proc_order(p, K_RESHOW, reshow_cmd, 0, NULL);
 
     if (get_param_int(global.parameters, "rules.alliances", 0) == 1) {
         p += 10;
@@ -4403,7 +4403,7 @@ void init_processor(void)
     add_proc_order(p, K_MAIL, mail_cmd, 0, "Botschaften");
 
     p += 10;                      /* all claims must be done before we can USE */
-    add_proc_region(p, &enter_1, "Betreten (1. Versuch)");     /* for GIVE CONTROL */
+    add_proc_region(p, enter_1, "Betreten (1. Versuch)");     /* for GIVE CONTROL */
     add_proc_order(p, K_USE, use_cmd, 0, "Benutzen");
 
     p += 10;                      /* in case it has any effects on alliance victories */
@@ -4426,11 +4426,11 @@ void init_processor(void)
     p += 10;                      /* can't allow reserve before siege (weapons) */
     add_proc_region(p, enter_1, "Betreten (3. Versuch)");  /* to claim a castle after a victory and to be able to DESTROY it in the same turn */
     if (get_param_int(global.parameters, "rules.reserve.twophase", 0)) {
-        add_proc_order(p, K_RESERVE, &reserve_self, 0, "RESERVE (self)");
+        add_proc_order(p, K_RESERVE, reserve_self, 0, "RESERVE (self)");
         p += 10;
     }
-    add_proc_order(p, K_RESERVE, &reserve_cmd, 0, "RESERVE (all)");
-    add_proc_order(p, K_CLAIM, &claim_cmd, 0, NULL);
+    add_proc_order(p, K_RESERVE, reserve_cmd, 0, "RESERVE (all)");
+    add_proc_order(p, K_CLAIM, claim_cmd, 0, NULL);
     add_proc_unit(p, follow_unit, "Folge auf Einheiten setzen");
 
     p += 10;                      /* rest rng again before economics */
@@ -4438,13 +4438,13 @@ void init_processor(void)
         add_proc_region(p, force_leave, "kick non-allies out of buildings/ships");
     }
     add_proc_region(p, economics, "Zerstoeren, Geben, Rekrutieren, Vergessen");
-    add_proc_order(p, K_PROMOTION, &promotion_cmd, 0, "Heldenbefoerderung");
+    add_proc_order(p, K_PROMOTION, promotion_cmd, 0, "Heldenbefoerderung");
 
     p += 10;
     if (!keyword_disabled(K_PAY)) {
-        add_proc_order(p, K_PAY, &pay_cmd, 0, "Gebaeudeunterhalt (disable)");
+        add_proc_order(p, K_PAY, pay_cmd, 0, "Gebaeudeunterhalt (disable)");
     }
-    add_proc_postregion(p, &maintain_buildings_1,
+    add_proc_postregion(p, maintain_buildings_1,
         "Gebaeudeunterhalt (1. Versuch)");
 
     p += 10;                      /* QUIT fuer sich alleine */
@@ -4452,68 +4452,68 @@ void init_processor(void)
 
     if (!keyword_disabled(K_CAST)) {
         p += 10;
-        add_proc_global(p, &magic, "Zaubern");
+        add_proc_global(p, magic, "Zaubern");
     }
 
     p += 10;
-    add_proc_order(p, K_TEACH, &teach_cmd, PROC_THISORDER | PROC_LONGORDER,
+    add_proc_order(p, K_TEACH, teach_cmd, PROC_THISORDER | PROC_LONGORDER,
         "Lehren");
     p += 10;
-    add_proc_order(p, K_STUDY, &learn_cmd, PROC_THISORDER | PROC_LONGORDER,
+    add_proc_order(p, K_STUDY, learn_cmd, PROC_THISORDER | PROC_LONGORDER,
         "Lernen");
 
     p += 10;
-    add_proc_order(p, K_MAKE, &make_cmd, PROC_THISORDER | PROC_LONGORDER,
+    add_proc_order(p, K_MAKE, make_cmd, PROC_THISORDER | PROC_LONGORDER,
         "Produktion");
-    add_proc_postregion(p, &produce, "Arbeiten, Handel, Rekruten");
-    add_proc_postregion(p, &split_allocations, "Produktion II");
+    add_proc_postregion(p, produce, "Arbeiten, Handel, Rekruten");
+    add_proc_postregion(p, split_allocations, "Produktion II");
 
     p += 10;
-    add_proc_region(p, &enter_2, "Betreten (4. Versuch)"); /* Once again after QUIT */
+    add_proc_region(p, enter_2, "Betreten (4. Versuch)"); /* Once again after QUIT */
 
     p += 10;
-    add_proc_region(p, &sinkships, "Schiffe sinken");
+    add_proc_region(p, sinkships, "Schiffe sinken");
 
     p += 10;
-    add_proc_global(p, &movement, "Bewegungen");
+    add_proc_global(p, movement, "Bewegungen");
 
     if (get_param_int(global.parameters, "work.auto", 0)) {
         p += 10;
-        add_proc_region(p, &auto_work, "Arbeiten (auto)");
+        add_proc_region(p, auto_work, "Arbeiten (auto)");
     }
 
     p += 10;
-    add_proc_order(p, K_GUARD, &guard_on_cmd, 0, "Bewache (an)");
+    add_proc_order(p, K_GUARD, guard_on_cmd, 0, "Bewache (an)");
 
     if (get_param_int(global.parameters, "rules.encounters", 0)) {
         p += 10;
-        add_proc_global(p, &encounters, "Zufallsbegegnungen");
+        add_proc_global(p, encounters, "Zufallsbegegnungen");
     }
 
     p += 10;
-    add_proc_unit(p, &monster_kills_peasants,
+    add_proc_unit(p, monster_kills_peasants,
         "Monster fressen und vertreiben Bauern");
 
     p += 10;
-    add_proc_global(p, &randomevents, "Zufallsereignisse");
+    add_proc_global(p, randomevents, "Zufallsereignisse");
 
     p += 10;
 
-    add_proc_global(p, &monthly_healing, "Regeneration (HP)");
-    add_proc_global(p, &regenerate_aura, "Regeneration (Aura)");
+    add_proc_global(p, monthly_healing, "Regeneration (HP)");
+    add_proc_global(p, regenerate_aura, "Regeneration (Aura)");
     if (!keyword_disabled(K_DEFAULT)) {
-        add_proc_global(p, &defaultorders, "Defaults setzen");
+        add_proc_global(p, defaultorders, "Defaults setzen");
     }
-    add_proc_global(p, &demographics, "Nahrung, Seuchen, Wachstum, Wanderung");
+    add_proc_global(p, demographics, "Nahrung, Seuchen, Wachstum, Wanderung");
 
     if (!keyword_disabled(K_SORT)) {
         p += 10;
         add_proc_global(p, restack_units, "Einheiten sortieren");
     }
     if (!keyword_disabled(K_NUMBER)) {
-        add_proc_order(p, K_NUMBER, &renumber_cmd, 0, "Neue Nummern (Einheiten)");
+        add_proc_order(p, K_NUMBER, renumber_cmd, 0, "Neue Nummern (Einheiten)");
         p += 10;
-        add_proc_global(p, &renumber_factions, "Neue Nummern");
+        add_proc_global(p, renumber_factions, "Neue Nummern");
     }
 }
 
