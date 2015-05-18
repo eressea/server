@@ -19,12 +19,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include "goodies.h"
 
-#include "unicode.h"
-
 /* libc includes */
-#include <wctype.h>
 #include <stdlib.h>
-#include <string.h>
 
 /* Simple Integer-Liste */
 
@@ -51,23 +47,6 @@ int *intlist_find(int *i_p, int fi)
             return (&i_p[i]);
     }
     return NULL;
-}
-
-char *set_string(char **s, const char *neu)
-{
-    if (neu == NULL) {
-        free(*s);
-        *s = NULL;
-    }
-    else if (*s == NULL) {
-        *s = malloc(strlen(neu) + 1);
-        strcpy(*s, neu);
-    }
-    else {
-        *s = realloc(*s, strlen(neu) + 1);
-        strcpy(*s, neu);
-    }
-    return *s;
 }
 
 static int spc_email_isvalid(const char *address)

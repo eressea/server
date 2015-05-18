@@ -19,18 +19,15 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifndef GOODIES_H
 #define GOODIES_H
 
-#include "strings.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-    extern char *set_string(char **s, const char *neu);
-    extern int set_email(char **pemail, const char *newmail);
+    int set_email(char **pemail, const char *newmail);
 
-    extern int *intlist_init(void);
-    extern int *intlist_add(int *i_p, int i);
-    extern int *intlist_find(int *i_p, int i);
+    int *intlist_init(void);
+    int *intlist_add(int *i_p, int i);
+    int *intlist_find(int *i_p, int i);
 
 #ifdef __cplusplus
 }

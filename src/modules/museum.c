@@ -43,7 +43,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/functions.h>
-#include <util/goodies.h>
+#include <util/strings.h>
 #include <util/language.h>
 
 #include <storage.h>

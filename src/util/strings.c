@@ -21,6 +21,24 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* libc includes */
 #include <string.h>
 #include <assert.h>
+#include <stdlib.h>
+
+char *set_string(char **s, const char *neu)
+{
+    if (neu == NULL) {
+        free(*s);
+        *s = NULL;
+    }
+    else if (*s == NULL) {
+        *s = malloc(strlen(neu) + 1);
+        strcpy(*s, neu);
+    }
+    else {
+        *s = realloc(*s, strlen(neu) + 1);
+        strcpy(*s, neu);
+    }
+    return *s;
+}
 
 unsigned int hashstring(const char *s)
 {
