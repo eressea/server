@@ -518,7 +518,7 @@ void sparagraph(strlist ** SP, const char *s, unsigned int indent, char mark)
     width = REPORTWIDTH - indent;
     firstline = 1;
 
-    for (;;) {
+    while (s[0]) {
         unsigned int j = 0, i;
 
         for (i=0; s[j]; j=i) {
