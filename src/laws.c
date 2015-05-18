@@ -2894,7 +2894,7 @@ void restack_units(void)
                             cmistake(u, ord, 260, MSG_EVENT);
                         }
                         else if (v == u) {
-                            cmistake(u, ord, 10, MSG_EVENT);
+                            syntax_error(u, ord);
                         }
                         else {
                             switch (p) {
