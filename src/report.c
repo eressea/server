@@ -535,7 +535,7 @@ void sparagraph(strlist ** SP, const char *s, unsigned int indent, char mark)
                 break;
             }
             i = j + 1;
-        } while (s[j]);
+        }
 
         for (j = 0; j != indent; j++)
             buf[j] = ' ';
