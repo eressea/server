@@ -317,7 +317,7 @@ static int cr_region(variant var, char *buffer, const void *userdata)
         plane *pl = rplane(r);
         int nx = r->x, ny = r->y;
         pnormalize(&nx, &ny, pl);
-        adjust_coordinates(report, &nx, &ny, pl, r);
+        adjust_coordinates(report, &nx, &ny, pl);
         sprintf(buffer, "%d %d %d", nx, ny, plane_id(pl));
         return 0;
     }
@@ -435,7 +435,7 @@ static int cr_regions(variant var, char *buffer, const void *userdata)
         int nx = r->x, ny = r->y;
 
         pnormalize(&nx, &ny, pl);
-        adjust_coordinates(f, &nx, &ny, pl, r);
+        adjust_coordinates(f, &nx, &ny, pl);
         wp += sprintf(wp, "\"%d %d %d", nx, ny, z);
         for (i = 1; i != rdata->nregions; ++i) {
             r = rdata->regions[i];
@@ -1257,7 +1257,7 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
     else {
         nx = r->x, ny = r->y;
         pnormalize(&nx, &ny, pl);
-        adjust_coordinates(f, &nx, &ny, pl, r);
+        adjust_coordinates(f, &nx, &ny, pl);
     }
 
     if (pl) {
@@ -1398,7 +1398,7 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
                     plane *plx = rplane(r);
 
                     pnormalize(&nx, &ny, plx);
-                    adjust_coordinates(f, &nx, &ny, plx, r);
+                    adjust_coordinates(f, &nx, &ny, plx);
                     fprintf(F, "SCHEMEN %d %d\n", nx, ny);
                     fprintf(F, "\"%s\";Name\n", rname(r, f->locale));
                     rl2 = rl2->next;
@@ -1623,7 +1623,7 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
             int nx = r->x, ny = r->y;
 
             pnormalize(&nx, &ny, pl);
-            adjust_coordinates(f, &nx, &ny, pl, r);
+            adjust_coordinates(f, &nx, &ny, pl);
             if (!plid)
                 fprintf(F, "BATTLE %d %d\n", nx, ny);
             else {

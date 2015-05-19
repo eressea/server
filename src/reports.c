@@ -2001,7 +2001,7 @@ f_regionid(const region * r, const faction * f, char *buffer, size_t size)
         int nx = r->x, ny = r->y;
         int named = (name && name[0]);
         pnormalize(&nx, &ny, pl);
-        adjust_coordinates(f, &nx, &ny, pl, r);
+        adjust_coordinates(f, &nx, &ny, pl);
         len = strlcpy(buffer, rname(r, f ? f->locale : 0), size);
         _snprintf(buffer + len, size - len, " (%d,%d%s%s)", nx, ny, named ? "," : "", (named) ? name : "");
         buffer[size - 1] = 0;

@@ -282,7 +282,7 @@ static int tolua_faction_normalize(lua_State * L)
         plane *pl = rplane(r);
         int nx = r->x, ny = r->y;
         pnormalize(&nx, &ny, pl);
-        adjust_coordinates(f, &nx, &ny, pl, r);
+        adjust_coordinates(f, &nx, &ny, pl);
         tolua_pushnumber(L, (lua_Number)nx);
         tolua_pushnumber(L, (lua_Number)ny);
         return 2;
@@ -297,7 +297,7 @@ static int tolua_faction_set_origin(lua_State * L)
     plane *pl = rplane(r);
     int id = pl ? pl->id : 0;
 
-    set_origin(f, id, r->x - plane_center_x(pl), r->y - plane_center_y(pl));
+    faction_setorigin(f, id, r->x - plane_center_x(pl), r->y - plane_center_y(pl));
     return 0;
 }
 
