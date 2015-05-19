@@ -120,7 +120,14 @@ void newline(stream *out) {
     sputs("", out);
 }
 
-static const char *spaces = "                                ";
+void write_spaces(stream *out, size_t num) {
+    static const char spaces[REPORTWIDTH] = "                                                                             ";
+    while (num > 0) {
+        size_t bytes = (num > REPORTWIDTH) ? REPORTWIDTH : num;
+        swrite(spaces, sizeof(char), bytes, out);
+        num -= bytes;
+    }
+}
 
 static void centre(stream *out, const char *s, bool breaking)
 {
@@ -140,9 +147,8 @@ static void centre(stream *out, const char *s, bool breaking)
         freestrlist(T);
     }
     else {
-        swrite(spaces, sizeof(char), (REPORTWIDTH - strlen(s) + 1) / 2, out);
+        write_spaces(out, (REPORTWIDTH - strlen(s) + 1) / 2);
         sputs(s, out);
-        newline(out);
     }
 }
 
@@ -176,16 +182,16 @@ char marker)
         const char *last_space = begin;
 
         if (mark && indent >= 2) {
-            swrite(spaces, sizeof(char), indent - 2, out);
+            write_spaces(out, indent - 2);
             swrite(mark, sizeof(char), 1, out);
-            swrite(spaces, sizeof(char), 1, out);
+            write_spaces(out, 1);
             mark = 0;
         }
         else if (begin == str) {
-            swrite(spaces, sizeof(char), indent, out);
+            write_spaces(out, indent);
         }
         else {
-            swrite(spaces, sizeof(char), indent + hanging_indent, out);
+            write_spaces(out, indent + hanging_indent);
         }
         while (*end && end <= begin + length - indent) {
             if (*end == ' ') {

@@ -1,6 +1,7 @@
 #include <platform.h>
 #include <config.h>
 #include "reports.h"
+#include "report.h"
 
 #include <kernel/building.h>
 #include <kernel/faction.h>
@@ -10,6 +11,8 @@
 #include <kernel/unit.h>
 
 #include <quicklist.h>
+#include <stream.h>
+#include <memstream.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -98,11 +101,43 @@ static void test_seen_faction(CuTest *tc) {
     CuAssertTrue(tc, f1->no < f2->no);
 }
 
+static void test_write_spaces(CuTest *tc) {
+    stream out = { 0 };
+    char buf[1024];
+    size_t len;
+
+    mstream_init(&out);
+    write_spaces(&out, 4);
+    out.api->rewind(out.handle);
+    len = out.api->read(out.handle, buf, sizeof(buf));
+    buf[len] = '\0';
+    CuAssertStrEquals(tc, "    ", buf);
+    CuAssertIntEquals(tc, ' ', buf[3]);
+    mstream_done(&out);
+}
+
+static void test_write_many_spaces(CuTest *tc) {
+    stream out = { 0 };
+    char buf[1024];
+    size_t len;
+
+    mstream_init(&out);
+    write_spaces(&out, 100);
+    out.api->rewind(out.handle);
+    len = out.api->read(out.handle, buf, sizeof(buf));
+    buf[len] = '\0';
+    CuAssertIntEquals(tc, 100, (int)len);
+    CuAssertIntEquals(tc, ' ', buf[99]);
+    mstream_done(&out);
+}
+
 CuSuite *get_reports_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_reorder_units);
     SUITE_ADD_TEST(suite, test_seen_faction);
     SUITE_ADD_TEST(suite, test_regionid);
+    SUITE_ADD_TEST(suite, test_write_spaces);
+    SUITE_ADD_TEST(suite, test_write_many_spaces);
     return suite;
 }
