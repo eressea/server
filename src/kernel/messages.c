@@ -287,7 +287,6 @@ void syntax_error(const struct unit *u, struct order *ord)
     message * result;
     result = msg_error(u, ord, 10);
     ADDMSG(&u->faction->msgs, result);
-    msg_release(result);
 }
 
 extern unsigned int new_hashstring(const char *s);
@@ -306,6 +305,7 @@ void free_messagelist(message_list * msgs)
 
 message *add_message(message_list ** pm, message * m)
 {
+    assert(m->type);
     if (!lomem && m != NULL) {
         struct mlist *mnew = malloc(sizeof(struct mlist));
         if (*pm == NULL) {

@@ -22,7 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* util includes */
 #include <critbit.h>
-#include <util/goodies.h>
+#include <util/strings.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/umlaut.h>

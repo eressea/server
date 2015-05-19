@@ -21,7 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "language_struct.h"
 
 #include "log.h"
-#include "goodies.h"
+#include "strings.h"
 #include "umlaut.h"
 
 #include <stdlib.h>

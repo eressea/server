@@ -2527,7 +2527,7 @@ static castorder *cast_cmd(unit * u, order * ord)
         level = _min(p, level);
         if (level < 1) {
             /* Fehler "Das macht wenig Sinn" */
-            cmistake(u, ord, 10, MSG_MAGIC);
+            syntax_error(u, ord);
             return 0;
         }
         s = gettoken(token, sizeof(token));
@@ -2557,7 +2557,7 @@ static castorder *cast_cmd(unit * u, order * ord)
         level = _min(p, level);
         if (level < 1) {
             /* Fehler "Das macht wenig Sinn" */
-            cmistake(u, ord, 10, MSG_MAGIC);
+            syntax_error(u, ord);
             return 0;
         }
         s = gettoken(token, sizeof(token));

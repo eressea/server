@@ -142,6 +142,7 @@ function process(rules, orders)
     callbacks(rules, 'update')
 
     write_files(config.locales)
+    dbupdate()
 
     file = '' .. get_turn() .. '.dat'
     if eressea.write_game(file)~=0 then
@@ -161,9 +162,6 @@ function run_turn(rules)
     orderfile = orderfile or config.basepath .. '/orders.' .. turn
     eressea.log.debug("executing turn " .. get_turn() .. " with " .. orderfile .. " with rules=" .. config.rules)
     local result = process(rules, orderfile)
-    if result==0 then
-        dbupdate()
-    end
     return result
 end
 

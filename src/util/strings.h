@@ -22,11 +22,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-    extern unsigned int hashstring(const char *s);
-    extern const char *escape_string(const char *str, char *buffer,
-        size_t len);
-    extern unsigned int jenkins_hash(unsigned int a);
-    extern unsigned int wang_hash(unsigned int a);
+    char *set_string(char **s, const char *neu);
+    unsigned int hashstring(const char *s);
+    const char *escape_string(const char *str, char *buffer, size_t len);
+    unsigned int jenkins_hash(unsigned int a);
+    unsigned int wang_hash(unsigned int a);
 
     /* benchmark for units:
      * JENKINS_HASH: 5.25 misses/hit (with good cache behavior)
