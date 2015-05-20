@@ -58,7 +58,7 @@
     <order name="tax" disable="yes"/>
     <order name="entertain" disable="yes"/>
     <order name="sell" disable="yes"/>
-    <order name="origin" disable="yes"/>
+    <order name="origin" disable="no"/>
 
     <skill name="armorer" enable="true"/>
     <skill name="bow" enable="true"/>

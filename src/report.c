@@ -1565,7 +1565,7 @@ report_template(const char *filename, report_context * ctx, const char *charset)
                     int nx = r->x, ny = r->y;
 
                     pnormalize(&nx, &ny, pl);
-                    adjust_coordinates(f, &nx, &ny, pl, r);
+                    adjust_coordinates(f, &nx, &ny, pl);
                     newline(out);
                     if (pl && pl->id != 0) {
                         sprintf(buf, "%s %d,%d,%d ; %s", LOC(f->locale,
