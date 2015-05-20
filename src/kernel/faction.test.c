@@ -113,9 +113,11 @@ static void test_get_monsters(CuTest *tc) {
 static void test_set_origin(CuTest *tc) {
     faction *f;
     int x = 0, y = 0;
+    plane *pl;
 
     test_cleanup();
     test_create_world();
+    pl = create_new_plane(0, "", 0, 19, 0, 19, 0);
     f = test_create_faction(0);
     CuAssertPtrEquals(tc, 0, f->ursprung);
     faction_setorigin(f, 0, 1, 1);
@@ -125,6 +127,12 @@ static void test_set_origin(CuTest *tc) {
     faction_getorigin(f, 0, &x, &y);
     CuAssertIntEquals(tc, 1, x);
     CuAssertIntEquals(tc, 1, y);
+    adjust_coordinates(f, &x, &y, pl);
+    CuAssertIntEquals(tc, -9, x);
+    CuAssertIntEquals(tc, -9, y);
+    adjust_coordinates(f, &x, &y, 0);
+    CuAssertIntEquals(tc, -10, x);
+    CuAssertIntEquals(tc, -10, y);
     test_cleanup();
 }
 
