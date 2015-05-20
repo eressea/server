@@ -151,6 +151,7 @@ extern "C" {
 
     void addstrlist(strlist ** SP, const char *s);
     void freestrlist(strlist * s);
+    void split_paragraph(strlist ** SP, const char *s, unsigned int indent, unsigned int width, char mark);
 
 
 #define GR_PLURAL     0x01      /* grammar: plural */
