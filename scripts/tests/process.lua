@@ -1,6 +1,6 @@
 require "lunit"
 
-module("tests.e2.process", package.seeall, lunit.testcase)
+module("tests.process", package.seeall, lunit.testcase)
 
 local u, r, f,turn
 
