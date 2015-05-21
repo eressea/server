@@ -131,6 +131,30 @@ static void test_write_many_spaces(CuTest *tc) {
     mstream_done(&out);
 }
 
+static void test_sparagraph(CuTest *tc) {
+    strlist *sp = 0;
+    split_paragraph(&sp, "Hello World", 0, 16, 0);
+    CuAssertPtrNotNull(tc, sp);
+    CuAssertStrEquals(tc, "Hello World", sp->s);
+    CuAssertPtrEquals(tc, 0, sp->next);
+    split_paragraph(&sp, "Hello World", 4, 16, 0);
+    CuAssertPtrNotNull(tc, sp);
+    CuAssertStrEquals(tc, "    Hello World", sp->s);
+    CuAssertPtrEquals(tc, 0, sp->next);
+    split_paragraph(&sp, "Hello World", 4, 16, '*');
+    CuAssertPtrNotNull(tc, sp);
+    CuAssertStrEquals(tc, "  * Hello World", sp->s);
+    CuAssertPtrEquals(tc, 0, sp->next);
+    split_paragraph(&sp, "12345678 90 12345678", 0, 8, '*');
+    CuAssertPtrNotNull(tc, sp);
+    CuAssertStrEquals(tc, "12345678", sp->s);
+    CuAssertPtrNotNull(tc, sp->next);
+    CuAssertStrEquals(tc, "90", sp->next->s);
+    CuAssertPtrNotNull(tc, sp->next->next);
+    CuAssertStrEquals(tc, "12345678", sp->next->next->s);
+    CuAssertPtrEquals(tc, 0, sp->next->next->next);
+}
+
 CuSuite *get_reports_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -139,5 +163,6 @@ CuSuite *get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_regionid);
     SUITE_ADD_TEST(suite, test_write_spaces);
     SUITE_ADD_TEST(suite, test_write_many_spaces);
+    SUITE_ADD_TEST(suite, test_sparagraph);
     return suite;
 }

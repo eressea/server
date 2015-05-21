@@ -510,59 +510,6 @@ static void nr_spell(stream *out, spellbook_entry * sbe, const struct locale *la
     newline(out);
 }
 
-void sparagraph(strlist ** SP, const char *s, unsigned int indent, char mark)
-{
-
-    /* Die Liste SP wird mit dem String s aufgefuellt, mit indent und einer
-     * mark, falls angegeben. SP wurde also auf 0 gesetzt vor dem Aufruf.
-     * Vgl. spunit (). */
-
-    unsigned int width;
-    int firstline;
-    static char buf[REPORTWIDTH + 1]; // FIXME: static return value
-
-    width = REPORTWIDTH - indent;
-    firstline = 1;
-
-    while (s[0]) {
-        unsigned int j = 0, i;
-
-        for (i=0; s[j]; j=i) {
-            while (s[j] && s[j] != ' ')
-                j++;
-            if (j > width) {
-
-                /* j zeigt auf das ende der aktuellen zeile, i zeigt auf den anfang der
-                 * nächsten zeile. existiert ein wort am anfang der zeile, welches
-                 * länger als eine zeile ist, muss dieses hier abgetrennt werden. */
-
-                if (i == 0)
-                    i = width - 1;
-                break;
-            }
-            i = j + 1;
-        }
-
-        for (j = 0; j != indent; j++)
-            buf[j] = ' ';
-
-        if (firstline && mark)
-            buf[indent - 2] = mark;
-
-        for (j = 0; j != i - 1; j++)
-            buf[indent + j] = s[j];
-        buf[indent + j] = 0;
-
-        addstrlist(SP, buf);
-
-        if (s[i - 1] == 0)
-            break;
-
-        s += i;
-        firstline = 0;
-    }
-}
-
 static void
 nr_curses_i(stream *out, int indent, const faction *viewer, objtype_t typ, const void *obj, attrib *a, int self)
 {
@@ -1565,7 +1512,7 @@ report_template(const char *filename, report_context * ctx, const char *charset)
                     int nx = r->x, ny = r->y;
 
                     pnormalize(&nx, &ny, pl);
-                    adjust_coordinates(f, &nx, &ny, pl, r);
+                    adjust_coordinates(f, &nx, &ny, pl);
                     newline(out);
                     if (pl && pl->id != 0) {
                         sprintf(buf, "%s %d,%d,%d ; %s", LOC(f->locale,

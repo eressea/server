@@ -70,7 +70,6 @@ extern "C" {
     struct plane *getplanebyid(int id);
     int plane_center_x(const struct plane *pl);
     int plane_center_y(const struct plane *pl);
-    void set_origin(struct faction *f, int id, int x, int y);
     struct plane *create_new_plane(int id, const char *name, int minx, int maxx,
         int miny, int maxy, int flags);
     struct plane *getplanebyname(const char *);
@@ -82,8 +81,7 @@ extern "C" {
     extern int read_plane_reference(plane ** pp, struct storage *store);
     extern int plane_width(const plane * pl);
     extern int plane_height(const plane * pl);
-    void adjust_coordinates(const struct faction *f, int *x, int *y,
-        const struct plane *pl, const struct region *r);
+    void adjust_coordinates(const struct faction *f, int *x, int *y, const struct plane *pl);
 #ifdef __cplusplus
 }
 #endif

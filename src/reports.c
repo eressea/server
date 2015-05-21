@@ -956,9 +956,60 @@ const struct unit * u, struct skill * sv, int *dh, int days)
     return tsize;
 }
 
-void lparagraph(struct strlist **SP, char *s, unsigned int indent, char mark)
+void split_paragraph(strlist ** SP, const char *s, unsigned int indent, unsigned int width, char mark)
 {
 
+    /* Die Liste SP wird mit dem String s aufgefuellt, mit indent und einer
+    * mark, falls angegeben. SP wurde also auf 0 gesetzt vor dem Aufruf.
+    * Vgl. spunit (). */
+    bool firstline;
+    static char buf[REPORTWIDTH + 1]; // FIXME: static buffer, artificial limit
+    size_t len = strlen(s);
+
+    assert(width <= REPORTWIDTH);
+    width -= indent;
+    firstline = (mark!=0 && indent>2);
+    *SP = 0;
+
+    while (len > 0) {
+        unsigned int j;
+        const char *cut = 0, *space = strchr(s, ' ');
+        while (space && *space && (space - s) <= (ptrdiff_t)width) {
+            cut = space;
+            space = strchr(space + 1, ' ');
+            if (!space && len < width) {
+                cut = space = s + len;
+            }
+        }
+
+        for (j = 0; j != indent; j++)
+            buf[j] = ' ';
+
+        if (firstline) {
+            buf[indent - 2] = mark;
+            firstline = false;
+        }
+        if (!cut) {
+            cut = s + _min(len, REPORTWIDTH);
+        }
+        strncpy(buf+indent, s, cut - s);
+        buf[indent + (cut - s)] = 0;
+        addstrlist(SP, buf); // TODO: too much string copying, cut out this function
+        while (*cut == ' ') {
+            ++cut;
+        }
+        len -= (cut - s);
+        s = cut;
+    }
+}
+
+void sparagraph(strlist ** SP, const char *s, unsigned int indent, char mark)
+{
+    split_paragraph(SP, s, indent, REPORTWIDTH, mark);
+}
+
+void lparagraph(struct strlist **SP, char *s, unsigned int indent, char mark)
+{
     /* Die Liste SP wird mit dem String s aufgefuellt, mit indent und einer
      * mark, falls angegeben. SP wurde also auf 0 gesetzt vor dem Aufruf.
      * Vgl. spunit (). */
@@ -2001,7 +2052,7 @@ f_regionid(const region * r, const faction * f, char *buffer, size_t size)
         int nx = r->x, ny = r->y;
         int named = (name && name[0]);
         pnormalize(&nx, &ny, pl);
-        adjust_coordinates(f, &nx, &ny, pl, r);
+        adjust_coordinates(f, &nx, &ny, pl);
         len = strlcpy(buffer, rname(r, f ? f->locale : 0), size);
         _snprintf(buffer + len, size - len, " (%d,%d%s%s)", nx, ny, named ? "," : "", (named) ? name : "");
         buffer[size - 1] = 0;
