@@ -143,6 +143,21 @@ static void test_skip_token(CuTest *tc) {
     CuAssertStrEquals(tc, 0, getstrtoken());
 }
 
+static void test_replace_order(CuTest *tc) {
+    order *orders = 0, *orig, *repl;
+    struct locale * lang = get_or_create_locale("en");
+
+    orig = create_order(K_MAKE, lang, 0);
+    repl = create_order(K_ALLY, lang, 0);
+    replace_order(&orders, orig, repl);
+    CuAssertPtrEquals(tc, 0, orders);
+    orders = orig;
+    replace_order(&orders, orig, repl);
+    CuAssertPtrNotNull(tc, orders);
+    CuAssertPtrEquals(tc, 0, orders->next);
+    CuAssertIntEquals(tc, getkeyword(repl), getkeyword(orders));
+}
+
 CuSuite *get_order_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -152,6 +167,7 @@ CuSuite *get_order_suite(void)
     SUITE_ADD_TEST(suite, test_parse_make_temp);
     SUITE_ADD_TEST(suite, test_parse_maketemp);
     SUITE_ADD_TEST(suite, test_init_order);
+    SUITE_ADD_TEST(suite, test_replace_order);
     SUITE_ADD_TEST(suite, test_skip_token);
     SUITE_ADD_TEST(suite, test_getstrtoken);
     return suite;
