@@ -15,7 +15,7 @@ if [ ! -d $ROOT/$BIN_DIR ]; then
   exit
 fi
 
-$ROOT/$BIN_DIR/eressea/test_eressea
+$ROOT/$BIN_DIR/eressea/test_eressea || exit $?
 cd $ROOT
 [ -e eressea.ini ] || ln -sf conf/eressea.ini
 $ROOT/$BIN_DIR/eressea/eressea -v0 scripts/run-tests.lua || exit $?
