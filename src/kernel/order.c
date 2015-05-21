@@ -65,6 +65,9 @@ static void release_data(order_data * data)
 
 void replace_order(order ** dlist, order * orig, const order * src)
 {
+    assert(src);
+    assert(orig);
+    assert(dlist);
     while (*dlist != NULL) {
         order *dst = *dlist;
         if (dst->data == orig->data) {
