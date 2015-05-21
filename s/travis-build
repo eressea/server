@@ -1,19 +1,31 @@
 #!/bin/sh
 
+MACHINE=`uname -m`
+[ -z "$CC" ] && [ ! -z `which gcc` ] && CC="gcc"
+[ -z "$CC" ] && [ ! -z `which tcc` ] && CC="tcc"
+[ -z "$CC" ] && [ ! -z `which cc` ] && CC="cc"
+BUILD="build-$MACHINE-$CC-Debug"
+
 inifile() {
 if [ ! -e eressea.ini ]; then
 cp conf/eressea.ini .
-build/iniparser/inifile eressea.ini add lua:paths lunit:scripts
+$BUILD/iniparser/inifile eressea.ini add lua:paths lunit:scripts
 fi
 }
 
-[ -d build ] || mkdir build 
-cd build && cmake .. \
+test_valgrind_report () {
+cd tests
+ln -sf ../scripts/config.lua
+valgrind ../$BUILD/eressea/eressea -v0 -t184 ../scripts/reports.lua
+}
+
+[ -d $BUILD ] || mkdir $BUILD
+cd $BUILD && cmake .. \
  -DCMAKE_MODULE_PATH=$PWD/../cmake/Modules \
  -DCMAKE_BUILD_TYPE=Debug .. && \
 make && cd .. && inifile &&
-build/eressea/test_eressea &&
-build/eressea/eressea -v0 scripts/run-tests.lua &&
-build/eressea/eressea -v0 scripts/run-tests-e2.lua &&
-build/eressea/eressea -v0 scripts/run-tests-e3.lua &&
-(cd tests ; valgrind ../build/eressea/eressea -v0 -t184 ../scripts/reports.lua )
+$BUILD/eressea/test_eressea &&
+$BUILD/eressea/eressea -v0 scripts/run-tests.lua &&
+$BUILD/eressea/eressea -v0 scripts/run-tests-e2.lua &&
+$BUILD/eressea/eressea -v0 scripts/run-tests-e3.lua &&
+test_valgrind_report
