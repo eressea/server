@@ -2542,7 +2542,7 @@ int origin_cmd(unit * u, struct order *ord)
     px = (short)getint();
     py = (short)getint();
 
-    set_origin(u->faction, getplaneid(u->region), px, py);
+    faction_setorigin(u->faction, getplaneid(u->region), px, py);
     return 0;
 }
 
@@ -4382,7 +4382,7 @@ void init_processor(void)
 
     p += 10;
     add_proc_order(p, K_QUIT, quit_cmd, 0, NULL);
-//    add_proc_order(p, K_URSPRUNG, origin_cmd, 0, NULL);
+    add_proc_order(p, K_URSPRUNG, origin_cmd, 0, NULL);
     add_proc_order(p, K_ALLY, ally_cmd, 0, NULL);
     add_proc_order(p, K_PREFIX, prefix_cmd, 0, NULL);
     add_proc_order(p, K_SETSTEALTH, setstealth_cmd, 0, NULL);

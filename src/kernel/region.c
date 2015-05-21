@@ -121,7 +121,7 @@ const char *write_regionname(const region * r, const faction * f, char *buffer,
         plane *pl = rplane(r);
         int nx = r->x, ny = r->y;
         pnormalize(&nx, &ny, pl);
-        adjust_coordinates(f, &nx, &ny, pl, r);
+        adjust_coordinates(f, &nx, &ny, pl);
         slprintf(buf, size, "%s (%d,%d)", rname(r, lang), nx, ny);
     }
     return buffer;

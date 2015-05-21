@@ -112,15 +112,45 @@ static void test_get_monsters(CuTest *tc) {
 
 static void test_set_origin(CuTest *tc) {
     faction *f;
+    int x = 0, y = 0;
+    plane *pl;
 
     test_cleanup();
     test_create_world();
+    pl = create_new_plane(0, "", 0, 19, 0, 19, 0);
     f = test_create_faction(0);
     CuAssertPtrEquals(tc, 0, f->ursprung);
-    set_origin(f, 0, 1, 1);
+    faction_setorigin(f, 0, 1, 1);
     CuAssertIntEquals(tc, 0, f->ursprung->id);
     CuAssertIntEquals(tc, 1, f->ursprung->x);
     CuAssertIntEquals(tc, 1, f->ursprung->y);
+    faction_getorigin(f, 0, &x, &y);
+    CuAssertIntEquals(tc, 1, x);
+    CuAssertIntEquals(tc, 1, y);
+    adjust_coordinates(f, &x, &y, pl);
+    CuAssertIntEquals(tc, -9, x);
+    CuAssertIntEquals(tc, -9, y);
+    adjust_coordinates(f, &x, &y, 0);
+    CuAssertIntEquals(tc, -10, x);
+    CuAssertIntEquals(tc, -10, y);
+    test_cleanup();
+}
+
+static void test_set_origin_bug(CuTest *tc) {
+    faction *f;
+    plane *pl;
+    int x = 17, y = 10;
+
+    test_cleanup();
+    test_create_world();
+    pl = create_new_plane(0, "", 0, 19, 0, 19, 0);
+    f = test_create_faction(0);
+    faction_setorigin(f, 0, -10, 3);
+    faction_setorigin(f, 0, -13, -4);
+    adjust_coordinates(f, &x, &y, pl);
+    CuAssertIntEquals(tc, 0, f->ursprung->id);
+    CuAssertIntEquals(tc, -9, x);
+    CuAssertIntEquals(tc, 2, y);
     test_cleanup();
 }
 
@@ -133,5 +163,6 @@ CuSuite *get_faction_suite(void)
     SUITE_ADD_TEST(suite, test_remove_dead_factions);
     SUITE_ADD_TEST(suite, test_get_monsters);
     SUITE_ADD_TEST(suite, test_set_origin);
+    SUITE_ADD_TEST(suite, test_set_origin_bug);
     return suite;
 }
