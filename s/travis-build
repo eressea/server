@@ -25,7 +25,7 @@ make
 test_valgrind_report () {
 cd tests
 ln -sf ../scripts/config.lua
-valgrind $BUILD/eressea/eressea -v0 -t184 ../scripts/reports.lua
+valgrind --gen-suppressions=all --error-exitcode=1 $BUILD/eressea/eressea -v0 -t184 ../scripts/reports.lua
 }
 
 test_unittests() {
