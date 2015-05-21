@@ -1,4 +1,7 @@
 #!/bin/bash
+
+set -e
+
 ROOT=$(pwd)
 while [ ! -d $ROOT/.git ]; do
   ROOT=$(dirname $ROOT)
@@ -15,11 +18,11 @@ if [ ! -d $ROOT/$BIN_DIR ]; then
   exit
 fi
 
-$ROOT/$BIN_DIR/eressea/test_eressea || exit $?
+$ROOT/$BIN_DIR/eressea/test_eressea
 cd $ROOT
 [ -e eressea.ini ] || ln -sf conf/eressea.ini
-$ROOT/$BIN_DIR/eressea/eressea -v0 scripts/run-tests.lua || exit $?
-$ROOT/$BIN_DIR/eressea/eressea -v0 scripts/run-tests-e2.lua || exit $?
-$ROOT/$BIN_DIR/eressea/eressea -v0 scripts/run-tests-e3.lua || exit $?
+$ROOT/$BIN_DIR/eressea/eressea -v0 scripts/run-tests.lua
+$ROOT/$BIN_DIR/eressea/eressea -v0 scripts/run-tests-e2.lua
+$ROOT/$BIN_DIR/eressea/eressea -v0 scripts/run-tests-e3.lua
 
 cd $OLDWPD

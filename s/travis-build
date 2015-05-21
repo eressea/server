@@ -47,6 +47,8 @@ $BUILD/eressea/eressea -v0 scripts/run-tests-e3.lua
 # information
 echo "* base directory: $ROOT"
 echo "* build directory: $BUILD"
+echo "* lsb_release:"
+lsb_release -a
 echo "* zlib1g-dev package:"
 dpkg -l zlib1g-dev
 echo
