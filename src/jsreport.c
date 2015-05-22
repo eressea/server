@@ -58,7 +58,7 @@ static int report_json(const char *filename, report_context * ctx, const char *c
                             sr = find_seen(ctx->seen, r);
                             if (sr) {
                                 terrain_t ter = oldterrain(r->terrain);
-                                if (ter != NOTERRAIN) {
+                                if (ter == NOTERRAIN) {
                                     log_warning("report_json: %s has no terrain id\n", r->terrain->_name);
                                 }
                                 data = 1 + (int)ter;
