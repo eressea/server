@@ -1,14 +1,26 @@
 #include <platform.h>
-#include "types.h"
-#include "curse.h"
 
+#include <kernel/config.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
+#include <kernel/version.h>
 #include <util/attrib.h>
 #include <util/message.h>
+#include <binarystore.h>
+#include <filestream.h>
+#include <memstream.h>
+#include <storage.h>
+#include <stream.h>
 #include <tests.h>
 
+#include "curse.h"
+
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
 #include <CuTest.h>
+
 
 static void test_curse(CuTest * tc)
 {
@@ -83,6 +95,82 @@ static void test_bad_dreams(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_memstream(CuTest *tc) {
+    storage store;
+    stream out = { 0 };
+    char buf[1024];
+    int val=0;
+
+#ifdef FILESTREAMTEST
+    FILE *F;
+    F = fopen("test.dat", "wb");
+    fstream_init(&out, F);
+#else
+    mstream_init(&out);
+#endif
+    binstore_init(&store, &out);
+    store.handle.data = &out;
+
+    WRITE_INT(&store, 999999);
+    WRITE_TOK(&store, "fortytwo");
+    WRITE_INT(&store, 42);
+
+#ifdef FILESTREAMTEST
+    fstream_done(&out);
+    F = fopen("test.dat", "rb");
+    fstream_init(&out, F);
+#endif
+    out.api->rewind(out.handle);
+    READ_INT(&store, &val);
+    READ_TOK(&store, buf, 1024);
+    CuAssertIntEquals(tc, 999999, val);
+    CuAssertStrEquals(tc, "fortytwo", buf);
+    READ_INT(&store, &val);
+    CuAssertIntEquals(tc, 42, val);
+}
+
+static void test_write_flag(CuTest *tc) {
+    curse_fixture fix;
+    storage store;
+    char buf[1024];
+    stream out = { 0 };
+    size_t len;
+#ifdef FILESTREAMTEST
+    FILE *F;
+    F = fopen("test.dat", "wb");
+    fstream_init(&out, F);
+#else
+    mstream_init(&out);
+#endif
+    binstore_init(&store, &out);
+    store.handle.data = &out;
+
+    setup_curse(&fix, "gbdream");
+    fix.c->flags = 42 | CURSE_ISNEW;
+    curse_write(fix.r->attribs, fix.r, &store);
+#ifdef FILESTREAMTEST
+    fstream_done(&out);
+    F = fopen("test.dat", "rb");
+    fstream_init(&out, F);
+#endif
+    out.api->rewind(out.handle);
+    len = out.api->read(out.handle, buf, sizeof(buf));
+    buf[len] = '\0';
+    out.api->rewind(out.handle);
+    curse_read(fix.r->attribs, fix.r, &store);
+    CuAssertIntEquals(tc, 42 | CURSE_ISNEW, ((curse *) fix.r->attribs->data.v)->flags);
+    global.data_version = RELEASE_VERSION;
+    CuAssertIntEquals(tc, RELEASE_VERSION, global.data_version);
+
+#ifdef FILESTREAMTEST
+    fstream_done(&out);
+#else
+    mstream_done(&out);
+#endif
+    binstore_done(&store);
+    test_cleanup();
+}
+
 CuSuite *get_curse_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -91,5 +179,7 @@ CuSuite *get_curse_suite(void)
     SUITE_ADD_TEST(suite, test_magicstreet_warning);
     SUITE_ADD_TEST(suite, test_good_dreams);
     SUITE_ADD_TEST(suite, test_bad_dreams);
+    SUITE_ADD_TEST(suite, test_memstream);
+    SUITE_ADD_TEST(suite, test_write_flag);
     return suite;
 }
