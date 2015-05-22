@@ -57,12 +57,7 @@ static int max_transfers(void) {
 
 static int GiveRestriction(void)
 {
-    static int value = -1;
-    if (value < 0) {
-        const char *str = get_param(global.parameters, "GiveRestriction");
-        value = str ? atoi(str) : 0;
-    }
-    return value;
+    return get_param_int(global.parameters, "GiveRestriction", 0);
 }
 
 static void feedback_give_not_allowed(unit * u, order * ord)
