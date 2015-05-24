@@ -700,7 +700,7 @@ static void statistic_test(CuTest *tc, int peasants, int luck, int maxp,
     for (i = 0; i < 1000; ++i) {
         effect = peasant_luck_effect(peasants, luck, maxp, variance);
         CuAssertTrue(tc, min_value <= effect);
-// broken        CuAssertTrue(tc, max_value >= effect);
+        CuAssertTrue(tc, max_value >= effect);
     }
 }
 
