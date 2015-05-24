@@ -39,7 +39,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <string.h>
 #include <stdlib.h>
 
-static int
+int
 use_skillpotion(struct unit *u, const struct item_type *itype, int amount,
 struct order *ord)
 {
@@ -59,12 +59,10 @@ struct order *ord)
         }
     }
     ADDMSG(&u->faction->msgs, msg_message("skillpotion_use", "unit", u));
-
-    change_resource(u, itype->rtype, -amount);
-    return 0;
+    return amount;
 }
 
-static int
+int
 use_manacrystal(struct unit *u, const struct item_type *itype, int amount,
 struct order *ord)
 {
@@ -82,8 +80,7 @@ struct order *ord)
 
     ADDMSG(&u->faction->msgs, msg_message("manacrystal_use", "unit aura", u, sp));
 
-    change_resource(u, itype->rtype, -amount);
-    return 0;
+    return amount;
 }
 
 void register_xerewards(void)

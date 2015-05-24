@@ -3499,8 +3499,7 @@ void update_long_order(unit * u)
     }
 }
 
-static int
-use_item(unit * u, const item_type * itype, int amount, struct order *ord)
+static int use_item(unit * u, const item_type * itype, int amount, struct order *ord)
 {
     int i;
     int target = read_unitid(u->faction, u->region);
@@ -3508,6 +3507,7 @@ use_item(unit * u, const item_type * itype, int amount, struct order *ord)
     i = get_pooled(u, itype->rtype, GET_DEFAULT, amount);
 
     if (amount > i) {
+        /* TODO: message? eg. "not enough %, using only %" */
         amount = i;
     }
     if (amount == 0) {
@@ -3515,10 +3515,15 @@ use_item(unit * u, const item_type * itype, int amount, struct order *ord)
     }
 
     if (target == -1) {
+        int result;
         if (itype->use == NULL) {
             return EUNUSABLE;
         }
-        return itype->use(u, itype, amount, ord);
+        result = itype->use ? itype->use(u, itype, amount, ord) : EUNUSABLE;
+        if (result>0) {
+            use_pooled(u, itype->rtype, GET_DEFAULT, result);
+        }
+        return result;
     }
     else {
         if (itype->useonother == NULL) {
@@ -3787,10 +3792,6 @@ int use_cmd(unit * u, struct order *ord)
 
     if (itype != NULL) {
         err = use_item(u, itype, n, ord);
-        assert(err <= 0 || !"use_item should not return positive values.");
-        if (err > 0) {
-            log_error("use_item returned a value>0 for %s\n", resourcename(itype->rtype, 0));
-        }
     }
     switch (err) {
     case ENOITEM:
@@ -3801,6 +3802,9 @@ int use_cmd(unit * u, struct order *ord)
         break;
     case ENOSKILL:
         cmistake(u, ord, 50, MSG_PRODUCE);
+        break;
+    default:
+        // no error
         break;
     }
     return err;
