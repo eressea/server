@@ -1,4 +1,6 @@
 #!/bin/bash
+set -e
+
 ROOT=$(pwd)
 while [ ! -d $ROOT/.git ]; do
   ROOT=$(dirname $ROOT)
