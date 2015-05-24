@@ -3510,6 +3510,7 @@ use_item(unit * u, const item_type * itype, int amount, struct order *ord)
     i = get_pooled(u, itype->rtype, GET_DEFAULT, amount);
 
     if (amount > i) {
+        /* TODO: message? eg. "not enough %, using only %" */
         amount = i;
     }
     if (amount == 0) {
@@ -3517,10 +3518,15 @@ use_item(unit * u, const item_type * itype, int amount, struct order *ord)
     }
 
     if (target == -1) {
+        int result;
         if (itype->use == NULL) {
             return EUNUSABLE;
         }
-        return itype->use(u, itype, amount, ord);
+        result = itype->use ? itype->use(u, itype, amount, ord) : EUNUSABLE;
+        if (result>0) {
+            use_pooled(u, itype->rtype, GET_DEFAULT, result);
+        }
+        return result;
     }
     else {
         if (itype->useonother == NULL) {
