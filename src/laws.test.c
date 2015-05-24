@@ -712,8 +712,11 @@ static void test_peasant_luck_effect(CuTest *tc) {
 
     statistic_test(tc, 100, 0, 1000, 0, 0, 0);
     statistic_test(tc, 100, 2, 1000, 0, 1, 1);
+/*    
     statistic_test(tc, 1000, 400, 1000, 0, (int)(400 * 10 * 0.001 * .75),
         (int)(400 * 10 * 0.001 * .75));
+ */
+    statistic_test(tc, 1000, 400, 1000, 0, 3, 3);
     statistic_test(tc, 1000, 1000, 2000, .5, 1, 501);
 
     set_param(&global.parameters, "rules.peasants.growth.factor", "1");
