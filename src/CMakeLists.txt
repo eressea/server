@@ -191,6 +191,7 @@ set(TESTS_SRC
   ${ATTRIBUTES_TESTS}
   ${UTIL_TESTS}
   ${KERNEL_TESTS}
+  ${ITEMS_TESTS}
 )
 
 add_executable(test_eressea ${TESTS_SRC})
