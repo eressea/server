@@ -3501,8 +3501,7 @@ void update_long_order(unit * u)
     }
 }
 
-static int
-use_item(unit * u, const item_type * itype, int amount, struct order *ord)
+static int use_item(unit * u, const item_type * itype, int amount, struct order *ord)
 {
     int i;
     int target = read_unitid(u->faction, u->region);
@@ -3795,10 +3794,6 @@ int use_cmd(unit * u, struct order *ord)
 
     if (itype != NULL) {
         err = use_item(u, itype, n, ord);
-        assert(err <= 0 || !"use_item should not return positive values.");
-        if (err > 0) {
-            log_error("use_item returned a value>0 for %s\n", resourcename(itype->rtype, 0));
-        }
     }
     switch (err) {
     case ENOITEM:
@@ -3809,6 +3804,9 @@ int use_cmd(unit * u, struct order *ord)
         break;
     case ENOSKILL:
         cmistake(u, ord, 50, MSG_PRODUCE);
+        break;
+    default:
+        // no error
         break;
     }
     return err;

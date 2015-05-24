@@ -61,6 +61,7 @@ end
 
 function test_give_divisor()
     eressea.settings.set("rules.items.give_divisor", 2)
+    eressea.settings.set("GiveRestriction", 0)
     local r = region.create(1, 1, "plain")
     local f1 = faction.create("test@example.com", "human", "de")
     local f2 = faction.create("test@example.com", "human", "de")
