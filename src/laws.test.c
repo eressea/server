@@ -696,12 +696,11 @@ static void test_reserve_self(CuTest *tc) {
 
 static void statistic_test(CuTest *tc, int peasants, int luck, int maxp,
     double variance, int min_value, int max_value) {
-    int effect, i;
-    for (i = 0; i < 1000; ++i) {
-        effect = peasant_luck_effect(peasants, luck, maxp, variance);
-        CuAssertTrue(tc, min_value <= effect);
-        CuAssertTrue(tc, max_value >= effect);
-    }
+    int effect;
+
+    effect = peasant_luck_effect(peasants, luck, maxp, variance);
+    CuAssertTrue(tc, min_value <= effect);
+    CuAssertTrue(tc, max_value >= effect);
 }
 
 static void test_peasant_luck_effect(CuTest *tc) {
@@ -780,7 +779,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_force_leave_buildings);
     SUITE_ADD_TEST(suite, test_force_leave_ships);
     SUITE_ADD_TEST(suite, test_force_leave_ships_on_ocean);
-    DISABLE_TEST(suite, test_peasant_luck_effect);
+    SUITE_ADD_TEST(suite, test_peasant_luck_effect);
     SUITE_ADD_TEST(suite, test_luck_message);
 
     return suite;
