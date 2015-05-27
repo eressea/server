@@ -29,7 +29,8 @@ extern "C" {
   long genrand_int31(void);
 
 # define rng_init(seed) init_genrand(seed)
-# define rng_int genrand_int31
+# define rng_int (int)genrand_int31
+# define rng_uint (unsigned int)genrand_int32
 # define rng_double genrand_real2
 # define RNG_RAND_MAX 0x7fffffff
 #else

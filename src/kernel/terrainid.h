@@ -16,25 +16,19 @@ extern "C" {
 
   enum {
     T_OCEAN = 0,
-    T_PLAIN = 1,
-    T_SWAMP = 2,
-    T_DESERT = 3,               /* kann aus T_PLAIN entstehen */
-    T_HIGHLAND = 4,
-    T_MOUNTAIN = 5,
-    T_GLACIER = 6,              /* kann aus T_MOUNTAIN entstehen */
-    T_FIREWALL = 7,             /* Unpassierbar */
-    /* T_HELL = 8, Hölle */
-    /* T_GRASSLAND = 9, */
-    T_ASTRAL = 10,
-    T_ASTRALB = 11,
-    T_VOLCANO = 12,
-    T_VOLCANO_SMOKING = 13,
-    T_ICEBERG_SLEEP = 14,
-    T_ICEBERG = 15,
-    /* T_HALL1 = 16, */
-    /* T_CORRIDOR1 = 17, */
-    /* T_MAGICSTORM = 18, */
-    /* T_WALL1 = 19, */
+    T_PLAIN,
+    T_SWAMP,
+    T_DESERT,
+    T_HIGHLAND,
+    T_MOUNTAIN,
+    T_GLACIER,
+    T_FIREWALL,
+    T_ASTRAL,
+    T_ASTRALB,
+    T_VOLCANO,
+    T_VOLCANO_SMOKING,
+    T_ICEBERG_SLEEP,
+    T_ICEBERG,
     NOTERRAIN = (terrain_t) - 1
   };
 

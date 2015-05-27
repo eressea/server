@@ -314,8 +314,11 @@ int walkingcapacity(const struct unit *u)
         }
     }
     if (rbelt) {
-        int tmp = i_get(u->items, rbelt->itype);
-        n += _min(people, tmp) * (STRENGTHMULTIPLIER - 1) * personcapacity(u);
+        int belts = i_get(u->items, rbelt->itype);
+        if (belts) {
+            int multi = get_param_int(global.parameters, "rules.trollbelt.multiplier", STRENGTHMULTIPLIER);
+            n += _min(people, belts) * (multi - 1) * u_race(u)->capacity;
+        }
     }
 
     return n;
@@ -919,17 +922,17 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
     }
     if (guard) {
         prob += base_prob;          /* 30% base chance */
-        prob = +guard_count*guard_number_prob;
+        prob += guard_count*guard_number_prob;
         if (r->terrain == newterrain(T_GLACIER))
-            prob = +region_type_prob * 2;
+            prob += region_type_prob * 2;
         if (r->terrain == newterrain(T_SWAMP))
-            prob = +region_type_prob * 2;
+            prob += region_type_prob * 2;
         if (r->terrain == newterrain(T_MOUNTAIN))
-            prob = +region_type_prob;
+            prob += region_type_prob;
         if (r->terrain == newterrain(T_VOLCANO))
-            prob = +region_type_prob;
+            prob += region_type_prob;
         if (r->terrain == newterrain(T_VOLCANO_SMOKING))
-            prob = +region_type_prob;
+            prob += region_type_prob;
 
         if (prob > 0 && chance(prob)) {
             return guard;
@@ -981,7 +984,7 @@ static bool is_guardian_r(const unit * guard)
     return true;
 }
 
-bool is_guard(const struct unit * u, int mask)
+bool is_guard(const struct unit * u, unsigned int mask)
 {
     return is_guardian_r(u) && (getguard(u) & mask) != 0;
 }
@@ -1137,7 +1140,8 @@ static const char *shortdirections[MAXDIRECTIONS] = {
 
 static void cycle_route(order * ord, unit * u, int gereist)
 {
-    int bytes, cm = 0;
+    size_t bytes;
+    int cm = 0;
     char tail[1024], *bufp = tail;
     char neworder[2048];
     char token[128];
@@ -1177,11 +1181,11 @@ static void cycle_route(order * ord, unit * u, int gereist)
             if (!pause) {
                 const char *loc = LOC(lang, shortdirections[d]);
                 if (bufp != tail) {
-                    bytes = (int)strlcpy(bufp, " ", size);
+                    bytes = strlcpy(bufp, " ", size);
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
                 }
-                bytes = (int)strlcpy(bufp, loc, size);
+                bytes = strlcpy(bufp, loc, size);
                 if (wrptr(&bufp, &size, bytes) != 0)
                     WARN_STATIC_BUFFER();
             }
@@ -1190,10 +1194,10 @@ static void cycle_route(order * ord, unit * u, int gereist)
             break;
         else if (cm == gereist && !paused && pause) {
             const char *loc = LOC(lang, parameters[P_PAUSE]);
-            bytes = (int)strlcpy(bufp, " ", size);
+            bytes = strlcpy(bufp, " ", size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
-            bytes = (int)strlcpy(bufp, loc, size);
+            bytes = strlcpy(bufp, loc, size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
             paused = true;
@@ -1562,8 +1566,9 @@ static arg_regions *var_copy_regions(const region_list * begin, int size)
 
     if (size > 0) {
         int i = 0;
+        assert(size>0);
         arg_regions *dst =
-            (arg_regions *)malloc(sizeof(arg_regions) + sizeof(region *) * size);
+            (arg_regions *)malloc(sizeof(arg_regions) + sizeof(region *) * (size_t)size);
         dst->nregions = size;
         dst->regions = (region **)(dst + 1);
         for (rsrc = begin; i != size; rsrc = rsrc->next) {
@@ -2310,10 +2315,11 @@ static void travel(unit * u, region_list ** routep)
         if (uf->region == r) {
             order *follow_order;
             const struct locale *lang = u->faction->locale;
-
+            const char *s = LOC(uf->faction->locale, parameters[P_UNIT]);
             /* construct an order */
+            assert(s || !"missing translation for UNIT keyword");
             follow_order = create_order(K_FOLLOW, lang, "%s %i",
-                LOC(uf->faction->locale, parameters[P_UNIT]), ut->no);
+                s, ut->no);
 
             route_end = reroute(uf, route_begin, route_end);
             travel_i(uf, route_begin, route_end, follow_order, TRAVEL_FOLLOWING,
@@ -2532,7 +2538,8 @@ static direction_t hunted_dir(attrib * at, int id)
 static int hunt(unit * u, order * ord)
 {
     region *rc = u->region;
-    int bytes, moves, id, speed;
+    size_t bytes;
+    int  moves, id, speed;
     char command[256], *bufp = command;
     size_t size = sizeof(command);
     direction_t dir;
@@ -2577,7 +2584,7 @@ static int hunt(unit * u, order * ord)
 
     moves = 1;
 
-    speed = getuint();
+    speed = (int)getuint();
     if (speed == 0) {
         speed = shipspeed(u->ship, u);
     }
@@ -2588,10 +2595,10 @@ static int hunt(unit * u, order * ord)
     }
     rc = rconnect(rc, dir);
     while (moves < speed && (dir = hunted_dir(rc->attribs, id)) != NODIRECTION) {
-        bytes = (int)strlcpy(bufp, " ", size);
+        bytes = strlcpy(bufp, " ", size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
-        bytes = (int)strlcpy(bufp, LOC(u->faction->locale, directions[dir]), size);
+        bytes = strlcpy(bufp, LOC(u->faction->locale, directions[dir]), size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
         moves++;

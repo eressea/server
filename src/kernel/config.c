@@ -853,7 +853,7 @@ int forbiddenid(int id)
             ++len;
         forbid = calloc(len, sizeof(int));
         for (i = 0; i != len; ++i) {
-            forbid[i] = strtol(forbidden[i], NULL, 36);
+            forbid[i] = atoi36(forbidden[i]);
         }
     }
     for (i = 0; i != len; ++i)
@@ -1199,7 +1199,7 @@ void setguard(unit * u, unsigned int flags)
     }
     fset(u, UFL_GUARD);
     fset(u->region, RF_GUARDED);
-    if ((int)flags == guard_flags(u)) {
+    if (flags == guard_flags(u)) {
         if (a)
             a_remove(&u->attribs, a);
     }

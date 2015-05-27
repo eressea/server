@@ -117,12 +117,12 @@ static float MagicRegeneration(void)
     return value;
 }
 
-float MagicPower(void)
+double MagicPower(void)
 {
-    static float value = -1.0;
+    static double value = -1.0;
     if (value < 0) {
         const char *str = get_param(global.parameters, "magic.power");
-        value = str ? (float)atof(str) : 1.0f;
+        value = str ? atof(str) : 1.0;
     }
     return value;
 }
@@ -1008,11 +1008,11 @@ cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
  * Spruchfunktionsroutine ermittelt.
  */
 
-float
+double
 spellpower(region * r, unit * u, const spell * sp, int cast_level, struct order *ord)
 {
     curse *c;
-    float force = (float)cast_level;
+    double force = cast_level;
     int elf_power;
     const struct resource_type *rtype;
 
@@ -1041,7 +1041,7 @@ spellpower(region * r, unit * u, const spell * sp, int cast_level, struct order 
     if (curse_active(c)) {
         unit *mage = c->magician;
         force -= curse_geteffect(c);
-        curse_changevigour(&r->attribs, c, (float)-cast_level);
+        curse_changevigour(&r->attribs, c, -cast_level);
         cmistake(u, ord, 185, MSG_MAGIC);
         if (mage != NULL && mage->faction != NULL) {
             if (force > 0) {
@@ -1340,7 +1340,7 @@ static void do_fumble(castorder * co)
     const spell *sp = co->sp;
     int level = co->level;
     int duration;
-    float effect;
+    double effect;
 
     ADDMSG(&u->faction->msgs,
         msg_message("patzer", "unit region spell", u, r, sp));
@@ -1382,8 +1382,8 @@ static void do_fumble(castorder * co)
     case 2:
         /* temporary skill loss */
         duration = _max(rng_int() % level / 2, 2);
-        effect = -(float)level / 2;
-        c = create_curse(u, &u->attribs, ct_find("skillmod"), (float)level,
+        effect = level / -2.0;
+        c = create_curse(u, &u->attribs, ct_find("skillmod"), level,
             duration, effect, 1);
         c->data.i = SK_MAGIC;
         ADDMSG(&u->faction->msgs, msg_message("patzer2", "unit region", u, r));
@@ -2067,7 +2067,7 @@ struct region * co_get_region(const struct castorder * co) {
 }
 
 castorder *create_castorder(castorder * co, unit *caster, unit * familiar, const spell * sp, region * r,
-    int lev, float force, int range, struct order * ord, spellparameter * p)
+    int lev, double force, int range, struct order * ord, spellparameter * p)
 {
     if (!co) co = (castorder*)calloc(1, sizeof(castorder));
 
@@ -2527,7 +2527,7 @@ static castorder *cast_cmd(unit * u, order * ord)
         level = _min(p, level);
         if (level < 1) {
             /* Fehler "Das macht wenig Sinn" */
-            cmistake(u, ord, 10, MSG_MAGIC);
+            syntax_error(u, ord);
             return 0;
         }
         s = gettoken(token, sizeof(token));
@@ -2557,7 +2557,7 @@ static castorder *cast_cmd(unit * u, order * ord)
         level = _min(p, level);
         if (level < 1) {
             /* Fehler "Das macht wenig Sinn" */
-            cmistake(u, ord, 10, MSG_MAGIC);
+            syntax_error(u, ord);
             return 0;
         }
         s = gettoken(token, sizeof(token));

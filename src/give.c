@@ -48,18 +48,16 @@
 #include <stdlib.h>
 
 /* Wieviel Fremde eine Partei pro Woche aufnehmen kangiven */
-#define MAXNEWBIES								5
 #define RESERVE_DONATIONS       /* shall we reserve objects given to us by other factions? */
 #define RESERVE_GIVE            /* reserve anything that's given from one unit to another? */
 
+static int max_transfers(void) {
+    return get_param_int(global.parameters, "rules.give.max_men", 5);
+}
+
 static int GiveRestriction(void)
 {
-    static int value = -1;
-    if (value < 0) {
-        const char *str = get_param(global.parameters, "GiveRestriction");
-        value = str ? atoi(str) : 0;
-    }
-    return value;
+    return get_param_int(global.parameters, "GiveRestriction", 0);
 }
 
 static void feedback_give_not_allowed(unit * u, order * ord)
@@ -128,7 +126,7 @@ static bool limited_give(const item_type * type)
 int give_quota(const unit * src, const unit * dst, const item_type * type,
     int n)
 {
-    float divisor;
+    double divisor;
 
     if (!limited_give(type)) {
         return n;
@@ -241,6 +239,7 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
     int k = 0;
     int error = 0;
     message * msg;
+    int maxt = max_transfers();
 
     assert(u2);
 
@@ -300,7 +299,7 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
             error = 96;
         }
         else if (u->faction != u2->faction) {
-            if (u2->faction->newbies + n > MAXNEWBIES) {
+            if (maxt>=0 && u2->faction->newbies + n > maxt) {
                 error = 129;
             }
             else if (u_race(u) != u2->faction->race) {
@@ -362,7 +361,7 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
             set_leftship(u2, sh);
         }
         transfermen(u, u2, n);
-        if (u->faction != u2->faction) {
+        if (maxt>=0 && u->faction != u2->faction) {
             u2->faction->newbies += n;
         }
     }
@@ -473,7 +472,7 @@ void give_unit(unit * u, unit * u2, order * ord)
         cmistake(u, ord, 105, MSG_COMMERCE);
         return;
     }
-    if (u2->faction->newbies + n > MAXNEWBIES) {
+    if (u2->faction->newbies + n > max_transfers()) {
         cmistake(u, ord, 129, MSG_COMMERCE);
         return;
     }
@@ -592,7 +591,7 @@ void give_cmd(unit * u, order * ord)
 
     else if (p == P_HERBS) {
         bool given = false;
-        if (!(u_race(u)->ec_flags & GIVEITEM) && u2 != NULL) {
+        if ((u_race(u)->ec_flags & ECF_KEEP_ITEM) && u2 != NULL) {
             ADDMSG(&u->faction->msgs,
                 msg_feedback(u, ord, "race_nogive", "race", u_race(u)));
             return;
@@ -657,7 +656,7 @@ void give_cmd(unit * u, order * ord)
         if (!s || *s == 0) {              /* GIVE ALL items that you have */
 
             /* do these checks once, not for each item we have: */
-            if (!(u_race(u)->ec_flags & GIVEITEM) && u2 != NULL) {
+            if ((u_race(u)->ec_flags & ECF_KEEP_ITEM) && u2 != NULL) {
                 ADDMSG(&u->faction->msgs,
                     msg_feedback(u, ord, "race_nogive", "race", u_race(u)));
                 return;
@@ -701,7 +700,7 @@ void give_cmd(unit * u, order * ord)
                     }
                 }
             }
-            else if (!(u_race(u)->ec_flags & GIVEITEM) && u2 != NULL) {
+            else if ((u_race(u)->ec_flags & ECF_KEEP_ITEM) && u2 != NULL) {
                 ADDMSG(&u->faction->msgs,
                     msg_feedback(u, ord, "race_nogive", "race", u_race(u)));
             }
@@ -760,7 +759,7 @@ void give_cmd(unit * u, order * ord)
     }
 
     if (u2 != NULL) {
-        if (!(u_race(u)->ec_flags & GIVEITEM) && u2 != NULL) {
+        if ((u_race(u)->ec_flags & ECF_KEEP_ITEM) && u2 != NULL) {
             ADDMSG(&u->faction->msgs,
                 msg_feedback(u, ord, "race_nogive", "race", u_race(u)));
             return;

@@ -1,0 +1,16 @@
+{
+   zlib1g-dev-1:1.2.3.4.dfsg
+   Memcheck:Cond
+   fun:inflateReset2
+   fun:inflateInit2_
+   obj:/usr/lib/x86_64-linux-gnu/libxml2.so.2.8.0
+   fun:__libxml2_xzread
+   obj:/usr/lib/x86_64-linux-gnu/libxml2.so.2.8.0
+   fun:xmlParserInputBufferGrow
+   fun:xmlParserInputGrow
+   obj:/usr/lib/x86_64-linux-gnu/libxml2.so.2.8.0
+   fun:xmlParseDocument
+   obj:/usr/lib/x86_64-linux-gnu/libxml2.so.2.8.0
+   fun:read_xml
+   fun:init_data
+}

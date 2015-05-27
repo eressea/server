@@ -33,11 +33,11 @@ int json_import(struct stream * out) {
         cJSON *j;
         for (j = child->child; j; j = j->next) {
             cJSON *attr;
-            unsigned int id = 0;
+            int id = 0;
             int x = 0, y = 0;
             region * r;
 
-            id = (unsigned int)atol(j->string);
+            id = atoi(j->string);
             if ((attr = cJSON_GetObjectItem(j, "x")) != 0 && attr->type == cJSON_Number) x = attr->valueint;
             if ((attr = cJSON_GetObjectItem(j, "y")) != 0 && attr->type == cJSON_Number) y = attr->valueint;
             r = new_region(x, y, 0, id);

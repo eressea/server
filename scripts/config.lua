@@ -4,5 +4,5 @@ if config.install then
 end
 package.path = package.path .. ';' .. path .. '/?.lua;' .. path .. '/?/init.lua'
 require 'eressea'
-require 'eressea.xmlconf'
-return require('eressea.rules')
+require 'eressea.xmlconf' -- read xml data
+

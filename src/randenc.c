@@ -1189,7 +1189,7 @@ void plagues(region * r)
     int dead = 0;
 
     peasants = rpeasants(r);
-    dead = (int)(0.5F + PLAGUE_VICTIMS * peasants);
+    dead = (int)(0.5 + PLAGUE_VICTIMS * peasants);
     for (i = dead; i != 0; i--) {
         if (rng_double() < PLAGUE_HEALCHANCE && rmoney(r) >= PLAGUE_HEALCOST) {
             rsetmoney(r, rmoney(r) - PLAGUE_HEALCOST);

@@ -181,7 +181,7 @@ newfaction *read_newfactions(const char *filename)
         password[0] = '\0';
 
         if (sscanf(buf, "%54s %20s %8s %d %d %16s %d", email, race, lang, &bonus,
-            &subscription, password, &alliance) < 6)
+            &subscription, password, &alliance) < 3)
             break;
         if (email[0] == '\0')
             break;

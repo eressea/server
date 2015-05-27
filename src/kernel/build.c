@@ -116,7 +116,7 @@ static void destroy_road(unit * u, int nmax, struct order *ord)
     else {
         unit *u2;
         region *r = u->region;
-        short road, n = (short)nmax;
+        int road, n = nmax;
 
         if (nmax > SHRT_MAX) {
             n = SHRT_MAX;
@@ -393,7 +393,7 @@ void build_road(region * r, unit * u, int size, direction_t d)
     /* n is now modified by several special effects, so we have to
      * minimize it again to make sure the road will not grow beyond
      * maximum. */
-    rsetroad(r, d, rroad(r, d) + (short)n);
+    rsetroad(r, d, rroad(r, d) + n);
 
     if (u_race(u) == get_race(RC_STONEGOLEM)) {
         int golemsused = n / GOLEM_STONE;

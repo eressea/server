@@ -1,16 +1,63 @@
 #!/bin/sh
 
+set -e
+ROOT=`pwd`
+MACHINE=`uname -m`
+[ -z "$CC" ] && [ ! -z `which gcc` ] && CC="gcc"
+[ -z "$CC" ] && [ ! -z `which tcc` ] && CC="tcc"
+[ -z "$CC" ] && [ ! -z `which cc` ] && CC="cc"
+BUILD="$ROOT/build-$MACHINE-$CC-Debug"
+
 inifile() {
+cd $ROOT
 if [ ! -e eressea.ini ]; then
 cp conf/eressea.ini .
-build/iniparser/inifile eressea.ini add lua:paths lunit:scripts
+$BUILD/iniparser/inifile eressea.ini add lua:paths lunit:scripts
 fi
 }
 
-[ -d build ] || mkdir build 
-cd build && cmake .. \
- -DCMAKE_MODULE_PATH=$PWD/../cmake/Modules \
- -DCMAKE_BUILD_TYPE=Debug .. && \
-make && cd .. && inifile &&
-build/eressea/test_eressea &&
-build/eressea/eressea -v0 scripts/run-tests.lua
+build() {
+cd $BUILD
+cmake -DCMAKE_MODULE_PATH=$ROOT/cmake/Modules -DCMAKE_BUILD_TYPE=Debug ..
+make
+}
+
+test_valgrind_report () {
+cd tests
+ln -sf ../scripts/config.lua
+valgrind --suppressions=ubuntu-12_04.supp --error-exitcode=1 $BUILD/eressea/eressea -v0 -t184 ../scripts/reports.lua
+}
+
+test_unittests() {
+$BUILD/eressea/test_eressea
+}
+
+cleanup() {
+cd $ROOT/tests
+rm -rf reports score eressea.log* config.lua
+}
+
+test_server() {
+cd $ROOT
+inifile
+$BUILD/eressea/eressea -v0 scripts/run-tests.lua
+$BUILD/eressea/eressea -v0 scripts/run-tests-e2.lua
+$BUILD/eressea/eressea -v0 scripts/run-tests-e3.lua
+}
+# information
+echo "* base directory: $ROOT"
+echo "* build directory: $BUILD"
+echo "* lsb_release:"
+lsb_release -a
+echo "* zlib1g-dev package:"
+dpkg -l zlib1g-dev
+echo
+
+# build the code
+[ -d $BUILD ] || mkdir $BUILD
+build
+test_unittests
+test_server
+test_valgrind_report
+
+cleanup

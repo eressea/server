@@ -38,6 +38,7 @@ extern "C" {
         int range;                  /* range in regions */
         int flags;                  /* flags */
         int combat;                 /* modifier for combat */
+        int fishing;                /* weekly income from fishing */
 
         double storm;               /* multiplier for chance to drift in storm */
         double damage;              /* multiplier for damage taken by the ship */
@@ -48,8 +49,6 @@ extern "C" {
         int cptskill;               /* min. skill of captain */
         int minskill;               /* min. skill to sail this (crew) */
         int sumskill;               /* min. sum of crew+captain */
-
-        int fishing;                /* weekly income from fishing */
 
         int at_bonus;               /* Verändert den Angriffsskill (default: 0) */
         int df_bonus;               /* Verändert den Verteidigungskill (default: 0) */

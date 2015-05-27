@@ -154,6 +154,9 @@ extern "C" {
     void faction_setpassword(struct faction *self, const char *password);
     bool valid_race(const struct faction *f, const struct race *rc);
 
+    void faction_getorigin(const struct faction * f, int id, int *x, int *y);
+    void faction_setorigin(struct faction * f, int id, int x, int y);
+
     struct spellbook * faction_get_spellbook(struct faction *f);
 
     /* skills */

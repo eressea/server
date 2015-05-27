@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="iso-8859-1" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <strings>
 
   <string name="ghoul_prefix_0">
     <text locale="de">Faulende</text>
   </string>
   <string name="ghoul_prefix_1">
-    <text locale="de">Angsteinflößende</text>
+    <text locale="de">AngsteinflÃ¶ÃŸende</text>
   </string>
   <string name="ghoul_prefix_2">
     <text locale="de">Leise</text>
@@ -29,7 +29,7 @@
     <text locale="de">Dunkle</text>
   </string>
   <string name="ghoul_prefix_9">
-    <text locale="de">Fürchterliche</text>
+    <text locale="de">FÃ¼rchterliche</text>
   </string>
   <string name="ghoul_prefix_10">
     <text locale="de">Grauenhafte</text>
@@ -47,7 +47,7 @@
     <text locale="de">Schreckliche</text>
   </string>
   <string name="ghoul_prefix_15">
-    <text locale="de">Düstere</text>
+    <text locale="de">DÃ¼stere</text>
   </string>
   <string name="ghoul_prefix_16">
     <text locale="de">Schaurige</text>
@@ -82,7 +82,7 @@
     <text locale="de">der Finsternis</text>
   </string>
   <string name="ghoul_postfix_3">
-    <text locale="de">des Bösen</text>
+    <text locale="de">des BÃ¶sen</text>
   </string>
   <string name="ghoul_postfix_4">
     <text locale="de">der Erschlagenen</text>

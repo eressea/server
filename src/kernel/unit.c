@@ -48,7 +48,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/base36.h>
 #include <util/bsdstring.h>
 #include <util/event.h>
-#include <util/goodies.h>
+#include <util/strings.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
@@ -257,9 +257,9 @@ static buddy *get_friends(const unit * u, int *numfriends)
                         *fr = nf;
                     }
                     else if (nf->faction == u2->faction
-                        && (u_race(u2)->ec_flags & GIVEITEM)) {
+                        && !(u_race(u2)->ec_flags & ECF_KEEP_ITEM)) {
                         /* we don't like to gift it to units that won't give it back */
-                        if ((u_race(nf->unit)->ec_flags & GIVEITEM) == 0) {
+                        if ((u_race(nf->unit)->ec_flags & ECF_KEEP_ITEM)) {
                             nf->unit = u2;
                         }
                     }
@@ -300,7 +300,7 @@ int gift_items(unit * u, int flags)
 
     if (u->items == NULL || fval(u_race(u), RCF_ILLUSIONARY))
         return 0;
-    if ((u_race(u)->ec_flags & GIVEITEM) == 0)
+    if ((u_race(u)->ec_flags & ECF_KEEP_ITEM))
         return 0;
 
     /* at first, I should try giving my crap to my own units in this region */
@@ -311,7 +311,7 @@ int gift_items(unit * u, int flags)
                 /* some units won't take stuff: */
                 if (u_race(u2)->ec_flags & GETITEM) {
                     /* we don't like to gift it to units that won't give it back */
-                    if (u_race(u2)->ec_flags & GIVEITEM) {
+                    if (!(u_race(u2)->ec_flags & ECF_KEEP_ITEM)) {
                         i_merge(&u2->items, &u->items);
                         u->items = NULL;
                         break;
@@ -1274,7 +1274,22 @@ static int item_modification(const unit * u, skill_t sk, int val)
     return val;
 }
 
-static int att_modification(const unit * u, skill_t sk)
+static int update_gbdream(const unit * u, int bonus, curse *c, const curse_type *gbdream_ct, int sign){
+    if (curse_active(c) && c->type == gbdream_ct) {
+        double effect = curse_geteffect(c);
+        unit *mage = c->magician;
+        /* wir suchen jeweils den groessten Bonus und den groestsen Malus */
+        if (sign * effect > sign * bonus) {
+            if (mage == NULL || mage->number == 0
+                || sign>0?alliedunit(mage, u->faction, HELP_GUARD):!alliedunit(mage, u->faction, HELP_GUARD)) {
+                bonus = (int)effect;
+            }
+        }
+    }
+    return bonus;
+}
+
+int att_modification(const unit * u, skill_t sk)
 {
     double result = 0;
     static bool init = false;
@@ -1307,26 +1322,14 @@ static int att_modification(const unit * u, skill_t sk)
      * jeweils erste vom Typ C_GBDREAM zurueckgegen wird, wir aber alle
      * durchsuchen und aufaddieren muessen */
     if (u->region) {
-        double bonus = 0, malus = 0;
+        int bonus = 0, malus = 0;
         attrib *a = a_find(u->region->attribs, &at_curse);
         while (a && a->type == &at_curse) {
             curse *c = (curse *)a->data.v;
-            if (curse_active(c) && c->type == gbdream_ct) {
-                double mod = curse_geteffect(c);
-                unit *mage = c->magician;
-                /* wir suchen jeweils den groesten Bonus und den groesten Malus */
-                if (mod > bonus) {
-                    if (mage == NULL || mage->number == 0
-                        || alliedunit(mage, u->faction, HELP_GUARD)) {
-                        bonus = mod;
-                    }
-                }
-                else if (mod < malus) {
-                    if (mage == NULL || !alliedunit(mage, u->faction, HELP_GUARD)) {
-                        malus = mod;
-                    }
-                }
-            }
+
+            bonus = update_gbdream(u, bonus, c, gbdream_ct, 1);
+            malus = update_gbdream(u, malus, c, gbdream_ct, -1);
+
             a = a->next;
         }
         result = result + bonus + malus;
@@ -1430,7 +1433,7 @@ int invisible(const unit * target, const unit * viewer)
  */
 void free_unit(unit * u)
 {
-    free(u->name);
+    free(u->_name);
     free(u->display);
     free_order(u->thisorder);
     free_orders(&u->orders);
@@ -1461,6 +1464,28 @@ static void createunitid(unit * u, int id)
     uhash(u);
 }
 
+void default_name(const unit *u, char name[], int len) {
+    const char * result;
+    const struct locale * lang = u->faction ? u->faction->locale : default_locale;
+    if (lang) {
+        static const char * prefix[MAXLOCALES];
+        int i = locale_index(lang);
+        /*if (!prefix[i]) {*/
+            prefix[i] = LOC(lang, "unitdefault");
+            if (!prefix[i]) {
+                prefix[i] = parameters[P_UNIT];
+            }
+        /*}*/
+        result = prefix[i];
+    }
+    else {
+        result = parameters[P_UNIT];
+    }
+    strlcpy(name, result, len);
+    strlcat(name, " ", len);
+    strlcat(name, itoa36(u->no), len);
+}
+
 void name_unit(unit * u)
 {
     if (u_race(u)->generate_name) {
@@ -1474,25 +1499,7 @@ void name_unit(unit * u)
     }
     else {
         char name[32];
-        const char * result;
-        const struct locale * lang = u->faction ? u->faction->locale : default_locale;
-        if (lang) {
-            static const char * prefix[MAXLOCALES];
-            int i = locale_index(lang);
-            if (!prefix[i]) {
-                prefix[i] = LOC(lang, "unitdefault");
-                if (!prefix[i]) {
-                    prefix[i] = parameters[P_UNIT];
-                }
-            }
-            result = prefix[i];
-        }
-        else {
-            result = parameters[P_UNIT];
-        }
-        strlcpy(name, result, sizeof(name));
-        strlcat(name, " ", sizeof(name));
-        strlcat(name, itoa36(u->no), sizeof(name));
+        default_name(u, name, sizeof(name));
         unit_setname(u, name);
     }
 }
@@ -1542,7 +1549,7 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
         name_unit(u);
     }
     else {
-        u->name = _strdup(dname);
+        u->_name = _strdup(dname);
     }
 
     if (creator) {
@@ -1631,18 +1638,24 @@ int countheroes(const struct faction *f)
     return n;
 }
 
+/** Returns the raw unit name, like "Frodo", or "Seeschlange" */
 const char *unit_getname(const unit * u)
 {
-    return (const char *)u->name;
+    if (!u->_name) {
+        const struct locale * lang = u->faction ? u->faction->locale : default_locale;
+        const char *rcname = rc_name_s(u->_race, u->number == 1 ? NAME_SINGULAR : NAME_PLURAL);
+        return LOC(lang, rcname);
+    }
+    return u->_name;
 }
 
 void unit_setname(unit * u, const char *name)
 {
-    free(u->name);
-    if (name)
-        u->name = _strdup(name);
+    free(u->_name);
+    if (name && name[0])
+        u->_name = _strdup(name);
     else
-        u->name = NULL;
+        u->_name = NULL;
 }
 
 const char *unit_getinfo(const unit * u)
@@ -1878,20 +1891,16 @@ typedef char name[OBJECTIDSIZE + 1];
 static name idbuf[8];
 static int nextbuf = 0;
 
+/** Puts human-readable unit name, with number, like "Frodo (hobb)" into buffer */
 char *write_unitname(const unit * u, char *buffer, size_t size)
 {
-    if (u->name) {
-        slprintf(buffer, size, "%s (%s)", u->name, itoa36(u->no));
-    }
-    else {
-        const struct locale * lang = u->faction ? u->faction->locale : default_locale;
-        const char * name = rc_name_s(u->_race, u->number == 1 ? NAME_SINGULAR : NAME_PLURAL);
-        slprintf(buffer, size, "%s (%s)", LOC(lang, name), itoa36(u->no));
-    }
+    const char * name = unit_getname(u);
+    slprintf(buffer, size, "%s (%s)", name, itoa36(u->no));
     buffer[size - 1] = 0;
     return buffer;
 }
 
+/** Returns human-readable unit name, with number, like "Frodo (hobb)" */
 const char *unitname(const unit * u)
 {
     char *ubuf = idbuf[(++nextbuf) % 8];
@@ -1899,14 +1908,14 @@ const char *unitname(const unit * u)
 }
 
 bool unit_name_equals_race(const unit *u) {
-    if (u->name) {
+    if (u->_name) {
         char sing[32], plur[32];
         const struct locale *lang = u->faction->locale;
         rc_name(u->_race, NAME_SINGULAR, sing, sizeof(sing));
         rc_name(u->_race, NAME_PLURAL, plur, sizeof(plur));
-        if (strcmp(u->name, sing) == 0 || strcmp(u->name, plur) == 0 ||
-            strcmp(u->name, LOC(lang, sing)) == 0 ||
-            strcmp(u->name, LOC(lang, plur)) == 0) {
+        if (strcmp(u->_name, sing) == 0 || strcmp(u->_name, plur) == 0 ||
+            strcmp(u->_name, LOC(lang, sing)) == 0 ||
+            strcmp(u->_name, LOC(lang, plur)) == 0) {
             return true;
         }
     }

@@ -512,7 +512,7 @@ static double study_speedup(unit * u, skill_t s, study_rule_t rule)
         if (rule == STUDY_AUTOTEACH) {
             for (i = 0; i != u->skill_size; ++i) {
                 skill *sv = u->skills + i;
-                learnweeks = +(sv->level * (sv->level + 1) / 2.0);
+                learnweeks += (sv->level * (sv->level + 1) / 2.0);
             }
             if (learnweeks < turn / 2) {
                 return 2.0;

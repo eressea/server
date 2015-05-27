@@ -7,7 +7,7 @@
 
 #include "bsdstring.h"
 
-int wrptr(char **ptr, size_t * size, int bytes)
+int wrptr(char **ptr, size_t * size, size_t bytes)
 {
     if (bytes == 0) {
         return 0;
@@ -16,7 +16,7 @@ int wrptr(char **ptr, size_t * size, int bytes)
         *size = 0;
         return EINVAL;
     }
-    if (bytes <= *(int *)size) {
+    if (bytes <= *size) {
         *ptr += bytes;
         *size -= bytes;
         return 0;

@@ -40,6 +40,8 @@ extern "C" {
 
 #define RACESPOILCHANCE 5       /* Chance auf rassentypische Beute */
 
+#define RACE_ATTACKS 10         /* maximum number of attacks */
+
     struct param;
     struct spell;
 
@@ -121,9 +123,9 @@ extern "C" {
         struct param *parameters;
         char *_name;
         float magres;
-        float maxaura;              /* Faktor auf Maximale Aura */
-        float regaura;              /* Faktor auf Regeneration */
-        float recruit_multi;        /* Faktor für Bauernverbrauch */
+        double maxaura;            /* Faktor auf Maximale Aura */
+        double regaura;            /* Faktor auf Regeneration */
+        double recruit_multi;      /* Faktor für Bauernverbrauch */
         int index;
         int recruitcost;
         int maintenance;
@@ -145,7 +147,7 @@ extern "C" {
         int battle_flags;
         int ec_flags;
         race_t oldfamiliars[MAXMAGIETYP];
-        struct att attack[10];
+        struct att attack[RACE_ATTACKS];
         signed char bonus[MAXSKILLS];
 
         const char *(*generate_name) (const struct unit *);
@@ -215,7 +217,7 @@ extern "C" {
 #define RCF_IRONGOLEM      (1<<28)      /* race gets irongolem properties */
 
     /* Economic flags */
-#define GIVEITEM       (1<<1)   /* gibt Gegenstände weg */
+#define ECF_KEEP_ITEM       (1<<1)   /* gibt Gegenstände weg */
 #define GIVEPERSON     (1<<2)   /* übergibt Personen */
 #define GIVEUNIT       (1<<3)   /* Einheiten an andere Partei übergeben */
 #define GETITEM        (1<<4)   /* nimmt Gegenstände an */

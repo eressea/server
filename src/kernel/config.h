@@ -81,12 +81,10 @@ extern "C" {
 #define ORDERSIZE           (DISPLAYSIZE*2) /* max. length of an order */
 #define NAMESIZE            128 /* max. Länge eines Namens, incl trailing 0 */
 #define IDSIZE              16  /* max. Länge einer no (als String), incl trailing 0 */
-#define KEYWORDSIZE         16  /* max. Länge eines Keyword, incl trailing 0 */
 #define OBJECTIDSIZE        (NAMESIZE+5+IDSIZE) /* max. Länge der Strings, die
      * von struct unitname, etc. zurückgegeben werden. ohne die 0 */
 
 #define BAGCAPACITY         20000   /* soviel paßt in einen Bag of Holding */
-#define STRENGTHMULTIPLIER  50   /* multiplier for trollbelt */
 
     /* ----------------- Befehle ----------------------------------- */
 

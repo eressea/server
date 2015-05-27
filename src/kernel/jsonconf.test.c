@@ -51,7 +51,7 @@ static void test_flags(CuTest *tc) {
     check_flag(tc, "dragon", RCF_DRAGON);
     check_flag(tc, "fly", RCF_FLY);
     check_ec_flag(tc, "getitem", GETITEM);
-    check_ec_flag(tc, "giveitem", GIVEITEM);
+    check_ec_flag(tc, "keepitem", ECF_KEEP_ITEM);
     check_ec_flag(tc, "giveperson", GIVEPERSON);
     check_ec_flag(tc, "giveunit", GIVEUNIT);
     test_cleanup();
@@ -320,6 +320,30 @@ static void test_buildings_default(CuTest * tc)
     test_cleanup();
 }
 
+static const char * ship_defaults_data = "{\"ships\": { "
+"\"hodor\" : { }"
+"}}";
+
+static void test_ships_default(CuTest * tc)
+{
+    cJSON *json = cJSON_Parse(ship_defaults_data);
+    const ship_type *st;
+    ship_type clone;
+
+    test_cleanup();
+
+    st = st_get_or_create("hodor");
+    clone = *st;
+
+    CuAssertIntEquals(tc, 0, memcmp(st, &clone, sizeof(ship_type)));
+    CuAssertPtrNotNull(tc, json);
+    json_config(json);
+
+    CuAssertPtrEquals(tc, (void *)st, (void *)st_find("hodor"));
+    CuAssertIntEquals(tc, 0, memcmp(st, &clone, sizeof(ship_type)));
+    test_cleanup();
+}
+
 static void test_configs(CuTest * tc)
 {
     const char * data = "{\"include\": [ \"test.json\" ] }";
@@ -470,6 +494,7 @@ CuSuite *get_jsonconf_suite(void)
     SUITE_ADD_TEST(suite, test_skills);
     SUITE_ADD_TEST(suite, test_directions);
     SUITE_ADD_TEST(suite, test_items);
+    SUITE_ADD_TEST(suite, test_ships_default);
     SUITE_ADD_TEST(suite, test_ships);
     SUITE_ADD_TEST(suite, test_buildings);
     SUITE_ADD_TEST(suite, test_buildings_default);

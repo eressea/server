@@ -77,7 +77,7 @@ static WINDOW *hstatus;
 
 static void init_curses(void)
 {
-    short fg, bg;
+    int fg, bg;
     initscr();
 
     if (has_colors() || force_color) {
@@ -93,7 +93,7 @@ static void init_curses(void)
 #endif
         for (fg = 0; fg != 8; ++fg) {
             for (bg = 0; bg != 2; ++bg) {
-                init_pair(fg + 8 * bg, fg, bg ? hcol : bcol);
+                init_pair((short)(fg + 8 * bg), (short)fg, (short)(bg ? hcol : bcol));
             }
         }
 
@@ -423,7 +423,7 @@ static void paint_info_region(window * wnd, const state * st)
             wattroff(win, A_BOLD | COLOR_PAIR(COLOR_YELLOW));
             for (u = r->units; u && line < maxline; u = u->next) {
                 mvwprintw(win, line, 1, "%.4s ", itoa36(u->no));
-                mvwaddnstr(win, line++, 6, (char *)u->name, size - 5);
+                mvwaddnstr(win, line++, 6, unit_getname(u), size - 5);
             }
         }
     }
@@ -761,6 +761,29 @@ static void select_regions(state * st, int selectmode)
     st->wnd_map->update |= 3;
 }
 
+void loaddata(state *st)  {
+    char datafile[MAX_PATH];
+
+    askstring(st->wnd_status->handle, "save as:", datafile, sizeof(datafile));
+    if (strlen(datafile) > 0) {
+        create_backup(datafile);
+        readgame(datafile, false);
+        st->modified = 0;
+    }
+}
+
+void savedata(state *st)  {
+    char datafile[MAX_PATH];
+
+    askstring(st->wnd_status->handle, "save as:", datafile, sizeof(datafile));
+    if (strlen(datafile) > 0) {
+        create_backup(datafile);
+        remove_empty_units();
+        writegame(datafile);
+        st->modified = 0;
+    }
+}
+
 static void handlekey(state * st, int c)
 {
     window *wnd;
@@ -816,17 +839,11 @@ static void handlekey(state * st, int c)
     case 'S':
     case KEY_SAVE:
     case KEY_F(2):
-        /* if (st->modified) */  {
-            char datafile[MAX_PATH];
-
-            askstring(st->wnd_status->handle, "save as:", datafile, sizeof(datafile));
-            if (strlen(datafile) > 0) {
-                create_backup(datafile);
-                remove_empty_units();
-                writegame(datafile);
-                st->modified = 0;
-            }
-    }
+        savedata(st);
+        break;
+    case KEY_F(3):
+    case KEY_OPEN:
+        loaddata(st);
         break;
     case 'B':
         /*
@@ -929,6 +946,7 @@ static void handlekey(state * st, int c)
             }
         }
         break;
+    case 'f':
     case 0x14:                 /* C-t */
         terraform_at(&st->cursor, select_terrain(st, NULL));
         st->modified = 1;
@@ -1011,6 +1029,7 @@ static void handlekey(state * st, int c)
         statusline(st->wnd_status->handle, "tag-");
         doupdate();
         switch (getch()) {
+        case 'f':
         case 't':
             terraform_selection(st->selected, select_terrain(st, NULL));
             st->modified = 1;

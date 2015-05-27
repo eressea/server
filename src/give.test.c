@@ -72,6 +72,36 @@ static void test_give_men(CuTest * tc) {
     test_cleanup();
 }
 
+static void test_give_men_limit(CuTest * tc) {
+    struct give env;
+    message *msg;
+    test_cleanup();
+    env.f2 = test_create_faction(0);
+    env.f1 = test_create_faction(0);
+    setup_give(&env);
+    set_param(&global.parameters, "rules.give.max_men", "1");
+
+    /* below the limit, give men, increase newbies counter */
+    usetcontact(env.dst, env.src);
+    msg = give_men(1, env.src, env.dst, NULL);
+    CuAssertStrEquals(tc, "give_person", (const char *)msg->parameters[0].v);
+    CuAssertIntEquals(tc, 2, env.dst->number);
+    CuAssertIntEquals(tc, 0, env.src->number);
+    CuAssertIntEquals(tc, 1, env.f2->newbies);
+    msg_release(msg);
+
+    /* beyond the limit, do nothing */
+    usetcontact(env.src, env.dst);
+    msg = give_men(2, env.dst, env.src, NULL);
+    CuAssertStrEquals(tc, "error129", (const char *)msg->parameters[3].v);
+    CuAssertIntEquals(tc, 2, env.dst->number);
+    CuAssertIntEquals(tc, 0, env.src->number);
+    CuAssertIntEquals(tc, 0, env.f1->newbies);
+    msg_release(msg);
+
+    test_cleanup();
+}
+
 static void test_give_men_in_ocean(CuTest * tc) {
     struct give env;
     message * msg;
@@ -247,6 +277,7 @@ CuSuite *get_give_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_give);
     SUITE_ADD_TEST(suite, test_give_men);
+    SUITE_ADD_TEST(suite, test_give_men_limit);
     SUITE_ADD_TEST(suite, test_give_men_in_ocean);
     SUITE_ADD_TEST(suite, test_give_men_none);
     SUITE_ADD_TEST(suite, test_give_men_too_many);

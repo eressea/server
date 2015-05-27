@@ -15,8 +15,10 @@
 extern "C" {
 #endif
 
+    struct stream;
     void register_nr(void);
     void report_cleanup(void);
+    void write_spaces(struct stream *out, size_t num);
 
 #ifdef __cplusplus
 }

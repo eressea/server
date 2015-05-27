@@ -62,7 +62,7 @@ without prior permission by the authors of Eressea.
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/crmessage.h>
-#include <util/goodies.h>
+#include <util/strings.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/message.h>
@@ -317,7 +317,7 @@ static int cr_region(variant var, char *buffer, const void *userdata)
         plane *pl = rplane(r);
         int nx = r->x, ny = r->y;
         pnormalize(&nx, &ny, pl);
-        adjust_coordinates(report, &nx, &ny, pl, r);
+        adjust_coordinates(report, &nx, &ny, pl);
         sprintf(buffer, "%d %d %d", nx, ny, plane_id(pl));
         return 0;
     }
@@ -435,7 +435,7 @@ static int cr_regions(variant var, char *buffer, const void *userdata)
         int nx = r->x, ny = r->y;
 
         pnormalize(&nx, &ny, pl);
-        adjust_coordinates(f, &nx, &ny, pl, r);
+        adjust_coordinates(f, &nx, &ny, pl);
         wp += sprintf(wp, "\"%d %d %d", nx, ny, z);
         for (i = 1; i != rdata->nregions; ++i) {
             r = rdata->regions[i];
@@ -762,7 +762,7 @@ static void cr_output_unit(FILE * F, const region * r, const faction * f,       
     assert(u && u->number);
 
     fprintf(F, "EINHEIT %d\n", u->no);
-    fprintf(F, "\"%s\";Name\n", u->name);
+    fprintf(F, "\"%s\";Name\n", unit_getname(u));
     str = u_description(u, f->locale);
     if (str) {
         fprintf(F, "\"%s\";Beschr\n", str);
@@ -1226,7 +1226,7 @@ cr_output_resources(FILE * F, report_context * ctx, seen_region * sr)
 }
 
 static void
-cr_region_header(FILE * F, int plid, int nx, int ny, unsigned int uid)
+cr_region_header(FILE * F, int plid, int nx, int ny, int uid)
 {
     if (plid == 0) {
         fprintf(F, "REGION %d %d\n", nx, ny);
@@ -1261,7 +1261,7 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
     else {
         nx = r->x, ny = r->y;
         pnormalize(&nx, &ny, pl);
-        adjust_coordinates(f, &nx, &ny, pl, r);
+        adjust_coordinates(f, &nx, &ny, pl);
     }
 
     if (pl) {
@@ -1402,7 +1402,7 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
                     plane *plx = rplane(r);
 
                     pnormalize(&nx, &ny, plx);
-                    adjust_coordinates(f, &nx, &ny, plx, r);
+                    adjust_coordinates(f, &nx, &ny, plx);
                     fprintf(F, "SCHEMEN %d %d\n", nx, ny);
                     fprintf(F, "\"%s\";Name\n", rname(r, f->locale));
                     rl2 = rl2->next;
@@ -1627,7 +1627,7 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
             int nx = r->x, ny = r->y;
 
             pnormalize(&nx, &ny, pl);
-            adjust_coordinates(f, &nx, &ny, pl, r);
+            adjust_coordinates(f, &nx, &ny, pl);
             if (!plid)
                 fprintf(F, "BATTLE %d %d\n", nx, ny);
             else {

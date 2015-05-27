@@ -65,6 +65,9 @@ static void release_data(order_data * data)
 
 void replace_order(order ** dlist, order * orig, const order * src)
 {
+    assert(src);
+    assert(orig);
+    assert(dlist);
     while (*dlist != NULL) {
         order *dst = *dlist;
         if (dst->data == orig->data) {
@@ -249,7 +252,7 @@ static order_data *create_data(keyword_t kwd, const char *sptr, int lindex)
     return data;
 }
 
-static order *create_order_i(keyword_t kwd, const char *sptr, int persistent,
+static order *create_order_i(keyword_t kwd, const char *sptr, bool persistent,
     const struct locale *lang)
 {
     order *ord = NULL;
@@ -305,6 +308,7 @@ order *create_order(keyword_t kwd, const struct locale * lang,
                 switch (*params) {
                 case 's':
                     s = va_arg(marker, const char *);
+                    assert(s);
                     bytes = (int)strlcpy(bufp, s, size);
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
@@ -337,7 +341,7 @@ order *create_order(keyword_t kwd, const struct locale * lang,
     else {
         zBuffer[0] = 0;
     }
-    return create_order_i(kwd, zBuffer, 0, lang);
+    return create_order_i(kwd, zBuffer, false, lang);
 }
 
 order *parse_order(const char *s, const struct locale * lang)
@@ -350,11 +354,11 @@ order *parse_order(const char *s, const struct locale * lang)
     if (*s != 0) {
         keyword_t kwd;
         const char *sptr;
-        int persistent = 0;
+        bool persistent = false;
         const char * p;
 
         while (*s == '@') {
-            persistent = 1;
+            persistent = true;
             ++s;
         }
         sptr = s;
@@ -510,18 +514,15 @@ bool is_long(const order * ord)
 bool is_persistent(const order * ord)
 {
     keyword_t kwd = ORD_KEYWORD(ord);
-    int persist = ord->_persistent != 0;
     switch (kwd) {
     case K_MOVE:
     case NOKEYWORD:
         /* lang, aber niemals persistent! */
         return false;
-
     case K_KOMMENTAR:
         return true;
-
     default:
-        return persist || is_repeated(ord);
+        return ord->_persistent || is_repeated(ord);
     }
 }
 

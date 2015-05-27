@@ -47,6 +47,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/faction.h>
 #include <kernel/save.h>
 #include <kernel/spell.h>
+#include <kernel/spellbook.h>
 
 #include "creport.h"
 #include "economy.h"
@@ -93,7 +94,7 @@ TOLUA_PKG(game);
 int log_lua_error(lua_State * L)
 {
     const char *error = lua_tostring(L, -1);
-    log_error("LUA call failed.\n%s\n", error);
+    log_fatal("LUA call failed.\n%s\n", error);
     lua_pop(L, 1);
     return 1;
 }
@@ -117,7 +118,7 @@ static int tolua_quicklist_iter(lua_State * L)
     quicklist **qlp = (quicklist **)lua_touserdata(L, lua_upvalueindex(1));
     quicklist *ql = *qlp;
     if (ql != NULL) {
-        int index = lua_tointeger(L, lua_upvalueindex(2));
+        int index = (int)lua_tointeger(L, lua_upvalueindex(2));
         const char *type = lua_tostring(L, lua_upvalueindex(3));
         void *data = ql_get(ql, index);
         tolua_pushusertype(L, data, TOLUA_CAST type);
@@ -988,9 +989,22 @@ static int tolua_get_spell_level(lua_State * L)
 
 static int tolua_get_spell_name(lua_State * L)
 {
-    const struct locale *lang = default_locale;
     spell *self = (spell *)tolua_tousertype(L, 1, 0);
-    lua_pushstring(L, spell_name(self, lang));
+    lua_pushstring(L, self->sname);
+    return 1;
+}
+
+static int tolua_get_spell_entry_name(lua_State * L)
+{
+    spellbook_entry *self = (spellbook_entry*)tolua_tousertype(L, 1, 0);
+    lua_pushstring(L, self->sp->sname);
+    return 1;
+}
+
+static int tolua_get_spell_entry_level(lua_State * L)
+{
+    spellbook_entry *self = (spellbook_entry*)tolua_tousertype(L, 1, 0);
+    lua_pushinteger(L, self->level);
     return 1;
 }
 
@@ -1085,6 +1099,8 @@ int tolua_bindings_open(lua_State * L)
     tolua_bind_open(L);
 
     /* register user types */
+    tolua_usertype(L, TOLUA_CAST "spellbook");
+    tolua_usertype(L, TOLUA_CAST "spell_entry");
     tolua_usertype(L, TOLUA_CAST "spell");
     tolua_usertype(L, TOLUA_CAST "spell_list");
     tolua_usertype(L, TOLUA_CAST "order");
@@ -1112,11 +1128,15 @@ int tolua_bindings_open(lua_State * L)
         {
             tolua_function(L, TOLUA_CAST "__tostring", tolua_get_spell_name);
             tolua_variable(L, TOLUA_CAST "name", tolua_get_spell_name, 0);
-#ifdef TODO
-            tolua_variable(L, TOLUA_CAST "school", tolua_get_spell_school, 0);
-            tolua_variable(L, TOLUA_CAST "level", tolua_get_spell_level, 0);
-#endif
             tolua_variable(L, TOLUA_CAST "text", tolua_get_spell_text, 0);
+        } tolua_endmodule(L);
+        tolua_cclass(L, TOLUA_CAST "spell_entry", TOLUA_CAST "spell_entry", TOLUA_CAST "",
+            NULL);
+        tolua_beginmodule(L, TOLUA_CAST "spell_entry");
+        {
+            tolua_function(L, TOLUA_CAST "__tostring", tolua_get_spell_entry_name);
+            tolua_variable(L, TOLUA_CAST "name", tolua_get_spell_entry_name, 0);
+            tolua_variable(L, TOLUA_CAST "level", tolua_get_spell_entry_level, 0);
         } tolua_endmodule(L);
         tolua_module(L, TOLUA_CAST "report", 1);
         tolua_beginmodule(L, TOLUA_CAST "report");

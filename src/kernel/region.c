@@ -42,7 +42,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/bsdstring.h>
-#include <util/goodies.h>
+#include <util/strings.h>
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/resolve.h>
@@ -121,7 +121,7 @@ const char *write_regionname(const region * r, const faction * f, char *buffer,
         plane *pl = rplane(r);
         int nx = r->x, ny = r->y;
         pnormalize(&nx, &ny, pl);
-        adjust_coordinates(f, &nx, &ny, pl, r);
+        adjust_coordinates(f, &nx, &ny, pl);
         slprintf(buf, size, "%s (%d,%d)", rname(r, lang), nx, ny);
     }
     return buffer;
@@ -537,11 +537,12 @@ attrib_type at_travelunit = {
     NO_READ
 };
 
-void rsetroad(region * r, direction_t d, short val)
+void rsetroad(region * r, direction_t d, int val)
 {
     connection *b;
     region *r2 = rconnect(r, d);
 
+    assert(val>=SHRT_MIN && val<=SHRT_MAX);
     if (!r2) {
         return;
     }
@@ -554,14 +555,14 @@ void rsetroad(region * r, direction_t d, short val)
         b = new_border(&bt_road, r, r2);
     }
     if (r == b->from) {
-        b->data.sa[0] = val;
+        b->data.sa[0] = (short)val;
     }
     else {
-        b->data.sa[1] = val;
+        b->data.sa[1] = (short)val;
     }
 }
 
-short rroad(const region * r, direction_t d)
+int rroad(const region * r, direction_t d)
 {
     connection *b;
     region *r2 = rconnect(r, d);
@@ -611,8 +612,8 @@ int rpeasants(const region * r)
 
 void rsetpeasants(region * r, int value)
 {
-    ((r)->land ? ((r)->land->peasants =
-        (value)) : (assert((value) >= 0), (value)), 0);
+    if (r->land) r->land->peasants = value;
+    else assert(value>=0);
 }
 
 int rmoney(const region * r)
@@ -634,8 +635,8 @@ int rhorses(const region * r)
 
 void rsetmoney(region * r, int value)
 {
-    ((r)->land ? ((r)->land->money =
-        (value)) : (assert((value) >= 0), (value)), 0);
+    if (r->land) r->land->money = value;
+    else assert(value >= 0);
 }
 
 void r_setdemand(region * r, const luxury_type * ltype, int value)

@@ -54,6 +54,8 @@ int RunAllTests(void)
   RUN_TESTS(suite, unicode);
   RUN_TESTS(suite, strings);
   RUN_TESTS(suite, rng);
+  /* items */
+  RUN_TESTS(suite, xerewards);
   /* kernel */
   RUN_TESTS(suite, alliance);
   RUN_TESTS(suite, unit);
@@ -71,6 +73,7 @@ int RunAllTests(void)
   RUN_TESTS(suite, spellbook);
   RUN_TESTS(suite, building);
   RUN_TESTS(suite, spell);
+  RUN_TESTS(suite, spells);
   RUN_TESTS(suite, ally);
   RUN_TESTS(suite, messages);
   /* gamecode */
@@ -84,6 +87,7 @@ int RunAllTests(void)
   RUN_TESTS(suite, upkeep);
   RUN_TESTS(suite, vortex);
   RUN_TESTS(suite, wormhole);
+  RUN_TESTS(suite, spy);
 
   printf("\ntest summary: %d tests, %d failed\n", suite->count, suite->failCount);
   log_flags = flags;

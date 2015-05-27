@@ -342,10 +342,36 @@ void test_shipowner_goes_to_empty_unit_after_leave(CuTest * tc)
     CuAssertPtrEquals(tc, u2, ship_owner(sh));
 }
 
+static void test_stype_defaults(CuTest *tc) {
+    ship_type *stype;
+    test_cleanup();
+    stype = st_get_or_create("hodor");
+    CuAssertPtrNotNull(tc, stype);
+    CuAssertStrEquals(tc, "hodor", stype->_name);
+    CuAssertPtrEquals(tc, 0, stype->construction);
+    CuAssertPtrEquals(tc, 0, stype->coasts);
+    CuAssertDblEquals(tc, 0.0, stype->damage, 0.0);
+    CuAssertDblEquals(tc, 1.0, stype->storm, 0.0);
+    CuAssertDblEquals(tc, 0.0, stype->tac_bonus, 0.0);
+    CuAssertIntEquals(tc, 0, stype->cabins);
+    CuAssertIntEquals(tc, 0, stype->cargo);
+    CuAssertIntEquals(tc, 0, stype->combat);
+    CuAssertIntEquals(tc, 0, stype->fishing);
+    CuAssertIntEquals(tc, 0, stype->range);
+    CuAssertIntEquals(tc, 0, stype->cptskill);
+    CuAssertIntEquals(tc, 0, stype->minskill);
+    CuAssertIntEquals(tc, 0, stype->sumskill);
+    CuAssertIntEquals(tc, 0, stype->at_bonus);
+    CuAssertIntEquals(tc, 0, stype->df_bonus);
+    CuAssertIntEquals(tc, 0, stype->flags);
+    test_cleanup();
+}
+
 CuSuite *get_ship_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_register_ship);
+    SUITE_ADD_TEST(suite, test_stype_defaults);
     SUITE_ADD_TEST(suite, test_ship_set_owner);
     SUITE_ADD_TEST(suite, test_shipowner_resets_when_empty);
     SUITE_ADD_TEST(suite, test_shipowner_goes_to_next_when_empty);

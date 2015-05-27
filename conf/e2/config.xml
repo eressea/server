@@ -94,6 +94,8 @@
     <param name="hunger.long" value="1"/>
     <param name="init_spells" value="0"/>
     <param name="rules.reserve.twophase" value="1"/>
+    <param name="rules.owners.force_leave" value="1"/>
+    <param name="rules.give.max_men" value="-1"/>
     <param name="rules.check_overload" value="0"/>
     <param name="rules.limit.faction" value="2500"/>
     <param name="rules.maxskills.magic" value="5"/>

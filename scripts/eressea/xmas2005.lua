@@ -11,8 +11,7 @@ function use_stardust(u, amount)
   u.region:set_resource("peasant", p)
   local msg = usepotion_message(u, "stardust")
   msg:send_region(u.region)
-  u:use_pooled("stardust", amount)
-  return 0
+  return amount
 end
 
 local self = {}

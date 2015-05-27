@@ -147,6 +147,7 @@ message *msg_message(const char *name, const char *sig, ...)
     const message_type *mtype = mt_find(name);
     char paramname[64];
     const char *ic = sig;
+    int argnum=0;
     variant args[16];
     memset(args, 0, sizeof(args));
 
@@ -183,6 +184,7 @@ message *msg_message(const char *name, const char *sig, ...)
             else {
                 assert(!"unknown variant type");
             }
+            argnum++;
         }
         else {
             log_error("invalid parameter %s for message type %s\n", paramname, mtype->name);
@@ -192,6 +194,10 @@ message *msg_message(const char *name, const char *sig, ...)
             ic++;
     }
     va_end(vargs);
+    if (argnum !=  mtype->nparameters) {
+        log_error("not enough parameters for message type %s\n", mtype->name);
+        assert(!"program aborted.");
+    }
 
     return msg_create(mtype, args);
 }
@@ -276,6 +282,13 @@ message * cmistake(const unit * u, struct order *ord, int mno, int mtype)
     return result;
 }
 
+void syntax_error(const struct unit *u, struct order *ord)
+{
+    message * result;
+    result = msg_error(u, ord, 10);
+    ADDMSG(&u->faction->msgs, result);
+}
+
 extern unsigned int new_hashstring(const char *s);
 
 void free_messagelist(message_list * msgs)
@@ -292,6 +305,7 @@ void free_messagelist(message_list * msgs)
 
 message *add_message(message_list ** pm, message * m)
 {
+    assert(m->type);
     if (!lomem && m != NULL) {
         struct mlist *mnew = malloc(sizeof(struct mlist));
         if (*pm == NULL) {
