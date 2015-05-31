@@ -101,13 +101,7 @@ static void test_memstream(CuTest *tc) {
     char buf[1024];
     int val=0;
 
-#ifdef FILESTREAMTEST
-    FILE *F;
-    F = fopen("test.dat", "wb");
-    fstream_init(&out, F);
-#else
     mstream_init(&out);
-#endif
     binstore_init(&store, &out);
     store.handle.data = &out;
 
@@ -115,11 +109,6 @@ static void test_memstream(CuTest *tc) {
     WRITE_TOK(&store, "fortytwo");
     WRITE_INT(&store, 42);
 
-#ifdef FILESTREAMTEST
-    fstream_done(&out);
-    F = fopen("test.dat", "rb");
-    fstream_init(&out, F);
-#endif
     out.api->rewind(out.handle);
     READ_INT(&store, &val);
     READ_TOK(&store, buf, 1024);
@@ -127,6 +116,7 @@ static void test_memstream(CuTest *tc) {
     CuAssertStrEquals(tc, "fortytwo", buf);
     READ_INT(&store, &val);
     CuAssertIntEquals(tc, 42, val);
+    mstream_done(&out);
 }
 
 static void test_write_flag(CuTest *tc) {
@@ -135,24 +125,14 @@ static void test_write_flag(CuTest *tc) {
     char buf[1024];
     stream out = { 0 };
     size_t len;
-#ifdef FILESTREAMTEST
-    FILE *F;
-    F = fopen("test.dat", "wb");
-    fstream_init(&out, F);
-#else
+
     mstream_init(&out);
-#endif
     binstore_init(&store, &out);
     store.handle.data = &out;
 
     setup_curse(&fix, "gbdream");
     fix.c->flags = 42 | CURSE_ISNEW;
     curse_write(fix.r->attribs, fix.r, &store);
-#ifdef FILESTREAMTEST
-    fstream_done(&out);
-    F = fopen("test.dat", "rb");
-    fstream_init(&out, F);
-#endif
     out.api->rewind(out.handle);
     len = out.api->read(out.handle, buf, sizeof(buf));
     buf[len] = '\0';
@@ -162,11 +142,7 @@ static void test_write_flag(CuTest *tc) {
     global.data_version = RELEASE_VERSION;
     CuAssertIntEquals(tc, RELEASE_VERSION, global.data_version);
 
-#ifdef FILESTREAMTEST
-    fstream_done(&out);
-#else
     mstream_done(&out);
-#endif
     binstore_done(&store);
     test_cleanup();
 }
