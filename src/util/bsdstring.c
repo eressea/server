@@ -20,7 +20,7 @@ int wrptr(char **ptr, size_t * size, size_t bytes)
 
     *ptr += *size;
     *size = 0;
-    return ENAMETOOLONG;
+    return ERANGE;
 }
 
 #ifndef HAVE_STRLCPY
