@@ -20,6 +20,7 @@ extern "C" {
     struct state;
     struct region;
     struct terrain_type;
+    struct newfaction;
 
   int gmmain(int argc, char *argv[]);
   int curses_readline(struct lua_State *L, char *buffer, size_t size,
@@ -35,7 +36,7 @@ extern "C" {
   void state_close(struct state *);
 
   void make_block(int x, int y, int radius, const struct terrain_type *terrain);
-  void seed_players(const char *filename, bool new_island);
+  void seed_players(struct newfaction **players, bool new_island);
 
 #ifdef __cplusplus
 }

@@ -93,6 +93,9 @@
     <param name="GiveRestriction" value="3"/>
     <param name="hunger.long" value="1"/>
     <param name="init_spells" value="0"/>
+    <param name="world.era" value="2"/>
+    <param name="seed.population.min" value="8"/>
+    <param name="seed.population.max" value="8"/>
     <param name="rules.reserve.twophase" value="1"/>
     <param name="rules.owners.force_leave" value="1"/>
     <param name="rules.give.max_men" value="-1"/>

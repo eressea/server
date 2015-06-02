@@ -116,6 +116,8 @@
     <param name="study.expensivemigrants" value="1"/>
     <param name="study.speedup" value="2"/>
     <param name="world.era" value="3"/>
+    <param name="seed.population.min" value="8"/>
+    <param name="seed.population.max" value="8"/>
     <param name="rules.migrants" value="0"/>
     <param name="rules.reserve.twophase" value="1"/>
     <param name="rules.owners.force_leave" value="1"/>
