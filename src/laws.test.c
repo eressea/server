@@ -696,12 +696,11 @@ static void test_reserve_self(CuTest *tc) {
 
 static void statistic_test(CuTest *tc, int peasants, int luck, int maxp,
     double variance, int min_value, int max_value) {
-    int effect, i;
-    for (i = 0; i < 1000; ++i) {
-        effect = peasant_luck_effect(peasants, luck, maxp, variance);
-        CuAssertTrue(tc, min_value <= effect);
-        CuAssertTrue(tc, max_value >= effect);
-    }
+    int effect;
+
+    effect = peasant_luck_effect(peasants, luck, maxp, variance);
+    CuAssertTrue(tc, min_value <= effect);
+    CuAssertTrue(tc, max_value >= effect);
 }
 
 static void test_peasant_luck_effect(CuTest *tc) {
@@ -713,6 +712,13 @@ static void test_peasant_luck_effect(CuTest *tc) {
 
     statistic_test(tc, 100, 0, 1000, 0, 0, 0);
     statistic_test(tc, 100, 2, 1000, 0, 1, 1);
+<<<<<<< HEAD
+=======
+/*    
+    statistic_test(tc, 1000, 400, 1000, 0, (int)(400 * 10 * 0.001 * .75),
+        (int)(400 * 10 * 0.001 * .75));
+ */
+>>>>>>> master
     statistic_test(tc, 1000, 400, 1000, 0, 3, 3);
     statistic_test(tc, 1000, 1000, 2000, .5, 1, 501);
 

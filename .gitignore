@@ -36,3 +36,4 @@ game-e3/reports/
 *.log.*
 tags
 Thumbs.db
+.gdb_history
