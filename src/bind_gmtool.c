@@ -152,7 +152,7 @@ static int tolua_make_island(lua_State * L)
     int s = (int)tolua_tonumber(L, 3, 0);
     int n = (int)tolua_tonumber(L, 4, s / 3);
 
-    n = build_island_e3(x, y, n, s);
+    n = build_island_e3(NULL, x, y, n, s);
     tolua_pushnumber(L, n);
     return 1;
 }
