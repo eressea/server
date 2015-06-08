@@ -61,8 +61,14 @@ static void test_give_unit(CuTest * tc) {
     env.f2 = test_create_faction(0);
     setup_give(&env);
     env.r->terrain = test_create_terrain("ocean", SEA_REGION);
+    set_param(&global.parameters, "rules.give.max_men", "0");
+    give_unit(env.src, env.dst, NULL);
+    CuAssertPtrEquals(tc, env.f1, env.src->faction);
+    CuAssertIntEquals(tc, 0, env.f2->newbies);
+    set_param(&global.parameters, "rules.give.max_men", "-1");
     give_unit(env.src, env.dst, NULL);
     CuAssertPtrEquals(tc, env.f2, env.src->faction);
+    CuAssertIntEquals(tc, 1, env.f2->newbies);
     CuAssertPtrEquals(tc, 0, env.f1->units);
     test_cleanup();
 }
