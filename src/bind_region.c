@@ -62,7 +62,7 @@ int tolua_regionlist_next(lua_State * L)
 static int tolua_region_get_id(lua_State * L)
 {
     region *self = (region *)tolua_tousertype(L, 1, 0);
-    tolua_pushnumber(L, (lua_Number)self->uid);
+    lua_pushinteger(L, self->uid);
     return 1;
 }
 
@@ -85,14 +85,14 @@ static int tolua_region_set_blocked(lua_State * L)
 static int tolua_region_get_x(lua_State * L)
 {
     region *self = (region *)tolua_tousertype(L, 1, 0);
-    tolua_pushnumber(L, (lua_Number)self->x);
+    lua_pushinteger(L, self->x);
     return 1;
 }
 
 static int tolua_region_get_y(lua_State * L)
 {
     region *self = (region *)tolua_tousertype(L, 1, 0);
-    tolua_pushnumber(L, (lua_Number)self->y);
+    lua_pushinteger(L, self->y);
     return 1;
 }
 
@@ -199,7 +199,7 @@ static int tolua_region_set_name(lua_State * L)
 static int tolua_region_get_morale(lua_State * L)
 {
     region *r = (region *)tolua_tousertype(L, 1, 0);
-    tolua_pushnumber(L, region_get_morale(r));
+    lua_pushinteger(L, region_get_morale(r));
     return 1;
 }
 
@@ -323,7 +323,7 @@ static int tolua_region_get_resourcelevel(lua_State * L)
         const rawmaterial *rm;
         for (rm = r->resources; rm; rm = rm->next) {
             if (rm->type->rtype == rtype) {
-                tolua_pushnumber(L, (lua_Number)rm->level);
+                lua_pushinteger(L, rm->level);
                 return 1;
             }
         }
@@ -389,7 +389,7 @@ static int tolua_region_get_resource(lua_State * L)
         }
     }
 
-    tolua_pushnumber(L, (lua_Number)result);
+    lua_pushinteger(L, result);
     return 1;
 }
 
@@ -613,7 +613,7 @@ static int tolua_plane_set_name(lua_State * L)
 static int tolua_plane_get_id(lua_State * L)
 {
     plane *self = (plane *)tolua_tousertype(L, 1, 0);
-    tolua_pushnumber(L, (lua_Number)self->id);
+    lua_pushinteger(L, self->id);
     return 1;
 }
 
@@ -623,8 +623,8 @@ static int tolua_plane_normalize(lua_State * L)
     int x = (int)tolua_tonumber(L, 2, 0);
     int y = (int)tolua_tonumber(L, 3, 0);
     pnormalize(&x, &y, self);
-    tolua_pushnumber(L, (lua_Number)x);
-    tolua_pushnumber(L, (lua_Number)y);
+    lua_pushinteger(L, x);
+    lua_pushinteger(L, y);
     return 2;
 }
 
