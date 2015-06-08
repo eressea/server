@@ -26,8 +26,11 @@ extern "C" {
 #error "must define SCORE_MODULE to use this module"
 #endif
 
-    extern void score(void);
-    extern int average_score_of_age(int age, int a);
+    struct item_type;
+
+    void score(void);
+    int average_score_of_age(int age, int a);
+    int default_score(const struct item_type *itype);
 
 #ifdef __cplusplus
 }

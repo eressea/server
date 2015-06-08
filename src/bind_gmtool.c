@@ -153,7 +153,7 @@ static int tolua_make_island(lua_State * L)
     int n = (int)tolua_tonumber(L, 4, s / 3);
 
     n = build_island_e3(NULL, x, y, n, s);
-    tolua_pushnumber(L, n);
+    lua_pushinteger(L, n);
     return 1;
 }
 
@@ -166,8 +166,8 @@ static void lua_paint_info(struct window *wnd, const struct state *st)
     int nx = st->cursor.x, ny = st->cursor.y;
     pnormalize(&nx, &ny, st->cursor.pl);
     lua_rawgeti(L, LUA_REGISTRYINDEX, paint_handle);
-    tolua_pushnumber(L, nx);
-    tolua_pushnumber(L, ny);
+    lua_pushinteger(L, nx);
+    lua_pushinteger(L, ny);
     if (lua_pcall(L, 2, 1, 0) != 0) {
         const char *error = lua_tostring(L, -1);
         log_error("paint function failed: %s\n", error);

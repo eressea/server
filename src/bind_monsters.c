@@ -21,7 +21,7 @@ static int tolua_levitate_ship(lua_State * L)
     float power = (float)tolua_tonumber(L, 3, 0);
     int duration = (int)tolua_tonumber(L, 4, 0);
     int cno = levitate_ship(sh, mage, power, duration);
-    tolua_pushnumber(L, (lua_Number)cno);
+    lua_pushinteger(L, cno);
     return 1;
 }
 

@@ -58,7 +58,7 @@ lua_giveitem(unit * s, unit * d, const item_type * itype, int n, struct order *o
         tolua_pushusertype(L, s, TOLUA_CAST "unit");
         tolua_pushusertype(L, d, TOLUA_CAST "unit");
         tolua_pushstring(L, iname);
-        tolua_pushnumber(L, (lua_Number)n);
+        lua_pushinteger(L, n);
 
         if (lua_pcall(L, 4, 1, 0) != 0) {
             const char *error = lua_tostring(L, -1);
@@ -121,7 +121,7 @@ produce_resource(region * r, const resource_type * rtype, int norders)
     lua_getglobal(L, fname);
     if (lua_isfunction(L, -1)) {
         tolua_pushusertype(L, (void *)r, TOLUA_CAST "region");
-        tolua_pushnumber(L, (lua_Number)norders);
+        lua_pushinteger(L, norders);
 
         if (lua_pcall(L, 2, 0, 0) != 0) {
             const char *error = lua_tostring(L, -1);
@@ -177,8 +177,8 @@ static int lua_callspell(castorder * co)
         int nparam = 4;
         tolua_pushusertype(L, r, TOLUA_CAST "region");
         tolua_pushusertype(L, caster, TOLUA_CAST "unit");
-        tolua_pushnumber(L, (lua_Number)co->level);
-        tolua_pushnumber(L, (lua_Number)co->force);
+        lua_pushinteger(L, co->level);
+        lua_pushnumber(L, co->force);
         if (co->sp->parameter && co->par->length) {
             const char *synp = co->sp->parameter;
             int i = 0;
@@ -267,7 +267,7 @@ lua_changeresource(unit * u, const struct resource_type *rtype, int delta)
     lua_getglobal(L, fname);
     if (lua_isfunction(L, -1)) {
         tolua_pushusertype(L, u, TOLUA_CAST "unit");
-        tolua_pushnumber(L, (lua_Number)delta);
+        lua_pushinteger(L, delta);
 
         if (lua_pcall(L, 2, 1, 0) != 0) {
             const char *error = lua_tostring(L, -1);
@@ -363,7 +363,7 @@ lua_wage(const region * r, const faction * f, const race * rc, int in_turn)
         tolua_pushusertype(L, (void *)r, TOLUA_CAST "region");
         tolua_pushusertype(L, (void *)f, TOLUA_CAST "faction");
         tolua_pushstring(L, rc ? rc->_name : 0);
-        tolua_pushnumber(L, (lua_Number)in_turn);
+        lua_pushinteger(L, in_turn);
 
         if (lua_pcall(L, 3, 1, 0) != 0) {
             const char *error = lua_tostring(L, -1);
@@ -416,7 +416,7 @@ static double lua_building_taxes(building * b, int level)
     lua_getglobal(L, fname);
     if (lua_isfunction(L, -1)) {
         tolua_pushusertype(L, (void *)b, TOLUA_CAST "building");
-        tolua_pushnumber(L, level);
+        lua_pushinteger(L, level);
 
         if (lua_pcall(L, 2, 1, 0) != 0) {
             const char *error = lua_tostring(L, -1);
@@ -508,7 +508,7 @@ struct order *ord)
     lua_getglobal(L, fname);
     if (lua_isfunction(L, -1)) {
         tolua_pushusertype(L, (void *)u, TOLUA_CAST "unit");
-        tolua_pushnumber(L, (lua_Number)amount);
+        lua_pushinteger(L, amount);
 
         if (lua_pcall(L, 2, 1, 0) != 0) {
             const char *error = lua_tostring(L, -1);
