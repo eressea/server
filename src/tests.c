@@ -31,7 +31,7 @@ struct race *test_create_race(const char *name)
 {
     race *rc = rc_get_or_create(name);
     rc->maintenance = 10;
-    rc->ec_flags |= GETITEM | GIVEITEM;
+    rc->ec_flags |= GETITEM;
     return rc;
 }
 
@@ -174,6 +174,11 @@ void test_create_world(void)
     itype->flags |= ITF_BIG | ITF_ANIMAL;
     itype->weight = 5000;
     itype->capacity = 7000;
+
+    itype = test_create_itemtype("cart");
+    itype->flags |= ITF_BIG | ITF_VEHICLE;
+    itype->weight = 4000;
+    itype->capacity = 14000;
 
     test_create_itemtype("iron");
     test_create_itemtype("stone");

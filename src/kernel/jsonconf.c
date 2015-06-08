@@ -62,6 +62,7 @@ static int json_flags(cJSON *json, const char *flags[]) {
             for (i = 0; flags[i]; ++i) {
                 if (strcmp(flags[i], entry->valuestring) == 0) {
                     result |= (1 << i);
+                    break;
                 }
             }
         }
@@ -344,7 +345,7 @@ static void json_race(cJSON *json, race *rc) {
         "coastal", "", "cansail", 0
     };
     const char *ecflags[] = {
-        "", "giveitem", "giveperson",
+        "", "keepitem", "giveperson",
         "giveunit", "getitem", 0
     };
     if (json->type != cJSON_Object) {

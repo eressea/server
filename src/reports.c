@@ -70,6 +70,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "move.h"
 
+#define SCALEWEIGHT      100    /* Faktor, um den die Anzeige von Gewichten skaliert wird */
+
 bool nocr = false;
 bool nonr = false;
 bool noreports = false;
@@ -124,18 +126,24 @@ const char *report_kampfstatus(const unit * u, const struct locale *lang)
 
 const char *hp_status(const unit * u)
 {
-    double p = (double)((double)u->hp / (double)(u->number * unit_max_hp(u)));
+    double p;
+    int max_hp = u->number * unit_max_hp(u);
 
-    if (p > 2.00)
-        return mkname("damage", "critical");
-    if (p > 1.50)
-        return mkname("damage", "heavily");
+    if (u->hp ==  max_hp)
+        return NULL;
+
+    p = (double)((double)u->hp / (double)(max_hp));
+
     if (p < 0.50)
         return mkname("damage", "badly");
     if (p < 0.75)
         return mkname("damage", "wounded");
     if (p < 0.99)
         return mkname("damage", "exhausted");
+    if (p > 2.00)
+        return mkname("damage", "plusstrong");
+    if (p > 1.50)
+        return mkname("damage", "strong");
 
     return NULL;
 }
@@ -1833,8 +1841,14 @@ static void write_script(FILE * F, const faction * f)
     fputc('\n', F);
 }
 
+static void check_messages_exist(void) {
+    ct_checknames();
+}
+
 int init_reports(void)
 {
+    check_messages_exist();
+
     prepare_reports();
     {
         if (_access(reportpath(), 0) != 0) {
@@ -2050,6 +2064,7 @@ static void eval_spell(struct opstack **stack, const void *userdata)
     const struct spell *sp = (const struct spell *)opop(stack).v;
     const char *c =
         sp ? spell_name(sp, f->locale) : LOC(f->locale, "an_unknown_spell");
+    assert(c || !"spell without description!");
     size_t len = strlen(c);
     variant var;
 
@@ -2063,6 +2078,7 @@ static void eval_curse(struct opstack **stack, const void *userdata)
     const struct curse_type *sp = (const struct curse_type *)opop(stack).v;
     const char *c =
         sp ? curse_name(sp, f->locale) : LOC(f->locale, "an_unknown_curse");
+    assert(c || !"spell effect without description!");
     size_t len = strlen(c);
     variant var;
 
@@ -2074,7 +2090,7 @@ static void eval_unitname(struct opstack **stack, const void *userdata)
 {                               /* unit -> string */
     const struct faction *f = (const struct faction *)userdata;
     const struct unit *u = (const struct unit *)opop(stack).v;
-    const char *c = u ? u->name : LOC(f->locale, "an_unknown_unit");
+    const char *c = u ? unit_getname(u) : LOC(f->locale, "an_unknown_unit");
     size_t len = strlen(c);
     variant var;
 
@@ -2086,7 +2102,7 @@ static void eval_unitid(struct opstack **stack, const void *userdata)
 {                               /* unit -> int */
     const struct faction *f = (const struct faction *)userdata;
     const struct unit *u = (const struct unit *)opop(stack).v;
-    const char *c = u ? u->name : LOC(f->locale, "an_unknown_unit");
+    const char *c = u ? unit_getname(u) : LOC(f->locale, "an_unknown_unit");
     size_t len = strlen(c);
     variant var;
 

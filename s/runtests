@@ -1,4 +1,6 @@
 #!/bin/bash
+set -e
+
 ROOT=$(pwd)
 while [ ! -d $ROOT/.git ]; do
   ROOT=$(dirname $ROOT)
@@ -19,5 +21,6 @@ $ROOT/$BIN_DIR/eressea/test_eressea
 cd $ROOT
 [ -e eressea.ini ] || ln -sf conf/eressea.ini
 $ROOT/$BIN_DIR/eressea/eressea -v0 scripts/run-tests.lua
+$ROOT/$BIN_DIR/eressea/eressea -v0 scripts/run-tests-e2.lua
 $ROOT/$BIN_DIR/eressea/eressea -v0 scripts/run-tests-e3.lua
 cd $OLDWPD

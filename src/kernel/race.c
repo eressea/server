@@ -169,6 +169,7 @@ const race * rc_find(const char *name) {
 race *rc_get_or_create(const char *zName)
 {
     race *rc;
+    int i;
 
     assert(zName);
     rc = rc_find_i(zName);
@@ -191,7 +192,8 @@ race *rc_get_or_create(const char *zName)
         rc->precombatspell = NULL;
 
         rc->attack[0].type = AT_COMBATSPELL;
-        rc->attack[1].type = AT_NONE;
+        for (i = 1; i < RACE_ATTACKS; ++i)
+            rc->attack[i].type = AT_NONE;
         rc->index = num_races++;
         ++cache_breaker;
         rc->next = races;

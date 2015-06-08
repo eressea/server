@@ -314,8 +314,11 @@ int walkingcapacity(const struct unit *u)
         }
     }
     if (rbelt) {
-        int tmp = i_get(u->items, rbelt->itype);
-        n += _min(people, tmp) * (STRENGTHMULTIPLIER - 1) * personcapacity(u);
+        int belts = i_get(u->items, rbelt->itype);
+        if (belts) {
+            int multi = get_param_int(global.parameters, "rules.trollbelt.multiplier", STRENGTHMULTIPLIER);
+            n += _min(people, belts) * (multi - 1) * u_race(u)->capacity;
+        }
     }
 
     return n;
@@ -2310,10 +2313,11 @@ static void travel(unit * u, region_list ** routep)
         if (uf->region == r) {
             order *follow_order;
             const struct locale *lang = u->faction->locale;
-
+            const char *s = LOC(uf->faction->locale, parameters[P_UNIT]);
             /* construct an order */
+            assert(s || !"missing translation for UNIT keyword");
             follow_order = create_order(K_FOLLOW, lang, "%s %i",
-                LOC(uf->faction->locale, parameters[P_UNIT]), ut->no);
+                s, ut->no);
 
             route_end = reroute(uf, route_begin, route_end);
             travel_i(uf, route_begin, route_end, follow_order, TRAVEL_FOLLOWING,

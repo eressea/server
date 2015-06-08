@@ -1,3 +1,4 @@
+#pragma once
 /*
 Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
@@ -19,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifndef H_KRNL_REPORTS
 #define H_KRNL_REPORTS
 
+#include <platform.h>
 #include <time.h>
 #include <kernel/objtypes.h>
 #include <kernel/types.h>

@@ -305,6 +305,7 @@ order *create_order(keyword_t kwd, const struct locale * lang,
                 switch (*params) {
                 case 's':
                     s = va_arg(marker, const char *);
+                    assert(s);
                     bytes = (int)strlcpy(bufp, s, size);
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();

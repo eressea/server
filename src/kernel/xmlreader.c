@@ -1610,7 +1610,7 @@ static int parse_races(xmlDocPtr doc)
         xmlChar *propValue;
         race *rc;
         xmlXPathObjectPtr result;
-        int k, study_speed_base;
+        int k, study_speed_base, attacks;
         struct att *attack;
 
         propValue = xmlGetProp(node, BAD_CAST "name");
@@ -1693,8 +1693,8 @@ static int parse_races(xmlDocPtr doc)
         if (xml_bvalue(node, "irongolem", false))
             rc->flags |= RCF_IRONGOLEM;
 
-        if (xml_bvalue(node, "giveitem", false))
-            rc->ec_flags |= GIVEITEM;
+        if (xml_bvalue(node, "keepitem", false))
+            rc->ec_flags |= ECF_KEEP_ITEM;
         if (xml_bvalue(node, "giveperson", false))
             rc->ec_flags |= GIVEPERSON;
         if (xml_bvalue(node, "giveunit", false))
@@ -1838,10 +1838,16 @@ static int parse_races(xmlDocPtr doc)
         xpath->node = node;
         result = xmlXPathEvalExpression(BAD_CAST "attack", xpath);
         attack = rc->attack;
+        attacks = 0;
         for (k = 0; k != result->nodesetval->nodeNr; ++k) {
             xmlNodePtr node = result->nodesetval->nodeTab[k];
-            while (attack->type != AT_NONE)
+            while (attack->type != AT_NONE) {
                 ++attack;
+                if (attacks++ >= RACE_ATTACKS) {
+                    log_error("too many attacks for race '%s'\n", rc->_name);
+                    assert(!"aborting");
+                }
+            }
 
             propValue = xmlGetProp(node, BAD_CAST "damage");
             if (propValue != NULL) {

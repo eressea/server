@@ -297,7 +297,7 @@ static int tolua_faction_set_origin(lua_State * L)
     plane *pl = rplane(r);
     int id = pl ? pl->id : 0;
 
-    set_ursprung(f, id, r->x - plane_center_x(pl), r->y - plane_center_y(pl));
+    set_origin(f, id, r->x - plane_center_x(pl), r->y - plane_center_y(pl));
     return 0;
 }
 
@@ -344,14 +344,14 @@ static int tolua_faction_create(lua_State * L)
     const char *email = tolua_tostring(L, 1, 0);
     const char *racename = tolua_tostring(L, 2, 0);
     const char *lang = tolua_tostring(L, 3, 0);
-    struct locale *loc = get_locale(lang);
+    struct locale *loc = lang ? get_locale(lang) : default_locale;
     faction *f = NULL;
-    const struct race *frace = rc_find(racename);
+    const struct race *frace = rc_find(racename ? racename : "human");
     if (frace != NULL) {
         f = addfaction(email, NULL, frace, loc, 0);
     }
     if (!f) {
-        log_error("faction.create(%s, %s, %s)\n", email, racename, lang);
+        log_error("faction.create(%s, %s, %s)\n", email, racename, locale_name(loc));
     }
     tolua_pushusertype(L, f, TOLUA_CAST "faction");
     return 1;
@@ -507,14 +507,6 @@ static int tolua_faction_tostring(lua_State * L)
     return 1;
 }
 
-#ifdef TODO /* these usertypes are undefined */
-static int tolua_faction_get_spells(lua_State * L)
-{
-    faction *self = (faction *) tolua_tousertype(L, 1, 0);
-    return tolua_quicklist_push(L, "spellbook", "spellbook_entry", self->spellbook->spells);
-}
-#endif
-
 void tolua_faction_open(lua_State * L)
 {
     /* register user types */
@@ -544,9 +536,6 @@ void tolua_faction_open(lua_State * L)
                 &tolua_faction_set_info);
             tolua_variable(L, TOLUA_CAST "units", tolua_faction_get_units, NULL);
             tolua_variable(L, TOLUA_CAST "heroes", tolua_faction_get_heroes, NULL);
-#ifdef TODO
-            tolua_variable(L, TOLUA_CAST "spells", tolua_faction_get_spells, 0);
-#endif
             tolua_variable(L, TOLUA_CAST "maxheroes", tolua_faction_get_maxheroes,
                 NULL);
             tolua_variable(L, TOLUA_CAST "password", tolua_faction_get_password,

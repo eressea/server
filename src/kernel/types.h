@@ -167,7 +167,7 @@ enum {
   O_REPORT,                     /* 1 */
   O_COMPUTER,                   /* 2 */
   O_ZUGVORLAGE,                 /* 4 */
-  O_UNUSED_3,
+  O_JSON,                       /* 8 */
   O_STATISTICS,                 /* 16 */
   O_DEBUG,                      /* 32 */
   O_COMPRESS,                   /* 64 */

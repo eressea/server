@@ -44,3 +44,25 @@ function test_blessedharvest_lasts_n_turn()
     process_orders()
     assert_equal(900, r:get_resource("money"))
 end
+
+function test_magic()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "halfling", "de")
+    local u = unit.create(f, r)
+    local b = building.create(r, "castle")
+
+    u.race = "dwarf"
+    u.magic = "gwyrrd"
+    u:set_skill("magic", 30)
+    u.aura = 300
+
+    u:add_spell("protective_runes")
+    u:add_spell("analyze_magic")
+    u:clear_orders()
+    u:add_order("ZAUBERE \"Runen des Schutzes\" BURG " .. itoa36(b.id));
+    u.building = b
+    u:add_order("ZAUBERE \"Magie analysieren\" BURG " .. itoa36(b.id));
+    process_orders()
+--  there used to be a SEGFAULT when writing reports here:
+--    write_reports()
+end

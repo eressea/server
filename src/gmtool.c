@@ -423,7 +423,7 @@ static void paint_info_region(window * wnd, const state * st)
             wattroff(win, A_BOLD | COLOR_PAIR(COLOR_YELLOW));
             for (u = r->units; u && line < maxline; u = u->next) {
                 mvwprintw(win, line, 1, "%.4s ", itoa36(u->no));
-                mvwaddnstr(win, line++, 6, (char *)u->name, size - 5);
+                mvwaddnstr(win, line++, 6, unit_getname(u), size - 5);
             }
         }
     }
@@ -929,6 +929,7 @@ static void handlekey(state * st, int c)
             }
         }
         break;
+    case 'f':
     case 0x14:                 /* C-t */
         terraform_at(&st->cursor, select_terrain(st, NULL));
         st->modified = 1;
@@ -1011,6 +1012,7 @@ static void handlekey(state * st, int c)
         statusline(st->wnd_status->handle, "tag-");
         doupdate();
         switch (getch()) {
+        case 'f':
         case 't':
             terraform_selection(st->selected, select_terrain(st, NULL));
             st->modified = 1;

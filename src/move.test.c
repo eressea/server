@@ -2,18 +2,22 @@
 #include <stdlib.h>
 #include "move.h"
 
+#include <kernel/config.h>
 #include <kernel/ally.h>
 #include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
 #include <kernel/terrain.h>
+#include <kernel/item.h>
 #include <kernel/unit.h>
+#include <kernel/race.h>
 
 #include <util/language.h>
 
 #include <CuTest.h>
 #include <tests.h>
+#include <assert.h>
 
 static void test_ship_not_allowed_in_coast(CuTest * tc)
 {
@@ -167,9 +171,54 @@ static void test_building_type_exists(CuTest * tc)
     CuAssertTrue(tc, !buildingtype_exists(r, btype2, false));
 }
 
+static void test_walkingcapacity(CuTest *tc) {
+    region *r;
+    unit *u;
+    int cap;
+    const struct item_type *itype;
+
+    test_cleanup();
+    test_create_world();
+
+    r = findregion(0, 0);
+    u = test_create_unit(test_create_faction(0), r);
+    cap = u->number * (u->_race->capacity + u->_race->weight);
+    CuAssertIntEquals(tc, cap, walkingcapacity(u));
+    scale_number(u, 2);
+    cap = u->number * (u->_race->capacity + u->_race->weight);
+    CuAssertIntEquals(tc, cap, walkingcapacity(u));
+
+    itype = it_find("horse");
+    assert(itype);
+    i_change(&u->items, itype, 1);
+    cap += itype->capacity;
+    CuAssertIntEquals(tc, cap, walkingcapacity(u));
+    i_change(&u->items, itype, 1);
+    cap += itype->capacity;
+    CuAssertIntEquals(tc, cap, walkingcapacity(u));
+
+    itype = it_find("cart");
+    assert(itype);
+    i_change(&u->items, itype, 1);
+    CuAssertIntEquals(tc, cap, walkingcapacity(u));
+    set_level(u, SK_RIDING, 1);
+    cap += itype->capacity;
+    CuAssertIntEquals(tc, cap, walkingcapacity(u));
+
+    itype = test_create_itemtype("trollbelt");
+    assert(itype);
+    i_change(&u->items, itype, 1);
+    CuAssertIntEquals(tc, cap + (STRENGTHMULTIPLIER-1) * u->_race->capacity, walkingcapacity(u));
+    set_param(&global.parameters, "rules.trollbelt.multiplier", "5");
+    CuAssertIntEquals(tc, cap + 4 * u->_race->capacity, walkingcapacity(u));
+
+    test_cleanup();
+}
+
 CuSuite *get_move_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_walkingcapacity);
     SUITE_ADD_TEST(suite, test_building_type_exists);
     SUITE_ADD_TEST(suite, test_ship_not_allowed_in_coast);
     SUITE_ADD_TEST(suite, test_ship_allowed_without_harbormaster);

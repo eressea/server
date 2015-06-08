@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <strings>
   <!--
-    _d: dativ (wir erklären allen /Trollen/ den Krieg)
-    _p: plural (13 /Trolle/)
-    _x: preposition (15 /Troll/schwerter)
-    _a: including article (ein Troll, a troll)
+    _d: dativ (wir erklären allen /Schlümpfen/ den Krieg)
+    _p: plural (13 /Schlümpfe/)
+    _x: preposition (15 /Schlumpf/schwerter)
+    _a: including article (ein Schlumpf, a smurf)
    -->
   <string name="vortex">
     <text locale="de">Wirbel</text>
@@ -731,7 +731,7 @@
     <text locale="en">an unknown building</text>
   </string>
   <string name="an_unknown_spell">
-    <text locale="de">ein unbekannter zauber</text>
+    <text locale="de">ein unbekannter Zauber</text>
     <text locale="en">an unknown spell</text>
   </string>
   <string name="an_unknown_ship">
@@ -745,6 +745,14 @@
   <string name="unknown_unit_dative">
     <text locale="de">einer unbekannten Einheit</text>
     <text locale="en">an unknown unit</text>
+  </string>
+  <string name="an_unknown_curse">
+    <text locale="de">ein unbekannter Zauber</text>
+    <text locale="en">an unknown curse</text>
+  </string>
+  <string name="missing_key">
+    <text locale="de">Fehler: Unbekannter Schlüssel</text>
+    <text locale="en">Fehler: Unbekannter Schlüssel</text>
   </string>
 
   <!--Meldungssektionen -->
@@ -3569,13 +3577,13 @@
 
   </namespace>
   <namespace name="damage">
-    <string name="critical">
+    <string name="plusstrong">
       <text locale="de">sehr stark</text>
-      <text locale="en">critically wounded</text>
+      <text locale="en">super strong</text>
     </string>
-    <string name="heavily">
+    <string name="strong">
       <text locale="de">stark</text>
-      <text locale="en">heavily wounded</text>
+      <text locale="en">strong</text>
     </string>
     <string name="badly">
       <text locale="de">schwer verwundet</text>
@@ -3655,11 +3663,11 @@
   <namespace name="spell">
     <string name="create_rop">
       <text locale="de">Erschaffe einen Ring der Macht</text>
-      <text locale="en">Create A Ring Of Power</text>
+      <text locale="en">Create A Ring of Power</text>
     </string>
     <string name="fish_shield">
       <text locale="de">Schild des Fisches</text>
-      <text locale="en">Shield Of The Fish</text>
+      <text locale="en">Shield of the Fish</text>
     </string>
     <string name="protective_runes">
       <text locale="de">Runen des Schutzes</text>
@@ -3667,7 +3675,7 @@
     </string>
     <string name="fetch_astral">
       <text locale="de">Ruf der Realität</text>
-      <text locale="en">Call Of Reality</text>
+      <text locale="en">Call of Reality</text>
     </string>
     <string name="pull_astral">
       <text locale="de">Astraler Ruf</text>
@@ -3707,7 +3715,7 @@
     </string>
     <string name="seduction">
       <text locale="de">Lied der Verführung</text>
-      <text locale="en">Song Of Seduction</text>
+      <text locale="en">Song of Seduction</text>
     </string>
     <string name="sound_out">
       <text locale="de">Aushorchen</text>
@@ -3715,11 +3723,11 @@
     </string>
     <string name="bloodthirst">
       <text locale="de">Kriegsgesang</text>
-      <text locale="en">Song Of War</text>
+      <text locale="en">Song of War</text>
     </string>
     <string name="frighten">
       <text locale="de">Gesang der Angst</text>
-      <text locale="en">Song Of Fear</text>
+      <text locale="en">Song of Fear</text>
     </string>
     <string name="analyse_object">
       <text locale="de">Lied des Ortes analysieren</text>
@@ -3735,7 +3743,7 @@
     </string>
     <string name="create_chastitybelt">
       <text locale="de">Erschaffe ein Amulett der Keuschheit</text>
-      <text locale="en">Create An Amulet Of Chastity</text>
+      <text locale="en">Create An Amulet of Chastity</text>
     </string>
     <string name="combat_speed">
       <text locale="de">Beschleunigung</text>
@@ -3759,23 +3767,23 @@
     </string>
     <string name="song_resist_magic">
       <text locale="de">Gesang des wachen Geistes</text>
-      <text locale="en">Song Of The Youthful Spirit</text>
+      <text locale="en">Song of the Youthful Spirit</text>
     </string>
     <string name="song_suscept_magic">
       <text locale="de">Gesang des schwachen Geistes</text>
-      <text locale="en">Song Of The Aging Spirit</text>
+      <text locale="en">Song of the Aging Spirit</text>
     </string>
     <string name="song_of_peace">
       <text locale="de">Gesang der Friedfertigkeit</text>
-      <text locale="en">Song Of Peace</text>
+      <text locale="en">Song of Peace</text>
     </string>
     <string name="song_of_slavery">
       <text locale="de">Gesang der Versklavung</text>
-      <text locale="en">Song Of Slavery</text>
+      <text locale="en">Song of Slavery</text>
     </string>
     <string name="big_recruit">
       <text locale="de">Hohe Kunst der Überzeugung</text>
-      <text locale="en">Song Of Slavery</text>
+      <text locale="en">Song of Slavery</text>
     </string>
     <string name="double_time">
       <text locale="de">Zeitdehnung</text>
@@ -3823,7 +3831,7 @@
     </string>
     <string name="create_ror">
       <text locale="de">Erschaffe einen Ring der Regeneration</text>
-      <text locale="en">Create A Ring Of Regeneration</text>
+      <text locale="en">Create A Ring of Regeneration</text>
     </string>
     <string name="raise_mob">
       <text locale="de">Mob aufwiegeln</text>
@@ -3859,7 +3867,7 @@
     </string>
     <string name="create_bagofholding">
       <text locale="de">Erschaffe einen Beutel des Negativen Gewichts</text>
-      <text locale="en">Create A Bag Of Holding</text>
+      <text locale="en">Create A Bag of Holding</text>
     </string>
     <string name="create_focus">
       <text locale="de">Erschaffe einen Aurafocus</text>
@@ -3901,17 +3909,9 @@
       <text locale="de">Magie analysieren</text>
       <text locale="en">Analyze Magic</text>
     </string>
-    <string name="generous">
-      <text locale="de">Hohes Lied der Gaukelei</text>
-      <text locale="en">Song of Generosity</text>
-    </string>
     <string name="courting">
       <text locale="de">Gesang des Werbens</text>
       <text locale="en">Song of Courting</text>
-    </string>
-    <string name="itemcloak">
-      <text locale="de">Schleieraura</text>
-      <text locale="en">Veil</text>
     </string>
     <string name="song_of_healing">
       <text locale="de">Lied der Heilung</text>
@@ -3975,11 +3975,11 @@
     </string>
     <string name="treegrow">
       <text locale="de">Hainzauber</text>
-      <text locale="en">Grove Of Oak Trees</text>
+      <text locale="en">Grove of Oak Trees</text>
     </string>
     <string name="rustweapon">
       <text locale="de">Rostregen</text>
-      <text locale="en">Rain Of Rust</text>
+      <text locale="en">Rain of Rust</text>
     </string>
     <string name="cold_protection">
       <text locale="de">Firuns Fell</text>
@@ -4011,7 +4011,7 @@
     </string>
     <string name="magic_roots">
       <text locale="de">Wurzeln der Magie</text>
-      <text locale="en">Roots Of Magic</text>
+      <text locale="en">Roots of Magic</text>
     </string>
     <string name="maelstrom">
       <text locale="de">Mahlstrom</text>
@@ -4057,12 +4057,12 @@
     <string name="create_aots">
       <text locale="de">Erschaffe ein Amulett des wahren
       Sehens</text>
-      <text locale="en">Create An Amulet Of True Sight</text>
+      <text locale="en">Create An Amulet of True Sight</text>
     </string>
     <string name="create_roi">
       <text locale="de">Erschaffe einen Ring der
       Unsichtbarkeit</text>
-      <text locale="en">Create A Ring Of Invisibility</text>
+      <text locale="en">Create A Ring of Invisibility</text>
     </string>
     <string name="create_roqf">
       <text locale="de">Miriams flinke Finger</text>
@@ -4078,7 +4078,7 @@
     </string>
     <string name="versteinern">
       <text locale="de">Blick des Basilisken</text>
-      <text locale="en">Gaze Of The Basilisk</text>
+      <text locale="en">Gaze of the Basilisk</text>
     </string>
     <string name="strongwall">
       <text locale="de">Starkes Tor und feste Mauer</text>
@@ -4098,11 +4098,11 @@
     </string>
     <string name="treewalkenter">
       <text locale="de">Weg der Bäume</text>
-      <text locale="en">Path Of Trees</text>
+      <text locale="en">Path of Trees</text>
     </string>
     <string name="treewalkexit">
       <text locale="de">Sog des Lebens</text>
-      <text locale="en">Ties Of Life</text>
+      <text locale="en">Ties of Life</text>
     </string>
     <string name="holyground">
       <text locale="de">Heiliger Boden</text>
@@ -4115,7 +4115,7 @@
     </string>
     <string name="summonent">
       <text locale="de">Erwecke Ents</text>
-      <text locale="en">Awakening Of The Ents</text>
+      <text locale="en">Awakening of the Ents</text>
     </string>
     <string name="blessstonecircle">
       <text locale="de">Segne Steinkreis</text>
@@ -4159,7 +4159,7 @@
     </string>
     <string name="combatrust">
       <text locale="de">Rosthauch</text>
-      <text locale="en">Winds Of Rust</text>
+      <text locale="en">Winds of Rust</text>
     </string>
     <string name="transferaurachaos">
       <text locale="de">Machtübertragung</text>
@@ -4167,11 +4167,11 @@
     </string>
     <string name="firewall">
       <text locale="de">Feuerwand</text>
-      <text locale="en">Wall Of Fire</text>
+      <text locale="en">Wall of Fire</text>
     </string>
     <string name="plague">
       <text locale="de">Fluch der Pestilenz</text>
-      <text locale="en">Curse Of Pestilence</text>
+      <text locale="en">Curse of Pestilence</text>
     </string>
     <string name="chaosrow">
       <text locale="de">Wahnsinn des Krieges</text>
@@ -4192,7 +4192,7 @@
     <string name="create_trollbelt">
       <text locale="de">Erschaffe einen Gürtel der
       Trollstärke</text>
-      <text locale="en">Create A Belt Of Troll
+      <text locale="en">Create A Belt of Troll
       Strength</text>
     </string>
     <string name="auraleak">
@@ -4261,11 +4261,11 @@
     </string>
     <string name="icastle">
       <text locale="de">Traumschlößchen</text>
-      <text locale="en">Castle Of Illusion</text>
+      <text locale="en">Castle of Illusion</text>
     </string>
     <string name="transferauratraum">
       <text locale="de">Traum der Magie</text>
-      <text locale="en">Dream Of Magic</text>
+      <text locale="en">Dream of Magic</text>
     </string>
     <string name="shapeshift">
       <text locale="de">Gestaltwandlung</text>
@@ -4342,6 +4342,150 @@
     <string name="wdwpyramid_draig">
       <text locale="de">Göttliche Macht</text>
       <text locale="en">Power of the Gods</text>
+    </string>
+    <string name="magicrunes">
+      <text locale="de">Runen des Schutzes</text>
+      <text locale="en">Protective Runes</text>
+    </string>
+    <string name="astralblock">
+      <text locale="de">Störe Astrale Integrität</text>
+      <text locale="en">Astral Disruption</text>
+    </string>
+    <string name="auraboost">
+      <text locale="de">Gabe des Chaos</text>
+      <text locale="en">Chaos Gift</text>
+    </string>
+    <string name="badlearn">
+      <text locale="de">Schlechter Schlaf</text>
+      <text locale="en">Insomnia</text>
+    </string>
+    <string name="badmagicresistancezone">
+      <text locale="de">Gesang des schwachen Geistes</text>
+      <text locale="en">Song of the Aging Spirit</text>
+    </string>
+    <string name="calmmonster">
+      <text locale="de">Monster friedlich stimmen</text>
+      <text locale="en">Calm Monster</text>
+    </string>
+    <string name="depression">
+      <text locale="de">Gesang der Melancholie</text>
+      <text locale="en">Song of Melancholy</text>
+    </string>
+    <string name="drought">
+      <text locale="de">Beschwörung eines Hitzeelementar</text>
+      <text locale="en">Summon Fire Elemental</text>
+    </string>
+    <string name="farvision">
+    <text locale="de">ein unbekannter Zauber</text>
+    <text locale="en">an unknown spell</text>
+    </string>
+    <string name="flyingship">
+      <text locale="de">Luftschiff</text>
+      <text locale="en">Airship</text>
+    </string>
+    <string name="fogtrap">
+    <text locale="de">ein unbekannter Zauber</text>
+    <text locale="en">an unknown spell</text>
+    </string>
+    <string name="fumble">
+      <text locale="de">Chaosfluch</text>
+      <text locale="en">Chaos Curse</text>
+    </string>
+    <string name="gbdream">
+      <text locale="de">Schöne Träume oder Schlechte Träume</text>
+      <text locale="en">Good Dreams or Bad Dreams</text>
+    </string>
+    <string name="generous">
+      <text locale="de">Hohes Lied der Gaukelei</text>
+      <text locale="en">Song of Generosity</text>
+    </string>
+    <string name="godcursezone">
+      <text locale="de">Fluch der Götter</text>
+      <text locale="en">Curse of the Gods</text>
+    </string>
+    <string name="goodmagicresistancezone">
+      <text locale="de">Gesang des wachen Geistes</text>
+      <text locale="en">Song of the Youthful Spirit</text>
+    </string>
+    <string name="insectfur">
+      <text locale="de">Firuns Fell</text>
+      <text locale="en">Firun's Coat</text>
+    </string>
+    <string name="itemcloak">
+      <text locale="de">Schleieraura</text>
+      <text locale="en">Concealing Aura</text>
+    </string>
+    <string name="magicresistance">
+      <text locale="de">Magieresistenz</text>
+      <text locale="en">Magic Resistance</text>
+    </string>
+    <string name="magicwalls">
+      <text locale="de">Heimstein</text>
+      <text locale="en">Homestone</text>
+    </string>
+    <string name="nocostbuilding">
+      <text locale="de">Mauern der Ewigkeit</text>
+      <text locale="en">Eternal Walls</text>
+    </string>
+    <string name="nodrift">
+      <text locale="de">Wasserelementar</text>
+      <text locale="en">Water Elemental</text>
+    </string>
+    <string name="oldrace">
+      <text locale="de">Unbekannter Effekt</text>
+      <text locale="en">Unknown Effect</text>
+    </string>
+    <string name="orcish">
+      <text locale="de">Unbekannter Effekt</text>
+      <text locale="en">Unknown Effect</text>
+    </string>
+    <string name="peacezone">
+      <text locale="de">Gesang der Friedfertigkeit</text>
+      <text locale="en">Song of Peace</text>
+    </string>
+    <string name="riotzone">
+      <text locale="de">Aufruhr</text>
+      <text locale="en">Riot</text>
+    </string>
+    <string name="skillmod">
+      <text locale="de">Unbekannter Effekt</text>
+      <text locale="en">Unknown Effect</text>
+    </string>
+    <string name="slavery">
+      <text locale="de">Gesang der Versklavung</text>
+      <text locale="en">Song of Slavery</text>
+    </string>
+    <string name="sparkle">
+      <text locale="de">Unbekannter Effekt</text>
+      <text locale="en">Unknown Effect</text>
+    </string>
+    <string name="speed">
+      <text locale="de">Zeitdehnung</text>
+      <text locale="en">Double Time</text>
+    </string>
+    <string name="stormwind">
+      <text locale="de">Sturmelementar</text>
+      <text locale="en">Storm Elemental</text>
+    </string>
+    <string name="strength">
+      <text locale="de">Unbekannter Effekt</text>
+      <text locale="en">Unknown Effect</text>
+    </string>
+    <string name="worse">
+      <text locale="de">Alp</text>
+      <text locale="en">Nightmare</text>
+    </string>
+    <string name="Feuerwand">
+      <text locale="de">Feuerwand</text>
+      <text locale="en">Firewall</text>
+    </string>
+    <string name="healingzone">
+      <text locale="de">Zone der Heilung</text>
+      <text locale="en">Zone of Healing</text>
+    </string>
+    <string name="shipspeedup">
+      <text locale="de">Beschleunigung</text>
+      <text locale="en">Acceleration</text>
     </string>
   </namespace>
   <namespace name="spellinfo">
@@ -4422,7 +4566,7 @@
     </string>
     <string name="auratransfer">
       <text locale="de">
-        Mit Hilfe dieses Zauber kann der Magier eigene Aura im Verhältnis
+        Mit Hilfe dieses Zaubers kann der Magier eigene Aura im Verhältnis
         2:1 auf einen anderen Magier des gleichen Magiegebietes oder im
         Verhältnis 3:1 auf einen Magier eines anderen Magiegebietes
         übertragen.
@@ -4486,7 +4630,7 @@
       Dieses magische Lied wird, einmal mit Inbrunst gesungen, sich in der 
       Region fortpflanzen, von Mund zu Mund springen und eine Zeitlang 
       überall zu vernehmen sein. Nach wie vielen Wochen der Gesang aus dem 
-      Gedächnis der Region entschwunden ist, ist von dem Geschick des Barden 
+      Gedächtnis der Region entschwunden ist, ist von dem Geschick des Barden 
       abhängig. Bis das Lied ganz verklungen ist, wird seine Magie allen 
       Verbündeten des Barden (HELFE BEWACHE), und natürlich auch seinen 
       eigenem Volk, einen einmaligen Bonus von 15% 
@@ -4996,7 +5140,7 @@
     <string name="cerrdorfumbleshield">
       <text locale="de">Dieser schrille Gesang hallt über das
       ganze Schlachtfeld. Die besonderen Dissonanzen in den
-      Melodien machen es Magier fast unmöglich, sich auf ihre
+      Melodien machen es Magiern fast unmöglich, sich auf ihre
       Zauber zu konzentrieren.</text>
       <text locale="en">The screeching sounds of this melody
       can be heard across the whole battlefield. Wizards
@@ -5009,7 +5153,7 @@
       kann, was für Gegenstände sie mit sich führt und sollte
       sie magisch begabt sein, sogar welche Zauber sie
       beherrscht. Leider beeinflußt dieser Zauber nicht das
-      Gedächnis, und so wird sie sich im nachhinein wohl
+      Gedächtnis, und so wird sie sich im nachhinein wohl
       bewußt werden, dass sie zuviel erzählt hat.</text>
       <text locale="en">The persons of the bewitched unit
       starts to babble without control about what it is said,
@@ -5034,7 +5178,7 @@
       STRASSE, so werden pro Golem 4 Steine verbaut und der
       Golem löst sich auf. </text>
       <text locale="en">'Take a flawless block of crystaline
-      stone and humidify it with a vial of Water Of Life until
+      stone and humidify it with a vial of Water of Life until
       the potion has been soaked up completely. Then focus
       your power on the forming aura of life and shape a
       container for the unbound forces'. The more power a magician
@@ -5085,7 +5229,7 @@
         armor will get rusty. The exact number of
         items affected by the rain depends on the
         ammount of power invested by the magician. Up to ten
-        weapons can be destroyed per level - a Ring Of
+        weapons can be destroyed per level - a Ring of
         Power increases the effect like an additional
         level.</text>
     </string>
@@ -5102,7 +5246,7 @@
         cold of a glacier. Under the effect of this
         spell, insects are able to enter glaciers and
         act normally there. Ten insects per level can be
-        protected in this way. A Ring Of Power increases
+        protected in this way. A Ring of Power increases
         the number by additional ten.</text>
     </string>
     <string name="hail">
@@ -5111,7 +5255,7 @@
         sich. Sodann kann er ihnen befehlen, den Gegner
         mit Hagelkörnern und Eisbrocken zuzusetzen.</text>
       <text locale="en">During a battle the druid calls the
-        Elemental Spirits Of Cold and binds them to
+        Elemental Spirits of Cold and binds them to
         himself. Then he commands them to attack his
         foes with hail and ice missiles.</text>
     </string>
@@ -5156,7 +5300,7 @@
         Windes beschwört plötzliche Windböen, kleine
         Windhosen und Luftlöcher herauf, die die
         gegnerischen Schützen behindern werden.</text>
-      <text locale="en">Calling the Elemental Spirits Of Wind
+      <text locale="en">Calling the Elemental Spirits of Wind
         conjurs up sudden breezes, small whirlwinds and
         minor turbulences that will hinder enemy
         archers.</text>
@@ -5179,7 +5323,7 @@
         Winde oder Strömungen beeinträchtigt.</text>
       <text locale="en">While being aboard a ship, the druid
         uses this ritual to force the Elemental Spirits
-        Of Water to serve him and commands them to carry
+        of Water to serve him and commands them to carry
         the ship across the water at a higher speed. In
         addition, the ship will not be affected by
         unfavourable winds or currents.</text>
@@ -5195,7 +5339,7 @@
         who can help those who got injured during a
         battle. Druids are, with the help of a summons
         of
-        the Elemental Spirits Of Life, able to heal
+        the Elemental Spirits of Life, able to heal
         wounds, mend broken bones or even regenerate
         separated limbs as well.</text>
     </string>
@@ -5206,7 +5350,7 @@
         starke Winde oder gar Stürme und behindern alle
         Schützen einer Schlacht.</text>
       <text locale="en">This summons opens a gate to the plane
-        of Elemental Spirits Of Wind. Immediately,
+        of Elemental Spirits of Wind. Immediately,
         strong winds or even storms will rise near the
         gate and hinder all archers during a battle.</text>
     </string>
@@ -5217,7 +5361,7 @@
         das Zaubern für die Dauer des Kampfes deutlich
         schwerer fallen.</text>
       <text locale="en">This ritual summons some Elemental
-        Spirits Of Magic and sends them into the ranks
+        Spirits of Magic and sends them into the ranks
         of the enemy mages. Casting spells will be much
         harder for them during the battle.</text>
     </string>
@@ -5237,7 +5381,7 @@
         Erdbeben wird alle Gebäude in der Region
         beschädigen.</text>
       <text locale="en">With this ritual the druid summons an
-        Elemental Spirit Of Earth that brings the ground
+        Elemental Spirit of Earth that brings the ground
         to shake. This earthquake damages all buildings
         in the target region.</text>
     </string>
@@ -5251,7 +5395,7 @@
         desto größer ist die Zahl der Elementargeister,
         die sich bannen lassen. Für jedes Schiff wird
         ein Elementargeist benötigt.</text>
-      <text locale="en">Calling the Elemental Spirits Of Storm
+      <text locale="en">Calling the Elemental Spirits of Storm
         is an ancient ritual. The druid binds the
         elementals to a ship's sails where they can help
         to carry the vessel across the waves at an
@@ -5305,7 +5449,7 @@
         die sich mit ihrem Tarnungs-Talent verstecken,
         bleiben weiterhin unentdeckt.</text>
       <text locale="en">This spell enables the caster to
-        create an Amulet Of True Sight. Wearing such an
+        create an Amulet of True Sight. Wearing such an
         amulet, a person can discover anyone wearing a
         Ring of Invisibility. Anyway, units concealed by
         the use of their stealth skill will remain
@@ -5347,11 +5491,11 @@
         Wahrnehmung auch sein mag. In einer unsichtbaren
         Einheit muss jede Person einen Ring tragen.</text>
       <text locale="en">With this spell the caster can create
-        a Ring Of Invisibility. The wearer of this ring
+        a Ring of Invisibility. The wearer of this ring
         will be invisible to all units of other
         factions, no matter how good their perception
         skill may be. In an invisible unit, each person
-        must wear a Ring Of Invisibility.</text>
+        must wear a Ring of Invisibility.</text>
     </string>
     <string name="homestone">
       <text locale="de">Mit dieser Formel bindet der Magier
@@ -5391,7 +5535,7 @@
         betroffenen Personen werden nicht mehr kämpfen,
         können jedoch auch nicht verwundet werden.</text>
       <text locale="en">This complicated but effective spell
-        uses the Elemental Spirits Of Stone to turn a
+        uses the Elemental Spirits of Stone to turn a
         number of enemies to stone for the duration of
         combat. The affected persons won't be able to
         fight any more, but they can't be wounded
@@ -5405,7 +5549,7 @@
         besseren Schutz gegen Angriffe mit dem Schwert
         wie mit Magie.</text>
       <text locale="en">At the beginning of a battle, the
-        magician binds some Elemental Spirits Of Rock to
+        magician binds some Elemental Spirits of Rock to
         the walls of the builing in which he currently
         is. The structure will then provide a better
         protection against attacks by sword or by magic.</text>
@@ -5438,7 +5582,7 @@
       <text locale="en">A great power lies within those places
         that are pulsing with life. A druid can focus
         this power and thereby create a gate into the
-        World Of Spirits. He can then send level*5
+        World of Spirits. He can then send level*5
         weight units of living or dead matter through
         the gate.</text>
     </string>
@@ -5448,7 +5592,7 @@
         Zaubers Stufe*5 Gewichtseinheiten in einen Wald
         auf der materiellen Welt zurückschicken.</text>
       <text locale="en">A druid who has traveled to the World
-        Of Spirits can use this spell to send level*5
+        of Spirits can use this spell to send level*5
         weight units of living or dead matter back to a
         forest in the material world.</text>
     </string>
@@ -5551,7 +5695,7 @@
         und so wird die Phase der Macht abgelöst von
         einer Phase der Schwäche.</text>
       <text locale="en">The sorcerer opens his mind to the
-        Spheres Of Chaos so that he can access a greater
+        Spheres of Chaos so that he can access a greater
         ammount of magical power for a while. But the
         help of the Chaos Lords has its price - and so
         the period of power will be followed by a period
@@ -5681,7 +5825,7 @@
         Sie sind schwer zu treffen und entziehen ihrem
         Gegner Kraft.</text>
       <text locale="en">With the help of dark rituals the
-        sorcerer summons demons from the Sphere Of
+        sorcerer summons demons from the Sphere of
         Shadows. These fearsome creatures can walk
         almost unseen among the living, but their dark
         aura can be sensed by everyone. Shadow demons
@@ -5775,7 +5919,7 @@
         Darkness are at their peak, the sorcerer can use
         his powers to destroy enchantments. In order to
         do so, he draws a pentagram on a surface of the
-        enchanted object and begins calling the Lords Of
+        enchanted object and begins calling the Lords of
         Darkness. The Lords will aid him, but whether he
         is able to undo the target spell or not depends
         upon his own power.</text>
@@ -5806,7 +5950,7 @@
         Schaden zufügen.</text>
       <text locale="en">By performing a gruesome ritual and
         sacrificing his own blood the Sorcerer conjurs
-        up a spirit from the Elemental Plane Of Poison.
+        up a spirit from the Elemental Plane of Poison.
         It will take the form of a green cloud of toxic
         gases that envelops a whole region and that will
         harm anyone within.</text>
@@ -5825,7 +5969,7 @@
         irresistable scent to dragons. It is not known
         whether the dragons come from surrounding
         regions or if they have their origin in the
-        Sphere Of Chaos. The bait will exist for about
+        Sphere of Chaos. The bait will exist for about
         six weeks, but it must be placed in a tarrain
         that is suitable for dragons.</text>
     </string>
@@ -5839,7 +5983,7 @@
         Sie sind schwer zu treffen und entziehen ihrem
         Gegner Kraft und Leben.</text>
       <text locale="en">With the help of dark rituals the
-        sorcerer summons demons from the Sphere Of
+        sorcerer summons demons from the Sphere of
         Shadows. These fearsome creatures can walk
         almost unseen among the living, but their dark
         aura can be sensed by everyone. Shadowmasters
@@ -5856,7 +6000,7 @@
         seiner Macht zu beseelen...'</text>
       <text locale="en">'So take the blood of a fierce warrior
         and apply it to the steel of the blade. Then
-        start calling the Spheres Of Chaos. If you did
+        start calling the Spheres of Chaos. If you did
         everything to their pleasure, they will send a
         minor one of their kind to fulfill the sword
         with his power.'</text>

@@ -1,11 +1,10 @@
 function use_xmastree(u, amount)
   u.region:set_key("xm06", true)
-  u:use_pooled("xmastree", amount)
   local msg = message.create("usepotion")
   msg:set_unit("unit", u)
   msg:set_resource("potion", "xmastree")
   msg:send_region(u.region)
-  return 0
+  return amount
 end
 
 local self = {}

@@ -79,6 +79,7 @@ set (ERESSEA_SRC
   skill.c
   json.c
   creport.c
+  jsreport.c
   economy.c
   give.c
   items.c
@@ -176,10 +177,13 @@ set(TESTS_SRC
   market.test.c
   move.test.c
   skill.test.c
+  spells.test.c
+  spy.test.c
   upkeep.test.c
   ${ATTRIBUTES_TESTS}
   ${UTIL_TESTS}
   ${KERNEL_TESTS}
+  ${ITEMS_TESTS}
 )
 
 add_executable(test_eressea ${TESTS_SRC})

@@ -117,6 +117,8 @@ int curse_age(attrib * a)
     curse *c = (curse *)a->data.v;
     int result = 0;
 
+    c_clearflag(c, CURSE_ISNEW);
+
     if (c_flags(c) & CURSE_NOAGE) {
         c->duration = INT_MAX;
     }
@@ -221,7 +223,9 @@ int curse_read(attrib * a, void *owner, struct storage *store)
         return AT_READ_FAIL;
     }
     c->flags = flags;
-    c_clearflag(c, CURSE_ISNEW);
+    if (global.data_version < EXPLICIT_CURSE_ISNEW_VERSION) {
+        c_clearflag(c, CURSE_ISNEW);
+    }
 
     if (c->type->read)
         c->type->read(store, c, owner);
@@ -248,7 +252,12 @@ void curse_write(const attrib * a, const void *owner, struct storage *store)
     unit *mage = (c->magician && c->magician->number) ? c->magician : NULL;
 
     /* copied from c_clearflag */
-    flags = (c->flags & ~CURSE_ISNEW) | (c->type->flags & CURSE_ISNEW);
+    if (global.data_version < EXPLICIT_CURSE_ISNEW_VERSION) {
+        flags = (c->flags & ~CURSE_ISNEW) | (c->type->flags & CURSE_ISNEW);
+    }
+    else {
+        flags = c->flags | c->type->flags;
+    }
 
     WRITE_INT(store, c->no);
     WRITE_TOK(store, ct->cname);
@@ -314,6 +323,20 @@ const curse_type *ct_find(const char *c)
         }
     }
     return NULL;
+}
+
+void ct_checknames(void) {
+    int i, qi;
+    quicklist *ctl;
+
+    for (i = 0; i < 256; ++i) {
+        ctl = cursetypes[i];
+        for (qi = 0; ctl; ql_advance(&ctl, &qi, 1)) {
+            curse_type *type = (curse_type *)ql_get(ctl, qi);
+            curse_name(type, default_locale);
+
+        }
+    }
 }
 
 /* ------------------------------------------------------------- */

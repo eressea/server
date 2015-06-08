@@ -136,7 +136,7 @@ ursprung_x(const faction * f, const plane * pl, const region * rdefault)
     }
     if (!rdefault)
         return 0;
-    set_ursprung((faction *)f, id, rdefault->x - plane_center_x(pl),
+    set_origin((faction *)f, id, rdefault->x - plane_center_x(pl),
         rdefault->y - plane_center_y(pl));
     return rdefault->x - plane_center_x(pl);
 }
@@ -159,7 +159,7 @@ ursprung_y(const faction * f, const plane * pl, const region * rdefault)
     }
     if (!rdefault)
         return 0;
-    set_ursprung((faction *)f, id, rdefault->x - plane_center_x(pl),
+    set_origin((faction *)f, id, rdefault->x - plane_center_x(pl),
         rdefault->y - plane_center_y(pl));
     return rdefault->y - plane_center_y(pl);
 }
@@ -221,7 +221,7 @@ const region * r)
     *y = ny;
 }
 
-void set_ursprung(faction * f, int id, int x, int y)
+void set_origin(faction * f, int id, int x, int y)
 {
     ursprung *ur;
     assert(f != NULL);

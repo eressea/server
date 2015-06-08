@@ -1282,11 +1282,19 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
     }
 
     assert(dt.index < du->number);
-    df->person[dt.index].hp -= rda;
-    if (u_race(au) == get_race(RC_DAEMON)) {
-        vampirism(at, rda);
-    }
+    if (rda>0) {
+        df->person[dt.index].hp -= rda;
+        if (u_race(au) == get_race(RC_DAEMON)) {
+            vampirism(at, rda);
+        }
+        if (b->turn>1) {
+            /* someone on the ship got damaged, damage the ship */
+            ship *sh = du->ship ? du->ship : leftship(du);
+            if (sh)
+                fset(sh, SF_DAMAGED);
+        }
 
+    }
     if (df->person[dt.index].hp > 0) {    /* Hat überlebt */
         if (bdebug) {
             fprintf(bdebug, "Damage %d, armor %d: %d -> %d HP\n",
@@ -2286,16 +2294,18 @@ void do_attack(fighter * af)
         /* Wir suchen eine beliebige Feind-Einheit aus. An der können
          * wir feststellen, ob noch jemand da ist. */
         int apr, attacks = attacks_per_round(ta);
+        assert(attacks <= RACE_ATTACKS);
         if (!count_enemies(b, af, FIGHT_ROW, LAST_ROW, SELECT_FIND))
             break;
 
         for (apr = 0; apr != attacks; ++apr) {
             int a;
-            for (a = 0; a != 10 && u_race(au)->attack[a].type != AT_NONE; ++a) {
+            for (a = 0; a < RACE_ATTACKS && u_race(au)->attack[a].type != AT_NONE; ++a) {
                 if (apr > 0) {
                     /* Wenn die Waffe nachladen muss, oder es sich nicht um einen
                      * Waffen-Angriff handelt, dann gilt der Speed nicht. */
-                    if (u_race(au)->attack[a].type != AT_STANDARD)
+                    /* FIXME allow multiple AT_NATURAL attacks? */
+                    if (u_race(au)->attack[a].type != AT_STANDARD) 
                         continue;
                     else {
                         weapon *wp = preferred_weapon(ta, true);
@@ -2712,13 +2722,6 @@ static void aftermath(battle * b)
             if (flags) {
                 fset(du, flags);
             }
-            if (sum_hp + df->run.hp < du->hp) {
-                /* someone on the ship got damaged, damage the ship */
-                ship *sh = du->ship ? du->ship : leftship(du);
-                if (sh)
-                    fset(sh, SF_DAMAGED);
-            }
-
             if (df->alive && df->alive == du->number) {
                 du->hp = sum_hp;
                 continue;               /* nichts passiert */

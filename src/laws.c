@@ -1321,7 +1321,7 @@ int ally_cmd(unit * u, struct order *ord)
 
     s = gettoken(token, sizeof(token));
 
-    if (!s[0])
+    if (s && !s[0])
         keyword = P_ANY;
     else
         keyword = findparam(s, u->faction->locale);
@@ -1834,11 +1834,10 @@ int name_cmd(struct unit *u, struct order *ord)
                 break;
             }
             else {
-                const char *udefault = LOC(u2->faction->locale, "unitdefault");
-                size_t udlen = strlen(udefault);
-                size_t unlen = strlen(u2->name);
-                if (unlen >= udlen && strncmp(u2->name, udefault, udlen) != 0) {
-                    cmistake(u2, ord, 244, MSG_EVENT);
+                char udefault[32];
+                default_name(u2, udefault, sizeof(udefault));
+                if (strcmp(unit_getname(u2), udefault) != 0) {
+                    cmistake(u, ord, 244, MSG_EVENT);
                     break;
                 }
             }
@@ -1850,10 +1849,10 @@ int name_cmd(struct unit *u, struct order *ord)
                 ADDMSG(&u2->faction->msgs, msg_message("renamed_notseen",
                     "renamed region", u2, r));
             }
-            s = &u2->name;
+            s = &u2->_name;
         }
         else {
-            s = &u->name;
+            s = &u->_name;
         }
         break;
 
@@ -2340,7 +2339,7 @@ static bool display_race(faction * f, unit * u, const race * rc)
 
     /* b_damage : Schaden */
     at_count = 0;
-    for (a = 0; a < 6; a++) {
+    for (a = 0; a < RACE_ATTACKS; a++) {
         if (rc->attack[a].type != AT_NONE) {
             at_count++;
         }
@@ -2372,7 +2371,7 @@ static bool display_race(faction * f, unit * u, const race * rc)
     if (wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
 
-    for (a = 0; a < 6; a++) {
+    for (a = 0; a < RACE_ATTACKS; a++) {
         if (rc->attack[a].type != AT_NONE) {
             if (a != 0)
                 bytes = (int)strlcpy(bufp, ", ", size);
@@ -2545,7 +2544,7 @@ int origin_cmd(unit * u, struct order *ord)
     px = (short)getint();
     py = (short)getint();
 
-    set_ursprung(u->faction, getplaneid(u->region), px, py);
+    set_origin(u->faction, getplaneid(u->region), px, py);
     return 0;
 }
 
@@ -3093,7 +3092,7 @@ static building *age_building(building * b)
          * find out if there's a magician in there. */
         for (u = r->units; u; u = u->next) {
             if (b == u->building && inside_building(u)) {
-                if (!(u_race(u)->ec_flags & GIVEITEM) == 0) {
+                if ((u_race(u)->ec_flags & ECF_KEEP_ITEM) == 0) {
                     int n, unicorns = 0;
                     for (n = 0; n != u->number; ++n) {
                         if (chance(0.02)) {
@@ -3502,8 +3501,7 @@ void update_long_order(unit * u)
     }
 }
 
-static int
-use_item(unit * u, const item_type * itype, int amount, struct order *ord)
+static int use_item(unit * u, const item_type * itype, int amount, struct order *ord)
 {
     int i;
     int target = read_unitid(u->faction, u->region);
@@ -3511,6 +3509,7 @@ use_item(unit * u, const item_type * itype, int amount, struct order *ord)
     i = get_pooled(u, itype->rtype, GET_DEFAULT, amount);
 
     if (amount > i) {
+        /* TODO: message? eg. "not enough %, using only %" */
         amount = i;
     }
     if (amount == 0) {
@@ -3518,10 +3517,15 @@ use_item(unit * u, const item_type * itype, int amount, struct order *ord)
     }
 
     if (target == -1) {
+        int result;
         if (itype->use == NULL) {
             return EUNUSABLE;
         }
-        return itype->use(u, itype, amount, ord);
+        result = itype->use ? itype->use(u, itype, amount, ord) : EUNUSABLE;
+        if (result>0) {
+            use_pooled(u, itype->rtype, GET_DEFAULT, result);
+        }
+        return result;
     }
     else {
         if (itype->useonother == NULL) {
@@ -3790,10 +3794,6 @@ int use_cmd(unit * u, struct order *ord)
 
     if (itype != NULL) {
         err = use_item(u, itype, n, ord);
-        assert(err <= 0 || !"use_item should not return positive values.");
-        if (err > 0) {
-            log_error("use_item returned a value>0 for %s\n", resourcename(itype->rtype, 0));
-        }
     }
     switch (err) {
     case ENOITEM:
@@ -3804,6 +3804,9 @@ int use_cmd(unit * u, struct order *ord)
         break;
     case ENOSKILL:
         cmistake(u, ord, 50, MSG_PRODUCE);
+        break;
+    default:
+        // no error
         break;
     }
     return err;
@@ -3912,24 +3915,27 @@ int claim_cmd(unit * u, struct order *ord)
 {
     char token[128];
     const char *t;
-    int n;
-    const item_type *itype;
+    int n = 1;
+    const item_type *itype = 0;
 
     init_order(ord);
 
     t = gettoken(token, sizeof(token));
-    n = atoi((const char *)t);
-    if (n == 0) {
-        n = 1;
+    if (t) {
+        n = atoi((const char *)t);
+        if (n == 0) {
+            n = 1;
+        }
+        else {
+            t = gettoken(token, sizeof(token));
+        }
+        if (t) {
+            itype = finditemtype(t, u->faction->locale);
+        }
     }
-    else {
-        t = gettoken(token, sizeof(token));
-    }
-    itype = finditemtype(t, u->faction->locale);
-
-    if (itype != NULL) {
+    if (itype) {
         item **iclaim = i_find(&u->faction->items, itype);
-        if (iclaim != NULL && *iclaim != NULL) {
+        if (iclaim && *iclaim) {
             n = _min(n, (*iclaim)->number);
             i_change(iclaim, itype, -n);
             i_change(&u->items, itype, n);

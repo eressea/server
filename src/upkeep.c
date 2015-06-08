@@ -42,9 +42,7 @@ int lifestyle(const unit * u)
 
 static bool help_money(const unit * u)
 {
-    if (u_race(u)->ec_flags & GIVEITEM)
-        return true;
-    return false;
+    return !(u_race(u)->ec_flags & ECF_KEEP_ITEM);
 }
 
 static void help_feed(unit * donor, unit * u, int *need_p)

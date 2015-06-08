@@ -4,6 +4,7 @@
 #include <kernel/faction.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
+#include <kernel/plane.h>
 #include <kernel/config.h>
 #include <util/language.h>
 
@@ -70,9 +71,12 @@ static void test_remove_dead_factions(CuTest *tc) {
 
 static void test_addfaction(CuTest *tc) {
     faction *f = 0;
-    const struct race *rc = rc_get_or_create("human");
-    const struct locale *lang = get_or_create_locale("en");
+    const struct race *rc;
+    const struct locale *lang;
 
+    test_cleanup();
+    rc = rc_get_or_create("human");
+    lang = get_or_create_locale("en");
     f = addfaction("test@eressea.de", "hurrdurr", rc, lang, 1234);
     CuAssertPtrNotNull(tc, f);
     CuAssertPtrNotNull(tc, f->name);
@@ -106,6 +110,20 @@ static void test_get_monsters(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_set_origin(CuTest *tc) {
+    faction *f;
+
+    test_cleanup();
+    test_create_world();
+    f = test_create_faction(0);
+    CuAssertPtrEquals(tc, 0, f->ursprung);
+    set_origin(f, 0, 1, 1);
+    CuAssertIntEquals(tc, 0, f->ursprung->id);
+    CuAssertIntEquals(tc, 1, f->ursprung->x);
+    CuAssertIntEquals(tc, 1, f->ursprung->y);
+    test_cleanup();
+}
+
 CuSuite *get_faction_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -114,5 +132,6 @@ CuSuite *get_faction_suite(void)
     SUITE_ADD_TEST(suite, test_remove_empty_factions_allies);
     SUITE_ADD_TEST(suite, test_remove_dead_factions);
     SUITE_ADD_TEST(suite, test_get_monsters);
+    SUITE_ADD_TEST(suite, test_set_origin);
     return suite;
 }
