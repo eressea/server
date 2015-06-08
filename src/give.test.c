@@ -3,6 +3,7 @@
 #include "give.h"
 #include "economy.h"
 
+#include <kernel/ally.h>
 #include <kernel/config.h>
 #include <kernel/item.h>
 #include <kernel/terrain.h>
@@ -34,6 +35,10 @@ static void setup_give(struct give *env) {
     env->dst = env->f2 ? test_create_unit(env->f2, env->r) : 0;
     env->itype = it_get_or_create(rt_get_or_create("money"));
     env->itype->flags |= ITF_HERB;
+    if (env->f1 && env->f2) {
+        ally * al = ally_add(&env->f2->allies, env->f1);
+        al->status = HELP_GIVE;
+    }
 }
 
 static void test_give_unit_to_peasants(CuTest * tc) {
@@ -46,6 +51,19 @@ static void test_give_unit_to_peasants(CuTest * tc) {
     give_unit(env.src, NULL, NULL);
     CuAssertIntEquals(tc, 0, env.src->number);
     CuAssertIntEquals(tc, 1, env.r->land->peasants);
+    test_cleanup();
+}
+
+static void test_give_unit(CuTest * tc) {
+    struct give env;
+    test_cleanup();
+    env.f1 = test_create_faction(0);
+    env.f2 = test_create_faction(0);
+    setup_give(&env);
+    env.r->terrain = test_create_terrain("ocean", SEA_REGION);
+    give_unit(env.src, env.dst, NULL);
+    CuAssertPtrEquals(tc, env.f2, env.src->faction);
+    CuAssertPtrEquals(tc, 0, env.f1->units);
     test_cleanup();
 }
 
@@ -284,6 +302,7 @@ CuSuite *get_give_suite(void)
     SUITE_ADD_TEST(suite, test_give_men_other_faction);
     SUITE_ADD_TEST(suite, test_give_men_requires_contact);
     SUITE_ADD_TEST(suite, test_give_men_not_to_self);
+    SUITE_ADD_TEST(suite, test_give_unit);
     SUITE_ADD_TEST(suite, test_give_unit_in_ocean);
     SUITE_ADD_TEST(suite, test_give_unit_to_peasants);
     SUITE_ADD_TEST(suite, test_give_peasants);
