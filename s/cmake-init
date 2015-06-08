@@ -10,6 +10,7 @@ done
 
 [ -z $BUILD ] && BUILD=Debug
 MACHINE=`uname -m`
+[ -z "$CC" ] && [ ! -z `which clang` ] && CC="clang"
 [ -z "$CC" ] && [ ! -z `which gcc` ] && CC="gcc"
 [ -z "$CC" ] && [ ! -z `which tcc` ] && CC="tcc"
 [ -z "$CC" ] && [ ! -z `which cc` ] && CC="cc"
@@ -33,7 +34,20 @@ if [ -d $HOME/usr ]; then
   PREFIX_PATH=$HOME/usr:$HOME/usr/local:$PREFIX_PATH
 fi
 
-cmake .. \
+if [ -z $PC_LUA ] && [ -e /opt/include/lua.h ]; then
+PC_LUA=/opt/include
+fi
+if [ -z $PC_TOLUA ] && [ -e /opt/include/tolua.h ]; then
+PC_TOLUA=/opt/include
+fi
+if [ ! -z $PC_TOLUA ]; then
+PC_ARGS="$PC_ARGS -DPC_TOLUA_INCLUDEDIR=$PC_TOLUA/include -DPC_TOLUA_LIBDIR=$PC_TOLUA/lib"
+fi
+if [ ! -z $PC_LUA ]; then
+PC_ARGS="$PC_ARGS -DPC_LUA_INCLUDEDIR=$PC_LUA/include -DPC_LUA_LIBDIR=$PC_LUA/lib"
+fi
+
+cmake .. $PC_ARGS \
  -DCMAKE_MODULE_PATH=$PWD/../cmake/Modules \
  -DCMAKE_BUILD_TYPE=$BUILD \
  -DCMAKE_LIBRARY_PATH=$LIBRARY_PATH \
