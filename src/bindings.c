@@ -139,7 +139,7 @@ int tolua_quicklist_push(struct lua_State *L, const char *list_type,
         *qlist_ptr = list;
         luaL_getmetatable(L, list_type);
         lua_setmetatable(L, -2);
-        lua_pushnumber(L, 0);
+        lua_pushinteger(L, 0);
         lua_pushstring(L, elem_type);
         lua_pushcclosure(L, tolua_quicklist_iter, 3);       /* OBS: this closure has multiple upvalues (list, index, type_name) */
     }
@@ -219,7 +219,7 @@ static int tolua_setkey(lua_State * L)
 
 static int tolua_rng_int(lua_State * L)
 {
-    lua_pushnumber(L, (lua_Number)rng_int());
+    lua_pushinteger(L, rng_int());
     return 1;
 }
 
@@ -227,7 +227,7 @@ static int tolua_read_orders(lua_State * L)
 {
     const char *filename = tolua_tostring(L, 1, 0);
     int result = readorders(filename);
-    lua_pushnumber(L, (lua_Number)result);
+    lua_pushinteger(L, result);
     return 1;
 }
 
@@ -534,7 +534,7 @@ static int tolua_process_orders(lua_State * L)
 static int tolua_write_passwords(lua_State * L)
 {
     int result = writepasswd();
-    lua_pushnumber(L, (lua_Number)result);
+    lua_pushinteger(L, result);
     return 0;
 }
 
@@ -982,7 +982,7 @@ static int tolua_get_spell_school(lua_State * L)
 static int tolua_get_spell_level(lua_State * L)
 {
     spell *self = (spell *) tolua_tousertype(L, 1, 0);
-    lua_pushnumber(L, self->level);
+    lua_pushinteger(L, self->level);
     return 1;
 }
 #endif

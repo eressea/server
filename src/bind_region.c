@@ -524,7 +524,7 @@ static int tolua_region_get_age(lua_State * L)
     region *self = (region *)tolua_tousertype(L, 1, 0);
 
     if (self) {
-        lua_pushnumber(L, self->age);
+        lua_pushinteger(L, self->age);
         return 1;
     }
     return 0;
@@ -638,8 +638,8 @@ static int tolua_plane_tostring(lua_State * L)
 static int tolua_plane_get_size(lua_State * L)
 {
     plane *pl = (plane *)tolua_tousertype(L, 1, 0);
-    lua_pushnumber(L, plane_width(pl));
-    lua_pushnumber(L, plane_height(pl));
+    lua_pushinteger(L, plane_width(pl));
+    lua_pushinteger(L, plane_height(pl));
     return 2;
 }
 
@@ -657,7 +657,7 @@ static int tolua_distance(lua_State * L)
     pnormalize(&x1, &y1, pl);
     pnormalize(&x2, &y2, pl);
     result = koor_distance(x1, y1, x2, y2);
-    lua_pushnumber(L, result);
+    lua_pushinteger(L, result);
     return 1;
 }
 

@@ -77,7 +77,7 @@ int tolua_faction_add_item(lua_State * L)
             result = i ? i->number : 0;
         }                           /* if (itype!=NULL) */
     }
-    lua_pushnumber(L, result);
+    lua_pushinteger(L, result);
     return 1;
 }
 
