@@ -8,6 +8,11 @@ project (eressea-server C)
 
 
 enable_testing()
+find_package (LibXml2)
+find_package (SQLite3)
+find_package (Curses)
+find_package (Lua REQUIRED)
+find_package (ToLua REQUIRED)
 
 INCLUDE (CheckIncludeFiles)
 INCLUDE (CheckSymbolExists)
@@ -56,13 +61,6 @@ CONFIGURE_FILE (
     ${CMAKE_BINARY_DIR}/include/autoconf.h)
 INCLUDE_DIRECTORIES (${CMAKE_BINARY_DIR}/include)
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DUSE_AUTOCONF")
-
-
-find_package (LibXml2)
-find_package (SQLite3)
-find_package (Curses)
-find_package (Lua REQUIRED)
-find_package (ToLua REQUIRED)
 
 add_subdirectory (cutest)
 add_subdirectory (crypto)
