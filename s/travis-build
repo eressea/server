@@ -2,6 +2,7 @@
 
 set -e
 ROOT=`pwd`
+SUPP=../share/ubuntu-12_04.supp
 MACHINE=`uname -m`
 [ -z "$CC" ] && [ ! -z `which gcc` ] && CC="gcc"
 [ -z "$CC" ] && [ ! -z `which tcc` ] && CC="tcc"
@@ -25,13 +26,13 @@ make
 test_valgrind_report () {
 cd $ROOT/tests
 ln -sf ../scripts/config.lua
-valgrind --suppressions=ubuntu-12_04.supp --error-exitcode=1 $BUILD/eressea/eressea -v0 -t184 ../scripts/reports.lua
+valgrind --suppressions=$SUPP --error-exitcode=1 $BUILD/eressea/eressea -v0 -t184 ../scripts/reports.lua
 }
 
 test_valgrind_turn () {
 cd $ROOT/tests
 ln -sf ../scripts/config.lua
-valgrind --suppressions=ubuntu-12_04.supp --error-exitcode=1 $BUILD/eressea/eressea -v0 -t184 ../scripts/run-turn.lua
+valgrind --suppressions=$SUPP --error-exitcode=1 $BUILD/eressea/eressea -v0 -t184 ../scripts/run-turn.lua
 }
 
 test_unittests() {
