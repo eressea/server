@@ -901,7 +901,9 @@ static void rmtroop(troop dt)
     rmfighter(df, 1);
 
     assert(dt.index >= 0 && dt.index < df->unit->number);
-    df->person[dt.index] = df->person[df->alive - df->removed];
+    if (dt.index!=df->alive-df->removed) {
+        df->person[dt.index] = df->person[df->alive - df->removed];
+    }
     if (df->removed) {
         df->person[df->alive - df->removed] = df->person[df->alive];
     }
