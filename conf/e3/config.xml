@@ -120,7 +120,7 @@
     <param name="seed.population.max" value="8"/>
     <param name="rules.migrants" value="0"/>
     <param name="rules.reserve.twophase" value="1"/>
-    <param name="rules.owners.force_leave" value="1"/>
+    <param name="rules.owners.force_leave" value="0"/>
     <param name="rules.monsters.attack_chance" value="0.0"/>
     <param name="rules.transfermen" value="0"/>
     <param name="rules.stealth.faction" value="1"/>
