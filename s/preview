@@ -1,5 +1,12 @@
 #!/bin/bash
 
+MACHINE=`uname -m`
+[ -z "$CC" ] && [ ! -z `which clang` ] && CC="clang"
+[ -z "$CC" ] && [ ! -z `which gcc` ] && CC="gcc"
+[ -z "$CC" ] && [ ! -z `which tcc` ] && CC="tcc"
+[ -z "$CC" ] && [ ! -z `which cc` ] && CC="cc"
+BUILD="build-$MACHINE-$CC-Debug"
+
 function usage() {
 cat <<HEREDOC
 usage: $0 [-t <turn>] [-g <game>] [-f <file>] command [args]
@@ -80,8 +87,8 @@ ln -f $LIVE/data/$turn.dat data/
 rm -rf reports
 mkdir -p reports
 
-SUPP="$SERVER/share/ubuntu-12_04.supp"
-SERVER="$SOURCE/build-x86_64-gcc-Debug/eressea/eressea"
+SUPP="$SOURCE/share/ubuntu-12_04.supp"
+SERVER="$SOURCE/$BUILD/eressea/eressea"
 VALGRIND=$(which valgrind)
 if [ ! -z $VALGRIND ]; then
 SERVER="$VALGRIND --suppressions=$SUPP --error-exitcode=1 --leak-check=no $SERVER"
@@ -148,7 +155,7 @@ case "$1" in
   ;;
 "run")
   if [ $turn -eq 0 ]; then
-    [ -f $LIVE/turn ] || abort "missing turn file, and no turn specified"
+    [ -f $LIVE/turn ] || abort "missing turn file in $LIVE, and no turn specified"
     let turn=$(cat $LIVE/turn)-1
   fi
   run
