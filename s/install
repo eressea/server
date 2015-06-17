@@ -29,4 +29,4 @@ done
 # install crontab, but only on the eressea server:
 HOST=`hostname`
 
-[ "eressea" = "$HOST" ] && crontab $ROOT/process/cron/crontab
+[ "gruenbaer" = "$HOST" ] && crontab $ROOT/process/cron/crontab
