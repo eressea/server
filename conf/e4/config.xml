@@ -118,7 +118,7 @@
     <param name="world.era" value="3"/>
     <param name="rules.migrants" value="0"/>
     <param name="rules.reserve.twophase" value="1"/>
-    <param name="rules.owners.force_leave" value="1"/>
+    <param name="rules.owners.force_leave" value="0"/>
     <param name="rules.transfermen" value="0"/>
     <param name="rules.stealth.faction" value="1"/>
     <param name="rules.stealth.anon_battle" value="0"/>
