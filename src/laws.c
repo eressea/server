@@ -4337,6 +4337,11 @@ void force_leave(region *r) {
     }
 }
 
+bool rule_force_leave(int flags) {
+    int rules = get_param_int(global.parameters, "rules.owners.force_leave", 0);
+    return (rules&flags) == flags;
+}
+
 static void maintain_buildings_1(region * r)
 {
     maintain_buildings(r, false);
@@ -4438,7 +4443,7 @@ void init_processor(void)
     add_proc_unit(p, follow_unit, "Folge auf Einheiten setzen");
 
     p += 10;                      /* rest rng again before economics */
-    if (get_param_int(global.parameters, "rules.owners.force_leave", 0)) {
+    if (rule_force_leave(FORCE_LEAVE_ALL)) {
         add_proc_region(p, force_leave, "kick non-allies out of buildings/ships");
     }
     add_proc_region(p, economics, "Zerstoeren, Geben, Rekrutieren, Vergessen");

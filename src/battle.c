@@ -4307,6 +4307,9 @@ void do_battle(region * r)
 
     /* Auswirkungen berechnen: */
     aftermath(b);
+    if (rule_force_leave(FORCE_LEAVE_POSTCOMBAT)) {
+        force_leave(b->region);
+    }
     /* Hier ist das Gefecht beendet, und wir können die
      * Hilfsstrukturen * wieder löschen: */
 

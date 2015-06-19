@@ -230,6 +230,21 @@ static void test_display_cmd(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_rule_force_leave(CuTest *tc) {
+    set_param(&global.parameters, "rules.owners.force_leave", "0");
+    CuAssertIntEquals(tc, false, rule_force_leave(FORCE_LEAVE_ALL));
+    CuAssertIntEquals(tc, false, rule_force_leave(FORCE_LEAVE_POSTCOMBAT));
+    set_param(&global.parameters, "rules.owners.force_leave", "1");
+    CuAssertIntEquals(tc, false, rule_force_leave(FORCE_LEAVE_ALL));
+    CuAssertIntEquals(tc, true, rule_force_leave(FORCE_LEAVE_POSTCOMBAT));
+    set_param(&global.parameters, "rules.owners.force_leave", "2");
+    CuAssertIntEquals(tc, true, rule_force_leave(FORCE_LEAVE_ALL));
+    CuAssertIntEquals(tc, false, rule_force_leave(FORCE_LEAVE_POSTCOMBAT));
+    set_param(&global.parameters, "rules.owners.force_leave", "3");
+    CuAssertIntEquals(tc, true, rule_force_leave(FORCE_LEAVE_ALL));
+    CuAssertIntEquals(tc, true, rule_force_leave(FORCE_LEAVE_POSTCOMBAT));
+}
+
 static void test_force_leave_buildings(CuTest *tc) {
     ally *al;
     region *r;
@@ -779,6 +794,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_enter_building);
     SUITE_ADD_TEST(suite, test_enter_ship);
     SUITE_ADD_TEST(suite, test_display_cmd);
+    SUITE_ADD_TEST(suite, test_rule_force_leave);
     SUITE_ADD_TEST(suite, test_force_leave_buildings);
     SUITE_ADD_TEST(suite, test_force_leave_ships);
     SUITE_ADD_TEST(suite, test_force_leave_ships_on_ocean);
