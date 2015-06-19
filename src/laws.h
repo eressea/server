@@ -105,8 +105,12 @@ extern "C" {
     bool seefaction(const struct faction *f, const struct region *r,
         const struct unit *u, int modifier);
     int armedmen(const struct unit *u, bool siege_weapons);
-    void force_leave(struct region *r);
     int peasant_luck_effect(int peasants, int luck, int maxp, double variance);
+
+    #define FORCE_LEAVE_POSTCOMBAT 1
+    #define FORCE_LEAVE_ALL 2
+    bool rule_force_leave(int flag);
+    void force_leave(struct region *r);
 
 #ifdef __cplusplus
 }

@@ -3946,7 +3946,6 @@ static bool start_battle(region * r, battle ** bp)
     unit *u;
     bool fighting = false;
 
-    /* list_foreach geht nicht, wegen flucht */
     for (u = r->units; u != NULL; u = u->next) {
         if (fval(u, UFL_LONGACTION))
             continue;
@@ -4307,6 +4306,9 @@ void do_battle(region * r)
 
     /* Auswirkungen berechnen: */
     aftermath(b);
+    if (rule_force_leave(FORCE_LEAVE_POSTCOMBAT)) {
+        force_leave(b->region);
+    }
     /* Hier ist das Gefecht beendet, und wir können die
      * Hilfsstrukturen * wieder löschen: */
 

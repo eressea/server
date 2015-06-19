@@ -3346,7 +3346,7 @@ void new_units(void)
                     }
                     u2 = create_unit(r, u->faction, 0, u->faction->race, alias, name, u);
                     if (name != NULL)
-                        free(name);
+                        free(name); // TODO: use a buffer on the stack instead?
                     fset(u2, UFL_ISNEW);
 
                     a_add(&u2->attribs, a_new(&at_alias))->data.i = alias;
@@ -4337,6 +4337,11 @@ void force_leave(region *r) {
     }
 }
 
+bool rule_force_leave(int flags) {
+    int rules = get_param_int(global.parameters, "rules.owners.force_leave", 0);
+    return (rules&flags) == flags;
+}
+
 static void maintain_buildings_1(region * r)
 {
     maintain_buildings(r, false);
@@ -4372,6 +4377,12 @@ static int warn_password(void)
 void init_processor(void)
 {
     int p;
+
+	while (processors) {
+		processor * next = processors->next;
+		free(processors);
+		processors = next;
+	}
 
     p = 10;
     add_proc_global(p, new_units, "Neue Einheiten erschaffen");
@@ -4438,7 +4449,7 @@ void init_processor(void)
     add_proc_unit(p, follow_unit, "Folge auf Einheiten setzen");
 
     p += 10;                      /* rest rng again before economics */
-    if (get_param_int(global.parameters, "rules.owners.force_leave", 0)) {
+    if (rule_force_leave(FORCE_LEAVE_ALL)) {
         add_proc_region(p, force_leave, "kick non-allies out of buildings/ships");
     }
     add_proc_region(p, economics, "Zerstoeren, Geben, Rekrutieren, Vergessen");
@@ -4523,13 +4534,9 @@ void init_processor(void)
 
 void processorders(void)
 {
-    static int init = 0;
+    init_processor();
 
-    if (!init) {
-        init_processor();
-        init = 1;
-    }
-    update_spells();
+	update_spells();
     process();
     /*************************************************/
 
