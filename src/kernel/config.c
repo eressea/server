@@ -991,7 +991,7 @@ void init_locale(struct locale *lang)
                 addtoken(tokens, name, var);
             }
             else {
-                log_error("no translation for magic school %s in locale %s", tok, locale_name(lang));
+                log_warning("no translation for magic school %s in locale %s", tok, locale_name(lang));
             }
             tok = strtok(NULL, " ");
         }

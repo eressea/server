@@ -3946,7 +3946,6 @@ static bool start_battle(region * r, battle ** bp)
     unit *u;
     bool fighting = false;
 
-    /* list_foreach geht nicht, wegen flucht */
     for (u = r->units; u != NULL; u = u->next) {
         if (fval(u, UFL_LONGACTION))
             continue;

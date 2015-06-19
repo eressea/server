@@ -36,4 +36,3 @@ function test_read_ship()
     s = ship.create(nil, "boat")
     assert_not_nil(s)
 end
-
