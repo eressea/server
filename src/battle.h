@@ -270,6 +270,7 @@ extern "C" {
         const struct group * g, unsigned int flags,
         const struct faction * stealthfaction);
     int skilldiff(troop at, troop dt, int dist);
+	void force_leave(struct region *r, struct battle *b);
 
 #ifdef __cplusplus
 }

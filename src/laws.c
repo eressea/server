@@ -4307,34 +4307,12 @@ static void enter_2(region * r)
     do_enter(r, 1);
 }
 
-static bool help_enter(unit *uo, unit *u) {
+bool help_enter(unit *uo, unit *u) {
     return uo->faction == u->faction || alliedunit(uo, u->faction, HELP_GUARD);
 }
 
-void force_leave(region *r) {
-    unit *u;
-    for (u = r->units; u; u = u->next) {
-        unit *uo = NULL;
-        if (u->building) {
-            uo = building_owner(u->building);
-        }
-        if (u->ship && r->land) {
-            uo = ship_owner(u->ship);
-        }
-        if (uo && !help_enter(uo, u)) {
-            message *msg = NULL;
-            if (u->building) {
-                msg = msg_message("force_leave_building", "unit owner building", u, uo, u->building);
-            }
-            else {
-                msg = msg_message("force_leave_ship", "unit owner ship", u, uo, u->ship);
-            }
-            if (msg) {
-                ADDMSG(&u->faction->msgs, msg);
-            }
-            leave(u, false);
-        }
-    }
+static void do_force_leave(region *r) {
+	force_leave(r, NULL);
 }
 
 bool rule_force_leave(int flags) {
@@ -4450,7 +4428,7 @@ void init_processor(void)
 
     p += 10;                      /* rest rng again before economics */
     if (rule_force_leave(FORCE_LEAVE_ALL)) {
-        add_proc_region(p, force_leave, "kick non-allies out of buildings/ships");
+        add_proc_region(p, do_force_leave, "kick non-allies out of buildings/ships");
     }
     add_proc_region(p, economics, "Zerstoeren, Geben, Rekrutieren, Vergessen");
     add_proc_order(p, K_PROMOTION, promotion_cmd, 0, "Heldenbefoerderung");
