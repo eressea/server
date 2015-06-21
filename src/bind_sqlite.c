@@ -44,7 +44,7 @@ static int tolua_db_execute(lua_State * L)
 
     int res = sqlite3_exec(db, sql, 0, 0, 0);
 
-    tolua_pushnumber(L, (LUA_NUMBER)res);
+    lua_pushinteger(L, res);
     return 1;
 }
 

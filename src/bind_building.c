@@ -20,6 +20,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/building.h>
 #include <kernel/region.h>
 
+#include <util/log.h>
 #include <util/language.h>
 
 #include <tolua.h>
@@ -114,7 +115,7 @@ static int tolua_building_set_name(lua_State * L)
 static int tolua_building_get_size(lua_State * L)
 {
     building *self = (building *)tolua_tousertype(L, 1, 0);
-    tolua_pushnumber(L, self->size);
+    lua_pushinteger(L, self->size);
     return 1;
 }
 
@@ -145,7 +146,7 @@ static int tolua_building_get_units(lua_State * L)
 static int tolua_building_get_id(lua_State * L)
 {
     building *self = (building *)tolua_tousertype(L, 1, 0);
-    tolua_pushnumber(L, (lua_Number)self->no);
+    lua_pushinteger(L, self->no);
     return 1;
 }
 
@@ -190,7 +191,13 @@ static int tolua_building_create(lua_State * L)
 {
     region *r = (region *)tolua_tousertype(L, 1, 0);
     const char *bname = tolua_tostring(L, 2, 0);
-    if (bname) {
+	if (!r) {
+		log_error("building.create expects a region as argument 1");
+	}
+	if (!bname) {
+		log_error("building.create expects a name as argument 2");
+	}
+	if (bname) {
         const building_type *btype = bt_find(bname);
         if (btype) {
             building *b = new_building(btype, r, default_locale);

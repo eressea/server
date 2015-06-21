@@ -24,6 +24,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* kernel includes */
 #include <kernel/alliance.h>
 #include <kernel/building.h>
+#include <kernel/build.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/race.h>
@@ -212,6 +213,22 @@ void score(void)
             fclose(scoreFP);
         }
     }
+}
+
+int default_score(const item_type *itype) {
+    int result = 0;
+    if (itype->construction) {
+        requirement *req = itype->construction->materials;
+        while (req->number) {
+            int score = req->rtype->itype ? req->rtype->itype->score : 10;
+            result += score * req->number * 2;
+            ++req;
+        }
+    }
+    else {
+        result = 10;
+    }
+    return result;
 }
 
 #endif

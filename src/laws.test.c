@@ -1,5 +1,6 @@
 #include <platform.h>
 #include "laws.h"
+#include "battle.h"
 
 #include <kernel/ally.h>
 #include <kernel/config.h>
@@ -230,6 +231,21 @@ static void test_display_cmd(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_rule_force_leave(CuTest *tc) {
+    set_param(&global.parameters, "rules.owners.force_leave", "0");
+    CuAssertIntEquals(tc, false, rule_force_leave(FORCE_LEAVE_ALL));
+    CuAssertIntEquals(tc, false, rule_force_leave(FORCE_LEAVE_POSTCOMBAT));
+    set_param(&global.parameters, "rules.owners.force_leave", "1");
+    CuAssertIntEquals(tc, false, rule_force_leave(FORCE_LEAVE_ALL));
+    CuAssertIntEquals(tc, true, rule_force_leave(FORCE_LEAVE_POSTCOMBAT));
+    set_param(&global.parameters, "rules.owners.force_leave", "2");
+    CuAssertIntEquals(tc, true, rule_force_leave(FORCE_LEAVE_ALL));
+    CuAssertIntEquals(tc, false, rule_force_leave(FORCE_LEAVE_POSTCOMBAT));
+    set_param(&global.parameters, "rules.owners.force_leave", "3");
+    CuAssertIntEquals(tc, true, rule_force_leave(FORCE_LEAVE_ALL));
+    CuAssertIntEquals(tc, true, rule_force_leave(FORCE_LEAVE_POSTCOMBAT));
+}
+
 static void test_force_leave_buildings(CuTest *tc) {
     ally *al;
     region *r;
@@ -246,8 +262,8 @@ static void test_force_leave_buildings(CuTest *tc) {
     building_set_owner(u1);
     u_set_building(u2, b);
     u_set_building(u3, b);
-    force_leave(r);
-    CuAssertPtrEquals_Msg(tc, "owner should not be forecd to leave", b, u1->building);
+    force_leave(r, NULL);
+    CuAssertPtrEquals_Msg(tc, "owner should not be forced to leave", b, u1->building);
     CuAssertPtrEquals_Msg(tc, "same faction should not be forced to leave", b, u2->building);
     CuAssertPtrEquals_Msg(tc, "non-allies should be forced to leave", NULL, u3->building);
     msg = test_get_last_message(u3->faction->msgs);
@@ -256,7 +272,7 @@ static void test_force_leave_buildings(CuTest *tc) {
     u_set_building(u3, b);
     al = ally_add(&u1->faction->allies, u3->faction);
     al->status = HELP_GUARD;
-    force_leave(r);
+    force_leave(r, NULL);
     CuAssertPtrEquals_Msg(tc, "allies should not be forced to leave", b, u3->building);
     test_cleanup();
 }
@@ -274,7 +290,7 @@ static void test_force_leave_ships(CuTest *tc) {
     u_set_ship(u1, sh);
     u_set_ship(u2, sh);
     ship_set_owner(u1);
-    force_leave(r);
+    force_leave(r, NULL);
     CuAssertPtrEquals_Msg(tc, "non-allies should be forced to leave", NULL, u2->ship);
     msg = test_get_last_message(u2->faction->msgs);
     CuAssertStrEquals(tc, "force_leave_ship", test_get_messagetype(msg));
@@ -293,7 +309,7 @@ static void test_force_leave_ships_on_ocean(CuTest *tc) {
     u_set_ship(u1, sh);
     u_set_ship(u2, sh);
     ship_set_owner(u1);
-    force_leave(r);
+    force_leave(r, NULL);
     CuAssertPtrEquals_Msg(tc, "no forcing out of ships on oceans", sh, u2->ship);
     test_cleanup();
 }
@@ -779,6 +795,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_enter_building);
     SUITE_ADD_TEST(suite, test_enter_ship);
     SUITE_ADD_TEST(suite, test_display_cmd);
+    SUITE_ADD_TEST(suite, test_rule_force_leave);
     SUITE_ADD_TEST(suite, test_force_leave_buildings);
     SUITE_ADD_TEST(suite, test_force_leave_ships);
     SUITE_ADD_TEST(suite, test_force_leave_ships_on_ocean);

@@ -901,7 +901,9 @@ static void rmtroop(troop dt)
     rmfighter(df, 1);
 
     assert(dt.index >= 0 && dt.index < df->unit->number);
-    df->person[dt.index] = df->person[df->alive - df->removed];
+    if (dt.index!=df->alive-df->removed) {
+        df->person[dt.index] = df->person[df->alive - df->removed];
+    }
     if (df->removed) {
         df->person[df->alive - df->removed] = df->person[df->alive];
     }
@@ -3944,7 +3946,6 @@ static bool start_battle(region * r, battle ** bp)
     unit *u;
     bool fighting = false;
 
-    /* list_foreach geht nicht, wegen flucht */
     for (u = r->units; u != NULL; u = u->next) {
         if (fval(u, UFL_LONGACTION))
             continue;
@@ -4234,6 +4235,52 @@ static void battle_flee(battle * b)
     }
 }
 
+static bool is_enemy(battle *b, unit *u1, unit *u2) {
+	if (u1->faction != u2->faction) {
+		if (b) {
+			side *es, *s1 = 0, *s2 = 0;
+			for (es = b->sides; es != b->sides + b->nsides; ++es) {
+				if (!s1 && es->faction == u1->faction) s1 = es;
+				else if (!s2 && es->faction == u2->faction) s2 = es;
+				if (s1 && s2) break;
+			}
+			return enemy(s1, s2);
+		}
+		else {
+			return !help_enter(u1, u2);
+		}
+	}
+	return false;
+}
+
+void force_leave(region *r, battle *b) {
+	unit *u;
+
+	for (u = r->units; u; u = u->next) {
+		unit *uo = NULL;
+		if (u->building) {
+			uo = building_owner(u->building);
+		}
+		if (u->ship && r->land) {
+			uo = ship_owner(u->ship);
+		}
+		if (uo && is_enemy(b, uo, u)) {
+			message *msg = NULL;
+			if (u->building) {
+				msg = msg_message("force_leave_building", "unit owner building", u, uo, u->building);
+			}
+			else {
+				msg = msg_message("force_leave_ship", "unit owner ship", u, uo, u->ship);
+			}
+			if (msg) {
+				ADDMSG(&u->faction->msgs, msg);
+			}
+			leave(u, false);
+		}
+	}
+}
+
+
 void do_battle(region * r)
 {
     battle *b = NULL;
@@ -4305,6 +4352,9 @@ void do_battle(region * r)
 
     /* Auswirkungen berechnen: */
     aftermath(b);
+    if (rule_force_leave(FORCE_LEAVE_POSTCOMBAT)) {
+        force_leave(b->region, b);
+    }
     /* Hier ist das Gefecht beendet, und wir können die
      * Hilfsstrukturen * wieder löschen: */
 

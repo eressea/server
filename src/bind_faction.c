@@ -77,35 +77,35 @@ int tolua_faction_add_item(lua_State * L)
             result = i ? i->number : 0;
         }                           /* if (itype!=NULL) */
     }
-    lua_pushnumber(L, result);
+    lua_pushinteger(L, result);
     return 1;
 }
 
 static int tolua_faction_get_maxheroes(lua_State * L)
 {
     faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    tolua_pushnumber(L, (lua_Number)maxheroes(self));
+    lua_pushinteger(L, maxheroes(self));
     return 1;
 }
 
 static int tolua_faction_get_heroes(lua_State * L)
 {
     faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    tolua_pushnumber(L, (lua_Number)countheroes(self));
+    lua_pushinteger(L, countheroes(self));
     return 1;
 }
 
 static int tolua_faction_get_score(lua_State * L)
 {
     faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    tolua_pushnumber(L, (lua_Number)self->score);
+    lua_pushinteger(L, self->score);
     return 1;
 }
 
 static int tolua_faction_get_id(lua_State * L)
 {
     faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    tolua_pushnumber(L, (lua_Number)self->no);
+    lua_pushinteger(L, self->no);
     return 1;
 }
 
@@ -148,7 +148,7 @@ static int tolua_faction_set_magic(lua_State * L)
 static int tolua_faction_get_age(lua_State * L)
 {
     faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    tolua_pushnumber(L, (lua_Number)self->age);
+    lua_pushinteger(L, self->age);
     return 1;
 }
 
@@ -163,7 +163,7 @@ static int tolua_faction_set_age(lua_State * L)
 static int tolua_faction_get_flags(lua_State * L)
 {
     faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    tolua_pushnumber(L, (lua_Number)self->flags);
+    lua_pushinteger(L, self->flags);
     return 1;
 }
 
@@ -178,7 +178,7 @@ static int tolua_faction_set_flags(lua_State * L)
 static int tolua_faction_get_options(lua_State * L)
 {
     faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    tolua_pushnumber(L, (lua_Number)self->options);
+    lua_pushinteger(L, self->options);
     return 1;
 }
 
@@ -193,7 +193,7 @@ static int tolua_faction_set_options(lua_State * L)
 static int tolua_faction_get_lastturn(lua_State * L)
 {
     faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    tolua_pushnumber(L, (lua_Number)self->lastorders);
+    lua_pushinteger(L, self->lastorders);
     return 1;
 }
 
@@ -245,7 +245,7 @@ static int tolua_faction_get_policy(lua_State * L)
         }
     }
 
-    tolua_pushnumber(L, (lua_Number)result);
+    lua_pushinteger(L, result);
     return 1;
 }
 
@@ -283,8 +283,8 @@ static int tolua_faction_normalize(lua_State * L)
         int nx = r->x, ny = r->y;
         pnormalize(&nx, &ny, pl);
         adjust_coordinates(f, &nx, &ny, pl);
-        tolua_pushnumber(L, (lua_Number)nx);
-        tolua_pushnumber(L, (lua_Number)ny);
+        lua_pushinteger(L, nx);
+        lua_pushinteger(L, ny);
         return 2;
     }
     return 0;
@@ -319,8 +319,8 @@ static int tolua_faction_get_origin(lua_State * L)
         y = 0;
     }
 
-    tolua_pushnumber(L, (lua_Number)x);
-    tolua_pushnumber(L, (lua_Number)y);
+    lua_pushinteger(L, x);
+    lua_pushinteger(L, y);
     return 2;
 }
 
@@ -443,7 +443,7 @@ static int tolua_faction_set_name(lua_State * L)
 static int tolua_faction_get_uid(lua_State * L)
 {
     faction *f = (faction *)tolua_tousertype(L, 1, 0);
-    tolua_pushnumber(L, f->subscription);
+    lua_pushinteger(L, f->subscription);
     return 1;
 }
 

@@ -123,7 +123,7 @@ static int tolua_quicklist_iter(lua_State * L)
         void *data = ql_get(ql, index);
         tolua_pushusertype(L, data, TOLUA_CAST type);
         ql_advance(qlp, &index, 1);
-        tolua_pushnumber(L, index);
+        lua_pushinteger(L, index);
         lua_replace(L, lua_upvalueindex(2));
         return 1;
     }
@@ -139,7 +139,7 @@ int tolua_quicklist_push(struct lua_State *L, const char *list_type,
         *qlist_ptr = list;
         luaL_getmetatable(L, list_type);
         lua_setmetatable(L, -2);
-        lua_pushnumber(L, 0);
+        lua_pushinteger(L, 0);
         lua_pushstring(L, elem_type);
         lua_pushcclosure(L, tolua_quicklist_iter, 3);       /* OBS: this closure has multiple upvalues (list, index, type_name) */
     }
@@ -219,7 +219,7 @@ static int tolua_setkey(lua_State * L)
 
 static int tolua_rng_int(lua_State * L)
 {
-    lua_pushnumber(L, (lua_Number)rng_int());
+    lua_pushinteger(L, rng_int());
     return 1;
 }
 
@@ -227,7 +227,7 @@ static int tolua_read_orders(lua_State * L)
 {
     const char *filename = tolua_tostring(L, 1, 0);
     int result = readorders(filename);
-    lua_pushnumber(L, (lua_Number)result);
+    lua_pushinteger(L, result);
     return 1;
 }
 
@@ -282,14 +282,14 @@ static int tolua_set_turn(lua_State * L)
 
 static int tolua_get_turn(lua_State * L)
 {
-    tolua_pushnumber(L, (lua_Number)turn);
+    lua_pushinteger(L, turn);
     return 1;
 }
 
 static int tolua_atoi36(lua_State * L)
 {
     const char *s = tolua_tostring(L, 1, 0);
-    tolua_pushnumber(L, (lua_Number)atoi36(s));
+    lua_pushinteger(L, atoi36(s));
     return 1;
 }
 
@@ -303,7 +303,7 @@ static int tolua_itoa36(lua_State * L)
 static int tolua_dice_rand(lua_State * L)
 {
     const char *s = tolua_tostring(L, 1, 0);
-    tolua_pushnumber(L, dice_rand(s));
+    lua_pushinteger(L, dice_rand(s));
     return 1;
 }
 
@@ -320,7 +320,7 @@ static int tolua_addequipment(lua_State * L)
             result = 0;
         }
     }
-    lua_pushnumber(L, (lua_Number)result);
+    lua_pushinteger(L, result);
     return 1;
 }
 
@@ -426,7 +426,7 @@ static int tolua_get_nmrs(lua_State * L)
         }
         result = nmrs[n];
     }
-    tolua_pushnumber(L, (lua_Number)result);
+    lua_pushinteger(L, result);
     return 1;
 }
 
@@ -451,7 +451,7 @@ static int tolua_equipment_setitem(lua_State * L)
             result = 0;
         }
     }
-    tolua_pushnumber(L, (lua_Number)result);
+    lua_pushinteger(L, result);
     return 1;
 }
 
@@ -465,7 +465,7 @@ static int tolua_spawn_braineaters(lua_State * L)
 static int tolua_init_reports(lua_State * L)
 {
     int result = init_reports();
-    tolua_pushnumber(L, (lua_Number)result);
+    lua_pushinteger(L, result);
     return 1;
 }
 
@@ -475,7 +475,7 @@ static int tolua_write_report(lua_State * L)
     if (f) {
         time_t ltime = time(0);
         int result = write_reports(f, ltime);
-        tolua_pushnumber(L, (lua_Number)result);
+        lua_pushinteger(L, result);
     }
     else {
         tolua_pushstring(L, "function expects a faction, got nil");
@@ -488,7 +488,7 @@ static int tolua_write_reports(lua_State * L)
     int result;
     init_reports();
     result = reports();
-    tolua_pushnumber(L, (lua_Number)result);
+    lua_pushinteger(L, result);
     return 1;
 }
 
@@ -534,7 +534,7 @@ static int tolua_process_orders(lua_State * L)
 static int tolua_write_passwords(lua_State * L)
 {
     int result = writepasswd();
-    lua_pushnumber(L, (lua_Number)result);
+    lua_pushinteger(L, result);
     return 0;
 }
 
@@ -568,7 +568,7 @@ static int tolua_write_map(lua_State * L)
 static int tolua_read_turn(lua_State * L)
 {
     int cturn = current_turn();
-    tolua_pushnumber(L, (lua_Number)cturn);
+    lua_pushinteger(L, cturn);
     return 1;
 }
 
@@ -661,7 +661,7 @@ static int tolua_get_alliance_factions(lua_State * L)
 static int tolua_get_alliance_id(lua_State * L)
 {
     alliance *self = (alliance *)tolua_tousertype(L, 1, 0);
-    tolua_pushnumber(L, (lua_Number)self->id);
+    lua_pushinteger(L, self->id);
     return 1;
 }
 
@@ -982,7 +982,7 @@ static int tolua_get_spell_school(lua_State * L)
 static int tolua_get_spell_level(lua_State * L)
 {
     spell *self = (spell *) tolua_tousertype(L, 1, 0);
-    lua_pushnumber(L, self->level);
+    lua_pushinteger(L, self->level);
     return 1;
 }
 #endif
@@ -1069,7 +1069,7 @@ static void parse_inifile(lua_State * L, dictionary * d, const char *section)
                 tolua_pushstring(L, str_value);
             }
             else {
-                tolua_pushnumber(L, num_value);
+                lua_pushnumber(L, num_value);
             }
             lua_rawset(L, -3);
         }

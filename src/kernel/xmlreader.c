@@ -31,6 +31,10 @@ without prior permission by the authors of Eressea.
 
 #include "vortex.h"
 
+#if SCORE_MODULE
+#include <modules/score.h>
+#endif
+
 /* util includes */
 #include <util/attrib.h>
 #include <util/bsdstring.h>
@@ -766,9 +770,6 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
     itype->weight = xml_ivalue(node, "weight", 0);
     itype->capacity = xml_ivalue(node, "capacity", 0);
     itype->flags |= flags;
-#if SCORE_MODULE
-    itype->score = xml_ivalue(node, "score", 0);
-#endif
 
     /* reading item/construction */
     xpath->node = node;
@@ -855,6 +856,10 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
         }
         xmlFree(propValue);
     }
+#if SCORE_MODULE
+    itype->score = xml_ivalue(node, "score", 0);
+    if (!itype->score) itype->score = default_score(itype);
+#endif
     xmlXPathFreeObject(result);
 
     return itype;
@@ -1721,7 +1726,7 @@ static int parse_races(xmlDocPtr doc)
         if (xml_bvalue(node, "resistpierce", false))
             rc->battle_flags |= BF_RES_PIERCE;
         if (xml_bvalue(node, "canattack", true))
-            rc->battle_flags |= BF_CANATTACK;
+            rc->battle_flags |= BF_CANATTACK; // TODO: invert this flag, so rc_get_or_create gets simpler
 
         for (child = node->children; child; child = child->next) {
             if (strcmp((const char *)child->name, "ai") == 0) {

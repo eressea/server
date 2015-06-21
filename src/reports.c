@@ -114,8 +114,18 @@ const char *combatstatus[] = {
 const char *report_kampfstatus(const unit * u, const struct locale *lang)
 {
     static char fsbuf[64]; // FIXME: static return value
+	const char * status = LOC(lang, combatstatus[u->status]);
 
-    strlcpy(fsbuf, LOC(lang, combatstatus[u->status]), sizeof(fsbuf));
+	if (!status) {
+		const char *lname = locale_name(lang);
+		struct locale *wloc = get_or_create_locale(lname);
+		log_error("no translation for combat status %s in %s", combatstatus[u->status], lname);
+		locale_setstring(wloc, combatstatus[u->status], combatstatus[u->status]);
+		strlcpy(fsbuf, combatstatus[u->status], sizeof(fsbuf));
+	}
+	else {
+		strlcpy(fsbuf, status, sizeof(fsbuf));
+	}
     if (fval(u, UFL_NOAID)) {
         strcat(fsbuf, ", ");
         strcat(fsbuf, LOC(lang, "status_noaid"));

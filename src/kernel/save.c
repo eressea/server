@@ -618,13 +618,13 @@ unit *read_unit(struct gamedata *data)
     }
 
     READ_STR(data->store, obuf, sizeof(obuf));
-    u->_name = _strdup(obuf);
+    u->_name = obuf[0] ? _strdup(obuf) : 0;
     if (lomem) {
         READ_STR(data->store, NULL, 0);
     }
     else {
         READ_STR(data->store, obuf, sizeof(obuf));
-        u->display = _strdup(obuf);
+        u->display = obuf[0] ? _strdup(obuf) : 0;
     }
     READ_INT(data->store, &number);
     set_number(u, number);

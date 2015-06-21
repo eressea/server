@@ -2,13 +2,13 @@
 <resources xmlns:xi="http://www.w3.org/2001/XInclude">
   <!-- this file contains resources that can be mined in some way (anything with a resourcelimit) -->
 
-  <xi:include href="config:///core/resources/cart.xml"/>
-  <xi:include href="config:///core/resources/horse.xml"/>
-  <xi:include href="config:///core/resources/hp.xml"/>
-  <xi:include href="config:///core/resources/laen.xml"/>
-  <xi:include href="config:///core/resources/log.xml"/>
-  <xi:include href="config:///core/resources/mallorn.xml"/>
-  <xi:include href="config:///core/resources/peasant.xml"/>
+  <xi:include href="config://core/resources/cart.xml"/>
+  <xi:include href="config://core/resources/horse.xml"/>
+  <xi:include href="config://core/resources/hp.xml"/>
+  <xi:include href="config://core/resources/laen.xml"/>
+  <xi:include href="config://core/resources/log.xml"/>
+  <xi:include href="config://core/resources/mallorn.xml"/>
+  <xi:include href="config://core/resources/peasant.xml"/>
   <xi:include href="resources/iron.xml"/>
   <xi:include href="resources/mallornseed.xml"/>
   <xi:include href="resources/seed.xml"/>

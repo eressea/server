@@ -275,11 +275,6 @@
     </string>
   </namespace>
 
-  <string name="Tresen">
-    <text locale="de">Tresen</text>
-    <text locale="en">counter</text>
-  </string>
-
   <string name="wenige">
     <text locale="de">wenige</text>
     <text locale="en">few</text>
