@@ -55,6 +55,9 @@ static void test_alliance_join(CuTest *tc) {
     setalliance(fix.f2, al);
     CuAssertPtrEquals(tc, fix.f1, alliance_get_leader(al));
     CuAssertTrue(tc, is_allied(fix.f1, fix.f2));
+    setalliance(fix.f1, 0);
+    CuAssertPtrEquals(tc, fix.f2, alliance_get_leader(al));
+    CuAssertTrue(tc, !is_allied(fix.f1, fix.f2));
     test_cleanup();
 }
 

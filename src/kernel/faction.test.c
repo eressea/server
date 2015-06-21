@@ -1,6 +1,7 @@
 #include <platform.h>
 
 #include <kernel/ally.h>
+#include <kernel/alliance.h>
 #include <kernel/faction.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
@@ -27,6 +28,20 @@ static void test_remove_empty_factions_allies(CuTest *tc) {
     ally_add(&f1->allies, f2);
     remove_empty_factions();
     CuAssertPtrEquals(tc, 0, f1->allies);
+    test_cleanup();
+}
+
+static void test_remove_empty_factions_alliance(CuTest *tc) {
+    faction *f;
+    struct alliance *al;
+
+    test_cleanup();
+    f = test_create_faction(0);
+    al = makealliance(0, "Hodor");
+    setalliance(f, al);
+    CuAssertPtrEquals(tc, f, alliance_get_leader(al));
+    remove_empty_factions();
+    CuAssertPtrEquals(tc, 0, al->_leader);
     test_cleanup();
 }
 
@@ -130,6 +145,7 @@ CuSuite *get_faction_suite(void)
     SUITE_ADD_TEST(suite, test_addfaction);
     SUITE_ADD_TEST(suite, test_remove_empty_factions);
     SUITE_ADD_TEST(suite, test_remove_empty_factions_allies);
+    SUITE_ADD_TEST(suite, test_remove_empty_factions_alliance);
     SUITE_ADD_TEST(suite, test_remove_dead_factions);
     SUITE_ADD_TEST(suite, test_get_monsters);
     SUITE_ADD_TEST(suite, test_set_origin);
