@@ -34,10 +34,8 @@ static void test_remove_empty_factions_allies(CuTest *tc) {
 static void test_remove_empty_factions_alliance(CuTest *tc) {
     faction *f;
     struct alliance *al;
-    region *r;
 
     test_cleanup();
-    r = test_create_region(0, 0, 0);
     f = test_create_faction(0);
     al = makealliance(0, "Hodor");
     setalliance(f, al);
