@@ -3760,7 +3760,7 @@ static int battle_report(battle * b)
                 char buffer[32];
 
                 if (komma) {
-                    strlcpy(bufp, ", ", size);
+                    bytes = strlcpy(bufp, ", ", size);
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
                 }
