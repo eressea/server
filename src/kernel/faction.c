@@ -651,6 +651,9 @@ void remove_empty_factions(void)
             *fp = f->next;
             funhash(f);
             free_faction(f);
+            if (f->alliance && f->alliance->_leader == f) {
+                setalliance(f, 0);
+            }
             free(f);
         }
         else

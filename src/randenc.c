@@ -1126,6 +1126,7 @@ void randomevents(void)
                 }
                 else if (r->age > 20 && rng_int() % 100 < 8) {
                     volcano_outbreak(r);
+                    rsetterrain(r, T_VOLCANO);
                 }
             }
         }

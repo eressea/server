@@ -114,18 +114,18 @@ const char *combatstatus[] = {
 const char *report_kampfstatus(const unit * u, const struct locale *lang)
 {
     static char fsbuf[64]; // FIXME: static return value
-	const char * status = LOC(lang, combatstatus[u->status]);
+    const char * status = LOC(lang, combatstatus[u->status]);
 
-	if (!status) {
-		const char *lname = locale_name(lang);
-		struct locale *wloc = get_or_create_locale(lname);
-		log_error("no translation for combat status %s in %s", combatstatus[u->status], lname);
-		locale_setstring(wloc, combatstatus[u->status], combatstatus[u->status]);
-		strlcpy(fsbuf, combatstatus[u->status], sizeof(fsbuf));
-	}
-	else {
-		strlcpy(fsbuf, status, sizeof(fsbuf));
-	}
+    if (!status) {
+        const char *lname = locale_name(lang);
+        struct locale *wloc = get_or_create_locale(lname);
+        log_error("no translation for combat status %s in %s", combatstatus[u->status], lname);
+        locale_setstring(wloc, combatstatus[u->status], combatstatus[u->status]);
+        strlcpy(fsbuf, combatstatus[u->status], sizeof(fsbuf));
+    }
+    else {
+        strlcpy(fsbuf, status, sizeof(fsbuf));
+    }
     if (fval(u, UFL_NOAID)) {
         strcat(fsbuf, ", ");
         strcat(fsbuf, LOC(lang, "status_noaid"));
@@ -139,7 +139,7 @@ const char *hp_status(const unit * u)
     double p;
     int max_hp = u->number * unit_max_hp(u);
 
-    if (u->hp ==  max_hp)
+    if (u->hp == max_hp)
         return NULL;
 
     p = (double)((double)u->hp / (double)(max_hp));
@@ -978,7 +978,7 @@ void split_paragraph(strlist ** SP, const char *s, unsigned int indent, unsigned
 
     assert(width <= REPORTWIDTH);
     width -= indent;
-    firstline = (mark!=0 && indent>2);
+    firstline = (mark != 0 && indent > 2);
     *SP = 0;
 
     while (len > 0) {
@@ -1002,7 +1002,7 @@ void split_paragraph(strlist ** SP, const char *s, unsigned int indent, unsigned
         if (!cut) {
             cut = s + _min(len, REPORTWIDTH);
         }
-        strncpy(buf+indent, s, cut - s);
+        strncpy(buf + indent, s, cut - s);
         buf[indent + (cut - s)] = 0;
         addstrlist(SP, buf); // TODO: too much string copying, cut out this function
         while (*cut == ' ') {
@@ -2445,7 +2445,7 @@ static void eval_trail(struct opstack **stack, const void *userdata)
         }
     }
     *bufp = 0;
-    var.v = strcpy(balloc((size_t)(bufp - buf +1)), buf);
+    var.v = strcpy(balloc((size_t)(bufp - buf + 1)), buf);
     opush(stack, var);
 #ifdef _SECURECRT_ERRCODE_VALUES_DEFINED
     if (errno == ERANGE) {

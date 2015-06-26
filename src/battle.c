@@ -3760,7 +3760,7 @@ static int battle_report(battle * b)
                 char buffer[32];
 
                 if (komma) {
-                    strlcpy(bufp, ", ", size);
+                    bytes = strlcpy(bufp, ", ", size);
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
                 }
@@ -4236,48 +4236,48 @@ static void battle_flee(battle * b)
 }
 
 static bool is_enemy(battle *b, unit *u1, unit *u2) {
-	if (u1->faction != u2->faction) {
-		if (b) {
-			side *es, *s1 = 0, *s2 = 0;
-			for (es = b->sides; es != b->sides + b->nsides; ++es) {
-				if (!s1 && es->faction == u1->faction) s1 = es;
-				else if (!s2 && es->faction == u2->faction) s2 = es;
-				if (s1 && s2) break;
-			}
-			return enemy(s1, s2);
-		}
-		else {
-			return !help_enter(u1, u2);
-		}
-	}
-	return false;
+    if (u1->faction != u2->faction) {
+        if (b) {
+            side *es, *s1 = 0, *s2 = 0;
+            for (es = b->sides; es != b->sides + b->nsides; ++es) {
+                if (!s1 && es->faction == u1->faction) s1 = es;
+                else if (!s2 && es->faction == u2->faction) s2 = es;
+                if (s1 && s2) break;
+            }
+            return enemy(s1, s2);
+        }
+        else {
+            return !help_enter(u1, u2);
+        }
+    }
+    return false;
 }
 
 void force_leave(region *r, battle *b) {
-	unit *u;
+    unit *u;
 
-	for (u = r->units; u; u = u->next) {
-		unit *uo = NULL;
-		if (u->building) {
-			uo = building_owner(u->building);
-		}
-		if (u->ship && r->land) {
-			uo = ship_owner(u->ship);
-		}
-		if (uo && is_enemy(b, uo, u)) {
-			message *msg = NULL;
-			if (u->building) {
-				msg = msg_message("force_leave_building", "unit owner building", u, uo, u->building);
-			}
-			else {
-				msg = msg_message("force_leave_ship", "unit owner ship", u, uo, u->ship);
-			}
-			if (msg) {
-				ADDMSG(&u->faction->msgs, msg);
-			}
-			leave(u, false);
-		}
-	}
+    for (u = r->units; u; u = u->next) {
+        unit *uo = NULL;
+        if (u->building) {
+            uo = building_owner(u->building);
+        }
+        if (u->ship && r->land) {
+            uo = ship_owner(u->ship);
+        }
+        if (uo && is_enemy(b, uo, u)) {
+            message *msg = NULL;
+            if (u->building) {
+                msg = msg_message("force_leave_building", "unit owner building", u, uo, u->building);
+            }
+            else {
+                msg = msg_message("force_leave_ship", "unit owner ship", u, uo, u->ship);
+            }
+            if (msg) {
+                ADDMSG(&u->faction->msgs, msg);
+            }
+            leave(u, false);
+        }
+    }
 }
 
 

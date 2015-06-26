@@ -4312,7 +4312,7 @@ bool help_enter(unit *uo, unit *u) {
 }
 
 static void do_force_leave(region *r) {
-	force_leave(r, NULL);
+    force_leave(r, NULL);
 }
 
 bool rule_force_leave(int flags) {
@@ -4356,11 +4356,11 @@ void init_processor(void)
 {
     int p;
 
-	while (processors) {
-		processor * next = processors->next;
-		free(processors);
-		processors = next;
-	}
+    while (processors) {
+        processor * next = processors->next;
+        free(processors);
+        processors = next;
+    }
 
     p = 10;
     add_proc_global(p, new_units, "Neue Einheiten erschaffen");
@@ -4514,7 +4514,7 @@ void processorders(void)
 {
     init_processor();
 
-	update_spells();
+    update_spells();
     process();
     /*************************************************/
 
