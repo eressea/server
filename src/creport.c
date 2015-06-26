@@ -1441,13 +1441,13 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
             }
         }
         if (sr->mode == see_unit || sr->mode == see_travel) {
-	    cr_output_messages(F, r->msgs, f);
-	    {
-		message_list *mlist = r_getmessages(r, f);
-		if (mlist)
-		    cr_output_messages(F, mlist, f);
-	    }
-	}
+            cr_output_messages(F, r->msgs, f);
+            {
+                message_list *mlist = r_getmessages(r, f);
+                if (mlist)
+                    cr_output_messages(F, mlist, f);
+            }
+        }
         /* buildings */
         for (b = rbuildings(r); b; b = b->next) {
             int fno = -1;
