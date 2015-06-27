@@ -1485,7 +1485,7 @@ static void make_route(unit * u, order * ord, region_list ** routep)
  */
 static int movement_speed(unit * u)
 {
-    int mp;
+    int mp = BP_WALKING;
     static const curse_type *speed_ct;
     static bool init = false;
     double dk = u_race(u)->speed;
@@ -1496,9 +1496,11 @@ static int movement_speed(unit * u)
     case RC_DRAGON:
     case RC_WYRM:
     case RC_FIREDRAGON:
+        return BP_DRAGON;
     case RC_BIRTHDAYDRAGON:
     case RC_SONGDRAGON:
-        return BP_DRAGON;
+        mp = BP_DRAGON;
+        break;
     default:
         break;
     }
@@ -1516,7 +1518,6 @@ static int movement_speed(unit * u)
     }
 
     switch (canride(u)) {
-
     case 1:                      /* Pferd */
         mp = BP_RIDING;
         break;
@@ -1526,8 +1527,6 @@ static int movement_speed(unit * u)
         break;
 
     default:
-        mp = BP_WALKING;
-
         /* Siebenmeilentee */
         if (get_effect(u, oldpotiontype[P_FAST]) >= u->number) {
             mp *= 2;
