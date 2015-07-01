@@ -742,12 +742,12 @@ function test_guard_resources()
   assert_equal(iron, u2:get_item("iron"))
 end
 
+]]--
+-- segfault above
+
 local function is_flag_set(flags, flag)
   return math.fmod(flags, flag*2) - math.fmod(flags, flag) == flag;
 end
-
-]]--
--- segfault above
 
 function test_hero_hero_transfer()
   local r = region.create(0,0, "mountain")
