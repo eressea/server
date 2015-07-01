@@ -511,6 +511,7 @@ function test_herbalism()
 end
 
 -- segfault below
+--[[
 
 function test_mallorn()
     local r = region.create(0, 0, "plain")
@@ -745,7 +746,8 @@ local function is_flag_set(flags, flag)
   return math.fmod(flags, flag*2) - math.fmod(flags, flag) == flag;
 end
 
---[[
+]]--
+-- segfault above
 
 function test_hero_hero_transfer()
   local r = region.create(0,0, "mountain")
@@ -798,8 +800,6 @@ function test_expensive_skills_cost_money()
   assert_equal(9900, u:get_item("money"))
   assert_equal(1, u:get_skill("magic"))
 end
-]]--
--- segfault above
 
 function test_food_is_consumed()
   local r = region.create(0, 0, "plain")
