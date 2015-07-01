@@ -510,7 +510,6 @@ function test_herbalism()
   process_orders()
 end
 
---[[
 function test_mallorn()
     local r = region.create(0, 0, "plain")
     r:set_flag(1, false) -- not mallorn
@@ -796,6 +795,7 @@ function test_expensive_skills_cost_money()
   assert_equal(1, u:get_skill("magic"))
 end
 
+--[[
 function test_food_is_consumed()
   local r = region.create(0, 0, "plain")
   local f = faction.create("noreply26@eressea.de", "human", "de")
