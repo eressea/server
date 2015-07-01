@@ -3,7 +3,7 @@ require "lunit"
 module("tests.e3.morale", package.seeall, lunit.testcase )
 
 function setup()
-    eressea.free_game()
+    eressea.game.reset()
 end
 
 function test_when_owner_returns_morale_drops_only_2()

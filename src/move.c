@@ -1889,18 +1889,13 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
 
         if (!flying_ship(sh)) {
             int stormchance;
-            static int stormyness;
-            static int gamecookie = -1;
+            int stormyness = 0;
             int reason;
-
-            if (gamecookie != global.cookie) {
-                bool storms_enabled = get_param_int(global.parameters, "rules.ship.storms", 1) != 0;
-                if (storms_enabled) {
-                    gamedate date;
-                    get_gamedate(turn, &date);
-                    stormyness = storms ? storms[date.month] * 5 : 0;
-                }
-                gamecookie = global.cookie;
+            bool storms_enabled = get_param_int(global.parameters, "rules.ship.storms", 1) != 0;
+            if (storms_enabled) {
+                gamedate date;
+                get_gamedate(turn, &date);
+                stormyness = storms ? storms[date.month] * 5 : 0;
             }
 
             /* storms should be the first thing we do. */

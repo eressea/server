@@ -14,9 +14,6 @@ without prior permission by the authors of Eressea.
 
 #include "bind_unit.h"
 #include "bind_dict.h"
-#ifdef BSON_ATTRIB
-# include "bind_attrib.h"
-#endif
 #include "alchemy.h"
 #include "bindings.h"
 #include "move.h"
@@ -63,23 +60,6 @@ static int tolua_unit_get_objects(lua_State * L)
     tolua_pushusertype(L, (void *)&self->attribs, USERTYPE_DICT);
     return 1;
 }
-
-#ifdef BSON_ATTRIB
-static int tolua_unit_get_attribs(lua_State * L)
-{
-    unit *self = (unit *) tolua_tousertype(L, 1, 0);
-    attrib **attrib_ptr = (attrib **) lua_newuserdata(L, sizeof(attrib *));
-    attrib *a = tolua_get_lua_ext(self->attribs);
-
-    luaL_getmetatable(L, "attrib");
-    lua_setmetatable(L, -2);
-
-    *attrib_ptr = a;
-
-    lua_pushcclosure(L, tolua_attriblist_next, 1);
-    return 1;
-}
-#endif
 
 int tolua_unitlist_nextf(lua_State * L)
 {
@@ -1054,9 +1034,6 @@ void tolua_unit_open(lua_State * L)
             tolua_variable(L, TOLUA_CAST "hp_max", &tolua_unit_get_hpmax, 0);
 
             tolua_variable(L, TOLUA_CAST "objects", &tolua_unit_get_objects, 0);
-#ifdef BSON_ATTRIB
-            tolua_variable(L, TOLUA_CAST "attribs", &tolua_unit_get_attribs, 0);
-#endif
         }
         tolua_endmodule(L);
     }
