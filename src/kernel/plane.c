@@ -186,7 +186,7 @@ adjust_coordinates(const faction * f, int *x, int *y, const plane * pl)
     int nx = *x;
     int ny = *y;
     if (f) {
-        int ux, uy;
+        int ux = 0, uy = 0;
         faction_getorigin(f, pl?pl->id:0, &ux, &uy);
         nx -= ux;
         ny -= uy;
