@@ -995,7 +995,6 @@ local function find_in_report(f, pattern, extension)
     report:close()
 
     local start, _ = string.find(t, pattern)
---    posix.unlink(filename)
     return start~=nil
 end
 

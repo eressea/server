@@ -1,5 +1,0 @@
-require 'eressea.tests.common'
-require 'eressea.tests.stealth'
-require 'eressea.tests.settings'
-require 'eressea.tests.castles'
-require 'eressea.tests.bindings'
