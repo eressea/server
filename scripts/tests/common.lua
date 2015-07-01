@@ -590,6 +590,7 @@ function test_coordinate_translation()
     assert_equal(-491, ny)
 end
 
+]]--
 function test_control()
     local u1, u2 = two_units(region.create(0, 0, "plain"), two_factions())
     local r = u1.region
@@ -648,7 +649,7 @@ function test_building_other()
     assert_not_equal(10, b.size)
 end
 
-]]--
+-- segfault above
 function test_config()
   assert_not_equal(nil, config.basepath)
   assert_not_equal(nil, config.locales)
@@ -742,8 +743,6 @@ function test_guard_resources()
   process_orders()
   assert_equal(iron, u2:get_item("iron"))
 end
-
--- segfault above
 
 local function is_flag_set(flags, flag)
   return math.fmod(flags, flag*2) - math.fmod(flags, flag) == flag;
