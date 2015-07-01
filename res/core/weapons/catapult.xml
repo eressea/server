@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <resource name="catapult">
-  <item weight="10000">
+  <item weight="10000" big="yes">
     <construction skill="cartmaking" minskill="5" reqsize="1">
       <requirement type="log" quantity="10"/>
     </construction>
