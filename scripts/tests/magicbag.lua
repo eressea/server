@@ -25,6 +25,14 @@ function test_magicbag_no_stone()
     assert_equal(7100, u.weight)
 end
 
+function test_magicbag_limit_200ge()
+    assert_equal(1000, u.weight)
+    u:add_item("log", 100)
+    assert_equal(51000, u.weight)
+    u:add_item("magicbag", 1)
+    assert_equal(31100, u.weight)
+end
+
 function test_magicbag_no_carts()
     assert_equal(1000, u.weight)
     u:add_item("cart", 1)
