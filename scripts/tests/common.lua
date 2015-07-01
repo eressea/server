@@ -510,9 +510,6 @@ function test_herbalism()
   process_orders()
 end
 
--- segfault below
---[[
-
 function test_mallorn()
     local r = region.create(0, 0, "plain")
     r:set_flag(1, false) -- not mallorn
@@ -590,7 +587,9 @@ function test_coordinate_translation()
     assert_equal(-491, ny)
 end
 
-]]--
+-- segfault below
+--[[
+
 function test_control()
     local u1, u2 = two_units(region.create(0, 0, "plain"), two_factions())
     local r = u1.region
@@ -628,6 +627,7 @@ function test_store_unit()
     assert_not_nil(u)
     assert_equal(u:get_item("money"), u.number * 100)
 end
+]]--
 
 function test_building_other()
     local r = region.create(0,0, "plain")
