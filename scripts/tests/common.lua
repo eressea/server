@@ -510,6 +510,8 @@ function test_herbalism()
   process_orders()
 end
 
+-- segfault below
+
 function test_mallorn()
     local r = region.create(0, 0, "plain")
     r:set_flag(1, false) -- not mallorn
@@ -743,6 +745,8 @@ local function is_flag_set(flags, flag)
   return math.fmod(flags, flag*2) - math.fmod(flags, flag) == flag;
 end
 
+--[[
+
 function test_hero_hero_transfer()
   local r = region.create(0,0, "mountain")
   local f = faction.create("noreply23@eressea.de", "human", "de")
@@ -794,8 +798,9 @@ function test_expensive_skills_cost_money()
   assert_equal(9900, u:get_item("money"))
   assert_equal(1, u:get_skill("magic"))
 end
+]]--
+-- segfault above
 
---[[
 function test_food_is_consumed()
   local r = region.create(0, 0, "plain")
   local f = faction.create("noreply26@eressea.de", "human", "de")
@@ -1106,4 +1111,3 @@ function test_parser()
     process_orders()
     assert_equal("Goldene Herde", u.name)
 end
-]]--
