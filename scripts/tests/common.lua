@@ -603,6 +603,7 @@ function test_control()
     process_orders()
     assert_equal(u2, b.owner)
 end
+]]--
 
 function test_store_unit()
     local r = region.create(0, 0, "plain")
@@ -627,7 +628,6 @@ function test_store_unit()
     assert_not_nil(u)
     assert_equal(u:get_item("money"), u.number * 100)
 end
-]]--
 
 function test_building_other()
     local r = region.create(0,0, "plain")
