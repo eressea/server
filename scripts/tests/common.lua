@@ -587,9 +587,6 @@ function test_coordinate_translation()
     assert_equal(-491, ny)
 end
 
--- segfault below
---[[
-
 function test_control()
     local u1, u2 = two_units(region.create(0, 0, "plain"), two_factions())
     local r = u1.region
@@ -603,7 +600,8 @@ function test_control()
     process_orders()
     assert_equal(u2, b.owner)
 end
-]]--
+-- segfault below
+--[[
 
 function test_store_unit()
     local r = region.create(0, 0, "plain")
@@ -628,6 +626,7 @@ function test_store_unit()
     assert_not_nil(u)
     assert_equal(u:get_item("money"), u.number * 100)
 end
+]]--
 
 function test_building_other()
     local r = region.create(0,0, "plain")
@@ -650,6 +649,7 @@ function test_building_other()
 end
 
 -- segfault above
+
 function test_config()
   assert_not_equal(nil, config.basepath)
   assert_not_equal(nil, config.locales)
