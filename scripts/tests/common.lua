@@ -1072,7 +1072,7 @@ function test_parser()
     local r = region.create(0, 0, "mountain")
     local f = faction.create("noreply@eressea.de", "human", "de")
     local u = unit.create(f, r, 1)
-    local filename = config.basepath .. "/data/orders.txt"
+    local filename = "orders.txt"
     
     local file = io.open(filename, "w")
     assert_not_nil(file)
