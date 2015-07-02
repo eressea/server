@@ -2675,7 +2675,7 @@ enum { E_GUARD_OK, E_GUARD_UNARMED, E_GUARD_NEWBIE, E_GUARD_FLEEING };
 
 static int can_start_guarding(const unit * u)
 {
-    if (u->status >= ST_FLEE)
+    if (u->status >= ST_FLEE || fval(u, UFL_FLEEING))
         return E_GUARD_FLEEING;
     if (fval(u_race(u), RCF_UNARMEDGUARD))
         return E_GUARD_OK;
