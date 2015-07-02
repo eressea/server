@@ -53,6 +53,7 @@
     <!-- Game specific settings -->
 
     <order name="pay" disable="yes"/>
+    <order name="besiege" disable="yes"/>
 
     <skill name="alchemy" enable="true"/>
     <skill name="crossbow" enable="true"/>
