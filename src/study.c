@@ -42,6 +42,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/language.h>
+#include <util/log.h>
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/umlaut.h>
@@ -217,8 +218,12 @@ bool report, int *academy)
         }
         if (index < MAXTEACHERS)
             teach->teachers[index++] = teacher;
-        if (index < MAXTEACHERS)
+        if (index < MAXTEACHERS) {
             teach->teachers[index] = NULL;
+        }
+        else {
+            log_warning("MAXTEACHERS is too low at %d", MAXTEACHERS);
+        }
         teach->value += n;
 
         /* Solange Akademien groessenbeschraenkt sind, sollte Lehrer und
