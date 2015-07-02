@@ -2297,7 +2297,6 @@ void do_attack(fighter * af)
         /* Wir suchen eine beliebige Feind-Einheit aus. An der können
          * wir feststellen, ob noch jemand da ist. */
         int apr, attacks = attacks_per_round(ta);
-        assert(attacks <= RACE_ATTACKS);
         if (!count_enemies(b, af, FIGHT_ROW, LAST_ROW, SELECT_FIND))
             break;
 
