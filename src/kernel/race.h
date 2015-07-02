@@ -146,7 +146,6 @@ extern "C" {
         int flags;
         int battle_flags;
         int ec_flags;
-        race_t oldfamiliars[MAXMAGIETYP];
         struct att attack[RACE_ATTACKS];
         signed char bonus[MAXSKILLS];
 
