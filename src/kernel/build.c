@@ -164,8 +164,7 @@ int destroy_cmd(unit * u, struct order *ord)
     if (s && *s) {
         n = atoi((const char *)s);
         if (n <= 0) {
-            cmistake(u, ord, 288, MSG_PRODUCE);
-            return 0;
+            n = INT_MAX;
         }
     }
 
