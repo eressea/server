@@ -158,6 +158,7 @@ static race *rc_find_i(const char *name)
     }
     if (!rc && strcmp(name, "uruk") == 0) {
         rc = rc_find_i("orc");
+        log_warning("a reference was made to the retired race '%s', returning '%s'.", name, rc->_name);
     }
     return rc;
 }

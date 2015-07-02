@@ -480,6 +480,7 @@ static const race *select_familiar(const race * magerace, magic_t magiegebiet)
     assert(magerace->familiars[0]);
     if (rnd >= 70) {
         retval = magerace->familiars[magiegebiet];
+        assert(retval);
     }
     else {
         retval = magerace->familiars[0];

@@ -1613,7 +1613,7 @@ static int parse_races(xmlDocPtr doc)
         xmlNodePtr node = nodes->nodeTab[i];
         xmlNodePtr child;
         xmlChar *propValue;
-        race *rc;
+        race *rc, *frc = 0;
         xmlXPathObjectPtr result;
         int k, study_speed_base, attacks;
         struct att *attack;
@@ -1810,21 +1810,27 @@ static int parse_races(xmlDocPtr doc)
         /* reading eressea/races/race/familiar */
         xpath->node = node;
         result = xmlXPathEvalExpression(BAD_CAST "familiar", xpath);
-        for (k = 0; k != result->nodesetval->nodeNr; ++k) {
-            xmlNodePtr node = result->nodesetval->nodeTab[k];
-            race *frc;
+        if (result->nodesetval->nodeNr > MAXMAGIETYP) {
+            log_error("race %s has %d potential familiars", rc->_name, result->nodesetval->nodeNr);
+        }
+        for (k = 0; k != MAXMAGIETYP; ++k) {
+            if (k < result->nodesetval->nodeNr) {
+                xmlNodePtr node = result->nodesetval->nodeTab[k];
 
-            propValue = xmlGetProp(node, BAD_CAST "race");
-            assert(propValue != NULL);
-            frc = rc_get_or_create((const char *)propValue);
-            if (xml_bvalue(node, "default", false)) {
-                rc->familiars[k] = rc->familiars[0];
-                rc->familiars[0] = frc;
-            }
-            else {
+                propValue = xmlGetProp(node, BAD_CAST "race");
+                assert(propValue != NULL);
+                frc = rc_get_or_create((const char *)propValue);
+                if (xml_bvalue(node, "default", false)) {
+                    rc->familiars[k] = rc->familiars[0];
+                    rc->familiars[0] = frc;
+                }
+                else {
+                    rc->familiars[k] = frc;
+                }
+                xmlFree(propValue);
+            } else {
                 rc->familiars[k] = frc;
             }
-            xmlFree(propValue);
         }
         xmlXPathFreeObject(result);
 
