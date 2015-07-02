@@ -996,6 +996,9 @@ void economics(region * r)
                 }
             }
         }
+        if (destroyed) {
+            fset(u, UFL_LONGACTION | UFL_NOTMOVING);
+        }
     }
 
 }
