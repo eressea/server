@@ -74,6 +74,16 @@
 #define DRAGON_RANGE 20         /* Max. Distanz zum nächsten Drachenziel */
 #define MAXILLUSION_TEXTS   3
 
+static void give_peasants(unit *u, const item_type *itype, int reduce) {
+    char buf[64];
+    slprintf(buf, sizeof(buf), "%s 0 %d %s", LOC(u->faction->locale, keyword(K_GIVE)), reduce, LOC(u->faction->locale, itype->rtype->_name));
+    unit_addorder(u, parse_order(buf, u->faction->locale));
+}
+
+static float monster_attack_chance(void) {
+    return get_param_flt(global.parameters, "rules.monsters.attack_chance", 0.4f);
+}
+
 static void reduce_weight(unit * u)
 {
     int capacity, weight = 0;
@@ -89,9 +99,11 @@ static void reduce_weight(unit * u)
     while (*itmp != NULL) {
         item *itm = *itmp;
         const item_type *itype = itm->type;
-        weight += itm->number * itype->weight;
         if (itype->flags & ITF_VEHICLE) {
-            give_item(itm->number, itm->type, u, NULL, NULL);
+            give_peasants(u, itm->type, itm->number);
+        }
+        else {
+            weight += itm->number * itype->weight;
         }
         if (*itmp == itm)
             itmp = &itm->next;
@@ -109,7 +121,7 @@ static void reduce_weight(unit * u)
                 && itype->rtype->atype == 0) {
                 if (itype->capacity < itype->weight) {
                     int reduce = _min(itm->number, -((capacity - weight) / itype->weight));
-                    give_item(reduce, itm->type, u, NULL, NULL);
+                    give_peasants(u, itm->type, reduce);
                     weight -= reduce * itype->weight;
                 }
             }
@@ -124,16 +136,12 @@ static void reduce_weight(unit * u)
         weight += itm->number * itype->weight;
         if (itype->capacity < itype->weight) {
             int reduce = _min(itm->number, -((capacity - weight) / itype->weight));
-            give_item(reduce, itm->type, u, NULL, NULL);
+            give_peasants(u, itm->type, reduce);
             weight -= reduce * itype->weight;
         }
         if (*itmp == itm)
             itmp = &itm->next;
     }
-}
-
-static float monster_attack_chance(void) {
-    return get_param_flt(global.parameters, "rules.monsters.attack_chance", 0.4f);
 }
 
 static order *monster_attack(unit * u, const unit * target)
@@ -665,8 +673,6 @@ static order *plan_dragon(unit * u)
     bool move = false;
     order *long_order = NULL;
 
-    reduce_weight(u);
-
     if (ta == NULL) {
         move |= (r->land == 0 || r->land->peasants == 0);   /* when no peasants, move */
         move |= (r->land == 0 || r->land->money == 0);      /* when no money, move */
@@ -716,6 +722,9 @@ static order *plan_dragon(unit * u)
             break;
         default:
             break;
+        }
+        if (long_order) {
+            reduce_weight(u);
         }
         if (rng_int() % 100 < 15) {
             const struct locale *lang = u->faction->locale;
