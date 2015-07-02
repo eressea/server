@@ -3772,6 +3772,10 @@ int use_cmd(unit * u, struct order *ord)
     init_order(ord);
 
     t = gettoken(token, sizeof(token));
+    if (!t) {
+        cmistake(u, ord, 43, MSG_PRODUCE);
+        return err;
+    }
     n = atoi((const char *)t);
     if (n == 0) {
         if (isparam(t, u->faction->locale, P_ANY)) {
