@@ -1834,39 +1834,6 @@ int write_reports(faction * f, time_t ltime)
     return 0;
 }
 
-static void nmr_warnings(void)
-{
-    faction *f, *fa;
-#define FRIEND (HELP_GUARD|HELP_MONEY)
-    for (f = factions; f; f = f->next) {
-        if (!fval(f, FFL_NOIDLEOUT) && (turn - f->lastorders) >= 2) {
-            message *msg = NULL;
-            for (fa = factions; fa; fa = fa->next) {
-                int warn = 0;
-                if (get_param_int(global.parameters, "rules.alliances", 0) != 0) {
-                    if (f->alliance && f->alliance == fa->alliance) {
-                        warn = 1;
-                    }
-                }
-                else if (alliedfaction(NULL, f, fa, FRIEND)
-                    && alliedfaction(NULL, fa, f, FRIEND)) {
-                    warn = 1;
-                }
-                if (warn) {
-                    if (msg == NULL) {
-                        msg =
-                            msg_message("warn_dropout", "faction turns", f,
-                            turn - f->lastorders);
-                    }
-                    add_message(&fa->msgs, msg);
-                }
-            }
-            if (msg != NULL)
-                msg_release(msg);
-        }
-    }
-}
-
 static void report_donations(void)
 {
     region *r;
@@ -1945,7 +1912,6 @@ int reports(void)
     if (verbosity >= 1) {
         log_printf(stdout, "Writing reports for turn %d:", turn);
     }
-    nmr_warnings();
     report_donations();
     remove_empty_units();
 
