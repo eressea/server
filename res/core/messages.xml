@@ -7100,9 +7100,16 @@
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Your faction must be at least $int($turns) weeks old to give something to another faction."</text>
   </message>
 
-  <message name="turnreminder" section="errors">
-    <type>
-  </type>
+  <message name="nmr_warning" section="errors">
+  <type/>
+    <text locale="de">Deine Partei hat letzte Runde keinen Zug
+    abgegeben!</text>
+    <text locale="en">No orders were received for your faction!</text>
+    <text locale="fr">Aucun ordre reçu pour votre faction !</text>
+  </message>
+
+  <message name="nmr_warning_final" section="errors">
+  <type/>
     <text locale="de">"Bitte sende die Befehle nächste Runde ein, wenn du weiterspielen möchtest."</text>
     <text locale="en">"Please send in orders for the next turn if you want to continue playing."</text>
   </message>

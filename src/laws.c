@@ -125,16 +125,6 @@ static int RemoveNMRNewbie(void)
     return value;
 }
 
-static void checkorders(void)
-{
-    faction *f;
-
-    log_info(" - Warne spaete Spieler...");
-    for (f = factions; f; f = f->next)
-        if (!is_monsters(f) && turn - f->lastorders == NMRTimeout() - 1)
-            ADDMSG(&f->msgs, msg_message("turnreminder", ""));
-}
-
 static void age_unit(region * r, unit * u)
 {
     if (u_race(u) == get_race(RC_SPELL)) {
@@ -735,6 +725,45 @@ void immigration(void)
     }
 }
 
+static void nmr_warnings(void)
+{
+    faction *f, *fa;
+#define FRIEND (HELP_GUARD|HELP_MONEY)
+    for (f = factions; f; f = f->next) {
+        if (!fval(f, FFL_NOIDLEOUT) && turn > f->lastorders) {
+            ADDMSG(&f->msgs, msg_message("nmr_warning", ""));
+            if (turn - f->lastorders == NMRTimeout() - 1) {
+                ADDMSG(&f->msgs, msg_message("nmr_warning_final", ""));
+            }
+            if ((turn - f->lastorders) >= 2) {
+                message *msg = NULL;
+                for (fa = factions; fa; fa = fa->next) {
+                    int warn = 0;
+                    if (get_param_int(global.parameters, "rules.alliances", 0) != 0) {
+                        if (f->alliance && f->alliance == fa->alliance) {
+                            warn = 1;
+                        }
+                    }
+                    else if (alliedfaction(NULL, f, fa, FRIEND)
+                        && alliedfaction(NULL, fa, f, FRIEND)) {
+                        warn = 1;
+                    }
+                    if (warn) {
+                        if (msg == NULL) {
+                            msg =
+                                msg_message("warn_dropout", "faction turns", f,
+                                turn - f->lastorders);
+                        }
+                        add_message(&fa->msgs, msg);
+                    }
+                }
+                if (msg != NULL)
+                    msg_release(msg);
+            }
+        }
+    }
+}
+
 void demographics(void)
 {
     region *r;
@@ -810,7 +839,6 @@ void demographics(void)
 
     remove_empty_units();
     immigration();
-    checkorders();
 }
 
 /* ------------------------------------------------------------- */
@@ -4367,6 +4395,7 @@ void init_processor(void)
     }
 
     p = 10;
+    add_proc_global(p, nmr_warnings, "NMR Warnings");
     add_proc_global(p, new_units, "Neue Einheiten erschaffen");
 
     p += 10;
