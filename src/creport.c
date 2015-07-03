@@ -264,6 +264,7 @@ cr_output_curses(FILE * F, const faction * viewer, const void *obj, objtype_t ty
                 fprintf(F, "\"%s\"\n", buf);
                 msg_release(msg);
             }
+            a = a->next;
         }
         else if (a->type == &at_effect && self) {
             effect_data *data = (effect_data *)a->data.v;
@@ -276,8 +277,11 @@ cr_output_curses(FILE * F, const faction * viewer, const void *obj, objtype_t ty
                 fprintf(F, "\"%d %s\"\n", data->value, translate(key,
                     LOC(default_locale, key)));
             }
+            a = a->next;
         }
-        a = a->next;
+        else {
+            a = a->nexttype;
+        }
     }
 }
 
