@@ -153,6 +153,11 @@ int destroy_cmd(unit * u, struct order *ord)
     if (u->number < 1)
         return 0;
 
+    if (fval(u, UFL_LONGACTION)) {
+        cmistake(u, ord, 52, MSG_PRODUCE);
+        return 0;
+    }
+
     init_order(ord);
     s = gettoken(token, sizeof(token));
 
