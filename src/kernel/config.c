@@ -530,7 +530,7 @@ int alliedunit(const unit * u, const faction * f2, int mode)
     ally *sf;
     int automode;
 
-    assert(u->region);            /* the unit should be in a region, but it's possible that u->number==0 (TEMP units) */
+    assert(u && u->region);            /* the unit should be in a region, but it's possible that u->number==0 (TEMP units) */
     if (u->faction == f2)
         return mode;
     if (u->faction != NULL && f2 != NULL) {

@@ -1281,7 +1281,7 @@ static int update_gbdream(const unit * u, int bonus, curse *c, const curse_type 
         /* wir suchen jeweils den groessten Bonus und den groestsen Malus */
         if (sign * effect > sign * bonus) {
             if (mage == NULL || mage->number == 0
-                || sign>0?alliedunit(mage, u->faction, HELP_GUARD):!alliedunit(mage, u->faction, HELP_GUARD)) {
+                || (sign>0?alliedunit(mage, u->faction, HELP_GUARD):!alliedunit(mage, u->faction, HELP_GUARD))) {
                 bonus = (int)effect;
             }
         }
