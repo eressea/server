@@ -4206,8 +4206,6 @@ static void battle_flee(battle * b)
                     default:
                         if ((fig->person[dt.index].flags & FL_HIT) == 0)
                             continue;
-                        if (b->turn <= 1)
-                            continue;
                         if (fig->person[dt.index].hp <= runhp)
                             break;
                         if (fig->person[dt.index].flags & FL_PANICED) {
