@@ -33,10 +33,13 @@
   <xi:include href="config:///default/adamantium.xml"/>
   <equipment>
     <set name="first_unit">
-      <item name="conquesttoken" amount="1"/>
-      <item name="log" amount="30"/>
-      <item name="stone" amount="30"/>
-      <item name="money" amount="4200"/>
+      <item name="log" amount="50"/>
+      <item name="stone" amount="50"/>
+      <item name="iron" amount="50"/>
+      <item name="laen" amount="10"/>
+      <item name="mallorn" amount="10"/>
+      <item name="skillpotion" amount="5"/>
+      <item name="money" amount="20000"/>
     </set>
     <set name="new_faction">
       <item name="adamantium" amount="1"/>
