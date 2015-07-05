@@ -32,7 +32,6 @@
 
   <equipment>
     <set name="first_unit">
-      <item name="conquesttoken" amount="1"/>
       <item name="log" amount="10"/>
       <item name="stone" amount="10"/>
       <item name="money" amount="5000"/>

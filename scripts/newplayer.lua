@@ -17,19 +17,10 @@ end
 local function seed(r, email, race, lang)
     local f = faction.create(email, race, lang)
     local u = unit.create(f, r)
+    equip_unit(u, "new_faction")
+    equip_unit(u, "first_unit")
+    equip_unit(u, "first_" .. race, 7) -- disable old callbacks
     u:set_skill("perception", 30)
-    u:add_item("money", 20000)
-    items = {
-        log = 50,
-        stone = 50,
-        iron = 50,
-        laen = 10,
-        mallorn = 10,
-        skillpotion = 5
-    }
-    for it, num in pairs(items) do
-        u:add_item(it, num)
-    end
     unit.create(f, r, 5):set_skill("mining", 30)
     unit.create(f, r, 5):set_skill("quarrying", 30)
     return f

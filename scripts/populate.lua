@@ -16,7 +16,7 @@ end
 local function select(regions, limit)
     local sel = {}
     for r in regions do
-        if r.terrain~="ocean" and not r.units() then
+        if not r.plane and r.terrain~="ocean" and not r.units() then
             s = score(r)
             if s >= limit then
                 table.insert(sel, r)
