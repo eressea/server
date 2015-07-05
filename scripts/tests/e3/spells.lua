@@ -5,7 +5,6 @@ module("tests.e3.spells", package.seeall, lunit.testcase)
 function setup()
     eressea.game.reset()
     eressea.settings.set("magic.fumble.enable", "0")
-    eressea.settings.set("nmr.removenewbie", "0")
     eressea.settings.set("nmr.timeout", "0")
     eressea.settings.set("rules.peasants.growth", "0")
 end

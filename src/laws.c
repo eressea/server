@@ -113,7 +113,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* - exported global symbols ----------------------------------- */
 
-static int RemoveNMRNewbie(void)
+static bool RemoveNMRNewbie(void)
 {
     static int value = -1;
     static int gamecookie = -1;
@@ -122,7 +122,7 @@ static int RemoveNMRNewbie(void)
         value = get_param_int(global.parameters, "nmr.removenewbie", 0);
         gamecookie = global.cookie;
     }
-    return value;
+    return value!=0;
 }
 
 static void age_unit(region * r, unit * u)

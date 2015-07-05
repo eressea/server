@@ -26,7 +26,6 @@ module("tests.common", package.seeall, lunit.testcase)
 
 function setup()
     eressea.free_game()
-    eressea.settings.set("nmr.removenewbie", "0")
     eressea.settings.set("nmr.timeout", "0")
     eressea.settings.set("NewbieImmunity", "0")
     eressea.settings.set("rules.economy.food", "4")
@@ -961,7 +960,6 @@ module("tests.report", package.seeall, lunit.testcase)
 
 function setup()
     eressea.free_game()
-    eressea.settings.set("nmr.removenewbie", "0")
     eressea.settings.set("nmr.timeout", "0")
     eressea.settings.set("rules.economy.food", "4")
 end
