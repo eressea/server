@@ -6,7 +6,6 @@ function setup()
     eressea.game.reset()
     eressea.config.reset()
     eressea.settings.set("rules.economy.food", "0")
-    eressea.settings.set("nmr.removenewbie", "0")
     eressea.settings.set("nmr.timeout", "0")
     eressea.settings.set("rules.magic.playerschools", "")
     conf = [[{
