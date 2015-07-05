@@ -4,7 +4,6 @@ module("tests.movement", package.seeall, lunit.testcase)
 
 function setup()
     eressea.free_game()
-    eressea.settings.set("nmr.removenewbie", "0")
     eressea.settings.set("nmr.timeout", "0")
     eressea.settings.set("rules.ships.storms", "0")
     conf = [[{
