@@ -64,6 +64,7 @@ for _, p in ipairs(players) do
             local index = math.random(#sel)
             start = sel[index]
         end
+        create_curse(nil, r, 'holyground', 1, 52)
         num_seeded = 0
     end
     local dupe = false
