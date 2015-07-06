@@ -400,7 +400,7 @@ message * disband_men(int n, unit * u, struct order *ord) {
 
 void give_unit(unit * u, unit * u2, order * ord)
 {
-    region *r = u->region;
+    region *r = u->region; //TODO: V595 http://www.viva64.com/en/V595 The 'u' pointer was utilized before it was verified against nullptr. Check lines: 403, 406.
     int maxt = max_transfers();
 
     assert(u);

@@ -755,7 +755,7 @@ static void cr_output_unit(FILE * F, const region * r, const faction * f,       
         itemcloak_ct = ct_find("itemcloak");
     }
     if (itemcloak_ct != NULL) {
-        itemcloak = curse_active(get_curse(u->attribs, itemcloak_ct));
+        itemcloak = curse_active(get_curse(u->attribs, itemcloak_ct)); //TODO: V595 http://www.viva64.com/en/V595 The 'u' pointer was utilized before it was verified against nullptr. Check lines: 758, 761.
     }
 
     assert(u && u->number);

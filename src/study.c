@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -743,7 +743,7 @@ int learn_cmd(unit * u, order * ord)
 
   multi *= study_speedup(u, sk, speed_rule);
   days = study_days(u, sk);
-  days = (int)((days + teach->value) * multi);
+  days = (int)((days + teach->value) * multi); //TODO: V595 http://www.viva64.com/en/V595 The 'teach' pointer was utilized before it was verified against nullptr. Check lines: 746, 772.
 
   /* the artacademy currently improves the learning of entertainment
      of all units in the region, to be able to make it cumulative with

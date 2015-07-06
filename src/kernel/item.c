@@ -333,7 +333,7 @@ potion_type *new_potiontype(item_type * itype, int level)
 
 void it_set_appearance(item_type *itype, const char *appearance) {
     assert(itype && itype->rtype && appearance);
-    itype->_appearance[0] = _strdup(appearance);
+    itype->_appearance[0] = _strdup(appearance); //TODO: V595 http://www.viva64.com/en/V595 The 'appearance' pointer was utilized before it was verified against nullptr. Check lines: 336, 337.
     itype->_appearance[1] = appearance ?
         strcat(strcpy((char *)malloc(strlen((char *)appearance) + 3), (char *)appearance), "_p") : 0;
 }

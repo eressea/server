@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -375,7 +375,7 @@ static int try_destruction(unit * u, unit * u2, const ship * sh, int skilldiff)
     }
     else if (skilldiff < 0) {
         /* tell the unit that the attempt was detected: */
-        ADDMSG(&u2->faction->msgs, msg_message(destruction_detected_msg,
+        ADDMSG(&u2->faction->msgs, msg_message(destruction_detected_msg, //TODO: V595 http://www.viva64.com/en/V595 The 'u2' pointer was utilized before it was verified against nullptr. Check lines: 378, 381.
             "ship unit", sh, u));
         /* tell the enemy whodunit: */
         if (u2) {

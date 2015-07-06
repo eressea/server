@@ -990,7 +990,7 @@ void writeregion(struct gamedata *data, const region * r)
         rawmaterial *res = r->resources;
 		
 		assert(r->land);
-        WRITE_STR(data->store, (const char *)r->land->name);
+        WRITE_STR(data->store, (const char *)r->land->name); //TODO: V595 http://www.viva64.com/en/V595 The 'r->land' pointer was utilized before it was verified against nullptr. Check lines: 993, 1023.
         assert(rtrees(r, 0) >= 0);
         assert(rtrees(r, 1) >= 0);
         assert(rtrees(r, 2) >= 0);

@@ -1741,7 +1741,7 @@ int name_cmd(struct unit *u, struct order *ord)
                 for (; lang; lang = nextlocale(lang)) {
                     const char *fdname = LOC(lang, "factiondefault");
                     size_t fdlen = strlen(fdname);
-                    if (strlen(f->name) >= fdlen && strncmp(f->name, fdname, fdlen) == 0) {
+                    if (strlen(f->name) >= fdlen && strncmp(f->name, fdname, fdlen) == 0) { //TODO: V814 http://www.viva64.com/en/V814 Decreased performance. The 'strlen' function was called multiple times inside the body of a loop.
                         break;
                     }
                 }
@@ -1778,14 +1778,14 @@ int name_cmd(struct unit *u, struct order *ord)
                 for (; lang; lang = nextlocale(lang)) {
                     const char *sdname = LOC(lang, sh->type->_name);
                     size_t sdlen = strlen(sdname);
-                    if (strlen(sh->name) >= sdlen
+                    if (strlen(sh->name) >= sdlen //TODO: V814 http://www.viva64.com/en/V814 Decreased performance. The 'strlen' function was called multiple times inside the body of a loop.
                         && strncmp(sh->name, sdname, sdlen) == 0) {
                         break;
                     }
 
                     sdname = LOC(lang, parameters[P_SHIP]);
                     sdlen = strlen(sdname);
-                    if (strlen(sh->name) >= sdlen
+                    if (strlen(sh->name) >= sdlen //TODO: V814 http://www.viva64.com/en/V814 Decreased performance. The 'strlen' function was called multiple times inside the body of a loop.
                         && strncmp(sh->name, sdname, sdlen) == 0) {
                         break;
                     }
@@ -2718,7 +2718,7 @@ int guard_on_cmd(unit * u, struct order *ord)
     init_order(ord);
 
     /* GUARD NOT is handled in goard_off_cmd earlier in the turn */
-    if (getparam(u->faction->locale) == P_NOT)
+    if (getparam(u->faction->locale) == P_NOT) //TODO: V595 http://www.viva64.com/en/V595 The 'u->faction' pointer was utilized before it was verified against nullptr. Check lines: 2721, 2737.
         return 0;
 
     if (fval(u->region->terrain, SEA_REGION)) {

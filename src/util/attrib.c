@@ -1,4 +1,4 @@
-/*
+ï»¿/*
 Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -69,7 +69,7 @@ static attrib_type *at_find(unsigned int hk)
 {
     const char *translate[3][2] = {
         { "zielregion", "targetregion" },     /* remapping: from 'zielregion, heute targetregion */
-        { "verzaubert", "curse" },    /* remapping: früher verzaubert, jetzt curse */
+        { "verzaubert", "curse" },    /* remapping: frÃ¼her verzaubert, jetzt curse */
         { NULL, NULL }
     };
     attrib_type *find = at_hash[hk % MAXATHASH];
@@ -110,7 +110,7 @@ const attrib *a_findc(const attrib * a, const attrib_type * at)
 
 static attrib *a_insert(attrib * head, attrib * a)
 {
-    attrib **pa = &head->next;
+    attrib **pa = &head->next; //TODO: V595 http://www.viva64.com/en/V595 The 'head' pointer was utilized before it was verified against nullptr. Check lines: 113, 116.
 
     assert(!(a->type->flags & ATF_UNIQUE));
     assert(head && head->type == a->type);
@@ -250,7 +250,7 @@ int a_age(attrib ** p)
 {
     attrib **ap = p;
     /* Attribute altern, und die Entfernung (age()==0) eines Attributs
-     * hat Einfluß auf den Besitzer */
+     * hat EinfluÃŸ auf den Besitzer */
     while (*ap) {
         attrib *a = *ap;
         if (a->type->age) {

@@ -1,4 +1,4 @@
-/*
+ï»¿/*
 Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -552,9 +552,9 @@ static void nr_curses(stream *out, int indent, const faction *viewer, objtype_t 
     region *r;
 
     /* Die Sichtbarkeit eines Zaubers und die Zaubermeldung sind bei
-    * Gebäuden und Schiffen je nach, ob man Besitzer ist, verschieden.
+    * GebÃ¤uden und Schiffen je nach, ob man Besitzer ist, verschieden.
     * Bei Einheiten sieht man Wirkungen auf eigene Einheiten immer.
-    * Spezialfälle (besonderes Talent, verursachender Magier usw. werde
+    * SpezialfÃ¤lle (besonderes Talent, verursachender Magier usw. werde
     * bei jedem curse gesondert behandelt. */
     if (typ == TYP_SHIP) {
         ship *sh = (ship *)obj;
@@ -945,7 +945,7 @@ static void describe(stream *out, const seen_region * sr, faction * f)
                 bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_tree"), size);
             }
             else {
-                bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_tree_p"), size);
+                bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_tree_p"), size); //TODO: V595 http://www.viva64.com/en/V595 The 'f' pointer was utilized before it was verified against nullptr. Check lines: 948, 956.
             }
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
@@ -1188,7 +1188,7 @@ static void describe(stream *out, const seen_region * sr, faction * f)
         }
     }
 
-    /* Wirkungen permanenter Sprüche */
+    /* Wirkungen permanenter SprÃ¼che */
     nr_curses(out, 0, f, TYP_REGION, r);
     n = 0;
 
