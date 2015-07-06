@@ -400,7 +400,6 @@ message * disband_men(int n, unit * u, struct order *ord) {
 
 void give_unit(unit * u, unit * u2, order * ord)
 {
-    region *r = u->region; //TODO: V595 http://www.viva64.com/en/V595 The 'u' pointer was utilized before it was verified against nullptr. Check lines: 403, 406.
     int maxt = max_transfers();
 
     assert(u);
@@ -409,7 +408,7 @@ void give_unit(unit * u, unit * u2, order * ord)
         return;
     }
 
-    if (u && unit_has_cursed_item(u)) {
+    if (unit_has_cursed_item(u)) {
         cmistake(u, ord, 78, MSG_COMMERCE);
         return;
     }
@@ -424,6 +423,7 @@ void give_unit(unit * u, unit * u2, order * ord)
     }
 
     if (u2 == NULL) {
+        region *r = u->region;
         message *msg;
         if (fval(r->terrain, SEA_REGION)) {
             msg = disband_men(u->number, u, ord);

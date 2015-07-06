@@ -840,7 +840,7 @@ bool see_border(const connection * b, const faction * f, const region * r)
 
 static void describe(stream *out, const seen_region * sr, faction * f)
 {
-    const region *r = sr->r;
+    const region *r;
     int n;
     bool dh;
     direction_t d;
@@ -862,6 +862,11 @@ static void describe(stream *out, const seen_region * sr, faction * f)
     size_t size = sizeof(buf);
     int bytes;
 
+    assert(out);
+    assert(f);
+    assert(sr);
+
+    r = sr->r;
     for (d = 0; d != MAXDIRECTIONS; d++) {
         /* Nachbarregionen, die gesehen werden, ermitteln */
         region *r2 = rconnect(r, d);
@@ -945,7 +950,7 @@ static void describe(stream *out, const seen_region * sr, faction * f)
                 bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_tree"), size);
             }
             else {
-                bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_tree_p"), size); //TODO: V595 http://www.viva64.com/en/V595 The 'f' pointer was utilized before it was verified against nullptr. Check lines: 948, 956.
+                bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_tree_p"), size);
             }
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
@@ -953,7 +958,7 @@ static void describe(stream *out, const seen_region * sr, faction * f)
     }
 
     /* iron & stone */
-    if (sr->mode == see_unit && f != (faction *)NULL) {
+    if (sr->mode == see_unit) {
         resource_report result[MAX_RAWMATERIALS];
         int n, numresults = report_resources(sr, result, MAX_RAWMATERIALS, f);
 
@@ -1410,7 +1415,6 @@ static void durchreisende(stream *out, const region * r, const faction * f)
                 }
             }
         }
-        /* TODO: finish localization */
         if (size > 0) {
             if (maxtravel == 1) {
                 bytes = _snprintf(bufp, size, " %s", LOC(f->locale, "has_moved_one"));

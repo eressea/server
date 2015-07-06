@@ -110,11 +110,11 @@ const attrib *a_findc(const attrib * a, const attrib_type * at)
 
 static attrib *a_insert(attrib * head, attrib * a)
 {
-    attrib **pa = &head->next; //TODO: V595 http://www.viva64.com/en/V595 The 'head' pointer was utilized before it was verified against nullptr. Check lines: 113, 116.
-
+    attrib **pa;
     assert(!(a->type->flags & ATF_UNIQUE));
     assert(head && head->type == a->type);
 
+    pa = &head->next;
     while (*pa && (*pa)->type == a->type) {
         pa = &(*pa)->next;
     }

@@ -978,6 +978,9 @@ static region *readregion(struct gamedata *data, int x, int y)
 
 void writeregion(struct gamedata *data, const region * r)
 {
+    assert(r);
+    assert(data);
+
     WRITE_INT(data->store, r->uid);
     WRITE_STR(data->store, region_getinfo(r));
     WRITE_TOK(data->store, r->terrain->_name);
@@ -988,9 +991,9 @@ void writeregion(struct gamedata *data, const region * r)
         const item_type *rht;
         struct demand *demand;
         rawmaterial *res = r->resources;
-		
-		assert(r->land);
-        WRITE_STR(data->store, (const char *)r->land->name); //TODO: V595 http://www.viva64.com/en/V595 The 'r->land' pointer was utilized before it was verified against nullptr. Check lines: 993, 1023.
+        
+        assert(r->land);
+        WRITE_STR(data->store, (const char *)r->land->name);
         assert(rtrees(r, 0) >= 0);
         assert(rtrees(r, 1) >= 0);
         assert(rtrees(r, 2) >= 0);
@@ -1020,11 +1023,9 @@ void writeregion(struct gamedata *data, const region * r)
         WRITE_INT(data->store, rherbs(r));
         WRITE_INT(data->store, rpeasants(r));
         WRITE_INT(data->store, rmoney(r));
-        if (r->land) {
-            for (demand = r->land->demands; demand; demand = demand->next) {
-                WRITE_TOK(data->store, resourcename(demand->type->itype->rtype, 0));
-                WRITE_INT(data->store, demand->value);
-            }
+        for (demand = r->land->demands; demand; demand = demand->next) {
+            WRITE_TOK(data->store, resourcename(demand->type->itype->rtype, 0));
+            WRITE_INT(data->store, demand->value);
         }
         WRITE_TOK(data->store, "end");
         write_items(data->store, r->land->items);

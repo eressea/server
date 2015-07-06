@@ -1789,9 +1789,10 @@ static void free_spellparameter(spellparameter * pa)
 {
     int i;
 
-    /* Elemente free'en */
-    for (i = 0; i < pa->length; i++) {
+    assert(pa->param);
 
+    for (i = 0; i < pa->length; i++) {
+        assert(pa->param[i]);
         switch (pa->param[i]->typ) {
         case SPP_STRING:
             free(pa->param[i]->data.s);
@@ -1799,12 +1800,9 @@ static void free_spellparameter(spellparameter * pa)
         default:
             break;
         }
-        free(pa->param[i]); //TODO: V595 http://www.viva64.com/en/V595 The 'pa->param' pointer was utilized before it was verified against nullptr. Check lines: 1802, 1805.
+        free(pa->param[i]);
     }
-
-    if (pa->param)
-        free(pa->param);
-    /* struct free'en */
+    free(pa->param);
     free(pa);
 }
 

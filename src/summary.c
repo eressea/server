@@ -356,7 +356,7 @@ summary *make_summary(void)
     const struct resource_type *rhorse = get_resourcetype(R_HORSE);
 
     for (f = factions; f; f = f->next) {
-        const struct locale *lang = f->locale; //TODO: V595 http://www.viva64.com/en/V595 The 'f' pointer was utilized before it was verified against nullptr. Check lines: 359, 376.
+        const struct locale *lang = f->locale;
         struct language *plang = s->languages;
         while (plang && plang->locale != lang)
             plang = plang->next;

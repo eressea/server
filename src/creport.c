@@ -746,8 +746,8 @@ static void cr_output_unit(FILE * F, const region * r, const faction * f,       
     const faction *sf;
     const char *prefix;
 
-    assert(u);
-    if (!u || fval(u_race(u), RCF_INVISIBLE))
+    assert(u && u->number);
+    if (u != NULL || fval(u_race(u), RCF_INVISIBLE))
         return;
 
     if (!init) {
@@ -755,10 +755,9 @@ static void cr_output_unit(FILE * F, const region * r, const faction * f,       
         itemcloak_ct = ct_find("itemcloak");
     }
     if (itemcloak_ct != NULL) {
-        itemcloak = curse_active(get_curse(u->attribs, itemcloak_ct)); //TODO: V595 http://www.viva64.com/en/V595 The 'u' pointer was utilized before it was verified against nullptr. Check lines: 758, 761.
+        curse * cu = get_curse(u->attribs, itemcloak_ct);
+        itemcloak = cu && curse_active(cu);
     }
-
-    assert(u && u->number);
 
     fprintf(F, "EINHEIT %d\n", u->no);
     fprintf(F, "\"%s\";Name\n", unit_getname(u));
