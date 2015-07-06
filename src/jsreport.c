@@ -74,7 +74,7 @@ static int report_json(const char *filename, report_context * ctx, const char *c
             }
             return 0;
         }
-        return errno;
+        return -1;
     }
     return 0;
 }

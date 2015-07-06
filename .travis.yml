@@ -2,10 +2,12 @@ language: c
 compiler:
   - gcc
   - clang
-script: s/travis-build
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -qq zlib1g-dev libtolua-dev liblua5.1-dev libncurses5-dev libsqlite3-dev libxml2-dev valgrind
+install:
+  - sudo apt-get install -qq zlib1g-dev libtolua-dev liblua5.1-dev libncurses5-dev libsqlite3-dev libxml2-dev valgrind clang
+script:
+  - s/travis-build
 os:
   - linux
   - osx
