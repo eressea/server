@@ -1,4 +1,4 @@
-/*
+ï»¿/*
  +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  |                   |  Enno Rehling <enno@eressea.de>
  | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
@@ -299,7 +299,7 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
             error = 96;
         }
         else if (u->faction != u2->faction) {
-            if (maxt>=0 && u2->faction->newbies + n > maxt) {
+            if (maxt >= 0 && u2->faction->newbies + n > maxt) {
                 error = 129;
             }
             else if (u_race(u) != u2->faction->race) {
@@ -332,7 +332,7 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
         if (has_skill(u2, SK_ALCHEMY) && !has_skill(u, SK_ALCHEMY))
             k += n;
 
-        /* Wenn Parteigrenzen überschritten werden */
+        /* Wenn Parteigrenzen Ã¼berschritten werden */
         if (u2->faction != u->faction)
             k += n;
 
@@ -354,14 +354,14 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
                 freset(u2, UFL_HERO);
         }
 
-        /* Einheiten von Schiffen können nicht NACH in von
-            * Nicht-alliierten bewachten Regionen ausführen */
+        /* Einheiten von Schiffen kÃ¶nnen nicht NACH in von
+            * Nicht-alliierten bewachten Regionen ausfÃ¼hren */
         sh = leftship(u);
         if (sh) {
             set_leftship(u2, sh);
         }
         transfermen(u, u2, n);
-        if (maxt>=0 && u->faction != u2->faction) {
+        if (maxt >= 0 && u->faction != u2->faction) {
             u2->faction->newbies += n;
         }
     }
@@ -403,6 +403,7 @@ void give_unit(unit * u, unit * u2, order * ord)
     region *r = u->region;
     int maxt = max_transfers();
 
+    assert(u);
     if (!rule_transfermen() && u->faction != u2->faction) {
         cmistake(u, ord, 74, MSG_COMMERCE);
         return;
@@ -518,7 +519,7 @@ void give_unit(unit * u, unit * u2, order * ord)
 }
 
 bool can_give_to(unit *u, unit *u2) {
-    /* Damit Tarner nicht durch die Fehlermeldung enttarnt werden können */
+    /* Damit Tarner nicht durch die Fehlermeldung enttarnt werden kÃ¶nnen */
     if (!u2) {
         return false;
     }
@@ -613,7 +614,7 @@ void give_cmd(unit * u, order * ord)
                 item *itm = *itmp;
                 const item_type *itype = itm->type;
                 if (fval(itype, ITF_HERB) && itm->number > 0) {
-                    /* give_item ändert im fall,das man alles übergibt, die
+                    /* give_item Ã¤ndert im fall,das man alles Ã¼bergibt, die
                     * item-liste der unit, darum continue vor pointerumsetzten */
                     if (give_item(itm->number, itm->type, u, u2, ord) == 0) {
                         given = true;
@@ -669,8 +670,8 @@ void give_cmd(unit * u, order * ord)
                 return;
             }
 
-            /* für alle items einmal prüfen, ob wir mehr als von diesem Typ
-            * reserviert ist besitzen und diesen Teil dann übergeben */
+            /* fÃ¼r alle items einmal prÃ¼fen, ob wir mehr als von diesem Typ
+            * reserviert ist besitzen und diesen Teil dann Ã¼bergeben */
             if (u->items) {
                 item **itmp = &u->items;
                 while (*itmp) {

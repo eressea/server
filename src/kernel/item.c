@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -332,7 +332,7 @@ potion_type *new_potiontype(item_type * itype, int level)
 }
 
 void it_set_appearance(item_type *itype, const char *appearance) {
-    assert(itype && itype->rtype);
+    assert(itype && itype->rtype && appearance);
     itype->_appearance[0] = _strdup(appearance);
     itype->_appearance[1] = appearance ?
         strcat(strcpy((char *)malloc(strlen((char *)appearance) + 3), (char *)appearance), "_p") : 0;

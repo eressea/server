@@ -1,4 +1,4 @@
-/*
+ï»¿/*
 Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -200,7 +200,7 @@ static unit *unitorders(FILE * F, int enc, struct faction *f)
                         }
                     }
                 }
-                /* Nun wird der Befehl erzeut und eingehängt */
+                /* Nun wird der Befehl erzeut und eingehÃ¤ngt */
                 *ordp = parse_order(s, u->faction->locale);
                 if (*ordp) {
                     ordp = &(*ordp)->next;
@@ -233,8 +233,8 @@ static faction *factionorders(void)
                 f->no, pass));
             return 0;
         }
-        /* Die Partei hat sich zumindest gemeldet, so daß sie noch
-         * nicht als untätig gilt */
+        /* Die Partei hat sich zumindest gemeldet, so daÃŸ sie noch
+         * nicht als untÃ¤tig gilt */
 
         /* TODO: +1 ist ein Workaround, weil cturn erst in process_orders
          * incrementiert wird. */
@@ -308,9 +308,9 @@ int readorders(const char *filename)
                 /* Falls in unitorders() abgebrochen wird, steht dort entweder eine neue
                  * Partei, eine neue Einheit oder das File-Ende. Das switch() wird erneut
                  * durchlaufen, und die entsprechende Funktion aufgerufen. Man darf buf
-                 * auf alle Fälle nicht überschreiben! Bei allen anderen Einträgen hier
-                 * muß buf erneut gefüllt werden, da die betreffende Information in nur
-                 * einer Zeile steht, und nun die nächste gelesen werden muß. */
+                 * auf alle FÃ¤lle nicht Ã¼berschreiben! Bei allen anderen EintrÃ¤gen hier
+                 * muÃŸ buf erneut gefÃ¼llt werden, da die betreffende Information in nur
+                 * einer Zeile steht, und nun die nÃ¤chste gelesen werden muÃŸ. */
 
         case P_NEXT:
             f = NULL;
@@ -331,7 +331,7 @@ int readorders(const char *filename)
 /* ------------------------------------------------------------- */
 
 /* #define INNER_WORLD  */
-/* fürs debuggen nur den inneren Teil der Welt laden */
+/* fÃ¼rs debuggen nur den inneren Teil der Welt laden */
 /* -9;-27;-1;-19;Sumpfloch */
 int inner_world(region * r)
 {
@@ -988,6 +988,8 @@ void writeregion(struct gamedata *data, const region * r)
         const item_type *rht;
         struct demand *demand;
         rawmaterial *res = r->resources;
+		
+		assert(r->land);
         WRITE_STR(data->store, (const char *)r->land->name);
         assert(rtrees(r, 0) >= 0);
         assert(rtrees(r, 1) >= 0);

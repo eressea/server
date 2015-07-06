@@ -1,4 +1,4 @@
-/*
+ï»¿/*
 Copyright (c) 1998-2014,
 Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
@@ -175,7 +175,7 @@ static void live(region * r)
     while (*up) {
         unit *u = *up;
         /* IUW: age_unit() kann u loeschen, u->next ist dann
-         * undefiniert, also muessen wir hier schon das nächste
+         * undefiniert, also muessen wir hier schon das nÃ¤chste
          * Element bestimmen */
 
         int effect = get_effect(u, oldpotiontype[P_FOOL]);
@@ -193,7 +193,7 @@ static void live(region * r)
                 reduce_skill(u, sb, weeks);
                 ADDMSG(&u->faction->msgs, msg_message("dumbeffect",
                     "unit weeks skill", u, weeks, (skill_t)sb->id));
-            }                         /* sonst Glück gehabt: wer nix weiß, kann nix vergessen... */
+            }                         /* sonst GlÃ¼ck gehabt: wer nix weiÃŸ, kann nix vergessen... */
             change_effect(u, oldpotiontype[P_FOOL], -effect);
         }
         age_unit(r, u);
@@ -335,16 +335,16 @@ static void peasants(region * r)
         peasants += births + luck;
     }
 
-    /* Alle werden satt, oder halt soviele für die es auch Geld gibt */
+    /* Alle werden satt, oder halt soviele fÃ¼r die es auch Geld gibt */
 
     satiated = _min(peasants, money / maintenance_cost(NULL));
     rsetmoney(r, money - satiated * maintenance_cost(NULL));
 
     /* Von denjenigen, die nicht satt geworden sind, verhungert der
-     * Großteil. dead kann nie größer als rpeasants(r) - satiated werden,
-     * so dass rpeasants(r) >= 0 bleiben muß. */
+     * GroÃŸteil. dead kann nie grÃ¶ÃŸer als rpeasants(r) - satiated werden,
+     * so dass rpeasants(r) >= 0 bleiben muÃŸ. */
 
-    /* Es verhungert maximal die unterernährten Bevölkerung. */
+    /* Es verhungert maximal die unterernÃ¤hrten BevÃ¶lkerung. */
 
     n = _min(peasants - satiated, rpeasants(r));
     dead += (int)(0.5 + n * PEASANT_STARVATION_CHANCE);
@@ -409,10 +409,10 @@ static void migrate(region * r)
         rsethorses(r, rhorses(r) + m->horses);
         /* Was macht das denn hier?
          * Baumwanderung wird in trees() gemacht.
-         * wer fragt das? Die Baumwanderung war abhängig von der
+         * wer fragt das? Die Baumwanderung war abhÃ¤ngig von der
          * Auswertungsreihenfolge der regionen,
-         * das hatte ich geändert. jemand hat es wieder gelöscht, toll.
-         * ich habe es wieder aktiviert, muß getestet werden.
+         * das hatte ich geÃ¤ndert. jemand hat es wieder gelÃ¶scht, toll.
+         * ich habe es wieder aktiviert, muÃŸ getestet werden.
          */
         *hp = m->next;
         m->next = free_migrants;
@@ -452,8 +452,8 @@ static void horses(region * r)
 
     /* Pferde wandern in Nachbarregionen.
      * Falls die Nachbarregion noch berechnet
-     * werden muß, wird eine migration-Struktur gebildet,
-     * die dann erst in die Berechnung der Nachbarstruktur einfließt.
+     * werden muÃŸ, wird eine migration-Struktur gebildet,
+     * die dann erst in die Berechnung der Nachbarstruktur einflieÃŸt.
      */
 
     for (n = 0; n != MAXDIRECTIONS; n++) {
@@ -467,7 +467,7 @@ static void horses(region * r)
             else {
                 migration *nb;
                 /* haben wir die Migration schonmal benutzt?
-                 * wenn nicht, müssen wir sie suchen.
+                 * wenn nicht, mÃ¼ssen wir sie suchen.
                  * Wandernde Pferde vermehren sich nicht.
                  */
                 nb = get_migrants(r2);
@@ -563,11 +563,11 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
 
         a = a_find(r->attribs, &at_germs);
         if (a && last_weeks_season == SEASON_SPRING) {
-            /* ungekeimte Samen bleiben erhalten, Sprößlinge wachsen */
+            /* ungekeimte Samen bleiben erhalten, SprÃ¶ÃŸlinge wachsen */
             sprout = _min(a->data.sa[1], rtrees(r, 1));
-            /* aus dem gesamt Sprößlingepool abziehen */
+            /* aus dem gesamt SprÃ¶ÃŸlingepool abziehen */
             rsettrees(r, 1, rtrees(r, 1) - sprout);
-            /* zu den Bäumen hinzufügen */
+            /* zu den BÃ¤umen hinzufÃ¼gen */
             rsettrees(r, 2, rtrees(r, 2) + sprout);
 
             a_removeall(&r->attribs, &at_germs);
@@ -583,7 +583,7 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
             return;
 
         /* Grundchance 1.0% */
-        /* Jeder Elf in der Region erhöht die Chance marginal */
+        /* Jeder Elf in der Region erhÃ¶ht die Chance marginal */
         elves = _min(elves, production(r) / 8);
         if (elves) {
             seedchance += 1.0 - pow(0.99999, elves * RESOURCE_QUANTITY);
@@ -604,19 +604,19 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
             }
         }
 
-        /* Bäume breiten sich in Nachbarregionen aus. */
+        /* BÃ¤ume breiten sich in Nachbarregionen aus. */
 
         /* Gesamtzahl der Samen:
-         * bis zu 6% (FORESTGROWTH*3) der Bäume samen in die Nachbarregionen */
+         * bis zu 6% (FORESTGROWTH*3) der BÃ¤ume samen in die Nachbarregionen */
         seeds = (rtrees(r, 2) * FORESTGROWTH * 3) / 1000000;
         for (d = 0; d != MAXDIRECTIONS; ++d) {
             region *r2 = rconnect(r, d);
             if (r2 && fval(r2->terrain, LAND_REGION) && r2->terrain->size) {
                 /* Eine Landregion, wir versuchen Samen zu verteilen:
-                 * Die Chance, das Samen ein Stück Boden finden, in dem sie
-                 * keimen können, hängt von der Bewuchsdichte und der
-                 * verfügbaren Fläche ab. In Gletschern gibt es weniger
-                 * Möglichkeiten als in Ebenen. */
+                 * Die Chance, das Samen ein StÃ¼ck Boden finden, in dem sie
+                 * keimen kÃ¶nnen, hÃ¤ngt von der Bewuchsdichte und der
+                 * verfÃ¼gbaren FlÃ¤che ab. In Gletschern gibt es weniger
+                 * MÃ¶glichkeiten als in Ebenen. */
                 sprout = 0;
                 seedchance = (1000 * maxworkingpeasants(r2)) / r2->terrain->size;
                 for (i = 0; i < seeds / MAXDIRECTIONS; i++) {
@@ -633,8 +633,8 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
         if (is_cursed(r->attribs, C_CURSED_BY_THE_GODS, 0))
             return;
 
-        /* in at_germs merken uns die Zahl der Samen und Sprößlinge, die
-         * dieses Jahr älter werden dürfen, damit nicht ein Same im selben
+        /* in at_germs merken uns die Zahl der Samen und SprÃ¶ÃŸlinge, die
+         * dieses Jahr Ã¤lter werden dÃ¼rfen, damit nicht ein Same im selben
          * Zyklus zum Baum werden kann */
         a = a_find(r->attribs, &at_germs);
         if (!a) {
@@ -642,13 +642,13 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
             a->data.sa[0] = (short)rtrees(r, 0);
             a->data.sa[1] = (short)rtrees(r, 1);
         }
-        /* wir haben 6 Wochen zum wachsen, jeder Same/Sproß hat 18% Chance
+        /* wir haben 6 Wochen zum wachsen, jeder Same/SproÃŸ hat 18% Chance
          * zu wachsen, damit sollten nach 5-6 Wochen alle gewachsen sein */
         growth = 1800;
 
         /* Samenwachstum */
 
-        /* Raubbau abfangen, es dürfen nie mehr Samen wachsen, als aktuell
+        /* Raubbau abfangen, es dÃ¼rfen nie mehr Samen wachsen, als aktuell
          * in der Region sind */
         seeds = _min(a->data.sa[0], rtrees(r, 0));
         sprout = 0;
@@ -661,15 +661,15 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
         a->data.sa[0] = (short)(seeds - sprout);
         /* aus dem gesamt Samenpool abziehen */
         rsettrees(r, 0, rtrees(r, 0) - sprout);
-        /* zu den Sprößlinge hinzufügen */
+        /* zu den SprÃ¶ÃŸlinge hinzufÃ¼gen */
         rsettrees(r, 1, rtrees(r, 1) + sprout);
 
         /* Baumwachstum */
 
-        /* hier gehen wir davon aus, das Jungbäume nicht ohne weiteres aus
-         * der Region entfernt werden können, da Jungbäume in der gleichen
-         * Runde nachwachsen, wir also nicht mehr zwischen diesjährigen und
-         * 'alten' Jungbäumen unterscheiden könnten */
+        /* hier gehen wir davon aus, das JungbÃ¤ume nicht ohne weiteres aus
+         * der Region entfernt werden kÃ¶nnen, da JungbÃ¤ume in der gleichen
+         * Runde nachwachsen, wir also nicht mehr zwischen diesjÃ¤hrigen und
+         * 'alten' JungbÃ¤umen unterscheiden kÃ¶nnten */
         sprout = _min(a->data.sa[1], rtrees(r, 1));
         grownup_trees = 0;
 
@@ -677,11 +677,11 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
             if (rng_int() % 10000 < growth)
                 grownup_trees++;
         }
-        /* aus dem Sprößlingepool dieses Jahres abziehen */
+        /* aus dem SprÃ¶ÃŸlingepool dieses Jahres abziehen */
         a->data.sa[1] = (short)(sprout - grownup_trees);
-        /* aus dem gesamt Sprößlingepool abziehen */
+        /* aus dem gesamt SprÃ¶ÃŸlingepool abziehen */
         rsettrees(r, 1, rtrees(r, 1) - grownup_trees);
-        /* zu den Bäumen hinzufügen */
+        /* zu den BÃ¤umen hinzufÃ¼gen */
         rsettrees(r, 2, rtrees(r, 2) + grownup_trees);
     }
 }
@@ -689,10 +689,10 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
 static void
 growing_herbs(region * r, const int current_season, const int last_weeks_season)
 {
-    /* Jetzt die Kräutervermehrung. Vermehrt wird logistisch:
+    /* Jetzt die KrÃ¤utervermehrung. Vermehrt wird logistisch:
      *
      * Jedes Kraut hat eine Wahrscheinlichkeit von (100-(vorhandene
-     * Kräuter))% sich zu vermehren. */
+     * KrÃ¤uter))% sich zu vermehren. */
     if (current_season != SEASON_WINTER) {
         int i;
         for (i = rherbs(r); i > 0; i--) {
@@ -1070,7 +1070,7 @@ int enter_building(unit * u, order * ord, int id, bool report)
     region *r = u->region;
     building *b;
 
-    /* Schwimmer können keine Gebäude betreten, außer diese sind
+    /* Schwimmer kÃ¶nnen keine GebÃ¤ude betreten, auÃŸer diese sind
      * auf dem Ozean */
     if (!fval(u_race(u), RCF_WALK) && !fval(u_race(u), RCF_FLY)) {
         if (!fval(r->terrain, SEA_REGION)) {
@@ -1186,8 +1186,8 @@ void do_enter(struct region *r, bool is_final_attempt)
                 }
                 if (ulast != NULL) {
                     /* Wenn wir hier angekommen sind, war der Befehl
-                     * erfolgreich und wir löschen ihn, damit er im
-                     * zweiten Versuch nicht nochmal ausgeführt wird. */
+                     * erfolgreich und wir lÃ¶schen ihn, damit er im
+                     * zweiten Versuch nicht nochmal ausgefÃ¼hrt wird. */
                     *ordp = ord->next;
                     ord->next = NULL;
                     free_order(ord);
@@ -1499,9 +1499,10 @@ int prefix_cmd(unit * u, struct order *ord)
         ap = &u->faction->attribs;
         if (fval(u, UFL_GROUP)) {
             attrib *a = a_find(u->attribs, &at_group);
-            group *g = (group *)a->data.v;
-            if (a)
+            if (a) {
+				group *g = (group *)a->data.v;
                 ap = &g->attribs;
+			}
         }
         set_prefix(ap, race_prefixes[var.i]);
     }
@@ -1961,13 +1962,13 @@ int mail_cmd(unit * u, struct order *ord)
     s = gettoken(token, sizeof(token));
 
     /* Falls kein Parameter, ist das eine Einheitsnummer;
-     * das Füllwort "AN" muß wegfallen, da gültige Nummer! */
+     * das FÃ¼llwort "AN" muÃŸ wegfallen, da gÃ¼ltige Nummer! */
 
     do {
         cont = 0;
         switch (findparam_ex(s, u->faction->locale)) {
         case P_REGION:
-            /* können alle Einheiten in der Region sehen */
+            /* kÃ¶nnen alle Einheiten in der Region sehen */
             s = getstrtoken();
             if (!s || !s[0]) {
                 cmistake(u, ord, 30, MSG_MESSAGE);
@@ -2320,7 +2321,7 @@ static bool display_race(faction * f, unit * u, const race * rc)
     if (wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
 
-    /* b_armor : Rüstung */
+    /* b_armor : RÃ¼stung */
     if (rc->armor > 0) {
         bytes =
             slprintf(bufp, size, ", %s: %d", LOC(f->locale, "stat_armor"), rc->armor);
@@ -2631,7 +2632,7 @@ int combatspell_cmd(unit * u, struct order *ord)
     init_order(ord);
     s = gettoken(token, sizeof(token));
 
-    /* KAMPFZAUBER [NICHT] löscht alle gesetzten Kampfzauber */
+    /* KAMPFZAUBER [NICHT] lÃ¶scht alle gesetzten Kampfzauber */
     if (!s || *s == 0 || findparam(s, u->faction->locale) == P_NOT) {
         unset_combatspell(u, 0);
         return 0;
@@ -2639,7 +2640,7 @@ int combatspell_cmd(unit * u, struct order *ord)
 
     /* Optional: STUFE n */
     if (findparam(s, u->faction->locale) == P_LEVEL) {
-        /* Merken, setzen kommt erst später */
+        /* Merken, setzen kommt erst spÃ¤ter */
         level = getint();
         level = _max(0, level);
         s = gettoken(token, sizeof(token));
@@ -2654,7 +2655,7 @@ int combatspell_cmd(unit * u, struct order *ord)
     s = gettoken(token, sizeof(token));
 
     if (findparam(s, u->faction->locale) == P_NOT) {
-        /* KAMPFZAUBER "<Spruchname>" NICHT  löscht diesen speziellen
+        /* KAMPFZAUBER "<Spruchname>" NICHT  lÃ¶scht diesen speziellen
          * Kampfzauber */
         unset_combatspell(u, sp);
         return 0;
@@ -2669,7 +2670,7 @@ int combatspell_cmd(unit * u, struct order *ord)
 
 /* ------------------------------------------------------------- */
 /* Beachten: einige Monster sollen auch unbewaffent die Region bewachen
- * können */
+ * kÃ¶nnen */
 
 enum { E_GUARD_OK, E_GUARD_UNARMED, E_GUARD_NEWBIE, E_GUARD_FLEEING };
 
@@ -2712,6 +2713,7 @@ void update_guards(void)
 int guard_on_cmd(unit * u, struct order *ord)
 {
     assert(getkeyword(ord) == K_GUARD);
+	assert(u && u->faction);
 
     init_order(ord);
 
@@ -2731,7 +2733,7 @@ int guard_on_cmd(unit * u, struct order *ord)
             cmistake(u, ord, 95, MSG_EVENT);
         }
         else {
-            /* Monster der Monsterpartei dürfen immer bewachen */
+            /* Monster der Monsterpartei dÃ¼rfen immer bewachen */
             if (is_monsters(u->faction)) {
                 guard(u, GUARD_ALL);
             }
@@ -2765,7 +2767,7 @@ void sinkships(struct region * r)
         if (!sh->type->construction || sh->size >= sh->type->construction->maxsize) {
             if (fval(r->terrain, SEA_REGION) && (!enoughsailors(sh, r)
                 || get_captain(sh) == NULL)) {
-                /* Schiff nicht seetüchtig */
+                /* Schiff nicht seetÃ¼chtig */
                 float dmg = get_param_flt(global.parameters,
                     "rules.ship.damage.nocrewocean",
                     0.30F);
@@ -3222,7 +3224,7 @@ static void ageing(void)
                 sp = &(*sp)->next;
         }
 
-        /* Gebäude */
+        /* GebÃ¤ude */
         for (bp = &r->buildings; *bp;) {
             building *b = *bp;
             age_building(b);
@@ -3428,7 +3430,7 @@ void update_long_order(unit * u)
     freset(u, UFL_MOVED);
     freset(u, UFL_LONGACTION);
     if (hunger) {
-        /* Hungernde Einheiten führen NUR den default-Befehl aus */
+        /* Hungernde Einheiten fÃ¼hren NUR den default-Befehl aus */
         set_order(&u->thisorder, default_order(u->faction->locale));
     }
     else {
@@ -3449,7 +3451,7 @@ void update_long_order(unit * u)
             continue;
 
         if (is_exclusive(ord)) {
-            /* Über dieser Zeile nur Befehle, die auch eine idle Faction machen darf */
+            /* Ãœber dieser Zeile nur Befehle, die auch eine idle Faction machen darf */
             if (idle(u->faction)) {
                 set_order(&u->thisorder, default_order(u->faction->locale));
             }
@@ -3461,13 +3463,13 @@ void update_long_order(unit * u)
         else {
             keyword_t keyword = getkeyword(ord);
             switch (keyword) {
-                /* Wenn gehandelt wird, darf kein langer Befehl ausgeführt
+                /* Wenn gehandelt wird, darf kein langer Befehl ausgefÃ¼hrt
                  * werden. Da Handel erst nach anderen langen Befehlen kommt,
-                 * muß das vorher abgefangen werden. Wir merken uns also
+                 * muÃŸ das vorher abgefangen werden. Wir merken uns also
                  * hier, ob die Einheit handelt. */
             case K_BUY:
             case K_SELL:
-                /* Wenn die Einheit handelt, muß der Default-Befehl gelöscht
+                /* Wenn die Einheit handelt, muÃŸ der Default-Befehl gelÃ¶scht
                  * werden.
                  * Wird je diese Ausschliesslichkeit aufgehoben, muss man aufpassen
                  * mit der Reihenfolge von Kaufen, Verkaufen etc., damit es Spielern
@@ -3477,7 +3479,7 @@ void update_long_order(unit * u)
 
             case K_CAST:
                 /* dient dazu, das neben Zaubern kein weiterer Befehl
-                 * ausgeführt werden kann, Zaubern ist ein kurzer Befehl */
+                 * ausgefÃ¼hrt werden kann, Zaubern ist ein kurzer Befehl */
                 set_order(&u->thisorder, copy_order(ord));
                 break;
 
@@ -3490,7 +3492,7 @@ void update_long_order(unit * u)
     if (hunger) {
         return;
     }
-    /* Wenn die Einheit handelt, muß der Default-Befehl gelöscht
+    /* Wenn die Einheit handelt, muÃŸ der Default-Befehl gelÃ¶scht
      * werden. */
 
     if (trade) {
@@ -3566,7 +3568,7 @@ void monthly_healing(void)
         double healingcurse = 0;
 
         if (heal_ct != NULL) {
-            /* bonus zurücksetzen */
+            /* bonus zurÃ¼cksetzen */
             curse *c = get_curse(r->attribs, heal_ct);
             if (c != NULL) {
                 healingcurse = curse_geteffect(c);
@@ -3576,8 +3578,8 @@ void monthly_healing(void)
             int umhp = unit_max_hp(u) * u->number;
             double p = 1.0;
 
-            /* hp über Maximum bauen sich ab. Wird zb durch Elixier der Macht
-             * oder verändertes Ausdauertalent verursacht */
+            /* hp Ã¼ber Maximum bauen sich ab. Wird zb durch Elixier der Macht
+             * oder verÃ¤ndertes Ausdauertalent verursacht */
             if (u->hp > umhp) {
                 u->hp -= (int)ceil((u->hp - umhp) / 2.0);
                 if (u->hp < umhp)
@@ -3604,7 +3606,7 @@ void monthly_healing(void)
                 if (btype == bt_find("inn")) {
                     p *= 1.5;
                 }
-                /* pro punkt 5% höher */
+                /* pro punkt 5% hÃ¶her */
                 p *= (1.0 + healingcurse * 0.05);
 
                 maxheal = p * maxheal;
@@ -3616,7 +3618,7 @@ void monthly_healing(void)
                 /* Aufaddieren der geheilten HP. */
                 u->hp = _min(u->hp + addhp, umhp);
 
-                /* soll man an negativer regeneration sterben können? */
+                /* soll man an negativer regeneration sterben kÃ¶nnen? */
                 assert(u->hp > 0);
             }
         }
@@ -3663,7 +3665,7 @@ void defaultorders(void)
                     ord->next = NULL;
                     free_order(ord);
                     if (!neworders) {
-                        /* lange Befehle aus orders und old_orders löschen zu gunsten des neuen */
+                        /* lange Befehle aus orders und old_orders lÃ¶schen zu gunsten des neuen */
                         remove_exclusive(&u->orders);
                         remove_exclusive(&u->old_orders);
                         neworders = true;
@@ -4535,8 +4537,8 @@ void processorders(void)
         wormholes_update();
     }
 
-    /* immer ausführen, wenn neue Sprüche dazugekommen sind, oder sich
-     * Beschreibungen geändert haben */
+    /* immer ausfÃ¼hren, wenn neue SprÃ¼che dazugekommen sind, oder sich
+     * Beschreibungen geÃ¤ndert haben */
     update_spells();
     warn_password();
 }

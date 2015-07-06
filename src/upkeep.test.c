@@ -1,4 +1,4 @@
-#include <platform.h>
+﻿#include <platform.h>
 #include "upkeep.h"
 
 #include <kernel/config.h>
@@ -82,6 +82,7 @@ void test_upkeep_from_pool(CuTest * tc)
     assert(i_silver);
     r = findregion(0, 0);
     u1 = test_create_unit(test_create_faction(test_create_race("human")), r);
+	assert(u1);
     u2 = test_create_unit(u1->faction, r);
     assert(r && u1 && u2);
 
