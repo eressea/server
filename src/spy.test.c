@@ -5,6 +5,7 @@
 #include <kernel/region.h>
 #include <kernel/unit.h>
 #include <kernel/faction.h>
+#include <kernel/ship.h>
 #include <kernel/order.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
@@ -101,10 +102,7 @@ static void test_all_spy_message(CuTest *tc) {
     test_cleanup();
 }
 
-static void test_sabotage_self(CuTest *tc) {
-    unit *u;
-    region *r;
-    order *ord;
+static void setup_sabotage(void) {
     struct locale *lang;
 
     test_cleanup();
@@ -112,25 +110,82 @@ static void test_sabotage_self(CuTest *tc) {
     locale_setstring(lang, parameters[P_SHIP], "SCHIFF");
     test_create_world();
     init_locales();
+}
 
+static void test_sabotage_self(CuTest *tc) {
+    unit *u;
+    region *r;
+    order *ord;
+
+    setup_sabotage();
     r = test_create_region(0, 0, NULL);
     assert(r);
     u = test_create_unit(test_create_faction(NULL), r);
     assert(u && u->faction && u->region == r);
     u->ship = test_create_ship(r, test_create_shiptype("boat"));
     assert(u->ship);
-    ord = create_order(K_SABOTAGE, lang, "SCHIFF");
+    ord = create_order(K_SABOTAGE, u->faction->locale, "SCHIFF");
     assert(ord);
     CuAssertIntEquals(tc, 0, sabotage_cmd(u, ord));
     CuAssertPtrEquals(tc, 0, r->ships);
     test_cleanup();
 }
 
+
+static void test_sabotage_other_fail(CuTest *tc) {
+    unit *u, *u2;
+    region *r;
+    order *ord;
+
+    setup_sabotage();
+    r = test_create_region(0, 0, NULL);
+    assert(r);
+    u = test_create_unit(test_create_faction(NULL), r);
+    u2 = test_create_unit(test_create_faction(NULL), r);
+    assert(u && u2);
+    u2->ship = test_create_ship(r, test_create_shiptype("boat"));
+    assert(u2->ship);
+    u->ship = u2->ship;
+    ship_update_owner(u->ship);
+    assert(ship_owner(u->ship) == u);
+    ord = create_order(K_SABOTAGE, u->faction->locale, "SCHIFF");
+    assert(ord);
+    CuAssertIntEquals(tc, 0, sabotage_cmd(u2, ord));
+    CuAssertPtrNotNull(tc, r->ships);
+    test_cleanup();
+}
+
+
+static void test_sabotage_other_success(CuTest *tc) {
+    unit *u, *u2;
+    region *r;
+    order *ord;
+
+    setup_sabotage();
+    r = test_create_region(0, 0, NULL);
+    assert(r);
+    u = test_create_unit(test_create_faction(NULL), r);
+    u2 = test_create_unit(test_create_faction(NULL), r);
+    assert(u && u2);
+    u2->ship = test_create_ship(r, test_create_shiptype("boat"));
+    assert(u2->ship);
+    u->ship = u2->ship;
+    ship_update_owner(u->ship);
+    assert(ship_owner(u->ship) == u);
+    ord = create_order(K_SABOTAGE, u->faction->locale, "SCHIFF");
+    assert(ord);
+    set_level(u2, SK_SPY, 1);
+    CuAssertIntEquals(tc, 0, sabotage_cmd(u2, ord));
+    CuAssertPtrEquals(tc, 0, r->ships);
+    test_cleanup();
+}
 CuSuite *get_spy_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_simple_spy_message);
     SUITE_ADD_TEST(suite, test_all_spy_message);
     SUITE_ADD_TEST(suite, test_sabotage_self);
+    SUITE_ADD_TEST(suite, test_sabotage_other_fail);
+    SUITE_ADD_TEST(suite, test_sabotage_other_success);
     return suite;
 }

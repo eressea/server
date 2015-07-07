@@ -445,3 +445,18 @@ const char *ship_getname(const ship * self)
 {
     return self->name;
 }
+
+unit *get_captain(const ship * sh)
+{
+    const region *r = sh->region;
+    unit *u;
+
+    for (u = r->units; u; u = u->next) {
+        if (u->ship == sh && u->number
+            && eff_skill(u, SK_SAILING, r) >= sh->type->cptskill)
+            return u;
+    }
+
+    return NULL;
+}
+

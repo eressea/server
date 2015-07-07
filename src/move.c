@@ -2130,20 +2130,6 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
     }
 }
 
-unit *get_captain(const ship * sh)
-{
-    const region *r = sh->region;
-    unit *u;
-
-    for (u = r->units; u; u = u->next) {
-        if (u->ship == sh && u->number
-            && eff_skill(u, SK_SAILING, r) >= sh->type->cptskill)
-            return u;
-    }
-
-    return NULL;
-}
-
 /* Segeln, Wandern, Reiten
 * when this routine returns a non-zero value, movement for the region needs
 * to be done again because of followers that got new MOVE orders.
