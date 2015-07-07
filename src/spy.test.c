@@ -5,9 +5,11 @@
 #include <kernel/region.h>
 #include <kernel/unit.h>
 #include <kernel/faction.h>
+#include <kernel/order.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
 #include <util/attrib.h>
+#include <util/language.h>
 #include <util/message.h>
 #include <util/crmessage.h>
 #include <tests.h>
@@ -16,6 +18,7 @@
 
 #include "spy.h"
 
+#include <assert.h>
 #include <stdio.h>
 
 #include <CuTest.h>
@@ -98,12 +101,36 @@ static void test_all_spy_message(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_sabotage_self(CuTest *tc) {
+    unit *u;
+    region *r;
+    order *ord;
+    struct locale *lang;
 
+    test_cleanup();
+    lang = get_or_create_locale("de");
+    locale_setstring(lang, parameters[P_SHIP], "SCHIFF");
+    test_create_world();
+    init_locales();
+
+    r = test_create_region(0, 0, NULL);
+    assert(r);
+    u = test_create_unit(test_create_faction(NULL), r);
+    assert(u && u->faction && u->region==r);
+    u->ship = test_create_ship(r, test_create_shiptype("boat"));
+    assert(u->ship);
+    ord = create_order(K_SABOTAGE, lang, "SCHIFF");
+    assert(ord);
+    CuAssertIntEquals(tc, 0, sabotage_cmd(u, ord));
+    CuAssertPtrEquals(tc, 0, r->ships);
+    test_cleanup();
+}
 
 CuSuite *get_spy_suite(void)
 {
   CuSuite *suite = CuSuiteNew();
   SUITE_ADD_TEST(suite, test_simple_spy_message);
   SUITE_ADD_TEST(suite, test_all_spy_message);
+  SUITE_ADD_TEST(suite, test_sabotage_self);
   return suite;
 }
