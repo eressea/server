@@ -53,6 +53,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 /* in spy steht der Unterschied zwischen Wahrnehmung des Opfers und
 * Spionage des Spions */
@@ -61,7 +62,7 @@ void spy_message(int spy, const unit * u, const unit * target)
     const char *str = report_kampfstatus(target, u->faction->locale);
 
     ADDMSG(&u->faction->msgs, msg_message("spyreport", "spy target status", u,
-					  target, str));
+        target, str));
     if (spy > 20) {
         sc_mage *mage = get_mage(target);
         /* for mages, spells and magic school */
@@ -394,7 +395,7 @@ static int try_destruction(unit * u, unit * u2, const ship * sh, int skilldiff)
     return 1;                     /* success */
 }
 
-static void sink_ship(region * r, ship * sh, const char *name, unit * saboteur)
+static void sink_ship(region * r, ship * sh, unit * saboteur)
 {
     unit **ui, *u;
     region *safety = r;
@@ -404,6 +405,9 @@ static void sink_ship(region * r, ship * sh, const char *name, unit * saboteur)
     message *sink_msg = NULL;
     faction *f;
 
+    assert(r);
+    assert(sh);
+    assert(saboteur);
     for (f = NULL, u = r->units; u; u = u->next) {
         /* slight optimization to avoid dereferencing u->faction each time */
         if (f != u->faction) {
@@ -426,7 +430,7 @@ static void sink_ship(region * r, ship * sh, const char *name, unit * saboteur)
             }
         }
     }
-    for (ui = &r->units; *ui; ui = &(*ui)->next) {
+    for (ui = &r->units; *ui;) {
         unit *u = *ui;
 
         /* inform this faction about the sinking ship: */
@@ -471,12 +475,13 @@ static void sink_ship(region * r, ship * sh, const char *name, unit * saboteur)
             add_message(&u->faction->msgs, msg);
             msg_release(msg);
             if (dead == u->number) {
-                /* the poor creature, she dies */
-                if (remove_unit(ui, u) != 0) {
-                    ui = &u->next;
+                if (remove_unit(ui, u) == 0) {
+                    /* ui is already pointing at u->next */
+                    continue;
                 }
             }
         }
+        ui = &u->next;
     }
     if (sink_msg)
         msg_release(sink_msg);
@@ -487,19 +492,21 @@ static void sink_ship(region * r, ship * sh, const char *name, unit * saboteur)
 int sabotage_cmd(unit * u, struct order *ord)
 {
     const char *s;
-    int i;
+    param_t p;
     ship *sh;
     unit *u2;
-    char buffer[DISPLAYSIZE];
-    region *r = u->region;
-    int skdiff;
+    region *r;
+    int skdiff = INT_MAX;
+
+    assert(u);
+    assert(ord);
 
     init_order(ord);
     s = getstrtoken();
 
-    i = findparam(s, u->faction->locale);
+    p = findparam(s, u->faction->locale);
 
-    switch (i) {
+    switch (p) {
     case P_SHIP:
         sh = u->ship;
         if (!sh) {
@@ -507,10 +514,13 @@ int sabotage_cmd(unit * u, struct order *ord)
             return 0;
         }
         u2 = ship_owner(sh);
-        skdiff =
-            eff_skill(u, SK_SPY, r) - crew_skill(r, u2->faction, sh, SK_PERCEPTION);
+        r = u->region;
+        if (u2->faction != u->faction) {
+            skdiff =
+                eff_skill(u, SK_SPY, r) - crew_skill(r, u2->faction, sh, SK_PERCEPTION);
+        }
         if (try_destruction(u, u2, sh, skdiff)) {
-            sink_ship(r, sh, buffer, u);
+            sink_ship(r, sh, u);
         }
         break;
     default:
