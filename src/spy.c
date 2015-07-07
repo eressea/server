@@ -53,6 +53,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 /* in spy steht der Unterschied zwischen Wahrnehmung des Opfers und
 * Spionage des Spions */
@@ -61,7 +62,7 @@ void spy_message(int spy, const unit * u, const unit * target)
     const char *str = report_kampfstatus(target, u->faction->locale);
 
     ADDMSG(&u->faction->msgs, msg_message("spyreport", "spy target status", u,
-					  target, str));
+        target, str));
     if (spy > 20) {
         sc_mage *mage = get_mage(target);
         /* for mages, spells and magic school */

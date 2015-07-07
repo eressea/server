@@ -68,9 +68,9 @@ static void test_simple_spy_message(CuTest *tc) {
 static void set_factionstealth(unit *u, faction *f) {
     attrib *a = a_find(u->attribs, &at_otherfaction);
     if (!a)
-	a = a_add(&u->attribs, make_otherfaction(f));
+        a = a_add(&u->attribs, make_otherfaction(f));
     else
-	a->data.v = f;
+        a->data.v = f;
 }
 
 static void test_all_spy_message(CuTest *tc) {
@@ -92,11 +92,11 @@ static void test_all_spy_message(CuTest *tc) {
     spy_message(99, fix.spy, fix.victim);
 
     assert_messages(tc, fix.spy->faction->msgs->begin, fix.msg_types, 5, true,
-		    M_BASE,
-		    M_MAGE,
-		    M_FACTION,
-		    M_SKILLS,
-		    M_ITEMS);
+        M_BASE,
+        M_MAGE,
+        M_FACTION,
+        M_SKILLS,
+        M_ITEMS);
 
     test_cleanup();
 }
@@ -116,7 +116,7 @@ static void test_sabotage_self(CuTest *tc) {
     r = test_create_region(0, 0, NULL);
     assert(r);
     u = test_create_unit(test_create_faction(NULL), r);
-    assert(u && u->faction && u->region==r);
+    assert(u && u->faction && u->region == r);
     u->ship = test_create_ship(r, test_create_shiptype("boat"));
     assert(u->ship);
     ord = create_order(K_SABOTAGE, lang, "SCHIFF");
@@ -128,9 +128,9 @@ static void test_sabotage_self(CuTest *tc) {
 
 CuSuite *get_spy_suite(void)
 {
-  CuSuite *suite = CuSuiteNew();
-  SUITE_ADD_TEST(suite, test_simple_spy_message);
-  SUITE_ADD_TEST(suite, test_all_spy_message);
-  SUITE_ADD_TEST(suite, test_sabotage_self);
-  return suite;
+    CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_simple_spy_message);
+    SUITE_ADD_TEST(suite, test_all_spy_message);
+    SUITE_ADD_TEST(suite, test_sabotage_self);
+    return suite;
 }
