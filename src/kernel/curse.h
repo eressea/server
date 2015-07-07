@@ -98,7 +98,6 @@ extern "C" {
      */
 
     enum {
-        /* struct's vom typ curse: */
         C_FOGTRAP,
         C_ANTIMAGICZONE,
         C_FARVISION,
@@ -128,18 +127,10 @@ extern "C" {
         C_RIOT,                     /*region in Aufruhr */
         C_NOCOST,
         C_CURSED_BY_THE_GODS,
-        /* struct's vom untertyp curse_unit: */
         C_SPEED,                    /* Beschleunigt */
         C_ORC,
         C_MBOOST,
         C_KAELTESCHUTZ,
-        C_STRENGTH,
-        C_ALLSKILLS,
-        C_MAGICRESISTANCE,          /* 44 - verändert Magieresistenz */
-        C_ITEMCLOAK,
-        C_SPARKLE,
-        /* struct's vom untertyp curse_skill: */
-        C_SKILL,
         MAXCURSE                    /* OBS: when removing curses, remember to update read_ccompat() */
     };
 

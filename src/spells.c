@@ -5011,12 +5011,6 @@ int sp_resist_magic_bonus(castorder * co)
 
         u = pa->param[n]->data.u;
 
-        /* Ist die Einheit schon verzaubert, wirkt sich dies nur auf die
-         * Menge der Verzauberten Personen aus.
-         if (is_cursed(u->attribs, C_MAGICRESISTANCE, 0))
-         continue;
-         */
-
         m = _min(u->number, victims);
         victims -= m;
 
