@@ -1,4 +1,4 @@
-#include "reports.h"
+﻿#include "reports.h"
 #include "jsreport.h"
 #include <kernel/region.h>
 #include <kernel/terrain.h>
@@ -74,7 +74,7 @@ static int report_json(const char *filename, report_context * ctx, const char *c
             }
             return 0;
         }
-        return ferror(F);
+        return -1;
     }
     return 0;
 }

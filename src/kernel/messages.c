@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -305,7 +305,7 @@ void free_messagelist(message_list * msgs)
 
 message *add_message(message_list ** pm, message * m)
 {
-    assert(m->type);
+    assert(m && m->type);
     if (!lomem && m != NULL) {
         struct mlist *mnew = malloc(sizeof(struct mlist));
         if (*pm == NULL) {

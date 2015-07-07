@@ -4,9 +4,8 @@ set -e
 ROOT=`pwd`
 SUPP=../share/ubuntu-12_04.supp
 MACHINE=`uname -m`
+[ -z "$CC" ] && [ ! -z `which clang` ] && CC="clang"
 [ -z "$CC" ] && [ ! -z `which gcc` ] && CC="gcc"
-[ -z "$CC" ] && [ ! -z `which tcc` ] && CC="tcc"
-[ -z "$CC" ] && [ ! -z `which cc` ] && CC="cc"
 BUILD="$ROOT/build-$MACHINE-$CC-Debug"
 
 inifile() {
@@ -20,7 +19,7 @@ fi
 build() {
 cd $BUILD
 cmake -DCMAKE_MODULE_PATH=$ROOT/cmake/Modules -DCMAKE_BUILD_TYPE=Debug ..
-make
+scan-build make
 }
 
 test_valgrind_report () {

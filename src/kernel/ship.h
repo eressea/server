@@ -121,9 +121,10 @@ extern "C" {
     extern void free_ship(struct ship *s);
     extern void free_ships(void);
 
-    extern const char *ship_getname(const struct ship *self);
-    extern void ship_setname(struct ship *self, const char *name);
+    const char *ship_getname(const struct ship *self);
+    void ship_setname(struct ship *self, const char *name);
     int shipspeed(const struct ship *sh, const struct unit *u);
+    struct unit *get_captain(const struct ship *sh);
 
 #ifdef __cplusplus
 }

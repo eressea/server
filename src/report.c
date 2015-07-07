@@ -1,4 +1,4 @@
-/*
+ï»¿/*
 Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -552,9 +552,9 @@ static void nr_curses(stream *out, int indent, const faction *viewer, objtype_t 
     region *r;
 
     /* Die Sichtbarkeit eines Zaubers und die Zaubermeldung sind bei
-    * Gebäuden und Schiffen je nach, ob man Besitzer ist, verschieden.
+    * GebÃ¤uden und Schiffen je nach, ob man Besitzer ist, verschieden.
     * Bei Einheiten sieht man Wirkungen auf eigene Einheiten immer.
-    * Spezialfälle (besonderes Talent, verursachender Magier usw. werde
+    * SpezialfÃ¤lle (besonderes Talent, verursachender Magier usw. werde
     * bei jedem curse gesondert behandelt. */
     if (typ == TYP_SHIP) {
         ship *sh = (ship *)obj;
@@ -840,7 +840,7 @@ bool see_border(const connection * b, const faction * f, const region * r)
 
 static void describe(stream *out, const seen_region * sr, faction * f)
 {
-    const region *r = sr->r;
+    const region *r;
     int n;
     bool dh;
     direction_t d;
@@ -862,6 +862,11 @@ static void describe(stream *out, const seen_region * sr, faction * f)
     size_t size = sizeof(buf);
     int bytes;
 
+    assert(out);
+    assert(f);
+    assert(sr);
+
+    r = sr->r;
     for (d = 0; d != MAXDIRECTIONS; d++) {
         /* Nachbarregionen, die gesehen werden, ermitteln */
         region *r2 = rconnect(r, d);
@@ -953,7 +958,7 @@ static void describe(stream *out, const seen_region * sr, faction * f)
     }
 
     /* iron & stone */
-    if (sr->mode == see_unit && f != (faction *)NULL) {
+    if (sr->mode == see_unit) {
         resource_report result[MAX_RAWMATERIALS];
         int n, numresults = report_resources(sr, result, MAX_RAWMATERIALS, f);
 
@@ -1188,7 +1193,7 @@ static void describe(stream *out, const seen_region * sr, faction * f)
         }
     }
 
-    /* Wirkungen permanenter Sprüche */
+    /* Wirkungen permanenter SprÃ¼che */
     nr_curses(out, 0, f, TYP_REGION, r);
     n = 0;
 
@@ -1410,7 +1415,6 @@ static void durchreisende(stream *out, const region * r, const faction * f)
                 }
             }
         }
-        /* TODO: finish localization */
         if (size > 0) {
             if (maxtravel == 1) {
                 bytes = _snprintf(bufp, size, " %s", LOC(f->locale, "has_moved_one"));

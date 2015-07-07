@@ -1,4 +1,4 @@
-/*
+﻿/*
 +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
 |                   |  Enno Rehling <enno@eressea.de>
 | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
@@ -54,13 +54,13 @@ cp_convert(const char *format, char *buffer, size_t length, int codepage)
     char *pos = buffer;
 
     while (pos + 1 < buffer + length && *input) {
-        size_t length = 0;
+        size_t size = 0;
         int result = 0;
         if (codepage == 437) {
-            result = unicode_utf8_to_cp437(pos, input, &length);
+            result = unicode_utf8_to_cp437(pos, input, &size);
         }
         else if (codepage == 1252) {
-            result = unicode_utf8_to_cp1252(pos, input, &length);
+            result = unicode_utf8_to_cp1252(pos, input, &size);
         }
         if (result != 0) {
             *pos = 0;                 /* just in case caller ignores our return value */
