@@ -1,17 +1,13 @@
 language: c
 compiler:
-- gcc
-- clang
+  - gcc
+  - clang
 before_install:
-- sudo apt-get update -qq
+  - sudo apt-get update -qq
 install:
-- sudo apt-get install -qq zlib1g-dev libtolua-dev liblua5.1-dev libncurses5-dev libsqlite3-dev
-  libxml2-dev valgrind clang
+  - sudo apt-get install -qq zlib1g-dev libtolua-dev liblua5.1-dev libncurses5-dev libsqlite3-dev libxml2-dev valgrind clang
 script:
-- s/travis-build
+  - s/travis-build
 os:
-- linux
-- osx
-notifications:
-  slack:
-    secure: Ha/kqXxCUqmI+gy0F2OFyCrCYauT/dYfWqjjMb9faqcWj/rP2iLnMMi1k2DEKFyP+g79cx6dCjedBQbJgqE3ZDrEnci2GVTLPorWpJ56EoHvzE7bH1sphAlfyxS6Lxm44OSLTegj9ZbRnPcGNYZ+TJuGiGKGN7RLWq0riZHwvps=
+  - linux
+  - osx
