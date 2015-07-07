@@ -435,10 +435,7 @@ void write_ship_reference(const struct ship *sh, struct storage *store)
 void ship_setname(ship * self, const char *name)
 {
     free(self->name);
-    if (name)
-        self->name = _strdup(name);
-    else
-        self->name = NULL;
+    self->name = name ? _strdup(name) : 0;
 }
 
 const char *ship_getname(const ship * self)

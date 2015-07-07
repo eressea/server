@@ -136,6 +136,7 @@ static void test_sabotage_other_fail(CuTest *tc) {
     unit *u, *u2;
     region *r;
     order *ord;
+    message *msg;
 
     setup_sabotage();
     r = test_create_region(0, 0, NULL);
@@ -151,6 +152,10 @@ static void test_sabotage_other_fail(CuTest *tc) {
     ord = create_order(K_SABOTAGE, u->faction->locale, "SCHIFF");
     assert(ord);
     CuAssertIntEquals(tc, 0, sabotage_cmd(u2, ord));
+    msg = test_get_last_message(u2->faction->msgs);
+    CuAssertStrEquals(tc, "destroy_ship_1", test_get_messagetype(msg));
+    msg = test_get_last_message(u->faction->msgs);
+    CuAssertStrEquals(tc, "destroy_ship_3", test_get_messagetype(msg));
     CuAssertPtrNotNull(tc, r->ships);
     test_cleanup();
 }
@@ -179,6 +184,7 @@ static void test_sabotage_other_success(CuTest *tc) {
     CuAssertPtrEquals(tc, 0, r->ships);
     test_cleanup();
 }
+
 CuSuite *get_spy_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
