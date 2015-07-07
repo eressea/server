@@ -193,6 +193,7 @@ set(TESTS_SRC
   spells.test.c
   spy.test.c
   upkeep.test.c
+  spells/magicresistance.test.c
   ${ATTRIBUTES_TESTS}
   ${UTIL_TESTS}
   ${KERNEL_TESTS}

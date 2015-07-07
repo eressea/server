@@ -33,14 +33,15 @@
 #include <stdlib.h>
 #include <assert.h>
 
-static message *cinfo_building(const void *obj, objtype_t typ, const curse * c,
+message *cinfo_building(const void *obj, objtype_t typ, const curse * c,
     int self)
 {
     unused_arg(typ);
     assert(typ == TYP_BUILDING);
 
     if (self != 0) {              /* owner or inside */
-        return msg_message(mkname("curseinfo", c->type->cname), "id", c->no);
+        building *b = (building *)obj;
+        return msg_message(mkname("curseinfo", c->type->cname), "id building", c->no, b);
     }
     return msg_message(mkname("curseinfo", "buildingunknown"), "id", c->no);
 }

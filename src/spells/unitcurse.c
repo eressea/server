@@ -301,10 +301,6 @@ static struct curse_type ct_oldrace = {
     "oldrace", CURSETYP_NORM, CURSE_SPREADALWAYS, NO_MERGE, NULL
 };
 
-static struct curse_type ct_magicresistance = {
-    "magicresistance", CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN, cinfo_unit
-};
-
 /* ------------------------------------------------------------- */
 /*
  * C_SKILL
@@ -365,5 +361,4 @@ void register_unitcurse(void)
     ct_register(&ct_itemcloak);
     ct_register(&ct_fumble);
     ct_register(&ct_oldrace);
-    ct_register(&ct_magicresistance);
 }

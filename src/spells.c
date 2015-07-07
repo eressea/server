@@ -6767,6 +6767,8 @@ static int sp_readmind(castorder * co)
     return cast_level;
 }
 
+void register_magicresistance(void);
+
 void register_spells(void)
 {
     register_borders();
@@ -6793,4 +6795,5 @@ void register_spells(void)
     register_regioncurse();
     register_shipcurse();
     register_buildingcurse();
+    register_magicresistance();
 }
