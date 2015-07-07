@@ -6589,7 +6589,7 @@ static spelldata spell_functions[] = {
     { "heroic_song", sp_hero, 0 },
     { "transfer_aura_song", sp_transferaura, 0 },
     { "analysesong_unit", sp_analysesong_unit, 0 },
-    { "cerrdorfumbleshield", sp_fumbleshield, 0 },
+    { "cerddorfumbleshield", sp_fumbleshield, 0 },
     { "calm_monster", sp_calm_monster, 0 },
     { "seduction", sp_seduce, 0 },
     { "headache", sp_headache, 0 },

@@ -1504,7 +1504,7 @@ int sp_fumbleshield(struct castorder * co)
     switch (sp->id) {
     case SPL_DRAIG_FUMBLESHIELD:
     case SPL_GWYRRD_FUMBLESHIELD:
-    case SPL_CERRDOR_FUMBLESHIELD:
+    case SPL_CERDDOR_FUMBLESHIELD:
     case SPL_TYBIED_FUMBLESHIELD:
         duration = 100;
         effect = _max(1, 25 - level);
