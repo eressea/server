@@ -517,11 +517,8 @@ static curse *make_curse(unit * mage, attrib ** ap, const curse_type * ct,
         break;
 
     case CURSETYP_UNIT:
-    {
         c->data.i = men;
         break;
-    }
-
     }
     return c;
 }

@@ -2212,12 +2212,6 @@
     <text locale="de">Schaden</text>
   </string>
 
-  <!--report newbie info -->
-  <string name="nr_nmr">
-    <text locale="de">Deine Partei hat letzte Runde keinen Zug
-    abgegeben!</text>
-  </string>
-
   <namespace name="race">
     <string name="snowman">
       <text locale="de">Schneemann</text>

@@ -90,8 +90,8 @@ extern "C" {
 #define AT_READ_OK 0
 #define AT_READ_FAIL -1
 
-#define AT_AGE_REMOVE 0         /* remove the attribute after calling age() */
-#define AT_AGE_KEEP 1           /* keep the attribute for another turn */
+#define AT_AGE_KEEP 0           /* keep the attribute for another turn */
+#define AT_AGE_REMOVE 1         /* remove the attribute after calling age() */
 
 #ifdef __cplusplus
 }
