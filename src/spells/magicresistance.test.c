@@ -22,15 +22,6 @@
 #include <assert.h>
 
 
-static struct castorder *test_create_castorder(castorder *order, unit *u, const char *name, int level, float force, int range) {
-    struct locale * lang;
-    spell *sp;
-
-    lang = get_or_create_locale("en");
-    sp = create_spell(name, 0);
-    return order = create_castorder(order, u, NULL, sp, u->region, level, force, range, create_order(K_CAST, lang, ""), NULL);
-}
-
 static void test_magicresistance_unit(CuTest *tc) {
     struct region *r;
     struct faction *f1, *f2;
@@ -59,7 +50,7 @@ static void test_magicresistance_unit(CuTest *tc) {
 
 static void test_magicresistance_building(CuTest *tc) {
     struct region *r;
-    struct faction *f1, *f2;
+    struct faction *f1;
     unit *u1;
     building *b1;
     message *msg;
@@ -71,7 +62,6 @@ static void test_magicresistance_building(CuTest *tc) {
     f1 = test_create_faction(test_create_race("human"));
     u1 = test_create_unit(f1, r);
 
-    f2 = test_create_faction(test_create_race("human"));
     b1 = test_create_building(r, test_create_buildingtype("castle"));
 
     c = create_curse(u1, &b1->attribs, ct_find("magicresistance"), 10, 20, 30, 0);
