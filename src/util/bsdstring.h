@@ -17,5 +17,6 @@ extern size_t slprintf(char * dst, size_t size, const char * format, ...);
 #endif
 
 #define WARN_STATIC_BUFFER() log_warning("static buffer too small in %s:%d\n", __FILE__, __LINE__)
+#define INFO_STATIC_BUFFER() log_info("static buffer too small in %s:%d\n", __FILE__, __LINE__)
 
 #endif

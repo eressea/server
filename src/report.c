@@ -1374,41 +1374,27 @@ static void durchreisende(stream *out, const region * r, const faction * f)
                 if (cansee_durchgezogen(f, r, u, 0)) {
                     ++counter;
                     if (u->ship != NULL) {
-#ifdef GERMAN_FLUFF_ENABLED
-                        if (strcmp("de", f->locale->name)==0) {
-                            if (counter == 1) {
-                                bytes = (int)strlcpy(bufp, "Die ", size);
-                            }
-                            else {
-                                bytes = (int)strlcpy(bufp, "die ", size);
-                            }
-                            if (wrptr(&bufp, &size, bytes) != 0) {
-                                WARN_STATIC_BUFFER();
-                                break;
-                            }
-                        }
-#endif
                         bytes = (int)strlcpy(bufp, shipname(u->ship), size);
                     }
                     else {
                         bytes = (int)strlcpy(bufp, unitname(u), size);
                     }
                     if (wrptr(&bufp, &size, bytes) != 0) {
-                        WARN_STATIC_BUFFER();
+                        INFO_STATIC_BUFFER();
                         break;
                     }
 
                     if (counter + 1 < maxtravel) {
                         bytes = (int)strlcpy(bufp, ", ", size);
                         if (wrptr(&bufp, &size, bytes) != 0) {
-                            WARN_STATIC_BUFFER();
+                            INFO_STATIC_BUFFER();
                             break;
                         }
                     }
                     else if (counter + 1 == maxtravel) {
                         bytes = (int)strlcpy(bufp, LOC(f->locale, "list_and"), size);
                         if (wrptr(&bufp, &size, bytes) != 0) {
-                            WARN_STATIC_BUFFER();
+                            INFO_STATIC_BUFFER();
                             break;
                         }
                     }

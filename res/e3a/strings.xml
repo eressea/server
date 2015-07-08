@@ -206,7 +206,18 @@
     </string>
   </namespace>
   
-   <namespace name="spellinfo">
+  <namespace name="spellinfo">
+	<string name="concealing_aura">
+		<text locale="de">Dieser Zauber wird die gesamte Ausrüstung der
+		Zieleinheit für
+		einige Zeit vor den Blicken anderer verschleiern. Der
+		Zauber
+		schützt nicht vor Dieben und Spionen.</text>
+		<text locale="en">This spell will hide the whole equipment of a target
+		unit from the
+		looks of others. It will not protect against thieves or
+		spies.</text>
+	</string>
     <string name="raindance">
       <text locale="de">Durch dieses uralte Tanzritual ruft der Zauberkundige 
         die Kräfte des Lebens und der Fruchtbarkeit an. Die darauf folgenden
