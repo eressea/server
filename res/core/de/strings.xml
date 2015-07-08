@@ -3922,7 +3922,7 @@
       <text locale="de">Gesang des Lebens analysieren</text>
       <text locale="en">Analyze Song of Life</text>
     </string>
-    <string name="cerrdorfumbleshield">
+    <string name="cerddorfumbleshield">
       <text locale="de">Bannlied</text>
       <text locale="en">Countersong</text>
     </string>
@@ -4324,7 +4324,7 @@
       <text locale="de">Kraft der Natur</text>
       <text locale="en">force of nature</text>
     </string>
-    <string name="wdwpyramid_cerrdor">
+    <string name="wdwpyramid_cerddor">
       <text locale="de">Gesang der Götter</text>
       <text locale="en">Song of the Gods</text>
     </string>
@@ -5126,7 +5126,7 @@
       able to decipher all enchantments or spells, which
       aren't disguised beyond your capability.</text>
     </string>
-    <string name="cerrdorfumbleshield">
+    <string name="cerddorfumbleshield">
       <text locale="de">Dieser schrille Gesang hallt über das
       ganze Schlachtfeld. Die besonderen Dissonanzen in den
       Melodien machen es Magiern fast unmöglich, sich auf ihre

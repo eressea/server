@@ -78,6 +78,7 @@ static const char *sp_aliases[][2] = {
     { "illaunfamiliar", "summon_familiar" },
     { "draigfamiliar", "summon_familiar" },
     { "commonfamiliar", "summon_familiar" },
+    { "cerrdorfumbleshield", "cerddorfumbleshield" },
     { NULL, NULL },
 };
 
