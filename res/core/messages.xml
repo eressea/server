@@ -398,6 +398,14 @@
     <text locale="de">"Die natürliche Widerstandskraft gegen Verzauberung ist gestärkt. ($int36($id))"</text>
     <text locale="en">"The magical resistance has been strengthened. ($int36($id))"</text>
   </message>
+  <message name="curseinfo::homestone" section="events">
+    <type>
+      <arg name="building" type="building"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"Die natürliche Widerstandskraft gegen Verzauberung ist gestärkt. ($int36($id))"</text>
+    <text locale="en">"The magical resistance has been strengthened. ($int36($id))"</text>
+  </message>
   <message name="curseinfo::goodmagicresistancezone" section="events">
     <type>
       <arg name="id" type="int"/>
@@ -414,6 +422,7 @@
   </message>
   <message name="curseinfo::magicwalls" section="events">
     <type>
+      <arg name="building" type="building"/>
       <arg name="id" type="int"/>
     </type>
     <text locale="de">"Diese Mauern wirken, als wären sie direkt aus der Erde gewachsen und nicht erbaut. ($int36($id))"</text>
@@ -421,6 +430,7 @@
   </message>
   <message name="curseinfo::buildingunknown" section="events">
     <type>
+      <arg name="building" type="building"/>
       <arg name="id" type="int"/>
     </type>
     <text locale="de">"Ein magischer Schimmer liegt auf diesen Mauern. ($int36($id))"</text>
@@ -541,6 +551,7 @@
   <message name="curseinfo::nocostbuilding" section="events">
     <type>
       <arg name="id" type="int"/>
+      <arg name="building" type="building"/>
     </type>
     <text locale="de">"Der Zahn der Zeit kann diesen Mauern nichts anhaben. ($int36($id))"</text>
     <text locale="en">"Time cannot touch these walls. ($int36($id))"</text>

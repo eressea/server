@@ -17,6 +17,9 @@ function test_dont_move_after_destroy()
     u:add_order("NACH O")
     u:add_order("ZERSTOERE " .. itoa36(u.building.id))
     process_orders()
+    if not u.region then
+        print("shit happened ", u.number)
+    end
     assert_equal(r1, u.region)
     assert_equal(nil, u.building)
 end
