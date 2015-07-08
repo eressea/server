@@ -159,6 +159,7 @@ message *cinfo_unit(const void *obj, objtype_t typ, const curse * c, int self)
 {
     unused_arg(typ);
     assert(typ == TYP_UNIT);
+    assert(obj);
 
     if (self != 0) {
         unit *u = (unit *)obj;

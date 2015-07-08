@@ -36,14 +36,13 @@
 message *cinfo_building(const void *obj, objtype_t typ, const curse * c,
     int self)
 {
+    const building *b = (const building *)obj;
     unused_arg(typ);
     assert(typ == TYP_BUILDING);
+    assert(obj);
+    assert(c);
 
-    if (self != 0) {              /* owner or inside */
-        building *b = (building *)obj;
-        return msg_message(mkname("curseinfo", c->type->cname), "id building", c->no, b);
-    }
-    return msg_message(mkname("curseinfo", "buildingunknown"), "id", c->no);
+    return msg_message(mkname("curseinfo", self ? c->type->cname : "buildingunknown"), "id building", c->no, b);
 }
 
 /* CurseInfo mit Spezialabfragen */

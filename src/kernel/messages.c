@@ -188,7 +188,6 @@ message *msg_message(const char *name, const char *sig, ...)
         }
         else {
             log_error("invalid parameter %s for message type %s\n", paramname, mtype->name);
-            assert(!"program aborted.");
         }
         while (*ic && !isalnum(*ic))
             ic++;
@@ -196,7 +195,6 @@ message *msg_message(const char *name, const char *sig, ...)
     va_end(vargs);
     if (argnum !=  mtype->nparameters) {
         log_error("not enough parameters for message type %s\n", mtype->name);
-        assert(!"program aborted.");
     }
 
     return msg_create(mtype, args);
