@@ -742,13 +742,7 @@ static const char *oldnames[MAXCURSE] = {
     "speed",
     "orcish",
     "magicboost",
-    "insectfur",
-    "strength",
-    "worse",
-    "magicresistance",
-    "itemcloak",
-    "sparkle",
-    "skillmod"
+    "insectfur"
 };
 
 const char *oldcursename(int id)
