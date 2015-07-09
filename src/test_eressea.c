@@ -89,6 +89,7 @@ int RunAllTests(void)
   RUN_TESTS(suite, vortex);
   RUN_TESTS(suite, wormhole);
   RUN_TESTS(suite, spy);
+  RUN_TESTS(suite, study);
 
   printf("\ntest summary: %d tests, %d failed\n", suite->count, suite->failCount);
   log_flags = flags;

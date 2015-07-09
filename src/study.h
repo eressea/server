@@ -20,13 +20,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define H_KRNL_STUDY
 
 #include "skill.h"
+#include <kernel/types.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
     extern int teach_cmd(struct unit *u, struct order *ord);
-    extern int learn_cmd(struct unit *u, struct order *ord);
+    extern int study_cmd(struct unit *u, struct order *ord);
 
     extern magic_t getmagicskill(const struct locale *lang);
     extern bool is_migrant(struct unit *u);

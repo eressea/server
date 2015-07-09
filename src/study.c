@@ -527,7 +527,7 @@ static double study_speedup(unit * u, skill_t s, study_rule_t rule)
     return 1.0;
 }
 
-int learn_cmd(unit * u, order * ord)
+int study_cmd(unit * u, order * ord)
 {
     region *r = u->region;
     int p;
