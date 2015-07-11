@@ -59,7 +59,7 @@ find_package (LibXml2)
 find_package (SQLite3)
 find_package (Curses)
 find_package (Lua REQUIRED)
-find_package (ToLua)
+find_package (ToLua REQUIRED)
 
 add_subdirectory (cutest)
 add_subdirectory (crypto)

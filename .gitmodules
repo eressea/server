@@ -29,3 +29,6 @@
 	path = storage
 	url = git://github.com/badgerman/storage.git
 	branch = master
+[submodule "tolua"]
+	path = tolua
+	url = git@github.com:ennorehling/tolua.git
