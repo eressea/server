@@ -19,9 +19,6 @@
 [submodule "cutest"]
 	path = cutest
 	url = git://github.com/badgerman/cutest.git
-[submodule "iniparser"]
-	path = iniparser
-	url = git://github.com/badgerman/iniparser.git
 [submodule "cJSON"]
 	path = cJSON
 	url = git://github.com/badgerman/cJSON.git
