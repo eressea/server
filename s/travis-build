@@ -1,5 +1,7 @@
 #!/bin/sh
 
+ROOT=`pwd`
+
 inifile() {
 if [ ! -e eressea.ini ]; then
 cp conf/eressea.ini .
@@ -7,10 +9,9 @@ build/iniparser/inifile eressea.ini add lua:paths lunit:scripts
 fi
 }
 
-[ -d build ] || mkdir build 
-cd build && cmake .. \
- -DCMAKE_MODULE_PATH=$PWD/../cmake/Modules \
- -DCMAKE_BUILD_TYPE=Debug .. && \
-make && cd .. && inifile &&
-build/eressea/test_eressea &&
-build/eressea/eressea -v0 scripts/run-tests.lua
+[ -z $BUILD ] && BUILD=Debug ; export BUILD
+s/cmake-init
+s/build
+cd $ROOT
+inifile
+s/runtests

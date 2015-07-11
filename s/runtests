@@ -4,20 +4,16 @@ while [ ! -d $ROOT/.git ]; do
   ROOT=$(dirname $ROOT)
 done
 
-MACHINE=`uname -m`
-[ -z "$CC" ] && [ ! -z `which gcc` ] && CC="gcc"
-[ -z "$CC" ] && [ ! -z `which tcc` ] && CC="tcc"
-[ -z "$CC" ] && [ ! -z `which cc` ] && CC="cc"
-BIN_DIR="build-$MACHINE-$CC-Debug"
+[ -z $BUILD ] && BUILD=Debug ; export BUILD
 
-if [ ! -d $ROOT/$BIN_DIR ]; then
-  echo "cannot find build directory $BIN_DIR in $ROOT. did you run cmake-init?"
+if [ ! -e $ROOT/$BUILD ]; then
+  echo "cannot find build directory $BUILD in $ROOT. did you run cmake-init?"
   exit
 fi
 
-$ROOT/$BIN_DIR/eressea/test_eressea
+$ROOT/$BUILD/eressea/test_eressea
 cd $ROOT
 [ -e eressea.ini ] || ln -sf conf/eressea.ini
-$ROOT/$BIN_DIR/eressea/eressea -v0 scripts/run-tests.lua
-$ROOT/$BIN_DIR/eressea/eressea -v0 scripts/run-tests-e3.lua
+$ROOT/$BUILD/eressea/eressea -v0 sacripts/run-tests.lua
+$ROOT/$BUILD/eressea/eressea -v0 scripts/run-tests-e3.lua
 cd $OLDWPD
