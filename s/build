@@ -25,9 +25,11 @@ if [ ! -d $ROOT/$BUILD ]; then
   exit
 fi
 
-git submodule update
+if [ -z `which tolua` ]; then
 echo "build tolua"
 cd $ROOT/tolua ; make
+fi
+
 echo "build eressea"
 cd $ROOT/$BUILD
 make $MAKEOPTS && make test
