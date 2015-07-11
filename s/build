@@ -30,7 +30,9 @@ if [ ! -d $ROOT/$BIN_DIR ]; then
 fi
 
 git submodule update
+echo "build tolua"
 cd $ROOT/tolua ; make
+echo "build eressea"
 cd $ROOT/$BIN_DIR
 make $MAKEOPTS && make test
 cd $OLDPWD
