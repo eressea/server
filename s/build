@@ -30,6 +30,7 @@ if [ ! -d $ROOT/$BIN_DIR ]; then
   exit
 fi
 
+git submodule update
 cd $ROOT/$BIN_DIR
 make $MAKEOPTS && make test
 cd $OLDPWD
