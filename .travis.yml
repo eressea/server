@@ -6,9 +6,9 @@ compiler:
 script: s/travis-build
 addons:
   apt:
-    sources:
+    packages:
       - libtolua-dev
-      - liblua5.1-dev
+      - liblua5.2-dev
       - libncurses5-dev
       - libsqlite3-dev
       - libxml2-dev
