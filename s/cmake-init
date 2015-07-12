@@ -1,5 +1,4 @@
 #!/bin/sh
-set -e
 ROOT=$(pwd)
 while [ ! -d $ROOT/.git ]; do
   ROOT=$(dirname $ROOT)
@@ -34,32 +33,26 @@ if [ -d $HOME/usr ]; then
   PREFIX_PATH=$HOME/usr:$HOME/usr/local:$PREFIX_PATH
 fi
 
-path=`which tolua`
-echo "TOLUA $path"
-if [ "$HAVE_TOLUA" = "0" ] || [ ! -e $path ]; then
- echo "tolua is not installed, building from source"
- cd $ROOT/tolua ; make
- ARGS="$ARGS -DPC_TOLUA_DIR=$ROOT/tolua"
-fi
-
-path=`which lua`
-if [ -e $path ]; then
- path=`dirname $path` # /opt/bin
- path=`dirname $path` # /opt
- if [ -e $path/include/lua.h ] && [ -d $path/lib ] ; then
-  echo "lua is installed in $path"
-  ARGS="$ARGS -DPC_LUA_DIR=$LUA"
- fi
-fi
-
-cd $BIN_DIR
-cmake .. \
- $ARGS \
- -DCMAKE_MODULE_PATH=$ROOT/cmake/Modules \
+ARGS=" -DCMAKE_MODULE_PATH=$ROOT/cmake/Modules \
  -DCMAKE_BUILD_TYPE=$BUILD \
  -DCMAKE_LIBRARY_PATH=$LIBRARY_PATH \
  -DCMAKE_INCLUDE_PATH=$INCLUDE_PATH \
  -DCMAKE_PREFIX_PATH=$PREFIX_PATH \
- -DCMAKE_INSTALL_PREFIX=$HOME/eressea/server $*
+ -DCMAKE_INSTALL_PREFIX=$HOME/eressea/server"
+
+path="$(which tolua)"
+if [ "$HAVE_TOLUA" = "0" ] || [ -z $path ] ; then
+ echo "tolua is not installed, building from source"
+ cd $ROOT/tolua ; make
+ ARGS="$ARGS -DPC_TOLUA_DIR=$ROOT/tolua"
+else
+ echo "tolua is $path"
+fi
+unset path
+
+set -e
+
+cd $BIN_DIR
+cmake .. $ARGS $*
 cd $OLDPWD
 
