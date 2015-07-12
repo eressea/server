@@ -2962,7 +2962,7 @@ spellbook * get_spellbook(const char * name)
 {
     char buffer[64];
     spellbook * result;
-    const void * match;
+    void * match;
 
     if (cb_find_prefix(&cb_spellbooks, name, strlen(name), &match, 1, 0)) {
         cb_get_kv(match, &result, sizeof(result));

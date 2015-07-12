@@ -1,0 +1,80 @@
+#!/bin/sh
+ROOT=$(pwd)
+while [ ! -d $ROOT/.git ]; do
+  ROOT=$(dirname $ROOT)
+  if [ "$ROOT" == "/" ; then
+    echo "could not find root, are you in the git repository?"
+    exit
+  fi
+done
+
+[ -z $BUILD ] && BUILD=Debug
+MACHINE=`uname -m`
+<<<<<<< HEAD
+[ -z "$CC" ] && [ ! -z `which clang` ] && CC="clang"
+=======
+[ -z "$CC" ] && [ ! -z `which gcc` ] && CC="clang"
+>>>>>>> hotfix-3.4.1
+[ -z "$CC" ] && [ ! -z `which gcc` ] && CC="gcc"
+[ -z "$CC" ] && [ ! -z `which tcc` ] && CC="tcc"
+[ -z "$CC" ] && [ ! -z `which cc` ] && CC="cc"
+BIN_DIR="$ROOT/build-$MACHINE-$CC-$BUILD"
+mkdir -p $BIN_DIR
+ln -sf $BIN_DIR $BUILD
+
+MACHINE=$(gcc -dumpmachine)
+rm -f CMakeCache.txt
+
+# use anything installed in /opt or /usr
+LIBRARY_PATH=/opt/lib:/opt/lib/$MACHINE:/usr/lib/$MACHINE
+INCLUDE_PATH=/opt/include:/usr/include
+PREFIX_PATH=/opt
+
+# I like to put stuff in ~/usr if I don't have permission to install packages on the machine:
+if [ -d $HOME/usr ]; then
+  LIBRARY_PATH=$HOME/usr/lib:$HOME/usr/lib/$MACHINE:$LIBRARY_PATH
+  INCLUDE_PATH=$HOME/usr/include:$HOME/usr/include/$MACHINE:$INCLUDE_PATH
+  PREFIX_PATH=$HOME/usr:$HOME/usr/local:$PREFIX_PATH
+fi
+
+<<<<<<< HEAD
+if [ -z $PC_LUA ] && [ -e /opt/include/lua.h ]; then
+PC_LUA=/opt/include
+fi
+if [ -z $PC_TOLUA ] && [ -e /opt/include/tolua.h ]; then
+PC_TOLUA=/opt/include
+fi
+if [ ! -z $PC_TOLUA ]; then
+PC_ARGS="$PC_ARGS -DPC_TOLUA_INCLUDEDIR=$PC_TOLUA/include -DPC_TOLUA_LIBDIR=$PC_TOLUA/lib"
+fi
+if [ ! -z $PC_LUA ]; then
+PC_ARGS="$PC_ARGS -DPC_LUA_INCLUDEDIR=$PC_LUA/include -DPC_LUA_LIBDIR=$PC_LUA/lib"
+fi
+
+cmake .. $PC_ARGS \
+ -DCMAKE_MODULE_PATH=$PWD/../cmake/Modules \
+=======
+ARGS=" -DCMAKE_MODULE_PATH=$ROOT/cmake/Modules \
+>>>>>>> hotfix-3.4.1
+ -DCMAKE_BUILD_TYPE=$BUILD \
+ -DCMAKE_LIBRARY_PATH=$LIBRARY_PATH \
+ -DCMAKE_INCLUDE_PATH=$INCLUDE_PATH \
+ -DCMAKE_PREFIX_PATH=$PREFIX_PATH \
+ -DCMAKE_INSTALL_PREFIX=$HOME/eressea/server"
+
+path="$(which tolua)"
+if [ "$HAVE_TOLUA" = "0" ] || [ -z $path ] ; then
+ echo "tolua is not installed, building from source"
+ cd $ROOT/tolua ; make
+ ARGS="$ARGS -DPC_TOLUA_DIR=$ROOT/tolua"
+else
+ echo "tolua is $path"
+fi
+unset path
+
+set -e
+
+cd $BIN_DIR
+cmake .. $ARGS $*
+cd $OLDPWD
+

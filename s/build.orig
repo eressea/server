@@ -1,0 +1,48 @@
+#!/bin/sh
+ROOT=`pwd`
+while [ ! -d $ROOT/.git ]; do
+  ROOT=`dirname $ROOT`
+done
+
+<<<<<<< HEAD
+[ -z $BUILD ] && BUILD=Debug
+MACHINE=`uname -m`
+[ -z "$CC" ] && [ ! -z `which clang` ] && CC="clang"
+[ -z "$CC" ] && [ ! -z `which gcc` ] && CC="gcc"
+[ -z "$CC" ] && [ ! -z `which tcc` ] && CC="tcc"
+[ -z "$CC" ] && [ ! -z `which cc` ] && CC="cc"
+BIN_DIR="build-$MACHINE-$CC-$BUILD"
+=======
+[ -z "$CC" ] && CC=clang
+[ -z "$BUILD" ] && BUILD=Debug
+>>>>>>> hotfix-3.4.1
+
+[ -z "$JOBS" ] && [ "" != "which nproc" ] && JOBS=`nproc`
+DISTCC=`which distcc`
+if [ ! -z "$DISTCC" ] ; then
+JOBS=`distcc -j`
+if [ -z "$JOBS" ] ; then
+JOBS=1
+elif [ $JOBS -gt 1 ] ; then
+CC="$DISTCC $CC"
+MAKEOPTS=-j$JOBS
+fi
+fi
+echo "Building with CC=$CC and $JOBS jobs"
+
+if [ ! -d $ROOT/$BUILD ]; then
+  echo "cannot find build directory $BUILD in $ROOT. did you run cmake-init?"
+  exit
+fi
+
+git submodule update
+
+if [ -z `which tolua` ]; then
+echo "build tolua"
+cd $ROOT/tolua ; make
+fi
+
+echo "build eressea"
+cd $ROOT/$BUILD
+make $MAKEOPTS && make test
+cd $OLDPWD

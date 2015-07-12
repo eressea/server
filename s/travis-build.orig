@@ -1,0 +1,83 @@
+#!/bin/sh
+
+<<<<<<< HEAD
+set -e
+ROOT=`pwd`
+SUPP=../share/ubuntu-12_04.supp
+MACHINE=`uname -m`
+[ -z "$CC" ] && [ ! -z `which clang` ] && CC="clang"
+[ -z "$CC" ] && [ ! -z `which gcc` ] && CC="gcc"
+BUILD="$ROOT/build-$MACHINE-$CC-Debug"
+=======
+ROOT=`pwd`
+>>>>>>> hotfix-3.4.1
+
+inifile() {
+cd $ROOT
+if [ ! -e eressea.ini ]; then
+cp conf/eressea.ini .
+$BUILD/iniparser/inifile eressea.ini add lua:paths lunit:scripts
+fi
+}
+
+<<<<<<< HEAD
+build() {
+cd $BUILD
+cmake -DCMAKE_MODULE_PATH=$ROOT/cmake/Modules -DCMAKE_BUILD_TYPE=Debug ..
+scan-build make
+}
+
+test_valgrind_report () {
+cd $ROOT/tests
+ln -sf ../scripts/config.lua
+valgrind --suppressions=$SUPP --error-exitcode=1 $BUILD/eressea/eressea -v0 -t184 ../scripts/reports.lua
+}
+
+test_valgrind_turn () {
+cd $ROOT/tests
+ln -sf ../scripts/config.lua
+valgrind --suppressions=$SUPP --error-exitcode=1 $BUILD/eressea/eressea -v0 -t184 ../scripts/run-turn.lua
+}
+
+test_unittests() {
+$BUILD/eressea/test_eressea
+}
+
+cleanup() {
+cd $ROOT/tests
+rm -rf reports score eressea.log* config.lua data/185.dat datum passwd parteien parteien.full turn
+}
+
+test_server() {
+cd $ROOT
+inifile
+$BUILD/eressea/eressea -v0 scripts/run-tests.lua
+$BUILD/eressea/eressea -v0 scripts/run-tests-e2.lua
+$BUILD/eressea/eressea -v0 scripts/run-tests-e3.lua
+}
+# information
+echo "* base directory: $ROOT"
+echo "* build directory: $BUILD"
+echo "* lsb_release:"
+lsb_release -a
+echo "* zlib1g-dev package:"
+dpkg -l zlib1g-dev
+echo
+
+# build the code
+[ -d $BUILD ] || mkdir $BUILD
+build
+test_unittests
+test_server
+test_valgrind_report
+test_valgrind_turn
+
+cleanup
+=======
+[ -z $BUILD ] && BUILD=Debug ; export BUILD
+s/cmake-init
+s/build
+cd $ROOT
+inifile
+s/runtests
+>>>>>>> hotfix-3.4.1
