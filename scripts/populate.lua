@@ -6,7 +6,7 @@ local function score(r, res)
     local x, y, rn
     local peas = r:get_resource(res)
     for _, rn in pairs(r.adj) do
-        if rn then
+        if rn and not rn.units() then
             peas = peas + rn:get_resource(res)
         end
     end
@@ -16,7 +16,7 @@ end
 local function select(regions, limit)
     local sel = {}
     for r in regions do
-        if r.terrain~="ocean" and r.units()==nil then
+        if not r.plane and r.terrain~="ocean" and not r.units() then
             s = score(r)
             if s >= limit then
                 table.insert(sel, r)
