@@ -1,3 +1,4 @@
+*.orig
 eressea.ini
 Debug
 Release
