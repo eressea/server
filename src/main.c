@@ -80,13 +80,13 @@ static void load_inifile(dictionary * d)
     str = iniparser_getstring(d, "eressea:locales", "de,en");
     make_locales(str);
 
-    if (global.inifile) iniparser_free(global.inifile);
+    if (global.inifile) iniparser_freedict(global.inifile);
     global.inifile = d;
 }
 
 static void parse_config(const char *filename)
 {
-    dictionary *d = iniparser_new(filename);
+    dictionary *d = iniparser_load(filename);
     if (d) {
         load_inifile(d);
         log_debug("reading from configuration file %s\n", filename);
@@ -318,7 +318,7 @@ int main(int argc, char **argv)
     lua_done(L);
     log_close();
     if (global.inifile) {
-        iniparser_free(global.inifile);
+        iniparser_freedict(global.inifile);
     }
     return 0;
 }
