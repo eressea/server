@@ -2560,7 +2560,7 @@ static castorder *cast_cmd(unit * u, order * ord)
         }
         s = gettoken(token, sizeof(token));
     }
-    if (!s || !s[0] || strlen(s) == 0) {
+    if (!s || !s[0]) {
         /* Fehler "Es wurde kein Zauber angegeben" */
         cmistake(u, ord, 172, MSG_MAGIC);
         return 0;
@@ -2571,7 +2571,7 @@ static castorder *cast_cmd(unit * u, order * ord)
     /* Vertraute können auch Zauber sprechen, die sie selbst nicht
      * können. unit_getspell findet aber nur jene Sprüche, die
      * die Einheit beherrscht. */
-    if (!sp && is_familiar(u)) {
+    if (!sp && is_familiar(u)) {    
         caster = get_familiar_mage(u);
         if (caster) {
             familiar = u;
@@ -2695,8 +2695,16 @@ static castorder *cast_cmd(unit * u, order * ord)
             if (!s || *s == 0)
                 break;
             if (p + 1 >= size) {
-                size *= 2;
-                params = (char**)realloc(params, sizeof(char *) * size);
+                char ** tmp;
+                tmp = (char**)realloc(params, sizeof(char *) * size * 2);
+                if (tmp) {
+                    size *= 2;
+                    params = tmp;
+                }
+                else {
+                    log_error("error allocationg %d bytes: %s", size * 2, strerror(errno));
+                    break;
+                }
             }
             params[p++] = _strdup(s);
         }
