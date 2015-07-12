@@ -179,18 +179,6 @@ extern "C" {
     /* ------------------------------------------------------------- */
     /* Allgemeine Zauberwirkungen */
 
-    typedef struct curse {
-        struct curse *nexthash;
-        int no;                     /* 'Einheitennummer' dieses Curse */
-        const struct curse_type *type;      /* Zeiger auf ein curse_type-struct */
-        int flags;         /* WARNING: these are XORed with type->flags! */
-        int duration;               /* Dauer der Verzauberung. Wird jede Runde vermindert */
-        double vigour;              /* Stärke der Verzauberung, Widerstand gegen Antimagie */
-        struct unit *magician;      /* Pointer auf den Magier, der den Spruch gewirkt hat */
-        double effect;
-        variant data;               /* pointer auf spezielle curse-unterstructs */
-    } curse;
-
 #define c_flags(c) ((c)->type->flags ^ (c)->flags)
 
     /* ------------------------------------------------------------- */
@@ -200,16 +188,28 @@ extern "C" {
         int typ;
         int flags;
         int mergeflags;
-        struct message *(*curseinfo) (const void *, objtype_t, const struct curse *,
-            int);
-        void(*change_vigour) (curse *, double);
-        int(*read) (struct storage * store, curse * c, void *target);
-        int(*write) (struct storage * store, const struct curse * c,
+        struct message *(*curseinfo) (const void *, objtype_t,
+            const struct curse *, int);
+        void(*change_vigour) (struct curse *, double);
+        int(*read) (struct storage * store, struct curse *, void *target);
+        int(*write) (struct storage * store, const struct curse *,
             const void *target);
         int(*cansee) (const struct faction *, const void *, objtype_t,
             const struct curse *, int);
-        int(*age) (curse *);
+        int(*age) (struct curse *);
     } curse_type;
+
+    typedef struct curse {
+        variant data;               /* pointer auf spezielle curse-unterstructs */
+        struct curse *nexthash;
+        const curse_type *type;      /* Zeiger auf ein curse_type-struct */
+        struct unit *magician;      /* Pointer auf den Magier, der den Spruch gewirkt hat */
+        double vigour;              /* Stärke der Verzauberung, Widerstand gegen Antimagie */
+        double effect;
+        int no;                     /* 'Einheitennummer' dieses Curse */
+        int flags;                  /* WARNING: these are XORed with type->flags! */
+        int duration;               /* Dauer der Verzauberung. Wird jede Runde vermindert */
+    } curse;
 
     extern struct attrib_type at_curse;
     void curse_write(const struct attrib *a, const void *owner,

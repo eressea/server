@@ -2339,8 +2339,9 @@ void do_regenerate(fighter * af)
     ta.index = af->fighting;
 
     while (ta.index--) {
-        af->person[ta.index].hp += effskill(au, SK_STAMINA);
-        af->person[ta.index].hp = _min(unit_max_hp(au), af->person[ta.index].hp);
+        struct person *p = af->person + ta.index;
+        p->hp += effskill(au, SK_STAMINA);
+        p->hp = _min(unit_max_hp(au), p->hp);
     }
 }
 
