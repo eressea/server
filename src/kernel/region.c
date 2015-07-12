@@ -614,6 +614,7 @@ void rsetpeasants(region * r, int value)
 {
     if (r->land) r->land->peasants = value;
     else assert(value>=0);
+
 }
 
 int rmoney(const region * r)

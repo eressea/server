@@ -1,5 +1,9 @@
 all:
-	@echo "Please use the cmake build system by running configure"
+	s/build
+
+test:
+	s/runtests
 
 clean:
+	@rm -f *.log.*
 	@find . -name "*~" | xargs rm -f

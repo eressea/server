@@ -4,13 +4,8 @@ while [ ! -d $ROOT/.git ]; do
   ROOT=`dirname $ROOT`
 done
 
-[ -z $BUILD ] && BUILD=Debug
-MACHINE=`uname -m`
-[ -z "$CC" ] && [ ! -z `which clang` ] && CC="clang"
-[ -z "$CC" ] && [ ! -z `which gcc` ] && CC="gcc"
-[ -z "$CC" ] && [ ! -z `which tcc` ] && CC="tcc"
-[ -z "$CC" ] && [ ! -z `which cc` ] && CC="cc"
-BIN_DIR="build-$MACHINE-$CC-$BUILD"
+[ -z "$CC" ] && CC=clang
+[ -z "$BUILD" ] && BUILD=Debug
 
 [ -z "$JOBS" ] && [ "" != "which nproc" ] && JOBS=`nproc`
 DISTCC=`which distcc`
@@ -23,13 +18,21 @@ CC="$DISTCC $CC"
 MAKEOPTS=-j$JOBS
 fi
 fi
-echo "Building with $CC and $JOBS jobs"
+echo "Building with CC=$CC and $JOBS jobs"
 
-if [ ! -d $ROOT/$BIN_DIR ]; then
-  echo "cannot find build directory $BIN_DIR in $ROOT. did you run cmake-init?"
+if [ ! -d $ROOT/$BUILD ]; then
+  echo "cannot find build directory $BUILD in $ROOT. did you run cmake-init?"
   exit
 fi
 
-cd $ROOT/$BIN_DIR
+git submodule update
+
+if [ -z `which tolua` ]; then
+echo "build tolua"
+cd $ROOT/tolua ; make
+fi
+
+echo "build eressea"
+cd $ROOT/$BUILD
 make $MAKEOPTS && make test
 cd $OLDPWD
