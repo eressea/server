@@ -26,6 +26,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
+    struct curse;
+    struct curse_type;
+
     /* Sprueche in der struct region und auf Einheiten, Schiffen oder Burgen
      * (struct attribute)
      */
