@@ -76,6 +76,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <limits.h>
 #include <assert.h>
+#include <errno.h>
 #include <math.h>
 
 const char *magic_school[MAXMAGIETYP] = {
