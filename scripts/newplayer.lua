@@ -9,7 +9,9 @@ local function read_players()
         local str = input:read("*line")
         if str==nil then break end
         local email, race, lang = str:match("([^ ]*) ([^ ]*) ([^ ]*)")
-        table.insert(players, { race = race, lang = lang, email = email })
+        if string.char(string.byte(email, 1))~='#' then
+            table.insert(players, { race = race, lang = lang, email = email })
+        end
     end
     return players
 end
@@ -64,10 +66,6 @@ for _, p in ipairs(players) do
             local index = math.random(#sel)
             start = sel[index]
         end
-<<<<<<< HEAD
-=======
-        create_curse(nil, r, 'holyground', 1, 52)
->>>>>>> hotfix-3-5-3
         num_seeded = 0
     end
     local dupe = false
