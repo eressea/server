@@ -58,7 +58,7 @@ extern "C" {
         sppobj_t typ;
         int flag;
         union {
-            struct region *r;
+            struct region *r; //TODO: V117 http://www.viva64.com/en/V117 Memsize type is used in the union.
             struct unit *u;
             struct building *b;
             struct ship *sh;

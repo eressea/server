@@ -37,3 +37,5 @@ game-e3/reports/
 tags
 Thumbs.db
 .gdb_history
+*.cfg
+*.cmd
