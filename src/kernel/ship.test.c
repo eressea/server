@@ -400,12 +400,14 @@ static ship *setup_ship(void) {
     ship_type *stype;
     ship *sh;
 
+    set_param(&global.parameters, "movement.shipspeed.skillbonus", "0");
     r = test_create_region(0, 0, test_create_terrain("ocean", 0));
     stype = test_create_shiptype("longboat");
     stype->cptskill = 1;
     stype->sumskill = 10;
     stype->minskill = 1;
     stype->range = 2;
+    stype->range_max = 4;
     sh = test_create_ship(r, stype);
     return sh;
 }
@@ -520,7 +522,7 @@ static void test_shipspeed_damage(CuTest *tc) {
 
 static void test_shipspeed(CuTest *tc) {
     ship *sh;
-    ship_type *stype;
+    const ship_type *stype;
     region *r;
     struct faction *f;
     unit *cap, *crew;
@@ -530,7 +532,7 @@ static void test_shipspeed(CuTest *tc) {
     r = sh->region;
     f = test_create_faction(0);
     assert(r && f);
-    stype = st_get_or_create(sh->type->_name);
+    stype = sh->type;
 
     CuAssertIntEquals_Msg(tc, "ship without a captain cannot move", 0, shipspeed(sh, NULL));
 
@@ -538,6 +540,7 @@ static void test_shipspeed(CuTest *tc) {
     crew = test_create_unit(f, r);
     cap->ship = sh;
     crew->ship = sh;
+
     CuAssertPtrEquals(tc, cap, ship_owner(sh));
     set_level(cap, SK_SAILING, stype->cptskill);
     set_level(crew, SK_SAILING, stype->sumskill - stype->cptskill);
@@ -555,6 +558,37 @@ static void test_shipspeed(CuTest *tc) {
     set_level(crew, SK_SAILING, (stype->sumskill - stype->cptskill) * 11);
     set_level(cap, SK_SAILING, stype->cptskill + 10);
     CuAssertIntEquals_Msg(tc, "regular skills should not exceed sh.range", 2, shipspeed(sh, cap));
+}
+
+static void test_shipspeed_max_range(CuTest *tc) {
+    ship *sh;
+    ship_type *stype;
+    region *r;
+    struct faction *f;
+    unit *cap, *crew;
+
+    test_cleanup();
+    sh = setup_ship();
+    setup_crew(sh, 0, &cap, &crew);
+    set_param(&global.parameters, "movement.shipspeed.skillbonus", "5");
+    r = sh->region;
+    f = test_create_faction(0);
+    assert(r && f);
+    stype = st_get_or_create(sh->type->_name);
+
+    set_level(cap, SK_SAILING, stype->cptskill + 4);
+    set_level(crew, SK_SAILING, (stype->sumskill - stype->cptskill) * 4);
+    CuAssertIntEquals_Msg(tc, "skill bonus requires at least movement.shipspeed.skillbonus points", 2, shipspeed(sh, cap));
+
+    set_level(cap, SK_SAILING, stype->cptskill + 5);
+    set_level(crew, SK_SAILING, (stype->sumskill - stype->cptskill) * 5);
+    CuAssertIntEquals_Msg(tc, "skill bonus from movement.shipspeed.skillbonus", 3, shipspeed(sh, cap));
+
+    set_level(cap, SK_SAILING, stype->cptskill + 15);
+    set_level(crew, SK_SAILING, (stype->sumskill - stype->cptskill) * 15);
+    CuAssertIntEquals_Msg(tc, "skill-bonus cannot exceed max_range", 4, shipspeed(sh, cap));
+
+    test_cleanup();
 }
 
 CuSuite *get_ship_suite(void)
@@ -579,5 +613,6 @@ CuSuite *get_ship_suite(void)
     SUITE_ADD_TEST(suite, test_shipspeed_at_speedup);
     SUITE_ADD_TEST(suite, test_shipspeed_race_bonus);
     SUITE_ADD_TEST(suite, test_shipspeed_damage);
+    SUITE_ADD_TEST(suite, test_shipspeed_max_range);
     return suite;
 }

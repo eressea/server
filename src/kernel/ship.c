@@ -270,11 +270,7 @@ const char *write_shipname(const ship * sh, char *ibuf, size_t size)
 
 static int ShipSpeedBonus(const unit * u)
 {
-    static int level = -1;
-    if (level == -1) {
-        level =
-            get_param_int(global.parameters, "movement.shipspeed.skillbonus", 0);
-    }
+    int level = get_param_int(global.parameters, "movement.shipspeed.skillbonus", 0);
     if (level > 0) {
         ship *sh = u->ship;
         int skl = effskill(u, SK_SAILING);
@@ -339,8 +335,13 @@ int shipspeed(const ship * sh, const unit * u)
     if (bonus > 0 && sh->type->range_max>sh->type->range) {
         int crew = crew_skill(sh);
         int crew_bonus = (crew / sh->type->sumskill / 2) - 1;
-        bonus = _min(bonus, crew_bonus);
-        bonus = _min(bonus, sh->type->range_max - sh->type->range);
+        if (crew_bonus > 0) {
+            bonus = _min(bonus, crew_bonus);
+            bonus = _min(bonus, sh->type->range_max - sh->type->range);
+        }
+        else {
+            bonus = 0;
+        }
     }
     k += bonus;
 
