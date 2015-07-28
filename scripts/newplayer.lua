@@ -42,12 +42,13 @@ local function dump_selection(sel)
 end
 
 players = read_players()
-local limit = 30000
+local peasants = 20000
+local trees = 1000
 local turn = get_turn()
 local sel
 if #players > 0 then
     eressea.read_game(("%d.dat"):format(turn))
-    sel = p.select(regions(), limit)
+    sel = p.select(regions(), peasants, trees)
     if #sel > 0 then
         local best = dump_selection(sel)
         print("finest region, " .. best.score .. " points: " .. tostring(best.r))

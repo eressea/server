@@ -13,12 +13,11 @@ local function score(r, res)
     return peas
 end
 
-local function select(regions, limit)
+local function select(regions, peasants, trees)
     local sel = {}
     for r in regions do
         if not r.plane and r.terrain~="ocean" and not r.units() then
-            s = score(r)
-            if s >= limit then
+            if score(r, "peasant") >= peasants and score(r, "tree") >= trees then
                 table.insert(sel, r)
             end
         end
