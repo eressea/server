@@ -40,6 +40,7 @@
       <item name="sword" amount="1"/>
       <item name="mallorn" amount="10"/>
       <item name="skillpotion" amount="5"/>
+      <item name="p2" amount="5"/>
       <item name="money" amount="20000"/>
       <skill name="perception" level="30"/>
       <skill name="melee" level="1"/>
