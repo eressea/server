@@ -24,6 +24,7 @@ local function seed(r, email, race, lang)
     equip_unit(u, "first_" .. race, 7) -- disable old callbacks
     unit.create(f, r, 5):set_skill("mining", 30)
     unit.create(f, r, 5):set_skill("quarrying", 30)
+    f:set_origin(r)
     return f
 end
 
