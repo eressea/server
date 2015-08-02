@@ -1274,18 +1274,16 @@ static int item_modification(const unit * u, skill_t sk, int val)
     return val;
 }
 
-static int update_gbdream(const unit * u, int bonus, curse *c, const curse_type *gbdream_ct, int sign){
-    if (curse_active(c) && c->type == gbdream_ct) {
-        double effect = curse_geteffect(c);
-        unit *mage = c->magician;
-        /* wir suchen jeweils den groessten Bonus und den groessten Malus */
-        if (sign * effect > sign * bonus) {
-            bool allied;
-            assert(mage && mage->number > 0);
-            allied = alliedunit(mage, u->faction, HELP_GUARD);
-            if ((sign>0)?allied:!allied) {
-                bonus = (int)effect;
-            }
+static int update_gbdream(const unit * u, int bonus, curse *c, int sign) {
+    double effect = curse_geteffect(c);
+    unit *mage = c->magician;
+    /* wir suchen jeweils den groessten Bonus und den groessten Malus */
+    if (sign * effect > sign * bonus) {
+        bool allied;
+        assert(mage && mage->number > 0);
+        allied = alliedunit(mage, u->faction, HELP_GUARD);
+        if ((sign>0)?allied:!allied) {
+            bonus = (int)effect;
         }
     }
     return bonus;
@@ -1294,7 +1292,7 @@ static int update_gbdream(const unit * u, int bonus, curse *c, const curse_type 
 int att_modification(const unit * u, skill_t sk)
 {
     double result = 0;
-    static bool init = false;
+    static bool init = false; // TODO: static variables are bad global state
     static const curse_type *skillmod_ct, *gbdream_ct, *worse_ct;
     curse *c;
 
@@ -1329,9 +1327,11 @@ int att_modification(const unit * u, skill_t sk)
         while (a && a->type == &at_curse) {
             curse *c = (curse *)a->data.v;
 
-            assert(c->magician); // update_gbdream makes no sense if there is no caster (calls alliedunit)
-            bonus = update_gbdream(u, bonus, c, gbdream_ct, 1);
-            malus = update_gbdream(u, malus, c, gbdream_ct, -1);
+            if (curse_active(c) && c->type == gbdream_ct) {
+                assert(c->magician); // update_gbdream makes no sense if there is no caster (calls alliedunit)
+                bonus = update_gbdream(u, bonus, c, 1);
+                malus = update_gbdream(u, malus, c, -1);
+            }
             a = a->next;
         }
         result = result + bonus + malus;
