@@ -1600,7 +1600,6 @@ int readgame(const char *filename, int backup)
 
         while (--p >= 0) {
             unit *u = read_unit(&gdata);
-            sc_mage *mage;
 
             if (gdata.version < JSON_REPORT_VERSION) {
                 if (u->_name && fval(u->faction, FFL_NPC)) {
@@ -1615,21 +1614,6 @@ int readgame(const char *filename, int backup)
             up = &u->next;
 
             update_interval(u->faction, u->region);
-            mage = get_mage(u);
-            if (mage) {
-                faction *f = u->faction;
-                int skl = effskill(u, SK_MAGIC);
-                if (!fval(f, FFL_NPC) && f->magiegebiet == M_GRAY) {
-                    log_error("faction %s had magic=gray, fixing (%s)\n", factionname(f), magic_school[mage->magietyp]);
-                    f->magiegebiet = mage->magietyp;
-                }
-                if (f->max_spelllevel < skl) {
-                    f->max_spelllevel = skl;
-                }
-                if (mage->spellcount < 0) {
-                    mage->spellcount = 0;
-                }
-            }
         }
     }
     log_printf(stdout, "\n");
@@ -1653,6 +1637,7 @@ int readgame(const char *filename, int backup)
     for (f = factions; f; f = f->next) {
         if (f->flags & FFL_NPC) {
             f->alive = 1;
+            f->magiegebiet = M_GRAY;
             if (f->no == 0) {
                 int no = 666;
                 while (findfaction(no))
@@ -1663,8 +1648,23 @@ int readgame(const char *filename, int backup)
         }
         else {
             for (u = f->units; u; u = u->nextF) {
+                sc_mage *mage = get_mage(u);
+                if (mage) {
+                    faction *f = u->faction;
+                    int skl = effskill(u, SK_MAGIC);
+                    if (f->magiegebiet == M_GRAY) {
+                        log_error("faction %s had magic=gray, fixing (%s)\n", factionname(f), magic_school[mage->magietyp]);
+                        f->magiegebiet = mage->magietyp;
+                    }
+                    if (f->max_spelllevel < skl) {
+                        f->max_spelllevel = skl;
+                    }
+                    if (mage->spellcount < 0) {
+                        mage->spellcount = 0;
+                    }
+                }
                 if (u->number > 0) {
-                    f->alive = 1;
+                    f->alive = true;
                     break;
                 }
             }
