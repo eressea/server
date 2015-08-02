@@ -1278,10 +1278,12 @@ static int update_gbdream(const unit * u, int bonus, curse *c, const curse_type 
     if (curse_active(c) && c->type == gbdream_ct) {
         double effect = curse_geteffect(c);
         unit *mage = c->magician;
-        /* wir suchen jeweils den groessten Bonus und den groestsen Malus */
+        /* wir suchen jeweils den groessten Bonus und den groessten Malus */
         if (sign * effect > sign * bonus) {
-            if (mage == NULL || mage->number == 0
-                || sign>0?alliedunit(mage, u->faction, HELP_GUARD):!alliedunit(mage, u->faction, HELP_GUARD)) {
+            bool allied;
+            assert(mage && mage->number > 0);
+            allied = alliedunit(mage, u->faction, HELP_GUARD);
+            if ((sign>0)?allied:!allied) {
                 bonus = (int)effect;
             }
         }
@@ -1327,9 +1329,9 @@ int att_modification(const unit * u, skill_t sk)
         while (a && a->type == &at_curse) {
             curse *c = (curse *)a->data.v;
 
+            assert(c->magician); // update_gbdream makes no sense if there is no caster (calls alliedunit)
             bonus = update_gbdream(u, bonus, c, gbdream_ct, 1);
             malus = update_gbdream(u, malus, c, gbdream_ct, -1);
-
             a = a->next;
         }
         result = result + bonus + malus;
