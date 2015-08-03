@@ -17,51 +17,12 @@ end
 local function seed(r, email, race, lang)
     local f = faction.create(email, race, lang)
     local u = unit.create(f, r)
+    equip_unit(u, "new_faction")
+    equip_unit(u, "first_unit")
+    equip_unit(u, "first_" .. race, 7) -- disable old callbacks
     u:set_skill("perception", 30)
-    u:add_item("money", 20000)
-    items = {
-        log = 50,
-        stone = 50,
-        iron = 50,
-        laen = 10,
-        mallorn = 10,
-        skillpotion = 5
-    }
-    for it, num in pairs(items) do
-        u:add_item(it, num)
-    end
-    u = nil
-    skills ={
-    "crossbow",
-    "bow",
-    "building",
-    "trade",
-    "forestry",
-    "catapult",
-    "herbalism",
-    "training",
-    "riding",
-    "armorer",
-    "shipcraft",
-    "melee",
-    "sailing",
-    "polearm",
-    "espionage",
-    "roadwork",
-    "tactics",
-    "stealth",
-    "weaponsmithing",
-    "cartmaking",
-    "taxation",
-    "stamina"
-    }
-    unit.create(f, r, 50):set_skill("entertainment", 15)
     unit.create(f, r, 5):set_skill("mining", 30)
     unit.create(f, r, 5):set_skill("quarrying", 30)
-    for _, sk in ipairs(skills) do
-        u = u or unit.create(f, r, 5)
-        if u:set_skill(sk, 15)>0 then u=nil end
-    end
     return f
 end
 
@@ -94,11 +55,17 @@ end
 math.randomseed(os.time())
 
 local newbs = {}
+local per_region = 2
+local num_seeded = 2
+local start = nil
 for _, p in ipairs(players) do
-    local index = math.random(#sel)
-    local start = nil
-    while not start or start.units() do
-        start = sel[index]
+    if num_seeded == per_region then
+        while not start or start.units() do
+            local index = math.random(#sel)
+            start = sel[index]
+        end
+        create_curse(nil, r, 'holyground', 1, 52)
+        num_seeded = 0
     end
     local dupe = false
     for f in factions() do
@@ -109,6 +76,7 @@ for _, p in ipairs(players) do
         end
     end
     if not dupe then
+        num_seeded = num_seeded + 1
         f = seed(start, p.email, p.race or "human", p.lang or "de")
         print("new faction ".. tostring(f) .. " starts in ".. tostring(start))
         table.insert(newbs, f)

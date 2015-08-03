@@ -434,7 +434,9 @@ static int tolua_equipunit(lua_State * L)
 {
     unit *u = (unit *)tolua_tousertype(L, 1, 0);
     const char *eqname = tolua_tostring(L, 2, 0);
-    equip_unit(u, get_equipment(eqname));
+    int mask = (int)tolua_tonumber(L, 3, EQUIP_ALL);
+    assert(mask > 0);
+    equip_unit_mask(u, get_equipment(eqname), mask);
     return 0;
 }
 

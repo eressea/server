@@ -1,4 +1,4 @@
-/*
+ï»¿/*
 Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -200,7 +200,7 @@ static unit *unitorders(FILE * F, int enc, struct faction *f)
                         }
                     }
                 }
-                /* Nun wird der Befehl erzeut und eingehängt */
+                /* Nun wird der Befehl erzeut und eingehÃ¤ngt */
                 *ordp = parse_order(s, u->faction->locale);
                 if (*ordp) {
                     ordp = &(*ordp)->next;
@@ -233,8 +233,8 @@ static faction *factionorders(void)
                 f->no, pass));
             return 0;
         }
-        /* Die Partei hat sich zumindest gemeldet, so daß sie noch
-         * nicht als untätig gilt */
+        /* Die Partei hat sich zumindest gemeldet, so dass sie noch
+         * nicht als untÃ¤tig gilt */
 
         /* TODO: +1 ist ein Workaround, weil cturn erst in process_orders
          * incrementiert wird. */
@@ -308,9 +308,9 @@ int readorders(const char *filename)
                 /* Falls in unitorders() abgebrochen wird, steht dort entweder eine neue
                  * Partei, eine neue Einheit oder das File-Ende. Das switch() wird erneut
                  * durchlaufen, und die entsprechende Funktion aufgerufen. Man darf buf
-                 * auf alle Fälle nicht überschreiben! Bei allen anderen Einträgen hier
-                 * muß buf erneut gefüllt werden, da die betreffende Information in nur
-                 * einer Zeile steht, und nun die nächste gelesen werden muß. */
+                 * auf alle FÃ¤lle nicht Ã¼berschreiben! Bei allen anderen EintrÃ¤gen hier
+                 * muss buf erneut gefÃ¼llt werden, da die betreffende Information in nur
+                 * einer Zeile steht, und nun die nÃ¤chste gelesen werden muss. */
 
         case P_NEXT:
             f = NULL;
@@ -331,7 +331,7 @@ int readorders(const char *filename)
 /* ------------------------------------------------------------- */
 
 /* #define INNER_WORLD  */
-/* fürs debuggen nur den inneren Teil der Welt laden */
+/* fÃ¼rs debuggen nur den inneren Teil der Welt laden */
 /* -9;-27;-1;-19;Sumpfloch */
 int inner_world(region * r)
 {
@@ -1600,7 +1600,6 @@ int readgame(const char *filename, int backup)
 
         while (--p >= 0) {
             unit *u = read_unit(&gdata);
-            sc_mage *mage;
 
             if (gdata.version < JSON_REPORT_VERSION) {
                 if (u->_name && fval(u->faction, FFL_NPC)) {
@@ -1615,21 +1614,6 @@ int readgame(const char *filename, int backup)
             up = &u->next;
 
             update_interval(u->faction, u->region);
-            mage = get_mage(u);
-            if (mage) {
-                faction *f = u->faction;
-                int skl = effskill(u, SK_MAGIC);
-                if (!fval(f, FFL_NPC) && f->magiegebiet == M_GRAY) {
-                    log_error("faction %s had magic=gray, fixing (%s)\n", factionname(f), magic_school[mage->magietyp]);
-                    f->magiegebiet = mage->magietyp;
-                }
-                if (f->max_spelllevel < skl) {
-                    f->max_spelllevel = skl;
-                }
-                if (mage->spellcount < 0) {
-                    mage->spellcount = 0;
-                }
-            }
         }
     }
     log_printf(stdout, "\n");
@@ -1653,6 +1637,7 @@ int readgame(const char *filename, int backup)
     for (f = factions; f; f = f->next) {
         if (f->flags & FFL_NPC) {
             f->alive = 1;
+            f->magiegebiet = M_GRAY;
             if (f->no == 0) {
                 int no = 666;
                 while (findfaction(no))
@@ -1663,8 +1648,23 @@ int readgame(const char *filename, int backup)
         }
         else {
             for (u = f->units; u; u = u->nextF) {
+                sc_mage *mage = get_mage(u);
+                if (mage) {
+                    faction *f = u->faction;
+                    int skl = effskill(u, SK_MAGIC);
+                    if (f->magiegebiet == M_GRAY) {
+                        log_error("faction %s had magic=gray, fixing (%s)\n", factionname(f), magic_school[mage->magietyp]);
+                        f->magiegebiet = mage->magietyp;
+                    }
+                    if (f->max_spelllevel < skl) {
+                        f->max_spelllevel = skl;
+                    }
+                    if (mage->spellcount < 0) {
+                        mage->spellcount = 0;
+                    }
+                }
                 if (u->number > 0) {
-                    f->alive = 1;
+                    f->alive = true;
                     break;
                 }
             }
