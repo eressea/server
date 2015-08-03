@@ -366,7 +366,7 @@ static int canwalk(unit * u)
         return E_CANWALK_TOOMANYCARTS;
     /* Es muß nicht zwingend an den Wagen liegen, aber egal... (man
      * könnte z.B. auch 8 Eisen abladen, damit ein weiterer Wagen als
-     * Fracht draufpaßt) */
+     * Fracht draufpasst) */
 
     return E_CANWALK_TOOHEAVY;
 }

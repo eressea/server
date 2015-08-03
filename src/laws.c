@@ -183,7 +183,7 @@ static void live(region * r)
                 reduce_skill(u, sb, weeks);
                 ADDMSG(&u->faction->msgs, msg_message("dumbeffect",
                     "unit weeks skill", u, weeks, (skill_t)sb->id));
-            }                         /* sonst Glück gehabt: wer nix weiß, kann nix vergessen... */
+            }                         /* sonst Glück gehabt: wer nix weiss, kann nix vergessen... */
             change_effect(u, oldpotiontype[P_FOOL], -effect);
         }
         age_unit(r, u);
@@ -402,7 +402,7 @@ static void migrate(region * r)
          * wer fragt das? Die Baumwanderung war abhängig von der
          * Auswertungsreihenfolge der regionen,
          * das hatte ich geändert. jemand hat es wieder gelöscht, toll.
-         * ich habe es wieder aktiviert, muß getestet werden.
+         * ich habe es wieder aktiviert, muss getestet werden.
          */
         *hp = m->next;
         m->next = free_migrants;
@@ -442,7 +442,7 @@ static void horses(region * r)
 
     /* Pferde wandern in Nachbarregionen.
      * Falls die Nachbarregion noch berechnet
-     * werden muß, wird eine migration-Struktur gebildet,
+     * werden muss, wird eine migration-Struktur gebildet,
      * die dann erst in die Berechnung der Nachbarstruktur einfließt.
      */
 
@@ -632,7 +632,7 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
             a->data.sa[0] = (short)rtrees(r, 0);
             a->data.sa[1] = (short)rtrees(r, 1);
         }
-        /* wir haben 6 Wochen zum wachsen, jeder Same/Sproß hat 18% Chance
+        /* wir haben 6 Wochen zum wachsen, jeder Same/Spross hat 18% Chance
          * zu wachsen, damit sollten nach 5-6 Wochen alle gewachsen sein */
         growth = 1800;
 
@@ -1990,7 +1990,7 @@ int mail_cmd(unit * u, struct order *ord)
     s = gettoken(token, sizeof(token));
 
     /* Falls kein Parameter, ist das eine Einheitsnummer;
-     * das Füllwort "AN" muß wegfallen, da gültige Nummer! */
+     * das Füllwort "AN" muss wegfallen, da gültige Nummer! */
 
     do {
         cont = 0;
@@ -3495,11 +3495,11 @@ void update_long_order(unit * u)
             switch (keyword) {
                 /* Wenn gehandelt wird, darf kein langer Befehl ausgeführt
                  * werden. Da Handel erst nach anderen langen Befehlen kommt,
-                 * muß das vorher abgefangen werden. Wir merken uns also
+                 * muss das vorher abgefangen werden. Wir merken uns also
                  * hier, ob die Einheit handelt. */
             case K_BUY:
             case K_SELL:
-                /* Wenn die Einheit handelt, muß der Default-Befehl gelöscht
+                /* Wenn die Einheit handelt, muss der Default-Befehl gelöscht
                  * werden.
                  * Wird je diese Ausschliesslichkeit aufgehoben, muss man aufpassen
                  * mit der Reihenfolge von Kaufen, Verkaufen etc., damit es Spielern
@@ -3522,7 +3522,7 @@ void update_long_order(unit * u)
     if (hunger) {
         return;
     }
-    /* Wenn die Einheit handelt, muß der Default-Befehl gelöscht
+    /* Wenn die Einheit handelt, muss der Default-Befehl gelöscht
      * werden. */
 
     if (trade) {
