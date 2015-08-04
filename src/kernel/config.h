@@ -286,7 +286,10 @@ extern "C" {
     int AllianceAuto(void);        /* flags that allied factions get automatically */
     int AllianceRestricted(void);  /* flags restricted to allied factions */
     int HelpMask(void);    /* flags restricted to allied factions */
+
     struct order *default_order(const struct locale *lang);
+    void set_default_order(int kwd);
+
     int entertainmoney(const struct region *r);
 
     void free_gamedata(void);

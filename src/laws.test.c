@@ -768,22 +768,146 @@ static void test_luck_message(CuTest *tc) {
     test_cleanup();
 }
 
-static void test_update_long_order(CuTest *tc) {
+static void test_long_order_normal(CuTest *tc) {
+    // TODO: write more tests
+    unit *u;
+    order *ord;
+    test_cleanup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    fset(u, UFL_MOVED);
+    fset(u, UFL_LONGACTION);
+    u->faction->locale = get_or_create_locale("de");
+    ord = create_order(K_MOVE, u->faction->locale, 0);
+    unit_addorder(u, ord);
+    update_long_order(u);
+    CuAssertPtrEquals(tc, ord->data, u->thisorder->data);
+    CuAssertIntEquals(tc, 0, fval(u, UFL_MOVED));
+    CuAssertIntEquals(tc, 0, fval(u, UFL_LONGACTION));
+    CuAssertPtrNotNull(tc, u->orders);
+    CuAssertPtrEquals(tc, 0, u->faction->msgs);
+    CuAssertPtrEquals(tc, 0, u->old_orders);
+    test_cleanup();
+}
+
+static void test_long_order_none(CuTest *tc) {
     // TODO: write more tests
     unit *u;
     test_cleanup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u->faction->locale = get_or_create_locale("de");
     update_long_order(u);
     CuAssertPtrEquals(tc, 0, u->thisorder);
     CuAssertPtrEquals(tc, 0, u->orders);
-    CuAssertPtrEquals(tc, 0, u->old_orders);
+    CuAssertPtrEquals(tc, 0, u->faction->msgs);
+    test_cleanup();
+}
+
+static void test_long_order_cast(CuTest *tc) {
+    // TODO: write more tests
+    unit *u;
+    test_cleanup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u->faction->locale = get_or_create_locale("de");
+    unit_addorder(u, create_order(K_CAST, u->faction->locale, 0));
+    unit_addorder(u, create_order(K_CAST, u->faction->locale, 0));
+    update_long_order(u);
+    CuAssertPtrEquals(tc, 0, u->thisorder);
+    CuAssertPtrNotNull(tc, u->orders);
+    CuAssertPtrEquals(tc, 0, u->faction->msgs);
+    test_cleanup();
+}
+
+static void test_long_order_buy_sell(CuTest *tc) {
+    // TODO: write more tests
+    unit *u;
+    test_cleanup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u->faction->locale = get_or_create_locale("de");
+    unit_addorder(u, create_order(K_BUY, u->faction->locale, 0));
+    unit_addorder(u, create_order(K_SELL, u->faction->locale, 0));
+    unit_addorder(u, create_order(K_SELL, u->faction->locale, 0));
+    update_long_order(u);
+    CuAssertPtrEquals(tc, 0, u->thisorder);
+    CuAssertPtrNotNull(tc, u->orders);
+    CuAssertPtrEquals(tc, 0, u->faction->msgs);
+    test_cleanup();
+}
+
+static void test_long_order_multi_long(CuTest *tc) {
+    // TODO: write more tests
+    unit *u;
+    test_cleanup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u->faction->locale = get_or_create_locale("de");
+    unit_addorder(u, create_order(K_MOVE, u->faction->locale, 0));
+    unit_addorder(u, create_order(K_DESTROY, u->faction->locale, 0));
+    update_long_order(u);
+    CuAssertPtrNotNull(tc, u->thisorder);
+    CuAssertPtrNotNull(tc, u->orders);
+    CuAssertStrEquals(tc, "error52", test_get_messagetype(u->faction->msgs->begin->msg));
+    test_cleanup();
+}
+
+static void test_long_order_multi_buy(CuTest *tc) {
+    // TODO: write more tests
+    unit *u;
+    test_cleanup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u->faction->locale = get_or_create_locale("de");
+    unit_addorder(u, create_order(K_BUY, u->faction->locale, 0));
+    unit_addorder(u, create_order(K_BUY, u->faction->locale, 0));
+    update_long_order(u);
+    CuAssertPtrEquals(tc, 0, u->thisorder);
+    CuAssertPtrNotNull(tc, u->orders);
+    CuAssertStrEquals(tc, "error52", test_get_messagetype(u->faction->msgs->begin->msg));
+    test_cleanup();
+}
+
+static void test_long_order_buy_cast(CuTest *tc) {
+    // TODO: write more tests
+    unit *u;
+    test_cleanup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u->faction->locale = get_or_create_locale("de");
+    unit_addorder(u, create_order(K_BUY, u->faction->locale, 0));
+    unit_addorder(u, create_order(K_CAST, u->faction->locale, 0));
+    update_long_order(u);
+    CuAssertPtrEquals(tc, 0, u->thisorder);
+    CuAssertPtrNotNull(tc, u->orders);
+    CuAssertStrEquals(tc, "error52", test_get_messagetype(u->faction->msgs->begin->msg));
+    test_cleanup();
+}
+
+static void test_long_order_hungry(CuTest *tc) {
+    // TODO: write more tests
+    unit *u;
+    test_cleanup();
+    set_param(&global.parameters, "hunger.long", "1");
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    fset(u, UFL_HUNGER);
+    u->faction->locale = get_or_create_locale("de");
+    unit_addorder(u, create_order(K_MOVE, u->faction->locale, 0));
+    unit_addorder(u, create_order(K_DESTROY, u->faction->locale, 0));
+    set_default_order(K_WORK);
+    update_long_order(u);
+    CuAssertIntEquals(tc, K_WORK, getkeyword(u->thisorder));
+    CuAssertPtrNotNull(tc, u->orders);
+    CuAssertPtrEquals(tc, 0, u->faction->msgs);
+    set_default_order(NOKEYWORD);
     test_cleanup();
 }
 
 CuSuite *get_laws_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
-    SUITE_ADD_TEST(suite, test_update_long_order);
+    SUITE_ADD_TEST(suite, test_long_order_normal);
+    SUITE_ADD_TEST(suite, test_long_order_none);
+    SUITE_ADD_TEST(suite, test_long_order_cast);
+    SUITE_ADD_TEST(suite, test_long_order_buy_sell);
+    SUITE_ADD_TEST(suite, test_long_order_multi_long);
+    SUITE_ADD_TEST(suite, test_long_order_multi_buy);
+    SUITE_ADD_TEST(suite, test_long_order_buy_cast);
+    SUITE_ADD_TEST(suite, test_long_order_hungry);
     SUITE_ADD_TEST(suite, test_new_building_can_be_renamed);
     SUITE_ADD_TEST(suite, test_rename_building);
     SUITE_ADD_TEST(suite, test_rename_building_twice);

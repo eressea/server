@@ -1681,6 +1681,11 @@ void kernel_init(void)
 }
 
 static order * defaults[MAXLOCALES];
+keyword_t default_keyword = NOKEYWORD;
+
+void set_default_order(int kwd) {
+    default_keyword = (keyword_t)kwd;
+}
 
 order *default_order(const struct locale *lang)
 {
@@ -1688,6 +1693,11 @@ order *default_order(const struct locale *lang)
     int i = locale_index(lang);
     order *result = 0;
     assert(i < MAXLOCALES);
+
+    if (default_keyword!=NOKEYWORD) {
+        return create_order(default_keyword, lang, 0);
+    }
+
     result = defaults[i];
     if (!result && usedefault) {
         const char * str = LOC(lang, "defaultorder");
