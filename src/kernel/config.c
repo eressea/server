@@ -906,11 +906,6 @@ int newcontainerid(void)
     return random_no;
 }
 
-bool idle(faction * f)
-{
-    return (bool)(f ? false : true);
-}
-
 int maxworkingpeasants(const struct region *r)
 {
     int size = production(r);

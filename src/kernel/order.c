@@ -389,9 +389,8 @@ order *parse_order(const char *s, const struct locale * lang)
  * \return true if the order is long
  * \sa is_exclusive(), is_repeated(), is_persistent()
  */
-bool is_repeated(const order * ord)
+bool is_repeated(keyword_t kwd)
 {
-    keyword_t kwd = ORD_KEYWORD(ord);
     switch (kwd) {
     case K_CAST:
     case K_BUY:
@@ -468,10 +467,8 @@ bool is_exclusive(const order * ord)
  * \return true if the order is long
  * \sa is_exclusive(), is_repeated(), is_persistent()
  */
-bool is_long(const order * ord)
+bool is_long(keyword_t kwd)
 {
-    keyword_t kwd = ORD_KEYWORD(ord);
-
     switch (kwd) {
     case K_CAST:
     case K_BUY:
@@ -522,7 +519,7 @@ bool is_persistent(const order * ord)
     case K_KOMMENTAR:
         return true;
     default:
-        return ord->_persistent || is_repeated(ord);
+        return ord->_persistent || is_repeated(kwd);
     }
 }
 

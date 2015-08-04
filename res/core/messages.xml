@@ -2830,17 +2830,6 @@
     <text locale="de">"$unit($unit) in $region($region) produziert $int($amount)$if($eq($wanted,$amount),""," von $int($wanted)") $resource($resource,$wanted)."</text>
     <text locale="en">"$unit($unit) in $region($region) produces $int($amount)$if($eq($wanted,$amount),""," of $int($wanted)") $resource($resource,$amount)."</text>
   </message>
-  <message name="manufacture" section="production">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="amount" type="int"/>
-      <arg name="wanted" type="int"/>
-      <arg name="resource" type="resource"/>
-    </type>
-    <text locale="de">"$unit($unit) in $region($region) produziert $int($amount)$if($eq($wanted,$amount),""," von $int($wanted)") $resource($resource,$wanted)."</text>
-    <text locale="en">"$unit($unit) in $region($region) produces $int($amount)$if($eq($wanted,$amount),""," of $int($wanted)") $resource($resource,$amount)."</text>
-  </message>
   <message name="buildbuilding" section="production">
     <type>
       <arg name="unit" type="unit"/>

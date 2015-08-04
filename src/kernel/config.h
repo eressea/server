@@ -179,7 +179,6 @@ extern "C" {
     bool has_limited_skills(const struct unit *u);
     const struct race *findrace(const char *, const struct locale *);
 
-    bool idle(struct faction *f);
     bool unit_has_cursed_item(const struct unit *u);
 
     /* grammatik-flags: */
