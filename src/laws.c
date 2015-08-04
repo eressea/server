@@ -3483,15 +3483,15 @@ void update_long_order(unit * u)
                     }
                     break;
                 default:
-#ifdef TODO // TODO: decide https://bugs.eressea.de/view.php?id=2080#c6011
-                    if (kwd < thiskwd) {
-                        /* swap thisorder for the new one */
-                        order *tmp = ord;
-                        ord = u->thisorder;
-                        u->thisorder = tmp;
+                    // TODO: decide https://bugs.eressea.de/view.php?id=2080#c6011
+                    if (kwd > thiskwd) {
+                        // swap out thisorder for the new one
+                        cmistake(u, u->thisorder, 52, MSG_EVENT);
+                        set_order(&u->thisorder, copy_order(ord));
                     }
-#endif
-                    cmistake(u, ord, 52, MSG_EVENT);
+                    else {
+                        cmistake(u, ord, 52, MSG_EVENT);
+                    }
                     break;
                 }
             }

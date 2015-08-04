@@ -768,9 +768,22 @@ static void test_luck_message(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_update_long_order(CuTest *tc) {
+    // TODO: write more tests
+    unit *u;
+    test_cleanup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    update_long_order(u);
+    CuAssertPtrEquals(tc, 0, u->thisorder);
+    CuAssertPtrEquals(tc, 0, u->orders);
+    CuAssertPtrEquals(tc, 0, u->old_orders);
+    test_cleanup();
+}
+
 CuSuite *get_laws_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_update_long_order);
     SUITE_ADD_TEST(suite, test_new_building_can_be_renamed);
     SUITE_ADD_TEST(suite, test_rename_building);
     SUITE_ADD_TEST(suite, test_rename_building_twice);
