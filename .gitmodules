@@ -1,28 +1,31 @@
 [submodule "lunit"]
 	path = lunit
-	url = git://github.com/badgerman/lunit.git
+	url = git://github.com/ennorehling/lunit.git
 [submodule "crypto"]
 	path = crypto
-	url = git://github.com/badgerman/crypto.git
+	url = git://github.com/ennorehling/crypto.git
 [submodule "cmake"]
 	path = cmake
-	url = git://github.com/badgerman/cmake.git
+	url = git://github.com/ennorehling/cmake.git
 [submodule "quicklist"]
 	path = quicklist
-	url = git://github.com/badgerman/quicklist.git
+	url = git://github.com/ennorehling/quicklist.git
 [submodule "critbit"]
 	path = critbit
-	url = git://github.com/badgerman/critbit.git
+	url = git://github.com/ennorehling/critbit.git
 [submodule "dlmalloc"]
 	path = dlmalloc
-	url = git://github.com/badgerman/dlmalloc.git
+	url = git://github.com/ennorehling/dlmalloc.git
 [submodule "cutest"]
 	path = cutest
-	url = git://github.com/badgerman/cutest.git
+	url = git://github.com/ennorehling/cutest.git
 [submodule "cJSON"]
 	path = cJSON
-	url = git://github.com/badgerman/cJSON.git
+	url = git://github.com/ennorehling/cJSON.git
+[submodule "iniparser"]
+	path = iniparser
+	url = git://github.com/ennorehling/iniparser.git
 [submodule "storage"]
 	path = storage
-	url = git://github.com/badgerman/storage.git
+	url = git://github.com/ennorehling/storage.git
 	branch = master
