@@ -2,6 +2,7 @@
 #include <config.h>
 #include "reports.h"
 #include "report.h"
+#include "creport.h"
 
 #include <kernel/building.h>
 #include <kernel/faction.h>
@@ -155,9 +156,32 @@ static void test_sparagraph(CuTest *tc) {
     CuAssertPtrEquals(tc, 0, sp->next->next->next);
 }
 
+static void test_cr_unit(CuTest *tc) {
+    stream strm;
+    char line[1024];
+    faction *f;
+    region *r;
+    unit *u;
+
+    test_cleanup();
+    f = test_create_faction(0);
+    r = test_create_region(0, 0, 0);
+    u = test_create_unit(f, r);
+    renumber_unit(u, 1234);
+
+    mstream_init(&strm);
+    cr_output_unit(&strm, r, f, u, see_unit);
+    strm.api->rewind(strm.handle);
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, line, "EINHEIT 1234");
+    mstream_done(&strm);
+    test_cleanup();
+}
+
 CuSuite *get_reports_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_cr_unit);
     SUITE_ADD_TEST(suite, test_reorder_units);
     SUITE_ADD_TEST(suite, test_seen_faction);
     SUITE_ADD_TEST(suite, test_regionid);

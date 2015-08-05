@@ -153,6 +153,7 @@ extern "C" {
     void freestrlist(strlist * s);
     void split_paragraph(strlist ** SP, const char *s, unsigned int indent, unsigned int width, char mark);
 
+    int stream_printf(struct stream * out, const char *format, ...);
 
 #define GR_PLURAL     0x01      /* grammar: plural */
 #define MAX_INVENTORY 128       /* maimum number of different items in an inventory */

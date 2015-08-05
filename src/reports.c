@@ -52,6 +52,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <stream.h>
 #include <quicklist.h>
 
 /* libc includes */
@@ -2497,6 +2498,23 @@ static void log_orders(const struct message *msg)
             break;
         }
     }
+}
+
+int stream_printf(struct stream * out, const char *format, ...) {
+    va_list args;
+    int result;
+    char buffer[4096];
+    size_t bytes = sizeof(buffer);
+    // TODO: should be in storage/stream.c (doesn't exist yet)
+    va_start(args, format);
+    result = vsnprintf(buffer, bytes, format, args);
+    if (result >= 0 && (size_t)result < bytes) {
+        bytes = (size_t)result;
+        // TODO: else = buffer too small
+    }
+    out->api->write(out->handle, buffer, bytes);
+    va_end(args);
+    return result;
 }
 
 void register_reports(void)
