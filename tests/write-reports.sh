@@ -22,8 +22,11 @@ cleanup
 valgrind ../Debug/eressea/eressea -t 184 ../scripts/reports.lua
 [ -d reports ] || quit 4 "no reports directory created"
 CRFILE=184-zvto.cr
-grep -q FACTION reports/$CRFILE || quit 1 "CR did not contain any factions"
+grep -q PARTEI reports/$CRFILE || quit 1 "CR did not contain any factions"
 grep -q REGION reports/$CRFILE || quit 2 "CR did not contain any regions"
-grep -q EINHEIT reports/$CRFILE || quit 3 "CR did not contain any units"
+grep -q SCHIFF reports/$CRFILE || quit 3 "CR did not contain any ships"
+grep -q BURG reports/$CRFILE || quit 4 "CR did not contain any buildings"
+grep -q EINHEIT reports/$CRFILE || quit 5 "CR did not contain any units"
+grep -q GEGENSTAENDE reports/$CRFILE || quit 6 "CR did not contain any items"
 echo "integration tests: PASS"
 cleanup
