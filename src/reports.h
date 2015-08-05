@@ -25,6 +25,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/objtypes.h>
 #include <kernel/types.h>
 
+struct stream;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
