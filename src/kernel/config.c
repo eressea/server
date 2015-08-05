@@ -919,6 +919,10 @@ static const char * parameter_key(int i)
     return parameters[i];
 }
 
+void init_parameters(struct locale *lang) {
+    init_translations(lang, UT_PARAMS, parameter_key, MAXPARAMS);
+}
+
 
 void init_terrains_translation(const struct locale *lang) {
     void **tokens;
@@ -1009,7 +1013,7 @@ void init_locale(struct locale *lang)
         if (name) addtoken(tokens, name, var);
     }
 
-    init_translations(lang, UT_PARAMS, parameter_key, MAXPARAMS);
+    init_parameters(lang);
 
     init_options_translation(lang);
     init_terrains_translation(lang);

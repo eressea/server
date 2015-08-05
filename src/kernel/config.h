@@ -291,6 +291,7 @@ extern "C" {
     void set_default_order(int kwd);
 
     int entertainmoney(const struct region *r);
+    void init_parameters(struct locale *lang);
 
     void free_gamedata(void);
 

@@ -1,6 +1,7 @@
 #include <platform.h>
 #include "laws.h"
 #include "battle.h"
+#include "monster.h"
 
 #include <kernel/ally.h>
 #include <kernel/config.h>
@@ -913,9 +914,71 @@ static void test_long_order_hungry(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_ally_cmd_errors(CuTest *tc) {
+    unit *u;
+    int fid;
+    order *ord;
+
+    test_cleanup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u->faction->locale = get_or_create_locale("de");
+    fid = u->faction->no + 1;
+    CuAssertPtrEquals(tc, 0, findfaction(fid));
+
+    ord = create_order(K_ALLY, u->faction->locale, itoa36(fid));
+    ally_cmd(u, ord);
+    CuAssertStrEquals(tc, "error66", test_get_messagetype(u->faction->msgs->begin->msg));
+    free_order(ord);
+
+    test_cleanup();
+}
+
+static void test_ally_cmd(CuTest *tc) {
+    unit *u;
+    faction * f;
+    order *ord;
+    struct locale *lang;
+
+    test_cleanup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    f = test_create_faction(0);
+    u->faction->locale = lang = get_or_create_locale("de");
+    locale_setstring(lang, parameters[P_NOT], "NICHT");
+    locale_setstring(lang, parameters[P_GUARD], "BEWACHE");
+    init_parameters(lang);
+
+    ord = create_order(K_ALLY, lang, "%s", itoa36(f->no));
+    ally_cmd(u, ord);
+    CuAssertPtrEquals(tc, 0, u->faction->msgs);
+    CuAssertIntEquals(tc, HELP_ALL, alliedfaction(0, u->faction, f, HELP_ALL));
+    free_order(ord);
+
+    ord = create_order(K_ALLY, lang, "%s NICHT", itoa36(f->no));
+    ally_cmd(u, ord);
+    CuAssertPtrEquals(tc, 0, u->faction->msgs);
+    CuAssertIntEquals(tc, 0, alliedfaction(0, u->faction, f, HELP_ALL));
+    free_order(ord);
+
+    ord = create_order(K_ALLY, lang, "%s BEWACHE", itoa36(f->no));
+    ally_cmd(u, ord);
+    CuAssertPtrEquals(tc, 0, u->faction->msgs);
+    CuAssertIntEquals(tc, HELP_GUARD, alliedfaction(0, u->faction, f, HELP_ALL));
+    free_order(ord);
+
+    ord = create_order(K_ALLY, lang, "%s BEWACHE NICHT", itoa36(f->no));
+    ally_cmd(u, ord);
+    CuAssertPtrEquals(tc, 0, u->faction->msgs);
+    CuAssertIntEquals(tc, 0, alliedfaction(0, u->faction, f, HELP_ALL));
+    free_order(ord);
+
+    test_cleanup();
+}
+
 CuSuite *get_laws_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_ally_cmd);
+    SUITE_ADD_TEST(suite, test_ally_cmd_errors);
     SUITE_ADD_TEST(suite, test_long_order_normal);
     SUITE_ADD_TEST(suite, test_long_order_none);
     SUITE_ADD_TEST(suite, test_long_order_cast);

@@ -1347,10 +1347,12 @@ int ally_cmd(unit * u, struct order *ord)
 
     s = gettoken(token, sizeof(token));
 
-    if (s && !s[0])
+    if (!s || !s[0]) {
         keyword = P_ANY;
-    else
+    } 
+    else {
         keyword = findparam(s, u->faction->locale);
+    }
 
     sfp = &u->faction->allies;
     if (fval(u, UFL_GROUP)) {
