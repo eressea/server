@@ -3022,13 +3022,7 @@ int renumber_cmd(unit * u, order * ord)
                 break;
             }
         }
-        uunhash(u);
-        if (!ualias(u)) {
-            attrib *a = a_add(&u->attribs, a_new(&at_alias));
-            a->data.i = -u->no;
-        }
-        u->no = i;
-        uhash(u);
+        renumber_unit(u, i);
         break;
 
     case P_SHIP:
