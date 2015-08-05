@@ -16,13 +16,15 @@ while [ ! -d $ROOT/.git ]; do
   ROOT=`dirname $ROOT`
 done
 
+set -e
 cd $ROOT/tests
 setup
 cleanup
 VALGRIND=`which valgrind`
 SERVER=../Debug/eressea/eressea
 if [ -n "$VALGRIND" ]; then
-SERVER="$VALGRIND $SERVER"
+SUPP=../share/ubuntu-12_04.supp
+SERVER="$VALGRIND --suppressions=$SUPP --error-exitcode=1 --leak-check=no $SERVER"
 fi
 echo "running $SERVER"
 $SERVER -t 184 ../scripts/reports.lua
