@@ -127,6 +127,8 @@ extern "C" {
     int ualias(const struct unit *u);
     int weight(const struct unit *u);
 
+    void renumber_unit(struct unit *u, int no);
+
     const struct race *u_irace(const struct unit *u);
     const struct race *u_race(const struct unit *u);
     void u_setrace(struct unit *u, const struct race *);

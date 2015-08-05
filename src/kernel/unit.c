@@ -1708,6 +1708,16 @@ int unit_getcapacity(const unit * u)
     return walkingcapacity(u);
 }
 
+void renumber_unit(unit *u, int no) {
+    uunhash(u);
+    if (!ualias(u)) {
+        attrib *a = a_add(&u->attribs, a_new(&at_alias));
+        a->data.i = -u->no;
+    }
+    u->no = no;
+    uhash(u);
+}
+
 void unit_addorder(unit * u, order * ord)
 {
     order **ordp = &u->orders;
