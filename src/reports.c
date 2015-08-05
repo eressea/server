@@ -60,6 +60,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <errno.h>
 #include <limits.h>
 #include <string.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <time.h>
 
