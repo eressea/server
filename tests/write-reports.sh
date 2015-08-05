@@ -19,7 +19,13 @@ done
 cd $ROOT/tests
 setup
 cleanup
-valgrind ../Debug/eressea/eressea -t 184 ../scripts/reports.lua
+VALGRIND=`which valgrind`
+SERVER=../Debug/eressea/eressea
+if [ -n "$VALGRIND" ]; then
+SERVER="$VALGRIND $SERVER"
+fi
+echo "running $SERVER"
+$SERVER -t 184 ../scripts/reports.lua
 [ -d reports ] || quit 4 "no reports directory created"
 CRFILE=184-zvto.cr
 grep -q PARTEI reports/$CRFILE || quit 1 "CR did not contain any factions"
