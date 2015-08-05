@@ -11,6 +11,7 @@ addons:
       - libncurses5-dev
       - libsqlite3-dev
       - libxml2-dev
+      - valgrind
 os:
 - linux
 - osx
