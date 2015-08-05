@@ -863,6 +863,22 @@ static void test_long_order_multi_buy(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_long_order_multi_sell(CuTest *tc) {
+    // TODO: write more tests
+    unit *u;
+    test_cleanup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u->faction->locale = get_or_create_locale("de");
+    unit_addorder(u, create_order(K_SELL, u->faction->locale, 0));
+    unit_addorder(u, create_order(K_BUY, u->faction->locale, 0));
+    unit_addorder(u, create_order(K_SELL, u->faction->locale, 0));
+    update_long_order(u);
+    CuAssertPtrEquals(tc, 0, u->thisorder);
+    CuAssertPtrNotNull(tc, u->orders);
+    CuAssertPtrEquals(tc, 0, u->faction->msgs);
+    test_cleanup();
+}
+
 static void test_long_order_buy_cast(CuTest *tc) {
     // TODO: write more tests
     unit *u;
@@ -906,6 +922,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_long_order_buy_sell);
     SUITE_ADD_TEST(suite, test_long_order_multi_long);
     SUITE_ADD_TEST(suite, test_long_order_multi_buy);
+    SUITE_ADD_TEST(suite, test_long_order_multi_sell);
     SUITE_ADD_TEST(suite, test_long_order_buy_cast);
     SUITE_ADD_TEST(suite, test_long_order_hungry);
     SUITE_ADD_TEST(suite, test_new_building_can_be_renamed);

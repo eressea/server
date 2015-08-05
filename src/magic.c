@@ -777,7 +777,7 @@ int spellcost(unit * u, const spell * sp)
     int count = countspells(u, 0);
     const resource_type *r_aura = get_resourcetype(R_AURA);
 
-    for (k = 0; sp->components[k].type; k++) {
+    for (k = 0; sp->components && sp->components[k].type; k++) {
         if (sp->components[k].type == r_aura) {
             aura = sp->components[k].amount;
         }
@@ -798,7 +798,7 @@ static int spl_costtyp(const spell * sp)
     int k;
     int costtyp = SPC_FIX;
 
-    for (k = 0; sp->components[k].type; k++) {
+    for (k = 0; sp->components && sp->components[k].type; k++) {
         if (costtyp == SPC_LINEAR)
             return SPC_LINEAR;
 
@@ -827,7 +827,7 @@ int eff_spelllevel(unit * u, const spell * sp, int cast_level, int range)
     int k, maxlevel, needplevel;
     int costtyp = SPC_FIX;
 
-    for (k = 0; sp->components[k].type; k++) {
+    for (k = 0; sp->components && sp->components[k].type; k++) {
         if (cast_level == 0)
             return 0;
 
@@ -894,7 +894,7 @@ void pay_spell(unit * u, const spell * sp, int cast_level, int range)
     int resuse;
 
     assert(cast_level > 0);
-    for (k = 0; sp->components[k].type; k++) {
+    for (k = 0; sp->components && sp->components[k].type; k++) {
         if (sp->components[k].type == r_aura) {
             resuse = spellcost(u, sp) * range;
         }
@@ -954,7 +954,7 @@ cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
         return false;
     }
 
-    for (k = 0; sp->components[k].type; ++k) {
+    for (k = 0; sp->components && sp->components[k].type; ++k) {
         if (sp->components[k].amount > 0) {
             const resource_type *rtype = sp->components[k].type;
             int itemhave;
@@ -2768,15 +2768,13 @@ void magic(void)
                 continue;
             }
 
-            if (u->thisorder != NULL) {
-                for (ord = u->orders; ord; ord = ord->next) {
-                    if (getkeyword(ord) == K_CAST) {
-                        castorder *co = cast_cmd(u, ord);
-                        fset(u, UFL_LONGACTION | UFL_NOTMOVING);
-                        if (co) {
-                            const spell *sp = co->sp;
-                            add_castorder(&spellranks[sp->rank], co);
-                        }
+            for (ord = u->orders; ord; ord = ord->next) {
+                if (getkeyword(ord) == K_CAST) {
+                    castorder *co = cast_cmd(u, ord);
+                    fset(u, UFL_LONGACTION | UFL_NOTMOVING);
+                    if (co) {
+                        const spell *sp = co->sp;
+                        add_castorder(&spellranks[sp->rank], co);
                     }
                 }
             }
