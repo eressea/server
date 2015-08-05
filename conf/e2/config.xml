@@ -33,10 +33,17 @@
   <xi:include href="config://default/adamantium.xml"/>
   <equipment>
     <set name="first_unit">
-      <item name="conquesttoken" amount="1"/>
-      <item name="log" amount="30"/>
-      <item name="stone" amount="30"/>
-      <item name="money" amount="4200"/>
+      <item name="log" amount="50"/>
+      <item name="stone" amount="50"/>
+      <item name="iron" amount="50"/>
+      <item name="laen" amount="10"/>
+      <item name="sword" amount="1"/>
+      <item name="mallorn" amount="10"/>
+      <item name="skillpotion" amount="5"/>
+      <item name="p2" amount="5"/>
+      <item name="money" amount="20000"/>
+      <skill name="perception" level="30"/>
+      <skill name="melee" level="1"/>
     </set>
     <set name="new_faction">
       <item name="adamantium" amount="1"/>
@@ -89,11 +96,12 @@
     <param name="entertain.base" value="0"/>
     <param name="entertain.perlevel" value="20"/>
     <param name="nmr.timeout" value="5"/>
-    <param name="nmr.removenewbie" value="10"/>
+    <param name="nmr.removenewbie" value="0"/>
     <param name="GiveRestriction" value="3"/>
     <param name="hunger.long" value="1"/>
     <param name="init_spells" value="0"/>
     <param name="rules.reserve.twophase" value="1"/>
+    <param name="rules.give.max_men" value="-1"/>
     <param name="rules.check_overload" value="0"/>
     <param name="rules.limit.faction" value="2500"/>
     <param name="rules.maxskills.magic" value="5"/>

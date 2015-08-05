@@ -1,13 +1,20 @@
 #include <platform.h>
 #include <kernel/config.h>
+#include <kernel/curse.h>
+#include <kernel/item.h>
+#include <kernel/faction.h>
+#include <kernel/order.h>
+#include <kernel/race.h>
+#include <kernel/region.h>
+#include <kernel/spell.h>
 #include <util/base36.h>
 #include <util/language.h>
-#include "alchemy.h"
-#include "faction.h"
+#include <util/attrib.h>
+#include <spells/regioncurse.h>
+#include <alchemy.h>
+#include <laws.h>
+#include <spells.h>
 #include "unit.h"
-#include "item.h"
-#include "race.h"
-#include "region.h"
 
 #include <CuTest.h>
 #include <tests.h>
@@ -155,10 +162,12 @@ static void test_unit_name_from_race(CuTest *tc) {
 
     _snprintf(name, sizeof(name), "Mensch (%s)", itoa36(u->no));
     CuAssertStrEquals(tc, name, unitname(u));
+    CuAssertStrEquals(tc, "Mensch", unit_getname(u));
 
     u->number = 2;
     _snprintf(name, sizeof(name), "Menschen (%s)", itoa36(u->no));
     CuAssertStrEquals(tc, name, unitname(u));
+    CuAssertStrEquals(tc, "Menschen", unit_getname(u));
 
     test_cleanup();
 }
@@ -195,6 +204,42 @@ static void test_update_monster_name(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_names(CuTest *tc) {
+    unit *u;
+
+    test_cleanup();
+    test_create_world();
+    u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
+
+    unit_setname(u, "Hodor");
+    unit_setid(u, 5);
+    CuAssertStrEquals(tc, "Hodor", unit_getname(u));
+    CuAssertStrEquals(tc, "Hodor (5)", unitname(u));
+    test_cleanup();
+}
+
+static void test_default_name(CuTest *tc) {
+    unit *u;
+    struct locale* lang;
+    char buf[32], compare[32];
+
+    test_cleanup();
+    test_create_world();
+    lang = get_or_create_locale("de");
+    /* FIXME this has no real effect: default_name uses a static buffer that is initialized in some other test. This sucks. */
+    locale_setstring(lang, "unitdefault", "Einheit");
+
+    u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
+
+    default_name(u, buf, sizeof(buf));
+
+    sprintf(compare, "Einheit %s", itoa36(u->no));
+    CuAssertStrEquals(tc, compare, buf);
+
+    test_cleanup();
+}
+
+
 CuSuite *get_unit_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -207,5 +252,7 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_remove_units_without_faction);
     SUITE_ADD_TEST(suite, test_remove_units_with_dead_faction);
     SUITE_ADD_TEST(suite, test_remove_empty_units_in_region);
+    SUITE_ADD_TEST(suite, test_names);
+    SUITE_ADD_TEST(suite, test_default_name);
     return suite;
 }

@@ -1,4 +1,4 @@
-/*
+ï»¿/*
  +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  |                   |  Enno Rehling <enno@eressea.de>
  | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
@@ -48,18 +48,16 @@
 #include <stdlib.h>
 
 /* Wieviel Fremde eine Partei pro Woche aufnehmen kangiven */
-#define MAXNEWBIES								5
 #define RESERVE_DONATIONS       /* shall we reserve objects given to us by other factions? */
 #define RESERVE_GIVE            /* reserve anything that's given from one unit to another? */
 
+static int max_transfers(void) {
+    return get_param_int(global.parameters, "rules.give.max_men", 5);
+}
+
 static int GiveRestriction(void)
 {
-    static int value = -1;
-    if (value < 0) {
-        const char *str = get_param(global.parameters, "GiveRestriction");
-        value = str ? atoi(str) : 0;
-    }
-    return value;
+    return get_param_int(global.parameters, "GiveRestriction", 0);
 }
 
 static void feedback_give_not_allowed(unit * u, order * ord)
@@ -128,7 +126,7 @@ static bool limited_give(const item_type * type)
 int give_quota(const unit * src, const unit * dst, const item_type * type,
     int n)
 {
-    float divisor;
+    double divisor;
 
     if (!limited_give(type)) {
         return n;
@@ -241,6 +239,7 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
     int k = 0;
     int error = 0;
     message * msg;
+    int maxt = max_transfers();
 
     assert(u2);
 
@@ -300,7 +299,7 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
             error = 96;
         }
         else if (u->faction != u2->faction) {
-            if (u2->faction->newbies + n > MAXNEWBIES) {
+            if (maxt >= 0 && u2->faction->newbies + n > maxt) {
                 error = 129;
             }
             else if (u_race(u) != u2->faction->race) {
@@ -333,7 +332,7 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
         if (has_skill(u2, SK_ALCHEMY) && !has_skill(u, SK_ALCHEMY))
             k += n;
 
-        /* Wenn Parteigrenzen überschritten werden */
+        /* Wenn Parteigrenzen Ã¼berschritten werden */
         if (u2->faction != u->faction)
             k += n;
 
@@ -355,14 +354,14 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
                 freset(u2, UFL_HERO);
         }
 
-        /* Einheiten von Schiffen können nicht NACH in von
-            * Nicht-alliierten bewachten Regionen ausführen */
+        /* Einheiten von Schiffen kÃ¶nnen nicht NACH in von
+            * Nicht-alliierten bewachten Regionen ausfÃ¼hren */
         sh = leftship(u);
         if (sh) {
             set_leftship(u2, sh);
         }
         transfermen(u, u2, n);
-        if (u->faction != u2->faction) {
+        if (maxt >= 0 && u->faction != u2->faction) {
             u2->faction->newbies += n;
         }
     }
@@ -401,15 +400,15 @@ message * disband_men(int n, unit * u, struct order *ord) {
 
 void give_unit(unit * u, unit * u2, order * ord)
 {
-    region *r = u->region;
-    int n = u->number;
+    int maxt = max_transfers();
 
+    assert(u);
     if (!rule_transfermen() && u->faction != u2->faction) {
         cmistake(u, ord, 74, MSG_COMMERCE);
         return;
     }
 
-    if (u && unit_has_cursed_item(u)) {
+    if (unit_has_cursed_item(u)) {
         cmistake(u, ord, 78, MSG_COMMERCE);
         return;
     }
@@ -424,6 +423,7 @@ void give_unit(unit * u, unit * u2, order * ord)
     }
 
     if (u2 == NULL) {
+        region *r = u->region;
         message *msg;
         if (fval(r->terrain, SEA_REGION)) {
             msg = disband_men(u->number, u, ord);
@@ -473,9 +473,11 @@ void give_unit(unit * u, unit * u2, order * ord)
         cmistake(u, ord, 105, MSG_COMMERCE);
         return;
     }
-    if (u2->faction->newbies + n > MAXNEWBIES) {
-        cmistake(u, ord, 129, MSG_COMMERCE);
-        return;
+    if (maxt >= 0 && u->faction != u2->faction) {
+        if (u2->faction->newbies + u->number > maxt) {
+            cmistake(u, ord, 129, MSG_COMMERCE);
+            return;
+        }
     }
     if (u_race(u) != u2->faction->race) {
         if (u2->faction->race != get_race(RC_HUMAN)) {
@@ -511,13 +513,13 @@ void give_unit(unit * u, unit * u2, order * ord)
         cmistake(u, ord, 156, MSG_COMMERCE);
         return;
     }
-    add_give(u, u2, n, n, get_resourcetype(R_PERSON), ord, 0);
+    add_give(u, u2, u->number, u->number, get_resourcetype(R_PERSON), ord, 0);
     u_setfaction(u, u2->faction);
-    u2->faction->newbies += n;
+    u2->faction->newbies += u->number;
 }
 
 bool can_give_to(unit *u, unit *u2) {
-    /* Damit Tarner nicht durch die Fehlermeldung enttarnt werden können */
+    /* Damit Tarner nicht durch die Fehlermeldung enttarnt werden kÃ¶nnen */
     if (!u2) {
         return false;
     }
@@ -592,7 +594,7 @@ void give_cmd(unit * u, order * ord)
 
     else if (p == P_HERBS) {
         bool given = false;
-        if (!(u_race(u)->ec_flags & GIVEITEM) && u2 != NULL) {
+        if ((u_race(u)->ec_flags & ECF_KEEP_ITEM) && u2 != NULL) {
             ADDMSG(&u->faction->msgs,
                 msg_feedback(u, ord, "race_nogive", "race", u_race(u)));
             return;
@@ -612,7 +614,7 @@ void give_cmd(unit * u, order * ord)
                 item *itm = *itmp;
                 const item_type *itype = itm->type;
                 if (fval(itype, ITF_HERB) && itm->number > 0) {
-                    /* give_item ändert im fall,das man alles übergibt, die
+                    /* give_item Ã¤ndert im fall,das man alles Ã¼bergibt, die
                     * item-liste der unit, darum continue vor pointerumsetzten */
                     if (give_item(itm->number, itm->type, u, u2, ord) == 0) {
                         given = true;
@@ -657,7 +659,7 @@ void give_cmd(unit * u, order * ord)
         if (!s || *s == 0) {              /* GIVE ALL items that you have */
 
             /* do these checks once, not for each item we have: */
-            if (!(u_race(u)->ec_flags & GIVEITEM) && u2 != NULL) {
+            if ((u_race(u)->ec_flags & ECF_KEEP_ITEM) && u2 != NULL) {
                 ADDMSG(&u->faction->msgs,
                     msg_feedback(u, ord, "race_nogive", "race", u_race(u)));
                 return;
@@ -668,8 +670,8 @@ void give_cmd(unit * u, order * ord)
                 return;
             }
 
-            /* für alle items einmal prüfen, ob wir mehr als von diesem Typ
-            * reserviert ist besitzen und diesen Teil dann übergeben */
+            /* fÃ¼r alle items einmal prÃ¼fen, ob wir mehr als von diesem Typ
+            * reserviert ist besitzen und diesen Teil dann Ã¼bergeben */
             if (u->items) {
                 item **itmp = &u->items;
                 while (*itmp) {
@@ -701,7 +703,7 @@ void give_cmd(unit * u, order * ord)
                     }
                 }
             }
-            else if (!(u_race(u)->ec_flags & GIVEITEM) && u2 != NULL) {
+            else if ((u_race(u)->ec_flags & ECF_KEEP_ITEM) && u2 != NULL) {
                 ADDMSG(&u->faction->msgs,
                     msg_feedback(u, ord, "race_nogive", "race", u_race(u)));
             }
@@ -760,7 +762,7 @@ void give_cmd(unit * u, order * ord)
     }
 
     if (u2 != NULL) {
-        if (!(u_race(u)->ec_flags & GIVEITEM) && u2 != NULL) {
+        if ((u_race(u)->ec_flags & ECF_KEEP_ITEM) && u2 != NULL) {
             ADDMSG(&u->faction->msgs,
                 msg_feedback(u, ord, "race_nogive", "race", u_race(u)));
             return;

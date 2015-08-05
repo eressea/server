@@ -25,3 +25,28 @@ function test_small_castles()
 	assert_equal("site", b:get_typename(9))
 	assert_equal("fortification", b:get_typename(10))
 end
+
+function test_build_normal()
+	local r = region.create(0, 0, "plain")
+	local f = faction.create("noreply@eressea.de", "human", "de")
+	local u = unit.create(f, r, 1)
+    u:clear_orders()
+    u:add_item("stone", 10)
+    u:set_skill("building", 10)
+    u:add_order("MACHE BURG")
+    process_orders()
+    assert_not_nil(u.building)
+    assert_equal(10, u.building.size)
+end
+
+function test_build_packice()
+	local r = region.create(0, 0, "packice")
+	local f = faction.create("noreply@eressea.de", "human", "de")
+	local u = unit.create(f, r, 1)
+    u:clear_orders()
+    u:add_item("stone", 10)
+    u:set_skill("building", 10)
+    u:add_order("MACHE BURG")
+    process_orders()
+    assert_equal(nil, u.building)
+end

@@ -1,6 +1,6 @@
 # What is this?
 
-This repository contains an the source code for the Play-by-Mail strategy game [Eressea](http://www.eressea.de/).
+This repository contains the source code for the Play-by-Mail strategy game [Eressea](http://www.eressea.de/).
 
 # Prerequisites
 

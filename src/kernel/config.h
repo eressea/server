@@ -81,12 +81,10 @@ extern "C" {
 #define ORDERSIZE           (DISPLAYSIZE*2) /* max. length of an order */
 #define NAMESIZE            128 /* max. Länge eines Namens, incl trailing 0 */
 #define IDSIZE              16  /* max. Länge einer no (als String), incl trailing 0 */
-#define KEYWORDSIZE         16  /* max. Länge eines Keyword, incl trailing 0 */
 #define OBJECTIDSIZE        (NAMESIZE+5+IDSIZE) /* max. Länge der Strings, die
      * von struct unitname, etc. zurückgegeben werden. ohne die 0 */
 
 #define BAGCAPACITY         20000   /* soviel paßt in einen Bag of Holding */
-#define STRENGTHMULTIPLIER  50   /* multiplier for trollbelt */
 
     /* ----------------- Befehle ----------------------------------- */
 
@@ -181,7 +179,6 @@ extern "C" {
     bool has_limited_skills(const struct unit *u);
     const struct race *findrace(const char *, const struct locale *);
 
-    bool idle(struct faction *f);
     bool unit_has_cursed_item(const struct unit *u);
 
     /* grammatik-flags: */
@@ -289,8 +286,12 @@ extern "C" {
     int AllianceAuto(void);        /* flags that allied factions get automatically */
     int AllianceRestricted(void);  /* flags restricted to allied factions */
     int HelpMask(void);    /* flags restricted to allied factions */
+
     struct order *default_order(const struct locale *lang);
+    void set_default_order(int kwd);
+
     int entertainmoney(const struct region *r);
+    void init_parameters(struct locale *lang);
 
     void free_gamedata(void);
 

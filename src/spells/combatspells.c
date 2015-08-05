@@ -908,11 +908,11 @@ int sp_strong_wall(struct castorder * co)
 {
     fighter * fi = co->magician.fig;
     int level = co->level;
-    float power = co->force;
+    double power = co->force;
     battle *b = fi->side->battle;
     unit *mage = fi->unit;
     building *burg;
-    float effect;
+    double effect;
     static bool init = false;
     message *msg;
     static const curse_type *strongwall_ct;
@@ -1504,7 +1504,7 @@ int sp_fumbleshield(struct castorder * co)
     switch (sp->id) {
     case SPL_DRAIG_FUMBLESHIELD:
     case SPL_GWYRRD_FUMBLESHIELD:
-    case SPL_CERRDOR_FUMBLESHIELD:
+    case SPL_CERDDOR_FUMBLESHIELD:
     case SPL_TYBIED_FUMBLESHIELD:
         duration = 100;
         effect = _max(1, 25 - level);
@@ -1748,7 +1748,7 @@ int sp_undeadhero(struct castorder * co)
             if (j > 0) {
                 item **ilist;
                 unit *u =
-                    create_unit(r, mage->faction, 0, get_race(RC_UNDEAD), 0, du->name,
+                    create_unit(r, mage->faction, 0, get_race(RC_UNDEAD), 0, unit_getname(du),
                     du);
 
                 /* new units gets some stats from old unit */

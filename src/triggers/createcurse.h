@@ -33,8 +33,8 @@ extern "C" {
     extern struct trigger_type tt_createcurse;
 
     struct trigger *trigger_createcurse(struct unit *mage,
-    struct unit *target, const struct curse_type *ct, float vigour,
-        int duration, float effect, int men);
+    struct unit *target, const struct curse_type *ct, double vigour,
+        int duration, double effect, int men);
 
 #ifdef __cplusplus
 }

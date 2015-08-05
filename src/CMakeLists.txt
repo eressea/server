@@ -13,18 +13,31 @@ include_directories (${TOLUA_INCLUDE_DIR})
 include_directories (${BSON_INCLUDE_DIR})
 include_directories (${INIPARSER_INCLUDE_DIR})
 
-IF(CMAKE_COMPILER_IS_GNUCC)
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long")
+IF(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_CLANG)
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wconversion -Wno-sign-conversion")
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic -Wsign-compare -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long")
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-error=unused-but-set-variable")
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -DHAVE__BOOL")
-elseif(MSVC)
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W4 /WX /MP")
+ELSEIF(MSVC)
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /Wall /WX /MP")
     set(CMAKE_EXE_LINKER_FLAGS_DEBUG
         "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:libc.lib /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:libcd.lib /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:msvcrt.lib")
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE
         "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /NODEFAULTLIB:libc.lib /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:libcd.lib /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:msvcrtd.lib")
-ELSE(CMAKE_COMPILER_IS_GNUCC)
-    MESSAGE(STATUS "Unknown compiler ${CMAKE_C_COMPILER_ID}")
-ENDIF(CMAKE_COMPILER_IS_GNUCC)
+ELSE()
+    MESSAGE(STATUS "unknown compiler ${CMAKE_C_COMPILER_ID}")
+ENDIF()
+
+IF(CMAKE_COMPILER_IS_CLANG)
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wtautological-compare -Weverything")
+    MESSAGE(STATUS "compiler is clang: ${CMAKE_C_COMPILER_ID}")
+ELSEIF(CMAKE_COMPILER_IS_GCC)
+    EXECUTE_PROCESS(COMMAND ${CMAKE_C_COMPILER} -dumpversion
+        OUTPUT_VARIABLE GCC_VERSION)
+    IF (GCC_VERSION VERSION_GREATER 4.9)
+        SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wfloat-conversion")
+    ENDIF()
+ENDIF(CMAKE_COMPILER_IS_CLANG)
 
 add_subdirectory(util)
 add_subdirectory(kernel)
@@ -80,6 +93,7 @@ set (ERESSEA_SRC
   skill.c
   json.c
   creport.c
+  jsreport.c
   economy.c
   give.c
   items.c
@@ -177,10 +191,14 @@ set(TESTS_SRC
   market.test.c
   move.test.c
   skill.test.c
+  spells.test.c
+  spy.test.c
   upkeep.test.c
+  spells/magicresistance.test.c
   ${ATTRIBUTES_TESTS}
   ${UTIL_TESTS}
   ${KERNEL_TESTS}
+  ${ITEMS_TESTS}
 )
 
 add_executable(test_eressea ${TESTS_SRC})

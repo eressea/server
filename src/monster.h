@@ -31,8 +31,7 @@ extern "C" {
     void make_zombie(struct unit * u);
 
 #define MONSTER_ID 666
-#define is_monsters(f) (f && fval(f, FFL_NPC) && f==get_monsters())
-
+#define is_monsters(f) (fval(f, FFL_NPC) && f==get_monsters())
 
 #ifdef __cplusplus
 }

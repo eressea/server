@@ -14,9 +14,6 @@ without prior permission by the authors of Eressea.
 
 #include "bind_unit.h"
 #include "bind_dict.h"
-#ifdef BSON_ATTRIB
-# include "bind_attrib.h"
-#endif
 #include "alchemy.h"
 #include "bindings.h"
 #include "move.h"
@@ -63,23 +60,6 @@ static int tolua_unit_get_objects(lua_State * L)
     tolua_pushusertype(L, (void *)&self->attribs, USERTYPE_DICT);
     return 1;
 }
-
-#ifdef BSON_ATTRIB
-static int tolua_unit_get_attribs(lua_State * L)
-{
-    unit *self = (unit *) tolua_tousertype(L, 1, 0);
-    attrib **attrib_ptr = (attrib **) lua_newuserdata(L, sizeof(attrib *));
-    attrib *a = tolua_get_lua_ext(self->attribs);
-
-    luaL_getmetatable(L, "attrib");
-    lua_setmetatable(L, -2);
-
-    *attrib_ptr = a;
-
-    lua_pushcclosure(L, tolua_attriblist_next, 1);
-    return 1;
-}
-#endif
 
 int tolua_unitlist_nextf(lua_State * L)
 {
@@ -160,14 +140,14 @@ static int tolua_unit_set_group(lua_State * L)
 {
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
     int result = join_group(self, tolua_tostring(L, 2, 0));
-    tolua_pushnumber(L, result);
+    lua_pushinteger(L, result);
     return 1;
 }
 
 static int tolua_unit_get_name(lua_State * L)
 {
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
-    tolua_pushstring(L, self->name);
+    tolua_pushstring(L, unit_getname(self));
     return 1;
 }
 
@@ -259,6 +239,24 @@ static int tolua_unit_set_flags(lua_State * L)
 {
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
     self->flags = (int)tolua_tonumber(L, 2, 0);
+    return 0;
+}
+
+static int tolua_unit_get_guard(lua_State * L)
+{
+    unit *self = (unit *)tolua_tousertype(L, 1, 0);
+    if (is_guard(self, GUARD_ALL)) {
+        lua_pushinteger(L, getguard(self));
+        return 1;
+    }
+    return 0;
+}
+
+static int tolua_unit_set_guard(lua_State * L)
+{
+    unit *self = (unit *)tolua_tousertype(L, 1, 0);
+    unsigned int flags = (unsigned int)tolua_tonumber(L, 2, 0);
+    setguard(self, flags);
     return 0;
 }
 
@@ -542,7 +540,7 @@ static int tolua_unit_addspell(lua_State * L)
     spell *sp = find_spell(str);
 
     if (!sp) {
-        log_error("spell %s could not be found\n", str);
+        log_warning("spell %s could not be found\n", str);
         return EINVAL;
     }
     else {
@@ -740,23 +738,22 @@ static int tolua_unit_get_items(lua_State * L)
     return 1;
 }
 
-#ifdef TODO /* spellbooks */
 static int tolua_unit_get_spells(lua_State * L)
 {
     unit *self = (unit *) tolua_tousertype(L, 1, 0);
-    sc_mage *mage = get_mage(self);
+    sc_mage *mage = self ? get_mage(self) : 0;
+    spellbook *sb = mage ? mage->spellbook : 0;
     quicklist *slist = 0;
-
-    if (mage) {
-        quicklist **slist_ptr = get_spelllist(mage, self->faction);
+    if (sb) {
+        quicklist **slist_ptr = &sb->spells;
         if (slist_ptr) {
             slist = *slist_ptr;
         }
     }
-
-    return tolua_quicklist_push(L, "spell_list", "spell", slist);
+    return tolua_quicklist_push(L, "spellbook", "spell_entry", slist);
 }
 
+#ifdef TODO /* spellbooks */
 static void unit_removespell(unit * u, spell * sp)
 {
     quicklist **isptr;
@@ -984,6 +981,8 @@ void tolua_unit_open(lua_State * L)
             /*  key-attributes for named flags: */
             tolua_function(L, TOLUA_CAST "set_flag", &tolua_unit_set_flag);
             tolua_function(L, TOLUA_CAST "get_flag", &tolua_unit_get_flag);
+            tolua_variable(L, TOLUA_CAST "guard", &tolua_unit_get_guard,
+                &tolua_unit_set_guard);
             tolua_variable(L, TOLUA_CAST "flags", &tolua_unit_get_flags,
                 &tolua_unit_set_flags);
             tolua_variable(L, TOLUA_CAST "age", &tolua_unit_get_age,
@@ -1014,8 +1013,8 @@ void tolua_unit_open(lua_State * L)
             tolua_function(L, TOLUA_CAST "add_spell", &tolua_unit_addspell);
 #ifdef TODO /* spellbooks */
             tolua_function(L, TOLUA_CAST "remove_spell", &tolua_unit_removespell);
-            tolua_variable(L, TOLUA_CAST "spells", &tolua_unit_get_spells, 0);
 #endif
+            tolua_variable(L, TOLUA_CAST "spells", &tolua_unit_get_spells, 0);
             tolua_function(L, TOLUA_CAST "cast_spell", &tolua_unit_castspell);
 
             tolua_variable(L, TOLUA_CAST "magic", &tolua_unit_get_magic,
@@ -1035,9 +1034,6 @@ void tolua_unit_open(lua_State * L)
             tolua_variable(L, TOLUA_CAST "hp_max", &tolua_unit_get_hpmax, 0);
 
             tolua_variable(L, TOLUA_CAST "objects", &tolua_unit_get_objects, 0);
-#ifdef BSON_ATTRIB
-            tolua_variable(L, TOLUA_CAST "attribs", &tolua_unit_get_attribs, 0);
-#endif
         }
         tolua_endmodule(L);
     }

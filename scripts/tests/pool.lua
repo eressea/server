@@ -6,7 +6,6 @@ function setup()
     eressea.game.reset()
     eressea.config.reset()
     eressea.settings.set("rules.economy.food", "0")
-    eressea.settings.set("nmr.removenewbie", "0")
     eressea.settings.set("nmr.timeout", "0")
     eressea.settings.set("rules.magic.playerschools", "")
     conf = [[{
@@ -61,6 +60,7 @@ end
 
 function test_give_divisor()
     eressea.settings.set("rules.items.give_divisor", 2)
+    eressea.settings.set("GiveRestriction", 0)
     local r = region.create(1, 1, "plain")
     local f1 = faction.create("test@example.com", "human", "de")
     local f2 = faction.create("test@example.com", "human", "de")

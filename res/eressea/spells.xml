@@ -188,11 +188,13 @@
     <resource name="h12" amount="1" cost="fixed"/>
     <resource name="h20" amount="1" cost="fixed"/>
   </spell>
+  <!--
   <spell name="summon_alp" rank="5" index="58" parameters="u" target_global="true">
     <resource name="aura" amount="350" cost="fixed"/>
     <resource name="permaura" amount="5" cost="fixed"/>
     <resource name="h8" amount="1" cost="fixed"/>
   </spell>
+  -->
   <spell name="windshield" rank="5" index="59" variable="true" combat="1">
     <resource name="aura" amount="2" cost="level"/>
   </spell>
@@ -400,7 +402,7 @@
   <spell name="gwyrrdfumbleshield" rank="2" index="144" variable="true" combat="1">
     <resource name="aura" amount="5" cost="level"/>
   </spell>
-  <spell name="cerrdorfumbleshield" rank="2" index="145" variable="true" combat="1">
+  <spell name="cerddorfumbleshield" rank="2" index="145" variable="true" combat="1">
     <resource name="aura" amount="5" cost="level"/>
   </spell>
   <spell name="tybiedfumbleshield" rank="2" index="146" variable="true" combat="1">

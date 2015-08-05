@@ -31,6 +31,10 @@ without prior permission by the authors of Eressea.
 
 #include "vortex.h"
 
+#if SCORE_MODULE
+#include <modules/score.h>
+#endif
+
 /* util includes */
 #include <util/attrib.h>
 #include <util/bsdstring.h>
@@ -766,9 +770,6 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
     itype->weight = xml_ivalue(node, "weight", 0);
     itype->capacity = xml_ivalue(node, "capacity", 0);
     itype->flags |= flags;
-#if SCORE_MODULE
-    itype->score = xml_ivalue(node, "score", 0);
-#endif
 
     /* reading item/construction */
     xpath->node = node;
@@ -855,6 +856,10 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
         }
         xmlFree(propValue);
     }
+#if SCORE_MODULE
+    itype->score = xml_ivalue(node, "score", 0);
+    if (!itype->score) itype->score = default_score(itype);
+#endif
     xmlXPathFreeObject(result);
 
     return itype;
@@ -1608,9 +1613,9 @@ static int parse_races(xmlDocPtr doc)
         xmlNodePtr node = nodes->nodeTab[i];
         xmlNodePtr child;
         xmlChar *propValue;
-        race *rc;
+        race *rc, *frc = 0;
         xmlXPathObjectPtr result;
-        int k, study_speed_base;
+        int k, study_speed_base, attacks;
         struct att *attack;
 
         propValue = xmlGetProp(node, BAD_CAST "name");
@@ -1693,8 +1698,8 @@ static int parse_races(xmlDocPtr doc)
         if (xml_bvalue(node, "irongolem", false))
             rc->flags |= RCF_IRONGOLEM;
 
-        if (xml_bvalue(node, "giveitem", false))
-            rc->ec_flags |= GIVEITEM;
+        if (xml_bvalue(node, "keepitem", false))
+            rc->ec_flags |= ECF_KEEP_ITEM;
         if (xml_bvalue(node, "giveperson", false))
             rc->ec_flags |= GIVEPERSON;
         if (xml_bvalue(node, "giveunit", false))
@@ -1721,7 +1726,7 @@ static int parse_races(xmlDocPtr doc)
         if (xml_bvalue(node, "resistpierce", false))
             rc->battle_flags |= BF_RES_PIERCE;
         if (xml_bvalue(node, "canattack", true))
-            rc->battle_flags |= BF_CANATTACK;
+            rc->battle_flags |= BF_CANATTACK; // TODO: invert this flag, so rc_get_or_create gets simpler
 
         for (child = node->children; child; child = child->next) {
             if (strcmp((const char *)child->name, "ai") == 0) {
@@ -1805,21 +1810,27 @@ static int parse_races(xmlDocPtr doc)
         /* reading eressea/races/race/familiar */
         xpath->node = node;
         result = xmlXPathEvalExpression(BAD_CAST "familiar", xpath);
-        for (k = 0; k != result->nodesetval->nodeNr; ++k) {
-            xmlNodePtr node = result->nodesetval->nodeTab[k];
-            race *frc;
+        if (result->nodesetval->nodeNr > MAXMAGIETYP) {
+            log_error("race %s has %d potential familiars", rc->_name, result->nodesetval->nodeNr);
+        }
+        for (k = 0; k != MAXMAGIETYP; ++k) {
+            if (k < result->nodesetval->nodeNr) {
+                xmlNodePtr node = result->nodesetval->nodeTab[k];
 
-            propValue = xmlGetProp(node, BAD_CAST "race");
-            assert(propValue != NULL);
-            frc = rc_get_or_create((const char *)propValue);
-            if (xml_bvalue(node, "default", false)) {
-                rc->familiars[k] = rc->familiars[0];
-                rc->familiars[0] = frc;
-            }
-            else {
+                propValue = xmlGetProp(node, BAD_CAST "race");
+                assert(propValue != NULL);
+                frc = rc_get_or_create((const char *)propValue);
+                if (xml_bvalue(node, "default", false)) {
+                    rc->familiars[k] = rc->familiars[0];
+                    rc->familiars[0] = frc;
+                }
+                else {
+                    rc->familiars[k] = frc;
+                }
+                xmlFree(propValue);
+            } else {
                 rc->familiars[k] = frc;
             }
-            xmlFree(propValue);
         }
         xmlXPathFreeObject(result);
 
@@ -1838,10 +1849,16 @@ static int parse_races(xmlDocPtr doc)
         xpath->node = node;
         result = xmlXPathEvalExpression(BAD_CAST "attack", xpath);
         attack = rc->attack;
+        attacks = 0;
         for (k = 0; k != result->nodesetval->nodeNr; ++k) {
             xmlNodePtr node = result->nodesetval->nodeTab[k];
-            while (attack->type != AT_NONE)
+            while (attack->type != AT_NONE) {
                 ++attack;
+                if (attacks++ >= RACE_ATTACKS) {
+                    log_error("too many attacks for race '%s'\n", rc->_name);
+                    assert(!"aborting");
+                }
+            }
 
             propValue = xmlGetProp(node, BAD_CAST "damage");
             if (propValue != NULL) {

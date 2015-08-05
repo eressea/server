@@ -32,7 +32,6 @@
 
   <equipment>
     <set name="first_unit">
-      <item name="conquesttoken" amount="1"/>
       <item name="log" amount="10"/>
       <item name="stone" amount="10"/>
       <item name="money" amount="5000"/>
@@ -58,7 +57,6 @@
     <order name="tax" disable="yes"/>
     <order name="entertain" disable="yes"/>
     <order name="sell" disable="yes"/>
-    <order name="origin" disable="yes"/>
 
     <skill name="armorer" enable="true"/>
     <skill name="bow" enable="true"/>
@@ -119,6 +117,7 @@
     <param name="world.era" value="3"/>
     <param name="rules.migrants" value="0"/>
     <param name="rules.reserve.twophase" value="1"/>
+    <param name="rules.owners.force_leave" value="0"/>
     <param name="rules.transfermen" value="0"/>
     <param name="rules.stealth.faction" value="1"/>
     <param name="rules.stealth.anon_battle" value="0"/>

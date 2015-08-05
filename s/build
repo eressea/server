@@ -1,13 +1,13 @@
 #!/bin/sh
-ROOT=$(pwd)
+ROOT=`pwd`
 while [ ! -d $ROOT/.git ]; do
-  ROOT=$(dirname $ROOT)
+  ROOT=`dirname $ROOT`
 done
 
 [ -z "$CC" ] && CC=clang
 [ -z "$BUILD" ] && BUILD=Debug
 
-[ -z "$JOBS" ] && JOBS=$(nproc)
+[ -z "$JOBS" ] && [ "" != "which nproc" ] && JOBS=`nproc`
 DISTCC=`which distcc`
 if [ ! -z "$DISTCC" ] ; then
 JOBS=`distcc -j`

@@ -2,11 +2,13 @@
 ROOT=$(pwd)
 while [ ! -d $ROOT/.git ]; do
   ROOT=$(dirname $ROOT)
-  if [ "$ROOT" == "/" ; then
+  if [ "/" = "$ROOT" ]; then
     echo "could not find root, are you in the git repository?"
     exit
   fi
 done
+
+DEST=$(dirname $ROOT)/server
 
 MACHINE=`uname -m`
 [ -z "$CC" ] && [ ! -z `which gcc` ] && CC="gcc"
@@ -17,3 +19,14 @@ BIN_DIR="build-$MACHINE-$CC-Debug"
 cd $ROOT/$BIN_DIR
 make install
 
+[ -d $DEST/bin ] || mkdir -p $DEST/bin
+install -v $ROOT/process/cron/*.cron $DEST/bin/
+programs="create-orders backup-eressea run-turn"
+for prg in ${programs} ; do
+install -v $ROOT/process/$prg $DEST/bin/
+done
+
+# install crontab, but only on the eressea server:
+HOST=`hostname`
+
+[ "gruenbaer" = "$HOST" ] && crontab $ROOT/process/cron/crontab

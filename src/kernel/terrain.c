@@ -35,7 +35,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 
-#define MAXTERRAINS 20
+#define MAXTERRAINS 14
 
 const char *terraindata[MAXTERRAINS] = {
     "ocean",
@@ -46,19 +46,12 @@ const char *terraindata[MAXTERRAINS] = {
     "mountain",
     "glacier",
     "firewall",
-    NULL,                         /* dungeon module */
-    NULL,                         /* former grassland */
     "fog",
     "thickfog",
     "volcano",
     "activevolcano",
     "iceberg_sleep",
-    "iceberg",
-
-    NULL,                         /* museum module */
-    NULL,                         /* museum module */
-    NULL,                         /* former magicstorm */
-    NULL                          /* museum module */
+    "iceberg"
 };
 
 static terrain_type *registered_terrains;
@@ -140,7 +133,7 @@ terrain_t oldterrain(const struct terrain_type * terrain)
         if (newterrains[t] == terrain)
             return t;
     }
-    log_warning("%s is not a classic terrain.\n", terrain->_name);
+    log_debug("%s is not a classic terrain.\n", terrain->_name);
     return NOTERRAIN;
 }
 

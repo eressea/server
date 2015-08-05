@@ -257,7 +257,7 @@ unit *addplayer(region * r, faction * f)
     char buffer[32];
 
     assert(f->units == NULL);
-    set_ursprung(f, 0, r->x, r->y);
+    faction_setorigin(f, 0, r->x, r->y);
     u = create_unit(r, f, 1, f->race, 0, NULL, NULL);
     equip_items(&u->faction->items, get_equipment("new_faction"));
     equip_unit(u, get_equipment("first_unit"));
@@ -651,9 +651,47 @@ void remove_empty_factions(void)
             *fp = f->next;
             funhash(f);
             free_faction(f);
+            if (f->alliance && f->alliance->_leader == f) {
+                setalliance(f, 0);
+            }
             free(f);
         }
         else
             fp = &(*fp)->next;
     }
 }
+
+void faction_getorigin(const faction * f, int id, int *x, int *y)
+{
+    ursprung *ur;
+
+    assert(f && x && y);
+    for (ur = f->ursprung; ur; ur = ur->next) {
+        if (ur->id == id) {
+            *x = ur->x;
+            *y = ur->y;
+            break;
+        }
+    }
+}
+
+void faction_setorigin(faction * f, int id, int x, int y)
+{
+    ursprung *ur;
+    assert(f != NULL);
+    for (ur = f->ursprung; ur; ur = ur->next) {
+        if (ur->id == id) {
+            ur->x = ur->x + x;
+            ur->y = ur->y + y;
+            return;
+        }
+    }
+
+    ur = calloc(1, sizeof(ursprung));
+    ur->id = id;
+    ur->x = x;
+    ur->y = y;
+
+    addlist(&f->ursprung, ur);
+}
+

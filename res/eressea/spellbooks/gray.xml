@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="iso-8859-1" ?>
+<?xml version="1.0" ?>
 <spellbook name="gray">
   <entry spell="acidrain" level="8" />
   <entry spell="airship" level="6" />
@@ -26,7 +26,7 @@
   <entry spell="calm_monster" level="6" />
   <entry spell="calm_riot" level="15" />
   <entry spell="cerddor_destroymagic" level="8" />
-  <entry spell="cerrdorfumbleshield" level="5" />
+  <entry spell="cerddorfumbleshield" level="5" />
   <entry spell="chaosrow" level="8" />
   <entry spell="chaossuction" level="14" />
   <entry spell="clone" level="9" />
@@ -142,7 +142,7 @@
   <entry spell="stonegolem" level="1" />
   <entry spell="stormwinds" level="6" />
   <entry spell="strongwall" level="8" />
-  <entry spell="summon_alp" level="15" />
+  <!-- <entry spell="summon_alp" level="15" /> -->
   <entry spell="summondragon" level="11" />
   <entry spell="summonent" level="10" />
   <entry spell="summon_familiar" level="9" />

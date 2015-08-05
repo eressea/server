@@ -307,7 +307,7 @@ fighter *select_corpse(battle * b, fighter * af)
             maxcasualties += s->casualties;
         }
     }
-    di = rng_int() % maxcasualties;
+    di = (int)(rng_int() % maxcasualties);
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
         for (df = s->fighters; df; df = df->next) {
             /* Geflohene haben auch 0 hp, dürfen hier aber nicht ausgewählt
@@ -431,7 +431,7 @@ static int get_row(const side * s, int row, const side * vs)
     return result;
 }
 
-int get_unitrow(const fighter * af, const side * vs)
+static int get_unitrow(const fighter * af, const side * vs)
 {
     int row = statusrow(af->status);
     if (vs == NULL) {
@@ -487,7 +487,7 @@ contest_classic(int skilldiff, const armor_type * ar, const armor_type * sh)
     vw = (int)(100 - ((100 - vw) * mod));
 
     do {
-        p = rng_int() % 100;
+        p = (int)(rng_int() % 100);
         vw -= p;
     } while (vw >= 0 && p >= 90);
     return (vw <= 0);
@@ -901,7 +901,9 @@ static void rmtroop(troop dt)
     rmfighter(df, 1);
 
     assert(dt.index >= 0 && dt.index < df->unit->number);
-    df->person[dt.index] = df->person[df->alive - df->removed];
+    if (dt.index!=df->alive-df->removed) {
+        df->person[dt.index] = df->person[df->alive - df->removed];
+    }
     if (df->removed) {
         df->person[df->alive - df->removed] = df->person[df->alive];
     }
@@ -1019,7 +1021,8 @@ static int natural_armor(unit * du)
     static int *bonus = 0;
     int an = u_race(du)->armor;
     if (bonus == 0) {
-        bonus = calloc(sizeof(int), num_races);
+        assert(num_races > 0);
+        bonus = calloc((size_t)num_races, sizeof(int));
     }
     if (bonus[u_race(du)->index] == 0) {
         bonus[u_race(du)->index] =
@@ -1282,11 +1285,19 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
     }
 
     assert(dt.index < du->number);
-    df->person[dt.index].hp -= rda;
-    if (u_race(au) == get_race(RC_DAEMON)) {
-        vampirism(at, rda);
-    }
+    if (rda>0) {
+        df->person[dt.index].hp -= rda;
+        if (u_race(au) == get_race(RC_DAEMON)) {
+            vampirism(at, rda);
+        }
+        if (b->turn>1) {
+            /* someone on the ship got damaged, damage the ship */
+            ship *sh = du->ship ? du->ship : leftship(du);
+            if (sh)
+                fset(sh, SF_DAMAGED);
+        }
 
+    }
     if (df->person[dt.index].hp > 0) {    /* Hat überlebt */
         if (bdebug) {
             fprintf(bdebug, "Damage %d, armor %d: %d -> %d HP\n",
@@ -1498,7 +1509,7 @@ troop select_enemy(fighter * af, int minrow, int maxrow, int select)
     if (enemies <= 0)
         return no_troop;
 
-    selected = rng_int() % enemies;
+    selected = (int)(rng_int() % enemies);
     for (si = 0; as->enemies[si]; ++si) {
         side *ds = as->enemies[si];
         fighter *df;
@@ -1686,7 +1697,7 @@ void do_combatmagic(battle * b, combatmagic_t was)
 
             level = eff_skill(mage, SK_MAGIC, r);
             if (level > 0) {
-                float power;
+                double power;
                 const spell *sp;
                 const struct locale *lang = mage->faction->locale;
                 order *ord;
@@ -1762,7 +1773,7 @@ void do_combatmagic(battle * b, combatmagic_t was)
     }
 }
 
-static int cast_combatspell(troop at, const spell * sp, int level, float force)
+static int cast_combatspell(troop at, const spell * sp, int level, double force)
 {
     castorder co;
 
@@ -1785,7 +1796,7 @@ static void do_combatspell(troop at)
     region *r = b->region;
     quicklist *ql;
     int level, qi;
-    float power;
+    double power;
     int fumblechance = 0;
     order *ord;
     int sl;
@@ -1858,9 +1869,9 @@ static void do_extra_spell(troop at, const att * a)
         log_error("spell '%s' has no function.\n", sp->sname);
     }
     else {
-        int level = a->level;
+        double force = a->level * MagicPower();
         assert(a->level > 0);
-        cast_combatspell(at, sp, level, level * MagicPower());
+        cast_combatspell(at, sp, a->level, force);
     }
 }
 
@@ -2291,11 +2302,12 @@ void do_attack(fighter * af)
 
         for (apr = 0; apr != attacks; ++apr) {
             int a;
-            for (a = 0; a != 10 && u_race(au)->attack[a].type != AT_NONE; ++a) {
+            for (a = 0; a < RACE_ATTACKS && u_race(au)->attack[a].type != AT_NONE; ++a) {
                 if (apr > 0) {
                     /* Wenn die Waffe nachladen muss, oder es sich nicht um einen
                      * Waffen-Angriff handelt, dann gilt der Speed nicht. */
-                    if (u_race(au)->attack[a].type != AT_STANDARD)
+                    /* FIXME allow multiple AT_NATURAL attacks? */
+                    if (u_race(au)->attack[a].type != AT_STANDARD) 
                         continue;
                     else {
                         weapon *wp = preferred_weapon(ta, true);
@@ -2327,8 +2339,9 @@ void do_regenerate(fighter * af)
     ta.index = af->fighting;
 
     while (ta.index--) {
-        af->person[ta.index].hp += effskill(au, SK_STAMINA);
-        af->person[ta.index].hp = _min(unit_max_hp(au), af->person[ta.index].hp);
+        struct person *p = af->person + ta.index;
+        p->hp += effskill(au, SK_STAMINA);
+        p->hp = _min(unit_max_hp(au), p->hp);
     }
 }
 
@@ -2458,7 +2471,7 @@ troop select_ally(fighter * af, int minrow, int maxrow, int allytype)
     if (!allies) {
         return no_troop;
     }
-    allies = rng_int() % allies;
+    allies = (int)(rng_int() % allies);
 
     for (ds = b->sides; ds != b->sides + b->nsides; ++ds) {
         if ((allytype == ALLY_ANY && helping(as, ds)) || (allytype == ALLY_SELF
@@ -2486,7 +2499,7 @@ troop select_ally(fighter * af, int minrow, int maxrow, int allytype)
 static int loot_quota(const unit * src, const unit * dst,
     const item_type * type, int n)
 {
-    static float divisor = -1;
+    static double divisor = -1;
     if (dst && src && src->faction != dst->faction) {
         if (divisor < 0) {
             divisor = get_param_flt(global.parameters, "rules.items.loot_divisor", 1);
@@ -2517,8 +2530,8 @@ static void loot_items(fighter * corpse)
         return;
 
     while (itm) {
-        float lootfactor = dead / (float)u->number; /* only loot the dead! */
-        int maxloot = (int)(itm->number * lootfactor);
+        float lootfactor = (float)dead / (float)u->number; /* only loot the dead! */
+        int maxloot = (int)((float)itm->number * lootfactor);
         if (maxloot > 0) {
             int i = _min(10, maxloot);
             for (; i != 0; --i) {
@@ -2712,13 +2725,6 @@ static void aftermath(battle * b)
             if (flags) {
                 fset(du, flags);
             }
-            if (sum_hp + df->run.hp < du->hp) {
-                /* someone on the ship got damaged, damage the ship */
-                ship *sh = du->ship ? du->ship : leftship(du);
-                if (sh)
-                    fset(sh, SF_DAMAGED);
-            }
-
             if (df->alive && df->alive == du->number) {
                 du->hp = sum_hp;
                 continue;               /* nichts passiert */
@@ -2860,7 +2866,7 @@ static void aftermath(battle * b)
                         float dmg =
                             get_param_flt(global.parameters, "rules.ship.damage.battleround",
                             0.05F);
-                        damage_ship(sh, dmg * n);
+                        damage_ship(sh, dmg * (float)n);
                         freset(sh, SF_DAMAGED);
                     }
                 }
@@ -2961,19 +2967,19 @@ static void print_header(battle * b)
         side *s;
         char *bufp = zText;
         size_t size = sizeof(zText) - 1;
-        int bytes;
+        size_t bytes;
 
         for (s = b->sides; s != b->sides + b->nsides; ++s) {
             fighter *df;
             for (df = s->fighters; df; df = df->next) {
                 if (is_attacker(df)) {
                     if (first) {
-                        bytes = (int)strlcpy(bufp, ", ", size);
+                        bytes = strlcpy(bufp, ", ", size);
                         if (wrptr(&bufp, &size, bytes) != 0)
                             WARN_STATIC_BUFFER();
                     }
                     if (lastf) {
-                        bytes = (int)strlcpy(bufp, (const char *)lastf, size);
+                        bytes = strlcpy(bufp, (const char *)lastf, size);
                         if (wrptr(&bufp, &size, bytes) != 0)
                             WARN_STATIC_BUFFER();
                         first = true;
@@ -2987,18 +2993,18 @@ static void print_header(battle * b)
             }
         }
         if (first) {
-            bytes = (int)strlcpy(bufp, " ", size);
+            bytes = strlcpy(bufp, " ", size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
-            bytes = (int)strlcpy(bufp, (const char *)LOC(f->locale, "and"), size);
+            bytes = strlcpy(bufp, (const char *)LOC(f->locale, "and"), size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
-            bytes = (int)strlcpy(bufp, " ", size);
+            bytes = strlcpy(bufp, " ", size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
         }
         if (lastf) {
-            bytes = (int)strlcpy(bufp, (const char *)lastf, size);
+            bytes = strlcpy(bufp, (const char *)lastf, size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
         }
@@ -3173,7 +3179,7 @@ side * get_side(battle * b, const struct unit * u)
     return 0;
 }
 
-side * find_side(battle * b, const faction * f, const group * g, int flags, const faction * stealthfaction)
+side * find_side(battle * b, const faction * f, const group * g, unsigned int flags, const faction * stealthfaction)
 {
     side * s;
     static int rule_anon_battle = -1;
@@ -3183,8 +3189,8 @@ side * find_side(battle * b, const faction * f, const group * g, int flags, cons
     }
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
         if (s->faction == f && s->group == g) {
-            int s1flags = flags | SIDE_HASGUARDS;
-            int s2flags = s->flags | SIDE_HASGUARDS;
+            unsigned int s1flags = flags | SIDE_HASGUARDS;
+            unsigned int s2flags = s->flags | SIDE_HASGUARDS;
             if (rule_anon_battle && s->stealthfaction != stealthfaction) {
                 continue;
             }
@@ -3202,7 +3208,6 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     weapon weapons[WMAX];
     int owp[WMAX];
     int dwp[WMAX];
-    int w = 0;
     region *r = b->region;
     item *itm;
     fighter *fig = NULL;
@@ -3227,7 +3232,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     }
 
     /* Illusionen und Zauber kaempfen nicht */
-    if (fval(u_race(u), RCF_ILLUSIONARY) || idle(u->faction) || u->number == 0) {
+    if (fval(u_race(u), RCF_ILLUSIONARY) || u->number == 0) {
         return NULL;
     }
     if (s1 == NULL) {
@@ -3268,7 +3273,8 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     fig->catmsg = -1;
 
     /* Freigeben nicht vergessen! */
-    fig->person = (struct person*)calloc(fig->alive, sizeof(struct person));
+    assert(fig->alive > 0);
+    fig->person = (struct person*)calloc((size_t)fig->alive, sizeof(struct person));
 
     h = u->hp / u->number;
     assert(h);
@@ -3327,7 +3333,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     /* Für alle Waffengattungen wird bestimmt, wie viele der Personen mit
      * ihr kämpfen könnten, und was ihr Wert darin ist. */
     if (u_race(u)->battle_flags & BF_EQUIPMENT) {
-        int oi = 0, di = 0;
+        int oi = 0, di = 0, w = 0;
         for (itm = u->items; itm && w != WMAX; itm = itm->next) {
             const weapon_type *wtype = resource2weapon(itm->type->rtype);
             if (wtype == NULL || itm->number == 0)
@@ -3342,8 +3348,9 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
             }
             assert(w != WMAX);
         }
-        fig->weapons = (weapon *)calloc(sizeof(weapon), w + 1);
-        memcpy(fig->weapons, weapons, w * sizeof(weapon));
+        assert(w >= 0);
+        fig->weapons = (weapon *)calloc(sizeof(weapon), (size_t)(w + 1));
+        memcpy(fig->weapons, weapons, (size_t)w * sizeof(weapon));
 
         for (i = 0; i != w; ++i) {
             int j, o = 0, d = 0;
@@ -3482,7 +3489,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
             int rnd;
 
             do {
-                rnd = rng_int() % 100;
+                rnd = (int)(rng_int() % 100);
                 if (rnd >= 40 && rnd <= 69)
                     p_bonus += 1;
                 else if (rnd <= 89)
@@ -3656,6 +3663,24 @@ static void free_fighter(fighter * fig)
 
 }
 
+static void battle_free(battle * b) {
+    side *s;
+
+    assert(b);
+
+    for (s = b->sides; s != b->sides + b->nsides; ++s) {
+        fighter *fnext = s->fighters;
+        while (fnext) {
+            fighter *fig = fnext;
+            fnext = fig->next;
+            free_fighter(fig);
+            free(fig);
+        }
+        free_side(s);
+    }
+    free(b);
+}
+
 void free_battle(battle * b)
 {
     int max_fac_no = 0;
@@ -3712,7 +3737,7 @@ static int battle_report(battle * b)
         faction *fac = bf->faction;
         char buf[32 * MAXSIDES];
         char *bufp = buf;
-        int bytes;
+        size_t bytes;
         size_t size = sizeof(buf) - 1;
         message *m;
 
@@ -3735,32 +3760,32 @@ static int battle_report(battle * b)
                 char buffer[32];
 
                 if (komma) {
-                    bytes = (int)strlcpy(bufp, ", ", size);
+                    bytes = strlcpy(bufp, ", ", size);
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
                 }
                 slprintf(buffer, sizeof(buffer), "%s %2d(%s): ",
                     loc_army, army_index(s), abbrev);
 
-                bytes = (int)strlcpy(bufp, buffer, size);
+                bytes = strlcpy(bufp, buffer, size);
                 if (wrptr(&bufp, &size, bytes) != 0)
                     WARN_STATIC_BUFFER();
 
                 for (r = FIGHT_ROW; r != NUMROWS; ++r) {
                     if (alive[r]) {
                         if (l != FIGHT_ROW) {
-                            bytes = (int)strlcpy(bufp, "+", size);
+                            bytes = strlcpy(bufp, "+", size);
                             if (wrptr(&bufp, &size, bytes) != 0)
                                 WARN_STATIC_BUFFER();
                         }
                         while (k--) {
-                            bytes = (int)strlcpy(bufp, "0+", size);
+                            bytes = strlcpy(bufp, "0+", size);
                             if (wrptr(&bufp, &size, bytes) != 0)
                                 WARN_STATIC_BUFFER();
                         }
                         sprintf(buffer, "%d", alive[r]);
 
-                        bytes = (int)strlcpy(bufp, buffer, size);
+                        bytes = strlcpy(bufp, buffer, size);
                         if (wrptr(&bufp, &size, bytes) != 0)
                             WARN_STATIC_BUFFER();
 
@@ -3921,7 +3946,6 @@ static bool start_battle(region * r, battle ** bp)
     unit *u;
     bool fighting = false;
 
-    /* list_foreach geht nicht, wegen flucht */
     for (u = r->units; u != NULL; u = u->next) {
         if (fval(u, UFL_LONGACTION))
             continue;
@@ -4183,8 +4207,6 @@ static void battle_flee(battle * b)
                     default:
                         if ((fig->person[dt.index].flags & FL_HIT) == 0)
                             continue;
-                        if (b->turn <= 1)
-                            continue;
                         if (fig->person[dt.index].hp <= runhp)
                             break;
                         if (fig->person[dt.index].flags & FL_PANICED) {
@@ -4210,6 +4232,52 @@ static void battle_flee(battle * b)
         }
     }
 }
+
+static bool is_enemy(battle *b, unit *u1, unit *u2) {
+    if (u1->faction != u2->faction) {
+        if (b) {
+            side *es, *s1 = 0, *s2 = 0;
+            for (es = b->sides; es != b->sides + b->nsides; ++es) {
+                if (!s1 && es->faction == u1->faction) s1 = es;
+                else if (!s2 && es->faction == u2->faction) s2 = es;
+                if (s1 && s2) break;
+            }
+            return enemy(s1, s2);
+        }
+        else {
+            return !help_enter(u1, u2);
+        }
+    }
+    return false;
+}
+
+void force_leave(region *r, battle *b) {
+    unit *u;
+
+    for (u = r->units; u; u = u->next) {
+        unit *uo = NULL;
+        if (u->building) {
+            uo = building_owner(u->building);
+        }
+        if (u->ship && r->land) {
+            uo = ship_owner(u->ship);
+        }
+        if (uo && is_enemy(b, uo, u)) {
+            message *msg = NULL;
+            if (u->building) {
+                msg = msg_message("force_leave_building", "unit owner building", u, uo, u->building);
+            }
+            else {
+                msg = msg_message("force_leave_ship", "unit owner ship", u, uo, u->ship);
+            }
+            if (msg) {
+                ADDMSG(&u->faction->msgs, msg);
+            }
+            leave(u, false);
+        }
+    }
+}
+
 
 void do_battle(region * r)
 {
@@ -4282,29 +4350,14 @@ void do_battle(region * r)
 
     /* Auswirkungen berechnen: */
     aftermath(b);
+    if (rule_force_leave(FORCE_LEAVE_POSTCOMBAT)) {
+        force_leave(b->region, b);
+    }
     /* Hier ist das Gefecht beendet, und wir können die
      * Hilfsstrukturen * wieder löschen: */
 
     if (b) {
         free_battle(b);
     }
-}
-
-void battle_free(battle * b) {
-    side *s;
-
-    assert(b);
-
-    for (s = b->sides; s != b->sides + b->nsides; ++s) {
-        fighter *fnext = s->fighters;
-        while (fnext) {
-            fighter *fig = fnext;
-            fnext = fig->next;
-            free_fighter(fig);
-            free(fig);
-        }
-        free_side(s);
-    }
-    free(b);
 }
 

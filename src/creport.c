@@ -1,4 +1,4 @@
-/*
+ï»¿/*
 +-------------------+  Enno Rehling <enno@eressea.de>
 | Eressea PBEM host |  Christian Schlittchen <corwin@amber.kn-bremen.de>
 | (c) 1998 - 2008   |  Katja Zedel <katze@felidae.kn-bremen.de>
@@ -62,7 +62,7 @@ without prior permission by the authors of Eressea.
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/crmessage.h>
-#include <util/goodies.h>
+#include <util/strings.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/message.h>
@@ -184,9 +184,9 @@ cr_output_curses(FILE * F, const faction * viewer, const void *obj, objtype_t ty
     region *r;
 
     /* Die Sichtbarkeit eines Zaubers und die Zaubermeldung sind bei
-     * Gebäuden und Schiffen je nach, ob man Besitzer ist, verschieden.
+     * GebÃ¤uden und Schiffen je nach, ob man Besitzer ist, verschieden.
      * Bei Einheiten sieht man Wirkungen auf eigene Einheiten immer.
-     * Spezialfälle (besonderes Talent, verursachender Magier usw. werde
+     * SpezialfÃ¤lle (besonderes Talent, verursachender Magier usw. werde
      * bei jedem curse gesondert behandelt. */
     if (typ == TYP_SHIP) {
         ship *sh = (ship *)obj;
@@ -264,6 +264,7 @@ cr_output_curses(FILE * F, const faction * viewer, const void *obj, objtype_t ty
                 fprintf(F, "\"%s\"\n", buf);
                 msg_release(msg);
             }
+            a = a->next;
         }
         else if (a->type == &at_effect && self) {
             effect_data *data = (effect_data *)a->data.v;
@@ -276,8 +277,11 @@ cr_output_curses(FILE * F, const faction * viewer, const void *obj, objtype_t ty
                 fprintf(F, "\"%d %s\"\n", data->value, translate(key,
                     LOC(default_locale, key)));
             }
+            a = a->next;
         }
-        a = a->next;
+        else {
+            a = a->nexttype;
+        }
     }
 }
 
@@ -317,7 +321,7 @@ static int cr_region(variant var, char *buffer, const void *userdata)
         plane *pl = rplane(r);
         int nx = r->x, ny = r->y;
         pnormalize(&nx, &ny, pl);
-        adjust_coordinates(report, &nx, &ny, pl, r);
+        adjust_coordinates(report, &nx, &ny, pl);
         sprintf(buffer, "%d %d %d", nx, ny, plane_id(pl));
         return 0;
     }
@@ -435,7 +439,7 @@ static int cr_regions(variant var, char *buffer, const void *userdata)
         int nx = r->x, ny = r->y;
 
         pnormalize(&nx, &ny, pl);
-        adjust_coordinates(f, &nx, &ny, pl, r);
+        adjust_coordinates(f, &nx, &ny, pl);
         wp += sprintf(wp, "\"%d %d %d", nx, ny, z);
         for (i = 1; i != rdata->nregions; ++i) {
             r = rdata->regions[i];
@@ -743,8 +747,11 @@ static void cr_output_unit(FILE * F, const region * r, const faction * f,       
     static const curse_type *itemcloak_ct = 0;
     static bool init = false;
     item result[MAX_INVENTORY];
+    const faction *sf;
+    const char *prefix;
 
-    if (fval(u_race(u), RCF_INVISIBLE))
+    assert(u && u->number);
+    if (u != NULL || fval(u_race(u), RCF_INVISIBLE))
         return;
 
     if (!init) {
@@ -752,256 +759,254 @@ static void cr_output_unit(FILE * F, const region * r, const faction * f,       
         itemcloak_ct = ct_find("itemcloak");
     }
     if (itemcloak_ct != NULL) {
-        itemcloak = curse_active(get_curse(u->attribs, itemcloak_ct));
+        curse * cu = get_curse(u->attribs, itemcloak_ct);
+        itemcloak = cu && curse_active(cu);
     }
 
-    assert(u && u->number);
-
     fprintf(F, "EINHEIT %d\n", u->no);
-    fprintf(F, "\"%s\";Name\n", u->name);
+    fprintf(F, "\"%s\";Name\n", unit_getname(u));
     str = u_description(u, f->locale);
     if (str) {
         fprintf(F, "\"%s\";Beschr\n", str);
     }
-  {
-      /* print faction information */
-      const faction *sf = visible_faction(f, u);
-      const char *prefix = raceprefix(u);
-      if (u->faction == f || omniscient(f)) {
-          const attrib *a_otherfaction = a_find(u->attribs, &at_otherfaction);
-          const faction *otherfaction =
-              a_otherfaction ? get_otherfaction(a_otherfaction) : NULL;
-          /* my own faction, full info */
-          const attrib *a = NULL;
-          unit *mage;
+    /* print faction information */
+    sf = visible_faction(f, u);
+    prefix = raceprefix(u);
+    if (u->faction == f || omniscient(f)) {
+        const attrib *a_otherfaction = a_find(u->attribs, &at_otherfaction);
+        const faction *otherfaction =
+            a_otherfaction ? get_otherfaction(a_otherfaction) : NULL;
+        /* my own faction, full info */
+        const attrib *a = NULL;
+        unit *mage;
 
-          if (fval(u, UFL_GROUP))
-              a = a_find(u->attribs, &at_group);
-          if (a != NULL) {
-              const group *g = (const group *)a->data.v;
-              fprintf(F, "%d;gruppe\n", g->gid);
-          }
-          fprintf(F, "%d;Partei\n", u->faction->no);
-          if (sf != u->faction)
-              fprintf(F, "%d;Verkleidung\n", sf->no);
-          if (fval(u, UFL_ANON_FACTION))
-              fprintf(F, "%d;Parteitarnung\n", i2b(fval(u, UFL_ANON_FACTION)));
-          if (otherfaction) {
-              if (otherfaction != u->faction) {
-                  fprintf(F, "%d;Anderepartei\n", otherfaction->no);
-              }
-          }
-          mage = get_familiar_mage(u);
-          if (mage) {
-              fprintf(F, "%u;familiarmage\n", mage->no);
-          }
-      }
-      else {
-          if (fval(u, UFL_ANON_FACTION)) {
-              /* faction info is hidden */
-              fprintf(F, "%d;Parteitarnung\n", i2b(fval(u, UFL_ANON_FACTION)));
-          }
-          else {
-              const attrib *a_otherfaction = a_find(u->attribs, &at_otherfaction);
-              const faction *otherfaction =
-                  a_otherfaction ? get_otherfaction(a_otherfaction) : NULL;
-              /* other unit. show visible faction, not u->faction */
-              fprintf(F, "%d;Partei\n", sf->no);
-              if (sf == f) {
-                  fprintf(F, "1;Verraeter\n");
-              }
-              if (a_otherfaction) {
-                  if (otherfaction != u->faction) {
-                      if (alliedunit(u, f, HELP_FSTEALTH)) {
-                          fprintf(F, "%d;Anderepartei\n", otherfaction->no);
-                      }
-                  }
-              }
-          }
-      }
-      if (prefix) {
-          prefix = mkname("prefix", prefix);
-          fprintf(F, "\"%s\";typprefix\n", translate(prefix, LOC(f->locale,
-              prefix)));
-      }
-  }
-  if (u->faction != f && a_fshidden
-      && a_fshidden->data.ca[0] == 1 && effskill(u, SK_STEALTH) >= 6) {
-      fprintf(F, "-1;Anzahl\n");
-  }
-  else {
-      fprintf(F, "%d;Anzahl\n", u->number);
-  }
+        if (fval(u, UFL_GROUP))
+            a = a_find(u->attribs, &at_group);
+        if (a != NULL) {
+            const group *g = (const group *)a->data.v;
+            fprintf(F, "%d;gruppe\n", g->gid);
+        }
+        fprintf(F, "%d;Partei\n", u->faction->no);
+        if (sf != u->faction)
+            fprintf(F, "%d;Verkleidung\n", sf->no);
+        if (fval(u, UFL_ANON_FACTION))
+            fprintf(F, "%d;Parteitarnung\n", i2b(fval(u, UFL_ANON_FACTION)));
+        if (otherfaction) {
+            if (otherfaction != u->faction) {
+                fprintf(F, "%d;Anderepartei\n", otherfaction->no);
+            }
+        }
+        mage = get_familiar_mage(u);
+        if (mage) {
+            fprintf(F, "%u;familiarmage\n", mage->no);
+        }
+    }
+    else {
+        if (fval(u, UFL_ANON_FACTION)) {
+            /* faction info is hidden */
+            fprintf(F, "%d;Parteitarnung\n", i2b(fval(u, UFL_ANON_FACTION)));
+        }
+        else {
+            const attrib *a_otherfaction = a_find(u->attribs, &at_otherfaction);
+            const faction *otherfaction =
+                a_otherfaction ? get_otherfaction(a_otherfaction) : NULL;
+            /* other unit. show visible faction, not u->faction */
+            fprintf(F, "%d;Partei\n", sf->no);
+            if (sf == f) {
+                fprintf(F, "1;Verraeter\n");
+            }
+            if (a_otherfaction) {
+                if (otherfaction != u->faction) {
+                    if (alliedunit(u, f, HELP_FSTEALTH)) {
+                        fprintf(F, "%d;Anderepartei\n", otherfaction->no);
+                    }
+                }
+            }
+        }
+    }
+    if (prefix) {
+        prefix = mkname("prefix", prefix);
+        fprintf(F, "\"%s\";typprefix\n", translate(prefix, LOC(f->locale,
+            prefix)));
+    }
+    if (u->faction != f && a_fshidden
+        && a_fshidden->data.ca[0] == 1 && effskill(u, SK_STEALTH) >= 6) {
+        fprintf(F, "-1;Anzahl\n");
+    }
+    else {
+        fprintf(F, "%d;Anzahl\n", u->number);
+    }
 
-  pzTmp = get_racename(u->attribs);
-  if (pzTmp) {
-      fprintf(F, "\"%s\";Typ\n", pzTmp);
-      if (u->faction == f && fval(u_race(u), RCF_SHAPESHIFTANY)) {
-          const char *zRace = rc_name_s(u_race(u), NAME_PLURAL);
-          fprintf(F, "\"%s\";wahrerTyp\n",
-              translate(zRace, LOC(f->locale, zRace)));
-      }
-  }
-  else {
-      const race *irace = u_irace(u);
-      const char *zRace = rc_name_s(irace, NAME_PLURAL);
-      fprintf(F, "\"%s\";Typ\n",
-          translate(zRace, LOC(f->locale, zRace)));
-      if (u->faction == f && irace != u_race(u)) {
-          assert(skill_enabled(SK_STEALTH)
-              || !"we're resetting this on load, so.. ircase should never be used");
-          zRace = rc_name_s(u_race(u), NAME_PLURAL);
-          fprintf(F, "\"%s\";wahrerTyp\n",
-              translate(zRace, LOC(f->locale, zRace)));
-      }
-  }
+    pzTmp = get_racename(u->attribs);
+    if (pzTmp) {
+        fprintf(F, "\"%s\";Typ\n", pzTmp);
+        if (u->faction == f && fval(u_race(u), RCF_SHAPESHIFTANY)) {
+            const char *zRace = rc_name_s(u_race(u), NAME_PLURAL);
+            fprintf(F, "\"%s\";wahrerTyp\n",
+                translate(zRace, LOC(f->locale, zRace)));
+        }
+    }
+    else {
+        const race *irace = u_irace(u);
+        const char *zRace = rc_name_s(irace, NAME_PLURAL);
+        fprintf(F, "\"%s\";Typ\n",
+            translate(zRace, LOC(f->locale, zRace)));
+        if (u->faction == f && irace != u_race(u)) {
+            assert(skill_enabled(SK_STEALTH)
+                || !"we're resetting this on load, so.. ircase should never be used");
+            zRace = rc_name_s(u_race(u), NAME_PLURAL);
+            fprintf(F, "\"%s\";wahrerTyp\n",
+                translate(zRace, LOC(f->locale, zRace)));
+        }
+    }
 
-  if (u->building) {
-      assert(u->building->region);
-      fprintf(F, "%d;Burg\n", u->building->no);
-  }
-  if (u->ship) {
-      assert(u->ship->region);
-      fprintf(F, "%d;Schiff\n", u->ship->no);
-  }
-  if (is_guard(u, GUARD_ALL) != 0) {
-      fprintf(F, "%d;bewacht\n", 1);
-  }
-  if ((b = usiege(u)) != NULL) {
-      fprintf(F, "%d;belagert\n", b->no);
-  }
-  /* additional information for own units */
-  if (u->faction == f || omniscient(f)) {
-      order *ord;
-      const char *xc;
-      const char *c;
-      int i;
-      sc_mage *mage;
+    if (u->building) {
+        assert(u->building->region);
+        fprintf(F, "%d;Burg\n", u->building->no);
+    }
+    if (u->ship) {
+        assert(u->ship->region);
+        fprintf(F, "%d;Schiff\n", u->ship->no);
+    }
+    if (is_guard(u, GUARD_ALL) != 0) {
+        fprintf(F, "%d;bewacht\n", 1);
+    }
+    if ((b = usiege(u)) != NULL) {
+        fprintf(F, "%d;belagert\n", b->no);
+    }
+    /* additional information for own units */
+    if (u->faction == f || omniscient(f)) {
+        order *ord;
+        const char *xc;
+        const char *c;
+        int i;
+        sc_mage *mage;
 
-      i = ualias(u);
-      if (i > 0)
-          fprintf(F, "%d;temp\n", i);
-      else if (i < 0)
-          fprintf(F, "%d;alias\n", -i);
-      i = get_money(u);
-      fprintf(F, "%d;Kampfstatus\n", u->status);
-      fprintf(F, "%d;weight\n", weight(u));
-      if (fval(u, UFL_NOAID)) {
-          fputs("1;unaided\n", F);
-      }
-      if (fval(u, UFL_STEALTH)) {
-          i = u_geteffstealth(u);
-          if (i >= 0) {
-              fprintf(F, "%d;Tarnung\n", i);
-          }
-      }
-      xc = uprivate(u);
-      if (xc) {
-          fprintf(F, "\"%s\";privat\n", xc);
-      }
-      c = hp_status(u);
-      if (c && *c && (u->faction == f || omniscient(f))) {
-          fprintf(F, "\"%s\";hp\n", translate(c,
-              LOC(u->faction->locale, c)));
-      }
-      if (fval(u, UFL_HERO)) {
-          fputs("1;hero\n", F);
-      }
+        i = ualias(u);
+        if (i > 0)
+            fprintf(F, "%d;temp\n", i);
+        else if (i < 0)
+            fprintf(F, "%d;alias\n", -i);
+        i = get_money(u);
+        fprintf(F, "%d;Kampfstatus\n", u->status);
+        fprintf(F, "%d;weight\n", weight(u));
+        if (fval(u, UFL_NOAID)) {
+            fputs("1;unaided\n", F);
+        }
+        if (fval(u, UFL_STEALTH)) {
+            i = u_geteffstealth(u);
+            if (i >= 0) {
+                fprintf(F, "%d;Tarnung\n", i);
+            }
+        }
+        xc = uprivate(u);
+        if (xc) {
+            fprintf(F, "\"%s\";privat\n", xc);
+        }
+        c = hp_status(u);
+        if (c && *c && (u->faction == f || omniscient(f))) {
+            fprintf(F, "\"%s\";hp\n", translate(c,
+                LOC(u->faction->locale, c)));
+        }
+        if (fval(u, UFL_HERO)) {
+            fputs("1;hero\n", F);
+        }
 
-      if (fval(u, UFL_HUNGER) && (u->faction == f)) {
-          fputs("1;hunger\n", F);
-      }
-      if (is_mage(u)) {
-          fprintf(F, "%d;Aura\n", get_spellpoints(u));
-          fprintf(F, "%d;Auramax\n", max_spellpoints(u->region, u));
-      }
-      /* default commands */
-      fprintf(F, "COMMANDS\n");
-      for (ord = u->old_orders; ord; ord = ord->next) {
-          /* this new order will replace the old defaults */
-          if (is_persistent(ord)) {
-              fwriteorder(F, ord, f->locale, true);
-              fputc('\n', F);
-          }
-      }
-      for (ord = u->orders; ord; ord = ord->next) {
-          if (u->old_orders && is_repeated(ord))
-              continue;               /* unit has defaults */
-          if (is_persistent(ord)) {
-              fwriteorder(F, ord, f->locale, true);
-              fputc('\n', F);
-          }
-      }
+        if (fval(u, UFL_HUNGER) && (u->faction == f)) {
+            fputs("1;hunger\n", F);
+        }
+        if (is_mage(u)) {
+            fprintf(F, "%d;Aura\n", get_spellpoints(u));
+            fprintf(F, "%d;Auramax\n", max_spellpoints(u->region, u));
+        }
+        /* default commands */
+        fprintf(F, "COMMANDS\n");
+        for (ord = u->old_orders; ord; ord = ord->next) {
+            /* this new order will replace the old defaults */
+            if (is_persistent(ord)) {
+                fwriteorder(F, ord, f->locale, true);
+                fputc('\n', F);
+            }
+        }
+        for (ord = u->orders; ord; ord = ord->next) {
+            keyword_t kwd = getkeyword(ord);
+            if (u->old_orders && is_repeated(kwd))
+                continue;               /* unit has defaults */
+            if (is_persistent(ord)) {
+                fwriteorder(F, ord, f->locale, true);
+                fputc('\n', F);
+            }
+        }
 
-      /* talents */
-      pr = 0;
-      for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
-          if (sv->level > 0) {
-              skill_t sk = sv->id;
-              int esk = eff_skill(u, sk, r);
-              if (!pr) {
-                  pr = 1;
-                  fprintf(F, "TALENTE\n");
-              }
-              fprintf(F, "%d %d;%s\n", u->number * level_days(sv->level), esk,
-                  translate(mkname("skill", skillnames[sk]), skillname(sk,
-                  f->locale)));
-          }
-      }
+        /* talents */
+        pr = 0;
+        for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
+            if (sv->level > 0) {
+                skill_t sk = sv->id;
+                int esk = eff_skill(u, sk, r);
+                if (!pr) {
+                    pr = 1;
+                    fprintf(F, "TALENTE\n");
+                }
+                fprintf(F, "%d %d;%s\n", u->number * level_days(sv->level), esk,
+                    translate(mkname("skill", skillnames[sk]), skillname(sk,
+                    f->locale)));
+            }
+        }
 
-      /* spells that this unit can cast */
-      mage = get_mage(u);
-      if (mage) {
-          int i, maxlevel = effskill(u, SK_MAGIC);
-          cr_output_spells(F, u, maxlevel);
+        /* spells that this unit can cast */
+        mage = get_mage(u);
+        if (mage) {
+            int i, maxlevel = effskill(u, SK_MAGIC);
+            cr_output_spells(F, u, maxlevel);
 
-          for (i = 0; i != MAXCOMBATSPELLS; ++i) {
-              const spell *sp = mage->combatspells[i].sp;
-              if (sp) {
-                  const char *name =
-                      translate(mkname("spell", sp->sname), spell_name(sp,
-                      f->locale));
-                  fprintf(F, "KAMPFZAUBER %d\n", i);
-                  fprintf(F, "\"%s\";name\n", name);
-                  fprintf(F, "%d;level\n", mage->combatspells[i].level);
-              }
-          }
-      }
-  }
-  /* items */
-  pr = 0;
-  if (f == u->faction || omniscient(f)) {
-      show = u->items;
-  }
-  else if (!itemcloak && mode >= see_unit && !(a_fshidden
-      && a_fshidden->data.ca[1] == 1 && effskill(u, SK_STEALTH) >= 3)) {
-      int n = report_items(u->items, result, MAX_INVENTORY, u, f);
-      assert(n >= 0);
-      if (n > 0)
-          show = result;
-      else
-          show = NULL;
-  }
-  else {
-      show = NULL;
-  }
-  lasttype = NULL;
-  for (itm = show; itm; itm = itm->next) {
-      const char *ic;
-      int in;
-      assert(itm->type != lasttype
-          || !"error: list contains two objects of the same item");
-      report_item(u, itm, f, NULL, &ic, &in, true);
-      if (in == 0)
-          continue;
-      if (!pr) {
-          pr = 1;
-          fputs("GEGENSTAENDE\n", F);
-      }
-      fprintf(F, "%d;%s\n", in, translate(ic, LOC(f->locale, ic)));
-  }
+            for (i = 0; i != MAXCOMBATSPELLS; ++i) {
+                const spell *sp = mage->combatspells[i].sp;
+                if (sp) {
+                    const char *name =
+                        translate(mkname("spell", sp->sname), spell_name(sp,
+                        f->locale));
+                    fprintf(F, "KAMPFZAUBER %d\n", i);
+                    fprintf(F, "\"%s\";name\n", name);
+                    fprintf(F, "%d;level\n", mage->combatspells[i].level);
+                }
+            }
+        }
+    }
+    /* items */
+    pr = 0;
+    if (f == u->faction || omniscient(f)) {
+        show = u->items;
+    }
+    else if (!itemcloak && mode >= see_unit && !(a_fshidden
+        && a_fshidden->data.ca[1] == 1 && effskill(u, SK_STEALTH) >= 3)) {
+        int n = report_items(u->items, result, MAX_INVENTORY, u, f);
+        assert(n >= 0);
+        if (n > 0)
+            show = result;
+        else
+            show = NULL;
+    }
+    else {
+        show = NULL;
+    }
+    lasttype = NULL;
+    for (itm = show; itm; itm = itm->next) {
+        const char *ic;
+        int in;
+        assert(itm->type != lasttype
+            || !"error: list contains two objects of the same item");
+        report_item(u, itm, f, NULL, &ic, &in, true);
+        if (in == 0)
+            continue;
+        if (!pr) {
+            pr = 1;
+            fputs("GEGENSTAENDE\n", F);
+        }
+        fprintf(F, "%d;%s\n", in, translate(ic, LOC(f->locale, ic)));
+    }
 
-  cr_output_curses(F, f, u, TYP_UNIT);
+    cr_output_curses(F, f, u, TYP_UNIT);
 }
 
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
@@ -1031,18 +1036,6 @@ static void show_alliances_cr(FILE * F, const faction * f)
         fprintf(F, "\"%s\";name\n", al->name);
         fprintf(F, "%d;leader\n", lead->no);
     }
-}
-
-/* prints all visible spells in a region */
-static void show_active_spells(const region * r)
-{
-    char fogwall[MAXDIRECTIONS];
-#ifdef TODO                     /* alte Regionszauberanzeigen umstellen */
-    unit *u;
-    int env = 0;
-#endif
-    memset(fogwall, 0, sizeof(char) * MAXDIRECTIONS);
-
 }
 
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
@@ -1222,7 +1215,7 @@ cr_output_resources(FILE * F, report_context * ctx, seen_region * sr)
 }
 
 static void
-cr_region_header(FILE * F, int plid, int nx, int ny, unsigned int uid)
+cr_region_header(FILE * F, int plid, int nx, int ny, int uid)
 {
     if (plid == 0) {
         fprintf(F, "REGION %d %d\n", nx, ny);
@@ -1257,7 +1250,7 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
     else {
         nx = r->x, ny = r->y;
         pnormalize(&nx, &ny, pl);
-        adjust_coordinates(f, &nx, &ny, pl, r);
+        adjust_coordinates(f, &nx, &ny, pl);
     }
 
     if (pl) {
@@ -1308,6 +1301,7 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
         if (r->display && r->display[0])
             fprintf(F, "\"%s\";Beschr\n", r->display);
         if (fval(r->terrain, LAND_REGION)) {
+            assert(r->land);
             fprintf(F, "%d;Bauern\n", rpeasants(r));
             if (fval(r, RF_ORCIFIED)) {
                 fprintf(F, "1;Verorkt\n");
@@ -1338,7 +1332,7 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
                         fputs("1;mourning\n", F);
                     }
                 }
-                if (r->land->ownership) {
+                if (r->land && r->land->ownership) {
                     fprintf(F, "%d;morale\n", r->land->morale);
                 }
             }
@@ -1398,7 +1392,7 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
                     plane *plx = rplane(r);
 
                     pnormalize(&nx, &ny, plx);
-                    adjust_coordinates(f, &nx, &ny, plx, r);
+                    adjust_coordinates(f, &nx, &ny, plx);
                     fprintf(F, "SCHEMEN %d %d\n", nx, ny);
                     fprintf(F, "\"%s\";Name\n", rname(r, f->locale));
                     rl2 = rl2->next;
@@ -1408,7 +1402,6 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
         }
 
         /* describe both passed and inhabited regions */
-        show_active_spells(r);
         if (fval(r, RF_TRAVELUNIT)) {
             bool seeunits = false, seeships = false;
             const attrib *ru;
@@ -1441,13 +1434,13 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
             }
         }
         if (sr->mode == see_unit || sr->mode == see_travel) {
-	    cr_output_messages(F, r->msgs, f);
-	    {
-		message_list *mlist = r_getmessages(r, f);
-		if (mlist)
-		    cr_output_messages(F, mlist, f);
-	    }
-	}
+            cr_output_messages(F, r->msgs, f);
+            {
+                message_list *mlist = r_getmessages(r, f);
+                if (mlist)
+                    cr_output_messages(F, mlist, f);
+            }
+        }
         /* buildings */
         for (b = rbuildings(r); b; b = b->next) {
             int fno = -1;
@@ -1500,7 +1493,7 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
     FILE *F = fopen(filename, "wt");
 
     if (era < 0) {
-        era = get_param_int(global.parameters, "world.era", 2);
+        era = get_param_int(global.parameters, "world.era", 1);
     }
     if (F == NULL) {
         perror(filename);
@@ -1623,7 +1616,7 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
             int nx = r->x, ny = r->y;
 
             pnormalize(&nx, &ny, pl);
-            adjust_coordinates(f, &nx, &ny, pl, r);
+            adjust_coordinates(f, &nx, &ny, pl);
             if (!plid)
                 fprintf(F, "BATTLE %d %d\n", nx, ny);
             else {

@@ -62,7 +62,7 @@ int tolua_regionlist_next(lua_State * L)
 static int tolua_region_get_id(lua_State * L)
 {
     region *self = (region *)tolua_tousertype(L, 1, 0);
-    tolua_pushnumber(L, (lua_Number)self->uid);
+    lua_pushinteger(L, self->uid);
     return 1;
 }
 
@@ -85,14 +85,14 @@ static int tolua_region_set_blocked(lua_State * L)
 static int tolua_region_get_x(lua_State * L)
 {
     region *self = (region *)tolua_tousertype(L, 1, 0);
-    tolua_pushnumber(L, (lua_Number)self->x);
+    lua_pushinteger(L, self->x);
     return 1;
 }
 
 static int tolua_region_get_y(lua_State * L)
 {
     region *self = (region *)tolua_tousertype(L, 1, 0);
-    tolua_pushnumber(L, (lua_Number)self->y);
+    lua_pushinteger(L, self->y);
     return 1;
 }
 
@@ -199,7 +199,7 @@ static int tolua_region_set_name(lua_State * L)
 static int tolua_region_get_morale(lua_State * L)
 {
     region *r = (region *)tolua_tousertype(L, 1, 0);
-    tolua_pushnumber(L, region_get_morale(r));
+    lua_pushinteger(L, region_get_morale(r));
     return 1;
 }
 
@@ -323,7 +323,7 @@ static int tolua_region_get_resourcelevel(lua_State * L)
         const rawmaterial *rm;
         for (rm = r->resources; rm; rm = rm->next) {
             if (rm->type->rtype == rtype) {
-                tolua_pushnumber(L, (lua_Number)rm->level);
+                lua_pushinteger(L, rm->level);
                 return 1;
             }
         }
@@ -355,7 +355,7 @@ static int tolua_region_get_resource(lua_State * L)
     const char *type;
     const resource_type *rtype;
     int result = 0;
-    const void * matches;
+    void * matches;
     critbit_tree * cb = special_resources();
 
     r = (region *)tolua_tousertype(L, 1, 0);
@@ -389,7 +389,7 @@ static int tolua_region_get_resource(lua_State * L)
         }
     }
 
-    tolua_pushnumber(L, (lua_Number)result);
+    lua_pushinteger(L, result);
     return 1;
 }
 
@@ -399,7 +399,7 @@ static int tolua_region_set_resource(lua_State * L)
     const char *type = tolua_tostring(L, 2, 0);
     int result, value = (int)tolua_tonumber(L, 3, 0);
     critbit_tree * cb = special_resources();
-    const void * matches;
+    void * matches;
 
     if (cb_find_prefix(cb, type, strlen(type) + 1, &matches, 1, 0)) {
         cb_get_kv(matches, &result, sizeof(result));
@@ -524,7 +524,7 @@ static int tolua_region_get_age(lua_State * L)
     region *self = (region *)tolua_tousertype(L, 1, 0);
 
     if (self) {
-        lua_pushnumber(L, self->age);
+        lua_pushinteger(L, self->age);
         return 1;
     }
     return 0;
@@ -613,7 +613,7 @@ static int tolua_plane_set_name(lua_State * L)
 static int tolua_plane_get_id(lua_State * L)
 {
     plane *self = (plane *)tolua_tousertype(L, 1, 0);
-    tolua_pushnumber(L, (lua_Number)self->id);
+    lua_pushinteger(L, self->id);
     return 1;
 }
 
@@ -623,8 +623,8 @@ static int tolua_plane_normalize(lua_State * L)
     int x = (int)tolua_tonumber(L, 2, 0);
     int y = (int)tolua_tonumber(L, 3, 0);
     pnormalize(&x, &y, self);
-    tolua_pushnumber(L, (lua_Number)x);
-    tolua_pushnumber(L, (lua_Number)y);
+    lua_pushinteger(L, x);
+    lua_pushinteger(L, y);
     return 2;
 }
 
@@ -638,8 +638,8 @@ static int tolua_plane_tostring(lua_State * L)
 static int tolua_plane_get_size(lua_State * L)
 {
     plane *pl = (plane *)tolua_tousertype(L, 1, 0);
-    lua_pushnumber(L, plane_width(pl));
-    lua_pushnumber(L, plane_height(pl));
+    lua_pushinteger(L, plane_width(pl));
+    lua_pushinteger(L, plane_height(pl));
     return 2;
 }
 
@@ -657,7 +657,7 @@ static int tolua_distance(lua_State * L)
     pnormalize(&x1, &y1, pl);
     pnormalize(&x2, &y2, pl);
     result = koor_distance(x1, y1, x2, y2);
-    lua_pushnumber(L, result);
+    lua_pushinteger(L, result);
     return 1;
 }
 

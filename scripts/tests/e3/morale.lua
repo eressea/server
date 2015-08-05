@@ -1,10 +1,9 @@
 require "lunit"
 
-module("tests.eressea.morale", package.seeall, lunit.testcase )
+module("tests.e3.morale", package.seeall, lunit.testcase )
 
 function setup()
     eressea.game.reset()
-    eressea.settings.set('rules.region_owners', '1')
 end
 
 function test_when_owner_returns_morale_drops_only_2()
@@ -156,12 +155,12 @@ function test_morale_old()
   update_owners()
   assert_equal(1, r.morale)
   r.morale = 5
-  assert_equal(u1.faction, r.owner)
+  assert_equal(r.owner, u1.faction)
   u1:clear_orders()
   u1:add_order("GIB " .. itoa36(u2.id) .. " KOMMANDO")
   process_orders()
   u1:clear_orders()
-  assert_equal(r.owner, u2.faction)
+  assert_equal(u2.faction, r.owner)
   assert_equal(3, r.morale) --  5-MORALE_TRANSFER
   for u in r.units do
     if u.faction.id==u2.faction.id then

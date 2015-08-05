@@ -1,6 +1,6 @@
 require "lunit"
 
-module("tests.e3.e2features", package.seeall, lunit.testcase )
+module("tests.e2.e2features", package.seeall, lunit.testcase )
 
 local function one_unit(r, f)
   local u = unit.create(f, r, 1)
@@ -23,6 +23,7 @@ function setup()
     eressea.free_game()
     eressea.settings.set("nmr.timeout", "0")
     eressea.settings.set("rules.economy.food", "4")
+    eressea.settings.set("rules.ship.storms", "0")
 end
 
 function test_learn()
@@ -107,7 +108,7 @@ function test_ship_capacity()
     local r = region.create(0,0, "ocean")
     region.create(1,0, "ocean")
     local r2 = region.create(2,0, "ocean")
-    local f = faction.create("noreply@eressea.de", "human", "de")
+    local f = faction.create("capacity@eressea.de", "human", "de")
 
     -- u1 is at the limit and moves
     local s1 = ship.create(r, "boat")
@@ -269,7 +270,7 @@ end
 function test_block_movement_aots()
   eressea.settings.set("rules.guard.base_stop_prob", "0.0")
   eressea.settings.set("rules.guard.skill_stop_prob", "1.0")
-  eressea.settings.set("rules.guard.amulet_stop_prob", "1.1")
+  eressea.settings.set("rules.guard.amulet_stop_prob", "1.0")
 
   local r0 = region.create(0, 0, "plain")
   local r1 = region.create(1, 0, "plain")
@@ -298,7 +299,7 @@ function test_block_movement_aots()
   	u:add_order("NACH o o")
   end
   
-  u12:add_item("aots", 10)
+  u12:add_item("aots", 1)
   u22:set_skill("stealth", 1)
 
   process_orders()
@@ -333,28 +334,4 @@ function test_stonegolems()
   assert_equal(230, c1.size, "resulting size should be 230")
   assert_equal(1 ,u2.number, "There shoud be one Stone Golems")
 -- end test Stone Golems four stones
-end
-
-function test_only_building_owner_can_set_not_paid()
-  local r = region.create(0, 0, "plain")
-  local f = faction.create("noreply@eressea.de", "human", "de")
-  local u1 = unit.create(f, r, 1)
-  local u2 = unit.create(f, r, 1)
-  local mine = building.create(r, "mine")
-  mine.size = 2
-  u1:add_item("money", 500)
-  u1.building = mine
-  u2.building = mine
-  u1:clear_orders()
-  u2:clear_orders()
--- Test that Bezahle nicht is working
-  u1:add_order("Bezahle nicht")
-  process_orders()
-  assert_equal(500, u1:get_item("money"))
-  u1:clear_orders()
--- Test that bug fix 0001976 is working 
--- Bezahle nicht is not working
-  u2:add_order("Bezahle nicht")
-  process_orders()
-  assert_equal(0, u1:get_item("money"))
 end

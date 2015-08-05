@@ -204,7 +204,8 @@ static void test_build_building_no_materials(CuTest *tc) {
     btype = bt_find("castle");
     assert(btype);
     set_level(u, SK_BUILDING, 1);
-    CuAssertIntEquals(tc, ENOMATERIALS, build_building(u, btype, 0, 4, 0));
+    u->orders = create_order(K_MAKE, u->faction->locale, 0);
+    CuAssertIntEquals(tc, ENOMATERIALS, build_building(u, btype, 0, 4, u->orders));
     CuAssertPtrEquals(tc, 0, u->region->buildings);
     CuAssertPtrEquals(tc, 0, u->building);
     test_cleanup();
@@ -222,7 +223,8 @@ static void test_build_building_with_golem(CuTest *tc) {
     assert(btype->construction);
 
     set_level(bf.u, SK_BUILDING, 1);
-    CuAssertIntEquals(tc, 1, build_building(u, btype, 0, 1, 0));
+    u->orders = create_order(K_MAKE, u->faction->locale, 0);
+    CuAssertIntEquals(tc, 1, build_building(u, btype, 0, 1, u->orders));
     CuAssertPtrNotNull(tc, u->region->buildings);
     CuAssertIntEquals(tc, 1, u->region->buildings->size);
     CuAssertIntEquals(tc, 0, u->number);
@@ -245,7 +247,8 @@ static void test_build_building_success(CuTest *tc) {
 
     i_change(&bf.u->items, rtype->itype, 1);
     set_level(u, SK_BUILDING, 1);
-    CuAssertIntEquals(tc, 1, build_building(u, btype, 0, 4, 0));
+    u->orders = create_order(K_MAKE, u->faction->locale, 0);
+    CuAssertIntEquals(tc, 1, build_building(u, btype, 0, 4, u->orders));
     CuAssertPtrNotNull(tc, u->region->buildings);
     CuAssertPtrEquals(tc, u->region->buildings, u->building);
     CuAssertIntEquals(tc, 1, u->building->size);

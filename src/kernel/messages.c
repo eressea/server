@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -147,6 +147,7 @@ message *msg_message(const char *name, const char *sig, ...)
     const message_type *mtype = mt_find(name);
     char paramname[64];
     const char *ic = sig;
+    int argnum=0;
     variant args[16];
     memset(args, 0, sizeof(args));
 
@@ -183,15 +184,18 @@ message *msg_message(const char *name, const char *sig, ...)
             else {
                 assert(!"unknown variant type");
             }
+            argnum++;
         }
         else {
             log_error("invalid parameter %s for message type %s\n", paramname, mtype->name);
-            assert(!"program aborted.");
         }
         while (*ic && !isalnum(*ic))
             ic++;
     }
     va_end(vargs);
+    if (argnum !=  mtype->nparameters) {
+        log_error("not enough parameters for message type %s\n", mtype->name);
+    }
 
     return msg_create(mtype, args);
 }
@@ -201,12 +205,6 @@ caddmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
 {
     message *m = NULL;
 
-#define LOG_ENGLISH
-#ifdef LOG_ENGLISH
-    if (f && f->locale != default_locale) {
-        log_warning("message for locale \"%s\": %s\n", locale_name(f->locale), s);
-    }
-#endif
     unused_arg(level);
     switch (mtype) {
     case MSG_INCOME:
@@ -276,12 +274,20 @@ message * cmistake(const unit * u, struct order *ord, int mno, int mtype)
     return result;
 }
 
+void syntax_error(const struct unit *u, struct order *ord)
+{
+    message * result;
+    result = msg_error(u, ord, 10);
+    ADDMSG(&u->faction->msgs, result);
+}
+
 extern unsigned int new_hashstring(const char *s);
 
 void free_messagelist(message_list * msgs)
 {
-    struct mlist **mlistptr = &msgs->begin;
-    while (*mlistptr) {
+    struct mlist **mlistptr;
+    assert(msgs && msgs->begin);
+    for (mlistptr = &msgs->begin; *mlistptr;) {
         struct mlist *ml = *mlistptr;
         *mlistptr = ml->next;
         msg_release(ml->msg);
@@ -292,6 +298,7 @@ void free_messagelist(message_list * msgs)
 
 message *add_message(message_list ** pm, message * m)
 {
+    assert(m && m->type);
     if (!lomem && m != NULL) {
         struct mlist *mnew = malloc(sizeof(struct mlist));
         if (*pm == NULL) {

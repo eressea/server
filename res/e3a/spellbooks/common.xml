@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="iso-8859-1" ?>
+<?xml version="1.0" ?>
 <spellbook name="common">
     <entry spell="goodwinds" level="4" />
     <entry spell="create_trollbelt" level="9" />
@@ -37,7 +37,7 @@
     <entry spell="summon_familiar" level="9" />
     <entry spell="draigfumbleshield" level="9" />
     <entry spell="gwyrrdfumbleshield" level="5" />
-    <entry spell="cerrdorfumbleshield" level="5" />
+    <entry spell="cerddorfumbleshield" level="5" />
     <entry spell="tybiedfumbleshield" level="2" />
     <entry spell="concealing_aura" level="1" />
     <entry spell="shockwave" level="5" />

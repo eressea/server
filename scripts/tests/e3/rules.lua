@@ -76,9 +76,7 @@ function disable_test_market_action()
     b.size = 10
     u.building = b
     update_owners()
-    for r in regions() do
-        market_action(r)
-    end
+    process.markets()
     assert_equal(35, u:get_item("balm"))
     assert_equal(70, u:get_item("h2"))
 end
@@ -147,25 +145,6 @@ function test_no_stealth()
     process_orders()
     assert_equal(-1, u:get_skill("stealth"))
 end
-
---[[
-function test_analyze_magic()
-    local r1 = region.create(0,0, "plain")
-    local r2 = region.create(1,0, "plain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
-
-    local u = unit.create(f, r2, 1)
-
-    u.race = "elf"
-    u:set_skill("magic", 6)
-    u.magic = "gwyrrd"
-    u.aura = 60
-    u:add_spell("analyze_magic")
-    u:clear_orders()
-    u:add_order("Zaubere stufe 2 'Magie analysieren' REGION 1,0")
-    process_orders()
-end
-]]--
 
 function test_seecast()
     local r = region.create(0,0, "plain")
@@ -481,7 +460,6 @@ function test_canoe_passes_through_land()
     u1:add_order("NACH O O O")
     process_orders()
     assert_equal(land, u2.region, "canoe did not stop at coast")
-    u1:add_order("NACH O O O")
     process_orders()
     assert_equal(dst, sh.region, "canoe could not leave coast")
     assert_equal(dst, u1.region, "canoe could not leave coast")
@@ -712,7 +690,7 @@ function test_golem_use_four_iron()
     assert_equal(4, u1:get_item("towershield"))
 end
 
-function skip_test_silver_weight_stops_movement()
+function test_silver_weight_stops_movement()
     local r1 = region.create(1, 1, "plain")
     local r2 = region.create(2, 1, "plain")
     region.create(3, 1, "plain")
@@ -729,7 +707,7 @@ function skip_test_silver_weight_stops_movement()
     assert_equal(r2, u1.region)
 end
 
-function skip_test_silver_weight_stops_ship()
+function test_silver_weight_stops_ship()
     local r1 = region.create(1, 1, "ocean")
     local r2 = region.create(2, 1, "ocean")
     region.create(3, 1, "ocean")
@@ -771,11 +749,49 @@ function test_building_owner_can_enter_ship()
     assert_equal(null, u1.building, "owner of the building can not go into a ship")
 end
 
-function test_weightless_silver()
+function test_only_building_owner_can_set_not_paid()
+  local r = region.create(0, 0, "plain")
+  local f = faction.create("noreply@eressea.de", "human", "de")
+  local u1 = unit.create(f, r, 1)
+  local u2 = unit.create(f, r, 1)
+  local mine = building.create(r, "mine")
+  mine.size = 2
+  u1:add_item("money", 500)
+  u1.building = mine
+  u2.building = mine
+  u1:clear_orders()
+  u2:clear_orders()
+-- Test that Bezahle nicht is working
+  u1:add_order("Bezahle nicht")
+  process_orders()
+  assert_equal(500, u1:get_item("money"))
+  u1:clear_orders()
+-- Test that bug fix 0001976 is working 
+-- Bezahle nicht is not working
+  u2:add_order("Bezahle nicht")
+  process_orders()
+  assert_equal(0, u1:get_item("money"))
+end
+
+function test_spyreport_message()
     local r1 = region.create(1, 2, "plain")    
     local f1 = faction.create("noreply@eressea.de", "human", "de")
     local u1 = unit.create(f1, r1, 1)
-    assert_equal(1000, u1.weight)
-    u1:add_item("money", 540)
-    assert_equal(1000, u1.weight)
+    local u2 = unit.create(f1, r1, 1)
+    msg = message.create("spyreport")
+    msg:set_unit("spy", u1)
+    msg:set_unit("target", u2)
+    msg:set_string("status", "hodor")
+    assert_not_equal("", msg:render("de"))
+    assert_not_equal("", msg:render("en"))
+end
+
+function test_volcanooutbreak_message()
+    local r1 = region.create(1, 0, "plain")
+    local r2 = region.create(1, 1, "plain")
+    msg = message.create("volcanooutbreak")
+    msg:set_region("regionn", r1)
+    msg:set_region("regionv", r2)
+    assert_not_equal("", msg:render("de"))
+    assert_not_equal("", msg:render("en"))
 end

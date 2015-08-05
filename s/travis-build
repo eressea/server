@@ -3,9 +3,10 @@
 ROOT=`pwd`
 
 inifile() {
+cd $ROOT
 if [ ! -e eressea.ini ]; then
 cp conf/eressea.ini .
-build/iniparser/inifile eressea.ini add lua:paths lunit:scripts
+$BUILD/iniparser/inifile eressea.ini add lua:paths lunit:scripts
 fi
 }
 

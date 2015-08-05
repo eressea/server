@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="iso-8859-1" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <strings>
 
   <string name="dragon_postfix_0">
@@ -8,16 +8,16 @@
     <text locale="de">der Allwissende</text>
   </string>
   <string name="dragon_postfix_2">
-    <text locale="de">der Mächtige</text>
+    <text locale="de">der MÃ¤chtige</text>
   </string>
   <string name="dragon_postfix_3">
-    <text locale="de">die Ehrwürdige</text>
+    <text locale="de">die EhrwÃ¼rdige</text>
   </string>
   <string name="dragon_postfix_4">
     <text locale="de">die Listige</text>
   </string>
   <string name="dragon_postfix_5">
-    <text locale="de">der Grüne</text>
+    <text locale="de">der GrÃ¼ne</text>
   </string>
   <string name="dragon_postfix_6">
     <text locale="de">die Strafende</text>
@@ -44,7 +44,7 @@
     <text locale="de">die Alte</text>
   </string>
   <string name="dragon_postfix_14">
-    <text locale="de">die Mächtige</text>
+    <text locale="de">die MÃ¤chtige</text>
   </string>
   <string name="dragon_postfix_15">
     <text locale="de">die Goldene</text>
@@ -62,7 +62,7 @@
     <text locale="de">die Verzehrende</text>
   </string>
   <string name="dragon_postfix_20">
-    <text locale="de">die Grüne</text>
+    <text locale="de">die GrÃ¼ne</text>
   </string>
   <string name="dragon_postfix_21">
     <text locale="de">die Rote</text>
@@ -71,16 +71,16 @@
     <text locale="de">der Furchtlose</text>
   </string>
   <string name="dragon_postfix_23">
-    <text locale="de">der Allmächtige</text>
+    <text locale="de">der AllmÃ¤chtige</text>
   </string>
   <string name="dragon_postfix_24">
     <text locale="de">der Weitblickende</text>
   </string>
   <string name="dragon_postfix_25">
-    <text locale="de">der Weiße</text>
+    <text locale="de">der WeiÃŸe</text>
   </string>
   <string name="dragon_postfix_26">
-    <text locale="de">die Glänzende</text>
+    <text locale="de">die GlÃ¤nzende</text>
   </string>
   <string name="dragon_postfix_27">
     <text locale="de">der Wissende</text>
@@ -89,7 +89,7 @@
     <text locale="de">die Unbarmherzige</text>
   </string>
   <string name="dragon_postfix_29">
-    <text locale="de">die Schöne</text>
+    <text locale="de">die SchÃ¶ne</text>
   </string>
 
 </strings>

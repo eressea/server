@@ -12,7 +12,7 @@
 
 const char * keyword(keyword_t kwd)
 {
-    static char result[KEYWORDSIZE]; // FIXME: static return value
+    static char result[32]; // FIXME: static return value
     if (!result[0]) {
         strcpy(result, "keyword::");
     }
@@ -58,7 +58,7 @@ keyword_t get_keyword(const char *s, const struct locale *lang) {
 
         if (str) {
             int i;
-            const void *match;
+            void *match;
             void **tokens = get_translations(lang, UT_KEYWORDS);
             critbit_tree *cb = (critbit_tree *)*tokens;
             if (cb && cb_find_prefix(cb, str, strlen(str), &match, 1, 0)) {
