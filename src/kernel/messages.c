@@ -285,8 +285,9 @@ extern unsigned int new_hashstring(const char *s);
 
 void free_messagelist(message_list * msgs)
 {
-    struct mlist **mlistptr = &msgs->begin;
-    while (*mlistptr) {
+    struct mlist **mlistptr;
+    assert(msgs && msgs->begin);
+    for (mlistptr = &msgs->begin; *mlistptr;) {
         struct mlist *ml = *mlistptr;
         *mlistptr = ml->next;
         msg_release(ml->msg);
