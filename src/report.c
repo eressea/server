@@ -1471,14 +1471,12 @@ report_template(const char *filename, report_context * ctx, const char *charset)
     newline(out);
     newline(out);
 
-    sprintf(buf, "%s %s \"%s\"", LOC(f->locale, "ERESSEA"), factionid(f),
-        LOC(f->locale, "enterpasswd"));
+    sprintf(buf, "%s %s \"%s\"", LOC(f->locale, "ERESSEA"), factionid(f), f->passw);
     rps_nowrap(out, buf);
     newline(out);
     newline(out);
     sprintf(buf, "; ECHECK -l -w4 -r%d -v%s", f->race->recruitcost,
         ECHECK_VERSION);
-    /* -v3.4: ECheck Version 3.4.x */
     rps_nowrap(out, buf);
     newline(out);
 
@@ -1575,7 +1573,8 @@ report_template(const char *filename, report_context * ctx, const char *charset)
                     newline(out);
                 }
                 for (ord = u->orders; ord; ord = ord->next) {
-                    if (u->old_orders && is_repeated(ord))
+                    keyword_t kwd = getkeyword(ord);
+                    if (u->old_orders && is_repeated(kwd))
                         continue;           /* unit has defaults */
                     if (is_persistent(ord)) {
                         strcpy(buf, "   ");

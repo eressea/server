@@ -31,7 +31,7 @@
 typedef struct opstack {
     variant *begin;
     variant *top;
-    int size;
+    unsigned int size;
 } opstack;
 
 variant opstack_pop(opstack ** stackp)
@@ -53,10 +53,16 @@ void opstack_push(opstack ** stackp, variant data)
         stack->top = stack->begin;
         *stackp = stack;
     }
-    if (stack->top - stack->begin == stack->size) {
+    if (stack->top == stack->begin + stack->size) {
         size_t pos = stack->top - stack->begin;
+        void *tmp;
         stack->size += stack->size;
-        stack->begin = realloc(stack->begin, sizeof(variant) * stack->size);
+        tmp = realloc(stack->begin, sizeof(variant) * stack->size);
+        if (!tmp) {
+            log_error("realloc out of memory");
+            abort();
+        }
+        stack->begin = (variant *)tmp;
         stack->top = stack->begin + pos;
     }
     *stack->top++ = data;
@@ -66,7 +72,7 @@ void opstack_push(opstack ** stackp, variant data)
  ** static buffer malloc
  **/
 
-#define BBUFSIZE 128*1024
+#define BBUFSIZE 0x20000
 static struct {
     char *begin;
     char *end;
@@ -79,7 +85,7 @@ char *balloc(size_t size)
     static int init = 0;          /* STATIC_XCALL: used across calls */
     if (!init) {
         init = 1;
-        buffer.current = buffer.begin = malloc(BBUFSIZE);
+        buffer.current = buffer.begin = malloc(BBUFSIZE * sizeof(char));
         buffer.end = buffer.begin + BBUFSIZE;
     }
     if (buffer.current + size > buffer.end) {
@@ -269,7 +275,7 @@ static const char *parse_string(opstack ** stack, const char *in,
         }
         else {
             int ch = (unsigned char)(*ic);
-            int bytes;
+            size_t bytes;
 
             switch (ch) {
             case '\\':
@@ -285,8 +291,8 @@ static const char *parse_string(opstack ** stack, const char *in,
                 if (ic == NULL)
                     return NULL;
                 c = (char *)opop_v(stack);
-                bytes = (int)(c ? strlcpy(oc, c, size) : 0);
-                if (bytes < (int)size)
+                bytes = (c ? strlcpy(oc, c, size) : 0);
+                if (bytes < size)
                     oc += bytes;
                 else
                     oc += size;
@@ -363,7 +369,7 @@ static const char *parse(opstack ** stack, const char *inn,
 const char *translate(const char *format, const void *userdata,
     const char *vars, variant args[])
 {
-    int i = 0;
+    unsigned int i = 0;
     const char *ic = vars;
     char symbol[32];
     char *oc = symbol;

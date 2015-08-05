@@ -179,7 +179,6 @@ extern "C" {
     bool has_limited_skills(const struct unit *u);
     const struct race *findrace(const char *, const struct locale *);
 
-    bool idle(struct faction *f);
     bool unit_has_cursed_item(const struct unit *u);
 
     /* grammatik-flags: */
@@ -287,8 +286,12 @@ extern "C" {
     int AllianceAuto(void);        /* flags that allied factions get automatically */
     int AllianceRestricted(void);  /* flags restricted to allied factions */
     int HelpMask(void);    /* flags restricted to allied factions */
+
     struct order *default_order(const struct locale *lang);
+    void set_default_order(int kwd);
+
     int entertainmoney(const struct region *r);
+    void init_parameters(struct locale *lang);
 
     void free_gamedata(void);
 

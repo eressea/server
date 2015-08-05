@@ -123,9 +123,9 @@ static void update_faction(sqlite3 *db, const faction *f) {
         "INSERT INTO faction_data (faction_id, code, name, email, lang, turn)"
         " VALUES (?, ?, ?, ?, ?, ?)";
     sqlite3_stmt *stmt = 0;
+    strcpy(code, itoa36(f->no));
     sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
     sqlite3_bind_int(stmt, 1, f->subscription);
-    strcpy(code, itoa36(f->no));
     sqlite3_bind_text(stmt, 2, code, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 3, f->name, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 4, f->email, -1, SQLITE_STATIC);

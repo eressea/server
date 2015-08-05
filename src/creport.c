@@ -929,7 +929,8 @@ static void cr_output_unit(FILE * F, const region * r, const faction * f,       
             }
         }
         for (ord = u->orders; ord; ord = ord->next) {
-            if (u->old_orders && is_repeated(ord))
+            keyword_t kwd = getkeyword(ord);
+            if (u->old_orders && is_repeated(kwd))
                 continue;               /* unit has defaults */
             if (is_persistent(ord)) {
                 fwriteorder(F, ord, f->locale, true);

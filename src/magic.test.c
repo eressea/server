@@ -3,6 +3,7 @@
 #include "magic.h"
 
 #include <kernel/faction.h>
+#include <kernel/order.h>
 #include <kernel/item.h>
 #include <kernel/region.h>
 #include <kernel/spell.h>
@@ -382,9 +383,45 @@ void test_hasspell(CuTest * tc)
     test_cleanup();
 }
 
+static quicklist * casts;
+
+static int cast_fireball(struct castorder * co) {
+    ql_push(&casts, co);
+    return 0;
+}
+
+void test_multi_cast(CuTest *tc) {
+    unit *u;
+    spell *sp;
+    struct locale * lang;
+
+    test_cleanup();
+    sp = create_spell("fireball", 0);
+    sp->cast = cast_fireball;
+    CuAssertPtrEquals(tc, sp, find_spell("fireball"));
+
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u->faction->locale = lang = get_or_create_locale("de");
+    locale_setstring(lang, mkname("spell", sp->sname), "Feuerball");
+    CuAssertStrEquals(tc, "Feuerball", spell_name(sp, lang));
+    set_level(u, SK_MAGIC, 10);
+    unit_add_spell(u, 0, sp, 1);
+    CuAssertPtrEquals(tc, sp, unit_getspell(u, "Feuerball", lang));
+
+    unit_addorder(u, create_order(K_CAST, u->faction->locale, "Feuerball"));
+    unit_addorder(u, create_order(K_CAST, u->faction->locale, "Feuerball"));
+    CuAssertPtrEquals(tc, casts, 0);
+    magic();
+    CuAssertPtrNotNull(tc, casts);
+    CuAssertIntEquals(tc, 2, ql_length(casts));
+    ql_free(casts);
+    test_cleanup();
+}
+
 CuSuite *get_magic_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_multi_cast);
     SUITE_ADD_TEST(suite, test_updatespells);
     SUITE_ADD_TEST(suite, test_spellbooks);
     SUITE_ADD_TEST(suite, test_pay_spell);

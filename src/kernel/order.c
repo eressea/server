@@ -252,6 +252,19 @@ static order_data *create_data(keyword_t kwd, const char *sptr, int lindex)
     return data;
 }
 
+static void free_localedata(int lindex) {
+    int i;
+    for (i = 0; i != MAXKEYWORDS; ++i) {
+        release_data(locale_array[lindex]->short_orders[i]);
+        locale_array[lindex]->short_orders[i] = 0;
+    }
+    for (i = 0; i != MAXSKILLS; ++i) {
+        release_data(locale_array[lindex]->study_orders[i]);
+        locale_array[lindex]->study_orders[i] = 0;
+    }
+    locale_array[lindex]->lang = 0;
+}
+
 static order *create_order_i(keyword_t kwd, const char *sptr, bool persistent,
     const struct locale *lang)
 {
@@ -276,7 +289,12 @@ static order *create_order_i(keyword_t kwd, const char *sptr, bool persistent,
 
     lindex = locale_index(lang);
     assert(lindex < MAXLOCALES);
-    locale_array[lindex] = (locale_data *)calloc(1, sizeof(locale_data));
+    if (!locale_array[lindex]) {
+        locale_array[lindex] = (locale_data *)calloc(1, sizeof(locale_data));
+    }
+    else if (locale_array[lindex]->lang != lang) {
+        free_localedata(lindex);
+    }
     locale_array[lindex]->lang = lang;
 
     ord = (order *)malloc(sizeof(order));
@@ -292,13 +310,13 @@ order *create_order(keyword_t kwd, const struct locale * lang,
     const char *params, ...)
 {
     char zBuffer[DISPLAYSIZE];
-    assert(lang);
     if (params) {
         char *bufp = zBuffer;
         int bytes;
         size_t size = sizeof(zBuffer) - 1;
         va_list marker;
 
+        assert(lang);
         va_start(marker, params);
         while (*params) {
             if (*params == '%') {
@@ -389,9 +407,8 @@ order *parse_order(const char *s, const struct locale * lang)
  * \return true if the order is long
  * \sa is_exclusive(), is_repeated(), is_persistent()
  */
-bool is_repeated(const order * ord)
+bool is_repeated(keyword_t kwd)
 {
-    keyword_t kwd = ORD_KEYWORD(ord);
     switch (kwd) {
     case K_CAST:
     case K_BUY:
@@ -468,10 +485,8 @@ bool is_exclusive(const order * ord)
  * \return true if the order is long
  * \sa is_exclusive(), is_repeated(), is_persistent()
  */
-bool is_long(const order * ord)
+bool is_long(keyword_t kwd)
 {
-    keyword_t kwd = ORD_KEYWORD(ord);
-
     switch (kwd) {
     case K_CAST:
     case K_BUY:
@@ -522,7 +537,7 @@ bool is_persistent(const order * ord)
     case K_KOMMENTAR:
         return true;
     default:
-        return ord->_persistent || is_repeated(ord);
+        return ord->_persistent || is_repeated(kwd);
     }
 }
 

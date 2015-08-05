@@ -151,11 +151,11 @@ int destroy_cmd(unit * u, struct order *ord)
     int n = INT_MAX;
 
     if (u->number < 1)
-        return 0;
+        return 1;
 
     if (fval(u, UFL_LONGACTION)) {
         cmistake(u, ord, 52, MSG_PRODUCE);
-        return 0;
+        return 52;
     }
 
     init_order(ord);
@@ -183,11 +183,11 @@ int destroy_cmd(unit * u, struct order *ord)
 
         if (u != building_owner(b)) {
             cmistake(u, ord, 138, MSG_PRODUCE);
-            return 0;
+            return 138;
         }
         if (fval(b->type, BTF_INDESTRUCTIBLE)) {
             cmistake(u, ord, 138, MSG_PRODUCE);
-            return 0;
+            return 138;
         }
         if (n >= b->size) {
             /* destroy completly */
@@ -213,11 +213,11 @@ int destroy_cmd(unit * u, struct order *ord)
 
         if (u != ship_owner(sh)) {
             cmistake(u, ord, 138, MSG_PRODUCE);
-            return 0;
+            return 138;
         }
         if (fval(r->terrain, SEA_REGION)) {
             cmistake(u, ord, 14, MSG_EVENT);
-            return 0;
+            return 14;
         }
 
         if (n >= (sh->size * 100) / sh->type->construction->maxsize) {
@@ -242,11 +242,11 @@ int destroy_cmd(unit * u, struct order *ord)
     }
     else {
         cmistake(u, ord, 138, MSG_PRODUCE);
-        return 0;
+        return 138;
     }
 
     if (con) {
-        /* TODO: Nicht an ZERSTÖRE mit Punktangabe angepaßt! */
+        /* TODO: Nicht an ZERSTÖRE mit Punktangabe angepasst! */
         int c;
         for (c = 0; con->materials[c].number; ++c) {
             const requirement *rq = con->materials + c;
