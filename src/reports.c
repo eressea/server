@@ -793,7 +793,8 @@ size_t size)
             bool printed = 0;
             order *ord;;
             for (ord = u->old_orders; ord; ord = ord->next) {
-                if (is_repeated(ord)) {
+                keyword_t kwd = getkeyword(ord);
+                if (is_repeated(kwd)) {
                     if (printed < ORDERS_IN_NR) {
                         bytes = buforder(bufp, size, ord, printed++);
                         if (wrptr(&bufp, &size, bytes) != 0)
@@ -805,7 +806,8 @@ size_t size)
             }
             if (printed < ORDERS_IN_NR)
                 for (ord = u->orders; ord; ord = ord->next) {
-                    if (is_repeated(ord)) {
+                    keyword_t kwd = getkeyword(ord);
+                    if (is_repeated(kwd)) {
                         if (printed < ORDERS_IN_NR) {
                             bytes = buforder(bufp, size, ord, printed++);
                             if (wrptr(&bufp, &size, bytes) != 0)

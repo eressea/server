@@ -563,7 +563,7 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
             return;
         }
     }
-    if (!playerrace(rc) || idle(u->faction)) {
+    if (!playerrace(rc)) {
         cmistake(u, ord, 139, MSG_EVENT);
         return;
     }
@@ -979,25 +979,12 @@ void economics(region * r)
     remove_empty_units_in_region(r);
 
     for (u = r->units; u; u = u->next) {
-        order *ord;
-        bool destroyed = false;
-        if (u->number > 0) {
-            for (ord = u->orders; ord; ord = ord->next) {
-                keyword_t kwd = getkeyword(ord);
-                if (kwd == K_DESTROY) {
-                    if (!destroyed) {
-                        if (destroy_cmd(u, ord) != 0)
-                            ord = NULL;
-                        destroyed = true;
-                    }
-                }
-                if (u->orders == NULL) {
-                    break;
-                }
+        order *ord = u->thisorder;
+        keyword_t kwd = getkeyword(ord);
+        if (kwd == K_DESTROY) {
+            if (destroy_cmd(u, ord) == 0) {
+                fset(u, UFL_LONGACTION | UFL_NOTMOVING);
             }
-        }
-        if (destroyed) {
-            fset(u, UFL_LONGACTION | UFL_NOTMOVING);
         }
     }
 
@@ -1051,7 +1038,7 @@ static void manufacture(unit * u, const item_type * itype, int want)
         i_change(&u->items, itype, n);
         if (want == INT_MAX)
             want = n;
-        ADDMSG(&u->faction->msgs, msg_message("manufacture",
+        ADDMSG(&u->faction->msgs, msg_message("produce",
             "unit region amount wanted resource", u, u->region, n, want,
             itype->rtype));
     }
@@ -1466,7 +1453,7 @@ static void create_potion(unit * u, const potion_type * ptype, int want)
         i_change(&u->items, ptype->itype, built);
         if (want == INT_MAX)
             want = built;
-        ADDMSG(&u->faction->msgs, msg_message("manufacture",
+        ADDMSG(&u->faction->msgs, msg_message("produce",
             "unit region amount wanted resource", u, u->region, built, want,
             ptype->itype->rtype));
         break;
@@ -3216,7 +3203,7 @@ void produce(struct region *r)
             continue;
 
         if (fval(u, UFL_LONGACTION) && u->thisorder == NULL) {
-            /* this message was already given in laws.setdefaults
+            /* this message was already given in laws.c:update_long_order
                cmistake(u, u->thisorder, 52, MSG_PRODUCE);
                */
             continue;

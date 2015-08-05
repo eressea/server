@@ -139,7 +139,8 @@ static unit *unitorders(FILE * F, int enc, struct faction *f)
             ordp = &u->old_orders;
             while (*ordp) {
                 order *ord = *ordp;
-                if (!is_repeated(ord)) {
+                keyword_t kwd = getkeyword(ord);
+                if (!is_repeated(kwd)) {
                     *ordp = ord->next;
                     ord->next = NULL;
                     free_order(ord);
@@ -777,7 +778,8 @@ void write_unit(struct gamedata *data, const unit * u)
         }
     }
     for (ord = u->orders; ord; ord = ord->next) {
-        if (u->old_orders && is_repeated(ord))
+        keyword_t kwd = getkeyword(ord);
+        if (u->old_orders && is_repeated(kwd))
             continue;                 /* has new defaults */
         if (is_persistent(ord)) {
             if (++p < MAXPERSISTENT) {
