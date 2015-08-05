@@ -56,15 +56,15 @@ extern "C" {
     extern int *age;
 
 
-    extern void new_units(void);
-    extern void defaultorders(void);
-    extern void quit(void);
-    extern void monthly_healing(void);
-    extern void renumber_factions(void);
-    extern void restack_units(void);
-    extern void update_long_order(struct unit *u);
-    extern void sinkships(struct region * r);
-    extern void do_enter(struct region *r, bool is_final_attempt);
+    void new_units(void);
+    void defaultorders(void);
+    void quit(void);
+    void monthly_healing(void);
+    void renumber_factions(void);
+    void restack_units(void);
+    void update_long_order(struct unit *u);
+    void sinkships(struct region * r);
+    void do_enter(struct region *r, bool is_final_attempt);
 
     extern int password_cmd(struct unit *u, struct order *ord);
     extern int banner_cmd(struct unit *u, struct order *ord);
