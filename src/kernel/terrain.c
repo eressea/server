@@ -127,8 +127,7 @@ const struct terrain_type *newterrain(terrain_t t)
 terrain_t oldterrain(const struct terrain_type * terrain)
 {
     terrain_t t;
-    if (terrain == NULL)
-        return NOTERRAIN;
+    assert(terrain);
     for (t = 0; t != MAXTERRAINS; ++t) {
         if (newterrains[t] == terrain)
             return t;

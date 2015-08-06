@@ -193,6 +193,7 @@ set(TESTS_SRC
   skill.test.c
   spells.test.c
   spy.test.c
+  study.test.c
   upkeep.test.c
   spells/magicresistance.test.c
   ${ATTRIBUTES_TESTS}
