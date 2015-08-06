@@ -222,7 +222,7 @@ bool report, int *academy)
             teach->teachers[index] = NULL;
         }
         else {
-            log_warning("MAXTEACHERS is too low at %d", MAXTEACHERS);
+            log_error("MAXTEACHERS=%d is too low for student %s, teacher %s", MAXTEACHERS, unitname(student), unitname(teacher));
         }
         teach->value += n;
 

@@ -33,7 +33,7 @@ extern "C" {
     extern bool is_migrant(struct unit *u);
     extern int study_cost(struct unit *u, skill_t talent);
 
-#define MAXTEACHERS 16
+#define MAXTEACHERS 20
     typedef struct teaching_info {
         struct unit *teachers[MAXTEACHERS];
         int value;
