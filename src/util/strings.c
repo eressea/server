@@ -43,6 +43,7 @@ char *set_string(char **s, const char *neu)
 unsigned int hashstring(const char *s)
 {
     unsigned int key = 0;
+    assert(s);
     while (*s) {
         key = key * 37 + *s++;
     }

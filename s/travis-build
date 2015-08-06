@@ -16,3 +16,5 @@ s/build
 cd $ROOT
 inifile
 s/runtests
+cd tests
+./write-reports.sh

@@ -68,6 +68,7 @@ without prior permission by the authors of Eressea.
 #include <util/message.h>
 #include <util/nrmessage.h>
 #include <quicklist.h>
+#include <filestream.h>
 
 /* libc includes */
 #include <assert.h>
@@ -176,7 +177,7 @@ static void print_items(FILE * F, item * items, const struct locale *lang)
 }
 
 static void
-cr_output_curses(FILE * F, const faction * viewer, const void *obj, objtype_t typ)
+cr_output_curses(stream *out, const faction * viewer, const void *obj, objtype_t typ)
 {
     bool header = false;
     attrib *a = NULL;
@@ -258,10 +259,10 @@ cr_output_curses(FILE * F, const faction * viewer, const void *obj, objtype_t ty
                 char buf[BUFFERSIZE];
                 if (!header) {
                     header = 1;
-                    fputs("EFFECTS\n", F);
+                    stream_printf(out, "EFFECTS\n");
                 }
                 nr_render(msg, viewer->locale, buf, sizeof(buf), viewer);
-                fprintf(F, "\"%s\"\n", buf);
+                stream_printf(out, "\"%s\"\n", buf);
                 msg_release(msg);
             }
             a = a->next;
@@ -272,9 +273,9 @@ cr_output_curses(FILE * F, const faction * viewer, const void *obj, objtype_t ty
                 const char *key = resourcename(data->type->itype->rtype, 0);
                 if (!header) {
                     header = 1;
-                    fputs("EFFECTS\n", F);
+                    stream_printf(out, "EFFECTS\n");
                 }
-                fprintf(F, "\"%d %s\"\n", data->value, translate(key,
+                stream_printf(out, "\"%d %s\"\n", data->value, translate(key,
                     LOC(default_locale, key)));
             }
             a = a->next;
@@ -283,6 +284,13 @@ cr_output_curses(FILE * F, const faction * viewer, const void *obj, objtype_t ty
             a = a->nexttype;
         }
     }
+}
+
+static void cr_output_curses_compat(FILE *F, const faction * viewer, const void *obj, objtype_t typ) {
+    // TODO: eliminate this function
+    stream strm;
+    fstream_init(&strm, F);
+    cr_output_curses(&strm, viewer, obj, typ);
 }
 
 static int cr_unit(variant var, char *buffer, const void *userdata)
@@ -636,7 +644,7 @@ faction * f)
         fprintf(F, "%d;Partei\n", fno);
     if (b->besieged)
         fprintf(F, "%d;Belagerer\n", b->besieged);
-    cr_output_curses(F, f, b, TYP_BUILDING);
+    cr_output_curses_compat(F, f, b, TYP_BUILDING);
 }
 
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
@@ -682,30 +690,22 @@ const faction * f, const region * r)
     if (w != NODIRECTION)
         fprintf(F, "%d;Kueste\n", w);
 
-    cr_output_curses(F, f, sh, TYP_SHIP);
+    cr_output_curses_compat(F, f, sh, TYP_SHIP);
 }
 
-static void
-fwriteorder(FILE * F, const struct order *ord, const struct locale *lang,
-bool escape)
-{
+static int stream_order(stream *out, const struct order *ord) {
+    const char *str;
     char ebuf[1025];
     char obuf[1024];
-    const char *str = obuf;
-    fputc('"', F);
     write_order(ord, obuf, sizeof(obuf));
-    if (escape) {
-        str = escape_string(obuf, ebuf, sizeof(ebuf));
-        if (str == ebuf) {
-            ebuf[1024] = 0;
-        }
+    str = escape_string(obuf, ebuf, sizeof(ebuf));
+    if (str == ebuf) {
+        ebuf[1024] = 0;
     }
-    if (str[0])
-        fputs(str, F);
-    fputc('"', F);
+    return stream_printf(out, "\"%s\"\n", str);
 }
 
-static void cr_output_spells(FILE * F, const unit * u, int maxlevel)
+static void cr_output_spells(stream *out, const unit * u, int maxlevel)
 {
     spellbook * book = unit_get_spellbook(u);
 
@@ -720,17 +720,20 @@ static void cr_output_spells(FILE * F, const unit * u, int maxlevel)
                 spell * sp = sbe->sp;
                 const char *name = translate(mkname("spell", sp->sname), spell_name(sp, f->locale));
                 if (!header) {
-                    fputs("SPRUECHE\n", F);
+                    stream_printf(out, "SPRUECHE\n");
                     header = 1;
                 }
-                fprintf(F, "\"%s\"\n", name);
+                stream_printf(out, "\"%s\"\n", name);
             }
         }
     }
 }
 
-/* prints all that belongs to a unit */
-static void cr_output_unit(FILE * F, const region * r, const faction * f,       /* observers faction */
+/** prints all that belongs to a unit
+* @param f observers faction
+* @param u unit to report
+*/
+void cr_output_unit(stream *out, const region * r, const faction * f,
     const unit * u, int mode)
 {
     /* Race attributes are always plural and item attributes always
@@ -751,7 +754,7 @@ static void cr_output_unit(FILE * F, const region * r, const faction * f,       
     const char *prefix;
 
     assert(u && u->number);
-    if (u != NULL || fval(u_race(u), RCF_INVISIBLE))
+    if (fval(u_race(u), RCF_INVISIBLE))
         return;
 
     if (!init) {
@@ -763,11 +766,11 @@ static void cr_output_unit(FILE * F, const region * r, const faction * f,       
         itemcloak = cu && curse_active(cu);
     }
 
-    fprintf(F, "EINHEIT %d\n", u->no);
-    fprintf(F, "\"%s\";Name\n", unit_getname(u));
+    stream_printf(out, "EINHEIT %d\n", u->no);
+    stream_printf(out, "\"%s\";Name\n", unit_getname(u));
     str = u_description(u, f->locale);
     if (str) {
-        fprintf(F, "\"%s\";Beschr\n", str);
+        stream_printf(out, "\"%s\";Beschr\n", str);
     }
     /* print faction information */
     sf = visible_faction(f, u);
@@ -784,41 +787,41 @@ static void cr_output_unit(FILE * F, const region * r, const faction * f,       
             a = a_find(u->attribs, &at_group);
         if (a != NULL) {
             const group *g = (const group *)a->data.v;
-            fprintf(F, "%d;gruppe\n", g->gid);
+            stream_printf(out, "%d;gruppe\n", g->gid);
         }
-        fprintf(F, "%d;Partei\n", u->faction->no);
+        stream_printf(out, "%d;Partei\n", u->faction->no);
         if (sf != u->faction)
-            fprintf(F, "%d;Verkleidung\n", sf->no);
+            stream_printf(out, "%d;Verkleidung\n", sf->no);
         if (fval(u, UFL_ANON_FACTION))
-            fprintf(F, "%d;Parteitarnung\n", i2b(fval(u, UFL_ANON_FACTION)));
+            stream_printf(out, "%d;Parteitarnung\n", i2b(fval(u, UFL_ANON_FACTION)));
         if (otherfaction) {
             if (otherfaction != u->faction) {
-                fprintf(F, "%d;Anderepartei\n", otherfaction->no);
+                stream_printf(out, "%d;Anderepartei\n", otherfaction->no);
             }
         }
         mage = get_familiar_mage(u);
         if (mage) {
-            fprintf(F, "%u;familiarmage\n", mage->no);
+            stream_printf(out, "%u;familiarmage\n", mage->no);
         }
     }
     else {
         if (fval(u, UFL_ANON_FACTION)) {
             /* faction info is hidden */
-            fprintf(F, "%d;Parteitarnung\n", i2b(fval(u, UFL_ANON_FACTION)));
+            stream_printf(out, "%d;Parteitarnung\n", i2b(fval(u, UFL_ANON_FACTION)));
         }
         else {
             const attrib *a_otherfaction = a_find(u->attribs, &at_otherfaction);
             const faction *otherfaction =
                 a_otherfaction ? get_otherfaction(a_otherfaction) : NULL;
             /* other unit. show visible faction, not u->faction */
-            fprintf(F, "%d;Partei\n", sf->no);
+            stream_printf(out, "%d;Partei\n", sf->no);
             if (sf == f) {
-                fprintf(F, "1;Verraeter\n");
+                stream_printf(out, "1;Verraeter\n");
             }
             if (a_otherfaction) {
                 if (otherfaction != u->faction) {
                     if (alliedunit(u, f, HELP_FSTEALTH)) {
-                        fprintf(F, "%d;Anderepartei\n", otherfaction->no);
+                        stream_printf(out, "%d;Anderepartei\n", otherfaction->no);
                     }
                 }
             }
@@ -826,53 +829,53 @@ static void cr_output_unit(FILE * F, const region * r, const faction * f,       
     }
     if (prefix) {
         prefix = mkname("prefix", prefix);
-        fprintf(F, "\"%s\";typprefix\n", translate(prefix, LOC(f->locale,
+        stream_printf(out, "\"%s\";typprefix\n", translate(prefix, LOC(f->locale,
             prefix)));
     }
     if (u->faction != f && a_fshidden
         && a_fshidden->data.ca[0] == 1 && effskill(u, SK_STEALTH) >= 6) {
-        fprintf(F, "-1;Anzahl\n");
+        stream_printf(out, "-1;Anzahl\n");
     }
     else {
-        fprintf(F, "%d;Anzahl\n", u->number);
+        stream_printf(out, "%d;Anzahl\n", u->number);
     }
 
     pzTmp = get_racename(u->attribs);
     if (pzTmp) {
-        fprintf(F, "\"%s\";Typ\n", pzTmp);
+        stream_printf(out, "\"%s\";Typ\n", pzTmp);
         if (u->faction == f && fval(u_race(u), RCF_SHAPESHIFTANY)) {
             const char *zRace = rc_name_s(u_race(u), NAME_PLURAL);
-            fprintf(F, "\"%s\";wahrerTyp\n",
+            stream_printf(out, "\"%s\";wahrerTyp\n",
                 translate(zRace, LOC(f->locale, zRace)));
         }
     }
     else {
         const race *irace = u_irace(u);
         const char *zRace = rc_name_s(irace, NAME_PLURAL);
-        fprintf(F, "\"%s\";Typ\n",
+        stream_printf(out, "\"%s\";Typ\n",
             translate(zRace, LOC(f->locale, zRace)));
         if (u->faction == f && irace != u_race(u)) {
             assert(skill_enabled(SK_STEALTH)
                 || !"we're resetting this on load, so.. ircase should never be used");
             zRace = rc_name_s(u_race(u), NAME_PLURAL);
-            fprintf(F, "\"%s\";wahrerTyp\n",
+            stream_printf(out, "\"%s\";wahrerTyp\n",
                 translate(zRace, LOC(f->locale, zRace)));
         }
     }
 
     if (u->building) {
         assert(u->building->region);
-        fprintf(F, "%d;Burg\n", u->building->no);
+        stream_printf(out, "%d;Burg\n", u->building->no);
     }
     if (u->ship) {
         assert(u->ship->region);
-        fprintf(F, "%d;Schiff\n", u->ship->no);
+        stream_printf(out, "%d;Schiff\n", u->ship->no);
     }
     if (is_guard(u, GUARD_ALL) != 0) {
-        fprintf(F, "%d;bewacht\n", 1);
+        stream_printf(out, "%d;bewacht\n", 1);
     }
     if ((b = usiege(u)) != NULL) {
-        fprintf(F, "%d;belagert\n", b->no);
+        stream_printf(out, "%d;belagert\n", b->no);
     }
     /* additional information for own units */
     if (u->faction == f || omniscient(f)) {
@@ -884,56 +887,55 @@ static void cr_output_unit(FILE * F, const region * r, const faction * f,       
 
         i = ualias(u);
         if (i > 0)
-            fprintf(F, "%d;temp\n", i);
+            stream_printf(out, "%d;temp\n", i);
         else if (i < 0)
-            fprintf(F, "%d;alias\n", -i);
+            stream_printf(out, "%d;alias\n", -i);
         i = get_money(u);
-        fprintf(F, "%d;Kampfstatus\n", u->status);
-        fprintf(F, "%d;weight\n", weight(u));
+        stream_printf(out, "%d;Kampfstatus\n", u->status);
+        stream_printf(out, "%d;weight\n", weight(u));
         if (fval(u, UFL_NOAID)) {
-            fputs("1;unaided\n", F);
+            stream_printf(out, "1;unaided\n");
         }
         if (fval(u, UFL_STEALTH)) {
             i = u_geteffstealth(u);
             if (i >= 0) {
-                fprintf(F, "%d;Tarnung\n", i);
+                stream_printf(out, "%d;Tarnung\n", i);
             }
         }
         xc = uprivate(u);
         if (xc) {
-            fprintf(F, "\"%s\";privat\n", xc);
+            stream_printf(out, "\"%s\";privat\n", xc);
         }
         c = hp_status(u);
         if (c && *c && (u->faction == f || omniscient(f))) {
-            fprintf(F, "\"%s\";hp\n", translate(c,
+            stream_printf(out, "\"%s\";hp\n", translate(c,
                 LOC(u->faction->locale, c)));
         }
         if (fval(u, UFL_HERO)) {
-            fputs("1;hero\n", F);
+            stream_printf(out, "1;hero\n");
         }
 
         if (fval(u, UFL_HUNGER) && (u->faction == f)) {
-            fputs("1;hunger\n", F);
+            stream_printf(out, "1;hunger\n");
         }
         if (is_mage(u)) {
-            fprintf(F, "%d;Aura\n", get_spellpoints(u));
-            fprintf(F, "%d;Auramax\n", max_spellpoints(u->region, u));
+            stream_printf(out, "%d;Aura\n", get_spellpoints(u));
+            stream_printf(out, "%d;Auramax\n", max_spellpoints(u->region, u));
         }
         /* default commands */
-        fprintf(F, "COMMANDS\n");
+        stream_printf(out, "COMMANDS\n");
         for (ord = u->old_orders; ord; ord = ord->next) {
             /* this new order will replace the old defaults */
             if (is_persistent(ord)) {
-                fwriteorder(F, ord, f->locale, true);
-                fputc('\n', F);
+                stream_order(out, ord);
             }
         }
         for (ord = u->orders; ord; ord = ord->next) {
-            if (u->old_orders && is_repeated(ord))
+            keyword_t kwd = getkeyword(ord);
+            if (u->old_orders && is_repeated(kwd))
                 continue;               /* unit has defaults */
             if (is_persistent(ord)) {
-                fwriteorder(F, ord, f->locale, true);
-                fputc('\n', F);
+                stream_order(out, ord);
             }
         }
 
@@ -945,9 +947,9 @@ static void cr_output_unit(FILE * F, const region * r, const faction * f,       
                 int esk = eff_skill(u, sk, r);
                 if (!pr) {
                     pr = 1;
-                    fprintf(F, "TALENTE\n");
+                    stream_printf(out, "TALENTE\n");
                 }
-                fprintf(F, "%d %d;%s\n", u->number * level_days(sv->level), esk,
+                stream_printf(out, "%d %d;%s\n", u->number * level_days(sv->level), esk,
                     translate(mkname("skill", skillnames[sk]), skillname(sk,
                     f->locale)));
             }
@@ -957,7 +959,7 @@ static void cr_output_unit(FILE * F, const region * r, const faction * f,       
         mage = get_mage(u);
         if (mage) {
             int i, maxlevel = effskill(u, SK_MAGIC);
-            cr_output_spells(F, u, maxlevel);
+            cr_output_spells(out, u, maxlevel);
 
             for (i = 0; i != MAXCOMBATSPELLS; ++i) {
                 const spell *sp = mage->combatspells[i].sp;
@@ -965,9 +967,9 @@ static void cr_output_unit(FILE * F, const region * r, const faction * f,       
                     const char *name =
                         translate(mkname("spell", sp->sname), spell_name(sp,
                         f->locale));
-                    fprintf(F, "KAMPFZAUBER %d\n", i);
-                    fprintf(F, "\"%s\";name\n", name);
-                    fprintf(F, "%d;level\n", mage->combatspells[i].level);
+                    stream_printf(out, "KAMPFZAUBER %d\n", i);
+                    stream_printf(out, "\"%s\";name\n", name);
+                    stream_printf(out, "%d;level\n", mage->combatspells[i].level);
                 }
             }
         }
@@ -1000,12 +1002,21 @@ static void cr_output_unit(FILE * F, const region * r, const faction * f,       
             continue;
         if (!pr) {
             pr = 1;
-            fputs("GEGENSTAENDE\n", F);
+            stream_printf(out, "GEGENSTAENDE\n");
         }
-        fprintf(F, "%d;%s\n", in, translate(ic, LOC(f->locale, ic)));
+        stream_printf(out, "%d;%s\n", in, translate(ic, LOC(f->locale, ic)));
     }
 
-    cr_output_curses(F, f, u, TYP_UNIT);
+    cr_output_curses(out, f, u, TYP_UNIT);
+}
+
+static void cr_output_unit_compat(FILE * F, const region * r, const faction * f,
+    const unit * u, int mode)
+{
+    // TODO: eliminate this function
+    stream strm;
+    fstream_init(&strm, F);
+    cr_output_unit(&strm, r, f, u, mode);
 }
 
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
@@ -1376,7 +1387,7 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
         if (r->land) {
             print_items(F, r->land->items, f->locale);
         }
-        cr_output_curses(F, f, r, TYP_REGION);
+        cr_output_curses_compat(F, f, r, TYP_REGION);
         cr_borders(ctx->seen, r, f, sr->mode, F);
         if (sr->mode == see_unit && is_astral(r)
             && !is_cursed(r->attribs, C_ASTRALBLOCK, 0)) {
@@ -1468,7 +1479,7 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
 
             if (u->building || u->ship || (stealthmod > INT_MIN
                 && cansee(f, r, u, stealthmod))) {
-                cr_output_unit(F, r, f, u, sr->mode);
+                cr_output_unit_compat(F, r, f, u, sr->mode);
             }
         }
     }

@@ -209,15 +209,20 @@ void test_create_world(void)
 }
 
 message * test_get_last_message(message_list *msgs) {
-    struct mlist *iter = msgs->begin;
-    while (iter->next) {
-        iter = iter->next;
+    if (msgs) {
+        struct mlist *iter = msgs->begin;
+        while (iter->next) {
+            iter = iter->next;
+        }
+        return iter->msg;
     }
-    return iter->msg;
+    return 0;
 }
 
 const char * test_get_messagetype(const message *msg) {
-    const char * name = msg->type->name;
+    const char * name;
+    assert(msg);
+    name = msg->type->name;
     if (strcmp(name, "missing_message") == 0) {
         name = (const char *)msg->parameters[0].v;
     }

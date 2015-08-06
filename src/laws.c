@@ -183,7 +183,7 @@ static void live(region * r)
                 reduce_skill(u, sb, weeks);
                 ADDMSG(&u->faction->msgs, msg_message("dumbeffect",
                     "unit weeks skill", u, weeks, (skill_t)sb->id));
-            }                         /* sonst Glück gehabt: wer nix weiß, kann nix vergessen... */
+            }                         /* sonst Glück gehabt: wer nix weiss, kann nix vergessen... */
             change_effect(u, oldpotiontype[P_FOOL], -effect);
         }
         age_unit(r, u);
@@ -402,7 +402,7 @@ static void migrate(region * r)
          * wer fragt das? Die Baumwanderung war abhängig von der
          * Auswertungsreihenfolge der regionen,
          * das hatte ich geändert. jemand hat es wieder gelöscht, toll.
-         * ich habe es wieder aktiviert, muß getestet werden.
+         * ich habe es wieder aktiviert, muss getestet werden.
          */
         *hp = m->next;
         m->next = free_migrants;
@@ -442,7 +442,7 @@ static void horses(region * r)
 
     /* Pferde wandern in Nachbarregionen.
      * Falls die Nachbarregion noch berechnet
-     * werden muß, wird eine migration-Struktur gebildet,
+     * werden muss, wird eine migration-Struktur gebildet,
      * die dann erst in die Berechnung der Nachbarstruktur einfließt.
      */
 
@@ -632,7 +632,7 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
             a->data.sa[0] = (short)rtrees(r, 0);
             a->data.sa[1] = (short)rtrees(r, 1);
         }
-        /* wir haben 6 Wochen zum wachsen, jeder Same/Sproß hat 18% Chance
+        /* wir haben 6 Wochen zum wachsen, jeder Same/Spross hat 18% Chance
          * zu wachsen, damit sollten nach 5-6 Wochen alle gewachsen sein */
         growth = 1800;
 
@@ -1347,10 +1347,12 @@ int ally_cmd(unit * u, struct order *ord)
 
     s = gettoken(token, sizeof(token));
 
-    if (s && !s[0])
+    if (!s || !s[0]) {
         keyword = P_ANY;
-    else
+    } 
+    else {
         keyword = findparam(s, u->faction->locale);
+    }
 
     sfp = &u->faction->allies;
     if (fval(u, UFL_GROUP)) {
@@ -1990,7 +1992,7 @@ int mail_cmd(unit * u, struct order *ord)
     s = gettoken(token, sizeof(token));
 
     /* Falls kein Parameter, ist das eine Einheitsnummer;
-     * das Füllwort "AN" muß wegfallen, da gültige Nummer! */
+     * das Füllwort "AN" muss wegfallen, da gültige Nummer! */
 
     do {
         cont = 0;
@@ -3020,13 +3022,7 @@ int renumber_cmd(unit * u, order * ord)
                 break;
             }
         }
-        uunhash(u);
-        if (!ualias(u)) {
-            attrib *a = a_add(&u->attribs, a_new(&at_alias));
-            a->data.i = -u->no;
-        }
-        u->no = i;
-        uhash(u);
+        renumber_unit(u, i);
         break;
 
     case P_SHIP:
@@ -3407,126 +3403,101 @@ void new_units(void)
     }
 }
 
-/** Checks for two long orders and issues a warning if necessary.
- */
-void check_long_orders(unit * u)
+void update_long_order(unit * u)
 {
     order *ord;
-    keyword_t otherorder = MAXKEYWORDS;
+    bool exclusive = true;
+    keyword_t thiskwd = NOKEYWORD;
+    bool hunger = LongHunger(u);
 
+    freset(u, UFL_MOVED);
+    freset(u, UFL_LONGACTION);
+
+    /* check all orders for a potential new long order this round: */
     for (ord = u->orders; ord; ord = ord->next) {
-        if (getkeyword(ord) == NOKEYWORD) {
-            cmistake(u, ord, 22, MSG_EVENT);
+        keyword_t kwd = getkeyword(ord);
+        if (kwd == NOKEYWORD) continue;
+
+        if (u->old_orders && is_repeated(kwd)) {
+            /* this new order will replace the old defaults */
+            free_orders(&u->old_orders);
         }
-        else if (is_long(ord)) {
-            keyword_t longorder = getkeyword(ord);
-            if (otherorder != MAXKEYWORDS) {
-                switch (longorder) {
+
+        // hungry units do not get long orders:
+        if (hunger)  {
+            if (u->old_orders) {
+                // keep looking for repeated orders that might clear the old_orders
+                continue;
+            }
+            break;
+        }
+
+        if (is_long(kwd)) {
+            if (thiskwd == NOKEYWORD) {
+                // we have found the (first) long order
+                // some long orders can have multiple instances:
+                switch (kwd) {
+                    /* Wenn gehandelt wird, darf kein langer Befehl ausgeführt
+                    * werden. Da Handel erst nach anderen langen Befehlen kommt,
+                    * muss das vorher abgefangen werden. Wir merken uns also
+                    * hier, ob die Einheit handelt. */
+                case K_BUY:
+                case K_SELL:
                 case K_CAST:
-                    if (otherorder != longorder) {
+                    // non-exclusive orders can be used with others. BUY can be paired with SELL,
+                    // CAST with other CAST orders. compatibility is checked once the second
+                    // long order is analyzed (below).
+                    exclusive = false;
+                    break;
+
+                default:
+                    set_order(&u->thisorder, copy_order(ord));
+                    break;
+                }
+                thiskwd = kwd;
+            }
+            else {
+                // we have found a second long order. this is okay for some, but not all commands.
+                // u->thisorder is already set, and should not have to be updated.
+                switch (kwd) {
+                case K_CAST:
+                    if (thiskwd != K_CAST) {
+                        cmistake(u, ord, 52, MSG_EVENT);
+                    }
+                    break;
+                case K_SELL:
+                    if (thiskwd != K_SELL && thiskwd != K_BUY) {
                         cmistake(u, ord, 52, MSG_EVENT);
                     }
                     break;
                 case K_BUY:
-                    if (otherorder == K_SELL) {
-                        otherorder = K_BUY;
+                    if (thiskwd != K_SELL) {
+                        cmistake(u, ord, 52, MSG_EVENT);
+                    }
+                    else {
+                        thiskwd = K_BUY;
+                    }
+                    break;
+                default:
+                    // TODO: decide https://bugs.eressea.de/view.php?id=2080#c6011
+                    if (kwd > thiskwd) {
+                        // swap out thisorder for the new one
+                        cmistake(u, u->thisorder, 52, MSG_EVENT);
+                        set_order(&u->thisorder, copy_order(ord));
                     }
                     else {
                         cmistake(u, ord, 52, MSG_EVENT);
                     }
                     break;
-                case K_SELL:
-                    if (otherorder != K_SELL && otherorder != K_BUY) {
-                        cmistake(u, ord, 52, MSG_EVENT);
-                    }
-                    break;
-                default:
-                    cmistake(u, ord, 52, MSG_EVENT);
                 }
             }
-            else {
-                otherorder = longorder;
-            }
         }
     }
-}
-
-void update_long_order(unit * u)
-{
-    order *ord;
-    bool trade = false;
-    bool hunger = LongHunger(u);
-
-    freset(u, UFL_MOVED);
-    freset(u, UFL_LONGACTION);
     if (hunger) {
-        /* Hungernde Einheiten führen NUR den default-Befehl aus */
+        // Hungernde Einheiten führen NUR den default-Befehl aus
         set_order(&u->thisorder, default_order(u->faction->locale));
-    }
-    else {
-        check_long_orders(u);
-    }
-    /* check all orders for a potential new long order this round: */
-    for (ord = u->orders; ord; ord = ord->next) {
-        if (getkeyword(ord) == NOKEYWORD)
-            continue;
-
-        if (u->old_orders && is_repeated(ord)) {
-            /* this new order will replace the old defaults */
-            free_orders(&u->old_orders);
-            if (hunger)
-                break;
-        }
-        if (hunger)
-            continue;
-
-        if (is_exclusive(ord)) {
-            /* Über dieser Zeile nur Befehle, die auch eine idle Faction machen darf */
-            if (idle(u->faction)) {
-                set_order(&u->thisorder, default_order(u->faction->locale));
-            }
-            else {
-                set_order(&u->thisorder, copy_order(ord));
-            }
-            break;
-        }
-        else {
-            keyword_t keyword = getkeyword(ord);
-            switch (keyword) {
-                /* Wenn gehandelt wird, darf kein langer Befehl ausgeführt
-                 * werden. Da Handel erst nach anderen langen Befehlen kommt,
-                 * muß das vorher abgefangen werden. Wir merken uns also
-                 * hier, ob die Einheit handelt. */
-            case K_BUY:
-            case K_SELL:
-                /* Wenn die Einheit handelt, muß der Default-Befehl gelöscht
-                 * werden.
-                 * Wird je diese Ausschliesslichkeit aufgehoben, muss man aufpassen
-                 * mit der Reihenfolge von Kaufen, Verkaufen etc., damit es Spielern
-                 * nicht moeglich ist, Schulden zu machen. */
-                trade = true;
-                break;
-
-            case K_CAST:
-                /* dient dazu, das neben Zaubern kein weiterer Befehl
-                 * ausgeführt werden kann, Zaubern ist ein kurzer Befehl */
-                set_order(&u->thisorder, copy_order(ord));
-                break;
-
-            default:
-                break;
-            }
-        }
-    }
-
-    if (hunger) {
-        return;
-    }
-    /* Wenn die Einheit handelt, muß der Default-Befehl gelöscht
-     * werden. */
-
-    if (trade) {
-        /* fset(u, UFL_LONGACTION|UFL_NOTMOVING); */
+    } else if (!exclusive) {
+        // Wenn die Einheit handelt oder zaubert, muss der Default-Befehl gelöscht werden.
         set_order(&u->thisorder, NULL);
     }
 }
@@ -3696,6 +3667,7 @@ void defaultorders(void)
                     free_order(ord);
                     if (!neworders) {
                         /* lange Befehle aus orders und old_orders löschen zu gunsten des neuen */
+                        // TODO: why only is_exclusive, not is_long? what about CAST, BUY, SELL?
                         remove_exclusive(&u->orders);
                         remove_exclusive(&u->old_orders);
                         neworders = true;
@@ -4489,7 +4461,7 @@ void init_processor(void)
     add_proc_order(p, K_TEACH, teach_cmd, PROC_THISORDER | PROC_LONGORDER,
         "Lehren");
     p += 10;
-    add_proc_order(p, K_STUDY, learn_cmd, PROC_THISORDER | PROC_LONGORDER,
+    add_proc_order(p, K_STUDY, study_cmd, PROC_THISORDER | PROC_LONGORDER,
         "Lernen");
 
     p += 10;

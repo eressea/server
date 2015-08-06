@@ -1274,25 +1274,10 @@ static int item_modification(const unit * u, skill_t sk, int val)
     return val;
 }
 
-static int update_gbdream(const unit * u, int bonus, curse *c, const curse_type *gbdream_ct, int sign){
-    if (curse_active(c) && c->type == gbdream_ct) {
-        double effect = curse_geteffect(c);
-        unit *mage = c->magician;
-        /* wir suchen jeweils den groessten Bonus und den groestsen Malus */
-        if (sign * effect > sign * bonus) {
-            if (mage == NULL || mage->number == 0
-                || (sign>0?alliedunit(mage, u->faction, HELP_GUARD):!alliedunit(mage, u->faction, HELP_GUARD))) {
-                bonus = (int)effect;
-            }
-        }
-    }
-    return bonus;
-}
-
-int att_modification(const unit * u, skill_t sk)
+static int att_modification(const unit * u, skill_t sk)
 {
     double result = 0;
-    static bool init = false;
+    static bool init = false; // TODO: static variables are bad global state
     static const curse_type *skillmod_ct, *gbdream_ct, *worse_ct;
     curse *c;
 
@@ -1321,15 +1306,21 @@ int att_modification(const unit * u, skill_t sk)
     /* TODO hier kann nicht mit get/iscursed gearbeitet werden, da nur der
      * jeweils erste vom Typ C_GBDREAM zurueckgegen wird, wir aber alle
      * durchsuchen und aufaddieren muessen */
-    if (u->region) {
+    if (gbdream_ct && u->region) {
         int bonus = 0, malus = 0;
         attrib *a = a_find(u->region->attribs, &at_curse);
         while (a && a->type == &at_curse) {
             curse *c = (curse *)a->data.v;
 
-            bonus = update_gbdream(u, bonus, c, gbdream_ct, 1);
-            malus = update_gbdream(u, malus, c, gbdream_ct, -1);
-
+            if (curse_active(c) && c->type == gbdream_ct) {
+                int effect = curse_geteffect_int(c);
+                bool allied = alliedunit(c->magician, u->faction, HELP_GUARD);
+                if (allied) {
+                    if (effect > bonus) bonus = effect;
+                } else {
+                    if (effect < malus) malus = effect;
+                }
+            }
             a = a->next;
         }
         result = result + bonus + malus;
@@ -1715,6 +1706,16 @@ int unit_getweight(const unit * u)
 int unit_getcapacity(const unit * u)
 {
     return walkingcapacity(u);
+}
+
+void renumber_unit(unit *u, int no) {
+    uunhash(u);
+    if (!ualias(u)) {
+        attrib *a = a_add(&u->attribs, a_new(&at_alias));
+        a->data.i = -u->no;
+    }
+    u->no = no;
+    uhash(u);
 }
 
 void unit_addorder(unit * u, order * ord)

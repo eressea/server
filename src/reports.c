@@ -52,6 +52,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <stream.h>
 #include <quicklist.h>
 
 /* libc includes */
@@ -59,6 +60,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <errno.h>
 #include <limits.h>
 #include <string.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <time.h>
 
@@ -793,7 +795,8 @@ size_t size)
             bool printed = 0;
             order *ord;;
             for (ord = u->old_orders; ord; ord = ord->next) {
-                if (is_repeated(ord)) {
+                keyword_t kwd = getkeyword(ord);
+                if (is_repeated(kwd)) {
                     if (printed < ORDERS_IN_NR) {
                         bytes = buforder(bufp, size, ord, printed++);
                         if (wrptr(&bufp, &size, bytes) != 0)
@@ -805,7 +808,8 @@ size_t size)
             }
             if (printed < ORDERS_IN_NR)
                 for (ord = u->orders; ord; ord = ord->next) {
-                    if (is_repeated(ord)) {
+                    keyword_t kwd = getkeyword(ord);
+                    if (is_repeated(kwd)) {
                         if (printed < ORDERS_IN_NR) {
                             bytes = buforder(bufp, size, ord, printed++);
                             if (wrptr(&bufp, &size, bytes) != 0)
@@ -2291,7 +2295,7 @@ static void eval_race(struct opstack **stack, const void *userdata)
 static void eval_order(struct opstack **stack, const void *userdata)
 {                               /* order -> string */
     const struct order *ord = (const struct order *)opop(stack).v;
-    char buf[512];
+    char buf[4096];
     size_t len;
     variant var;
 
@@ -2495,6 +2499,23 @@ static void log_orders(const struct message *msg)
             break;
         }
     }
+}
+
+int stream_printf(struct stream * out, const char *format, ...) {
+    va_list args;
+    int result;
+    char buffer[4096];
+    size_t bytes = sizeof(buffer);
+    // TODO: should be in storage/stream.c (doesn't exist yet)
+    va_start(args, format);
+    result = vsnprintf(buffer, bytes, format, args);
+    if (result >= 0 && (size_t)result < bytes) {
+        bytes = (size_t)result;
+        // TODO: else = buffer too small
+    }
+    out->api->write(out->handle, buffer, bytes);
+    va_end(args);
+    return result;
 }
 
 void register_reports(void)

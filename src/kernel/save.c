@@ -139,7 +139,8 @@ static unit *unitorders(FILE * F, int enc, struct faction *f)
             ordp = &u->old_orders;
             while (*ordp) {
                 order *ord = *ordp;
-                if (!is_repeated(ord)) {
+                keyword_t kwd = getkeyword(ord);
+                if (!is_repeated(kwd)) {
                     *ordp = ord->next;
                     ord->next = NULL;
                     free_order(ord);
@@ -233,7 +234,7 @@ static faction *factionorders(void)
                 f->no, pass));
             return 0;
         }
-        /* Die Partei hat sich zumindest gemeldet, so daß sie noch
+        /* Die Partei hat sich zumindest gemeldet, so dass sie noch
          * nicht als untätig gilt */
 
         /* TODO: +1 ist ein Workaround, weil cturn erst in process_orders
@@ -309,8 +310,8 @@ int readorders(const char *filename)
                  * Partei, eine neue Einheit oder das File-Ende. Das switch() wird erneut
                  * durchlaufen, und die entsprechende Funktion aufgerufen. Man darf buf
                  * auf alle Fälle nicht überschreiben! Bei allen anderen Einträgen hier
-                 * muß buf erneut gefüllt werden, da die betreffende Information in nur
-                 * einer Zeile steht, und nun die nächste gelesen werden muß. */
+                 * muss buf erneut gefüllt werden, da die betreffende Information in nur
+                 * einer Zeile steht, und nun die nächste gelesen werden muss. */
 
         case P_NEXT:
             f = NULL;
@@ -777,7 +778,8 @@ void write_unit(struct gamedata *data, const unit * u)
         }
     }
     for (ord = u->orders; ord; ord = ord->next) {
-        if (u->old_orders && is_repeated(ord))
+        keyword_t kwd = getkeyword(ord);
+        if (u->old_orders && is_repeated(kwd))
             continue;                 /* has new defaults */
         if (is_persistent(ord)) {
             if (++p < MAXPERSISTENT) {
@@ -1603,7 +1605,6 @@ int readgame(const char *filename, bool backup)
 
         while (--p >= 0) {
             unit *u = read_unit(&gdata);
-            sc_mage *mage;
 
             if (gdata.version < JSON_REPORT_VERSION) {
                 if (u->_name && fval(u->faction, FFL_NPC)) {
@@ -1618,21 +1619,6 @@ int readgame(const char *filename, bool backup)
             up = &u->next;
 
             update_interval(u->faction, u->region);
-            mage = get_mage(u);
-            if (mage) {
-                faction *f = u->faction;
-                int skl = effskill(u, SK_MAGIC);
-                if (!fval(f, FFL_NPC) && f->magiegebiet == M_GRAY) {
-                    log_error("faction %s had magic=gray, fixing (%s)\n", factionname(f), magic_school[mage->magietyp]);
-                    f->magiegebiet = mage->magietyp;
-                }
-                if (f->max_spelllevel < skl) {
-                    f->max_spelllevel = skl;
-                }
-                if (mage->spellcount < 0) {
-                    mage->spellcount = 0;
-                }
-            }
         }
     }
     log_printf(stdout, "\n");
@@ -1656,6 +1642,7 @@ int readgame(const char *filename, bool backup)
     for (f = factions; f; f = f->next) {
         if (f->flags & FFL_NPC) {
             f->alive = 1;
+            f->magiegebiet = M_GRAY;
             if (f->no == 0) {
                 int no = 666;
                 while (findfaction(no))
@@ -1666,8 +1653,23 @@ int readgame(const char *filename, bool backup)
         }
         else {
             for (u = f->units; u; u = u->nextF) {
+                sc_mage *mage = get_mage(u);
+                if (mage) {
+                    faction *f = u->faction;
+                    int skl = effskill(u, SK_MAGIC);
+                    if (f->magiegebiet == M_GRAY) {
+                        log_error("faction %s had magic=gray, fixing (%s)\n", factionname(f), magic_school[mage->magietyp]);
+                        f->magiegebiet = mage->magietyp;
+                    }
+                    if (f->max_spelllevel < skl) {
+                        f->max_spelllevel = skl;
+                    }
+                    if (mage->spellcount < 0) {
+                        mage->spellcount = 0;
+                    }
+                }
                 if (u->number > 0) {
-                    f->alive = 1;
+                    f->alive = true;
                     break;
                 }
             }
