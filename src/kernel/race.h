@@ -118,7 +118,6 @@ extern "C" {
     extern int num_races;
 
     typedef struct race {
-        struct param *parameters;
         char *_name;
         float magres;
         float maxaura;              /* Faktor auf Maximale Aura */
@@ -139,6 +138,7 @@ extern "C" {
         int df_default;             /* Verteidigungsskill Unbewaffnet (default: -2) */
         int at_bonus;               /* Verändert den Angriffsskill (default: 0) */
         int df_bonus;               /* Verändert den Verteidigungskill (default: 0) */
+        struct param *parameters;   // additional properties, for an example see natural_armor
         const struct spell *precombatspell;
         signed char *study_speed;   /* study-speed-bonus in points/turn (0=30 Tage) */
         int flags;

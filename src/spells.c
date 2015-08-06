@@ -36,7 +36,6 @@
 #include <kernel/connection.h>
 #include <kernel/building.h>
 #include <kernel/curse.h>
-#include <kernel/spellid.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
@@ -6663,7 +6662,6 @@ static spelldata spell_functions[] = {
     { "firestorm", sp_immolation, 0 },
     { "coldfront", sp_immolation, 0 },
     { "acidrain", sp_immolation, 0 },
-    /* SPL_NOSPELL  MUSS der letzte Spruch der Liste sein */
     { 0, 0, 0 }
 };
 

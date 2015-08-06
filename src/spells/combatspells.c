@@ -25,7 +25,6 @@
 #include <kernel/region.h>
 #include <kernel/unit.h>
 #include <kernel/spell.h>
-#include <kernel/spellid.h>
 #include <kernel/race.h>
 #include <kernel/terrain.h>
 
@@ -46,6 +45,30 @@
 #include <string.h>
 
 #define EFFECT_HEALING_SPELL     5
+
+// Some spells with a fixed, known ID (in XML).
+// TODO: this method of identifying spells is error-prone, do not use it for new spells.
+enum {
+    SPL_FIREBALL = 4,
+    SPL_HAGEL = 5,
+    SPL_CHAOSROW = 18,
+    SPL_FLEE = 20,
+    SPL_SONG_OF_FEAR = 21,
+    SPL_BERSERK = 22,
+    SPL_BLOODTHIRST = 23,
+    SPL_WINDSHIELD = 59,
+    SPL_HERO = 76,
+    SPL_METEORRAIN = 108,
+    SPL_REDUCESHIELD = 109,
+    SPL_ARMORSHIELD = 110,
+    SPL_DRAIG_FUMBLESHIELD = 143,
+    SPL_GWYRRD_FUMBLESHIELD = 144,
+    SPL_CERRDOR_FUMBLESHIELD = 145,
+    SPL_TYBIED_FUMBLESHIELD = 146,
+    SPL_SHADOWKNIGHTS = 147,
+    SPL_SHOCKWAVE = 163,
+    SPL_AURA_OF_FEAR = 175
+};
 
 /* ------------------------------------------------------------------ */
 /* Kampfzauberfunktionen */
