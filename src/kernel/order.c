@@ -115,7 +115,9 @@ char* get_command(const order *ord, char *sbuffer, size_t size) {
             assert(str);
             if (text) --size;
             bytes = (int)strlcpy(bufp, str, size);
-            if (wrptr(&bufp, &size, bytes) != 0) WARN_STATIC_BUFFER();
+            if (wrptr(&bufp, &size, bytes) != 0) {
+                WARN_STATIC_BUFFER();
+            }
             if (text) *bufp++ = ' ';
         }
         else {

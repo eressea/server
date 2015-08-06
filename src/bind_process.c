@@ -159,7 +159,7 @@ void process_quit(void) {
 
 void process_study(void) {
     process_cmd(K_TEACH, teach_cmd, PROC_LONG_ORDER);
-    process_cmd(K_STUDY, learn_cmd, PROC_LONG_ORDER);
+    process_cmd(K_STUDY, study_cmd, PROC_LONG_ORDER);
 }
 
 void process_movement(void) {

@@ -4461,7 +4461,7 @@ void init_processor(void)
     add_proc_order(p, K_TEACH, teach_cmd, PROC_THISORDER | PROC_LONGORDER,
         "Lehren");
     p += 10;
-    add_proc_order(p, K_STUDY, learn_cmd, PROC_THISORDER | PROC_LONGORDER,
+    add_proc_order(p, K_STUDY, study_cmd, PROC_THISORDER | PROC_LONGORDER,
         "Lernen");
 
     p += 10;
