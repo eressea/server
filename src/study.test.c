@@ -2,6 +2,7 @@
 
 #include "study.h"
 
+#include <kernel/config.h>
 #include <kernel/unit.h>
 #include <kernel/faction.h>
 #include <kernel/order.h>
@@ -26,6 +27,7 @@ static void setup_study(study_fixture *fix, skill_t sk) {
 
     assert(fix);
     test_cleanup();
+    set_param(&global.parameters, "study.random_progress", "0");
     test_create_world();
     r = test_create_region(0, 0, 0);
     f = test_create_faction(0);

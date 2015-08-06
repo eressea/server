@@ -1852,7 +1852,7 @@ static void do_combatspell(troop at)
         log_error("spell '%s' has no function.\n", sp->sname);
     }
     else {
-        level = cast_combatspell(at, sp, level, MagicPower(power));
+        level = cast_combatspell(at, sp, level, power);
     }
 }
 
@@ -1870,7 +1870,7 @@ static void do_extra_spell(troop at, const att * a)
     }
     else {
         assert(a->level > 0);
-        cast_combatspell(at, sp, a->level, MagicPower(a->level));
+        cast_combatspell(at, sp, a->level, a->level);
     }
 }
 

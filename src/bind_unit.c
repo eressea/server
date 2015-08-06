@@ -525,7 +525,7 @@ static void unit_castspell(unit * u, const char *name, int level)
             }
             else {
                 castorder co;
-                create_castorder(&co, u, 0, sp, u->region, level, MagicPower((float)level), 0, 0, 0);
+                create_castorder(&co, u, 0, sp, u->region, level, (double)level, 0, 0, 0);
                 sp->cast(&co);
                 free_castorder(&co);
             }
