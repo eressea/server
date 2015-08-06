@@ -118,7 +118,8 @@ static float MagicRegeneration(void)
     return value;
 }
 
-double MagicPower(double force) {
+static double MagicPower(double force)
+{
     if (force > 0) {
         const char *str = get_param(global.parameters, "magic.power");
         double value = str ? atof(str) : 1.0;
@@ -1073,8 +1074,6 @@ spellpower(region * r, unit * u, const spell * sp, int cast_level, struct order 
             }
         }
     }
-
-    force = MagicPower(force);
 
     return _max(force, 0);
 }
@@ -2073,7 +2072,7 @@ castorder *create_castorder(castorder * co, unit *caster, unit * familiar, const
     co->_familiar = familiar;
     co->sp = sp;
     co->level = lev;
-    co->force = force;
+    co->force = MagicPower(force);
     co->_rtarget = r ? r : (familiar ? familiar->region : (caster ? caster->region : 0));
     co->distance = range;
     co->order = copy_order(ord);
@@ -2821,7 +2820,7 @@ void magic(void)
                 continue;
             }
 
-            co->force = spellpower(target_r, u, sp, co->level, ord);
+            co->force = MagicPower(spellpower(target_r, u, sp, co->level, ord));
             /* die Stärke kann durch Antimagie auf 0 sinken */
             if (co->force <= 0) {
                 co->force = 0;
