@@ -513,7 +513,6 @@
             <F N="../src/items/speedsail.h"/>
             <F N="../src/kernel/spell.h"/>
             <F N="../src/kernel/spellbook.h"/>
-            <F N="../src/kernel/spellid.h"/>
             <F N="../src/spells/spells.h"/>
             <F N="../src/spy.h"/>
             <F N="../src/stdafx.h"/>
