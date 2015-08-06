@@ -1869,9 +1869,8 @@ static void do_extra_spell(troop at, const att * a)
         log_error("spell '%s' has no function.\n", sp->sname);
     }
     else {
-        double force = a->level * MagicPower();
         assert(a->level > 0);
-        cast_combatspell(at, sp, a->level, force);
+        cast_combatspell(at, sp, a->level, a->level);
     }
 }
 
