@@ -2295,7 +2295,7 @@ static void eval_race(struct opstack **stack, const void *userdata)
 static void eval_order(struct opstack **stack, const void *userdata)
 {                               /* order -> string */
     const struct order *ord = (const struct order *)opop(stack).v;
-    char buf[512];
+    char buf[4096];
     size_t len;
     variant var;
 
