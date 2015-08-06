@@ -49,7 +49,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/base36.h>
 #include <util/event.h>
 #include <util/functions.h>
-#include <util/goodies.h>
+#include <util/strings.h>
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/resolve.h>

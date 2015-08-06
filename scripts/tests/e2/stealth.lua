@@ -1,11 +1,11 @@
 require "lunit"
 
-module('eressea.tests.stealth', package.seeall, lunit.testcase)
+module('tests.e2.stealth', package.seeall, lunit.testcase)
 
 local f
 local u
 
-local settings
+local settings = {}
 
 local function set_rule(key, value)
     if value==nil then

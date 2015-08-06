@@ -14,7 +14,7 @@
 #include <platform.h>
 #include "message.h"
 
-#include "goodies.h"
+#include "strings.h"
 #include "log.h"
 #include "quicklist.h"
 

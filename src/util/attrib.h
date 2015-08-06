@@ -30,14 +30,14 @@ extern "C" {
     typedef struct attrib {
         const struct attrib_type *type;
         union {
-            afun f;
-            void *v;
+            afun f; //TODO: V117 http://www.viva64.com/en/V117 Memsize type is used in the union.
+            void *v; //TODO: V117 http://www.viva64.com/en/V117 Memsize type is used in the union.
             int i;
             float flt;
             char c;
             short s;
             short sa[2];
-            char ca[4];
+            char ca[4]; //TODO: V112 http://www.viva64.com/en/V112 Dangerous magic number 4 used: char ca[4];.
         } data;
         /* internal data, do not modify: */
         struct attrib *next;        /* next attribute in the list */
@@ -90,8 +90,8 @@ extern "C" {
 #define AT_READ_OK 0
 #define AT_READ_FAIL -1
 
-#define AT_AGE_REMOVE 0         /* remove the attribute after calling age() */
-#define AT_AGE_KEEP 1           /* keep the attribute for another turn */
+#define AT_AGE_KEEP 0           /* keep the attribute for another turn */
+#define AT_AGE_REMOVE 1         /* remove the attribute after calling age() */
 
 #ifdef __cplusplus
 }

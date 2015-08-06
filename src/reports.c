@@ -52,6 +52,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <stream.h>
 #include <quicklist.h>
 
 /* libc includes */
@@ -59,6 +60,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <errno.h>
 #include <limits.h>
 #include <string.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <time.h>
 
@@ -114,8 +116,18 @@ const char *combatstatus[] = {
 const char *report_kampfstatus(const unit * u, const struct locale *lang)
 {
     static char fsbuf[64]; // FIXME: static return value
+    const char * status = LOC(lang, combatstatus[u->status]);
 
-    strlcpy(fsbuf, LOC(lang, combatstatus[u->status]), sizeof(fsbuf));
+    if (!status) {
+        const char *lname = locale_name(lang);
+        struct locale *wloc = get_or_create_locale(lname);
+        log_error("no translation for combat status %s in %s", combatstatus[u->status], lname);
+        locale_setstring(wloc, combatstatus[u->status], combatstatus[u->status]);
+        strlcpy(fsbuf, combatstatus[u->status], sizeof(fsbuf));
+    }
+    else {
+        strlcpy(fsbuf, status, sizeof(fsbuf));
+    }
     if (fval(u, UFL_NOAID)) {
         strcat(fsbuf, ", ");
         strcat(fsbuf, LOC(lang, "status_noaid"));
@@ -126,18 +138,24 @@ const char *report_kampfstatus(const unit * u, const struct locale *lang)
 
 const char *hp_status(const unit * u)
 {
-    double p = (double)((double)u->hp / (double)(u->number * unit_max_hp(u)));
+    double p;
+    int max_hp = u->number * unit_max_hp(u);
 
-    if (p > 2.00)
-        return mkname("damage", "critical");
-    if (p > 1.50)
-        return mkname("damage", "heavily");
+    if (u->hp == max_hp)
+        return NULL;
+
+    p = (double)((double)u->hp / (double)(max_hp));
+
     if (p < 0.50)
         return mkname("damage", "badly");
     if (p < 0.75)
         return mkname("damage", "wounded");
     if (p < 0.99)
         return mkname("damage", "exhausted");
+    if (p > 2.00)
+        return mkname("damage", "plusstrong");
+    if (p > 1.50)
+        return mkname("damage", "strong");
 
     return NULL;
 }
@@ -210,19 +228,19 @@ const char **name, const char **basename, int *number, bool singular)
 static size_t buforder(char *bufp, size_t size, const order * ord, int mode)
 {
     size_t tsize = 0;
-    int bytes;
+    size_t bytes;
 
-    bytes = (int)strlcpy(bufp, ", \"", size);
+    bytes = strlcpy(bufp, ", \"", size);
     tsize += bytes;
     if (wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
     if (mode < ORDERS_IN_NR) {
         char cmd[ORDERSIZE];
         get_command(ord, cmd, sizeof(cmd));
-        bytes = (int)strlcpy(bufp, cmd, size);
+        bytes = strlcpy(bufp, cmd, size);
     }
     else {
-        bytes = (int)strlcpy(bufp, "...", size);
+        bytes = strlcpy(bufp, "...", size);
     }
     tsize += bytes;
     if (wrptr(&bufp, &size, bytes) != 0)
@@ -430,7 +448,7 @@ const faction * viewer)
 }
 
 int
-bufunit(const faction * f, const unit * u, int indent, int mode, char *buf,
+bufunit(const faction * f, const unit * u, unsigned int indent, int mode, char *buf,
 size_t size)
 {
     int i, dh;
@@ -446,15 +464,16 @@ size_t size)
     char *bufp = buf;
     bool itemcloak = false;
     const curse_type *itemcloak_ct = 0;
-    int bytes;
-    item result[MAX_INVENTORY];
+    int result = 0;
+    size_t bytes;
+    item results[MAX_INVENTORY];
 
     itemcloak_ct = ct_find("itemcloak");
     if (itemcloak_ct) {
         itemcloak = curse_active(get_curse(u->attribs, itemcloak_ct));
     }
 
-    bytes = (int)strlcpy(bufp, unitname(u), size);
+    bytes = strlcpy(bufp, unitname(u), size);
     if (wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
 
@@ -465,29 +484,29 @@ size_t size)
                 attrib *a = a_find(u->attribs, &at_group);
                 if (a) {
                     group *g = (group *)a->data.v;
-                    bytes = (int)strlcpy(bufp, ", ", size);
+                    bytes = strlcpy(bufp, ", ", size);
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
-                    bytes = (int)strlcpy(bufp, groupid(g, f), size);
+                    bytes = strlcpy(bufp, groupid(g, f), size);
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
                 }
             }
             if (getarnt) {
-                bytes = (int)strlcpy(bufp, ", ", size);
+                bytes = strlcpy(bufp, ", ", size);
                 if (wrptr(&bufp, &size, bytes) != 0)
                     WARN_STATIC_BUFFER();
-                bytes = (int)strlcpy(bufp, LOC(f->locale, "anonymous"), size);
+                bytes = strlcpy(bufp, LOC(f->locale, "anonymous"), size);
                 if (wrptr(&bufp, &size, bytes) != 0)
                     WARN_STATIC_BUFFER();
             }
             else if (a_otherfaction) {
                 faction *otherfaction = get_otherfaction(a_otherfaction);
                 if (otherfaction) {
-                    bytes = (int)strlcpy(bufp, ", ", size);
+                    bytes = strlcpy(bufp, ", ", size);
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
-                    bytes = (int)strlcpy(bufp, factionname(otherfaction), size);
+                    bytes = strlcpy(bufp, factionname(otherfaction), size);
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
                 }
@@ -495,27 +514,28 @@ size_t size)
         }
         else {
             if (getarnt) {
-                bytes = (int)strlcpy(bufp, ", ", size);
+                bytes = strlcpy(bufp, ", ", size);
                 if (wrptr(&bufp, &size, bytes) != 0)
                     WARN_STATIC_BUFFER();
-                bytes = (int)strlcpy(bufp, LOC(f->locale, "anonymous"), size);
+                bytes = strlcpy(bufp, LOC(f->locale, "anonymous"), size);
                 if (wrptr(&bufp, &size, bytes) != 0)
                     WARN_STATIC_BUFFER();
             }
             else {
                 if (a_otherfaction && alliedunit(u, f, HELP_FSTEALTH)) {
                     faction *f = get_otherfaction(a_otherfaction);
-                    bytes =
-                        _snprintf(bufp, size, ", %s (%s)", factionname(f),
+                    int result =
+                        (size_t)_snprintf(bufp, size, ", %s (%s)", factionname(f),
                         factionname(u->faction));
-                    if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0)
+                    bytes = (size_t)result;
+                    if (result < 0 || wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
                 }
                 else {
-                    bytes = (int)strlcpy(bufp, ", ", size);
+                    bytes = strlcpy(bufp, ", ", size);
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
-                    bytes = (int)strlcpy(bufp, factionname(fv), size);
+                    bytes = strlcpy(bufp, factionname(fv), size);
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
                 }
@@ -523,30 +543,31 @@ size_t size)
         }
     }
 
-    bytes = (int)strlcpy(bufp, ", ", size);
+    bytes = strlcpy(bufp, ", ", size);
     if (wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
 
     if (u->faction != f && a_fshidden && a_fshidden->data.ca[0] == 1
         && effskill(u, SK_STEALTH) >= 6) {
-        bytes = (int)strlcpy(bufp, "? ", size);
+        bytes = strlcpy(bufp, "? ", size);
     }
     else {
-        bytes = _snprintf(bufp, size, "%d ", u->number);
+        result = _snprintf(bufp, size, "%d ", u->number);
+        bytes = (size_t)result;
     }
-    if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0)
+    if (result < 0 || wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
 
     pzTmp = get_racename(u->attribs);
     if (pzTmp) {
-        bytes = (int)strlcpy(bufp, pzTmp, size);
+        bytes = strlcpy(bufp, pzTmp, size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
         if (u->faction == f && fval(u_race(u), RCF_SHAPESHIFTANY)) {
-            bytes = (int)strlcpy(bufp, " (", size);
+            bytes = strlcpy(bufp, " (", size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
-            bytes = (int)strlcpy(bufp, racename(f->locale, u, u_race(u)), size);
+            bytes = strlcpy(bufp, racename(f->locale, u, u_race(u)), size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
             if (size > 1) {
@@ -557,14 +578,14 @@ size_t size)
     }
     else {
         const race *irace = u_irace(u);
-        bytes = (int)strlcpy(bufp, racename(f->locale, u, irace), size);
+        bytes = strlcpy(bufp, racename(f->locale, u, irace), size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
         if (u->faction == f && irace != u_race(u)) {
-            bytes = (int)strlcpy(bufp, " (", size);
+            bytes = strlcpy(bufp, " (", size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
-            bytes = (int)strlcpy(bufp, racename(f->locale, u, u_race(u)), size);
+            bytes = strlcpy(bufp, racename(f->locale, u, u_race(u)), size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
             if (size > 1) {
@@ -575,10 +596,10 @@ size_t size)
     }
 
     if (fval(u, UFL_HERO) && (u->faction == f || omniscient(f))) {
-        bytes = (int)strlcpy(bufp, ", ", size);
+        bytes = strlcpy(bufp, ", ", size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
-        bytes = (int)strlcpy(bufp, LOC(f->locale, "hero"), size);
+        bytes = strlcpy(bufp, LOC(f->locale, "hero"), size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
     }
@@ -587,28 +608,28 @@ size_t size)
     if (u->number && (u->faction == f || telepath_see || isbattle)) {
         const char *c = hp_status(u);
         c = c ? LOC(f->locale, c) : 0;
-        bytes = (int)strlcpy(bufp, ", ", size);
+        bytes = strlcpy(bufp, ", ", size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
-        bytes = (int)strlcpy(bufp, report_kampfstatus(u, f->locale), size);
+        bytes = strlcpy(bufp, report_kampfstatus(u, f->locale), size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
         if (c || fval(u, UFL_HUNGER)) {
-            bytes = (int)strlcpy(bufp, " (", size);
+            bytes = strlcpy(bufp, " (", size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
             if (c) {
-                bytes = (int)strlcpy(bufp, c, size);
+                bytes = strlcpy(bufp, c, size);
                 if (wrptr(&bufp, &size, bytes) != 0)
                     WARN_STATIC_BUFFER();
             }
             if (fval(u, UFL_HUNGER)) {
                 if (c) {
-                    bytes = (int)strlcpy(bufp, ", ", size);
+                    bytes = strlcpy(bufp, ", ", size);
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
                 }
-                bytes = (int)strlcpy(bufp, LOC(f->locale, "unit_hungers"), size);
+                bytes = strlcpy(bufp, LOC(f->locale, "unit_hungers"), size);
                 if (wrptr(&bufp, &size, bytes) != 0)
                     WARN_STATIC_BUFFER();
             }
@@ -619,19 +640,19 @@ size_t size)
         }
     }
     if (is_guard(u, GUARD_ALL) != 0) {
-        bytes = (int)strlcpy(bufp, ", ", size);
+        bytes = strlcpy(bufp, ", ", size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
-        bytes = (int)strlcpy(bufp, LOC(f->locale, "unit_guards"), size);
+        bytes = strlcpy(bufp, LOC(f->locale, "unit_guards"), size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
     }
 
     if ((b = usiege(u)) != NULL) {
-        bytes = (int)strlcpy(bufp, ", belagert ", size);
+        bytes = strlcpy(bufp, ", belagert ", size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
-        bytes = (int)strlcpy(bufp, buildingname(b), size);
+        bytes = strlcpy(bufp, buildingname(b), size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
     }
@@ -640,7 +661,7 @@ size_t size)
     if (u->faction == f || telepath_see) {
         skill *sv;
         for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
-            bytes = (int)spskill(bufp, size, f->locale, u, sv, &dh, 1);
+            bytes = spskill(bufp, size, f->locale, u, sv, &dh, 1);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
         }
@@ -652,10 +673,10 @@ size_t size)
     }
     else if (!itemcloak && mode >= see_unit && !(a_fshidden
         && a_fshidden->data.ca[1] == 1 && effskill(u, SK_STEALTH) >= 3)) {
-        int n = report_items(u->items, result, MAX_INVENTORY, u, f);
+        int n = report_items(u->items, results, MAX_INVENTORY, u, f);
         assert(n >= 0);
         if (n > 0)
-            show = result;
+            show = results;
         else
             show = NULL;
     }
@@ -664,27 +685,29 @@ size_t size)
     }
     for (itm = show; itm; itm = itm->next) {
         const char *ic;
-        int in, bytes;
+        int in;
         report_item(u, itm, f, &ic, NULL, &in, false);
         if (in == 0 || ic == NULL)
             continue;
-        bytes = (int)strlcpy(bufp, ", ", size);
+        bytes = strlcpy(bufp, ", ", size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
 
         if (!dh) {
-            bytes = _snprintf(bufp, size, "%s: ", LOC(f->locale, "nr_inventory"));
-            if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0)
+            result = _snprintf(bufp, size, "%s: ", LOC(f->locale, "nr_inventory"));
+            bytes = (size_t)result;
+            if (result < 0 || wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
             dh = 1;
         }
         if (in == 1) {
-            bytes = (int)strlcpy(bufp, ic, size);
+            bytes = strlcpy(bufp, ic, size);
         }
         else {
-            bytes = _snprintf(bufp, size, "%d %s", in, ic);
+            result = _snprintf(bufp, size, "%d %s", in, ic);
+            bytes = (size_t)result;
         }
-        if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0)
+        if (result < 0 || wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
     }
 
@@ -694,26 +717,29 @@ size_t size)
         if (book) {
             quicklist *ql = book->spells;
             int qi, header, maxlevel = effskill(u, SK_MAGIC);
-            int bytes = _snprintf(bufp, size, ". Aura %d/%d", get_spellpoints(u), max_spellpoints(u->region, u));
-            if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0) {
+            int result = _snprintf(bufp, size, ". Aura %d/%d", get_spellpoints(u), max_spellpoints(u->region, u));
+            size_t bytes = (size_t)result;
+            if (result < 0 || wrptr(&bufp, &size, bytes) != 0) {
                 WARN_STATIC_BUFFER();
             }
 
             for (header = 0, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
                 spellbook_entry * sbe = (spellbook_entry *)ql_get(ql, qi);
                 if (sbe->level <= maxlevel) {
+                    int result = 0;
                     if (!header) {
-                        bytes = _snprintf(bufp, size, ", %s: ", LOC(f->locale, "nr_spells"));
+                        result = _snprintf(bufp, size, ", %s: ", LOC(f->locale, "nr_spells"));
+                        bytes = (size_t)result;
                         header = 1;
                     }
                     else {
-                        bytes = (int)strlcpy(bufp, ", ", size);
+                        bytes = strlcpy(bufp, ", ", size);
                     }
-                    if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0) {
+                    if (result < 0 || wrptr(&bufp, &size, bytes) != 0) {
                         WARN_STATIC_BUFFER();
                     }
-                    bytes = (int)strlcpy(bufp, spell_name(sbe->sp, f->locale), size);
-                    if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0) {
+                    bytes = strlcpy(bufp, spell_name(sbe->sp, f->locale), size);
+                    if (wrptr(&bufp, &size, bytes) != 0) {
                         WARN_STATIC_BUFFER();
                     }
                 }
@@ -724,9 +750,10 @@ size_t size)
                     break;
             }
             if (i != MAXCOMBATSPELLS) {
-                bytes =
+                int result =
                     _snprintf(bufp, size, ", %s: ", LOC(f->locale, "nr_combatspells"));
-                if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0)
+                size_t bytes = (size_t)result;
+                if (result < 0 || wrptr(&bufp, &size, bytes) != 0)
                     WARN_STATIC_BUFFER();
 
                 dh = 0;
@@ -736,7 +763,7 @@ size_t size)
                         dh = 1;
                     }
                     else {
-                        bytes = (int)strlcpy(bufp, ", ", size);
+                        bytes = strlcpy(bufp, ", ", size);
                         if (bytes && wrptr(&bufp, &size, bytes) != 0) {
                             WARN_STATIC_BUFFER();
                         }
@@ -744,20 +771,20 @@ size_t size)
                     sp = get_combatspell(u, i);
                     if (sp) {
                         int sl = get_combatspelllevel(u, i);
-                        bytes =
-                            (int)strlcpy(bufp, spell_name(sp, u->faction->locale), size);
+                        bytes = strlcpy(bufp, spell_name(sp, u->faction->locale), size);
                         if (bytes && wrptr(&bufp, &size, bytes) != 0) {
                             WARN_STATIC_BUFFER();
                         }
 
                         if (sl > 0) {
-                            bytes = _snprintf(bufp, size, " (%d)", sl);
-                            if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0)
+                            result = _snprintf(bufp, size, " (%d)", sl);
+                            bytes = (size_t)result;
+                            if (result < 0 || wrptr(&bufp, &size, bytes) != 0)
                                 WARN_STATIC_BUFFER();
                         }
                     }
                     else {
-                        bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_nospells"), size);
+                        bytes = strlcpy(bufp, LOC(f->locale, "nr_nospells"), size);
                         if (bytes && wrptr(&bufp, &size, bytes) != 0)
                             WARN_STATIC_BUFFER();
                     }
@@ -768,9 +795,10 @@ size_t size)
             bool printed = 0;
             order *ord;;
             for (ord = u->old_orders; ord; ord = ord->next) {
-                if (is_repeated(ord)) {
+                keyword_t kwd = getkeyword(ord);
+                if (is_repeated(kwd)) {
                     if (printed < ORDERS_IN_NR) {
-                        bytes = (int)buforder(bufp, size, ord, printed++);
+                        bytes = buforder(bufp, size, ord, printed++);
                         if (wrptr(&bufp, &size, bytes) != 0)
                             WARN_STATIC_BUFFER();
                     }
@@ -780,9 +808,10 @@ size_t size)
             }
             if (printed < ORDERS_IN_NR)
                 for (ord = u->orders; ord; ord = ord->next) {
-                    if (is_repeated(ord)) {
+                    keyword_t kwd = getkeyword(ord);
+                    if (is_repeated(kwd)) {
                         if (printed < ORDERS_IN_NR) {
-                            bytes = (int)buforder(bufp, size, ord, printed++);
+                            bytes = buforder(bufp, size, ord, printed++);
                             if (wrptr(&bufp, &size, bytes) != 0)
                                 WARN_STATIC_BUFFER();
                         }
@@ -796,11 +825,11 @@ size_t size)
 
     str = u_description(u, f->locale);
     if (str) {
-        bytes = (int)strlcpy(bufp, "; ", size);
+        bytes = strlcpy(bufp, "; ", size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
 
-        bytes = (int)strlcpy(bufp, str, size);
+        bytes = strlcpy(bufp, str, size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
 
@@ -814,13 +843,13 @@ size_t size)
     }
     pzTmp = uprivate(u);
     if (u->faction == f && pzTmp) {
-        bytes = (int)strlcpy(bufp, " (Bem: ", size);
+        bytes = strlcpy(bufp, " (Bem: ", size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
-        bytes = (int)strlcpy(bufp, pzTmp, size);
+        bytes = strlcpy(bufp, pzTmp, size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
-        bytes = (int)strlcpy(bufp, ")", size);
+        bytes = strlcpy(bufp, ")", size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
     }
@@ -848,7 +877,7 @@ const struct unit * u, struct skill * sv, int *dh, int days)
 {
     char *bufp = buffer;
     int i, effsk;
-    int bytes;
+    size_t bytes;
     size_t tsize = 0;
 
     if (!u->number)
@@ -859,30 +888,30 @@ const struct unit * u, struct skill * sv, int *dh, int days)
         }
     }
 
-    bytes = (int)strlcpy(bufp, ", ", size);
+    bytes = strlcpy(bufp, ", ", size);
     tsize += bytes;
     if (wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
 
     if (!*dh) {
-        bytes = (int)strlcpy(bufp, LOC(lang, "nr_skills"), size);
+        bytes = strlcpy(bufp, LOC(lang, "nr_skills"), size);
         tsize += bytes;
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
 
-        bytes = (int)strlcpy(bufp, ": ", size);
+        bytes = strlcpy(bufp, ": ", size);
         tsize += bytes;
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
 
         *dh = 1;
     }
-    bytes = (int)strlcpy(bufp, skillname(sv->id, lang), size);
+    bytes = strlcpy(bufp, skillname(sv->id, lang), size);
     tsize += bytes;
     if (wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
 
-    bytes = (int)strlcpy(bufp, " ", size);
+    bytes = strlcpy(bufp, " ", size);
     tsize += bytes;
     if (wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
@@ -891,13 +920,13 @@ const struct unit * u, struct skill * sv, int *dh, int days)
         sc_mage *mage = get_mage(u);
         if (mage && mage->magietyp != M_GRAY) {
             bytes =
-                (int)strlcpy(bufp, LOC(lang, mkname("school",
+                strlcpy(bufp, LOC(lang, mkname("school",
                 magic_school[mage->magietyp])), size);
             tsize += bytes;
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
 
-            bytes = (int)strlcpy(bufp, " ", size);
+            bytes = strlcpy(bufp, " ", size);
             tsize += bytes;
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
@@ -941,9 +970,60 @@ const struct unit * u, struct skill * sv, int *dh, int days)
     return tsize;
 }
 
-void lparagraph(struct strlist **SP, char *s, int indent, char mark)
+void split_paragraph(strlist ** SP, const char *s, unsigned int indent, unsigned int width, char mark)
 {
 
+    /* Die Liste SP wird mit dem String s aufgefuellt, mit indent und einer
+    * mark, falls angegeben. SP wurde also auf 0 gesetzt vor dem Aufruf.
+    * Vgl. spunit (). */
+    bool firstline;
+    static char buf[REPORTWIDTH + 1]; // FIXME: static buffer, artificial limit
+    size_t len = strlen(s);
+
+    assert(width <= REPORTWIDTH);
+    width -= indent;
+    firstline = (mark != 0 && indent > 2);
+    *SP = 0;
+
+    while (len > 0) {
+        unsigned int j;
+        const char *cut = 0, *space = strchr(s, ' ');
+        while (space && *space && (space - s) <= (ptrdiff_t)width) {
+            cut = space;
+            space = strchr(space + 1, ' ');
+            if (!space && len < width) {
+                cut = space = s + len;
+            }
+        }
+
+        for (j = 0; j != indent; j++)
+            buf[j] = ' ';
+
+        if (firstline) {
+            buf[indent - 2] = mark;
+            firstline = false;
+        }
+        if (!cut) {
+            cut = s + _min(len, REPORTWIDTH);
+        }
+        strncpy(buf + indent, s, cut - s);
+        buf[indent + (cut - s)] = 0;
+        addstrlist(SP, buf); // TODO: too much string copying, cut out this function
+        while (*cut == ' ') {
+            ++cut;
+        }
+        len -= (cut - s);
+        s = cut;
+    }
+}
+
+void sparagraph(strlist ** SP, const char *s, unsigned int indent, char mark)
+{
+    split_paragraph(SP, s, indent, REPORTWIDTH, mark);
+}
+
+void lparagraph(struct strlist **SP, char *s, unsigned int indent, char mark)
+{
     /* Die Liste SP wird mit dem String s aufgefuellt, mit indent und einer
      * mark, falls angegeben. SP wurde also auf 0 gesetzt vor dem Aufruf.
      * Vgl. spunit (). */
@@ -961,7 +1041,7 @@ void lparagraph(struct strlist **SP, char *s, int indent, char mark)
 }
 
 void
-spunit(struct strlist **SP, const struct faction *f, const unit * u, int indent,
+spunit(struct strlist **SP, const struct faction *f, const unit * u, unsigned int indent,
 int mode)
 {
     char buf[DISPLAYSIZE];
@@ -1699,7 +1779,7 @@ static seen_region **prepare_report(faction * f)
 
 int write_reports(faction * f, time_t ltime)
 {
-    int backup = 1, maxbackup = 128 * 1000;
+    unsigned int backup = 1, maxbackup = 128 * 1000;
     bool gotit = false;
     struct report_context ctx;
     const char *encoding = "UTF-8";
@@ -1758,39 +1838,6 @@ int write_reports(faction * f, time_t ltime)
     return 0;
 }
 
-static void nmr_warnings(void)
-{
-    faction *f, *fa;
-#define FRIEND (HELP_GUARD|HELP_MONEY)
-    for (f = factions; f; f = f->next) {
-        if (!fval(f, FFL_NOIDLEOUT) && (turn - f->lastorders) >= 2) {
-            message *msg = NULL;
-            for (fa = factions; fa; fa = fa->next) {
-                int warn = 0;
-                if (get_param_int(global.parameters, "rules.alliances", 0) != 0) {
-                    if (f->alliance && f->alliance == fa->alliance) {
-                        warn = 1;
-                    }
-                }
-                else if (alliedfaction(NULL, f, fa, FRIEND)
-                    && alliedfaction(NULL, fa, f, FRIEND)) {
-                    warn = 1;
-                }
-                if (warn) {
-                    if (msg == NULL) {
-                        msg =
-                            msg_message("warn_dropout", "faction turns", f,
-                            turn - f->lastorders);
-                    }
-                    add_message(&fa->msgs, msg);
-                }
-            }
-            if (msg != NULL)
-                msg_release(msg);
-        }
-    }
-}
-
 static void report_donations(void)
 {
     region *r;
@@ -1835,8 +1882,14 @@ static void write_script(FILE * F, const faction * f)
     fputc('\n', F);
 }
 
+static void check_messages_exist(void) {
+    ct_checknames();
+}
+
 int init_reports(void)
 {
+    check_messages_exist();
+
     prepare_reports();
     {
         if (_access(reportpath(), 0) != 0) {
@@ -1863,7 +1916,6 @@ int reports(void)
     if (verbosity >= 1) {
         log_printf(stdout, "Writing reports for turn %d:", turn);
     }
-    nmr_warnings();
     report_donations();
     remove_empty_units();
 
@@ -1980,7 +2032,7 @@ f_regionid(const region * r, const faction * f, char *buffer, size_t size)
         int nx = r->x, ny = r->y;
         int named = (name && name[0]);
         pnormalize(&nx, &ny, pl);
-        adjust_coordinates(f, &nx, &ny, pl, r);
+        adjust_coordinates(f, &nx, &ny, pl);
         len = strlcpy(buffer, rname(r, f ? f->locale : 0), size);
         _snprintf(buffer + len, size - len, " (%d,%d%s%s)", nx, ny, named ? "," : "", (named) ? name : "");
         buffer[size - 1] = 0;
@@ -2052,6 +2104,7 @@ static void eval_spell(struct opstack **stack, const void *userdata)
     const struct spell *sp = (const struct spell *)opop(stack).v;
     const char *c =
         sp ? spell_name(sp, f->locale) : LOC(f->locale, "an_unknown_spell");
+    assert(c || !"spell without description!");
     size_t len = strlen(c);
     variant var;
 
@@ -2065,6 +2118,7 @@ static void eval_curse(struct opstack **stack, const void *userdata)
     const struct curse_type *sp = (const struct curse_type *)opop(stack).v;
     const char *c =
         sp ? curse_name(sp, f->locale) : LOC(f->locale, "an_unknown_curse");
+    assert(c || !"spell effect without description!");
     size_t len = strlen(c);
     variant var;
 
@@ -2265,8 +2319,9 @@ static void eval_resources(struct opstack **stack, const void *userdata)
     while (res != NULL && size > 4) {
         const char *rname =
             resourcename(res->type, (res->number != 1) ? NMF_PLURAL : 0);
-        int bytes = _snprintf(bufp, size, "%d %s", res->number, LOC(lang, rname));
-        if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0 || size < sizeof(buf) / 2) {
+        int result = _snprintf(bufp, size, "%d %s", res->number, LOC(lang, rname));
+        size_t bytes = (size_t)result;
+        if (result < 0 || wrptr(&bufp, &size, bytes) != 0 || size < sizeof(buf) / 2) {
             WARN_STATIC_BUFFER();
             break;
         }
@@ -2279,7 +2334,7 @@ static void eval_resources(struct opstack **stack, const void *userdata)
         }
     }
     *bufp = 0;
-    var.v = strcpy(balloc(bufp - buf + 1), buf);
+    var.v = strcpy(balloc((size_t)(bufp - buf + 1)), buf);
     opush(stack, var);
 }
 
@@ -2305,7 +2360,7 @@ static void eval_regions(struct opstack **stack, const void *userdata)
     }
     for (i = begin; i < end; ++i) {
         const char *rname = (const char *)regionname(regions->regions[i], report);
-        int bytes = (int)strlcpy(bufp, rname, size);
+        size_t bytes = strlcpy(bufp, rname, size);
         if (bytes && wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
 
@@ -2316,7 +2371,7 @@ static void eval_regions(struct opstack **stack, const void *userdata)
         }
     }
     *bufp = 0;
-    var.v = strcpy(balloc(bufp - buf + 1), buf);
+    var.v = strcpy(balloc((size_t)(bufp - buf + 1)), buf);
     opush(stack, var);
 }
 
@@ -2341,15 +2396,16 @@ static void eval_trail(struct opstack **stack, const void *userdata)
             region *r = regions->regions[i];
             const char *trail = trailinto(r, lang);
             const char *rn = f_regionid_s(r, report);
-            int bytes = _snprintf(bufp, size, trail, rn);
-            if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0)
+            int result = _snprintf(bufp, size, trail, rn);
+            size_t bytes = (size_t)result;
+            if (result < 0 || wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
 
             if (i + 2 < end) {
-                bytes = (int)strlcpy(bufp, ", ", size);
+                bytes = strlcpy(bufp, ", ", size);
             }
             else if (i + 1 < end) {
-                bytes = (int)strlcpy(bufp, LOC(lang, "list_and"), size);
+                bytes = strlcpy(bufp, LOC(lang, "list_and"), size);
             }
             else
                 bytes = 0;
@@ -2359,7 +2415,7 @@ static void eval_trail(struct opstack **stack, const void *userdata)
         }
     }
     *bufp = 0;
-    var.v = strcpy(balloc(bufp - buf + 1), buf);
+    var.v = strcpy(balloc((size_t)(bufp - buf + 1)), buf);
     opush(stack, var);
 #ifdef _SECURECRT_ERRCODE_VALUES_DEFINED
     if (errno == ERANGE) {
@@ -2443,6 +2499,23 @@ static void log_orders(const struct message *msg)
             break;
         }
     }
+}
+
+int stream_printf(struct stream * out, const char *format, ...) {
+    va_list args;
+    int result;
+    char buffer[4096];
+    size_t bytes = sizeof(buffer);
+    // TODO: should be in storage/stream.c (doesn't exist yet)
+    va_start(args, format);
+    result = vsnprintf(buffer, bytes, format, args);
+    if (result >= 0 && (size_t)result < bytes) {
+        bytes = (size_t)result;
+        // TODO: else = buffer too small
+    }
+    out->api->write(out->handle, buffer, bytes);
+    va_end(args);
+    return result;
 }
 
 void register_reports(void)

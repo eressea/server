@@ -38,9 +38,11 @@ for line in infile.readlines():
     if not options.has_key("reports"):
         continue
     reports = options["reports"].split(",")
-#    reports = reports + [ "iso.cr" ]
     prefix = "%(turn)s-%(faction)s." % options
     files=[]
+    times="../parteien"
+    if os.path.isfile(times):
+        files = files + [ times ]
     if options["compression"]=="zip":
         output = prefix+"zip"
         files = [output]

@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="utf-8"?>
 <messages>
  <message name="raindance_effect" section="magic">
     <type>
       <arg name="mage" type="unit"/>
     </type>
-    <text locale="de">"$if($isnull($mage),"Ein unentdeckter Magier",$unit($mage)) führt einen sonderbaren Tanz auf. Kurz darauf beginnt es zu regnen."</text>
+    <text locale="de">"$if($isnull($mage),"Ein unentdeckter Magier",$unit($mage)) fÃ¼hrt einen sonderbaren Tanz auf. Kurz darauf beginnt es zu regnen."</text>
     <text locale="en">"$if($isnull($mage),"an unseen magician",$unit($mage)) dances a strange dance. Shortly after, rain begins to fall on the fields."</text>
   </message>
 </messages>

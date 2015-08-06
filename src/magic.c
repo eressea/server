@@ -1,4 +1,4 @@
-/*
+ï»¿/*
 Copyright (c) 1998-2014,
 Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
@@ -76,6 +76,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <limits.h>
 #include <assert.h>
+#include <errno.h>
 #include <math.h>
 
 const char *magic_school[MAXMAGIETYP] = {
@@ -117,17 +118,13 @@ static float MagicRegeneration(void)
     return value;
 }
 
-float MagicPower(float force)
-{
-    static float value = -1.0;
-    if (force <= 0) {
-        return 0;
-    }
-    if (value < 0) {
+double MagicPower(double force) {
+    if (force > 0) {
         const char *str = get_param(global.parameters, "magic.power");
-        value = str ? (float)atof(str) : 1.0f;
+        double value = str ? atof(str) : 1.0;
+        return _max(value * force, 1.0f);
     }
-    return _max(value * force, 1.0f);
+    return 0;
 }
 
 static int a_readicastle(attrib * a, void *owner, struct storage *store)
@@ -196,7 +193,7 @@ attrib_type at_icastle = {
 extern int dice(int count, int value);
 
 /* ------------------------------------------------------------- */
-/* aus dem alten System übriggebliegene Funktionen, die bei der
+/* aus dem alten System Ã¼briggebliegene Funktionen, die bei der
  * Umwandlung von alt nach neu gebraucht werden */
 /* ------------------------------------------------------------- */
 
@@ -355,9 +352,9 @@ sc_mage *get_mage(const unit * u)
 /* ------------------------------------------------------------- */
 /* Ausgabe der Spruchbeschreibungen
 * Anzeige des Spruchs nur, wenn die Stufe des besten Magiers vorher
-* kleiner war (u->faction->seenspells). Ansonsten muss nur geprüft
+* kleiner war (u->faction->seenspells). Ansonsten muss nur geprÃ¼ft
 * werden, ob dieser Magier den Spruch schon kennt, und andernfalls der
-* Spruch zu seiner List-of-known-spells hinzugefügt werden.
+* Spruch zu seiner List-of-known-spells hinzugefÃ¼gt werden.
 */
 
 static int read_seenspell(attrib * a, void *owner, struct storage *store)
@@ -510,7 +507,7 @@ sc_mage *create_mage(unit * u, magic_t mtyp)
 }
 
 /* ------------------------------------------------------------- */
-/* Funktionen für die Bearbeitung der List-of-known-spells */
+/* Funktionen fÃ¼r die Bearbeitung der List-of-known-spells */
 
 int u_hasspell(const unit *u, const struct spell *sp)
 {
@@ -538,7 +535,7 @@ int get_combatspelllevel(const unit * u, int nr)
 }
 
 /* ------------------------------------------------------------- */
-/* Kampfzauber ermitteln, setzen oder löschen */
+/* Kampfzauber ermitteln, setzen oder lÃ¶schen */
 
 const spell *get_combatspell(const unit * u, int nr)
 {
@@ -563,7 +560,7 @@ void set_combatspell(unit * u, spell * sp, struct order *ord, int level)
 
     assert(mage || !"trying to set a combat spell for non-mage");
 
-    /* knowsspell prüft auf ist_magier, ist_spruch, kennt_spruch */
+    /* knowsspell prÃ¼ft auf ist_magier, ist_spruch, kennt_spruch */
     if (!knowsspell(u->region, u, sp)) {
         /* Fehler 'Spell not found' */
         cmistake(u, ord, 173, MSG_MAGIC);
@@ -629,7 +626,7 @@ void unset_combatspell(unit * u, spell * sp)
 }
 
 /* ------------------------------------------------------------- */
-/* Gibt die aktuelle Anzahl der Magiepunkte der Einheit zurück */
+/* Gibt die aktuelle Anzahl der Magiepunkte der Einheit zurÃ¼ck */
 int get_spellpoints(const unit * u)
 {
     sc_mage *m;
@@ -655,7 +652,7 @@ void set_spellpoints(unit * u, int sp)
 }
 
 /*
- * verändert die Anzahl der Magiepunkte der Einheit um +mp
+ * verÃ¤ndert die Anzahl der Magiepunkte der Einheit um +mp
  */
 int change_spellpoints(unit * u, int mp)
 {
@@ -674,7 +671,7 @@ int change_spellpoints(unit * u, int mp)
     return sp;
 }
 
-/* bietet die Möglichkeit, die maximale Anzahl der Magiepunkte mit
+/* bietet die MÃ¶glichkeit, die maximale Anzahl der Magiepunkte mit
  * Regionszaubern oder Attributen zu beinflussen
  */
 static int get_spchange(const unit * u)
@@ -690,13 +687,13 @@ static int get_spchange(const unit * u)
 
 /* ein Magier kann normalerweise maximal Stufe^2.1/1.2+1 Magiepunkte
  * haben.
- * Manche Rassen haben einen zusätzlichen Multiplikator
- * Durch Talentverlust (zB Insekten im Berg) können negative Werte
+ * Manche Rassen haben einen zusÃ¤tzlichen Multiplikator
+ * Durch Talentverlust (zB Insekten im Berg) kÃ¶nnen negative Werte
  * entstehen
  */
 
-/* Artefakt der Stärke
- * Ermöglicht dem Magier mehr Magiepunkte zu 'speichern'
+/* Artefakt der StÃ¤rke
+ * ErmÃ¶glicht dem Magier mehr Magiepunkte zu 'speichern'
  */
 /** TODO: at_skillmod daraus machen */
 static int use_item_aura(const region * r, const unit * u)
@@ -744,8 +741,8 @@ int change_maxspellpoints(unit * u, int csp)
 }
 
 /* ------------------------------------------------------------- */
-/* Counter für die bereits gezauberte Anzahl Sprüche pro Runde.
- * Um nur die Zahl der bereits gezauberten Sprüche zu ermitteln mit
+/* Counter fÃ¼r die bereits gezauberte Anzahl SprÃ¼che pro Runde.
+ * Um nur die Zahl der bereits gezauberten SprÃ¼che zu ermitteln mit
  * step = 0 aufrufen.
  */
 int countspells(unit * u, int step)
@@ -769,9 +766,9 @@ int countspells(unit * u, int step)
 }
 
 /* ------------------------------------------------------------- */
-/* Die für den Spruch benötigte Aura pro Stufe.
- * Die Grundkosten pro Stufe werden hier um 2^count erhöht. Der
- * Parameter count ist dabei die Anzahl der bereits gezauberten Sprüche
+/* Die fÃ¼r den Spruch benÃ¶tigte Aura pro Stufe.
+ * Die Grundkosten pro Stufe werden hier um 2^count erhÃ¶ht. Der
+ * Parameter count ist dabei die Anzahl der bereits gezauberten SprÃ¼che
  */
 int spellcost(unit * u, const spell * sp)
 {
@@ -779,7 +776,7 @@ int spellcost(unit * u, const spell * sp)
     int count = countspells(u, 0);
     const resource_type *r_aura = get_resourcetype(R_AURA);
 
-    for (k = 0; sp->components[k].type; k++) {
+    for (k = 0; sp->components && sp->components[k].type; k++) {
         if (sp->components[k].type == r_aura) {
             aura = sp->components[k].amount;
         }
@@ -789,18 +786,18 @@ int spellcost(unit * u, const spell * sp)
 }
 
 /* ------------------------------------------------------------- */
-/* SPC_LINEAR ist am höchstwertigen, dann müssen Komponenten für die
+/* SPC_LINEAR ist am hÃ¶chstwertigen, dann mÃ¼ssen Komponenten fÃ¼r die
  * Stufe des Magiers vorhanden sein.
- * SPC_LINEAR hat die gewünschte Stufe als multiplikator,
+ * SPC_LINEAR hat die gewÃ¼nschte Stufe als multiplikator,
  * nur SPC_FIX muss nur einmal vorhanden sein, ist also am
  * niedrigstwertigen und sollte von den beiden anderen Typen
- * überschrieben werden */
+ * Ã¼berschrieben werden */
 static int spl_costtyp(const spell * sp)
 {
     int k;
     int costtyp = SPC_FIX;
 
-    for (k = 0; sp->components[k].type; k++) {
+    for (k = 0; sp->components && sp->components[k].type; k++) {
         if (costtyp == SPC_LINEAR)
             return SPC_LINEAR;
 
@@ -808,7 +805,7 @@ static int spl_costtyp(const spell * sp)
             return SPC_LINEAR;
         }
 
-        /* wenn keine Fixkosten, Typ übernehmen */
+        /* wenn keine Fixkosten, Typ Ã¼bernehmen */
         if (sp->components[k].cost != SPC_FIX) {
             costtyp = sp->components[k].cost;
         }
@@ -817,10 +814,10 @@ static int spl_costtyp(const spell * sp)
 }
 
 /* ------------------------------------------------------------- */
-/* durch Komponenten und cast_level begrenzter maximal möglicher
+/* durch Komponenten und cast_level begrenzter maximal mÃ¶glicher
  * Level
  * Da die Funktion nicht alle Komponenten durchprobiert sondern beim
- * ersten Fehler abbricht, muss die Fehlermeldung später mit cancast()
+ * ersten Fehler abbricht, muss die Fehlermeldung spÃ¤ter mit cancast()
  * generiert werden.
  * */
 int eff_spelllevel(unit * u, const spell * sp, int cast_level, int range)
@@ -829,13 +826,13 @@ int eff_spelllevel(unit * u, const spell * sp, int cast_level, int range)
     int k, maxlevel, needplevel;
     int costtyp = SPC_FIX;
 
-    for (k = 0; sp->components[k].type; k++) {
+    for (k = 0; sp->components && sp->components[k].type; k++) {
         if (cast_level == 0)
             return 0;
 
         if (sp->components[k].amount > 0) {
-            /* Die Kosten für Aura sind auch von der Zahl der bereits
-             * gezauberten Sprüche abhängig */
+            /* Die Kosten fÃ¼r Aura sind auch von der Zahl der bereits
+             * gezauberten SprÃ¼che abhÃ¤ngig */
             if (sp->components[k].type == r_aura) {
                 needplevel = spellcost(u, sp) * range;
             }
@@ -847,18 +844,18 @@ int eff_spelllevel(unit * u, const spell * sp, int cast_level, int range)
                 needplevel * cast_level) / needplevel;
 
             /* sind die Kosten fix, so muss die Komponente nur einmal vorhanden
-             * sein und der cast_level ändert sich nicht */
+             * sein und der cast_level Ã¤ndert sich nicht */
             if (sp->components[k].cost == SPC_FIX) {
                 if (maxlevel < 1)
                     cast_level = 0;
-                /* ansonsten wird das Minimum aus maximal möglicher Stufe und der
-                 * gewünschten gebildet */
+                /* ansonsten wird das Minimum aus maximal mÃ¶glicher Stufe und der
+                 * gewÃ¼nschten gebildet */
             }
             else if (sp->components[k].cost == SPC_LEVEL) {
                 costtyp = SPC_LEVEL;
                 cast_level = _min(cast_level, maxlevel);
-                /* bei Typ Linear müssen die Kosten in Höhe der Stufe vorhanden
-                 * sein, ansonsten schlägt der Spruch fehl */
+                /* bei Typ Linear mÃ¼ssen die Kosten in HÃ¶he der Stufe vorhanden
+                 * sein, ansonsten schlÃ¤gt der Spruch fehl */
             }
             else if (sp->components[k].cost == SPC_LINEAR) {
                 costtyp = SPC_LINEAR;
@@ -885,7 +882,7 @@ int eff_spelllevel(unit * u, const spell * sp, int cast_level, int range)
 /* ------------------------------------------------------------- */
 /* Die Spruchgrundkosten werden mit der Entfernung (Farcasting)
  * multipliziert, wobei die Aurakosten ein Sonderfall sind, da sie sich
- * auch durch die Menge der bereits gezauberten Sprüche erhöht.
+ * auch durch die Menge der bereits gezauberten SprÃ¼che erhÃ¶ht.
  * Je nach Kostenart werden dann die Komponenten noch mit cast_level
  * multipliziert.
  */
@@ -896,7 +893,7 @@ void pay_spell(unit * u, const spell * sp, int cast_level, int range)
     int resuse;
 
     assert(cast_level > 0);
-    for (k = 0; sp->components[k].type; k++) {
+    for (k = 0; sp->components && sp->components[k].type; k++) {
         if (sp->components[k].type == r_aura) {
             resuse = spellcost(u, sp) * range;
         }
@@ -916,12 +913,12 @@ void pay_spell(unit * u, const spell * sp, int cast_level, int range)
 /* ------------------------------------------------------------- */
 /* Ein Magier kennt den Spruch und kann sich die Beschreibung anzeigen
  * lassen, wenn diese in seiner Spruchliste steht. Zaubern muss er ihn
- * aber dann immer noch nicht können, vieleicht ist seine Stufe derzeit
+ * aber dann immer noch nicht kÃ¶nnen, vieleicht ist seine Stufe derzeit
  * nicht ausreichend oder die Komponenten fehlen.
  */
 bool knowsspell(const region * r, const unit * u, const spell * sp)
 {
-    /* Ist überhaupt ein gültiger Spruch angegeben? */
+    /* Ist Ã¼berhaupt ein gÃ¼ltiger Spruch angegeben? */
     if (!sp || sp->id == 0) {
         return false;
     }
@@ -932,7 +929,7 @@ bool knowsspell(const region * r, const unit * u, const spell * sp)
 /* Um einen Spruch zu beherrschen, muss der Magier die Stufe des
  * Spruchs besitzen, nicht nur wissen, das es ihn gibt (also den Spruch
  * in seiner Spruchliste haben).
- * Kosten für einen Spruch können Magiepunkte, Silber, Kraeuter
+ * Kosten fÃ¼r einen Spruch kÃ¶nnen Magiepunkte, Silber, Kraeuter
  * und sonstige Gegenstaende sein.
  */
 
@@ -951,18 +948,18 @@ cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
     }
     /* reicht die Stufe aus? */
     if (eff_skill(u, SK_MAGIC, u->region) < level) {
-        /* die Einheit ist nicht erfahren genug für diesen Zauber */
+        /* die Einheit ist nicht erfahren genug fÃ¼r diesen Zauber */
         cmistake(u, ord, 169, MSG_MAGIC);
         return false;
     }
 
-    for (k = 0; sp->components[k].type; ++k) {
+    for (k = 0; sp->components && sp->components[k].type; ++k) {
         if (sp->components[k].amount > 0) {
             const resource_type *rtype = sp->components[k].type;
             int itemhave;
 
-            /* Die Kosten für Aura sind auch von der Zahl der bereits
-             * gezauberten Sprüche abhängig */
+            /* Die Kosten fÃ¼r Aura sind auch von der Zahl der bereits
+             * gezauberten SprÃ¼che abhÃ¤ngig */
             if (rtype == r_aura) {
                 itemanz = spellcost(u, sp) * range;
             }
@@ -970,7 +967,7 @@ cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
                 itemanz = sp->components[k].amount * range;
             }
 
-            /* sind die Kosten stufenabhängig, so muss itemanz noch mit dem
+            /* sind die Kosten stufenabhÃ¤ngig, so muss itemanz noch mit dem
              * level multipliziert werden */
             switch (sp->components[k].cost) {
             case SPC_LEVEL:
@@ -1007,15 +1004,15 @@ cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
  * Spruchitems und Antimagiefeldern zusammen. Es koennen noch die
  * Stufe des Spruchs und Magiekosten mit einfliessen.
  *
- * Die effektive Spruchstärke und ihre Auswirkungen werden in der
+ * Die effektive SpruchstÃ¤rke und ihre Auswirkungen werden in der
  * Spruchfunktionsroutine ermittelt.
  */
 
-float
+double
 spellpower(region * r, unit * u, const spell * sp, int cast_level, struct order *ord)
 {
     curse *c;
-    float force = (float)cast_level;
+    double force = cast_level;
     int elf_power;
     const struct resource_type *rtype;
 
@@ -1044,7 +1041,7 @@ spellpower(region * r, unit * u, const spell * sp, int cast_level, struct order 
     if (curse_active(c)) {
         unit *mage = c->magician;
         force -= curse_geteffect(c);
-        curse_changevigour(&r->attribs, c, (float)-cast_level);
+        curse_changevigour(&r->attribs, c, -cast_level);
         cmistake(u, ord, 185, MSG_MAGIC);
         if (mage != NULL && mage->faction != NULL) {
             if (force > 0) {
@@ -1083,7 +1080,7 @@ spellpower(region * r, unit * u, const spell * sp, int cast_level, struct order 
 }
 
 /* ------------------------------------------------------------- */
-/* farcasting() == 1 -> gleiche Region, da man mit Null nicht vernünfigt
+/* farcasting() == 1 -> gleiche Region, da man mit Null nicht vernÃ¼nfigt
  * rechnen kann */
 static int farcasting(unit * magician, region * r)
 {
@@ -1169,7 +1166,7 @@ double magic_resistance(unit * target)
     /* Bonus durch Artefakte */
     /* TODO (noch gibs keine) */
 
-    /* Bonus durch Gebäude */
+    /* Bonus durch GebÃ¤ude */
     {
         struct building *b = inside_building(target);
         const struct building_type *btype = b ? b->type : NULL;
@@ -1182,14 +1179,14 @@ double magic_resistance(unit * target)
 }
 
 /* ------------------------------------------------------------- */
-/* Prüft, ob das Objekt dem Zauber widerstehen kann.
- * Objekte können Regionen, Units, Gebäude oder Schiffe sein.
+/* PrÃ¼ft, ob das Objekt dem Zauber widerstehen kann.
+ * Objekte kÃ¶nnen Regionen, Units, GebÃ¤ude oder Schiffe sein.
  * TYP_UNIT:
- * Das höchste Talent des Ziels ist sein 'Magieresistenz-Talent', Magier
- * bekommen einen Bonus. Grundchance ist 50%, für jede Stufe
- * Unterschied gibt es 5%, minimalchance ist 5% für jeden (5-95%)
+ * Das hÃ¶chste Talent des Ziels ist sein 'Magieresistenz-Talent', Magier
+ * bekommen einen Bonus. Grundchance ist 50%, fÃ¼r jede Stufe
+ * Unterschied gibt es 5%, minimalchance ist 5% fÃ¼r jeden (5-95%)
  * Scheitert der Spruch an der Magieresistenz, so gibt die Funktion
- * true zurück
+ * true zurÃ¼ck
  */
 
 bool
@@ -1251,8 +1248,8 @@ target_resists_magic(unit * magician, void *obj, int objtyp, int t_bonus)
     probability = _min(0.98, probability);
 
     /* gibt true, wenn die Zufallszahl kleiner als die chance ist und
-     * false, wenn sie gleich oder größer ist, dh je größer die
-     * Magieresistenz (chance) desto eher gibt die Funktion true zurück */
+     * false, wenn sie gleich oder grÃ¶ÃŸer ist, dh je grÃ¶ÃŸer die
+     * Magieresistenz (chance) desto eher gibt die Funktion true zurÃ¼ck */
     return chance(probability);
 }
 
@@ -1279,7 +1276,7 @@ bool fumble(region * r, unit * u, const spell * sp, int cast_grade)
 {
     /* X ergibt Zahl zwischen 1 und 0, je kleiner, desto besser der Magier.
      * 0,5*40-20=0, dh wenn der Magier doppelt so gut ist, wie der Spruch
-     * benötigt, gelingt er immer, ist er gleich gut, gelingt der Spruch mit
+     * benÃ¶tigt, gelingt er immer, ist er gleich gut, gelingt der Spruch mit
      * 20% Warscheinlichkeit nicht
      * */
 
@@ -1309,8 +1306,8 @@ bool fumble(region * r, unit * u, const spell * sp, int cast_grade)
         fumble_chance += CHAOSPATZERCHANCE;
     }
 
-    /* wenn die Chance kleiner als 0 ist, können wir gleich false
-     * zurückgeben */
+    /* wenn die Chance kleiner als 0 ist, kÃ¶nnen wir gleich false
+     * zurÃ¼ckgeben */
     if (fumble_chance <= 0) {
         return false;
     }
@@ -1320,7 +1317,7 @@ bool fumble(region * r, unit * u, const spell * sp, int cast_grade)
 }
 
 /* ------------------------------------------------------------- */
-/* Dummy-Zauberpatzer, Platzhalter für speziel auf die Sprüche
+/* Dummy-Zauberpatzer, Platzhalter fÃ¼r speziel auf die SprÃ¼che
 * zugeschnittene Patzer */
 static void fumble_default(castorder * co)
 {
@@ -1331,7 +1328,7 @@ static void fumble_default(castorder * co)
     return;
 }
 
-/* Die normalen Spruchkosten müssen immer bezahlt werden, hier noch
+/* Die normalen Spruchkosten mÃ¼ssen immer bezahlt werden, hier noch
  * alle weiteren Folgen eines Patzers
  */
 
@@ -1343,7 +1340,7 @@ static void do_fumble(castorder * co)
     const spell *sp = co->sp;
     int level = co->level;
     int duration;
-    float effect;
+    double effect;
 
     ADDMSG(&u->faction->msgs,
         msg_message("patzer", "unit region spell", u, r, sp));
@@ -1385,15 +1382,15 @@ static void do_fumble(castorder * co)
     case 2:
         /* temporary skill loss */
         duration = _max(rng_int() % level / 2, 2);
-        effect = -(float)level / 2;
-        c = create_curse(u, &u->attribs, ct_find("skillmod"), (float)level,
+        effect = level / -2.0;
+        c = create_curse(u, &u->attribs, ct_find("skillmod"), level,
             duration, effect, 1);
         c->data.i = SK_MAGIC;
         ADDMSG(&u->faction->msgs, msg_message("patzer2", "unit region", u, r));
         break;
     case 3:
     case 4:
-        /* Spruch schlägt fehl, alle Magiepunkte weg */
+        /* Spruch schlÃ¤gt fehl, alle Magiepunkte weg */
         set_spellpoints(u, 0);
         ADDMSG(&u->faction->msgs, msg_message("patzer3", "unit region spell",
             u, r, sp));
@@ -1412,7 +1409,7 @@ static void do_fumble(castorder * co)
     case 8:
     case 9:
     default:
-        /* Spruch gelingt, alle nachfolgenden Sprüche werden 2^4 so teuer */
+        /* Spruch gelingt, alle nachfolgenden SprÃ¼che werden 2^4 so teuer */
         co->level = sp->cast(co);
         ADDMSG(&u->faction->msgs, msg_message("patzer5", "unit region spell",
             u, r, sp));
@@ -1425,7 +1422,7 @@ static void do_fumble(castorder * co)
 /* ------------------------------------------------------------- */
 
 /* Ein Magier regeneriert pro Woche W(Stufe^1.5/2+1), mindestens 1
- * Zwerge nur die Hälfte
+ * Zwerge nur die HÃ¤lfte
  */
 static double regeneration(unit * u)
 {
@@ -1442,7 +1439,7 @@ static double regeneration(unit * u)
     /* Einfluss von Artefakten */
     /* TODO (noch gibs keine) */
 
-    /* Würfeln */
+    /* WÃ¼rfeln */
     aura = (rng_double() * d + rng_double() * d) / 2 + 1;
 
     aura *= MagicRegeneration();
@@ -1472,8 +1469,8 @@ void regenerate_aura(void)
                     const struct building_type *btype = b ? b->type : NULL;
                     reg_aura = regeneration(u);
 
-                    /* Magierturm erhöht die Regeneration um 75% */
-                    /* Steinkreis erhöht die Regeneration um 50% */
+                    /* Magierturm erhÃ¶ht die Regeneration um 75% */
+                    /* Steinkreis erhÃ¶ht die Regeneration um 50% */
                     if (btype)
                         reg_aura *= btype->auraregen;
 
@@ -1612,14 +1609,14 @@ order * ord)
 
 /* ------------------------------------------------------------- */
 /* Zuerst wird versucht alle noch nicht gefundenen Objekte zu finden
- * oder zu prüfen, ob das gefundene Objekt wirklich hätte gefunden
- * werden dürfen (nicht alle Zauber wirken global). Dabei zählen wir die
+ * oder zu prÃ¼fen, ob das gefundene Objekt wirklich hÃ¤tte gefunden
+ * werden dÃ¼rfen (nicht alle Zauber wirken global). Dabei zÃ¤hlen wir die
  * Misserfolge (failed).
  * Dann folgen die Tests der gefundenen Objekte auf Magieresistenz und
- * Sichtbarkeit. Dabei zählen wir die magieresistenten (resists)
+ * Sichtbarkeit. Dabei zÃ¤hlen wir die magieresistenten (resists)
  * Objekte. Alle anderen werten wir als Erfolge (success) */
 
-/* gibt bei Misserfolg 0 zurück, bei Magieresistenz zumindeste eines
+/* gibt bei Misserfolg 0 zurÃ¼ck, bei Magieresistenz zumindeste eines
  * Objektes 1 und bei Erfolg auf ganzer Linie 2 */
 static void
 verify_targets(castorder * co, int *invalid, int *resist, int *success)
@@ -1637,8 +1634,8 @@ verify_targets(castorder * co, int *invalid, int *resist, int *success)
     if (sa && sa->length) {
         /* zuerst versuchen wir vorher nicht gefundene Objekte zu finden.
          * Wurde ein Objekt durch globalsuche gefunden, obwohl der Zauber
-         * gar nicht global hätte suchen dürften, setzen wir das Objekt
-         * zurück. */
+         * gar nicht global hÃ¤tte suchen dÃ¼rften, setzen wir das Objekt
+         * zurÃ¼ck. */
         for (i = 0; i < sa->length; i++) {
             spllprm *spobj = sa->param[i];
 
@@ -1722,7 +1719,7 @@ verify_targets(castorder * co, int *invalid, int *resist, int *success)
 
             case SPP_REGION:
                 /* haben wir ein Regionsobjekt, dann wird auch dieses und
-                   nicht target_r überprüft. */
+                   nicht target_r Ã¼berprÃ¼ft. */
                 tr = spobj->data.r;
 
                 if ((sp->sptyp & TESTRESISTANCE)
@@ -1748,7 +1745,7 @@ verify_targets(castorder * co, int *invalid, int *resist, int *success)
     else {
         /* der Zauber hat keine expliziten Parameter/Ziele, es kann sich
          * aber um einen Regionszauber handeln. Wenn notwendig hier die
-         * Magieresistenz der Region prüfen. */
+         * Magieresistenz der Region prÃ¼fen. */
         if ((sp->sptyp & REGIONSPELL)) {
             /* Zielobjekt Region anlegen */
             spllprm *spobj = (spllprm *)malloc(sizeof(spllprm));
@@ -1785,16 +1782,17 @@ verify_targets(castorder * co, int *invalid, int *resist, int *success)
 }
 
 /* ------------------------------------------------------------- */
-/* Hilfsstrukturen für ZAUBERE */
+/* Hilfsstrukturen fÃ¼r ZAUBERE */
 /* ------------------------------------------------------------- */
 
 static void free_spellparameter(spellparameter * pa)
 {
     int i;
 
-    /* Elemente free'en */
-    for (i = 0; i < pa->length; i++) {
+    assert(pa->param);
 
+    for (i = 0; i < pa->length; i++) {
+        assert(pa->param[i]);
         switch (pa->param[i]->typ) {
         case SPP_STRING:
             free(pa->param[i]->data.s);
@@ -1804,10 +1802,7 @@ static void free_spellparameter(spellparameter * pa)
         }
         free(pa->param[i]);
     }
-
-    if (pa->param)
-        free(pa->param);
-    /* struct free'en */
+    free(pa->param);
     free(pa);
 }
 
@@ -1969,7 +1964,7 @@ static spellparameter *add_spellparameter(region * target_r, unit * u,
             break;
         case '+':
             /* das vorhergehende Element kommt ein oder mehrmals vor, wir
-             * springen zum key zurück */
+             * springen zum key zurÃ¼ck */
             j = 0;
             --c;
             break;
@@ -2070,7 +2065,7 @@ struct region * co_get_region(const struct castorder * co) {
 }
 
 castorder *create_castorder(castorder * co, unit *caster, unit * familiar, const spell * sp, region * r,
-    int lev, float force, int range, struct order * ord, spellparameter * p)
+    int lev, double force, int range, struct order * ord, spellparameter * p)
 {
     if (!co) co = (castorder*)calloc(1, sizeof(castorder));
 
@@ -2093,7 +2088,7 @@ void free_castorder(struct castorder *co)
     if (co->order) free_order(co->order);
 }
 
-/* Hänge c-order co an die letze c-order von cll an */
+/* HÃ¤nge c-order co an die letze c-order von cll an */
 void add_castorder(spellrank * cll, castorder * co)
 {
     if (cll->begin == NULL) {
@@ -2524,13 +2519,13 @@ static castorder *cast_cmd(unit * u, order * ord)
     init_order(ord);
     s = gettoken(token, sizeof(token));
     param = findparam(s, u->faction->locale);
-    /* für Syntax ' STUFE x REGION y z ' */
+    /* fÃ¼r Syntax ' STUFE x REGION y z ' */
     if (param == P_LEVEL) {
         int p = getint();
         level = _min(p, level);
         if (level < 1) {
             /* Fehler "Das macht wenig Sinn" */
-            cmistake(u, ord, 10, MSG_MAGIC);
+            syntax_error(u, ord);
             return 0;
         }
         s = gettoken(token, sizeof(token));
@@ -2553,19 +2548,19 @@ static castorder *cast_cmd(unit * u, order * ord)
         s = gettoken(token, sizeof(token));
         param = findparam(s, u->faction->locale);
     }
-    /* für Syntax ' REGION x y STUFE z '
-     * hier nach REGION nochmal auf STUFE prüfen */
+    /* fÃ¼r Syntax ' REGION x y STUFE z '
+     * hier nach REGION nochmal auf STUFE prÃ¼fen */
     if (param == P_LEVEL) {
         int p = getint();
         level = _min(p, level);
         if (level < 1) {
             /* Fehler "Das macht wenig Sinn" */
-            cmistake(u, ord, 10, MSG_MAGIC);
+            syntax_error(u, ord);
             return 0;
         }
         s = gettoken(token, sizeof(token));
     }
-    if (!s || !s[0] || strlen(s) == 0) {
+    if (!s || !s[0]) {
         /* Fehler "Es wurde kein Zauber angegeben" */
         cmistake(u, ord, 172, MSG_MAGIC);
         return 0;
@@ -2573,10 +2568,10 @@ static castorder *cast_cmd(unit * u, order * ord)
 
     sp = unit_getspell(u, s, u->faction->locale);
 
-    /* Vertraute können auch Zauber sprechen, die sie selbst nicht
-     * können. unit_getspell findet aber nur jene Sprüche, die
+    /* Vertraute kÃ¶nnen auch Zauber sprechen, die sie selbst nicht
+     * kÃ¶nnen. unit_getspell findet aber nur jene SprÃ¼che, die
      * die Einheit beherrscht. */
-    if (!sp && is_familiar(u)) {
+    if (!sp && is_familiar(u)) {    
         caster = get_familiar_mage(u);
         if (caster) {
             familiar = u;
@@ -2597,7 +2592,7 @@ static castorder *cast_cmd(unit * u, order * ord)
     /* um testen auf spruchnamen zu unterbinden sollte vor allen
      * fehlermeldungen die anzeigen das der magier diesen Spruch
      * nur in diese Situation nicht anwenden kann, noch eine
-     * einfache Sicherheitsprüfung kommen */
+     * einfache SicherheitsprÃ¼fung kommen */
     if (!knowsspell(r, u, sp)) {
         /* vorsicht! u kann der familiar sein */
         if (!familiar) {
@@ -2610,9 +2605,9 @@ static castorder *cast_cmd(unit * u, order * ord)
         cmistake(u, ord, 174, MSG_MAGIC);
         return 0;
     }
-    /* Auf dem Ozean Zaubern als quasi-langer Befehl können
+    /* Auf dem Ozean Zaubern als quasi-langer Befehl kÃ¶nnen
      * normalerweise nur Meermenschen, ausgenommen explizit als
-     * OCEANCASTABLE deklarierte Sprüche */
+     * OCEANCASTABLE deklarierte SprÃ¼che */
     if (fval(r->terrain, SEA_REGION)) {
         if (u_race(u) != get_race(RC_AQUARIAN)
             && !fval(u_race(u), RCF_SWIM)
@@ -2635,7 +2630,7 @@ static castorder *cast_cmd(unit * u, order * ord)
             }
         }
     }
-    /* Farcasting bei nicht farcastbaren Sprüchen abfangen */
+    /* Farcasting bei nicht farcastbaren SprÃ¼chen abfangen */
     range = farcasting(u, target_r);
     if (range > 1) {
         if (!(sp->sptyp & FARCASTING)) {
@@ -2650,7 +2645,7 @@ static castorder *cast_cmd(unit * u, order * ord)
             return 0;
         }
     }
-    /* Stufenangabe bei nicht Stufenvariierbaren Sprüchen abfangen */
+    /* Stufenangabe bei nicht Stufenvariierbaren SprÃ¼chen abfangen */
     if (!(sp->sptyp & SPELLLEVEL)) {
         int ilevel = eff_skill(u, SK_MAGIC, u->region);
         if (ilevel != level) {
@@ -2683,9 +2678,9 @@ static castorder *cast_cmd(unit * u, order * ord)
                     "mage", caster));
                 return 0;
             }
-            /* mage auf magier setzen, level anpassen, range für Erhöhung
+            /* mage auf magier setzen, level anpassen, range fÃ¼r ErhÃ¶hung
              * der Spruchkosten nutzen, langen Befehl des Magiers
-             * löschen, zaubern kann er noch */
+             * lÃ¶schen, zaubern kann er noch */
             range *= 2;
             set_order(&caster->thisorder, NULL);
             level = _min(level, eff_skill(caster, SK_MAGIC, caster->region) / 2);
@@ -2700,8 +2695,16 @@ static castorder *cast_cmd(unit * u, order * ord)
             if (!s || *s == 0)
                 break;
             if (p + 1 >= size) {
-                size *= 2;
-                params = (char**)realloc(params, sizeof(char *) * size);
+                char ** tmp;
+                tmp = (char**)realloc(params, sizeof(char *) * size * 2);
+                if (tmp) {
+                    size *= 2;
+                    params = tmp;
+                }
+                else {
+                    log_error("error allocationg %d bytes: %s", size * 2, strerror(errno));
+                    break;
+                }
             }
             params[p++] = _strdup(s);
         }
@@ -2724,19 +2727,19 @@ static castorder *cast_cmd(unit * u, order * ord)
 /* ------------------------------------------------------------- */
 /* Damit man keine Rituale in fremden Gebiet machen kann, diese vor
  * Bewegung zaubern. Magier sind also in einem fremden Gebiet eine Runde
- * lang verletzlich, da sie es betreten, und angegriffen werden können,
- * bevor sie ein Ritual machen können.
+ * lang verletzlich, da sie es betreten, und angegriffen werden kÃ¶nnen,
+ * bevor sie ein Ritual machen kÃ¶nnen.
  *
  * Syntax: ZAUBER [REGION X Y] [STUFE <stufe>] "Spruchname" [Einheit-1
  * Einheit-2 ..]
  *
- * Nach Priorität geordnet die Zauber global auswerten.
+ * Nach PrioritÃ¤t geordnet die Zauber global auswerten.
  *
- * Die Kosten für Farcasting multiplizieren sich mit der Entfernung,
+ * Die Kosten fÃ¼r Farcasting multiplizieren sich mit der Entfernung,
  * cast_level gibt die virtuelle Stufe an, die den durch das Farcasten
  * entstandenen Spruchkosten entspricht.  Sind die Spruchkosten nicht
- * levelabhängig, so sind die Kosten nur von der Entfernung bestimmt,
- * die Stärke/Level durch den realen Skill des Magiers
+ * levelabhÃ¤ngig, so sind die Kosten nur von der Entfernung bestimmt,
+ * die StÃ¤rke/Level durch den realen Skill des Magiers
  */
 
 void magic(void)
@@ -2764,26 +2767,24 @@ void magic(void)
                 continue;
             }
 
-            if (u->thisorder != NULL) {
-                for (ord = u->orders; ord; ord = ord->next) {
-                    if (getkeyword(ord) == K_CAST) {
-                        castorder *co = cast_cmd(u, ord);
-                        fset(u, UFL_LONGACTION | UFL_NOTMOVING);
-                        if (co) {
-                            const spell *sp = co->sp;
-                            add_castorder(&spellranks[sp->rank], co);
-                        }
+            for (ord = u->orders; ord; ord = ord->next) {
+                if (getkeyword(ord) == K_CAST) {
+                    castorder *co = cast_cmd(u, ord);
+                    fset(u, UFL_LONGACTION | UFL_NOTMOVING);
+                    if (co) {
+                        const spell *sp = co->sp;
+                        add_castorder(&spellranks[sp->rank], co);
                     }
                 }
             }
         }
     }
 
-    /* Da sich die Aura und Komponenten in der Zwischenzeit verändert
-     * haben können und sich durch vorherige Sprüche das Zaubern
-     * erschwert haben kann, muss beim zaubern erneut geprüft werden, ob der
-     * Spruch überhaupt gezaubert werden kann.
-     * (level) die effektive Stärke des Spruchs (= Stufe, auf der der
+    /* Da sich die Aura und Komponenten in der Zwischenzeit verÃ¤ndert
+     * haben kÃ¶nnen und sich durch vorherige SprÃ¼che das Zaubern
+     * erschwert haben kann, muss beim zaubern erneut geprÃ¼ft werden, ob der
+     * Spruch Ã¼berhaupt gezaubert werden kann.
+     * (level) die effektive StÃ¤rke des Spruchs (= Stufe, auf der der
      * Spruch gezaubert wird) */
 
     for (rank = 0; rank < MAX_SPELLRANK; rank++) {
@@ -2805,30 +2806,30 @@ void magic(void)
             }
 
             if (cast_level > co->level) {
-                /* Sprüche mit Fixkosten werden immer auf Stufe des Spruchs
-                 * gezaubert, co->level ist aber defaultmäßig Stufe des Magiers */
+                /* SprÃ¼che mit Fixkosten werden immer auf Stufe des Spruchs
+                 * gezaubert, co->level ist aber defaultmÃ¤ÃŸig Stufe des Magiers */
                 if (spl_costtyp(sp) != SPC_FIX) {
                     ADDMSG(&u->faction->msgs, msg_message("missing_components",
                         "unit spell level", u, sp, cast_level));
                 }
             }
 
-            /* Prüfen, ob die realen Kosten für die gewünschten Stufe bezahlt
-             * werden können */
+            /* PrÃ¼fen, ob die realen Kosten fÃ¼r die gewÃ¼nschten Stufe bezahlt
+             * werden kÃ¶nnen */
             if (!cancast(u, sp, co->level, co->distance, ord)) {
                 /* die Fehlermeldung wird in cancast generiert */
                 continue;
             }
 
             co->force = spellpower(target_r, u, sp, co->level, ord);
-            /* die Stärke kann durch Antimagie auf 0 sinken */
+            /* die StÃ¤rke kann durch Antimagie auf 0 sinken */
             if (co->force <= 0) {
                 co->force = 0;
                 ADDMSG(&u->faction->msgs, msg_message("missing_force",
                     "unit spell level", u, sp, co->level));
             }
 
-            /* Ziele auf Existenz prüfen und Magieresistenz feststellen. Wurde
+            /* Ziele auf Existenz prÃ¼fen und Magieresistenz feststellen. Wurde
              * kein Ziel gefunden, so ist verify_targets=0. Scheitert der
              * Spruch an der Magieresistenz, so ist verify_targets = 1, bei
              * Erfolg auf ganzer Linie ist verify_targets= 2
@@ -2836,8 +2837,8 @@ void magic(void)
             verify_targets(co, &invalid, &resist, &success);
             if (success + resist == 0) {
                 /* kein Ziel gefunden, Fehlermeldungen sind in verify_targets */
-                /* keine kosten für den zauber */
-                continue;               /* äußere Schleife, nächster Zauberer */
+                /* keine kosten fÃ¼r den zauber */
+                continue;               /* Ã¤uÃŸere Schleife, nÃ¤chster Zauberer */
             }
             else if (co->force > 0 && resist > 0) {
                 /* einige oder alle Ziele waren magieresistent */
@@ -2850,8 +2851,8 @@ void magic(void)
                 }
             }
 
-            /* Auch für Patzer gibt es Erfahrung, müssen die Spruchkosten
-             * bezahlt werden und die nachfolgenden Sprüche werden teurer */
+            /* Auch fÃ¼r Patzer gibt es Erfahrung, mÃ¼ssen die Spruchkosten
+             * bezahlt werden und die nachfolgenden SprÃ¼che werden teurer */
             if (co->force > 0) {
                 if (fumble(target_r, u, sp, co->level)) {
                     /* zuerst bezahlen, dann evt in do_fumble alle Aura verlieren */
@@ -2860,12 +2861,12 @@ void magic(void)
                 else {
                     co->level = sp->cast(co);
                     if (co->level <= 0) {
-                        /* Kosten nur für real benötige Stufe berechnen */
+                        /* Kosten nur fÃ¼r real benÃ¶tige Stufe berechnen */
                         continue;
                     }
                 }
             }
-            /* erst bezahlen, dann Kostenzähler erhöhen */
+            /* erst bezahlen, dann KostenzÃ¤hler erhÃ¶hen */
             if (co->level > 0) {
                 pay_spell(u, sp, co->level, co->distance);
             }
@@ -2967,7 +2968,7 @@ spellbook * get_spellbook(const char * name)
 {
     char buffer[64];
     spellbook * result;
-    const void * match;
+    void * match;
 
     if (cb_find_prefix(&cb_spellbooks, name, strlen(name), &match, 1, 0)) {
         cb_get_kv(match, &result, sizeof(result));

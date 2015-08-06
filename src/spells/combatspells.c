@@ -63,7 +63,7 @@ enum {
     SPL_ARMORSHIELD = 110,
     SPL_DRAIG_FUMBLESHIELD = 143,
     SPL_GWYRRD_FUMBLESHIELD = 144,
-    SPL_CERRDOR_FUMBLESHIELD = 145,
+    SPL_CERDDOR_FUMBLESHIELD = 145,
     SPL_TYBIED_FUMBLESHIELD = 146,
     SPL_SHADOWKNIGHTS = 147,
     SPL_SHOCKWAVE = 163,
@@ -931,11 +931,11 @@ int sp_strong_wall(struct castorder * co)
 {
     fighter * fi = co->magician.fig;
     int level = co->level;
-    float power = co->force;
+    double power = co->force;
     battle *b = fi->side->battle;
     unit *mage = fi->unit;
     building *burg;
-    float effect;
+    double effect;
     static bool init = false;
     message *msg;
     static const curse_type *strongwall_ct;
@@ -1527,7 +1527,7 @@ int sp_fumbleshield(struct castorder * co)
     switch (sp->id) {
     case SPL_DRAIG_FUMBLESHIELD:
     case SPL_GWYRRD_FUMBLESHIELD:
-    case SPL_CERRDOR_FUMBLESHIELD:
+    case SPL_CERDDOR_FUMBLESHIELD:
     case SPL_TYBIED_FUMBLESHIELD:
         duration = 100;
         effect = _max(1, 25 - level);

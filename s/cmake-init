@@ -10,13 +10,13 @@ done
 
 [ -z $BUILD ] && BUILD=Debug
 MACHINE=`uname -m`
+[ -z "$CC" ] && [ ! -z `which gcc` ] && CC="clang"
 [ -z "$CC" ] && [ ! -z `which gcc` ] && CC="gcc"
 [ -z "$CC" ] && [ ! -z `which tcc` ] && CC="tcc"
 [ -z "$CC" ] && [ ! -z `which cc` ] && CC="cc"
-BIN_DIR="build-$MACHINE-$CC-$BUILD"
+BIN_DIR="$ROOT/build-$MACHINE-$CC-$BUILD"
 mkdir -p $BIN_DIR
 ln -sf $BIN_DIR $BUILD
-cd $BIN_DIR
 
 MACHINE=$(gcc -dumpmachine)
 rm -f CMakeCache.txt
@@ -33,12 +33,26 @@ if [ -d $HOME/usr ]; then
   PREFIX_PATH=$HOME/usr:$HOME/usr/local:$PREFIX_PATH
 fi
 
-cmake .. \
- -DCMAKE_MODULE_PATH=$PWD/../cmake/Modules \
+ARGS=" -DCMAKE_MODULE_PATH=$ROOT/cmake/Modules \
  -DCMAKE_BUILD_TYPE=$BUILD \
  -DCMAKE_LIBRARY_PATH=$LIBRARY_PATH \
  -DCMAKE_INCLUDE_PATH=$INCLUDE_PATH \
  -DCMAKE_PREFIX_PATH=$PREFIX_PATH \
- -DCMAKE_INSTALL_PREFIX=$HOME/eressea/server $*
+ -DCMAKE_INSTALL_PREFIX=$HOME/eressea/server"
+
+path="$(which tolua)"
+if [ "$HAVE_TOLUA" = "0" ] || [ -z $path ] ; then
+ echo "tolua is not installed, building from source"
+ cd $ROOT/tolua ; make
+ ARGS="$ARGS -DPC_TOLUA_DIR=$ROOT/tolua"
+else
+ echo "tolua is $path"
+fi
+unset path
+
+set -e
+
+cd $BIN_DIR
+cmake .. $ARGS $*
 cd $OLDPWD
 

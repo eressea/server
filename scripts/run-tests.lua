@@ -14,4 +14,4 @@ require 'eressea.path'
 require 'tests'
 require 'lunit'
 result = lunit.main()
-return result.errors
+return result.errors + result.failed

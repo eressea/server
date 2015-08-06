@@ -1,12 +1,12 @@
-<?xml version="1.0" encoding="iso-8859-1" ?>
+<?xml version="1.0" ?>
 <races xmlns:xi="http://www.w3.org/2001/XInclude">
 
   <!-- begin main races -->
 
-  <xi:include href="config:///default/races/goblin-3.xml"/>
-  <xi:include href="config:///default/races/wyrm.xml"/>
-  <xi:include href="config:///default/races/dragon.xml"/>
-  <xi:include href="config:///default/races/youngdragon.xml"/>
+  <xi:include href="config://default/races/goblin-3.xml"/>
+  <xi:include href="config://default/races/wyrm.xml"/>
+  <xi:include href="config://default/races/dragon.xml"/>
+  <xi:include href="config://default/races/youngdragon.xml"/>
   
   <race name="lynx" magres="0.000000" maxaura="0.000000" regaura="0.000000" weight="500" capacity="540" speed="1.0" hp="20" damage="2d3" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="5" walk="yes" teach="no" getitem="yes">
     <ai splitsize="99999"/>

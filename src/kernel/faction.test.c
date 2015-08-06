@@ -1,9 +1,11 @@
 #include <platform.h>
 
 #include <kernel/ally.h>
+#include <kernel/alliance.h>
 #include <kernel/faction.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
+#include <kernel/plane.h>
 #include <kernel/config.h>
 #include <util/language.h>
 
@@ -26,6 +28,20 @@ static void test_remove_empty_factions_allies(CuTest *tc) {
     ally_add(&f1->allies, f2);
     remove_empty_factions();
     CuAssertPtrEquals(tc, 0, f1->allies);
+    test_cleanup();
+}
+
+static void test_remove_empty_factions_alliance(CuTest *tc) {
+    faction *f;
+    struct alliance *al;
+
+    test_cleanup();
+    f = test_create_faction(0);
+    al = makealliance(0, "Hodor");
+    setalliance(f, al);
+    CuAssertPtrEquals(tc, f, alliance_get_leader(al));
+    remove_empty_factions();
+    CuAssertPtrEquals(tc, 0, al->_leader);
     test_cleanup();
 }
 
@@ -109,13 +125,60 @@ static void test_get_monsters(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_set_origin(CuTest *tc) {
+    faction *f;
+    int x = 0, y = 0;
+    plane *pl;
+
+    test_cleanup();
+    test_create_world();
+    pl = create_new_plane(0, "", 0, 19, 0, 19, 0);
+    f = test_create_faction(0);
+    CuAssertPtrEquals(tc, 0, f->ursprung);
+    faction_setorigin(f, 0, 1, 1);
+    CuAssertIntEquals(tc, 0, f->ursprung->id);
+    CuAssertIntEquals(tc, 1, f->ursprung->x);
+    CuAssertIntEquals(tc, 1, f->ursprung->y);
+    faction_getorigin(f, 0, &x, &y);
+    CuAssertIntEquals(tc, 1, x);
+    CuAssertIntEquals(tc, 1, y);
+    adjust_coordinates(f, &x, &y, pl);
+    CuAssertIntEquals(tc, -9, x);
+    CuAssertIntEquals(tc, -9, y);
+    adjust_coordinates(f, &x, &y, 0);
+    CuAssertIntEquals(tc, -10, x);
+    CuAssertIntEquals(tc, -10, y);
+    test_cleanup();
+}
+
+static void test_set_origin_bug(CuTest *tc) {
+    faction *f;
+    plane *pl;
+    int x = 17, y = 10;
+
+    test_cleanup();
+    test_create_world();
+    pl = create_new_plane(0, "", 0, 19, 0, 19, 0);
+    f = test_create_faction(0);
+    faction_setorigin(f, 0, -10, 3);
+    faction_setorigin(f, 0, -13, -4);
+    adjust_coordinates(f, &x, &y, pl);
+    CuAssertIntEquals(tc, 0, f->ursprung->id);
+    CuAssertIntEquals(tc, -9, x);
+    CuAssertIntEquals(tc, 2, y);
+    test_cleanup();
+}
+
 CuSuite *get_faction_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_addfaction);
     SUITE_ADD_TEST(suite, test_remove_empty_factions);
     SUITE_ADD_TEST(suite, test_remove_empty_factions_allies);
+    SUITE_ADD_TEST(suite, test_remove_empty_factions_alliance);
     SUITE_ADD_TEST(suite, test_remove_dead_factions);
     SUITE_ADD_TEST(suite, test_get_monsters);
+    SUITE_ADD_TEST(suite, test_set_origin);
+    SUITE_ADD_TEST(suite, test_set_origin_bug);
     return suite;
 }

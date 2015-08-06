@@ -1,13 +1,20 @@
 #include <platform.h>
 #include <kernel/config.h>
+#include <kernel/curse.h>
+#include <kernel/item.h>
+#include <kernel/faction.h>
+#include <kernel/order.h>
+#include <kernel/race.h>
+#include <kernel/region.h>
+#include <kernel/spell.h>
 #include <util/base36.h>
 #include <util/language.h>
-#include "alchemy.h"
-#include "faction.h"
+#include <util/attrib.h>
+#include <spells/regioncurse.h>
+#include <alchemy.h>
+#include <laws.h>
+#include <spells.h>
 #include "unit.h"
-#include "item.h"
-#include "race.h"
-#include "region.h"
 
 #include <CuTest.h>
 #include <tests.h>
@@ -231,6 +238,7 @@ static void test_default_name(CuTest *tc) {
 
     test_cleanup();
 }
+
 
 CuSuite *get_unit_suite(void)
 {

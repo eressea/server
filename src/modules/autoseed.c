@@ -181,7 +181,7 @@ newfaction *read_newfactions(const char *filename)
         password[0] = '\0';
 
         if (sscanf(buf, "%54s %20s %8s %d %d %16s %d", email, race, lang, &bonus,
-            &subscription, password, &alliance) < 6)
+            &subscription, password, &alliance) < 3)
             break;
         if (email[0] == '\0')
             break;
@@ -904,10 +904,9 @@ static void smooth_island(region_list * island)
     }
 }
 
-static void starting_region(region * r, region * rn[])
+static void starting_region(newfaction ** players, region * r, region * rn[])
 {
     int n;
-
     oceans_around(r, rn);
     freset(r, RF_MARK);
     for (n = 0; n != MAXDIRECTIONS; ++n) {
@@ -915,11 +914,19 @@ static void starting_region(region * r, region * rn[])
     }
     terraform_region(r, newterrain(T_PLAIN));
     prepare_starting_region(r);
-    addplayer(r, addfaction("enno@eressea.de", itoa36(rng_int()), races, default_locale, 0));
+    if (players && *players) {
+        newfaction *nf = *players;
+        const struct race *rc = nf->race ? nf->race : races;
+        const struct locale *lang = nf->lang ? nf->lang : default_locale;
+        const char * passwd = nf->password ? nf->password : itoa36(rng_int());
+        addplayer(r, addfaction(nf->email, passwd, rc, lang, 0));
+        *players = nf->next;
+        free_newfaction(nf);
+    }
 }
 
 /* E3A island generation */
-int build_island_e3(int x, int y, int numfactions, int minsize)
+int build_island_e3(newfaction ** players, int x, int y, int numfactions, int minsize)
 {
 #define MIN_QUALITY 1000
     int nfactions = 0;
@@ -961,8 +968,8 @@ int build_island_e3(int x, int y, int numfactions, int minsize)
 
                 get_neighbours(r, rn);
                 q = region_quality(r, rn);
-                if (q >= MIN_QUALITY && nfactions < numfactions) {
-                    starting_region(r, rn);
+                if (q >= MIN_QUALITY && nfactions < numfactions && *players) {
+                    starting_region(players, r, rn);
                     minq = _min(minq, q);
                     maxq = _max(maxq, q);
                     ++nfactions;
@@ -976,8 +983,8 @@ int build_island_e3(int x, int y, int numfactions, int minsize)
                 region *rn[MAXDIRECTIONS];
                 get_neighbours(r, rn);
                 q = region_quality(r, rn);
-                if (q >= MIN_QUALITY * 4 / 3 && nfactions < numfactions) {
-                    starting_region(r, rn);
+                if (q >= MIN_QUALITY * 4 / 3 && nfactions < numfactions && *players) {
+                    starting_region(players, r, rn);
                     minq = _min(minq, q);
                     maxq = _max(maxq, q);
                     ++nfactions;

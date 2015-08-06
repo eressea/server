@@ -21,7 +21,7 @@
 #include "message.h"
 #include "language.h"
 #include "translation.h"
-#include "goodies.h"
+#include "strings.h"
 
 /* libc includes */
 #include <assert.h>

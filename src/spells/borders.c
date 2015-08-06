@@ -29,7 +29,7 @@ typedef struct wallcurse {
     connection *wall;
 } wallcurse;
 
-void cw_init(attrib * a)
+static void cw_init(attrib * a)
 {
     curse *c;
     curse_init(a);
@@ -37,7 +37,7 @@ void cw_init(attrib * a)
     c->data.v = calloc(sizeof(wallcurse), 1);
 }
 
-void cw_write(const attrib * a, const void *target, storage * store)
+static void cw_write(const attrib * a, const void *target, storage * store)
 {
     connection *b = ((wallcurse *)((curse *)a->data.v)->data.v)->wall;
     curse_write(a, target, store);
@@ -86,7 +86,7 @@ static int cw_read(attrib * a, void *target, storage * store)
  *   Was fuer eine Wirkung hat die?
  */
 
-void wall_vigour(curse * c, float delta)
+static void wall_vigour(curse * c, double delta)
 {
     wallcurse *wc = (wallcurse *)c->data.v;
     assert(wc->buddy->vigour == c->vigour);
@@ -105,7 +105,7 @@ const curse_type ct_firewall = {
     wall_vigour                   /* change_vigour */
 };
 
-attrib_type at_cursewall = {
+static attrib_type at_cursewall = {
     "cursewall",
     cw_init,
     curse_done,

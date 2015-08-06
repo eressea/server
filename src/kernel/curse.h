@@ -26,6 +26,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
+    struct curse;
+    struct curse_type;
+
     /* Sprueche in der struct region und auf Einheiten, Schiffen oder Burgen
      * (struct attribute)
      */
@@ -98,7 +101,6 @@ extern "C" {
      */
 
     enum {
-        /* struct's vom typ curse: */
         C_FOGTRAP,
         C_ANTIMAGICZONE,
         C_FARVISION,
@@ -128,18 +130,10 @@ extern "C" {
         C_RIOT,                     /*region in Aufruhr */
         C_NOCOST,
         C_CURSED_BY_THE_GODS,
-        /* struct's vom untertyp curse_unit: */
         C_SPEED,                    /* Beschleunigt */
         C_ORC,
         C_MBOOST,
         C_KAELTESCHUTZ,
-        C_STRENGTH,
-        C_ALLSKILLS,
-        C_MAGICRESISTANCE,          /* 44 - verändert Magieresistenz */
-        C_ITEMCLOAK,
-        C_SPARKLE,
-        /* struct's vom untertyp curse_skill: */
-        C_SKILL,
         MAXCURSE                    /* OBS: when removing curses, remember to update read_ccompat() */
     };
 
@@ -188,18 +182,6 @@ extern "C" {
     /* ------------------------------------------------------------- */
     /* Allgemeine Zauberwirkungen */
 
-    typedef struct curse {
-        struct curse *nexthash;
-        int no;                     /* 'Einheitennummer' dieses Curse */
-        const struct curse_type *type;      /* Zeiger auf ein curse_type-struct */
-        int flags;         /* WARNING: these are XORed with type->flags! */
-        int duration;               /* Dauer der Verzauberung. Wird jede Runde vermindert */
-        float vigour;              /* Stärke der Verzauberung, Widerstand gegen Antimagie */
-        struct unit *magician;      /* Pointer auf den Magier, der den Spruch gewirkt hat */
-        float effect;
-        variant data;               /* pointer auf spezielle curse-unterstructs */
-    } curse;
-
 #define c_flags(c) ((c)->type->flags ^ (c)->flags)
 
     /* ------------------------------------------------------------- */
@@ -209,16 +191,28 @@ extern "C" {
         int typ;
         int flags;
         int mergeflags;
-        struct message *(*curseinfo) (const void *, objtype_t, const struct curse *,
-            int);
-        void(*change_vigour) (curse *, float);
-        int(*read) (struct storage * store, curse * c, void *target);
-        int(*write) (struct storage * store, const struct curse * c,
+        struct message *(*curseinfo) (const void *, objtype_t,
+            const struct curse *, int);
+        void(*change_vigour) (struct curse *, double);
+        int(*read) (struct storage * store, struct curse *, void *target);
+        int(*write) (struct storage * store, const struct curse *,
             const void *target);
         int(*cansee) (const struct faction *, const void *, objtype_t,
             const struct curse *, int);
-        int(*age) (curse *);
+        int(*age) (struct curse *);
     } curse_type;
+
+    typedef struct curse {
+        variant data;               /* pointer auf spezielle curse-unterstructs */
+        struct curse *nexthash;
+        const curse_type *type;      /* Zeiger auf ein curse_type-struct */
+        struct unit *magician;      /* Pointer auf den Magier, der den Spruch gewirkt hat */
+        double vigour;              /* Stärke der Verzauberung, Widerstand gegen Antimagie */
+        double effect;
+        int no;                     /* 'Einheitennummer' dieses Curse */
+        int flags;                  /* WARNING: these are XORed with type->flags! */
+        int duration;               /* Dauer der Verzauberung. Wird jede Runde vermindert */
+    } curse;
 
     extern struct attrib_type at_curse;
     void curse_write(const struct attrib *a, const void *owner,
@@ -238,7 +232,7 @@ extern "C" {
      */
 
     curse *create_curse(struct unit *magician, struct attrib **ap,
-        const curse_type * ctype, float vigour, int duration, float ceffect,
+        const curse_type * ctype, double vigour, int duration, double ceffect,
         int men);
     /* Verzweigt automatisch zum passenden struct-typ. Sollte es schon
      * einen Zauber dieses Typs geben, so wird der neue dazuaddiert. Die
@@ -248,47 +242,46 @@ extern "C" {
 
     void destroy_curse(curse * c);
 
-    bool is_cursed_internal(struct attrib *ap, const curse_type * ctype);
     /* ignoriert CURSE_ISNEW */
+    bool is_cursed_internal(struct attrib *ap, const curse_type * ctype);
 
+    /* löscht einen konkreten Spruch auf einem Objekt.  */
     bool remove_curse(struct attrib **ap, const struct curse *c);
-    /* löscht einen konkreten Spruch auf einem Objekt.
-     */
 
-    int curse_geteffect_int(const struct curse *c);
-    float curse_geteffect(const struct curse *c);
     /* gibt die Auswirkungen der Verzauberungen zurück. zB bei
      * Skillmodifiziernden Verzauberungen ist hier der Modifizierer
      * gespeichert. Wird automatisch beim Anlegen eines neuen curse
      * gesetzt. Gibt immer den ersten Treffer von ap aus zurück.
      */
+    int curse_geteffect_int(const struct curse *c);
+    double curse_geteffect(const struct curse *c);
 
-    float curse_changevigour(struct attrib **ap, curse * c, float i);
     /* verändert die Stärke der Verzauberung um i */
+    double curse_changevigour(struct attrib **ap, curse * c, double delta);
 
-    int get_cursedmen(struct unit *u, const struct curse *c);
     /* gibt bei Personenbeschränkten Verzauberungen die Anzahl der
      * betroffenen Personen zurück. Ansonsten wird 0 zurückgegeben. */
+    int get_cursedmen(struct unit *u, const struct curse *c);
 
+    /* setzt/loescht Spezialflag einer Verzauberung (zB 'dauert ewig') */
     void c_setflag(curse * c, unsigned int flag);
     void c_clearflag(curse * c, unsigned int flags);
-    /* setzt/loescht Spezialflag einer Verzauberung (zB 'dauert ewig') */
 
-    void transfer_curse(struct unit *u, struct unit *u2, int n);
     /* sorgt dafür, das bei der Übergabe von Personen die curse-attribute
      * korrekt gehandhabt werden. Je nach internen Flag kann dies
      * unterschiedlich gewünscht sein
      * */
+    void transfer_curse(struct unit *u, struct unit *u2, int n);
 
-    struct curse *get_curse(struct attrib *ap, const curse_type * ctype);
     /* gibt pointer auf die erste curse-struct zurück, deren Typ ctype ist,
      * oder einen NULL-pointer
      * */
+    struct curse *get_curse(struct attrib *ap, const curse_type * ctype);
 
     int find_cursebyname(const char *c);
     const curse_type *ct_find(const char *c);
     void ct_register(const curse_type *);
-    /* Regionszauber */
+    void ct_checknames(void);
 
     curse *cfindhash(int i);
 
@@ -298,13 +291,13 @@ extern "C" {
     void curse_done(struct attrib *a);
     int curse_age(struct attrib *a);
 
-    float destr_curse(struct curse *c, int cast_level, float force);
+    double destr_curse(struct curse *c, int cast_level, double force);
 
     int resolve_curse(variant data, void *address);
     bool is_cursed_with(const struct attrib *ap, const struct curse *c);
 
-    bool curse_active(const struct curse *c);
     /* gibt true, wenn der Curse nicht NULL oder inaktiv ist */
+    bool curse_active(const struct curse *c);
 
     /*** COMPATIBILITY MACROS. DO NOT USE FOR NEW CODE, REPLACE IN OLD CODE: */
     const char *oldcursename(int id);

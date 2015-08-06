@@ -101,7 +101,7 @@ static void destroy_road(unit * u, int nmax, struct order *ord)
     else {
         unit *u2;
         region *r = u->region;
-        short road, n = (short)nmax;
+        int road, n = nmax;
 
         if (nmax > SHRT_MAX) {
             n = SHRT_MAX;
@@ -131,7 +131,7 @@ static void destroy_road(unit * u, int nmax, struct order *ord)
             if (willdo > SHRT_MAX)
                 road = 0;
             else
-                road = road - (short)willdo;
+                road = (short)(road - willdo);
             rsetroad(r, d, road);
             ADDMSG(&u->faction->msgs, msg_message("destroy_road",
                 "unit from to", u, r, r2));
@@ -151,7 +151,12 @@ int destroy_cmd(unit * u, struct order *ord)
     int n = INT_MAX;
 
     if (u->number < 1)
-        return 0;
+        return 1;
+
+    if (fval(u, UFL_LONGACTION)) {
+        cmistake(u, ord, 52, MSG_PRODUCE);
+        return 52;
+    }
 
     init_order(ord);
     s = gettoken(token, sizeof(token));
@@ -164,8 +169,7 @@ int destroy_cmd(unit * u, struct order *ord)
     if (s && *s) {
         n = atoi((const char *)s);
         if (n <= 0) {
-            cmistake(u, ord, 288, MSG_PRODUCE);
-            return 0;
+            n = INT_MAX;
         }
     }
 
@@ -179,11 +183,11 @@ int destroy_cmd(unit * u, struct order *ord)
 
         if (u != building_owner(b)) {
             cmistake(u, ord, 138, MSG_PRODUCE);
-            return 0;
+            return 138;
         }
         if (fval(b->type, BTF_INDESTRUCTIBLE)) {
             cmistake(u, ord, 138, MSG_PRODUCE);
-            return 0;
+            return 138;
         }
         if (n >= b->size) {
             /* destroy completly */
@@ -209,11 +213,11 @@ int destroy_cmd(unit * u, struct order *ord)
 
         if (u != ship_owner(sh)) {
             cmistake(u, ord, 138, MSG_PRODUCE);
-            return 0;
+            return 138;
         }
         if (fval(r->terrain, SEA_REGION)) {
             cmistake(u, ord, 14, MSG_EVENT);
-            return 0;
+            return 14;
         }
 
         if (n >= (sh->size * 100) / sh->type->construction->maxsize) {
@@ -238,11 +242,11 @@ int destroy_cmd(unit * u, struct order *ord)
     }
     else {
         cmistake(u, ord, 138, MSG_PRODUCE);
-        return 0;
+        return 138;
     }
 
     if (con) {
-        /* TODO: Nicht an ZERSTÖRE mit Punktangabe angepaßt! */
+        /* TODO: Nicht an ZERSTÖRE mit Punktangabe angepasst! */
         int c;
         for (c = 0; con->materials[c].number; ++c) {
             const requirement *rq = con->materials + c;
@@ -360,7 +364,7 @@ void build_road(region * r, unit * u, int size, direction_t d)
     /* n is now modified by several special effects, so we have to
      * minimize it again to make sure the road will not grow beyond
      * maximum. */
-    rsetroad(r, d, rroad(r, d) + (short)n);
+    rsetroad(r, d, rroad(r, d) + n);
 
     if (u_race(u) == get_race(RC_STONEGOLEM)) {
         int golemsused = n / GOLEM_STONE;

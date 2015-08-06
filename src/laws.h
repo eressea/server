@@ -56,15 +56,15 @@ extern "C" {
     extern int *age;
 
 
-    extern void new_units(void);
-    extern void defaultorders(void);
-    extern void quit(void);
-    extern void monthly_healing(void);
-    extern void renumber_factions(void);
-    extern void restack_units(void);
-    extern void update_long_order(struct unit *u);
-    extern void sinkships(struct region * r);
-    extern void do_enter(struct region *r, bool is_final_attempt);
+    void new_units(void);
+    void defaultorders(void);
+    void quit(void);
+    void monthly_healing(void);
+    void renumber_factions(void);
+    void restack_units(void);
+    void update_long_order(struct unit *u);
+    void sinkships(struct region * r);
+    void do_enter(struct region *r, bool is_final_attempt);
 
     extern int password_cmd(struct unit *u, struct order *ord);
     extern int banner_cmd(struct unit *u, struct order *ord);
@@ -105,8 +105,12 @@ extern "C" {
     bool seefaction(const struct faction *f, const struct region *r,
         const struct unit *u, int modifier);
     int armedmen(const struct unit *u, bool siege_weapons);
-    void force_leave(struct region *r);
     int peasant_luck_effect(int peasants, int luck, int maxp, double variance);
+
+    #define FORCE_LEAVE_POSTCOMBAT 1
+    #define FORCE_LEAVE_ALL 2
+    bool rule_force_leave(int flag);
+	bool help_enter(struct unit *uo, struct unit *u);
 
 #ifdef __cplusplus
 }

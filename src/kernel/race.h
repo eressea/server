@@ -40,6 +40,8 @@ extern "C" {
 
 #define RACESPOILCHANCE 5       /* Chance auf rassentypische Beute */
 
+#define RACE_ATTACKS 10         /* maximum number of attacks */
+
     struct param;
     struct spell;
 
@@ -120,9 +122,9 @@ extern "C" {
     typedef struct race {
         char *_name;
         float magres;
-        float maxaura;              /* Faktor auf Maximale Aura */
-        float regaura;              /* Faktor auf Regeneration */
-        float recruit_multi;        /* Faktor für Bauernverbrauch */
+        double maxaura;            /* Faktor auf Maximale Aura */
+        double regaura;            /* Faktor auf Regeneration */
+        double recruit_multi;      /* Faktor für Bauernverbrauch */
         int index;
         int recruitcost;
         int maintenance;
@@ -144,8 +146,7 @@ extern "C" {
         int flags;
         int battle_flags;
         int ec_flags;
-        race_t oldfamiliars[MAXMAGIETYP];
-        struct att attack[10];
+        struct att attack[RACE_ATTACKS];
         signed char bonus[MAXSKILLS];
 
         const char *(*generate_name) (const struct unit *);

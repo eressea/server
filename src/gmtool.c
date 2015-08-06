@@ -65,6 +65,7 @@
 
 static int g_quit;
 int force_color = 0;
+newfaction * new_players = 0;
 
 state *current_state = NULL;
 
@@ -77,7 +78,7 @@ static WINDOW *hstatus;
 
 static void init_curses(void)
 {
-    short fg, bg;
+    int fg, bg;
     initscr();
 
     if (has_colors() || force_color) {
@@ -93,7 +94,7 @@ static void init_curses(void)
 #endif
         for (fg = 0; fg != 8; ++fg) {
             for (bg = 0; bg != 2; ++bg) {
-                init_pair(fg + 8 * bg, fg, bg ? hcol : bcol);
+                init_pair((short)(fg + 8 * bg), (short)fg, (short)(bg ? hcol : bcol));
             }
         }
 
@@ -248,6 +249,8 @@ static void paint_map(window * wnd, const state * st)
     int cols = getmaxx(win);
     int vx, vy;
 
+    assert(st);
+    if (!st) return;
     lines = lines / THEIGHT;
     cols = cols / TWIDTH;
     for (vy = 0; vy != lines; ++vy) {
@@ -259,11 +262,9 @@ static void paint_map(window * wnd, const state * st)
             int xp = vx * TWIDTH + (vy & 1) * TWIDTH / 2;
             int nx, ny;
             if (mr) {
-                if (st) {
-                    cnormalize(&mr->coord, &nx, &ny);
-                    if (tagged_region(st->selected, nx, ny)) {
-                        attr |= A_REVERSE;
-                    }
+                cnormalize(&mr->coord, &nx, &ny);
+                if (tagged_region(st->selected, nx, ny)) {
+                    attr |= A_REVERSE;
                 }
                 if (mr->r && (mr->r->flags & RF_MAPPER_HIGHLIGHT))
                     hl = 1;
@@ -761,6 +762,29 @@ static void select_regions(state * st, int selectmode)
     st->wnd_map->update |= 3;
 }
 
+void loaddata(state *st)  {
+    char datafile[MAX_PATH];
+
+    askstring(st->wnd_status->handle, "save as:", datafile, sizeof(datafile));
+    if (strlen(datafile) > 0) {
+        create_backup(datafile);
+        readgame(datafile, false);
+        st->modified = 0;
+    }
+}
+
+void savedata(state *st)  {
+    char datafile[MAX_PATH];
+
+    askstring(st->wnd_status->handle, "save as:", datafile, sizeof(datafile));
+    if (strlen(datafile) > 0) {
+        create_backup(datafile);
+        remove_empty_units();
+        writegame(datafile);
+        st->modified = 0;
+    }
+}
+
 static void handlekey(state * st, int c)
 {
     window *wnd;
@@ -770,7 +794,7 @@ static void handlekey(state * st, int c)
     region *r;
     char sbuffer[80];
     static char kbuffer[80];
-    int n, nx, ny;
+    int n, nx, ny, minpop, maxpop;
 
     switch (c) {
     case FAST_RIGHT:
@@ -816,25 +840,27 @@ static void handlekey(state * st, int c)
     case 'S':
     case KEY_SAVE:
     case KEY_F(2):
-        /* if (st->modified) */  {
-            char datafile[MAX_PATH];
-
-            askstring(st->wnd_status->handle, "save as:", datafile, sizeof(datafile));
-            if (strlen(datafile) > 0) {
-                create_backup(datafile);
-                remove_empty_units();
-                writegame(datafile);
-                st->modified = 0;
-            }
-    }
+        savedata(st);
+        break;
+    case KEY_F(3):
+    case KEY_OPEN:
+        loaddata(st);
         break;
     case 'B':
-        /*
-           make_block(st->cursor.x, st->cursor.y, 6, select_terrain(st, NULL));
-           */
+        if (!new_players) {
+            sprintf(sbuffer, "%s/newfactions", basepath());
+            new_players = read_newfactions(sbuffer);
+        }
         cnormalize(&st->cursor, &nx, &ny);
-        n = rng_int() % 8 + 8;
-        build_island_e3(nx, ny, n, n * 3);
+        minpop = get_param_int(global.parameters, "seed.population.min", 8);
+        maxpop = get_param_int(global.parameters, "seed.population.max", minpop);
+        if (maxpop > minpop) {
+            n = rng_int() % (maxpop - minpop) + minpop;
+        }
+        else {
+            n = minpop;
+        }
+        build_island_e3(&new_players, nx, ny, n, n * 3);
         st->modified = 1;
         st->wnd_info->update |= 1;
         st->wnd_status->update |= 1;
@@ -929,6 +955,7 @@ static void handlekey(state * st, int c)
             }
         }
         break;
+    case 'f':
     case 0x14:                 /* C-t */
         terraform_at(&st->cursor, select_terrain(st, NULL));
         st->modified = 1;
@@ -1011,6 +1038,7 @@ static void handlekey(state * st, int c)
         statusline(st->wnd_status->handle, "tag-");
         doupdate();
         switch (getch()) {
+        case 'f':
         case 't':
             terraform_selection(st->selected, select_terrain(st, NULL));
             st->modified = 1;
@@ -1033,8 +1061,11 @@ static void handlekey(state * st, int c)
             tag_region(st->selected, nx, ny);
         break;
     case 'A':
-        sprintf(sbuffer, "%s/newfactions", basepath());
-        seed_players(sbuffer, false);
+        if (!new_players) {
+            sprintf(sbuffer, "%s/newfactions", basepath());
+            new_players = read_newfactions(sbuffer);
+        }
+        seed_players(&new_players, false);
         st->wnd_map->update |= 1;
         break;
     case '/':
@@ -1313,15 +1344,14 @@ const char *prompt)
     return buffer[0] != 0;
 }
 
-void seed_players(const char *filename, bool new_island)
+void seed_players(newfaction **players, bool new_island)
 {
-    newfaction *players = read_newfactions(filename);
-    if (players != NULL) {
-        while (players) {
-            int n = listlen(players);
+    if (players) {
+        while (*players) {
+            int n = listlen(*players);
             int k = (n + ISLANDSIZE - 1) / ISLANDSIZE;
             k = n / k;
-            n = autoseed(&players, k, new_island ? 0 : TURNS_PER_ISLAND);
+            n = autoseed(players, k, new_island ? 0 : TURNS_PER_ISLAND);
             if (n == 0) {
                 break;
             }

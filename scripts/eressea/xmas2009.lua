@@ -1,14 +1,15 @@
 function use_xmastree(u, amount)
     if u.region.herb~=nil then
+        -- TODO: else?
         local trees = u.region:get_resource("tree")
         u.region:set_resource("tree", 10+trees)
-        u:use_pooled("xmastree", amount)
         local msg = message.create("usepotion")
         msg:set_unit("unit", u)
         msg:set_resource("potion", "xmastree")
         msg:send_region(u.region)
-        return 0
+        return amount
     end
+    return 0
 end
 
 local xmas = {}

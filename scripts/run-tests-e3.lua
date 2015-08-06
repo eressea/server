@@ -20,4 +20,4 @@ require 'lunit'
 eressea.settings.set("rules.alliances", "0")
 rules = require('eressea.' .. config.rules)
 result = lunit.main()
-return result.errors
+return result.errors + result.failed

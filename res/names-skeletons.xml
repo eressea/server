@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="iso-8859-1" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <strings>
 
   <string name="skeleton_prefix_0">
     <text locale="de">Klapperige</text>
   </string>
   <string name="skeleton_prefix_1">
-    <text locale="de">Stöhnende</text>
+    <text locale="de">StÃ¶hnende</text>
   </string>
   <string name="skeleton_prefix_2">
     <text locale="de">Schwarzknochige</text>
@@ -14,7 +14,7 @@
     <text locale="de">Schwarzgewandete</text>
   </string>
   <string name="skeleton_prefix_4">
-    <text locale="de">Angsteinflößende</text>
+    <text locale="de">AngsteinflÃ¶ÃŸende</text>
   </string>
   <string name="skeleton_prefix_5">
     <text locale="de">Heulende</text>
@@ -32,7 +32,7 @@
     <text locale="de">Dunkle</text>
   </string>
   <string name="skeleton_prefix_10">
-    <text locale="de">Fürchterliche</text>
+    <text locale="de">FÃ¼rchterliche</text>
   </string>
   <string name="skeleton_prefix_11">
     <text locale="de">Grauenhafte</text>
@@ -50,7 +50,7 @@
     <text locale="de">Schreckliche</text>
   </string>
   <string name="skeleton_prefix_16">
-    <text locale="de">Düstere</text>
+    <text locale="de">DÃ¼stere</text>
   </string>
   <string name="skeleton_prefix_17">
     <text locale="de">Schaurige</text>
@@ -69,10 +69,10 @@
     <text locale="de">Krieger</text>
   </string>
   <string name="skeleton_name_3">
-    <text locale="de">Kämpfer</text>
+    <text locale="de">KÃ¤mpfer</text>
   </string>
   <string name="skeleton_name_4">
-    <text locale="de">Rächer</text>
+    <text locale="de">RÃ¤cher</text>
   </string>
 
   <string name="skeleton_postfix_0">
@@ -85,7 +85,7 @@
     <text locale="de">der Finsternis</text>
   </string>
   <string name="skeleton_postfix_3">
-    <text locale="de">des Bösen</text>
+    <text locale="de">des BÃ¶sen</text>
   </string>
   <string name="skeleton_postfix_4">
     <text locale="de">der Erschlagenen</text>
