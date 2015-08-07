@@ -250,9 +250,7 @@ cr_output_curses(stream *out, const faction * viewer, const void *obj, objtype_t
             curse *c = (curse *)a->data.v;
             message *msg;
 
-            if (c->type->cansee) {
-                self = c->type->cansee(viewer, obj, typ, c, self);
-            }
+            self = curse_cansee(c, viewer, typ, obj, self);
             msg = msg_curse(c, obj, typ, self);
 
             if (msg) {
