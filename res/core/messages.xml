@@ -914,7 +914,7 @@
       <arg name="transparent" type="int"/>
       <arg name="object" type="string"/>
     </type>
-    <text locale="de">"$if($transparent," befindet sich"," versperrt") ${object} $if($transparent,""," die Sicht")."</text>
+    <text locale="de">"$if($transparent," befindet sich"," versperrt") ${object}$if($transparent,""," die Sicht")."</text>
     <text locale="en">"$if($transparent," there is"," sight is blocked by ") ${object}."</text>
   </message>
   <message name="nr_building_besieged" section="nr">

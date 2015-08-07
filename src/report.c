@@ -515,30 +515,26 @@ nr_curses_i(stream *out, int indent, const faction *viewer, objtype_t typ, const
 {
     for (; a; a = a->next) {
         char buf[4096];
-        message *msg;
+        message *msg = 0;
 
         if (fval(a->type, ATF_CURSE)) {
             curse *c = (curse *)a->data.v;
 
             self = curse_cansee(c, viewer, typ, obj, self);
             msg = msg_curse(c, obj, typ, self);
-
-            if (msg) {
-                newline(out);
-                nr_render(msg, viewer->locale, buf, sizeof(buf), viewer);
-                paragraph(out, buf, indent, 2, 0);
-                msg_release(msg);
-            }
         }
         else if (a->type == &at_effect && self) {
             effect_data *data = (effect_data *)a->data.v;
             if (data->value > 0) {
                 msg = msg_message("nr_potion_effect", "potion left",
                     data->type->itype->rtype, data->value);
-                nr_render(msg, viewer->locale, buf, sizeof(buf), viewer);
-                paragraph(out, buf, indent, 2, 0);
-                msg_release(msg);
             }
+        }
+        if (msg) {
+            newline(out);
+            nr_render(msg, viewer->locale, buf, sizeof(buf), viewer);
+            paragraph(out, buf, indent, 2, 0);
+            msg_release(msg);
         }
     }
 }
