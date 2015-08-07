@@ -10,6 +10,7 @@
 #include <tests.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 static void test_register_ship(CuTest * tc)
 {
@@ -367,6 +368,69 @@ static void test_stype_defaults(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_crew_skill(CuTest *tc) {
+    ship *sh;
+    region *r;
+    struct faction *f;
+    int i;
+
+    test_cleanup();
+    test_create_world();
+    r = findregion(0, 0);
+    f = test_create_faction(0);
+    assert(r && f);
+    sh = test_create_ship(r, st_find("boat"));
+    for (i = 0; i != 4; ++i) {
+        unit * u = test_create_unit(f, r);
+        set_level(u, SK_SAILING, 5);
+        u->ship = sh;
+    }
+    CuAssertIntEquals(tc, 20, crew_skill(sh));
+    test_cleanup();
+}
+
+static void test_shipspeed(CuTest *tc) {
+    ship *sh;
+    ship_type *stype;
+    region *r;
+    struct faction *f;
+    unit *cap, *crew;
+
+    test_cleanup();
+    test_create_world();
+    r = test_create_region(0, 0, test_create_terrain("ocean", 0));
+    f = test_create_faction(0);
+    assert(r && f);
+    stype = test_create_shiptype("longboat");
+    stype->cptskill = 1;
+    stype->sumskill = 10;
+    stype->minskill = 1;
+    stype->range = 2;
+    sh = test_create_ship(r, stype);
+
+    CuAssertIntEquals_Msg(tc, "ship without a captain cannot move", 0, shipspeed(sh, NULL));
+
+    cap = test_create_unit(f, r);
+    crew = test_create_unit(f, r);
+    cap->ship = sh;
+    crew->ship = sh;
+    CuAssertPtrEquals(tc, cap, ship_owner(sh));
+    set_level(cap, SK_SAILING, stype->cptskill);
+    set_level(crew, SK_SAILING, stype->sumskill - stype->cptskill);
+    CuAssertIntEquals_Msg(tc, "ship with fully skilled crew can sail at max speed", 2, shipspeed(sh, cap));
+
+    set_level(cap, SK_SAILING, stype->cptskill + 5);
+    CuAssertIntEquals_Msg(tc, "higher captain skill should not affect top speed", 2, shipspeed(sh, cap));
+    set_level(cap, SK_SAILING, stype->cptskill);
+
+    CuAssertIntEquals(tc, 2, shipspeed(sh, cap));
+
+    set_level(crew, SK_SAILING, (stype->sumskill - stype->cptskill) * 11);
+    set_level(cap, SK_SAILING, stype->cptskill + 10);
+    CuAssertIntEquals_Msg(tc, "regular skills should not exceed sh.range", 2, shipspeed(sh, cap));
+
+}
+
 CuSuite *get_ship_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -381,5 +445,6 @@ CuSuite *get_ship_suite(void)
     SUITE_ADD_TEST(suite, test_shipowner_goes_to_other_after_leave);
     SUITE_ADD_TEST(suite, test_shipowner_goes_to_same_faction_after_leave);
     SUITE_ADD_TEST(suite, test_shipowner_goes_to_empty_unit_after_leave);
+    SUITE_ADD_TEST(suite, test_shipspeed);
     return suite;
 }

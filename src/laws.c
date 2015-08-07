@@ -2797,17 +2797,17 @@ void sinkships(struct region * r)
         ship *sh = *shp;
 
         if (!sh->type->construction || sh->size >= sh->type->construction->maxsize) {
-            if (fval(r->terrain, SEA_REGION) && (!enoughsailors(sh, r)
-                || get_captain(sh) == NULL)) {
-                /* Schiff nicht seetüchtig */
-                float dmg = get_param_flt(global.parameters,
-                    "rules.ship.damage.nocrewocean",
-                    0.30F);
-                damage_ship(sh, dmg);
-            }
-            if (ship_owner(sh) == NULL) {
-                float dmg = get_param_flt(global.parameters, "rules.ship.damage.nocrew",
-                    0.05F);
+            if (fval(r->terrain, SEA_REGION)) {
+                if (!enoughsailors(sh, crew_skill(sh))) {
+                    // ship is at sea, but not enough people to control it
+                    float dmg = get_param_flt(global.parameters,
+                        "rules.ship.damage.nocrewocean",
+                        0.30F);
+                    damage_ship(sh, dmg);
+                }
+            } else if (!ship_owner(sh)) {
+                // any ship lying around without an owner slowly rots
+                float dmg = get_param_flt(global.parameters, "rules.ship.damage.nocrew", 0.05F);
                 damage_ship(sh, dmg);
             }
         }

@@ -342,7 +342,7 @@ int setstealth_cmd(unit * u, struct order *ord)
     return 0;
 }
 
-static int crew_skill(region * r, faction * f, ship * sh, skill_t sk)
+static int top_skill(region * r, faction * f, ship * sh, skill_t sk)
 {
     int value = 0;
     unit *u;
@@ -517,7 +517,7 @@ int sabotage_cmd(unit * u, struct order *ord)
         r = u->region;
         if (u2->faction != u->faction) {
             skdiff =
-                eff_skill(u, SK_SPY, r) - crew_skill(r, u2->faction, sh, SK_PERCEPTION);
+                eff_skill(u, SK_SPY, r) - top_skill(r, u2->faction, sh, SK_PERCEPTION);
         }
         if (try_destruction(u, u2, sh, skdiff)) {
             sink_ship(r, sh, u);

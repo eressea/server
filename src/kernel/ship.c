@@ -282,6 +282,20 @@ static int ShipSpeedBonus(const unit * u)
     return 0;
 }
 
+int crew_skill(const ship *sh) {
+    int n = 0;
+    unit *u;
+
+    n = 0;
+
+    for (u = sh->region->units; u; u = u->next) {
+        if (u->ship == sh) {
+            n += eff_skill(u, SK_SAILING, sh->region) * u->number;
+        }
+    }
+    return n;
+}
+
 int shipspeed(const ship * sh, const unit * u)
 {
     double k = sh->type->range;
@@ -290,14 +304,19 @@ int shipspeed(const ship * sh, const unit * u)
     attrib *a;
     struct curse *c;
 
+    assert(sh);
+    if (!u) u = ship_owner(sh);
+    if (!u) return 0;
+    assert(u->ship == sh);
+    assert(u == ship_owner(sh));
+    assert(sh->type->construction);
+    assert(sh->type->construction->improvement == NULL);  /* sonst ist construction::size nicht ship_type::maxsize */
+
     if (!init) {
         init = true;
         stormwind_ct = ct_find("stormwind");
         nodrift_ct = ct_find("nodrift");
     }
-
-    assert(u->ship == sh);
-    assert(sh->type->construction->improvement == NULL);  /* sonst ist construction::size nicht ship_type::maxsize */
     if (sh->size != sh->type->construction->maxsize)
         return 0;
 
@@ -442,18 +461,3 @@ const char *ship_getname(const ship * self)
 {
     return self->name;
 }
-
-unit *get_captain(const ship * sh)
-{
-    const region *r = sh->region;
-    unit *u;
-
-    for (u = r->units; u; u = u->next) {
-        if (u->ship == sh && u->number
-            && eff_skill(u, SK_SAILING, r) >= sh->type->cptskill)
-            return u;
-    }
-
-    return NULL;
-}
-
