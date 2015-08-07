@@ -4582,7 +4582,7 @@ int sp_illusionary_shapeshift(castorder * co)
     irace = u_irace(u);
     if (irace == u_race(u)) {
         trigger *trestore = trigger_changerace(u, NULL, irace);
-        add_trigger(&u->attribs, "timer", trigger_timeout((int)power + 2,
+        add_trigger(&u->attribs, "timer", trigger_timeout((int)power + 3,
             trestore));
         u->irace = rc;
     }

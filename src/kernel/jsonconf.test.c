@@ -155,7 +155,9 @@ static void test_ships(CuTest * tc)
 {
     const char * data = "{\"ships\": { \"boat\" : { "
         "\"construction\" : { \"maxsize\" : 20, \"reqsize\" : 10, \"minskill\" : 1 },"
-        "\"coasts\" : [ \"plain\" ]"
+        "\"coasts\" : [ \"plain\" ],"
+        "\"range\" : 8,"
+        "\"maxrange\" : 16"
         "}}}";
 
     cJSON *json = cJSON_Parse(data);
@@ -175,6 +177,8 @@ static void test_ships(CuTest * tc)
     CuAssertIntEquals(tc, 10, st->construction->reqsize);
     CuAssertIntEquals(tc, 20, st->construction->maxsize);
     CuAssertIntEquals(tc, 1, st->construction->minskill);
+    CuAssertIntEquals(tc, 8, st->range);
+    CuAssertIntEquals(tc, 16, st->range_max);
 
     ter = get_terrain("plain");
     CuAssertPtrNotNull(tc, ter);

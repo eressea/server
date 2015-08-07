@@ -469,9 +469,9 @@ static bool cansail(const region * r, ship * sh)
     return true;
 }
 
-int enoughsailors(const ship * sh, int sumskill)
+int enoughsailors(const ship * sh, int crew_skill)
 {
-    return sumskill >= sh->type->sumskill;
+    return crew_skill >= sh->type->sumskill;
 }
 
 /* ------------------------------------------------------------- */

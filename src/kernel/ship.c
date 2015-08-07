@@ -270,11 +270,7 @@ const char *write_shipname(const ship * sh, char *ibuf, size_t size)
 
 static int ShipSpeedBonus(const unit * u)
 {
-    static int level = -1;
-    if (level == -1) {
-        level =
-            get_param_int(global.parameters, "movement.shipspeed.skillbonus", 0);
-    }
+    int level = get_param_int(global.parameters, "movement.shipspeed.skillbonus", 0);
     if (level > 0) {
         ship *sh = u->ship;
         int skl = effskill(u, SK_SAILING);
@@ -305,6 +301,7 @@ int shipspeed(const ship * sh, const unit * u)
     static bool init;
     attrib *a;
     struct curse *c;
+    int bonus;
 
     assert(sh);
     if (!u) u = ship_owner(sh);
@@ -334,7 +331,19 @@ int shipspeed(const ship * sh, const unit * u)
         }
     }
 
-    k += ShipSpeedBonus(u);
+    bonus = ShipSpeedBonus(u);
+    if (bonus > 0 && sh->type->range_max>sh->type->range) {
+        int crew = crew_skill(sh);
+        int crew_bonus = (crew / sh->type->sumskill / 2) - 1;
+        if (crew_bonus > 0) {
+            bonus = _min(bonus, crew_bonus);
+            bonus = _min(bonus, sh->type->range_max - sh->type->range);
+        }
+        else {
+            bonus = 0;
+        }
+    }
+    k += bonus;
 
     a = a_find(sh->attribs, &at_speedup);
     while (a != NULL && a->type == &at_speedup) {
@@ -347,10 +356,6 @@ int shipspeed(const ship * sh, const unit * u)
         k += curse_geteffect_int(c);
         c = c->nexthash;
     }
-
-#ifdef SHIPSPEED
-    k *= SHIPSPEED;
-#endif
 
     if (sh->damage>0) {
         int size = sh->size * DAMAGE_SCALE;
