@@ -40,3 +40,4 @@ Thumbs.db
 .gdb_history
 *.cfg
 *.cmd
+tmp/
