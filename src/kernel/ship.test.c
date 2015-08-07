@@ -5,6 +5,12 @@
 #include <kernel/region.h>
 #include <kernel/ship.h>
 #include <kernel/unit.h>
+#include <kernel/curse.h>
+
+#include <util/attrib.h>
+
+#include <spells/shipcurse.h>
+#include <attributes/movement.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -389,6 +395,134 @@ static void test_crew_skill(CuTest *tc) {
     test_cleanup();
 }
 
+static ship *setup_ship(void) {
+    region *r;
+    ship_type *stype;
+    ship *sh;
+
+    test_cleanup();
+    test_create_world();
+    r = test_create_region(0, 0, test_create_terrain("ocean", 0));
+    stype = test_create_shiptype("longboat");
+    stype->cptskill = 1;
+    stype->sumskill = 10;
+    stype->minskill = 1;
+    stype->range = 2;
+    sh = test_create_ship(r, stype);
+    return sh;
+}
+
+static void setup_crew(ship *sh, struct faction *f, unit **cap, unit **crew) {
+    if (!f) f = test_create_faction(0);
+    assert(cap);
+    assert(crew);
+    *cap = test_create_unit(f, sh->region);
+    *crew = test_create_unit(f, sh->region);
+    (*cap)->ship = sh;
+    (*crew)->ship = sh;
+    set_level(*cap, SK_SAILING, sh->type->cptskill);
+    set_level(*crew, SK_SAILING, sh->type->sumskill - sh->type->cptskill);
+}
+
+static void test_shipspeed_stormwind(CuTest *tc) {
+    ship *sh;
+    unit *cap, *crew;
+
+    test_cleanup();
+    sh = setup_ship();
+    setup_crew(sh, 0, &cap, &crew);
+    register_shipcurse();
+    assert(sh && cap && crew);
+
+    create_curse(0, &sh->attribs, ct_find("stormwind"), 1, 1, 1, 0);
+    CuAssertIntEquals_Msg(tc, "stormwind doubles ship range", sh->type->range * 2, shipspeed(sh, cap));
+    test_cleanup();
+}
+
+static void test_shipspeed_nodrift(CuTest *tc) {
+    ship *sh;
+    unit *cap, *crew;
+
+    test_cleanup();
+    sh = setup_ship();
+    setup_crew(sh, 0, &cap, &crew);
+    register_shipcurse();
+    assert(sh && cap && crew);
+
+    create_curse(0, &sh->attribs, ct_find("nodrift"), 1, 1, 1, 0);
+    CuAssertIntEquals_Msg(tc, "nodrift adds +1 to range", sh->type->range + 1, shipspeed(sh, cap));
+    test_cleanup();
+}
+
+static void test_shipspeed_shipspeedup(CuTest *tc) {
+    ship *sh;
+    unit *cap, *crew;
+
+    test_cleanup();
+    sh = setup_ship();
+    setup_crew(sh, 0, &cap, &crew);
+    register_shipcurse();
+    assert(sh && cap && crew);
+
+    create_curse(0, &sh->attribs, ct_find("shipspeedup"), 1, 1, 3, 0);
+    CuAssertIntEquals_Msg(tc, "shipspeedup adds effect to range", sh->type->range + 3, shipspeed(sh, cap));
+    test_cleanup();
+}
+
+static void test_shipspeed_at_speedup(CuTest *tc) {
+    ship *sh;
+    unit *cap, *crew;
+    attrib *a;
+
+    test_cleanup();
+    sh = setup_ship();
+    setup_crew(sh, 0, &cap, &crew);
+    assert(sh && cap && crew);
+
+    a = a_new(&at_speedup);
+    a->data.i = 3;
+    a_add(&sh->attribs, a);
+    CuAssertIntEquals_Msg(tc, "at_speedup adds value to range", sh->type->range + 3, shipspeed(sh, cap));
+    test_cleanup();
+}
+
+static void test_shipspeed_race_bonus(CuTest *tc) {
+    ship *sh;
+    unit *cap, *crew;
+    race *rc;
+
+    test_cleanup();
+    sh = setup_ship();
+    setup_crew(sh, 0, &cap, &crew);
+    assert(sh && cap && crew);
+
+    rc = rc_get_or_create(cap->_race->_name);
+    rc->flags |= RCF_SHIPSPEED;
+    CuAssertIntEquals_Msg(tc, "captain with RCF_SHIPSPEED adds +1 to range", sh->type->range + 1, shipspeed(sh, cap));
+    test_cleanup();
+}
+
+static void test_shipspeed_damage(CuTest *tc) {
+    ship *sh;
+    unit *cap, *crew;
+    race *rc;
+
+    test_cleanup();
+    sh = setup_ship();
+    setup_crew(sh, 0, &cap, &crew);
+    assert(sh && cap && crew);
+
+    rc = rc_get_or_create(cap->_race->_name);
+    rc->flags |= RCF_SHIPSPEED;
+    sh->damage = 1;
+    CuAssertIntEquals_Msg(tc, "minimally damaged ships lose no range", 2, shipspeed(sh, cap));
+    sh->damage = sh->size * DAMAGE_SCALE / 2;
+    CuAssertIntEquals_Msg(tc, "damaged ships lose range", 1, shipspeed(sh, cap));
+    sh->damage = sh->size * DAMAGE_SCALE;
+    CuAssertIntEquals_Msg(tc, "fully damaged ships have no range", 0, shipspeed(sh, cap));
+    test_cleanup();
+}
+
 static void test_shipspeed(CuTest *tc) {
     ship *sh;
     ship_type *stype;
@@ -397,16 +531,11 @@ static void test_shipspeed(CuTest *tc) {
     unit *cap, *crew;
 
     test_cleanup();
-    test_create_world();
-    r = test_create_region(0, 0, test_create_terrain("ocean", 0));
+    sh = setup_ship();
+    r = sh->region;
     f = test_create_faction(0);
     assert(r && f);
-    stype = test_create_shiptype("longboat");
-    stype->cptskill = 1;
-    stype->sumskill = 10;
-    stype->minskill = 1;
-    stype->range = 2;
-    sh = test_create_ship(r, stype);
+    stype = st_get_or_create(sh->type->_name);
 
     CuAssertIntEquals_Msg(tc, "ship without a captain cannot move", 0, shipspeed(sh, NULL));
 
@@ -418,10 +547,13 @@ static void test_shipspeed(CuTest *tc) {
     set_level(cap, SK_SAILING, stype->cptskill);
     set_level(crew, SK_SAILING, stype->sumskill - stype->cptskill);
     CuAssertIntEquals_Msg(tc, "ship with fully skilled crew can sail at max speed", 2, shipspeed(sh, cap));
+    CuAssertIntEquals_Msg(tc, "shipspeed without a hint defaults to captain", 2, shipspeed(sh, NULL));
 
     set_level(cap, SK_SAILING, stype->cptskill + 5);
-    CuAssertIntEquals_Msg(tc, "higher captain skill should not affect top speed", 2, shipspeed(sh, cap));
+    set_level(crew, SK_SAILING, (stype->sumskill - stype->cptskill) * 10);
+    CuAssertIntEquals_Msg(tc, "higher skills should not affect top speed", 2, shipspeed(sh, cap));
     set_level(cap, SK_SAILING, stype->cptskill);
+    set_level(crew, SK_SAILING, stype->sumskill - stype->cptskill);
 
     CuAssertIntEquals(tc, 2, shipspeed(sh, cap));
 
@@ -446,5 +578,11 @@ CuSuite *get_ship_suite(void)
     SUITE_ADD_TEST(suite, test_shipowner_goes_to_same_faction_after_leave);
     SUITE_ADD_TEST(suite, test_shipowner_goes_to_empty_unit_after_leave);
     SUITE_ADD_TEST(suite, test_shipspeed);
+    SUITE_ADD_TEST(suite, test_shipspeed_stormwind);
+    SUITE_ADD_TEST(suite, test_shipspeed_nodrift);
+    SUITE_ADD_TEST(suite, test_shipspeed_shipspeedup);
+    SUITE_ADD_TEST(suite, test_shipspeed_at_speedup);
+    SUITE_ADD_TEST(suite, test_shipspeed_race_bonus);
+    SUITE_ADD_TEST(suite, test_shipspeed_damage);
     return suite;
 }

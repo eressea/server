@@ -191,12 +191,14 @@ ship *new_ship(const ship_type * stype, region * r, const struct locale *lang)
     sh->type = stype;
     sh->region = r;
 
-    sname = LOC(lang, stype->_name);
-    if (!sname) {
-        sname = LOC(lang, parameters[P_SHIP]);
+    if (lang) {
+        sname = LOC(lang, stype->_name);
         if (!sname) {
-            sname = parameters[P_SHIP];
+            sname = LOC(lang, parameters[P_SHIP]);
         }
+    }
+    if (!sname) {
+        sname = parameters[P_SHIP];
     }
     assert(sname);
     slprintf(buffer, sizeof(buffer), "%s %s", sname, shipid(sh));
