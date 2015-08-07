@@ -300,7 +300,7 @@ int crew_skill(const ship *sh) {
 
 int shipspeed(const ship * sh, const unit * u)
 {
-    double k = sh->type->range;
+    int k = sh->type->range;
     static const struct curse_type *stormwind_ct, *nodrift_ct;
     static bool init;
     attrib *a;
@@ -344,7 +344,7 @@ int shipspeed(const ship * sh, const unit * u)
 
     c = get_curse(sh->attribs, ct_find("shipspeedup"));
     while (c) {
-        k += curse_geteffect(c);
+        k += curse_geteffect_int(c);
         c = c->nexthash;
     }
 
@@ -352,12 +352,12 @@ int shipspeed(const ship * sh, const unit * u)
     k *= SHIPSPEED;
 #endif
 
-    if (sh->damage)
-        k =
-        (k * (sh->size * DAMAGE_SCALE - sh->damage) + sh->size * DAMAGE_SCALE -
-        1) / (sh->size * DAMAGE_SCALE);
-
-    return (int)k;
+    if (sh->damage>0) {
+        int size = sh->size * DAMAGE_SCALE;
+        k *= (size - sh->damage);
+        k = (k + size - 1) / size;
+    }
+    return k;
 }
 
 const char *shipname(const ship * sh)

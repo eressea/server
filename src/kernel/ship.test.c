@@ -505,15 +505,12 @@ static void test_shipspeed_race_bonus(CuTest *tc) {
 static void test_shipspeed_damage(CuTest *tc) {
     ship *sh;
     unit *cap, *crew;
-    race *rc;
 
     test_cleanup();
     sh = setup_ship();
     setup_crew(sh, 0, &cap, &crew);
     assert(sh && cap && crew);
 
-    rc = rc_get_or_create(cap->_race->_name);
-    rc->flags |= RCF_SHIPSPEED;
     sh->damage = 1;
     CuAssertIntEquals_Msg(tc, "minimally damaged ships lose no range", 2, shipspeed(sh, cap));
     sh->damage = sh->size * DAMAGE_SCALE / 2;
