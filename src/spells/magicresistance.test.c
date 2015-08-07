@@ -43,7 +43,7 @@ static void test_magicresistance_unit(CuTest *tc) {
     CuAssertPtrEquals(tc, (void *)&at_curse, (void *)u2->attribs->type);
     msg = c->type->curseinfo(u2, TYP_UNIT, c, 1);
     CuAssertPtrNotNull(tc, msg);
-    CuAssertStrEquals(tc, "curseinfo::magicresistance", test_get_messagetype(msg));
+    CuAssertStrEquals(tc, "curseinfo::magicresistance_unit", test_get_messagetype(msg));
 
     test_cleanup();
 }
@@ -69,7 +69,7 @@ static void test_magicresistance_building(CuTest *tc) {
     CuAssertPtrEquals(tc, (void *)&at_curse, (void *)b1->attribs->type);
     msg = c->type->curseinfo(b1, TYP_BUILDING, c, 1);
     CuAssertPtrNotNull(tc, msg);
-    CuAssertStrEquals(tc, "curseinfo::homestone", test_get_messagetype(msg));
+    CuAssertStrEquals(tc, "curseinfo::magicresistance_building", test_get_messagetype(msg));
 
     test_cleanup();
 }
