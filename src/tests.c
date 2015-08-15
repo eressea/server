@@ -244,6 +244,17 @@ const char * test_get_messagetype(const message *msg) {
     return name;
 }
 
+struct message * test_find_messagetype(struct message_list *msgs, const char *name) {
+    struct mlist *ml;
+    assert(msgs);
+    for (ml = msgs->begin; ml; ml = ml->next) {
+        if (strcmp(name, test_get_messagetype(ml->msg)) == 0) {
+            return ml->msg;
+        }
+    }
+    return 0;
+}
+
 const message_type *register_msg(const char *type, int n_param, ...) {
     char **argv;
     va_list args;

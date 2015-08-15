@@ -845,7 +845,7 @@ static void test_long_order_multi_long(CuTest *tc) {
     update_long_order(u);
     CuAssertPtrNotNull(tc, u->thisorder);
     CuAssertPtrNotNull(tc, u->orders);
-    CuAssertStrEquals(tc, "error52", test_get_messagetype(u->faction->msgs->begin->msg));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error52"));
     test_cleanup();
 }
 
@@ -860,7 +860,7 @@ static void test_long_order_multi_buy(CuTest *tc) {
     update_long_order(u);
     CuAssertPtrEquals(tc, 0, u->thisorder);
     CuAssertPtrNotNull(tc, u->orders);
-    CuAssertStrEquals(tc, "error52", test_get_messagetype(u->faction->msgs->begin->msg));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error52"));
     test_cleanup();
 }
 
@@ -891,7 +891,7 @@ static void test_long_order_buy_cast(CuTest *tc) {
     update_long_order(u);
     CuAssertPtrEquals(tc, 0, u->thisorder);
     CuAssertPtrNotNull(tc, u->orders);
-    CuAssertStrEquals(tc, "error52", test_get_messagetype(u->faction->msgs->begin->msg));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error52"));
     test_cleanup();
 }
 
@@ -927,7 +927,7 @@ static void test_ally_cmd_errors(CuTest *tc) {
 
     ord = create_order(K_ALLY, u->faction->locale, itoa36(fid));
     ally_cmd(u, ord);
-    CuAssertStrEquals(tc, "error66", test_get_messagetype(u->faction->msgs->begin->msg));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error66"));
     free_order(ord);
 
     test_cleanup();
@@ -974,9 +974,29 @@ static void test_ally_cmd(CuTest *tc) {
     test_cleanup();
 }
 
+void test_nmr_warnings(CuTest *tc) {
+    faction *f1, *f2;
+    test_cleanup();
+    set_param(&global.parameters, "nmr.timeout", "3");
+    f1 = test_create_faction(0);
+    f2 = test_create_faction(0);
+    f2->age = 2;
+    f2->lastorders = 1;
+    turn = 3;
+    CuAssertIntEquals(tc, 0, f1->age);
+    nmr_warnings();
+    CuAssertPtrNotNull(tc, f1->msgs);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f1->msgs, "changepasswd"));
+    CuAssertPtrNotNull(tc, f2->msgs);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f2->msgs, "nmr_warning"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f2->msgs, "nmr_warning_final"));
+    test_cleanup();
+}
+
 CuSuite *get_laws_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_nmr_warnings);
     SUITE_ADD_TEST(suite, test_ally_cmd);
     SUITE_ADD_TEST(suite, test_ally_cmd_errors);
     SUITE_ADD_TEST(suite, test_long_order_normal);

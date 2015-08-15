@@ -725,11 +725,14 @@ void immigration(void)
     }
 }
 
-static void nmr_warnings(void)
+void nmr_warnings(void)
 {
     faction *f, *fa;
 #define FRIEND (HELP_GUARD|HELP_MONEY)
     for (f = factions; f; f = f->next) {
+        if (f->age <= 1) {
+            ADDMSG(&f->msgs, msg_message("changepasswd", "value", f->passw));
+        }
         if (!fval(f, FFL_NOIDLEOUT) && turn > f->lastorders) {
             ADDMSG(&f->msgs, msg_message("nmr_warning", ""));
             if (turn - f->lastorders == NMRTimeout() - 1) {
