@@ -2059,9 +2059,6 @@ const char *charset)
 
     if (f->age <= 2) {
         const char *s;
-        if (f->age <= 1) {
-            ADDMSG(&f->msgs, msg_message("changepasswd", "value", f->passw));
-        }
         RENDER(f, buf, sizeof(buf), ("newbie_password", "password", f->passw));
         newline(out);
         centre(out, buf, true);

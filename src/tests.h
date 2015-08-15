@@ -41,6 +41,7 @@ extern "C" {
     int RunAllTests(void);
     void test_translate_param(const struct locale *lang, param_t param, const char *text);
     const char * test_get_messagetype(const struct message *msg);
+    struct message * test_find_messagetype(struct message_list *msgs, const char *name);
     struct message * test_get_last_message(struct message_list *mlist);
 
     const struct message_type *register_msg(const char *type, int n_param, ...);

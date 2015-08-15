@@ -32,6 +32,10 @@ extern "C" {
     struct order;
     struct attrib_type;
 
+    extern struct attrib_type at_germs;
+    extern int dropouts[2];
+    extern int *age;
+
     int writepasswd(void);
     void demographics(void);
     void immigration(void);
@@ -50,11 +54,6 @@ extern "C" {
 
     /* eressea-specific. put somewhere else, please. */
     void processorders(void);
-    extern struct attrib_type at_germs;
-
-    extern int dropouts[2];
-    extern int *age;
-
 
     void new_units(void);
     void defaultorders(void);
@@ -66,35 +65,37 @@ extern "C" {
     void sinkships(struct region * r);
     void do_enter(struct region *r, bool is_final_attempt);
 
-    extern int password_cmd(struct unit *u, struct order *ord);
-    extern int banner_cmd(struct unit *u, struct order *ord);
-    extern int email_cmd(struct unit *u, struct order *ord);
-    extern int send_cmd(struct unit *u, struct order *ord);
-    extern int ally_cmd(struct unit* u, struct order *ord);
-    extern int prefix_cmd(struct unit *u, struct order *ord);
-    extern int setstealth_cmd(struct unit *u, struct order *ord);
-    extern int status_cmd(struct unit *u, struct order *ord);
-    extern int display_cmd(struct unit *u, struct order *ord);
-    extern int group_cmd(struct unit *u, struct order *ord);
-    extern int origin_cmd(struct unit *u, struct order *ord);
-    extern int quit_cmd(struct unit *u, struct order *ord);
-    extern int name_cmd(struct unit *u, struct order *ord);
-    extern int use_cmd(struct unit *u, struct order *ord);
-    extern int siege_cmd(struct unit *u, struct order *ord);
-    extern int leave_cmd(struct unit *u, struct order *ord);
-    extern int pay_cmd(struct unit *u, struct order *ord);
-    extern int promotion_cmd(struct unit *u, struct order *ord);
-    extern int renumber_cmd(struct unit *u, struct order *ord);
-    extern int combatspell_cmd(struct unit *u, struct order *ord);
-    extern int contact_cmd(struct unit *u, struct order *ord);
-    extern int guard_on_cmd(struct unit *u, struct order *ord);
-    extern int guard_off_cmd(struct unit *u, struct order *ord);
-    extern int reshow_cmd(struct unit *u, struct order *ord);
-    extern int mail_cmd(struct unit *u, struct order *ord);
-    extern int reserve_cmd(struct unit *u, struct order *ord);
-    extern int reserve_self(struct unit *u, struct order *ord);
-    extern int claim_cmd(struct unit *u, struct order *ord);
-    extern int follow_cmd(struct unit *u, struct order *ord);
+    int password_cmd(struct unit *u, struct order *ord);
+    int banner_cmd(struct unit *u, struct order *ord);
+    int email_cmd(struct unit *u, struct order *ord);
+    int send_cmd(struct unit *u, struct order *ord);
+    int ally_cmd(struct unit* u, struct order *ord);
+    int prefix_cmd(struct unit *u, struct order *ord);
+    int setstealth_cmd(struct unit *u, struct order *ord);
+    int status_cmd(struct unit *u, struct order *ord);
+    int display_cmd(struct unit *u, struct order *ord);
+    int group_cmd(struct unit *u, struct order *ord);
+    int origin_cmd(struct unit *u, struct order *ord);
+    int quit_cmd(struct unit *u, struct order *ord);
+    int name_cmd(struct unit *u, struct order *ord);
+    int use_cmd(struct unit *u, struct order *ord);
+    int siege_cmd(struct unit *u, struct order *ord);
+    int leave_cmd(struct unit *u, struct order *ord);
+    int pay_cmd(struct unit *u, struct order *ord);
+    int promotion_cmd(struct unit *u, struct order *ord);
+    int renumber_cmd(struct unit *u, struct order *ord);
+    int combatspell_cmd(struct unit *u, struct order *ord);
+    int contact_cmd(struct unit *u, struct order *ord);
+    int guard_on_cmd(struct unit *u, struct order *ord);
+    int guard_off_cmd(struct unit *u, struct order *ord);
+    int reshow_cmd(struct unit *u, struct order *ord);
+    int mail_cmd(struct unit *u, struct order *ord);
+    int reserve_cmd(struct unit *u, struct order *ord);
+    int reserve_self(struct unit *u, struct order *ord);
+    int claim_cmd(struct unit *u, struct order *ord);
+    int follow_cmd(struct unit *u, struct order *ord);
+
+    void nmr_warnings(void);
 
     bool cansee(const struct faction *f, const struct region *r,
         const struct unit *u, int modifier);
