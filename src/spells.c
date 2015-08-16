@@ -6564,14 +6564,14 @@ static spelldata spell_functions[] = {
     { "analysedream", sp_analysedream, 0 },
     { "disturbingdreams", sp_disturbingdreams, 0 },
     { "sleep", sp_sleep, 0 },
-    { "wisps", 0, 0 }, /* this spell is gone */
+    { "wisps", 0, 0 }, /* TODO: this spell is gone */
     { "gooddreams", sp_gooddreams, 0 },
     { "illaundestroymagic", sp_destroy_magic, 0 },
     { "clone", sp_clonecopy, 0 },
     { "bad_dreams", sp_baddreams, 0 },
     { "mindblast", sp_mindblast_temp, 0 },
     { "orkdream", sp_sweetdreams, 0 },
-    { "summon_alp", sp_summon_alp, 0 },
+    { "summon_alp", sp_summon_alp, 0 }, // TODO: this spell is disabled everywhere
     /* M_CERDDOR */
     { "appeasement", sp_denyattack, 0 },
     { "song_of_healing", sp_healing, 0 },

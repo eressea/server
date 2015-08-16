@@ -175,8 +175,6 @@ race *rc_get_or_create(const char *zName)
     assert(zName);
     rc = rc_find_i(zName);
     if (!rc) {
-        char zBuffer[80];
-
         rc = (race *)calloc(sizeof(race), 1);
         rc->hitpoints = 1;
         rc->weight = PERSON_WEIGHT;
@@ -189,8 +187,7 @@ race *rc_get_or_create(const char *zName)
             log_error("race '%s' has an invalid name. remove spaces\n", zName);
             assert(strchr(zName, ' ') == NULL);
         }
-        strcpy(zBuffer, zName);
-        rc->_name = _strdup(zBuffer);
+        rc->_name = _strdup(zName);
         rc->precombatspell = NULL;
 
         rc->attack[0].type = AT_COMBATSPELL;
