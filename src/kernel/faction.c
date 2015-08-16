@@ -310,14 +310,6 @@ void destroyfaction(faction * f)
         free(f->spellbook);
         f->spellbook = 0;
     }
-    while (f->battles) {
-        struct bmsg *bm = f->battles;
-        f->battles = bm->next;
-        if (bm->msgs) {
-            free_messagelist(bm->msgs);
-        }
-        free(bm);
-    }
 
     while (u) {
         /* give away your stuff, make zombies if you cannot (quest items) */
