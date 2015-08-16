@@ -312,3 +312,22 @@ message *add_message(message_list ** pm, message * m)
     }
     return m;
 }
+
+struct mlist ** merge_messages(message_list *mlist, message_list *append) {
+    struct mlist **split = 0;
+    assert(mlist);
+    if (append) {
+        split = mlist->end;
+        *split = append->begin;
+        mlist->end = append->end;
+    }
+    return split;
+}
+
+void split_messages(message_list *mlist, struct mlist **split) {
+    assert(mlist);
+    if (split) {
+        *split = 0;
+        mlist->end = split;
+    }
+}

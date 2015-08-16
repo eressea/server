@@ -2335,9 +2335,14 @@ const char *charset)
         if (sr->mode == see_unit || sr->mode == see_travel) {
             // TODO: Bug 2073
             message_list *mlist = r_getmessages(r, f);
-            rp_messages(out, r->msgs, f, 0, true);
-            if (mlist)
+            if (mlist) {
+                struct mlist **split = merge_messages(mlist, r->msgs);
                 rp_messages(out, mlist, f, 0, true);
+                split_messages(mlist, split);
+            }
+            else {
+                rp_messages(out, r->msgs, f, 0, true);
+            }
         }
 
         /* report all units. they are pre-sorted in an efficient manner */

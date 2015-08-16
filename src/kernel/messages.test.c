@@ -36,9 +36,31 @@ void test_message(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_merge_split(CuTest *tc) {
+    message_list *mlist = 0, *append = 0;
+    struct mlist **split;
+    message_type *mtype = mt_new("custom", NULL);
+
+    mt_register(mtype);
+    add_message(&mlist, msg_message(mtype->name, ""));
+    add_message(&append, msg_message(mtype->name, ""));
+
+    CuAssertPtrEquals(tc, 0, mlist->begin->next);
+    CuAssertPtrEquals(tc, &mlist->begin->next, mlist->end);
+    split = merge_messages(mlist, append);
+    CuAssertPtrNotNull(tc, split);
+    CuAssertPtrEquals(tc, &mlist->begin->next, split);
+    CuAssertPtrEquals(tc, append->end, mlist->end);
+    CuAssertPtrNotNull(tc, mlist->begin->next);
+    CuAssertPtrEquals(tc, append->begin, mlist->begin->next);
+    split_messages(mlist, split);
+    CuAssertPtrEquals(tc, 0, mlist->begin->next);
+}
+
 CuSuite *get_messages_suite(void) {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_missing_message);
+    SUITE_ADD_TEST(suite, test_merge_split);
     SUITE_ADD_TEST(suite, test_message);
     return suite;
 }
