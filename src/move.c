@@ -1172,17 +1172,17 @@ static void cycle_route(order * ord, unit * u, int gereist)
             if (!pause) {
                 const char *loc = LOC(lang, shortdirections[d]);
                 if (bufp != tail) {
-                    bufp = STRLCPY(bufp, " ", &size, "cycle_route");
+                    bufp = STRLCPY_EX(bufp, " ", &size, "cycle_route");
                 }
-                bufp = STRLCPY(bufp, loc, &size, "cycle_route");
+                bufp = STRLCPY_EX(bufp, loc, &size, "cycle_route");
             }
         }
         else if (strlen(neworder) > sizeof(neworder) / 2)
             break;
         else if (cm == gereist && !paused && pause) {
             const char *loc = LOC(lang, parameters[P_PAUSE]);
-            bufp = STRLCPY(bufp, " ", &size, "cycle_route");
-            bufp = STRLCPY(bufp, loc, &size, "cycle_route");
+            bufp = STRLCPY_EX(bufp, " ", &size, "cycle_route");
+            bufp = STRLCPY_EX(bufp, loc, &size, "cycle_route");
             paused = true;
         }
         else if (pause) {
@@ -2562,8 +2562,8 @@ static int hunt(unit * u, order * ord)
     rc = rconnect(rc, dir);
     while (moves < speed && (dir = hunted_dir(rc->attribs, id)) != NODIRECTION) {
         const char *loc = LOC(u->faction->locale, directions[dir]);
-        bufp = STRLCPY(bufp, " ", &size, "hunt");
-        bufp = STRLCPY(bufp, loc, &size, "hunt");
+        bufp = STRLCPY_EX(bufp, " ", &size, "hunt");
+        bufp = STRLCPY_EX(bufp, loc, &size, "hunt");
         moves++;
         rc = rconnect(rc, dir);
     }

@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <assert.h>
 #include <stdarg.h>
+#include <limits.h>
 
 #include "bsdstring.h"
 #include "log.h"
@@ -66,8 +67,14 @@ char * strlcpy_w(char *dst, const char *src, size_t *siz, const char *err, const
 {
     size_t bytes = strlcpy(dst, src, *siz);
     char * buf = dst;
-    if (wrptr(&buf, siz, bytes) != 0)
-        log_warning("%s: static buffer too small in %s:%d\n", err, file, line);
+    assert(bytes <= INT_MAX);
+    if (wrptr(&buf, siz, (int)bytes) != 0) {
+        if (err) {
+            log_warning("%s: static buffer too small in %s:%d\n", err, file, line);
+        } else {
+            log_warning("static buffer too small in %s:%d\n", file, line);
+        }
+    }
     return buf;
 }
 

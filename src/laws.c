@@ -2330,7 +2330,7 @@ static bool display_race(faction * f, unit * u, const race * rc)
         info = LOC(f->locale, mkname("raceinfo", "no_info"));
     }
 
-    bufp = STRLCPY(bufp, info, &size, "display_race");
+    bufp = STRLCPY(bufp, info, size);
 
     /* hp_p : Trefferpunkte */
     bytes =
@@ -2402,11 +2402,9 @@ static bool display_race(faction * f, unit * u, const race * rc)
     for (a = 0; a < RACE_ATTACKS; a++) {
         if (rc->attack[a].type != AT_NONE) {
             if (a != 0)
-                bytes = strlcpy(bufp, ", ", size);
+                bufp = STRLCPY(bufp, ", ", size);
             else
-                bytes = strlcpy(bufp, ": ", size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
+                bufp = STRLCPY(bufp, ": ", size);
 
             switch (rc->attack[a].type) {
             case AT_STANDARD:

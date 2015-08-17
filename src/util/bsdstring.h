@@ -20,6 +20,7 @@ size_t slprintf(char * dst, size_t size, const char * format, ...);
 #define WARN_STATIC_BUFFER_EX(foo) log_warning("%s: static buffer too small in %s:%d\n", (foo), __FILE__, __LINE__)
 #define WARN_STATIC_BUFFER() log_warning("static buffer too small in %s:%d\n", __FILE__, __LINE__)
 #define INFO_STATIC_BUFFER() log_info("static buffer too small in %s:%d\n", __FILE__, __LINE__)
-#define STRLCPY(dst, src, siz, err) strlcpy_w((dst), (src), (siz), (err), __FILE__, __LINE__)
+#define STRLCPY(dst, src, siz) strlcpy_w((dst), (src), &(siz), 0, __FILE__, __LINE__)
+#define STRLCPY_EX(dst, src, siz, err) strlcpy_w((dst), (src), (siz), (err), __FILE__, __LINE__)
 
 #endif
