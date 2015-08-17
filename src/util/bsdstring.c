@@ -7,8 +7,18 @@
 
 #include "bsdstring.h"
 
-int wrptr(char **ptr, size_t * size, size_t bytes)
+int wrptr(char **ptr, size_t * size, int result)
 {
+    size_t bytes = (size_t)result;
+    if (result < 0) {
+        // _snprintf buffer was too small
+        if (*size > 0) {
+            **ptr = 0;
+            *size = 0;
+        }
+        errno = 0;
+        return ERANGE;
+    }
     if (bytes == 0) {
         return 0;
     }

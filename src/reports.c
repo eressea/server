@@ -1783,6 +1783,7 @@ int write_reports(faction * f, time_t ltime)
     bool gotit = false;
     struct report_context ctx;
     const char *encoding = "UTF-8";
+    report_type *rtype;
 
     if (noreports) {
         return false;
@@ -1798,36 +1799,42 @@ int write_reports(faction * f, time_t ltime)
         get_seen_interval(&ctx);
     }
     get_addresses(&ctx);
-    _mkdir(reportpath());
-    do {
-        report_type *rtype = report_types;
-
+    if (_access(reportpath(), 0) < 0) {
+        _mkdir(reportpath());
+    }
+    if (errno) {
+        log_warning("errno was %d before writing reports", errno);
         errno = 0;
-        if (verbosity >= 2) {
-            log_printf(stdout, "Reports for %s:", factionname(f));
-        }
-        for (; rtype != NULL; rtype = rtype->next) {
-            if (f->options & rtype->flag) {
+    }
+    if (verbosity >= 2) {
+        log_printf(stdout, "Reports for %s:", factionname(f));
+    }
+    for (rtype = report_types; rtype != NULL; rtype = rtype->next) {
+        if (f->options & rtype->flag) {
+            int error;
+            do {
                 char filename[MAX_PATH];
                 sprintf(filename, "%s/%d-%s.%s", reportpath(), turn, factionid(f),
                     rtype->extension);
+                error = 0;
                 if (rtype->write(filename, &ctx, encoding) == 0) {
                     gotit = true;
                 }
-            }
+                if (errno) {
+                    char zText[64];
+                    log_warning("retrying, error %d during %s report for faction %s", error, rtype->extension, factionname(f));
+                    sprintf(zText, "waiting %u seconds before we retry", backup / 1000);
+                    perror(zText);
+                    _sleep(backup);
+                    if (backup < maxbackup) {
+                        backup *= 2;
+                    }
+                    error = errno;
+                    errno = 0;
+                }
+            } while (error);
         }
-
-        if (errno) {
-            char zText[64];
-            log_warning("retrying, error %d during reports for faction %s", errno, factionname(f));
-            sprintf(zText, "waiting %u seconds before we retry", backup / 1000);
-            perror(zText);
-            _sleep(backup);
-            if (backup < maxbackup) {
-                backup *= 2;
-            }
-        }
-    } while (errno);
+    }
     if (!gotit) {
         log_warning("No report for faction %s!", factionid(f));
     }
