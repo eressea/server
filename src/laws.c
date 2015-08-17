@@ -2320,7 +2320,8 @@ static bool display_race(faction * f, unit * u, const race * rc)
     name = rc_name_s(rc, NAME_SINGULAR);
 
     bytes = slprintf(bufp, size, "%s: ", LOC(f->locale, name));
-    if (wrptr(&bufp, &size, bytes) != 0)
+    assert(bytes <= INT_MAX);
+    if (wrptr(&bufp, &size, (int)bytes) != 0)
         WARN_STATIC_BUFFER();
 
     key = mkname("raceinfo", rc->_name);
@@ -2329,36 +2330,38 @@ static bool display_race(faction * f, unit * u, const race * rc)
         info = LOC(f->locale, mkname("raceinfo", "no_info"));
     }
 
-    bytes = strlcpy(bufp, info, size);
-    if (wrptr(&bufp, &size, bytes) != 0)
-        WARN_STATIC_BUFFER();
+    bufp = STRLCPY(bufp, info, &size, "display_race");
 
     /* hp_p : Trefferpunkte */
     bytes =
         slprintf(bufp, size, " %d %s", rc->hitpoints, LOC(f->locale,
         "stat_hitpoints"));
-    if (wrptr(&bufp, &size, bytes) != 0)
+    assert(bytes <= INT_MAX);
+    if (wrptr(&bufp, &size, (int)bytes) != 0)
         WARN_STATIC_BUFFER();
 
     /* b_attacke : Angriff */
     bytes =
         slprintf(bufp, size, ", %s: %d", LOC(f->locale, "stat_attack"),
         (rc->at_default + rc->at_bonus));
-    if (wrptr(&bufp, &size, bytes) != 0)
+    assert(bytes <= INT_MAX);
+    if (wrptr(&bufp, &size, (int)bytes) != 0)
         WARN_STATIC_BUFFER();
 
     /* b_defense : Verteidigung */
     bytes =
         slprintf(bufp, size, ", %s: %d", LOC(f->locale, "stat_defense"),
         (rc->df_default + rc->df_bonus));
-    if (wrptr(&bufp, &size, bytes) != 0)
+    assert(bytes <= INT_MAX);
+    if (wrptr(&bufp, &size, (int)bytes) != 0)
         WARN_STATIC_BUFFER();
 
     /* b_armor : Rüstung */
     if (rc->armor > 0) {
         bytes =
             slprintf(bufp, size, ", %s: %d", LOC(f->locale, "stat_armor"), rc->armor);
-        if (wrptr(&bufp, &size, bytes) != 0)
+        assert(bytes <= INT_MAX);
+        if (wrptr(&bufp, &size, (int)bytes) != 0)
             WARN_STATIC_BUFFER();
     }
 
@@ -2377,30 +2380,23 @@ static bool display_race(faction * f, unit * u, const race * rc)
         }
     }
     if (rc->battle_flags & BF_EQUIPMENT) {
-        bytes = (size_t)_snprintf(bufp, size, " %s", LOC(f->locale, "stat_equipment"));
-        if (wrptr(&bufp, &size, bytes) != 0)
+        if (wrptr(&bufp, &size, _snprintf(bufp, size, " %s", LOC(f->locale, "stat_equipment"))) != 0)
             WARN_STATIC_BUFFER();
     }
     if (rc->battle_flags & BF_RES_PIERCE) {
-        bytes = (size_t)_snprintf(bufp, size, " %s", LOC(f->locale, "stat_pierce"));
-        if (wrptr(&bufp, &size, bytes) != 0)
+        if (wrptr(&bufp, &size, _snprintf(bufp, size, " %s", LOC(f->locale, "stat_pierce"))) != 0)
             WARN_STATIC_BUFFER();
     }
     if (rc->battle_flags & BF_RES_CUT) {
-        bytes = (size_t)_snprintf(bufp, size, " %s", LOC(f->locale, "stat_cut"));
-        if (wrptr(&bufp, &size, bytes) != 0)
+        if (wrptr(&bufp, &size, _snprintf(bufp, size, " %s", LOC(f->locale, "stat_cut"))) != 0)
             WARN_STATIC_BUFFER();
     }
     if (rc->battle_flags & BF_RES_BASH) {
-        bytes = (size_t)_snprintf(bufp, size, " %s", LOC(f->locale, "stat_bash"));
-        if (wrptr(&bufp, &size, bytes) != 0)
+        if (wrptr(&bufp, &size, _snprintf(bufp, size, " %s", LOC(f->locale, "stat_bash"))) != 0)
             WARN_STATIC_BUFFER();
     }
 
-    bytes =
-       (size_t)_snprintf(bufp, size, " %d %s", at_count, LOC(f->locale,
-        (at_count == 1) ? "stat_attack" : "stat_attacks"));
-    if (wrptr(&bufp, &size, bytes) != 0)
+    if (wrptr(&bufp, &size, _snprintf(bufp, size, " %d %s", at_count, LOC(f->locale, (at_count == 1) ? "stat_attack" : "stat_attacks"))) != 0)
         WARN_STATIC_BUFFER();
 
     for (a = 0; a < RACE_ATTACKS; a++) {
@@ -2439,7 +2435,8 @@ static bool display_race(faction * f, unit * u, const race * rc)
                 bytes = 0;
             }
 
-            if (bytes && wrptr(&bufp, &size, bytes) != 0)
+            assert(bytes <= INT_MAX);
+            if (bytes && wrptr(&bufp, &size, (int)bytes) != 0)
                 WARN_STATIC_BUFFER();
         }
     }
