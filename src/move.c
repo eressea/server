@@ -1131,7 +1131,6 @@ static const char *shortdirections[MAXDIRECTIONS] = {
 
 static void cycle_route(order * ord, unit * u, int gereist)
 {
-    size_t bytes;
     int cm = 0;
     char tail[1024], *bufp = tail;
     char neworder[2048];
@@ -1172,25 +1171,17 @@ static void cycle_route(order * ord, unit * u, int gereist)
             if (!pause) {
                 const char *loc = LOC(lang, shortdirections[d]);
                 if (bufp != tail) {
-                    bytes = strlcpy(bufp, " ", size);
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
+                    bufp = STRLCPY(bufp, " ", &size, "cycle_route");
                 }
-                bytes = strlcpy(bufp, loc, size);
-                if (wrptr(&bufp, &size, bytes) != 0)
-                    WARN_STATIC_BUFFER();
+                bufp = STRLCPY(bufp, loc, &size, "cycle_route");
             }
         }
         else if (strlen(neworder) > sizeof(neworder) / 2)
             break;
         else if (cm == gereist && !paused && pause) {
             const char *loc = LOC(lang, parameters[P_PAUSE]);
-            bytes = strlcpy(bufp, " ", size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
-            bytes = strlcpy(bufp, loc, size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
+            bufp = STRLCPY(bufp, " ", &size, "cycle_route");
+            bufp = STRLCPY(bufp, loc, &size, "cycle_route");
             paused = true;
         }
         else if (pause) {
@@ -2568,12 +2559,9 @@ static int hunt(unit * u, order * ord)
     }
     rc = rconnect(rc, dir);
     while (moves < speed && (dir = hunted_dir(rc->attribs, id)) != NODIRECTION) {
-        bytes = strlcpy(bufp, " ", size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
-        bytes = strlcpy(bufp, LOC(u->faction->locale, directions[dir]), size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
+        const char *loc = LOC(u->faction->locale, directions[dir]);
+        bufp = STRLCPY(bufp, " ", &size, "hunt");
+        bufp = STRLCPY(bufp, loc, &size, "hunt");
         moves++;
         rc = rconnect(rc, dir);
     }

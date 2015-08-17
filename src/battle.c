@@ -2966,21 +2966,16 @@ static void print_header(battle * b)
         side *s;
         char *bufp = zText;
         size_t size = sizeof(zText) - 1;
-        size_t bytes;
 
         for (s = b->sides; s != b->sides + b->nsides; ++s) {
             fighter *df;
             for (df = s->fighters; df; df = df->next) {
                 if (is_attacker(df)) {
                     if (first) {
-                        bytes = strlcpy(bufp, ", ", size);
-                        if (wrptr(&bufp, &size, bytes) != 0)
-                            WARN_STATIC_BUFFER();
+                        bufp = STRLCPY(bufp, ", ", &size, "print_header");
                     }
                     if (lastf) {
-                        bytes = strlcpy(bufp, (const char *)lastf, size);
-                        if (wrptr(&bufp, &size, bytes) != 0)
-                            WARN_STATIC_BUFFER();
+                        bufp = STRLCPY(bufp, lastf, &size, "print_header");
                         first = true;
                     }
                     if (seematrix(f, s))
@@ -2992,20 +2987,12 @@ static void print_header(battle * b)
             }
         }
         if (first) {
-            bytes = strlcpy(bufp, " ", size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
-            bytes = strlcpy(bufp, (const char *)LOC(f->locale, "and"), size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
-            bytes = strlcpy(bufp, " ", size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
+            bufp = STRLCPY(bufp, " ", &size, "print_header");
+            bufp = STRLCPY(bufp, LOC(f->locale, "and"), &size, "print_header");
+            bufp = STRLCPY(bufp, " ", &size, "print_header");
         }
         if (lastf) {
-            bytes = strlcpy(bufp, (const char *)lastf, size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
+            bufp = STRLCPY(bufp, lastf, &size, "print_header");
         }
 
         m = msg_message("battle::starters", "factions", zText);
