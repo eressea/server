@@ -1676,6 +1676,7 @@ void attrib_init(void)
 void kernel_init(void)
 {
     register_reports();
+    mt_clear();
     if (!mt_find("missing_message")) {
         mt_register(mt_new_va("missing_message", "name:string", 0));
         mt_register(mt_new_va("missing_feedback", "unit:unit", "region:region", "command:order", "name:string", 0));

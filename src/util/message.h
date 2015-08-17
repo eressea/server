@@ -28,10 +28,10 @@ extern "C" {
 
     typedef struct message_type {
         unsigned int key;
-        const char *name;
+        char *name;
         int nparameters;
-        const char **pnames;
-        const struct arg_type **types;
+        char **pnames;
+        struct arg_type ** types;
     } message_type;
 
     typedef struct message {
@@ -40,8 +40,9 @@ extern "C" {
         int refcount;
     } message;
 
-    extern struct message_type *mt_new(const char *name, const char **args);
-    extern struct message_type *mt_new_va(const char *name, ...);
+    void mt_clear(void);
+    struct message_type *mt_new(const char *name, const char **args);
+    struct message_type *mt_new_va(const char *name, ...);
     /* mt_new("simple_sentence", "subject:string", "predicate:string",
      *        "object:string", "lang:locale", NULL); */
 
@@ -61,9 +62,8 @@ extern "C" {
 
     extern void register_argtype(const char *name, void(*free_arg) (variant),
         variant(*copy_arg) (variant), variant_type);
-    extern const struct arg_type *find_argtype(const char *name);
 
-    extern void(*msg_log_create) (const struct message * msg);
+    void(*msg_log_create) (const struct message * msg);
 
 #ifdef __cplusplus
 }

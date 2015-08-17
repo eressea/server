@@ -745,13 +745,9 @@ static void test_peasant_luck_effect(CuTest *tc) {
 
 static void test_luck_message(CuTest *tc) {
     region* r;
-    const message_type *msg_types[1];
-
     test_cleanup();
     r = test_create_region(0, 0, NULL);
     rsetpeasants(r, 1);
-
-    msg_types[0] = register_msg("peasantluck_success", 1, "births:int");
 
     demographics();
 
@@ -764,7 +760,7 @@ static void test_luck_message(CuTest *tc) {
 
     demographics();
 
-    assert_messages(tc, r->msgs->begin, msg_types, 1, true, 0);
+    CuAssertPtrNotNull(tc, test_find_messagetype(r->msgs, "peasantluck_success"));
 
     test_cleanup();
 }

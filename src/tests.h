@@ -44,10 +44,6 @@ extern "C" {
     struct message * test_find_messagetype(struct message_list *msgs, const char *name);
     struct message * test_get_last_message(struct message_list *mlist);
 
-    const struct message_type *register_msg(const char *type, int n_param, ...);
-    void assert_messages(struct CuTest * tc, struct mlist *msglist, const struct message_type **types,
-        int num_msgs, bool exact_match, ...);
-
     void disabled_test(void *suite, void (*)(struct CuTest *), const char *name);
 
 #define DISABLE_TEST(SUITE, TEST) disabled_test(SUITE, TEST, #TEST)
