@@ -604,13 +604,15 @@ static int sp_summon_familiar(castorder * co)
                 else {
                     bytes = strlcpy(bufp, (const char *)", ", size);
                 }
-                if (wrptr(&bufp, &size, bytes) != 0)
+                assert(bytes <= INT_MAX);
+                if (wrptr(&bufp, &size, (int)bytes) != 0)
                     WARN_STATIC_BUFFER();
             }
             bytes =
                 strlcpy(bufp, (const char *)skillname((skill_t)sk, mage->faction->locale),
                 size);
-            if (wrptr(&bufp, &size, bytes) != 0)
+            assert(bytes <= INT_MAX);
+            if (wrptr(&bufp, &size, (int)bytes) != 0)
                 WARN_STATIC_BUFFER();
         }
     }
