@@ -77,6 +77,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 int *storms;
 
@@ -1131,7 +1132,6 @@ static const char *shortdirections[MAXDIRECTIONS] = {
 
 static void cycle_route(order * ord, unit * u, int gereist)
 {
-    size_t bytes;
     int cm = 0;
     char tail[1024], *bufp = tail;
     char neworder[2048];
@@ -1172,25 +1172,17 @@ static void cycle_route(order * ord, unit * u, int gereist)
             if (!pause) {
                 const char *loc = LOC(lang, shortdirections[d]);
                 if (bufp != tail) {
-                    bytes = strlcpy(bufp, " ", size);
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
+                    bufp = STRLCPY_EX(bufp, " ", &size, "cycle_route");
                 }
-                bytes = strlcpy(bufp, loc, size);
-                if (wrptr(&bufp, &size, bytes) != 0)
-                    WARN_STATIC_BUFFER();
+                bufp = STRLCPY_EX(bufp, loc, &size, "cycle_route");
             }
         }
         else if (strlen(neworder) > sizeof(neworder) / 2)
             break;
         else if (cm == gereist && !paused && pause) {
             const char *loc = LOC(lang, parameters[P_PAUSE]);
-            bytes = strlcpy(bufp, " ", size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
-            bytes = strlcpy(bufp, loc, size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
+            bufp = STRLCPY_EX(bufp, " ", &size, "cycle_route");
+            bufp = STRLCPY_EX(bufp, loc, &size, "cycle_route");
             paused = true;
         }
         else if (pause) {
@@ -2552,7 +2544,8 @@ static int hunt(unit * u, order * ord)
 
     bufp = command;
     bytes = slprintf(bufp, size, "%s %s", LOC(u->faction->locale, keyword(K_MOVE)), LOC(u->faction->locale, directions[dir]));
-    if (wrptr(&bufp, &size, bytes) != 0)
+    assert(bytes <= INT_MAX);
+    if (wrptr(&bufp, &size, (int)bytes) != 0)
         WARN_STATIC_BUFFER();
 
     moves = 1;
@@ -2568,12 +2561,9 @@ static int hunt(unit * u, order * ord)
     }
     rc = rconnect(rc, dir);
     while (moves < speed && (dir = hunted_dir(rc->attribs, id)) != NODIRECTION) {
-        bytes = strlcpy(bufp, " ", size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
-        bytes = strlcpy(bufp, LOC(u->faction->locale, directions[dir]), size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
+        const char *loc = LOC(u->faction->locale, directions[dir]);
+        bufp = STRLCPY_EX(bufp, " ", &size, "hunt");
+        bufp = STRLCPY_EX(bufp, loc, &size, "hunt");
         moves++;
         rc = rconnect(rc, dir);
     }

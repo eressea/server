@@ -100,6 +100,17 @@ extern int *storms;
 extern int weeks_per_month;
 extern int months_per_year;
 
+static void check_errno(const char * file, int line) {
+    if (errno) {
+        char zText[64];
+        sprintf(zText, "error %d during report at %s:%d", errno, file, line);
+        perror(zText);
+        errno = 0;
+    }
+}
+
+#define CHECK_ERRNO() check_errno(__FILE__, __LINE__)
+
 static char *gamedate_season(const struct locale *lang)
 {
     static char buf[256]; // FIXME: static return value
@@ -1396,14 +1407,17 @@ static void durchreisende(stream *out, const region * r, const faction * f)
             }
         }
         if (size > 0) {
+            CHECK_ERRNO();
             if (maxtravel == 1) {
                 bytes = _snprintf(bufp, size, " %s", LOC(f->locale, "has_moved_one"));
             }
             else {
                 bytes = _snprintf(bufp, size, " %s", LOC(f->locale, "has_moved_many"));
             }
+            CHECK_ERRNO();
             if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
+                WARN_STATIC_BUFFER_EX("durchreisende");
+            CHECK_ERRNO();
         }
         *bufp = 0;
         paragraph(out, buf, 0, 0, 0);
@@ -2206,6 +2220,7 @@ const char *charset)
     }
 
     ch = 0;
+    CHECK_ERRNO();
     for (a = a_find(f->attribs, &at_showitem); a && a->type == &at_showitem;
         a = a->next) {
         const potion_type *ptype =
@@ -2258,6 +2273,7 @@ const char *charset)
         }
     }
     newline(out);
+    CHECK_ERRNO();
     centre(out, LOC(f->locale, "nr_alliances"), false);
     newline(out);
 
@@ -2265,6 +2281,7 @@ const char *charset)
 
     rpline(out);
 
+    CHECK_ERRNO();
     anyunits = 0;
 
     for (r = ctx->first; sr == NULL && r != ctx->last; r = r->next) {
@@ -2389,6 +2406,7 @@ const char *charset)
 
         newline(out);
         rpline(out);
+        CHECK_ERRNO();
     }
     if (!is_monsters(f)) {
         if (!anyunits) {
@@ -2400,6 +2418,7 @@ const char *charset)
         }
     }
     fstream_done(&strm);
+    CHECK_ERRNO();
     return 0;
 }
 

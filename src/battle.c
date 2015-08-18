@@ -2966,21 +2966,16 @@ static void print_header(battle * b)
         side *s;
         char *bufp = zText;
         size_t size = sizeof(zText) - 1;
-        size_t bytes;
 
         for (s = b->sides; s != b->sides + b->nsides; ++s) {
             fighter *df;
             for (df = s->fighters; df; df = df->next) {
                 if (is_attacker(df)) {
                     if (first) {
-                        bytes = strlcpy(bufp, ", ", size);
-                        if (wrptr(&bufp, &size, bytes) != 0)
-                            WARN_STATIC_BUFFER();
+                        bufp = STRLCPY(bufp, ", ", size);
                     }
                     if (lastf) {
-                        bytes = strlcpy(bufp, (const char *)lastf, size);
-                        if (wrptr(&bufp, &size, bytes) != 0)
-                            WARN_STATIC_BUFFER();
+                        bufp = STRLCPY(bufp, lastf, size);
                         first = true;
                     }
                     if (seematrix(f, s))
@@ -2992,20 +2987,12 @@ static void print_header(battle * b)
             }
         }
         if (first) {
-            bytes = strlcpy(bufp, " ", size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
-            bytes = strlcpy(bufp, (const char *)LOC(f->locale, "and"), size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
-            bytes = strlcpy(bufp, " ", size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
+            bufp = STRLCPY(bufp, " ", size);
+            bufp = STRLCPY(bufp, LOC(f->locale, "and"), size);
+            bufp = STRLCPY(bufp, " ", size);
         }
         if (lastf) {
-            bytes = strlcpy(bufp, (const char *)lastf, size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
+            bufp = STRLCPY(bufp, lastf, size);
         }
 
         m = msg_message("battle::starters", "factions", zText);
@@ -3736,7 +3723,6 @@ static int battle_report(battle * b)
         faction *fac = bf->faction;
         char buf[32 * MAXSIDES];
         char *bufp = buf;
-        size_t bytes;
         size_t size = sizeof(buf) - 1;
         message *m;
 
@@ -3759,34 +3745,24 @@ static int battle_report(battle * b)
                 char buffer[32];
 
                 if (komma) {
-                    bytes = strlcpy(bufp, ", ", size);
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
+                    bufp = STRLCPY(bufp, ", ", size);
                 }
                 slprintf(buffer, sizeof(buffer), "%s %2d(%s): ",
                     loc_army, army_index(s), abbrev);
-
-                bytes = strlcpy(bufp, buffer, size);
-                if (wrptr(&bufp, &size, bytes) != 0)
-                    WARN_STATIC_BUFFER();
+                
+                bufp = STRLCPY(bufp, buffer, size);
 
                 for (r = FIGHT_ROW; r != NUMROWS; ++r) {
                     if (alive[r]) {
                         if (l != FIGHT_ROW) {
-                            bytes = strlcpy(bufp, "+", size);
-                            if (wrptr(&bufp, &size, bytes) != 0)
-                                WARN_STATIC_BUFFER();
+                            bufp = STRLCPY(bufp, "+", size);
                         }
                         while (k--) {
-                            bytes = strlcpy(bufp, "0+", size);
-                            if (wrptr(&bufp, &size, bytes) != 0)
-                                WARN_STATIC_BUFFER();
+                            bufp = STRLCPY(bufp, "0+", size);
                         }
                         sprintf(buffer, "%d", alive[r]);
-
-                        bytes = strlcpy(bufp, buffer, size);
-                        if (wrptr(&bufp, &size, bytes) != 0)
-                            WARN_STATIC_BUFFER();
+                        
+                        bufp = STRLCPY(bufp, buffer, size);
 
                         k = 0;
                         l = r + 1;

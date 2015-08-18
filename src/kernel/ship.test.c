@@ -521,12 +521,10 @@ static void test_shipspeed_damage(CuTest *tc) {
 static void test_shipspeed(CuTest *tc) {
     ship *sh;
     const ship_type *stype;
-    region *r;
     unit *cap, *crew;
 
     test_cleanup();
     sh = setup_ship();
-    r = sh->region;
     stype = sh->type;
 
     CuAssertIntEquals_Msg(tc, "ship without a captain cannot move", 0, shipspeed(sh, NULL));

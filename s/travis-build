@@ -10,6 +10,7 @@ $BUILD/iniparser/inifile eressea.ini add lua:paths lunit:scripts
 fi
 }
 
+set -e
 [ -z $BUILD ] && BUILD=Debug ; export BUILD
 s/cmake-init
 s/build

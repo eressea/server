@@ -80,6 +80,11 @@ void test_cleanup(void)
     free_races();
     free_spellbooks();
     free_gamedata();
+    mt_clear();
+    if (!mt_find("missing_message")) {
+        mt_register(mt_new_va("missing_message", "name:string", 0));
+        mt_register(mt_new_va("missing_feedback", "unit:unit", "region:region", "command:order", "name:string", 0));
+    }
 }
 
 terrain_type *
@@ -253,59 +258,6 @@ struct message * test_find_messagetype(struct message_list *msgs, const char *na
         }
     }
     return 0;
-}
-
-const message_type *register_msg(const char *type, int n_param, ...) {
-    char **argv;
-    va_list args;
-    int i;
-
-    va_start(args, n_param);
-
-    argv = malloc(sizeof(char *) * (n_param + 1));
-    for (i = 0; i < n_param; ++i) {
-        argv[i] = va_arg(args, char *);
-    }
-    argv[n_param] = 0;
-    va_end(args);
-    return mt_register(mt_new(type, (const char **)argv));
-}
-
-void assert_messages(struct CuTest * tc, struct mlist *msglist, const message_type **types,
-    int num_msgs, bool exact_match, ...) {
-    char buf[100];
-    va_list args;
-    int found = 0, argc = -1;
-    struct message *msg;
-    bool match = true;
-
-    va_start(args, exact_match);
-
-    while (msglist) {
-        msg = msglist->msg;
-        if (found >= num_msgs) {
-            if (exact_match) {
-                slprintf(buf, sizeof(buf), "too many messages: %s", msg->type->name);
-                CuFail(tc, buf);
-            } else {
-                break;
-            }
-        }
-        if (exact_match || match)
-            argc = va_arg(args, int);
-
-        match = strcmp(types[argc]->name, msg->type->name) == 0;
-        if (match)
-            ++found;
-        else if (exact_match)
-            CuAssertStrEquals(tc, types[argc]->name, msg->type->name);
-
-        msglist = msglist->next;
-    }
-
-    CuAssertIntEquals_Msg(tc, "not enough messages", num_msgs, found);
-
-    va_end(args);
 }
 
 void disabled_test(void *suite, void (*test)(CuTest *), const char *name) {
