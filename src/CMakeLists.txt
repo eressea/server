@@ -108,6 +108,7 @@ set (ERESSEA_SRC
   spy.c
   study.c
   summary.c
+  travelthru.c
   monsters.c
   wormhole.c
   ${SPELLS_SRC}

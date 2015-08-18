@@ -169,7 +169,6 @@ extern "C" {
     extern struct attrib_type at_horseluck;
     extern struct attrib_type at_woodcount;
     extern struct attrib_type at_deathcount;
-    extern struct attrib_type at_travelunit;
 
     void initrhash(void);
     void rhash(struct region *r);

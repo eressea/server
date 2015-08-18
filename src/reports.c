@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "reports.h"
 #include "laws.h"
+#include "travelthru.h"
 #include "lighthouse.h"
 
 /* kernel includes */

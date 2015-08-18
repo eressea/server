@@ -525,18 +525,6 @@ attrib_type at_woodcount = {
     ATF_UNIQUE
 };
 
-/*********************/
-/*   at_travelunit   */
-/*********************/
-attrib_type at_travelunit = {
-    "travelunit",
-    DEFAULT_INIT,
-    DEFAULT_FINALIZE,
-    DEFAULT_AGE,
-    NO_WRITE,
-    NO_READ
-};
-
 void rsetroad(region * r, direction_t d, int val)
 {
     connection *b;
