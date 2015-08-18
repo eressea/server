@@ -3,6 +3,7 @@
 #include "reports.h"
 #include "report.h"
 #include "creport.h"
+#include "move.h"
 
 #include <kernel/building.h>
 #include <kernel/faction.h>
@@ -178,6 +179,42 @@ static void test_cr_unit(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_write_travelthru(CuTest *tc) {
+    stream out = { 0 };
+    char buf[1024];
+    size_t len;
+    region *r;
+    faction *f;
+    unit *u;
+
+    test_cleanup();
+    mstream_init(&out);
+    r = test_create_region(0, 0, 0);
+    r->flags |= RF_TRAVELUNIT;
+    f = test_create_faction(0);
+    u = test_create_unit(f, 0);
+
+    write_travelthru(&out, r, f);
+    out.api->rewind(out.handle);
+    len = out.api->read(out.handle, buf, sizeof(buf));
+    CuAssertIntEquals_Msg(tc, "no travelers, no report", 0, (int)len);
+
+    travelthru(u, r);
+    out.api->rewind(out.handle);
+    write_travelthru(&out, r, f);
+    len = out.api->read(out.handle, buf, sizeof(buf));
+    CuAssertIntEquals_Msg(tc, "report units that moved through", 0, (int)len);
+
+    move_unit(u, r, 0);
+    out.api->rewind(out.handle);
+    write_travelthru(&out, r, f);
+    len = out.api->read(out.handle, buf, sizeof(buf));
+    CuAssertPtrNotNull(tc, strstr(buf, unitname(u)));
+
+    mstream_done(&out);
+    test_cleanup();
+}
+
 CuSuite *get_reports_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -188,5 +225,6 @@ CuSuite *get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_write_spaces);
     SUITE_ADD_TEST(suite, test_write_many_spaces);
     SUITE_ADD_TEST(suite, test_sparagraph);
+    SUITE_ADD_TEST(suite, test_write_travelthru);
     return suite;
 }

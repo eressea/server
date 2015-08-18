@@ -183,7 +183,7 @@ char marker)
             str = x + 2;
             hanging_indent -= 2;
         }
-    } 
+    }
     else {
         mark = &marker;
     }
@@ -1344,84 +1344,99 @@ static void statistics(stream *out, const region * r, const faction * f)
         i_free(i_remove(&items, items));
 }
 
-static void durchreisende(stream *out, const region * r, const faction * f)
-{
-    if (fval(r, RF_TRAVELUNIT)) {
-        attrib *abegin = a_find(r->attribs, &at_travelunit), *a;
-        int counter = 0, maxtravel = 0;
-        char buf[8192];
-        char *bufp = buf;
-        int bytes;
-        size_t size = sizeof(buf) - 1;
 
-        /* How many are we listing? For grammar. */
-        for (a = abegin; a && a->type == &at_travelunit; a = a->next) {
-            unit *u = (unit *)a->data.v;
+static int count_travelthru(const region *r, const faction *f, attrib *alist) {
+    int maxtravel = 0;
+    attrib *a;
+    for (a = alist; a && a->type == &at_travelunit; a = a->next) {
+        unit *u = (unit *)a->data.v;
 
-            if (r != u->region && (!u->ship || ship_owner(u->ship) == u)) {
-                if (cansee_durchgezogen(f, r, u, 0)) {
-                    ++maxtravel;
-                }
+        if (r != u->region && (!u->ship || ship_owner(u->ship) == u)) {
+            if (cansee_durchgezogen(f, r, u, 0)) {
+                ++maxtravel;
             }
         }
+    }
+    return maxtravel;
+}
 
-        if (maxtravel == 0) {
-            return;
-        }
+void write_travelthru(stream *out, const region * r, const faction * f)
+{
+    attrib *abegin, *a;
+    int counter = 0, maxtravel = 0;
+    char buf[8192];
+    char *bufp = buf;
+    int bytes;
+    size_t size = sizeof(buf) - 1;
 
-        /* Auflisten. */
-        newline(out);
+    assert(r);
+    assert(f);
+    if (!fval(r, RF_TRAVELUNIT)) {
+        return;
+    }
+    CHECK_ERRNO();
+    abegin = a_find(r->attribs, &at_travelunit);
 
-        for (a = abegin; a && a->type == &at_travelunit; a = a->next) {
-            unit *u = (unit *)a->data.v;
+    /* How many are we listing? For grammar. */
+    maxtravel = count_travelthru(r, f, abegin);
+    if (maxtravel == 0) {
+        return;
+    }
 
-            if (r != u->region && (!u->ship || ship_owner(u->ship) == u)) {
-                if (cansee_durchgezogen(f, r, u, 0)) {
-                    ++counter;
-                    if (u->ship != NULL) {
-                        bytes = (int)strlcpy(bufp, shipname(u->ship), size);
-                    }
-                    else {
-                        bytes = (int)strlcpy(bufp, unitname(u), size);
-                    }
+    /* Auflisten. */
+    newline(out);
+    for (a = abegin; a && a->type == &at_travelunit; a = a->next) {
+        unit *u = (unit *)a->data.v;
+
+        if (r != u->region && (!u->ship || ship_owner(u->ship) == u)) {
+            if (cansee_durchgezogen(f, r, u, 0)) {
+                ++counter;
+                if (u->ship != NULL) {
+                    bytes = (int)strlcpy(bufp, shipname(u->ship), size);
+                }
+                else {
+                    bytes = (int)strlcpy(bufp, unitname(u), size);
+                }
+                CHECK_ERRNO();
+                if (wrptr(&bufp, &size, bytes) != 0) {
+                    INFO_STATIC_BUFFER();
+                    break;
+                }
+
+                if (counter + 1 < maxtravel) {
+                    bytes = (int)strlcpy(bufp, ", ", size);
+                    CHECK_ERRNO();
                     if (wrptr(&bufp, &size, bytes) != 0) {
                         INFO_STATIC_BUFFER();
                         break;
                     }
-
-                    if (counter + 1 < maxtravel) {
-                        bytes = (int)strlcpy(bufp, ", ", size);
-                        if (wrptr(&bufp, &size, bytes) != 0) {
-                            INFO_STATIC_BUFFER();
-                            break;
-                        }
-                    }
-                    else if (counter + 1 == maxtravel) {
-                        bytes = (int)strlcpy(bufp, LOC(f->locale, "list_and"), size);
-                        if (wrptr(&bufp, &size, bytes) != 0) {
-                            INFO_STATIC_BUFFER();
-                            break;
-                        }
+                }
+                else if (counter + 1 == maxtravel) {
+                    bytes = (int)strlcpy(bufp, LOC(f->locale, "list_and"), size);
+                    CHECK_ERRNO();
+                    if (wrptr(&bufp, &size, bytes) != 0) {
+                        INFO_STATIC_BUFFER();
+                        break;
                     }
                 }
             }
         }
-        if (size > 0) {
-            CHECK_ERRNO();
-            if (maxtravel == 1) {
-                bytes = _snprintf(bufp, size, " %s", LOC(f->locale, "has_moved_one"));
-            }
-            else {
-                bytes = _snprintf(bufp, size, " %s", LOC(f->locale, "has_moved_many"));
-            }
-            CHECK_ERRNO();
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER_EX("durchreisende");
-            CHECK_ERRNO();
-        }
-        *bufp = 0;
-        paragraph(out, buf, 0, 0, 0);
     }
+    if (size > 0) {
+        CHECK_ERRNO();
+        if (maxtravel == 1) {
+            bytes = _snprintf(bufp, size, " %s", LOC(f->locale, "has_moved_one"));
+        }
+        else {
+            bytes = _snprintf(bufp, size, " %s", LOC(f->locale, "has_moved_many"));
+        }
+        CHECK_ERRNO();
+        if (wrptr(&bufp, &size, bytes) != 0)
+            WARN_STATIC_BUFFER_EX("write_travelthru");
+        CHECK_ERRNO();
+    }
+    *bufp = 0;
+    paragraph(out, buf, 0, 0, 0);
 }
 
 static int buildingmaintenance(const building * b, const resource_type * rtype)
@@ -2325,21 +2340,21 @@ const char *charset)
                 }
             }
             guards(out, r, f);
-            durchreisende(out, r, f);
+            write_travelthru(out, r, f);
         }
         else {
             if (sr->mode == see_far) {
                 describe(out, sr, f);
                 guards(out, r, f);
-                durchreisende(out, r, f);
+                write_travelthru(out, r, f);
             }
             else if (sr->mode == see_lighthouse) {
                 describe(out, sr, f);
-                durchreisende(out, r, f);
+                write_travelthru(out, r, f);
             }
             else {
                 describe(out, sr, f);
-                durchreisende(out, r, f);
+                write_travelthru(out, r, f);
             }
         }
         /* Statistik */

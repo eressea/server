@@ -16,10 +16,12 @@ extern "C" {
 #endif
 
     struct stream;
+    struct region;
+    struct faction;
     void register_nr(void);
     void report_cleanup(void);
     void write_spaces(struct stream *out, size_t num);
-
+    void write_travelthru(struct stream *out, const struct region * r, const struct faction * f);
 #ifdef __cplusplus
 }
 #endif
