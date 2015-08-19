@@ -182,11 +182,6 @@ static void test_cr_unit(CuTest *tc) {
     test_cleanup();
 }
 
-static void reset_stream(stream *out) {
-    out->api->rewind(out->handle);
-    out->api->write(out->handle, "", 0);
-}
-
 static void test_write_travelthru(CuTest *tc) {
     stream out = { 0 };
     char buf[1024];
@@ -212,21 +207,23 @@ static void test_write_travelthru(CuTest *tc) {
     out.api->rewind(out.handle);
     len = out.api->read(out.handle, buf, sizeof(buf));
     CuAssertIntEquals_Msg(tc, "no travelers, no report", 0, (int)len);
-
-    reset_stream(&out);
+    mstream_done(&out);
+    
+    mstream_init(&out);
     travelthru_add(r, u);
     write_travelthru(&out, r, f);
     out.api->rewind(out.handle);
     len = out.api->read(out.handle, buf, sizeof(buf));
     buf[len] = '\0';
     CuAssertStrEquals_Msg(tc, "list one unit", "Durchreise: Hodor (1).\n", buf);
+    mstream_done(&out);
 
-    reset_stream(&out);
+    mstream_init(&out);
     move_unit(u, r, 0);
     write_travelthru(&out, r, f);
     out.api->rewind(out.handle);
     len = out.api->read(out.handle, buf, sizeof(buf));
-    CuAssertIntEquals_Msg(tc, "do not list units that stopped in the region", 0, len);
+    CuAssertIntEquals_Msg(tc, "do not list units that stopped in the region", 0, (int)len);
 
     mstream_done(&out);
     test_cleanup();

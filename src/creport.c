@@ -1242,7 +1242,7 @@ typedef struct travel_data {
     int n;
 } travel_data;
 
-static void cb_cr_travelthru_ship(const region *r, unit *u, void *cbdata) {
+static void cb_cr_travelthru_ship(region *r, unit *u, void *cbdata) {
     travel_data *data = (travel_data *)cbdata;
     const faction *f = data->f;
     FILE *F = data->file;
@@ -1255,7 +1255,7 @@ static void cb_cr_travelthru_ship(const region *r, unit *u, void *cbdata) {
     }
 }
 
-static void cb_cr_travelthru_unit(const region *r, unit *u, void *cbdata) {
+static void cb_cr_travelthru_unit(region *r, unit *u, void *cbdata) {
     travel_data *data = (travel_data *)cbdata;
     const faction *f = data->f;
     FILE *F = data->file;

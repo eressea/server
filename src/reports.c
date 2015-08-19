@@ -988,7 +988,7 @@ typedef struct address_data {
     int stealthmod;
 } address_data;
 
-static void cb_add_address(const region *r, unit *ut, void *cbdata) {
+static void cb_add_address(region *r, unit *ut, void *cbdata) {
     address_data *data = (address_data *)cbdata;
     faction *f = data->f;
 
@@ -2396,7 +2396,7 @@ typedef struct count_data {
     const struct faction *f;
 } count_data;
 
-static void count_cb(const region *r, unit *u, void *cbdata) {
+static void count_cb(region *r, unit *u, void *cbdata) {
     count_data *data = (count_data *)cbdata;
     const struct faction *f = data->f;
     if (r != u->region && (!u->ship || ship_owner(u->ship) == u)) {
