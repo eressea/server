@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "reports.h"
 #include "laws.h"
+#include "travelthru.h"
 #include "lighthouse.h"
 
 /* kernel includes */
@@ -981,6 +982,38 @@ void add_seen_faction(faction *self, faction *seen) {
     add_seen_faction_i(&self->seen_factions, seen);
 }
 
+typedef struct address_data {
+    faction *f, *lastf;
+    quicklist **flist;
+    int stealthmod;
+} address_data;
+
+static void cb_add_address(region *r, unit *ut, void *cbdata) {
+    address_data *data = (address_data *)cbdata;
+    faction *f = data->f;
+
+    if (ut->faction==f) {
+        unit *u;
+        for (u = r->units; u; u = u->next) {
+            faction *sf = visible_faction(f, u);
+            assert(u->faction != f);   /* if this is see_travel only, then I shouldn't be here. */
+            if (data->lastf != sf && cansee_unit(u, ut, data->stealthmod)) {
+                add_seen_faction_i(data->flist, sf);
+                data->lastf = sf;
+                break;
+            }
+        }
+    }
+}
+
+static void add_travelthru_addresses(region *r, faction *f, quicklist **flist, int stealthmod) {
+    // for each traveling unit: add the faction of any unit is can see
+    address_data cbdata = { 0 };
+    cbdata.f = f;
+    cbdata.flist = flist;
+    cbdata.stealthmod = stealthmod;
+    travelthru_map(r, cb_add_address, &cbdata);
+}
 
 static void get_addresses(report_context * ctx)
 {
@@ -1025,26 +1058,9 @@ static void get_addresses(report_context * ctx)
             }
         }
         else if (sr->mode == see_travel) {
-            unit *u = r->units;
-            while (u) {
-                faction *sf = visible_faction(ctx->f, u);
-                assert(u->faction != ctx->f);   /* if this is see_travel only, then I shouldn't be here. */
-                if (lastf != sf) {
-                    attrib *a = a_find(r->attribs, &at_travelunit);
-                    while (a && a->type == &at_travelunit) {
-                        unit *u2 = (unit *)a->data.v;
-                        if (u2->faction == ctx->f) {
-                            if (cansee_unit(u2, u, stealthmod)) {
-                                add_seen_faction_i(&flist, sf);
-                                lastf = sf;
-                                break;
-                            }
-                        }
-                        a = a->next;
-                    }
-                }
-                u = u->next;
-            }
+            /* when we travel through a region, then we must add
+             * the factions of any units we saw */
+            add_travelthru_addresses(r, ctx->f, &flist, stealthmod);
         }
         else if (sr->mode > see_travel) {
             const unit *u = r->units;
@@ -1465,6 +1481,13 @@ void reorder_units(region * r)
     }
 }
 
+static void cb_add_seen(region *r, unit *u, void *cbdata) {
+    unused_arg(cbdata);
+    if (u->faction) {
+        add_seen(u->faction->seen, r, see_travel, false);
+    }
+}
+
 static void prepare_reports(void)
 {
     region *r;
@@ -1478,7 +1501,6 @@ static void prepare_reports(void)
     }
 
     for (r = regions; r; r = r->next) {
-        attrib *ru;
         unit *u;
         plane *p = rplane(r);
 
@@ -1532,16 +1554,15 @@ static void prepare_reports(void)
 
 
         if (fval(r, RF_TRAVELUNIT)) {
-            for (ru = a_find(r->attribs, &at_travelunit);
-                ru && ru->type == &at_travelunit; ru = ru->next) {
-                unit *u = (unit *)ru->data.v;
-
-                /* make sure the faction has not been removed this turn: */
-                if (u->faction) {
-                    add_seen(u->faction->seen, r, see_travel, false);
-                }
-            }
+            travelthru_map(r, cb_add_seen, r);
         }
+    }
+}
+
+static void cb_set_last(region *r, unit *u, void *cbdata) {
+    faction *f = (faction *)cbdata;
+    if (u->faction == f) {
+        f->last = r;
     }
 }
 
@@ -1571,15 +1592,7 @@ static region *lastregion(faction * f)
 
         /* search the region for travelthru-attributes: */
         if (fval(r, RF_TRAVELUNIT)) {
-            attrib *ru = a_find(r->attribs, &at_travelunit);
-            while (ru && ru->type == &at_travelunit) {
-                u = (unit *)ru->data.v;
-                if (u->faction == f) {
-                    f->last = r;
-                    break;
-                }
-                ru = ru->next;
-            }
+            travelthru_map(r, cb_set_last, f);
         }
         if (f->last == r)
             continue;
@@ -2376,6 +2389,28 @@ int stream_printf(struct stream * out, const char *format, ...) {
     out->api->write(out->handle, buffer, bytes);
     va_end(args);
     return result;
+}
+
+typedef struct count_data {
+    int n;
+    const struct faction *f;
+} count_data;
+
+static void count_cb(region *r, unit *u, void *cbdata) {
+    count_data *data = (count_data *)cbdata;
+    const struct faction *f = data->f;
+    if (r != u->region && (!u->ship || ship_owner(u->ship) == u)) {
+        if (cansee_durchgezogen(f, r, u, 0)) {
+            ++data->n;
+        }
+    }
+}
+
+int count_travelthru(struct region *r, const struct faction *f) {
+    count_data data = { 0 };
+    data.f = f;
+    travelthru_map(r, count_cb, &data);
+    return data.n;
 }
 
 void register_reports(void)

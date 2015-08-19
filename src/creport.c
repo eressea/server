@@ -11,6 +11,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/config.h>
 #include "buildno.h"
 #include "creport.h"
+#include "travelthru.h"
 
 /* tweakable features */
 #define RENDER_CRMESSAGES
@@ -1189,7 +1190,7 @@ static void
 cr_output_resources(FILE * F, report_context * ctx, seen_region * sr)
 {
     char cbuf[BUFFERSIZE], *pos = cbuf;
-    region *r = sr->r;
+    const region *r = sr->r;
     faction *f = ctx->f;
     resource_report result[MAX_RAWMATERIALS];
     int n, size = report_resources(sr, result, MAX_RAWMATERIALS, f);
@@ -1233,6 +1234,49 @@ cr_region_header(FILE * F, int plid, int nx, int ny, int uid)
     }
     if (uid)
         fprintf(F, "%d;id\n", uid);
+}
+
+typedef struct travel_data {
+    const faction *f;
+    FILE *file;
+    int n;
+} travel_data;
+
+static void cb_cr_travelthru_ship(region *r, unit *u, void *cbdata) {
+    travel_data *data = (travel_data *)cbdata;
+    const faction *f = data->f;
+    FILE *F = data->file;
+
+    if (u->ship && travelthru_cansee(r, f, u)) {
+        if (data->n++ == 0) {
+            fprintf(F, "DURCHSCHIFFUNG\n");
+        }
+        fprintf(F, "\"%s\"\n", shipname(u->ship));
+    }
+}
+
+static void cb_cr_travelthru_unit(region *r, unit *u, void *cbdata) {
+    travel_data *data = (travel_data *)cbdata;
+    const faction *f = data->f;
+    FILE *F = data->file;
+
+    if (!u->ship && travelthru_cansee(r, f, u)) {
+        if (data->n++ == 0) {
+            fprintf(F, "DURCHREISE\n");
+        }
+        fprintf(F, "\"%s\"\n", unitname(u));
+    }
+}
+
+static void cr_output_travelthru(FILE *F, region *r, const faction *f) {
+    /* describe both passed and inhabited regions */
+    travel_data cbdata = { 0 };
+    cbdata.f = f;
+    cbdata.file = F;
+    cbdata.n = 0;
+    travelthru_map(r, cb_cr_travelthru_ship, &cbdata);
+    cbdata.n = 0;
+    travelthru_map(r, cb_cr_travelthru_unit, &cbdata);
 }
 
 static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
@@ -1409,38 +1453,7 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
             }
         }
 
-        /* describe both passed and inhabited regions */
-        if (fval(r, RF_TRAVELUNIT)) {
-            bool seeunits = false, seeships = false;
-            const attrib *ru;
-            /* show units pulled through region */
-            for (ru = a_find(r->attribs, &at_travelunit);
-                ru && ru->type == &at_travelunit; ru = ru->next) {
-                unit *u = (unit *)ru->data.v;
-                if (cansee_durchgezogen(f, r, u, 0) && r != u->region) {
-                    if (u->ship && ship_owner(u->ship) == u) {
-                        if (!seeships) {
-                            fprintf(F, "DURCHSCHIFFUNG\n");
-                        }
-                        seeships = true;
-                        fprintf(F, "\"%s\"\n", shipname(u->ship));
-                    }
-                }
-            }
-            for (ru = a_find(r->attribs, &at_travelunit);
-                ru && ru->type == &at_travelunit; ru = ru->next) {
-                unit *u = (unit *)ru->data.v;
-                if (cansee_durchgezogen(f, r, u, 0) && r != u->region) {
-                    if (!u->ship) {
-                        if (!seeunits) {
-                            fprintf(F, "DURCHREISE\n");
-                        }
-                        seeunits = true;
-                        fprintf(F, "\"%s\"\n", unitname(u));
-                    }
-                }
-            }
-        }
+        cr_output_travelthru(F, r, f);
         if (sr->mode == see_unit || sr->mode == see_travel) {
             message_list *mlist = r_getmessages(r, f);
             cr_output_messages(F, r->msgs, f);

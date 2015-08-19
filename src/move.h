@@ -64,7 +64,6 @@ extern "C" {
     int enoughsailors(const struct ship *sh, int sumskill);
     bool canswim(struct unit *u);
     bool canfly(struct unit *u);
-    void travelthru(const struct unit *u, struct region *r);
     struct ship *move_ship(struct ship *sh, struct region *from,
     struct region *to, struct region_list *route);
     int walkingcapacity(const struct unit *u);

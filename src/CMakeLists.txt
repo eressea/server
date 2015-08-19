@@ -108,6 +108,7 @@ set (ERESSEA_SRC
   spy.c
   study.c
   summary.c
+  travelthru.c
   monsters.c
   wormhole.c
   ${SPELLS_SRC}
@@ -180,6 +181,7 @@ set(TESTS_SRC
   vortex.test.c
   tests.test.c
   reports.test.c
+  travelthru.test.c
   callback.test.c
   direction.test.c
   economy.test.c

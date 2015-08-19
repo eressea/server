@@ -23,6 +23,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "laws.h"
 #include "reports.h"
 #include "alchemy.h"
+#include "travelthru.h"
 #include "vortex.h"
 #include "monster.h"
 #include "lighthouse.h"
@@ -501,29 +502,6 @@ static ship *do_maelstrom(region * r, unit * u)
     return u->ship;
 }
 
-/** sets a marker in the region telling that the unit has travelled through it
- * this is used for two distinctly different purposes:
- * - to report that a unit has travelled through. the report function
- *   makes sure to only report the ships of travellers, not the travellers
- *   themselves
- * - to report the region to the traveller
- */
-void travelthru(const unit * u, region * r)
-{
-    attrib *ru = a_add(&r->attribs, a_new(&at_travelunit));
-
-    fset(r, RF_TRAVELUNIT);
-
-    ru->data.v = (void *)u;
-
-    /* the first and last region of the faction gets reset, because travelthrough
-     * could be in regions that are located before the [first, last] interval,
-     * and recalculation is needed */
-#ifdef SMART_INTERVALS
-    update_interval(u->faction, r);
-#endif
-}
-
 static direction_t
 koor_reldirection(int ax, int ay, int bx, int by, const struct plane *pl)
 {
@@ -589,12 +567,12 @@ static void leave_trail(ship * sh, region * from, region_list * route)
 }
 
 static void
-mark_travelthru(const unit * u, region * r, const region_list * route,
+mark_travelthru(unit * u, region * r, const region_list * route,
 const region_list * route_end)
 {
     /* kein travelthru in der letzten region! */
     while (route != route_end) {
-        travelthru(u, r);
+        travelthru_add(r, u);
         r = route->data;
         route = route->next;
     }

@@ -23,6 +23,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "reports.h"
 #include "laws.h"
+#include "travelthru.h"
 #include "monster.h"
 
 /* modules includes */
@@ -140,6 +141,7 @@ void write_spaces(stream *out, size_t num) {
     }
 }
 
+
 static void centre(stream *out, const char *s, bool breaking)
 {
     /* Bei Namen die genau 80 Zeichen lang sind, kann es hier Probleme
@@ -183,7 +185,7 @@ char marker)
             str = x + 2;
             hanging_indent -= 2;
         }
-    } 
+    }
     else {
         mark = &marker;
     }
@@ -1344,85 +1346,6 @@ static void statistics(stream *out, const region * r, const faction * f)
         i_free(i_remove(&items, items));
 }
 
-static void durchreisende(stream *out, const region * r, const faction * f)
-{
-    if (fval(r, RF_TRAVELUNIT)) {
-        attrib *abegin = a_find(r->attribs, &at_travelunit), *a;
-        int counter = 0, maxtravel = 0;
-        char buf[8192];
-        char *bufp = buf;
-        int bytes;
-        size_t size = sizeof(buf) - 1;
-
-        /* How many are we listing? For grammar. */
-        for (a = abegin; a && a->type == &at_travelunit; a = a->next) {
-            unit *u = (unit *)a->data.v;
-
-            if (r != u->region && (!u->ship || ship_owner(u->ship) == u)) {
-                if (cansee_durchgezogen(f, r, u, 0)) {
-                    ++maxtravel;
-                }
-            }
-        }
-
-        if (maxtravel == 0) {
-            return;
-        }
-
-        /* Auflisten. */
-        newline(out);
-
-        for (a = abegin; a && a->type == &at_travelunit; a = a->next) {
-            unit *u = (unit *)a->data.v;
-
-            if (r != u->region && (!u->ship || ship_owner(u->ship) == u)) {
-                if (cansee_durchgezogen(f, r, u, 0)) {
-                    ++counter;
-                    if (u->ship != NULL) {
-                        bytes = (int)strlcpy(bufp, shipname(u->ship), size);
-                    }
-                    else {
-                        bytes = (int)strlcpy(bufp, unitname(u), size);
-                    }
-                    if (wrptr(&bufp, &size, bytes) != 0) {
-                        INFO_STATIC_BUFFER();
-                        break;
-                    }
-
-                    if (counter + 1 < maxtravel) {
-                        bytes = (int)strlcpy(bufp, ", ", size);
-                        if (wrptr(&bufp, &size, bytes) != 0) {
-                            INFO_STATIC_BUFFER();
-                            break;
-                        }
-                    }
-                    else if (counter + 1 == maxtravel) {
-                        bytes = (int)strlcpy(bufp, LOC(f->locale, "list_and"), size);
-                        if (wrptr(&bufp, &size, bytes) != 0) {
-                            INFO_STATIC_BUFFER();
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        if (size > 0) {
-            CHECK_ERRNO();
-            if (maxtravel == 1) {
-                bytes = _snprintf(bufp, size, " %s", LOC(f->locale, "has_moved_one"));
-            }
-            else {
-                bytes = _snprintf(bufp, size, " %s", LOC(f->locale, "has_moved_many"));
-            }
-            CHECK_ERRNO();
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER_EX("durchreisende");
-            CHECK_ERRNO();
-        }
-        *bufp = 0;
-        paragraph(out, buf, 0, 0, 0);
-    }
-}
 
 static int buildingmaintenance(const building * b, const resource_type * rtype)
 {
@@ -2007,6 +1930,104 @@ static void nr_paragraph(stream *out, message * m, faction * f)
     paragraph(out, buf, 0, 0, 0);
 }
 
+typedef struct cb_data {
+    stream *out;
+    char *start, *writep;
+    size_t size;
+    const faction *f;
+    int maxtravel, counter;
+} cb_data;
+
+static void init_cb(cb_data *data, stream *out, char *buffer, size_t size, const faction *f) {
+    data->out = out;
+    data->writep = buffer;
+    data->start = buffer;
+    data->size = size;
+    data->f = f;
+    data->maxtravel = 0;
+    data->counter = 0;
+}
+
+static void cb_write_travelthru(region *r, unit *u, void *cbdata) {
+    cb_data *data = (cb_data *)cbdata;
+    const faction *f = data->f;
+
+    if (data->counter >= data->maxtravel) {
+        return;
+    }
+    if (travelthru_cansee(r, f, u)) {
+        ++data->counter;
+        do {
+            size_t len, size = data->size - (data->writep - data->start);
+            const char *str;
+            char *writep = data->writep;
+
+            if (u->ship != NULL) {
+                str = shipname(u->ship);
+            }
+            else {
+                str = unitname(u);
+            }
+            len = strlen(str);
+            if (len < size && data->counter <= data->maxtravel) {
+                memcpy(writep, str, len);
+                writep += len;
+                size -= len;
+                if (data->counter == data->maxtravel) {
+                    str = ".";
+                }
+                else if (data->counter + 1 == data->maxtravel) {
+                    str = LOC(f->locale, "list_and");
+                }
+                else {
+                    str = ", ";
+                }
+                len = strlen(str);
+                if (len < size) {
+                    memcpy(writep, str, len);
+                    writep += len;
+                    size -= len;
+                    data->writep = writep;
+                }
+            }
+            if (len >= size || data->counter == data->maxtravel) {
+                // buffer is full
+                *writep = 0;
+                paragraph(data->out, data->start, 0, 0, 0);
+                data->writep = data->start;
+                if (data->counter == data->maxtravel) {
+                    break;
+                }
+            }
+        } while (data->writep == data->start);
+    }
+}
+
+void write_travelthru(stream *out, region * r, const faction * f)
+{
+    int maxtravel;
+    char buf[8192];
+
+    assert(r);
+    assert(f);
+    if (!fval(r, RF_TRAVELUNIT)) {
+        return;
+    }
+
+    /* How many are we listing? For grammar. */
+    maxtravel = count_travelthru(r, f);
+    if (maxtravel > 0) {
+        cb_data cbdata;
+
+        init_cb(&cbdata, out, buf, sizeof(buf), f);
+        cbdata.maxtravel = maxtravel;
+        cbdata.writep += 
+            strlcpy(buf, LOC(f->locale, "travelthru_header"), sizeof(buf));
+        travelthru_map(r, cb_write_travelthru, &cbdata);
+        return;
+    }
+}
+
 int
 report_plaintext(const char *filename, report_context * ctx,
 const char *charset)
@@ -2118,7 +2139,7 @@ const char *charset)
     }
     if (no_people != f->num_people) {
         f->num_people = no_people;
-    }
+}
 #else
     no_units = count_units(f);
     no_people = count_all(f);
@@ -2325,21 +2346,26 @@ const char *charset)
                 }
             }
             guards(out, r, f);
-            durchreisende(out, r, f);
+            newline(out);
+            write_travelthru(out, r, f);
         }
         else {
             if (sr->mode == see_far) {
                 describe(out, sr, f);
+                newline(out);
                 guards(out, r, f);
-                durchreisende(out, r, f);
+                newline(out);
+                write_travelthru(out, r, f);
             }
             else if (sr->mode == see_lighthouse) {
                 describe(out, sr, f);
-                durchreisende(out, r, f);
+                newline(out);
+                write_travelthru(out, r, f);
             }
             else {
                 describe(out, sr, f);
-                durchreisende(out, r, f);
+                newline(out);
+                write_travelthru(out, r, f);
             }
         }
         /* Statistik */

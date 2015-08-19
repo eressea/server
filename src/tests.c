@@ -24,6 +24,7 @@
 #include <CuTest.h>
 
 #include <assert.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -84,6 +85,11 @@ void test_cleanup(void)
     if (!mt_find("missing_message")) {
         mt_register(mt_new_va("missing_message", "name:string", 0));
         mt_register(mt_new_va("missing_feedback", "unit:unit", "region:region", "command:order", "name:string", 0));
+    }
+    if (errno) {
+        int error = errno;
+        errno = 0;
+        log_error("errno: %d", error);
     }
 }
 
