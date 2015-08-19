@@ -13,6 +13,8 @@
 #include <kernel/ship.h>
 #include <kernel/unit.h>
 
+#include <util/language.h>
+
 #include <quicklist.h>
 #include <stream.h>
 #include <memstream.h>
@@ -180,6 +182,11 @@ static void test_cr_unit(CuTest *tc) {
     test_cleanup();
 }
 
+static void reset_stream(stream *out) {
+    out->api->rewind(out->handle);
+    out->api->write(out->handle, "", 0);
+}
+
 static void test_write_travelthru(CuTest *tc) {
     stream out = { 0 };
     char buf[1024];
@@ -187,30 +194,39 @@ static void test_write_travelthru(CuTest *tc) {
     region *r;
     faction *f;
     unit *u;
+    struct locale *lang;
 
     test_cleanup();
+    lang = get_or_create_locale("de");
+    locale_setstring(lang, "travelthru_header", "Durchreise: ");
     mstream_init(&out);
     r = test_create_region(0, 0, 0);
     r->flags |= RF_TRAVELUNIT;
     f = test_create_faction(0);
+    f->locale = lang;
     u = test_create_unit(f, 0);
+    unit_setname(u, "Hodor");
+    unit_setid(u, 1);
 
     write_travelthru(&out, r, f);
     out.api->rewind(out.handle);
     len = out.api->read(out.handle, buf, sizeof(buf));
     CuAssertIntEquals_Msg(tc, "no travelers, no report", 0, (int)len);
 
-    travelthru(u, r);
-    out.api->rewind(out.handle);
+    reset_stream(&out);
+    travelthru_add(r, u);
     write_travelthru(&out, r, f);
+    out.api->rewind(out.handle);
     len = out.api->read(out.handle, buf, sizeof(buf));
-    CuAssertIntEquals_Msg(tc, "report units that moved through", 0, (int)len);
+    buf[len] = '\0';
+    CuAssertStrEquals_Msg(tc, "list one unit", "Durchreise: Hodor (1).\n", buf);
 
+    reset_stream(&out);
     move_unit(u, r, 0);
-    out.api->rewind(out.handle);
     write_travelthru(&out, r, f);
+    out.api->rewind(out.handle);
     len = out.api->read(out.handle, buf, sizeof(buf));
-    CuAssertPtrNotNull(tc, strstr(buf, unitname(u)));
+    CuAssertIntEquals_Msg(tc, "do not list units that stopped in the region", 0, len);
 
     mstream_done(&out);
     test_cleanup();

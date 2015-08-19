@@ -6,13 +6,14 @@
 extern "C" {
 #endif
 
-    extern struct attrib_type at_travelunit;
-
+    struct attrib;
     struct stream;
     struct region;
     struct faction;
-    void write_travelthru(struct stream *out, const struct region * r, const struct faction * f);
-    void travelthru(const struct unit * u, struct region * r);
+    struct unit;
+    void travelthru_map(struct region * r, void(*cb)(struct region *r, struct unit *, void *), void *cbdata);
+    bool travelthru_cansee(const struct region *r, const struct faction *f, const struct unit *u);
+    void travelthru_add(struct region * r, struct unit * u);
 
 #ifdef __cplusplus
 }

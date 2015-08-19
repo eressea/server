@@ -181,6 +181,7 @@ set(TESTS_SRC
   vortex.test.c
   tests.test.c
   reports.test.c
+  travelthru.test.c
   callback.test.c
   direction.test.c
   economy.test.c

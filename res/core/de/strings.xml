@@ -6947,14 +6947,9 @@
     <text locale="en">is helping</text>
   </string>
 
-  <string name="has_moved_one">
-    <text locale="de">hat die Region durchquert.</text>
-    <text locale="en">passed through the region.</text>
-  </string>
-
-  <string name="has_moved_many">
-    <text locale="de">haben die Region durchquert.</text>
-    <text locale="en">passed through the region.</text>
+  <string name="travelthru_header">
+    <text locale="de">Die Region wurde durchquert von </text>
+    <text locale="en">The region was crossed by </text>
   </string>
 
   <string name="see_travel">

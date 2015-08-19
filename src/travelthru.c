@@ -31,7 +31,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/bsdstring.h>
 #include <util/log.h>
 #include <util/language.h>
+
 #include <stream.h>
+#include <quicklist.h>
 
 #include <assert.h>
 #include <string.h>
@@ -48,92 +50,6 @@ attrib_type at_travelunit = {
     NO_READ
 };
 
-static int count_travelthru(const struct region *r, const struct faction *f, attrib *alist) {
-    int maxtravel = 0;
-    attrib *a;
-    for (a = alist; a && a->type == &at_travelunit; a = a->next) {
-        unit *u = (unit *)a->data.v;
-
-        if (r != u->region && (!u->ship || ship_owner(u->ship) == u)) {
-            if (cansee_durchgezogen(f, r, u, 0)) {
-                ++maxtravel;
-            }
-        }
-    }
-    return maxtravel;
-}
-
-void write_travelthru(stream *out, const region * r, const faction * f)
-{
-    attrib *abegin, *a;
-    int counter = 0, maxtravel = 0;
-    char buf[8192];
-    char *bufp = buf;
-    int bytes;
-    size_t size = sizeof(buf) - 1;
-
-    assert(r);
-    assert(f);
-    if (!fval(r, RF_TRAVELUNIT)) {
-        return;
-    }
-    abegin = a_find(r->attribs, &at_travelunit);
-
-    /* How many are we listing? For grammar. */
-    maxtravel = count_travelthru(r, f, abegin);
-    if (maxtravel == 0) {
-        return;
-    }
-
-    /* Auflisten. */
-    for (a = abegin; a && a->type == &at_travelunit; a = a->next) {
-        unit *u = (unit *)a->data.v;
-
-        if (r != u->region && (!u->ship || ship_owner(u->ship) == u)) {
-            if (cansee_durchgezogen(f, r, u, 0)) {
-                ++counter;
-                if (u->ship != NULL) {
-                    bytes = (int)strlcpy(bufp, shipname(u->ship), size);
-                }
-                else {
-                    bytes = (int)strlcpy(bufp, unitname(u), size);
-                }
-                if (wrptr(&bufp, &size, bytes) != 0) {
-                    INFO_STATIC_BUFFER();
-                    break;
-                }
-
-                if (counter + 1 < maxtravel) {
-                    bytes = (int)strlcpy(bufp, ", ", size);
-                    if (wrptr(&bufp, &size, bytes) != 0) {
-                        INFO_STATIC_BUFFER();
-                        break;
-                    }
-                }
-                else if (counter + 1 == maxtravel) {
-                    bytes = (int)strlcpy(bufp, LOC(f->locale, "list_and"), size);
-                    if (wrptr(&bufp, &size, bytes) != 0) {
-                        INFO_STATIC_BUFFER();
-                        break;
-                    }
-                }
-            }
-        }
-    }
-    if (size > 0) {
-        if (maxtravel == 1) {
-            bytes = _snprintf(bufp, size, " %s", LOC(f->locale, "has_moved_one"));
-        }
-        else {
-            bytes = _snprintf(bufp, size, " %s", LOC(f->locale, "has_moved_many"));
-        }
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER_EX("write_travelthru");
-    }
-    *bufp = 0;
-    paragraph(out, buf, 0, 0, 0);
-}
-
 /** sets a marker in the region telling that the unit has travelled through it
 * this is used for two distinctly different purposes:
 * - to report that a unit has travelled through. the report function
@@ -141,19 +57,51 @@ void write_travelthru(stream *out, const region * r, const faction * f)
 *   themselves
 * - to report the region to the traveller
 */
-void travelthru(const unit * u, region * r)
+void travelthru_add(region * r, unit * u)
 {
-    attrib *ru = a_add(&r->attribs, a_new(&at_travelunit));
+    attrib *a;
+    quicklist *ql;
+
+    assert(r);
+    assert(u);
+
+    a = a_find(r->attribs, &at_travelunit);
+    if (!a) {
+        a = a_add(&r->attribs, a_new(&at_travelunit));
+    }
+    ql = (quicklist *)a->data.v;
 
     fset(r, RF_TRAVELUNIT);
+    ql_push(&ql, u);
+    a->data.v = ql;
 
-    ru->data.v = (void *)u;
-
+#ifdef SMART_INTERVALS
     /* the first and last region of the faction gets reset, because travelthrough
     * could be in regions that are located before the [first, last] interval,
     * and recalculation is needed */
-#ifdef SMART_INTERVALS
     update_interval(u->faction, r);
 #endif
 }
 
+bool travelthru_cansee(const struct region *r, const struct faction *f, const struct unit *u) {
+    if (r != u->region && (!u->ship || ship_owner(u->ship) == u)) {
+        return cansee_durchgezogen(f, r, u, 0);
+    }
+    return false;
+}
+
+void travelthru_map(region * r, void(*cb)(region *, struct unit *, void *), void *cbdata)
+{
+    attrib *a;
+    assert(r);
+    a = a_find(r->attribs, &at_travelunit);
+    if (a) {
+        quicklist *ql;
+        ql_iter qi;
+        ql = (quicklist *)a->data.v;
+        for (qi = qli_init(&ql); qli_more(qi);) {
+            unit *u = (unit *)qli_next(&qi);
+            cb(r, u, cbdata);
+        }
+    }
+}

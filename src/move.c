@@ -567,12 +567,12 @@ static void leave_trail(ship * sh, region * from, region_list * route)
 }
 
 static void
-mark_travelthru(const unit * u, region * r, const region_list * route,
+mark_travelthru(unit * u, region * r, const region_list * route,
 const region_list * route_end)
 {
     /* kein travelthru in der letzten region! */
     while (route != route_end) {
-        travelthru(u, r);
+        travelthru_add(r, u);
         r = route->data;
         route = route->next;
     }

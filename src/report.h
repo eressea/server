@@ -25,8 +25,7 @@ extern "C" {
     void register_nr(void);
     void report_cleanup(void);
     void write_spaces(struct stream *out, size_t num);
-
-    void paragraph(struct stream *out, const char *str, ptrdiff_t indent, int hanging_indent, char marker);
+    void write_travelthru(struct stream *out, const struct region * r, const struct faction * f);
 #ifdef __cplusplus
 }
 #endif

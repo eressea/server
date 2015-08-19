@@ -157,6 +157,8 @@ extern "C" {
 
     int stream_printf(struct stream * out, const char *format, ...);
 
+    int count_travelthru(struct region *r, const struct faction *f);
+
 #define GR_PLURAL     0x01      /* grammar: plural */
 #define MAX_INVENTORY 128       /* maimum number of different items in an inventory */
 #define MAX_RAWMATERIALS 8      /* maximum kinds of raw materials in a regions */
