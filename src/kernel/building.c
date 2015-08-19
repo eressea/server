@@ -324,6 +324,7 @@ static int building_protection(building * b, unit * u, building_bonus bonus)
 {
 
     int i = 0;
+    assert(b);
     int bsize = buildingeffsize(b, false);
     const construction *cons = b->type->construction;
     if (!cons) {
