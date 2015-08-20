@@ -101,7 +101,6 @@
     <param name="magic.power" value="0.5"/>
     <param name="resource.factor" value="0.25"/>
 
-    <param name="fix.spells" value="67"/>
     <param name="skills.cost.tactics" value="500"/>
     <param name="entertain.base" value="0"/>
     <param name="entertain.perlevel" value="20"/>
