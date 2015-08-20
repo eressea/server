@@ -4531,7 +4531,6 @@ void processorders(void)
         init_processor();
         init = 1;
     }
-    update_spells();
     process();
     /*************************************************/
 
