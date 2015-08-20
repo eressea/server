@@ -4520,8 +4520,6 @@ void init_processor(void)
 void processorders(void)
 {
     init_processor();
-
-    update_spells();
     process();
     /*************************************************/
 

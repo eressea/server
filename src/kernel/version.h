@@ -30,8 +30,9 @@
 #define AUTO_RACENAME_VERSION 345 /* NPC units with name==NULL will automatically get their race for a name */
 #define JSON_REPORT_VERSION 346 /* bit 3 in f->options flags the json report */
 #define EXPLICIT_CURSE_ISNEW_VERSION 347 /* CURSE_ISNEW is not reset in read/write, but in age() */
+#define SPELL_LEVEL_VERSION 348 /* f->max_spelllevel gets stored, not calculated */
 
-#define RELEASE_VERSION EXPLICIT_CURSE_ISNEW_VERSION /* current datafile */
+#define RELEASE_VERSION SPELL_LEVEL_VERSION /* current datafile */
 #define MIN_VERSION INTPAK_VERSION      /* minimal datafile we support */
 #define MAX_VERSION RELEASE_VERSION /* change this if we can need to read the future datafile, and we can do so */
 

@@ -465,11 +465,13 @@ void pick_random_spells(faction * f, int level, spellbook * book, int num_spells
                 spellno = rng_int() % maxspell;
                 sbe = commonspells[spellno];
                 if (sbe->level > f->max_spelllevel) {
+                    // not going to pick it in this round, move it to the end for later
                     commonspells[spellno] = commonspells[--maxspell];
                     commonspells[maxspell] = sbe;
                     sbe = 0;
                 }
                 else if (f->spellbook && spellbook_get(f->spellbook, sbe->sp)) {
+                    // already have this spell, remove it from the list of candidates
                     commonspells[spellno] = commonspells[--numspells];
                     if (maxspell > numspells) {
                         maxspell = numspells;
