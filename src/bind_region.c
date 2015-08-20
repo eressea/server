@@ -355,7 +355,7 @@ static int tolua_region_get_resource(lua_State * L)
     const char *type;
     const resource_type *rtype;
     int result = 0;
-    const void * matches;
+    void * match;
     critbit_tree * cb = special_resources();
 
     r = (region *)tolua_tousertype(L, 1, 0);
@@ -363,8 +363,8 @@ static int tolua_region_get_resource(lua_State * L)
     type = tolua_tostring(L, 2, 0);
     LUA_ASSERT(type != NULL, "invalid parameter");
 
-    if (cb_find_prefix(cb, type, strlen(type) + 1, &matches, 1, 0)) {
-        cb_get_kv(matches, &result, sizeof(result));
+    if (cb_find_prefix(cb, type, strlen(type) + 1, &match, 1, 0)) {
+        cb_get_kv(match, &result, sizeof(result));
         switch (result) {
         case 0:
         case 1:
@@ -399,10 +399,10 @@ static int tolua_region_set_resource(lua_State * L)
     const char *type = tolua_tostring(L, 2, 0);
     int result, value = (int)tolua_tonumber(L, 3, 0);
     critbit_tree * cb = special_resources();
-    const void * matches;
+    void * match;
 
-    if (cb_find_prefix(cb, type, strlen(type) + 1, &matches, 1, 0)) {
-        cb_get_kv(matches, &result, sizeof(result));
+    if (cb_find_prefix(cb, type, strlen(type) + 1, &match, 1, 0)) {
+        cb_get_kv(match, &result, sizeof(result));
         switch (result) {
         case 0:
         case 1:

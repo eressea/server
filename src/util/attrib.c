@@ -299,7 +299,7 @@ int a_read(struct storage *store, attrib ** attribs, void *owner)
             na = a_new(at);
         }
         else {
-            const void * kv = 0;
+            void * kv = 0;
             cb_find_prefix(&cb_deprecated, zText, strlen(zText) + 1, &kv, 1, 0);
             if (kv) {
                 cb_get_kv(kv, &reader, sizeof(reader));

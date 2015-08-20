@@ -168,7 +168,7 @@ void add_function(const char *symbol, evalfun parse)
 
 static evalfun find_function(const char *symbol)
 {
-    const void * matches;
+    void * matches;
     if (cb_find_prefix(&functions, symbol, strlen(symbol) + 1, &matches, 1, 0)) {
         evalfun result;
         cb_get_kv(matches, &result, sizeof(result));

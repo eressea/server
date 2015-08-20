@@ -688,7 +688,7 @@ param_t findparam(const char *s, const struct locale * lang)
 
     if (str && *str) {
         int i;
-        const void * match;
+        void * match;
         void **tokens = get_translations(lang, UT_PARAMS);
         critbit_tree *cb = (critbit_tree *)*tokens;
         if (!cb) {

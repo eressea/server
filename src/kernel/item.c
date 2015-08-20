@@ -379,11 +379,11 @@ const potion_type *resource2potion(const resource_type * rtype)
 
 resource_type *rt_find(const char *name)
 {
-    const void * matches;
+    void * match;
     resource_type *result = 0;
 
-    if (cb_find_prefix(&cb_resources, name, strlen(name) + 1, &matches, 1, 0)) {
-        cb_get_kv(matches, &result, sizeof(result));
+    if (cb_find_prefix(&cb_resources, name, strlen(name) + 1, &match, 1, 0)) {
+        cb_get_kv(match, &result, sizeof(result));
     }
     return result;
 }
@@ -1064,7 +1064,7 @@ const resource_type *findresourcetype(const char *name, const struct locale *lan
     char buffer[128];
 
     if (transliterate(buffer, sizeof(buffer), name)) {
-        const void * match;
+        void * match;
         if (!cb->root) {
             /* first-time initialization  of resource names for this locale */
             cb_foreach(&cb_resources, "", 0, add_resourcename_cb, (void *)lang);
@@ -1117,7 +1117,7 @@ const item_type *finditemtype(const char *name, const struct locale *lang)
 
     assert(name);
     if (transliterate(buffer, sizeof(buffer), name)) {
-        const void * match;
+        void * match;
         if (!cb->root) {
             /* first-time initialization  of item names for this locale */
             cb_foreach(&cb_resources, "", 0, add_itemname_cb, (void *)lang);
