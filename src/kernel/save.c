@@ -1686,7 +1686,7 @@ int readgame(const char *filename, int backup)
                     }
                 }
             }
-            if (global.data_version < SPELL_LEVEL_VERSION) {
+            if (global.data_version < SPELL_LEVEL_VERSION && f->spellbook) {
                 spellbook_foreach(f->spellbook, cb_sb_maxlevel, f);
             }
         }
