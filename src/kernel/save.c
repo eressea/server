@@ -48,6 +48,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "unit.h"
 #include "lighthouse.h"
 #include "version.h"
+#include "repair.h"
 
 /* attributes includes */
 #include <attributes/key.h>
@@ -1695,6 +1696,11 @@ int readgame(const char *filename, int backup)
         remove_empty_factions();
     }
     log_printf(stdout, "Done loading turn %d.\n", turn);
+
+    n = get_param_int(global.parameters, "fix.spells", -1);
+    if (n>=turn) {
+        repair_spells("spells.txt");
+    }
     return 0;
 }
 
