@@ -7,7 +7,7 @@ function setup()
     eressea.settings.set("NewbieImmunity", "0")
 end
 
-function test_dont_move_after_destroy()
+function disabled_test_dont_move_after_destroy()
     local r1 = region.create(0, 0, "plain")
     local r2 = region.create(1, 0, "plain")
     local f = faction.create("test@example.com", "human", "de")
