@@ -688,6 +688,7 @@ static int sp_destroy_magic(castorder * co)
         break;
     }
     default:
+        cmistake(mage, co->order, 213, MSG_MAGIC);
         return 0;
     }
 
@@ -734,8 +735,12 @@ static int sp_transferaura(castorder * co)
     sc_mage *scm_dst, *scm_src = get_mage(mage);
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag == TARGET_NOTFOUND) {
+        ADDMSG(&mage->faction->msgs,
+            msg_message("spelltargetnotfound", "unit region command",
+            mage, mage->region, co->order));
         return 0;
+    }
 
     /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
      * abbrechen aber kosten lassen */
@@ -811,8 +816,12 @@ static int sp_goodwinds(castorder * co)
     unit *u;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag == TARGET_NOTFOUND) {
+        ADDMSG(&mage->faction->msgs,
+            msg_message("spelltargetnotfound", "unit region command",
+            mage, mage->region, co->order));
         return 0;
+    }
 
     sh = pa->param[0]->data.sh;
 
@@ -958,8 +967,12 @@ static int sp_blessstonecircle(castorder * co)
     message *msg;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (p->param[0]->flag == TARGET_NOTFOUND)
+    if (p->param[0]->flag == TARGET_NOTFOUND) {
+        ADDMSG(&mage->faction->msgs,
+            msg_message("spelltargetnotfound", "unit region command",
+            mage, mage->region, co->order));
         return 0;
+    }
 
     b = p->param[0]->data.b;
 
@@ -1436,8 +1449,12 @@ static int sp_sparkle(castorder * co)
     double effect;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag == TARGET_NOTFOUND) {
+        ADDMSG(&mage->faction->msgs,
+            msg_message("spelltargetnotfound", "unit region command",
+            mage, mage->region, co->order));
         return 0;
+    }
 
     /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
      * abbrechen aber kosten lassen */
@@ -1624,7 +1641,6 @@ static int sp_great_drought(castorder * co)
 
     if (fval(r->terrain, SEA_REGION)) {
         cmistake(mage, co->order, 189, MSG_MAGIC);
-        /* TODO: vielleicht einen netten Patzer hier? */
         return 0;
     }
 
@@ -2510,8 +2526,12 @@ static int sp_fumblecurse(castorder * co)
     spellparameter *pa = co->par;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag == TARGET_NOTFOUND) {
+        ADDMSG(&mage->faction->msgs,
+            msg_message("spelltargetnotfound", "unit region command",
+            mage, mage->region, co->order));
         return 0;
+    }
 
     target = pa->param[0]->data.u;
 
@@ -3452,6 +3472,7 @@ static int sp_analysesong_obj(castorder * co)
     }
     default:
         /* Syntax fehlerhaft */
+        cmistake(mage, co->order, 213, MSG_MAGIC);
         return 0;
     }
 
@@ -3481,8 +3502,12 @@ static int sp_analysesong_unit(castorder * co)
     spellparameter *pa = co->par;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag == TARGET_NOTFOUND) {
+        ADDMSG(&mage->faction->msgs,
+            msg_message("spelltargetnotfound", "unit region command",
+            mage, mage->region, co->order));
         return 0;
+    }
 
     /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
      * abbrechen aber kosten lassen */
@@ -3568,8 +3593,12 @@ static int sp_charmingsong(castorder * co)
     int tb = 0;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag == TARGET_NOTFOUND) {
+        ADDMSG(&mage->faction->msgs,
+            msg_message("spelltargetnotfound", "unit region command",
+            mage, mage->region, co->order));
         return 0;
+    }
 
     target = pa->param[0]->data.u;
 
@@ -3821,8 +3850,12 @@ static int sp_migranten(castorder * co)
     spellparameter *pa = co->par;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag == TARGET_NOTFOUND) {
+        ADDMSG(&mage->faction->msgs,
+            msg_message("spelltargetnotfound", "unit region command",
+            mage, mage->region, co->order));
         return 0;
+    }
 
     target = pa->param[0]->data.u;        /* Zieleinheit */
 
@@ -4107,8 +4140,12 @@ static int sp_pump(castorder * co)
     int cast_level = co->level;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag == TARGET_NOTFOUND) {
+        ADDMSG(&mage->faction->msgs,
+            msg_message("spelltargetnotfound", "unit region command",
+            mage, mage->region, co->order));
         return 0;
+    }
 
     target = pa->param[0]->data.u;        /* Zieleinheit */
 
@@ -4174,8 +4211,12 @@ static int sp_seduce(castorder * co)
     double force = co->force;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag == TARGET_NOTFOUND) {
+        ADDMSG(&mage->faction->msgs,
+            msg_message("spelltargetnotfound", "unit region command",
+            mage, mage->region, co->order));
         return 0;
+    }
 
     target = pa->param[0]->data.u;        /* Zieleinheit */
 
@@ -4252,8 +4293,12 @@ static int sp_calm_monster(castorder * co)
     message *msg;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag == TARGET_NOTFOUND) {
+        ADDMSG(&mage->faction->msgs,
+            msg_message("spelltargetnotfound", "unit region command",
+            mage, mage->region, co->order));
         return 0;
+    }
 
     target = pa->param[0]->data.u;        /* Zieleinheit */
 
@@ -4307,8 +4352,12 @@ static int sp_headache(castorder * co)
     target = pa->param[0]->data.u;        /* Zieleinheit */
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (target->number == 0 || pa->param[0]->flag == TARGET_NOTFOUND)
+    if (target->number == 0 || pa->param[0]->flag == TARGET_NOTFOUND) {
+        ADDMSG(&mage->faction->msgs,
+            msg_message("spelltargetnotfound", "unit region command",
+            mage, mage->region, co->order));
         return 0;
+    }
 
     /* finde das groeßte Talent: */
     for (i = 0; i != target->skill_size; ++i) {
@@ -4483,6 +4532,7 @@ int sp_icastle(castorder * co)
     const building_type *bt_illusion = bt_find("illusioncastle");
 
     if (!bt_illusion) {
+        log_warning("building type illusioncastle not found\n");
         return 0;
     }
 
@@ -4559,8 +4609,12 @@ int sp_illusionary_shapeshift(castorder * co)
     const race *irace;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag == TARGET_NOTFOUND) {
+        ADDMSG(&mage->faction->msgs,
+            msg_message("spelltargetnotfound", "unit region command",
+            mage, mage->region, co->order));
         return 0;
+    }
 
     /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
      * abbrechen aber kosten lassen */
@@ -4636,8 +4690,12 @@ int sp_analysedream(castorder * co)
     spellparameter *pa = co->par;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag == TARGET_NOTFOUND) {
+        ADDMSG(&mage->faction->msgs,
+            msg_message("spelltargetnotfound", "unit region command",
+            mage, mage->region, co->order));
         return 0;
+    }
 
     /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
      * abbrechen aber kosten lassen */
@@ -4766,8 +4824,12 @@ int sp_dreamreading(castorder * co)
     message *msg;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag == TARGET_NOTFOUND) {
+        ADDMSG(&mage->faction->msgs,
+            msg_message("spelltargetnotfound", "unit region command",
+            mage, mage->region, co->order));
         return 0;
+    }
 
     /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
      * abbrechen aber kosten lassen */
@@ -4903,8 +4965,10 @@ int sp_analysemagic(castorder * co)
     spellparameter *pa = co->par;
 
     if (!pa->param) {
+        cmistake(mage, co->order, 213, MSG_MAGIC);
         return 0;
     }
+
     /* Objekt ermitteln */
     obj = pa->param[0]->typ;
 
@@ -4939,6 +5003,7 @@ int sp_analysemagic(castorder * co)
     }
     default:
         /* Fehlerhafter Parameter */
+        cmistake(mage, co->order, 213, MSG_MAGIC);
         return 0;
     }
 
@@ -4957,8 +5022,12 @@ int sp_itemcloak(castorder * co)
     int duration = (int)_max(2.0, power + 1);      /* works in the report, and ageing this round would kill it if it's <=1 */
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag == TARGET_NOTFOUND) {
+        ADDMSG(&mage->faction->msgs,
+            msg_message("spelltargetnotfound", "unit region command",
+            mage, mage->region, co->order));
         return 0;
+    }
 
     /* Zieleinheit */
     target = pa->param[0]->data.u;
@@ -5808,8 +5877,12 @@ static int sp_eternizewall(castorder * co)
     message *msg;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag == TARGET_NOTFOUND) {
+        ADDMSG(&mage->faction->msgs,
+            msg_message("spelltargetnotfound", "unit region command",
+            mage, mage->region, co->order));
         return 0;
+    }
 
     b = pa->param[0]->data.b;
     c = create_curse(mage, &b->attribs, ct_find("nocostbuilding"),
@@ -5873,8 +5946,12 @@ int sp_permtransfer(castorder * co)
     message *msg;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag == TARGET_NOTFOUND) {
+        ADDMSG(&mage->faction->msgs,
+            msg_message("spelltargetnotfound", "unit region command",
+            mage, mage->region, co->order));
         return 0;
+    }
 
     /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
      * abbrechen aber kosten lassen */
@@ -5930,8 +6007,12 @@ int sp_movecastle(castorder * co)
     message *msg;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag == TARGET_NOTFOUND) {
+        ADDMSG(&mage->faction->msgs,
+            msg_message("spelltargetnotfound", "unit region command",
+            mage, mage->region, co->order));
         return 0;
+    }
 
     b = pa->param[0]->data.b;
     dir = get_direction(pa->param[1]->data.xs, mage->faction->locale);
@@ -6014,8 +6095,12 @@ int sp_flying_ship(castorder * co)
     int cno;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag == TARGET_NOTFOUND) {
+        ADDMSG(&mage->faction->msgs,
+            msg_message("spelltargetnotfound", "unit region command",
+            mage, mage->region, co->order));
         return 0;
+    }
     sh = pa->param[0]->data.sh;
     if (sh->type->construction->maxsize > 50) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
@@ -6034,7 +6119,12 @@ int sp_flying_ship(castorder * co)
         else if (is_cursed(sh->attribs, C_SHIP_SPEEDUP, 0)) {
             /* Es ist zu gefaehrlich, ein sturmgepeitschtes Schiff fliegen zu lassen. */
             cmistake(mage, co->order, 210, MSG_MAGIC);
+        } else {
+            ADDMSG(&mage->faction->msgs,
+                msg_message("spelltargetnotfound", "unit region command",
+                mage, mage->region, co->order));
         }
+
         return 0;
     }
     sh->coast = NODIRECTION;
@@ -6079,8 +6169,12 @@ int sp_stealaura(castorder * co)
     spellparameter *pa = co->par;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag == TARGET_NOTFOUND) {
+        ADDMSG(&mage->faction->msgs,
+            msg_message("spelltargetnotfound", "unit region command",
+            mage, mage->region, co->order));
         return 0;
+    }
 
     /* Zieleinheit */
     u = pa->param[0]->data.u;
@@ -6241,6 +6335,7 @@ static int sp_magicrunes(castorder * co)
     }
     default:
         /* fehlerhafter Parameter */
+        cmistake(mage, co->order, 213, MSG_MAGIC);
         return 0;
     }
 
@@ -6487,6 +6582,7 @@ int sp_break_curse(castorder * co)
 /* ------------------------------------------------------------- */
 int sp_becomewyrm(castorder * co)
 {
+    log_error("not implemented");
     return 0;
 }
 
@@ -6693,8 +6789,12 @@ static int sp_babbler(castorder * co)
     message *msg;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag == TARGET_NOTFOUND) {
+        ADDMSG(&mage->faction->msgs,
+            msg_message("spelltargetnotfound", "unit region command",
+            mage, mage->region, co->order));
         return 0;
+    }
 
     target = pa->param[0]->data.u;
 
@@ -6739,8 +6839,12 @@ static int sp_readmind(castorder * co)
     spellparameter *pa = co->par;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag == TARGET_NOTFOUND) {
+        ADDMSG(&mage->faction->msgs,
+            msg_message("spelltargetnotfound", "unit region command",
+            mage, mage->region, co->order));
         return 0;
+    }
 
     target = pa->param[0]->data.u;
 

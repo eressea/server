@@ -1478,6 +1478,16 @@ static int parse_spells(xmlDocPtr doc)
                 sp->sptyp |= FARCASTING;
             if (xml_bvalue(node, "variable", false))
                 sp->sptyp |= SPELLLEVEL;
+
+            if (xml_bvalue(node, "buildingtarget", false))
+                sp->sptyp |= BUILDINGSPELL;
+            if (xml_bvalue(node, "shiptarget", false))
+                sp->sptyp |= SHIPSPELL;
+            if (xml_bvalue(node, "unittarget", false))
+                sp->sptyp |= UNITSPELL;
+            if (xml_bvalue(node, "regiontarget", false))
+                sp->sptyp |= REGIONSPELL;
+
             k = xml_ivalue(node, "combat", 0);
             if (k >= 0 && k <= 3)
                 sp->sptyp |= modes[k];
