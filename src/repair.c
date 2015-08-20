@@ -80,7 +80,7 @@ void repair_spells(const char *filename) {
             perror("repair_spells");
             abort();
         }
-        write_spellbook_state(F);
+        write_spellbook_states(F);
     }
     fclose(F);
 }
