@@ -48,6 +48,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "unit.h"
 #include "lighthouse.h"
 #include "version.h"
+#include "repair.h"
 
 /* attributes includes */
 #include <attributes/key.h>
@@ -1165,6 +1166,9 @@ faction *readfaction(struct gamedata * data)
     }
     READ_INT(data->store, &f->subscription);
 
+    if (data->version >= SPELL_LEVEL_VERSION) {
+        READ_INT(data->store, &f->max_spelllevel);
+    }
     if (alliances || data->version >= OWNER_2_VERSION) {
         int allianceid;
         READ_INT(data->store, &allianceid);
@@ -1294,6 +1298,9 @@ void writefaction(struct gamedata *data, const faction * f)
 
     write_faction_reference(f, data->store);
     WRITE_INT(data->store, f->subscription);
+#if RELEASE_VERSION >= SPELL_LEVEL_VERSION
+    WRITE_INT(data->store, f->max_spelllevel);
+#endif
     if (f->alliance) {
         WRITE_INT(data->store, f->alliance->id);
         if (f->alliance->flags & ALF_NON_ALLIED) {
@@ -1346,6 +1353,14 @@ void writefaction(struct gamedata *data, const faction * f)
     WRITE_SECTION(data->store);
     write_groups(data->store, f);
     write_spellbook(f->spellbook, data->store);
+}
+
+static int cb_sb_maxlevel(spellbook_entry *sbe, void *cbdata) {
+    faction *f = (faction *)cbdata;
+    if (sbe->level > f->max_spelllevel) {
+        f->max_spelllevel = sbe->level;
+    }
+    return 0;
 }
 
 int readgame(const char *filename, int backup)
@@ -1648,25 +1663,32 @@ int readgame(const char *filename, int backup)
         }
         else {
             for (u = f->units; u; u = u->nextF) {
-                sc_mage *mage = get_mage(u);
-                if (mage) {
-                    faction *f = u->faction;
-                    int skl = effskill(u, SK_MAGIC);
-                    if (f->magiegebiet == M_GRAY) {
-                        log_error("faction %s had magic=gray, fixing (%s)\n", factionname(f), magic_school[mage->magietyp]);
-                        f->magiegebiet = mage->magietyp;
-                    }
-                    if (f->max_spelllevel < skl) {
-                        f->max_spelllevel = skl;
-                    }
-                    if (mage->spellcount < 0) {
-                        mage->spellcount = 0;
+                if (global.data_version < SPELL_LEVEL_VERSION) {
+                    sc_mage *mage = get_mage(u);
+                    if (mage) {
+                        faction *f = u->faction;
+                        int skl = effskill(u, SK_MAGIC);
+                        if (f->magiegebiet == M_GRAY) {
+                            log_error("faction %s had magic=gray, fixing (%s)\n", factionname(f), magic_school[mage->magietyp]);
+                            f->magiegebiet = mage->magietyp;
+                        }
+                        if (f->max_spelllevel < skl) {
+                            f->max_spelllevel = skl;
+                        }
+                        if (mage->spellcount < 0) {
+                            mage->spellcount = 0;
+                        }
                     }
                 }
                 if (u->number > 0) {
                     f->alive = true;
-                    break;
+                    if (global.data_version >= SPELL_LEVEL_VERSION) {
+                        break;
+                    }
                 }
+            }
+            if (global.data_version < SPELL_LEVEL_VERSION) {
+                spellbook_foreach(f->spellbook, cb_sb_maxlevel, f);
             }
         }
     }
@@ -1674,6 +1696,11 @@ int readgame(const char *filename, int backup)
         remove_empty_factions();
     }
     log_printf(stdout, "Done loading turn %d.\n", turn);
+
+    n = get_param_int(global.parameters, "fix.spells", -1);
+    if (n>=turn) {
+        repair_spells("spells.txt");
+    }
     return 0;
 }
 

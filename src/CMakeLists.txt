@@ -64,6 +64,7 @@ ENDIF()
 
 set (ERESSEA_SRC
   move.c
+  repair.c
   spells.c
   battle.c
   alchemy.c
