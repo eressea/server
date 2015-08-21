@@ -1223,11 +1223,6 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
         res -= magic_resistance(du) * 3.0;
 
         if (u_race(du)->battle_flags & BF_EQUIPMENT) {
-#ifdef TODO_RUNESWORD
-            /* Runenschwert gibt im Kampf 80% Resistenzbonus */
-            if (dwp == WP_RUNESWORD)
-                res -= 0.80;
-#endif
             /* der Effekt von Laen steigt nicht linear */
             if (armor && fval(armor, ATF_LAEN))
                 res *= (1 - armor->magres);
@@ -1304,10 +1299,6 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
                 da, ar, df->person[dt.index].hp + rda, df->person[dt.index].hp);
         }
         if (u_race(au) == get_race(RC_DAEMON)) {
-#ifdef TODO_RUNESWORD
-            if (select_weapon(dt, 0, -1) == WP_RUNESWORD)
-                continue;
-#endif
             if (!(df->person[dt.index].flags & (FL_COURAGE | FL_DAZZLED))) {
                 df->person[dt.index].flags |= FL_DAZZLED;
                 df->person[dt.index].defence--;

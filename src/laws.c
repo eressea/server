@@ -2817,10 +2817,6 @@ void sinkships(struct region * r)
     }
 }
 
-/* The following functions do not really belong here: */
-#include <kernel/config.h>
-#include <kernel/build.h>
-
 static attrib_type at_number = {
     "faction_renum",
     NULL, NULL, NULL, NULL, NULL,
