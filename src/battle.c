@@ -194,6 +194,7 @@ static void message_faction(battle * b, faction * f, struct message *m)
 {
     region *r = b->region;
 
+    assert(f);
     if (f->battles == NULL || f->battles->r != r) {
         struct bmsg *bm = (struct bmsg *)calloc(1, sizeof(struct bmsg));
         bm->next = f->battles;
@@ -210,6 +211,7 @@ void message_all(battle * b, message * m)
     watcher *w;
 
     for (bf = b->factions; bf; bf = bf->next) {
+        assert(bf->faction);
         message_faction(b, bf->faction, m);
     }
     if (p)
@@ -1687,6 +1689,39 @@ void do_combatmagic(battle * b, combatmagic_t was)
 
     memset(spellranks, 0, sizeof(spellranks));
 
+#ifdef FFL_CURSED
+    for (s = b->sides; s != b->sides + b->nsides; ++s) {
+        fighter *fig = 0;
+        if (s->bf->attacker) {
+            spell *sp = find_spell("wolfhowl");
+            if (sp && fval(s->faction, FFL_CURSED)) {
+                int si;
+                for (si = 0; s->enemies[si]; ++si) {
+                    side *se = s->enemies[si];
+                    if (se && !fval(se->faction, FFL_NPC)) {
+                        fighter *fi;
+                        for (fi = se->fighters; fi; fi = fi->next) {
+                            if (fi && (!fig || fig->unit->number > fi->unit->number)) {
+                                fig = fi;
+                                if (fig->unit->number == 1) {
+                                    break;
+                                }
+                            }
+                        }
+                        if (fig && fig->unit->number == 1) {
+                            break;
+                        }
+                    }
+                }
+                if (fig) {
+                    co = create_castorder(0, fig->unit, 0, sp, r, 10, 10, 0, 0, 0);
+                    add_castorder(&spellranks[sp->rank], co);
+                    break;
+                }
+            }
+        }
+    }
+#endif
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
         fighter *fig;
         for (fig = s->fighters; fig; fig = fig->next) {
