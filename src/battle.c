@@ -1679,6 +1679,12 @@ static void report_failed_spell(struct battle * b, struct unit * mage, const str
     msg_release(m);
 }
 
+static castorder * create_castorder_combat(castorder *co, fighter *fig, const spell * sp, int level, double force) {
+    co = create_castorder(co, fig->unit, 0, sp, fig->unit->region, level, force, 0, 0, 0);
+    co->magician.fig = fig;
+    return co;
+}
+
 void do_combatmagic(battle * b, combatmagic_t was)
 {
     side *s;
@@ -1714,7 +1720,8 @@ void do_combatmagic(battle * b, combatmagic_t was)
                     }
                 }
                 if (fig) {
-                    co = create_castorder(0, fig->unit, 0, sp, r, 10, 10, 0, 0, 0);
+                    co = create_castorder_combat(0, fig, sp, 10, 10);
+                    co->magician.fig = fig;
                     add_castorder(&spellranks[sp->rank], co);
                     break;
                 }
@@ -1779,8 +1786,7 @@ void do_combatmagic(battle * b, combatmagic_t was)
                     pay_spell(mage, sp, level, 1);
                 }
                 else {
-                    co = create_castorder(0, fig->unit, 0, sp, r, level, power, 0, 0, 0);
-                    co->magician.fig = fig;
+                    co = create_castorder_combat(0, fig, sp, level, power);
                     add_castorder(&spellranks[sp->rank], co);
                 }
             }
@@ -1812,8 +1818,7 @@ static int cast_combatspell(troop at, const spell * sp, int level, double force)
 {
     castorder co;
 
-    create_castorder(&co, at.fighter->unit, 0, sp, at.fighter->unit->region, level, force, 0, 0, 0);
-    co.magician.fig = at.fighter;
+    create_castorder_combat(&co, at.fighter, sp, level, force);
     level = sp->cast(&co);
     free_castorder(&co);
     if (level > 0) {
