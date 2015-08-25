@@ -256,7 +256,7 @@ int a_age(attrib ** p)
         if (a->type->age) {
             int result = a->type->age(a);
             assert(result >= 0 || !"age() returned a negative value");
-            if (result == 0) {
+            if (result == AT_AGE_REMOVE) {
                 a_remove(p, a);
                 continue;
             }

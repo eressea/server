@@ -131,7 +131,7 @@ int curse_age(attrib * a)
     else if (c->duration != INT_MAX) {
         c->duration = _max(0, c->duration - 1);
     }
-    return c->duration;
+    return (c->duration > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
 }
 
 void destroy_curse(curse * c)
