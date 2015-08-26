@@ -229,6 +229,46 @@ static void test_write_travelthru(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_write_unit(CuTest *tc) {
+    unit *u;
+    faction *f;
+    race *rc;
+    struct locale *lang;
+    char buffer[1024];
+
+    test_cleanup();
+    rc = rc_get_or_create("human");
+    rc->bonus[SK_ALCHEMY] = 1;
+    lang = get_or_create_locale("de");
+    locale_setstring(lang, "nr_skills", "Talente");
+    locale_setstring(lang, "skill::sailing", "Segeln");
+    locale_setstring(lang, "skill::alchemy", "Alchemie");
+    init_skills(lang);
+    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
+    u->faction->locale = lang;
+    faction_setname(u->faction, "UFO");
+    renumber_faction(u->faction, 1);
+    unit_setname(u, "Hodor");
+    unit_setid(u, 1);
+
+    bufunit(u->faction, u, 0, 0, buffer, sizeof(buffer));
+    CuAssertStrEquals(tc, "Hodor (1), 1 human, status_aggressive.", buffer);
+
+    set_level(u, SK_SAILING, 1);
+    bufunit(u->faction, u, 0, 0, buffer, sizeof(buffer));
+    CuAssertStrEquals(tc, "Hodor (1), 1 human, status_aggressive, Talente: Segeln 1.", buffer);
+
+    set_level(u, SK_ALCHEMY, 1);
+    bufunit(u->faction, u, 0, 0, buffer, sizeof(buffer));
+    CuAssertStrEquals(tc, "Hodor (1), 1 human, status_aggressive, Talente: Segeln 1, Alchemie 2.", buffer);
+
+    f = test_create_faction(0);
+    f->locale = get_or_create_locale("de");
+    bufunit(f, u, 0, 0, buffer, sizeof(buffer));
+    CuAssertStrEquals(tc, "Hodor (1), UFO (1), 1 human.", buffer);
+    test_cleanup();
+}
+
 CuSuite *get_reports_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -240,5 +280,6 @@ CuSuite *get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_write_many_spaces);
     SUITE_ADD_TEST(suite, test_sparagraph);
     SUITE_ADD_TEST(suite, test_write_travelthru);
+    SUITE_ADD_TEST(suite, test_write_unit);
     return suite;
 }
