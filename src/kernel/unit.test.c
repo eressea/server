@@ -296,6 +296,7 @@ static void test_skill_hunger(CuTest *tc) {
     CuAssertIntEquals(tc, 5, effskill(u, SK_SAILING));
     set_level(u, SK_SAILING, 2);
     CuAssertIntEquals(tc, 1, effskill(u, SK_SAILING));
+    test_cleanup();
 }
 
 static void test_skill_familiar(CuTest *tc) {
@@ -323,6 +324,30 @@ static void test_skill_familiar(CuTest *tc) {
     r = test_create_region(3, 0, 0);
     move_unit(fam, r, &r->units);
     CuAssertIntEquals(tc, 7, effskill(mag, SK_PERCEPTION));
+    test_cleanup();
+}
+
+static void test_age_familiar(CuTest *tc) {
+    unit *mag, *fam;
+
+    test_cleanup();
+
+    // setup two units
+    mag = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    fam = test_create_unit(mag->faction, test_create_region(0, 0, 0));
+    CuAssertPtrEquals(tc, 0, get_familiar(mag));
+    CuAssertPtrEquals(tc, 0, get_familiar_mage(fam));
+    CuAssertIntEquals(tc, true, create_newfamiliar(mag, fam));
+    CuAssertPtrEquals(tc, fam, get_familiar(mag));
+    CuAssertPtrEquals(tc, mag, get_familiar_mage(fam));
+    a_age(&fam->attribs);
+    a_age(&mag->attribs);
+    CuAssertPtrEquals(tc, fam, get_familiar(mag));
+    CuAssertPtrEquals(tc, mag, get_familiar_mage(fam));
+    set_number(fam, 0);
+    a_age(&mag->attribs);
+    CuAssertPtrEquals(tc, 0, get_familiar(mag));
+    test_cleanup();
 }
 
 CuSuite *get_unit_suite(void)
@@ -342,5 +367,6 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_skillmod);
     SUITE_ADD_TEST(suite, test_skill_hunger);
     SUITE_ADD_TEST(suite, test_skill_familiar);
+    SUITE_ADD_TEST(suite, test_age_familiar);
     return suite;
 }
