@@ -1254,25 +1254,23 @@ static int item_invis(const unit *u) {
         + (rsphere ? i_get(u->items, rsphere->itype) * 100 : 0);
 }
 
+#ifdef NEWATSROI
 static int item_modification(const unit * u, skill_t sk, int val)
 {
     if (sk == SK_STEALTH) {
-#if NEWATSROI == 1
         if (item_invis(u) >= u->number) {
             val += ROIBONUS;
         }
-#endif
     }
-#if NEWATSROI == 1
     if (sk == SK_PERCEPTION) {
         const struct resource_type *rtype = get_resourcetype(R_AMULET_OF_TRUE_SEEING);
         if (i_get(u->items, rtype->itype) >= u->number) {
             val += ATSBONUS;
         }
     }
-#endif
     return val;
 }
+#endif
 
 static int att_modification(const unit * u, skill_t sk)
 {
@@ -1345,9 +1343,11 @@ int get_modifier(const unit * u, skill_t sk, int level, const region * r, bool n
     skill += rc_skillmod(u_race(u), r, sk);
     skill += att_modification(u, sk);
 
+#ifdef NEWATSROI
     if (!noitem) {
         skill = item_modification(u, sk, skill);
     }
+#endif
     skill = skillmod(u->attribs, u, r, sk, skill, SMF_ALWAYS);
 
     if (hunger_red_skill == -1) {
@@ -1398,7 +1398,7 @@ int eff_skill_study(const unit * u, skill_t sk, const region * r)
 
 int invisible(const unit * target, const unit * viewer)
 {
-#if NEWATSROI == 1
+#ifdef NEWATSROI
     return 0;
 #else
     if (viewer && viewer->faction == target->faction)
