@@ -239,6 +239,60 @@ static void test_default_name(CuTest *tc) {
     test_cleanup();
 }
 
+static int cb_skillmod(const unit *u, const region *r, skill_t sk, int level) {
+    unused_arg(u);
+    unused_arg(r);
+    unused_arg(sk);
+    return level + 3;
+}
+
+static void test_skillmod(CuTest *tc) {
+    unit *u;
+    attrib *a;
+
+    test_cleanup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    set_level(u, SK_ARMORER, 5);
+    CuAssertIntEquals(tc, 5, effskill(u, SK_ARMORER));
+
+    a_add(&u->attribs, a = make_skillmod(SK_ARMORER, SMF_ALWAYS, 0, 2.0, 0));
+    CuAssertIntEquals(tc, 10, effskill(u, SK_ARMORER));
+    a_remove(&u->attribs, a);
+
+    a_add(&u->attribs, a = make_skillmod(SK_ARMORER, SMF_ALWAYS, 0, 0, 2));
+    CuAssertIntEquals(tc, 7, effskill(u, SK_ARMORER));
+    a_remove(&u->attribs, a);
+
+    a_add(&u->attribs, a = make_skillmod(SK_ARMORER, SMF_ALWAYS, cb_skillmod, 0, 0));
+    CuAssertIntEquals(tc, 8, effskill(u, SK_ARMORER));
+    a_remove(&u->attribs, a);
+
+    test_cleanup();
+}
+
+static void test_skill_hunger(CuTest *tc) {
+    unit *u;
+
+    test_cleanup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    set_level(u, SK_ARMORER, 6);
+    set_level(u, SK_SAILING, 6);
+    fset(u, UFL_HUNGER);
+
+    set_param(&global.parameters, "rules.hunger.reduces_skill", "0");
+    CuAssertIntEquals(tc, 6, effskill(u, SK_ARMORER));
+    CuAssertIntEquals(tc, 6, effskill(u, SK_SAILING));
+
+    set_param(&global.parameters, "rules.hunger.reduces_skill", "1");
+    CuAssertIntEquals(tc, 3, effskill(u, SK_ARMORER));
+    CuAssertIntEquals(tc, 3, effskill(u, SK_SAILING));
+
+    set_param(&global.parameters, "rules.hunger.reduces_skill", "2");
+    CuAssertIntEquals(tc, 3, effskill(u, SK_ARMORER));
+    CuAssertIntEquals(tc, 5, effskill(u, SK_SAILING));
+    set_level(u, SK_SAILING, 2);
+    CuAssertIntEquals(tc, 1, effskill(u, SK_SAILING));
+}
 
 CuSuite *get_unit_suite(void)
 {
@@ -254,5 +308,7 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_remove_empty_units_in_region);
     SUITE_ADD_TEST(suite, test_names);
     SUITE_ADD_TEST(suite, test_default_name);
+    SUITE_ADD_TEST(suite, test_skillmod);
+    SUITE_ADD_TEST(suite, test_skill_hunger);
     return suite;
 }
