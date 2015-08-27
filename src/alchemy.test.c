@@ -11,6 +11,8 @@
 #include <kernel/item.h>
 #include <kernel/region.h>
 
+#include <limits.h>
+
 #include <CuTest.h>
 #include "tests.h"
 
