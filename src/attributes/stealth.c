@@ -46,11 +46,11 @@ int u_geteffstealth(const unit *u)
     return -1;
 }
 
+/* r != u->region when called by cansee (see comment there) */
 int eff_stealth(const unit * u, const region * r)
 {
     int e = 0;
 
-    assert(u->region == r); // TODO: param r is useless
     /* Auf Schiffen keine Tarnung! */
     if (!u->ship && skill_enabled(SK_STEALTH)) {
         e = effskill(u, SK_STEALTH, r);

@@ -4597,14 +4597,14 @@ void update_subscriptions(void)
 
 bool
 cansee(const faction * f, const region * r, const unit * u, int modifier)
-/* r kann != u->region sein, wenn es um durchreisen geht */
-/* und es muss niemand aus f in der region sein, wenn sie vom Turm
-* erblickt wird */
+/* r kann != u->region sein, wenn es um Durchreisen geht, 
+ * oder Zauber (sp_generous, sp_fetchastral).
+ * Es muss auch niemand aus f in der region sein, wenn sie vom Turm
+ * erblickt wird */
 {
     int stealth, rings;
     unit *u2 = r->units;
 
-    assert(u->region == r); // TODO: param r is unnecessary
     if (u->faction == f || omniscient(f)) {
         return true;
     }

@@ -2264,11 +2264,12 @@ static void expandstealing(region * r, request * stealorders)
 }
 
 /* ------------------------------------------------------------- */
-static void plant(region * r, unit * u, int raw)
+static void plant(unit * u, int raw)
 {
     int n, i, skill, planted = 0;
     const item_type *itype;
     const resource_type *rt_water = get_resourcetype(R_WATER_OF_LIFE);
+    region *r = u->region;
 
     assert(rt_water != NULL);
     if (!fval(r->terrain, LAND_REGION)) {
@@ -2320,12 +2321,12 @@ static void plant(region * r, unit * u, int raw)
         u, r, planted, itype->rtype));
 }
 
-static void planttrees(region * r, unit * u, int raw)
+static void planttrees(unit * u, int raw)
 {
     int n, i, skill, planted = 0;
     const resource_type *rtype;
+    region * r = u->region;
 
-    assert(r == u->region); // TODO: param r is unnecessary
     if (!fval(r->terrain, LAND_REGION)) {
         return;
     }
@@ -2374,14 +2375,14 @@ static void planttrees(region * r, unit * u, int raw)
 }
 
 /* züchte bäume */
-static void breedtrees(region * r, unit * u, int raw)
+static void breedtrees(unit * u, int raw)
 {
     int n, i, skill, planted = 0;
     const resource_type *rtype;
     static int gamecookie = -1;
     static int current_season;
+    region *r = u->region;
 
-    assert(r == u->region); // TODO: param r is unnecessary
     if (gamecookie != global.cookie) {
         gamedate date;
         get_gamedate(turn, &date);
@@ -2391,7 +2392,7 @@ static void breedtrees(region * r, unit * u, int raw)
 
     /* Bäume züchten geht nur im Frühling */
     if (current_season != SEASON_SPRING) {
-        planttrees(r, u, raw);
+        planttrees(u, raw);
         return;
     }
 
@@ -2405,7 +2406,7 @@ static void breedtrees(region * r, unit * u, int raw)
     /* Skill prüfen */
     skill = effskill(u, SK_HERBALISM, 0);
     if (skill < 12) {
-        planttrees(r, u, raw);
+        planttrees(u, raw);
         return;
     }
 
@@ -2506,16 +2507,16 @@ static void breed_cmd(unit * u, struct order *ord)
 
     switch (p) {
     case P_HERBS:
-        plant(r, u, m);
+        plant(u, m);
         break;
     case P_TREES:
-        breedtrees(r, u, m);
+        breedtrees(u, m);
         break;
     default:
         if (p != P_ANY) {
             rtype = findresourcetype(s, u->faction->locale);
             if (rtype == get_resourcetype(R_SEED) || rtype == get_resourcetype(R_MALLORNSEED)) {
-                breedtrees(r, u, m);
+                breedtrees(u, m);
                 break;
             }
             else if (rtype != get_resourcetype(R_HORSE)) {
