@@ -52,7 +52,7 @@ void herbsearch(unit * u, int max)
     region * r = u->region;
     int herbsfound;
     const item_type *whichherb;
-    int effsk = effskill(u, SK_HERBALISM);
+    int effsk = effskill(u, SK_HERBALISM, 0);
 
     if (effsk == 0) {
         cmistake(u, u->thisorder, 59, MSG_PRODUCE);

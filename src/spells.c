@@ -2516,7 +2516,7 @@ static int sp_fumblecurse(castorder * co)
     target = pa->param[0]->data.u;
 
     rx = rng_int() % 3;
-    sx = cast_level - effskill(target, SK_MAGIC);
+    sx = cast_level - effskill(target, SK_MAGIC, 0);
     duration = _max(sx, rx) + 1;
 
     effect = force / 2;
@@ -3254,7 +3254,7 @@ static int sp_bloodsacrifice(castorder * co)
     unit *mage = co->magician.u;
     int cast_level = co->level;
     int aura;
-    int skill = eff_skill(mage, SK_MAGIC, mage->region);
+    int skill = effskill(mage, SK_MAGIC, 0);
     int hp = (int)(co->force * 8);
 
     if (hp <= 0) {
@@ -3591,11 +3591,11 @@ static int sp_charmingsong(castorder * co)
     }
     /* Magieresistensbonus fuer hoehere Talentwerte */
     for (i = 0; i < MAXSKILLS; i++) {
-        int sk = effskill(target, i);
+        int sk = effskill(target, i, 0);
         if (tb < sk)
             tb = sk;
     }
-    tb -= effskill(mage, SK_MAGIC);
+    tb -= effskill(mage, SK_MAGIC, 0);
     if (tb > 0) {
         resist_bonus += tb * 15;
     }
@@ -4143,7 +4143,7 @@ static int sp_pump(castorder * co)
         create_unit(rt, mage->faction, RS_FARVISION, get_race(RC_SPELL), 0,
         "spell/pump", NULL);
     u->age = 2;
-    set_level(u, SK_PERCEPTION, eff_skill(target, SK_PERCEPTION, u->region));
+    set_level(u, SK_PERCEPTION, effskill(target, SK_PERCEPTION, 0));
 
     return cast_level;
 }
@@ -4795,7 +4795,7 @@ int sp_dreamreading(castorder * co)
         "spell/dreamreading", NULL);
     set_number(u2, 1);
     u2->age = 2;                  /* Nur fuer diese Runde. */
-    set_level(u2, SK_PERCEPTION, eff_skill(u, SK_PERCEPTION, u2->region));
+    set_level(u2, SK_PERCEPTION, effskill(u, SK_PERCEPTION, u2->region));
 
     msg =
         msg_message("sp_dreamreading_effect", "mage unit region", mage, u,

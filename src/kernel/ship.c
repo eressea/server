@@ -273,7 +273,7 @@ static int ShipSpeedBonus(const unit * u)
     int level = get_param_int(global.parameters, "movement.shipspeed.skillbonus", 0);
     if (level > 0) {
         ship *sh = u->ship;
-        int skl = effskill(u, SK_SAILING);
+        int skl = effskill(u, SK_SAILING, 0);
         int minsk = (sh->type->cptskill + 1) / 2;
         return (skl - minsk) / level;
     }
@@ -288,7 +288,7 @@ int crew_skill(const ship *sh) {
 
     for (u = sh->region->units; u; u = u->next) {
         if (u->ship == sh) {
-            n += eff_skill(u, SK_SAILING, sh->region) * u->number;
+            n += effskill(u, SK_SAILING, 0) * u->number;
         }
     }
     return n;

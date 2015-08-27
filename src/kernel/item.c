@@ -825,7 +825,7 @@ int amount, struct order *ord)
             ""));
         return ECUSTOM;
     }
-    if (effskill(u, SK_STEALTH) <= effskill(target, SK_PERCEPTION)) {
+    if (effskill(u, SK_STEALTH, 0) <= effskill(target, SK_PERCEPTION, 0)) {
         cmistake(u, ord, 64, MSG_EVENT);
         return ECUSTOM;
     }

@@ -832,7 +832,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
             prefix)));
     }
     if (u->faction != f && a_fshidden
-        && a_fshidden->data.ca[0] == 1 && effskill(u, SK_STEALTH) >= 6) {
+        && a_fshidden->data.ca[0] == 1 && effskill(u, SK_STEALTH, 0) >= 6) {
         stream_printf(out, "-1;Anzahl\n");
     }
     else {
@@ -942,14 +942,13 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
         pr = 0;
         for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
             if (sv->level > 0) {
-                skill_t sk = sv->id;
-                int esk = eff_skill(u, sk, r);
+                int esk = eff_skill(u, sv, r);
                 if (!pr) {
                     pr = 1;
                     stream_printf(out, "TALENTE\n");
                 }
                 stream_printf(out, "%d %d;%s\n", u->number * level_days(sv->level), esk,
-                    translate(mkname("skill", skillnames[sk]), skillname(sk,
+                    translate(mkname("skill", skillnames[sv->id]), skillname(sv->id,
                     f->locale)));
             }
         }
@@ -957,7 +956,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
         /* spells that this unit can cast */
         mage = get_mage(u);
         if (mage) {
-            int i, maxlevel = effskill(u, SK_MAGIC);
+            int i, maxlevel = effskill(u, SK_MAGIC, 0);
             cr_output_spells(out, u, maxlevel);
 
             for (i = 0; i != MAXCOMBATSPELLS; ++i) {
@@ -979,7 +978,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
         show = u->items;
     }
     else if (!itemcloak && mode >= see_unit && !(a_fshidden
-        && a_fshidden->data.ca[1] == 1 && effskill(u, SK_STEALTH) >= 3)) {
+        && a_fshidden->data.ca[1] == 1 && effskill(u, SK_STEALTH, 0) >= 3)) {
         int n = report_items(u->items, result, MAX_INVENTORY, u, f);
         assert(n >= 0);
         if (n > 0)

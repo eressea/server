@@ -420,7 +420,7 @@ const faction * viewer)
                 const unit *u;
                 for (u = r->units; visible != res->amount && u != NULL; u = u->next) {
                     if (u->faction == viewer) {
-                        int s = eff_skill(u, itype->construction->skill, r);
+                        int s = effskill(u, itype->construction->skill, 0);
                         if (s > maxskill) {
                             maxskill = s;
                             visible = res->type->visible(res, maxskill);
@@ -515,7 +515,7 @@ size_t size)
     bufp = STRLCPY(bufp, ", ", size);
 
     if (u->faction != f && a_fshidden && a_fshidden->data.ca[0] == 1
-        && effskill(u, SK_STEALTH) >= 6) {
+        && effskill(u, SK_STEALTH, 0) >= 6) {
         bufp = STRLCPY(bufp, "? ", size);
     }
     else {
@@ -602,7 +602,7 @@ size_t size)
         show = u->items;
     }
     else if (!itemcloak && mode >= see_unit && !(a_fshidden
-        && a_fshidden->data.ca[1] == 1 && effskill(u, SK_STEALTH) >= 3)) {
+        && a_fshidden->data.ca[1] == 1 && effskill(u, SK_STEALTH, 0) >= 3)) {
         int n = report_items(u->items, results, MAX_INVENTORY, u, f);
         assert(n >= 0);
         if (n > 0)
@@ -641,7 +641,7 @@ size_t size)
 
         if (book) {
             quicklist *ql = book->spells;
-            int qi, header, maxlevel = effskill(u, SK_MAGIC);
+            int qi, header, maxlevel = effskill(u, SK_MAGIC, 0);
             int result = _snprintf(bufp, size, ". Aura %d/%d", get_spellpoints(u), max_spellpoints(u->region, u));
             if (wrptr(&bufp, &size, result) != 0) {
                 WARN_STATIC_BUFFER();
@@ -810,7 +810,7 @@ const struct unit * u, struct skill * sv, int *dh, int days)
         }
     }
 
-    effsk = effskill(u, sv->id);
+    effsk = eff_skill(u, sv, 0);
     if (wrptr(&bufp, &size, _snprintf(bufp, size, "%d", effsk)) != 0)
         WARN_STATIC_BUFFER();
 
@@ -1351,7 +1351,7 @@ static void view_regatta(struct seen_region **seen, region * r, faction * f)
     int skill = 0;
     for (u = r->units; u; u = u->next) {
         if (u->faction == f) {
-            int es = effskill(u, SK_PERCEPTION);
+            int es = effskill(u, SK_PERCEPTION, 0);
             if (es > skill)
                 skill = es;
         }

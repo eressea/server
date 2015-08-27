@@ -517,7 +517,7 @@ int u_hasspell(const unit *u, const struct spell *sp)
     spellbook * book = unit_get_spellbook(u);
     spellbook_entry * sbe = book ? spellbook_get(book, sp) : 0;
     if (sbe) {
-        return sbe->level <= effskill(u, SK_MAGIC);
+        return sbe->level <= effskill(u, SK_MAGIC, 0);
     }
     return 0;
 }
@@ -531,7 +531,7 @@ int get_combatspelllevel(const unit * u, int nr)
 
     assert(nr < MAXCOMBATSPELLS);
     if (m) {
-        int level = eff_skill(u, SK_MAGIC, u->region);
+        int level = effskill(u, SK_MAGIC, 0);
         return _min(m->combatspells[nr].level, level);
     }
     return -1;
@@ -703,7 +703,7 @@ static int use_item_aura(const region * r, const unit * u)
 {
     int sk, n;
 
-    sk = eff_skill(u, SK_MAGIC, r);
+    sk = effskill(u, SK_MAGIC, r);
     n = (int)(sk * sk * u_race(u)->maxaura / 4);
 
     return n;
@@ -717,7 +717,7 @@ int max_spellpoints(const region * r, const unit * u)
     double divisor = 1.2;
     const struct resource_type *rtype;
 
-    sk = eff_skill(u, SK_MAGIC, r);
+    sk = effskill(u, SK_MAGIC, r);
     msp = u_race(u)->maxaura * (pow(sk, potenz) / divisor + 1) + get_spchange(u);
 
     rtype = rt_find("aurafocus");
@@ -950,7 +950,7 @@ cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
         return false;
     }
     /* reicht die Stufe aus? */
-    if (eff_skill(u, SK_MAGIC, u->region) < level) {
+    if (effskill(u, SK_MAGIC, 0) < level) {
         /* die Einheit ist nicht erfahren genug für diesen Zauber */
         cmistake(u, ord, 169, MSG_MAGIC);
         return false;
@@ -1123,7 +1123,7 @@ double magic_resistance(unit * target)
 
     assert(target->number > 0);
     /* Magier haben einen Resistenzbonus vom Magietalent * 5% */
-    probability += effskill(target, SK_MAGIC) * 0.05;
+    probability += effskill(target, SK_MAGIC, 0) * 0.05;
 
     /* Auswirkungen von Zaubern auf der Einheit */
     c = get_curse(target->attribs, ct_find("magicresistance"));
@@ -1207,10 +1207,10 @@ target_resists_magic(unit * magician, void *obj, int objtyp, int t_bonus)
         skill *sv;
         unit *u = (unit *)obj;
 
-        at = effskill(magician, SK_MAGIC);
+        at = effskill(magician, SK_MAGIC, 0);
 
         for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
-            int sk = effskill(u, sv->id);
+            int sk = eff_skill(u, sv, 0);
             if (pa < sk)
                 pa = sk;
         }
@@ -1282,7 +1282,7 @@ bool fumble(region * r, unit * u, const spell * sp, int cast_grade)
      * */
 
     int rnd = 0;
-    double x = (double)cast_grade / (double)eff_skill(u, SK_MAGIC, r);
+    double x = (double)cast_grade / (double)effskill(u, SK_MAGIC, r);
     int fumble_chance = (int)(((double)x * 40.0) - 20.0);
     struct building *b = inside_building(u);
     const struct building_type *btype = b ? b->type : NULL;
@@ -1432,7 +1432,7 @@ static double regeneration(unit * u)
     double potenz = 1.5;
     double divisor = 2.0;
 
-    sk = effskill(u, SK_MAGIC);
+    sk = effskill(u, SK_MAGIC, 0);
     /* Rassenbonus/-malus */
     d = pow(sk, potenz) * u_race(u)->regaura / divisor;
     d++;
@@ -2149,7 +2149,7 @@ static int sm_familiar(const unit * u, const region * r, skill_t sk, int value)
             /* the familiar is dead */
             return value;
         }
-        mod = eff_skill(familiar, sk, r) / 2;
+        mod = effskill(familiar, sk, r) / 2;
         if (r != familiar->region) {
             mod /= distance(r, familiar->region);
         }
@@ -2515,7 +2515,7 @@ static castorder *cast_cmd(unit * u, order * ord)
         cmistake(u, ord, 269, MSG_MAGIC);
         return 0;
     }
-    level = eff_skill(u, SK_MAGIC, r);
+    level = effskill(u, SK_MAGIC, 0);
 
     init_order(ord);
     s = gettoken(token, sizeof(token));
@@ -2648,7 +2648,7 @@ static castorder *cast_cmd(unit * u, order * ord)
     }
     /* Stufenangabe bei nicht Stufenvariierbaren Sprüchen abfangen */
     if (!(sp->sptyp & SPELLLEVEL)) {
-        int ilevel = eff_skill(u, SK_MAGIC, u->region);
+        int ilevel = effskill(u, SK_MAGIC, 0);
         if (ilevel != level) {
             level = ilevel;
             ADDMSG(&u->faction->msgs, msg_message("spellfail::nolevel",
@@ -2674,7 +2674,7 @@ static castorder *cast_cmd(unit * u, order * ord)
                     "mage", caster));
                 return 0;
             }
-            if (distance(caster->region, r) > eff_skill(caster, SK_MAGIC, caster->region)) {
+            if (distance(caster->region, r) > effskill(caster, SK_MAGIC, 0)) {
                 ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "familiar_toofar",
                     "mage", caster));
                 return 0;
@@ -2684,7 +2684,7 @@ static castorder *cast_cmd(unit * u, order * ord)
              * löschen, zaubern kann er noch */
             range *= 2;
             set_order(&caster->thisorder, NULL);
-            level = _min(level, eff_skill(caster, SK_MAGIC, caster->region) / 2);
+            level = _min(level, effskill(caster, SK_MAGIC, 0) / 2);
         }
     }
     /* Weitere Argumente zusammenbasteln */

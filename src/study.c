@@ -347,8 +347,7 @@ int teach_cmd(unit * u, struct order *ord)
                         sk = teachskill[i];
                     }
                     if (sk != NOSKILL
-                        && eff_skill_study(u, sk,
-                        r) - TEACHDIFFERENCE > eff_skill_study(student, sk, r)) {
+                        && effskill_study(u, sk, 0) - TEACHDIFFERENCE > effskill_study(student, sk, 0)) {
                         teaching -= teach_unit(u, student, teaching, sk, true, &academy);
                     }
                 }
@@ -366,8 +365,7 @@ int teach_cmd(unit * u, struct order *ord)
                     init_order(student->thisorder);
                     sk = getskill(student->faction->locale);
                     if (sk != NOSKILL
-                        && eff_skill_study(u, sk, r) - TEACHDIFFERENCE >= eff_skill(student,
-                        sk, r)) {
+                        && effskill_study(u, sk, 0) - TEACHDIFFERENCE >= effskill(student, sk, 0)) {
                         teaching -= teach_unit(u, student, teaching, sk, true, &academy);
                     }
                 }
@@ -454,8 +452,8 @@ int teach_cmd(unit * u, struct order *ord)
             }
 
             /* u is teacher, u2 is student */
-            if (eff_skill_study(u2, sk, r) > eff_skill_study(u, sk,
-                r) - TEACHDIFFERENCE) {
+            if (effskill_study(u2, sk, 0) > effskill_study(u, sk, 0)
+                - TEACHDIFFERENCE) {
                 if (feedback) {
                     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "teach_asgood",
                         "student", u2));
@@ -565,7 +563,7 @@ int study_cmd(unit * u, order * ord)
         cmistake(u, ord, 77, MSG_EVENT);
         return 0;
     }
-    if (SkillCap(sk) && SkillCap(sk) <= effskill(u, sk)) {
+    if (SkillCap(sk) && SkillCap(sk) <= effskill(u, sk, 0)) {
         cmistake(u, ord, 771, MSG_EVENT);
         return 0;
     }
@@ -684,7 +682,7 @@ int study_cmd(unit * u, order * ord)
         }
     }
     if (sk == SK_ALCHEMY) {
-        maxalchemy = eff_skill(u, SK_ALCHEMY, r);
+        maxalchemy = effskill(u, SK_ALCHEMY, 0);
         if (!has_skill(u, SK_ALCHEMY)) {
             int amax = skill_limit(u->faction, SK_ALCHEMY);
             if (count_skill(u->faction, SK_ALCHEMY) + u->number > amax) {
@@ -779,7 +777,7 @@ int study_cmd(unit * u, order * ord)
                 if (feedback) {
                     ADDMSG(&teacher->faction->msgs, msg_message("teach_teacher",
                         "teacher student skill level", teacher, u, sk,
-                        effskill(u, sk)));
+                        effskill(u, sk, 0)));
                 }
                 ADDMSG(&u->faction->msgs, msg_message("teach_student",
                     "teacher student skill", teacher, u, sk));
@@ -796,7 +794,7 @@ int study_cmd(unit * u, order * ord)
     if (sk == SK_ALCHEMY) {
         const potion_type *ptype;
         faction *f = u->faction;
-        int skill = eff_skill(u, SK_ALCHEMY, r);
+        int skill = effskill(u, SK_ALCHEMY, 0);
         if (skill > maxalchemy) {
             for (ptype = potiontypes; ptype; ptype = ptype->next) {
                 if (skill == ptype->level * 2) {
