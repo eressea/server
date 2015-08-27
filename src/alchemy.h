@@ -56,7 +56,7 @@ extern "C" {
         MAX_POTIONS
     };
 
-    extern void herbsearch(struct region *r, struct unit *u, int max);
+    void herbsearch(struct region *r, struct unit *u, int max);
     extern int use_potion(struct unit *u, const struct item_type *itype,
         int amount, struct order *);
     extern int use_potion_delayed(struct unit *u, const struct item_type *itype,

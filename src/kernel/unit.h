@@ -164,8 +164,8 @@ extern "C" {
     int produceexp(struct unit *u, skill_t sk, int n);
     int SkillCap(skill_t sk);
 
-    extern void set_level(struct unit *u, skill_t id, int level);
-    extern int get_level(const struct unit *u, skill_t id);
+    void set_level(struct unit *u, skill_t id, int level);
+    int get_level(const struct unit *u, skill_t id);
     extern void transfermen(struct unit *u, struct unit *u2, int n);
 
     extern int eff_skill(const struct unit *u, skill_t sk,

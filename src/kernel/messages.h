@@ -37,7 +37,7 @@ extern "C" {
         struct mlist *begin, **end;
     } message_list;
 
-    extern void free_messagelist(message_list * msgs);
+    void free_messagelist(message_list * msgs);
 
     typedef struct msglevel {
         /* used to set specialized msg-levels */

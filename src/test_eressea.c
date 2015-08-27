@@ -67,6 +67,7 @@ int RunAllTests(void)
   RUN_TESTS(suite, equipment);
   RUN_TESTS(suite, item);
   RUN_TESTS(suite, magic);
+  RUN_TESTS(suite, alchemy);
   RUN_TESTS(suite, reports);
   RUN_TESTS(suite, save);
   RUN_TESTS(suite, ship);
