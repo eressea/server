@@ -5,7 +5,6 @@
 #include <util/attrib.h>
 #include <attributes/stealth.h>
 
-#include <assert.h>
 #include <stdlib.h>
 
 attrib_type at_stealth = {
@@ -50,7 +49,6 @@ int u_geteffstealth(const unit *u)
 int eff_stealth(const unit * u, const region * r)
 {
     int e = 0;
-
     /* Auf Schiffen keine Tarnung! */
     if (!u->ship && skill_enabled(SK_STEALTH)) {
         e = effskill(u, SK_STEALTH, r);
