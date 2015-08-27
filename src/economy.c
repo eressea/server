@@ -1526,7 +1526,7 @@ int make_cmd(unit * u, struct order *ord)
             const char * s = gettoken(token, sizeof(token));
             direction_t d = s ? get_direction(s, u->faction->locale) : NODIRECTION;
             if (d != NODIRECTION) {
-                build_road(r, u, m, d);
+                build_road(u, m, d);
             }
             else {
                 /* Die Richtung wurde nicht erkannt */
@@ -1541,7 +1541,7 @@ int make_cmd(unit * u, struct order *ord)
             cmistake(u, ord, 276, MSG_PRODUCE);
         }
         else {
-            continue_ship(r, u, m);
+            continue_ship(u, m);
         }
         return 0;
     }
@@ -1597,7 +1597,7 @@ int make_cmd(unit * u, struct order *ord)
             cmistake(u, ord, 276, MSG_PRODUCE);
         }
         else {
-            create_ship(r, u, stype, m, ord);
+            create_ship(u, stype, m, ord);
         }
     }
     else if (btype != NOBUILDING) {
@@ -2437,15 +2437,15 @@ static void breedtrees(unit * u, int raw)
 }
 
 /* züchte pferde */
-static void breedhorses(region * r, unit * u)
+static void breedhorses(unit * u)
 {
     int n, c, breed = 0;
     struct building *b = inside_building(u);
     const struct building_type *btype = b ? b->type : NULL;
     const struct resource_type *rhorse = get_resourcetype(R_HORSE);
     int horses, effsk;
+
     assert(rhorse && rhorse->itype);
-    assert(r == u->region); // TODO: param r is unnecessary
     if (btype != bt_find("stables")) {
         cmistake(u, u->thisorder, 122, MSG_PRODUCE);
         return;
@@ -2524,7 +2524,7 @@ static void breed_cmd(unit * u, struct order *ord)
                 break;
             }
         }
-        breedhorses(r, u);
+        breedhorses(u);
         break;
     }
 }

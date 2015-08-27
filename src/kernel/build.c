@@ -261,13 +261,13 @@ int destroy_cmd(unit * u, struct order *ord)
 
 /* ------------------------------------------------------------- */
 
-void build_road(region * r, unit * u, int size, direction_t d)
+void build_road(unit * u, int size, direction_t d)
 {
+    region *r = u->region;
     int n, left, effsk;
     region *rn = rconnect(r, d);
 
     assert(u->number);
-    assert(r == u->region); // TODO: param r is unnecessary
     effsk = effskill(u, SK_ROAD_BUILDING, 0);
     if (!effsk) {
         cmistake(u, u->thisorder, 103, MSG_PRODUCE);
@@ -880,15 +880,15 @@ static void build_ship(unit * u, ship * sh, int want)
 }
 
 void
-create_ship(region * r, unit * u, const struct ship_type *newtype, int want,
+create_ship(unit * u, const struct ship_type *newtype, int want,
 order * ord)
 {
     ship *sh;
     int msize;
     const construction *cons = newtype->construction;
     order *new_order;
+    region * r = u->region;
 
-    assert(u->region == r); // TODO: param r is unnecessary
     if (!effskill(u, SK_SHIPBUILDING, 0)) {
         cmistake(u, ord, 100, MSG_PRODUCE);
         return;
@@ -931,13 +931,13 @@ order * ord)
     build_ship(u, sh, want);
 }
 
-void continue_ship(region * r, unit * u, int want)
+void continue_ship(unit * u, int want)
 {
     const construction *cons;
     ship *sh;
     int msize;
+    region * r = u->region;
 
-    assert(u->region == r); // TODO: param r is unnecessary
     if (!effskill(u, SK_SHIPBUILDING, 0)) {
         cmistake(u, u->thisorder, 100, MSG_PRODUCE);
         return;
