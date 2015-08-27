@@ -33,14 +33,14 @@ static void test_herbsearch(CuTest * tc)
     u = test_create_unit(f, r);
     itype = test_create_itemtype("rosemary");
 
-    herbsearch(r, u, INT_MAX);
+    herbsearch(u, INT_MAX);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error59"));
     free_messagelist(f->msgs);
     f->msgs = 0;
 
     set_level(u, SK_HERBALISM, 1);
     CuAssertPtrEquals(tc, u2, is_guarded(r, u, GUARD_PRODUCE));
-    herbsearch(r, u, INT_MAX);
+    herbsearch(u, INT_MAX);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error70"));
     CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error59"));
     free_messagelist(f->msgs);
@@ -49,7 +49,7 @@ static void test_herbsearch(CuTest * tc)
     guard(u2, GUARD_NONE);
     CuAssertPtrEquals(tc, 0, is_guarded(r, u, GUARD_PRODUCE));
     CuAssertPtrEquals(tc, 0, (void *)rherbtype(r));
-    herbsearch(r, u, INT_MAX);
+    herbsearch(u, INT_MAX);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error108"));
     CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error70"));
     CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error59"));
@@ -59,7 +59,7 @@ static void test_herbsearch(CuTest * tc)
     rsetherbtype(r, itype);
     CuAssertPtrEquals(tc, (void *)itype, (void *)rherbtype(r));
     CuAssertIntEquals(tc, 0, rherbs(r));
-    herbsearch(r, u, INT_MAX);
+    herbsearch(u, INT_MAX);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "researchherb_none"));
     CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error108"));
     CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error70"));
@@ -69,7 +69,7 @@ static void test_herbsearch(CuTest * tc)
 
     rsetherbs(r, 100);
     CuAssertIntEquals(tc, 100, rherbs(r));
-    herbsearch(r, u, INT_MAX);
+    herbsearch(u, INT_MAX);
     CuAssertIntEquals(tc, 99, rherbs(r));
     CuAssertIntEquals(tc, 1, i_get(u->items, itype));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "herbfound"));

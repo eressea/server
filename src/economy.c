@@ -1546,7 +1546,7 @@ int make_cmd(unit * u, struct order *ord)
         return 0;
     }
     else if (p == P_HERBS) {
-        herbsearch(r, u, m);
+        herbsearch(u, m);
         return 0;
     }
 

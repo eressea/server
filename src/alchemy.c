@@ -47,12 +47,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* ------------------------------------------------------------- */
 
-void herbsearch(region * r, unit * u, int max)
+void herbsearch(unit * u, int max)
 {
+    region * r = u->region;
     int herbsfound;
     const item_type *whichherb;
+    int effsk = effskill(u, SK_HERBALISM);
 
-    if (eff_skill(u, SK_HERBALISM, r) == 0) {
+    if (effsk == 0) {
         cmistake(u, u->thisorder, 59, MSG_PRODUCE);
         return;
     }
@@ -72,7 +74,7 @@ void herbsearch(region * r, unit * u, int max)
         max = _min(max, rherbs(r));
     else
         max = rherbs(r);
-    herbsfound = ntimespprob(eff_skill(u, SK_HERBALISM, r) * u->number,
+    herbsfound = ntimespprob(effsk * u->number,
         (double)rherbs(r) / 100.0F, -0.01F);
     herbsfound = _min(herbsfound, max);
     rsetherbs(r, rherbs(r) - herbsfound);
@@ -85,7 +87,7 @@ void herbsearch(region * r, unit * u, int max)
     }
     else {
         ADDMSG(&u->faction->msgs, msg_message("researchherb_none",
-            "unit region", u, u->region));
+            "unit region", u, r));
     }
 }
 
