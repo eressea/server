@@ -291,9 +291,9 @@ static void get_allies(region * r, unit * u)
             break;
         }
         else {
-            if (eff_skill(u, SK_LONGBOW, r) < 3
-                && eff_skill(u, SK_HERBALISM, r) < 2
-                && eff_skill(u, SK_MAGIC, r) < 2) {
+            if (effskill(u, SK_LONGBOW, r) < 3
+                && effskill(u, SK_HERBALISM, r) < 2
+                && effskill(u, SK_MAGIC, r) < 2) {
                 return;
             }
             name = "random_forest_men";
@@ -303,7 +303,7 @@ static void get_allies(region * r, unit * u)
         break;
 
     case T_SWAMP:
-        if (eff_skill(u, SK_MELEE, r) <= 1) {
+        if (effskill(u, SK_MELEE, r) <= 1) {
             return;
         }
         name = "random_swamp_men";
@@ -312,7 +312,7 @@ static void get_allies(region * r, unit * u)
         break;
 
     case T_DESERT:
-        if (eff_skill(u, SK_RIDING, r) <= 2) {
+        if (effskill(u, SK_RIDING, r) <= 2) {
             return;
         }
         name = "random_desert_men";
@@ -321,7 +321,7 @@ static void get_allies(region * r, unit * u)
         break;
 
     case T_HIGHLAND:
-        if (eff_skill(u, SK_MELEE, r) <= 1) {
+        if (effskill(u, SK_MELEE, r) <= 1) {
             return;
         }
         name = "random_highland_men";
@@ -330,7 +330,7 @@ static void get_allies(region * r, unit * u)
         break;
 
     case T_MOUNTAIN:
-        if (eff_skill(u, SK_MELEE, r) <= 1 || eff_skill(u, SK_TRADE, r) <= 2) {
+        if (effskill(u, SK_MELEE, r) <= 1 || effskill(u, SK_TRADE, r) <= 2) {
             return;
         }
         name = "random_mountain_men";
@@ -339,7 +339,7 @@ static void get_allies(region * r, unit * u)
         break;
 
     case T_GLACIER:
-        if (eff_skill(u, SK_MELEE, r) <= 1 || eff_skill(u, SK_TRADE, r) <= 1) {
+        if (effskill(u, SK_MELEE, r) <= 1 || effskill(u, SK_TRADE, r) <= 1) {
             return;
         }
         name = "random_glacier_men";

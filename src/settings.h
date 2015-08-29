@@ -21,7 +21,7 @@
 #define RESOURCE_QUANTITY 0.5
 #define RECRUITFRACTION 40      /* 100/RECRUITFRACTION% */
 #define COMBAT_TURNS 5
-#define NEWATSROI 0
+#undef NEWATSROI
 
 /* Vermehrungsrate Bauern in 1/10000.
 * TODO: Evt. Berechnungsfehler, reale Vermehrungsraten scheinen höher. */

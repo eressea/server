@@ -251,7 +251,7 @@ static int ridingcapacity(unit * u)
      ** tragen nichts (siehe walkingcapacity). Ein Wagen zählt nur, wenn er
      ** von zwei Pferden gezogen wird */
 
-    animals = _min(animals, effskill(u, SK_RIDING) * u->number * 2);
+    animals = _min(animals, effskill(u, SK_RIDING, 0) * u->number * 2);
     if (fval(u_race(u), RCF_HORSE))
         animals += u->number;
 
@@ -275,7 +275,7 @@ int walkingcapacity(const struct unit *u)
     /* Das Gewicht, welches die Pferde tragen, plus das Gewicht, welches
      * die Leute tragen */
 
-    pferde_fuer_wagen = _min(animals, effskill(u, SK_RIDING) * u->number * 4);
+    pferde_fuer_wagen = _min(animals, effskill(u, SK_RIDING, 0) * u->number * 4);
     if (fval(u_race(u), RCF_HORSE)) {
         animals += u->number;
         people = 0;
@@ -338,7 +338,7 @@ static int canwalk(unit * u)
     int maxwagen, maxpferde;
     int vehicles = 0, vcap = 0;
     int animals = 0, acap = 0;
-
+    int effsk;
     /* workaround: monsters are too stupid to drop items, therefore they have
      * infinite carrying capacity */
 
@@ -347,11 +347,12 @@ static int canwalk(unit * u)
 
     get_transporters(u->items, &animals, &acap, &vehicles, &vcap);
 
-    maxwagen = effskill(u, SK_RIDING) * u->number * 2;
+    effsk = effskill(u, SK_RIDING, 0);
+    maxwagen = effsk * u->number * 2;
     if (u_race(u) == get_race(RC_TROLL)) {
         maxwagen = _max(maxwagen, u->number / 4);
     }
-    maxpferde = effskill(u, SK_RIDING) * u->number * 4 + u->number;
+    maxpferde = effsk * u->number * 4 + u->number;
 
     if (animals > maxpferde)
         return E_CANWALK_TOOMANYHORSES;
@@ -375,7 +376,7 @@ static int canwalk(unit * u)
 
 bool canfly(unit * u)
 {
-    if (i_get(u->items, it_find("pegasus")) >= u->number && effskill(u, SK_RIDING) >= 4)
+    if (i_get(u->items, it_find("pegasus")) >= u->number && effskill(u, SK_RIDING, 0) >= 4)
         return true;
 
     if (fval(u_race(u), RCF_FLY))
@@ -389,7 +390,7 @@ bool canfly(unit * u)
 
 bool canswim(unit * u)
 {
-    if (i_get(u->items, it_find("dolphin")) >= u->number && effskill(u, SK_RIDING) >= 4)
+    if (i_get(u->items, it_find("dolphin")) >= u->number && effskill(u, SK_RIDING, 0) >= 4)
         return true;
 
     if (u_race(u)->flags & RCF_FLY)
@@ -410,7 +411,7 @@ bool canswim(unit * u)
 static int canride(unit * u)
 {
     int horses = 0, maxhorses, unicorns = 0, maxunicorns;
-    int skill = effskill(u, SK_RIDING);
+    int skill = effskill(u, SK_RIDING, 0);
     item *itm;
     const item_type *it_horse, *it_elvenhorse, *it_charger;
     const resource_type *rtype;
@@ -483,7 +484,7 @@ static ship *do_maelstrom(region * r, unit * u)
     int damage;
     ship *sh = u->ship;
 
-    damage = rng_int() % 75 + rng_int() % 75 - eff_skill(u, SK_SAILING, r) * 4;
+    damage = rng_int() % 75 + rng_int() % 75 - effskill(u, SK_SAILING, r) * 4;
 
     if (damage <= 0) {
         return sh;
@@ -606,7 +607,7 @@ ship *move_ship(ship * sh, region * from, region * to, region_list * route)
                 ulist = &u->next;
                 u->ship = sh; /* undo the trick -- do not use u_set_ship here */
             }
-            if (route && eff_skill(u, SK_SAILING, from) >= 1) {
+            if (route && effskill(u, SK_SAILING, from) >= 1) {
                 produceexp(u, SK_SAILING, u->number);
             }
         }
@@ -739,7 +740,7 @@ static void drifting_ships(region * r)
                     continue;
                 if (firstu == NULL)
                     firstu = captain;
-                if (eff_skill(captain, SK_SAILING, r) >= sh->type->cptskill) {
+                if (effskill(captain, SK_SAILING, r) >= sh->type->cptskill) {
                     break;
                 }
             }
@@ -869,7 +870,7 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
         return NULL;
     for (u = r->units; u; u = u->next) {
         if (is_guard(u, GUARD_TRAVELTHRU)) {
-            int sk = eff_skill(u, SK_PERCEPTION, r);
+            int sk = effskill(u, SK_PERCEPTION, r);
             if (invisible(reisender, u) >= reisender->number)
                 continue;
             if (!(u_race(u)->flags & RCF_FLY) && u_race(reisender)->flags & RCF_FLY)
@@ -1717,7 +1718,7 @@ static bool ship_ready(const region * r, unit * u)
         cmistake(u, u->thisorder, 146, MSG_MOVE);
         return false;
     }
-    if (eff_skill(u, SK_SAILING, r) < u->ship->type->cptskill) {
+    if (effskill(u, SK_SAILING, r) < u->ship->type->cptskill) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
             "error_captain_skill_low", "value ship", u->ship->type->cptskill,
             u->ship));
@@ -2060,11 +2061,11 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
             for (u2 = current_point->units; u2; u2 = u2->next) {
                 if (u2->ship == sh && !alliedunit(harbourmaster, u->faction, HELP_GUARD)) {
 
-                    if (effskill(harbourmaster, SK_PERCEPTION) > effskill(u2, SK_STEALTH)) {
+                    if (effskill(harbourmaster, SK_PERCEPTION, 0) > effskill(u2, SK_STEALTH, 0)) {
                         for (itm = u2->items; itm; itm = itm->next) {
                             const luxury_type *ltype = resource2luxury(itm->type->rtype);
                             if (ltype != NULL && itm->number > 0) {
-                                int st = itm->number * effskill(harbourmaster, SK_TRADE) / 50;
+                                int st = itm->number * effskill(harbourmaster, SK_TRADE, 0) / 50;
                                 st = _min(itm->number, st);
 
                                 if (st > 0) {

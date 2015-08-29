@@ -1671,7 +1671,7 @@ int readgame(const char *filename, bool backup)
                     sc_mage *mage = get_mage(u);
                     if (mage) {
                         faction *f = u->faction;
-                        int skl = effskill(u, SK_MAGIC);
+                        int skl = effskill(u, SK_MAGIC, 0);
                         if (f->magiegebiet == M_GRAY) {
                             log_error("faction %s had magic=gray, fixing (%s)\n", factionname(f), magic_school[mage->magietyp]);
                             f->magiegebiet = mage->magietyp;

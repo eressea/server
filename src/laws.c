@@ -894,7 +894,7 @@ static int slipthru(const region * r, const unit * u, const building * b)
 
     /* u wird am hinein- oder herausschluepfen gehindert, wenn STEALTH <=
      * OBSERVATION +2 der belagerer u2 ist */
-    n = eff_skill(u, SK_STEALTH, r);
+    n = effskill(u, SK_STEALTH, r);
 
     for (u2 = r->units; u2; u2 = u2->next) {
         if (usiege(u2) == b) {
@@ -902,7 +902,7 @@ static int slipthru(const region * r, const unit * u, const building * b)
             if (invisible(u, u2) >= u->number)
                 continue;
 
-            o = eff_skill(u2, SK_PERCEPTION, r);
+            o = effskill(u2, SK_PERCEPTION, r);
 
             if (o + 2 >= n) {
                 return 0;               /* entdeckt! */
@@ -2290,7 +2290,7 @@ static bool display_potion(faction * f, unit * u, const potion_type * ptype)
         return false;
     else {
         int i = i_get(u->items, ptype->itype);
-        if (i == 0 && 2 * ptype->level > effskill(u, SK_ALCHEMY)) {
+        if (i == 0 && 2 * ptype->level > effskill(u, SK_ALCHEMY, 0)) {
             return false;
         }
     }
@@ -2465,7 +2465,7 @@ static void reshow(unit * u, struct order *ord, const char *s, param_t p)
         a_removeall(&u->faction->attribs, &at_seenspell);
         break;
     case P_POTIONS:
-        skill = effskill(u, SK_ALCHEMY);
+        skill = effskill(u, SK_ALCHEMY, 0);
         c = 0;
         for (ptype = potiontypes; ptype != NULL; ptype = ptype->next) {
             if (ptype->level * 2 <= skill) {
@@ -2817,10 +2817,6 @@ void sinkships(struct region * r)
     }
 }
 
-/* The following functions do not really belong here: */
-#include <kernel/config.h>
-#include <kernel/build.h>
-
 static attrib_type at_number = {
     "faction_renum",
     NULL, NULL, NULL, NULL, NULL,
@@ -3142,7 +3138,7 @@ static building *age_building(building * b)
             curse *c = get_curse(rt->attribs, ct_astralblock);
             if (c == NULL) {
                 if (mage != NULL) {
-                    int sk = effskill(mage, SK_MAGIC);
+                    int sk = effskill(mage, SK_MAGIC, 0);
                     float effect = 100;
                     /* the mage reactivates the circle */
                     c = create_curse(mage, &rt->attribs, ct_astralblock,
@@ -3152,7 +3148,7 @@ static building *age_building(building * b)
                 }
             }
             else if (mage != NULL) {
-                int sk = effskill(mage, SK_MAGIC);
+                int sk = effskill(mage, SK_MAGIC, 0);
                 c->duration = _max(c->duration, sk / 2);
                 c->vigour = _max(c->vigour, (float)sk);
             }
@@ -3697,7 +3693,7 @@ static int faction_getmages(faction * f, unit ** results, int numresults)
         if (u->number > 0) {
             sc_mage *mage = get_mage(u);
             if (mage) {
-                int level = eff_skill(u, SK_MAGIC, u->region);
+                int level = effskill(u, SK_MAGIC, 0);
                 if (level > maxlevel) {
                     maxlevel = level;
                 }
@@ -3756,7 +3752,7 @@ static void update_spells(void)
                 unit * u = mages[i];
                 sc_mage *mage = get_mage(u);
                 if (mage && mage->spellbook) {
-                    int level = effskill(u, SK_MAGIC);
+                    int level = effskill(u, SK_MAGIC, 0);
                     show_new_spells(f, level, mage->spellbook);
                 }
             }
@@ -4186,7 +4182,7 @@ int armedmen(const unit * u, bool siege_weapons)
     item *itm;
     int n = 0;
     if (!(urace(u)->flags & RCF_NOWEAPONS)) {
-        if (effskill(u, SK_WEAPONLESS) >= 1) {
+        if (effskill(u, SK_WEAPONLESS, 0) >= 1) {
             /* kann ohne waffen bewachen: fuer drachen */
             n = u->number;
         }
@@ -4197,7 +4193,7 @@ int armedmen(const unit * u, bool siege_weapons)
                 const weapon_type *wtype = resource2weapon(itm->type->rtype);
                 if (wtype == NULL || (!siege_weapons && (wtype->flags & WTF_SIEGE)))
                     continue;
-                if (effskill(u, wtype->skill) >= wtype->minskill)
+                if (effskill(u, wtype->skill, 0) >= wtype->minskill)
                     n += itm->number;
                 /* if (effskill(u, wtype->skill) >= wtype->minskill) n += itm->number; */
                 if (n > u->number)
@@ -4242,9 +4238,9 @@ int siege_cmd(unit * u, order * ord)
     d = _min(u->number, d);
     pooled = get_pooled(u, rt_catapultammo, GET_DEFAULT, d);
     d = _min(pooled, d);
-    if (eff_skill(u, SK_CATAPULT, r) >= 1) {
+    if (effskill(u, SK_CATAPULT, 0) >= 1) {
         katapultiere = d;
-        d *= eff_skill(u, SK_CATAPULT, r);
+        d *= effskill(u, SK_CATAPULT, 0);
     }
     else {
         d = 0;
@@ -4601,9 +4597,10 @@ void update_subscriptions(void)
 
 bool
 cansee(const faction * f, const region * r, const unit * u, int modifier)
-/* r kann != u->region sein, wenn es um durchreisen geht */
-/* und es muss niemand aus f in der region sein, wenn sie vom Turm
-* erblickt wird */
+/* r kann != u->region sein, wenn es um Durchreisen geht, 
+ * oder Zauber (sp_generous, sp_fetchastral).
+ * Es muss auch niemand aus f in der region sein, wenn sie vom Turm
+ * erblickt wird */
 {
     int stealth, rings;
     unit *u2 = r->units;
@@ -4644,7 +4641,7 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
     while (u2) {
         if (rings < u->number || invisible(u, u2) < u->number) {
             if (skill_enabled(SK_PERCEPTION)) {
-                int observation = eff_skill(u2, SK_PERCEPTION, r);
+                int observation = effskill(u2, SK_PERCEPTION, 0);
 
                 if (observation >= stealth) {
                     return true;
@@ -4688,7 +4685,7 @@ bool cansee_unit(const unit * u, const unit * target, int modifier)
             return false;
         }
         if (skill_enabled(SK_PERCEPTION)) {
-            o = eff_skill(u, SK_PERCEPTION, target->region);
+            o = effskill(u, SK_PERCEPTION, target->region);
             if (o >= n) {
                 return true;
             }
@@ -4734,7 +4731,7 @@ int modifier)
                 if (rings && invisible(u, u2) >= u->number)
                     continue;
 
-                o = eff_skill(u2, SK_PERCEPTION, r);
+                o = effskill(u2, SK_PERCEPTION, 0);
 
                 if (o >= n) {
                     return true;

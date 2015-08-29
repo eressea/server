@@ -175,6 +175,7 @@ target_link_libraries(eressea
 
 set(TESTS_SRC
   wormhole.test.c
+  alchemy.test.c
   test_eressea.c
   tests.c
   battle.test.c

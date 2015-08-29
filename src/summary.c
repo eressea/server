@@ -440,7 +440,7 @@ summary *make_summary(void)
 
                     for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
                         skill_t sk = sv->id;
-                        int aktskill = eff_skill(u, sk, r);
+                        int aktskill = effskill(u, sk, r);
                         if (aktskill > s->maxskill)
                             s->maxskill = aktskill;
                     }

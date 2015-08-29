@@ -853,7 +853,7 @@ void plan_monsters(faction * f)
                 /* Einheiten, die Waffenlosen Kampf lernen könnten, lernen es um
                  * zu bewachen: */
                 if (u_race(u)->bonus[SK_WEAPONLESS] != -99) {
-                    if (eff_skill(u, SK_WEAPONLESS, u->region) < 1) {
+                    if (effskill(u, SK_WEAPONLESS, 0) < 1) {
                         long_order =
                             create_order(K_STUDY, f->locale, "'%s'",
                             skillname(SK_WEAPONLESS, f->locale));

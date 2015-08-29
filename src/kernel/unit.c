@@ -1254,25 +1254,23 @@ static int item_invis(const unit *u) {
         + (rsphere ? i_get(u->items, rsphere->itype) * 100 : 0);
 }
 
+#ifdef NEWATSROI
 static int item_modification(const unit * u, skill_t sk, int val)
 {
     if (sk == SK_STEALTH) {
-#if NEWATSROI == 1
         if (item_invis(u) >= u->number) {
             val += ROIBONUS;
         }
-#endif
     }
-#if NEWATSROI == 1
     if (sk == SK_PERCEPTION) {
         const struct resource_type *rtype = get_resourcetype(R_AMULET_OF_TRUE_SEEING);
         if (i_get(u->items, rtype->itype) >= u->number) {
             val += ATSBONUS;
         }
     }
-#endif
     return val;
 }
+#endif
 
 static int att_modification(const unit * u, skill_t sk)
 {
@@ -1345,9 +1343,11 @@ int get_modifier(const unit * u, skill_t sk, int level, const region * r, bool n
     skill += rc_skillmod(u_race(u), r, sk);
     skill += att_modification(u, sk);
 
+#ifdef NEWATSROI
     if (!noitem) {
         skill = item_modification(u, sk, skill);
     }
+#endif
     skill = skillmod(u->attribs, u, r, sk, skill, SMF_ALWAYS);
 
     if (hunger_red_skill == -1) {
@@ -1365,31 +1365,31 @@ int get_modifier(const unit * u, skill_t sk, int level, const region * r, bool n
     return skill - bskill;
 }
 
-int eff_skill(const unit * u, skill_t sk, const region * r)
+int eff_skill(const unit * u, const skill *sv, const region *r)
 {
-    if (skill_enabled(sk)) {
-        int level = get_level(u, sk);
-        if (level > 0) {
-            int mlevel = level + get_modifier(u, sk, level, r, false);
+    assert(u);
+    if (!r) r = u->region;
+    if (sv && sv->level>0) {
+        int mlevel = sv->level + get_modifier(u, sv->id, sv->level, r, false);
 
-            if (mlevel > 0) {
-                int skillcap = SkillCap(sk);
-                if (skillcap && mlevel > skillcap) {
-                    return skillcap;
-                }
-                return mlevel;
+        if (mlevel > 0) {
+            int skillcap = SkillCap(sv->id);
+            if (skillcap && mlevel > skillcap) {
+                return skillcap;
             }
+            return mlevel;
         }
     }
     return 0;
 }
 
-int eff_skill_study(const unit * u, skill_t sk, const region * r)
+int effskill_study(const unit * u, skill_t sk, const region * r)
 {
-    int level = get_level(u, sk);
-    if (level > 0) {
-        int mlevel = level + get_modifier(u, sk, level, r, true);
-
+    skill *sv = unit_skill(u, sk);
+    if (sv && sv->level > 0) {
+        int mlevel = sv->level;
+        if (!r) r = u->region;
+        mlevel += get_modifier(u, sv->id, sv->level, r, true);
         if (mlevel > 0)
             return mlevel;
     }
@@ -1398,7 +1398,7 @@ int eff_skill_study(const unit * u, skill_t sk, const region * r)
 
 int invisible(const unit * target, const unit * viewer)
 {
-#if NEWATSROI == 1
+#ifdef NEWATSROI
     return 0;
 #else
     if (viewer && viewer->faction == target->faction)
@@ -1741,7 +1741,7 @@ int unit_max_hp(const unit * u)
     h = u_race(u)->hitpoints;
 
     if (rules_stamina & 1) {
-        p = pow(effskill(u, SK_STAMINA) / 2.0, 1.5) * 0.2;
+        p = pow(effskill(u, SK_STAMINA, u->region) / 2.0, 1.5) * 0.2;
         h += (int)(h * p + 0.5);
     }
 
@@ -1852,9 +1852,20 @@ struct spellbook * unit_get_spellbook(const struct unit * u)
     return 0;
 }
 
-int effskill(const unit * u, skill_t sk)
+int effskill(const unit * u, skill_t sk, const region *r)
 {
-    return eff_skill(u, sk, u->region);
+    assert(u);
+
+    if (skill_enabled(sk)) {
+        skill *sv = u->skills;
+        while (sv != u->skills + u->skill_size) {
+            if (sv->id == sk) {
+                return eff_skill(u, sv, r);
+            }
+            ++sv;
+        }
+    }
+    return 0;
 }
 
 void remove_empty_units_in_region(region * r)

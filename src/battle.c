@@ -504,7 +504,7 @@ const armor_type * sh)
     if (tohit < 0.5)
         tohit = 0.5;
     if (chance(tohit)) {
-        int defense = effskill(dt.fighter->unit, SK_STAMINA);
+        int defense = effskill(dt.fighter->unit, SK_STAMINA, dt.fighter->unit->region);
         double tosave = defense * 0.05;
         return !chance(tosave);
     }
@@ -586,12 +586,12 @@ weapon_skill(const weapon_type * wtype, const unit * u, bool attacking)
     int skill;
 
     if (wtype == NULL) {
-        skill = effskill(u, SK_WEAPONLESS);
+        skill = effskill(u, SK_WEAPONLESS, 0);
         if (skill <= 0) {
             /* wenn kein waffenloser kampf, dann den rassen-defaultwert */
             if (u_race(u) == get_race(RC_ORC)) {
-                int sword = effskill(u, SK_MELEE);
-                int spear = effskill(u, SK_SPEAR);
+                int sword = effskill(u, SK_MELEE, 0);
+                int spear = effskill(u, SK_SPEAR, 0);
                 skill = _max(sword, spear) - 3;
                 if (attacking) {
                     skill = _max(skill, u_race(u)->at_default);
@@ -636,7 +636,7 @@ weapon_skill(const weapon_type * wtype, const unit * u, bool attacking)
         /* changed: if we own a weapon, we have at least a skill of 0 */
         if (!i_canuse(u, wtype->itype))
             return -1;
-        skill = effskill(u, wtype->skill);
+        skill = effskill(u, wtype->skill, 0);
         if (skill < wtype->minskill)
             skill = 0;
         if (skill > 0) {
@@ -683,7 +683,7 @@ static int CavalryBonus(const unit * u, troop enemy, int type)
     }
     else {
         /* new rule, chargers in Eressea 1.1 */
-        int skl = effskill(u, SK_RIDING);
+        int skl = effskill(u, SK_RIDING, 0);
         /* only half against trolls */
         if (skl > 0) {
             if (type == BONUS_DAMAGE) {
@@ -1031,7 +1031,7 @@ static int natural_armor(unit * du)
             bonus[u_race(du)->index] = -1;
     }
     if (bonus[u_race(du)->index] > 0) {
-        int sk = effskill(du, SK_STAMINA);
+        int sk = effskill(du, SK_STAMINA, 0);
         sk /= bonus[u_race(du)->index];
         an += sk;
     }
@@ -1223,11 +1223,6 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
         res -= magic_resistance(du) * 3.0;
 
         if (u_race(du)->battle_flags & BF_EQUIPMENT) {
-#ifdef TODO_RUNESWORD
-            /* Runenschwert gibt im Kampf 80% Resistenzbonus */
-            if (dwp == WP_RUNESWORD)
-                res -= 0.80;
-#endif
             /* der Effekt von Laen steigt nicht linear */
             if (armor && fval(armor, ATF_LAEN))
                 res *= (1 - armor->magres);
@@ -1304,10 +1299,6 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
                 da, ar, df->person[dt.index].hp + rda, df->person[dt.index].hp);
         }
         if (u_race(au) == get_race(RC_DAEMON)) {
-#ifdef TODO_RUNESWORD
-            if (select_weapon(dt, 0, -1) == WP_RUNESWORD)
-                continue;
-#endif
             if (!(df->person[dt.index].flags & (FL_COURAGE | FL_DAZZLED))) {
                 df->person[dt.index].flags |= FL_DAZZLED;
                 df->person[dt.index].defence--;
@@ -1695,7 +1686,7 @@ void do_combatmagic(battle * b, combatmagic_t was)
             if (fig->alive <= 0)
                 continue;               /* fighter kann im Kampf getötet worden sein */
 
-            level = eff_skill(mage, SK_MAGIC, r);
+            level = effskill(mage, SK_MAGIC, r);
             if (level > 0) {
                 double power;
                 const spell *sp;
@@ -2339,7 +2330,7 @@ void do_regenerate(fighter * af)
 
     while (ta.index--) {
         struct person *p = af->person + ta.index;
-        p->hp += effskill(au, SK_STAMINA);
+        p->hp += effskill(au, SK_STAMINA, 0);
         p->hp = _min(unit_max_hp(au), p->hp);
     }
 }
@@ -2362,7 +2353,7 @@ static double horsebonus(const unit * u)
     const item_type *it_horse, *it_elvenhorse, *it_charger;
     int n1 = 0, n2 = 0, n3 = 0;
     item *itm;
-    int skl = eff_skill(u, SK_RIDING, u->region);
+    int skl = effskill(u, SK_RIDING, 0);
     const resource_type *rtype;
 
     if (skl < 1) return 0.0;
@@ -2393,11 +2384,10 @@ static double horsebonus(const unit * u)
 double fleechance(unit * u)
 {
     double c = 0.20;              /* Fluchtwahrscheinlichkeit in % */
-    region *r = u->region;
     attrib *a = a_find(u->attribs, &at_fleechance);
     /* Einheit u versucht, dem Getümmel zu entkommen */
 
-    c += (eff_skill(u, SK_STEALTH, r) * 0.05);
+    c += (effskill(u, SK_STEALTH, 0) * 0.05);
     c += horsebonus(u);
 
     if (u_race(u) == get_race(RC_HALFLING)) {
@@ -3197,7 +3187,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     region *r = b->region;
     item *itm;
     fighter *fig = NULL;
-    int h, i, tactics = eff_skill(u, SK_TACTICS, r);
+    int h, i, tactics = effskill(u, SK_TACTICS, 0);
     int berserk;
     int strongmen;
     int speeded = 0, speed = 1;
@@ -3441,17 +3431,17 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
      * keine addierten boni. */
 
     /* Zuerst mal die Spezialbehandlung gewisser Sonderfälle. */
-    fig->magic = eff_skill(u, SK_MAGIC, r);
+    fig->magic = effskill(u, SK_MAGIC, 0);
 
     if (fig->horses) {
         if (!fval(r->terrain, CAVALRY_REGION) || r_isforest(r)
-            || eff_skill(u, SK_RIDING, r) < CavalrySkill()
+            || effskill(u, SK_RIDING, 0) < CavalrySkill()
             || u_race(u) == get_race(RC_TROLL) || fval(u, UFL_WERE))
             fig->horses = 0;
     }
 
     if (fig->elvenhorses) {
-        if (eff_skill(u, SK_RIDING, r) < 5 || u_race(u) == get_race(RC_TROLL)
+        if (effskill(u, SK_RIDING, 0) < 5 || u_race(u) == get_race(RC_TROLL)
             || fval(u, UFL_WERE))
             fig->elvenhorses = 0;
     }

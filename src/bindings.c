@@ -681,80 +681,6 @@ static int tolua_set_alliance_name(lua_State * L)
     return 0;
 }
 
-#ifdef WRITE_SPELLS
-#include <libxml/tree.h>
-#include <util/functions.h>
-#include <util/xml.h>
-#include <kernel/spell.h>
-static int tolua_write_spells(lua_State * L)
-{
-    spell_f fun = (spell_f) get_function("lua_castspell");
-    const char *filename = "magic.xml";
-    xmlDocPtr doc = xmlNewDoc(BAD_CAST "1.0");
-    xmlNodePtr root = xmlNewNode(NULL, BAD_CAST "spells");
-    quicklist *ql;
-    int qi;
-    for (ql = spells, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-        spell *sp = (spell *) ql_get(ql, qi);
-        if (sp->cast != fun) {
-            int combat = 0;
-            xmlNodePtr node = xmlNewNode(NULL, BAD_CAST "spell");
-            xmlNewProp(node, BAD_CAST "name", BAD_CAST sp->sname);
-            xmlNewProp(node, BAD_CAST "type", BAD_CAST magic_school[sp->magietyp]);
-            xmlNewProp(node, BAD_CAST "rank", xml_i(sp->rank));
-            xmlNewProp(node, BAD_CAST "level", xml_i(sp->level));
-            xmlNewProp(node, BAD_CAST "index", xml_i(sp->id));
-            if (sp->syntax)
-                xmlNewProp(node, BAD_CAST "syntax", BAD_CAST sp->syntax);
-            if (sp->parameter)
-                xmlNewProp(node, BAD_CAST "parameters", BAD_CAST sp->parameter);
-            if (sp->components) {
-                spell_component *comp = sp->components;
-                for (; comp->type != 0; ++comp) {
-                    static const char *costs[] = { "fixed", "level", "linear" };
-                    xmlNodePtr cnode = xmlNewNode(NULL, BAD_CAST "resource");
-                    xmlNewProp(cnode, BAD_CAST "name", BAD_CAST comp->type->_name);
-                    xmlNewProp(cnode, BAD_CAST "amount", xml_i(comp->amount));
-                    xmlNewProp(cnode, BAD_CAST "cost", BAD_CAST costs[comp->cost]);
-                    xmlAddChild(node, cnode);
-                }}
-            if (sp->sptyp & TESTCANSEE) {
-                xmlNewProp(node, BAD_CAST "los", BAD_CAST "true");
-            }
-            if (sp->sptyp & ONSHIPCAST) {
-                xmlNewProp(node, BAD_CAST "ship", BAD_CAST "true");
-            }
-            if (sp->sptyp & OCEANCASTABLE) {
-                xmlNewProp(node, BAD_CAST "ocean", BAD_CAST "true");
-            }
-            if (sp->sptyp & FARCASTING) {
-                xmlNewProp(node, BAD_CAST "far", BAD_CAST "true");
-            }
-            if (sp->sptyp & SPELLLEVEL) {
-                xmlNewProp(node, BAD_CAST "variable", BAD_CAST "true");
-            }
-            if (sp->sptyp & POSTCOMBATSPELL)
-                combat = 3;
-
-            else if (sp->sptyp & COMBATSPELL)
-                combat = 2;
-
-            else if (sp->sptyp & PRECOMBATSPELL)
-                combat = 1;
-            if (combat) {
-                xmlNewProp(node, BAD_CAST "combat", xml_i(combat));
-            }
-            xmlAddChild(root, node);
-        }
-    }
-    xmlDocSetRootElement(doc, root);
-    xmlKeepBlanksDefault(0);
-    xmlSaveFormatFileEnc(filename, doc, "utf-8", 1);
-    xmlFreeDoc(doc);
-    return 0;
-}
-#endif
-
 static int config_get_ships(lua_State * L)
 {
     quicklist *ql;
@@ -973,22 +899,6 @@ static int tolua_get_spell_text(lua_State * L)
     return 1;
 }
 
-#ifdef TODO
-static int tolua_get_spell_school(lua_State * L)
-{
-    spell *self = (spell *) tolua_tousertype(L, 1, 0);
-    lua_pushstring(L, magic_school[self->magietyp]);
-    return 1;
-}
-
-static int tolua_get_spell_level(lua_State * L)
-{
-    spell *self = (spell *) tolua_tousertype(L, 1, 0);
-    lua_pushinteger(L, self->level);
-    return 1;
-}
-#endif
-
 static int tolua_get_spell_name(lua_State * L)
 {
     spell *self = (spell *)tolua_tousertype(L, 1, 0);
@@ -1204,9 +1114,6 @@ int tolua_bindings_open(lua_State * L)
         tolua_function(L, TOLUA_CAST "translate", &tolua_translate);
         tolua_function(L, TOLUA_CAST "rng_int", tolua_rng_int);
         tolua_function(L, TOLUA_CAST "spells", tolua_get_spells);
-#ifdef WRITE_SPELLS
-        tolua_function(L, TOLUA_CAST "write_spells", tolua_write_spells);
-#endif
         tolua_function(L, TOLUA_CAST "read_xml", tolua_read_xml);
     } tolua_endmodule(L);
     return 1;
