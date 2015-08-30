@@ -1699,7 +1699,7 @@ void do_combatmagic(battle * b, combatmagic_t was)
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
         fighter *fig = 0;
         if (s->bf->attacker) {
-            spell *sp = find_spell("wolfhowl");
+            spell *sp = find_spell("igjarjuk");
             if (sp && fval(s->faction, FFL_CURSED)) {
                 int si;
                 for (si = 0; s->enemies[si]; ++si) {

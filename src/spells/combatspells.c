@@ -848,41 +848,59 @@ int sp_shadowcall(struct castorder * co)
     return level;
 }
 
-int sp_wolfhowl(struct castorder * co)
+static fighter *summon_allies(const fighter *fi, const race *rc, int number) {
+    attrib *a;
+    unit *mage = fi->unit;
+    side *si = fi->side;
+    battle *b = si->battle;
+    region *r = b->region;
+    unit *u =
+        create_unit(r, mage->faction, number, rc, 0, NULL, mage);
+    leave(u, true);
+    setstatus(u, ST_FIGHT);
+    
+    u->hp = u->number * unit_max_hp(u);
+    
+    if (fval(mage, UFL_ANON_FACTION)) {
+        fset(u, UFL_ANON_FACTION);
+    }
+    
+    a = a_new(&at_unitdissolve);
+    a->data.ca[0] = 0;
+    a->data.ca[1] = 100;
+    a_add(&u->attribs, a);
+    
+    return make_fighter(b, u, si, is_attacker(fi));
+}
+
+int sp_igjarjuk(castorder *co) {
+    fighter * fi = co->magician.fig;
+    const race *rc = get_race(RC_WYRM);
+    fi = summon_allies(fi, rc, 1);
+    return 1;
+}
+
+int sp_wolfhowl(castorder * co)
 {
     fighter * fi = co->magician.fig;
     int level = co->level;
     double power = co->force;
     battle *b = fi->side->battle;
-    region *r = b->region;
     unit *mage = fi->unit;
-    attrib *a;
     message *msg;
     int force = (int)(get_force(power, 3) / 2);
     const race * rc = get_race(RC_WOLF);
     if (force > 0) {
-        unit *u =
-            create_unit(r, mage->faction, force, rc, 0, NULL, mage);
-        leave(u, true);
-        setstatus(u, ST_FIGHT);
-
-        set_level(u, SK_WEAPONLESS, (int)(power / 3));
-        set_level(u, SK_STAMINA, (int)(power / 3));
-        u->hp = u->number * unit_max_hp(u);
-
-        if (fval(mage, UFL_ANON_FACTION)) {
-            fset(u, UFL_ANON_FACTION);
-        }
-
-        a = a_new(&at_unitdissolve);
-        a->data.ca[0] = 0;
-        a->data.ca[1] = 100;
-        a_add(&u->attribs, a);
-
-        make_fighter(b, u, fi->side, is_attacker(fi));
+        unit *u;
+        int skills = (int)(power/3);
+        fi = summon_allies(fi, rc, force);
+        u = fi->unit;
+        set_level(u, SK_WEAPONLESS, skills);
+        set_level(u, SK_STAMINA, skills);
     }
     msg =
-        msg_message("sp_wolfhowl_effect", "mage amount race", mage, force, rc);
+        msg_message("sp_wolfhowl_effect", "mage amount race", 
+                    mage, force, rc);
     message_all(b, msg);
     msg_release(msg);
 
