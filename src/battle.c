@@ -1696,34 +1696,36 @@ void do_combatmagic(battle * b, combatmagic_t was)
     memset(spellranks, 0, sizeof(spellranks));
 
 #ifdef FFL_CURSED
-    for (s = b->sides; s != b->sides + b->nsides; ++s) {
-        fighter *fig = 0;
-        if (s->bf->attacker) {
-            spell *sp = find_spell("igjarjuk");
-            if (sp && fval(s->faction, FFL_CURSED)) {
-                int si;
-                for (si = 0; s->enemies[si]; ++si) {
-                    side *se = s->enemies[si];
-                    if (se && !fval(se->faction, FFL_NPC)) {
-                        fighter *fi;
-                        for (fi = se->fighters; fi; fi = fi->next) {
-                            if (fi && (!fig || fig->unit->number > fi->unit->number)) {
-                                fig = fi;
-                                if (fig->unit->number == 1) {
-                                    break;
+    if (was == DO_PRECOMBATSPELL) {
+        for (s = b->sides; s != b->sides + b->nsides; ++s) {
+            fighter *fig = 0;
+            if (s->bf->attacker) {
+                spell *sp = find_spell("igjarjuk");
+                if (sp && fval(s->faction, FFL_CURSED)) {
+                    int si;
+                    for (si = 0; s->enemies[si]; ++si) {
+                        side *se = s->enemies[si];
+                        if (se && !fval(se->faction, FFL_NPC)) {
+                            fighter *fi;
+                            for (fi = se->fighters; fi; fi = fi->next) {
+                                if (fi && (!fig || fig->unit->number > fi->unit->number)) {
+                                    fig = fi;
+                                    if (fig->unit->number == 1) {
+                                        break;
+                                    }
                                 }
                             }
-                        }
-                        if (fig && fig->unit->number == 1) {
-                            break;
+                            if (fig && fig->unit->number == 1) {
+                                break;
+                            }
                         }
                     }
-                }
-                if (fig) {
-                    co = create_castorder_combat(0, fig, sp, 10, 10);
-                    co->magician.fig = fig;
-                    add_castorder(&spellranks[sp->rank], co);
-                    break;
+                    if (fig) {
+                        co = create_castorder_combat(0, fig, sp, 10, 10);
+                        co->magician.fig = fig;
+                        add_castorder(&spellranks[sp->rank], co);
+                        break;
+                    }
                 }
             }
         }
