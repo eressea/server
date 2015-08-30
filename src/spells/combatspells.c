@@ -854,6 +854,7 @@ static fighter *summon_allies(const fighter *fi, const race *rc, int number) {
     side *si = fi->side;
     battle *b = si->battle;
     region *r = b->region;
+    message *msg;
     unit *u =
         create_unit(r, mage->faction, number, rc, 0, NULL, mage);
     leave(u, true);
@@ -870,14 +871,23 @@ static fighter *summon_allies(const fighter *fi, const race *rc, int number) {
     a->data.ca[1] = 100;
     a_add(&u->attribs, a);
     
+    msg =
+        msg_message("sp_wolfhowl_effect", "mage amount race",
+                    mage, u->number, rc);
+    message_all(b, msg);
+    msg_release(msg);
+
     return make_fighter(b, u, si, is_attacker(fi));
 }
 
 int sp_igjarjuk(castorder *co) {
+    unit *u;
     fighter * fi = co->magician.fig;
     const race *rc = get_race(RC_WYRM);
     fi = summon_allies(fi, rc, 1);
-    return 1;
+    u = fi->unit;
+    unit_setname(u, "Igjarjuk");
+    return co->level;
 }
 
 int sp_wolfhowl(castorder * co)
@@ -885,9 +895,6 @@ int sp_wolfhowl(castorder * co)
     fighter * fi = co->magician.fig;
     int level = co->level;
     double power = co->force;
-    battle *b = fi->side->battle;
-    unit *mage = fi->unit;
-    message *msg;
     int force = (int)(get_force(power, 3) / 2);
     const race * rc = get_race(RC_WOLF);
     if (force > 0) {
@@ -898,12 +905,6 @@ int sp_wolfhowl(castorder * co)
         set_level(u, SK_WEAPONLESS, skills);
         set_level(u, SK_STAMINA, skills);
     }
-    msg =
-        msg_message("sp_wolfhowl_effect", "mage amount race", 
-                    mage, force, rc);
-    message_all(b, msg);
-    msg_release(msg);
-
     return level;
 }
 
