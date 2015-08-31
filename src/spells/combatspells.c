@@ -904,6 +904,7 @@ int sp_wolfhowl(castorder * co)
         u = fi->unit;
         set_level(u, SK_WEAPONLESS, skills);
         set_level(u, SK_STAMINA, skills);
+        u->hp = u->number * unit_max_hp(u);
     }
     return level;
 }
