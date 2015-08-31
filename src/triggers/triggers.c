@@ -42,8 +42,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 void register_triggers(void)
 {
-    if (verbosity >= 2)
-        printf("- registering triggers\n");
     tt_register(&tt_changefaction);
     tt_register(&tt_changerace);
     tt_register(&tt_createcurse);

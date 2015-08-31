@@ -6516,6 +6516,7 @@ static spelldata spell_functions[] = {
     { "stormwinds", sp_stormwinds, 0 },
     { "homestone", sp_homestone, 0 },
     { "wolfhowl", sp_wolfhowl, 0 },
+    { "igjarjuk", sp_igjarjuk, 0 },
     { "versteinern", sp_petrify, 0 },
     { "strongwall", sp_strong_wall, 0 },
     { "gwyrrddestroymagic", sp_destroy_magic, 0 },
