@@ -115,6 +115,7 @@
     <param name="rules.economy.repopulate_maximum" value="500"/>
     <param name="game.id" value="2"/>
     <param name="game.name" value="Eressea"/>
+    <param name="world.era" value="2"/>
   </game>
   <strings>
     <string name="mailto">
