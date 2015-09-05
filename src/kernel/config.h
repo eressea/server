@@ -277,6 +277,7 @@ extern "C" {
     int get_param_int(const struct param *p, const char *key, int def);
     int check_param(const struct param *p, const char *key, const char *searchvalue);
     float get_param_flt(const struct param *p, const char *key, float def);
+    void free_params(struct param **pp);
 
     bool ExpensiveMigrants(void);
     int NMRTimeout(void);

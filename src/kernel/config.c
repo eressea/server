@@ -768,7 +768,7 @@ int read_unitid(const faction * f, const region * r)
      * paramliste. machen wir das nicht, dann wird getnewunit in s nach der
      * nummer suchen, doch dort steht bei temp-units nur "temp" drinnen! */
 
-    if (!s || *s == 0) {
+    if (!s || *s == 0 || !isalnum(*s)) {
         return -1;
     }
     if (isparam(s, f->locale, P_TEMP)) {
@@ -842,6 +842,7 @@ building *largestbuilding(const region * r, cmp_building_cb cmp_gt,
 extern faction *dfindhash(int i);
 
 static const char *forbidden[] = { "t", "te", "tem", "temp", NULL };
+// PEASANT: "b", "ba", "bau", "baue", "p", "pe", "pea", "peas"
 
 int forbiddenid(int id)
 {
@@ -1024,6 +1025,16 @@ typedef struct param {
     char *name;
     char *data;
 } param;
+
+void free_params(struct param **pp) {
+    while (*pp) {
+        param *p = *pp;
+        free(p->name);
+        free(p->data);
+        *pp = p->next;
+        free(p);
+    }
+}
 
 const char *get_param(const struct param *p, const char *key)
 {

@@ -73,6 +73,7 @@ void test_cleanup(void)
     free_resources();
     global.functions.maintenance = NULL;
     global.functions.wage = NULL;
+    free_params(&global.parameters);
     default_locale = 0;
     free_locales();
     free_spells();

@@ -2448,21 +2448,6 @@ const char *charset)
     return 0;
 }
 
-void base36conversion(void)
-{
-    region *r;
-    for (r = regions; r; r = r->next) {
-        unit *u;
-        for (u = r->units; u; u = u->next) {
-            if (forbiddenid(u->no)) {
-                uunhash(u);
-                u->no = newunitid();
-                uhash(u);
-            }
-        }
-    }
-}
-
 #define FMAXHASH 1021
 
 struct fsee {

@@ -296,6 +296,31 @@ static void test_give_denied_by_rules(CuTest * tc) {
     test_cleanup();
 }
 
+static void test_give_invalid_target(CuTest *tc) {
+    // bug https://bugs.eressea.de/view.php?id=1685
+    struct give env;
+    order *ord;
+    struct locale * lang;
+
+    test_cleanup();
+    env.f1 = test_create_faction(0);
+    env.f2 = 0;
+    setup_give(&env);
+
+    i_change(&env.src->items, env.itype, 10);
+    lang = get_or_create_locale("test");
+    env.f1->locale = lang;
+    locale_setstring(lang, "KRAEUTER", "HERBS");
+    init_locale(lang);
+    ord = create_order(K_GIVE, lang, "## HERBS");
+    assert(ord);
+
+    give_cmd(env.src, ord);
+    CuAssertIntEquals(tc, 10, i_get(env.src->items, env.itype));
+    CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "feedback_unit_not_found"));
+    test_cleanup();
+}
+
 CuSuite *get_give_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -315,5 +340,6 @@ CuSuite *get_give_suite(void)
     SUITE_ADD_TEST(suite, test_give_herbs);
     SUITE_ADD_TEST(suite, test_give_okay);
     SUITE_ADD_TEST(suite, test_give_denied_by_rules);
+    SUITE_ADD_TEST(suite, test_give_invalid_target);
     return suite;
 }
