@@ -50,6 +50,12 @@ static void test_read_unitid(CuTest *tc) {
     CuAssertIntEquals(tc, -1, read_unitid(u->faction, u->region));
     free_order(ord);
 
+    // bug https://bugs.eressea.de/view.php?id=1685
+    ord = create_order(K_GIVE, lang, "##");
+    init_order(ord);
+    CuAssertIntEquals(tc, -1, read_unitid(u->faction, u->region));
+    free_order(ord);
+
     test_cleanup();
 }
 
