@@ -1025,6 +1025,16 @@ typedef struct param {
     char *data;
 } param;
 
+void free_params(struct param **pp) {
+    while (*pp) {
+        param *p = *pp;
+        free(p->name);
+        free(p->data);
+        *pp = p->next;
+        free(p);
+    }
+}
+
 const char *get_param(const struct param *p, const char *key)
 {
     while (p != NULL) {
