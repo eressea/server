@@ -8,7 +8,6 @@ before_install:
   - sudo apt-get install -qq libtolua-dev liblua5.1-dev libncurses5-dev libsqlite3-dev libxml2-dev 
 os:
   - linux
-  - osx
 notifications:
   slack:
     secure: F89aXLWaE125PaJIlETv12jT4EfH6wLXJmGCPZzrN3OcLn2ahDWqjwuzR7lOEDf2nAISmeMPyDZMhEHXLNHAE5qP6lg9yliYQw5hzGmDK9m1xUq/pPEne/b2Y7K3my1mkRZ6n3asbHgSmBWAfCIk1JN8R5Rv+rmbLuWLc+zofts=
