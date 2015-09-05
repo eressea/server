@@ -53,6 +53,13 @@ static void test_getunit(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, u2);
     free_order(ord);
 
+    // bug https://bugs.eressea.de/view.php?id=1685
+    ord = create_order(K_GIVE, lang, "##");
+    init_order(ord);
+    CuAssertIntEquals(tc, GET_NOTFOUND, getunit(u->region, u->faction, &u2));
+    CuAssertPtrEquals(tc, NULL, u2);
+    free_order(ord);
+
     ord = create_order(K_GIVE, lang, "TEMP 42");
     init_order(ord);
     CuAssertIntEquals(tc, GET_UNIT, getunit(u->region, u->faction, &u2));
@@ -97,9 +104,20 @@ static void test_param_flt(CuTest * tc)
     CuAssertDblEquals(tc, 42.0, get_param_flt(par, "bar", 0.0), 0.01);
 }
 
+static void test_forbiddenid(CuTest *tc) {
+    CuAssertIntEquals(tc, 0, forbiddenid(1));
+    CuAssertIntEquals(tc, 1, forbiddenid(0));
+    CuAssertIntEquals(tc, 1, forbiddenid(-1));
+    CuAssertIntEquals(tc, 1, forbiddenid(atoi36("temp")));
+    CuAssertIntEquals(tc, 1, forbiddenid(atoi36("tem")));
+    CuAssertIntEquals(tc, 1, forbiddenid(atoi36("te")));
+    CuAssertIntEquals(tc, 1, forbiddenid(atoi36("t")));
+}
+
 CuSuite *get_config_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_forbiddenid);
     SUITE_ADD_TEST(suite, test_getunit);
     SUITE_ADD_TEST(suite, test_get_set_param);
     SUITE_ADD_TEST(suite, test_param_int);

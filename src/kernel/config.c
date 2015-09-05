@@ -842,6 +842,7 @@ building *largestbuilding(const region * r, cmp_building_cb cmp_gt,
 extern faction *dfindhash(int i);
 
 static const char *forbidden[] = { "t", "te", "tem", "temp", NULL };
+// PEASANT: "b", "ba", "bau", "baue", "p", "pe", "pea", "peas"
 
 int forbiddenid(int id)
 {
