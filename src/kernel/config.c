@@ -768,7 +768,7 @@ int read_unitid(const faction * f, const region * r)
      * paramliste. machen wir das nicht, dann wird getnewunit in s nach der
      * nummer suchen, doch dort steht bei temp-units nur "temp" drinnen! */
 
-    if (!s || *s == 0) {
+    if (!s || *s == 0 || !isalnum(*s)) {
         return -1;
     }
     if (isparam(s, f->locale, P_TEMP)) {
