@@ -9,7 +9,7 @@ local function curse(file)
         f = get_faction(line)
         if not f then
             print("no such faction: " .. line)
-        elseif bitset(f.flags, 16) then
+        elseif not bitset(f.flags, 16) then
             print("cursing " .. tostring(f))
             f.flags = f.flags + 16
         else
