@@ -98,7 +98,7 @@ static int tolua_faction_get_heroes(lua_State * L)
 static int tolua_faction_get_score(lua_State * L)
 {
     faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    lua_pushinteger(L, self->score);
+    lua_pushnumber(L, (lua_Number)self->score);
     return 1;
 }
 

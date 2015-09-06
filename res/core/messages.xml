@@ -841,11 +841,11 @@
   </message>
   <message name="nr_score" section="nr">
     <type>
-      <arg name="score" type="int"/>
-      <arg name="average" type="int"/>
+      <arg name="score" type="string"/>
+      <arg name="average" type="string"/>
     </type>
-    <text locale="de">"Deine Partei hat $int($score) Punkte. Der Durchschnitt für Parteien ähnlichen Alters ist $int($average) Punkte."</text>
-    <text locale="en">"Your faction has a score of $int($score). The average score for similar factions is $int($average)."</text>
+    <text locale="de">"Deine Partei hat ${score} Punkte. Der Durchschnitt für Parteien ähnlichen Alters ist ${average} Punkte."</text>
+    <text locale="en">"Your faction has a score of ${score}. The average score for similar factions is ${average}."</text>
   </message>
   <message name="nr_header_date" section="nr">
     <type>

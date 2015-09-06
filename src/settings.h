@@ -35,7 +35,6 @@
  * configuration variables (XML), script extensions (lua),
  * or both. We don't want separate binaries for different games
  */
-#define SCORE_MODULE 1
 #define MUSEUM_MODULE 1
 #define ARENA_MODULE 1
 #define CHANGED_CROSSBOWS 0     /* use the WTF_ARMORPIERCING flag */
