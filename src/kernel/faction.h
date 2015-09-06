@@ -21,7 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "skill.h"
 #include "types.h"
-
+#include <modules/score.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -84,9 +84,7 @@ extern "C" {
         struct group *groups;
         int nregions;
         int money;
-#if SCORE_MODULE
-        int score;
-#endif
+        score_t score;
         struct alliance *alliance;
         int alliance_joindate;      /* the turn on which the faction joined its current alliance (or left the last one) */
 #ifdef VICTORY_DELAY

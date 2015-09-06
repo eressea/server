@@ -2117,13 +2117,13 @@ const char *charset)
         }
     }
     newline(out);
-#if SCORE_MODULE
     if (f->options & want(O_SCORE) && f->age > DISPLAYSCORE) {
-        RENDER(f, buf, sizeof(buf), ("nr_score", "score average", f->score,
-            average_score_of_age(f->age, f->age / 24 + 1)));
+        char score[32], avg[32];
+        write_score(score, sizeof(score), f->score);
+        write_score(avg, sizeof(avg), average_score_of_age(f->age, f->age / 24 + 1));
+        RENDER(f, buf, sizeof(buf), ("nr_score", "score average", score, avg));
         centre(out, buf, true);
     }
-#endif
 #ifdef COUNT_AGAIN
     no_units = 0;
     no_people = 0;

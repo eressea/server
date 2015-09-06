@@ -753,6 +753,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
     const char *prefix;
 
     assert(u && u->number);
+    assert(u->region == r); // TODO: if this holds true, then why did we pass in r?
     if (fval(u_race(u), RCF_INVISIBLE))
         return;
 
@@ -942,13 +943,14 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
         pr = 0;
         for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
             if (sv->level > 0) {
-                int esk = eff_skill(u, sv, r);
+                skill_t sk = sv->id;
+                int esk = effskill(u, sk, 0);
                 if (!pr) {
                     pr = 1;
                     stream_printf(out, "TALENTE\n");
                 }
                 stream_printf(out, "%d %d;%s\n", u->number * level_days(sv->level), esk,
-                    translate(mkname("skill", skillnames[sv->id]), skillname(sv->id,
+                    translate(mkname("skill", skillnames[sk]), skillname(sk,
                     f->locale)));
             }
         }
@@ -1506,9 +1508,6 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
     const char *mailto = LOC(f->locale, "mailto");
     const attrib *a;
     seen_region *sr = NULL;
-#if SCORE_MODULE
-    int score = 0, avgscore = 0;
-#endif
     FILE *F = fopen(filename, "wt");
 
     if (era < 0) {
@@ -1555,14 +1554,13 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
     }
     fprintf(F, "%d;age\n", f->age);
     fprintf(F, "%d;Optionen\n", f->options);
-#if SCORE_MODULE
     if (f->options & want(O_SCORE) && f->age > DISPLAYSCORE) {
-        score = f->score;
-        avgscore = average_score_of_age(f->age, f->age / 24 + 1);
+        char score[32];
+        write_score(score, sizeof(score), f->score);
+        fprintf(F, "%s;Punkte\n", score);
+        write_score(score, sizeof(score), average_score_of_age(f->age, f->age / 24 + 1));
+        fprintf(F, "%s;Punktedurchschnitt\n", score);
     }
-    fprintf(F, "%d;Punkte\n", score);
-    fprintf(F, "%d;Punktedurchschnitt\n", avgscore);
-#endif
     {
         const char *zRace = rc_name_s(f->race, NAME_PLURAL);
         fprintf(F, "\"%s\";Typ\n", translate(zRace, LOC(f->locale, zRace)));

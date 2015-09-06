@@ -31,9 +31,7 @@ without prior permission by the authors of Eressea.
 
 #include "vortex.h"
 
-#if SCORE_MODULE
 #include <modules/score.h>
-#endif
 
 /* util includes */
 #include <util/attrib.h>
@@ -857,10 +855,8 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
         }
         xmlFree(propValue);
     }
-#if SCORE_MODULE
     itype->score = xml_ivalue(node, "score", 0);
     if (!itype->score) itype->score = default_score(itype);
-#endif
     xmlXPathFreeObject(result);
 
     return itype;
