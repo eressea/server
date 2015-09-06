@@ -77,7 +77,7 @@ static int tolua_storage_read_float(lua_State * L)
     gamedata *data = (gamedata *)tolua_tousertype(L, 1, 0);
     float num;
     READ_FLT(data->store, &num);
-    tolua_pushnumber(L, (lua_Number)num);
+    lua_pushnumber(L, num);
     return 1;
 }
 
@@ -86,7 +86,7 @@ static int tolua_storage_read_int(lua_State * L)
     gamedata *data = (gamedata *)tolua_tousertype(L, 1, 0);
     int num;
     READ_INT(data->store, &num);
-    tolua_pushnumber(L, (lua_Number)num);
+    lua_pushinteger(L, num);
     return 1;
 }
 

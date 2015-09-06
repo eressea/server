@@ -132,32 +132,33 @@ static int parse_args(int argc, char **argv, int *exitcode)
     int i;
 
     for (i = 1; i != argc; ++i) {
-        if (argv[i][0] != '-') {
-            luafile = argv[i];
+        char *argi = argv[i];
+        if (argi[0] != '-') {
+            luafile = argi;
         }
-        else if (argv[i][1] == '-') {     /* long format */
-            if (strcmp(argv[i] + 2, "version") == 0) {
+        else if (argi[1] == '-') {     /* long format */
+            if (strcmp(argi + 2, "version") == 0) {
                 printf("\n%s PBEM host\n"
                     "Copyright (C) 1996-2005 C. Schlittchen, K. Zedel, E. Rehling, H. Peters.\n\n"
                     "Compilation: " __DATE__ " at " __TIME__ "\nVersion: %d.%d.%d\n\n",
                     game_name(), VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD);
 #ifdef USE_CURSES          
             }
-            else if (strcmp(argv[i] + 2, "color") == 0) {
+            else if (strcmp(argi + 2, "color") == 0) {
                 /* force the editor to have colors */
                 force_color = 1;
 #endif          
             }
-            else if (strcmp(argv[i] + 2, "help") == 0) {
+            else if (strcmp(argi + 2, "help") == 0) {
                 return usage(argv[0], NULL);
             }
             else {
-                return usage(argv[0], argv[i]);
+                return usage(argv[0], argi);
             }
         }
         else {
             const char *arg;
-            switch (argv[i][1]) {
+            switch (argi[1]) {
             case 'r':
                 i = get_arg(argc, argv, 2, i, &arg, 0);
                 set_param(&global.parameters, "config.rules", arg);
@@ -184,7 +185,7 @@ static int parse_args(int argc, char **argv, int *exitcode)
                 return 1;
             default:
                 *exitcode = -1;
-                usage(argv[0], argv[i]);
+                usage(argv[0], argi);
                 return 1;
             }
         }
@@ -282,7 +283,6 @@ int main(int argc, char **argv)
     int err = 0;
     lua_State *L;
     setup_signal_handler();
-
     /* parse args once to read config file location */
     if (parse_args(argc, argv, &err) != 0) {
         return err;

@@ -24,6 +24,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* kernel includes */
 #include <kernel/alliance.h>
 #include <kernel/building.h>
+#include <kernel/build.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/race.h>
@@ -161,8 +162,8 @@ void score(void)
             if (f->num_total != 0) {
                 fprintf(scoreFP, "%8d (%8d/%4.2f%%/%5.2f) %30.30s (%3.3s) %5s (%3d)\n",
                     f->score, f->score - average_score_of_age(f->age, f->age / 24 + 1),
-                    ((float)f->score / (float)allscores) * 100.0,
-                    (float)f->score / f->num_total,
+                    ((double)f->score / allscores) * 100,
+                    (double)f->score / f->num_total,
                     f->name, LOC(default_locale, rc_name_s(f->race, NAME_SINGULAR)), factionid(f),
                     f->age);
             }
@@ -212,6 +213,22 @@ void score(void)
             fclose(scoreFP);
         }
     }
+}
+
+int default_score(const item_type *itype) {
+    int result = 0;
+    if (itype->construction) {
+        requirement *req = itype->construction->materials;
+        while (req->number) {
+            int score = req->rtype->itype ? req->rtype->itype->score : 10;
+            result += score * req->number * 2;
+            ++req;
+        }
+    }
+    else {
+        result = 10;
+    }
+    return result;
 }
 
 #endif

@@ -139,7 +139,8 @@ static unit *unitorders(FILE * F, int enc, struct faction *f)
             ordp = &u->old_orders;
             while (*ordp) {
                 order *ord = *ordp;
-                if (!is_repeated(ord)) {
+                keyword_t kwd = getkeyword(ord);
+                if (!is_repeated(kwd)) {
                     *ordp = ord->next;
                     ord->next = NULL;
                     free_order(ord);
@@ -618,13 +619,13 @@ unit *read_unit(struct gamedata *data)
     }
 
     READ_STR(data->store, obuf, sizeof(obuf));
-    u->_name = _strdup(obuf);
+    u->_name = obuf[0] ? _strdup(obuf) : 0;
     if (lomem) {
         READ_STR(data->store, NULL, 0);
     }
     else {
         READ_STR(data->store, obuf, sizeof(obuf));
-        u->display = _strdup(obuf);
+        u->display = obuf[0] ? _strdup(obuf) : 0;
     }
     READ_INT(data->store, &number);
     set_number(u, number);
@@ -777,7 +778,8 @@ void write_unit(struct gamedata *data, const unit * u)
         }
     }
     for (ord = u->orders; ord; ord = ord->next) {
-        if (u->old_orders && is_repeated(ord))
+        keyword_t kwd = getkeyword(ord);
+        if (u->old_orders && is_repeated(kwd))
             continue;                 /* has new defaults */
         if (is_persistent(ord)) {
             if (++p < MAXPERSISTENT) {
@@ -978,6 +980,9 @@ static region *readregion(struct gamedata *data, int x, int y)
 
 void writeregion(struct gamedata *data, const region * r)
 {
+    assert(r);
+    assert(data);
+
     WRITE_INT(data->store, r->uid);
     WRITE_STR(data->store, region_getinfo(r));
     WRITE_TOK(data->store, r->terrain->_name);
@@ -988,6 +993,8 @@ void writeregion(struct gamedata *data, const region * r)
         const item_type *rht;
         struct demand *demand;
         rawmaterial *res = r->resources;
+        
+        assert(r->land);
         WRITE_STR(data->store, (const char *)r->land->name);
         assert(rtrees(r, 0) >= 0);
         assert(rtrees(r, 1) >= 0);
@@ -1018,11 +1025,9 @@ void writeregion(struct gamedata *data, const region * r)
         WRITE_INT(data->store, rherbs(r));
         WRITE_INT(data->store, rpeasants(r));
         WRITE_INT(data->store, rmoney(r));
-        if (r->land) {
-            for (demand = r->land->demands; demand; demand = demand->next) {
-                WRITE_TOK(data->store, resourcename(demand->type->itype->rtype, 0));
-                WRITE_INT(data->store, demand->value);
-            }
+        for (demand = r->land->demands; demand; demand = demand->next) {
+            WRITE_TOK(data->store, resourcename(demand->type->itype->rtype, 0));
+            WRITE_INT(data->store, demand->value);
         }
         WRITE_TOK(data->store, "end");
         write_items(data->store, r->land->items);
@@ -1119,7 +1124,7 @@ void read_spellbook(spellbook **bookp, struct storage *store, int(*get_level)(co
                 *bookp = create_spellbook(0);
                 sb = *bookp;
             }
-            if (global.data_version >= SPELLBOOK_VERSION || !spellbook_get(sb, sp)) {
+            if (level>0 && (global.data_version >= SPELLBOOK_VERSION || !spellbook_get(sb, sp))) {
                 spellbook_add(sb, sp, level);
             }
         }
@@ -1253,7 +1258,7 @@ faction *readfaction(struct gamedata * data)
         READ_INT(data->store, &id);
         READ_INT(data->store, &ux);
         READ_INT(data->store, &uy);
-        set_origin(f, id, ux, uy);
+        faction_setorigin(f, id, ux, uy);
     }
     f->newbies = 0;
 
@@ -1362,7 +1367,7 @@ static int cb_sb_maxlevel(spellbook_entry *sbe, void *cbdata) {
     return 0;
 }
 
-int readgame(const char *filename, int backup)
+int readgame(const char *filename, bool backup)
 {
     int n, p, nread;
     faction *f, **fp;
@@ -1746,6 +1751,7 @@ int writegame(const char *filename)
     gdata.store = &store;
     gdata.encoding = enc_gamedata;
     gdata.version = RELEASE_VERSION;
+    global.data_version = RELEASE_VERSION;
     n = STREAM_VERSION;
     fwrite(&gdata.version, sizeof(int), 1, F);
     fwrite(&n, sizeof(int), 1, F);

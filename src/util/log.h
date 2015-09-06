@@ -20,8 +20,9 @@ extern "C" {
     extern void log_flush(void);
 
     /* use macros above instead of these: */
-    extern void log_warning(const char *format, ...);
+    extern void log_fatal(const char *format, ...);
     extern void log_error(const char *format, ...);
+    extern void log_warning(const char *format, ...);
     extern void log_debug(const char *format, ...);
     extern void log_info(const char *format, ...);
     extern void log_printf(FILE * ios, const char *format, ...);

@@ -169,7 +169,6 @@ extern "C" {
     extern struct attrib_type at_horseluck;
     extern struct attrib_type at_woodcount;
     extern struct attrib_type at_deathcount;
-    extern struct attrib_type at_travelunit;
 
     void initrhash(void);
     void rhash(struct region *r);
@@ -187,8 +186,8 @@ extern "C" {
     void setluxuries(struct region *r, const struct luxury_type *sale);
     int get_maxluxuries(void);
 
-    short rroad(const struct region *r, direction_t d);
-    void rsetroad(struct region *r, direction_t d, short value);
+    int rroad(const struct region *r, direction_t d);
+    void rsetroad(struct region *r, direction_t d, int value);
 
     bool is_coastregion(struct region *r);
 

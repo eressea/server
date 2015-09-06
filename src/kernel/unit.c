@@ -48,7 +48,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/base36.h>
 #include <util/bsdstring.h>
 #include <util/event.h>
-#include <util/goodies.h>
+#include <util/strings.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
@@ -1708,6 +1708,16 @@ int unit_getcapacity(const unit * u)
     return walkingcapacity(u);
 }
 
+void renumber_unit(unit *u, int no) {
+    uunhash(u);
+    if (!ualias(u)) {
+        attrib *a = a_add(&u->attribs, a_new(&at_alias));
+        a->data.i = -u->no;
+    }
+    u->no = no;
+    uhash(u);
+}
+
 void unit_addorder(unit * u, order * ord)
 {
     order **ordp = &u->orders;
@@ -1797,7 +1807,7 @@ void scale_number(unit * u, int n)
 
 const struct race *u_irace(const struct unit *u)
 {
-    if (u->irace && skill_enabled(SK_STEALTH)) {
+    if (u->irace) {
         return u->irace;
     }
     return u->_race;

@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -188,7 +188,6 @@ message *msg_message(const char *name, const char *sig, ...)
         }
         else {
             log_error("invalid parameter %s for message type %s\n", paramname, mtype->name);
-            assert(!"program aborted.");
         }
         while (*ic && !isalnum(*ic))
             ic++;
@@ -196,7 +195,6 @@ message *msg_message(const char *name, const char *sig, ...)
     va_end(vargs);
     if (argnum !=  mtype->nparameters) {
         log_error("not enough parameters for message type %s\n", mtype->name);
-        assert(!"program aborted.");
     }
 
     return msg_create(mtype, args);
@@ -207,12 +205,6 @@ caddmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
 {
     message *m = NULL;
 
-#define LOG_ENGLISH
-#ifdef LOG_ENGLISH
-    if (f && f->locale != default_locale) {
-        log_warning("message for locale \"%s\": %s\n", locale_name(f->locale), s);
-    }
-#endif
     unused_arg(level);
     switch (mtype) {
     case MSG_INCOME:
@@ -282,12 +274,20 @@ message * cmistake(const unit * u, struct order *ord, int mno, int mtype)
     return result;
 }
 
+void syntax_error(const struct unit *u, struct order *ord)
+{
+    message * result;
+    result = msg_error(u, ord, 10);
+    ADDMSG(&u->faction->msgs, result);
+}
+
 extern unsigned int new_hashstring(const char *s);
 
 void free_messagelist(message_list * msgs)
 {
-    struct mlist **mlistptr = &msgs->begin;
-    while (*mlistptr) {
+    struct mlist **mlistptr;
+    assert(msgs && msgs->begin);
+    for (mlistptr = &msgs->begin; *mlistptr;) {
         struct mlist *ml = *mlistptr;
         *mlistptr = ml->next;
         msg_release(ml->msg);
@@ -298,6 +298,7 @@ void free_messagelist(message_list * msgs)
 
 message *add_message(message_list ** pm, message * m)
 {
+    assert(m && m->type);
     if (!lomem && m != NULL) {
         struct mlist *mnew = malloc(sizeof(struct mlist));
         if (*pm == NULL) {
@@ -310,4 +311,23 @@ message *add_message(message_list ** pm, message * m)
         (*pm)->end = &mnew->next;
     }
     return m;
+}
+
+struct mlist ** merge_messages(message_list *mlist, message_list *append) {
+    struct mlist **split = 0;
+    assert(mlist);
+    if (append) {
+        split = mlist->end;
+        *split = append->begin;
+        mlist->end = append->end;
+    }
+    return split;
+}
+
+void split_messages(message_list *mlist, struct mlist **split) {
+    assert(mlist);
+    if (split) {
+        *split = 0;
+        mlist->end = split;
+    }
 }

@@ -357,7 +357,8 @@ static const char *dracoid_name(const unit * u)
     static char name[NAMESIZE + 1]; // FIXME: static return value
     int mid_syllabels;
 
-    u = u;
+    /* ignore u */
+    u = 0;
     /* Wieviele Mittelteile? */
 
     mid_syllabels = rng_int() % 4;

@@ -136,7 +136,7 @@ ursprung_x(const faction * f, const plane * pl, const region * rdefault)
     }
     if (!rdefault)
         return 0;
-    set_origin((faction *)f, id, rdefault->x - plane_center_x(pl),
+    faction_setorigin((faction *)f, id, rdefault->x - plane_center_x(pl),
         rdefault->y - plane_center_y(pl));
     return rdefault->x - plane_center_x(pl);
 }
@@ -159,7 +159,7 @@ ursprung_y(const faction * f, const plane * pl, const region * rdefault)
     }
     if (!rdefault)
         return 0;
-    set_origin((faction *)f, id, rdefault->x - plane_center_x(pl),
+    faction_setorigin((faction *)f, id, rdefault->x - plane_center_x(pl),
         rdefault->y - plane_center_y(pl));
     return rdefault->y - plane_center_y(pl);
 }
@@ -181,14 +181,15 @@ int plane_center_y(const plane * pl)
 }
 
 void
-adjust_coordinates(const faction * f, int *x, int *y, const plane * pl,
-const region * r)
+adjust_coordinates(const faction * f, int *x, int *y, const plane * pl)
 {
     int nx = *x;
     int ny = *y;
     if (f) {
-        nx -= ursprung_x(f, pl, r);
-        ny -= ursprung_y(f, pl, r);
+        int ux = 0, uy = 0;
+        faction_getorigin(f, pl?pl->id:0, &ux, &uy);
+        nx -= ux;
+        ny -= uy;
     }
     if (pl) {
         int plx = plane_center_x(pl);
@@ -198,8 +199,8 @@ const region * r)
         int width_2 = width / 2;
         int height_2 = height / 2;
 
-        nx -= plx;
-        ny -= ply;
+        nx = (nx - plx) % width;
+        ny = (ny - ply) % height;
 
         if (nx < 0)
             nx = (width - (-nx) % width);
@@ -219,26 +220,6 @@ const region * r)
 
     *x = nx;
     *y = ny;
-}
-
-void set_origin(faction * f, int id, int x, int y)
-{
-    ursprung *ur;
-    assert(f != NULL);
-    for (ur = f->ursprung; ur; ur = ur->next) {
-        if (ur->id == id) {
-            ur->x = ur->x + x;
-            ur->y = ur->y + y;
-            return;
-        }
-    }
-
-    ur = calloc(1, sizeof(ursprung));
-    ur->id = id;
-    ur->x = x;
-    ur->y = y;
-
-    addlist(&f->ursprung, ur);
 }
 
 plane *create_new_plane(int id, const char *name, int minx, int maxx, int miny,

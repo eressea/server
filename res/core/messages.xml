@@ -390,8 +390,17 @@
     <text locale="de">"Die Ausrüstung von $unit($unit) scheint unsichtbar. ($int36($id))"</text>
     <text locale="en">"$unit($unit)'s equipment is invisible. ($int36($id))"</text>
   </message>
-  <message name="curseinfo::magicresistance" section="events">
+  <message name="curseinfo::magicresistance_unit" section="events">
     <type>
+      <arg name="unit" type="unit"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"Die natürliche Widerstandskraft gegen Verzauberung ist gestärkt. ($int36($id))"</text>
+    <text locale="en">"The magical resistance has been strengthened. ($int36($id))"</text>
+  </message>
+  <message name="curseinfo::magicresistance_building" section="events">
+    <type>
+      <arg name="building" type="building"/>
       <arg name="id" type="int"/>
     </type>
     <text locale="de">"Die natürliche Widerstandskraft gegen Verzauberung ist gestärkt. ($int36($id))"</text>
@@ -413,6 +422,7 @@
   </message>
   <message name="curseinfo::magicwalls" section="events">
     <type>
+      <arg name="building" type="building"/>
       <arg name="id" type="int"/>
     </type>
     <text locale="de">"Diese Mauern wirken, als wären sie direkt aus der Erde gewachsen und nicht erbaut. ($int36($id))"</text>
@@ -420,6 +430,7 @@
   </message>
   <message name="curseinfo::buildingunknown" section="events">
     <type>
+      <arg name="building" type="building"/>
       <arg name="id" type="int"/>
     </type>
     <text locale="de">"Ein magischer Schimmer liegt auf diesen Mauern. ($int36($id))"</text>
@@ -540,6 +551,7 @@
   <message name="curseinfo::nocostbuilding" section="events">
     <type>
       <arg name="id" type="int"/>
+      <arg name="building" type="building"/>
     </type>
     <text locale="de">"Der Zahn der Zeit kann diesen Mauern nichts anhaben. ($int36($id))"</text>
     <text locale="en">"Time cannot touch these walls. ($int36($id))"</text>
@@ -902,7 +914,7 @@
       <arg name="transparent" type="int"/>
       <arg name="object" type="string"/>
     </type>
-    <text locale="de">"$if($transparent," befindet sich"," versperrt") ${object} $if($transparent,""," die Sicht")."</text>
+    <text locale="de">"$if($transparent," befindet sich"," versperrt") ${object}$if($transparent,""," die Sicht")."</text>
     <text locale="en">"$if($transparent," there is"," sight is blocked by ") ${object}."</text>
   </message>
   <message name="nr_building_besieged" section="nr">
@@ -1182,7 +1194,25 @@
     <text locale="en">"$unit($unit) drowns in $region($region)."</text>
   </message>
 
-<message name="drown_amphibian_dead" section="events">
+  <message name="poison_damage" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+    </type>
+    <text locale="de">"$unit($unit) nimmt Schaden durch den Giftelementar in $region($region)."</text>
+    <text locale="en">"$unit($unit) is taking poison damage in $region($region)."</text>
+  </message>
+
+  <message name="poison_death" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+    </type>
+    <text locale="de">"$unit($unit) stirbt am Schaden durch den Giftelementar in $region($region)."</text>
+    <text locale="en">"$unit($unit) dies from poison damage taken in $region($region)."</text>
+  </message>
+
+  <message name="drown_amphibian_dead" section="events">
     <type>
       <arg name="amount" type="int"/>
       <arg name="unit" type="unit"/>
@@ -2790,17 +2820,6 @@
     <text locale="en">"$unit($unit) in $region($region) is not proficient enough to produce $resource($resource,0)."</text>
   </message>
   <message name="produce" section="production">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="amount" type="int"/>
-      <arg name="wanted" type="int"/>
-      <arg name="resource" type="resource"/>
-    </type>
-    <text locale="de">"$unit($unit) in $region($region) produziert $int($amount)$if($eq($wanted,$amount),""," von $int($wanted)") $resource($resource,$wanted)."</text>
-    <text locale="en">"$unit($unit) in $region($region) produces $int($amount)$if($eq($wanted,$amount),""," of $int($wanted)") $resource($resource,$amount)."</text>
-  </message>
-  <message name="manufacture" section="production">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -7100,9 +7119,16 @@
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Your faction must be at least $int($turns) weeks old to give something to another faction."</text>
   </message>
 
-  <message name="turnreminder" section="errors">
-    <type>
-  </type>
+  <message name="nmr_warning" section="errors">
+  <type/>
+    <text locale="de">Deine Partei hat letzte Runde keinen Zug
+    abgegeben!</text>
+    <text locale="en">No orders were received for your faction!</text>
+    <text locale="fr">Aucun ordre reçu pour votre faction !</text>
+  </message>
+
+  <message name="nmr_warning_final" section="errors">
+  <type/>
     <text locale="de">"Bitte sende die Befehle nächste Runde ein, wenn du weiterspielen möchtest."</text>
     <text locale="en">"Please send in orders for the next turn if you want to continue playing."</text>
   </message>

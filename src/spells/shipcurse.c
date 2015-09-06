@@ -121,7 +121,7 @@ static struct curse_type ct_shipspeedup = { "shipspeedup",
 CURSETYP_NORM, 0, 0, cinfo_ship
 };
 
-curse *shipcurse_flyingship(ship * sh, unit * mage, float power, int duration)
+curse *shipcurse_flyingship(ship * sh, unit * mage, double power, int duration)
 {
     static const curse_type *ct_flyingship = NULL;
     if (!ct_flyingship) {
@@ -146,7 +146,7 @@ curse *shipcurse_flyingship(ship * sh, unit * mage, float power, int duration)
     }
 }
 
-int levitate_ship(ship * sh, unit * mage, float power, int duration)
+int levitate_ship(ship * sh, unit * mage, double power, int duration)
 {
     curse *c = shipcurse_flyingship(sh, mage, power, duration);
     if (c) {

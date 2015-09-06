@@ -43,6 +43,7 @@ extern "C" {
     extern int sp_mindblast_temp(struct castorder * co);
     extern int sp_speed(struct castorder * co);
     extern int sp_wolfhowl(struct castorder * co);
+    extern int sp_igjarjuk(struct castorder * co);
     extern int sp_dragonodem(struct castorder * co);
     extern int sp_reduceshield(struct castorder * co);
     extern int sp_armorshield(struct castorder * co);

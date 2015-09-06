@@ -1,3 +1,4 @@
+#pragma once
 /* 
  +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  |                   |  Enno Rehling <enno@eressea.de>
@@ -11,13 +12,20 @@
  */
 #ifndef H_GC_REPORT
 #define H_GC_REPORT
+
+#include <stddef.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+    struct stream;
+    struct region;
+    struct faction;
     void register_nr(void);
     void report_cleanup(void);
-
+    void write_spaces(struct stream *out, size_t num);
+    void write_travelthru(struct stream *out, const struct region * r, const struct faction * f);
 #ifdef __cplusplus
 }
 #endif

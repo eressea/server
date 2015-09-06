@@ -1,6 +1,10 @@
 #include <platform.h>
 #include <config.h>
 #include "reports.h"
+#include "report.h"
+#include "creport.h"
+#include "move.h"
+#include "travelthru.h"
 
 #include <kernel/building.h>
 #include <kernel/faction.h>
@@ -9,7 +13,11 @@
 #include <kernel/ship.h>
 #include <kernel/unit.h>
 
+#include <util/language.h>
+
 #include <quicklist.h>
+#include <stream.h>
+#include <memstream.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -71,12 +79,12 @@ static void test_regionid(CuTest * tc) {
 
     memset(buffer, 0x7d, sizeof(buffer));
     len = f_regionid(r, 0, buffer, sizeof(buffer));
-    CuAssertIntEquals(tc, 11, len);
+    CuAssertIntEquals(tc, 11, (int)len);
     CuAssertStrEquals(tc, "plain (0,0)", buffer);
 
     memset(buffer, 0x7d, sizeof(buffer));
     len = f_regionid(r, 0, buffer, 11);
-    CuAssertIntEquals(tc, 10, len);
+    CuAssertIntEquals(tc, 10, (int)len);
     CuAssertStrEquals(tc, "plain (0,0", buffer);
     CuAssertIntEquals(tc, 0x7d, buffer[11]);
 }
@@ -98,11 +106,139 @@ static void test_seen_faction(CuTest *tc) {
     CuAssertTrue(tc, f1->no < f2->no);
 }
 
+static void test_write_spaces(CuTest *tc) {
+    stream out = { 0 };
+    char buf[1024];
+    size_t len;
+
+    mstream_init(&out);
+    write_spaces(&out, 4);
+    out.api->rewind(out.handle);
+    len = out.api->read(out.handle, buf, sizeof(buf));
+    buf[len] = '\0';
+    CuAssertStrEquals(tc, "    ", buf);
+    CuAssertIntEquals(tc, ' ', buf[3]);
+    mstream_done(&out);
+}
+
+static void test_write_many_spaces(CuTest *tc) {
+    stream out = { 0 };
+    char buf[1024];
+    size_t len;
+
+    mstream_init(&out);
+    write_spaces(&out, 100);
+    out.api->rewind(out.handle);
+    len = out.api->read(out.handle, buf, sizeof(buf));
+    buf[len] = '\0';
+    CuAssertIntEquals(tc, 100, (int)len);
+    CuAssertIntEquals(tc, ' ', buf[99]);
+    mstream_done(&out);
+}
+
+static void test_sparagraph(CuTest *tc) {
+    strlist *sp = 0;
+    split_paragraph(&sp, "Hello World", 0, 16, 0);
+    CuAssertPtrNotNull(tc, sp);
+    CuAssertStrEquals(tc, "Hello World", sp->s);
+    CuAssertPtrEquals(tc, 0, sp->next);
+    split_paragraph(&sp, "Hello World", 4, 16, 0);
+    CuAssertPtrNotNull(tc, sp);
+    CuAssertStrEquals(tc, "    Hello World", sp->s);
+    CuAssertPtrEquals(tc, 0, sp->next);
+    split_paragraph(&sp, "Hello World", 4, 16, '*');
+    CuAssertPtrNotNull(tc, sp);
+    CuAssertStrEquals(tc, "  * Hello World", sp->s);
+    CuAssertPtrEquals(tc, 0, sp->next);
+    split_paragraph(&sp, "12345678 90 12345678", 0, 8, '*');
+    CuAssertPtrNotNull(tc, sp);
+    CuAssertStrEquals(tc, "12345678", sp->s);
+    CuAssertPtrNotNull(tc, sp->next);
+    CuAssertStrEquals(tc, "90", sp->next->s);
+    CuAssertPtrNotNull(tc, sp->next->next);
+    CuAssertStrEquals(tc, "12345678", sp->next->next->s);
+    CuAssertPtrEquals(tc, 0, sp->next->next->next);
+}
+
+static void test_cr_unit(CuTest *tc) {
+    stream strm;
+    char line[1024];
+    faction *f;
+    region *r;
+    unit *u;
+
+    test_cleanup();
+    f = test_create_faction(0);
+    r = test_create_region(0, 0, 0);
+    u = test_create_unit(f, r);
+    renumber_unit(u, 1234);
+
+    mstream_init(&strm);
+    cr_output_unit(&strm, r, f, u, see_unit);
+    strm.api->rewind(strm.handle);
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, line, "EINHEIT 1234");
+    mstream_done(&strm);
+    test_cleanup();
+}
+
+static void test_write_travelthru(CuTest *tc) {
+    stream out = { 0 };
+    char buf[1024];
+    size_t len;
+    region *r;
+    faction *f;
+    unit *u;
+    struct locale *lang;
+
+    test_cleanup();
+    lang = get_or_create_locale("de");
+    locale_setstring(lang, "travelthru_header", "Durchreise: ");
+    mstream_init(&out);
+    r = test_create_region(0, 0, 0);
+    r->flags |= RF_TRAVELUNIT;
+    f = test_create_faction(0);
+    f->locale = lang;
+    u = test_create_unit(f, 0);
+    unit_setname(u, "Hodor");
+    unit_setid(u, 1);
+
+    write_travelthru(&out, r, f);
+    out.api->rewind(out.handle);
+    len = out.api->read(out.handle, buf, sizeof(buf));
+    CuAssertIntEquals_Msg(tc, "no travelers, no report", 0, (int)len);
+    mstream_done(&out);
+    
+    mstream_init(&out);
+    travelthru_add(r, u);
+    write_travelthru(&out, r, f);
+    out.api->rewind(out.handle);
+    len = out.api->read(out.handle, buf, sizeof(buf));
+    buf[len] = '\0';
+    CuAssertStrEquals_Msg(tc, "list one unit", "Durchreise: Hodor (1).\n", buf);
+    mstream_done(&out);
+
+    mstream_init(&out);
+    move_unit(u, r, 0);
+    write_travelthru(&out, r, f);
+    out.api->rewind(out.handle);
+    len = out.api->read(out.handle, buf, sizeof(buf));
+    CuAssertIntEquals_Msg(tc, "do not list units that stopped in the region", 0, (int)len);
+
+    mstream_done(&out);
+    test_cleanup();
+}
+
 CuSuite *get_reports_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_cr_unit);
     SUITE_ADD_TEST(suite, test_reorder_units);
     SUITE_ADD_TEST(suite, test_seen_faction);
     SUITE_ADD_TEST(suite, test_regionid);
+    SUITE_ADD_TEST(suite, test_write_spaces);
+    SUITE_ADD_TEST(suite, test_write_many_spaces);
+    SUITE_ADD_TEST(suite, test_sparagraph);
+    SUITE_ADD_TEST(suite, test_write_travelthru);
     return suite;
 }

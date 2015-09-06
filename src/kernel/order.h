@@ -33,7 +33,7 @@ extern "C" {
         struct order *next;
         /* do not access this data: */
         struct order_data *data;
-        int _persistent : 1;
+        bool _persistent;
     } order;
 
     /* constructor */
@@ -55,8 +55,8 @@ extern "C" {
     char* get_command(const order *ord, char *buffer, size_t size);
     bool is_persistent(const order * ord);
     bool is_exclusive(const order * ord);
-    bool is_repeated(const order * ord);
-    bool is_long(const order * ord);
+    bool is_repeated(keyword_t kwd);
+    bool is_long(keyword_t kwd);
 
     char *write_order(const order * ord, char *buffer, size_t size);
     keyword_t init_order(const struct order *ord);

@@ -158,6 +158,7 @@ static race *rc_find_i(const char *name)
     }
     if (!rc && strcmp(name, "uruk") == 0) {
         rc = rc_find_i("orc");
+        log_warning("a reference was made to the retired race '%s', returning '%s'.", name, rc->_name);
     }
     return rc;
 }
@@ -183,6 +184,7 @@ race *rc_get_or_create(const char *zName)
         rc->recruit_multi = 1.0F;
         rc->regaura = 1.0F;
         rc->speed = 1.0F;
+        rc->battle_flags = BF_CANATTACK;
         if (strchr(zName, ' ') != NULL) {
             log_error("race '%s' has an invalid name. remove spaces\n", zName);
             assert(strchr(zName, ' ') == NULL);

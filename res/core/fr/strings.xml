@@ -2051,7 +2051,4 @@
       <text locale="fr">côte ouest</text>
     </string>
   </namespace>
-  <string name="nr_nmr">
-    <text locale="fr">Aucun ordre reçu pour votre faction !</text>
-  </string>
 </strings>

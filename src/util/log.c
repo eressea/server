@@ -1,4 +1,4 @@
-/*
+﻿/*
 +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
 |                   |  Enno Rehling <enno@eressea.de>
 | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
@@ -54,13 +54,13 @@ cp_convert(const char *format, char *buffer, size_t length, int codepage)
     char *pos = buffer;
 
     while (pos + 1 < buffer + length && *input) {
-        size_t length = 0;
+        size_t size = 0;
         int result = 0;
         if (codepage == 437) {
-            result = unicode_utf8_to_cp437(pos, input, &length);
+            result = unicode_utf8_to_cp437(pos, input, &size);
         }
         else if (codepage == 1252) {
-            result = unicode_utf8_to_cp1252(pos, input, &length);
+            result = unicode_utf8_to_cp1252(pos, input, &size);
         }
         if (result != 0) {
             *pos = 0;                 /* just in case caller ignores our return value */
@@ -251,6 +251,34 @@ void log_error(const char *format, ...)
 
     /* write to stderr, if that's not the logfile already */
     if (logfile != stderr && (log_stderr & mask)) {
+        int dupe = check_dupe(format, prefix);
+        if (!dupe) {
+            va_list args;
+            va_start(args, format);
+            _log_writeln(stderr, stdio_codepage, prefix, format, args);
+            va_end(args);
+        }
+    }
+    if (log_flags & LOG_FLUSH) {
+        log_flush();
+    }
+}
+
+void log_fatal(const char *format, ...)
+{
+    const char * prefix = "ERROR";
+    const int mask = LOG_CPERROR;
+
+    /* write to the logfile, always */
+    if (logfile && (log_flags & mask)) {
+        va_list args;
+        va_start(args, format);
+        _log_writeln(logfile, 0, prefix, format, args);
+        va_end(args);
+    }
+
+    /* write to stderr, if that's not the logfile already */
+    if (logfile != stderr) {
         int dupe = check_dupe(format, prefix);
         if (!dupe) {
             va_list args;

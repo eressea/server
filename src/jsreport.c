@@ -1,9 +1,11 @@
-#include "reports.h"
+﻿#include "reports.h"
 #include "jsreport.h"
-#include "kernel/region.h"
-#include "kernel/terrain.h"
-#include "kernel/terrainid.h"
-#include "kernel/config.h"
+#include <kernel/region.h>
+#include <kernel/terrain.h>
+#include <kernel/terrainid.h>
+#include <kernel/config.h>
+
+#include <util/log.h>
 
 #include <limits.h>
 #include <stdio.h>
@@ -56,7 +58,12 @@ static int report_json(const char *filename, report_context * ctx, const char *c
                             sr = find_seen(ctx->seen, r);
                             if (sr) {
                                 terrain_t ter = oldterrain(r->terrain);
-                                data = 1 + (int)ter;
+                                if (ter == NOTERRAIN) {
+                                    data = 1 + r->terrain->_name[0];
+                                }
+                                else {
+                                    data = 1 + (int)ter;
+                                }
                             }
                         }
                         fprintf(F, "%d", data);
@@ -69,7 +76,7 @@ static int report_json(const char *filename, report_context * ctx, const char *c
             }
             return 0;
         }
-        return ferror(F);
+        return -1;
     }
     return 0;
 }

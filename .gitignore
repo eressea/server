@@ -1,3 +1,4 @@
+*.orig
 eressea.ini
 Debug
 Release
@@ -37,3 +38,6 @@ game-e3/reports/
 tags
 Thumbs.db
 .gdb_history
+*.cfg
+*.cmd
+tmp/

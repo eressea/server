@@ -275,11 +275,6 @@
     </string>
   </namespace>
 
-  <string name="Tresen">
-    <text locale="de">Tresen</text>
-    <text locale="en">counter</text>
-  </string>
-
   <string name="wenige">
     <text locale="de">wenige</text>
     <text locale="en">few</text>
@@ -2217,12 +2212,6 @@
     <text locale="de">Schaden</text>
   </string>
 
-  <!--report newbie info -->
-  <string name="nr_nmr">
-    <text locale="de">Deine Partei hat letzte Runde keinen Zug
-    abgegeben!</text>
-  </string>
-
   <namespace name="race">
     <string name="snowman">
       <text locale="de">Schneemann</text>
@@ -3933,7 +3922,7 @@
       <text locale="de">Gesang des Lebens analysieren</text>
       <text locale="en">Analyze Song of Life</text>
     </string>
-    <string name="cerrdorfumbleshield">
+    <string name="cerddorfumbleshield">
       <text locale="de">Bannlied</text>
       <text locale="en">Countersong</text>
     </string>
@@ -4335,7 +4324,7 @@
       <text locale="de">Kraft der Natur</text>
       <text locale="en">force of nature</text>
     </string>
-    <string name="wdwpyramid_cerrdor">
+    <string name="wdwpyramid_cerddor">
       <text locale="de">Gesang der Götter</text>
       <text locale="en">Song of the Gods</text>
     </string>
@@ -5137,7 +5126,7 @@
       able to decipher all enchantments or spells, which
       aren't disguised beyond your capability.</text>
     </string>
-    <string name="cerrdorfumbleshield">
+    <string name="cerddorfumbleshield">
       <text locale="de">Dieser schrille Gesang hallt über das
       ganze Schlachtfeld. Die besonderen Dissonanzen in den
       Melodien machen es Magiern fast unmöglich, sich auf ihre
@@ -5865,11 +5854,10 @@
         das 50fache und auch im Kampf werden sich die
         erhöhte Kraft und die trollisch zähe Haut
         positiv auswirken.</text>
-      <text locale="en">This artifact gives the one wearing it
+      <text locale="en">This artifact gives the wearer
         the strength of a cavetroll. He will be able to
-        carry fifty times as much as normal and also in
-        combat his enhanced strength and tough troll
-        skin will serve him well.</text>
+        carry fifty times his normal load, as well as
+        gain strength and tough troll skin in combat.</text>
     </string>
     <string name="auraleak">
       <text locale="de">Der Schwarzmagier kann mit diesem
@@ -5879,7 +5867,7 @@
         Region werden einen Großteil ihrer Aura
         verlieren.</text>
       <text locale="en">With this dark ritual the
-        chaossorcerer causes a deep rift to appear in
+        chaos sorcerer causes a deep rift to appear in
         the astral balance that will tear all magical
         power from a region. All spellcasters in that
         region will lose most of their aura.</text>
@@ -6959,14 +6947,9 @@
     <text locale="en">is helping</text>
   </string>
 
-  <string name="has_moved_one">
-    <text locale="de">hat die Region durchquert.</text>
-    <text locale="en">passed through the region.</text>
-  </string>
-
-  <string name="has_moved_many">
-    <text locale="de">haben die Region durchquert.</text>
-    <text locale="en">passed through the region.</text>
+  <string name="travelthru_header">
+    <text locale="de">Die Region wurde durchquert von </text>
+    <text locale="en">The region was crossed by </text>
   </string>
 
   <string name="see_travel">

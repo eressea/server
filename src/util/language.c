@@ -21,7 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "language_struct.h"
 
 #include "log.h"
-#include "goodies.h"
+#include "strings.h"
 #include "umlaut.h"
 
 #include <stdlib.h>
@@ -153,8 +153,13 @@ const char *locale_string(const locale * lang, const char *key, bool warn)
         if (warn) {
             log_warning("missing translation for \"%s\" in locale %s\n", key, lang->name);
         }
-        if (lang->fallback) {
-            return locale_string(lang->fallback, key, warn);
+        if (default_locale && lang != default_locale) {
+            const char * value = locale_string(default_locale, key, warn);
+            if (value) {
+                /* TODO: evil side-effects for a const function */
+                locale_setstring(get_or_create_locale(lang->name), key, value);
+            }
+            return value;
         }
     }
     return 0;

@@ -127,13 +127,12 @@ const struct terrain_type *newterrain(terrain_t t)
 terrain_t oldterrain(const struct terrain_type * terrain)
 {
     terrain_t t;
-    if (terrain == NULL)
-        return NOTERRAIN;
+    assert(terrain);
     for (t = 0; t != MAXTERRAINS; ++t) {
         if (newterrains[t] == terrain)
             return t;
     }
-    log_warning("%s is not a classic terrain.\n", terrain->_name);
+    log_debug("%s is not a classic terrain.\n", terrain->_name);
     return NOTERRAIN;
 }
 

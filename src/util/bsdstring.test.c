@@ -1,5 +1,6 @@
 #include <CuTest.h>
 #include "bsdstring.h"
+#include <errno.h>
 #include <string.h>
 
 static void test_strlcat(CuTest * tc)
@@ -9,15 +10,15 @@ static void test_strlcat(CuTest * tc)
     memset(buffer, 0x7f, sizeof(buffer));
 
     buffer[0] = '\0';
-    CuAssertIntEquals(tc, 4, strlcat(buffer, "herp", 4));
+    CuAssertIntEquals(tc, 4, (int)strlcat(buffer, "herp", 4));
     CuAssertStrEquals(tc, "her", buffer);
 
     buffer[0] = '\0';
-    CuAssertIntEquals(tc, 4, strlcat(buffer, "herp", 8));
+    CuAssertIntEquals(tc, 4, (int)strlcat(buffer, "herp", 8));
     CuAssertStrEquals(tc, "herp", buffer);
     CuAssertIntEquals(tc, 0x7f, buffer[5]);
 
-    CuAssertIntEquals(tc, 8, strlcat(buffer, "derp", 8));
+    CuAssertIntEquals(tc, 8, (int)strlcat(buffer, "derp", 8));
     CuAssertStrEquals(tc, "herpder", buffer);
     CuAssertIntEquals(tc, 0x7f, buffer[8]);
 }
@@ -28,16 +29,17 @@ static void test_strlcpy(CuTest * tc)
 
     memset(buffer, 0x7f, sizeof(buffer));
 
-    CuAssertIntEquals(tc, 4, strlcpy(buffer, "herp", 4));
+    CuAssertIntEquals(tc, 4, (int)strlcpy(buffer, "herp", 4));
     CuAssertStrEquals(tc, "her", buffer);
 
-    CuAssertIntEquals(tc, 4, strlcpy(buffer, "herp", 8));
+    CuAssertIntEquals(tc, 4, (int)strlcpy(buffer, "herp", 8));
     CuAssertStrEquals(tc, "herp", buffer);
     CuAssertIntEquals(tc, 0x7f, buffer[5]);
 
-    CuAssertIntEquals(tc, 8, strlcpy(buffer, "herpderp", 8));
+    CuAssertIntEquals(tc, 8, (int)strlcpy(buffer, "herpderp", 8));
     CuAssertStrEquals(tc, "herpder", buffer);
     CuAssertIntEquals(tc, 0x7f, buffer[8]);
+    errno = 0;
 }
 
 static void test_slprintf(CuTest * tc)
@@ -49,11 +51,11 @@ static void test_slprintf(CuTest * tc)
     CuAssertTrue(tc, slprintf(buffer, 4, "%s", "herpderp") > 3);
     CuAssertStrEquals(tc, "her", buffer);
 
-    CuAssertIntEquals(tc, 4, slprintf(buffer, 8, "%s", "herp"));
+    CuAssertIntEquals(tc, 4, (int)slprintf(buffer, 8, "%s", "herp"));
     CuAssertStrEquals(tc, "herp", buffer);
     CuAssertIntEquals(tc, 0x7f, buffer[5]);
 
-    CuAssertIntEquals(tc, 8, slprintf(buffer, 8, "%s", "herpderp"));
+    CuAssertIntEquals(tc, 8, (int)slprintf(buffer, 8, "%s", "herpderp"));
     CuAssertStrEquals(tc, "herpder", buffer);
     CuAssertIntEquals(tc, 0x7f, buffer[8]);
 }

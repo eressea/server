@@ -25,9 +25,9 @@ extern "C" {
     struct region;
 
     /** Plagues **/
-#define PLAGUE_CHANCE      0.1F /* Seuchenwahrscheinlichkeit (siehe plagues()) */
-#define PLAGUE_VICTIMS     0.2F /* % Betroffene */
-#define PLAGUE_HEALCHANCE  0.25F        /* Wahrscheinlichkeit Heilung */
+#define PLAGUE_CHANCE      0.1 /* Seuchenwahrscheinlichkeit (siehe plagues()) */
+#define PLAGUE_VICTIMS     0.2 /* % Betroffene */
+#define PLAGUE_HEALCHANCE  0.25        /* Wahrscheinlichkeit Heilung */
 #define PLAGUE_HEALCOST    30   /* Heilkosten */
     void plagues(struct region *r);
     void encounters(void);

@@ -214,7 +214,7 @@ static int tolua_msg_set_string(lua_State * L)
     const char *param = tolua_tostring(L, 2, 0);
     const char *value = tolua_tostring(L, 3, 0);
     int result = msg_set_string(lmsg, param, value);
-    tolua_pushnumber(L, (lua_Number)result);
+    lua_pushinteger(L, result);
     return 1;
 }
 
@@ -224,7 +224,7 @@ static int tolua_msg_set_int(lua_State * L)
     const char *param = tolua_tostring(L, 2, 0);
     int value = (int)tolua_tonumber(L, 3, 0);
     int result = msg_set_int(lmsg, param, value);
-    tolua_pushnumber(L, (lua_Number)result);
+    lua_pushinteger(L, result);
     return 1;
 }
 
@@ -234,7 +234,7 @@ static int tolua_msg_set_resource(lua_State * L)
     const char *param = tolua_tostring(L, 2, 0);
     const char *value = tolua_tostring(L, 3, 0);
     int result = msg_set_resource(lmsg, param, value);
-    tolua_pushnumber(L, (lua_Number)result);
+    lua_pushinteger(L, result);
     return 1;
 }
 
@@ -244,7 +244,7 @@ static int tolua_msg_set_unit(lua_State * L)
     const char *param = tolua_tostring(L, 2, 0);
     unit *value = (unit *)tolua_tousertype(L, 3, 0);
     int result = msg_set_unit(lmsg, param, value);
-    tolua_pushnumber(L, (lua_Number)result);
+    lua_pushinteger(L, result);
     return 1;
 }
 
@@ -254,7 +254,7 @@ static int tolua_msg_set_region(lua_State * L)
     const char *param = tolua_tostring(L, 2, 0);
     region *value = (region *)tolua_tousertype(L, 3, 0);
     int result = msg_set_region(lmsg, param, value);
-    tolua_pushnumber(L, (lua_Number)result);
+    lua_pushinteger(L, result);
     return 1;
 }
 
@@ -270,7 +270,7 @@ static int tolua_msg_set(lua_State * L)
     else if (tolua_isusertype(L, 3, TOLUA_CAST "unit", 0, &err)) {
         return tolua_msg_set_unit(L);
     }
-    tolua_pushnumber(L, (lua_Number)-1);
+    lua_pushinteger(L, -1);
     return 1;
 }
 
@@ -279,7 +279,7 @@ static int tolua_msg_send_region(lua_State * L)
     lua_message *lmsg = (lua_message *)tolua_tousertype(L, 1, 0);
     region *r = (region *)tolua_tousertype(L, 2, 0);
     int result = msg_send_region(lmsg, r);
-    tolua_pushnumber(L, (lua_Number)result);
+    lua_pushinteger(L, result);
     return 1;
 }
 
@@ -293,7 +293,7 @@ static int tolua_msg_report_action(lua_State * L)
         lmsg->msg = msg_create(lmsg->mtype, lmsg->args);
     }
     result = report_action(r, u, lmsg->msg, flags);
-    tolua_pushnumber(L, (lua_Number)result);
+    lua_pushinteger(L, result);
     return 1;
 }
 
@@ -303,7 +303,7 @@ static int tolua_msg_send_faction(lua_State * L)
     faction *f = (faction *)tolua_tousertype(L, 2, 0);
     if (f && lmsg) {
         int result = msg_send_faction(lmsg, f);
-        tolua_pushnumber(L, (lua_Number)result);
+        lua_pushinteger(L, result);
         return 1;
     }
     return 0;

@@ -39,6 +39,7 @@ extern "C" {
 #define FFL_ISNEW         (1<<1)
 #define FFL_RESTART       (1<<2)
 #define FFL_QUIT          (1<<3)
+#define FFL_CURSED        (1<<4) /* you're going to have a bad time */
 #define FFL_DEFENDER      (1<<10)
 #define FFL_SELECT        (1<<18)       /* ehemals f->dh, u->dh, r->dh, etc... */
 #define FFL_NOAID         (1<<21)       /* Hilfsflag Kampf */
@@ -49,8 +50,7 @@ extern "C" {
 #define FFL_NOIDLEOUT     (1<<24)       /* Partei stirbt nicht an NMRs */
 #define FFL_NPC           (1<<25)       /* eine Partei mit Monstern */
 #define FFL_DBENTRY       (1<<28)       /* Partei ist in Datenbank eingetragen */
-
-#define FFL_SAVEMASK (FFL_DEFENDER|FFL_NEWID|FFL_NPC|FFL_DBENTRY|FFL_NOIDLEOUT)
+#define FFL_SAVEMASK (FFL_DEFENDER|FFL_NEWID|FFL_NPC|FFL_DBENTRY|FFL_NOIDLEOUT|FFL_CURSED)
 
     typedef struct faction {
         struct faction *next;
@@ -153,6 +153,9 @@ extern "C" {
     const char *faction_getpassword(const struct faction *self);
     void faction_setpassword(struct faction *self, const char *password);
     bool valid_race(const struct faction *f, const struct race *rc);
+
+    void faction_getorigin(const struct faction * f, int id, int *x, int *y);
+    void faction_setorigin(struct faction * f, int id, int x, int y);
 
     struct spellbook * faction_get_spellbook(struct faction *f);
 

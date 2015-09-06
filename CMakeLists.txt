@@ -8,6 +8,11 @@ project (eressea-server C)
 
 
 enable_testing()
+find_package (LibXml2)
+find_package (SQLite3)
+find_package (Curses)
+find_package (Lua REQUIRED)
+find_package (ToLua REQUIRED)
 
 INCLUDE (CheckIncludeFiles)
 INCLUDE (CheckSymbolExists)
@@ -57,13 +62,6 @@ CONFIGURE_FILE (
 INCLUDE_DIRECTORIES (${CMAKE_BINARY_DIR}/include)
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DUSE_AUTOCONF")
 
-
-find_package (LibXml2)
-find_package (SQLite3)
-find_package (Curses)
-find_package (Lua REQUIRED)
-find_package (ToLua REQUIRED)
-
 add_subdirectory (cutest)
 add_subdirectory (crypto)
 add_subdirectory (cJSON)
@@ -75,4 +73,4 @@ add_subdirectory (src eressea)
 install(DIRECTORY res conf DESTINATION ${CMAKE_INSTALL_PREFIX} FILES_MATCHING PATTERN "*.xml")
 install(DIRECTORY res conf DESTINATION ${CMAKE_INSTALL_PREFIX} FILES_MATCHING PATTERN "*.json")
 install(DIRECTORY scripts DESTINATION ${CMAKE_INSTALL_PREFIX} FILES_MATCHING PATTERN "*.lua")
-
+install(DIRECTORY share DESTINATION ${CMAKE_INSTALL_PREFIX})

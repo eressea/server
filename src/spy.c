@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -53,6 +53,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 /* in spy steht der Unterschied zwischen Wahrnehmung des Opfers und
 * Spionage des Spions */
@@ -61,7 +62,7 @@ void spy_message(int spy, const unit * u, const unit * target)
     const char *str = report_kampfstatus(target, u->faction->locale);
 
     ADDMSG(&u->faction->msgs, msg_message("spyreport", "spy target status", u,
-					  target, str));
+        target, str));
     if (spy > 20) {
         sc_mage *mage = get_mage(target);
         /* for mages, spells and magic school */
@@ -213,7 +214,6 @@ int setstealth_cmd(unit * u, struct order *ord)
     char token[64];
     const char *s;
     int level, rule;
-    const race *trace;
 
     init_order(ord);
     s = gettoken(token, sizeof(token));
@@ -236,47 +236,51 @@ int setstealth_cmd(unit * u, struct order *ord)
         return 0;
     }
 
-    trace = findrace(s, u->faction->locale);
-    if (trace) {
-        /* demons can cloak as other player-races */
-        if (u_race(u) == get_race(RC_DAEMON)) {
-            race_t allowed[] = { RC_DWARF, RC_ELF, RC_ORC, RC_GOBLIN, RC_HUMAN,
-                RC_TROLL, RC_DAEMON, RC_INSECT, RC_HALFLING, RC_CAT, RC_AQUARIAN,
-                NORACE
-            };
-            int i;
-            for (i = 0; allowed[i] != NORACE; ++i)
-                if (get_race(allowed[i]) == trace)
-                    break;
-            if (get_race(allowed[i]) == trace) {
-                u->irace = trace;
-                if (u_race(u)->flags & RCF_SHAPESHIFTANY && get_racename(u->attribs))
-                    set_racename(&u->attribs, NULL);
+    if (skill_enabled(SK_STEALTH)) { /* hack! E3 erlaubt keine Tarnung */
+        const race *trace;
+
+        trace = findrace(s, u->faction->locale);
+        if (trace) {
+            /* demons can cloak as other player-races */
+            if (u_race(u) == get_race(RC_DAEMON)) {
+                race_t allowed[] = { RC_DWARF, RC_ELF, RC_ORC, RC_GOBLIN, RC_HUMAN,
+                    RC_TROLL, RC_DAEMON, RC_INSECT, RC_HALFLING, RC_CAT, RC_AQUARIAN,
+                    NORACE
+                };
+                int i;
+                for (i = 0; allowed[i] != NORACE; ++i)
+                    if (get_race(allowed[i]) == trace)
+                        break;
+                if (get_race(allowed[i]) == trace) {
+                    u->irace = trace;
+                    if (u_race(u)->flags & RCF_SHAPESHIFTANY && get_racename(u->attribs))
+                        set_racename(&u->attribs, NULL);
+                }
+                return 0;
+            }
+
+            /* Singdrachen koennen sich nur als Drachen tarnen */
+            if (u_race(u) == get_race(RC_SONGDRAGON)
+                || u_race(u) == get_race(RC_BIRTHDAYDRAGON)) {
+                if (trace == get_race(RC_SONGDRAGON) || trace == get_race(RC_FIREDRAGON)
+                    || trace == get_race(RC_DRAGON) || trace == get_race(RC_WYRM)) {
+                    u->irace = trace;
+                    if (u_race(u)->flags & RCF_SHAPESHIFTANY && get_racename(u->attribs))
+                        set_racename(&u->attribs, NULL);
+                }
+                return 0;
+            }
+
+            /* Daemomen und Illusionsparteien koennen sich als andere race tarnen */
+            if (u_race(u)->flags & RCF_SHAPESHIFT) {
+                if (playerrace(trace)) {
+                    u->irace = trace;
+                    if ((u_race(u)->flags & RCF_SHAPESHIFTANY) && get_racename(u->attribs))
+                        set_racename(&u->attribs, NULL);
+                }
             }
             return 0;
         }
-
-        /* Singdrachen koennen sich nur als Drachen tarnen */
-        if (u_race(u) == get_race(RC_SONGDRAGON)
-            || u_race(u) == get_race(RC_BIRTHDAYDRAGON)) {
-            if (trace == get_race(RC_SONGDRAGON) || trace == get_race(RC_FIREDRAGON)
-                || trace == get_race(RC_DRAGON) || trace == get_race(RC_WYRM)) {
-                u->irace = trace;
-                if (u_race(u)->flags & RCF_SHAPESHIFTANY && get_racename(u->attribs))
-                    set_racename(&u->attribs, NULL);
-            }
-            return 0;
-        }
-
-        /* Daemomen und Illusionsparteien koennen sich als andere race tarnen */
-        if (u_race(u)->flags & RCF_SHAPESHIFT) {
-            if (playerrace(trace)) {
-                u->irace = trace;
-                if ((u_race(u)->flags & RCF_SHAPESHIFTANY) && get_racename(u->attribs))
-                    set_racename(&u->attribs, NULL);
-            }
-        }
-        return 0;
     }
 
     switch (findparam(s, u->faction->locale)) {
@@ -341,7 +345,7 @@ int setstealth_cmd(unit * u, struct order *ord)
     return 0;
 }
 
-static int crew_skill(region * r, faction * f, ship * sh, skill_t sk)
+static int top_skill(region * r, faction * f, ship * sh, skill_t sk)
 {
     int value = 0;
     unit *u;
@@ -375,7 +379,7 @@ static int try_destruction(unit * u, unit * u2, const ship * sh, int skilldiff)
     }
     else if (skilldiff < 0) {
         /* tell the unit that the attempt was detected: */
-        ADDMSG(&u2->faction->msgs, msg_message(destruction_detected_msg,
+        ADDMSG(&u->faction->msgs, msg_message(destruction_detected_msg,
             "ship unit", sh, u));
         /* tell the enemy whodunit: */
         if (u2) {
@@ -394,7 +398,7 @@ static int try_destruction(unit * u, unit * u2, const ship * sh, int skilldiff)
     return 1;                     /* success */
 }
 
-static void sink_ship(region * r, ship * sh, const char *name, unit * saboteur)
+static void sink_ship(region * r, ship * sh, unit * saboteur)
 {
     unit **ui, *u;
     region *safety = r;
@@ -404,6 +408,9 @@ static void sink_ship(region * r, ship * sh, const char *name, unit * saboteur)
     message *sink_msg = NULL;
     faction *f;
 
+    assert(r);
+    assert(sh);
+    assert(saboteur);
     for (f = NULL, u = r->units; u; u = u->next) {
         /* slight optimization to avoid dereferencing u->faction each time */
         if (f != u->faction) {
@@ -426,7 +433,7 @@ static void sink_ship(region * r, ship * sh, const char *name, unit * saboteur)
             }
         }
     }
-    for (ui = &r->units; *ui; ui = &(*ui)->next) {
+    for (ui = &r->units; *ui;) {
         unit *u = *ui;
 
         /* inform this faction about the sinking ship: */
@@ -471,12 +478,13 @@ static void sink_ship(region * r, ship * sh, const char *name, unit * saboteur)
             add_message(&u->faction->msgs, msg);
             msg_release(msg);
             if (dead == u->number) {
-                /* the poor creature, she dies */
-                if (remove_unit(ui, u) != 0) {
-                    ui = &u->next;
+                if (remove_unit(ui, u) == 0) {
+                    /* ui is already pointing at u->next */
+                    continue;
                 }
             }
         }
+        ui = &u->next;
     }
     if (sink_msg)
         msg_release(sink_msg);
@@ -487,19 +495,21 @@ static void sink_ship(region * r, ship * sh, const char *name, unit * saboteur)
 int sabotage_cmd(unit * u, struct order *ord)
 {
     const char *s;
-    int i;
+    param_t p;
     ship *sh;
     unit *u2;
-    char buffer[DISPLAYSIZE];
-    region *r = u->region;
-    int skdiff;
+    region *r;
+    int skdiff = INT_MAX;
+
+    assert(u);
+    assert(ord);
 
     init_order(ord);
     s = getstrtoken();
 
-    i = findparam(s, u->faction->locale);
+    p = findparam(s, u->faction->locale);
 
-    switch (i) {
+    switch (p) {
     case P_SHIP:
         sh = u->ship;
         if (!sh) {
@@ -507,10 +517,13 @@ int sabotage_cmd(unit * u, struct order *ord)
             return 0;
         }
         u2 = ship_owner(sh);
-        skdiff =
-            eff_skill(u, SK_SPY, r) - crew_skill(r, u2->faction, sh, SK_PERCEPTION);
+        r = u->region;
+        if (u2->faction != u->faction) {
+            skdiff =
+                eff_skill(u, SK_SPY, r) - top_skill(r, u2->faction, sh, SK_PERCEPTION);
+        }
         if (try_destruction(u, u2, sh, skdiff)) {
-            sink_ship(r, sh, buffer, u);
+            sink_ship(r, sh, u);
         }
         break;
     default:

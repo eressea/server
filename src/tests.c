@@ -24,6 +24,7 @@
 #include <CuTest.h>
 
 #include <assert.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -80,6 +81,16 @@ void test_cleanup(void)
     free_races();
     free_spellbooks();
     free_gamedata();
+    mt_clear();
+    if (!mt_find("missing_message")) {
+        mt_register(mt_new_va("missing_message", "name:string", 0));
+        mt_register(mt_new_va("missing_feedback", "unit:unit", "region:region", "command:order", "name:string", 0));
+    }
+    if (errno) {
+        int error = errno;
+        errno = 0;
+        log_error("errno: %d", error);
+    }
 }
 
 terrain_type *
@@ -107,7 +118,19 @@ ship * test_create_ship(region * r, const ship_type * stype)
 ship_type * test_create_shiptype(const char * name)
 {
     ship_type * stype = st_get_or_create(name);
-    locale_setstring(default_locale, name, name);
+    stype->cptskill = 1;
+    stype->sumskill = 1;
+    stype->minskill = 1;
+    if (!stype->construction) {
+        stype->construction = calloc(1, sizeof(construction));
+        stype->construction->maxsize = 5;
+        stype->construction->minskill = 1;
+        stype->construction->reqsize = 1;
+        stype->construction->skill = SK_SHIPBUILDING;
+    }
+    if (default_locale) {
+        locale_setstring(default_locale, name, name);
+    }
     return stype;
 }
 
@@ -209,15 +232,20 @@ void test_create_world(void)
 }
 
 message * test_get_last_message(message_list *msgs) {
-    struct mlist *iter = msgs->begin;
-    while (iter->next) {
-        iter = iter->next;
+    if (msgs) {
+        struct mlist *iter = msgs->begin;
+        while (iter->next) {
+            iter = iter->next;
+        }
+        return iter->msg;
     }
-    return iter->msg;
+    return 0;
 }
 
 const char * test_get_messagetype(const message *msg) {
-    const char * name = msg->type->name;
+    const char * name;
+    assert(msg);
+    name = msg->type->name;
     if (strcmp(name, "missing_message") == 0) {
         name = (const char *)msg->parameters[0].v;
     }
@@ -227,57 +255,15 @@ const char * test_get_messagetype(const message *msg) {
     return name;
 }
 
-const message_type *register_msg(const char *type, int n_param, ...) {
-    char **argv;
-    va_list args;
-    int i;
-
-    va_start(args, n_param);
-
-    argv = malloc(sizeof(char *) * (n_param + 1));
-    for (i = 0; i < n_param; ++i) {
-        argv[i] = va_arg(args, char *);
-    }
-    argv[n_param] = 0;
-    va_end(args);
-    return mt_register(mt_new(type, (const char **)argv));
-}
-
-void assert_messages(struct CuTest * tc, struct mlist *msglist, const message_type **types,
-    int num_msgs, bool exact_match, ...) {
-    char buf[100];
-    va_list args;
-    int found = 0, argc = -1;
-    struct message *msg;
-    bool match = true;
-
-    va_start(args, exact_match);
-
-    while (msglist) {
-        msg = msglist->msg;
-        if (found >= num_msgs) {
-            if (exact_match) {
-                slprintf(buf, sizeof(buf), "too many messages: %s", msg->type->name);
-                CuFail(tc, buf);
-            } else {
-                break;
-            }
+struct message * test_find_messagetype(struct message_list *msgs, const char *name) {
+    struct mlist *ml;
+    assert(msgs);
+    for (ml = msgs->begin; ml; ml = ml->next) {
+        if (strcmp(name, test_get_messagetype(ml->msg)) == 0) {
+            return ml->msg;
         }
-        if (exact_match || match)
-            argc = va_arg(args, int);
-
-        match = strcmp(types[argc]->name, msg->type->name) == 0;
-        if (match)
-            ++found;
-        else if (exact_match)
-            CuAssertStrEquals(tc, types[argc]->name, msg->type->name);
-
-        msglist = msglist->next;
     }
-
-    CuAssertIntEquals_Msg(tc, "not enough messages", num_msgs, found);
-
-    va_end(args);
+    return 0;
 }
 
 void disabled_test(void *suite, void (*test)(CuTest *), const char *name) {

@@ -14,7 +14,7 @@
 #include <platform.h>
 #include "message.h"
 
-#include "goodies.h"
+#include "strings.h"
 #include "log.h"
 #include "quicklist.h"
 
@@ -30,6 +30,32 @@ void(*msg_log_create) (const struct message * msg) = 0;
 const char *mt_name(const message_type * mtype)
 {
     return mtype->name;
+}
+
+arg_type *argtypes = NULL;
+
+void
+register_argtype(const char *name, void(*free_arg) (variant),
+variant(*copy_arg) (variant), variant_type type)
+{
+    arg_type *atype = (arg_type *)malloc(sizeof(arg_type));
+    atype->name = name;
+    atype->next = argtypes;
+    atype->release = free_arg;
+    atype->copy = copy_arg;
+    atype->vtype = type;
+    argtypes = atype;
+}
+
+static arg_type *find_argtype(const char *name)
+{
+    arg_type *atype = argtypes;
+    while (atype != NULL) {
+        if (strcmp(atype->name, name) == 0)
+            return atype;
+        atype = atype->next;
+    }
+    return NULL;
 }
 
 message_type *mt_new(const char *name, const char *args[])
@@ -50,8 +76,8 @@ message_type *mt_new(const char *name, const char *args[])
     mtype->name = _strdup(name);
     mtype->nparameters = nparameters;
     if (nparameters > 0) {
-        mtype->pnames = (const char **)malloc(sizeof(char *) * nparameters);
-        mtype->types = (const arg_type **)malloc(sizeof(arg_type *) * nparameters);
+        mtype->pnames = (char **)malloc(sizeof(char *) * nparameters);
+        mtype->types = (arg_type **)malloc(sizeof(arg_type *) * nparameters);
     }
     else {
         mtype->pnames = NULL;
@@ -96,32 +122,6 @@ message_type *mt_new_va(const char *name, ...)
     return mt_new(name, args);
 }
 
-arg_type *argtypes = NULL;
-
-void
-register_argtype(const char *name, void(*free_arg) (variant),
-variant(*copy_arg) (variant), variant_type type)
-{
-    arg_type *atype = (arg_type *)malloc(sizeof(arg_type));
-    atype->name = name;
-    atype->next = argtypes;
-    atype->release = free_arg;
-    atype->copy = copy_arg;
-    atype->vtype = type;
-    argtypes = atype;
-}
-
-const arg_type *find_argtype(const char *name)
-{
-    arg_type *atype = argtypes;
-    while (atype != NULL) {
-        if (strcmp(atype->name, name) == 0)
-            return atype;
-        atype = atype->next;
-    }
-    return NULL;
-}
-
 static variant copy_arg(const arg_type * atype, variant data)
 {
     assert(atype != NULL);
@@ -160,6 +160,28 @@ message *msg_create(const struct message_type *mtype, variant args[])
 
 #define MT_MAXHASH 1021
 static quicklist *messagetypes[MT_MAXHASH];
+
+static void mt_free(void *val) {
+    message_type *mtype = (message_type *)val;
+    int i;
+    for (i = 0; i != mtype->nparameters; ++i) {
+        free(mtype->pnames[i]);
+    }
+    free(mtype->pnames);
+    free(mtype->types);
+    free(mtype->name);
+    free(mtype);
+}
+
+void mt_clear(void) {
+    int i;
+    for (i = 0; i != MT_MAXHASH; ++i) {
+        quicklist *ql = messagetypes[i];
+        ql_foreach(ql, mt_free);
+        ql_free(ql);
+        messagetypes[i] = 0;
+    }
+}
 
 const message_type *mt_find(const char *name)
 {

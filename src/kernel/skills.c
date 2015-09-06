@@ -206,8 +206,8 @@ int level(int days)
 void sk_set(skill * sv, int level)
 {
     assert(level != 0);
-    sv->weeks = (unsigned char)skill_weeks(level);
-    sv->level = (unsigned char)level;
+    sv->weeks = skill_weeks(level);
+    sv->level = level;
 }
 
 static int rule_random_progress(void)

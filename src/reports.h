@@ -25,6 +25,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/objtypes.h>
 #include <kernel/types.h>
 
+struct stream;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -47,12 +49,12 @@ extern "C" {
     struct unit *can_find(struct faction *, struct faction *);
 
     /* funktionen zum schreiben eines reports */
-    void sparagraph(struct strlist **SP, const char *s, int indent, char mark);
-    void lparagraph(struct strlist **SP, char *s, int indent, char mark);
+    void sparagraph(struct strlist **SP, const char *s, unsigned int indent, char mark);
+    void lparagraph(struct strlist **SP, char *s, unsigned int indent, char mark);
     const char *hp_status(const struct unit *u);
     size_t spskill(char *pbuf, size_t siz, const struct locale *lang, const struct unit *u, struct skill *sv, int *dh, int days);  /* mapper */
     void spunit(struct strlist **SP, const struct faction *f,
-        const struct unit *u, int indent, int mode);
+        const struct unit *u, unsigned int indent, int mode);
 
     int reports(void);
     int write_reports(struct faction *f, time_t ltime);
@@ -105,7 +107,7 @@ extern "C" {
     void register_reporttype(const char *extension, report_fun write,
         int flag);
 
-    int bufunit(const struct faction *f, const struct unit *u, int indent,
+    int bufunit(const struct faction *f, const struct unit *u, unsigned int indent,
         int mode, char *buf, size_t size);
 
     const char *trailinto(const struct region *r,
@@ -151,7 +153,11 @@ extern "C" {
 
     void addstrlist(strlist ** SP, const char *s);
     void freestrlist(strlist * s);
+    void split_paragraph(strlist ** SP, const char *s, unsigned int indent, unsigned int width, char mark);
 
+    int stream_printf(struct stream * out, const char *format, ...);
+
+    int count_travelthru(struct region *r, const struct faction *f);
 
 #define GR_PLURAL     0x01      /* grammar: plural */
 #define MAX_INVENTORY 128       /* maimum number of different items in an inventory */

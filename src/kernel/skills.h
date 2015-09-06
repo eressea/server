@@ -32,9 +32,9 @@ extern "C" {
         unsigned int old:8;
 #else
         int id;
-        unsigned int level;
-        unsigned int weeks;
-        unsigned int old;
+        int level;
+        int weeks;
+        int old;
 #endif
     } skill;
 

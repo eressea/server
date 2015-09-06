@@ -25,7 +25,10 @@ function embassy.init()
 end
 
 function embassy.update()
--- Muschelplateau
+    -- Muschelplateau
+    if home==nil then
+        return
+    end
     eressea.log.debug("updating embassies in " .. tostring(home))
     local u
     for u in home.units do

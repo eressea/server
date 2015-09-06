@@ -19,13 +19,16 @@
 [submodule "cutest"]
 	path = cutest
 	url = git://github.com/ennorehling/cutest.git
-[submodule "cJSON"]
-	path = cJSON
-	url = git://github.com/ennorehling/cJSON.git
 [submodule "iniparser"]
 	path = iniparser
 	url = git://github.com/ennorehling/iniparser.git
+[submodule "cJSON"]
+	path = cJSON
+	url = git://github.com/ennorehling/cJSON.git
 [submodule "storage"]
 	path = storage
 	url = git://github.com/ennorehling/storage.git
 	branch = master
+[submodule "tolua"]
+	path = tolua
+	url = git://github.com/ennorehling/tolua.git

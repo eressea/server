@@ -98,7 +98,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <limits.h>
 
 /* chance that a peasant dies of starvation: */
-#define PEASANT_STARVATION_CHANCE 0.9F
+#define PEASANT_STARVATION_CHANCE 0.9
 /* Pferdevermehrung */
 #define HORSEGROWTH 4
 /* Wanderungschance pro Pferd */
@@ -123,16 +123,6 @@ static bool RemoveNMRNewbie(void)
         gamecookie = global.cookie;
     }
     return value!=0;
-}
-
-static void checkorders(void)
-{
-    faction *f;
-
-    log_info(" - Warne spaete Spieler...");
-    for (f = factions; f; f = f->next)
-        if (!is_monsters(f) && turn - f->lastorders == NMRTimeout() - 1)
-            ADDMSG(&f->msgs, msg_message("turnreminder", ""));
 }
 
 static void age_unit(region * r, unit * u)
@@ -257,7 +247,7 @@ static void calculate_emigration(region * r)
 }
 
 
-static float peasant_growth_factor(void)
+static double peasant_growth_factor(void)
 {
     return get_param_flt(global.parameters, "rules.peasants.growth.factor", 0.0001F * PEASANTGROWTH);
 }
@@ -265,7 +255,7 @@ static float peasant_growth_factor(void)
 #ifdef SLOWLUCK
 int peasant_luck_effect(int peasants, int luck, int maxp, double variance) {
     int n, births=0;
-    float factor = peasant_growth_factor();
+    double factor = peasant_growth_factor();
     for (n = peasants; n && luck; --n) {
         int chances = 0;
 
@@ -287,7 +277,7 @@ int peasant_luck_effect(int peasants, int luck, int maxp, double variance) {
     return births;
 }
 #else
-static float peasant_luck_factor(void)
+static double peasant_luck_factor(void)
 {
     return get_param_flt(global.parameters, "rules.peasants.peasantluck.factor", PEASANTLUCK);
 }
@@ -296,12 +286,10 @@ int peasant_luck_effect(int peasants, int luck, int maxp, double variance)
 {
     int births = 0;
     double mean;
-
     if (luck == 0) return 0;
 
-    mean = _min(luck, peasants) * peasant_luck_factor()
-        * peasant_growth_factor() * ((peasants / (double)maxp < .9) ? 1 :
-        PEASANTFORCE);
+    mean = peasant_luck_factor() * peasant_growth_factor() * _min(luck, peasants);
+    mean *= ((peasants / (double)maxp < .9) ? 1 : PEASANTFORCE);
 
     births = RAND_ROUND(normalvariate(mean, variance * mean));
     if (births <= 0)
@@ -349,7 +337,7 @@ static void peasants(region * r)
     /* Es verhungert maximal die unterernährten Bevölkerung. */
 
     n = _min(peasants - satiated, rpeasants(r));
-    dead += (int)(0.5F + n * PEASANT_STARVATION_CHANCE);
+    dead += (int)(0.5 + n * PEASANT_STARVATION_CHANCE);
 
     if (dead > 0) {
         message *msg = add_message(&r->msgs, msg_message("phunger", "dead", dead));
@@ -433,7 +421,7 @@ static void horses(region * r)
     horses = rhorses(r);
     if (horses > 0) {
         if (is_cursed(r->attribs, C_CURSED_BY_THE_GODS, 0)) {
-            rsethorses(r, (int)(horses * 0.9F));
+            rsethorses(r, (int)(horses * 0.9));
         }
         else if (maxhorses) {
             int i;
@@ -445,7 +433,7 @@ static void horses(region * r)
                 if (a_find(r->attribs, &at_horseluck))
                     growth *= 2;
                 /* printf("Horses: <%d> %d -> ", growth, horses); */
-                i = (int)(0.5F + (horses * 0.0001F) * growth);
+                i = (int)(0.5 + (horses * 0.0001) * growth);
                 /* printf("%d\n", horses); */
                 rsethorses(r, horses + i);
             }
@@ -683,7 +671,7 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
         a->data.sa[1] = (short)(sprout - grownup_trees);
         /* aus dem gesamt Sprößlingepool abziehen */
         rsettrees(r, 1, rtrees(r, 1) - grownup_trees);
-        /* zu den bäumen hinzufügen */
+        /* zu den Bäumen hinzufügen */
         rsettrees(r, 2, rtrees(r, 2) + grownup_trees);
     }
 }
@@ -732,6 +720,48 @@ void immigration(void)
             {
                 peasants += (int)(rng_double()*(wage(r, NULL, NULL, turn) - 9));
                 rsetpeasants(r, peasants);
+            }
+        }
+    }
+}
+
+void nmr_warnings(void)
+{
+    faction *f, *fa;
+#define FRIEND (HELP_GUARD|HELP_MONEY)
+    for (f = factions; f; f = f->next) {
+        if (f->age <= 1) {
+            ADDMSG(&f->msgs, msg_message("changepasswd", "value", f->passw));
+        }
+        if (!fval(f, FFL_NOIDLEOUT) && turn > f->lastorders) {
+            ADDMSG(&f->msgs, msg_message("nmr_warning", ""));
+            if (turn - f->lastorders == NMRTimeout() - 1) {
+                ADDMSG(&f->msgs, msg_message("nmr_warning_final", ""));
+            }
+            if ((turn - f->lastorders) >= 2) {
+                message *msg = NULL;
+                for (fa = factions; fa; fa = fa->next) {
+                    int warn = 0;
+                    if (get_param_int(global.parameters, "rules.alliances", 0) != 0) {
+                        if (f->alliance && f->alliance == fa->alliance) {
+                            warn = 1;
+                        }
+                    }
+                    else if (alliedfaction(NULL, f, fa, FRIEND)
+                        && alliedfaction(NULL, fa, f, FRIEND)) {
+                        warn = 1;
+                    }
+                    if (warn) {
+                        if (msg == NULL) {
+                            msg =
+                                msg_message("warn_dropout", "faction turns", f,
+                                turn - f->lastorders);
+                        }
+                        add_message(&fa->msgs, msg);
+                    }
+                }
+                if (msg != NULL)
+                    msg_release(msg);
             }
         }
     }
@@ -812,7 +842,6 @@ void demographics(void)
 
     remove_empty_units();
     immigration();
-    checkorders();
 }
 
 /* ------------------------------------------------------------- */
@@ -1321,10 +1350,12 @@ int ally_cmd(unit * u, struct order *ord)
 
     s = gettoken(token, sizeof(token));
 
-    if (s && !s[0])
+    if (!s || !s[0]) {
         keyword = P_ANY;
-    else
+    } 
+    else {
         keyword = findparam(s, u->faction->locale);
+    }
 
     sfp = &u->faction->allies;
     if (fval(u, UFL_GROUP)) {
@@ -1501,9 +1532,10 @@ int prefix_cmd(unit * u, struct order *ord)
         ap = &u->faction->attribs;
         if (fval(u, UFL_GROUP)) {
             attrib *a = a_find(u->attribs, &at_group);
-            group *g = (group *)a->data.v;
-            if (a)
+            if (a) {
+				group *g = (group *)a->data.v;
                 ap = &g->attribs;
+			}
         }
         set_prefix(ap, race_prefixes[var.i]);
     }
@@ -1739,10 +1771,11 @@ int name_cmd(struct unit *u, struct order *ord)
             }
             else {
                 const struct locale *lang = locales;
+                size_t f_len = strlen(f->name);
                 for (; lang; lang = nextlocale(lang)) {
                     const char *fdname = LOC(lang, "factiondefault");
                     size_t fdlen = strlen(fdname);
-                    if (strlen(f->name) >= fdlen && strncmp(f->name, fdname, fdlen) == 0) {
+                    if (f_len >= fdlen && strncmp(f->name, fdname, fdlen) == 0) {
                         break;
                     }
                 }
@@ -1776,18 +1809,17 @@ int name_cmd(struct unit *u, struct order *ord)
             }
             else {
                 const struct locale *lang = locales;
+                size_t sh_len = strlen(sh->name);
                 for (; lang; lang = nextlocale(lang)) {
                     const char *sdname = LOC(lang, sh->type->_name);
                     size_t sdlen = strlen(sdname);
-                    if (strlen(sh->name) >= sdlen
-                        && strncmp(sh->name, sdname, sdlen) == 0) {
+                    if (sh_len >= sdlen && strncmp(sh->name, sdname, sdlen) == 0) {
                         break;
                     }
 
                     sdname = LOC(lang, parameters[P_SHIP]);
                     sdlen = strlen(sdname);
-                    if (strlen(sh->name) >= sdlen
-                        && strncmp(sh->name, sdname, sdlen) == 0) {
+                    if (sh_len >= sdlen && strncmp(sh->name, sdname, sdlen) == 0) {
                         break;
                     }
 
@@ -2281,14 +2313,15 @@ static bool display_race(faction * f, unit * u, const race * rc)
     int a, at_count;
     char buf[2048], *bufp = buf;
     size_t size = sizeof(buf) - 1;
-    int bytes;
+    size_t bytes;
 
     if (u && u_race(u) != rc)
         return false;
     name = rc_name_s(rc, NAME_SINGULAR);
 
     bytes = slprintf(bufp, size, "%s: ", LOC(f->locale, name));
-    if (wrptr(&bufp, &size, bytes) != 0)
+    assert(bytes <= INT_MAX);
+    if (wrptr(&bufp, &size, (int)bytes) != 0)
         WARN_STATIC_BUFFER();
 
     key = mkname("raceinfo", rc->_name);
@@ -2297,36 +2330,38 @@ static bool display_race(faction * f, unit * u, const race * rc)
         info = LOC(f->locale, mkname("raceinfo", "no_info"));
     }
 
-    bytes = (int)strlcpy(bufp, info, size);
-    if (wrptr(&bufp, &size, bytes) != 0)
-        WARN_STATIC_BUFFER();
+    bufp = STRLCPY(bufp, info, size);
 
     /* hp_p : Trefferpunkte */
     bytes =
         slprintf(bufp, size, " %d %s", rc->hitpoints, LOC(f->locale,
         "stat_hitpoints"));
-    if (wrptr(&bufp, &size, bytes) != 0)
+    assert(bytes <= INT_MAX);
+    if (wrptr(&bufp, &size, (int)bytes) != 0)
         WARN_STATIC_BUFFER();
 
     /* b_attacke : Angriff */
     bytes =
         slprintf(bufp, size, ", %s: %d", LOC(f->locale, "stat_attack"),
         (rc->at_default + rc->at_bonus));
-    if (wrptr(&bufp, &size, bytes) != 0)
+    assert(bytes <= INT_MAX);
+    if (wrptr(&bufp, &size, (int)bytes) != 0)
         WARN_STATIC_BUFFER();
 
     /* b_defense : Verteidigung */
     bytes =
         slprintf(bufp, size, ", %s: %d", LOC(f->locale, "stat_defense"),
         (rc->df_default + rc->df_bonus));
-    if (wrptr(&bufp, &size, bytes) != 0)
+    assert(bytes <= INT_MAX);
+    if (wrptr(&bufp, &size, (int)bytes) != 0)
         WARN_STATIC_BUFFER();
 
     /* b_armor : Rüstung */
     if (rc->armor > 0) {
         bytes =
             slprintf(bufp, size, ", %s: %d", LOC(f->locale, "stat_armor"), rc->armor);
-        if (wrptr(&bufp, &size, bytes) != 0)
+        assert(bytes <= INT_MAX);
+        if (wrptr(&bufp, &size, (int)bytes) != 0)
             WARN_STATIC_BUFFER();
     }
 
@@ -2345,50 +2380,41 @@ static bool display_race(faction * f, unit * u, const race * rc)
         }
     }
     if (rc->battle_flags & BF_EQUIPMENT) {
-        bytes = _snprintf(bufp, size, " %s", LOC(f->locale, "stat_equipment"));
-        if (wrptr(&bufp, &size, bytes) != 0)
+        if (wrptr(&bufp, &size, _snprintf(bufp, size, " %s", LOC(f->locale, "stat_equipment"))) != 0)
             WARN_STATIC_BUFFER();
     }
     if (rc->battle_flags & BF_RES_PIERCE) {
-        bytes = _snprintf(bufp, size, " %s", LOC(f->locale, "stat_pierce"));
-        if (wrptr(&bufp, &size, bytes) != 0)
+        if (wrptr(&bufp, &size, _snprintf(bufp, size, " %s", LOC(f->locale, "stat_pierce"))) != 0)
             WARN_STATIC_BUFFER();
     }
     if (rc->battle_flags & BF_RES_CUT) {
-        bytes = _snprintf(bufp, size, " %s", LOC(f->locale, "stat_cut"));
-        if (wrptr(&bufp, &size, bytes) != 0)
+        if (wrptr(&bufp, &size, _snprintf(bufp, size, " %s", LOC(f->locale, "stat_cut"))) != 0)
             WARN_STATIC_BUFFER();
     }
     if (rc->battle_flags & BF_RES_BASH) {
-        bytes = _snprintf(bufp, size, " %s", LOC(f->locale, "stat_bash"));
-        if (wrptr(&bufp, &size, bytes) != 0)
+        if (wrptr(&bufp, &size, _snprintf(bufp, size, " %s", LOC(f->locale, "stat_bash"))) != 0)
             WARN_STATIC_BUFFER();
     }
 
-    bytes =
-        _snprintf(bufp, size, " %d %s", at_count, LOC(f->locale,
-        (at_count == 1) ? "stat_attack" : "stat_attacks"));
-    if (wrptr(&bufp, &size, bytes) != 0)
+    if (wrptr(&bufp, &size, _snprintf(bufp, size, " %d %s", at_count, LOC(f->locale, (at_count == 1) ? "stat_attack" : "stat_attacks"))) != 0)
         WARN_STATIC_BUFFER();
 
     for (a = 0; a < RACE_ATTACKS; a++) {
         if (rc->attack[a].type != AT_NONE) {
             if (a != 0)
-                bytes = (int)strlcpy(bufp, ", ", size);
+                bufp = STRLCPY(bufp, ", ", size);
             else
-                bytes = (int)strlcpy(bufp, ": ", size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
+                bufp = STRLCPY(bufp, ": ", size);
 
             switch (rc->attack[a].type) {
             case AT_STANDARD:
                 bytes =
-                    _snprintf(bufp, size, "%s (%s)",
+                    (size_t)_snprintf(bufp, size, "%s (%s)",
                     LOC(f->locale, "attack_standard"), rc->def_damage);
                 break;
             case AT_NATURAL:
                 bytes =
-                    _snprintf(bufp, size, "%s (%s)",
+                    (size_t)_snprintf(bufp, size, "%s (%s)",
                     LOC(f->locale, "attack_natural"), rc->attack[a].data.dice);
                 break;
             case AT_SPELL:
@@ -2396,18 +2422,19 @@ static bool display_race(faction * f, unit * u, const race * rc)
             case AT_DRAIN_ST:
             case AT_DRAIN_EXP:
             case AT_DAZZLE:
-                bytes = _snprintf(bufp, size, "%s", LOC(f->locale, "attack_magical"));
+                bytes = (size_t)_snprintf(bufp, size, "%s", LOC(f->locale, "attack_magical"));
                 break;
             case AT_STRUCTURAL:
                 bytes =
-                    _snprintf(bufp, size, "%s (%s)",
+                    (size_t)_snprintf(bufp, size, "%s (%s)",
                     LOC(f->locale, "attack_structural"), rc->attack[a].data.dice);
                 break;
             default:
                 bytes = 0;
             }
 
-            if (bytes && wrptr(&bufp, &size, bytes) != 0)
+            assert(bytes <= INT_MAX);
+            if (bytes && wrptr(&bufp, &size, (int)bytes) != 0)
                 WARN_STATIC_BUFFER();
         }
     }
@@ -2544,7 +2571,7 @@ int origin_cmd(unit * u, struct order *ord)
     px = (short)getint();
     py = (short)getint();
 
-    set_origin(u->faction, getplaneid(u->region), px, py);
+    faction_setorigin(u->faction, getplaneid(u->region), px, py);
     return 0;
 }
 
@@ -2677,7 +2704,7 @@ enum { E_GUARD_OK, E_GUARD_UNARMED, E_GUARD_NEWBIE, E_GUARD_FLEEING };
 
 static int can_start_guarding(const unit * u)
 {
-    if (u->status >= ST_FLEE)
+    if (u->status >= ST_FLEE || fval(u, UFL_FLEEING))
         return E_GUARD_FLEEING;
     if (fval(u_race(u), RCF_UNARMEDGUARD))
         return E_GUARD_OK;
@@ -2714,12 +2741,15 @@ void update_guards(void)
 int guard_on_cmd(unit * u, struct order *ord)
 {
     assert(getkeyword(ord) == K_GUARD);
+    assert(u);
+    assert(u->faction);
 
     init_order(ord);
 
     /* GUARD NOT is handled in goard_off_cmd earlier in the turn */
-    if (getparam(u->faction->locale) == P_NOT)
+    if (getparam(u->faction->locale) == P_NOT) {
         return 0;
+    }
 
     if (fval(u->region->terrain, SEA_REGION)) {
         cmistake(u, ord, 2, MSG_EVENT);
@@ -2765,17 +2795,17 @@ void sinkships(struct region * r)
         ship *sh = *shp;
 
         if (!sh->type->construction || sh->size >= sh->type->construction->maxsize) {
-            if (fval(r->terrain, SEA_REGION) && (!enoughsailors(sh, r)
-                || get_captain(sh) == NULL)) {
-                /* Schiff nicht seetüchtig */
-                float dmg = get_param_flt(global.parameters,
-                    "rules.ship.damage.nocrewocean",
-                    0.30F);
-                damage_ship(sh, dmg);
-            }
-            if (ship_owner(sh) == NULL) {
-                float dmg = get_param_flt(global.parameters, "rules.ship.damage.nocrew",
-                    0.05F);
+            if (fval(r->terrain, SEA_REGION)) {
+                if (!enoughsailors(sh, crew_skill(sh))) {
+                    // ship is at sea, but not enough people to control it
+                    float dmg = get_param_flt(global.parameters,
+                        "rules.ship.damage.nocrewocean",
+                        0.30F);
+                    damage_ship(sh, dmg);
+                }
+            } else if (!ship_owner(sh)) {
+                // any ship lying around without an owner slowly rots
+                float dmg = get_param_flt(global.parameters, "rules.ship.damage.nocrew", 0.05F);
                 damage_ship(sh, dmg);
             }
         }
@@ -2896,7 +2926,7 @@ void restack_units(void)
                             cmistake(u, ord, 260, MSG_EVENT);
                         }
                         else if (v == u) {
-                            cmistake(u, ord, 10, MSG_EVENT);
+                            syntax_error(u, ord);
                         }
                         else {
                             switch (p) {
@@ -2990,13 +3020,7 @@ int renumber_cmd(unit * u, order * ord)
                 break;
             }
         }
-        uunhash(u);
-        if (!ualias(u)) {
-            attrib *a = a_add(&u->attribs, a_new(&at_alias));
-            a->data.i = -u->no;
-        }
-        u->no = i;
-        uhash(u);
+        renumber_unit(u, i);
         break;
 
     case P_SHIP:
@@ -3130,7 +3154,7 @@ static building *age_building(building * b)
             else if (mage != NULL) {
                 int sk = effskill(mage, SK_MAGIC);
                 c->duration = _max(c->duration, sk / 2);
-                c->vigour = _max(c->vigour, sk);
+                c->vigour = _max(c->vigour, (float)sk);
             }
         }
     }
@@ -3348,7 +3372,7 @@ void new_units(void)
                     }
                     u2 = create_unit(r, u->faction, 0, u->faction->race, alias, name, u);
                     if (name != NULL)
-                        free(name);
+                        free(name); // TODO: use a buffer on the stack instead?
                     fset(u2, UFL_ISNEW);
 
                     a_add(&u2->attribs, a_new(&at_alias))->data.i = alias;
@@ -3377,126 +3401,101 @@ void new_units(void)
     }
 }
 
-/** Checks for two long orders and issues a warning if necessary.
- */
-void check_long_orders(unit * u)
+void update_long_order(unit * u)
 {
     order *ord;
-    keyword_t otherorder = MAXKEYWORDS;
+    bool exclusive = true;
+    keyword_t thiskwd = NOKEYWORD;
+    bool hunger = LongHunger(u);
 
+    freset(u, UFL_MOVED);
+    freset(u, UFL_LONGACTION);
+
+    /* check all orders for a potential new long order this round: */
     for (ord = u->orders; ord; ord = ord->next) {
-        if (getkeyword(ord) == NOKEYWORD) {
-            cmistake(u, ord, 22, MSG_EVENT);
+        keyword_t kwd = getkeyword(ord);
+        if (kwd == NOKEYWORD) continue;
+
+        if (u->old_orders && is_repeated(kwd)) {
+            /* this new order will replace the old defaults */
+            free_orders(&u->old_orders);
         }
-        else if (is_long(ord)) {
-            keyword_t longorder = getkeyword(ord);
-            if (otherorder != MAXKEYWORDS) {
-                switch (longorder) {
+
+        // hungry units do not get long orders:
+        if (hunger)  {
+            if (u->old_orders) {
+                // keep looking for repeated orders that might clear the old_orders
+                continue;
+            }
+            break;
+        }
+
+        if (is_long(kwd)) {
+            if (thiskwd == NOKEYWORD) {
+                // we have found the (first) long order
+                // some long orders can have multiple instances:
+                switch (kwd) {
+                    /* Wenn gehandelt wird, darf kein langer Befehl ausgeführt
+                    * werden. Da Handel erst nach anderen langen Befehlen kommt,
+                    * muss das vorher abgefangen werden. Wir merken uns also
+                    * hier, ob die Einheit handelt. */
+                case K_BUY:
+                case K_SELL:
                 case K_CAST:
-                    if (otherorder != longorder) {
+                    // non-exclusive orders can be used with others. BUY can be paired with SELL,
+                    // CAST with other CAST orders. compatibility is checked once the second
+                    // long order is analyzed (below).
+                    exclusive = false;
+                    break;
+
+                default:
+                    set_order(&u->thisorder, copy_order(ord));
+                    break;
+                }
+                thiskwd = kwd;
+            }
+            else {
+                // we have found a second long order. this is okay for some, but not all commands.
+                // u->thisorder is already set, and should not have to be updated.
+                switch (kwd) {
+                case K_CAST:
+                    if (thiskwd != K_CAST) {
+                        cmistake(u, ord, 52, MSG_EVENT);
+                    }
+                    break;
+                case K_SELL:
+                    if (thiskwd != K_SELL && thiskwd != K_BUY) {
                         cmistake(u, ord, 52, MSG_EVENT);
                     }
                     break;
                 case K_BUY:
-                    if (otherorder == K_SELL) {
-                        otherorder = K_BUY;
+                    if (thiskwd != K_SELL) {
+                        cmistake(u, ord, 52, MSG_EVENT);
+                    }
+                    else {
+                        thiskwd = K_BUY;
+                    }
+                    break;
+                default:
+                    // TODO: decide https://bugs.eressea.de/view.php?id=2080#c6011
+                    if (kwd > thiskwd) {
+                        // swap out thisorder for the new one
+                        cmistake(u, u->thisorder, 52, MSG_EVENT);
+                        set_order(&u->thisorder, copy_order(ord));
                     }
                     else {
                         cmistake(u, ord, 52, MSG_EVENT);
                     }
                     break;
-                case K_SELL:
-                    if (otherorder != K_SELL && otherorder != K_BUY) {
-                        cmistake(u, ord, 52, MSG_EVENT);
-                    }
-                    break;
-                default:
-                    cmistake(u, ord, 52, MSG_EVENT);
                 }
             }
-            else {
-                otherorder = longorder;
-            }
         }
     }
-}
-
-void update_long_order(unit * u)
-{
-    order *ord;
-    bool trade = false;
-    bool hunger = LongHunger(u);
-
-    freset(u, UFL_MOVED);
-    freset(u, UFL_LONGACTION);
     if (hunger) {
-        /* Hungernde Einheiten führen NUR den default-Befehl aus */
+        // Hungernde Einheiten führen NUR den default-Befehl aus
         set_order(&u->thisorder, default_order(u->faction->locale));
-    }
-    else {
-        check_long_orders(u);
-    }
-    /* check all orders for a potential new long order this round: */
-    for (ord = u->orders; ord; ord = ord->next) {
-        if (getkeyword(ord) == NOKEYWORD)
-            continue;
-
-        if (u->old_orders && is_repeated(ord)) {
-            /* this new order will replace the old defaults */
-            free_orders(&u->old_orders);
-            if (hunger)
-                break;
-        }
-        if (hunger)
-            continue;
-
-        if (is_exclusive(ord)) {
-            /* über dieser Zeile nur Befehle, die auch eine idle Faction machen darf */
-            if (idle(u->faction)) {
-                set_order(&u->thisorder, default_order(u->faction->locale));
-            }
-            else {
-                set_order(&u->thisorder, copy_order(ord));
-            }
-            break;
-        }
-        else {
-            keyword_t keyword = getkeyword(ord);
-            switch (keyword) {
-                /* Wenn gehandelt wird, darf kein langer Befehl ausgeführt
-                 * werden. Da Handel erst nach anderen langen Befehlen kommt,
-                 * muss das vorher abgefangen werden. Wir merken uns also
-                 * hier, ob die Einheit handelt. */
-            case K_BUY:
-            case K_SELL:
-                /* Wenn die Einheit handelt, muss der Default-Befehl gelöscht
-                 * werden.
-                 * Wird je diese Ausschliesslichkeit aufgehoben, muss man aufpassen
-                 * mit der Reihenfolge von Kaufen, Verkaufen etc., damit es Spielern
-                 * nicht moeglich ist, Schulden zu machen. */
-                trade = true;
-                break;
-
-            case K_CAST:
-                /* dient dazu, das neben Zaubern kein weiterer Befehl
-                 * ausgeführt werden kann, Zaubern ist ein kurzer Befehl */
-                set_order(&u->thisorder, copy_order(ord));
-                break;
-
-            default:
-                break;
-            }
-        }
-    }
-
-    if (hunger) {
-        return;
-    }
-    /* Wenn die Einheit handelt, muss der Default-Befehl gelöscht
-     * werden. */
-
-    if (trade) {
-        /* fset(u, UFL_LONGACTION|UFL_NOTMOVING); */
+    } else if (!exclusive) {
+        // Wenn die Einheit handelt oder zaubert, muss der Default-Befehl gelöscht werden.
         set_order(&u->thisorder, NULL);
     }
 }
@@ -3666,6 +3665,7 @@ void defaultorders(void)
                     free_order(ord);
                     if (!neworders) {
                         /* lange Befehle aus orders und old_orders löschen zu gunsten des neuen */
+                        // TODO: why only is_exclusive, not is_long? what about CAST, BUY, SELL?
                         remove_exclusive(&u->orders);
                         remove_exclusive(&u->old_orders);
                         neworders = true;
@@ -3774,6 +3774,10 @@ int use_cmd(unit * u, struct order *ord)
     init_order(ord);
 
     t = gettoken(token, sizeof(token));
+    if (!t) {
+        cmistake(u, ord, 43, MSG_PRODUCE);
+        return err;
+    }
     n = atoi((const char *)t);
     if (n == 0) {
         if (isparam(t, u->faction->locale, P_ANY)) {
@@ -4309,34 +4313,17 @@ static void enter_2(region * r)
     do_enter(r, 1);
 }
 
-static bool help_enter(unit *uo, unit *u) {
+bool help_enter(unit *uo, unit *u) {
     return uo->faction == u->faction || alliedunit(uo, u->faction, HELP_GUARD);
 }
 
-void force_leave(region *r) {
-    unit *u;
-    for (u = r->units; u; u = u->next) {
-        unit *uo = NULL;
-        if (u->building) {
-            uo = building_owner(u->building);
-        }
-        if (u->ship && r->land) {
-            uo = ship_owner(u->ship);
-        }
-        if (uo && !help_enter(uo, u)) {
-            message *msg = NULL;
-            if (u->building) {
-                msg = msg_message("force_leave_building", "unit owner building", u, uo, u->building);
-            }
-            else {
-                msg = msg_message("force_leave_ship", "unit owner ship", u, uo, u->ship);
-            }
-            if (msg) {
-                ADDMSG(&u->faction->msgs, msg);
-            }
-            leave(u, false);
-        }
-    }
+static void do_force_leave(region *r) {
+    force_leave(r, NULL);
+}
+
+bool rule_force_leave(int flags) {
+    int rules = get_param_int(global.parameters, "rules.owners.force_leave", 0);
+    return (rules&flags) == flags;
 }
 
 static void maintain_buildings_1(region * r)
@@ -4375,7 +4362,14 @@ void init_processor(void)
 {
     int p;
 
+    while (processors) {
+        processor * next = processors->next;
+        free(processors);
+        processors = next;
+    }
+
     p = 10;
+    add_proc_global(p, nmr_warnings, "NMR Warnings");
     add_proc_global(p, new_units, "Neue Einheiten erschaffen");
 
     p += 10;
@@ -4387,17 +4381,17 @@ void init_processor(void)
     add_proc_order(p, K_GROUP, group_cmd, 0, NULL);
 
     p += 10;
-    add_proc_order(p, K_QUIT, &quit_cmd, 0, NULL);
-//    add_proc_order(p, K_URSPRUNG, &origin_cmd, 0, NULL);
-    add_proc_order(p, K_ALLY, &ally_cmd, 0, NULL);
-    add_proc_order(p, K_PREFIX, &prefix_cmd, 0, NULL);
-    add_proc_order(p, K_SETSTEALTH, &setstealth_cmd, 0, NULL);
-    add_proc_order(p, K_STATUS, &status_cmd, 0, NULL);
-    add_proc_order(p, K_COMBATSPELL, &combatspell_cmd, 0, NULL);
-    add_proc_order(p, K_DISPLAY, &display_cmd, 0, NULL);
-    add_proc_order(p, K_NAME, &name_cmd, 0, NULL);
-    add_proc_order(p, K_GUARD, &guard_off_cmd, 0, NULL);
-    add_proc_order(p, K_RESHOW, &reshow_cmd, 0, NULL);
+    add_proc_order(p, K_QUIT, quit_cmd, 0, NULL);
+    add_proc_order(p, K_URSPRUNG, origin_cmd, 0, NULL);
+    add_proc_order(p, K_ALLY, ally_cmd, 0, NULL);
+    add_proc_order(p, K_PREFIX, prefix_cmd, 0, NULL);
+    add_proc_order(p, K_SETSTEALTH, setstealth_cmd, 0, NULL);
+    add_proc_order(p, K_STATUS, status_cmd, 0, NULL);
+    add_proc_order(p, K_COMBATSPELL, combatspell_cmd, 0, NULL);
+    add_proc_order(p, K_DISPLAY, display_cmd, 0, NULL);
+    add_proc_order(p, K_NAME, name_cmd, 0, NULL);
+    add_proc_order(p, K_GUARD, guard_off_cmd, 0, NULL);
+    add_proc_order(p, K_RESHOW, reshow_cmd, 0, NULL);
 
     if (get_param_int(global.parameters, "rules.alliances", 0) == 1) {
         p += 10;
@@ -4409,7 +4403,7 @@ void init_processor(void)
     add_proc_order(p, K_MAIL, mail_cmd, 0, "Botschaften");
 
     p += 10;                      /* all claims must be done before we can USE */
-    add_proc_region(p, &enter_1, "Betreten (1. Versuch)");     /* for GIVE CONTROL */
+    add_proc_region(p, enter_1, "Betreten (1. Versuch)");     /* for GIVE CONTROL */
     add_proc_order(p, K_USE, use_cmd, 0, "Benutzen");
 
     p += 10;                      /* in case it has any effects on alliance victories */
@@ -4432,25 +4426,25 @@ void init_processor(void)
     p += 10;                      /* can't allow reserve before siege (weapons) */
     add_proc_region(p, enter_1, "Betreten (3. Versuch)");  /* to claim a castle after a victory and to be able to DESTROY it in the same turn */
     if (get_param_int(global.parameters, "rules.reserve.twophase", 0)) {
-        add_proc_order(p, K_RESERVE, &reserve_self, 0, "RESERVE (self)");
+        add_proc_order(p, K_RESERVE, reserve_self, 0, "RESERVE (self)");
         p += 10;
     }
-    add_proc_order(p, K_RESERVE, &reserve_cmd, 0, "RESERVE (all)");
-    add_proc_order(p, K_CLAIM, &claim_cmd, 0, NULL);
+    add_proc_order(p, K_RESERVE, reserve_cmd, 0, "RESERVE (all)");
+    add_proc_order(p, K_CLAIM, claim_cmd, 0, NULL);
     add_proc_unit(p, follow_unit, "Folge auf Einheiten setzen");
 
     p += 10;                      /* rest rng again before economics */
-    if (get_param_int(global.parameters, "rules.owners.force_leave", 0)) {
-        add_proc_region(p, force_leave, "kick non-allies out of buildings/ships");
+    if (rule_force_leave(FORCE_LEAVE_ALL)) {
+        add_proc_region(p, do_force_leave, "kick non-allies out of buildings/ships");
     }
     add_proc_region(p, economics, "Zerstoeren, Geben, Rekrutieren, Vergessen");
-    add_proc_order(p, K_PROMOTION, &promotion_cmd, 0, "Heldenbefoerderung");
+    add_proc_order(p, K_PROMOTION, promotion_cmd, 0, "Heldenbefoerderung");
 
     p += 10;
     if (!keyword_disabled(K_PAY)) {
-        add_proc_order(p, K_PAY, &pay_cmd, 0, "Gebaeudeunterhalt (disable)");
+        add_proc_order(p, K_PAY, pay_cmd, 0, "Gebaeudeunterhalt (disable)");
     }
-    add_proc_postregion(p, &maintain_buildings_1,
+    add_proc_postregion(p, maintain_buildings_1,
         "Gebaeudeunterhalt (1. Versuch)");
 
     p += 10;                      /* QUIT fuer sich alleine */
@@ -4458,79 +4452,74 @@ void init_processor(void)
 
     if (!keyword_disabled(K_CAST)) {
         p += 10;
-        add_proc_global(p, &magic, "Zaubern");
+        add_proc_global(p, magic, "Zaubern");
     }
 
     p += 10;
-    add_proc_order(p, K_TEACH, &teach_cmd, PROC_THISORDER | PROC_LONGORDER,
+    add_proc_order(p, K_TEACH, teach_cmd, PROC_THISORDER | PROC_LONGORDER,
         "Lehren");
     p += 10;
-    add_proc_order(p, K_STUDY, &learn_cmd, PROC_THISORDER | PROC_LONGORDER,
+    add_proc_order(p, K_STUDY, study_cmd, PROC_THISORDER | PROC_LONGORDER,
         "Lernen");
 
     p += 10;
-    add_proc_order(p, K_MAKE, &make_cmd, PROC_THISORDER | PROC_LONGORDER,
+    add_proc_order(p, K_MAKE, make_cmd, PROC_THISORDER | PROC_LONGORDER,
         "Produktion");
-    add_proc_postregion(p, &produce, "Arbeiten, Handel, Rekruten");
-    add_proc_postregion(p, &split_allocations, "Produktion II");
+    add_proc_postregion(p, produce, "Arbeiten, Handel, Rekruten");
+    add_proc_postregion(p, split_allocations, "Produktion II");
 
     p += 10;
-    add_proc_region(p, &enter_2, "Betreten (4. Versuch)"); /* Once again after QUIT */
+    add_proc_region(p, enter_2, "Betreten (4. Versuch)"); /* Once again after QUIT */
 
     p += 10;
-    add_proc_region(p, &sinkships, "Schiffe sinken");
+    add_proc_region(p, sinkships, "Schiffe sinken");
 
     p += 10;
-    add_proc_global(p, &movement, "Bewegungen");
+    add_proc_global(p, movement, "Bewegungen");
 
     if (get_param_int(global.parameters, "work.auto", 0)) {
         p += 10;
-        add_proc_region(p, &auto_work, "Arbeiten (auto)");
+        add_proc_region(p, auto_work, "Arbeiten (auto)");
     }
 
     p += 10;
-    add_proc_order(p, K_GUARD, &guard_on_cmd, 0, "Bewache (an)");
+    add_proc_order(p, K_GUARD, guard_on_cmd, 0, "Bewache (an)");
 
     if (get_param_int(global.parameters, "rules.encounters", 0)) {
         p += 10;
-        add_proc_global(p, &encounters, "Zufallsbegegnungen");
+        add_proc_global(p, encounters, "Zufallsbegegnungen");
     }
 
     p += 10;
-    add_proc_unit(p, &monster_kills_peasants,
+    add_proc_unit(p, monster_kills_peasants,
         "Monster fressen und vertreiben Bauern");
 
     p += 10;
-    add_proc_global(p, &randomevents, "Zufallsereignisse");
+    add_proc_global(p, randomevents, "Zufallsereignisse");
 
     p += 10;
 
-    add_proc_global(p, &monthly_healing, "Regeneration (HP)");
-    add_proc_global(p, &regenerate_aura, "Regeneration (Aura)");
+    add_proc_global(p, monthly_healing, "Regeneration (HP)");
+    add_proc_global(p, regenerate_aura, "Regeneration (Aura)");
     if (!keyword_disabled(K_DEFAULT)) {
-        add_proc_global(p, &defaultorders, "Defaults setzen");
+        add_proc_global(p, defaultorders, "Defaults setzen");
     }
-    add_proc_global(p, &demographics, "Nahrung, Seuchen, Wachstum, Wanderung");
+    add_proc_global(p, demographics, "Nahrung, Seuchen, Wachstum, Wanderung");
 
     if (!keyword_disabled(K_SORT)) {
         p += 10;
         add_proc_global(p, restack_units, "Einheiten sortieren");
     }
     if (!keyword_disabled(K_NUMBER)) {
-        add_proc_order(p, K_NUMBER, &renumber_cmd, 0, "Neue Nummern (Einheiten)");
+        add_proc_order(p, K_NUMBER, renumber_cmd, 0, "Neue Nummern (Einheiten)");
         p += 10;
-        add_proc_global(p, &renumber_factions, "Neue Nummern");
+        add_proc_global(p, renumber_factions, "Neue Nummern");
     }
 }
 
 void processorders(void)
 {
-    static int init = 0;
-
-    if (!init) {
-        init_processor();
-        init = 1;
-    }
+    init_processor();
     process();
     /*************************************************/
 

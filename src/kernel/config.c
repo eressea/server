@@ -855,7 +855,7 @@ int forbiddenid(int id)
             ++len;
         forbid = calloc(len, sizeof(int));
         for (i = 0; i != len; ++i) {
-            forbid[i] = strtol(forbidden[i], NULL, 36);
+            forbid[i] = atoi36(forbidden[i]);
         }
     }
     for (i = 0; i != len; ++i)
@@ -906,11 +906,6 @@ int newcontainerid(void)
     return random_no;
 }
 
-bool idle(faction * f)
-{
-    return (bool)(f ? false : true);
-}
-
 int maxworkingpeasants(const struct region *r)
 {
     int size = production(r);
@@ -922,6 +917,10 @@ static const char * parameter_key(int i)
 {
     assert(i < MAXPARAMS && i >= 0);
     return parameters[i];
+}
+
+void init_parameters(struct locale *lang) {
+    init_translations(lang, UT_PARAMS, parameter_key, MAXPARAMS);
 }
 
 
@@ -993,7 +992,7 @@ void init_locale(struct locale *lang)
                 addtoken(tokens, name, var);
             }
             else {
-                log_error("no translation for magic school %s in locale %s", tok, locale_name(lang));
+                log_warning("no translation for magic school %s in locale %s", tok, locale_name(lang));
             }
             tok = strtok(NULL, " ");
         }
@@ -1014,7 +1013,7 @@ void init_locale(struct locale *lang)
         if (name) addtoken(tokens, name, var);
     }
 
-    init_translations(lang, UT_PARAMS, parameter_key, MAXPARAMS);
+    init_parameters(lang);
 
     init_options_translation(lang);
     init_terrains_translation(lang);
@@ -1201,7 +1200,7 @@ void setguard(unit * u, unsigned int flags)
     }
     fset(u, UFL_GUARD);
     fset(u->region, RF_GUARDED);
-    if ((int)flags == guard_flags(u)) {
+    if (flags == guard_flags(u)) {
         if (a)
             a_remove(&u->attribs, a);
     }
@@ -1677,6 +1676,7 @@ void attrib_init(void)
 void kernel_init(void)
 {
     register_reports();
+    mt_clear();
     if (!mt_find("missing_message")) {
         mt_register(mt_new_va("missing_message", "name:string", 0));
         mt_register(mt_new_va("missing_feedback", "unit:unit", "region:region", "command:order", "name:string", 0));
@@ -1686,6 +1686,11 @@ void kernel_init(void)
 }
 
 static order * defaults[MAXLOCALES];
+keyword_t default_keyword = NOKEYWORD;
+
+void set_default_order(int kwd) {
+    default_keyword = (keyword_t)kwd;
+}
 
 order *default_order(const struct locale *lang)
 {
@@ -1693,6 +1698,11 @@ order *default_order(const struct locale *lang)
     int i = locale_index(lang);
     order *result = 0;
     assert(i < MAXLOCALES);
+
+    if (default_keyword!=NOKEYWORD) {
+        return create_order(default_keyword, lang, 0);
+    }
+
     result = defaults[i];
     if (!result && usedefault) {
         const char * str = LOC(lang, "defaultorder");

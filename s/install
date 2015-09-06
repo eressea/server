@@ -2,7 +2,7 @@
 ROOT=$(pwd)
 while [ ! -d $ROOT/.git ]; do
   ROOT=$(dirname $ROOT)
-  if [ "$ROOT" == "/" ; then
+  if [ "/" = "$ROOT" ]; then
     echo "could not find root, are you in the git repository?"
     exit
   fi
@@ -25,4 +25,8 @@ programs="create-orders backup-eressea run-turn"
 for prg in ${programs} ; do
 install -v $ROOT/process/$prg $DEST/bin/
 done
-crontab $ROOT/process/cron/crontab
+
+# install crontab, but only on the eressea server:
+HOST=`hostname`
+
+[ "gruenbaer" = "$HOST" ] && crontab $ROOT/process/cron/crontab

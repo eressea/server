@@ -1,4 +1,4 @@
-/*
+ï»¿/*
 Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -39,7 +39,7 @@ static unsigned int __at_hashkey(const char *s)
     while (i > 0) {
         key = (s[--i] + key * 37);
     }
-    return key & 0x7fffffff;
+    return key & 0x7fffffff; //TODO: V112 http://www.viva64.com/en/V112 Dangerous magic number 0x7fffffff used: return key & 0x7fffffff;.
 }
 
 void at_register(attrib_type * at)
@@ -47,7 +47,7 @@ void at_register(attrib_type * at)
     attrib_type *find;
 
     if (at->read == NULL) {
-        log_warning("registering non-persistent attribute %s.\n", at->name);
+        log_warning("registering non-persistent attribute %s.\n", at->name); //TODO: V111 http://www.viva64.com/en/V111 Call of function 'log_warning' with variable number of arguments. Second argument has memsize type.
     }
     at->hashkey = __at_hashkey(at->name);
     find = at_hash[at->hashkey % MAXATHASH];
@@ -55,7 +55,7 @@ void at_register(attrib_type * at)
         find = find->nexthash;
     }
     if (find && find == at) {
-        log_warning("attribute '%s' was registered more than once\n", at->name);
+        log_warning("attribute '%s' was registered more than once\n", at->name); //TODO: V111 http://www.viva64.com/en/V111 Call of function 'log_warning' with variable number of arguments. Second argument has memsize type.
         return;
     }
     else {
@@ -69,7 +69,7 @@ static attrib_type *at_find(unsigned int hk)
 {
     const char *translate[3][2] = {
         { "zielregion", "targetregion" },     /* remapping: from 'zielregion, heute targetregion */
-        { "verzaubert", "curse" },    /* remapping: früher verzaubert, jetzt curse */
+        { "verzaubert", "curse" },    /* remapping: frÃ¼her verzaubert, jetzt curse */
         { NULL, NULL }
     };
     attrib_type *find = at_hash[hk % MAXATHASH];
@@ -110,11 +110,11 @@ const attrib *a_findc(const attrib * a, const attrib_type * at)
 
 static attrib *a_insert(attrib * head, attrib * a)
 {
-    attrib **pa = &head->next;
-
+    attrib **pa;
     assert(!(a->type->flags & ATF_UNIQUE));
     assert(head && head->type == a->type);
 
+    pa = &head->next;
     while (*pa && (*pa)->type == a->type) {
         pa = &(*pa)->next;
     }
@@ -250,7 +250,7 @@ int a_age(attrib ** p)
 {
     attrib **ap = p;
     /* Attribute altern, und die Entfernung (age()==0) eines Attributs
-     * hat Einfluß auf den Besitzer */
+     * hat EinfluÃŸ auf den Besitzer */
     while (*ap) {
         attrib *a = *ap;
         if (a->type->age) {

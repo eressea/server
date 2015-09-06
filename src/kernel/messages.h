@@ -54,8 +54,12 @@ extern "C" {
     void addmessage(struct region *r, struct faction *f, const char *s,
         msg_t mtype, int level);
 
+    struct mlist ** merge_messages(message_list *mlist, message_list *append);
+    void split_messages(message_list *mlist, struct mlist **split);
+
 #define ADDMSG(msgs, mcreate) { message * m = mcreate; if (m) { assert(m->refcount>=1); add_message(msgs, m); msg_release(m); } }
 
+    void syntax_error(const struct unit *u, struct order *ord);
     struct message * cmistake(const struct unit *u, struct order *ord, int mno, int mtype);
     struct message * msg_error(const struct unit * u, struct order *ord, int mno);
 #ifdef __cplusplus

@@ -74,10 +74,12 @@ int RunAllTests(void)
   RUN_TESTS(suite, building);
   RUN_TESTS(suite, spell);
   RUN_TESTS(suite, spells);
+  RUN_TESTS(suite, magicresistance);
   RUN_TESTS(suite, ally);
   RUN_TESTS(suite, messages);
   /* gamecode */
   RUN_TESTS(suite, battle);
+  RUN_TESTS(suite, travelthru);
   RUN_TESTS(suite, economy);
   RUN_TESTS(suite, give);
   RUN_TESTS(suite, laws);
@@ -88,6 +90,7 @@ int RunAllTests(void)
   RUN_TESTS(suite, vortex);
   RUN_TESTS(suite, wormhole);
   RUN_TESTS(suite, spy);
+  RUN_TESTS(suite, study);
 
   printf("\ntest summary: %d tests, %d failed\n", suite->count, suite->failCount);
   log_flags = flags;

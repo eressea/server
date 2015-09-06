@@ -47,7 +47,7 @@ static int tolua_dict_get(lua_State * L)
                 lua_pushnil(L);
                 break;
             case TINTEGER:
-                lua_pushnumber(L, (lua_Number)val.i);
+                lua_pushinteger(L, val.i);
                 break;
             case TREAL:
                 lua_pushnumber(L, (lua_Number)val.f);

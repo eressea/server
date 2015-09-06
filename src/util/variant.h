@@ -5,12 +5,12 @@ extern "C" {
 #endif
 
   typedef union variant {
-    void *v;
+    void *v; //TODO: V117 http://www.viva64.com/en/V117 Memsize type is used in the union.
     int i;
     char c;
     short s;
     short sa[2];
-    char ca[4];
+    char ca[4]; //TODO: V112 http://www.viva64.com/en/V112 Dangerous magic number 4 used: char ca[4];.
     float f;
   } variant;
 

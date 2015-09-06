@@ -84,7 +84,7 @@ size_t * inlen)
             if (op - out >= os - 1)
                 break;
             *op++ = 0xC3;
-            *op++ = c - 64;
+            *op++ = (unsigned char)(c - 64);
         }
         else if (c > 0x7F) {
             if (op - out >= os - 1)

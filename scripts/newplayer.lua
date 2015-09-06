@@ -9,7 +9,9 @@ local function read_players()
         local str = input:read("*line")
         if str==nil then break end
         local email, race, lang = str:match("([^ ]*) ([^ ]*) ([^ ]*)")
-        table.insert(players, { race = race, lang = lang, email = email })
+        if string.char(string.byte(email, 1))~='#' then
+            table.insert(players, { race = race, lang = lang, email = email })
+        end
     end
     return players
 end
@@ -20,9 +22,9 @@ local function seed(r, email, race, lang)
     equip_unit(u, "new_faction")
     equip_unit(u, "first_unit")
     equip_unit(u, "first_" .. race, 7) -- disable old callbacks
-    u:set_skill("perception", 30)
     unit.create(f, r, 5):set_skill("mining", 30)
     unit.create(f, r, 5):set_skill("quarrying", 30)
+    f:set_origin(r)
     return f
 end
 
@@ -41,12 +43,13 @@ local function dump_selection(sel)
 end
 
 players = read_players()
-local limit = 30000
+local peasants = 20000
+local trees = 1000
 local turn = get_turn()
 local sel
 if #players > 0 then
     eressea.read_game(("%d.dat"):format(turn))
-    sel = p.select(regions(), limit)
+    sel = p.select(regions(), peasants, trees)
     if #sel > 0 then
         local best = dump_selection(sel)
         print("finest region, " .. best.score .. " points: " .. tostring(best.r))
@@ -64,7 +67,6 @@ for _, p in ipairs(players) do
             local index = math.random(#sel)
             start = sel[index]
         end
-        create_curse(nil, r, 'holyground', 1, 52)
         num_seeded = 0
     end
     local dupe = false

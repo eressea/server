@@ -120,12 +120,11 @@ extern "C" {
     extern int num_races;
 
     typedef struct race {
-        struct param *parameters;
         char *_name;
         float magres;
-        float maxaura;              /* Faktor auf Maximale Aura */
-        float regaura;              /* Faktor auf Regeneration */
-        float recruit_multi;        /* Faktor für Bauernverbrauch */
+        double maxaura;            /* Faktor auf Maximale Aura */
+        double regaura;            /* Faktor auf Regeneration */
+        double recruit_multi;      /* Faktor für Bauernverbrauch */
         int index;
         int recruitcost;
         int maintenance;
@@ -141,12 +140,12 @@ extern "C" {
         int df_default;             /* Verteidigungsskill Unbewaffnet (default: -2) */
         int at_bonus;               /* Verändert den Angriffsskill (default: 0) */
         int df_bonus;               /* Verändert den Verteidigungskill (default: 0) */
+        struct param *parameters;   // additional properties, for an example see natural_armor
         const struct spell *precombatspell;
         signed char *study_speed;   /* study-speed-bonus in points/turn (0=30 Tage) */
         int flags;
         int battle_flags;
         int ec_flags;
-        race_t oldfamiliars[MAXMAGIETYP];
         struct att attack[RACE_ATTACKS];
         signed char bonus[MAXSKILLS];
 
