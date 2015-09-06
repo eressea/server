@@ -12,7 +12,7 @@ function test_store_unit()
     local u = unit.create(f, r, 1)
     local fid = f.id
     u:add_item("money", u.number * 100)
-    local filename = config.basepath .. "/data/test.dat"
+    local filename = "test.dat"
     store = storage.create(filename, "wb")
     assert_not_equal(store, nil)
     store:write_unit(u)
