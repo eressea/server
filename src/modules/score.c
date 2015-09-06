@@ -208,7 +208,7 @@ void score(void)
                     }
                 }
 
-                fprintf(scoreFP, "%d:%d:%d:%d", a->id, alliance_factions,
+                fprintf(scoreFP, "%d:%d:%d:%lld", a->id, alliance_factions,
                     alliance_number, alliance_score);
                 if (token != NULL)
                     fprintf(scoreFP, ":%d", grails);
