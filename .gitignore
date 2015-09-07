@@ -41,3 +41,4 @@ Thumbs.db
 *.cfg
 *.cmd
 tmp/
+tests/config.lua
