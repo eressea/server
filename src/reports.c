@@ -1038,7 +1038,7 @@ static void get_addresses(report_context * ctx)
 
     /* find the first region that this faction can see */
     for (r = ctx->first; sr == NULL && r != ctx->last; r = r->next) {
-        sr = find_seen(ctx->seen, r);
+        sr = find_seen(ctx->f->seen, r);
     }
 
     for (; sr != NULL; sr = sr->next) {
@@ -1166,9 +1166,9 @@ static void get_seen_interval(report_context * ctx)
      * which may well be outside of [firstregion, lastregion) */
     int i;
 
-    assert(ctx->seen);
+    assert(ctx->f->seen);
     for (i = 0; i != MAXSEEHASH; ++i) {
-        seen_region *sr = ctx->seen[i];
+        seen_region *sr = ctx->f->seen[i];
         while (sr != NULL) {
             if (ctx->first == NULL || sr->r->index < ctx->first->index) {
                 ctx->first = sr->r;
@@ -1179,7 +1179,7 @@ static void get_seen_interval(report_context * ctx)
             sr = sr->nextHash;
         }
     }
-    link_seen(ctx->seen, ctx->first, ctx->last);
+    link_seen(ctx->f->seen, ctx->first, ctx->last);
 }
 
 bool
@@ -1624,15 +1624,19 @@ static region *firstregion(faction * f)
 #endif
 }
 
-static seen_region **prepare_report(faction * f)
+static void prepare_report(struct report_context *ctx, faction *f)
 {
+    region *r;
     struct seen_region *sr;
-    region *r = firstregion(f);
-    region *last = lastregion(f);
 
-    link_seen(f->seen, r, last);
+    ctx->f = f;
+    ctx->report_time = time(NULL);
+    ctx->first = firstregion(f);
+    ctx->last = lastregion(f);
+    ctx->addresses = NULL;
+    ctx->userdata = NULL;
 
-    for (sr = NULL; sr == NULL && r != last; r = r->next) {
+    for (r = ctx->first, sr = NULL; sr == NULL && r != ctx->last; r = r->next) {
         sr = find_seen(f->seen, r);
     }
 
@@ -1649,7 +1653,7 @@ static seen_region **prepare_report(faction * f)
             view(f->seen, r, f);
         }
     }
-    return f->seen;
+    get_seen_interval(ctx);
 }
 
 int write_reports(faction * f, time_t ltime)
@@ -1663,16 +1667,7 @@ int write_reports(faction * f, time_t ltime)
     if (noreports) {
         return false;
     }
-    ctx.f = f;
-    ctx.report_time = time(NULL);
-    ctx.seen = prepare_report(f);
-    ctx.first = firstregion(f);
-    ctx.last = lastregion(f);
-    ctx.addresses = NULL;
-    ctx.userdata = NULL;
-    if (ctx.seen) {
-        get_seen_interval(&ctx);
-    }
+    prepare_report(&ctx, f);
     get_addresses(&ctx);
     if (_access(reportpath(), 0) < 0) {
         _mkdir(reportpath());
@@ -1714,8 +1709,8 @@ int write_reports(faction * f, time_t ltime)
         log_warning("No report for faction %s!", factionid(f));
     }
     ql_free(ctx.addresses);
-    if (ctx.seen) {
-        seen_done(ctx.seen);
+    if (ctx.f->seen) {
+        seen_done(ctx.f->seen);
     }
     return 0;
 }

@@ -96,7 +96,6 @@ extern "C" {
     typedef struct report_context {
         struct faction *f;
         struct quicklist *addresses;
-        struct seen_region **seen;
         struct region *first, *last;
         void *userdata;
         time_t report_time;

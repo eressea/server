@@ -1,5 +1,6 @@
 ﻿#include "reports.h"
 #include "jsreport.h"
+#include <kernel/faction.h>
 #include <kernel/region.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
@@ -31,7 +32,7 @@ static int report_json(const char *filename, report_context * ctx, const char *c
             region *r;
             /* traverse all regions */
             for (sr = NULL, r = ctx->first; sr == NULL && r != ctx->last; r = r->next) {
-                sr = find_seen(ctx->seen, r);
+                sr = find_seen(ctx->f->seen, r);
             }
             for (; sr != NULL; sr = sr->next) {
                 int tx = sr->r->x;
@@ -55,7 +56,7 @@ static int report_json(const char *filename, report_context * ctx, const char *c
                         coor_from_tiled(&tx, &ty);
                         r = findregion(tx, ty);
                         if (r) {
-                            sr = find_seen(ctx->seen, r);
+                            sr = find_seen(ctx->f->seen, r);
                             if (sr) {
                                 terrain_t ter = oldterrain(r->terrain);
                                 if (ter == NOTERRAIN) {
