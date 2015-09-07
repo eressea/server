@@ -286,14 +286,15 @@ extern unsigned int new_hashstring(const char *s);
 void free_messagelist(message_list * msgs)
 {
     struct mlist **mlistptr;
-    assert(msgs && msgs->begin);
-    for (mlistptr = &msgs->begin; *mlistptr;) {
-        struct mlist *ml = *mlistptr;
-        *mlistptr = ml->next;
-        msg_release(ml->msg);
-        free(ml);
+    if (msgs) {
+        for (mlistptr = &msgs->begin; *mlistptr;) {
+            struct mlist *ml = *mlistptr;
+            *mlistptr = ml->next;
+            msg_release(ml->msg);
+            free(ml);
+        }
+        free(msgs);
     }
-    free(msgs);
 }
 
 message *add_message(message_list ** pm, message * m)
