@@ -9,7 +9,16 @@ ln -sf ../scripts/config.lua
 
 quit() {
 test -n "$2" && echo $2
+echo "integration tests: FAILED"
 exit $1
+}
+
+assert_grep_count() {
+file=$1
+expr=$2
+expect=$3
+count=`grep -cE $expr $file`
+[ $count -eq $expect ] || quit 1 "expected $expect counts of $expr in $file, got $count"
 }
 
 ROOT=`pwd`
@@ -34,11 +43,11 @@ CRFILE=185-zvto.cr
 for file in $NEWFILES reports/$CRFILE ; do
   [ -e $file ] || quit 5 "did not create $file"
 done
-grep -q PARTEI reports/$CRFILE || quit 1 "CR did not contain any factions"
-grep -q REGION reports/$CRFILE || quit 2 "CR did not contain any regions"
-grep -q SCHIFF reports/$CRFILE || quit 3 "CR did not contain any ships"
-grep -q BURG reports/$CRFILE || quit 4 "CR did not contain any buildings"
-grep -q EINHEIT reports/$CRFILE || quit 5 "CR did not contain any units"
-grep -q GEGENSTAENDE reports/$CRFILE || quit 6 "CR did not contain any items"
+assert_grep_count reports/$CRFILE '^REGION' 7
+assert_grep_count reports/$CRFILE '^PARTEI' 2
+assert_grep_count reports/$CRFILE '^SCHIFF' 1
+assert_grep_count reports/$CRFILE '^BURG' 1
+assert_grep_count reports/$CRFILE '^EINHEIT' 2
+assert_grep_count reports/$CRFILE '^GEGENSTAENDE' 2
 echo "integration tests: PASS"
 cleanup
