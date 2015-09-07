@@ -49,5 +49,8 @@ assert_grep_count reports/$CRFILE '^SCHIFF' 1
 assert_grep_count reports/$CRFILE '^BURG' 1
 assert_grep_count reports/$CRFILE '^EINHEIT' 2
 assert_grep_count reports/$CRFILE '^GEGENSTAENDE' 2
+
+assert_grep_count reports/185-6rLo.cr '^EINHEIT' 2
+assert_grep_count reports/185-6rLo.cr '^REGION' 13
 echo "integration tests: PASS"
 cleanup
