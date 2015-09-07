@@ -21,7 +21,7 @@ make install
 
 [ -d $DEST/bin ] || mkdir -p $DEST/bin
 install -v $ROOT/process/cron/*.cron $DEST/bin/
-programs="create-orders backup-eressea run-turn"
+programs="create-orders backup-eressea run-turn send-zip-report send-bz2-report"
 for prg in ${programs} ; do
 install -v $ROOT/process/$prg $DEST/bin/
 done
