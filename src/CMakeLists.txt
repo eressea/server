@@ -86,6 +86,7 @@ set (ERESSEA_SRC
   names.c
   lighthouse.c
   reports.c
+  seen.c
   eressea.c
   callback.c
   direction.c

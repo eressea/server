@@ -11,6 +11,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/config.h>
 #include "buildno.h"
 #include "creport.h"
+#include "seen.h"
 #include "travelthru.h"
 
 /* tweakable features */

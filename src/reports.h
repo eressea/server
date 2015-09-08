@@ -26,7 +26,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/types.h>
 
 struct stream;
-
+struct seen_region;
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -64,34 +64,7 @@ extern "C" {
     const struct unit *ucansee(const struct faction *f,
         const struct unit *u, const struct unit *x);
 
-    enum {
-        see_none,
-        see_neighbour,
-        see_lighthouse,
-        see_travel,
-        see_far,
-        see_unit,
-        see_battle
-    };
     int stealth_modifier(int seen_mode);
-
-    typedef struct seen_region {
-        struct seen_region *nextHash;
-        struct seen_region *next;
-        struct region *r;
-        unsigned char mode;
-        bool disbelieves;
-    } seen_region;
-
-    struct seen_region *find_seen(struct seen_region *seehash[],
-        const struct region *r);
-    bool add_seen(struct seen_region *seehash[], struct region *r,
-        unsigned char mode, bool dis);
-    struct seen_region **seen_init(void);
-    void seen_done(struct seen_region *seehash[]);
-    void free_seen(void);
-    void link_seen(seen_region * seehash[], const struct region *first,
-        const struct region *last);
 
     typedef struct report_context {
         struct faction *f;
