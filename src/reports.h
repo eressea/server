@@ -102,6 +102,8 @@ extern "C" {
         int number;
         int level;
     } resource_report;
+    void view_default(struct seen_region **seen, struct region * r, struct faction * f);
+    void view_neighbours(struct seen_region **seen, struct region * r, struct faction * f);
     int report_resources(const struct seen_region *sr,
     struct resource_report *result, int size, const struct faction *viewer);
     int report_items(const struct item *items, struct item *result, int size,

@@ -1140,7 +1140,7 @@ static quicklist *get_regions_distance(region * root, int radius)
     return rlist;
 }
 
-static void view_default(struct seen_region **seen, region * r, faction * f)
+void view_default(struct seen_region **seen, region * r, faction * f)
 {
     int dir;
     for (dir = 0; dir != MAXDIRECTIONS; ++dir) {
@@ -1158,7 +1158,7 @@ static void view_default(struct seen_region **seen, region * r, faction * f)
     }
 }
 
-static void view_neighbours(struct seen_region **seen, region * r, faction * f)
+void view_neighbours(struct seen_region **seen, region * r, faction * f)
 {
     int d;
     region * nb[MAXDIRECTIONS];
