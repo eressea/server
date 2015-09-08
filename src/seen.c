@@ -118,6 +118,8 @@ void get_seen_interval(struct seen_region *seen[], struct region **firstp, struc
             sr = sr->nextHash;
         }
     }
+    *firstp = first;
+    *lastp = last;
 }
 
 bool add_seen(struct seen_region *seehash[], struct region *r, int mode, bool dis)
