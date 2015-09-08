@@ -19,7 +19,6 @@ ipch/
 *.opensdf
 *.pdb
 *.sdf
-*.sh
 *.suo
 *.user
 
