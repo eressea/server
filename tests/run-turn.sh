@@ -30,7 +30,7 @@ set -e
 cd $ROOT/tests
 setup
 cleanup
-VALGRIND=`which valgrind`
+#VALGRIND=`which valgrind`
 SERVER=../Debug/eressea/eressea
 if [ -n "$VALGRIND" ]; then
 SUPP=../share/ubuntu-12_04.supp
