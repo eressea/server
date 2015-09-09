@@ -1371,6 +1371,9 @@ static void cb_add_seen(region *r, unit *u, void *cbdata) {
     unused_arg(cbdata);
     if (u->faction) {
         add_seen(u->faction->seen, r, see_travel, false);
+#ifdef SMART_INTERVALS
+        update_interval(u->faction, r);
+#endif
     }
 }
 
@@ -1403,7 +1406,7 @@ static void prepare_reports(void)
         }
 
         /* Region owner get always the Lighthouse report */
-        if (check_param(global.parameters, "rules.region_owner_pay_building", bt_lighthouse->_name)) {
+        if (bt_lighthouse && check_param(global.parameters, "rules.region_owner_pay_building", bt_lighthouse->_name)) {
             for (b = rbuildings(r); b; b = b->next) {
                 if (b && b->type == bt_lighthouse) {
                     u = building_owner(b);
@@ -1510,37 +1513,45 @@ static region *firstregion(faction * f)
 #endif
 }
 
-static void prepare_report(struct report_context *ctx, faction *f)
+static void view_region(region *r, faction *f) {
+    plane *p = rplane(r);
+    void(*view) (struct seen_region **, region *, faction *) = view_default;
+
+    if (p && fval(p, PFL_SEESPECIAL)) {
+        /* TODO: this is not very customizable */
+        view = (strcmp(p->name, "Regatta") == 0) ? view_regatta : view_neighbours;
+    }
+    view(f->seen, r, f);
+}
+
+void prepare_seen(faction *f)
 {
     region *r;
     struct seen_region *sr;
 
-    ctx->f = f;
-    ctx->report_time = time(NULL);
-    ctx->first = firstregion(f);
-    ctx->last = lastregion(f);
-    ctx->addresses = NULL;
-    ctx->userdata = NULL;
-
-    for (r = ctx->first, sr = NULL; sr == NULL && r != ctx->last; r = r->next) {
+    for (r = f->first, sr = NULL; sr == NULL && r != f->last; r = r->next) {
         sr = find_seen(f->seen, r);
     }
 
     for (; sr != NULL; sr = sr->next) {
         if (sr->mode > see_neighbour) {
             region *r = sr->r;
-            plane *p = rplane(r);
-            void(*view) (struct seen_region **, region *, faction *) = view_default;
-
-            if (p && fval(p, PFL_SEESPECIAL)) {
-                /* TODO: this is not very customizable */
-                view = (strcmp(p->name, "Regatta") == 0) ? view_regatta : view_neighbours;
-            }
-            view(f->seen, r, f);
+            view_region(r, f);
         }
     }
-    get_seen_interval(ctx->f->seen, &ctx->first, &ctx->last);
-    link_seen(ctx->f->seen, ctx->first, ctx->last);
+    get_seen_interval(f->seen, &f->first, &f->last);
+    link_seen(f->seen, f->first, f->last);
+}
+
+static void prepare_report(struct report_context *ctx, faction *f)
+{
+    prepare_seen(f);
+    ctx->f = f;
+    ctx->report_time = time(NULL);
+    ctx->addresses = NULL;
+    ctx->userdata = NULL;
+    ctx->first = firstregion(f);
+    ctx->last = lastregion(f);
 }
 
 int write_reports(faction * f, time_t ltime)

@@ -51,7 +51,7 @@ void free_seen(void);
 void link_seen(struct seen_region *seehash[], const struct region * first, const struct region * last);
 struct seen_region *find_seen(struct seen_region *seehash[], const struct region * r);
 void get_seen_interval(struct seen_region *seen[], struct region **firstp, struct region **lastp);
-bool add_seen(struct seen_region *seehash[], struct region *r, int mode, bool dis);
+bool add_seen(struct seen_region *seehash[], struct region *r, unsigned char mode, bool dis);
 void link_seen(struct seen_region *seehash[], const struct region *first, const struct region *last);
 #ifdef __cplusplus
 }

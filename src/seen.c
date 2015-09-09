@@ -122,7 +122,7 @@ void get_seen_interval(struct seen_region *seen[], struct region **firstp, struc
     *lastp = last;
 }
 
-bool add_seen(struct seen_region *seehash[], struct region *r, int mode, bool dis)
+bool add_seen(struct seen_region *seehash[], struct region *r, unsigned char mode, bool dis)
 {
     seen_region *find = find_seen(seehash, r);
     if (find == NULL) {

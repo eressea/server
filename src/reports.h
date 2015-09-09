@@ -56,6 +56,7 @@ extern "C" {
     void spunit(struct strlist **SP, const struct faction *f,
         const struct unit *u, unsigned int indent, int mode);
 
+    void prepare_seen(struct faction *f);
     int reports(void);
     int write_reports(struct faction *f, time_t ltime);
     int init_reports(void);
