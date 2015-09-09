@@ -311,6 +311,11 @@ void destroyfaction(faction * f)
         f->spellbook = 0;
     }
 
+    if (f->seen_factions) {
+        ql_free(f->seen_factions);
+        f->seen_factions = 0;
+    }
+
     while (u) {
         /* give away your stuff, make zombies if you cannot (quest items) */
         int result = gift_items(u, GIFT_FRIENDS | GIFT_PEASANTS);

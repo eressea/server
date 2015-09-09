@@ -86,6 +86,7 @@ set (ERESSEA_SRC
   names.c
   lighthouse.c
   reports.c
+  seen.c
   eressea.c
   callback.c
   direction.c
@@ -182,6 +183,7 @@ set(TESTS_SRC
   vortex.test.c
   tests.test.c
   reports.test.c
+  seen.test.c
   travelthru.test.c
   callback.test.c
   direction.test.c

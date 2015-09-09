@@ -4,6 +4,7 @@
 #include "report.h"
 #include "creport.h"
 #include "move.h"
+#include "seen.h"
 #include "travelthru.h"
 
 #include <kernel/building.h>

@@ -19,3 +19,4 @@ inifile
 s/runtests
 cd tests
 ./write-reports.sh
+./run-turn.sh

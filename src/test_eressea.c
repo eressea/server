@@ -36,6 +36,7 @@ int RunAllTests(void)
   /* self-test */
   RUN_TESTS(suite, tests);
   RUN_TESTS(suite, callback);
+  RUN_TESTS(suite, seen);
   RUN_TESTS(suite, json);
   RUN_TESTS(suite, jsonconf);
   RUN_TESTS(suite, direction);

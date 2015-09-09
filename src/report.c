@@ -22,6 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 
 #include "reports.h"
+#include "seen.h"
 #include "laws.h"
 #include "travelthru.h"
 #include "monster.h"
@@ -1412,7 +1413,7 @@ report_template(const char *filename, report_context * ctx, const char *charset)
     newline(out);
 
     for (r = ctx->first; sr == NULL && r != ctx->last; r = r->next) {
-        sr = find_seen(ctx->seen, r);
+        sr = find_seen(ctx->f->seen, r);
     }
 
     for (; sr != NULL; sr = sr->next) {
@@ -2306,7 +2307,7 @@ const char *charset)
     anyunits = 0;
 
     for (r = ctx->first; sr == NULL && r != ctx->last; r = r->next) {
-        sr = find_seen(ctx->seen, r);
+        sr = find_seen(ctx->f->seen, r);
     }
     for (; sr != NULL; sr = sr->next) {
         region *r = sr->r;
