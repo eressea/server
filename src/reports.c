@@ -1513,15 +1513,19 @@ static region *firstregion(faction * f)
 #endif
 }
 
-static void view_region(region *r, faction *f) {
-    plane *p = rplane(r);
-    void(*view) (struct seen_region **, region *, faction *) = view_default;
+static void cb_view_neighbours(seen_region *sr, void *cbdata) {
+    faction *f = (faction *)cbdata;
+    if (sr->mode > see_neighbour) {
+        region *r = sr->r;
+        plane *p = rplane(r);
+        void(*view) (struct seen_region **, region *, faction *) = view_default;
 
-    if (p && fval(p, PFL_SEESPECIAL)) {
-        /* TODO: this is not very customizable */
-        view = (strcmp(p->name, "Regatta") == 0) ? view_regatta : view_neighbours;
+        if (p && fval(p, PFL_SEESPECIAL)) {
+            /* TODO: this is not very customizable */
+            view = (strcmp(p->name, "Regatta") == 0) ? view_regatta : view_neighbours;
+        }
+        view(f->seen, r, f);
     }
-    view(f->seen, r, f);
 }
 
 void prepare_seen(faction *f)
@@ -1533,12 +1537,7 @@ void prepare_seen(faction *f)
         sr = find_seen(f->seen, r);
     }
 
-    for (; sr != NULL; sr = sr->next) {
-        if (sr->mode > see_neighbour) {
-            region *r = sr->r;
-            view_region(r, f);
-        }
-    }
+    seenhash_map(f->seen, cb_view_neighbours, f);
     get_seen_interval(f->seen, &f->first, &f->last);
     link_seen(f->seen, f->first, f->last);
 }
