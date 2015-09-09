@@ -19,6 +19,48 @@ static void setup_seen(int x, int y) {
     }
 }
 
+static void test_add_seen(CuTest *tc) {
+    region *r;
+    seen_region **seen, *sr;
+
+    test_cleanup();
+    seen = seen_init();
+    r = test_create_region(0, 0, 0);
+    sr = add_seen(seen, r, see_travel, false);
+    CuAssertPtrEquals(tc, r, sr->r);
+    CuAssertIntEquals(tc, see_travel, sr->mode);
+    CuAssertIntEquals(tc, false, sr->disbelieves);
+    CuAssertPtrEquals(tc, 0, sr->next);
+    CuAssertPtrEquals(tc, 0, sr->nextHash);
+    CuAssertPtrEquals(tc, sr, find_seen(seen, r));
+    sr = add_seen(seen, r, see_neighbour, true);
+    CuAssertIntEquals(tc, true, sr->disbelieves);
+    CuAssertIntEquals(tc, see_travel, sr->mode);
+    sr = add_seen(seen, r, see_unit, false);
+    CuAssertIntEquals(tc, true, sr->disbelieves);
+    CuAssertIntEquals(tc, see_unit, sr->mode);
+    seen_done(seen);
+    test_cleanup();
+}
+
+static void test_faction_add_seen(CuTest *tc) {
+    region *r;
+    faction *f;
+    seen_region *sr;
+
+    test_cleanup();
+    f = test_create_faction(0);
+    f->seen = seen_init();
+    r = test_create_region(0, 0, 0);
+    sr = faction_add_seen(f, r, see_unit);
+    r = test_create_region(0, 1, 0);
+    CuAssertIntEquals(tc, false, sr->disbelieves);
+    CuAssertPtrEquals(tc, regions, f->first);
+    CuAssertPtrEquals(tc, r, f->last);
+    seen_done(f->seen);
+    test_cleanup();
+}
+
 static void test_prepare_seen(CuTest *tc) {
     region *r;
     faction *f;
@@ -29,7 +71,7 @@ static void test_prepare_seen(CuTest *tc) {
     r = test_create_region(0, 0, 0);
     u = test_create_unit(f, r);
     f->seen = seen_init();
-    add_seen(f->seen, r, see_unit, false);
+    faction_add_seen(f, r, see_unit);
     setup_seen(0, 0);
     r = test_create_region(2, 2, 0);
     setup_seen(2, 2);
@@ -146,6 +188,8 @@ static void test_seenhash_map(CuTest *tc) {
 CuSuite *get_seen_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_add_seen);
+    DISABLE_TEST(suite, test_faction_add_seen);
     SUITE_ADD_TEST(suite, test_prepare_seen);
     SUITE_ADD_TEST(suite, test_seen_travelthru);
     SUITE_ADD_TEST(suite, test_seen_region);

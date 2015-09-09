@@ -27,7 +27,7 @@ struct seen_region;
 extern "C" {
 #endif
 
-    enum {
+    typedef enum {
         see_none,
         see_neighbour,
         see_lighthouse,
@@ -35,13 +35,13 @@ extern "C" {
         see_far,
         see_unit,
         see_battle
-    };
+    } seen_t;
 
     typedef struct seen_region {
         struct seen_region *nextHash;
         struct seen_region *next;
         struct region *r;
-        unsigned char mode;
+        seen_t mode;
         bool disbelieves;
     } seen_region;
 
@@ -51,9 +51,10 @@ void free_seen(void);
 void link_seen(struct seen_region *seehash[], const struct region * first, const struct region * last);
 struct seen_region *find_seen(struct seen_region *seehash[], const struct region * r);
 void get_seen_interval(struct seen_region *seen[], struct region **firstp, struct region **lastp);
-bool add_seen(struct seen_region *seehash[], struct region *r, unsigned char mode, bool dis);
+seen_region *add_seen(struct seen_region *seehash[], struct region *r, seen_t mode, bool dis);
 void link_seen(struct seen_region *seehash[], const struct region *first, const struct region *last);
 void seenhash_map(struct seen_region *seen[], void(*cb)(struct seen_region *, void *), void *cbdata);
+struct seen_region *faction_add_seen(struct faction *f, struct region *r, seen_t mode);
 #ifdef __cplusplus
 }
 #endif

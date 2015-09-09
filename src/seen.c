@@ -21,6 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "seen.h"
 
 #include <kernel/region.h>
+#include <kernel/faction.h>
 
 #include <assert.h>
 #include <stdlib.h>
@@ -46,7 +47,7 @@ void seen_done(seen_region * seehash[])
         reuse = seehash[i];
         seehash[i] = NULL;
     }
-    /*  free(seehash); */
+    free(seehash);
 }
 
 void free_seen(void)
@@ -137,7 +138,7 @@ void get_seen_interval(struct seen_region *seen[], struct region **firstp, struc
     *lastp = interval.last;
 }
 
-bool add_seen(struct seen_region *seehash[], struct region *r, unsigned char mode, bool dis)
+seen_region *add_seen(struct seen_region *seehash[], struct region *r, seen_t mode, bool dis)
 {
     seen_region *find = find_seen(seehash, r);
     if (find == NULL) {
@@ -147,13 +148,21 @@ bool add_seen(struct seen_region *seehash[], struct region *r, unsigned char mod
         find = reuse;
         reuse = reuse->nextHash;
         find->nextHash = seehash[index];
+        find->mode = mode;
         seehash[index] = find;
         find->r = r;
     }
-    else if (find->mode >= mode) {
-        return false;
+    else if (find->mode < mode) {
+        find->mode = mode;
     }
-    find->mode = mode;
     find->disbelieves |= dis;
-    return true;
+    return find;
+}
+
+seen_region *faction_add_seen(faction *f, region *r, seen_t mode) {
+    assert(f->seen);
+#ifdef SMART_INTERVALS
+    update_interval(f, r);
+#endif
+    return add_seen(f->seen, r, mode, false);
 }

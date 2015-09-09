@@ -1258,10 +1258,10 @@ static void prepare_lighthouse(building * b, faction * f)
             int d;
 
             get_neighbours(rl, next);
-            add_seen(f->seen, rl, see_lighthouse, false);
+            faction_add_seen(f, rl, see_lighthouse);
             for (d = 0; d != MAXDIRECTIONS; ++d) {
                 if (next[d]) {
-                    add_seen(f->seen, next[d], see_neighbour, false);
+                    faction_add_seen(f, next[d], see_neighbour);
                 }
             }
         }
@@ -1370,10 +1370,7 @@ void reorder_units(region * r)
 static void cb_add_seen(region *r, unit *u, void *cbdata) {
     unused_arg(cbdata);
     if (u->faction) {
-        add_seen(u->faction->seen, r, see_travel, false);
-#ifdef SMART_INTERVALS
-        update_interval(u->faction, r);
-#endif
+        faction_add_seen(u->faction, r, see_travel);
     }
 }
 
@@ -1398,10 +1395,7 @@ static void prepare_reports(void)
         if (p) {
             watcher *w = p->watchers;
             for (; w; w = w->next) {
-                add_seen(w->faction->seen, r, w->mode, false);
-#ifdef SMART_INTERVALS
-                update_interval(w->faction, r);
-#endif
+                faction_add_seen(w->faction, r, w->mode);
             }
         }
 
@@ -1413,11 +1407,9 @@ static void prepare_reports(void)
                     if (u) {
                         prepare_lighthouse(b, u->faction);
                         if (u_race(u) != get_race(RC_SPELL) || u->number == RS_FARVISION) {
+                            seen_region *sr = faction_add_seen(u->faction, r, see_unit);
                             if (fval(u, UFL_DISBELIEVES)) {
-                                add_seen(u->faction->seen, r, see_unit, true);
-                            }
-                            else {
-                                add_seen(u->faction->seen, r, see_unit, false);
+                                sr->disbelieves = true;
                             }
                         }
                     }
@@ -1432,11 +1424,9 @@ static void prepare_reports(void)
             }
 
             if (u_race(u) != get_race(RC_SPELL) || u->number == RS_FARVISION) {
+                seen_region *sr = faction_add_seen(u->faction, r, see_unit);
                 if (fval(u, UFL_DISBELIEVES)) {
-                    add_seen(u->faction->seen, r, see_unit, true);
-                }
-                else {
-                    add_seen(u->faction->seen, r, see_unit, false);
+                    sr->disbelieves = true;
                 }
             }
         }
