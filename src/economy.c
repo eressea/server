@@ -2640,8 +2640,9 @@ static void steal_cmd(unit * u, struct order *ord, request ** stealorders)
         return;
     }
     id = read_unitid(u->faction, r);
-    u2 = findunitr(r, id);
-
+    if (id>0) {
+        u2 = findunitr(r, id);
+    }
     if (u2 && u2->region == u->region) {
         f = u2->faction;
     }

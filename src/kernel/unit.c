@@ -97,25 +97,21 @@ attrib_type at_creator = {
     /* Rest ist NULL; temporaeres, nicht alterndes Attribut */
 };
 
-unit *findunitr(const region * r, int n)
-{
-    unit *u;
-
-    /* findunit regional! */
-
-    for (u = r->units; u; u = u->next)
-        if (u->no == n)
-            return u;
-
-    return 0;
-}
-
 unit *findunit(int n)
 {
     if (n <= 0) {
         return NULL;
     }
     return ufindhash(n);
+}
+
+unit *findunitr(const region * r, int n)
+{
+    unit *u;
+    /* findunit regional! */
+    assert(n>0);
+    u = ufindhash(n);
+    return (u && u->region==r)?u:0;
 }
 
 unit *findunitg(int n, const region * hint)
