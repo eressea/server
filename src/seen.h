@@ -21,6 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define H_SEEN_REGION
 
 struct region;
+struct faction;
 struct seen_region;
 
 #ifdef __cplusplus
