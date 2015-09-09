@@ -44,15 +44,14 @@ static void test_add_seen(CuTest *tc) {
 }
 
 static void test_faction_add_seen(CuTest *tc) {
-    region *r;
     faction *f;
     seen_region *sr;
 
     test_cleanup();
     f = test_create_faction(0);
     f->seen = seen_init();
-    r = test_create_region(0, 0, 0);
-    r = test_create_region(0, 1, 0);
+    test_create_region(0, 0, 0);
+    test_create_region(0, 1, 0);
     sr = faction_add_seen(f, regions, see_unit);
     CuAssertIntEquals(tc, false, sr->disbelieves);
     CuAssertPtrEquals(tc, regions, f->first);
