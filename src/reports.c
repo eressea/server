@@ -23,6 +23,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "seen.h"
 #include "travelthru.h"
 #include "lighthouse.h"
+#include "donations.h"
 
 /* kernel includes */
 #include <kernel/alliance.h>
@@ -1600,25 +1601,6 @@ int write_reports(faction * f, time_t ltime)
         seen_done(ctx.f->seen);
     }
     return 0;
-}
-
-static void report_donations(void)
-{
-    region *r;
-    for (r = regions; r; r = r->next) {
-        while (r->donations) {
-            donation *sp = r->donations;
-            if (sp->amount > 0) {
-                struct message *msg = msg_message("donation",
-                    "from to amount", sp->f1, sp->f2, sp->amount);
-                r_addmessage(r, sp->f1, msg);
-                r_addmessage(r, sp->f2, msg);
-                msg_release(msg);
-            }
-            r->donations = sp->next;
-            free(sp);
-        }
-    }
 }
 
 static void write_script(FILE * F, const faction * f)

@@ -839,12 +839,6 @@ void free_region(region * r)
         free(res);
     }
 
-    while (r->donations) {
-        donation *don = r->donations;
-        r->donations = don->next;
-        free(don);
-    }
-
     while (r->units) {
         unit *u = r->units;
         r->units = u->next;

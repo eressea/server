@@ -16,6 +16,7 @@
 #include "alchemy.h"
 #include "economy.h"
 #include "monster.h"
+#include "donations.h"
 
 #include <assert.h>
 
@@ -55,7 +56,7 @@ static void help_feed(unit * donor, unit * u, int *need_p)
         change_money(donor, -give);
         change_money(u, give);
         need -= give;
-        add_spende(donor->faction, u->faction, give, donor->region);
+        add_donation(donor->faction, u->faction, give, donor->region);
     }
     *need_p = need;
 }
