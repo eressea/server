@@ -52,11 +52,11 @@ static void test_faction_add_seen(CuTest *tc) {
     f = test_create_faction(0);
     f->seen = seen_init();
     r = test_create_region(0, 0, 0);
-    sr = faction_add_seen(f, r, see_unit);
     r = test_create_region(0, 1, 0);
+    sr = faction_add_seen(f, regions, see_unit);
     CuAssertIntEquals(tc, false, sr->disbelieves);
     CuAssertPtrEquals(tc, regions, f->first);
-    CuAssertPtrEquals(tc, r, f->last);
+    CuAssertPtrEquals(tc, regions, f->last);
     seen_done(f->seen);
     test_cleanup();
 }
@@ -189,7 +189,7 @@ CuSuite *get_seen_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_add_seen);
-    DISABLE_TEST(suite, test_faction_add_seen);
+    SUITE_ADD_TEST(suite, test_faction_add_seen);
     SUITE_ADD_TEST(suite, test_prepare_seen);
     SUITE_ADD_TEST(suite, test_seen_travelthru);
     SUITE_ADD_TEST(suite, test_seen_region);
