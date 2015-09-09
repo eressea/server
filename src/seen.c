@@ -96,30 +96,45 @@ seen_region *find_seen(struct seen_region *seehash[], const region * r)
     return NULL;
 }
 
-void get_seen_interval(struct seen_region *seen[], struct region **firstp, struct region **lastp)
-{
-    /* this is required to find the neighbour regions of the ones we are in,
-     * which may well be outside of [firstregion, lastregion) */
+void seenhash_map(struct seen_region *seen[], void(*cb)(seen_region *, void *), void *cbdata) {
     int i;
-    region *first, *last;
-
-    assert(seen && firstp && lastp);
-    first = *firstp;
-    last = *lastp;
     for (i = 0; i != MAXSEEHASH; ++i) {
         seen_region *sr = seen[i];
         while (sr != NULL) {
-            if (first == NULL || sr->r->index < first->index) {
-                first = sr->r;
-            }
-            if (last != NULL && sr->r->index >= last->index) {
-                last = sr->r->next;
-            }
+            cb(sr, cbdata);
             sr = sr->nextHash;
         }
     }
-    *firstp = first;
-    *lastp = last;
+}
+
+typedef struct cb_interval {
+    region *first;
+    region *last;
+} cb_interval;
+
+static void cb_get_interval(seen_region *sr, void *cbdata) {
+    cb_interval *iv = (cb_interval *)cbdata;
+    region *r = sr->r;
+    if (iv->first == NULL || r->index < iv->first->index) {
+        iv->first = r;
+    }
+    if (iv->last != NULL && r->index >= iv->last->index) {
+        iv->last = r->next;
+    }
+}
+
+/* this function adds the neighbour regions of the ones we have seen
+ * to the interval, which may be outside of [faction.first, faction.last)
+ */
+void get_seen_interval(struct seen_region *seen[], struct region **firstp, struct region **lastp)
+{
+    cb_interval interval;
+
+    interval.first = *firstp;
+    interval.last = *lastp;
+    seenhash_map(seen, cb_get_interval, &interval);
+    *firstp = interval.first;
+    *lastp = interval.last;
 }
 
 bool add_seen(struct seen_region *seehash[], struct region *r, unsigned char mode, bool dis)

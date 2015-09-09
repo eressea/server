@@ -121,6 +121,28 @@ static void test_seen_interval_forward(CuTest *tc) {
     test_cleanup();
 }
 
+static void cb_testmap(seen_region *sr, void *cbdata) {
+    int *ip = (int *)cbdata;
+    *ip += sr->r->y;
+}
+
+static void test_seenhash_map(CuTest *tc) {
+    region *r;
+    seen_region **seen;
+    int i = 0;
+
+    test_cleanup();
+    seen = seen_init();
+    r = test_create_region(1, 1, 0);
+    add_seen(seen, r, see_unit, false);
+    r = test_create_region(2, 2, 0);
+    add_seen(seen, r, see_unit, false);
+    seenhash_map(seen, cb_testmap, &i);
+    CuAssertIntEquals(tc, 3, i);
+    seen_done(seen);
+    test_cleanup();
+}
+
 CuSuite *get_seen_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -129,5 +151,6 @@ CuSuite *get_seen_suite(void)
     SUITE_ADD_TEST(suite, test_seen_region);
     SUITE_ADD_TEST(suite, test_seen_interval_backward);
     SUITE_ADD_TEST(suite, test_seen_interval_forward);
+    SUITE_ADD_TEST(suite, test_seenhash_map);
     return suite;
 }

@@ -53,6 +53,7 @@ struct seen_region *find_seen(struct seen_region *seehash[], const struct region
 void get_seen_interval(struct seen_region *seen[], struct region **firstp, struct region **lastp);
 bool add_seen(struct seen_region *seehash[], struct region *r, unsigned char mode, bool dis);
 void link_seen(struct seen_region *seehash[], const struct region *first, const struct region *last);
+void seenhash_map(struct seen_region *seen[], void(*cb)(struct seen_region *, void *), void *cbdata);
 #ifdef __cplusplus
 }
 #endif
