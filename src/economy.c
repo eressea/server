@@ -23,6 +23,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "alchemy.h"
 #include "direction.h"
+#include "donations.h"
 #include "give.h"
 #include "laws.h"
 #include "randenc.h"
@@ -705,28 +706,6 @@ static int forget_cmd(unit * u, order * ord)
     return 0;
 }
 
-void add_spende(faction * f1, faction * f2, int amount, region * r)
-{
-    donation *sp;
-
-    sp = r->donations;
-
-    while (sp) {
-        if (sp->f1 == f1 && sp->f2 == f2) {
-            sp->amount += amount;
-            return;
-        }
-        sp = sp->next;
-    }
-
-    sp = calloc(1, sizeof(donation));
-    sp->f1 = f1;
-    sp->f2 = f2;
-    sp->amount = amount;
-    sp->next = r->donations;
-    r->donations = sp;
-}
-
 static bool maintain(building * b, bool first)
 /* first==false -> take money from wherever you can */
 {
@@ -886,7 +865,7 @@ static bool maintain(building * b, bool first)
                         cost -= give;
                         fset(ua->faction, FFL_SELECT);
                         if (m->rtype == rsilver)
-                            add_spende(ua->faction, u->faction, give, r);
+                            add_donation(ua->faction, u->faction, give, r);
                         if (cost <= 0)
                             break;
                     }

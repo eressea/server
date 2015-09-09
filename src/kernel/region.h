@@ -133,7 +133,7 @@ extern "C" {
             struct message_list *msgs;
         } *individual_messages;
         struct attrib *attribs;
-        struct donation *donations;
+        struct donation *donations_;
         const struct terrain_type *terrain;
         struct rawmaterial *resources;
 #ifdef FAST_CONNECT

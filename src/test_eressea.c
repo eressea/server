@@ -81,6 +81,7 @@ int RunAllTests(void)
   RUN_TESTS(suite, messages);
   /* gamecode */
   RUN_TESTS(suite, battle);
+  RUN_TESTS(suite, donations);
   RUN_TESTS(suite, travelthru);
   RUN_TESTS(suite, economy);
   RUN_TESTS(suite, give);

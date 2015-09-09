@@ -73,6 +73,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/umlaut.h>
 #include <util/xml.h>
 
+#include "donations.h"
+
 #ifdef USE_LIBXML2
 /* libxml includes */
 #include <libxml/tree.h>
@@ -1761,6 +1763,7 @@ int markets_module(void)
 void free_gamedata(void)
 {
     int i;
+    free_donations();
     free_units();
     free_regions();
     free_borders();
