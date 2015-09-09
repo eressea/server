@@ -57,15 +57,13 @@ static void test_get_direction_default(CuTest *tc) {
     CuAssertIntEquals(tc, D_EAST, get_direction("east", lang));
 }
 
-#define SUITE_DISABLE_TEST(suite, test) (void)test
-
 CuSuite *get_direction_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_init_direction);
     SUITE_ADD_TEST(suite, test_init_directions);
     SUITE_ADD_TEST(suite, test_finddirection);
-    SUITE_DISABLE_TEST(suite, test_get_direction_default);
+    DISABLE_TEST(suite, test_get_direction_default);
     return suite;
 }
 
