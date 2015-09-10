@@ -3,7 +3,7 @@
 from sys import argv, exit
 from string import join
 from os import access, R_OK
-from os import system
+from os import system, symlink
 
 gamename='Eressea'
 
@@ -38,11 +38,8 @@ for line in infile.readlines():
     if not options.has_key("reports"):
         continue
     reports = options["reports"].split(",")
+#    reports = reports + [ "iso.cr" ]
     prefix = "%(turn)s-%(faction)s." % options
-    files=[]
-    times="../parteien"
-    if os.path.isfile(times):
-        files = files + [ times ]
     if options["compression"]=="zip":
         output = prefix+"zip"
         files = [output]
@@ -54,8 +51,9 @@ for line in infile.readlines():
                 filename = "%s%s" % (prefix, extension)
                 if (access(filename, R_OK)):
                     parameters = parameters + [ filename ]
-            system("zip %s -q -m -j -1 %s" % (output, join(parameters," ")))
+            system("zip %s -q -m -j %s" % (output, join(parameters," ")))
     else:
+        files = []
         for extension in reports:
             if extension!='':
                 filename = "%s%s" % (prefix, extension)
@@ -66,7 +64,12 @@ for line in infile.readlines():
                         #print output, "exists, skipping"
                         continue
                     system("bzip2 %s" % filename)
-    #print files
+    if not access('../wochenbericht.txt'):
+        os.symlink('../parteien', '../wochenbericht.txt')
+    extras = [ '../wochenbericht.txt', '../express.txt' ]
+    for extra in extras:
+        if access(extra, R_OK):
+            files = files + [extra]
     options["files"] = join(files, " ")
     batch = file("%s.sh" % options["faction"], "w")
     batch.write(template % options)
