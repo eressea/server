@@ -69,7 +69,7 @@ static void report_transfer(faction *f1, faction *f2, region *r, int amount) {
 
 void report_donations(void)
 {
-    ql_iter qli = qli_init(&transfers);;
+    ql_iter qli = qli_init(&transfers);
 
     while (qli_more(qli)) {
         transfer *tf = (transfer *)qli_next(&qli);
