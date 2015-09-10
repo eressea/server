@@ -86,6 +86,7 @@ set (ERESSEA_SRC
   names.c
   lighthouse.c
   reports.c
+  donations.c
   seen.c
   eressea.c
   callback.c
@@ -175,6 +176,7 @@ target_link_libraries(eressea
 )
 
 set(TESTS_SRC
+  donations.test.c
   wormhole.test.c
   alchemy.test.c
   test_eressea.c
