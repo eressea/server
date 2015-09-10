@@ -15,10 +15,10 @@ then
 fi
 
 if [ ! -d $GAME/reports ]; then
-  echo "cannot find reprts directory in $GAME"
-  exit
+  echo "cannot find reports directory in $GAME"
+  exit -1
 fi
 
 cd $GAME/reports
-compress.py $TURN "$GAME_NAME"
+$HOME/bin/compress.py $TURN "$GAME_NAME"
 cd -
