@@ -638,6 +638,24 @@ static void json_keywords(cJSON *json) {
     }
 }
 
+static void json_settings(cJSON *json) {
+    cJSON *child;
+    if (json->type != cJSON_Object) {
+        log_error("settings is not a json object: %d", json->type);
+        return;
+    }
+    for (child = json->child; child; child = child->next) {
+        if (child->valuestring) {
+            set_param(&global.parameters, child->string, child->valuestring);
+        }
+        else {
+            char value[32];
+            _snprintf(value, sizeof(value), "%lf", child->valuedouble);
+            set_param(&global.parameters, child->string, value);
+        }
+    }
+}
+
 static void json_races(cJSON *json) {
     cJSON *child;
     if (json->type != cJSON_Object) {
@@ -713,6 +731,9 @@ void json_config(cJSON *json) {
         }
         else if (strcmp(child->string, "keywords") == 0) {
             json_keywords(child);
+        }
+        else if (strcmp(child->string, "settings") == 0) {
+            json_settings(child);
         }
         else if (strcmp(child->string, "skills") == 0) {
             json_skills(child);

@@ -57,6 +57,22 @@ static void test_flags(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_settings(CuTest * tc)
+{
+    const char * data = "{\"settings\": { "
+        "\"string\" : \"1d4\","
+        "\"integer\" : 14,"
+        "\"float\" : 0.5 }}";
+    cJSON *json = cJSON_Parse(data);
+
+    test_cleanup();
+    json_config(json);
+    CuAssertStrEquals(tc, "1d4", get_param(global.parameters, "string"));
+    CuAssertIntEquals(tc, 14, get_param_int(global.parameters, "integer", 0));
+    CuAssertDblEquals(tc, 0.5f, get_param_flt(global.parameters, "float", 0), 0.01);
+    test_cleanup();
+}
+
 static void test_races(CuTest * tc)
 {
     const char * data = "{\"races\": { \"orc\" : { "
@@ -510,6 +526,7 @@ CuSuite *get_jsonconf_suite(void)
     SUITE_ADD_TEST(suite, test_strings);
     SUITE_ADD_TEST(suite, test_spells);
     SUITE_ADD_TEST(suite, test_flags);
+    SUITE_ADD_TEST(suite, test_settings);
     SUITE_ADD_TEST(suite, test_infinitive_from_config);
     return suite;
 }

@@ -90,34 +90,6 @@
     <skill name="taxation" enable="true"/>
     <skill name="stamina" enable="true"/>
     <skill name="unarmed" enable="true"/>
-
-    <param name="NewbieImmunity" value="8"/>
-    <param name="modules.wormholes" value="1"/>
-    <param name="entertain.base" value="0"/>
-    <param name="entertain.perlevel" value="20"/>
-    <param name="nmr.timeout" value="5"/>
-    <param name="nmr.removenewbie" value="0"/>
-    <param name="GiveRestriction" value="3"/>
-    <param name="hunger.long" value="1"/>
-    <param name="init_spells" value="0"/>
-    <param name="world.era" value="2"/>
-    <param name="seed.population.min" value="8"/>
-    <param name="seed.population.max" value="8"/>
-    <param name="rules.ship.damage_drift" value="0.00"/> <!-- percent damage from drifting-->
-    <param name="rules.reserve.twophase" value="1"/>
-    <param name="rules.give.max_men" value="-1"/>
-    <param name="rules.check_overload" value="0"/>
-    <param name="rules.limit.faction" value="2500"/>
-    <param name="rules.maxskills.magic" value="5"/>
-    <param name="rules.guard.base_stop_prob" value="0.30"/>
-    <param name="rules.guard.skill_stop_prob" value="0.05"/>
-    <param name="rules.guard.amulet_stop_prob" value="0.10"/>
-    <param name="rules.guard.guard_number_stop_prob" value="0.001"/>
-    <param name="rules.guard.castle_stop_prob" value="0.05"/>
-    <param name="rules.guard.region_type_stop_prob" value="0.05"/>
-    <param name="rules.economy.repopulate_maximum" value="500"/>
-    <param name="game.id" value="2"/>
-    <param name="game.name" value="Eressea"/>
   </game>
   <strings>
     <string name="mailto">

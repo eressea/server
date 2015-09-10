@@ -1,5 +1,34 @@
 {
 	"include": [
 		"keywords.json"
-	]
+	],
+    "settings": {
+        "NewbieImmunity": 8,
+        "modules.wormholes": 1,
+        "entertain.base": 0,
+        "entertain.perlevel": 20,
+        "nmr.timeout": 5,
+        "nmr.removenewbie": 0,
+        "GiveRestriction": 3,
+        "hunger.long": 1,
+        "init_spells": 0,
+        "world.era": 2,
+        "seed.population.min": 8,
+        "seed.population.max": 8,
+        "rules.ship.damage_drift": 0.00,
+        "rules.reserve.twophase": 1,
+        "rules.give.max_men": "-1",
+        "rules.check_overload": 0,
+        "rules.limit.faction": 2500,
+        "rules.maxskills.magic": 5,
+        "rules.guard.base_stop_prob": 0.30,
+        "rules.guard.skill_stop_prob": 0.05,
+        "rules.guard.amulet_stop_prob": 0.10,
+        "rules.guard.guard_number_stop_prob": 0.001,
+        "rules.guard.castle_stop_prob": 0.05,
+        "rules.guard.region_type_stop_prob": 0.05,
+        "rules.economy.repopulate_maximum": 500,
+        "game.id": 2,
+        "game.name": "Eressea"
+    }
 }
