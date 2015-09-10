@@ -3,6 +3,8 @@
 		"keywords.json"
 	],
     "settings": {
+        "game.id": 2,
+        "game.name": "Eressea",
         "NewbieImmunity": 8,
         "modules.wormholes": 1,
         "entertain.base": 0,
@@ -27,8 +29,6 @@
         "rules.guard.guard_number_stop_prob": 0.001,
         "rules.guard.castle_stop_prob": 0.05,
         "rules.guard.region_type_stop_prob": 0.05,
-        "rules.economy.repopulate_maximum": 500,
-        "game.id": 2,
-        "game.name": "Eressea"
+        "rules.economy.repopulate_maximum": 500
     }
 }
