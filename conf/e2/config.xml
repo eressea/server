@@ -100,6 +100,9 @@
     <param name="GiveRestriction" value="3"/>
     <param name="hunger.long" value="1"/>
     <param name="init_spells" value="0"/>
+    <param name="world.era" value="2"/>
+    <param name="seed.population.min" value="8"/>
+    <param name="seed.population.max" value="8"/>
     <param name="rules.ship.damage_drift" value="0.00"/> <!-- percent damage from drifting-->
     <param name="rules.reserve.twophase" value="1"/>
     <param name="rules.give.max_men" value="-1"/>
@@ -115,7 +118,6 @@
     <param name="rules.economy.repopulate_maximum" value="500"/>
     <param name="game.id" value="2"/>
     <param name="game.name" value="Eressea"/>
-    <param name="world.era" value="2"/>
   </game>
   <strings>
     <string name="mailto">
