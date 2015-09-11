@@ -2231,6 +2231,7 @@ static int parse_main(xmlDocPtr doc)
 
         xmlXPathFreeObject(result);
 
+        xpath->node = node;
         /* reading eressea/game/order */
         result = xmlXPathEvalExpression(BAD_CAST "order", xpath);
         nodes = result->nodesetval;
