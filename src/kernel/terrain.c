@@ -59,10 +59,18 @@ static terrain_type *registered_terrains;
 void free_terrains(void)
 {
     while (registered_terrains) {
+        int n;
         terrain_type * t = registered_terrains;
         registered_terrains = t->next;
         free(t->_name);
-        free(t->production);
+        if (t->production) {
+            for (n = 0; t->production[n].type; ++n) {
+                free(t->production[n].base);
+                free(t->production[n].divisor);
+                free(t->production[n].startlevel);
+            }
+            free(t->production);
+        }
         free(t);
     }
 }
