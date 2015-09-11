@@ -611,7 +611,7 @@ int count_maxmigrants(const faction * f)
     static int migrants = -1;
 
     if (migrants < 0) {
-        migrants = get_param_int(global.parameters, "rules.migrants", INT_MAX);
+        migrants = get_param_int(global.parameters, "rules.migrants.max", INT_MAX);
     }
     if (migrants == INT_MAX) {
         int x = 0;
@@ -1404,19 +1404,19 @@ int cmp_current_owner(const building * b, const building * a)
     return -1;
 }
 
-int rule_stealth_faction(void)
+bool rule_stealth_faction(void)
 {
     static int gamecookie = -1;
     static int rule = -1;
     if (rule < 0 || gamecookie != global.cookie) {
-        rule = get_param_int(global.parameters, "rules.stealth.faction", 0xFF);
+        rule = get_param_int(global.parameters, "rules.stealth.faction", 1);
         gamecookie = global.cookie;
         assert(rule >= 0);
     }
-    return rule;
+    return rule!=0;
 }
 
-int rule_region_owners(void)
+bool rule_region_owners(void)
 {
     static int gamecookie = -1;
     static int rule = -1;
@@ -1425,7 +1425,7 @@ int rule_region_owners(void)
         gamecookie = global.cookie;
         assert(rule >= 0);
     }
-    return rule;
+    return rule!=0;
 }
 
 int rule_auto_taxation(void)
@@ -1447,7 +1447,7 @@ int rule_blessed_harvest(void)
     static int rule = -1;
     if (rule < 0 || gamecookie != global.cookie) {
         rule =
-            get_param_int(global.parameters, "rules.magic.blessed_harvest",
+            get_param_int(global.parameters, "rules.blessed_harvest.flags",
             HARVEST_WORK);
         gamecookie = global.cookie;
         assert(rule >= 0);
@@ -1479,7 +1479,7 @@ int rule_faction_limit(void)
     return rule;
 }
 
-int rule_transfermen(void)
+bool rule_transfermen(void)
 {
     static int gamecookie = -1;
     static int rule = -1;
@@ -1488,7 +1488,7 @@ int rule_transfermen(void)
         gamecookie = global.cookie;
         assert(rule >= 0);
     }
-    return rule;
+    return rule!=0;
 }
 
 static int

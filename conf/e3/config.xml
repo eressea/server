@@ -46,8 +46,6 @@
 
   <game name="E3">
     <!-- Game specific settings -->
-    <param name="database.gameid" value="7"></param>
-
     <order name="besiege" disable="yes"/>
     <order name="steal" disable="yes"/>
     <order name="buy" disable="yes"/>
@@ -89,82 +87,6 @@
     <skill name="stealth" enable="false"/>
     <skill name="taxation" enable="false"/>
     <skill name="trade" enable="false"/>
-
-    <param name="NewbieImmunity" value="4"/>-
-    <param name="modules.astralspace" value="0"/>
-    <param name="modules.wormholes" value="0"/>
-    <param name="modules.markets" value="1"/>
-
-    <!-- resource limitations -->
-    <param name="magic.regeneration" value="0.75"/>
-    <param name="magic.power" value="0.5"/>
-    <param name="resource.factor" value="0.25"/>
-
-    <param name="skills.cost.tactics" value="500"/>
-    <param name="entertain.base" value="0"/>
-    <param name="entertain.perlevel" value="20"/>
-    <param name="nmr.timeout" value="5"/>
-    <param name="nmr.removenewbie" value="0"/>
-    <param name="GiveRestriction" value="3"/>
-    <param name="hunger.long" value="0"/>
-    <param name="hunger.demon.skill" value="1"/>
-    <param name="hunger.damage" value="1d9+9"/>
-    <param name="hunger.demons" value="1"/>
-    <param name="init_spells" value="0"/>
-    <param name="recruit.allow_merge" value="1"/>
-    <param name="study.expensivemigrants" value="1"/>
-    <param name="study.speedup" value="2"/>
-    <param name="world.era" value="3"/>
-    <param name="seed.population.min" value="8"/>
-    <param name="seed.population.max" value="8"/>
-    <param name="rules.migrants" value="0"/>
-    <param name="rules.reserve.twophase" value="1"/>
-    <param name="rules.owners.force_leave" value="0"/>
-    <param name="rules.monsters.attack_chance" value="0.0"/>
-    <param name="rules.transfermen" value="0"/>
-    <param name="rules.stealth.faction" value="1"/>
-    <param name="rules.stealth.anon_battle" value="0"/>
-    <param name="rules.check_overload" value="0"/>
-    <param name="rules.combat.goblinbonus" value="3"/>
-    <param name="rules.ship.damage_drift" value="0.00"/> <!-- percent damage from drifting-->
-    <param name="rules.alliances" value="1"/>
-    <param name="rules.combat.herospeed" value="3"/>
-    <param name="rules.combat.demon_vampire" value="5"/> <!-- regen 1 hp per X points of damage done -->
-    <param name="rules.combat.skill_bonus" value="0"/>
-    <param name="rules.combat.nat_armor" value="1"/>
-    <!--param name="rules.combat.loot" value="5"/--> <!-- only self + others - keeploot -->
-    <param name="rules.items.loot_divisor" value="2"/> <!-- damage skims off 1/2 of goods transfers -->
-    <param name="rules.items.give_divisor" value="2"/> <!-- corruption skims off 1/2 of goods transfers -->
-    <param name="rules.move.owner_leave" value="1"/> <!-- owner must leave before moving -->
-    <param name="rules.region_owners" value="1"/>
-    <param name="rules.cavalry.skill" value="2"/>
-    <param name="rules.cavalry.mode" value="1"/>
-    <param name="rules.magic.multipotion" value="1"/>
-    <param name="rules.magic.wol_effect" value="5"/>
-    <param name="rules.magic.factionlist" value="1"/>
-    <param name="rules.magic.wol_type" value="2"/>
-    <param name="rules.magic.blessed_harvest" value="1"/>
-    <param name="rules.magic.elfpower" value="1"/> <!-- elves get ring-of-power bonus in a forest -->
-    <param name="rules.magic.playerschools" value="gwyrrd illaun draig cerddor"/>
-    <param name="rules.build.other_buildings" value="1"/>
-    <param name="rules.economy.taxation" value="1"/>
-    <param name="rules.economy.food" value="2"/>
-    <param name="rules.economy.wages" value="1"/>
-    <param name="rules.economy.roqf" value="5"/>
-    <param name="rules.economy.herbrot" value="0"/>
-    <param name="rules.region_owner_pay_building" value="market harbour lighthouse"/>
-    <param name="rules.dwarf_castles" value="1"/>
-    <!-- param name="rules.nmr.destroy" value="1"/ -->
-    <param name="rules.limit.faction" value="250"/>
-    <!--param name="rules.give" value="15"/ --> <!-- self + peasants + herbs + lux - goods -->
-    <param name="rules.economy.grow" value="1"/>
-    <param name="rules.tactics.formula" value="1"/> <!-- 10% per skilldiff -->
-    <param name="rules.help.mask" value="fight guard money give"/>
-    <param name="movement.shipspeed.skillbonus" value="6"/>
-    <param name="alliance.auto" value="fight"/>
-    <param name="alliance.restricted" value="fight"/>
-    <param name="game.id" value="3"/>
-    <param name="game.name" value="E3"/>
   </game>
   <rules>
     <function name="wage" value="minimum_wage"/>

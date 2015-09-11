@@ -17,14 +17,14 @@ function setup()
     eressea.game.reset()
     settings = {}
     set_rule("rules.move.owner_leave", "1")
-    set_rule("rules.economy.food", "4")
+    set_rule("rules.food.flags", "4")
     set_rule("rules.ship.drifting", "0")
     set_rule("rules.ship.storms", "0")
 end
 
 function teardown()
     set_rule("rules.move.owner_leave")
-    set_rule("rules.economy.food")
+    set_rule("rules.food.flags")
     set_rule("rules.ship.drifting")
     set_rule("rules.ship.storms")
 end
@@ -146,6 +146,21 @@ function test_no_stealth()
     assert_equal(-1, u:get_skill("stealth"))
 end
 
+function test_no_teach()
+    local r = region.create(0,0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u1 = unit.create(f, r, 1)
+    local u2 = unit.create(f, r, 1)
+
+    u1:clear_orders()
+    u2:clear_orders()
+    u1:set_skill("riding", 3)
+    u2:add_order("LERNE Reiten")
+    u1:add_order("LEHRE " .. itoa36(u2.id))
+    process_orders()
+    -- TODO: assert something (reflecting skills sucks!)
+end
+
 function test_seecast()
     local r = region.create(0,0, "plain")
     for i = 1,10 do
@@ -206,7 +221,7 @@ function test_xmastree()
 end
 
 function test_fishing()
-    eressea.settings.set("rules.economy.food", "0")
+    eressea.settings.set("rules.food.flags", "0")
     local r = region.create(0,0, "ocean")
     local r2 = region.create(1,0, "plain")
     local f = faction.create("noreply@eressea.de", "human", "de")

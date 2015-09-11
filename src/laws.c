@@ -793,7 +793,7 @@ void demographics(void)
 
                 if (plant_rules < 0) {
                     plant_rules =
-                        get_param_int(global.parameters, "rules.economy.grow", 0);
+                        get_param_int(global.parameters, "rules.grow.formula", 0);
                 }
                 for (dmd = r->land->demands; dmd; dmd = dmd->next) {
                     if (dmd->value > 0 && dmd->value < MAXDEMAND) {

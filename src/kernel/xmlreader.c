@@ -2231,17 +2231,7 @@ static int parse_main(xmlDocPtr doc)
 
         xmlXPathFreeObject(result);
 
-        /* reading eressea/game/param */
         xpath->node = node;
-        result = xmlXPathEvalExpression(BAD_CAST "param", xpath);
-        nodes = result->nodesetval;
-        for (i = 0; i != nodes->nodeNr; ++i) {
-            xmlNodePtr node = nodes->nodeTab[i];
-            parse_param(&global.parameters, node);
-        }
-
-        xmlXPathFreeObject(result);
-
         /* reading eressea/game/order */
         result = xmlXPathEvalExpression(BAD_CAST "order", xpath);
         nodes = result->nodesetval;
