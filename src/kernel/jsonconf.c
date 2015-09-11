@@ -229,16 +229,19 @@ static void json_terrain(cJSON *json, terrain_type *ter) {
         case cJSON_Object:
             if (strcmp(child->string, "production") == 0) {
                 cJSON *entry;
-                int n, size = cJSON_GetArraySize(child);
-                ter->production = (terrain_production *)calloc(size + 1, sizeof(terrain_production));
-                ter->production[size].type = 0;
-                for (n = 0, entry = child->child; entry; entry = entry->next, ++n) {
-                    ter->production[n].type = rt_get_or_create(entry->string);
-                    if (entry->type != cJSON_Object) {
-                        log_error("terrain %s contains invalid production %s", json->string, entry->string);
-                    }
-                    else {
-                        json_terrain_production(entry, ter->production + n);
+                int size = cJSON_GetArraySize(child);
+                if (size > 0) {
+                    int n;
+                    ter->production = (terrain_production *)calloc(size + 1, sizeof(terrain_production));
+                    ter->production[size].type = 0;
+                    for (n = 0, entry = child->child; entry; entry = entry->next, ++n) {
+                        ter->production[n].type = rt_get_or_create(entry->string);
+                        if (entry->type != cJSON_Object) {
+                            log_error("terrain %s contains invalid production %s", json->string, entry->string);
+                        }
+                        else {
+                            json_terrain_production(entry, ter->production + n);
+                        }
                     }
                 }
             }
@@ -255,11 +258,14 @@ static void json_terrain(cJSON *json, terrain_type *ter) {
             }
             else if (strcmp(child->string, "herbs") == 0) {
                 cJSON *entry;
-                int n, size = cJSON_GetArraySize(child);
-                ter->herbs = malloc(sizeof(const item_type *) * (size+1));
-                ter->herbs[size] = 0;
-                for (n = 0, entry = child->child; entry; entry = entry->next) {
-                    ter->herbs[n++] = it_get_or_create(rt_get_or_create(entry->valuestring));
+                int size = cJSON_GetArraySize(child);
+                if (size > 0) {
+                    int n;
+                    ter->herbs = malloc(sizeof(const item_type *) * (size + 1));
+                    ter->herbs[size] = 0;
+                    for (n = 0, entry = child->child; entry; entry = entry->next) {
+                        ter->herbs[n++] = it_get_or_create(rt_get_or_create(entry->valuestring));
+                    }
                 }
             }
             else {
