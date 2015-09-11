@@ -418,6 +418,10 @@ static void test_terrains(CuTest * tc)
     CuAssertPtrNotNull(tc, ter->name); // anything named "plain" uses plain_name()
     CuAssertPtrNotNull(tc, ter->production);
     CuAssertPtrEquals(tc, rt_get_or_create("stone"), (resource_type *)ter->production[0].type);
+    CuAssertDblEquals(tc, 0.1, ter->production[0].chance, 0.01);
+    CuAssertStrEquals(tc, "1d4", ter->production[0].base);
+    CuAssertStrEquals(tc, "1d5", ter->production[0].divisor);
+    CuAssertStrEquals(tc, "1d6", ter->production[0].startlevel);
     CuAssertPtrEquals(tc, rt_get_or_create("iron"), (resource_type *)ter->production[1].type);
     CuAssertPtrEquals(tc, 0, (void *)ter->production[2].type);
 
