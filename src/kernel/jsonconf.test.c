@@ -389,7 +389,13 @@ static void test_configs(CuTest * tc)
 
 static void test_terrains(CuTest * tc)
 {
-    const char * data = "{\"terrains\": { \"plain\" : { \"flags\" : [ \"land\", \"fly\", \"walk\" ] } }}";
+    const char * data = "{\"terrains\": { \"plain\" : { "
+        "\"herbs\": [ \"h0\", \"h1\" ], "
+        "\"production\": { \"stone\": { \"chance\": 0.1, \"base\": \"1d4\", \"div\": \"1d5\", \"level\": \"1d6\" }, \"iron\": {} }, "
+        "\"size\": 4000, "
+        "\"road\": 50, "
+        "\"seed\": 3, "
+        "\"flags\" : [ \"forbidden\", \"arctic\", \"cavalry\", \"sea\", \"forest\", \"land\", \"sail\", \"fly\", \"swim\", \"walk\" ] } }}";
     const terrain_type *ter;
 
     cJSON *json = cJSON_Parse(data);
@@ -401,7 +407,19 @@ static void test_terrains(CuTest * tc)
     json_config(json);
     ter = get_terrain("plain");
     CuAssertPtrNotNull(tc, ter);
-    CuAssertIntEquals(tc, ter->flags, LAND_REGION | FLY_INTO | WALK_INTO);
+    CuAssertIntEquals(tc, ARCTIC_REGION | LAND_REGION | SEA_REGION | FOREST_REGION | CAVALRY_REGION | FORBIDDEN_REGION | FLY_INTO | WALK_INTO | SWIM_INTO | SAIL_INTO, ter->flags);
+    CuAssertIntEquals(tc, 4000, ter->size);
+    CuAssertIntEquals(tc, 50, ter->max_road);
+    CuAssertIntEquals(tc, 3, ter->distribution);
+    CuAssertPtrNotNull(tc, ter->herbs);
+    CuAssertPtrEquals(tc, rt_get_or_create("h0"), ter->herbs[0]->rtype);
+    CuAssertPtrEquals(tc, rt_get_or_create("h1"), ter->herbs[1]->rtype);
+    CuAssertPtrEquals(tc, 0, (void *)ter->herbs[2]);
+    CuAssertPtrNotNull(tc, ter->name); // anything named "plain" uses plain_name()
+    CuAssertPtrNotNull(tc, ter->production);
+    CuAssertPtrEquals(tc, rt_get_or_create("stone"), (resource_type *)ter->production[0].type);
+    CuAssertPtrEquals(tc, rt_get_or_create("iron"), (resource_type *)ter->production[1].type);
+    CuAssertPtrEquals(tc, 0, (void *)ter->production[2].type);
 
     test_cleanup();
 }

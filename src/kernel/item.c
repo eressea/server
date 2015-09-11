@@ -54,6 +54,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* libc includes */
 #include <assert.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -179,9 +180,14 @@ static void rt_register(resource_type * rtype)
 resource_type *rt_get_or_create(const char *name) {
     resource_type *rtype = rt_find(name);
     if (!rtype) {
-        rtype = (resource_type *)calloc(sizeof(resource_type), 1);
-        rtype->_name = _strdup(name);
-        rt_register(rtype);
+        rtype = calloc(1, sizeof(resource_type));
+        if (!rtype) {
+            perror("resource_type allocation failed");
+        }
+        else {
+            rtype->_name = _strdup(name);
+            rt_register(rtype);
+        }
     }
     return rtype;
 }

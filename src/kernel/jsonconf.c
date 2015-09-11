@@ -185,6 +185,39 @@ static void json_construction(cJSON *json, construction **consp) {
     *consp = cons;
 }
 
+static void json_terrain_production(cJSON *json, terrain_production *prod) {
+    assert(json->type == cJSON_Object);
+    cJSON *child;
+    for (child = json->child; child; child = child->next) {
+        switch (child->type) {
+        case cJSON_String:
+            if (strcmp(child->string, "base") == 0) {
+                prod->base = _strdup(child->valuestring);
+            }
+            else if (strcmp(child->string, "level") == 0) {
+                prod->startlevel = _strdup(child->valuestring);
+            }
+            else if (strcmp(child->string, "div") == 0) {
+                prod->divisor = _strdup(child->valuestring);
+            }
+            else {
+                log_error("terrain_production %s contains unknown attribute %s", json->string, child->string);
+            }
+            break;
+        case cJSON_Number:
+            if (strcmp(child->string, "chance") == 0) {
+                prod->chance = (float)child->valuedouble;
+            }
+            else {
+                log_error("terrain_production %s contains unknown attribute %s", json->string, child->string);
+            }
+            break;
+        default:
+            log_error("terrain_production %s contains unknown attribute %s", json->string, child->string);
+        }
+    }
+}
+
 static void json_terrain(cJSON *json, terrain_type *ter) {
     cJSON *child;
     if (json->type != cJSON_Object) {
@@ -193,6 +226,26 @@ static void json_terrain(cJSON *json, terrain_type *ter) {
     }
     for (child = json->child; child; child = child->next) {
         switch (child->type) {
+        case cJSON_Object:
+            if (strcmp(child->string, "production") == 0) {
+                cJSON *entry;
+                int n, size = cJSON_GetArraySize(child);
+                ter->production = (terrain_production *)calloc(size + 1, sizeof(const item_type *));
+                ter->production[size].type = 0;
+                for (n = 0, entry = child->child; entry; entry = entry->next, ++n) {
+                    ter->production[n].type = rt_get_or_create(entry->string);
+                    if (entry->type != cJSON_Object) {
+                        log_error("terrain %s contains invalid production %s", json->string, entry->string);
+                    }
+                    else {
+                        json_terrain_production(entry, ter->production + n);
+                    }
+                }
+            }
+            else {
+                log_error("terrain %s contains unknown attribute %s", json->string, child->string);
+            }
+            break;
         case cJSON_Array:
             if (strcmp(child->string, "flags") == 0) {
                 const char * flags[] = {
@@ -200,10 +253,29 @@ static void json_terrain(cJSON *json, terrain_type *ter) {
                 };
                 ter->flags = json_flags(child, flags);
             }
+            else if (strcmp(child->string, "herbs") == 0) {
+                cJSON *entry;
+                int n, size = cJSON_GetArraySize(child);
+                ter->herbs = malloc(sizeof(const item_type *) * (size+1));
+                ter->herbs[size] = 0;
+                for (n = 0, entry = child->child; entry; entry = entry->next) {
+                    ter->herbs[n++] = it_get_or_create(rt_get_or_create(entry->valuestring));
+                }
+            }
             else {
                 log_error("terrain %s contains unknown attribute %s", json->string, child->string);
             }
             break;
+        case cJSON_Number:
+            if (strcmp(child->string, "size") == 0) {
+                ter->size = child->valueint;
+            }
+            else if (strcmp(child->string, "road") == 0) {
+                ter->max_road = (short)child->valueint;
+            }
+            else if (strcmp(child->string, "seed") == 0) {
+                ter->distribution = (short)child->valueint;
+            }
         default:
             log_error("terrain %s contains unknown attribute %s", json->string, child->string);
         }
