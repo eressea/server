@@ -6425,7 +6425,7 @@
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat soetwas nicht."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat so etwas nicht."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit does not have this."</text>
   </message>
   <message name="error42" section="errors">
