@@ -104,7 +104,7 @@ function test_process_quit()
     eressea.write_game('test.dat')
     eressea.free_game()
     eressea.read_game('test.dat')
-    os.remove('test.dat')
+    os.remove('data/test.dat')
     assert_equal(nil, _G.get_faction(fno))
 end
 

@@ -41,3 +41,5 @@ Thumbs.db
 *.cmd
 tmp/
 tests/config.lua
+tests/reports/
+tests/data/185.dat
