@@ -62,14 +62,18 @@ static void test_settings(CuTest * tc)
     const char * data = "{\"settings\": { "
         "\"string\" : \"1d4\","
         "\"integer\" : 14,"
-        "\"float\" : 0.5 }}";
+        "\"true\": true,"
+        "\"false\": false,"
+        "\"float\" : 1.5 }}";
     cJSON *json = cJSON_Parse(data);
 
     test_cleanup();
     json_config(json);
+    CuAssertStrEquals(tc, "1", get_param(global.parameters, "true"));
+    CuAssertStrEquals(tc, "0", get_param(global.parameters, "false"));
     CuAssertStrEquals(tc, "1d4", get_param(global.parameters, "string"));
     CuAssertIntEquals(tc, 14, get_param_int(global.parameters, "integer", 0));
-    CuAssertDblEquals(tc, 0.5f, get_param_flt(global.parameters, "float", 0), 0.01);
+    CuAssertDblEquals(tc, 1.5f, get_param_flt(global.parameters, "float", 0), 0.01);
     test_cleanup();
 }
 

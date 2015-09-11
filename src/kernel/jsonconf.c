@@ -650,7 +650,12 @@ static void json_settings(cJSON *json) {
         }
         else {
             char value[32];
-            _snprintf(value, sizeof(value), "%lf", child->valuedouble);
+            if (child->type == cJSON_Number && child->valuedouble && child->valueint<child->valuedouble) {
+                _snprintf(value, sizeof(value), "%lf", child->valuedouble);
+            }
+            else {
+                _snprintf(value, sizeof(value), "%d", child->valueint);
+            }
             set_param(&global.parameters, child->string, value);
         }
     }
