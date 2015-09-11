@@ -230,7 +230,7 @@ static void json_terrain(cJSON *json, terrain_type *ter) {
             if (strcmp(child->string, "production") == 0) {
                 cJSON *entry;
                 int n, size = cJSON_GetArraySize(child);
-                ter->production = (terrain_production *)calloc(size + 1, sizeof(const item_type *));
+                ter->production = (terrain_production *)calloc(size + 1, sizeof(terrain_production));
                 ter->production[size].type = 0;
                 for (n = 0, entry = child->child; entry; entry = entry->next, ++n) {
                     ter->production[n].type = rt_get_or_create(entry->string);
