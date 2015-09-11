@@ -1151,7 +1151,7 @@ void terraform_region(region * r, const terrain_type * terrain)
 
 /** ENNO:
  * ich denke, das das hier nicht sein sollte.
- * statt dessen sollte ein attribut an der region sein, das das erledigt,
+ * statt dessen sollte ein attribut an der region sein, dass das erledigt,
  * egal ob durch den spell oder anderes angelegt.
  **/
 #include "curse.h"

@@ -20,7 +20,6 @@
   <xi:include href="config://core/ships.xml"/>
   <xi:include href="config://core/common/buildings.xml"/>
   <xi:include href="config://game/familiars.xml"/>
-  <xi:include href="config://core/terrains.xml"/>
   <xi:include href="config://game/artrewards.xml"/>
   <xi:include href="config://game/buildings.xml"/>
   <xi:include href="config://core/calendar.xml"/>

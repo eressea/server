@@ -166,6 +166,110 @@
                 }
             }
         },
+        "iceberg": {
+            "size": 100,
+            "herbs": [ "h18", "h19", "h20" ],
+            "flags": [ "arctic", "land", "walk", "sail", "fly" ],
+            "production": {
+                "iron": {
+                    "chance": 0.9,
+                    "base": "3",
+                    "div": "50",
+                    "level": "1"
+                },
+                "stone": {
+                    "chance": 0.9,
+                    "base": "2",
+                    "div": "100",
+                    "level": "1"
+                }
+            }
+        },
+        "iceberg_sleep": {
+            "size": 100,
+            "herbs": [ "h18", "h19", "h20" ],
+            "flags": [ "arctic", "land", "walk", "sail", "fly" ],
+            "production": {
+                "iron": {
+                    "chance": 0.9,
+                    "base": "3",
+                    "div": "50",
+                    "level": "1"
+                },
+                "stone": {
+                    "chance": 0.9,
+                    "base": "2",
+                    "div": "100",
+                    "level": "1"
+                },
+                "laen": {
+                    "chance": 0.05,
+                    "base": "4",
+                    "div": "100",
+                    "level": "1"
+                }
+            }
+        },
+        "firewall": {
+            "size": 100,
+            "road": 250,
+            "flags": [ "forbidden" ]
+        },
+        "fog": {
+            "flags": [ "walk", "fly" ]
+        },
+        "thickfog": {
+            "flags": [ "forbidden" ]
+        },
+        "volcano": {
+            "size": 500,
+            "road": 250,
+            "seed": 1,
+            "production": {
+                "iron": {
+                    "chance": 0.5,
+                    "level": 1,
+                    "base": 50,
+                    "div": 50
+                },
+                "stone": {
+                    "chance": 0.5,
+                    "level": 1,
+                    "base": 100,
+                    "div": 100
+                },
+                "laen": {
+                    "chance": 0.075,
+                    "level": 1,
+                    "base": 4,
+                    "div": 100
+                }
+            }
+        },
+        "activevolcano": {
+            "size": 500,
+            "road": 250,
+            "production": {
+                "iron": {
+                    "chance": 0.5,
+                    "level": 1,
+                    "base": 50,
+                    "div": 50
+                },
+                "stone": {
+                    "chance": 0.5,
+                    "level": 1,
+                    "base": 100,
+                    "div": 100
+                },
+                "laen": {
+                    "chance": 0.075,
+                    "level": 1,
+                    "base": 4,
+                    "div": 100
+                }
+            }
+        },
         "hell": {
             "flags": [ "land", "walk" ]
         },
