@@ -282,6 +282,10 @@ static void json_terrain(cJSON *json, terrain_type *ter) {
             else if (strcmp(child->string, "seed") == 0) {
                 ter->distribution = (short)child->valueint;
             }
+            else {
+                log_error("terrain %s contains unknown attribute %s", json->string, child->string);
+            }
+            break;
         default:
             log_error("terrain %s contains unknown attribute %s", json->string, child->string);
         }
@@ -829,6 +833,7 @@ void json_config(cJSON *json) {
         }
         else if (strcmp(child->string, "terrains") == 0) {
             json_terrains(child);
+            init_terrains();
         }
         else {
             log_error("config contains unknown attribute %s", child->string);
