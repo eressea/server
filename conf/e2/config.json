@@ -1,48 +1,8 @@
 {
 	"include": [
-		"keywords.json"
+		"keywords.json",
+        "terrains.json"
 	],
-    "terrains": {
-        "ocean": {
-            "size": 100,
-            "flags": [ "swim", "sea", "sail", "fly" ]
-        },
-        "plain": {
-            "size": 10000,
-            "herbs": [ "h0", "h1", "h2", "h3", "h4", "h5" ],
-            "seed": 3,
-            "road": 50,
-            "flags": [ "land", "walk", "sail", "fly" ],
-            "production": {
-                "iron": {
-                    "chance": 0.1,
-                    "base": "5d8",
-                    "div": "2d20+10",
-                    "level": "2d4-1"
-                },
-                "stone": {
-                    "chance": 0.15,
-                    "base": "5d8",
-                    "div": "2d30+20",
-                    "level": "1d4"
-                },
-                "laen": {
-                    "chance": 0.01,
-                    "base": "1d4",
-                    "div": "2d20+50",
-                    "level": "1d4"
-                }
-            }
-        },
-        "default": {
-            "size": 0,
-            "herbs": [],
-            "seed": 0,
-            "road": 0,
-            "flags": [ "land", "walk", "sail", "fly" ],
-            "production": {}
-        }
-    },
     "settings": {
         "game.id": 2,
         "game.name": "Eressea",
