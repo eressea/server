@@ -151,18 +151,26 @@ extern "C" {
     int cmp_current_owner(const struct building *b,
         const struct building *bother);
 
-#define TAX_ORDER 0x00
-#define TAX_OWNER 0x01
-    int rule_auto_taxation(void);
-    int rule_transfermen(void);
-    int rule_region_owners(void);
-    int rule_stealth_faction(void);
+    bool rule_transfermen(void);
+    bool rule_region_owners(void);
+    bool rule_stealth_faction(void);
+    int rule_alliance_limit(void);
+    int rule_faction_limit(void);
 #define HARVEST_WORK  0x00
 #define HARVEST_TAXES 0x01
     int rule_blessed_harvest(void);
+#define TAX_ORDER 0x00
+#define TAX_OWNER 0x01
+    int rule_auto_taxation(void);
+#define GIVE_SELF 1
+#define GIVE_PEASANTS 2
+#define GIVE_LUXURIES 4
+#define GIVE_HERBS 8
+#define GIVE_GOODS 16
+#define GIVE_ONDEATH 32
+#define GIVE_ALLITEMS (GIVE_GOODS|GIVE_HERBS|GIVE_LUXURIES)
+#define GIVE_DEFAULT (GIVE_SELF|GIVE_PEASANTS|GIVE_LUXURIES|GIVE_HERBS|GIVE_GOODS)
     int rule_give(void);
-    int rule_alliance_limit(void);
-    int rule_faction_limit(void);
 
 #define COUNT_MONSTERS 0x01
 #define COUNT_MIGRANTS 0x02
@@ -295,15 +303,6 @@ extern "C" {
     void init_parameters(struct locale *lang);
 
     void free_gamedata(void);
-
-#define GIVE_SELF 1
-#define GIVE_PEASANTS 2
-#define GIVE_LUXURIES 4
-#define GIVE_HERBS 8
-#define GIVE_GOODS 16
-#define GIVE_ONDEATH 32
-#define GIVE_ALLITEMS (GIVE_GOODS|GIVE_HERBS|GIVE_LUXURIES)
-#define GIVE_DEFAULT (GIVE_SELF|GIVE_PEASANTS|GIVE_LUXURIES|GIVE_HERBS|GIVE_GOODS)
 
     extern struct attrib_type at_guard;
     extern struct helpmode helpmodes[];

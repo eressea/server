@@ -213,14 +213,14 @@ static void free_mage(attrib * a)
     free(mage);
 }
 
-int FactionSpells(void)
+bool FactionSpells(void)
 {
     static int rules_factionspells = -1;
     if (rules_factionspells < 0) {
         rules_factionspells =
             get_param_int(global.parameters, "rules.magic.factionlist", 0);
     }
-    return rules_factionspells;
+    return rules_factionspells!=0;
 }
 
 void read_spells(struct quicklist **slistp, magic_t mtype,

@@ -17,14 +17,14 @@ function setup()
     eressea.game.reset()
     settings = {}
     set_rule("rules.move.owner_leave", "1")
-    set_rule("rules.economy.food", "4")
+    set_rule("rules.food.flags", "4")
     set_rule("rules.ship.drifting", "0")
     set_rule("rules.ship.storms", "0")
 end
 
 function teardown()
     set_rule("rules.move.owner_leave")
-    set_rule("rules.economy.food")
+    set_rule("rules.food.flags")
     set_rule("rules.ship.drifting")
     set_rule("rules.ship.storms")
 end
@@ -221,7 +221,7 @@ function test_xmastree()
 end
 
 function test_fishing()
-    eressea.settings.set("rules.economy.food", "0")
+    eressea.settings.set("rules.food.flags", "0")
     local r = region.create(0,0, "ocean")
     local r2 = region.create(1,0, "plain")
     local f = faction.create("noreply@eressea.de", "human", "de")

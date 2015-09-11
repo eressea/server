@@ -17,7 +17,7 @@ function setup()
     eressea.game.reset()
     eressea.config.reset();
     eressea.settings.set('rules.magic.playerschools', '')
-    eressea.settings.set("rules.economy.food", "4")
+    eressea.settings.set("rules.food.flags", "4")
     eressea.settings.set('study.random_progress', '0')
     eressea.config.parse(conf)
 end

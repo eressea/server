@@ -3210,7 +3210,7 @@ side * find_side(battle * b, const faction * f, const group * g, unsigned int fl
         if (s->faction == f && s->group == g) {
             unsigned int s1flags = flags | SIDE_HASGUARDS;
             unsigned int s2flags = s->flags | SIDE_HASGUARDS;
-            if (rule_anon_battle && s->stealthfaction != stealthfaction) {
+            if (rule_anon_battle!=0 && s->stealthfaction != stealthfaction) {
                 continue;
             }
             if (s1flags == s2flags) {

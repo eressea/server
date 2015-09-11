@@ -121,7 +121,7 @@ void get_food(region * r)
 
     if (food_rules < 0 || gamecookie != global.cookie) {
         gamecookie = global.cookie;
-        food_rules = get_param_int(global.parameters, "rules.economy.food", 0);
+        food_rules = get_param_int(global.parameters, "rules.food.flags", 0);
     }
 
     if (food_rules & FOOD_IS_FREE) {
