@@ -225,6 +225,7 @@
             "size": 500,
             "road": 250,
             "seed": 1,
+            "flags": [ "land", "walk", "sail", "fly" ],
             "production": {
                 "iron": {
                     "chance": 0.5,
@@ -249,6 +250,7 @@
         "activevolcano": {
             "size": 500,
             "road": 250,
+            "flags": [ "land", "walk", "sail", "fly" ],
             "production": {
                 "iron": {
                     "chance": 0.5,
