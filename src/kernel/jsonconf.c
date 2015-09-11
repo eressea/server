@@ -784,14 +784,20 @@ static void json_include(cJSON *json) {
             fclose(F);
             config = cJSON_Parse(data);
             free(data);
-            json_config(config);
-            cJSON_Delete(config);
+            if (config) {
+                json_config(config);
+                cJSON_Delete(config);
+            }
+            else {
+                log_error("invalid JSON, could not parse %s", child->valuestring);
+            }
         }
     }
 }
 
 void json_config(cJSON *json) {
     cJSON *child;
+    assert(json);
     if (json->type != cJSON_Object) {
         log_error("config is not a json object: %d", json->type);
         return;
