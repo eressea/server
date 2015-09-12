@@ -110,13 +110,12 @@ int turn = -1;
 
 int NewbieImmunity(void)
 {
-    static int value = -1;
-    static int gamecookie = -1;
-    if (value < 0 || gamecookie != global.cookie) {
-        gamecookie = global.cookie;
-        value = get_param_int(global.parameters, "NewbieImmunity", 0);
+    static int update = -1;
+    if (update != global.cookie) {
+        update = global.cookie;
+        global.newbie_immunity_ = get_param_int(global.parameters, "NewbieImmunity", 0);
     }
-    return value;
+    return global.newbie_immunity_;
 }
 
 bool IsImmune(const faction * f)
@@ -185,48 +184,46 @@ int AllianceAuto(void)
  */
 int HelpMask(void)
 {
-    static int rule = -1;
     static int gamecookie = -1;
-    if (rule < 0 || gamecookie != global.cookie) {
+    if (gamecookie != global.cookie) {
         const char *str = get_param(global.parameters, "rules.help.mask");
         gamecookie = global.cookie;
-        rule = 0;
+        global.help_mask_ = 0;
         if (str != NULL) {
             char *sstr = _strdup(str);
             char *tok = strtok(sstr, " ");
             while (tok) {
-                rule |= ally_flag(tok, -1);
+                global.help_mask_ |= ally_flag(tok, -1);
                 tok = strtok(NULL, " ");
             }
             free(sstr);
         }
         else {
-            rule = HELP_ALL;
+            global.help_mask_ = HELP_ALL;
         }
     }
-    return rule;
+    return global.help_mask_;
 }
 
 int AllianceRestricted(void)
 {
-    static int rule = -1;
     static int gamecookie = -1;
-    if (rule < 0 || gamecookie != global.cookie) {
+    if (gamecookie != global.cookie) {
         const char *str = get_param(global.parameters, "alliance.restricted");
         gamecookie = global.cookie;
-        rule = 0;
+        global.alliance_restricted_ = 0;
         if (str != NULL) {
             char *sstr = _strdup(str);
             char *tok = strtok(sstr, " ");
             while (tok) {
-                rule |= ally_flag(tok, -1);
+                global.alliance_restricted_ |= ally_flag(tok, -1);
                 tok = strtok(NULL, " ");
             }
             free(sstr);
         }
-        rule &= HelpMask();
+        global.alliance_restricted_ &= HelpMask();
     }
-    return rule;
+    return global.alliance_restricted_;
 }
 
 int LongHunger(const struct unit *u)
@@ -1506,11 +1503,6 @@ int maintenance_cost(const struct unit *u)
 {
     if (u == NULL)
         return MAINTENANCE;
-    if (global.functions.maintenance) {
-        int retval = global.functions.maintenance(u);
-        if (retval >= 0)
-            return retval;
-    }
     return u_race(u)->maintenance * u->number;
 }
 

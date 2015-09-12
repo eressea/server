@@ -75,7 +75,6 @@ void test_cleanup(void)
 
     free_terrains();
     free_resources();
-    global.functions.maintenance = NULL;
     global.functions.wage = NULL;
     free_params(&global.parameters);
     default_locale = 0;
