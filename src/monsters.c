@@ -80,7 +80,7 @@ static void give_peasants(unit *u, const item_type *itype, int reduce) {
     unit_addorder(u, parse_order(buf, u->faction->locale));
 }
 
-static float monster_attack_chance(void) {
+static double monster_attack_chance(void) {
     return get_param_flt(global.parameters, "rules.monsters.attack_chance", 0.4f);
 }
 

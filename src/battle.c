@@ -2895,10 +2895,10 @@ static void aftermath(battle * b)
                 if (sh && fval(sh, SF_DAMAGED)) {
                     int n = b->turn - 2;
                     if (n > 0) {
-                        float dmg =
+                        double dmg =
                             get_param_flt(global.parameters, "rules.ship.damage.battleround",
                             0.05F);
-                        damage_ship(sh, dmg * (float)n);
+                        damage_ship(sh, dmg * n);
                         freset(sh, SF_DAMAGED);
                     }
                 }

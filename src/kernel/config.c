@@ -1123,10 +1123,10 @@ void set_basepath(const char *path)
     g_basedir = path;
 }
 
-float get_param_flt(const struct param *p, const char *key, float def)
+double get_param_flt(const struct param *p, const char *key, double def)
 {
     const char *str = get_param(p, key);
-    return str ? (float)atof(str) : def;
+    return str ? atof(str) : def;
 }
 
 void set_param(struct param **p, const char *key, const char *data)
