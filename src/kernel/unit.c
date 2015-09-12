@@ -1933,3 +1933,27 @@ bool unit_name_equals_race(const unit *u) {
 bool unit_can_study(const unit *u) {
     return !((u_race(u)->flags & RCF_NOLEARN) || fval(u, UFL_WERE));
 }
+
+static double produceexp_chance(void) {
+    static int update = 0;
+    if (update != global.cookie) {
+        global.producexpchance_ = get_param_flt(global.parameters, "study.from_use", 1.0 / 3);
+        update = global.cookie;
+    }
+    return global.producexpchance_;
+}
+
+void produceexp_ex(struct unit *u, skill_t sk, int n, bool (*learn)(unit *, skill_t, double))
+{
+    if (n != 0 && playerrace(u_race(u))) {
+        double chance = produceexp_chance();
+        if (chance > 0.0F) {
+            learn(u, sk, (n * chance) / u->number);
+        }
+    }
+}
+
+void produceexp(struct unit *u, skill_t sk, int n)
+{
+    produceexp_ex(u, sk, n, learn_skill);
+}

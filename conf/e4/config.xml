@@ -42,7 +42,7 @@
   <xi:include href="config://default/names-ghouls.xml"/>
   <xi:include href="config://default/names-dragons.xml"/>
 
-  <game name="Deveron">
+  <game>
     <order name="besiege" disable="yes"/>
     <order name="steal" disable="yes"/>
     <order name="buy" disable="yes"/>
