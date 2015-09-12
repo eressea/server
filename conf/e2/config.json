@@ -1,6 +1,7 @@
 {
 	"include": [
-		"keywords.json"
+		"keywords.json",
+        "e2/terrains.json"
 	],
     "settings": {
         "game.id": 2,

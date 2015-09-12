@@ -1119,14 +1119,19 @@ void terraform_region(region * r, const terrain_type * terrain)
     }
 
     if (oldterrain == NULL || terrain->size != oldterrain->size) {
+        int horses = 0, trees = 0;
+        if (terrain->size>0) {
+            horses = rng_int() % (terrain->size / 50);
+            trees = terrain->size * (30 + rng_int() % 40) / 1000;
+        }
         if (terrain == newterrain(T_PLAIN)) {
-            rsethorses(r, rng_int() % (terrain->size / 50));
-            if (rng_int() % 100 < 40) {
-                rsettrees(r, 2, terrain->size * (30 + rng_int() % 40) / 1000);
+            rsethorses(r, horses);
+            if (chance(0.4)) {
+                rsettrees(r, 2, trees);
             }
         }
-        else if (chance(0.2)) {
-            rsettrees(r, 2, terrain->size * (30 + rng_int() % 40) / 1000);
+        else if (trees>0 && chance(0.2)) {
+            rsettrees(r, 2, trees);
         }
         else {
             rsettrees(r, 2, 0);
@@ -1146,7 +1151,7 @@ void terraform_region(region * r, const terrain_type * terrain)
 
 /** ENNO:
  * ich denke, das das hier nicht sein sollte.
- * statt dessen sollte ein attribut an der region sein, das das erledigt,
+ * statt dessen sollte ein attribut an der region sein, dass das erledigt,
  * egal ob durch den spell oder anderes angelegt.
  **/
 #include "curse.h"
