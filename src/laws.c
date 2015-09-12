@@ -847,20 +847,6 @@ void demographics(void)
 
 /* ------------------------------------------------------------- */
 
-static int modify(int i)
-{
-    int c;
-
-    c = i * 2 / 3;
-
-    if (c >= 1) {
-        return (c + rng_int() % c);
-    }
-    else {
-        return (i);
-    }
-}
-
 /* test if the unit can slip through a siege undetected.
  * returns 0 if siege is successful, or 1 if the building is either
  * not besieged or the unit can slip through the siege due to better stealth.
