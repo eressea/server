@@ -4,6 +4,9 @@
 		"prefixes.json",
         "e2/terrains.json"
 	],
+    "disable": [
+        "pay"
+    ],
     "settings": {
         "game.id": 2,
         "game.name": "Eressea",

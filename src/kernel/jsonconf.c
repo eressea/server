@@ -501,6 +501,17 @@ static void json_prefixes(cJSON *json) {
     }
 }
 
+static void json_disable_keywords(cJSON *json) {
+    cJSON *child;
+    if (json->type != cJSON_Array) {
+        log_error("disabled is not a json array: %d", json->type);
+        return;
+    }
+    for (child = json->child; child; child = child->next) {
+        disable_keyword_str(child->valuestring);
+    }
+}
+
 static void json_terrains(cJSON *json) {
     cJSON *child;
     if (json->type != cJSON_Object) {
@@ -853,6 +864,9 @@ void json_config(cJSON *json) {
         }
         else if (strcmp(child->string, "prefixes") == 0) {
             json_prefixes(child);
+        }
+        else if (strcmp(child->string, "disable") == 0) {
+            json_disable_keywords(child);
         }
         else if (strcmp(child->string, "terrains") == 0) {
             json_terrains(child);

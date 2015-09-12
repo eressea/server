@@ -2074,16 +2074,7 @@ static int parse_main(xmlDocPtr doc)
             xmlChar *propName = xmlGetProp(node, BAD_CAST "name");
 
             if (xml_bvalue(node, "disable", false)) {
-                int k;
-                for (k = 0; k != MAXKEYWORDS; ++k) {
-                    if (strcmp(keywords[k], (const char *)propName) == 0) {
-                        enable_keyword(k, false);
-                        break;
-                    }
-                }
-                if (k == MAXKEYWORDS) {
-                    log_error("trying to disable unknown command %s\n", (const char *)propName);
-                }
+                disable_keyword_str((const char *)propName);
             }
             xmlFree(propName);
         }
