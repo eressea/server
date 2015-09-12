@@ -4064,11 +4064,10 @@ void process(void)
         region *r;
         processor *pglobal = proc;
 
-        if (verbosity >= 3)
-            printf("- Step %u\n", prio);
+        log_debug("- Step %u", prio);
         while (proc && proc->priority == prio) {
-            if (proc->name && verbosity >= 1)
-                log_printf(stdout, " - %s\n", proc->name);
+            if (proc->name)
+                log_debug(" - %s", proc->name);
             proc = proc->next;
         }
 
@@ -4164,8 +4163,7 @@ void process(void)
         }
     }
 
-    if (verbosity >= 3)
-        printf("\n - Leere Gruppen loeschen...\n");
+    log_debug("\n - Leere Gruppen loeschen...\n");
     for (f = factions; f; f = f->next) {
         group **gp = &f->groups;
         while (*gp) {

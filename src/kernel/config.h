@@ -313,28 +313,10 @@ extern "C" {
     extern bool battledebug;
     extern bool sqlpatch;
     extern bool lomem;         /* save memory */
-
     extern int turn;
-    extern int verbosity;
-
-    /** report options **/
-    extern const char *options[MAXOPTIONS];
-
-    extern struct helpmode helpmodes[];
-    extern const char *parameters[];
-    extern const char *localenames[];
-    extern settings global;
-
-    extern bool battledebug;
-    extern bool sqlpatch;
-    extern bool lomem;         /* save memory */
-
-    extern int turn;
-    extern int verbosity;
     extern bool getunitpeasants;
 
-    /** report options **/
-    extern const char *options[MAXOPTIONS];
+    extern const char *options[MAXOPTIONS];    /* report options */
 
 #ifdef __cplusplus
 }

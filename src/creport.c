@@ -81,7 +81,6 @@ without prior permission by the authors of Eressea.
 #include <string.h>
 
 /* imports */
-extern int verbosity;
 bool opt_cr_absolute_coords = false;
 
 /* globals */
