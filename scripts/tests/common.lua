@@ -1110,4 +1110,10 @@ function test_prefix()
     set_order(u1, "PRAEFIX")
     process_orders()
     assert_not_nil(u1:show():find("Elf"))
+
+    set_order(u1, "PRAEFIX Erz")
+    process_orders()
+    assert_not_nil(u1:show():find("Erzelf"))
+    u1.faction.locale = "en"
+    assert_not_nil(u1:show():find("archelf"))
 end
