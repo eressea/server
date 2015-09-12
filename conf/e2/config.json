@@ -1,6 +1,7 @@
 {
 	"include": [
 		"keywords.json",
+		"prefixes.json",
         "e2/terrains.json"
 	],
     "settings": {
