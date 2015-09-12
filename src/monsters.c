@@ -943,11 +943,9 @@ void spawn_dragons(void)
             fset(u, UFL_ISNEW | UFL_MOVED);
             equip_unit(u, get_equipment("monster_dragon"));
 
-            if (verbosity >= 2) {
-                log_printf(stdout, "%d %s in %s.\n", u->number,
-                    LOC(default_locale,
-                    rc_name_s(u_race(u), (u->number == 1) ? NAME_SINGULAR : NAME_PLURAL)), regionname(r, NULL));
-            }
+            log_debug("spawning %d %s in %s.\n", u->number,
+                LOC(default_locale,
+                rc_name_s(u_race(u), (u->number == 1) ? NAME_SINGULAR : NAME_PLURAL)), regionname(r, NULL));
 
             name_unit(u);
 
@@ -976,6 +974,7 @@ void spawn_undead(void)
         /* Chance 0.1% * chaosfactor */
         if (r->land && unburied > r->land->peasants / 20
             && rng_int() % 10000 < (100 + 100 * chaosfactor(r))) {
+            message *msg;
             unit *u;
             /* es ist sinnfrei, wenn irgendwo im Wald 3er-Einheiten Untote entstehen.
              * Lieber sammeln lassen, bis sie mindestens 5% der Bevölkerung sind, und
@@ -1018,14 +1017,10 @@ void spawn_undead(void)
             deathcounts(r, -undead);
             name_unit(u);
 
-            if (verbosity >= 2) {
-                log_printf(stdout, "%d %s in %s.\n", u->number,
-                    LOC(default_locale,
-                    rc_name_s(u_race(u), (u->number == 1) ? NAME_SINGULAR : NAME_PLURAL)), regionname(r, NULL));
-            }
-
-      {
-          message *msg = msg_message("undeadrise", "region", r);
+            log_debug("spawning %d %s in %s.\n", u->number,
+                LOC(default_locale,
+                rc_name_s(u_race(u), (u->number == 1) ? NAME_SINGULAR : NAME_PLURAL)), regionname(r, NULL));
+          msg = msg_message("undeadrise", "region", r);
           add_message(&r->msgs, msg);
           for (u = r->units; u; u = u->next)
               freset(u->faction, FFL_SELECT);
@@ -1036,7 +1031,6 @@ void spawn_undead(void)
               add_message(&u->faction->msgs, msg);
           }
           msg_release(msg);
-      }
         }
         else {
             int i = deathcount(r);

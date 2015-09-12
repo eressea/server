@@ -44,6 +44,7 @@ static const char *logfile = "eressea.log";
 static const char *luafile = 0;
 static const char *inifile = "eressea.ini";
 static int memdebug = 0;
+static int verbosity = 1;
 
 static void load_inifile(dictionary * d)
 {
@@ -202,10 +203,10 @@ static int parse_args(int argc, char **argv, int *exitcode)
         log_stderr = LOG_CPERROR | LOG_CPWARNING;
         break;
     case 3:
-        log_stderr = LOG_CPERROR | LOG_CPWARNING | LOG_CPDEBUG;
+        log_stderr = LOG_CPERROR | LOG_CPWARNING | LOG_CPINFO;
         break;
     default:
-        log_stderr = LOG_CPERROR | LOG_CPWARNING | LOG_CPDEBUG | LOG_CPINFO;
+        log_stderr = LOG_CPERROR | LOG_CPWARNING | LOG_CPINFO | LOG_CPDEBUG;
         break;
     }
 
