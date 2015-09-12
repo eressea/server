@@ -89,6 +89,9 @@ void test_cleanup(void)
     free_seen();
     free_prefixes();
     mt_clear();
+    for (i = 0; i != MAXSKILLS; ++i) {
+        enable_skill(i, true);
+    }
     for (i = 0; i != MAXKEYWORDS; ++i) {
         enable_keyword(i, true);
     }

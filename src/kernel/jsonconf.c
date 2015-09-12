@@ -508,21 +508,25 @@ static void json_prefixes(cJSON *json) {
  * 3. a "module.enabled" flag in the settings
  */
 static void disable_feature(const char *str) {
-    // FIXME: this is slower than balls.
+    char name[32];
     int k;
+    skill_t sk;
+    sk = findskill(str);
+    if (sk != NOSKILL) {
+        enable_skill(sk, false);
+        return;
+    }
     for (k = 0; k != MAXKEYWORDS; ++k) {
+        // FIXME: this loop is slow as balls.
         if (strcmp(keywords[k], str) == 0) {
             log_info("disable keyword %s\n", str);
             enable_keyword(k, false);
-            break;
+            return;
         }
     }
-    if (k == MAXKEYWORDS) {
-        char name[32];
-        _snprintf(name, sizeof(name), "%s.enabled", str);
-        log_info("disable feature %s\n", name);
-        set_param(&global.parameters, name, "0");
-    }
+    _snprintf(name, sizeof(name), "%s.enabled", str);
+    log_info("disable feature %s\n", name);
+    set_param(&global.parameters, name, "0");
 }
 
 static void json_disable_features(cJSON *json) {

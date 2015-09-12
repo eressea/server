@@ -102,6 +102,7 @@ static void test_prefixes(CuTest * tc)
 static void test_disable(CuTest * tc)
 {
     const char * data = "{\"disabled\": [ "
+        "\"alchemy\","
         "\"pay\","
         "\"besiege\","
         "\"module\""
@@ -109,11 +110,13 @@ static void test_disable(CuTest * tc)
     cJSON *json = cJSON_Parse(data);
 
     test_cleanup();
+    CuAssertTrue(tc, skill_enabled(SK_ALCHEMY));
     CuAssertTrue(tc, !keyword_disabled(K_BANNER));
     CuAssertTrue(tc, !keyword_disabled(K_PAY));
     CuAssertTrue(tc, !keyword_disabled(K_BESIEGE));
     CuAssertIntEquals(tc, 1, get_param_int(global.parameters, "module.enabled", 1));
     json_config(json);
+    CuAssertTrue(tc, !skill_enabled(SK_ALCHEMY));
     CuAssertTrue(tc, !keyword_disabled(K_BANNER));
     CuAssertTrue(tc, keyword_disabled(K_PAY));
     CuAssertTrue(tc, keyword_disabled(K_BESIEGE));
