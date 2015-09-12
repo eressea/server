@@ -6833,6 +6833,11 @@
       <text locale="en">black </text>
     </string>
 
+    <string name="arch">
+      <text locale="de">Erz</text>
+      <text locale="en">arch</text>
+    </string>
+
     <string name="star">
       <text locale="de">Sternen</text>
       <text locale="en">star </text>

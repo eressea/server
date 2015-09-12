@@ -1,7 +1,8 @@
 {
 	"include": [
 		"keywords.json",
-        "e3/terrains.xml"
+        "prefixes.json",
+        "e3/terrains.json"
 	],
     "settings": {
         "game.id": 4,

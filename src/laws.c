@@ -35,6 +35,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "spy.h"
 #include "study.h"
 #include "wormhole.h"
+#include "prefix.h"
+#include "calendar.h"
 
 /* kernel includes */
 #include <kernel/alliance.h>
@@ -42,7 +44,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/connection.h>
 #include <kernel/curse.h>
 #include <kernel/building.h>
-#include <kernel/calendar.h>
 #include <kernel/faction.h>
 #include <kernel/group.h>
 #include <kernel/item.h>
@@ -846,38 +847,6 @@ void demographics(void)
 
 /* ------------------------------------------------------------- */
 
-static int modify(int i)
-{
-    int c;
-
-    c = i * 2 / 3;
-
-    if (c >= 1) {
-        return (c + rng_int() % c);
-    }
-    else {
-        return (i);
-    }
-}
-
-static void inactivefaction(faction * f)
-{
-    FILE *inactiveFILE;
-    char zText[128];
-
-    sprintf(zText, "%s/%s", datapath(), "inactive");
-    inactiveFILE = fopen(zText, "a");
-
-    if (inactiveFILE) {
-        fprintf(inactiveFILE, "%s:%s:%d:%d\n",
-            factionid(f),
-            LOC(default_locale, rc_name_s(f->race, NAME_PLURAL)),
-            modify(count_all(f)), turn - f->lastorders);
-
-        fclose(inactiveFILE);
-    }
-}
-
 /* test if the unit can slip through a siege undetected.
  * returns 0 if siege is successful, or 1 if the building is either
  * not besieged or the unit can slip through the siege due to better stealth.
@@ -1278,11 +1247,6 @@ static void remove_idle_players(void)
             sprintf(info, "%d Einheiten, %d Personen, %d Silber",
                 f->no_units, f->num_total, f->money);
         }
-
-        if (NMRTimeout() > 0 && turn - f->lastorders >= (NMRTimeout() - 1)) {
-            inactivefaction(f);
-            continue;
-        }
     }
     log_info(" - beseitige Spieler, die sich nach der Anmeldung nicht gemeldet haben...");
 
@@ -1468,7 +1432,7 @@ static void init_prefixnames(void)
         in->next = pnames;
         in->lang = lang;
 
-        if (!exist) {
+        if (!exist && race_prefixes) {
             int key;
             for (key = 0; race_prefixes[key]; ++key) {
                 variant var;

@@ -29,7 +29,6 @@ alliance.c
 ally.c
 build.c
 building.c
-calendar.c
 command.c
 config.c
 connection.c

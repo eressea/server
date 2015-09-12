@@ -18,6 +18,7 @@
 #include "console.h"
 #include "listbox.h"
 #include "wormhole.h"
+#include "calendar.h"
 
 #include <modules/xmas.h>
 #include <modules/gmcmd.h>
@@ -30,7 +31,6 @@
 #include <modules/autoseed.h>
 
 #include <kernel/building.h>
-#include <kernel/calendar.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/plane.h>

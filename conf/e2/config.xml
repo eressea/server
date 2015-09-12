@@ -16,7 +16,6 @@
   <xi:include href="config://core/common/potions.xml" />
   <xi:include href="config://core/spoils.xml"/>
   <xi:include href="config://game/races.xml"/>
-  <xi:include href="config://core/prefixes.xml"/>
   <xi:include href="config://core/ships.xml"/>
   <xi:include href="config://core/common/buildings.xml"/>
   <xi:include href="config://game/familiars.xml"/>

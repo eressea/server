@@ -74,6 +74,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/xml.h>
 
 #include "donations.h"
+#include "prefix.h"
 
 #ifdef USE_LIBXML2
 /* libxml includes */

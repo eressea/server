@@ -28,6 +28,7 @@ without prior permission by the authors of Eressea.
 #include "spell.h"
 #include "spellbook.h"
 #include "calendar.h"
+#include "prefix.h"
 
 #include "vortex.h"
 
@@ -2051,38 +2052,6 @@ static int parse_strings(xmlDocPtr doc)
     return 0;
 }
 
-static void
-xml_readprefixes(xmlXPathContextPtr xpath, xmlNodePtr * nodeTab, int nodeNr,
-bool names)
-{
-    int i;
-
-    for (i = 0; i != nodeNr; ++i) {
-        xmlNodePtr node = nodeTab[i];
-        xmlChar *propText = xmlNodeListGetString(node->doc, node->children, 1);
-
-        if (propText != NULL) {
-            add_raceprefix((const char *)propText);
-            xmlFree(propText);
-        }
-    }
-}
-
-static int parse_prefixes(xmlDocPtr doc)
-{
-    xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
-    xmlXPathObjectPtr strings;
-
-    /* reading eressea/strings/string */
-    strings = xmlXPathEvalExpression(BAD_CAST "/eressea/prefixes/prefix", xpath);
-    xml_readprefixes(xpath, strings->nodesetval->nodeTab,
-        strings->nodesetval->nodeNr, false);
-    xmlXPathFreeObject(strings);
-
-    xmlXPathFreeContext(xpath);
-    return 0;
-}
-
 static int parse_main(xmlDocPtr doc)
 {
     xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
@@ -2157,7 +2126,6 @@ void register_xmlreader(void)
     xml_register_callback(parse_main);
 
     xml_register_callback(parse_strings);
-    xml_register_callback(parse_prefixes);
     xml_register_callback(parse_messages);
     xml_register_callback(parse_resources);
     xml_register_callback(parse_rules);

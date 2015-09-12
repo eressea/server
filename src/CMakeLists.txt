@@ -77,6 +77,7 @@ TOLUA_BINDING(settings.pkg bind_settings.h)
 ENDIF()
 
 set (ERESSEA_SRC
+  calendar.c
   move.c
   spells.c
   battle.c
@@ -86,6 +87,7 @@ set (ERESSEA_SRC
   names.c
   lighthouse.c
   reports.c
+  prefix.c
   donations.c
   seen.c
   eressea.c
@@ -197,6 +199,7 @@ set(TESTS_SRC
   magic.test.c
   market.test.c
   move.test.c
+  prefix.test.c
   skill.test.c
   spells.test.c
   spy.test.c

@@ -32,10 +32,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "monster.h"
 #include "morale.h"
 #include "reports.h"
+#include "calendar.h"
 
 /* kernel includes */
 #include <kernel/building.h>
-#include <kernel/calendar.h>
 #include <kernel/curse.h>
 #include <kernel/equipment.h>
 #include <kernel/faction.h>
