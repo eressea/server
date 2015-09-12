@@ -2052,79 +2052,8 @@ static int parse_strings(xmlDocPtr doc)
     return 0;
 }
 
-static int parse_main(xmlDocPtr doc)
-{
-    xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
-    xmlXPathObjectPtr result =
-        xmlXPathEvalExpression(BAD_CAST "/eressea/game", xpath);
-    xmlNodeSetPtr nodes = result->nodesetval;
-    int i;
-
-    xmlChar *propValue;
-    if (nodes->nodeNr > 0) {
-        xmlNodePtr node = nodes->nodeTab[0];
-
-        global.producexpchance =
-            (float)xml_fvalue(node, "learningbydoing", 1.0 / 3);
-
-        propValue = xmlGetProp(node, BAD_CAST "name");
-        if (propValue != NULL) {
-            global.gamename = _strdup((const char *)propValue);
-            xmlFree(propValue);
-        }
-
-        xmlXPathFreeObject(result);
-
-        xpath->node = node;
-        /* reading eressea/game/order */
-        result = xmlXPathEvalExpression(BAD_CAST "order", xpath);
-        nodes = result->nodesetval;
-        for (i = 0; i != nodes->nodeNr; ++i) {
-            xmlNodePtr node = nodes->nodeTab[i];
-            xmlChar *propName = xmlGetProp(node, BAD_CAST "name");
-            bool disable = xml_bvalue(node, "disable", false);
-
-            if (disable) {
-                int k;
-                for (k = 0; k != MAXKEYWORDS; ++k) {
-                    if (strcmp(keywords[k], (const char *)propName) == 0) {
-                        enable_keyword(k, false);
-                        break;
-                    }
-                }
-                if (k == MAXKEYWORDS) {
-                    log_error("trying to disable unknown command %s\n", (const char *)propName);
-                }
-            }
-            xmlFree(propName);
-        }
-
-        xmlXPathFreeObject(result);
-
-        /* reading eressea/game/skill */
-        result = xmlXPathEvalExpression(BAD_CAST "skill", xpath);
-        nodes = result->nodesetval;
-        for (i = 0; i != nodes->nodeNr; ++i) {
-            xmlNodePtr node = nodes->nodeTab[i];
-            xmlChar *propName = xmlGetProp(node, BAD_CAST "name");
-            skill_t sk = findskill((const char *)propName);
-            if (sk != NOSKILL) {
-                bool enable = xml_bvalue(node, "enable", true);
-                enable_skill(sk, enable);
-            }
-            xmlFree(propName);
-        }
-    }
-    xmlXPathFreeObject(result);
-
-    xmlXPathFreeContext(xpath);
-    return 0;
-}
-
 void register_xmlreader(void)
 {
-    xml_register_callback(parse_main);
-
     xml_register_callback(parse_strings);
     xml_register_callback(parse_messages);
     xml_register_callback(parse_resources);

@@ -261,8 +261,6 @@ extern "C" {
         unsigned int data_turn;
         struct param *parameters;
         void *vm_state;
-        float producexpchance;
-        int cookie;
         int data_version; /* TODO: eliminate in favor of gamedata.version */
         struct _dictionary_ *inifile;
 
@@ -271,6 +269,10 @@ extern "C" {
                 const struct race * rc, int in_turn);
             int(*maintenance) (const struct unit * u);
         } functions;
+        /* the following are some cached values, because get_param can be slow.
+         * you should almost never need to touch them */
+        int cookie;
+        double producexpchance_;
     } settings;
 
     typedef struct helpmode {
@@ -284,7 +286,7 @@ extern "C" {
     const char *get_param(const struct param *p, const char *key);
     int get_param_int(const struct param *p, const char *key, int def);
     int check_param(const struct param *p, const char *key, const char *searchvalue);
-    float get_param_flt(const struct param *p, const char *key, float def);
+    double get_param_flt(const struct param *p, const char *key, double def);
     void free_params(struct param **pp);
 
     bool ExpensiveMigrants(void);

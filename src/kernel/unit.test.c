@@ -350,6 +350,32 @@ static void test_age_familiar(CuTest *tc) {
     test_cleanup();
 }
 
+static CuTest *g_tc;
+
+static bool cb_learn_one(unit *u, skill_t sk, double chance) {
+    CuAssertIntEquals(g_tc, SK_ALCHEMY, sk);
+    CuAssertDblEquals(g_tc, 0.5 / u->number, chance, 0.01);
+    return false;
+}
+
+static bool cb_learn_two(unit *u, skill_t sk, double chance) {
+    CuAssertIntEquals(g_tc, SK_ALCHEMY, sk);
+    CuAssertDblEquals(g_tc, 2 * 0.5 / u->number, chance, 0.01);
+    return false;
+}
+
+static void test_produceexp(CuTest *tc) {
+    unit *u;
+
+    g_tc = tc;
+    test_cleanup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    set_param(&global.parameters, "study.from_use", "0.5");
+    produceexp_ex(u, SK_ALCHEMY, 1, cb_learn_one);
+    produceexp_ex(u, SK_ALCHEMY, 2, cb_learn_two);
+    test_cleanup();
+}
+
 CuSuite *get_unit_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -368,5 +394,6 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_skill_hunger);
     SUITE_ADD_TEST(suite, test_skill_familiar);
     SUITE_ADD_TEST(suite, test_age_familiar);
+    SUITE_ADD_TEST(suite, test_produceexp);
     return suite;
 }

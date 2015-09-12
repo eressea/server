@@ -42,49 +42,6 @@
   <xi:include href="config://default/names-ghouls.xml"/>
   <xi:include href="config://default/names-dragons.xml"/>
 
-  <game name="Deveron">
-    <order name="besiege" disable="yes"/>
-    <order name="steal" disable="yes"/>
-    <order name="buy" disable="yes"/>
-    <order name="teach" disable="yes"/>
-    <order name="sabotage" disable="yes"/>
-    <order name="spy" disable="yes"/>
-    <order name="tax" disable="yes"/>
-    <order name="entertain" disable="yes"/>
-    <order name="sell" disable="yes"/>
-
-    <skill name="armorer" enable="true"/>
-    <skill name="bow" enable="true"/>
-    <skill name="building" enable="true"/>
-    <skill name="cartmaking" enable="true"/>
-    <skill name="catapult" enable="true"/>
-    <skill name="crossbow" enable="true"/>
-    <skill name="forestry" enable="true"/>
-    <skill name="magic" enable="true"/>
-    <skill name="melee" enable="true"/>
-    <skill name="mining" enable="true"/>
-    <skill name="polearm" enable="true"/>
-    <skill name="quarrying" enable="true"/>
-    <skill name="riding" enable="true"/>
-    <skill name="roadwork" enable="true"/>
-    <skill name="sailing" enable="true"/>
-    <skill name="shipcraft" enable="true"/>
-    <skill name="stamina" enable="true"/>
-    <skill name="tactics" enable="true"/>
-    <skill name="training" enable="true"/>
-    <skill name="unarmed" enable="true"/>
-    <skill name="weaponsmithing" enable="true"/>
-
-    <skill name="herbalism" enable="false"/>
-
-    <skill name="alchemy" enable="false"/>
-    <skill name="entertainment" enable="false"/>
-    <skill name="espionage" enable="false"/>
-    <skill name="perception" enable="false"/>
-    <skill name="stealth" enable="false"/>
-    <skill name="taxation" enable="false"/>
-    <skill name="trade" enable="false"/>
-  </game>
   <rules>
     <function name="wage" value="minimum_wage"/>
   </rules>

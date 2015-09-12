@@ -2762,14 +2762,14 @@ void sinkships(struct region * r)
             if (fval(r->terrain, SEA_REGION)) {
                 if (!enoughsailors(sh, crew_skill(sh))) {
                     // ship is at sea, but not enough people to control it
-                    float dmg = get_param_flt(global.parameters,
+                    double dmg = get_param_flt(global.parameters,
                         "rules.ship.damage.nocrewocean",
                         0.30F);
                     damage_ship(sh, dmg);
                 }
             } else if (!ship_owner(sh)) {
                 // any ship lying around without an owner slowly rots
-                float dmg = get_param_flt(global.parameters, "rules.ship.damage.nocrew", 0.05F);
+                double dmg = get_param_flt(global.parameters, "rules.ship.damage.nocrew", 0.05F);
                 damage_ship(sh, dmg);
             }
         }
@@ -3496,7 +3496,7 @@ static int use_item(unit * u, const item_type * itype, int amount, struct order 
 
 static double heal_factor(const unit * u)
 {
-    static float elf_regen = -1;
+    static double elf_regen = -1;
     switch (old_race(u_race(u))) {
     case RC_TROLL:
     case RC_DAEMON:

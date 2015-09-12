@@ -2,8 +2,9 @@
 #include <kernel/config.h>
 #include "keyword.h"
 
-#include "util/language.h"
-#include "util/umlaut.h"
+#include <util/language.h>
+#include <util/umlaut.h>
+#include <util/log.h>
 
 #include <critbit.h>
 
