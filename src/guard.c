@@ -21,6 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "guard.h"
 
+#include <kernel/save.h>
 #include <kernel/unit.h>
 #include <kernel/faction.h>
 #include <kernel/race.h>
@@ -29,6 +30,16 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 
 #include <assert.h>
+
+attrib_type at_guard = {
+    "guard",
+    DEFAULT_INIT,
+    DEFAULT_FINALIZE,
+    DEFAULT_AGE,
+    a_writeint,
+    a_readint,
+    ATF_UNIQUE
+};
 
 void update_guards(void)
 {

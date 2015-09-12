@@ -306,7 +306,6 @@ extern "C" {
 
     void free_gamedata(void);
 
-    extern struct attrib_type at_guard;
     extern struct helpmode helpmodes[];
     extern const char *parameters[];
     extern const char *localenames[];

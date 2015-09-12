@@ -51,6 +51,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "types.h"
 #include "unit.h"
 
+
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
 
@@ -74,6 +75,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/xml.h>
 
 #include "donations.h"
+#include "guard.h"
 #include "prefix.h"
 
 #ifdef USE_LIBXML2
@@ -1174,16 +1176,6 @@ attrib_type at_germs = {
     DEFAULT_AGE,
     a_writeshorts,
     a_readshorts,
-    ATF_UNIQUE
-};
-
-attrib_type at_guard = {
-    "guard",
-    DEFAULT_INIT,
-    DEFAULT_FINALIZE,
-    DEFAULT_AGE,
-    a_writeint,
-    a_readint,
     ATF_UNIQUE
 };
 
