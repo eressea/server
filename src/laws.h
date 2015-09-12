@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define H_GC_LAWS
 
 #include <kernel/types.h>
+#include "guard.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -111,7 +112,8 @@ extern "C" {
     #define FORCE_LEAVE_POSTCOMBAT 1
     #define FORCE_LEAVE_ALL 2
     bool rule_force_leave(int flag);
-	bool help_enter(struct unit *uo, struct unit *u);
+    bool help_enter(struct unit *uo, struct unit *u);
+    guard_t can_start_guarding(const struct unit * u);
 
 #ifdef __cplusplus
 }

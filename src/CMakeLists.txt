@@ -87,6 +87,7 @@ set (ERESSEA_SRC
   names.c
   lighthouse.c
   reports.c
+  guard.c
   prefix.c
   donations.c
   seen.c

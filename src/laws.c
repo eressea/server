@@ -37,6 +37,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "wormhole.h"
 #include "prefix.h"
 #include "calendar.h"
+#include "guard.h"
 
 /* kernel includes */
 #include <kernel/alliance.h>
@@ -2660,13 +2661,9 @@ int combatspell_cmd(unit * u, struct order *ord)
     return 0;
 }
 
-/* ------------------------------------------------------------- */
 /* Beachten: einige Monster sollen auch unbewaffent die Region bewachen
- * können */
-
-enum { E_GUARD_OK, E_GUARD_UNARMED, E_GUARD_NEWBIE, E_GUARD_FLEEING };
-
-static int can_start_guarding(const unit * u)
+* können */
+guard_t can_start_guarding(const unit * u)
 {
     if (u->status >= ST_FLEE || fval(u, UFL_FLEEING))
         return E_GUARD_FLEEING;
@@ -2677,29 +2674,6 @@ static int can_start_guarding(const unit * u)
     if (IsImmune(u->faction))
         return E_GUARD_NEWBIE;
     return E_GUARD_OK;
-}
-
-void update_guards(void)
-{
-    const region *r;
-
-    for (r = regions; r; r = r->next) {
-        unit *u;
-        for (u = r->units; u; u = u->next) {
-            if (fval(u, UFL_GUARD)) {
-                if (can_start_guarding(u) != E_GUARD_OK) {
-                    setguard(u, GUARD_NONE);
-                }
-                else {
-                    attrib *a = a_find(u->attribs, &at_guard);
-                    if (a && a->data.i == (int)guard_flags(u)) {
-                        /* this is really rather not necessary */
-                        a_remove(&u->attribs, a);
-                    }
-                }
-            }
-        }
-    }
 }
 
 int guard_on_cmd(unit * u, struct order *ord)

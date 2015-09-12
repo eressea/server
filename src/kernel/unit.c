@@ -43,6 +43,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/racename.h>
 #include <attributes/stealth.h>
 
+#include "guard.h"
+
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
@@ -1957,3 +1959,4 @@ void produceexp(struct unit *u, skill_t sk, int n)
 {
     produceexp_ex(u, sk, n, learn_skill);
 }
+

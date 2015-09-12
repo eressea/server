@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include "move.h"
 
+#include "guard.h"
+
 #include <kernel/config.h>
 #include <kernel/ally.h>
 #include <kernel/building.h>

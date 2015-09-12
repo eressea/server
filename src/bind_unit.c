@@ -19,6 +19,7 @@ without prior permission by the authors of Eressea.
 #include "move.h"
 #include "reports.h"
 #include "seen.h"
+#include "guard.h"
 
 /*  attributes includes */
 #include <attributes/racename.h>
