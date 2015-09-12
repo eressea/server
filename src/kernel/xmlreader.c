@@ -2052,44 +2052,8 @@ static int parse_strings(xmlDocPtr doc)
     return 0;
 }
 
-static int parse_main(xmlDocPtr doc)
-{
-    xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
-    xmlXPathObjectPtr result =
-        xmlXPathEvalExpression(BAD_CAST "/eressea/game", xpath);
-    xmlNodeSetPtr nodes = result->nodesetval;
-    int i;
-
-    if (nodes->nodeNr > 0) {
-        xmlNodePtr node = nodes->nodeTab[0];
-
-        xmlXPathFreeObject(result);
-
-        xpath->node = node;
-        /* reading eressea/game/skill */
-        result = xmlXPathEvalExpression(BAD_CAST "skill", xpath);
-        nodes = result->nodesetval;
-        for (i = 0; i != nodes->nodeNr; ++i) {
-            xmlNodePtr node = nodes->nodeTab[i];
-            xmlChar *propName = xmlGetProp(node, BAD_CAST "name");
-            skill_t sk = findskill((const char *)propName);
-            if (sk != NOSKILL) {
-                bool enable = xml_bvalue(node, "enable", true);
-                enable_skill(sk, enable);
-            }
-            xmlFree(propName);
-        }
-    }
-    xmlXPathFreeObject(result);
-
-    xmlXPathFreeContext(xpath);
-    return 0;
-}
-
 void register_xmlreader(void)
 {
-    xml_register_callback(parse_main);
-
     xml_register_callback(parse_strings);
     xml_register_callback(parse_messages);
     xml_register_callback(parse_resources);
