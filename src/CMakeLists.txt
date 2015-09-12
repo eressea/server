@@ -77,6 +77,7 @@ TOLUA_BINDING(settings.pkg bind_settings.h)
 ENDIF()
 
 set (ERESSEA_SRC
+  calendar.c
   move.c
   spells.c
   battle.c

@@ -30,7 +30,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <kernel/build.h>
 #include <kernel/building.h>
-#include <kernel/calendar.h>
 #include <kernel/connection.h>
 #include <kernel/curse.h>
 #include <kernel/faction.h>
@@ -49,6 +48,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/unit.h>
 
 #include "direction.h"
+#include "calendar.h"
 #include "skill.h"
 
 /* util includes */

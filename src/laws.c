@@ -36,6 +36,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "study.h"
 #include "wormhole.h"
 #include "prefix.h"
+#include "calendar.h"
 
 /* kernel includes */
 #include <kernel/alliance.h>
@@ -43,7 +44,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/connection.h>
 #include <kernel/curse.h>
 #include <kernel/building.h>
-#include <kernel/calendar.h>
 #include <kernel/faction.h>
 #include <kernel/group.h>
 #include <kernel/item.h>
