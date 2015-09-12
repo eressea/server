@@ -1681,9 +1681,7 @@ int write_reports(faction * f, time_t ltime)
         log_warning("errno was %d before writing reports", errno);
         errno = 0;
     }
-    if (verbosity >= 2) {
-        log_printf(stdout, "Reports for %s:", factionname(f));
-    }
+    log_debug("Reports for %s:", factionname(f));
     for (rtype = report_types; rtype != NULL; rtype = rtype->next) {
         if (f->options & rtype->flag) {
             int error;
@@ -1795,9 +1793,7 @@ int reports(void)
     int retval = 0;
     char path[MAX_PATH];
 
-    if (verbosity >= 1) {
-        log_printf(stdout, "Writing reports for turn %d:", turn);
-    }
+    log_info("Writing reports for turn %d:", turn);
     report_donations();
     remove_empty_units();
 
