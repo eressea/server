@@ -74,6 +74,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/xml.h>
 
 #include "donations.h"
+#include "prefix.h"
 
 #ifdef USE_LIBXML2
 /* libxml includes */
@@ -1767,6 +1768,7 @@ void free_gamedata(void)
     free_units();
     free_regions();
     free_borders();
+    free_prefixes();
 
     for (i = 0; i != MAXLOCALES; ++i) {
         if (defaults[i]) {

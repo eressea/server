@@ -19,3 +19,14 @@ void add_raceprefix(const char *prefix)
     race_prefixes[next++] = _strdup(prefix);
     race_prefixes[next] = NULL;
 }
+
+void free_prefixes(void) {
+    int i;
+    if (race_prefixes) {
+        for (i = 0; race_prefixes[i]; ++i) {
+            free(race_prefixes[i]);
+        }
+        free(race_prefixes);
+        race_prefixes = 0;
+    }
+}
