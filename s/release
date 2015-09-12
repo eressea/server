@@ -1,0 +1,21 @@
+#!/usr/bin/env python
+
+import os
+import sys
+
+template="""#define VERSION_MAJOR %s
+#define VERSION_MINOR %s
+#define VERSION_BUILD %s
+"""
+
+def new_version(ver):
+    sp = ver.split(".")
+    sp = (sp[0], sp[1], sp[2])
+    file = open("src/buildno.h", "w")
+    file.write(template % sp)
+    file.close()
+    os.system("git add src/buildno.h")
+    os.system("git commit -m 'release version %s'" % ver)
+    os.system("git tag -f version-%s" % ver)
+
+new_version(sys.argv[1])
