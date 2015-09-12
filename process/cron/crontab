@@ -2,7 +2,6 @@
 
 PATH=/home/eressea/bin:/opt/bin:/usr/local/bin:/usr/bin:/bin
 ERESSEA=/home/eressea/eressea
-ATLANTIS=/home/eressea/atlantis
 ENABLED=yes
 PREVIEW=yes
 CONFIRM=yes
