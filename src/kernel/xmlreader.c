@@ -2064,9 +2064,6 @@ static int parse_main(xmlDocPtr doc)
     if (nodes->nodeNr > 0) {
         xmlNodePtr node = nodes->nodeTab[0];
 
-        global.producexpchance =
-            (float)xml_fvalue(node, "learningbydoing", 1.0 / 3);
-
         propValue = xmlGetProp(node, BAD_CAST "name");
         if (propValue != NULL) {
             global.gamename = _strdup((const char *)propValue);
