@@ -2,6 +2,7 @@
 #include "tests.h"
 #include "keyword.h"
 #include "seen.h"
+#include "prefix.h"
 
 #include <kernel/config.h>
 #include <kernel/region.h>
@@ -84,6 +85,7 @@ void test_cleanup(void)
     free_spellbooks();
     free_gamedata();
     free_seen();
+    free_prefixes();
     mt_clear();
     if (!mt_find("missing_message")) {
         mt_register(mt_new_va("missing_message", "name:string", 0));

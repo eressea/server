@@ -1469,7 +1469,7 @@ static void init_prefixnames(void)
         in->next = pnames;
         in->lang = lang;
 
-        if (!exist) {
+        if (!exist && race_prefixes) {
             int key;
             for (key = 0; race_prefixes[key]; ++key) {
                 variant var;
