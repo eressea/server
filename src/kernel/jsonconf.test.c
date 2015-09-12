@@ -12,7 +12,11 @@
 #include "spell.h"
 #include "order.h"
 #include "terrain.h"
+
+#include "prefix.h"
+
 #include "util/language.h"
+
 #include <CuTest.h>
 #include <cJSON.h>
 #include <tests.h>
@@ -88,7 +92,10 @@ static void test_prefixes(CuTest * tc)
 
     test_cleanup();
     json_config(json);
-    // CuAssertStrEquals("dark", get_prefix("snow"));
+    CuAssertPtrNotNull(tc, race_prefixes);
+    CuAssertStrEquals(tc, "snow", race_prefixes[0]);
+    CuAssertStrEquals(tc, "dark", race_prefixes[2]);
+    CuAssertPtrEquals(tc, 0, race_prefixes[3]);
     test_cleanup();
 }
 
