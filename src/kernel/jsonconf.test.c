@@ -99,6 +99,25 @@ static void test_prefixes(CuTest * tc)
     test_cleanup();
 }
 
+static void test_disable(CuTest * tc)
+{
+    const char * data = "{\"disable\": [ "
+        "\"pay\","
+        "\"besiege\""
+        "]}";
+    cJSON *json = cJSON_Parse(data);
+
+    test_cleanup();
+    CuAssertTrue(tc, !keyword_disabled(K_BANNER));
+    CuAssertTrue(tc, !keyword_disabled(K_PAY));
+    CuAssertTrue(tc, !keyword_disabled(K_BESIEGE));
+    json_config(json);
+    CuAssertTrue(tc, !keyword_disabled(K_BANNER));
+    CuAssertTrue(tc, keyword_disabled(K_PAY));
+    CuAssertTrue(tc, keyword_disabled(K_BESIEGE));
+    test_cleanup();
+}
+
 static void test_races(CuTest * tc)
 {
     const char * data = "{\"races\": { \"orc\" : { "
@@ -576,6 +595,7 @@ CuSuite *get_jsonconf_suite(void)
     SUITE_ADD_TEST(suite, test_flags);
     SUITE_ADD_TEST(suite, test_settings);
     SUITE_ADD_TEST(suite, test_prefixes);
+    SUITE_ADD_TEST(suite, test_disable);
     SUITE_ADD_TEST(suite, test_infinitive_from_config);
     return suite;
 }

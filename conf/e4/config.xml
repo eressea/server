@@ -43,16 +43,6 @@
   <xi:include href="config://default/names-dragons.xml"/>
 
   <game>
-    <order name="besiege" disable="yes"/>
-    <order name="steal" disable="yes"/>
-    <order name="buy" disable="yes"/>
-    <order name="teach" disable="yes"/>
-    <order name="sabotage" disable="yes"/>
-    <order name="spy" disable="yes"/>
-    <order name="tax" disable="yes"/>
-    <order name="entertain" disable="yes"/>
-    <order name="sell" disable="yes"/>
-
     <skill name="armorer" enable="true"/>
     <skill name="bow" enable="true"/>
     <skill name="building" enable="true"/>

@@ -4,6 +4,17 @@
         "prefixes.json",
         "e3/terrains.json"
 	],
+    "disable": [
+        "besiege",
+        "steal",
+        "buy",
+        "teach",
+        "sabotage",
+        "spy",
+        "tax",
+        "entertain",
+        "sell"
+    ],
     "settings": {
         "game.id": 4,
         "game.name": "Deveron",

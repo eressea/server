@@ -2066,30 +2066,6 @@ static int parse_main(xmlDocPtr doc)
         xmlXPathFreeObject(result);
 
         xpath->node = node;
-        /* reading eressea/game/order */
-        result = xmlXPathEvalExpression(BAD_CAST "order", xpath);
-        nodes = result->nodesetval;
-        for (i = 0; i != nodes->nodeNr; ++i) {
-            xmlNodePtr node = nodes->nodeTab[i];
-            xmlChar *propName = xmlGetProp(node, BAD_CAST "name");
-
-            if (xml_bvalue(node, "disable", false)) {
-                int k;
-                for (k = 0; k != MAXKEYWORDS; ++k) {
-                    if (strcmp(keywords[k], (const char *)propName) == 0) {
-                        enable_keyword(k, false);
-                        break;
-                    }
-                }
-                if (k == MAXKEYWORDS) {
-                    log_error("trying to disable unknown command %s\n", (const char *)propName);
-                }
-            }
-            xmlFree(propName);
-        }
-
-        xmlXPathFreeObject(result);
-
         /* reading eressea/game/skill */
         result = xmlXPathEvalExpression(BAD_CAST "skill", xpath);
         nodes = result->nodesetval;

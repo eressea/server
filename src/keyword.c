@@ -2,8 +2,9 @@
 #include <kernel/config.h>
 #include "keyword.h"
 
-#include "util/language.h"
-#include "util/umlaut.h"
+#include <util/language.h>
+#include <util/umlaut.h>
+#include <util/log.h>
 
 #include <critbit.h>
 
@@ -72,6 +73,20 @@ keyword_t get_keyword(const char *s, const struct locale *lang) {
 }
 
 static bool disabled_kwd[MAXKEYWORDS];
+
+void disable_keyword_str(const char *str) {
+    // FIXME: this is slower than balls.
+    int k;
+    for (k = 0; k != MAXKEYWORDS; ++k) {
+        if (strcmp(keywords[k], str) == 0) {
+            enable_keyword(k, false);
+            break;
+        }
+    }
+    if (k == MAXKEYWORDS) {
+        log_error("trying to disable unknown command %s\n", str);
+    }
+}
 
 void enable_keyword(keyword_t kwd, bool enabled) {
     assert(kwd < MAXKEYWORDS);
