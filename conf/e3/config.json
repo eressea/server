@@ -5,6 +5,14 @@
         "e3/terrains.json"
 	],
     "disabled": [
+        "herbalism",
+        "alchemy",
+        "entertainment",
+        "espionage",
+        "perception",
+        "stealth",
+        "taxation",
+        "trade",
         "besiege",
         "steal",
         "buy",
