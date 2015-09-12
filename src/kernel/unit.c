@@ -1938,7 +1938,7 @@ static double produceexp_chance(void) {
     return global.producexpchance;
 }
 
-void produceexp_ex(struct unit *u, skill_t sk, int n, void(*learn)(unit *, skill_t, double))
+void produceexp_ex(struct unit *u, skill_t sk, int n, bool (*learn)(unit *, skill_t, double))
 {
     if (n != 0 && playerrace(u_race(u))) {
         double chance = produceexp_chance();

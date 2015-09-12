@@ -352,14 +352,16 @@ static void test_age_familiar(CuTest *tc) {
 
 static CuTest *g_tc;
 
-static void cb_learn_one(unit *u, skill_t sk, double chance) {
+static bool cb_learn_one(unit *u, skill_t sk, double chance) {
     CuAssertIntEquals(g_tc, SK_ALCHEMY, sk);
     CuAssertDblEquals(g_tc, global.producexpchance / u->number, chance, 0.01);
+    return false;
 }
 
-static void cb_learn_two(unit *u, skill_t sk, double chance) {
+static bool cb_learn_two(unit *u, skill_t sk, double chance) {
     CuAssertIntEquals(g_tc, SK_ALCHEMY, sk);
     CuAssertDblEquals(g_tc, 2 * global.producexpchance / u->number, chance, 0.01);
+    return false;
 }
 
 static void test_produceexp(CuTest *tc) {
