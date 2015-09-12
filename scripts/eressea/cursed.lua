@@ -12,8 +12,6 @@ local function curse(file)
         elseif not bitset(f.flags, 16) then
             print("cursing " .. tostring(f))
             f.flags = f.flags + 16
-        else
-            print("already cursed: " .. tostring(f))
         end
     end
 end

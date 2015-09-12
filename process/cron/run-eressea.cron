@@ -40,6 +40,5 @@ fi
 echo "sending reports for game $GAME, turn $TURN"
 $BIN/compress.sh $GAME $TURN
 $BIN/sendreports.sh $GAME
-[ $GAME -lt 4 ] && $BIN/send-summary $GAME
 $BIN/backup-eressea $GAME $TURN
 rm -f test/execute.lock
