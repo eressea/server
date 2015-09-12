@@ -34,6 +34,7 @@
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/log.h>
 #include <util/rand.h>
 #include <util/rng.h>
 
@@ -887,6 +888,7 @@ int sp_igjarjuk(castorder *co) {
     fi = summon_allies(fi, rc, 1);
     u = fi->unit;
     unit_setname(u, "Igjarjuk");
+    log_debug("%s calls a wyrm in %s", unitname(fi->unit), regionname(u->region, 0));
     return co->level;
 }
 
