@@ -31,6 +31,9 @@ without prior permission by the authors of Eressea.
 #include "spellbook.h"
 #include "calendar.h"
 
+/* game modules */
+#include "prefix.h"
+
 /* util includes */
 #include <util/attrib.h>
 #include <util/bsdstring.h>
@@ -487,6 +490,17 @@ static void json_race(cJSON *json, race *rc) {
     }
 }
 
+static void json_prefixes(cJSON *json) {
+    cJSON *child;
+    if (json->type != cJSON_Array) {
+        log_error("prefixes is not a json array: %d", json->type);
+        return;
+    }
+    for (child = json->child; child; child = child->next) {
+        add_raceprefix(child->valuestring);
+    }
+}
+
 static void json_terrains(cJSON *json) {
     cJSON *child;
     if (json->type != cJSON_Object) {
@@ -836,6 +850,9 @@ void json_config(cJSON *json) {
         }
         else if (strcmp(child->string, "spells") == 0) {
             json_spells(child);
+        }
+        else if (strcmp(child->string, "prefixes") == 0) {
+            json_prefixes(child);
         }
         else if (strcmp(child->string, "terrains") == 0) {
             json_terrains(child);

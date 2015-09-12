@@ -1,18 +1,23 @@
 #include <platform.h>
 #include "prefix.h"
 
+#include <assert.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
 char **race_prefixes = NULL;
+static size_t size = 4;
+static unsigned int next = 0;
 
 void add_raceprefix(const char *prefix)
 {
-    static size_t size = 4;
-    static unsigned int next = 0;
-    if (race_prefixes == NULL)
+    assert(prefix);
+    if (race_prefixes == NULL) {
+        next = 0;
+        size = 4;
         race_prefixes = malloc(size * sizeof(char *));
+    }
     if (next + 1 == size) {
         size *= 2;
         race_prefixes = realloc(race_prefixes, size * sizeof(char *));
