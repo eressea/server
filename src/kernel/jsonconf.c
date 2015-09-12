@@ -501,14 +501,38 @@ static void json_prefixes(cJSON *json) {
     }
 }
 
-static void json_disable_keywords(cJSON *json) {
+/** disable a feature.
+ * features are identified by eone of:
+ * 1. the keyword for their orders,
+ * 2. the name of the skill they use,
+ * 3. a "module.enabled" flag in the settings
+ */
+static void disable_feature(const char *str) {
+    // FIXME: this is slower than balls.
+    int k;
+    for (k = 0; k != MAXKEYWORDS; ++k) {
+        if (strcmp(keywords[k], str) == 0) {
+            log_info("disable keyword %s\n", str);
+            enable_keyword(k, false);
+            break;
+        }
+    }
+    if (k == MAXKEYWORDS) {
+        char name[32];
+        _snprintf(name, sizeof(name), "%s.enabled", str);
+        log_info("disable feature %s\n", name);
+        set_param(&global.parameters, name, "0");
+    }
+}
+
+static void json_disable_features(cJSON *json) {
     cJSON *child;
     if (json->type != cJSON_Array) {
-        log_error("disable is not a json array: %d", json->type);
+        log_error("disabled is not a json array: %d", json->type);
         return;
     }
     for (child = json->child; child; child = child->next) {
-        disable_keyword_str(child->valuestring);
+        disable_feature(child->valuestring);
     }
 }
 
@@ -865,8 +889,8 @@ void json_config(cJSON *json) {
         else if (strcmp(child->string, "prefixes") == 0) {
             json_prefixes(child);
         }
-        else if (strcmp(child->string, "disable") == 0) {
-            json_disable_keywords(child);
+        else if (strcmp(child->string, "disabled") == 0) {
+            json_disable_features(child);
         }
         else if (strcmp(child->string, "terrains") == 0) {
             json_terrains(child);

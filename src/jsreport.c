@@ -25,7 +25,7 @@ static void coor_from_tiled(int *x, int *y) {
 
 static int report_json(const char *filename, report_context * ctx, const char *charset)
 {
-    if (get_param_int(global.parameters, "feature.jsreport.enable", 0) != 0) {
+    if (get_param_int(global.parameters, "jsreport.enabled", 0) != 0) {
         FILE * F = fopen(filename, "w");
         if (F) {
             int x, y, minx = INT_MAX, maxx = INT_MIN, miny = INT_MAX, maxy = INT_MIN;
