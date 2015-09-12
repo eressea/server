@@ -1195,47 +1195,6 @@ void setstatus(struct unit *u, int status)
     }
 }
 
-void setguard(unit * u, unsigned int flags)
-{
-    /* setzt die guard-flags der Einheit */
-    attrib *a = NULL;
-    assert(flags == 0 || !fval(u, UFL_MOVED));
-    assert(flags == 0 || u->status < ST_FLEE);
-    if (fval(u, UFL_GUARD)) {
-        a = a_find(u->attribs, &at_guard);
-    }
-    if (flags == GUARD_NONE) {
-        freset(u, UFL_GUARD);
-        if (a)
-            a_remove(&u->attribs, a);
-        return;
-    }
-    fset(u, UFL_GUARD);
-    fset(u->region, RF_GUARDED);
-    if (flags == guard_flags(u)) {
-        if (a)
-            a_remove(&u->attribs, a);
-    }
-    else {
-        if (!a)
-            a = a_add(&u->attribs, a_new(&at_guard));
-        a->data.i = (int)flags;
-    }
-}
-
-unsigned int getguard(const unit * u)
-{
-    attrib *a;
-
-    assert(fval(u, UFL_GUARD) || (u->building && u == building_owner(u->building))
-        || !"you're doing it wrong! check is_guard first");
-    a = a_find(u->attribs, &at_guard);
-    if (a) {
-        return (unsigned int)a->data.i;
-    }
-    return guard_flags(u);
-}
-
 #ifndef HAVE_STRDUP
 char *_strdup(const char *s)
 {
@@ -1246,40 +1205,6 @@ char *_strdup(const char *s)
 bool faction_id_is_unused(int id)
 {
     return findfaction(id) == NULL;
-}
-
-unsigned int guard_flags(const unit * u)
-{
-    unsigned int flags =
-        GUARD_CREWS | GUARD_LANDING | GUARD_TRAVELTHRU | GUARD_TAX;
-#if GUARD_DISABLES_PRODUCTION == 1
-    flags |= GUARD_PRODUCE;
-#endif
-#if GUARD_DISABLES_RECRUIT == 1
-    flags |= GUARD_RECRUIT;
-#endif
-    switch (old_race(u_race(u))) {
-    case RC_ELF:
-        if (u->faction->race != u_race(u))
-            break;
-        /* else fallthrough */
-    case RC_TREEMAN:
-        flags |= GUARD_TREES;
-        break;
-    case RC_IRONKEEPER:
-        flags = GUARD_MINING;
-        break;
-    default:
-        /* TODO: This should be configuration variables, all of it */
-        break;
-    }
-    return flags;
-}
-
-void guard(unit * u, unsigned int mask)
-{
-    unsigned int flags = guard_flags(u);
-    setguard(u, flags & mask);
 }
 
 int besieged(const unit * u)
