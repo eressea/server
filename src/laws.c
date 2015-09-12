@@ -35,6 +35,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "spy.h"
 #include "study.h"
 #include "wormhole.h"
+#include "prefix.h"
 
 /* kernel includes */
 #include <kernel/alliance.h>

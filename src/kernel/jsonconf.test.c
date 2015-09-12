@@ -77,6 +77,21 @@ static void test_settings(CuTest * tc)
     test_cleanup();
 }
 
+static void test_prefixes(CuTest * tc)
+{
+    const char * data = "{\"prefixes\": [ "
+        "\"snow\","
+        "\"sea\","
+        "\"dark\""
+        "]}";
+    cJSON *json = cJSON_Parse(data);
+
+    test_cleanup();
+    json_config(json);
+    // CuAssertStrEquals("dark", get_prefix("snow"));
+    test_cleanup();
+}
+
 static void test_races(CuTest * tc)
 {
     const char * data = "{\"races\": { \"orc\" : { "
@@ -553,6 +568,7 @@ CuSuite *get_jsonconf_suite(void)
     SUITE_ADD_TEST(suite, test_spells);
     SUITE_ADD_TEST(suite, test_flags);
     SUITE_ADD_TEST(suite, test_settings);
+    SUITE_ADD_TEST(suite, test_prefixes);
     SUITE_ADD_TEST(suite, test_infinitive_from_config);
     return suite;
 }

@@ -28,6 +28,7 @@ without prior permission by the authors of Eressea.
 #include "spell.h"
 #include "spellbook.h"
 #include "calendar.h"
+#include "prefix.h"
 
 #include "vortex.h"
 

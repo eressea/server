@@ -1,0 +1,32 @@
+{
+    "prefixes": [
+        "Dunkel",
+        "Licht",
+        "Klein",
+        "Hoch",
+        "Huegel",
+        "Berg",
+        "Wald",
+        "Sumpf",
+        "Schnee",
+        "Sonnen",
+        "Mond",
+        "See",
+        "Tal",
+        "Schatten",
+        "Hoehlen",
+        "Blut",
+        "Wild",
+        "Chaos",
+        "Nacht",
+        "Nebel",
+        "Grau",
+        "Frost",
+        "Finster",
+        "Duester",
+        "flame",
+        "ice",
+        "star",
+        "black"
+    ]
+}
