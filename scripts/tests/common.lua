@@ -1085,3 +1085,29 @@ function test_parser()
     os.remove(filename)
     assert_equal("Goldene Herde", u.name)
 end
+
+local function set_order(u, str)
+    u:clear_orders()
+    u:add_order(str)
+end
+
+function test_prefix()
+    local r0 = region.create(0, 0, "plain")
+    local f1 = faction.create("noreply@eressea.de", "human", "de")
+    local u1 = unit.create(f1, r0, 1)
+
+    set_order(u1, "PRAEFIX See")
+    process_orders()
+    assert_not_nil(u1:show():find("Seemensch"))
+
+    u1.race = "elf"
+    assert_not_nil(u1:show():find("Seeelf"))
+
+    set_order(u1, "PRAEFIX Mond")
+    process_orders()
+    assert_not_nil(u1:show():find("Mondelf"))
+
+    set_order(u1, "PRAEFIX")
+    process_orders()
+    assert_not_nil(u1:show():find("Elf"))
+end
