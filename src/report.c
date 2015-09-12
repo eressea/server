@@ -97,7 +97,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <limits.h>
 #include <stdlib.h>
 
-extern int verbosity;
 extern int *storms;
 extern int weeks_per_month;
 extern int months_per_year;

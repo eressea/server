@@ -30,8 +30,8 @@ extern "C" {
 #define LOG_FLUSH      0x01
 #define LOG_CPWARNING  0x02
 #define LOG_CPERROR    0x04
-#define LOG_CPDEBUG    0x08
-#define LOG_CPINFO     0x10
+#define LOG_CPINFO     0x08
+#define LOG_CPDEBUG    0x10
 
     extern int log_flags;
     extern int log_stderr;

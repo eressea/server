@@ -3748,8 +3748,6 @@ static int battle_report(battle * b)
         }
     }
 
-    if (verbosity > 0)
-        log_printf(stdout, " %d", b->turn);
     fflush(stdout);
 
     for (bf = b->factions; bf; bf = bf->next) {
@@ -4340,8 +4338,7 @@ void do_battle(region * r)
     do_combatmagic(b, DO_PRECOMBATSPELL);
 
     print_stats(b);               /* gibt die Kampfaufstellung aus */
-    if (verbosity > 0)
-        log_printf(stdout, "%s (%d, %d) : ", rname(r, default_locale), r->x, r->y);
+    log_debug("battle in %s (%d, %d) : ", regionname(r, 0), r->x, r->y);
 
     for (; battle_report(b) && b->turn <= max_turns; ++b->turn) {
         if (bdebug) {
@@ -4352,9 +4349,6 @@ void do_battle(region * r)
         battle_attacks(b);
 
     }
-
-    if (verbosity > 0)
-        log_printf(stdout, "\n");
 
     /* Auswirkungen berechnen: */
     aftermath(b);
