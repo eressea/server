@@ -27,6 +27,5 @@ install -v $ROOT/process/$prg $DEST/bin/
 done
 
 # install crontab, but only on the eressea server:
-HOST=`hostname`
-
-[ "gruenbaer" = "$HOST" ] && crontab $ROOT/process/cron/crontab
+WHOAMI=`whoami`@`hostname`
+[ "eressea@gruenbaer" = "$WHOAMI" ] && crontab $ROOT/process/cron/crontab

@@ -60,11 +60,10 @@ for line in infile.readlines():
                 output = "%s%s.bz2" % (prefix, extension)
                 files = files+[output]
                 if access(filename, R_OK):
-                    if (access(output, R_OK)):
-                        #print output, "exists, skipping"
+                    if access(output, R_OK):
                         continue
                     system("bzip2 %s" % filename)
-    if not access('../wochenbericht.txt'):
+    if not access('../wochenbericht.txt', R_OK):
         os.symlink('../parteien', '../wochenbericht.txt')
     extras = [ '../wochenbericht.txt', '../express.txt' ]
     for extra in extras:
