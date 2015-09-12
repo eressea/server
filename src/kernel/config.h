@@ -224,16 +224,6 @@ extern "C" {
 
     void setstatus(struct unit *u, int status);
     /* !< sets combatstatus of a unit */
-    void setguard(struct unit *u, unsigned int flags);
-    /* !< setzt die guard-flags der Einheit */
-    unsigned int getguard(const struct unit *u);
-    /* liest die guard-flags der Einheit */
-    void guard(struct unit *u, unsigned int mask);
-    /* Einheit setzt "BEWACHE", rassenspezifzisch.
-     * 'mask' kann einzelne flags zusätzlich und-maskieren.
-     */
-    unsigned int guard_flags(const struct unit *u);
-
     int besieged(const struct unit *u);
     int maxworkingpeasants(const struct region *r);
     bool has_horses(const struct unit *u);

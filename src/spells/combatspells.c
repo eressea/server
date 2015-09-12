@@ -28,6 +28,7 @@
 #include <kernel/race.h>
 #include <kernel/terrain.h>
 
+#include <guard.h>
 #include <battle.h>
 #include <move.h>
 
