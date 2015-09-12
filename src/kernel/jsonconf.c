@@ -504,7 +504,7 @@ static void json_prefixes(cJSON *json) {
 static void json_disable_keywords(cJSON *json) {
     cJSON *child;
     if (json->type != cJSON_Array) {
-        log_error("disabled is not a json array: %d", json->type);
+        log_error("disable is not a json array: %d", json->type);
         return;
     }
     for (child = json->child; child; child = child->next) {

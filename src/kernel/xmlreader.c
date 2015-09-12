@@ -2066,21 +2066,6 @@ static int parse_main(xmlDocPtr doc)
         xmlXPathFreeObject(result);
 
         xpath->node = node;
-        /* reading eressea/game/order */
-        result = xmlXPathEvalExpression(BAD_CAST "order", xpath);
-        nodes = result->nodesetval;
-        for (i = 0; i != nodes->nodeNr; ++i) {
-            xmlNodePtr node = nodes->nodeTab[i];
-            xmlChar *propName = xmlGetProp(node, BAD_CAST "name");
-
-            if (xml_bvalue(node, "disable", false)) {
-                disable_keyword_str((const char *)propName);
-            }
-            xmlFree(propName);
-        }
-
-        xmlXPathFreeObject(result);
-
         /* reading eressea/game/skill */
         result = xmlXPathEvalExpression(BAD_CAST "skill", xpath);
         nodes = result->nodesetval;

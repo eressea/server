@@ -54,10 +54,6 @@
   <xi:include href="config://default/names-dragons.xml"/>
 
   <game>
-    <!-- Game specific settings -->
-
-    <order name="pay" disable="yes"/>
-
     <skill name="alchemy" enable="true"/>
     <skill name="crossbow" enable="true"/>
     <skill name="mining" enable="true"/>
