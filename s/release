@@ -16,6 +16,6 @@ def new_version(ver):
     file.close()
     os.system("git add src/buildno.h")
     os.system("git commit -m 'release version %s'" % ver)
-    os.system("git tag -f version-%s" % ver)
+    os.system("git tag -f v%s" % ver)
 
 new_version(sys.argv[1])
