@@ -4064,10 +4064,10 @@ void process(void)
         region *r;
         processor *pglobal = proc;
 
-        log_debug("- Step %u\n", prio);
+        log_debug("- Step %u", prio);
         while (proc && proc->priority == prio) {
-            if (proc->name && verbosity >= 1)
-                log_debug(" - %s\n", proc->name);
+            if (proc->name)
+                log_debug(" - %s", proc->name);
             proc = proc->next;
         }
 

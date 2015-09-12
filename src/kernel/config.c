@@ -438,8 +438,6 @@ static attrib_type at_npcfaction = {
     ATF_UNIQUE
 };
 
-int verbosity = 1;
-
 FILE *debug;
 
 /* ----------------------------------------------------------------------- */

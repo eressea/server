@@ -44,6 +44,7 @@ static const char *logfile = "eressea.log";
 static const char *luafile = 0;
 static const char *inifile = "eressea.ini";
 static int memdebug = 0;
+static int verbosity = 1;
 
 static void load_inifile(dictionary * d)
 {
