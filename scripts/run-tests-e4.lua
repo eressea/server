@@ -9,13 +9,12 @@ if config.install then
 end
 package.path = package.path .. ';' .. path .. '/?.lua;' .. path .. '/?/init.lua'
 
-config.rules = 'e3'
+config.rules = 'e4'
 
 require 'eressea'
 require 'eressea.path'
 require 'eressea.xmlconf'
 require 'tests.e3'
-require 'tests.xmas'
 require 'lunit'
 
 eressea.settings.set("rules.alliances", "0")

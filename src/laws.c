@@ -861,24 +861,6 @@ static int modify(int i)
     }
 }
 
-static void inactivefaction(faction * f)
-{
-    FILE *inactiveFILE;
-    char zText[128];
-
-    sprintf(zText, "%s/%s", datapath(), "inactive");
-    inactiveFILE = fopen(zText, "a");
-
-    if (inactiveFILE) {
-        fprintf(inactiveFILE, "%s:%s:%d:%d\n",
-            factionid(f),
-            LOC(default_locale, rc_name_s(f->race, NAME_PLURAL)),
-            modify(count_all(f)), turn - f->lastorders);
-
-        fclose(inactiveFILE);
-    }
-}
-
 /* test if the unit can slip through a siege undetected.
  * returns 0 if siege is successful, or 1 if the building is either
  * not besieged or the unit can slip through the siege due to better stealth.
@@ -1278,11 +1260,6 @@ static void remove_idle_players(void)
             char info[256];
             sprintf(info, "%d Einheiten, %d Personen, %d Silber",
                 f->no_units, f->num_total, f->money);
-        }
-
-        if (NMRTimeout() > 0 && turn - f->lastorders >= (NMRTimeout() - 1)) {
-            inactivefaction(f);
-            continue;
         }
     }
     log_info(" - beseitige Spieler, die sich nach der Anmeldung nicht gemeldet haben...");
