@@ -2060,15 +2060,8 @@ static int parse_main(xmlDocPtr doc)
     xmlNodeSetPtr nodes = result->nodesetval;
     int i;
 
-    xmlChar *propValue;
     if (nodes->nodeNr > 0) {
         xmlNodePtr node = nodes->nodeTab[0];
-
-        propValue = xmlGetProp(node, BAD_CAST "name");
-        if (propValue != NULL) {
-            global.gamename = _strdup((const char *)propValue);
-            xmlFree(propValue);
-        }
 
         xmlXPathFreeObject(result);
 
@@ -2079,9 +2072,8 @@ static int parse_main(xmlDocPtr doc)
         for (i = 0; i != nodes->nodeNr; ++i) {
             xmlNodePtr node = nodes->nodeTab[i];
             xmlChar *propName = xmlGetProp(node, BAD_CAST "name");
-            bool disable = xml_bvalue(node, "disable", false);
 
-            if (disable) {
+            if (xml_bvalue(node, "disable", false)) {
                 int k;
                 for (k = 0; k != MAXKEYWORDS; ++k) {
                     if (strcmp(keywords[k], (const char *)propName) == 0) {

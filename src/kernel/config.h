@@ -261,8 +261,6 @@ extern "C" {
         unsigned int data_turn;
         struct param *parameters;
         void *vm_state;
-        double producexpchance;
-        int cookie;
         int data_version; /* TODO: eliminate in favor of gamedata.version */
         struct _dictionary_ *inifile;
 
@@ -271,6 +269,10 @@ extern "C" {
                 const struct race * rc, int in_turn);
             int(*maintenance) (const struct unit * u);
         } functions;
+        /* the following are some cached values, because get_param can be slow.
+         * you should almost never need to touch them */
+        int cookie;
+        double producexpchance_;
     } settings;
 
     typedef struct helpmode {

@@ -42,7 +42,7 @@
   <xi:include href="config://default/names-ghouls.xml"/>
   <xi:include href="config://default/names-dragons.xml"/>
 
-  <game name="E3">
+  <game>
     <!-- Game specific settings -->
     <order name="besiege" disable="yes"/>
     <order name="steal" disable="yes"/>

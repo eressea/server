@@ -53,7 +53,7 @@
   <xi:include href="config://default/names-ghouls.xml"/>
   <xi:include href="config://default/names-dragons.xml"/>
 
-  <game name="Eressea">
+  <game>
     <!-- Game specific settings -->
 
     <order name="pay" disable="yes"/>
