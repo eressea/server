@@ -6,7 +6,6 @@
   <xi:include href="config://core/common/items.xml"/>
   <xi:include href="config://core/common/herbs.xml" />
   <xi:include href="config://core/spoils.xml"/>
-  <xi:include href="config://core/prefixes.xml"/>
   <xi:include href="config://core/common/buildings.xml"/>
   <xi:include href="config://game/familiars.xml"/>
 
