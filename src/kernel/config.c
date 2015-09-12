@@ -1599,16 +1599,6 @@ int maintenance_cost(const struct unit *u)
     return u_race(u)->maintenance * u->number;
 }
 
-int produceexp(struct unit *u, skill_t sk, int n)
-{
-    if (global.producexpchance > 0.0F) {
-        if (n == 0 || !playerrace(u_race(u)))
-            return 0;
-        learn_skill(u, sk, global.producexpchance);
-    }
-    return 0;
-}
-
 int lovar(double xpct_x2)
 {
     int n = (int)(xpct_x2 * 500) + 1;

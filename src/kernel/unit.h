@@ -161,8 +161,9 @@ extern "C" {
     struct skill *unit_skill(const struct unit *u, skill_t id);
     bool has_skill(const unit * u, skill_t sk);
     int effskill(const struct unit *u, skill_t sk, const struct region *r);
-    int produceexp(struct unit *u, skill_t sk, int n);
     int SkillCap(skill_t sk);
+    void produceexp(struct unit *u, skill_t sk, int n);
+    void produceexp_ex(struct unit *u, skill_t sk, int n, void(*learn)(unit *, skill_t, double));
 
     void set_level(struct unit *u, skill_t id, int level);
     int get_level(const struct unit *u, skill_t id);
