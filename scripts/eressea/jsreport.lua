@@ -1,7 +1,7 @@
 local pkg = {}
 
 function pkg.init()
-    eressea.settings.set("feature.jsreport.enable", "1")
+    eressea.settings.set("jsreport.enabled", "1")
 end
 
 function pkg.update()

@@ -4,7 +4,15 @@
         "prefixes.json",
         "e3/terrains.json"
 	],
-    "disable": [
+    "disabled": [
+        "herbalism",
+        "alchemy",
+        "entertainment",
+        "espionage",
+        "perception",
+        "stealth",
+        "taxation",
+        "trade",
         "besiege",
         "steal",
         "buy",
@@ -13,7 +21,8 @@
         "spy",
         "tax",
         "entertain",
-        "sell"
+        "sell",
+        "jsreport"
     ],
     "settings": {
         "game.id": 3,
