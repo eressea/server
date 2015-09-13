@@ -192,31 +192,37 @@ static void json_terrain_production(cJSON *json, terrain_production *prod) {
     assert(json->type == cJSON_Object);
     cJSON *child;
     for (child = json->child; child; child = child->next) {
+        char **dst = 0;
         switch (child->type) {
-        case cJSON_String:
-            if (strcmp(child->string, "base") == 0) {
-                prod->base = _strdup(child->valuestring);
-            }
-            else if (strcmp(child->string, "level") == 0) {
-                prod->startlevel = _strdup(child->valuestring);
-            }
-            else if (strcmp(child->string, "div") == 0) {
-                prod->divisor = _strdup(child->valuestring);
-            }
-            else {
-                log_error("terrain_production %s contains unknown attribute %s", json->string, child->string);
-            }
-            break;
         case cJSON_Number:
             if (strcmp(child->string, "chance") == 0) {
                 prod->chance = (float)child->valuedouble;
             }
             else {
-                log_error("terrain_production %s contains unknown attribute %s", json->string, child->string);
+                log_error("terrain_production %s contains unknown number %s", json->string, child->string);
+            }
+            break;
+        case cJSON_String:
+            if (strcmp(child->string, "base") == 0) {
+                dst = &prod->base;
+            }
+            else if (strcmp(child->string, "level") == 0) {
+                dst = &prod->startlevel;
+            }
+            else if (strcmp(child->string, "div") == 0) {
+                dst = &prod->divisor;
+            }
+            else {
+                log_error("terrain_production %s contains unknown string %s", json->string, child->string);
             }
             break;
         default:
             log_error("terrain_production %s contains unknown attribute %s", json->string, child->string);
+        }
+        if (dst) {
+            free(*dst);
+            assert(child->type == cJSON_String);
+            *dst = _strdup(child->valuestring);
         }
     }
 }
