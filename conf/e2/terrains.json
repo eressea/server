@@ -273,7 +273,7 @@
             }
         },
         "hell": {
-            "flags": [ "land", "walk" ]
+            "flags": [ "walk" ]
         },
         "hall1": {
             "flags": [ "land", "walk", "sail" ]
@@ -282,7 +282,7 @@
             "flags": [ "land", "walk", "sail" ]
         },
         "wall1": {
-            "flags": [ "forbidden" ]
+            "flags": [ "forbidden", "land" ]
         },
         "default": {
             "size": 0,
