@@ -229,21 +229,21 @@
             "production": {
                 "iron": {
                     "chance": 0.5,
-                    "level": 1,
-                    "base": 50,
-                    "div": 50
+                    "level": "1",
+                    "base": "50",
+                    "div": "50"
                 },
                 "stone": {
                     "chance": 0.5,
-                    "level": 1,
-                    "base": 100,
-                    "div": 100
+                    "level": "1",
+                    "base": "100",
+                    "div": "100"
                 },
                 "laen": {
                     "chance": 0.075,
-                    "level": 1,
-                    "base": 4,
-                    "div": 100
+                    "level": "1",
+                    "base": "4",
+                    "div": "100"
                 }
             }
         },
@@ -254,21 +254,21 @@
             "production": {
                 "iron": {
                     "chance": 0.5,
-                    "level": 1,
-                    "base": 50,
-                    "div": 50
+                    "level": "1",
+                    "base": "50",
+                    "div": "50"
                 },
                 "stone": {
                     "chance": 0.5,
-                    "level": 1,
-                    "base": 100,
-                    "div": 100
+                    "level": "1",
+                    "base": "100",
+                    "div": "100"
                 },
                 "laen": {
                     "chance": 0.075,
-                    "level": 1,
-                    "base": 4,
-                    "div": 100
+                    "level": "1",
+                    "base": "4",
+                    "div": "100"
                 }
             }
         },
