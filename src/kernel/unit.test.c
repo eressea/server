@@ -239,6 +239,33 @@ static void test_default_name(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_skill_familiar(CuTest *tc) {
+    unit *mag, *fam;
+    region *r;
+
+    test_cleanup();
+
+    // setup two units
+    mag = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    fam = test_create_unit(mag->faction, test_create_region(0, 0, 0));
+    set_level(fam, SK_PERCEPTION, 6);
+    CuAssertIntEquals(tc, 6, effskill(fam, SK_PERCEPTION));
+    set_level(mag, SK_PERCEPTION, 6);
+    CuAssertIntEquals(tc, 6, effskill(mag, SK_PERCEPTION));
+
+    // make them mage and familiar to each other
+    CuAssertIntEquals(tc, true, create_newfamiliar(mag, fam));
+
+    // when they are in the same region, the mage gets half their skill as a bonus
+    CuAssertIntEquals(tc, 6, effskill(fam, SK_PERCEPTION));
+    CuAssertIntEquals(tc, 9, effskill(mag, SK_PERCEPTION));
+
+    // when they are further apart, divide bonus by distance
+    r = test_create_region(3, 0, 0);
+    move_unit(fam, r, &r->units);
+    CuAssertIntEquals(tc, 7, effskill(mag, SK_PERCEPTION));
+    test_cleanup();
+}
 
 CuSuite *get_unit_suite(void)
 {
@@ -254,5 +281,6 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_remove_empty_units_in_region);
     SUITE_ADD_TEST(suite, test_names);
     SUITE_ADD_TEST(suite, test_default_name);
+    SUITE_ADD_TEST(suite, test_skill_familiar);
     return suite;
 }
