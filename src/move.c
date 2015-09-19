@@ -950,9 +950,7 @@ static bool is_guardian_r(const unit * guard)
 
     if ((guard->flags & UFL_GUARD) == 0)
         return false;
-    if (!armedmen(guard, true) && !fval(u_race(guard), RCF_UNARMEDGUARD))
-        return false;
-    return true;
+    return armedmen(guard, true) > 0 || fval(u_race(guard), RCF_UNARMEDGUARD);
 }
 
 bool is_guard(const struct unit * u, unsigned int mask)

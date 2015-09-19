@@ -430,7 +430,7 @@
     <attack type="1" damage="1d4"/>
     <attack type="2" damage="2d20"/>
   </race>
-  <race name="songdragon" magres="0.990000" maxaura="1.000000" regaura="1.000000" recruitcost="50" weight="1000" capacity="600" speed="1.500000" hp="40" ac="1" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="1" fly="yes" walk="yes" teach="no" getitem="yes">
+  <race name="songdragon" magres="0.990000" maxaura="1.000000" regaura="1.000000" recruitcost="50" weight="1000" capacity="600" speed="1.500000" hp="40" ac="1" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="1" fly="yes" walk="yes" teach="no" getitem="yes" unarmedguard="yes">
     <ai splitsize="9999"/>
     <function name="initfamiliar" value="oldfamiliars"/>
     <skill name="alchemy" modifier="-99"/>
@@ -733,7 +733,7 @@
     <attack type="4" damage="2d12"/>
     <attack type="4" damage="2d12"/>
   </race>
-  <race name="wyrm" magres="0.900000" maxaura="1.000000" regaura="3.000000" recruitcost="250000" weight="18000" capacity="1000000" speed="1.000000" hp="2700" ac="8" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes">
+  <race name="wyrm" magres="0.900000" maxaura="1.000000" regaura="3.000000" recruitcost="250000" weight="18000" capacity="1000000" speed="1.000000" hp="2700" ac="8" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes" unarmedguard="yes">
     <ai splitsize="1" killpeasants="yes" learn="yes"/>
     <function name="name" value="namedragon"/>
     <function name="move" value="movedragon"/>
@@ -745,7 +745,7 @@
     <attack type="4" damage="5d30"/>
     <attack type="6" spell="powerful_dragonbreath" level="12" />
   </race>
-  <race name="dragon" magres="0.700000" maxaura="1.000000" regaura="2.000000" recruitcost="50000" weight="10000" capacity="1000000" speed="1.500000" hp="900" ac="6" damage="2d30" unarmedattack="0" unarmeddefense="0" attackmodifier="7" defensemodifier="7" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes">
+  <race name="dragon" magres="0.700000" maxaura="1.000000" regaura="2.000000" recruitcost="50000" weight="10000" capacity="1000000" speed="1.500000" hp="900" ac="6" damage="2d30" unarmedattack="0" unarmeddefense="0" attackmodifier="7" defensemodifier="7" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes" unarmedguard="yes">
     <ai splitsize="2" killpeasants="yes" learn="yes"/>
     <function name="name" value="namedragon"/>
     <function name="age" value="agedragon"/>
@@ -758,7 +758,7 @@
     <attack type="4" damage="3d30"/>
     <attack type="6" spell="icy_dragonbreath" level="6" />
   </race>
-  <race name="youngdragon" magres="0.500000" maxaura="1.000000" regaura="1.000000" recruitcost="10000" weight="20000" capacity="10000" speed="1.000000" hp="300" ac="4" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes">
+  <race name="youngdragon" magres="0.500000" maxaura="1.000000" regaura="1.000000" recruitcost="10000" weight="20000" capacity="10000" speed="1.000000" hp="300" ac="4" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes" unarmedguard="yes">
     <ai splitsize="6" killpeasants="yes" learn="yes"/>
     <function name="name" value="namedragon"/>
     <function name="age" value="agefiredragon"/>
@@ -1170,7 +1170,7 @@
     <function name="name" value="namegeneric"/>
     <attack type="1" damage="1d1"/>
   </race>
-  <race name="seaserpent" magres="0.500000" maxaura="1.000000" regaura="1.000000" recruitcost="5000" weight="20000" capacity="5000" speed="1.000000" hp="600" ac="3" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" scarepeasants="yes" swim="yes" teach="no" getitem="yes" resistbash="yes">
+  <race name="seaserpent" magres="0.500000" maxaura="1.000000" regaura="1.000000" recruitcost="5000" weight="20000" capacity="5000" speed="1.000000" hp="600" ac="3" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" scarepeasants="yes" swim="yes" teach="no" getitem="yes" resistbash="yes" unarmedguard="yes">
     <ai splitsize="6" killpeasants="yes" moverandom="yes" learn="yes"/>
     <function name="name" value="namegeneric"/>
     <function name="move" value="moveswimming"/>

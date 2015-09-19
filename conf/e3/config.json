@@ -55,7 +55,7 @@
         "rules.migrants.max": 0,
         "rules.reserve.twophase": true,
         "rules.owners.force_leave": false,
-        "rules.monsters.attack_chance": 0.0,
+        "rules.monsters.attack_chance": 0.1,
         "rules.transfermen": false,
         "rules.stealth.faction": true,
         "rules.stealth.anon_battle": false,

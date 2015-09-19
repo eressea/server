@@ -146,10 +146,8 @@ static void reduce_weight(unit * u)
 
 static order *monster_attack(unit * u, const unit * target)
 {
-    if (u->region != target->region)
-        return NULL;
-    if (u->faction == target->faction)
-        return NULL;
+    assert(u->region == target->region);
+    assert(u->faction != target->faction);
     if (!cansee(u->faction, u->region, target, 0))
         return NULL;
     if (monster_is_waiting(u))
@@ -167,7 +165,7 @@ static order *get_money_for_dragon(region * r, unit * u, int wanted)
     if (attack_chance > 0.0 && is_guard(u, GUARD_TAX)) {
         /* attackiere bewachende Einheiten nur wenn wir selbst schon bewachen */
         for (u2 = r->units; u2; u2 = u2->next) {
-            if (u2 != u && is_guard(u2, GUARD_TAX)) {
+            if (u2 != u && is_guard(u2, GUARD_TAX) && u->faction!=u2->faction) {
                 /*In E3 + E4 etwas problematisch, da der Regionsbesitzer immer bewacht. Der Drache greift also immer die Burg an!*/
                 order *ord = monster_attack(u, u2);
                 if (ord)
@@ -557,8 +555,7 @@ static void monster_attacks(unit * u)
     unit *u2;
 
     for (u2 = r->units; u2; u2 = u2->next) {
-        if (cansee(u->faction, r, u2, 0) && u2->faction != u->faction && inside_building(u2) != u->building
-            && chance(0.75)) {
+        if (u2->faction != u->faction && cansee(u->faction, r, u2, 0) && !inside_building(u2)) {
             order *ord = monster_attack(u, u2);
             if (ord)
                 addlist(&u->orders, ord);
