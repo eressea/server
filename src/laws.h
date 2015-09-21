@@ -94,7 +94,6 @@ extern "C" {
     int reserve_cmd(struct unit *u, struct order *ord);
     int reserve_self(struct unit *u, struct order *ord);
     int claim_cmd(struct unit *u, struct order *ord);
-    int follow_cmd(struct unit *u, struct order *ord);
 
     void nmr_warnings(void);
 

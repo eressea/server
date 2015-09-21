@@ -2477,7 +2477,7 @@ static direction_t hunted_dir(attrib * at, int id)
     return d;
 }
 
-static int hunt(unit * u, order * ord)
+static int follow_ship(unit * u, order * ord)
 {
     region *rc = u->region;
     size_t bytes;
@@ -2615,7 +2615,7 @@ static void move_hunters(void)
                             break;
                         }
 
-                        if (!fval(u, UFL_LONGACTION) && !LongHunger(u) && hunt(u, ord)) {
+                        if (!fval(u, UFL_LONGACTION) && !LongHunger(u) && follow_ship(u, ord)) {
                             up = &r->units;
                             break;
                         }
