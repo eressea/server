@@ -6,7 +6,7 @@ function setup()
     eressea.free_game()
     eressea.settings.set("nmr.timeout", "0")
     eressea.settings.set("NewbieImmunity", "0")
-    eressea.settings.set("rules.economy.food", "4")
+    eressea.settings.set("rules.food.flags", "4")
 end
 
 function test_guard_unarmed()

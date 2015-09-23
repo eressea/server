@@ -23,6 +23,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "chaos.h"
 #include "move.h"
 #include "laws.h"
+#include "seen.h"
 #include "skill.h"
 #include "monster.h"
 
@@ -2894,10 +2895,10 @@ static void aftermath(battle * b)
                 if (sh && fval(sh, SF_DAMAGED)) {
                     int n = b->turn - 2;
                     if (n > 0) {
-                        float dmg =
+                        double dmg =
                             get_param_flt(global.parameters, "rules.ship.damage.battleround",
                             0.05F);
-                        damage_ship(sh, dmg * (float)n);
+                        damage_ship(sh, dmg * n);
                         freset(sh, SF_DAMAGED);
                     }
                 }
@@ -3209,7 +3210,7 @@ side * find_side(battle * b, const faction * f, const group * g, unsigned int fl
         if (s->faction == f && s->group == g) {
             unsigned int s1flags = flags | SIDE_HASGUARDS;
             unsigned int s2flags = s->flags | SIDE_HASGUARDS;
-            if (rule_anon_battle && s->stealthfaction != stealthfaction) {
+            if (rule_anon_battle!=0 && s->stealthfaction != stealthfaction) {
                 continue;
             }
             if (s1flags == s2flags) {
@@ -3747,8 +3748,6 @@ static int battle_report(battle * b)
         }
     }
 
-    if (verbosity > 0)
-        log_printf(stdout, " %d", b->turn);
     fflush(stdout);
 
     for (bf = b->factions; bf; bf = bf->next) {
@@ -4339,8 +4338,7 @@ void do_battle(region * r)
     do_combatmagic(b, DO_PRECOMBATSPELL);
 
     print_stats(b);               /* gibt die Kampfaufstellung aus */
-    if (verbosity > 0)
-        log_printf(stdout, "%s (%d, %d) : ", rname(r, default_locale), r->x, r->y);
+    log_debug("battle in %s (%d, %d) : ", regionname(r, 0), r->x, r->y);
 
     for (; battle_report(b) && b->turn <= max_turns; ++b->turn) {
         if (bdebug) {
@@ -4351,9 +4349,6 @@ void do_battle(region * r)
         battle_attacks(b);
 
     }
-
-    if (verbosity > 0)
-        log_printf(stdout, "\n");
 
     /* Auswirkungen berechnen: */
     aftermath(b);

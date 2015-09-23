@@ -16,12 +16,9 @@
   <xi:include href="config://core/common/potions.xml" />
   <xi:include href="config://core/spoils.xml"/>
   <xi:include href="config://game/races.xml"/>
-  <xi:include href="config://core/prefixes.xml"/>
   <xi:include href="config://core/ships.xml"/>
   <xi:include href="config://core/common/buildings.xml"/>
   <xi:include href="config://game/familiars.xml"/>
-  <xi:include href="config://core/terrains.xml"/>
-  <xi:include href="config://game/terrains.xml"/>
   <xi:include href="config://game/artrewards.xml"/>
   <xi:include href="config://game/buildings.xml"/>
   <xi:include href="config://core/calendar.xml"/>
@@ -55,68 +52,6 @@
   <xi:include href="config://default/names-zombies.xml"/>
   <xi:include href="config://default/names-ghouls.xml"/>
   <xi:include href="config://default/names-dragons.xml"/>
-
-  <game name="Eressea">
-    <!-- Game specific settings -->
-
-    <order name="pay" disable="yes"/>
-
-    <skill name="alchemy" enable="true"/>
-    <skill name="crossbow" enable="true"/>
-    <skill name="mining" enable="true"/>
-    <skill name="bow" enable="true"/>
-    <skill name="building" enable="true"/>
-    <skill name="trade" enable="true"/>
-    <skill name="forestry" enable="true"/>
-    <skill name="catapult" enable="true"/>
-    <skill name="herbalism" enable="true"/>
-    <skill name="magic" enable="true"/>
-    <skill name="training" enable="true"/>
-    <skill name="riding" enable="true"/>
-    <skill name="armorer" enable="true"/>
-    <skill name="shipcraft" enable="true"/>
-    <skill name="melee" enable="true"/>
-    <skill name="sailing" enable="true"/>
-    <skill name="polearm" enable="true"/>
-    <skill name="espionage" enable="true"/>
-    <skill name="quarrying" enable="true"/>
-    <skill name="roadwork" enable="true"/>
-    <skill name="tactics" enable="true"/>
-    <skill name="stealth" enable="true"/>
-    <skill name="entertainment" enable="true"/>
-    <skill name="weaponsmithing" enable="true"/>
-    <skill name="cartmaking" enable="true"/>
-    <skill name="perception" enable="true"/>
-    <skill name="taxation" enable="true"/>
-    <skill name="stamina" enable="true"/>
-    <skill name="unarmed" enable="true"/>
-
-    <param name="NewbieImmunity" value="8"/>
-    <param name="modules.wormholes" value="1"/>
-    <param name="entertain.base" value="0"/>
-    <param name="entertain.perlevel" value="20"/>
-    <param name="nmr.timeout" value="5"/>
-    <param name="nmr.removenewbie" value="0"/>
-    <param name="GiveRestriction" value="3"/>
-    <param name="hunger.long" value="1"/>
-    <param name="init_spells" value="0"/>
-    <param name="rules.ship.damage_drift" value="0.00"/> <!-- percent damage from drifting-->
-    <param name="rules.reserve.twophase" value="1"/>
-    <param name="rules.give.max_men" value="-1"/>
-    <param name="rules.check_overload" value="0"/>
-    <param name="rules.limit.faction" value="2500"/>
-    <param name="rules.maxskills.magic" value="5"/>
-    <param name="rules.guard.base_stop_prob" value="0.30"/>
-    <param name="rules.guard.skill_stop_prob" value="0.05"/>
-    <param name="rules.guard.amulet_stop_prob" value="0.10"/>
-    <param name="rules.guard.guard_number_stop_prob" value="0.001"/>
-    <param name="rules.guard.castle_stop_prob" value="0.05"/>
-    <param name="rules.guard.region_type_stop_prob" value="0.05"/>
-    <param name="rules.economy.repopulate_maximum" value="500"/>
-    <param name="game.id" value="2"/>
-    <param name="game.name" value="Eressea"/>
-    <param name="world.era" value="2"/>
-  </game>
   <strings>
     <string name="mailto">
       <text locale="de">eressea-server@eressea.de</text>

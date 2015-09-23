@@ -30,7 +30,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <kernel/build.h>
 #include <kernel/building.h>
-#include <kernel/calendar.h>
 #include <kernel/connection.h>
 #include <kernel/curse.h>
 #include <kernel/faction.h>
@@ -49,6 +48,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/unit.h>
 
 #include "direction.h"
+#include "calendar.h"
 #include "skill.h"
 
 /* util includes */
@@ -704,7 +704,7 @@ static float damage_drift(void)
 {
     static float value = -1.0F;
     if (value < 0) {
-        value = get_param_flt(global.parameters, "rules.ship.damage_drift", 0.02F);
+        value = (float)get_param_flt(global.parameters, "rules.ship.damage_drift", 0.02F);
     }
     return value;
 }
@@ -1955,7 +1955,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
                     ADDMSG(&f->msgs, msg_message("sailnolandingstorm", "ship region", sh, next_point));
                 }
                 else {
-                    float dmg =
+                    double dmg =
                         get_param_flt(global.parameters, "rules.ship.damage.nolanding",
                         0.10F);
                     ADDMSG(&f->msgs, msg_message("sailnolanding", "ship region", sh,

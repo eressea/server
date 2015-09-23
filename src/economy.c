@@ -23,6 +23,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "alchemy.h"
 #include "direction.h"
+#include "donations.h"
 #include "give.h"
 #include "laws.h"
 #include "randenc.h"
@@ -31,10 +32,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "monster.h"
 #include "morale.h"
 #include "reports.h"
+#include "calendar.h"
 
 /* kernel includes */
 #include <kernel/building.h>
-#include <kernel/calendar.h>
 #include <kernel/curse.h>
 #include <kernel/equipment.h>
 #include <kernel/faction.h>
@@ -705,28 +706,6 @@ static int forget_cmd(unit * u, order * ord)
     return 0;
 }
 
-void add_spende(faction * f1, faction * f2, int amount, region * r)
-{
-    donation *sp;
-
-    sp = r->donations;
-
-    while (sp) {
-        if (sp->f1 == f1 && sp->f2 == f2) {
-            sp->amount += amount;
-            return;
-        }
-        sp = sp->next;
-    }
-
-    sp = calloc(1, sizeof(donation));
-    sp->f1 = f1;
-    sp->f2 = f2;
-    sp->amount = amount;
-    sp->next = r->donations;
-    r->donations = sp;
-}
-
 static bool maintain(building * b, bool first)
 /* first==false -> take money from wherever you can */
 {
@@ -886,7 +865,7 @@ static bool maintain(building * b, bool first)
                         cost -= give;
                         fset(ua->faction, FFL_SELECT);
                         if (m->rtype == rsilver)
-                            add_spende(ua->faction, u->faction, give, r);
+                            add_donation(ua->faction, u->faction, give, r);
                         if (cost <= 0)
                             break;
                     }
@@ -2640,8 +2619,9 @@ static void steal_cmd(unit * u, struct order *ord, request ** stealorders)
         return;
     }
     id = read_unitid(u->faction, r);
-    u2 = findunitr(r, id);
-
+    if (id>0) {
+        u2 = findunitr(r, id);
+    }
     if (u2 && u2->region == u->region) {
         f = u2->faction;
     }

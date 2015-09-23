@@ -191,7 +191,7 @@ static void chaos(region * r)
 
                         while (sh) {
                             ship *nsh = sh->next;
-                            float dmg =
+                            double dmg =
                                 get_param_flt(global.parameters, "rules.ship.damage.atlantis",
                                 0.50);
                             damage_ship(sh, dmg);

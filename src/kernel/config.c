@@ -51,6 +51,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "types.h"
 #include "unit.h"
 
+
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
 
@@ -72,6 +73,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/unicode.h>
 #include <util/umlaut.h>
 #include <util/xml.h>
+
+#include "donations.h"
+#include "guard.h"
+#include "prefix.h"
 
 #ifdef USE_LIBXML2
 /* libxml includes */
@@ -438,8 +443,6 @@ static attrib_type at_npcfaction = {
     ATF_UNIQUE
 };
 
-int verbosity = 1;
-
 FILE *debug;
 
 /* ----------------------------------------------------------------------- */
@@ -609,7 +612,7 @@ int count_maxmigrants(const faction * f)
     static int migrants = -1;
 
     if (migrants < 0) {
-        migrants = get_param_int(global.parameters, "rules.migrants", INT_MAX);
+        migrants = get_param_int(global.parameters, "rules.migrants.max", INT_MAX);
     }
     if (migrants == INT_MAX) {
         int x = 0;
@@ -1120,10 +1123,10 @@ void set_basepath(const char *path)
     g_basedir = path;
 }
 
-float get_param_flt(const struct param *p, const char *key, float def)
+double get_param_flt(const struct param *p, const char *key, double def)
 {
     const char *str = get_param(p, key);
-    return str ? (float)atof(str) : def;
+    return str ? atof(str) : def;
 }
 
 void set_param(struct param **p, const char *key, const char *data)
@@ -1176,63 +1179,12 @@ attrib_type at_germs = {
     ATF_UNIQUE
 };
 
-attrib_type at_guard = {
-    "guard",
-    DEFAULT_INIT,
-    DEFAULT_FINALIZE,
-    DEFAULT_AGE,
-    a_writeint,
-    a_readint,
-    ATF_UNIQUE
-};
-
 void setstatus(struct unit *u, int status)
 {
     assert(status >= ST_AGGRO && status <= ST_FLEE);
     if (u->status != status) {
         u->status = (status_t)status;
     }
-}
-
-void setguard(unit * u, unsigned int flags)
-{
-    /* setzt die guard-flags der Einheit */
-    attrib *a = NULL;
-    assert(flags == 0 || !fval(u, UFL_MOVED));
-    assert(flags == 0 || u->status < ST_FLEE);
-    if (fval(u, UFL_GUARD)) {
-        a = a_find(u->attribs, &at_guard);
-    }
-    if (flags == GUARD_NONE) {
-        freset(u, UFL_GUARD);
-        if (a)
-            a_remove(&u->attribs, a);
-        return;
-    }
-    fset(u, UFL_GUARD);
-    fset(u->region, RF_GUARDED);
-    if (flags == guard_flags(u)) {
-        if (a)
-            a_remove(&u->attribs, a);
-    }
-    else {
-        if (!a)
-            a = a_add(&u->attribs, a_new(&at_guard));
-        a->data.i = (int)flags;
-    }
-}
-
-unsigned int getguard(const unit * u)
-{
-    attrib *a;
-
-    assert(fval(u, UFL_GUARD) || (u->building && u == building_owner(u->building))
-        || !"you're doing it wrong! check is_guard first");
-    a = a_find(u->attribs, &at_guard);
-    if (a) {
-        return (unsigned int)a->data.i;
-    }
-    return guard_flags(u);
 }
 
 #ifndef HAVE_STRDUP
@@ -1245,40 +1197,6 @@ char *_strdup(const char *s)
 bool faction_id_is_unused(int id)
 {
     return findfaction(id) == NULL;
-}
-
-unsigned int guard_flags(const unit * u)
-{
-    unsigned int flags =
-        GUARD_CREWS | GUARD_LANDING | GUARD_TRAVELTHRU | GUARD_TAX;
-#if GUARD_DISABLES_PRODUCTION == 1
-    flags |= GUARD_PRODUCE;
-#endif
-#if GUARD_DISABLES_RECRUIT == 1
-    flags |= GUARD_RECRUIT;
-#endif
-    switch (old_race(u_race(u))) {
-    case RC_ELF:
-        if (u->faction->race != u_race(u))
-            break;
-        /* else fallthrough */
-    case RC_TREEMAN:
-        flags |= GUARD_TREES;
-        break;
-    case RC_IRONKEEPER:
-        flags = GUARD_MINING;
-        break;
-    default:
-        /* TODO: This should be configuration variables, all of it */
-        break;
-    }
-    return flags;
-}
-
-void guard(unit * u, unsigned int mask)
-{
-    unsigned int flags = guard_flags(u);
-    setguard(u, flags & mask);
 }
 
 int besieged(const unit * u)
@@ -1402,19 +1320,19 @@ int cmp_current_owner(const building * b, const building * a)
     return -1;
 }
 
-int rule_stealth_faction(void)
+bool rule_stealth_faction(void)
 {
     static int gamecookie = -1;
     static int rule = -1;
     if (rule < 0 || gamecookie != global.cookie) {
-        rule = get_param_int(global.parameters, "rules.stealth.faction", 0xFF);
+        rule = get_param_int(global.parameters, "rules.stealth.faction", 1);
         gamecookie = global.cookie;
         assert(rule >= 0);
     }
-    return rule;
+    return rule!=0;
 }
 
-int rule_region_owners(void)
+bool rule_region_owners(void)
 {
     static int gamecookie = -1;
     static int rule = -1;
@@ -1423,7 +1341,7 @@ int rule_region_owners(void)
         gamecookie = global.cookie;
         assert(rule >= 0);
     }
-    return rule;
+    return rule!=0;
 }
 
 int rule_auto_taxation(void)
@@ -1445,7 +1363,7 @@ int rule_blessed_harvest(void)
     static int rule = -1;
     if (rule < 0 || gamecookie != global.cookie) {
         rule =
-            get_param_int(global.parameters, "rules.magic.blessed_harvest",
+            get_param_int(global.parameters, "rules.blessed_harvest.flags",
             HARVEST_WORK);
         gamecookie = global.cookie;
         assert(rule >= 0);
@@ -1477,7 +1395,7 @@ int rule_faction_limit(void)
     return rule;
 }
 
-int rule_transfermen(void)
+bool rule_transfermen(void)
 {
     static int gamecookie = -1;
     static int rule = -1;
@@ -1486,7 +1404,7 @@ int rule_transfermen(void)
         gamecookie = global.cookie;
         assert(rule >= 0);
     }
-    return rule;
+    return rule!=0;
 }
 
 static int
@@ -1594,16 +1512,6 @@ int maintenance_cost(const struct unit *u)
             return retval;
     }
     return u_race(u)->maintenance * u->number;
-}
-
-int produceexp(struct unit *u, skill_t sk, int n)
-{
-    if (global.producexpchance > 0.0F) {
-        if (n == 0 || !playerrace(u_race(u)))
-            return 0;
-        learn_skill(u, sk, global.producexpchance);
-    }
-    return 0;
 }
 
 int lovar(double xpct_x2)
@@ -1761,6 +1669,7 @@ int markets_module(void)
 void free_gamedata(void)
 {
     int i;
+    free_donations();
     free_units();
     free_regions();
     free_borders();

@@ -28,6 +28,7 @@ without prior permission by the authors of Eressea.
 #include "spell.h"
 #include "spellbook.h"
 #include "calendar.h"
+#include "prefix.h"
 
 #include "vortex.h"
 
@@ -1883,131 +1884,6 @@ static int parse_races(xmlDocPtr doc)
     return 0;
 }
 
-static int parse_terrains(xmlDocPtr doc)
-{
-    xmlXPathContextPtr xpath;
-    xmlXPathObjectPtr terrains;
-    xmlNodeSetPtr nodes;
-    int i;
-
-    xpath = xmlXPathNewContext(doc);
-
-    /* reading eressea/terrains/terrain */
-    terrains =
-        xmlXPathEvalExpression(BAD_CAST "/eressea/terrains/terrain", xpath);
-    nodes = terrains->nodesetval;
-    for (i = 0; i != nodes->nodeNr; ++i) {
-        xmlNodePtr node = nodes->nodeTab[i];
-        terrain_type *terrain;
-        xmlChar *propValue;
-        xmlXPathObjectPtr xpathChildren;
-        xmlNodeSetPtr children;
-
-        propValue = xmlGetProp(node, BAD_CAST "name");
-        assert(propValue != NULL);
-        terrain = get_or_create_terrain((const char *)propValue);
-        xmlFree(propValue);
-
-        terrain->max_road = (short)xml_ivalue(node, "road", 0);
-        assert(terrain->max_road >= 0);
-        terrain->size = xml_ivalue(node, "size", 0);
-
-        if (xml_bvalue(node, "forbidden", false))
-            terrain->flags |= FORBIDDEN_REGION;
-        else {
-            if (xml_bvalue(node, "fly", true))
-                terrain->flags |= FLY_INTO;
-            if (xml_bvalue(node, "sail", true))
-                terrain->flags |= SAIL_INTO;
-            if (xml_bvalue(node, "walk", true))
-                terrain->flags |= WALK_INTO;
-            if (xml_bvalue(node, "swim", false))
-                terrain->flags |= SWIM_INTO;
-            if (xml_bvalue(node, "cavalry", false))
-                terrain->flags |= CAVALRY_REGION;
-        }
-        if (xml_bvalue(node, "sea", false))
-            terrain->flags |= SEA_REGION;
-        if (xml_bvalue(node, "arctic", false))
-            terrain->flags |= ARCTIC_REGION;
-        if (xml_bvalue(node, "land", true))
-            terrain->flags |= LAND_REGION;
-        if (xml_bvalue(node, "forest", false))
-            terrain->flags |= FOREST_REGION;
-
-        terrain->distribution = (short)xml_ivalue(node, "seed", 0);
-
-        xpath->node = node;
-        xpathChildren = xmlXPathEvalExpression(BAD_CAST "herb", xpath);
-        children = xpathChildren->nodesetval;
-        if (children->nodeNr > 0) {
-            int k;
-
-            terrain->herbs = malloc((children->nodeNr + 1) * sizeof(item_type *));
-            terrain->herbs[children->nodeNr] = NULL;
-            for (k = 0; k != children->nodeNr; ++k) {
-                xmlNodePtr nodeHerb = children->nodeTab[k];
-                const struct resource_type *rtype;
-
-                propValue = xmlGetProp(nodeHerb, BAD_CAST "name");
-                assert(propValue != NULL);
-                rtype = rt_find((const char *)propValue);
-                assert(rtype != NULL && rtype->itype != NULL
-                    && fval(rtype->itype, ITF_HERB));
-                terrain->herbs[k] = rtype->itype;
-                xmlFree(propValue);
-            }
-        }
-        xmlXPathFreeObject(xpathChildren);
-
-        xpath->node = node;
-        xpathChildren = xmlXPathEvalExpression(BAD_CAST "resource", xpath);
-        children = xpathChildren->nodesetval;
-        if (children->nodeNr > 0) {
-            int k;
-
-            terrain->production =
-                malloc((children->nodeNr + 1) * sizeof(terrain_production));
-            terrain->production[children->nodeNr].type = NULL;
-            for (k = 0; k != children->nodeNr; ++k) {
-                xmlNodePtr nodeProd = children->nodeTab[k];
-
-                propValue = xmlGetProp(nodeProd, BAD_CAST "name");
-                assert(propValue != NULL);
-                terrain->production[k].type = rt_find((const char *)propValue);
-                assert(terrain->production[k].type);
-                xmlFree(propValue);
-
-                propValue = xmlGetProp(nodeProd, BAD_CAST "level");
-                assert(propValue);
-                terrain->production[k].startlevel = _strdup((const char *)propValue);
-                xmlFree(propValue);
-
-                propValue = xmlGetProp(nodeProd, BAD_CAST "base");
-                assert(propValue);
-                terrain->production[k].base = _strdup((const char *)propValue);
-                xmlFree(propValue);
-
-                propValue = xmlGetProp(nodeProd, BAD_CAST "div");
-                assert(propValue);
-                terrain->production[k].divisor = _strdup((const char *)propValue);
-                xmlFree(propValue);
-
-                terrain->production[k].chance =
-                    (float)xml_fvalue(nodeProd, "chance", 1.0);
-            }
-        }
-        xmlXPathFreeObject(xpathChildren);
-
-    }
-    xmlXPathFreeObject(terrains);
-
-    xmlXPathFreeContext(xpath);
-
-    init_terrains();
-    return 0;
-}
-
 static int parse_messages(xmlDocPtr doc)
 {
     xmlXPathContextPtr xpath;
@@ -2176,128 +2052,13 @@ static int parse_strings(xmlDocPtr doc)
     return 0;
 }
 
-static void
-xml_readprefixes(xmlXPathContextPtr xpath, xmlNodePtr * nodeTab, int nodeNr,
-bool names)
-{
-    int i;
-
-    for (i = 0; i != nodeNr; ++i) {
-        xmlNodePtr node = nodeTab[i];
-        xmlChar *propText = xmlNodeListGetString(node->doc, node->children, 1);
-
-        if (propText != NULL) {
-            add_raceprefix((const char *)propText);
-            xmlFree(propText);
-        }
-    }
-}
-
-static int parse_prefixes(xmlDocPtr doc)
-{
-    xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
-    xmlXPathObjectPtr strings;
-
-    /* reading eressea/strings/string */
-    strings = xmlXPathEvalExpression(BAD_CAST "/eressea/prefixes/prefix", xpath);
-    xml_readprefixes(xpath, strings->nodesetval->nodeTab,
-        strings->nodesetval->nodeNr, false);
-    xmlXPathFreeObject(strings);
-
-    xmlXPathFreeContext(xpath);
-    return 0;
-}
-
-static int parse_main(xmlDocPtr doc)
-{
-    xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
-    xmlXPathObjectPtr result =
-        xmlXPathEvalExpression(BAD_CAST "/eressea/game", xpath);
-    xmlNodeSetPtr nodes = result->nodesetval;
-    int i;
-
-    xmlChar *propValue;
-    if (nodes->nodeNr > 0) {
-        xmlNodePtr node = nodes->nodeTab[0];
-
-        global.producexpchance =
-            (float)xml_fvalue(node, "learningbydoing", 1.0 / 3);
-
-        propValue = xmlGetProp(node, BAD_CAST "name");
-        if (propValue != NULL) {
-            global.gamename = _strdup((const char *)propValue);
-            xmlFree(propValue);
-        }
-
-        xmlXPathFreeObject(result);
-
-        /* reading eressea/game/param */
-        xpath->node = node;
-        result = xmlXPathEvalExpression(BAD_CAST "param", xpath);
-        nodes = result->nodesetval;
-        for (i = 0; i != nodes->nodeNr; ++i) {
-            xmlNodePtr node = nodes->nodeTab[i];
-            parse_param(&global.parameters, node);
-        }
-
-        xmlXPathFreeObject(result);
-
-        /* reading eressea/game/order */
-        result = xmlXPathEvalExpression(BAD_CAST "order", xpath);
-        nodes = result->nodesetval;
-        for (i = 0; i != nodes->nodeNr; ++i) {
-            xmlNodePtr node = nodes->nodeTab[i];
-            xmlChar *propName = xmlGetProp(node, BAD_CAST "name");
-            bool disable = xml_bvalue(node, "disable", false);
-
-            if (disable) {
-                int k;
-                for (k = 0; k != MAXKEYWORDS; ++k) {
-                    if (strcmp(keywords[k], (const char *)propName) == 0) {
-                        enable_keyword(k, false);
-                        break;
-                    }
-                }
-                if (k == MAXKEYWORDS) {
-                    log_error("trying to disable unknown command %s\n", (const char *)propName);
-                }
-            }
-            xmlFree(propName);
-        }
-
-        xmlXPathFreeObject(result);
-
-        /* reading eressea/game/skill */
-        result = xmlXPathEvalExpression(BAD_CAST "skill", xpath);
-        nodes = result->nodesetval;
-        for (i = 0; i != nodes->nodeNr; ++i) {
-            xmlNodePtr node = nodes->nodeTab[i];
-            xmlChar *propName = xmlGetProp(node, BAD_CAST "name");
-            skill_t sk = findskill((const char *)propName);
-            if (sk != NOSKILL) {
-                bool enable = xml_bvalue(node, "enable", true);
-                enable_skill(sk, enable);
-            }
-            xmlFree(propName);
-        }
-    }
-    xmlXPathFreeObject(result);
-
-    xmlXPathFreeContext(xpath);
-    return 0;
-}
-
 void register_xmlreader(void)
 {
-    xml_register_callback(parse_main);
-
     xml_register_callback(parse_strings);
-    xml_register_callback(parse_prefixes);
     xml_register_callback(parse_messages);
     xml_register_callback(parse_resources);
     xml_register_callback(parse_rules);
 
-    xml_register_callback(parse_terrains);        /* requires resources */
     xml_register_callback(parse_buildings);       /* requires resources */
     xml_register_callback(parse_ships);   /* requires terrains */
     xml_register_callback(parse_spells);  /* requires resources */

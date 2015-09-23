@@ -3598,11 +3598,11 @@
     </string>
     <string name="p2">
       <text locale="en">The "Water of Life" allows living trees to be created from logs. A Knotroot and Elvendear are heated until one can just still keep one's finger in. This is then poured into a jar and allowed to cool slowly. The extract is sufficient for 10 pieces of wood.</text>
-      <text locale="de">Das 'Wasser des Lebens' ist in der Lage, aus gefällten Baumstämmen wieder lebende Bäume zu machen. Dazu wird ein knotiger Saugwurz zusammen mit einem Elfenlieb erwärmt, so daß man gerade noch den Finger reinhalten kann. Dies gieße man in ein Gefäß und lasse es langsam abkühlen. Der Extrakt reicht für 10 Holzstämme.</text>
+      <text locale="de">Das 'Wasser des Lebens' ist in der Lage, aus gefällten Baumstämmen wieder lebende Bäume zu machen. Dazu wird ein knotiger Saugwurz zusammen mit einem Elfenlieb erwärmt, so dass man gerade noch den Finger reinhalten kann. Dies gieße man in ein Gefäß und lasse es langsam abkühlen. Der Extrakt reicht für 10 Holzstämme.</text>
     </string>
     <string name="p3">
       <text locale="en">Allow a Tangy Temerity to simmer for three hours in a litre of water, then add a grated Mandrake, and sprinkle in a Gapgrowth harvested at full moon. The whole brew should then be allowed to stew for three days in a warm place. This potion increases the strength and endurance of ten men so that they can achieve twice as much in a week.</text>
-      <text locale="de">Man lasse einen Würzigen Wagemut drei Stunden lang in einem Liter Wasser köcheln. Dann gebe man eine geriebene Alraune dazu und bestreue das ganze mit bei Vollmond geerntetem Spaltwachs. Nun lasse man den Sud drei Tage an einem dunklen und warmen Ort ziehen und seie dann die Flüssigkeit ab. Dieser Schaffenstrunk erhöht die Kraft und Ausdauer von zehn Männern, so daß sie doppelt soviel schaffen können wie sonst.</text>
+      <text locale="de">Man lasse einen Würzigen Wagemut drei Stunden lang in einem Liter Wasser köcheln. Dann gebe man eine geriebene Alraune dazu und bestreue das ganze mit bei Vollmond geerntetem Spaltwachs. Nun lasse man den Sud drei Tage an einem dunklen und warmen Ort ziehen und seie dann die Flüssigkeit ab. Dieser Schaffenstrunk erhöht die Kraft und Ausdauer von zehn Männern, so dass sie doppelt soviel schaffen können wie sonst.</text>
     </string>
     <string name="ointment">
       <text locale="en">When one is severely wounded after a hard battle it is advisable to have some Ointment to hand. Applied to wounds, this magical paste closes them in the blink of an eye. For the preparation the alchemist requires a cobalt fungus, tangy temerity, and white hemlock. A dose of the potion heals up to 400 hitpoints.</text>
@@ -3626,7 +3626,7 @@
     </string>
     <string name="p9">
       <text locale="en">To make a horsepower potion, chop a peyote, a cobalt fungus and some knotroot, and boil it in a bucketful of water. Then add some sand reeker and let the mixture steep for three days. Finally one gives this to the horses to drink, to double their procreation.</text>
-      <text locale="de">Für das Pferdeglück zerhacke man einen Kakteenschwitz, einen blauen Baumringel und etwas knotigen Saugwurz und koche das ganze mit einem Eimer Wasser auf. Dann füge man etwas Sandfäule dazu und lasse diesen Sud drei Tage lang ziehen. Letztlich gebe man es den Pferden zu trinken, auf daß sie sich doppelt so schnell vermehren.</text>
+      <text locale="de">Für das Pferdeglück zerhacke man einen Kakteenschwitz, einen blauen Baumringel und etwas knotigen Saugwurz und koche das ganze mit einem Eimer Wasser auf. Dann füge man etwas Sandfäule dazu und lasse diesen Sud drei Tage lang ziehen. Letztlich gebe man es den Pferden zu trinken, auf dass sie sich doppelt so schnell vermehren.</text>
     </string>
     <string name="p10">
       <text locale="en">The use of the berserkers blood potion is advised to increase one's warriors abilities to new heights. To create this, one needs a white hemlock, some flatroot, sand reeker and a mandrake. All ingredients have to be sliced as finely as possible, after which it is boiled for two hours. The cooled brew is strained through a cloth. The resulting juice is enough to improve up to ten warriors.</text>
@@ -3638,7 +3638,7 @@
     </string>
     <string name="truthpotion">
       <text locale="en">This simple but very potent brew sharpens the senses of anyone that drinks of it and makes him able to see through even the most complex illusions for one week.</text>
-      <text locale="de">Dieses wirkungsvolle einfache Gebräu schärft die Sinne des Trinkenden derart, daß er in der Lage ist, eine Woche lang auch die komplexesten Illusionen zu durchschauen.</text>
+      <text locale="de">Dieses wirkungsvolle einfache Gebräu schärft die Sinne des Trinkenden derart, dass er in der Lage ist, eine Woche lang auch die komplexesten Illusionen zu durchschauen.</text>
     </string>
     <string name="p13">
       <text locale="en">One of the most rare and prized of all alchemist elixers, this potion grants the user a dragon's power for a few weeks. The potion increases the life-energy of a maximum of ten people fivefold. The effect is strongest right after drinking and slowly decreases over time. To brew this potion the alchemist needs an elvendear, a windbag, a piece of waterfinder and a spider ivy. Finally he dusts it with some minced bubblemorel and stirrs the powder into some dragon's blood. </text>
@@ -4902,7 +4902,7 @@
     <string name="shockwave">
       <text locale="de">Dieser Zauber läßt eine Welle aus purer Kraft über die
       gegnerischen Reihen hinwegfegen. Viele Kämpfer wird der Schock so
-      benommen machen, daß sie für einen kurzen Moment nicht angreifen
+      benommen machen, dass sie für einen kurzen Moment nicht angreifen
       können.</text>
       <text locale="en">A wave of pure force spreads out from the magician,
       crashing into the enemy ranks. Many warriors are thrown off balance and
@@ -6831,6 +6831,11 @@
     <string name="Duester">
       <text locale="de">Düster</text>
       <text locale="en">black </text>
+    </string>
+
+    <string name="arch">
+      <text locale="de">Erz</text>
+      <text locale="en">arch</text>
     </string>
 
     <string name="star">

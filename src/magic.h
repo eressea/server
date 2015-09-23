@@ -346,23 +346,23 @@ extern "C" {
     extern void create_newclone(struct unit *mage, struct unit *familiar);
     extern struct unit *has_clone(struct unit *mage);
 
-    extern const char *spell_info(const struct spell *sp,
+    const char *spell_info(const struct spell *sp,
         const struct locale *lang);
-    extern const char *spell_name(const struct spell *sp,
+    const char *spell_name(const struct spell *sp,
         const struct locale *lang);
-    extern const char *curse_name(const struct curse_type *ctype,
+    const char *curse_name(const struct curse_type *ctype,
         const struct locale *lang);
 
-    extern struct message *msg_unitnotfound(const struct unit *mage,
+    struct message *msg_unitnotfound(const struct unit *mage,
     struct order *ord, const struct spllprm *spobj);
-    extern int FactionSpells(void);
+    bool FactionSpells(void);
 
-    extern void write_spells(struct quicklist *slist, struct storage *store);
-    extern void read_spells(struct quicklist **slistp, magic_t mtype,
-    struct storage *store);
+    void write_spells(struct quicklist *slist, struct storage *store);
+    void read_spells(struct quicklist **slistp, magic_t mtype,
+        struct storage *store);
 
-    extern struct spellbook * get_spellbook(const char * name);
-    extern void free_spellbooks(void);
+    struct spellbook * get_spellbook(const char * name);
+    void free_spellbooks(void);
 #ifdef __cplusplus
 }
 #endif

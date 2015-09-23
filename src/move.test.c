@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include "move.h"
 
+#include "guard.h"
+
 #include <kernel/config.h>
 #include <kernel/ally.h>
 #include <kernel/building.h>
@@ -215,6 +217,31 @@ static void test_walkingcapacity(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_is_guarded(CuTest *tc) {
+    unit *u1, *u2;
+    region *r;
+    race *rc;
+
+    test_cleanup();
+    rc = rc_get_or_create("dragon");
+    rc->flags |= RCF_UNARMEDGUARD;
+    r = test_create_region(0, 0, 0);
+    u1 = test_create_unit(test_create_faction(0), r);
+    u2 = test_create_unit(test_create_faction(rc), r);
+    CuAssertPtrEquals(tc, 0, is_guarded(r, u1, GUARD_TRAVELTHRU));
+    CuAssertPtrEquals(tc, 0, is_guarded(r, u1, GUARD_PRODUCE));
+    CuAssertPtrEquals(tc, 0, is_guarded(r, u1, GUARD_TREES));
+    CuAssertPtrEquals(tc, 0, is_guarded(r, u1, GUARD_MINING));
+    guard(u2, GUARD_MINING | GUARD_PRODUCE);
+    CuAssertIntEquals(tc, GUARD_CREWS | GUARD_LANDING | GUARD_TRAVELTHRU | GUARD_TAX | GUARD_PRODUCE | GUARD_RECRUIT, guard_flags(u2));
+    CuAssertPtrEquals(tc, 0, is_guarded(r, u1, GUARD_TRAVELTHRU));
+    CuAssertPtrEquals(tc, 0, is_guarded(r, u1, GUARD_TREES));
+    CuAssertPtrEquals(tc, 0, is_guarded(r, u1, GUARD_MINING));
+    CuAssertPtrEquals(tc, u2, is_guarded(r, u1, GUARD_PRODUCE));
+
+    test_cleanup();
+}
+
 CuSuite *get_move_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -226,5 +253,6 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_ship_has_harbormaster_contact);
     SUITE_ADD_TEST(suite, test_ship_has_harbormaster_ally);
     SUITE_ADD_TEST(suite, test_ship_has_harbormaster_same_faction);
+    SUITE_ADD_TEST(suite, test_is_guarded);
     return suite;
 }

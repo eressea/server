@@ -311,6 +311,11 @@ void destroyfaction(faction * f)
         f->spellbook = 0;
     }
 
+    if (f->seen_factions) {
+        ql_free(f->seen_factions);
+        f->seen_factions = 0;
+    }
+
     while (u) {
         /* give away your stuff, make zombies if you cannot (quest items) */
         int result = gift_items(u, GIFT_FRIENDS | GIFT_PEASANTS);
@@ -608,8 +613,7 @@ void remove_empty_factions(void)
             ursprung *ur = f->ursprung;
             while (ur && ur->id != 0)
                 ur = ur->next;
-            if (verbosity >= 2)
-                log_printf(stdout, "\t%s\n", factionname(f));
+            log_debug("dead: %s", factionname(f));
 
             /* Einfach in eine Datei schreiben und später vermailen */
 

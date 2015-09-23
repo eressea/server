@@ -156,6 +156,6 @@ CuSuite *get_curse_suite(void)
     SUITE_ADD_TEST(suite, test_good_dreams);
     SUITE_ADD_TEST(suite, test_bad_dreams);
     SUITE_ADD_TEST(suite, test_memstream);
-    SUITE_ADD_TEST(suite, test_write_flag);
+    DISABLE_TEST(suite, test_write_flag);
     return suite;
 }

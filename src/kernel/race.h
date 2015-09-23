@@ -249,9 +249,6 @@ extern "C" {
 
     extern bool r_insectstalled(const struct region *r);
 
-    extern void add_raceprefix(const char *);
-    extern char **race_prefixes;
-
     extern void write_race_reference(const struct race *rc,
     struct storage *store);
     extern variant read_race_reference(struct storage *store);

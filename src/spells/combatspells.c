@@ -28,12 +28,14 @@
 #include <kernel/race.h>
 #include <kernel/terrain.h>
 
+#include <guard.h>
 #include <battle.h>
 #include <move.h>
 
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/log.h>
 #include <util/rand.h>
 #include <util/rng.h>
 
@@ -871,9 +873,7 @@ static fighter *summon_allies(const fighter *fi, const race *rc, int number) {
     a->data.ca[1] = 100;
     a_add(&u->attribs, a);
     
-    msg =
-        msg_message("sp_wolfhowl_effect", "mage amount race",
-                    mage, u->number, rc);
+    msg = msg_message("sp_wolfhowl_effect", "mage amount race", mage, u->number, rc);
     message_all(b, msg);
     msg_release(msg);
 
@@ -882,11 +882,12 @@ static fighter *summon_allies(const fighter *fi, const race *rc, int number) {
 
 int sp_igjarjuk(castorder *co) {
     unit *u;
-    fighter * fi = co->magician.fig;
+    fighter *fm = co->magician.fig, *fi;
     const race *rc = get_race(RC_WYRM);
-    fi = summon_allies(fi, rc, 1);
+    fi = summon_allies(fm, rc, 1);
     u = fi->unit;
     unit_setname(u, "Igjarjuk");
+    log_info("%s summons Igjarjuk in %s", unitname(fm->unit), regionname(u->region, 0));
     return co->level;
 }
 

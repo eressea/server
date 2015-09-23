@@ -77,6 +77,7 @@ TOLUA_BINDING(settings.pkg bind_settings.h)
 ENDIF()
 
 set (ERESSEA_SRC
+  calendar.c
   move.c
   spells.c
   battle.c
@@ -86,6 +87,10 @@ set (ERESSEA_SRC
   names.c
   lighthouse.c
   reports.c
+  guard.c
+  prefix.c
+  donations.c
+  seen.c
   eressea.c
   callback.c
   direction.c
@@ -174,6 +179,7 @@ target_link_libraries(eressea
 )
 
 set(TESTS_SRC
+  donations.test.c
   wormhole.test.c
   alchemy.test.c
   test_eressea.c
@@ -182,6 +188,7 @@ set(TESTS_SRC
   vortex.test.c
   tests.test.c
   reports.test.c
+  seen.test.c
   travelthru.test.c
   callback.test.c
   direction.test.c
@@ -193,6 +200,7 @@ set(TESTS_SRC
   magic.test.c
   market.test.c
   move.test.c
+  prefix.test.c
   skill.test.c
   spells.test.c
   spy.test.c

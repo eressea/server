@@ -21,12 +21,12 @@ make install
 
 [ -d $DEST/bin ] || mkdir -p $DEST/bin
 install -v $ROOT/process/cron/*.cron $DEST/bin/
-programs="create-orders backup-eressea run-turn send-zip-report send-bz2-report"
+programs="create-orders backup-eressea run-turn send-zip-report send-bz2-report compress.py compress.sh"
 for prg in ${programs} ; do
 install -v $ROOT/process/$prg $DEST/bin/
 done
 
 # install crontab, but only on the eressea server:
-HOST=`hostname`
-
-[ "gruenbaer" = "$HOST" ] && crontab $ROOT/process/cron/crontab
+# in fact, never do this, because it overwrites hand-edits
+#WHOAMI=`whoami`@`hostname`
+#[ "eressea@gruenbaer" = "$WHOAMI" ] && crontab $ROOT/process/cron/crontab

@@ -2,7 +2,6 @@
 
 PATH=/home/eressea/bin:/opt/bin:/usr/local/bin:/usr/bin:/bin
 ERESSEA=/home/eressea/eressea
-ATLANTIS=/home/eressea/atlantis
 ENABLED=yes
 PREVIEW=yes
 CONFIRM=yes
@@ -14,5 +13,5 @@ CONFIRM=yes
 15 21 * * Sat        [ "$ENABLED" = "yes" ] && $ERESSEA/server/bin/run-eressea.cron 3
 25 21 * * Sat        [ "$ENABLED" = "yes" ] && $ERESSEA/server/bin/run-eressea.cron 4
 35 21 * * Sat        [ "$ENABLED" = "yes" ] && $ERESSEA/server/bin/run-eressea.cron 2
-39 08 * * Sun        [ "$PREVIEW" = "yes" ] && $ERESSEA/server/bin/preview.cron
+30 07 * * Sun        [ "$PREVIEW" = "yes" ] && $ERESSEA/server/bin/preview.cron
 */5 * * * *          [ "$CONFIRM" = "yes" ] && $ERESSEA/server/bin/orders.cron 2 3 4

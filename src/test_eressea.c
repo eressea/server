@@ -36,6 +36,7 @@ int RunAllTests(void)
   /* self-test */
   RUN_TESTS(suite, tests);
   RUN_TESTS(suite, callback);
+  RUN_TESTS(suite, seen);
   RUN_TESTS(suite, json);
   RUN_TESTS(suite, jsonconf);
   RUN_TESTS(suite, direction);
@@ -79,7 +80,9 @@ int RunAllTests(void)
   RUN_TESTS(suite, ally);
   RUN_TESTS(suite, messages);
   /* gamecode */
+  RUN_TESTS(suite, prefix);
   RUN_TESTS(suite, battle);
+  RUN_TESTS(suite, donations);
   RUN_TESTS(suite, travelthru);
   RUN_TESTS(suite, economy);
   RUN_TESTS(suite, give);

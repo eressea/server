@@ -746,7 +746,7 @@ static void move_iceberg(region * r)
 
             for (sh = r->ships; sh; sh = sh->next) {
                 /* Meldung an Kapitän */
-                float dmg =
+                double dmg =
                     get_param_flt(global.parameters, "rules.ship.damage.intoiceberg",
                     0.10F);
                 damage_ship(sh, dmg);
@@ -759,7 +759,7 @@ static void move_iceberg(region * r)
                 translist(&rc->buildings, &r->buildings, rc->buildings);
             }
             while (rc->ships) {
-                float dmg =
+                double dmg =
                     get_param_flt(global.parameters, "rules.ship.damage.withiceberg",
                     0.10F);
                 fset(rc->ships, SF_SELECT);
@@ -893,7 +893,7 @@ static void godcurse(void)
                 ship *sh;
                 for (sh = r->ships; sh;) {
                     ship *shn = sh->next;
-                    float dmg =
+                    double dmg =
                         get_param_flt(global.parameters, "rules.ship.damage.godcurse",
                         0.10F);
                     damage_ship(sh, dmg);

@@ -212,22 +212,6 @@ bool allowed_dragon(const region * src, const region * target)
     return allowed_fly(src, target);
 }
 
-char **race_prefixes = NULL;
-
-extern void add_raceprefix(const char *prefix)
-{
-    static size_t size = 4;
-    static unsigned int next = 0;
-    if (race_prefixes == NULL)
-        race_prefixes = malloc(size * sizeof(char *));
-    if (next + 1 == size) {
-        size *= 2;
-        race_prefixes = realloc(race_prefixes, size * sizeof(char *));
-    }
-    race_prefixes[next++] = _strdup(prefix);
-    race_prefixes[next] = NULL;
-}
-
 bool r_insectstalled(const region * r)
 {
     return fval(r->terrain, ARCTIC_REGION);

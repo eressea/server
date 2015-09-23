@@ -11,6 +11,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/config.h>
 #include "buildno.h"
 #include "creport.h"
+#include "seen.h"
 #include "travelthru.h"
 
 /* tweakable features */
@@ -81,7 +82,6 @@ without prior permission by the authors of Eressea.
 #include <string.h>
 
 /* imports */
-extern int verbosity;
 bool opt_cr_absolute_coords = false;
 
 /* globals */
@@ -1343,7 +1343,7 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
     if (sr->mode != see_unit)
         fprintf(F, "\"%s\";visibility\n", visibility[sr->mode]);
     if (sr->mode == see_neighbour) {
-        cr_borders(ctx->seen, r, f, sr->mode, F);
+        cr_borders(ctx->f->seen, r, f, sr->mode, F);
     }
     else {
         building *b;
@@ -1431,7 +1431,7 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
             print_items(F, r->land->items, f->locale);
         }
         cr_output_curses_compat(F, f, r, TYP_REGION);
-        cr_borders(ctx->seen, r, f, sr->mode, F);
+        cr_borders(ctx->f->seen, r, f, sr->mode, F);
         if (sr->mode == see_unit && is_astral(r)
             && !is_cursed(r->attribs, C_ASTRALBLOCK, 0)) {
             /* Sonderbehandlung Teleport-Ebene */
@@ -1686,7 +1686,7 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
 
     /* traverse all regions */
     for (r = ctx->first; sr == NULL && r != ctx->last; r = r->next) {
-        sr = find_seen(ctx->seen, r);
+        sr = find_seen(ctx->f->seen, r);
     }
     for (; sr != NULL; sr = sr->next) {
         cr_output_region(F, ctx, sr);

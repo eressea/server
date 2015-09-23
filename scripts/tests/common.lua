@@ -28,7 +28,7 @@ function setup()
     eressea.free_game()
     eressea.settings.set("nmr.timeout", "0")
     eressea.settings.set("NewbieImmunity", "0")
-    eressea.settings.set("rules.economy.food", "4")
+    eressea.settings.set("rules.food.flags", "4")
     eressea.settings.set("rules.encounters", "0")
     eressea.settings.set("rules.peasants.growth", "1")
     eressea.settings.set("study.random_progress", "0")
@@ -45,7 +45,7 @@ function test_flags()
     eressea.write_game("test.dat")
     eressea.free_game()
     eressea.read_game("test.dat")
-    os.remove('test.dat')
+    os.remove('data/test.dat')
     f = get_faction(no)
     assert_equal(flags, f.flags)
 end
@@ -92,7 +92,7 @@ function test_demon_food()
     local u = unit.create(f, r, 1)
     local p = r:get_resource("peasant")
     r:set_resource("peasant", 2000)
-    eressea.settings.set("rules.economy.food", "0")
+    eressea.settings.set("rules.food.flags", "0")
     eressea.settings.set("rules.peasants.growth", "0")
     process_orders()
     assert_not_nil(u)
@@ -194,6 +194,7 @@ function test_descriptions()
     eressea.write_game(filename)
     eressea.free_game()
     eressea.read_game(filename)
+    os.remove("data/test.dat")
     assert_equal(info, get_ship(sno).info)
     assert_equal(info, get_unit(uno).info)
     assert_equal(info, get_faction(fno).info)
@@ -459,7 +460,7 @@ function test_work()
 end
 
 function test_upkeep()
-    eressea.settings.set("rules.economy.food", "0")
+    eressea.settings.set("rules.food.flags", "0")
     local r = region.create(0, 0, "plain")
     local f = faction.create("noreply10@eressea.de", "human", "de")
     local u = unit.create(f, r, 5)
@@ -781,7 +782,7 @@ function test_food_is_consumed()
   u:add_item("money", 100)
   u:clear_orders()
   u:add_order("LERNEN Reiten") -- don't work
-  eressea.settings.set("rules.economy.food", "4")
+  eressea.settings.set("rules.food.flags", "4")
   process_orders()
   assert_equal(100, u:get_item("money"))
 end
@@ -793,7 +794,7 @@ function test_food_can_override()
   u:add_item("money", 100)
   u:clear_orders()
   u:add_order("LERNEN Reiten") -- don't work
-  eressea.settings.set("rules.economy.food", "0")
+  eressea.settings.set("rules.food.flags", "0")
   process_orders()
   assert_equal(90, u:get_item("money"))
 end
@@ -920,7 +921,7 @@ module("tests.recruit", package.seeall, lunit.testcase)
 
 function setup()
     eressea.free_game()
-    eressea.settings.set("rules.economy.food", "4")
+    eressea.settings.set("rules.food.flags", "4")
     eressea.settings.set("rules.peasants.growth", "0")
 end
 
@@ -961,7 +962,7 @@ module("tests.report", package.seeall, lunit.testcase)
 function setup()
     eressea.free_game()
     eressea.settings.set("nmr.timeout", "0")
-    eressea.settings.set("rules.economy.food", "4")
+    eressea.settings.set("rules.food.flags", "4")
 end
 
 local function find_in_report(f, pattern, extension)
@@ -1061,7 +1062,7 @@ module("tests.parser", package.seeall, lunit.testcase)
 
 function setup()
     eressea.free_game()
-    eressea.settings.set("rules.economy.food", "4") -- FOOD_IS_FREE
+    eressea.settings.set("rules.food.flags", "4") -- FOOD_IS_FREE
     eressea.settings.set("rules.encounters", "0")
     eressea.settings.set("rules.move.owner_leave", "0")
 end
@@ -1081,5 +1082,38 @@ function test_parser()
     
     eressea.read_orders(filename)
     process_orders()
+    os.remove(filename)
     assert_equal("Goldene Herde", u.name)
+end
+
+local function set_order(u, str)
+    u:clear_orders()
+    u:add_order(str)
+end
+
+function test_prefix()
+    local r0 = region.create(0, 0, "plain")
+    local f1 = faction.create("noreply@eressea.de", "human", "de")
+    local u1 = unit.create(f1, r0, 1)
+
+    set_order(u1, "PRAEFIX See")
+    process_orders()
+    assert_not_nil(u1:show():find("Seemensch"))
+
+    u1.race = "elf"
+    assert_not_nil(u1:show():find("Seeelf"))
+
+    set_order(u1, "PRAEFIX Mond")
+    process_orders()
+    assert_not_nil(u1:show():find("Mondelf"))
+
+    set_order(u1, "PRAEFIX")
+    process_orders()
+    assert_not_nil(u1:show():find("Elf"))
+
+    set_order(u1, "PRAEFIX Erz")
+    process_orders()
+    assert_not_nil(u1:show():find("Erzelf"))
+    u1.faction.locale = "en"
+    assert_not_nil(u1:show():find("archelf"))
 end

@@ -35,6 +35,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "spy.h"
 #include "study.h"
 #include "wormhole.h"
+#include "prefix.h"
+#include "calendar.h"
+#include "guard.h"
 
 /* kernel includes */
 #include <kernel/alliance.h>
@@ -42,7 +45,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/connection.h>
 #include <kernel/curse.h>
 #include <kernel/building.h>
-#include <kernel/calendar.h>
 #include <kernel/faction.h>
 #include <kernel/group.h>
 #include <kernel/item.h>
@@ -793,7 +795,7 @@ void demographics(void)
 
                 if (plant_rules < 0) {
                     plant_rules =
-                        get_param_int(global.parameters, "rules.economy.grow", 0);
+                        get_param_int(global.parameters, "rules.grow.formula", 0);
                 }
                 for (dmd = r->land->demands; dmd; dmd = dmd->next) {
                     if (dmd->value > 0 && dmd->value < MAXDEMAND) {
@@ -845,38 +847,6 @@ void demographics(void)
 }
 
 /* ------------------------------------------------------------- */
-
-static int modify(int i)
-{
-    int c;
-
-    c = i * 2 / 3;
-
-    if (c >= 1) {
-        return (c + rng_int() % c);
-    }
-    else {
-        return (i);
-    }
-}
-
-static void inactivefaction(faction * f)
-{
-    FILE *inactiveFILE;
-    char zText[128];
-
-    sprintf(zText, "%s/%s", datapath(), "inactive");
-    inactiveFILE = fopen(zText, "a");
-
-    if (inactiveFILE) {
-        fprintf(inactiveFILE, "%s:%s:%d:%d\n",
-            factionid(f),
-            LOC(default_locale, rc_name_s(f->race, NAME_PLURAL)),
-            modify(count_all(f)), turn - f->lastorders);
-
-        fclose(inactiveFILE);
-    }
-}
 
 /* test if the unit can slip through a siege undetected.
  * returns 0 if siege is successful, or 1 if the building is either
@@ -1278,11 +1248,6 @@ static void remove_idle_players(void)
             sprintf(info, "%d Einheiten, %d Personen, %d Silber",
                 f->no_units, f->num_total, f->money);
         }
-
-        if (NMRTimeout() > 0 && turn - f->lastorders >= (NMRTimeout() - 1)) {
-            inactivefaction(f);
-            continue;
-        }
     }
     log_info(" - beseitige Spieler, die sich nach der Anmeldung nicht gemeldet haben...");
 
@@ -1468,7 +1433,7 @@ static void init_prefixnames(void)
         in->next = pnames;
         in->lang = lang;
 
-        if (!exist) {
+        if (!exist && race_prefixes) {
             int key;
             for (key = 0; race_prefixes[key]; ++key) {
                 variant var;
@@ -2696,13 +2661,9 @@ int combatspell_cmd(unit * u, struct order *ord)
     return 0;
 }
 
-/* ------------------------------------------------------------- */
 /* Beachten: einige Monster sollen auch unbewaffent die Region bewachen
- * können */
-
-enum { E_GUARD_OK, E_GUARD_UNARMED, E_GUARD_NEWBIE, E_GUARD_FLEEING };
-
-static int can_start_guarding(const unit * u)
+* können */
+guard_t can_start_guarding(const unit * u)
 {
     if (u->status >= ST_FLEE || fval(u, UFL_FLEEING))
         return E_GUARD_FLEEING;
@@ -2713,29 +2674,6 @@ static int can_start_guarding(const unit * u)
     if (IsImmune(u->faction))
         return E_GUARD_NEWBIE;
     return E_GUARD_OK;
-}
-
-void update_guards(void)
-{
-    const region *r;
-
-    for (r = regions; r; r = r->next) {
-        unit *u;
-        for (u = r->units; u; u = u->next) {
-            if (fval(u, UFL_GUARD)) {
-                if (can_start_guarding(u) != E_GUARD_OK) {
-                    setguard(u, GUARD_NONE);
-                }
-                else {
-                    attrib *a = a_find(u->attribs, &at_guard);
-                    if (a && a->data.i == (int)guard_flags(u)) {
-                        /* this is really rather not necessary */
-                        a_remove(&u->attribs, a);
-                    }
-                }
-            }
-        }
-    }
 }
 
 int guard_on_cmd(unit * u, struct order *ord)
@@ -2798,14 +2736,14 @@ void sinkships(struct region * r)
             if (fval(r->terrain, SEA_REGION)) {
                 if (!enoughsailors(sh, crew_skill(sh))) {
                     // ship is at sea, but not enough people to control it
-                    float dmg = get_param_flt(global.parameters,
+                    double dmg = get_param_flt(global.parameters,
                         "rules.ship.damage.nocrewocean",
                         0.30F);
                     damage_ship(sh, dmg);
                 }
             } else if (!ship_owner(sh)) {
                 // any ship lying around without an owner slowly rots
-                float dmg = get_param_flt(global.parameters, "rules.ship.damage.nocrew", 0.05F);
+                double dmg = get_param_flt(global.parameters, "rules.ship.damage.nocrew", 0.05F);
                 damage_ship(sh, dmg);
             }
         }
@@ -3532,7 +3470,7 @@ static int use_item(unit * u, const item_type * itype, int amount, struct order 
 
 static double heal_factor(const unit * u)
 {
-    static float elf_regen = -1;
+    static double elf_regen = -1;
     switch (old_race(u_race(u))) {
     case RC_TROLL:
     case RC_DAEMON:
@@ -4060,11 +3998,10 @@ void process(void)
         region *r;
         processor *pglobal = proc;
 
-        if (verbosity >= 3)
-            printf("- Step %u\n", prio);
+        log_debug("- Step %u", prio);
         while (proc && proc->priority == prio) {
-            if (proc->name && verbosity >= 1)
-                log_printf(stdout, " - %s\n", proc->name);
+            if (proc->name)
+                log_debug(" - %s", proc->name);
             proc = proc->next;
         }
 
@@ -4160,8 +4097,7 @@ void process(void)
         }
     }
 
-    if (verbosity >= 3)
-        printf("\n - Leere Gruppen loeschen...\n");
+    log_debug("\n - Leere Gruppen loeschen...\n");
     for (f = factions; f; f = f->next) {
         group **gp = &f->groups;
         while (*gp) {

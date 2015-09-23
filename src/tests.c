@@ -1,6 +1,8 @@
 #include <platform.h>
 #include "tests.h"
 #include "keyword.h"
+#include "seen.h"
+#include "prefix.h"
 
 #include <kernel/config.h>
 #include <kernel/region.h>
@@ -69,6 +71,8 @@ struct unit *test_create_unit(struct faction *f, struct region *r)
 
 void test_cleanup(void)
 {
+    int i;
+
     free_terrains();
     free_resources();
     global.functions.maintenance = NULL;
@@ -82,7 +86,15 @@ void test_cleanup(void)
     free_races();
     free_spellbooks();
     free_gamedata();
+    free_seen();
+    free_prefixes();
     mt_clear();
+    for (i = 0; i != MAXSKILLS; ++i) {
+        enable_skill(i, true);
+    }
+    for (i = 0; i != MAXKEYWORDS; ++i) {
+        enable_keyword(i, true);
+    }
     if (!mt_find("missing_message")) {
         mt_register(mt_new_va("missing_message", "name:string", 0));
         mt_register(mt_new_va("missing_feedback", "unit:unit", "region:region", "command:order", "name:string", 0));

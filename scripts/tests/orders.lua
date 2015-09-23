@@ -15,7 +15,7 @@ function setup()
     f = _G.faction.create("noreply@eressea.de", "human", "de")
     u = _G.unit.create(f, r, 1)
     u:clear_orders()
-    eressea.settings.set("rules.economy.food", "4")
+    eressea.settings.set("rules.food.flags", "4")
     eressea.settings.set("nmr.timeout", "0")
     eressea.settings.set("NewbieImmunity", "0")
 end
@@ -104,7 +104,7 @@ function test_process_quit()
     eressea.write_game('test.dat')
     eressea.free_game()
     eressea.read_game('test.dat')
-    os.remove('test.dat')
+    os.remove('data/test.dat')
     assert_equal(nil, _G.get_faction(fno))
 end
 

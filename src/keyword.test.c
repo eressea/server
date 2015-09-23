@@ -93,8 +93,6 @@ static void test_get_shortest_match(CuTest *tc) {
     test_cleanup();
 }
 
-#define SUITE_DISABLE_TEST(suite, test) (void)test
-
 CuSuite *get_keyword_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -103,6 +101,6 @@ CuSuite *get_keyword_suite(void)
     SUITE_ADD_TEST(suite, test_init_keywords);
     SUITE_ADD_TEST(suite, test_findkeyword);
     SUITE_ADD_TEST(suite, test_get_shortest_match);
-    SUITE_DISABLE_TEST(suite, test_get_keyword_default);
+    DISABLE_TEST(suite, test_get_keyword_default);
     return suite;
 }

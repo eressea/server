@@ -25,6 +25,8 @@ without prior permission by the authors of Eressea.
 #include "helpers.h"
 #include "console.h"
 #include "reports.h"
+#include "seen.h"
+#include "calendar.h"
 
 #include <kernel/config.h>
 
@@ -32,7 +34,6 @@ without prior permission by the authors of Eressea.
 #include <kernel/building.h>
 #include <kernel/curse.h>
 #include <kernel/equipment.h>
-#include <kernel/calendar.h>
 #include <kernel/unit.h>
 #include <kernel/terrain.h>
 #include <kernel/messages.h>

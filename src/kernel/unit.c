@@ -43,6 +43,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/racename.h>
 #include <attributes/stealth.h>
 
+#include "guard.h"
+
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
@@ -97,25 +99,21 @@ attrib_type at_creator = {
     /* Rest ist NULL; temporaeres, nicht alterndes Attribut */
 };
 
-unit *findunitr(const region * r, int n)
-{
-    unit *u;
-
-    /* findunit regional! */
-
-    for (u = r->units; u; u = u->next)
-        if (u->no == n)
-            return u;
-
-    return 0;
-}
-
 unit *findunit(int n)
 {
     if (n <= 0) {
         return NULL;
     }
     return ufindhash(n);
+}
+
+unit *findunitr(const region * r, int n)
+{
+    unit *u;
+    /* findunit regional! */
+    assert(n>0);
+    u = ufindhash(n);
+    return (u && u->region==r)?u:0;
 }
 
 unit *findunitg(int n, const region * hint)
@@ -862,7 +860,7 @@ bool can_leave(unit * u)
         rule_leave = get_param_int(global.parameters, "rules.move.owner_leave", 0);
     }
 
-    if (rule_leave && u->building && u == building_owner(u->building)) {
+    if (rule_leave!=0 && u->building && u == building_owner(u->building)) {
         return false;
     }
     return true;
@@ -1937,3 +1935,28 @@ bool unit_name_equals_race(const unit *u) {
 bool unit_can_study(const unit *u) {
     return !((u_race(u)->flags & RCF_NOLEARN) || fval(u, UFL_WERE));
 }
+
+static double produceexp_chance(void) {
+    static int update = 0;
+    if (update != global.cookie) {
+        global.producexpchance_ = get_param_flt(global.parameters, "study.from_use", 1.0 / 3);
+        update = global.cookie;
+    }
+    return global.producexpchance_;
+}
+
+void produceexp_ex(struct unit *u, skill_t sk, int n, bool (*learn)(unit *, skill_t, double))
+{
+    if (n != 0 && playerrace(u_race(u))) {
+        double chance = produceexp_chance();
+        if (chance > 0.0F) {
+            learn(u, sk, (n * chance) / u->number);
+        }
+    }
+}
+
+void produceexp(struct unit *u, skill_t sk, int n)
+{
+    produceexp_ex(u, sk, n, learn_skill);
+}
+
