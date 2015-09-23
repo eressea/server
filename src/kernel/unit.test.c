@@ -239,6 +239,31 @@ static void test_default_name(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_skill_hunger(CuTest *tc) {
+    unit *u;
+
+    test_cleanup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    set_level(u, SK_ARMORER, 6);
+    set_level(u, SK_SAILING, 6);
+    fset(u, UFL_HUNGER);
+
+    set_param(&global.parameters, "rules.hunger.reduces_skill", "0");
+    CuAssertIntEquals(tc, 6, effskill(u, SK_ARMORER));
+    CuAssertIntEquals(tc, 6, effskill(u, SK_SAILING));
+
+    set_param(&global.parameters, "rules.hunger.reduces_skill", "1");
+    CuAssertIntEquals(tc, 3, effskill(u, SK_ARMORER));
+    CuAssertIntEquals(tc, 3, effskill(u, SK_SAILING));
+
+    set_param(&global.parameters, "rules.hunger.reduces_skill", "2");
+    CuAssertIntEquals(tc, 3, effskill(u, SK_ARMORER));
+    CuAssertIntEquals(tc, 5, effskill(u, SK_SAILING));
+    set_level(u, SK_SAILING, 2);
+    CuAssertIntEquals(tc, 1, effskill(u, SK_SAILING));
+    test_cleanup();
+}
+
 static void test_skill_familiar(CuTest *tc) {
     unit *mag, *fam;
     region *r;
@@ -267,6 +292,29 @@ static void test_skill_familiar(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_age_familiar(CuTest *tc) {
+    unit *mag, *fam;
+
+    test_cleanup();
+
+    // setup two units
+    mag = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    fam = test_create_unit(mag->faction, test_create_region(0, 0, 0));
+    CuAssertPtrEquals(tc, 0, get_familiar(mag));
+    CuAssertPtrEquals(tc, 0, get_familiar_mage(fam));
+    CuAssertIntEquals(tc, true, create_newfamiliar(mag, fam));
+    CuAssertPtrEquals(tc, fam, get_familiar(mag));
+    CuAssertPtrEquals(tc, mag, get_familiar_mage(fam));
+    a_age(&fam->attribs);
+    a_age(&mag->attribs);
+    CuAssertPtrEquals(tc, fam, get_familiar(mag));
+    CuAssertPtrEquals(tc, mag, get_familiar_mage(fam));
+    set_number(fam, 0);
+    a_age(&mag->attribs);
+    CuAssertPtrEquals(tc, 0, get_familiar(mag));
+    test_cleanup();
+}
+
 CuSuite *get_unit_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -281,6 +329,8 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_remove_empty_units_in_region);
     SUITE_ADD_TEST(suite, test_names);
     SUITE_ADD_TEST(suite, test_default_name);
+    SUITE_ADD_TEST(suite, test_skill_hunger);
     SUITE_ADD_TEST(suite, test_skill_familiar);
+    SUITE_ADD_TEST(suite, test_age_familiar);
     return suite;
 }
