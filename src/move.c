@@ -583,15 +583,13 @@ ship *move_ship(ship * sh, region * from, region * to, region_list * route)
 {
     unit **iunit = &from->units;
     unit **ulist = &to->units;
-    bool trail = (route == NULL);
 
     if (from != to) {
         translist(&from->ships, &to->ships, sh);
         sh->region = to;
     }
-    if (!trail) {
+    if (route) {
         leave_trail(sh, from, route);
-        trail = true;
     }
 
     while (*iunit != NULL) {

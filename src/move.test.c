@@ -15,6 +15,7 @@
 #include <kernel/unit.h>
 #include <kernel/race.h>
 
+#include <util/attrib.h>
 #include <util/language.h>
 
 #include <CuTest.h>
@@ -238,7 +239,36 @@ static void test_is_guarded(CuTest *tc) {
     CuAssertPtrEquals(tc, 0, is_guarded(r, u1, GUARD_TREES));
     CuAssertPtrEquals(tc, 0, is_guarded(r, u1, GUARD_MINING));
     CuAssertPtrEquals(tc, u2, is_guarded(r, u1, GUARD_PRODUCE));
+    test_cleanup();
+}
 
+static void test_ship_trails(CuTest *tc) {
+    ship *sh;
+    region *r1, *r2, *r3;
+    terrain_type *otype;
+    region_list *route = 0;
+
+    test_cleanup();
+    otype = test_create_terrain("ocean", SEA_REGION | SAIL_INTO);
+    r1 = test_create_region(0, 0, otype);
+    r2 = test_create_region(1, 0, otype);
+    r3 = test_create_region(2, 0, otype);
+    sh = test_create_ship(r1, 0);
+    move_ship(sh, r1, r3, 0);
+    CuAssertPtrEquals(tc, r3, sh->region);
+    CuAssertPtrEquals(tc, sh, r3->ships);
+    CuAssertPtrEquals(tc, 0, r1->ships);
+    CuAssertPtrEquals(tc, 0, a_find(r1->attribs, &at_shiptrail));
+    CuAssertPtrEquals(tc, 0, a_find(r3->attribs, &at_shiptrail));
+    add_regionlist(&route, r3);
+    add_regionlist(&route, r2);
+    move_ship(sh, r3, r1, route);
+    CuAssertPtrEquals(tc, r1, sh->region);
+    CuAssertPtrEquals(tc, sh, r1->ships);
+    CuAssertPtrEquals(tc, 0, r3->ships);
+    CuAssertPtrEquals(tc, 0, a_find(r1->attribs, &at_shiptrail));
+    CuAssertPtrNotNull(tc, a_find(r2->attribs, &at_shiptrail));
+    CuAssertPtrNotNull(tc, a_find(r3->attribs, &at_shiptrail));
     test_cleanup();
 }
 
@@ -253,6 +283,7 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_ship_has_harbormaster_contact);
     SUITE_ADD_TEST(suite, test_ship_has_harbormaster_ally);
     SUITE_ADD_TEST(suite, test_ship_has_harbormaster_same_faction);
+    SUITE_ADD_TEST(suite, test_ship_trails);
     SUITE_ADD_TEST(suite, test_is_guarded);
     return suite;
 }
