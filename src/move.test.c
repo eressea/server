@@ -272,6 +272,27 @@ static void test_ship_trails(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_age_trails(CuTest *tc) {
+    region_list *route = 0;
+    region *r1, *r2;
+    ship *sh;
+
+    test_cleanup();
+    r1 = test_create_region(0, 0, 0);
+    r2 = test_create_region(1, 0, 0);
+    sh = test_create_ship(r1, 0);
+    add_regionlist(&route, r1);
+    add_regionlist(&route, r2);
+    move_ship(sh, r1, r2, route);
+
+    CuAssertPtrNotNull(tc, r1->attribs);
+    a_age(&r1->attribs);
+    CuAssertPtrNotNull(tc, r1->attribs);
+    a_age(&r1->attribs);
+    CuAssertPtrEquals(tc, 0, r1->attribs);
+    test_cleanup();
+}
+
 CuSuite *get_move_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -283,7 +304,8 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_ship_has_harbormaster_contact);
     SUITE_ADD_TEST(suite, test_ship_has_harbormaster_ally);
     SUITE_ADD_TEST(suite, test_ship_has_harbormaster_same_faction);
-    SUITE_ADD_TEST(suite, test_ship_trails);
     SUITE_ADD_TEST(suite, test_is_guarded);
+    SUITE_ADD_TEST(suite, test_ship_trails);
+    SUITE_ADD_TEST(suite, test_age_trails);
     return suite;
 }
