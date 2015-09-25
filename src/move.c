@@ -583,15 +583,13 @@ ship *move_ship(ship * sh, region * from, region * to, region_list * route)
 {
     unit **iunit = &from->units;
     unit **ulist = &to->units;
-    bool trail = (route == NULL);
 
     if (from != to) {
         translist(&from->ships, &to->ships, sh);
         sh->region = to;
     }
-    if (!trail) {
+    if (route) {
         leave_trail(sh, from, route);
-        trail = true;
     }
 
     while (*iunit != NULL) {
@@ -2477,7 +2475,7 @@ static direction_t hunted_dir(attrib * at, int id)
     return d;
 }
 
-static int hunt(unit * u, order * ord)
+static int follow_ship(unit * u, order * ord)
 {
     region *rc = u->region;
     size_t bytes;
@@ -2615,7 +2613,7 @@ static void move_hunters(void)
                             break;
                         }
 
-                        if (!fval(u, UFL_LONGACTION) && !LongHunger(u) && hunt(u, ord)) {
+                        if (!fval(u, UFL_LONGACTION) && !LongHunger(u) && follow_ship(u, ord)) {
                             up = &r->units;
                             break;
                         }
