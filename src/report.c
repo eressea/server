@@ -96,6 +96,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <limits.h>
 #include <stdlib.h>
 
+#ifdef _MSC_VER
+# pragma warning(disable: 4774) // TODO: remove this
+#endif
+
 extern int *storms;
 extern int weeks_per_month;
 extern int months_per_year;
