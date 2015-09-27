@@ -96,7 +96,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <limits.h>
 #include <stdlib.h>
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && _MSC_VER >= 1900
 # pragma warning(disable: 4774) // TODO: remove this
 #endif
 

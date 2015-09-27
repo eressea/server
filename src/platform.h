@@ -34,6 +34,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 # undef MOUSE_MOVED
 # define STDIO_CP 1252          /* log.c, convert to console character set */
 # pragma warning (disable: 4201 4214 4514 4115 4711)
+#if _MSC_VER >= 1900
 # pragma warning(disable: 4710)
 /* warning C4710: function not inlined */
 # pragma warning(disable: 4456)
@@ -42,6 +43,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* warning C4457: declaration of <name> hides function parameter */
 # pragma warning(disable: 4459)
 /* warning C4459: declaration of <name> hides global declaration */
+#endif
 # pragma warning(disable: 4056)
 /* warning C4056: overflow in floating point constant arithmetic */
 # pragma warning(disable: 4201)
