@@ -1,5 +1,7 @@
-#include "reports.h"
+﻿#include "reports.h"
 #include "jsreport.h"
+#include "seen.h"
+#include <kernel/faction.h>
 #include <kernel/region.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
@@ -23,7 +25,7 @@ static void coor_from_tiled(int *x, int *y) {
 
 static int report_json(const char *filename, report_context * ctx, const char *charset)
 {
-    if (get_param_int(global.parameters, "feature.jsreport.enable", 0) != 0) {
+    if (get_param_int(global.parameters, "jsreport.enabled", 0) != 0) {
         FILE * F = fopen(filename, "w");
         if (F) {
             int x, y, minx = INT_MAX, maxx = INT_MIN, miny = INT_MAX, maxy = INT_MIN;
@@ -31,7 +33,7 @@ static int report_json(const char *filename, report_context * ctx, const char *c
             region *r;
             /* traverse all regions */
             for (sr = NULL, r = ctx->first; sr == NULL && r != ctx->last; r = r->next) {
-                sr = find_seen(ctx->seen, r);
+                sr = find_seen(ctx->f->seen, r);
             }
             for (; sr != NULL; sr = sr->next) {
                 int tx = sr->r->x;
@@ -55,13 +57,15 @@ static int report_json(const char *filename, report_context * ctx, const char *c
                         coor_from_tiled(&tx, &ty);
                         r = findregion(tx, ty);
                         if (r) {
-                            sr = find_seen(ctx->seen, r);
+                            sr = find_seen(ctx->f->seen, r);
                             if (sr) {
                                 terrain_t ter = oldterrain(r->terrain);
                                 if (ter == NOTERRAIN) {
-                                    log_warning("report_json: %s has no terrain id\n", r->terrain->_name);
+                                    data = 1 + r->terrain->_name[0];
                                 }
-                                data = 1 + (int)ter;
+                                else {
+                                    data = 1 + (int)ter;
+                                }
                             }
                         }
                         fprintf(F, "%d", data);
@@ -74,7 +78,7 @@ static int report_json(const char *filename, report_context * ctx, const char *c
             }
             return 0;
         }
-        return ferror(F);
+        return -1;
     }
     return 0;
 }

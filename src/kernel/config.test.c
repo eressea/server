@@ -14,6 +14,51 @@
 
 struct critbit_tree;
 
+static void test_read_unitid(CuTest *tc) {
+    unit *u;
+    order *ord;
+    attrib *a;
+    struct locale *lang;
+    struct terrain_type *t_plain;
+
+    test_cleanup();
+    lang = get_or_create_locale("de");
+    test_translate_param(lang, P_TEMP, "TEMP");
+    /* note that the english order is FIGHT, not COMBAT, so this is a poor example */
+    t_plain = test_create_terrain("plain", LAND_REGION);
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, t_plain));
+    a = a_add(&u->attribs, a_new(&at_alias));
+    a->data.i = atoi36("42"); /* this unit is also TEMP 42 */
+
+    ord = create_order(K_GIVE, lang, "TEMP 42");
+    init_order(ord);
+    CuAssertIntEquals(tc, u->no, read_unitid(u->faction, u->region));
+    free_order(ord);
+
+    ord = create_order(K_GIVE, lang, "8");
+    init_order(ord);
+    CuAssertIntEquals(tc, 8, read_unitid(u->faction, u->region));
+    free_order(ord);
+
+    ord = create_order(K_GIVE, lang, "");
+    init_order(ord);
+    CuAssertIntEquals(tc, -1, read_unitid(u->faction, u->region));
+    free_order(ord);
+
+    ord = create_order(K_GIVE, lang, "TEMP");
+    init_order(ord);
+    CuAssertIntEquals(tc, -1, read_unitid(u->faction, u->region));
+    free_order(ord);
+
+    // bug https://bugs.eressea.de/view.php?id=1685
+    ord = create_order(K_GIVE, lang, "##");
+    init_order(ord);
+    CuAssertIntEquals(tc, -1, read_unitid(u->faction, u->region));
+    free_order(ord);
+
+    test_cleanup();
+}
+
 static void test_getunit(CuTest *tc) {
     unit *u, *u2;
     order *ord;
@@ -50,6 +95,20 @@ static void test_getunit(CuTest *tc) {
     ord = create_order(K_GIVE, lang, "0");
     init_order(ord);
     CuAssertIntEquals(tc, GET_PEASANTS, getunit(u->region, u->faction, &u2));
+    CuAssertPtrEquals(tc, NULL, u2);
+    free_order(ord);
+
+    // bug https://bugs.eressea.de/view.php?id=1685
+    ord = create_order(K_GIVE, lang, "TEMP ##");
+    init_order(ord);
+    CuAssertIntEquals(tc, GET_NOTFOUND, getunit(u->region, u->faction, &u2));
+    CuAssertPtrEquals(tc, NULL, u2);
+    free_order(ord);
+
+    // bug https://bugs.eressea.de/view.php?id=1685
+    ord = create_order(K_GIVE, lang, "##");
+    init_order(ord);
+    CuAssertIntEquals(tc, GET_NOTFOUND, getunit(u->region, u->faction, &u2));
     CuAssertPtrEquals(tc, NULL, u2);
     free_order(ord);
 
@@ -97,10 +156,22 @@ static void test_param_flt(CuTest * tc)
     CuAssertDblEquals(tc, 42.0, get_param_flt(par, "bar", 0.0), 0.01);
 }
 
+static void test_forbiddenid(CuTest *tc) {
+    CuAssertIntEquals(tc, 0, forbiddenid(1));
+    CuAssertIntEquals(tc, 1, forbiddenid(0));
+    CuAssertIntEquals(tc, 1, forbiddenid(-1));
+    CuAssertIntEquals(tc, 1, forbiddenid(atoi36("temp")));
+    CuAssertIntEquals(tc, 1, forbiddenid(atoi36("tem")));
+    CuAssertIntEquals(tc, 1, forbiddenid(atoi36("te")));
+    CuAssertIntEquals(tc, 1, forbiddenid(atoi36("t")));
+}
+
 CuSuite *get_config_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_forbiddenid);
     SUITE_ADD_TEST(suite, test_getunit);
+    SUITE_ADD_TEST(suite, test_read_unitid);
     SUITE_ADD_TEST(suite, test_get_set_param);
     SUITE_ADD_TEST(suite, test_param_int);
     SUITE_ADD_TEST(suite, test_param_flt);

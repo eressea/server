@@ -4,7 +4,6 @@ module("tests.e2.movement", package.seeall, lunit.testcase)
 
 function setup()
     eressea.free_game()
-    eressea.settings.set("nmr.removenewbie", "0")
     eressea.settings.set("nmr.timeout", "0")
     eressea.settings.set("NewbieImmunity", "0")
 end

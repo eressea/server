@@ -525,18 +525,6 @@ attrib_type at_woodcount = {
     ATF_UNIQUE
 };
 
-/*********************/
-/*   at_travelunit   */
-/*********************/
-attrib_type at_travelunit = {
-    "travelunit",
-    DEFAULT_INIT,
-    DEFAULT_FINALIZE,
-    DEFAULT_AGE,
-    NO_WRITE,
-    NO_READ
-};
-
 void rsetroad(region * r, direction_t d, int val)
 {
     connection *b;
@@ -614,6 +602,7 @@ void rsetpeasants(region * r, int value)
 {
     if (r->land) r->land->peasants = value;
     else assert(value>=0);
+
 }
 
 int rmoney(const region * r)
@@ -848,12 +837,6 @@ void free_region(region * r)
         rawmaterial *res = r->resources;
         r->resources = res->next;
         free(res);
-    }
-
-    while (r->donations) {
-        donation *don = r->donations;
-        r->donations = don->next;
-        free(don);
     }
 
     while (r->units) {
@@ -1136,14 +1119,19 @@ void terraform_region(region * r, const terrain_type * terrain)
     }
 
     if (oldterrain == NULL || terrain->size != oldterrain->size) {
+        int horses = 0, trees = 0;
+        if (terrain->size>0) {
+            horses = rng_int() % (terrain->size / 50);
+            trees = terrain->size * (30 + rng_int() % 40) / 1000;
+        }
         if (terrain == newterrain(T_PLAIN)) {
-            rsethorses(r, rng_int() % (terrain->size / 50));
-            if (rng_int() % 100 < 40) {
-                rsettrees(r, 2, terrain->size * (30 + rng_int() % 40) / 1000);
+            rsethorses(r, horses);
+            if (chance(0.4)) {
+                rsettrees(r, 2, trees);
             }
         }
-        else if (chance(0.2)) {
-            rsettrees(r, 2, terrain->size * (30 + rng_int() % 40) / 1000);
+        else if (trees>0 && chance(0.2)) {
+            rsettrees(r, 2, trees);
         }
         else {
             rsettrees(r, 2, 0);
@@ -1163,7 +1151,7 @@ void terraform_region(region * r, const terrain_type * terrain)
 
 /** ENNO:
  * ich denke, das das hier nicht sein sollte.
- * statt dessen sollte ein attribut an der region sein, das das erledigt,
+ * statt dessen sollte ein attribut an der region sein, dass das erledigt,
  * egal ob durch den spell oder anderes angelegt.
  **/
 #include "curse.h"

@@ -434,10 +434,9 @@ static bool
 b_blockfogwall(const connection * b, const unit * u, const region * r)
 {
     unused_arg(b);
-    unused_arg(r);
     if (!u)
         return true;
-    return (bool)(effskill(u, SK_PERCEPTION) > 4);    /* Das ist die alte Nebelwand */
+    return (bool)(effskill(u, SK_PERCEPTION, r) > 4);    /* Das ist die alte Nebelwand */
 }
 
 /** Legacy type used in old Eressea games, no longer in use. */

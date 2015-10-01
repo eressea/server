@@ -31,6 +31,9 @@ without prior permission by the authors of Eressea.
 #include "spellbook.h"
 #include "calendar.h"
 
+/* game modules */
+#include "prefix.h"
+
 /* util includes */
 #include <util/attrib.h>
 #include <util/bsdstring.h>
@@ -185,6 +188,45 @@ static void json_construction(cJSON *json, construction **consp) {
     *consp = cons;
 }
 
+static void json_terrain_production(cJSON *json, terrain_production *prod) {
+    assert(json->type == cJSON_Object);
+    cJSON *child;
+    for (child = json->child; child; child = child->next) {
+        char **dst = 0;
+        switch (child->type) {
+        case cJSON_Number:
+            if (strcmp(child->string, "chance") == 0) {
+                prod->chance = (float)child->valuedouble;
+            }
+            else {
+                log_error("terrain_production %s contains unknown number %s", json->string, child->string);
+            }
+            break;
+        case cJSON_String:
+            if (strcmp(child->string, "base") == 0) {
+                dst = &prod->base;
+            }
+            else if (strcmp(child->string, "level") == 0) {
+                dst = &prod->startlevel;
+            }
+            else if (strcmp(child->string, "div") == 0) {
+                dst = &prod->divisor;
+            }
+            else {
+                log_error("terrain_production %s contains unknown string %s", json->string, child->string);
+            }
+            break;
+        default:
+            log_error("terrain_production %s contains unknown attribute %s", json->string, child->string);
+        }
+        if (dst) {
+            free(*dst);
+            assert(child->type == cJSON_String);
+            *dst = _strdup(child->valuestring);
+        }
+    }
+}
+
 static void json_terrain(cJSON *json, terrain_type *ter) {
     cJSON *child;
     if (json->type != cJSON_Object) {
@@ -193,12 +235,61 @@ static void json_terrain(cJSON *json, terrain_type *ter) {
     }
     for (child = json->child; child; child = child->next) {
         switch (child->type) {
+        case cJSON_Object:
+            if (strcmp(child->string, "production") == 0) {
+                cJSON *entry;
+                int size = cJSON_GetArraySize(child);
+                if (size > 0) {
+                    int n;
+                    ter->production = (terrain_production *)calloc(size + 1, sizeof(terrain_production));
+                    ter->production[size].type = 0;
+                    for (n = 0, entry = child->child; entry; entry = entry->next, ++n) {
+                        ter->production[n].type = rt_get_or_create(entry->string);
+                        if (entry->type != cJSON_Object) {
+                            log_error("terrain %s contains invalid production %s", json->string, entry->string);
+                        }
+                        else {
+                            json_terrain_production(entry, ter->production + n);
+                        }
+                    }
+                }
+            }
+            else {
+                log_error("terrain %s contains unknown attribute %s", json->string, child->string);
+            }
+            break;
         case cJSON_Array:
             if (strcmp(child->string, "flags") == 0) {
                 const char * flags[] = {
                     "land", "sea", "forest", "arctic", "cavalry", "forbidden", "sail", "fly", "swim", "walk", 0
                 };
                 ter->flags = json_flags(child, flags);
+            }
+            else if (strcmp(child->string, "herbs") == 0) {
+                cJSON *entry;
+                int size = cJSON_GetArraySize(child);
+                if (size > 0) {
+                    int n;
+                    ter->herbs = malloc(sizeof(const item_type *) * (size + 1));
+                    ter->herbs[size] = 0;
+                    for (n = 0, entry = child->child; entry; entry = entry->next) {
+                        ter->herbs[n++] = it_get_or_create(rt_get_or_create(entry->valuestring));
+                    }
+                }
+            }
+            else {
+                log_error("terrain %s contains unknown attribute %s", json->string, child->string);
+            }
+            break;
+        case cJSON_Number:
+            if (strcmp(child->string, "size") == 0) {
+                ter->size = child->valueint;
+            }
+            else if (strcmp(child->string, "road") == 0) {
+                ter->max_road = (short)child->valueint;
+            }
+            else if (strcmp(child->string, "seed") == 0) {
+                ter->distribution = (short)child->valueint;
             }
             else {
                 log_error("terrain %s contains unknown attribute %s", json->string, child->string);
@@ -323,6 +414,9 @@ static void json_ship(cJSON *json, ship_type *st) {
             if (strcmp(child->string, "range") == 0) {
                 st->range = child->valueint;
             }
+            else if (strcmp(child->string, "maxrange") == 0) {
+                st->range_max = child->valueint;
+            }
             else {
                 log_error("ship %s contains unknown attribute %s", json->string, child->string);
             }
@@ -399,6 +493,56 @@ static void json_race(cJSON *json, race *rc) {
             }
             break;
         }
+    }
+}
+
+static void json_prefixes(cJSON *json) {
+    cJSON *child;
+    if (json->type != cJSON_Array) {
+        log_error("prefixes is not a json array: %d", json->type);
+        return;
+    }
+    for (child = json->child; child; child = child->next) {
+        add_raceprefix(child->valuestring);
+    }
+}
+
+/** disable a feature.
+ * features are identified by eone of:
+ * 1. the keyword for their orders,
+ * 2. the name of the skill they use,
+ * 3. a "module.enabled" flag in the settings
+ */
+static void disable_feature(const char *str) {
+    char name[32];
+    int k;
+    skill_t sk;
+    sk = findskill(str);
+    if (sk != NOSKILL) {
+        enable_skill(sk, false);
+        return;
+    }
+    for (k = 0; k != MAXKEYWORDS; ++k) {
+        // FIXME: this loop is slow as balls.
+        if (strcmp(keywords[k], str) == 0) {
+            log_info("disable keyword %s\n", str);
+            enable_keyword(k, false);
+            return;
+        }
+    }
+    _snprintf(name, sizeof(name), "%s.enabled", str);
+    log_info("disable feature %s\n", name);
+    set_param(&global.parameters, name, "0");
+}
+
+static void json_disable_features(cJSON *json) {
+    cJSON *child;
+    if (json->type != cJSON_Array) {
+        log_error("disabled is not a json array: %d", json->type);
+        return;
+    }
+    for (child = json->child; child; child = child->next) {
+        disable_feature(child->valuestring);
     }
 }
 
@@ -635,6 +779,29 @@ static void json_keywords(cJSON *json) {
     }
 }
 
+static void json_settings(cJSON *json) {
+    cJSON *child;
+    if (json->type != cJSON_Object) {
+        log_error("settings is not a json object: %d", json->type);
+        return;
+    }
+    for (child = json->child; child; child = child->next) {
+        if (child->valuestring) {
+            set_param(&global.parameters, child->string, child->valuestring);
+        }
+        else {
+            char value[32];
+            if (child->type == cJSON_Number && child->valuedouble && child->valueint<child->valuedouble) {
+                _snprintf(value, sizeof(value), "%lf", child->valuedouble);
+            }
+            else {
+                _snprintf(value, sizeof(value), "%d", child->valueint);
+            }
+            set_param(&global.parameters, child->string, value);
+        }
+    }
+}
+
 static void json_races(cJSON *json) {
     cJSON *child;
     if (json->type != cJSON_Object) {
@@ -676,14 +843,20 @@ static void json_include(cJSON *json) {
             fclose(F);
             config = cJSON_Parse(data);
             free(data);
-            json_config(config);
-            cJSON_Delete(config);
+            if (config) {
+                json_config(config);
+                cJSON_Delete(config);
+            }
+            else {
+                log_error("invalid JSON, could not parse %s", child->valuestring);
+            }
         }
     }
 }
 
 void json_config(cJSON *json) {
     cJSON *child;
+    assert(json);
     if (json->type != cJSON_Object) {
         log_error("config is not a json object: %d", json->type);
         return;
@@ -711,6 +884,9 @@ void json_config(cJSON *json) {
         else if (strcmp(child->string, "keywords") == 0) {
             json_keywords(child);
         }
+        else if (strcmp(child->string, "settings") == 0) {
+            json_settings(child);
+        }
         else if (strcmp(child->string, "skills") == 0) {
             json_skills(child);
         }
@@ -720,8 +896,15 @@ void json_config(cJSON *json) {
         else if (strcmp(child->string, "spells") == 0) {
             json_spells(child);
         }
+        else if (strcmp(child->string, "prefixes") == 0) {
+            json_prefixes(child);
+        }
+        else if (strcmp(child->string, "disabled") == 0) {
+            json_disable_features(child);
+        }
         else if (strcmp(child->string, "terrains") == 0) {
             json_terrains(child);
+            init_terrains();
         }
         else {
             log_error("config contains unknown attribute %s", child->string);

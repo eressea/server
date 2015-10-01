@@ -1,4 +1,4 @@
-/* 
+/*
 +-------------------+
 |                   |  Enno Rehling <enno@eressea.de>
 | Eressea PBEM host |  Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -20,6 +20,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/building.h>
 #include <kernel/region.h>
 
+#include <util/log.h>
 #include <util/language.h>
 
 #include <tolua.h>
@@ -204,6 +205,12 @@ static int tolua_building_create(lua_State * L)
 {
     region *r = (region *)tolua_tousertype(L, 1, 0);
     const char *bname = tolua_tostring(L, 2, 0);
+    if (!r) {
+        log_error("building.create expects a region as argument 1");
+    }
+    if (!bname) {
+        log_error("building.create expects a name as argument 2");
+    }
     if (bname) {
         const building_type *btype = bt_find(bname);
         if (btype) {

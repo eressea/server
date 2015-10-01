@@ -22,16 +22,16 @@ local function two_factions()
   return f1, f2
 end
 
-module("tests.eressea.common", package.seeall, lunit.testcase)
+module("tests.common", package.seeall, lunit.testcase)
 
 function setup()
     eressea.free_game()
-    eressea.settings.set("nmr.removenewbie", "0")
     eressea.settings.set("nmr.timeout", "0")
     eressea.settings.set("NewbieImmunity", "0")
-    eressea.settings.set("rules.economy.food", "4")
+    eressea.settings.set("rules.food.flags", "4")
     eressea.settings.set("rules.encounters", "0")
     eressea.settings.set("rules.peasants.growth", "1")
+    eressea.settings.set("study.random_progress", "0")
 end
 
 function test_flags()
@@ -39,13 +39,13 @@ function test_flags()
     local f = faction.create("flags@eressea.de", "halfling", "de")
     local u = unit.create(f, r, 1)
     local no = itoa36(f.id)
-    local flags = 587203585
+    local flags = 50332673
     f.flags = flags
 
     eressea.write_game("test.dat")
     eressea.free_game()
     eressea.read_game("test.dat")
-    os.remove('test.dat')
+    os.remove('data/test.dat')
     f = get_faction(no)
     assert_equal(flags, f.flags)
 end
@@ -92,7 +92,7 @@ function test_demon_food()
     local u = unit.create(f, r, 1)
     local p = r:get_resource("peasant")
     r:set_resource("peasant", 2000)
-    eressea.settings.set("rules.economy.food", "0")
+    eressea.settings.set("rules.food.flags", "0")
     eressea.settings.set("rules.peasants.growth", "0")
     process_orders()
     assert_not_nil(u)
@@ -194,6 +194,7 @@ function test_descriptions()
     eressea.write_game(filename)
     eressea.free_game()
     eressea.read_game(filename)
+    os.remove("data/test.dat")
     assert_equal(info, get_ship(sno).info)
     assert_equal(info, get_unit(uno).info)
     assert_equal(info, get_faction(fno).info)
@@ -459,7 +460,7 @@ function test_work()
 end
 
 function test_upkeep()
-    eressea.settings.set("rules.economy.food", "0")
+    eressea.settings.set("rules.food.flags", "0")
     local r = region.create(0, 0, "plain")
     local f = faction.create("noreply10@eressea.de", "human", "de")
     local u = unit.create(f, r, 5)
@@ -511,139 +512,117 @@ function test_herbalism()
 end
 
 function test_mallorn()
-  local r = region.create(0, 0, "plain")
-  r:set_flag(1, false) -- not mallorn
-  r:set_resource("tree", 100)
-  assert(r:get_resource("tree")==100)
-  local m = region.create(0, 0, "plain")
-  m:set_flag(1, true) -- mallorn
-  m:set_resource("tree", 100)
-  assert(m:get_resource("tree")==100)
-  
-  local f = faction.create("noreply13@eressea.de", "human", "de")
+    local r = region.create(0, 0, "plain")
+    r:set_flag(1, false) -- not mallorn
+    r:set_resource("tree", 100)
+    assert(r:get_resource("tree")==100)
+    local m = region.create(0, 0, "plain")
+    m:set_flag(1, true) -- mallorn
+    m:set_resource("tree", 100)
+    assert(m:get_resource("tree")==100)
 
-  local u1 = unit.create(f, r, 1)
-  u1:add_item("money", u1.number * 100)
-  u1:set_skill("forestry", 2)
-  u1:clear_orders()
-  u1:add_order("MACHE HOLZ")
+    local f = faction.create("noreply13@eressea.de", "human", "de")
 
-  local u2 = unit.create(f, m, 1)
-  u2:add_item("money", u2.number * 100)
-  u2:set_skill("forestry", 2)
-  u2:clear_orders()
-  u2:add_order("MACHE HOLZ")
+    local u1 = unit.create(f, r, 1)
+    u1:add_item("money", u1.number * 100)
+    u1:set_skill("forestry", 2)
+    u1:clear_orders()
+    u1:add_order("MACHE HOLZ")
 
-  local u3 = unit.create(f, m, 1)
-  u3:add_item("money", u3.number * 100)
-  u3:set_skill("forestry", 2)
-  u3:clear_orders()
-  u3:add_order("MACHE Mallorn")
-  
-  process_orders()
-  
-  assert_equal(2, u1:get_item("log"))
-  assert_equal(2, u2:get_item("log"))
-  local mallorn_cfg = config.get_resource("mallorn")
-  if mallorn_cfg then
-    assert_equal(1, u3:get_item("mallorn"))
-  else
-    assert_equal(-1, u3:get_item("mallorn"))
-    assert_equal(0, u3:get_item("log"))
-  end
+    local u2 = unit.create(f, m, 1)
+    u2:add_item("money", u2.number * 100)
+    u2:set_skill("forestry", 2)
+    u2:clear_orders()
+    u2:add_order("MACHE HOLZ")
+
+    local u3 = unit.create(f, m, 1)
+    u3:add_item("money", u3.number * 100)
+    u3:set_skill("forestry", 2)
+    u3:clear_orders()
+    u3:add_order("MACHE Mallorn")
+
+    process_orders()
+
+    assert_equal(2, u1:get_item("log"))
+    assert_equal(2, u2:get_item("log"))
+    local mallorn_cfg = config.get_resource("mallorn")
+    if mallorn_cfg then
+        assert_equal(1, u3:get_item("mallorn"))
+    else
+        assert_equal(-1, u3:get_item("mallorn"))
+        assert_equal(0, u3:get_item("log"))
+    end
 end
 
 function test_coordinate_translation()
-  local pl = plane.create(1, 500, 500, 1001, 1001) -- astralraum
-  local pe = plane.create(1, -8761, 3620, 23, 23) -- eternath
-  local r = region.create(1000, 1000, "plain")
-  local f = faction.create("noreply14@eressea.de", "human", "de")
-  assert_not_equal(nil, r)
-  assert_equal(r.x, 1000)
-  assert_equal(r.y, 1000)
-  local nx, ny = plane.normalize(pl, r.x, r.y)
-  assert_equal(nx, 1000)
-  assert_equal(ny, 1000)
-  local r1 = region.create(500, 500, "plain")
-  f:set_origin(r1)
-  nx, ny = f:normalize(r1)
-  assert_equal(0, nx)
-  assert_equal(0, ny)
-  local r0 = region.create(0, 0, "plain")
-  nx, ny = f:normalize(r0)
-  assert_equal(0, nx)
-  assert_equal(0, ny)
-  nx, ny = f:normalize(r)
-  assert_equal(500, nx)
-  assert_equal(500, ny)
-  local rn = region.create(1010, 1010, "plain")
-  nx, ny = f:normalize(rn)
-  assert_equal(-491, nx)
-  assert_equal(-491, ny)
+    local pl = plane.create(1, 500, 500, 1001, 1001) -- astralraum
+    local pe = plane.create(1, -8761, 3620, 23, 23) -- eternath
+    local r = region.create(1000, 1000, "plain")
+    local f = faction.create("noreply14@eressea.de", "human", "de")
+    assert_not_equal(nil, r)
+    assert_equal(r.x, 1000)
+    assert_equal(r.y, 1000)
+    local nx, ny = plane.normalize(pl, r.x, r.y)
+    assert_equal(nx, 1000)
+    assert_equal(ny, 1000)
+    local r1 = region.create(500, 500, "plain")
+    f:set_origin(r1)
+    nx, ny = f:normalize(r1)
+    assert_equal(0, nx)
+    assert_equal(0, ny)
+    local r0 = region.create(0, 0, "plain")
+    nx, ny = f:normalize(r0)
+    assert_equal(0, nx)
+    assert_equal(0, ny)
+    nx, ny = f:normalize(r)
+    assert_equal(500, nx)
+    assert_equal(500, ny)
+    local rn = region.create(1010, 1010, "plain")
+    nx, ny = f:normalize(rn)
+    assert_equal(-491, nx)
+    assert_equal(-491, ny)
 
-  local re = region.create(-8760, 3541, "plain") -- eternath
-  nx, ny = f:normalize(rn)
-  assert_equal(-491, nx)
-  assert_equal(-491, ny)
+    local re = region.create(-8760, 3541, "plain") -- eternath
+    nx, ny = f:normalize(rn)
+    assert_equal(-491, nx)
+    assert_equal(-491, ny)
 end
 
 function test_control()
-  local u1, u2 = two_units(region.create(0, 0, "plain"), two_factions())
-  local r = u1.region
-  local b = building.create(r, "castle")
-  u1.building = b
-  u2.building = b
-  assert_equal(u1, b.owner)
-  u1:clear_orders()
-  u1:add_order("GIB " .. itoa36(u2.id) .. " KOMMANDO")
-  u1:add_order("VERLASSE")
-  process_orders()
-  assert_equal(u2, b.owner)
-end
-
-function test_store_unit()
-  local r = region.create(0, 0, "plain")
-  local f = faction.create("noreply15@eressea.de", "human", "de")
-  local u = unit.create(f, r, 1)
-  local fid = f.id
-  u:add_item("money", u.number * 100)
-  local filename = config.basepath .. "/data/test.dat"
-  store = storage.create(filename, "wb")
-  assert_not_equal(store, nil)
-  store:write_unit(u)
-  store:close()
-  eressea.free_game()
-  -- recreate world:
-  r = region.create(0, 0, "plain")
-  f = faction.create("noreply16@eressea.de", "human", "de")
-  f.id = fid
-  store = storage.create(filename, "rb")
-  assert_not_nil(store)
-  u = store:read_unit()
-  store:close()
-  assert(u)
-  assert(u:get_item("money") == u.number * 100)
+    local u1, u2 = two_units(region.create(0, 0, "plain"), two_factions())
+    local r = u1.region
+    local b = building.create(r, "castle")
+    u1.building = b
+    u2.building = b
+    assert_equal(u1, b.owner)
+    u1:clear_orders()
+    u1:add_order("GIB " .. itoa36(u2.id) .. " KOMMANDO")
+    u1:add_order("VERLASSE")
+    process_orders()
+    assert_equal(u2, b.owner)
 end
 
 function test_building_other()
-  local r = region.create(0,0, "plain")
-  local f1 = faction.create("noreply17@eressea.de", "human", "de")
-  local f2 = faction.create("noreply18@eressea.de", "human", "de")
-  local b = building.create(r, "castle")
-  b.size = 10
-  local u1 = unit.create(f1, r, 3)
-  u1.building = b
-  u1:add_item("money", 100)
+    local r = region.create(0,0, "plain")
+    local f1 = faction.create("noreply17@eressea.de", "human", "de")
+    local f2 = faction.create("noreply18@eressea.de", "human", "de")
+    local b = building.create(r, "castle")
+    b.size = 10
+    local u1 = unit.create(f1, r, 3)
+    u1.building = b
+    u1:add_item("money", 100)
 
-  local u2 = unit.create(f2, r, 3)
-  u2:set_skill("building", 10)
-  u2:add_item("money", 100)
-  u2:add_item("stone", 100)
-  u2:clear_orders()
-  u2:add_order("MACHEN BURG " .. itoa36(b.id))
-  process_orders()
-  assert_not_equal(10, b.size)
+    local u2 = unit.create(f2, r, 3)
+    u2:set_skill("building", 10)
+    u2:add_item("money", 100)
+    u2:add_item("stone", 100)
+    u2:clear_orders()
+    u2:add_order("MACHEN BURG " .. itoa36(b.id))
+    process_orders()
+    assert_not_equal(10, b.size)
 end
+
+-- segfault above
 
 function test_config()
   assert_not_equal(nil, config.basepath)
@@ -790,6 +769,7 @@ function test_expensive_skills_cost_money()
   u:add_item("money", 10000)
   u:clear_orders()
   u:add_order("LERNEN MAGIE Gwyrrd")
+  assert_equal(0, u:get_skill("magic"))
   process_orders()
   assert_equal(9900, u:get_item("money"))
   assert_equal(1, u:get_skill("magic"))
@@ -802,7 +782,7 @@ function test_food_is_consumed()
   u:add_item("money", 100)
   u:clear_orders()
   u:add_order("LERNEN Reiten") -- don't work
-  eressea.settings.set("rules.economy.food", "4")
+  eressea.settings.set("rules.food.flags", "4")
   process_orders()
   assert_equal(100, u:get_item("money"))
 end
@@ -814,7 +794,7 @@ function test_food_can_override()
   u:add_item("money", 100)
   u:clear_orders()
   u:add_order("LERNEN Reiten") -- don't work
-  eressea.settings.set("rules.economy.food", "0")
+  eressea.settings.set("rules.food.flags", "0")
   process_orders()
   assert_equal(90, u:get_item("money"))
 end
@@ -941,7 +921,7 @@ module("tests.recruit", package.seeall, lunit.testcase)
 
 function setup()
     eressea.free_game()
-    eressea.settings.set("rules.economy.food", "4")
+    eressea.settings.set("rules.food.flags", "4")
     eressea.settings.set("rules.peasants.growth", "0")
 end
 
@@ -981,9 +961,8 @@ module("tests.report", package.seeall, lunit.testcase)
 
 function setup()
     eressea.free_game()
-    eressea.settings.set("nmr.removenewbie", "0")
     eressea.settings.set("nmr.timeout", "0")
-    eressea.settings.set("rules.economy.food", "4")
+    eressea.settings.set("rules.food.flags", "4")
 end
 
 local function find_in_report(f, pattern, extension)
@@ -995,7 +974,6 @@ local function find_in_report(f, pattern, extension)
     report:close()
 
     local start, _ = string.find(t, pattern)
---    posix.unlink(filename)
     return start~=nil
 end
 
@@ -1052,6 +1030,7 @@ function test_coordinates_noname_plane()
 end
 
 function test_lighthouse()
+    eressea.free_game()
     local r = region.create(0, 0, "mountain")
     local f = faction.create("noreply@eressea.de", "human", "de")
     region.create(1, 0, "mountain")
@@ -1083,7 +1062,7 @@ module("tests.parser", package.seeall, lunit.testcase)
 
 function setup()
     eressea.free_game()
-    eressea.settings.set("rules.economy.food", "4") -- FOOD_IS_FREE
+    eressea.settings.set("rules.food.flags", "4") -- FOOD_IS_FREE
     eressea.settings.set("rules.encounters", "0")
     eressea.settings.set("rules.move.owner_leave", "0")
 end
@@ -1092,7 +1071,7 @@ function test_parser()
     local r = region.create(0, 0, "mountain")
     local f = faction.create("noreply@eressea.de", "human", "de")
     local u = unit.create(f, r, 1)
-    local filename = config.basepath .. "/data/orders.txt"
+    local filename = "orders.txt"
     
     local file = io.open(filename, "w")
     assert_not_nil(file)
@@ -1103,5 +1082,38 @@ function test_parser()
     
     eressea.read_orders(filename)
     process_orders()
+    os.remove(filename)
     assert_equal("Goldene Herde", u.name)
+end
+
+local function set_order(u, str)
+    u:clear_orders()
+    u:add_order(str)
+end
+
+function test_prefix()
+    local r0 = region.create(0, 0, "plain")
+    local f1 = faction.create("noreply@eressea.de", "human", "de")
+    local u1 = unit.create(f1, r0, 1)
+
+    set_order(u1, "PRAEFIX See")
+    process_orders()
+    assert_not_nil(u1:show():find("Seemensch"))
+
+    u1.race = "elf"
+    assert_not_nil(u1:show():find("Seeelf"))
+
+    set_order(u1, "PRAEFIX Mond")
+    process_orders()
+    assert_not_nil(u1:show():find("Mondelf"))
+
+    set_order(u1, "PRAEFIX")
+    process_orders()
+    assert_not_nil(u1:show():find("Elf"))
+
+    set_order(u1, "PRAEFIX Erz")
+    process_orders()
+    assert_not_nil(u1:show():find("Erzelf"))
+    u1.faction.locale = "en"
+    assert_not_nil(u1:show():find("archelf"))
 end

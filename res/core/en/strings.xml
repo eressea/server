@@ -1660,10 +1660,6 @@
   </string>
   </namespace>
 
-  <string name="nr_nmr">
-    <text locale="en">No orders were received for your faction!</text>
-  </string>
-
   <!-- resources -->
   <string name="mistletoe">
     <text locale="de">Mistelzweig</text>

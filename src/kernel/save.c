@@ -1,4 +1,4 @@
-/*
+ï»¿/*
 Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -139,7 +139,8 @@ static unit *unitorders(FILE * F, int enc, struct faction *f)
             ordp = &u->old_orders;
             while (*ordp) {
                 order *ord = *ordp;
-                if (!is_repeated(ord)) {
+                keyword_t kwd = getkeyword(ord);
+                if (!is_repeated(kwd)) {
                     *ordp = ord->next;
                     ord->next = NULL;
                     free_order(ord);
@@ -200,7 +201,7 @@ static unit *unitorders(FILE * F, int enc, struct faction *f)
                         }
                     }
                 }
-                /* Nun wird der Befehl erzeut und eingehängt */
+                /* Nun wird der Befehl erzeut und eingehÃ¤ngt */
                 *ordp = parse_order(s, u->faction->locale);
                 if (*ordp) {
                     ordp = &(*ordp)->next;
@@ -233,8 +234,8 @@ static faction *factionorders(void)
                 f->no, pass));
             return 0;
         }
-        /* Die Partei hat sich zumindest gemeldet, so daß sie noch
-         * nicht als untätig gilt */
+        /* Die Partei hat sich zumindest gemeldet, so dass sie noch
+         * nicht als untÃ¤tig gilt */
 
         /* TODO: +1 ist ein Workaround, weil cturn erst in process_orders
          * incrementiert wird. */
@@ -308,9 +309,9 @@ int readorders(const char *filename)
                 /* Falls in unitorders() abgebrochen wird, steht dort entweder eine neue
                  * Partei, eine neue Einheit oder das File-Ende. Das switch() wird erneut
                  * durchlaufen, und die entsprechende Funktion aufgerufen. Man darf buf
-                 * auf alle Fälle nicht überschreiben! Bei allen anderen Einträgen hier
-                 * muß buf erneut gefüllt werden, da die betreffende Information in nur
-                 * einer Zeile steht, und nun die nächste gelesen werden muß. */
+                 * auf alle FÃ¤lle nicht Ã¼berschreiben! Bei allen anderen EintrÃ¤gen hier
+                 * muss buf erneut gefÃ¼llt werden, da die betreffende Information in nur
+                 * einer Zeile steht, und nun die nÃ¤chste gelesen werden muss. */
 
         case P_NEXT:
             f = NULL;
@@ -331,7 +332,7 @@ int readorders(const char *filename)
 /* ------------------------------------------------------------- */
 
 /* #define INNER_WORLD  */
-/* fürs debuggen nur den inneren Teil der Welt laden */
+/* fÃ¼rs debuggen nur den inneren Teil der Welt laden */
 /* -9;-27;-1;-19;Sumpfloch */
 int inner_world(region * r)
 {
@@ -618,13 +619,13 @@ unit *read_unit(struct gamedata *data)
     }
 
     READ_STR(data->store, obuf, sizeof(obuf));
-    u->_name = _strdup(obuf);
+    u->_name = obuf[0] ? _strdup(obuf) : 0;
     if (lomem) {
         READ_STR(data->store, NULL, 0);
     }
     else {
         READ_STR(data->store, obuf, sizeof(obuf));
-        u->display = _strdup(obuf);
+        u->display = obuf[0] ? _strdup(obuf) : 0;
     }
     READ_INT(data->store, &number);
     set_number(u, number);
@@ -777,7 +778,8 @@ void write_unit(struct gamedata *data, const unit * u)
         }
     }
     for (ord = u->orders; ord; ord = ord->next) {
-        if (u->old_orders && is_repeated(ord))
+        keyword_t kwd = getkeyword(ord);
+        if (u->old_orders && is_repeated(kwd))
             continue;                 /* has new defaults */
         if (is_persistent(ord)) {
             if (++p < MAXPERSISTENT) {
@@ -978,6 +980,9 @@ static region *readregion(struct gamedata *data, int x, int y)
 
 void writeregion(struct gamedata *data, const region * r)
 {
+    assert(r);
+    assert(data);
+
     WRITE_INT(data->store, r->uid);
     WRITE_STR(data->store, region_getinfo(r));
     WRITE_TOK(data->store, r->terrain->_name);
@@ -988,6 +993,8 @@ void writeregion(struct gamedata *data, const region * r)
         const item_type *rht;
         struct demand *demand;
         rawmaterial *res = r->resources;
+        
+        assert(r->land);
         WRITE_STR(data->store, (const char *)r->land->name);
         assert(rtrees(r, 0) >= 0);
         assert(rtrees(r, 1) >= 0);
@@ -1018,11 +1025,9 @@ void writeregion(struct gamedata *data, const region * r)
         WRITE_INT(data->store, rherbs(r));
         WRITE_INT(data->store, rpeasants(r));
         WRITE_INT(data->store, rmoney(r));
-        if (r->land) {
-            for (demand = r->land->demands; demand; demand = demand->next) {
-                WRITE_TOK(data->store, resourcename(demand->type->itype->rtype, 0));
-                WRITE_INT(data->store, demand->value);
-            }
+        for (demand = r->land->demands; demand; demand = demand->next) {
+            WRITE_TOK(data->store, resourcename(demand->type->itype->rtype, 0));
+            WRITE_INT(data->store, demand->value);
         }
         WRITE_TOK(data->store, "end");
         write_items(data->store, r->land->items);
@@ -1119,7 +1124,7 @@ void read_spellbook(spellbook **bookp, struct storage *store, int(*get_level)(co
                 *bookp = create_spellbook(0);
                 sb = *bookp;
             }
-            if (global.data_version >= SPELLBOOK_VERSION || !spellbook_get(sb, sp)) {
+            if (level>0 && (global.data_version >= SPELLBOOK_VERSION || !spellbook_get(sb, sp))) {
                 spellbook_add(sb, sp, level);
             }
         }
@@ -1165,6 +1170,9 @@ faction *readfaction(struct gamedata * data)
     }
     READ_INT(data->store, &f->subscription);
 
+    if (data->version >= SPELL_LEVEL_VERSION) {
+        READ_INT(data->store, &f->max_spelllevel);
+    }
     if (alliances || data->version >= OWNER_2_VERSION) {
         int allianceid;
         READ_INT(data->store, &allianceid);
@@ -1196,7 +1204,7 @@ faction *readfaction(struct gamedata * data)
     READ_STR(data->store, name, sizeof(name));
     f->banner = _strdup(name);
 
-    log_printf(stdout, "   - Lese Partei %s (%s)\n", f->name, factionid(f));
+    log_debug("   - Lese Partei %s (%s)", f->name, factionid(f));
 
     READ_STR(data->store, name, sizeof(name));
     if (set_email(&f->email, name) != 0) {
@@ -1294,6 +1302,9 @@ void writefaction(struct gamedata *data, const faction * f)
 
     write_faction_reference(f, data->store);
     WRITE_INT(data->store, f->subscription);
+#if RELEASE_VERSION >= SPELL_LEVEL_VERSION
+    WRITE_INT(data->store, f->max_spelllevel);
+#endif
     if (f->alliance) {
         WRITE_INT(data->store, f->alliance->id);
         if (f->alliance->flags & ALF_NON_ALLIED) {
@@ -1348,6 +1359,14 @@ void writefaction(struct gamedata *data, const faction * f)
     write_spellbook(f->spellbook, data->store);
 }
 
+static int cb_sb_maxlevel(spellbook_entry *sbe, void *cbdata) {
+    faction *f = (faction *)cbdata;
+    if (sbe->level > f->max_spelllevel) {
+        f->max_spelllevel = sbe->level;
+    }
+    return 0;
+}
+
 int readgame(const char *filename, bool backup)
 {
     int n, p, nread;
@@ -1366,7 +1385,7 @@ int readgame(const char *filename, bool backup)
     FILE *F;
 
     init_locales();
-    log_printf(stdout, "- reading game data from %s\n", filename);
+    log_debug("- reading game data from %s\n", filename);
     sprintf(path, "%s/%s", datapath(), filename);
 
     if (backup) {
@@ -1414,7 +1433,7 @@ int readgame(const char *filename, bool backup)
     a_read(&store, &global.attribs, NULL);
     READ_INT(&store, &turn);
     global.data_turn = turn;
-    log_printf(stdout, " - reading turn %d\n", turn);
+    log_debug(" - reading turn %d\n", turn);
     rng_init(turn);
     ++global.cookie;
     READ_INT(&store, &nread);          /* max_unique_id = ignore */
@@ -1482,7 +1501,7 @@ int readgame(const char *filename, bool backup)
     /* Read factions */
     read_alliances(&store);
     READ_INT(&store, &nread);
-    log_printf(stdout, " - Einzulesende Parteien: %d\n", nread);
+    log_debug(" - Einzulesende Parteien: %d\n", nread);
     fp = &factions;
     while (*fp)
         fp = &(*fp)->next;
@@ -1503,7 +1522,7 @@ int readgame(const char *filename, bool backup)
     if (rmax < 0) {
         rmax = nread;
     }
-    log_printf(stdout, " - Einzulesende Regionen: %d/%d\r", rmax, nread);
+    log_debug(" - Einzulesende Regionen: %d/%d\r", rmax, nread);
     while (--nread >= 0) {
         unit **up;
         int x, y;
@@ -1511,7 +1530,7 @@ int readgame(const char *filename, bool backup)
         READ_INT(&store, &y);
 
         if ((nread & 0x3FF) == 0) {     /* das spart extrem Zeit */
-            log_printf(stdout, " - Einzulesende Regionen: %d/%d * %d,%d    \r", rmax, nread, x, y);
+            log_debug(" - Einzulesende Regionen: %d/%d * %d,%d    \r", rmax, nread, x, y);
         }
         --rmax;
 
@@ -1603,7 +1622,6 @@ int readgame(const char *filename, bool backup)
 
         while (--p >= 0) {
             unit *u = read_unit(&gdata);
-            sc_mage *mage;
 
             if (gdata.version < JSON_REPORT_VERSION) {
                 if (u->_name && fval(u->faction, FFL_NPC)) {
@@ -1618,33 +1636,17 @@ int readgame(const char *filename, bool backup)
             up = &u->next;
 
             update_interval(u->faction, u->region);
-            mage = get_mage(u);
-            if (mage) {
-                faction *f = u->faction;
-                int skl = effskill(u, SK_MAGIC);
-                if (!fval(f, FFL_NPC) && f->magiegebiet == M_GRAY) {
-                    log_error("faction %s had magic=gray, fixing (%s)\n", factionname(f), magic_school[mage->magietyp]);
-                    f->magiegebiet = mage->magietyp;
-                }
-                if (f->max_spelllevel < skl) {
-                    f->max_spelllevel = skl;
-                }
-                if (mage->spellcount < 0) {
-                    mage->spellcount = 0;
-                }
-            }
         }
     }
-    log_printf(stdout, "\n");
     read_borders(&store);
 
     binstore_done(&store);
     fstream_done(&strm);
     /* Unaufgeloeste Zeiger initialisieren */
-    log_printf(stdout, "fixing unresolved references.\n");
+    log_debug("fixing unresolved references.\n");
     resolve();
 
-    log_printf(stdout, "updating area information for lighthouses.\n");
+    log_debug("updating area information for lighthouses.\n");
     for (r = regions; r; r = r->next) {
         if (r->flags & RF_LIGHTHOUSE) {
             building *b;
@@ -1652,10 +1654,11 @@ int readgame(const char *filename, bool backup)
                 update_lighthouse(b);
         }
     }
-    log_printf(stdout, "marking factions as alive.\n");
+    log_debug("marking factions as alive.\n");
     for (f = factions; f; f = f->next) {
         if (f->flags & FFL_NPC) {
             f->alive = 1;
+            f->magiegebiet = M_GRAY;
             if (f->no == 0) {
                 int no = 666;
                 while (findfaction(no))
@@ -1666,17 +1669,40 @@ int readgame(const char *filename, bool backup)
         }
         else {
             for (u = f->units; u; u = u->nextF) {
-                if (u->number > 0) {
-                    f->alive = 1;
-                    break;
+                if (global.data_version < SPELL_LEVEL_VERSION) {
+                    sc_mage *mage = get_mage(u);
+                    if (mage) {
+                        faction *f = u->faction;
+                        int skl = effskill(u, SK_MAGIC, 0);
+                        if (f->magiegebiet == M_GRAY) {
+                            log_error("faction %s had magic=gray, fixing (%s)\n", factionname(f), magic_school[mage->magietyp]);
+                            f->magiegebiet = mage->magietyp;
+                        }
+                        if (f->max_spelllevel < skl) {
+                            f->max_spelllevel = skl;
+                        }
+                        if (mage->spellcount < 0) {
+                            mage->spellcount = 0;
+                        }
+                    }
                 }
+                if (u->number > 0) {
+                    f->alive = true;
+                    if (global.data_version >= SPELL_LEVEL_VERSION) {
+                        break;
+                    }
+                }
+            }
+            if (global.data_version < SPELL_LEVEL_VERSION && f->spellbook) {
+                spellbook_foreach(f->spellbook, cb_sb_maxlevel, f);
             }
         }
     }
     if (loadplane || maxregions >= 0) {
         remove_empty_factions();
     }
-    log_printf(stdout, "Done loading turn %d.\n", turn);
+    log_debug("Done loading turn %d.\n", turn);
+
     return 0;
 }
 
@@ -1781,7 +1807,7 @@ int writegame(const char *filename)
     WRITE_INT(&store, n);
     WRITE_SECTION(&store);
 
-    log_printf(stdout, " - Schreibe %d Parteien...\n", n);
+    log_debug(" - Schreibe %d Parteien...\n", n);
     for (f = factions; f; f = f->next) {
         if (fval(f, FFL_NPC)) {
             clear_npc_orders(f);
@@ -1795,13 +1821,12 @@ int writegame(const char *filename)
     n = listlen(regions);
     WRITE_INT(&store, n);
     WRITE_SECTION(&store);
-    log_printf(stdout, " - Schreibe Regionen: %d  \r", n);
+    log_debug(" - Schreibe Regionen: %d", n);
 
     for (r = regions; r; r = r->next, --n) {
         /* plus leerzeile */
         if ((n % 1024) == 0) {      /* das spart extrem Zeit */
-            log_printf(stdout, " - Schreibe Regionen: %d  \r", n);
-            fflush(stdout);
+            log_debug(" - Schreibe Regionen: %d", n);
         }
         WRITE_SECTION(&store);
         WRITE_INT(&store, r->x);
@@ -1853,7 +1878,6 @@ int writegame(const char *filename)
     binstore_done(&store);
     fstream_done(&strm);
 
-    log_printf(stdout, "\nOk.\n");
     return 0;
 }
 

@@ -1,6 +1,10 @@
 #!/bin/bash
 if [ -z $ERESSEA ]; then
-  echo "You have to define the \$ERESSEA environment variable to run $0"
+  ERESSEA=`echo $PWD |sed -e 's/\/game.*//'`
+  echo "Assuming that ERESSEA=$ERESSEA"
+fi
+if [ ! -f reports.txt ]; then
+  echo "need to run $0 from the report direcory"
   exit -2
 fi
 source $HOME/bin/functions.sh
@@ -19,17 +23,8 @@ then
   shift
 fi
 
-EMAIL=$1
-SUBJECT=$2
+addr=$1
+subj=$2
 shift 2
 
-ATTACHMENTS=""
-while [ $# -gt 0 ]
-do
-  if [ -e "$1" ]; then
-    ATTACHMENTS="-a $1 $ATTACHMENTS"
-  fi
-  shift
-done
-
-cat $ERESSEA/etc/$TEMPLATE | mutt -F $ERESSEA/etc/muttrc -s "$SUBJECT" $ATTACHMENTS -- $EMAIL
+cat $ERESSEA/etc/$TEMPLATE | mutt -F $ERESSEA/etc/muttrc -s "$subj" -a $* -- $addr

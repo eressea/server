@@ -1,11 +1,11 @@
 require "lunit"
 
-module('eressea.tests.stealth', package.seeall, lunit.testcase)
+module('tests.e2.stealth', package.seeall, lunit.testcase)
 
 local f
 local u
 
-local settings
+local settings = {}
 
 local function set_rule(key, value)
     if value==nil then
@@ -18,7 +18,7 @@ end
 
 function setup()
     eressea.game.reset()
-    set_rule('rules.economy.food', '4')
+    set_rule('rules.food.flags', '4')
     set_rule('rules.magic.playerschools', '')
 
     local r = region.create(0,0, "plain")
@@ -28,7 +28,7 @@ function setup()
 end
 
 function teardown()
-    set_rule('rules.economy.food')
+    set_rule('rules.food.flags')
     set_rule('rules.magic.playerschools')
     set_rule('rules.stealth.faction')
 end

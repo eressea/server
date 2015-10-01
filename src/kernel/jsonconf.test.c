@@ -12,7 +12,11 @@
 #include "spell.h"
 #include "order.h"
 #include "terrain.h"
+
+#include "prefix.h"
+
 #include "util/language.h"
+
 #include <CuTest.h>
 #include <cJSON.h>
 #include <tests.h>
@@ -54,6 +58,69 @@ static void test_flags(CuTest *tc) {
     check_ec_flag(tc, "keepitem", ECF_KEEP_ITEM);
     check_ec_flag(tc, "giveperson", GIVEPERSON);
     check_ec_flag(tc, "giveunit", GIVEUNIT);
+    test_cleanup();
+}
+
+static void test_settings(CuTest * tc)
+{
+    const char * data = "{\"settings\": { "
+        "\"string\" : \"1d4\","
+        "\"integer\" : 14,"
+        "\"true\": true,"
+        "\"false\": false,"
+        "\"float\" : 1.5 }}";
+    cJSON *json = cJSON_Parse(data);
+
+    test_cleanup();
+    json_config(json);
+    CuAssertStrEquals(tc, "1", get_param(global.parameters, "true"));
+    CuAssertStrEquals(tc, "0", get_param(global.parameters, "false"));
+    CuAssertStrEquals(tc, "1d4", get_param(global.parameters, "string"));
+    CuAssertIntEquals(tc, 14, get_param_int(global.parameters, "integer", 0));
+    CuAssertDblEquals(tc, 1.5f, get_param_flt(global.parameters, "float", 0), 0.01);
+    test_cleanup();
+}
+
+static void test_prefixes(CuTest * tc)
+{
+    const char * data = "{\"prefixes\": [ "
+        "\"snow\","
+        "\"sea\","
+        "\"dark\""
+        "]}";
+    cJSON *json = cJSON_Parse(data);
+
+    test_cleanup();
+    json_config(json);
+    CuAssertPtrNotNull(tc, race_prefixes);
+    CuAssertStrEquals(tc, "snow", race_prefixes[0]);
+    CuAssertStrEquals(tc, "dark", race_prefixes[2]);
+    CuAssertPtrEquals(tc, 0, race_prefixes[3]);
+    test_cleanup();
+}
+
+static void test_disable(CuTest * tc)
+{
+    const char * data = "{\"disabled\": [ "
+        "\"alchemy\","
+        "\"pay\","
+        "\"besiege\","
+        "\"module\""
+        "]}";
+    cJSON *json = cJSON_Parse(data);
+
+    test_cleanup();
+    CuAssertTrue(tc, skill_enabled(SK_ALCHEMY));
+    CuAssertTrue(tc, !keyword_disabled(K_BANNER));
+    CuAssertTrue(tc, !keyword_disabled(K_PAY));
+    CuAssertTrue(tc, !keyword_disabled(K_BESIEGE));
+    CuAssertIntEquals(tc, 1, get_param_int(global.parameters, "module.enabled", 1));
+    json_config(json);
+    CuAssertTrue(tc, !skill_enabled(SK_ALCHEMY));
+    CuAssertTrue(tc, !keyword_disabled(K_BANNER));
+    CuAssertTrue(tc, keyword_disabled(K_PAY));
+    CuAssertTrue(tc, keyword_disabled(K_BESIEGE));
+    CuAssertIntEquals(tc, 0, get_param_int(global.parameters, "module.enabled", 1));
     test_cleanup();
 }
 
@@ -155,7 +222,9 @@ static void test_ships(CuTest * tc)
 {
     const char * data = "{\"ships\": { \"boat\" : { "
         "\"construction\" : { \"maxsize\" : 20, \"reqsize\" : 10, \"minskill\" : 1 },"
-        "\"coasts\" : [ \"plain\" ]"
+        "\"coasts\" : [ \"plain\" ],"
+        "\"range\" : 8,"
+        "\"maxrange\" : 16"
         "}}}";
 
     cJSON *json = cJSON_Parse(data);
@@ -175,6 +244,8 @@ static void test_ships(CuTest * tc)
     CuAssertIntEquals(tc, 10, st->construction->reqsize);
     CuAssertIntEquals(tc, 20, st->construction->maxsize);
     CuAssertIntEquals(tc, 1, st->construction->minskill);
+    CuAssertIntEquals(tc, 8, st->range);
+    CuAssertIntEquals(tc, 16, st->range_max);
 
     ter = get_terrain("plain");
     CuAssertPtrNotNull(tc, ter);
@@ -365,7 +436,13 @@ static void test_configs(CuTest * tc)
 
 static void test_terrains(CuTest * tc)
 {
-    const char * data = "{\"terrains\": { \"plain\" : { \"flags\" : [ \"land\", \"fly\", \"walk\" ] } }}";
+    const char * data = "{\"terrains\": { \"plain\" : { "
+        "\"herbs\": [ \"h0\", \"h1\" ], "
+        "\"production\": { \"stone\": { \"chance\": 0.1, \"base\": \"1d4\", \"div\": \"1d5\", \"level\": \"1d6\" }, \"iron\": {} }, "
+        "\"size\": 4000, "
+        "\"road\": 50, "
+        "\"seed\": 3, "
+        "\"flags\" : [ \"forbidden\", \"arctic\", \"cavalry\", \"sea\", \"forest\", \"land\", \"sail\", \"fly\", \"swim\", \"walk\" ] } }}";
     const terrain_type *ter;
 
     cJSON *json = cJSON_Parse(data);
@@ -377,7 +454,23 @@ static void test_terrains(CuTest * tc)
     json_config(json);
     ter = get_terrain("plain");
     CuAssertPtrNotNull(tc, ter);
-    CuAssertIntEquals(tc, ter->flags, LAND_REGION | FLY_INTO | WALK_INTO);
+    CuAssertIntEquals(tc, ARCTIC_REGION | LAND_REGION | SEA_REGION | FOREST_REGION | CAVALRY_REGION | FORBIDDEN_REGION | FLY_INTO | WALK_INTO | SWIM_INTO | SAIL_INTO, ter->flags);
+    CuAssertIntEquals(tc, 4000, ter->size);
+    CuAssertIntEquals(tc, 50, ter->max_road);
+    CuAssertIntEquals(tc, 3, ter->distribution);
+    CuAssertPtrNotNull(tc, ter->herbs);
+    CuAssertPtrEquals(tc, rt_get_or_create("h0"), ter->herbs[0]->rtype);
+    CuAssertPtrEquals(tc, rt_get_or_create("h1"), ter->herbs[1]->rtype);
+    CuAssertPtrEquals(tc, 0, (void *)ter->herbs[2]);
+    CuAssertPtrNotNull(tc, ter->name); // anything named "plain" uses plain_name()
+    CuAssertPtrNotNull(tc, ter->production);
+    CuAssertPtrEquals(tc, rt_get_or_create("stone"), (resource_type *)ter->production[0].type);
+    CuAssertDblEquals(tc, 0.1, ter->production[0].chance, 0.01);
+    CuAssertStrEquals(tc, "1d4", ter->production[0].base);
+    CuAssertStrEquals(tc, "1d5", ter->production[0].divisor);
+    CuAssertStrEquals(tc, "1d6", ter->production[0].startlevel);
+    CuAssertPtrEquals(tc, rt_get_or_create("iron"), (resource_type *)ter->production[1].type);
+    CuAssertPtrEquals(tc, 0, (void *)ter->production[2].type);
 
     test_cleanup();
 }
@@ -506,6 +599,9 @@ CuSuite *get_jsonconf_suite(void)
     SUITE_ADD_TEST(suite, test_strings);
     SUITE_ADD_TEST(suite, test_spells);
     SUITE_ADD_TEST(suite, test_flags);
+    SUITE_ADD_TEST(suite, test_settings);
+    SUITE_ADD_TEST(suite, test_prefixes);
+    SUITE_ADD_TEST(suite, test_disable);
     SUITE_ADD_TEST(suite, test_infinitive_from_config);
     return suite;
 }

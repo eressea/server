@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<resource name="cart" big="true">
-  <item capacity="14000" weight="4000" score="60" vehicle="yes">
+<resource name="cart">
+  <item capacity="14000" weight="4000" score="60" vehicle="yes" big="yes">
     <construction skill="cartmaking" minskill="1" reqsize="1">
       <requirement type="log" quantity="5"/>
     </construction>

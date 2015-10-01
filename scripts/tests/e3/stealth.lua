@@ -7,7 +7,7 @@ local u
 
 function setup()
 	eressea.game.reset()
-	eressea.settings.set("rules.economy.food", "4")
+	eressea.settings.set("rules.food.flags", "4")
 
 	local r = region.create(0,0, "plain")
 	f = faction.create("stealth1@eressea.de", "human", "de")

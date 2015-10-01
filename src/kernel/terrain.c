@@ -59,10 +59,18 @@ static terrain_type *registered_terrains;
 void free_terrains(void)
 {
     while (registered_terrains) {
+        int n;
         terrain_type * t = registered_terrains;
         registered_terrains = t->next;
         free(t->_name);
-        free(t->production);
+        if (t->production) {
+            for (n = 0; t->production[n].type; ++n) {
+                free(t->production[n].base);
+                free(t->production[n].divisor);
+                free(t->production[n].startlevel);
+            }
+            free(t->production);
+        }
         free(t);
     }
 }
@@ -127,8 +135,7 @@ const struct terrain_type *newterrain(terrain_t t)
 terrain_t oldterrain(const struct terrain_type * terrain)
 {
     terrain_t t;
-    if (terrain == NULL)
-        return NOTERRAIN;
+    assert(terrain);
     for (t = 0; t != MAXTERRAINS; ++t) {
         if (newterrains[t] == terrain)
             return t;

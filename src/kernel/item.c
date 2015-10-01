@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -54,6 +54,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* libc includes */
 #include <assert.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -179,9 +180,14 @@ static void rt_register(resource_type * rtype)
 resource_type *rt_get_or_create(const char *name) {
     resource_type *rtype = rt_find(name);
     if (!rtype) {
-        rtype = (resource_type *)calloc(sizeof(resource_type), 1);
-        rtype->_name = _strdup(name);
-        rt_register(rtype);
+        rtype = calloc(1, sizeof(resource_type));
+        if (!rtype) {
+            perror("resource_type allocation failed");
+        }
+        else {
+            rtype->_name = _strdup(name);
+            rt_register(rtype);
+        }
     }
     return rtype;
 }
@@ -332,10 +338,15 @@ potion_type *new_potiontype(item_type * itype, int level)
 }
 
 void it_set_appearance(item_type *itype, const char *appearance) {
-    assert(itype && itype->rtype);
-    itype->_appearance[0] = _strdup(appearance);
-    itype->_appearance[1] = appearance ?
-        strcat(strcpy((char *)malloc(strlen((char *)appearance) + 3), (char *)appearance), "_p") : 0;
+    assert(itype);
+    assert(itype->rtype);
+    if (appearance) {
+        itype->_appearance[0] = _strdup(appearance);
+        itype->_appearance[1] = strcat(strcpy((char *)malloc(strlen((char *)appearance) + 3), (char *)appearance), "_p");
+    } else {
+        itype->_appearance[0] = 0;
+        itype->_appearance[1] = 0;
+    }
 }
 
 const resource_type *item2resource(const item_type * itype)
@@ -379,11 +390,11 @@ const potion_type *resource2potion(const resource_type * rtype)
 
 resource_type *rt_find(const char *name)
 {
-    const void * matches;
+    void * match;
     resource_type *result = 0;
 
-    if (cb_find_prefix(&cb_resources, name, strlen(name) + 1, &matches, 1, 0)) {
-        cb_get_kv(matches, &result, sizeof(result));
+    if (cb_find_prefix(&cb_resources, name, strlen(name) + 1, &match, 1, 0)) {
+        cb_get_kv(match, &result, sizeof(result));
     }
     return result;
 }
@@ -820,7 +831,7 @@ int amount, struct order *ord)
             ""));
         return ECUSTOM;
     }
-    if (effskill(u, SK_STEALTH) <= effskill(target, SK_PERCEPTION)) {
+    if (effskill(u, SK_STEALTH, 0) <= effskill(target, SK_PERCEPTION, 0)) {
         cmistake(u, ord, 64, MSG_EVENT);
         return ECUSTOM;
     }
@@ -1064,7 +1075,7 @@ const resource_type *findresourcetype(const char *name, const struct locale *lan
     char buffer[128];
 
     if (transliterate(buffer, sizeof(buffer), name)) {
-        const void * match;
+        void * match;
         if (!cb->root) {
             /* first-time initialization  of resource names for this locale */
             cb_foreach(&cb_resources, "", 0, add_resourcename_cb, (void *)lang);
@@ -1117,7 +1128,7 @@ const item_type *finditemtype(const char *name, const struct locale *lang)
 
     assert(name);
     if (transliterate(buffer, sizeof(buffer), name)) {
-        const void * match;
+        void * match;
         if (!cb->root) {
             /* first-time initialization  of item names for this locale */
             cb_foreach(&cb_resources, "", 0, add_itemname_cb, (void *)lang);

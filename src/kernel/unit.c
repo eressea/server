@@ -43,6 +43,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/racename.h>
 #include <attributes/stealth.h>
 
+#include "guard.h"
+
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
@@ -97,25 +99,21 @@ attrib_type at_creator = {
     /* Rest ist NULL; temporaeres, nicht alterndes Attribut */
 };
 
-unit *findunitr(const region * r, int n)
-{
-    unit *u;
-
-    /* findunit regional! */
-
-    for (u = r->units; u; u = u->next)
-        if (u->no == n)
-            return u;
-
-    return 0;
-}
-
 unit *findunit(int n)
 {
     if (n <= 0) {
         return NULL;
     }
     return ufindhash(n);
+}
+
+unit *findunitr(const region * r, int n)
+{
+    unit *u;
+    /* findunit regional! */
+    assert(n>0);
+    u = ufindhash(n);
+    return (u && u->region==r)?u:0;
 }
 
 unit *findunitg(int n, const region * hint)
@@ -862,7 +860,7 @@ bool can_leave(unit * u)
         rule_leave = get_param_int(global.parameters, "rules.move.owner_leave", 0);
     }
 
-    if (rule_leave && u->building && u == building_owner(u->building)) {
+    if (rule_leave!=0 && u->building && u == building_owner(u->building)) {
         return false;
     }
     return true;
@@ -1254,45 +1252,28 @@ static int item_invis(const unit *u) {
         + (rsphere ? i_get(u->items, rsphere->itype) * 100 : 0);
 }
 
+#ifdef NEWATSROI
 static int item_modification(const unit * u, skill_t sk, int val)
 {
     if (sk == SK_STEALTH) {
-#if NEWATSROI == 1
         if (item_invis(u) >= u->number) {
             val += ROIBONUS;
         }
-#endif
     }
-#if NEWATSROI == 1
     if (sk == SK_PERCEPTION) {
         const struct resource_type *rtype = get_resourcetype(R_AMULET_OF_TRUE_SEEING);
         if (i_get(u->items, rtype->itype) >= u->number) {
             val += ATSBONUS;
         }
     }
-#endif
     return val;
 }
+#endif
 
-static int update_gbdream(const unit * u, int bonus, curse *c, const curse_type *gbdream_ct, int sign){
-    if (curse_active(c) && c->type == gbdream_ct) {
-        double effect = curse_geteffect(c);
-        unit *mage = c->magician;
-        /* wir suchen jeweils den groessten Bonus und den groestsen Malus */
-        if (sign * effect > sign * bonus) {
-            if (mage == NULL || mage->number == 0
-                || sign>0?alliedunit(mage, u->faction, HELP_GUARD):!alliedunit(mage, u->faction, HELP_GUARD)) {
-                bonus = (int)effect;
-            }
-        }
-    }
-    return bonus;
-}
-
-int att_modification(const unit * u, skill_t sk)
+static int att_modification(const unit * u, skill_t sk)
 {
     double result = 0;
-    static bool init = false;
+    static bool init = false; // TODO: static variables are bad global state
     static const curse_type *skillmod_ct, *gbdream_ct, *worse_ct;
     curse *c;
 
@@ -1321,15 +1302,21 @@ int att_modification(const unit * u, skill_t sk)
     /* TODO hier kann nicht mit get/iscursed gearbeitet werden, da nur der
      * jeweils erste vom Typ C_GBDREAM zurueckgegen wird, wir aber alle
      * durchsuchen und aufaddieren muessen */
-    if (u->region) {
+    if (gbdream_ct && u->region) {
         int bonus = 0, malus = 0;
         attrib *a = a_find(u->region->attribs, &at_curse);
         while (a && a->type == &at_curse) {
             curse *c = (curse *)a->data.v;
 
-            bonus = update_gbdream(u, bonus, c, gbdream_ct, 1);
-            malus = update_gbdream(u, malus, c, gbdream_ct, -1);
-
+            if (curse_active(c) && c->type == gbdream_ct) {
+                int effect = curse_geteffect_int(c);
+                bool allied = alliedunit(c->magician, u->faction, HELP_GUARD);
+                if (allied) {
+                    if (effect > bonus) bonus = effect;
+                } else {
+                    if (effect < malus) malus = effect;
+                }
+            }
             a = a->next;
         }
         result = result + bonus + malus;
@@ -1354,9 +1341,11 @@ int get_modifier(const unit * u, skill_t sk, int level, const region * r, bool n
     skill += rc_skillmod(u_race(u), r, sk);
     skill += att_modification(u, sk);
 
+#ifdef NEWATSROI
     if (!noitem) {
         skill = item_modification(u, sk, skill);
     }
+#endif
     skill = skillmod(u->attribs, u, r, sk, skill, SMF_ALWAYS);
 
     if (hunger_red_skill == -1) {
@@ -1374,31 +1363,31 @@ int get_modifier(const unit * u, skill_t sk, int level, const region * r, bool n
     return skill - bskill;
 }
 
-int eff_skill(const unit * u, skill_t sk, const region * r)
+int eff_skill(const unit * u, const skill *sv, const region *r)
 {
-    if (skill_enabled(sk)) {
-        int level = get_level(u, sk);
-        if (level > 0) {
-            int mlevel = level + get_modifier(u, sk, level, r, false);
+    assert(u);
+    if (!r) r = u->region;
+    if (sv && sv->level>0) {
+        int mlevel = sv->level + get_modifier(u, sv->id, sv->level, r, false);
 
-            if (mlevel > 0) {
-                int skillcap = SkillCap(sk);
-                if (skillcap && mlevel > skillcap) {
-                    return skillcap;
-                }
-                return mlevel;
+        if (mlevel > 0) {
+            int skillcap = SkillCap(sv->id);
+            if (skillcap && mlevel > skillcap) {
+                return skillcap;
             }
+            return mlevel;
         }
     }
     return 0;
 }
 
-int eff_skill_study(const unit * u, skill_t sk, const region * r)
+int effskill_study(const unit * u, skill_t sk, const region * r)
 {
-    int level = get_level(u, sk);
-    if (level > 0) {
-        int mlevel = level + get_modifier(u, sk, level, r, true);
-
+    skill *sv = unit_skill(u, sk);
+    if (sv && sv->level > 0) {
+        int mlevel = sv->level;
+        if (!r) r = u->region;
+        mlevel += get_modifier(u, sv->id, sv->level, r, true);
         if (mlevel > 0)
             return mlevel;
     }
@@ -1407,7 +1396,7 @@ int eff_skill_study(const unit * u, skill_t sk, const region * r)
 
 int invisible(const unit * target, const unit * viewer)
 {
-#if NEWATSROI == 1
+#ifdef NEWATSROI
     return 0;
 #else
     if (viewer && viewer->faction == target->faction)
@@ -1717,6 +1706,16 @@ int unit_getcapacity(const unit * u)
     return walkingcapacity(u);
 }
 
+void renumber_unit(unit *u, int no) {
+    uunhash(u);
+    if (!ualias(u)) {
+        attrib *a = a_add(&u->attribs, a_new(&at_alias));
+        a->data.i = -u->no;
+    }
+    u->no = no;
+    uhash(u);
+}
+
 void unit_addorder(unit * u, order * ord)
 {
     order **ordp = &u->orders;
@@ -1740,7 +1739,7 @@ int unit_max_hp(const unit * u)
     h = u_race(u)->hitpoints;
 
     if (rules_stamina & 1) {
-        p = pow(effskill(u, SK_STAMINA) / 2.0, 1.5) * 0.2;
+        p = pow(effskill(u, SK_STAMINA, u->region) / 2.0, 1.5) * 0.2;
         h += (int)(h * p + 0.5);
     }
 
@@ -1806,7 +1805,7 @@ void scale_number(unit * u, int n)
 
 const struct race *u_irace(const struct unit *u)
 {
-    if (u->irace && skill_enabled(SK_STEALTH)) {
+    if (u->irace) {
         return u->irace;
     }
     return u->_race;
@@ -1851,9 +1850,20 @@ struct spellbook * unit_get_spellbook(const struct unit * u)
     return 0;
 }
 
-int effskill(const unit * u, skill_t sk)
+int effskill(const unit * u, skill_t sk, const region *r)
 {
-    return eff_skill(u, sk, u->region);
+    assert(u);
+
+    if (skill_enabled(sk)) {
+        skill *sv = u->skills;
+        while (sv != u->skills + u->skill_size) {
+            if (sv->id == sk) {
+                return eff_skill(u, sv, r);
+            }
+            ++sv;
+        }
+    }
+    return 0;
 }
 
 void remove_empty_units_in_region(region * r)
@@ -1925,3 +1935,28 @@ bool unit_name_equals_race(const unit *u) {
 bool unit_can_study(const unit *u) {
     return !((u_race(u)->flags & RCF_NOLEARN) || fval(u, UFL_WERE));
 }
+
+static double produceexp_chance(void) {
+    static int update = 0;
+    if (update != global.cookie) {
+        global.producexpchance_ = get_param_flt(global.parameters, "study.from_use", 1.0 / 3);
+        update = global.cookie;
+    }
+    return global.producexpchance_;
+}
+
+void produceexp_ex(struct unit *u, skill_t sk, int n, bool (*learn)(unit *, skill_t, double))
+{
+    if (n != 0 && playerrace(u_race(u))) {
+        double chance = produceexp_chance();
+        if (chance > 0.0F) {
+            learn(u, sk, (n * chance) / u->number);
+        }
+    }
+}
+
+void produceexp(struct unit *u, skill_t sk, int n)
+{
+    produceexp_ex(u, sk, n, learn_skill);
+}
+

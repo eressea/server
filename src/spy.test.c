@@ -5,9 +5,12 @@
 #include <kernel/region.h>
 #include <kernel/unit.h>
 #include <kernel/faction.h>
+#include <kernel/ship.h>
+#include <kernel/order.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
 #include <util/attrib.h>
+#include <util/language.h>
 #include <util/message.h>
 #include <util/crmessage.h>
 #include <tests.h>
@@ -16,24 +19,15 @@
 
 #include "spy.h"
 
+#include <assert.h>
 #include <stdio.h>
 
 #include <CuTest.h>
-
-typedef enum {
-    M_BASE,
-    M_MAGE,
-    M_SKILLS,
-    M_FACTION,
-    M_ITEMS,
-    NUM_TYPES
-} m_type;
 
 typedef struct {
     region *r;
     unit *spy;
     unit *victim;
-    const message_type *msg_types[NUM_TYPES];
 } spy_fixture;
 
 static void setup_spy(spy_fixture *fix) {
@@ -41,12 +35,6 @@ static void setup_spy(spy_fixture *fix) {
     fix->r = test_create_region(0, 0, NULL);
     fix->spy = test_create_unit(test_create_faction(NULL), fix->r);
     fix->victim = test_create_unit(test_create_faction(NULL), fix->r);
-    fix->msg_types[M_BASE] = register_msg("spyreport", 3, "spy:unit", "target:unit", "status:string");
-    fix->msg_types[M_MAGE] = register_msg("spyreport_mage", 3, "spy:unit", "target:unit", "type:string");
-    fix->msg_types[M_SKILLS] = register_msg("spyreport_skills", 3, "spy:unit", "target:unit", "skills:string");
-    fix->msg_types[M_FACTION] = register_msg("spyreport_faction", 3, "spy:unit", "target:unit", "faction:faction");
-    fix->msg_types[M_ITEMS] = register_msg("spyreport_items", 3, "spy:unit", "target:unit", "items:items");
-
 }
 
 static void test_simple_spy_message(CuTest *tc) {
@@ -56,8 +44,7 @@ static void test_simple_spy_message(CuTest *tc) {
 
     spy_message(0, fix.spy, fix.victim);
 
-    assert_messages(tc, fix.spy->faction->msgs->begin, fix.msg_types, 1, true, M_BASE);
-
+    CuAssertPtrNotNull(tc, test_find_messagetype(fix.spy->faction->msgs, "spyreport"));
 
     test_cleanup();
 }
@@ -65,9 +52,9 @@ static void test_simple_spy_message(CuTest *tc) {
 static void set_factionstealth(unit *u, faction *f) {
     attrib *a = a_find(u->attribs, &at_otherfaction);
     if (!a)
-	a = a_add(&u->attribs, make_otherfaction(f));
+        a = a_add(&u->attribs, make_otherfaction(f));
     else
-	a->data.v = f;
+        a->data.v = f;
 }
 
 static void test_all_spy_message(CuTest *tc) {
@@ -88,22 +75,105 @@ static void test_all_spy_message(CuTest *tc) {
 
     spy_message(99, fix.spy, fix.victim);
 
-    assert_messages(tc, fix.spy->faction->msgs->begin, fix.msg_types, 5, true,
-		    M_BASE,
-		    M_MAGE,
-		    M_FACTION,
-		    M_SKILLS,
-		    M_ITEMS);
+    CuAssertPtrNotNull(tc, test_find_messagetype(fix.spy->faction->msgs, "spyreport"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(fix.spy->faction->msgs, "spyreport_mage"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(fix.spy->faction->msgs, "spyreport_skills"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(fix.spy->faction->msgs, "spyreport_faction"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(fix.spy->faction->msgs, "spyreport_items"));
 
     test_cleanup();
 }
 
+static void setup_sabotage(void) {
+    struct locale *lang;
 
+    test_cleanup();
+    lang = get_or_create_locale("de");
+    locale_setstring(lang, parameters[P_SHIP], "SCHIFF");
+    test_create_world();
+    init_locales();
+}
+
+static void test_sabotage_self(CuTest *tc) {
+    unit *u;
+    region *r;
+    order *ord;
+
+    setup_sabotage();
+    r = test_create_region(0, 0, NULL);
+    assert(r);
+    u = test_create_unit(test_create_faction(NULL), r);
+    assert(u && u->faction && u->region == r);
+    u->ship = test_create_ship(r, test_create_shiptype("boat"));
+    assert(u->ship);
+    ord = create_order(K_SABOTAGE, u->faction->locale, "SCHIFF");
+    assert(ord);
+    CuAssertIntEquals(tc, 0, sabotage_cmd(u, ord));
+    CuAssertPtrEquals(tc, 0, r->ships);
+    test_cleanup();
+}
+
+
+static void test_sabotage_other_fail(CuTest *tc) {
+    unit *u, *u2;
+    region *r;
+    order *ord;
+    message *msg;
+
+    setup_sabotage();
+    r = test_create_region(0, 0, NULL);
+    assert(r);
+    u = test_create_unit(test_create_faction(NULL), r);
+    u2 = test_create_unit(test_create_faction(NULL), r);
+    assert(u && u2);
+    u2->ship = test_create_ship(r, test_create_shiptype("boat"));
+    assert(u2->ship);
+    u->ship = u2->ship;
+    ship_update_owner(u->ship);
+    assert(ship_owner(u->ship) == u);
+    ord = create_order(K_SABOTAGE, u->faction->locale, "SCHIFF");
+    assert(ord);
+    CuAssertIntEquals(tc, 0, sabotage_cmd(u2, ord));
+    msg = test_get_last_message(u2->faction->msgs);
+    CuAssertStrEquals(tc, "destroy_ship_1", test_get_messagetype(msg));
+    msg = test_get_last_message(u->faction->msgs);
+    CuAssertStrEquals(tc, "destroy_ship_3", test_get_messagetype(msg));
+    CuAssertPtrNotNull(tc, r->ships);
+    test_cleanup();
+}
+
+
+static void test_sabotage_other_success(CuTest *tc) {
+    unit *u, *u2;
+    region *r;
+    order *ord;
+
+    setup_sabotage();
+    r = test_create_region(0, 0, NULL);
+    assert(r);
+    u = test_create_unit(test_create_faction(NULL), r);
+    u2 = test_create_unit(test_create_faction(NULL), r);
+    assert(u && u2);
+    u2->ship = test_create_ship(r, test_create_shiptype("boat"));
+    assert(u2->ship);
+    u->ship = u2->ship;
+    ship_update_owner(u->ship);
+    assert(ship_owner(u->ship) == u);
+    ord = create_order(K_SABOTAGE, u->faction->locale, "SCHIFF");
+    assert(ord);
+    set_level(u2, SK_SPY, 1);
+    CuAssertIntEquals(tc, 0, sabotage_cmd(u2, ord));
+    CuAssertPtrEquals(tc, 0, r->ships);
+    test_cleanup();
+}
 
 CuSuite *get_spy_suite(void)
 {
-  CuSuite *suite = CuSuiteNew();
-  SUITE_ADD_TEST(suite, test_simple_spy_message);
-  SUITE_ADD_TEST(suite, test_all_spy_message);
-  return suite;
+    CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_simple_spy_message);
+    SUITE_ADD_TEST(suite, test_all_spy_message);
+    SUITE_ADD_TEST(suite, test_sabotage_self);
+    SUITE_ADD_TEST(suite, test_sabotage_other_fail);
+    SUITE_ADD_TEST(suite, test_sabotage_other_success);
+    return suite;
 }

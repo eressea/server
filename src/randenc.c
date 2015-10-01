@@ -291,9 +291,9 @@ static void get_allies(region * r, unit * u)
             break;
         }
         else {
-            if (eff_skill(u, SK_LONGBOW, r) < 3
-                && eff_skill(u, SK_HERBALISM, r) < 2
-                && eff_skill(u, SK_MAGIC, r) < 2) {
+            if (effskill(u, SK_LONGBOW, r) < 3
+                && effskill(u, SK_HERBALISM, r) < 2
+                && effskill(u, SK_MAGIC, r) < 2) {
                 return;
             }
             name = "random_forest_men";
@@ -303,7 +303,7 @@ static void get_allies(region * r, unit * u)
         break;
 
     case T_SWAMP:
-        if (eff_skill(u, SK_MELEE, r) <= 1) {
+        if (effskill(u, SK_MELEE, r) <= 1) {
             return;
         }
         name = "random_swamp_men";
@@ -312,7 +312,7 @@ static void get_allies(region * r, unit * u)
         break;
 
     case T_DESERT:
-        if (eff_skill(u, SK_RIDING, r) <= 2) {
+        if (effskill(u, SK_RIDING, r) <= 2) {
             return;
         }
         name = "random_desert_men";
@@ -321,7 +321,7 @@ static void get_allies(region * r, unit * u)
         break;
 
     case T_HIGHLAND:
-        if (eff_skill(u, SK_MELEE, r) <= 1) {
+        if (effskill(u, SK_MELEE, r) <= 1) {
             return;
         }
         name = "random_highland_men";
@@ -330,7 +330,7 @@ static void get_allies(region * r, unit * u)
         break;
 
     case T_MOUNTAIN:
-        if (eff_skill(u, SK_MELEE, r) <= 1 || eff_skill(u, SK_TRADE, r) <= 2) {
+        if (effskill(u, SK_MELEE, r) <= 1 || effskill(u, SK_TRADE, r) <= 2) {
             return;
         }
         name = "random_mountain_men";
@@ -339,7 +339,7 @@ static void get_allies(region * r, unit * u)
         break;
 
     case T_GLACIER:
-        if (eff_skill(u, SK_MELEE, r) <= 1 || eff_skill(u, SK_TRADE, r) <= 1) {
+        if (effskill(u, SK_MELEE, r) <= 1 || effskill(u, SK_TRADE, r) <= 1) {
             return;
         }
         name = "random_glacier_men";
@@ -746,7 +746,7 @@ static void move_iceberg(region * r)
 
             for (sh = r->ships; sh; sh = sh->next) {
                 /* Meldung an Kapitän */
-                float dmg =
+                double dmg =
                     get_param_flt(global.parameters, "rules.ship.damage.intoiceberg",
                     0.10F);
                 damage_ship(sh, dmg);
@@ -759,7 +759,7 @@ static void move_iceberg(region * r)
                 translist(&rc->buildings, &r->buildings, rc->buildings);
             }
             while (rc->ships) {
-                float dmg =
+                double dmg =
                     get_param_flt(global.parameters, "rules.ship.damage.withiceberg",
                     0.10F);
                 fset(rc->ships, SF_SELECT);
@@ -893,7 +893,7 @@ static void godcurse(void)
                 ship *sh;
                 for (sh = r->ships; sh;) {
                     ship *shn = sh->next;
-                    float dmg =
+                    double dmg =
                         get_param_flt(global.parameters, "rules.ship.damage.godcurse",
                         0.10F);
                     damage_ship(sh, dmg);
@@ -1126,6 +1126,7 @@ void randomevents(void)
                 }
                 else if (r->age > 20 && rng_int() % 100 < 8) {
                     volcano_outbreak(r);
+                    rsetterrain(r, T_VOLCANO);
                 }
             }
         }

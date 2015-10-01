@@ -158,6 +158,7 @@ static race *rc_find_i(const char *name)
     }
     if (!rc && strcmp(name, "uruk") == 0) {
         rc = rc_find_i("orc");
+        log_warning("a reference was made to the retired race '%s', returning '%s'.", name, rc->_name);
     }
     return rc;
 }
@@ -174,8 +175,6 @@ race *rc_get_or_create(const char *zName)
     assert(zName);
     rc = rc_find_i(zName);
     if (!rc) {
-        char zBuffer[80];
-
         rc = (race *)calloc(sizeof(race), 1);
         rc->hitpoints = 1;
         rc->weight = PERSON_WEIGHT;
@@ -183,12 +182,12 @@ race *rc_get_or_create(const char *zName)
         rc->recruit_multi = 1.0F;
         rc->regaura = 1.0F;
         rc->speed = 1.0F;
+        rc->battle_flags = BF_CANATTACK;
         if (strchr(zName, ' ') != NULL) {
             log_error("race '%s' has an invalid name. remove spaces\n", zName);
             assert(strchr(zName, ' ') == NULL);
         }
-        strcpy(zBuffer, zName);
-        rc->_name = _strdup(zBuffer);
+        rc->_name = _strdup(zName);
         rc->precombatspell = NULL;
 
         rc->attack[0].type = AT_COMBATSPELL;
@@ -208,22 +207,6 @@ bool allowed_dragon(const region * src, const region * target)
     if (fval(src->terrain, ARCTIC_REGION) && fval(target->terrain, SEA_REGION))
         return false;
     return allowed_fly(src, target);
-}
-
-char **race_prefixes = NULL;
-
-extern void add_raceprefix(const char *prefix)
-{
-    static size_t size = 4;
-    static unsigned int next = 0;
-    if (race_prefixes == NULL)
-        race_prefixes = malloc(size * sizeof(char *));
-    if (next + 1 == size) {
-        size *= 2;
-        race_prefixes = realloc(race_prefixes, size * sizeof(char *));
-    }
-    race_prefixes[next++] = _strdup(prefix);
-    race_prefixes[next] = NULL;
 }
 
 bool r_insectstalled(const region * r)

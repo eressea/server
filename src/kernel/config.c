@@ -51,6 +51,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "types.h"
 #include "unit.h"
 
+
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
 
@@ -72,6 +73,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/unicode.h>
 #include <util/umlaut.h>
 #include <util/xml.h>
+
+#include "donations.h"
+#include "guard.h"
+#include "prefix.h"
 
 #ifdef USE_LIBXML2
 /* libxml includes */
@@ -438,8 +443,6 @@ static attrib_type at_npcfaction = {
     ATF_UNIQUE
 };
 
-int verbosity = 1;
-
 FILE *debug;
 
 /* ----------------------------------------------------------------------- */
@@ -530,6 +533,8 @@ int alliedunit(const unit * u, const faction * f2, int mode)
     ally *sf;
     int automode;
 
+    assert(u);
+    assert(f2);
     assert(u->region);            /* the unit should be in a region, but it's possible that u->number==0 (TEMP units) */
     if (u->faction == f2)
         return mode;
@@ -607,7 +612,7 @@ int count_maxmigrants(const faction * f)
     static int migrants = -1;
 
     if (migrants < 0) {
-        migrants = get_param_int(global.parameters, "rules.migrants", INT_MAX);
+        migrants = get_param_int(global.parameters, "rules.migrants.max", INT_MAX);
     }
     if (migrants == INT_MAX) {
         int x = 0;
@@ -686,7 +691,7 @@ param_t findparam(const char *s, const struct locale * lang)
 
     if (str && *str) {
         int i;
-        const void * match;
+        void * match;
         void **tokens = get_translations(lang, UT_PARAMS);
         critbit_tree *cb = (critbit_tree *)*tokens;
         if (!cb) {
@@ -766,7 +771,7 @@ int read_unitid(const faction * f, const region * r)
      * paramliste. machen wir das nicht, dann wird getnewunit in s nach der
      * nummer suchen, doch dort steht bei temp-units nur "temp" drinnen! */
 
-    if (!s || *s == 0) {
+    if (!s || *s == 0 || !isalnum(*s)) {
         return -1;
     }
     if (isparam(s, f->locale, P_TEMP)) {
@@ -840,6 +845,7 @@ building *largestbuilding(const region * r, cmp_building_cb cmp_gt,
 extern faction *dfindhash(int i);
 
 static const char *forbidden[] = { "t", "te", "tem", "temp", NULL };
+// PEASANT: "b", "ba", "bau", "baue", "p", "pe", "pea", "peas"
 
 int forbiddenid(int id)
 {
@@ -904,11 +910,6 @@ int newcontainerid(void)
     return random_no;
 }
 
-bool idle(faction * f)
-{
-    return (bool)(f ? false : true);
-}
-
 int maxworkingpeasants(const struct region *r)
 {
     int size = production(r);
@@ -920,6 +921,10 @@ static const char * parameter_key(int i)
 {
     assert(i < MAXPARAMS && i >= 0);
     return parameters[i];
+}
+
+void init_parameters(struct locale *lang) {
+    init_translations(lang, UT_PARAMS, parameter_key, MAXPARAMS);
 }
 
 
@@ -991,7 +996,7 @@ void init_locale(struct locale *lang)
                 addtoken(tokens, name, var);
             }
             else {
-                log_error("no translation for magic school %s in locale %s", tok, locale_name(lang));
+                log_warning("no translation for magic school %s in locale %s", tok, locale_name(lang));
             }
             tok = strtok(NULL, " ");
         }
@@ -1012,7 +1017,7 @@ void init_locale(struct locale *lang)
         if (name) addtoken(tokens, name, var);
     }
 
-    init_translations(lang, UT_PARAMS, parameter_key, MAXPARAMS);
+    init_parameters(lang);
 
     init_options_translation(lang);
     init_terrains_translation(lang);
@@ -1023,6 +1028,16 @@ typedef struct param {
     char *name;
     char *data;
 } param;
+
+void free_params(struct param **pp) {
+    while (*pp) {
+        param *p = *pp;
+        free(p->name);
+        free(p->data);
+        *pp = p->next;
+        free(p);
+    }
+}
 
 const char *get_param(const struct param *p, const char *key)
 {
@@ -1108,10 +1123,10 @@ void set_basepath(const char *path)
     g_basedir = path;
 }
 
-float get_param_flt(const struct param *p, const char *key, float def)
+double get_param_flt(const struct param *p, const char *key, double def)
 {
     const char *str = get_param(p, key);
-    return str ? (float)atof(str) : def;
+    return str ? atof(str) : def;
 }
 
 void set_param(struct param **p, const char *key, const char *data)
@@ -1164,63 +1179,12 @@ attrib_type at_germs = {
     ATF_UNIQUE
 };
 
-attrib_type at_guard = {
-    "guard",
-    DEFAULT_INIT,
-    DEFAULT_FINALIZE,
-    DEFAULT_AGE,
-    a_writeint,
-    a_readint,
-    ATF_UNIQUE
-};
-
 void setstatus(struct unit *u, int status)
 {
     assert(status >= ST_AGGRO && status <= ST_FLEE);
     if (u->status != status) {
         u->status = (status_t)status;
     }
-}
-
-void setguard(unit * u, unsigned int flags)
-{
-    /* setzt die guard-flags der Einheit */
-    attrib *a = NULL;
-    assert(flags == 0 || !fval(u, UFL_MOVED));
-    assert(flags == 0 || u->status < ST_FLEE);
-    if (fval(u, UFL_GUARD)) {
-        a = a_find(u->attribs, &at_guard);
-    }
-    if (flags == GUARD_NONE) {
-        freset(u, UFL_GUARD);
-        if (a)
-            a_remove(&u->attribs, a);
-        return;
-    }
-    fset(u, UFL_GUARD);
-    fset(u->region, RF_GUARDED);
-    if (flags == guard_flags(u)) {
-        if (a)
-            a_remove(&u->attribs, a);
-    }
-    else {
-        if (!a)
-            a = a_add(&u->attribs, a_new(&at_guard));
-        a->data.i = (int)flags;
-    }
-}
-
-unsigned int getguard(const unit * u)
-{
-    attrib *a;
-
-    assert(fval(u, UFL_GUARD) || (u->building && u == building_owner(u->building))
-        || !"you're doing it wrong! check is_guard first");
-    a = a_find(u->attribs, &at_guard);
-    if (a) {
-        return (unsigned int)a->data.i;
-    }
-    return guard_flags(u);
 }
 
 #ifndef HAVE_STRDUP
@@ -1233,40 +1197,6 @@ char *_strdup(const char *s)
 bool faction_id_is_unused(int id)
 {
     return findfaction(id) == NULL;
-}
-
-unsigned int guard_flags(const unit * u)
-{
-    unsigned int flags =
-        GUARD_CREWS | GUARD_LANDING | GUARD_TRAVELTHRU | GUARD_TAX;
-#if GUARD_DISABLES_PRODUCTION == 1
-    flags |= GUARD_PRODUCE;
-#endif
-#if GUARD_DISABLES_RECRUIT == 1
-    flags |= GUARD_RECRUIT;
-#endif
-    switch (old_race(u_race(u))) {
-    case RC_ELF:
-        if (u->faction->race != u_race(u))
-            break;
-        /* else fallthrough */
-    case RC_TREEMAN:
-        flags |= GUARD_TREES;
-        break;
-    case RC_IRONKEEPER:
-        flags = GUARD_MINING;
-        break;
-    default:
-        /* TODO: This should be configuration variables, all of it */
-        break;
-    }
-    return flags;
-}
-
-void guard(unit * u, unsigned int mask)
-{
-    unsigned int flags = guard_flags(u);
-    setguard(u, flags & mask);
 }
 
 int besieged(const unit * u)
@@ -1390,19 +1320,19 @@ int cmp_current_owner(const building * b, const building * a)
     return -1;
 }
 
-int rule_stealth_faction(void)
+bool rule_stealth_faction(void)
 {
     static int gamecookie = -1;
     static int rule = -1;
     if (rule < 0 || gamecookie != global.cookie) {
-        rule = get_param_int(global.parameters, "rules.stealth.faction", 0xFF);
+        rule = get_param_int(global.parameters, "rules.stealth.faction", 1);
         gamecookie = global.cookie;
         assert(rule >= 0);
     }
-    return rule;
+    return rule!=0;
 }
 
-int rule_region_owners(void)
+bool rule_region_owners(void)
 {
     static int gamecookie = -1;
     static int rule = -1;
@@ -1411,7 +1341,7 @@ int rule_region_owners(void)
         gamecookie = global.cookie;
         assert(rule >= 0);
     }
-    return rule;
+    return rule!=0;
 }
 
 int rule_auto_taxation(void)
@@ -1433,7 +1363,7 @@ int rule_blessed_harvest(void)
     static int rule = -1;
     if (rule < 0 || gamecookie != global.cookie) {
         rule =
-            get_param_int(global.parameters, "rules.magic.blessed_harvest",
+            get_param_int(global.parameters, "rules.blessed_harvest.flags",
             HARVEST_WORK);
         gamecookie = global.cookie;
         assert(rule >= 0);
@@ -1465,7 +1395,7 @@ int rule_faction_limit(void)
     return rule;
 }
 
-int rule_transfermen(void)
+bool rule_transfermen(void)
 {
     static int gamecookie = -1;
     static int rule = -1;
@@ -1474,7 +1404,7 @@ int rule_transfermen(void)
         gamecookie = global.cookie;
         assert(rule >= 0);
     }
-    return rule;
+    return rule!=0;
 }
 
 static int
@@ -1584,16 +1514,6 @@ int maintenance_cost(const struct unit *u)
     return u_race(u)->maintenance * u->number;
 }
 
-int produceexp(struct unit *u, skill_t sk, int n)
-{
-    if (global.producexpchance > 0.0F) {
-        if (n == 0 || !playerrace(u_race(u)))
-            return 0;
-        learn_skill(u, sk, global.producexpchance);
-    }
-    return 0;
-}
-
 int lovar(double xpct_x2)
 {
     int n = (int)(xpct_x2 * 500) + 1;
@@ -1675,6 +1595,7 @@ void attrib_init(void)
 void kernel_init(void)
 {
     register_reports();
+    mt_clear();
     if (!mt_find("missing_message")) {
         mt_register(mt_new_va("missing_message", "name:string", 0));
         mt_register(mt_new_va("missing_feedback", "unit:unit", "region:region", "command:order", "name:string", 0));
@@ -1684,6 +1605,11 @@ void kernel_init(void)
 }
 
 static order * defaults[MAXLOCALES];
+keyword_t default_keyword = NOKEYWORD;
+
+void set_default_order(int kwd) {
+    default_keyword = (keyword_t)kwd;
+}
 
 order *default_order(const struct locale *lang)
 {
@@ -1691,6 +1617,11 @@ order *default_order(const struct locale *lang)
     int i = locale_index(lang);
     order *result = 0;
     assert(i < MAXLOCALES);
+
+    if (default_keyword!=NOKEYWORD) {
+        return create_order(default_keyword, lang, 0);
+    }
+
     result = defaults[i];
     if (!result && usedefault) {
         const char * str = LOC(lang, "defaultorder");
@@ -1738,6 +1669,7 @@ int markets_module(void)
 void free_gamedata(void)
 {
     int i;
+    free_donations();
     free_units();
     free_regions();
     free_borders();

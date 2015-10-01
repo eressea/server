@@ -54,7 +54,6 @@ extern "C" {
 
     enum { IC_WORK, IC_ENTERTAIN, IC_TAX, IC_TRADE, IC_TRADETAX, IC_STEAL, IC_MAGIC, IC_LOOT };
     void maintain_buildings(struct region *r, bool crash);
-    void add_spende(struct faction *f1, struct faction *f2, int betrag, struct region *r);
     int make_cmd(struct unit *u, struct order *ord);
     void split_allocations(struct region *r);
     int recruit_archetypes(void);

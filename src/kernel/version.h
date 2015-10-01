@@ -30,7 +30,8 @@
 #define AUTO_RACENAME_VERSION 345 /* NPC units with name==NULL will automatically get their race for a name */
 #define JSON_REPORT_VERSION 346 /* bit 3 in f->options flags the json report */
 #define EXPLICIT_CURSE_ISNEW_VERSION 347 /* CURSE_ISNEW is not reset in read/write, but in age() */
-#define CASTLE_DAMAGE_VERSION 348 /* New value for building damage */
+#define SPELL_LEVEL_VERSION 348 /* f->max_spelllevel gets stored, not calculated */
+#define CASTLE_DAMAGE_VERSION 349 /* New value for building damage */
 
 #define MIN_VERSION INTPAK_VERSION      /* minimal datafile we support */
 #define RELEASE_VERSION CASTLE_DAMAGE_VERSION /* current datafile */

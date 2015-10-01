@@ -2,7 +2,7 @@
 ROOT=$(pwd)
 while [ ! -d $ROOT/.git ]; do
   ROOT=$(dirname $ROOT)
-  if [ "$ROOT" == "/" ; then
+  if [ "/" = "$ROOT" ]; then
     echo "could not find root, are you in the git repository?"
     exit
   fi
@@ -21,8 +21,12 @@ make install
 
 [ -d $DEST/bin ] || mkdir -p $DEST/bin
 install -v $ROOT/process/cron/*.cron $DEST/bin/
-programs="create-orders backup-eressea run-turn"
+programs="create-orders backup-eressea run-turn send-zip-report send-bz2-report compress.py compress.sh"
 for prg in ${programs} ; do
 install -v $ROOT/process/$prg $DEST/bin/
 done
-crontab $ROOT/process/cron/crontab
+
+# install crontab, but only on the eressea server:
+# in fact, never do this, because it overwrites hand-edits
+#WHOAMI=`whoami`@`hostname`
+#[ "eressea@gruenbaer" = "$WHOAMI" ] && crontab $ROOT/process/cron/crontab

@@ -81,7 +81,7 @@ int lighthouse_range(const building * b, const faction * f)
                     if (c > buildingcapacity(b))
                         break;
                     if (f == NULL || u->faction == f) {
-                        int sk = eff_skill(u, SK_PERCEPTION, r) / 3;
+                        int sk = effskill(u, SK_PERCEPTION, 0) / 3;
                         d = _max(d, sk);
                         d = _min(maxd, d);
                         if (d == maxd)
@@ -131,7 +131,7 @@ bool check_leuchtturm(region * r, faction * f)
                                 d = distance(r, r2);
                             if (maxd < d)
                                 break;
-                            if (eff_skill(u, SK_PERCEPTION, r) >= d * 3)
+                            if (effskill(u, SK_PERCEPTION, 0) >= d * 3)
                                 return true;
                         }
                     }

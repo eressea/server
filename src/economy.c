@@ -23,6 +23,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "alchemy.h"
 #include "direction.h"
+#include "donations.h"
 #include "give.h"
 #include "laws.h"
 #include "randenc.h"
@@ -31,10 +32,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "monster.h"
 #include "morale.h"
 #include "reports.h"
+#include "calendar.h"
 
 /* kernel includes */
 #include <kernel/building.h>
-#include <kernel/calendar.h>
 #include <kernel/curse.h>
 #include <kernel/equipment.h>
 #include <kernel/faction.h>
@@ -563,7 +564,7 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
             return;
         }
     }
-    if (!playerrace(rc) || idle(u->faction)) {
+    if (!playerrace(rc)) {
         cmistake(u, ord, 139, MSG_EVENT);
         return;
     }
@@ -703,28 +704,6 @@ static int forget_cmd(unit * u, order * ord)
         set_level(u, sk, 0);
     }
     return 0;
-}
-
-void add_spende(faction * f1, faction * f2, int amount, region * r)
-{
-    donation *sp;
-
-    sp = r->donations;
-
-    while (sp) {
-        if (sp->f1 == f1 && sp->f2 == f2) {
-            sp->amount += amount;
-            return;
-        }
-        sp = sp->next;
-    }
-
-    sp = calloc(1, sizeof(donation));
-    sp->f1 = f1;
-    sp->f2 = f2;
-    sp->amount = amount;
-    sp->next = r->donations;
-    r->donations = sp;
 }
 
 static bool maintain(building * b, bool first)
@@ -886,7 +865,7 @@ static bool maintain(building * b, bool first)
                         cost -= give;
                         fset(ua->faction, FFL_SELECT);
                         if (m->rtype == rsilver)
-                            add_spende(ua->faction, u->faction, give, r);
+                            add_donation(ua->faction, u->faction, give, r);
                         if (cost <= 0)
                             break;
                     }
@@ -979,21 +958,11 @@ void economics(region * r)
     remove_empty_units_in_region(r);
 
     for (u = r->units; u; u = u->next) {
-        order *ord;
-        bool destroyed = false;
-        if (u->number > 0) {
-            for (ord = u->orders; ord; ord = ord->next) {
-                keyword_t kwd = getkeyword(ord);
-                if (kwd == K_DESTROY) {
-                    if (!destroyed) {
-                        if (destroy_cmd(u, ord) != 0)
-                            ord = NULL;
-                        destroyed = true;
-                    }
-                }
-                if (u->orders == NULL) {
-                    break;
-                }
+        order *ord = u->thisorder;
+        keyword_t kwd = getkeyword(ord);
+        if (kwd == K_DESTROY) {
+            if (destroy_cmd(u, ord) == 0) {
+                fset(u, UFL_LONGACTION | UFL_NOTMOVING);
             }
         }
     }
@@ -1009,7 +978,7 @@ static void manufacture(unit * u, const item_type * itype, int want)
     int minskill = itype->construction->minskill;
     skill_t sk = itype->construction->skill;
 
-    skill = effskill(u, sk);
+    skill = effskill(u, sk, 0);
     skill =
         skillmod(itype->rtype->attribs, u, u->region, sk, skill, SMF_PRODUCTION);
 
@@ -1048,7 +1017,7 @@ static void manufacture(unit * u, const item_type * itype, int want)
         i_change(&u->items, itype, n);
         if (want == INT_MAX)
             want = n;
-        ADDMSG(&u->faction->msgs, msg_message("manufacture",
+        ADDMSG(&u->faction->msgs, msg_message("produce",
             "unit region amount wanted resource", u, u->region, n, want,
             itype->rtype));
     }
@@ -1169,7 +1138,7 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
 
     assert(itype->construction->skill != 0
         || "limited resource needs a required skill for making it");
-    skill = eff_skill(u, itype->construction->skill, u->region);
+    skill = effskill(u, itype->construction->skill, 0);
     if (skill == 0) {
         skill_t sk = itype->construction->skill;
         add_message(&u->faction->msgs,
@@ -1292,7 +1261,7 @@ leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
                 if (!fval(al, AFL_DONE)) {
                     int req = required(al->want - al->get, al->save);
                     assert(al->get <= al->want && al->get >= 0);
-                    if (eff_skill(al->unit, itype->construction->skill, r)
+                    if (effskill(al->unit, itype->construction->skill, 0)
                         >= rm->level + itype->construction->minskill - 1) {
                         if (req) {
                             norders += req;
@@ -1463,7 +1432,7 @@ static void create_potion(unit * u, const potion_type * ptype, int want)
         i_change(&u->items, ptype->itype, built);
         if (want == INT_MAX)
             want = built;
-        ADDMSG(&u->faction->msgs, msg_message("manufacture",
+        ADDMSG(&u->faction->msgs, msg_message("produce",
             "unit region amount wanted resource", u, u->region, built, want,
             ptype->itype->rtype));
         break;
@@ -1536,7 +1505,7 @@ int make_cmd(unit * u, struct order *ord)
             const char * s = gettoken(token, sizeof(token));
             direction_t d = s ? get_direction(s, u->faction->locale) : NODIRECTION;
             if (d != NODIRECTION) {
-                build_road(r, u, m, d);
+                build_road(u, m, d);
             }
             else {
                 /* Die Richtung wurde nicht erkannt */
@@ -1551,12 +1520,12 @@ int make_cmd(unit * u, struct order *ord)
             cmistake(u, ord, 276, MSG_PRODUCE);
         }
         else {
-            continue_ship(r, u, m);
+            continue_ship(u, m);
         }
         return 0;
     }
     else if (p == P_HERBS) {
-        herbsearch(r, u, m);
+        herbsearch(u, m);
         return 0;
     }
 
@@ -1607,7 +1576,7 @@ int make_cmd(unit * u, struct order *ord)
             cmistake(u, ord, 276, MSG_PRODUCE);
         }
         else {
-            create_ship(r, u, stype, m, ord);
+            create_ship(u, stype, m, ord);
         }
     }
     else if (btype != NOBUILDING) {
@@ -1827,7 +1796,7 @@ static void buy(unit * u, request ** buyorders, struct order *ord)
     }
 
     /* Ein Händler kann nur 10 Güter pro Talentpunkt handeln. */
-    k = u->number * 10 * eff_skill(u, SK_TRADE, r);
+    k = u->number * 10 * effskill(u, SK_TRADE, 0);
 
     /* hat der Händler bereits gehandelt, muss die Menge der bereits
      * verkauften/gekauften Güter abgezogen werden */
@@ -2144,7 +2113,7 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
 
     /* Ein Händler kann nur 10 Güter pro Talentpunkt verkaufen. */
 
-    n = _min(n, u->number * 10 * eff_skill(u, SK_TRADE, r));
+    n = _min(n, u->number * 10 * effskill(u, SK_TRADE, 0));
 
     if (!n) {
         cmistake(u, ord, 54, MSG_COMMERCE);
@@ -2191,7 +2160,7 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
          * existiert, so dass man arrays von orders machen kann. */
 
         /* Ein Händler kann nur 10 Güter pro Talentpunkt handeln. */
-        k = u->number * 10 * eff_skill(u, SK_TRADE, r);
+        k = u->number * 10 * effskill(u, SK_TRADE, 0);
 
         /* hat der Händler bereits gehandelt, muss die Menge der bereits
          * verkauften/gekauften Güter abgezogen werden */
@@ -2274,11 +2243,12 @@ static void expandstealing(region * r, request * stealorders)
 }
 
 /* ------------------------------------------------------------- */
-static void plant(region * r, unit * u, int raw)
+static void plant(unit * u, int raw)
 {
     int n, i, skill, planted = 0;
     const item_type *itype;
     const resource_type *rt_water = get_resourcetype(R_WATER_OF_LIFE);
+    region *r = u->region;
 
     assert(rt_water != NULL);
     if (!fval(r->terrain, LAND_REGION)) {
@@ -2290,7 +2260,7 @@ static void plant(region * r, unit * u, int raw)
     }
 
     /* Skill prüfen */
-    skill = eff_skill(u, SK_HERBALISM, r);
+    skill = effskill(u, SK_HERBALISM, 0);
     itype = rherbtype(r);
     if (skill < 6) {
         ADDMSG(&u->faction->msgs,
@@ -2330,10 +2300,11 @@ static void plant(region * r, unit * u, int raw)
         u, r, planted, itype->rtype));
 }
 
-static void planttrees(region * r, unit * u, int raw)
+static void planttrees(unit * u, int raw)
 {
     int n, i, skill, planted = 0;
     const resource_type *rtype;
+    region * r = u->region;
 
     if (!fval(r->terrain, LAND_REGION)) {
         return;
@@ -2343,7 +2314,7 @@ static void planttrees(region * r, unit * u, int raw)
     rtype = get_resourcetype(fval(r, RF_MALLORN) ? R_MALLORNSEED : R_SEED);
 
     /* Skill prüfen */
-    skill = eff_skill(u, SK_HERBALISM, r);
+    skill = effskill(u, SK_HERBALISM, 0);
     if (skill < 6) {
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "plant_skills",
@@ -2383,12 +2354,13 @@ static void planttrees(region * r, unit * u, int raw)
 }
 
 /* züchte bäume */
-static void breedtrees(region * r, unit * u, int raw)
+static void breedtrees(unit * u, int raw)
 {
     int n, i, skill, planted = 0;
     const resource_type *rtype;
     static int gamecookie = -1;
     static int current_season;
+    region *r = u->region;
 
     if (gamecookie != global.cookie) {
         gamedate date;
@@ -2399,7 +2371,7 @@ static void breedtrees(region * r, unit * u, int raw)
 
     /* Bäume züchten geht nur im Frühling */
     if (current_season != SEASON_SPRING) {
-        planttrees(r, u, raw);
+        planttrees(u, raw);
         return;
     }
 
@@ -2411,9 +2383,9 @@ static void breedtrees(region * r, unit * u, int raw)
     rtype = get_resourcetype(fval(r, RF_MALLORN) ? R_MALLORNSEED : R_SEED);
 
     /* Skill prüfen */
-    skill = eff_skill(u, SK_HERBALISM, r);
+    skill = effskill(u, SK_HERBALISM, 0);
     if (skill < 12) {
-        planttrees(r, u, raw);
+        planttrees(u, raw);
         return;
     }
 
@@ -2444,13 +2416,14 @@ static void breedtrees(region * r, unit * u, int raw)
 }
 
 /* züchte pferde */
-static void breedhorses(region * r, unit * u)
+static void breedhorses(unit * u)
 {
     int n, c, breed = 0;
     struct building *b = inside_building(u);
     const struct building_type *btype = b ? b->type : NULL;
     const struct resource_type *rhorse = get_resourcetype(R_HORSE);
-    int horses;
+    int horses, effsk;
+
     assert(rhorse && rhorse->itype);
     if (btype != bt_find("stables")) {
         cmistake(u, u->thisorder, 122, MSG_PRODUCE);
@@ -2461,11 +2434,12 @@ static void breedhorses(region * r, unit * u)
         cmistake(u, u->thisorder, 107, MSG_PRODUCE);
         return;
     }
-    n = u->number * eff_skill(u, SK_HORSE_TRAINING, r);
+    effsk = effskill(u, SK_HORSE_TRAINING, 0);
+    n = u->number * effsk;
     n = _min(n, horses);
 
     for (c = 0; c < n; c++) {
-        if (rng_int() % 100 < eff_skill(u, SK_HORSE_TRAINING, r)) {
+        if (rng_int() % 100 < effsk) {
             i_change(&u->items, rhorse->itype, 1);
             ++breed;
         }
@@ -2512,16 +2486,16 @@ static void breed_cmd(unit * u, struct order *ord)
 
     switch (p) {
     case P_HERBS:
-        plant(r, u, m);
+        plant(u, m);
         break;
     case P_TREES:
-        breedtrees(r, u, m);
+        breedtrees(u, m);
         break;
     default:
         if (p != P_ANY) {
             rtype = findresourcetype(s, u->faction->locale);
             if (rtype == get_resourcetype(R_SEED) || rtype == get_resourcetype(R_MALLORNSEED)) {
-                breedtrees(r, u, m);
+                breedtrees(u, m);
                 break;
             }
             else if (rtype != get_resourcetype(R_HORSE)) {
@@ -2529,7 +2503,7 @@ static void breed_cmd(unit * u, struct order *ord)
                 break;
             }
         }
-        breedhorses(r, u);
+        breedhorses(u);
         break;
     }
 }
@@ -2561,7 +2535,7 @@ static void research_cmd(unit * u, struct order *ord)
     kwd = init_order(ord);
     assert(kwd == K_RESEARCH);
 
-    if (eff_skill(u, SK_HERBALISM, r) < 7) {
+    if (effskill(u, SK_HERBALISM, 0) < 7) {
         cmistake(u, ord, 227, MSG_EVENT);
         return;
     }
@@ -2594,8 +2568,9 @@ static int max_skill(region * r, faction * f, skill_t sk)
 
     for (u = r->units; u; u = u->next) {
         if (u->faction == f) {
-            if (eff_skill(u, sk, r) > w) {
-                w = eff_skill(u, sk, r);
+            int effsk = effskill(u, sk, 0);
+            if (effsk > w) {
+                w = effsk;
             }
         }
     }
@@ -2624,7 +2599,7 @@ message * check_steal(const unit * u, struct order *ord) {
 static void steal_cmd(unit * u, struct order *ord, request ** stealorders)
 {
     const resource_type *rring = get_resourcetype(R_RING_OF_NIMBLEFINGER);
-    int n, i, id;
+    int n, i, id, effsk;
     bool goblin = false;
     request *o;
     unit *u2 = NULL;
@@ -2644,8 +2619,9 @@ static void steal_cmd(unit * u, struct order *ord, request ** stealorders)
         return;
     }
     id = read_unitid(u->faction, r);
-    u2 = findunitr(r, id);
-
+    if (id>0) {
+        u2 = findunitr(r, id);
+    }
     if (u2 && u2->region == u->region) {
         f = u2->faction;
     }
@@ -2681,11 +2657,12 @@ static void steal_cmd(unit * u, struct order *ord, request ** stealorders)
         return;
     }
 
-    n = eff_skill(u, SK_STEALTH, r) - max_skill(r, f, SK_PERCEPTION);
+    effsk = effskill(u, SK_STEALTH, 0);
+    n = effsk - max_skill(r, f, SK_PERCEPTION);
 
     if (n <= 0) {
         /* Wahrnehmung == Tarnung */
-        if (u_race(u) != get_race(RC_GOBLIN) || eff_skill(u, SK_STEALTH, r) <= 3) {
+        if (u_race(u) != get_race(RC_GOBLIN) || effsk <= 3) {
             ADDMSG(&u->faction->msgs, msg_message("stealfail", "unit target", u, u2));
             if (n == 0) {
                 ADDMSG(&u2->faction->msgs, msg_message("stealdetect", "unit", u2));
@@ -2781,7 +2758,7 @@ void entertain_cmd(unit * u, struct order *ord)
         cmistake(u, ord, 58, MSG_INCOME);
         return;
     }
-    if (!effskill(u, SK_ENTERTAINMENT)) {
+    if (!effskill(u, SK_ENTERTAINMENT, 0)) {
         cmistake(u, ord, 58, MSG_INCOME);
         return;
     }
@@ -2798,7 +2775,7 @@ void entertain_cmd(unit * u, struct order *ord)
         return;
     }
 
-    u->wants = u->number * (entertainbase + effskill(u, SK_ENTERTAINMENT)
+    u->wants = u->number * (entertainbase + effskill(u, SK_ENTERTAINMENT, 0)
         * entertainperlevel);
 
     max_e = getuint();
@@ -3012,7 +2989,7 @@ void tax_cmd(unit * u, struct order *ord, request ** taxorders)
         u->wants = _min(income(u), max);
     }
     else {
-        u->wants = _min(n * eff_skill(u, SK_TAXING, r) * 20, max);
+        u->wants = _min(n * effskill(u, SK_TAXING, 0) * 20, max);
     }
 
     u2 = is_guarded(r, u, GUARD_TAX);
@@ -3087,7 +3064,7 @@ void loot_cmd(unit * u, struct order *ord, request ** lootorders)
     }
     else {
         /* For player start with 20 Silver +10 every 5 level of close combat skill*/
-        int skbonus = (_max(eff_skill(u, SK_MELEE, r), eff_skill(u, SK_SPEAR, r)) * 2 / 10) + 2;
+        int skbonus = (_max(effskill(u, SK_MELEE, 0), effskill(u, SK_SPEAR, 0)) * 2 / 10) + 2;
         u->wants = _min(n * skbonus * 10, max);
     }
 
@@ -3213,7 +3190,7 @@ void produce(struct region *r)
             continue;
 
         if (fval(u, UFL_LONGACTION) && u->thisorder == NULL) {
-            /* this message was already given in laws.setdefaults
+            /* this message was already given in laws.c:update_long_order
                cmistake(u, u->thisorder, 52, MSG_PRODUCE);
                */
             continue;

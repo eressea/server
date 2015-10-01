@@ -1,11 +1,19 @@
+sudo: false
 language: c
 compiler:
   - gcc
   - clang
 script: s/travis-build
-before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq zlib1g-dev libtolua-dev liblua5.1-dev libncurses5-dev libsqlite3-dev libxml2-dev valgrind
+addons:
+  apt:
+    packages:
+      - liblua5.2-dev
+      - libncurses5-dev
+      - libsqlite3-dev
+      - libxml2-dev
+      - valgrind
 os:
   - linux
-  - osx
+notifications:
+  slack:
+    secure: F89aXLWaE125PaJIlETv12jT4EfH6wLXJmGCPZzrN3OcLn2ahDWqjwuzR7lOEDf2nAISmeMPyDZMhEHXLNHAE5qP6lg9yliYQw5hzGmDK9m1xUq/pPEne/b2Y7K3my1mkRZ6n3asbHgSmBWAfCIk1JN8R5Rv+rmbLuWLc+zofts=

@@ -1,3 +1,4 @@
+# old zlib version
 {
    zlib1g-dev-1:1.2.3.4.dfsg
    Memcheck:Cond
@@ -13,4 +14,24 @@
    obj:/usr/lib/x86_64-linux-gnu/libxml2.so.2.8.0
    fun:read_xml
    fun:init_data
+}
+
+# https://sourceware.org/bugzilla/show_bug.cgi?id=14404
+{
+   glibc-bug-14404-1
+   Memcheck:Addr8
+   fun:__GI___strncasecmp_l
+   fun:____strtod_l_internal
+}
+{
+   glibc-bug-14404-2
+   Memcheck:Cond
+   fun:__GI___strncasecmp_l
+   fun:____strtod_l_internal
+}
+{
+   glibc-bug-14404-3
+   Memcheck:Value8
+   fun:__GI___strncasecmp_l
+   fun:____strtod_l_internal
 }

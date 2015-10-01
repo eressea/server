@@ -1,0 +1,296 @@
+{
+    "terrains": {
+        "ocean": {
+            "size": 100,
+            "flags": [ "swim", "sea", "sail", "fly" ]
+        },
+        "plain": {
+            "size": 10000,
+            "herbs": [ "h0", "h1", "h2", "h3", "h4", "h5" ],
+            "seed": 3,
+            "road": 50,
+            "flags": [ "land", "walk", "sail", "fly" ],
+            "production": {
+                "iron": {
+                    "chance": 0.1,
+                    "base": "5d8",
+                    "div": "2d20+10",
+                    "level": "2d4-1"
+                },
+                "stone": {
+                    "chance": 0.15,
+                    "base": "5d8",
+                    "div": "2d30+20",
+                    "level": "1d4"
+                },
+                "laen": {
+                    "chance": 0.01,
+                    "base": "1d4",
+                    "div": "2d20+50",
+                    "level": "1d4"
+                }
+            }
+        },
+        "swamp": {
+            "size": 2000,
+            "herbs": [ "h6", "h7", "h8" ],
+            "seed": 2,
+            "road": 75,
+            "flags": [ "land", "walk", "sail", "fly" ],
+            "production": {
+                "iron": {
+                    "chance": 0.02,
+                    "base": "5d8",
+                    "div": "2d20+10",
+                    "level": "2d4-1"
+                },
+                "stone": {
+                    "chance": 0.02,
+                    "base": "5d8",
+                    "div": "2d30+20",
+                    "level": "1d4"
+                },
+                "laen": {
+                    "chance": 0.02,
+                    "base": "1d4",
+                    "div": "2d20+50",
+                    "level": "1d4"
+                }
+            }
+        },
+        "desert": {
+            "size": 500,
+            "herbs": [ "h9", "h10", "h11" ],
+            "seed": 2,
+            "road": 100,
+            "flags": [ "land", "walk", "sail", "fly", "cavalry" ],
+            "production": {
+                "iron": {
+                    "chance": 0.15,
+                    "base": "5d8",
+                    "div": "2d20+10",
+                    "level": "2d4-1"
+                },
+                "stone": {
+                    "chance": 0.25,
+                    "base": "5d8",
+                    "div": "2d30+20",
+                    "level": "1d4"
+                },
+                "laen": {
+                    "chance": 0.025,
+                    "base": "1d4",
+                    "div": "2d20+50",
+                    "level": "1d4"
+                }
+            }
+        },
+        "highland": {
+            "size": 4000,
+            "herbs": [ "h12", "h13", "h14" ],
+            "seed": 2,
+            "road": 100,
+            "flags": [ "land", "walk", "sail", "fly", "cavalry" ],
+            "production": {
+                "iron": {
+                    "chance": 0.15,
+                    "base": "5d8",
+                    "div": "2d20+10",
+                    "level": "2d4-1"
+                },
+                "stone": {
+                    "chance": 0.25,
+                    "base": "5d8",
+                    "div": "2d30+20",
+                    "level": "1d4"
+                },
+                "laen": {
+                    "chance": 0.025,
+                    "base": "1d4",
+                    "div": "2d20+50",
+                    "level": "1d4"
+                }
+            }
+        },
+        "mountain": {
+            "size": 1000,
+            "herbs": [ "h15", "h16", "h17" ],
+            "seed": 2,
+            "road": 250,
+            "flags": [ "land", "walk", "sail", "fly" ],
+            "production": {
+                "iron": {
+                    "chance": 1.0,
+                    "base": "50",
+                    "div": "50",
+                    "level": "1"
+                },
+                "stone": {
+                    "chance": 1.0,
+                    "base": "100",
+                    "div": "100",
+                    "level": "1"
+                },
+                "laen": {
+                    "chance": 0.05,
+                    "base": "4",
+                    "div": "100",
+                    "level": "1"
+                }
+            }
+        },
+        "glacier": {
+            "size": 100,
+            "herbs": [ "h15", "h16", "h17" ],
+            "seed": 2,
+            "road": 250,
+            "flags": [ "arctic", "land", "walk", "sail", "fly" ],
+            "production": {
+                "iron": {
+                    "chance": 1.0,
+                    "base": "3",
+                    "div": "50",
+                    "level": "1"
+                },
+                "stone": {
+                    "chance": 1.0,
+                    "base": "2",
+                    "div": "100",
+                    "level": "1"
+                },
+                "laen": {
+                    "chance": 0.05,
+                    "base": "4",
+                    "div": "100",
+                    "level": "1"
+                }
+            }
+        },
+        "iceberg": {
+            "size": 100,
+            "herbs": [ "h18", "h19", "h20" ],
+            "flags": [ "arctic", "land", "walk", "sail", "fly" ],
+            "production": {
+                "iron": {
+                    "chance": 0.9,
+                    "base": "3",
+                    "div": "50",
+                    "level": "1"
+                },
+                "stone": {
+                    "chance": 0.9,
+                    "base": "2",
+                    "div": "100",
+                    "level": "1"
+                }
+            }
+        },
+        "iceberg_sleep": {
+            "size": 100,
+            "herbs": [ "h18", "h19", "h20" ],
+            "flags": [ "arctic", "land", "walk", "sail", "fly" ],
+            "production": {
+                "iron": {
+                    "chance": 0.9,
+                    "base": "3",
+                    "div": "50",
+                    "level": "1"
+                },
+                "stone": {
+                    "chance": 0.9,
+                    "base": "2",
+                    "div": "100",
+                    "level": "1"
+                },
+                "laen": {
+                    "chance": 0.05,
+                    "base": "4",
+                    "div": "100",
+                    "level": "1"
+                }
+            }
+        },
+        "firewall": {
+            "size": 100,
+            "road": 250,
+            "flags": [ "forbidden" ]
+        },
+        "fog": {
+            "flags": [ "walk", "fly" ]
+        },
+        "thickfog": {
+            "flags": [ "forbidden" ]
+        },
+        "volcano": {
+            "size": 500,
+            "road": 250,
+            "seed": 1,
+            "flags": [ "land", "walk", "sail", "fly" ],
+            "production": {
+                "iron": {
+                    "chance": 0.5,
+                    "level": "1",
+                    "base": "50",
+                    "div": "50"
+                },
+                "stone": {
+                    "chance": 0.5,
+                    "level": "1",
+                    "base": "100",
+                    "div": "100"
+                },
+                "laen": {
+                    "chance": 0.075,
+                    "level": "1",
+                    "base": "4",
+                    "div": "100"
+                }
+            }
+        },
+        "activevolcano": {
+            "size": 500,
+            "road": 250,
+            "flags": [ "land", "walk", "sail", "fly" ],
+            "production": {
+                "iron": {
+                    "chance": 0.5,
+                    "level": "1",
+                    "base": "50",
+                    "div": "50"
+                },
+                "stone": {
+                    "chance": 0.5,
+                    "level": "1",
+                    "base": "100",
+                    "div": "100"
+                },
+                "laen": {
+                    "chance": 0.075,
+                    "level": "1",
+                    "base": "4",
+                    "div": "100"
+                }
+            }
+        },
+        "hell": {
+            "flags": [ "walk" ]
+        },
+        "hall1": {
+            "flags": [ "land", "walk", "sail" ]
+        },
+        "corridor1": {
+            "flags": [ "land", "walk", "sail" ]
+        },
+        "wall1": {
+            "flags": [ "forbidden", "land" ]
+        },
+        "default": {
+            "size": 0,
+            "herbs": [],
+            "seed": 0,
+            "road": 0,
+            "flags": [ "land", "walk", "sail", "fly" ],
+            "production": {}
+        }
+    }
+}

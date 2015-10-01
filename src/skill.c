@@ -97,7 +97,7 @@ skill_t get_skill(const char *s, const struct locale * lang)
         char * str = transliterate(buffer, sizeof(buffer) - sizeof(int), s);
         if (str) {
             int i;
-            const void * match;
+            void * match;
             void **tokens = get_translations(lang, UT_SKILLS);
             struct critbit_tree *cb = (critbit_tree *)*tokens;
             if (cb && cb_find_prefix(cb, str, strlen(str), &match, 1, 0)) {

@@ -2,8 +2,8 @@
 
 from sys import argv, exit
 from string import join
-from os import access, R_OK
-from os import system
+import os
+import os.path
 
 gamename='Eressea'
 
@@ -38,35 +38,33 @@ for line in infile.readlines():
     if not options.has_key("reports"):
         continue
     reports = options["reports"].split(",")
+#    reports = reports + [ "iso.cr" ]
     prefix = "%(turn)s-%(faction)s." % options
-    files=[]
-    times="../parteien"
-    if os.path.isfile(times):
-        files = files + [ times ]
     if options["compression"]=="zip":
         output = prefix+"zip"
         files = [output]
-        if (access(output, R_OK)):
-            pass
-        else:
+        if not os.path.isfile(output):
             parameters = []
             for extension in reports:
                 filename = "%s%s" % (prefix, extension)
-                if (access(filename, R_OK)):
+                if os.path.isfile(filename):
                     parameters = parameters + [ filename ]
-            system("zip %s -q -m -j -1 %s" % (output, join(parameters," ")))
+            os.system("zip %s -q -m -j %s" % (output, join(parameters," ")))
     else:
+        files = []
         for extension in reports:
             if extension!='':
                 filename = "%s%s" % (prefix, extension)
                 output = "%s%s.bz2" % (prefix, extension)
                 files = files+[output]
-                if access(filename, R_OK):
-                    if (access(output, R_OK)):
-                        #print output, "exists, skipping"
+                if os.path.isfile(filename):
+                    if os.path.isfile(output):
                         continue
-                    system("bzip2 %s" % filename)
-    #print files
+                    os.system("bzip2 %s" % filename)
+    extras = [ '../wochenbericht.txt', '../express.txt' ]
+    for extra in extras:
+        if os.path.isfile(extra):
+            files = files + [extra]
     options["files"] = join(files, " ")
     batch = file("%s.sh" % options["faction"], "w")
     batch.write(template % options)

@@ -143,9 +143,7 @@ extern "C" {
             const struct item_type * itype, int amount, struct order * ord);
         int(*give) (struct unit * src, struct unit * dest,
             const struct item_type * itm, int number, struct order * ord);
-#if SCORE_MODULE
         int score;
-#endif
     } item_type;
 
     const item_type *finditemtype(const char *name, const struct locale *lang);

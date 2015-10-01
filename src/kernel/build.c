@@ -139,7 +139,7 @@ static void destroy_road(unit * u, int nmax, struct order *ord)
         n = _min(n, road);
         if (n != 0) {
             region *r2 = rconnect(r, d);
-            int willdo = eff_skill(u, SK_ROAD_BUILDING, r) * u->number;
+            int willdo = effskill(u, SK_ROAD_BUILDING, 0) * u->number;
             willdo = _min(willdo, n);
             if (willdo <= 0) {
                 ADDMSG(&u->faction->msgs,
@@ -171,7 +171,12 @@ int destroy_cmd(unit * u, struct order *ord)
     int n = INT_MAX;
 
     if (u->number < 1)
-        return 0;
+        return 1;
+
+    if (fval(u, UFL_LONGACTION)) {
+        cmistake(u, ord, 52, MSG_PRODUCE);
+        return 52;
+    }
 
     init_order(ord);
     s = gettoken(token, sizeof(token));
@@ -184,8 +189,7 @@ int destroy_cmd(unit * u, struct order *ord)
     if (s && *s) {
         n = atoi((const char *)s);
         if (n <= 0) {
-            cmistake(u, ord, 288, MSG_PRODUCE);
-            return 0;
+            n = INT_MAX;
         }
     }
 
@@ -199,11 +203,11 @@ int destroy_cmd(unit * u, struct order *ord)
 
         if (u != building_owner(b)) {
             cmistake(u, ord, 138, MSG_PRODUCE);
-            return 0;
+            return 138;
         }
         if (fval(b->type, BTF_INDESTRUCTIBLE)) {
             cmistake(u, ord, 138, MSG_PRODUCE);
-            return 0;
+            return 138;
         }
         if (b->damage >= b->size || strcmp(b->type->_name, "castle") != 0) {  
             /* Reduce size*/
@@ -253,11 +257,11 @@ int destroy_cmd(unit * u, struct order *ord)
 
         if (u != ship_owner(sh)) {
             cmistake(u, ord, 138, MSG_PRODUCE);
-            return 0;
+            return 138;
         }
         if (fval(r->terrain, SEA_REGION)) {
             cmistake(u, ord, 14, MSG_EVENT);
-            return 0;
+            return 14;
         }
         n = min(n, ((eff_skill(u, SK_SHIPBUILDING, r) + 1)* u->number * 100 / sh->type->construction->maxsize));
         if (n >= (sh->size * 100) / sh->type->construction->maxsize) {
@@ -285,20 +289,22 @@ int destroy_cmd(unit * u, struct order *ord)
     }
     else {
         cmistake(u, ord, 138, MSG_PRODUCE);
-        return 0;
+        return 138;
     }
 
     return 0;
 }
 /* ------------------------------------------------------------- */
 
-void build_road(region * r, unit * u, int size, direction_t d)
+void build_road(unit * u, int size, direction_t d)
 {
-    int n, left;
+    region *r = u->region;
+    int n, left, effsk;
     region *rn = rconnect(r, d);
 
     assert(u->number);
-    if (!eff_skill(u, SK_ROAD_BUILDING, r)) {
+    effsk = effskill(u, SK_ROAD_BUILDING, 0);
+    if (!effsk) {
         cmistake(u, u->thisorder, 103, MSG_PRODUCE);
         return;
     }
@@ -368,7 +374,7 @@ void build_road(region * r, unit * u, int size, direction_t d)
     left = _min(n, left);
 
     /* n = maximum by skill. try to maximize it */
-    n = u->number * eff_skill(u, SK_ROAD_BUILDING, r);
+    n = u->number * effsk;
     if (n < left) {
         const resource_type *ring = get_resourcetype(R_RING_OF_NIMBLEFINGER);
         item *itm = ring ? *i_find(&u->items, ring->itype) : 0;
@@ -380,12 +386,11 @@ void build_road(region * r, unit * u, int size, direction_t d)
     if (n < left) {
         int dm = get_effect(u, oldpotiontype[P_DOMORE]);
         if (dm != 0) {
-            int sk = eff_skill(u, SK_ROAD_BUILDING, r);
-            int todo = (left - n + sk - 1) / sk;
+            int todo = (left - n + effsk - 1) / effsk;
             todo = _min(todo, u->number);
             dm = _min(dm, todo);
             change_effect(u, oldpotiontype[P_DOMORE], -dm);
-            n += dm * sk;
+            n += dm * effsk;
         }                           /* Auswirkung Schaffenstrunk */
     }
 
@@ -487,7 +492,7 @@ int build(unit * u, const construction * ctype, int completed, int want)
         int dm = get_effect(u, oldpotiontype[P_DOMORE]);
 
         assert(u->number);
-        basesk = effskill(u, type->skill);
+        basesk = effskill(u, type->skill, 0);
         if (basesk == 0)
             return ENEEDSKILL;
 
@@ -707,7 +712,7 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
 
     assert(u->number);
     assert(btype->construction);
-    if (eff_skill(u, SK_BUILDING, r) == 0) {
+    if (effskill(u, SK_BUILDING, 0) == 0) {
         cmistake(u, ord, 101, MSG_PRODUCE);
         return 0;
     }
@@ -923,15 +928,16 @@ static void build_ship(unit * u, ship * sh, int want)
 }
 
 void
-create_ship(region * r, unit * u, const struct ship_type *newtype, int want,
+create_ship(unit * u, const struct ship_type *newtype, int want,
 order * ord)
 {
     ship *sh;
     int msize;
     const construction *cons = newtype->construction;
     order *new_order;
+    region * r = u->region;
 
-    if (!eff_skill(u, SK_SHIPBUILDING, r)) {
+    if (!effskill(u, SK_SHIPBUILDING, 0)) {
         cmistake(u, ord, 100, MSG_PRODUCE);
         return;
     }
@@ -941,7 +947,7 @@ order * ord)
     }
 
     /* check if skill and material for 1 size is available */
-    if (eff_skill(u, cons->skill, r) < cons->minskill) {
+    if (effskill(u, cons->skill, 0) < cons->minskill) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
             "error_build_skill_low", "value", cons->minskill));
         return;
@@ -973,13 +979,14 @@ order * ord)
     build_ship(u, sh, want);
 }
 
-void continue_ship(region * r, unit * u, int want)
+void continue_ship(unit * u, int want)
 {
     const construction *cons;
     ship *sh;
     int msize;
+    region * r = u->region;
 
-    if (!eff_skill(u, SK_SHIPBUILDING, r)) {
+    if (!effskill(u, SK_SHIPBUILDING, 0)) {
         cmistake(u, u->thisorder, 100, MSG_PRODUCE);
         return;
     }
@@ -1000,7 +1007,7 @@ void continue_ship(region * r, unit * u, int want)
         cmistake(u, u->thisorder, 16, MSG_PRODUCE);
         return;
     }
-    if (eff_skill(u, cons->skill, r) < cons->minskill) {
+    if (effskill(u, cons->skill, 0) < cons->minskill) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
             "error_build_skill_low", "value", cons->minskill));
         return;

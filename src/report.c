@@ -1,4 +1,4 @@
-/*
+ï»¿/*
 Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -22,7 +22,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 
 #include "reports.h"
+#include "seen.h"
 #include "laws.h"
+#include "travelthru.h"
 #include "monster.h"
 
 /* modules includes */
@@ -39,13 +41,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "move.h"
 #include "upkeep.h"
 #include "vortex.h"
+#include "calendar.h"
 
 /* kernel includes */
 #include <kernel/ally.h>
 #include <kernel/connection.h>
 #include <kernel/build.h>
 #include <kernel/building.h>
-#include <kernel/calendar.h>
 #include <kernel/curse.h>
 #include <kernel/faction.h>
 #include <kernel/group.h>
@@ -95,10 +97,20 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <limits.h>
 #include <stdlib.h>
 
-extern int verbosity;
 extern int *storms;
 extern int weeks_per_month;
 extern int months_per_year;
+
+static void check_errno(const char * file, int line) {
+    if (errno) {
+        char zText[64];
+        sprintf(zText, "error %d during report at %s:%d", errno, file, line);
+        perror(zText);
+        errno = 0;
+    }
+}
+
+#define CHECK_ERRNO() check_errno(__FILE__, __LINE__)
 
 static char *gamedate_season(const struct locale *lang)
 {
@@ -128,6 +140,7 @@ void write_spaces(stream *out, size_t num) {
         num -= bytes;
     }
 }
+
 
 static void centre(stream *out, const char *s, bool breaking)
 {
@@ -172,7 +185,7 @@ char marker)
             str = x + 2;
             hanging_indent -= 2;
         }
-    } 
+    }
     else {
         mark = &marker;
     }
@@ -515,32 +528,26 @@ nr_curses_i(stream *out, int indent, const faction *viewer, objtype_t typ, const
 {
     for (; a; a = a->next) {
         char buf[4096];
-        message *msg;
+        message *msg = 0;
 
         if (fval(a->type, ATF_CURSE)) {
             curse *c = (curse *)a->data.v;
 
-            if (c->type->cansee) {
-                self = c->type->cansee(viewer, obj, typ, c, self);
-            }
+            self = curse_cansee(c, viewer, typ, obj, self);
             msg = msg_curse(c, obj, typ, self);
-
-            if (msg) {
-                newline(out);
-                nr_render(msg, viewer->locale, buf, sizeof(buf), viewer);
-                paragraph(out, buf, indent, 2, 0);
-                msg_release(msg);
-            }
         }
         else if (a->type == &at_effect && self) {
             effect_data *data = (effect_data *)a->data.v;
             if (data->value > 0) {
                 msg = msg_message("nr_potion_effect", "potion left",
                     data->type->itype->rtype, data->value);
-                nr_render(msg, viewer->locale, buf, sizeof(buf), viewer);
-                paragraph(out, buf, indent, 2, 0);
-                msg_release(msg);
             }
+        }
+        if (msg) {
+            newline(out);
+            nr_render(msg, viewer->locale, buf, sizeof(buf), viewer);
+            paragraph(out, buf, indent, 2, 0);
+            msg_release(msg);
         }
     }
 }
@@ -552,9 +559,9 @@ static void nr_curses(stream *out, int indent, const faction *viewer, objtype_t 
     region *r;
 
     /* Die Sichtbarkeit eines Zaubers und die Zaubermeldung sind bei
-    * Gebäuden und Schiffen je nach, ob man Besitzer ist, verschieden.
+    * GebÃ¤uden und Schiffen je nach, ob man Besitzer ist, verschieden.
     * Bei Einheiten sieht man Wirkungen auf eigene Einheiten immer.
-    * Spezialfälle (besonderes Talent, verursachender Magier usw. werde
+    * SpezialfÃ¤lle (besonderes Talent, verursachender Magier usw. werde
     * bei jedem curse gesondert behandelt. */
     if (typ == TYP_SHIP) {
         ship *sh = (ship *)obj;
@@ -840,7 +847,7 @@ bool see_border(const connection * b, const faction * f, const region * r)
 
 static void describe(stream *out, const seen_region * sr, faction * f)
 {
-    const region *r = sr->r;
+    const region *r;
     int n;
     bool dh;
     direction_t d;
@@ -862,6 +869,11 @@ static void describe(stream *out, const seen_region * sr, faction * f)
     size_t size = sizeof(buf);
     int bytes;
 
+    assert(out);
+    assert(f);
+    assert(sr);
+
+    r = sr->r;
     for (d = 0; d != MAXDIRECTIONS; d++) {
         /* Nachbarregionen, die gesehen werden, ermitteln */
         region *r2 = rconnect(r, d);
@@ -953,7 +965,7 @@ static void describe(stream *out, const seen_region * sr, faction * f)
     }
 
     /* iron & stone */
-    if (sr->mode == see_unit && f != (faction *)NULL) {
+    if (sr->mode == see_unit) {
         resource_report result[MAX_RAWMATERIALS];
         int n, numresults = report_resources(sr, result, MAX_RAWMATERIALS, f);
 
@@ -1188,7 +1200,7 @@ static void describe(stream *out, const seen_region * sr, faction * f)
         }
     }
 
-    /* Wirkungen permanenter Sprüche */
+    /* Wirkungen permanenter SprÃ¼che */
     nr_curses(out, 0, f, TYP_REGION, r);
     n = 0;
 
@@ -1334,97 +1346,6 @@ static void statistics(stream *out, const region * r, const faction * f)
         i_free(i_remove(&items, items));
 }
 
-static void durchreisende(stream *out, const region * r, const faction * f)
-{
-    if (fval(r, RF_TRAVELUNIT)) {
-        attrib *abegin = a_find(r->attribs, &at_travelunit), *a;
-        int counter = 0, maxtravel = 0;
-        char buf[8192];
-        char *bufp = buf;
-        int bytes;
-        size_t size = sizeof(buf) - 1;
-
-        /* How many are we listing? For grammar. */
-        for (a = abegin; a && a->type == &at_travelunit; a = a->next) {
-            unit *u = (unit *)a->data.v;
-
-            if (r != u->region && (!u->ship || ship_owner(u->ship) == u)) {
-                if (cansee_durchgezogen(f, r, u, 0)) {
-                    ++maxtravel;
-                }
-            }
-        }
-
-        if (maxtravel == 0) {
-            return;
-        }
-
-        /* Auflisten. */
-        newline(out);
-
-        for (a = abegin; a && a->type == &at_travelunit; a = a->next) {
-            unit *u = (unit *)a->data.v;
-
-            if (r != u->region && (!u->ship || ship_owner(u->ship) == u)) {
-                if (cansee_durchgezogen(f, r, u, 0)) {
-                    ++counter;
-                    if (u->ship != NULL) {
-#ifdef GERMAN_FLUFF_ENABLED
-                        if (strcmp("de", f->locale->name)==0) {
-                            if (counter == 1) {
-                                bytes = (int)strlcpy(bufp, "Die ", size);
-                            }
-                            else {
-                                bytes = (int)strlcpy(bufp, "die ", size);
-                            }
-                            if (wrptr(&bufp, &size, bytes) != 0) {
-                                WARN_STATIC_BUFFER();
-                                break;
-                            }
-                        }
-#endif
-                        bytes = (int)strlcpy(bufp, shipname(u->ship), size);
-                    }
-                    else {
-                        bytes = (int)strlcpy(bufp, unitname(u), size);
-                    }
-                    if (wrptr(&bufp, &size, bytes) != 0) {
-                        WARN_STATIC_BUFFER();
-                        break;
-                    }
-
-                    if (counter + 1 < maxtravel) {
-                        bytes = (int)strlcpy(bufp, ", ", size);
-                        if (wrptr(&bufp, &size, bytes) != 0) {
-                            WARN_STATIC_BUFFER();
-                            break;
-                        }
-                    }
-                    else if (counter + 1 == maxtravel) {
-                        bytes = (int)strlcpy(bufp, LOC(f->locale, "list_and"), size);
-                        if (wrptr(&bufp, &size, bytes) != 0) {
-                            WARN_STATIC_BUFFER();
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        /* TODO: finish localization */
-        if (size > 0) {
-            if (maxtravel == 1) {
-                bytes = _snprintf(bufp, size, " %s", LOC(f->locale, "has_moved_one"));
-            }
-            else {
-                bytes = _snprintf(bufp, size, " %s", LOC(f->locale, "has_moved_many"));
-            }
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
-        }
-        *bufp = 0;
-        paragraph(out, buf, 0, 0, 0);
-    }
-}
 
 static int buildingmaintenance(const building * b, const resource_type * rtype)
 {
@@ -1481,19 +1402,17 @@ report_template(const char *filename, report_context * ctx, const char *charset)
     newline(out);
     newline(out);
 
-    sprintf(buf, "%s %s \"%s\"", LOC(f->locale, "ERESSEA"), factionid(f),
-        LOC(f->locale, "enterpasswd"));
+    sprintf(buf, "%s %s \"%s\"", LOC(f->locale, "ERESSEA"), factionid(f), f->passw);
     rps_nowrap(out, buf);
     newline(out);
     newline(out);
     sprintf(buf, "; ECHECK -l -w4 -r%d -v%s", f->race->recruitcost,
         ECHECK_VERSION);
-    /* -v3.4: ECheck Version 3.4.x */
     rps_nowrap(out, buf);
     newline(out);
 
     for (r = ctx->first; sr == NULL && r != ctx->last; r = r->next) {
-        sr = find_seen(ctx->seen, r);
+        sr = find_seen(ctx->f->seen, r);
     }
 
     for (; sr != NULL; sr = sr->next) {
@@ -1585,7 +1504,8 @@ report_template(const char *filename, report_context * ctx, const char *charset)
                     newline(out);
                 }
                 for (ord = u->orders; ord; ord = ord->next) {
-                    if (u->old_orders && is_repeated(ord))
+                    keyword_t kwd = getkeyword(ord);
+                    if (u->old_orders && is_repeated(kwd))
                         continue;           /* unit has defaults */
                     if (is_persistent(ord)) {
                         strcpy(buf, "   ");
@@ -2016,6 +1936,104 @@ static void nr_paragraph(stream *out, message * m, faction * f)
     paragraph(out, buf, 0, 0, 0);
 }
 
+typedef struct cb_data {
+    stream *out;
+    char *start, *writep;
+    size_t size;
+    const faction *f;
+    int maxtravel, counter;
+} cb_data;
+
+static void init_cb(cb_data *data, stream *out, char *buffer, size_t size, const faction *f) {
+    data->out = out;
+    data->writep = buffer;
+    data->start = buffer;
+    data->size = size;
+    data->f = f;
+    data->maxtravel = 0;
+    data->counter = 0;
+}
+
+static void cb_write_travelthru(region *r, unit *u, void *cbdata) {
+    cb_data *data = (cb_data *)cbdata;
+    const faction *f = data->f;
+
+    if (data->counter >= data->maxtravel) {
+        return;
+    }
+    if (travelthru_cansee(r, f, u)) {
+        ++data->counter;
+        do {
+            size_t len, size = data->size - (data->writep - data->start);
+            const char *str;
+            char *writep = data->writep;
+
+            if (u->ship != NULL) {
+                str = shipname(u->ship);
+            }
+            else {
+                str = unitname(u);
+            }
+            len = strlen(str);
+            if (len < size && data->counter <= data->maxtravel) {
+                memcpy(writep, str, len);
+                writep += len;
+                size -= len;
+                if (data->counter == data->maxtravel) {
+                    str = ".";
+                }
+                else if (data->counter + 1 == data->maxtravel) {
+                    str = LOC(f->locale, "list_and");
+                }
+                else {
+                    str = ", ";
+                }
+                len = strlen(str);
+                if (len < size) {
+                    memcpy(writep, str, len);
+                    writep += len;
+                    size -= len;
+                    data->writep = writep;
+                }
+            }
+            if (len >= size || data->counter == data->maxtravel) {
+                // buffer is full
+                *writep = 0;
+                paragraph(data->out, data->start, 0, 0, 0);
+                data->writep = data->start;
+                if (data->counter == data->maxtravel) {
+                    break;
+                }
+            }
+        } while (data->writep == data->start);
+    }
+}
+
+void write_travelthru(stream *out, region * r, const faction * f)
+{
+    int maxtravel;
+    char buf[8192];
+
+    assert(r);
+    assert(f);
+    if (!fval(r, RF_TRAVELUNIT)) {
+        return;
+    }
+
+    /* How many are we listing? For grammar. */
+    maxtravel = count_travelthru(r, f);
+    if (maxtravel > 0) {
+        cb_data cbdata;
+
+        init_cb(&cbdata, out, buf, sizeof(buf), f);
+        cbdata.maxtravel = maxtravel;
+        cbdata.writep += 
+            strlcpy(buf, LOC(f->locale, "travelthru_header"), sizeof(buf));
+        travelthru_map(r, cb_write_travelthru, &cbdata);
+        return;
+    }
+}
+
 int
 report_plaintext(const char *filename, report_context * ctx,
 const char *charset)
@@ -2082,9 +2100,6 @@ const char *charset)
 
     if (f->age <= 2) {
         const char *s;
-        if (f->age <= 1) {
-            ADDMSG(&f->msgs, msg_message("changepasswd", "value", f->passw));
-        }
         RENDER(f, buf, sizeof(buf), ("newbie_password", "password", f->passw));
         newline(out);
         centre(out, buf, true);
@@ -2108,13 +2123,13 @@ const char *charset)
         }
     }
     newline(out);
-#if SCORE_MODULE
     if (f->options & want(O_SCORE) && f->age > DISPLAYSCORE) {
-        RENDER(f, buf, sizeof(buf), ("nr_score", "score average", f->score,
-            average_score_of_age(f->age, f->age / 24 + 1)));
+        char score[32], avg[32];
+        write_score(score, sizeof(score), f->score);
+        write_score(avg, sizeof(avg), average_score_of_age(f->age, f->age / 24 + 1));
+        RENDER(f, buf, sizeof(buf), ("nr_score", "score average", score, avg));
         centre(out, buf, true);
     }
-#endif
 #ifdef COUNT_AGAIN
     no_units = 0;
     no_people = 0;
@@ -2130,7 +2145,7 @@ const char *charset)
     }
     if (no_people != f->num_people) {
         f->num_people = no_people;
-    }
+}
 #else
     no_units = count_units(f);
     no_people = count_all(f);
@@ -2232,6 +2247,7 @@ const char *charset)
     }
 
     ch = 0;
+    CHECK_ERRNO();
     for (a = a_find(f->attribs, &at_showitem); a && a->type == &at_showitem;
         a = a->next) {
         const potion_type *ptype =
@@ -2284,6 +2300,7 @@ const char *charset)
         }
     }
     newline(out);
+    CHECK_ERRNO();
     centre(out, LOC(f->locale, "nr_alliances"), false);
     newline(out);
 
@@ -2291,10 +2308,11 @@ const char *charset)
 
     rpline(out);
 
+    CHECK_ERRNO();
     anyunits = 0;
 
     for (r = ctx->first; sr == NULL && r != ctx->last; r = r->next) {
-        sr = find_seen(ctx->seen, r);
+        sr = find_seen(ctx->f->seen, r);
     }
     for (; sr != NULL; sr = sr->next) {
         region *r = sr->r;
@@ -2334,21 +2352,26 @@ const char *charset)
                 }
             }
             guards(out, r, f);
-            durchreisende(out, r, f);
+            newline(out);
+            write_travelthru(out, r, f);
         }
         else {
             if (sr->mode == see_far) {
                 describe(out, sr, f);
+                newline(out);
                 guards(out, r, f);
-                durchreisende(out, r, f);
+                newline(out);
+                write_travelthru(out, r, f);
             }
             else if (sr->mode == see_lighthouse) {
                 describe(out, sr, f);
-                durchreisende(out, r, f);
+                newline(out);
+                write_travelthru(out, r, f);
             }
             else {
                 describe(out, sr, f);
-                durchreisende(out, r, f);
+                newline(out);
+                write_travelthru(out, r, f);
             }
         }
         /* Statistik */
@@ -2361,9 +2384,14 @@ const char *charset)
         if (sr->mode == see_unit || sr->mode == see_travel) {
             // TODO: Bug 2073
             message_list *mlist = r_getmessages(r, f);
-            rp_messages(out, r->msgs, f, 0, true);
-            if (mlist)
+            if (mlist) {
+                struct mlist **split = merge_messages(mlist, r->msgs);
                 rp_messages(out, mlist, f, 0, true);
+                split_messages(mlist, split);
+            }
+            else {
+                rp_messages(out, r->msgs, f, 0, true);
+            }
         }
 
         /* report all units. they are pre-sorted in an efficient manner */
@@ -2410,6 +2438,7 @@ const char *charset)
 
         newline(out);
         rpline(out);
+        CHECK_ERRNO();
     }
     if (!is_monsters(f)) {
         if (!anyunits) {
@@ -2421,22 +2450,8 @@ const char *charset)
         }
     }
     fstream_done(&strm);
+    CHECK_ERRNO();
     return 0;
-}
-
-void base36conversion(void)
-{
-    region *r;
-    for (r = regions; r; r = r->next) {
-        unit *u;
-        for (u = r->units; u; u = u->next) {
-            if (forbiddenid(u->no)) {
-                uunhash(u);
-                u->no = newunitid();
-                uhash(u);
-            }
-        }
-    }
 }
 
 #define FMAXHASH 1021

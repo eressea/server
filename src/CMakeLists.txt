@@ -9,6 +9,7 @@ include_directories (${CRYPTO_INCLUDE_DIR})
 include_directories (${QUICKLIST_INCLUDE_DIR})
 include_directories (${CUTEST_INCLUDE_DIR})
 include_directories (${LUA_INCLUDE_DIR})
+include_directories (${TOLUA_INCLUDE_DIR})
 include_directories (${BSON_INCLUDE_DIR})
 include_directories (${INIPARSER_INCLUDE_DIR})
 
@@ -76,6 +77,7 @@ TOLUA_BINDING(settings.pkg bind_settings.h)
 ENDIF()
 
 set (ERESSEA_SRC
+  calendar.c
   move.c
   spells.c
   battle.c
@@ -85,6 +87,10 @@ set (ERESSEA_SRC
   names.c
   lighthouse.c
   reports.c
+  guard.c
+  prefix.c
+  donations.c
+  seen.c
   eressea.c
   callback.c
   direction.c
@@ -107,6 +113,7 @@ set (ERESSEA_SRC
   spy.c
   study.c
   summary.c
+  travelthru.c
   monsters.c
   wormhole.c
   ${SPELLS_SRC}
@@ -172,13 +179,17 @@ target_link_libraries(eressea
 )
 
 set(TESTS_SRC
+  donations.test.c
   wormhole.test.c
+  alchemy.test.c
   test_eressea.c
   tests.c
   battle.test.c
   vortex.test.c
   tests.test.c
   reports.test.c
+  seen.test.c
+  travelthru.test.c
   callback.test.c
   direction.test.c
   economy.test.c
@@ -189,10 +200,13 @@ set(TESTS_SRC
   magic.test.c
   market.test.c
   move.test.c
+  prefix.test.c
   skill.test.c
   spells.test.c
   spy.test.c
+  study.test.c
   upkeep.test.c
+  spells/magicresistance.test.c
   ${ATTRIBUTES_TESTS}
   ${UTIL_TESTS}
   ${KERNEL_TESTS}

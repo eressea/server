@@ -36,7 +36,6 @@
 #include <kernel/connection.h>
 #include <kernel/building.h>
 #include <kernel/curse.h>
-#include <kernel/spellid.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
@@ -480,6 +479,7 @@ static const race *select_familiar(const race * magerace, magic_t magiegebiet)
     assert(magerace->familiars[0]);
     if (rnd >= 70) {
         retval = magerace->familiars[magiegebiet];
+        assert(retval);
     }
     else {
         retval = magerace->familiars[0];
@@ -604,13 +604,15 @@ static int sp_summon_familiar(castorder * co)
                 else {
                     bytes = strlcpy(bufp, (const char *)", ", size);
                 }
-                if (wrptr(&bufp, &size, bytes) != 0)
+                assert(bytes <= INT_MAX);
+                if (wrptr(&bufp, &size, (int)bytes) != 0)
                     WARN_STATIC_BUFFER();
             }
             bytes =
                 strlcpy(bufp, (const char *)skillname((skill_t)sk, mage->faction->locale),
                 size);
-            if (wrptr(&bufp, &size, bytes) != 0)
+            assert(bytes <= INT_MAX);
+            if (wrptr(&bufp, &size, (int)bytes) != 0)
                 WARN_STATIC_BUFFER();
         }
     }
@@ -2514,7 +2516,7 @@ static int sp_fumblecurse(castorder * co)
     target = pa->param[0]->data.u;
 
     rx = rng_int() % 3;
-    sx = cast_level - effskill(target, SK_MAGIC);
+    sx = cast_level - effskill(target, SK_MAGIC, 0);
     duration = _max(sx, rx) + 1;
 
     effect = force / 2;
@@ -2819,9 +2821,9 @@ static int dc_age(struct curse *c)
     if (curse_active(c))
         while (*up != NULL) {
             unit *u = *up;
+            int hp;
             double damage = c->effect * u->number;
 
-            freset(u->faction, FFL_SELECT);
             if (u->number <= 0 || target_resists_magic(mage, u, TYP_UNIT, 0)) {
                 up = &u->next;
                 continue;
@@ -2829,8 +2831,9 @@ static int dc_age(struct curse *c)
 
             /* Reduziert durch Magieresistenz */
             damage *= (1.0 - magic_resistance(u));
-            change_hitpoints(u, -(int)damage);
+            hp = change_hitpoints(u, -(int)damage);
 
+            ADDMSG(&u->faction->msgs, msg_message((hp>0)?"poison_damage":"poison_death", "region unit", r, u));
             if (*up == u)
                 up = &u->next;
         }
@@ -3251,7 +3254,7 @@ static int sp_bloodsacrifice(castorder * co)
     unit *mage = co->magician.u;
     int cast_level = co->level;
     int aura;
-    int skill = eff_skill(mage, SK_MAGIC, mage->region);
+    int skill = effskill(mage, SK_MAGIC, 0);
     int hp = (int)(co->force * 8);
 
     if (hp <= 0) {
@@ -3588,11 +3591,11 @@ static int sp_charmingsong(castorder * co)
     }
     /* Magieresistensbonus fuer hoehere Talentwerte */
     for (i = 0; i < MAXSKILLS; i++) {
-        int sk = effskill(target, i);
+        int sk = effskill(target, i, 0);
         if (tb < sk)
             tb = sk;
     }
-    tb -= effskill(mage, SK_MAGIC);
+    tb -= effskill(mage, SK_MAGIC, 0);
     if (tb > 0) {
         resist_bonus += tb * 15;
     }
@@ -4140,7 +4143,7 @@ static int sp_pump(castorder * co)
         create_unit(rt, mage->faction, RS_FARVISION, get_race(RC_SPELL), 0,
         "spell/pump", NULL);
     u->age = 2;
-    set_level(u, SK_PERCEPTION, eff_skill(target, SK_PERCEPTION, u->region));
+    set_level(u, SK_PERCEPTION, effskill(target, SK_PERCEPTION, 0));
 
     return cast_level;
 }
@@ -4581,7 +4584,7 @@ int sp_illusionary_shapeshift(castorder * co)
     irace = u_irace(u);
     if (irace == u_race(u)) {
         trigger *trestore = trigger_changerace(u, NULL, irace);
-        add_trigger(&u->attribs, "timer", trigger_timeout((int)power + 2,
+        add_trigger(&u->attribs, "timer", trigger_timeout((int)power + 3,
             trestore));
         u->irace = rc;
     }
@@ -4792,7 +4795,7 @@ int sp_dreamreading(castorder * co)
         "spell/dreamreading", NULL);
     set_number(u2, 1);
     u2->age = 2;                  /* Nur fuer diese Runde. */
-    set_level(u2, SK_PERCEPTION, eff_skill(u, SK_PERCEPTION, u2->region));
+    set_level(u2, SK_PERCEPTION, effskill(u, SK_PERCEPTION, u2->region));
 
     msg =
         msg_message("sp_dreamreading_effect", "mage unit region", mage, u,
@@ -5008,12 +5011,6 @@ int sp_resist_magic_bonus(castorder * co)
             continue;
 
         u = pa->param[n]->data.u;
-
-        /* Ist die Einheit schon verzaubert, wirkt sich dies nur auf die
-         * Menge der Verzauberten Personen aus.
-         if (is_cursed(u->attribs, C_MAGICRESISTANCE, 0))
-         continue;
-         */
 
         m = _min(u->number, victims);
         victims -= m;
@@ -6519,6 +6516,7 @@ static spelldata spell_functions[] = {
     { "stormwinds", sp_stormwinds, 0 },
     { "homestone", sp_homestone, 0 },
     { "wolfhowl", sp_wolfhowl, 0 },
+    { "igjarjuk", sp_igjarjuk, 0 },
     { "versteinern", sp_petrify, 0 },
     { "strongwall", sp_strong_wall, 0 },
     { "gwyrrddestroymagic", sp_destroy_magic, 0 },
@@ -6569,14 +6567,14 @@ static spelldata spell_functions[] = {
     { "analysedream", sp_analysedream, 0 },
     { "disturbingdreams", sp_disturbingdreams, 0 },
     { "sleep", sp_sleep, 0 },
-    { "wisps", 0, 0 }, /* this spell is gone */
+    { "wisps", 0, 0 }, /* TODO: this spell is gone */
     { "gooddreams", sp_gooddreams, 0 },
     { "illaundestroymagic", sp_destroy_magic, 0 },
     { "clone", sp_clonecopy, 0 },
     { "bad_dreams", sp_baddreams, 0 },
     { "mindblast", sp_mindblast_temp, 0 },
     { "orkdream", sp_sweetdreams, 0 },
-    { "summon_alp", sp_summon_alp, 0 },
+    { "summon_alp", sp_summon_alp, 0 }, // TODO: this spell is disabled everywhere
     /* M_CERDDOR */
     { "appeasement", sp_denyattack, 0 },
     { "song_of_healing", sp_healing, 0 },
@@ -6587,7 +6585,7 @@ static spelldata spell_functions[] = {
     { "heroic_song", sp_hero, 0 },
     { "transfer_aura_song", sp_transferaura, 0 },
     { "analysesong_unit", sp_analysesong_unit, 0 },
-    { "cerrdorfumbleshield", sp_fumbleshield, 0 },
+    { "cerddorfumbleshield", sp_fumbleshield, 0 },
     { "calm_monster", sp_calm_monster, 0 },
     { "seduction", sp_seduce, 0 },
     { "headache", sp_headache, 0 },
@@ -6651,7 +6649,6 @@ static spelldata spell_functions[] = {
     { "firestorm", sp_immolation, 0 },
     { "coldfront", sp_immolation, 0 },
     { "acidrain", sp_immolation, 0 },
-    /* SPL_NOSPELL  MUSS der letzte Spruch der Liste sein */
     { 0, 0, 0 }
 };
 
@@ -6765,6 +6762,8 @@ static int sp_readmind(castorder * co)
     return cast_level;
 }
 
+void register_magicresistance(void);
+
 void register_spells(void)
 {
     register_borders();
@@ -6791,4 +6790,5 @@ void register_spells(void)
     register_regioncurse();
     register_shipcurse();
     register_buildingcurse();
+    register_magicresistance();
 }

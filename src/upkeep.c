@@ -16,6 +16,7 @@
 #include "alchemy.h"
 #include "economy.h"
 #include "monster.h"
+#include "donations.h"
 
 #include <assert.h>
 
@@ -55,7 +56,7 @@ static void help_feed(unit * donor, unit * u, int *need_p)
         change_money(donor, -give);
         change_money(u, give);
         need -= give;
-        add_spende(donor->faction, u->faction, give, donor->region);
+        add_donation(donor->faction, u->faction, give, donor->region);
     }
     *need_p = need;
 }
@@ -120,7 +121,7 @@ void get_food(region * r)
 
     if (food_rules < 0 || gamecookie != global.cookie) {
         gamecookie = global.cookie;
-        food_rules = get_param_int(global.parameters, "rules.economy.food", 0);
+        food_rules = get_param_int(global.parameters, "rules.food.flags", 0);
     }
 
     if (food_rules & FOOD_IS_FREE) {

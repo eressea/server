@@ -1,3 +1,4 @@
+*.orig
 eressea.ini
 Debug
 Release
@@ -18,7 +19,6 @@ ipch/
 *.opensdf
 *.pdb
 *.sdf
-*.sh
 *.suo
 *.user
 
@@ -37,3 +37,9 @@ game-e3/reports/
 tags
 Thumbs.db
 .gdb_history
+*.cfg
+*.cmd
+tmp/
+tests/config.lua
+tests/reports/
+tests/data/185.dat
