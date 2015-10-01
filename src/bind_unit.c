@@ -160,7 +160,7 @@ static int tolua_unit_set_group(lua_State * L)
 {
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
     int result = join_group(self, tolua_tostring(L, 2, 0));
-    tolua_pushnumber(L, result);
+    lua_pushinteger(L, result);
     return 1;
 }
 

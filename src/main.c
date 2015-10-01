@@ -282,7 +282,6 @@ int main(int argc, char **argv)
     int err = 0;
     lua_State *L;
     setup_signal_handler();
-
     /* parse args once to read config file location */
     if (parse_args(argc, argv, &err) != 0) {
         return err;

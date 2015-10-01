@@ -401,7 +401,7 @@ message * disband_men(int n, unit * u, struct order *ord) {
 void give_unit(unit * u, unit * u2, order * ord)
 {
     region *r = u->region;
-    int n = u->number;
+    int maxt = max_transfers();
 
     if (!rule_transfermen() && u->faction != u2->faction) {
         cmistake(u, ord, 74, MSG_COMMERCE);
@@ -472,9 +472,11 @@ void give_unit(unit * u, unit * u2, order * ord)
         cmistake(u, ord, 105, MSG_COMMERCE);
         return;
     }
-    if (u2->faction->newbies + n > max_transfers()) {
-        cmistake(u, ord, 129, MSG_COMMERCE);
-        return;
+    if (maxt >= 0 && u->faction != u2->faction) {
+        if (u2->faction->newbies + u->number > maxt) {
+            cmistake(u, ord, 129, MSG_COMMERCE);
+            return;
+        }
     }
     if (u_race(u) != u2->faction->race) {
         if (u2->faction->race != get_race(RC_HUMAN)) {
@@ -510,9 +512,9 @@ void give_unit(unit * u, unit * u2, order * ord)
         cmistake(u, ord, 156, MSG_COMMERCE);
         return;
     }
-    add_give(u, u2, n, n, get_resourcetype(R_PERSON), ord, 0);
+    add_give(u, u2, u->number, u->number, get_resourcetype(R_PERSON), ord, 0);
     u_setfaction(u, u2->faction);
-    u2->faction->newbies += n;
+    u2->faction->newbies += u->number;
 }
 
 bool can_give_to(unit *u, unit *u2) {
