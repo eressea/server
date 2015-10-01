@@ -40,6 +40,9 @@ function test_destroy_is_long()
     local r1 = region.create(0, 0, "plain")
     local u = unit.create(faction.create("one@example.com", "human", "de"), r1, 10)
     u.building = building.create(u.region, "castle")
+    u.building.size = 1
+    u.building.damage = 1
+    u:set_skill("building", 2)
     u:clear_orders()
     u:add_order("LERNE Unterhaltung")
     u:add_order("ZERSTOERE " .. itoa36(u.building.id))
