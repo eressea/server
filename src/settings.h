@@ -21,7 +21,7 @@
 #define RESOURCE_QUANTITY 0.5
 #define RECRUITFRACTION 40      /* 100/RECRUITFRACTION% */
 #define COMBAT_TURNS 5
-#define NEWATSROI 0
+#undef NEWATSROI
 
 /* Vermehrungsrate Bauern in 1/10000.
 * TODO: Evt. Berechnungsfehler, reale Vermehrungsraten scheinen höher. */
@@ -35,7 +35,6 @@
  * configuration variables (XML), script extensions (lua),
  * or both. We don't want separate binaries for different games
  */
-#define SCORE_MODULE 1
 #define MUSEUM_MODULE 1
 #define ARENA_MODULE 1
 #define CHANGED_CROSSBOWS 0     /* use the WTF_ARMORPIERCING flag */

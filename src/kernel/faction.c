@@ -310,13 +310,10 @@ void destroyfaction(faction * f)
         free(f->spellbook);
         f->spellbook = 0;
     }
-    while (f->battles) {
-        struct bmsg *bm = f->battles;
-        f->battles = bm->next;
-        if (bm->msgs) {
-            free_messagelist(bm->msgs);
-        }
-        free(bm);
+
+    if (f->seen_factions) {
+        ql_free(f->seen_factions);
+        f->seen_factions = 0;
     }
 
     while (u) {
@@ -616,8 +613,7 @@ void remove_empty_factions(void)
             ursprung *ur = f->ursprung;
             while (ur && ur->id != 0)
                 ur = ur->next;
-            if (verbosity >= 2)
-                log_printf(stdout, "\t%s\n", factionname(f));
+            log_debug("dead: %s", factionname(f));
 
             /* Einfach in eine Datei schreiben und später vermailen */
 
@@ -651,6 +647,9 @@ void remove_empty_factions(void)
             *fp = f->next;
             funhash(f);
             free_faction(f);
+            if (f->alliance && f->alliance->_leader == f) {
+                setalliance(f, 0);
+            }
             free(f);
         }
         else

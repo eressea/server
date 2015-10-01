@@ -37,7 +37,7 @@ extern "C" {
         struct mlist *begin, **end;
     } message_list;
 
-    extern void free_messagelist(message_list * msgs);
+    void free_messagelist(message_list * msgs);
 
     typedef struct msglevel {
         /* used to set specialized msg-levels */
@@ -53,6 +53,9 @@ extern "C" {
     struct message *m);
     void addmessage(struct region *r, struct faction *f, const char *s,
         msg_t mtype, int level);
+
+    struct mlist ** merge_messages(message_list *mlist, message_list *append);
+    void split_messages(message_list *mlist, struct mlist **split);
 
 #define ADDMSG(msgs, mcreate) { message * m = mcreate; if (m) { assert(m->refcount>=1); add_message(msgs, m); msg_release(m); } }
 

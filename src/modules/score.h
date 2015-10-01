@@ -22,15 +22,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-#if SCORE_MODULE == 0
-#error "must define SCORE_MODULE to use this module"
-#endif
-
     struct item_type;
+    typedef long long score_t;
 
     void score(void);
-    int average_score_of_age(int age, int a);
+    score_t average_score_of_age(int age, int a);
     int default_score(const struct item_type *itype);
+    void write_score(char *buffer, size_t size, score_t score);
 
 #ifdef __cplusplus
 }

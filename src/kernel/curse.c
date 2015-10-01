@@ -131,7 +131,7 @@ int curse_age(attrib * a)
     else if (c->duration != INT_MAX) {
         c->duration = _max(0, c->duration - 1);
     }
-    return c->duration;
+    return (c->duration > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
 }
 
 void destroy_curse(curse * c)
@@ -307,18 +307,22 @@ const curse_type *ct_find(const char *c)
 {
     unsigned int hash = tolower(c[0]);
     quicklist *ctl = cursetypes[hash];
-    int qi;
 
-    for (qi = 0; ctl; ql_advance(&ctl, &qi, 1)) {
-        curse_type *type = (curse_type *)ql_get(ctl, qi);
+    if (ctl) {
+        size_t c_len = strlen(c);
+        int qi;
 
-        if (strcmp(c, type->cname) == 0) {
-            return type;
-        }
-        else {
-            size_t k = _min(strlen(c), strlen(type->cname));
-            if (!_memicmp(c, type->cname, k)) {
+        for (qi = 0; ctl; ql_advance(&ctl, &qi, 1)) {
+            curse_type *type = (curse_type *)ql_get(ctl, qi);
+
+            if (strcmp(c, type->cname) == 0) {
                 return type;
+            }
+            else {
+                size_t k = _min(c_len, strlen(type->cname));
+                if (!_memicmp(c, type->cname, k)) {
+                    return type;
+                }
             }
         }
     }
@@ -513,11 +517,8 @@ static curse *make_curse(unit * mage, attrib ** ap, const curse_type * ct,
         break;
 
     case CURSETYP_UNIT:
-    {
         c->data.i = men;
         break;
-    }
-
     }
     return c;
 }
@@ -641,6 +642,17 @@ void transfer_curse(unit * u, unit * u2, int n)
 
 /* ------------------------------------------------------------- */
 
+int curse_cansee(const curse *c, const faction *viewer, objtype_t typ, const void *obj, int self) {
+    if (self < 3 && c->magician && c->magician->faction == viewer) {
+        // magicians can see their own curses better than anybody, no exceptions
+        self = 3;
+    }
+    else if (c->type->cansee) {
+        self = c->type->cansee(viewer, obj, typ, c, self);
+    }
+    return self;
+}
+
 bool curse_active(const curse * c)
 {
     if (!c)
@@ -741,13 +753,7 @@ static const char *oldnames[MAXCURSE] = {
     "speed",
     "orcish",
     "magicboost",
-    "insectfur",
-    "strength",
-    "worse",
-    "magicresistance",
-    "itemcloak",
-    "sparkle",
-    "skillmod"
+    "insectfur"
 };
 
 const char *oldcursename(int id)

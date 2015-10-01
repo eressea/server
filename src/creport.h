@@ -15,10 +15,16 @@
 extern "C" {
 #endif
 
+    struct stream;
+    struct region;
+    struct faction;
+    struct unit;
+
     void creport_cleanup(void);
     void register_cr(void);
 
     int crwritemap(const char *filename);
+    void cr_output_unit(struct stream *out, const struct region * r, const struct faction * f, const struct unit * u, int mode);
 
 #ifdef __cplusplus
 }

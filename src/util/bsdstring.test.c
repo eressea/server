@@ -1,5 +1,6 @@
 #include <CuTest.h>
 #include "bsdstring.h"
+#include <errno.h>
 #include <string.h>
 
 static void test_strlcat(CuTest * tc)
@@ -38,6 +39,7 @@ static void test_strlcpy(CuTest * tc)
     CuAssertIntEquals(tc, 8, (int)strlcpy(buffer, "herpderp", 8));
     CuAssertStrEquals(tc, "herpder", buffer);
     CuAssertIntEquals(tc, 0x7f, buffer[8]);
+    errno = 0;
 }
 
 static void test_slprintf(CuTest * tc)

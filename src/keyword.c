@@ -2,8 +2,9 @@
 #include <kernel/config.h>
 #include "keyword.h"
 
-#include "util/language.h"
-#include "util/umlaut.h"
+#include <util/language.h>
+#include <util/umlaut.h>
+#include <util/log.h>
 
 #include <critbit.h>
 
@@ -58,7 +59,7 @@ keyword_t get_keyword(const char *s, const struct locale *lang) {
 
         if (str) {
             int i;
-            const void *match;
+            void *match;
             void **tokens = get_translations(lang, UT_KEYWORDS);
             critbit_tree *cb = (critbit_tree *)*tokens;
             if (cb && cb_find_prefix(cb, str, strlen(str), &match, 1, 0)) {

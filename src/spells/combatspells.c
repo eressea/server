@@ -25,16 +25,17 @@
 #include <kernel/region.h>
 #include <kernel/unit.h>
 #include <kernel/spell.h>
-#include <kernel/spellid.h>
 #include <kernel/race.h>
 #include <kernel/terrain.h>
 
+#include <guard.h>
 #include <battle.h>
 #include <move.h>
 
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/log.h>
 #include <util/rand.h>
 #include <util/rng.h>
 
@@ -46,6 +47,30 @@
 #include <string.h>
 
 #define EFFECT_HEALING_SPELL     5
+
+// Some spells with a fixed, known ID (in XML).
+// TODO: this method of identifying spells is error-prone, do not use it for new spells.
+enum {
+    SPL_FIREBALL = 4,
+    SPL_HAGEL = 5,
+    SPL_CHAOSROW = 18,
+    SPL_FLEE = 20,
+    SPL_SONG_OF_FEAR = 21,
+    SPL_BERSERK = 22,
+    SPL_BLOODTHIRST = 23,
+    SPL_WINDSHIELD = 59,
+    SPL_HERO = 76,
+    SPL_METEORRAIN = 108,
+    SPL_REDUCESHIELD = 109,
+    SPL_ARMORSHIELD = 110,
+    SPL_DRAIG_FUMBLESHIELD = 143,
+    SPL_GWYRRD_FUMBLESHIELD = 144,
+    SPL_CERDDOR_FUMBLESHIELD = 145,
+    SPL_TYBIED_FUMBLESHIELD = 146,
+    SPL_SHADOWKNIGHTS = 147,
+    SPL_SHOCKWAVE = 163,
+    SPL_AURA_OF_FEAR = 175
+};
 
 /* ------------------------------------------------------------------ */
 /* Kampfzauberfunktionen */
@@ -825,44 +850,63 @@ int sp_shadowcall(struct castorder * co)
     return level;
 }
 
-int sp_wolfhowl(struct castorder * co)
+static fighter *summon_allies(const fighter *fi, const race *rc, int number) {
+    attrib *a;
+    unit *mage = fi->unit;
+    side *si = fi->side;
+    battle *b = si->battle;
+    region *r = b->region;
+    message *msg;
+    unit *u =
+        create_unit(r, mage->faction, number, rc, 0, NULL, mage);
+    leave(u, true);
+    setstatus(u, ST_FIGHT);
+    
+    u->hp = u->number * unit_max_hp(u);
+    
+    if (fval(mage, UFL_ANON_FACTION)) {
+        fset(u, UFL_ANON_FACTION);
+    }
+    
+    a = a_new(&at_unitdissolve);
+    a->data.ca[0] = 0;
+    a->data.ca[1] = 100;
+    a_add(&u->attribs, a);
+    
+    msg = msg_message("sp_wolfhowl_effect", "mage amount race", mage, u->number, rc);
+    message_all(b, msg);
+    msg_release(msg);
+
+    return make_fighter(b, u, si, is_attacker(fi));
+}
+
+int sp_igjarjuk(castorder *co) {
+    unit *u;
+    fighter *fm = co->magician.fig, *fi;
+    const race *rc = get_race(RC_WYRM);
+    fi = summon_allies(fm, rc, 1);
+    u = fi->unit;
+    unit_setname(u, "Igjarjuk");
+    log_info("%s summons Igjarjuk in %s", unitname(fm->unit), regionname(u->region, 0));
+    return co->level;
+}
+
+int sp_wolfhowl(castorder * co)
 {
     fighter * fi = co->magician.fig;
     int level = co->level;
     double power = co->force;
-    battle *b = fi->side->battle;
-    region *r = b->region;
-    unit *mage = fi->unit;
-    attrib *a;
-    message *msg;
     int force = (int)(get_force(power, 3) / 2);
     const race * rc = get_race(RC_WOLF);
     if (force > 0) {
-        unit *u =
-            create_unit(r, mage->faction, force, rc, 0, NULL, mage);
-        leave(u, true);
-        setstatus(u, ST_FIGHT);
-
-        set_level(u, SK_WEAPONLESS, (int)(power / 3));
-        set_level(u, SK_STAMINA, (int)(power / 3));
+        unit *u;
+        int skills = (int)(power/3);
+        fi = summon_allies(fi, rc, force);
+        u = fi->unit;
+        set_level(u, SK_WEAPONLESS, skills);
+        set_level(u, SK_STAMINA, skills);
         u->hp = u->number * unit_max_hp(u);
-
-        if (fval(mage, UFL_ANON_FACTION)) {
-            fset(u, UFL_ANON_FACTION);
-        }
-
-        a = a_new(&at_unitdissolve);
-        a->data.ca[0] = 0;
-        a->data.ca[1] = 100;
-        a_add(&u->attribs, a);
-
-        make_fighter(b, u, fi->side, is_attacker(fi));
     }
-    msg =
-        msg_message("sp_wolfhowl_effect", "mage amount race", mage, force, rc);
-    message_all(b, msg);
-    msg_release(msg);
-
     return level;
 }
 
@@ -1504,7 +1548,7 @@ int sp_fumbleshield(struct castorder * co)
     switch (sp->id) {
     case SPL_DRAIG_FUMBLESHIELD:
     case SPL_GWYRRD_FUMBLESHIELD:
-    case SPL_CERRDOR_FUMBLESHIELD:
+    case SPL_CERDDOR_FUMBLESHIELD:
     case SPL_TYBIED_FUMBLESHIELD:
         duration = 100;
         effect = _max(1, 25 - level);

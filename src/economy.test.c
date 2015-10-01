@@ -142,10 +142,8 @@ static struct unit *create_recruiter(void) {
 static void test_heroes_dont_recruit(CuTest * tc) {
     unit *u;
     order *ord;
-    const message_type *msg_types[1];
 
     test_cleanup();
-    msg_types[0] = register_msg("error_herorecruit", 3, "unit:unit", "region:region", "command:order");
 
     u = create_recruiter();
     fset(u, UFL_HERO);
@@ -155,7 +153,7 @@ static void test_heroes_dont_recruit(CuTest * tc) {
     economics(u->region);
 
     CuAssertIntEquals(tc, 1, u->number);
-    assert_messages(tc, u->faction->msgs->begin, msg_types, 1, true, 0);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error_herorecruit"));
 
     test_cleanup();
 }

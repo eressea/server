@@ -62,7 +62,6 @@ extern "C" {
     struct message;
     struct message_list;
     struct rawmaterial;
-    struct donation;
     struct item;
 
 #define MORALE_TAX_FACTOR 0.005 /* 0.5% tax per point of morale */
@@ -104,12 +103,6 @@ extern "C" {
         struct region_owner *ownership;
     } land_region;
 
-    typedef struct donation {
-        struct donation *next;
-        struct faction *f1, *f2;
-        int amount;
-    } donation;
-
     typedef struct region {
         struct region *next;
         struct land_region *land;
@@ -133,7 +126,6 @@ extern "C" {
             struct message_list *msgs;
         } *individual_messages;
         struct attrib *attribs;
-        struct donation *donations;
         const struct terrain_type *terrain;
         struct rawmaterial *resources;
 #ifdef FAST_CONNECT
@@ -169,7 +161,6 @@ extern "C" {
     extern struct attrib_type at_horseluck;
     extern struct attrib_type at_woodcount;
     extern struct attrib_type at_deathcount;
-    extern struct attrib_type at_travelunit;
 
     void initrhash(void);
     void rhash(struct region *r);

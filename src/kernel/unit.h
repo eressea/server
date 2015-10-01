@@ -127,6 +127,8 @@ extern "C" {
     int ualias(const struct unit *u);
     int weight(const struct unit *u);
 
+    void renumber_unit(struct unit *u, int no);
+
     const struct race *u_irace(const struct unit *u);
     const struct race *u_race(const struct unit *u);
     void u_setrace(struct unit *u, const struct race *);
@@ -158,22 +160,21 @@ extern "C" {
     void remove_skill(struct unit *u, skill_t sk);
     struct skill *unit_skill(const struct unit *u, skill_t id);
     bool has_skill(const unit * u, skill_t sk);
-    int effskill(const struct unit *u, skill_t sk);
-    int produceexp(struct unit *u, skill_t sk, int n);
+    int effskill(const struct unit *u, skill_t sk, const struct region *r);
     int SkillCap(skill_t sk);
+    void produceexp(struct unit *u, skill_t sk, int n);
+    void produceexp_ex(struct unit *u, skill_t sk, int n, bool (*learn)(unit *, skill_t, double));
 
-    extern void set_level(struct unit *u, skill_t id, int level);
-    extern int get_level(const struct unit *u, skill_t id);
+    void set_level(struct unit *u, skill_t id, int level);
+    int get_level(const struct unit *u, skill_t id);
     extern void transfermen(struct unit *u, struct unit *u2, int n);
 
-    extern int eff_skill(const struct unit *u, skill_t sk,
-        const struct region *r);
-    extern int eff_skill_study(const struct unit *u, skill_t sk,
-        const struct region *r);
+    int eff_skill(const struct unit *u, const struct skill *sv, const struct region *r);
+    int effskill_study(const struct unit *u, skill_t sk, const struct region *r);
 
-    extern int get_modifier(const struct unit *u, skill_t sk, int lvl,
+    int get_modifier(const struct unit *u, skill_t sk, int level,
         const struct region *r, bool noitem);
-    extern int remove_unit(struct unit **ulist, struct unit *u);
+    int remove_unit(struct unit **ulist, struct unit *u);
 
 #define GIFT_SELF     1<<0
 #define GIFT_FRIENDS  1<<1

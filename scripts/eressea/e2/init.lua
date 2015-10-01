@@ -14,5 +14,6 @@ return {
     require('eressea.astral'),
     require('eressea.locales'),
     require('eressea.jsreport'),
-    require('eressea.ents')
+    require('eressea.ents'),
+    require('eressea.cursed')
 }

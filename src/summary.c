@@ -1,4 +1,4 @@
-/* 
+﻿/* 
  * +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  * |                   |  Enno Rehling <enno@eressea.de>
  * | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
@@ -15,9 +15,9 @@
 #include "summary.h"
 #include "laws.h"
 #include "monster.h"
+#include "calendar.h"
 
 #include <kernel/alliance.h>
-#include <kernel/calendar.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/race.h>
@@ -440,7 +440,7 @@ summary *make_summary(void)
 
                     for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
                         skill_t sk = sv->id;
-                        int aktskill = eff_skill(u, sk, r);
+                        int aktskill = effskill(u, sk, r);
                         if (aktskill > s->maxskill)
                             s->maxskill = aktskill;
                     }

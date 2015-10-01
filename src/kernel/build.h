@@ -68,10 +68,10 @@ extern "C" {
     extern int destroy_cmd(struct unit *u, struct order *ord);
     extern int leave_cmd(struct unit *u, struct order *ord);
 
-    void build_road(struct region *r, struct unit *u, int size, direction_t d);
-    void create_ship(struct region *r, struct unit *u,
-        const struct ship_type *newtype, int size, struct order *ord);
-    void continue_ship(struct region *r, struct unit *u, int size);
+    void build_road(struct unit *u, int size, direction_t d);
+    void create_ship(struct unit *u, const struct ship_type *newtype,
+        int size, struct order *ord);
+    void continue_ship(struct unit *u, int size);
 
     struct building *getbuilding(const struct region *r);
     struct ship *getship(const struct region *r);

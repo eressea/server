@@ -23,6 +23,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "chaos.h"
 #include "move.h"
 #include "laws.h"
+#include "seen.h"
 #include "skill.h"
 #include "monster.h"
 
@@ -194,6 +195,7 @@ static void message_faction(battle * b, faction * f, struct message *m)
 {
     region *r = b->region;
 
+    assert(f);
     if (f->battles == NULL || f->battles->r != r) {
         struct bmsg *bm = (struct bmsg *)calloc(1, sizeof(struct bmsg));
         bm->next = f->battles;
@@ -210,6 +212,7 @@ void message_all(battle * b, message * m)
     watcher *w;
 
     for (bf = b->factions; bf; bf = bf->next) {
+        assert(bf->faction);
         message_faction(b, bf->faction, m);
     }
     if (p)
@@ -504,7 +507,7 @@ const armor_type * sh)
     if (tohit < 0.5)
         tohit = 0.5;
     if (chance(tohit)) {
-        int defense = effskill(dt.fighter->unit, SK_STAMINA);
+        int defense = effskill(dt.fighter->unit, SK_STAMINA, dt.fighter->unit->region);
         double tosave = defense * 0.05;
         return !chance(tosave);
     }
@@ -586,12 +589,12 @@ weapon_skill(const weapon_type * wtype, const unit * u, bool attacking)
     int skill;
 
     if (wtype == NULL) {
-        skill = effskill(u, SK_WEAPONLESS);
+        skill = effskill(u, SK_WEAPONLESS, 0);
         if (skill <= 0) {
             /* wenn kein waffenloser kampf, dann den rassen-defaultwert */
             if (u_race(u) == get_race(RC_ORC)) {
-                int sword = effskill(u, SK_MELEE);
-                int spear = effskill(u, SK_SPEAR);
+                int sword = effskill(u, SK_MELEE, 0);
+                int spear = effskill(u, SK_SPEAR, 0);
                 skill = _max(sword, spear) - 3;
                 if (attacking) {
                     skill = _max(skill, u_race(u)->at_default);
@@ -636,7 +639,7 @@ weapon_skill(const weapon_type * wtype, const unit * u, bool attacking)
         /* changed: if we own a weapon, we have at least a skill of 0 */
         if (!i_canuse(u, wtype->itype))
             return -1;
-        skill = effskill(u, wtype->skill);
+        skill = effskill(u, wtype->skill, 0);
         if (skill < wtype->minskill)
             skill = 0;
         if (skill > 0) {
@@ -683,7 +686,7 @@ static int CavalryBonus(const unit * u, troop enemy, int type)
     }
     else {
         /* new rule, chargers in Eressea 1.1 */
-        int skl = effskill(u, SK_RIDING);
+        int skl = effskill(u, SK_RIDING, 0);
         /* only half against trolls */
         if (skl > 0) {
             if (type == BONUS_DAMAGE) {
@@ -901,7 +904,9 @@ static void rmtroop(troop dt)
     rmfighter(df, 1);
 
     assert(dt.index >= 0 && dt.index < df->unit->number);
-    df->person[dt.index] = df->person[df->alive - df->removed];
+    if (dt.index!=df->alive-df->removed) {
+        df->person[dt.index] = df->person[df->alive - df->removed];
+    }
     if (df->removed) {
         df->person[df->alive - df->removed] = df->person[df->alive];
     }
@@ -1029,7 +1034,7 @@ static int natural_armor(unit * du)
             bonus[u_race(du)->index] = -1;
     }
     if (bonus[u_race(du)->index] > 0) {
-        int sk = effskill(du, SK_STAMINA);
+        int sk = effskill(du, SK_STAMINA, 0);
         sk /= bonus[u_race(du)->index];
         an += sk;
     }
@@ -1221,11 +1226,6 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
         res -= magic_resistance(du) * 3.0;
 
         if (u_race(du)->battle_flags & BF_EQUIPMENT) {
-#ifdef TODO_RUNESWORD
-            /* Runenschwert gibt im Kampf 80% Resistenzbonus */
-            if (dwp == WP_RUNESWORD)
-                res -= 0.80;
-#endif
             /* der Effekt von Laen steigt nicht linear */
             if (armor && fval(armor, ATF_LAEN))
                 res *= (1 - armor->magres);
@@ -1302,10 +1302,6 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
                 da, ar, df->person[dt.index].hp + rda, df->person[dt.index].hp);
         }
         if (u_race(au) == get_race(RC_DAEMON)) {
-#ifdef TODO_RUNESWORD
-            if (select_weapon(dt, 0, -1) == WP_RUNESWORD)
-                continue;
-#endif
             if (!(df->person[dt.index].flags & (FL_COURAGE | FL_DAZZLED))) {
                 df->person[dt.index].flags |= FL_DAZZLED;
                 df->person[dt.index].defence--;
@@ -1675,6 +1671,12 @@ static void report_failed_spell(struct battle * b, struct unit * mage, const str
     msg_release(m);
 }
 
+static castorder * create_castorder_combat(castorder *co, fighter *fig, const spell * sp, int level, double force) {
+    co = create_castorder(co, fig->unit, 0, sp, fig->unit->region, level, force, 0, 0, 0);
+    co->magician.fig = fig;
+    return co;
+}
+
 void do_combatmagic(battle * b, combatmagic_t was)
 {
     side *s;
@@ -1685,6 +1687,42 @@ void do_combatmagic(battle * b, combatmagic_t was)
 
     memset(spellranks, 0, sizeof(spellranks));
 
+#ifdef FFL_CURSED
+    if (was == DO_PRECOMBATSPELL) {
+        for (s = b->sides; s != b->sides + b->nsides; ++s) {
+            fighter *fig = 0;
+            if (fval(s->faction, FFL_CURSED) && s->bf->attacker) {
+                spell *sp = find_spell("igjarjuk");
+                if (sp) {
+                    int si;
+                    for (si = 0; s->enemies[si]; ++si) {
+                        side *se = s->enemies[si];
+                        if (se && !fval(se->faction, FFL_NPC)) {
+                            fighter *fi;
+                            for (fi = se->fighters; fi; fi = fi->next) {
+                                if (fi && (!fig || fig->unit->number > fi->unit->number)) {
+                                    fig = fi;
+                                    if (fig->unit->number == 1) {
+                                        break;
+                                    }
+                                }
+                            }
+                            if (fig && fig->unit->number == 1) {
+                                break;
+                            }
+                        }
+                    }
+                    if (fig) {
+                        co = create_castorder_combat(0, fig, sp, 10, 10);
+                        co->magician.fig = fig;
+                        add_castorder(&spellranks[sp->rank], co);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+#endif
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
         fighter *fig;
         for (fig = s->fighters; fig; fig = fig->next) {
@@ -1693,7 +1731,7 @@ void do_combatmagic(battle * b, combatmagic_t was)
             if (fig->alive <= 0)
                 continue;               /* fighter kann im Kampf getötet worden sein */
 
-            level = eff_skill(mage, SK_MAGIC, r);
+            level = effskill(mage, SK_MAGIC, r);
             if (level > 0) {
                 double power;
                 const spell *sp;
@@ -1742,8 +1780,7 @@ void do_combatmagic(battle * b, combatmagic_t was)
                     pay_spell(mage, sp, level, 1);
                 }
                 else {
-                    co = create_castorder(0, fig->unit, 0, sp, r, level, power, 0, 0, 0);
-                    co->magician.fig = fig;
+                    co = create_castorder_combat(0, fig, sp, level, power);
                     add_castorder(&spellranks[sp->rank], co);
                 }
             }
@@ -1775,8 +1812,7 @@ static int cast_combatspell(troop at, const spell * sp, int level, double force)
 {
     castorder co;
 
-    create_castorder(&co, at.fighter->unit, 0, sp, at.fighter->unit->region, level, force, 0, 0, 0);
-    co.magician.fig = at.fighter;
+    create_castorder_combat(&co, at.fighter, sp, level, force);
     level = sp->cast(&co);
     free_castorder(&co);
     if (level > 0) {
@@ -1867,9 +1903,8 @@ static void do_extra_spell(troop at, const att * a)
         log_error("spell '%s' has no function.\n", sp->sname);
     }
     else {
-        double force = a->level * MagicPower();
         assert(a->level > 0);
-        cast_combatspell(at, sp, a->level, force);
+        cast_combatspell(at, sp, a->level, a->level);
     }
 }
 
@@ -2295,7 +2330,6 @@ void do_attack(fighter * af)
         /* Wir suchen eine beliebige Feind-Einheit aus. An der können
          * wir feststellen, ob noch jemand da ist. */
         int apr, attacks = attacks_per_round(ta);
-        assert(attacks <= RACE_ATTACKS);
         if (!count_enemies(b, af, FIGHT_ROW, LAST_ROW, SELECT_FIND))
             break;
 
@@ -2338,8 +2372,9 @@ void do_regenerate(fighter * af)
     ta.index = af->fighting;
 
     while (ta.index--) {
-        af->person[ta.index].hp += effskill(au, SK_STAMINA);
-        af->person[ta.index].hp = _min(unit_max_hp(au), af->person[ta.index].hp);
+        struct person *p = af->person + ta.index;
+        p->hp += effskill(au, SK_STAMINA, 0);
+        p->hp = _min(unit_max_hp(au), p->hp);
     }
 }
 
@@ -2361,7 +2396,7 @@ static double horsebonus(const unit * u)
     const item_type *it_horse, *it_elvenhorse, *it_charger;
     int n1 = 0, n2 = 0, n3 = 0;
     item *itm;
-    int skl = eff_skill(u, SK_RIDING, u->region);
+    int skl = effskill(u, SK_RIDING, 0);
     const resource_type *rtype;
 
     if (skl < 1) return 0.0;
@@ -2392,11 +2427,10 @@ static double horsebonus(const unit * u)
 double fleechance(unit * u)
 {
     double c = 0.20;              /* Fluchtwahrscheinlichkeit in % */
-    region *r = u->region;
     attrib *a = a_find(u->attribs, &at_fleechance);
     /* Einheit u versucht, dem Getümmel zu entkommen */
 
-    c += (eff_skill(u, SK_STEALTH, r) * 0.05);
+    c += (effskill(u, SK_STEALTH, 0) * 0.05);
     c += horsebonus(u);
 
     if (u_race(u) == get_race(RC_HALFLING)) {
@@ -2861,10 +2895,10 @@ static void aftermath(battle * b)
                 if (sh && fval(sh, SF_DAMAGED)) {
                     int n = b->turn - 2;
                     if (n > 0) {
-                        float dmg =
+                        double dmg =
                             get_param_flt(global.parameters, "rules.ship.damage.battleround",
                             0.05F);
-                        damage_ship(sh, dmg * (float)n);
+                        damage_ship(sh, dmg * n);
                         freset(sh, SF_DAMAGED);
                     }
                 }
@@ -2965,21 +2999,16 @@ static void print_header(battle * b)
         side *s;
         char *bufp = zText;
         size_t size = sizeof(zText) - 1;
-        size_t bytes;
 
         for (s = b->sides; s != b->sides + b->nsides; ++s) {
             fighter *df;
             for (df = s->fighters; df; df = df->next) {
                 if (is_attacker(df)) {
                     if (first) {
-                        bytes = strlcpy(bufp, ", ", size);
-                        if (wrptr(&bufp, &size, bytes) != 0)
-                            WARN_STATIC_BUFFER();
+                        bufp = STRLCPY(bufp, ", ", size);
                     }
                     if (lastf) {
-                        bytes = strlcpy(bufp, (const char *)lastf, size);
-                        if (wrptr(&bufp, &size, bytes) != 0)
-                            WARN_STATIC_BUFFER();
+                        bufp = STRLCPY(bufp, lastf, size);
                         first = true;
                     }
                     if (seematrix(f, s))
@@ -2991,20 +3020,12 @@ static void print_header(battle * b)
             }
         }
         if (first) {
-            bytes = strlcpy(bufp, " ", size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
-            bytes = strlcpy(bufp, (const char *)LOC(f->locale, "and"), size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
-            bytes = strlcpy(bufp, " ", size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
+            bufp = STRLCPY(bufp, " ", size);
+            bufp = STRLCPY(bufp, LOC(f->locale, "and"), size);
+            bufp = STRLCPY(bufp, " ", size);
         }
         if (lastf) {
-            bytes = strlcpy(bufp, (const char *)lastf, size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
+            bufp = STRLCPY(bufp, lastf, size);
         }
 
         m = msg_message("battle::starters", "factions", zText);
@@ -3189,7 +3210,7 @@ side * find_side(battle * b, const faction * f, const group * g, unsigned int fl
         if (s->faction == f && s->group == g) {
             unsigned int s1flags = flags | SIDE_HASGUARDS;
             unsigned int s2flags = s->flags | SIDE_HASGUARDS;
-            if (rule_anon_battle && s->stealthfaction != stealthfaction) {
+            if (rule_anon_battle!=0 && s->stealthfaction != stealthfaction) {
                 continue;
             }
             if (s1flags == s2flags) {
@@ -3209,7 +3230,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     region *r = b->region;
     item *itm;
     fighter *fig = NULL;
-    int h, i, tactics = eff_skill(u, SK_TACTICS, r);
+    int h, i, tactics = effskill(u, SK_TACTICS, 0);
     int berserk;
     int strongmen;
     int speeded = 0, speed = 1;
@@ -3230,7 +3251,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     }
 
     /* Illusionen und Zauber kaempfen nicht */
-    if (fval(u_race(u), RCF_ILLUSIONARY) || idle(u->faction) || u->number == 0) {
+    if (fval(u_race(u), RCF_ILLUSIONARY) || u->number == 0) {
         return NULL;
     }
     if (s1 == NULL) {
@@ -3453,17 +3474,17 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
      * keine addierten boni. */
 
     /* Zuerst mal die Spezialbehandlung gewisser Sonderfälle. */
-    fig->magic = eff_skill(u, SK_MAGIC, r);
+    fig->magic = effskill(u, SK_MAGIC, 0);
 
     if (fig->horses) {
         if (!fval(r->terrain, CAVALRY_REGION) || r_isforest(r)
-            || eff_skill(u, SK_RIDING, r) < CavalrySkill()
+            || effskill(u, SK_RIDING, 0) < CavalrySkill()
             || u_race(u) == get_race(RC_TROLL) || fval(u, UFL_WERE))
             fig->horses = 0;
     }
 
     if (fig->elvenhorses) {
-        if (eff_skill(u, SK_RIDING, r) < 5 || u_race(u) == get_race(RC_TROLL)
+        if (effskill(u, SK_RIDING, 0) < 5 || u_race(u) == get_race(RC_TROLL)
             || fval(u, UFL_WERE))
             fig->elvenhorses = 0;
     }
@@ -3727,15 +3748,12 @@ static int battle_report(battle * b)
         }
     }
 
-    if (verbosity > 0)
-        log_printf(stdout, " %d", b->turn);
     fflush(stdout);
 
     for (bf = b->factions; bf; bf = bf->next) {
         faction *fac = bf->faction;
         char buf[32 * MAXSIDES];
         char *bufp = buf;
-        size_t bytes;
         size_t size = sizeof(buf) - 1;
         message *m;
 
@@ -3758,34 +3776,24 @@ static int battle_report(battle * b)
                 char buffer[32];
 
                 if (komma) {
-                    strlcpy(bufp, ", ", size);
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
+                    bufp = STRLCPY(bufp, ", ", size);
                 }
                 slprintf(buffer, sizeof(buffer), "%s %2d(%s): ",
                     loc_army, army_index(s), abbrev);
-
-                bytes = strlcpy(bufp, buffer, size);
-                if (wrptr(&bufp, &size, bytes) != 0)
-                    WARN_STATIC_BUFFER();
+                
+                bufp = STRLCPY(bufp, buffer, size);
 
                 for (r = FIGHT_ROW; r != NUMROWS; ++r) {
                     if (alive[r]) {
                         if (l != FIGHT_ROW) {
-                            bytes = strlcpy(bufp, "+", size);
-                            if (wrptr(&bufp, &size, bytes) != 0)
-                                WARN_STATIC_BUFFER();
+                            bufp = STRLCPY(bufp, "+", size);
                         }
                         while (k--) {
-                            bytes = strlcpy(bufp, "0+", size);
-                            if (wrptr(&bufp, &size, bytes) != 0)
-                                WARN_STATIC_BUFFER();
+                            bufp = STRLCPY(bufp, "0+", size);
                         }
                         sprintf(buffer, "%d", alive[r]);
-
-                        bytes = strlcpy(bufp, buffer, size);
-                        if (wrptr(&bufp, &size, bytes) != 0)
-                            WARN_STATIC_BUFFER();
+                        
+                        bufp = STRLCPY(bufp, buffer, size);
 
                         k = 0;
                         l = r + 1;
@@ -3944,7 +3952,6 @@ static bool start_battle(region * r, battle ** bp)
     unit *u;
     bool fighting = false;
 
-    /* list_foreach geht nicht, wegen flucht */
     for (u = r->units; u != NULL; u = u->next) {
         if (fval(u, UFL_LONGACTION))
             continue;
@@ -4206,8 +4213,6 @@ static void battle_flee(battle * b)
                     default:
                         if ((fig->person[dt.index].flags & FL_HIT) == 0)
                             continue;
-                        if (b->turn <= 1)
-                            continue;
                         if (fig->person[dt.index].hp <= runhp)
                             break;
                         if (fig->person[dt.index].flags & FL_PANICED) {
@@ -4233,6 +4238,52 @@ static void battle_flee(battle * b)
         }
     }
 }
+
+static bool is_enemy(battle *b, unit *u1, unit *u2) {
+    if (u1->faction != u2->faction) {
+        if (b) {
+            side *es, *s1 = 0, *s2 = 0;
+            for (es = b->sides; es != b->sides + b->nsides; ++es) {
+                if (!s1 && es->faction == u1->faction) s1 = es;
+                else if (!s2 && es->faction == u2->faction) s2 = es;
+                if (s1 && s2) break;
+            }
+            return enemy(s1, s2);
+        }
+        else {
+            return !help_enter(u1, u2);
+        }
+    }
+    return false;
+}
+
+void force_leave(region *r, battle *b) {
+    unit *u;
+
+    for (u = r->units; u; u = u->next) {
+        unit *uo = NULL;
+        if (u->building) {
+            uo = building_owner(u->building);
+        }
+        if (u->ship && r->land) {
+            uo = ship_owner(u->ship);
+        }
+        if (uo && is_enemy(b, uo, u)) {
+            message *msg = NULL;
+            if (u->building) {
+                msg = msg_message("force_leave_building", "unit owner building", u, uo, u->building);
+            }
+            else {
+                msg = msg_message("force_leave_ship", "unit owner ship", u, uo, u->ship);
+            }
+            if (msg) {
+                ADDMSG(&u->faction->msgs, msg);
+            }
+            leave(u, false);
+        }
+    }
+}
+
 
 void do_battle(region * r)
 {
@@ -4287,8 +4338,7 @@ void do_battle(region * r)
     do_combatmagic(b, DO_PRECOMBATSPELL);
 
     print_stats(b);               /* gibt die Kampfaufstellung aus */
-    if (verbosity > 0)
-        log_printf(stdout, "%s (%d, %d) : ", rname(r, default_locale), r->x, r->y);
+    log_debug("battle in %s (%d, %d) : ", regionname(r, 0), r->x, r->y);
 
     for (; battle_report(b) && b->turn <= max_turns; ++b->turn) {
         if (bdebug) {
@@ -4300,11 +4350,11 @@ void do_battle(region * r)
 
     }
 
-    if (verbosity > 0)
-        log_printf(stdout, "\n");
-
     /* Auswirkungen berechnen: */
     aftermath(b);
+    if (rule_force_leave(FORCE_LEAVE_POSTCOMBAT)) {
+        force_leave(b->region, b);
+    }
     /* Hier ist das Gefecht beendet, und wir können die
      * Hilfsstrukturen * wieder löschen: */
 

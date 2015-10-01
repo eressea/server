@@ -1,4 +1,4 @@
-/*
+ï»¿/*
 Copyright (c) 1998-2014,
 Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
@@ -23,13 +23,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "laws.h"
 #include "reports.h"
 #include "alchemy.h"
+#include "travelthru.h"
 #include "vortex.h"
 #include "monster.h"
 #include "lighthouse.h"
 
 #include <kernel/build.h>
 #include <kernel/building.h>
-#include <kernel/calendar.h>
 #include <kernel/connection.h>
 #include <kernel/curse.h>
 #include <kernel/faction.h>
@@ -48,6 +48,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/unit.h>
 
 #include "direction.h"
+#include "calendar.h"
 #include "skill.h"
 
 /* util includes */
@@ -77,6 +78,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 int *storms;
 
@@ -90,7 +92,7 @@ static attrib_type at_traveldir = {
     "traveldir",
     DEFAULT_INIT,
     DEFAULT_FINALIZE,
-    DEFAULT_AGE,                  /* Weil normales Aging an ungünstiger Stelle */
+    DEFAULT_AGE,                  /* Weil normales Aging an ungÃ¼nstiger Stelle */
     a_writechars,
     a_readchars
 };
@@ -245,15 +247,15 @@ static int ridingcapacity(unit * u)
 
     get_transporters(u->items, &animals, &acap, &vehicles, &vcap);
 
-    /* Man trägt sein eigenes Gewicht plus seine Kapazität! Die Menschen
-     ** tragen nichts (siehe walkingcapacity). Ein Wagen zählt nur, wenn er
+    /* Man trÃ¤gt sein eigenes Gewicht plus seine KapazitÃ¤t! Die Menschen
+     ** tragen nichts (siehe walkingcapacity). Ein Wagen zÃ¤hlt nur, wenn er
      ** von zwei Pferden gezogen wird */
 
-    animals = _min(animals, effskill(u, SK_RIDING) * u->number * 2);
+    animals = _min(animals, effskill(u, SK_RIDING, 0) * u->number * 2);
     if (fval(u_race(u), RCF_HORSE))
         animals += u->number;
 
-    /* maximal diese Pferde können zum Ziehen benutzt werden */
+    /* maximal diese Pferde kÃ¶nnen zum Ziehen benutzt werden */
     vehicles = _min(animals / HORSESNEEDED, vehicles);
 
     return vehicles * vcap + animals * acap;
@@ -273,7 +275,7 @@ int walkingcapacity(const struct unit *u)
     /* Das Gewicht, welches die Pferde tragen, plus das Gewicht, welches
      * die Leute tragen */
 
-    pferde_fuer_wagen = _min(animals, effskill(u, SK_RIDING) * u->number * 4);
+    pferde_fuer_wagen = _min(animals, effskill(u, SK_RIDING, 0) * u->number * 4);
     if (fval(u_race(u), RCF_HORSE)) {
         animals += u->number;
         people = 0;
@@ -282,7 +284,7 @@ int walkingcapacity(const struct unit *u)
         people = u->number;
     }
 
-    /* maximal diese Pferde können zum Ziehen benutzt werden */
+    /* maximal diese Pferde kÃ¶nnen zum Ziehen benutzt werden */
     wagen_mit_pferden = _min(vehicles, pferde_fuer_wagen / HORSESNEEDED);
 
     n = wagen_mit_pferden * vcap;
@@ -295,7 +297,7 @@ int walkingcapacity(const struct unit *u)
         /* Genug Trolle, um die Restwagen zu ziehen? */
         wagen_mit_trollen = _min(u->number / 4, wagen_ohne_pferde);
 
-        /* Wagenkapazität hinzuzählen */
+        /* WagenkapazitÃ¤t hinzuzÃ¤hlen */
         n += wagen_mit_trollen * vcap;
         wagen_ohne_pferde -= wagen_mit_trollen;
     }
@@ -336,7 +338,7 @@ static int canwalk(unit * u)
     int maxwagen, maxpferde;
     int vehicles = 0, vcap = 0;
     int animals = 0, acap = 0;
-
+    int effsk;
     /* workaround: monsters are too stupid to drop items, therefore they have
      * infinite carrying capacity */
 
@@ -345,11 +347,12 @@ static int canwalk(unit * u)
 
     get_transporters(u->items, &animals, &acap, &vehicles, &vcap);
 
-    maxwagen = effskill(u, SK_RIDING) * u->number * 2;
+    effsk = effskill(u, SK_RIDING, 0);
+    maxwagen = effsk * u->number * 2;
     if (u_race(u) == get_race(RC_TROLL)) {
         maxwagen = _max(maxwagen, u->number / 4);
     }
-    maxpferde = effskill(u, SK_RIDING) * u->number * 4 + u->number;
+    maxpferde = effsk * u->number * 4 + u->number;
 
     if (animals > maxpferde)
         return E_CANWALK_TOOMANYHORSES;
@@ -357,23 +360,23 @@ static int canwalk(unit * u)
     if (walkingcapacity(u) - eff_weight(u) >= 0)
         return E_CANWALK_OK;
 
-    /* Stimmt das Gewicht, impliziert dies hier, daß alle Wagen ohne
+    /* Stimmt das Gewicht, impliziert dies hier, daÃŸ alle Wagen ohne
      * Zugpferde/-trolle als Fracht aufgeladen wurden: zu viele Pferde hat
      * die Einheit nicht zum Ziehen benutzt, also nicht mehr Wagen gezogen
      * als erlaubt. */
 
     if (vehicles > maxwagen)
         return E_CANWALK_TOOMANYCARTS;
-    /* Es muß nicht zwingend an den Wagen liegen, aber egal... (man
-     * könnte z.B. auch 8 Eisen abladen, damit ein weiterer Wagen als
-     * Fracht draufpaßt) */
+    /* Es muÃŸ nicht zwingend an den Wagen liegen, aber egal... (man
+     * kÃ¶nnte z.B. auch 8 Eisen abladen, damit ein weiterer Wagen als
+     * Fracht draufpasst) */
 
     return E_CANWALK_TOOHEAVY;
 }
 
 bool canfly(unit * u)
 {
-    if (i_get(u->items, it_find("pegasus")) >= u->number && effskill(u, SK_RIDING) >= 4)
+    if (i_get(u->items, it_find("pegasus")) >= u->number && effskill(u, SK_RIDING, 0) >= 4)
         return true;
 
     if (fval(u_race(u), RCF_FLY))
@@ -387,7 +390,7 @@ bool canfly(unit * u)
 
 bool canswim(unit * u)
 {
-    if (i_get(u->items, it_find("dolphin")) >= u->number && effskill(u, SK_RIDING) >= 4)
+    if (i_get(u->items, it_find("dolphin")) >= u->number && effskill(u, SK_RIDING, 0) >= 4)
         return true;
 
     if (u_race(u)->flags & RCF_FLY)
@@ -408,7 +411,7 @@ bool canswim(unit * u)
 static int canride(unit * u)
 {
     int horses = 0, maxhorses, unicorns = 0, maxunicorns;
-    int skill = effskill(u, SK_RIDING);
+    int skill = effskill(u, SK_RIDING, 0);
     item *itm;
     const item_type *it_horse, *it_elvenhorse, *it_charger;
     const resource_type *rtype;
@@ -469,18 +472,9 @@ static bool cansail(const region * r, ship * sh)
     return true;
 }
 
-int enoughsailors(const ship * sh, const region * r)
+int enoughsailors(const ship * sh, int crew_skill)
 {
-    int n;
-    unit *u;
-
-    n = 0;
-
-    for (u = r->units; u; u = u->next) {
-        if (u->ship == sh)
-            n += eff_skill(u, SK_SAILING, r) * u->number;
-    }
-    return n >= sh->type->sumskill;
+    return crew_skill >= sh->type->sumskill;
 }
 
 /* ------------------------------------------------------------- */
@@ -490,7 +484,7 @@ static ship *do_maelstrom(region * r, unit * u)
     int damage;
     ship *sh = u->ship;
 
-    damage = rng_int() % 75 + rng_int() % 75 - eff_skill(u, SK_SAILING, r) * 4;
+    damage = rng_int() % 75 + rng_int() % 75 - effskill(u, SK_SAILING, r) * 4;
 
     if (damage <= 0) {
         return sh;
@@ -507,29 +501,6 @@ static ship *do_maelstrom(region * r, unit * u)
     ADDMSG(&u->faction->msgs, msg_message("entermaelstrom",
         "region ship damage sink", r, sh, damage, 0));
     return u->ship;
-}
-
-/** sets a marker in the region telling that the unit has travelled through it
- * this is used for two distinctly different purposes:
- * - to report that a unit has travelled through. the report function
- *   makes sure to only report the ships of travellers, not the travellers
- *   themselves
- * - to report the region to the traveller
- */
-void travelthru(const unit * u, region * r)
-{
-    attrib *ru = a_add(&r->attribs, a_new(&at_travelunit));
-
-    fset(r, RF_TRAVELUNIT);
-
-    ru->data.v = (void *)u;
-
-    /* the first and last region of the faction gets reset, because travelthrough
-     * could be in regions that are located before the [first, last] interval,
-     * and recalculation is needed */
-#ifdef SMART_INTERVALS
-    update_interval(u->faction, r);
-#endif
 }
 
 static direction_t
@@ -597,12 +568,12 @@ static void leave_trail(ship * sh, region * from, region_list * route)
 }
 
 static void
-mark_travelthru(const unit * u, region * r, const region_list * route,
+mark_travelthru(unit * u, region * r, const region_list * route,
 const region_list * route_end)
 {
     /* kein travelthru in der letzten region! */
     while (route != route_end) {
-        travelthru(u, r);
+        travelthru_add(r, u);
         r = route->data;
         route = route->next;
     }
@@ -612,15 +583,13 @@ ship *move_ship(ship * sh, region * from, region * to, region_list * route)
 {
     unit **iunit = &from->units;
     unit **ulist = &to->units;
-    bool trail = (route == NULL);
 
     if (from != to) {
         translist(&from->ships, &to->ships, sh);
         sh->region = to;
     }
-    if (!trail) {
+    if (route) {
         leave_trail(sh, from, route);
-        trail = true;
     }
 
     while (*iunit != NULL) {
@@ -636,7 +605,7 @@ ship *move_ship(ship * sh, region * from, region * to, region_list * route)
                 ulist = &u->next;
                 u->ship = sh; /* undo the trick -- do not use u_set_ship here */
             }
-            if (route && eff_skill(u, SK_SAILING, from) >= 1) {
+            if (route && effskill(u, SK_SAILING, from) >= 1) {
                 produceexp(u, SK_SAILING, u->number);
             }
         }
@@ -663,7 +632,7 @@ int check_ship_allowed(struct ship *sh, const region * r)
     bt_harbour = bt_find("harbour");
 
     if (sh->region && r_insectstalled(r)) {
-        /* insekten dürfen nicht hier rein. haben wir welche? */
+        /* insekten dÃ¼rfen nicht hier rein. haben wir welche? */
         unit *u;
 
         for (u = sh->region->units; u != NULL; u = u->next) {
@@ -733,7 +702,7 @@ static float damage_drift(void)
 {
     static float value = -1.0F;
     if (value < 0) {
-        value = get_param_flt(global.parameters, "rules.ship.damage_drift", 0.02F);
+        value = (float)get_param_flt(global.parameters, "rules.ship.damage_drift", 0.02F);
     }
     return value;
 }
@@ -757,34 +726,34 @@ static void drifting_ships(region * r)
                 sh->flags |= SF_FISHING;
             }
 
-            /* Schiff schon abgetrieben oder durch Zauber geschützt? */
+            /* Schiff schon abgetrieben oder durch Zauber geschÃ¼tzt? */
             if (!drift || fval(sh, SF_DRIFTED) || is_cursed(sh->attribs, C_SHIP_NODRIFT, 0)) {
                 shp = &sh->next;
                 continue;
             }
 
-            /* Kapitän bestimmen */
+            /* KapitÃ¤n bestimmen */
             for (captain = r->units; captain; captain = captain->next) {
                 if (captain->ship != sh)
                     continue;
                 if (firstu == NULL)
                     firstu = captain;
-                if (eff_skill(captain, SK_SAILING, r) >= sh->type->cptskill) {
+                if (effskill(captain, SK_SAILING, r) >= sh->type->cptskill) {
                     break;
                 }
             }
-            /* Kapitän da? Beschädigt? Genügend Matrosen?
-             * Genügend leicht? Dann ist alles OK. */
+            /* KapitÃ¤n da? BeschÃ¤digt? GenÃ¼gend Matrosen?
+             * GenÃ¼gend leicht? Dann ist alles OK. */
 
             assert(sh->type->construction->improvement == NULL);      /* sonst ist construction::size nicht ship_type::maxsize */
             if (captain && sh->size == sh->type->construction->maxsize
-                && enoughsailors(sh, r) && cansail(r, sh)) {
+                && enoughsailors(sh, crew_skill(sh)) && cansail(r, sh)) {
                 shp = &sh->next;
                 continue;
             }
 
             /* Auswahl einer Richtung: Zuerst auf Land, dann
-             * zufällig. Falls unmögliches Resultat: vergiß es. */
+             * zufÃ¤llig. Falls unmÃ¶gliches Resultat: vergiÃŸ es. */
             d_offset = rng_int() % MAXDIRECTIONS;
             for (d = 0; d != MAXDIRECTIONS; ++d) {
                 region *rn;
@@ -899,7 +868,7 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
         return NULL;
     for (u = r->units; u; u = u->next) {
         if (is_guard(u, GUARD_TRAVELTHRU)) {
-            int sk = eff_skill(u, SK_PERCEPTION, r);
+            int sk = effskill(u, SK_PERCEPTION, r);
             if (invisible(reisender, u) >= reisender->number)
                 continue;
             if (!(u_race(u)->flags & RCF_FLY) && u_race(reisender)->flags & RCF_FLY)
@@ -979,9 +948,7 @@ static bool is_guardian_r(const unit * guard)
 
     if ((guard->flags & UFL_GUARD) == 0)
         return false;
-    if (!armedmen(guard, true) && !fval(u_race(guard), RCF_UNARMEDGUARD))
-        return false;
-    return true;
+    return armedmen(guard, true) > 0 || fval(u_race(guard), RCF_UNARMEDGUARD);
 }
 
 bool is_guard(const struct unit * u, unsigned int mask)
@@ -1140,7 +1107,6 @@ static const char *shortdirections[MAXDIRECTIONS] = {
 
 static void cycle_route(order * ord, unit * u, int gereist)
 {
-    size_t bytes;
     int cm = 0;
     char tail[1024], *bufp = tail;
     char neworder[2048];
@@ -1181,25 +1147,17 @@ static void cycle_route(order * ord, unit * u, int gereist)
             if (!pause) {
                 const char *loc = LOC(lang, shortdirections[d]);
                 if (bufp != tail) {
-                    bytes = strlcpy(bufp, " ", size);
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
+                    bufp = STRLCPY_EX(bufp, " ", &size, "cycle_route");
                 }
-                bytes = strlcpy(bufp, loc, size);
-                if (wrptr(&bufp, &size, bytes) != 0)
-                    WARN_STATIC_BUFFER();
+                bufp = STRLCPY_EX(bufp, loc, &size, "cycle_route");
             }
         }
         else if (strlen(neworder) > sizeof(neworder) / 2)
             break;
         else if (cm == gereist && !paused && pause) {
             const char *loc = LOC(lang, parameters[P_PAUSE]);
-            bytes = strlcpy(bufp, " ", size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
-            bytes = strlcpy(bufp, loc, size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
+            bufp = STRLCPY_EX(bufp, " ", &size, "cycle_route");
+            bufp = STRLCPY_EX(bufp, loc, &size, "cycle_route");
             paused = true;
         }
         else if (pause) {
@@ -1335,7 +1293,9 @@ static bool roadto(const region * r, direction_t dir)
     region *r2;
     static const curse_type *roads_ct = NULL;
 
-    if (dir >= MAXDIRECTIONS || dir < 0)
+	assert(r);
+	assert(dir<MAXDIRECTIONS);
+    if (!r || dir >= MAXDIRECTIONS || dir < 0)
         return false;
     r2 = rconnect(r, dir);
     if (r == NULL || r2 == NULL)
@@ -1476,16 +1436,16 @@ static void make_route(unit * u, order * ord, region_list ** routep)
 
 /** calculate the speed of a unit
  *
- * zu Fuß reist man 1 Region, zu Pferd 2 Regionen. Mit Straßen reist
- * man zu Fuß 2, mit Pferden 3 weit.
+ * zu FuÃŸ reist man 1 Region, zu Pferd 2 Regionen. Mit StraÃŸen reist
+ * man zu FuÃŸ 2, mit Pferden 3 weit.
  *
- * Berechnet wird das mit BPs. Zu Fuß hat man 4 BPs, zu Pferd 6.
- * Normalerweise verliert man 3 BP pro Region, bei Straßen nur 2 BP.
- * Außerdem: Wenn Einheit transportiert, nur halbe BP
+ * Berechnet wird das mit BPs. Zu FuÃŸ hat man 4 BPs, zu Pferd 6.
+ * Normalerweise verliert man 3 BP pro Region, bei StraÃŸen nur 2 BP.
+ * AuÃŸerdem: Wenn Einheit transportiert, nur halbe BP
  */
 static int movement_speed(unit * u)
 {
-    int mp;
+    int mp = BP_WALKING;
     static const curse_type *speed_ct;
     static bool init = false;
     double dk = u_race(u)->speed;
@@ -1496,9 +1456,11 @@ static int movement_speed(unit * u)
     case RC_DRAGON:
     case RC_WYRM:
     case RC_FIREDRAGON:
+        return BP_DRAGON;
     case RC_BIRTHDAYDRAGON:
     case RC_SONGDRAGON:
-        return BP_DRAGON;
+        mp = BP_DRAGON;
+        break;
     default:
         break;
     }
@@ -1516,7 +1478,6 @@ static int movement_speed(unit * u)
     }
 
     switch (canride(u)) {
-
     case 1:                      /* Pferd */
         mp = BP_RIDING;
         break;
@@ -1526,8 +1487,6 @@ static int movement_speed(unit * u)
         break;
 
     default:
-        mp = BP_WALKING;
-
         /* Siebenmeilentee */
         if (get_effect(u, oldpotiontype[P_FAST]) >= u->number) {
             mp *= 2;
@@ -1622,7 +1581,7 @@ static const region_list *travel_route(unit * u,
                     landing = true;
                 }
                 else if ((u_race(u)->flags & RCF_WALK) == 0) {
-                    /* Spezialeinheiten, die nicht laufen können. */
+                    /* Spezialeinheiten, die nicht laufen kÃ¶nnen. */
                     ADDMSG(&u->faction->msgs, msg_message("detectocean",
                         "unit region", u, next));
                     break;
@@ -1635,7 +1594,7 @@ static const region_list *travel_route(unit * u,
                 }
             }
             else {
-                /* Ozeanfelder können nur von Einheiten mit Schwimmen und ohne
+                /* Ozeanfelder kÃ¶nnen nur von Einheiten mit Schwimmen und ohne
                  * Pferde betreten werden. */
                 if (!(canswim(u) || canfly(u))) {
                     ADDMSG(&u->faction->msgs, msg_message("detectocean",
@@ -1730,7 +1689,7 @@ static const region_list *travel_route(unit * u,
             walkmode = 2;
         }
 
-        /* Berichte über Durchreiseregionen */
+        /* Berichte Ã¼ber Durchreiseregionen */
 
         if (mode != TRAVEL_TRANSPORTED) {
             arg_regions *ar = var_copy_regions(route_begin, steps - 1);
@@ -1755,7 +1714,7 @@ static bool ship_ready(const region * r, unit * u)
         cmistake(u, u->thisorder, 146, MSG_MOVE);
         return false;
     }
-    if (eff_skill(u, SK_SAILING, r) < u->ship->type->cptskill) {
+    if (effskill(u, SK_SAILING, r) < u->ship->type->cptskill) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
             "error_captain_skill_low", "value ship", u->ship->type->cptskill,
             u->ship));
@@ -1766,7 +1725,7 @@ static bool ship_ready(const region * r, unit * u)
         cmistake(u, u->thisorder, 15, MSG_MOVE);
         return false;
     }
-    if (!enoughsailors(u->ship, r)) {
+    if (!enoughsailors(u->ship, crew_skill(u->ship))) {
         cmistake(u, u->thisorder, 1, MSG_MOVE);
         /*		mistake(u, u->thisorder,
                                         "Auf dem Schiff befinden sich zuwenig erfahrene Seeleute.", MSG_MOVE); */
@@ -1809,7 +1768,7 @@ buildingtype_exists(const region * r, const building_type * bt, bool working)
     return false;
 }
 
-/* Prüft, ob Ablegen von einer Küste in eine der erlaubten Richtungen erfolgt. */
+/* PrÃ¼ft, ob Ablegen von einer KÃ¼ste in eine der erlaubten Richtungen erfolgt. */
 
 static bool check_takeoff(ship * sh, region * from, region * to)
 {
@@ -1859,18 +1818,18 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
         return;
 
     /* Wir suchen so lange nach neuen Richtungen, wie es geht. Diese werden
-     * dann nacheinander ausgeführt. */
+     * dann nacheinander ausgefÃ¼hrt. */
 
     k = shipspeed(sh, u);
 
     last_point = starting_point;
     current_point = starting_point;
 
-    /* die nächste Region, in die man segelt, wird durch movewhere () aus der
+    /* die nÃ¤chste Region, in die man segelt, wird durch movewhere () aus der
      * letzten Region bestimmt.
      *
      * Anfangen tun wir bei starting_point. next_point ist beim ersten
-     * Durchlauf schon gesetzt (Parameter!). current_point ist die letzte gültige,
+     * Durchlauf schon gesetzt (Parameter!). current_point ist die letzte gÃ¼ltige,
      * befahrene Region. */
 
     while (next_point && current_point != next_point && step < k) {
@@ -1890,18 +1849,13 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
 
         if (!flying_ship(sh)) {
             int stormchance;
-            static int stormyness;
-            static int gamecookie = -1;
+            int stormyness = 0;
             int reason;
-
-            if (gamecookie != global.cookie) {
-                bool storms_enabled = get_param_int(global.parameters, "rules.ship.storms", 1) != 0;
-                if (storms_enabled) {
-                    gamedate date;
-                    get_gamedate(turn, &date);
-                    stormyness = storms ? storms[date.month] * 5 : 0;
-                }
-                gamecookie = global.cookie;
+            bool storms_enabled = get_param_int(global.parameters, "rules.ship.storms", 1) != 0;
+            if (storms_enabled) {
+                gamedate date;
+                get_gamedate(turn, &date);
+                stormyness = storms ? storms[date.month] * 5 : 0;
             }
 
             /* storms should be the first thing we do. */
@@ -1922,7 +1876,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
                     bool storm = true;
                     int d_offset = rng_int() % MAXDIRECTIONS;
                     direction_t d;
-                    /* Sturm nur, wenn nächste Region Hochsee ist. */
+                    /* Sturm nur, wenn nÃ¤chste Region Hochsee ist. */
                     for (d = 0; d != MAXDIRECTIONS; ++d) {
                         direction_t dnext = (direction_t)((d + d_offset) % MAXDIRECTIONS);
                         region *rn = rconnect(current_point, dnext);
@@ -1997,7 +1951,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
                     ADDMSG(&f->msgs, msg_message("sailnolandingstorm", "ship region", sh, next_point));
                 }
                 else {
-                    float dmg =
+                    double dmg =
                         get_param_flt(global.parameters, "rules.ship.damage.nolanding",
                         0.10F);
                     ADDMSG(&f->msgs, msg_message("sailnolanding", "ship region", sh,
@@ -2058,16 +2012,16 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
         sh = NULL;
     }
 
-    /* Nun enthält current_point die Region, in der das Schiff seine Runde
-     * beendet hat. Wir generieren hier ein Ereignis für den Spieler, das
-     * ihm sagt, bis wohin er gesegelt ist, falls er überhaupt vom Fleck
-     * gekommen ist. Das ist nicht der Fall, wenn er von der Küste ins
+    /* Nun enthÃ¤lt current_point die Region, in der das Schiff seine Runde
+     * beendet hat. Wir generieren hier ein Ereignis fÃ¼r den Spieler, das
+     * ihm sagt, bis wohin er gesegelt ist, falls er Ã¼berhaupt vom Fleck
+     * gekommen ist. Das ist nicht der Fall, wenn er von der KÃ¼ste ins
      * Inland zu segeln versuchte */
 
     if (sh != NULL && fval(sh, SF_MOVED)) {
         unit *harbourmaster;
         /* nachdem alle Richtungen abgearbeitet wurden, und alle Einheiten
-         * transferiert wurden, kann der aktuelle Befehl gelöscht werden. */
+         * transferiert wurden, kann der aktuelle Befehl gelÃ¶scht werden. */
         cycle_route(ord, u, step);
         set_order(&u->thisorder, NULL);
         if (!move_on_land) {
@@ -2092,7 +2046,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
 
         sh = move_ship(sh, starting_point, current_point, *routep);
 
-        /* Hafengebühren ? */
+        /* HafengebÃ¼hren ? */
 
         harbourmaster = owner_buildingtyp(current_point, bt_find("harbour"));
         if (sh && harbourmaster != NULL) {
@@ -2103,11 +2057,11 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
             for (u2 = current_point->units; u2; u2 = u2->next) {
                 if (u2->ship == sh && !alliedunit(harbourmaster, u->faction, HELP_GUARD)) {
 
-                    if (effskill(harbourmaster, SK_PERCEPTION) > effskill(u2, SK_STEALTH)) {
+                    if (effskill(harbourmaster, SK_PERCEPTION, 0) > effskill(u2, SK_STEALTH, 0)) {
                         for (itm = u2->items; itm; itm = itm->next) {
                             const luxury_type *ltype = resource2luxury(itm->type->rtype);
                             if (ltype != NULL && itm->number > 0) {
-                                int st = itm->number * effskill(harbourmaster, SK_TRADE) / 50;
+                                int st = itm->number * effskill(harbourmaster, SK_TRADE, 0) / 50;
                                 st = _min(itm->number, st);
 
                                 if (st > 0) {
@@ -2132,20 +2086,6 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
             }
         }
     }
-}
-
-unit *get_captain(const ship * sh)
-{
-    const region *r = sh->region;
-    unit *u;
-
-    for (u = r->units; u; u = u->next) {
-        if (u->ship == sh && u->number
-            && eff_skill(u, SK_SAILING, r) >= sh->type->cptskill)
-            return u;
-    }
-
-    return NULL;
 }
 
 /* Segeln, Wandern, Reiten
@@ -2440,7 +2380,7 @@ static void piracy_cmd(unit * u, struct order *ord)
     /* Wenn nicht, sehen wir, ob wir ein Ziel finden. */
 
     if (target_dir == NODIRECTION) {
-        /* Einheit ist also Kapitän. Jetzt gucken, in wievielen
+        /* Einheit ist also KapitÃ¤n. Jetzt gucken, in wievielen
          * Nachbarregionen potentielle Opfer sind. */
 
         for (dir = 0; dir < MAXDIRECTIONS; dir++) {
@@ -2499,7 +2439,7 @@ static void piracy_cmd(unit * u, struct order *ord)
     set_order(&u->thisorder, create_order(K_MOVE, u->faction->locale, "%s",
         LOC(u->faction->locale, directions[target_dir])));
 
-    /* Bewegung ausführen */
+    /* Bewegung ausfÃ¼hren */
     init_order(u->thisorder);
     move(u, true);
 }
@@ -2535,7 +2475,7 @@ static direction_t hunted_dir(attrib * at, int id)
     return d;
 }
 
-static int hunt(unit * u, order * ord)
+static int follow_ship(unit * u, order * ord)
 {
     region *rc = u->region;
     size_t bytes;
@@ -2579,7 +2519,8 @@ static int hunt(unit * u, order * ord)
 
     bufp = command;
     bytes = slprintf(bufp, size, "%s %s", LOC(u->faction->locale, keyword(K_MOVE)), LOC(u->faction->locale, directions[dir]));
-    if (wrptr(&bufp, &size, bytes) != 0)
+    assert(bytes <= INT_MAX);
+    if (wrptr(&bufp, &size, (int)bytes) != 0)
         WARN_STATIC_BUFFER();
 
     moves = 1;
@@ -2595,12 +2536,9 @@ static int hunt(unit * u, order * ord)
     }
     rc = rconnect(rc, dir);
     while (moves < speed && (dir = hunted_dir(rc->attribs, id)) != NODIRECTION) {
-        bytes = strlcpy(bufp, " ", size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
-        bytes = strlcpy(bufp, LOC(u->faction->locale, directions[dir]), size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
+        const char *loc = LOC(u->faction->locale, directions[dir]);
+        bufp = STRLCPY_EX(bufp, " ", &size, "hunt");
+        bufp = STRLCPY_EX(bufp, loc, &size, "hunt");
         moves++;
         rc = rconnect(rc, dir);
     }
@@ -2610,7 +2548,7 @@ static int hunt(unit * u, order * ord)
     /* NACH ignorieren und Parsing initialisieren. */
     init_tokens_str(command);
     getstrtoken();
-    /* NACH ausführen */
+    /* NACH ausfÃ¼hren */
     move(u, false);
     return 1;                     /* true -> Einheitenliste von vorne durchgehen */
 }
@@ -2675,7 +2613,7 @@ static void move_hunters(void)
                             break;
                         }
 
-                        if (!fval(u, UFL_LONGACTION) && !LongHunger(u) && hunt(u, ord)) {
+                        if (!fval(u, UFL_LONGACTION) && !LongHunger(u) && follow_ship(u, ord)) {
                             up = &r->units;
                             break;
                         }
@@ -2809,7 +2747,7 @@ void movement(void)
             if (repeat)
                 continue;
             if (ships == 0) {
-                /* Abtreiben von beschädigten, unterbemannten, überladenen Schiffen */
+                /* Abtreiben von beschÃ¤digten, unterbemannten, Ã¼berladenen Schiffen */
                 drifting_ships(r);
             }
             r = r->next;

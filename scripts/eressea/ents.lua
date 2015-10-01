@@ -16,7 +16,7 @@ end
 local function repair_ents(r)
     for u in r.units do
         if u.faction.id==666 and u.race == "undead" and u.name == "Wütende Ents" then
-            print("ent repair", u)
+            eressea.log.info("ent repair: " .. tostring(u))
             u.race = "ent"
         end
     end

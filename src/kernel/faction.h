@@ -21,7 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "skill.h"
 #include "types.h"
-
+#include <modules/score.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -39,6 +39,7 @@ extern "C" {
 #define FFL_ISNEW         (1<<1)
 #define FFL_RESTART       (1<<2)
 #define FFL_QUIT          (1<<3)
+#define FFL_CURSED        (1<<4) /* you're going to have a bad time */
 #define FFL_DEFENDER      (1<<10)
 #define FFL_SELECT        (1<<18)       /* ehemals f->dh, u->dh, r->dh, etc... */
 #define FFL_NOAID         (1<<21)       /* Hilfsflag Kampf */
@@ -49,8 +50,7 @@ extern "C" {
 #define FFL_NOIDLEOUT     (1<<24)       /* Partei stirbt nicht an NMRs */
 #define FFL_NPC           (1<<25)       /* eine Partei mit Monstern */
 #define FFL_DBENTRY       (1<<28)       /* Partei ist in Datenbank eingetragen */
-
-#define FFL_SAVEMASK (FFL_DEFENDER|FFL_NEWID|FFL_NPC|FFL_DBENTRY|FFL_NOIDLEOUT)
+#define FFL_SAVEMASK (FFL_DEFENDER|FFL_NEWID|FFL_NPC|FFL_DBENTRY|FFL_NOIDLEOUT|FFL_CURSED)
 
     typedef struct faction {
         struct faction *next;
@@ -84,9 +84,7 @@ extern "C" {
         struct group *groups;
         int nregions;
         int money;
-#if SCORE_MODULE
-        int score;
-#endif
+        score_t score;
         struct alliance *alliance;
         int alliance_joindate;      /* the turn on which the faction joined its current alliance (or left the last one) */
 #ifdef VICTORY_DELAY

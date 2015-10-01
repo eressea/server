@@ -18,7 +18,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <platform.h>
 #include <kernel/config.h>
-#if SCORE_MODULE
 #include "score.h"
 
 /* kernel includes */
@@ -35,16 +34,17 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* util includes */
 #include <util/base36.h>
+#include <util/bsdstring.h>
 #include <util/language.h>
 
 /* libc includes */
 #include <math.h>
 #include <stdio.h>
 
-int average_score_of_age(int age, int a)
+score_t average_score_of_age(int age, int a)
 {
     faction *f;
-    int sum = 0, count = 0;
+    score_t sum = 0, count = 0;
 
     for (f = factions; f; f = f->next) {
         if (!fval(f, FFL_NPC) && f->age <= age + a
@@ -65,7 +65,7 @@ void score(void)
     FILE *scoreFP;
     region *r;
     faction *fc;
-    int allscores = 0;
+    score_t allscores = 0;
     char path[MAX_PATH];
 
     for (fc = factions; fc; fc = fc->next)
@@ -124,18 +124,18 @@ void score(void)
                 skill *sv = u->skills + i;
                 switch (sv->id) {
                 case SK_MAGIC:
-                    f->score += (int)(u->number * pow(sv->level, 4));
+                    f->score += (score_t)(u->number * pow(sv->level, 4));
                     break;
                 case SK_TACTICS:
-                    f->score += (int)(u->number * pow(sv->level, 3));
+                    f->score += (score_t)(u->number * pow(sv->level, 3));
                     break;
                 case SK_SPY:
                 case SK_ALCHEMY:
                 case SK_HERBALISM:
-                    f->score += (int)(u->number * pow(sv->level, 2.5));
+                    f->score += (score_t)(u->number * pow(sv->level, 2.5));
                     break;
                 default:
-                    f->score += (int)(u->number * pow(sv->level, 2.5) / 10);
+                    f->score += (score_t)(u->number * pow(sv->level, 2.5) / 10);
                     break;
                 }
             }
@@ -159,12 +159,16 @@ void score(void)
         faction *f;
         fwrite(utf8_bom, 1, 3, scoreFP);
         for (f = factions; f; f = f->next)
-            if (f->num_total != 0) {
-                fprintf(scoreFP, "%8d (%8d/%4.2f%%/%5.2f) %30.30s (%3.3s) %5s (%3d)\n",
-                    f->score, f->score - average_score_of_age(f->age, f->age / 24 + 1),
-                    ((double)f->score / allscores) * 100,
-                    (double)f->score / f->num_total,
-                    f->name, LOC(default_locale, rc_name_s(f->race, NAME_SINGULAR)), factionid(f),
+            if (!fval(f, FFL_NPC) && f->num_total != 0) {
+                char score[32];
+                write_score(score, sizeof(score), f->score);
+                fprintf(scoreFP, "%s ", score);
+                write_score(score, sizeof(score), average_score_of_age(f->age, f->age / 24 + 1));
+                fprintf(scoreFP, "(%s) ", score);
+                fprintf(scoreFP, "%30.30s (%3.3s) %5s (%3d)\n",
+                    f->name,
+                    rc_name_s(f->race, NAME_SINGULAR),
+                    factionid(f),
                     f->age);
             }
         fclose(scoreFP);
@@ -182,8 +186,8 @@ void score(void)
             fprintf(scoreFP, "# alliance:factions:persons:score\n");
 
             for (a = alliances; a; a = a->next) {
-                int alliance_score = 0, alliance_number = 0, alliance_factions = 0;
-                int grails = 0;
+                score_t alliance_score = 0;
+                int alliance_number = 0, alliance_factions = 0, grails = 0;
                 faction *f;
 
                 for (f = factions; f; f = f->next) {
@@ -204,7 +208,7 @@ void score(void)
                     }
                 }
 
-                fprintf(scoreFP, "%d:%d:%d:%d", a->id, alliance_factions,
+                fprintf(scoreFP, "%d:%d:%d:%lld", a->id, alliance_factions,
                     alliance_number, alliance_score);
                 if (token != NULL)
                     fprintf(scoreFP, ":%d", grails);
@@ -231,4 +235,6 @@ int default_score(const item_type *itype) {
     return result;
 }
 
-#endif
+void write_score(char *buffer, size_t size, score_t score) {
+    slprintf(buffer, size, "%lld", score);
+}

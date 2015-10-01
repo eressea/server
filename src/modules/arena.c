@@ -61,6 +61,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 /* exports: */
 plane *arena = NULL;
@@ -122,12 +123,19 @@ enter_arena(unit * u, const item_type * itype, int amount, order * ord)
     skill_t sk;
     region *r = u->region;
     unit *u2;
-    int fee = u->faction->score / 5;
+    int fee = 2000;
     unused_arg(ord);
     unused_arg(amount);
     unused_arg(itype);
-    if (fee > 2000)
-        fee = 2000;
+    if (u->faction->score > fee * 5) {
+        score_t score = u->faction->score / 5;
+        if (score < INT_MAX) {
+            fee = (int)score;
+        } 
+        else {
+            fee = INT_MAX;
+        }
+    }
     if (getplane(r) == arena)
         return -1;
     if (u->number != 1 && enter_fail(u))

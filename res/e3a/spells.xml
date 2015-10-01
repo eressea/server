@@ -619,7 +619,7 @@
   <spell name="gwyrrdfumbleshield" rank="2" index="144" variable="true" combat="1">
     <resource name="aura" amount="5" cost="level"/>
   </spell>
-  <spell name="cerrdorfumbleshield" rank="2" index="145" variable="true" combat="1">
+  <spell name="cerddorfumbleshield" rank="2" index="145" variable="true" combat="1">
     <resource name="aura" amount="5" cost="level"/>
   </spell>
   <spell name="tybiedfumbleshield" rank="2" index="146" variable="true" combat="1">

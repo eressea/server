@@ -22,7 +22,8 @@ end
 function setup()
     eressea.free_game()
     eressea.settings.set("nmr.timeout", "0")
-    eressea.settings.set("rules.economy.food", "4")
+    eressea.settings.set("rules.food.flags", "4")
+    eressea.settings.set("rules.ship.storms", "0")
 end
 
 function test_learn()
@@ -107,7 +108,7 @@ function test_ship_capacity()
     local r = region.create(0,0, "ocean")
     region.create(1,0, "ocean")
     local r2 = region.create(2,0, "ocean")
-    local f = faction.create("noreply@eressea.de", "human", "de")
+    local f = faction.create("capacity@eressea.de", "human", "de")
 
     -- u1 is at the limit and moves
     local s1 = ship.create(r, "boat")

@@ -304,6 +304,9 @@
   <spell name="wolfhowl" rank="5" index="94" variable="true" combat="1">
     <resource name="aura" amount="2" cost="level"/>
   </spell>
+  <spell name="igjarjuk" rank="5" index="94" variable="true" combat="1">
+    <function name="cast" value="igjarjuk"/>
+  </spell>
   <spell name="resist_magic" rank="2" index="97" parameters="u+" los="true" ship="true" variable="true">
     <resource name="aura" amount="5" cost="level"/>
   </spell>
@@ -402,7 +405,7 @@
   <spell name="gwyrrdfumbleshield" rank="2" index="144" variable="true" combat="1">
     <resource name="aura" amount="5" cost="level"/>
   </spell>
-  <spell name="cerrdorfumbleshield" rank="2" index="145" variable="true" combat="1">
+  <spell name="cerddorfumbleshield" rank="2" index="145" variable="true" combat="1">
     <resource name="aura" amount="5" cost="level"/>
   </spell>
   <spell name="tybiedfumbleshield" rank="2" index="146" variable="true" combat="1">

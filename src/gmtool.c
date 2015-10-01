@@ -18,6 +18,7 @@
 #include "console.h"
 #include "listbox.h"
 #include "wormhole.h"
+#include "calendar.h"
 
 #include <modules/xmas.h>
 #include <modules/gmcmd.h>
@@ -30,7 +31,6 @@
 #include <modules/autoseed.h>
 
 #include <kernel/building.h>
-#include <kernel/calendar.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/plane.h>
@@ -249,6 +249,8 @@ static void paint_map(window * wnd, const state * st)
     int cols = getmaxx(win);
     int vx, vy;
 
+    assert(st);
+    if (!st) return;
     lines = lines / THEIGHT;
     cols = cols / TWIDTH;
     for (vy = 0; vy != lines; ++vy) {
@@ -260,11 +262,9 @@ static void paint_map(window * wnd, const state * st)
             int xp = vx * TWIDTH + (vy & 1) * TWIDTH / 2;
             int nx, ny;
             if (mr) {
-                if (st) {
-                    cnormalize(&mr->coord, &nx, &ny);
-                    if (tagged_region(st->selected, nx, ny)) {
-                        attr |= A_REVERSE;
-                    }
+                cnormalize(&mr->coord, &nx, &ny);
+                if (tagged_region(st->selected, nx, ny)) {
+                    attr |= A_REVERSE;
                 }
                 if (mr->r && (mr->r->flags & RF_MAPPER_HIGHLIGHT))
                     hl = 1;

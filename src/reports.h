@@ -25,6 +25,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/objtypes.h>
 #include <kernel/types.h>
 
+struct stream;
+struct seen_region;
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -54,6 +56,7 @@ extern "C" {
     void spunit(struct strlist **SP, const struct faction *f,
         const struct unit *u, unsigned int indent, int mode);
 
+    void prepare_seen(struct faction *f);
     int reports(void);
     int write_reports(struct faction *f, time_t ltime);
     int init_reports(void);
@@ -62,39 +65,11 @@ extern "C" {
     const struct unit *ucansee(const struct faction *f,
         const struct unit *u, const struct unit *x);
 
-    enum {
-        see_none,
-        see_neighbour,
-        see_lighthouse,
-        see_travel,
-        see_far,
-        see_unit,
-        see_battle
-    };
     int stealth_modifier(int seen_mode);
-
-    typedef struct seen_region {
-        struct seen_region *nextHash;
-        struct seen_region *next;
-        struct region *r;
-        unsigned char mode;
-        bool disbelieves;
-    } seen_region;
-
-    struct seen_region *find_seen(struct seen_region *seehash[],
-        const struct region *r);
-    bool add_seen(struct seen_region *seehash[], struct region *r,
-        unsigned char mode, bool dis);
-    struct seen_region **seen_init(void);
-    void seen_done(struct seen_region *seehash[]);
-    void free_seen(void);
-    void link_seen(seen_region * seehash[], const struct region *first,
-        const struct region *last);
 
     typedef struct report_context {
         struct faction *f;
         struct quicklist *addresses;
-        struct seen_region **seen;
         struct region *first, *last;
         void *userdata;
         time_t report_time;
@@ -128,6 +103,8 @@ extern "C" {
         int number;
         int level;
     } resource_report;
+    void view_default(struct seen_region **seen, struct region * r, struct faction * f);
+    void view_neighbours(struct seen_region **seen, struct region * r, struct faction * f);
     int report_resources(const struct seen_region *sr,
     struct resource_report *result, int size, const struct faction *viewer);
     int report_items(const struct item *items, struct item *result, int size,
@@ -153,6 +130,9 @@ extern "C" {
     void freestrlist(strlist * s);
     void split_paragraph(strlist ** SP, const char *s, unsigned int indent, unsigned int width, char mark);
 
+    int stream_printf(struct stream * out, const char *format, ...);
+
+    int count_travelthru(struct region *r, const struct faction *f);
 
 #define GR_PLURAL     0x01      /* grammar: plural */
 #define MAX_INVENTORY 128       /* maimum number of different items in an inventory */

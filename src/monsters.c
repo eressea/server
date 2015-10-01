@@ -74,6 +74,16 @@
 #define DRAGON_RANGE 20         /* Max. Distanz zum nächsten Drachenziel */
 #define MAXILLUSION_TEXTS   3
 
+static void give_peasants(unit *u, const item_type *itype, int reduce) {
+    char buf[64];
+    slprintf(buf, sizeof(buf), "%s 0 %d %s", LOC(u->faction->locale, keyword(K_GIVE)), reduce, LOC(u->faction->locale, itype->rtype->_name));
+    unit_addorder(u, parse_order(buf, u->faction->locale));
+}
+
+static double monster_attack_chance(void) {
+    return get_param_flt(global.parameters, "rules.monsters.attack_chance", 0.4f);
+}
+
 static void reduce_weight(unit * u)
 {
     int capacity, weight = 0;
@@ -89,9 +99,11 @@ static void reduce_weight(unit * u)
     while (*itmp != NULL) {
         item *itm = *itmp;
         const item_type *itype = itm->type;
-        weight += itm->number * itype->weight;
         if (itype->flags & ITF_VEHICLE) {
-            give_item(itm->number, itm->type, u, NULL, NULL);
+            give_peasants(u, itm->type, itm->number);
+        }
+        else {
+            weight += itm->number * itype->weight;
         }
         if (*itmp == itm)
             itmp = &itm->next;
@@ -109,7 +121,7 @@ static void reduce_weight(unit * u)
                 && itype->rtype->atype == 0) {
                 if (itype->capacity < itype->weight) {
                     int reduce = _min(itm->number, -((capacity - weight) / itype->weight));
-                    give_item(reduce, itm->type, u, NULL, NULL);
+                    give_peasants(u, itm->type, reduce);
                     weight -= reduce * itype->weight;
                 }
             }
@@ -124,7 +136,7 @@ static void reduce_weight(unit * u)
         weight += itm->number * itype->weight;
         if (itype->capacity < itype->weight) {
             int reduce = _min(itm->number, -((capacity - weight) / itype->weight));
-            give_item(reduce, itm->type, u, NULL, NULL);
+            give_peasants(u, itm->type, reduce);
             weight -= reduce * itype->weight;
         }
         if (*itmp == itm)
@@ -132,16 +144,10 @@ static void reduce_weight(unit * u)
     }
 }
 
-static float monster_attack_chance(void) {
-    return get_param_flt(global.parameters, "rules.monsters.attack_chance", 0.4f);
-}
-
 static order *monster_attack(unit * u, const unit * target)
 {
-    if (u->region != target->region)
-        return NULL;
-    if (u->faction == target->faction)
-        return NULL;
+    assert(u->region == target->region);
+    assert(u->faction != target->faction);
     if (!cansee(u->faction, u->region, target, 0))
         return NULL;
     if (monster_is_waiting(u))
@@ -159,7 +165,7 @@ static order *get_money_for_dragon(region * r, unit * u, int wanted)
     if (attack_chance > 0.0 && is_guard(u, GUARD_TAX)) {
         /* attackiere bewachende Einheiten nur wenn wir selbst schon bewachen */
         for (u2 = r->units; u2; u2 = u2->next) {
-            if (u2 != u && is_guard(u2, GUARD_TAX)) {
+            if (u2 != u && is_guard(u2, GUARD_TAX) && u->faction!=u2->faction) {
                 /*In E3 + E4 etwas problematisch, da der Regionsbesitzer immer bewacht. Der Drache greift also immer die Burg an!*/
                 order *ord = monster_attack(u, u2);
                 if (ord)
@@ -549,8 +555,7 @@ static void monster_attacks(unit * u)
     unit *u2;
 
     for (u2 = r->units; u2; u2 = u2->next) {
-        if (cansee(u->faction, r, u2, 0) && u2->faction != u->faction && inside_building(u2) != u->building
-            && chance(0.75)) {
+        if (u2->faction != u->faction && cansee(u->faction, r, u2, 0) && !inside_building(u2)) {
             order *ord = monster_attack(u, u2);
             if (ord)
                 addlist(&u->orders, ord);
@@ -665,8 +670,6 @@ static order *plan_dragon(unit * u)
     bool move = false;
     order *long_order = NULL;
 
-    reduce_weight(u);
-
     if (ta == NULL) {
         move |= (r->land == 0 || r->land->peasants == 0);   /* when no peasants, move */
         move |= (r->land == 0 || r->land->money == 0);      /* when no money, move */
@@ -716,6 +719,9 @@ static order *plan_dragon(unit * u)
             break;
         default:
             break;
+        }
+        if (long_order) {
+            reduce_weight(u);
         }
         if (rng_int() % 100 < 15) {
             const struct locale *lang = u->faction->locale;
@@ -844,7 +850,7 @@ void plan_monsters(faction * f)
                 /* Einheiten, die Waffenlosen Kampf lernen könnten, lernen es um
                  * zu bewachen: */
                 if (u_race(u)->bonus[SK_WEAPONLESS] != -99) {
-                    if (eff_skill(u, SK_WEAPONLESS, u->region) < 1) {
+                    if (effskill(u, SK_WEAPONLESS, 0) < 1) {
                         long_order =
                             create_order(K_STUDY, f->locale, "'%s'",
                             skillname(SK_WEAPONLESS, f->locale));
@@ -934,11 +940,9 @@ void spawn_dragons(void)
             fset(u, UFL_ISNEW | UFL_MOVED);
             equip_unit(u, get_equipment("monster_dragon"));
 
-            if (verbosity >= 2) {
-                log_printf(stdout, "%d %s in %s.\n", u->number,
-                    LOC(default_locale,
-                    rc_name_s(u_race(u), (u->number == 1) ? NAME_SINGULAR : NAME_PLURAL)), regionname(r, NULL));
-            }
+            log_debug("spawning %d %s in %s.\n", u->number,
+                LOC(default_locale,
+                rc_name_s(u_race(u), (u->number == 1) ? NAME_SINGULAR : NAME_PLURAL)), regionname(r, NULL));
 
             name_unit(u);
 
@@ -967,6 +971,7 @@ void spawn_undead(void)
         /* Chance 0.1% * chaosfactor */
         if (r->land && unburied > r->land->peasants / 20
             && rng_int() % 10000 < (100 + 100 * chaosfactor(r))) {
+            message *msg;
             unit *u;
             /* es ist sinnfrei, wenn irgendwo im Wald 3er-Einheiten Untote entstehen.
              * Lieber sammeln lassen, bis sie mindestens 5% der Bevölkerung sind, und
@@ -1009,14 +1014,10 @@ void spawn_undead(void)
             deathcounts(r, -undead);
             name_unit(u);
 
-            if (verbosity >= 2) {
-                log_printf(stdout, "%d %s in %s.\n", u->number,
-                    LOC(default_locale,
-                    rc_name_s(u_race(u), (u->number == 1) ? NAME_SINGULAR : NAME_PLURAL)), regionname(r, NULL));
-            }
-
-      {
-          message *msg = msg_message("undeadrise", "region", r);
+            log_debug("spawning %d %s in %s.\n", u->number,
+                LOC(default_locale,
+                rc_name_s(u_race(u), (u->number == 1) ? NAME_SINGULAR : NAME_PLURAL)), regionname(r, NULL));
+          msg = msg_message("undeadrise", "region", r);
           add_message(&r->msgs, msg);
           for (u = r->units; u; u = u->next)
               freset(u->faction, FFL_SELECT);
@@ -1027,7 +1028,6 @@ void spawn_undead(void)
               add_message(&u->faction->msgs, msg);
           }
           msg_release(msg);
-      }
         }
         else {
             int i = deathcount(r);

@@ -30,7 +30,7 @@ static critbit_tree cb_functions;
 
 pf_generic get_function(const char *name)
 {
-    const void * matches;
+    void * matches;
     pf_generic result;
     if (cb_find_prefix(&cb_functions, name, strlen(name) + 1, &matches, 1, 0)) {
         cb_get_kv(matches, &result, sizeof(result));

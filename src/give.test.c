@@ -5,12 +5,14 @@
 
 #include <kernel/ally.h>
 #include <kernel/config.h>
-#include <kernel/item.h>
-#include <kernel/terrain.h>
-#include <kernel/region.h>
-#include <kernel/order.h>
-#include <kernel/unit.h>
 #include <kernel/faction.h>
+#include <kernel/item.h>
+#include <kernel/messages.h>
+#include <kernel/order.h>
+#include <kernel/race.h>
+#include <kernel/region.h>
+#include <kernel/terrain.h>
+#include <kernel/unit.h>
 
 #include <util/base36.h>
 #include <util/language.h>
@@ -30,8 +32,21 @@ struct give {
 
 static void setup_give(struct give *env) {
     struct terrain_type *ter = test_create_terrain("plain", LAND_REGION);
+    struct locale *lang;
+    race *rc;
+
+    assert(env->f1);
+    rc = test_create_race(env->f1->race ? env->f1->race->_name : "humon");
+    rc->ec_flags |= GIVEPERSON;
+    lang = get_or_create_locale(env->f1->locale ? locale_name(env->f1->locale) : "test");
+    env->f1->locale = lang;
+    locale_setstring(lang, "ALLES", "ALLES");
+    locale_setstring(lang, "PERSONEN", "PERSONEN");
+    locale_setstring(lang, "KRAEUTER", "KRAUT");
+    init_locale(lang);
+
     env->r = test_create_region(0, 0, ter);
-    env->src = env->f1 ? test_create_unit(env->f1, env->r) : 0;
+    env->src = test_create_unit(env->f1, env->r);
     env->dst = env->f2 ? test_create_unit(env->f2, env->r) : 0;
     env->itype = it_get_or_create(rt_get_or_create("money"));
     env->itype->flags |= ITF_HERB;
@@ -185,6 +200,8 @@ static void test_give_men_other_faction(CuTest * tc) {
 static void test_give_men_requires_contact(CuTest * tc) {
     struct give env;
     message * msg;
+    order *ord;
+    char cmd[32];
 
     test_cleanup();
     env.f1 = test_create_faction(0);
@@ -194,6 +211,15 @@ static void test_give_men_requires_contact(CuTest * tc) {
     CuAssertStrEquals(tc, "feedback_no_contact", test_get_messagetype(msg));
     CuAssertIntEquals(tc, 1, env.dst->number);
     CuAssertIntEquals(tc, 1, env.src->number);
+
+    _snprintf(cmd, sizeof(cmd), "%s ALLES PERSONEN", itoa36(env.dst->no));
+    ord = create_order(K_GIVE, env.f1->locale, cmd);
+    free_messagelist(env.f1->msgs);
+    env.f1->msgs = 0;
+    give_cmd(env.src, ord);
+    CuAssertPtrEquals(tc, 0, test_find_messagetype(env.f1->msgs, "give_person"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "feedback_no_contact"));
+
     test_cleanup();
 }
 
@@ -257,9 +283,9 @@ static void test_give_herbs(CuTest * tc) {
 
     lang = get_or_create_locale("test");
     env.f1->locale = lang;
-    locale_setstring(lang, "KRAEUTER", "HERBS");
+    locale_setstring(lang, "KRAEUTER", "KRAUT");
     init_locale(lang);
-    _snprintf(cmd, sizeof(cmd), "%s HERBS", itoa36(env.dst->no));
+    _snprintf(cmd, sizeof(cmd), "%s KRAUT", itoa36(env.dst->no));
     ord = create_order(K_GIVE, lang, cmd);
     assert(ord);
 
@@ -296,6 +322,31 @@ static void test_give_denied_by_rules(CuTest * tc) {
     test_cleanup();
 }
 
+static void test_give_invalid_target(CuTest *tc) {
+    // bug https://bugs.eressea.de/view.php?id=1685
+    struct give env;
+    order *ord;
+    struct locale * lang;
+
+    test_cleanup();
+    env.f1 = test_create_faction(0);
+    env.f2 = 0;
+    setup_give(&env);
+
+    i_change(&env.src->items, env.itype, 10);
+    lang = get_or_create_locale("test");
+    env.f1->locale = lang;
+    locale_setstring(lang, "KRAEUTER", "KRAUT");
+    init_locale(lang);
+    ord = create_order(K_GIVE, lang, "## KRAUT");
+    assert(ord);
+
+    give_cmd(env.src, ord);
+    CuAssertIntEquals(tc, 10, i_get(env.src->items, env.itype));
+    CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "feedback_unit_not_found"));
+    test_cleanup();
+}
+
 CuSuite *get_give_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -315,5 +366,6 @@ CuSuite *get_give_suite(void)
     SUITE_ADD_TEST(suite, test_give_herbs);
     SUITE_ADD_TEST(suite, test_give_okay);
     SUITE_ADD_TEST(suite, test_give_denied_by_rules);
+    SUITE_ADD_TEST(suite, test_give_invalid_target);
     return suite;
 }

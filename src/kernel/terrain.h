@@ -51,9 +51,9 @@ extern "C" {
 
     typedef struct terrain_production {
         const struct resource_type *type;
-        const char *startlevel;
-        const char *base;
-        const char *divisor;
+        char *startlevel;
+        char *base;
+        char *divisor;
         float chance;
     } terrain_production;
 

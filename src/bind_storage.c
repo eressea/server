@@ -40,6 +40,9 @@ static int tolua_storage_create(lua_State * L)
     data->store = store;
 
     F = fopen(filename, type);
+    if (!F) {
+        return 0;
+    }
     if (strchr(type, 'r')) {
         fread(&data->version, sizeof(int), 1, F);
         fseek(F, sizeof(int), SEEK_CUR);

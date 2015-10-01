@@ -130,13 +130,13 @@ extern "C" {
     } weapon;
 
     /*** fighter::person::flags ***/
-#define FL_TIRED	  1
+#define FL_TIRED      1
 #define FL_DAZZLED  2           /* durch Untote oder Dämonen eingeschüchtert */
 #define FL_PANICED  4
 #define FL_COURAGE  8           /* Helden fliehen nie */
 #define FL_SLEEPING 16
-#define FL_STUNNED	32      /* eine Runde keinen Angriff */
-#define FL_HIT    	64      /* the person at attacked */
+#define FL_STUNNED    32      /* eine Runde keinen Angriff */
+#define FL_HIT        64      /* the person at attacked */
 
     typedef struct troop {
         struct fighter *fighter;
@@ -270,6 +270,7 @@ extern "C" {
         const struct group * g, unsigned int flags,
         const struct faction * stealthfaction);
     int skilldiff(troop at, troop dt, int dist);
+    void force_leave(struct region *r, struct battle *b);
 
 #ifdef __cplusplus
 }

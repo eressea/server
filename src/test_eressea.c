@@ -36,6 +36,7 @@ int RunAllTests(void)
   /* self-test */
   RUN_TESTS(suite, tests);
   RUN_TESTS(suite, callback);
+  RUN_TESTS(suite, seen);
   RUN_TESTS(suite, json);
   RUN_TESTS(suite, jsonconf);
   RUN_TESTS(suite, direction);
@@ -67,6 +68,7 @@ int RunAllTests(void)
   RUN_TESTS(suite, equipment);
   RUN_TESTS(suite, item);
   RUN_TESTS(suite, magic);
+  RUN_TESTS(suite, alchemy);
   RUN_TESTS(suite, reports);
   RUN_TESTS(suite, save);
   RUN_TESTS(suite, ship);
@@ -74,10 +76,14 @@ int RunAllTests(void)
   RUN_TESTS(suite, building);
   RUN_TESTS(suite, spell);
   RUN_TESTS(suite, spells);
+  RUN_TESTS(suite, magicresistance);
   RUN_TESTS(suite, ally);
   RUN_TESTS(suite, messages);
   /* gamecode */
+  RUN_TESTS(suite, prefix);
   RUN_TESTS(suite, battle);
+  RUN_TESTS(suite, donations);
+  RUN_TESTS(suite, travelthru);
   RUN_TESTS(suite, economy);
   RUN_TESTS(suite, give);
   RUN_TESTS(suite, laws);
@@ -88,6 +94,7 @@ int RunAllTests(void)
   RUN_TESTS(suite, vortex);
   RUN_TESTS(suite, wormhole);
   RUN_TESTS(suite, spy);
+  RUN_TESTS(suite, study);
 
   printf("\ntest summary: %d tests, %d failed\n", suite->count, suite->failCount);
   log_flags = flags;

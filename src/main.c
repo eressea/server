@@ -44,6 +44,7 @@ static const char *logfile = "eressea.log";
 static const char *luafile = 0;
 static const char *inifile = "eressea.ini";
 static int memdebug = 0;
+static int verbosity = 1;
 
 static void load_inifile(dictionary * d)
 {
@@ -80,13 +81,13 @@ static void load_inifile(dictionary * d)
     str = iniparser_getstring(d, "eressea:locales", "de,en");
     make_locales(str);
 
-    if (global.inifile) iniparser_free(global.inifile);
+    if (global.inifile) iniparser_freedict(global.inifile);
     global.inifile = d;
 }
 
 static void parse_config(const char *filename)
 {
-    dictionary *d = iniparser_new(filename);
+    dictionary *d = iniparser_load(filename);
     if (d) {
         load_inifile(d);
         log_debug("reading from configuration file %s\n", filename);
@@ -132,32 +133,33 @@ static int parse_args(int argc, char **argv, int *exitcode)
     int i;
 
     for (i = 1; i != argc; ++i) {
-        if (argv[i][0] != '-') {
-            luafile = argv[i];
+        char *argi = argv[i];
+        if (argi[0] != '-') {
+            luafile = argi;
         }
-        else if (argv[i][1] == '-') {     /* long format */
-            if (strcmp(argv[i] + 2, "version") == 0) {
+        else if (argi[1] == '-') {     /* long format */
+            if (strcmp(argi + 2, "version") == 0) {
                 printf("\n%s PBEM host\n"
                     "Copyright (C) 1996-2005 C. Schlittchen, K. Zedel, E. Rehling, H. Peters.\n\n"
                     "Compilation: " __DATE__ " at " __TIME__ "\nVersion: %d.%d.%d\n\n",
                     game_name(), VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD);
 #ifdef USE_CURSES          
             }
-            else if (strcmp(argv[i] + 2, "color") == 0) {
+            else if (strcmp(argi + 2, "color") == 0) {
                 /* force the editor to have colors */
                 force_color = 1;
 #endif          
             }
-            else if (strcmp(argv[i] + 2, "help") == 0) {
+            else if (strcmp(argi + 2, "help") == 0) {
                 return usage(argv[0], NULL);
             }
             else {
-                return usage(argv[0], argv[i]);
+                return usage(argv[0], argi);
             }
         }
         else {
             const char *arg;
-            switch (argv[i][1]) {
+            switch (argi[1]) {
             case 'r':
                 i = get_arg(argc, argv, 2, i, &arg, 0);
                 set_param(&global.parameters, "config.rules", arg);
@@ -184,7 +186,7 @@ static int parse_args(int argc, char **argv, int *exitcode)
                 return 1;
             default:
                 *exitcode = -1;
-                usage(argv[0], argv[i]);
+                usage(argv[0], argi);
                 return 1;
             }
         }
@@ -201,10 +203,10 @@ static int parse_args(int argc, char **argv, int *exitcode)
         log_stderr = LOG_CPERROR | LOG_CPWARNING;
         break;
     case 3:
-        log_stderr = LOG_CPERROR | LOG_CPWARNING | LOG_CPDEBUG;
+        log_stderr = LOG_CPERROR | LOG_CPWARNING | LOG_CPINFO;
         break;
     default:
-        log_stderr = LOG_CPERROR | LOG_CPWARNING | LOG_CPDEBUG | LOG_CPINFO;
+        log_stderr = LOG_CPERROR | LOG_CPWARNING | LOG_CPINFO | LOG_CPDEBUG;
         break;
     }
 
@@ -317,7 +319,7 @@ int main(int argc, char **argv)
     lua_done(L);
     log_close();
     if (global.inifile) {
-        iniparser_free(global.inifile);
+        iniparser_freedict(global.inifile);
     }
     return 0;
 }

@@ -43,15 +43,13 @@ static void test_get_skill_default(CuTest *tc) {
     CuAssertIntEquals(tc, SK_CROSSBOW, get_skill("crossbow", lang));
 }
 
-#define SUITE_DISABLE_TEST(suite, test) (void)test
-
 CuSuite *get_skill_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_init_skill);
     SUITE_ADD_TEST(suite, test_init_skills);
     SUITE_ADD_TEST(suite, test_get_skill);
-    SUITE_DISABLE_TEST(suite, test_get_skill_default);
+    DISABLE_TEST(suite, test_get_skill_default);
     return suite;
 }
 

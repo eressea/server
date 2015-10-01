@@ -1,6 +1,9 @@
+#pragma once
+
 #ifndef H_SKILL_H
 #define H_SKILL_H
 
+#include <platform.h>
 struct locale;
 
 typedef enum {
