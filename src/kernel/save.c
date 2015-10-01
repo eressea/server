@@ -1557,6 +1557,9 @@ int readgame(const char *filename, bool backup)
                 b->display = _strdup(name);
             }
             READ_INT(&store, &b->size);
+            if (global.data_version >= CASTLE_DAMAGE_VERSION) {
+                READ_INT(&store, &b->damage);
+            }
             READ_STR(&store, name, sizeof(name));
             b->type = bt_find(name);
             b->region = r;
@@ -1837,6 +1840,7 @@ int writegame(const char *filename)
             WRITE_STR(&store, b->name);
             WRITE_STR(&store, b->display ? b->display : "");
             WRITE_INT(&store, b->size);
+            WRITE_INT(&store, b->damage);
             WRITE_TOK(&store, b->type->_name);
             WRITE_SECTION(&store);
             a_write(&store, b->attribs, b);

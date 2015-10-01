@@ -126,6 +126,20 @@ static int tolua_building_set_size(lua_State * L)
     return 0;
 }
 
+static int tolua_building_get_damage(lua_State * L)
+{
+    building *self = (building *)tolua_tousertype(L, 1, 0);
+    tolua_pushnumber(L, self->damage);
+    return 1;
+}
+
+static int tolua_building_set_damage(lua_State * L)
+{
+    building *self = (building *)tolua_tousertype(L, 1, 0);
+    self->damage = (int)tolua_tonumber(L, 2, 0);
+    return 0;
+}
+
 static int tolua_building_get_units(lua_State * L)
 {
     building *self = (building *)tolua_tousertype(L, 1, 0);
@@ -251,6 +265,8 @@ void tolua_building_open(lua_State * L)
                 tolua_building_set_region);
             tolua_variable(L, TOLUA_CAST "size", tolua_building_get_size,
                 tolua_building_set_size);
+            tolua_variable(L, TOLUA_CAST "damage", tolua_building_get_damage,
+                tolua_building_set_damage);
             tolua_function(L, TOLUA_CAST "get_typename", tolua_building_get_typename);
             tolua_variable(L, TOLUA_CAST "objects", tolua_building_get_objects, 0);
             tolua_variable(L, TOLUA_CAST "working", tolua_building_get_working, tolua_building_set_working);

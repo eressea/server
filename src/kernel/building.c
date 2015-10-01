@@ -324,6 +324,8 @@ static int building_protection(building * b, unit * u, building_bonus bonus)
 {
 
     int i = 0;
+    double damage = 1.0;
+    assert(b);
     int bsize = buildingeffsize(b, false);
     const construction *cons = b->type->construction;
     if (!cons) {
@@ -334,15 +336,18 @@ static int building_protection(building * b, unit * u, building_bonus bonus)
     {
         cons = cons->improvement;
     }
+    if (b->damage) {
+        damage = b->damage / b->size;
+    }
 
     switch (bonus)
     {
     case DEFENSE_BONUS:
-        return cons->defense_bonus;
+        return (int)(cons->defense_bonus * damage);
     case CLOSE_COMBAT_ATTACK_BONUS:
-        return cons->close_combat_bonus;
+        return (int)(cons->close_combat_bonus * damage);
     case RANGED_ATTACK_BONUS:
-        return cons->ranged_bonus;
+        return (int)(cons->ranged_bonus * damage);
     default:
         return 0;
     }
