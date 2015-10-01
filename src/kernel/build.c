@@ -53,6 +53,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/log.h>
 #include <util/parser.h>
+#include <util/rng.h>
 #include <util/resolve.h>
 #include <util/xml.h>
 
@@ -138,7 +139,7 @@ static void destroy_road(unit * u, int nmax, struct order *ord)
         n = _min(n, road);
         if (n != 0) {
             region *r2 = rconnect(r, d);
-            short willdo = (short)eff_skill(u, SK_ROAD_BUILDING, r) * u->number;
+            int willdo = eff_skill(u, SK_ROAD_BUILDING, r) * u->number;
             willdo = _min(willdo, n);
             if (willdo <= 0) {
                 ADDMSG(&u->faction->msgs,
@@ -239,8 +240,9 @@ int destroy_cmd(unit * u, struct order *ord)
                     b->damage = b->size;
                 }
             } else {
-                /* first damage between 10% and 40% */
-                b->damage = (int)(b->size*(0.1 + lovar(0.3)));
+                /* first damage between 11% and 50% */
+                double damage_percent = rng_int() % 40 + 10;
+                    b->damage = (int)(b->size*damage_percent*0.01);
             }
             ADDMSG(&u->faction->msgs, msg_message("destroy_partial",
                 "building unit", b, u));
