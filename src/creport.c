@@ -637,6 +637,10 @@ faction * f)
         fprintf(F, "\"%s\";Beschr\n", b->display);
     if (b->size)
         fprintf(F, "%d;Groesse\n", b->size);
+    if (b->damage) {
+        int percent = (b->damage * 100) / b->size;
+        fprintf(F, "%d;Schaden\n", percent);
+    }
     if (owner)
         fprintf(F, "%d;Besitzer\n", owner ? owner->no : -1);
     if (fno >= 0)
