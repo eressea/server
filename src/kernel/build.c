@@ -211,7 +211,7 @@ int destroy_cmd(unit * u, struct order *ord)
         }
         if (b->damage >= b->size || strcmp(b->type->_name, "castle") != 0) {  
             /* Reduce size*/
-            n = min(n, eff_skill(u, SK_BUILDING, r)* u->number);
+            n = _min(n, effskill(u, SK_BUILDING, r)* u->number);
             if (n == 0) {
                 return 0;
             }
@@ -236,7 +236,7 @@ int destroy_cmd(unit * u, struct order *ord)
             }
         } else {
             /* only Damage */
-            n = min(n, (eff_skill(u, SK_BUILDING, r) + 1)* u->number);
+            n = _min(n, (effskill(u, SK_BUILDING, r) + 1)* u->number);
             if (b->damage > 0) {
                 /* do damage depending on skill and number*/
                 b->damage += n;
@@ -263,7 +263,7 @@ int destroy_cmd(unit * u, struct order *ord)
             cmistake(u, ord, 14, MSG_EVENT);
             return 14;
         }
-        n = min(n, ((eff_skill(u, SK_SHIPBUILDING, r) + 1)* u->number * 100 / sh->type->construction->maxsize));
+        n = _min(n, ((effskill(u, SK_SHIPBUILDING, r) + 1)* u->number * 100 / sh->type->construction->maxsize));
         if (n >= (sh->size * 100) / sh->type->construction->maxsize) {
             /* destroy completly */
             /* all units leave the ship */
