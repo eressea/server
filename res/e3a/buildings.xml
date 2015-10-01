@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <buildings xmlns:xi="http://www.w3.org/2001/XInclude">
 
-  <xi:include href="config:///default/buildings/castle-2.xml" />
+  <xi:include href="config://default/buildings/castle-2.xml" />
 
   <building name="watch" capacity="1" maxsize="10">
     <function name="name" value="fort_name"/>

@@ -225,8 +225,6 @@ extern "C" {
     extern const troop no_troop;
 
     /* BEGIN battle interface */
-    void battle_init(battle * b);
-    void battle_free(battle * b);
     side * find_side(battle * b, const struct faction * f, const struct group * g, unsigned int flags, const struct faction * stealthfaction);
     side * get_side(battle * b, const struct unit * u);
     fighter * get_fighter(battle * b, const struct unit * u);
@@ -251,11 +249,10 @@ extern "C" {
     extern int hits(troop at, troop dt, weapon * awp);
     extern void damage_building(struct battle *b, struct building *bldg,
         int damage_abs);
-    extern struct quicklist *fighters(struct battle *b, const struct side *vs,
+    struct quicklist *fighters(struct battle *b, const struct side *vs,
         int minrow, int maxrow, int mask);
-    extern int count_allies(const struct side *as, int minrow, int maxrow,
+    int count_allies(const struct side *as, int minrow, int maxrow,
         int select, int allytype);
-    extern int get_unitrow(const struct fighter *af, const struct side *vs);
     extern bool helping(const struct side *as, const struct side *ds);
     extern void rmfighter(fighter * df, int i);
     extern struct fighter *select_corpse(struct battle *b, struct fighter *af);

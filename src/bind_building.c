@@ -114,7 +114,7 @@ static int tolua_building_set_name(lua_State * L)
 static int tolua_building_get_size(lua_State * L)
 {
     building *self = (building *)tolua_tousertype(L, 1, 0);
-    tolua_pushnumber(L, self->size);
+    lua_pushinteger(L, self->size);
     return 1;
 }
 
@@ -159,7 +159,7 @@ static int tolua_building_get_units(lua_State * L)
 static int tolua_building_get_id(lua_State * L)
 {
     building *self = (building *)tolua_tousertype(L, 1, 0);
-    tolua_pushnumber(L, (lua_Number)self->no);
+    lua_pushinteger(L, self->no);
     return 1;
 }
 

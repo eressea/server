@@ -65,6 +65,7 @@
 
 static int g_quit;
 int force_color = 0;
+newfaction * new_players = 0;
 
 state *current_state = NULL;
 
@@ -793,7 +794,7 @@ static void handlekey(state * st, int c)
     region *r;
     char sbuffer[80];
     static char kbuffer[80];
-    int n, nx, ny;
+    int n, nx, ny, minpop, maxpop;
 
     switch (c) {
     case FAST_RIGHT:
@@ -846,12 +847,20 @@ static void handlekey(state * st, int c)
         loaddata(st);
         break;
     case 'B':
-        /*
-           make_block(st->cursor.x, st->cursor.y, 6, select_terrain(st, NULL));
-           */
+        if (!new_players) {
+            sprintf(sbuffer, "%s/newfactions", basepath());
+            new_players = read_newfactions(sbuffer);
+        }
         cnormalize(&st->cursor, &nx, &ny);
-        n = rng_int() % 8 + 8;
-        build_island_e3(nx, ny, n, n * 3);
+        minpop = get_param_int(global.parameters, "seed.population.min", 8);
+        maxpop = get_param_int(global.parameters, "seed.population.max", minpop);
+        if (maxpop > minpop) {
+            n = rng_int() % (maxpop - minpop) + minpop;
+        }
+        else {
+            n = minpop;
+        }
+        build_island_e3(&new_players, nx, ny, n, n * 3);
         st->modified = 1;
         st->wnd_info->update |= 1;
         st->wnd_status->update |= 1;
@@ -1052,8 +1061,11 @@ static void handlekey(state * st, int c)
             tag_region(st->selected, nx, ny);
         break;
     case 'A':
-        sprintf(sbuffer, "%s/newfactions", basepath());
-        seed_players(sbuffer, false);
+        if (!new_players) {
+            sprintf(sbuffer, "%s/newfactions", basepath());
+            new_players = read_newfactions(sbuffer);
+        }
+        seed_players(&new_players, false);
         st->wnd_map->update |= 1;
         break;
     case '/':
@@ -1332,15 +1344,14 @@ const char *prompt)
     return buffer[0] != 0;
 }
 
-void seed_players(const char *filename, bool new_island)
+void seed_players(newfaction **players, bool new_island)
 {
-    newfaction *players = read_newfactions(filename);
-    if (players != NULL) {
-        while (players) {
-            int n = listlen(players);
+    if (players) {
+        while (*players) {
+            int n = listlen(*players);
             int k = (n + ISLANDSIZE - 1) / ISLANDSIZE;
             k = n / k;
-            n = autoseed(&players, k, new_island ? 0 : TURNS_PER_ISLAND);
+            n = autoseed(players, k, new_island ? 0 : TURNS_PER_ISLAND);
             if (n == 0) {
                 break;
             }

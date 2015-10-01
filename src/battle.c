@@ -431,7 +431,7 @@ static int get_row(const side * s, int row, const side * vs)
     return result;
 }
 
-int get_unitrow(const fighter * af, const side * vs)
+static int get_unitrow(const fighter * af, const side * vs)
 {
     int row = statusrow(af->status);
     if (vs == NULL) {
@@ -3661,6 +3661,24 @@ static void free_fighter(fighter * fig)
 
 }
 
+static void battle_free(battle * b) {
+    side *s;
+
+    assert(b);
+
+    for (s = b->sides; s != b->sides + b->nsides; ++s) {
+        fighter *fnext = s->fighters;
+        while (fnext) {
+            fighter *fig = fnext;
+            fnext = fig->next;
+            free_fighter(fig);
+            free(fig);
+        }
+        free_side(s);
+    }
+    free(b);
+}
+
 void free_battle(battle * b)
 {
     int max_fac_no = 0;
@@ -3740,7 +3758,7 @@ static int battle_report(battle * b)
                 char buffer[32];
 
                 if (komma) {
-                    bytes = strlcpy(bufp, ", ", size);
+                    strlcpy(bufp, ", ", size);
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
                 }
@@ -4293,23 +4311,5 @@ void do_battle(region * r)
     if (b) {
         free_battle(b);
     }
-}
-
-void battle_free(battle * b) {
-    side *s;
-
-    assert(b);
-
-    for (s = b->sides; s != b->sides + b->nsides; ++s) {
-        fighter *fnext = s->fighters;
-        while (fnext) {
-            fighter *fig = fnext;
-            fnext = fig->next;
-            free_fighter(fig);
-            free(fig);
-        }
-        free_side(s);
-    }
-    free(b);
 }
 

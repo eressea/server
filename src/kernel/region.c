@@ -956,8 +956,10 @@ void setluxuries(region * r, const luxury_type * sale)
 
     assert(r->land);
 
-    if (r->land->demands)
+    if (r->land->demands) {
         freelist(r->land->demands);
+        r->land->demands = 0;
+    }
 
     for (ltype = luxurytypes; ltype; ltype = ltype->next) {
         struct demand *dmd = malloc(sizeof(struct demand));

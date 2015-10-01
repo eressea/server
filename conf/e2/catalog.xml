@@ -5,12 +5,12 @@
 
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
     <rewriteURI
-        uriStartString="config:///core/"
+        uriStartString="config://core/"
         rewritePrefix="../../res/core/" />
     <rewriteURI
-        uriStartString="config:///game/"
+        uriStartString="config://game/"
         rewritePrefix="../../res/eressea/" />
     <rewriteURI
-        uriStartString="config:///default/"
+        uriStartString="config://default/"
         rewritePrefix="../../res/" />
 </catalog>

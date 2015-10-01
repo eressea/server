@@ -45,7 +45,7 @@ int tolua_shiplist_next(lua_State * L)
 static int tolua_ship_get_id(lua_State * L)
 {
     ship *self = (ship *)tolua_tousertype(L, 1, 0);
-    tolua_pushnumber(L, (lua_Number)self->no);
+    lua_pushinteger(L, self->no);
     return 1;
 }
 
@@ -152,7 +152,7 @@ tolua_ship_tostring(lua_State * L)
 static int tolua_ship_get_flags(lua_State * L)
 {
     ship *self = (ship *)tolua_tousertype(L, 1, 0);
-    tolua_pushnumber(L, (lua_Number)self->flags);
+    lua_pushinteger(L, self->flags);
     return 1;
 }
 
@@ -179,7 +179,7 @@ static int tolua_ship_get_coast(lua_State * L)
 {
     ship *self = (ship *)tolua_tousertype(L, 1, 0);
     if (self->coast) {
-        tolua_pushnumber(L, self->coast);
+        lua_pushinteger(L, self->coast);
         return 1;
     }
     return 0;
