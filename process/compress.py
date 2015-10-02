@@ -24,7 +24,13 @@ try:
 except:
     print "%s: reports.txt file does not exist" % (argv[0], )
     exit(0)
-    
+
+extras = [ '../wochenbericht.txt' ]
+express='../express-%s.txt' % turn
+if os.path.isfile(express):
+    os.symlink(express, 'express.txt')
+    extras.append('express.txt')
+
 for line in infile.readlines():
     settings = line[:-1].split(":")
     options = { "turn" : turn}
@@ -38,7 +44,6 @@ for line in infile.readlines():
     if not options.has_key("reports"):
         continue
     reports = options["reports"].split(",")
-#    reports = reports + [ "iso.cr" ]
     prefix = "%(turn)s-%(faction)s." % options
     if options["compression"]=="zip":
         output = prefix+"zip"
@@ -61,7 +66,6 @@ for line in infile.readlines():
                     if os.path.isfile(output):
                         continue
                     os.system("bzip2 %s" % filename)
-    extras = [ '../wochenbericht.txt', '../express.txt' ]
     for extra in extras:
         if os.path.isfile(extra):
             files = files + [extra]
