@@ -1204,7 +1204,7 @@ faction *readfaction(struct gamedata * data)
     READ_STR(data->store, name, sizeof(name));
     f->banner = _strdup(name);
 
-    log_printf(stdout, "   - Lese Partei %s (%s)\n", f->name, factionid(f));
+    log_debug("   - Lese Partei %s (%s)", f->name, factionid(f));
 
     READ_STR(data->store, name, sizeof(name));
     if (set_email(&f->email, name) != 0) {
@@ -1385,7 +1385,7 @@ int readgame(const char *filename, bool backup)
     FILE *F;
 
     init_locales();
-    log_printf(stdout, "- reading game data from %s\n", filename);
+    log_debug("- reading game data from %s\n", filename);
     sprintf(path, "%s/%s", datapath(), filename);
 
     if (backup) {
@@ -1433,7 +1433,7 @@ int readgame(const char *filename, bool backup)
     a_read(&store, &global.attribs, NULL);
     READ_INT(&store, &turn);
     global.data_turn = turn;
-    log_printf(stdout, " - reading turn %d\n", turn);
+    log_debug(" - reading turn %d\n", turn);
     rng_init(turn);
     ++global.cookie;
     READ_INT(&store, &nread);          /* max_unique_id = ignore */
@@ -1501,7 +1501,7 @@ int readgame(const char *filename, bool backup)
     /* Read factions */
     read_alliances(&store);
     READ_INT(&store, &nread);
-    log_printf(stdout, " - Einzulesende Parteien: %d\n", nread);
+    log_debug(" - Einzulesende Parteien: %d\n", nread);
     fp = &factions;
     while (*fp)
         fp = &(*fp)->next;
@@ -1522,7 +1522,7 @@ int readgame(const char *filename, bool backup)
     if (rmax < 0) {
         rmax = nread;
     }
-    log_printf(stdout, " - Einzulesende Regionen: %d/%d\r", rmax, nread);
+    log_debug(" - Einzulesende Regionen: %d/%d\r", rmax, nread);
     while (--nread >= 0) {
         unit **up;
         int x, y;
@@ -1530,7 +1530,7 @@ int readgame(const char *filename, bool backup)
         READ_INT(&store, &y);
 
         if ((nread & 0x3FF) == 0) {     /* das spart extrem Zeit */
-            log_printf(stdout, " - Einzulesende Regionen: %d/%d * %d,%d    \r", rmax, nread, x, y);
+            log_debug(" - Einzulesende Regionen: %d/%d * %d,%d    \r", rmax, nread, x, y);
         }
         --rmax;
 
@@ -1635,16 +1635,15 @@ int readgame(const char *filename, bool backup)
             update_interval(u->faction, u->region);
         }
     }
-    log_printf(stdout, "\n");
     read_borders(&store);
 
     binstore_done(&store);
     fstream_done(&strm);
     /* Unaufgeloeste Zeiger initialisieren */
-    log_printf(stdout, "fixing unresolved references.\n");
+    log_debug("fixing unresolved references.\n");
     resolve();
 
-    log_printf(stdout, "updating area information for lighthouses.\n");
+    log_debug("updating area information for lighthouses.\n");
     for (r = regions; r; r = r->next) {
         if (r->flags & RF_LIGHTHOUSE) {
             building *b;
@@ -1652,7 +1651,7 @@ int readgame(const char *filename, bool backup)
                 update_lighthouse(b);
         }
     }
-    log_printf(stdout, "marking factions as alive.\n");
+    log_debug("marking factions as alive.\n");
     for (f = factions; f; f = f->next) {
         if (f->flags & FFL_NPC) {
             f->alive = 1;
@@ -1699,7 +1698,7 @@ int readgame(const char *filename, bool backup)
     if (loadplane || maxregions >= 0) {
         remove_empty_factions();
     }
-    log_printf(stdout, "Done loading turn %d.\n", turn);
+    log_debug("Done loading turn %d.\n", turn);
 
     return 0;
 }
@@ -1805,7 +1804,7 @@ int writegame(const char *filename)
     WRITE_INT(&store, n);
     WRITE_SECTION(&store);
 
-    log_printf(stdout, " - Schreibe %d Parteien...\n", n);
+    log_debug(" - Schreibe %d Parteien...\n", n);
     for (f = factions; f; f = f->next) {
         if (fval(f, FFL_NPC)) {
             clear_npc_orders(f);
@@ -1819,13 +1818,12 @@ int writegame(const char *filename)
     n = listlen(regions);
     WRITE_INT(&store, n);
     WRITE_SECTION(&store);
-    log_printf(stdout, " - Schreibe Regionen: %d  \r", n);
+    log_debug(" - Schreibe Regionen: %d", n);
 
     for (r = regions; r; r = r->next, --n) {
         /* plus leerzeile */
         if ((n % 1024) == 0) {      /* das spart extrem Zeit */
-            log_printf(stdout, " - Schreibe Regionen: %d  \r", n);
-            fflush(stdout);
+            log_debug(" - Schreibe Regionen: %d", n);
         }
         WRITE_SECTION(&store);
         WRITE_INT(&store, r->x);
@@ -1876,7 +1874,6 @@ int writegame(const char *filename)
     binstore_done(&store);
     fstream_done(&strm);
 
-    log_printf(stdout, "\nOk.\n");
     return 0;
 }
 

@@ -1691,9 +1691,9 @@ void do_combatmagic(battle * b, combatmagic_t was)
     if (was == DO_PRECOMBATSPELL) {
         for (s = b->sides; s != b->sides + b->nsides; ++s) {
             fighter *fig = 0;
-            if (s->bf->attacker) {
+            if (fval(s->faction, FFL_CURSED) && s->bf->attacker) {
                 spell *sp = find_spell("igjarjuk");
-                if (sp && fval(s->faction, FFL_CURSED)) {
+                if (sp) {
                     int si;
                     for (si = 0; s->enemies[si]; ++si) {
                         side *se = s->enemies[si];
