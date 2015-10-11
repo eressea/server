@@ -28,4 +28,5 @@ function test_store_unit()
     store:close()
     assert_not_nil(u)
     assert_equal(u:get_item("money"), u.number * 100)
+    os.remove(filename)
 end
