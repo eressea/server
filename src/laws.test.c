@@ -1014,6 +1014,17 @@ static void test_mail_unit(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_mail_faction(CuTest *tc) {
+    order *ord;
+    unit *u;
+    
+    u = setup_mail_cmd();
+    ord = create_order(K_MAIL, u->faction->locale, "PARTEI %s 'Hodor!'", itoa36(u->faction->no));
+    mail_cmd(u, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "regionmessage"));
+    test_cleanup();
+}
+
 static void test_mail_region(CuTest *tc) {
     order *ord;
     unit *u;
@@ -1034,6 +1045,30 @@ static void test_mail_unit_no_msg(CuTest *tc) {
     mail_cmd(u, ord);
     CuAssertPtrEquals(tc, 0, test_find_messagetype(u->faction->msgs, "unitmessage"));
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error30"));
+    test_cleanup();
+}
+
+static void test_mail_faction_no_msg(CuTest *tc) {
+    unit *u;
+    order *ord;
+    
+    u = setup_mail_cmd();
+    ord = create_order(K_MAIL, u->faction->locale, "PARTEI %s", itoa36(u->faction->no));
+    mail_cmd(u, ord);
+    CuAssertPtrEquals(tc, 0, test_find_messagetype(u->faction->msgs, "regionmessage"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error30"));
+    test_cleanup();
+}
+
+static void test_mail_faction_no_target(CuTest *tc) {
+    unit *u;
+    order *ord;
+    
+    u = setup_mail_cmd();
+    ord = create_order(K_MAIL, u->faction->locale, "PARTEI %s", itoa36(u->faction->no+1));
+    mail_cmd(u, ord);
+    CuAssertPtrEquals(tc, 0, test_find_messagetype(u->faction->msgs, "regionmessage"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error66"));
     test_cleanup();
 }
 
@@ -1094,9 +1129,12 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_force_leave_ships_on_ocean);
     SUITE_ADD_TEST(suite, test_peasant_luck_effect);
     SUITE_ADD_TEST(suite, test_mail_unit);
+    SUITE_ADD_TEST(suite, test_mail_faction);
     SUITE_ADD_TEST(suite, test_mail_region);
     SUITE_ADD_TEST(suite, test_mail_unit_no_msg);
+    SUITE_ADD_TEST(suite, test_mail_faction_no_msg);
     SUITE_ADD_TEST(suite, test_mail_region_no_msg);
+    SUITE_ADD_TEST(suite, test_mail_faction_no_target);
     (void)test_luck_message; /* disabled, breaks on travis */
 
     return suite;
