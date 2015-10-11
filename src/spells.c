@@ -101,6 +101,10 @@
 #include <attributes/hate.h>
 /* ----------------------------------------------------------------------- */
 
+#if defined(_MSC_VER) && _MSC_VER >= 1900
+# pragma warning(disable: 4774) // TODO: remove this
+#endif
+
 static double zero_effect = 0.0;
 
 attrib_type at_wdwpyramid = {
