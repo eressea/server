@@ -1531,7 +1531,7 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
     fprintf(F, "\"%s\";charset\n", charset);
     fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
     fprintf(F, "%d;noskillpoints\n", 1);
-    fprintf(F, "%ld;date\n", ctx->report_time);
+    fprintf(F, "%lld;date\n", (long long)ctx->report_time);
     fprintf(F, "\"%s\";Spiel\n", game_name());
     fprintf(F, "\"%s\";Konfiguration\n", "Standard");
     fprintf(F, "\"%s\";Koordinaten\n", "Hex");
