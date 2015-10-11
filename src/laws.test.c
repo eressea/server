@@ -989,9 +989,7 @@ static void test_nmr_warnings(CuTest *tc) {
     test_cleanup();
 }
 
-static void test_mail_cmd(CuTest *tc) {
-    unit *u;
-    order *ord;
+static unit * setup_mail_cmd(void) {
     faction *f;
     struct locale *lang;
     
@@ -999,30 +997,32 @@ static void test_mail_cmd(CuTest *tc) {
     f = test_create_faction(0);
     f->locale = lang = get_or_create_locale("de");
     locale_setstring(lang, parameters[P_UNIT], "EINHEIT");
+    locale_setstring(lang, parameters[P_REGION], "REGION");
+    locale_setstring(lang, parameters[P_FACTION], "PARTEI");
     init_parameters(lang);
-    u = test_create_unit(f, test_create_region(0, 0, 0));
+    return test_create_unit(f, test_create_region(0, 0, 0));
+}
+
+static void test_mail_cmd(CuTest *tc) {
+    order *ord;
+    unit *u;
+    
+    u = setup_mail_cmd();
     ord = create_order(K_MAIL, u->faction->locale, "EINHEIT %s 'Hodor!'", itoa36(u->no));
     mail_cmd(u, ord);
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "unitmessage"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "unitmessage"));
     test_cleanup();
 }
 
 static void test_mail_cmd_no_msg(CuTest *tc) {
     unit *u;
     order *ord;
-    faction *f;
-    struct locale *lang;
     
-    test_cleanup();
-    f = test_create_faction(0);
-    f->locale = lang = get_or_create_locale("de");
-    locale_setstring(lang, parameters[P_UNIT], "EINHEIT");
-    init_parameters(lang);
-    u = test_create_unit(f, test_create_region(0, 0, 0));
+    u = setup_mail_cmd();
     ord = create_order(K_MAIL, u->faction->locale, "EINHEIT %s", itoa36(u->no));
     mail_cmd(u, ord);
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "unitmessage"));
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error30"));
+    CuAssertPtrEquals(tc, 0, test_find_messagetype(u->faction->msgs, "unitmessage"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error30"));
     test_cleanup();
 }
 
