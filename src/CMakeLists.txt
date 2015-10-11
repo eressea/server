@@ -79,6 +79,7 @@ ENDIF()
 set (ERESSEA_SRC
   calendar.c
   move.c
+  piracy.c
   spells.c
   battle.c
   alchemy.c

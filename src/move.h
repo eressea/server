@@ -74,6 +74,8 @@ extern "C" {
         const struct building_type *bt);
     bool move_blocked(const struct unit *u, const struct region *src,
         const struct region *dest);
+    bool can_takeoff(const struct ship * sh, const struct region * from, const struct region * to);
+    void move_cmd(struct unit * u, bool move_on_land);
 
 #define SA_HARBOUR 2
 #define SA_COAST 1
