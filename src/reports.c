@@ -75,6 +75,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "move.h"
 
+#if defined(_MSC_VER) && _MSC_VER >= 1900
+# pragma warning(disable: 4774) // TODO: remove this
+#endif
+
 #define SCALEWEIGHT      100    /* Faktor, um den die Anzeige von Gewichten skaliert wird */
 
 bool nocr = false;

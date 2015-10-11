@@ -1992,7 +1992,7 @@ int mail_cmd(unit * u, struct order *ord)
             }
 
             s = getstrtoken();
-            if (!s[0]) {
+            if (!s || !s[0]) {
                 cmistake(u, ord, 30, MSG_MESSAGE);
                 break;
             }
@@ -2015,7 +2015,7 @@ int mail_cmd(unit * u, struct order *ord)
             }
 
             s = getstrtoken();
-            if (!s[0]) {
+            if (!s || !s[0]) {
                 cmistake(u, ord, 30, MSG_MESSAGE);
                 break;
             }
@@ -2047,7 +2047,7 @@ int mail_cmd(unit * u, struct order *ord)
 
             s = getstrtoken();
 
-            if (!s[0]) {
+            if (!s || !s[0]) {
                 cmistake(u, ord, 30, MSG_MESSAGE);
                 break;
             }
@@ -2076,7 +2076,7 @@ int mail_cmd(unit * u, struct order *ord)
 
             s = getstrtoken();
 
-            if (!s[0]) {
+            if (!s || !s[0]) {
                 cmistake(u, ord, 30, MSG_MESSAGE);
                 break;
             }
