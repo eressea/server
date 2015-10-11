@@ -989,9 +989,7 @@ static void test_nmr_warnings(CuTest *tc) {
     test_cleanup();
 }
 
-static void test_mail_cmd(CuTest *tc) {
-    unit *u;
-    order *ord;
+static unit * setup_mail_cmd(void) {
     faction *f;
     struct locale *lang;
     
@@ -999,30 +997,90 @@ static void test_mail_cmd(CuTest *tc) {
     f = test_create_faction(0);
     f->locale = lang = get_or_create_locale("de");
     locale_setstring(lang, parameters[P_UNIT], "EINHEIT");
+    locale_setstring(lang, parameters[P_REGION], "REGION");
+    locale_setstring(lang, parameters[P_FACTION], "PARTEI");
     init_parameters(lang);
-    u = test_create_unit(f, test_create_region(0, 0, 0));
+    return test_create_unit(f, test_create_region(0, 0, 0));
+}
+
+static void test_mail_unit(CuTest *tc) {
+    order *ord;
+    unit *u;
+    
+    u = setup_mail_cmd();
     ord = create_order(K_MAIL, u->faction->locale, "EINHEIT %s 'Hodor!'", itoa36(u->no));
     mail_cmd(u, ord);
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "unitmessage"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "unitmessage"));
     test_cleanup();
 }
 
-static void test_mail_cmd_no_msg(CuTest *tc) {
+static void test_mail_faction(CuTest *tc) {
+    order *ord;
+    unit *u;
+    
+    u = setup_mail_cmd();
+    ord = create_order(K_MAIL, u->faction->locale, "PARTEI %s 'Hodor!'", itoa36(u->faction->no));
+    mail_cmd(u, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "regionmessage"));
+    test_cleanup();
+}
+
+static void test_mail_region(CuTest *tc) {
+    order *ord;
+    unit *u;
+    
+    u = setup_mail_cmd();
+    ord = create_order(K_MAIL, u->faction->locale, "REGION 'Hodor!'", itoa36(u->no));
+    mail_cmd(u, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->region->msgs, "mail_result"));
+    test_cleanup();
+}
+
+static void test_mail_unit_no_msg(CuTest *tc) {
     unit *u;
     order *ord;
-    faction *f;
-    struct locale *lang;
     
-    test_cleanup();
-    f = test_create_faction(0);
-    f->locale = lang = get_or_create_locale("de");
-    locale_setstring(lang, parameters[P_UNIT], "EINHEIT");
-    init_parameters(lang);
-    u = test_create_unit(f, test_create_region(0, 0, 0));
+    u = setup_mail_cmd();
     ord = create_order(K_MAIL, u->faction->locale, "EINHEIT %s", itoa36(u->no));
     mail_cmd(u, ord);
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "unitmessage"));
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error30"));
+    CuAssertPtrEquals(tc, 0, test_find_messagetype(u->faction->msgs, "unitmessage"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error30"));
+    test_cleanup();
+}
+
+static void test_mail_faction_no_msg(CuTest *tc) {
+    unit *u;
+    order *ord;
+    
+    u = setup_mail_cmd();
+    ord = create_order(K_MAIL, u->faction->locale, "PARTEI %s", itoa36(u->faction->no));
+    mail_cmd(u, ord);
+    CuAssertPtrEquals(tc, 0, test_find_messagetype(u->faction->msgs, "regionmessage"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error30"));
+    test_cleanup();
+}
+
+static void test_mail_faction_no_target(CuTest *tc) {
+    unit *u;
+    order *ord;
+    
+    u = setup_mail_cmd();
+    ord = create_order(K_MAIL, u->faction->locale, "PARTEI %s", itoa36(u->faction->no+1));
+    mail_cmd(u, ord);
+    CuAssertPtrEquals(tc, 0, test_find_messagetype(u->faction->msgs, "regionmessage"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error66"));
+    test_cleanup();
+}
+
+static void test_mail_region_no_msg(CuTest *tc) {
+    unit *u;
+    order *ord;
+    
+    u = setup_mail_cmd();
+    ord = create_order(K_MAIL, u->faction->locale, "REGION");
+    mail_cmd(u, ord);
+    CuAssertPtrEquals(tc, 0, test_find_messagetype(u->region->msgs, "mail_result"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error30"));
     test_cleanup();
 }
 
@@ -1070,8 +1128,13 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_force_leave_ships);
     SUITE_ADD_TEST(suite, test_force_leave_ships_on_ocean);
     SUITE_ADD_TEST(suite, test_peasant_luck_effect);
-    SUITE_ADD_TEST(suite, test_mail_cmd);
-    SUITE_ADD_TEST(suite, test_mail_cmd_no_msg);
+    SUITE_ADD_TEST(suite, test_mail_unit);
+    SUITE_ADD_TEST(suite, test_mail_faction);
+    SUITE_ADD_TEST(suite, test_mail_region);
+    SUITE_ADD_TEST(suite, test_mail_unit_no_msg);
+    SUITE_ADD_TEST(suite, test_mail_faction_no_msg);
+    SUITE_ADD_TEST(suite, test_mail_region_no_msg);
+    SUITE_ADD_TEST(suite, test_mail_faction_no_target);
     (void)test_luck_message; /* disabled, breaks on travis */
 
     return suite;

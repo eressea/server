@@ -257,7 +257,7 @@ const char * test_get_messagetype(const message *msg) {
 
 struct message * test_find_messagetype(struct message_list *msgs, const char *name) {
     struct mlist *ml;
-    assert(msgs);
+    if (!msgs) return 0;
     for (ml = msgs->begin; ml; ml = ml->next) {
         if (strcmp(name, test_get_messagetype(ml->msg)) == 0) {
             return ml->msg;
