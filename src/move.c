@@ -1847,66 +1847,65 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
         }
 
         if (!flying_ship(sh)) {
-            int stormchance;
-            int stormyness = 0;
+            int stormchance = 0;
             int reason;
             bool storms_enabled = get_param_int(global.parameters, "rules.ship.storms", 1) != 0;
             if (storms_enabled) {
+                int stormyness;
                 gamedate date;
                 get_gamedate(turn, &date);
                 stormyness = storms ? storms[date.month] * 5 : 0;
-            }
 
-            /* storms should be the first thing we do. */
-            stormchance = stormyness / shipspeed(sh, u);
-            if (check_leuchtturm(next_point, NULL)) {
-                int param = get_param_int(global.parameters, "rules.lighthous.stormchancedevisor", 0);
-                if (param > 0) {
-                    stormchance /= param;
+                /* storms should be the first thing we do. */
+                stormchance = stormyness / shipspeed(sh, u);
+                if (check_leuchtturm(next_point, NULL)) {
+                    int param = get_param_int(global.parameters, "rules.lighthous.stormchancedevisor", 0);
+                    if (param > 0) {
+                        stormchance /= param;
+                    }
+                    else {
+                        stormchance = 0;
+                    }
                 }
-                else {
-                    stormchance = 0;
-                }
-            }
-            if (rng_int() % 10000 < stormchance * sh->type->storm
-                && fval(current_point->terrain, SEA_REGION)) {
-                if (!is_cursed(sh->attribs, C_SHIP_NODRIFT, 0)) {
-                    region *rnext = NULL;
-                    bool storm = true;
-                    int d_offset = rng_int() % MAXDIRECTIONS;
-                    direction_t d;
-                    /* Sturm nur, wenn nächste Region Hochsee ist. */
-                    for (d = 0; d != MAXDIRECTIONS; ++d) {
-                        direction_t dnext = (direction_t)((d + d_offset) % MAXDIRECTIONS);
-                        region *rn = rconnect(current_point, dnext);
+                if (rng_int() % 10000 < stormchance * sh->type->storm
+                    && fval(current_point->terrain, SEA_REGION)) {
+                    if (!is_cursed(sh->attribs, C_SHIP_NODRIFT, 0)) {
+                        region *rnext = NULL;
+                        bool storm = true;
+                        int d_offset = rng_int() % MAXDIRECTIONS;
+                        direction_t d;
+                        /* Sturm nur, wenn nächste Region Hochsee ist. */
+                        for (d = 0; d != MAXDIRECTIONS; ++d) {
+                            direction_t dnext = (direction_t)((d + d_offset) % MAXDIRECTIONS);
+                            region *rn = rconnect(current_point, dnext);
 
-                        if (rn != NULL) {
-                            if (fval(rn->terrain, FORBIDDEN_REGION))
-                                continue;
-                            if (!fval(rn->terrain, SEA_REGION)) {
-                                storm = false;
-                                break;
+                            if (rn != NULL) {
+                                if (fval(rn->terrain, FORBIDDEN_REGION))
+                                    continue;
+                                if (!fval(rn->terrain, SEA_REGION)) {
+                                    storm = false;
+                                    break;
+                                }
+                                if (rn != next_point)
+                                    rnext = rn;
                             }
-                            if (rn != next_point)
-                                rnext = rn;
+                        }
+                        if (storm && rnext != NULL) {
+                            ADDMSG(&f->msgs, msg_message("storm", "ship region sink",
+                                sh, current_point, sh->damage >= sh->size * DAMAGE_SCALE));
+
+                            /* damage the ship. we handle destruction in the end */
+                            damage_ship(sh, damage_drift());
+                            if (sh->damage >= sh->size * DAMAGE_SCALE)
+                                break;
+
+                            next_point = rnext;
+                            /* these values need to be updated if next_point changes (due to storms): */
+                            tnext = next_point->terrain;
                         }
                     }
-                    if (storm && rnext != NULL) {
-                        ADDMSG(&f->msgs, msg_message("storm", "ship region sink",
-                            sh, current_point, sh->damage >= sh->size * DAMAGE_SCALE));
-
-                        /* damage the ship. we handle destruction in the end */
-                        damage_ship(sh, damage_drift());
-                        if (sh->damage >= sh->size * DAMAGE_SCALE)
-                            break;
-
-                        next_point = rnext;
-                        /* these values need to be updated if next_point changes (due to storms): */
-                        tnext = next_point->terrain;
-                    }
                 }
-            }
-
+            } // storms_enabled
             if (!fval(tthis, SEA_REGION)) {
                 if (!fval(tnext, SEA_REGION)) {
                     if (!move_on_land) {

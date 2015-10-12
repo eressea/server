@@ -115,7 +115,7 @@ void piracy_cmd(unit * u, order *ord)
 {
     region *r = u->region;
     ship *sh = u->ship, *sh2;
-    direction_t dir, target_dir;
+    direction_t target_dir;
     struct {
         const faction *target;
         int value;
@@ -136,6 +136,7 @@ void piracy_cmd(unit * u, order *ord)
     /* Wenn nicht, sehen wir, ob wir ein Ziel finden. */
 
     if (target_dir == NODIRECTION) {
+        direction_t dir;
         /* Einheit ist also Kapitän. Jetzt gucken, in wievielen
         * Nachbarregionen potentielle Opfer sind. */
 
