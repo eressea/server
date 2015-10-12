@@ -201,6 +201,7 @@ set(TESTS_SRC
   magic.test.c
   market.test.c
   move.test.c
+  piracy.test.c
   prefix.test.c
   skill.test.c
   spells.test.c

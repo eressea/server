@@ -89,6 +89,7 @@ int RunAllTests(void)
   RUN_TESTS(suite, laws);
   RUN_TESTS(suite, market);
   RUN_TESTS(suite, move);
+  RUN_TESTS(suite, piracy);
   RUN_TESTS(suite, stealth);
   RUN_TESTS(suite, upkeep);
   RUN_TESTS(suite, vortex);
