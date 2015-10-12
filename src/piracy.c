@@ -76,26 +76,10 @@ static bool validate_pirate(unit *u, order *ord) {
     return true;
 }
 
-void piracy_cmd(unit * u, order *ord)
-{
-    region *r = u->region;
-    ship *sh = u->ship, *sh2;
-    direction_t dir, target_dir = NODIRECTION;
-    struct {
-        const faction *target;
-        int value;
-    } aff[MAXDIRECTIONS];
-    int saff = 0;
-    int *il = NULL;
+int *parse_ids(const order *ord) {
     const char *s;
-    attrib *a;
+    int *il = NULL;
 
-    if (!validate_pirate(u, ord)) {
-        return;
-    }
-
-    /* Feststellen, ob schon ein anderer alliierter Pirat ein
-    * Ziel gefunden hat. */
     init_order(ord);
     s = getstrtoken();
     if (s != NULL && *s) {
@@ -105,6 +89,12 @@ void piracy_cmd(unit * u, order *ord)
             s = getstrtoken();
         }
     }
+    return il;
+}
+
+direction_t find_piracy_target(unit *u, int *il) {
+    attrib *a;
+    region *r = u->region;
 
     for (a = a_find(r->attribs, &at_piracy_direction);
     a && a->type == &at_piracy_direction; a = a->next) {
@@ -114,11 +104,34 @@ void piracy_cmd(unit * u, order *ord)
 
         if (alliedunit(u, p, HELP_FIGHT)) {
             if (il == 0 || (t && intlist_find(il, t->no))) {
-                target_dir = data->dir;
-                break;
+                return data->dir;
             }
         }
     }
+    return NODIRECTION;
+}
+
+void piracy_cmd(unit * u, order *ord)
+{
+    region *r = u->region;
+    ship *sh = u->ship, *sh2;
+    direction_t dir, target_dir;
+    struct {
+        const faction *target;
+        int value;
+    } aff[MAXDIRECTIONS];
+    int saff = 0;
+    int *il;
+
+    if (!validate_pirate(u, ord)) {
+        return;
+    }
+
+    il = parse_ids(ord);
+    /* Feststellen, ob schon ein anderer alliierter Pirat ein
+    * Ziel gefunden hat. */
+
+    target_dir = find_piracy_target(u, il);
 
     /* Wenn nicht, sehen wir, ob wir ein Ziel finden. */
 
@@ -138,7 +151,7 @@ void piracy_cmd(unit * u, order *ord)
                         faction *f = visible_faction(cap->faction, cap);
                         if (alliedunit(u, f, HELP_FIGHT))
                             continue;
-                        if (il == 0 || intlist_find(il, cap->faction->no)) {
+                        if (!il || intlist_find(il, cap->faction->no)) { // TODO: shouldn't this be f->no?
                             ++aff[dir].value;
                             if (rng_int() % aff[dir].value == 0) {
                                 aff[dir].target = f;
@@ -160,8 +173,7 @@ void piracy_cmd(unit * u, order *ord)
                 saff -= aff[dir].value;
             }
             target_dir = dir;
-            a =
-                a_add(&r->attribs, mk_piracy(u->faction, aff[dir].target, target_dir));
+            a_add(&r->attribs, mk_piracy(u->faction, aff[dir].target, target_dir));
         }
     }
 
