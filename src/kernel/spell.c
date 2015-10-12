@@ -103,7 +103,7 @@ spell *find_spell(const char *name)
         cb_get_kv(match, &sp, sizeof(sp));
     }
     else {
-        log_warning("find_spell: could not find spell '%s'\n", name);
+        log_debug("find_spell: could not find spell '%s'\n", name);
     }
     return sp;
 }
