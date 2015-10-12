@@ -43,6 +43,7 @@ extern "C" {
     const char * test_get_messagetype(const struct message *msg);
     struct message * test_find_messagetype(struct message_list *msgs, const char *name);
     struct message * test_get_last_message(struct message_list *mlist);
+    void test_clear_messages(struct faction *f);
 
     void disabled_test(void *suite, void (*)(struct CuTest *), const char *name);
 

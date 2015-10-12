@@ -279,6 +279,11 @@ struct message * test_find_messagetype(struct message_list *msgs, const char *na
     return 0;
 }
 
+void test_clear_messages(faction *f) {
+    free_messagelist(f->msgs);
+    f->msgs = 0;
+}
+
 void disabled_test(void *suite, void (*test)(CuTest *), const char *name) {
     (void)test;
     fprintf(stderr, "%s: SKIP\n", name);

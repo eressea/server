@@ -7,7 +7,6 @@
 #include <kernel/config.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
-#include <kernel/messages.h>
 #include <kernel/order.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
@@ -214,8 +213,7 @@ static void test_give_men_requires_contact(CuTest * tc) {
 
     _snprintf(cmd, sizeof(cmd), "%s ALLES PERSONEN", itoa36(env.dst->no));
     ord = create_order(K_GIVE, env.f1->locale, cmd);
-    free_messagelist(env.f1->msgs);
-    env.f1->msgs = 0;
+    test_clear_messages(env.f1);
     give_cmd(env.src, ord);
     CuAssertPtrEquals(tc, 0, test_find_messagetype(env.f1->msgs, "give_person"));
     CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "feedback_no_contact"));
