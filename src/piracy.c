@@ -63,7 +63,20 @@ static attrib *mk_piracy(const faction * pirate, const faction * target,
     return a;
 }
 
-void piracy_cmd(unit * u, struct order *ord)
+static bool validate_pirate(unit *u, order *ord) {
+    if (!u->ship) {
+        cmistake(u, ord, 144, MSG_MOVE);
+        return false;
+    }
+
+    if (!u->ship || u != ship_owner(u->ship)) {
+        cmistake(u, ord, 146, MSG_MOVE);
+        return false;
+    }
+    return true;
+}
+
+void piracy_cmd(unit * u, order *ord)
 {
     region *r = u->region;
     ship *sh = u->ship, *sh2;
@@ -77,19 +90,12 @@ void piracy_cmd(unit * u, struct order *ord)
     const char *s;
     attrib *a;
 
-    if (!sh) {
-        cmistake(u, ord, 144, MSG_MOVE);
-        return;
-    }
-
-    if (!u->ship || u != ship_owner(u->ship)) {
-        cmistake(u, ord, 146, MSG_MOVE);
+    if (!validate_pirate(u, ord)) {
         return;
     }
 
     /* Feststellen, ob schon ein anderer alliierter Pirat ein
     * Ziel gefunden hat. */
-
     init_order(ord);
     s = getstrtoken();
     if (s != NULL && *s) {
@@ -124,7 +130,7 @@ void piracy_cmd(unit * u, struct order *ord)
             region *rc = rconnect(r, dir);
             aff[dir].value = 0;
             aff[dir].target = 0;
-            if (rc && fval(rc->terrain, SWIM_INTO) && can_takeoff(sh, r, rc)) {
+            if (rc && fval(rc->terrain, SAIL_INTO) && can_takeoff(sh, r, rc)) {
 
                 for (sh2 = rc->ships; sh2; sh2 = sh2->next) {
                     unit *cap = ship_owner(sh2);

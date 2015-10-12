@@ -1719,15 +1719,15 @@ static bool ship_ready(const region * r, unit * u)
             u->ship));
         return false;
     }
-    assert(u->ship->type->construction->improvement == NULL);     /* sonst ist construction::size nicht ship_type::maxsize */
-    if (u->ship->size != u->ship->type->construction->maxsize) {
-        cmistake(u, u->thisorder, 15, MSG_MOVE);
-        return false;
+    if (u->ship->type->construction) {
+        assert(!u->ship->type->construction->improvement);     /* sonst ist construction::size nicht ship_type::maxsize */
+        if (u->ship->size != u->ship->type->construction->maxsize) {
+            cmistake(u, u->thisorder, 15, MSG_MOVE);
+            return false;
+        }
     }
     if (!enoughsailors(u->ship, crew_skill(u->ship))) {
         cmistake(u, u->thisorder, 1, MSG_MOVE);
-        /*		mistake(u, u->thisorder,
-                                        "Auf dem Schiff befinden sich zuwenig erfahrene Seeleute.", MSG_MOVE); */
         return false;
     }
     if (!cansail(r, u->ship)) {
