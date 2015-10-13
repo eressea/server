@@ -94,6 +94,10 @@ void free_faction(faction * f)
     free(f->banner);
     free(f->passw);
     free(f->name);
+    if (f->seen_factions) {
+        ql_free(f->seen_factions);
+        f->seen_factions = 0;
+    }
 
     while (f->attribs) {
         a_remove(&f->attribs, f->attribs);
