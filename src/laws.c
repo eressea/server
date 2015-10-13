@@ -1622,7 +1622,7 @@ bool renamed_building(const building * b)
 
 static int rename_cmd(unit * u, order * ord, char **s, const char *s2)
 {
-    if (!s2[0]) {
+    if (!s2 || !s2[0]) {
         cmistake(u, ord, 84, MSG_EVENT);
         return 0;
     }

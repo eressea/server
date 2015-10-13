@@ -1135,7 +1135,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_mail_faction_no_msg);
     SUITE_ADD_TEST(suite, test_mail_region_no_msg);
     SUITE_ADD_TEST(suite, test_mail_faction_no_target);
-    (void)test_luck_message; /* disabled, breaks on travis */
+    SUITE_ADD_TEST(suite, test_luck_message);
 
     return suite;
 }
