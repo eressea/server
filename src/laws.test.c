@@ -467,6 +467,7 @@ static void test_reserve_cmd(CuTest *tc) {
     CuAssertIntEquals(tc, 200, reserve_cmd(u1, ord));
     CuAssertIntEquals(tc, 200, i_get(u1->items, rtype->itype));
     CuAssertIntEquals(tc, 0, i_get(u2->items, rtype->itype));
+    free_order(ord);
     test_cleanup();
 }
 
@@ -517,6 +518,7 @@ static void test_pay_cmd(CuTest *tc) {
     assert(ord);
     CuAssertIntEquals(tc, 0, pay_cmd(fix.u1, ord));
     CuAssertIntEquals(tc, BLD_DONTPAY, b->flags&BLD_DONTPAY);
+    free_order(ord);
     test_cleanup();
 }
 
@@ -541,6 +543,7 @@ static void test_pay_cmd_other_building(CuTest *tc) {
     CuAssertPtrEquals(tc, fix.u1, building_owner(b));
     CuAssertIntEquals(tc, 0, pay_cmd(fix.u1, ord));
     CuAssertIntEquals(tc, BLD_DONTPAY, b->flags&BLD_DONTPAY);
+    free_order(ord);
     test_cleanup();
 }
 
@@ -559,6 +562,7 @@ static void test_pay_cmd_must_be_owner(CuTest *tc) {
     assert(ord);
     CuAssertIntEquals(tc, 0, pay_cmd(fix.u2, ord));
     CuAssertIntEquals(tc, 0, b->flags&BLD_DONTPAY);
+    free_order(ord);
     test_cleanup();
 }
 
@@ -566,8 +570,8 @@ static void test_new_units(CuTest *tc) {
     unit *u;
     faction *f;
     region *r;
-    order *ord;
     const struct locale *loc;
+
     test_cleanup();
     test_create_world();
     f = test_create_faction(NULL);
@@ -577,9 +581,7 @@ static void test_new_units(CuTest *tc) {
     assert(u && !u->next);
     loc = get_locale("de");
     assert(loc);
-    ord = create_order(K_MAKETEMP, loc, "hurr");
-    assert(ord);
-    u->orders = ord;
+    u->orders = create_order(K_MAKETEMP, loc, "hurr");
     new_units();
     CuAssertPtrNotNull(tc, u->next);
     test_cleanup();
@@ -708,6 +710,7 @@ static void test_reserve_self(CuTest *tc) {
     CuAssertIntEquals(tc, 100, reserve_self(u1, ord));
     CuAssertIntEquals(tc, 100, i_get(u1->items, rtype->itype));
     CuAssertIntEquals(tc, 100, i_get(u2->items, rtype->itype));
+    free_order(ord);
     test_cleanup();
 }
 
@@ -765,17 +768,127 @@ static void test_luck_message(CuTest *tc) {
     test_cleanup();
 }
 
+static unit * setup_name_cmd(void) {
+    faction *f;
+    struct locale *lang;
+
+    test_cleanup();
+    f = test_create_faction(0);
+    f->locale = lang = get_or_create_locale("en");
+    locale_setstring(lang, parameters[P_UNIT], "UNIT");
+    locale_setstring(lang, parameters[P_REGION], "REGION");
+    locale_setstring(lang, parameters[P_FACTION], "FACTION");
+    locale_setstring(lang, parameters[P_BUILDING], "BUILDING");
+    locale_setstring(lang, parameters[P_SHIP], "SHIP");
+    init_parameters(lang);
+    return test_create_unit(f, test_create_region(0, 0, 0));
+}
+
+static void test_name_unit(CuTest *tc) {
+    unit *u;
+    order *ord;
+
+    u = setup_name_cmd();
+
+    ord = create_order(K_NAME, u->faction->locale, "UNIT Hodor");
+    name_cmd(u, ord);
+    CuAssertStrEquals(tc, "Hodor", u->_name);
+    free_order(ord);
+
+    ord = create_order(K_NAME, u->faction->locale, "UNIT");
+    name_cmd(u, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error84"));
+    CuAssertStrEquals(tc, "Hodor", u->_name);
+    free_order(ord);
+
+    test_cleanup();
+}
+
+static void test_name_region(CuTest *tc) {
+    unit *u;
+    order *ord;
+
+    u = setup_name_cmd();
+
+    ord = create_order(K_NAME, u->faction->locale, "REGION Hodor");
+    name_cmd(u, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error145"));
+
+    u->building = test_create_building(u->region, 0);
+    name_cmd(u, ord);
+    CuAssertStrEquals(tc, "Hodor", u->region->land->name);
+    free_order(ord);
+
+    ord = create_order(K_NAME, u->faction->locale, "REGION");
+    name_cmd(u, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error84"));
+    CuAssertStrEquals(tc, "Hodor", u->region->land->name);
+    free_order(ord);
+
+    test_cleanup();
+}
+
+static void test_name_building(CuTest *tc) {
+    unit *u;
+    order *ord;
+
+    u = setup_name_cmd();
+
+    ord = create_order(K_NAME, u->faction->locale, "BUILDING Hodor");
+    name_cmd(u, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error145"));
+
+    u->building = test_create_building(u->region, 0);
+    name_cmd(u, ord);
+    CuAssertStrEquals(tc, "Hodor", u->building->name);
+    free_order(ord);
+
+    ord = create_order(K_NAME, u->faction->locale, "BUILDING");
+    name_cmd(u, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error84"));
+    CuAssertStrEquals(tc, "Hodor", u->building->name);
+    free_order(ord);
+
+    /* TODO: test BTF_NAMECHANGE:
+    btype->flags |= BTF_NAMECHANGE;
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error278"));
+    test_clear_messages(u->faction);
+    name_cmd(u, ord); */
+    test_cleanup();
+}
+
+static void test_name_ship(CuTest *tc) {
+    unit *u;
+    order *ord;
+
+    u = setup_name_cmd();
+    u->ship = test_create_ship(u->region, 0);
+
+    ord = create_order(K_NAME, u->faction->locale, "SHIP Hodor");
+    name_cmd(u, ord);
+    CuAssertStrEquals(tc, "Hodor", u->ship->name);
+    free_order(ord);
+
+    ord = create_order(K_NAME, u->faction->locale, "SHIP");
+    name_cmd(u, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error84"));
+    CuAssertStrEquals(tc, "Hodor", u->ship->name);
+    free_order(ord);
+
+    test_cleanup();
+}
+
 static void test_long_order_normal(CuTest *tc) {
     // TODO: write more tests
     unit *u;
     order *ord;
+
     test_cleanup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     fset(u, UFL_MOVED);
     fset(u, UFL_LONGACTION);
     u->faction->locale = get_or_create_locale("de");
-    ord = create_order(K_MOVE, u->faction->locale, 0);
-    unit_addorder(u, ord);
+    unit_addorder(u, ord = create_order(K_MOVE, u->faction->locale, 0));
     update_long_order(u);
     CuAssertPtrEquals(tc, ord->data, u->thisorder->data);
     CuAssertIntEquals(tc, 0, fval(u, UFL_MOVED));
@@ -1011,6 +1124,7 @@ static void test_mail_unit(CuTest *tc) {
     ord = create_order(K_MAIL, u->faction->locale, "EINHEIT %s 'Hodor!'", itoa36(u->no));
     mail_cmd(u, ord);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "unitmessage"));
+    free_order(ord);
     test_cleanup();
 }
 
@@ -1022,6 +1136,7 @@ static void test_mail_faction(CuTest *tc) {
     ord = create_order(K_MAIL, u->faction->locale, "PARTEI %s 'Hodor!'", itoa36(u->faction->no));
     mail_cmd(u, ord);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "regionmessage"));
+    free_order(ord);
     test_cleanup();
 }
 
@@ -1033,6 +1148,7 @@ static void test_mail_region(CuTest *tc) {
     ord = create_order(K_MAIL, u->faction->locale, "REGION 'Hodor!'", itoa36(u->no));
     mail_cmd(u, ord);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->region->msgs, "mail_result"));
+    free_order(ord);
     test_cleanup();
 }
 
@@ -1045,6 +1161,7 @@ static void test_mail_unit_no_msg(CuTest *tc) {
     mail_cmd(u, ord);
     CuAssertPtrEquals(tc, 0, test_find_messagetype(u->faction->msgs, "unitmessage"));
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error30"));
+    free_order(ord);
     test_cleanup();
 }
 
@@ -1057,6 +1174,7 @@ static void test_mail_faction_no_msg(CuTest *tc) {
     mail_cmd(u, ord);
     CuAssertPtrEquals(tc, 0, test_find_messagetype(u->faction->msgs, "regionmessage"));
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error30"));
+    free_order(ord);
     test_cleanup();
 }
 
@@ -1069,6 +1187,7 @@ static void test_mail_faction_no_target(CuTest *tc) {
     mail_cmd(u, ord);
     CuAssertPtrEquals(tc, 0, test_find_messagetype(u->faction->msgs, "regionmessage"));
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error66"));
+    free_order(ord);
     test_cleanup();
 }
 
@@ -1081,6 +1200,7 @@ static void test_mail_region_no_msg(CuTest *tc) {
     mail_cmd(u, ord);
     CuAssertPtrEquals(tc, 0, test_find_messagetype(u->region->msgs, "mail_result"));
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error30"));
+    free_order(ord);
     test_cleanup();
 }
 
@@ -1135,7 +1255,11 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_mail_faction_no_msg);
     SUITE_ADD_TEST(suite, test_mail_region_no_msg);
     SUITE_ADD_TEST(suite, test_mail_faction_no_target);
-    (void)test_luck_message; /* disabled, breaks on travis */
+    SUITE_ADD_TEST(suite, test_luck_message);
+    SUITE_ADD_TEST(suite, test_name_unit);
+    SUITE_ADD_TEST(suite, test_name_region);
+    SUITE_ADD_TEST(suite, test_name_building);
+    SUITE_ADD_TEST(suite, test_name_ship);
 
     return suite;
 }

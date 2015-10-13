@@ -116,14 +116,14 @@ test_create_terrain(const char * name, unsigned int flags)
 
 building * test_create_building(region * r, const building_type * btype)
 {
-    building * b = new_building(btype ? btype : bt_get_or_create("castle"), r, default_locale);
+    building * b = new_building(btype ? btype : test_create_buildingtype("castle"), r, default_locale);
     b->size = b->type->maxsize > 0 ? b->type->maxsize : 1;
     return b;
 }
 
 ship * test_create_ship(region * r, const ship_type * stype)
 {
-    ship * s = new_ship(stype ? stype : st_get_or_create("boat"), r, default_locale);
+    ship * s = new_ship(stype ? stype : test_create_shiptype("boat"), r, default_locale);
     s->size = s->type->construction ? s->type->construction->maxsize : 1;
     return s;
 }
@@ -134,6 +134,7 @@ ship_type * test_create_shiptype(const char * name)
     stype->cptskill = 1;
     stype->sumskill = 1;
     stype->minskill = 1;
+    stype->range = 2;
     if (!stype->construction) {
         stype->construction = calloc(1, sizeof(construction));
         stype->construction->maxsize = 5;
@@ -149,7 +150,7 @@ ship_type * test_create_shiptype(const char * name)
 
 building_type * test_create_buildingtype(const char * name)
 {
-    building_type *btype = (building_type *)calloc(sizeof(building_type), 1);
+    building_type *btype = bt_get_or_create(name);
     btype->flags = BTF_NAMECHANGE;
     btype->_name = _strdup(name);
     btype->construction = (construction *)calloc(sizeof(construction), 1);
@@ -164,7 +165,6 @@ building_type * test_create_buildingtype(const char * name)
     if (default_locale) {
         locale_setstring(default_locale, name, name);
     }
-    bt_register(btype);
     return btype;
 }
 
@@ -277,6 +277,11 @@ struct message * test_find_messagetype(struct message_list *msgs, const char *na
         }
     }
     return 0;
+}
+
+void test_clear_messages(faction *f) {
+    free_messagelist(f->msgs);
+    f->msgs = 0;
 }
 
 void disabled_test(void *suite, void (*test)(CuTest *), const char *name) {

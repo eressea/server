@@ -1622,6 +1622,7 @@ bool renamed_building(const building * b)
 
 static int rename_cmd(unit * u, order * ord, char **s, const char *s2)
 {
+    assert(s2);
     if (!s2[0]) {
         cmistake(u, ord, 84, MSG_EVENT);
         return 0;
@@ -1638,48 +1639,53 @@ static int rename_cmd(unit * u, order * ord, char **s, const char *s2)
     return 0;
 }
 
-int
-rename_building(unit * u, order * ord, building * b, const char *name)
-{
+static bool try_rename(unit *u, building *b, order *ord) {
     unit *owner = b ? building_owner(b) : 0;
     bool foreign = !(owner && owner->faction == u->faction);
 
     if (!b) {
         cmistake(u, ord, u->building ? 6 : 145, MSG_EVENT);
-        return -1;
+        return false;
     }
 
     if (!fval(b->type, BTF_NAMECHANGE) && renamed_building(b)) {
         cmistake(u, ord, 278, MSG_EVENT);
-        return -1;
+        return false;
     }
 
     if (foreign) {
         if (renamed_building(b)) {
             cmistake(u, ord, 246, MSG_EVENT);
-            return -1;
+            return false;
         }
 
         if (owner) {
             if (cansee(owner->faction, u->region, u, 0)) {
                 ADDMSG(&owner->faction->msgs,
                     msg_message("renamed_building_seen",
-                    "building renamer region", b, u, u->region));
+                        "building renamer region", b, u, u->region));
             }
             else {
                 ADDMSG(&owner->faction->msgs,
                     msg_message("renamed_building_notseen",
-                    "building region", b, u->region));
+                        "building region", b, u->region));
+            }
+            if (owner != u) {
+                cmistake(u, ord, 148, MSG_PRODUCE);
+                return false;
             }
         }
     }
-    else {
-        if (owner != u) {
-            cmistake(u, ord, 148, MSG_PRODUCE);
-            return -1;
-        }
-    }
+    return true;
+}
 
+int
+rename_building(unit * u, order * ord, building * b, const char *name)
+{
+    assert(name);
+    if (!try_rename(u, b, ord)) {
+        return -1;
+    }
     return rename_cmd(u, ord, &b->name, name);
 }
 
@@ -1718,9 +1724,10 @@ int name_cmd(struct unit *u, struct order *ord)
         if (foreign) {
             b = getbuilding(u->region);
         }
-
-        return rename_building(u, ord, b, getstrtoken());
-
+        if (try_rename(u, b, ord)) {
+            s = &b->name;
+        }
+        break;
     case P_FACTION:
         if (foreign) {
             faction *f;
@@ -1895,6 +1902,9 @@ int name_cmd(struct unit *u, struct order *ord)
         const char *name = getstrtoken();
         if (name) {
             rename_cmd(u, ord, s, name);
+        }
+        else {
+            cmistake(u, ord, 84, MSG_EVENT);
         }
     }
 

@@ -79,6 +79,7 @@ ENDIF()
 set (ERESSEA_SRC
   calendar.c
   move.c
+  piracy.c
   spells.c
   battle.c
   alchemy.c
@@ -200,6 +201,7 @@ set(TESTS_SRC
   magic.test.c
   market.test.c
   move.test.c
+  piracy.test.c
   prefix.test.c
   skill.test.c
   spells.test.c

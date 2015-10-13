@@ -4,7 +4,6 @@
 #include "move.h"
 
 #include <kernel/config.h>
-#include <kernel/messages.h>
 #include <kernel/faction.h>
 #include <kernel/unit.h>
 #include <kernel/race.h>
@@ -39,16 +38,14 @@ static void test_herbsearch(CuTest * tc)
 
     herbsearch(u, INT_MAX);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error59"));
-    free_messagelist(f->msgs);
-    f->msgs = 0;
+    test_clear_messages(f);
 
     set_level(u, SK_HERBALISM, 1);
     CuAssertPtrEquals(tc, u2, is_guarded(r, u, GUARD_PRODUCE));
     herbsearch(u, INT_MAX);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error70"));
     CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error59"));
-    free_messagelist(f->msgs);
-    f->msgs = 0;
+    test_clear_messages(f);
 
     guard(u2, GUARD_NONE);
     CuAssertPtrEquals(tc, 0, is_guarded(r, u, GUARD_PRODUCE));
@@ -57,8 +54,7 @@ static void test_herbsearch(CuTest * tc)
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error108"));
     CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error70"));
     CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error59"));
-    free_messagelist(f->msgs);
-    f->msgs = 0;
+    test_clear_messages(f);
 
     rsetherbtype(r, itype);
     CuAssertPtrEquals(tc, (void *)itype, (void *)rherbtype(r));
@@ -68,8 +64,7 @@ static void test_herbsearch(CuTest * tc)
     CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error108"));
     CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error70"));
     CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error59"));
-    free_messagelist(f->msgs);
-    f->msgs = 0;
+    test_clear_messages(f);
 
     rsetherbs(r, 100);
     CuAssertIntEquals(tc, 100, rherbs(r));
@@ -81,8 +76,7 @@ static void test_herbsearch(CuTest * tc)
     CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error108"));
     CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error70"));
     CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error59"));
-    free_messagelist(f->msgs);
-    f->msgs = 0;
+    test_clear_messages(f);
 
     test_cleanup();
 }
