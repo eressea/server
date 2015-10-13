@@ -86,6 +86,7 @@ void free_faction(faction * f)
     }
     freelist(f->allies);
 
+    free_spellbook(f->spellbook);
     free(f->email);
     free(f->banner);
     free(f->passw);
