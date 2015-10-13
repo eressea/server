@@ -28,9 +28,8 @@ static void test_give_control_building(CuTest * tc)
     region *r;
 
     test_cleanup();
-    test_create_world();
     f = test_create_faction(0);
-    r = findregion(0, 0);
+    r = test_create_region(0, 0, 0);
     b = test_create_building(r, 0);
     u1 = test_create_unit(f, r);
     u_set_building(u1, b);
@@ -50,9 +49,8 @@ static void test_give_control_ship(CuTest * tc)
     region *r;
 
     test_cleanup();
-    test_create_world();
     f = test_create_faction(0);
-    r = findregion(0, 0);
+    r = test_create_region(0, 0, 0);
     sh = test_create_ship(r, 0);
     u1 = test_create_unit(f, r);
     u_set_ship(u1, sh);
