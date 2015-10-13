@@ -577,6 +577,7 @@ static void test_infinitive_from_config(CuTest *tc) {
 
     ord = create_order(K_STUDY, lang, "");
     CuAssertStrEquals(tc, "LERNE", get_command(ord, buffer, sizeof(buffer)));
+    free_order(ord);
     test_cleanup();
 }
 

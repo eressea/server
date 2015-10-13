@@ -141,14 +141,12 @@ static struct unit *create_recruiter(void) {
 
 static void test_heroes_dont_recruit(CuTest * tc) {
     unit *u;
-    order *ord;
 
     test_cleanup();
 
     u = create_recruiter();
     fset(u, UFL_HERO);
-    ord = create_order(K_RECRUIT, default_locale, "1");
-    unit_addorder(u, ord);
+    unit_addorder(u, create_order(K_RECRUIT, default_locale, "1"));
 
     economics(u->region);
 
@@ -160,13 +158,11 @@ static void test_heroes_dont_recruit(CuTest * tc) {
 
 static void test_normals_recruit(CuTest * tc) {
     unit *u;
-    order *ord;
 
     test_cleanup();
 
     u = create_recruiter();
-    ord = create_order(K_RECRUIT, default_locale, "1");
-    unit_addorder(u, ord);
+    unit_addorder(u, create_order(K_RECRUIT, default_locale, "1"));
 
     economics(u->region);
 

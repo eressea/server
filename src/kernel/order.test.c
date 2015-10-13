@@ -123,6 +123,7 @@ static void test_init_order(CuTest *tc) {
     CuAssertIntEquals(tc, K_MAKETEMP, init_order(ord));
     CuAssertStrEquals(tc, "hurr", getstrtoken());
     CuAssertStrEquals(tc, "durr", getstrtoken());
+    free_order(ord);
 }
 
 static void test_getstrtoken(CuTest *tc) {

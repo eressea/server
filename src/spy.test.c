@@ -110,6 +110,7 @@ static void test_sabotage_self(CuTest *tc) {
     assert(ord);
     CuAssertIntEquals(tc, 0, sabotage_cmd(u, ord));
     CuAssertPtrEquals(tc, 0, r->ships);
+    free_order(ord);
     test_cleanup();
 }
 
@@ -139,6 +140,7 @@ static void test_sabotage_other_fail(CuTest *tc) {
     msg = test_get_last_message(u->faction->msgs);
     CuAssertStrEquals(tc, "destroy_ship_3", test_get_messagetype(msg));
     CuAssertPtrNotNull(tc, r->ships);
+    free_order(ord);
     test_cleanup();
 }
 
@@ -164,6 +166,7 @@ static void test_sabotage_other_success(CuTest *tc) {
     set_level(u2, SK_SPY, 1);
     CuAssertIntEquals(tc, 0, sabotage_cmd(u2, ord));
     CuAssertPtrEquals(tc, 0, r->ships);
+    free_order(ord);
     test_cleanup();
 }
 

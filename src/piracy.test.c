@@ -61,6 +61,7 @@ static void test_piracy_cmd(CuTest * tc) {
     CuAssertPtrNotNullMsg(tc, "successful PIRACY sets attribute", r->attribs); // FIXME: this is testing implementation, not interface
     CuAssertPtrNotNullMsg(tc, "successful PIRACY message", test_find_messagetype(f->msgs, "piratesawvictim"));
     CuAssertPtrNotNullMsg(tc, "successful PIRACY movement", test_find_messagetype(f->msgs, "shipsail"));
+    free_order(ord);
 
     test_cleanup();
 }
@@ -93,6 +94,7 @@ static void test_piracy_cmd_errors(CuTest * tc) {
     test_clear_messages(f);
     piracy_cmd(u, ord);
     CuAssertPtrNotNullMsg(tc, "must specify target for PIRACY", test_find_messagetype(f->msgs, "piratenovictim"));
+    free_order(ord);
 
     test_cleanup();
 }

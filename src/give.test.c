@@ -217,6 +217,7 @@ static void test_give_men_requires_contact(CuTest * tc) {
     give_cmd(env.src, ord);
     CuAssertPtrEquals(tc, 0, test_find_messagetype(env.f1->msgs, "give_person"));
     CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "feedback_no_contact"));
+    free_order(ord);
 
     test_cleanup();
 }
@@ -290,6 +291,7 @@ static void test_give_herbs(CuTest * tc) {
     give_cmd(env.src, ord);
     CuAssertIntEquals(tc, 0, i_get(env.src->items, env.itype));
     CuAssertIntEquals(tc, 10, i_get(env.dst->items, env.itype));
+    free_order(ord);
     test_cleanup();
 }
 
@@ -342,6 +344,7 @@ static void test_give_invalid_target(CuTest *tc) {
     give_cmd(env.src, ord);
     CuAssertIntEquals(tc, 10, i_get(env.src->items, env.itype));
     CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "feedback_unit_not_found"));
+    free_order(ord);
     test_cleanup();
 }
 
