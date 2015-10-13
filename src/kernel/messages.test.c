@@ -57,6 +57,8 @@ static void test_merge_split(CuTest *tc) {
     CuAssertPtrEquals(tc, append->begin, mlist->begin->next);
     split_messages(mlist, split);
     CuAssertPtrEquals(tc, 0, mlist->begin->next);
+    free_messagelist(mlist);
+    free_messagelist(append);
     test_cleanup();
 }
 

@@ -152,6 +152,7 @@ static void test_give_men_in_ocean(CuTest * tc) {
     msg = disband_men(1, env.src, NULL);
     CuAssertStrEquals(tc, "give_person_ocean", (const char *)msg->parameters[0].v);
     CuAssertIntEquals(tc, 0, env.src->number);
+    msg_release(msg);
     test_cleanup();
 }
 
