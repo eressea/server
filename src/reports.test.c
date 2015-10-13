@@ -145,18 +145,25 @@ static void test_write_many_spaces(CuTest *tc) {
 
 static void test_sparagraph(CuTest *tc) {
     strlist *sp = 0;
+
     split_paragraph(&sp, "Hello World", 0, 16, 0);
     CuAssertPtrNotNull(tc, sp);
     CuAssertStrEquals(tc, "Hello World", sp->s);
     CuAssertPtrEquals(tc, 0, sp->next);
+    freestrlist(sp);
+
     split_paragraph(&sp, "Hello World", 4, 16, 0);
     CuAssertPtrNotNull(tc, sp);
     CuAssertStrEquals(tc, "    Hello World", sp->s);
     CuAssertPtrEquals(tc, 0, sp->next);
+    freestrlist(sp);
+
     split_paragraph(&sp, "Hello World", 4, 16, '*');
     CuAssertPtrNotNull(tc, sp);
     CuAssertStrEquals(tc, "  * Hello World", sp->s);
     CuAssertPtrEquals(tc, 0, sp->next);
+    freestrlist(sp);
+
     split_paragraph(&sp, "12345678 90 12345678", 0, 8, '*');
     CuAssertPtrNotNull(tc, sp);
     CuAssertStrEquals(tc, "12345678", sp->s);
