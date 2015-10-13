@@ -116,7 +116,7 @@ test_create_terrain(const char * name, unsigned int flags)
 
 building * test_create_building(region * r, const building_type * btype)
 {
-    building * b = new_building(btype ? btype : bt_get_or_create("castle"), r, default_locale);
+    building * b = new_building(btype ? btype : test_create_buildingtype("castle"), r, default_locale);
     b->size = b->type->maxsize > 0 ? b->type->maxsize : 1;
     return b;
 }
@@ -150,7 +150,7 @@ ship_type * test_create_shiptype(const char * name)
 
 building_type * test_create_buildingtype(const char * name)
 {
-    building_type *btype = (building_type *)calloc(sizeof(building_type), 1);
+    building_type *btype = bt_get_or_create(name);
     btype->flags = BTF_NAMECHANGE;
     btype->_name = _strdup(name);
     btype->construction = (construction *)calloc(sizeof(construction), 1);
@@ -165,7 +165,6 @@ building_type * test_create_buildingtype(const char * name)
     if (default_locale) {
         locale_setstring(default_locale, name, name);
     }
-    bt_register(btype);
     return btype;
 }
 

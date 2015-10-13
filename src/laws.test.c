@@ -765,6 +765,83 @@ static void test_luck_message(CuTest *tc) {
     test_cleanup();
 }
 
+static unit * setup_name_cmd(void) {
+    faction *f;
+    struct locale *lang;
+
+    test_cleanup();
+    f = test_create_faction(0);
+    f->locale = lang = get_or_create_locale("en");
+    locale_setstring(lang, parameters[P_UNIT], "UNIT");
+    locale_setstring(lang, parameters[P_REGION], "REGION");
+    locale_setstring(lang, parameters[P_FACTION], "FACTION");
+    locale_setstring(lang, parameters[P_BUILDING], "BUILDING");
+    locale_setstring(lang, parameters[P_SHIP], "SHIP");
+    init_parameters(lang);
+    return test_create_unit(f, test_create_region(0, 0, 0));
+}
+
+static void test_name_unit(CuTest *tc) {
+    unit *u;
+    order *ord;
+
+    u = setup_name_cmd();
+    ord = create_order(K_NAME, u->faction->locale, "UNIT Hodor");
+    name_cmd(u, ord);
+    CuAssertStrEquals(tc, "Hodor", u->_name);
+    test_cleanup();
+}
+
+static void test_name_region(CuTest *tc) {
+    unit *u;
+    order *ord;
+
+    u = setup_name_cmd();
+    ord = create_order(K_NAME, u->faction->locale, "REGION Hodor");
+
+    name_cmd(u, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error145"));
+
+    u->building = test_create_building(u->region, 0);
+    name_cmd(u, ord);
+    CuAssertStrEquals(tc, "Hodor", u->region->land->name);
+
+    test_cleanup();
+}
+
+static void test_name_building(CuTest *tc) {
+    unit *u;
+    order *ord;
+
+    u = setup_name_cmd();
+    ord = create_order(K_NAME, u->faction->locale, "BUILDING Hodor");
+
+    name_cmd(u, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error145"));
+
+    u->building = test_create_building(u->region, 0);
+    name_cmd(u, ord);
+    CuAssertStrEquals(tc, "Hodor", u->building->name);
+/* TODO: test BTF_NAMECHANGE:
+    btype->flags |= BTF_NAMECHANGE;
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error278"));
+    test_clear_messages(u->faction);
+    name_cmd(u, ord); */
+    test_cleanup();
+}
+
+static void test_name_ship(CuTest *tc) {
+    unit *u;
+    order *ord;
+
+    u = setup_name_cmd();
+    u->ship = test_create_ship(u->region, 0);
+    ord = create_order(K_NAME, u->faction->locale, "SHIP Hodor");
+    name_cmd(u, ord);
+    CuAssertStrEquals(tc, "Hodor", u->ship->name);
+    test_cleanup();
+}
+
 static void test_long_order_normal(CuTest *tc) {
     // TODO: write more tests
     unit *u;
@@ -1136,6 +1213,10 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_mail_region_no_msg);
     SUITE_ADD_TEST(suite, test_mail_faction_no_target);
     SUITE_ADD_TEST(suite, test_luck_message);
+    SUITE_ADD_TEST(suite, test_name_unit);
+    SUITE_ADD_TEST(suite, test_name_region);
+    SUITE_ADD_TEST(suite, test_name_building);
+    SUITE_ADD_TEST(suite, test_name_ship);
 
     return suite;
 }
