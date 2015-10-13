@@ -786,9 +786,18 @@ static void test_name_unit(CuTest *tc) {
     order *ord;
 
     u = setup_name_cmd();
+
     ord = create_order(K_NAME, u->faction->locale, "UNIT Hodor");
     name_cmd(u, ord);
     CuAssertStrEquals(tc, "Hodor", u->_name);
+    free_order(ord);
+
+    ord = create_order(K_NAME, u->faction->locale, "UNIT");
+    name_cmd(u, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error84"));
+    CuAssertStrEquals(tc, "Hodor", u->_name);
+    free_order(ord);
+
     test_cleanup();
 }
 
@@ -797,14 +806,21 @@ static void test_name_region(CuTest *tc) {
     order *ord;
 
     u = setup_name_cmd();
-    ord = create_order(K_NAME, u->faction->locale, "REGION Hodor");
 
+    ord = create_order(K_NAME, u->faction->locale, "REGION Hodor");
     name_cmd(u, ord);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error145"));
 
     u->building = test_create_building(u->region, 0);
     name_cmd(u, ord);
     CuAssertStrEquals(tc, "Hodor", u->region->land->name);
+    free_order(ord);
+
+    ord = create_order(K_NAME, u->faction->locale, "REGION");
+    name_cmd(u, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error84"));
+    CuAssertStrEquals(tc, "Hodor", u->region->land->name);
+    free_order(ord);
 
     test_cleanup();
 }
@@ -814,15 +830,23 @@ static void test_name_building(CuTest *tc) {
     order *ord;
 
     u = setup_name_cmd();
-    ord = create_order(K_NAME, u->faction->locale, "BUILDING Hodor");
 
+    ord = create_order(K_NAME, u->faction->locale, "BUILDING Hodor");
     name_cmd(u, ord);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error145"));
 
     u->building = test_create_building(u->region, 0);
     name_cmd(u, ord);
     CuAssertStrEquals(tc, "Hodor", u->building->name);
-/* TODO: test BTF_NAMECHANGE:
+    free_order(ord);
+
+    ord = create_order(K_NAME, u->faction->locale, "BUILDING");
+    name_cmd(u, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error84"));
+    CuAssertStrEquals(tc, "Hodor", u->building->name);
+    free_order(ord);
+
+    /* TODO: test BTF_NAMECHANGE:
     btype->flags |= BTF_NAMECHANGE;
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error278"));
     test_clear_messages(u->faction);
@@ -836,9 +860,18 @@ static void test_name_ship(CuTest *tc) {
 
     u = setup_name_cmd();
     u->ship = test_create_ship(u->region, 0);
+
     ord = create_order(K_NAME, u->faction->locale, "SHIP Hodor");
     name_cmd(u, ord);
     CuAssertStrEquals(tc, "Hodor", u->ship->name);
+    free_order(ord);
+
+    ord = create_order(K_NAME, u->faction->locale, "SHIP");
+    name_cmd(u, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error84"));
+    CuAssertStrEquals(tc, "Hodor", u->ship->name);
+    free_order(ord);
+
     test_cleanup();
 }
 
