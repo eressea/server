@@ -94,7 +94,10 @@ void bt_register(building_type * type)
 
 void free_buildingtype(void *ptr) {
     building_type *btype = (building_type *)ptr;
-    free(btype->construction);
+    if (btype->construction) {
+        free(btype->construction->materials);
+        free(btype->construction);
+    }
     free(btype->_name);
     free(btype);
 }

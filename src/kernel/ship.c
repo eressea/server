@@ -245,7 +245,10 @@ static void free_shiptype(void *ptr) {
     ship_type *stype = (ship_type *)ptr;
     free(stype->_name);
     free(stype->coasts);
-    free(stype->construction);
+    if (stype->construction) {
+        free(stype->construction->materials);
+        free(stype->construction);
+    }
     free(stype);
 }
 
