@@ -79,6 +79,10 @@ void free_faction(faction * f)
         free(bm);
     }
 
+    if (f->spellbook) {
+        free_spellbook(f->spellbook);
+    }
+
     while (f->groups) {
         group *g = f->groups;
         f->groups = g->next;
@@ -86,7 +90,6 @@ void free_faction(faction * f)
     }
     freelist(f->allies);
 
-    free_spellbook(f->spellbook);
     free(f->email);
     free(f->banner);
     free(f->passw);
