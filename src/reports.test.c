@@ -66,6 +66,7 @@ static void test_reorder_units(CuTest * tc)
     CuAssertPtrEquals(tc, u1, u2->next);
     CuAssertPtrEquals(tc, u0, u1->next);
     CuAssertPtrEquals(tc, 0, u0->next);
+    test_cleanup();
 }
 
 static void test_regionid(CuTest * tc) {
@@ -88,11 +89,15 @@ static void test_regionid(CuTest * tc) {
     CuAssertIntEquals(tc, 10, (int)len);
     CuAssertStrEquals(tc, "plain (0,0", buffer);
     CuAssertIntEquals(tc, 0x7d, buffer[11]);
+    test_cleanup();
 }
 
 static void test_seen_faction(CuTest *tc) {
     faction *f1, *f2;
-    race *rc = test_create_race("human");
+    race *rc;
+
+    test_cleanup();
+    rc = test_create_race("human");
     f1 = test_create_faction(rc);
     f2 = test_create_faction(rc);
     add_seen_faction(f1, f2);
@@ -105,6 +110,7 @@ static void test_seen_faction(CuTest *tc) {
     f2 = (faction *)ql_get(f1->seen_factions, 1);
     f1 = (faction *)ql_get(f1->seen_factions, 0);
     CuAssertTrue(tc, f1->no < f2->no);
+    test_cleanup();
 }
 
 static void test_write_spaces(CuTest *tc) {
