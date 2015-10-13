@@ -65,6 +65,7 @@ extern "C" {
 
     } construction;
 
+    void free_construction(struct construction *cons);
     extern int destroy_cmd(struct unit *u, struct order *ord);
     extern int leave_cmd(struct unit *u, struct order *ord);
 

@@ -977,3 +977,12 @@ void continue_ship(unit * u, int want)
     build_ship(u, sh, want);
 }
 
+void free_construction(struct construction *cons)
+{
+    while (cons) {
+        construction *next = cons->improvement;
+        free(cons->materials);
+        free(cons);
+        cons = next;
+    }
+}
