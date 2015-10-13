@@ -165,6 +165,7 @@ static void test_sparagraph(CuTest *tc) {
     CuAssertPtrNotNull(tc, sp->next->next);
     CuAssertStrEquals(tc, "12345678", sp->next->next->s);
     CuAssertPtrEquals(tc, 0, sp->next->next->next);
+    freestrlist(sp);
 }
 
 static void test_cr_unit(CuTest *tc) {

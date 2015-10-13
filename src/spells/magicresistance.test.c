@@ -70,7 +70,7 @@ static void test_magicresistance_building(CuTest *tc) {
     msg = c->type->curseinfo(b1, TYP_BUILDING, c, 1);
     CuAssertPtrNotNull(tc, msg);
     CuAssertStrEquals(tc, "curseinfo::magicresistance_building", test_get_messagetype(msg));
-
+    msg_release(msg);
     test_cleanup();
 }
 

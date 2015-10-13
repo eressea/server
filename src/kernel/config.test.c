@@ -132,6 +132,7 @@ static void test_get_set_param(CuTest * tc)
     CuAssertStrEquals(tc, "foo", get_param(par, "bar"));
     set_param(&par, "bar", NULL);
     CuAssertPtrEquals(tc, NULL, (void *)get_param(par, "bar"));
+    test_cleanup();
 }
 
 static void test_param_int(CuTest * tc)
@@ -143,6 +144,7 @@ static void test_param_int(CuTest * tc)
     set_param(&par, "bar", "42");
     CuAssertIntEquals(tc, 23, get_param_int(par, "foo", 0));
     CuAssertIntEquals(tc, 42, get_param_int(par, "bar", 0));
+    test_cleanup();
 }
 
 static void test_param_flt(CuTest * tc)
@@ -154,6 +156,7 @@ static void test_param_flt(CuTest * tc)
     set_param(&par, "bar", "42.0");
     CuAssertDblEquals(tc, 23.0, get_param_flt(par, "foo", 0.0), 0.01);
     CuAssertDblEquals(tc, 42.0, get_param_flt(par, "bar", 0.0), 0.01);
+    test_cleanup();
 }
 
 static void test_forbiddenid(CuTest *tc) {
