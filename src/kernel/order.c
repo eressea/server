@@ -267,6 +267,13 @@ static void free_localedata(int lindex) {
     locale_array[lindex]->lang = 0;
 }
 
+void close_orders(void) {
+    int i;
+    for (i = 0; i != MAXLOCALES; ++i) {
+        if (locale_array[i]) free_localedata(i);
+    }
+}
+
 static order *create_order_i(keyword_t kwd, const char *sptr, bool persistent,
     const struct locale *lang)
 {

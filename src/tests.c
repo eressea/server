@@ -9,6 +9,7 @@
 #include <kernel/terrain.h>
 #include <kernel/item.h>
 #include <kernel/unit.h>
+#include <kernel/order.h>
 #include <kernel/race.h>
 #include <kernel/faction.h>
 #include <kernel/building.h>
@@ -79,6 +80,7 @@ void test_cleanup(void)
     global.functions.wage = NULL;
     free_params(&global.parameters);
     default_locale = 0;
+    close_orders();
     free_locales();
     free_spells();
     free_buildingtypes();
