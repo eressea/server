@@ -334,7 +334,7 @@ static void test_give_invalid_target(CuTest *tc) {
     setup_give(&env);
 
     i_change(&env.src->items, env.itype, 10);
-    lang = get_or_create_locale("test");
+    lang = get_or_create_locale("de");
     env.f1->locale = lang;
     locale_setstring(lang, "KRAEUTER", "KRAUT");
     init_locale(lang);
