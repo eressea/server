@@ -252,6 +252,7 @@ static void test_give_peasants(CuTest * tc) {
     CuAssertStrEquals(tc, "give_person_peasants", (const char*)msg->parameters[0].v);
     CuAssertIntEquals(tc, 0, env.src->number);
     CuAssertIntEquals(tc, 1, env.r->land->peasants);
+    msg_release(msg);
     test_cleanup();
 }
 
