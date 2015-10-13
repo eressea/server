@@ -26,6 +26,7 @@ extern "C" {
 
     pf_generic get_function(const char *name);
     void register_function(pf_generic fun, const char *name);
+    void free_functions(void);
 
 #ifdef __cplusplus
 }
