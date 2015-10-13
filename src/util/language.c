@@ -315,9 +315,23 @@ void reset_locales(void) {
 void free_locales(void) {
     locale_init = 0;
     while (locales) {
-        int i;
+        int i, index = locales->index;
         locale * next = locales->next;
 
+        for (i = UT_PARAMS; i != UT_RACES; ++i) {
+            struct critbit_tree ** cb = (struct critbit_tree **)get_translations(locales, i);
+            if (*cb) {
+                // TODO: this crashes?
+                cb_clear(*cb);
+                free(*cb);
+            }
+        }
+        for (i = UT_RACES; i != UT_MAX; ++i) {
+            void *tokens = lstrs[index].tokens[i];
+            if (tokens) {
+                freetokens(tokens);
+            }
+        }
         for (i = 0; i != SMAXHASH; ++i) {
             while (locales->strings[i]) {
                 struct locale_str * strings = locales->strings[i];
