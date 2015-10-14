@@ -178,6 +178,7 @@ void test_change_resource(CuTest * tc)
         CuAssertIntEquals(tc, have + 1, change_resource(u, rtype, 1));
         CuAssertIntEquals(tc, have + 1, get_resource(u, rtype));
     }
+    test_cleanup();
 }
 
 CuSuite *get_pool_suite(void)

@@ -94,6 +94,7 @@ void free_triggers(trigger * triggers)
         trigger *t = triggers;
         triggers = t->next;
         t_free(t);
+        free(t);
     }
 }
 
