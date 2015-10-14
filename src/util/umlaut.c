@@ -181,7 +181,7 @@ void addtoken(void ** root, const char *str, variant id)
                 ref->ucs = lcs;
                 ref->node = node;
                 ref->nexthash = tk->next[index];
-                tk->next[index] = ref;
+                tk->next[index] = ref; // FIXME: memory leak of tk->next[index]
             }
             next = ref;
         }
