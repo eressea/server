@@ -44,6 +44,7 @@ static void test_magicresistance_unit(CuTest *tc) {
     msg = c->type->curseinfo(u2, TYP_UNIT, c, 1);
     CuAssertPtrNotNull(tc, msg);
     CuAssertStrEquals(tc, "curseinfo::magicresistance_unit", test_get_messagetype(msg));
+    msg_release(msg);
 
     test_cleanup();
 }
