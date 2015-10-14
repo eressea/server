@@ -1611,6 +1611,8 @@ void set_default_order(int kwd) {
     default_keyword = (keyword_t)kwd;
 }
 
+// TODO: outside of tests, default_keyword is never used, why is this here?
+// see also test_long_order_hungry
 order *default_order(const struct locale *lang)
 {
     static int usedefault = 1;

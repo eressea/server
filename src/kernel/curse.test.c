@@ -33,9 +33,10 @@ static void test_curse(CuTest * tc)
     cid = c->no;
     result = findcurse(cid);
     CuAssertPtrEquals(tc, c, result);
-    destroy_curse(c);
+    a_remove(&attrs, attrs);
     result = findcurse(cid);
     CuAssertPtrEquals(tc, NULL, result);
+    test_cleanup();
 }
 
 typedef struct {

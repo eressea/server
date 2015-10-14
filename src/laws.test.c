@@ -999,7 +999,8 @@ static void test_long_order_buy_cast(CuTest *tc) {
 }
 
 static void test_long_order_hungry(CuTest *tc) {
-    // TODO: write more tests
+    // FIXME: set_default_order is a test-only function, this is a bad test.
+    // see also default_order
     unit *u;
     test_cleanup();
     set_param(&global.parameters, "hunger.long", "1");
