@@ -38,6 +38,9 @@ quicklist * spells;
 
 static void free_spell_cb(void *cbdata) {
     spell *sp = (spell *)cbdata;
+    free(sp->syntax);
+    free(sp->parameter);
+    free(sp->sname);
     free(sp->components);
     free(sp);
 }
