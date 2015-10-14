@@ -155,7 +155,7 @@ void addtoken(void ** root, const char *str, variant id)
             next = next->nexthash;
         if (!next) {
             tref *ref;
-            tnode *node = (tnode *)calloc(1, sizeof(tnode));
+            tnode *node = (tnode *)calloc(1, sizeof(tnode)); // TODO: what is the reason for this empty node to exist?
 
             if (ucs < 'a' || ucs > 'z') {
                 lcs = towlower((wint_t)ucs);
@@ -166,6 +166,7 @@ void addtoken(void ** root, const char *str, variant id)
 
             ref = (tref *)malloc(sizeof(tref));
             ref->ucs = ucs;
+            ref->node = 0;
             ref->node = node;
             ref->nexthash = tk->next[index];
             tk->next[index] = ref;
@@ -181,7 +182,7 @@ void addtoken(void ** root, const char *str, variant id)
                 ref->ucs = lcs;
                 ref->node = node;
                 ref->nexthash = tk->next[index];
-                tk->next[index] = ref; // FIXME: memory leak of tk->next[index]
+                tk->next[index] = ref;
             }
             next = ref;
         }
@@ -216,6 +217,7 @@ void freetokens(void * root)
             while (*refs) {
                 tref * ref = *refs;
                 *refs = ref->nexthash;
+//                free(ref->node);
                 free(ref);
             }
         }
