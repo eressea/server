@@ -399,6 +399,7 @@ void free_recruitments(recruitment * recruits)
         while (rec->requests) {
             request *req = rec->requests;
             rec->requests = req->next;
+            free_order(req->ord);
             free(req);
         }
         free(rec);
@@ -953,8 +954,9 @@ void economics(region * r)
         }
     }
 
-    if (recruitorders)
+    if (recruitorders) {
         expandrecruit(r, recruitorders);
+    }
     remove_empty_units_in_region(r);
 
     for (u = r->units; u; u = u->next) {
