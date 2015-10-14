@@ -154,7 +154,6 @@ building_type * test_create_buildingtype(const char * name)
 {
     building_type *btype = bt_get_or_create(name);
     btype->flags = BTF_NAMECHANGE;
-    btype->_name = _strdup(name);
     if (!btype->construction) {
         btype->construction = (construction *)calloc(sizeof(construction), 1);
         btype->construction->skill = SK_BUILDING;
