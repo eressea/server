@@ -55,6 +55,8 @@ static void test_good_dreams(CuTest *tc) {
     a_age(&r->attribs);
     CuAssertIntEquals_Msg(tc, "good dreams give +1 to allies", 1, get_modifier(u1, SK_MELEE, 11, r, false));
     CuAssertIntEquals_Msg(tc, "good dreams have no effect on non-allies", 0, get_modifier(u2, SK_MELEE, 11, r, false));
+    free_castorder(&co);
+    test_cleanup();
 }
 
 static void test_dreams(CuTest *tc) {
