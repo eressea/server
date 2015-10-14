@@ -17,7 +17,7 @@ typedef struct suite {
 
 static suite *suites;
 
-static void add_suite(CuSuite *(*csuite)(void), const char *name, int argc, const char *argv[]) {
+static void add_suite(CuSuite *(*csuite)(void), const char *name, int argc, char *argv[]) {
     suite *s = 0;
     if (argc > 1) {
         int i;
