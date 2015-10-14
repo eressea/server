@@ -627,19 +627,27 @@ message *msg_materials_required(unit * u, order * ord,
     const construction * ctype, int multi)
 {
     int c;
+    message *msg;
     /* something missing from the list of materials */
     resource *reslist = NULL;
 
     if (multi <= 0 || multi == INT_MAX)
         multi = 1;
     for (c = 0; ctype && ctype->materials[c].number; ++c) {
+        // TODO: lots of alloc/dealloc calls here (make var_copy_resources take an array)
         resource *res = malloc(sizeof(resource));
         res->number = multi * ctype->materials[c].number / ctype->reqsize;
         res->type = ctype->materials[c].rtype;
         res->next = reslist;
         reslist = res;
     }
-    return msg_feedback(u, ord, "build_required", "required", reslist);
+    msg = msg_feedback(u, ord, "build_required", "required", reslist);
+    while (reslist) {
+        resource *res = reslist->next;
+        free(reslist);
+        reslist = res;
+    }
+    return msg;
 }
 
 int maxbuild(const unit * u, const construction * cons)
