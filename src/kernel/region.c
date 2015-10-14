@@ -753,6 +753,7 @@ void remove_region(region ** rlist, region * r)
 
 static void freeland(land_region * lr)
 {
+    free(lr->ownership);
     while (lr->demands) {
         struct demand *d = lr->demands;
         lr->demands = d->next;
