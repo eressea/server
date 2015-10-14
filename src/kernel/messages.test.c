@@ -39,7 +39,7 @@ void test_message(CuTest *tc) {
 
 static void test_merge_split(CuTest *tc) {
     message_list *mlist = 0, *append = 0;
-    struct mlist **split;
+    struct mlist **split; // TODO: why is this a double asterisk?
     message_type *mtype = mt_new("custom", NULL);
 
     test_cleanup();
@@ -57,8 +57,11 @@ static void test_merge_split(CuTest *tc) {
     CuAssertPtrEquals(tc, append->begin, mlist->begin->next);
     split_messages(mlist, split);
     CuAssertPtrEquals(tc, 0, mlist->begin->next);
-    free_messagelist(mlist);
-    free_messagelist(append);
+    free_messagelist(*split);
+    free_messagelist(mlist->begin);
+    free(mlist);
+    free_messagelist(append->begin);
+    free(append);
     test_cleanup();
 }
 

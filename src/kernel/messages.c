@@ -283,17 +283,14 @@ void syntax_error(const struct unit *u, struct order *ord)
 
 extern unsigned int new_hashstring(const char *s);
 
-void free_messagelist(message_list * msgs)
+void free_messagelist(mlist *msgs)
 {
     struct mlist **mlistptr;
-    if (msgs) {
-        for (mlistptr = &msgs->begin; *mlistptr;) {
-            struct mlist *ml = *mlistptr;
-            *mlistptr = ml->next;
-            msg_release(ml->msg);
-            free(ml);
-        }
-        free(msgs);
+    for (mlistptr = &msgs; *mlistptr;) {
+        struct mlist *ml = *mlistptr;
+        *mlistptr = ml->next;
+        msg_release(ml->msg);
+        free(ml);
     }
 }
 
