@@ -270,6 +270,7 @@ static void json_terrain(cJSON *json, terrain_type *ter) {
                 int size = cJSON_GetArraySize(child);
                 if (size > 0) {
                     int n;
+                    free(ter->herbs);
                     ter->herbs = malloc(sizeof(const item_type *) * (size + 1));
                     ter->herbs[size] = 0;
                     for (n = 0, entry = child->child; entry; entry = entry->next) {
