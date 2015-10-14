@@ -58,11 +58,9 @@ bool list = false;
 
 int RunAllTests(int argc, char *argv[])
 {
-    CuSuite *summary = CuSuiteNew();
     int flags = log_flags;
 
     log_flags = LOG_FLUSH | LOG_CPERROR;
-    game_init();
 
     /* self-test */
     ADD_SUITE(tests);
@@ -129,7 +127,9 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(study);
 
     if (suites) {
+        CuSuite *summary = CuSuiteNew();
         int fail_count;
+        game_init();
         while (suites) {
             suite *s = suites->next;
             RunTests(suites->csuite, suites->name);
