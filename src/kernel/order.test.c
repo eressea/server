@@ -167,6 +167,8 @@ static void test_replace_order(CuTest *tc) {
     CuAssertPtrNotNull(tc, orders);
     CuAssertPtrEquals(tc, 0, orders->next);
     CuAssertIntEquals(tc, getkeyword(repl), getkeyword(orders));
+    free_order(orders);
+    free_order(repl);
     test_cleanup();
 }
 
