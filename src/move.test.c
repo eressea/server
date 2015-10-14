@@ -269,6 +269,7 @@ static void test_ship_trails(CuTest *tc) {
     CuAssertPtrEquals(tc, 0, a_find(r1->attribs, &at_shiptrail));
     CuAssertPtrNotNull(tc, a_find(r2->attribs, &at_shiptrail));
     CuAssertPtrNotNull(tc, a_find(r3->attribs, &at_shiptrail));
+    free_regionlist(route);
     test_cleanup();
 }
 
@@ -290,6 +291,7 @@ static void test_age_trails(CuTest *tc) {
     CuAssertPtrNotNull(tc, r1->attribs);
     a_age(&r1->attribs);
     CuAssertPtrEquals(tc, 0, r1->attribs);
+    free_regionlist(route);
     test_cleanup();
 }
 
