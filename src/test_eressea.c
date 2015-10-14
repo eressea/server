@@ -3,9 +3,41 @@
 #include <kernel/config.h>
 #include <CuTest.h>
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include <util/log.h>
 
 #pragma warning(disable: 4210)
+
+typedef struct suite {
+    struct suite *next;
+    CuSuite *csuite;
+    char *name;
+} suite;
+
+static suite *suites;
+
+static void add_suite(CuSuite *(*csuite)(void), const char *name, int argc, const char *argv[]) {
+    suite *s = 0;
+    if (argc > 1) {
+        int i;
+        for (i = 0; i != argc; ++i) {
+            if (strcmp(argv[i], name) == 0) {
+                s = malloc(sizeof(suite));
+                break;
+            }
+        }
+    }
+    else {
+        s = malloc(sizeof(suite));
+    }
+    if (s) {
+        s->next = suites;
+        s->name = _strdup(name);
+        s->csuite = csuite();
+        suites = s;
+    }
+}
 
 void RunTests(CuSuite * suite, const char *name) {
     CuString *output = CuStringNew();
@@ -17,95 +49,115 @@ void RunTests(CuSuite * suite, const char *name) {
     CuStringDelete(output);
 }
 
-#define RUN_TESTS(suite, name) \
+bool list = false;
+
+#define ADD_SUITE(name) \
     CuSuite *get_##name##_suite(void); \
-    CuSuite *name = get_##name##_suite(); \
-    RunTests(name, #name); \
-    suite->failCount += name->failCount; \
-    suite->count += name->count; \
-    CuSuiteDelete(name);
+    if (list) printf("%s\n", #name); \
+    if (!list || argc>0) add_suite(get_##name##_suite, #name, argc, argv)
 
-int RunAllTests(void)
+int RunAllTests(int argc, char *argv[])
 {
-  CuSuite *suite = CuSuiteNew();
-  int fail_count, flags = log_flags;
+    CuSuite *summary = CuSuiteNew();
+    int flags = log_flags;
 
-  log_flags = LOG_FLUSH | LOG_CPERROR;
-  game_init();
+    log_flags = LOG_FLUSH | LOG_CPERROR;
+    game_init();
 
-  /* self-test */
-  RUN_TESTS(suite, tests);
-  RUN_TESTS(suite, callback);
-  RUN_TESTS(suite, seen);
-  RUN_TESTS(suite, json);
-  RUN_TESTS(suite, jsonconf);
-  RUN_TESTS(suite, direction);
-  RUN_TESTS(suite, skill);
-  RUN_TESTS(suite, keyword);
-  RUN_TESTS(suite, order);
-  RUN_TESTS(suite, race);
-  /* util */
-  RUN_TESTS(suite, config);
-  RUN_TESTS(suite, attrib);
-  RUN_TESTS(suite, base36);
-  RUN_TESTS(suite, bsdstring);
-  RUN_TESTS(suite, functions);
-  RUN_TESTS(suite, parser);
-  RUN_TESTS(suite, umlaut);
-  RUN_TESTS(suite, unicode);
-  RUN_TESTS(suite, strings);
-  RUN_TESTS(suite, rng);
-  /* items */
-  RUN_TESTS(suite, xerewards);
-  /* kernel */
-  RUN_TESTS(suite, alliance);
-  RUN_TESTS(suite, unit);
-  RUN_TESTS(suite, faction);
-  RUN_TESTS(suite, group);
-  RUN_TESTS(suite, build);
-  RUN_TESTS(suite, pool);
-  RUN_TESTS(suite, curse);
-  RUN_TESTS(suite, equipment);
-  RUN_TESTS(suite, item);
-  RUN_TESTS(suite, magic);
-  RUN_TESTS(suite, alchemy);
-  RUN_TESTS(suite, reports);
-  RUN_TESTS(suite, save);
-  RUN_TESTS(suite, ship);
-  RUN_TESTS(suite, spellbook);
-  RUN_TESTS(suite, building);
-  RUN_TESTS(suite, spell);
-  RUN_TESTS(suite, spells);
-  RUN_TESTS(suite, magicresistance);
-  RUN_TESTS(suite, ally);
-  RUN_TESTS(suite, messages);
-  /* gamecode */
-  RUN_TESTS(suite, prefix);
-  RUN_TESTS(suite, battle);
-  RUN_TESTS(suite, donations);
-  RUN_TESTS(suite, travelthru);
-  RUN_TESTS(suite, economy);
-  RUN_TESTS(suite, give);
-  RUN_TESTS(suite, laws);
-  RUN_TESTS(suite, market);
-  RUN_TESTS(suite, move);
-  RUN_TESTS(suite, piracy);
-  RUN_TESTS(suite, stealth);
-  RUN_TESTS(suite, upkeep);
-  RUN_TESTS(suite, vortex);
-  RUN_TESTS(suite, wormhole);
-  RUN_TESTS(suite, spy);
-  RUN_TESTS(suite, study);
+    /* self-test */
+    ADD_SUITE(tests);
+    ADD_SUITE(callback);
+    ADD_SUITE(seen);
+    ADD_SUITE(json);
+    ADD_SUITE(jsonconf);
+    ADD_SUITE(direction);
+    ADD_SUITE(skill);
+    ADD_SUITE(keyword);
+    ADD_SUITE(order);
+    ADD_SUITE(race);
+    /* util */
+    ADD_SUITE(config);
+    ADD_SUITE(attrib);
+    ADD_SUITE(base36);
+    ADD_SUITE(bsdstring);
+    ADD_SUITE(functions);
+    ADD_SUITE(parser);
+    ADD_SUITE(umlaut);
+    ADD_SUITE(unicode);
+    ADD_SUITE(strings);
+    ADD_SUITE(rng);
+    /* items */
+    ADD_SUITE(xerewards);
+    /* kernel */
+    ADD_SUITE(alliance);
+    ADD_SUITE(unit);
+    ADD_SUITE(faction);
+    ADD_SUITE(group);
+    ADD_SUITE(build);
+    ADD_SUITE(pool);
+    ADD_SUITE(curse);
+    ADD_SUITE(equipment);
+    ADD_SUITE(item);
+    ADD_SUITE(magic);
+    ADD_SUITE(alchemy);
+    ADD_SUITE(reports);
+    ADD_SUITE(save);
+    ADD_SUITE(ship);
+    ADD_SUITE(spellbook);
+    ADD_SUITE(building);
+    ADD_SUITE(spell);
+    ADD_SUITE(spells);
+    ADD_SUITE(magicresistance);
+    ADD_SUITE(ally);
+    ADD_SUITE(messages);
+    /* gamecode */
+    ADD_SUITE(prefix);
+    ADD_SUITE(battle);
+    ADD_SUITE(donations);
+    ADD_SUITE(travelthru);
+    ADD_SUITE(economy);
+    ADD_SUITE(give);
+    ADD_SUITE(laws);
+    ADD_SUITE(market);
+    ADD_SUITE(move);
+    ADD_SUITE(piracy);
+    ADD_SUITE(stealth);
+    ADD_SUITE(upkeep);
+    ADD_SUITE(vortex);
+    ADD_SUITE(wormhole);
+    ADD_SUITE(spy);
+    ADD_SUITE(study);
 
-  printf("\ntest summary: %d tests, %d failed\n", suite->count, suite->failCount);
-  log_flags = flags;
-  fail_count = suite->failCount;
-  CuSuiteDelete(suite);
-  game_done();
-  return fail_count;
+    if (suites) {
+        int fail_count;
+        while (suites) {
+            suite *s = suites->next;
+            RunTests(suites->csuite, suites->name);
+            summary->failCount += suites->csuite->failCount;
+            summary->count += suites->csuite->count;
+            CuSuiteDelete(suites->csuite);
+            free(suites->name);
+            free(suites);
+            suites = s;
+        }
+        printf("\ntest summary: %d tests, %d failed\n", summary->count, summary->failCount);
+        log_flags = flags;
+        fail_count = summary->failCount;
+        CuSuiteDelete(summary);
+        game_done();
+        return fail_count;
+    }
+    return 0;
 }
 
 int main(int argc, char ** argv) {
     log_stderr = 0;
-    return RunAllTests();
+    ++argv;
+    --argc;
+    if (argc > 0 && strcmp("--list", argv[0]) == 0) {
+        list = true;
+        ++argv;
+        --argc;
+    }
+    return RunAllTests(argc, argv);
 }
