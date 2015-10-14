@@ -155,15 +155,19 @@ building_type * test_create_buildingtype(const char * name)
     building_type *btype = bt_get_or_create(name);
     btype->flags = BTF_NAMECHANGE;
     btype->_name = _strdup(name);
-    btype->construction = (construction *)calloc(sizeof(construction), 1);
-    btype->construction->skill = SK_BUILDING;
-    btype->construction->maxsize = -1;
-    btype->construction->minskill = 1;
-    btype->construction->reqsize = 1;
-    btype->construction->materials = (requirement *)calloc(sizeof(requirement), 2);
-    btype->construction->materials[1].number = 0;
-    btype->construction->materials[0].number = 1;
-    btype->construction->materials[0].rtype = get_resourcetype(R_STONE);
+    if (!btype->construction) {
+        btype->construction = (construction *)calloc(sizeof(construction), 1);
+        btype->construction->skill = SK_BUILDING;
+        btype->construction->maxsize = -1;
+        btype->construction->minskill = 1;
+        btype->construction->reqsize = 1;
+    }
+    if (!btype->construction->materials) {
+        btype->construction->materials = (requirement *)calloc(sizeof(requirement), 2);
+        btype->construction->materials[1].number = 0;
+        btype->construction->materials[0].number = 1;
+        btype->construction->materials[0].rtype = get_resourcetype(R_STONE);
+    }
     if (default_locale) {
         locale_setstring(default_locale, name, name);
     }
