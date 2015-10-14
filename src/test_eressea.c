@@ -19,7 +19,7 @@ static suite *suites;
 
 static void add_suite(CuSuite *(*csuite)(void), const char *name, int argc, char *argv[]) {
     suite *s = 0;
-    if (argc > 1) {
+    if (argc > 0) {
         int i;
         for (i = 0; i != argc; ++i) {
             if (strcmp(argv[i], name) == 0) {
