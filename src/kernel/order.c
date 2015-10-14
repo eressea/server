@@ -245,6 +245,7 @@ static order_data *create_data(keyword_t kwd, const char *sptr, int lindex)
         if (data == NULL) {
             mkdata(&data, 0, kwd, lindex, 0);
             data->_refcount = 1;
+            locale_array[lindex]->short_orders[kwd] = data;
         }
         ++data->_refcount;
         return data;
