@@ -1144,6 +1144,7 @@ void set_param(struct param **p, const char *key, const char *data)
             }
             else {
                 *p = par->next;
+                free(par->name);
                 free(par);
             }
             return;
