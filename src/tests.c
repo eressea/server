@@ -97,10 +97,6 @@ void test_cleanup(void)
     for (i = 0; i != MAXKEYWORDS; ++i) {
         enable_keyword(i, true);
     }
-    if (!mt_find("missing_message")) {
-        mt_register(mt_new_va("missing_message", "name:string", 0));
-        mt_register(mt_new_va("missing_feedback", "unit:unit", "region:region", "command:order", "name:string", 0));
-    }
     if (errno) {
         int error = errno;
         errno = 0;
