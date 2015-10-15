@@ -334,7 +334,7 @@ void ct_checknames(void) {
     int i, qi;
     quicklist *ctl;
 
-    for (i = 0; i < 256; ++i) {
+    for (i = 0; i < MAXCTHASH; ++i) {
         ctl = cursetypes[i];
         for (qi = 0; ctl; ql_advance(&ctl, &qi, 1)) {
             curse_type *type = (curse_type *)ql_get(ctl, qi);
