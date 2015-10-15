@@ -363,6 +363,7 @@ extern "C" {
 
     struct spellbook * get_spellbook(const char * name);
     void free_spellbooks(void);
+    void free_spellbook(struct spellbook *sb);
 #ifdef __cplusplus
 }
 #endif

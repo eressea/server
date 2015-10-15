@@ -185,11 +185,10 @@ static void test_building_defence_bonus(CuTest * tc)
     building_type * btype;
     faction * f;
     int def;
+
     test_cleanup();
-    test_create_world();
-    r = findregion(0, 0);
-    register_buildings();
-    btype = bt_get_or_create("castle");
+    r = test_create_region(0, 0, 0);
+    btype = test_create_buildingtype("castle");
     btype->protection = (int(*)(struct building *, struct unit *, building_bonus))get_function("building_protection");
     btype->construction->defense_bonus = 3;
     bld = test_create_building(r, btype);

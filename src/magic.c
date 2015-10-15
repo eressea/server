@@ -2984,11 +2984,15 @@ spellbook * get_spellbook(const char * name)
     return result;
 }
 
-int free_spellbook_cb(const void *match, const void *key, size_t keylen, void *data) {
-    spellbook *sb;
-    cb_get_kv(match, &sb, sizeof(sb));
+void free_spellbook(spellbook *sb) {
     spellbook_clear(sb);
     free(sb);
+}
+
+static int free_spellbook_cb(const void *match, const void *key, size_t keylen, void *data) {
+    spellbook *sb;
+    cb_get_kv(match, &sb, sizeof(sb));
+    free_spellbook(sb);
     return 0;
 }
 

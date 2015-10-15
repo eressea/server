@@ -245,6 +245,7 @@ static order_data *create_data(keyword_t kwd, const char *sptr, int lindex)
         if (data == NULL) {
             mkdata(&data, 0, kwd, lindex, 0);
             data->_refcount = 1;
+            locale_array[lindex]->short_orders[kwd] = data;
         }
         ++data->_refcount;
         return data;
@@ -254,7 +255,7 @@ static order_data *create_data(keyword_t kwd, const char *sptr, int lindex)
     return data;
 }
 
-static void free_localedata(int lindex) {
+static void clear_localedata(int lindex) {
     int i;
     for (i = 0; i != MAXKEYWORDS; ++i) {
         release_data(locale_array[lindex]->short_orders[i]);
@@ -265,6 +266,17 @@ static void free_localedata(int lindex) {
         locale_array[lindex]->study_orders[i] = 0;
     }
     locale_array[lindex]->lang = 0;
+}
+
+void close_orders(void) {
+    int i;
+    for (i = 0; i != MAXLOCALES; ++i) {
+        if (locale_array[i]){
+            clear_localedata(i);
+            free(locale_array[i]);
+            locale_array[i] = 0;
+        }
+    }
 }
 
 static order *create_order_i(keyword_t kwd, const char *sptr, bool persistent,
@@ -295,7 +307,7 @@ static order *create_order_i(keyword_t kwd, const char *sptr, bool persistent,
         locale_array[lindex] = (locale_data *)calloc(1, sizeof(locale_data));
     }
     else if (locale_array[lindex]->lang != lang) {
-        free_localedata(lindex);
+        clear_localedata(lindex);
     }
     locale_array[lindex]->lang = lang;
 

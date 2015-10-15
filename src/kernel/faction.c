@@ -69,14 +69,22 @@ faction *factions;
 void free_faction(faction * f)
 {
     funhash(f);
-    if (f->msgs)
-        free_messagelist(f->msgs);
+    if (f->msgs) {
+        free_messagelist(f->msgs->begin);
+        free(f->msgs);
+    }
     while (f->battles) {
         struct bmsg *bm = f->battles;
         f->battles = bm->next;
-        if (bm->msgs)
-            free_messagelist(bm->msgs);
+        if (bm->msgs) {
+            free_messagelist(bm->msgs->begin);
+            free(bm->msgs);
+        }
         free(bm);
+    }
+
+    if (f->spellbook) {
+        free_spellbook(f->spellbook);
     }
 
     while (f->groups) {
@@ -90,6 +98,10 @@ void free_faction(faction * f)
     free(f->banner);
     free(f->passw);
     free(f->name);
+    if (f->seen_factions) {
+        ql_free(f->seen_factions);
+        f->seen_factions = 0;
+    }
 
     while (f->attribs) {
         a_remove(&f->attribs, f->attribs);

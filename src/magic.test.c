@@ -40,6 +40,7 @@ void test_updatespells(CuTest * tc)
     CuAssertPtrNotNull(tc, f->spellbook);
     CuAssertIntEquals(tc, 1, ql_length(f->spellbook->spells));
     CuAssertPtrNotNull(tc, spellbook_get(f->spellbook, sp));
+    free_spellbook(book);
     test_cleanup();
 }
 

@@ -9,6 +9,7 @@
 #include <kernel/terrain.h>
 #include <kernel/item.h>
 #include <kernel/unit.h>
+#include <kernel/order.h>
 #include <kernel/race.h>
 #include <kernel/faction.h>
 #include <kernel/building.h>
@@ -79,6 +80,7 @@ void test_cleanup(void)
     global.functions.wage = NULL;
     free_params(&global.parameters);
     default_locale = 0;
+    close_orders();
     free_locales();
     free_spells();
     free_buildingtypes();
@@ -94,10 +96,6 @@ void test_cleanup(void)
     }
     for (i = 0; i != MAXKEYWORDS; ++i) {
         enable_keyword(i, true);
-    }
-    if (!mt_find("missing_message")) {
-        mt_register(mt_new_va("missing_message", "name:string", 0));
-        mt_register(mt_new_va("missing_feedback", "unit:unit", "region:region", "command:order", "name:string", 0));
     }
     if (errno) {
         int error = errno;
@@ -152,16 +150,19 @@ building_type * test_create_buildingtype(const char * name)
 {
     building_type *btype = bt_get_or_create(name);
     btype->flags = BTF_NAMECHANGE;
-    btype->_name = _strdup(name);
-    btype->construction = (construction *)calloc(sizeof(construction), 1);
-    btype->construction->skill = SK_BUILDING;
-    btype->construction->maxsize = -1;
-    btype->construction->minskill = 1;
-    btype->construction->reqsize = 1;
-    btype->construction->materials = (requirement *)calloc(sizeof(requirement), 2);
-    btype->construction->materials[1].number = 0;
-    btype->construction->materials[0].number = 1;
-    btype->construction->materials[0].rtype = get_resourcetype(R_STONE);
+    if (!btype->construction) {
+        btype->construction = (construction *)calloc(sizeof(construction), 1);
+        btype->construction->skill = SK_BUILDING;
+        btype->construction->maxsize = -1;
+        btype->construction->minskill = 1;
+        btype->construction->reqsize = 1;
+    }
+    if (!btype->construction->materials) {
+        btype->construction->materials = (requirement *)calloc(sizeof(requirement), 2);
+        btype->construction->materials[1].number = 0;
+        btype->construction->materials[0].number = 1;
+        btype->construction->materials[0].rtype = get_resourcetype(R_STONE);
+    }
     if (default_locale) {
         locale_setstring(default_locale, name, name);
     }
@@ -280,8 +281,11 @@ struct message * test_find_messagetype(struct message_list *msgs, const char *na
 }
 
 void test_clear_messages(faction *f) {
-    free_messagelist(f->msgs);
-    f->msgs = 0;
+    if (f->msgs) {
+        free_messagelist(f->msgs->begin);
+        free(f->msgs);
+        f->msgs = 0;
+    }
 }
 
 void disabled_test(void *suite, void (*test)(CuTest *), const char *name) {

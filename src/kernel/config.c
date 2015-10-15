@@ -1144,6 +1144,7 @@ void set_param(struct param **p, const char *key, const char *data)
             }
             else {
                 *p = par->next;
+                free(par->name);
                 free(par);
             }
             return;
@@ -1596,10 +1597,6 @@ void kernel_init(void)
 {
     register_reports();
     mt_clear();
-    if (!mt_find("missing_message")) {
-        mt_register(mt_new_va("missing_message", "name:string", 0));
-        mt_register(mt_new_va("missing_feedback", "unit:unit", "region:region", "command:order", "name:string", 0));
-    }
     attrib_init();
     translation_init();
 }
@@ -1611,6 +1608,8 @@ void set_default_order(int kwd) {
     default_keyword = (keyword_t)kwd;
 }
 
+// TODO: outside of tests, default_keyword is never used, why is this here?
+// see also test_long_order_hungry
 order *default_order(const struct locale *lang)
 {
     static int usedefault = 1;

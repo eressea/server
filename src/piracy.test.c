@@ -18,7 +18,6 @@
 
 static void setup_piracy(void) {
     struct locale *lang;
-    terrain_type *t_ocean;
     ship_type *st_boat;
 
     test_cleanup();
@@ -26,7 +25,7 @@ static void setup_piracy(void) {
     lang = get_or_create_locale("de");
     locale_setstring(lang, directions[D_EAST], "OSTEN");
     init_directions(lang);
-    t_ocean = test_create_terrain("ocean", SAIL_INTO | SEA_REGION);
+    test_create_terrain("ocean", SAIL_INTO | SEA_REGION);
     st_boat = test_create_shiptype("boat");
     st_boat->cargo = 1000;
 }

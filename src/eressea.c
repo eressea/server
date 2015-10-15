@@ -13,8 +13,10 @@
 #endif
 #include <triggers/triggers.h>
 #include <util/language.h>
+#include <util/functions.h>
 #include <kernel/xmlreader.h>
 #include <kernel/item.h>
+#include <kernel/curse.h>
 #include <kernel/building.h>
 #include <modules/gmcmd.h>
 #include <modules/xmas.h>
@@ -46,6 +48,8 @@ void game_done(void)
 #endif
     calendar_cleanup();
 #endif
+    free_functions();
+    free_curses();
     kernel_done();
 }
 

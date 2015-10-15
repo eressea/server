@@ -108,6 +108,7 @@ static void test_seen_travelthru(CuTest *tc) {
     sr = find_seen(f->seen, r);
     CuAssertPtrEquals(tc, r, sr->r);
     CuAssertIntEquals(tc, see_travel, sr->mode);
+    seen_done(f->seen);
     test_cleanup();
 }
 
@@ -141,6 +142,7 @@ static void test_seen_interval_backward(CuTest *tc) {
     get_seen_interval(seen, &first, &last);
     CuAssertPtrEquals(tc, regions, first);
     CuAssertPtrEquals(tc, 0, last);
+    seen_done(seen);
     test_cleanup();
 }
 
@@ -159,6 +161,7 @@ static void test_seen_interval_forward(CuTest *tc) {
     get_seen_interval(seen, &first, &last);
     CuAssertPtrEquals(tc, regions, first);
     CuAssertPtrEquals(tc, 0, last);
+    seen_done(seen);
     test_cleanup();
 }
 

@@ -66,6 +66,7 @@ static void test_reorder_units(CuTest * tc)
     CuAssertPtrEquals(tc, u1, u2->next);
     CuAssertPtrEquals(tc, u0, u1->next);
     CuAssertPtrEquals(tc, 0, u0->next);
+    test_cleanup();
 }
 
 static void test_regionid(CuTest * tc) {
@@ -88,11 +89,15 @@ static void test_regionid(CuTest * tc) {
     CuAssertIntEquals(tc, 10, (int)len);
     CuAssertStrEquals(tc, "plain (0,0", buffer);
     CuAssertIntEquals(tc, 0x7d, buffer[11]);
+    test_cleanup();
 }
 
 static void test_seen_faction(CuTest *tc) {
     faction *f1, *f2;
-    race *rc = test_create_race("human");
+    race *rc;
+
+    test_cleanup();
+    rc = test_create_race("human");
     f1 = test_create_faction(rc);
     f2 = test_create_faction(rc);
     add_seen_faction(f1, f2);
@@ -105,6 +110,7 @@ static void test_seen_faction(CuTest *tc) {
     f2 = (faction *)ql_get(f1->seen_factions, 1);
     f1 = (faction *)ql_get(f1->seen_factions, 0);
     CuAssertTrue(tc, f1->no < f2->no);
+    test_cleanup();
 }
 
 static void test_write_spaces(CuTest *tc) {
@@ -139,18 +145,25 @@ static void test_write_many_spaces(CuTest *tc) {
 
 static void test_sparagraph(CuTest *tc) {
     strlist *sp = 0;
+
     split_paragraph(&sp, "Hello World", 0, 16, 0);
     CuAssertPtrNotNull(tc, sp);
     CuAssertStrEquals(tc, "Hello World", sp->s);
     CuAssertPtrEquals(tc, 0, sp->next);
+    freestrlist(sp);
+
     split_paragraph(&sp, "Hello World", 4, 16, 0);
     CuAssertPtrNotNull(tc, sp);
     CuAssertStrEquals(tc, "    Hello World", sp->s);
     CuAssertPtrEquals(tc, 0, sp->next);
+    freestrlist(sp);
+
     split_paragraph(&sp, "Hello World", 4, 16, '*');
     CuAssertPtrNotNull(tc, sp);
     CuAssertStrEquals(tc, "  * Hello World", sp->s);
     CuAssertPtrEquals(tc, 0, sp->next);
+    freestrlist(sp);
+
     split_paragraph(&sp, "12345678 90 12345678", 0, 8, '*');
     CuAssertPtrNotNull(tc, sp);
     CuAssertStrEquals(tc, "12345678", sp->s);
@@ -159,6 +172,7 @@ static void test_sparagraph(CuTest *tc) {
     CuAssertPtrNotNull(tc, sp->next->next);
     CuAssertStrEquals(tc, "12345678", sp->next->next->s);
     CuAssertPtrEquals(tc, 0, sp->next->next->next);
+    freestrlist(sp);
 }
 
 static void test_cr_unit(CuTest *tc) {

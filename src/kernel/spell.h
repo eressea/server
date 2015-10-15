@@ -50,11 +50,11 @@ extern "C" {
     void showspells(struct region *r, struct unit *u);
     int sp_antimagiczone(struct castorder *co);
 
-    extern struct spell * create_spell(const char * name, unsigned int id);
-    extern struct spell * find_spell(const char *name);
-    extern struct spell * find_spellbyid(unsigned int i);
-    extern void add_spell(struct quicklist **slistp, spell * sp);
-    extern void free_spells(void);
+    struct spell * create_spell(const char * name, unsigned int id);
+    struct spell * find_spell(const char *name);
+    struct spell * find_spellbyid(unsigned int i);
+    void add_spell(struct quicklist **slistp, spell * sp);
+    void free_spells(void);
 
     /** globals **/
     extern struct attrib_type at_unitdissolve;

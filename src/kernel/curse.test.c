@@ -33,9 +33,10 @@ static void test_curse(CuTest * tc)
     cid = c->no;
     result = findcurse(cid);
     CuAssertPtrEquals(tc, c, result);
-    destroy_curse(c);
+    a_remove(&attrs, attrs);
     result = findcurse(cid);
     CuAssertPtrEquals(tc, NULL, result);
+    test_cleanup();
 }
 
 typedef struct {
@@ -156,6 +157,6 @@ CuSuite *get_curse_suite(void)
     SUITE_ADD_TEST(suite, test_good_dreams);
     SUITE_ADD_TEST(suite, test_bad_dreams);
     SUITE_ADD_TEST(suite, test_memstream);
-    DISABLE_TEST(suite, test_write_flag);
+    SUITE_ADD_TEST(suite, test_write_flag);
     return suite;
 }

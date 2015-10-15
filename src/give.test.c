@@ -152,6 +152,7 @@ static void test_give_men_in_ocean(CuTest * tc) {
     msg = disband_men(1, env.src, NULL);
     CuAssertStrEquals(tc, "give_person_ocean", (const char *)msg->parameters[0].v);
     CuAssertIntEquals(tc, 0, env.src->number);
+    msg_release(msg);
     test_cleanup();
 }
 
@@ -177,6 +178,7 @@ static void test_give_men_none(CuTest * tc) {
     CuAssertStrEquals(tc, "error96", test_get_messagetype(msg));
     CuAssertIntEquals(tc, 1, env.dst->number);
     CuAssertIntEquals(tc, 1, env.src->number);
+    msg_release(msg);
     test_cleanup();
 }
 
@@ -193,6 +195,7 @@ static void test_give_men_other_faction(CuTest * tc) {
     CuAssertStrEquals(tc, "give_person", (const char *)msg->parameters[0].v);
     CuAssertIntEquals(tc, 2, env.dst->number);
     CuAssertIntEquals(tc, 0, env.src->number);
+    msg_release(msg);
     test_cleanup();
 }
 
@@ -217,8 +220,9 @@ static void test_give_men_requires_contact(CuTest * tc) {
     give_cmd(env.src, ord);
     CuAssertPtrEquals(tc, 0, test_find_messagetype(env.f1->msgs, "give_person"));
     CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "feedback_no_contact"));
-    free_order(ord);
 
+    msg_release(msg);
+    free_order(ord);
     test_cleanup();
 }
 
@@ -231,6 +235,7 @@ static void test_give_men_not_to_self(CuTest * tc) {
     msg = give_men(1, env.src, env.src, NULL);
     CuAssertStrEquals(tc, "error10", test_get_messagetype(msg));
     CuAssertIntEquals(tc, 1, env.src->number);
+    msg_release(msg);
     test_cleanup();
 }
 
@@ -247,6 +252,7 @@ static void test_give_peasants(CuTest * tc) {
     CuAssertStrEquals(tc, "give_person_peasants", (const char*)msg->parameters[0].v);
     CuAssertIntEquals(tc, 0, env.src->number);
     CuAssertIntEquals(tc, 1, env.r->land->peasants);
+    msg_release(msg);
     test_cleanup();
 }
 
@@ -334,7 +340,7 @@ static void test_give_invalid_target(CuTest *tc) {
     setup_give(&env);
 
     i_change(&env.src->items, env.itype, 10);
-    lang = get_or_create_locale("test");
+    lang = get_or_create_locale("de");
     env.f1->locale = lang;
     locale_setstring(lang, "KRAEUTER", "KRAUT");
     init_locale(lang);

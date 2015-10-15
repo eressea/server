@@ -49,8 +49,12 @@ static void test_umlaut(CuTest * tc)
     CuAssertIntEquals(tc, E_TOK_SUCCESS, result);
     CuAssertIntEquals(tc, 1, id.i);
 
-    result = findtoken(tokens, "DERP", &id);
-    CuAssertIntEquals(tc, E_TOK_SUCCESS, result);
+    CuAssertIntEquals(tc, E_TOK_SUCCESS, findtoken(tokens, "derp", &id));
+    CuAssertIntEquals(tc, E_TOK_SUCCESS, findtoken(tokens, "Derp", &id));
+    CuAssertIntEquals(tc, E_TOK_SUCCESS, findtoken(tokens, "dErp", &id));
+    CuAssertIntEquals(tc, E_TOK_SUCCESS, findtoken(tokens, "deRp", &id));
+    CuAssertIntEquals(tc, E_TOK_SUCCESS, findtoken(tokens, "derP", &id));
+    CuAssertIntEquals(tc, E_TOK_SUCCESS, findtoken(tokens, "DERP", &id));
     CuAssertIntEquals(tc, 2, id.i);
 
     result = findtoken(tokens, umlauts, &id);

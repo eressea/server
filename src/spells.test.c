@@ -20,10 +20,13 @@
 #include <assert.h>
 
 
-static void test_create_castorder(castorder *order, unit *u, int level, float force, int range) {
+static void test_create_castorder(castorder *co, unit *u, int level, float force, int range) {
     struct locale * lang;
+    order *ord;
+
     lang = get_or_create_locale("en");
-    create_castorder(order, u, NULL, NULL, u->region, level, force, range, create_order(K_CAST, lang, ""), NULL);
+    create_castorder(co, u, NULL, NULL, u->region, level, force, range, ord = create_order(K_CAST, lang, ""), NULL);
+    free_order(ord);
 }
 
 static void test_good_dreams(CuTest *tc) {
@@ -31,7 +34,7 @@ static void test_good_dreams(CuTest *tc) {
     struct faction *f1, *f2;
     unit *u1, *u2;
     int level;
-    castorder order;
+    castorder co;
 
     test_cleanup();
     test_create_world();
@@ -41,9 +44,9 @@ static void test_good_dreams(CuTest *tc) {
     u1 = test_create_unit(f1, r);
     u2 = test_create_unit(f2, r);
 
-    test_create_castorder(&order, u1, 10, 10., 0);
+    test_create_castorder(&co, u1, 10, 10., 0);
 
-    level = sp_gooddreams(&order);
+    level = sp_gooddreams(&co);
     CuAssertIntEquals(tc, 10, level);
     curse *curse = get_curse(r->attribs, ct_find("gbdream"));
     CuAssertTrue(tc, curse && curse->duration > 1);
@@ -52,13 +55,15 @@ static void test_good_dreams(CuTest *tc) {
     a_age(&r->attribs);
     CuAssertIntEquals_Msg(tc, "good dreams give +1 to allies", 1, get_modifier(u1, SK_MELEE, 11, r, false));
     CuAssertIntEquals_Msg(tc, "good dreams have no effect on non-allies", 0, get_modifier(u2, SK_MELEE, 11, r, false));
+    free_castorder(&co);
+    test_cleanup();
 }
 
 static void test_dreams(CuTest *tc) {
     struct region *r;
     struct faction *f1, *f2;
     unit *u1, *u2;
-    castorder order;
+    castorder co;
 
     test_cleanup();
     test_create_world();
@@ -68,15 +73,15 @@ static void test_dreams(CuTest *tc) {
     u1 = test_create_unit(f1, r);
     u2 = test_create_unit(f2, r);
 
-    test_create_castorder(&order, u1, 10, 10., 0);
+    test_create_castorder(&co, u1, 10, 10., 0);
 
-    sp_gooddreams(&order);
-    sp_baddreams(&order);
+    sp_gooddreams(&co);
+    sp_baddreams(&co);
     a_age(&r->attribs);
     CuAssertIntEquals_Msg(tc, "good dreams in same region as bad dreams", 1, get_modifier(u1, SK_MELEE, 11, r, false));
     CuAssertIntEquals_Msg(tc, "bad dreams in same region as good dreams", -1, get_modifier(u2, SK_MELEE, 11, r, false));
 
-    free_castorder(&order);
+    free_castorder(&co);
     test_cleanup();
 }
 
@@ -85,7 +90,7 @@ static void test_bad_dreams(CuTest *tc) {
     struct faction *f1, *f2;
     unit *u1, *u2;
     int level;
-    castorder order;
+    castorder co;
 
     test_cleanup();
     test_create_world();
@@ -95,9 +100,9 @@ static void test_bad_dreams(CuTest *tc) {
     u1 = test_create_unit(f1, r);
     u2 = test_create_unit(f2, r);
 
-    test_create_castorder(&order, u1, 10, 10., 0);
+    test_create_castorder(&co, u1, 10, 10., 0);
 
-    level = sp_baddreams(&order);
+    level = sp_baddreams(&co);
     CuAssertIntEquals(tc, 10, level);
     curse *curse = get_curse(r->attribs, ct_find("gbdream"));
     CuAssertTrue(tc, curse && curse->duration > 1);
@@ -107,7 +112,7 @@ static void test_bad_dreams(CuTest *tc) {
     CuAssertIntEquals_Msg(tc, "bad dreams have no effect on allies", 0, get_modifier(u1, SK_MELEE, 11, r, false));
     CuAssertIntEquals_Msg(tc, "bad dreams give -1 to non-allies", -1, get_modifier(u2, SK_MELEE, 11, r, false));
 
-    free_castorder(&order);
+    free_castorder(&co);
     test_cleanup();
 }
 

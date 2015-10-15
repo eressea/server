@@ -753,6 +753,7 @@ void remove_region(region ** rlist, region * r)
 
 static void freeland(land_region * lr)
 {
+    free(lr->ownership);
     while (lr->demands) {
         struct demand *d = lr->demands;
         lr->demands = d->next;
@@ -819,15 +820,18 @@ void free_region(region * r)
         freeland(r->land);
 
     if (r->msgs) {
-        free_messagelist(r->msgs);
+        free_messagelist(r->msgs->begin);
+        free(r->msgs);
         r->msgs = 0;
     }
 
     while (r->individual_messages) {
         struct individual_message *msg = r->individual_messages;
         r->individual_messages = msg->next;
-        if (msg->msgs)
-            free_messagelist(msg->msgs);
+        if (msg->msgs) {
+            free_messagelist(msg->msgs->begin);
+            free(msg->msgs);
+        }
         free(msg);
     }
 

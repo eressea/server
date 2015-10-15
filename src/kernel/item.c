@@ -1178,12 +1178,17 @@ static item *default_spoil(const struct race *rc, int size)
     return itm;
 }
 
-int free_itype(item_type *itype) {
+static void free_itype(item_type *itype) {
     free(itype->construction);
     free(itype->_appearance[0]);
     free(itype->_appearance[1]);
     free(itype);
-    return 0;
+}
+
+static void free_wtype(weapon_type *wtype) {
+    free(wtype->damage[0]);
+    free(wtype->damage[1]);
+    free(wtype);
 }
 
 int free_rtype_cb(const void * match, const void * key, size_t keylen, void *cbdata) {
@@ -1192,6 +1197,9 @@ int free_rtype_cb(const void * match, const void * key, size_t keylen, void *cbd
     free(rtype->_name);
     if (rtype->itype) {
         free_itype(rtype->itype);
+    }
+    if (rtype->wtype) {
+        free_wtype(rtype->wtype);
     }
     free(rtype);
     return 0;
