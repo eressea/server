@@ -52,17 +52,10 @@ static void test_directions(CuTest * tc)
     variant id;
     int result;
 
-    id.i = 1;
-    addtoken(&tokens, "OSTEN", id);
-    addtoken(&tokens, "O", id);
-    
     id.i = 2;
     addtoken(&tokens, "nw", id);
     addtoken(&tokens, "northwest", id);
     
-    result = findtoken(tokens, "ost", &id);
-    CuAssertIntEquals(tc, E_TOK_SUCCESS, result);
-    CuAssertIntEquals(tc, 1, id.i);
     result = findtoken(tokens, "northw", &id);
     CuAssertIntEquals(tc, E_TOK_SUCCESS, result);
     CuAssertIntEquals(tc, 2, id.i);
