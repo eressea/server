@@ -1,33 +1,19 @@
 sudo: false
 language: c
 compiler:
-- gcc
-- clang
+  - gcc
+  - clang
 script: s/travis-build
 addons:
   apt:
     packages:
-    - liblua5.2-dev
-    - libncurses5-dev
-    - libsqlite3-dev
-    - libxml2-dev
-    - valgrind
+      - liblua5.2-dev
+      - libncurses5-dev
+      - libsqlite3-dev
+      - libxml2-dev
+      - valgrind
 os:
-- linux
+  - linux
 notifications:
   slack:
     secure: F89aXLWaE125PaJIlETv12jT4EfH6wLXJmGCPZzrN3OcLn2ahDWqjwuzR7lOEDf2nAISmeMPyDZMhEHXLNHAE5qP6lg9yliYQw5hzGmDK9m1xUq/pPEne/b2Y7K3my1mkRZ6n3asbHgSmBWAfCIk1JN8R5Rv+rmbLuWLc+zofts=
-env:
-  global:
-    secure: SOuZkWHfQmKf7qCVkK8WSsTU7R9f2nJYh1tMFdiauVKfdOSqYZwoPomp9S+7cPZhGrYEZ91mPadrWGTD/02c+tXVOJA51JGzvM55kl8Dy1htqHt7thCjAr1cDRh/Ek+qLGGf4CwAlzO/xnSUCttvioT8F678HJgArwqnR6i3Mgc=
-
-addons:
-  coverity_scan:
-    project:
-      name: "eressea/server"
-      description: "Eressea PBEM server"
-    notification_email: enno.rehling@gmail.com
-    build_command: s/travis-build
-    branch_pattern: coverity_scan
-#    build_command_prepend: "<Your build preprocessing command here>"
-
