@@ -143,13 +143,6 @@ size_t report_status(const unit * u, const struct locale *lang, char *fsbuf, siz
     return len;
 }
 
-const char * report_kampfstatus(const unit * u, const struct locale *lang) {
-    static char fsbuf[64]; // FIXME: static variable.
-    report_status(u, lang, fsbuf, sizeof(fsbuf));
-    return fsbuf;
-}
-
-
 const char *hp_status(const unit * u)
 {
     double p;
@@ -571,8 +564,7 @@ size_t size)
         const char *c = hp_status(u);
         c = c ? LOC(f->locale, c) : 0;
         bufp = STRLCPY(bufp, ", ", size);
-        // FIXME: use report_status
-        bufp = STRLCPY(bufp, report_kampfstatus(u, f->locale), size);
+        bufp += report_status(u, f->locale, bufp, size);
         if (c || fval(u, UFL_HUNGER)) {
             bufp = STRLCPY(bufp, " (", size);
             if (c) {
