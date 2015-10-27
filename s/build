@@ -4,7 +4,6 @@ while [ ! -d $ROOT/.git ]; do
   ROOT=`dirname $ROOT`
 done
 
-[ -z "$CC" ] && CC=clang
 [ -z "$BUILD" ] && BUILD=Debug
 
 [ -z "$JOBS" ] && [ "" != "which nproc" ] && JOBS=`nproc`
@@ -14,11 +13,15 @@ JOBS=`distcc -j`
 if [ -z "$JOBS" ] ; then
 JOBS=1
 elif [ $JOBS -gt 1 ] ; then
+[ -z "$CC" ] && [ ! -z `which clang` ] && CC="clang"
+[ -z "$CC" ] && [ ! -z `which gcc` ] && CC="gcc"
+[ -z "$CC" ] && [ ! -z `which tcc` ] && CC="tcc"
+[ -z "$CC" ] && [ ! -z `which cc` ] && CC="cc"
 CC="$DISTCC $CC"
 MAKEOPTS=-j$JOBS
 fi
 fi
-echo "Building with CC=$CC and $JOBS jobs"
+echo "Building with $JOBS jobs"
 
 if [ ! -d $ROOT/$BUILD ]; then
   echo "cannot find build directory $BUILD in $ROOT. did you run cmake-init?"

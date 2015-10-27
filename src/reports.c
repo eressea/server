@@ -120,27 +120,27 @@ const char *combatstatus[] = {
     "status_avoid", "status_flee"
 };
 
-const char *report_kampfstatus(const unit * u, const struct locale *lang)
+size_t report_status(const unit * u, const struct locale *lang, char *fsbuf, size_t buflen)
 {
-    static char fsbuf[64]; // FIXME: static return value
     const char * status = LOC(lang, combatstatus[u->status]);
+    size_t len = 0;
 
     if (!status) {
         const char *lname = locale_name(lang);
         struct locale *wloc = get_or_create_locale(lname);
         log_error("no translation for combat status %s in %s", combatstatus[u->status], lname);
         locale_setstring(wloc, combatstatus[u->status], combatstatus[u->status]);
-        strlcpy(fsbuf, combatstatus[u->status], sizeof(fsbuf));
+        len = strlcpy(fsbuf, combatstatus[u->status], buflen);
     }
     else {
-        strlcpy(fsbuf, status, sizeof(fsbuf));
+        len = strlcpy(fsbuf, status, buflen);
     }
     if (fval(u, UFL_NOAID)) {
-        strcat(fsbuf, ", ");
-        strcat(fsbuf, LOC(lang, "status_noaid"));
+        len += strlcat(fsbuf+len, ", ", buflen-len);
+        len += strlcat(fsbuf+len, LOC(lang, "status_noaid"), buflen-len);
     }
 
-    return fsbuf;
+    return len;
 }
 
 const char *hp_status(const unit * u)
@@ -564,7 +564,7 @@ size_t size)
         const char *c = hp_status(u);
         c = c ? LOC(f->locale, c) : 0;
         bufp = STRLCPY(bufp, ", ", size);
-        bufp = STRLCPY(bufp, report_kampfstatus(u, f->locale), size);
+        bufp += report_status(u, f->locale, bufp, size);
         if (c || fval(u, UFL_HUNGER)) {
             bufp = STRLCPY(bufp, " (", size);
             if (c) {

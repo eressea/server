@@ -59,10 +59,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 * Spionage des Spions */
 void spy_message(int spy, const unit * u, const unit * target)
 {
-    const char *str = report_kampfstatus(target, u->faction->locale);
+    char status[32];
+
+    report_status(target, u->faction->locale, status, sizeof(status));
 
     ADDMSG(&u->faction->msgs, msg_message("spyreport", "spy target status", u,
-        target, str));
+        target, status));
     if (spy > 20) {
         sc_mage *mage = get_mage(target);
         /* for mages, spells and magic school */
