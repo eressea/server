@@ -87,8 +87,6 @@ extern "C" {
         const struct locale *lang);
     size_t report_status(const struct unit *u,
         const struct locale *lang, char *buf, size_t siz);
-    const char *report_kampfstatus(const struct unit *u,
-        const struct locale *lang); // FIXME: kill this (static variable)
 
     void register_reports(void);
 
