@@ -59,7 +59,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 * Spionage des Spions */
 void spy_message(int spy, const unit * u, const unit * target)
 {
-    const char *str = report_kampfstatus(target, u->faction->locale);
+    const char *str = report_kampfstatus(target, u->faction->locale); // FIXME: use report_status instead
 
     ADDMSG(&u->faction->msgs, msg_message("spyreport", "spy target status", u,
         target, str));
