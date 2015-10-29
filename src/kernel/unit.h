@@ -89,11 +89,11 @@ extern "C" {
         struct faction *faction;
         struct building *building;
         struct ship *ship;
-        unsigned short number;      /* persons */
-        short age;
+        int number;      /* persons */
+        int age;
 
         /* skill data */
-        short skill_size;
+        int skill_size;
         struct skill *skills;
         struct item *items;
         reservation *reservations;
