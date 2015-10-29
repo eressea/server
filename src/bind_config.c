@@ -65,7 +65,7 @@ int config_read(const char *filename, const char * relpath)
         F = fopen(filename, "rt");
     }
     if (F) {
-        int result;
+        long result;
         char *data;
 
         fseek(F, 0, SEEK_END);
