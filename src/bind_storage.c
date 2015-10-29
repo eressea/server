@@ -36,7 +36,7 @@ static int tolua_storage_create(lua_State * L)
     FILE * F;
 
     F = fopen(filename, type);
-    if (!F) {
+    if (F) {
         gamedata *data = (gamedata *)calloc(1, sizeof(gamedata));
         storage *store = (storage *)calloc(1, sizeof(storage));
         data->store = store;
