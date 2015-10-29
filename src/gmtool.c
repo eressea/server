@@ -54,6 +54,7 @@
 #include <util/lists.h>
 #include <util/rng.h>
 #include <util/base36.h>
+#include <util/bsdstring.h>
 
 #include <storage.h>
 #include <lua.h>
@@ -1086,7 +1087,7 @@ static void handlekey(state * st, int c)
         else if (findmode == 'F') {
             faction *f = select_faction(st);
             if (f != NULL) {
-                strcpy(locate, itoa36(f->no));
+                strlcpy(locate, itoa36(f->no), sizeof(locate));
                 findmode = 'f';
             }
             else {
