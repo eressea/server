@@ -430,8 +430,8 @@ int teach_cmd(unit * u, struct order *ord)
             /* Neuen Befehl zusammenbauen. TEMP-Einheiten werden automatisch in
              * ihre neuen Nummern uebersetzt. */
             if (zOrder[0])
-                strcat(zOrder, " ");
-            strcat(zOrder, unitid(u2));
+                strncat(zOrder, " ", sizeof(zOrder));
+            strncat(zOrder, unitid(u2), sizeof(zOrder));
 
             if (getkeyword(u2->thisorder) != K_STUDY) {
                 ADDMSG(&u->faction->msgs,
