@@ -325,26 +325,29 @@ int teach_cmd(unit * u, struct order *ord)
 
 #if TEACH_ALL
     if (getparam(u->faction->locale) == P_ANY) {
-        unit *student = r->units;
+        unit *student;
         skill_t teachskill[MAXSKILLS];
-        int i = 0;
-        do {
-            sk = getskill(u->faction->locale);
-            teachskill[i++] = sk;
-        } while (sk != NOSKILL);
-        while (teaching && student) {
-            if (student->faction == u->faction) {
-                if (LongHunger(student))
-                    continue;
+        int t;
+
+        for (t = 0; sk != NOSKILL; ++t)  {
+            teachskill[t] = getskill(u->faction->locale);
+        };
+
+        for (student = r->units; teaching && student; student = student->next) {
+            if (LongHunger(student)) {
+                continue;
+            } else if (student->faction == u->faction) {
                 if (getkeyword(student->thisorder) == K_STUDY) {
                     /* Input ist nun von student->thisorder !! */
                     init_order(student->thisorder);
                     sk = getskill(student->faction->locale);
                     if (sk != NOSKILL && teachskill[0] != NOSKILL) {
-                        for (i = 0; teachskill[i] != NOSKILL; ++i)
-                            if (sk == teachskill[i])
+                        for (t = 0; teachskill[t] != NOSKILL; ++t) {
+                            if (sk == teachskill[t]) {
                                 break;
-                        sk = teachskill[i];
+                            }
+                        }
+                        sk = teachskill[t];
                     }
                     if (sk != NOSKILL
                         && effskill_study(u, sk, 0) - TEACHDIFFERENCE > effskill_study(student, sk, 0)) {
@@ -352,14 +355,8 @@ int teach_cmd(unit * u, struct order *ord)
                     }
                 }
             }
-            student = student->next;
-        }
 #ifdef TEACH_FRIENDS
-        while (teaching && student) {
-            if (student->faction != u->faction
-                && alliedunit(u, student->faction, HELP_GUARD)) {
-                if (LongHunger(student))
-                    continue;
+            else if (alliedunit(u, student->faction, HELP_GUARD)) {
                 if (getkeyword(student->thisorder) == K_STUDY) {
                     /* Input ist nun von student->thisorder !! */
                     init_order(student->thisorder);
@@ -370,9 +367,8 @@ int teach_cmd(unit * u, struct order *ord)
                     }
                 }
             }
-            student = student->next;
-        }
 #endif
+        }
     }
     else
 #endif
