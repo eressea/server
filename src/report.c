@@ -1525,7 +1525,7 @@ report_template(const char *filename, report_context * ctx, const char *charset)
         }
     }
     newline(out);
-    strcpy(buf, LOC(f->locale, parameters[P_NEXT]));
+    strlcpy(buf, LOC(f->locale, parameters[P_NEXT]), sizeof(buf));
     rps_nowrap(out, buf);
     newline(out);
     fstream_done(&strm);
