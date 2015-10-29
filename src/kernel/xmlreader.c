@@ -929,12 +929,14 @@ static int parse_resources(xmlDocPtr doc)
             flags |= RTF_LIMITED;
 
         name = xmlGetProp(node, BAD_CAST "name");
-        assert(name != NULL);
-
+        if (!name) {
+            assert(name);
+            log_error("invalid resource %d has no name", i);
+            continue;
+        }
         rtype = rt_get_or_create((const char *)name);
         rtype->flags |= flags;
-
-        if (name) xmlFree(name);
+        xmlFree(name);
 
         name = xmlGetProp(node, BAD_CAST "material");
         if (name) {
