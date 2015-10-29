@@ -439,7 +439,6 @@ static int parse_calendar(xmlDocPtr doc)
                 for (i = 0; i != nsetMonths->nodeNr; ++i) {
                     xmlNodePtr month = nsetMonths->nodeTab[i];
                     xmlChar *propValue = xmlGetProp(month, BAD_CAST "name");
-                    int j;
 
                     if (propValue) {
                         if (newyear
@@ -451,14 +450,17 @@ static int parse_calendar(xmlDocPtr doc)
                         monthnames[i] = _strdup(mkname("calendar", (const char *)propValue));
                         xmlFree(propValue);
                     }
-                    for (j = 0; j != seasons; ++j) {
-                        xmlNodePtr season = month->parent;
-                        if (season == nsetSeasons->nodeTab[j]) {
-                            month_season[i] = j;
-                            break;
+                    if (nsetSeasons) {
+                        int j;
+                        for (j = 0; j != seasons; ++j) {
+                            xmlNodePtr season = month->parent;
+                            if (season == nsetSeasons->nodeTab[j]) {
+                                month_season[i] = j;
+                                break;
+                            }
                         }
+                        assert(j != seasons);
                     }
-                    assert(j != seasons);
                     storms[i] = xml_ivalue(nsetMonths->nodeTab[i], "storm", 0);
                 }
             }
