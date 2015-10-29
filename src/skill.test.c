@@ -29,6 +29,7 @@ static void test_init_skill(CuTest *tc) {
 static void test_get_skill(CuTest *tc) {
     test_cleanup();
     CuAssertIntEquals(tc, SK_ALCHEMY, findskill("alchemy"));
+    CuAssertIntEquals(tc, SK_MAGIC, findskill("magic"));
     CuAssertIntEquals(tc, SK_CROSSBOW, findskill("crossbow"));
     CuAssertIntEquals(tc, NOSKILL, findskill(""));
     CuAssertIntEquals(tc, NOSKILL, findskill("potato"));
