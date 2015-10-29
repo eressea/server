@@ -66,21 +66,23 @@ int config_read(const char *filename, const char * relpath)
     }
     if (F) {
         long size;
-        int result;
-        char *data;
 
         fseek(F, 0, SEEK_END);
         size = ftell(F);
         rewind(F);
         if (size > 0) {
+            int result;
+            char *data;
             size_t sz = (size_t)size;
+
             data = malloc(sz);
             fread(data, 1, sz, F);
             fclose(F);
+            result = config_parse(data);
+            free(data);
+            return result;
         }
-        result = config_parse(data);
-        free(data);
-        return result;
+        fclose(F);
     }
     return 1;
 }
