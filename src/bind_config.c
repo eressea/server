@@ -67,14 +67,16 @@ int config_read(const char *filename, const char * relpath)
     if (F) {
         int result;
         char *data;
-        size_t sz;
 
         fseek(F, 0, SEEK_END);
-        sz = ftell(F);
+        result = ftell(F);
         rewind(F);
-        data = malloc(sz);
-        fread(data, 1, sz, F);
-        fclose(F);
+        if (result > 0) {
+            size_t sz = (size_t)result;
+            data = malloc(sz);
+            fread(data, 1, sz, F);
+            fclose(F);
+        }
         result = config_parse(data);
         free(data);
         return result;
