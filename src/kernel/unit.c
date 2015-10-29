@@ -943,7 +943,7 @@ void move_unit(unit * u, region * r, unit ** ulist)
 /* ist mist, aber wegen nicht skalierender attribute notwendig: */
 #include "alchemy.h"
 
-void transfermen(unit * u, unit * u2, int n)
+void transfermen(unit * u, unit * dst, int n)
 {
     const attrib *a;
     int hp = u->hp;
@@ -954,22 +954,22 @@ void transfermen(unit * u, unit * u2, int n)
     assert(n > 0);
     /* "hat attackiert"-status wird uebergeben */
 
-    if (u2) {
+    if (dst) {
         skill *sv, *sn;
         skill_t sk;
         ship *sh;
 
-        assert(u2->number + n > 0);
+        assert(dst->number + n > 0);
 
         for (sk = 0; sk != MAXSKILLS; ++sk) {
             int weeks, level = 0;
 
             sv = unit_skill(u, sk);
-            sn = unit_skill(u2, sk);
+            sn = unit_skill(dst, sk);
 
             if (sv == NULL && sn == NULL)
                 continue;
-            if (sn == NULL && u2->number == 0) {
+            if (sn == NULL && dst->number == 0) {
                 /* new unit, easy to solve */
                 level = sv->level;
                 weeks = sv->weeks;
@@ -983,12 +983,12 @@ void transfermen(unit * u, unit * u2, int n)
                 }
                 if (sn && sn->level) {
                     dlevel +=
-                        (sn->level + 1 - sn->weeks / (sn->level + 1.0)) * u2->number;
-                    level += sn->level * u2->number;
+                        (sn->level + 1 - sn->weeks / (sn->level + 1.0)) * dst->number;
+                    level += sn->level * dst->number;
                 }
 
-                dlevel = dlevel / (n + u2->number);
-                level = level / (n + u2->number);
+                dlevel = dlevel / (n + dst->number);
+                level = level / (n + dst->number);
                 if (level <= dlevel) {
                     /* apply the remaining fraction to the number of weeks to go.
                      * subtract the according number of weeks, getting closer to the
@@ -1007,15 +1007,15 @@ void transfermen(unit * u, unit * u2, int n)
             }
             if (level) {
                 if (sn == NULL)
-                    sn = add_skill(u2, sk);
+                    sn = add_skill(dst, sk);
                 sn->level = (unsigned char)level;
                 sn->weeks = (unsigned char)weeks;
                 assert(sn->weeks > 0 && sn->weeks <= sn->level * 2 + 1);
-                assert(u2->number != 0 || (sn->level == sv->level
+                assert(dst->number != 0 || (sn->level == sv->level
                     && sn->weeks == sv->weeks));
             }
             else if (sn) {
-                remove_skill(u2, sk);
+                remove_skill(dst, sk);
                 sn = NULL;
             }
         }
@@ -1023,32 +1023,32 @@ void transfermen(unit * u, unit * u2, int n)
         while (a && a->type == &at_effect) {
             effect_data *olde = (effect_data *)a->data.v;
             if (olde->value)
-                change_effect(u2, olde->type, olde->value);
+                change_effect(dst, olde->type, olde->value);
             a = a->next;
         }
         sh = leftship(u);
         if (sh != NULL)
-            set_leftship(u2, sh);
-        u2->flags |=
+            set_leftship(dst, sh);
+        dst->flags |=
             u->flags & (UFL_LONGACTION | UFL_NOTMOVING | UFL_HUNGER | UFL_MOVED |
             UFL_ENTER);
         if (u->attribs) {
-            transfer_curse(u, u2, n);
+            transfer_curse(u, dst, n);
         }
     }
     scale_number(u, u->number - n);
-    if (u2) {
-        set_number(u2, u2->number + n);
+    if (dst) {
+        set_number(dst, dst->number + n);
         hp -= u->hp;
-        u2->hp += hp;
+        dst->hp += hp;
         /* TODO: Das ist schnarchlahm! und gehoert nicht hierhin */
-        a = a_find(u2->attribs, &at_effect);
+        a = a_find(dst->attribs, &at_effect);
         while (a && a->type == &at_effect) {
             attrib *an = a->next;
             effect_data *olde = (effect_data *)a->data.v;
             int e = get_effect(u, olde->type);
             if (e != 0)
-                change_effect(u2, olde->type, -e);
+                change_effect(dst, olde->type, -e);
             a = an;
         }
     }
