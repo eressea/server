@@ -75,7 +75,7 @@ magic_t getmagicskill(const struct locale * lang)
             return (magic_t)token.i;
         }
         else {
-            char buffer[3];
+            char buffer[8];
             buffer[0] = s[0];
             buffer[1] = s[1];
             buffer[2] = '\0';
