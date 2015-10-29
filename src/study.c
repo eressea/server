@@ -41,6 +41,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/bsdstring.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/parser.h>
@@ -374,6 +375,7 @@ int teach_cmd(unit * u, struct order *ord)
 #endif
     {
         char zOrder[4096];
+        size_t sz = sizeof(zOrder);
         order *new_order;
 
         zOrder[0] = '\0';
@@ -425,9 +427,11 @@ int teach_cmd(unit * u, struct order *ord)
 
             /* Neuen Befehl zusammenbauen. TEMP-Einheiten werden automatisch in
              * ihre neuen Nummern uebersetzt. */
-            if (zOrder[0])
-                strncat(zOrder, " ", sizeof(zOrder));
-            strncat(zOrder, unitid(u2), sizeof(zOrder));
+            if (zOrder[0]) {
+                strncat(zOrder, " ", sz - 1);
+                --sz;
+            }
+            sz -= strlcpy(zOrder + 4096 - sz, unitid(u2), sz);
 
             if (getkeyword(u2->thisorder) != K_STUDY) {
                 ADDMSG(&u->faction->msgs,
