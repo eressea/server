@@ -2379,7 +2379,7 @@ static int follow_ship(unit * u, order * ord)
             speed = maxspeed;
     }
     rc = rconnect(rc, dir);
-    while (moves < speed && (dir = hunted_dir(rc->attribs, id)) != NODIRECTION) {
+    while (rc && moves < speed && (dir = hunted_dir(rc->attribs, id)) != NODIRECTION) {
         const char *loc = LOC(u->faction->locale, directions[dir]);
         bufp = STRLCPY_EX(bufp, " ", &size, "hunt");
         bufp = STRLCPY_EX(bufp, loc, &size, "hunt");
