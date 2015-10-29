@@ -1578,7 +1578,7 @@ show_allies(const faction * f, const ally * allies, char *buf, size_t size)
                 WARN_STATIC_BUFFER();
         }
         else {
-            for (h = 1; h < HELP_ALL; h *= 2) {
+            for (h = 1; h <= HELP_TRAVEL; h *= 2) {
                 int p = MAXPARAMS;
                 if ((mode & h) == h) {
                     switch (h) {
