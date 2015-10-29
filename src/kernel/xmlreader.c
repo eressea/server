@@ -389,7 +389,8 @@ static int parse_calendar(xmlDocPtr doc)
                 int i;
 
                 weeks_per_month = nsetWeeks->nodeNr;
-                assert(!weeknames);
+                free(weeknames);
+                free(weeknames2);
                 weeknames = malloc(sizeof(char *) * weeks_per_month);
                 weeknames2 = malloc(sizeof(char *) * weeks_per_month);
                 for (i = 0; i != nsetWeeks->nodeNr; ++i) {
@@ -431,9 +432,11 @@ static int parse_calendar(xmlDocPtr doc)
                 int i;
 
                 months_per_year = nsetMonths->nodeNr;
-                assert(!monthnames);
+                free(monthnames);
                 monthnames = malloc(sizeof(char *) * months_per_year);
+                free(month_season);
                 month_season = malloc(sizeof(int) * months_per_year);
+                free(storms);
                 storms = malloc(sizeof(int) * months_per_year);
 
                 for (i = 0; i != nsetMonths->nodeNr; ++i) {
