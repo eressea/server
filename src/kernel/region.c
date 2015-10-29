@@ -751,7 +751,7 @@ void remove_region(region ** rlist, region * r)
     deleted_regions = r;
 }
 
-static void freeland(land_region * lr)
+void free_land(land_region * lr)
 {
     free(lr->ownership);
     while (lr->demands) {
@@ -817,7 +817,7 @@ void free_region(region * r)
         last = NULL;
     free(r->display);
     if (r->land)
-        freeland(r->land);
+        free_land(r->land);
 
     if (r->msgs) {
         free_messagelist(r->msgs->begin);
@@ -997,7 +997,7 @@ void terraform_region(region * r, const terrain_type * terrain)
         region_setinfo(r, NULL);
         if (r->land != NULL) {
             i_freeall(&r->land->items);
-            freeland(r->land);
+            free_land(r->land);
             r->land = NULL;
         }
         rsettrees(r, 0, 0);

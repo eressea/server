@@ -840,8 +840,8 @@ static region *readregion(struct gamedata *data, int x, int y)
         while (r->attribs)
             a_remove(&r->attribs, r->attribs);
         if (r->land) {
-            free(r->land);            /* mem leak */
-            r->land->demands = 0;     /* mem leak */
+            free_land(r->land);
+            r->land = 0;
         }
         while (r->resources) {
             rawmaterial *rm = r->resources;
