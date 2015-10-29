@@ -637,8 +637,9 @@ faction * f)
         fprintf(F, "\"%s\";Beschr\n", b->display);
     if (b->size)
         fprintf(F, "%d;Groesse\n", b->size);
-    if (owner)
-        fprintf(F, "%d;Besitzer\n", owner ? owner->no : -1);
+    if (owner) {
+        fprintf(F, "%d;Besitzer\n", owner->no);
+    }
     if (fno >= 0)
         fprintf(F, "%d;Partei\n", fno);
     if (b->besieged)
@@ -667,8 +668,9 @@ const faction * f, const region * r)
             (sh->damage * 100 + DAMAGE_SCALE - 1) / (sh->size * DAMAGE_SCALE);
         fprintf(F, "%d;Schaden\n", percent);
     }
-    if (u)
-        fprintf(F, "%d;Kapitaen\n", u ? u->no : -1);
+    if (u) {
+        fprintf(F, "%d;Kapitaen\n", u->no);
+    }
     if (fcaptain >= 0)
         fprintf(F, "%d;Partei\n", fcaptain);
 
