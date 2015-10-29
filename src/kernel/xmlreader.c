@@ -1815,23 +1815,26 @@ static int parse_races(xmlDocPtr doc)
         if (result->nodesetval->nodeNr > MAXMAGIETYP) {
             log_error("race %s has %d potential familiars", rc->_name, result->nodesetval->nodeNr);
         }
-        for (k = 0; k != MAXMAGIETYP; ++k) {
-            if (k < result->nodesetval->nodeNr) {
-                xmlNodePtr node = result->nodesetval->nodeTab[k];
+        else {
+            for (k = 0; k != MAXMAGIETYP; ++k) {
+                if (k < result->nodesetval->nodeNr) {
+                    xmlNodePtr node = result->nodesetval->nodeTab[k];
 
-                propValue = xmlGetProp(node, BAD_CAST "race");
-                assert(propValue != NULL);
-                frc = rc_get_or_create((const char *)propValue);
-                if (xml_bvalue(node, "default", false)) {
-                    rc->familiars[k] = rc->familiars[0];
-                    rc->familiars[0] = frc;
+                    propValue = xmlGetProp(node, BAD_CAST "race");
+                    assert(propValue != NULL);
+                    frc = rc_get_or_create((const char *)propValue);
+                    if (xml_bvalue(node, "default", false)) {
+                        rc->familiars[k] = rc->familiars[0];
+                        rc->familiars[0] = frc;
+                    }
+                    else {
+                        rc->familiars[k] = frc;
+                    }
+                    xmlFree(propValue);
                 }
                 else {
                     rc->familiars[k] = frc;
                 }
-                xmlFree(propValue);
-            } else {
-                rc->familiars[k] = frc;
             }
         }
         xmlXPathFreeObject(result);
