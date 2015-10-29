@@ -284,8 +284,8 @@ int teach_cmd(unit * u, struct order *ord)
     static const curse_type *gbdream_ct = NULL;
     plane *pl;
     region *r = u->region;
-    int teaching, i, j, count, academy = 0;
     skill_t sk = NOSKILL;
+    int teaching, i, j, count, academy = 0;
 
     if (gbdream_ct == 0)
         gbdream_ct = ct_find("gbdream");
@@ -328,11 +328,12 @@ int teach_cmd(unit * u, struct order *ord)
     if (getparam(u->faction->locale) == P_ANY) {
         unit *student;
         skill_t teachskill[MAXSKILLS];
-        int t;
+        int t = 0;
 
-        for (t = 0; sk != NOSKILL; ++t)  {
+        do {
+            sk = getskill(u->faction->locale);
             teachskill[t] = getskill(u->faction->locale);
-        };
+        } while (sk != NOSKILL);
 
         for (student = r->units; teaching && student; student = student->next) {
             if (LongHunger(student)) {
