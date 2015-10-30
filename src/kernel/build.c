@@ -494,7 +494,7 @@ int build(unit * u, const construction * ctype, int completed, int want)
          * type->improvement==type means build another object of the same time
          * while material lasts type->improvement==x means build x when type
          * is finished */
-        while (type->improvement != NULL &&
+        while (type && type->improvement &&
             type->improvement != type &&
             type->maxsize > 0 && type->maxsize <= completed) {
             completed -= type->maxsize;
