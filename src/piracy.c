@@ -169,12 +169,13 @@ void piracy_cmd(unit * u, order *ord)
         if (saff != 0) {
             saff = rng_int() % saff;
             for (dir = 0; dir != MAXDIRECTIONS; ++dir) {
-                if (saff < aff[dir].value)
+                if (saff < aff[dir].value) {
+                    target_dir = dir;
+                    a_add(&r->attribs, mk_piracy(u->faction, aff[dir].target, target_dir));
                     break;
+                }
                 saff -= aff[dir].value;
             }
-            target_dir = dir;
-            a_add(&r->attribs, mk_piracy(u->faction, aff[dir].target, target_dir));
         }
     }
 
