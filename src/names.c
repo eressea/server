@@ -360,7 +360,7 @@ static const char *dracoid_name(const unit * u)
     size_t sz;
 
     /* ignore u */
-    u = 0;
+    unused_arg(u);
     /* Wieviele Mittelteile? */
 
     mid_syllabels = rng_int() % 4;
