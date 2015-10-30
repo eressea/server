@@ -281,22 +281,23 @@ static const char *dragon_name(const unit * u)
     }
     else {
         char n[32];
+        size_t sz;
 
-        strcpy(n, silbe1[rng_int() % SIL1]);
-        strcat(n, silbe2[rng_int() % SIL2]);
-        strcat(n, silbe3[rng_int() % SIL3]);
+        sz = strlcpy(n, silbe1[rng_int() % SIL1], sizeof(n));
+        sz += strlcat(n, silbe2[rng_int() % SIL2], sizeof(n));
+        sz += strlcat(n, silbe3[rng_int() % SIL3], sizeof(n));
         if (rng_int() % 5 > 2) {
             sprintf(name, "%s, %s", n, str);  /* "Name, der Titel" */
         }
         else {
-            strcpy(name, (const char *)str);  /* "Der Titel Name" */
+            sz = strlcpy(name, (const char *)str, sizeof(name));  /* "Der Titel Name" */
             name[0] = (char)toupper(name[0]); /* TODO: UNICODE - should use towupper() */
-            strcat(name, " ");
-            strcat(name, n);
+            sz += strlcat(name, " ", sizeof(name));
+            sz += strlcat(name, n, sizeof(name));
         }
         if (u && (rng_int() % 3 == 0)) {
-            strcat(name, " von ");
-            strcat(name, (const char *)rname(u->region, default_locale));
+            sz += strlcat(name, " von ", sizeof(name));
+            sz += strlcat(name, (const char *)rname(u->region, default_locale), sizeof(name));
         }
     }
 
