@@ -571,11 +571,12 @@ static int sp_summon_familiar(castorder * co)
             region *rn = rconnect(r, dir);
             if (rn && fval(rn->terrain, SEA_REGION)) {
                 dh++;
-                if (dh == coasts)
+                if (dh == coasts) {
+                    r = rconnect(r, dir);
                     break;
+                }
             }
         }
-        r = rconnect(r, dir);
     }
 
     msg = msg_message("familiar_name", "unit", mage);
