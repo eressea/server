@@ -4513,7 +4513,9 @@ void update_subscriptions(void)
     FILE *F;
     char zText[MAX_PATH];
     faction *f;
-    strcat(strcpy(zText, basepath()), "/subscriptions");
+
+    strlcpy(zText, basepath(), sizeof(zText));
+    strlcat(zText, "/subscriptions", sizeof(zText));
     F = fopen(zText, "r");
     if (F == NULL) {
         log_warning(0, "could not open %s.\n", zText);
