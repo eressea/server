@@ -76,7 +76,8 @@ int config_read(const char *filename, const char * relpath)
             size_t sz = (size_t)size;
 
             data = malloc(sz);
-            fread(data, 1, sz, F);
+            sz = fread(data, 1, sz, F);
+            data[sz] = 0;
             fclose(F);
             result = config_parse(data);
             free(data);
