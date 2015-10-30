@@ -186,7 +186,7 @@ static const char *sideabkz(side * s, bool truename)
 #ifdef SIDE_ABKZ
     abkz(f->name, sideabkz_buf, sizeof(sideabkz_buf), 3);
 #else
-    strcpy(sideabkz_buf, itoa36(f->no));
+    strlcpy(sideabkz_buf, itoa36(f->no), sizeof(sideabkz_buf));
 #endif
     return sideabkz_buf;
 }
