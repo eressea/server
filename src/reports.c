@@ -1621,9 +1621,10 @@ static void write_script(FILE * F, const faction * f)
     buf[0] = 0;
     for (rtype = report_types; rtype != NULL; rtype = rtype->next) {
         if (f->options & rtype->flag) {
-            if (buf[0])
-                strcat(buf, ",");
-            strcat(buf, rtype->extension);
+            if (buf[0]) {
+                strlcat(buf, ",", sizeof(buf));
+            }
+            strlcat(buf, rtype->extension, sizeof(buf));
         }
     }
     fputs(buf, F);
