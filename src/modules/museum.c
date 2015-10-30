@@ -319,11 +319,10 @@ order * ord)
     }
 
     a = a_find(u->attribs, &at_museumexit);
-    if (a) {
-        r = findregion(a->data.sa[0], a->data.sa[1]);
-        assert(r);
-        a_remove(&u->attribs, a);
-    }
+    assert(a);
+    r = findregion(a->data.sa[0], a->data.sa[1]);
+    assert(r);
+    a_remove(&u->attribs, a);
     /* Übergebene Gegenstände zurückgeben */
 
     a = a_find(u->attribs, &at_museumgivebackcookie);
