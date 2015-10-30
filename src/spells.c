@@ -5954,7 +5954,7 @@ int sp_movecastle(castorder * co)
 
     target_region = rconnect(r, dir);
 
-    if (!(target_region->terrain->flags & LAND_REGION)) {
+    if (!target_region || !(target_region->terrain->flags & LAND_REGION)) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "sp_movecastle_fail_1", "direction", dir));
         return cast_level;
