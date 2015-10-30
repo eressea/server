@@ -319,18 +319,18 @@ order * ord)
     }
 
     a = a_find(u->attribs, &at_museumexit);
-    assert(a);
-    r = findregion(a->data.sa[0], a->data.sa[1]);
-    assert(r);
-    a_remove(&u->attribs, a);
-
+    if (a) {
+        r = findregion(a->data.sa[0], a->data.sa[1]);
+        assert(r);
+        a_remove(&u->attribs, a);
+    }
     /* Übergebene Gegenstände zurückgeben */
 
     a = a_find(u->attribs, &at_museumgivebackcookie);
-    unit_cookie = a->data.i;
-    a_remove(&u->attribs, a);
-
     if (a) {
+        unit_cookie = a->data.i;
+        a_remove(&u->attribs, a);
+
         for (a = a_find(warden->attribs, &at_museumgiveback);
             a && a->type == &at_museumgiveback; a = a->next) {
             if (((museumgiveback *)(a->data.v))->cookie == unit_cookie)
