@@ -357,6 +357,7 @@ static const char *dracoid_name(const unit * u)
 {
     static char name[NAMESIZE + 1]; // FIXME: static return value
     int mid_syllabels;
+    size_t sz;
 
     /* ignore u */
     u = 0;
@@ -364,14 +365,14 @@ static const char *dracoid_name(const unit * u)
 
     mid_syllabels = rng_int() % 4;
 
-    strcpy(name, drac_pre[rng_int() % DRAC_PRE]);
+    sz = strlcpy(name, drac_pre[rng_int() % DRAC_PRE], sizeof(name));
     while (mid_syllabels > 0) {
         mid_syllabels--;
         if (rng_int() % 10 < 4)
-            strcat(name, "'");
-        strcat(name, drac_mid[rng_int() % DRAC_MID]);
+            strlcat(name, "'", sizeof(name));
+        sz += strlcat(name, drac_mid[rng_int() % DRAC_MID], sizeof(name));
     }
-    strcat(name, drac_suf[rng_int() % DRAC_SUF]);
+    sz += strlcat(name, drac_suf[rng_int() % DRAC_SUF], sizeof(name));
     return name;
 }
 
