@@ -1705,23 +1705,26 @@ int crwritemap(const char *filename)
     FILE *F = fopen(filename, "w");
     region *r;
 
-    fprintf(F, "VERSION %d\n", C_REPORT_VERSION);
-    fputs("\"UTF-8\";charset\n", F);
+    if (F) {
+        fprintf(F, "VERSION %d\n", C_REPORT_VERSION);
+        fputs("\"UTF-8\";charset\n", F);
 
-    for (r = regions; r; r = r->next) {
-        plane *pl = rplane(r);
-        int plid = plane_id(pl);
-        if (plid) {
-            fprintf(F, "REGION %d %d %d\n", r->x, r->y, plid);
+        for (r = regions; r; r = r->next) {
+            plane *pl = rplane(r);
+            int plid = plane_id(pl);
+            if (plid) {
+                fprintf(F, "REGION %d %d %d\n", r->x, r->y, plid);
+            }
+            else {
+                fprintf(F, "REGION %d %d\n", r->x, r->y);
+            }
+            fprintf(F, "\"%s\";Name\n\"%s\";Terrain\n", rname(r, default_locale),
+                LOC(default_locale, terrain_name(r)));
         }
-        else {
-            fprintf(F, "REGION %d %d\n", r->x, r->y);
-        }
-        fprintf(F, "\"%s\";Name\n\"%s\";Terrain\n", rname(r, default_locale),
-            LOC(default_locale, terrain_name(r)));
+        fclose(F);
+        return 0;
     }
-    fclose(F);
-    return 0;
+    return EOF;
 }
 
 void register_cr(void)
