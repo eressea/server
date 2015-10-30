@@ -116,9 +116,10 @@ unit *findunitr(const region * r, int n)
     return (u && u->region==r)?u:0;
 }
 
+// TODO: deprecated, replace with findunit(n)
 unit *findunitg(int n, const region * hint)
 {
-
+    unused_arg(hint);
     /* Abfangen von Syntaxfehlern. */
     if (n <= 0)
         return NULL;
