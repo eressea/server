@@ -4512,7 +4512,6 @@ void update_subscriptions(void)
 {
     FILE *F;
     char zText[MAX_PATH];
-    faction *f;
 
     strlcpy(zText, basepath(), sizeof(zText));
     strlcat(zText, "/subscriptions", sizeof(zText));
@@ -4524,6 +4523,8 @@ void update_subscriptions(void)
     for (;;) {
         char zFaction[5];
         int subscription, fno;
+        faction *f;
+
         if (fscanf(F, "%d %s", &subscription, zFaction) <= 0)
             break;
         fno = atoi36(zFaction);
@@ -4536,11 +4537,14 @@ void update_subscriptions(void)
 
     sprintf(zText, "subscriptions.%u", turn);
     F = fopen(zText, "w");
-    for (f = factions; f != NULL; f = f->next) {
-        fprintf(F, "%s:%u:%s:%s:%u:\n",
-            itoa36(f->no), f->subscription, f->email, dbrace(f->race), f->lastorders);
+    if (F) {
+        faction *f;
+        for (f = factions; f != NULL; f = f->next) {
+            fprintf(F, "%s:%u:%s:%s:%u:\n",
+                itoa36(f->no), f->subscription, f->email, dbrace(f->race), f->lastorders);
+        }
+        fclose(F);
     }
-    fclose(F);
 }
 
 bool
