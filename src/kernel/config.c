@@ -307,7 +307,7 @@ const char *dbrace(const struct race *rc)
     char *zPtr = zText;
 
     /* the english names are all in ASCII, so we don't need to worry about UTF8 */
-    strcpy(zText, (const char *)LOC(get_locale("en"), rc_name_s(rc, NAME_SINGULAR)));
+    strlcpy(zText, (const char *)LOC(get_locale("en"), rc_name_s(rc, NAME_SINGULAR)), sizeof(zText));
     while (*zPtr) {
         *zPtr = (char)(toupper(*zPtr));
         ++zPtr;
