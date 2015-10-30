@@ -735,6 +735,7 @@ variant read_unit_reference(struct storage * store)
 
 int get_level(const unit * u, skill_t id)
 {
+    assert(id != NOSKILL);
     if (skill_enabled(id)) {
         skill *sv = u->skills;
         while (sv != u->skills + u->skill_size) {
