@@ -1773,7 +1773,10 @@ const char *trailinto(const region * r, const struct locale *lang)
     const char *s;
     if (r) {
         const char *tname = terrain_name(r);
-        strcat(strcpy(ref, tname), "_trail");
+        size_t sz;
+
+        sz = strlcpy(ref, tname, sizeof(ref));
+        sz += strlcat(ref+sz, "_trail", sizeof(ref)-sz);
         s = LOC(lang, ref);
         if (s && *s) {
             if (strstr(s, "%s"))
