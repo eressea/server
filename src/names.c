@@ -103,22 +103,22 @@ static const char *make_names(const char *monster, int *num_postfix,
         sprintf(zText, "%s_prefix_%d", monster, uv);
         str = locale_getstring(default_locale, zText);
         if (str) {
-            strcat(name, (const char *)str);
-            strcat(name, " ");
+            size_t sz = strlcpy(name, (const char *)str, sizeof(name));
+            strlcpy(name + sz, " ", sizeof(name) - sz);
         }
     }
 
     sprintf(zText, "%s_name_%d", monster, uu);
     str = locale_getstring(default_locale, zText);
     if (str)
-        strcat(name, (const char *)str);
+        strlcat(name, (const char *)str, sizeof(name));
 
     if (un < *num_postfix) {
         sprintf(zText, "%s_postfix_%d", monster, un);
         str = locale_getstring(default_locale, zText);
         if (str) {
-            strcat(name, " ");
-            strcat(name, (const char *)str);
+            strlcat(name, " ", sizeof(name));
+            strlcat(name, (const char *)str, sizeof(name));
         }
     }
     return name;
