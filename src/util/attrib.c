@@ -199,11 +199,17 @@ static void a_free(attrib * a)
 
 int a_remove(attrib ** pa, attrib * a)
 {
+    attrib *head = *pa;
     int ok;
+
     assert(a != NULL);
     ok = a_unlink(pa, a);
-    if (ok)
+    if (ok) {
+        if (head == a) {
+            *pa = a->next;
+        }
         a_free(a);
+    }
     return ok;
 }
 

@@ -45,6 +45,7 @@ const char *skillnames[MAXSKILLS] = {
 bool skill_disabled[MAXSKILLS];
 
 bool skill_enabled(skill_t sk) {
+    assert(sk != NOSKILL);
     return !skill_disabled[sk];
 }
 

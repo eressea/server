@@ -1621,9 +1621,10 @@ static void write_script(FILE * F, const faction * f)
     buf[0] = 0;
     for (rtype = report_types; rtype != NULL; rtype = rtype->next) {
         if (f->options & rtype->flag) {
-            if (buf[0])
-                strcat(buf, ",");
-            strcat(buf, rtype->extension);
+            if (buf[0]) {
+                strlcat(buf, ",", sizeof(buf));
+            }
+            strlcat(buf, rtype->extension, sizeof(buf));
         }
     }
     fputs(buf, F);
@@ -1772,7 +1773,10 @@ const char *trailinto(const region * r, const struct locale *lang)
     const char *s;
     if (r) {
         const char *tname = terrain_name(r);
-        strcat(strcpy(ref, tname), "_trail");
+        size_t sz;
+
+        sz = strlcpy(ref, tname, sizeof(ref));
+        sz += strlcat(ref+sz, "_trail", sizeof(ref)-sz);
         s = LOC(lang, ref);
         if (s && *s) {
             if (strstr(s, "%s"))

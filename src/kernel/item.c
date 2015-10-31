@@ -925,7 +925,7 @@ struct order *ord)
         user->number);
 
     a_add(&f->attribs, make_key(atoi36("mbst")));
-    set_level(user, findskill("magic"), 3);
+    set_level(user, SK_MAGIC, 3);
 
     ADDMSG(&user->faction->msgs, msg_message("use_item",
         "unit item", user, itype->rtype));

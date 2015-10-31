@@ -307,7 +307,7 @@ const char *dbrace(const struct race *rc)
     char *zPtr = zText;
 
     /* the english names are all in ASCII, so we don't need to worry about UTF8 */
-    strcpy(zText, (const char *)LOC(get_locale("en"), rc_name_s(rc, NAME_SINGULAR)));
+    strlcpy(zText, (const char *)LOC(get_locale("en"), rc_name_s(rc, NAME_SINGULAR)), sizeof(zText));
     while (*zPtr) {
         *zPtr = (char)(toupper(*zPtr));
         ++zPtr;
@@ -1082,13 +1082,19 @@ int check_param(const struct param *p, const char *key, const char *searchvalue)
     return result;
 }
 
+const char * relpath(char *buf, size_t sz, const char *path) {
+    strlcpy(buf, basepath(), sz);
+    strlcat(buf, path, sz);
+    return buf;
+}
+
 static const char *g_datadir;
 const char *datapath(void)
 {
     static char zText[MAX_PATH]; // FIXME: static return value
     if (g_datadir)
         return g_datadir;
-    return strcat(strcpy(zText, basepath()), "/data");
+    return relpath(zText, sizeof(zText), "/data");
 }
 
 void set_datapath(const char *path)
@@ -1102,7 +1108,7 @@ const char *reportpath(void)
     static char zText[MAX_PATH]; // FIXME: static return value
     if (g_reportdir)
         return g_reportdir;
-    return strcat(strcpy(zText, basepath()), "/reports");
+    return relpath(zText, sizeof(zText), "/reports");
 }
 
 void set_reportpath(const char *path)

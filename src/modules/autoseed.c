@@ -31,6 +31,7 @@
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/bsdstring.h>
 #include <util/goodies.h>
 #include <util/language.h>
 #include <util/lists.h>
@@ -186,8 +187,9 @@ newfaction *read_newfactions(const char *filename)
         if (email[0] == '\0')
             break;
         if (password[0] == '\0') {
-            strcpy(password, itoa36(rng_int()));
-            strcat(password, itoa36(rng_int()));
+            size_t sz;
+            sz = strlcpy(password, itoa36(rng_int()), sizeof(password));
+            sz += strlcat(password, itoa36(rng_int()), sizeof(password));
         }
         for (f = factions; f; f = f->next) {
             if (strcmp(f->email, email) == 0 && f->subscription

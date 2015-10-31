@@ -637,8 +637,9 @@ faction * f)
         fprintf(F, "\"%s\";Beschr\n", b->display);
     if (b->size)
         fprintf(F, "%d;Groesse\n", b->size);
-    if (owner)
-        fprintf(F, "%d;Besitzer\n", owner ? owner->no : -1);
+    if (owner) {
+        fprintf(F, "%d;Besitzer\n", owner->no);
+    }
     if (fno >= 0)
         fprintf(F, "%d;Partei\n", fno);
     if (b->besieged)
@@ -667,8 +668,9 @@ const faction * f, const region * r)
             (sh->damage * 100 + DAMAGE_SCALE - 1) / (sh->size * DAMAGE_SCALE);
         fprintf(F, "%d;Schaden\n", percent);
     }
-    if (u)
-        fprintf(F, "%d;Kapitaen\n", u ? u->no : -1);
+    if (u) {
+        fprintf(F, "%d;Kapitaen\n", u->no);
+    }
     if (fcaptain >= 0)
         fprintf(F, "%d;Partei\n", fcaptain);
 
@@ -1703,23 +1705,26 @@ int crwritemap(const char *filename)
     FILE *F = fopen(filename, "w");
     region *r;
 
-    fprintf(F, "VERSION %d\n", C_REPORT_VERSION);
-    fputs("\"UTF-8\";charset\n", F);
+    if (F) {
+        fprintf(F, "VERSION %d\n", C_REPORT_VERSION);
+        fputs("\"UTF-8\";charset\n", F);
 
-    for (r = regions; r; r = r->next) {
-        plane *pl = rplane(r);
-        int plid = plane_id(pl);
-        if (plid) {
-            fprintf(F, "REGION %d %d %d\n", r->x, r->y, plid);
+        for (r = regions; r; r = r->next) {
+            plane *pl = rplane(r);
+            int plid = plane_id(pl);
+            if (plid) {
+                fprintf(F, "REGION %d %d %d\n", r->x, r->y, plid);
+            }
+            else {
+                fprintf(F, "REGION %d %d\n", r->x, r->y);
+            }
+            fprintf(F, "\"%s\";Name\n\"%s\";Terrain\n", rname(r, default_locale),
+                LOC(default_locale, terrain_name(r)));
         }
-        else {
-            fprintf(F, "REGION %d %d\n", r->x, r->y);
-        }
-        fprintf(F, "\"%s\";Name\n\"%s\";Terrain\n", rname(r, default_locale),
-            LOC(default_locale, terrain_name(r)));
+        fclose(F);
+        return 0;
     }
-    fclose(F);
-    return 0;
+    return EOF;
 }
 
 void register_cr(void)

@@ -41,6 +41,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/bsdstring.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/parser.h>
@@ -75,7 +76,7 @@ magic_t getmagicskill(const struct locale * lang)
             return (magic_t)token.i;
         }
         else {
-            char buffer[3];
+            char buffer[8];
             buffer[0] = s[0];
             buffer[1] = s[1];
             buffer[2] = '\0';
@@ -283,8 +284,8 @@ int teach_cmd(unit * u, struct order *ord)
     static const curse_type *gbdream_ct = NULL;
     plane *pl;
     region *r = u->region;
-    int teaching, i, j, count, academy = 0;
     skill_t sk = NOSKILL;
+    int teaching, i, j, count, academy = 0;
 
     if (gbdream_ct == 0)
         gbdream_ct = ct_find("gbdream");
@@ -325,26 +326,30 @@ int teach_cmd(unit * u, struct order *ord)
 
 #if TEACH_ALL
     if (getparam(u->faction->locale) == P_ANY) {
-        unit *student = r->units;
+        unit *student;
         skill_t teachskill[MAXSKILLS];
-        int i = 0;
+        int t = 0;
+
         do {
             sk = getskill(u->faction->locale);
-            teachskill[i++] = sk;
+            teachskill[t] = getskill(u->faction->locale);
         } while (sk != NOSKILL);
-        while (teaching && student) {
-            if (student->faction == u->faction) {
-                if (LongHunger(student))
-                    continue;
+
+        for (student = r->units; teaching && student; student = student->next) {
+            if (LongHunger(student)) {
+                continue;
+            } else if (student->faction == u->faction) {
                 if (getkeyword(student->thisorder) == K_STUDY) {
                     /* Input ist nun von student->thisorder !! */
                     init_order(student->thisorder);
                     sk = getskill(student->faction->locale);
                     if (sk != NOSKILL && teachskill[0] != NOSKILL) {
-                        for (i = 0; teachskill[i] != NOSKILL; ++i)
-                            if (sk == teachskill[i])
+                        for (t = 0; teachskill[t] != NOSKILL; ++t) {
+                            if (sk == teachskill[t]) {
                                 break;
-                        sk = teachskill[i];
+                            }
+                        }
+                        sk = teachskill[t];
                     }
                     if (sk != NOSKILL
                         && effskill_study(u, sk, 0) - TEACHDIFFERENCE > effskill_study(student, sk, 0)) {
@@ -352,14 +357,8 @@ int teach_cmd(unit * u, struct order *ord)
                     }
                 }
             }
-            student = student->next;
-        }
 #ifdef TEACH_FRIENDS
-        while (teaching && student) {
-            if (student->faction != u->faction
-                && alliedunit(u, student->faction, HELP_GUARD)) {
-                if (LongHunger(student))
-                    continue;
+            else if (alliedunit(u, student->faction, HELP_GUARD)) {
                 if (getkeyword(student->thisorder) == K_STUDY) {
                     /* Input ist nun von student->thisorder !! */
                     init_order(student->thisorder);
@@ -370,14 +369,14 @@ int teach_cmd(unit * u, struct order *ord)
                     }
                 }
             }
-            student = student->next;
-        }
 #endif
+        }
     }
     else
 #endif
     {
         char zOrder[4096];
+        size_t sz = sizeof(zOrder);
         order *new_order;
 
         zOrder[0] = '\0';
@@ -429,9 +428,11 @@ int teach_cmd(unit * u, struct order *ord)
 
             /* Neuen Befehl zusammenbauen. TEMP-Einheiten werden automatisch in
              * ihre neuen Nummern uebersetzt. */
-            if (zOrder[0])
-                strcat(zOrder, " ");
-            strcat(zOrder, unitid(u2));
+            if (zOrder[0]) {
+                strncat(zOrder, " ", sz - 1);
+                --sz;
+            }
+            sz -= strlcpy(zOrder + 4096 - sz, unitid(u2), sz);
 
             if (getkeyword(u2->thisorder) != K_STUDY) {
                 ADDMSG(&u->faction->msgs,
@@ -505,7 +506,7 @@ static double study_speedup(unit * u, skill_t s, study_rule_t rule)
                 skill *sv = u->skills + i;
                 if (sv->id == s){
                     learnweeks = sv->level * (sv->level + 1) / 2.0;
-                    if (learnweeks < turn / 3) {
+                    if (learnweeks < turn / 3.0) {
                         return 2.0;
                     }
                 }
@@ -517,7 +518,7 @@ static double study_speedup(unit * u, skill_t s, study_rule_t rule)
                 skill *sv = u->skills + i;
                 learnweeks += (sv->level * (sv->level + 1) / 2.0);
             }
-            if (learnweeks < turn / 2) {
+            if (learnweeks < turn / 2.0) {
                 return 2.0;
             }
         }

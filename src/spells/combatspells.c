@@ -622,10 +622,12 @@ int sp_mindblast(struct castorder * co)
                 skill_t sk = random_skill(du, false);
                 if (sk != NOSKILL) {
                     skill *sv = unit_skill(du, sk);
-                    int n = 1 + rng_int() % 3;
+                    if (sv) {
+                        int n = 1 + rng_int() % 3;
 
-                    reduce_skill(du, sv, n);
-                    k += du->number;
+                        reduce_skill(du, sv, n);
+                        k += du->number;
+                    }
                 }
                 else {
                     /* unit has no skill. kill it. */
