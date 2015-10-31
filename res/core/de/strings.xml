@@ -3648,6 +3648,10 @@
       <text locale="en">For a healing potion one takes the peel of a windbag and some bugleweed, stirr in some chopped elvendear and sprinkle it with the blossoms of an ice begonia. This has to cook through for four days, while a gapgrowth has to be added on the second day. Then one carefully scoops off the top layer of liquid. One such potion gives four men (or one man four times) a 50% chance to survive otherwise lethal wounds. The potion is automatically used in case of injury.</text>
       <text locale="de">Für einen Heiltrank nehme man die Schale eines Windbeutels und etwas Gurgelkraut, rühre eine kleingehacktes Elfenlieb dazu und bestreue alles mit den Blüten einer Eisblume. Dies muß vier Tage lang gären, wobei man am zweiten Tag einen Spaltwachs dazutun muß. Dann ziehe man vorsichtig den oben schwimmenden Saft ab. Ein solcher Trank gibt vier Männern (oder einem Mann vier mal) im Kampf eine Chance von 50%, sonst tödliche Wunden zu überleben. Der Trank wird von ihnen automatisch bei Verletzung angewandt.</text>
     </string>
+    <string name="skillpotion">
+    	<text locale="en">The creation of this potion is a well kept secret. Some even say, it couldn't be brewed by mere mortals. One thing is certain though, the drinker receives further insight into any learned talents, which furthers their progress towards the mastery of those talents.</text>
+    	<text locale="de">Die Herstellung dieses Trunkes ist ein wohlgehütetes Geheimnis. Manche behaupten gar, von Sterblichen könne er gar nicht gebraut werden. Tatsache ist, dass er dem Trinkenden tiefere Einsicht in seine erlernten Talente gewährt, was ihn in der Meisterung dieser Talente voranbringt.</text>
+    </string>
   </namespace>
   <namespace name="spell">
     <string name="create_rop">
