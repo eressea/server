@@ -245,6 +245,7 @@ extern "C" {
 #endif
 
     void free_regions(void);
+    void free_land(struct land_region * lr);
 
     int region_get_morale(const region * r);
     void region_set_morale(region * r, int morale, int turn);

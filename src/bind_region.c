@@ -456,7 +456,7 @@ static int tolua_region_create(lua_State * L)
         assert(!pnormalize(&x, &y, pl));
         r = result = findregion(x, y);
 
-        if (terrain == NULL && r != NULL && r->units != NULL) {
+        if (r != NULL && r->units != NULL) {
             /* TODO: error message */
             result = NULL;
         }
@@ -465,9 +465,9 @@ static int tolua_region_create(lua_State * L)
         }
         if (result) {
             terraform_region(result, terrain);
-        }
-        if (result->land) {
-            fix_demand(result);
+            if (result->land) {
+                fix_demand(result);
+            }
         }
 
         tolua_pushusertype(L, result, TOLUA_CAST "region");

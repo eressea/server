@@ -11,6 +11,7 @@ without prior permission by the authors of Eressea.
 */
 #include <platform.h>
 #include "log.h"
+#include "bsdstring.h"
 #include "unicode.h"
 
 #include <assert.h>
@@ -144,7 +145,7 @@ static int check_dupe(const char *format, const char *type)
         }
         dupes = 0;
     }
-    strncpy(last_message, format, sizeof(last_message));
+    strlcpy(last_message, format, sizeof(last_message));
     last_type = type;
     return 0;
 }

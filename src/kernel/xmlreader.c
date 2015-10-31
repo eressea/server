@@ -389,7 +389,8 @@ static int parse_calendar(xmlDocPtr doc)
                 int i;
 
                 weeks_per_month = nsetWeeks->nodeNr;
-                assert(!weeknames);
+                free(weeknames);
+                free(weeknames2);
                 weeknames = malloc(sizeof(char *) * weeks_per_month);
                 weeknames2 = malloc(sizeof(char *) * weeks_per_month);
                 for (i = 0; i != nsetWeeks->nodeNr; ++i) {
@@ -431,15 +432,16 @@ static int parse_calendar(xmlDocPtr doc)
                 int i;
 
                 months_per_year = nsetMonths->nodeNr;
-                assert(!monthnames);
+                free(monthnames);
                 monthnames = malloc(sizeof(char *) * months_per_year);
+                free(month_season);
                 month_season = malloc(sizeof(int) * months_per_year);
+                free(storms);
                 storms = malloc(sizeof(int) * months_per_year);
 
                 for (i = 0; i != nsetMonths->nodeNr; ++i) {
                     xmlNodePtr month = nsetMonths->nodeTab[i];
                     xmlChar *propValue = xmlGetProp(month, BAD_CAST "name");
-                    int j;
 
                     if (propValue) {
                         if (newyear
@@ -451,14 +453,17 @@ static int parse_calendar(xmlDocPtr doc)
                         monthnames[i] = _strdup(mkname("calendar", (const char *)propValue));
                         xmlFree(propValue);
                     }
-                    for (j = 0; j != seasons; ++j) {
-                        xmlNodePtr season = month->parent;
-                        if (season == nsetSeasons->nodeTab[j]) {
-                            month_season[i] = j;
-                            break;
+                    if (nsetSeasons) {
+                        int j;
+                        for (j = 0; j != seasons; ++j) {
+                            xmlNodePtr season = month->parent;
+                            if (season == nsetSeasons->nodeTab[j]) {
+                                month_season[i] = j;
+                                break;
+                            }
                         }
+                        assert(j != seasons);
                     }
-                    assert(j != seasons);
                     storms[i] = xml_ivalue(nsetMonths->nodeTab[i], "storm", 0);
                 }
             }
@@ -929,12 +934,14 @@ static int parse_resources(xmlDocPtr doc)
             flags |= RTF_LIMITED;
 
         name = xmlGetProp(node, BAD_CAST "name");
-        assert(name != NULL);
-
+        if (!name) {
+            assert(name);
+            log_error("invalid resource %d has no name", i);
+            continue;
+        }
         rtype = rt_get_or_create((const char *)name);
         rtype->flags |= flags;
-
-        if (name) xmlFree(name);
+        xmlFree(name);
 
         name = xmlGetProp(node, BAD_CAST "material");
         if (name) {
@@ -1811,23 +1818,26 @@ static int parse_races(xmlDocPtr doc)
         if (result->nodesetval->nodeNr > MAXMAGIETYP) {
             log_error("race %s has %d potential familiars", rc->_name, result->nodesetval->nodeNr);
         }
-        for (k = 0; k != MAXMAGIETYP; ++k) {
-            if (k < result->nodesetval->nodeNr) {
-                xmlNodePtr node = result->nodesetval->nodeTab[k];
+        else {
+            for (k = 0; k != MAXMAGIETYP; ++k) {
+                if (k < result->nodesetval->nodeNr) {
+                    xmlNodePtr node = result->nodesetval->nodeTab[k];
 
-                propValue = xmlGetProp(node, BAD_CAST "race");
-                assert(propValue != NULL);
-                frc = rc_get_or_create((const char *)propValue);
-                if (xml_bvalue(node, "default", false)) {
-                    rc->familiars[k] = rc->familiars[0];
-                    rc->familiars[0] = frc;
+                    propValue = xmlGetProp(node, BAD_CAST "race");
+                    assert(propValue != NULL);
+                    frc = rc_get_or_create((const char *)propValue);
+                    if (xml_bvalue(node, "default", false)) {
+                        rc->familiars[k] = rc->familiars[0];
+                        rc->familiars[0] = frc;
+                    }
+                    else {
+                        rc->familiars[k] = frc;
+                    }
+                    xmlFree(propValue);
                 }
                 else {
                     rc->familiars[k] = frc;
                 }
-                xmlFree(propValue);
-            } else {
-                rc->familiars[k] = frc;
             }
         }
         xmlXPathFreeObject(result);

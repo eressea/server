@@ -1108,7 +1108,7 @@ static void cycle_route(order * ord, unit * u, int gereist)
 {
     int cm = 0;
     char tail[1024], *bufp = tail;
-    char neworder[2048];
+    char neworder[2048], *obuf = neworder;
     char token[128];
     direction_t d = NODIRECTION;
     bool paused = false;
@@ -1163,14 +1163,16 @@ static void cycle_route(order * ord, unit * u, int gereist)
             /* da PAUSE nicht in ein shortdirections[d] umgesetzt wird (ist
              * hier keine normale direction), muss jede PAUSE einzeln
              * herausgefiltert und explizit gesetzt werden */
-            if (neworder[0])
-                strcat(neworder, " ");
-            strcat(neworder, LOC(lang, parameters[P_PAUSE]));
+            if (neworder != obuf) {
+                obuf += strlcat(obuf, " ", sizeof(neworder)-(obuf-neworder));
+            }
+            obuf += strlcat(obuf, LOC(lang, parameters[P_PAUSE]), sizeof(neworder) - (obuf - neworder));
         }
         else {
-            if (neworder[0])
-                strcat(neworder, " ");
-            strcat(neworder, LOC(lang, shortdirections[d]));
+            if (neworder != obuf) {
+                obuf += strlcat(obuf, " ", sizeof(neworder) - (obuf - neworder));
+            }
+            obuf += strlcat(obuf, LOC(lang, shortdirections[d]), sizeof(neworder) - (obuf - neworder));
         }
     }
 
@@ -2379,7 +2381,7 @@ static int follow_ship(unit * u, order * ord)
             speed = maxspeed;
     }
     rc = rconnect(rc, dir);
-    while (moves < speed && (dir = hunted_dir(rc->attribs, id)) != NODIRECTION) {
+    while (rc && moves < speed && (dir = hunted_dir(rc->attribs, id)) != NODIRECTION) {
         const char *loc = LOC(u->faction->locale, directions[dir]);
         bufp = STRLCPY_EX(bufp, " ", &size, "hunt");
         bufp = STRLCPY_EX(bufp, loc, &size, "hunt");

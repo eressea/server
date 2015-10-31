@@ -1281,19 +1281,20 @@ bool fumble(region * r, unit * u, const spell * sp, int cast_grade)
      * 20% Warscheinlichkeit nicht
      * */
 
-    int rnd = 0;
-    double x = (double)cast_grade / (double)effskill(u, SK_MAGIC, r);
-    int fumble_chance = (int)(((double)x * 40.0) - 20.0);
+    int fumble_chance, rnd = 0;
+    int effsk = effskill(u, SK_MAGIC, r);
     struct building *b = inside_building(u);
     const struct building_type *btype = b ? b->type : NULL;
     int fumble_enabled = get_param_int(global.parameters, "magic.fumble.enable", 1);
     sc_mage * mage;
 
-    if (!fumble_enabled) {
+    if (effsk<=0 || !fumble_enabled) {
         return false;
     }
-    if (btype)
+    fumble_chance = (int)((cast_grade * 40.0 / (double)effsk) - 20.0);
+    if (btype) {
         fumble_chance -= btype->fumblebonus;
+    }
 
     /* CHAOSPATZERCHANCE 10 : +10% Chance zu Patzern */
     mage = get_mage(u);

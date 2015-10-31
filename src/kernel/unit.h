@@ -89,11 +89,11 @@ extern "C" {
         struct faction *faction;
         struct building *building;
         struct ship *ship;
-        unsigned short number;      /* persons */
-        short age;
+        int number;      /* persons */
+        int age;
 
         /* skill data */
-        short skill_size;
+        int skill_size;
         struct skill *skills;
         struct item *items;
         reservation *reservations;
@@ -167,7 +167,7 @@ extern "C" {
 
     void set_level(struct unit *u, skill_t id, int level);
     int get_level(const struct unit *u, skill_t id);
-    extern void transfermen(struct unit *u, struct unit *u2, int n);
+    extern void transfermen(struct unit *src, struct unit *dst, int n);
 
     int eff_skill(const struct unit *u, const struct skill *sv, const struct region *r);
     int effskill_study(const struct unit *u, skill_t sk, const struct region *r);

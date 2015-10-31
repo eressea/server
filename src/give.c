@@ -289,7 +289,7 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
     else {
         if (n > u->number)
             n = u->number;
-        if (u2 && n + u2->number > UNIT_MAXSIZE) {
+        if (n + u2->number > UNIT_MAXSIZE) {
             n = UNIT_MAXSIZE - u2->number;
             ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_unit_size",
                 "maxsize", UNIT_MAXSIZE));

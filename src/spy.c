@@ -428,7 +428,7 @@ static void sink_ship(region * r, ship * sh, unit * saboteur)
     else {
         for (d = 0; d != MAXDIRECTIONS; ++d) {
             region *rn = rconnect(r, d);
-            if (!fval(rn->terrain, SEA_REGION) && !move_blocked(NULL, r, rn)) {
+            if (rn && !fval(rn->terrain, SEA_REGION) && !move_blocked(NULL, r, rn)) {
                 safety = rn;
                 probability = OCEAN_SWIMMER_CHANCE;
                 break;
