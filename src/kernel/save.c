@@ -1346,7 +1346,9 @@ void writefaction(struct gamedata *data, const faction * f)
     WRITE_SECTION(data->store);
 
     for (sf = f->allies; sf; sf = sf->next) {
-        int no = (sf->faction != NULL) ? sf->faction->no : 0;
+        assert(sf->faction);
+
+        int no = sf->faction->no;
         int status = alliedfaction(NULL, f, sf->faction, HELP_ALL);
         if (status != 0) {
             WRITE_INT(data->store, no);
