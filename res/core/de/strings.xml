@@ -4881,16 +4881,15 @@
       magician's aura against his will.</text>
     </string>
     <string name="airship">
-      <text locale="de">Diese magischen Runen bringen ein Boot oder Langboot
-      für
-      eine Woche zum fliegen. Damit kann dann auch Land überquert werden. Die
-      Zuladung  von Langbooten ist unter der Einwirkung dieses Zaubers auf 100
-      Gewichtseinheiten begrenzt. Für die Farbe der Runen muss eine spezielle
-      Tinte aus einem Windbeutel und einem Schneekristall angerührt werden.</text>
-      <text locale="en">These magic runes allow a boat or longboat to fly for
-      a
-      week. The boat can only carry 100 weight units. The enchanted ink's
-      components include a windbag and a snowcrystal petal.</text>
+      <text locale="de">Diese magischen Runen bringen ein Boot bis zu einer 
+      Kapazität von 50 Gewichtseinheiten für eine Woche zum Fliegen. Dies 
+      ermöglicht dem Boot die Überquerung von Land. Für die Farbe der Runen 
+      muss eine spezielle Tinte aus einem Windbeutel und einem Schneekristall 
+      angerührt werden.</text>
+      <text locale="en">These magic runes allow a boat with a capacity of up 
+      to 50 weight units to fly for a week and allow the boat to cross land. 
+      The enchanted ink's components include a windbag and a snowcrystal petal.
+      </text>
     </string>
     <string name="double_time">
       <text locale="de">Diese praktische Anwendung des theoretischen Wissens um 
