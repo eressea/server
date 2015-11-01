@@ -1156,13 +1156,11 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
     /* Momentan nur Trollgürtel und Werwolf-Eigenschaft */
     am = select_magicarmor(dt);
 
-#if CHANGED_CROSSBOWS
     if (awtype && fval(awtype, WTF_ARMORPIERCING)) {
         /* crossbows */
         ar /= 2;
         an /= 2;
     }
-#endif
 
     if (rule_armor < 0) {
         rule_armor = get_param_int(global.parameters, "rules.combat.nat_armor", 0);
