@@ -30,8 +30,6 @@ extern "C" {
     void register_shipcurse(void);
     struct curse *shipcurse_flyingship(struct ship *sh, struct unit *mage,
         double power, int duration);
-    int levitate_ship(struct ship *sh, struct unit *mage, double power,
-        int duration);
 
 #ifdef __cplusplus
 }

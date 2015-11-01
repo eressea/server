@@ -146,15 +146,6 @@ curse *shipcurse_flyingship(ship * sh, unit * mage, double power, int duration)
     }
 }
 
-int levitate_ship(ship * sh, unit * mage, double power, int duration)
-{
-    curse *c = shipcurse_flyingship(sh, mage, power, duration);
-    if (c) {
-        return c->no;
-    }
-    return 0;
-}
-
 void register_shipcurse(void)
 {
     ct_register(&ct_stormwind);
