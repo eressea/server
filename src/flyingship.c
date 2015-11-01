@@ -14,15 +14,6 @@
 /* libc includes */
 #include <assert.h>
 
-int levitate_ship(ship * sh, unit * mage, double power, int duration)
-{
-    curse *c = shipcurse_flyingship(sh, mage, power, duration);
-    if (c) {
-        return c->no;
-    }
-    return 0;
-}
-
 /* ------------------------------------------------------------- */
 /* Name:       Luftschiff
 * Stufe:      6
@@ -88,4 +79,22 @@ int sp_flying_ship(castorder * co)
     if (m)
         msg_release(m);
     return cast_level;
+}
+
+int levitate_ship(ship * sh, unit * mage, double power, int duration)
+{
+    curse *c = shipcurse_flyingship(sh, mage, power, duration);
+    if (c) {
+        return c->no;
+    }
+    return 0;
+}
+
+bool flying_ship(const ship * sh)
+{
+    if (sh->type->flags & SFL_FLY)
+        return true;
+    if (sh->flags & SF_FLYING)
+        return true;
+    return false;
 }

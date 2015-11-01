@@ -28,6 +28,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "monster.h"
 #include "lighthouse.h"
 #include "piracy.h"
+#include "flyingship.h"
 
 #include <kernel/build.h>
 #include <kernel/building.h>
@@ -672,15 +673,6 @@ int check_ship_allowed(struct ship *sh, const region * r)
         }
     }
     return SA_NO_COAST;
-}
-
-static bool flying_ship(const ship * sh)
-{
-    if (sh->type->flags & SFL_FLY)
-        return true;
-    if (sh->flags & SF_FLYING)
-        return true;
-    return false;
 }
 
 static void set_coast(ship * sh, region * r, region * rnext)
