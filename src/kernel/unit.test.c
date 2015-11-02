@@ -2,6 +2,7 @@
 #include <kernel/config.h>
 #include <kernel/curse.h>
 #include <kernel/item.h>
+#include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/order.h>
 #include <kernel/race.h>
@@ -376,6 +377,26 @@ static void test_produceexp(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_inside_building(CuTest *tc) {
+    unit *u;
+    building *b;
+
+    test_cleanup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    b = test_create_building(u->region, 0);
+
+    b->size = 1;
+    scale_number(u, 1);
+    CuAssertPtrEquals(tc, 0, inside_building(u));
+    u->building = b;
+    CuAssertPtrEquals(tc, b, inside_building(u));
+    scale_number(u, 2);
+    CuAssertPtrEquals(tc, 0, inside_building(u));
+    b->size = 2;
+    CuAssertPtrEquals(tc, b, inside_building(u));
+    test_cleanup();
+}
+
 CuSuite *get_unit_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -394,6 +415,7 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_skill_hunger);
     SUITE_ADD_TEST(suite, test_skill_familiar);
     SUITE_ADD_TEST(suite, test_age_familiar);
+    SUITE_ADD_TEST(suite, test_inside_building);
     SUITE_ADD_TEST(suite, test_produceexp);
     return suite;
 }

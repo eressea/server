@@ -115,7 +115,7 @@ building_type *bt_get_or_create(const char *name)
             btype->_name = _strdup(name);
             btype->auraregen = 1.0;
             btype->maxsize = -1;
-            btype->capacity = -1;
+            btype->capacity = 1;
             btype->maxcapacity = -1;
             bt_register(btype);
         }
