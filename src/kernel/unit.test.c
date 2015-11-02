@@ -394,6 +394,11 @@ static void test_inside_building(CuTest *tc) {
     CuAssertPtrEquals(tc, 0, inside_building(u));
     b->size = 2;
     CuAssertPtrEquals(tc, b, inside_building(u));
+    u = test_create_unit(u->faction, u->region);
+    u->building = b;
+    CuAssertPtrEquals(tc, 0, inside_building(u));
+    b->size = 3;
+    CuAssertPtrEquals(tc, b, inside_building(u));
     test_cleanup();
 }
 

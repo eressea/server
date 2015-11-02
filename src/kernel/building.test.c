@@ -382,6 +382,19 @@ static void test_btype_defaults(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_active_building(CuTest *tc) {
+    building *b;
+
+    test_cleanup();
+    b = test_create_building(test_create_region(0,0,0), 0);
+    CuAssertIntEquals(tc, false, building_is_active(b));
+    b->flags |= BLD_WORKING;
+    CuAssertIntEquals(tc, true, building_is_active(b));
+    b->flags &= ~BLD_WORKING;
+    CuAssertIntEquals(tc, false, building_is_active(b));
+    test_cleanup();
+}
+
 CuSuite *get_building_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -396,5 +409,6 @@ CuSuite *get_building_suite(void)
     SUITE_ADD_TEST(suite, test_buildingowner_goes_to_other_after_leave);
     SUITE_ADD_TEST(suite, test_buildingowner_goes_to_same_faction_after_leave);
     SUITE_ADD_TEST(suite, test_buildingowner_goes_to_empty_unit_after_leave);
+    SUITE_ADD_TEST(suite, test_active_building);
     return suite;
 }
