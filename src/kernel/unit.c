@@ -1072,11 +1072,7 @@ void transfermen(unit * u, unit * dst, int n)
 
 struct building *inside_building(const struct unit *u)
 {
-    if (u->building == NULL)
-        return NULL;
-
-    if (!fval(u->building, BLD_WORKING)) {
-        /* Unterhalt nicht bezahlt */
+    if (!u->building || !building_is_active(u->building)) {
         return NULL;
     }
     else if (u->building->size < u->building->type->maxsize) {

@@ -3545,7 +3545,7 @@ void monthly_healing(void)
                 double maxheal = _max(u->number, umhp / 20.0);
                 int addhp;
                 struct building *b = inside_building(u);
-                const struct building_type *btype = b ? b->type : NULL;
+                const struct building_type *btype = building_is_active(b) ? b->type : NULL;
                 if (btype == bt_find("inn")) {
                     p *= 1.5;
                 }

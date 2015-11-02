@@ -175,6 +175,13 @@ static int study_days(unit * student, skill_t sk)
     return student->number * speed;
 }
 
+static building *active_building(const unit *u, const struct building_type *btype) {
+    if (u->building && u->building->type == btype && building_is_active(u->building)) {
+        return inside_building(u);
+    }
+    return 0;
+}
+
 static int
 teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
 bool report, int *academy)
@@ -205,8 +212,7 @@ bool report, int *academy)
     n = _min(n, nteaching);
 
     if (n != 0) {
-        struct building *b = inside_building(teacher);
-        const struct building_type *btype = b ? b->type : NULL;
+        const struct building_type *btype = bt_find("academy");
         int index = 0;
 
         if (teach == NULL) {
@@ -229,8 +235,7 @@ bool report, int *academy)
 
         /* Solange Akademien groessenbeschraenkt sind, sollte Lehrer und
          * Student auch in unterschiedlichen Gebaeuden stehen duerfen */
-        if (btype == bt_find("academy")
-            && student->building && student->building->type == bt_find("academy")) {
+        if (active_building(teacher, btype) && active_building(student, btype)) {
             int j = study_cost(student, sk);
             j = _max(50, j * 2);
             /* kann Einheit das zahlen? */
@@ -542,7 +547,7 @@ int study_cmd(unit * u, order * ord)
     int speed_rule = (study_rule_t)get_param_int(global.parameters, "study.speedup", 0);
     static int learn_newskills = -1;
     struct building *b = inside_building(u);
-    const struct building_type *btype = b ? b->type : NULL;
+    const struct building_type *btype = building_is_active(b) ? b->type : NULL;
 
     if (learn_newskills < 0) {
         const char *str = get_param(global.parameters, "study.newskills");
@@ -606,7 +611,7 @@ int study_cmd(unit * u, order * ord)
     }
     /* Akademie: */
     b = inside_building(u);
-    btype = b ? b->type : NULL;
+    btype = building_is_active(b) ? b->type : NULL;
 
     if (btype && btype == bt_find("academy")) {
         studycost = _max(50, studycost * 2);

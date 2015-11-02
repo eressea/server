@@ -642,6 +642,10 @@ region *building_getregion(const building * b)
     return b->region;
 }
 
+bool building_is_active(const struct building *b) {
+    return b && fval(b, BLD_WORKING);
+}
+
 void building_setregion(building * b, region * r)
 {
     building **blist = &b->region->buildings;

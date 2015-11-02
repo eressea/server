@@ -1025,7 +1025,7 @@ spellpower(region * r, unit * u, const spell * sp, int cast_level, struct order 
     else {
         /* Bonus durch Magieturm und gesegneten Steinkreis */
         struct building *b = inside_building(u);
-        const struct building_type *btype = b ? b->type : NULL;
+        const struct building_type *btype = building_is_active(b) ? b->type : NULL;
         if (btype && btype->flags & BTF_MAGIC) ++force;
     }
 
@@ -1170,7 +1170,7 @@ double magic_resistance(unit * target)
     /* Bonus durch Gebäude */
     {
         struct building *b = inside_building(target);
-        const struct building_type *btype = b ? b->type : NULL;
+        const struct building_type *btype = building_is_active(b) ? b->type : NULL;
 
         /* gesegneter Steinkreis gibt 30% dazu */
         if (btype)
@@ -1284,7 +1284,7 @@ bool fumble(region * r, unit * u, const spell * sp, int cast_grade)
     int fumble_chance, rnd = 0;
     int effsk = effskill(u, SK_MAGIC, r);
     struct building *b = inside_building(u);
-    const struct building_type *btype = b ? b->type : NULL;
+    const struct building_type *btype = building_is_active(b) ? b->type : NULL;
     int fumble_enabled = get_param_int(global.parameters, "magic.fumble.enable", 1);
     sc_mage * mage;
 
@@ -1468,7 +1468,7 @@ void regenerate_aura(void)
                 auramax = max_spellpoints(r, u);
                 if (aura < auramax) {
                     struct building *b = inside_building(u);
-                    const struct building_type *btype = b ? b->type : NULL;
+                    const struct building_type *btype = building_is_active(b) ? b->type : NULL;
                     reg_aura = regeneration(u);
 
                     /* Magierturm erhöht die Regeneration um 75% */

@@ -183,36 +183,36 @@ extern "C" {
     void make_zombie(unit * u);
 
     /* see resolve.h */
-    extern int resolve_unit(variant data, void *address);
-    extern void write_unit_reference(const struct unit *u, struct storage *store);
-    extern variant read_unit_reference(struct storage *store);
+    int resolve_unit(variant data, void *address);
+    void write_unit_reference(const struct unit *u, struct storage *store);
+    variant read_unit_reference(struct storage *store);
 
-    extern bool leave(struct unit *u, bool force);
-    extern bool can_leave(struct unit *u);
+    bool leave(struct unit *u, bool force);
+    bool can_leave(struct unit *u);
 
-    extern void u_set_building(struct unit * u, struct building * b);
-    extern void u_set_ship(struct unit * u, struct ship * sh);
-    extern void leave_ship(struct unit * u);
-    extern void leave_building(struct unit * u);
+    void u_set_building(struct unit * u, struct building * b);
+    void u_set_ship(struct unit * u, struct ship * sh);
+    void leave_ship(struct unit * u);
+    void leave_building(struct unit * u);
 
-    extern void set_leftship(struct unit *u, struct ship *sh);
-    extern struct ship *leftship(const struct unit *);
-    extern bool can_survive(const struct unit *u, const struct region *r);
-    extern void move_unit(struct unit *u, struct region *target,
-    struct unit **ulist);
+    void set_leftship(struct unit *u, struct ship *sh);
+    struct ship *leftship(const struct unit *);
+    bool can_survive(const struct unit *u, const struct region *r);
+    void move_unit(struct unit *u, struct region *target,
+        struct unit **ulist);
 
-    extern struct building *inside_building(const struct unit *u);
+    struct building *inside_building(const struct unit *u);
 
     /* cleanup code for this module */
-    extern void free_units(void);
-    extern struct faction *dfindhash(int no);
-    extern void u_setfaction(struct unit *u, struct faction *f);
-    extern void set_number(struct unit *u, int count);
+    void free_units(void);
+    struct faction *dfindhash(int no);
+    void u_setfaction(struct unit *u, struct faction *f);
+    void set_number(struct unit *u, int count);
 
-    extern bool learn_skill(struct unit *u, skill_t sk, double chance);
+    bool learn_skill(struct unit *u, skill_t sk, double chance);
 
-    extern int invisible(const struct unit *target, const struct unit *viewer);
-    extern void free_unit(struct unit *u);
+    int invisible(const struct unit *target, const struct unit *viewer);
+    void free_unit(struct unit *u);
 
     extern void name_unit(struct unit *u);
     extern struct unit *create_unit(struct region *r1, struct faction *f,

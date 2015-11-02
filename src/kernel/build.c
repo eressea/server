@@ -448,8 +448,9 @@ int build(unit * u, const construction * ctype, int completed, int want)
             return EBUILDINGREQ;
         }
         b = inside_building(u);
-        if (b == NULL)
+        if (!b || !building_is_active(b)) {
             return EBUILDINGREQ;
+        }
     }
 
     if (type->skill != NOSKILL) {
@@ -462,7 +463,7 @@ int build(unit * u, const construction * ctype, int completed, int want)
             return ENEEDSKILL;
 
         effsk = basesk;
-        if (inside_building(u)) {
+        if (building_is_active(u->building) && inside_building(u)) {
             effsk = skillmod(u->building->type->attribs, u, u->region, type->skill,
                 effsk, SMF_PRODUCTION);
         }
@@ -558,7 +559,7 @@ int build(unit * u, const construction * ctype, int completed, int want)
                 int need, prebuilt;
                 int canuse = get_pooled(u, rtype, GET_DEFAULT, INT_MAX);
 
-                if (inside_building(u)) {
+                if (building_is_active(u->building) && inside_building(u)) {
                     canuse = matmod(u->building->type->attribs, u, rtype, canuse);
                 }
 
@@ -597,8 +598,9 @@ int build(unit * u, const construction * ctype, int completed, int want)
                     required(completed + n, type->reqsize, type->materials[c].number);
                 int multi = 1;
                 int canuse = 100;       /* normalization */
-                if (inside_building(u))
+                if (building_is_active(u->building) && inside_building(u)) {
                     canuse = matmod(u->building->type->attribs, u, rtype, canuse);
+                }
                 if (canuse < 0)
                     return canuse;        /* pass errors to caller */
                 canuse = matmod(type->attribs, u, rtype, canuse);

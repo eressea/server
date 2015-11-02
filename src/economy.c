@@ -1101,7 +1101,7 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
         for (; mod->flags != 0; ++mod) {
             if (mod->flags & RMF_REQUIREDBUILDING) {
                 struct building *b = inside_building(u);
-                const struct building_type *btype = b ? b->type : NULL;
+                const struct building_type *btype = building_is_active(b) ? b->type : NULL;
                 if (mod->btype && mod->btype != btype) {
                     cmistake(u, u->thisorder, 104, MSG_PRODUCE);
                     return;
@@ -1157,7 +1157,7 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
     }
     else {
         struct building *b = inside_building(u);
-        const struct building_type *btype = b ? b->type : NULL;
+        const struct building_type *btype = building_is_active(b) ? b->type : NULL;
 
         if (rdata->modifiers) {
             resource_mod *mod = rdata->modifiers;
@@ -1213,7 +1213,7 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
 
     if (rdata->modifiers) {
         struct building *b = inside_building(u);
-        const struct building_type *btype = b ? b->type : NULL;
+        const struct building_type *btype = building_is_active(b) ? b->type : NULL;
 
         resource_mod *mod = rdata->modifiers;
         for (; mod->flags != 0; ++mod) {
@@ -2422,7 +2422,7 @@ static void breedhorses(unit * u)
 {
     int n, c, breed = 0;
     struct building *b = inside_building(u);
-    const struct building_type *btype = b ? b->type : NULL;
+    const struct building_type *btype = building_is_active(b) ? b->type : NULL;
     const struct resource_type *rhorse = get_resourcetype(R_HORSE);
     int horses, effsk;
 
