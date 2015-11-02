@@ -204,71 +204,6 @@ static void test_building_defence_bonus(CuTest * tc)
     test_cleanup();
 }
 
-static void test_armor_penetration(CuTest * tc)
-{
-    faction* pAttackingFaction = NULL;
-    faction* pDefendingFaction_Human = NULL;
-    faction* pDefendingFaction_Demon = NULL;
-    unit* pAttackingUnit = NULL;
-    unit* pDefendingUnit = NULL;
-    fighter* pAttackingFighter = NULL;
-    fighter* pDefendingFighter = NULL;
-    troop attackingTroop;
-    troop defendingTroop;
-    side* pAttackingSide = NULL;
-    side* pDefendingSide = NULL;
-    region* pRegion = NULL;
-    battle* pBattle = NULL;
-
-    test_cleanup();
-    test_create_world();
-
-    resource_type* pResType_Crossbow = rt_get_or_create("crossbow");
-    item_type* pItemType_Crossbow = it_get_or_create(pResType_Crossbow);
-    (void)new_weapontype(pItemType_Crossbow, WTF_ARMORPIERCING, 0.0, NULL, 0, 0, 1, SK_CROSSBOW, 1);
-    item* pItem_Crossbow = i_new(pItemType_Crossbow, 1);
-
-    item_type* pItemType_Armor = it_get_or_create(rt_get_or_create("plate"));
-    /*armor_type* pArmorType = */new_armortype(pItemType_Armor, 0.0, 0.0, 5, ATF_NONE);
-
-    pRegion = findregion(0, 0);
-
-    pAttackingFaction = test_create_faction(NULL);
-    pDefendingFaction_Human = test_create_faction(rc_get_or_create("human"));
-    pDefendingFaction_Demon = test_create_faction(rc_get_or_create("demon"));
-
-    pAttackingUnit = test_create_unit(pAttackingFaction, pRegion);
-    scale_number(pAttackingUnit, 1);
-    set_level(pAttackingUnit, SK_CROSSBOW, 10);
-    pAttackingUnit->items = pItem_Crossbow;
-    
-
-    pDefendingUnit = test_create_unit(pDefendingFaction_Human, pRegion);
-    scale_number(pDefendingUnit, 1);
-    //i_change(&(pDefendingUnit->items), pItemType_Armor, 1);
-
-    pBattle = make_battle(pRegion);
-    pAttackingSide = make_side(pBattle, pAttackingFaction, NULL, 0, NULL);
-    pDefendingSide = make_side(pBattle, pDefendingFaction_Human, NULL, 0, NULL);
-
-    pAttackingFighter = make_fighter(pBattle, pAttackingUnit, pAttackingSide, false);
-    attackingTroop.fighter = pAttackingFighter;
-    attackingTroop.index = 0;
-
-    pDefendingFighter = make_fighter(pBattle, pDefendingUnit, pDefendingSide, false);
-    defendingTroop.fighter = pDefendingFighter;
-    defendingTroop.index = 0;
-
-    int initialHP = 10;
-    pDefendingUnit->hp = initialHP;
-
-    CuAssertTrue(tc, terminate(defendingTroop, attackingTroop, AT_STANDARD, "10", true));
-
-    CuAssertIntEquals(tc, initialHP - 10, pDefendingUnit->hp);
-
-    test_cleanup();
-}
-
 CuSuite *get_battle_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -277,6 +212,5 @@ CuSuite *get_battle_suite(void)
     SUITE_ADD_TEST(suite, test_attackers_get_no_building_bonus);
     SUITE_ADD_TEST(suite, test_building_bonus_respects_size);
     SUITE_ADD_TEST(suite, test_building_defence_bonus);
-	SUITE_ADD_TEST(suite, test_armor_penetration);
     return suite;
 }
