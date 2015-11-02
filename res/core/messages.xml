@@ -1212,23 +1212,6 @@
     <text locale="en">"$unit($unit) dies from poison damage taken in $region($region)."</text>
   </message>
 
-  <message name="drown_amphibian_dead" section="events">
-    <type>
-      <arg name="amount" type="int"/>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-    </type>
-    <text locale="de">"$int($amount) Personen in $unit($unit) in $region($region) ertrinken."</text>
-    <text locale="en">"$int($amount) people in $unit($unit) in $region($region) drown."</text>
-  </message>
-  <message name="drown_amphibian_nodead" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-    </type>
-    <text locale="de">"$unit($unit) nimmt Schaden auf dem Wasser in $region($region)."</text>
-    <text locale="en">"$unit($unit) is taking damage on the water."</text>
-  </message>
   <message name="wand_of_tears_usage" section="events">
     <type>
       <arg name="unit" type="unit"/>
