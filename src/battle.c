@@ -1156,12 +1156,6 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
     /* Momentan nur Trollgürtel und Werwolf-Eigenschaft */
     am = select_magicarmor(dt);
 
-    if (awtype && fval(awtype, WTF_ARMORPIERCING)) {
-        /* crossbows */
-        ar /= 2;
-        an /= 2;
-    }
-
     if (rule_armor < 0) {
         rule_armor = get_param_int(global.parameters, "rules.combat.nat_armor", 0);
     }
@@ -1178,6 +1172,12 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
         /* use the higher value, add half the other value */
         ar = (ar > an) ? (ar + an / 2) : (an + ar / 2);
     }
+
+    if (awtype && fval(awtype, WTF_ARMORPIERCING)) {
+        /* crossbows */
+        ar /= 2;
+    }
+
     ar += am;
 
     if (type != AT_COMBATSPELL && type != AT_SPELL) {
