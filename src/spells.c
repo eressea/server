@@ -6730,4 +6730,6 @@ void register_spells(void)
     register_shipcurse();
     register_buildingcurse();
     register_magicresistance();
+
+    register_flyingship();
 }

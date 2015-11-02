@@ -13,23 +13,18 @@
 #ifndef _SCURSE_H
 #define _SCURSE_H
 
-#include <kernel/objtypes.h>
+//#include <kernel/objtypes.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-    struct locale;
     struct message;
-    struct ship;
-    struct unit;
     struct curse;
 
     struct message *cinfo_ship(const void *obj, objtype_t typ,
         const struct curse *c, int self);
     void register_shipcurse(void);
-    struct curse *shipcurse_flyingship(struct ship *sh, struct unit *mage,
-        double power, int duration);
 
 #ifdef __cplusplus
 }
