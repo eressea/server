@@ -179,12 +179,12 @@ item_type * test_create_itemtype(const char * name) {
     return itype;
 }
 
-void test_create_castorder(castorder *co, unit *u, int level, float force, int range) {
+void test_create_castorder(castorder *co, unit *u, int level, float force, int range, spellparameter *par) {
     struct locale * lang;
     order *ord;
 
     lang = get_or_create_locale("en");
-    create_castorder(co, u, NULL, NULL, u->region, level, force, range, ord = create_order(K_CAST, lang, ""), NULL);
+    create_castorder(co, u, NULL, NULL, u->region, level, force, range, ord = create_order(K_CAST, lang, ""), par);
     free_order(ord);
 }
 

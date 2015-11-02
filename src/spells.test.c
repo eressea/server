@@ -34,7 +34,7 @@ static void test_good_dreams(CuTest *tc) {
     u1 = test_create_unit(f1, r);
     u2 = test_create_unit(f2, r);
 
-    test_create_castorder(&co, u1, 10, 10., 0);
+    test_create_castorder(&co, u1, 10, 10., 0, NULL);
 
     level = sp_gooddreams(&co);
     CuAssertIntEquals(tc, 10, level);
@@ -63,7 +63,7 @@ static void test_dreams(CuTest *tc) {
     u1 = test_create_unit(f1, r);
     u2 = test_create_unit(f2, r);
 
-    test_create_castorder(&co, u1, 10, 10., 0);
+    test_create_castorder(&co, u1, 10, 10., 0, NULL);
 
     sp_gooddreams(&co);
     sp_baddreams(&co);
@@ -90,7 +90,7 @@ static void test_bad_dreams(CuTest *tc) {
     u1 = test_create_unit(f1, r);
     u2 = test_create_unit(f2, r);
 
-    test_create_castorder(&co, u1, 10, 10., 0);
+    test_create_castorder(&co, u1, 10, 10., 0, NULL);
 
     level = sp_baddreams(&co);
     CuAssertIntEquals(tc, 10, level);
