@@ -19,16 +19,6 @@
 #include <string.h>
 #include <assert.h>
 
-
-static void test_create_castorder(castorder *co, unit *u, int level, float force, int range) {
-    struct locale * lang;
-    order *ord;
-
-    lang = get_or_create_locale("en");
-    create_castorder(co, u, NULL, NULL, u->region, level, force, range, ord = create_order(K_CAST, lang, ""), NULL);
-    free_order(ord);
-}
-
 static void test_good_dreams(CuTest *tc) {
     struct region *r;
     struct faction *f1, *f2;
