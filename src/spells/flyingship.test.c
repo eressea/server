@@ -7,6 +7,8 @@
 #include <kernel/unit.h>
 #include <kernel/ship.h>
 
+#include <magic.h>
+
 #include <CuTest.h>
 #include <tests.h>
 #include <assert.h>
@@ -17,14 +19,15 @@ static void test_flyingship(CuTest * tc)
     spellparameter par;
     spllprm par_data;
     spllprm *par_data_ptr = &par_data;
-    par.param = &par_data_ptr;
-    par_data.typ = SPP_SHIP;
 
     region *r;
     faction *f;
     unit *u;
     ship_type *shipType1, *shipType2;
     ship *sh1, *sh2;
+
+    par.param = &par_data_ptr;
+    par_data.typ = SPP_SHIP;
 
     test_cleanup();
     test_create_world();

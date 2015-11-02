@@ -9,6 +9,9 @@
 #include <kernel/messages.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
+#include <kernel/ship.h>
+
+#include <magic.h>
 
 #include <spells/shipcurse.h>
 
