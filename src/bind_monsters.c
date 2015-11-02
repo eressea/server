@@ -1,7 +1,6 @@
 #include <platform.h>
 #include "spells/shipcurse.h"
 #include "monster.h"
-#include "flyingship.h"
 
 #include <kernel/equipment.h>
 #include <kernel/faction.h>
@@ -9,6 +8,8 @@
 #include <kernel/ship.h>
 #include <kernel/spellbook.h>
 #include <kernel/unit.h>
+
+#include <spells/flyingship.h>
 
 #include <quicklist.h>
 

@@ -117,7 +117,6 @@ set (ERESSEA_SRC
   travelthru.c
   monsters.c
   wormhole.c
-  flyingship.c
   ${SPELLS_SRC}
   ${RACES_SRC}
   ${ITEMS_SRC}
@@ -209,7 +208,7 @@ set(TESTS_SRC
   spy.test.c
   study.test.c
   upkeep.test.c
-  flyingship.test.c
+  spells/flyingship.test.c
   spells/magicresistance.test.c
   ${ATTRIBUTES_TESTS}
   ${UTIL_TESTS}

@@ -22,7 +22,6 @@
 #include "direction.h"
 #include "randenc.h"
 #include "monster.h"
-#include "flyingship.h"
 
 #include <spells/borders.h>
 #include <spells/buildingcurse.h>
@@ -31,6 +30,7 @@
 #include <spells/shipcurse.h>
 #include <spells/combatspells.h>
 #include <spells/alp.h>
+#include <spells/flyingship.h>
 
 /* kernel includes */
 #include <kernel/curse.h>
