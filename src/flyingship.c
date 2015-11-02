@@ -17,45 +17,6 @@
 /* libc includes */
 #include <assert.h>
 
-static int flyingship_read(storage * store, curse * c, void *target)
-{
-    ship *sh = (ship *)target;
-    c->data.v = sh;
-    if (global.data_version < FOSS_VERSION) {
-        sh->flags |= SF_FLYING;
-        return 0;
-    }
-    assert(sh->flags & SF_FLYING);
-    return 0;
-}
-
-static int flyingship_write(storage * store, const curse * c,
-    const void *target)
-{
-    const ship *sh = (const ship *)target;
-    assert(sh->flags & SF_FLYING);
-    return 0;
-}
-
-static int flyingship_age(curse * c)
-{
-    ship *sh = (ship *)c->data.v;
-    if (sh && c->duration == 1) {
-        freset(sh, SF_FLYING);
-        return 1;
-    }
-    return 0;
-}
-
-static struct curse_type ct_flyingship = { "flyingship",
-CURSETYP_NORM, 0, NO_MERGE, cinfo_ship, NULL, flyingship_read,
-flyingship_write, NULL, flyingship_age
-};
-
-void register_flyingship(void)
-{
-    ct_register(&ct_flyingship);
-}
 
 /* ------------------------------------------------------------- */
 /* Name:       Luftschiff
@@ -124,13 +85,44 @@ int sp_flying_ship(castorder * co)
     return cast_level;
 }
 
-int levitate_ship(ship * sh, unit * mage, double power, int duration)
+static int flyingship_read(storage * store, curse * c, void *target)
 {
-    curse *c = shipcurse_flyingship(sh, mage, power, duration);
-    if (c) {
-        return c->no;
+    ship *sh = (ship *)target;
+    c->data.v = sh;
+    if (global.data_version < FOSS_VERSION) {
+        sh->flags |= SF_FLYING;
+        return 0;
+    }
+    assert(sh->flags & SF_FLYING);
+    return 0;
+}
+
+static int flyingship_write(storage * store, const curse * c,
+    const void *target)
+{
+    const ship *sh = (const ship *)target;
+    assert(sh->flags & SF_FLYING);
+    return 0;
+}
+
+static int flyingship_age(curse * c)
+{
+    ship *sh = (ship *)c->data.v;
+    if (sh && c->duration == 1) {
+        freset(sh, SF_FLYING);
+        return 1;
     }
     return 0;
+}
+
+static struct curse_type ct_flyingship = { "flyingship",
+CURSETYP_NORM, 0, NO_MERGE, cinfo_ship, NULL, flyingship_read,
+flyingship_write, NULL, flyingship_age
+};
+
+void register_flyingship(void)
+{
+    ct_register(&ct_flyingship);
 }
 
 bool flying_ship(const ship * sh)
@@ -142,7 +134,7 @@ bool flying_ship(const ship * sh)
     return false;
 }
 
-curse *shipcurse_flyingship(ship * sh, unit * mage, double power, int duration)
+static curse *shipcurse_flyingship(ship * sh, unit * mage, double power, int duration)
 {
     static const curse_type *ct_flyingship = NULL;
     if (!ct_flyingship) {
@@ -165,5 +157,14 @@ curse *shipcurse_flyingship(ship * sh, unit * mage, double power, int duration)
         }
         return c;
     }
+}
+
+int levitate_ship(ship * sh, unit * mage, double power, int duration)
+{
+    curse *c = shipcurse_flyingship(sh, mage, power, duration);
+    if (c) {
+        return c->no;
+    }
+    return 0;
 }
 
