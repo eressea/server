@@ -7,6 +7,10 @@
 extern "C" {
 #endif
 
+    struct castorder;
+    struct ship;
+    struct unit;
+
     int sp_flying_ship(struct castorder * co);
 
     void register_flyingship(void);
