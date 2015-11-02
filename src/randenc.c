@@ -529,17 +529,12 @@ void drown(region * r)
         while (*up) {
             unit *u = *up;
 
-            if (u->ship || u_race(u) == get_race(RC_SPELL) || u->number == 0) {
-                up = &u->next;
-                continue;
-            }
-
-            if (!(canswim(u) || canfly(u))) {
+            if (!(u->ship || u_race(u) == get_race(RC_SPELL) || u->number == 0 || canswim(u) || canfly(u))) {
                 scale_number(u, 0);
                 ADDMSG(&u->faction->msgs, msg_message("drown", "unit region", u, r));
             }
-            if (*up == u)
-                up = &u->next;
+
+            up = &u->next;
         }
         remove_empty_units_in_region(r);
     }
