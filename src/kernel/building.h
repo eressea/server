@@ -78,6 +78,7 @@ extern "C" {
     } building_type;
 
     extern struct quicklist *buildingtypes;
+    extern struct attrib_type at_building_action;
 
     building_type *bt_get_or_create(const char *name);
     const building_type *bt_find(const char *name);
@@ -163,7 +164,7 @@ extern "C" {
     extern void building_set_owner(struct unit * u);
     extern void building_update_owner(struct building * bld);
 
-    extern struct attrib_type at_building_action;
+    bool building_is_active(const struct building *b);
 
 #ifdef WDW_PYRAMID
     extern int wdw_pyramid_level(const struct building *b);

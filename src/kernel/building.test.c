@@ -373,12 +373,25 @@ static void test_btype_defaults(CuTest *tc) {
     CuAssertTrue(tc, !btype->taxes);
     CuAssertDblEquals(tc, 1.0, btype->auraregen, 0.0);
     CuAssertIntEquals(tc, -1, btype->maxsize);
-    CuAssertIntEquals(tc, -1, btype->capacity);
+    CuAssertIntEquals(tc, 1, btype->capacity);
     CuAssertIntEquals(tc, -1, btype->maxcapacity);
     CuAssertIntEquals(tc, 0, btype->magres);
     CuAssertIntEquals(tc, 0, btype->magresbonus);
     CuAssertIntEquals(tc, 0, btype->fumblebonus);
     CuAssertIntEquals(tc, 0, btype->flags);
+    test_cleanup();
+}
+
+static void test_active_building(CuTest *tc) {
+    building *b;
+
+    test_cleanup();
+    b = test_create_building(test_create_region(0,0,0), 0);
+    CuAssertIntEquals(tc, false, building_is_active(b));
+    b->flags |= BLD_WORKING;
+    CuAssertIntEquals(tc, true, building_is_active(b));
+    b->flags &= ~BLD_WORKING;
+    CuAssertIntEquals(tc, false, building_is_active(b));
     test_cleanup();
 }
 
@@ -396,5 +409,6 @@ CuSuite *get_building_suite(void)
     SUITE_ADD_TEST(suite, test_buildingowner_goes_to_other_after_leave);
     SUITE_ADD_TEST(suite, test_buildingowner_goes_to_same_faction_after_leave);
     SUITE_ADD_TEST(suite, test_buildingowner_goes_to_empty_unit_after_leave);
+    SUITE_ADD_TEST(suite, test_active_building);
     return suite;
 }

@@ -115,7 +115,7 @@ building_type *bt_get_or_create(const char *name)
             btype->_name = _strdup(name);
             btype->auraregen = 1.0;
             btype->maxsize = -1;
-            btype->capacity = -1;
+            btype->capacity = 1;
             btype->maxcapacity = -1;
             bt_register(btype);
         }
@@ -640,6 +640,10 @@ void building_setname(building * self, const char *name)
 region *building_getregion(const building * b)
 {
     return b->region;
+}
+
+bool building_is_active(const struct building *b) {
+    return b && fval(b, BLD_WORKING);
 }
 
 void building_setregion(building * b, region * r)

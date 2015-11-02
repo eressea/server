@@ -769,13 +769,14 @@ static order *plan_dragon(unit * u)
 void plan_monsters(faction * f)
 {
     region *r;
+    double attack_chance = monster_attack_chance();
 
     assert(f);
     f->lastorders = turn;
 
     for (r = regions; r; r = r->next) {
         unit *u;
-        double attack_chance = monster_attack_chance();
+        double rchance = attack_chance;
         bool attacking = false;
 
         for (u = r->units; u; u = u->next) {
@@ -786,25 +787,23 @@ void plan_monsters(faction * f)
             if (!is_monsters(u->faction))
                 continue;
 
-            if (attack_chance > 0.0) {
-                if (chance(attack_chance))
-                    attacking = true;
-                attack_chance = 0.0;
-            }
-
-            if (u->status > ST_BEHIND) {
-                setstatus(u, ST_FIGHT);
-                /* all monsters fight */
-            }
+            /* Befehle müssen jede Runde neu gegeben werden: */
+            free_orders(&u->orders);
             if (skill_enabled(SK_PERCEPTION)) {
                 /* Monster bekommen jede Runde ein paar Tage Wahrnehmung dazu */
                 /* TODO: this only works for playerrace */
                 produceexp(u, SK_PERCEPTION, u->number);
             }
 
-            /* Befehle müssen jede Runde neu gegeben werden: */
-            free_orders(&u->orders);
-
+            if (rchance > 0.0) {
+                if (chance(rchance))
+                    attacking = true;
+                rchance = 0.0;
+            }
+            if (u->status > ST_BEHIND) {
+                setstatus(u, ST_FIGHT);
+                /* all monsters fight */
+            }
             if (attacking && is_guard(u, GUARD_TAX)) {
                 monster_attacks(u);
             }
