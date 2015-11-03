@@ -8,6 +8,7 @@ regioncurse.c
 shipcurse.c
 unitcurse.c
 magicresistance.c
+flyingship.c
 )
 FOREACH(_FILE ${_FILES})
     LIST(APPEND _SOURCES ${PROJECT_NAME}/${_FILE})

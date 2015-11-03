@@ -19,16 +19,6 @@
 #include <string.h>
 #include <assert.h>
 
-
-static void test_create_castorder(castorder *co, unit *u, int level, float force, int range) {
-    struct locale * lang;
-    order *ord;
-
-    lang = get_or_create_locale("en");
-    create_castorder(co, u, NULL, NULL, u->region, level, force, range, ord = create_order(K_CAST, lang, ""), NULL);
-    free_order(ord);
-}
-
 static void test_good_dreams(CuTest *tc) {
     struct region *r;
     struct faction *f1, *f2;
@@ -44,7 +34,7 @@ static void test_good_dreams(CuTest *tc) {
     u1 = test_create_unit(f1, r);
     u2 = test_create_unit(f2, r);
 
-    test_create_castorder(&co, u1, 10, 10., 0);
+    test_create_castorder(&co, u1, 10, 10., 0, NULL);
 
     level = sp_gooddreams(&co);
     CuAssertIntEquals(tc, 10, level);
@@ -73,7 +63,7 @@ static void test_dreams(CuTest *tc) {
     u1 = test_create_unit(f1, r);
     u2 = test_create_unit(f2, r);
 
-    test_create_castorder(&co, u1, 10, 10., 0);
+    test_create_castorder(&co, u1, 10, 10., 0, NULL);
 
     sp_gooddreams(&co);
     sp_baddreams(&co);
@@ -100,7 +90,7 @@ static void test_bad_dreams(CuTest *tc) {
     u1 = test_create_unit(f1, r);
     u2 = test_create_unit(f2, r);
 
-    test_create_castorder(&co, u1, 10, 10., 0);
+    test_create_castorder(&co, u1, 10, 10., 0, NULL);
 
     level = sp_baddreams(&co);
     CuAssertIntEquals(tc, 10, level);
