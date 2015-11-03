@@ -4602,6 +4602,11 @@
       ganzen Region ist fähig seine Waffe gegen irgendjemanden zu erheben.
       Die Wirkung kann etliche Wochen andauern.
       </text>
+      <text locale="en">
+      This powerful spell prevents any attacks. Noone in the entire region 
+      will be able to raise his weapon against another. The effect can last 
+      for weeks.
+      </text>
     </string>
     <string name="song_suscept_magic">
       <text locale="de">
@@ -4690,6 +4695,11 @@
       so ihre Kampfkraft erheblich. Angst wird ihren Schwertarm schwächen 
       und Furcht ihren Schildarm lähmen.
       </text>
+      <text locale="en">
+      This warsong sows panic among the enemy front line and weakens their 
+      fighting strength significantly. Fear will weaken their sword arm and 
+      dread will freeze their shield arm.
+      </text>
     </string>
     <string name="bloodthirst">
       <text locale="de">
@@ -4716,6 +4726,12 @@
       was sie über die gefragte Region weiß. Ist in der Region niemand 
       ihrer Partei, so weiß sie nichts zu berichten. Auch kann sie nur das 
       erzählen, was sie selber sehen könnte.
+      </text>
+      <text locale="en">
+      Should the unit succumb to the spell, they will tell the mage everything 
+      they know about the region is question. Is no unit of their faction in 
+      that region, they'll have nothing to report. Also, they can only report, 
+      what they themselves could see.
       </text>
     </string>
     <string name="seduction">
