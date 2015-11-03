@@ -160,6 +160,9 @@ const unit *random_unit_in_faction(const faction * f)
     unit *u;
     int c = 0, u_nr;
 
+    if (!f->units) {
+        return NULL;
+    }
     for (u = f->units; u; u = u->next)
         c++;
 
