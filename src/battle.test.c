@@ -204,6 +204,117 @@ static void test_building_defence_bonus(CuTest * tc)
     test_cleanup();
 }
 
+fighter *setup_fighter(battle **bp, unit *u) {
+    battle *b;
+
+    *bp = b = make_battle(u->region);
+    return make_fighter(b, u, make_side(b, u->faction, 0, 0, 0), false);
+}
+
+static void test_calculate_armor(CuTest * tc)
+{
+    troop dt;
+    battle *b;
+    region *r;
+    unit *du;
+    weapon_type *wtype;
+    armor_type *ashield, *achain;
+    item_type *ibelt, *ishield, *ichain;
+    race *rc;
+    double magres = 0.0;
+
+    test_cleanup();
+    r = test_create_region(0, 0, 0);
+    ibelt = it_get_or_create(rt_get_or_create("trollbelt"));
+    ishield = it_get_or_create(rt_get_or_create("shield"));
+    ashield = new_armortype(ishield, 0.0, 0.5, 1, ATF_SHIELD);
+    ichain = it_get_or_create(rt_get_or_create("chainmail"));
+    achain = new_armortype(ichain, 0.0, 0.5, 3, ATF_NONE);
+    wtype = new_weapontype(it_get_or_create(rt_get_or_create("sword")), 0, 0.5, 0, 0, 0, 0, SK_MELEE, 1);
+    rc = test_create_race("human");
+    du = test_create_unit(test_create_faction(rc), r);
+    dt.index = 0;
+
+    dt.fighter = setup_fighter(&b, du);
+    CuAssertIntEquals_Msg(tc, "default ac", 0, calculate_armor(dt, 0, 0, &magres));
+    CuAssertDblEquals_Msg(tc, "magres unmodified", 0.0, magres, 0.01);
+    free_battle(b);
+
+    i_change(&du->items, ibelt, 1);
+    dt.fighter = setup_fighter(&b, du);
+    CuAssertIntEquals_Msg(tc, "magical armor", 1, calculate_armor(dt, 0, 0, 0));
+    rc->armor = 2;
+    CuAssertIntEquals_Msg(tc, "natural armor", 3, calculate_armor(dt, 0, 0, 0));
+    rc->armor = 0;
+    free_battle(b);
+
+    i_change(&du->items, ishield, 1);
+    i_change(&du->items, ichain, 1);
+    dt.fighter = setup_fighter(&b, du);
+    CuAssertIntEquals_Msg(tc, "require BF_EQUIPMENT", 1, calculate_armor(dt, 0, 0, 0));
+    free_battle(b);
+
+    rc->battle_flags |= BF_EQUIPMENT;
+    dt.fighter = setup_fighter(&b, du);
+    CuAssertIntEquals_Msg(tc, "stack equipment rc", 5, calculate_armor(dt, 0, 0, 0));
+    rc->armor = 2;
+    CuAssertIntEquals_Msg(tc, "natural armor adds 50%", 6, calculate_armor(dt, 0, 0, 0));
+    wtype->flags = WTF_NONE;
+    CuAssertIntEquals_Msg(tc, "regular weapon has no effect", 6, calculate_armor(dt, 0, wtype, 0));
+    wtype->flags = WTF_ARMORPIERCING;
+    CuAssertIntEquals_Msg(tc, "armor piercing weapon", 3, calculate_armor(dt, 0, wtype, 0));
+    wtype->flags = WTF_NONE;
+
+    CuAssertIntEquals_Msg(tc, "magical attack", 3, calculate_armor(dt, 0, 0, &magres));
+    CuAssertDblEquals_Msg(tc, "magres unmodified", 0.0, magres, 0.01);
+
+    ashield->flags |= ATF_LAEN;
+    achain->flags |= ATF_LAEN;
+    magres = 1.0;
+    CuAssertIntEquals_Msg(tc, "laen armor", 3, calculate_armor(dt, 0, 0, &magres));
+    CuAssertDblEquals_Msg(tc, "laen magres bonus", 0.25, magres, 0.01);
+    free_battle(b);
+    test_cleanup();
+}
+
+static void test_projectile_armor(CuTest * tc)
+{
+    troop dt;
+    battle *b;
+    region *r;
+    unit *du;
+    weapon_type *wtype;
+    armor_type *ashield, *achain;
+    item_type *ishield, *ichain;
+    race *rc;
+
+    test_cleanup();
+    r = test_create_region(0, 0, 0);
+    ishield = it_get_or_create(rt_get_or_create("shield"));
+    ashield = new_armortype(ishield, 0.0, 0.5, 1, ATF_SHIELD);
+    ichain = it_get_or_create(rt_get_or_create("chainmail"));
+    achain = new_armortype(ichain, 0.0, 0.5, 3, ATF_NONE);
+    wtype = new_weapontype(it_get_or_create(rt_get_or_create("sword")), 0, 0.5, 0, 0, 0, 0, SK_MELEE, 1);
+    rc = test_create_race("human");
+    rc->battle_flags |= BF_EQUIPMENT;
+    du = test_create_unit(test_create_faction(rc), r);
+    dt.index = 0;
+
+    i_change(&du->items, ishield, 1);
+    i_change(&du->items, ichain, 1);
+    dt.fighter = setup_fighter(&b, du);
+    wtype->flags = WTF_MISSILE;
+    achain->projectile = 1.0;
+    CuAssertIntEquals_Msg(tc, "projectile armor", -1, calculate_armor(dt, 0, wtype, 0));
+    achain->projectile = 0.0;
+    ashield->projectile = 1.0;
+    CuAssertIntEquals_Msg(tc, "projectile shield", -1, calculate_armor(dt, 0, wtype, 0));
+    wtype->flags = WTF_NONE;
+    CuAssertIntEquals_Msg(tc, "no projectiles", 4, calculate_armor(dt, 0, wtype, 0));
+    free_battle(b);
+    test_cleanup();
+}
+
 CuSuite *get_battle_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -212,5 +323,7 @@ CuSuite *get_battle_suite(void)
     SUITE_ADD_TEST(suite, test_attackers_get_no_building_bonus);
     SUITE_ADD_TEST(suite, test_building_bonus_respects_size);
     SUITE_ADD_TEST(suite, test_building_defence_bonus);
+    SUITE_ADD_TEST(suite, test_calculate_armor);
+    SUITE_ADD_TEST(suite, test_projectile_armor);
     return suite;
 }

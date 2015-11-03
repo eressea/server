@@ -1078,6 +1078,81 @@ static int rc_specialdamage(const unit *au, const unit *du, const struct weapon_
     return modifier;
 }
 
+int calculate_armor(troop dt, const weapon_type *dwtype, const weapon_type *awtype, double *magres) {
+    static int rule_armor = -1;
+    fighter *df = dt.fighter;
+    unit *du = df->unit;
+    int ar = 0, an, am;
+    const armor_type *armor = select_armor(dt, false);
+    const armor_type *shield = select_armor(dt, true);
+    bool missile = awtype && (awtype->flags&WTF_MISSILE);
+
+    if (armor) {
+        ar += armor->prot;
+        if (missile && armor->projectile > 0 && chance(armor->projectile)) {
+            return -1;
+        }
+    }
+    if (shield) {
+        ar += shield->prot;
+        if (missile && shield->projectile > 0 && chance(shield->projectile)) {
+            return -1;
+        }
+    }
+
+    /* natürliche Rüstung */
+    an = natural_armor(du);
+
+    /* magische Rüstung durch Artefakte oder Sprüche */
+    /* Momentan nur Trollgürtel und Werwolf-Eigenschaft */
+    am = select_magicarmor(dt);
+
+    if (rule_armor < 0) {
+        rule_armor = get_param_int(global.parameters, "rules.combat.nat_armor", 0);
+    }
+    if (rule_armor == 0) {
+        /* natürliche Rüstung ist halbkumulativ */
+        if (ar > 0) {
+            ar += an / 2;
+        }
+        else {
+            ar = an;
+        }
+    }
+    else {
+        /* use the higher value, add half the other value */
+        ar = (ar > an) ? (ar + an / 2) : (an + ar / 2);
+    }
+
+    if (awtype && fval(awtype, WTF_ARMORPIERCING)) {
+        /* crossbows */
+        ar /= 2;
+    }
+
+    ar += am;
+
+    if (magres) {
+        /* magic_resistance gib x% Resistenzbonus zurück */
+        double res = *magres - magic_resistance(du) * 3.0;
+
+        if (u_race(du)->battle_flags & BF_EQUIPMENT) {
+            /* der Effekt von Laen steigt nicht linear */
+            if (armor && fval(armor, ATF_LAEN))
+                res *= (1 - armor->magres);
+            if (shield && fval(shield, ATF_LAEN))
+                res *= (1 - shield->magres);
+            if (dwtype)
+                res *= (1 - dwtype->magres);
+        }
+
+        /* gegen Magie wirkt nur natürliche und magische Rüstung */
+        ar = an + am;
+        *magres = res;
+    }
+
+    return ar;
+}
+
 bool
 terminate(troop dt, troop at, int type, const char *damage, bool missile)
 {
@@ -1088,19 +1163,15 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
     unit *du = df->unit;
     battle *b = df->side->battle;
     int heiltrank = 0;
-    static int rule_armor = -1;
 
     /* Schild */
     side *ds = df->side;
-    int hp;
-
-    int ar = 0, an, am;
-    const armor_type *armor = select_armor(dt, false);
-    const armor_type *shield = select_armor(dt, true);
+    int hp, ar;
 
     const weapon_type *dwtype = NULL;
     const weapon_type *awtype = NULL;
     const weapon *weapon;
+    double res = 0.0;
 
     int rda, sk = 0, sd;
     bool magic = false;
@@ -1138,49 +1209,14 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
         da += CavalryBonus(au, dt, BONUS_DAMAGE);
     }
 
-    if (armor) {
-        ar += armor->prot;
-        if (armor->projectile > 0 && chance(armor->projectile)) {
-            return false;
-        }
-    }
-    if (shield) {
-        ar += shield->prot;
-        if (shield->projectile > 0 && chance(shield->projectile)) {
-            return false;
-        }
+    ar = calculate_armor(dt, dwtype, awtype, magic ? &res : 0);
+    if (ar < 0) {
+        return false;
     }
 
-    /* natürliche Rüstung */
-    an = natural_armor(du);
-
-    /* magische Rüstung durch Artefakte oder Sprüche */
-    /* Momentan nur Trollgürtel und Werwolf-Eigenschaft */
-    am = select_magicarmor(dt);
-
-    if (rule_armor < 0) {
-        rule_armor = get_param_int(global.parameters, "rules.combat.nat_armor", 0);
+    if (magic) {
+        da = (int)(_max(da * res, 0));
     }
-    if (rule_armor == 0) {
-        /* natürliche Rüstung ist halbkumulativ */
-        if (ar > 0) {
-            ar += an / 2;
-        }
-        else {
-            ar = an;
-        }
-    }
-    else {
-        /* use the higher value, add half the other value */
-        ar = (ar > an) ? (ar + an / 2) : (an + ar / 2);
-    }
-
-    if (awtype && fval(awtype, WTF_ARMORPIERCING)) {
-        /* crossbows */
-        ar /= 2;
-    }
-
-    ar += am;
 
     if (type != AT_COMBATSPELL && type != AT_SPELL) {
         if (damage_rules & DAMAGE_CRITICAL) {
@@ -1216,30 +1252,6 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
         if (damage_rules & DAMAGE_SKILL_BONUS) {
             da += _max(0, (sk - sd) / DAMAGE_QUOTIENT);
         }
-    }
-
-    if (magic) {
-        /* Magischer Schaden durch Spruch oder magische Waffe */
-        double res = 1.0;
-
-        /* magic_resistance gib x% Resistenzbonus zurück */
-        res -= magic_resistance(du) * 3.0;
-
-        if (u_race(du)->battle_flags & BF_EQUIPMENT) {
-            /* der Effekt von Laen steigt nicht linear */
-            if (armor && fval(armor, ATF_LAEN))
-                res *= (1 - armor->magres);
-            if (shield && fval(shield, ATF_LAEN))
-                res *= (1 - shield->magres);
-            if (dwtype)
-                res *= (1 - dwtype->magres);
-        }
-
-        if (res > 0) {
-            da = (int)(_max(da * res, 0));
-        }
-        /* gegen Magie wirkt nur natürliche und magische Rüstung */
-        ar = an + am;
     }
 
     rda = _max(da - ar, 0);
