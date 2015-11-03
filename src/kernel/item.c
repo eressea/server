@@ -277,7 +277,7 @@ weapon_type *new_weapontype(item_type * itype,
     weapon_type *wtype;
 
     assert(minskill > 0);
-    assert(resource2weapon(itype->rtype) == NULL);
+    assert(itype && (!itype->rtype || !resource2weapon(itype->rtype)));
 
     wtype = calloc(sizeof(weapon_type), 1);
     if (damage) {

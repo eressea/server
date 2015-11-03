@@ -1089,13 +1089,13 @@ int calculate_armor(troop dt, const weapon_type *dwtype, const weapon_type *awty
     if (armor) {
         ar += armor->prot;
         if (armor->projectile > 0 && chance(armor->projectile)) {
-            return false;
+            return -1;
         }
     }
     if (shield) {
         ar += shield->prot;
         if (shield->projectile > 0 && chance(shield->projectile)) {
-            return false;
+            return -1;
         }
     }
 
@@ -1209,6 +1209,9 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
     }
 
     ar = calculate_armor(dt, dwtype, awtype, magic ? &res : 0);
+    if (ar < 0) {
+        return false;
+    }
 
     if (magic) {
         da = (int)(_max(da * res, 0));
