@@ -54,6 +54,7 @@ const terrain_type *random_terrain(const terrain_type * terrains[],
     const terrain_type *terrain;
     int n;
 
+    assert(size > 0);
     if (distribution) {
         ndistribution = 0;
         for (n = 0; n != size; ++n) {
