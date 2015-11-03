@@ -97,7 +97,12 @@ char * transliterate(char * out, size_t size, const char * in)
             }
             else {
                 ucs4_t ucs;
-                unicode_utf8_to_ucs4(&ucs, src, &len);
+                int ret = unicode_utf8_to_ucs4(&ucs, src, &len);
+                if (ret != 0) {
+                    /* encoding is broken. yikes */
+                    log_error("transliterate | encoding error in '%s'\n", src);
+                    return NULL;
+                }
                 src += len;
                 *dst++ = '?';
                 --size;
