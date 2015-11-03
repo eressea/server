@@ -20,6 +20,8 @@ extern "C" {
     struct building_type;
     struct ship_type;
     struct terrain_type;
+    struct castorder;
+    struct spellparameter;
 
     struct CuTest;
 
@@ -37,6 +39,7 @@ extern "C" {
     struct item_type * test_create_itemtype(const char * name);
     struct ship_type *test_create_shiptype(const char * name);
     struct building_type *test_create_buildingtype(const char *name);
+    void test_create_castorder(struct castorder *co, struct unit *u, int level, float force, int range, struct spellparameter *par);
 
     int RunAllTests(void);
     void test_translate_param(const struct locale *lang, param_t param, const char *text);

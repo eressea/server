@@ -208,6 +208,7 @@ set(TESTS_SRC
   spy.test.c
   study.test.c
   upkeep.test.c
+  spells/flyingship.test.c
   spells/magicresistance.test.c
   ${ATTRIBUTES_TESTS}
   ${UTIL_TESTS}
