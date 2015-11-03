@@ -1116,7 +1116,6 @@ double magic_resistance(unit * target)
 {
     attrib *a;
     curse *c;
-    int n;
     const curse_type * ct_goodresist = 0, *ct_badresist = 0;
     const resource_type *rtype;
     double probability = u_race(target)->magres;
@@ -1133,9 +1132,11 @@ double magic_resistance(unit * target)
 
     /* Unicorn +10 */
     rtype = get_resourcetype(R_UNICORN);
-    n = i_get(target->items, rtype->itype);
-    if (n) {
-        probability += n * 0.1 / target->number;
+    if (rtype) {
+        int n = i_get(target->items, rtype->itype);
+        if (n) {
+            probability += n * 0.1 / target->number;
+        }
     }
 
     /* Auswirkungen von Zaubern auf der Region */
