@@ -232,8 +232,8 @@ static void test_calculate_armor(CuTest * tc)
     achain = new_armortype(ichain, 0.0, 0.5, 3, ATF_NONE);
     wtype = new_weapontype(it_get_or_create(rt_get_or_create("sword")), 0, 0.5, 0, 0, 0, 0, SK_MELEE, 1);
     rc = test_create_race("human");
-    dt.index = 0;
     du = test_create_unit(test_create_faction(rc), r);
+    dt.index = 0;
 
     dt.fighter = setup_fighter(&b, du);
     CuAssertIntEquals_Msg(tc, "default ac", 0, calculate_armor(dt, 0, 0, &magres));
@@ -277,6 +277,44 @@ static void test_calculate_armor(CuTest * tc)
     test_cleanup();
 }
 
+static void test_projectile_armor(CuTest * tc)
+{
+    troop dt;
+    battle *b;
+    region *r;
+    unit *du;
+    weapon_type *wtype;
+    armor_type *ashield, *achain;
+    item_type *ishield, *ichain;
+    race *rc;
+
+    test_cleanup();
+    r = test_create_region(0, 0, 0);
+    ishield = it_get_or_create(rt_get_or_create("shield"));
+    ashield = new_armortype(ishield, 0.0, 0.5, 1, ATF_SHIELD);
+    ichain = it_get_or_create(rt_get_or_create("chainmail"));
+    achain = new_armortype(ichain, 0.0, 0.5, 3, ATF_NONE);
+    wtype = new_weapontype(it_get_or_create(rt_get_or_create("sword")), 0, 0.5, 0, 0, 0, 0, SK_MELEE, 1);
+    rc = test_create_race("human");
+    rc->battle_flags |= BF_EQUIPMENT;
+    du = test_create_unit(test_create_faction(rc), r);
+    dt.index = 0;
+
+    i_change(&du->items, ishield, 1);
+    i_change(&du->items, ichain, 1);
+    dt.fighter = setup_fighter(&b, du);
+    wtype->flags = WTF_MISSILE;
+    achain->projectile = 1.0;
+    CuAssertIntEquals_Msg(tc, "projectile armor", -1, calculate_armor(dt, 0, wtype, 0));
+    achain->projectile = 0.0;
+    ashield->projectile = 1.0;
+    CuAssertIntEquals_Msg(tc, "projectile shield", -1, calculate_armor(dt, 0, wtype, 0));
+    wtype->flags = WTF_NONE;
+    CuAssertIntEquals_Msg(tc, "no projectiles", 4, calculate_armor(dt, 0, wtype, 0));
+    free_battle(b);
+    test_cleanup();
+}
+
 CuSuite *get_battle_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -286,5 +324,6 @@ CuSuite *get_battle_suite(void)
     SUITE_ADD_TEST(suite, test_building_bonus_respects_size);
     SUITE_ADD_TEST(suite, test_building_defence_bonus);
     SUITE_ADD_TEST(suite, test_calculate_armor);
+    SUITE_ADD_TEST(suite, test_projectile_armor);
     return suite;
 }
