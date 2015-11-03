@@ -1085,16 +1085,17 @@ int calculate_armor(troop dt, const weapon_type *dwtype, const weapon_type *awty
     int ar = 0, an, am;
     const armor_type *armor = select_armor(dt, false);
     const armor_type *shield = select_armor(dt, true);
+    bool missile = awtype && (awtype->flags&WTF_MISSILE);
 
     if (armor) {
         ar += armor->prot;
-        if (armor->projectile > 0 && chance(armor->projectile)) {
+        if (missile && armor->projectile > 0 && chance(armor->projectile)) {
             return -1;
         }
     }
     if (shield) {
         ar += shield->prot;
-        if (shield->projectile > 0 && chance(shield->projectile)) {
+        if (missile && shield->projectile > 0 && chance(shield->projectile)) {
             return -1;
         }
     }
