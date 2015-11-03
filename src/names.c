@@ -421,8 +421,7 @@ const char *abkz(const char *s, char *buf, size_t buflen, size_t maxchars)
     }
 
     /* Buchstaben pro Teilkürzel = _max(1,max/AnzWort) */
-
-    bpt = _max(1, maxchars / c);
+    bpt = (c > 0) ? _max(1, maxchars / c) : 1;
 
     /* Einzelne Wörter anspringen und jeweils die ersten BpT kopieren */
 
