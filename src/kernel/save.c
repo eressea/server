@@ -1428,9 +1428,14 @@ int readgame(const char *filename, bool backup)
 
         READ_INT(&store, &gameid);
         if (gameid != game_id()) {
-            log_warning("game mismatch: datafile contains game %d, but config is for %d\n", gameid, game_id());
+            int c;
+            log_warning("game mismatch: datafile contains game %d, but config is for %d", gameid, game_id());
             printf("WARNING: invalid game id. any key to continue, Ctrl-C to stop\n");
-            getchar();
+            c = getchar();
+            if (c == EOF) {
+                log_error("aborting.");
+                abort();
+            }
         }
     }
     else {
