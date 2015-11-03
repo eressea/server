@@ -4617,6 +4617,11 @@
       Stimmung unter den Bauern. Einige Wochen lang werden sie sich in ihre 
       Hütten zurückziehen und kein Silber in den Theatern und Tavernen lassen.
       </text>
+      <text locale="en">
+      With this chant the bard spreads a melancholic, sad mood among the 
+      peasants. For a few weeks they will retreat to their huts and not 
+      spend any silver in the theatres and taverns.
+      </text>
     </string>
     <string name="song_resist_magic">
       <text locale="de">
@@ -4639,6 +4644,13 @@
       werden zudem einige der Bauern den Bann abwerfen und auf ihre Felder 
       zurückkehren. Wie viele Bauern sich dem Magier anschließen hängt von der 
       Kraft seines Gesangs ab.
+      </text>
+      <text locale="en">
+      Employing this magic chant the mage convinces the peasants of the region 
+      to join him. The peasants won't leave their home region and won't give up 
+      their possessions, though. Additionally each week some peasants will 
+      shake off the spell and return to their fields. How many peasants join 
+      the mage depends on the power of his chant.
       </text>
     </string>
     <string name="migration">
@@ -4689,6 +4701,14 @@
       Tode und niemals fliehen. Während ihre Attacke verstärkt ist
       achten sie kaum auf sich selbst.
       </text>
+      <text locale="en">
+      Like many magic chants this one also originates from the ancient 
+      knowledge of the cats who always were aware of the powerful effect 
+      of the voice. This song inflames the temper of the warriors, enrages 
+      them even, into a murderous frenzy. Ignoring their own pain, they fight 
+      until death and will never flee from battle. They fight with little 
+      regard for themselves.
+      </text>
     </string>
     <string name="sound_out">
       <text locale="de">
@@ -4705,6 +4725,11 @@
       schenkt. Sie behält jedoch immer soviel, wie sie zum Überleben 
       braucht.
       </text>
+      <text locale="en">
+      With this song a unit can be bewitched in a manner, which compels 
+      them to bequeath a large portion of their possessions to the bard. 
+      They will keep enough for their own survival, though.
+      </text>
     </string>
     <string name="calm_monster">
       <text locale="de">
@@ -4713,12 +4738,21 @@
       Begleiter nicht anrühren. Doch sollte man sich nicht täuschen, es 
       wird dennoch ein unberechenbares Wesen bleiben.
       </text>
+      <text locale="en">
+      This disarming chant can tame almost any intelligent monster. It will 
+      refrain from attacks on the mage and his companions. But one should not 
+      deceive oneself about the persisting unpredictable nature of the creature.
+      </text>
     </string>
     <string name="bad_dreams">
       <text locale="de">
       Dieser Zauber ermöglicht es dem Träumer, den Schlaf aller nichtaliierten
       Einheiten (HELFE BEWACHE) in der Region so stark zu stören, das sie
       vorübergehend einen Teil ihrer Erinnerungen verlieren.
+      </text>
+      <text locale="en">
+      This spell enables the dreamer to disturb the sleep of all non-allied 
+      units (HELP GUARD) in the region so severely they lose parts of their memories.
       </text>
     </string>
     <string name="clone">
@@ -4730,8 +4764,18 @@
       Anschließend transferiert er in einem aufwändigen Ritual einen Teil 
       seiner Seele in den Klon. Stirbt der Magier, reist seine Seele in den 
       Klon und der erschaffene Körper dient nun dem Magier als neues Gefäß. 
-      Es besteht allerdings eine geringer Wahrscheinlichkeit, dass die Seele 
+      Es besteht allerdings eine geringe Wahrscheinlichkeit, dass die Seele 
       nach dem Tod zu schwach ist, das neue Gefäß zu erreichen.
+      </text>
+      <text locale="en">
+      This powerful spell can keep the mage from certain death. The mage 
+      creates a clone of himself from a small blood sample and puts it into 
+      a bath of dragon's blood and thinned water of life.
+      Subsequently he transfers a fragment of his soul into the clone in a 
+      complex ritual. If the mage dies afterwards, his soul takes possession 
+      of the clone which will serve as his new vessel. There is however a 
+      small chance the soul is to weak to reach the vessel in the wake of the 
+      mage's death.
       </text>
     </string>
     <string name="great_drought">
@@ -4756,6 +4800,12 @@
       das Gleichgewicht der Natur in der Region für immer verändert, und in 
       Zukunft werden nur noch die anspruchsvollen, aber kräftigen 
       Mallorngewächse in der Region gedeihen.
+      </text>
+      <text locale="en">
+      Through a elaborate ritual a druid permanently channels a fragment of his 
+      power into the soil and the forests of the region. This forever changes 
+      the equilibrium of nature in the region. From this point on only the 
+      fierce but strong mallorn trees will grow there.
       </text>
     </string>
     <string name="maelstrom">
