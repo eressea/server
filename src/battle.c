@@ -1078,65 +1078,13 @@ static int rc_specialdamage(const unit *au, const unit *du, const struct weapon_
     return modifier;
 }
 
-bool
-terminate(troop dt, troop at, int type, const char *damage, bool missile)
-{
-    item **pitm;
-    fighter *df = dt.fighter;
-    fighter *af = at.fighter;
-    unit *au = af->unit;
-    unit *du = df->unit;
-    battle *b = df->side->battle;
-    int heiltrank = 0;
+int calculate_armor(troop dt, const weapon_type *dwtype, const weapon_type *awtype, double *magres) {
     static int rule_armor = -1;
-
-    /* Schild */
-    side *ds = df->side;
-    int hp;
-
+    fighter *df = dt.fighter;
+    unit *du = df->unit;
     int ar = 0, an, am;
     const armor_type *armor = select_armor(dt, false);
     const armor_type *shield = select_armor(dt, true);
-
-    const weapon_type *dwtype = NULL;
-    const weapon_type *awtype = NULL;
-    const weapon *weapon;
-
-    int rda, sk = 0, sd;
-    bool magic = false;
-    int da = dice_rand(damage);
-
-    assert(du->number > 0);
-    ++at.fighter->hits;
-
-    switch (type) {
-    case AT_STANDARD:
-        weapon = select_weapon(at, true, missile);
-        sk = weapon_effskill(at, dt, weapon, true, missile);
-        if (weapon)
-            awtype = weapon->type;
-        if (awtype && fval(awtype, WTF_MAGICAL))
-            magic = true;
-        break;
-    case AT_NATURAL:
-        sk = weapon_effskill(at, dt, NULL, true, missile);
-        break;
-    case AT_SPELL:
-    case AT_COMBATSPELL:
-        magic = true;
-        break;
-    default:
-        break;
-    }
-    weapon = select_weapon(dt, false, true);      /* missile=true to get the unmodified best weapon she has */
-    sd = weapon_effskill(dt, at, weapon, false, false);
-    if (weapon != NULL)
-        dwtype = weapon->type;
-
-    if (is_riding(at) && (awtype == NULL || (fval(awtype, WTF_HORSEBONUS)
-        && !fval(awtype, WTF_MISSILE)))) {
-        da += CavalryBonus(au, dt, BONUS_DAMAGE);
-    }
 
     if (armor) {
         ar += armor->prot;
@@ -1182,6 +1130,90 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
 
     ar += am;
 
+    if (magres) {
+        /* magic_resistance gib x% Resistenzbonus zurück */
+        double res = *magres - magic_resistance(du) * 3.0;
+
+        if (u_race(du)->battle_flags & BF_EQUIPMENT) {
+            /* der Effekt von Laen steigt nicht linear */
+            if (armor && fval(armor, ATF_LAEN))
+                res *= (1 - armor->magres);
+            if (shield && fval(shield, ATF_LAEN))
+                res *= (1 - shield->magres);
+            if (dwtype)
+                res *= (1 - dwtype->magres);
+        }
+
+        /* gegen Magie wirkt nur natürliche und magische Rüstung */
+        ar = an + am;
+        *magres = res;
+    }
+
+    return ar;
+}
+
+bool
+terminate(troop dt, troop at, int type, const char *damage, bool missile)
+{
+    item **pitm;
+    fighter *df = dt.fighter;
+    fighter *af = at.fighter;
+    unit *au = af->unit;
+    unit *du = df->unit;
+    battle *b = df->side->battle;
+    int heiltrank = 0;
+
+    /* Schild */
+    side *ds = df->side;
+    int hp, ar;
+
+    const weapon_type *dwtype = NULL;
+    const weapon_type *awtype = NULL;
+    const weapon *weapon;
+    double res = 0.0;
+
+    int rda, sk = 0, sd;
+    bool magic = false;
+    int da = dice_rand(damage);
+
+    assert(du->number > 0);
+    ++at.fighter->hits;
+
+    switch (type) {
+    case AT_STANDARD:
+        weapon = select_weapon(at, true, missile);
+        sk = weapon_effskill(at, dt, weapon, true, missile);
+        if (weapon)
+            awtype = weapon->type;
+        if (awtype && fval(awtype, WTF_MAGICAL))
+            magic = true;
+        break;
+    case AT_NATURAL:
+        sk = weapon_effskill(at, dt, NULL, true, missile);
+        break;
+    case AT_SPELL:
+    case AT_COMBATSPELL:
+        magic = true;
+        break;
+    default:
+        break;
+    }
+    weapon = select_weapon(dt, false, true);      /* missile=true to get the unmodified best weapon she has */
+    sd = weapon_effskill(dt, at, weapon, false, false);
+    if (weapon != NULL)
+        dwtype = weapon->type;
+
+    if (is_riding(at) && (awtype == NULL || (fval(awtype, WTF_HORSEBONUS)
+        && !fval(awtype, WTF_MISSILE)))) {
+        da += CavalryBonus(au, dt, BONUS_DAMAGE);
+    }
+
+    ar = calculate_armor(dt, dwtype, awtype, magic ? &res : 0);
+
+    if (magic) {
+        da = (int)(_max(da * res, 0));
+    }
+
     if (type != AT_COMBATSPELL && type != AT_SPELL) {
         if (damage_rules & DAMAGE_CRITICAL) {
             double kritchance = (sk * 3 - sd) / 200.0;
@@ -1216,30 +1248,6 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
         if (damage_rules & DAMAGE_SKILL_BONUS) {
             da += _max(0, (sk - sd) / DAMAGE_QUOTIENT);
         }
-    }
-
-    if (magic) {
-        /* Magischer Schaden durch Spruch oder magische Waffe */
-        double res = 1.0;
-
-        /* magic_resistance gib x% Resistenzbonus zurück */
-        res -= magic_resistance(du) * 3.0;
-
-        if (u_race(du)->battle_flags & BF_EQUIPMENT) {
-            /* der Effekt von Laen steigt nicht linear */
-            if (armor && fval(armor, ATF_LAEN))
-                res *= (1 - armor->magres);
-            if (shield && fval(shield, ATF_LAEN))
-                res *= (1 - shield->magres);
-            if (dwtype)
-                res *= (1 - dwtype->magres);
-        }
-
-        if (res > 0) {
-            da = (int)(_max(da * res, 0));
-        }
-        /* gegen Magie wirkt nur natürliche und magische Rüstung */
-        ar = an + am;
     }
 
     rda = _max(da - ar, 0);

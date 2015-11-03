@@ -204,6 +204,31 @@ static void test_building_defence_bonus(CuTest * tc)
     test_cleanup();
 }
 
+static void test_calculate_armor(CuTest * tc)
+{
+    troop dt;
+    battle *b;
+    region *r;
+    unit *du;
+    side *ds;
+    fighter *df;
+    weapon_type *awtype = 0, *dwtype = 0;
+    int result;
+
+    test_cleanup();
+    r = test_create_region(0, 0, 0);
+    du = test_create_unit(test_create_faction(NULL), r);
+
+    b = make_battle(r);
+    ds = make_side(b, du->faction, 0, 0, 0);
+    df = make_fighter(b, du, ds, false);
+    dt.fighter = df;
+    dt.index = 0;
+    result = calculate_armor(dt, dwtype, awtype, 0);
+    CuAssertIntEquals(tc, 0, result);
+    test_cleanup();
+}
+
 CuSuite *get_battle_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -212,5 +237,6 @@ CuSuite *get_battle_suite(void)
     SUITE_ADD_TEST(suite, test_attackers_get_no_building_bonus);
     SUITE_ADD_TEST(suite, test_building_bonus_respects_size);
     SUITE_ADD_TEST(suite, test_building_defence_bonus);
+    SUITE_ADD_TEST(suite, test_calculate_armor);
     return suite;
 }
