@@ -35,6 +35,7 @@ static int tolua_storage_create(lua_State * L)
     const char *type = tolua_tostring(L, 2, "rb");
     FILE * F;
     int err = 0;
+    size_t sz;
 
     F = fopen(filename, type);
     if (F) {
@@ -42,8 +43,13 @@ static int tolua_storage_create(lua_State * L)
         storage *store = (storage *)calloc(1, sizeof(storage));
         data->store = store;
         if (strchr(type, 'r')) {
-            fread(&data->version, sizeof(int), 1, F);
-            err = fseek(F, sizeof(int), SEEK_CUR);
+            sz = fread(&data->version, sizeof(int), 1, F);
+            if (sz != sizeof(int)) {
+                err = ferror(F);
+            } 
+            else {
+                err = fseek(F, sizeof(int), SEEK_CUR);
+            }
         }
         else if (strchr(type, 'w')) {
             int n = STREAM_VERSION;
