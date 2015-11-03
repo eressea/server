@@ -37,6 +37,5 @@
  */
 #define MUSEUM_MODULE 1
 #define ARENA_MODULE 1
-#define CHANGED_CROSSBOWS 0     /* use the WTF_ARMORPIERCING flag */
 
 #undef REGIONOWNERS             /* (WIP) region-owner uses HELP_TRAVEL to control entry to region */
