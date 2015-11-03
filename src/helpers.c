@@ -547,25 +547,25 @@ void register_tolua_helpers(void)
     at_register(&at_direction);
     at_register(&at_building_action);
 
-    register_function((pf_generic)& lua_building_taxes,
+    register_function((pf_generic)lua_building_taxes,
         TOLUA_CAST "lua_building_taxes");
-    register_function((pf_generic)& lua_agebuilding,
+    register_function((pf_generic)lua_agebuilding,
         TOLUA_CAST "lua_agebuilding");
-    register_function((pf_generic)& lua_callspell, TOLUA_CAST "lua_castspell");
-    register_function((pf_generic)& lua_initfamiliar,
+    register_function((pf_generic)lua_callspell, TOLUA_CAST "lua_castspell");
+    register_function((pf_generic)lua_initfamiliar,
         TOLUA_CAST "lua_initfamiliar");
     register_item_use(&lua_useitem, TOLUA_CAST "lua_useitem");
-    register_function((pf_generic)& lua_getresource,
+    register_function((pf_generic)lua_getresource,
         TOLUA_CAST "lua_getresource");
-    register_function((pf_generic)& lua_canuse_item,
+    register_function((pf_generic)lua_canuse_item,
         TOLUA_CAST "lua_canuse_item");
-    register_function((pf_generic)& lua_changeresource,
+    register_function((pf_generic)lua_changeresource,
         TOLUA_CAST "lua_changeresource");
-    register_function((pf_generic)& lua_equipmentcallback,
+    register_function((pf_generic)lua_equipmentcallback,
         TOLUA_CAST "lua_equip");
 
-    register_function((pf_generic)& lua_wage, TOLUA_CAST "lua_wage");
-    register_function((pf_generic)& lua_maintenance,
+    register_function((pf_generic)lua_wage, TOLUA_CAST "lua_wage");
+    register_function((pf_generic)lua_maintenance,
         TOLUA_CAST "lua_maintenance");
 
     register_function((pf_generic)produce_resource,

@@ -357,14 +357,14 @@ static int meropis_building_protection(building * b, unit * u)
 
 void register_buildings(void)
 {
-    register_function((pf_generic)& building_protection,
+    register_function((pf_generic)building_protection,
         "building_protection");
-    register_function((pf_generic)& meropis_building_protection,
+    register_function((pf_generic)meropis_building_protection,
         "meropis_building_protection");
-    register_function((pf_generic)& init_smithy, "init_smithy");
-    register_function((pf_generic)& castle_name, "castle_name");
-    register_function((pf_generic)& castle_name_2, "castle_name_2");
-    register_function((pf_generic)& fort_name, "fort_name");
+    register_function((pf_generic)init_smithy, "init_smithy");
+    register_function((pf_generic)castle_name, "castle_name");
+    register_function((pf_generic)castle_name_2, "castle_name_2");
+    register_function((pf_generic)fort_name, "fort_name");
 }
 
 void write_building_reference(const struct building *b, struct storage *store)
