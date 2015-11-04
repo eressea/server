@@ -165,8 +165,8 @@ struct order *ord)
     else if (n == 0) {
         int reserve = get_reservation(src, itype);
         if (reserve) {
-            msg_feedback(src, ord, "nogive_reserved", "resource reservation",
-                itype->rtype, reserve);
+            ADDMSG(&src->faction->msgs, msg_feedback(src, ord, "nogive_reserved", "resource reservation",
+                itype->rtype, reserve));
             return -1;
         }
         error = 36;
