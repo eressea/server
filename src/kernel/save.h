@@ -42,44 +42,46 @@ extern "C" {
     /* Nach MAX_INPUT_SIZE brechen wir das Einlesen der Zeile ab und nehmen an,
      * dass hier ein Fehler (fehlende ") vorliegt */
 
+    extern int data_version;
+    extern int enc_gamedata;
+
     int readorders(const char *filename);
     int creategame(void);
     int readgame(const char *filename, bool backup);
     int writegame(const char *filename);
 
-    /* Versionsänderungen: */
-    extern int data_version;
-    extern int enc_gamedata;
+    int current_turn(void);
 
-    extern int current_turn(void);
+    void read_items(struct storage *store, struct item **it);
+    void write_items(struct storage *store, struct item *it);
 
-    extern void read_items(struct storage *store, struct item **it);
-    extern void write_items(struct storage *store, struct item *it);
+    void read_spellbook(struct spellbook **bookp, struct storage *store, int(*get_level)(const struct spell * sp, void *), void * cbdata);
+    void write_spellbook(const struct spellbook *book, struct storage *store);
 
-    extern void read_spellbook(struct spellbook **bookp, struct storage *store, int(*get_level)(const struct spell * sp, void *), void * cbdata);
-    extern void write_spellbook(const struct spellbook *book, struct storage *store);
+    void write_unit(struct gamedata *data, const struct unit *u);
+    struct unit *read_unit(struct gamedata *data);
 
-    extern void write_unit(struct gamedata *data, const struct unit *u);
-    extern struct unit *read_unit(struct gamedata *data);
+    int a_readint(struct attrib *a, void *owner, struct storage *store);
+    void a_writeint(const struct attrib *a, const void *owner,
+        struct storage *store);
+    int a_readshorts(struct attrib *a, void *owner, struct storage *store);
+    void a_writeshorts(const struct attrib *a, const void *owner,
+        struct storage *store);
+    int a_readchars(struct attrib *a, void *owner, struct storage *store);
+    void a_writechars(const struct attrib *a, const void *owner,
+        struct storage *store);
+    int a_readvoid(struct attrib *a, void *owner, struct storage *store);
+    void a_writevoid(const struct attrib *a, const void *owner,
+        struct storage *store);
+    int a_readstring(struct attrib *a, void *owner, struct storage *store);
+    void a_writestring(const struct attrib *a, const void *owner,
+        struct storage *store);
+    void a_finalizestring(struct attrib *a);
 
-    extern int a_readint(struct attrib *a, void *owner, struct storage *store);
-    extern void a_writeint(const struct attrib *a, const void *owner,
-    struct storage *store);
-    extern int a_readshorts(struct attrib *a, void *owner, struct storage *store);
-    extern void a_writeshorts(const struct attrib *a, const void *owner,
-    struct storage *store);
-    extern int a_readchars(struct attrib *a, void *owner, struct storage *store);
-    extern void a_writechars(const struct attrib *a, const void *owner,
-    struct storage *store);
-    extern int a_readvoid(struct attrib *a, void *owner, struct storage *store);
-    extern void a_writevoid(const struct attrib *a, const void *owner,
-    struct storage *store);
-    extern int a_readstring(struct attrib *a, void *owner, struct storage *store);
-    extern void a_writestring(const struct attrib *a, const void *owner,
-    struct storage *store);
-    extern void a_finalizestring(struct attrib *a);
+    void create_backup(char *file);
 
-    extern void create_backup(char *file);
+    struct gamedata *gamedata_open(const char *filename, const char *mode);
+    void gamedata_close(struct gamedata *data);
 
 #ifdef __cplusplus
 }

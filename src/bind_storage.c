@@ -33,40 +33,12 @@ static int tolua_storage_create(lua_State * L)
 {
     const char *filename = tolua_tostring(L, 1, 0);
     const char *type = tolua_tostring(L, 2, "rb");
-    FILE * F;
-    int err = 0;
-    size_t sz;
+    gamedata *data;
 
-    F = fopen(filename, type);
-    if (F) {
-        gamedata *data = (gamedata *)calloc(1, sizeof(gamedata));
-        storage *store = (storage *)calloc(1, sizeof(storage));
-        data->store = store;
-        if (strchr(type, 'r')) {
-            sz = fread(&data->version, sizeof(int), 1, F);
-            if (sz != sizeof(int)) {
-                err = ferror(F);
-            } 
-            else {
-                err = fseek(F, sizeof(int), SEEK_CUR);
-            }
-        }
-        else if (strchr(type, 'w')) {
-            int n = STREAM_VERSION;
-            data->version = RELEASE_VERSION;
-            fwrite(&data->version, sizeof(int), 1, F);
-            fwrite(&n, sizeof(int), 1, F);
-        }
-        if (err) {
-            fclose(F);
-            free(data);
-            free(store);
-        } else {
-            fstream_init(&data->strm, F);
-            binstore_init(store, &data->strm);
-            tolua_pushusertype(L, (void *)data, TOLUA_CAST "storage");
-            return 1;
-        }
+    data = gamedata_open(filename, type);
+    if (data) {
+        tolua_pushusertype(L, (void *)data, TOLUA_CAST "storage");
+        return 1;
     }
     return 0;
 }
@@ -134,8 +106,7 @@ static int tolua_storage_tostring(lua_State * L)
 static int tolua_storage_close(lua_State * L)
 {
     gamedata *data = (gamedata *)tolua_tousertype(L, 1, 0);
-    binstore_done(data->store);
-    fstream_done(&data->strm);
+    gamedata_close(data);
     return 0;
 }
 
