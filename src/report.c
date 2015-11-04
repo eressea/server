@@ -2361,11 +2361,6 @@ const char *charset)
                 newline(out);
                 write_travelthru(out, r, f);
             }
-            else if (sr->mode == see_lighthouse) {
-                describe(out, sr, f);
-                newline(out);
-                write_travelthru(out, r, f);
-            }
             else {
                 describe(out, sr, f);
                 newline(out);
