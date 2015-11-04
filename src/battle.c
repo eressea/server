@@ -3247,7 +3247,6 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     int berserk;
     int strongmen;
     int speeded = 0, speed = 1;
-    bool pr_aid = false;
     int rest;
     const group *g = NULL;
     const attrib *a = a_find(u->attribs, &at_otherfaction);
@@ -3347,14 +3346,6 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
 
         if (i < berserk) {
             fig->person[i].attack++;
-        }
-        /* Leute mit einem Aid-Prayer bekommen +1 auf fast alles. */
-        if (pr_aid) {
-            fig->person[i].attack++;
-            fig->person[i].defence++;
-            fig->person[i].damage++;
-            fig->person[i].damage_rear++;
-            fig->person[i].flags |= FL_COURAGE;
         }
         /* Leute mit Kraftzauber machen +2 Schaden im Nahkampf. */
         if (i < strongmen) {
