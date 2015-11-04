@@ -4258,9 +4258,10 @@ static bool is_enemy(battle *b, unit *u1, unit *u2) {
             for (es = b->sides; es != b->sides + b->nsides; ++es) {
                 if (!s1 && es->faction == u1->faction) s1 = es;
                 else if (!s2 && es->faction == u2->faction) s2 = es;
-                if (s1 && s2) break;
+                if (s1 && s2) {
+                    return enemy(s1, s2);
+                }
             }
-            return enemy(s1, s2);
         }
         else {
             return !help_enter(u1, u2);
