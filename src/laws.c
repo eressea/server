@@ -4525,7 +4525,7 @@ void update_subscriptions(void)
         int subscription, fno;
         faction *f;
 
-        if (fscanf(F, "%d %s", &subscription, zFaction) <= 0)
+        if (fscanf(F, "%d %4s", &subscription, zFaction) <= 0)
             break;
         fno = atoi36(zFaction);
         f = findfaction(fno);
