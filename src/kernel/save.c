@@ -553,8 +553,11 @@ int current_turn(void)
         perror(zText);
     }
     else {
-        fscanf(F, "%d\n", &cturn);
+        int c = fscanf(F, "%d\n", &cturn);
         fclose(F);
+        if (c != 1) {
+            return -1;
+        }
     }
     return cturn;
 }

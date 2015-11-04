@@ -51,7 +51,7 @@ extern "C" {
     extern int data_version;
     extern int enc_gamedata;
 
-    extern int current_turn(void);
+    int current_turn(void);
 
     extern void read_items(struct storage *store, struct item **it);
     extern void write_items(struct storage *store, struct item *it);
