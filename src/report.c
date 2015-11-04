@@ -2330,7 +2330,7 @@ const char *charset)
                 message *m = 0;
                 if (herb && lux) {
                     m = msg_message("nr_market_info_p", "p1 p2",
-                        lux ? lux->rtype : 0, herb ? herb->rtype : 0);
+                        lux->rtype, herb->rtype);
                 }
                 else if (lux || herb) {
                     m = msg_message("nr_market_info_s", "p1",
