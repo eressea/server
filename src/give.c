@@ -403,7 +403,7 @@ void give_unit(unit * u, unit * u2, order * ord)
     int maxt = max_transfers();
 
     assert(u);
-    if (!rule_transfermen() && u->faction != u2->faction) {
+    if (!rule_transfermen() && u2 && u->faction != u2->faction) {
         cmistake(u, ord, 74, MSG_COMMERCE);
         return;
     }
