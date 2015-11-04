@@ -91,7 +91,7 @@ static const char *make_names(const char *monster, int *num_postfix,
     uu = rng_int() % *num_name;
 
     /* nur 50% aller Namen haben "Nach-Teil", wenn kein Vor-Teil */
-    if (uv >= *num_prefix) {
+    if (*num_prefix > 0 && uv >= *num_prefix) {
         un = rng_int() % *num_postfix;
     }
     else {
