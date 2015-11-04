@@ -78,23 +78,23 @@ function autoseed.init()
         local sel
         eressea.log.info(#players .. ' new players')
         sel = select_regions(regions(), peasants, trees)
-    end
-    for _, p in ipairs(players) do
-        if num_seeded == per_region then
-            while not start or start.units() do
-                local index = 1 + (rng_int() % #sel)
-                start = sel[index]
+        for _, p in ipairs(players) do
+            if num_seeded == per_region then
+                while not start or start.units() do
+                    local index = 1 + (rng_int() % #sel)
+                    start = sel[index]
+                end
+                num_seeded = 0
             end
-            num_seeded = 0
-        end
-        local dupe = get_faction_by_email(p.email)
-        if dupe then
-            eressea.log.warning("seed: duplicate email " .. p.email .. " already used by faction " .. tostring(f))
-        else
-            local f = seed(start, p.email, p.race or "human", p.lang or "de")
-            num_seeded = num_seeded + 1
-            print("new faction ".. tostring(f) .. " starts in ".. tostring(start))
-            -- table.insert(newbs, f)
+            local dupe = get_faction_by_email(p.email)
+            if dupe then
+                eressea.log.warning("seed: duplicate email " .. p.email .. " already used by faction " .. tostring(f))
+            else
+                local f = seed(start, p.email, p.race or "human", p.lang or "de")
+                num_seeded = num_seeded + 1
+                print("new faction ".. tostring(f) .. " starts in ".. tostring(start))
+                -- table.insert(newbs, f)
+            end
         end
     end
 end
