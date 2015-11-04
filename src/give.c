@@ -618,8 +618,6 @@ void give_cmd(unit * u, order * ord)
                     * item-liste der unit, darum continue vor pointerumsetzten */
                     if (give_item(itm->number, itm->type, u, u2, ord) == 0) {
                         given = true;
-                        if (*itmp != itm)
-                            continue;
                         continue;
                     }
                 }
