@@ -839,8 +839,9 @@ static void json_include(cJSON *json) {
             fseek(F, 0, SEEK_END);
             sz = ftell(F);
             rewind(F);
-            data = malloc(sz);
-            fread(data, 1, sz, F);
+            data = malloc(sz+1);
+            sz = fread(data, 1, sz, F);
+            data[sz] = 0;
             fclose(F);
             config = cJSON_Parse(data);
             free(data);
