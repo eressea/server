@@ -480,7 +480,7 @@ void pick_random_spells(faction * f, int level, spellbook * book, int num_spells
                 }
             }
 
-            if (spellno < maxspell) {
+            if (sbe && spellno < maxspell) {
                 if (!f->spellbook) {
                     f->spellbook = create_spellbook(0);
                 }
