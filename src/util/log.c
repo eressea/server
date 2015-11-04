@@ -84,7 +84,7 @@ void log_rotate(const char *filename, int maxindex)
 
         sprintf(buffer[dst], "%s.%d", filename, maxindex);
         while (maxindex > 0) {
-            int err, src = dst - 1;
+            int err, src = 1 - dst;
             sprintf(buffer[src], "%s.%d", filename, --maxindex);
             err = rename(buffer[src], buffer[dst]);
             if (err != 0) {
