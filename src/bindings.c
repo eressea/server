@@ -1,4 +1,4 @@
-/* 
+/*
 +-------------------+
 |                   |  Enno Rehling <enno@eressea.de>
 | Eressea PBEM host |  Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -250,11 +250,15 @@ static int tolua_message_faction(lua_State * L)
     unit *sender = (unit *)tolua_tousertype(L, 1, 0);
     faction *target = (faction *)tolua_tousertype(L, 2, 0);
     const char *str = tolua_tostring(L, 3, 0);
-    if (!target)
+    if (!target) {
         tolua_error(L, TOLUA_CAST "target is nil", NULL);
-    if (!sender)
+    }
+    else if (!sender) {
         tolua_error(L, TOLUA_CAST "sender is nil", NULL);
-    deliverMail(target, sender->region, sender, str, NULL);
+    }
+    else {
+        deliverMail(target, sender->region, sender, str, NULL);
+    }
     return 0;
 }
 
@@ -1172,7 +1176,7 @@ int eressea_run(lua_State *L, const char *luafile)
         if (err != 0) {
             log_lua_error(L);
         }
-        else  {
+        else {
             if (lua_isnumber(L, -1)) {
                 err = (int)lua_tonumber(L, -1);
             }
