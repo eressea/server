@@ -15,6 +15,7 @@ without prior permission by the authors of Eressea.
 #include "unicode.h"
 
 #include <assert.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
