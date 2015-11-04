@@ -2461,8 +2461,10 @@ static void reshow(unit * u, struct order *ord, const char *s, param_t p)
                         break;
                 }
                 else {
-                    if (display_item(u->faction, u, itype))
-                        break;
+                    if (!display_item(u->faction, u, itype))
+                        cmistake(u, ord, 36, MSG_EVENT);
+
+                    break;
                 }
             }
             /* try for a spell */
