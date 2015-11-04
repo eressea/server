@@ -833,25 +833,29 @@ static void json_include(cJSON *json) {
             F = fopen(child->valuestring, "rt");
         }
         if (F) {
-            cJSON *config;
-            char *data;
-            size_t sz;
+            long pos;
             fseek(F, 0, SEEK_END);
-            sz = ftell(F);
+            pos = ftell(F);
             rewind(F);
-            data = malloc(sz+1);
-            sz = fread(data, 1, sz, F);
-            data[sz] = 0;
+            if (pos > 0) {
+                cJSON *config;
+                char *data;
+                size_t sz;
+
+                data = malloc(pos + 1);
+                sz = fread(data, 1, (size_t)pos, F);
+                data[sz] = 0;
+                config = cJSON_Parse(data);
+                free(data);
+                if (config) {
+                    json_config(config);
+                    cJSON_Delete(config);
+                }
+                else {
+                    log_error("invalid JSON, could not parse %s", child->valuestring);
+                }
+            }
             fclose(F);
-            config = cJSON_Parse(data);
-            free(data);
-            if (config) {
-                json_config(config);
-                cJSON_Delete(config);
-            }
-            else {
-                log_error("invalid JSON, could not parse %s", child->valuestring);
-            }
         }
     }
 }

@@ -3247,7 +3247,6 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     int berserk;
     int strongmen;
     int speeded = 0, speed = 1;
-    bool pr_aid = false;
     int rest;
     const group *g = NULL;
     const attrib *a = a_find(u->attribs, &at_otherfaction);
@@ -3347,14 +3346,6 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
 
         if (i < berserk) {
             fig->person[i].attack++;
-        }
-        /* Leute mit einem Aid-Prayer bekommen +1 auf fast alles. */
-        if (pr_aid) {
-            fig->person[i].attack++;
-            fig->person[i].defence++;
-            fig->person[i].damage++;
-            fig->person[i].damage_rear++;
-            fig->person[i].flags |= FL_COURAGE;
         }
         /* Leute mit Kraftzauber machen +2 Schaden im Nahkampf. */
         if (i < strongmen) {
@@ -3631,18 +3622,22 @@ battle *make_battle(region * r)
         char zText[MAX_PATH];
         char zFilename[MAX_PATH];
         sprintf(zText, "%s/battles", basepath());
-        _mkdir(zText);
-        sprintf(zFilename, "%s/battle-%d-%s.log", zText, obs_count, simplename(r));
-        bdebug = fopen(zFilename, "w");
-        if (!bdebug)
-            log_error("battles cannot be debugged\n");
-        else {
-            const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
-            fwrite(utf8_bom, 1, 3, bdebug);
-            fprintf(bdebug, "In %s findet ein Kampf statt:\n", rname(r,
-                default_locale));
+        if (_mkdir(zText) != 0) {
+            log_error("could not create subdirectory for battle logs: %s", zText);
+            battledebug = false;
         }
-        obs_count++;
+        else {
+            sprintf(zFilename, "%s/battle-%d-%s.log", zText, obs_count++, simplename(r));
+            bdebug = fopen(zFilename, "w");
+            if (!bdebug)
+                log_error("battles cannot be debugged");
+            else {
+                const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
+                fwrite(utf8_bom, 1, 3, bdebug);
+                fprintf(bdebug, "In %s findet ein Kampf statt:\n", rname(r,
+                    default_locale));
+            }
+        }
     }
 
     b->region = r;
@@ -4259,9 +4254,10 @@ static bool is_enemy(battle *b, unit *u1, unit *u2) {
             for (es = b->sides; es != b->sides + b->nsides; ++es) {
                 if (!s1 && es->faction == u1->faction) s1 = es;
                 else if (!s2 && es->faction == u2->faction) s2 = es;
-                if (s1 && s2) break;
+                if (s1 && s2) {
+                    return enemy(s1, s2);
+                }
             }
-            return enemy(s1, s2);
         }
         else {
             return !help_enter(u1, u2);

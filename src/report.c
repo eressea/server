@@ -1848,18 +1848,16 @@ const faction * f)
 {
     int i, bytes;
     const char *name, *bname, *billusion = NULL;
-    const struct locale *lang = NULL;
+    const struct locale *lang;
     char buffer[8192], *bufp = buffer;
     message *msg;
     size_t size = sizeof(buffer) - 1;
 
+    assert(f);
+    lang = f->locale;
     newline(out);
-
-    if (f)
-        lang = f->locale;
-
     bytes =
-        _snprintf(bufp, size, "%s, %s %d, ", buildingname(b), LOC(f->locale,
+        _snprintf(bufp, size, "%s, %s %d, ", buildingname(b), LOC(lang,
         "nr_size"), b->size);
     if (wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
@@ -1881,7 +1879,7 @@ const faction * f)
     }
 
     if (b->size < b->type->maxsize) {
-        bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_building_inprogress"), size);
+        bytes = (int)strlcpy(bufp, LOC(lang, "nr_building_inprogress"), size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
     }
@@ -1889,7 +1887,7 @@ const faction * f)
     if (b->besieged > 0 && sr->mode >= see_lighthouse) {
         msg = msg_message("nr_building_besieged", "soldiers diff", b->besieged,
             b->besieged - b->size * SIEGEFACTOR);
-        bytes = (int)nr_render(msg, f->locale, bufp, size, f);
+        bytes = (int)nr_render(msg, lang, bufp, size, f);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
         msg_release(msg);
@@ -1926,6 +1924,7 @@ static void nr_paragraph(stream *out, message * m, faction * f)
     char buf[4096], *bufp = buf;
     size_t size = sizeof(buf) - 1;
 
+    assert(f);
     bytes = (int)nr_render(m, f->locale, bufp, size, f);
     if (wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
@@ -2331,7 +2330,7 @@ const char *charset)
                 message *m = 0;
                 if (herb && lux) {
                     m = msg_message("nr_market_info_p", "p1 p2",
-                        lux ? lux->rtype : 0, herb ? herb->rtype : 0);
+                        lux->rtype, herb->rtype);
                 }
                 else if (lux || herb) {
                     m = msg_message("nr_market_info_s", "p1",
@@ -2358,11 +2357,6 @@ const char *charset)
                 describe(out, sr, f);
                 newline(out);
                 guards(out, r, f);
-                newline(out);
-                write_travelthru(out, r, f);
-            }
-            else if (sr->mode == see_lighthouse) {
-                describe(out, sr, f);
                 newline(out);
                 write_travelthru(out, r, f);
             }
