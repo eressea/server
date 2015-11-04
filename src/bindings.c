@@ -237,11 +237,15 @@ static int tolua_message_unit(lua_State * L)
     unit *sender = (unit *)tolua_tousertype(L, 1, 0);
     unit *target = (unit *)tolua_tousertype(L, 2, 0);
     const char *str = tolua_tostring(L, 3, 0);
-    if (!target)
+    if (!target) {
         tolua_error(L, TOLUA_CAST "target is nil", NULL);
-    if (!sender)
+    }
+    else if (!sender) {
         tolua_error(L, TOLUA_CAST "sender is nil", NULL);
-    deliverMail(target->faction, sender->region, sender, str, target);
+    }
+    else {
+        deliverMail(target->faction, sender->region, sender, str, target);
+    }
     return 0;
 }
 
@@ -266,10 +270,13 @@ static int tolua_message_region(lua_State * L)
 {
     unit *sender = (unit *)tolua_tousertype(L, 1, 0);
     const char *str = tolua_tostring(L, 2, 0);
-    if (!sender)
+    if (!sender) {
         tolua_error(L, TOLUA_CAST "sender is nil", NULL);
-    ADDMSG(&sender->region->msgs, msg_message("mail_result", "unit message",
-        sender, str));
+    }
+    else {
+        ADDMSG(&sender->region->msgs, msg_message("mail_result", "unit message",
+            sender, str));
+    }
     return 0;
 }
 
