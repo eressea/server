@@ -613,8 +613,7 @@ unit *read_unit(struct gamedata *data)
         ++u->faction->no_units;
     }
     else {
-        log_error("unit %s has faction == NULL\n", unitname(u));
-        assert(u->faction);
+        log_error("unit %s has faction == NULL\n", itoa36(u->no));
         return 0;
     }
 
@@ -1428,9 +1427,14 @@ int readgame(const char *filename, bool backup)
 
         READ_INT(&store, &gameid);
         if (gameid != game_id()) {
-            log_warning("game mismatch: datafile contains game %d, but config is for %d\n", gameid, game_id());
+            int c;
+            log_warning("game mismatch: datafile contains game %d, but config is for %d", gameid, game_id());
             printf("WARNING: invalid game id. any key to continue, Ctrl-C to stop\n");
-            getchar();
+            c = getchar();
+            if (c == EOF) {
+                log_error("aborting.");
+                abort();
+            }
         }
     }
     else {
@@ -1880,6 +1884,50 @@ int writegame(const char *filename)
     binstore_done(&store);
     fstream_done(&strm);
 
+    return 0;
+}
+
+void gamedata_close(gamedata *data) {
+    binstore_done(data->store);
+    fstream_done(&data->strm);
+}
+
+gamedata *gamedata_open(const char *filename, const char *mode) {
+    FILE *F = fopen(filename, mode);
+
+    if (F) {
+        gamedata *data = (gamedata *)calloc(1, sizeof(gamedata));
+        storage *store = (storage *)calloc(1, sizeof(storage));
+        int err = 0;
+        size_t sz;
+
+        data->store = store;
+        if (strchr(mode, 'r')) {
+            sz = fread(&data->version, 1, sizeof(int), F);
+            if (sz != sizeof(int)) {
+                err = ferror(F);
+            }
+            else {
+                err = fseek(F, sizeof(int), SEEK_CUR);
+            }
+        }
+        else if (strchr(mode, 'w')) {
+            int n = STREAM_VERSION;
+            data->version = RELEASE_VERSION;
+            fwrite(&data->version, sizeof(int), 1, F);
+            fwrite(&n, sizeof(int), 1, F);
+        }
+        if (err) {
+            fclose(F);
+            free(data);
+            free(store);
+        }
+        else {
+            fstream_init(&data->strm, F);
+            binstore_init(store, &data->strm);
+            return data;
+        }
+    }
     return 0;
 }
 

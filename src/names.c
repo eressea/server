@@ -91,7 +91,7 @@ static const char *make_names(const char *monster, int *num_postfix,
     uu = rng_int() % *num_name;
 
     /* nur 50% aller Namen haben "Nach-Teil", wenn kein Vor-Teil */
-    if (uv >= *num_prefix) {
+    if (*num_postfix > 0 && uv >= *num_prefix) {
         un = rng_int() % *num_postfix;
     }
     else {
@@ -421,8 +421,7 @@ const char *abkz(const char *s, char *buf, size_t buflen, size_t maxchars)
     }
 
     /* Buchstaben pro Teilkürzel = _max(1,max/AnzWort) */
-
-    bpt = _max(1, maxchars / c);
+    bpt = (c > 0) ? _max(1, maxchars / c) : 1;
 
     /* Einzelne Wörter anspringen und jeweils die ersten BpT kopieren */
 

@@ -300,9 +300,8 @@ fighter *select_corpse(battle * b, fighter * af)
  *
  * Untote werden nicht ausgewählt (casualties, not dead) */
 {
-    int si, di, maxcasualties = 0;
+    int si, maxcasualties = 0;
     fighter *df;
-    side *s;
 
     for (si = 0; si != b->nsides; ++si) {
         side *s = b->sides + si;
@@ -310,24 +309,26 @@ fighter *select_corpse(battle * b, fighter * af)
             maxcasualties += s->casualties;
         }
     }
-    di = (int)(rng_int() % maxcasualties);
-    for (s = b->sides; s != b->sides + b->nsides; ++s) {
-        for (df = s->fighters; df; df = df->next) {
-            /* Geflohene haben auch 0 hp, dürfen hier aber nicht ausgewählt
-             * werden! */
-            int dead = dead_fighters(df);
-            if (!playerrace(u_race(df->unit)))
-                continue;
+    if (maxcasualties > 0) {
+        int di = (int)(rng_int() % maxcasualties);
+        side *s;
+        for (s = b->sides; s != b->sides + b->nsides; ++s) {
+            for (df = s->fighters; df; df = df->next) {
+                /* Geflohene haben auch 0 hp, dürfen hier aber nicht ausgewählt
+                 * werden! */
+                int dead = dead_fighters(df);
+                if (!playerrace(u_race(df->unit)))
+                    continue;
 
-            if (af && !helping(af->side, df->side))
-                continue;
-            if (di < dead) {
-                return df;
+                if (af && !helping(af->side, df->side))
+                    continue;
+                if (di < dead) {
+                    return df;
+                }
+                di -= dead;
             }
-            di -= dead;
         }
     }
-
     return NULL;
 }
 
