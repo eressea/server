@@ -456,7 +456,6 @@ size_t size)
     building *b;
     bool isbattle = (bool)(mode == see_battle);
     int telepath_see = 0;
-    attrib *a_fshidden = NULL;
     item *itm;
     item *show;
     faction *fv = visible_faction(f, u);
@@ -520,14 +519,8 @@ size_t size)
 
     bufp = STRLCPY(bufp, ", ", size);
 
-    if (u->faction != f && a_fshidden && a_fshidden->data.ca[0] == 1
-        && effskill(u, SK_STEALTH, 0) >= 6) {
-        bufp = STRLCPY(bufp, "? ", size);
-    }
-    else {
-        if (wrptr(&bufp, &size, _snprintf(bufp, size, "%d ", u->number)))
-            WARN_STATIC_BUFFER();
-    }
+    if (wrptr(&bufp, &size, _snprintf(bufp, size, "%d ", u->number)))
+        WARN_STATIC_BUFFER();
 
     pzTmp = get_racename(u->attribs);
     if (pzTmp) {
@@ -607,8 +600,7 @@ size_t size)
     if (f == u->faction || telepath_see || omniscient(f)) {
         show = u->items;
     }
-    else if (!itemcloak && mode >= see_unit && !(a_fshidden
-        && a_fshidden->data.ca[1] == 1 && effskill(u, SK_STEALTH, 0) >= 3)) {
+    else if (!itemcloak && mode >= see_unit) {
         int n = report_items(u->items, results, MAX_INVENTORY, u, f);
         assert(n >= 0);
         if (n > 0)

@@ -746,7 +746,6 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
     building *b;
     const char *pzTmp;
     skill *sv;
-    const attrib *a_fshidden = NULL;
     bool itemcloak = false;
     static const curse_type *itemcloak_ct = 0;
     static bool init = false;
@@ -834,13 +833,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
         stream_printf(out, "\"%s\";typprefix\n", translate(prefix, LOC(f->locale,
             prefix)));
     }
-    if (u->faction != f && a_fshidden
-        && a_fshidden->data.ca[0] == 1 && effskill(u, SK_STEALTH, 0) >= 6) {
-        stream_printf(out, "-1;Anzahl\n");
-    }
-    else {
-        stream_printf(out, "%d;Anzahl\n", u->number);
-    }
+    stream_printf(out, "%d;Anzahl\n", u->number);
 
     pzTmp = get_racename(u->attribs);
     if (pzTmp) {
@@ -981,8 +974,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
     if (f == u->faction || omniscient(f)) {
         show = u->items;
     }
-    else if (!itemcloak && mode >= see_unit && !(a_fshidden
-        && a_fshidden->data.ca[1] == 1 && effskill(u, SK_STEALTH, 0) >= 3)) {
+    else if (!itemcloak && mode >= see_unit) {
         int n = report_items(u->items, result, MAX_INVENTORY, u, f);
         assert(n >= 0);
         if (n > 0)
