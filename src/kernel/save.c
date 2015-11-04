@@ -1409,8 +1409,8 @@ int readgame(const char *filename, bool backup)
     fread(&gdata.version, sizeof(int), 1, F);
     if (gdata.version >= INTPAK_VERSION) {
         int stream_version;
-        fread(&stream_version, sizeof(int), 1, F);
-        assert(stream_version == STREAM_VERSION || !"unsupported data format");
+        size_t sz = fread(&stream_version, sizeof(int), 1, F);
+        assert((sz==1 && stream_version == STREAM_VERSION) || !"unsupported data format");
     }
     assert(gdata.version >= MIN_VERSION || !"unsupported data format");
     assert(gdata.version <= MAX_VERSION || !"unsupported data format");
