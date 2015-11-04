@@ -76,27 +76,24 @@ cp_convert(const char *format, char *buffer, size_t length, int codepage)
 
 void log_rotate(const char *filename, int maxindex)
 {
-    int n;
     if (_access(filename, 4) == 0) {
         char buffer[2][MAX_PATH];
-        int src = 1;
+        int dst = 1;
         assert(strlen(filename) < sizeof(buffer[0]) - 4);
-        for (n = 0; n < maxindex; ++n) {
-            sprintf(buffer[0], "%s.%d", filename, n);
-            if (_access(filename, 0) != 0) {
-                break;
+
+        sprintf(buffer[dst], "%s.%d", filename, maxindex);
+        while (maxindex > 0) {
+            int err, src = dst - 1;
+            sprintf(buffer[src], "%s.%d", filename, --maxindex);
+            err = rename(buffer[src], buffer[dst]);
+            if (err != 0) {
+                log_error("log rotate %s: %s", buffer[dst], strerror(errno));
             }
+            dst = src;
         }
-        if (_access(buffer[0], 0) == 0) {
-            unlink(buffer[0]);
+        if (rename(filename, buffer[dst]) != 0) {
+            log_error("log rotate %s: %s", buffer[dst], strerror(errno));
         }
-        while (n--) {
-            int dst = 1 - src;
-            sprintf(buffer[src], "%s.%d", filename, n);
-            rename(buffer[src], buffer[dst]);
-            src = dst;
-        }
-        rename(filename, buffer[1 - src]);
     }
 }
 
