@@ -165,8 +165,8 @@ struct order *ord)
     else if (n == 0) {
         int reserve = get_reservation(src, itype);
         if (reserve) {
-            msg_feedback(src, ord, "nogive_reserved", "resource reservation",
-                itype->rtype, reserve);
+            ADDMSG(&src->faction->msgs, msg_feedback(src, ord, "nogive_reserved", "resource reservation",
+                itype->rtype, reserve));
             return -1;
         }
         error = 36;
@@ -403,7 +403,7 @@ void give_unit(unit * u, unit * u2, order * ord)
     int maxt = max_transfers();
 
     assert(u);
-    if (!rule_transfermen() && u->faction != u2->faction) {
+    if (!rule_transfermen() && u2 && u->faction != u2->faction) {
         cmistake(u, ord, 74, MSG_COMMERCE);
         return;
     }
@@ -618,8 +618,6 @@ void give_cmd(unit * u, order * ord)
                     * item-liste der unit, darum continue vor pointerumsetzten */
                     if (give_item(itm->number, itm->type, u, u2, ord) == 0) {
                         given = true;
-                        if (*itmp != itm)
-                            continue;
                         continue;
                     }
                 }

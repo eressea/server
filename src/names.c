@@ -238,9 +238,6 @@ static const char *dragon_name(const unit * u)
         if (num_postfix == 0)
             num_postfix = -1;
     }
-    if (num_postfix <= 0) {
-        return NULL;
-    }
 
     if (u) {
         region *r = u->region;
@@ -264,9 +261,16 @@ static const char *dragon_name(const unit * u)
         }
     }
 
-    rnd = num_postfix / 6;
-    rnd = (rng_int() % rnd) + ter * rnd;
-
+    if (num_postfix <=0) {
+        return NULL;
+    }
+    else if (num_postfix < 6) {
+        rnd = rng_int() % num_postfix;
+    }
+    else {
+        rnd = num_postfix / 6;
+        rnd = (rng_int() % rnd) + ter * rnd;
+    }
     sprintf(zText, "dragon_postfix_%d", rnd);
 
     str = locale_getstring(default_locale, zText);
