@@ -3622,18 +3622,22 @@ battle *make_battle(region * r)
         char zText[MAX_PATH];
         char zFilename[MAX_PATH];
         sprintf(zText, "%s/battles", basepath());
-        _mkdir(zText);
-        sprintf(zFilename, "%s/battle-%d-%s.log", zText, obs_count, simplename(r));
-        bdebug = fopen(zFilename, "w");
-        if (!bdebug)
-            log_error("battles cannot be debugged\n");
-        else {
-            const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
-            fwrite(utf8_bom, 1, 3, bdebug);
-            fprintf(bdebug, "In %s findet ein Kampf statt:\n", rname(r,
-                default_locale));
+        if (_mkdir(zText) != 0) {
+            log_error("could not create subdirectory for battle logs: %s", zText);
+            battledebug = false;
         }
-        obs_count++;
+        else {
+            sprintf(zFilename, "%s/battle-%d-%s.log", zText, obs_count++, simplename(r));
+            bdebug = fopen(zFilename, "w");
+            if (!bdebug)
+                log_error("battles cannot be debugged");
+            else {
+                const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
+                fwrite(utf8_bom, 1, 3, bdebug);
+                fprintf(bdebug, "In %s findet ein Kampf statt:\n", rname(r,
+                    default_locale));
+            }
+        }
     }
 
     b->region = r;
