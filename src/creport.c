@@ -361,10 +361,10 @@ static int cr_race(variant var, char *buffer, const void *userdata)
 static int cr_alliance(variant var, char *buffer, const void *userdata)
 {
     const alliance *al = (const alliance *)var.v;
+    unused_arg(userdata);
     if (al != NULL) {
         sprintf(buffer, "%d", al->id);
     }
-    unused_arg(userdata);
     return 0;
 }
 
@@ -372,6 +372,7 @@ static int cr_skill(variant var, char *buffer, const void *userdata)
 {
     const faction *report = (const faction *)userdata;
     skill_t sk = (skill_t)var.i;
+    unused_arg(userdata);
     if (sk != NOSKILL)
         sprintf(buffer, "\"%s\"",
         translate(mkname("skill", skillnames[sk]), skillname(sk,
@@ -384,6 +385,7 @@ static int cr_skill(variant var, char *buffer, const void *userdata)
 static int cr_order(variant var, char *buffer, const void *userdata)
 {
     order *ord = (order *)var.v;
+    unused_arg(userdata);
     if (ord != NULL) {
         char cmd[ORDERSIZE];
         char *wp = buffer;
@@ -393,13 +395,11 @@ static int cr_order(variant var, char *buffer, const void *userdata)
 
         *wp++ = '\"';
         for (rp = cmd; *rp;) {
-            switch (*rp) {
-            case '\"':
-            case '\\':
+            char r = *rp++;
+            if (r == '\"' || r == '\\') {
                 *wp++ = '\\';
-            default:
-                *wp++ = *rp++;
             }
+            *wp++ = r;
         }
         *wp++ = '\"';
         *wp++ = 0;
