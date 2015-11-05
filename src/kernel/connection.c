@@ -606,7 +606,6 @@ int read_borders(struct storage *store)
     for (;;) {
         int bid = 0;
         char zText[32];
-        connection *b;
         region *from, *to;
         border_type *type;
 
@@ -629,6 +628,10 @@ int read_borders(struct storage *store)
             READ_INT(store, &tid);
             from = findregionbyid(fid);
             to = findregionbyid(tid);
+            if (!to || !from) {
+                log_warning("%s connection between incomplete regions %d and %d", zText, fid, tid);
+                continue;
+            }
         }
 
         type = find_bordertype(zText);
@@ -644,26 +647,29 @@ int read_borders(struct storage *store)
             if (r != NULL)
                 to = r;
         }
-        b = new_border(type, from, to);
-        nextborder--;               /* new_border erhöht den Wert */
-        b->id = bid;
-        assert(bid <= nextborder);
-        if (type->read)
-            type->read(b, store);
-        if (global.data_version < NOBORDERATTRIBS_VERSION) {
-            attrib *a = NULL;
-            int result = a_read(store, &a, b);
-            if (border_convert_cb)
-                border_convert_cb(b, a);
-            while (a) {
-                a_remove(&a, a);
-            }
-            if (result < 0)
-                return result;
+        if ((type->read && !type->write)) {
+            log_warning("ignore invalid border '%s' between '%s' and '%s'\n", zText, regionname(from, 0), regionname(to, 0));
         }
-        if ((type->read && !type->write) || !to || !from) {
-            log_warning("erase invalid border '%s' between '%s' and '%s'\n", type->__name, regionname(from, 0), regionname(to, 0));
-            erase_border(b);
+        else {
+            connection *b = new_border(type, from, to);
+            nextborder--;               /* new_border erhöht den Wert */
+            b->id = bid;
+            assert(bid <= nextborder);
+            if (type->read)
+                type->read(b, store);
+            if (global.data_version < NOBORDERATTRIBS_VERSION) {
+                attrib *a = NULL;
+                int result = a_read(store, &a, b);
+                if (border_convert_cb) {
+                    border_convert_cb(b, a);
+                }
+                while (a) {
+                    a_remove(&a, a);
+                }
+                if (result < 0) {
+                    return result;
+                }
+            }
         }
     }
     return 0;
