@@ -77,24 +77,26 @@ cp_convert(const char *format, char *buffer, size_t length, int codepage)
 
 void log_rotate(const char *filename, int maxindex)
 {
-    if (_access(filename, 4) == 0) {
-        char buffer[2][MAX_PATH];
-        int dst = 1;
-        assert(strlen(filename) < sizeof(buffer[0]) - 4);
+    char buffer[2][MAX_PATH];
+    int dst = 1;
+    assert(strlen(filename) < sizeof(buffer[0]) - 4);
 
-        sprintf(buffer[dst], "%s.%d", filename, maxindex);
-        while (maxindex > 0) {
-            int err, src = 1 - dst;
-            sprintf(buffer[src], "%s.%d", filename, --maxindex);
-            err = rename(buffer[src], buffer[dst]);
-            if (err != 0) {
-                log_error("log rotate %s: %s", buffer[dst], strerror(errno));
-            }
-            dst = src;
+    sprintf(buffer[dst], "%s.%d", filename, maxindex);
+#ifdef HAVE_UNISTD_H
+    /* make sure we don't overwrite an existing file (hard links) */
+    unlink(buffer[dst]);
+#endif
+    while (maxindex > 0) {
+        int err, src = 1 - dst;
+        sprintf(buffer[src], "%s.%d", filename, --maxindex);
+        err = rename(buffer[src], buffer[dst]);
+        if (err != 0) {
+            log_debug("log rotate %s: %s", buffer[dst], strerror(errno));
         }
-        if (rename(filename, buffer[dst]) != 0) {
-            log_error("log rotate %s: %s", buffer[dst], strerror(errno));
-        }
+        dst = src;
+    }
+    if (rename(filename, buffer[dst]) != 0) {
+        log_debug("log rotate %s: %s", buffer[dst], strerror(errno));
     }
 }
 
