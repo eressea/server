@@ -76,6 +76,7 @@ static int report_json(const char *filename, report_context * ctx, const char *c
                     "\"margin\": 0, \"name\": \"hextiles\", \"properties\": { }, \"spacing\": 0, "
                     "\"tileheight\" : 64, \"tilewidth\" : 64 }], \"tilewidth\": 64, \"tileheight\": 96}", F);
             }
+            fclose(F);
             return 0;
         }
         return -1;
