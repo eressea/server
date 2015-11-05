@@ -1540,6 +1540,15 @@ static void prepare_report(struct report_context *ctx, faction *f)
     ctx->last = lastregion(f);
 }
 
+static void mkreportdir(const char *rpath) {
+    if (_access(rpath, 0) < 0) {
+        if (_mkdir(rpath) != 0) {
+            log_error("could not create reports directory %s: %s", rpath, strerror(errno));
+            abort();
+        }
+    }
+}
+
 int write_reports(faction * f, time_t ltime)
 {
     unsigned int backup = 1, maxbackup = 128 * 1000;
@@ -1624,15 +1633,6 @@ static void write_script(FILE * F, const faction * f)
 
 static void check_messages_exist(void) {
     ct_checknames();
-}
-
-void mkreportdir(const char *rpath) {
-    if (_access(rpath, 0) < 0) {
-        if (_mkdir(rpath) != 0) {
-            log_error("could not create reports directory %s: %s", rpath, strerror(errno));
-            abort();
-        }
-    }
 }
 
 int init_reports(void)
