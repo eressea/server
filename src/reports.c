@@ -1547,19 +1547,14 @@ int write_reports(faction * f, time_t ltime)
     struct report_context ctx;
     const char *encoding = "UTF-8";
     report_type *rtype;
-    const char *path = reportpath();;
+    const char *path = reportpath();
 
     if (noreports) {
         return false;
     }
     prepare_report(&ctx, f);
     get_addresses(&ctx);
-    if (_access(path, 0) < 0) {
-        if (_mkdir(path) != 0) {
-            log_error("could not create reports directory %s: %s", path, strerror(errno));
-            abort();
-        }
-    }
+    mkreportdir(path);
     if (errno) {
         log_warning("errno was %d before writing reports", errno);
         errno = 0;
@@ -1631,6 +1626,15 @@ static void check_messages_exist(void) {
     ct_checknames();
 }
 
+void mkreportdir(const char *rpath) {
+    if (_access(rpath, 0) < 0) {
+        if (_mkdir(rpath) != 0) {
+            log_error("could not create reports directory %s: %s", rpath, strerror(errno));
+            abort();
+        }
+    }
+}
+
 int init_reports(void)
 {
     check_messages_exist();
@@ -1641,12 +1645,7 @@ int init_reports(void)
             return 0;
         }
     }
-    if (_mkdir(reportpath()) != 0) {
-        if (errno != EEXIST) {
-            perror("could not create reportpath");
-            return -1;
-        }
-    }
+    mkreportdir(reportpath());
     return 0;
 }
 
@@ -1663,13 +1662,8 @@ int reports(void)
     report_donations();
     remove_empty_units();
 
-    if (_access(rpath, 0) < 0) {
-        if (_mkdir(rpath) != 0) {
-            log_error("could not create reports directory %s: %s", rpath, strerror(errno));
-            abort();
-        }
-    }
-    sprintf(path, "%s/reports.txt", reportpath());
+    mkreportdir(rpath);
+    sprintf(path, "%s/reports.txt", rpath);
     mailit = fopen(path, "w");
     if (mailit == NULL) {
         log_error("%s could not be opened!\n", path);
