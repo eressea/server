@@ -1547,14 +1547,18 @@ int write_reports(faction * f, time_t ltime)
     struct report_context ctx;
     const char *encoding = "UTF-8";
     report_type *rtype;
+    const char *path = reportpath();;
 
     if (noreports) {
         return false;
     }
     prepare_report(&ctx, f);
     get_addresses(&ctx);
-    if (_access(reportpath(), 0) < 0) {
-        _mkdir(reportpath());
+    if (_access(path, 0) < 0) {
+        if (_mkdir(path) != 0) {
+            log_error("could not create reports directory %s: %s", path, strerror(errno));
+            abort();
+        }
     }
     if (errno) {
         log_warning("errno was %d before writing reports", errno);
