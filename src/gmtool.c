@@ -1245,7 +1245,7 @@ void run_mapper(void)
     curs_set(1);
 
     set_readline(curses_readline);
-
+    assert(stdscr);
     getbegyx(stdscr, x, y);
     width = getmaxx(stdscr);
     height = getmaxy(stdscr);
