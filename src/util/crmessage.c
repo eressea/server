@@ -91,21 +91,20 @@ void crt_register(const struct message_type *mtype)
         crt = crt->next;
     }
     if (!crt) {
-        int i;
         crt = malloc(sizeof(crmessage_type));
         crt->mtype = mtype;
         crt->next = crtypes[hash];
         crtypes[hash] = crt;
         if (mtype->nparameters > 0) {
+            int i;
             crt->renderers = malloc(sizeof(tostring_f) * mtype->nparameters);
+            /* can be scrapped for memory vs. speed */
+            for (i = 0; i != mtype->nparameters; ++i) {
+                crt->renderers[i] = tsf_find(mtype->types[i]->name);
+            }
         }
         else {
             crt->renderers = NULL;
-        }
-
-        /* can be scrapped for memory vs. speed */
-        for (i = 0; i != mtype->nparameters; ++i) {
-            crt->renderers[i] = tsf_find(mtype->types[i]->name);
         }
     }
 }
