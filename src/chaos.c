@@ -176,6 +176,7 @@ static void chaos(region * r)
                     set_money(u, u->number * (rng_int() % mfac));
                 fset(u, UFL_ISNEW | UFL_MOVED);
             }
+            break;
         case 2:                  /* Terrainveränderung */
             if (!fval(r->terrain, FORBIDDEN_REGION)) {
                 if (!fval(r->terrain, SEA_REGION)) {
