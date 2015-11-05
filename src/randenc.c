@@ -525,7 +525,7 @@ damage_unit(unit * u, const char *dam, bool physical, bool magic)
 void drown(region * r)
 {
     if (fval(r->terrain, SEA_REGION)) {
-        unit **up = up = &r->units;
+        unit **up = &r->units;
         while (*up) {
             unit *u = *up;
 
