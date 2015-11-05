@@ -1199,6 +1199,38 @@ static void test_mail_region_no_msg(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_show_without_item(CuTest *tc)
+{
+    unit *u;
+    order *ord;
+    item_type *itype;
+    item *i;
+
+    u = setup_name_cmd();
+    ord = create_order(K_RESHOW, u->faction->locale, "");
+    itype = it_get_or_create(rt_get_or_create("testitem"));
+    i = i_new(itype, 1);
+
+    reshow_cmd(u, ord);
+    CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "error21") != NULL);
+    test_clear_messages(u->faction);
+
+    locale_setstring(get_locale("en"), "iteminfo::testitem", "testdescription");
+    reshow_cmd(u, ord);
+    CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "error21") == NULL);
+    CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "error36") != NULL);
+    test_clear_messages(u->faction);
+
+    i_add(&(u->items), i);
+    reshow_cmd(u, ord);
+    CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "error21") == NULL);
+    CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "error36") == NULL);
+
+    i_free(i);
+    free_order(ord);
+    test_cleanup();
+}
+
 CuSuite *get_laws_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -1255,6 +1287,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_name_region);
     SUITE_ADD_TEST(suite, test_name_building);
     SUITE_ADD_TEST(suite, test_name_ship);
+    SUITE_ADD_TEST(suite, test_show_without_item);
 
     return suite;
 }
