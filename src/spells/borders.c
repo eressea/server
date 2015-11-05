@@ -263,6 +263,7 @@ void convert_firewall_timeouts(connection * b, attrib * a)
             wall_data *fd = (wall_data *)b->data.v;
             fd->countdown = a->data.i;
         }
+        a = a->next;
     }
 }
 

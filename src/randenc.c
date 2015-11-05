@@ -449,7 +449,7 @@ static int nb_armor(const unit * u, int index)
 static int
 damage_unit(unit * u, const char *dam, bool physical, bool magic)
 {
-    int *hp = malloc(u->number * sizeof(int));
+    int *hp, hpstack[20];
     int h;
     int i, dead = 0, hp_rem = 0, heiltrank;
     double magres = magic_resistance(u);
@@ -462,6 +462,12 @@ damage_unit(unit * u, const char *dam, bool physical, bool magic)
     assert(u->number <= u->hp);
     h = u->hp / u->number;
     /* HP verteilen */
+    if (u->number < 20) {
+        hp = hpstack;
+    }
+    else {
+        hp = malloc(u->number * sizeof(int));
+    }
     for (i = 0; i < u->number; i++)
         hp[i] = h;
     h = u->hp - (u->number * h);
@@ -517,7 +523,9 @@ damage_unit(unit * u, const char *dam, bool physical, bool magic)
     scale_number(u, u->number - dead);
     u->hp = hp_rem;
 
-    free(hp);
+    if (hp != hpstack) {
+        free(hp);
+    }
 
     return dead;
 }
@@ -525,7 +533,7 @@ damage_unit(unit * u, const char *dam, bool physical, bool magic)
 void drown(region * r)
 {
     if (fval(r->terrain, SEA_REGION)) {
-        unit **up = up = &r->units;
+        unit **up = &r->units;
         while (*up) {
             unit *u = *up;
 
@@ -580,7 +588,7 @@ volcano_destruction(region * volcano, region * r, const char *damage)
     rsettrees(r, 0, 0);
 
     a = a_find(r->attribs, &at_reduceproduction);
-    if (a) {
+    if (!a) {
         a = a_add(&r->attribs, make_reduceproduction(percent, time));
     }
     else {
