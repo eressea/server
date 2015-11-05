@@ -983,6 +983,7 @@ static void handlekey(state * st, int c)
                     statusline(st->wnd_status->handle, "info-buildings true");
                 else
                     statusline(st->wnd_status->handle, "info-buildings false");
+                break;
             case 'f':
                 st->info_flags ^= IFL_FACTIONS;
                 if (st->info_flags & IFL_FACTIONS)
