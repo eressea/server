@@ -193,11 +193,9 @@ static int tolua_building_create(lua_State * L)
     const char *bname = tolua_tostring(L, 2, 0);
     if (!r) {
         log_error("building.create expects a region as argument 1");
-    }
-    if (!bname) {
+    } else if (!bname) {
         log_error("building.create expects a name as argument 2");
-    }
-    if (bname) {
+    } else {
         const building_type *btype = bt_find(bname);
         if (btype) {
             building *b = new_building(btype, r, default_locale);
