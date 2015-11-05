@@ -73,7 +73,7 @@ spell * create_spell(const char * name, unsigned int id)
     }
     sp = (spell *)calloc(1, sizeof(spell));
     len = cb_new_kv(name, len, &sp, sizeof(sp), buffer);
-    if (cb_insert(&cb_spells, buffer, len)) {
+    if (cb_insert(&cb_spells, buffer, len) == CB_SUCCESS) {
         sp->id = id ? id : hashstring(name);
         sp->sname = _strdup(name);
         add_spell(&spells, sp);

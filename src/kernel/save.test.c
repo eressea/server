@@ -38,6 +38,7 @@ static void test_readwrite_unit(CuTest * tc)
     f = test_create_faction(0);
     fno = f->no;
     u = test_create_unit(f, r);
+    _mkdir(datapath());
     sprintf(path, "%s/%s", datapath(), filename);
 
     data = gamedata_open(path, "wb");
