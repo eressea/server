@@ -1743,10 +1743,8 @@ int writegame(const char *filename)
 
     sprintf(path, "%s/%s", datapath(), filename);
 #ifdef HAVE_UNISTD_H
-    if (access(path, R_OK) == 0) {
-        /* make sure we don't overwrite some hardlinkedfile */
-        unlink(path);
-    }
+    /* make sure we don't overwrite an existing file (hard links) */
+    unlink(path);
 #endif
     F = fopen(path, "wb");
     if (!F) {
