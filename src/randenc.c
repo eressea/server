@@ -580,7 +580,7 @@ volcano_destruction(region * volcano, region * r, const char *damage)
     rsettrees(r, 0, 0);
 
     a = a_find(r->attribs, &at_reduceproduction);
-    if (a) {
+    if (!a) {
         a = a_add(&r->attribs, make_reduceproduction(percent, time));
     }
     else {
