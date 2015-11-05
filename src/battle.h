@@ -39,8 +39,8 @@ extern "C" {
 #define BEHIND_ROW 2
 #define AVOID_ROW 3
 #define FLEE_ROW 4
-#define LAST_ROW (NUMROWS-1)
 #define FIRST_ROW FIGHT_ROW
+#define LAST_ROW FLEE_ROW
 #define MAXSIDES 192            /* if there are ever more than this, we're fucked. */
 
     struct message;
