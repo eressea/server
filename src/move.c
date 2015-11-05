@@ -1321,7 +1321,7 @@ static const region_list *cap_route(region * r, const region_list * route,
     region *current = r;
     int moves = speed;
     const region_list *iroute = route;
-    while (iroute != route_end) {
+    while (iroute && iroute != route_end) {
         region *next = iroute->data;
         direction_t reldir = reldirection(current, next);
 
