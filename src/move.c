@@ -2192,8 +2192,8 @@ static void travel(unit * u, region_list ** routep)
     region_list *route_begin = NULL;
     follower *followers = NULL;
 
-    if (routep)
-        *routep = NULL;
+    assert(routep);
+    *routep = NULL;
 
     /* a few pre-checks that need not be done for each step: */
     if (!fval(r->terrain, SEA_REGION)) {
