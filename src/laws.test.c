@@ -1206,8 +1206,10 @@ static void test_show_without_item(CuTest *tc)
     item_type *itype;
     item *i;
 
-    u = setup_name_cmd();
-    ord = create_order(K_RESHOW, u->faction->locale, "");
+    test_create_world();
+
+    u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
+    ord = create_order(K_RESHOW, u->faction->locale, "testname");
     itype = it_get_or_create(rt_get_or_create("testitem"));
     i = i_new(itype, 1);
 
@@ -1215,7 +1217,8 @@ static void test_show_without_item(CuTest *tc)
     CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "error21") != NULL);
     test_clear_messages(u->faction);
 
-    locale_setstring(get_locale("en"), "iteminfo::testitem", "testdescription");
+    locale_setstring(get_locale("de"), "testitem", "testname");
+    locale_setstring(get_locale("de"), "iteminfo::testitem", "testdescription");
     reshow_cmd(u, ord);
     CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "error21") == NULL);
     CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "error36") != NULL);
@@ -1226,7 +1229,6 @@ static void test_show_without_item(CuTest *tc)
     CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "error21") == NULL);
     CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "error36") == NULL);
 
-    i_free(i);
     free_order(ord);
     test_cleanup();
 }
