@@ -335,3 +335,14 @@ function test_stonegolems()
   assert_equal(1 ,u2.number, "There shoud be one Stone Golems")
 -- end test Stone Golems four stones
 end
+
+
+function test_birthdaycake()
+  r = region.create(0,0, "plain")
+  f = faction.create("cake@eressea.de", "human", "de")
+  u = unit.create(f, r, 1)
+  u:add_item("birthdaycake", 1)
+  u:clear_orders()
+  u:add_order("ZEIGE Geburtstagstorte")
+  process_orders()
+end

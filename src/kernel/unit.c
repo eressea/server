@@ -1013,7 +1013,7 @@ void transfermen(unit * u, unit * dst, int n)
                 sn->level = (unsigned char)level;
                 sn->weeks = (unsigned char)weeks;
                 assert(sn->weeks > 0 && sn->weeks <= sn->level * 2 + 1);
-                assert(dst->number != 0 || (sn->level == sv->level
+                assert(dst->number != 0 || (sv && sn->level == sv->level
                     && sn->weeks == sv->weeks));
             }
             else if (sn) {

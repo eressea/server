@@ -151,14 +151,13 @@ connection *get_borders(const region * r1, const region * r2)
 
 connection *new_border(border_type * type, region * from, region * to)
 {
-    connection *b = calloc(1, sizeof(struct connection));
+    connection *b, **bp = get_borders_i(from, to);
 
-    if (from && to) {
-        connection **bp = get_borders_i(from, to);
-        while (*bp)
-            bp = &(*bp)->next;
-        *bp = b;
+    assert(from && to);
+    while (*bp) {
+        bp = &(*bp)->next;
     }
+    *bp = b = calloc(1, sizeof(connection));
     b->type = type;
     b->from = from;
     b->to = to;

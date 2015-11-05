@@ -1321,7 +1321,7 @@ static const region_list *cap_route(region * r, const region_list * route,
     region *current = r;
     int moves = speed;
     const region_list *iroute = route;
-    while (iroute != route_end) {
+    while (iroute && iroute != route_end) {
         region *next = iroute->data;
         direction_t reldir = reldirection(current, next);
 
@@ -2192,8 +2192,8 @@ static void travel(unit * u, region_list ** routep)
     region_list *route_begin = NULL;
     follower *followers = NULL;
 
-    if (routep)
-        *routep = NULL;
+    assert(routep);
+    *routep = NULL;
 
     /* a few pre-checks that need not be done for each step: */
     if (!fval(r->terrain, SEA_REGION)) {

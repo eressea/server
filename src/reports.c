@@ -456,7 +456,6 @@ size_t size)
     building *b;
     bool isbattle = (bool)(mode == see_battle);
     int telepath_see = 0;
-    attrib *a_fshidden = NULL;
     item *itm;
     item *show;
     faction *fv = visible_faction(f, u);
@@ -520,14 +519,8 @@ size_t size)
 
     bufp = STRLCPY(bufp, ", ", size);
 
-    if (u->faction != f && a_fshidden && a_fshidden->data.ca[0] == 1
-        && effskill(u, SK_STEALTH, 0) >= 6) {
-        bufp = STRLCPY(bufp, "? ", size);
-    }
-    else {
-        if (wrptr(&bufp, &size, _snprintf(bufp, size, "%d ", u->number)))
-            WARN_STATIC_BUFFER();
-    }
+    if (wrptr(&bufp, &size, _snprintf(bufp, size, "%d ", u->number)))
+        WARN_STATIC_BUFFER();
 
     pzTmp = get_racename(u->attribs);
     if (pzTmp) {
@@ -607,8 +600,7 @@ size_t size)
     if (f == u->faction || telepath_see || omniscient(f)) {
         show = u->items;
     }
-    else if (!itemcloak && mode >= see_unit && !(a_fshidden
-        && a_fshidden->data.ca[1] == 1 && effskill(u, SK_STEALTH, 0) >= 3)) {
+    else if (!itemcloak && mode >= see_unit) {
         int n = report_items(u->items, results, MAX_INVENTORY, u, f);
         assert(n >= 0);
         if (n > 0)
@@ -1555,14 +1547,18 @@ int write_reports(faction * f, time_t ltime)
     struct report_context ctx;
     const char *encoding = "UTF-8";
     report_type *rtype;
+    const char *path = reportpath();;
 
     if (noreports) {
         return false;
     }
     prepare_report(&ctx, f);
     get_addresses(&ctx);
-    if (_access(reportpath(), 0) < 0) {
-        _mkdir(reportpath());
+    if (_access(path, 0) < 0) {
+        if (_mkdir(path) != 0) {
+            log_error("could not create reports directory %s: %s", path, strerror(errno));
+            abort();
+        }
     }
     if (errno) {
         log_warning("errno was %d before writing reports", errno);
@@ -1661,12 +1657,18 @@ int reports(void)
     time_t ltime = time(NULL);
     int retval = 0;
     char path[MAX_PATH];
+    const char * rpath = reportpath();
 
     log_info("Writing reports for turn %d:", turn);
     report_donations();
     remove_empty_units();
 
-    _mkdir(reportpath());
+    if (_access(rpath, 0) < 0) {
+        if (_mkdir(rpath) != 0) {
+            log_error("could not create reports directory %s: %s", rpath, strerror(errno));
+            abort();
+        }
+    }
     sprintf(path, "%s/reports.txt", reportpath());
     mailit = fopen(path, "w");
     if (mailit == NULL) {
