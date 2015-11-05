@@ -1657,12 +1657,18 @@ int reports(void)
     time_t ltime = time(NULL);
     int retval = 0;
     char path[MAX_PATH];
+    const char * rpath = reportpath();
 
     log_info("Writing reports for turn %d:", turn);
     report_donations();
     remove_empty_units();
 
-    _mkdir(reportpath());
+    if (_access(rpath, 0) < 0) {
+        if (_mkdir(rpath) != 0) {
+            log_error("could not create reports directory %s: %s", rpath, strerror(errno));
+            abort();
+        }
+    }
     sprintf(path, "%s/reports.txt", reportpath());
     mailit = fopen(path, "w");
     if (mailit == NULL) {
