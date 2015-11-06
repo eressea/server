@@ -1205,8 +1205,10 @@ static void test_show_without_item(CuTest *tc)
     order *ord;
     item_type *itype;
     item *i;
+    struct locale *loc;
 
     test_create_world();
+    loc = get_locale("de");
 
     u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
     ord = create_order(K_RESHOW, u->faction->locale, "testname");
@@ -1217,8 +1219,8 @@ static void test_show_without_item(CuTest *tc)
     CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "error21") != NULL);
     test_clear_messages(u->faction);
 
-    locale_setstring(get_locale("de"), "testitem", "testname");
-    locale_setstring(get_locale("de"), "iteminfo::testitem", "testdescription");
+    locale_setstring(loc, "testitem", "testname");
+    locale_setstring(loc, "iteminfo::testitem", "testdescription");
     reshow_cmd(u, ord);
     CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "error21") == NULL);
     CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "error36") != NULL);
