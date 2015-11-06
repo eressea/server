@@ -522,9 +522,7 @@ int build(unit * u, const construction * ctype, int completed, int want)
 
         if (basesk < type->minskill) {
             if (made == 0)
-                return ELOWSKILL;
-            else
-                return made;        /* not good enough to go on */
+                return ELOWSKILL;       /* not good enough to go on */
         }
 
         /* n = maximum buildable size */
