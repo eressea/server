@@ -2981,7 +2981,10 @@ spellbook * get_spellbook(const char * name)
         result = create_spellbook(name);
         assert(strlen(name) + sizeof(result) < sizeof(buffer));
         len = cb_new_kv(name, len, &result, sizeof(result), buffer);
-        cb_insert(&cb_spellbooks, buffer, len);
+        if (cb_insert(&cb_spellbooks, buffer, len) == CB_EXISTS) {
+            log_error("cb_insert failed although cb_find returned nothing for spellbook=%s", name);
+            assert(!"should not happen");
+        }
     }
     return result;
 }
