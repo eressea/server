@@ -261,6 +261,34 @@ static void test_build_building_success(CuTest *tc) {
     teardown_build(&bf);
 }
 
+static void test_build_castle_skillcap(CuTest *tc) {
+    const building_type *btype;
+    build_fixture bf = { 0 };
+    unit *u;
+    const resource_type *rtype;
+
+    u = setup_build(&bf);
+    btype = bt_find("castle");
+    assert(btype);
+
+    set_number(u, 1000);
+    set_level(u, SK_BUILDING, 1);
+    rtype = get_resourcetype(R_STONE);
+    i_change(&bf.u->items, rtype->itype, 1000);
+
+    u->orders = create_order(K_MAKE, u->faction->locale, 0);
+
+    CuAssertIntEquals(tc, 10, build_building(u, btype, 0, 100, u->orders));
+    CuAssertIntEquals(tc, 10, u->building->size);
+
+    set_level(u, SK_BUILDING, 3);
+
+    CuAssertIntEquals(tc, 240, build_building(u, btype, 0, 200, u->orders));
+    CuAssertIntEquals(tc, 250, u->building->size);
+
+    teardown_build(&bf);
+}
+
 CuSuite *get_build_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -275,6 +303,7 @@ CuSuite *get_build_suite(void)
     SUITE_ADD_TEST(suite, test_build_building_success);
     SUITE_ADD_TEST(suite, test_build_building_with_golem);
     SUITE_ADD_TEST(suite, test_build_building_no_materials);
+    SUITE_ADD_TEST(suite, test_build_castle_skillcap);
     return suite;
 }
 
