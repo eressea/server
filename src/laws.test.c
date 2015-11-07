@@ -1209,6 +1209,8 @@ static void test_show_without_item(CuTest *tc)
     item *i;
     struct locale *loc;
 
+    test_cleanup();
+
     loc = get_or_create_locale("de");
 
     r = test_create_region(0, 0, test_create_terrain("testregion", LAND_REGION));
