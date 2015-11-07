@@ -819,7 +819,7 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
         /* gebäude fertig */
         new_order = default_order(lang);
     }
-    else if (want != INT_MAX) {
+    else if (want != INT_MAX && btname) {
         /* reduzierte restgröße */
         const char *hasspace = strchr(btname, ' ');
         if (hasspace) {

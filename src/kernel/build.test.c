@@ -27,10 +27,14 @@ typedef struct build_fixture {
 
 static unit * setup_build(build_fixture *bf) {
     test_cleanup();
-    test_create_world();
+    init_resources();
+
+    test_create_itemtype("stone");
+    test_create_buildingtype("castle");
     bf->rc = test_create_race("human");
-    bf->r = findregion(0, 0);
+    bf->r = test_create_region(0, 0, 0);
     bf->f = test_create_faction(bf->rc);
+    bf->f->locale = get_or_create_locale("de");
     assert(bf->rc && bf->f && bf->r);
     bf->u = test_create_unit(bf->f, bf->r);
     assert(bf->u);
@@ -134,6 +138,7 @@ static void test_build_limits(CuTest *tc) {
 
     u = setup_build(&bf);
     rtype = bf.cons.materials[0].rtype;
+    assert(rtype);
     i_change(&u->items, rtype->itype, 1);
     set_level(u, SK_ARMORER, bf.cons.minskill);
     CuAssertIntEquals(tc, 1, build(u, &bf.cons, 0, 10));
