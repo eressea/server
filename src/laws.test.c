@@ -1201,17 +1201,22 @@ static void test_mail_region_no_msg(CuTest *tc) {
 
 static void test_show_without_item(CuTest *tc)
 {
+    region *r;
+    faction *f;
     unit *u;
     order *ord;
     item_type *itype;
     item *i;
     struct locale *loc;
 
-    test_create_world();
-    loc = get_locale("de");
+    loc = get_or_create_locale("de");
 
-    u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
+    r = test_create_region(0, 0, test_create_terrain("testregion", LAND_REGION));
+    f = test_create_faction(test_create_race("human"));
+    u = test_create_unit(f, r);
+
     ord = create_order(K_RESHOW, u->faction->locale, "testname");
+
     itype = it_get_or_create(rt_get_or_create("testitem"));
     i = i_new(itype, 1);
 
