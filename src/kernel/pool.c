@@ -68,6 +68,8 @@ int change_resource(unit * u, const resource_type * rtype, int change)
 {
     int i = 0;
 
+    assert(rtype);
+
     if (rtype->uchange)
         i = rtype->uchange(u, rtype, change);
     else if (rtype == get_resourcetype(R_AURA))
