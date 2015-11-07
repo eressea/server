@@ -37,13 +37,20 @@ int sp_flying_ship(castorder * co)
 {
     ship *sh;
     unit *u;
-    region *r = co_get_region(co);
-    unit *mage = co->magician.u;
-    int cast_level = co->level;
-    double power = co->force;
-    spellparameter *pa = co->par;
+    region *r;
+    unit *mage;
+    int cast_level;
+    double power;
+    spellparameter *pa;
     message *m = NULL;
     int cno;
+
+    assert(co);
+    r = co_get_region(co);
+    mage = co->magician.u;
+    cast_level = co->level;
+    power = co->force;
+    pa = co->par;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
     if (pa->param[0]->flag == TARGET_NOTFOUND)

@@ -1199,6 +1199,50 @@ static void test_mail_region_no_msg(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_show_without_item(CuTest *tc)
+{
+    region *r;
+    faction *f;
+    unit *u;
+    order *ord;
+    item_type *itype;
+    item *i;
+    struct locale *loc;
+
+    test_cleanup();
+
+    loc = get_or_create_locale("de");
+
+    r = test_create_region(0, 0, test_create_terrain("testregion", LAND_REGION));
+    f = test_create_faction(test_create_race("human"));
+    u = test_create_unit(f, r);
+
+    ord = create_order(K_RESHOW, u->faction->locale, "testname");
+
+    itype = it_get_or_create(rt_get_or_create("testitem"));
+    i = i_new(itype, 1);
+
+    reshow_cmd(u, ord);
+    CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "error21") != NULL);
+    test_clear_messages(u->faction);
+
+    locale_setstring(loc, "testitem", "testname");
+    locale_setstring(loc, "iteminfo::testitem", "testdescription");
+    reshow_cmd(u, ord);
+    CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "error21") == NULL);
+    CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "error36") != NULL);
+    test_clear_messages(u->faction);
+
+    i_add(&(u->items), i);
+    reshow_cmd(u, ord);
+    CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "error21") == NULL);
+    CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "error36") == NULL);
+    test_clear_messages(u->faction);
+
+    free_order(ord);
+    test_cleanup();
+}
+
 CuSuite *get_laws_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -1255,6 +1299,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_name_region);
     SUITE_ADD_TEST(suite, test_name_building);
     SUITE_ADD_TEST(suite, test_name_ship);
+    SUITE_ADD_TEST(suite, test_show_without_item);
 
     return suite;
 }
