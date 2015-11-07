@@ -28,6 +28,7 @@ static void test_flyingship(CuTest * tc)
 
     par.param = &par_data_ptr;
     par_data.typ = SPP_SHIP;
+    par_data.flag = 0;
 
     test_cleanup();
     test_create_world();
