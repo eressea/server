@@ -26,13 +26,13 @@ static void test_flyingship(CuTest * tc)
     ship_type *shipType1, *shipType2;
     ship *sh1, *sh2;
 
+    test_cleanup();
+
     par.param = &par_data_ptr;
     par_data.typ = SPP_SHIP;
+    par_data.flag = 0;
 
-    test_cleanup();
-    test_create_world();
-
-    r = findregion(0, 0);
+    r = test_create_region(0, 0, 0);
     f = test_create_faction(test_create_race("human"));
     u = test_create_unit(f, r);
 
@@ -57,6 +57,7 @@ static void test_flyingship(CuTest * tc)
     CuAssertTrue(tc, !flying_ship(sh2));
     CuAssertIntEquals(tc, 0, sp_flying_ship(&co));
     CuAssertTrue(tc, !flying_ship(sh2));
+    test_cleanup();
 }
 
 CuSuite *get_flyingship_suite(void)
