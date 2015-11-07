@@ -146,6 +146,7 @@ void free_races(void) {
         free(races);
         races = rc;
     }
+    num_races = 0;
 }
 
 static race *rc_find_i(const char *name)

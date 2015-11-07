@@ -1022,23 +1022,32 @@ static void vampirism(troop at, int damage)
     }
 }
 
+#define MAXRACES 128
+
 static int natural_armor(unit * du)
 {
-    static int *bonus = 0;
-    int an = u_race(du)->armor;
-    if (bonus == 0) {
-        assert(num_races > 0);
-        bonus = calloc((size_t)num_races, sizeof(int));
+    static int cookie = -1;
+    static int bonus[MAXRACES];
+    const race *rc = u_race(du);
+    int index, an = rc->armor;
+
+    assert(rc);
+    if (cookie!=global.cookie) {
+        cookie = global.cookie;
+        memset(bonus, 0, sizeof(bonus));
     }
-    if (bonus[u_race(du)->index] == 0) {
-        bonus[u_race(du)->index] =
-            get_param_int(u_race(du)->parameters, "armor.stamina", -1);
-        if (bonus[u_race(du)->index] == 0)
-            bonus[u_race(du)->index] = -1;
+    assert(num_races < MAXRACES);
+    index = rc->index;
+    assert(index >= 0 && index < num_races);
+    if (bonus[index] == 0) {
+        bonus[index] =
+            get_param_int(rc->parameters, "armor.stamina", -1);
+        if (bonus[index] == 0)
+            bonus[index] = -1;
     }
-    if (bonus[u_race(du)->index] > 0) {
+    if (bonus[index] > 0) {
         int sk = effskill(du, SK_STAMINA, 0);
-        sk /= bonus[u_race(du)->index];
+        sk /= bonus[index];
         an += sk;
     }
     return an;
