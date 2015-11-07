@@ -1235,6 +1235,7 @@ static void test_show_without_item(CuTest *tc)
     reshow_cmd(u, ord);
     CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "error21") == NULL);
     CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "error36") == NULL);
+    test_clear_messages(u->faction);
 
     free_order(ord);
     test_cleanup();
