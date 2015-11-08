@@ -1929,6 +1929,7 @@ gamedata *gamedata_open(const char *filename, const char *mode) {
             return data;
         }
     }
+    log_error("could not open %s: %s", filename, strerror(errno));
     return 0;
 }
 
