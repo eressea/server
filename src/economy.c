@@ -2898,11 +2898,12 @@ static void expandloot(region * r, request * lootorders)
     if (!norders)
         return;
 
-    for (i = 0; i != norders && rmoney(r) > TAXFRACTION * 2; i++) {
+    for (i = 0; i != norders && startmoney > TAXFRACTION * 2; i++) {
         change_money(oa[i].unit, TAXFRACTION);
         oa[i].unit->n += TAXFRACTION;
         /*Looting destroys double the money*/
-        rsetmoney(r, rmoney(r) - TAXFRACTION * 2);
+        startmoney = startmoney - TAXFRACTION * 2;
+        rsetmoney(r, startmoney);
         looted = looted + TAXFRACTION * 2;
     }
     free(oa);
