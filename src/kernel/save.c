@@ -812,7 +812,7 @@ void write_unit(struct gamedata *data, const unit * u)
     WRITE_SECTION(data->store);
     write_items(data->store, u->items);
     WRITE_SECTION(data->store);
-    if (u->hp == 0) {
+    if (u->hp == 0 && u_race(u)!= get_race(RC_SPELL)) {
         log_error("unit %s has 0 hitpoints, adjusting.\n", itoa36(u->no));
         ((unit *)u)->hp = u->number;
     }
