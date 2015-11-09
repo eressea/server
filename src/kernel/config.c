@@ -1160,11 +1160,13 @@ void set_param(struct param **p, const char *key, const char *data)
         }
         p = &(*p)->next;
     }
-    par = malloc(sizeof(param));
-    par->name = _strdup(key);
-    par->data = _strdup(data);
-    par->next = *p;
-    *p = par;
+    if (data) {
+        par = malloc(sizeof(param));
+        par->name = _strdup(key);
+        par->data = _strdup(data);
+        par->next = *p;
+        *p = par;
+    }
 }
 
 void kernel_done(void)
