@@ -1541,8 +1541,8 @@ static void prepare_report(struct report_context *ctx, faction *f)
 }
 
 static void mkreportdir(const char *rpath) {
-    if (_access(rpath, 0) < 0) {
-        if (_mkdir(rpath) != 0) {
+    if (_mkdir(rpath) != 0) {
+        if (_access(rpath, 0) < 0) {
             log_error("could not create reports directory %s: %s", rpath, strerror(errno));
             abort();
         }
