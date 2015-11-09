@@ -995,6 +995,11 @@ cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
     if (reslist != NULL) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "missing_components_list",
             "list", reslist));
+        while (reslist) {
+            resource *res = reslist->next;
+            free(reslist);
+            reslist = res;
+        }
         return false;
     }
     return true;
@@ -2985,6 +2990,8 @@ spellbook * get_spellbook(const char * name)
             log_error("cb_insert failed although cb_find returned nothing for spellbook=%s", name);
             assert(!"should not happen");
         }
+        cb_find_prefix(&cb_spellbooks, name, strlen(name), &match, 1, 0);
+        cb_get_kv(match, &result, sizeof(result));
     }
     return result;
 }

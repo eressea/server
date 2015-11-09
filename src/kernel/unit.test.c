@@ -123,11 +123,11 @@ static void test_scale_number(CuTest *tc) {
     u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
     change_effect(u, ptype, 1);
     CuAssertIntEquals(tc, 1, u->number);
-    CuAssertIntEquals(tc, 1, u->hp);
+    CuAssertIntEquals(tc, 20, u->hp);
     CuAssertIntEquals(tc, 1, get_effect(u, ptype));
     scale_number(u, 2);
     CuAssertIntEquals(tc, 2, u->number);
-    CuAssertIntEquals(tc, 2, u->hp);
+    CuAssertIntEquals(tc, 40, u->hp);
     CuAssertIntEquals(tc, 2, get_effect(u, ptype));
     set_level(u, SK_ALCHEMY, 1);
     scale_number(u, 0);
