@@ -96,8 +96,8 @@ void do_markets(void)
             const struct race *rc = f ? f->race : NULL;
             int p = rpeasants(r);
             int numlux = rc_luxury_trade(rc), numherbs = rc_herb_trade(rc);
-            numlux = (p + numlux - MIN_PEASANTS) / numlux;
-            numherbs = (p + numherbs - MIN_PEASANTS) / numherbs;
+            if (numlux>0) numlux = (p + numlux - MIN_PEASANTS) / numlux;
+            if (numherbs>0) numherbs = (p + numherbs - MIN_PEASANTS) / numherbs;
             if (numlux > 0 || numherbs > 0) {
                 int d, nmarkets = 0;
                 const item_type *lux = r_luxury(r);
