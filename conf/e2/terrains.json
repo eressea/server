@@ -9,7 +9,7 @@
             "herbs": [ "h0", "h1", "h2", "h3", "h4", "h5" ],
             "seed": 3,
             "road": 50,
-            "flags": [ "land", "walk", "sail", "fly" ],
+            "flags": [ "forest", "cavalry", "land", "walk", "sail", "fly" ],
             "production": {
                 "iron": {
                     "chance": 0.1,
