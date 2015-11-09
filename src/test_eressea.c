@@ -121,6 +121,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(move);
     ADD_SUITE(piracy);
     ADD_SUITE(stealth);
+    ADD_SUITE(otherfaction);
     ADD_SUITE(upkeep);
     ADD_SUITE(vortex);
     ADD_SUITE(wormhole);

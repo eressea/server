@@ -25,8 +25,8 @@ static void test_make_fighter(CuTest * tc)
     const resource_type *rtype;
 
     test_cleanup();
-    test_create_world();
-    r = findregion(0, 0);
+    test_create_horse();
+    r = test_create_region(0, 0, 0);
     f = test_create_faction(NULL);
     au = test_create_unit(f, r);
     enable_skill(SK_MAGIC, true);
@@ -75,8 +75,7 @@ static void test_defenders_get_building_bonus(CuTest * tc)
     building_type * btype;
 
     test_cleanup();
-    test_create_world();
-    r = findregion(0, 0);
+    r = test_create_region(0, 0, 0);
     btype = bt_get_or_create("castle");
     btype->protection = &add_two;
     bld = test_create_building(r, btype);
@@ -120,8 +119,7 @@ static void test_attackers_get_no_building_bonus(CuTest * tc)
     building_type * btype;
 
     test_cleanup();
-    test_create_world();
-    r = findregion(0, 0);
+    r = test_create_region(0, 0, 0);
     btype = bt_get_or_create("castle");
     btype->protection = &add_two;
     bld = test_create_building(r, btype);
@@ -151,8 +149,7 @@ static void test_building_bonus_respects_size(CuTest * tc)
     faction * f;
 
     test_cleanup();
-    test_create_world();
-    r = findregion(0, 0);
+    r = test_create_region(0, 0, 0);
     btype = bt_get_or_create("castle");
     btype->protection = &add_two;
     bld = test_create_building(r, btype);

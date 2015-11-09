@@ -45,7 +45,7 @@ struct region *test_create_region(int x, int y, const terrain_type *terrain)
     if (!terrain) {
         terrain_type *t = get_or_create_terrain("plain");
         t->size = 1000;
-        fset(t, LAND_REGION);
+        fset(t, LAND_REGION|CAVALRY_REGION|FOREST_REGION);
         terraform_region(r, t);
     } else
         terraform_region(r, terrain);
@@ -196,6 +196,16 @@ void test_translate_param(const struct locale *lang, param_t param, const char *
     add_translation(cb, text, param);
 }
 
+
+item_type *test_create_horse(void) {
+    item_type * itype;
+    itype = test_create_itemtype("horse");
+    itype->flags |= ITF_BIG | ITF_ANIMAL;
+    itype->weight = 5000;
+    itype->capacity = 7000;
+    return itype;
+}
+
 /** creates a small world and some stuff in it.
  * two terrains: 'plain' and 'ocean'
  * one race: 'human'
@@ -216,10 +226,7 @@ void test_create_world(void)
     locale_setstring(loc, "money", "SILBER");
     init_resources();
 
-    itype = test_create_itemtype("horse");
-    itype->flags |= ITF_BIG | ITF_ANIMAL;
-    itype->weight = 5000;
-    itype->capacity = 7000;
+    test_create_horse();
 
     itype = test_create_itemtype("cart");
     itype->flags |= ITF_BIG | ITF_VEHICLE;

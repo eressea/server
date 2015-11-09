@@ -402,16 +402,16 @@ void destroyfaction(faction * f)
 
     /* units of other factions that were disguised as this faction
      * have their disguise replaced by ordinary faction hiding. */
-    if (rule_stealth_faction()) {
+    if (rule_stealth_other()) {
         region *rc;
         for (rc = regions; rc; rc = rc->next) {
             for (u = rc->units; u; u = u->next) {
                 attrib *a = a_find(u->attribs, &at_otherfaction);
-                if (!a)
-                    continue;
-                if (get_otherfaction(a) == f) {
+                if (a && get_otherfaction(a) == f) {
                     a_removeall(&u->attribs, &at_otherfaction);
-                    fset(u, UFL_ANON_FACTION);
+                    if (rule_stealth_anon()) {
+                        fset(u, UFL_ANON_FACTION);
+                    }
                 }
             }
         }

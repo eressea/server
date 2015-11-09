@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
+    struct unit;
     struct faction;
     struct attrib;
     extern struct attrib_type at_otherfaction;
