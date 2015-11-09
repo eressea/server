@@ -2985,6 +2985,8 @@ spellbook * get_spellbook(const char * name)
             log_error("cb_insert failed although cb_find returned nothing for spellbook=%s", name);
             assert(!"should not happen");
         }
+        cb_find_prefix(&cb_spellbooks, name, strlen(name), &match, 1, 0);
+        cb_get_kv(match, &result, sizeof(result));
     }
     return result;
 }
