@@ -2188,7 +2188,7 @@ static int sp_ironkeeper(castorder * co)
     guard(keeper, GUARD_MINING);
     fset(keeper, UFL_ISNEW);
     /* Parteitarnen, damit man nicht sofort weiß, wer dahinter steckt */
-    if (rule_stealth_faction()) {
+    if (rule_stealth_anon()) {
         fset(keeper, UFL_ANON_FACTION);
     }
 
@@ -3630,7 +3630,7 @@ static int sp_charmingsong(castorder * co)
 
     /* setze Parteitarnung, damit nicht sofort klar ist, wer dahinter
      * steckt */
-    if (rule_stealth_faction()) {
+    if (rule_stealth_anon()) {
         fset(target, UFL_ANON_FACTION);
     }
 
@@ -4377,7 +4377,7 @@ static int sp_raisepeasants(castorder * co)
         LOC(mage->faction->locale, "furious_mob"), mage);
 
     fset(u2, UFL_LOCKED);
-    if (rule_stealth_faction()) {
+    if (rule_stealth_anon()) {
         fset(u2, UFL_ANON_FACTION);
     }
 

@@ -215,7 +215,7 @@ int setstealth_cmd(unit * u, struct order *ord)
 {
     char token[64];
     const char *s;
-    int level, rule;
+    int level;
 
     init_order(ord);
     s = gettoken(token, sizeof(token));
@@ -288,13 +288,8 @@ int setstealth_cmd(unit * u, struct order *ord)
     switch (findparam(s, u->faction->locale)) {
     case P_FACTION:
         /* TARNE PARTEI [NICHT|NUMMER abcd] */
-        rule = rule_stealth_faction();
-        if (!rule) {
-            /* TARNE PARTEI is disabled */
-            break;
-        }
         s = gettoken(token, sizeof(token));
-        if (rule & 1) {
+        if (rule_stealth_anon()) {
             if (!s || *s == 0) {
                 fset(u, UFL_ANON_FACTION);
                 break;
@@ -304,7 +299,7 @@ int setstealth_cmd(unit * u, struct order *ord)
                 break;
             }
         }
-        if (rule & 2) {
+        if (rule_stealth_other()) {
             if (get_keyword(s, u->faction->locale) == K_NUMBER) {
                 s = gettoken(token, sizeof(token));
                 int nr = -1;

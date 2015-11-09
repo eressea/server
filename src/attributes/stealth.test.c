@@ -11,12 +11,11 @@
 #include <stdlib.h>
 #include <assert.h>
 
-void test_stealth(CuTest *tc) {
+static void test_stealth(CuTest *tc) {
     unit *u;
 
     test_cleanup();
-    test_create_world();
-    u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
+    u = test_create_unit(test_create_faction(test_create_race("human")), test_create_region(0, 0, 0));
     set_level(u, SK_STEALTH, 2);
     CuAssertIntEquals(tc, -1, u_geteffstealth(u));
     CuAssertIntEquals(tc, 2, eff_stealth(u, u->region));

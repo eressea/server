@@ -1327,12 +1327,24 @@ int cmp_current_owner(const building * b, const building * a)
     return -1;
 }
 
-bool rule_stealth_faction(void)
+bool rule_stealth_other(void)
 {
     static int gamecookie = -1;
     static int rule = -1;
     if (rule < 0 || gamecookie != global.cookie) {
-        rule = get_param_int(global.parameters, "rules.stealth.faction", 1);
+        rule = get_param_int(global.parameters, "stealth.faction.other", 1);
+        gamecookie = global.cookie;
+        assert(rule >= 0);
+    }
+    return rule != 0;
+}
+
+bool rule_stealth_anon(void)
+{
+    static int gamecookie = -1;
+    static int rule = -1;
+    if (rule < 0 || gamecookie != global.cookie) {
+        rule = get_param_int(global.parameters, "stealth.faction.anon", 1);
         gamecookie = global.cookie;
         assert(rule >= 0);
     }
@@ -1351,13 +1363,13 @@ bool rule_region_owners(void)
     return rule!=0;
 }
 
-int rule_auto_taxation(void)
+bool rule_auto_taxation(void)
 {
     static int gamecookie = -1;
     static int rule = -1;
     if (rule < 0 || gamecookie != global.cookie) {
         rule =
-            get_param_int(global.parameters, "rules.economy.taxation", TAX_ORDER);
+            get_param_int(global.parameters, "rules.economy.taxation", 0);
         gamecookie = global.cookie;
         assert(rule >= 0);
     }
@@ -1659,10 +1671,10 @@ int entertainmoney(const region * r)
 
 int rule_give(void)
 {
-    return get_param_int(global.parameters, "rules.give", GIVE_DEFAULT);
+    return get_param_int(global.parameters, "rules.give.flags", GIVE_DEFAULT);
 }
 
-int markets_module(void)
+bool markets_module(void)
 {
     return get_param_int(global.parameters, "modules.markets", 0);
 }

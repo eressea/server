@@ -153,15 +153,14 @@ extern "C" {
 
     bool rule_transfermen(void);
     bool rule_region_owners(void);
-    bool rule_stealth_faction(void);
+    bool rule_stealth_other(void); // units can pretend to be another faction, TARNE PARTEI <no>
+    bool rule_stealth_anon(void);  // units can anonymize their faction, TARNE PARTEI [NICHT]
     int rule_alliance_limit(void);
     int rule_faction_limit(void);
 #define HARVEST_WORK  0x00
 #define HARVEST_TAXES 0x01
     int rule_blessed_harvest(void);
-#define TAX_ORDER 0x00
-#define TAX_OWNER 0x01
-    int rule_auto_taxation(void);
+    bool rule_auto_taxation(void);
 #define GIVE_SELF 1
 #define GIVE_PEASANTS 2
 #define GIVE_LUXURIES 4
@@ -227,7 +226,7 @@ extern "C" {
     int besieged(const struct unit *u);
     int maxworkingpeasants(const struct region *r);
     bool has_horses(const struct unit *u);
-    int markets_module(void);
+    bool markets_module(void);
     int wage(const struct region *r, const struct faction *f,
         const struct race *rc, int in_turn);
     int maintenance_cost(const struct unit *u);

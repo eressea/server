@@ -308,7 +308,7 @@ static void test_give_okay(CuTest * tc) {
     env.f2 = env.f1 = test_create_faction(0);
     setup_give(&env);
 
-    set_param(&global.parameters, "rules.give", "0");
+    set_param(&global.parameters, "rules.give.flags", "0");
     CuAssertPtrEquals(tc, 0, check_give(env.src, env.dst, 0));
     test_cleanup();
 }
@@ -322,7 +322,7 @@ static void test_give_denied_by_rules(CuTest * tc) {
     env.f2 = test_create_faction(0);
     setup_give(&env);
 
-    set_param(&global.parameters, "rules.give", "0");
+    set_param(&global.parameters, "rules.give.flags", "0");
     CuAssertPtrNotNull(tc, msg = check_give(env.src, env.dst, 0));
     msg_release(msg);
     test_cleanup();

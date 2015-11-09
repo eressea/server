@@ -687,7 +687,7 @@ unit *read_unit(struct gamedata *data)
     setstatus(u, n);
     READ_INT(data->store, &u->flags);
     u->flags &= UFL_SAVEMASK;
-    if ((u->flags & UFL_ANON_FACTION) && !rule_stealth_faction()) {
+    if ((u->flags & UFL_ANON_FACTION) && !rule_stealth_anon()) {
         /* if this rule is broken, then fix broken units */
         u->flags -= UFL_ANON_FACTION;
         log_warning("%s was anonymous.\n", unitname(u));

@@ -1,6 +1,7 @@
 PROJECT(attributes C)
 SET(_TEST_FILES
 stealth.test.c
+otherfaction.test.c
 )
 
 SET(_FILES
