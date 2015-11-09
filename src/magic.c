@@ -995,6 +995,11 @@ cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
     if (reslist != NULL) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "missing_components_list",
             "list", reslist));
+        while (reslist) {
+            resource *res = reslist->next;
+            free(reslist);
+            reslist = res;
+        }
         return false;
     }
     return true;

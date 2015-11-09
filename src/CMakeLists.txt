@@ -210,6 +210,7 @@ set(TESTS_SRC
   upkeep.test.c
   spells/flyingship.test.c
   spells/magicresistance.test.c
+  triggers/shock.test.c
   ${ATTRIBUTES_TESTS}
   ${UTIL_TESTS}
   ${KERNEL_TESTS}

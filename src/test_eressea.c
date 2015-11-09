@@ -127,6 +127,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(wormhole);
     ADD_SUITE(spy);
     ADD_SUITE(study);
+    ADD_SUITE(shock);
 
     if (suites) {
         CuSuite *summary = CuSuiteNew();

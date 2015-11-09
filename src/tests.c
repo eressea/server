@@ -35,6 +35,8 @@ struct race *test_create_race(const char *name)
 {
     race *rc = rc_get_or_create(name);
     rc->maintenance = 10;
+    rc->hitpoints = 20;
+    rc->maxaura = 1.0;
     rc->ec_flags |= GETITEM;
     return rc;
 }
@@ -59,7 +61,7 @@ struct region *test_create_region(int x, int y, const terrain_type *terrain)
 
 struct faction *test_create_faction(const struct race *rc)
 {
-    faction *f = addfaction("nobody@eressea.de", NULL, rc ? rc : rc_get_or_create("human"), default_locale, 0);
+    faction *f = addfaction("nobody@eressea.de", NULL, rc ? rc : test_create_race("human"), default_locale, 0);
     return f;
 }
 
