@@ -2898,18 +2898,17 @@ static void expandloot(region * r, request * lootorders)
     if (!norders)
         return;
 
-    for (i = 0; i != norders && startmoney > TAXFRACTION * 2; i++) {
+    for (i = 0; i != norders && startmoney > looted + TAXFRACTION * 2; i++) {
         change_money(oa[i].unit, TAXFRACTION);
         oa[i].unit->n += TAXFRACTION;
         /*Looting destroys double the money*/
-        startmoney = startmoney - TAXFRACTION * 2;
-        rsetmoney(r, startmoney);
-        looted = looted + TAXFRACTION * 2;
+        looted += TAXFRACTION * 2;
     }
+    rsetmoney(r, startmoney - looted);
     free(oa);
 
     /* Lowering morale by 1 depending on the looted money (+20%) */
-    if (rng_int() % 100 < ((looted / startmoney) + 0.2)) {
+    if (rng_int() % 100 < 20 + (looted * 80) / startmoney) {
         int m = region_get_morale(r);
         if (m) {
             /*Nur Moral -1, turns is not changed, so the first time nothing happens if the morale is good*/
