@@ -1033,7 +1033,7 @@ int sp_chaosrow(struct castorder * co)
             if (u_race(df->unit)->battle_flags & BF_NOBLOCK) {
                 df->side->nonblockers[row] -= df->alive;
             }
-            row = FIRST_ROW + (rng_int() % (LAST_ROW - FIRST_ROW));
+            row = FIRST_ROW + (rng_int() % (NUMROWS - FIRST_ROW));
             switch (row) {
             case FIGHT_ROW:
                 df->status = ST_FIGHT;
