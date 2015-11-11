@@ -53,8 +53,9 @@ void test_spellbooks(CuTest * tc)
     test_cleanup();
 
     herp = get_spellbook("herp");
-    derp = get_spellbook("derp");
     CuAssertPtrNotNull(tc, herp);
+    CuAssertPtrEquals(tc, herp, get_spellbook("herp"));
+    derp = get_spellbook("derp");
     CuAssertPtrNotNull(tc, derp);
     CuAssertTrue(tc, derp != herp);
     CuAssertStrEquals(tc, "herp", herp->name);

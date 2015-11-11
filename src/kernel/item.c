@@ -187,6 +187,7 @@ resource_type *rt_get_or_create(const char *name) {
         else {
             rtype->_name = _strdup(name);
             rt_register(rtype);
+            return rt_find(name);
         }
     }
     return rtype;
