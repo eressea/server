@@ -270,6 +270,8 @@ static int parse_buildings(xmlDocPtr doc)
                 btype->flags |= BTF_DECAY;
             if (xml_bvalue(node, "magic", false))
                 btype->flags |= BTF_MAGIC;
+            if (xml_bvalue(node, "fort", false))
+                btype->flags |= BTF_FORTIFICATION;
 
             /* reading eressea/buildings/building/construction */
             xpath->node = node;
