@@ -47,6 +47,7 @@ extern "C" {
 #define BTF_MAGIC          0x40 /* magical effect */
 #define BTF_ONEPERTURN     0x80 /* one one sizepoint can be added per turn */
 #define BTF_NAMECHANGE    0x100 /* name and description can be changed more than once */
+#define BTF_FORTIFICATION 0x200 /* safe from monsters */
 
     typedef enum {
         DEFENSE_BONUS,

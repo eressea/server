@@ -305,7 +305,7 @@ static void json_terrain(cJSON *json, terrain_type *ter) {
 static void json_building(cJSON *json, building_type *bt) {
     cJSON *child;
     const char *flags[] = {
-        "nodestroy", "nobuild", "unique", "decay", "dynamic", "magic", "oneperturn", "namechange", 0
+        "nodestroy", "nobuild", "unique", "decay", "dynamic", "magic", "oneperturn", "namechange", "fort", 0
     };
     if (json->type != cJSON_Object) {
         log_error("building %s is not a json object: %d", json->string, json->type);

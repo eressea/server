@@ -36,6 +36,7 @@
 
 /* kernel includes */
 #include <kernel/build.h>
+#include <kernel/building.h>
 #include <kernel/curse.h>
 #include <kernel/equipment.h>
 #include <kernel/faction.h>
@@ -156,45 +157,47 @@ static order *monster_attack(unit * u, const unit * target)
     return create_order(K_ATTACK, u->faction->locale, "%i", target->no);
 }
 
-static order *get_money_for_dragon(region * r, unit * u, int wanted)
-{
-    unit *u2;
-    int n;
-    double attack_chance = monster_attack_chance();
-
-    if (attack_chance > 0.0 && is_guard(u, GUARD_TAX)) {
-        /* attackiere bewachende Einheiten nur wenn wir selbst schon bewachen */
-        for (u2 = r->units; u2; u2 = u2->next) {
-            if (u2 != u && is_guard(u2, GUARD_TAX) && u->faction!=u2->faction) {
-                /*In E3 + E4 etwas problematisch, da der Regionsbesitzer immer bewacht. Der Drache greift also immer die Burg an!*/
-                order *ord = monster_attack(u, u2);
-                if (ord)
-                    addlist(&u->orders, ord);
-            }
+static bool in_safe_building(unit *u1, unit *u2) {
+    if (u1->building && u2->building == u1->building) {
+        building * b = inside_building(u1);
+        if (u2->building) {
+            if (b != inside_building(u2)) return true;
+        }
+        if (b->type->flags & BTF_FORTIFICATION) {
+            return true;
         }
     }
+    return false;
+}
+
+static order *get_money_for_dragon(region * r, unit * u, int wanted)
+{
+    int n;
+    bool attacks = monster_attack_chance() > 0.0;
 
     /* falls genug geld in der region ist, treiben wir steuern ein. */
     if (rmoney(r) >= wanted) {
         /* 5% chance, dass der drache aus einer laune raus attackiert */
-        if (attack_chance <= 0.0 || chance(1.0 - u_race(u)->aggression)) {
+        if (!attacks || chance(1.0 - u_race(u)->aggression)) {
             /* Drachen haben in E3 und E4 keine Einnahmen. Neuer Befehl Pluendern erstmal nur fuer Monster?*/
             return create_order(K_LOOT, default_locale, NULL);
         }
     }
 
-    /* falls der drache launisch ist, oder das regionssilber knapp, greift er alle an */
+    /* falls der drache launisch ist, oder das regionssilber knapp, greift er alle an
+     * und holt sich Silber von Einheiten, vorausgesetzt er bewacht bereits */
     n = 0;
-    for (u2 = r->units; u2; u2 = u2->next) {
-        if (inside_building(u2) != u->building && is_guard(u, GUARD_TAX) && u2->faction != u->faction && cansee(u->faction, r, u2, 0)) {
-            int m = get_money(u2);
-            if (m == 0 || is_guard(u2, GUARD_TAX) || attack_chance <= 0.0)
-                continue;
-            else {
-                order *ord = monster_attack(u, u2);
-                if (ord) {
-                    addlist(&u->orders, ord);
-                    n += m;
+    if (attacks && is_guard(u, GUARD_TAX)) {
+        unit *u2;
+        for (u2 = r->units; u2; u2 = u2->next) {
+            if (u2->faction != u->faction && cansee(u->faction, r, u2, 0) && !in_safe_building(u, u2)) {
+                int m = get_money(u2);
+                if (m != 0) {
+                    order *ord = monster_attack(u, u2);
+                    if (ord) {
+                        addlist(&u->orders, ord);
+                        n += m;
+                    }
                 }
             }
         }
@@ -203,8 +206,7 @@ static order *get_money_for_dragon(region * r, unit * u, int wanted)
     /* falls die einnahmen erreicht werden, bleibt das monster noch eine */
     /* runde hier. */
     if (n + rmoney(r) >= wanted) {
-        keyword_t kwd = keyword_disabled(K_TAX) ? K_LOOT : K_TAX;
-        return create_order(kwd, default_locale, NULL);
+        return create_order(K_LOOT, default_locale, NULL);
     }
 
     /* wenn wir NULL zurueckliefern, macht der drache was anderes, z.b. weggehen */
@@ -549,16 +551,17 @@ static order *monster_seeks_target(region * r, unit * u)
 }
 #endif
 
-static void monster_attacks(unit * u)
+static void monster_attacks(unit * monster)
 {
-    region *r = u->region;
-    unit *u2;
+    region *r = monster->region;
+    unit *u;
 
-    for (u2 = r->units; u2; u2 = u2->next) {
-        if (u2->faction != u->faction && cansee(u->faction, r, u2, 0) && !inside_building(u2)) {
-            order *ord = monster_attack(u, u2);
-            if (ord)
-                addlist(&u->orders, ord);
+    for (u = r->units; u; u = u->next) {
+        if (u->faction != monster->faction && cansee(monster->faction, r, u, 0) && !in_safe_building(u, monster)) {
+            order *ord = monster_attack(monster, u);
+            if (ord) {
+                addlist(&monster->orders, ord);
+            }
         }
     }
 }
