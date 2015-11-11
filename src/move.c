@@ -2189,7 +2189,7 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
 static void travel(unit * u, region_list ** routep)
 {
     region *r = u->region;
-    region_list *route_begin = NULL;
+    region_list *route_begin;
     follower *followers = NULL;
 
     assert(routep);
@@ -2232,36 +2232,37 @@ static void travel(unit * u, region_list ** routep)
     make_route(u, u->thisorder, routep);
     route_begin = *routep;
 
-    /* und ab die post: */
-    travel_i(u, route_begin, NULL, u->thisorder, TRAVEL_NORMAL, &followers);
+    if (route_begin) {
+        /* und ab die post: */
+        travel_i(u, route_begin, NULL, u->thisorder, TRAVEL_NORMAL, &followers);
 
-    /* followers */
-    while (followers != NULL) {
-        follower *fnext = followers->next;
-        unit *uf = followers->uf;
-        unit *ut = followers->ut;
-        const region_list *route_end = followers->route_end;
+        /* followers */
+        while (followers != NULL) {
+            follower *fnext = followers->next;
+            unit *uf = followers->uf;
+            unit *ut = followers->ut;
+            const region_list *route_end = followers->route_end;
 
-        free(followers);
-        followers = fnext;
+            free(followers);
+            followers = fnext;
 
-        if (uf->region == r) {
-            order *follow_order;
-            const struct locale *lang = u->faction->locale;
-            const char *s = LOC(uf->faction->locale, parameters[P_UNIT]);
-            /* construct an order */
-            assert(s || !"missing translation for UNIT keyword");
-            follow_order = create_order(K_FOLLOW, lang, "%s %i",
-                s, ut->no);
+            if (uf->region == r) {
+                order *follow_order;
+                const struct locale *lang = u->faction->locale;
+                const char *s = LOC(uf->faction->locale, parameters[P_UNIT]);
+                /* construct an order */
+                assert(s || !"missing translation for UNIT keyword");
+                follow_order = create_order(K_FOLLOW, lang, "%s %i",
+                    s, ut->no);
 
-            route_end = reroute(uf, route_begin, route_end);
-            travel_i(uf, route_begin, route_end, follow_order, TRAVEL_FOLLOWING,
-                &followers);
-            caught_target(uf->region, uf);
-            free_order(follow_order);
+                route_end = reroute(uf, route_begin, route_end);
+                travel_i(uf, route_begin, route_end, follow_order, TRAVEL_FOLLOWING,
+                    &followers);
+                caught_target(uf->region, uf);
+                free_order(follow_order);
+            }
         }
     }
-
 }
 
 void move_cmd(unit * u, bool move_on_land)

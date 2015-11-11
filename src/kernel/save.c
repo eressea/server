@@ -1391,6 +1391,7 @@ int readgame(const char *filename, bool backup)
     storage store;
     stream strm;
     FILE *F;
+    size_t sz;
 
     init_locales();
     log_debug("- reading game data from %s\n", filename);
@@ -1405,8 +1406,8 @@ int readgame(const char *filename, bool backup)
         perror(path);
         return -1;
     }
-    fread(&gdata.version, sizeof(int), 1, F);
-    if (gdata.version >= INTPAK_VERSION) {
+    sz = fread(&gdata.version, sizeof(int), 1, F);
+    if (sz!=sizeof(int) || gdata.version >= INTPAK_VERSION) {
         int stream_version;
         size_t sz = fread(&stream_version, sizeof(int), 1, F);
         assert((sz==1 && stream_version == STREAM_VERSION) || !"unsupported data format");

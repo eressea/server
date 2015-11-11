@@ -208,6 +208,7 @@ newfaction *read_newfactions(const char *filename)
         nf = calloc(sizeof(newfaction), 1);
         if (set_email(&nf->email, email) != 0) {
             log_error("Invalid email address for subscription %s: %s\n", itoa36(subscription), email);
+            free(nf);
             continue;
         }
         nf->password = _strdup(password);

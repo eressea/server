@@ -374,7 +374,10 @@ summary *make_summary(void)
             s->factions++;
             /* Problem mit Monsterpartei ... */
             if (!is_monsters(f)) {
-                s->factionrace[old_race(f->race)]++;
+                int rc = old_race(f->race);
+                if (rc >= 0) {
+                    s->factionrace[rc]++;
+                }
             }
         }
     }
