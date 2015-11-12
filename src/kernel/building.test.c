@@ -386,12 +386,32 @@ static void test_active_building(CuTest *tc) {
     building *b;
 
     test_cleanup();
-    b = test_create_building(test_create_region(0,0,0), 0);
+    b = test_create_building(test_create_region(0, 0, 0), 0);
     CuAssertIntEquals(tc, false, building_is_active(b));
     b->flags |= BLD_WORKING;
     CuAssertIntEquals(tc, true, building_is_active(b));
     b->flags &= ~BLD_WORKING;
     CuAssertIntEquals(tc, false, building_is_active(b));
+    test_cleanup();
+}
+
+static void test_safe_building(CuTest *tc) {
+    building_type *btype;
+    unit *u1, *u2;
+
+    test_cleanup();
+    btype = test_create_buildingtype("castle");
+    u1 = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u2 = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    CuAssertIntEquals(tc, false, in_safe_building(u1, u2));
+    u1->building = test_create_building(u1->region, btype);
+    CuAssertIntEquals(tc, false, in_safe_building(u1, u2));
+    btype->flags |= BTF_FORTIFICATION;
+    CuAssertIntEquals(tc, true, in_safe_building(u1, u2));
+    u2->building = u1->building;
+    CuAssertIntEquals(tc, true, in_safe_building(u1, u2));
+    u1->building->size = 2;
+    CuAssertIntEquals(tc, false, in_safe_building(u1, u2));
     test_cleanup();
 }
 
@@ -410,5 +430,6 @@ CuSuite *get_building_suite(void)
     SUITE_ADD_TEST(suite, test_buildingowner_goes_to_same_faction_after_leave);
     SUITE_ADD_TEST(suite, test_buildingowner_goes_to_empty_unit_after_leave);
     SUITE_ADD_TEST(suite, test_active_building);
+    SUITE_ADD_TEST(suite, test_safe_building);
     return suite;
 }
