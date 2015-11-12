@@ -248,6 +248,8 @@ static size_t write_spell_modifier(spell * sp, int flag, const char * str, bool 
     return 0;
 }
 
+void nr_spell_syntax(struct stream *out, struct spellbook_entry * sbe, const struct locale *lang);
+
 void nr_spell(stream *out, spellbook_entry * sbe, const struct locale *lang)
 {
     int bytes, k, itemanz, costtyp;
@@ -255,7 +257,6 @@ void nr_spell(stream *out, spellbook_entry * sbe, const struct locale *lang)
     char *startp, *bufp = buf;
     size_t size = sizeof(buf) - 1;
     spell * sp = sbe->sp;
-    const char *params = sp->parameter;
 
     newline(out);
     centre(out, spell_name(sp, lang), true);
@@ -361,6 +362,20 @@ void nr_spell(stream *out, spellbook_entry * sbe, const struct locale *lang)
     bufp = buf;
     size = sizeof(buf) - 1;
 
+    nr_spell_syntax(out, sbe, lang);
+
+    newline(out);
+}
+
+void nr_spell_syntax(stream *out, spellbook_entry * sbe, const struct locale *lang)
+{
+    int bytes;
+    char buf[4096];
+    char *bufp = buf;
+    size_t size = sizeof(buf) - 1;
+    spell * sp = sbe->sp;
+    const char *params = sp->parameter;
+
     if (sp->sptyp & ISCOMBATSPELL) {
         bytes = (int)strlcpy(bufp, LOC(lang, keyword(K_COMBATSPELL)), size);
     }
@@ -456,9 +471,14 @@ void nr_spell(stream *out, spellbook_entry * sbe, const struct locale *lang)
                 WARN_STATIC_BUFFER();
         }
         else if (cp == 'k') {
-            if (*params == 'c') {
+            bool multi = false;
+            if (params && *params == 'c') {
                 /* skip over a potential id */
                 ++params;
+            }
+            if (params && *params == '+') {
+                ++params;
+                multi = true;
             }
             for (targetp = targets; targetp->flag; ++targetp) {
                 if (sp->sptyp & targetp->flag)
@@ -482,8 +502,7 @@ void nr_spell(stream *out, spellbook_entry * sbe, const struct locale *lang)
                         bytes =
                             (int)_snprintf(bufp, size, " %s <%s>", parameters[targetp->param],
                                 locp);
-                        if (*params == '+') {
-                            ++params;
+                        if (multi) {
                             if (wrptr(&bufp, &size, bytes) != 0)
                                 WARN_STATIC_BUFFER();
                             bytes = (int)_snprintf(bufp, size, " [<%s> ...]", locp);
@@ -520,11 +539,13 @@ void nr_spell(stream *out, spellbook_entry * sbe, const struct locale *lang)
             bytes = (int)_snprintf(bufp, size, " <%s>", locp);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
+        } else {
+           log_error("unknown spell parameter %c for spell", cp, sp->sname);
         }
     }
     *bufp = 0;
     paragraph(out, buf, 2, 0, 0);
-    newline(out);
+
 }
 
 static void

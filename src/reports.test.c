@@ -287,47 +287,125 @@ static void test_write_unit(CuTest *tc) {
     test_cleanup();
 }
 
-static void test_write_spell_syntax(CuTest *tc) {
-    stream strm;
-    char buf[1024];
-    char *line;
-    size_t len;
+typedef struct {
+    struct locale *lang;
     spell *sp;
     spellbook *spb;
     spellbook_entry * sbe;
-    struct locale *lang;
+} spell_fixture;
 
+static void setup_spell_fixture(spell_fixture * spf) {
+    spf->lang = get_or_create_locale("de");
+    locale_setstring(spf->lang, mkname("spell", "testspell"), "Testzauber");
+    locale_setstring(spf->lang, "nr_spell_type", "Typ:");
+    locale_setstring(spf->lang, "sptype_normal", "Normal");
+    locale_setstring(spf->lang, "nr_spell_modifiers", "Modifier:");
+    locale_setstring(spf->lang, "smod_none", "Keine");
+    locale_setstring(spf->lang, keyword(K_CAST), "ZAUBERE");
+    locale_setstring(spf->lang, parameters[P_REGION], "REGION");
+    locale_setstring(spf->lang, parameters[P_LEVEL], "STUFE");
+    locale_setstring(spf->lang, "par_unit", "enr");
+    locale_setstring(spf->lang, "par_ship", "snr");
+    locale_setstring(spf->lang, "par_building", "bnr");
+    locale_setstring(spf->lang, "spellpar::hodor", "Hodor");
 
-    test_cleanup();
+    spf->spb = create_spellbook("testbook");
+    spf->sp = test_create_spell();
+    spellbook_add(spf->spb, spf->sp, 1);
+    spf->sbe = spellbook_get(spf->spb, spf->sp);
 
-    lang = get_or_create_locale("de");
-    locale_setstring(lang, "spell::testspell", "Testzauber");
-    locale_setstring(lang, "nr_spell_type", "Typ:");
-    locale_setstring(lang, "sptype_normal", "Normal");
-    locale_setstring(lang, "nr_spell_modifiers", "Modifier:");
-    locale_setstring(lang, "smod_none", "Keine");
-    locale_setstring(lang, keyword(K_CAST), "ZAUBERE");
+}
 
-    spb = create_spellbook("testbook");
-    sp = test_create_spell();
-    spellbook_add(spb, sp, 1);
-    sbe = spellbook_get(spb, sp);
+static void test_spell_syntax(CuTest *tc, char *msg, spell_fixture *spell, char *syntax) {
+    stream strm;
+    char buf[1024];
+    char *linestart, *newline;
+    size_t len;
+
     mstream_init(&strm);
 
-    nr_spell(&strm, sbe, lang);
-    stream_printf(&strm, "\n");
+
+    nr_spell_syntax(&strm, spell->sbe, spell->lang);
 
     strm.api->rewind(strm.handle);
 
     len = strm.api->read(strm.handle, buf, sizeof(buf));
     buf[len] = '\0';
 
-    line = strtok(buf, "\n");
-    while (line && !strstr(line, "ZAUBERE")) line = strtok(NULL, "\n") ;
+    linestart = strtok(buf, "\n");
+    while (linestart && !strstr(linestart, "ZAUBERE"))
+        linestart = strtok(NULL, "\n") ;
 
-    CuAssertTrue(tc, (bool) line);
-    CuAssertStrEquals(tc, "  ZAUBERE \"Testzauber\"", line);
+    CuAssertTrue(tc, (bool) linestart);
+
+    while ((newline = strtok(NULL, "\n")))
+        *(newline-1) = '\n';
+
+    CuAssertStrEquals_Msg(tc, msg, syntax, linestart);
+
     mstream_done(&strm);
+}
+
+static void set_parameter(spell_fixture spell, char *value) {
+    if (spell.sp->parameter)
+        strcpy(spell.sp->parameter, value);
+    else
+        spell.sp->parameter = _strdup(value);
+}
+
+static void test_write_spell_syntax(CuTest *tc) {
+    spell_fixture spell;
+
+    test_cleanup();
+    setup_spell_fixture(&spell);
+
+    test_spell_syntax(tc, "vanilla",  &spell,   "  ZAUBERE \"Testzauber\"");
+
+    spell.sp->sptyp |= FARCASTING;
+    test_spell_syntax(tc, "far",  &spell,   "  ZAUBERE [REGION x y] \"Testzauber\"");
+
+    spell.sp->sptyp |= SPELLLEVEL;
+    test_spell_syntax(tc, "farlevel",  &spell,   "  ZAUBERE [REGION x y] [STUFE n] \"Testzauber\"");
+    spell.sp->sptyp = 0;
+
+    set_parameter(spell, "kc");
+    test_spell_syntax(tc, "kc", &spell,   "  ZAUBERE \"Testzauber\" ( REGION | EINHEIT <enr> | SCHIFF <snr> | BURG <bnr> )");
+
+    spell.sp->sptyp |= BUILDINGSPELL;
+    test_spell_syntax(tc, "kc typed", &spell,   "  ZAUBERE \"Testzauber\" BURG <bnr>");
+    spell.sp->sptyp = 0;
+
+    set_parameter(spell, "b");
+    test_spell_syntax(tc, "b", &spell,   "  ZAUBERE \"Testzauber\" <bnr>");
+
+    set_parameter(spell, "s");
+    test_spell_syntax(tc, "s", &spell,   "  ZAUBERE \"Testzauber\" <snr>");
+
+    set_parameter(spell, "s+");
+    test_spell_syntax(tc, "s+", &spell,   "  ZAUBERE \"Testzauber\" <snr> [<snr> ...]");
+
+    set_parameter(spell, "u");
+    test_spell_syntax(tc, "u", &spell,   "  ZAUBERE \"Testzauber\" <enr>");
+
+    set_parameter(spell, "r");
+    test_spell_syntax(tc, "r", &spell,   "  ZAUBERE \"Testzauber\" <x> <y>");
+
+    set_parameter(spell, "bc");
+    spell.sp->syntax = _strdup("hodor");
+    test_spell_syntax(tc, "bc hodor", &spell,   "  ZAUBERE \"Testzauber\" <bnr> <Hodor>");
+    free(spell.sp->syntax);
+
+    /* no idea what ? is supposed to mean, optional parameter maybe?
+    set_parameter(spell, "kcc?");
+    spell.sp->syntax = _strdup("hodor");
+    test_spell_syntax(tc, "kcc?", &spell,   "  ZAUBERE \"Testzauber\" <bnr>");
+    free(spell.sp->syntax);
+    */
+
+    set_parameter(spell, "kc+");
+    test_spell_syntax(tc, "kc+", &spell,
+        "  ZAUBERE \"Testzauber\" ( REGION | EINHEIT <enr> [<enr> ...] | SCHIFF <snr>\n  [<snr> ...] | BURG <bnr> [<bnr> ...] )");
+
     test_cleanup();
 }
 
