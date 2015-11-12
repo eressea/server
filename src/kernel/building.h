@@ -89,6 +89,7 @@ extern "C" {
     int bt_effsize(const struct building_type *btype,
         const struct building *b, int bsize);
 
+    bool in_safe_building(struct unit *u1, struct unit *u2);
     /* buildingt => building_type
      * Name => locale_string(name)
      * MaxGroesse => levels
