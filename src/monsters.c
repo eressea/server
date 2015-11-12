@@ -157,19 +157,6 @@ static order *monster_attack(unit * u, const unit * target)
     return create_order(K_ATTACK, u->faction->locale, "%i", target->no);
 }
 
-static bool in_safe_building(unit *u1, unit *u2) {
-    if (u1->building && u2->building == u1->building) {
-        building * b = inside_building(u1);
-        if (u2->building) {
-            if (b != inside_building(u2)) return true;
-        }
-        if (b->type->flags & BTF_FORTIFICATION) {
-            return true;
-        }
-    }
-    return false;
-}
-
 static order *get_money_for_dragon(region * r, unit * u, int wanted)
 {
     int n;
