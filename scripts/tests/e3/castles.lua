@@ -7,6 +7,10 @@ function setup()
     eressea.settings.set("rules.food.flags", "4")
 end
 
+function teardown()
+    eressea.settings.set("rules.food.flags", "0")
+end
+
 function test_small_castles()
 	local r = region.create(0, 0, "plain")
 	local f1 = faction.create("noreply@eressea.de", "human", "de")

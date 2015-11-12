@@ -210,6 +210,14 @@ static int tolua_region_set_morale(lua_State * L)
     return 0;
 }
 
+/* region mourning this turn */
+static int tolua_region_get_is_mourning(lua_State * L)
+{
+    region *r = (region *)tolua_tousertype(L, 1, 0);
+    lua_pushboolean(L, is_mourning(r, turn+1));
+    return 1;
+}
+
 static int tolua_region_get_adj(lua_State * L)
 {
     region *r = (region *)tolua_tousertype(L, 1, 0);
@@ -691,6 +699,7 @@ void tolua_region_open(lua_State * L)
                 tolua_region_set_name);
             tolua_variable(L, TOLUA_CAST "morale", tolua_region_get_morale,
                 tolua_region_set_morale);
+            tolua_variable(L, TOLUA_CAST "is_mourning", tolua_region_get_is_mourning, NULL);
             tolua_variable(L, TOLUA_CAST "info", tolua_region_get_info,
                 tolua_region_set_info);
             tolua_variable(L, TOLUA_CAST "units", tolua_region_get_units, NULL);

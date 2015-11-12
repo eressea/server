@@ -789,3 +789,9 @@ function test_volcanooutbreak_message()
     assert_not_equal("", msg:render("de"))
     assert_not_equal("", msg:render("en"))
 end
+
+function test_no_uruk()
+  local f1 = faction.create("noreply@eressea.de", "uruk", "de")
+  assert_equal(f1.race, "orc")
+end
+
