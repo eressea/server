@@ -4,12 +4,17 @@ module("tests.e3.morale", package.seeall, lunit.testcase )
 
 function setup()
     eressea.game.reset()
+    eressea.settings.set("rules.food.flags", "4") -- food is free
 end
 
-function test_when_owner_returns_morale_drops_only_2()
+function teardown()
+    eressea.settings.set("rules.food.flags", "0")
+end
+
+function test_when_owner_returns_morale_stays()
   local r = region.create(0, 0, "plain")
   assert_equal(1, r.morale)
-  local f1 = faction.create("noreply@eressea.de", "human", "de")
+  local f1 = faction.create("owner_returns@eressea.de", "human", "de")
   local u1 = unit.create(f1, r, 1)
   u1:add_item("money", 10000)
   local b = building.create(r, "castle")
@@ -25,21 +30,21 @@ function test_when_owner_returns_morale_drops_only_2()
   assert_equal(5, r.morale) -- no owner, fall by 1
   u1.building = b
   update_owners()
-  set_key("test", 42)
   process_orders()
-  assert_equal(3, r.morale) -- new owner, fall by 2
+  assert_equal(5, r.morale) -- old owner returns, no reduction
+  assert_false(r.is_mourning)
 end
 
 function test_morale_alliance()
   local r = region.create(0, 0, "plain")
   assert_equal(1, r.morale)
-  local f1 = faction.create("noreply@eressea.de", "human", "de")
+  local f1 = faction.create("ma1@eressea.de", "human", "de")
   local u1 = unit.create(f1, r, 1)
   u1:add_item("money", 10000)
-  local f2 = faction.create("noreply@eressea.de", "human", "de")
+  local f2 = faction.create("ma2@eressea.de", "human", "de")
   local u2 = unit.create(f2, r, 1)
   u2:add_item("money", 10000)
-  local f3 = faction.create("noreply@eressea.de", "human", "de")
+  local f3 = faction.create("ma3@eressea.de", "human", "de")
   local u3 = unit.create(f3, r, 1)
   u3:add_item("money", 10000)
 
@@ -65,27 +70,68 @@ function test_morale_alliance()
   -- just checking everything's okay after setup.
   run_a_turn()
   assert_equal(6, r.morale)
+  assert_false(r.is_mourning)
+
   
   -- change owner, new owner is in the same alliance
   u1.building = nil
   run_a_turn()
   assert_equal(4, r.morale)
+  assert_true(r.is_mourning)
+
+  run_a_turn()
+  assert_false(r.is_mourning) -- mourning recovers
+
   
   -- change owner, new owner is not in the same alliance
   u2.building = nil
   run_a_turn()
   assert_equal(0, r.morale)
+  assert_true(r.is_mourning)
+  run_a_turn()
+  assert_false(r.is_mourning) -- mourning recovers
+end
+
+function test_bigger_castle_empty()
+    local r = region.create(0, 0, "plain")
+    assert_equal(1, r.morale)
+    local f1 = faction.create("small1@eressea.de", "human", "de")
+    local u1 = unit.create(f1, r, 1)
+    local f2 = faction.create("small2@eressea.de", "human", "de")
+    local u2 = unit.create(f2, r, 1)
+    u1:add_item("money", 10000)
+    
+    local big = building.create(r, "castle")
+    big.size = 20
+    u1.building = big
+
+    local small = building.create(r, "castle")
+    small.size = 10
+    u2.building = small
+
+    local function run_a_turn()
+        process_orders()
+        f1.lastturn=get_turn()
+    end
+
+    update_owners()
+    assert_equal(r.owner, u1.faction)
+    u1.building = nil
+    update_owners()
+    assert_equal(r.owner, u2.faction)
+    assert_equal(0, r.morale)
+    assert_true(r.is_mourning)
+
+    run_a_turn()
+    assert_false(r.is_mourning) -- mourning recovers
 end
 
 function test_morale_change()
     local r = region.create(0, 0, "plain")
     assert_equal(1, r.morale)
-    local f1 = faction.create("noreply@eressea.de", "human", "de")
+    local f1 = faction.create("mchange@eressea.de", "human", "de")
     local u1 = unit.create(f1, r, 1)
     u1:add_item("money", 10000)
-    local f2 = faction.create("noreply@eressea.de", "human", "de")
-    local u2 = unit.create(f2, r, 1)
-    u2:add_item("money", 10000)
     
     local AVG_STEP = 6
     local b = building.create(r, "castle")
@@ -95,38 +141,44 @@ function test_morale_change()
     local function run_a_turn()
         process_orders()
         f1.lastturn=get_turn()
-        f2.lastturn=get_turn()
     end
   
     -- reinhardt-regel: nach 2*AVG_STEP ist moral mindestens einmal gestiegen.
     update_owners()
     assert_not_equal(r.owner, nil)
+    assert_false(r.is_mourning)
     for i=1,AVG_STEP*2 do
         run_a_turn()
         assert_not_equal(r.owner, nil)
     end
     assert_not_equal(1, r.morale)
+    assert_false(r.is_mourning)
 
     -- regel: moral ist nie hoeher als 2 punkte ueber burgen-max.
     for i=1,AVG_STEP*4 do
         run_a_turn()
     end
     assert_equal(4, r.morale)
+    assert_false(r.is_mourning)
   
     -- auch mit herrscher faellt moral um 1 pro woche, wenn moral > burgstufe
     r.morale = 6
     run_a_turn()
     assert_equal(5, r.morale)
+    assert_false(r.is_mourning)
     run_a_turn()
     assert_equal(4, r.morale)
     run_a_turn()
     assert_equal(4, r.morale)
     
     -- regel: ohne herrscher fällt die moral jede woche um 1 punkt, bis sie 1 erreicht
+    assert_false(r.is_mourning)
     u1.building = nil
     update_owners()
+    assert_false(r.is_mourning)
     run_a_turn()
     assert_equal(3, r.morale)
+    assert_false(r.is_mourning)
     run_a_turn()
     assert_equal(2, r.morale)
     run_a_turn()
@@ -140,12 +192,12 @@ function test_morale_change()
     assert_equal(0, r.morale)
 end
 
-function test_morale_old()
+function test_morale_give_command()
   local r = region.create(0, 0, "plain")
   assert_equal(1, r.morale)
-  local f1 = faction.create("first@eressea.de", "human", "de")
+  local f1 = faction.create("mold1@eressea.de", "human", "de")
   local u1 = unit.create(f1, r, 1)
-  local f2 = faction.create("second@eressea.de", "human", "de")
+  local f2 = faction.create("mold2@eressea.de", "human", "de")
   local u2 = unit.create(f2, r, 1)
 
   local b = building.create(r, "castle")
@@ -154,25 +206,20 @@ function test_morale_old()
   u2.building = b
   update_owners()
   assert_equal(1, r.morale)
+  assert_false(r.is_mourning)
   r.morale = 5
   assert_equal(r.owner, u1.faction)
   u1:clear_orders()
   u1:add_order("GIB " .. itoa36(u2.id) .. " KOMMANDO")
+
   process_orders()
-  u1:clear_orders()
   assert_equal(u2.faction, r.owner)
-  assert_equal(3, r.morale) --  5-MORALE_TRANSFER
-  for u in r.units do
-    if u.faction.id==u2.faction.id then
-      u.building = nil
-    end
-  end
-  update_owners()
-  assert_equal(r.owner, u1.faction)
-  assert_equal(0, r.morale)
+  assert_equal(3, r.morale) --  5 - MORALE_TRANSFER
+  assert_true(r.is_mourning) 
+
+  u1:clear_orders()
+
+  process_orders()
+  assert_false(r.is_mourning) -- mourning recovers
 end
 
-function test_no_uruk()
-  local f1 = faction.create("noreply@eressea.de", "uruk", "de")
-  assert_equal(f1.race, "orc")
-end
