@@ -248,7 +248,7 @@ static size_t write_spell_modifier(spell * sp, int flag, const char * str, bool 
     return 0;
 }
 
-static void nr_spell(stream *out, spellbook_entry * sbe, const struct locale *lang)
+void nr_spell(stream *out, spellbook_entry * sbe, const struct locale *lang)
 {
     int bytes, k, itemanz, costtyp;
     char buf[4096];

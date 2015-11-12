@@ -6,6 +6,7 @@
 #include "move.h"
 #include "seen.h"
 #include "travelthru.h"
+#include "keyword.h"
 
 #include <kernel/building.h>
 #include <kernel/faction.h>
@@ -13,6 +14,8 @@
 #include <kernel/region.h>
 #include <kernel/ship.h>
 #include <kernel/unit.h>
+#include <kernel/spell.h>
+#include <kernel/spellbook.h>
 
 #include <util/language.h>
 
@@ -284,6 +287,50 @@ static void test_write_unit(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_write_spell_syntax(CuTest *tc) {
+    stream strm;
+    char buf[1024];
+    char *line;
+    size_t len;
+    spell *sp;
+    spellbook *spb;
+    spellbook_entry * sbe;
+    struct locale *lang;
+
+
+    test_cleanup();
+
+    lang = get_or_create_locale("de");
+    locale_setstring(lang, "spell::testspell", "Testzauber");
+    locale_setstring(lang, "nr_spell_type", "Typ:");
+    locale_setstring(lang, "sptype_normal", "Normal");
+    locale_setstring(lang, "nr_spell_modifiers", "Modifier:");
+    locale_setstring(lang, "smod_none", "Keine");
+    locale_setstring(lang, keyword(K_CAST), "ZAUBERE");
+
+    spb = create_spellbook("testbook");
+    sp = test_create_spell();
+    spellbook_add(spb, sp, 1);
+    sbe = spellbook_get(spb, sp);
+    mstream_init(&strm);
+
+    nr_spell(&strm, sbe, lang);
+    stream_printf(&strm, "\n");
+
+    strm.api->rewind(strm.handle);
+
+    len = strm.api->read(strm.handle, buf, sizeof(buf));
+    buf[len] = '\0';
+
+    line = strtok(buf, "\n");
+    while (line && !strstr(line, "ZAUBERE")) line = strtok(NULL, "\n") ;
+
+    CuAssertTrue(tc, (bool) line);
+    CuAssertStrEquals(tc, "  ZAUBERE \"Testzauber\"", line);
+    mstream_done(&strm);
+    test_cleanup();
+}
+
 CuSuite *get_reports_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -296,5 +343,6 @@ CuSuite *get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_sparagraph);
     SUITE_ADD_TEST(suite, test_write_travelthru);
     SUITE_ADD_TEST(suite, test_write_unit);
+    SUITE_ADD_TEST(suite, test_write_spell_syntax);
     return suite;
 }
