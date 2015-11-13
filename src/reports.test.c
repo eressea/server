@@ -347,10 +347,8 @@ static void test_spell_syntax(CuTest *tc, char *msg, spell_fixture *spell, char 
 }
 
 static void set_parameter(spell_fixture spell, char *value) {
-    if (spell.sp->parameter)
-        strcpy(spell.sp->parameter, value);
-    else
-        spell.sp->parameter = _strdup(value);
+    free(spell.sp->parameter);
+    spell.sp->parameter = _strdup(value);
 }
 
 static void test_write_spell_syntax(CuTest *tc) {
@@ -391,15 +389,19 @@ static void test_write_spell_syntax(CuTest *tc) {
     test_spell_syntax(tc, "r", &spell,   "  ZAUBERE \"Testzauber\" <x> <y>");
 
     set_parameter(spell, "bc");
+    free(spell.sp->syntax);
     spell.sp->syntax = _strdup("hodor");
     test_spell_syntax(tc, "bc hodor", &spell,   "  ZAUBERE \"Testzauber\" <bnr> <Hodor>");
     free(spell.sp->syntax);
+    spell.sp->syntax = 0;
 
-    /* no idea what ? is supposed to mean, optional parameter maybe?
-    set_parameter(spell, "kcc?");
-    spell.sp->syntax = _strdup("hodor");
-    test_spell_syntax(tc, "kcc?", &spell,   "  ZAUBERE \"Testzauber\" <bnr>");
+    /* There are no spells with optional parameters, so we don't force this, for now
+    set_parameter(spell, "c?");
     free(spell.sp->syntax);
+    spell.sp->syntax = _strdup("hodor");
+    test_spell_syntax(tc, "c?", &spell,   "  ZAUBERE \"Testzauber\" [<Hodor>]");
+    free(spell.sp->syntax);
+    spell.sp->syntax = 0;
     */
 
     set_parameter(spell, "kc+");

@@ -205,6 +205,8 @@ spell * test_create_spell(void)
     sp->components[2].amount = 1;
     sp->components[2].type = get_resourcetype(R_HORSE);
     sp->components[2].cost = SPC_LINEAR;
+    sp->syntax = 0;
+    sp->parameter = 0;
     return sp;
 }
 
