@@ -15,6 +15,7 @@
         "modules.wormholes": true,
         "entertain.base": 0,
         "entertain.perlevel": 20,
+        "taxing.perlevel": 20,
         "nmr.timeout": 5,
         "nmr.removenewbie": 0,
         "GiveRestriction": 3,

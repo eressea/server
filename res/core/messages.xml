@@ -6357,6 +6357,16 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist nicht der Eigentümer."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit is not the owner."</text>
   </message>
+  <message name="error_no_tax_skill" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist nicht geschult im Eintreiben von Steuern."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit does not now how to tax."</text>
+  </message>
+
   <message name="error48" section="errors">
     <type>
       <arg name="unit" type="unit"/>

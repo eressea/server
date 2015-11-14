@@ -2924,7 +2924,7 @@ static void expandloot(region * r, request * lootorders)
     }
 }
 
-static void expandtax(region * r, request * taxorders)
+void expandtax(region * r, request * taxorders)
 {
     unit *u;
     unsigned int i;
@@ -2957,6 +2957,11 @@ void tax_cmd(unit * u, struct order *ord, request ** taxorders)
     request *o;
     int max;
     keyword_t kwd;
+    static int taxperlevel = 0;
+
+    if (!taxperlevel) {
+        taxperlevel = get_param_int(global.parameters, "taxing.perlevel", 0);
+    }
 
     kwd = init_order(ord);
     assert(kwd == K_TAX);
@@ -2982,6 +2987,12 @@ void tax_cmd(unit * u, struct order *ord, request ** taxorders)
         return;
     }
 
+    if (effskill(u, SK_TAXING, 0) <= 0) {
+        ADDMSG(&u->faction->msgs,
+            msg_feedback(u, ord, "error_no_tax_skill", ""));
+        return;
+    }
+
     max = getint();
 
     if (max <= 0) {
@@ -2991,7 +3002,7 @@ void tax_cmd(unit * u, struct order *ord, request ** taxorders)
         u->wants = _min(income(u), max);
     }
     else {
-        u->wants = _min(n * effskill(u, SK_TAXING, 0) * 20, max);
+        u->wants = _min(n * effskill(u, SK_TAXING, 0) * taxperlevel, max);
     }
 
     u2 = is_guarded(r, u, GUARD_TAX);

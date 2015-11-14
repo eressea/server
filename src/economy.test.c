@@ -19,6 +19,7 @@
 
 #include <CuTest.h>
 #include <tests.h>
+#include <assert.h>
 
 static void test_give_control_building(CuTest * tc)
 {
@@ -169,6 +170,77 @@ static void test_normals_recruit(CuTest * tc) {
     test_cleanup();
 }
 
+typedef struct request {
+    struct request *next;
+    struct unit *unit;
+    struct order *ord;
+    int qty;
+    int no;
+    union {
+        bool goblin;             /* stealing */
+        const struct luxury_type *ltype;    /* trading */
+    } type;
+} request;
+
+static void test_tax_cmd(CuTest *tc) {
+    order *ord;
+    faction *f;
+    region *r;
+    unit *u;
+    item_type *sword, *silver;
+    request *taxorders = 0;
+
+
+    test_cleanup();
+    set_param(&global.parameters, "taxing.perlevel", "20");
+    test_create_world();
+    f = test_create_faction(NULL);
+    r = findregion(0, 0);
+    assert(r && f);
+    u = test_create_unit(f, r);
+
+    ord = create_order(K_TAX, f->locale, "");
+    assert(ord);
+
+    tax_cmd(u, ord, &taxorders);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error48"));
+    test_clear_messages(u->faction);
+
+    silver = get_resourcetype(R_SILVER)->itype;
+
+    sword = it_get_or_create(rt_get_or_create("sword"));
+    new_weapontype(sword, 0, 0.0, NULL, 0, 0, 0, SK_MELEE, 1);
+    i_change(&u->items, sword, 1);
+    set_level(u, SK_MELEE, 1);
+
+    tax_cmd(u, ord, &taxorders);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error_no_tax_skill"));
+    test_clear_messages(u->faction);
+
+    set_level(u, SK_TAXING, 1);
+    tax_cmd(u, ord, &taxorders);
+    CuAssertPtrEquals(tc, 0, test_find_messagetype(u->faction->msgs, "error_no_tax_skill"));
+    CuAssertPtrNotNull(tc, taxorders);
+
+
+    r->land->money = 11;
+    expandtax(r, taxorders);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "income"));
+    CuAssertTrue(tc, i_get(u->items, silver) > 0 && i_get(u->items, silver) <= 11);
+    test_clear_messages(u->faction);
+    i_change(&u->items, silver, -i_get(u->items, silver));
+
+    r->land->money = 1000;
+    taxorders = 0;
+    tax_cmd(u, ord, &taxorders);
+    expandtax(r, taxorders);
+    CuAssertIntEquals(tc, 20, i_get(u->items, silver));
+    test_clear_messages(u->faction);
+
+    free_order(ord);
+    test_cleanup();
+}
+
 CuSuite *get_economy_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -179,5 +251,6 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_steal_nosteal);
     SUITE_ADD_TEST(suite, test_normals_recruit);
     SUITE_ADD_TEST(suite, test_heroes_dont_recruit);
+    SUITE_ADD_TEST(suite, test_tax_cmd);
     return suite;
 }
