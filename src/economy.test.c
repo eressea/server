@@ -223,10 +223,12 @@ static void test_tax_cmd(CuTest *tc) {
     CuAssertPtrNotNull(tc, taxorders);
 
 
+
     r->land->money = 11;
     expandtax(r, taxorders);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "income"));
-    CuAssertTrue(tc, i_get(u->items, silver) > 0 && i_get(u->items, silver) <= 11);
+    /* taxing is in multiples of 10 */
+    CuAssertIntEquals(tc, 10, i_get(u->items, silver));
     test_clear_messages(u->faction);
     i_change(&u->items, silver, -i_get(u->items, silver));
 
