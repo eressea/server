@@ -3,6 +3,7 @@
 #include "move.h"
 
 #include "guard.h"
+#include "keyword.h"
 
 #include <kernel/config.h>
 #include <kernel/ally.h>
@@ -14,9 +15,13 @@
 #include <kernel/item.h>
 #include <kernel/unit.h>
 #include <kernel/race.h>
+#include <kernel/order.h>
 
 #include <util/attrib.h>
 #include <util/language.h>
+#include <util/message.h>
+#include <util/base36.h>
+#include <util/parser.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -295,6 +300,70 @@ static void test_age_trails(CuTest *tc) {
     test_cleanup();
 }
 
+typedef struct traveldir {
+    int no;
+    direction_t dir;
+    int age;
+} traveldir;
+
+
+static void test_follow_ship_msg(CuTest * tc) {
+    region *r;
+    ship * sh;
+    faction *f;
+    unit *u;
+    const ship_type *stype;
+    message *msg;
+    order *ord;
+    item_type *silver;
+
+    traveldir *td = NULL;
+    attrib *a;
+
+    test_cleanup();
+    test_create_world();
+    f = test_create_faction(0);
+    r = findregion(0, 0);
+
+    stype = st_find("boat");
+    sh = test_create_ship(r, stype);
+    u = test_create_unit(f, r);
+    u->ship = sh;
+    ship_set_owner(u);
+    set_level(u, SK_SAILING, 10);
+
+    ord = create_order(K_FOLLOW, f->locale, "SHIP 2");
+    assert(ord);
+    unit_addorder(u, ord);
+
+    silver = get_resourcetype(R_SILVER)->itype;
+    i_change(&u->items, silver, 999999);
+
+    a = a_add(&(r->attribs), a_new(&at_shiptrail));
+    td = (traveldir *)a->data.v;
+    td->no = 2;
+    td->dir = D_NORTHWEST;
+    td->age = 2;
+
+    locale_setstring(default_locale, "northwest", "Nordwesten");
+    locale_setstring(default_locale, "keyword::move", "NACH");
+    init_locale(default_locale);
+
+    mt_register(mt_new_va("error18", "unit:unit", "region:region", "command:order"));
+
+    init_order(ord);
+    getstrtoken();
+
+    follow_ship(u, ord);
+
+    CuAssertPtrNotNull(tc, msg = test_find_messagetype(u->faction->msgs, "error18"));
+    void *p = msg->parameters[2].v;
+    CuAssertPtrNotNull(tc, p);
+    CuAssertIntEquals(tc, K_FOLLOW, getkeyword((order *)p));
+
+    test_cleanup();
+}
+
 CuSuite *get_move_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -309,5 +378,6 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_is_guarded);
     SUITE_ADD_TEST(suite, test_ship_trails);
     SUITE_ADD_TEST(suite, test_age_trails);
+    SUITE_ADD_TEST(suite, test_follow_ship_msg);
     return suite;
 }

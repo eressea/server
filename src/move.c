@@ -2315,7 +2315,7 @@ static direction_t hunted_dir(attrib * at, int id)
     return d;
 }
 
-static int follow_ship(unit * u, order * ord)
+int follow_ship(unit * u, order * ord)
 {
     region *rc = u->region;
     size_t bytes;
