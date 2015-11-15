@@ -1615,6 +1615,13 @@
     <text locale="de">"Die $ship($ship) wird bei einer Kollision mit einem Eisberg beschädigt."</text>
     <text locale="en">"The $ship($ship) has been damaged by a collision with an iceberg."</text>
   </message>
+  <message name="massive_overload" section="events">
+    <type>
+      <arg name="ship" type="ship"/>
+    </type>
+    <text locale="de">"Die $ship($ship) ist zu stark überladen und wird stark beschädigt."</text>
+    <text locale="en">"The $ship($ship) is massively overloaded and is damaged heavily."</text>
+  </message>
   <message name="ship_drift" section="events">
     <type>
       <arg name="ship" type="ship"/>

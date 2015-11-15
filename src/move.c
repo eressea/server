@@ -80,6 +80,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include <float.h>
 
 int *storms;
 
@@ -473,6 +474,27 @@ static bool cansail(const region * r, ship * sh)
     return true;
 }
 
+static double overload(const region * r, ship * sh)
+{
+    /* sonst ist construction:: size nicht ship_type::maxsize */
+    assert(!sh->type->construction
+        || sh->type->construction->improvement == NULL);
+
+    if (sh->type->construction && sh->size != sh->type->construction->maxsize) {
+        return DBL_MAX;
+    } else {
+        int n = 0, p = 0;
+        int mcabins = sh->type->cabins;
+
+        getshipweight(sh, &n, &p);
+
+        double ovl = n / (double)sh->type->cargo;
+        if (mcabins)
+            ovl = _max(ovl, p / (double)mcabins);
+        return ovl;
+    }
+}
+
 int enoughsailors(const ship * sh, int crew_skill)
 {
     return crew_skill >= sh->type->sumskill;
@@ -699,6 +721,37 @@ static float damage_drift(void)
     return value;
 }
 
+static float damage_overload(void)
+{
+    static float value = -1.0F;
+    if (value < 0) {
+        value = (float)get_param_flt(global.parameters, "rules.ship.damage_overload", 0.3F);
+    }
+    return value;
+}
+
+/* message to all factions in ship, start from firstu, end before lastu (may be NULL) */
+static void msg_to_ship_inmates(ship *sh, unit **firstu, unit **lastu, message *msg) {
+    unit *u, *shipfirst = NULL;
+    for (u = *firstu; u != *lastu; u = u->next) {
+        if (u->ship == sh) {
+            if (shipfirst == NULL)
+                shipfirst = u;
+            if (!fval(u->faction, FFL_MARK)) {
+                fset(u->faction, FFL_MARK);
+                add_message(&u->faction->msgs, msg);
+            }
+            *lastu = u->next;
+        }
+    }
+    if (shipfirst)
+        *firstu = shipfirst;
+    for (u = *firstu; u != *lastu; u = u->next) {
+        freset(u->faction, FFL_MARK);
+    }
+    msg_release(msg);
+}
+
 static void drifting_ships(region * r)
 {
     direction_t d;
@@ -710,9 +763,10 @@ static void drifting_ships(region * r)
             ship *sh = *shp;
             region *rnext = NULL;
             region_list *route = NULL;
-            unit *firstu = NULL, *captain;
+            unit *firstu = r->units, *lastu = NULL, *captain;
             int d_offset;
             direction_t dir = 0;
+            double ovl;
 
             if (sh->type->fishing > 0) {
                 sh->flags |= SF_FISHING;
@@ -725,73 +779,64 @@ static void drifting_ships(region * r)
             }
 
             /* Kapitän bestimmen */
-            for (captain = r->units; captain; captain = captain->next) {
-                if (captain->ship != sh)
-                    continue;
-                if (firstu == NULL)
-                    firstu = captain;
-                if (effskill(captain, SK_SAILING, r) >= sh->type->cptskill) {
-                    break;
-                }
-            }
+            captain = ship_owner(sh);
+            if (effskill(captain, SK_SAILING, r) < sh->type->cptskill)
+               captain = NULL;
+
             /* Kapitän da? Beschädigt? Genügend Matrosen?
              * Genügend leicht? Dann ist alles OK. */
 
-            assert(sh->type->construction->improvement == NULL);      /* sonst ist construction::size nicht ship_type::maxsize */
+            assert(sh->type->construction->improvement == NULL); /* sonst ist construction::size nicht ship_type::maxsize */
             if (captain && sh->size == sh->type->construction->maxsize
                 && enoughsailors(sh, crew_skill(sh)) && cansail(r, sh)) {
                 shp = &sh->next;
                 continue;
             }
 
-            /* Auswahl einer Richtung: Zuerst auf Land, dann
-             * zufällig. Falls unmögliches Resultat: vergiß es. */
-            d_offset = rng_int() % MAXDIRECTIONS;
-            for (d = 0; d != MAXDIRECTIONS; ++d) {
-                region *rn;
-                dir = (direction_t)((d + d_offset) % MAXDIRECTIONS);
-                rn = rconnect(r, dir);
-                if (rn != NULL && fval(rn->terrain, SAIL_INTO) && check_ship_allowed(sh, rn) > 0) {
-                    rnext = rn;
-                    if (!fval(rnext->terrain, SEA_REGION))
-                        break;
-                }
-            }
-
-            if (rnext == NULL) {
-                shp = &sh->next;
-                continue;
-            }
-
-            /* Das Schiff und alle Einheiten darin werden nun von r
-             * nach rnext verschoben. Danach eine Meldung. */
-            add_regionlist(&route, rnext);
-
-            set_coast(sh, r, rnext);
-            sh = move_ship(sh, r, rnext, route);
-            free_regionlist(route);
-
-            if (firstu != NULL) {
-                unit *u, *lastu = NULL;
-                message *msg = msg_message("ship_drift", "ship dir", sh, dir);
-                for (u = firstu; u; u = u->next) {
-                    if (u->ship == sh && !fval(u->faction, FFL_MARK)) {
-                        fset(u->faction, FFL_MARK);
-                        add_message(&u->faction->msgs, msg);
-                        lastu = u->next;
+            ovl = overload(r, sh);
+            if (ovl >= 2) {
+                rnext = NULL;
+            } else {
+                /* Auswahl einer Richtung: Zuerst auf Land, dann
+                 * zufällig. Falls unmögliches Resultat: vergiß es. */
+                d_offset = rng_int () % MAXDIRECTIONS;
+                for (d = 0; d != MAXDIRECTIONS; ++d) {
+                    region *rn;
+                    dir = (direction_t)((d + d_offset) % MAXDIRECTIONS);
+                    rn = rconnect(r, dir);
+                    if (rn != NULL && fval(rn->terrain, SAIL_INTO) && check_ship_allowed(sh, rn) > 0) {
+                        rnext = rn;
+                        if (!fval(rnext->terrain, SEA_REGION))
+                            break;
                     }
                 }
-                for (u = firstu; u != lastu; u = u->next) {
-                    freset(u->faction, FFL_MARK);
+            }
+
+            if (rnext != NULL) {
+
+                /* Das Schiff und alle Einheiten darin werden nun von r
+                 * nach rnext verschoben. Danach eine Meldung. */
+                add_regionlist(&route, rnext);
+
+                set_coast(sh, r, rnext);
+                sh = move_ship(sh, r, rnext, route);
+                free_regionlist(route);
+
+                if (firstu != NULL) {
+                    message *msg = msg_message("ship_drift", "ship dir", sh, dir);
+                    msg_to_ship_inmates(sh, &firstu, &lastu, msg);
                 }
-                msg_release(msg);
             }
 
             if (sh != NULL) {
                 fset(sh, SF_DRIFTED);
-
-                damage_ship(sh, damage_drift());
+                if (ovl >= 2) {
+                    damage_ship(sh, (ovl - 1) * damage_overload());
+                    msg_to_ship_inmates(sh, &firstu, &lastu, msg_message("massive_overload", "ship", sh));
+                } else
+                    damage_ship(sh, damage_drift());
                 if (sh->damage >= sh->size * DAMAGE_SCALE) {
+                    msg_to_ship_inmates(sh, &firstu, &lastu, msg_message("shipsink", "ship", sh));
                     remove_ship(&sh->region->ships, sh);
                 }
             }
