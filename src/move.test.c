@@ -16,7 +16,6 @@
 #include <kernel/race.h>
 
 #include <util/attrib.h>
-#include <util/language.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -153,27 +152,6 @@ static void test_ship_has_harbormaster_ally(CuTest * tc) {
     test_cleanup();
 }
 
-static void test_building_type_exists(CuTest * tc)
-{
-    region *r;
-    building *b;
-    building_type *btype, *btype2;
-
-    test_cleanup();
-    test_create_world();
-
-    btype2 = bt_get_or_create("lighthouse");
-    btype = bt_get_or_create("castle");
-
-    r = findregion(-1, 0);
-    b = new_building(btype, r, default_locale);
-
-    CuAssertPtrNotNull(tc, b);
-    CuAssertTrue(tc, !buildingtype_exists(r, NULL, false));
-    CuAssertTrue(tc, buildingtype_exists(r, btype, false));
-    CuAssertTrue(tc, !buildingtype_exists(r, btype2, false));
-}
-
 static void test_walkingcapacity(CuTest *tc) {
     region *r;
     unit *u;
@@ -299,7 +277,6 @@ CuSuite *get_move_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_walkingcapacity);
-    SUITE_ADD_TEST(suite, test_building_type_exists);
     SUITE_ADD_TEST(suite, test_ship_not_allowed_in_coast);
     SUITE_ADD_TEST(suite, test_ship_allowed_without_harbormaster);
     SUITE_ADD_TEST(suite, test_ship_blocked_by_harbormaster);

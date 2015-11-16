@@ -642,9 +642,30 @@ region *building_getregion(const building * b)
     return b->region;
 }
 
-bool building_is_active(const struct building *b) {
-    return b && fval(b, BLD_WORKING);
+bool
+buildingtype_exists(const region * r, const building_type * bt, bool working)
+{
+    building *b;
+
+    for (b = rbuildings(r); b; b = b->next) {
+        if (b->type == bt && b->size >= bt->maxsize && (!working || fval(b, BLD_WORKING)))
+            return true;
+    }
+
+    return false;
 }
+
+bool building_is_active(const struct building *b) {
+    return b && fval(b, BLD_WORKING)  && b->size >= b->type->maxsize;
+}
+
+building *active_building(const unit *u, const struct building_type *btype) {
+    if (u->building && u->building->type == btype && building_is_active(u->building)) {
+        return inside_building(u);
+    }
+    return 0;
+}
+
 
 void building_setregion(building * b, region * r)
 {
