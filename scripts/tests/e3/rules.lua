@@ -59,28 +59,6 @@ function disable_test_bug_1738_build_castle_e3()
     assert_equal(c.size, 250)
 end
 
-function disable_test_market_action()
-    local f = faction.create("noreply@eressea.de", "human", "de")
-    local x, y, r
-    for x=0,2 do
-        for y=0,2 do
-            r = region.create(x, y, "plain")
-            r.luxury = "balm"
-            r.herb = "h2"
-            r:set_resource("peasant", 5000)
-        end
-    end
-    r = get_region(1, 1)
-    local u = unit.create(f, r, 1)
-    b = building.create(r, "market")
-    b.size = 10
-    u.building = b
-    update_owners()
-    process.markets()
-    assert_equal(35, u:get_item("balm"))
-    assert_equal(70, u:get_item("h2"))
-end
-
 function disable_test_alliance()
     local r = region.create(0, 0, "plain")
     local f1 = faction.create("noreply@eressea.de", "human", "de")
@@ -345,43 +323,204 @@ function test_region_owner_cannot_leave_castle()
     assert_equal(b1, u.building, "region owner has left the building") -- region owners may not leave
 end
 
-function test_market()
-    -- if i am the only trader around, i should be getting all the herbs from all 7 regions
+function reset_items(u)
+  for i in u.items do
+    u:add_item(i, u:get_item(i))
+  end
+  u:add_item("money", u.number * 10000)
+end
+
+function market_fixture()
     local herb_multi = 500 -- from rc_herb_trade()
-    local r, idx
-    local herbnames = { 'h0', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'h7', 'h8' }
-    idx = 1
+    local r
+    local herbnames = { 'h0', 'h1', 'h2', 'h3', 'h4', 'h5' }
+    local herbtable = {}
+    for _, name in pairs(herbnames) do
+        herbtable[name] = name
+    end
+    local luxurynames = { 'balm', 'jewel', 'myrrh', 'oil', 'silk', 'incense' } -- no spice in E3
+    local luxurytable = {}
+    for _, name in pairs(luxurynames) do
+        luxurytable[name] = name
+    end
+
     for x = -1, 1 do for y = -1, 1 do
         r = region.create(x, y, "plain")
-        r:set_resource("peasant", herb_multi * 9 + 50) -- 10 herbs per region
-        r.herb = herbnames[idx]
-        idx = idx+1
+        r:set_resource("peasant", 1) 
     end end
+
     r = get_region(0, 0)
     local b = building.create(r, "market")
     b.size = 10
-    local f = faction.create("noreply@eressea.de", "human", "de")
+    b.working = true
+
+    local f = faction.create("market1@eressea.de", "human", "de")
     f.id = 42
     local u = unit.create(f, r, 1)
     u.building = b
-    u:add_item("money", u.number * 10000)
-    for i = 0, 5 do
+
+    r.herb = herbnames[6]
+    r.luxury = luxurynames[6]
+    r:set_resource("peasant", herb_multi * 9 + 50) -- 10 herbs per region
+    for i = 0, 4 do
         local rn = r:next(i)
+        rn.name = luxurynames[i+1]
+        rn.herb = herbnames[i+1]
+        rn.luxury = luxurynames[i+1]
+        rn:set_resource("peasant", herb_multi * 9 + 50) -- 10 herbs per region
+        unit.create(f, rn, 1)
     end
-    b.working = true
-    eressea.process.markets()
-    u:add_item("money", -u:get_item("money")) -- now we only have herbs
-    local len = 0
-    for i in u.items do
+  
+    reset_items(u)  
+    return r, u, b, herbnames, luxurynames, herbtable, luxurytable
+end
+
+local function test_items(u, names, amount)
+  local len = 0
+  for i in u.items do
+      if names[i] ~= nil then
         len = len + 1
+      end
+  end
+  if amount > 0 then
+      assert_not_equal(0, len, "trader did not get any items")
+  else
+      assert_equal(0, len, "trader should not have items")
+  end
+  for _, name in pairs(names) do
+      local n = u:get_item(name)
+      if n>0 then
+         if amount == 0 then
+            assert_equal(0, n, 'trader should have no ' .. name)
+         else
+             assert_equal(amount, n, 'trader has ' .. n .. ' instead of ' .. amount .. ' ' .. name)
+         end
+      end
+  end
+end
+
+function test_market_regions()
+    -- if i am the only trader around, i should be getting all the herbs from all 7 regions
+    local r, u, b, herbnames, luxurynames, herbtable, luxurytable = market_fixture()
+
+
+    eressea.process.markets()
+
+    test_items(u, herbtable, 10)
+    test_items(u, luxurytable, 5)
+end
+
+function test_multiple_markets()
+   local r, u1, b, herbnames, luxurynames, herbtable, luxurytable = market_fixture()
+   local r2 = get_region(1,0)
+   local f = faction.create("multim@eressea.de", "human", "de")
+   local u2 = unit.create(f, r2, 1)
+   local b2 = building.create(r2, "market")
+   b2.size = 10
+   b2.working = true
+   reset_items(u2)
+   u2.building = b2
+   
+
+   eressea.process.markets()
+   for _, i in pairs(luxurytable) do
+     assert_equal(5, u1:get_item(i)+u2:get_item(i), "not enough " .. i )
+   end
+   for _, i in pairs(herbtable) do
+     assert_equal(10, u1:get_item(i)+u2:get_item(i), "not enough " .. i )
+   end
+   assert_equal(5, u1:get_item('silk')) -- uncontested
+end
+
+
+function test_market()
+  local r = region.create(0, 0, "plain")
+  local f1 = faction.create("market2@eressea.de", "human", "de")
+  local u1 = unit.create(f1, r, 1)
+	
+  local b = building.create(r, "market")
+
+  eressea.settings.set("rules.peasants.growth", "0")
+
+  b.size = 10
+  u1.building = b
+  u1:add_item("money", 10000)
+  r.herb = "h0"
+  r.luxury = "balm"
+  r:set_resource("peasant", 1050)
+  process_orders()
+  assert_equal(3, u1:get_item("h0"))
+  assert_equal(2, u1:get_item("balm"))
+
+  local function reset_items()
+    for i in u1.items do
+      u1:add_item(i, -1 * u1:get_item(i))
     end
-    assert_not_equal(0, len, "trader did not get any herbs")
-    for idx, name in pairs(herbnames) do
-        local n = u:get_item(name)
-        if n>0 then
-            assert_equal(10, n, 'trader did not get exaxtly 10 herbs')
-        end
-    end
+    u1:add_item("money", u1.number * 10000)
+--    eressea.game.reset()
+    f1.lastturn=get_turn()
+    assert_not_equal(nil, factions())
+    local idx = 0
+    for f in factions() do
+      assert_equal(1,1,"fac".. f.email)
+      idx = idx + 1
+    end    
+    assert_not_equal(0, idx)
+  end
+  reset_items()
+  b.size = 1  
+  eressea.process.markets()
+
+  assert_equal(0, u1:get_item("h0"))
+  b.size = 10 
+
+
+  reset_items()
+  r:set_resource("peasant", 2100)
+  eressea.process.markets()
+  
+  assert_equal(5, u1:get_item("h0"))
+  assert_equal(3, u1:get_item("balm"))
+
+  reset_items()
+  r:set_resource("peasant", 1049)
+  eressea.process.markets()
+  assert_equal(2, u1:get_item("h0"))
+  assert_equal(1, u1:get_item("balm"))
+
+  reset_items()
+  r:set_resource("peasant", 550)
+  eressea.process.markets()
+  assert_equal(2, u1:get_item("h0"))
+  assert_equal(1, u1:get_item("balm"))
+
+  reset_items()
+  r:set_resource("peasant", 549)
+  eressea.process.markets()
+  assert_equal(1, u1:get_item("h0"))
+  assert_equal(1, u1:get_item("balm"))
+
+  reset_items()
+  r:set_resource("peasant", 50)
+  eressea.process.markets()
+  assert_equal(1, u1:get_item("h0"))
+  assert_equal(1, u1:get_item("balm"))
+
+  reset_items()
+  r:set_resource("peasant", 49)
+  eressea.process.markets()
+  assert_equal(0, u1:get_item("h0"))
+  r:set_resource("peasant", 1050)
+
+  reset_items()
+  u1:add_item("money", -1 * u1:get_item("money"))
+  assert_equal(0, u1:get_item("money"))
+
+  process_orders() -- process_orders to update maintenance
+  assert_equal(0, u1:get_item("h0"))
+
+  process_orders()
+  eressea.settings.set("rules.peasants.growth", "1")
 end
 
 function test_market_gives_items()
@@ -393,7 +532,7 @@ function test_market_gives_items()
     r = get_region(0, 0)
     local b = building.create(r, "market")
     b.size = 10
-    local f = faction.create("noreply@eressea.de", "human", "de")
+    local f = faction.create("market0@eressea.de", "human", "de")
     f.id = 42
     local u = unit.create(f, r, 1)
     u.building = b
@@ -788,4 +927,37 @@ function test_volcanooutbreak_message()
     msg:set_region("regionv", r2)
     assert_not_equal("", msg:render("de"))
     assert_not_equal("", msg:render("en"))
+end
+
+
+function test_bug2083()
+    local herb_multi = 500 -- from rc_herb_trade()
+    local r = region.create(0,0,"plain")
+    r:set_resource("peasant", 2000) 
+    r.luxury = "balm"
+
+    local f = faction.create("2083@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+    u:set_skill("building", 8)
+    u:add_item("stone", 100)
+    u:add_item("log", 100)
+    u:add_item("iron", 100)
+    u:add_item("money", 10000)
+    u:clear_orders()
+    u:add_order("MACHE Markt")
+    process_orders()
+
+    -- this is a bit weird, but the bug was caused by market code
+    -- being called in two places. We want to make sure this doesn't happen
+    for k, v in pairs(rules) do
+        set_key("xm09", true)
+    	if 'table' == type(v) then
+           cb = v['update']
+	   if 'function' == type(cb) then
+              cb()
+	   end
+        end
+     end
+
+    assert_equal(0, u:get_item("balm"))
 end

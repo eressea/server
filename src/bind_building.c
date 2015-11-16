@@ -112,6 +112,13 @@ static int tolua_building_set_name(lua_State * L)
     return 0;
 }
 
+static int tolua_building_get_maxsize(lua_State * L)
+{
+    building *self = (building *)tolua_tousertype(L, 1, 0);
+    lua_pushinteger(L, self->type->maxsize);
+    return 1;
+}
+
 static int tolua_building_get_size(lua_State * L)
 {
     building *self = (building *)tolua_tousertype(L, 1, 0);
@@ -247,6 +254,7 @@ void tolua_building_open(lua_State * L)
             tolua_variable(L, TOLUA_CAST "units", tolua_building_get_units, NULL);
             tolua_variable(L, TOLUA_CAST "region", tolua_building_get_region,
                 tolua_building_set_region);
+            tolua_variable(L, TOLUA_CAST "maxsize", tolua_building_get_maxsize, NULL);
             tolua_variable(L, TOLUA_CAST "size", tolua_building_get_size,
                 tolua_building_set_size);
             tolua_function(L, TOLUA_CAST "get_typename", tolua_building_get_typename);
