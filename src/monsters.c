@@ -399,10 +399,10 @@ static int dragon_affinity_value(region * r, unit * u)
     int m = all_money(r, u->faction);
 
     if (u_race(u) == get_race(RC_FIREDRAGON)) {
-        return (int)(normalvariate(m, m / 2));
+        return dice(6, m / 6);
     }
     else {
-        return (int)(normalvariate(m, m / 4));
+        return dice(4, m / 8);
     }
 }
 
@@ -745,9 +745,10 @@ static order *plan_dragon(unit * u)
         }
     }
     if (long_order == NULL) {
+        int attempts = 0;
         skill_t sk = SK_PERCEPTION;
         /* study perception (or a random useful skill) */
-        while (!skill_enabled(sk) || u_race(u)->bonus[sk] < -5) {
+        while ((!skill_enabled(sk) || (attempts < MAXSKILLS && u_race(u)->bonus[sk] < (++attempts < 10?1:-5 )))) {
             sk = (skill_t)(rng_int() % MAXSKILLS);
         }
         long_order = create_order(K_STUDY, u->faction->locale, "'%s'",
