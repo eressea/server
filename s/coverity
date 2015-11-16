@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 VERSION="$1"
+echo "submitting version $VERSION"
 shift
 DESC="$*"
 cd Debug

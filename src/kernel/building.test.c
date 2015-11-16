@@ -410,7 +410,9 @@ static void test_safe_building(CuTest *tc) {
     CuAssertIntEquals(tc, true, in_safe_building(u1, u2));
     u2->building = u1->building;
     CuAssertIntEquals(tc, true, in_safe_building(u1, u2));
-    u1->building->size = 2;
+    u1->number = 2;
+    CuAssertIntEquals(tc, false, in_safe_building(u1, u2));
+    u1->building->size = 3;
     CuAssertIntEquals(tc, false, in_safe_building(u1, u2));
     test_cleanup();
 }
