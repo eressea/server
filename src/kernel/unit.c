@@ -27,6 +27,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "curse.h"
 #include "item.h"
 #include "move.h"
+#include "monster.h"
 #include "order.h"
 #include "plane.h"
 #include "race.h"
@@ -1945,7 +1946,7 @@ static double produceexp_chance(void) {
 
 void produceexp_ex(struct unit *u, skill_t sk, int n, bool (*learn)(unit *, skill_t, double))
 {
-    if (n != 0 && playerrace(u_race(u))) {
+    if (n != 0 && (is_monsters(u->faction) || playerrace(u_race(u)))) {
         double chance = produceexp_chance();
         if (chance > 0.0F) {
             learn(u, sk, (n * chance) / u->number);
