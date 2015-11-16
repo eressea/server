@@ -157,9 +157,30 @@ static order *monster_attack(unit * u, const unit * target)
     return create_order(K_ATTACK, u->faction->locale, "%i", target->no);
 }
 
+static int monster_attacks(unit * monster, bool respect_buildings, bool rich_only)
+{
+    region *r = monster->region;
+    unit *u2;
+    int money = 0;
+
+    for (u2 = r->units; u2; u2 = u2->next) {
+        if (u2->faction != monster->faction && cansee(monster->faction, r, u2, 0) && !in_safe_building(u2, monster)) {
+            int m = get_money(u2);
+            if (!rich_only || m > 0) {
+                order *ord = monster_attack(monster, u2);
+                if (ord) {
+                    addlist(&monster->orders, ord);
+                    money += m;
+                }
+            }
+        }
+    }
+    return money;
+}
+
 static order *get_money_for_dragon(region * r, unit * u, int wanted)
 {
-    int n;
+    int money;
     bool attacks = monster_attack_chance() > 0.0;
 
     /* falls genug geld in der region ist, treiben wir steuern ein. */
@@ -173,26 +194,14 @@ static order *get_money_for_dragon(region * r, unit * u, int wanted)
 
     /* falls der drache launisch ist, oder das regionssilber knapp, greift er alle an
      * und holt sich Silber von Einheiten, vorausgesetzt er bewacht bereits */
-    n = 0;
+    money = 0;
     if (attacks && is_guard(u, GUARD_TAX)) {
-        unit *u2;
-        for (u2 = r->units; u2; u2 = u2->next) {
-            if (u2->faction != u->faction && cansee(u->faction, r, u2, 0) && !in_safe_building(u, u2)) {
-                int m = get_money(u2);
-                if (m != 0) {
-                    order *ord = monster_attack(u, u2);
-                    if (ord) {
-                        addlist(&u->orders, ord);
-                        n += m;
-                    }
-                }
-            }
-        }
+        money += monster_attacks(u, true, true);
     }
 
     /* falls die einnahmen erreicht werden, bleibt das monster noch eine */
     /* runde hier. */
-    if (n + rmoney(r) >= wanted) {
+    if (money + rmoney(r) >= wanted) {
         return create_order(K_LOOT, default_locale, NULL);
     }
 
@@ -538,21 +547,6 @@ static order *monster_seeks_target(region * r, unit * u)
 }
 #endif
 
-static void monster_attacks(unit * monster)
-{
-    region *r = monster->region;
-    unit *u;
-
-    for (u = r->units; u; u = u->next) {
-        if (u->faction != monster->faction && cansee(monster->faction, r, u, 0) && !in_safe_building(u, monster)) {
-            order *ord = monster_attack(monster, u);
-            if (ord) {
-                addlist(&monster->orders, ord);
-            }
-        }
-    }
-}
-
 static const char *random_growl(void)
 {
     switch (rng_int() % 5) {
@@ -790,7 +784,7 @@ void plan_monsters(faction * f)
                 /* all monsters fight */
             }
             if (attacking && is_guard(u, GUARD_TAX)) {
-                monster_attacks(u);
+                monster_attacks(u, true, false);
             }
             /* units with a plan to kill get ATTACK orders: */
             ta = a_find(u->attribs, &at_hate);
