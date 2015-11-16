@@ -1547,6 +1547,7 @@ static void mkreportdir(const char *rpath) {
             abort();
         }
     }
+    errno = 0;
 }
 
 int write_reports(faction * f, time_t ltime)
@@ -1563,11 +1564,7 @@ int write_reports(faction * f, time_t ltime)
     }
     prepare_report(&ctx, f);
     get_addresses(&ctx);
-    mkreportdir(path);
-    if (errno) {
-        log_warning("errno was %d before writing reports", errno);
-        errno = 0;
-    }
+    mkreportdir(path); // FIXME: too many mkdir calls! init_reports is enough
     log_debug("Reports for %s:", factionname(f));
     for (rtype = report_types; rtype != NULL; rtype = rtype->next) {
         if (f->options & rtype->flag) {
@@ -1662,7 +1659,7 @@ int reports(void)
     report_donations();
     remove_empty_units();
 
-    mkreportdir(rpath);
+    mkreportdir(rpath); // FIXME: init_reports already does this?
     sprintf(path, "%s/reports.txt", rpath);
     mailit = fopen(path, "w");
     if (mailit == NULL) {

@@ -685,14 +685,13 @@ static order *plan_dragon(unit * u)
         /* dragon gets bored and looks for a different place to go */
         ta = set_new_dragon_target(u, u->region, DRAGON_RANGE);
     }
-    else
-        ta = a_find(u->attribs, &at_targetregion);
     if (ta != NULL) {
         tr = (region *)ta->data.v;
         if (tr == NULL || !path_exists(u->region, tr, DRAGON_RANGE, allowed_dragon)) {
             ta = set_new_dragon_target(u, u->region, DRAGON_RANGE);
-            if (ta)
+            if (ta) {
                 tr = findregion(ta->data.sa[0], ta->data.sa[1]);
+            }
         }
     }
     if (tr != NULL) {
