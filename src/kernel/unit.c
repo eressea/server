@@ -55,6 +55,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <util/rand.h>
 #include <util/resolve.h>
 #include <util/rng.h>
 #include <util/variant.h>
@@ -1161,10 +1162,11 @@ void set_number(unit * u, int count)
     u->number = (unsigned short)count;
 }
 
-bool learn_skill(unit * u, skill_t sk, double chance)
+bool learn_skill(unit * u, skill_t sk, double learn_chance)
 {
     skill *sv = u->skills;
-    if (chance < 1.0 && rng_int() % 10000 >= chance * 10000)
+    if (learn_chance < 1.0 && rng_int() % 10000 >= learn_chance * 10000)
+    if (!chance(learn_chance))
         return false;
     while (sv != u->skills + u->skill_size) {
         assert(sv->weeks > 0);

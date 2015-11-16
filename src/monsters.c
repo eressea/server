@@ -766,8 +766,7 @@ void plan_monsters(faction * f)
 
     for (r = regions; r; r = r->next) {
         unit *u;
-        double rchance = attack_chance;
-        bool attacking = false;
+        bool attacking = chance(attack_chance);
 
         for (u = r->units; u; u = u->next) {
             attrib *ta;
@@ -785,11 +784,6 @@ void plan_monsters(faction * f)
                 produceexp(u, SK_PERCEPTION, u->number);
             }
 
-            if (rchance > 0.0) {
-                if (chance(rchance))
-                    attacking = true;
-                rchance = 0.0;
-            }
             if (u->status > ST_BEHIND) {
                 setstatus(u, ST_FIGHT);
                 /* all monsters fight */
