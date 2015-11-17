@@ -8,6 +8,7 @@
 #include <kernel/terrain.h>
 #include <kernel/faction.h>
 #include <kernel/order.h>
+#include <kernel/race.h>
 
 #include <util/base36.h>
 #include <util/language.h>
@@ -66,6 +67,7 @@ static void test_piracy_cmd(CuTest * tc) {
 }
 
 static void test_piracy_cmd_errors(CuTest * tc) {
+    race *r;
     faction *f;
     unit *u, *u2;
     order *ord;
@@ -73,13 +75,25 @@ static void test_piracy_cmd_errors(CuTest * tc) {
 
     setup_piracy();
     st_boat = st_get_or_create("boat");
-    u = test_create_unit(f = test_create_faction(0), test_create_region(0, 0, get_or_create_terrain("ocean")));
+    r = test_create_race("pirates");
+    u = test_create_unit(f = test_create_faction(r), test_create_region(0, 0, get_or_create_terrain("ocean")));
     f->locale = get_or_create_locale("de");
     ord = create_order(K_PIRACY, f->locale, "");
     assert(u && ord);
 
     piracy_cmd(u, ord);
     CuAssertPtrNotNullMsg(tc, "must be on a ship for PIRACY", test_find_messagetype(f->msgs, "error144"));
+
+    test_clear_messages(f);
+    fset(r, RCF_SWIM);
+    piracy_cmd(u, ord);
+    CuAssertPtrEquals_Msg(tc, "swimmers are pirates", 0, test_find_messagetype(f->msgs, "error144"));
+    CuAssertPtrEquals_Msg(tc, "swimmers are pirates", 0, test_find_messagetype(f->msgs, "error146"));
+    freset(r, RCF_SWIM);
+    fset(r, RCF_FLY);
+    CuAssertPtrEquals_Msg(tc, "flyers are pirates", 0, test_find_messagetype(f->msgs, "error144"));
+    freset(r, RCF_FLY);
+    test_clear_messages(f);
 
     u_set_ship(u, test_create_ship(u->region, st_boat));
 

@@ -1604,6 +1604,8 @@ static void parse_ai(race * rc, xmlNodePtr node)
         rc->flags |= RCF_MOVERANDOM;
     if (xml_bvalue(node, "learn", false))
         rc->flags |= RCF_LEARN;
+    if (xml_bvalue(node, "moveattack", false))
+        rc->flags |= RCF_ATTACK_MOVED;
 }
 
 static int parse_races(xmlDocPtr doc)
