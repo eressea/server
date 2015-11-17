@@ -71,7 +71,7 @@
 #include <string.h>
 #include <assert.h>
 
-#define MOVECHANCE                  25  /* chance fuer bewegung */
+#define MOVECHANCE                  .25  /* chance fuer bewegung */
 #define DRAGON_RANGE 20         /* Max. Distanz zum nächsten Drachenziel */
 #define MAXILLUSION_TEXTS   3
 
@@ -83,6 +83,10 @@ static void give_peasants(unit *u, const item_type *itype, int reduce) {
 
 static double monster_attack_chance(void) {
     return get_param_flt(global.parameters, "rules.monsters.attack_chance", 0.4f);
+}
+
+static double random_move_chance(void) {
+    return get_param_flt(global.parameters, "rules.monsters.random_move_chance", MOVECHANCE);
 }
 
 static void reduce_weight(unit * u)
@@ -157,7 +161,7 @@ static order *monster_attack(unit * u, const unit * target)
     return create_order(K_ATTACK, u->faction->locale, "%i", target->no);
 }
 
-static int monster_attacks(unit * monster, bool respect_buildings, bool rich_only)
+int monster_attacks(unit * monster, bool respect_buildings, bool rich_only)
 {
     region *r = monster->region;
     unit *u2;
@@ -786,6 +790,7 @@ void plan_monsters(faction * f)
             if (attacking && is_guard(u, GUARD_TAX)) {
                 monster_attacks(u, true, false);
             }
+
             /* units with a plan to kill get ATTACK orders: */
             ta = a_find(u->attribs, &at_hate);
             if (ta && !monster_is_waiting(u)) {
@@ -818,7 +823,7 @@ void plan_monsters(faction * f)
                     }
                 }
                 else if (u_race(u)->flags & RCF_MOVERANDOM) {
-                    if (rng_int() % 100 < MOVECHANCE || check_overpopulated(u)) {
+                    if (chance(random_move_chance()) || check_overpopulated(u)) {
                         long_order = monster_move(r, u);
                     }
                 }
