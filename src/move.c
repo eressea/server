@@ -721,13 +721,13 @@ static float damage_drift(void)
     return value;
 }
 
-static float damage_overload(void)
+static double damage_overload(double overload)
 {
-    static float value = -1.0F;
-    if (value < 0) {
-        value = (float)get_param_flt(global.parameters, "rules.ship.damage_overload", 0.3F);
-    }
-    return value;
+    static double damage;
+    damage = get_param_flt(global.parameters, "rules.ship.damage_overload_min", 0.2);
+    damage *= overload - OVERLOAD_THRESHOLD + 1;
+    damage = _min(damage, get_param_flt(global.parameters, "rules.ship.damage_overload_max", 0.37));
+    return damage;
 }
 
 /* message to all factions in ship, start from firstu, end before lastu (may be NULL) */
@@ -794,7 +794,7 @@ static void drifting_ships(region * r)
             }
 
             ovl = overload(r, sh);
-            if (ovl >= 2) {
+            if (ovl >= OVERLOAD_THRESHOLD) {
                 rnext = NULL;
             } else {
                 /* Auswahl einer Richtung: Zuerst auf Land, dann
@@ -830,8 +830,8 @@ static void drifting_ships(region * r)
 
             if (sh != NULL) {
                 fset(sh, SF_DRIFTED);
-                if (ovl >= 2) {
-                    damage_ship(sh, (ovl - 1) * damage_overload());
+                if (ovl >= OVERLOAD_THRESHOLD) {
+                    damage_ship(sh, damage_overload(ovl));
                     msg_to_ship_inmates(sh, &firstu, &lastu, msg_message("massive_overload", "ship", sh));
                 } else
                     damage_ship(sh, damage_drift());

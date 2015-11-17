@@ -469,3 +469,7 @@ const char *ship_getname(const ship * self)
 {
     return self->name;
 }
+
+int ship_damage_percent(const ship *ship) {
+    return (ship->damage * 100 + DAMAGE_SCALE - 1) / (ship->size * DAMAGE_SCALE);
+}
