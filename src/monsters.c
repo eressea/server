@@ -412,10 +412,10 @@ static int dragon_affinity_value(region * r, unit * u)
     int m = all_money(r, u->faction);
 
     if (u_race(u) == get_race(RC_FIREDRAGON)) {
-        return dice(6, m / 6);
+        return dice(4, m / 2);
     }
     else {
-        return dice(4, m / 8);
+        return dice(6, m / 3);
     }
 }
 
@@ -779,7 +779,6 @@ void plan_monsters(faction * f)
             free_orders(&u->orders);
             if (skill_enabled(SK_PERCEPTION)) {
                 /* Monster bekommen jede Runde ein paar Tage Wahrnehmung dazu */
-                /* TODO: this only works for playerrace */
                 produceexp(u, SK_PERCEPTION, u->number);
             }
 
