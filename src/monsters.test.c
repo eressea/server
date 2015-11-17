@@ -145,6 +145,31 @@ static void test_monsters_waiting(CuTest * tc)
     test_cleanup();
 }
 
+static void test_seaserpent_attack(CuTest * tc)
+{
+    faction *f, *f2;
+    region *r;
+    unit *u, *m;
+    race *rc;
+
+    create_monsters(&f, &f2, &r, &u, &m);
+    r = findregion(-1, 0);
+    u = test_create_unit(u->faction, r);
+    unit_setid(u, 2);
+    m = test_create_unit(m->faction, r);
+    u_setrace(m, rc = test_create_race("seaserpent"));
+    assert(!m->region->land);
+    fset(m, UFL_MOVED);
+    fset(rc, RCF_ATTACK_MOVED);
+
+    set_param(&global.parameters, "rules.monsters.attack_chance", "1");
+
+    plan_monsters(f2);
+
+    CuAssertPtrNotNull(tc, find_order("ATTACKIERE 2", m));
+    test_cleanup();
+}
+
 static void test_monsters_attack_not(CuTest * tc)
 {
     faction *f, *f2;
@@ -238,6 +263,7 @@ CuSuite *get_monsters_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_monsters_attack);
     SUITE_ADD_TEST(suite, test_monsters_attack_ocean);
+    SUITE_ADD_TEST(suite, test_seaserpent_attack);
     SUITE_ADD_TEST(suite, test_monsters_waiting);
     SUITE_ADD_TEST(suite, test_monsters_attack_not);
     SUITE_ADD_TEST(suite, test_dragon_attacks_the_rich);
