@@ -306,7 +306,6 @@ typedef struct traveldir {
     int age;
 } traveldir;
 
-
 static void test_follow_ship_msg(CuTest * tc) {
     region *r;
     ship * sh;
