@@ -198,7 +198,7 @@ void piracy_cmd(unit * u, order *ord)
 
     /* Bewegung ausführen */
     init_order(u->thisorder);
-    move_cmd(u, true);
+    move_cmd(u, ord, true);
 }
 
 void age_piracy(region *r) {
