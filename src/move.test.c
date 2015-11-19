@@ -314,7 +314,7 @@ void setup_drift (struct drift_fixture *fix) {
     test_create_world();
 
     fix->st_boat = st_get_or_create("boat");
-    fix->st_boat->cabins = 10000;
+    fix->st_boat->cabins = 20000;
     fix->u = test_create_unit(fix->f = test_create_faction(0), fix->r=findregion(-1,0));
     assert(fix->r && fix->r->terrain->flags & SAIL_INTO);
     set_level(fix->u, SK_SAILING, fix->st_boat->sumskill);
@@ -338,7 +338,7 @@ static void test_ship_normal_overload(CuTest *tc) {
     struct drift_fixture fix;
     setup_drift(&fix);
 
-    fix.u->number = 12;
+    fix.u->number = 21;
     movement();
     CuAssertPtrEquals(tc, fix.u->region, findregion(0, 0));
     CuAssertIntEquals(tc, 2, ship_damage_percent(fix.sh));
@@ -349,10 +349,10 @@ static void test_ship_big_overload(CuTest *tc) {
     struct drift_fixture fix;
     setup_drift(&fix);
 
-    fix.u->number = 15;
+    fix.u->number = 22;
     movement();
     CuAssertPtrEquals(tc, fix.u->region, findregion(-1, 0));
-    CuAssertIntEquals(tc, 20, ship_damage_percent(fix.sh));
+    CuAssertIntEquals(tc, 5, ship_damage_percent(fix.sh));
     CuAssertPtrNotNull(tc, test_find_messagetype(fix.f->msgs, "massive_overload"));
 }
 
@@ -360,7 +360,7 @@ static void test_ship_no_real_overload(CuTest *tc) {
     struct drift_fixture fix;
     setup_drift(&fix);
 
-    fix.u->number = 12;
+    fix.u->number = 21;
     damage_ship(fix.sh, .80);
     movement();
     CuAssertPtrEquals(tc, fix.u->region, findregion(0, 0));
@@ -372,7 +372,7 @@ static void test_ship_ridiculous_overload(CuTest *tc) {
     struct drift_fixture fix;
     setup_drift(&fix);
 
-    fix.u->number = 100;
+    fix.u->number = 500;
     movement();
     CuAssertIntEquals(tc, 37, ship_damage_percent(fix.sh));
     CuAssertPtrNotNull(tc, test_find_messagetype(fix.f->msgs, "massive_overload"));
@@ -383,7 +383,7 @@ static void test_ship_ridiculous_overload_no_captain(CuTest *tc) {
     setup_drift(&fix);
     set_level(fix.u, SK_SAILING, 0);
 
-    fix.u->number = 100;
+    fix.u->number = 500;
     movement();
     CuAssertIntEquals(tc, 37, ship_damage_percent(fix.sh));
     CuAssertPtrNotNull(tc, test_find_messagetype(fix.f->msgs, "massive_overload"));
@@ -393,8 +393,8 @@ static void test_ship_ridiculous_overload_bad(CuTest *tc) {
     struct drift_fixture fix;
     setup_drift(&fix);
 
-    fix.u->number = 200;
-    set_param(&global.parameters, "rules.ship.damage_overload_max", "1");
+    fix.u->number = 500;
+    set_param(&global.parameters, "rules.ship.overload.damage.max", "1");
     movement();
     CuAssertTrue(tc, ship_damage_percent(fix.sh) > 99);
     CuAssertPtrNotNull(tc, test_find_messagetype(fix.f->msgs, "massive_overload"));
@@ -402,6 +402,15 @@ static void test_ship_ridiculous_overload_bad(CuTest *tc) {
     CuAssertPtrNotNull(tc, test_find_messagetype(fix.f->msgs, "shipsink"));
 }
 
+extern double damage_overload(double overload);
+
+static void test_ship_damage_overload(CuTest *tc) {
+    CuAssertDblEquals(tc, 0.0, damage_overload(1), ASSERT_DBL_DELTA);
+    CuAssertDblEquals(tc, 0.05, damage_overload(1.1), ASSERT_DBL_DELTA);
+    CuAssertDblEquals(tc, 0.05, damage_overload(1.5), ASSERT_DBL_DELTA);
+    CuAssertDblEquals(tc, 0.21, damage_overload(3.25), ASSERT_DBL_DELTA);
+    CuAssertDblEquals(tc, 0.37, damage_overload(5), ASSERT_DBL_DELTA);
+}
 
 CuSuite *get_move_suite(void)
 {
@@ -424,5 +433,6 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_ship_ridiculous_overload);
     SUITE_ADD_TEST(suite, test_ship_ridiculous_overload_bad);
     SUITE_ADD_TEST(suite, test_ship_ridiculous_overload_no_captain);
+    SUITE_ADD_TEST(suite, test_ship_damage_overload);
     return suite;
 }

@@ -721,12 +721,38 @@ static float damage_drift(void)
     return value;
 }
 
-static double damage_overload(double overload)
+static double overload_start(void) {
+    return get_param_flt(global.parameters, "rules.ship.overload.start", 1.1);
+}
+
+static double overload_worse(void) {
+    return get_param_flt(global.parameters, "rules.ship.overload.worse", 1.5);
+}
+
+static double overload_worst(void) {
+    return get_param_flt(global.parameters, "rules.ship.overload.worst", 5.0);
+}
+
+static double overload_default_damage(void) {
+    return get_param_flt(global.parameters, "rules.ship.overload.damage.default", 0.05);
+}
+
+static double overload_max_damage(void) {
+    return get_param_flt(global.parameters, "rules.ship.overload.damage.max", 0.37);
+}
+
+double damage_overload(double overload)
 {
-    static double damage;
-    damage = get_param_flt(global.parameters, "rules.ship.damage_overload_min", 0.2);
-    damage *= overload - OVERLOAD_THRESHOLD + 1;
-    damage = _min(damage, get_param_flt(global.parameters, "rules.ship.damage_overload_max", 0.37));
+    double damage, badness;
+    if (overload < overload_start())
+        return 0;
+    damage = overload_default_damage();
+    badness = overload - overload_worse();
+    if (badness >= 0) {
+        damage += _min(badness, overload_worst() - overload_worse()) *
+            (overload_max_damage() - damage) /
+            (overload_worst() - overload_worse());
+    }
     return damage;
 }
 
@@ -794,7 +820,7 @@ static void drifting_ships(region * r)
             }
 
             ovl = overload(r, sh);
-            if (ovl >= OVERLOAD_THRESHOLD) {
+            if (ovl >= overload_start()) {
                 rnext = NULL;
             } else {
                 /* Auswahl einer Richtung: Zuerst auf Land, dann
@@ -830,7 +856,7 @@ static void drifting_ships(region * r)
 
             if (sh != NULL) {
                 fset(sh, SF_DRIFTED);
-                if (ovl >= OVERLOAD_THRESHOLD) {
+                if (ovl >= overload_start()) {
                     damage_ship(sh, damage_overload(ovl));
                     msg_to_ship_inmates(sh, &firstu, &lastu, msg_message("massive_overload", "ship", sh));
                 } else

@@ -789,27 +789,3 @@ function test_volcanooutbreak_message()
     assert_not_equal("", msg:render("de"))
     assert_not_equal("", msg:render("en"))
 end
-
-function test_ship_massive()
-    set_rule("rules.ship.drifting", "1")
-    set_rule("rules.ship.damage_drift", "0.02")
-    local r = region.create(0,0, "ocean")
-    region.create(1,0, "plain")
-    region.create(0,1, "ocean")
-    local f = faction.create("massive@eressea.de", "human", "de")
-
-    local s1 = ship.create(r, "cutter")
-    s1.damage = 390
-    local u1 = unit.create(f, r, 10)
-    u1.ship = s1
---    u1:set_skill("sailing", 10)
-    u1:clear_orders()
-    u1:add_order("NACH o")
-
-    update_owners()
-    process_orders()
-    write_reports()
-    assert_equal(990, s1.damage)
-
-    set_rule("rules.ship.drifting", "0")
-end

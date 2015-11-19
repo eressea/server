@@ -42,8 +42,6 @@ extern "C" {
 #define HORSESNEEDED    2
 #define STRENGTHMULTIPLIER  50   /* multiplier for trollbelt */
 
-#define OVERLOAD_THRESHOLD 1.5
-
     /* ein mensch wiegt 10, traegt also 5, ein pferd wiegt 50, traegt also 20. ein
     ** wagen wird von zwei pferden gezogen und traegt total 140, davon 40 die
     ** pferde, macht nur noch 100, aber samt eigenem gewicht (40) macht also 140. */
