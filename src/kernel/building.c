@@ -666,7 +666,7 @@ void building_setregion(building * b, region * r)
 bool in_safe_building(unit *u1, unit *u2) {
     if (u1->building) {
         building * b = inside_building(u1);
-        if (b->type->flags & BTF_FORTIFICATION) {
+        if (b && b->type->flags & BTF_FORTIFICATION) {
             if (!u2->building) {
                 return true;
             }

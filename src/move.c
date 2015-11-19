@@ -1773,14 +1773,14 @@ static const region_list *travel_route(unit * u,
     return iroute;
 }
 
-static bool ship_ready(const region * r, unit * u)
+static bool ship_ready(const region * r, unit * u, order * ord)
 {
     if (!u->ship || u != ship_owner(u->ship)) {
-        cmistake(u, u->thisorder, 146, MSG_MOVE);
+        cmistake(u, ord, 146, MSG_MOVE);
         return false;
     }
     if (effskill(u, SK_SAILING, r) < u->ship->type->cptskill) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
             "error_captain_skill_low", "value ship", u->ship->type->cptskill,
             u->ship));
         return false;
@@ -1788,16 +1788,16 @@ static bool ship_ready(const region * r, unit * u)
     if (u->ship->type->construction) {
         assert(!u->ship->type->construction->improvement);     /* sonst ist construction::size nicht ship_type::maxsize */
         if (u->ship->size != u->ship->type->construction->maxsize) {
-            cmistake(u, u->thisorder, 15, MSG_MOVE);
+            cmistake(u, ord, 15, MSG_MOVE);
             return false;
         }
     }
     if (!enoughsailors(u->ship, crew_skill(u->ship))) {
-        cmistake(u, u->thisorder, 1, MSG_MOVE);
+        cmistake(u, ord, 1, MSG_MOVE);
         return false;
     }
     if (!cansail(r, u->ship)) {
-        cmistake(u, u->thisorder, 18, MSG_MOVE);
+        cmistake(u, ord, 18, MSG_MOVE);
         return false;
     }
     return true;
@@ -1879,7 +1879,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
         return;
     }
 
-    if (!ship_ready(starting_point, u))
+    if (!ship_ready(starting_point, u, ord))
         return;
 
     /* Wir suchen so lange nach neuen Richtungen, wie es geht. Diese werden
@@ -2336,13 +2336,13 @@ static void travel(unit * u, region_list ** routep)
     }
 }
 
-void move_cmd(unit * u, bool move_on_land)
+void move_cmd(unit * u, order * ord, bool move_on_land)
 {
     region_list *route = NULL;
 
     assert(u->number);
     if (u->ship && u == ship_owner(u->ship)) {
-        sail(u, u->thisorder, move_on_land, &route);
+        sail(u, ord, move_on_land, &route);
     }
     else {
         travel(u, &route);
@@ -2386,7 +2386,7 @@ static direction_t hunted_dir(attrib * at, int id)
     return d;
 }
 
-static int follow_ship(unit * u, order * ord)
+int follow_ship(unit * u, order * ord)
 {
     region *rc = u->region;
     size_t bytes;
@@ -2460,7 +2460,7 @@ static int follow_ship(unit * u, order * ord)
     init_tokens_str(command);
     getstrtoken();
     /* NACH ausführen */
-    move_cmd(u, false);
+    move_cmd(u, ord, false);
     return 1;                     /* true -> Einheitenliste von vorne durchgehen */
 }
 
@@ -2627,13 +2627,13 @@ void movement(void)
                         if (ships) {
                             if (u->ship && ship_owner(u->ship) == u) {
                                 init_order(u->thisorder);
-                                move_cmd(u, false);
+                                move_cmd(u, u->thisorder, false);
                             }
                         }
                         else {
                             if (!u->ship || ship_owner(u->ship) != u) {
                                 init_order(u->thisorder);
-                                move_cmd(u, false);
+                                move_cmd(u, u->thisorder, false);
                             }
                         }
                     }
