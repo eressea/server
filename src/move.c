@@ -749,6 +749,7 @@ double damage_overload(double overload)
     damage = overload_default_damage();
     badness = overload - overload_worse();
     if (badness >= 0) {
+        assert(overload_worst() > overload_worse() || !"overload.worst must be > overload.worse");
         damage += _min(badness, overload_worst() - overload_worse()) *
             (overload_max_damage() - damage) /
             (overload_worst() - overload_worse());
