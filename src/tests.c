@@ -235,6 +235,7 @@ void test_create_world(void)
     locale_setstring(loc, keyword(K_RESERVE), "RESERVIEREN");
     locale_setstring(loc, "money", "SILBER");
     init_resources();
+    get_resourcetype(R_SILVER)->itype->weight = 1;
 
     test_create_horse();
 

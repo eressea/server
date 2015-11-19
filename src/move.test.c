@@ -317,9 +317,10 @@ void setup_drift (struct drift_fixture *fix) {
     fix->lang = get_or_create_locale("de");
 
     test_create_world();
-
-    fix->st_boat = st_get_or_create("boat");
+    test_create_shiptype("drifter");
+    fix->st_boat = st_get_or_create("drifter");
     fix->st_boat->cabins = 20000;
+
     fix->u = test_create_unit(fix->f = test_create_faction(0), fix->r=findregion(-1,0));
     assert(fix->r && fix->r->terrain->flags & SAIL_INTO);
     set_level(fix->u, SK_SAILING, fix->st_boat->sumskill);
@@ -331,16 +332,24 @@ void setup_drift (struct drift_fixture *fix) {
 
 static void test_ship_no_overload(CuTest *tc) {
     struct drift_fixture fix;
+
+    test_cleanup();
+
     setup_drift(&fix);
 
     fix.u->number = 2;
     movement();
     CuAssertPtrEquals(tc, fix.u->region, findregion(-1,0));
     CuAssertIntEquals(tc, 0, fix.sh->damage);
+
+    test_cleanup();
 }
 
 static void test_ship_normal_overload(CuTest *tc) {
     struct drift_fixture fix;
+
+    test_cleanup();
+
     setup_drift(&fix);
 
     fix.u->number = 21;
@@ -348,10 +357,15 @@ static void test_ship_normal_overload(CuTest *tc) {
     CuAssertPtrEquals(tc, fix.u->region, findregion(0, 0));
     CuAssertIntEquals(tc, 2, ship_damage_percent(fix.sh));
     CuAssertPtrNotNull(tc, test_find_messagetype(fix.f->msgs, "ship_drift"));
+
+    test_cleanup();
 }
 
 static void test_ship_big_overload(CuTest *tc) {
     struct drift_fixture fix;
+
+    test_cleanup();
+
     setup_drift(&fix);
 
     fix.u->number = 22;
@@ -359,10 +373,15 @@ static void test_ship_big_overload(CuTest *tc) {
     CuAssertPtrEquals(tc, fix.u->region, findregion(-1, 0));
     CuAssertIntEquals(tc, 5, ship_damage_percent(fix.sh));
     CuAssertPtrNotNull(tc, test_find_messagetype(fix.f->msgs, "massive_overload"));
+
+    test_cleanup();
 }
 
 static void test_ship_no_real_overload(CuTest *tc) {
     struct drift_fixture fix;
+
+    test_cleanup();
+
     setup_drift(&fix);
 
     fix.u->number = 21;
@@ -371,20 +390,30 @@ static void test_ship_no_real_overload(CuTest *tc) {
     CuAssertPtrEquals(tc, fix.u->region, findregion(0, 0));
     CuAssertIntEquals(tc, 82, ship_damage_percent(fix.sh));
     CuAssertPtrEquals(tc, 0, test_find_messagetype(fix.f->msgs, "massive_overload"));
+
+    test_cleanup();
 }
 
 static void test_ship_ridiculous_overload(CuTest *tc) {
     struct drift_fixture fix;
+
+    test_cleanup();
+
     setup_drift(&fix);
 
     fix.u->number = 500;
     movement();
     CuAssertIntEquals(tc, 37, ship_damage_percent(fix.sh));
     CuAssertPtrNotNull(tc, test_find_messagetype(fix.f->msgs, "massive_overload"));
+
+    test_cleanup();
 }
 
 static void test_ship_ridiculous_overload_no_captain(CuTest *tc) {
     struct drift_fixture fix;
+
+    test_cleanup();
+
     setup_drift(&fix);
     set_level(fix.u, SK_SAILING, 0);
 
@@ -392,10 +421,14 @@ static void test_ship_ridiculous_overload_no_captain(CuTest *tc) {
     movement();
     CuAssertIntEquals(tc, 37, ship_damage_percent(fix.sh));
     CuAssertPtrNotNull(tc, test_find_messagetype(fix.f->msgs, "massive_overload"));
+
+    test_cleanup();
 }
 
 static void test_ship_ridiculous_overload_bad(CuTest *tc) {
     struct drift_fixture fix;
+
+    test_cleanup();
     setup_drift(&fix);
 
     fix.u->number = 500;
@@ -405,6 +438,7 @@ static void test_ship_ridiculous_overload_bad(CuTest *tc) {
     CuAssertPtrNotNull(tc, test_find_messagetype(fix.f->msgs, "massive_overload"));
     CuAssertPtrEquals(tc, 0, fix.sh->region);
     CuAssertPtrNotNull(tc, test_find_messagetype(fix.f->msgs, "shipsink"));
+    test_cleanup();
 }
 
 extern double damage_overload(double overload);
@@ -431,7 +465,6 @@ static void test_follow_ship_msg(CuTest * tc) {
     const ship_type *stype;
     message *msg;
     order *ord;
-    item_type *silver;
 
     traveldir *td = NULL;
     attrib *a;
@@ -452,8 +485,7 @@ static void test_follow_ship_msg(CuTest * tc) {
     assert(ord);
     unit_addorder(u, ord);
 
-    silver = get_resourcetype(R_SILVER)->itype;
-    i_change(&u->items, silver, 999999);
+    set_money(u, 999999);
 
     a = a_add(&(r->attribs), a_new(&at_shiptrail));
     td = (traveldir *)a->data.v;
