@@ -1024,32 +1024,61 @@ void init_locale(struct locale *lang)
 }
 
 typedef struct param {
-    struct param *next;
-    char *name;
-    char *data;
+    critbit_tree cb;
 } param;
 
+size_t pack_keyval(const char *key, const char *value, char *data, size_t len) {
+    size_t klen = strlen(key);
+    size_t vlen = strlen(value);
+    assert(klen + vlen + 2 + sizeof(vlen) <= len);
+    memcpy(data, key, klen + 1);
+    memcpy(data + klen + 1, value, vlen + 1);
+    return klen + vlen + 2;
+}
+
+void set_param(struct param **p, const char *key, const char *value)
+{
+    struct param *par;
+    assert(p);
+
+    par = *p;
+    if (!par && value) {
+        *p = par = calloc(1, sizeof(param));
+    }
+    if (par) {
+        void *match;
+        size_t klen = strlen(key) + 1;
+        if (cb_find_prefix(&par->cb, key, klen, &match, 1, 0) > 0) {
+            const char * kv = (const char *)match;
+            size_t vlen = strlen(kv + klen) + 1;
+            cb_erase(&par->cb, kv, klen + vlen);
+            ++global.cookie;
+        }
+    }
+    if (value) {
+        char data[512];
+        size_t sz = pack_keyval(key, value, data, sizeof(data));
+        if (cb_insert(&par->cb, data, sz) == CB_SUCCESS) {
+            ++global.cookie;
+        }
+    }
+}
+
 void free_params(struct param **pp) {
-    while (*pp) {
-        param *p = *pp;
-        free(p->name);
-        free(p->data);
-        *pp = p->next;
+    param *p = *pp;
+    if (p) {
+        cb_clear(&p->cb);
         free(p);
     }
+    *pp = 0;
 }
 
 const char *get_param(const struct param *p, const char *key)
 {
-    while (p != NULL) {
-        int cmp = strcmp(p->name, key);
-        if (cmp == 0) {
-            return p->data;
-        }
-        else if (cmp > 0) {
-            break;
-        }
-        p = p->next;
+    void *match;
+    if (p && cb_find_prefix(&p->cb, key, strlen(key)+1, &match, 1, 0) > 0) {
+        cb_get_kv_ex(match, &match);
+        return (const char *)match;
     }
     return NULL;
 }
@@ -1133,40 +1162,6 @@ double get_param_flt(const struct param *p, const char *key, double def)
 {
     const char *str = get_param(p, key);
     return str ? atof(str) : def;
-}
-
-void set_param(struct param **p, const char *key, const char *data)
-{
-    struct param *par;
-
-    ++global.cookie;
-    while (*p != NULL) {
-        int cmp = strcmp((*p)->name, key);
-        if (cmp == 0) {
-            par = *p;
-            free(par->data);
-            if (data) {
-                par->data = _strdup(data);
-            }
-            else {
-                *p = par->next;
-                free(par->name);
-                free(par);
-            }
-            return;
-        }
-        else if (cmp > 0) {
-            break;
-        }
-        p = &(*p)->next;
-    }
-    if (data) {
-        par = malloc(sizeof(param));
-        par->name = _strdup(key);
-        par->data = _strdup(data);
-        par->next = *p;
-        *p = par;
-    }
 }
 
 void kernel_done(void)
