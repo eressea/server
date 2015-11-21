@@ -181,22 +181,17 @@ bool is_astral(const region * r)
 
 plane *get_astralplane(void)
 {
-    static plane *astralspace;
-    static int rule_astralplane = -1;
-    static int gamecookie = -1;
-    if (rule_astralplane < 0) {
-        rule_astralplane =
-            get_param_int(global.parameters, "modules.astralspace", 1);
-    }
+    plane *astralspace = 0;
+    int rule_astralplane =
+        get_param_int(global.parameters, "modules.astralspace", 1);
+
     if (!rule_astralplane) {
         return NULL;
     }
-    if (gamecookie != global.cookie) {
+    if (!astralspace) {
         astralspace = getplanebyname("Astralraum");
-        gamecookie = global.cookie;
     }
-
-    if (astralspace == NULL) {
+    if (!astralspace) {
         astralspace = create_new_plane(1, "Astralraum",
             TE_CENTER_X - 500, TE_CENTER_X + 500,
             TE_CENTER_Y - 500, TE_CENTER_Y + 500, 0);

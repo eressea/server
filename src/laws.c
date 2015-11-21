@@ -117,13 +117,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 static bool RemoveNMRNewbie(void)
 {
-    static int value = -1;
-    static int gamecookie = -1;
-
-    if (value < 0 || gamecookie != global.cookie) {
-        value = get_param_int(global.parameters, "nmr.removenewbie", 0);
-        gamecookie = global.cookie;
-    }
+    int value = get_param_int(global.parameters, "nmr.removenewbie", 0);
     return value!=0;
 }
 

@@ -850,17 +850,13 @@ void leave_building(unit * u)
 
 bool can_leave(unit * u)
 {
-    static int gamecookie = -1;
-    static int rule_leave = -1;
+    int rule_leave;
 
     if (!u->building) {
         return true;
     }
 
-    if (rule_leave < 0 || gamecookie != global.cookie) {
-        gamecookie = global.cookie;
-        rule_leave = get_param_int(global.parameters, "rules.move.owner_leave", 0);
-    }
+    rule_leave = get_param_int(global.parameters, "rules.move.owner_leave", 0);
 
     if (rule_leave!=0 && u->building && u == building_owner(u->building)) {
         return false;
