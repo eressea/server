@@ -24,10 +24,6 @@ int lifestyle(const unit * u)
 {
     int need;
     plane *pl;
-    static int gamecookie = -1;
-    if (gamecookie != global.cookie) {
-        gamecookie = global.cookie;
-    }
 
     if (is_monsters(u->faction))
         return 0;
@@ -116,13 +112,7 @@ void get_food(region * r)
     plane *pl = rplane(r);
     unit *u;
     int peasantfood = rpeasants(r) * 10;
-    static int food_rules = -1;
-    static int gamecookie = -1;
-
-    if (food_rules < 0 || gamecookie != global.cookie) {
-        gamecookie = global.cookie;
-        food_rules = get_param_int(global.parameters, "rules.food.flags", 0);
-    }
+    int food_rules = get_param_int(global.parameters, "rules.food.flags", 0);
 
     if (food_rules & FOOD_IS_FREE) {
         return;
