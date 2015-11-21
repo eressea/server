@@ -110,13 +110,7 @@ int turn = -1;
 
 int NewbieImmunity(void)
 {
-    static int value = -1;
-    static int gamecookie = -1;
-    if (value < 0 || gamecookie != global.cookie) {
-        gamecookie = global.cookie;
-        value = get_param_int(global.parameters, "NewbieImmunity", 0);
-    }
-    return value;
+    return get_param_int(global.parameters, "NewbieImmunity", 0);
 }
 
 bool IsImmune(const faction * f)
@@ -143,13 +137,7 @@ static int ally_flag(const char *s, int help_mask)
 
 bool ExpensiveMigrants(void)
 {
-    static int value = -1;
-    static int gamecookie = -1;
-    if (value < 0 || gamecookie != global.cookie) {
-        gamecookie = global.cookie;
-        value = get_param_int(global.parameters, "study.expensivemigrants", 0);
-    }
-    return value != 0;
+    return get_param_int(global.parameters, "study.expensivemigrants", 0) != 0;
 }
 
 /** Specifies automatic alliance modes.
@@ -158,21 +146,17 @@ bool ExpensiveMigrants(void)
  */
 int AllianceAuto(void)
 {
-    static int value = -1;
-    static int gamecookie = -1;
-    if (value < 0 || gamecookie != global.cookie) {
-        const char *str = get_param(global.parameters, "alliance.auto");
-        gamecookie = global.cookie;
-        value = 0;
-        if (str != NULL) {
-            char *sstr = _strdup(str);
-            char *tok = strtok(sstr, " ");
-            while (tok) {
-                value |= ally_flag(tok, -1);
-                tok = strtok(NULL, " ");
-            }
-            free(sstr);
+    int value;
+    const char *str = get_param(global.parameters, "alliance.auto");
+    value = 0;
+    if (str != NULL) {
+        char *sstr = _strdup(str);
+        char *tok = strtok(sstr, " ");
+        while (tok) {
+            value |= ally_flag(tok, -1);
+            tok = strtok(NULL, " ");
         }
+        free(sstr);
     }
     return value & HelpMask();
 }
@@ -185,65 +169,49 @@ int AllianceAuto(void)
  */
 int HelpMask(void)
 {
-    static int rule = -1;
-    static int gamecookie = -1;
-    if (rule < 0 || gamecookie != global.cookie) {
-        const char *str = get_param(global.parameters, "rules.help.mask");
-        gamecookie = global.cookie;
-        rule = 0;
-        if (str != NULL) {
-            char *sstr = _strdup(str);
-            char *tok = strtok(sstr, " ");
-            while (tok) {
-                rule |= ally_flag(tok, -1);
-                tok = strtok(NULL, " ");
-            }
-            free(sstr);
+    const char *str = get_param(global.parameters, "rules.help.mask");
+    int rule = 0;
+    if (str != NULL) {
+        char *sstr = _strdup(str);
+        char *tok = strtok(sstr, " ");
+        while (tok) {
+            rule |= ally_flag(tok, -1);
+            tok = strtok(NULL, " ");
         }
-        else {
-            rule = HELP_ALL;
-        }
+        free(sstr);
+    }
+    else {
+        rule = HELP_ALL;
     }
     return rule;
 }
 
 int AllianceRestricted(void)
 {
-    static int rule = -1;
-    static int gamecookie = -1;
-    if (rule < 0 || gamecookie != global.cookie) {
-        const char *str = get_param(global.parameters, "alliance.restricted");
-        gamecookie = global.cookie;
-        rule = 0;
-        if (str != NULL) {
-            char *sstr = _strdup(str);
-            char *tok = strtok(sstr, " ");
-            while (tok) {
-                rule |= ally_flag(tok, -1);
-                tok = strtok(NULL, " ");
-            }
-            free(sstr);
+    const char *str = get_param(global.parameters, "alliance.restricted");
+    int rule = 0;
+    if (str != NULL) {
+        char *sstr = _strdup(str);
+        char *tok = strtok(sstr, " ");
+        while (tok) {
+            rule |= ally_flag(tok, -1);
+            tok = strtok(NULL, " ");
         }
-        rule &= HelpMask();
+        free(sstr);
     }
+    rule &= HelpMask();
     return rule;
 }
 
 int LongHunger(const struct unit *u)
 {
-    static int gamecookie = -1;
-    static int rule = -1;
     if (u != NULL) {
         if (!fval(u, UFL_HUNGER))
             return false;
         if (u_race(u) == get_race(RC_DAEMON))
             return false;
     }
-    if (rule < 0 || gamecookie != global.cookie) {
-        gamecookie = global.cookie;
-        rule = get_param_int(global.parameters, "hunger.long", 0);
-    }
-    return rule;
+    return get_param_int(global.parameters, "hunger.long", 0);
 }
 
 int SkillCap(skill_t sk)
@@ -498,7 +466,7 @@ static int ally_mode(const ally * sf, int mode)
 
 int
 alliedgroup(const struct plane *pl, const struct faction *f,
-const struct faction *f2, const struct ally *sf, int mode)
+    const struct faction *f2, const struct ally *sf, int mode)
 {
     while (sf && sf->faction != f2)
         sf = sf->next;
@@ -522,7 +490,7 @@ const struct faction *f2, const struct ally *sf, int mode)
 
 int
 alliedfaction(const struct plane *pl, const struct faction *f,
-const struct faction *f2, int mode)
+    const struct faction *f2, int mode)
 {
     return alliedgroup(pl, f, f2, f->allies, mode);
 }
@@ -1076,7 +1044,7 @@ void free_params(struct param **pp) {
 const char *get_param(const struct param *p, const char *key)
 {
     void *match;
-    if (p && cb_find_prefix(&p->cb, key, strlen(key)+1, &match, 1, 0) > 0) {
+    if (p && cb_find_prefix(&p->cb, key, strlen(key) + 1, &match, 1, 0) > 0) {
         cb_get_kv_ex(match, &match);
         return (const char *)match;
     }
@@ -1345,7 +1313,7 @@ bool rule_stealth_anon(void)
         gamecookie = global.cookie;
         assert(rule >= 0);
     }
-    return rule!=0;
+    return rule != 0;
 }
 
 bool rule_region_owners(void)
@@ -1357,7 +1325,7 @@ bool rule_region_owners(void)
         gamecookie = global.cookie;
         assert(rule >= 0);
     }
-    return rule!=0;
+    return rule != 0;
 }
 
 bool rule_auto_taxation(void)
@@ -1380,7 +1348,7 @@ int rule_blessed_harvest(void)
     if (rule < 0 || gamecookie != global.cookie) {
         rule =
             get_param_int(global.parameters, "rules.blessed_harvest.flags",
-            HARVEST_WORK);
+                HARVEST_WORK);
         gamecookie = global.cookie;
         assert(rule >= 0);
     }
@@ -1420,7 +1388,7 @@ bool rule_transfermen(void)
         gamecookie = global.cookie;
         assert(rule >= 0);
     }
-    return rule!=0;
+    return rule != 0;
 }
 
 static int
@@ -1632,7 +1600,7 @@ order *default_order(const struct locale *lang)
     order *result = 0;
     assert(i < MAXLOCALES);
 
-    if (default_keyword!=NOKEYWORD) {
+    if (default_keyword != NOKEYWORD) {
         return create_order(default_keyword, lang, 0);
     }
 
