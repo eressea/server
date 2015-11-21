@@ -233,6 +233,12 @@ static bool can_give_men(const unit *u, order *ord, message **msg) {
     return false;
 }
 
+static bool rule_transfermen(void)
+{
+    int rule = get_param_int(global.parameters, "rules.transfermen", 1);
+    return rule != 0;
+}
+
 message * give_men(int n, unit * u, unit * u2, struct order *ord)
 {
     ship *sh;

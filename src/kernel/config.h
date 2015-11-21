@@ -151,7 +151,6 @@ extern "C" {
     int cmp_current_owner(const struct building *b,
         const struct building *bother);
 
-    bool rule_transfermen(void);
     bool rule_region_owners(void);
     bool rule_stealth_other(void); // units can pretend to be another faction, TARNE PARTEI <no>
     bool rule_stealth_anon(void);  // units can anonymize their faction, TARNE PARTEI [NICHT]
@@ -160,7 +159,6 @@ extern "C" {
 #define HARVEST_WORK  0x00
 #define HARVEST_TAXES 0x01
     int rule_blessed_harvest(void);
-    bool rule_auto_taxation(void);
 #define GIVE_SELF 1
 #define GIVE_PEASANTS 2
 #define GIVE_LUXURIES 4

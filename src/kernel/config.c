@@ -216,26 +216,13 @@ int LongHunger(const struct unit *u)
 
 int SkillCap(skill_t sk)
 {
-    static int gamecookie = -1;
-    static int rule = -1;
-    if (sk == SK_MAGIC)
-        return 0;                   /* no caps on magic */
-    if (rule < 0 || gamecookie != global.cookie) {
-        gamecookie = global.cookie;
-        rule = get_param_int(global.parameters, "skill.maxlevel", 0);
-    }
-    return rule;
+    if (sk == SK_MAGIC) return 0; /* no caps on magic */
+    return get_param_int(global.parameters, "skill.maxlevel", 0);
 }
 
 int NMRTimeout(void)
 {
-    static int gamecookie = -1;
-    static int rule = -1;
-    if (rule < 0 || gamecookie != global.cookie) {
-        gamecookie = global.cookie;
-        rule = get_param_int(global.parameters, "nmr.timeout", 0);
-    }
-    return rule;
+    return get_param_int(global.parameters, "nmr.timeout", 0);
 }
 
 race_t old_race(const struct race * rc)
@@ -1294,101 +1281,42 @@ int cmp_current_owner(const building * b, const building * a)
 
 bool rule_stealth_other(void)
 {
-    static int gamecookie = -1;
-    static int rule = -1;
-    if (rule < 0 || gamecookie != global.cookie) {
-        rule = get_param_int(global.parameters, "stealth.faction.other", 1);
-        gamecookie = global.cookie;
-        assert(rule >= 0);
-    }
+    int rule = get_param_int(global.parameters, "stealth.faction.other", 1);
     return rule != 0;
 }
 
 bool rule_stealth_anon(void)
 {
-    static int gamecookie = -1;
-    static int rule = -1;
-    if (rule < 0 || gamecookie != global.cookie) {
-        rule = get_param_int(global.parameters, "stealth.faction.anon", 1);
-        gamecookie = global.cookie;
-        assert(rule >= 0);
-    }
+    int rule = get_param_int(global.parameters, "stealth.faction.anon", 1);
     return rule != 0;
 }
 
 bool rule_region_owners(void)
 {
-    static int gamecookie = -1;
-    static int rule = -1;
-    if (rule < 0 || gamecookie != global.cookie) {
-        rule = get_param_int(global.parameters, "rules.region_owners", 0);
-        gamecookie = global.cookie;
-        assert(rule >= 0);
-    }
+    int rule = get_param_int(global.parameters, "rules.region_owners", 0);
     return rule != 0;
-}
-
-bool rule_auto_taxation(void)
-{
-    static int gamecookie = -1;
-    static int rule = -1;
-    if (rule < 0 || gamecookie != global.cookie) {
-        rule =
-            get_param_int(global.parameters, "rules.economy.taxation", 0);
-        gamecookie = global.cookie;
-        assert(rule >= 0);
-    }
-    return rule;
 }
 
 int rule_blessed_harvest(void)
 {
-    static int gamecookie = -1;
-    static int rule = -1;
-    if (rule < 0 || gamecookie != global.cookie) {
-        rule =
-            get_param_int(global.parameters, "rules.blessed_harvest.flags",
-                HARVEST_WORK);
-        gamecookie = global.cookie;
-        assert(rule >= 0);
-    }
+    int rule = get_param_int(global.parameters, "rules.blessed_harvest.flags",
+        HARVEST_WORK);
+    assert(rule >= 0);
     return rule;
 }
 
 int rule_alliance_limit(void)
 {
-    static int gamecookie = -1;
-    static int rule = -1;
-    if (rule < 0 || gamecookie != global.cookie) {
-        rule = get_param_int(global.parameters, "rules.limit.alliance", 0);
-        gamecookie = global.cookie;
-        assert(rule >= 0);
-    }
+    int rule = get_param_int(global.parameters, "rules.limit.alliance", 0);
+    assert(rule >= 0);
     return rule;
 }
 
 int rule_faction_limit(void)
 {
-    static int gamecookie = -1;
-    static int rule = -1;
-    if (rule < 0 || gamecookie != global.cookie) {
-        rule = get_param_int(global.parameters, "rules.limit.faction", 0);
-        gamecookie = global.cookie;
-        assert(rule >= 0);
-    }
+    int rule = get_param_int(global.parameters, "rules.limit.faction", 0);
+    assert(rule >= 0);
     return rule;
-}
-
-bool rule_transfermen(void)
-{
-    static int gamecookie = -1;
-    static int rule = -1;
-    if (rule < 0 || gamecookie != global.cookie) {
-        rule = get_param_int(global.parameters, "rules.transfermen", 1);
-        gamecookie = global.cookie;
-        assert(rule >= 0);
-    }
-    return rule != 0;
 }
 
 static int

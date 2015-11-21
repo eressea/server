@@ -184,7 +184,7 @@ static building *active_building(const unit *u, const struct building_type *btyp
 
 static int
 teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
-bool report, int *academy)
+    bool report, int *academy)
 {
     teaching_info *teach = NULL;
     attrib *a;
@@ -343,7 +343,8 @@ int teach_cmd(unit * u, struct order *ord)
         for (student = r->units; teaching && student; student = student->next) {
             if (LongHunger(student)) {
                 continue;
-            } else if (student->faction == u->faction) {
+            }
+            else if (student->faction == u->faction) {
                 if (getkeyword(student->thisorder) == K_STUDY) {
                     /* Input ist nun von student->thisorder !! */
                     init_order(student->thisorder);
@@ -509,7 +510,7 @@ static double study_speedup(unit * u, skill_t s, study_rule_t rule)
         if (rule == STUDY_FASTER) {
             for (i = 0; i != u->skill_size; ++i) {
                 skill *sv = u->skills + i;
-                if (sv->id == s){
+                if (sv->id == s) {
                     learnweeks = sv->level * (sv->level + 1) / 2.0;
                     if (learnweeks < turn / 3.0) {
                         return 2.0;
@@ -534,7 +535,7 @@ static double study_speedup(unit * u, skill_t s, study_rule_t rule)
 int study_cmd(unit * u, order * ord)
 {
     region *r = u->region;
-    int p;
+    int p, cap;
     magic_t mtyp;
     int l;
     int studycost, days;
@@ -569,7 +570,8 @@ int study_cmd(unit * u, order * ord)
         cmistake(u, ord, 77, MSG_EVENT);
         return 0;
     }
-    if (SkillCap(sk) && SkillCap(sk) <= effskill(u, sk, 0)) {
+    cap = SkillCap(sk);
+    if (cap > 0 && cap <= effskill(u, sk, 0)) {
         cmistake(u, ord, 771, MSG_EVENT);
         return 0;
     }

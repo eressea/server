@@ -1366,7 +1366,7 @@ int eff_skill(const unit * u, const skill *sv, const region *r)
 
         if (mlevel > 0) {
             int skillcap = SkillCap(sv->id);
-            if (skillcap && mlevel > skillcap) {
+            if (skillcap>0 && mlevel > skillcap) {
                 return skillcap;
             }
             return mlevel;

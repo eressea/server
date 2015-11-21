@@ -3134,6 +3134,12 @@ static void peasant_taxes(region * r)
     }
 }
 
+static bool rule_auto_taxation(void)
+{
+    int rule = get_param_int(global.parameters, "rules.economy.taxation", 0);
+    return rule != 0;
+}
+
 void produce(struct region *r)
 {
     request workers[MAX_WORKERS];
