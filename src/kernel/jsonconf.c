@@ -526,7 +526,7 @@ static void disable_feature(const char *str) {
     for (k = 0; k != MAXKEYWORDS; ++k) {
         // FIXME: this loop is slow as balls.
         if (strcmp(keywords[k], str) == 0) {
-            log_info("disable keyword %s\n", str);
+            log_debug("disable keyword %s\n", str);
             enable_keyword(k, false);
             return;
         }
