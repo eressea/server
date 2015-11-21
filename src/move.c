@@ -938,76 +938,27 @@ bool is_guard(const struct unit * u, unsigned int mask)
     return is_guardian_r(u) && (getguard(u) & mask) != 0;
 }
 
-#define MAXGUARDCACHE 16
-/** returns the guard which prevents 'u' from doing 'mask' actions in 'r'.
-*/
 unit *is_guarded(region * r, unit * u, unsigned int mask)
 {
-    unit *u2 = NULL;
-    int i, noguards = 1;
-    static unit *guardcache[MAXGUARDCACHE], *lastguard;   /* STATIC_XCALL: used across calls */
-    static int gamecookie = -1;
+    unit *u2;
+    int noguards = 1;
 
     if (!fval(r, RF_GUARDED)) {
         return NULL;
-    }
-
-    if (gamecookie != global.cookie) {
-        if (gamecookie >= 0) {
-            /* clear the previous turn's cache */
-            memset(guardcache, 0, sizeof(guardcache));
-            lastguard = NULL;
-        }
-        gamecookie = global.cookie;
-    }
-
-    if (lastguard && lastguard->region == r) {
-        if (is_guardian_u(lastguard, u, mask)) {
-            return lastguard;
-        }
-    }
-
-    for (i = 0; i != MAXGUARDCACHE; ++i) {
-        unit *guard = guardcache[i];
-        if (guard && guard != lastguard && guard->region == r) {
-            noguards = 0;
-            if (is_guardian_u(guard, u, mask)) {
-                lastguard = guard;
-                return guard;
-            }
-            if (u2 == guard) {
-                /* same guard twice signals we've tested everyone */
-                return NULL;
-            }
-            u2 = guard;
-        }
-        else {
-            /* exhausted all the guards in the cache, but maybe we'll find one later? */
-            break;
-        }
     }
 
     /* at this point, u2 is the last unit we tested to
      * be a guard (and failed), or NULL
      * i is the position of the first free slot in the cache */
 
-    for (u2 = (u2 ? u2->next : r->units); u2; u2 = u2->next) {
+    for (u2 = r->units; u2; u2 = u2->next) {
         if (is_guardian_r(u2)) {
             noguards = 0;
-            /* u2 is a guard, so worth remembering */
-            if (i < MAXGUARDCACHE)
-                guardcache[i++] = u2;
             if (is_guardian_u(u2, u, mask)) {
                 /* u2 is our guard. stop processing (we might have to go further next time) */
-                lastguard = u2;
                 return u2;
             }
         }
-    }
-    /* there are no more guards. we signal this by duplicating the last one.
-     * i is still the position of the first free slot in the cache */
-    if (i > 0 && i < MAXGUARDCACHE) {
-        guardcache[i] = guardcache[i - 1];
     }
 
     if (noguards) {
