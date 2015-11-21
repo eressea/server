@@ -243,6 +243,7 @@ extern "C" {
 
     int count_enemies(struct battle *b, const struct fighter *af,
         int minrow, int maxrow, int select);
+    int natural_armor(struct unit * u);
     int calculate_armor(troop dt, const struct weapon_type *dwtype, const struct weapon_type *awtype, double *magres);
     bool terminate(troop dt, troop at, int type, const char *damage,
         bool missile);
