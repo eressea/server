@@ -837,24 +837,14 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
     unit *guard = NULL;
     int guard_count = 0;
     int stealth = eff_stealth(reisender, r);
-    static int gamecookie = -1;
-    static double base_prob = -999;
-    static double skill_prob = -999;
-    static double amulet_prob = -999;
-    static double guard_number_prob = -999;
-    static double castle_prob = -999;
-    static double region_type_prob = -999;
     const struct resource_type *ramulet = get_resourcetype(R_AMULET_OF_TRUE_SEEING);
 
-    if (gamecookie < 0 || gamecookie != global.cookie) {
-        base_prob = get_param_flt(global.parameters, "rules.guard.base_stop_prob", .3f);
-        skill_prob = get_param_flt(global.parameters, "rules.guard.skill_stop_prob", .1f);
-        amulet_prob = get_param_flt(global.parameters, "rules.guard.amulet_stop_prob", .1f);
-        guard_number_prob = get_param_flt(global.parameters, "rules.guard.guard_number_stop_prob", .001f);
-        castle_prob = get_param_flt(global.parameters, "rules.guard.castle_stop_prob", .1f);
-        region_type_prob = get_param_flt(global.parameters, "rules.guard.region_type_stop_prob", .1f);
-        gamecookie = global.cookie;
-    }
+    double base_prob = get_param_flt(global.parameters, "rules.guard.base_stop_prob", .3f);
+    double skill_prob = get_param_flt(global.parameters, "rules.guard.skill_stop_prob", .1f);
+    double amulet_prob = get_param_flt(global.parameters, "rules.guard.amulet_stop_prob", .1f);
+    double guard_number_prob = get_param_flt(global.parameters, "rules.guard.guard_number_stop_prob", .001f);
+    double castle_prob = get_param_flt(global.parameters, "rules.guard.castle_stop_prob", .1f);
+    double region_type_prob = get_param_flt(global.parameters, "rules.guard.region_type_stop_prob", .1f);
 
     if (fval(u_race(reisender), RCF_ILLUSIONARY))
         return NULL;
