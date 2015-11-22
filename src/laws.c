@@ -3465,7 +3465,8 @@ static int use_item(unit * u, const item_type * itype, int amount, struct order 
 
 static double heal_factor(const unit * u)
 {
-    static double elf_regen = -1;
+    double elf_regen;
+
     switch (old_race(u_race(u))) {
     case RC_TROLL:
     case RC_DAEMON:
@@ -3473,8 +3474,7 @@ static double heal_factor(const unit * u)
     case RC_GOBLIN:
         return 2.0;
     case RC_ELF:
-        if (elf_regen < 0)
-            elf_regen = get_param_flt(u_race(u)->parameters, "regen.forest", 1.0F);
+        elf_regen = get_param_flt(u_race(u)->parameters, "regen.forest", 1.0F);
         if (elf_regen != 1.0 && r_isforest(u->region)) {
             return elf_regen;
         }

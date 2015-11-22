@@ -108,14 +108,9 @@ attrib_type at_reportspell = {
  ** TODO: separate castle-appearance from illusion-effects
  **/
 
-static float MagicRegeneration(void)
+static double MagicRegeneration(void)
 {
-    static float value = -1.0;
-    if (value < 0) {
-        const char *str = config_get("magic.regeneration");
-        value = str ? (float)atof(str) : 1.0F;
-    }
-    return value;
+    return config_get_flt("magic.regeneration", 1.0);
 }
 
 static double MagicPower(double force)

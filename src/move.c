@@ -700,11 +700,7 @@ static void set_coast(ship * sh, region * r, region * rnext)
 
 static float damage_drift(void)
 {
-    static float value = -1.0F;
-    if (value < 0) {
-        value = (float)config_get_flt("rules.ship.damage_drift", 0.02F);
-    }
-    return value;
+    return (float)config_get_flt("rules.ship.damage_drift", 0.02);
 }
 
 static void drifting_ships(region * r)

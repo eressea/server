@@ -2532,12 +2532,9 @@ troop select_ally(fighter * af, int minrow, int maxrow, int allytype)
 static int loot_quota(const unit * src, const unit * dst,
     const item_type * type, int n)
 {
-    static double divisor = -1;
     if (dst && src && src->faction != dst->faction) {
-        if (divisor < 0) {
-            divisor = config_get_flt("rules.items.loot_divisor", 1);
-            assert(divisor == 0 || divisor >= 1);
-        }
+        double divisor = config_get_flt("rules.items.loot_divisor", 1);
+        assert(divisor == 0 || divisor >= 1);
         if (divisor >= 1) {
             double r = n / divisor;
             int x = (int)r;
