@@ -122,8 +122,7 @@ static void end_potion(unit * u, const potion_type * ptype, int amount)
         "unit potion", u, ptype->itype->rtype));
 }
 
-static int potion_water_of_life(unit * u, int amount) {
-    region *r = u->region;
+static int potion_water_of_life(unit * u, region *r, int amount) {
     int wood = 0;
     int tree_type = config_get_int("rules.magic.wol_type", 1);
     int tree_count = config_get_int("rules.magic.wol_effect", 10);
@@ -156,8 +155,7 @@ static int potion_healing(unit * u, int amount) {
     return amount;
 }
 
-static int potion_luck(unit *u, attrib_type *atype, int amount) {
-    region *r = u->region;
+static int potion_luck(unit *u, region *r, attrib_type *atype, int amount) {
     attrib *a = (attrib *)a_find(r->attribs, atype);
     if (!a) {
         a = a_add(&r->attribs, a_new(atype));
@@ -184,18 +182,17 @@ static int potion_power(unit *u, int amount) {
 
 static int do_potion(unit * u, region *r, const potion_type * ptype, int amount)
 {
-    assert(r == u->region); // TODO: is r an unnecessary argument?
     if (ptype == oldpotiontype[P_LIFE]) {
-        return potion_water_of_life(u, amount);
+        return potion_water_of_life(u, r, amount);
     }
     else if (ptype == oldpotiontype[P_HEILWASSER]) {
         return potion_healing(u, amount);
     }
     else if (ptype == oldpotiontype[P_PEOPLE]) {
-        return potion_luck(u, &at_peasantluck, amount);
+        return potion_luck(u, r, &at_peasantluck, amount);
     }
     else if (ptype == oldpotiontype[P_HORSE]) {
-        return potion_luck(u, &at_horseluck, amount);
+        return potion_luck(u, r, &at_horseluck, amount);
     }
     else if (ptype == oldpotiontype[P_WAHRHEIT]) {
         return potion_truth(u);
