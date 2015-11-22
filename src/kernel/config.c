@@ -1572,6 +1572,22 @@ bool markets_module(void)
     return get_param_int(global.parameters, "modules.markets", 0);
 }
 
+void config_set(const char *key, const char *value) {
+    set_param(&global.parameters, key, value);
+}
+
+const char *config_get(const char *key) {
+    return get_param(global.parameters, key);
+}
+
+int config_get_int(const char *key, int def) {
+    return get_param_int(global.parameters, key, def);
+}
+
+double config_get_flt(const char *key, double def) {
+    return get_param_flt(global.parameters, key, def);
+}
+
 /** releases all memory associated with the game state.
  * call this function before calling read_game() to load a new game
  * if you have a previously loaded state in memory.

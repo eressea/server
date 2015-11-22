@@ -399,7 +399,7 @@ static ship *setup_ship(void) {
     region *r;
     ship_type *stype;
 
-    set_param(&global.parameters, "movement.shipspeed.skillbonus", "0");
+    config_set("movement.shipspeed.skillbonus", "0");
     r = test_create_region(0, 0, test_create_terrain("ocean", 0));
     stype = test_create_shiptype("longboat");
     stype->cptskill = 1;
@@ -558,7 +558,7 @@ static void test_shipspeed_max_range(CuTest *tc) {
     test_cleanup();
     sh = setup_ship();
     setup_crew(sh, 0, &cap, &crew);
-    set_param(&global.parameters, "movement.shipspeed.skillbonus", "5");
+    config_set("movement.shipspeed.skillbonus", "5");
     r = sh->region;
     f = test_create_faction(0);
     assert(r && f);

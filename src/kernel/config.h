@@ -268,12 +268,17 @@ extern "C" {
 
     const char *dbrace(const struct race *rc);
 
-    void set_param(struct param **p, const char *key, const char *data);
+    void set_param(struct param **p, const char *key, const char *value);
     const char *get_param(const struct param *p, const char *key);
     int get_param_int(const struct param *p, const char *key, int def);
     int check_param(const struct param *p, const char *key, const char *searchvalue);
     double get_param_flt(const struct param *p, const char *key, double def);
     void free_params(struct param **pp);
+
+    void config_set(const char *key, const char *value);
+    const char *config_get(const char *key);
+    int config_get_int(const char *key, int def);
+    double config_get_flt(const char *key, double def);
 
     bool ExpensiveMigrants(void);
     int NMRTimeout(void);

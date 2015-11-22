@@ -284,15 +284,15 @@ static void test_skill_hunger(CuTest *tc) {
     set_level(u, SK_SAILING, 6);
     fset(u, UFL_HUNGER);
 
-    set_param(&global.parameters, "rules.hunger.reduces_skill", "0");
+    config_set("rules.hunger.reduces_skill", "0");
     CuAssertIntEquals(tc, 6, effskill(u, SK_ARMORER, 0));
     CuAssertIntEquals(tc, 6, effskill(u, SK_SAILING, 0));
 
-    set_param(&global.parameters, "rules.hunger.reduces_skill", "1");
+    config_set("rules.hunger.reduces_skill", "1");
     CuAssertIntEquals(tc, 3, effskill(u, SK_ARMORER, 0));
     CuAssertIntEquals(tc, 3, effskill(u, SK_SAILING, 0));
 
-    set_param(&global.parameters, "rules.hunger.reduces_skill", "2");
+    config_set("rules.hunger.reduces_skill", "2");
     CuAssertIntEquals(tc, 3, effskill(u, SK_ARMORER, 0));
     CuAssertIntEquals(tc, 5, effskill(u, SK_SAILING, 0));
     set_level(u, SK_SAILING, 2);
@@ -371,7 +371,7 @@ static void test_produceexp(CuTest *tc) {
     g_tc = tc;
     test_cleanup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
-    set_param(&global.parameters, "study.from_use", "0.5");
+    config_set("study.from_use", "0.5");
     produceexp_ex(u, SK_ALCHEMY, 1, cb_learn_one);
     produceexp_ex(u, SK_ALCHEMY, 2, cb_learn_two);
     test_cleanup();

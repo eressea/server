@@ -98,8 +98,7 @@ static int begin_potion(unit * u, const potion_type * ptype, struct order *ord)
 
     if (rule_multipotion < 0) {
         /* should we allow multiple different potions to be used the same turn? */
-        rule_multipotion =
-            get_param_int(global.parameters, "rules.magic.multipotion", 0);
+        rule_multipotion = config_get_int("rules.magic.multipotion", 0);
     }
     if (!rule_multipotion) {
         const potion_type *use = ugetpotionuse(u);
@@ -130,9 +129,9 @@ static int do_potion(unit * u, region *r, const potion_type * ptype, int amount)
         static int tree_type = -1;
         static int tree_count = -1;
         if (tree_type < 0) {
-            tree_type = get_param_int(global.parameters, "rules.magic.wol_type", 1);
+            tree_type = config_get_int("rules.magic.wol_type", 1);
             tree_count =
-                get_param_int(global.parameters, "rules.magic.wol_effect", 10);
+                config_get_int("rules.magic.wol_effect", 10);
         }
         /* mallorn is required to make mallorn forests, wood for regular ones */
         if (fval(r, RF_MALLORN)) {

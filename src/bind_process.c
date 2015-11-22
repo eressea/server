@@ -223,7 +223,7 @@ void process_explain(void) {
 }
 
 void process_reserve(void) {
-    int rule = get_param_int(global.parameters, "rules.reserve.twophase", 0);
+    int rule = config_get_int("rules.reserve.twophase", 0);
     if (rule) {
         process_cmd(K_RESERVE, reserve_self, 0);
     }

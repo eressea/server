@@ -233,16 +233,16 @@ static void test_display_cmd(CuTest *tc) {
 }
 
 static void test_rule_force_leave(CuTest *tc) {
-    set_param(&global.parameters, "rules.owners.force_leave", "0");
+    config_set("rules.owners.force_leave", "0");
     CuAssertIntEquals(tc, false, rule_force_leave(FORCE_LEAVE_ALL));
     CuAssertIntEquals(tc, false, rule_force_leave(FORCE_LEAVE_POSTCOMBAT));
-    set_param(&global.parameters, "rules.owners.force_leave", "1");
+    config_set("rules.owners.force_leave", "1");
     CuAssertIntEquals(tc, false, rule_force_leave(FORCE_LEAVE_ALL));
     CuAssertIntEquals(tc, true, rule_force_leave(FORCE_LEAVE_POSTCOMBAT));
-    set_param(&global.parameters, "rules.owners.force_leave", "2");
+    config_set("rules.owners.force_leave", "2");
     CuAssertIntEquals(tc, true, rule_force_leave(FORCE_LEAVE_ALL));
     CuAssertIntEquals(tc, false, rule_force_leave(FORCE_LEAVE_POSTCOMBAT));
-    set_param(&global.parameters, "rules.owners.force_leave", "3");
+    config_set("rules.owners.force_leave", "3");
     CuAssertIntEquals(tc, true, rule_force_leave(FORCE_LEAVE_ALL));
     CuAssertIntEquals(tc, true, rule_force_leave(FORCE_LEAVE_POSTCOMBAT));
 }
@@ -413,13 +413,13 @@ static void test_fishing_gets_reset(CuTest * tc)
 
 static void test_unit_limit(CuTest * tc)
 {
-    set_param(&global.parameters, "rules.limit.faction", "250");
+    config_set("rules.limit.faction", "250");
     CuAssertIntEquals(tc, 250, rule_faction_limit());
 
-    set_param(&global.parameters, "rules.limit.faction", "200");
+    config_set("rules.limit.faction", "200");
     CuAssertIntEquals(tc, 200, rule_faction_limit());
 
-    set_param(&global.parameters, "rules.limit.alliance", "250");
+    config_set("rules.limit.alliance", "250");
     CuAssertIntEquals(tc, 250, rule_alliance_limit());
 
 }
@@ -432,12 +432,12 @@ static void test_cannot_create_unit_above_limit(CuTest * tc)
     test_cleanup();
     test_create_world();
     f = test_create_faction(NULL);
-    set_param(&global.parameters, "rules.limit.faction", "4");
+    config_set("rules.limit.faction", "4");
 
     CuAssertIntEquals(tc, 0, checkunitnumber(f, 4));
     CuAssertIntEquals(tc, 2, checkunitnumber(f, 5));
 
-    set_param(&global.parameters, "rules.limit.alliance", "3");
+    config_set("rules.limit.alliance", "3");
     CuAssertIntEquals(tc, 0, checkunitnumber(f, 3));
     CuAssertIntEquals(tc, 1, checkunitnumber(f, 4));
 }
@@ -533,8 +533,8 @@ static void test_pay_cmd_other_building(CuTest *tc) {
     setup_pay_cmd(&fix);
     f = fix.u1->faction;
     b = test_create_building(fix.u1->region, bt_get_or_create("lighthouse"));
-    set_param(&global.parameters, "rules.region_owners", "1");
-    set_param(&global.parameters, "rules.region_owner_pay_building", "lighthouse");
+    config_set("rules.region_owners", "1");
+    config_set("rules.region_owner_pay_building", "lighthouse");
     update_owners(b->region);
 
     _snprintf(cmd, sizeof(cmd), "NOT %s", itoa36(b->no));
@@ -633,7 +633,7 @@ static void test_newbie_cannot_guard(CuTest *tc) {
     guard_fixture fix;
 
     setup_guard(&fix, true);
-    set_param(&global.parameters, "NewbieImmunity", "4");
+    config_set("NewbieImmunity", "4");
     CuAssertTrue(tc, IsImmune(fix.u->faction));
     update_guards();
     CuAssertTrue(tc, !fval(fix.u, UFL_GUARD));
@@ -726,15 +726,15 @@ static void statistic_test(CuTest *tc, int peasants, int luck, int maxp,
 static void test_peasant_luck_effect(CuTest *tc) {
     test_cleanup();
 
-    set_param(&global.parameters, "rules.peasants.peasantluck.factor", "10");
-    set_param(&global.parameters, "rules.peasants.growth.factor", "0.001");
+    config_set("rules.peasants.peasantluck.factor", "10");
+    config_set("rules.peasants.growth.factor", "0.001");
 
     statistic_test(tc, 100, 0, 1000, 0, 0, 0);
     statistic_test(tc, 100, 2, 1000, 0, 1, 1);
     statistic_test(tc, 1000, 400, 1000, 0, 3, 3);
     statistic_test(tc, 1000, 1000, 2000, .5, 1, 501);
 
-    set_param(&global.parameters, "rules.peasants.growth.factor", "1");
+    config_set("rules.peasants.growth.factor", "1");
     statistic_test(tc, 1000, 1000, 1000, 0, 501, 501);
     test_cleanup();
 }
@@ -1003,7 +1003,7 @@ static void test_long_order_hungry(CuTest *tc) {
     // see also default_order
     unit *u;
     test_cleanup();
-    set_param(&global.parameters, "hunger.long", "1");
+    config_set("hunger.long", "1");
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     fset(u, UFL_HUNGER);
     u->faction->locale = get_or_create_locale("de");
@@ -1081,7 +1081,7 @@ static void test_ally_cmd(CuTest *tc) {
 static void test_nmr_warnings(CuTest *tc) {
     faction *f1, *f2;
     test_cleanup();
-    set_param(&global.parameters, "nmr.timeout", "3");
+    config_set("nmr.timeout", "3");
     f1 = test_create_faction(0);
     f2 = test_create_faction(0);
     f2->age = 2;
