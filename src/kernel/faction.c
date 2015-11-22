@@ -756,24 +756,20 @@ int count_migrants(const faction * f)
     return count_faction(f, COUNT_MIGRANTS);
 }
 
+#define MIGRANTS_NONE 0
+#define MIGRANTS_LOG10 1
+
 int count_maxmigrants(const faction * f)
 {
-    static int migrants = -1;
+    int formula = get_param_int(f->race->parameters, "migrants.formula", 0);
 
-    if (migrants < 0) {
-        migrants = config_get_int("rules.migrants.max", INT_MAX);
-    }
-    if (migrants == INT_MAX) {
-        int x = 0;
-        if (f->race == get_race(RC_HUMAN)) {
-            int nsize = count_all(f);
-            if (nsize > 0) {
-                x = (int)(log10(nsize / 50.0) * 20);
-                if (x < 0)
-                    x = 0;
-            }
+    if (formula == MIGRANTS_LOG10) {
+        int nsize = count_all(f);
+        if (nsize > 0) {
+            int x = (int)(log10(nsize / 50.0) * 20);
+            if (x < 0) x = 0;
+            return x;
         }
-        return x;
     }
-    return migrants;
+    return 0;
 }

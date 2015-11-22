@@ -51,7 +51,6 @@
         "study.speedup": 2,
         "study.from_use": 0.4,
         "world.era": 3,
-        "rules.migrants.max": 0,
         "rules.reserve.twophase": true,
         "rules.owners.force_leave": false,
         "rules.transfermen": false,

@@ -52,7 +52,6 @@
         "world.era": 3,
         "seed.population.min": 8,
         "seed.population.max": 8,
-        "rules.migrants.max": 0,
         "rules.reserve.twophase": true,
         "rules.owners.force_leave": false,
         "rules.monsters.attack_chance": 0.1,
