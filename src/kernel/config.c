@@ -1587,6 +1587,10 @@ double config_get_flt(const char *key, double def) {
     return get_param_flt(global.parameters, key, def);
 }
 
+bool config_token(const char *key, const char *tok) {
+    return !!check_param(global.parameters, key, tok);
+}
+
 /** releases all memory associated with the game state.
  * call this function before calling read_game() to load a new game
  * if you have a previously loaded state in memory.

@@ -731,7 +731,7 @@ static bool maintain(building * b, bool first)
         return false;
     }
     /* If the owner is the region owner, check if dontpay flag is set for the building where he is in */
-    if (check_param(global.parameters, "rules.region_owner_pay_building", b->type->_name)) {
+    if (config_token("rules.region_owner_pay_building", b->type->_name)) {
         if (fval(u->building, BLD_DONTPAY)) {
             return false;
         }

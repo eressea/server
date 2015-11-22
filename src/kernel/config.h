@@ -279,6 +279,7 @@ extern "C" {
     const char *config_get(const char *key);
     int config_get_int(const char *key, int def);
     double config_get_flt(const char *key, double def);
+    bool config_token(const char *key, const char *tok);
 
     bool ExpensiveMigrants(void);
     int NMRTimeout(void);

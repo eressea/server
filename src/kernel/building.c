@@ -591,7 +591,7 @@ static unit *building_owner_ex(const building * bld, const struct faction * last
             }
         }
     }
-    if (!heir && check_param(global.parameters, "rules.region_owner_pay_building", bld->type->_name)) {
+    if (!heir && config_token("rules.region_owner_pay_building", bld->type->_name)) {
         if (rule_region_owners()) {
             u = building_owner(largestbuilding(bld->region, &cmp_taxes, false));
         }
