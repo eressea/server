@@ -70,10 +70,7 @@ void process_produce(void) {
 }
 
 void process_battle(void) {
-    struct region *r;
-    for (r = regions; r; r = r->next) {
-        do_battle(r);
-    }
+    do_battles();
 }
 
 void process_siege(void) {

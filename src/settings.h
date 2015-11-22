@@ -26,7 +26,6 @@
 /* Vermehrungsrate Bauern in 1/10000.
 * TODO: Evt. Berechnungsfehler, reale Vermehrungsraten scheinen höher. */
 #define PEASANTGROWTH 10
-#define BATTLE_KILLS_PEASANTS 20
 #define PEASANTLUCK 10
 
 #define ROW_FACTOR 3            /* factor for combat row advancement rule */

@@ -230,7 +230,7 @@ extern "C" {
     fighter * get_fighter(battle * b, const struct unit * u);
     /* END battle interface */
 
-    extern void do_battle(struct region *r);
+    extern void do_battles(void);
 
     /* for combat spells and special attacks */
     enum { SELECT_ADVANCE = 0x1, SELECT_DISTANCE = 0x2, SELECT_FIND = 0x4 };

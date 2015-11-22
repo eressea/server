@@ -64,7 +64,7 @@
         "rules.combat.herospeed": 3,
         "rules.combat.demon_vampire": 5,
         "rules.combat.skill_bonus": 0,
-        "rules.combat.nat_armor": true,
+        "rules.combat.nat_armor": 1,
         "rules.items.loot_divisor": 2,
         "rules.items.give_divisor": 2,
         "rules.move.owner_leave": true,

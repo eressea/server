@@ -114,11 +114,6 @@ static message *msg_separator;
 
 const troop no_troop = { 0, 0 };
 
-static int max_turns = 0;
-static int damage_rules = 0;
-static int loot_rules = 0;
-static int skill_formula = 0;
-
 #define FORMULA_ORIG 0
 #define FORMULA_NEW 1
 
@@ -131,20 +126,44 @@ static int skill_formula = 0;
 #define DAMAGE_MELEE_BONUS   (1<<1)
 #define DAMAGE_MISSILE_BONUS (1<<2)
 #define DAMAGE_SKILL_BONUS   (1<<4)
+
+static int max_turns;
+static int damage_rules;
+static int loot_rules;
+static int skill_formula;
+static int rule_cavalry_skill;
+static int rule_population_damage;
+static int rule_hero_speed;
+static bool rule_anon_battle;
+static int rule_goblin_bonus;
+static int rule_tactics_formula;
+static int rule_nat_armor;
+static int rule_cavalry_mode;
+
+static const curse_type *peace_ct, *slave_ct, *calm_ct;
+
 /** initialize rules from configuration.
  */
-static void static_rules(void)
+static void init_rules(void)
 {
-    loot_rules =
-        config_get_int("rules.combat.loot",
+    peace_ct = ct_find("peacezone");
+    slave_ct = ct_find("slavery");
+    calm_ct = ct_find("calmmonster");
+    rule_nat_armor = config_get_int("rules.combat.nat_armor", 0);
+    rule_tactics_formula = config_get_int("rules.tactics.formula", 0);
+    rule_goblin_bonus = config_get_int("rules.combat.goblinbonus", 10);
+    rule_hero_speed = config_get_int("rules.combat.herospeed", 10);
+    rule_population_damage = config_get_int("rules.combat.populationdamage", 20);
+    rule_anon_battle = config_get_int("rules.stealth.anon_battle", 1) != 0;
+    rule_cavalry_mode = config_get_int("rules.cavalry.mode", 1);
+    rule_cavalry_skill = config_get_int("rules.cavalry.skill", 2);
+    loot_rules = config_get_int("rules.combat.loot",
         LOOT_MONSTERS | LOOT_OTHERS | LOOT_KEEPLOOT);
     /* new formula to calculate to-hit-chance */
-    skill_formula =
-        config_get_int("rules.combat.skill_formula",
+    skill_formula = config_get_int("rules.combat.skill_formula",
         FORMULA_ORIG);
     /* maximum number of combat turns */
-    max_turns =
-        config_get_int("rules.combat.turns", COMBAT_TURNS);
+    max_turns = config_get_int("rules.combat.turns", COMBAT_TURNS);
     /* damage calculation */
     if (config_get_int("rules.combat.critical", 1)) {
         damage_rules |= DAMAGE_CRITICAL;
@@ -664,15 +683,14 @@ weapon_skill(const weapon_type * wtype, const unit * u, bool attacking)
 
 static int CavalrySkill(void)
 {
-    return config_get_int("rules.cavalry.skill", 2);
+    return rule_cavalry_skill;
 }
 
 #define BONUS_SKILL 1
 #define BONUS_DAMAGE 2
 static int CavalryBonus(const unit * u, troop enemy, int type)
 {
-    int mode = config_get_int("rules.cavalry.mode", 1);
-    if (mode == 0) {
+    if (rule_cavalry_mode == 0) {
         /* old rule, Eressea 1.0 compat */
         return (type == BONUS_SKILL) ? 2 : 0;
     }
@@ -1095,7 +1113,7 @@ int calculate_armor(troop dt, const weapon_type *dwtype, const weapon_type *awty
     /* Momentan nur Trollgürtel und Werwolf-Eigenschaft */
     am = select_magicarmor(dt);
 
-    if (config_get_int("rules.combat.nat_armor", 0) == 0) {
+    if (rule_nat_armor == 0) {
         /* natürliche Rüstung ist halbkumulativ */
         if (ar > 0) {
             ar += an / 2;
@@ -1597,13 +1615,7 @@ static troop select_opponent(battle * b, troop at, int mindist, int maxdist)
     }
 
     if (b->turn == 0 && dt.fighter) {
-        int tactics_formula = -1;
-
-        if (tactics_formula < 0) {
-            tactics_formula =
-                config_get_int("rules.tactics.formula", 0);
-        }
-        if (tactics_formula == 1) {
+        if (rule_tactics_formula == 1) {
             int tactics = get_tactics(at.fighter->side, dt.fighter->side);
 
             /* percentage chance to get this attack */
@@ -1924,8 +1936,7 @@ int skilldiff(troop at, troop dt, int dist)
     }
 
     if (u_race(au) == get_race(RC_GOBLIN)) {
-        int goblin_bonus = config_get_int("rules.combat.goblinbonus", 10);
-        if (af->side->size[SUM_ROW] >= df->side->size[SUM_ROW] * goblin_bonus) {
+        if (af->side->size[SUM_ROW] >= df->side->size[SUM_ROW] * rule_goblin_bonus) {
             skdiff += 1;
         }
     }
@@ -2122,7 +2133,6 @@ static int attacks_per_round(troop t)
 static void make_heroes(battle * b)
 {
     side *s;
-    int hero_speed = config_get_int("rules.combat.herospeed", 10);
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
         fighter *fig;
         for (fig = s->fighters; fig; fig = fig->next) {
@@ -2133,7 +2143,7 @@ static void make_heroes(battle * b)
                     log_error("Hero %s is a %s.\n", unitname(u), u_race(u)->_name);
                 }
                 for (i = 0; i != u->number; ++i) {
-                    fig->person[i].speed += (hero_speed - 1);
+                    fig->person[i].speed += (rule_hero_speed - 1);
                 }
             }
         }
@@ -2630,14 +2640,7 @@ static bool seematrix(const faction * f, const side * s)
 
 static double PopulationDamage(void)
 {
-    static double value = -1.0;
-    if (value < 0) {
-        int damage =
-            config_get_int("rules.combat.populationdamage",
-            BATTLE_KILLS_PEASANTS);
-        value = damage / 100.0;
-    }
-    return value;
+    return rule_population_damage / 100.0;
 }
 
 static void battle_effects(battle * b, int dead_players)
@@ -3192,7 +3195,6 @@ side * get_side(battle * b, const struct unit * u)
 side * find_side(battle * b, const faction * f, const group * g, unsigned int flags, const faction * stealthfaction)
 {
     side * s;
-    bool rule_anon_battle = config_get_int("rules.stealth.anon_battle", 1) != 0;
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
         if (s->faction == f && s->group == g) {
             unsigned int s1flags = flags | SIDE_HASGUARDS;
@@ -3935,15 +3937,6 @@ static bool start_battle(region * r, battle ** bp)
             order *ord;
 
             for (ord = u->orders; ord; ord = ord->next) {
-                static bool init = false;
-                static const curse_type *peace_ct, *slave_ct, *calm_ct;
-
-                if (!init) {
-                    init = true;
-                    peace_ct = ct_find("peacezone");
-                    slave_ct = ct_find("slavery");
-                    calm_ct = ct_find("calmmonster");
-                }
                 if (getkeyword(ord) == K_ATTACK) {
                     unit *u2;
                     fighter *c1, *c2;
@@ -4267,12 +4260,6 @@ void do_battle(region * r)
     battle *b = NULL;
     bool fighting = false;
     ship *sh;
-    static int init_rules = 0;
-
-    if (!init_rules) {
-        static_rules();
-        init_rules = 1;
-    }
     if (msg_separator == NULL) {
         msg_separator = msg_message("battle::section", "");
     }
@@ -4340,3 +4327,10 @@ void do_battle(region * r)
     }
 }
 
+void do_battles(void) {
+    region *r;
+    init_rules();
+    for (r = regions; r; r = r->next) {
+        do_battle(r);
+    }
+}

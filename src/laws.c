@@ -4352,7 +4352,7 @@ void init_processor(void)
     add_proc_region(p, enter_1, "Betreten (2. Versuch)"); /* to allow a buildingowner to enter the castle pre combat */
 
     p += 10;
-    add_proc_region(p, do_battle, "Attackieren");
+    add_proc_global(p, do_battles, "Attackieren");
 
     if (!keyword_disabled(K_BESIEGE)) {
         p += 10;
