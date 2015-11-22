@@ -162,6 +162,19 @@ extern "C" {
     int count_skill(struct faction *f, skill_t sk);
     bool faction_id_is_unused(int);
 
+#define COUNT_MONSTERS 0x01
+#define COUNT_MIGRANTS 0x02
+#define COUNT_DEFAULT  0x04
+#define COUNT_ALL      0x07
+#define COUNT_UNITS    0x10
+
+    int count_faction(const struct faction * f, int flags);
+    int count_migrants(const struct faction * f);
+    int count_maxmigrants(const struct faction * f);
+    int count_all(const struct faction * f);
+    int count_units(const struct faction * f);
+
+
 #ifdef __cplusplus
 }
 #endif

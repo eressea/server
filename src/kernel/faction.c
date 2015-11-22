@@ -22,6 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "alliance.h"
 #include "ally.h"
+#include "curse.h"
 #include "equipment.h"
 #include "group.h"
 #include "item.h"
@@ -54,10 +55,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* libc includes */
 #include <assert.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include <limits.h>
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 faction *factions;
 
@@ -712,3 +714,66 @@ void faction_setorigin(faction * f, int id, int x, int y)
     addlist(&f->ursprung, ur);
 }
 
+
+int count_faction(const faction * f, int flags)
+{
+    unit *u;
+    int n = 0;
+    for (u = f->units; u; u = u->nextF) {
+        const race *rc = u_race(u);
+        int x = (flags&COUNT_UNITS) ? 1 : u->number;
+        if (f->race != rc) {
+            if (!playerrace(rc)) {
+                if (flags&COUNT_MONSTERS) {
+                    n += x;
+                }
+            }
+            else if (flags&COUNT_MIGRANTS) {
+                if (!is_cursed(u->attribs, C_SLAVE, 0)) {
+                    n += x;
+                }
+            }
+        }
+        else if (flags&COUNT_DEFAULT) {
+            n += x;
+        }
+    }
+    return n;
+}
+
+int count_units(const faction * f)
+{
+    return count_faction(f, COUNT_ALL | COUNT_UNITS);
+}
+
+int count_all(const faction * f)
+{
+    return count_faction(f, COUNT_ALL);
+}
+
+int count_migrants(const faction * f)
+{
+    return count_faction(f, COUNT_MIGRANTS);
+}
+
+int count_maxmigrants(const faction * f)
+{
+    static int migrants = -1;
+
+    if (migrants < 0) {
+        migrants = config_get_int("rules.migrants.max", INT_MAX);
+    }
+    if (migrants == INT_MAX) {
+        int x = 0;
+        if (f->race == get_race(RC_HUMAN)) {
+            int nsize = count_all(f);
+            if (nsize > 0) {
+                x = (int)(log10(nsize / 50.0) * 20);
+                if (x < 0)
+                    x = 0;
+            }
+        }
+        return x;
+    }
+    return migrants;
+}
