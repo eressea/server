@@ -77,7 +77,7 @@
         "rules.blessed_harvest.flags": 1,
         "rules.magic.elfpower": true,
         "rules.magic.playerschools": "gwyrrd illaun draig cerddor",
-        "rules.build.other_buildings": 1,
+        "rules.build.other_buildings": true,
         "rules.economy.taxation": 1,
         "rules.food.flags": 2,
         "rules.economy.roqf": 5,

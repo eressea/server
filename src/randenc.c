@@ -962,10 +962,7 @@ static void demon_skillchanges(void)
 
                 if (fval(u, UFL_HUNGER)) {
                     /* hungry demons only go down, never up in skill */
-                    static int rule_hunger = -1;
-                    if (rule_hunger < 0) {
-                        rule_hunger = config_get_int("hunger.demon.skill", 0);
-                    }
+                    int rule_hunger = config_get_int("hunger.demon.skill", 0) != 0;
                     if (rule_hunger) {
                         upchance = 0;
                         downchance = 15;
@@ -1009,15 +1006,13 @@ static void icebergs(void)
     }
 }
 
+#define HERBS_ROT               /* herbs owned by units have a chance to rot. */
+#define HERBROTCHANCE 5         /* Verrottchance für Kräuter (ifdef HERBS_ROT) */
 #ifdef HERBS_ROT
 static void rotting_herbs(void)
 {
-    static int rule_rot = -1;
     region *r;
-
-    if (rule_rot < 0) {
-        rule_rot = config_get_int("rules.economy.herbrot", HERBROTCHANCE);
-    }
+    int rule_rot = config_get_int("rules.economy.herbrot", HERBROTCHANCE);
     if (rule_rot == 0) return;
 
     for (r = regions; r; r = r->next) {

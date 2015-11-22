@@ -270,11 +270,8 @@ void get_food(region * r)
                     peasantfood = 0;
                 }
                 if (hungry > 0) {
-                    static int demon_hunger = -1;
-                    if (demon_hunger < 0) {
-                        demon_hunger = config_get_int("hunger.demons", 0);
-                    }
-                    if (demon_hunger == 0) {
+                    bool demon_hunger = config_get_int("hunger.demons", 0) != 0;
+                    if (demon_hunger) {
                         /* demons who don't feed are hungry */
                         if (hunger(hungry, u))
                             fset(u, UFL_HUNGER);

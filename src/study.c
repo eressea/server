@@ -546,17 +546,10 @@ int study_cmd(unit * u, order * ord)
     skill_t sk;
     int maxalchemy = 0;
     int speed_rule = (study_rule_t)config_get_int("study.speedup", 0);
-    static int learn_newskills = -1;
     struct building *b = inside_building(u);
     const struct building_type *btype = building_is_active(b) ? b->type : NULL;
+    bool learn_newskills = config_get_int("study.newskills", 1) != 0;
 
-    if (learn_newskills < 0) {
-        const char *str = config_get("study.newskills");
-        if (str && strcmp(str, "false") == 0)
-            learn_newskills = 0;
-        else
-            learn_newskills = 1;
-    }
     if (!unit_can_study(u)) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_race_nolearn", "race",
             u_race(u)));
@@ -580,7 +573,7 @@ int study_cmd(unit * u, order * ord)
         cmistake(u, ord, 771, MSG_EVENT);
         return 0;
     }
-    if (learn_newskills == 0) {
+    if (!learn_newskills) {
         skill *sv = unit_skill(u, sk);
         if (sv == NULL) {
             /* we can only learn skills we already have */

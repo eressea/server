@@ -3136,8 +3136,11 @@ static void peasant_taxes(region * r)
 
 static bool rule_auto_taxation(void)
 {
-    int rule = config_get_int("rules.economy.taxation", 0);
-    return rule != 0;
+    return config_get_int("rules.economy.taxation", 0) != 0;
+}
+
+static bool rule_autowork(void) {
+    return config_get_int("work.auto", 0) != 0;
 }
 
 void produce(struct region *r)
@@ -3145,7 +3148,6 @@ void produce(struct region *r)
     request workers[MAX_WORKERS];
     request *taxorders, *lootorders, *sellorders, *stealorders, *buyorders;
     unit *u;
-    static int rule_autowork = -1;
     bool limited = true;
     request *nextworker = workers;
     assert(r);
@@ -3159,10 +3161,6 @@ void produce(struct region *r)
      * produkte egal. nicht so wegen dem geld.
      *
      * lehren vor lernen. */
-
-    if (rule_autowork < 0) {
-        rule_autowork = config_get_int("work.auto", 0);
-    }
 
     assert(rmoney(r) >= 0);
     assert(rpeasants(r) >= 0);
@@ -3237,7 +3235,7 @@ void produce(struct region *r)
             break;
 
         case K_WORK:
-            if (!rule_autowork && do_work(u, u->thisorder, nextworker) == 0) {
+            if (!rule_autowork() && do_work(u, u->thisorder, nextworker) == 0) {
                 assert(nextworker - workers < MAX_WORKERS);
                 ++nextworker;
             }
@@ -3282,7 +3280,7 @@ void produce(struct region *r)
      * auszugeben bereit sind. */
     if (entertaining)
         expandentertainment(r);
-    if (!rule_autowork) {
+    if (!rule_autowork()) {
         expandwork(r, workers, nextworker, maxworkingpeasants(r));
     }
     if (taxorders)

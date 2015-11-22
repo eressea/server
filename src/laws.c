@@ -118,7 +118,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 static bool RemoveNMRNewbie(void)
 {
     int value = config_get_int("nmr.removenewbie", 0);
-    return value!=0;
+    return value != 0;
 }
 
 static void age_unit(region * r, unit * u)
@@ -250,7 +250,7 @@ static double peasant_growth_factor(void)
 
 #ifdef SLOWLUCK
 int peasant_luck_effect(int peasants, int luck, int maxp, double variance) {
-    int n, births=0;
+    int n, births = 0;
     double factor = peasant_growth_factor();
     for (n = peasants; n && luck; --n) {
         int chances = 0;
@@ -330,7 +330,7 @@ static void peasants(region * r)
      * Großteil. dead kann nie größer als rpeasants(r) - satiated werden,
      * so dass rpeasants(r) >= 0 bleiben muß. */
 
-    /* Es verhungert maximal die unterernährten Bevölkerung. */
+     /* Es verhungert maximal die unterernährten Bevölkerung. */
 
     n = _min(peasants - satiated, rpeasants(r));
     dead += (int)(0.5 + n * PEASANT_STARVATION_CHANCE);
@@ -423,7 +423,7 @@ static void horses(region * r)
             int i;
             double growth =
                 (RESOURCE_QUANTITY * HORSEGROWTH * 200 * (maxhorses -
-                horses)) / maxhorses;
+                    horses)) / maxhorses;
 
             if (growth > 0) {
                 if (a_find(r->attribs, &at_horseluck))
@@ -482,7 +482,7 @@ extern struct attrib_type at_germs;
 
 static void
 growing_trees_e3(region * r, const int current_season,
-const int last_weeks_season)
+    const int last_weeks_season)
 {
     static const int transform[4][3] = {
         { -1, -1, 0 },
@@ -751,7 +751,7 @@ void nmr_warnings(void)
                         if (msg == NULL) {
                             msg =
                                 msg_message("warn_dropout", "faction turns", f,
-                                turn - f->lastorders);
+                                    turn - f->lastorders);
                         }
                         add_message(&fa->msgs, msg);
                     }
@@ -785,12 +785,7 @@ void demographics(void)
             /* die Nachfrage nach Produkten steigt. */
             struct demand *dmd;
             if (r->land) {
-                static int plant_rules = -1;
-
-                if (plant_rules < 0) {
-                    plant_rules =
-                        config_get_int("rules.grow.formula", 0);
-                }
+                int plant_rules = config_get_int("rules.grow.formula", 0);
                 for (dmd = r->land->demands; dmd; dmd = dmd->next) {
                     if (dmd->value > 0 && dmd->value < MAXDEMAND) {
                         float rise = DMRISE;
@@ -988,11 +983,7 @@ static int mayboard(const unit * u, ship * sh)
 
 static bool CheckOverload(void)
 {
-    static int value = -1;
-    if (value < 0) {
-        value = config_get_int("rules.check_overload", 0);
-    }
-    return value != 0;
+    return config_get_int("rules.check_overload", 0) != 0;
 }
 
 int enter_ship(unit * u, struct order *ord, int id, bool report)
@@ -1209,9 +1200,7 @@ int *age = NULL;
 
 static void nmr_death(faction * f)
 {
-    static int rule = -1;
-    if (rule < 0)
-        rule = config_get_int("rules.nmr.destroy", 0);
+    int rule = config_get_int("rules.nmr.destroy", 0) != 0;
     if (rule) {
         unit *u;
         for (u = f->units; u; u = u->nextF) {
@@ -1311,7 +1300,7 @@ int ally_cmd(unit * u, struct order *ord)
 
     if (!s || !s[0]) {
         keyword = P_ANY;
-    } 
+    }
     else {
         keyword = findparam(s, u->faction->locale);
     }
@@ -1492,9 +1481,9 @@ int prefix_cmd(unit * u, struct order *ord)
         if (fval(u, UFL_GROUP)) {
             attrib *a = a_find(u->attribs, &at_group);
             if (a) {
-				group *g = (group *)a->data.v;
+                group *g = (group *)a->data.v;
                 ap = &g->attribs;
-			}
+            }
         }
         set_prefix(ap, race_prefixes[var.i]);
     }
@@ -1920,7 +1909,7 @@ deliverMail(faction * f, region * r, unit * u, const char *s, unit * receiver)
     else {                      /* BOTSCHAFT an EINHEIT */
         ADDMSG(&f->msgs,
             msg_message("unitmessage", "region unit sender string", r,
-            receiver, u, s));
+                receiver, u, s));
     }
 }
 
@@ -2304,7 +2293,7 @@ static bool display_race(faction * f, unit * u, const race * rc)
     /* hp_p : Trefferpunkte */
     bytes =
         slprintf(bufp, size, " %d %s", rc->hitpoints, LOC(f->locale,
-        "stat_hitpoints"));
+            "stat_hitpoints"));
     assert(bytes <= INT_MAX);
     if (wrptr(&bufp, &size, (int)bytes) != 0)
         WARN_STATIC_BUFFER();
@@ -2312,7 +2301,7 @@ static bool display_race(faction * f, unit * u, const race * rc)
     /* b_attacke : Angriff */
     bytes =
         slprintf(bufp, size, ", %s: %d", LOC(f->locale, "stat_attack"),
-        (rc->at_default + rc->at_bonus));
+            (rc->at_default + rc->at_bonus));
     assert(bytes <= INT_MAX);
     if (wrptr(&bufp, &size, (int)bytes) != 0)
         WARN_STATIC_BUFFER();
@@ -2320,7 +2309,7 @@ static bool display_race(faction * f, unit * u, const race * rc)
     /* b_defense : Verteidigung */
     bytes =
         slprintf(bufp, size, ", %s: %d", LOC(f->locale, "stat_defense"),
-        (rc->df_default + rc->df_bonus));
+            (rc->df_default + rc->df_bonus));
     assert(bytes <= INT_MAX);
     if (wrptr(&bufp, &size, (int)bytes) != 0)
         WARN_STATIC_BUFFER();
@@ -2379,12 +2368,12 @@ static bool display_race(faction * f, unit * u, const race * rc)
             case AT_STANDARD:
                 bytes =
                     (size_t)_snprintf(bufp, size, "%s (%s)",
-                    LOC(f->locale, "attack_standard"), rc->def_damage);
+                        LOC(f->locale, "attack_standard"), rc->def_damage);
                 break;
             case AT_NATURAL:
                 bytes =
                     (size_t)_snprintf(bufp, size, "%s (%s)",
-                    LOC(f->locale, "attack_natural"), rc->attack[a].data.dice);
+                        LOC(f->locale, "attack_natural"), rc->attack[a].data.dice);
                 break;
             case AT_SPELL:
             case AT_COMBATSPELL:
@@ -2396,7 +2385,7 @@ static bool display_race(faction * f, unit * u, const race * rc)
             case AT_STRUCTURAL:
                 bytes =
                     (size_t)_snprintf(bufp, size, "%s (%s)",
-                    LOC(f->locale, "attack_structural"), rc->attack[a].data.dice);
+                        LOC(f->locale, "attack_structural"), rc->attack[a].data.dice);
                 break;
             default:
                 bytes = 0;
@@ -2500,7 +2489,7 @@ int promotion_cmd(unit * u, struct order *ord)
     if (maxheroes(u->faction) < countheroes(u->faction) + u->number) {
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, ord, "heroes_maxed", "max count",
-            maxheroes(u->faction), countheroes(u->faction)));
+                maxheroes(u->faction), countheroes(u->faction)));
         return 0;
     }
     if (!valid_race(u->faction, u_race(u))) {
@@ -2745,7 +2734,8 @@ void sinkships(struct region * r)
                     double dmg = config_get_flt("rules.ship.damage.nocrewocean", 0.3);
                     damage_ship(sh, dmg);
                 }
-            } else if (!ship_owner(sh)) {
+            }
+            else if (!ship_owner(sh)) {
                 // any ship lying around without an owner slowly rots
                 double dmg = config_get_flt("rules.ship.damage.nocrew", 0.05);
                 damage_ship(sh, dmg);
@@ -3280,14 +3270,14 @@ void new_units(void)
                         if (err == 1) {
                             ADDMSG(&u->faction->msgs,
                                 msg_feedback(u, makeord,
-                                "too_many_units_in_alliance",
-                                "allowed", maxunits(u->faction)));
+                                    "too_many_units_in_alliance",
+                                    "allowed", maxunits(u->faction)));
                         }
                         else {
                             ADDMSG(&u->faction->msgs,
                                 msg_feedback(u, makeord,
-                                "too_many_units_in_faction",
-                                "allowed", maxunits(u->faction)));
+                                    "too_many_units_in_faction",
+                                    "allowed", maxunits(u->faction)));
                         }
                         ordp = &makeord->next;
 
@@ -3360,7 +3350,7 @@ void update_long_order(unit * u)
         }
 
         // hungry units do not get long orders:
-        if (hunger)  {
+        if (hunger) {
             if (u->old_orders) {
                 // keep looking for repeated orders that might clear the old_orders
                 continue;
@@ -3432,7 +3422,8 @@ void update_long_order(unit * u)
     if (hunger) {
         // Hungernde Einheiten führen NUR den default-Befehl aus
         set_order(&u->thisorder, default_order(u->faction->locale));
-    } else if (!exclusive) {
+    }
+    else if (!exclusive) {
         // Wenn die Einheit handelt oder zaubert, muss der Default-Befehl gelöscht werden.
         set_order(&u->thisorder, NULL);
     }
@@ -3459,7 +3450,7 @@ static int use_item(unit * u, const item_type * itype, int amount, struct order 
             return EUNUSABLE;
         }
         result = itype->use ? itype->use(u, itype, amount, ord) : EUNUSABLE;
-        if (result>0) {
+        if (result > 0) {
             use_pooled(u, itype->rtype, GET_DEFAULT, result);
         }
         return result;
@@ -4543,7 +4534,7 @@ void update_subscriptions(void)
 
 bool
 cansee(const faction * f, const region * r, const unit * u, int modifier)
-/* r kann != u->region sein, wenn es um Durchreisen geht, 
+/* r kann != u->region sein, wenn es um Durchreisen geht,
  * oder Zauber (sp_generous, sp_fetchastral).
  * Es muss auch niemand aus f in der region sein, wenn sie vom Turm
  * erblickt wird */
@@ -4645,10 +4636,10 @@ bool cansee_unit(const unit * u, const unit * target, int modifier)
 
 bool
 cansee_durchgezogen(const faction * f, const region * r, const unit * u,
-int modifier)
-/* r kann != u->region sein, wenn es um durchreisen geht */
-/* und es muss niemand aus f in der region sein, wenn sie vom Turm
-* erblickt wird */
+    int modifier)
+    /* r kann != u->region sein, wenn es um durchreisen geht */
+    /* und es muss niemand aus f in der region sein, wenn sie vom Turm
+    * erblickt wird */
 {
     int n;
     unit *u2;

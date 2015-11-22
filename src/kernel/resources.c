@@ -82,10 +82,7 @@ void terraform_resources(region * r)
 {
     int i;
     const terrain_type *terrain = r->terrain;
-    static int terraform_all = -1;
-    if (terraform_all < 0) {
-        terraform_all = config_get_int("rules.terraform.all", 0);
-    }
+    bool terraform_all = config_get_int("rules.terraform.all", 0) != 0;
 
     if (terrain->production == NULL)
         return;

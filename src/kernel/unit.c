@@ -1721,17 +1721,13 @@ void unit_addorder(unit * u, order * ord)
 
 int unit_max_hp(const unit * u)
 {
-    static int rules_stamina = -1;
     int h;
     double p;
     static const curse_type *heal_ct = NULL;
-
-    if (rules_stamina < 0) {
-        rules_stamina = config_get_int("rules.stamina", STAMINA_AFFECTS_HP);
-    }
+    int rule_stamina = config_get_int("rules.stamina", STAMINA_AFFECTS_HP);
     h = u_race(u)->hitpoints;
 
-    if (rules_stamina & 1) {
+    if (rule_stamina & 1) {
         p = pow(effskill(u, SK_STAMINA, u->region) / 2.0, 1.5) * 0.2;
         h += (int)(h * p + 0.5);
     }

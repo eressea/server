@@ -685,7 +685,6 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
     const char *btname;
     order *new_order = NULL;
     const struct locale *lang = u->faction->locale;
-    static int rule_other = -1;
 
     assert(u->number);
     assert(btype->construction);
@@ -749,10 +748,7 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
         n = 1;
     }
     if (b) {
-        if (rule_other < 0) {
-            rule_other =
-                config_get_int("rules.build.other_buildings", 1);
-        }
+        bool rule_other = config_get_int("rules.build.other_buildings", 1) != 0;
         if (!rule_other) {
             unit *owner = building_owner(b);
             if (!owner || owner->faction != u->faction) {
