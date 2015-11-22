@@ -205,9 +205,6 @@ struct param;
                 const struct race * rc, int in_turn);
             int(*maintenance) (const struct unit * u);
         } functions;
-        /* the following are some cached values, because get_param can be slow.
-         * you should almost never need to touch them */
-        int cookie;
     } settings;
 
     typedef struct helpmode {

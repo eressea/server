@@ -1006,15 +1006,12 @@ void set_param(struct param **p, const char *key, const char *value)
             const char * kv = (const char *)match;
             size_t vlen = strlen(kv + klen) + 1;
             cb_erase(&par->cb, kv, klen + vlen);
-            ++global.cookie;
         }
     }
     if (value) {
         char data[512];
         size_t sz = pack_keyval(key, value, data, sizeof(data));
-        if (cb_insert(&par->cb, data, sz) == CB_SUCCESS) {
-            ++global.cookie;
-        }
+        cb_insert(&par->cb, data, sz);
     }
 }
 
@@ -1631,7 +1628,6 @@ void free_gamedata(void)
     while (global.attribs) {
         a_remove(&global.attribs, global.attribs);
     }
-    ++global.cookie;              /* readgame() already does this, but sjust in case */
 }
 
 const char * game_name(void) {
