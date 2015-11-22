@@ -104,7 +104,7 @@ static void recruit_init(void)
 {
     if (rules_recruit < 0) {
         rules_recruit = 0;
-        if (get_param_int(global.parameters, "recruit.allow_merge", 1)) {
+        if (config_get_int("recruit.allow_merge", 1)) {
             rules_recruit |= RECRUIT_MERGE;
         }
     }
@@ -2745,11 +2745,11 @@ void entertain_cmd(unit * u, struct order *ord)
     kwd = init_order(ord);
     assert(kwd == K_ENTERTAIN);
     if (!entertainbase) {
-        const char *str = get_param(global.parameters, "entertain.base");
+        const char *str = config_get("entertain.base");
         entertainbase = str ? atoi(str) : 0;
     }
     if (!entertainperlevel) {
-        const char *str = get_param(global.parameters, "entertain.perlevel");
+        const char *str = config_get("entertain.perlevel");
         entertainperlevel = str ? atoi(str) : 0;
     }
     if (fval(u, UFL_WERE)) {
@@ -3020,7 +3020,7 @@ void loot_cmd(unit * u, struct order *ord, request ** lootorders)
     kwd = init_order(ord);
     assert(kwd == K_LOOT);
 
-    if (get_param_int(global.parameters, "rules.enable_loot", 0) == 0 && !is_monsters(u->faction)) {
+    if (config_get_int("rules.enable_loot", 0) == 0 && !is_monsters(u->faction)) {
         return;
     }
 
@@ -3136,7 +3136,7 @@ static void peasant_taxes(region * r)
 
 static bool rule_auto_taxation(void)
 {
-    int rule = get_param_int(global.parameters, "rules.economy.taxation", 0);
+    int rule = config_get_int("rules.economy.taxation", 0);
     return rule != 0;
 }
 
@@ -3161,7 +3161,7 @@ void produce(struct region *r)
      * lehren vor lernen. */
 
     if (rule_autowork < 0) {
-        rule_autowork = get_param_int(global.parameters, "work.auto", 0);
+        rule_autowork = config_get_int("work.auto", 0);
     }
 
     assert(rmoney(r) >= 0);

@@ -182,8 +182,7 @@ bool is_astral(const region * r)
 plane *get_astralplane(void)
 {
     plane *astralspace = 0;
-    int rule_astralplane =
-        get_param_int(global.parameters, "modules.astralspace", 1);
+    int rule_astralplane = config_get_int("modules.astralspace", 1);
 
     if (!rule_astralplane) {
         return NULL;

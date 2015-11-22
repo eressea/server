@@ -1678,7 +1678,7 @@ int reports(void)
     free_seen();
 #ifdef GLOBAL_REPORT
     {
-        const char *str = get_param(global.parameters, "globalreport");
+        const char *str = config_get("globalreport");
         if (str != NULL) {
             sprintf(path, "%s/%s.%u.cr", reportpath(), str, turn);
             global_report(path);

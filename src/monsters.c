@@ -82,7 +82,7 @@ static void give_peasants(unit *u, const item_type *itype, int reduce) {
 }
 
 static double monster_attack_chance(void) {
-    return get_param_flt(global.parameters, "rules.monsters.attack_chance", 0.4f);
+    return config_get_flt("rules.monsters.attack_chance", 0.4);
 }
 
 static void reduce_weight(unit * u)

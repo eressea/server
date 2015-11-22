@@ -136,26 +136,26 @@ static int skill_formula = 0;
 static void static_rules(void)
 {
     loot_rules =
-        get_param_int(global.parameters, "rules.combat.loot",
+        config_get_int("rules.combat.loot",
         LOOT_MONSTERS | LOOT_OTHERS | LOOT_KEEPLOOT);
     /* new formula to calculate to-hit-chance */
     skill_formula =
-        get_param_int(global.parameters, "rules.combat.skill_formula",
+        config_get_int("rules.combat.skill_formula",
         FORMULA_ORIG);
     /* maximum number of combat turns */
     max_turns =
-        get_param_int(global.parameters, "rules.combat.turns", COMBAT_TURNS);
+        config_get_int("rules.combat.turns", COMBAT_TURNS);
     /* damage calculation */
-    if (get_param_int(global.parameters, "rules.combat.critical", 1)) {
+    if (config_get_int("rules.combat.critical", 1)) {
         damage_rules |= DAMAGE_CRITICAL;
     }
-    if (get_param_int(global.parameters, "rules.combat.melee_bonus", 1)) {
+    if (config_get_int("rules.combat.melee_bonus", 1)) {
         damage_rules |= DAMAGE_MELEE_BONUS;
     }
-    if (get_param_int(global.parameters, "rules.combat.missile_bonus", 1)) {
+    if (config_get_int("rules.combat.missile_bonus", 1)) {
         damage_rules |= DAMAGE_MISSILE_BONUS;
     }
-    if (get_param_int(global.parameters, "rules.combat.skill_bonus", 1)) {
+    if (config_get_int("rules.combat.skill_bonus", 1)) {
         damage_rules |= DAMAGE_SKILL_BONUS;
     }
 }
@@ -667,7 +667,7 @@ static int CavalrySkill(void)
     static int skill = -1;
 
     if (skill < 0) {
-        skill = get_param_int(global.parameters, "rules.cavalry.skill", 2);
+        skill = config_get_int("rules.cavalry.skill", 2);
     }
     return skill;
 }
@@ -679,7 +679,7 @@ static int CavalryBonus(const unit * u, troop enemy, int type)
     static int mode = -1;
 
     if (mode < 0) {
-        mode = get_param_int(global.parameters, "rules.cavalry.mode", 1);
+        mode = config_get_int("rules.cavalry.mode", 1);
     }
     if (mode == 0) {
         /* old rule, Eressea 1.0 compat */
@@ -1008,7 +1008,7 @@ static void vampirism(troop at, int damage)
 {
     static int vampire = -1;
     if (vampire < 0)
-        vampire = get_param_int(global.parameters, "rules.combat.demon_vampire", 0);
+        vampire = config_get_int("rules.combat.demon_vampire", 0);
     if (vampire > 0) {
         int gain = damage / vampire;
         int chance = damage - vampire * gain;
@@ -1108,7 +1108,7 @@ int calculate_armor(troop dt, const weapon_type *dwtype, const weapon_type *awty
     am = select_magicarmor(dt);
 
     if (rule_armor < 0) {
-        rule_armor = get_param_int(global.parameters, "rules.combat.nat_armor", 0);
+        rule_armor = config_get_int("rules.combat.nat_armor", 0);
     }
     if (rule_armor == 0) {
         /* natürliche Rüstung ist halbkumulativ */
@@ -1616,7 +1616,7 @@ static troop select_opponent(battle * b, troop at, int mindist, int maxdist)
 
         if (tactics_formula < 0) {
             tactics_formula =
-                get_param_int(global.parameters, "rules.tactics.formula", 0);
+                config_get_int("rules.tactics.formula", 0);
         }
         if (tactics_formula == 1) {
             int tactics = get_tactics(at.fighter->side, dt.fighter->side);
@@ -1942,7 +1942,7 @@ int skilldiff(troop at, troop dt, int dist)
         static int goblin_bonus = -1;
         if (goblin_bonus < 0)
             goblin_bonus =
-            get_param_int(global.parameters, "rules.combat.goblinbonus", 10);
+            config_get_int("rules.combat.goblinbonus", 10);
         if (af->side->size[SUM_ROW] >= df->side->size[SUM_ROW] * goblin_bonus) {
             skdiff += 1;
         }
@@ -2142,7 +2142,7 @@ static void make_heroes(battle * b)
     side *s;
     static int hero_speed = 0;
     if (hero_speed == 0) {
-        hero_speed = get_param_int(global.parameters, "rules.combat.herospeed", 10);
+        hero_speed = config_get_int("rules.combat.herospeed", 10);
     }
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
         fighter *fig;
@@ -2546,7 +2546,7 @@ static int loot_quota(const unit * src, const unit * dst,
     static double divisor = -1;
     if (dst && src && src->faction != dst->faction) {
         if (divisor < 0) {
-            divisor = get_param_flt(global.parameters, "rules.items.loot_divisor", 1);
+            divisor = config_get_flt("rules.items.loot_divisor", 1);
             assert(divisor == 0 || divisor >= 1);
         }
         if (divisor >= 1) {
@@ -2654,7 +2654,7 @@ static double PopulationDamage(void)
     static double value = -1.0;
     if (value < 0) {
         int damage =
-            get_param_int(global.parameters, "rules.combat.populationdamage",
+            config_get_int("rules.combat.populationdamage",
             BATTLE_KILLS_PEASANTS);
         value = damage / 100.0;
     }
@@ -2908,7 +2908,7 @@ static void aftermath(battle * b)
                     int n = b->turn - 2;
                     if (n > 0) {
                         double dmg =
-                            get_param_flt(global.parameters, "rules.ship.damage.battleround",
+                            config_get_flt("rules.ship.damage.battleround",
                             0.05F);
                         damage_ship(sh, dmg * n);
                         freset(sh, SF_DAMAGED);
@@ -3216,7 +3216,7 @@ side * find_side(battle * b, const faction * f, const group * g, unsigned int fl
     static int rule_anon_battle = -1;
 
     if (rule_anon_battle < 0) {
-        rule_anon_battle = get_param_int(global.parameters, "rules.stealth.anon_battle", 1);
+        rule_anon_battle = config_get_int("rules.stealth.anon_battle", 1);
     }
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
         if (s->faction == f && s->group == g) {

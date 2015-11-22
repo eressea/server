@@ -112,7 +112,7 @@ static float MagicRegeneration(void)
 {
     static float value = -1.0;
     if (value < 0) {
-        const char *str = get_param(global.parameters, "magic.regeneration");
+        const char *str = config_get("magic.regeneration");
         value = str ? (float)atof(str) : 1.0F;
     }
     return value;
@@ -121,7 +121,7 @@ static float MagicRegeneration(void)
 static double MagicPower(double force)
 {
     if (force > 0) {
-        const char *str = get_param(global.parameters, "magic.power");
+        const char *str = config_get("magic.power");
         double value = str ? atof(str) : 1.0;
         return _max(value * force, 1.0f);
     }
@@ -217,8 +217,7 @@ bool FactionSpells(void)
 {
     static int rules_factionspells = -1;
     if (rules_factionspells < 0) {
-        rules_factionspells =
-            get_param_int(global.parameters, "rules.magic.factionlist", 0);
+        rules_factionspells = config_get_int("rules.magic.factionlist", 0);
     }
     return rules_factionspells!=0;
 }
@@ -1034,7 +1033,7 @@ spellpower(region * r, unit * u, const spell * sp, int cast_level, struct order 
         if (btype && btype->flags & BTF_MAGIC) ++force;
     }
 
-    elf_power = get_param_int(global.parameters, "rules.magic.elfpower", 0);
+    elf_power = config_get_int("rules.magic.elfpower", 0);
 
     if (elf_power && u_race(u) == get_race(RC_ELF) && r_isforest(r)) {
         ++force;
@@ -1291,7 +1290,7 @@ bool fumble(region * r, unit * u, const spell * sp, int cast_grade)
     int effsk = effskill(u, SK_MAGIC, r);
     struct building *b = inside_building(u);
     const struct building_type *btype = building_is_active(b) ? b->type : NULL;
-    int fumble_enabled = get_param_int(global.parameters, "magic.fumble.enable", 1);
+    int fumble_enabled = config_get_int("magic.fumble.enable", 1);
     sc_mage * mage;
 
     if (effsk<=0 || !fumble_enabled) {
@@ -1463,7 +1462,7 @@ void regenerate_aura(void)
     double reg_aura;
     int regen;
     double mod;
-    int regen_enabled = get_param_int(global.parameters, "magic.regeneration.enable", 1);
+    int regen_enabled = config_get_int("magic.regeneration.enable", 1);
 
     if (!regen_enabled) return;
 

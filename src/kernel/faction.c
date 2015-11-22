@@ -568,7 +568,7 @@ static int allied_skilllimit(const faction * f, skill_t sk)
 {
     static int value = -1;
     if (value < 0) {
-        value = get_param_int(global.parameters, "alliance.skilllimit", 0);
+        value = config_get_int("alliance.skilllimit", 0);
     }
     return value;
 }
@@ -611,8 +611,7 @@ int skill_limit(faction * f, skill_t sk)
         m = max_magicians(f);
     }
     else if (sk == SK_ALCHEMY) {
-        m = get_param_int(global.parameters, "rules.maxskills.alchemy",
-            MAXALCHEMISTS);
+        m = config_get_int("rules.maxskills.alchemy", MAXALCHEMISTS);
     }
     return m;
 }

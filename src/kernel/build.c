@@ -419,7 +419,7 @@ int roqf_factor(void)
 {
     int value = -1;
     if (value < 0) {
-        value = get_param_int(global.parameters, "rules.economy.roqf", 10);
+        value = config_get_int("rules.economy.roqf", 10);
     }
     return value;
 }
@@ -751,7 +751,7 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
     if (b) {
         if (rule_other < 0) {
             rule_other =
-                get_param_int(global.parameters, "rules.build.other_buildings", 1);
+                config_get_int("rules.build.other_buildings", 1);
         }
         if (!rule_other) {
             unit *owner = building_owner(b);

@@ -110,7 +110,7 @@ int turn = -1;
 
 int NewbieImmunity(void)
 {
-    return get_param_int(global.parameters, "NewbieImmunity", 0);
+    return config_get_int("NewbieImmunity", 0);
 }
 
 bool IsImmune(const faction * f)
@@ -137,7 +137,7 @@ static int ally_flag(const char *s, int help_mask)
 
 bool ExpensiveMigrants(void)
 {
-    return get_param_int(global.parameters, "study.expensivemigrants", 0) != 0;
+    return config_get_int("study.expensivemigrants", 0) != 0;
 }
 
 /** Specifies automatic alliance modes.
@@ -147,7 +147,7 @@ bool ExpensiveMigrants(void)
 int AllianceAuto(void)
 {
     int value;
-    const char *str = get_param(global.parameters, "alliance.auto");
+    const char *str = config_get("alliance.auto");
     value = 0;
     if (str != NULL) {
         char *sstr = _strdup(str);
@@ -169,7 +169,7 @@ int AllianceAuto(void)
  */
 int HelpMask(void)
 {
-    const char *str = get_param(global.parameters, "rules.help.mask");
+    const char *str = config_get("rules.help.mask");
     int rule = 0;
     if (str != NULL) {
         char *sstr = _strdup(str);
@@ -188,7 +188,7 @@ int HelpMask(void)
 
 int AllianceRestricted(void)
 {
-    const char *str = get_param(global.parameters, "alliance.restricted");
+    const char *str = config_get("alliance.restricted");
     int rule = 0;
     if (str != NULL) {
         char *sstr = _strdup(str);
@@ -211,18 +211,18 @@ int LongHunger(const struct unit *u)
         if (u_race(u) == get_race(RC_DAEMON))
             return false;
     }
-    return get_param_int(global.parameters, "hunger.long", 0);
+    return config_get_int("hunger.long", 0);
 }
 
 int SkillCap(skill_t sk)
 {
     if (sk == SK_MAGIC) return 0; /* no caps on magic */
-    return get_param_int(global.parameters, "skill.maxlevel", 0);
+    return config_get_int("skill.maxlevel", 0);
 }
 
 int NMRTimeout(void)
 {
-    return get_param_int(global.parameters, "nmr.timeout", 0);
+    return config_get_int("nmr.timeout", 0);
 }
 
 race_t old_race(const struct race * rc)
@@ -371,8 +371,7 @@ static attrib_type at_maxmagicians = {
 
 int max_magicians(const faction * f)
 {
-    int m =
-        get_param_int(global.parameters, "rules.maxskills.magic", MAXMAGICIANS);
+    int m = config_get_int("rules.maxskills.magic", MAXMAGICIANS);
     attrib *a;
 
     if ((a = a_find(f->attribs, &at_maxmagicians)) != NULL) {
@@ -567,7 +566,7 @@ int count_maxmigrants(const faction * f)
     static int migrants = -1;
 
     if (migrants < 0) {
-        migrants = get_param_int(global.parameters, "rules.migrants.max", INT_MAX);
+        migrants = config_get_int("rules.migrants.max", INT_MAX);
     }
     if (migrants == INT_MAX) {
         int x = 0;
@@ -931,7 +930,7 @@ void init_locale(struct locale *lang)
 
     tokens = get_translations(lang, UT_MAGIC);
     if (tokens) {
-        const char *str = get_param(global.parameters, "rules.magic.playerschools");
+        const char *str = config_get("rules.magic.playerschools");
         char *sstr, *tok;
         if (str == NULL) {
             str = "gwyrrd illaun draig cerddor tybied";
@@ -1281,25 +1280,25 @@ int cmp_current_owner(const building * b, const building * a)
 
 bool rule_stealth_other(void)
 {
-    int rule = get_param_int(global.parameters, "stealth.faction.other", 1);
+    int rule = config_get_int("stealth.faction.other", 1);
     return rule != 0;
 }
 
 bool rule_stealth_anon(void)
 {
-    int rule = get_param_int(global.parameters, "stealth.faction.anon", 1);
+    int rule = config_get_int("stealth.faction.anon", 1);
     return rule != 0;
 }
 
 bool rule_region_owners(void)
 {
-    int rule = get_param_int(global.parameters, "rules.region_owners", 0);
+    int rule = config_get_int("rules.region_owners", 0);
     return rule != 0;
 }
 
 int rule_blessed_harvest(void)
 {
-    int rule = get_param_int(global.parameters, "rules.blessed_harvest.flags",
+    int rule = config_get_int("rules.blessed_harvest.flags",
         HARVEST_WORK);
     assert(rule >= 0);
     return rule;
@@ -1307,14 +1306,14 @@ int rule_blessed_harvest(void)
 
 int rule_alliance_limit(void)
 {
-    int rule = get_param_int(global.parameters, "rules.limit.alliance", 0);
+    int rule = config_get_int("rules.limit.alliance", 0);
     assert(rule >= 0);
     return rule;
 }
 
 int rule_faction_limit(void)
 {
-    int rule = get_param_int(global.parameters, "rules.limit.faction", 0);
+    int rule = config_get_int("rules.limit.faction", 0);
     assert(rule >= 0);
     return rule;
 }
@@ -1564,12 +1563,12 @@ int entertainmoney(const region * r)
 
 int rule_give(void)
 {
-    return get_param_int(global.parameters, "rules.give.flags", GIVE_DEFAULT);
+    return config_get_int("rules.give.flags", GIVE_DEFAULT);
 }
 
 bool markets_module(void)
 {
-    return get_param_int(global.parameters, "modules.markets", 0);
+    return config_get_int("modules.markets", 0);
 }
 
 void config_set(const char *key, const char *value) {
@@ -1629,11 +1628,11 @@ void free_gamedata(void)
 }
 
 const char * game_name(void) {
-    const char * param = get_param(global.parameters, "game.name");
+    const char * param = config_get("game.name");
     return param ? param : global.gamename;
 }
 
 int game_id(void) {
-    return get_param_int(global.parameters, "game.id", 0);
+    return config_get_int("game.id", 0);
 }
 

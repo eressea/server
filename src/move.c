@@ -319,7 +319,7 @@ int walkingcapacity(const struct unit *u)
     if (rbelt) {
         int belts = i_get(u->items, rbelt->itype);
         if (belts) {
-            int multi = get_param_int(global.parameters, "rules.trollbelt.multiplier", STRENGTHMULTIPLIER);
+            int multi = config_get_int("rules.trollbelt.multiplier", STRENGTHMULTIPLIER);
             n += _min(people, belts) * (multi - 1) * u_race(u)->capacity;
         }
     }
@@ -694,7 +694,7 @@ static float damage_drift(void)
 {
     static float value = -1.0F;
     if (value < 0) {
-        value = (float)get_param_flt(global.parameters, "rules.ship.damage_drift", 0.02F);
+        value = (float)config_get_flt("rules.ship.damage_drift", 0.02F);
     }
     return value;
 }
@@ -702,7 +702,7 @@ static float damage_drift(void)
 static void drifting_ships(region * r)
 {
     direction_t d;
-    bool drift = get_param_int(global.parameters, "rules.ship.drifting", 1) != 0;
+    bool drift = config_get_int("rules.ship.drifting", 1) != 0;
 
     if (fval(r->terrain, SEA_REGION)) {
         ship **shp = &r->ships;
@@ -839,12 +839,12 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
     int stealth = eff_stealth(reisender, r);
     const struct resource_type *ramulet = get_resourcetype(R_AMULET_OF_TRUE_SEEING);
 
-    double base_prob = get_param_flt(global.parameters, "rules.guard.base_stop_prob", .3f);
-    double skill_prob = get_param_flt(global.parameters, "rules.guard.skill_stop_prob", .1f);
-    double amulet_prob = get_param_flt(global.parameters, "rules.guard.amulet_stop_prob", .1f);
-    double guard_number_prob = get_param_flt(global.parameters, "rules.guard.guard_number_stop_prob", .001f);
-    double castle_prob = get_param_flt(global.parameters, "rules.guard.castle_stop_prob", .1f);
-    double region_type_prob = get_param_flt(global.parameters, "rules.guard.region_type_stop_prob", .1f);
+    double base_prob = config_get_flt("rules.guard.base_stop_prob", .3);
+    double skill_prob = config_get_flt("rules.guard.skill_stop_prob", .1);
+    double amulet_prob = config_get_flt("rules.guard.amulet_stop_prob", .1);
+    double guard_number_prob = config_get_flt("rules.guard.guard_number_stop_prob", .001);
+    double castle_prob = config_get_flt("rules.guard.castle_stop_prob", .1);
+    double region_type_prob = config_get_flt("rules.guard.region_type_stop_prob", .1);
 
     if (fval(u_race(reisender), RCF_ILLUSIONARY))
         return NULL;
@@ -1785,7 +1785,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
         if (!flying_ship(sh)) {
             int stormchance = 0;
             int reason;
-            bool storms_enabled = get_param_int(global.parameters, "rules.ship.storms", 1) != 0;
+            bool storms_enabled = config_get_int("rules.ship.storms", 1) != 0;
             if (storms_enabled) {
                 int stormyness;
                 gamedate date;
@@ -1795,7 +1795,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
                 /* storms should be the first thing we do. */
                 stormchance = stormyness / shipspeed(sh, u);
                 if (check_leuchtturm(next_point, NULL)) {
-                    int param = get_param_int(global.parameters, "rules.lighthous.stormchancedevisor", 0);
+                    int param = config_get_int("rules.lighthous.stormchancedevisor", 0);
                     if (param > 0) {
                         stormchance /= param;
                     }
@@ -1885,9 +1885,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
                     ADDMSG(&f->msgs, msg_message("sailnolandingstorm", "ship region", sh, next_point));
                 }
                 else {
-                    double dmg =
-                        get_param_flt(global.parameters, "rules.ship.damage.nolanding",
-                        0.10F);
+                    double dmg = config_get_flt("rules.ship.damage.nolanding", 0.1);
                     ADDMSG(&f->msgs, msg_message("sailnolanding", "ship region", sh,
                         next_point));
                     damage_ship(sh, dmg);

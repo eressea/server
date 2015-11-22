@@ -738,9 +738,7 @@ static void move_iceberg(region * r)
 
             for (sh = r->ships; sh; sh = sh->next) {
                 /* Meldung an Kapitän */
-                double dmg =
-                    get_param_flt(global.parameters, "rules.ship.damage.intoiceberg",
-                    0.10F);
+                double dmg = config_get_flt("rules.ship.damage.intoiceberg", 0.1);
                 damage_ship(sh, dmg);
                 fset(sh, SF_SELECT);
             }
@@ -751,9 +749,7 @@ static void move_iceberg(region * r)
                 translist(&rc->buildings, &r->buildings, rc->buildings);
             }
             while (rc->ships) {
-                double dmg =
-                    get_param_flt(global.parameters, "rules.ship.damage.withiceberg",
-                    0.10F);
+                double dmg = config_get_flt("rules.ship.damage.withiceberg", 0.1);
                 fset(rc->ships, SF_SELECT);
                 damage_ship(rc->ships, dmg);
                 move_ship(rc->ships, rc, r, NULL);
@@ -885,9 +881,7 @@ static void godcurse(void)
                 ship *sh;
                 for (sh = r->ships; sh;) {
                     ship *shn = sh->next;
-                    double dmg =
-                        get_param_flt(global.parameters, "rules.ship.damage.godcurse",
-                        0.10F);
+                    double dmg = config_get_flt("rules.ship.damage.godcurse", 0.1);
                     damage_ship(sh, dmg);
                     if (sh->damage >= sh->size * DAMAGE_SCALE) {
                         unit *u = ship_owner(sh);
@@ -970,8 +964,7 @@ static void demon_skillchanges(void)
                     /* hungry demons only go down, never up in skill */
                     static int rule_hunger = -1;
                     if (rule_hunger < 0) {
-                        rule_hunger =
-                            get_param_int(global.parameters, "hunger.demon.skill", 0);
+                        rule_hunger = config_get_int("hunger.demon.skill", 0);
                     }
                     if (rule_hunger) {
                         upchance = 0;
@@ -1023,8 +1016,7 @@ static void rotting_herbs(void)
     region *r;
 
     if (rule_rot < 0) {
-        rule_rot =
-            get_param_int(global.parameters, "rules.economy.herbrot", HERBROTCHANCE);
+        rule_rot = config_get_int("rules.economy.herbrot", HERBROTCHANCE);
     }
     if (rule_rot == 0) return;
 

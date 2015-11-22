@@ -531,7 +531,7 @@ int bt_effsize(const building_type * btype, const building * b, int bsize)
     const construction *cons = btype->construction;
 
     /* TECH DEBT: simplest thing that works for E3 dwarf/halfling faction rules */
-    if (b && get_param_int(global.parameters, "rules.dwarf_castles", 0)
+    if (b && config_get_int("rules.dwarf_castles", 0)
         && strcmp(btype->_name, "castle") == 0) {
         unit *u = building_owner(b);
         if (u && u->faction->race == get_race(RC_HALFLING)) {

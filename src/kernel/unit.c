@@ -232,7 +232,7 @@ static buddy *get_friends(const unit * u, int *numfriends)
     for (u2 = r->units; u2; u2 = u2->next) {
         if (u2->faction != f && u2->number > 0) {
             int allied = 0;
-            if (get_param_int(global.parameters, "rules.alliances", 0) != 0) {
+            if (config_get_int("rules.alliances", 0) != 0) {
                 allied = (f->alliance && f->alliance == u2->faction->alliance);
             }
             else if (alliedunit(u, u2->faction, HELP_MONEY)
@@ -856,7 +856,7 @@ bool can_leave(unit * u)
         return true;
     }
 
-    rule_leave = get_param_int(global.parameters, "rules.move.owner_leave", 0);
+    rule_leave = config_get_int("rules.move.owner_leave", 0);
 
     if (rule_leave!=0 && u->building && u == building_owner(u->building)) {
         return false;
@@ -1343,7 +1343,7 @@ int get_modifier(const unit * u, skill_t sk, int level, const region * r, bool n
     skill = skillmod(u->attribs, u, r, sk, skill, SMF_ALWAYS);
 
     if (hunger_red_skill == -1) {
-        hunger_red_skill = get_param_int(global.parameters, "rules.hunger.reduces_skill", 2);
+        hunger_red_skill = config_get_int("rules.hunger.reduces_skill", 2);
     }
 
     if (fval(u, UFL_HUNGER) && hunger_red_skill) {
@@ -1727,8 +1727,7 @@ int unit_max_hp(const unit * u)
     static const curse_type *heal_ct = NULL;
 
     if (rules_stamina < 0) {
-        rules_stamina =
-            get_param_int(global.parameters, "rules.stamina", STAMINA_AFFECTS_HP);
+        rules_stamina = config_get_int("rules.stamina", STAMINA_AFFECTS_HP);
     }
     h = u_race(u)->hitpoints;
 
@@ -1931,7 +1930,7 @@ bool unit_can_study(const unit *u) {
 }
 
 static double produceexp_chance(void) {
-    return get_param_flt(global.parameters, "study.from_use", 1.0 / 3);
+    return config_get_flt("study.from_use", 1.0 / 3);
 }
 
 void produceexp_ex(struct unit *u, skill_t sk, int n, bool (*learn)(unit *, skill_t, double))

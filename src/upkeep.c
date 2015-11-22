@@ -67,7 +67,7 @@ static bool hunger(int number, unit * u)
     static const race *rc = 0;
 
     if (!damage) {
-        damage = get_param(global.parameters, "hunger.damage");
+        damage = config_get("hunger.damage");
         if (damage == NULL)
             damage = "1d12+12";
     }
@@ -112,7 +112,7 @@ void get_food(region * r)
     plane *pl = rplane(r);
     unit *u;
     int peasantfood = rpeasants(r) * 10;
-    int food_rules = get_param_int(global.parameters, "rules.food.flags", 0);
+    int food_rules = config_get_int("rules.food.flags", 0);
 
     if (food_rules & FOOD_IS_FREE) {
         return;
@@ -272,7 +272,7 @@ void get_food(region * r)
                 if (hungry > 0) {
                     static int demon_hunger = -1;
                     if (demon_hunger < 0) {
-                        demon_hunger = get_param_int(global.parameters, "hunger.demons", 0);
+                        demon_hunger = config_get_int("hunger.demons", 0);
                     }
                     if (demon_hunger == 0) {
                         /* demons who don't feed are hungry */

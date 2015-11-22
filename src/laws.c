@@ -117,7 +117,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 static bool RemoveNMRNewbie(void)
 {
-    int value = get_param_int(global.parameters, "nmr.removenewbie", 0);
+    int value = config_get_int("nmr.removenewbie", 0);
     return value!=0;
 }
 
@@ -245,7 +245,7 @@ static void calculate_emigration(region * r)
 
 static double peasant_growth_factor(void)
 {
-    return get_param_flt(global.parameters, "rules.peasants.growth.factor", 0.0001F * PEASANTGROWTH);
+    return config_get_flt("rules.peasants.growth.factor", 0.0001F * PEASANTGROWTH);
 }
 
 #ifdef SLOWLUCK
@@ -275,7 +275,7 @@ int peasant_luck_effect(int peasants, int luck, int maxp, double variance) {
 #else
 static double peasant_luck_factor(void)
 {
-    return get_param_flt(global.parameters, "rules.peasants.peasantluck.factor", PEASANTLUCK);
+    return config_get_flt("rules.peasants.peasantluck.factor", PEASANTLUCK);
 }
 
 int peasant_luck_effect(int peasants, int luck, int maxp, double variance)
@@ -305,7 +305,7 @@ static void peasants(region * r)
     int n, satiated;
     int dead = 0;
 
-    if (peasants > 0 && get_param_int(global.parameters, "rules.peasants.growth", 1)) {
+    if (peasants > 0 && config_get_int("rules.peasants.growth", 1)) {
         int luck = 0;
         double fraction = peasants * peasant_growth_factor();
         int births = RAND_ROUND(fraction);
@@ -692,7 +692,7 @@ void immigration(void)
 {
     region *r;
     log_info(" - Einwanderung...");
-    int repopulate = get_param_int(global.parameters, "rules.economy.repopulate_maximum", 90);
+    int repopulate = config_get_int("rules.economy.repopulate_maximum", 90);
     for (r = regions; r; r = r->next) {
         if (r->land && r->land->newpeasants) {
             int rp = rpeasants(r) + r->land->newpeasants;
@@ -738,7 +738,7 @@ void nmr_warnings(void)
                 message *msg = NULL;
                 for (fa = factions; fa; fa = fa->next) {
                     int warn = 0;
-                    if (get_param_int(global.parameters, "rules.alliances", 0) != 0) {
+                    if (config_get_int("rules.alliances", 0) != 0) {
                         if (f->alliance && f->alliance == fa->alliance) {
                             warn = 1;
                         }
@@ -789,7 +789,7 @@ void demographics(void)
 
                 if (plant_rules < 0) {
                     plant_rules =
-                        get_param_int(global.parameters, "rules.grow.formula", 0);
+                        config_get_int("rules.grow.formula", 0);
                 }
                 for (dmd = r->land->demands; dmd; dmd = dmd->next) {
                     if (dmd->value > 0 && dmd->value < MAXDEMAND) {
@@ -990,7 +990,7 @@ static bool CheckOverload(void)
 {
     static int value = -1;
     if (value < 0) {
-        value = get_param_int(global.parameters, "rules.check_overload", 0);
+        value = config_get_int("rules.check_overload", 0);
     }
     return value != 0;
 }
@@ -1211,7 +1211,7 @@ static void nmr_death(faction * f)
 {
     static int rule = -1;
     if (rule < 0)
-        rule = get_param_int(global.parameters, "rules.nmr.destroy", 0);
+        rule = config_get_int("rules.nmr.destroy", 0);
     if (rule) {
         unit *u;
         for (u = f->units; u; u = u->nextF) {
@@ -2742,14 +2742,12 @@ void sinkships(struct region * r)
             if (fval(r->terrain, SEA_REGION)) {
                 if (!enoughsailors(sh, crew_skill(sh))) {
                     // ship is at sea, but not enough people to control it
-                    double dmg = get_param_flt(global.parameters,
-                        "rules.ship.damage.nocrewocean",
-                        0.30F);
+                    double dmg = config_get_flt("rules.ship.damage.nocrewocean", 0.3);
                     damage_ship(sh, dmg);
                 }
             } else if (!ship_owner(sh)) {
                 // any ship lying around without an owner slowly rots
-                double dmg = get_param_flt(global.parameters, "rules.ship.damage.nocrew", 0.05F);
+                double dmg = config_get_flt("rules.ship.damage.nocrew", 0.05);
                 damage_ship(sh, dmg);
             }
         }
@@ -4260,7 +4258,7 @@ static void do_force_leave(region *r) {
 }
 
 bool rule_force_leave(int flags) {
-    int rules = get_param_int(global.parameters, "rules.owners.force_leave", 0);
+    int rules = config_get_int("rules.owners.force_leave", 0);
     return (rules&flags) == flags;
 }
 
@@ -4331,7 +4329,7 @@ void init_processor(void)
     add_proc_order(p, K_GUARD, guard_off_cmd, 0, NULL);
     add_proc_order(p, K_RESHOW, reshow_cmd, 0, NULL);
 
-    if (get_param_int(global.parameters, "rules.alliances", 0) == 1) {
+    if (config_get_int("rules.alliances", 0) == 1) {
         p += 10;
         add_proc_global(p, alliance_cmd, NULL);
     }
@@ -4363,7 +4361,7 @@ void init_processor(void)
 
     p += 10;                      /* can't allow reserve before siege (weapons) */
     add_proc_region(p, enter_1, "Betreten (3. Versuch)");  /* to claim a castle after a victory and to be able to DESTROY it in the same turn */
-    if (get_param_int(global.parameters, "rules.reserve.twophase", 0)) {
+    if (config_get_int("rules.reserve.twophase", 0)) {
         add_proc_order(p, K_RESERVE, reserve_self, 0, "RESERVE (self)");
         p += 10;
     }
@@ -4415,7 +4413,7 @@ void init_processor(void)
     p += 10;
     add_proc_global(p, movement, "Bewegungen");
 
-    if (get_param_int(global.parameters, "work.auto", 0)) {
+    if (config_get_int("work.auto", 0)) {
         p += 10;
         add_proc_region(p, auto_work, "Arbeiten (auto)");
     }
@@ -4423,7 +4421,7 @@ void init_processor(void)
     p += 10;
     add_proc_order(p, K_GUARD, guard_on_cmd, 0, "Bewache (an)");
 
-    if (get_param_int(global.parameters, "rules.encounters", 0)) {
+    if (config_get_int("rules.encounters", 0)) {
         p += 10;
         add_proc_global(p, encounters, "Zufallsbegegnungen");
     }
@@ -4461,7 +4459,7 @@ void processorders(void)
     process();
     /*************************************************/
 
-    if (get_param_int(global.parameters, "modules.markets", 0)) {
+    if (config_get_int("modules.markets", 0)) {
         do_markets();
     }
 
@@ -4470,7 +4468,7 @@ void processorders(void)
     remove_empty_units();
 
     /* must happen AFTER age, because that would destroy them right away */
-    if (get_param_int(global.parameters, "modules.wormholes", 0)) {
+    if (config_get_int("modules.wormholes", 0)) {
         wormholes_update();
     }
 

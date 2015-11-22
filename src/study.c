@@ -121,7 +121,7 @@ int study_cost(unit * u, skill_t sk)
     if (cost[sk] == 0) {
         char buffer[256];
         sprintf(buffer, "skills.cost.%s", skillnames[sk]);
-        cost[sk] = get_param_int(global.parameters, buffer, -1);
+        cost[sk] = config_get_int(buffer, -1);
     }
     if (cost[sk] >= 0) {
         return cost[sk];
@@ -545,13 +545,13 @@ int study_cmd(unit * u, order * ord)
     int money = 0;
     skill_t sk;
     int maxalchemy = 0;
-    int speed_rule = (study_rule_t)get_param_int(global.parameters, "study.speedup", 0);
+    int speed_rule = (study_rule_t)config_get_int("study.speedup", 0);
     static int learn_newskills = -1;
     struct building *b = inside_building(u);
     const struct building_type *btype = building_is_active(b) ? b->type : NULL;
 
     if (learn_newskills < 0) {
-        const char *str = get_param(global.parameters, "study.newskills");
+        const char *str = config_get("study.newskills");
         if (str && strcmp(str, "false") == 0)
             learn_newskills = 0;
         else

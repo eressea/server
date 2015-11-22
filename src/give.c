@@ -52,12 +52,12 @@
 #define RESERVE_GIVE            /* reserve anything that's given from one unit to another? */
 
 static int max_transfers(void) {
-    return get_param_int(global.parameters, "rules.give.max_men", 5);
+    return config_get_int("rules.give.max_men", 5);
 }
 
 static int GiveRestriction(void)
 {
-    return get_param_int(global.parameters, "GiveRestriction", 0);
+    return config_get_int("GiveRestriction", 0);
 }
 
 static void feedback_give_not_allowed(unit * u, order * ord)
@@ -132,7 +132,7 @@ int give_quota(const unit * src, const unit * dst, const item_type * type,
         return n;
     }
     if (dst && src && src->faction != dst->faction) {
-        divisor = get_param_flt(global.parameters, "rules.items.give_divisor", 1);
+        divisor = config_get_flt("rules.items.give_divisor", 1);
         assert(divisor == 0 || divisor >= 1);
         if (divisor >= 1) {
             /* predictable > correct: */
@@ -235,7 +235,7 @@ static bool can_give_men(const unit *u, order *ord, message **msg) {
 
 static bool rule_transfermen(void)
 {
-    int rule = get_param_int(global.parameters, "rules.transfermen", 1);
+    int rule = config_get_int("rules.transfermen", 1);
     return rule != 0;
 }
 
