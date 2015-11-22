@@ -1931,12 +1931,7 @@ bool unit_can_study(const unit *u) {
 }
 
 static double produceexp_chance(void) {
-    static int update = 0;
-    if (update != global.cookie) {
-        global.producexpchance_ = get_param_flt(global.parameters, "study.from_use", 1.0 / 3);
-        update = global.cookie;
-    }
-    return global.producexpchance_;
+    return get_param_flt(global.parameters, "study.from_use", 1.0 / 3);
 }
 
 void produceexp_ex(struct unit *u, skill_t sk, int n, bool (*learn)(unit *, skill_t, double))

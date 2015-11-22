@@ -259,7 +259,6 @@ extern "C" {
         /* the following are some cached values, because get_param can be slow.
          * you should almost never need to touch them */
         int cookie;
-        double producexpchance_;
     } settings;
 
     typedef struct helpmode {
