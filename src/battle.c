@@ -664,23 +664,14 @@ weapon_skill(const weapon_type * wtype, const unit * u, bool attacking)
 
 static int CavalrySkill(void)
 {
-    static int skill = -1;
-
-    if (skill < 0) {
-        skill = config_get_int("rules.cavalry.skill", 2);
-    }
-    return skill;
+    return config_get_int("rules.cavalry.skill", 2);
 }
 
 #define BONUS_SKILL 1
 #define BONUS_DAMAGE 2
 static int CavalryBonus(const unit * u, troop enemy, int type)
 {
-    static int mode = -1;
-
-    if (mode < 0) {
-        mode = config_get_int("rules.cavalry.mode", 1);
-    }
+    int mode = config_get_int("rules.cavalry.mode", 1);
     if (mode == 0) {
         /* old rule, Eressea 1.0 compat */
         return (type == BONUS_SKILL) ? 2 : 0;
@@ -1006,9 +997,7 @@ const char *rel_dam(int dam, int hp)
 
 static void vampirism(troop at, int damage)
 {
-    static int vampire = -1;
-    if (vampire < 0)
-        vampire = config_get_int("rules.combat.demon_vampire", 0);
+    int vampire = config_get_int("rules.combat.demon_vampire", 0);
     if (vampire > 0) {
         int gain = damage / vampire;
         int chance = damage - vampire * gain;
@@ -1079,7 +1068,6 @@ static int rc_specialdamage(const unit *au, const unit *du, const struct weapon_
 }
 
 int calculate_armor(troop dt, const weapon_type *dwtype, const weapon_type *awtype, double *magres) {
-    static int rule_armor = -1;
     fighter *df = dt.fighter;
     unit *du = df->unit;
     int ar = 0, an, am;
@@ -1107,10 +1095,7 @@ int calculate_armor(troop dt, const weapon_type *dwtype, const weapon_type *awty
     /* Momentan nur Trollgürtel und Werwolf-Eigenschaft */
     am = select_magicarmor(dt);
 
-    if (rule_armor < 0) {
-        rule_armor = config_get_int("rules.combat.nat_armor", 0);
-    }
-    if (rule_armor == 0) {
+    if (config_get_int("rules.combat.nat_armor", 0) == 0) {
         /* natürliche Rüstung ist halbkumulativ */
         if (ar > 0) {
             ar += an / 2;
@@ -1939,10 +1924,7 @@ int skilldiff(troop at, troop dt, int dist)
     }
 
     if (u_race(au) == get_race(RC_GOBLIN)) {
-        static int goblin_bonus = -1;
-        if (goblin_bonus < 0)
-            goblin_bonus =
-            config_get_int("rules.combat.goblinbonus", 10);
+        int goblin_bonus = config_get_int("rules.combat.goblinbonus", 10);
         if (af->side->size[SUM_ROW] >= df->side->size[SUM_ROW] * goblin_bonus) {
             skdiff += 1;
         }
@@ -2140,10 +2122,7 @@ static int attacks_per_round(troop t)
 static void make_heroes(battle * b)
 {
     side *s;
-    static int hero_speed = 0;
-    if (hero_speed == 0) {
-        hero_speed = config_get_int("rules.combat.herospeed", 10);
-    }
+    int hero_speed = config_get_int("rules.combat.herospeed", 10);
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
         fighter *fig;
         for (fig = s->fighters; fig; fig = fig->next) {
@@ -3213,16 +3192,12 @@ side * get_side(battle * b, const struct unit * u)
 side * find_side(battle * b, const faction * f, const group * g, unsigned int flags, const faction * stealthfaction)
 {
     side * s;
-    static int rule_anon_battle = -1;
-
-    if (rule_anon_battle < 0) {
-        rule_anon_battle = config_get_int("rules.stealth.anon_battle", 1);
-    }
+    bool rule_anon_battle = config_get_int("rules.stealth.anon_battle", 1) != 0;
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
         if (s->faction == f && s->group == g) {
             unsigned int s1flags = flags | SIDE_HASGUARDS;
             unsigned int s2flags = s->flags | SIDE_HASGUARDS;
-            if (rule_anon_battle!=0 && s->stealthfaction != stealthfaction) {
+            if (rule_anon_battle && s->stealthfaction != stealthfaction) {
                 continue;
             }
             if (s1flags == s2flags) {
@@ -3611,7 +3586,6 @@ battle *make_battle(region * r)
     unit *u;
     bfaction *bf;
     building * bld;
-    static int max_fac_no = 0;    /* need this only once */
 
     /* Alle Mann raus aus der Burg! */
     for (bld = r->buildings; bld != NULL; bld = bld->next)
@@ -3663,7 +3637,6 @@ battle *make_battle(region * r)
 
     for (bf = b->factions; bf; bf = bf->next) {
         faction *f = bf->faction;
-        max_fac_no = _max(max_fac_no, f->no);
         freset(f, FFL_MARK);
     }
     return b;
@@ -3709,17 +3682,13 @@ static void battle_free(battle * b) {
 
 void free_battle(battle * b)
 {
-    int max_fac_no = 0;
-
     if (bdebug) {
         fclose(bdebug);
     }
 
     while (b->factions) {
         bfaction *bf = b->factions;
-        faction *f = bf->faction;
         b->factions = bf->next;
-        max_fac_no = _max(max_fac_no, f->no);
         free(bf);
     }
 

@@ -93,13 +93,11 @@ void herbsearch(unit * u, int max)
 
 static int begin_potion(unit * u, const potion_type * ptype, struct order *ord)
 {
-    static int rule_multipotion = -1;
+    bool rule_multipotion;
     assert(ptype != NULL);
 
-    if (rule_multipotion < 0) {
-        /* should we allow multiple different potions to be used the same turn? */
-        rule_multipotion = config_get_int("rules.magic.multipotion", 0);
-    }
+    /* should we allow multiple different potions to be used the same turn? */
+    rule_multipotion = config_get_int("rules.magic.multipotion", 0) != 0;
     if (!rule_multipotion) {
         const potion_type *use = ugetpotionuse(u);
         if (use != NULL && use != ptype) {
