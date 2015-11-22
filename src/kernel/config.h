@@ -246,7 +246,6 @@ extern "C" {
         const char *gamename;
         struct attrib *attribs;
         unsigned int data_turn;
-        struct param *parameters_;
         void *vm_state;
         int data_version; /* TODO: eliminate in favor of gamedata.version */
         struct _dictionary_ *inifile;

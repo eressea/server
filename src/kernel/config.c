@@ -1571,30 +1571,32 @@ bool markets_module(void)
     return config_get_int("modules.markets", 0);
 }
 
+static struct param *configuration;
+
 void config_set(const char *key, const char *value) {
-    set_param(&global.parameters_, key, value);
+    set_param(&configuration, key, value);
 }
 
 const char *config_get(const char *key) {
-    return get_param(global.parameters_, key);
+    return get_param(configuration, key);
 }
 
 int config_get_int(const char *key, int def) {
-    return get_param_int(global.parameters_, key, def);
+    return get_param_int(configuration, key, def);
 }
 
 double config_get_flt(const char *key, double def) {
-    return get_param_flt(global.parameters_, key, def);
+    return get_param_flt(configuration, key, def);
 }
 
 bool config_token(const char *key, const char *tok) {
-    return !!check_param(global.parameters_, key, tok);
+    return !!check_param(configuration, key, tok);
 }
 
 void free_config(void) {
     global.functions.maintenance = NULL;
     global.functions.wage = NULL;
-    free_params(&global.parameters_);
+    free_params(&configuration);
 }
 
 /** releases all memory associated with the game state.
