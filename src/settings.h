@@ -39,3 +39,27 @@
 #define ARENA_MODULE 1
 
 #undef REGIONOWNERS             /* (WIP) region-owner uses HELP_TRAVEL to control entry to region */
+
+ /* experimental gameplay features (that don't affect the savefile) */
+ /* TODO: move these settings to settings.h or into configuration files */
+#define GOBLINKILL              /* Goblin-Spezialklau kann tödlich enden */
+#define HERBS_ROT               /* herbs owned by units have a chance to rot. */
+#define INSECT_POTION           /* Spezialtrank für Insekten */
+#define ORCIFICATION            /* giving snotlings to the peasants gets counted */
+
+#define TREESIZE (8)            /* space used by trees (in #peasants) */
+
+#define PEASANTFORCE 0.75       /* Chance einer Vermehrung trotz 90% Auslastung */
+#define HERBROTCHANCE 5         /* Verrottchance für Kräuter (ifdef HERBS_ROT) */
+
+ /* Gebäudegröße = Minimalbelagerer */
+#define SIEGEFACTOR     2
+
+ /** Magic */
+#define MAXMAGICIANS    3
+#define MAXALCHEMISTS   3
+
+#define ENCCHANCE           10  /* %-Chance für einmalige Zufallsbegegnung */
+#define BAGCAPACITY         20000   /* soviel paßt in einen Bag of Holding */
+#define PERSON_WEIGHT 1000      /* weight of a "normal" human unit */
+#define STAMINA_AFFECTS_HP 1<<0

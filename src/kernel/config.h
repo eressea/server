@@ -25,13 +25,7 @@ extern "C" {
 
     /* this should always be the first thing included after platform.h */
 #include "types.h"
-
-    /* experimental gameplay features (that don't affect the savefile) */
-    /* TODO: move these settings to settings.h or into configuration files */
-#define GOBLINKILL              /* Goblin-Spezialklau kann tödlich enden */
-#define HERBS_ROT               /* herbs owned by units have a chance to rot. */
-#define INSECT_POTION           /* Spezialtrank für Insekten */
-#define ORCIFICATION            /* giving snotlings to the peasants gets counted */
+struct param;
 
     /* for some good prime numbers, check http://www.math.niu.edu/~rusin/known-math/98/pi_x */
 #ifndef MAXREGIONS
@@ -41,18 +35,6 @@ extern "C" {
 # define MAXUNITS 1048573       /* must be prime for hashing. 524287 was >90% full */
 #endif
 #define MAXLUXURIES 16 /* there must be no more than MAXLUXURIES kinds of luxury goods in any game */
-
-#define TREESIZE (8)            /* space used by trees (in #peasants) */
-
-#define PEASANTFORCE 0.75       /* Chance einer Vermehrung trotz 90% Auslastung */
-#define HERBROTCHANCE 5         /* Verrottchance für Kräuter (ifdef HERBS_ROT) */
-
-    /* Gebäudegröße = Minimalbelagerer */
-#define SIEGEFACTOR     2
-
-    /** Magic */
-#define MAXMAGICIANS    3
-#define MAXALCHEMISTS   3
 
     /* getunit results: */
 #define GET_UNIT 0
@@ -67,15 +49,10 @@ extern "C" {
 #define BP_NORMAL 3
 #define BP_ROAD   2
 
-#define PERSON_WEIGHT 1000      /* weight of a "normal" human unit */
-#define STAMINA_AFFECTS_HP 1<<0
-
     /**
      * Hier endet der Teil von config.h, der die defines für die
      * Spielwelt Eressea enthält, und beginnen die allgemeinen Routinen
      */
-
-#define ENCCHANCE           10  /* %-Chance für einmalige Zufallsbegegnung */
 
 #define DISPLAYSIZE         8192        /* max. Länge einer Beschreibung, incl trailing 0 */
 #define ORDERSIZE           (DISPLAYSIZE*2) /* max. length of an order */
@@ -83,8 +60,6 @@ extern "C" {
 #define IDSIZE              16  /* max. Länge einer no (als String), incl trailing 0 */
 #define OBJECTIDSIZE        (NAMESIZE+5+IDSIZE) /* max. Länge der Strings, die
      * von struct unitname, etc. zurückgegeben werden. ohne die 0 */
-
-#define BAGCAPACITY         20000   /* soviel paßt in einen Bag of Holding */
 
     /* ----------------- Befehle ----------------------------------- */
 
