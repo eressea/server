@@ -246,7 +246,7 @@ extern "C" {
         const char *gamename;
         struct attrib *attribs;
         unsigned int data_turn;
-        struct param *parameters;
+        struct param *parameters_;
         void *vm_state;
         int data_version; /* TODO: eliminate in favor of gamedata.version */
         struct _dictionary_ *inifile;
@@ -297,6 +297,7 @@ extern "C" {
     void init_parameters(struct locale *lang);
 
     void free_gamedata(void);
+    void free_config(void);
 
     extern struct helpmode helpmodes[];
     extern const char *parameters[];
