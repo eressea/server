@@ -40,14 +40,6 @@ struct param;
 #define GET_UNIT 0
 #define GET_NOTFOUND 1
 #define GET_PEASANTS 2
-    /* Bewegungsweiten: */
-#define BP_WALKING 4
-#define BP_RIDING  6
-#define BP_UNICORN 9
-#define BP_DRAGON  4
-
-#define BP_NORMAL 3
-#define BP_ROAD   2
 
     /**
      * Hier endet der Teil von config.h, der die defines für die
