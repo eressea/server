@@ -26,6 +26,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
+#define MAXUNITS 1048573       /* must be prime for hashing. 524287 was >90% full */
     struct skill;
     struct item;
     struct sc_mage;

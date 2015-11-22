@@ -208,6 +208,11 @@ int resolve_faction(variant id, void *address)
     return result;
 }
 
+bool faction_id_is_unused(int id)
+{
+    return findfaction(id) == NULL;
+}
+
 #define MAX_FACTION_ID (36*36*36*36)
 
 static int unused_faction_id(void)

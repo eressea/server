@@ -1152,11 +1152,6 @@ char *_strdup(const char *s)
 }
 #endif
 
-bool faction_id_is_unused(int id)
-{
-    return findfaction(id) == NULL;
-}
-
 int besieged(const unit * u)
 {
     /* belagert kann man in schiffen und burgen werden */

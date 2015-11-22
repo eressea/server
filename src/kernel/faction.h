@@ -160,6 +160,7 @@ extern "C" {
     /* skills */
     int skill_limit(struct faction *f, skill_t sk);
     int count_skill(struct faction *f, skill_t sk);
+    bool faction_id_is_unused(int);
 
 #ifdef __cplusplus
 }

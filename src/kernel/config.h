@@ -27,24 +27,10 @@ extern "C" {
 #include "types.h"
 struct param;
 
-    /* for some good prime numbers, check http://www.math.niu.edu/~rusin/known-math/98/pi_x */
-#ifndef MAXREGIONS
-# define MAXREGIONS 524287      /* must be prime for hashing. 262139 was a little small */
-#endif
-#ifndef MAXUNITS
-# define MAXUNITS 1048573       /* must be prime for hashing. 524287 was >90% full */
-#endif
-#define MAXLUXURIES 16 /* there must be no more than MAXLUXURIES kinds of luxury goods in any game */
-
     /* getunit results: */
 #define GET_UNIT 0
 #define GET_NOTFOUND 1
 #define GET_PEASANTS 2
-
-    /**
-     * Hier endet der Teil von config.h, der die defines für die
-     * Spielwelt Eressea enthält, und beginnen die allgemeinen Routinen
-     */
 
 #define DISPLAYSIZE         8192        /* max. Länge einer Beschreibung, incl trailing 0 */
 #define ORDERSIZE           (DISPLAYSIZE*2) /* max. length of an order */
@@ -63,9 +49,6 @@ struct param;
 #define fval(u, i) ((u)->flags & (i))
 #define fset(u, i) ((u)->flags |= (i))
 #define freset(u, i) ((u)->flags &= ~(i))
-
-    /* parteinummern */
-    bool faction_id_is_unused(int);
 
     int max_magicians(const struct faction * f);
     int findoption(const char *s, const struct locale *lang);
