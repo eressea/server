@@ -75,14 +75,12 @@
 #define DRAGON_RANGE 20         /* Max. Distanz zum nächsten Drachenziel */
 #define MAXILLUSION_TEXTS   3
 
+static double attack_chance; /* rules.monsters.attack_chance, or default 0.4 */
+
 static void give_peasants(unit *u, const item_type *itype, int reduce) {
     char buf[64];
     slprintf(buf, sizeof(buf), "%s 0 %d %s", LOC(u->faction->locale, keyword(K_GIVE)), reduce, LOC(u->faction->locale, itype->rtype->_name));
     unit_addorder(u, parse_order(buf, u->faction->locale));
-}
-
-static double monster_attack_chance(void) {
-    return get_param_flt(global.parameters, "rules.monsters.attack_chance", 0.4f);
 }
 
 static void reduce_weight(unit * u)
@@ -160,7 +158,7 @@ static order *monster_attack(unit * u, const unit * target)
 static order *get_money_for_dragon(region * r, unit * u, int wanted)
 {
     int n;
-    bool attacks = monster_attack_chance() > 0.0;
+    bool attacks = attack_chance > 0.0;
 
     /* falls genug geld in der region ist, treiben wir steuern ein. */
     if (rmoney(r) >= wanted) {
@@ -759,14 +757,13 @@ static order *plan_dragon(unit * u)
 void plan_monsters(faction * f)
 {
     region *r;
-    double attack_chance = monster_attack_chance();
-
+    
     assert(f);
+    attack_chance = get_param_flt(global.parameters, "rules.monsters.attack_chance", 0.4);
     f->lastorders = turn;
 
     for (r = regions; r; r = r->next) {
         unit *u;
-        double rchance = attack_chance;
         bool attacking = false;
 
         for (u = r->units; u; u = u->next) {
@@ -785,10 +782,8 @@ void plan_monsters(faction * f)
                 produceexp(u, SK_PERCEPTION, u->number);
             }
 
-            if (rchance > 0.0) {
-                if (chance(rchance))
-                    attacking = true;
-                rchance = 0.0;
+            if (!attacking) {
+                if (chance(attack_chance)) attacking = true;
             }
             if (u->status > ST_BEHIND) {
                 setstatus(u, ST_FIGHT);
