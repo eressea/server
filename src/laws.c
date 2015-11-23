@@ -2673,13 +2673,12 @@ int combatspell_cmd(unit * u, struct order *ord)
     return 0;
 }
 
-/* Beachten: einige Monster sollen auch unbewaffent die Region bewachen
-* können */
 guard_t can_start_guarding(const unit * u)
 {
     if (u->status >= ST_FLEE || fval(u, UFL_FLEEING))
         return E_GUARD_FLEEING;
-    if (fval(u_race(u), RCF_UNARMEDGUARD))
+    /* Monster der Monsterpartei dürfen immer bewachen */
+    if (is_monsters(u->faction) || fval(u_race(u), RCF_UNARMEDGUARD))
         return E_GUARD_OK;
     if (!armedmen(u, true))
         return E_GUARD_UNARMED;
@@ -2713,24 +2712,18 @@ int guard_on_cmd(unit * u, struct order *ord)
             cmistake(u, ord, 95, MSG_EVENT);
         }
         else {
-            /* Monster der Monsterpartei dürfen immer bewachen */
-            if (is_monsters(u->faction)) {
+            int err = can_start_guarding(u);
+            if (err == E_GUARD_OK) {
                 guard(u, GUARD_ALL);
             }
-            else {
-                int err = can_start_guarding(u);
-                if (err == E_GUARD_OK) {
-                    guard(u, GUARD_ALL);
-                }
-                else if (err == E_GUARD_UNARMED) {
-                    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "unit_unarmed", ""));
-                }
-                else if (err == E_GUARD_FLEEING) {
-                    cmistake(u, ord, 320, MSG_EVENT);
-                }
-                else if (err == E_GUARD_NEWBIE) {
-                    cmistake(u, ord, 304, MSG_EVENT);
-                }
+            else if (err == E_GUARD_UNARMED) {
+                ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "unit_unarmed", ""));
+            }
+            else if (err == E_GUARD_FLEEING) {
+                cmistake(u, ord, 320, MSG_EVENT);
+            }
+            else if (err == E_GUARD_NEWBIE) {
+                cmistake(u, ord, 304, MSG_EVENT);
             }
         }
     }
