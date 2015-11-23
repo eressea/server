@@ -42,6 +42,7 @@ static void test_readwrite_unit(CuTest * tc)
     sprintf(path, "%s/%s", datapath(), filename);
 
     data = gamedata_open(path, "wb");
+    CuAssertPtrNotNull(tc, data); // TODO: intermittent test
     write_unit(data, u);
     gamedata_close(data);
 

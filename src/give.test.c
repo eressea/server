@@ -75,11 +75,11 @@ static void test_give_unit(CuTest * tc) {
     env.f2 = test_create_faction(0);
     setup_give(&env);
     env.r->terrain = test_create_terrain("ocean", SEA_REGION);
-    set_param(&global.parameters, "rules.give.max_men", "0");
+    config_set("rules.give.max_men", "0");
     give_unit(env.src, env.dst, NULL);
     CuAssertPtrEquals(tc, env.f1, env.src->faction);
     CuAssertIntEquals(tc, 0, env.f2->newbies);
-    set_param(&global.parameters, "rules.give.max_men", "-1");
+    config_set("rules.give.max_men", "-1");
     give_unit(env.src, env.dst, NULL);
     CuAssertPtrEquals(tc, env.f2, env.src->faction);
     CuAssertIntEquals(tc, 1, env.f2->newbies);
@@ -117,7 +117,7 @@ static void test_give_men_limit(CuTest * tc) {
     env.f2 = test_create_faction(0);
     env.f1 = test_create_faction(0);
     setup_give(&env);
-    set_param(&global.parameters, "rules.give.max_men", "1");
+    config_set("rules.give.max_men", "1");
 
     /* below the limit, give men, increase newbies counter */
     usetcontact(env.dst, env.src);
@@ -308,7 +308,7 @@ static void test_give_okay(CuTest * tc) {
     env.f2 = env.f1 = test_create_faction(0);
     setup_give(&env);
 
-    set_param(&global.parameters, "rules.give.flags", "0");
+    config_set("rules.give.flags", "0");
     CuAssertPtrEquals(tc, 0, check_give(env.src, env.dst, 0));
     test_cleanup();
 }
@@ -322,7 +322,7 @@ static void test_give_denied_by_rules(CuTest * tc) {
     env.f2 = test_create_faction(0);
     setup_give(&env);
 
-    set_param(&global.parameters, "rules.give.flags", "0");
+    config_set("rules.give.flags", "0");
     CuAssertPtrNotNull(tc, msg = check_give(env.src, env.dst, 0));
     msg_release(msg);
     test_cleanup();

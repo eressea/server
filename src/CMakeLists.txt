@@ -73,7 +73,7 @@ TOLUA_BINDING(config.pkg bind_config.h)
 TOLUA_BINDING(process.pkg bind_process.h)
 TOLUA_BINDING(game.pkg bind_eressea.h config.h)
 TOLUA_BINDING(eressea.pkg bind_eressea.h)
-TOLUA_BINDING(settings.pkg bind_settings.h)
+TOLUA_BINDING(settings.pkg kenel/config.h)
 ENDIF()
 
 set (ERESSEA_SRC
@@ -144,7 +144,6 @@ set(SERVER_SRC
   bind_monsters.c
   bind_process.c
   bind_region.c
-  bind_settings.c
   bind_ship.c
   bind_storage.c
   bind_unit.c

@@ -81,6 +81,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <string.h>
 #include <limits.h>
 
+/* Bewegungsweiten: */
+#define BP_WALKING 4
+#define BP_RIDING  6
+#define BP_UNICORN 9
+#define BP_DRAGON  4
+#define BP_NORMAL 3
+#define BP_ROAD   2
+
 int *storms;
 
 typedef struct traveldir {
@@ -319,7 +327,7 @@ int walkingcapacity(const struct unit *u)
     if (rbelt) {
         int belts = i_get(u->items, rbelt->itype);
         if (belts) {
-            int multi = get_param_int(global.parameters, "rules.trollbelt.multiplier", STRENGTHMULTIPLIER);
+            int multi = config_get_int("rules.trollbelt.multiplier", STRENGTHMULTIPLIER);
             n += _min(people, belts) * (multi - 1) * u_race(u)->capacity;
         }
     }
@@ -692,17 +700,13 @@ static void set_coast(ship * sh, region * r, region * rnext)
 
 static float damage_drift(void)
 {
-    static float value = -1.0F;
-    if (value < 0) {
-        value = (float)get_param_flt(global.parameters, "rules.ship.damage_drift", 0.02F);
-    }
-    return value;
+    return (float)config_get_flt("rules.ship.damage_drift", 0.02);
 }
 
 static void drifting_ships(region * r)
 {
     direction_t d;
-    bool drift = get_param_int(global.parameters, "rules.ship.drifting", 1) != 0;
+    bool drift = config_get_int("rules.ship.drifting", 1) != 0;
 
     if (fval(r->terrain, SEA_REGION)) {
         ship **shp = &r->ships;
@@ -837,24 +841,14 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
     unit *guard = NULL;
     int guard_count = 0;
     int stealth = eff_stealth(reisender, r);
-    static int gamecookie = -1;
-    static double base_prob = -999;
-    static double skill_prob = -999;
-    static double amulet_prob = -999;
-    static double guard_number_prob = -999;
-    static double castle_prob = -999;
-    static double region_type_prob = -999;
     const struct resource_type *ramulet = get_resourcetype(R_AMULET_OF_TRUE_SEEING);
 
-    if (gamecookie < 0 || gamecookie != global.cookie) {
-        base_prob = get_param_flt(global.parameters, "rules.guard.base_stop_prob", .3f);
-        skill_prob = get_param_flt(global.parameters, "rules.guard.skill_stop_prob", .1f);
-        amulet_prob = get_param_flt(global.parameters, "rules.guard.amulet_stop_prob", .1f);
-        guard_number_prob = get_param_flt(global.parameters, "rules.guard.guard_number_stop_prob", .001f);
-        castle_prob = get_param_flt(global.parameters, "rules.guard.castle_stop_prob", .1f);
-        region_type_prob = get_param_flt(global.parameters, "rules.guard.region_type_stop_prob", .1f);
-        gamecookie = global.cookie;
-    }
+    double base_prob = config_get_flt("rules.guard.base_stop_prob", .3);
+    double skill_prob = config_get_flt("rules.guard.skill_stop_prob", .1);
+    double amulet_prob = config_get_flt("rules.guard.amulet_stop_prob", .1);
+    double guard_number_prob = config_get_flt("rules.guard.guard_number_stop_prob", .001);
+    double castle_prob = config_get_flt("rules.guard.castle_stop_prob", .1);
+    double region_type_prob = config_get_flt("rules.guard.region_type_stop_prob", .1);
 
     if (fval(u_race(reisender), RCF_ILLUSIONARY))
         return NULL;
@@ -948,76 +942,27 @@ bool is_guard(const struct unit * u, unsigned int mask)
     return is_guardian_r(u) && (getguard(u) & mask) != 0;
 }
 
-#define MAXGUARDCACHE 16
-/** returns the guard which prevents 'u' from doing 'mask' actions in 'r'.
-*/
 unit *is_guarded(region * r, unit * u, unsigned int mask)
 {
-    unit *u2 = NULL;
-    int i, noguards = 1;
-    static unit *guardcache[MAXGUARDCACHE], *lastguard;   /* STATIC_XCALL: used across calls */
-    static int gamecookie = -1;
+    unit *u2;
+    int noguards = 1;
 
     if (!fval(r, RF_GUARDED)) {
         return NULL;
-    }
-
-    if (gamecookie != global.cookie) {
-        if (gamecookie >= 0) {
-            /* clear the previous turn's cache */
-            memset(guardcache, 0, sizeof(guardcache));
-            lastguard = NULL;
-        }
-        gamecookie = global.cookie;
-    }
-
-    if (lastguard && lastguard->region == r) {
-        if (is_guardian_u(lastguard, u, mask)) {
-            return lastguard;
-        }
-    }
-
-    for (i = 0; i != MAXGUARDCACHE; ++i) {
-        unit *guard = guardcache[i];
-        if (guard && guard != lastguard && guard->region == r) {
-            noguards = 0;
-            if (is_guardian_u(guard, u, mask)) {
-                lastguard = guard;
-                return guard;
-            }
-            if (u2 == guard) {
-                /* same guard twice signals we've tested everyone */
-                return NULL;
-            }
-            u2 = guard;
-        }
-        else {
-            /* exhausted all the guards in the cache, but maybe we'll find one later? */
-            break;
-        }
     }
 
     /* at this point, u2 is the last unit we tested to
      * be a guard (and failed), or NULL
      * i is the position of the first free slot in the cache */
 
-    for (u2 = (u2 ? u2->next : r->units); u2; u2 = u2->next) {
+    for (u2 = r->units; u2; u2 = u2->next) {
         if (is_guardian_r(u2)) {
             noguards = 0;
-            /* u2 is a guard, so worth remembering */
-            if (i < MAXGUARDCACHE)
-                guardcache[i++] = u2;
             if (is_guardian_u(u2, u, mask)) {
                 /* u2 is our guard. stop processing (we might have to go further next time) */
-                lastguard = u2;
                 return u2;
             }
         }
-    }
-    /* there are no more guards. we signal this by duplicating the last one.
-     * i is still the position of the first free slot in the cache */
-    if (i > 0 && i < MAXGUARDCACHE) {
-        guardcache[i] = guardcache[i - 1];
     }
 
     if (noguards) {
@@ -1844,7 +1789,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
         if (!flying_ship(sh)) {
             int stormchance = 0;
             int reason;
-            bool storms_enabled = get_param_int(global.parameters, "rules.ship.storms", 1) != 0;
+            bool storms_enabled = config_get_int("rules.ship.storms", 1) != 0;
             if (storms_enabled) {
                 int stormyness;
                 gamedate date;
@@ -1854,7 +1799,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
                 /* storms should be the first thing we do. */
                 stormchance = stormyness / shipspeed(sh, u);
                 if (check_leuchtturm(next_point, NULL)) {
-                    int param = get_param_int(global.parameters, "rules.lighthous.stormchancedevisor", 0);
+                    int param = config_get_int("rules.lighthous.stormchancedevisor", 0);
                     if (param > 0) {
                         stormchance /= param;
                     }
@@ -1944,9 +1889,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
                     ADDMSG(&f->msgs, msg_message("sailnolandingstorm", "ship region", sh, next_point));
                 }
                 else {
-                    double dmg =
-                        get_param_flt(global.parameters, "rules.ship.damage.nolanding",
-                        0.10F);
+                    double dmg = config_get_flt("rules.ship.damage.nolanding", 0.1);
                     ADDMSG(&f->msgs, msg_message("sailnolanding", "ship region", sh,
                         next_point));
                     damage_ship(sh, dmg);

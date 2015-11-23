@@ -94,7 +94,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <string.h>
 #include <ctype.h>
 #include <assert.h>
-#include <math.h>
 #include <limits.h>
 #include <time.h>
 #include <errno.h>
@@ -110,13 +109,7 @@ int turn = -1;
 
 int NewbieImmunity(void)
 {
-    static int value = -1;
-    static int gamecookie = -1;
-    if (value < 0 || gamecookie != global.cookie) {
-        gamecookie = global.cookie;
-        value = get_param_int(global.parameters, "NewbieImmunity", 0);
-    }
-    return value;
+    return config_get_int("NewbieImmunity", 0);
 }
 
 bool IsImmune(const faction * f)
@@ -143,13 +136,7 @@ static int ally_flag(const char *s, int help_mask)
 
 bool ExpensiveMigrants(void)
 {
-    static int value = -1;
-    static int gamecookie = -1;
-    if (value < 0 || gamecookie != global.cookie) {
-        gamecookie = global.cookie;
-        value = get_param_int(global.parameters, "study.expensivemigrants", 0);
-    }
-    return value != 0;
+    return config_get_int("study.expensivemigrants", 0) != 0;
 }
 
 /** Specifies automatic alliance modes.
@@ -158,21 +145,17 @@ bool ExpensiveMigrants(void)
  */
 int AllianceAuto(void)
 {
-    static int value = -1;
-    static int gamecookie = -1;
-    if (value < 0 || gamecookie != global.cookie) {
-        const char *str = get_param(global.parameters, "alliance.auto");
-        gamecookie = global.cookie;
-        value = 0;
-        if (str != NULL) {
-            char *sstr = _strdup(str);
-            char *tok = strtok(sstr, " ");
-            while (tok) {
-                value |= ally_flag(tok, -1);
-                tok = strtok(NULL, " ");
-            }
-            free(sstr);
+    int value;
+    const char *str = config_get("alliance.auto");
+    value = 0;
+    if (str != NULL) {
+        char *sstr = _strdup(str);
+        char *tok = strtok(sstr, " ");
+        while (tok) {
+            value |= ally_flag(tok, -1);
+            tok = strtok(NULL, " ");
         }
+        free(sstr);
     }
     return value & HelpMask();
 }
@@ -185,89 +168,60 @@ int AllianceAuto(void)
  */
 int HelpMask(void)
 {
-    static int rule = -1;
-    static int gamecookie = -1;
-    if (rule < 0 || gamecookie != global.cookie) {
-        const char *str = get_param(global.parameters, "rules.help.mask");
-        gamecookie = global.cookie;
-        rule = 0;
-        if (str != NULL) {
-            char *sstr = _strdup(str);
-            char *tok = strtok(sstr, " ");
-            while (tok) {
-                rule |= ally_flag(tok, -1);
-                tok = strtok(NULL, " ");
-            }
-            free(sstr);
+    const char *str = config_get("rules.help.mask");
+    int rule = 0;
+    if (str != NULL) {
+        char *sstr = _strdup(str);
+        char *tok = strtok(sstr, " ");
+        while (tok) {
+            rule |= ally_flag(tok, -1);
+            tok = strtok(NULL, " ");
         }
-        else {
-            rule = HELP_ALL;
-        }
+        free(sstr);
+    }
+    else {
+        rule = HELP_ALL;
     }
     return rule;
 }
 
 int AllianceRestricted(void)
 {
-    static int rule = -1;
-    static int gamecookie = -1;
-    if (rule < 0 || gamecookie != global.cookie) {
-        const char *str = get_param(global.parameters, "alliance.restricted");
-        gamecookie = global.cookie;
-        rule = 0;
-        if (str != NULL) {
-            char *sstr = _strdup(str);
-            char *tok = strtok(sstr, " ");
-            while (tok) {
-                rule |= ally_flag(tok, -1);
-                tok = strtok(NULL, " ");
-            }
-            free(sstr);
+    const char *str = config_get("alliance.restricted");
+    int rule = 0;
+    if (str != NULL) {
+        char *sstr = _strdup(str);
+        char *tok = strtok(sstr, " ");
+        while (tok) {
+            rule |= ally_flag(tok, -1);
+            tok = strtok(NULL, " ");
         }
-        rule &= HelpMask();
+        free(sstr);
     }
+    rule &= HelpMask();
     return rule;
 }
 
 int LongHunger(const struct unit *u)
 {
-    static int gamecookie = -1;
-    static int rule = -1;
     if (u != NULL) {
         if (!fval(u, UFL_HUNGER))
             return false;
         if (u_race(u) == get_race(RC_DAEMON))
             return false;
     }
-    if (rule < 0 || gamecookie != global.cookie) {
-        gamecookie = global.cookie;
-        rule = get_param_int(global.parameters, "hunger.long", 0);
-    }
-    return rule;
+    return config_get_int("hunger.long", 0);
 }
 
 int SkillCap(skill_t sk)
 {
-    static int gamecookie = -1;
-    static int rule = -1;
-    if (sk == SK_MAGIC)
-        return 0;                   /* no caps on magic */
-    if (rule < 0 || gamecookie != global.cookie) {
-        gamecookie = global.cookie;
-        rule = get_param_int(global.parameters, "skill.maxlevel", 0);
-    }
-    return rule;
+    if (sk == SK_MAGIC) return 0; /* no caps on magic */
+    return config_get_int("skill.maxlevel", 0);
 }
 
 int NMRTimeout(void)
 {
-    static int gamecookie = -1;
-    static int rule = -1;
-    if (rule < 0 || gamecookie != global.cookie) {
-        gamecookie = global.cookie;
-        rule = get_param_int(global.parameters, "nmr.timeout", 0);
-    }
-    return rule;
+    return config_get_int("nmr.timeout", 0);
 }
 
 race_t old_race(const struct race * rc)
@@ -416,8 +370,7 @@ static attrib_type at_maxmagicians = {
 
 int max_magicians(const faction * f)
 {
-    int m =
-        get_param_int(global.parameters, "rules.maxskills.magic", MAXMAGICIANS);
+    int m = config_get_int("rules.maxskills.magic", MAXMAGICIANS);
     attrib *a;
 
     if ((a = a_find(f->attribs, &at_maxmagicians)) != NULL) {
@@ -498,7 +451,7 @@ static int ally_mode(const ally * sf, int mode)
 
 int
 alliedgroup(const struct plane *pl, const struct faction *f,
-const struct faction *f2, const struct ally *sf, int mode)
+    const struct faction *f2, const struct ally *sf, int mode)
 {
     while (sf && sf->faction != f2)
         sf = sf->next;
@@ -522,7 +475,7 @@ const struct faction *f2, const struct ally *sf, int mode)
 
 int
 alliedfaction(const struct plane *pl, const struct faction *f,
-const struct faction *f2, int mode)
+    const struct faction *f2, int mode)
 {
     return alliedgroup(pl, f, f2, f->allies, mode);
 }
@@ -567,68 +520,6 @@ int alliedunit(const unit * u, const faction * f2, int mode)
     }
     return 0;
 }
-
-int count_faction(const faction * f, int flags)
-{
-    unit *u;
-    int n = 0;
-    for (u = f->units; u; u = u->nextF) {
-        const race *rc = u_race(u);
-        int x = (flags&COUNT_UNITS) ? 1 : u->number;
-        if (f->race != rc) {
-            if (!playerrace(rc)) {
-                if (flags&COUNT_MONSTERS) {
-                    n += x;
-                }
-            }
-            else if (flags&COUNT_MIGRANTS) {
-                if (!is_cursed(u->attribs, C_SLAVE, 0)) {
-                    n += x;
-                }
-            }
-        }
-        else if (flags&COUNT_DEFAULT) {
-            n += x;
-        }
-    }
-    return n;
-}
-
-int count_units(const faction * f)
-{
-    return count_faction(f, COUNT_ALL | COUNT_UNITS);
-}
-int count_all(const faction * f)
-{
-    return count_faction(f, COUNT_ALL);
-}
-int count_migrants(const faction * f)
-{
-    return count_faction(f, COUNT_MIGRANTS);
-}
-
-int count_maxmigrants(const faction * f)
-{
-    static int migrants = -1;
-
-    if (migrants < 0) {
-        migrants = get_param_int(global.parameters, "rules.migrants.max", INT_MAX);
-    }
-    if (migrants == INT_MAX) {
-        int x = 0;
-        if (f->race == get_race(RC_HUMAN)) {
-            int nsize = count_all(f);
-            if (nsize > 0) {
-                x = (int)(log10(nsize / 50.0) * 20);
-                if (x < 0)
-                    x = 0;
-            }
-        }
-        return x;
-    }
-    return migrants;
-}
-
 void
 parse(keyword_t kword, int(*dofun) (unit *, struct order *), bool thisorder)
 {
@@ -976,7 +867,7 @@ void init_locale(struct locale *lang)
 
     tokens = get_translations(lang, UT_MAGIC);
     if (tokens) {
-        const char *str = get_param(global.parameters, "rules.magic.playerschools");
+        const char *str = config_get("rules.magic.playerschools");
         char *sstr, *tok;
         if (str == NULL) {
             str = "gwyrrd illaun draig cerddor tybied";
@@ -1024,32 +915,58 @@ void init_locale(struct locale *lang)
 }
 
 typedef struct param {
-    struct param *next;
-    char *name;
-    char *data;
+    critbit_tree cb;
 } param;
 
+size_t pack_keyval(const char *key, const char *value, char *data, size_t len) {
+    size_t klen = strlen(key);
+    size_t vlen = strlen(value);
+    assert(klen + vlen + 2 + sizeof(vlen) <= len);
+    memcpy(data, key, klen + 1);
+    memcpy(data + klen + 1, value, vlen + 1);
+    return klen + vlen + 2;
+}
+
+void set_param(struct param **p, const char *key, const char *value)
+{
+    struct param *par;
+    assert(p);
+
+    par = *p;
+    if (!par && value) {
+        *p = par = calloc(1, sizeof(param));
+    }
+    if (par) {
+        void *match;
+        size_t klen = strlen(key) + 1;
+        if (cb_find_prefix(&par->cb, key, klen, &match, 1, 0) > 0) {
+            const char * kv = (const char *)match;
+            size_t vlen = strlen(kv + klen) + 1;
+            cb_erase(&par->cb, kv, klen + vlen);
+        }
+    }
+    if (value) {
+        char data[512];
+        size_t sz = pack_keyval(key, value, data, sizeof(data));
+        cb_insert(&par->cb, data, sz);
+    }
+}
+
 void free_params(struct param **pp) {
-    while (*pp) {
-        param *p = *pp;
-        free(p->name);
-        free(p->data);
-        *pp = p->next;
+    param *p = *pp;
+    if (p) {
+        cb_clear(&p->cb);
         free(p);
     }
+    *pp = 0;
 }
 
 const char *get_param(const struct param *p, const char *key)
 {
-    while (p != NULL) {
-        int cmp = strcmp(p->name, key);
-        if (cmp == 0) {
-            return p->data;
-        }
-        else if (cmp > 0) {
-            break;
-        }
-        p = p->next;
+    void *match;
+    if (p && cb_find_prefix(&p->cb, key, strlen(key) + 1, &match, 1, 0) > 0) {
+        cb_get_kv_ex(match, &match);
+        return (const char *)match;
     }
     return NULL;
 }
@@ -1135,40 +1052,6 @@ double get_param_flt(const struct param *p, const char *key, double def)
     return str ? atof(str) : def;
 }
 
-void set_param(struct param **p, const char *key, const char *data)
-{
-    struct param *par;
-
-    ++global.cookie;
-    while (*p != NULL) {
-        int cmp = strcmp((*p)->name, key);
-        if (cmp == 0) {
-            par = *p;
-            free(par->data);
-            if (data) {
-                par->data = _strdup(data);
-            }
-            else {
-                *p = par->next;
-                free(par->name);
-                free(par);
-            }
-            return;
-        }
-        else if (cmp > 0) {
-            break;
-        }
-        p = &(*p)->next;
-    }
-    if (data) {
-        par = malloc(sizeof(param));
-        par->name = _strdup(key);
-        par->data = _strdup(data);
-        par->next = *p;
-        *p = par;
-    }
-}
-
 void kernel_done(void)
 {
     /* calling this function releases memory assigned to static variables, etc.
@@ -1202,11 +1085,6 @@ char *_strdup(const char *s)
     return strcpy((char *)malloc(sizeof(char) * (strlen(s) + 1)), s);
 }
 #endif
-
-bool faction_id_is_unused(int id)
-{
-    return findfaction(id) == NULL;
-}
 
 int besieged(const unit * u)
 {
@@ -1331,101 +1209,42 @@ int cmp_current_owner(const building * b, const building * a)
 
 bool rule_stealth_other(void)
 {
-    static int gamecookie = -1;
-    static int rule = -1;
-    if (rule < 0 || gamecookie != global.cookie) {
-        rule = get_param_int(global.parameters, "stealth.faction.other", 1);
-        gamecookie = global.cookie;
-        assert(rule >= 0);
-    }
+    int rule = config_get_int("stealth.faction.other", 1);
     return rule != 0;
 }
 
 bool rule_stealth_anon(void)
 {
-    static int gamecookie = -1;
-    static int rule = -1;
-    if (rule < 0 || gamecookie != global.cookie) {
-        rule = get_param_int(global.parameters, "stealth.faction.anon", 1);
-        gamecookie = global.cookie;
-        assert(rule >= 0);
-    }
-    return rule!=0;
+    int rule = config_get_int("stealth.faction.anon", 1);
+    return rule != 0;
 }
 
 bool rule_region_owners(void)
 {
-    static int gamecookie = -1;
-    static int rule = -1;
-    if (rule < 0 || gamecookie != global.cookie) {
-        rule = get_param_int(global.parameters, "rules.region_owners", 0);
-        gamecookie = global.cookie;
-        assert(rule >= 0);
-    }
-    return rule!=0;
-}
-
-bool rule_auto_taxation(void)
-{
-    static int gamecookie = -1;
-    static int rule = -1;
-    if (rule < 0 || gamecookie != global.cookie) {
-        rule =
-            get_param_int(global.parameters, "rules.economy.taxation", 0);
-        gamecookie = global.cookie;
-        assert(rule >= 0);
-    }
-    return rule;
+    int rule = config_get_int("rules.region_owners", 0);
+    return rule != 0;
 }
 
 int rule_blessed_harvest(void)
 {
-    static int gamecookie = -1;
-    static int rule = -1;
-    if (rule < 0 || gamecookie != global.cookie) {
-        rule =
-            get_param_int(global.parameters, "rules.blessed_harvest.flags",
-            HARVEST_WORK);
-        gamecookie = global.cookie;
-        assert(rule >= 0);
-    }
+    int rule = config_get_int("rules.blessed_harvest.flags",
+        HARVEST_WORK);
+    assert(rule >= 0);
     return rule;
 }
 
 int rule_alliance_limit(void)
 {
-    static int gamecookie = -1;
-    static int rule = -1;
-    if (rule < 0 || gamecookie != global.cookie) {
-        rule = get_param_int(global.parameters, "rules.limit.alliance", 0);
-        gamecookie = global.cookie;
-        assert(rule >= 0);
-    }
+    int rule = config_get_int("rules.limit.alliance", 0);
+    assert(rule >= 0);
     return rule;
 }
 
 int rule_faction_limit(void)
 {
-    static int gamecookie = -1;
-    static int rule = -1;
-    if (rule < 0 || gamecookie != global.cookie) {
-        rule = get_param_int(global.parameters, "rules.limit.faction", 0);
-        gamecookie = global.cookie;
-        assert(rule >= 0);
-    }
+    int rule = config_get_int("rules.limit.faction", 0);
+    assert(rule >= 0);
     return rule;
-}
-
-bool rule_transfermen(void)
-{
-    static int gamecookie = -1;
-    static int rule = -1;
-    if (rule < 0 || gamecookie != global.cookie) {
-        rule = get_param_int(global.parameters, "rules.transfermen", 1);
-        gamecookie = global.cookie;
-        assert(rule >= 0);
-    }
-    return rule!=0;
 }
 
 static int
@@ -1637,7 +1456,7 @@ order *default_order(const struct locale *lang)
     order *result = 0;
     assert(i < MAXLOCALES);
 
-    if (default_keyword!=NOKEYWORD) {
+    if (default_keyword != NOKEYWORD) {
         return create_order(default_keyword, lang, 0);
     }
 
@@ -1673,12 +1492,40 @@ int entertainmoney(const region * r)
 
 int rule_give(void)
 {
-    return get_param_int(global.parameters, "rules.give.flags", GIVE_DEFAULT);
+    return config_get_int("rules.give.flags", GIVE_DEFAULT);
 }
 
 bool markets_module(void)
 {
-    return get_param_int(global.parameters, "modules.markets", 0);
+    return config_get_int("modules.markets", 0);
+}
+
+static struct param *configuration;
+
+void config_set(const char *key, const char *value) {
+    set_param(&configuration, key, value);
+}
+
+const char *config_get(const char *key) {
+    return get_param(configuration, key);
+}
+
+int config_get_int(const char *key, int def) {
+    return get_param_int(configuration, key, def);
+}
+
+double config_get_flt(const char *key, double def) {
+    return get_param_flt(configuration, key, def);
+}
+
+bool config_token(const char *key, const char *tok) {
+    return !!check_param(configuration, key, tok);
+}
+
+void free_config(void) {
+    global.functions.maintenance = NULL;
+    global.functions.wage = NULL;
+    free_params(&configuration);
 }
 
 /** releases all memory associated with the game state.
@@ -1718,15 +1565,14 @@ void free_gamedata(void)
     while (global.attribs) {
         a_remove(&global.attribs, global.attribs);
     }
-    ++global.cookie;              /* readgame() already does this, but sjust in case */
 }
 
 const char * game_name(void) {
-    const char * param = get_param(global.parameters, "game.name");
+    const char * param = config_get("game.name");
     return param ? param : global.gamename;
 }
 
 int game_id(void) {
-    return get_param_int(global.parameters, "game.id", 0);
+    return config_get_int("game.id", 0);
 }
 

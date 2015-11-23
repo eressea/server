@@ -1,10 +1,10 @@
 $#undef tolua_reg_types
 $#define tolua_reg_types tolua_reg_types_config
-$#include "bind_settings.h"
+$#include <kernel/config.h>
 
 module eressea {
   module settings {
-    void settings_set @ set(const char *key, const char *value);
-    const char * settings_get @ get(const char *key);
+    void config_set @ set(const char *key, const char *value);
+    const char * config_get @ get(const char *key);
   }
 }

@@ -20,7 +20,7 @@ LUALIB_API int luaopen_settings (lua_State* tolua_S);
 
 #undef tolua_reg_types
 #define tolua_reg_types tolua_reg_types_settings
-#include "bind_settings.h"
+#include <kernel/config.h>
 
 /* function to register type */
 static void tolua_reg_types (lua_State* tolua_S)
@@ -44,7 +44,7 @@ static int tolua_settings_eressea_settings_set00(lua_State* tolua_S)
   const char* key = ((const char*)  tolua_tostring(tolua_S,1,0));
   const char* value = ((const char*)  tolua_tostring(tolua_S,2,0));
  {
-  settings_set(key,value);
+  config_set(key,value);
  }
  }
  return 0;
@@ -70,7 +70,7 @@ static int tolua_settings_eressea_settings_get00(lua_State* tolua_S)
  {
   const char* key = ((const char*)  tolua_tostring(tolua_S,1,0));
  {
-  const char* tolua_ret = (const char*)  settings_get(key);
+  const char* tolua_ret = (const char*)  config_get(key);
  tolua_pushstring(tolua_S,(const char*)tolua_ret);
  }
  }

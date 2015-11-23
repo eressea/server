@@ -121,7 +121,7 @@ int study_cost(unit * u, skill_t sk)
     if (cost[sk] == 0) {
         char buffer[256];
         sprintf(buffer, "skills.cost.%s", skillnames[sk]);
-        cost[sk] = get_param_int(global.parameters, buffer, -1);
+        cost[sk] = config_get_int(buffer, -1);
     }
     if (cost[sk] >= 0) {
         return cost[sk];
@@ -184,7 +184,7 @@ static building *active_building(const unit *u, const struct building_type *btyp
 
 static int
 teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
-bool report, int *academy)
+    bool report, int *academy)
 {
     teaching_info *teach = NULL;
     attrib *a;
@@ -343,7 +343,8 @@ int teach_cmd(unit * u, struct order *ord)
         for (student = r->units; teaching && student; student = student->next) {
             if (LongHunger(student)) {
                 continue;
-            } else if (student->faction == u->faction) {
+            }
+            else if (student->faction == u->faction) {
                 if (getkeyword(student->thisorder) == K_STUDY) {
                     /* Input ist nun von student->thisorder !! */
                     init_order(student->thisorder);
@@ -509,7 +510,7 @@ static double study_speedup(unit * u, skill_t s, study_rule_t rule)
         if (rule == STUDY_FASTER) {
             for (i = 0; i != u->skill_size; ++i) {
                 skill *sv = u->skills + i;
-                if (sv->id == s){
+                if (sv->id == s) {
                     learnweeks = sv->level * (sv->level + 1) / 2.0;
                     if (learnweeks < turn / 3.0) {
                         return 2.0;
@@ -534,7 +535,7 @@ static double study_speedup(unit * u, skill_t s, study_rule_t rule)
 int study_cmd(unit * u, order * ord)
 {
     region *r = u->region;
-    int p;
+    int p, cap;
     magic_t mtyp;
     int l;
     int studycost, days;
@@ -544,18 +545,11 @@ int study_cmd(unit * u, order * ord)
     int money = 0;
     skill_t sk;
     int maxalchemy = 0;
-    int speed_rule = (study_rule_t)get_param_int(global.parameters, "study.speedup", 0);
-    static int learn_newskills = -1;
+    int speed_rule = (study_rule_t)config_get_int("study.speedup", 0);
     struct building *b = inside_building(u);
     const struct building_type *btype = building_is_active(b) ? b->type : NULL;
+    bool learn_newskills = config_get_int("study.newskills", 1) != 0;
 
-    if (learn_newskills < 0) {
-        const char *str = get_param(global.parameters, "study.newskills");
-        if (str && strcmp(str, "false") == 0)
-            learn_newskills = 0;
-        else
-            learn_newskills = 1;
-    }
     if (!unit_can_study(u)) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_race_nolearn", "race",
             u_race(u)));
@@ -569,7 +563,8 @@ int study_cmd(unit * u, order * ord)
         cmistake(u, ord, 77, MSG_EVENT);
         return 0;
     }
-    if (SkillCap(sk) && SkillCap(sk) <= effskill(u, sk, 0)) {
+    cap = SkillCap(sk);
+    if (cap > 0 && cap <= effskill(u, sk, 0)) {
         cmistake(u, ord, 771, MSG_EVENT);
         return 0;
     }
@@ -578,7 +573,7 @@ int study_cmd(unit * u, order * ord)
         cmistake(u, ord, 771, MSG_EVENT);
         return 0;
     }
-    if (learn_newskills == 0) {
+    if (!learn_newskills) {
         skill *sv = unit_skill(u, sk);
         if (sv == NULL) {
             /* we can only learn skills we already have */

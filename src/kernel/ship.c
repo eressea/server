@@ -271,7 +271,7 @@ const char *write_shipname(const ship * sh, char *ibuf, size_t size)
 
 static int ShipSpeedBonus(const unit * u)
 {
-    int level = get_param_int(global.parameters, "movement.shipspeed.skillbonus", 0);
+    int level = config_get_int("movement.shipspeed.skillbonus", 0);
     if (level > 0) {
         ship *sh = u->ship;
         int skl = effskill(u, SK_SAILING, 0);

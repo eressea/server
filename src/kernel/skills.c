@@ -212,7 +212,7 @@ void sk_set(skill * sv, int level)
 
 static int rule_random_progress(void)
 {
-    return get_param_int(global.parameters, "study.random_progress", 1);
+    return config_get_int("study.random_progress", 1);
 }
 
 int skill_weeks(int level)

@@ -82,7 +82,7 @@ static void give_peasants(unit *u, const item_type *itype, int reduce) {
 }
 
 static double monster_attack_chance(void) {
-    return get_param_flt(global.parameters, "rules.monsters.attack_chance", 0.4f);
+    return config_get_flt("rules.monsters.attack_chance", 0.4);
 }
 
 static void reduce_weight(unit * u)
@@ -685,14 +685,13 @@ static order *plan_dragon(unit * u)
         /* dragon gets bored and looks for a different place to go */
         ta = set_new_dragon_target(u, u->region, DRAGON_RANGE);
     }
-    else
-        ta = a_find(u->attribs, &at_targetregion);
     if (ta != NULL) {
         tr = (region *)ta->data.v;
         if (tr == NULL || !path_exists(u->region, tr, DRAGON_RANGE, allowed_dragon)) {
             ta = set_new_dragon_target(u, u->region, DRAGON_RANGE);
-            if (ta)
+            if (ta) {
                 tr = findregion(ta->data.sa[0], ta->data.sa[1]);
+            }
         }
     }
     if (tr != NULL) {

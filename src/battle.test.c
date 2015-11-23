@@ -3,6 +3,7 @@
 #include "battle.h"
 #include "skill.h"
 
+#include <kernel/config.h>
 #include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
@@ -201,11 +202,28 @@ static void test_building_defence_bonus(CuTest * tc)
     test_cleanup();
 }
 
-fighter *setup_fighter(battle **bp, unit *u) {
+static fighter *setup_fighter(battle **bp, unit *u) {
     battle *b;
 
     *bp = b = make_battle(u->region);
     return make_fighter(b, u, make_side(b, u->faction, 0, 0, 0), false);
+}
+
+static void test_natural_armor(CuTest * tc)
+{
+    race *rc;
+    unit *u;
+
+    test_cleanup();
+    rc = test_create_race("human");
+    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
+    set_level(u, SK_STAMINA, 2);
+    CuAssertIntEquals(tc, 0, natural_armor(u));
+    set_param(&rc->parameters, "armor.stamina", "1");
+    CuAssertIntEquals(tc, 2, natural_armor(u));
+    set_param(&rc->parameters, "armor.stamina", "2");
+    CuAssertIntEquals(tc, 1, natural_armor(u));
+    test_cleanup();
 }
 
 static void test_calculate_armor(CuTest * tc)
@@ -321,6 +339,7 @@ CuSuite *get_battle_suite(void)
     SUITE_ADD_TEST(suite, test_building_bonus_respects_size);
     SUITE_ADD_TEST(suite, test_building_defence_bonus);
     SUITE_ADD_TEST(suite, test_calculate_armor);
+    SUITE_ADD_TEST(suite, test_natural_armor);
     SUITE_ADD_TEST(suite, test_projectile_armor);
     return suite;
 }

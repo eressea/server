@@ -104,7 +104,7 @@ static void recruit_init(void)
 {
     if (rules_recruit < 0) {
         rules_recruit = 0;
-        if (get_param_int(global.parameters, "recruit.allow_merge", 1)) {
+        if (config_get_int("recruit.allow_merge", 1)) {
             rules_recruit |= RECRUIT_MERGE;
         }
     }
@@ -731,7 +731,7 @@ static bool maintain(building * b, bool first)
         return false;
     }
     /* If the owner is the region owner, check if dontpay flag is set for the building where he is in */
-    if (check_param(global.parameters, "rules.region_owner_pay_building", b->type->_name)) {
+    if (config_token("rules.region_owner_pay_building", b->type->_name)) {
         if (fval(u->building, BLD_DONTPAY)) {
             return false;
         }
@@ -2360,16 +2360,12 @@ static void breedtrees(unit * u, int raw)
 {
     int n, i, skill, planted = 0;
     const resource_type *rtype;
-    static int gamecookie = -1;
-    static int current_season;
+    int current_season;
     region *r = u->region;
-
-    if (gamecookie != global.cookie) {
-        gamedate date;
-        get_gamedate(turn, &date);
-        current_season = date.season;
-        gamecookie = global.cookie;
-    }
+    gamedate date;
+    
+    get_gamedate(turn, &date);
+    current_season = date.season;
 
     /* Bäume züchten geht nur im Frühling */
     if (current_season != SEASON_SPRING) {
@@ -2749,11 +2745,11 @@ void entertain_cmd(unit * u, struct order *ord)
     kwd = init_order(ord);
     assert(kwd == K_ENTERTAIN);
     if (!entertainbase) {
-        const char *str = get_param(global.parameters, "entertain.base");
+        const char *str = config_get("entertain.base");
         entertainbase = str ? atoi(str) : 0;
     }
     if (!entertainperlevel) {
-        const char *str = get_param(global.parameters, "entertain.perlevel");
+        const char *str = config_get("entertain.perlevel");
         entertainperlevel = str ? atoi(str) : 0;
     }
     if (fval(u, UFL_WERE)) {
@@ -3024,7 +3020,7 @@ void loot_cmd(unit * u, struct order *ord, request ** lootorders)
     kwd = init_order(ord);
     assert(kwd == K_LOOT);
 
-    if (get_param_int(global.parameters, "rules.enable_loot", 0) == 0 && !is_monsters(u->faction)) {
+    if (config_get_int("rules.enable_loot", 0) == 0 && !is_monsters(u->faction)) {
         return;
     }
 
@@ -3138,12 +3134,20 @@ static void peasant_taxes(region * r)
     }
 }
 
+static bool rule_auto_taxation(void)
+{
+    return config_get_int("rules.economy.taxation", 0) != 0;
+}
+
+static bool rule_autowork(void) {
+    return config_get_int("work.auto", 0) != 0;
+}
+
 void produce(struct region *r)
 {
     request workers[MAX_WORKERS];
     request *taxorders, *lootorders, *sellorders, *stealorders, *buyorders;
     unit *u;
-    static int rule_autowork = -1;
     bool limited = true;
     request *nextworker = workers;
     assert(r);
@@ -3157,10 +3161,6 @@ void produce(struct region *r)
      * produkte egal. nicht so wegen dem geld.
      *
      * lehren vor lernen. */
-
-    if (rule_autowork < 0) {
-        rule_autowork = get_param_int(global.parameters, "work.auto", 0);
-    }
 
     assert(rmoney(r) >= 0);
     assert(rpeasants(r) >= 0);
@@ -3235,7 +3235,7 @@ void produce(struct region *r)
             break;
 
         case K_WORK:
-            if (!rule_autowork && do_work(u, u->thisorder, nextworker) == 0) {
+            if (!rule_autowork() && do_work(u, u->thisorder, nextworker) == 0) {
                 assert(nextworker - workers < MAX_WORKERS);
                 ++nextworker;
             }
@@ -3280,7 +3280,7 @@ void produce(struct region *r)
      * auszugeben bereit sind. */
     if (entertaining)
         expandentertainment(r);
-    if (!rule_autowork) {
+    if (!rule_autowork()) {
         expandwork(r, workers, nextworker, maxworkingpeasants(r));
     }
     if (taxorders)

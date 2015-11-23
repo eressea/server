@@ -533,7 +533,7 @@ static void disable_feature(const char *str) {
     }
     _snprintf(name, sizeof(name), "%s.enabled", str);
     log_info("disable feature %s\n", name);
-    set_param(&global.parameters, name, "0");
+    config_set(name, "0");
 }
 
 static void json_disable_features(cJSON *json) {
@@ -788,7 +788,7 @@ static void json_settings(cJSON *json) {
     }
     for (child = json->child; child; child = child->next) {
         if (child->valuestring) {
-            set_param(&global.parameters, child->string, child->valuestring);
+            config_set(child->string, child->valuestring);
         }
         else {
             char value[32];
@@ -798,7 +798,7 @@ static void json_settings(cJSON *json) {
             else {
                 _snprintf(value, sizeof(value), "%d", child->valueint);
             }
-            set_param(&global.parameters, child->string, value);
+            config_set(child->string, value);
         }
     }
 }
