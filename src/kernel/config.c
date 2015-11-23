@@ -213,12 +213,6 @@ int LongHunger(const struct unit *u)
     return config_get_int("hunger.long", 0);
 }
 
-int SkillCap(skill_t sk)
-{
-    if (sk == SK_MAGIC) return 0; /* no caps on magic */
-    return config_get_int("skill.maxlevel", 0);
-}
-
 int NMRTimeout(void)
 {
     return config_get_int("nmr.timeout", 0);

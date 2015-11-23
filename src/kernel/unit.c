@@ -1365,10 +1365,6 @@ int eff_skill(const unit * u, const skill *sv, const region *r)
         int mlevel = sv->level + get_modifier(u, sv->id, sv->level, r, false);
 
         if (mlevel > 0) {
-            int skillcap = SkillCap(sv->id);
-            if (skillcap>0 && mlevel > skillcap) {
-                return skillcap;
-            }
             return mlevel;
         }
     }

@@ -535,7 +535,7 @@ static double study_speedup(unit * u, skill_t s, study_rule_t rule)
 int study_cmd(unit * u, order * ord)
 {
     region *r = u->region;
-    int p, cap;
+    int p;
     magic_t mtyp;
     int l;
     int studycost, days;
@@ -561,11 +561,6 @@ int study_cmd(unit * u, order * ord)
 
     if (sk < 0) {
         cmistake(u, ord, 77, MSG_EVENT);
-        return 0;
-    }
-    cap = SkillCap(sk);
-    if (cap > 0 && cap <= effskill(u, sk, 0)) {
-        cmistake(u, ord, 771, MSG_EVENT);
         return 0;
     }
     /* Hack: Talente mit Malus -99 koennen nicht gelernt werden */
