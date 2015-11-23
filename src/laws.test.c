@@ -635,6 +635,7 @@ static void test_newbie_cannot_guard(CuTest *tc) {
     setup_guard(&fix, true);
     config_set("NewbieImmunity", "4");
     CuAssertTrue(tc, IsImmune(fix.u->faction));
+    CuAssertIntEquals(tc, E_GUARD_NEWBIE, can_start_guarding(fix.u));
     update_guards();
     CuAssertTrue(tc, !fval(fix.u, UFL_GUARD));
     test_cleanup();
@@ -644,6 +645,7 @@ static void test_unarmed_cannot_guard(CuTest *tc) {
     guard_fixture fix;
 
     setup_guard(&fix, false);
+    CuAssertIntEquals(tc, E_GUARD_UNARMED, can_start_guarding(fix.u));
     update_guards();
     CuAssertTrue(tc, !fval(fix.u, UFL_GUARD));
     test_cleanup();
@@ -656,6 +658,18 @@ static void test_unarmed_races_can_guard(CuTest *tc) {
     setup_guard(&fix, false);
     rc = rc_get_or_create(fix.u->_race->_name);
     rc->flags |= RCF_UNARMEDGUARD;
+    CuAssertIntEquals(tc, E_GUARD_OK, can_start_guarding(fix.u));
+    update_guards();
+    CuAssertTrue(tc, fval(fix.u, UFL_GUARD));
+    test_cleanup();
+}
+
+static void test_monsters_can_guard(CuTest *tc) {
+    guard_fixture fix;
+
+    setup_guard(&fix, false);
+    u_setfaction(fix.u, get_or_create_monsters());
+    CuAssertIntEquals(tc, E_GUARD_OK, can_start_guarding(fix.u));
     update_guards();
     CuAssertTrue(tc, fval(fix.u, UFL_GUARD));
     test_cleanup();
@@ -666,7 +680,7 @@ static void test_low_skill_cannot_guard(CuTest *tc) {
 
     setup_guard(&fix, true);
     set_level(fix.u, SK_MELEE, 1);
-    fix.u->status = ST_FLEE;
+    CuAssertIntEquals(tc, E_GUARD_UNARMED, can_start_guarding(fix.u));
     update_guards();
     CuAssertTrue(tc, !fval(fix.u, UFL_GUARD));
     test_cleanup();
@@ -677,6 +691,7 @@ static void test_fleeing_cannot_guard(CuTest *tc) {
 
     setup_guard(&fix, true);
     fix.u->status = ST_FLEE;
+    CuAssertIntEquals(tc, E_GUARD_FLEEING, can_start_guarding(fix.u));
     update_guards();
     CuAssertTrue(tc, !fval(fix.u, UFL_GUARD));
     test_cleanup();
@@ -1269,6 +1284,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_newbie_cannot_guard);
     SUITE_ADD_TEST(suite, test_unarmed_cannot_guard);
     SUITE_ADD_TEST(suite, test_unarmed_races_can_guard);
+    SUITE_ADD_TEST(suite, test_monsters_can_guard);
     SUITE_ADD_TEST(suite, test_fleeing_cannot_guard);
     SUITE_ADD_TEST(suite, test_low_skill_cannot_guard);
     SUITE_ADD_TEST(suite, test_reserve_self);

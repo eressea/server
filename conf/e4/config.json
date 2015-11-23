@@ -58,7 +58,6 @@
         "rules.stealth.anon_battle": false,
         "rules.check_overload": false,
         "rules.combat.goblinbonus": 3,
-        "rules.ship.damage_drift": 0.00,
         "rules.alliances": true,
         "rules.combat.herospeed": 3,
         "rules.combat.demon_vampire": 5,
