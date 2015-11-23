@@ -1449,7 +1449,6 @@ int readgame(const char *filename, bool backup)
     global.data_turn = turn;
     log_debug(" - reading turn %d\n", turn);
     rng_init(turn);
-    ++global.cookie;
     READ_INT(&store, &nread);          /* max_unique_id = ignore */
     READ_INT(&store, &nextborder);
 

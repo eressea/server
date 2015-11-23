@@ -217,7 +217,7 @@ static void test_walkingcapacity(CuTest *tc) {
     assert(itype);
     i_change(&u->items, itype, 1);
     CuAssertIntEquals(tc, cap + (STRENGTHMULTIPLIER-1) * u->_race->capacity, walkingcapacity(u));
-    set_param(&global.parameters, "rules.trollbelt.multiplier", "5");
+    config_set("rules.trollbelt.multiplier", "5");
     CuAssertIntEquals(tc, cap + 4 * u->_race->capacity, walkingcapacity(u));
 
     test_cleanup();

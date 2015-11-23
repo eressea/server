@@ -222,7 +222,7 @@ faction *get_or_create_monsters(void)
     faction *f = findfaction(MONSTER_ID);
     if (!f) {
         const race *rc = rc_get_or_create("dragon");
-        const char *email = get_param(global.parameters, "monster.email");
+        const char *email = config_get("monster.email");
         f = addfaction(email ? email : "noreply@eressea.de", NULL, rc, default_locale, 0);
         renumber_faction(f, MONSTER_ID);
         faction_setname(f, "Monster");

@@ -75,14 +75,12 @@
 #define DRAGON_RANGE 20         /* Max. Distanz zum nächsten Drachenziel */
 #define MAXILLUSION_TEXTS   3
 
+static double attack_chance; /* rules.monsters.attack_chance, or default 0.4 */
+
 static void give_peasants(unit *u, const item_type *itype, int reduce) {
     char buf[64];
     slprintf(buf, sizeof(buf), "%s 0 %d %s", LOC(u->faction->locale, keyword(K_GIVE)), reduce, LOC(u->faction->locale, itype->rtype->_name));
     unit_addorder(u, parse_order(buf, u->faction->locale));
-}
-
-static double monster_attack_chance(void) {
-    return get_param_flt(global.parameters, "rules.monsters.attack_chance", 0.4f);
 }
 
 static void reduce_weight(unit * u)
@@ -157,15 +155,15 @@ static order *monster_attack(unit * u, const unit * target)
     return create_order(K_ATTACK, u->faction->locale, "%i", target->no);
 }
 
-static order *get_money_for_dragon(region * r, unit * u, int wanted)
+static order *get_money_for_dragon(region * r, unit * udragon, int wanted)
 {
     int n;
-    bool attacks = monster_attack_chance() > 0.0;
+    bool attacks = attack_chance > 0.0;
 
     /* falls genug geld in der region ist, treiben wir steuern ein. */
     if (rmoney(r) >= wanted) {
         /* 5% chance, dass der drache aus einer laune raus attackiert */
-        if (!attacks || chance(1.0 - u_race(u)->aggression)) {
+        if (!attacks || chance(1.0 - u_race(udragon)->aggression)) {
             /* Drachen haben in E3 und E4 keine Einnahmen. Neuer Befehl Pluendern erstmal nur fuer Monster?*/
             return create_order(K_LOOT, default_locale, NULL);
         }
@@ -174,15 +172,15 @@ static order *get_money_for_dragon(region * r, unit * u, int wanted)
     /* falls der drache launisch ist, oder das regionssilber knapp, greift er alle an
      * und holt sich Silber von Einheiten, vorausgesetzt er bewacht bereits */
     n = 0;
-    if (attacks && is_guard(u, GUARD_TAX)) {
-        unit *u2;
-        for (u2 = r->units; u2; u2 = u2->next) {
-            if (u2->faction != u->faction && cansee(u->faction, r, u2, 0) && !in_safe_building(u, u2)) {
-                int m = get_money(u2);
+    if (attacks && is_guard(udragon, GUARD_TAX)) {
+        unit *u;
+        for (u = r->units; u; u = u->next) {
+            if (u->faction != udragon->faction && cansee(udragon->faction, r, u, 0) && !in_safe_building(u, udragon)) {
+                int m = get_money(u);
                 if (m != 0) {
-                    order *ord = monster_attack(u, u2);
+                    order *ord = monster_attack(udragon, u);
                     if (ord) {
-                        addlist(&u->orders, ord);
+                        addlist(&udragon->orders, ord);
                         n += m;
                     }
                 }
@@ -758,14 +756,13 @@ static order *plan_dragon(unit * u)
 void plan_monsters(faction * f)
 {
     region *r;
-    double attack_chance = monster_attack_chance();
-
+    
     assert(f);
+    attack_chance = config_get_flt("rules.monsters.attack_chance", 0.4);
     f->lastorders = turn;
 
     for (r = regions; r; r = r->next) {
         unit *u;
-        double rchance = attack_chance;
         bool attacking = false;
 
         for (u = r->units; u; u = u->next) {
@@ -784,10 +781,8 @@ void plan_monsters(faction * f)
                 produceexp(u, SK_PERCEPTION, u->number);
             }
 
-            if (rchance > 0.0) {
-                if (chance(rchance))
-                    attacking = true;
-                rchance = 0.0;
+            if (!attacking) {
+                if (chance(attack_chance)) attacking = true;
             }
             if (u->status > ST_BEHIND) {
                 setstatus(u, ST_FIGHT);
@@ -801,8 +796,10 @@ void plan_monsters(faction * f)
             if (ta && !monster_is_waiting(u)) {
                 unit *tu = (unit *)ta->data.v;
                 if (tu && tu->region == r) {
-                    addlist(&u->orders,
-                        create_order(K_ATTACK, u->faction->locale, "%i", tu->no));
+                    order * ord = monster_attack(u, tu);
+                    if (ord) {
+                        addlist(&u->orders, ord);
+                    }
                 }
                 else if (tu) {
                     tu = findunitg(ta->data.i, NULL);

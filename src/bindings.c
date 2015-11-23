@@ -1006,7 +1006,7 @@ static void parse_inifile(lua_State * L, dictionary * d, const char *section)
     lua_pushstring(L, "reportpath");
     lua_pushstring(L, reportpath());
     lua_rawset(L, -3);
-    arg = get_param(global.parameters, "config.rules");
+    arg = config_get("config.rules");
     if (arg) {
         lua_pushstring(L, "rules");
         lua_pushstring(L, arg);

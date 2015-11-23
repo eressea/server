@@ -22,6 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "alliance.h"
 #include "ally.h"
+#include "curse.h"
 #include "equipment.h"
 #include "group.h"
 #include "item.h"
@@ -54,10 +55,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* libc includes */
 #include <assert.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include <limits.h>
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 faction *factions;
 
@@ -206,6 +208,11 @@ int resolve_faction(variant id, void *address)
     }
     *(faction **)address = f;
     return result;
+}
+
+bool faction_id_is_unused(int id)
+{
+    return findfaction(id) == NULL;
 }
 
 #define MAX_FACTION_ID (36*36*36*36)
@@ -568,7 +575,7 @@ static int allied_skilllimit(const faction * f, skill_t sk)
 {
     static int value = -1;
     if (value < 0) {
-        value = get_param_int(global.parameters, "alliance.skilllimit", 0);
+        value = config_get_int("alliance.skilllimit", 0);
     }
     return value;
 }
@@ -611,8 +618,7 @@ int skill_limit(faction * f, skill_t sk)
         m = max_magicians(f);
     }
     else if (sk == SK_ALCHEMY) {
-        m = get_param_int(global.parameters, "rules.maxskills.alchemy",
-            MAXALCHEMISTS);
+        m = config_get_int("rules.maxskills.alchemy", MAXALCHEMISTS);
     }
     return m;
 }
@@ -708,3 +714,62 @@ void faction_setorigin(faction * f, int id, int x, int y)
     addlist(&f->ursprung, ur);
 }
 
+
+int count_faction(const faction * f, int flags)
+{
+    unit *u;
+    int n = 0;
+    for (u = f->units; u; u = u->nextF) {
+        const race *rc = u_race(u);
+        int x = (flags&COUNT_UNITS) ? 1 : u->number;
+        if (f->race != rc) {
+            if (!playerrace(rc)) {
+                if (flags&COUNT_MONSTERS) {
+                    n += x;
+                }
+            }
+            else if (flags&COUNT_MIGRANTS) {
+                if (!is_cursed(u->attribs, C_SLAVE, 0)) {
+                    n += x;
+                }
+            }
+        }
+        else if (flags&COUNT_DEFAULT) {
+            n += x;
+        }
+    }
+    return n;
+}
+
+int count_units(const faction * f)
+{
+    return count_faction(f, COUNT_ALL | COUNT_UNITS);
+}
+
+int count_all(const faction * f)
+{
+    return count_faction(f, COUNT_ALL);
+}
+
+int count_migrants(const faction * f)
+{
+    return count_faction(f, COUNT_MIGRANTS);
+}
+
+#define MIGRANTS_NONE 0
+#define MIGRANTS_LOG10 1
+
+int count_maxmigrants(const faction * f)
+{
+    int formula = get_param_int(f->race->parameters, "migrants.formula", 0);
+
+    if (formula == MIGRANTS_LOG10) {
+        int nsize = count_all(f);
+        if (nsize > 0) {
+            int x = (int)(log10(nsize / 50.0) * 20);
+            if (x < 0) x = 0;
+            return x;
+        }
+    }
+    return 0;
+}

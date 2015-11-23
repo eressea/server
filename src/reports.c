@@ -1397,7 +1397,7 @@ static void prepare_reports(void)
         }
 
         /* Region owner get always the Lighthouse report */
-        if (bt_lighthouse && check_param(global.parameters, "rules.region_owner_pay_building", bt_lighthouse->_name)) {
+        if (bt_lighthouse && config_token("rules.region_owner_pay_building", bt_lighthouse->_name)) {
             for (b = rbuildings(r); b; b = b->next) {
                 if (b && b->type == bt_lighthouse) {
                     u = building_owner(b);
@@ -1678,7 +1678,7 @@ int reports(void)
     free_seen();
 #ifdef GLOBAL_REPORT
     {
-        const char *str = get_param(global.parameters, "globalreport");
+        const char *str = config_get("globalreport");
         if (str != NULL) {
             sprintf(path, "%s/%s.%u.cr", reportpath(), str, turn);
             global_report(path);

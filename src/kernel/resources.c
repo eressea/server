@@ -29,12 +29,7 @@
 
 static double ResourceFactor(void)
 {
-    static double value = -1.0;
-    if (value < 0) {
-        const char *str = get_param(global.parameters, "resource.factor");
-        value = str ? atof(str) : 1.0;
-    }
-    return value;
+    return config_get_flt("resource.factor", 1.0);
 }
 
 void update_resources(region * r)
@@ -82,10 +77,7 @@ void terraform_resources(region * r)
 {
     int i;
     const terrain_type *terrain = r->terrain;
-    static int terraform_all = -1;
-    if (terraform_all < 0) {
-        terraform_all = get_param_int(global.parameters, "rules.terraform.all", 0);
-    }
+    bool terraform_all = config_get_int("rules.terraform.all", 0) != 0;
 
     if (terrain->production == NULL)
         return;

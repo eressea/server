@@ -17,18 +17,18 @@
 
 static void test_rules(CuTest *tc) {
     test_cleanup();
-    set_param(&global.parameters, "stealth.faction.other", NULL);
+    config_set("stealth.faction.other", NULL);
     CuAssertIntEquals(tc, true, rule_stealth_other());
-    set_param(&global.parameters, "stealth.faction.other", "0");
+    config_set("stealth.faction.other", "0");
     CuAssertIntEquals(tc, false, rule_stealth_other());
-    set_param(&global.parameters, "stealth.faction.other", "1");
+    config_set("stealth.faction.other", "1");
     CuAssertIntEquals(tc, true, rule_stealth_other());
 
-    set_param(&global.parameters, "stealth.faction.anon", NULL);
+    config_set("stealth.faction.anon", NULL);
     CuAssertIntEquals(tc, true, rule_stealth_anon());
-    set_param(&global.parameters, "stealth.faction.anon", "0");
+    config_set("stealth.faction.anon", "0");
     CuAssertIntEquals(tc, false, rule_stealth_anon());
-    set_param(&global.parameters, "stealth.faction.anon", "1");
+    config_set("stealth.faction.anon", "1");
     CuAssertIntEquals(tc, true, rule_stealth_anon());
     test_cleanup();
 }
@@ -40,7 +40,7 @@ static void test_otherfaction(CuTest *tc) {
     test_cleanup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     f = test_create_faction(0);
-    set_param(&global.parameters, "stealth.faction.other", "1");
+    config_set("stealth.faction.other", "1");
     CuAssertIntEquals(tc, true, rule_stealth_other());
     CuAssertPtrEquals(tc, u->faction, visible_faction(f, u));
     a_add(&u->attribs, make_otherfaction(f));

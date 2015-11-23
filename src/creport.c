@@ -1505,7 +1505,7 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
     FILE *F = fopen(filename, "wt");
 
     if (era < 0) {
-        era = get_param_int(global.parameters, "world.era", 1);
+        era = config_get_int("world.era", 1);
     }
     if (F == NULL) {
         perror(filename);

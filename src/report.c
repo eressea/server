@@ -2054,19 +2054,14 @@ const char *charset)
     char *bufp;
     bool utf8 = _strcmpl(charset, "utf8") == 0 || _strcmpl(charset, "utf-8") == 0;
     size_t size;
-
-    /* static variables can cope with writing for different turns */
-    static int thisseason = -1;
-    static int nextseason = -1;
-    static int gamecookie = -1;
-    if (gamecookie != global.cookie) {
-        gamedate date;
-        get_gamedate(turn + 1, &date);
-        thisseason = date.season;
-        get_gamedate(turn + 2, &date);
-        nextseason = date.season;
-        gamecookie = global.cookie;
-    }
+    int thisseason;
+    int nextseason;
+    gamedate date;
+    
+    get_gamedate(turn + 1, &date);
+    thisseason = date.season;
+    get_gamedate(turn + 2, &date);
+    nextseason = date.season;
 
     if (F == NULL) {
         perror(filename);

@@ -853,8 +853,8 @@ static void handlekey(state * st, int c)
             new_players = read_newfactions(sbuffer);
         }
         cnormalize(&st->cursor, &nx, &ny);
-        minpop = get_param_int(global.parameters, "seed.population.min", 8);
-        maxpop = get_param_int(global.parameters, "seed.population.max", minpop);
+        minpop = config_get_int("seed.population.min", 8);
+        maxpop = config_get_int("seed.population.max", minpop);
         if (maxpop > minpop) {
             n = rng_int() % (maxpop - minpop) + minpop;
         }

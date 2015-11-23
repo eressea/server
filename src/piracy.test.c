@@ -21,7 +21,7 @@ static void setup_piracy(void) {
     ship_type *st_boat;
 
     test_cleanup();
-    set_param(&global.parameters, "rules.ship.storms", "0");
+    config_set("rules.ship.storms", "0");
     lang = get_or_create_locale("de");
     locale_setstring(lang, directions[D_EAST], "OSTEN");
     init_directions(lang);

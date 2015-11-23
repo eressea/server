@@ -74,11 +74,11 @@ static void test_settings(CuTest * tc)
 
     test_cleanup();
     json_config(json);
-    CuAssertStrEquals(tc, "1", get_param(global.parameters, "true"));
-    CuAssertStrEquals(tc, "0", get_param(global.parameters, "false"));
-    CuAssertStrEquals(tc, "1d4", get_param(global.parameters, "string"));
-    CuAssertIntEquals(tc, 14, get_param_int(global.parameters, "integer", 0));
-    CuAssertDblEquals(tc, 1.5f, get_param_flt(global.parameters, "float", 0), 0.01);
+    CuAssertStrEquals(tc, "1", config_get("true"));
+    CuAssertStrEquals(tc, "0", config_get("false"));
+    CuAssertStrEquals(tc, "1d4", config_get("string"));
+    CuAssertIntEquals(tc, 14, config_get_int("integer", 0));
+    CuAssertDblEquals(tc, 1.5f, config_get_flt("float", 0), 0.01);
     cJSON_Delete(json);
     test_cleanup();
 }
@@ -117,13 +117,13 @@ static void test_disable(CuTest * tc)
     CuAssertTrue(tc, !keyword_disabled(K_BANNER));
     CuAssertTrue(tc, !keyword_disabled(K_PAY));
     CuAssertTrue(tc, !keyword_disabled(K_BESIEGE));
-    CuAssertIntEquals(tc, 1, get_param_int(global.parameters, "module.enabled", 1));
+    CuAssertIntEquals(tc, 1, config_get_int("module.enabled", 1));
     json_config(json);
     CuAssertTrue(tc, !skill_enabled(SK_ALCHEMY));
     CuAssertTrue(tc, !keyword_disabled(K_BANNER));
     CuAssertTrue(tc, keyword_disabled(K_PAY));
     CuAssertTrue(tc, keyword_disabled(K_BESIEGE));
-    CuAssertIntEquals(tc, 0, get_param_int(global.parameters, "module.enabled", 1));
+    CuAssertIntEquals(tc, 0, config_get_int("module.enabled", 1));
     cJSON_Delete(json);
     test_cleanup();
 }

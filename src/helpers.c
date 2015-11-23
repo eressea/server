@@ -320,33 +320,28 @@ static int lua_getresource(unit * u, const struct resource_type *rtype)
 
 static bool lua_canuse_item(const unit * u, const struct item_type *itype)
 {
-    static int function_exists = 1;
     bool result = true;
+    lua_State *L = (lua_State *)global.vm_state;
+    const char *fname = "item_canuse";
 
-    if (function_exists) {
-        lua_State *L = (lua_State *)global.vm_state;
-        const char *fname = "item_canuse";
+    lua_getglobal(L, fname);
+    if (lua_isfunction(L, -1)) {
+        tolua_pushusertype(L, (void *)u, TOLUA_CAST "unit");
+        tolua_pushstring(L, itype->rtype->_name);
 
-        lua_getglobal(L, fname);
-        if (lua_isfunction(L, -1)) {
-            tolua_pushusertype(L, (void *)u, TOLUA_CAST "unit");
-            tolua_pushstring(L, itype->rtype->_name);
-
-            if (lua_pcall(L, 2, 1, 0) != 0) {
-                const char *error = lua_tostring(L, -1);
-                log_error("get(%s) calling '%s': %s.\n", unitname(u), fname, error);
-                lua_pop(L, 1);
-            }
-            else {
-                result = lua_toboolean(L, -1);
-                lua_pop(L, 1);
-            }
-        }
-        else {
-            function_exists = 0;
-            log_error("get(%s) calling '%s': not a function.\n", unitname(u), fname);
+        if (lua_pcall(L, 2, 1, 0) != 0) {
+            const char *error = lua_tostring(L, -1);
+            log_error("use(%s) calling '%s': %s.\n", unitname(u), fname, error);
             lua_pop(L, 1);
         }
+        else {
+            result = lua_toboolean(L, -1);
+            lua_pop(L, 1);
+        }
+    }
+    else {
+        log_error("use(%s) calling '%s': not a function.\n", unitname(u), fname);
+        lua_pop(L, 1);
     }
     return result;
 }

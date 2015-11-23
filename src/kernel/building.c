@@ -531,7 +531,7 @@ int bt_effsize(const building_type * btype, const building * b, int bsize)
     const construction *cons = btype->construction;
 
     /* TECH DEBT: simplest thing that works for E3 dwarf/halfling faction rules */
-    if (b && get_param_int(global.parameters, "rules.dwarf_castles", 0)
+    if (b && config_get_int("rules.dwarf_castles", 0)
         && strcmp(btype->_name, "castle") == 0) {
         unit *u = building_owner(b);
         if (u && u->faction->race == get_race(RC_HALFLING)) {
@@ -591,7 +591,7 @@ static unit *building_owner_ex(const building * bld, const struct faction * last
             }
         }
     }
-    if (!heir && check_param(global.parameters, "rules.region_owner_pay_building", bld->type->_name)) {
+    if (!heir && config_token("rules.region_owner_pay_building", bld->type->_name)) {
         if (rule_region_owners()) {
             u = building_owner(largestbuilding(bld->region, &cmp_taxes, false));
         }

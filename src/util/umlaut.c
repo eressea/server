@@ -260,7 +260,7 @@ int findtoken(const void * root, const char *key, variant * result)
             ref = ref->nexthash;
         str += len;
         if (!ref) {
-            log_info("findtoken | token not found '%s'\n", key);
+            log_debug("findtoken | token not found '%s'\n", key);
             return E_TOK_NOMATCH;
         }
         tk = ref->node;
@@ -269,6 +269,6 @@ int findtoken(const void * root, const char *key, variant * result)
         *result = tk->id;
         return E_TOK_SUCCESS;
     }
-    log_info("findtoken | token not found '%s'\n", key);
+    log_debug("findtoken | token not found '%s'\n", key);
     return E_TOK_NOMATCH;
 }
