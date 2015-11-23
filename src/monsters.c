@@ -155,7 +155,7 @@ static order *monster_attack(unit * u, const unit * target)
     return create_order(K_ATTACK, u->faction->locale, "%i", target->no);
 }
 
-static order *get_money_for_dragon(region * r, unit * u, int wanted)
+static order *get_money_for_dragon(region * r, unit * udragon, int wanted)
 {
     int n;
     bool attacks = attack_chance > 0.0;
@@ -163,7 +163,7 @@ static order *get_money_for_dragon(region * r, unit * u, int wanted)
     /* falls genug geld in der region ist, treiben wir steuern ein. */
     if (rmoney(r) >= wanted) {
         /* 5% chance, dass der drache aus einer laune raus attackiert */
-        if (!attacks || chance(1.0 - u_race(u)->aggression)) {
+        if (!attacks || chance(1.0 - u_race(udragon)->aggression)) {
             /* Drachen haben in E3 und E4 keine Einnahmen. Neuer Befehl Pluendern erstmal nur fuer Monster?*/
             return create_order(K_LOOT, default_locale, NULL);
         }
@@ -172,15 +172,15 @@ static order *get_money_for_dragon(region * r, unit * u, int wanted)
     /* falls der drache launisch ist, oder das regionssilber knapp, greift er alle an
      * und holt sich Silber von Einheiten, vorausgesetzt er bewacht bereits */
     n = 0;
-    if (attacks && is_guard(u, GUARD_TAX)) {
-        unit *u2;
-        for (u2 = r->units; u2; u2 = u2->next) {
-            if (u2->faction != u->faction && cansee(u->faction, r, u2, 0) && !in_safe_building(u, u2)) {
-                int m = get_money(u2);
+    if (attacks && is_guard(udragon, GUARD_TAX)) {
+        unit *u;
+        for (u = r->units; u; u = u->next) {
+            if (u->faction != udragon->faction && cansee(udragon->faction, r, u, 0) && !in_safe_building(u, udragon)) {
+                int m = get_money(u);
                 if (m != 0) {
-                    order *ord = monster_attack(u, u2);
+                    order *ord = monster_attack(udragon, u);
                     if (ord) {
-                        addlist(&u->orders, ord);
+                        addlist(&udragon->orders, ord);
                         n += m;
                     }
                 }
