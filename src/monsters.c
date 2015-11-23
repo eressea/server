@@ -797,8 +797,10 @@ void plan_monsters(faction * f)
             if (ta && !monster_is_waiting(u)) {
                 unit *tu = (unit *)ta->data.v;
                 if (tu && tu->region == r) {
-                    addlist(&u->orders,
-                        create_order(K_ATTACK, u->faction->locale, "%i", tu->no));
+                    order * ord = monster_attack(u, tu);
+                    if (ord) {
+                        addlist(&u->orders, ord);
+                    }
                 }
                 else if (tu) {
                     tu = findunitg(ta->data.i, NULL);
