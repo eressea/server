@@ -690,15 +690,6 @@ static void set_coast(ship * sh, region * r, region * rnext)
     }
 }
 
-static float damage_drift(void)
-{
-    static float value = -1.0F;
-    if (value < 0) {
-        value = (float)get_param_flt(global.parameters, "rules.ship.damage_drift", 0.02F);
-    }
-    return value;
-}
-
 static void drifting_ships(region * r)
 {
     direction_t d;
@@ -789,11 +780,6 @@ static void drifting_ships(region * r)
 
             if (sh != NULL) {
                 fset(sh, SF_DRIFTED);
-
-                damage_ship(sh, damage_drift());
-                if (sh->damage >= sh->size * DAMAGE_SCALE) {
-                    remove_ship(&sh->region->ships, sh);
-                }
             }
 
             if (*shp == sh)
@@ -1888,11 +1874,6 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
                         if (storm && rnext != NULL) {
                             ADDMSG(&f->msgs, msg_message("storm", "ship region sink",
                                 sh, current_point, sh->damage >= sh->size * DAMAGE_SCALE));
-
-                            /* damage the ship. we handle destruction in the end */
-                            damage_ship(sh, damage_drift());
-                            if (sh->damage >= sh->size * DAMAGE_SCALE)
-                                break;
 
                             next_point = rnext;
                             /* these values need to be updated if next_point changes (due to storms): */
