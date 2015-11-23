@@ -1323,7 +1323,6 @@ int get_modifier(const unit * u, skill_t sk, int level, const region * r, bool n
 {
     int bskill = level;
     int skill = bskill;
-    int hunger_red_skill = -1;
 
     if (r && sk == SK_STEALTH) {
         plane *pl = rplane(r);
@@ -1342,12 +1341,8 @@ int get_modifier(const unit * u, skill_t sk, int level, const region * r, bool n
 #endif
     skill = skillmod(u->attribs, u, r, sk, skill, SMF_ALWAYS);
 
-    if (hunger_red_skill == -1) {
-        hunger_red_skill = config_get_int("rules.hunger.reduces_skill", 2);
-    }
-
-    if (fval(u, UFL_HUNGER) && hunger_red_skill) {
-        if (sk == SK_SAILING && skill > 2 && hunger_red_skill == 2) {
+    if (fval(u, UFL_HUNGER)) {
+        if (sk == SK_SAILING && skill > 2) {
             skill = skill - 1;
         }
         else {
