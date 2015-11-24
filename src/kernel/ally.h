@@ -24,6 +24,9 @@ extern "C" {
 #endif
 
     struct attrib_type;
+    struct plane;
+    struct faction;
+    struct unit;
     extern struct attrib_type at_npcfaction;
 
     typedef struct ally {

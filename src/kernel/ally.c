@@ -12,6 +12,7 @@
 
 #include <util/attrib.h>
 #include <assert.h>
+#include <string.h>
 #include <stdlib.h>
 
 ally * ally_find(ally *al, const struct faction *f) {
