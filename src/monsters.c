@@ -789,7 +789,7 @@ void plan_monsters(faction * f)
                 setstatus(u, ST_FIGHT);
                 /* all monsters fight */
             }
-            if (attacking && is_guard(u, GUARD_TAX)) {
+            if (attacking && (!r->land || is_guard(u, GUARD_TAX))) {
                 monster_attacks(u);
             }
             /* units with a plan to kill get ATTACK orders: */
