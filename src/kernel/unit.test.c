@@ -283,16 +283,6 @@ static void test_skill_hunger(CuTest *tc) {
     set_level(u, SK_ARMORER, 6);
     set_level(u, SK_SAILING, 6);
     fset(u, UFL_HUNGER);
-
-    config_set("rules.hunger.reduces_skill", "0");
-    CuAssertIntEquals(tc, 6, effskill(u, SK_ARMORER, 0));
-    CuAssertIntEquals(tc, 6, effskill(u, SK_SAILING, 0));
-
-    config_set("rules.hunger.reduces_skill", "1");
-    CuAssertIntEquals(tc, 3, effskill(u, SK_ARMORER, 0));
-    CuAssertIntEquals(tc, 3, effskill(u, SK_SAILING, 0));
-
-    config_set("rules.hunger.reduces_skill", "2");
     CuAssertIntEquals(tc, 3, effskill(u, SK_ARMORER, 0));
     CuAssertIntEquals(tc, 5, effskill(u, SK_SAILING, 0));
     set_level(u, SK_SAILING, 2);

@@ -128,8 +128,8 @@ const troop no_troop = { 0, 0 };
 #define DAMAGE_SKILL_BONUS   (1<<4)
 
 static int max_turns;
-static int damage_rules;
-static int loot_rules;
+static int rule_damage;
+static int rule_loot;
 static int skill_formula;
 static int rule_cavalry_skill;
 static int rule_population_damage;
@@ -157,7 +157,7 @@ static void init_rules(void)
     rule_anon_battle = config_get_int("rules.stealth.anon_battle", 1) != 0;
     rule_cavalry_mode = config_get_int("rules.cavalry.mode", 1);
     rule_cavalry_skill = config_get_int("rules.cavalry.skill", 2);
-    loot_rules = config_get_int("rules.combat.loot",
+    rule_loot = config_get_int("rules.combat.loot",
         LOOT_MONSTERS | LOOT_OTHERS | LOOT_KEEPLOOT);
     /* new formula to calculate to-hit-chance */
     skill_formula = config_get_int("rules.combat.skill_formula",
@@ -166,16 +166,16 @@ static void init_rules(void)
     max_turns = config_get_int("rules.combat.turns", COMBAT_TURNS);
     /* damage calculation */
     if (config_get_int("rules.combat.critical", 1)) {
-        damage_rules |= DAMAGE_CRITICAL;
+        rule_damage |= DAMAGE_CRITICAL;
     }
     if (config_get_int("rules.combat.melee_bonus", 1)) {
-        damage_rules |= DAMAGE_MELEE_BONUS;
+        rule_damage |= DAMAGE_MELEE_BONUS;
     }
     if (config_get_int("rules.combat.missile_bonus", 1)) {
-        damage_rules |= DAMAGE_MISSILE_BONUS;
+        rule_damage |= DAMAGE_MISSILE_BONUS;
     }
     if (config_get_int("rules.combat.skill_bonus", 1)) {
-        damage_rules |= DAMAGE_SKILL_BONUS;
+        rule_damage |= DAMAGE_SKILL_BONUS;
     }
 }
 
@@ -1222,7 +1222,7 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
     }
 
     if (type != AT_COMBATSPELL && type != AT_SPELL) {
-        if (damage_rules & DAMAGE_CRITICAL) {
+        if (rule_damage & DAMAGE_CRITICAL) {
             double kritchance = (sk * 3 - sd) / 200.0;
 
             kritchance = _max(kritchance, 0.005);
@@ -1240,19 +1240,19 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
 
         if (awtype != NULL && fval(awtype, WTF_MISSILE)) {
             /* missile weapon bonus */
-            if (damage_rules & DAMAGE_MISSILE_BONUS) {
+            if (rule_damage & DAMAGE_MISSILE_BONUS) {
                 da += af->person[at.index].damage_rear;
             }
         }
         else {
             /* melee bonus */
-            if (damage_rules & DAMAGE_MELEE_BONUS) {
+            if (rule_damage & DAMAGE_MELEE_BONUS) {
                 da += af->person[at.index].damage;
             }
         }
 
         /* Skilldifferenzbonus */
-        if (damage_rules & DAMAGE_SKILL_BONUS) {
+        if (rule_damage & DAMAGE_SKILL_BONUS) {
             da += _max(0, (sk - sd) / DAMAGE_QUOTIENT);
         }
     }
@@ -2577,20 +2577,20 @@ static void loot_items(fighter * corpse)
                     itm->number -= loot;
                     maxloot -= loot;
 
-                    if (is_monsters(u->faction) && (loot_rules & LOOT_MONSTERS)) {
+                    if (is_monsters(u->faction) && (rule_loot & LOOT_MONSTERS)) {
                         looting = 1;
                     }
-                    else if (loot_rules & LOOT_OTHERS) {
+                    else if (rule_loot & LOOT_OTHERS) {
                         looting = 1;
                     }
-                    else if (loot_rules & LOOT_SELF) {
+                    else if (rule_loot & LOOT_SELF) {
                         looting = 2;
                     }
                     if (looting) {
                         if (mustloot) {
                             maxrow = LAST_ROW;
                         }
-                        else if (loot_rules & LOOT_KEEPLOOT) {
+                        else if (rule_loot & LOOT_KEEPLOOT) {
                             int lootchance = 50 + b->keeploot;
                             if (rng_int() % 100 < lootchance) {
                                 maxrow = BEHIND_ROW;
