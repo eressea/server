@@ -233,8 +233,8 @@ extern "C" {
 #define BF_INV_NONMAGIC (1<<5)  /* Immun gegen nichtmagischen Schaden */
 #define BF_CANATTACK    (1<<6)  /* Kann keine ATTACKIERE Befehle ausfuehren */
 
-    extern int unit_old_max_hp(struct unit *u);
-    extern const char *racename(const struct locale *lang, const struct unit *u,
+    int unit_old_max_hp(struct unit *u);
+    const char *racename(const struct locale *lang, const struct unit *u,
         const race * rc);
 
 #define omniscient(f) ((f)->race==get_race(RC_ILLUSION) || (f)->race==get_race(RC_TEMPLATE))
@@ -244,19 +244,20 @@ extern "C" {
 #define humanoidrace(rc) (fval((rc), RCF_UNDEAD) || (rc)==get_race(RC_DRACOID) || playerrace(rc))
 #define illusionaryrace(rc) (fval(rc, RCF_ILLUSIONARY))
 
-    extern bool allowed_dragon(const struct region *src,
+    bool allowed_dragon(const struct region *src,
         const struct region *target);
 
-    extern bool r_insectstalled(const struct region *r);
+    bool r_insectstalled(const struct region *r);
 
-    extern void write_race_reference(const struct race *rc,
-    struct storage *store);
-    extern variant read_race_reference(struct storage *store);
+    void write_race_reference(const struct race *rc,
+        struct storage *store);
+    variant read_race_reference(struct storage *store);
 
-    extern const char *raceprefix(const struct unit *u);
+    const char *raceprefix(const struct unit *u);
 
-    extern void give_starting_equipment(const struct equipment *eq,
-    struct unit *u);
+    void give_starting_equipment(const struct equipment *eq,
+        struct unit *u);
+    const char *dbrace(const struct race *rc);
 
 #ifdef __cplusplus
 }

@@ -183,40 +183,6 @@ unit *ufindhash(int uid)
     return NULL;
 }
 
-#define DMAXHASH 7919
-typedef struct dead {
-    struct dead *nexthash;
-    faction *f;
-    int no;
-} dead;
-
-static dead *deadhash[DMAXHASH];
-
-static void dhash(int no, faction * f)
-{
-    dead *hash = (dead *)calloc(1, sizeof(dead));
-    dead *old = deadhash[no % DMAXHASH];
-    hash->no = no;
-    hash->f = f;
-    deadhash[no % DMAXHASH] = hash;
-    hash->nexthash = old;
-}
-
-faction *dfindhash(int no)
-{
-    dead *old;
-
-    if (no < 0)
-        return 0;
-
-    for (old = deadhash[no % DMAXHASH]; old; old = old->nexthash) {
-        if (old->no == no) {
-            return old->f;
-        }
-    }
-    return 0;
-}
-
 typedef struct buddy {
     struct buddy *next;
     int number;
@@ -2020,3 +1986,59 @@ int getunit(const region * r, const faction * f, unit **uresult)
     }
     return result;
 }
+
+int besieged(const unit * u)
+{
+    /* belagert kann man in schiffen und burgen werden */
+    return (u && !keyword_disabled(K_BESIEGE)
+        && u->building && u->building->besieged
+        && u->building->besieged >= u->building->size * SIEGEFACTOR);
+}
+
+bool has_horses(const unit * u)
+{
+    item *itm = u->items;
+    for (; itm; itm = itm->next) {
+        if (itm->type->flags & ITF_ANIMAL)
+            return true;
+    }
+    return false;
+}
+
+void setstatus(unit *u, int status)
+{
+    assert(status >= ST_AGGRO && status <= ST_FLEE);
+    if (u->status != status) {
+        u->status = (status_t)status;
+    }
+}
+
+#define MAINTENANCE 10
+int maintenance_cost(const struct unit *u)
+{
+    if (u == NULL)
+        return MAINTENANCE;
+    if (global.functions.maintenance) {
+        int retval = global.functions.maintenance(u);
+        if (retval >= 0)
+            return retval;
+    }
+    return u_race(u)->maintenance * u->number;
+}
+
+static skill_t limited_skills[] = { SK_MAGIC, SK_ALCHEMY, SK_TACTICS, SK_SPY, SK_HERBALISM, NOSKILL };
+bool has_limited_skills(const struct unit * u)
+{
+    int i, j;
+
+    for (i = 0; i != u->skill_size; ++i) {
+        skill *sv = u->skills + i;
+        for (j = 0; limited_skills[j] != NOSKILL; ++j) {
+            if (sv->id == limited_skills[j]) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+

@@ -209,6 +209,17 @@ struct order *ord)
     return 0;
 }
 
+static bool unit_has_cursed_item(const unit * u)
+{
+    item *itm = u->items;
+    while (itm) {
+        if (fval(itm->type, ITF_CURSED) && itm->number > 0)
+            return true;
+        itm = itm->next;
+    }
+    return false;
+}
+
 static bool can_give_men(const unit *u, order *ord, message **msg) {
     if (u_race(u) == get_race(RC_SNOTLING)) {
         /* snotlings may not be given to the peasants. */

@@ -177,6 +177,12 @@ extern "C" {
     int count_units(const struct faction * f);
     int max_magicians(const struct faction * f);
 
+    struct faction *getfaction(void);
+
+    /* looking up dead factions: */
+    void dhash(int no, struct faction * f);
+    struct faction *dfindhash(int no);
+
 #ifdef __cplusplus
 }
 #endif

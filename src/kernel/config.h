@@ -70,8 +70,6 @@ struct param;
     int forbiddenid(int id);
     int newcontainerid(void);
 
-    struct faction *getfaction(void);
-
     char *untilde(char *s);
 
     typedef int(*cmp_building_cb) (const struct building * b,
@@ -101,10 +99,7 @@ struct param;
 #define GIVE_DEFAULT (GIVE_SELF|GIVE_PEASANTS|GIVE_LUXURIES|GIVE_HERBS|GIVE_GOODS)
     int rule_give(void);
 
-    bool has_limited_skills(const struct unit *u);
     const struct race *findrace(const char *, const struct locale *);
-
-    bool unit_has_cursed_item(const struct unit *u);
 
     /* grammatik-flags: */
 #define GF_NONE 0
@@ -139,15 +134,10 @@ struct param;
     /* Verhindert Abbau von Resourcen mit RTF_LIMITED */
 #define GUARD_ALL 0xFFFF
 
-    void setstatus(struct unit *u, int status);
-    /* !< sets combatstatus of a unit */
-    int besieged(const struct unit *u);
     int maxworkingpeasants(const struct region *r);
-    bool has_horses(const struct unit *u);
     bool markets_module(void);
     int wage(const struct region *r, const struct faction *f,
         const struct race *rc, int in_turn);
-    int maintenance_cost(const struct unit *u);
 
     const char *datapath(void);
     void set_datapath(const char *path);
@@ -181,8 +171,6 @@ struct param;
         const char *name;
         int status;
     } helpmode;
-
-    const char *dbrace(const struct race *rc);
 
     void set_param(struct param **p, const char *key, const char *value);
     const char *get_param(const struct param *p, const char *key);

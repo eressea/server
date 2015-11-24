@@ -165,22 +165,6 @@ helpmode helpmodes[] = {
     { NULL, 0 }
 };
 
-/** Returns the English name of the race, which is what the database uses.
- */
-const char *dbrace(const struct race *rc)
-{
-    static char zText[32]; // FIXME: static return value
-    char *zPtr = zText;
-
-    /* the english names are all in ASCII, so we don't need to worry about UTF8 */
-    strlcpy(zText, (const char *)LOC(get_locale("en"), rc_name_s(rc, NAME_SINGULAR)), sizeof(zText));
-    while (*zPtr) {
-        *zPtr = (char)(toupper(*zPtr));
-        ++zPtr;
-    }
-    return zText;
-}
-
 const char *parameters[MAXPARAMS] = {
     "LOCALE",
     "ALLES",
@@ -266,37 +250,6 @@ const char *options[MAXOPTIONS] = {
 };
 
 FILE *debug;
-
-/* ----------------------------------------------------------------------- */
-
-int distribute(int old, int new_value, int n)
-{
-    int i;
-    int t;
-    assert(new_value <= old);
-
-    if (old == 0)
-        return 0;
-
-    t = (n / old) * new_value;
-    for (i = (n % old); i; i--)
-        if (rng_int() % old < new_value)
-            t++;
-
-    return t;
-}
-
-bool unit_has_cursed_item(const unit * u)
-{
-    item *itm = u->items;
-    while (itm) {
-        if (fval(itm->type, ITF_CURSED) && itm->number > 0)
-            return true;
-        itm = itm->next;
-    }
-    return false;
-}
-
 
 void
 parse(keyword_t kword, int(*dofun) (unit *, struct order *), bool thisorder)
@@ -403,11 +356,6 @@ param_t getparam(const struct locale * lang)
     return s ? findparam(s, lang) : NOPARAM;
 }
 
-faction *getfaction(void)
-{
-    return findfaction(getid());
-}
-
 unit *getnewunit(const region * r, const faction * f)
 {
     int n;
@@ -449,8 +397,6 @@ building *largestbuilding(const region * r, cmp_building_cb cmp_gt,
 }
 
 /* -- Erschaffung neuer Einheiten ------------------------------ */
-
-extern faction *dfindhash(int i);
 
 static const char *forbidden[] = { "t", "te", "tem", "temp", NULL };
 // PEASANT: "b", "ba", "bau", "baue", "p", "pe", "pea", "peas"
@@ -756,38 +702,12 @@ void kernel_done(void)
     free_attribs();
 }
 
-void setstatus(struct unit *u, int status)
-{
-    assert(status >= ST_AGGRO && status <= ST_FLEE);
-    if (u->status != status) {
-        u->status = (status_t)status;
-    }
-}
-
 #ifndef HAVE_STRDUP
 char *_strdup(const char *s)
 {
     return strcpy((char *)malloc(sizeof(char) * (strlen(s) + 1)), s);
 }
 #endif
-
-int besieged(const unit * u)
-{
-    /* belagert kann man in schiffen und burgen werden */
-    return (u && !keyword_disabled(K_BESIEGE)
-        && u->building && u->building->besieged
-        && u->building->besieged >= u->building->size * SIEGEFACTOR);
-}
-
-bool has_horses(const struct unit * u)
-{
-    item *itm = u->items;
-    for (; itm; itm = itm->next) {
-        if (itm->type->flags & ITF_ANIMAL)
-            return true;
-    }
-    return false;
-}
 
 /* Lohn bei den einzelnen Burgstufen für Normale Typen, Orks, Bauern,
  * Modifikation für Städter. */
@@ -1026,37 +946,12 @@ int wage(const region * r, const faction * f, const race * rc, int in_turn)
     return default_wage(r, f, rc, in_turn);
 }
 
-#define MAINTENANCE 10
-int maintenance_cost(const struct unit *u)
-{
-    if (u == NULL)
-        return MAINTENANCE;
-    if (global.functions.maintenance) {
-        int retval = global.functions.maintenance(u);
-        if (retval >= 0)
-            return retval;
-    }
-    return u_race(u)->maintenance * u->number;
-}
-
 int lovar(double xpct_x2)
 {
     int n = (int)(xpct_x2 * 500) + 1;
     if (n == 0)
         return 0;
     return (rng_int() % n + rng_int() % n) / 1000;
-}
-
-bool has_limited_skills(const struct unit * u)
-{
-    if (has_skill(u, SK_MAGIC) || has_skill(u, SK_ALCHEMY) ||
-        has_skill(u, SK_TACTICS) || has_skill(u, SK_HERBALISM) ||
-        has_skill(u, SK_SPY)) {
-        return true;
-    }
-    else {
-        return false;
-    }
 }
 
 void kernel_init(void)
