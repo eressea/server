@@ -29,7 +29,9 @@ extern "C" {
     struct alliance;
     struct item;
     struct seen_region;
+    struct attrib_type;
 
+    extern struct attrib_type at_maxmagicians;
     /* SMART_INTERVALS: define to speed up finding the interval of regions that a
        faction is in. defining this speeds up the turn by 30-40% */
 #define SMART_INTERVALS
@@ -173,7 +175,7 @@ extern "C" {
     int count_maxmigrants(const struct faction * f);
     int count_all(const struct faction * f);
     int count_units(const struct faction * f);
-
+    int max_magicians(const struct faction * f);
 
 #ifdef __cplusplus
 }

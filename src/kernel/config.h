@@ -27,11 +27,6 @@ extern "C" {
 #include "types.h"
 struct param;
 
-    /* getunit results: */
-#define GET_UNIT 0
-#define GET_NOTFOUND 1
-#define GET_PEASANTS 2
-
 #define DISPLAYSIZE         8192        /* max. Länge einer Beschreibung, incl trailing 0 */
 #define ORDERSIZE           (DISPLAYSIZE*2) /* max. length of an order */
 #define NAMESIZE            128 /* max. Länge eines Namens, incl trailing 0 */
@@ -50,7 +45,6 @@ struct param;
 #define fset(u, i) ((u)->flags |= (i))
 #define freset(u, i) ((u)->flags &= ~(i))
 
-    int max_magicians(const struct faction * f);
     int findoption(const char *s, const struct locale *lang);
 
     param_t findparam(const char *s, const struct locale *lang);

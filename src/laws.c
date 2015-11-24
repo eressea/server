@@ -478,7 +478,16 @@ static int count_race(const region * r, const race * rc)
     return c;
 }
 
-extern struct attrib_type at_germs;
+attrib_type at_germs = {
+    "germs",
+    DEFAULT_INIT,
+    DEFAULT_FINALIZE,
+    DEFAULT_AGE,
+    a_writeshorts,
+    a_readshorts,
+    ATF_UNIQUE
+};
+
 
 static void
 growing_trees_e3(region * r, const int current_season,

@@ -20,12 +20,17 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "attributes.h"
 
+#include "laws.h"
+#include "move.h"
+#include "guard.h"
+
 /* attributes includes */
 #include "follow.h"
 #include "hate.h"
 #include "iceberg.h"
 #include "key.h"
 #include "stealth.h"
+#include "magic.h"
 #include "moved.h"
 #include "movement.h"
 #include "dict.h"
@@ -38,8 +43,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "targetregion.h"
 
 /* kernel includes */
+#include <kernel/ally.h>
+#include <kernel/connection.h>
+#include <kernel/curse.h>
 #include <kernel/unit.h>
 #include <kernel/faction.h>
+#include <kernel/group.h>
 #include <kernel/region.h>
 #include <kernel/save.h>
 #include <kernel/ship.h>
@@ -47,13 +56,67 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* util includes */
 #include <util/attrib.h>
+#include <util/event.h>
+
+#include <storage.h>
 
 attrib_type at_unitdissolve = {
     "unitdissolve", NULL, NULL, NULL, a_writechars, a_readchars
 };
 
+static int read_ext(attrib * a, void *owner, struct storage *store)
+{
+    int len;
+
+    READ_INT(store, &len);
+    store->api->r_bin(store->handle, NULL, (size_t)len);
+    return AT_READ_OK;
+}
+
 void register_attributes(void)
 {
+    /* Alle speicherbaren Attribute müssen hier registriert werden */
+    at_register(&at_shiptrail);
+    at_register(&at_familiar);
+    at_register(&at_familiarmage);
+    at_register(&at_clone);
+    at_register(&at_clonemage);
+    at_register(&at_eventhandler);
+    at_register(&at_mage);
+    at_register(&at_countdown);
+    at_register(&at_curse);
+
+    at_register(&at_seenspell);
+
+    /* neue REGION-Attribute */
+    at_register(&at_moveblock);
+    at_register(&at_deathcount);
+    at_register(&at_woodcount);
+
+    /* neue UNIT-Attribute */
+    at_register(&at_siege);
+    at_register(&at_effect);
+    at_register(&at_private);
+
+    at_register(&at_icastle);
+    at_register(&at_guard);
+    at_register(&at_group);
+
+    at_register(&at_building_generic_type);
+    at_register(&at_maxmagicians);
+    at_register(&at_npcfaction);
+
+    /* connection-typen */
+    register_bordertype(&bt_noway);
+    register_bordertype(&bt_fogwall);
+    register_bordertype(&bt_wall);
+    register_bordertype(&bt_illusionwall);
+    register_bordertype(&bt_road);
+
+    at_register(&at_germs);
+
+    at_deprecate("xontormiaexpress", a_readint);    /* required for old datafiles */
+    at_deprecate("lua", read_ext);    /* required for old datafiles */
     at_deprecate("gm", a_readint);
     at_register(&at_stealth);
     at_register(&at_dict);

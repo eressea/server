@@ -44,7 +44,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "race.h"
 #include "reports.h"
 #include "region.h"
-#include "save.h"
 #include "ship.h"
 #include "skill.h"
 #include "terrain.h"
@@ -85,7 +84,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #endif
 
 /* external libraries */
-#include <storage.h>
 #include <iniparser.h>
 #include <critbit.h>
 
@@ -266,34 +264,6 @@ const char *options[MAXOPTIONS] = {
     "PUNKTE",
     "SHOWSKCHANGE"
 };
-
-static void init_maxmagicians(struct attrib *a)
-{
-    a->data.i = MAXMAGICIANS;
-}
-
-static attrib_type at_maxmagicians = {
-    "maxmagicians",
-    init_maxmagicians,
-    NULL,
-    NULL,
-    a_writeint,
-    a_readint,
-    ATF_UNIQUE
-};
-
-int max_magicians(const faction * f)
-{
-    int m = config_get_int("rules.maxskills.magic", MAXMAGICIANS);
-    attrib *a;
-
-    if ((a = a_find(f->attribs, &at_maxmagicians)) != NULL) {
-        m = a->data.i;
-    }
-    if (f->race == get_race(RC_ELF))
-        ++m;
-    return m;
-}
 
 FILE *debug;
 
@@ -786,16 +756,6 @@ void kernel_done(void)
     free_attribs();
 }
 
-attrib_type at_germs = {
-    "germs",
-    DEFAULT_INIT,
-    DEFAULT_FINALIZE,
-    DEFAULT_AGE,
-    a_writeshorts,
-    a_readshorts,
-    ATF_UNIQUE
-};
-
 void setstatus(struct unit *u, int status)
 {
     assert(status >= ST_AGGRO && status <= ST_FLEE);
@@ -1099,70 +1059,12 @@ bool has_limited_skills(const struct unit * u)
     }
 }
 
-static int read_ext(attrib * a, void *owner, struct storage *store)
-{
-    int len;
-
-    READ_INT(store, &len);
-    store->api->r_bin(store->handle, NULL, (size_t)len);
-    return AT_READ_OK;
-}
-
-
-void attrib_init(void)
-{
-    /* Alle speicherbaren Attribute müssen hier registriert werden */
-    at_register(&at_shiptrail);
-    at_register(&at_familiar);
-    at_register(&at_familiarmage);
-    at_register(&at_clone);
-    at_register(&at_clonemage);
-    at_register(&at_eventhandler);
-    at_register(&at_mage);
-    at_register(&at_countdown);
-    at_register(&at_curse);
-
-    at_register(&at_seenspell);
-
-    /* neue REGION-Attribute */
-    at_register(&at_moveblock);
-    at_register(&at_deathcount);
-    at_register(&at_woodcount);
-
-    /* neue UNIT-Attribute */
-    at_register(&at_siege);
-    at_register(&at_effect);
-    at_register(&at_private);
-
-    at_register(&at_icastle);
-    at_register(&at_guard);
-    at_register(&at_group);
-
-    at_register(&at_building_generic_type);
-    at_register(&at_maxmagicians);
-    at_register(&at_npcfaction);
-
-    /* connection-typen */
-    register_bordertype(&bt_noway);
-    register_bordertype(&bt_fogwall);
-    register_bordertype(&bt_wall);
-    register_bordertype(&bt_illusionwall);
-    register_bordertype(&bt_road);
-
-    register_function((pf_generic)minimum_wage, "minimum_wage");
-
-    at_register(&at_germs);
-
-    at_deprecate("xontormiaexpress", a_readint);    /* required for old datafiles */
-    at_deprecate("lua", read_ext);    /* required for old datafiles */
-}
-
 void kernel_init(void)
 {
     register_reports();
     mt_clear();
-    attrib_init();
     translation_init();
+    register_function((pf_generic)minimum_wage, "minimum_wage");
 }
 
 static order * defaults[MAXLOCALES];

@@ -30,6 +30,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "plane.h"
 #include "race.h"
 #include "region.h"
+#include "save.h"
 #include "spellbook.h"
 #include "terrain.h"
 #include "unit.h"
@@ -773,3 +774,32 @@ int count_maxmigrants(const faction * f)
     }
     return 0;
 }
+
+static void init_maxmagicians(struct attrib *a)
+{
+    a->data.i = MAXMAGICIANS;
+}
+
+attrib_type at_maxmagicians = {
+    "maxmagicians",
+    init_maxmagicians,
+    NULL,
+    NULL,
+    a_writeint,
+    a_readint,
+    ATF_UNIQUE
+};
+
+int max_magicians(const faction * f)
+{
+    int m = config_get_int("rules.maxskills.magic", MAXMAGICIANS);
+    attrib *a;
+
+    if ((a = a_find(f->attribs, &at_maxmagicians)) != NULL) {
+        m = a->data.i;
+    }
+    if (f->race == get_race(RC_ELF))
+        ++m;
+    return m;
+}
+
