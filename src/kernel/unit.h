@@ -256,6 +256,10 @@ extern "C" {
     bool unit_name_equals_race(const struct unit *u);
     bool unit_can_study(const struct unit *u);
 
+    int newunitid(void);
+    int getunit(const struct region * r, const struct faction * f, struct unit **uresult);
+    int read_unitid(const struct faction *f, const struct region *r);
+
 #ifdef __cplusplus
 }
 #endif

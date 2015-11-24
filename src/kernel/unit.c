@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "unit.h"
 
+#include "ally.h"
 #include "building.h"
 #include "faction.h"
 #include "group.h"
@@ -54,6 +55,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <util/parser.h>
 #include <util/resolve.h>
 #include <util/rng.h>
 #include <util/variant.h>
@@ -1935,3 +1937,85 @@ void produceexp(struct unit *u, skill_t sk, int n)
     produceexp_ex(u, sk, n, learn_skill);
 }
 
+/* ID's für Einheiten und Zauber */
+int newunitid(void)
+{
+    int random_unit_no;
+    int start_random_no;
+    random_unit_no = 1 + (rng_int() % MAX_UNIT_NR);
+    start_random_no = random_unit_no;
+
+    while (ufindhash(random_unit_no) || dfindhash(random_unit_no)
+        || cfindhash(random_unit_no)
+        || forbiddenid(random_unit_no)) {
+        random_unit_no++;
+        if (random_unit_no == MAX_UNIT_NR + 1) {
+            random_unit_no = 1;
+        }
+        if (random_unit_no == start_random_no) {
+            random_unit_no = (int)MAX_UNIT_NR + 1;
+        }
+    }
+    return random_unit_no;
+}
+
+static int read_newunitid(const faction * f, const region * r)
+{
+    int n;
+    unit *u2;
+    n = getid();
+    if (n == 0)
+        return -1;
+
+    u2 = findnewunit(r, f, n);
+    if (u2)
+        return u2->no;
+
+    return -1;
+}
+
+int read_unitid(const faction * f, const region * r)
+{
+    char token[16];
+    const char *s = gettoken(token, sizeof(token));
+
+    /* Da s nun nur einen string enthaelt, suchen wir ihn direkt in der
+    * paramliste. machen wir das nicht, dann wird getnewunit in s nach der
+    * nummer suchen, doch dort steht bei temp-units nur "temp" drinnen! */
+
+    if (!s || *s == 0 || !isalnum(*s)) {
+        return -1;
+    }
+    if (isparam(s, f->locale, P_TEMP)) {
+        return read_newunitid(f, r);
+    }
+    return atoi36((const char *)s);
+}
+
+int getunit(const region * r, const faction * f, unit **uresult)
+{
+    unit *u2 = NULL;
+    int n = read_unitid(f, r);
+    int result = GET_NOTFOUND;
+
+    if (n == 0) {
+        result = GET_PEASANTS;
+    }
+    else if (n > 0) {
+        u2 = findunit(n);
+        if (u2 != NULL && u2->region == r) {
+            /* there used to be a 'u2->flags & UFL_ISNEW || u2->number>0' condition
+            * here, but it got removed because of a bug that made units disappear:
+            * http://eressea.upb.de/mantis/bug_view_page.php?bug_id=0000172
+            */
+            result = GET_UNIT;
+        }
+        else {
+            u2 = NULL;
+        }
+    }
+    if (uresult) {
+        *uresult = u2;
+    }
+    return result;
+}

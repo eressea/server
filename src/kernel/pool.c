@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "pool.h"
 
+#include "ally.h"
 #include "faction.h"
 #include "item.h"
 #include "order.h"

@@ -73,20 +73,8 @@ struct param;
     int distribute(int old, int new_value, int n);
     void init_locale(struct locale *lang);
 
-    int newunitid(void);
     int forbiddenid(int id);
     int newcontainerid(void);
-
-    int getunit(const struct region * r, const struct faction * f, struct unit **uresult);
-
-    int read_unitid(const struct faction *f, const struct region *r);
-
-    int alliedunit(const struct unit *u, const struct faction *f2,
-        int mode);
-    int alliedfaction(const struct plane *pl, const struct faction *f,
-        const struct faction *f2, int mode);
-    int alliedgroup(const struct plane *pl, const struct faction *f,
-        const struct faction *f2, const struct ally *sf, int mode);
 
     struct faction *getfaction(void);
 
@@ -220,9 +208,6 @@ struct param;
     int LongHunger(const struct unit *u);
     int NewbieImmunity(void);
     bool IsImmune(const struct faction *f);
-    int AllianceAuto(void);        /* flags that allied factions get automatically */
-    int AllianceRestricted(void);  /* flags restricted to allied factions */
-    int HelpMask(void);    /* flags restricted to allied factions */
 
     struct order *default_order(const struct locale *lang);
     void set_default_order(int kwd);

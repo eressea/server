@@ -25,6 +25,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "move.h"
 #include "alchemy.h"
 
+#include <kernel/ally.h>
 #include <kernel/building.h>
 #include <kernel/curse.h>
 #include <kernel/faction.h>

@@ -24,6 +24,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "skill.h"
 #include "laws.h"
 
+#include <kernel/ally.h>
 #include <kernel/building.h>
 #include <kernel/curse.h>
 #include <kernel/faction.h>

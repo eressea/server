@@ -18,6 +18,7 @@
 #include "laws.h"
 
 /* kernel includes */
+#include <kernel/ally.h>
 #include <kernel/curse.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>

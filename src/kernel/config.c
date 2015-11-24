@@ -117,89 +117,9 @@ bool IsImmune(const faction * f)
     return !fval(f, FFL_NPC) && f->age < NewbieImmunity();
 }
 
-static int ally_flag(const char *s, int help_mask)
-{
-    if ((help_mask & HELP_MONEY) && strcmp(s, "money") == 0)
-        return HELP_MONEY;
-    if ((help_mask & HELP_FIGHT) && strcmp(s, "fight") == 0)
-        return HELP_FIGHT;
-    if ((help_mask & HELP_GIVE) && strcmp(s, "give") == 0)
-        return HELP_GIVE;
-    if ((help_mask & HELP_GUARD) && strcmp(s, "guard") == 0)
-        return HELP_GUARD;
-    if ((help_mask & HELP_FSTEALTH) && strcmp(s, "stealth") == 0)
-        return HELP_FSTEALTH;
-    if ((help_mask & HELP_TRAVEL) && strcmp(s, "travel") == 0)
-        return HELP_TRAVEL;
-    return 0;
-}
-
 bool ExpensiveMigrants(void)
 {
     return config_get_int("study.expensivemigrants", 0) != 0;
-}
-
-/** Specifies automatic alliance modes.
- * If this returns a value then the bits set are immutable between alliance
- * partners (faction::alliance) and cannot be changed with the HELP command.
- */
-int AllianceAuto(void)
-{
-    int value;
-    const char *str = config_get("alliance.auto");
-    value = 0;
-    if (str != NULL) {
-        char *sstr = _strdup(str);
-        char *tok = strtok(sstr, " ");
-        while (tok) {
-            value |= ally_flag(tok, -1);
-            tok = strtok(NULL, " ");
-        }
-        free(sstr);
-    }
-    return value & HelpMask();
-}
-
-/** Limits the available help modes
- * The bitfield returned by this function specifies the available help modes
- * in this game (so you can, for example, disable HELP GIVE globally).
- * Disabling a status will disable the command sequence entirely (order parsing
- * uses this function).
- */
-int HelpMask(void)
-{
-    const char *str = config_get("rules.help.mask");
-    int rule = 0;
-    if (str != NULL) {
-        char *sstr = _strdup(str);
-        char *tok = strtok(sstr, " ");
-        while (tok) {
-            rule |= ally_flag(tok, -1);
-            tok = strtok(NULL, " ");
-        }
-        free(sstr);
-    }
-    else {
-        rule = HELP_ALL;
-    }
-    return rule;
-}
-
-int AllianceRestricted(void)
-{
-    const char *str = config_get("alliance.restricted");
-    int rule = 0;
-    if (str != NULL) {
-        char *sstr = _strdup(str);
-        char *tok = strtok(sstr, " ");
-        while (tok) {
-            rule |= ally_flag(tok, -1);
-            tok = strtok(NULL, " ");
-        }
-        free(sstr);
-    }
-    rule &= HelpMask();
-    return rule;
 }
 
 int LongHunger(const struct unit *u)
@@ -375,21 +295,6 @@ int max_magicians(const faction * f)
     return m;
 }
 
-static void init_npcfaction(struct attrib *a)
-{
-    a->data.i = 1;
-}
-
-static attrib_type at_npcfaction = {
-    "npcfaction",
-    init_npcfaction,
-    NULL,
-    NULL,
-    a_writeint,
-    a_readint,
-    ATF_UNIQUE
-};
-
 FILE *debug;
 
 /* ----------------------------------------------------------------------- */
@@ -422,98 +327,7 @@ bool unit_has_cursed_item(const unit * u)
     return false;
 }
 
-static int
-autoalliance(const plane * pl, const faction * sf, const faction * f2)
-{
-    if (pl && (pl->flags & PFL_FRIENDLY))
-        return HELP_ALL;
 
-    if (f_get_alliance(sf) != NULL && AllianceAuto()) {
-        if (sf->alliance == f2->alliance)
-            return AllianceAuto();
-    }
-
-    return 0;
-}
-
-static int ally_mode(const ally * sf, int mode)
-{
-    if (sf == NULL)
-        return 0;
-    return sf->status & mode;
-}
-
-int
-alliedgroup(const struct plane *pl, const struct faction *f,
-    const struct faction *f2, const struct ally *sf, int mode)
-{
-    while (sf && sf->faction != f2)
-        sf = sf->next;
-    if (sf == NULL) {
-        mode = mode & autoalliance(pl, f, f2);
-    }
-    mode = ally_mode(sf, mode) | (mode & autoalliance(pl, f, f2));
-    if (AllianceRestricted()) {
-        if (a_findc(f->attribs, &at_npcfaction)) {
-            return mode;
-        }
-        if (a_findc(f2->attribs, &at_npcfaction)) {
-            return mode;
-        }
-        if (f->alliance != f2->alliance) {
-            mode &= ~AllianceRestricted();
-        }
-    }
-    return mode;
-}
-
-int
-alliedfaction(const struct plane *pl, const struct faction *f,
-    const struct faction *f2, int mode)
-{
-    return alliedgroup(pl, f, f2, f->allies, mode);
-}
-
-/* Die Gruppe von Einheit u hat helfe zu f2 gesetzt. */
-int alliedunit(const unit * u, const faction * f2, int mode)
-{
-    ally *sf;
-    int automode;
-
-    assert(u);
-    assert(f2);
-    assert(u->region);            /* the unit should be in a region, but it's possible that u->number==0 (TEMP units) */
-    if (u->faction == f2)
-        return mode;
-    if (u->faction != NULL && f2 != NULL) {
-        plane *pl;
-
-        if (mode & HELP_FIGHT) {
-            if ((u->flags & UFL_DEFENDER) || (u->faction->flags & FFL_DEFENDER)) {
-                faction *owner = region_get_owner(u->region);
-                /* helps the owner of the region */
-                if (owner == f2) {
-                    return HELP_FIGHT;
-                }
-            }
-        }
-
-        pl = rplane(u->region);
-        automode = mode & autoalliance(pl, u->faction, f2);
-
-        if (pl != NULL && (pl->flags & PFL_NOALLIANCES))
-            mode = (mode & automode) | (mode & HELP_GIVE);
-
-        sf = u->faction->allies;
-        if (fval(u, UFL_GROUP)) {
-            const attrib *a = a_findc(u->attribs, &at_group);
-            if (a != NULL)
-                sf = ((group *)a->data.v)->allies;
-        }
-        return alliedgroup(pl, u->faction, f2, sf, mode);
-    }
-    return 0;
-}
 void
 parse(keyword_t kword, int(*dofun) (unit *, struct order *), bool thisorder)
 {
@@ -632,67 +446,6 @@ unit *getnewunit(const region * r, const faction * f)
     return findnewunit(r, f, n);
 }
 
-static int read_newunitid(const faction * f, const region * r)
-{
-    int n;
-    unit *u2;
-    n = getid();
-    if (n == 0)
-        return -1;
-
-    u2 = findnewunit(r, f, n);
-    if (u2)
-        return u2->no;
-
-    return -1;
-}
-
-int read_unitid(const faction * f, const region * r)
-{
-    char token[16];
-    const char *s = gettoken(token, sizeof(token));
-
-    /* Da s nun nur einen string enthaelt, suchen wir ihn direkt in der
-     * paramliste. machen wir das nicht, dann wird getnewunit in s nach der
-     * nummer suchen, doch dort steht bei temp-units nur "temp" drinnen! */
-
-    if (!s || *s == 0 || !isalnum(*s)) {
-        return -1;
-    }
-    if (isparam(s, f->locale, P_TEMP)) {
-        return read_newunitid(f, r);
-    }
-    return atoi36((const char *)s);
-}
-
-int getunit(const region * r, const faction * f, unit **uresult)
-{
-    unit *u2 = NULL;
-    int n = read_unitid(f, r);
-    int result = GET_NOTFOUND;
-
-    if (n == 0) {
-        result = GET_PEASANTS;
-    }
-    else if (n > 0) {
-        u2 = findunit(n);
-        if (u2 != NULL && u2->region == r) {
-            /* there used to be a 'u2->flags & UFL_ISNEW || u2->number>0' condition
-            * here, but it got removed because of a bug that made units disappear:
-            * http://eressea.upb.de/mantis/bug_view_page.php?bug_id=0000172
-            */
-            result = GET_UNIT;
-        }
-        else {
-            u2 = NULL;
-        }
-    }
-    if (uresult) {
-        *uresult = u2;
-    }
-    return result;
-}
-
 /* - Namen der Strukturen -------------------------------------- */
 char *untilde(char *ibuf)
 {
@@ -751,28 +504,6 @@ int forbiddenid(int id)
         if (id == forbid[i])
             return 1;
     return 0;
-}
-
-/* ID's für Einheiten und Zauber */
-int newunitid(void)
-{
-    int random_unit_no;
-    int start_random_no;
-    random_unit_no = 1 + (rng_int() % MAX_UNIT_NR);
-    start_random_no = random_unit_no;
-
-    while (ufindhash(random_unit_no) || dfindhash(random_unit_no)
-        || cfindhash(random_unit_no)
-        || forbiddenid(random_unit_no)) {
-        random_unit_no++;
-        if (random_unit_no == MAX_UNIT_NR + 1) {
-            random_unit_no = 1;
-        }
-        if (random_unit_no == start_random_no) {
-            random_unit_no = (int)MAX_UNIT_NR + 1;
-        }
-    }
-    return random_unit_no;
 }
 
 int newcontainerid(void)

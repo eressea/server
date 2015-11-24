@@ -28,6 +28,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "lighthouse.h"
 
 /* kernel includes */
+#include <kernel/ally.h>
 #include <kernel/alliance.h>
 #include <kernel/connection.h>
 #include <kernel/building.h>
