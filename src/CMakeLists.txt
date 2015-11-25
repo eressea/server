@@ -179,6 +179,7 @@ target_link_libraries(eressea
 )
 
 set(TESTS_SRC
+  monsters.test.c
   donations.test.c
   wormhole.test.c
   alchemy.test.c
