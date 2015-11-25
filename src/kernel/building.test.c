@@ -385,7 +385,7 @@ static void test_btype_defaults(CuTest *tc) {
     test_cleanup();
 }
 
-static void test_building_type_exists(CuTest * tc)
+static void test_buildingtype_exists(CuTest * tc)
 {
     region *r;
     building *b;
@@ -394,16 +394,33 @@ static void test_building_type_exists(CuTest * tc)
     test_cleanup();
     test_create_world();
 
-    btype2 = bt_get_or_create("lighthouse");
-    btype = bt_get_or_create("castle");
+    btype2 = bt_get_or_create("castle");
+    assert(btype2);
+    btype = test_create_buildingtype("Hodor");
+    btype->maxsize = 10;
 
     r = findregion(-1, 0);
     b = new_building(btype, r, default_locale);
-
+    b->size = 10;
     CuAssertPtrNotNull(tc, b);
+
     CuAssertTrue(tc, !buildingtype_exists(r, NULL, false));
-    CuAssertTrue(tc, buildingtype_exists(r, btype, false));
     CuAssertTrue(tc, !buildingtype_exists(r, btype2, false));
+
+    CuAssertTrue(tc, buildingtype_exists(r, btype, false));
+    b->size = 9;
+    fset(b, BLD_WORKING);
+    CuAssertTrue(tc, !buildingtype_exists(r, btype, false));
+    btype->maxsize = 0;
+    freset(b, BLD_WORKING);
+    CuAssertTrue(tc, buildingtype_exists(r, btype, false));
+    btype->maxsize = 10;
+    b->size = 10;
+
+    fset(b, BLD_WORKING);
+    CuAssertTrue(tc, buildingtype_exists(r, btype, true));
+    freset(b, BLD_WORKING);
+    CuAssertTrue(tc, !buildingtype_exists(r, btype, true));
 }
 
 static void test_active_building(CuTest *tc) {
@@ -476,7 +493,7 @@ CuSuite *get_building_suite(void)
     SUITE_ADD_TEST(suite, test_buildingowner_goes_to_same_faction_after_leave);
     SUITE_ADD_TEST(suite, test_buildingowner_goes_to_empty_unit_after_leave);
     SUITE_ADD_TEST(suite, test_active_building);
-    SUITE_ADD_TEST(suite, test_building_type_exists);
+    SUITE_ADD_TEST(suite, test_buildingtype_exists);
     SUITE_ADD_TEST(suite, test_safe_building);
     return suite;
 }
