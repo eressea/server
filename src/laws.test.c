@@ -657,7 +657,7 @@ static void test_unarmed_races_can_guard(CuTest *tc) {
 
     setup_guard(&fix, false);
     rc = rc_get_or_create(fix.u->_race->_name);
-    rc->flags |= RCF_UNARMEDGUARD;
+    fset(rc, RCF_UNARMEDGUARD);
     CuAssertIntEquals(tc, E_GUARD_OK, can_start_guarding(fix.u));
     update_guards();
     CuAssertTrue(tc, fval(fix.u, UFL_GUARD));

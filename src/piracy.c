@@ -10,6 +10,7 @@
 #include <kernel/faction.h>
 #include <kernel/messages.h>
 #include <kernel/order.h>
+#include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
 #include <kernel/terrain.h>
@@ -65,6 +66,8 @@ static attrib *mk_piracy(const faction * pirate, const faction * target,
 }
 
 static bool validate_pirate(unit *u, order *ord) {
+    if (fval(u_race(u), RCF_SWIM | RCF_FLY))
+        return true;
     if (!u->ship) {
         cmistake(u, ord, 144, MSG_MOVE);
         return false;
