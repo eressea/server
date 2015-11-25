@@ -107,7 +107,7 @@ typedef struct follower {
 
 static void
 get_followers(unit * target, region * r, const region_list * route_end,
-follower ** followers)
+    follower ** followers)
 {
     unit *uf;
     for (uf = r->units; uf; uf = uf->next) {
@@ -211,7 +211,7 @@ static int eff_weight(const unit * u)
 
 static void
 get_transporters(const item * itm, int *p_animals, int *p_acap, int *p_vehicles,
-int *p_vcap)
+    int *p_vcap)
 {
     int vehicles = 0, vcap = 0;
     int animals = 0, acap = 0;
@@ -435,7 +435,7 @@ static int canride(unit * u)
 
     if (!(u_race(u)->flags & RCF_HORSE)
         && ((horses == 0 && unicorns == 0)
-        || horses > maxhorses || unicorns > maxunicorns)) {
+            || horses > maxhorses || unicorns > maxunicorns)) {
         return 0;
     }
 
@@ -570,7 +570,7 @@ static void leave_trail(ship * sh, region * from, region_list * route)
 
 static void
 mark_travelthru(unit * u, region * r, const region_list * route,
-const region_list * route_end)
+    const region_list * route_end)
 {
     /* kein travelthru in der letzten region! */
     while (route != route_end) {
@@ -1143,7 +1143,7 @@ static void cycle_route(order * ord, unit * u, int gereist)
              * hier keine normale direction), muss jede PAUSE einzeln
              * herausgefiltert und explizit gesetzt werden */
             if (neworder != obuf) {
-                obuf += strlcat(obuf, " ", sizeof(neworder)-(obuf-neworder));
+                obuf += strlcat(obuf, " ", sizeof(neworder) - (obuf - neworder));
             }
             obuf += strlcat(obuf, LOC(lang, parameters[P_PAUSE]), sizeof(neworder) - (obuf - neworder));
         }
@@ -1273,8 +1273,8 @@ static bool roadto(const region * r, direction_t dir)
     region *r2;
     static const curse_type *roads_ct = NULL;
 
-	assert(r);
-	assert(dir<MAXDIRECTIONS);
+    assert(r);
+    assert(dir < MAXDIRECTIONS);
     if (!r || dir >= MAXDIRECTIONS || dir < 0)
         return false;
     r2 = rconnect(r, dir);
@@ -1505,7 +1505,7 @@ static arg_regions *var_copy_regions(const region_list * begin, int size)
 
     if (size > 0) {
         int i = 0;
-        assert(size>0);
+        assert(size > 0);
         arg_regions *dst =
             (arg_regions *)malloc(sizeof(arg_regions) + sizeof(region *) * (size_t)size);
         dst->nregions = size;
@@ -1779,6 +1779,9 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
     faction *f = u->faction;
     region *next_point = NULL;
     int error;
+    double damage_storm = get_param_flt(global.parameters, "rules.ship.damage_storm", 0.02);
+    bool storms_enabled = get_param_int(global.parameters, "rules.ship.storms", 1) != 0;
+    int lighthouse_div = get_param_int(global.parameters, "rules.storm.lighthouse.divisor", 0);
     const char *token = getstrtoken();
 
     if (routep)
@@ -1830,7 +1833,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
         if (!flying_ship(sh)) {
             int stormchance = 0;
             int reason;
-            bool storms_enabled = get_param_int(global.parameters, "rules.ship.storms", 1) != 0;
+
             if (storms_enabled) {
                 int stormyness;
                 gamedate date;
@@ -1840,9 +1843,8 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
                 /* storms should be the first thing we do. */
                 stormchance = stormyness / shipspeed(sh, u);
                 if (check_leuchtturm(next_point, NULL)) {
-                    int param = get_param_int(global.parameters, "rules.lighthous.stormchancedevisor", 0);
-                    if (param > 0) {
-                        stormchance /= param;
+                    if (lighthouse_div > 0) {
+                        stormchance /= lighthouse_div;
                     }
                     else {
                         stormchance = 0;
@@ -1874,6 +1876,12 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
                         if (storm && rnext != NULL) {
                             ADDMSG(&f->msgs, msg_message("storm", "ship region sink",
                                 sh, current_point, sh->damage >= sh->size * DAMAGE_SCALE));
+
+                            damage_ship(sh, damage_storm);
+                            if (sh->damage >= sh->size * DAMAGE_SCALE) {
+                                /* ship sinks, end journey here */
+                                break;
+                            }
 
                             next_point = rnext;
                             /* these values need to be updated if next_point changes (due to storms): */
@@ -1927,7 +1935,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
                 else {
                     double dmg =
                         get_param_flt(global.parameters, "rules.ship.damage.nolanding",
-                        0.10F);
+                            0.10F);
                     ADDMSG(&f->msgs, msg_message("sailnolanding", "ship region", sh,
                         next_point));
                     damage_ship(sh, dmg);
@@ -2014,7 +2022,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
         /* Das Schiff und alle Einheiten darin werden nun von
          * starting_point nach current_point verschoben */
 
-        /* Verfolgungen melden */
+         /* Verfolgungen melden */
         if (fval(u, UFL_FOLLOWING))
             caught_target(current_point, u);
 
@@ -2051,7 +2059,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
             if (trans) {
                 message *msg =
                     msg_message("harbor_trade", "unit items ship", harbourmaster, trans,
-                    u->ship);
+                        u->ship);
                 add_message(&u->faction->msgs, msg);
                 add_message(&harbourmaster->faction->msgs, msg);
                 msg_release(msg);
@@ -2134,7 +2142,7 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
                         if (u2 == u) {
                             const region_list *route_to =
                                 travel_route(ut, route_begin, route_end, ord,
-                                TRAVEL_TRANSPORTED);
+                                    TRAVEL_TRANSPORTED);
 
                             if (route_to != route_begin) {
                                 get_followers(ut, r, route_to, followers);
@@ -2625,7 +2633,7 @@ void follow_unit(unit * u)
                 if (id <= 0) {
                     /*	cmistake(u, ord, 20, MSG_MOVE); */
                 }
-                else  {
+                else {
                     ship *sh = findship(id);
                     if (sh == NULL || (sh->region != r && hunted_dir(r->attribs, id) == NODIRECTION)) {
                         cmistake(u, ord, 20, MSG_MOVE);
