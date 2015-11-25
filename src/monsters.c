@@ -827,18 +827,6 @@ void plan_monsters(faction * f)
                 }
             }
 
-            if (long_order == NULL && unit_can_study(u)) {
-                /* Einheiten, die Waffenlosen Kampf lernen könnten, lernen es um
-                 * zu bewachen: */
-                if (u_race(u)->bonus[SK_WEAPONLESS] != -99) {
-                    if (effskill(u, SK_WEAPONLESS, 0) < 1) {
-                        long_order =
-                            create_order(K_STUDY, f->locale, "'%s'",
-                            skillname(SK_WEAPONLESS, f->locale));
-                    }
-                }
-            }
-
             if (long_order == NULL) {
                 /* Ab hier noch nicht generalisierte Spezialbehandlungen. */
 
@@ -867,6 +855,18 @@ void plan_monsters(faction * f)
                     break;
                 }
             }
+            if (long_order == NULL && unit_can_study(u)) {
+                /* Einheiten, die Waffenlosen Kampf lernen könnten, lernen es um
+                * zu bewachen: */
+                if (u_race(u)->bonus[SK_WEAPONLESS] != -99) {
+                    if (effskill(u, SK_WEAPONLESS, 0) < 1) {
+                        long_order =
+                            create_order(K_STUDY, f->locale, "'%s'",
+                                skillname(SK_WEAPONLESS, f->locale));
+                    }
+                }
+            }
+
             if (long_order) {
                 addlist(&u->orders, long_order);
             }
