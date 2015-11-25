@@ -118,6 +118,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(give);
     ADD_SUITE(laws);
     ADD_SUITE(market);
+    ADD_SUITE(monsters);
     ADD_SUITE(move);
     ADD_SUITE(piracy);
     ADD_SUITE(stealth);
