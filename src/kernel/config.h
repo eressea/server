@@ -27,11 +27,6 @@ extern "C" {
 #include "types.h"
 struct param;
 
-    /* getunit results: */
-#define GET_UNIT 0
-#define GET_NOTFOUND 1
-#define GET_PEASANTS 2
-
 #define DISPLAYSIZE         8192        /* max. Länge einer Beschreibung, incl trailing 0 */
 #define ORDERSIZE           (DISPLAYSIZE*2) /* max. length of an order */
 #define NAMESIZE            128 /* max. Länge eines Namens, incl trailing 0 */
@@ -50,7 +45,6 @@ struct param;
 #define fset(u, i) ((u)->flags |= (i))
 #define freset(u, i) ((u)->flags &= ~(i))
 
-    int max_magicians(const struct faction * f);
     int findoption(const char *s, const struct locale *lang);
 
     param_t findparam(const char *s, const struct locale *lang);
@@ -73,22 +67,8 @@ struct param;
     int distribute(int old, int new_value, int n);
     void init_locale(struct locale *lang);
 
-    int newunitid(void);
     int forbiddenid(int id);
     int newcontainerid(void);
-
-    int getunit(const struct region * r, const struct faction * f, struct unit **uresult);
-
-    int read_unitid(const struct faction *f, const struct region *r);
-
-    int alliedunit(const struct unit *u, const struct faction *f2,
-        int mode);
-    int alliedfaction(const struct plane *pl, const struct faction *f,
-        const struct faction *f2, int mode);
-    int alliedgroup(const struct plane *pl, const struct faction *f,
-        const struct faction *f2, const struct ally *sf, int mode);
-
-    struct faction *getfaction(void);
 
     char *untilde(char *s);
 
@@ -119,10 +99,7 @@ struct param;
 #define GIVE_DEFAULT (GIVE_SELF|GIVE_PEASANTS|GIVE_LUXURIES|GIVE_HERBS|GIVE_GOODS)
     int rule_give(void);
 
-    bool has_limited_skills(const struct unit *u);
     const struct race *findrace(const char *, const struct locale *);
-
-    bool unit_has_cursed_item(const struct unit *u);
 
     /* grammatik-flags: */
 #define GF_NONE 0
@@ -157,15 +134,10 @@ struct param;
     /* Verhindert Abbau von Resourcen mit RTF_LIMITED */
 #define GUARD_ALL 0xFFFF
 
-    void setstatus(struct unit *u, int status);
-    /* !< sets combatstatus of a unit */
-    int besieged(const struct unit *u);
     int maxworkingpeasants(const struct region *r);
-    bool has_horses(const struct unit *u);
     bool markets_module(void);
     int wage(const struct region *r, const struct faction *f,
         const struct race *rc, int in_turn);
-    int maintenance_cost(const struct unit *u);
 
     const char *datapath(void);
     void set_datapath(const char *path);
@@ -200,8 +172,6 @@ struct param;
         int status;
     } helpmode;
 
-    const char *dbrace(const struct race *rc);
-
     void set_param(struct param **p, const char *key, const char *value);
     const char *get_param(const struct param *p, const char *key);
     int get_param_int(const struct param *p, const char *key, int def);
@@ -220,9 +190,6 @@ struct param;
     int LongHunger(const struct unit *u);
     int NewbieImmunity(void);
     bool IsImmune(const struct faction *f);
-    int AllianceAuto(void);        /* flags that allied factions get automatically */
-    int AllianceRestricted(void);  /* flags restricted to allied factions */
-    int HelpMask(void);    /* flags restricted to allied factions */
 
     struct order *default_order(const struct locale *lang);
     void set_default_order(int kwd);

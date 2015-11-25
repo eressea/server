@@ -29,6 +29,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "lighthouse.h"
 #include "piracy.h"
 
+#include <kernel/ally.h>
 #include <kernel/build.h>
 #include <kernel/building.h>
 #include <kernel/connection.h>

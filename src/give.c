@@ -18,6 +18,7 @@
 #include "laws.h"
 
 /* kernel includes */
+#include <kernel/ally.h>
 #include <kernel/curse.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
@@ -206,6 +207,17 @@ struct order *ord)
     if (error)
         return -1;
     return 0;
+}
+
+static bool unit_has_cursed_item(const unit * u)
+{
+    item *itm = u->items;
+    while (itm) {
+        if (fval(itm->type, ITF_CURSED) && itm->number > 0)
+            return true;
+        itm = itm->next;
+    }
+    return false;
 }
 
 static bool can_give_men(const unit *u, order *ord, message **msg) {

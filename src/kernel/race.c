@@ -301,3 +301,20 @@ variant read_race_reference(struct storage *store)
     assert(result.v != NULL);
     return result;
 }
+
+/** Returns the English name of the race, which is what the database uses.
+*/
+const char *dbrace(const struct race *rc)
+{
+    static char zText[32]; // FIXME: static return value
+    char *zPtr = zText;
+
+    /* the english names are all in ASCII, so we don't need to worry about UTF8 */
+    strlcpy(zText, (const char *)LOC(get_locale("en"), rc_name_s(rc, NAME_SINGULAR)), sizeof(zText));
+    while (*zPtr) {
+        *zPtr = (char)(toupper(*zPtr));
+        ++zPtr;
+    }
+    return zText;
+}
+

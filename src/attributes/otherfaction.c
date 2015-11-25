@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "otherfaction.h"
 
+#include <kernel/ally.h>
 #include <kernel/faction.h>
 #include <kernel/unit.h>
 #include <util/attrib.h>

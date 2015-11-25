@@ -44,7 +44,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "race.h"
 #include "reports.h"
 #include "region.h"
-#include "save.h"
 #include "ship.h"
 #include "skill.h"
 #include "terrain.h"
@@ -85,7 +84,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #endif
 
 /* external libraries */
-#include <storage.h>
 #include <iniparser.h>
 #include <critbit.h>
 
@@ -117,89 +115,9 @@ bool IsImmune(const faction * f)
     return !fval(f, FFL_NPC) && f->age < NewbieImmunity();
 }
 
-static int ally_flag(const char *s, int help_mask)
-{
-    if ((help_mask & HELP_MONEY) && strcmp(s, "money") == 0)
-        return HELP_MONEY;
-    if ((help_mask & HELP_FIGHT) && strcmp(s, "fight") == 0)
-        return HELP_FIGHT;
-    if ((help_mask & HELP_GIVE) && strcmp(s, "give") == 0)
-        return HELP_GIVE;
-    if ((help_mask & HELP_GUARD) && strcmp(s, "guard") == 0)
-        return HELP_GUARD;
-    if ((help_mask & HELP_FSTEALTH) && strcmp(s, "stealth") == 0)
-        return HELP_FSTEALTH;
-    if ((help_mask & HELP_TRAVEL) && strcmp(s, "travel") == 0)
-        return HELP_TRAVEL;
-    return 0;
-}
-
 bool ExpensiveMigrants(void)
 {
     return config_get_int("study.expensivemigrants", 0) != 0;
-}
-
-/** Specifies automatic alliance modes.
- * If this returns a value then the bits set are immutable between alliance
- * partners (faction::alliance) and cannot be changed with the HELP command.
- */
-int AllianceAuto(void)
-{
-    int value;
-    const char *str = config_get("alliance.auto");
-    value = 0;
-    if (str != NULL) {
-        char *sstr = _strdup(str);
-        char *tok = strtok(sstr, " ");
-        while (tok) {
-            value |= ally_flag(tok, -1);
-            tok = strtok(NULL, " ");
-        }
-        free(sstr);
-    }
-    return value & HelpMask();
-}
-
-/** Limits the available help modes
- * The bitfield returned by this function specifies the available help modes
- * in this game (so you can, for example, disable HELP GIVE globally).
- * Disabling a status will disable the command sequence entirely (order parsing
- * uses this function).
- */
-int HelpMask(void)
-{
-    const char *str = config_get("rules.help.mask");
-    int rule = 0;
-    if (str != NULL) {
-        char *sstr = _strdup(str);
-        char *tok = strtok(sstr, " ");
-        while (tok) {
-            rule |= ally_flag(tok, -1);
-            tok = strtok(NULL, " ");
-        }
-        free(sstr);
-    }
-    else {
-        rule = HELP_ALL;
-    }
-    return rule;
-}
-
-int AllianceRestricted(void)
-{
-    const char *str = config_get("alliance.restricted");
-    int rule = 0;
-    if (str != NULL) {
-        char *sstr = _strdup(str);
-        char *tok = strtok(sstr, " ");
-        while (tok) {
-            rule |= ally_flag(tok, -1);
-            tok = strtok(NULL, " ");
-        }
-        free(sstr);
-    }
-    rule &= HelpMask();
-    return rule;
 }
 
 int LongHunger(const struct unit *u)
@@ -246,22 +164,6 @@ helpmode helpmodes[] = {
     ,
     { NULL, 0 }
 };
-
-/** Returns the English name of the race, which is what the database uses.
- */
-const char *dbrace(const struct race *rc)
-{
-    static char zText[32]; // FIXME: static return value
-    char *zPtr = zText;
-
-    /* the english names are all in ASCII, so we don't need to worry about UTF8 */
-    strlcpy(zText, (const char *)LOC(get_locale("en"), rc_name_s(rc, NAME_SINGULAR)), sizeof(zText));
-    while (*zPtr) {
-        *zPtr = (char)(toupper(*zPtr));
-        ++zPtr;
-    }
-    return zText;
-}
 
 const char *parameters[MAXPARAMS] = {
     "LOCALE",
@@ -347,173 +249,8 @@ const char *options[MAXOPTIONS] = {
     "SHOWSKCHANGE"
 };
 
-static void init_maxmagicians(struct attrib *a)
-{
-    a->data.i = MAXMAGICIANS;
-}
-
-static attrib_type at_maxmagicians = {
-    "maxmagicians",
-    init_maxmagicians,
-    NULL,
-    NULL,
-    a_writeint,
-    a_readint,
-    ATF_UNIQUE
-};
-
-int max_magicians(const faction * f)
-{
-    int m = config_get_int("rules.maxskills.magic", MAXMAGICIANS);
-    attrib *a;
-
-    if ((a = a_find(f->attribs, &at_maxmagicians)) != NULL) {
-        m = a->data.i;
-    }
-    if (f->race == get_race(RC_ELF))
-        ++m;
-    return m;
-}
-
-static void init_npcfaction(struct attrib *a)
-{
-    a->data.i = 1;
-}
-
-static attrib_type at_npcfaction = {
-    "npcfaction",
-    init_npcfaction,
-    NULL,
-    NULL,
-    a_writeint,
-    a_readint,
-    ATF_UNIQUE
-};
-
 FILE *debug;
 
-/* ----------------------------------------------------------------------- */
-
-int distribute(int old, int new_value, int n)
-{
-    int i;
-    int t;
-    assert(new_value <= old);
-
-    if (old == 0)
-        return 0;
-
-    t = (n / old) * new_value;
-    for (i = (n % old); i; i--)
-        if (rng_int() % old < new_value)
-            t++;
-
-    return t;
-}
-
-bool unit_has_cursed_item(const unit * u)
-{
-    item *itm = u->items;
-    while (itm) {
-        if (fval(itm->type, ITF_CURSED) && itm->number > 0)
-            return true;
-        itm = itm->next;
-    }
-    return false;
-}
-
-static int
-autoalliance(const plane * pl, const faction * sf, const faction * f2)
-{
-    if (pl && (pl->flags & PFL_FRIENDLY))
-        return HELP_ALL;
-
-    if (f_get_alliance(sf) != NULL && AllianceAuto()) {
-        if (sf->alliance == f2->alliance)
-            return AllianceAuto();
-    }
-
-    return 0;
-}
-
-static int ally_mode(const ally * sf, int mode)
-{
-    if (sf == NULL)
-        return 0;
-    return sf->status & mode;
-}
-
-int
-alliedgroup(const struct plane *pl, const struct faction *f,
-    const struct faction *f2, const struct ally *sf, int mode)
-{
-    while (sf && sf->faction != f2)
-        sf = sf->next;
-    if (sf == NULL) {
-        mode = mode & autoalliance(pl, f, f2);
-    }
-    mode = ally_mode(sf, mode) | (mode & autoalliance(pl, f, f2));
-    if (AllianceRestricted()) {
-        if (a_findc(f->attribs, &at_npcfaction)) {
-            return mode;
-        }
-        if (a_findc(f2->attribs, &at_npcfaction)) {
-            return mode;
-        }
-        if (f->alliance != f2->alliance) {
-            mode &= ~AllianceRestricted();
-        }
-    }
-    return mode;
-}
-
-int
-alliedfaction(const struct plane *pl, const struct faction *f,
-    const struct faction *f2, int mode)
-{
-    return alliedgroup(pl, f, f2, f->allies, mode);
-}
-
-/* Die Gruppe von Einheit u hat helfe zu f2 gesetzt. */
-int alliedunit(const unit * u, const faction * f2, int mode)
-{
-    ally *sf;
-    int automode;
-
-    assert(u);
-    assert(f2);
-    assert(u->region);            /* the unit should be in a region, but it's possible that u->number==0 (TEMP units) */
-    if (u->faction == f2)
-        return mode;
-    if (u->faction != NULL && f2 != NULL) {
-        plane *pl;
-
-        if (mode & HELP_FIGHT) {
-            if ((u->flags & UFL_DEFENDER) || (u->faction->flags & FFL_DEFENDER)) {
-                faction *owner = region_get_owner(u->region);
-                /* helps the owner of the region */
-                if (owner == f2) {
-                    return HELP_FIGHT;
-                }
-            }
-        }
-
-        pl = rplane(u->region);
-        automode = mode & autoalliance(pl, u->faction, f2);
-
-        if (pl != NULL && (pl->flags & PFL_NOALLIANCES))
-            mode = (mode & automode) | (mode & HELP_GIVE);
-
-        sf = u->faction->allies;
-        if (fval(u, UFL_GROUP)) {
-            const attrib *a = a_findc(u->attribs, &at_group);
-            if (a != NULL)
-                sf = ((group *)a->data.v)->allies;
-        }
-        return alliedgroup(pl, u->faction, f2, sf, mode);
-    }
-    return 0;
-}
 void
 parse(keyword_t kword, int(*dofun) (unit *, struct order *), bool thisorder)
 {
@@ -619,78 +356,12 @@ param_t getparam(const struct locale * lang)
     return s ? findparam(s, lang) : NOPARAM;
 }
 
-faction *getfaction(void)
-{
-    return findfaction(getid());
-}
-
 unit *getnewunit(const region * r, const faction * f)
 {
     int n;
     n = getid();
 
     return findnewunit(r, f, n);
-}
-
-static int read_newunitid(const faction * f, const region * r)
-{
-    int n;
-    unit *u2;
-    n = getid();
-    if (n == 0)
-        return -1;
-
-    u2 = findnewunit(r, f, n);
-    if (u2)
-        return u2->no;
-
-    return -1;
-}
-
-int read_unitid(const faction * f, const region * r)
-{
-    char token[16];
-    const char *s = gettoken(token, sizeof(token));
-
-    /* Da s nun nur einen string enthaelt, suchen wir ihn direkt in der
-     * paramliste. machen wir das nicht, dann wird getnewunit in s nach der
-     * nummer suchen, doch dort steht bei temp-units nur "temp" drinnen! */
-
-    if (!s || *s == 0 || !isalnum(*s)) {
-        return -1;
-    }
-    if (isparam(s, f->locale, P_TEMP)) {
-        return read_newunitid(f, r);
-    }
-    return atoi36((const char *)s);
-}
-
-int getunit(const region * r, const faction * f, unit **uresult)
-{
-    unit *u2 = NULL;
-    int n = read_unitid(f, r);
-    int result = GET_NOTFOUND;
-
-    if (n == 0) {
-        result = GET_PEASANTS;
-    }
-    else if (n > 0) {
-        u2 = findunit(n);
-        if (u2 != NULL && u2->region == r) {
-            /* there used to be a 'u2->flags & UFL_ISNEW || u2->number>0' condition
-            * here, but it got removed because of a bug that made units disappear:
-            * http://eressea.upb.de/mantis/bug_view_page.php?bug_id=0000172
-            */
-            result = GET_UNIT;
-        }
-        else {
-            u2 = NULL;
-        }
-    }
-    if (uresult) {
-        *uresult = u2;
-    }
-    return result;
 }
 
 /* - Namen der Strukturen -------------------------------------- */
@@ -727,8 +398,6 @@ building *largestbuilding(const region * r, cmp_building_cb cmp_gt,
 
 /* -- Erschaffung neuer Einheiten ------------------------------ */
 
-extern faction *dfindhash(int i);
-
 static const char *forbidden[] = { "t", "te", "tem", "temp", NULL };
 // PEASANT: "b", "ba", "bau", "baue", "p", "pe", "pea", "peas"
 
@@ -751,28 +420,6 @@ int forbiddenid(int id)
         if (id == forbid[i])
             return 1;
     return 0;
-}
-
-/* ID's für Einheiten und Zauber */
-int newunitid(void)
-{
-    int random_unit_no;
-    int start_random_no;
-    random_unit_no = 1 + (rng_int() % MAX_UNIT_NR);
-    start_random_no = random_unit_no;
-
-    while (ufindhash(random_unit_no) || dfindhash(random_unit_no)
-        || cfindhash(random_unit_no)
-        || forbiddenid(random_unit_no)) {
-        random_unit_no++;
-        if (random_unit_no == MAX_UNIT_NR + 1) {
-            random_unit_no = 1;
-        }
-        if (random_unit_no == start_random_no) {
-            random_unit_no = (int)MAX_UNIT_NR + 1;
-        }
-    }
-    return random_unit_no;
 }
 
 int newcontainerid(void)
@@ -1055,48 +702,12 @@ void kernel_done(void)
     free_attribs();
 }
 
-attrib_type at_germs = {
-    "germs",
-    DEFAULT_INIT,
-    DEFAULT_FINALIZE,
-    DEFAULT_AGE,
-    a_writeshorts,
-    a_readshorts,
-    ATF_UNIQUE
-};
-
-void setstatus(struct unit *u, int status)
-{
-    assert(status >= ST_AGGRO && status <= ST_FLEE);
-    if (u->status != status) {
-        u->status = (status_t)status;
-    }
-}
-
 #ifndef HAVE_STRDUP
 char *_strdup(const char *s)
 {
     return strcpy((char *)malloc(sizeof(char) * (strlen(s) + 1)), s);
 }
 #endif
-
-int besieged(const unit * u)
-{
-    /* belagert kann man in schiffen und burgen werden */
-    return (u && !keyword_disabled(K_BESIEGE)
-        && u->building && u->building->besieged
-        && u->building->besieged >= u->building->size * SIEGEFACTOR);
-}
-
-bool has_horses(const struct unit * u)
-{
-    item *itm = u->items;
-    for (; itm; itm = itm->next) {
-        if (itm->type->flags & ITF_ANIMAL)
-            return true;
-    }
-    return false;
-}
 
 /* Lohn bei den einzelnen Burgstufen für Normale Typen, Orks, Bauern,
  * Modifikation für Städter. */
@@ -1335,19 +946,6 @@ int wage(const region * r, const faction * f, const race * rc, int in_turn)
     return default_wage(r, f, rc, in_turn);
 }
 
-#define MAINTENANCE 10
-int maintenance_cost(const struct unit *u)
-{
-    if (u == NULL)
-        return MAINTENANCE;
-    if (global.functions.maintenance) {
-        int retval = global.functions.maintenance(u);
-        if (retval >= 0)
-            return retval;
-    }
-    return u_race(u)->maintenance * u->number;
-}
-
 int lovar(double xpct_x2)
 {
     int n = (int)(xpct_x2 * 500) + 1;
@@ -1356,82 +954,12 @@ int lovar(double xpct_x2)
     return (rng_int() % n + rng_int() % n) / 1000;
 }
 
-bool has_limited_skills(const struct unit * u)
-{
-    if (has_skill(u, SK_MAGIC) || has_skill(u, SK_ALCHEMY) ||
-        has_skill(u, SK_TACTICS) || has_skill(u, SK_HERBALISM) ||
-        has_skill(u, SK_SPY)) {
-        return true;
-    }
-    else {
-        return false;
-    }
-}
-
-static int read_ext(attrib * a, void *owner, struct storage *store)
-{
-    int len;
-
-    READ_INT(store, &len);
-    store->api->r_bin(store->handle, NULL, (size_t)len);
-    return AT_READ_OK;
-}
-
-
-void attrib_init(void)
-{
-    /* Alle speicherbaren Attribute müssen hier registriert werden */
-    at_register(&at_shiptrail);
-    at_register(&at_familiar);
-    at_register(&at_familiarmage);
-    at_register(&at_clone);
-    at_register(&at_clonemage);
-    at_register(&at_eventhandler);
-    at_register(&at_mage);
-    at_register(&at_countdown);
-    at_register(&at_curse);
-
-    at_register(&at_seenspell);
-
-    /* neue REGION-Attribute */
-    at_register(&at_moveblock);
-    at_register(&at_deathcount);
-    at_register(&at_woodcount);
-
-    /* neue UNIT-Attribute */
-    at_register(&at_siege);
-    at_register(&at_effect);
-    at_register(&at_private);
-
-    at_register(&at_icastle);
-    at_register(&at_guard);
-    at_register(&at_group);
-
-    at_register(&at_building_generic_type);
-    at_register(&at_maxmagicians);
-    at_register(&at_npcfaction);
-
-    /* connection-typen */
-    register_bordertype(&bt_noway);
-    register_bordertype(&bt_fogwall);
-    register_bordertype(&bt_wall);
-    register_bordertype(&bt_illusionwall);
-    register_bordertype(&bt_road);
-
-    register_function((pf_generic)minimum_wage, "minimum_wage");
-
-    at_register(&at_germs);
-
-    at_deprecate("xontormiaexpress", a_readint);    /* required for old datafiles */
-    at_deprecate("lua", read_ext);    /* required for old datafiles */
-}
-
 void kernel_init(void)
 {
     register_reports();
     mt_clear();
-    attrib_init();
     translation_init();
+    register_function((pf_generic)minimum_wage, "minimum_wage");
 }
 
 static order * defaults[MAXLOCALES];

@@ -27,6 +27,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "skill.h"
 #include "monster.h"
 
+#include <kernel/ally.h>
 #include <kernel/alliance.h>
 #include <kernel/build.h>
 #include <kernel/building.h>

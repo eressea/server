@@ -30,6 +30,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "plane.h"
 #include "race.h"
 #include "region.h"
+#include "save.h"
 #include "spellbook.h"
 #include "terrain.h"
 #include "unit.h"
@@ -44,13 +45,15 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/lists.h>
 #include <util/language.h>
 #include <util/log.h>
-#include <quicklist.h>
+#include <util/parser.h>
 #include <util/resolve.h>
 #include <util/rng.h>
 #include <util/variant.h>
 #include <util/unicode.h>
+
 #include <attributes/otherfaction.h>
 
+#include <quicklist.h>
 #include <storage.h>
 
 /* libc includes */
@@ -149,6 +152,11 @@ faction *findfaction(int n)
 {
     faction *f = ffindhash(n);
     return f;
+}
+
+faction *getfaction(void)
+{
+    return findfaction(getid());
 }
 
 void set_show_item(faction * f, const struct item_type *itype)
@@ -769,6 +777,68 @@ int count_maxmigrants(const faction * f)
             int x = (int)(log10(nsize / 50.0) * 20);
             if (x < 0) x = 0;
             return x;
+        }
+    }
+    return 0;
+}
+
+static void init_maxmagicians(struct attrib *a)
+{
+    a->data.i = MAXMAGICIANS;
+}
+
+attrib_type at_maxmagicians = {
+    "maxmagicians",
+    init_maxmagicians,
+    NULL,
+    NULL,
+    a_writeint,
+    a_readint,
+    ATF_UNIQUE
+};
+
+int max_magicians(const faction * f)
+{
+    int m = config_get_int("rules.maxskills.magic", MAXMAGICIANS);
+    attrib *a;
+
+    if ((a = a_find(f->attribs, &at_maxmagicians)) != NULL) {
+        m = a->data.i;
+    }
+    if (f->race == get_race(RC_ELF))
+        ++m;
+    return m;
+}
+
+#define DMAXHASH 7919
+typedef struct dead {
+    struct dead *nexthash;
+    faction *f;
+    int no;
+} dead;
+
+static dead *deadhash[DMAXHASH];
+
+void dhash(int no, faction * f)
+{
+    dead *hash = (dead *)calloc(1, sizeof(dead));
+    dead *old = deadhash[no % DMAXHASH];
+    hash->no = no;
+    hash->f = f;
+    deadhash[no % DMAXHASH] = hash;
+    hash->nexthash = old;
+}
+
+faction *dfindhash(int no)
+{
+    dead *old;
+
+    if (no < 0)
+        return 0;
+
+    for (old = deadhash[no % DMAXHASH]; old; old = old->nexthash) {
+        if (old->no == no) {
+            return old->f;
         }
     }
     return 0;

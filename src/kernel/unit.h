@@ -206,7 +206,6 @@ extern "C" {
 
     /* cleanup code for this module */
     void free_units(void);
-    struct faction *dfindhash(int no);
     void u_setfaction(struct unit *u, struct faction *f);
     void set_number(struct unit *u, int count);
 
@@ -255,6 +254,22 @@ extern "C" {
     char *write_unitname(const struct unit *u, char *buffer, size_t size);
     bool unit_name_equals_race(const struct unit *u);
     bool unit_can_study(const struct unit *u);
+
+    /* getunit results: */
+#define GET_UNIT 0
+#define GET_NOTFOUND 1
+#define GET_PEASANTS 2
+
+    int getunit(const struct region * r, const struct faction * f, struct unit **uresult);
+    int newunitid(void);
+    int read_unitid(const struct faction *f, const struct region *r);
+
+    void setstatus(struct unit *u, int status);
+    /* !< sets combatstatus of a unit */
+    int besieged(const struct unit *u);
+    bool has_horses(const struct unit *u);
+    int maintenance_cost(const struct unit *u);
+    bool has_limited_skills(const struct unit *u);
 
 #ifdef __cplusplus
 }

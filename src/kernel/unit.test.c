@@ -392,6 +392,28 @@ static void test_inside_building(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_limited_skills(CuTest *tc) {
+    unit *u;
+    test_cleanup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    CuAssertIntEquals(tc, false, has_limited_skills(u));
+    set_level(u, SK_ENTERTAINMENT, 1);
+    CuAssertIntEquals(tc, false, has_limited_skills(u));
+    u->skills->id = SK_ALCHEMY;
+    CuAssertIntEquals(tc, true, has_limited_skills(u));
+    u->skills->id = SK_MAGIC;
+    CuAssertIntEquals(tc, true, has_limited_skills(u));
+    u->skills->id = SK_TACTICS;
+    CuAssertIntEquals(tc, true, has_limited_skills(u));
+    u->skills->id = SK_HERBALISM;
+    CuAssertIntEquals(tc, true, has_limited_skills(u));
+    u->skills->id = SK_SPY;
+    CuAssertIntEquals(tc, true, has_limited_skills(u));
+    u->skills->id = SK_TAXING;
+    CuAssertIntEquals(tc, false, has_limited_skills(u));
+    test_cleanup();
+}
+
 CuSuite *get_unit_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -412,5 +434,6 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_age_familiar);
     SUITE_ADD_TEST(suite, test_inside_building);
     SUITE_ADD_TEST(suite, test_produceexp);
+    SUITE_ADD_TEST(suite, test_limited_skills);
     return suite;
 }

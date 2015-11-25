@@ -35,6 +35,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "calendar.h"
 
 /* kernel includes */
+#include <kernel/ally.h>
 #include <kernel/building.h>
 #include <kernel/curse.h>
 #include <kernel/equipment.h>

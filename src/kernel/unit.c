@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "unit.h"
 
+#include "ally.h"
 #include "building.h"
 #include "faction.h"
 #include "group.h"
@@ -54,6 +55,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <util/parser.h>
 #include <util/resolve.h>
 #include <util/rng.h>
 #include <util/variant.h>
@@ -62,6 +64,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* libc includes */
 #include <assert.h>
+#include <ctype.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <string.h>
@@ -178,40 +181,6 @@ unit *ufindhash(int uid)
         return unithash[key];
     }
     return NULL;
-}
-
-#define DMAXHASH 7919
-typedef struct dead {
-    struct dead *nexthash;
-    faction *f;
-    int no;
-} dead;
-
-static dead *deadhash[DMAXHASH];
-
-static void dhash(int no, faction * f)
-{
-    dead *hash = (dead *)calloc(1, sizeof(dead));
-    dead *old = deadhash[no % DMAXHASH];
-    hash->no = no;
-    hash->f = f;
-    deadhash[no % DMAXHASH] = hash;
-    hash->nexthash = old;
-}
-
-faction *dfindhash(int no)
-{
-    dead *old;
-
-    if (no < 0)
-        return 0;
-
-    for (old = deadhash[no % DMAXHASH]; old; old = old->nexthash) {
-        if (old->no == no) {
-            return old->f;
-        }
-    }
-    return 0;
 }
 
 typedef struct buddy {
@@ -1933,5 +1902,143 @@ void produceexp_ex(struct unit *u, skill_t sk, int n, bool (*learn)(unit *, skil
 void produceexp(struct unit *u, skill_t sk, int n)
 {
     produceexp_ex(u, sk, n, learn_skill);
+}
+
+/* ID's für Einheiten und Zauber */
+int newunitid(void)
+{
+    int random_unit_no;
+    int start_random_no;
+    random_unit_no = 1 + (rng_int() % MAX_UNIT_NR);
+    start_random_no = random_unit_no;
+
+    while (ufindhash(random_unit_no) || dfindhash(random_unit_no)
+        || cfindhash(random_unit_no)
+        || forbiddenid(random_unit_no)) {
+        random_unit_no++;
+        if (random_unit_no == MAX_UNIT_NR + 1) {
+            random_unit_no = 1;
+        }
+        if (random_unit_no == start_random_no) {
+            random_unit_no = (int)MAX_UNIT_NR + 1;
+        }
+    }
+    return random_unit_no;
+}
+
+static int read_newunitid(const faction * f, const region * r)
+{
+    int n;
+    unit *u2;
+    n = getid();
+    if (n == 0)
+        return -1;
+
+    u2 = findnewunit(r, f, n);
+    if (u2)
+        return u2->no;
+
+    return -1;
+}
+
+int read_unitid(const faction * f, const region * r)
+{
+    char token[16];
+    const char *s = gettoken(token, sizeof(token));
+
+    /* Da s nun nur einen string enthaelt, suchen wir ihn direkt in der
+    * paramliste. machen wir das nicht, dann wird getnewunit in s nach der
+    * nummer suchen, doch dort steht bei temp-units nur "temp" drinnen! */
+
+    if (!s || *s == 0 || !isalnum(*s)) {
+        return -1;
+    }
+    if (isparam(s, f->locale, P_TEMP)) {
+        return read_newunitid(f, r);
+    }
+    return atoi36((const char *)s);
+}
+
+int getunit(const region * r, const faction * f, unit **uresult)
+{
+    unit *u2 = NULL;
+    int n = read_unitid(f, r);
+    int result = GET_NOTFOUND;
+
+    if (n == 0) {
+        result = GET_PEASANTS;
+    }
+    else if (n > 0) {
+        u2 = findunit(n);
+        if (u2 != NULL && u2->region == r) {
+            /* there used to be a 'u2->flags & UFL_ISNEW || u2->number>0' condition
+            * here, but it got removed because of a bug that made units disappear:
+            * http://eressea.upb.de/mantis/bug_view_page.php?bug_id=0000172
+            */
+            result = GET_UNIT;
+        }
+        else {
+            u2 = NULL;
+        }
+    }
+    if (uresult) {
+        *uresult = u2;
+    }
+    return result;
+}
+
+int besieged(const unit * u)
+{
+    /* belagert kann man in schiffen und burgen werden */
+    return (u && !keyword_disabled(K_BESIEGE)
+        && u->building && u->building->besieged
+        && u->building->besieged >= u->building->size * SIEGEFACTOR);
+}
+
+bool has_horses(const unit * u)
+{
+    item *itm = u->items;
+    for (; itm; itm = itm->next) {
+        if (itm->type->flags & ITF_ANIMAL)
+            return true;
+    }
+    return false;
+}
+
+void setstatus(unit *u, int status)
+{
+    assert(status >= ST_AGGRO && status <= ST_FLEE);
+    if (u->status != status) {
+        u->status = (status_t)status;
+    }
+}
+
+#define MAINTENANCE 10
+int maintenance_cost(const struct unit *u)
+{
+    if (u == NULL)
+        return MAINTENANCE;
+    if (global.functions.maintenance) {
+        int retval = global.functions.maintenance(u);
+        if (retval >= 0)
+            return retval;
+    }
+    return u_race(u)->maintenance * u->number;
+}
+
+static skill_t limited_skills[] = { SK_MAGIC, SK_ALCHEMY, SK_TACTICS, SK_SPY, SK_HERBALISM, NOSKILL };
+bool has_limited_skills(const struct unit * u)
+{
+    int i, j;
+
+    for (i = 0; i != u->skill_size; ++i) {
+        skill *sv = u->skills + i;
+        for (j = 0; limited_skills[j] != NOSKILL; ++j) {
+            if (sv->id == limited_skills[j]) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 

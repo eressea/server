@@ -6,6 +6,7 @@
 #include "keyword.h"
 #include "move.h"
 
+#include <kernel/ally.h>
 #include <kernel/faction.h>
 #include <kernel/messages.h>
 #include <kernel/order.h>
