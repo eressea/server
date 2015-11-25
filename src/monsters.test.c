@@ -101,7 +101,7 @@ static void test_monsters_attack(CuTest * tc)
 
     guard(m, GUARD_TAX);
 
-    set_param(&global.parameters, "rules.monsters.attack_chance", "1");
+    config_set("rules.monsters.attack_chance", "1");
 
     plan_monsters(f2);
 
@@ -122,7 +122,7 @@ static void test_monsters_attack_ocean(CuTest * tc)
     m = test_create_unit(m->faction, r);
     assert(!m->region->land);
 
-    set_param(&global.parameters, "rules.monsters.attack_chance", "1");
+    config_set("rules.monsters.attack_chance", "1");
 
     plan_monsters(f2);
 
@@ -163,7 +163,7 @@ static void test_seaserpent_piracy(CuTest * tc)
     fset(m, UFL_MOVED);
     // fset(rc, RCF_ATTACK_MOVED);
 
-    set_param(&global.parameters, "rules.monsters.attack_chance", "1");
+    config_set("rules.monsters.attack_chance", "1");
 
     plan_monsters(f2);
 
@@ -183,7 +183,7 @@ static void test_monsters_attack_not(CuTest * tc)
     guard(m, GUARD_TAX);
     guard(u, GUARD_TAX);
 
-    set_param(&global.parameters, "rules.monsters.attack_chance", "0");
+    config_set("rules.monsters.attack_chance", "0");
 
     plan_monsters(f2);
 
@@ -210,7 +210,7 @@ static void test_dragon_attacks_the_rich(CuTest * tc)
     assert(i_silver);
     i_change(&u->items, i_silver, 5000);
 
-    set_param(&global.parameters, "rules.monsters.attack_chance", "0.00001");
+    config_set("rules.monsters.attack_chance", "0.00001");
 
     plan_monsters(f2);
 
@@ -231,7 +231,7 @@ static void test_dragon_moves(CuTest * tc)
     rsetmoney(findregion(1, 0), 1000);
 
     set_level(m, SK_WEAPONLESS, 10);
-    set_param(&global.parameters, "rules.monsters.attack_chance", ".0");
+    config_set("rules.monsters.attack_chance", ".0");
     plan_monsters(f2);
 
     CuAssertPtrNotNull(tc, find_order("NACH O", m));
@@ -246,7 +246,7 @@ static void test_monsters_learn_exp(CuTest * tc)
     skill* sk;
 
     create_monsters(&f, &f2, &r, &u, &m);
-    set_param(&global.parameters, "study.from_use", "1");
+    config_set("study.from_use", "1");
 
     u_setrace(u, u_race(m));
     produceexp(u, SK_MELEE, u->number);
