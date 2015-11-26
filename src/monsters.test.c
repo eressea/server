@@ -23,6 +23,7 @@
 #include <string.h>
 
 extern void plan_monsters(struct faction *f);
+extern int monster_attacks(unit * monster, bool respect_buildings, bool rich_only);
 
 static void init_language(void)
 {
@@ -130,8 +131,6 @@ static void test_monsters_attack_ocean(CuTest * tc)
     test_cleanup();
 }
 
-extern int monster_attacks(unit * monster, bool respect_buildings, bool rich_only);
-
 static void test_monsters_waiting(CuTest * tc)
 {
     faction *f, *f2;
@@ -141,7 +140,7 @@ static void test_monsters_waiting(CuTest * tc)
     create_monsters(&f, &f2, &r, &u, &m);
     guard(m, GUARD_TAX);
     fset(m, UFL_ISNEW);
-    // FIXME: monster_attacks(m, false, false);
+    monster_attacks(m, false, false);
     CuAssertPtrEquals(tc, 0, find_order("ATTACKIERE 1", m));
     test_cleanup();
 }
@@ -161,12 +160,11 @@ static void test_seaserpent_piracy(CuTest * tc)
     u_setrace(m, rc = test_create_race("seaserpent"));
     assert(!m->region->land);
     fset(m, UFL_MOVED);
-    // fset(rc, RCF_ATTACK_MOVED);
+    fset(rc, RCF_ATTACK_MOVED);
 
     config_set("rules.monsters.attack_chance", "1");
 
     plan_monsters(f2);
-
     CuAssertPtrNotNull(tc, find_order("PIRATERIE", m));
     CuAssertPtrNotNull(tc, find_order("ATTACKIERE 2", m));
     test_cleanup();
@@ -265,11 +263,11 @@ CuSuite *get_monsters_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_monsters_attack);
     SUITE_ADD_TEST(suite, test_monsters_attack_ocean);
-    DISABLE_TEST(suite, test_seaserpent_piracy);
-    DISABLE_TEST(suite, test_monsters_waiting);
+    SUITE_ADD_TEST(suite, test_seaserpent_piracy);
+    SUITE_ADD_TEST(suite, test_monsters_waiting);
     SUITE_ADD_TEST(suite, test_monsters_attack_not);
     SUITE_ADD_TEST(suite, test_dragon_attacks_the_rich);
-    DISABLE_TEST(suite, test_dragon_moves);
-    DISABLE_TEST(suite, test_monsters_learn_exp);
+    SUITE_ADD_TEST(suite, test_dragon_moves);
+    SUITE_ADD_TEST(suite, test_monsters_learn_exp);
     return suite;
 }
