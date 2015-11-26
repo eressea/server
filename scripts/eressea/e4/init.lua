@@ -1,7 +1,7 @@
 require 'eressea.e3.rules'
 require 'eressea.spells'
 
-eressea.log.debug("rules for game E3")
+eressea.log.debug("rules for game E4")
 
 return {
     require('eressea'),
