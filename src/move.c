@@ -1685,21 +1685,7 @@ unit *owner_buildingtyp(const region * r, const building_type * bt)
     return NULL;
 }
 
-bool
-buildingtype_exists(const region * r, const building_type * bt, bool working)
-{
-    building *b;
-
-    for (b = rbuildings(r); b; b = b->next) {
-        if (b->type == bt && b->size >= bt->maxsize && (!working || fval(b, BLD_WORKING)))
-            return true;
-    }
-
-    return false;
-}
-
 /* Prüft, ob Ablegen von einer Küste in eine der erlaubten Richtungen erfolgt. */
-
 bool can_takeoff(const ship * sh, const region * from, const region * to)
 {
     if (!fval(from->terrain, SEA_REGION) && sh->coast != NODIRECTION) {

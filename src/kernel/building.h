@@ -166,7 +166,10 @@ extern "C" {
     extern void building_set_owner(struct unit * u);
     extern void building_update_owner(struct building * bld);
 
+    bool buildingtype_exists(const struct region *r,
+        const struct building_type *bt, bool working);
     bool building_is_active(const struct building *b);
+    struct building *active_building(const struct unit *u, const struct building_type *btype);
 
 #ifdef WDW_PYRAMID
     extern int wdw_pyramid_level(const struct building *b);

@@ -2418,13 +2418,11 @@ static void breedtrees(unit * u, int raw)
 static void breedhorses(unit * u)
 {
     int n, c, breed = 0;
-    struct building *b = inside_building(u);
-    const struct building_type *btype = building_is_active(b) ? b->type : NULL;
     const struct resource_type *rhorse = get_resourcetype(R_HORSE);
     int horses, effsk;
 
     assert(rhorse && rhorse->itype);
-    if (btype != bt_find("stables")) {
+    if (!active_building(u, bt_find("stables"))) {
         cmistake(u, u->thisorder, 122, MSG_PRODUCE);
         return;
     }
