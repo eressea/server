@@ -176,13 +176,6 @@ static int study_days(unit * student, skill_t sk)
     return student->number * speed;
 }
 
-static building *active_building(const unit *u, const struct building_type *btype) {
-    if (u->building && u->building->type == btype && building_is_active(u->building)) {
-        return inside_building(u);
-    }
-    return 0;
-}
-
 static int
 teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
     bool report, int *academy)
@@ -547,8 +540,6 @@ int study_cmd(unit * u, order * ord)
     skill_t sk;
     int maxalchemy = 0;
     int speed_rule = (study_rule_t)config_get_int("study.speedup", 0);
-    struct building *b = inside_building(u);
-    const struct building_type *btype = building_is_active(b) ? b->type : NULL;
     bool learn_newskills = config_get_int("study.newskills", 1) != 0;
 
     if (!unit_can_study(u)) {
@@ -601,10 +592,7 @@ int study_cmd(unit * u, order * ord)
         return 0;
     }
     /* Akademie: */
-    b = inside_building(u);
-    btype = building_is_active(b) ? b->type : NULL;
-
-    if (btype && btype == bt_find("academy")) {
+    if (active_building(u, bt_find("academy"))) {
         studycost = _max(50, studycost * 2);
     }
 
