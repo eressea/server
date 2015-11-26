@@ -45,6 +45,7 @@ extern "C" {
     struct faction;
     struct order;
     struct message;
+    struct request;
 
     int income(const struct unit *u);
 
@@ -59,6 +60,8 @@ extern "C" {
     int recruit_archetypes(void);
     int give_control_cmd(struct unit *u, struct order *ord);
     void give_control(struct unit * u, struct unit * u2);
+    void tax_cmd(struct unit * u, struct order *ord, struct request ** taxorders);
+    void expandtax(struct region * r, struct request * taxorders);
 
     struct message * check_steal(const struct unit * u, struct order *ord);
 
