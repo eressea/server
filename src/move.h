@@ -69,8 +69,6 @@ extern "C" {
     struct region *to, struct region_list *route);
     int walkingcapacity(const struct unit *u);
     void follow_unit(struct unit *u);
-    bool buildingtype_exists(const struct region *r,
-        const struct building_type *bt, bool working);
     struct unit *owner_buildingtyp(const struct region *r,
         const struct building_type *bt);
     bool move_blocked(const struct unit *u, const struct region *src,

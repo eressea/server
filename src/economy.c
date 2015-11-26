@@ -2418,13 +2418,11 @@ static void breedtrees(unit * u, int raw)
 static void breedhorses(unit * u)
 {
     int n, c, breed = 0;
-    struct building *b = inside_building(u);
-    const struct building_type *btype = building_is_active(b) ? b->type : NULL;
     const struct resource_type *rhorse = get_resourcetype(R_HORSE);
     int horses, effsk;
 
     assert(rhorse && rhorse->itype);
-    if (btype != bt_find("stables")) {
+    if (!active_building(u, bt_find("stables"))) {
         cmistake(u, u->thisorder, 122, MSG_PRODUCE);
         return;
     }
@@ -2921,7 +2919,7 @@ static void expandloot(region * r, request * lootorders)
     }
 }
 
-static void expandtax(region * r, request * taxorders)
+void expandtax(region * r, request * taxorders)
 {
     unit *u;
     unsigned int i;
@@ -2954,6 +2952,11 @@ void tax_cmd(unit * u, struct order *ord, request ** taxorders)
     request *o;
     int max;
     keyword_t kwd;
+    static int taxperlevel = 0;
+
+    if (!taxperlevel) {
+        taxperlevel = config_get_int("taxing.perlevel", 0);
+    }
 
     kwd = init_order(ord);
     assert(kwd == K_TAX);
@@ -2979,6 +2982,12 @@ void tax_cmd(unit * u, struct order *ord, request ** taxorders)
         return;
     }
 
+    if (effskill(u, SK_TAXING, 0) <= 0) {
+        ADDMSG(&u->faction->msgs,
+            msg_feedback(u, ord, "error_no_tax_skill", ""));
+        return;
+    }
+
     max = getint();
 
     if (max <= 0) {
@@ -2988,7 +2997,7 @@ void tax_cmd(unit * u, struct order *ord, request ** taxorders)
         u->wants = _min(income(u), max);
     }
     else {
-        u->wants = _min(n * effskill(u, SK_TAXING, 0) * 20, max);
+        u->wants = _min(n * effskill(u, SK_TAXING, 0) * taxperlevel, max);
     }
 
     u2 = is_guarded(r, u, GUARD_TAX);
