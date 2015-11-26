@@ -2955,7 +2955,7 @@ void tax_cmd(unit * u, struct order *ord, request ** taxorders)
     static int taxperlevel = 0;
 
     if (!taxperlevel) {
-        taxperlevel = get_param_int(global.parameters, "taxing.perlevel", 0);
+        taxperlevel = config_get_int("taxing.perlevel", 0);
     }
 
     kwd = init_order(ord);

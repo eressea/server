@@ -192,7 +192,7 @@ static void test_tax_cmd(CuTest *tc) {
 
 
     test_cleanup();
-    set_param(&global.parameters, "taxing.perlevel", "20");
+    config_set("taxing.perlevel", "20");
     test_create_world();
     f = test_create_faction(NULL);
     r = findregion(0, 0);
