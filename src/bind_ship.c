@@ -192,6 +192,20 @@ static int tolua_ship_get_type(lua_State * L)
     return 1;
 }
 
+static int tolua_ship_get_damage(lua_State * L)
+{
+    ship *self = (ship *)tolua_tousertype(L, 1, 0);
+    lua_pushinteger(L, self->damage);
+    return 1;
+}
+
+static int tolua_ship_set_damage(lua_State * L)
+{
+    ship *self = (ship *)tolua_tousertype(L, 1, 0);
+    self->damage = (int)tolua_tonumber(L, 2, 0);
+    return 0;
+}
+
 void tolua_ship_open(lua_State * L)
 {
     /* register user types */
@@ -217,6 +231,9 @@ void tolua_ship_open(lua_State * L)
             tolua_variable(L, TOLUA_CAST "coast", tolua_ship_get_coast,
                 tolua_ship_set_coast);
             tolua_variable(L, TOLUA_CAST "type", tolua_ship_get_type, 0);
+            tolua_variable(L, TOLUA_CAST "damage", tolua_ship_get_damage,
+                tolua_ship_set_damage);
+
 #ifdef TODO
             .property("weight", &ship_getweight)
                 .property("capacity", &ship_getcapacity)
