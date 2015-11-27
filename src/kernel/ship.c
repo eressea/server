@@ -172,7 +172,7 @@ struct ship *findshipr(const region * r, int n)
 void damage_ship(ship * sh, double percent)
 {
     double damage =
-        DAMAGE_SCALE * sh->type->damage * percent * sh->size + sh->damage;
+        DAMAGE_SCALE * sh->type->damage * percent * sh->size + sh->damage + .000001;
     sh->damage = (int)damage;
 }
 
@@ -468,4 +468,8 @@ void ship_setname(ship * self, const char *name)
 const char *ship_getname(const ship * self)
 {
     return self->name;
+}
+
+int ship_damage_percent(const ship *ship) {
+    return (ship->damage * 100 + DAMAGE_SCALE - 1) / (ship->size * DAMAGE_SCALE);
 }

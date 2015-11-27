@@ -133,6 +133,8 @@ ship_type * test_create_shiptype(const char * name)
     stype->sumskill = 1;
     stype->minskill = 1;
     stype->range = 2;
+    stype->cargo = 1000;
+    stype->damage = 1;
     if (!stype->construction) {
         stype->construction = calloc(1, sizeof(construction));
         stype->construction->maxsize = 5;
@@ -140,6 +142,12 @@ ship_type * test_create_shiptype(const char * name)
         stype->construction->reqsize = 1;
         stype->construction->skill = SK_SHIPBUILDING;
     }
+
+    stype->coasts =
+        (terrain_type **)malloc(sizeof(terrain_type *)*2);
+    stype->coasts[0] = get_or_create_terrain("plain");
+    stype->coasts[1] = NULL;
+
     if (default_locale) {
         locale_setstring(default_locale, name, name);
     }
@@ -225,6 +233,7 @@ void test_create_world(void)
     locale_setstring(loc, keyword(K_RESERVE), "RESERVIEREN");
     locale_setstring(loc, "money", "SILBER");
     init_resources();
+    get_resourcetype(R_SILVER)->itype->weight = 1;
 
     test_create_horse();
 
@@ -236,7 +245,7 @@ void test_create_world(void)
     test_create_itemtype("iron");
     test_create_itemtype("stone");
 
-    t_plain = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION | FLY_INTO);
+    t_plain = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION | SAIL_INTO | FLY_INTO);
     t_plain->size = 1000;
     t_plain->max_road = 100;
     t_ocean = test_create_terrain("ocean", SEA_REGION | SAIL_INTO | SWIM_INTO | FLY_INTO);

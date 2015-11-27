@@ -8,6 +8,8 @@
 extern "C" {
 #endif
 
+    #define ASSERT_DBL_DELTA 0.001
+
     struct region;
     struct unit;
     struct faction;
