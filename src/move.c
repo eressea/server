@@ -808,7 +808,7 @@ static void drifting_ships(region * r)
 
             /* Kapitän bestimmen */
             captain = ship_owner(sh);
-            if (effskill(captain, SK_SAILING, r) < sh->type->cptskill)
+            if (captain && effskill(captain, SK_SAILING, r) < sh->type->cptskill)
                captain = NULL;
 
             /* Kapitän da? Beschädigt? Genügend Matrosen?
