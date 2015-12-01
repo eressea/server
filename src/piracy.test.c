@@ -188,7 +188,7 @@ static void test_piracy_cmd_land_to_land(CuTest * tc) {
 
     piracy_cmd(pirate, ord);
     CuAssertPtrEquals(tc, 0, pirate->thisorder);
-    CuAssertTrue(tc, "no piracy from land to adjacent land region", pirate->region == r);
+    CuAssertTrue(tc, pirate->region == r);
     /* TODO check message
      CuAssertPtrNotNullMsg(tc, "successful PIRACY movement", test_find_messagetype(pirate->faction->msgs, "travel"));
      */
