@@ -836,7 +836,7 @@ void plan_monsters(faction * f)
 
                 switch (old_race(u_race(u))) {
                 case RC_SEASERPENT:
-                    long_order = create_order(K_PIRACY, f->locale, NULL);
+                    // long_order = create_order(K_PIRACY, f->locale, NULL);
                     break;
 #ifdef TODO_ALP
                 case RC_ALP:
