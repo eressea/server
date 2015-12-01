@@ -7,14 +7,32 @@ local function get_direction(locale, token)
 end
 
 function use_snowglobe(u, amount, token)
+    local transform = {
+        ocean = "glacier",
+        firewall = "volcano",
+        volcano = "mountain",
+        desert = "plain"
+    }
     local direction = get_direction(u.faction.locale, token)
     if direction then
         local r = u.region:next(direction)
-        if r and r.terrain=="ocean" then
-            r.terrain = "glacier"
+        if r.units() then
+            -- message "target region not empty"
+            return -1
+        end
+        if r then 
+            local trans = transform[r.terrain]
+            if trans then
+                r.terrain = trans
+            else
+                -- message "invalid terrain"
+            end
+        else
+            -- message "invalid terrain"
         end
     else
-        return -4
+        -- message "need to specify direction"
+        return -1
     end
     return 1
 end
