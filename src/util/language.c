@@ -18,7 +18,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <platform.h>
 #include "language.h"
-#include "language_struct.h"
 
 #include "log.h"
 #include "strings.h"
@@ -30,7 +29,24 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <assert.h>
 #include <critbit.h>
 
-/** importing **/
+#define SMAXHASH 2048
+typedef struct locale_str {
+    unsigned int hashkey;
+    struct locale_str *nexthash;
+    char *str;
+    char *key;
+} locale_str;
+
+typedef struct locale {
+    char *name;
+    unsigned int index;
+    struct locale *next;
+    unsigned int hashkey;
+    struct locale_str *strings[SMAXHASH];
+} locale;
+
+extern locale *default_locale;
+extern locale *locales;
 
 locale *default_locale;
 locale *locales;
