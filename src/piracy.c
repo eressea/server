@@ -148,7 +148,11 @@ void piracy_cmd(unit * u, order *ord)
             region *rc = rconnect(r, dir);
             aff[dir].value = 0;
             aff[dir].target = 0;
-            if (rc && fval(rc->terrain, SAIL_INTO) && can_takeoff(sh, r, rc)) {
+            // TODO this could still result in an illegal movement order (through a wall or whatever)
+            // which will be prevented by move_cmd below
+            if (rc &&
+                ((sh && fval(rc->terrain, SAIL_INTO) && can_takeoff(sh, r, rc))
+                    || (canswim(u) && fval(rc->terrain, SWIM_INTO) && fval(rc->terrain, SEA_REGION)))) {
 
                 for (sh2 = rc->ships; sh2; sh2 = sh2->next) {
                     unit *cap = ship_owner(sh2);
@@ -188,13 +192,13 @@ void piracy_cmd(unit * u, order *ord)
     /* Wenn kein Ziel gefunden, entsprechende Meldung generieren */
     if (target_dir == NODIRECTION) {
         ADDMSG(&u->faction->msgs, msg_message("piratenovictim",
-            "ship region", sh, r));
+            "ship unit region", sh, u, r));
         return;
     }
 
     /* Meldung generieren */
     ADDMSG(&u->faction->msgs, msg_message("piratesawvictim",
-        "ship region dir", sh, r, target_dir));
+        "ship unit region dir", sh, u, r, target_dir));
 
     /* Befehl konstruieren */
     set_order(&u->thisorder, create_order(K_MOVE, u->faction->locale, "%s",

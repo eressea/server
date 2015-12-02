@@ -3269,19 +3269,21 @@
   <message name="piratesawvictim" section="events">
     <type>
       <arg name="ship" type="ship"/>
+      <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
       <arg name="dir" type="direction"/>
     </type>
-    <text locale="de">"Die $ship($ship) in $region($region) entdeckt ein Opfer im $direction($dir)."</text>
-    <text locale="en">"The $ship($ship) in $region($region) made $direction($dir) a target."</text>
+    <text locale="de">"$if($isnull($ship),"$unit($unit)","Die $ship($ship)") in $region($region) entdeckt ein Opfer im $direction($dir)."</text>
+    <text locale="en">"$if($isnull($ship),"$unit($unit)","The $ship($ship)") in $region($region) made $direction($dir) a target."</text>
   </message>
   <message name="piratenovictim" section="events">
     <type>
       <arg name="ship" type="ship"/>
+      <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
     </type>
-    <text locale="de">"Die $ship($ship) in $region($region) kann keine Schiffe aufbringen."</text>
-    <text locale="en">"The $ship($ship) could not capture other ships in $region($region)."</text>
+    <text locale="de">"$if($isnull($ship),"$unit($unit)","Die $ship($ship)") in $region($region) kann keine Schiffe aufbringen."</text>
+    <text locale="en">"$if($isnull($ship),"$unit($unit)","The $ship($ship)") could not capture other ships in $region($region)."</text>
   </message>
   <message name="deorcified" section="events">
     <type>
