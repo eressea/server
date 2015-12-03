@@ -490,9 +490,6 @@ static int resolve_owner(variant id, void *address)
         }
     }
     owner->owner = f;
-    if (f) {
-        owner->alliance = f->alliance;
-    }
     return result;
 }
 
@@ -511,13 +508,20 @@ static void read_owner(struct gamedata *data, region_owner ** powner)
         else {
             owner->flags = 0;
         }
-        if (data->version >= OWNER_2_VERSION) {
+        if (data->version >= OWNER_3_VERSION) {
             int id;
             READ_INT(data->store, &id);
-            owner->alliance = id ? findalliance(id) : NULL;
+            owner->last_owner = id ? findfaction(id) : NULL;
+        } else if (data->version >= OWNER_2_VERSION) {
+            int id;
+            alliance *a;
+            READ_INT(data->store, &id);
+            a = id ? findalliance(id) : NULL;
+            /* don't know which faction, take the leader */
+            owner->last_owner = a? a->_leader : NULL;
         }
         else {
-            owner->alliance = NULL;
+            owner->last_owner = NULL;
         }
         read_reference(owner, data->store, &read_faction_reference, &resolve_owner);
         *powner = owner;
@@ -533,7 +537,7 @@ static void write_owner(struct gamedata *data, region_owner * owner)
         WRITE_INT(data->store, owner->since_turn);
         WRITE_INT(data->store, owner->morale_turn);
         WRITE_INT(data->store, owner->flags);
-        WRITE_INT(data->store, owner->alliance ? owner->alliance->id : 0);
+        write_faction_reference(owner->last_owner, data->store);
         write_faction_reference(owner->owner, data->store);
     }
     else {
