@@ -8,7 +8,7 @@
 
 #include <stdlib.h>
 
-static void test_create_spell(CuTest * tc)
+static void test_create_a_spell(CuTest * tc)
 {
     spell * sp;
 
@@ -48,7 +48,7 @@ static void test_create_spell_with_id(CuTest * tc)
 CuSuite *get_spell_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
-    SUITE_ADD_TEST(suite, test_create_spell);
+    SUITE_ADD_TEST(suite, test_create_a_spell);
     SUITE_ADD_TEST(suite, test_create_duplicate_spell);
     SUITE_ADD_TEST(suite, test_create_spell_with_id);
     return suite;
