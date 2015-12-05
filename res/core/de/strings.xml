@@ -3851,8 +3851,8 @@
       <text locale="en">Icy Dragonbreath</text>
     </string>
     <string name="fiery_dragonbreath">
-      <text locale="de">Eisiger Drachenodem</text>
-      <text locale="en">Icy Dragonbreath</text>
+      <text locale="de">Feuriger Drachenodem</text>
+      <text locale="en">Fiery Dragonbreath</text>
     </string>
     <string name="create_runesword">
       <text locale="de">Erschaffe ein Runenschwert</text>

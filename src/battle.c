@@ -1218,6 +1218,7 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
         return false;
     }
 
+    /* TODO not sure if res could be > 1 here */
     if (magic) {
         da = (int)(_max(da * res, 0));
     }
