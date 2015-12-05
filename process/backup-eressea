@@ -30,5 +30,5 @@ fi
 echo "backup turn $TURN, game $GAME, files: $files"
 tar cjf backup/$TURN.tar.bz2 $files
 echo "uploading game-$GAME/$TURN.tar.bz2"
-curl -n -T backup/$TURN.tar.bz2 https://dav.box.com/dav/Eressea/game-$GAME/$TURN.tar.bz2
-curl -n -T eressea.db https://dav.box.com/dav/Eressea/eressea.db
+curl -s -n -T backup/$TURN.tar.bz2 https://dav.box.com/dav/Eressea/game-$GAME/$TURN.tar.bz2
+curl -s -n -T eressea.db https://dav.box.com/dav/Eressea/eressea.db
