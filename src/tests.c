@@ -38,6 +38,7 @@ struct race *test_create_race(const char *name)
     rc->hitpoints = 20;
     rc->maxaura = 1.0;
     rc->ec_flags |= GETITEM;
+    rc->battle_flags = BF_EQUIPMENT;
     return rc;
 }
 
@@ -194,6 +195,26 @@ void test_create_castorder(castorder *co, unit *u, int level, float force, int r
     lang = get_or_create_locale("en");
     create_castorder(co, u, NULL, NULL, u->region, level, force, range, ord = create_order(K_CAST, lang, ""), par);
     free_order(ord);
+}
+
+spell * test_create_spell(void)
+{
+    spell *sp;
+    sp = create_spell("testspell", 0);
+
+    sp->components = (spell_component *)calloc(4, sizeof(spell_component));
+    sp->components[0].amount = 1;
+    sp->components[0].type = get_resourcetype(R_SILVER);
+    sp->components[0].cost = SPC_FIX;
+    sp->components[1].amount = 1;
+    sp->components[1].type = get_resourcetype(R_AURA);
+    sp->components[1].cost = SPC_LEVEL;
+    sp->components[2].amount = 1;
+    sp->components[2].type = get_resourcetype(R_HORSE);
+    sp->components[2].cost = SPC_LINEAR;
+    sp->syntax = 0;
+    sp->parameter = 0;
+    return sp;
 }
 
 void test_translate_param(const struct locale *lang, param_t param, const char *text) {

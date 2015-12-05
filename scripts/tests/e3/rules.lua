@@ -929,7 +929,6 @@ function test_volcanooutbreak_message()
     assert_not_equal("", msg:render("en"))
 end
 
-
 function test_bug2083()
     local herb_multi = 500 -- from rc_herb_trade()
     local r = region.create(0,0,"plain")
@@ -960,4 +959,9 @@ function test_bug2083()
      end
 
     assert_equal(0, u:get_item("balm"))
+end
+
+function test_no_uruk()
+  local f1 = faction.create("noreply@eressea.de", "uruk", "de")
+  assert_equal(f1.race, "orc")
 end

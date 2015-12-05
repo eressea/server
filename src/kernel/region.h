@@ -75,10 +75,9 @@ extern "C" {
 #define MORALE_AVERAGE 6        /* default average time for morale to change */
 #define MORALE_TRANSFER 2       /* points of morale lost when GIVE COMMAND */
 
-#define OWNER_MOURNING 0x01
     typedef struct region_owner {
         struct faction *owner;
-        struct alliance *alliance;
+        struct faction *last_owner;
         int since_turn;             /* turn the region changed owners */
         int morale_turn;            /* turn when morale has changed most recently */
         int flags;

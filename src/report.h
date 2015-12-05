@@ -20,12 +20,17 @@ extern "C" {
 #endif
 
     struct stream;
+    struct spellbook_entry;
     struct region;
     struct faction;
     void register_nr(void);
     void report_cleanup(void);
     void write_spaces(struct stream *out, size_t num);
     void write_travelthru(struct stream *out, const struct region * r, const struct faction * f);
+
+    void nr_spell_syntax(struct stream *out, struct spellbook_entry * sbe, const struct locale *lang);
+    void nr_spell(struct stream *out, struct spellbook_entry * sbe, const struct locale *lang);
+
 #ifdef __cplusplus
 }
 #endif

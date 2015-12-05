@@ -313,7 +313,7 @@
   <spell name="keeploot" rank="5" index="98" variable="true" combat="3">
     <resource name="aura" amount="1" cost="level"/>
   </spell>
-  <spell name="protective_runes" rank="2" index="99" parameters="kc" ship="true">
+  <spell name="protective_runes" rank="2" index="99" parameters="kc" regiontarget="false" unittarget="false" buildingtarget="true" shiptarget="true" ship="true">
     <resource name="aura" amount="20" cost="fixed"/>
   </spell>
   <spell name="song_resist_magic" rank="2" index="100" far="true" variable="true">
@@ -332,7 +332,7 @@
     <resource name="aura" amount="10" cost="fixed"/>
   </spell>
   <spell name="analyse_object" rank="5" index="105" parameters="kc+" ship="true" variable="true">
-    <resource name="aura" amount="3" cost="level"/>
+    <resource name="aura" amount="3" cost="level" regiontarget="true" unittarget="false" buildingtarget="true" shiptarget="true"/>
   </spell>
   <spell name="destroy_magic" rank="2" index="106" parameters="kc+" los="true" ship="true" far="true" variable="true">
     <resource name="aura" amount="4" cost="level"/>

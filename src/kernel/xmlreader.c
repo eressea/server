@@ -1484,6 +1484,16 @@ static int parse_spells(xmlDocPtr doc)
                 sp->sptyp |= FARCASTING;
             if (xml_bvalue(node, "variable", false))
                 sp->sptyp |= SPELLLEVEL;
+
+            if (xml_bvalue(node, "buildingtarget", false))
+                sp->sptyp |= BUILDINGSPELL;
+            if (xml_bvalue(node, "shiptarget", false))
+                sp->sptyp |= SHIPSPELL;
+            if (xml_bvalue(node, "unittarget", false))
+                sp->sptyp |= UNITSPELL;
+            if (xml_bvalue(node, "regiontarget", false))
+                sp->sptyp |= REGIONSPELL;
+
             k = xml_ivalue(node, "combat", 0);
             if (k >= 0 && k <= 3)
                 sp->sptyp |= modes[k];
@@ -1723,7 +1733,7 @@ static int parse_races(xmlDocPtr doc)
             rc->ec_flags |= ECF_REC_UNLIMITED;
 
         if (xml_bvalue(node, "equipment", false))
-            rc->battle_flags |= BF_EQUIPMENT;
+            rc->battle_flags |= BF_EQUIPMENT; // TODO: invert this flag, so rc_get_or_create gets simpler
         if (xml_bvalue(node, "noblock", false))
             rc->battle_flags |= BF_NOBLOCK;
         if (xml_bvalue(node, "invinciblenonmagic", false))
@@ -1734,8 +1744,8 @@ static int parse_races(xmlDocPtr doc)
             rc->battle_flags |= BF_RES_CUT;
         if (xml_bvalue(node, "resistpierce", false))
             rc->battle_flags |= BF_RES_PIERCE;
-        if (xml_bvalue(node, "canattack", true))
-            rc->battle_flags |= BF_CANATTACK; // TODO: invert this flag, so rc_get_or_create gets simpler
+        if (xml_bvalue(node, "noattack", false))
+            rc->battle_flags |= BF_NO_ATTACK;
 
         for (child = node->children; child; child = child->next) {
             if (strcmp((const char *)child->name, "ai") == 0) {

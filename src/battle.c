@@ -1175,7 +1175,7 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
     const weapon_type *dwtype = NULL;
     const weapon_type *awtype = NULL;
     const weapon *weapon;
-    double res = 0.0;
+    double res = 1.0;
 
     int rda, sk = 0, sd;
     bool magic = false;
@@ -3946,7 +3946,7 @@ static bool start_battle(region * r, battle ** bp)
                         continue;
                     }
 
-                    if ((u_race(u)->battle_flags & BF_CANATTACK) == 0) {
+                    if (u_race(u)->battle_flags & BF_NO_ATTACK) {
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "race_no_attack",
                             "race", u_race(u)));
                         continue;

@@ -74,24 +74,6 @@ void test_spellbooks(CuTest * tc)
     test_cleanup();
 }
 
-static spell * test_magic_create_spell(void)
-{
-    spell *sp;
-    sp = create_spell("testspell", 0);
-
-    sp->components = (spell_component *)calloc(4, sizeof(spell_component));
-    sp->components[0].amount = 1;
-    sp->components[0].type = get_resourcetype(R_SILVER);
-    sp->components[0].cost = SPC_FIX;
-    sp->components[1].amount = 1;
-    sp->components[1].type = get_resourcetype(R_AURA);
-    sp->components[1].cost = SPC_LEVEL;
-    sp->components[2].amount = 1;
-    sp->components[2].type = get_resourcetype(R_HORSE);
-    sp->components[2].cost = SPC_LINEAR;
-    return sp;
-}
-
 void test_pay_spell(CuTest * tc)
 {
     spell *sp;
@@ -107,7 +89,7 @@ void test_pay_spell(CuTest * tc)
     u = test_create_unit(f, r);
     CuAssertPtrNotNull(tc, u);
 
-    sp = test_magic_create_spell();
+    sp = test_create_spell();
     CuAssertPtrNotNull(tc, sp);
 
     set_level(u, SK_MAGIC, 5);
@@ -141,7 +123,7 @@ void test_pay_spell_failure(CuTest * tc)
     u = test_create_unit(f, r);
     CuAssertPtrNotNull(tc, u);
 
-    sp = test_magic_create_spell();
+    sp = test_create_spell();
     CuAssertPtrNotNull(tc, sp);
 
     set_level(u, SK_MAGIC, 5);
