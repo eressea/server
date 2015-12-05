@@ -336,10 +336,13 @@ static void test_spell_syntax(CuTest *tc, char *msg, spell_fixture *spell, char 
     while (linestart && !strstr(linestart, "ZAUBERE"))
         linestart = strtok(NULL, "\n") ;
 
-    CuAssertTrue(tc, (bool) linestart);
+    CuAssertPtrNotNull(tc, linestart);
 
-    while ((newline = strtok(NULL, "\n")))
-        *(newline-1) = '\n';
+    newline = strtok(NULL, "\n");
+    while (newline) {
+        *(newline - 1) = '\n';
+        newline = strtok(NULL, "\n");
+    }
 
     CuAssertStrEquals_Msg(tc, msg, syntax, linestart);
 
