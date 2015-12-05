@@ -1224,8 +1224,9 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
         return false;
     }
 
-    if (magic) {
-        da = (int)(_max(da * res, 0));
+    /* TODO not sure if res could be < 0 here */
+    if (magic && res > 0) {
+        da = (int)(_max(da * (1.0 - res), 0));
     }
 
     if (type != AT_COMBATSPELL && type != AT_SPELL) {
