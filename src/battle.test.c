@@ -281,20 +281,17 @@ static void test_magic_resistance(CuTest *tc)
     battle *b;
     region *r;
     unit *du;
-    weapon_type *wtype;
     armor_type *ashield, *achain;
-    item_type *ibelt, *ishield, *ichain;
+    item_type *ishield, *ichain;
     race *rc;
     double magres = 0.0;
 
     test_cleanup();
     r = test_create_region(0, 0, 0);
-    ibelt = it_get_or_create(rt_get_or_create("trollbelt"));
     ishield = it_get_or_create(rt_get_or_create("shield"));
     ashield = new_armortype(ishield, 0.0, 0.5, 1, ATF_SHIELD);
     ichain = it_get_or_create(rt_get_or_create("chainmail"));
     achain = new_armortype(ichain, 0.0, 0.5, 3, ATF_NONE);
-    wtype = new_weapontype(it_get_or_create(rt_get_or_create("sword")), 0, 0.5, 0, 0, 0, 0, SK_MELEE, 1);
     rc = test_create_race("human");
     du = test_create_unit(test_create_faction(rc), r);
     dt.index = 0;
