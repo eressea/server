@@ -29,8 +29,10 @@ function self.init()
     local tbl = gifts[config.rules]
     if tbl then
         for _, gift in ipairs(tbl) do
-            if turn == gift.turn then
-                give_gifts(gift)
+            if gift.turn then
+                if gift.turn==turn then
+                    give_gifts(gift)
+                end
             elseif gift.key and not get_key(gift.key) then
                 give_gifts(gift)
                 set_key(gift.key)
