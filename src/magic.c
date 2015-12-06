@@ -1173,7 +1173,8 @@ double magic_resistance(unit * target)
         if (btype)
             probability += btype->magresbonus * 0.01;
     }
-    return probability;
+
+    return (probability<0.9) ? probability : 0.9;
 }
 
 /* ------------------------------------------------------------- */

@@ -348,8 +348,9 @@ static void test_magic_resistance(CuTest *tc)
     CuAssertDblEquals_Msg(tc, "race reduction", 0.4, magres, 0.01);
 
     rc->magres = 1.5; /* should not cause negative damage multiplier */
+    CuAssertDblEquals_Msg(tc, "magic resistance is never > 0.9", 0.9, magic_resistance(du), 0.01);
     calculate_armor(dt, 0, 0, &magres);
-    CuAssertDblEquals_Msg(tc, "damage reduction is never < 0", 0.0, magres, 0.01);
+    CuAssertDblEquals_Msg(tc, "damage reduction is never < 0.1", 0.1, magres, 0.01);
 
     free_battle(b);
     test_cleanup();
