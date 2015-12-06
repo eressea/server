@@ -393,14 +393,12 @@ static void test_write_spell_syntax(CuTest *tc) {
     free(spell.sp->syntax);
     spell.sp->syntax = 0;
 
-    /* There are no spells with optional parameters, so we don't force this, for now
     set_parameter(spell, "c?");
     free(spell.sp->syntax);
     spell.sp->syntax = _strdup("hodor");
     check_spell_syntax(tc, "c?", &spell,   "  ZAUBERE \"Testzauber\" [<Hodor>]");
     free(spell.sp->syntax);
     spell.sp->syntax = 0;
-    */
 
     set_parameter(spell, "kc+");
     check_spell_syntax(tc, "kc+", &spell,
