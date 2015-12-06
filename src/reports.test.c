@@ -313,22 +313,17 @@ static void setup_spell_fixture(spell_fixture * spf) {
     spf->sp = test_create_spell();
     spellbook_add(spf->spb, spf->sp, 1);
     spf->sbe = spellbook_get(spf->spb, spf->sp);
-
 }
 
-static void test_spell_syntax(CuTest *tc, char *msg, spell_fixture *spell, char *syntax) {
+static void check_spell_syntax(CuTest *tc, char *msg, spell_fixture *spell, char *syntax) {
     stream strm;
     char buf[1024];
     char *linestart, *newline;
     size_t len;
 
     mstream_init(&strm);
-
-
     nr_spell_syntax(&strm, spell->sbe, spell->lang);
-
     strm.api->rewind(strm.handle);
-
     len = strm.api->read(strm.handle, buf, sizeof(buf));
     buf[len] = '\0';
 
@@ -360,55 +355,53 @@ static void test_write_spell_syntax(CuTest *tc) {
     test_cleanup();
     setup_spell_fixture(&spell);
 
-    test_spell_syntax(tc, "vanilla",  &spell,   "  ZAUBERE \"Testzauber\"");
+    check_spell_syntax(tc, "vanilla",  &spell,   "  ZAUBERE \"Testzauber\"");
 
     spell.sp->sptyp |= FARCASTING;
-    test_spell_syntax(tc, "far",  &spell,   "  ZAUBERE [REGION x y] \"Testzauber\"");
+    check_spell_syntax(tc, "far",  &spell,   "  ZAUBERE [REGION x y] \"Testzauber\"");
 
     spell.sp->sptyp |= SPELLLEVEL;
-    test_spell_syntax(tc, "farlevel",  &spell,   "  ZAUBERE [REGION x y] [STUFE n] \"Testzauber\"");
+    check_spell_syntax(tc, "farlevel",  &spell,   "  ZAUBERE [REGION x y] [STUFE n] \"Testzauber\"");
     spell.sp->sptyp = 0;
 
     set_parameter(spell, "kc");
-    test_spell_syntax(tc, "kc", &spell,   "  ZAUBERE \"Testzauber\" ( REGION | EINHEIT <enr> | SCHIFF <snr> | BURG <bnr> )");
+    check_spell_syntax(tc, "kc", &spell,   "  ZAUBERE \"Testzauber\" ( REGION | EINHEIT <enr> | SCHIFF <snr> | BURG <bnr> )");
 
     spell.sp->sptyp |= BUILDINGSPELL;
-    test_spell_syntax(tc, "kc typed", &spell,   "  ZAUBERE \"Testzauber\" BURG <bnr>");
+    check_spell_syntax(tc, "kc typed", &spell,   "  ZAUBERE \"Testzauber\" BURG <bnr>");
     spell.sp->sptyp = 0;
 
     set_parameter(spell, "b");
-    test_spell_syntax(tc, "b", &spell,   "  ZAUBERE \"Testzauber\" <bnr>");
+    check_spell_syntax(tc, "b", &spell,   "  ZAUBERE \"Testzauber\" <bnr>");
 
     set_parameter(spell, "s");
-    test_spell_syntax(tc, "s", &spell,   "  ZAUBERE \"Testzauber\" <snr>");
+    check_spell_syntax(tc, "s", &spell,   "  ZAUBERE \"Testzauber\" <snr>");
 
     set_parameter(spell, "s+");
-    test_spell_syntax(tc, "s+", &spell,   "  ZAUBERE \"Testzauber\" <snr> [<snr> ...]");
+    check_spell_syntax(tc, "s+", &spell,   "  ZAUBERE \"Testzauber\" <snr> [<snr> ...]");
 
     set_parameter(spell, "u");
-    test_spell_syntax(tc, "u", &spell,   "  ZAUBERE \"Testzauber\" <enr>");
+    check_spell_syntax(tc, "u", &spell,   "  ZAUBERE \"Testzauber\" <enr>");
 
     set_parameter(spell, "r");
-    test_spell_syntax(tc, "r", &spell,   "  ZAUBERE \"Testzauber\" <x> <y>");
+    check_spell_syntax(tc, "r", &spell,   "  ZAUBERE \"Testzauber\" <x> <y>");
 
     set_parameter(spell, "bc");
     free(spell.sp->syntax);
     spell.sp->syntax = _strdup("hodor");
-    test_spell_syntax(tc, "bc hodor", &spell,   "  ZAUBERE \"Testzauber\" <bnr> <Hodor>");
+    check_spell_syntax(tc, "bc hodor", &spell,   "  ZAUBERE \"Testzauber\" <bnr> <Hodor>");
     free(spell.sp->syntax);
     spell.sp->syntax = 0;
 
-    /* There are no spells with optional parameters, so we don't force this, for now
     set_parameter(spell, "c?");
     free(spell.sp->syntax);
     spell.sp->syntax = _strdup("hodor");
-    test_spell_syntax(tc, "c?", &spell,   "  ZAUBERE \"Testzauber\" [<Hodor>]");
+    check_spell_syntax(tc, "c?", &spell,   "  ZAUBERE \"Testzauber\" [<Hodor>]");
     free(spell.sp->syntax);
     spell.sp->syntax = 0;
-    */
 
     set_parameter(spell, "kc+");
-    test_spell_syntax(tc, "kc+", &spell,
+    check_spell_syntax(tc, "kc+", &spell,
         "  ZAUBERE \"Testzauber\" ( REGION | EINHEIT <enr> [<enr> ...] | SCHIFF <snr>\n  [<snr> ...] | BURG <bnr> [<bnr> ...] )");
 
     test_cleanup();

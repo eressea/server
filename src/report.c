@@ -536,11 +536,17 @@ void nr_spell_syntax(stream *out, spellbook_entry * sbe, const struct locale *la
                 locp = LOC(lang, mkname("spellpar", substr));
                 syntaxp = substr + 1;
             }
-            bytes = (int)_snprintf(bufp, size, " <%s>", locp);
+            if (*params == '?') {
+                ++params;
+                bytes = (int)_snprintf(bufp, size, " [<%s>]", locp);
+            }
+            else {
+                bytes = (int)_snprintf(bufp, size, " <%s>", locp);
+            }
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
         } else {
-           log_error("unknown spell parameter %c for spell", cp, sp->sname);
+           log_error("unknown spell parameter %c for spell %s", cp, sp->sname);
         }
     }
     *bufp = 0;
