@@ -234,7 +234,7 @@ static void test_calculate_armor(CuTest * tc)
 
     dt.fighter = setup_fighter(&b, du);
     CuAssertIntEquals_Msg(tc, "default ac", 0, calculate_armor(dt, 0, 0, &magres));
-    CuAssertDblEquals_Msg(tc, "magres unmodified", 0.0, magres, 0.01);
+    CuAssertDblEquals_Msg(tc, "magres unmodified", 1.0, magres, 0.01);
     free_battle(b);
 
     i_change(&du->items, ibelt, 1);
@@ -264,7 +264,7 @@ static void test_calculate_armor(CuTest * tc)
     wtype->flags = WTF_NONE;
 
     CuAssertIntEquals_Msg(tc, "magical attack", 3, calculate_armor(dt, 0, 0, &magres));
-    CuAssertDblEquals_Msg(tc, "magres unmodified", 0.0, magres, 0.01);
+    CuAssertDblEquals_Msg(tc, "magres unmodified", 1.0, magres, 0.01);
 
     ashield->flags |= ATF_LAEN;
     achain->flags |= ATF_LAEN;
@@ -284,7 +284,7 @@ static void test_magic_resistance(CuTest *tc)
     armor_type *ashield, *achain;
     item_type *ishield, *ichain;
     race *rc;
-    double magres = 0.0;
+    double magres;
 
     test_cleanup();
     r = test_create_region(0, 0, 0);
@@ -298,16 +298,11 @@ static void test_magic_resistance(CuTest *tc)
 
     dt.fighter = setup_fighter(&b, du);
     calculate_armor(dt, 0, 0, &magres);
-    CuAssertDblEquals_Msg(tc, "magres unmodified", 0.0, magres, 0.01);
-
-    magres = 1.0;
-    calculate_armor(dt, 0, 0, &magres);
     CuAssertDblEquals_Msg(tc, "no magres bonus", 0.0, magic_resistance(du), 0.01);
-    CuAssertDblEquals_Msg(tc, "no magres bonus", 1.0, magres, 0.01);
+    CuAssertDblEquals_Msg(tc, "no magres reduction", 1.0, magres, 0.01);
 
     ashield->flags |= ATF_LAEN;
     ashield->magres = 0.1;
-    magres = 1.0;
     calculate_armor(dt, 0, 0, &magres);
     free_battle(b);
 
@@ -318,19 +313,25 @@ static void test_magic_resistance(CuTest *tc)
     ashield->flags |= ATF_LAEN;
     ashield->magres = 0.1;
     dt.fighter = setup_fighter(&b, du);
-    magres = 1.0;
     calculate_armor(dt, 0, 0, &magres);
-    CuAssertDblEquals_Msg(tc, "laen bonus", 0.81, magres, 0.01);
+    CuAssertDblEquals_Msg(tc, "laen reduction", 0.81, magres, 0.01);
     free_battle(b);
 
     i_change(&du->items, ishield, -1);
     i_change(&du->items, ichain, -1);
     set_level(du, SK_MAGIC, 2);
     dt.fighter = setup_fighter(&b, du);
-    magres = 1.0;
     calculate_armor(dt, 0, 0, &magres);
-    CuAssertDblEquals_Msg(tc, "magic bonus", 0.1, magic_resistance(du), 0.01);
-    CuAssertDblEquals_Msg(tc, "magic bonus", 0.7, magres, 0.01);
+    CuAssertDblEquals_Msg(tc, "skill bonus", 0.1, magic_resistance(du), 0.01);
+    CuAssertDblEquals_Msg(tc, "skill reduction", 0.9, magres, 0.01);
+    rc->magres = 0.5; /* gets added to skill bonus */
+    calculate_armor(dt, 0, 0, &magres);
+    CuAssertDblEquals_Msg(tc, "race bonus", 0.6, magic_resistance(du), 0.01);
+    CuAssertDblEquals_Msg(tc, "race reduction", 0.4, magres, 0.01);
+
+    rc->magres = 1.5; /* should not cause negative damage multiplier */
+    calculate_armor(dt, 0, 0, &magres);
+    CuAssertDblEquals_Msg(tc, "damage reduction is never < 0", 0.0, magres, 0.01);
 
     free_battle(b);
     test_cleanup();
