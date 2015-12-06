@@ -1136,8 +1136,8 @@ int calculate_armor(troop dt, const weapon_type *dwtype, const weapon_type *awty
     ar += am;
 
     if (magres) {
-        /* magic_resistance gib x% Resistenzbonus zurück */
-        double res = *magres - magic_resistance(du) * 3.0;
+        // calculate damage multiplier for magical damage
+        double res = 1.0 - magic_resistance(du);
 
         if (u_race(du)->battle_flags & BF_EQUIPMENT) {
             /* der Effekt von Laen steigt nicht linear */
@@ -1151,7 +1151,7 @@ int calculate_armor(troop dt, const weapon_type *dwtype, const weapon_type *awty
 
         /* gegen Magie wirkt nur natürliche und magische Rüstung */
         ar = an + am;
-        *magres = res;
+        *magres = res > 0 ? res : 0;
     }
 
     return ar;
