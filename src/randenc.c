@@ -604,6 +604,7 @@ volcano_destruction(region * volcano, region * r, const char *damage)
         unit *u = *up;
         if (u->number) {
             int dead = damage_unit(u, damage, true, false);
+            /* TODO create undead */
             if (dead) {
                 ADDMSG(&u->faction->msgs, msg_message("volcano_dead",
                     "unit region dead", u, volcano, dead));
