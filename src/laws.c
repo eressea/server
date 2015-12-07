@@ -707,23 +707,21 @@ void immigration(void)
             int rp = rpeasants(r) + r->land->newpeasants;
             rsetpeasants(r, _max(0, rp));
         }
-        /* Genereate some (0-2 to 0-6 depending on the income) peasants out of nothing */
-        /*if less then 50 are in the region and there is space and no monster or deamon units in the region */
+        /* Genereate some (0-6 depending on the income) peasants out of nothing */
+        /* if less than 50 are in the region and there is space and no monster or demon units in the region */
         int peasants = rpeasants(r);
-        if (repopulate && r->land && (peasants < repopulate) && maxworkingpeasants(r) >(peasants + 30) * 2)
-        {
+        int income = wage(r, NULL, NULL, turn) - maintenance_cost(NULL);
+        if (repopulate && r->land && (peasants < repopulate) && maxworkingpeasants(r) > (peasants + 30) * 2 && income >= 0) {
             int badunit = 0;
             unit *u;
             for (u = r->units; u; u = u->next) {
-                if (!playerrace(u_race(u)) || u_race(u) == get_race(RC_DAEMON))
-                {
+                if (!playerrace(u_race(u)) || u_race(u) == get_race(RC_DAEMON)) {
                     badunit = 1;
                     break;
                 }
             }
-            if (badunit == 0)
-            {
-                peasants += (int)(rng_double()*(wage(r, NULL, NULL, turn) - 9));
+            if (badunit == 0) {
+                peasants += (int)(rng_double() * (income + 1));
                 rsetpeasants(r, peasants);
             }
         }
