@@ -224,7 +224,7 @@ static void test_tax_cmd(CuTest *tc) {
 
 
 
-    r->land->money = 11;
+    rsetmoney(r, 11);
     expandtax(r, taxorders);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "income"));
     /* taxing is in multiples of 10 */
@@ -232,7 +232,7 @@ static void test_tax_cmd(CuTest *tc) {
     test_clear_messages(u->faction);
     i_change(&u->items, silver, -i_get(u->items, silver));
 
-    r->land->money = 1000;
+    rsetmoney(r, 1000);
     taxorders = 0;
     tax_cmd(u, ord, &taxorders);
     expandtax(r, taxorders);

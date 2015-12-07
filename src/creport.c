@@ -1380,7 +1380,7 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
                     }
                 }
                 if (r->land && r->land->ownership) {
-                    fprintf(F, "%d;morale\n", r->land->morale);
+                    fprintf(F, "%d;morale\n", region_get_morale(r));
                 }
             }
 

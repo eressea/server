@@ -385,9 +385,8 @@ static void paint_info_region(window * wnd, const state * st)
         line++;
         mvwprintw(win, line++, 1, "%s, age %d", r->terrain->_name, r->age);
         if (r->land) {
-            mvwprintw(win, line++, 1, "$:%6d  P:%5d", r->land->money,
-                r->land->peasants);
-            mvwprintw(win, line++, 1, "H:%6d  %s:%5d", r->land->horses,
+            mvwprintw(win, line++, 1, "$:%6d  P:%5d", rmoney(r), rpeasants(r));
+            mvwprintw(win, line++, 1, "H:%6d  %s:%5d", rhorses(r),
                 (r->flags & RF_MALLORN) ? "M" : "T",
                 r->land->trees[1] + r->land->trees[2]);
         }

@@ -98,8 +98,8 @@ static int res_changehp(unit * u, const resource_type * rtype, int delta)
 static int res_changepeasants(unit * u, const resource_type * rtype, int delta)
 {
     assert(rtype != NULL && u->region->land);
-    u->region->land->peasants += delta;
-    return u->region->land->peasants;
+    rsetpeasants(u->region, rpeasants(u->region) + delta);
+    return rpeasants(u->region);
 }
 
 static int golem_factor(const unit *u, const resource_type *rtype) {

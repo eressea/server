@@ -64,7 +64,7 @@ static void test_give_unit_to_peasants(CuTest * tc) {
     rsetpeasants(env.r, 0);
     give_unit(env.src, NULL, NULL);
     CuAssertIntEquals(tc, 0, env.src->number);
-    CuAssertIntEquals(tc, 1, env.r->land->peasants);
+    CuAssertIntEquals(tc, 1, rpeasants(env.r));
     test_cleanup();
 }
 
@@ -251,7 +251,7 @@ static void test_give_peasants(CuTest * tc) {
     msg = disband_men(1, env.src, NULL);
     CuAssertStrEquals(tc, "give_person_peasants", (const char*)msg->parameters[0].v);
     CuAssertIntEquals(tc, 0, env.src->number);
-    CuAssertIntEquals(tc, 1, env.r->land->peasants);
+    CuAssertIntEquals(tc, 1, rpeasants(env.r));
     msg_release(msg);
     test_cleanup();
 }

@@ -595,26 +595,30 @@ bool is_coastregion(region * r)
 
 int rpeasants(const region * r)
 {
-    return ((r)->land ? (r)->land->peasants : 0);
+    return r->land ? r->land->peasants : 0;
 }
 
 void rsetpeasants(region * r, int value)
 {
-    if (r->land) r->land->peasants = value;
-    else assert(value>=0);
-
+    if (r->land) {
+        assert(value >= 0);
+        r->land->peasants = value;
+    } else
+        assert(value == 0);
 }
 
 int rmoney(const region * r)
 {
-    return ((r)->land ? (r)->land->money : 0);
+    return r->land ? r->land->money : 0;
 }
 
 void rsethorses(const region * r, int value)
 {
-    assert(value >= 0);
-    if (r->land)
+    if (r->land) {
+        assert(value >= 0);
         r->land->horses = value;
+    } else
+        assert(value == 0);
 }
 
 int rhorses(const region * r)
@@ -624,9 +628,27 @@ int rhorses(const region * r)
 
 void rsetmoney(region * r, int value)
 {
-    if (r->land) r->land->money = value;
-    else assert(value >= 0);
+    if (r->land) {
+        assert(value >= 0);
+        r->land->money = value;
+    } else
+        assert(value == 0);
 }
+
+short rherbs(const struct region *r)
+{
+    return r->land?r->land->herbs:0;
+}
+
+void rsetherbs(const struct region *r, short value)
+{
+    if (r->land) {
+        assert(value >= 0);
+        r->land->herbs = (short)(value);
+    } else
+        assert(value == 0);
+}
+
 
 void r_setdemand(region * r, const luxury_type * ltype, int value)
 {
@@ -1325,7 +1347,7 @@ faction *update_owners(region * r)
                     else if (f || new_owner->faction != region_get_last_owner(r)) {
                         alliance *al = region_get_alliance(r);
                         if (al && new_owner->faction->alliance == al) {
-                            int morale = _max(0, r->land->morale - MORALE_TRANSFER);
+                            int morale = _max(0, region_get_morale(r) - MORALE_TRANSFER);
                             region_set_morale(r, morale, turn);
                         }
                         else {
