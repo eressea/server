@@ -23,7 +23,7 @@ extern "C" {
   extern unsigned long genrand_int32(void);
 
   /* generates a random number on [0,1)-real-interval */
-  extern double genrand_real2(void);
+  extern double rng_injectable_double(void);
 
   /* generates a random number on [0,0x7fffffff]-interval */
   long genrand_int31(void);
@@ -31,7 +31,7 @@ extern "C" {
 # define rng_init(seed) init_genrand(seed)
 # define rng_int (int)genrand_int31
 # define rng_uint (unsigned int)genrand_int32
-# define rng_double genrand_real2
+# define rng_double rng_injectable_double
 # define RNG_RAND_MAX 0x7fffffff
 #else
 # include <stdlib.h>
