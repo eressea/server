@@ -597,7 +597,8 @@
     <ai splitsize="10000"/>
     <attack type="1" damage="1d6"/>
   </race>
-  <race name="braineater" magres="0.900000" maxaura="1.000000" regaura="1.000000" recruitcost="50000" weight="100" capacity="540" speed="1.000000" hp="20" ac="1" damage="0d0" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" invinciblenonmagic="yes">
+  <race name="braineater" magres="0.900000" maxaura="1.000000"
+  regaura="1.000000" recruitcost="50000" weight="100" capacity="540" speed="1.000000" hp="20" damage="0d0" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" invinciblenonmagic="yes">
     <ai splitsize="500" killpeasants="yes" moverandom="yes" learn="yes"/>
     <function name="name" value="namegeneric"/>
     <function name="describe" value="describe_braineater"/>
