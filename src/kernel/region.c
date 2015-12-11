@@ -640,7 +640,7 @@ int rherbs(const struct region *r)
 void rsetherbs(const struct region *r, int value)
 {
     if (r->land) {
-        assert(value >= 0);
+        assert(value >= 0 && value < (1 << 15));
         r->land->herbs = (short)(value);
     }
 }
@@ -1124,7 +1124,7 @@ void terraform_region(region * r, const terrain_type * terrain)
         }
         if (itype != NULL) {
             rsetherbtype(r, itype);
-            rsetherbs(r, (short)(50 + rng_int() % 31));
+            rsetherbs(r, 50 +  rng_int() % 31);
         }
         else {
             rsetherbtype(r, NULL);

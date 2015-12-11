@@ -692,7 +692,7 @@ growing_herbs(region * r, const int current_season, const int last_weeks_season)
         int i;
         for (i = rherbs(r); i > 0; i--) {
             if (rng_int() % 100 < (100 - rherbs(r)))
-                rsetherbs(r, (short)(rherbs(r) + 1));
+                rsetherbs(r, rherbs(r) + 1);
         }
     }
 }
