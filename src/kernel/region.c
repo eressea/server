@@ -635,12 +635,12 @@ void rsetmoney(region * r, int value)
         assert(value == 0);
 }
 
-short rherbs(const struct region *r)
+int rherbs(const struct region *r)
 {
     return r->land?r->land->herbs:0;
 }
 
-void rsetherbs(const struct region *r, short value)
+void rsetherbs(const struct region *r, int value)
 {
     if (r->land) {
         assert(value >= 0);

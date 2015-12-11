@@ -201,8 +201,8 @@ extern "C" {
     int rhorses(const struct region *r);
     void rsethorses(const struct region *r, int value);
 
-    short rherbs(const struct region *r);
-    void rsetherbs(const struct region *r, short value);
+    int rherbs(const struct region *r);
+    void rsetherbs(const struct region *r, int value);
 
 #define rbuildings(r) ((r)->buildings)
 
