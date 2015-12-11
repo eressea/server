@@ -201,13 +201,14 @@ extern "C" {
     int rhorses(const struct region *r);
     void rsethorses(const struct region *r, int value);
 
+    int rherbs(const struct region *r);
+    void rsetherbs(const struct region *r, int value);
+
 #define rbuildings(r) ((r)->buildings)
 
 #define rherbtype(r) ((r)->land?(r)->land->herbtype:0)
 #define rsetherbtype(r, value) if ((r)->land) (r)->land->herbtype=(value)
 
-#define rherbs(r) ((r)->land?(r)->land->herbs:0)
-#define rsetherbs(r, value) if ((r)->land) ((r)->land->herbs=(short)(value))
 
     bool r_isforest(const struct region *r);
 

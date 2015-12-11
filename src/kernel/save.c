@@ -973,10 +973,7 @@ static region *readregion(struct gamedata *data, int x, int y)
         read_items(data->store, &r->land->items);
         if (data->version >= REGIONOWNER_VERSION) {
             READ_INT(data->store, &n);
-            r->land->morale = (short)n;
-            if (r->land->morale < 0) {
-                r->land->morale = 0;
-            }
+            region_set_morale(r, _max(0, (short) n), -1);
             read_owner(data, &r->land->ownership);
         }
     }
@@ -1039,7 +1036,7 @@ void writeregion(struct gamedata *data, const region * r)
         write_items(data->store, r->land->items);
         WRITE_SECTION(data->store);
 #if RELEASE_VERSION>=REGIONOWNER_VERSION
-        WRITE_INT(data->store, r->land->morale);
+        WRITE_INT(data->store, region_get_morale(r));
         write_owner(data, r->land->ownership);
         WRITE_SECTION(data->store);
 #endif

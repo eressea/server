@@ -23,6 +23,7 @@
 #include <util/language.h>
 #include <util/message.h>
 #include <util/log.h>
+#include <util/rand.h>
 
 #include <CuTest.h>
 
@@ -103,6 +104,8 @@ void test_cleanup(void)
         errno = 0;
         log_error("errno: %d", error);
     }
+
+    random_source_reset();
 }
 
 terrain_type *

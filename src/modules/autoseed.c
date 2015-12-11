@@ -842,7 +842,7 @@ int region_quality(const region * r, region * rn[])
                 /* nobody likes volcanoes */
                 result -= 2000;
             }
-            result += rn[n]->land->peasants;
+            result += rpeasants(rn[n]);
         }
     }
     return result;
@@ -1007,10 +1007,10 @@ int build_island_e3(newfaction ** players, int x, int y, int numfactions, int mi
                 terraform_region(r, newterrain(T_HIGHLAND));
                 prepare_starting_region(r);
             }
-            r->land->money = 50000;   /* 2% = 1000 silver */
+            rsetmoney(r, 50000);   /* 2% = 1000 silver */
         }
         else if (r->land) {
-            r->land->money *= 4;
+            rsetmoney(r, rmoney(r) *4);
         }
     }
     return nfactions;

@@ -77,7 +77,7 @@ void herbsearch(unit * u, int max)
     herbsfound = ntimespprob(effsk * u->number,
         (double)rherbs(r) / 100.0F, -0.01F);
     herbsfound = _min(herbsfound, max);
-    rsetherbs(r, rherbs(r) - herbsfound);
+    rsetherbs(r, (short) (rherbs(r) - herbsfound));
 
     if (herbsfound) {
         produceexp(u, SK_HERBALISM, u->number);

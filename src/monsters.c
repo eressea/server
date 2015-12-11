@@ -657,8 +657,8 @@ static order *plan_dragon(unit * u)
     order *long_order = NULL;
 
     if (ta == NULL) {
-        move |= (r->land == 0 || r->land->peasants == 0);   /* when no peasants, move */
-        move |= (r->land == 0 || r->land->money == 0);      /* when no money, move */
+        move |= (rpeasants(r) == 0);   /* when no peasants, move */
+        move |= (rmoney(r) == 0);      /* when no money, move */
     }
     move |= chance(0.04);         /* 4% chance to change your mind */
 
@@ -950,7 +950,7 @@ void spawn_undead(void)
             continue;
 
         /* Chance 0.1% * chaosfactor */
-        if (r->land && unburied > r->land->peasants / 20
+        if (r->land && unburied > rpeasants(r) / 20
             && rng_int() % 10000 < (100 + 100 * chaosfactor(r))) {
             message *msg;
             unit *u;

@@ -1019,7 +1019,7 @@ static void describe(stream *out, const seen_region * sr, faction * f)
 
         if (r->land->ownership) {
             const char *str =
-                LOC(f->locale, mkname("morale", itoa10(r->land->morale)));
+                LOC(f->locale, mkname("morale", itoa10(region_get_morale(r))));
             bytes = _snprintf(bufp, size, " %s", str);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
@@ -1354,7 +1354,7 @@ static void statistics(stream *out, const region * r, const faction * f)
         }
 
         if (r->land->ownership) {
-            m = msg_message("nr_stat_morale", "morale", r->land->morale);
+            m = msg_message("nr_stat_morale", "morale", region_get_morale(r));
             nr_render(m, f->locale, buf, sizeof(buf), f);
             paragraph(out, buf, 2, 2, 0);
             msg_release(m);

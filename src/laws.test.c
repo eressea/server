@@ -1258,6 +1258,43 @@ static void test_show_without_item(CuTest *tc)
     test_cleanup();
 }
 
+static int low_wage(const region * r, const faction * f, const race * rc, int in_turn) {
+    return 1;
+}
+
+static void test_immigration(CuTest * tc)
+{
+    region *r;
+    double inject[] = { 1 };
+    int (*old_wage)(const region*, const faction*, const race*, int) = global.functions.wage;
+
+    test_cleanup();
+    test_create_world();
+    r = findregion(0, 0);
+
+    rsetpeasants(r, 0);
+    config_set("rules.economy.repopulate_maximum", 0);
+
+    random_source_inject_constant(0);
+
+    immigration();
+    CuAssertIntEquals(tc, 0, rpeasants(r));
+
+    random_source_inject_constant(1);
+
+    immigration();
+    CuAssertIntEquals(tc, 2, rpeasants(r));
+
+    random_source_inject_array(inject, 2);
+
+    global.functions.wage = low_wage;
+    immigration();
+    CuAssertIntEquals(tc, 2, rpeasants(r));
+    global.functions.wage = old_wage;
+
+    test_cleanup();
+}
+
 CuSuite *get_laws_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -1316,6 +1353,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_name_building);
     SUITE_ADD_TEST(suite, test_name_ship);
     SUITE_ADD_TEST(suite, test_show_without_item);
+    SUITE_ADD_TEST(suite, test_immigration);
 
     return suite;
 }
