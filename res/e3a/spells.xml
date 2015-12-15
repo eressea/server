@@ -588,7 +588,7 @@
   <spell name="protective_runes" rank="2" index="99" parameters="kc" regiontarget="false" unittarget="false" buildingtarget="true" shiptarget="true" ship="true">
     <resource name="aura" amount="20" cost="fixed"/>
   </spell>
-  <spell name="analyze_magic" rank="5" index="102" parameters="kc?" los="true" ship="true" variable="true">
+  <spell name="analyze_magic" rank="5" index="102" parameters="kc+" los="true" ship="true" variable="true">
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="destroy_magic" rank="2" index="106" parameters="kc+" los="true" ship="true" far="true" variable="true">
