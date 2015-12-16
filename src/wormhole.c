@@ -56,7 +56,7 @@ static int cmp_age(const void *v1, const void *v2)
 }
 
 typedef struct wormhole_data {
-    building *entry;
+    building *entry; // TODO: remove, use attribute-owner
     region *exit;
 } wormhole_data;
 
@@ -70,13 +70,14 @@ static void wormhole_done(struct attrib *a)
     free(a->data.v);
 }
 
-static int wormhole_age(struct attrib *a)
+static int wormhole_age(struct attrib *a, void *owner)
 {
     wormhole_data *data = (wormhole_data *)a->data.v;
     int maxtransport = data->entry->size;
     region *r = data->entry->region;
     unit *u = r->units;
 
+    unused_arg(owner);
     for (; u != NULL && maxtransport != 0; u = u->next) {
         if (u->building == data->entry) {
             message *m = NULL;

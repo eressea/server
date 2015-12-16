@@ -331,12 +331,12 @@ static void test_age_familiar(CuTest *tc) {
     CuAssertIntEquals(tc, true, create_newfamiliar(mag, fam));
     CuAssertPtrEquals(tc, fam, get_familiar(mag));
     CuAssertPtrEquals(tc, mag, get_familiar_mage(fam));
-    a_age(&fam->attribs);
-    a_age(&mag->attribs);
+    a_age(&fam->attribs, fam);
+    a_age(&mag->attribs, mag);
     CuAssertPtrEquals(tc, fam, get_familiar(mag));
     CuAssertPtrEquals(tc, mag, get_familiar_mage(fam));
     set_number(fam, 0);
-    a_age(&mag->attribs);
+    a_age(&mag->attribs, mag);
     CuAssertPtrEquals(tc, 0, get_familiar(mag));
     test_cleanup();
 }

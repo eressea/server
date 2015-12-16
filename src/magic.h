@@ -208,7 +208,7 @@ extern "C" {
 
     typedef struct icastle_data {
         const struct building_type *type;
-        struct building *building;  /* reverse pointer to dissolve the object */
+        struct building *building;  // TODO: remove, use owner argument
         int time;
     } icastle_data;
 

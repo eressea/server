@@ -45,8 +45,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define HORNDURATION 3
 #define HORNIMMUNITY 30
 
-static int age_peaceimmune(attrib * a)
+static int age_peaceimmune(attrib * a, void *owner)
 {
+    unused_arg(owner);
     return (--a->data.i > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
 }
 

@@ -145,17 +145,19 @@ static void
 a_writeicastle(const attrib * a, const void *owner, struct storage *store)
 {
     icastle_data *data = (icastle_data *)a->data.v;
+    assert(owner == data->building);
     WRITE_TOK(store, data->type->_name);
     WRITE_INT(store, data->building->no);
     WRITE_INT(store, data->time);
 }
 
-static int a_ageicastle(struct attrib *a)
+static int a_ageicastle(struct attrib *a, void *owner)
 {
     icastle_data *data = (icastle_data *)a->data.v;
     if (data->time <= 0) {
-        building *b = data->building;
+        building *b = data->building; // TODO: use owner
         region *r = b->region;
+        assert(owner == b);
         ADDMSG(&r->msgs, msg_message("icastle_dissolve", "building", b));
         /* remove_building lets units leave the building */
         remove_building(&r->buildings, b);
@@ -2384,10 +2386,11 @@ static int read_magician(attrib * a, void *owner, struct storage *store)
     return AT_READ_OK;
 }
 
-static int age_unit(attrib * a)
+static int age_unit(attrib * a, void *owner)
 /* if unit is gone or dead, remove the attribute */
 {
     unit *u = (unit *)a->data.v;
+    unused_arg(owner);
     return (u != NULL && u->number > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
 }
 

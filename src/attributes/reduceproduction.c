@@ -20,15 +20,26 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "reduceproduction.h"
 #include <kernel/save.h>
+#include <kernel/region.h>
+#include <kernel/messages.h>
+#include <util/message.h>
 #include <util/attrib.h>
+#include <assert.h>
 
-static int age_reduceproduction(attrib * a)
+static int age_reduceproduction(attrib * a, void *owner)
 {
+    region * r = (region *)owner;
     int reduce = 100 - (5 * --a->data.sa[1]);
-    if (reduce < 10)
+    assert(r);
+    if (reduce < 10) {
         reduce = 10;
+    }
     a->data.sa[0] = (short)reduce;
-    return (a->data.sa[1] > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
+    if (a->data.sa[1] > 0) {
+        ADDMSG(&r->msgs, msg_message("reduceproduction", ""));
+        return AT_AGE_KEEP;
+    }
+    return AT_AGE_REMOVE;
 }
 
 attrib_type at_reduceproduction = {

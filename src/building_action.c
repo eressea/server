@@ -28,12 +28,12 @@ without prior permission by the authors of Eressea.
 #include <string.h>
 
 typedef struct building_action {
-    struct building *b;
+    struct building *b; // TODO: remove, use attribute-owner?
     char *fname;
     char *param;
 } building_action;
 
-static int lc_age(struct attrib *a)
+static int lc_age(struct attrib *a, void *owner)
 {
     building_action *data = (building_action *)a->data.v;
     const char *fname = data->fname;
@@ -42,6 +42,7 @@ static int lc_age(struct attrib *a)
     int result = -1;
 
     assert(b != NULL);
+    assert(owner == b);
     if (fname != NULL) {
         lua_State *L = (lua_State *)global.vm_state;
 

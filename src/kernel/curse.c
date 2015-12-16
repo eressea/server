@@ -112,11 +112,12 @@ void curse_init(attrib * a)
     a->data.v = calloc(1, sizeof(curse));
 }
 
-int curse_age(attrib * a)
+int curse_age(attrib * a, void *owner)
 {
     curse *c = (curse *)a->data.v;
     int result = 0;
 
+    unused_arg(owner);
     c_clearflag(c, CURSE_ISNEW);
 
     if (c_flags(c) & CURSE_NOAGE) {

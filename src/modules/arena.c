@@ -212,11 +212,12 @@ order * ord)
 /**
  * Tempel der Schreie, Demo-Gebäude **/
 
-static int age_hurting(attrib * a)
+static int age_hurting(attrib * a, void *owner)
 {
     building *b = (building *)a->data.v;
     unit *u;
     int active = 0;
+    assert(owner == b);
     if (b == NULL)
         return AT_AGE_REMOVE;
     for (u = b->region->units; u; u = u->next) {

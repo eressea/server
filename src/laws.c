@@ -3087,7 +3087,7 @@ static building *age_building(building * b)
         }
     }
 
-    a_age(&b->attribs);
+    a_age(&b->attribs, b);
     handle_event(b->attribs, "timer", b);
 
     if (b->type->age) {
@@ -3099,7 +3099,7 @@ static building *age_building(building * b)
 
 static void age_region(region * r)
 {
-    a_age(&r->attribs);
+    a_age(&r->attribs, r);
     handle_event(r->attribs, "timer", r);
 
     if (!r->land)
@@ -3144,7 +3144,7 @@ static void ageing(void)
 
     /* Factions */
     for (f = factions; f; f = f->next) {
-        a_age(&f->attribs);
+        a_age(&f->attribs, f);
         handle_event(f->attribs, "timer", f);
     }
 
@@ -3159,7 +3159,7 @@ static void ageing(void)
         /* Einheiten */
         for (up = &r->units; *up;) {
             unit *u = *up;
-            a_age(&u->attribs);
+            a_age(&u->attribs, u);
             if (u == *up)
                 handle_event(u->attribs, "timer", u);
             if (u == *up)
@@ -3169,7 +3169,7 @@ static void ageing(void)
         /* Schiffe */
         for (sp = &r->ships; *sp;) {
             ship *s = *sp;
-            a_age(&s->attribs);
+            a_age(&s->attribs, s);
             if (s == *sp)
                 handle_event(s->attribs, "timer", s);
             if (s == *sp)
