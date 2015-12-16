@@ -42,7 +42,7 @@ static void test_good_dreams(CuTest *tc) {
     CuAssertTrue(tc, curse && curse->duration > 1);
     CuAssertTrue(tc, curse->effect == 1);
 
-    a_age(&r->attribs);
+    a_age(&r->attribs, r);
     CuAssertIntEquals_Msg(tc, "good dreams give +1 to allies", 1, get_modifier(u1, SK_MELEE, 11, r, false));
     CuAssertIntEquals_Msg(tc, "good dreams have no effect on non-allies", 0, get_modifier(u2, SK_MELEE, 11, r, false));
     free_castorder(&co);
@@ -67,7 +67,7 @@ static void test_dreams(CuTest *tc) {
 
     sp_gooddreams(&co);
     sp_baddreams(&co);
-    a_age(&r->attribs);
+    a_age(&r->attribs, r);
     CuAssertIntEquals_Msg(tc, "good dreams in same region as bad dreams", 1, get_modifier(u1, SK_MELEE, 11, r, false));
     CuAssertIntEquals_Msg(tc, "bad dreams in same region as good dreams", -1, get_modifier(u2, SK_MELEE, 11, r, false));
 
@@ -98,7 +98,7 @@ static void test_bad_dreams(CuTest *tc) {
     CuAssertTrue(tc, curse && curse->duration > 1);
     CuAssertTrue(tc, curse->effect == -1);
 
-    a_age(&r->attribs);
+    a_age(&r->attribs, r);
     CuAssertIntEquals_Msg(tc, "bad dreams have no effect on allies", 0, get_modifier(u1, SK_MELEE, 11, r, false));
     CuAssertIntEquals_Msg(tc, "bad dreams give -1 to non-allies", -1, get_modifier(u2, SK_MELEE, 11, r, false));
 

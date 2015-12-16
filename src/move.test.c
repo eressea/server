@@ -287,9 +287,9 @@ static void test_age_trails(CuTest *tc) {
     move_ship(sh, r1, r2, route);
 
     CuAssertPtrNotNull(tc, r1->attribs);
-    a_age(&r1->attribs);
+    a_age(&r1->attribs, r1);
     CuAssertPtrNotNull(tc, r1->attribs);
-    a_age(&r1->attribs);
+    a_age(&r1->attribs, r1);
     CuAssertPtrEquals(tc, 0, r1->attribs);
     free_regionlist(route);
     test_cleanup();
