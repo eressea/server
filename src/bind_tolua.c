@@ -8,6 +8,7 @@
 #include "log.pkg.c"
 #include "process.pkg.c"
 #include "settings.pkg.c"
+#pragma warning(pop)
 
 void tolua_bind_open(lua_State * L) {
     tolua_eressea_open(L);
