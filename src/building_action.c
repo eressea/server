@@ -93,9 +93,7 @@ lc_write(const struct attrib *a, const void *owner, struct storage *store)
     const char *fname = data->fname;
     const char *fparam = data->param;
 
-#if RELEASE_VERSION < ATTRIBOWNER_VERSION
-    write_building_reference((building *)owner, store);
-#endif
+    unused_arg(owner);
     WRITE_TOK(store, fname);
     WRITE_TOK(store, fparam ? fparam : NULLSTRING);
 }

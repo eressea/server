@@ -206,11 +206,8 @@ extern "C" {
     extern struct attrib_type at_reportspell;
     extern struct attrib_type at_icastle;
 
-    typedef struct icastle_data {
-        const struct building_type *type;
-        struct building *building;  // TODO: remove, use owner argument
-        int time;
-    } icastle_data;
+    void make_icastle(struct building *b, const struct building_type *btype, int timeout);
+    const struct building_type *icastle_type(const struct attrib *a);
 
     /* ------------------------------------------------------------- */
     /* Kommentare:

@@ -124,19 +124,20 @@ static double MagicPower(double force)
     return 0;
 }
 
+typedef struct icastle_data {
+    const struct building_type *type;
+    int time;
+} icastle_data;
+
 static int a_readicastle(attrib * a, void *owner, struct storage *store)
 {
     icastle_data *data = (icastle_data *)a->data.v;
-    variant bno;
     char token[32];
     READ_TOK(store, token, sizeof(token));
-    READ_INT(store, &bno.i);
-    READ_INT(store, &data->time);
-    data->building = findbuilding(bno.i);
-    if (!data->building) {
-        /* this shouldn't happen, but just in case it does: */
-        ur_add(bno, &data->building, resolve_building);
+    if (global.data_version < ATTRIBOWNER_VERSION) {
+        READ_INT(store, NULL);
     }
+    READ_INT(store, &data->time);
     data->type = bt_find(token);
     return AT_READ_OK;
 }
@@ -145,9 +146,8 @@ static void
 a_writeicastle(const attrib * a, const void *owner, struct storage *store)
 {
     icastle_data *data = (icastle_data *)a->data.v;
-    assert(owner == data->building);
+    unused_arg(owner);
     WRITE_TOK(store, data->type->_name);
-    WRITE_INT(store, data->building->no);
     WRITE_INT(store, data->time);
 }
 
@@ -155,7 +155,7 @@ static int a_ageicastle(struct attrib *a, void *owner)
 {
     icastle_data *data = (icastle_data *)a->data.v;
     if (data->time <= 0) {
-        building *b = data->building; // TODO: use owner
+        building *b = (building *)owner;
         region *r = b->region;
         assert(owner == b);
         ADDMSG(&r->msgs, msg_message("icastle_dissolve", "building", b));
@@ -187,6 +187,17 @@ attrib_type at_icastle = {
     a_readicastle
 };
 
+void make_icastle(building *b, const building_type *btype, int timeout) {
+    attrib *a = a_add(&b->attribs, a_new(&at_icastle));
+    icastle_data *data = (icastle_data *)a->data.v;
+    data->type = btype;
+    data->time = timeout;
+}
+
+const building_type *icastle_type(const struct attrib *a) {
+    icastle_data *icastle = (icastle_data *)a->data.v;
+    return icastle->type;
+}
 /* ------------------------------------------------------------- */
 
 extern int dice(int count, int value);
