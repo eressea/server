@@ -44,6 +44,11 @@
     </type>
   </message>
   
+  <message name="reduced_production">
+    <text locale="de">Die Region ist verwüstet, der Boden karg.</text>
+    <text locale="en">The region is ravaged, the ground infertile.</text>
+  </message>
+
   <message name="force_leave_ship" section="events">
     <type>
       <arg name="unit" type="unit"/>
