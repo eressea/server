@@ -24,8 +24,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <storage.h>
 
-static int age_moved(attrib * a)
+static int age_moved(attrib * a, void *owner)
 {
+    unused_arg(owner);
     --a->data.i;
     return a->data.i > 0;
 }

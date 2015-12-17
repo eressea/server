@@ -4477,13 +4477,11 @@ int sp_icastle(castorder * co)
 {
     building *b;
     const building_type *type;
-    attrib *a;
     region *r = co_get_region(co);
     unit *mage = co->magician.u;
     int cast_level = co->level;
     double power = co->force;
     spellparameter *pa = co->par;
-    icastle_data *data;
     const char *bname;
     message *msg;
     const building_type *bt_illusion = bt_find("illusioncastle");
@@ -4519,12 +4517,7 @@ int sp_icastle(castorder * co)
     building_setname(b, bname);
 
     /* TODO: Auf timeout und action_destroy umstellen */
-    a = a_add(&b->attribs, a_new(&at_icastle));
-    data = (icastle_data *)a->data.v;
-    data->type = type;
-    data->building = b;
-    data->time =
-        2 + (rng_int() % (int)(power)+1) * (rng_int() % (int)(power)+1);
+    make_icastle(b, type, 2 + (rng_int() % (int)(power)+1) * (rng_int() % (int)(power)+1));
 
     if (mage->region == r) {
         if (leave(mage, false)) {

@@ -52,7 +52,7 @@ extern "C" {
         const char *name;
         void(*initialize) (struct attrib *);
         void(*finalize) (struct attrib *);
-        int(*age) (struct attrib *);
+        int(*age) (struct attrib *, void *owner);
         /* age returns 0 if the attribute needs to be removed, !=0 otherwise */
         void(*write) (const struct attrib *, const void *owner, struct storage *);
         int(*read) (struct attrib *, void *owner, struct storage *);       /* return AT_READ_OK on success, AT_READ_FAIL if attrib needs removal */
@@ -74,7 +74,7 @@ extern "C" {
     extern void a_removeall(attrib ** a, const attrib_type * at);
     extern attrib *a_new(const attrib_type * at);
 
-    extern int a_age(attrib ** attribs);
+    extern int a_age(attrib ** attribs, void *owner);
     extern int a_read(struct storage *store, attrib ** attribs, void *owner);
     extern void a_write(struct storage *store, const attrib * attribs,
         const void *owner);

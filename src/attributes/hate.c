@@ -28,8 +28,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <storage.h>
 
-static int verify_hate(attrib * a)
+static int verify_hate(attrib * a, void *owner)
 {
+    unused_arg(owner);
     if (a->data.v == NULL) {
         return 0;
     }

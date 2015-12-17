@@ -238,9 +238,10 @@ static void free_potiondelay(attrib * a)
     free(a->data.v);
 }
 
-static int age_potiondelay(attrib * a)
+static int age_potiondelay(attrib * a, void *owner)
 {
     potiondelay *pd = (potiondelay *)a->data.v;
+    unused_arg(owner);
     pd->amount = do_potion(pd->u, pd->r, pd->ptype, pd->amount);
     return AT_AGE_REMOVE;
 }
