@@ -5181,14 +5181,6 @@
       powerful
       spells he will need some luck for a successful analysis.</text>
     </string>
-    <string name="concealing_aura">
-      <text locale="de">Dieser Zauber wird die gesamte Ausrüstung der
-      Zieleinheit für
-      einige Zeit vor den Blicken anderer verschleiern. </text>
-      <text locale="en">This spell will hide the whole equipment of a target
-      unit from the
-      looks of others.</text>
-    </string>
     <string name="tybiedfumbleshield">
       <text locale="de">Dieser Zauber legt ein antimagisches Feld um die Magier der Feinde
          und behindert ihre Zauber erheblich. Nur wenige werden die Kraft
