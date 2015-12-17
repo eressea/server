@@ -36,7 +36,7 @@ static int age_reduceproduction(attrib * a, void *owner)
     }
     a->data.sa[0] = (short)reduce;
     if (a->data.sa[1] > 0) {
-        ADDMSG(&r->msgs, msg_message("reduceproduction", ""));
+        ADDMSG(&r->msgs, msg_message("reduced_production", ""));
         return AT_AGE_KEEP;
     }
     return AT_AGE_REMOVE;
