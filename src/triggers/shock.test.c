@@ -1,7 +1,7 @@
 #include <platform.h>
 #include "shock.h"
-#include "../magic.h"
 
+#include <magic.h>
 #include <kernel/unit.h>
 #include <kernel/faction.h>
 #include <util/event.h>

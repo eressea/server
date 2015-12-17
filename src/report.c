@@ -1235,13 +1235,6 @@ static void describe(stream *out, const seen_region * sr, faction * f)
     nr_curses(out, 0, f, TYP_REGION, r);
     n = 0;
 
-    /* Produktionsreduktion */
-    a = a_find(r->attribs, &at_reduceproduction);
-    if (a) {
-        const char *str = LOC(f->locale, "nr_reduced_production");
-        paragraph(out, str, 0, 0, 0);
-    }
-
     if (edges)
         newline(out);
     for (e = edges; e; e = e->next) {
@@ -1268,6 +1261,7 @@ static void describe(stream *out, const seen_region * sr, faction * f)
             first = false;
         }
         // TODO name is localized? Works for roads anyway...
+        // TODO: creating messages during reporting makes them not show up in CR?
         msg = msg_message("nr_borderlist_postfix", "transparent object",
             e->transparent, e->name);
         bytes = (int)nr_render(msg, f->locale, bufp, size, f);

@@ -46,7 +46,7 @@ extern const char *directions[];
 
 typedef struct alp_data {
     unit *mage;
-    unit *target;
+    unit *target; // TODO: remove, use attribute-owner?
 } alp_data;
 
 static void alp_init(attrib * a)
@@ -59,9 +59,10 @@ static void alp_done(attrib * a)
     free(a->data.v);
 }
 
-static int alp_verify(attrib * a)
+static int alp_verify(attrib * a, void *owner)
 {
     alp_data *ad = (alp_data *)a->data.v;
+    unused_arg(owner);
     if (ad->mage && ad->target)
         return 1;
     return 0;                     /* remove the attribute */

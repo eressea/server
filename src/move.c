@@ -145,9 +145,10 @@ static void shiptrail_finalize(attrib * a)
     free(a->data.v);
 }
 
-static int shiptrail_age(attrib * a)
+static int shiptrail_age(attrib * a, void *owner)
 {
     traveldir *t = (traveldir *)(a->data.v);
+    unused_arg(owner);
 
     t->age--;
     return (t->age > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;

@@ -588,7 +588,9 @@ struct order *ord)
             use +=
             use_pooled(s, item2resource(itype), GET_RESERVE | GET_POOLED_SLACK,
             n - use);
-        rsetmoney(s->region, rmoney(s->region) + use);
+        if (s->region->land) {
+            rsetmoney(s->region, rmoney(s->region) + use);
+        }
         return 0;
     }
     return -1;                    /* use the mechanism */

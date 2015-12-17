@@ -20,7 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "save.h"
 
-#include "../buildno.h"
+#include <buildno.h>
 
 #include "alchemy.h"
 #include "alliance.h"

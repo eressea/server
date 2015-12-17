@@ -7503,11 +7503,6 @@
 
   </namespace>
 
-  <string name="nr_reduced_production">
-    <text locale="de">Die Region ist verwüstet, der Boden karg.</text>
-    <text locale="en">The region is ravaged, the ground infertile.</text>
-  </string>
-
   <string name="par_unit">
     <text locale="de">Einheit-Nr</text>
     <text locale="en">unitid</text>

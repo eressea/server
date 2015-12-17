@@ -603,8 +603,7 @@ void rsetpeasants(region * r, int value)
     if (r->land) {
         assert(value >= 0);
         r->land->peasants = value;
-    } else
-        assert(value == 0);
+    }
 }
 
 int rmoney(const region * r)
@@ -617,8 +616,7 @@ void rsethorses(const region * r, int value)
     if (r->land) {
         assert(value >= 0);
         r->land->horses = value;
-    } else
-        assert(value == 0);
+    }
 }
 
 int rhorses(const region * r)
@@ -631,8 +629,7 @@ void rsetmoney(region * r, int value)
     if (r->land) {
         assert(value >= 0);
         r->land->money = value;
-    } else
-        assert(value == 0);
+    }
 }
 
 int rherbs(const struct region *r)
@@ -645,8 +642,7 @@ void rsetherbs(const struct region *r, int value)
     if (r->land) {
         assert(value >= 0);
         r->land->herbs = (short)(value);
-    } else
-        assert(value == 0);
+    }
 }
 
 
