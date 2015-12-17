@@ -56,7 +56,6 @@ static int cmp_age(const void *v1, const void *v2)
 }
 
 typedef struct wormhole_data {
-    building *entry; // TODO: remove, use attribute-owner
     region *exit;
 } wormhole_data;
 
@@ -73,13 +72,14 @@ static void wormhole_done(struct attrib *a)
 static int wormhole_age(struct attrib *a, void *owner)
 {
     wormhole_data *data = (wormhole_data *)a->data.v;
-    int maxtransport = data->entry->size;
-    region *r = data->entry->region;
+    building *b = (building *)owner;
+    int maxtransport = b->size;
+    region *r = b->region;
     unit *u = r->units;
 
     unused_arg(owner);
     for (; u != NULL && maxtransport != 0; u = u->next) {
-        if (u->building == data->entry) {
+        if (u->building == b) {
             message *m = NULL;
             if (u->number > maxtransport || has_limited_skills(u)) {
                 m = msg_message("wormhole_requirements", "unit region", u, u->region);
@@ -97,7 +97,7 @@ static int wormhole_age(struct attrib *a, void *owner)
         }
     }
 
-    remove_building(&r->buildings, data->entry);
+    remove_building(&r->buildings, b);
     ADDMSG(&r->msgs, msg_message("wormhole_dissolve", "region", r));
 
     /* age returns 0 if the attribute needs to be removed, !=0 otherwise */
@@ -107,7 +107,6 @@ static int wormhole_age(struct attrib *a, void *owner)
 static void wormhole_write(const struct attrib *a, const void *owner, struct storage *store)
 {
     wormhole_data *data = (wormhole_data *)a->data.v;
-    write_building_reference(data->entry, store);
     write_region_reference(data->exit, store);
 }
 
@@ -132,12 +131,11 @@ static int wormhole_read(struct attrib *a, void *owner, struct storage *store)
     read_fun reader = (global.data_version < UIDHASH_VERSION)
         ? read_building_reference : read_region_reference;
 
-    int rb =
-        read_reference(&data->entry, store, read_building_reference,
-        resolve_building);
-    int rr = read_reference(&data->exit, store, reader, resolver);
-    if (rb == 0 && rr == 0) {
-        if (!data->exit || !data->entry) {
+    if (global.data_version < ATTRIBOWNER_VERSION) {
+        READ_INT(store, NULL);
+    }
+    if (read_reference(&data->exit, store, reader, resolver) == 0) {
+        if (!data->exit) {
             return AT_READ_FAIL;
         }
     }
@@ -163,8 +161,6 @@ make_wormhole(const building_type * bt_wormhole, region * r1, region * r2)
     attrib *a2 = a_add(&b2->attribs, a_new(&at_wormhole));
     wormhole_data *d1 = (wormhole_data *)a1->data.v;
     wormhole_data *d2 = (wormhole_data *)a2->data.v;
-    d1->entry = b1;
-    d2->entry = b2;
     d1->exit = b2->region;
     d2->exit = b1->region;
     b1->size = bt_wormhole->maxsize;
