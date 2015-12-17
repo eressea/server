@@ -25,6 +25,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "move.h"
 #include "alchemy.h"
 
+#include <kernel/ally.h>
 #include <kernel/building.h>
 #include <kernel/curse.h>
 #include <kernel/faction.h>
@@ -41,6 +42,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/bsdstring.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/parser.h>
@@ -75,7 +77,7 @@ magic_t getmagicskill(const struct locale * lang)
             return (magic_t)token.i;
         }
         else {
-            char buffer[3];
+            char buffer[8];
             buffer[0] = s[0];
             buffer[1] = s[1];
             buffer[2] = '\0';
@@ -120,7 +122,7 @@ int study_cost(unit * u, skill_t sk)
     if (cost[sk] == 0) {
         char buffer[256];
         sprintf(buffer, "skills.cost.%s", skillnames[sk]);
-        cost[sk] = get_param_int(global.parameters, buffer, -1);
+        cost[sk] = config_get_int(buffer, -1);
     }
     if (cost[sk] >= 0) {
         return cost[sk];
@@ -176,7 +178,7 @@ static int study_days(unit * student, skill_t sk)
 
 static int
 teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
-bool report, int *academy)
+    bool report, int *academy)
 {
     teaching_info *teach = NULL;
     attrib *a;
@@ -204,8 +206,7 @@ bool report, int *academy)
     n = _min(n, nteaching);
 
     if (n != 0) {
-        struct building *b = inside_building(teacher);
-        const struct building_type *btype = b ? b->type : NULL;
+        const struct building_type *btype = bt_find("academy");
         int index = 0;
 
         if (teach == NULL) {
@@ -228,8 +229,7 @@ bool report, int *academy)
 
         /* Solange Akademien groessenbeschraenkt sind, sollte Lehrer und
          * Student auch in unterschiedlichen Gebaeuden stehen duerfen */
-        if (btype == bt_find("academy")
-            && student->building && student->building->type == bt_find("academy")) {
+        if (active_building(teacher, btype) && active_building(student, btype)) {
             int j = study_cost(student, sk);
             j = _max(50, j * 2);
             /* kann Einheit das zahlen? */
@@ -283,8 +283,8 @@ int teach_cmd(unit * u, struct order *ord)
     static const curse_type *gbdream_ct = NULL;
     plane *pl;
     region *r = u->region;
-    int teaching, i, j, count, academy = 0;
     skill_t sk = NOSKILL;
+    int teaching, i, j, count, academy = 0;
 
     if (gbdream_ct == 0)
         gbdream_ct = ct_find("gbdream");
@@ -325,26 +325,31 @@ int teach_cmd(unit * u, struct order *ord)
 
 #if TEACH_ALL
     if (getparam(u->faction->locale) == P_ANY) {
-        unit *student = r->units;
+        unit *student;
         skill_t teachskill[MAXSKILLS];
-        int i = 0;
+        int t = 0;
+
         do {
             sk = getskill(u->faction->locale);
-            teachskill[i++] = sk;
+            teachskill[t] = getskill(u->faction->locale);
         } while (sk != NOSKILL);
-        while (teaching && student) {
-            if (student->faction == u->faction) {
-                if (LongHunger(student))
-                    continue;
+
+        for (student = r->units; teaching && student; student = student->next) {
+            if (LongHunger(student)) {
+                continue;
+            }
+            else if (student->faction == u->faction) {
                 if (getkeyword(student->thisorder) == K_STUDY) {
                     /* Input ist nun von student->thisorder !! */
                     init_order(student->thisorder);
                     sk = getskill(student->faction->locale);
                     if (sk != NOSKILL && teachskill[0] != NOSKILL) {
-                        for (i = 0; teachskill[i] != NOSKILL; ++i)
-                            if (sk == teachskill[i])
+                        for (t = 0; teachskill[t] != NOSKILL; ++t) {
+                            if (sk == teachskill[t]) {
                                 break;
-                        sk = teachskill[i];
+                            }
+                        }
+                        sk = teachskill[t];
                     }
                     if (sk != NOSKILL
                         && effskill_study(u, sk, 0) - TEACHDIFFERENCE > effskill_study(student, sk, 0)) {
@@ -352,14 +357,8 @@ int teach_cmd(unit * u, struct order *ord)
                     }
                 }
             }
-            student = student->next;
-        }
 #ifdef TEACH_FRIENDS
-        while (teaching && student) {
-            if (student->faction != u->faction
-                && alliedunit(u, student->faction, HELP_GUARD)) {
-                if (LongHunger(student))
-                    continue;
+            else if (alliedunit(u, student->faction, HELP_GUARD)) {
                 if (getkeyword(student->thisorder) == K_STUDY) {
                     /* Input ist nun von student->thisorder !! */
                     init_order(student->thisorder);
@@ -370,14 +369,14 @@ int teach_cmd(unit * u, struct order *ord)
                     }
                 }
             }
-            student = student->next;
-        }
 #endif
+        }
     }
     else
 #endif
     {
         char zOrder[4096];
+        size_t sz = sizeof(zOrder);
         order *new_order;
 
         zOrder[0] = '\0';
@@ -429,9 +428,11 @@ int teach_cmd(unit * u, struct order *ord)
 
             /* Neuen Befehl zusammenbauen. TEMP-Einheiten werden automatisch in
              * ihre neuen Nummern uebersetzt. */
-            if (zOrder[0])
-                strcat(zOrder, " ");
-            strcat(zOrder, unitid(u2));
+            if (zOrder[0]) {
+                strncat(zOrder, " ", sz - 1);
+                --sz;
+            }
+            sz -= strlcpy(zOrder + 4096 - sz, unitid(u2), sz);
 
             if (getkeyword(u2->thisorder) != K_STUDY) {
                 ADDMSG(&u->faction->msgs,
@@ -503,9 +504,9 @@ static double study_speedup(unit * u, skill_t s, study_rule_t rule)
         if (rule == STUDY_FASTER) {
             for (i = 0; i != u->skill_size; ++i) {
                 skill *sv = u->skills + i;
-                if (sv->id == s){
+                if (sv->id == s) {
                     learnweeks = sv->level * (sv->level + 1) / 2.0;
-                    if (learnweeks < turn / 3) {
+                    if (learnweeks < turn / 3.0) {
                         return 2.0;
                     }
                 }
@@ -517,7 +518,7 @@ static double study_speedup(unit * u, skill_t s, study_rule_t rule)
                 skill *sv = u->skills + i;
                 learnweeks += (sv->level * (sv->level + 1) / 2.0);
             }
-            if (learnweeks < turn / 2) {
+            if (learnweeks < turn / 2.0) {
                 return 2.0;
             }
         }
@@ -538,18 +539,9 @@ int study_cmd(unit * u, order * ord)
     int money = 0;
     skill_t sk;
     int maxalchemy = 0;
-    int speed_rule = (study_rule_t)get_param_int(global.parameters, "study.speedup", 0);
-    static int learn_newskills = -1;
-    struct building *b = inside_building(u);
-    const struct building_type *btype = b ? b->type : NULL;
+    int speed_rule = (study_rule_t)config_get_int("study.speedup", 0);
+    bool learn_newskills = config_get_int("study.newskills", 1) != 0;
 
-    if (learn_newskills < 0) {
-        const char *str = get_param(global.parameters, "study.newskills");
-        if (str && strcmp(str, "false") == 0)
-            learn_newskills = 0;
-        else
-            learn_newskills = 1;
-    }
     if (!unit_can_study(u)) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_race_nolearn", "race",
             u_race(u)));
@@ -563,16 +555,12 @@ int study_cmd(unit * u, order * ord)
         cmistake(u, ord, 77, MSG_EVENT);
         return 0;
     }
-    if (SkillCap(sk) && SkillCap(sk) <= effskill(u, sk, 0)) {
-        cmistake(u, ord, 771, MSG_EVENT);
-        return 0;
-    }
     /* Hack: Talente mit Malus -99 koennen nicht gelernt werden */
     if (u_race(u)->bonus[sk] == -99) {
         cmistake(u, ord, 771, MSG_EVENT);
         return 0;
     }
-    if (learn_newskills == 0) {
+    if (!learn_newskills) {
         skill *sv = unit_skill(u, sk);
         if (sv == NULL) {
             /* we can only learn skills we already have */
@@ -604,10 +592,7 @@ int study_cmd(unit * u, order * ord)
         return 0;
     }
     /* Akademie: */
-    b = inside_building(u);
-    btype = b ? b->type : NULL;
-
-    if (btype && btype == bt_find("academy")) {
+    if (active_building(u, bt_find("academy"))) {
         studycost = _max(50, studycost * 2);
     }
 

@@ -146,6 +146,7 @@ void free_races(void) {
         free(races);
         races = rc;
     }
+    num_races = 0;
 }
 
 static race *rc_find_i(const char *name)
@@ -182,7 +183,7 @@ race *rc_get_or_create(const char *zName)
         rc->recruit_multi = 1.0F;
         rc->regaura = 1.0F;
         rc->speed = 1.0F;
-        rc->battle_flags = BF_CANATTACK;
+        rc->battle_flags = 0;
         if (strchr(zName, ' ') != NULL) {
             log_error("race '%s' has an invalid name. remove spaces\n", zName);
             assert(strchr(zName, ' ') == NULL);
@@ -244,7 +245,7 @@ const char *raceprefix(const unit * u)
     const attrib *asource = u->faction->attribs;
 
     if (fval(u, UFL_GROUP)) {
-        const attrib *agroup = agroup = a_findc(u->attribs, &at_group);
+        const attrib *agroup = a_findc(u->attribs, &at_group);
         if (agroup != NULL)
             asource = ((const group *)(agroup->data.v))->attribs;
     }
@@ -300,3 +301,20 @@ variant read_race_reference(struct storage *store)
     assert(result.v != NULL);
     return result;
 }
+
+/** Returns the English name of the race, which is what the database uses.
+*/
+const char *dbrace(const struct race *rc)
+{
+    static char zText[32]; // FIXME: static return value
+    char *zPtr = zText;
+
+    /* the english names are all in ASCII, so we don't need to worry about UTF8 */
+    strlcpy(zText, (const char *)LOC(get_locale("en"), rc_name_s(rc, NAME_SINGULAR)), sizeof(zText));
+    while (*zPtr) {
+        *zPtr = (char)(toupper(*zPtr));
+        ++zPtr;
+    }
+    return zText;
+}
+

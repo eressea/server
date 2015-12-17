@@ -30,6 +30,7 @@ extern "C" {
     struct region_list;
     struct ship;
     struct building_type;
+    struct order;
 
     extern struct attrib_type at_shiptrail;
 
@@ -68,12 +69,13 @@ extern "C" {
     struct region *to, struct region_list *route);
     int walkingcapacity(const struct unit *u);
     void follow_unit(struct unit *u);
-    bool buildingtype_exists(const struct region *r,
-        const struct building_type *bt, bool working);
     struct unit *owner_buildingtyp(const struct region *r,
         const struct building_type *bt);
     bool move_blocked(const struct unit *u, const struct region *src,
         const struct region *dest);
+    bool can_takeoff(const struct ship * sh, const struct region * from, const struct region * to);
+    void move_cmd(struct unit * u, struct order * ord, bool move_on_land);
+    int follow_ship(struct unit * u, struct order * ord);
 
 #define SA_HARBOUR 2
 #define SA_COAST 1

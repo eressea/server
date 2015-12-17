@@ -26,7 +26,6 @@
 /* Vermehrungsrate Bauern in 1/10000.
 * TODO: Evt. Berechnungsfehler, reale Vermehrungsraten scheinen höher. */
 #define PEASANTGROWTH 10
-#define BATTLE_KILLS_PEASANTS 20
 #define PEASANTLUCK 10
 
 #define ROW_FACTOR 3            /* factor for combat row advancement rule */
@@ -37,6 +36,27 @@
  */
 #define MUSEUM_MODULE 1
 #define ARENA_MODULE 1
-#define CHANGED_CROSSBOWS 0     /* use the WTF_ARMORPIERCING flag */
 
 #undef REGIONOWNERS             /* (WIP) region-owner uses HELP_TRAVEL to control entry to region */
+
+ /* experimental gameplay features (that don't affect the savefile) */
+ /* TODO: move these settings to settings.h or into configuration files */
+#define GOBLINKILL              /* Goblin-Spezialklau kann tödlich enden */
+#define INSECT_POTION           /* Spezialtrank für Insekten */
+#define ORCIFICATION            /* giving snotlings to the peasants gets counted */
+
+#define TREESIZE (8)            /* space used by trees (in #peasants) */
+
+#define PEASANTFORCE 0.75       /* Chance einer Vermehrung trotz 90% Auslastung */
+
+ /* Gebäudegröße = Minimalbelagerer */
+#define SIEGEFACTOR     2
+
+ /** Magic */
+#define MAXMAGICIANS    3
+#define MAXALCHEMISTS   3
+
+#define ENCCHANCE           10  /* %-Chance für einmalige Zufallsbegegnung */
+#define BAGCAPACITY         20000   /* soviel paßt in einen Bag of Holding */
+#define PERSON_WEIGHT 1000      /* weight of a "normal" human unit */
+#define STAMINA_AFFECTS_HP 1<<0

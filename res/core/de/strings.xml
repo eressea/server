@@ -246,6 +246,10 @@
       unharmed from every conflict, no enemy will lay hand on
       the bearer for one week.</text>
     </string>
+    <string name="skillpotion">
+        <text locale="en">The recipe of this potion is a well kept secret. Some even say it couldn't be brewed by mere mortals. One thing is certain though, the drinker receives further insight into any learned skills, which furthers their progress towards the mastery of those skills.</text>
+        <text locale="de">Die Herstellung dieses Trunkes ist ein wohlgehütetes Geheimnis. Manche behaupten gar, von Sterblichen könne er gar nicht gebraut werden. Tatsache ist, dass er dem Trinkenden tiefere Einsicht in seine erlernten Talente gewährt, was ihn in der Meisterung dieser Talente voranbringt.</text>
+    </string>
   </namespace>
 
   <namespace name="school">
@@ -3772,7 +3776,7 @@
     </string>
     <string name="big_recruit">
       <text locale="de">Hohe Kunst der Überzeugung</text>
-      <text locale="en">Song of Slavery</text>
+      <text locale="en">High art of persuasion</text>
     </string>
     <string name="double_time">
       <text locale="de">Zeitdehnung</text>
@@ -3847,8 +3851,8 @@
       <text locale="en">Icy Dragonbreath</text>
     </string>
     <string name="fiery_dragonbreath">
-      <text locale="de">Eisiger Drachenodem</text>
-      <text locale="en">Icy Dragonbreath</text>
+      <text locale="de">Feuriger Drachenodem</text>
+      <text locale="en">Fiery Dragonbreath</text>
     </string>
     <string name="create_runesword">
       <text locale="de">Erschaffe ein Runenschwert</text>
@@ -4514,7 +4518,20 @@
       <text locale="de">Entzieht Talentstufen und macht Schaden wie Großer Odem.</text>
     </string>
     <string name="astral_disruption">
-      <text locale="de">Dieser Zauber bewirkt eine schwere Störung des Astralraums. Innerhalb eines astralen Radius von Stufe/5 Regionen werden alle Astralwesen, die dem Zauber nicht wiederstehen können, aus der astralen Ebene geschleudert. Der astrale Kontakt mit allen betroffenen Regionen ist für Stufe/3 Wochen gestört.</text>
+      <text locale="de">
+        Dieser Zauber bewirkt eine schwere Störung des Astralraums. Innerhalb 
+        eines astralen Radius von Stufe/5 Regionen werden alle Astralwesen, 
+        die dem Zauber nicht wiederstehen können, aus der astralen Ebene 
+        geschleudert. Der astrale Kontakt mit allen betroffenen Regionen ist 
+        für Stufe/3 Wochen gestört.
+      </text>
+      <text locale="en">
+        This spell causes a severe disturbance of the atral plane. Within an 
+        astral radius of level/5 regions all astral creatures not able to 
+        resist the spell will be thrown from the astral plane. The astral 
+        contact with all affected regions will be disrupted for level/3 
+        weeks.
+      </text>
     </string>
     <string name="armor_shield">
       <text locale="de">
@@ -4523,12 +4540,21 @@
         reduziert die Kraft des Zaubers, so dass der Schild sich irgendwann
         im Kampf auflösen wird.
       </text>
+      <text locale="en">
+        This ritual, to be performed before battle, gives the own troops an 
+        added bonus to their armor. Every hit reduces the strength of the 
+        spell until it dissipates during battle.
+      </text>
     </string>
     <string name="combat_speed">
       <text locale="de">
         Dieser Zauber beschleunigt einige Kämpfer auf der eigenen Seite
         so, dass sie während des gesamten Kampfes in einer Kampfrunde zweimal
         angreifen können.
+      </text>
+      <text locale="en">
+        This spell accelerates some fighters of the own side, which empowers 
+        them to attack twice every round throughout the battle.
       </text>
     </string>
     <string name="fish_shield">
@@ -4539,6 +4565,13 @@
         des Schadens unschädlich abgeleitet werden. Doch hält der Schild nur
         einige Hundert Schwerthiebe aus, danach wird er sich auflösen.
         Je stärker der Magier, desto mehr Schaden hält der Schild aus.
+      </text>
+      <text locale="en">
+        This spell can project a slightly distorted image of the own troops, 
+        like the surface of the lake distorts the position of a fish. Half 
+        the damage of each hit can be deflected harmlessly through those 
+        means. The shield will only last a few hundred hits before it 
+        dissipates. The stronger the mage, the more damage the shield can take.
       </text>
     </string>
     <string name="protective_runes">
@@ -4552,6 +4585,14 @@
         nicht erreichen. Der Zauber hält mindestens drei Wochen an, je nach
         Talent des Magiers aber auch viel länger.
       </text>
+      <text locale="en">
+        Drawn on the walls of a building or on the planks of a ship these 
+        runes will protect it from magic influence. Every ritual increases 
+        the resistance of the building or ship against enchantments by 20%. 
+        The effect can be increased by performing the ritual multiple times, 
+        but perfect protection is unlikely. The runes last at least three 
+        weeks, depending on the mage's skill maybe much longer.
+      </text>
     </string>
     <string name="auratransfer">
       <text locale="de">
@@ -4560,11 +4601,20 @@
         Verhältnis 3:1 auf einen Magier eines anderen Magiegebietes
         übertragen.
       </text>
+      <text locale="en">
+        With this spell the mage can transfer aura of his own to a mage of 
+        the same school with a rate of 2:1 or to a mage of a different school 
+        with a rate of 3:1.
+      </text>
     </string>
     <string name="show_astral">
       <text locale="de">
         Der Magier kann kurzzeitig in die Astralebene blicken und erfährt
         so alle Einheiten innerhalb eines astralen Radius von Stufe/5 Regionen.
+      </text>
+      <text locale="en">
+        The mage kann glance in the astral plane for a short time and 
+        perceives all units within an astral radius of level/5 regions.
       </text>
     </string>
     <string name="calm_riot">
@@ -4573,23 +4623,44 @@
         Aufruhr wieder beruhigen. Die Bauernhorden werden sich verlaufen
         und wieder auf ihre Felder zurückkehren.
       </text>
+      <text locale="en">
+        By means of this magical chant the mage can calm a rioting region. 
+        The peasant mobs will disperse and return to their fields.
+      </text>
     </string>
     <string name="big_recruit">
-      <text locale="de">Aus 'Wanderungen' von Firudin dem Weisen:
+      <text locale="de">
+        Aus 'Wanderungen' von Firudin dem Weisen:
         'In Weilersweide, nahe dem Wytharhafen, liegt ein kleiner Gasthof, der
         nur wenig besucht ist. Niemanden bekannt ist, das dieser Hof
         bis vor einigen Jahren die Bleibe des verbannten Wanderpredigers Grauwolf
         war. Nachdem er bei einer seiner berüchtigten flammenden Reden fast die
         gesammte Bauernschaft angeworben hatte, wurde er wegen Aufruhr verurteilt
-        und verbannt. Nur zögerlich war er bereit mir das Geheimniss seiner
+        und verbannt. Nur zögerlich war er bereit mir das Geheimnis seiner
         Überzeugungskraft zu lehren.'
+      </text>
+      <text locale="en">
+        From 'Journeys' by Firudin the Wise:
+        'There's a small, scarcely visited inn in Weilersweide, near 
+        Wytharhafen. It is a little known fact, that it was home to the 
+        banished itinerant preacher Grauwolf until a few years ago. After he 
+        recruited almost the whole peasantry with one of his notorious 
+        speeches, he was convicted and banished for inciting unrest. Only 
+        hesitantly did he disclose the secret to his powers of persuasion 
+        to me.'
       </text>
     </string>
     <string name="song_of_slavery">
-      <text locale="de">Dieser mächtige Bann raubt dem Opfer seinen freien Willen
-      und unterwirft sie den Befehlen des Barden. Für einige Zeit wird das Opfer
-      sich völlig von seinen eigenen Leuten abwenden und der Partei des Barden
-      zugehörig fühlen.
+      <text locale="de">
+      Dieser mächtige Bann raubt dem Opfer seinen freien Willen und unterwirft 
+      sie den Befehlen des Barden. Für einige Zeit wird das Opfer sich völlig 
+      von seinen eigenen Leuten abwenden und der Partei des Barden zugehörig 
+      fühlen.
+      </text>
+      <text locale="en">
+      This powerful spell robs the victim of their own free will and enslaves 
+      them to the commands of the bard. For some time the victim will turn 
+      their back on their own people and join the faction of the bard.
       </text>
     </string>
     <string name="song_of_peace">
@@ -4597,6 +4668,11 @@
       Dieser mächtige Bann verhindert jegliche Attacken. Niemand in der
       ganzen Region ist fähig seine Waffe gegen irgendjemanden zu erheben.
       Die Wirkung kann etliche Wochen andauern.
+      </text>
+      <text locale="en">
+      This powerful spell prevents any attacks. Noone in the entire region 
+      will be able to raise his weapon against another. The effect can last 
+      for weeks.
       </text>
     </string>
     <string name="song_suscept_magic">
@@ -4606,12 +4682,23 @@
       Verzauberung einmalig um 15%. Nur die Verbündeten des Barden 
       (HELFE BEWACHE) sind gegen die Wirkung des Gesangs gefeit.
       </text>
+      <text locale="en">
+      This song, which is woven into the magical essence of the region, 
+      weakens the natural resistance against a singular enchantment by 15%. 
+      Only the allies of the bard (HELP GUARD) are immune to the effect of 
+      the chant.
+      </text>
     </string>
     <string name="melancholy">
       <text locale="de">
       Mit diesem Gesang verbreitet der Barde eine melancholische, traurige 
       Stimmung unter den Bauern. Einige Wochen lang werden sie sich in ihre 
       Hütten zurückziehen und kein Silber in den Theatern und Tavernen lassen.
+      </text>
+      <text locale="en">
+      With this chant the bard spreads a melancholic, sad mood among the 
+      peasants. For a few weeks they will retreat to their huts and not 
+      spend any silver in the theatres and taverns.
       </text>
     </string>
     <string name="song_resist_magic">
@@ -4626,6 +4713,13 @@
       auf die natürliche Widerstandskraft gegen eine Verzauberung 
       verleihen.
       </text>
+      <text locale="en">
+      This magical song, once performed with vigor, will propagate in the 
+      region by wandering from mouth to mouth. It will be heard everywhere. 
+      How long the song will last in the public perception depends on the 
+      bard's skill. Until it is gone it will give him and all his allies 
+      (HELP GUARD) a bonus of 15% to their natural resistance to magic.
+      </text>
     </string>
     <string name="raise_mob">
       <text locale="de">
@@ -4635,6 +4729,13 @@
       werden zudem einige der Bauern den Bann abwerfen und auf ihre Felder 
       zurückkehren. Wie viele Bauern sich dem Magier anschließen hängt von der 
       Kraft seines Gesangs ab.
+      </text>
+      <text locale="en">
+      Employing this magic chant the mage convinces the peasants of the region 
+      to join him. The peasants won't leave their home region and won't give up 
+      their possessions, though. Additionally each week some peasants will 
+      shake off the spell and return to their fields. How many peasants join 
+      the mage depends on the power of his chant.
       </text>
     </string>
     <string name="migration">
@@ -4651,6 +4752,16 @@
       permanente Aura aufwenden. Pro Stufe und pro 1 permanente Aura kann 
       er eine Person aufnehmen.
       </text>
+      <text locale="en">
+      This ritual facilitates the migration of an unit to the own faction. 
+      The candidate has to be able and willing to leave his previous faction. 
+      He attests to that by CONTACTing the mage and will otherwise be 
+      occupied with preparations for the ritual. The ritual will fail, if 
+      the candidate owes the previous faction fealty for an expensive 
+      training. The mage performing the ritual has to invest permanent aura 
+      to bind the candidate to the faction. Per level and per point of 
+      permanent aura the mage can bind one person.
+      </text>
     </string>
     <string name="cerddor_destroymagic">
       <text locale="de">
@@ -4658,14 +4769,25 @@
       Der kundige Barde kann versuchen, das Lebenslied aufzufangen und zu 
       verstärken und die Veränderungen aus dem Lied zu tilgen.
       </text>
+      <text locale="en">
+      Every enchantment influences the life song, weakens and distorts it. 
+      The skillful bard can try to catch the life song, to strengthen it and 
+      cleanse the alteration from the song.
+      </text>
     </string>
     <string name="analyse_object">
       <text locale="de">
       Wie Lebewesen, so haben auch Schiffe und Gebäude und sogar Regionen 
       ihr eigenes Lied, wenn auch viel schwächer und schwerer zu hören. 
-      Und so, wie wie aus dem Lebenslied einer Person erkannt werden kann, 
+      Und so, wie aus dem Lebenslied einer Person erkannt werden kann, 
       ob diese unter einem Zauber steht, so ist dies auch bei Burgen, 
       Schiffen oder Regionen möglich.
+      </text>
+      <text locale="en">
+      Like creatures ships, buildings and even regions also have their own 
+      song, even though it's faint and harder to hear. Like it can be 
+      discerned from the life song of a person, if the person is affected 
+      by a spell, it can also be done for ships, buildings and regions.
       </text>
     </string>
     <string name="frighten">
@@ -4673,6 +4795,11 @@
       Dieser Kriegsgesang sät Panik in der Front der Gegner und schwächt 
       so ihre Kampfkraft erheblich. Angst wird ihren Schwertarm schwächen 
       und Furcht ihren Schildarm lähmen.
+      </text>
+      <text locale="en">
+      This warsong sows panic among the enemy front line and weakens their 
+      fighting strength significantly. Fear will weaken their sword arm and 
+      dread will freeze their shield arm.
       </text>
     </string>
     <string name="bloodthirst">
@@ -4685,6 +4812,14 @@
       Tode und niemals fliehen. Während ihre Attacke verstärkt ist
       achten sie kaum auf sich selbst.
       </text>
+      <text locale="en">
+      Like many magic chants this one also originates from the ancient 
+      knowledge of the cats who always were aware of the powerful effect 
+      of the voice. This song inflames the temper of the warriors, enrages 
+      them even, into a murderous frenzy. Ignoring their own pain, they fight 
+      until death and will never flee from battle. They fight with little 
+      regard for themselves.
+      </text>
     </string>
     <string name="sound_out">
       <text locale="de">
@@ -4692,6 +4827,12 @@
       was sie über die gefragte Region weiß. Ist in der Region niemand 
       ihrer Partei, so weiß sie nichts zu berichten. Auch kann sie nur das 
       erzählen, was sie selber sehen könnte.
+      </text>
+      <text locale="en">
+      Should the unit succumb to the spell, they will tell the mage everything 
+      they know about the region is question. Is no unit of their faction in 
+      that region, they'll have nothing to report. Also, they can only report, 
+      what they themselves could see.
       </text>
     </string>
     <string name="seduction">
@@ -4701,6 +4842,11 @@
       schenkt. Sie behält jedoch immer soviel, wie sie zum Überleben 
       braucht.
       </text>
+      <text locale="en">
+      With this song a unit can be bewitched in a manner, which compels 
+      them to bequeath a large portion of their possessions to the bard. 
+      They will keep enough for their own survival, though.
+      </text>
     </string>
     <string name="calm_monster">
       <text locale="de">
@@ -4709,12 +4855,21 @@
       Begleiter nicht anrühren. Doch sollte man sich nicht täuschen, es 
       wird dennoch ein unberechenbares Wesen bleiben.
       </text>
+      <text locale="en">
+      This disarming chant can tame almost any intelligent monster. It will 
+      refrain from attacks on the mage and his companions. But one should not 
+      deceive oneself about the persisting unpredictable nature of the creature.
+      </text>
     </string>
     <string name="bad_dreams">
       <text locale="de">
       Dieser Zauber ermöglicht es dem Träumer, den Schlaf aller nichtaliierten
       Einheiten (HELFE BEWACHE) in der Region so stark zu stören, das sie
       vorübergehend einen Teil ihrer Erinnerungen verlieren.
+      </text>
+      <text locale="en">
+      This spell enables the dreamer to disturb the sleep of all non-allied 
+      units (HELP GUARD) in the region so severely they lose parts of their memories.
       </text>
     </string>
     <string name="clone">
@@ -4726,8 +4881,18 @@
       Anschließend transferiert er in einem aufwändigen Ritual einen Teil 
       seiner Seele in den Klon. Stirbt der Magier, reist seine Seele in den 
       Klon und der erschaffene Körper dient nun dem Magier als neues Gefäß. 
-      Es besteht allerdings eine geringer Wahrscheinlichkeit, dass die Seele 
+      Es besteht allerdings eine geringe Wahrscheinlichkeit, dass die Seele 
       nach dem Tod zu schwach ist, das neue Gefäß zu erreichen.
+      </text>
+      <text locale="en">
+      This powerful spell can keep the mage from certain death. The mage 
+      creates a clone of himself from a small blood sample and puts it into 
+      a bath of dragon's blood and thinned water of life.
+      Subsequently he transfers a fragment of his soul into the clone in a 
+      complex ritual. If the mage dies afterwards, his soul takes possession 
+      of the clone which will serve as his new vessel. There is however a 
+      small chance the soul is to weak to reach the vessel in the wake of the 
+      mage's death.
       </text>
     </string>
     <string name="great_drought">
@@ -4739,11 +4904,13 @@
       Der Landstrich kann über Jahre hinaus von den Folgen einer 
       solchen Dürre betroffen sein.
       </text>
-      <text locale="en">This powerful ritual opens a gate to the elemental plane of 
+      <text locale="en">
+      This powerful ritual opens a gate to the elemental plane of 
       fire. A great drought comes over the land. Farmers, animals and 
       plants of the region are fighting for survival, but only half of 
       all living things will be able to survive a drought like this. 
-      The region will suffer the consequences of such a drought for years to come.</text>
+      The region will suffer the consequences of such a drought for years to come.
+      </text>
     </string>
     <string name="magic_roots">
       <text locale="de">
@@ -4752,6 +4919,12 @@
       das Gleichgewicht der Natur in der Region für immer verändert, und in 
       Zukunft werden nur noch die anspruchsvollen, aber kräftigen 
       Mallorngewächse in der Region gedeihen.
+      </text>
+      <text locale="en">
+      Through a elaborate ritual a druid permanently channels a fragment of his 
+      power into the soil and the forests of the region. This forever changes 
+      the equilibrium of nature in the region. From this point on only the 
+      fierce but strong mallorn trees will grow there.
       </text>
     </string>
     <string name="maelstrom">
@@ -4784,12 +4957,22 @@
         es können keine neuen Leute angeworben werden. Nach einigen Wochen
         beruhigt sich der Mob wieder.
       </text>
+      <text locale="en">
+        By means of this magical chant the mage incites riots in a region. 
+        Rebelling peasant mobs prevent taxation and recruiting and almost 
+        noone will pay money for entertainment. After a few weeks the mob 
+        will calm down again.
+      </text>
     </string>
     <string name="view_reality">
       <text locale="de">
         Der Magier kann mit Hilfe dieses Zaubers aus der Astral- in die
         materielle Ebene blicken und die Regionen und Einheiten genau
         erkennen.
+      </text>
+      <text locale="en">
+        With this spell the mage can glance from the astral to the material 
+        plane and recognize regions and units.
       </text>
     </string>
     <string name="living_rock">
@@ -4802,6 +4985,14 @@
         Magiers ab: Der Elementar kann maximal [Stufe-12]*250 Größeneinheiten 
         große Gebäude versetzen. Das Gebäude wird diese Prozedur nicht 
         unbeschädigt überstehen.
+      </text>
+      <text locale="en">
+        This draining ritual summons a gigantic earth elemental from a sphere 
+        of laen and binds it to a building. The elemental can then be commanded 
+        to move the building with all its occupants to a neighbouring region. 
+        The strength of the elemental depends of the mage's skill: it can move 
+        up to [level-12]*250 size units of building. The building won't remain 
+        undamaged by the process.
       </text>
     </string>
     <string name="create_chastitybelt">
@@ -4877,16 +5068,15 @@
       magician's aura against his will.</text>
     </string>
     <string name="airship">
-      <text locale="de">Diese magischen Runen bringen ein Boot oder Langboot
-      für
-      eine Woche zum fliegen. Damit kann dann auch Land überquert werden. Die
-      Zuladung  von Langbooten ist unter der Einwirkung dieses Zaubers auf 100
-      Gewichtseinheiten begrenzt. Für die Farbe der Runen muss eine spezielle
-      Tinte aus einem Windbeutel und einem Schneekristall angerührt werden.</text>
-      <text locale="en">These magic runes allow a boat or longboat to fly for
-      a
-      week. The boat can only carry 100 weight units. The enchanted ink's
-      components include a windbag and a snowcrystal petal.</text>
+      <text locale="de">Diese magischen Runen bringen ein Boot bis zu einer 
+      Kapazität von 50 Gewichtseinheiten für eine Woche zum Fliegen. Dies 
+      ermöglicht dem Boot die Überquerung von Land. Für die Farbe der Runen 
+      muss eine spezielle Tinte aus einem Windbeutel und einem Schneekristall 
+      angerührt werden.</text>
+      <text locale="en">These magic runes allow a boat with a capacity of up 
+      to 50 weight units to fly for a week and allow the boat to cross land. 
+      The enchanted ink's components include a windbag and a snowcrystal petal.
+      </text>
     </string>
     <string name="double_time">
       <text locale="de">Diese praktische Anwendung des theoretischen Wissens um 
@@ -7320,11 +7510,6 @@
     </string>
 
   </namespace>
-
-  <string name="nr_reduced_production">
-    <text locale="de">Die Region ist verwüstet, der Boden karg.</text>
-    <text locale="en">The region is ravaged, the ground infertile.</text>
-  </string>
 
   <string name="par_unit">
     <text locale="de">Einheit-Nr</text>

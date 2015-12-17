@@ -65,19 +65,25 @@ int config_read(const char *filename, const char * relpath)
         F = fopen(filename, "rt");
     }
     if (F) {
-        int result;
-        char *data;
-        size_t sz;
+        long size;
 
         fseek(F, 0, SEEK_END);
-        sz = ftell(F);
+        size = ftell(F);
         rewind(F);
-        data = malloc(sz);
-        fread(data, 1, sz, F);
+        if (size > 0) {
+            int result;
+            char *data;
+            size_t sz = (size_t)size;
+
+            data = malloc(sz+1);
+            sz = fread(data, 1, sz, F);
+            data[sz] = 0;
+            fclose(F);
+            result = config_parse(data);
+            free(data);
+            return result;
+        }
         fclose(F);
-        result = config_parse(data);
-        free(data);
-        return result;
     }
     return 1;
 }

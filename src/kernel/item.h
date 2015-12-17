@@ -211,7 +211,7 @@ extern "C" {
 
     typedef struct weapon_type {
         const item_type *itype;
-        const char *damage[2];
+        char *damage[2];
         unsigned int flags;
         skill_t skill;
         int minskill;

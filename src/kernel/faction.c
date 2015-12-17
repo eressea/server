@@ -22,6 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "alliance.h"
 #include "ally.h"
+#include "curse.h"
 #include "equipment.h"
 #include "group.h"
 #include "item.h"
@@ -29,6 +30,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "plane.h"
 #include "race.h"
 #include "region.h"
+#include "save.h"
 #include "spellbook.h"
 #include "terrain.h"
 #include "unit.h"
@@ -43,21 +45,24 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/lists.h>
 #include <util/language.h>
 #include <util/log.h>
-#include <quicklist.h>
+#include <util/parser.h>
 #include <util/resolve.h>
 #include <util/rng.h>
 #include <util/variant.h>
 #include <util/unicode.h>
+
 #include <attributes/otherfaction.h>
 
+#include <quicklist.h>
 #include <storage.h>
 
 /* libc includes */
 #include <assert.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include <limits.h>
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 faction *factions;
 
@@ -69,14 +74,22 @@ faction *factions;
 void free_faction(faction * f)
 {
     funhash(f);
-    if (f->msgs)
-        free_messagelist(f->msgs);
+    if (f->msgs) {
+        free_messagelist(f->msgs->begin);
+        free(f->msgs);
+    }
     while (f->battles) {
         struct bmsg *bm = f->battles;
         f->battles = bm->next;
-        if (bm->msgs)
-            free_messagelist(bm->msgs);
+        if (bm->msgs) {
+            free_messagelist(bm->msgs->begin);
+            free(bm->msgs);
+        }
         free(bm);
+    }
+
+    if (f->spellbook) {
+        free_spellbook(f->spellbook);
     }
 
     while (f->groups) {
@@ -90,6 +103,10 @@ void free_faction(faction * f)
     free(f->banner);
     free(f->passw);
     free(f->name);
+    if (f->seen_factions) {
+        ql_free(f->seen_factions);
+        f->seen_factions = 0;
+    }
 
     while (f->attribs) {
         a_remove(&f->attribs, f->attribs);
@@ -137,6 +154,11 @@ faction *findfaction(int n)
     return f;
 }
 
+faction *getfaction(void)
+{
+    return findfaction(getid());
+}
+
 void set_show_item(faction * f, const struct item_type *itype)
 {
     attrib *a = a_add(&f->attribs, a_new(&at_showitem));
@@ -148,6 +170,9 @@ const unit *random_unit_in_faction(const faction * f)
     unit *u;
     int c = 0, u_nr;
 
+    if (!f->units) {
+        return NULL;
+    }
     for (u = f->units; u; u = u->next)
         c++;
 
@@ -191,6 +216,11 @@ int resolve_faction(variant id, void *address)
     }
     *(faction **)address = f;
     return result;
+}
+
+bool faction_id_is_unused(int id)
+{
+    return findfaction(id) == NULL;
 }
 
 #define MAX_FACTION_ID (36*36*36*36)
@@ -387,16 +417,16 @@ void destroyfaction(faction * f)
 
     /* units of other factions that were disguised as this faction
      * have their disguise replaced by ordinary faction hiding. */
-    if (rule_stealth_faction()) {
+    if (rule_stealth_other()) {
         region *rc;
         for (rc = regions; rc; rc = rc->next) {
             for (u = rc->units; u; u = u->next) {
                 attrib *a = a_find(u->attribs, &at_otherfaction);
-                if (!a)
-                    continue;
-                if (get_otherfaction(a) == f) {
+                if (a && get_otherfaction(a) == f) {
                     a_removeall(&u->attribs, &at_otherfaction);
-                    fset(u, UFL_ANON_FACTION);
+                    if (rule_stealth_anon()) {
+                        fset(u, UFL_ANON_FACTION);
+                    }
                 }
             }
         }
@@ -553,7 +583,7 @@ static int allied_skilllimit(const faction * f, skill_t sk)
 {
     static int value = -1;
     if (value < 0) {
-        value = get_param_int(global.parameters, "alliance.skilllimit", 0);
+        value = config_get_int("alliance.skilllimit", 0);
     }
     return value;
 }
@@ -581,10 +611,12 @@ int skill_limit(faction * f, skill_t sk)
         if (sk != SK_ALCHEMY && sk != SK_MAGIC)
             return INT_MAX;
         if (f_get_alliance(f)) {
-            int ac = listlen(f->alliance->members);   /* number of factions */
-            int fl = (al + ac - 1) / ac;      /* faction limit, rounded up */
+            int sc, fl, ac = listlen(f->alliance->members);   /* number of factions */
+
+            assert(ac > 0);
+            fl = (al + ac - 1) / ac;      /* faction limit, rounded up */
             /* the faction limit may not be achievable because it would break the alliance-limit */
-            int sc = al - allied_skillcount(f, sk);
+            sc = al - allied_skillcount(f, sk);
             if (sc <= 0)
                 return 0;
             return fl;
@@ -594,8 +626,7 @@ int skill_limit(faction * f, skill_t sk)
         m = max_magicians(f);
     }
     else if (sk == SK_ALCHEMY) {
-        m = get_param_int(global.parameters, "rules.maxskills.alchemy",
-            MAXALCHEMISTS);
+        m = config_get_int("rules.maxskills.alchemy", MAXALCHEMISTS);
     }
     return m;
 }
@@ -691,3 +722,124 @@ void faction_setorigin(faction * f, int id, int x, int y)
     addlist(&f->ursprung, ur);
 }
 
+
+int count_faction(const faction * f, int flags)
+{
+    unit *u;
+    int n = 0;
+    for (u = f->units; u; u = u->nextF) {
+        const race *rc = u_race(u);
+        int x = (flags&COUNT_UNITS) ? 1 : u->number;
+        if (f->race != rc) {
+            if (!playerrace(rc)) {
+                if (flags&COUNT_MONSTERS) {
+                    n += x;
+                }
+            }
+            else if (flags&COUNT_MIGRANTS) {
+                if (!is_cursed(u->attribs, C_SLAVE, 0)) {
+                    n += x;
+                }
+            }
+        }
+        else if (flags&COUNT_DEFAULT) {
+            n += x;
+        }
+    }
+    return n;
+}
+
+int count_units(const faction * f)
+{
+    return count_faction(f, COUNT_ALL | COUNT_UNITS);
+}
+
+int count_all(const faction * f)
+{
+    return count_faction(f, COUNT_ALL);
+}
+
+int count_migrants(const faction * f)
+{
+    return count_faction(f, COUNT_MIGRANTS);
+}
+
+#define MIGRANTS_NONE 0
+#define MIGRANTS_LOG10 1
+
+int count_maxmigrants(const faction * f)
+{
+    int formula = get_param_int(f->race->parameters, "migrants.formula", 0);
+
+    if (formula == MIGRANTS_LOG10) {
+        int nsize = count_all(f);
+        if (nsize > 0) {
+            int x = (int)(log10(nsize / 50.0) * 20);
+            if (x < 0) x = 0;
+            return x;
+        }
+    }
+    return 0;
+}
+
+static void init_maxmagicians(struct attrib *a)
+{
+    a->data.i = MAXMAGICIANS;
+}
+
+attrib_type at_maxmagicians = {
+    "maxmagicians",
+    init_maxmagicians,
+    NULL,
+    NULL,
+    a_writeint,
+    a_readint,
+    ATF_UNIQUE
+};
+
+int max_magicians(const faction * f)
+{
+    int m = config_get_int("rules.maxskills.magic", MAXMAGICIANS);
+    attrib *a;
+
+    if ((a = a_find(f->attribs, &at_maxmagicians)) != NULL) {
+        m = a->data.i;
+    }
+    if (f->race == get_race(RC_ELF))
+        ++m;
+    return m;
+}
+
+#define DMAXHASH 7919
+typedef struct dead {
+    struct dead *nexthash;
+    faction *f;
+    int no;
+} dead;
+
+static dead *deadhash[DMAXHASH];
+
+void dhash(int no, faction * f)
+{
+    dead *hash = (dead *)calloc(1, sizeof(dead));
+    dead *old = deadhash[no % DMAXHASH];
+    hash->no = no;
+    hash->f = f;
+    deadhash[no % DMAXHASH] = hash;
+    hash->nexthash = old;
+}
+
+faction *dfindhash(int no)
+{
+    dead *old;
+
+    if (no < 0)
+        return 0;
+
+    for (old = deadhash[no % DMAXHASH]; old; old = old->nexthash) {
+        if (old->no == no) {
+            return old->f;
+        }
+    }
+    return 0;
+}

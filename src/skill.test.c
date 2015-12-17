@@ -29,18 +29,10 @@ static void test_init_skill(CuTest *tc) {
 static void test_get_skill(CuTest *tc) {
     test_cleanup();
     CuAssertIntEquals(tc, SK_ALCHEMY, findskill("alchemy"));
+    CuAssertIntEquals(tc, SK_MAGIC, findskill("magic"));
     CuAssertIntEquals(tc, SK_CROSSBOW, findskill("crossbow"));
     CuAssertIntEquals(tc, NOSKILL, findskill(""));
     CuAssertIntEquals(tc, NOSKILL, findskill("potato"));
-}
-
-static void test_get_skill_default(CuTest *tc) {
-    struct locale *lang;
-    test_cleanup();
-    lang = get_or_create_locale("en");
-    CuAssertIntEquals(tc, NOSKILL, get_skill("potato", lang));
-    CuAssertIntEquals(tc, SK_ALCHEMY, get_skill("alchemy", lang));
-    CuAssertIntEquals(tc, SK_CROSSBOW, get_skill("crossbow", lang));
 }
 
 CuSuite *get_skill_suite(void)
@@ -49,7 +41,6 @@ CuSuite *get_skill_suite(void)
     SUITE_ADD_TEST(suite, test_init_skill);
     SUITE_ADD_TEST(suite, test_init_skills);
     SUITE_ADD_TEST(suite, test_get_skill);
-    DISABLE_TEST(suite, test_get_skill_default);
     return suite;
 }
 

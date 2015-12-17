@@ -112,11 +112,12 @@ void curse_init(attrib * a)
     a->data.v = calloc(1, sizeof(curse));
 }
 
-int curse_age(attrib * a)
+int curse_age(attrib * a, void *owner)
 {
     curse *c = (curse *)a->data.v;
     int result = 0;
 
+    unused_arg(owner);
     c_clearflag(c, CURSE_ISNEW);
 
     if (c_flags(c) & CURSE_NOAGE) {
@@ -293,11 +294,12 @@ attrib_type at_curse = {
 #include <util/umlaut.h>
 #include <quicklist.h>
 
-static quicklist *cursetypes[256];
+#define MAXCTHASH 128
+static quicklist *cursetypes[MAXCTHASH];
 
 void ct_register(const curse_type * ct)
 {
-    unsigned int hash = tolower(ct->cname[0]);
+    unsigned int hash = tolower(ct->cname[0]) & 0xFF;
     quicklist **ctlp = cursetypes + hash;
 
     ql_set_insert(ctlp, (void *)ct);
@@ -333,7 +335,7 @@ void ct_checknames(void) {
     int i, qi;
     quicklist *ctl;
 
-    for (i = 0; i < 256; ++i) {
+    for (i = 0; i < MAXCTHASH; ++i) {
         ctl = cursetypes[i];
         for (qi = 0; ctl; ql_advance(&ctl, &qi, 1)) {
             curse_type *type = (curse_type *)ql_get(ctl, qi);
@@ -817,4 +819,11 @@ double destr_curse(curse * c, int cast_level, double force)
         }
     }
     return force;
+}
+
+void free_curses(void) {
+    int i;
+    for (i = 0; i != MAXCTHASH; ++i) {
+        ql_free(cursetypes[i]);
+    }
 }

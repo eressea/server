@@ -30,6 +30,7 @@
 #include <spells/shipcurse.h>
 #include <spells/combatspells.h>
 #include <spells/alp.h>
+#include <spells/flyingship.h>
 
 /* kernel includes */
 #include <kernel/curse.h>
@@ -100,6 +101,10 @@
 #include <attributes/targetregion.h>
 #include <attributes/hate.h>
 /* ----------------------------------------------------------------------- */
+
+#if defined(_MSC_VER) && _MSC_VER >= 1900
+# pragma warning(disable: 4774) // TODO: remove this
+#endif
 
 static double zero_effect = 0.0;
 
@@ -567,11 +572,12 @@ static int sp_summon_familiar(castorder * co)
             region *rn = rconnect(r, dir);
             if (rn && fval(rn->terrain, SEA_REGION)) {
                 dh++;
-                if (dh == coasts)
+                if (dh == coasts) {
+                    r = rconnect(r, dir);
                     break;
+                }
             }
         }
-        r = rconnect(r, dir);
     }
 
     msg = msg_message("familiar_name", "unit", mage);
@@ -2182,7 +2188,7 @@ static int sp_ironkeeper(castorder * co)
     guard(keeper, GUARD_MINING);
     fset(keeper, UFL_ISNEW);
     /* Parteitarnen, damit man nicht sofort weiß, wer dahinter steckt */
-    if (rule_stealth_faction()) {
+    if (rule_stealth_anon()) {
         fset(keeper, UFL_ANON_FACTION);
     }
 
@@ -3624,7 +3630,7 @@ static int sp_charmingsong(castorder * co)
 
     /* setze Parteitarnung, damit nicht sofort klar ist, wer dahinter
      * steckt */
-    if (rule_stealth_faction()) {
+    if (rule_stealth_anon()) {
         fset(target, UFL_ANON_FACTION);
     }
 
@@ -4371,7 +4377,7 @@ static int sp_raisepeasants(castorder * co)
         LOC(mage->faction->locale, "furious_mob"), mage);
 
     fset(u2, UFL_LOCKED);
-    if (rule_stealth_faction()) {
+    if (rule_stealth_anon()) {
         fset(u2, UFL_ANON_FACTION);
     }
 
@@ -4471,13 +4477,11 @@ int sp_icastle(castorder * co)
 {
     building *b;
     const building_type *type;
-    attrib *a;
     region *r = co_get_region(co);
     unit *mage = co->magician.u;
     int cast_level = co->level;
     double power = co->force;
     spellparameter *pa = co->par;
-    icastle_data *data;
     const char *bname;
     message *msg;
     const building_type *bt_illusion = bt_find("illusioncastle");
@@ -4513,12 +4517,7 @@ int sp_icastle(castorder * co)
     building_setname(b, bname);
 
     /* TODO: Auf timeout und action_destroy umstellen */
-    a = a_add(&b->attribs, a_new(&at_icastle));
-    data = (icastle_data *)a->data.v;
-    data->type = type;
-    data->building = b;
-    data->time =
-        2 + (rng_int() % (int)(power)+1) * (rng_int() % (int)(power)+1);
+    make_icastle(b, type, 2 + (rng_int() % (int)(power)+1) * (rng_int() % (int)(power)+1));
 
     if (mage->region == r) {
         if (leave(mage, false)) {
@@ -5950,7 +5949,7 @@ int sp_movecastle(castorder * co)
 
     target_region = rconnect(r, dir);
 
-    if (!(target_region->terrain->flags & LAND_REGION)) {
+    if (!target_region || !(target_region->terrain->flags & LAND_REGION)) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "sp_movecastle_fail_1", "direction", dir));
         return cast_level;
@@ -5989,72 +5988,6 @@ int sp_movecastle(castorder * co)
     return cast_level;
 }
 
-/* ------------------------------------------------------------- */
-/* Name:       Luftschiff
- * Stufe:      6
- *
- * Wirkung:
- * Laeßt ein Schiff eine Runde lang fliegen.  Wirkt nur auf Boote und
- * Langboote.
- * Kombinierbar mit "Guenstige Winde", aber nicht mit "Sturmwind".
- *
- * Flag:
- *  (ONSHIPCAST | SHIPSPELL | TESTRESISTANCE)
- */
-int sp_flying_ship(castorder * co)
-{
-    ship *sh;
-    unit *u;
-    region *r = co_get_region(co);
-    unit *mage = co->magician.u;
-    int cast_level = co->level;
-    double power = co->force;
-    spellparameter *pa = co->par;
-    message *m = NULL;
-    int cno;
-
-    /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
-        return 0;
-    sh = pa->param[0]->data.sh;
-    if (sh->type->construction->maxsize > 50) {
-        ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
-            "error_flying_ship_too_big", "ship", sh));
-        return 0;
-    }
-
-    /* Duration = 1, nur diese Runde */
-
-    cno = levitate_ship(sh, mage, power, 1);
-    if (cno == 0) {
-        if (is_cursed(sh->attribs, C_SHIP_FLYING, 0)) {
-            /* Auf dem Schiff befindet liegt bereits so ein Zauber. */
-            cmistake(mage, co->order, 211, MSG_MAGIC);
-        }
-        else if (is_cursed(sh->attribs, C_SHIP_SPEEDUP, 0)) {
-            /* Es ist zu gefaehrlich, ein sturmgepeitschtes Schiff fliegen zu lassen. */
-            cmistake(mage, co->order, 210, MSG_MAGIC);
-        }
-        return 0;
-    }
-    sh->coast = NODIRECTION;
-
-    /* melden, 1x pro Partei */
-    for (u = r->units; u; u = u->next)
-        freset(u->faction, FFL_SELECT);
-    for (u = r->units; u; u = u->next) {
-        /* das sehen natuerlich auch die Leute an Land */
-        if (!fval(u->faction, FFL_SELECT)) {
-            fset(u->faction, FFL_SELECT);
-            if (!m)
-                m = msg_message("flying_ship_result", "mage ship", mage, sh);
-            add_message(&u->faction->msgs, m);
-        }
-    }
-    if (m)
-        msg_release(m);
-    return cast_level;
-}
 
 /* ------------------------------------------------------------- */
 /* Name:       Stehle Aura
@@ -6791,4 +6724,6 @@ void register_spells(void)
     register_shipcurse();
     register_buildingcurse();
     register_magicresistance();
+
+    register_flyingship();
 }

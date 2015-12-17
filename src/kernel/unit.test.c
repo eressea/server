@@ -2,6 +2,7 @@
 #include <kernel/config.h>
 #include <kernel/curse.h>
 #include <kernel/item.h>
+#include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/order.h>
 #include <kernel/race.h>
@@ -122,11 +123,11 @@ static void test_scale_number(CuTest *tc) {
     u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
     change_effect(u, ptype, 1);
     CuAssertIntEquals(tc, 1, u->number);
-    CuAssertIntEquals(tc, 1, u->hp);
+    CuAssertIntEquals(tc, 20, u->hp);
     CuAssertIntEquals(tc, 1, get_effect(u, ptype));
     scale_number(u, 2);
     CuAssertIntEquals(tc, 2, u->number);
-    CuAssertIntEquals(tc, 2, u->hp);
+    CuAssertIntEquals(tc, 40, u->hp);
     CuAssertIntEquals(tc, 2, get_effect(u, ptype));
     set_level(u, SK_ALCHEMY, 1);
     scale_number(u, 0);
@@ -282,16 +283,6 @@ static void test_skill_hunger(CuTest *tc) {
     set_level(u, SK_ARMORER, 6);
     set_level(u, SK_SAILING, 6);
     fset(u, UFL_HUNGER);
-
-    set_param(&global.parameters, "rules.hunger.reduces_skill", "0");
-    CuAssertIntEquals(tc, 6, effskill(u, SK_ARMORER, 0));
-    CuAssertIntEquals(tc, 6, effskill(u, SK_SAILING, 0));
-
-    set_param(&global.parameters, "rules.hunger.reduces_skill", "1");
-    CuAssertIntEquals(tc, 3, effskill(u, SK_ARMORER, 0));
-    CuAssertIntEquals(tc, 3, effskill(u, SK_SAILING, 0));
-
-    set_param(&global.parameters, "rules.hunger.reduces_skill", "2");
     CuAssertIntEquals(tc, 3, effskill(u, SK_ARMORER, 0));
     CuAssertIntEquals(tc, 5, effskill(u, SK_SAILING, 0));
     set_level(u, SK_SAILING, 2);
@@ -340,12 +331,12 @@ static void test_age_familiar(CuTest *tc) {
     CuAssertIntEquals(tc, true, create_newfamiliar(mag, fam));
     CuAssertPtrEquals(tc, fam, get_familiar(mag));
     CuAssertPtrEquals(tc, mag, get_familiar_mage(fam));
-    a_age(&fam->attribs);
-    a_age(&mag->attribs);
+    a_age(&fam->attribs, fam);
+    a_age(&mag->attribs, mag);
     CuAssertPtrEquals(tc, fam, get_familiar(mag));
     CuAssertPtrEquals(tc, mag, get_familiar_mage(fam));
     set_number(fam, 0);
-    a_age(&mag->attribs);
+    a_age(&mag->attribs, mag);
     CuAssertPtrEquals(tc, 0, get_familiar(mag));
     test_cleanup();
 }
@@ -370,9 +361,56 @@ static void test_produceexp(CuTest *tc) {
     g_tc = tc;
     test_cleanup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
-    set_param(&global.parameters, "study.from_use", "0.5");
+    config_set("study.from_use", "0.5");
     produceexp_ex(u, SK_ALCHEMY, 1, cb_learn_one);
     produceexp_ex(u, SK_ALCHEMY, 2, cb_learn_two);
+    test_cleanup();
+}
+
+static void test_inside_building(CuTest *tc) {
+    unit *u;
+    building *b;
+
+    test_cleanup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    b = test_create_building(u->region, 0);
+
+    b->size = 1;
+    scale_number(u, 1);
+    CuAssertPtrEquals(tc, 0, inside_building(u));
+    u->building = b;
+    CuAssertPtrEquals(tc, b, inside_building(u));
+    scale_number(u, 2);
+    CuAssertPtrEquals(tc, 0, inside_building(u));
+    b->size = 2;
+    CuAssertPtrEquals(tc, b, inside_building(u));
+    u = test_create_unit(u->faction, u->region);
+    u->building = b;
+    CuAssertPtrEquals(tc, 0, inside_building(u));
+    b->size = 3;
+    CuAssertPtrEquals(tc, b, inside_building(u));
+    test_cleanup();
+}
+
+static void test_limited_skills(CuTest *tc) {
+    unit *u;
+    test_cleanup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    CuAssertIntEquals(tc, false, has_limited_skills(u));
+    set_level(u, SK_ENTERTAINMENT, 1);
+    CuAssertIntEquals(tc, false, has_limited_skills(u));
+    u->skills->id = SK_ALCHEMY;
+    CuAssertIntEquals(tc, true, has_limited_skills(u));
+    u->skills->id = SK_MAGIC;
+    CuAssertIntEquals(tc, true, has_limited_skills(u));
+    u->skills->id = SK_TACTICS;
+    CuAssertIntEquals(tc, true, has_limited_skills(u));
+    u->skills->id = SK_HERBALISM;
+    CuAssertIntEquals(tc, true, has_limited_skills(u));
+    u->skills->id = SK_SPY;
+    CuAssertIntEquals(tc, true, has_limited_skills(u));
+    u->skills->id = SK_TAXING;
+    CuAssertIntEquals(tc, false, has_limited_skills(u));
     test_cleanup();
 }
 
@@ -394,6 +432,8 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_skill_hunger);
     SUITE_ADD_TEST(suite, test_skill_familiar);
     SUITE_ADD_TEST(suite, test_age_familiar);
+    SUITE_ADD_TEST(suite, test_inside_building);
     SUITE_ADD_TEST(suite, test_produceexp);
+    SUITE_ADD_TEST(suite, test_limited_skills);
     return suite;
 }

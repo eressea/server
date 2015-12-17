@@ -6,6 +6,7 @@
 #include "move.h"
 #include "seen.h"
 #include "travelthru.h"
+#include "keyword.h"
 
 #include <kernel/building.h>
 #include <kernel/faction.h>
@@ -13,6 +14,8 @@
 #include <kernel/region.h>
 #include <kernel/ship.h>
 #include <kernel/unit.h>
+#include <kernel/spell.h>
+#include <kernel/spellbook.h>
 
 #include <util/language.h>
 
@@ -66,6 +69,7 @@ static void test_reorder_units(CuTest * tc)
     CuAssertPtrEquals(tc, u1, u2->next);
     CuAssertPtrEquals(tc, u0, u1->next);
     CuAssertPtrEquals(tc, 0, u0->next);
+    test_cleanup();
 }
 
 static void test_regionid(CuTest * tc) {
@@ -88,11 +92,15 @@ static void test_regionid(CuTest * tc) {
     CuAssertIntEquals(tc, 10, (int)len);
     CuAssertStrEquals(tc, "plain (0,0", buffer);
     CuAssertIntEquals(tc, 0x7d, buffer[11]);
+    test_cleanup();
 }
 
 static void test_seen_faction(CuTest *tc) {
     faction *f1, *f2;
-    race *rc = test_create_race("human");
+    race *rc;
+
+    test_cleanup();
+    rc = test_create_race("human");
     f1 = test_create_faction(rc);
     f2 = test_create_faction(rc);
     add_seen_faction(f1, f2);
@@ -105,6 +113,7 @@ static void test_seen_faction(CuTest *tc) {
     f2 = (faction *)ql_get(f1->seen_factions, 1);
     f1 = (faction *)ql_get(f1->seen_factions, 0);
     CuAssertTrue(tc, f1->no < f2->no);
+    test_cleanup();
 }
 
 static void test_write_spaces(CuTest *tc) {
@@ -139,18 +148,25 @@ static void test_write_many_spaces(CuTest *tc) {
 
 static void test_sparagraph(CuTest *tc) {
     strlist *sp = 0;
+
     split_paragraph(&sp, "Hello World", 0, 16, 0);
     CuAssertPtrNotNull(tc, sp);
     CuAssertStrEquals(tc, "Hello World", sp->s);
     CuAssertPtrEquals(tc, 0, sp->next);
+    freestrlist(sp);
+
     split_paragraph(&sp, "Hello World", 4, 16, 0);
     CuAssertPtrNotNull(tc, sp);
     CuAssertStrEquals(tc, "    Hello World", sp->s);
     CuAssertPtrEquals(tc, 0, sp->next);
+    freestrlist(sp);
+
     split_paragraph(&sp, "Hello World", 4, 16, '*');
     CuAssertPtrNotNull(tc, sp);
     CuAssertStrEquals(tc, "  * Hello World", sp->s);
     CuAssertPtrEquals(tc, 0, sp->next);
+    freestrlist(sp);
+
     split_paragraph(&sp, "12345678 90 12345678", 0, 8, '*');
     CuAssertPtrNotNull(tc, sp);
     CuAssertStrEquals(tc, "12345678", sp->s);
@@ -159,6 +175,7 @@ static void test_sparagraph(CuTest *tc) {
     CuAssertPtrNotNull(tc, sp->next->next);
     CuAssertStrEquals(tc, "12345678", sp->next->next->s);
     CuAssertPtrEquals(tc, 0, sp->next->next->next);
+    freestrlist(sp);
 }
 
 static void test_cr_unit(CuTest *tc) {
@@ -270,6 +287,126 @@ static void test_write_unit(CuTest *tc) {
     test_cleanup();
 }
 
+typedef struct {
+    struct locale *lang;
+    spell *sp;
+    spellbook *spb;
+    spellbook_entry * sbe;
+} spell_fixture;
+
+static void setup_spell_fixture(spell_fixture * spf) {
+    spf->lang = get_or_create_locale("de");
+    locale_setstring(spf->lang, mkname("spell", "testspell"), "Testzauber");
+    locale_setstring(spf->lang, "nr_spell_type", "Typ:");
+    locale_setstring(spf->lang, "sptype_normal", "Normal");
+    locale_setstring(spf->lang, "nr_spell_modifiers", "Modifier:");
+    locale_setstring(spf->lang, "smod_none", "Keine");
+    locale_setstring(spf->lang, keyword(K_CAST), "ZAUBERE");
+    locale_setstring(spf->lang, parameters[P_REGION], "REGION");
+    locale_setstring(spf->lang, parameters[P_LEVEL], "STUFE");
+    locale_setstring(spf->lang, "par_unit", "enr");
+    locale_setstring(spf->lang, "par_ship", "snr");
+    locale_setstring(spf->lang, "par_building", "bnr");
+    locale_setstring(spf->lang, "spellpar::hodor", "Hodor");
+
+    spf->spb = create_spellbook("testbook");
+    spf->sp = test_create_spell();
+    spellbook_add(spf->spb, spf->sp, 1);
+    spf->sbe = spellbook_get(spf->spb, spf->sp);
+}
+
+static void check_spell_syntax(CuTest *tc, char *msg, spell_fixture *spell, char *syntax) {
+    stream strm;
+    char buf[1024];
+    char *linestart, *newline;
+    size_t len;
+
+    mstream_init(&strm);
+    nr_spell_syntax(&strm, spell->sbe, spell->lang);
+    strm.api->rewind(strm.handle);
+    len = strm.api->read(strm.handle, buf, sizeof(buf));
+    buf[len] = '\0';
+
+    linestart = strtok(buf, "\n");
+    while (linestart && !strstr(linestart, "ZAUBERE"))
+        linestart = strtok(NULL, "\n") ;
+
+    CuAssertPtrNotNull(tc, linestart);
+
+    newline = strtok(NULL, "\n");
+    while (newline) {
+        *(newline - 1) = '\n';
+        newline = strtok(NULL, "\n");
+    }
+
+    CuAssertStrEquals_Msg(tc, msg, syntax, linestart);
+
+    mstream_done(&strm);
+}
+
+static void set_parameter(spell_fixture spell, char *value) {
+    free(spell.sp->parameter);
+    spell.sp->parameter = _strdup(value);
+}
+
+static void test_write_spell_syntax(CuTest *tc) {
+    spell_fixture spell;
+
+    test_cleanup();
+    setup_spell_fixture(&spell);
+
+    check_spell_syntax(tc, "vanilla",  &spell,   "  ZAUBERE \"Testzauber\"");
+
+    spell.sp->sptyp |= FARCASTING;
+    check_spell_syntax(tc, "far",  &spell,   "  ZAUBERE [REGION x y] \"Testzauber\"");
+
+    spell.sp->sptyp |= SPELLLEVEL;
+    check_spell_syntax(tc, "farlevel",  &spell,   "  ZAUBERE [REGION x y] [STUFE n] \"Testzauber\"");
+    spell.sp->sptyp = 0;
+
+    set_parameter(spell, "kc");
+    check_spell_syntax(tc, "kc", &spell,   "  ZAUBERE \"Testzauber\" ( REGION | EINHEIT <enr> | SCHIFF <snr> | BURG <bnr> )");
+
+    spell.sp->sptyp |= BUILDINGSPELL;
+    check_spell_syntax(tc, "kc typed", &spell,   "  ZAUBERE \"Testzauber\" BURG <bnr>");
+    spell.sp->sptyp = 0;
+
+    set_parameter(spell, "b");
+    check_spell_syntax(tc, "b", &spell,   "  ZAUBERE \"Testzauber\" <bnr>");
+
+    set_parameter(spell, "s");
+    check_spell_syntax(tc, "s", &spell,   "  ZAUBERE \"Testzauber\" <snr>");
+
+    set_parameter(spell, "s+");
+    check_spell_syntax(tc, "s+", &spell,   "  ZAUBERE \"Testzauber\" <snr> [<snr> ...]");
+
+    set_parameter(spell, "u");
+    check_spell_syntax(tc, "u", &spell,   "  ZAUBERE \"Testzauber\" <enr>");
+
+    set_parameter(spell, "r");
+    check_spell_syntax(tc, "r", &spell,   "  ZAUBERE \"Testzauber\" <x> <y>");
+
+    set_parameter(spell, "bc");
+    free(spell.sp->syntax);
+    spell.sp->syntax = _strdup("hodor");
+    check_spell_syntax(tc, "bc hodor", &spell,   "  ZAUBERE \"Testzauber\" <bnr> <Hodor>");
+    free(spell.sp->syntax);
+    spell.sp->syntax = 0;
+
+    set_parameter(spell, "c?");
+    free(spell.sp->syntax);
+    spell.sp->syntax = _strdup("hodor");
+    check_spell_syntax(tc, "c?", &spell,   "  ZAUBERE \"Testzauber\" [<Hodor>]");
+    free(spell.sp->syntax);
+    spell.sp->syntax = 0;
+
+    set_parameter(spell, "kc+");
+    check_spell_syntax(tc, "kc+", &spell,
+        "  ZAUBERE \"Testzauber\" ( REGION | EINHEIT <enr> [<enr> ...] | SCHIFF <snr>\n  [<snr> ...] | BURG <bnr> [<bnr> ...] )");
+
+    test_cleanup();
+}
+
 CuSuite *get_reports_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -282,5 +419,6 @@ CuSuite *get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_sparagraph);
     SUITE_ADD_TEST(suite, test_write_travelthru);
     SUITE_ADD_TEST(suite, test_write_unit);
+    SUITE_ADD_TEST(suite, test_write_spell_syntax);
     return suite;
 }

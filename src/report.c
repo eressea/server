@@ -97,6 +97,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <limits.h>
 #include <stdlib.h>
 
+#if defined(_MSC_VER) && _MSC_VER >= 1900
+# pragma warning(disable: 4774) // TODO: remove this
+#endif
+
 extern int *storms;
 extern int weeks_per_month;
 extern int months_per_year;
@@ -244,14 +248,15 @@ static size_t write_spell_modifier(spell * sp, int flag, const char * str, bool 
     return 0;
 }
 
-static void nr_spell(stream *out, spellbook_entry * sbe, const struct locale *lang)
+void nr_spell_syntax(struct stream *out, struct spellbook_entry * sbe, const struct locale *lang);
+
+void nr_spell(stream *out, spellbook_entry * sbe, const struct locale *lang)
 {
     int bytes, k, itemanz, costtyp;
     char buf[4096];
     char *startp, *bufp = buf;
     size_t size = sizeof(buf) - 1;
     spell * sp = sbe->sp;
-    const char *params = sp->parameter;
 
     newline(out);
     centre(out, spell_name(sp, lang), true);
@@ -301,7 +306,7 @@ static void nr_spell(stream *out, spellbook_entry * sbe, const struct locale *la
             if (sp->sptyp & SPELLLEVEL) {
                 bytes =
                     _snprintf(bufp, size, "  %d %s", itemanz, LOC(lang, resourcename(rtype,
-                    itemanz != 1)));
+                        itemanz != 1)));
                 if (wrptr(&bufp, &size, bytes) != 0)
                     WARN_STATIC_BUFFER();
                 if (costtyp == SPC_LEVEL || costtyp == SPC_LINEAR) {
@@ -356,6 +361,20 @@ static void nr_spell(stream *out, spellbook_entry * sbe, const struct locale *la
 
     bufp = buf;
     size = sizeof(buf) - 1;
+
+    nr_spell_syntax(out, sbe, lang);
+
+    newline(out);
+}
+
+void nr_spell_syntax(stream *out, spellbook_entry * sbe, const struct locale *lang)
+{
+    int bytes;
+    char buf[4096];
+    char *bufp = buf;
+    size_t size = sizeof(buf) - 1;
+    spell * sp = sbe->sp;
+    const char *params = sp->parameter;
 
     if (sp->sptyp & ISCOMBATSPELL) {
         bytes = (int)strlcpy(bufp, LOC(lang, keyword(K_COMBATSPELL)), size);
@@ -452,34 +471,38 @@ static void nr_spell(stream *out, spellbook_entry * sbe, const struct locale *la
                 WARN_STATIC_BUFFER();
         }
         else if (cp == 'k') {
-            if (*params == 'c') {
+            bool multi = false;
+            if (params && *params == 'c') {
                 /* skip over a potential id */
                 ++params;
+            }
+            if (params && *params == '+') {
+                ++params;
+                multi = true;
             }
             for (targetp = targets; targetp->flag; ++targetp) {
                 if (sp->sptyp & targetp->flag)
                     ++maxparam;
             }
-            if (maxparam > 1) {
+            if (!maxparam || maxparam > 1) {
                 bytes = (int)strlcpy(bufp, " (", size);
                 if (wrptr(&bufp, &size, bytes) != 0)
                     WARN_STATIC_BUFFER();
             }
             i = 0;
             for (targetp = targets; targetp->flag; ++targetp) {
-                if (sp->sptyp & targetp->flag) {
+                if (!maxparam || sp->sptyp & targetp->flag) {
                     if (i++ != 0) {
                         bytes = (int)strlcpy(bufp, " |", size);
                         if (wrptr(&bufp, &size, bytes) != 0)
                             WARN_STATIC_BUFFER();
                     }
-                    if (targetp->param) {
+                    if (targetp->param && targetp->vars) {
                         locp = LOC(lang, targetp->vars);
                         bytes =
                             (int)_snprintf(bufp, size, " %s <%s>", parameters[targetp->param],
-                            locp);
-                        if (*params == '+') {
-                            ++params;
+                                locp);
+                        if (multi) {
                             if (wrptr(&bufp, &size, bytes) != 0)
                                 WARN_STATIC_BUFFER();
                             bytes = (int)_snprintf(bufp, size, " [<%s> ...]", locp);
@@ -493,7 +516,7 @@ static void nr_spell(stream *out, spellbook_entry * sbe, const struct locale *la
                         WARN_STATIC_BUFFER();
                 }
             }
-            if (maxparam > 1) {
+            if (!maxparam || maxparam > 1) {
                 bytes = (int)strlcpy(bufp, " )", size);
                 if (wrptr(&bufp, &size, bytes) != 0)
                     WARN_STATIC_BUFFER();
@@ -513,14 +536,22 @@ static void nr_spell(stream *out, spellbook_entry * sbe, const struct locale *la
                 locp = LOC(lang, mkname("spellpar", substr));
                 syntaxp = substr + 1;
             }
-            bytes = (int)_snprintf(bufp, size, " <%s>", locp);
+            if (*params == '?') {
+                ++params;
+                bytes = (int)_snprintf(bufp, size, " [<%s>]", locp);
+            }
+            else {
+                bytes = (int)_snprintf(bufp, size, " <%s>", locp);
+            }
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
+        } else {
+           log_error("unknown spell parameter %c for spell %s", cp, sp->sname);
         }
     }
     *bufp = 0;
     paragraph(out, buf, 2, 0, 0);
-    newline(out);
+
 }
 
 static void
@@ -988,7 +1019,7 @@ static void describe(stream *out, const seen_region * sr, faction * f)
 
         if (r->land->ownership) {
             const char *str =
-                LOC(f->locale, mkname("morale", itoa10(r->land->morale)));
+                LOC(f->locale, mkname("morale", itoa10(region_get_morale(r))));
             bytes = _snprintf(bufp, size, " %s", str);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
@@ -1204,13 +1235,6 @@ static void describe(stream *out, const seen_region * sr, faction * f)
     nr_curses(out, 0, f, TYP_REGION, r);
     n = 0;
 
-    /* Produktionsreduktion */
-    a = a_find(r->attribs, &at_reduceproduction);
-    if (a) {
-        const char *str = LOC(f->locale, "nr_reduced_production");
-        paragraph(out, str, 0, 0, 0);
-    }
-
     if (edges)
         newline(out);
     for (e = edges; e; e = e->next) {
@@ -1237,6 +1261,7 @@ static void describe(stream *out, const seen_region * sr, faction * f)
             first = false;
         }
         // TODO name is localized? Works for roads anyway...
+        // TODO: creating messages during reporting makes them not show up in CR?
         msg = msg_message("nr_borderlist_postfix", "transparent object",
             e->transparent, e->name);
         bytes = (int)nr_render(msg, f->locale, bufp, size, f);
@@ -1323,7 +1348,7 @@ static void statistics(stream *out, const region * r, const faction * f)
         }
 
         if (r->land->ownership) {
-            m = msg_message("nr_stat_morale", "morale", r->land->morale);
+            m = msg_message("nr_stat_morale", "morale", region_get_morale(r));
             nr_render(m, f->locale, buf, sizeof(buf), f);
             paragraph(out, buf, 2, 2, 0);
             msg_release(m);
@@ -1521,7 +1546,7 @@ report_template(const char *filename, report_context * ctx, const char *charset)
         }
     }
     newline(out);
-    strcpy(buf, LOC(f->locale, parameters[P_NEXT]));
+    strlcpy(buf, LOC(f->locale, parameters[P_NEXT]), sizeof(buf));
     rps_nowrap(out, buf);
     newline(out);
     fstream_done(&strm);
@@ -1574,7 +1599,7 @@ show_allies(const faction * f, const ally * allies, char *buf, size_t size)
                 WARN_STATIC_BUFFER();
         }
         else {
-            for (h = 1; h < HELP_ALL; h *= 2) {
+            for (h = 1; h <= HELP_TRAVEL; h *= 2) {
                 int p = MAXPARAMS;
                 if ((mode & h) == h) {
                     switch (h) {
@@ -1800,8 +1825,7 @@ const unit * captain)
             WARN_STATIC_BUFFER();
     }
     if (sh->damage) {
-        int percent =
-            (sh->damage * 100 + DAMAGE_SCALE - 1) / (sh->size * DAMAGE_SCALE);
+        int percent = ship_damage_percent(sh);
         bytes =
             _snprintf(bufp, size, ", %d%% %s", percent, LOC(f->locale, "nr_damaged"));
         if (wrptr(&bufp, &size, bytes) != 0)
@@ -1844,18 +1868,16 @@ const faction * f)
 {
     int i, bytes;
     const char *name, *bname, *billusion = NULL;
-    const struct locale *lang = NULL;
+    const struct locale *lang;
     char buffer[8192], *bufp = buffer;
     message *msg;
     size_t size = sizeof(buffer) - 1;
 
+    assert(f);
+    lang = f->locale;
     newline(out);
-
-    if (f)
-        lang = f->locale;
-
     bytes =
-        _snprintf(bufp, size, "%s, %s %d, ", buildingname(b), LOC(f->locale,
+        _snprintf(bufp, size, "%s, %s %d, ", buildingname(b), LOC(lang,
         "nr_size"), b->size);
     if (wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
@@ -1877,7 +1899,7 @@ const faction * f)
     }
 
     if (b->size < b->type->maxsize) {
-        bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_building_inprogress"), size);
+        bytes = (int)strlcpy(bufp, LOC(lang, "nr_building_inprogress"), size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
     }
@@ -1885,7 +1907,7 @@ const faction * f)
     if (b->besieged > 0 && sr->mode >= see_lighthouse) {
         msg = msg_message("nr_building_besieged", "soldiers diff", b->besieged,
             b->besieged - b->size * SIEGEFACTOR);
-        bytes = (int)nr_render(msg, f->locale, bufp, size, f);
+        bytes = (int)nr_render(msg, lang, bufp, size, f);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
         msg_release(msg);
@@ -1922,6 +1944,7 @@ static void nr_paragraph(stream *out, message * m, faction * f)
     char buf[4096], *bufp = buf;
     size_t size = sizeof(buf) - 1;
 
+    assert(f);
     bytes = (int)nr_render(m, f->locale, bufp, size, f);
     if (wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
@@ -2051,19 +2074,14 @@ const char *charset)
     char *bufp;
     bool utf8 = _strcmpl(charset, "utf8") == 0 || _strcmpl(charset, "utf-8") == 0;
     size_t size;
-
-    /* static variables can cope with writing for different turns */
-    static int thisseason = -1;
-    static int nextseason = -1;
-    static int gamecookie = -1;
-    if (gamecookie != global.cookie) {
-        gamedate date;
-        get_gamedate(turn + 1, &date);
-        thisseason = date.season;
-        get_gamedate(turn + 2, &date);
-        nextseason = date.season;
-        gamecookie = global.cookie;
-    }
+    int thisseason;
+    int nextseason;
+    gamedate date;
+    
+    get_gamedate(turn + 1, &date);
+    thisseason = date.season;
+    get_gamedate(turn + 2, &date);
+    nextseason = date.season;
 
     if (F == NULL) {
         perror(filename);
@@ -2327,7 +2345,7 @@ const char *charset)
                 message *m = 0;
                 if (herb && lux) {
                     m = msg_message("nr_market_info_p", "p1 p2",
-                        lux ? lux->rtype : 0, herb ? herb->rtype : 0);
+                        lux->rtype, herb->rtype);
                 }
                 else if (lux || herb) {
                     m = msg_message("nr_market_info_s", "p1",
@@ -2354,11 +2372,6 @@ const char *charset)
                 describe(out, sr, f);
                 newline(out);
                 guards(out, r, f);
-                newline(out);
-                write_travelthru(out, r, f);
-            }
-            else if (sr->mode == see_lighthouse) {
-                describe(out, sr, f);
                 newline(out);
                 write_travelthru(out, r, f);
             }

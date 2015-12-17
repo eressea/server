@@ -31,6 +31,7 @@ static const struct race * race_with_flag(const char * name) {
     json = cJSON_Parse(data);
     free_races();
     json_config(json);
+    cJSON_Delete(json);
     return rc_find("orc");
 }
 
@@ -73,11 +74,12 @@ static void test_settings(CuTest * tc)
 
     test_cleanup();
     json_config(json);
-    CuAssertStrEquals(tc, "1", get_param(global.parameters, "true"));
-    CuAssertStrEquals(tc, "0", get_param(global.parameters, "false"));
-    CuAssertStrEquals(tc, "1d4", get_param(global.parameters, "string"));
-    CuAssertIntEquals(tc, 14, get_param_int(global.parameters, "integer", 0));
-    CuAssertDblEquals(tc, 1.5f, get_param_flt(global.parameters, "float", 0), 0.01);
+    CuAssertStrEquals(tc, "1", config_get("true"));
+    CuAssertStrEquals(tc, "0", config_get("false"));
+    CuAssertStrEquals(tc, "1d4", config_get("string"));
+    CuAssertIntEquals(tc, 14, config_get_int("integer", 0));
+    CuAssertDblEquals(tc, 1.5f, config_get_flt("float", 0), 0.01);
+    cJSON_Delete(json);
     test_cleanup();
 }
 
@@ -96,6 +98,7 @@ static void test_prefixes(CuTest * tc)
     CuAssertStrEquals(tc, "snow", race_prefixes[0]);
     CuAssertStrEquals(tc, "dark", race_prefixes[2]);
     CuAssertPtrEquals(tc, 0, race_prefixes[3]);
+    cJSON_Delete(json);
     test_cleanup();
 }
 
@@ -114,13 +117,14 @@ static void test_disable(CuTest * tc)
     CuAssertTrue(tc, !keyword_disabled(K_BANNER));
     CuAssertTrue(tc, !keyword_disabled(K_PAY));
     CuAssertTrue(tc, !keyword_disabled(K_BESIEGE));
-    CuAssertIntEquals(tc, 1, get_param_int(global.parameters, "module.enabled", 1));
+    CuAssertIntEquals(tc, 1, config_get_int("module.enabled", 1));
     json_config(json);
     CuAssertTrue(tc, !skill_enabled(SK_ALCHEMY));
     CuAssertTrue(tc, !keyword_disabled(K_BANNER));
     CuAssertTrue(tc, keyword_disabled(K_PAY));
     CuAssertTrue(tc, keyword_disabled(K_BESIEGE));
-    CuAssertIntEquals(tc, 0, get_param_int(global.parameters, "module.enabled", 1));
+    CuAssertIntEquals(tc, 0, config_get_int("module.enabled", 1));
+    cJSON_Delete(json);
     test_cleanup();
 }
 
@@ -164,6 +168,7 @@ static void test_races(CuTest * tc)
     CuAssertIntEquals(tc, 4, rc->capacity);
     CuAssertIntEquals(tc, 5, rc->hitpoints);
     CuAssertIntEquals(tc, 6, rc->armor);
+    cJSON_Delete(json);
     test_cleanup();
 }
 
@@ -183,6 +188,7 @@ static void test_findrace(CuTest *tc) {
     rc = findrace("Zwerg", lang);
     CuAssertPtrNotNull(tc, rc);
     CuAssertStrEquals(tc, "dwarf", rc->_name);
+    cJSON_Delete(json);
     test_cleanup();
 }
 
@@ -216,6 +222,8 @@ static void test_items(CuTest * tc)
 
     CuAssertPtrNotNull(tc, rt_find("axe"));
     CuAssertPtrNotNull(tc, (void *)get_resourcetype(R_HORSE));
+    cJSON_Delete(json);
+    test_cleanup();
 }
 
 static void test_ships(CuTest * tc)
@@ -254,6 +262,7 @@ static void test_ships(CuTest * tc)
     CuAssertPtrEquals(tc, (void *)ter, (void *)st->coasts[0]);
     CuAssertPtrEquals(tc, 0, (void *)st->coasts[1]);
 
+    cJSON_Delete(json);
     test_cleanup();
 }
 
@@ -281,6 +290,8 @@ static void test_castles(CuTest *tc) {
     CuAssertPtrNotNull(tc, bt->construction->improvement);
     CuAssertIntEquals(tc, 6, bt->construction->improvement->maxsize);
     CuAssertPtrEquals(tc, 0, bt->construction->improvement->improvement);
+    cJSON_Delete(json);
+    test_cleanup();
 }
 
 static void test_spells(CuTest * tc)
@@ -299,6 +310,7 @@ static void test_spells(CuTest * tc)
     CuAssertPtrNotNull(tc, sp);
     CuAssertStrEquals(tc, "u+", sp->syntax);
 
+    cJSON_Delete(json);
     test_cleanup();
     CuAssertPtrEquals(tc, 0, find_spell("fireball"));
 }
@@ -364,6 +376,7 @@ static void test_buildings(CuTest * tc)
     CuAssertIntEquals(tc, 20, bt->construction->maxsize);
     CuAssertIntEquals(tc, 1, bt->construction->minskill);
     CuAssertPtrEquals(tc, 0, bt->construction->improvement);
+    cJSON_Delete(json);
     test_cleanup();
 }
 
@@ -388,6 +401,7 @@ static void test_buildings_default(CuTest * tc)
 
     CuAssertPtrEquals(tc, (void *)bt, (void *)bt_find("house"));
     CuAssertIntEquals(tc, 0, memcmp(bt, &clone, sizeof(building_type)));
+    cJSON_Delete(json);
     test_cleanup();
 }
 
@@ -412,6 +426,7 @@ static void test_ships_default(CuTest * tc)
 
     CuAssertPtrEquals(tc, (void *)st, (void *)st_find("hodor"));
     CuAssertIntEquals(tc, 0, memcmp(st, &clone, sizeof(ship_type)));
+    cJSON_Delete(json);
     test_cleanup();
 }
 
@@ -431,6 +446,7 @@ static void test_configs(CuTest * tc)
     json_config(json);
     CuAssertPtrNotNull(tc, buildingtypes);
     unlink("test.json");
+    cJSON_Delete(json);
     test_cleanup();
 }
 
@@ -472,6 +488,7 @@ static void test_terrains(CuTest * tc)
     CuAssertPtrEquals(tc, rt_get_or_create("iron"), (resource_type *)ter->production[1].type);
     CuAssertPtrEquals(tc, 0, (void *)ter->production[2].type);
 
+    cJSON_Delete(json);
     test_cleanup();
 }
 
@@ -493,6 +510,7 @@ static void test_directions(CuTest * tc)
     CuAssertIntEquals(tc, D_NORTHWEST, get_direction("nordwest", lang));
     CuAssertIntEquals(tc, D_PAUSE, get_direction("pause", lang));
 
+    cJSON_Delete(json);
     test_cleanup();
 }
 
@@ -517,6 +535,7 @@ static void test_skills(CuTest * tc)
     CuAssertStrEquals(tc, "ALCHEMIE", LOC(lang, "skill::alchemy"));
     CuAssertStrEquals(tc, "ARMBRUST", LOC(lang, "skill::crossbow"));
 
+    cJSON_Delete(json);
     test_cleanup();
 }
 
@@ -540,6 +559,7 @@ static void test_keywords(CuTest * tc)
     CuAssertStrEquals(tc, "LERNEN", LOC(lang, "keyword::study"));
     CuAssertStrEquals(tc, "NACH", LOC(lang, "keyword::move"));
 
+    cJSON_Delete(json);
     test_cleanup();
 }
 
@@ -558,6 +578,8 @@ static void test_strings(CuTest * tc)
     json_config(json);
     CuAssertStrEquals(tc, "NACH", LOC(lang, "move"));
     CuAssertStrEquals(tc, "LERNEN", LOC(lang, "study"));
+    cJSON_Delete(json);
+    test_cleanup();
 }
 
 static void test_infinitive_from_config(CuTest *tc) {
@@ -577,6 +599,8 @@ static void test_infinitive_from_config(CuTest *tc) {
 
     ord = create_order(K_STUDY, lang, "");
     CuAssertStrEquals(tc, "LERNE", get_command(ord, buffer, sizeof(buffer)));
+    free_order(ord);
+    cJSON_Delete(json);
     test_cleanup();
 }
 

@@ -3,7 +3,7 @@ local function get_markets(r, result)
   result = result or {}
 
   for b in r.buildings do
-    if b.type=="market" then
+    if b.type == "market" and b.working and b.size == b.maxsize then
       u = b.owner
       if u~=nil then
         table.insert(result, u)

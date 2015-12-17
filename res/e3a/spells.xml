@@ -585,16 +585,16 @@
     <!-- Schutzzauber -->
     <resource name="aura" amount="5" cost="level"/>
   </spell>
-  <spell name="protective_runes" rank="2" index="99" parameters="kc" ship="true">
+  <spell name="protective_runes" rank="2" index="99" parameters="kc" regiontarget="false" unittarget="false" buildingtarget="true" shiptarget="true" ship="true">
     <resource name="aura" amount="20" cost="fixed"/>
   </spell>
-  <spell name="analyze_magic" rank="5" index="102" parameters="kc?" los="true" ship="true" variable="true">
+  <spell name="analyze_magic" rank="5" index="102" parameters="kc+" los="true" ship="true" variable="true">
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="destroy_magic" rank="2" index="106" parameters="kc+" los="true" ship="true" far="true" variable="true">
     <resource name="aura" amount="4" cost="level"/>
   </spell>
-  <spell name="break_curse" rank="3" index="107" syntax="spellid" parameters="kcc?" los="true" ship="true" far="true" variable="true">
+  <spell name="break_curse" rank="3" index="107" syntax="spellid" parameters="kcc" los="true" ship="true" far="true" variable="true">
     <resource name="aura" amount="3" cost="level"/>
   </spell>
   <spell name="fish_shield" rank="2" index="109" variable="true" combat="1">

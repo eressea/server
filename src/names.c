@@ -91,7 +91,7 @@ static const char *make_names(const char *monster, int *num_postfix,
     uu = rng_int() % *num_name;
 
     /* nur 50% aller Namen haben "Nach-Teil", wenn kein Vor-Teil */
-    if (uv >= *num_prefix) {
+    if (*num_postfix > 0 && uv >= *num_prefix) {
         un = rng_int() % *num_postfix;
     }
     else {
@@ -103,22 +103,22 @@ static const char *make_names(const char *monster, int *num_postfix,
         sprintf(zText, "%s_prefix_%d", monster, uv);
         str = locale_getstring(default_locale, zText);
         if (str) {
-            strcat(name, (const char *)str);
-            strcat(name, " ");
+            size_t sz = strlcpy(name, (const char *)str, sizeof(name));
+            strlcpy(name + sz, " ", sizeof(name) - sz);
         }
     }
 
     sprintf(zText, "%s_name_%d", monster, uu);
     str = locale_getstring(default_locale, zText);
     if (str)
-        strcat(name, (const char *)str);
+        strlcat(name, (const char *)str, sizeof(name));
 
     if (un < *num_postfix) {
         sprintf(zText, "%s_postfix_%d", monster, un);
         str = locale_getstring(default_locale, zText);
         if (str) {
-            strcat(name, " ");
-            strcat(name, (const char *)str);
+            strlcat(name, " ", sizeof(name));
+            strlcat(name, (const char *)str, sizeof(name));
         }
     }
     return name;
@@ -238,9 +238,6 @@ static const char *dragon_name(const unit * u)
         if (num_postfix == 0)
             num_postfix = -1;
     }
-    if (num_postfix <= 0) {
-        return NULL;
-    }
 
     if (u) {
         region *r = u->region;
@@ -264,9 +261,16 @@ static const char *dragon_name(const unit * u)
         }
     }
 
-    rnd = num_postfix / 6;
-    rnd = (rng_int() % rnd) + ter * rnd;
-
+    if (num_postfix <=0) {
+        return NULL;
+    }
+    else if (num_postfix < 6) {
+        rnd = rng_int() % num_postfix;
+    }
+    else {
+        rnd = num_postfix / 6;
+        rnd = (rng_int() % rnd) + ter * rnd;
+    }
     sprintf(zText, "dragon_postfix_%d", rnd);
 
     str = locale_getstring(default_locale, zText);
@@ -281,22 +285,23 @@ static const char *dragon_name(const unit * u)
     }
     else {
         char n[32];
+        size_t sz;
 
-        strcpy(n, silbe1[rng_int() % SIL1]);
-        strcat(n, silbe2[rng_int() % SIL2]);
-        strcat(n, silbe3[rng_int() % SIL3]);
+        sz = strlcpy(n, silbe1[rng_int() % SIL1], sizeof(n));
+        sz += strlcat(n, silbe2[rng_int() % SIL2], sizeof(n));
+        sz += strlcat(n, silbe3[rng_int() % SIL3], sizeof(n));
         if (rng_int() % 5 > 2) {
             sprintf(name, "%s, %s", n, str);  /* "Name, der Titel" */
         }
         else {
-            strcpy(name, (const char *)str);  /* "Der Titel Name" */
+            sz = strlcpy(name, (const char *)str, sizeof(name));  /* "Der Titel Name" */
             name[0] = (char)toupper(name[0]); /* TODO: UNICODE - should use towupper() */
-            strcat(name, " ");
-            strcat(name, n);
+            sz += strlcat(name, " ", sizeof(name));
+            sz += strlcat(name, n, sizeof(name));
         }
         if (u && (rng_int() % 3 == 0)) {
-            strcat(name, " von ");
-            strcat(name, (const char *)rname(u->region, default_locale));
+            sz += strlcat(name, " von ", sizeof(name));
+            sz += strlcat(name, (const char *)rname(u->region, default_locale), sizeof(name));
         }
     }
 
@@ -356,21 +361,22 @@ static const char *dracoid_name(const unit * u)
 {
     static char name[NAMESIZE + 1]; // FIXME: static return value
     int mid_syllabels;
+    size_t sz;
 
     /* ignore u */
-    u = 0;
+    unused_arg(u);
     /* Wieviele Mittelteile? */
 
     mid_syllabels = rng_int() % 4;
 
-    strcpy(name, drac_pre[rng_int() % DRAC_PRE]);
+    sz = strlcpy(name, drac_pre[rng_int() % DRAC_PRE], sizeof(name));
     while (mid_syllabels > 0) {
         mid_syllabels--;
         if (rng_int() % 10 < 4)
-            strcat(name, "'");
-        strcat(name, drac_mid[rng_int() % DRAC_MID]);
+            strlcat(name, "'", sizeof(name));
+        sz += strlcat(name, drac_mid[rng_int() % DRAC_MID], sizeof(name));
     }
-    strcat(name, drac_suf[rng_int() % DRAC_SUF]);
+    sz += strlcat(name, drac_suf[rng_int() % DRAC_SUF], sizeof(name));
     return name;
 }
 
@@ -419,8 +425,7 @@ const char *abkz(const char *s, char *buf, size_t buflen, size_t maxchars)
     }
 
     /* Buchstaben pro Teilkürzel = _max(1,max/AnzWort) */
-
-    bpt = _max(1, maxchars / c);
+    bpt = (c > 0) ? _max(1, maxchars / c) : 1;
 
     /* Einzelne Wörter anspringen und jeweils die ersten BpT kopieren */
 

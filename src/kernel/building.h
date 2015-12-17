@@ -47,6 +47,7 @@ extern "C" {
 #define BTF_MAGIC          0x40 /* magical effect */
 #define BTF_ONEPERTURN     0x80 /* one one sizepoint can be added per turn */
 #define BTF_NAMECHANGE    0x100 /* name and description can be changed more than once */
+#define BTF_FORTIFICATION 0x200 /* safe from monsters */
 
     typedef enum {
         DEFENSE_BONUS,
@@ -78,6 +79,7 @@ extern "C" {
     } building_type;
 
     extern struct quicklist *buildingtypes;
+    extern struct attrib_type at_building_action;
 
     building_type *bt_get_or_create(const char *name);
     const building_type *bt_find(const char *name);
@@ -87,6 +89,7 @@ extern "C" {
     int bt_effsize(const struct building_type *btype,
         const struct building *b, int bsize);
 
+    bool in_safe_building(struct unit *u1, struct unit *u2);
     /* buildingt => building_type
      * Name => locale_string(name)
      * MaxGroesse => levels
@@ -163,7 +166,10 @@ extern "C" {
     extern void building_set_owner(struct unit * u);
     extern void building_update_owner(struct building * bld);
 
-    extern struct attrib_type at_building_action;
+    bool buildingtype_exists(const struct region *r,
+        const struct building_type *bt, bool working);
+    bool building_is_active(const struct building *b);
+    struct building *active_building(const struct unit *u, const struct building_type *btype);
 
 #ifdef WDW_PYRAMID
     extern int wdw_pyramid_level(const struct building *b);

@@ -36,8 +36,18 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 static critbit_tree cb_spells;
 quicklist * spells;
 
+static void free_spell_cb(void *cbdata) {
+    spell *sp = (spell *)cbdata;
+    free(sp->syntax);
+    free(sp->parameter);
+    free(sp->sname);
+    free(sp->components);
+    free(sp);
+}
+
 void free_spells(void) {
     cb_clear(&cb_spells);
+    ql_foreach(spells, free_spell_cb);
     ql_free(spells);
     spells = 0;
 }
@@ -63,7 +73,7 @@ spell * create_spell(const char * name, unsigned int id)
     }
     sp = (spell *)calloc(1, sizeof(spell));
     len = cb_new_kv(name, len, &sp, sizeof(sp), buffer);
-    if (cb_insert(&cb_spells, buffer, len)) {
+    if (cb_insert(&cb_spells, buffer, len) == CB_SUCCESS) {
         sp->id = id ? id : hashstring(name);
         sp->sname = _strdup(name);
         add_spell(&spells, sp);
@@ -103,7 +113,7 @@ spell *find_spell(const char *name)
         cb_get_kv(match, &sp, sizeof(sp));
     }
     else {
-        log_warning("find_spell: could not find spell '%s'\n", name);
+        log_debug("find_spell: could not find spell '%s'\n", name);
     }
     return sp;
 }

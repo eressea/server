@@ -19,6 +19,7 @@
 
 #include <CuTest.h>
 #include <tests.h>
+#include <assert.h>
 
 static void test_give_control_building(CuTest * tc)
 {
@@ -28,9 +29,8 @@ static void test_give_control_building(CuTest * tc)
     region *r;
 
     test_cleanup();
-    test_create_world();
     f = test_create_faction(0);
-    r = findregion(0, 0);
+    r = test_create_region(0, 0, 0);
     b = test_create_building(r, 0);
     u1 = test_create_unit(f, r);
     u_set_building(u1, b);
@@ -50,9 +50,8 @@ static void test_give_control_ship(CuTest * tc)
     region *r;
 
     test_cleanup();
-    test_create_world();
     f = test_create_faction(0);
-    r = findregion(0, 0);
+    r = test_create_region(0, 0, 0);
     sh = test_create_ship(r, 0);
     u1 = test_create_unit(f, r);
     u_set_ship(u1, sh);
@@ -141,14 +140,12 @@ static struct unit *create_recruiter(void) {
 
 static void test_heroes_dont_recruit(CuTest * tc) {
     unit *u;
-    order *ord;
 
     test_cleanup();
 
     u = create_recruiter();
     fset(u, UFL_HERO);
-    ord = create_order(K_RECRUIT, default_locale, "1");
-    unit_addorder(u, ord);
+    unit_addorder(u, create_order(K_RECRUIT, default_locale, "1"));
 
     economics(u->region);
 
@@ -160,18 +157,89 @@ static void test_heroes_dont_recruit(CuTest * tc) {
 
 static void test_normals_recruit(CuTest * tc) {
     unit *u;
-    order *ord;
 
     test_cleanup();
 
     u = create_recruiter();
-    ord = create_order(K_RECRUIT, default_locale, "1");
-    unit_addorder(u, ord);
+    unit_addorder(u, create_order(K_RECRUIT, default_locale, "1"));
 
     economics(u->region);
 
     CuAssertIntEquals(tc, 2, u->number);
 
+    test_cleanup();
+}
+
+typedef struct request {
+    struct request *next;
+    struct unit *unit;
+    struct order *ord;
+    int qty;
+    int no;
+    union {
+        bool goblin;             /* stealing */
+        const struct luxury_type *ltype;    /* trading */
+    } type;
+} request;
+
+static void test_tax_cmd(CuTest *tc) {
+    order *ord;
+    faction *f;
+    region *r;
+    unit *u;
+    item_type *sword, *silver;
+    request *taxorders = 0;
+
+
+    test_cleanup();
+    config_set("taxing.perlevel", "20");
+    test_create_world();
+    f = test_create_faction(NULL);
+    r = findregion(0, 0);
+    assert(r && f);
+    u = test_create_unit(f, r);
+
+    ord = create_order(K_TAX, f->locale, "");
+    assert(ord);
+
+    tax_cmd(u, ord, &taxorders);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error48"));
+    test_clear_messages(u->faction);
+
+    silver = get_resourcetype(R_SILVER)->itype;
+
+    sword = it_get_or_create(rt_get_or_create("sword"));
+    new_weapontype(sword, 0, 0.0, NULL, 0, 0, 0, SK_MELEE, 1);
+    i_change(&u->items, sword, 1);
+    set_level(u, SK_MELEE, 1);
+
+    tax_cmd(u, ord, &taxorders);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error_no_tax_skill"));
+    test_clear_messages(u->faction);
+
+    set_level(u, SK_TAXING, 1);
+    tax_cmd(u, ord, &taxorders);
+    CuAssertPtrEquals(tc, 0, test_find_messagetype(u->faction->msgs, "error_no_tax_skill"));
+    CuAssertPtrNotNull(tc, taxorders);
+
+
+
+    rsetmoney(r, 11);
+    expandtax(r, taxorders);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "income"));
+    /* taxing is in multiples of 10 */
+    CuAssertIntEquals(tc, 10, i_get(u->items, silver));
+    test_clear_messages(u->faction);
+    i_change(&u->items, silver, -i_get(u->items, silver));
+
+    rsetmoney(r, 1000);
+    taxorders = 0;
+    tax_cmd(u, ord, &taxorders);
+    expandtax(r, taxorders);
+    CuAssertIntEquals(tc, 20, i_get(u->items, silver));
+    test_clear_messages(u->faction);
+
+    free_order(ord);
     test_cleanup();
 }
 
@@ -185,5 +253,6 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_steal_nosteal);
     SUITE_ADD_TEST(suite, test_normals_recruit);
     SUITE_ADD_TEST(suite, test_heroes_dont_recruit);
+    SUITE_ADD_TEST(suite, test_tax_cmd);
     return suite;
 }

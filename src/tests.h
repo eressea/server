@@ -8,6 +8,8 @@
 extern "C" {
 #endif
 
+    #define ASSERT_DBL_DELTA 0.001
+
     struct region;
     struct unit;
     struct faction;
@@ -20,6 +22,9 @@ extern "C" {
     struct building_type;
     struct ship_type;
     struct terrain_type;
+    struct castorder;
+    struct spellparameter;
+    struct spell;
 
     struct CuTest;
 
@@ -32,17 +37,21 @@ extern "C" {
     struct faction *test_create_faction(const struct race *rc);
     struct unit *test_create_unit(struct faction *f, struct region *r);
     void test_create_world(void);
+    struct item_type * test_create_horse(void);
     struct building * test_create_building(struct region * r, const struct building_type * btype);
     struct ship * test_create_ship(struct region * r, const struct ship_type * stype);
     struct item_type * test_create_itemtype(const char * name);
     struct ship_type *test_create_shiptype(const char * name);
     struct building_type *test_create_buildingtype(const char *name);
+    void test_create_castorder(struct castorder *co, struct unit *u, int level, float force, int range, struct spellparameter *par);
+    struct spell * test_create_spell(void);
 
     int RunAllTests(void);
     void test_translate_param(const struct locale *lang, param_t param, const char *text);
     const char * test_get_messagetype(const struct message *msg);
     struct message * test_find_messagetype(struct message_list *msgs, const char *name);
     struct message * test_get_last_message(struct message_list *mlist);
+    void test_clear_messages(struct faction *f);
 
     void disabled_test(void *suite, void (*)(struct CuTest *), const char *name);
 

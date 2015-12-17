@@ -4,7 +4,7 @@
   <string name="headache">
       <text locale="de">
       Aufzeichung des Vortrags von Selen Ard'Ragorn in Bar'Glingal: 
-      'Es heiss, dieser Spruch wäre wohl in den Spelunken der Westgassen 
+      'Es heisst, dieser Spruch wäre wohl in den Spelunken der Westgassen 
       entstanden, doch es kann genausogut in jedem andern verrufenen 
       Viertel gewesen sein. Seine wichtigste Zutat ist etwa ein Fass 
       schlechtesten Weines, je billiger und ungesunder, desto 
@@ -28,9 +28,33 @@
       fürchterliches Leid des Kopfes folgen wird, wie der Tag auf die 
       Nacht folgt. Und er wird gar sicherlich von seiner besten Fähigkeit 
       einige Tage bis hin zu den Studien zweier Wochen vergessen haben. 
-      Noch ein Wort der Warnung: Dieses ist sehr aufwendig, und so Ihr 
+      Noch ein Wort der Warnung: dieses ist sehr aufwendig, und so Ihr 
       noch weitere Zauber in der selben Woche wirken wollt, so werden sie Euch 
       schwerer fallen.'
+      </text>
+      <text locale="en">
+      Transcript to the lecture of Selen Ard'Ragorn in Bar'Glingal:
+      'It is said, this spell had its beginnings in the drinking holes of the 
+      Westgassen, but every other disreputable quarter is just as likely. Its 
+      most important ingredient is about a cask of terrible wine, the cheaper 
+      and more unbecoming, the more effective will be the essence. The art to 
+      distill this wine into pure essence is far more demanding than the simple 
+      brewery of an alchemist. Even more so to bind and conserve it, preventing 
+      its natural tendency to evaporate. This can only be accomplished by a 
+      master of Cerddor. Say, you manage to produce a vial of this ruby red, 
+      shimmering - well, not fluid, but also not exactly vapor - let's call it 
+      elixir. More challenges still lie ahead. The effective properties of the 
+      elixir are quick to dissipate. Therefore it has to be dribbled into the 
+      drink of the chosen victim within days. That is when you masters of 
+      infatuation and seduction can truly proof your worth. But take care not 
+      to drink of the concoction yourselves, for one taste will ensnare you to 
+      the tastes of wine and you will spend a full week on a bender. And as 
+      sure as day follows night, a dreadful agony will claim your head 
+      afterwards. You will lose knowledge of your best skill, two weeks worth 
+      of study just gone.
+      Another word of warning: this spell is very complex. Should you try 
+      further spells during the same week, they will be far more difficult to 
+      perform.'
       </text>
     </string>
     <string name="analysedream">

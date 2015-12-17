@@ -70,10 +70,7 @@ void process_produce(void) {
 }
 
 void process_battle(void) {
-    struct region *r;
-    for (r = regions; r; r = r->next) {
-        do_battle(r);
-    }
+    do_battles();
 }
 
 void process_siege(void) {
@@ -223,7 +220,7 @@ void process_explain(void) {
 }
 
 void process_reserve(void) {
-    int rule = get_param_int(global.parameters, "rules.reserve.twophase", 0);
+    int rule = config_get_int("rules.reserve.twophase", 0);
     if (rule) {
         process_cmd(K_RESERVE, reserve_self, 0);
     }

@@ -99,8 +99,11 @@ static void test_parse_make_temp(CuTest *tc) {
 static void test_parse_maketemp(CuTest *tc) {
     char cmd[32];
     order *ord;
-    struct locale * lang = get_or_create_locale("en");
+    struct locale * lang;
+    
+    test_cleanup();
 
+    lang = get_or_create_locale("en");
     locale_setstring(lang, keyword(K_MAKE), "MAKE");
     locale_setstring(lang, keyword(K_MAKETEMP), "MAKETEMP");
     locale_setstring(lang, "TEMP", "TEMP");
@@ -113,16 +116,22 @@ static void test_parse_maketemp(CuTest *tc) {
     CuAssertIntEquals(tc, K_MAKETEMP, init_order(ord));
     CuAssertStrEquals(tc, "herp", getstrtoken());
     free_order(ord);
+    test_cleanup();
 }
 
 static void test_init_order(CuTest *tc) {
     order *ord;
-    struct locale * lang = get_or_create_locale("en");
+    struct locale * lang;
 
+    test_cleanup();
+
+    lang = get_or_create_locale("en");
     ord = create_order(K_MAKETEMP, lang, "hurr durr");
     CuAssertIntEquals(tc, K_MAKETEMP, init_order(ord));
     CuAssertStrEquals(tc, "hurr", getstrtoken());
     CuAssertStrEquals(tc, "durr", getstrtoken());
+    free_order(ord);
+    test_cleanup();
 }
 
 static void test_getstrtoken(CuTest *tc) {
@@ -145,8 +154,10 @@ static void test_skip_token(CuTest *tc) {
 
 static void test_replace_order(CuTest *tc) {
     order *orders = 0, *orig, *repl;
-    struct locale * lang = get_or_create_locale("en");
+    struct locale * lang;
 
+    test_cleanup();
+    lang = get_or_create_locale("en");
     orig = create_order(K_MAKE, lang, 0);
     repl = create_order(K_ALLY, lang, 0);
     replace_order(&orders, orig, repl);
@@ -156,6 +167,9 @@ static void test_replace_order(CuTest *tc) {
     CuAssertPtrNotNull(tc, orders);
     CuAssertPtrEquals(tc, 0, orders->next);
     CuAssertIntEquals(tc, getkeyword(repl), getkeyword(orders));
+    free_order(orders);
+    free_order(repl);
+    test_cleanup();
 }
 
 CuSuite *get_order_suite(void)

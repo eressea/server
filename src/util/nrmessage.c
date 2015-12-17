@@ -135,7 +135,7 @@ const char *string, int level, const char *section)
         for (i = 0; i != mtype->nparameters; ++i) {
             if (i != 0)
                 *c++ = ' ';
-            c += strlen(strcpy(c, mtype->pnames[i]));
+            c += strlcpy(c, mtype->pnames[i], sizeof(zNames)-(c-zNames));
         }
         nrt->vars = _strdup(zNames);
     }

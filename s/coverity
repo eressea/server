@@ -1,0 +1,16 @@
+#!/bin/bash
+set -e
+VERSION="$1"
+echo "submitting version $VERSION"
+shift
+DESC="$*"
+cd Debug
+make clean
+../../coverity/bin/cov-build --dir cov-int make eressea
+tar czf eressea.tgz cov-int
+curl --form token=IISXKH3A1ngZGfFmBz_aSA \
+  --form email=enno.rehling@gmail.com \
+  --form file=@eressea.tgz \
+  --form version="$VERSION" \
+  --form description="$DESC" \
+  https://scan.coverity.com/builds?project=eressea%2Fserver

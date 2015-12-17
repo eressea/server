@@ -449,7 +449,7 @@ static int nb_armor(const unit * u, int index)
 static int
 damage_unit(unit * u, const char *dam, bool physical, bool magic)
 {
-    int *hp = malloc(u->number * sizeof(int));
+    int *hp, hpstack[20];
     int h;
     int i, dead = 0, hp_rem = 0, heiltrank;
     double magres = magic_resistance(u);
@@ -462,6 +462,12 @@ damage_unit(unit * u, const char *dam, bool physical, bool magic)
     assert(u->number <= u->hp);
     h = u->hp / u->number;
     /* HP verteilen */
+    if (u->number < 20) {
+        hp = hpstack;
+    }
+    else {
+        hp = malloc(u->number * sizeof(int));
+    }
     for (i = 0; i < u->number; i++)
         hp[i] = h;
     h = u->hp - (u->number * h);
@@ -517,7 +523,9 @@ damage_unit(unit * u, const char *dam, bool physical, bool magic)
     scale_number(u, u->number - dead);
     u->hp = hp_rem;
 
-    free(hp);
+    if (hp != hpstack) {
+        free(hp);
+    }
 
     return dead;
 }
@@ -525,32 +533,16 @@ damage_unit(unit * u, const char *dam, bool physical, bool magic)
 void drown(region * r)
 {
     if (fval(r->terrain, SEA_REGION)) {
-        unit **up = up = &r->units;
+        unit **up = &r->units;
         while (*up) {
             unit *u = *up;
-            int amphibian_level = 0;
-            if (u->ship || u_race(u) == get_race(RC_SPELL) || u->number == 0) {
-                up = &u->next;
-                continue;
-            }
 
-            if (amphibian_level) {
-                int dead = damage_unit(u, "5d1", false, false);
-                if (dead) {
-                    ADDMSG(&u->faction->msgs, msg_message("drown_amphibian_dead",
-                        "amount unit region", dead, u, r));
-                }
-                else {
-                    ADDMSG(&u->faction->msgs, msg_message("drown_amphibian_nodead",
-                        "unit region", u, r));
-                }
-            }
-            else if (!(canswim(u) || canfly(u))) {
+            if (!(u->ship || u_race(u) == get_race(RC_SPELL) || u->number == 0 || canswim(u) || canfly(u))) {
                 scale_number(u, 0);
                 ADDMSG(&u->faction->msgs, msg_message("drown", "unit region", u, r));
             }
-            if (*up == u)
-                up = &u->next;
+
+            up = &u->next;
         }
         remove_empty_units_in_region(r);
     }
@@ -597,7 +589,7 @@ volcano_destruction(region * volcano, region * r, const char *damage)
 
     a = a_find(r->attribs, &at_reduceproduction);
     if (!a) {
-        a = make_reduceproduction(percent, time);
+        a = a_add(&r->attribs, make_reduceproduction(percent, time));
     }
     else {
         /* Produktion vierteln ... */
@@ -612,6 +604,7 @@ volcano_destruction(region * volcano, region * r, const char *damage)
         unit *u = *up;
         if (u->number) {
             int dead = damage_unit(u, damage, true, false);
+            /* TODO create undead */
             if (dead) {
                 ADDMSG(&u->faction->msgs, msg_message("volcano_dead",
                     "unit region dead", u, volcano, dead));
@@ -746,9 +739,7 @@ static void move_iceberg(region * r)
 
             for (sh = r->ships; sh; sh = sh->next) {
                 /* Meldung an Kapitän */
-                double dmg =
-                    get_param_flt(global.parameters, "rules.ship.damage.intoiceberg",
-                    0.10F);
+                double dmg = config_get_flt("rules.ship.damage.intoiceberg", 0.1);
                 damage_ship(sh, dmg);
                 fset(sh, SF_SELECT);
             }
@@ -759,9 +750,7 @@ static void move_iceberg(region * r)
                 translist(&rc->buildings, &r->buildings, rc->buildings);
             }
             while (rc->ships) {
-                double dmg =
-                    get_param_flt(global.parameters, "rules.ship.damage.withiceberg",
-                    0.10F);
+                double dmg = config_get_flt("rules.ship.damage.withiceberg", 0.1);
                 fset(rc->ships, SF_SELECT);
                 damage_ship(rc->ships, dmg);
                 move_ship(rc->ships, rc, r, NULL);
@@ -893,9 +882,7 @@ static void godcurse(void)
                 ship *sh;
                 for (sh = r->ships; sh;) {
                     ship *shn = sh->next;
-                    double dmg =
-                        get_param_flt(global.parameters, "rules.ship.damage.godcurse",
-                        0.10F);
+                    double dmg = config_get_flt("rules.ship.damage.godcurse", 0.1);
                     damage_ship(sh, dmg);
                     if (sh->damage >= sh->size * DAMAGE_SCALE) {
                         unit *u = ship_owner(sh);
@@ -976,11 +963,7 @@ static void demon_skillchanges(void)
 
                 if (fval(u, UFL_HUNGER)) {
                     /* hungry demons only go down, never up in skill */
-                    static int rule_hunger = -1;
-                    if (rule_hunger < 0) {
-                        rule_hunger =
-                            get_param_int(global.parameters, "hunger.demon.skill", 0);
-                    }
+                    int rule_hunger = config_get_int("hunger.demon.skill", 0) != 0;
                     if (rule_hunger) {
                         upchance = 0;
                         downchance = 15;
@@ -1024,16 +1007,13 @@ static void icebergs(void)
     }
 }
 
+#define HERBS_ROT               /* herbs owned by units have a chance to rot. */
+#define HERBROTCHANCE 5         /* Verrottchance für Kräuter (ifdef HERBS_ROT) */
 #ifdef HERBS_ROT
 static void rotting_herbs(void)
 {
-    static int rule_rot = -1;
     region *r;
-
-    if (rule_rot < 0) {
-        rule_rot =
-            get_param_int(global.parameters, "rules.economy.herbrot", HERBROTCHANCE);
-    }
+    int rule_rot = config_get_int("rules.economy.herbrot", HERBROTCHANCE);
     if (rule_rot == 0) return;
 
     for (r = regions; r; r = r->next) {

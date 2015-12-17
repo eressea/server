@@ -595,26 +595,28 @@ bool is_coastregion(region * r)
 
 int rpeasants(const region * r)
 {
-    return ((r)->land ? (r)->land->peasants : 0);
+    return r->land ? r->land->peasants : 0;
 }
 
 void rsetpeasants(region * r, int value)
 {
-    if (r->land) r->land->peasants = value;
-    else assert(value>=0);
-
+    if (r->land) {
+        assert(value >= 0);
+        r->land->peasants = value;
+    }
 }
 
 int rmoney(const region * r)
 {
-    return ((r)->land ? (r)->land->money : 0);
+    return r->land ? r->land->money : 0;
 }
 
 void rsethorses(const region * r, int value)
 {
-    assert(value >= 0);
-    if (r->land)
+    if (r->land) {
+        assert(value >= 0);
         r->land->horses = value;
+    }
 }
 
 int rhorses(const region * r)
@@ -624,9 +626,25 @@ int rhorses(const region * r)
 
 void rsetmoney(region * r, int value)
 {
-    if (r->land) r->land->money = value;
-    else assert(value >= 0);
+    if (r->land) {
+        assert(value >= 0);
+        r->land->money = value;
+    }
 }
+
+int rherbs(const struct region *r)
+{
+    return r->land?r->land->herbs:0;
+}
+
+void rsetherbs(const struct region *r, int value)
+{
+    if (r->land) {
+        assert(value >= 0);
+        r->land->herbs = (short)(value);
+    }
+}
+
 
 void r_setdemand(region * r, const luxury_type * ltype, int value)
 {
@@ -751,8 +769,9 @@ void remove_region(region ** rlist, region * r)
     deleted_regions = r;
 }
 
-static void freeland(land_region * lr)
+void free_land(land_region * lr)
 {
+    free(lr->ownership);
     while (lr->demands) {
         struct demand *d = lr->demands;
         lr->demands = d->next;
@@ -816,18 +835,21 @@ void free_region(region * r)
         last = NULL;
     free(r->display);
     if (r->land)
-        freeland(r->land);
+        free_land(r->land);
 
     if (r->msgs) {
-        free_messagelist(r->msgs);
+        free_messagelist(r->msgs->begin);
+        free(r->msgs);
         r->msgs = 0;
     }
 
     while (r->individual_messages) {
         struct individual_message *msg = r->individual_messages;
         r->individual_messages = msg->next;
-        if (msg->msgs)
-            free_messagelist(msg->msgs);
+        if (msg->msgs) {
+            free_messagelist(msg->msgs->begin);
+            free(msg->msgs);
+        }
         free(msg);
     }
 
@@ -993,7 +1015,7 @@ void terraform_region(region * r, const terrain_type * terrain)
         region_setinfo(r, NULL);
         if (r->land != NULL) {
             i_freeall(&r->land->items);
-            freeland(r->land);
+            free_land(r->land);
             r->land = NULL;
         }
         rsettrees(r, 0, 0);
@@ -1257,12 +1279,21 @@ struct faction *region_get_owner(const struct region *r)
     return NULL;
 }
 
+struct faction *region_get_last_owner(const struct region *r)
+{
+    assert(rule_region_owners());
+    if (r->land && r->land->ownership) {
+        return r->land->ownership->last_owner;
+    }
+    return NULL;
+}
+
 struct alliance *region_get_alliance(const struct region *r)
 {
     assert(rule_region_owners());
     if (r->land && r->land->ownership) {
         region_owner *own = r->land->ownership;
-        return own->owner ? own->owner->alliance : own->alliance;
+        return own->owner ? own->owner->alliance : (own->last_owner? own->last_owner->alliance : NULL);
     }
     return NULL;
 }
@@ -1275,16 +1306,14 @@ void region_set_owner(struct region *r, struct faction *owner, int turn)
             r->land->ownership = malloc(sizeof(region_owner));
             assert(region_get_morale(r) == MORALE_DEFAULT);
             r->land->ownership->owner = NULL;
-            r->land->ownership->alliance = NULL;
+            r->land->ownership->last_owner = NULL;
             r->land->ownership->flags = 0;
         }
         r->land->ownership->since_turn = turn;
         r->land->ownership->morale_turn = turn;
         assert(r->land->ownership->owner != owner);
+        r->land->ownership->last_owner = r->land->ownership->owner;
         r->land->ownership->owner = owner;
-        if (owner) {
-            r->land->ownership->alliance = owner->alliance;
-        }
     }
 }
 
@@ -1298,40 +1327,35 @@ faction *update_owners(region * r)
         if (blargest) {
             if (!bowner || bowner->size < blargest->size) {
                 /* region owners update? */
-                unit *u = building_owner(blargest);
+                unit *new_owner = building_owner(blargest);
                 f = region_get_owner(r);
-                if (u == NULL) {
+                if (new_owner == NULL) {
                     if (f) {
                         region_set_owner(r, NULL, turn);
-                        r->land->ownership->flags |= OWNER_MOURNING;
                         f = NULL;
                     }
                 }
-                else if (u->faction != f) {
+                else if (new_owner->faction != f) {
                     if (!r->land->ownership) {
                         /* there has never been a prior owner */
                         region_set_morale(r, MORALE_DEFAULT, turn);
                     }
-                    else {
+                    else if (f || new_owner->faction != region_get_last_owner(r)) {
                         alliance *al = region_get_alliance(r);
-                        if (al && u->faction->alliance == al) {
-                            int morale = _max(0, r->land->morale - MORALE_TRANSFER);
+                        if (al && new_owner->faction->alliance == al) {
+                            int morale = _max(0, region_get_morale(r) - MORALE_TRANSFER);
                             region_set_morale(r, morale, turn);
                         }
                         else {
                             region_set_morale(r, MORALE_TAKEOVER, turn);
-                            if (f) {
-                                r->land->ownership->flags |= OWNER_MOURNING;
-                            }
                         }
                     }
-                    region_set_owner(r, u->faction, turn);
-                    f = u->faction;
+                    region_set_owner(r, new_owner->faction, turn);
+                    f = new_owner->faction;
                 }
             }
         }
         else if (r->land->ownership && r->land->ownership->owner) {
-            r->land->ownership->flags |= OWNER_MOURNING;
             region_set_owner(r, NULL, turn);
             f = NULL;
         }
@@ -1405,6 +1429,6 @@ int owner_change(const region * r)
 bool is_mourning(const region * r, int in_turn)
 {
     int change = owner_change(r);
-    return (change == in_turn - 1
-        && (r->land->ownership->flags & OWNER_MOURNING));
+    return (change == in_turn - 1 && r->land->ownership->last_owner && r->land->ownership->owner
+        && r->land->ownership->last_owner != r->land->ownership->owner);
 }

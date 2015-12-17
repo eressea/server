@@ -35,6 +35,7 @@ static void test_infinitive(CuTest *tc) {
 
     ord = create_order(K_STUDY, lang, "");
     CuAssertStrEquals(tc, "LERNE", get_command(ord, buffer, sizeof(buffer)));
+    free_order(ord);
     test_cleanup();
 }
 
@@ -61,16 +62,6 @@ static void test_findkeyword(CuTest *tc) {
     CuAssertIntEquals(tc, K_STUDY, findkeyword("study"));
     CuAssertIntEquals(tc, NOKEYWORD, findkeyword(""));
     CuAssertIntEquals(tc, NOKEYWORD, findkeyword("potato"));
-    test_cleanup();
-}
-
-static void test_get_keyword_default(CuTest *tc) {
-    struct locale *lang;
-    test_cleanup();
-    lang = get_or_create_locale("en");
-    CuAssertIntEquals(tc, NOKEYWORD, get_keyword("potato", lang));
-    CuAssertIntEquals(tc, K_MOVE, get_keyword("move", lang));
-    CuAssertIntEquals(tc, K_STUDY, get_keyword("study", lang));
     test_cleanup();
 }
 
@@ -101,6 +92,5 @@ CuSuite *get_keyword_suite(void)
     SUITE_ADD_TEST(suite, test_init_keywords);
     SUITE_ADD_TEST(suite, test_findkeyword);
     SUITE_ADD_TEST(suite, test_get_shortest_match);
-    DISABLE_TEST(suite, test_get_keyword_default);
     return suite;
 }

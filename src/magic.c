@@ -24,6 +24,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "skill.h"
 #include "laws.h"
 
+#include <kernel/ally.h>
 #include <kernel/building.h>
 #include <kernel/curse.h>
 #include <kernel/faction.h>
@@ -108,39 +109,35 @@ attrib_type at_reportspell = {
  ** TODO: separate castle-appearance from illusion-effects
  **/
 
-static float MagicRegeneration(void)
+static double MagicRegeneration(void)
 {
-    static float value = -1.0;
-    if (value < 0) {
-        const char *str = get_param(global.parameters, "magic.regeneration");
-        value = str ? (float)atof(str) : 1.0F;
-    }
-    return value;
+    return config_get_flt("magic.regeneration", 1.0);
 }
 
 static double MagicPower(double force)
 {
     if (force > 0) {
-        const char *str = get_param(global.parameters, "magic.power");
+        const char *str = config_get("magic.power");
         double value = str ? atof(str) : 1.0;
         return _max(value * force, 1.0f);
     }
     return 0;
 }
 
+typedef struct icastle_data {
+    const struct building_type *type;
+    int time;
+} icastle_data;
+
 static int a_readicastle(attrib * a, void *owner, struct storage *store)
 {
     icastle_data *data = (icastle_data *)a->data.v;
-    variant bno;
     char token[32];
     READ_TOK(store, token, sizeof(token));
-    READ_INT(store, &bno.i);
-    READ_INT(store, &data->time);
-    data->building = findbuilding(bno.i);
-    if (!data->building) {
-        /* this shouldn't happen, but just in case it does: */
-        ur_add(bno, &data->building, resolve_building);
+    if (global.data_version < ATTRIBOWNER_VERSION) {
+        READ_INT(store, NULL);
     }
+    READ_INT(store, &data->time);
     data->type = bt_find(token);
     return AT_READ_OK;
 }
@@ -149,17 +146,18 @@ static void
 a_writeicastle(const attrib * a, const void *owner, struct storage *store)
 {
     icastle_data *data = (icastle_data *)a->data.v;
+    unused_arg(owner);
     WRITE_TOK(store, data->type->_name);
-    WRITE_INT(store, data->building->no);
     WRITE_INT(store, data->time);
 }
 
-static int a_ageicastle(struct attrib *a)
+static int a_ageicastle(struct attrib *a, void *owner)
 {
     icastle_data *data = (icastle_data *)a->data.v;
     if (data->time <= 0) {
-        building *b = data->building;
+        building *b = (building *)owner;
         region *r = b->region;
+        assert(owner == b);
         ADDMSG(&r->msgs, msg_message("icastle_dissolve", "building", b));
         /* remove_building lets units leave the building */
         remove_building(&r->buildings, b);
@@ -189,6 +187,17 @@ attrib_type at_icastle = {
     a_readicastle
 };
 
+void make_icastle(building *b, const building_type *btype, int timeout) {
+    attrib *a = a_add(&b->attribs, a_new(&at_icastle));
+    icastle_data *data = (icastle_data *)a->data.v;
+    data->type = btype;
+    data->time = timeout;
+}
+
+const building_type *icastle_type(const struct attrib *a) {
+    icastle_data *icastle = (icastle_data *)a->data.v;
+    return icastle->type;
+}
 /* ------------------------------------------------------------- */
 
 extern int dice(int count, int value);
@@ -215,16 +224,11 @@ static void free_mage(attrib * a)
 
 bool FactionSpells(void)
 {
-    static int rules_factionspells = -1;
-    if (rules_factionspells < 0) {
-        rules_factionspells =
-            get_param_int(global.parameters, "rules.magic.factionlist", 0);
-    }
-    return rules_factionspells!=0;
+    return config_get_int("rules.magic.factionlist", 0) != 0;
 }
 
-void read_spells(struct quicklist **slistp, magic_t mtype,
-struct storage *store)
+void read_spells(struct quicklist **slistp, magic_t mtype, 
+    struct storage *store)
 {
     for (;;) {
         spell *sp;
@@ -480,7 +484,7 @@ void pick_random_spells(faction * f, int level, spellbook * book, int num_spells
                 }
             }
 
-            if (spellno < maxspell) {
+            if (sbe && spellno < maxspell) {
                 if (!f->spellbook) {
                     f->spellbook = create_spellbook(0);
                 }
@@ -870,9 +874,9 @@ int eff_spelllevel(unit * u, const spell * sp, int cast_level, int range)
     /* Ein Spruch mit Fixkosten wird immer mit der Stufe des Spruchs und
      * nicht auf der Stufe des Magiers gezaubert */
     if (costtyp == SPC_FIX) {
-        spellbook * spells = unit_get_spellbook(u);
-        if (spells) {
-            spellbook_entry * sbe = spellbook_get(spells, sp);
+        spellbook * sb = unit_get_spellbook(u);
+        if (sb) {
+            spellbook_entry * sbe = spellbook_get(sb, sp);
             if (sbe) {
                 return _min(cast_level, sbe->level);
             }
@@ -995,6 +999,11 @@ cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
     if (reslist != NULL) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "missing_components_list",
             "list", reslist));
+        while (reslist) {
+            resource *res = reslist->next;
+            free(reslist);
+            reslist = res;
+        }
         return false;
     }
     return true;
@@ -1025,11 +1034,11 @@ spellpower(region * r, unit * u, const spell * sp, int cast_level, struct order 
     else {
         /* Bonus durch Magieturm und gesegneten Steinkreis */
         struct building *b = inside_building(u);
-        const struct building_type *btype = b ? b->type : NULL;
+        const struct building_type *btype = building_is_active(b) ? b->type : NULL;
         if (btype && btype->flags & BTF_MAGIC) ++force;
     }
 
-    elf_power = get_param_int(global.parameters, "rules.magic.elfpower", 0);
+    elf_power = config_get_int("rules.magic.elfpower", 0);
 
     if (elf_power && u_race(u) == get_race(RC_ELF) && r_isforest(r)) {
         ++force;
@@ -1116,7 +1125,6 @@ double magic_resistance(unit * target)
 {
     attrib *a;
     curse *c;
-    int n;
     const curse_type * ct_goodresist = 0, *ct_badresist = 0;
     const resource_type *rtype;
     double probability = u_race(target)->magres;
@@ -1133,9 +1141,11 @@ double magic_resistance(unit * target)
 
     /* Unicorn +10 */
     rtype = get_resourcetype(R_UNICORN);
-    n = i_get(target->items, rtype->itype);
-    if (n) {
-        probability += n * 0.1 / target->number;
+    if (rtype) {
+        int n = i_get(target->items, rtype->itype);
+        if (n) {
+            probability += n * 0.1 / target->number;
+        }
     }
 
     /* Auswirkungen von Zaubern auf der Region */
@@ -1170,13 +1180,14 @@ double magic_resistance(unit * target)
     /* Bonus durch Gebäude */
     {
         struct building *b = inside_building(target);
-        const struct building_type *btype = b ? b->type : NULL;
+        const struct building_type *btype = building_is_active(b) ? b->type : NULL;
 
         /* gesegneter Steinkreis gibt 30% dazu */
         if (btype)
             probability += btype->magresbonus * 0.01;
     }
-    return probability;
+
+    return (probability<0.9) ? probability : 0.9;
 }
 
 /* ------------------------------------------------------------- */
@@ -1281,19 +1292,20 @@ bool fumble(region * r, unit * u, const spell * sp, int cast_grade)
      * 20% Warscheinlichkeit nicht
      * */
 
-    int rnd = 0;
-    double x = (double)cast_grade / (double)effskill(u, SK_MAGIC, r);
-    int fumble_chance = (int)(((double)x * 40.0) - 20.0);
+    int fumble_chance, rnd = 0;
+    int effsk = effskill(u, SK_MAGIC, r);
     struct building *b = inside_building(u);
-    const struct building_type *btype = b ? b->type : NULL;
-    int fumble_enabled = get_param_int(global.parameters, "magic.fumble.enable", 1);
+    const struct building_type *btype = building_is_active(b) ? b->type : NULL;
+    int fumble_enabled = config_get_int("magic.fumble.enable", 1);
     sc_mage * mage;
 
-    if (!fumble_enabled) {
+    if (effsk<=0 || !fumble_enabled) {
         return false;
     }
-    if (btype)
+    fumble_chance = (int)((cast_grade * 40.0 / (double)effsk) - 20.0);
+    if (btype) {
         fumble_chance -= btype->fumblebonus;
+    }
 
     /* CHAOSPATZERCHANCE 10 : +10% Chance zu Patzern */
     mage = get_mage(u);
@@ -1456,7 +1468,7 @@ void regenerate_aura(void)
     double reg_aura;
     int regen;
     double mod;
-    int regen_enabled = get_param_int(global.parameters, "magic.regeneration.enable", 1);
+    int regen_enabled = config_get_int("magic.regeneration.enable", 1);
 
     if (!regen_enabled) return;
 
@@ -1467,7 +1479,7 @@ void regenerate_aura(void)
                 auramax = max_spellpoints(r, u);
                 if (aura < auramax) {
                     struct building *b = inside_building(u);
-                    const struct building_type *btype = b ? b->type : NULL;
+                    const struct building_type *btype = building_is_active(b) ? b->type : NULL;
                     reg_aura = regeneration(u);
 
                     /* Magierturm erhöht die Regeneration um 75% */
@@ -2385,10 +2397,11 @@ static int read_magician(attrib * a, void *owner, struct storage *store)
     return AT_READ_OK;
 }
 
-static int age_unit(attrib * a)
+static int age_unit(attrib * a, void *owner)
 /* if unit is gone or dead, remove the attribute */
 {
     unit *u = (unit *)a->data.v;
+    unused_arg(owner);
     return (u != NULL && u->number > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
 }
 
@@ -2971,7 +2984,7 @@ spellbook * get_spellbook(const char * name)
     spellbook * result;
     void * match;
 
-    if (cb_find_prefix(&cb_spellbooks, name, strlen(name), &match, 1, 0)) {
+    if (cb_find_prefix(&cb_spellbooks, name, strlen(name), &match, 1, 0) > 0) {
         cb_get_kv(match, &result, sizeof(result));
     }
     else {
@@ -2979,16 +2992,27 @@ spellbook * get_spellbook(const char * name)
         result = create_spellbook(name);
         assert(strlen(name) + sizeof(result) < sizeof(buffer));
         len = cb_new_kv(name, len, &result, sizeof(result), buffer);
-        cb_insert(&cb_spellbooks, buffer, len);
+        if (cb_insert(&cb_spellbooks, buffer, len) == CB_EXISTS) {
+            log_error("cb_insert failed although cb_find returned nothing for spellbook=%s", name);
+            assert(!"should not happen");
+        }
+        result = 0;
+        if (cb_find_prefix(&cb_spellbooks, name, strlen(name), &match, 1, 0) > 0) {
+            cb_get_kv(match, &result, sizeof(result));
+        }
     }
     return result;
 }
 
-int free_spellbook_cb(const void *match, const void *key, size_t keylen, void *data) {
-    spellbook *sb;
-    cb_get_kv(match, &sb, sizeof(sb));
+void free_spellbook(spellbook *sb) {
     spellbook_clear(sb);
     free(sb);
+}
+
+static int free_spellbook_cb(const void *match, const void *key, size_t keylen, void *data) {
+    spellbook *sb;
+    cb_get_kv(match, &sb, sizeof(sb));
+    free_spellbook(sb);
     return 0;
 }
 

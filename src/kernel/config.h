@@ -25,57 +25,7 @@ extern "C" {
 
     /* this should always be the first thing included after platform.h */
 #include "types.h"
-
-    /* experimental gameplay features (that don't affect the savefile) */
-    /* TODO: move these settings to settings.h or into configuration files */
-#define GOBLINKILL              /* Goblin-Spezialklau kann tödlich enden */
-#define HERBS_ROT               /* herbs owned by units have a chance to rot. */
-#define INSECT_POTION           /* Spezialtrank für Insekten */
-#define ORCIFICATION            /* giving snotlings to the peasants gets counted */
-
-    /* for some good prime numbers, check http://www.math.niu.edu/~rusin/known-math/98/pi_x */
-#ifndef MAXREGIONS
-# define MAXREGIONS 524287      /* must be prime for hashing. 262139 was a little small */
-#endif
-#ifndef MAXUNITS
-# define MAXUNITS 1048573       /* must be prime for hashing. 524287 was >90% full */
-#endif
-#define MAXLUXURIES 16 /* there must be no more than MAXLUXURIES kinds of luxury goods in any game */
-
-#define TREESIZE (8)            /* space used by trees (in #peasants) */
-
-#define PEASANTFORCE 0.75       /* Chance einer Vermehrung trotz 90% Auslastung */
-#define HERBROTCHANCE 5         /* Verrottchance für Kräuter (ifdef HERBS_ROT) */
-
-    /* Gebäudegröße = Minimalbelagerer */
-#define SIEGEFACTOR     2
-
-    /** Magic */
-#define MAXMAGICIANS    3
-#define MAXALCHEMISTS   3
-
-    /* getunit results: */
-#define GET_UNIT 0
-#define GET_NOTFOUND 1
-#define GET_PEASANTS 2
-    /* Bewegungsweiten: */
-#define BP_WALKING 4
-#define BP_RIDING  6
-#define BP_UNICORN 9
-#define BP_DRAGON  4
-
-#define BP_NORMAL 3
-#define BP_ROAD   2
-
-#define PERSON_WEIGHT 1000      /* weight of a "normal" human unit */
-#define STAMINA_AFFECTS_HP 1<<0
-
-    /**
-     * Hier endet der Teil von config.h, der die defines für die
-     * Spielwelt Eressea enthält, und beginnen die allgemeinen Routinen
-     */
-
-#define ENCCHANCE           10  /* %-Chance für einmalige Zufallsbegegnung */
+struct param;
 
 #define DISPLAYSIZE         8192        /* max. Länge einer Beschreibung, incl trailing 0 */
 #define ORDERSIZE           (DISPLAYSIZE*2) /* max. length of an order */
@@ -83,8 +33,6 @@ extern "C" {
 #define IDSIZE              16  /* max. Länge einer no (als String), incl trailing 0 */
 #define OBJECTIDSIZE        (NAMESIZE+5+IDSIZE) /* max. Länge der Strings, die
      * von struct unitname, etc. zurückgegeben werden. ohne die 0 */
-
-#define BAGCAPACITY         20000   /* soviel paßt in einen Bag of Holding */
 
     /* ----------------- Befehle ----------------------------------- */
 
@@ -97,10 +45,6 @@ extern "C" {
 #define fset(u, i) ((u)->flags |= (i))
 #define freset(u, i) ((u)->flags &= ~(i))
 
-    /* parteinummern */
-    bool faction_id_is_unused(int);
-
-    int max_magicians(const struct faction * f);
     int findoption(const char *s, const struct locale *lang);
 
     param_t findparam(const char *s, const struct locale *lang);
@@ -123,22 +67,8 @@ extern "C" {
     int distribute(int old, int new_value, int n);
     void init_locale(struct locale *lang);
 
-    int newunitid(void);
     int forbiddenid(int id);
     int newcontainerid(void);
-
-    int getunit(const struct region * r, const struct faction * f, struct unit **uresult);
-
-    int read_unitid(const struct faction *f, const struct region *r);
-
-    int alliedunit(const struct unit *u, const struct faction *f2,
-        int mode);
-    int alliedfaction(const struct plane *pl, const struct faction *f,
-        const struct faction *f2, int mode);
-    int alliedgroup(const struct plane *pl, const struct faction *f,
-        const struct faction *f2, const struct ally *sf, int mode);
-
-    struct faction *getfaction(void);
 
     char *untilde(char *s);
 
@@ -151,17 +81,14 @@ extern "C" {
     int cmp_current_owner(const struct building *b,
         const struct building *bother);
 
-    bool rule_transfermen(void);
     bool rule_region_owners(void);
-    bool rule_stealth_faction(void);
+    bool rule_stealth_other(void); // units can pretend to be another faction, TARNE PARTEI <no>
+    bool rule_stealth_anon(void);  // units can anonymize their faction, TARNE PARTEI [NICHT]
     int rule_alliance_limit(void);
     int rule_faction_limit(void);
 #define HARVEST_WORK  0x00
 #define HARVEST_TAXES 0x01
     int rule_blessed_harvest(void);
-#define TAX_ORDER 0x00
-#define TAX_OWNER 0x01
-    int rule_auto_taxation(void);
 #define GIVE_SELF 1
 #define GIVE_PEASANTS 2
 #define GIVE_LUXURIES 4
@@ -172,22 +99,7 @@ extern "C" {
 #define GIVE_DEFAULT (GIVE_SELF|GIVE_PEASANTS|GIVE_LUXURIES|GIVE_HERBS|GIVE_GOODS)
     int rule_give(void);
 
-#define COUNT_MONSTERS 0x01
-#define COUNT_MIGRANTS 0x02
-#define COUNT_DEFAULT  0x04
-#define COUNT_ALL      0x07
-#define COUNT_UNITS    0x10
-
-    int count_faction(const struct faction * f, int flags);
-    int count_migrants(const struct faction * f);
-    int count_maxmigrants(const struct faction * f);
-    int count_all(const struct faction * f);
-    int count_units(const struct faction * f);
-
-    bool has_limited_skills(const struct unit *u);
     const struct race *findrace(const char *, const struct locale *);
-
-    bool unit_has_cursed_item(const struct unit *u);
 
     /* grammatik-flags: */
 #define GF_NONE 0
@@ -222,15 +134,10 @@ extern "C" {
     /* Verhindert Abbau von Resourcen mit RTF_LIMITED */
 #define GUARD_ALL 0xFFFF
 
-    void setstatus(struct unit *u, int status);
-    /* !< sets combatstatus of a unit */
-    int besieged(const struct unit *u);
     int maxworkingpeasants(const struct region *r);
-    bool has_horses(const struct unit *u);
-    int markets_module(void);
+    bool markets_module(void);
     int wage(const struct region *r, const struct faction *f,
         const struct race *rc, int in_turn);
-    int maintenance_cost(const struct unit *u);
 
     const char *datapath(void);
     void set_datapath(const char *path);
@@ -249,7 +156,6 @@ extern "C" {
         const char *gamename;
         struct attrib *attribs;
         unsigned int data_turn;
-        struct param *parameters;
         void *vm_state;
         int data_version; /* TODO: eliminate in favor of gamedata.version */
         struct _dictionary_ *inifile;
@@ -259,10 +165,6 @@ extern "C" {
                 const struct race * rc, int in_turn);
             int(*maintenance) (const struct unit * u);
         } functions;
-        /* the following are some cached values, because get_param can be slow.
-         * you should almost never need to touch them */
-        int cookie;
-        double producexpchance_;
     } settings;
 
     typedef struct helpmode {
@@ -270,23 +172,24 @@ extern "C" {
         int status;
     } helpmode;
 
-    const char *dbrace(const struct race *rc);
-
-    void set_param(struct param **p, const char *key, const char *data);
+    void set_param(struct param **p, const char *key, const char *value);
     const char *get_param(const struct param *p, const char *key);
     int get_param_int(const struct param *p, const char *key, int def);
     int check_param(const struct param *p, const char *key, const char *searchvalue);
     double get_param_flt(const struct param *p, const char *key, double def);
     void free_params(struct param **pp);
 
+    void config_set(const char *key, const char *value);
+    const char *config_get(const char *key);
+    int config_get_int(const char *key, int def);
+    double config_get_flt(const char *key, double def);
+    bool config_token(const char *key, const char *tok);
+
     bool ExpensiveMigrants(void);
     int NMRTimeout(void);
     int LongHunger(const struct unit *u);
     int NewbieImmunity(void);
     bool IsImmune(const struct faction *f);
-    int AllianceAuto(void);        /* flags that allied factions get automatically */
-    int AllianceRestricted(void);  /* flags restricted to allied factions */
-    int HelpMask(void);    /* flags restricted to allied factions */
 
     struct order *default_order(const struct locale *lang);
     void set_default_order(int kwd);
@@ -295,6 +198,7 @@ extern "C" {
     void init_parameters(struct locale *lang);
 
     void free_gamedata(void);
+    void free_config(void);
 
     extern struct helpmode helpmodes[];
     extern const char *parameters[];

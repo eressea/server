@@ -199,11 +199,17 @@ static void a_free(attrib * a)
 
 int a_remove(attrib ** pa, attrib * a)
 {
+    attrib *head = *pa;
     int ok;
+
     assert(a != NULL);
     ok = a_unlink(pa, a);
-    if (ok)
+    if (ok) {
+        if (head == a) {
+            *pa = a->next;
+        }
         a_free(a);
+    }
     return ok;
 }
 
@@ -246,7 +252,7 @@ attrib *a_new(const attrib_type * at)
     return a;
 }
 
-int a_age(attrib ** p)
+int a_age(attrib ** p, void *owner)
 {
     attrib **ap = p;
     /* Attribute altern, und die Entfernung (age()==0) eines Attributs
@@ -254,7 +260,7 @@ int a_age(attrib ** p)
     while (*ap) {
         attrib *a = *ap;
         if (a->type->age) {
-            int result = a->type->age(a);
+            int result = a->type->age(a, owner);
             assert(result >= 0 || !"age() returned a negative value");
             if (result == AT_AGE_REMOVE) {
                 a_remove(p, a);

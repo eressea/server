@@ -59,10 +59,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 * Spionage des Spions */
 void spy_message(int spy, const unit * u, const unit * target)
 {
-    const char *str = report_kampfstatus(target, u->faction->locale);
+    char status[32];
+
+    report_status(target, u->faction->locale, status, sizeof(status));
 
     ADDMSG(&u->faction->msgs, msg_message("spyreport", "spy target status", u,
-        target, str));
+        target, status));
     if (spy > 20) {
         sc_mage *mage = get_mage(target);
         /* for mages, spells and magic school */
@@ -213,7 +215,7 @@ int setstealth_cmd(unit * u, struct order *ord)
 {
     char token[64];
     const char *s;
-    int level, rule;
+    int level;
 
     init_order(ord);
     s = gettoken(token, sizeof(token));
@@ -286,13 +288,8 @@ int setstealth_cmd(unit * u, struct order *ord)
     switch (findparam(s, u->faction->locale)) {
     case P_FACTION:
         /* TARNE PARTEI [NICHT|NUMMER abcd] */
-        rule = rule_stealth_faction();
-        if (!rule) {
-            /* TARNE PARTEI is disabled */
-            break;
-        }
         s = gettoken(token, sizeof(token));
-        if (rule & 1) {
+        if (rule_stealth_anon()) {
             if (!s || *s == 0) {
                 fset(u, UFL_ANON_FACTION);
                 break;
@@ -302,7 +299,7 @@ int setstealth_cmd(unit * u, struct order *ord)
                 break;
             }
         }
-        if (rule & 2) {
+        if (rule_stealth_other()) {
             if (get_keyword(s, u->faction->locale) == K_NUMBER) {
                 s = gettoken(token, sizeof(token));
                 int nr = -1;
@@ -426,7 +423,7 @@ static void sink_ship(region * r, ship * sh, unit * saboteur)
     else {
         for (d = 0; d != MAXDIRECTIONS; ++d) {
             region *rn = rconnect(r, d);
-            if (!fval(rn->terrain, SEA_REGION) && !move_blocked(NULL, r, rn)) {
+            if (rn && !fval(rn->terrain, SEA_REGION) && !move_blocked(NULL, r, rn)) {
                 safety = rn;
                 probability = OCEAN_SWIMMER_CHANCE;
                 break;

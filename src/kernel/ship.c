@@ -172,7 +172,7 @@ struct ship *findshipr(const region * r, int n)
 void damage_ship(ship * sh, double percent)
 {
     double damage =
-        DAMAGE_SCALE * sh->type->damage * percent * sh->size + sh->damage;
+        DAMAGE_SCALE * sh->type->damage * percent * sh->size + sh->damage + .000001;
     sh->damage = (int)damage;
 }
 
@@ -245,6 +245,7 @@ static void free_shiptype(void *ptr) {
     ship_type *stype = (ship_type *)ptr;
     free(stype->_name);
     free(stype->coasts);
+    free_construction(stype->construction);
     free(stype);
 }
 
@@ -270,7 +271,7 @@ const char *write_shipname(const ship * sh, char *ibuf, size_t size)
 
 static int ShipSpeedBonus(const unit * u)
 {
-    int level = get_param_int(global.parameters, "movement.shipspeed.skillbonus", 0);
+    int level = config_get_int("movement.shipspeed.skillbonus", 0);
     if (level > 0) {
         ship *sh = u->ship;
         int skl = effskill(u, SK_SAILING, 0);
@@ -467,4 +468,8 @@ void ship_setname(ship * self, const char *name)
 const char *ship_getname(const ship * self)
 {
     return self->name;
+}
+
+int ship_damage_percent(const ship *ship) {
+    return (ship->damage * 100 + DAMAGE_SCALE - 1) / (ship->size * DAMAGE_SCALE);
 }

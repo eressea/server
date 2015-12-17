@@ -18,7 +18,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <platform.h>
 #include "language.h"
-#include "language_struct.h"
 
 #include "log.h"
 #include "strings.h"
@@ -30,7 +29,24 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <assert.h>
 #include <critbit.h>
 
-/** importing **/
+#define SMAXHASH 2048
+typedef struct locale_str {
+    unsigned int hashkey;
+    struct locale_str *nexthash;
+    char *str;
+    char *key;
+} locale_str;
+
+typedef struct locale {
+    char *name;
+    unsigned int index;
+    struct locale *next;
+    unsigned int hashkey;
+    struct locale_str *strings[SMAXHASH];
+} locale;
+
+extern locale *default_locale;
+extern locale *locales;
 
 locale *default_locale;
 locale *locales;
@@ -249,7 +265,7 @@ void add_translation(struct critbit_tree **cbp, const char *key, int i) {
         size_t len = strlen(str);
         if (!cb) {
             // TODO: this will leak, because we do not know how to clean it up */
-            *cbp = cb = (struct critbit_tree *)calloc(1, sizeof(struct critbit_tree *));
+            *cbp = cb = (struct critbit_tree *)calloc(1, sizeof(struct critbit_tree));
         }
         len = cb_new_kv(str, len, &i, sizeof(int), buffer);
         cb_insert(cb, buffer, len);
@@ -315,9 +331,23 @@ void reset_locales(void) {
 void free_locales(void) {
     locale_init = 0;
     while (locales) {
-        int i;
+        int i, index = locales->index;
         locale * next = locales->next;
 
+        for (i = UT_PARAMS; i != UT_RACES; ++i) {
+            struct critbit_tree ** cb = (struct critbit_tree **)get_translations(locales, i);
+            if (*cb) {
+                // TODO: this crashes?
+                cb_clear(*cb);
+                free(*cb);
+            }
+        }
+        for (i = UT_RACES; i != UT_MAX; ++i) {
+            void *tokens = lstrs[index].tokens[i];
+            if (tokens) {
+                freetokens(tokens);
+            }
+        }
         for (i = 0; i != SMAXHASH; ++i) {
             while (locales->strings[i]) {
                 struct locale_str * strings = locales->strings[i];

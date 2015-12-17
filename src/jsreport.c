@@ -25,7 +25,7 @@ static void coor_from_tiled(int *x, int *y) {
 
 static int report_json(const char *filename, report_context * ctx, const char *charset)
 {
-    if (get_param_int(global.parameters, "jsreport.enabled", 0) != 0) {
+    if (config_get_int("jsreport.enabled", 0) != 0) {
         FILE * F = fopen(filename, "w");
         if (F) {
             int x, y, minx = INT_MAX, maxx = INT_MIN, miny = INT_MAX, maxy = INT_MIN;
@@ -76,6 +76,7 @@ static int report_json(const char *filename, report_context * ctx, const char *c
                     "\"margin\": 0, \"name\": \"hextiles\", \"properties\": { }, \"spacing\": 0, "
                     "\"tileheight\" : 64, \"tilewidth\" : 64 }], \"tilewidth\": 64, \"tileheight\": 96}", F);
             }
+            fclose(F);
             return 0;
         }
         return -1;

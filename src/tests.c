@@ -9,6 +9,7 @@
 #include <kernel/terrain.h>
 #include <kernel/item.h>
 #include <kernel/unit.h>
+#include <kernel/order.h>
 #include <kernel/race.h>
 #include <kernel/faction.h>
 #include <kernel/building.h>
@@ -22,6 +23,7 @@
 #include <util/language.h>
 #include <util/message.h>
 #include <util/log.h>
+#include <util/rand.h>
 
 #include <CuTest.h>
 
@@ -34,7 +36,10 @@ struct race *test_create_race(const char *name)
 {
     race *rc = rc_get_or_create(name);
     rc->maintenance = 10;
+    rc->hitpoints = 20;
+    rc->maxaura = 1.0;
     rc->ec_flags |= GETITEM;
+    rc->battle_flags = BF_EQUIPMENT;
     return rc;
 }
 
@@ -44,7 +49,7 @@ struct region *test_create_region(int x, int y, const terrain_type *terrain)
     if (!terrain) {
         terrain_type *t = get_or_create_terrain("plain");
         t->size = 1000;
-        fset(t, LAND_REGION);
+        fset(t, LAND_REGION|CAVALRY_REGION|FOREST_REGION);
         terraform_region(r, t);
     } else
         terraform_region(r, terrain);
@@ -58,7 +63,7 @@ struct region *test_create_region(int x, int y, const terrain_type *terrain)
 
 struct faction *test_create_faction(const struct race *rc)
 {
-    faction *f = addfaction("nobody@eressea.de", NULL, rc ? rc : rc_get_or_create("human"), default_locale, 0);
+    faction *f = addfaction("nobody@eressea.de", NULL, rc ? rc : test_create_race("human"), default_locale, 0);
     return f;
 }
 
@@ -75,10 +80,9 @@ void test_cleanup(void)
 
     free_terrains();
     free_resources();
-    global.functions.maintenance = NULL;
-    global.functions.wage = NULL;
-    free_params(&global.parameters);
+    free_config();
     default_locale = 0;
+    close_orders();
     free_locales();
     free_spells();
     free_buildingtypes();
@@ -95,15 +99,13 @@ void test_cleanup(void)
     for (i = 0; i != MAXKEYWORDS; ++i) {
         enable_keyword(i, true);
     }
-    if (!mt_find("missing_message")) {
-        mt_register(mt_new_va("missing_message", "name:string", 0));
-        mt_register(mt_new_va("missing_feedback", "unit:unit", "region:region", "command:order", "name:string", 0));
-    }
     if (errno) {
         int error = errno;
         errno = 0;
         log_error("errno: %d", error);
     }
+
+    random_source_reset();
 }
 
 terrain_type *
@@ -116,14 +118,14 @@ test_create_terrain(const char * name, unsigned int flags)
 
 building * test_create_building(region * r, const building_type * btype)
 {
-    building * b = new_building(btype ? btype : bt_get_or_create("castle"), r, default_locale);
+    building * b = new_building(btype ? btype : test_create_buildingtype("castle"), r, default_locale);
     b->size = b->type->maxsize > 0 ? b->type->maxsize : 1;
     return b;
 }
 
 ship * test_create_ship(region * r, const ship_type * stype)
 {
-    ship * s = new_ship(stype ? stype : st_get_or_create("boat"), r, default_locale);
+    ship * s = new_ship(stype ? stype : test_create_shiptype("boat"), r, default_locale);
     s->size = s->type->construction ? s->type->construction->maxsize : 1;
     return s;
 }
@@ -134,6 +136,9 @@ ship_type * test_create_shiptype(const char * name)
     stype->cptskill = 1;
     stype->sumskill = 1;
     stype->minskill = 1;
+    stype->range = 2;
+    stype->cargo = 1000;
+    stype->damage = 1;
     if (!stype->construction) {
         stype->construction = calloc(1, sizeof(construction));
         stype->construction->maxsize = 5;
@@ -141,6 +146,12 @@ ship_type * test_create_shiptype(const char * name)
         stype->construction->reqsize = 1;
         stype->construction->skill = SK_SHIPBUILDING;
     }
+
+    stype->coasts =
+        (terrain_type **)malloc(sizeof(terrain_type *)*2);
+    stype->coasts[0] = get_or_create_terrain("plain");
+    stype->coasts[1] = NULL;
+
     if (default_locale) {
         locale_setstring(default_locale, name, name);
     }
@@ -149,22 +160,24 @@ ship_type * test_create_shiptype(const char * name)
 
 building_type * test_create_buildingtype(const char * name)
 {
-    building_type *btype = (building_type *)calloc(sizeof(building_type), 1);
+    building_type *btype = bt_get_or_create(name);
     btype->flags = BTF_NAMECHANGE;
-    btype->_name = _strdup(name);
-    btype->construction = (construction *)calloc(sizeof(construction), 1);
-    btype->construction->skill = SK_BUILDING;
-    btype->construction->maxsize = -1;
-    btype->construction->minskill = 1;
-    btype->construction->reqsize = 1;
-    btype->construction->materials = (requirement *)calloc(sizeof(requirement), 2);
-    btype->construction->materials[1].number = 0;
-    btype->construction->materials[0].number = 1;
-    btype->construction->materials[0].rtype = get_resourcetype(R_STONE);
+    if (!btype->construction) {
+        btype->construction = (construction *)calloc(sizeof(construction), 1);
+        btype->construction->skill = SK_BUILDING;
+        btype->construction->maxsize = -1;
+        btype->construction->minskill = 1;
+        btype->construction->reqsize = 1;
+    }
+    if (!btype->construction->materials) {
+        btype->construction->materials = (requirement *)calloc(sizeof(requirement), 2);
+        btype->construction->materials[1].number = 0;
+        btype->construction->materials[0].number = 1;
+        btype->construction->materials[0].rtype = get_resourcetype(R_STONE);
+    }
     if (default_locale) {
         locale_setstring(default_locale, name, name);
     }
-    bt_register(btype);
     return btype;
 }
 
@@ -178,12 +191,51 @@ item_type * test_create_itemtype(const char * name) {
     return itype;
 }
 
+void test_create_castorder(castorder *co, unit *u, int level, float force, int range, spellparameter *par) {
+    struct locale * lang;
+    order *ord;
+
+    lang = get_or_create_locale("en");
+    create_castorder(co, u, NULL, NULL, u->region, level, force, range, ord = create_order(K_CAST, lang, ""), par);
+    free_order(ord);
+}
+
+spell * test_create_spell(void)
+{
+    spell *sp;
+    sp = create_spell("testspell", 0);
+
+    sp->components = (spell_component *)calloc(4, sizeof(spell_component));
+    sp->components[0].amount = 1;
+    sp->components[0].type = get_resourcetype(R_SILVER);
+    sp->components[0].cost = SPC_FIX;
+    sp->components[1].amount = 1;
+    sp->components[1].type = get_resourcetype(R_AURA);
+    sp->components[1].cost = SPC_LEVEL;
+    sp->components[2].amount = 1;
+    sp->components[2].type = get_resourcetype(R_HORSE);
+    sp->components[2].cost = SPC_LINEAR;
+    sp->syntax = 0;
+    sp->parameter = 0;
+    return sp;
+}
+
 void test_translate_param(const struct locale *lang, param_t param, const char *text) {
     struct critbit_tree **cb;
 
     assert(lang && text);
     cb = (struct critbit_tree **)get_translations(lang, UT_PARAMS);
     add_translation(cb, text, param);
+}
+
+
+item_type *test_create_horse(void) {
+    item_type * itype;
+    itype = test_create_itemtype("horse");
+    itype->flags |= ITF_BIG | ITF_ANIMAL;
+    itype->weight = 5000;
+    itype->capacity = 7000;
+    return itype;
 }
 
 /** creates a small world and some stuff in it.
@@ -205,11 +257,9 @@ void test_create_world(void)
     locale_setstring(loc, keyword(K_RESERVE), "RESERVIEREN");
     locale_setstring(loc, "money", "SILBER");
     init_resources();
+    get_resourcetype(R_SILVER)->itype->weight = 1;
 
-    itype = test_create_itemtype("horse");
-    itype->flags |= ITF_BIG | ITF_ANIMAL;
-    itype->weight = 5000;
-    itype->capacity = 7000;
+    test_create_horse();
 
     itype = test_create_itemtype("cart");
     itype->flags |= ITF_BIG | ITF_VEHICLE;
@@ -219,10 +269,10 @@ void test_create_world(void)
     test_create_itemtype("iron");
     test_create_itemtype("stone");
 
-    t_plain = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION);
+    t_plain = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION | SAIL_INTO | FLY_INTO);
     t_plain->size = 1000;
     t_plain->max_road = 100;
-    t_ocean = test_create_terrain("ocean", SEA_REGION | SAIL_INTO | SWIM_INTO);
+    t_ocean = test_create_terrain("ocean", SEA_REGION | SAIL_INTO | SWIM_INTO | FLY_INTO);
     t_ocean->size = 0;
 
     island[0] = test_create_region(0, 0, t_plain);
@@ -270,13 +320,21 @@ const char * test_get_messagetype(const message *msg) {
 
 struct message * test_find_messagetype(struct message_list *msgs, const char *name) {
     struct mlist *ml;
-    assert(msgs);
+    if (!msgs) return 0;
     for (ml = msgs->begin; ml; ml = ml->next) {
         if (strcmp(name, test_get_messagetype(ml->msg)) == 0) {
             return ml->msg;
         }
     }
     return 0;
+}
+
+void test_clear_messages(faction *f) {
+    if (f->msgs) {
+        free_messagelist(f->msgs->begin);
+        free(f->msgs);
+        f->msgs = 0;
+    }
 }
 
 void disabled_test(void *suite, void (*test)(CuTest *), const char *name) {

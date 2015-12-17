@@ -26,6 +26,9 @@ extern "C" {
 #include "types.h"
 #include "direction.h"
 
+#define MAXLUXURIES 16 /* there must be no more than MAXLUXURIES kinds of luxury goods in any game */
+#define MAXREGIONS 524287      /* must be prime for hashing. 262139 was a little small */
+
     /* FAST_CONNECT: regions are directly connected to neighbours, saves doing
        a hash-access each time a neighbour is needed, 6 extra pointers per hex */
 #define FAST_CONNECT
@@ -72,10 +75,9 @@ extern "C" {
 #define MORALE_AVERAGE 6        /* default average time for morale to change */
 #define MORALE_TRANSFER 2       /* points of morale lost when GIVE COMMAND */
 
-#define OWNER_MOURNING 0x01
     typedef struct region_owner {
         struct faction *owner;
-        struct alliance *alliance;
+        struct faction *last_owner;
         int since_turn;             /* turn the region changed owners */
         int morale_turn;            /* turn when morale has changed most recently */
         int flags;
@@ -199,13 +201,14 @@ extern "C" {
     int rhorses(const struct region *r);
     void rsethorses(const struct region *r, int value);
 
+    int rherbs(const struct region *r);
+    void rsetherbs(const struct region *r, int value);
+
 #define rbuildings(r) ((r)->buildings)
 
 #define rherbtype(r) ((r)->land?(r)->land->herbtype:0)
 #define rsetherbtype(r, value) if ((r)->land) (r)->land->herbtype=(value)
 
-#define rherbs(r) ((r)->land?(r)->land->herbs:0)
-#define rsetherbs(r, value) if ((r)->land) ((r)->land->herbs=(short)(value))
 
     bool r_isforest(const struct region *r);
 
@@ -245,6 +248,7 @@ extern "C" {
 #endif
 
     void free_regions(void);
+    void free_land(struct land_region * lr);
 
     int region_get_morale(const region * r);
     void region_set_morale(region * r, int morale, int turn);

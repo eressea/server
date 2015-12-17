@@ -97,7 +97,12 @@ char * transliterate(char * out, size_t size, const char * in)
             }
             else {
                 ucs4_t ucs;
-                unicode_utf8_to_ucs4(&ucs, src, &len);
+                int ret = unicode_utf8_to_ucs4(&ucs, src, &len);
+                if (ret != 0) {
+                    /* encoding is broken. yikes */
+                    log_error("transliterate | encoding error in '%s'\n", src);
+                    return NULL;
+                }
                 src += len;
                 *dst++ = '?';
                 --size;
@@ -155,7 +160,7 @@ void addtoken(void ** root, const char *str, variant id)
             next = next->nexthash;
         if (!next) {
             tref *ref;
-            tnode *node = (tnode *)calloc(1, sizeof(tnode));
+            tnode *node = (tnode *)calloc(1, sizeof(tnode)); // TODO: what is the reason for this empty node to exist?
 
             if (ucs < 'a' || ucs > 'z') {
                 lcs = towlower((wint_t)ucs);
@@ -166,6 +171,7 @@ void addtoken(void ** root, const char *str, variant id)
 
             ref = (tref *)malloc(sizeof(tref));
             ref->ucs = ucs;
+            ref->node = 0;
             ref->node = node;
             ref->nexthash = tk->next[index];
             tk->next[index] = ref;
@@ -216,6 +222,7 @@ void freetokens(void * root)
             while (*refs) {
                 tref * ref = *refs;
                 *refs = ref->nexthash;
+//                free(ref->node);
                 free(ref);
             }
         }
@@ -253,7 +260,7 @@ int findtoken(const void * root, const char *key, variant * result)
             ref = ref->nexthash;
         str += len;
         if (!ref) {
-            log_info("findtoken | token not found '%s'\n", key);
+            log_debug("findtoken | token not found '%s'\n", key);
             return E_TOK_NOMATCH;
         }
         tk = ref->node;
@@ -262,6 +269,6 @@ int findtoken(const void * root, const char *key, variant * result)
         *result = tk->id;
         return E_TOK_SUCCESS;
     }
-    log_info("findtoken | token not found '%s'\n", key);
+    log_debug("findtoken | token not found '%s'\n", key);
     return E_TOK_NOMATCH;
 }

@@ -112,6 +112,13 @@ static int tolua_building_set_name(lua_State * L)
     return 0;
 }
 
+static int tolua_building_get_maxsize(lua_State * L)
+{
+    building *self = (building *)tolua_tousertype(L, 1, 0);
+    lua_pushinteger(L, self->type->maxsize);
+    return 1;
+}
+
 static int tolua_building_get_size(lua_State * L)
 {
     building *self = (building *)tolua_tousertype(L, 1, 0);
@@ -193,11 +200,9 @@ static int tolua_building_create(lua_State * L)
     const char *bname = tolua_tostring(L, 2, 0);
     if (!r) {
         log_error("building.create expects a region as argument 1");
-    }
-    if (!bname) {
+    } else if (!bname) {
         log_error("building.create expects a name as argument 2");
-    }
-    if (bname) {
+    } else {
         const building_type *btype = bt_find(bname);
         if (btype) {
             building *b = new_building(btype, r, default_locale);
@@ -249,6 +254,7 @@ void tolua_building_open(lua_State * L)
             tolua_variable(L, TOLUA_CAST "units", tolua_building_get_units, NULL);
             tolua_variable(L, TOLUA_CAST "region", tolua_building_get_region,
                 tolua_building_set_region);
+            tolua_variable(L, TOLUA_CAST "maxsize", tolua_building_get_maxsize, NULL);
             tolua_variable(L, TOLUA_CAST "size", tolua_building_get_size,
                 tolua_building_set_size);
             tolua_function(L, TOLUA_CAST "get_typename", tolua_building_get_typename);

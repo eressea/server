@@ -77,7 +77,7 @@ void herbsearch(unit * u, int max)
     herbsfound = ntimespprob(effsk * u->number,
         (double)rherbs(r) / 100.0F, -0.01F);
     herbsfound = _min(herbsfound, max);
-    rsetherbs(r, rherbs(r) - herbsfound);
+    rsetherbs(r, (short) (rherbs(r) - herbsfound));
 
     if (herbsfound) {
         produceexp(u, SK_HERBALISM, u->number);
@@ -93,14 +93,11 @@ void herbsearch(unit * u, int max)
 
 static int begin_potion(unit * u, const potion_type * ptype, struct order *ord)
 {
-    static int rule_multipotion = -1;
+    bool rule_multipotion;
     assert(ptype != NULL);
 
-    if (rule_multipotion < 0) {
-        /* should we allow multiple different potions to be used the same turn? */
-        rule_multipotion =
-            get_param_int(global.parameters, "rules.magic.multipotion", 0);
-    }
+    /* should we allow multiple different potions to be used the same turn? */
+    rule_multipotion = config_get_int("rules.magic.multipotion", 0) != 0;
     if (!rule_multipotion) {
         const potion_type *use = ugetpotionuse(u);
         if (use != NULL && use != ptype) {
@@ -123,61 +120,83 @@ static void end_potion(unit * u, const potion_type * ptype, int amount)
         "unit potion", u, ptype->itype->rtype));
 }
 
+static int potion_water_of_life(unit * u, region *r, int amount) {
+    int wood = 0;
+    int tree_type = config_get_int("rules.magic.wol_type", 1);
+    int tree_count = config_get_int("rules.magic.wol_effect", 10);
+    /* mallorn is required to make mallorn forests, wood for regular ones */
+    if (fval(r, RF_MALLORN)) {
+        wood = use_pooled(u, rt_find("mallorn"),
+            GET_SLACK | GET_RESERVE | GET_POOLED_SLACK, tree_count * amount);
+    }
+    else {
+        wood = use_pooled(u, rt_find("log"),
+            GET_SLACK | GET_RESERVE | GET_POOLED_SLACK, tree_count * amount);
+    }
+    if (r->land == 0)
+        wood = 0;
+    if (wood < tree_count * amount) {
+        int x = wood / tree_count;
+        if (wood % tree_count)
+            ++x;
+        if (x < amount)
+            amount = x;
+    }
+    rsettrees(r, tree_type, rtrees(r, tree_type) + wood);
+    ADDMSG(&u->faction->msgs, msg_message("growtree_effect",
+        "mage amount", u, wood));
+    return amount;
+}
+
+static int potion_healing(unit * u, int amount) {
+    u->hp = _min(unit_max_hp(u) * u->number, u->hp + 400 * amount);
+    return amount;
+}
+
+static int potion_luck(unit *u, region *r, attrib_type *atype, int amount) {
+    attrib *a = (attrib *)a_find(r->attribs, atype);
+    if (!a) {
+        a = a_add(&r->attribs, a_new(atype));
+    }
+    a->data.i += amount;
+    return amount;
+}
+
+static int potion_truth(unit *u) {
+    fset(u, UFL_DISBELIEVES);
+    return 1;
+}
+
+static int potion_power(unit *u, int amount) {
+    int use = u->number / 10;
+    if (use < amount) {
+        if (u->number % 10 > 0) ++use;
+        amount = use;
+    }
+    /* Verfünffacht die HP von max. 10 Personen in der Einheit */
+    u->hp += _min(u->number, 10 * amount) * unit_max_hp(u) * 4;
+    return amount;
+}
+
 static int do_potion(unit * u, region *r, const potion_type * ptype, int amount)
 {
     if (ptype == oldpotiontype[P_LIFE]) {
-        int holz = 0;
-        static int tree_type = -1;
-        static int tree_count = -1;
-        if (tree_type < 0) {
-            tree_type = get_param_int(global.parameters, "rules.magic.wol_type", 1);
-            tree_count =
-                get_param_int(global.parameters, "rules.magic.wol_effect", 10);
-        }
-        /* mallorn is required to make mallorn forests, wood for regular ones */
-        if (fval(r, RF_MALLORN)) {
-            holz = use_pooled(u, rt_find("mallorn"),
-                GET_SLACK | GET_RESERVE | GET_POOLED_SLACK, tree_count * amount);
-        }
-        else {
-            holz = use_pooled(u, rt_find("log"),
-                GET_SLACK | GET_RESERVE | GET_POOLED_SLACK, tree_count * amount);
-        }
-        if (r->land == 0)
-            holz = 0;
-        if (holz < tree_count * amount) {
-            int x = holz / tree_count;
-            if (holz % tree_count)
-                ++x;
-            if (x < amount)
-                amount = x;
-        }
-        rsettrees(r, tree_type, rtrees(r, tree_type) + holz);
-        ADDMSG(&u->faction->msgs, msg_message("growtree_effect",
-            "mage amount", u, holz));
+        return potion_water_of_life(u, r, amount);
     }
     else if (ptype == oldpotiontype[P_HEILWASSER]) {
-        u->hp = _min(unit_max_hp(u) * u->number, u->hp + 400 * amount);
+        return potion_healing(u, amount);
     }
     else if (ptype == oldpotiontype[P_PEOPLE]) {
-        attrib *a = (attrib *)a_find(r->attribs, &at_peasantluck);
-        if (!a)
-            a = a_add(&r->attribs, a_new(&at_peasantluck));
-        a->data.i += amount;
+        return potion_luck(u, r, &at_peasantluck, amount);
     }
     else if (ptype == oldpotiontype[P_HORSE]) {
-        attrib *a = (attrib *)a_find(r->attribs, &at_horseluck);
-        if (!a)
-            a = a_add(&r->attribs, a_new(&at_horseluck));
-        a->data.i += amount;
+        return potion_luck(u, r, &at_horseluck, amount);
     }
     else if (ptype == oldpotiontype[P_WAHRHEIT]) {
-        fset(u, UFL_DISBELIEVES);
-        amount = 1;
+        return potion_truth(u);
     }
     else if (ptype == oldpotiontype[P_MACHT]) {
-        /* Verfünffacht die HP von max. 10 Personen in der Einheit */
-        u->hp += _min(u->number, 10 * amount) * unit_max_hp(u) * 4;
+        return potion_power(u, amount);
     }
     else {
         change_effect(u, ptype, 10 * amount);
@@ -219,9 +238,10 @@ static void free_potiondelay(attrib * a)
     free(a->data.v);
 }
 
-static int age_potiondelay(attrib * a)
+static int age_potiondelay(attrib * a, void *owner)
 {
     potiondelay *pd = (potiondelay *)a->data.v;
+    unused_arg(owner);
     pd->amount = do_potion(pd->u, pd->r, pd->ptype, pd->amount);
     return AT_AGE_REMOVE;
 }

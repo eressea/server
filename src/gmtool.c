@@ -54,6 +54,7 @@
 #include <util/lists.h>
 #include <util/rng.h>
 #include <util/base36.h>
+#include <util/bsdstring.h>
 
 #include <storage.h>
 #include <lua.h>
@@ -384,9 +385,8 @@ static void paint_info_region(window * wnd, const state * st)
         line++;
         mvwprintw(win, line++, 1, "%s, age %d", r->terrain->_name, r->age);
         if (r->land) {
-            mvwprintw(win, line++, 1, "$:%6d  P:%5d", r->land->money,
-                r->land->peasants);
-            mvwprintw(win, line++, 1, "H:%6d  %s:%5d", r->land->horses,
+            mvwprintw(win, line++, 1, "$:%6d  P:%5d", rmoney(r), rpeasants(r));
+            mvwprintw(win, line++, 1, "H:%6d  %s:%5d", rhorses(r),
                 (r->flags & RF_MALLORN) ? "M" : "T",
                 r->land->trees[1] + r->land->trees[2]);
         }
@@ -852,8 +852,8 @@ static void handlekey(state * st, int c)
             new_players = read_newfactions(sbuffer);
         }
         cnormalize(&st->cursor, &nx, &ny);
-        minpop = get_param_int(global.parameters, "seed.population.min", 8);
-        maxpop = get_param_int(global.parameters, "seed.population.max", minpop);
+        minpop = config_get_int("seed.population.min", 8);
+        maxpop = config_get_int("seed.population.max", minpop);
         if (maxpop > minpop) {
             n = rng_int() % (maxpop - minpop) + minpop;
         }
@@ -982,6 +982,7 @@ static void handlekey(state * st, int c)
                     statusline(st->wnd_status->handle, "info-buildings true");
                 else
                     statusline(st->wnd_status->handle, "info-buildings false");
+                break;
             case 'f':
                 st->info_flags ^= IFL_FACTIONS;
                 if (st->info_flags & IFL_FACTIONS)
@@ -1086,7 +1087,7 @@ static void handlekey(state * st, int c)
         else if (findmode == 'F') {
             faction *f = select_faction(st);
             if (f != NULL) {
-                strcpy(locate, itoa36(f->no));
+                strlcpy(locate, itoa36(f->no), sizeof(locate));
                 findmode = 'f';
             }
             else {
@@ -1244,7 +1245,7 @@ void run_mapper(void)
     curs_set(1);
 
     set_readline(curses_readline);
-
+    assert(stdscr);
     getbegyx(stdscr, x, y);
     width = getmaxx(stdscr);
     height = getmaxy(stdscr);

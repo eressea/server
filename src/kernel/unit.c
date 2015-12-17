@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "unit.h"
 
+#include "ally.h"
 #include "building.h"
 #include "faction.h"
 #include "group.h"
@@ -27,6 +28,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "curse.h"
 #include "item.h"
 #include "move.h"
+#include "monster.h"
 #include "order.h"
 #include "plane.h"
 #include "race.h"
@@ -54,6 +56,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <util/parser.h>
+#include <util/rand.h>
 #include <util/resolve.h>
 #include <util/rng.h>
 #include <util/variant.h>
@@ -62,6 +66,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* libc includes */
 #include <assert.h>
+#include <ctype.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <string.h>
@@ -116,9 +121,10 @@ unit *findunitr(const region * r, int n)
     return (u && u->region==r)?u:0;
 }
 
+// TODO: deprecated, replace with findunit(n)
 unit *findunitg(int n, const region * hint)
 {
-
+    unused_arg(hint);
     /* Abfangen von Syntaxfehlern. */
     if (n <= 0)
         return NULL;
@@ -179,40 +185,6 @@ unit *ufindhash(int uid)
     return NULL;
 }
 
-#define DMAXHASH 7919
-typedef struct dead {
-    struct dead *nexthash;
-    faction *f;
-    int no;
-} dead;
-
-static dead *deadhash[DMAXHASH];
-
-static void dhash(int no, faction * f)
-{
-    dead *hash = (dead *)calloc(1, sizeof(dead));
-    dead *old = deadhash[no % DMAXHASH];
-    hash->no = no;
-    hash->f = f;
-    deadhash[no % DMAXHASH] = hash;
-    hash->nexthash = old;
-}
-
-faction *dfindhash(int no)
-{
-    dead *old;
-
-    if (no < 0)
-        return 0;
-
-    for (old = deadhash[no % DMAXHASH]; old; old = old->nexthash) {
-        if (old->no == no) {
-            return old->f;
-        }
-    }
-    return 0;
-}
-
 typedef struct buddy {
     struct buddy *next;
     int number;
@@ -231,7 +203,7 @@ static buddy *get_friends(const unit * u, int *numfriends)
     for (u2 = r->units; u2; u2 = u2->next) {
         if (u2->faction != f && u2->number > 0) {
             int allied = 0;
-            if (get_param_int(global.parameters, "rules.alliances", 0) != 0) {
+            if (config_get_int("rules.alliances", 0) != 0) {
                 allied = (f->alliance && f->alliance == u2->faction->alliance);
             }
             else if (alliedunit(u, u2->faction, HELP_MONEY)
@@ -735,6 +707,7 @@ variant read_unit_reference(struct storage * store)
 
 int get_level(const unit * u, skill_t id)
 {
+    assert(id != NOSKILL);
     if (skill_enabled(id)) {
         skill *sv = u->skills;
         while (sv != u->skills + u->skill_size) {
@@ -769,10 +742,11 @@ void set_level(unit * u, skill_t sk, int value)
     sk_set(add_skill(u, sk), value);
 }
 
-static int leftship_age(struct attrib *a)
+static int leftship_age(struct attrib *a, void *owner)
 {
     /* must be aged, so it doesn't affect report generation (cansee) */
     unused_arg(a);
+    unused_arg(owner);
     return AT_AGE_REMOVE;         /* remove me */
 }
 
@@ -848,17 +822,13 @@ void leave_building(unit * u)
 
 bool can_leave(unit * u)
 {
-    static int gamecookie = -1;
-    static int rule_leave = -1;
+    int rule_leave;
 
     if (!u->building) {
         return true;
     }
 
-    if (rule_leave < 0 || gamecookie != global.cookie) {
-        gamecookie = global.cookie;
-        rule_leave = get_param_int(global.parameters, "rules.move.owner_leave", 0);
-    }
+    rule_leave = config_get_int("rules.move.owner_leave", 0);
 
     if (rule_leave!=0 && u->building && u == building_owner(u->building)) {
         return false;
@@ -943,7 +913,7 @@ void move_unit(unit * u, region * r, unit ** ulist)
 /* ist mist, aber wegen nicht skalierender attribute notwendig: */
 #include "alchemy.h"
 
-void transfermen(unit * u, unit * u2, int n)
+void transfermen(unit * u, unit * dst, int n)
 {
     const attrib *a;
     int hp = u->hp;
@@ -954,22 +924,22 @@ void transfermen(unit * u, unit * u2, int n)
     assert(n > 0);
     /* "hat attackiert"-status wird uebergeben */
 
-    if (u2) {
+    if (dst) {
         skill *sv, *sn;
         skill_t sk;
         ship *sh;
 
-        assert(u2->number + n > 0);
+        assert(dst->number + n > 0);
 
         for (sk = 0; sk != MAXSKILLS; ++sk) {
             int weeks, level = 0;
 
             sv = unit_skill(u, sk);
-            sn = unit_skill(u2, sk);
+            sn = unit_skill(dst, sk);
 
             if (sv == NULL && sn == NULL)
                 continue;
-            if (sn == NULL && u2->number == 0) {
+            if (sn == NULL && dst->number == 0) {
                 /* new unit, easy to solve */
                 level = sv->level;
                 weeks = sv->weeks;
@@ -983,12 +953,12 @@ void transfermen(unit * u, unit * u2, int n)
                 }
                 if (sn && sn->level) {
                     dlevel +=
-                        (sn->level + 1 - sn->weeks / (sn->level + 1.0)) * u2->number;
-                    level += sn->level * u2->number;
+                        (sn->level + 1 - sn->weeks / (sn->level + 1.0)) * dst->number;
+                    level += sn->level * dst->number;
                 }
 
-                dlevel = dlevel / (n + u2->number);
-                level = level / (n + u2->number);
+                dlevel = dlevel / (n + dst->number);
+                level = level / (n + dst->number);
                 if (level <= dlevel) {
                     /* apply the remaining fraction to the number of weeks to go.
                      * subtract the according number of weeks, getting closer to the
@@ -1007,15 +977,15 @@ void transfermen(unit * u, unit * u2, int n)
             }
             if (level) {
                 if (sn == NULL)
-                    sn = add_skill(u2, sk);
+                    sn = add_skill(dst, sk);
                 sn->level = (unsigned char)level;
                 sn->weeks = (unsigned char)weeks;
                 assert(sn->weeks > 0 && sn->weeks <= sn->level * 2 + 1);
-                assert(u2->number != 0 || (sn->level == sv->level
+                assert(dst->number != 0 || (sv && sn->level == sv->level
                     && sn->weeks == sv->weeks));
             }
             else if (sn) {
-                remove_skill(u2, sk);
+                remove_skill(dst, sk);
                 sn = NULL;
             }
         }
@@ -1023,32 +993,32 @@ void transfermen(unit * u, unit * u2, int n)
         while (a && a->type == &at_effect) {
             effect_data *olde = (effect_data *)a->data.v;
             if (olde->value)
-                change_effect(u2, olde->type, olde->value);
+                change_effect(dst, olde->type, olde->value);
             a = a->next;
         }
         sh = leftship(u);
         if (sh != NULL)
-            set_leftship(u2, sh);
-        u2->flags |=
+            set_leftship(dst, sh);
+        dst->flags |=
             u->flags & (UFL_LONGACTION | UFL_NOTMOVING | UFL_HUNGER | UFL_MOVED |
             UFL_ENTER);
         if (u->attribs) {
-            transfer_curse(u, u2, n);
+            transfer_curse(u, dst, n);
         }
     }
     scale_number(u, u->number - n);
-    if (u2) {
-        set_number(u2, u2->number + n);
+    if (dst) {
+        set_number(dst, dst->number + n);
         hp -= u->hp;
-        u2->hp += hp;
+        dst->hp += hp;
         /* TODO: Das ist schnarchlahm! und gehoert nicht hierhin */
-        a = a_find(u2->attribs, &at_effect);
+        a = a_find(dst->attribs, &at_effect);
         while (a && a->type == &at_effect) {
             attrib *an = a->next;
             effect_data *olde = (effect_data *)a->data.v;
             int e = get_effect(u, olde->type);
             if (e != 0)
-                change_effect(u2, olde->type, -e);
+                change_effect(dst, olde->type, -e);
             a = an;
         }
     }
@@ -1070,11 +1040,7 @@ void transfermen(unit * u, unit * u2, int n)
 
 struct building *inside_building(const struct unit *u)
 {
-    if (u->building == NULL)
-        return NULL;
-
-    if (!fval(u->building, BLD_WORKING)) {
-        /* Unterhalt nicht bezahlt */
+    if (!u->building) {
         return NULL;
     }
     else if (u->building->size < u->building->type->maxsize) {
@@ -1162,10 +1128,11 @@ void set_number(unit * u, int count)
     u->number = (unsigned short)count;
 }
 
-bool learn_skill(unit * u, skill_t sk, double chance)
+bool learn_skill(unit * u, skill_t sk, double learn_chance)
 {
     skill *sv = u->skills;
-    if (chance < 1.0 && rng_int() % 10000 >= chance * 10000)
+    if (learn_chance < 1.0 && rng_int() % 10000 >= learn_chance * 10000)
+    if (!chance(learn_chance))
         return false;
     while (sv != u->skills + u->skill_size) {
         assert(sv->weeks > 0);
@@ -1329,7 +1296,6 @@ int get_modifier(const unit * u, skill_t sk, int level, const region * r, bool n
 {
     int bskill = level;
     int skill = bskill;
-    int hunger_red_skill = -1;
 
     if (r && sk == SK_STEALTH) {
         plane *pl = rplane(r);
@@ -1348,12 +1314,8 @@ int get_modifier(const unit * u, skill_t sk, int level, const region * r, bool n
 #endif
     skill = skillmod(u->attribs, u, r, sk, skill, SMF_ALWAYS);
 
-    if (hunger_red_skill == -1) {
-        hunger_red_skill = get_param_int(global.parameters, "rules.hunger.reduces_skill", 2);
-    }
-
-    if (fval(u, UFL_HUNGER) && hunger_red_skill) {
-        if (sk == SK_SAILING && skill > 2 && hunger_red_skill == 2) {
+    if (fval(u, UFL_HUNGER)) {
+        if (sk == SK_SAILING && skill > 2) {
             skill = skill - 1;
         }
         else {
@@ -1371,10 +1333,6 @@ int eff_skill(const unit * u, const skill *sv, const region *r)
         int mlevel = sv->level + get_modifier(u, sv->id, sv->level, r, false);
 
         if (mlevel > 0) {
-            int skillcap = SkillCap(sv->id);
-            if (skillcap && mlevel > skillcap) {
-                return skillcap;
-            }
             return mlevel;
         }
     }
@@ -1727,18 +1685,13 @@ void unit_addorder(unit * u, order * ord)
 
 int unit_max_hp(const unit * u)
 {
-    static int rules_stamina = -1;
     int h;
     double p;
     static const curse_type *heal_ct = NULL;
-
-    if (rules_stamina < 0) {
-        rules_stamina =
-            get_param_int(global.parameters, "rules.stamina", STAMINA_AFFECTS_HP);
-    }
+    int rule_stamina = config_get_int("rules.stamina", STAMINA_AFFECTS_HP);
     h = u_race(u)->hitpoints;
 
-    if (rules_stamina & 1) {
+    if (rule_stamina & 1) {
         p = pow(effskill(u, SK_STAMINA, u->region) / 2.0, 1.5) * 0.2;
         h += (int)(h * p + 0.5);
     }
@@ -1937,17 +1890,12 @@ bool unit_can_study(const unit *u) {
 }
 
 static double produceexp_chance(void) {
-    static int update = 0;
-    if (update != global.cookie) {
-        global.producexpchance_ = get_param_flt(global.parameters, "study.from_use", 1.0 / 3);
-        update = global.cookie;
-    }
-    return global.producexpchance_;
+    return config_get_flt("study.from_use", 1.0 / 3);
 }
 
 void produceexp_ex(struct unit *u, skill_t sk, int n, bool (*learn)(unit *, skill_t, double))
 {
-    if (n != 0 && playerrace(u_race(u))) {
+    if (n != 0 && (is_monsters(u->faction) || playerrace(u_race(u)))) {
         double chance = produceexp_chance();
         if (chance > 0.0F) {
             learn(u, sk, (n * chance) / u->number);
@@ -1958,5 +1906,143 @@ void produceexp_ex(struct unit *u, skill_t sk, int n, bool (*learn)(unit *, skil
 void produceexp(struct unit *u, skill_t sk, int n)
 {
     produceexp_ex(u, sk, n, learn_skill);
+}
+
+/* ID's für Einheiten und Zauber */
+int newunitid(void)
+{
+    int random_unit_no;
+    int start_random_no;
+    random_unit_no = 1 + (rng_int() % MAX_UNIT_NR);
+    start_random_no = random_unit_no;
+
+    while (ufindhash(random_unit_no) || dfindhash(random_unit_no)
+        || cfindhash(random_unit_no)
+        || forbiddenid(random_unit_no)) {
+        random_unit_no++;
+        if (random_unit_no == MAX_UNIT_NR + 1) {
+            random_unit_no = 1;
+        }
+        if (random_unit_no == start_random_no) {
+            random_unit_no = (int)MAX_UNIT_NR + 1;
+        }
+    }
+    return random_unit_no;
+}
+
+static int read_newunitid(const faction * f, const region * r)
+{
+    int n;
+    unit *u2;
+    n = getid();
+    if (n == 0)
+        return -1;
+
+    u2 = findnewunit(r, f, n);
+    if (u2)
+        return u2->no;
+
+    return -1;
+}
+
+int read_unitid(const faction * f, const region * r)
+{
+    char token[16];
+    const char *s = gettoken(token, sizeof(token));
+
+    /* Da s nun nur einen string enthaelt, suchen wir ihn direkt in der
+    * paramliste. machen wir das nicht, dann wird getnewunit in s nach der
+    * nummer suchen, doch dort steht bei temp-units nur "temp" drinnen! */
+
+    if (!s || *s == 0 || !isalnum(*s)) {
+        return -1;
+    }
+    if (isparam(s, f->locale, P_TEMP)) {
+        return read_newunitid(f, r);
+    }
+    return atoi36((const char *)s);
+}
+
+int getunit(const region * r, const faction * f, unit **uresult)
+{
+    unit *u2 = NULL;
+    int n = read_unitid(f, r);
+    int result = GET_NOTFOUND;
+
+    if (n == 0) {
+        result = GET_PEASANTS;
+    }
+    else if (n > 0) {
+        u2 = findunit(n);
+        if (u2 != NULL && u2->region == r) {
+            /* there used to be a 'u2->flags & UFL_ISNEW || u2->number>0' condition
+            * here, but it got removed because of a bug that made units disappear:
+            * http://eressea.upb.de/mantis/bug_view_page.php?bug_id=0000172
+            */
+            result = GET_UNIT;
+        }
+        else {
+            u2 = NULL;
+        }
+    }
+    if (uresult) {
+        *uresult = u2;
+    }
+    return result;
+}
+
+int besieged(const unit * u)
+{
+    /* belagert kann man in schiffen und burgen werden */
+    return (u && !keyword_disabled(K_BESIEGE)
+        && u->building && u->building->besieged
+        && u->building->besieged >= u->building->size * SIEGEFACTOR);
+}
+
+bool has_horses(const unit * u)
+{
+    item *itm = u->items;
+    for (; itm; itm = itm->next) {
+        if (itm->type->flags & ITF_ANIMAL)
+            return true;
+    }
+    return false;
+}
+
+void setstatus(unit *u, int status)
+{
+    assert(status >= ST_AGGRO && status <= ST_FLEE);
+    if (u->status != status) {
+        u->status = (status_t)status;
+    }
+}
+
+#define MAINTENANCE 10
+int maintenance_cost(const struct unit *u)
+{
+    if (u == NULL)
+        return MAINTENANCE;
+    if (global.functions.maintenance) {
+        int retval = global.functions.maintenance(u);
+        if (retval >= 0)
+            return retval;
+    }
+    return u_race(u)->maintenance * u->number;
+}
+
+static skill_t limited_skills[] = { SK_MAGIC, SK_ALCHEMY, SK_TACTICS, SK_SPY, SK_HERBALISM, NOSKILL };
+bool has_limited_skills(const struct unit * u)
+{
+    int i, j;
+
+    for (i = 0; i != u->skill_size; ++i) {
+        skill *sv = u->skills + i;
+        for (j = 0; limited_skills[j] != NOSKILL; ++j) {
+            if (sv->id == limited_skills[j]) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 

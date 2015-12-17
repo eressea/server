@@ -29,7 +29,9 @@ extern "C" {
     struct alliance;
     struct item;
     struct seen_region;
+    struct attrib_type;
 
+    extern struct attrib_type at_maxmagicians;
     /* SMART_INTERVALS: define to speed up finding the interval of regions that a
        faction is in. defining this speeds up the turn by 30-40% */
 #define SMART_INTERVALS
@@ -160,6 +162,26 @@ extern "C" {
     /* skills */
     int skill_limit(struct faction *f, skill_t sk);
     int count_skill(struct faction *f, skill_t sk);
+    bool faction_id_is_unused(int);
+
+#define COUNT_MONSTERS 0x01
+#define COUNT_MIGRANTS 0x02
+#define COUNT_DEFAULT  0x04
+#define COUNT_ALL      0x07
+#define COUNT_UNITS    0x10
+
+    int count_faction(const struct faction * f, int flags);
+    int count_migrants(const struct faction * f);
+    int count_maxmigrants(const struct faction * f);
+    int count_all(const struct faction * f);
+    int count_units(const struct faction * f);
+    int max_magicians(const struct faction * f);
+
+    struct faction *getfaction(void);
+
+    /* looking up dead factions: */
+    void dhash(int no, struct faction * f);
+    struct faction *dfindhash(int no);
 
 #ifdef __cplusplus
 }

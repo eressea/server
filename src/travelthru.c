@@ -38,13 +38,18 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <assert.h>
 #include <string.h>
 
+static void travel_done(attrib *a) {
+    quicklist *ql = (quicklist *)a->data.v;
+    ql_free(ql);
+}
+
 /*********************/
 /*   at_travelunit   */
 /*********************/
 attrib_type at_travelunit = {
     "travelunit",
     DEFAULT_INIT,
-    DEFAULT_FINALIZE,
+    travel_done,
     DEFAULT_AGE,
     NO_WRITE,
     NO_READ

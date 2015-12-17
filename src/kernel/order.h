@@ -61,6 +61,8 @@ extern "C" {
     char *write_order(const order * ord, char *buffer, size_t size);
     keyword_t init_order(const struct order *ord);
 
+    void close_orders(void);
+
 #ifdef __cplusplus
 }
 #endif

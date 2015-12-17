@@ -130,8 +130,12 @@ static void test_get_set_param(CuTest * tc)
     set_param(&par, "bar", "foo");
     CuAssertStrEquals(tc, "bar", get_param(par, "foo"));
     CuAssertStrEquals(tc, "foo", get_param(par, "bar"));
+    set_param(&par, "bar", "bar");
+    CuAssertStrEquals(tc, "bar", get_param(par, "bar"));
     set_param(&par, "bar", NULL);
     CuAssertPtrEquals(tc, NULL, (void *)get_param(par, "bar"));
+    free_params(&par);
+    test_cleanup();
 }
 
 static void test_param_int(CuTest * tc)
@@ -143,6 +147,8 @@ static void test_param_int(CuTest * tc)
     set_param(&par, "bar", "42");
     CuAssertIntEquals(tc, 23, get_param_int(par, "foo", 0));
     CuAssertIntEquals(tc, 42, get_param_int(par, "bar", 0));
+    free_params(&par);
+    test_cleanup();
 }
 
 static void test_param_flt(CuTest * tc)
@@ -154,6 +160,8 @@ static void test_param_flt(CuTest * tc)
     set_param(&par, "bar", "42.0");
     CuAssertDblEquals(tc, 23.0, get_param_flt(par, "foo", 0.0), 0.01);
     CuAssertDblEquals(tc, 42.0, get_param_flt(par, "bar", 0.0), 0.01);
+    free_params(&par);
+    test_cleanup();
 }
 
 static void test_forbiddenid(CuTest *tc) {
@@ -169,11 +177,11 @@ static void test_forbiddenid(CuTest *tc) {
 CuSuite *get_config_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
-    SUITE_ADD_TEST(suite, test_forbiddenid);
-    SUITE_ADD_TEST(suite, test_getunit);
-    SUITE_ADD_TEST(suite, test_read_unitid);
     SUITE_ADD_TEST(suite, test_get_set_param);
     SUITE_ADD_TEST(suite, test_param_int);
     SUITE_ADD_TEST(suite, test_param_flt);
+    SUITE_ADD_TEST(suite, test_forbiddenid);
+    SUITE_ADD_TEST(suite, test_getunit);
+    SUITE_ADD_TEST(suite, test_read_unitid);
     return suite;
 }

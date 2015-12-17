@@ -361,10 +361,10 @@ static int cr_race(variant var, char *buffer, const void *userdata)
 static int cr_alliance(variant var, char *buffer, const void *userdata)
 {
     const alliance *al = (const alliance *)var.v;
+    unused_arg(userdata);
     if (al != NULL) {
         sprintf(buffer, "%d", al->id);
     }
-    unused_arg(userdata);
     return 0;
 }
 
@@ -372,6 +372,7 @@ static int cr_skill(variant var, char *buffer, const void *userdata)
 {
     const faction *report = (const faction *)userdata;
     skill_t sk = (skill_t)var.i;
+    unused_arg(userdata);
     if (sk != NOSKILL)
         sprintf(buffer, "\"%s\"",
         translate(mkname("skill", skillnames[sk]), skillname(sk,
@@ -384,6 +385,7 @@ static int cr_skill(variant var, char *buffer, const void *userdata)
 static int cr_order(variant var, char *buffer, const void *userdata)
 {
     order *ord = (order *)var.v;
+    unused_arg(userdata);
     if (ord != NULL) {
         char cmd[ORDERSIZE];
         char *wp = buffer;
@@ -393,13 +395,11 @@ static int cr_order(variant var, char *buffer, const void *userdata)
 
         *wp++ = '\"';
         for (rp = cmd; *rp;) {
-            switch (*rp) {
-            case '\"':
-            case '\\':
+            char r = *rp++;
+            if (r == '\"' || r == '\\') {
                 *wp++ = '\\';
-            default:
-                *wp++ = *rp++;
             }
+            *wp++ = r;
         }
         *wp++ = '\"';
         *wp++ = 0;
@@ -637,8 +637,9 @@ faction * f)
         fprintf(F, "\"%s\";Beschr\n", b->display);
     if (b->size)
         fprintf(F, "%d;Groesse\n", b->size);
-    if (owner)
-        fprintf(F, "%d;Besitzer\n", owner ? owner->no : -1);
+    if (owner) {
+        fprintf(F, "%d;Besitzer\n", owner->no);
+    }
     if (fno >= 0)
         fprintf(F, "%d;Partei\n", fno);
     if (b->besieged)
@@ -667,8 +668,9 @@ const faction * f, const region * r)
             (sh->damage * 100 + DAMAGE_SCALE - 1) / (sh->size * DAMAGE_SCALE);
         fprintf(F, "%d;Schaden\n", percent);
     }
-    if (u)
-        fprintf(F, "%d;Kapitaen\n", u ? u->no : -1);
+    if (u) {
+        fprintf(F, "%d;Kapitaen\n", u->no);
+    }
     if (fcaptain >= 0)
         fprintf(F, "%d;Partei\n", fcaptain);
 
@@ -744,7 +746,6 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
     building *b;
     const char *pzTmp;
     skill *sv;
-    const attrib *a_fshidden = NULL;
     bool itemcloak = false;
     static const curse_type *itemcloak_ct = 0;
     static bool init = false;
@@ -832,13 +833,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
         stream_printf(out, "\"%s\";typprefix\n", translate(prefix, LOC(f->locale,
             prefix)));
     }
-    if (u->faction != f && a_fshidden
-        && a_fshidden->data.ca[0] == 1 && effskill(u, SK_STEALTH, 0) >= 6) {
-        stream_printf(out, "-1;Anzahl\n");
-    }
-    else {
-        stream_printf(out, "%d;Anzahl\n", u->number);
-    }
+    stream_printf(out, "%d;Anzahl\n", u->number);
 
     pzTmp = get_racename(u->attribs);
     if (pzTmp) {
@@ -979,8 +974,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
     if (f == u->faction || omniscient(f)) {
         show = u->items;
     }
-    else if (!itemcloak && mode >= see_unit && !(a_fshidden
-        && a_fshidden->data.ca[1] == 1 && effskill(u, SK_STEALTH, 0) >= 3)) {
+    else if (!itemcloak && mode >= see_unit) {
         int n = report_items(u->items, result, MAX_INVENTORY, u, f);
         assert(n >= 0);
         if (n > 0)
@@ -1386,7 +1380,7 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
                     }
                 }
                 if (r->land && r->land->ownership) {
-                    fprintf(F, "%d;morale\n", r->land->morale);
+                    fprintf(F, "%d;morale\n", region_get_morale(r));
                 }
             }
 
@@ -1511,7 +1505,7 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
     FILE *F = fopen(filename, "wt");
 
     if (era < 0) {
-        era = get_param_int(global.parameters, "world.era", 1);
+        era = config_get_int("world.era", 1);
     }
     if (F == NULL) {
         perror(filename);
@@ -1530,7 +1524,7 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
     fprintf(F, "\"%s\";charset\n", charset);
     fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
     fprintf(F, "%d;noskillpoints\n", 1);
-    fprintf(F, "%ld;date\n", ctx->report_time);
+    fprintf(F, "%lld;date\n", (long long)ctx->report_time);
     fprintf(F, "\"%s\";Spiel\n", game_name());
     fprintf(F, "\"%s\";Konfiguration\n", "Standard");
     fprintf(F, "\"%s\";Koordinaten\n", "Hex");
@@ -1703,23 +1697,26 @@ int crwritemap(const char *filename)
     FILE *F = fopen(filename, "w");
     region *r;
 
-    fprintf(F, "VERSION %d\n", C_REPORT_VERSION);
-    fputs("\"UTF-8\";charset\n", F);
+    if (F) {
+        fprintf(F, "VERSION %d\n", C_REPORT_VERSION);
+        fputs("\"UTF-8\";charset\n", F);
 
-    for (r = regions; r; r = r->next) {
-        plane *pl = rplane(r);
-        int plid = plane_id(pl);
-        if (plid) {
-            fprintf(F, "REGION %d %d %d\n", r->x, r->y, plid);
+        for (r = regions; r; r = r->next) {
+            plane *pl = rplane(r);
+            int plid = plane_id(pl);
+            if (plid) {
+                fprintf(F, "REGION %d %d %d\n", r->x, r->y, plid);
+            }
+            else {
+                fprintf(F, "REGION %d %d\n", r->x, r->y);
+            }
+            fprintf(F, "\"%s\";Name\n\"%s\";Terrain\n", rname(r, default_locale),
+                LOC(default_locale, terrain_name(r)));
         }
-        else {
-            fprintf(F, "REGION %d %d\n", r->x, r->y);
-        }
-        fprintf(F, "\"%s\";Name\n\"%s\";Terrain\n", rname(r, default_locale),
-            LOC(default_locale, terrain_name(r)));
+        fclose(F);
+        return 0;
     }
-    fclose(F);
-    return 0;
+    return EOF;
 }
 
 void register_cr(void)

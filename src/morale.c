@@ -29,6 +29,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <util/rand.h>
 
+#include <assert.h>
+
 static double rc_popularity(const struct race *rc)
 {
     int pop = get_param_int(rc->parameters, "morale", MORALE_AVERAGE);
@@ -36,6 +38,9 @@ static double rc_popularity(const struct race *rc)
 }
 
 void morale_update(region *r) {
+    int morale = region_get_morale(r);
+    assert(r->land);
+
     if (r->land->ownership && r->land->ownership->owner) {
         int stability = turn - r->land->ownership->morale_turn;
         int maxmorale = MORALE_DEFAULT;
@@ -44,24 +49,24 @@ void morale_update(region *r) {
             int bsize = buildingeffsize(b, false);
             maxmorale = (int)(0.5 + b->type->taxes(b, bsize + 1) / MORALE_TAX_FACTOR);
         }
-        if (r->land->morale < maxmorale) {
+        if (morale < maxmorale) {
             if (stability > MORALE_COOLDOWN && r->land->ownership->owner
-                && r->land->morale < MORALE_MAX) {
+                && morale < MORALE_MAX) {
                 double ch = rc_popularity(r->land->ownership->owner->race);
                 if (is_cursed(r->attribs, C_GENEROUS, 0)) {
                     ch *= 1.2;            /* 20% improvement */
                 }
                 if (stability >= MORALE_AVERAGE * 2 || chance(ch)) {
-                    region_set_morale(r, r->land->morale + 1, turn);
+                    region_set_morale(r, morale + 1, turn);
                 }
             }
         }
-        else if (r->land->morale > maxmorale) {
-            region_set_morale(r, r->land->morale - 1, turn);
+        else if (morale > maxmorale) {
+            region_set_morale(r, morale - 1, turn);
         }
     }
-    else if (r->land->morale > MORALE_DEFAULT) {
-        region_set_morale(r, r->land->morale - 1, turn);
+    else if (morale > MORALE_DEFAULT) {
+        region_set_morale(r, morale - 1, turn);
     }
 }
 

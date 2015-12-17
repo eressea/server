@@ -69,7 +69,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 bool monster_is_waiting(const unit * u)
 {
-    if (fval(u, UFL_ISNEW | UFL_MOVED))
+    int test = fval(u_race(u), RCF_ATTACK_MOVED) ? UFL_ISNEW : UFL_ISNEW | UFL_MOVED;
+    if (fval(u, test))
         return true;
     return false;
 }
@@ -222,7 +223,7 @@ faction *get_or_create_monsters(void)
     faction *f = findfaction(MONSTER_ID);
     if (!f) {
         const race *rc = rc_get_or_create("dragon");
-        const char *email = get_param(global.parameters, "monster.email");
+        const char *email = config_get("monster.email");
         f = addfaction(email ? email : "noreply@eressea.de", NULL, rc, default_locale, 0);
         renumber_faction(f, MONSTER_ID);
         faction_setname(f, "Monster");

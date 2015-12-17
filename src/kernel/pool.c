@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "pool.h"
 
+#include "ally.h"
 #include "faction.h"
 #include "item.h"
 #include "order.h"
@@ -67,6 +68,8 @@ int get_resource(const unit * u, const resource_type * rtype)
 int change_resource(unit * u, const resource_type * rtype, int change)
 {
     int i = 0;
+
+    assert(rtype);
 
     if (rtype->uchange)
         i = rtype->uchange(u, rtype, change);

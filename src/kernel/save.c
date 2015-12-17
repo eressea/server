@@ -20,7 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "save.h"
 
-#include "../buildno.h"
+#include <buildno.h>
 
 #include "alchemy.h"
 #include "alliance.h"
@@ -490,9 +490,6 @@ static int resolve_owner(variant id, void *address)
         }
     }
     owner->owner = f;
-    if (f) {
-        owner->alliance = f->alliance;
-    }
     return result;
 }
 
@@ -511,13 +508,20 @@ static void read_owner(struct gamedata *data, region_owner ** powner)
         else {
             owner->flags = 0;
         }
-        if (data->version >= OWNER_2_VERSION) {
+        if (data->version >= OWNER_3_VERSION) {
             int id;
             READ_INT(data->store, &id);
-            owner->alliance = id ? findalliance(id) : NULL;
+            owner->last_owner = id ? findfaction(id) : NULL;
+        } else if (data->version >= OWNER_2_VERSION) {
+            int id;
+            alliance *a;
+            READ_INT(data->store, &id);
+            a = id ? findalliance(id) : NULL;
+            /* don't know which faction, take the leader */
+            owner->last_owner = a? a->_leader : NULL;
         }
         else {
-            owner->alliance = NULL;
+            owner->last_owner = NULL;
         }
         read_reference(owner, data->store, &read_faction_reference, &resolve_owner);
         *powner = owner;
@@ -533,7 +537,7 @@ static void write_owner(struct gamedata *data, region_owner * owner)
         WRITE_INT(data->store, owner->since_turn);
         WRITE_INT(data->store, owner->morale_turn);
         WRITE_INT(data->store, owner->flags);
-        WRITE_INT(data->store, owner->alliance ? owner->alliance->id : 0);
+        write_faction_reference(owner->last_owner, data->store);
         write_faction_reference(owner->owner, data->store);
     }
     else {
@@ -553,8 +557,11 @@ int current_turn(void)
         perror(zText);
     }
     else {
-        fscanf(F, "%d\n", &cturn);
+        int c = fscanf(F, "%d\n", &cturn);
         fclose(F);
+        if (c != 1) {
+            return -1;
+        }
     }
     return cturn;
 }
@@ -613,8 +620,7 @@ unit *read_unit(struct gamedata *data)
         ++u->faction->no_units;
     }
     else {
-        log_error("unit %s has faction == NULL\n", unitname(u));
-        assert(u->faction);
+        log_error("unit %s has faction == NULL\n", itoa36(u->no));
         return 0;
     }
 
@@ -685,7 +691,7 @@ unit *read_unit(struct gamedata *data)
     setstatus(u, n);
     READ_INT(data->store, &u->flags);
     u->flags &= UFL_SAVEMASK;
-    if ((u->flags & UFL_ANON_FACTION) && !rule_stealth_faction()) {
+    if ((u->flags & UFL_ANON_FACTION) && !rule_stealth_anon()) {
         /* if this rule is broken, then fix broken units */
         u->flags -= UFL_ANON_FACTION;
         log_warning("%s was anonymous.\n", unitname(u));
@@ -810,7 +816,7 @@ void write_unit(struct gamedata *data, const unit * u)
     WRITE_SECTION(data->store);
     write_items(data->store, u->items);
     WRITE_SECTION(data->store);
-    if (u->hp == 0) {
+    if (u->hp == 0 && u_race(u)!= get_race(RC_SPELL)) {
         log_error("unit %s has 0 hitpoints, adjusting.\n", itoa36(u->no));
         ((unit *)u)->hp = u->number;
     }
@@ -840,8 +846,8 @@ static region *readregion(struct gamedata *data, int x, int y)
         while (r->attribs)
             a_remove(&r->attribs, r->attribs);
         if (r->land) {
-            free(r->land);            /* mem leak */
-            r->land->demands = 0;     /* mem leak */
+            free_land(r->land);
+            r->land = 0;
         }
         while (r->resources) {
             rawmaterial *rm = r->resources;
@@ -967,10 +973,7 @@ static region *readregion(struct gamedata *data, int x, int y)
         read_items(data->store, &r->land->items);
         if (data->version >= REGIONOWNER_VERSION) {
             READ_INT(data->store, &n);
-            r->land->morale = (short)n;
-            if (r->land->morale < 0) {
-                r->land->morale = 0;
-            }
+            region_set_morale(r, _max(0, (short) n), -1);
             read_owner(data, &r->land->ownership);
         }
     }
@@ -1033,7 +1036,7 @@ void writeregion(struct gamedata *data, const region * r)
         write_items(data->store, r->land->items);
         WRITE_SECTION(data->store);
 #if RELEASE_VERSION>=REGIONOWNER_VERSION
-        WRITE_INT(data->store, r->land->morale);
+        WRITE_INT(data->store, region_get_morale(r));
         write_owner(data, r->land->ownership);
         WRITE_SECTION(data->store);
 #endif
@@ -1346,8 +1349,14 @@ void writefaction(struct gamedata *data, const faction * f)
     WRITE_SECTION(data->store);
 
     for (sf = f->allies; sf; sf = sf->next) {
-        int no = (sf->faction != NULL) ? sf->faction->no : 0;
-        int status = alliedfaction(NULL, f, sf->faction, HELP_ALL);
+        int no;
+        int status;
+
+        assert(sf->faction);
+
+        no = sf->faction->no;
+        status = alliedfaction(NULL, f, sf->faction, HELP_ALL);
+
         if (status != 0) {
             WRITE_INT(data->store, no);
             WRITE_INT(data->store, sf->status);
@@ -1383,6 +1392,7 @@ int readgame(const char *filename, bool backup)
     storage store;
     stream strm;
     FILE *F;
+    size_t sz;
 
     init_locales();
     log_debug("- reading game data from %s\n", filename);
@@ -1397,11 +1407,11 @@ int readgame(const char *filename, bool backup)
         perror(path);
         return -1;
     }
-    fread(&gdata.version, sizeof(int), 1, F);
-    if (gdata.version >= INTPAK_VERSION) {
+    sz = fread(&gdata.version, sizeof(int), 1, F);
+    if (sz!=sizeof(int) || gdata.version >= INTPAK_VERSION) {
         int stream_version;
-        fread(&stream_version, sizeof(int), 1, F);
-        assert(stream_version == STREAM_VERSION || !"unsupported data format");
+        size_t sz = fread(&stream_version, sizeof(int), 1, F);
+        assert((sz==1 && stream_version == STREAM_VERSION) || !"unsupported data format");
     }
     assert(gdata.version >= MIN_VERSION || !"unsupported data format");
     assert(gdata.version <= MAX_VERSION || !"unsupported data format");
@@ -1422,9 +1432,14 @@ int readgame(const char *filename, bool backup)
 
         READ_INT(&store, &gameid);
         if (gameid != game_id()) {
-            log_warning("game mismatch: datafile contains game %d, but config is for %d\n", gameid, game_id());
+            int c;
+            log_warning("game mismatch: datafile contains game %d, but config is for %d", gameid, game_id());
             printf("WARNING: invalid game id. any key to continue, Ctrl-C to stop\n");
-            getchar();
+            c = getchar();
+            if (c == EOF) {
+                log_error("aborting.");
+                abort();
+            }
         }
     }
     else {
@@ -1435,7 +1450,6 @@ int readgame(const char *filename, bool backup)
     global.data_turn = turn;
     log_debug(" - reading turn %d\n", turn);
     rng_init(turn);
-    ++global.cookie;
     READ_INT(&store, &nread);          /* max_unique_id = ignore */
     READ_INT(&store, &nextborder);
 
@@ -1730,10 +1744,8 @@ int writegame(const char *filename)
 
     sprintf(path, "%s/%s", datapath(), filename);
 #ifdef HAVE_UNISTD_H
-    if (access(path, R_OK) == 0) {
-        /* make sure we don't overwrite some hardlinkedfile */
-        unlink(path);
-    }
+    /* make sure we don't overwrite an existing file (hard links) */
+    unlink(path);
 #endif
     F = fopen(path, "wb");
     if (!F) {
@@ -1874,6 +1886,51 @@ int writegame(const char *filename)
     binstore_done(&store);
     fstream_done(&strm);
 
+    return 0;
+}
+
+void gamedata_close(gamedata *data) {
+    binstore_done(data->store);
+    fstream_done(&data->strm);
+}
+
+gamedata *gamedata_open(const char *filename, const char *mode) {
+    FILE *F = fopen(filename, mode);
+
+    if (F) {
+        gamedata *data = (gamedata *)calloc(1, sizeof(gamedata));
+        storage *store = (storage *)calloc(1, sizeof(storage));
+        int err = 0;
+        size_t sz;
+
+        data->store = store;
+        if (strchr(mode, 'r')) {
+            sz = fread(&data->version, 1, sizeof(int), F);
+            if (sz != sizeof(int)) {
+                err = ferror(F);
+            }
+            else {
+                err = fseek(F, sizeof(int), SEEK_CUR);
+            }
+        }
+        else if (strchr(mode, 'w')) {
+            int n = STREAM_VERSION;
+            data->version = RELEASE_VERSION;
+            fwrite(&data->version, sizeof(int), 1, F);
+            fwrite(&n, sizeof(int), 1, F);
+        }
+        if (err) {
+            fclose(F);
+            free(data);
+            free(store);
+        }
+        else {
+            fstream_init(&data->strm, F);
+            binstore_init(store, &data->strm);
+            return data;
+        }
+    }
+    log_error("could not open %s: %s", filename, strerror(errno));
     return 0;
 }
 

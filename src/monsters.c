@@ -36,6 +36,7 @@
 
 /* kernel includes */
 #include <kernel/build.h>
+#include <kernel/building.h>
 #include <kernel/curse.h>
 #include <kernel/equipment.h>
 #include <kernel/faction.h>
@@ -70,9 +71,11 @@
 #include <string.h>
 #include <assert.h>
 
-#define MOVECHANCE                  25  /* chance fuer bewegung */
+#define MOVECHANCE                  .25  /* chance fuer bewegung */
 #define DRAGON_RANGE 20         /* Max. Distanz zum nächsten Drachenziel */
 #define MAXILLUSION_TEXTS   3
+
+static double attack_chance; /* rules.monsters.attack_chance, or default 0.4 */
 
 static void give_peasants(unit *u, const item_type *itype, int reduce) {
     char buf[64];
@@ -80,8 +83,8 @@ static void give_peasants(unit *u, const item_type *itype, int reduce) {
     unit_addorder(u, parse_order(buf, u->faction->locale));
 }
 
-static double monster_attack_chance(void) {
-    return get_param_flt(global.parameters, "rules.monsters.attack_chance", 0.4f);
+static double random_move_chance(void) {
+    return config_get_flt("rules.monsters.random_move_chance", MOVECHANCE);
 }
 
 static void reduce_weight(unit * u)
@@ -156,55 +159,52 @@ static order *monster_attack(unit * u, const unit * target)
     return create_order(K_ATTACK, u->faction->locale, "%i", target->no);
 }
 
-static order *get_money_for_dragon(region * r, unit * u, int wanted)
+int monster_attacks(unit * monster, bool respect_buildings, bool rich_only)
 {
+    region *r = monster->region;
     unit *u2;
-    int n;
-    double attack_chance = monster_attack_chance();
+    int money = 0;
 
-    if (attack_chance > 0.0 && is_guard(u, GUARD_TAX)) {
-        /* attackiere bewachende Einheiten nur wenn wir selbst schon bewachen */
-        for (u2 = r->units; u2; u2 = u2->next) {
-            if (u2 != u && is_guard(u2, GUARD_TAX) && u->faction!=u2->faction) {
-                /*In E3 + E4 etwas problematisch, da der Regionsbesitzer immer bewacht. Der Drache greift also immer die Burg an!*/
-                order *ord = monster_attack(u, u2);
-                if (ord)
-                    addlist(&u->orders, ord);
+    for (u2 = r->units; u2; u2 = u2->next) {
+        if (u2->faction != monster->faction && cansee(monster->faction, r, u2, 0) && !in_safe_building(u2, monster)) {
+            int m = get_money(u2);
+            if (!rich_only || m > 0) {
+                order *ord = monster_attack(monster, u2);
+                if (ord) {
+                    addlist(&monster->orders, ord);
+                    money += m;
+                }
             }
         }
     }
+    return money;
+}
+
+static order *get_money_for_dragon(region * r, unit * udragon, int wanted)
+{
+    int money;
+    bool attacks = attack_chance > 0.0;
 
     /* falls genug geld in der region ist, treiben wir steuern ein. */
     if (rmoney(r) >= wanted) {
         /* 5% chance, dass der drache aus einer laune raus attackiert */
-        if (attack_chance <= 0.0 || chance(1.0 - u_race(u)->aggression)) {
+        if (!attacks || chance(1.0 - u_race(udragon)->aggression)) {
             /* Drachen haben in E3 und E4 keine Einnahmen. Neuer Befehl Pluendern erstmal nur fuer Monster?*/
             return create_order(K_LOOT, default_locale, NULL);
         }
     }
 
-    /* falls der drache launisch ist, oder das regionssilber knapp, greift er alle an */
-    n = 0;
-    for (u2 = r->units; u2; u2 = u2->next) {
-        if (inside_building(u2) != u->building && is_guard(u, GUARD_TAX) && u2->faction != u->faction && cansee(u->faction, r, u2, 0)) {
-            int m = get_money(u2);
-            if (m == 0 || is_guard(u2, GUARD_TAX) || attack_chance <= 0.0)
-                continue;
-            else {
-                order *ord = monster_attack(u, u2);
-                if (ord) {
-                    addlist(&u->orders, ord);
-                    n += m;
-                }
-            }
-        }
+    /* falls der drache launisch ist, oder das regionssilber knapp, greift er alle an
+     * und holt sich Silber von Einheiten, vorausgesetzt er bewacht bereits */
+    money = 0;
+    if (attacks && is_guard(udragon, GUARD_TAX)) {
+        money += monster_attacks(udragon, true, true);
     }
 
     /* falls die einnahmen erreicht werden, bleibt das monster noch eine */
     /* runde hier. */
-    if (n + rmoney(r) >= wanted) {
-        keyword_t kwd = keyword_disabled(K_TAX) ? K_LOOT : K_TAX;
-        return create_order(kwd, default_locale, NULL);
+    if (money + rmoney(r) >= wanted) {
+        return create_order(K_LOOT, default_locale, NULL);
     }
 
     /* wenn wir NULL zurueckliefern, macht der drache was anderes, z.b. weggehen */
@@ -410,10 +410,10 @@ static int dragon_affinity_value(region * r, unit * u)
     int m = all_money(r, u->faction);
 
     if (u_race(u) == get_race(RC_FIREDRAGON)) {
-        return (int)(normalvariate(m, m / 2));
+        return dice(4, m / 2);
     }
     else {
-        return (int)(normalvariate(m, m / 4));
+        return dice(6, m / 3);
     }
 }
 
@@ -549,20 +549,6 @@ static order *monster_seeks_target(region * r, unit * u)
 }
 #endif
 
-static void monster_attacks(unit * u)
-{
-    region *r = u->region;
-    unit *u2;
-
-    for (u2 = r->units; u2; u2 = u2->next) {
-        if (u2->faction != u->faction && cansee(u->faction, r, u2, 0) && !inside_building(u2)) {
-            order *ord = monster_attack(u, u2);
-            if (ord)
-                addlist(&u->orders, ord);
-        }
-    }
-}
-
 static const char *random_growl(void)
 {
     switch (rng_int() % 5) {
@@ -671,8 +657,8 @@ static order *plan_dragon(unit * u)
     order *long_order = NULL;
 
     if (ta == NULL) {
-        move |= (r->land == 0 || r->land->peasants == 0);   /* when no peasants, move */
-        move |= (r->land == 0 || r->land->money == 0);      /* when no money, move */
+        move |= (rpeasants(r) == 0);   /* when no peasants, move */
+        move |= (rmoney(r) == 0);      /* when no money, move */
     }
     move |= chance(0.04);         /* 4% chance to change your mind */
 
@@ -695,14 +681,13 @@ static order *plan_dragon(unit * u)
         /* dragon gets bored and looks for a different place to go */
         ta = set_new_dragon_target(u, u->region, DRAGON_RANGE);
     }
-    else
-        ta = a_find(u->attribs, &at_targetregion);
     if (ta != NULL) {
         tr = (region *)ta->data.v;
         if (tr == NULL || !path_exists(u->region, tr, DRAGON_RANGE, allowed_dragon)) {
             ta = set_new_dragon_target(u, u->region, DRAGON_RANGE);
-            if (ta)
+            if (ta) {
                 tr = findregion(ta->data.sa[0], ta->data.sa[1]);
+            }
         }
     }
     if (tr != NULL) {
@@ -755,9 +740,10 @@ static order *plan_dragon(unit * u)
         }
     }
     if (long_order == NULL) {
+        int attempts = 0;
         skill_t sk = SK_PERCEPTION;
         /* study perception (or a random useful skill) */
-        while (!skill_enabled(sk) || u_race(u)->bonus[sk] < -5) {
+        while ((!skill_enabled(sk) || (attempts < MAXSKILLS && u_race(u)->bonus[sk] < (++attempts < 10?1:-5 )))) {
             sk = (skill_t)(rng_int() % MAXSKILLS);
         }
         long_order = create_order(K_STUDY, u->faction->locale, "'%s'",
@@ -769,14 +755,14 @@ static order *plan_dragon(unit * u)
 void plan_monsters(faction * f)
 {
     region *r;
-
+    
     assert(f);
+    attack_chance = config_get_flt("rules.monsters.attack_chance", 0.4);
     f->lastorders = turn;
 
     for (r = regions; r; r = r->next) {
         unit *u;
-        double attack_chance = monster_attack_chance();
-        bool attacking = false;
+        bool attacking = chance(attack_chance);
 
         for (u = r->units; u; u = u->next) {
             attrib *ta;
@@ -786,35 +772,30 @@ void plan_monsters(faction * f)
             if (!is_monsters(u->faction))
                 continue;
 
-            if (attack_chance > 0.0) {
-                if (chance(attack_chance))
-                    attacking = true;
-                attack_chance = 0.0;
+            /* Befehle müssen jede Runde neu gegeben werden: */
+            free_orders(&u->orders);
+            if (skill_enabled(SK_PERCEPTION)) {
+                /* Monster bekommen jede Runde ein paar Tage Wahrnehmung dazu */
+                produceexp(u, SK_PERCEPTION, u->number);
             }
 
             if (u->status > ST_BEHIND) {
                 setstatus(u, ST_FIGHT);
                 /* all monsters fight */
             }
-            if (skill_enabled(SK_PERCEPTION)) {
-                /* Monster bekommen jede Runde ein paar Tage Wahrnehmung dazu */
-                /* TODO: this only works for playerrace */
-                produceexp(u, SK_PERCEPTION, u->number);
+            if (attacking && (!r->land || is_guard(u, GUARD_TAX))) {
+                monster_attacks(u, true, false);
             }
 
-            /* Befehle müssen jede Runde neu gegeben werden: */
-            free_orders(&u->orders);
-
-            if (attacking && is_guard(u, GUARD_TAX)) {
-                monster_attacks(u);
-            }
             /* units with a plan to kill get ATTACK orders: */
             ta = a_find(u->attribs, &at_hate);
             if (ta && !monster_is_waiting(u)) {
                 unit *tu = (unit *)ta->data.v;
                 if (tu && tu->region == r) {
-                    addlist(&u->orders,
-                        create_order(K_ATTACK, u->faction->locale, "%i", tu->no));
+                    order * ord = monster_attack(u, tu);
+                    if (ord) {
+                        addlist(&u->orders, ord);
+                    }
                 }
                 else if (tu) {
                     tu = findunitg(ta->data.i, NULL);
@@ -840,20 +821,8 @@ void plan_monsters(faction * f)
                     }
                 }
                 else if (u_race(u)->flags & RCF_MOVERANDOM) {
-                    if (rng_int() % 100 < MOVECHANCE || check_overpopulated(u)) {
+                    if (chance(random_move_chance()) || check_overpopulated(u)) {
                         long_order = monster_move(r, u);
-                    }
-                }
-            }
-
-            if (long_order == NULL && unit_can_study(u)) {
-                /* Einheiten, die Waffenlosen Kampf lernen könnten, lernen es um
-                 * zu bewachen: */
-                if (u_race(u)->bonus[SK_WEAPONLESS] != -99) {
-                    if (effskill(u, SK_WEAPONLESS, 0) < 1) {
-                        long_order =
-                            create_order(K_STUDY, f->locale, "'%s'",
-                            skillname(SK_WEAPONLESS, f->locale));
                     }
                 }
             }
@@ -886,6 +855,18 @@ void plan_monsters(faction * f)
                     break;
                 }
             }
+            if (long_order == NULL && unit_can_study(u)) {
+                /* Einheiten, die Waffenlosen Kampf lernen könnten, lernen es um
+                * zu bewachen: */
+                if (u_race(u)->bonus[SK_WEAPONLESS] != -99) {
+                    if (effskill(u, SK_WEAPONLESS, 0) < 1) {
+                        long_order =
+                            create_order(K_STUDY, f->locale, "'%s'",
+                                skillname(SK_WEAPONLESS, f->locale));
+                    }
+                }
+            }
+
             if (long_order) {
                 addlist(&u->orders, long_order);
             }
@@ -969,7 +950,7 @@ void spawn_undead(void)
             continue;
 
         /* Chance 0.1% * chaosfactor */
-        if (r->land && unburied > r->land->peasants / 20
+        if (r->land && unburied > rpeasants(r) / 20
             && rng_int() % 10000 < (100 + 100 * chaosfactor(r))) {
             message *msg;
             unit *u;

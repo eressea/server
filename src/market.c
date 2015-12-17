@@ -36,9 +36,9 @@ static unsigned int get_markets(region * r, unit ** results, size_t size)
     if (!btype)
         return 0;
     for (b = r->buildings; n < size && b; b = b->next) {
-        if (b->type == btype && (b->flags & BLD_WORKING)
-            && b->size >= b->type->maxsize) {
+        if (b->type == btype && building_is_active(b)) {
             unit *u = building_owner(b);
+            /* I decided to omit check for inside_building(u) */
             unsigned int i;
             for (i = 0; u && i != n; ++i) {
                 /* only one market per faction */
@@ -96,8 +96,8 @@ void do_markets(void)
             const struct race *rc = f ? f->race : NULL;
             int p = rpeasants(r);
             int numlux = rc_luxury_trade(rc), numherbs = rc_herb_trade(rc);
-            numlux = (p + numlux - MIN_PEASANTS) / numlux;
-            numherbs = (p + numherbs - MIN_PEASANTS) / numherbs;
+            if (numlux>0) numlux = (p + numlux - MIN_PEASANTS) / numlux;
+            if (numherbs>0) numherbs = (p + numherbs - MIN_PEASANTS) / numherbs;
             if (numlux > 0 || numherbs > 0) {
                 int d, nmarkets = 0;
                 const item_type *lux = r_luxury(r);

@@ -66,9 +66,10 @@ static void a_freedirection(attrib * a)
     free(d);
 }
 
-static int a_agedirection(attrib * a)
+static int a_agedirection(attrib * a, void *owner)
 {
     spec_direction *d = (spec_direction *)(a->data.v);
+    unused_arg(owner);
     --d->duration;
     return (d->duration > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
 }
@@ -78,7 +79,7 @@ static int a_readdirection(attrib * a, void *owner, struct storage *store)
     spec_direction *d = (spec_direction *)(a->data.v);
     char lbuf[32];
 
-    (void)owner;
+    unused_arg(owner);
     READ_INT(store, &d->x);
     READ_INT(store, &d->y);
     READ_INT(store, &d->duration);
@@ -95,7 +96,7 @@ a_writedirection(const attrib * a, const void *owner, struct storage *store)
 {
     spec_direction *d = (spec_direction *)(a->data.v);
 
-    (void)owner;
+    unused_arg(owner);
     WRITE_INT(store, d->x);
     WRITE_INT(store, d->y);
     WRITE_INT(store, d->duration);

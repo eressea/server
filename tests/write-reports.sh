@@ -21,13 +21,16 @@ cd $ROOT/tests
 setup
 cleanup
 VALGRIND=`which valgrind`
+TESTS=../Debug/eressea/test_eressea
 SERVER=../Debug/eressea/eressea
 if [ -n "$VALGRIND" ]; then
 SUPP=../share/ubuntu-12_04.supp
-SERVER="$VALGRIND --suppressions=$SUPP --error-exitcode=1 --leak-check=no $SERVER"
+VALGRIND="$VALGRIND --suppressions=$SUPP --error-exitcode=1 --leak-check=no"
 fi
+echo "running $TESTS"
+$VALGRIND $TESTS
 echo "running $SERVER"
-$SERVER -t 184 ../scripts/reports.lua
+$VALGRIND $SERVER -t 184 ../scripts/reports.lua
 [ -d reports ] || quit 4 "no reports directory created"
 CRFILE=184-zvto.cr
 grep -q PARTEI reports/$CRFILE || quit 1 "CR did not contain any factions"

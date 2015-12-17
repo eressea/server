@@ -45,6 +45,8 @@ static void test_resourcename_with_appearance(CuTest *tc) {
 
 static void test_uchange(CuTest * tc, unit * u, const resource_type * rtype) {
     int n;
+
+    assert(rtype);
     change_resource(u, rtype, 4);
     n = get_resource(u, rtype);
     CuAssertPtrNotNull(tc, rtype->uchange);
@@ -59,8 +61,8 @@ void test_change_item(CuTest * tc)
     unit * u;
 
     test_cleanup();
+    test_create_itemtype("iron");
     init_resources();
-    test_create_world();
 
     u = test_create_unit(0, 0);
     test_uchange(tc, u, get_resourcetype(R_IRON));
@@ -79,43 +81,41 @@ void test_resource_type(CuTest * tc)
     itype = test_create_itemtype("herp");
 
     CuAssertPtrEquals(tc, itype->rtype, rt_find("herp"));
+    test_cleanup();
 }
 
 void test_finditemtype(CuTest * tc)
 {
     const item_type *itype;
-    const resource_type *rtype;
     struct locale * lang;
 
     test_cleanup();
-    test_create_world();
 
-    lang = get_locale("de");
+    lang = get_or_create_locale("de");
     locale_setstring(lang, "horse", "Pferd");
-    rtype = get_resourcetype(R_HORSE);
-    itype = finditemtype("Pferd", lang);
-    CuAssertPtrNotNull(tc, itype);
-    CuAssertPtrEquals(tc, (void*)rtype->itype, (void*)itype);
+    itype = test_create_itemtype("horse");
+    CuAssertPtrEquals(tc, (void *)itype, (void *)finditemtype("Pferd", lang));
+    test_cleanup();
 }
 
 void test_findresourcetype(CuTest * tc)
 {
-    const resource_type *rtype, *rresult;
+    const item_type *itype;
     struct locale * lang;
 
     test_cleanup();
-    test_create_world();
 
-    lang = get_locale("de");
+    lang = get_or_create_locale("de");
     locale_setstring(lang, "horse", "Pferd");
     locale_setstring(lang, "peasant", "Bauer");
+    init_resources();
+    CuAssertPtrNotNull(tc, rt_find("peasant"));
+    CuAssertPtrEquals(tc, 0, rt_find("horse"));
+    itype = test_create_itemtype("horse");
 
-    rtype = get_resourcetype(R_HORSE);
-    rresult = findresourcetype("Pferd", lang);
-    CuAssertPtrNotNull(tc, rresult);
-    CuAssertPtrEquals(tc, (void*)rtype, (void*)rresult);
-
-    CuAssertPtrNotNull(tc, findresourcetype("Bauer", lang));
+    CuAssertPtrEquals(tc, (void*)itype->rtype, (void*)findresourcetype("Pferd", lang));
+    CuAssertPtrEquals(tc, (void *)rt_find("peasant"), (void *)findresourcetype("Bauer", lang));
+    test_cleanup();
 }
 
 #include <modules/autoseed.h>

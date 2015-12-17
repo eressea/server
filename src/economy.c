@@ -35,6 +35,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "calendar.h"
 
 /* kernel includes */
+#include <kernel/ally.h>
 #include <kernel/building.h>
 #include <kernel/curse.h>
 #include <kernel/equipment.h>
@@ -104,7 +105,7 @@ static void recruit_init(void)
 {
     if (rules_recruit < 0) {
         rules_recruit = 0;
-        if (get_param_int(global.parameters, "recruit.allow_merge", 1)) {
+        if (config_get_int("recruit.allow_merge", 1)) {
             rules_recruit |= RECRUIT_MERGE;
         }
     }
@@ -399,6 +400,7 @@ void free_recruitments(recruitment * recruits)
         while (rec->requests) {
             request *req = rec->requests;
             rec->requests = req->next;
+            free_order(req->ord);
             free(req);
         }
         free(rec);
@@ -730,7 +732,7 @@ static bool maintain(building * b, bool first)
         return false;
     }
     /* If the owner is the region owner, check if dontpay flag is set for the building where he is in */
-    if (check_param(global.parameters, "rules.region_owner_pay_building", b->type->_name)) {
+    if (config_token("rules.region_owner_pay_building", b->type->_name)) {
         if (fval(u->building, BLD_DONTPAY)) {
             return false;
         }
@@ -953,8 +955,9 @@ void economics(region * r)
         }
     }
 
-    if (recruitorders)
+    if (recruitorders) {
         expandrecruit(r, recruitorders);
+    }
     remove_empty_units_in_region(r);
 
     for (u = r->units; u; u = u->next) {
@@ -1099,7 +1102,7 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
         for (; mod->flags != 0; ++mod) {
             if (mod->flags & RMF_REQUIREDBUILDING) {
                 struct building *b = inside_building(u);
-                const struct building_type *btype = b ? b->type : NULL;
+                const struct building_type *btype = building_is_active(b) ? b->type : NULL;
                 if (mod->btype && mod->btype != btype) {
                     cmistake(u, u->thisorder, 104, MSG_PRODUCE);
                     return;
@@ -1155,7 +1158,7 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
     }
     else {
         struct building *b = inside_building(u);
-        const struct building_type *btype = b ? b->type : NULL;
+        const struct building_type *btype = building_is_active(b) ? b->type : NULL;
 
         if (rdata->modifiers) {
             resource_mod *mod = rdata->modifiers;
@@ -1211,7 +1214,7 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
 
     if (rdata->modifiers) {
         struct building *b = inside_building(u);
-        const struct building_type *btype = b ? b->type : NULL;
+        const struct building_type *btype = building_is_active(b) ? b->type : NULL;
 
         resource_mod *mod = rdata->modifiers;
         for (; mod->flags != 0; ++mod) {
@@ -2295,7 +2298,7 @@ static void plant(unit * u, int raw)
     /* Alles ok. Abziehen. */
     use_pooled(u, rt_water, GET_DEFAULT, 1);
     use_pooled(u, itype->rtype, GET_DEFAULT, n);
-    rsetherbs(r, rherbs(r) + planted);
+    rsetherbs(r, (short) (rherbs(r) + planted));
     ADDMSG(&u->faction->msgs, msg_message("plant", "unit region amount herb",
         u, r, planted, itype->rtype));
 }
@@ -2358,16 +2361,12 @@ static void breedtrees(unit * u, int raw)
 {
     int n, i, skill, planted = 0;
     const resource_type *rtype;
-    static int gamecookie = -1;
-    static int current_season;
+    int current_season;
     region *r = u->region;
-
-    if (gamecookie != global.cookie) {
-        gamedate date;
-        get_gamedate(turn, &date);
-        current_season = date.season;
-        gamecookie = global.cookie;
-    }
+    gamedate date;
+    
+    get_gamedate(turn, &date);
+    current_season = date.season;
 
     /* Bäume züchten geht nur im Frühling */
     if (current_season != SEASON_SPRING) {
@@ -2419,13 +2418,11 @@ static void breedtrees(unit * u, int raw)
 static void breedhorses(unit * u)
 {
     int n, c, breed = 0;
-    struct building *b = inside_building(u);
-    const struct building_type *btype = b ? b->type : NULL;
     const struct resource_type *rhorse = get_resourcetype(R_HORSE);
     int horses, effsk;
 
     assert(rhorse && rhorse->itype);
-    if (btype != bt_find("stables")) {
+    if (!active_building(u, bt_find("stables"))) {
         cmistake(u, u->thisorder, 122, MSG_PRODUCE);
         return;
     }
@@ -2747,11 +2744,11 @@ void entertain_cmd(unit * u, struct order *ord)
     kwd = init_order(ord);
     assert(kwd == K_ENTERTAIN);
     if (!entertainbase) {
-        const char *str = get_param(global.parameters, "entertain.base");
+        const char *str = config_get("entertain.base");
         entertainbase = str ? atoi(str) : 0;
     }
     if (!entertainperlevel) {
-        const char *str = get_param(global.parameters, "entertain.perlevel");
+        const char *str = config_get("entertain.perlevel");
         entertainperlevel = str ? atoi(str) : 0;
     }
     if (fval(u, UFL_WERE)) {
@@ -2896,17 +2893,17 @@ static void expandloot(region * r, request * lootorders)
     if (!norders)
         return;
 
-    for (i = 0; i != norders && rmoney(r) > TAXFRACTION * 2; i++) {
+    for (i = 0; i != norders && startmoney > looted + TAXFRACTION * 2; i++) {
         change_money(oa[i].unit, TAXFRACTION);
         oa[i].unit->n += TAXFRACTION;
         /*Looting destroys double the money*/
-        rsetmoney(r, rmoney(r) - TAXFRACTION * 2);
-        looted = looted + TAXFRACTION * 2;
+        looted += TAXFRACTION * 2;
     }
+    rsetmoney(r, startmoney - looted);
     free(oa);
 
     /* Lowering morale by 1 depending on the looted money (+20%) */
-    if (rng_int() % 100 < ((looted / startmoney) + 0.2)) {
+    if (rng_int() % 100 < 20 + (looted * 80) / startmoney) {
         int m = region_get_morale(r);
         if (m) {
             /*Nur Moral -1, turns is not changed, so the first time nothing happens if the morale is good*/
@@ -2922,7 +2919,7 @@ static void expandloot(region * r, request * lootorders)
     }
 }
 
-static void expandtax(region * r, request * taxorders)
+void expandtax(region * r, request * taxorders)
 {
     unit *u;
     unsigned int i;
@@ -2955,6 +2952,11 @@ void tax_cmd(unit * u, struct order *ord, request ** taxorders)
     request *o;
     int max;
     keyword_t kwd;
+    static int taxperlevel = 0;
+
+    if (!taxperlevel) {
+        taxperlevel = config_get_int("taxing.perlevel", 0);
+    }
 
     kwd = init_order(ord);
     assert(kwd == K_TAX);
@@ -2980,6 +2982,12 @@ void tax_cmd(unit * u, struct order *ord, request ** taxorders)
         return;
     }
 
+    if (effskill(u, SK_TAXING, 0) <= 0) {
+        ADDMSG(&u->faction->msgs,
+            msg_feedback(u, ord, "error_no_tax_skill", ""));
+        return;
+    }
+
     max = getint();
 
     if (max <= 0) {
@@ -2989,7 +2997,7 @@ void tax_cmd(unit * u, struct order *ord, request ** taxorders)
         u->wants = _min(income(u), max);
     }
     else {
-        u->wants = _min(n * effskill(u, SK_TAXING, 0) * 20, max);
+        u->wants = _min(n * effskill(u, SK_TAXING, 0) * taxperlevel, max);
     }
 
     u2 = is_guarded(r, u, GUARD_TAX);
@@ -3022,7 +3030,7 @@ void loot_cmd(unit * u, struct order *ord, request ** lootorders)
     kwd = init_order(ord);
     assert(kwd == K_LOOT);
 
-    if (get_param_int(global.parameters, "rules.enable_loot", 0) == 0 && !is_monsters(u->faction)) {
+    if (config_get_int("rules.enable_loot", 0) == 0 && !is_monsters(u->faction)) {
         return;
     }
 
@@ -3136,12 +3144,20 @@ static void peasant_taxes(region * r)
     }
 }
 
+static bool rule_auto_taxation(void)
+{
+    return config_get_int("rules.economy.taxation", 0) != 0;
+}
+
+static bool rule_autowork(void) {
+    return config_get_int("work.auto", 0) != 0;
+}
+
 void produce(struct region *r)
 {
     request workers[MAX_WORKERS];
     request *taxorders, *lootorders, *sellorders, *stealorders, *buyorders;
     unit *u;
-    static int rule_autowork = -1;
     bool limited = true;
     request *nextworker = workers;
     assert(r);
@@ -3155,10 +3171,6 @@ void produce(struct region *r)
      * produkte egal. nicht so wegen dem geld.
      *
      * lehren vor lernen. */
-
-    if (rule_autowork < 0) {
-        rule_autowork = get_param_int(global.parameters, "work.auto", 0);
-    }
 
     assert(rmoney(r) >= 0);
     assert(rpeasants(r) >= 0);
@@ -3233,7 +3245,7 @@ void produce(struct region *r)
             break;
 
         case K_WORK:
-            if (!rule_autowork && do_work(u, u->thisorder, nextworker) == 0) {
+            if (!rule_autowork() && do_work(u, u->thisorder, nextworker) == 0) {
                 assert(nextworker - workers < MAX_WORKERS);
                 ++nextworker;
             }
@@ -3278,7 +3290,7 @@ void produce(struct region *r)
      * auszugeben bereit sind. */
     if (entertaining)
         expandentertainment(r);
-    if (!rule_autowork) {
+    if (!rule_autowork()) {
         expandwork(r, workers, nextworker, maxworkingpeasants(r));
     }
     if (taxorders)

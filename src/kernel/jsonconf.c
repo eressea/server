@@ -270,6 +270,7 @@ static void json_terrain(cJSON *json, terrain_type *ter) {
                 int size = cJSON_GetArraySize(child);
                 if (size > 0) {
                     int n;
+                    free(ter->herbs);
                     ter->herbs = malloc(sizeof(const item_type *) * (size + 1));
                     ter->herbs[size] = 0;
                     for (n = 0, entry = child->child; entry; entry = entry->next) {
@@ -304,7 +305,7 @@ static void json_terrain(cJSON *json, terrain_type *ter) {
 static void json_building(cJSON *json, building_type *bt) {
     cJSON *child;
     const char *flags[] = {
-        "nodestroy", "nobuild", "unique", "decay", "dynamic", "magic", "oneperturn", "namechange", 0
+        "nodestroy", "nobuild", "unique", "decay", "dynamic", "magic", "oneperturn", "namechange", "fort", 0
     };
     if (json->type != cJSON_Object) {
         log_error("building %s is not a json object: %d", json->string, json->type);
@@ -525,14 +526,14 @@ static void disable_feature(const char *str) {
     for (k = 0; k != MAXKEYWORDS; ++k) {
         // FIXME: this loop is slow as balls.
         if (strcmp(keywords[k], str) == 0) {
-            log_info("disable keyword %s\n", str);
+            log_debug("disable keyword %s\n", str);
             enable_keyword(k, false);
             return;
         }
     }
     _snprintf(name, sizeof(name), "%s.enabled", str);
     log_info("disable feature %s\n", name);
-    set_param(&global.parameters, name, "0");
+    config_set(name, "0");
 }
 
 static void json_disable_features(cJSON *json) {
@@ -787,7 +788,7 @@ static void json_settings(cJSON *json) {
     }
     for (child = json->child; child; child = child->next) {
         if (child->valuestring) {
-            set_param(&global.parameters, child->string, child->valuestring);
+            config_set(child->string, child->valuestring);
         }
         else {
             char value[32];
@@ -797,7 +798,7 @@ static void json_settings(cJSON *json) {
             else {
                 _snprintf(value, sizeof(value), "%d", child->valueint);
             }
-            set_param(&global.parameters, child->string, value);
+            config_set(child->string, value);
         }
     }
 }
@@ -832,24 +833,29 @@ static void json_include(cJSON *json) {
             F = fopen(child->valuestring, "rt");
         }
         if (F) {
-            cJSON *config;
-            char *data;
-            size_t sz;
+            long pos;
             fseek(F, 0, SEEK_END);
-            sz = ftell(F);
+            pos = ftell(F);
             rewind(F);
-            data = malloc(sz);
-            fread(data, 1, sz, F);
+            if (pos > 0) {
+                cJSON *config;
+                char *data;
+                size_t sz;
+
+                data = malloc(pos + 1);
+                sz = fread(data, 1, (size_t)pos, F);
+                data[sz] = 0;
+                config = cJSON_Parse(data);
+                free(data);
+                if (config) {
+                    json_config(config);
+                    cJSON_Delete(config);
+                }
+                else {
+                    log_error("invalid JSON, could not parse %s", child->valuestring);
+                }
+            }
             fclose(F);
-            config = cJSON_Parse(data);
-            free(data);
-            if (config) {
-                json_config(config);
-                cJSON_Delete(config);
-            }
-            else {
-                log_error("invalid JSON, could not parse %s", child->valuestring);
-            }
         }
     }
 }

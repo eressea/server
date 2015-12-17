@@ -59,13 +59,18 @@ static void do_shock(unit * u, const char *reason)
 
     if (u->number > 0) {
         /* HP - Verlust */
-        u->hp = (unit_max_hp(u) * u->number) / 10;
-        u->hp = _max(1, u->hp);
+        int hp = (unit_max_hp(u) * u->number) / 10;
+        hp = _min(u->hp, hp);
+        u->hp = _max(1, hp);
     }
 
     /* Aura - Verlust */
     if (is_mage(u)) {
-        set_spellpoints(u, max_spellpoints(u->region, u) / 10);
+        int aura = max_spellpoints(u->region, u) / 10;
+        int now = get_spellpoints(u);
+        if (now > aura) {
+            set_spellpoints(u, aura);
+        }
     }
 
     /* Evt. Talenttageverlust */
@@ -86,7 +91,7 @@ static void do_shock(unit * u, const char *reason)
     }
     if (u->faction != NULL) {
         ADDMSG(&u->faction->msgs, msg_message("shock",
-            "mage reason", u, _strdup(reason)));
+            "mage reason", u, reason));
     }
 }
 

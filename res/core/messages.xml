@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <messages>
+  <message name="reduced_production">
+    <text locale="de">Die Region ist verwüstet, der Boden karg.</text>
+    <text locale="en">The region is ravaged, the ground infertile.</text>
+  </message>
+
   <message name="force_leave_ship" section="events">
     <type>
       <arg name="unit" type="unit"/>
@@ -1212,23 +1217,6 @@
     <text locale="en">"$unit($unit) dies from poison damage taken in $region($region)."</text>
   </message>
 
-  <message name="drown_amphibian_dead" section="events">
-    <type>
-      <arg name="amount" type="int"/>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-    </type>
-    <text locale="de">"$int($amount) Personen in $unit($unit) in $region($region) ertrinken."</text>
-    <text locale="en">"$int($amount) people in $unit($unit) in $region($region) drown."</text>
-  </message>
-  <message name="drown_amphibian_nodead" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-    </type>
-    <text locale="de">"$unit($unit) nimmt Schaden auf dem Wasser in $region($region)."</text>
-    <text locale="en">"$unit($unit) is taking damage on the water."</text>
-  </message>
   <message name="wand_of_tears_usage" section="events">
     <type>
       <arg name="unit" type="unit"/>
@@ -1631,6 +1619,13 @@
     </type>
     <text locale="de">"Die $ship($ship) wird bei einer Kollision mit einem Eisberg beschädigt."</text>
     <text locale="en">"The $ship($ship) has been damaged by a collision with an iceberg."</text>
+  </message>
+  <message name="massive_overload" section="events">
+    <type>
+      <arg name="ship" type="ship"/>
+    </type>
+    <text locale="de">"Die $ship($ship) ist zu stark überladen und wird stark beschädigt."</text>
+    <text locale="en">"The $ship($ship) is massively overloaded and is damaged heavily."</text>
   </message>
   <message name="ship_drift" section="events">
     <type>
@@ -3279,19 +3274,21 @@
   <message name="piratesawvictim" section="events">
     <type>
       <arg name="ship" type="ship"/>
+      <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
       <arg name="dir" type="direction"/>
     </type>
-    <text locale="de">"Die $ship($ship) in $region($region) entdeckt ein Opfer im $direction($dir)."</text>
-    <text locale="en">"The $ship($ship) in $region($region) made $direction($dir) a target."</text>
+    <text locale="de">"$if($isnull($ship),"$unit($unit)","Die $ship($ship)") in $region($region) entdeckt ein Opfer im $direction($dir)."</text>
+    <text locale="en">"$if($isnull($ship),"$unit($unit)","The $ship($ship)") in $region($region) made $direction($dir) a target."</text>
   </message>
   <message name="piratenovictim" section="events">
     <type>
       <arg name="ship" type="ship"/>
+      <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
     </type>
-    <text locale="de">"Die $ship($ship) in $region($region) kann keine Schiffe aufbringen."</text>
-    <text locale="en">"The $ship($ship) could not capture other ships in $region($region)."</text>
+    <text locale="de">"$if($isnull($ship),"$unit($unit)","Die $ship($ship)") in $region($region) kann keine Schiffe aufbringen."</text>
+    <text locale="en">"$if($isnull($ship),"$unit($unit)","The $ship($ship)") could not capture other ships in $region($region)."</text>
   </message>
   <message name="deorcified" section="events">
     <type>
@@ -6374,6 +6371,16 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist nicht der Eigentümer."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit is not the owner."</text>
   </message>
+  <message name="error_no_tax_skill" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist nicht geschult im Eintreiben von Steuern."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit does not now how to tax."</text>
+  </message>
+
   <message name="error48" section="errors">
     <type>
       <arg name="unit" type="unit"/>

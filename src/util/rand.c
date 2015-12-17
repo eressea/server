@@ -21,12 +21,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "rng.h"
 
 #include <assert.h>
+#include <stdlib.h>
 #include <string.h>
 #include <math.h>
 #include <float.h>
 #include <ctype.h>
-
-#define M_PIl   3.1415926535897932384626433832795029L   /* pi */
 
 /* NormalRand aus python, random.py geklaut, dort ist Referenz auf
 * den Algorithmus. mu = Mittelwert, sigma = Standardabweichung.
@@ -66,4 +65,67 @@ bool chance(double x)
     if (x >= 1.0)
         return true;
     return rng_double() < x;
+}
+
+extern double genrand_real2(void);
+
+
+typedef struct random_source {
+    double (*double_source) (void);
+} random_source;
+
+random_source *r_source = 0;
+
+double rng_injectable_double(void) {
+    if (r_source)
+        return r_source->double_source();
+    return genrand_real2();
+}
+
+static double constant_value;
+
+static double constant_source (void) {
+    return constant_value;
+}
+
+struct random_source constant_provider = {
+    constant_source
+};
+
+void random_source_inject_constant(double value) {
+    constant_value = value;
+    r_source = &constant_provider;
+}
+
+static int i = 0;
+static double *values;
+static int value_size = 0;
+
+static double array_source (void) {
+    assert(i<value_size);
+    return values[i++];
+}
+
+struct random_source array_provider = {
+    array_source
+};
+
+void random_source_inject_array(double inject[], int size) {
+    assert(size > 0);
+    value_size = size;
+    if (values)
+        free(values);
+    values = malloc(sizeof(double) * size);
+    for (i=0; i < size; ++i) {
+        values[i] = inject[i];
+    }
+    i = 0;
+    r_source = &array_provider;
+}
+
+void random_source_reset(void) {
+    if (values)
+        free(values);
+    values = NULL;
+    r_source = NULL;
 }

@@ -27,10 +27,14 @@ typedef struct build_fixture {
 
 static unit * setup_build(build_fixture *bf) {
     test_cleanup();
-    test_create_world();
+    init_resources();
+
+    test_create_itemtype("stone");
+    test_create_buildingtype("castle");
     bf->rc = test_create_race("human");
-    bf->r = findregion(0, 0);
+    bf->r = test_create_region(0, 0, 0);
     bf->f = test_create_faction(bf->rc);
+    bf->f->locale = get_or_create_locale("de");
     assert(bf->rc && bf->f && bf->r);
     bf->u = test_create_unit(bf->f, bf->r);
     assert(bf->u);
@@ -45,6 +49,11 @@ static unit * setup_build(build_fixture *bf) {
     return bf->u;
 }
 
+static void teardown_build(build_fixture *bf) {
+    free(bf->cons.materials);
+    test_cleanup();
+}
+
 static void test_build_requires_materials(CuTest *tc) {
     build_fixture bf = { 0 };
     unit *u;
@@ -57,7 +66,7 @@ static void test_build_requires_materials(CuTest *tc) {
     i_change(&u->items, itype, 2);
     CuAssertIntEquals(tc, 1, build(u, &bf.cons, 0, 1));
     CuAssertIntEquals(tc, 1, i_get(u->items, itype));
-    test_cleanup();
+    teardown_build(&bf);
 }
 
 static void test_build_requires_building(CuTest *tc) {
@@ -79,7 +88,7 @@ static void test_build_requires_building(CuTest *tc) {
     CuAssertIntEquals(tc, 1, build(u, &bf.cons, 0, 1));
     btype->maxcapacity = 0;
     CuAssertIntEquals_Msg(tc, "cannot build when production building capacity exceeded", EBUILDINGREQ, build(u, &bf.cons, 0, 1));
-    test_cleanup();
+    teardown_build(&bf);
 }
 
 static void test_build_failure_missing_skill(CuTest *tc) {
@@ -91,7 +100,7 @@ static void test_build_failure_missing_skill(CuTest *tc) {
     rtype = bf.cons.materials[0].rtype;
     i_change(&u->items, rtype->itype, 1);
     CuAssertIntEquals(tc, ENEEDSKILL, build(u, &bf.cons, 1, 1));
-    test_cleanup();
+    teardown_build(&bf);
 }
 
 static void test_build_failure_low_skill(CuTest *tc) {
@@ -104,7 +113,7 @@ static void test_build_failure_low_skill(CuTest *tc) {
     i_change(&u->items, rtype->itype, 1);
     set_level(u, SK_ARMORER, bf.cons.minskill - 1);
     CuAssertIntEquals(tc, ELOWSKILL, build(u, &bf.cons, 0, 10));
-    test_cleanup();
+    teardown_build(&bf);
 }
 
 static void test_build_failure_completed(CuTest *tc) {
@@ -119,7 +128,7 @@ static void test_build_failure_completed(CuTest *tc) {
     bf.cons.maxsize = 1;
     CuAssertIntEquals(tc, ECOMPLETE, build(u, &bf.cons, bf.cons.maxsize, 10));
     CuAssertIntEquals(tc, 1, i_get(u->items, rtype->itype));
-    test_cleanup();
+    teardown_build(&bf);
 }
 
 static void test_build_limits(CuTest *tc) {
@@ -129,6 +138,7 @@ static void test_build_limits(CuTest *tc) {
 
     u = setup_build(&bf);
     rtype = bf.cons.materials[0].rtype;
+    assert(rtype);
     i_change(&u->items, rtype->itype, 1);
     set_level(u, SK_ARMORER, bf.cons.minskill);
     CuAssertIntEquals(tc, 1, build(u, &bf.cons, 0, 10));
@@ -145,7 +155,7 @@ static void test_build_limits(CuTest *tc) {
     i_change(&u->items, rtype->itype, 4);
     CuAssertIntEquals(tc, 4, build(u, &bf.cons, 0, 10));
     CuAssertIntEquals(tc, 0, i_get(u->items, rtype->itype));
-    test_cleanup();
+    teardown_build(&bf);
 }
 
 static void test_build_with_ring(CuTest *tc) {
@@ -164,7 +174,7 @@ static void test_build_with_ring(CuTest *tc) {
     i_change(&u->items, ring, 1);
     CuAssertIntEquals(tc, 10, build(u, &bf.cons, 0, 20));
     CuAssertIntEquals(tc, 10, i_get(u->items, rtype->itype));
-    test_cleanup();
+    teardown_build(&bf);
 }
 
 static void test_build_with_potion(CuTest *tc) {
@@ -192,7 +202,7 @@ static void test_build_with_potion(CuTest *tc) {
     CuAssertIntEquals(tc, 4, get_effect(u, ptype));
     CuAssertIntEquals(tc, 4, build(u, &bf.cons, 0, 20));
     CuAssertIntEquals(tc, 2, get_effect(u, ptype));
-    test_cleanup();
+    teardown_build(&bf);
 }
 
 static void test_build_building_no_materials(CuTest *tc) {
@@ -208,7 +218,7 @@ static void test_build_building_no_materials(CuTest *tc) {
     CuAssertIntEquals(tc, ENOMATERIALS, build_building(u, btype, 0, 4, u->orders));
     CuAssertPtrEquals(tc, 0, u->region->buildings);
     CuAssertPtrEquals(tc, 0, u->building);
-    test_cleanup();
+    teardown_build(&bf);
 }
 
 static void test_build_building_with_golem(CuTest *tc) {
@@ -228,7 +238,7 @@ static void test_build_building_with_golem(CuTest *tc) {
     CuAssertPtrNotNull(tc, u->region->buildings);
     CuAssertIntEquals(tc, 1, u->region->buildings->size);
     CuAssertIntEquals(tc, 0, u->number);
-    test_cleanup();
+    teardown_build(&bf);
 }
 
 static void test_build_building_success(CuTest *tc) {
@@ -253,7 +263,7 @@ static void test_build_building_success(CuTest *tc) {
     CuAssertPtrEquals(tc, u->region->buildings, u->building);
     CuAssertIntEquals(tc, 1, u->building->size);
     CuAssertIntEquals(tc, 0, i_get(u->items, rtype->itype));
-    test_cleanup();
+    teardown_build(&bf);
 }
 
 CuSuite *get_build_suite(void)

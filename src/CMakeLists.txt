@@ -73,12 +73,13 @@ TOLUA_BINDING(config.pkg bind_config.h)
 TOLUA_BINDING(process.pkg bind_process.h)
 TOLUA_BINDING(game.pkg bind_eressea.h config.h)
 TOLUA_BINDING(eressea.pkg bind_eressea.h)
-TOLUA_BINDING(settings.pkg bind_settings.h)
+TOLUA_BINDING(settings.pkg kenel/config.h)
 ENDIF()
 
 set (ERESSEA_SRC
   calendar.c
   move.c
+  piracy.c
   spells.c
   battle.c
   alchemy.c
@@ -143,7 +144,6 @@ set(SERVER_SRC
   bind_monsters.c
   bind_process.c
   bind_region.c
-  bind_settings.c
   bind_ship.c
   bind_storage.c
   bind_unit.c
@@ -179,6 +179,7 @@ target_link_libraries(eressea
 )
 
 set(TESTS_SRC
+  monsters.test.c
   donations.test.c
   wormhole.test.c
   alchemy.test.c
@@ -199,14 +200,18 @@ set(TESTS_SRC
   laws.test.c
   magic.test.c
   market.test.c
+  monsters.test.c
   move.test.c
+  piracy.test.c
   prefix.test.c
   skill.test.c
   spells.test.c
   spy.test.c
   study.test.c
   upkeep.test.c
+  spells/flyingship.test.c
   spells/magicresistance.test.c
+  triggers/shock.test.c
   ${ATTRIBUTES_TESTS}
   ${UTIL_TESTS}
   ${KERNEL_TESTS}

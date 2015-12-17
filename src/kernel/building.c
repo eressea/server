@@ -94,6 +94,8 @@ void bt_register(building_type * type)
 
 void free_buildingtype(void *ptr) {
     building_type *btype = (building_type *)ptr;
+    free_construction(btype->construction);
+    free(btype->maintenance);
     free(btype->_name);
     free(btype);
 }
@@ -113,7 +115,7 @@ building_type *bt_get_or_create(const char *name)
             btype->_name = _strdup(name);
             btype->auraregen = 1.0;
             btype->maxsize = -1;
-            btype->capacity = -1;
+            btype->capacity = 1;
             btype->maxcapacity = -1;
             bt_register(btype);
         }
@@ -355,14 +357,14 @@ static int meropis_building_protection(building * b, unit * u)
 
 void register_buildings(void)
 {
-    register_function((pf_generic)& building_protection,
+    register_function((pf_generic)building_protection,
         "building_protection");
-    register_function((pf_generic)& meropis_building_protection,
+    register_function((pf_generic)meropis_building_protection,
         "meropis_building_protection");
-    register_function((pf_generic)& init_smithy, "init_smithy");
-    register_function((pf_generic)& castle_name, "castle_name");
-    register_function((pf_generic)& castle_name_2, "castle_name_2");
-    register_function((pf_generic)& fort_name, "fort_name");
+    register_function((pf_generic)init_smithy, "init_smithy");
+    register_function((pf_generic)castle_name, "castle_name");
+    register_function((pf_generic)castle_name_2, "castle_name_2");
+    register_function((pf_generic)fort_name, "fort_name");
 }
 
 void write_building_reference(const struct building *b, struct storage *store)
@@ -529,7 +531,7 @@ int bt_effsize(const building_type * btype, const building * b, int bsize)
     const construction *cons = btype->construction;
 
     /* TECH DEBT: simplest thing that works for E3 dwarf/halfling faction rules */
-    if (b && get_param_int(global.parameters, "rules.dwarf_castles", 0)
+    if (b && config_get_int("rules.dwarf_castles", 0)
         && strcmp(btype->_name, "castle") == 0) {
         unit *u = building_owner(b);
         if (u && u->faction->race == get_race(RC_HALFLING)) {
@@ -589,7 +591,7 @@ static unit *building_owner_ex(const building * bld, const struct faction * last
             }
         }
     }
-    if (!heir && check_param(global.parameters, "rules.region_owner_pay_building", bld->type->_name)) {
+    if (!heir && config_token("rules.region_owner_pay_building", bld->type->_name)) {
         if (rule_region_owners()) {
             u = building_owner(largestbuilding(bld->region, &cmp_taxes, false));
         }
@@ -640,6 +642,31 @@ region *building_getregion(const building * b)
     return b->region;
 }
 
+bool
+buildingtype_exists(const region * r, const building_type * bt, bool working)
+{
+    building *b;
+
+    for (b = rbuildings(r); b; b = b->next) {
+        if (b->type == bt && b->size >= bt->maxsize && (!working || fval(b, BLD_WORKING)))
+            return true;
+    }
+
+    return false;
+}
+
+bool building_is_active(const struct building *b) {
+    return b && fval(b, BLD_WORKING)  && b->size >= b->type->maxsize;
+}
+
+building *active_building(const unit *u, const struct building_type *btype) {
+    if (u->building && u->building->type == btype && building_is_active(u->building)) {
+        return inside_building(u);
+    }
+    return 0;
+}
+
+
 void building_setregion(building * b, region * r)
 {
     building **blist = &b->region->buildings;
@@ -655,4 +682,19 @@ void building_setregion(building * b, region * r)
     *blist = b;
 
     b->region = r;
+}
+
+bool in_safe_building(unit *u1, unit *u2) {
+    if (u1->building) {
+        building * b = inside_building(u1);
+        if (b && b->type->flags & BTF_FORTIFICATION) {
+            if (!u2->building) {
+                return true;
+            }
+            if (u2->building != b || b != inside_building(u2)) {
+                return true;
+            }
+        }
+    }
+    return false;
 }

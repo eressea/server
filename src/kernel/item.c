@@ -98,8 +98,8 @@ static int res_changehp(unit * u, const resource_type * rtype, int delta)
 static int res_changepeasants(unit * u, const resource_type * rtype, int delta)
 {
     assert(rtype != NULL && u->region->land);
-    u->region->land->peasants += delta;
-    return u->region->land->peasants;
+    rsetpeasants(u->region, rpeasants(u->region) + delta);
+    return rpeasants(u->region);
 }
 
 static int golem_factor(const unit *u, const resource_type *rtype) {
@@ -187,6 +187,7 @@ resource_type *rt_get_or_create(const char *name) {
         else {
             rtype->_name = _strdup(name);
             rt_register(rtype);
+            return rt_find(name);
         }
     }
     return rtype;
@@ -277,7 +278,7 @@ weapon_type *new_weapontype(item_type * itype,
     weapon_type *wtype;
 
     assert(minskill > 0);
-    assert(resource2weapon(itype->rtype) == NULL);
+    assert(itype && (!itype->rtype || !resource2weapon(itype->rtype)));
 
     wtype = calloc(sizeof(weapon_type), 1);
     if (damage) {
@@ -587,7 +588,9 @@ struct order *ord)
             use +=
             use_pooled(s, item2resource(itype), GET_RESERVE | GET_POOLED_SLACK,
             n - use);
-        rsetmoney(s->region, rmoney(s->region) + use);
+        if (s->region->land) {
+            rsetmoney(s->region, rmoney(s->region) + use);
+        }
         return 0;
     }
     return -1;                    /* use the mechanism */
@@ -925,7 +928,7 @@ struct order *ord)
         user->number);
 
     a_add(&f->attribs, make_key(atoi36("mbst")));
-    set_level(user, findskill("magic"), 3);
+    set_level(user, SK_MAGIC, 3);
 
     ADDMSG(&user->faction->msgs, msg_message("use_item",
         "unit item", user, itype->rtype));
@@ -1178,12 +1181,17 @@ static item *default_spoil(const struct race *rc, int size)
     return itm;
 }
 
-int free_itype(item_type *itype) {
+static void free_itype(item_type *itype) {
     free(itype->construction);
     free(itype->_appearance[0]);
     free(itype->_appearance[1]);
     free(itype);
-    return 0;
+}
+
+static void free_wtype(weapon_type *wtype) {
+    free(wtype->damage[0]);
+    free(wtype->damage[1]);
+    free(wtype);
 }
 
 int free_rtype_cb(const void * match, const void * key, size_t keylen, void *cbdata) {
@@ -1192,6 +1200,9 @@ int free_rtype_cb(const void * match, const void * key, size_t keylen, void *cbd
     free(rtype->_name);
     if (rtype->itype) {
         free_itype(rtype->itype);
+    }
+    if (rtype->wtype) {
+        free_wtype(rtype->wtype);
     }
     free(rtype);
     return 0;

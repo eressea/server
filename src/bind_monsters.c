@@ -9,6 +9,8 @@
 #include <kernel/spellbook.h>
 #include <kernel/unit.h>
 
+#include <spells/flyingship.h>
+
 #include <quicklist.h>
 
 #include <tolua.h>

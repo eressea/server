@@ -26,6 +26,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
+#define MAXUNITS 1048573       /* must be prime for hashing. 524287 was >90% full */
     struct skill;
     struct item;
     struct sc_mage;
@@ -89,11 +90,11 @@ extern "C" {
         struct faction *faction;
         struct building *building;
         struct ship *ship;
-        unsigned short number;      /* persons */
-        short age;
+        int number;      /* persons */
+        int age;
 
         /* skill data */
-        short skill_size;
+        int skill_size;
         struct skill *skills;
         struct item *items;
         reservation *reservations;
@@ -167,7 +168,7 @@ extern "C" {
 
     void set_level(struct unit *u, skill_t id, int level);
     int get_level(const struct unit *u, skill_t id);
-    extern void transfermen(struct unit *u, struct unit *u2, int n);
+    extern void transfermen(struct unit *src, struct unit *dst, int n);
 
     int eff_skill(const struct unit *u, const struct skill *sv, const struct region *r);
     int effskill_study(const struct unit *u, skill_t sk, const struct region *r);
@@ -183,36 +184,35 @@ extern "C" {
     void make_zombie(unit * u);
 
     /* see resolve.h */
-    extern int resolve_unit(variant data, void *address);
-    extern void write_unit_reference(const struct unit *u, struct storage *store);
-    extern variant read_unit_reference(struct storage *store);
+    int resolve_unit(variant data, void *address);
+    void write_unit_reference(const struct unit *u, struct storage *store);
+    variant read_unit_reference(struct storage *store);
 
-    extern bool leave(struct unit *u, bool force);
-    extern bool can_leave(struct unit *u);
+    bool leave(struct unit *u, bool force);
+    bool can_leave(struct unit *u);
 
-    extern void u_set_building(struct unit * u, struct building * b);
-    extern void u_set_ship(struct unit * u, struct ship * sh);
-    extern void leave_ship(struct unit * u);
-    extern void leave_building(struct unit * u);
+    void u_set_building(struct unit * u, struct building * b);
+    void u_set_ship(struct unit * u, struct ship * sh);
+    void leave_ship(struct unit * u);
+    void leave_building(struct unit * u);
 
-    extern void set_leftship(struct unit *u, struct ship *sh);
-    extern struct ship *leftship(const struct unit *);
-    extern bool can_survive(const struct unit *u, const struct region *r);
-    extern void move_unit(struct unit *u, struct region *target,
-    struct unit **ulist);
+    void set_leftship(struct unit *u, struct ship *sh);
+    struct ship *leftship(const struct unit *);
+    bool can_survive(const struct unit *u, const struct region *r);
+    void move_unit(struct unit *u, struct region *target,
+        struct unit **ulist);
 
-    extern struct building *inside_building(const struct unit *u);
+    struct building *inside_building(const struct unit *u);
 
     /* cleanup code for this module */
-    extern void free_units(void);
-    extern struct faction *dfindhash(int no);
-    extern void u_setfaction(struct unit *u, struct faction *f);
-    extern void set_number(struct unit *u, int count);
+    void free_units(void);
+    void u_setfaction(struct unit *u, struct faction *f);
+    void set_number(struct unit *u, int count);
 
-    extern bool learn_skill(struct unit *u, skill_t sk, double chance);
+    bool learn_skill(struct unit *u, skill_t sk, double chance);
 
-    extern int invisible(const struct unit *target, const struct unit *viewer);
-    extern void free_unit(struct unit *u);
+    int invisible(const struct unit *target, const struct unit *viewer);
+    void free_unit(struct unit *u);
 
     extern void name_unit(struct unit *u);
     extern struct unit *create_unit(struct region *r1, struct faction *f,
@@ -254,6 +254,22 @@ extern "C" {
     char *write_unitname(const struct unit *u, char *buffer, size_t size);
     bool unit_name_equals_race(const struct unit *u);
     bool unit_can_study(const struct unit *u);
+
+    /* getunit results: */
+#define GET_UNIT 0
+#define GET_NOTFOUND 1
+#define GET_PEASANTS 2
+
+    int getunit(const struct region * r, const struct faction * f, struct unit **uresult);
+    int newunitid(void);
+    int read_unitid(const struct faction *f, const struct region *r);
+
+    void setstatus(struct unit *u, int status);
+    /* !< sets combatstatus of a unit */
+    int besieged(const struct unit *u);
+    bool has_horses(const struct unit *u);
+    int maintenance_cost(const struct unit *u);
+    bool has_limited_skills(const struct unit *u);
 
 #ifdef __cplusplus
 }

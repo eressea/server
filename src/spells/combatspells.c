@@ -622,10 +622,12 @@ int sp_mindblast(struct castorder * co)
                 skill_t sk = random_skill(du, false);
                 if (sk != NOSKILL) {
                     skill *sv = unit_skill(du, sk);
-                    int n = 1 + rng_int() % 3;
+                    if (sv) {
+                        int n = 1 + rng_int() % 3;
 
-                    reduce_skill(du, sv, n);
-                    k += du->number;
+                        reduce_skill(du, sv, n);
+                        k += du->number;
+                    }
                 }
                 else {
                     /* unit has no skill. kill it. */
@@ -1031,7 +1033,7 @@ int sp_chaosrow(struct castorder * co)
             if (u_race(df->unit)->battle_flags & BF_NOBLOCK) {
                 df->side->nonblockers[row] -= df->alive;
             }
-            row = FIRST_ROW + (rng_int() % (LAST_ROW - FIRST_ROW));
+            row = FIRST_ROW + (rng_int() % (NUMROWS - FIRST_ROW));
             switch (row) {
             case FIGHT_ROW:
                 df->status = ST_FIGHT;

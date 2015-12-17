@@ -176,6 +176,7 @@ static void chaos(region * r)
                     set_money(u, u->number * (rng_int() % mfac));
                 fset(u, UFL_ISNEW | UFL_MOVED);
             }
+            break;
         case 2:                  /* Terrainveränderung */
             if (!fval(r->terrain, FORBIDDEN_REGION)) {
                 if (!fval(r->terrain, SEA_REGION)) {
@@ -192,7 +193,7 @@ static void chaos(region * r)
                         while (sh) {
                             ship *nsh = sh->next;
                             double dmg =
-                                get_param_flt(global.parameters, "rules.ship.damage.atlantis",
+                                config_get_flt("rules.ship.damage.atlantis",
                                 0.50);
                             damage_ship(sh, dmg);
                             if (sh->damage >= sh->size * DAMAGE_SCALE) {

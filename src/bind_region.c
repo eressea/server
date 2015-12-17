@@ -210,6 +210,14 @@ static int tolua_region_set_morale(lua_State * L)
     return 0;
 }
 
+/* region mourning this turn */
+static int tolua_region_get_is_mourning(lua_State * L)
+{
+    region *r = (region *)tolua_tousertype(L, 1, 0);
+    lua_pushboolean(L, is_mourning(r, turn+1));
+    return 1;
+}
+
 static int tolua_region_get_adj(lua_State * L)
 {
     region *r = (region *)tolua_tousertype(L, 1, 0);
@@ -456,7 +464,7 @@ static int tolua_region_create(lua_State * L)
         assert(!pnormalize(&x, &y, pl));
         r = result = findregion(x, y);
 
-        if (terrain == NULL && r != NULL && r->units != NULL) {
+        if (r != NULL && r->units != NULL) {
             /* TODO: error message */
             result = NULL;
         }
@@ -465,9 +473,9 @@ static int tolua_region_create(lua_State * L)
         }
         if (result) {
             terraform_region(result, terrain);
-        }
-        if (result->land) {
-            fix_demand(result);
+            if (result->land) {
+                fix_demand(result);
+            }
         }
 
         tolua_pushusertype(L, result, TOLUA_CAST "region");
@@ -691,6 +699,7 @@ void tolua_region_open(lua_State * L)
                 tolua_region_set_name);
             tolua_variable(L, TOLUA_CAST "morale", tolua_region_get_morale,
                 tolua_region_set_morale);
+            tolua_variable(L, TOLUA_CAST "is_mourning", tolua_region_get_is_mourning, NULL);
             tolua_variable(L, TOLUA_CAST "info", tolua_region_get_info,
                 tolua_region_set_info);
             tolua_variable(L, TOLUA_CAST "units", tolua_region_get_units, NULL);

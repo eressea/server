@@ -63,6 +63,7 @@ void free_terrains(void)
         terrain_type * t = registered_terrains;
         registered_terrains = t->next;
         free(t->_name);
+        free(t->herbs);
         if (t->production) {
             for (n = 0; t->production[n].type; ++n) {
                 free(t->production[n].base);

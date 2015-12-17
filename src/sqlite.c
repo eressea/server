@@ -2,7 +2,7 @@
 #include <kernel/config.h>
 #include <kernel/faction.h>
 #include <kernel/race.h>
-#include <util/language_struct.h>
+#include <util/language.h>
 #include <util/unicode.h>
 #include <util/log.h>
 #include <util/base36.h>
@@ -123,13 +123,13 @@ static void update_faction(sqlite3 *db, const faction *f) {
         "INSERT INTO faction_data (faction_id, code, name, email, lang, turn)"
         " VALUES (?, ?, ?, ?, ?, ?)";
     sqlite3_stmt *stmt = 0;
-    strcpy(code, itoa36(f->no));
+    strncpy(code, itoa36(f->no), sizeof(code)-1);
     sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
     sqlite3_bind_int(stmt, 1, f->subscription);
     sqlite3_bind_text(stmt, 2, code, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 3, f->name, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 4, f->email, -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 5, f->locale->name, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 5, locale_name(f->locale), -1, SQLITE_STATIC);
     sqlite3_bind_int(stmt, 6, turn);
     sqlite3_step(stmt);
     sqlite3_finalize(stmt);

@@ -43,7 +43,7 @@ static void test_market_curse(CuTest * tc)
     ltype->rtype->flags |= (RTF_ITEM | RTF_POOLED);
     lux = new_luxurytype(ltype, 0);
 
-    set_param(&global.parameters, "rules.region_owners", "1");
+    config_set("rules.region_owners", "1");
 
     btype = (building_type *)calloc(1, sizeof(building_type));
     btype->_name = _strdup("market");

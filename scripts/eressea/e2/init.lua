@@ -3,9 +3,9 @@ eressea.log.debug("rules for game E2")
 
 return {
     require('eressea'),
-    require('eressea.xmas2004'),
-    require('eressea.xmas2005'),
-    require('eressea.xmas2006'),
+    require('eressea.autoseed'),
+    require('eressea.xmas'),
+    require('eressea.xmasitems'),
     require('eressea.wedding'),
     require('eressea.embassy'),
     require('eressea.eternath'),

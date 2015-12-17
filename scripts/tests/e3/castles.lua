@@ -4,6 +4,11 @@ module("tests.e3.castles", package.seeall, lunit.testcase )
 
 function setup()
     eressea.game.reset()
+    eressea.settings.set("rules.food.flags", "4")
+end
+
+function teardown()
+    eressea.settings.set("rules.food.flags", "0")
 end
 
 function test_small_castles()
@@ -49,4 +54,27 @@ function test_build_packice()
     u:add_order("MACHE BURG")
     process_orders()
     assert_equal(nil, u.building)
+end
+
+function test_build_castle_stages()
+    local r = region.create(0,0, "plain")
+    local f = faction.create("castle@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1000)
+    local b = building.create(r, "castle")
+
+    u:add_item("stone", 1000)
+
+    u:set_skill("building", 1)
+    u:clear_orders()
+
+    u:add_order("MACHE BURG " .. itoa36(b.id))
+    process_orders()
+    assert_equal(10, b.size)
+    
+    u:set_skill("building", 3)
+    u:clear_orders()
+    
+    u:add_order("MACHE BURG " .. itoa36(b.id))
+    process_orders()
+    assert_equal(250, b.size)
 end

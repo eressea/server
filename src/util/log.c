@@ -11,9 +11,11 @@ without prior permission by the authors of Eressea.
 */
 #include <platform.h>
 #include "log.h"
+#include "bsdstring.h"
 #include "unicode.h"
 
 #include <assert.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -75,27 +77,26 @@ cp_convert(const char *format, char *buffer, size_t length, int codepage)
 
 void log_rotate(const char *filename, int maxindex)
 {
-    int n;
-    if (_access(filename, 4) == 0) {
-        char buffer[2][MAX_PATH];
-        int src = 1;
-        assert(strlen(filename) < sizeof(buffer[0]) - 4);
-        for (n = 0; n < maxindex; ++n) {
-            sprintf(buffer[0], "%s.%d", filename, n);
-            if (_access(filename, 0) != 0) {
-                break;
-            }
+    char buffer[2][MAX_PATH];
+    int dst = 1;
+    assert(strlen(filename) < sizeof(buffer[0]) - 4);
+
+    sprintf(buffer[dst], "%s.%d", filename, maxindex);
+#ifdef HAVE_UNISTD_H
+    /* make sure we don't overwrite an existing file (hard links) */
+    unlink(buffer[dst]);
+#endif
+    while (maxindex > 0) {
+        int err, src = 1 - dst;
+        sprintf(buffer[src], "%s.%d", filename, --maxindex);
+        err = rename(buffer[src], buffer[dst]);
+        if (err != 0) {
+            log_debug("log rotate %s: %s", buffer[dst], strerror(errno));
         }
-        if (_access(buffer[0], 0) == 0) {
-            unlink(buffer[0]);
-        }
-        while (n--) {
-            int dst = 1 - src;
-            sprintf(buffer[src], "%s.%d", filename, n);
-            rename(buffer[src], buffer[dst]);
-            src = dst;
-        }
-        rename(filename, buffer[1 - src]);
+        dst = src;
+    }
+    if (rename(filename, buffer[dst]) != 0) {
+        log_debug("log rotate %s: %s", buffer[dst], strerror(errno));
     }
 }
 
@@ -144,7 +145,7 @@ static int check_dupe(const char *format, const char *type)
         }
         dupes = 0;
     }
-    strncpy(last_message, format, sizeof(last_message));
+    strlcpy(last_message, format, sizeof(last_message));
     last_type = type;
     return 0;
 }

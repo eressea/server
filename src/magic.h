@@ -206,11 +206,8 @@ extern "C" {
     extern struct attrib_type at_reportspell;
     extern struct attrib_type at_icastle;
 
-    typedef struct icastle_data {
-        const struct building_type *type;
-        struct building *building;  /* reverse pointer to dissolve the object */
-        int time;
-    } icastle_data;
+    void make_icastle(struct building *b, const struct building_type *btype, int timeout);
+    const struct building_type *icastle_type(const struct attrib *a);
 
     /* ------------------------------------------------------------- */
     /* Kommentare:
@@ -363,6 +360,7 @@ extern "C" {
 
     struct spellbook * get_spellbook(const char * name);
     void free_spellbooks(void);
+    void free_spellbook(struct spellbook *sb);
 #ifdef __cplusplus
 }
 #endif

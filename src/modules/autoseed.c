@@ -31,6 +31,7 @@
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/bsdstring.h>
 #include <util/goodies.h>
 #include <util/language.h>
 #include <util/lists.h>
@@ -53,6 +54,7 @@ const terrain_type *random_terrain(const terrain_type * terrains[],
     const terrain_type *terrain;
     int n;
 
+    assert(size > 0);
     if (distribution) {
         ndistribution = 0;
         for (n = 0; n != size; ++n) {
@@ -186,8 +188,9 @@ newfaction *read_newfactions(const char *filename)
         if (email[0] == '\0')
             break;
         if (password[0] == '\0') {
-            strcpy(password, itoa36(rng_int()));
-            strcat(password, itoa36(rng_int()));
+            size_t sz;
+            sz = strlcpy(password, itoa36(rng_int()), sizeof(password));
+            sz += strlcat(password, itoa36(rng_int()), sizeof(password));
         }
         for (f = factions; f; f = f->next) {
             if (strcmp(f->email, email) == 0 && f->subscription
@@ -205,6 +208,7 @@ newfaction *read_newfactions(const char *filename)
         nf = calloc(sizeof(newfaction), 1);
         if (set_email(&nf->email, email) != 0) {
             log_error("Invalid email address for subscription %s: %s\n", itoa36(subscription), email);
+            free(nf);
             continue;
         }
         nf->password = _strdup(password);
@@ -838,7 +842,7 @@ int region_quality(const region * r, region * rn[])
                 /* nobody likes volcanoes */
                 result -= 2000;
             }
-            result += rn[n]->land->peasants;
+            result += rpeasants(rn[n]);
         }
     }
     return result;
@@ -1003,10 +1007,10 @@ int build_island_e3(newfaction ** players, int x, int y, int numfactions, int mi
                 terraform_region(r, newterrain(T_HIGHLAND));
                 prepare_starting_region(r);
             }
-            r->land->money = 50000;   /* 2% = 1000 silver */
+            rsetmoney(r, 50000);   /* 2% = 1000 silver */
         }
         else if (r->land) {
-            r->land->money *= 4;
+            rsetmoney(r, rmoney(r) *4);
         }
     }
     return nfactions;

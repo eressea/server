@@ -13,6 +13,7 @@
   <race name="human" magres="0.000000" maxaura="1.000000" regaura="1.000000" recruitcost="75" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <function name="itemdrop" value="defaultdrops"/>
+    <param name="migrants.formula" value="1"/>
     <skill name="trade" modifier="1"/>
     <skill name="herbalism" modifier="-1"/>
     <skill name="shipcraft" modifier="1"/>
@@ -597,7 +598,8 @@
     <ai splitsize="10000"/>
     <attack type="1" damage="1d6"/>
   </race>
-  <race name="braineater" magres="0.900000" maxaura="1.000000" regaura="1.000000" recruitcost="50000" weight="100" capacity="540" speed="1.000000" hp="20" ac="1" damage="0d0" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" invinciblenonmagic="yes">
+  <race name="braineater" magres="0.900000" maxaura="1.000000"
+  regaura="1.000000" recruitcost="50000" weight="100" capacity="540" speed="1.000000" hp="20" damage="0d0" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" invinciblenonmagic="yes">
     <ai splitsize="500" killpeasants="yes" moverandom="yes" learn="yes"/>
     <function name="name" value="namegeneric"/>
     <function name="describe" value="describe_braineater"/>
@@ -1171,7 +1173,7 @@
     <attack type="1" damage="1d1"/>
   </race>
   <race name="seaserpent" magres="0.500000" maxaura="1.000000" regaura="1.000000" recruitcost="5000" weight="20000" capacity="5000" speed="1.000000" hp="600" ac="3" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" scarepeasants="yes" swim="yes" teach="no" getitem="yes" resistbash="yes" unarmedguard="yes">
-    <ai splitsize="6" killpeasants="yes" moverandom="yes" learn="yes"/>
+    <ai splitsize="6" killpeasants="yes" moverandom="yes" learn="yes" moveattack="yes"/>
     <function name="name" value="namegeneric"/>
     <function name="move" value="moveswimming"/>
     <skill name="tactics" modifier="4"/>

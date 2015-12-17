@@ -34,6 +34,7 @@ extern "C" {
     struct attrib_type;
 
     extern struct attrib_type at_germs;
+
     extern int dropouts[2];
     extern int *age;
 

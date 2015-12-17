@@ -48,3 +48,7 @@ void register_function(pf_generic fun, const char *name)
     len = cb_new_kv(name, len, &fun, sizeof(fun), buffer);
     cb_insert(&cb_functions, buffer, len);
 }
+
+void free_functions(void) {
+    cb_clear(&cb_functions);
+}

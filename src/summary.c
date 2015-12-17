@@ -374,7 +374,10 @@ summary *make_summary(void)
             s->factions++;
             /* Problem mit Monsterpartei ... */
             if (!is_monsters(f)) {
-                s->factionrace[old_race(f->race)]++;
+                int rc = old_race(f->race);
+                if (rc >= 0) {
+                    s->factionrace[rc]++;
+                }
             }
         }
     }
@@ -414,6 +417,7 @@ summary *make_summary(void)
             for (u = r->units; u; u = u->next)
                 freset(u->faction, FFL_SELECT);
             for (u = r->units; u; u = u->next) {
+                int orace;
                 f = u->faction;
                 if (!is_monsters(u->faction)) {
                     skill *sv;
@@ -452,7 +456,10 @@ summary *make_summary(void)
 
                 f->num_total += u->number;
                 f->money += get_money(u);
-                s->poprace[old_race(u_race(u))] += u->number;
+                orace = (int)old_race(u_race(u));
+                if (orace >= 0) {
+                    s->poprace[orace] += u->number;
+                }
             }
         }
     }

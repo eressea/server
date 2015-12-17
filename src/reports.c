@@ -26,6 +26,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "donations.h"
 
 /* kernel includes */
+#include <kernel/ally.h>
 #include <kernel/alliance.h>
 #include <kernel/connection.h>
 #include <kernel/building.h>
@@ -75,6 +76,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "move.h"
 
+#if defined(_MSC_VER) && _MSC_VER >= 1900
+# pragma warning(disable: 4774) // TODO: remove this
+#endif
+
 #define SCALEWEIGHT      100    /* Faktor, um den die Anzeige von Gewichten skaliert wird */
 
 bool nocr = false;
@@ -116,27 +121,27 @@ const char *combatstatus[] = {
     "status_avoid", "status_flee"
 };
 
-const char *report_kampfstatus(const unit * u, const struct locale *lang)
+size_t report_status(const unit * u, const struct locale *lang, char *fsbuf, size_t buflen)
 {
-    static char fsbuf[64]; // FIXME: static return value
     const char * status = LOC(lang, combatstatus[u->status]);
+    size_t len = 0;
 
     if (!status) {
         const char *lname = locale_name(lang);
         struct locale *wloc = get_or_create_locale(lname);
         log_error("no translation for combat status %s in %s", combatstatus[u->status], lname);
         locale_setstring(wloc, combatstatus[u->status], combatstatus[u->status]);
-        strlcpy(fsbuf, combatstatus[u->status], sizeof(fsbuf));
+        len = strlcpy(fsbuf, combatstatus[u->status], buflen);
     }
     else {
-        strlcpy(fsbuf, status, sizeof(fsbuf));
+        len = strlcpy(fsbuf, status, buflen);
     }
     if (fval(u, UFL_NOAID)) {
-        strcat(fsbuf, ", ");
-        strcat(fsbuf, LOC(lang, "status_noaid"));
+        len += strlcat(fsbuf+len, ", ", buflen-len);
+        len += strlcat(fsbuf+len, LOC(lang, "status_noaid"), buflen-len);
     }
 
-    return fsbuf;
+    return len;
 }
 
 const char *hp_status(const unit * u)
@@ -351,8 +356,7 @@ const char **illusion)
         if (bt_illusion && b->type == bt_illusion) {
             const attrib *a = a_findc(b->attribs, &at_icastle);
             if (a != NULL) {
-                icastle_data *icastle = (icastle_data *)a->data.v;
-                *illusion = buildingtype(icastle->type, b, b->size);
+                *illusion = buildingtype(icastle_type(a), b, b->size);
             }
         }
     }
@@ -452,7 +456,6 @@ size_t size)
     building *b;
     bool isbattle = (bool)(mode == see_battle);
     int telepath_see = 0;
-    attrib *a_fshidden = NULL;
     item *itm;
     item *show;
     faction *fv = visible_faction(f, u);
@@ -516,14 +519,8 @@ size_t size)
 
     bufp = STRLCPY(bufp, ", ", size);
 
-    if (u->faction != f && a_fshidden && a_fshidden->data.ca[0] == 1
-        && effskill(u, SK_STEALTH, 0) >= 6) {
-        bufp = STRLCPY(bufp, "? ", size);
-    }
-    else {
-        if (wrptr(&bufp, &size, _snprintf(bufp, size, "%d ", u->number)))
-            WARN_STATIC_BUFFER();
-    }
+    if (wrptr(&bufp, &size, _snprintf(bufp, size, "%d ", u->number)))
+        WARN_STATIC_BUFFER();
 
     pzTmp = get_racename(u->attribs);
     if (pzTmp) {
@@ -560,7 +557,7 @@ size_t size)
         const char *c = hp_status(u);
         c = c ? LOC(f->locale, c) : 0;
         bufp = STRLCPY(bufp, ", ", size);
-        bufp = STRLCPY(bufp, report_kampfstatus(u, f->locale), size);
+        bufp += report_status(u, f->locale, bufp, size);
         if (c || fval(u, UFL_HUNGER)) {
             bufp = STRLCPY(bufp, " (", size);
             if (c) {
@@ -603,8 +600,7 @@ size_t size)
     if (f == u->faction || telepath_see || omniscient(f)) {
         show = u->items;
     }
-    else if (!itemcloak && mode >= see_unit && !(a_fshidden
-        && a_fshidden->data.ca[1] == 1 && effskill(u, SK_STEALTH, 0) >= 3)) {
+    else if (!itemcloak && mode >= see_unit) {
         int n = report_items(u->items, results, MAX_INVENTORY, u, f);
         assert(n >= 0);
         if (n > 0)
@@ -1401,7 +1397,7 @@ static void prepare_reports(void)
         }
 
         /* Region owner get always the Lighthouse report */
-        if (bt_lighthouse && check_param(global.parameters, "rules.region_owner_pay_building", bt_lighthouse->_name)) {
+        if (bt_lighthouse && config_token("rules.region_owner_pay_building", bt_lighthouse->_name)) {
             for (b = rbuildings(r); b; b = b->next) {
                 if (b && b->type == bt_lighthouse) {
                     u = building_owner(b);
@@ -1544,6 +1540,16 @@ static void prepare_report(struct report_context *ctx, faction *f)
     ctx->last = lastregion(f);
 }
 
+static void mkreportdir(const char *rpath) {
+    if (_mkdir(rpath) != 0) {
+        if (_access(rpath, 0) < 0) {
+            log_error("could not create reports directory %s: %s", rpath, strerror(errno));
+            abort();
+        }
+    }
+    errno = 0;
+}
+
 int write_reports(faction * f, time_t ltime)
 {
     unsigned int backup = 1, maxbackup = 128 * 1000;
@@ -1551,19 +1557,14 @@ int write_reports(faction * f, time_t ltime)
     struct report_context ctx;
     const char *encoding = "UTF-8";
     report_type *rtype;
+    const char *path = reportpath();
 
     if (noreports) {
         return false;
     }
     prepare_report(&ctx, f);
     get_addresses(&ctx);
-    if (_access(reportpath(), 0) < 0) {
-        _mkdir(reportpath());
-    }
-    if (errno) {
-        log_warning("errno was %d before writing reports", errno);
-        errno = 0;
-    }
+    mkreportdir(path); // FIXME: too many mkdir calls! init_reports is enough
     log_debug("Reports for %s:", factionname(f));
     for (rtype = report_types; rtype != NULL; rtype = rtype->next) {
         if (f->options & rtype->flag) {
@@ -1617,9 +1618,10 @@ static void write_script(FILE * F, const faction * f)
     buf[0] = 0;
     for (rtype = report_types; rtype != NULL; rtype = rtype->next) {
         if (f->options & rtype->flag) {
-            if (buf[0])
-                strcat(buf, ",");
-            strcat(buf, rtype->extension);
+            if (buf[0]) {
+                strlcat(buf, ",", sizeof(buf));
+            }
+            strlcat(buf, rtype->extension, sizeof(buf));
         }
     }
     fputs(buf, F);
@@ -1640,12 +1642,7 @@ int init_reports(void)
             return 0;
         }
     }
-    if (_mkdir(reportpath()) != 0) {
-        if (errno != EEXIST) {
-            perror("could not create reportpath");
-            return -1;
-        }
-    }
+    mkreportdir(reportpath());
     return 0;
 }
 
@@ -1656,13 +1653,14 @@ int reports(void)
     time_t ltime = time(NULL);
     int retval = 0;
     char path[MAX_PATH];
+    const char * rpath = reportpath();
 
     log_info("Writing reports for turn %d:", turn);
     report_donations();
     remove_empty_units();
 
-    _mkdir(reportpath());
-    sprintf(path, "%s/reports.txt", reportpath());
+    mkreportdir(rpath); // FIXME: init_reports already does this?
+    sprintf(path, "%s/reports.txt", rpath);
     mailit = fopen(path, "w");
     if (mailit == NULL) {
         log_error("%s could not be opened!\n", path);
@@ -1680,7 +1678,7 @@ int reports(void)
     free_seen();
 #ifdef GLOBAL_REPORT
     {
-        const char *str = get_param(global.parameters, "globalreport");
+        const char *str = config_get("globalreport");
         if (str != NULL) {
             sprintf(path, "%s/%s.%u.cr", reportpath(), str, turn);
             global_report(path);
@@ -1729,6 +1727,23 @@ static variant var_copy_items(variant x)
     return x;
 }
 
+static variant var_copy_resources(variant x)
+{
+    resource *rsrc;
+    resource *rdst = NULL, **rptr = &rdst;
+
+    for (rsrc = (resource *)x.v; rsrc != NULL; rsrc = rsrc->next) {
+        resource *res = malloc(sizeof(resource));
+        res->number = rsrc->number;
+        res->type = rsrc->type;
+        *rptr = res;
+        rptr = &res->next;
+    }
+    *rptr = NULL;
+    x.v = rdst;
+    return x;
+}
+
 static void var_free_resources(variant x)
 {
     resource *rsrc = (resource *)x.v;
@@ -1751,7 +1766,10 @@ const char *trailinto(const region * r, const struct locale *lang)
     const char *s;
     if (r) {
         const char *tname = terrain_name(r);
-        strcat(strcpy(ref, tname), "_trail");
+        size_t sz;
+
+        sz = strlcpy(ref, tname, sizeof(ref));
+        sz += strlcat(ref+sz, "_trail", sizeof(ref)-sz);
         s = LOC(lang, ref);
         if (s && *s) {
             if (strstr(s, "%s"))
@@ -2291,7 +2309,7 @@ void register_reports(void)
     register_argtype("int", NULL, NULL, VAR_INT);
     register_argtype("string", var_free_string, var_copy_string, VAR_VOIDPTR);
     register_argtype("order", var_free_order, var_copy_order, VAR_VOIDPTR);
-    register_argtype("resources", var_free_resources, NULL, VAR_VOIDPTR);
+    register_argtype("resources", var_free_resources, var_copy_resources, VAR_VOIDPTR);
     register_argtype("items", var_free_resources, var_copy_items, VAR_VOIDPTR);
     register_argtype("regions", var_free_regions, NULL, VAR_VOIDPTR);
 
