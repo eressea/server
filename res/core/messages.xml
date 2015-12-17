@@ -2899,9 +2899,10 @@
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
+      <arg name="terrain" type="string"/>
     </type>
-    <text locale="de">"$unit($unit) entdeckt, dass $region($region) $terrain($region) ist."</text>
-    <text locale="en">"$unit($unit) discovered that $region($region) is $terrain($region)."</text>
+    <text locale="de">"$unit($unit) entdeckt, dass $region($region) $localize($terrain) ist."</text>
+    <text locale="en">"$unit($unit) discovered that $region($region) is $localize($terrain)."</text>
   </message>
   <message name="leftship" section="movement">
     <type>
