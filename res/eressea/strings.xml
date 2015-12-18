@@ -103,10 +103,6 @@
   </namespace>
   <namespace name="shipinfo">
     <!-- ship info is not implemented! -->
-    <string name="no_info">
-      <text locale="de">Keine Informationen über diesen Schiffstyp verfügbar.</text>
-      <text locale="en">No Information available for this type of ship.</text>
-    </string>
     <string name="balloon">
       <text locale="de">Der Sumpfgasballon besteht aus einem großen 
         Weidenkorb, welcher Platz
@@ -127,10 +123,6 @@
     <string name="birthdaycake">
       <text locale="de">Eine Geburtstagstorte mit 10 Kerzen. Herzlichen Glückwunsch, Eressea!</text>
       <text locale="en">A birthday cake with 10 candles. Happy Birthday, Eressea!</text>
-    </string>
-    <string name="no_info">
-      <text locale="de">Keine Informationen.</text>
-      <text locale="en">No Information available.</text>
     </string>
     <string name="griphonwing">
       <text locale="de">Dieses Fluggerät aus der Schmiede der Zwerge von Celeband galt wie die
