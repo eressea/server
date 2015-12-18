@@ -21,6 +21,12 @@
     Ruderschwanz und einem riesigen runden Maul zu bestehen scheint.</text>
     <text locale="en">Wobbling green vapours drift through the mists to form an eldritch creature that seems to be entirely made up of huge jaws and a long tail.</text>
   </string>
+  <namespace name="shipinfo">
+    <string name="no_info">
+      <text locale="de">Keine Informationen über diesen Schiffstyp verfügbar.</text>
+      <text locale="en">No Information available for this type of ship.</text>
+    </string>
+  </namespace>
   <namespace name="raceinfo">
     <string name="no_info">
       <text locale="de">Keine Informationen über diese Rasse verfügbar.</text>
@@ -62,6 +68,10 @@
     </string>
   </namespace>
   <namespace name="iteminfo">
+    <string name="no_info">
+      <text locale="de">Keine Informationen.</text>
+      <text locale="en">No Information available.</text>
+    </string>
     <string name="trollspoil">
       <text locale="de">Das Horn eines Trolles. Kein Troll würde sich lebend davon trennen.</text>
       <text locale="en">The horn of an adult troll. No troll would ever part with this while he's alive.</text>

@@ -72,7 +72,7 @@ for _, p in ipairs(players) do
     local dupe = false
     for f in factions() do
         if f.email==p.email then
-            print("seed: duplicate email " .. p.email .. " already used by faction " .. tostring(f))
+            print("seed: duplicate email " .. p.email .. " already used by " .. tostring(f))
             dupe = true
             break
         end

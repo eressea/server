@@ -88,7 +88,7 @@ function autoseed.init()
             end
             local dupe = get_faction_by_email(p.email)
             if dupe then
-                eressea.log.warning("seed: duplicate email " .. p.email .. " already used by faction " .. tostring(dupe))
+                eressea.log.warning("seed: duplicate email " .. p.email .. " already used by " .. tostring(dupe))
             else
                 local f = seed(start, p.email, p.race or "human", p.lang or "de")
                 num_seeded = num_seeded + 1
