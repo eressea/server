@@ -61,7 +61,7 @@
         "desert": {
             "size": 400,
             "seed": 2,
-            "road": 75,
+            "road": 100,
             "flags": [ "cavalry", "land", "walk", "sail", "fly" ],
             "herbs": [ "h9", "h11" ],
             "production": {
