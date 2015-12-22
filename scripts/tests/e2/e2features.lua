@@ -201,7 +201,7 @@ function test_no_uruk()
   assert_equal(f1.race, "orc")
 end
 
-function test_snowglobe()
+function disable_test_snowglobe()
     local r1 = region.create(0, 0, "glacier")
     local r2 = region.create(1, 0, "ocean")
     local f = faction.create("noreply@eressea.de", "human", "de")
