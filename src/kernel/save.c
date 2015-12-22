@@ -712,11 +712,11 @@ unit *read_unit(struct gamedata *data)
                         ord = NULL;
                     }
                     else if (p == MAXPERSISTENT) {
-                        log_warning("%s had %d or more persistent orders\n", unitname(u), MAXPERSISTENT);
+                        log_info("%s had %d or more persistent orders\n", unitname(u), MAXPERSISTENT);
                     }
                 }
                 else if (n == MAXORDERS) {
-                    log_warning("%s had %d or more orders\n", unitname(u), MAXORDERS);
+                    log_info("%s had %d or more orders\n", unitname(u), MAXORDERS);
                 }
                 if (ord != NULL)
                     free_order(ord);
@@ -779,7 +779,7 @@ void write_unit(struct gamedata *data, const unit * u)
             writeorder(data, ord, u->faction->locale);
         }
         else {
-            log_warning("%s had %d or more persistent orders\n", unitname(u), MAXPERSISTENT);
+            log_info("%s had %d or more persistent orders\n", unitname(u), MAXPERSISTENT);
             break;
         }
     }
@@ -792,7 +792,7 @@ void write_unit(struct gamedata *data, const unit * u)
                 writeorder(data, ord, u->faction->locale);
             }
             else {
-                log_warning("%s had %d or more persistent orders\n", unitname(u), MAXPERSISTENT);
+                log_info("%s had %d or more persistent orders\n", unitname(u), MAXPERSISTENT);
                 break;
             }
         }

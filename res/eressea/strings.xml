@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <strings>
   <namespace name="spellinfo">
+    <string name="concealing_aura">
+      <text locale="de">Dieser Zauber wird die gesamte Ausrüstung der
+      Zieleinheit für
+      einige Zeit vor den Blicken anderer verschleiern. </text>
+      <text locale="en">This spell will hide the whole equipment of a target
+      unit from the
+      looks of others.</text>
+    </string>
   <string name="headache">
       <text locale="de">
       Aufzeichung des Vortrags von Selen Ard'Ragorn in Bar'Glingal: 
@@ -95,10 +103,6 @@
   </namespace>
   <namespace name="shipinfo">
     <!-- ship info is not implemented! -->
-    <string name="no_info">
-      <text locale="de">Keine Informationen über diesen Schiffstyp verfügbar.</text>
-      <text locale="en">No Information available for this type of ship.</text>
-    </string>
     <string name="balloon">
       <text locale="de">Der Sumpfgasballon besteht aus einem großen 
         Weidenkorb, welcher Platz
@@ -119,10 +123,6 @@
     <string name="birthdaycake">
       <text locale="de">Eine Geburtstagstorte mit 10 Kerzen. Herzlichen Glückwunsch, Eressea!</text>
       <text locale="en">A birthday cake with 10 candles. Happy Birthday, Eressea!</text>
-    </string>
-    <string name="no_info">
-      <text locale="de">Keine Informationen.</text>
-      <text locale="en">No Information available.</text>
     </string>
     <string name="griphonwing">
       <text locale="de">Dieses Fluggerät aus der Schmiede der Zwerge von Celeband galt wie die

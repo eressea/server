@@ -1592,13 +1592,13 @@ static const region_list *travel_route(unit * u,
                 else if ((u_race(u)->flags & RCF_WALK) == 0) {
                     /* Spezialeinheiten, die nicht laufen können. */
                     ADDMSG(&u->faction->msgs, msg_message("detectocean",
-                        "unit region", u, next));
+                        "unit region terrain", u, next, terrain_name(next)));
                     break;
                 }
                 else if (landing) {
                     /* wir sind diese woche angelandet */
                     ADDMSG(&u->faction->msgs, msg_message("detectocean",
-                        "unit region", u, next));
+                        "unit region terrain", u, next, terrain_name(next)));
                     break;
                 }
             }
@@ -1607,7 +1607,7 @@ static const region_list *travel_route(unit * u,
                  * Pferde betreten werden. */
                 if (!(canswim(u) || canfly(u))) {
                     ADDMSG(&u->faction->msgs, msg_message("detectocean",
-                        "unit region", u, next));
+                        "unit region terrain", u, next, terrain_name(next)));
                     break;
                 }
             }
