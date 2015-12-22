@@ -784,19 +784,14 @@ void demographics(void)
     }
 
     for (r = regions; r; r = r->next) {
-        ++r->age;                   /* also oceans. no idea why we didn't always do that */
+        ++r->age; /* also oceans. no idea why we didn't always do that */
         live(r);
 
         if (!fval(r->terrain, SEA_REGION)) {
             /* die Nachfrage nach Produkten steigt. */
             struct demand *dmd;
             if (r->land) {
-                static int plant_rules = -1;
-
-                if (plant_rules < 0) {
-                    plant_rules =
-                        get_param_int(global.parameters, "rules.grow.formula", 0);
-                }
+                int plant_rules = get_param_int(global.parameters, "rules.grow.formula", 2);
                 for (dmd = r->land->demands; dmd; dmd = dmd->next) {
                     if (dmd->value > 0 && dmd->value < MAXDEMAND) {
                         float rise = DMRISE;
@@ -822,11 +817,11 @@ void demographics(void)
                     }
                 }
                 horses(r);
-                if (plant_rules == 0) { /* E1 */
+                if (plant_rules == 2) { /* E2 */
                     growing_trees(r, current_season, last_weeks_season);
                     growing_herbs(r, current_season, last_weeks_season);
                 }
-                else {                /* E3 */
+                else if (plant_rules==1) { /* E3 */
                     growing_trees_e3(r, current_season, last_weeks_season);
                 }
             }

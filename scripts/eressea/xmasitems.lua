@@ -24,6 +24,7 @@ function use_snowglobe(u, amount, token)
             local trans = transform[r.terrain]
             if trans then
                 r.terrain = trans
+                return 1
             else
                 -- message "invalid terrain"
             end
@@ -32,9 +33,8 @@ function use_snowglobe(u, amount, token)
         end
     else
         -- message "need to specify direction"
-        return -1
     end
-    return 1
+    return -1
 end
 
 function use_snowman(u, amount)

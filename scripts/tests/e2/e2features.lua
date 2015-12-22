@@ -201,18 +201,6 @@ function test_no_uruk()
   assert_equal(f1.race, "orc")
 end
 
-function disable_test_snowglobe()
-    local r1 = region.create(0, 0, "glacier")
-    local r2 = region.create(1, 0, "ocean")
-    local f = faction.create("noreply@eressea.de", "human", "de")
-    local u = unit.create(f, r1, 1)
-    u:add_item("snowglobe", 1)
-    u:clear_orders()
-    u:add_order("BENUTZEN 1 Schneekugel Ost")
-    process_orders()
-    assert_equal("glacier", r2.terrain)
-end
-
 function test_snowman()
     local r = region.create(0, 0, "glacier")
     local f = faction.create("noreply@eressea.de", "human", "de")
