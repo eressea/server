@@ -20,7 +20,6 @@ LUALIB_API int luaopen_locale (lua_State* tolua_S);
 
 #undef tolua_reg_types
 #define tolua_reg_types tolua_reg_types_locale
-#include "bind_tolua.h"
 #include "bind_locale.h"
 
 /* function to register type */
@@ -113,6 +112,35 @@ static int tolua_locale_eressea_locale_get00(lua_State* tolua_S)
 #endif
 }
 
+/* function: locale_direction */
+static int tolua_locale_eressea_locale_direction00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isstring(tolua_S,1,0,&tolua_err) || 
+ !tolua_isstring(tolua_S,2,0,&tolua_err) || 
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const char* lang = ((const char*)  tolua_tostring(tolua_S,1,0));
+  const char* str = ((const char*)  tolua_tostring(tolua_S,2,0));
+ {
+  int tolua_ret = (int)  locale_direction(lang,str);
+ tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'direction'.",&tolua_err);
+ return 0;
+#endif
+}
+
 /* Open lib function */
 LUALIB_API int luaopen_locale (lua_State* tolua_S)
 {
@@ -127,6 +155,7 @@ LUALIB_API int luaopen_locale (lua_State* tolua_S)
  tolua_function(tolua_S,"create",tolua_locale_eressea_locale_create00);
  tolua_function(tolua_S,"set",tolua_locale_eressea_locale_set00);
  tolua_function(tolua_S,"get",tolua_locale_eressea_locale_get00);
+ tolua_function(tolua_S,"direction",tolua_locale_eressea_locale_direction00);
  tolua_endmodule(tolua_S);
  tolua_endmodule(tolua_S);
  tolua_endmodule(tolua_S);
