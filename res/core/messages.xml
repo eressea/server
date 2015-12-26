@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <messages>
+
+  <message name="santa_f" section="events">
+    <type>
+      <arg name="item" type="resource"/>
+    </type>
+    <text locale="de">'Ho ho ho!' Ein dicker Gnom fliegt auf einem von
+    8 Jungdrachen gezogenen Schlitten durch die Nacht und vermacht Deiner
+    Partei eine $resource($item,1). (Um diesen Gegenstand einer Einheit zu geben, gib
+    ihr den Befehl 'BEANSPRUCHE 1 $resource($item,1)').</text>
+    <text locale="en">'Ho ho ho!' A fat little gnome Gnom on a sled
+    pulled by 8 young dragons flies through the stary night and presents
+    your faction with a $resource($item,1).</text>
+  </message>
+
+
   <message name="force_leave_ship" section="events">
     <type>
       <arg name="unit" type="unit"/>

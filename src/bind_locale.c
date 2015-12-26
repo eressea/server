@@ -1,5 +1,6 @@
 #include "bind_locale.h"
 #include "util/language.h"
+#include "direction.h"
 
 void locale_create(const char *lang) {
     get_or_create_locale(lang);
@@ -18,4 +19,12 @@ const char * locale_get(const char *lang, const char *key) {
         return locale_getstring(loc, key);
     }
     return 0;
+}
+
+int locale_direction(const char *lang, const char *str) {
+    struct locale *loc = get_locale(lang);
+    if (loc) {
+        return get_direction(str, loc);
+    }
+    return NODIRECTION;
 }

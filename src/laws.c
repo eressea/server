@@ -784,19 +784,14 @@ void demographics(void)
     }
 
     for (r = regions; r; r = r->next) {
-        ++r->age;                   /* also oceans. no idea why we didn't always do that */
+        ++r->age; /* also oceans. no idea why we didn't always do that */
         live(r);
 
         if (!fval(r->terrain, SEA_REGION)) {
             /* die Nachfrage nach Produkten steigt. */
             struct demand *dmd;
             if (r->land) {
-                static int plant_rules = -1;
-
-                if (plant_rules < 0) {
-                    plant_rules =
-                        get_param_int(global.parameters, "rules.grow.formula", 0);
-                }
+                int plant_rules = get_param_int(global.parameters, "rules.grow.formula", 2);
                 for (dmd = r->land->demands; dmd; dmd = dmd->next) {
                     if (dmd->value > 0 && dmd->value < MAXDEMAND) {
                         float rise = DMRISE;
@@ -822,11 +817,11 @@ void demographics(void)
                     }
                 }
                 horses(r);
-                if (plant_rules == 0) { /* E1 */
+                if (plant_rules == 2) { /* E2 */
                     growing_trees(r, current_season, last_weeks_season);
                     growing_herbs(r, current_season, last_weeks_season);
                 }
-                else {                /* E3 */
+                else if (plant_rules==1) { /* E3 */
                     growing_trees_e3(r, current_season, last_weeks_season);
                 }
             }
@@ -3442,10 +3437,13 @@ void update_long_order(unit * u)
 static int use_item(unit * u, const item_type * itype, int amount, struct order *ord)
 {
     int i;
-    int target = read_unitid(u->faction, u->region);
+    int target = -1;
+
+    if (itype->useonother) {
+        target = read_unitid(u->faction, u->region);
+    }
 
     i = get_pooled(u, itype->rtype, GET_DEFAULT, amount);
-
     if (amount > i) {
         /* TODO: message? eg. "not enough %, using only %" */
         amount = i;
@@ -3455,20 +3453,16 @@ static int use_item(unit * u, const item_type * itype, int amount, struct order 
     }
 
     if (target == -1) {
-        int result;
-        if (itype->use == NULL) {
-            return EUNUSABLE;
+        if (itype->use) {
+            int result = itype->use(u, itype, amount, ord);
+            if (result > 0) {
+                use_pooled(u, itype->rtype, GET_DEFAULT, result);
+            }
+            return result;
         }
-        result = itype->use ? itype->use(u, itype, amount, ord) : EUNUSABLE;
-        if (result>0) {
-            use_pooled(u, itype->rtype, GET_DEFAULT, result);
-        }
-        return result;
+        return EUNUSABLE;
     }
     else {
-        if (itype->useonother == NULL) {
-            return EUNUSABLE;
-        }
         return itype->useonother(u, target, itype, amount, ord);
     }
 }

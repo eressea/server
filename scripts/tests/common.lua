@@ -34,6 +34,14 @@ function setup()
     eressea.settings.set("study.random_progress", "0")
 end
 
+function test_locales()
+    assert_equal(2, eressea.locale.direction("de", "Ost"))
+    assert_equal(5, eressea.locale.direction("de", "westen"))
+    assert_equal(4, eressea.locale.direction("de", "sw"))
+    assert_equal(-1, eressea.locale.direction("de", "foo"))
+    assert_equal(-1, eressea.locale.direction("foo", "sw"))
+end
+
 function test_flags()
     local r = region.create(0, 0, "plain")
     local f = faction.create("flags@eressea.de", "halfling", "de")
