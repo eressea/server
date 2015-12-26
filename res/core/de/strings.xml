@@ -1591,6 +1591,14 @@
     <text locale="de">Schneemann</text>
     <text locale="en">snowman</text>
   </string>
+  <string name="snowglobe">
+    <text locale="de">Schneekugel</text>
+    <text locale="en">snow globe</text>
+  </string>
+  <string name="snowglobe_p">
+    <text locale="de">Schneekugeln</text>
+    <text locale="en">snow globes</text>
+  </string>
   <string name="snowman_p">
     <text locale="de">Schneemänner</text>
     <text locale="en">snowmen</text>

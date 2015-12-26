@@ -15,7 +15,6 @@ require 'eressea'
 require 'eressea.path'
 require 'eressea.xmlconf'
 require 'tests.e3'
-require 'tests.xmas'
 require 'lunit'
 
 eressea.settings.set("rules.alliances", "0")

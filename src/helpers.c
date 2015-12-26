@@ -19,6 +19,7 @@ without prior permission by the authors of Eressea.
 #include <util/bsdstring.h>
 #include <util/functions.h>
 #include <util/log.h>
+#include <util/parser.h>
 #include <util/resolve.h>
 
 #include <kernel/config.h>
@@ -504,8 +505,8 @@ struct order *ord)
     if (lua_isfunction(L, -1)) {
         tolua_pushusertype(L, (void *)u, TOLUA_CAST "unit");
         lua_pushinteger(L, amount);
-
-        if (lua_pcall(L, 2, 1, 0) != 0) {
+        lua_pushstring(L, getstrtoken());
+        if (lua_pcall(L, 3, 1, 0) != 0) {
             const char *error = lua_tostring(L, -1);
             log_error("use(%s) calling '%s': %s.\n", unitname(u), fname, error);
             lua_pop(L, 1);

@@ -7,5 +7,6 @@ module eressea {
     void locale_create @ create(const char *lang);
     void locale_set @ set(const char *lang, const char *key, const char *str);
     const char * locale_get @ get(const char *lang, const char *key);
+    int locale_direction @ direction(const char *lang, const char *str);
   }
 }

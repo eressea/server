@@ -51,13 +51,13 @@
     </string>
     <string name="newbie_info_1">
       <text locale="de">Bitte denke daran, deine Befehle mit dem Betreff
-      E3 BEFEHLE an eressea-server@eressea.de zu senden.</text>
+      ERESSEA 3 BEFEHLE an eressea-server@eressea.de zu senden.</text>
       <text locale="en">Remember to send your orders to
       eressea-server@eressea.de with the subject E3 ORDERS.</text>
     </string>
     <string name="mailcmd">
-      <text locale="de">E3 BEFEHLE</text>
-      <text locale="en">E3 ORDERS</text>
+      <text locale="de">ERESSEA 3 BEFEHLE</text>
+      <text locale="en">ERESSEA 3 ORDERS</text>
     </string>
     <string name="defaultorder">
       <text locale="de">ARBEITEN</text>
