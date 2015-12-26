@@ -15,7 +15,6 @@ require 'eressea'
 require 'eressea.xmlconf'
 require 'eressea.path'
 require 'tests.e2'
-require 'tests.xmas'
 require 'lunit'
 
 rules = require('eressea.' .. config.rules)
