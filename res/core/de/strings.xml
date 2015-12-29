@@ -247,8 +247,18 @@
       the bearer for one week.</text>
     </string>
     <string name="skillpotion">
-        <text locale="en">The recipe of this potion is a well kept secret. Some even say it couldn't be brewed by mere mortals. One thing is certain though, the drinker receives further insight into any learned skills, which furthers their progress towards the mastery of those skills.</text>
-        <text locale="de">Die Herstellung dieses Trunkes ist ein wohlgehütetes Geheimnis. Manche behaupten gar, von Sterblichen könne er gar nicht gebraut werden. Tatsache ist, dass er dem Trinkenden tiefere Einsicht in seine erlernten Talente gewährt, was ihn in der Meisterung dieser Talente voranbringt.</text>
+      <text locale="de">
+      Die Herstellung dieses Trunkes ist ein wohlgehütetes Geheimnis. Manche 
+      behaupten gar, von Sterblichen könne er gar nicht gebraut werden. 
+      Tatsache ist, dass er dem Trinkenden tiefere Einsicht in seine erlernten 
+      Talente gewährt, was ihn in der Meisterung dieser Talente voranbringt.
+      </text>
+      <text locale="en">
+      The recipe of this potion is a well kept secret. Some even say it 
+      couldn't be brewed by mere mortals. One thing is certain though, the 
+      drinker receives further insight into any learned skills, which furthers 
+      their progress towards the mastery of those skills.
+      </text>
     </string>
     <string name="snowglobe">
       <text locale="de">
