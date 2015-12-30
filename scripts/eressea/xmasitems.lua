@@ -6,7 +6,7 @@ local function get_direction(locale, token)
     return nil
 end
 
-function use_snowglobe(u, amount, token)
+function use_snowglobe(u, amount, token, ord)
     local transform = {
         ocean = "glacier",
         firewall = "volcano",
