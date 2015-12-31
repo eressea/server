@@ -6,6 +6,15 @@ local function get_direction(locale, token)
     return nil
 end
 
+local function error_message(msg, u, ord)
+    local msg = message.create(msg)
+    msg:set_unit("unit", u)
+    msg:set_region("region", u.region)
+    msg:set_order("command", ord)
+    msg:send_faction(u.faction)
+    return -1
+end
+
 function use_snowglobe(u, amount, token, ord)
     local transform = {
         ocean = "glacier",
@@ -17,8 +26,7 @@ function use_snowglobe(u, amount, token, ord)
     if direction then
         local r = u.region:next(direction)
         if r.units() then
-            -- message "target region not empty"
-            return -1
+            return error_message('target_region_not_empty', u, ord)
         end
         if r then 
             local trans = transform[r.terrain]
@@ -26,15 +34,13 @@ function use_snowglobe(u, amount, token, ord)
                 r.terrain = trans
                 return 1
             else
-                -- message "invalid terrain"
+                return error_message('target_region_invalid', u, ord)
             end
         else
-            -- message "invalid terrain"
+            return error_message('target_region_invalid', u, ord)
         end
-    else
-        -- message "need to specify direction"
     end
-    return -1
+    return error_message('missing_direction', u, ord)
 end
 
 function use_snowman(u, amount)
