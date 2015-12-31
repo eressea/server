@@ -677,7 +677,7 @@ static order *plan_dragon(unit * u)
         }
     }
 
-    if (move) {
+    if (move && (!ta || chance(0.1))) {
         /* dragon gets bored and looks for a different place to go */
         ta = set_new_dragon_target(u, u->region, DRAGON_RANGE);
     }
