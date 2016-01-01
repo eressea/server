@@ -19,6 +19,7 @@ without prior permission by the authors of Eressea.
 #include "bind_message.h"
 #include "bind_building.h"
 #include "bind_faction.h"
+#include "bind_order.h"
 #include "bind_ship.h"
 #include "bind_gmtool.h"
 #include "bind_region.h"
@@ -1157,6 +1158,7 @@ lua_State *lua_init(void) {
     tolua_faction_open(L);
     tolua_unit_open(L);
     tolua_message_open(L);
+    tolua_order_open(L);
     tolua_dict_open(L);
 #ifdef USE_CURSES
     tolua_gmtool_open(L);
