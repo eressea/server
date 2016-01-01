@@ -14,7 +14,36 @@
     your faction with a $resource($item,1).</text>
   </message>
 
-
+  <message name="target_region_invalid">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+        <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Ungültige Zielregion."</text>
+      <text locale="en">"$unit($unit) in $region($region): '$order($command)' - invalid target region."</text>
+    </type>
+  </message>
+  
+  <message name="missing_direction">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+        <text locale="de">"$unit($unit) in $region($region): '$order($command)' - keine Richtung angegeben."</text>
+      <text locale="en">"$unit($unit) in $region($region): '$order($command)' - no direction was specified."</text>
+    </type>
+  </message>
+  
+  <message name="target_region_not_empty">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+        <text locale="de">"$unit($unit) in $region($region): '$order($command)' - In der Zielregion befinden sich noch Einheiten."</text>
+      <text locale="en">"$unit($unit) in $region($region): '$order($command)' - There are units in the target region."</text>
+    </type>
+  </message>
+  
   <message name="force_leave_ship" section="events">
     <type>
       <arg name="unit" type="unit"/>

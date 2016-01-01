@@ -511,7 +511,8 @@ struct order *ord)
         tolua_pushusertype(L, (void *)u, TOLUA_CAST "unit");
         lua_pushinteger(L, amount);
         lua_pushstring(L, getstrtoken());
-        if (lua_pcall(L, 3, 1, 0) != 0) {
+        tolua_pushusertype(L, (void *)ord, TOLUA_CAST "order");
+        if (lua_pcall(L, 4, 1, 0) != 0) {
             const char *error = lua_tostring(L, -1);
             log_error("use(%s) calling '%s': %s.\n", unitname(u), fname, error);
             lua_pop(L, 1);

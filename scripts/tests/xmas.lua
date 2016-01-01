@@ -19,6 +19,22 @@ function test_snowglobe_fail()
     unit.create(f, r2, 1) -- unit in target region => fail
     process_orders()
     assert_equal('ocean', r2.terrain)
+    assert_equal(1, u:get_item('snowglobe'))
+    assert_equal(1, f:count_msg_type('target_region_not_empty'))
+end
+
+function test_snowglobe_missing_direction()
+    local r1 = region.create(0, 0, "glacier")
+    local r2 = region.create(1, 0, "ocean")
+    local f = faction.create("snowglobe1@eressea.de", "human", "de")
+    local u = unit.create(f, r1, 1)
+    u:add_item("snowglobe", 1)
+    u:clear_orders()
+    u:add_order("BENUTZEN 1 Schneekugel")
+    process_orders()
+    assert_equal('ocean', r2.terrain)
+    assert_equal(1, u:get_item('snowglobe'))
+    assert_equal(1, f:count_msg_type('missing_direction'))
 end
 
 function test_snowglobe()
@@ -27,6 +43,7 @@ function test_snowglobe()
     local f = faction.create("snowglobe2@eressea.de", "human", "de")
     local u = unit.create(f, r1, 1)
     local have = 6
+    local fail = 0
     u:add_item("snowglobe", have)
     local xform = { ocean = "glacier", glacier = "glacier", firewall = "volcano", volcano = "mountain", desert = "plain", plain = "plain" }
     u:clear_orders()
@@ -35,7 +52,12 @@ function test_snowglobe()
         r2.terrain = k
         process_orders()
         assert_equal(v, r2.terrain)
-        if k~=v then have=have - 1 end
+        if k~=v then
+            have=have - 1 
+        else
+            fail = fail + 1
+            assert_equal(fail, f:count_msg_type('target_region_invalid'))
+        end
         assert_equal(have, u:get_item("snowglobe"))
     end
 end
