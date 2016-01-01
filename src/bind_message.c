@@ -321,6 +321,13 @@ static int tolua_msg_send_faction(lua_State * L)
     return 0;
 }
 
+static int tolua_msg_get_type(lua_State * L)
+{
+    lua_message *lmsg = (lua_message *)tolua_tousertype(L, 1, 0);
+    lua_pushstring(L, lmsg->msg->type->name);
+    return 1;
+}
+
 static int tolua_msg_render(lua_State * L)
 {
     lua_message *lmsg = (lua_message *)tolua_tousertype(L, 1, 0);
@@ -351,6 +358,7 @@ void tolua_message_open(lua_State * L)
         tolua_beginmodule(L, TOLUA_CAST "message");
         {
             tolua_function(L, TOLUA_CAST "render", tolua_msg_render);
+            tolua_variable(L, TOLUA_CAST "type", tolua_msg_get_type, 0);
             tolua_function(L, TOLUA_CAST "set", tolua_msg_set);
             tolua_function(L, TOLUA_CAST "set_unit", tolua_msg_set_unit);
             tolua_function(L, TOLUA_CAST "set_order", tolua_msg_set_order);

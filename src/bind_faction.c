@@ -224,6 +224,23 @@ static int tolua_faction_addnotice(lua_State * L)
     return 0;
 }
 
+static int tolua_faction_count_msg_type(lua_State *L) {
+    faction *self = (faction *)tolua_tousertype(L, 1, 0);
+    const char *str = tolua_tostring(L, 2, 0);
+    int n = 0;
+    if (self->msgs) {
+        mlist * ml = self->msgs->begin;
+        while (ml) {
+            if (strcmp(str, ml->msg->type->name) == 0) {
+                ++n;
+            }
+            ml = ml->next;
+        }
+    }
+    lua_pushinteger(L, n);
+    return 1;
+}
+
 static int tolua_faction_get_objects(lua_State * L)
 {
     faction *self = (faction *)tolua_tousertype(L, 1, 0);
@@ -528,12 +545,12 @@ void tolua_faction_open(lua_State * L)
 
             tolua_variable(L, TOLUA_CAST "id", tolua_faction_get_id,
                 tolua_faction_set_id);
-            tolua_variable(L, TOLUA_CAST "uid", &tolua_faction_get_uid,
-                &tolua_faction_set_uid);
-            tolua_variable(L, TOLUA_CAST "name", &tolua_faction_get_name,
-                &tolua_faction_set_name);
-            tolua_variable(L, TOLUA_CAST "info", &tolua_faction_get_info,
-                &tolua_faction_set_info);
+            tolua_variable(L, TOLUA_CAST "uid", tolua_faction_get_uid,
+                tolua_faction_set_uid);
+            tolua_variable(L, TOLUA_CAST "name", tolua_faction_get_name,
+                tolua_faction_set_name);
+            tolua_variable(L, TOLUA_CAST "info", tolua_faction_get_info,
+                tolua_faction_set_info);
             tolua_variable(L, TOLUA_CAST "units", tolua_faction_get_units, NULL);
             tolua_variable(L, TOLUA_CAST "heroes", tolua_faction_get_heroes, NULL);
             tolua_variable(L, TOLUA_CAST "maxheroes", tolua_faction_get_maxheroes,
@@ -549,7 +566,7 @@ void tolua_faction_open(lua_State * L)
             tolua_variable(L, TOLUA_CAST "alliance", tolua_faction_get_alliance,
                 tolua_faction_set_alliance);
             tolua_variable(L, TOLUA_CAST "score", tolua_faction_get_score, NULL);
-            tolua_variable(L, TOLUA_CAST "magic", &tolua_faction_get_magic,
+            tolua_variable(L, TOLUA_CAST "magic", tolua_faction_get_magic,
                 tolua_faction_set_magic);
             tolua_variable(L, TOLUA_CAST "age", tolua_faction_get_age,
                 tolua_faction_set_age);
@@ -559,11 +576,11 @@ void tolua_faction_open(lua_State * L)
             tolua_variable(L, TOLUA_CAST "lastturn", tolua_faction_get_lastturn,
                 tolua_faction_set_lastturn);
 
-            tolua_function(L, TOLUA_CAST "set_policy", &tolua_faction_set_policy);
-            tolua_function(L, TOLUA_CAST "get_policy", &tolua_faction_get_policy);
-            tolua_function(L, TOLUA_CAST "get_origin", &tolua_faction_get_origin);
-            tolua_function(L, TOLUA_CAST "set_origin", &tolua_faction_set_origin);
-            tolua_function(L, TOLUA_CAST "normalize", &tolua_faction_normalize);
+            tolua_function(L, TOLUA_CAST "set_policy", tolua_faction_set_policy);
+            tolua_function(L, TOLUA_CAST "get_policy", tolua_faction_get_policy);
+            tolua_function(L, TOLUA_CAST "get_origin", tolua_faction_get_origin);
+            tolua_function(L, TOLUA_CAST "set_origin", tolua_faction_set_origin);
+            tolua_function(L, TOLUA_CAST "normalize", tolua_faction_normalize);
 
             tolua_function(L, TOLUA_CAST "add_item", tolua_faction_add_item);
             tolua_variable(L, TOLUA_CAST "items", tolua_faction_get_items, NULL);
@@ -572,7 +589,10 @@ void tolua_faction_open(lua_State * L)
             tolua_function(L, TOLUA_CAST "create", tolua_faction_create);
             tolua_function(L, TOLUA_CAST "get", tolua_faction_get);
             tolua_function(L, TOLUA_CAST "destroy", tolua_faction_destroy);
-            tolua_function(L, TOLUA_CAST "add_notice", &tolua_faction_addnotice);
+            tolua_function(L, TOLUA_CAST "add_notice", tolua_faction_addnotice);
+
+            /* tech debt hack, siehe https://paper.dropbox.com/doc/Weihnachten-2015-5tOx5r1xsgGDBpb0gILrv#:h=Probleme-mit-Tests-(Nachtrag-0 */
+            tolua_function(L, TOLUA_CAST "count_msg_type", tolua_faction_count_msg_type);
 
             tolua_variable(L, TOLUA_CAST "objects", tolua_faction_get_objects,
                 NULL);
