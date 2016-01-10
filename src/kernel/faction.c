@@ -322,7 +322,7 @@ variant read_faction_reference(struct storage * store)
 
 void write_faction_reference(const faction * f, struct storage *store)
 {
-    WRITE_INT(store, f ? f->no : 0);
+    WRITE_INT(store, (f && f->alive) ? f->no : 0);
 }
 
 void destroyfaction(faction * f)
@@ -681,7 +681,9 @@ void remove_empty_factions(void)
             if (f->alliance && f->alliance->_leader == f) {
                 setalliance(f, 0);
             }
-            free(f);
+            destroyfaction(f); // TODO: there was a free() here,
+            // are we duplicating efforts here that also happen
+            // in destroyfaction?
         }
         else
             fp = &(*fp)->next;
