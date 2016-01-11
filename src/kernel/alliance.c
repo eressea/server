@@ -424,13 +424,14 @@ void alliancevictory(void)
     }
     while (al != NULL) {
         if (!fval(al, FFL_MARK)) {
-            int qi;
-            quicklist *flist = al->members;
-            for (qi = 0; flist; ql_advance(&flist, &qi, 1)) {
-                faction *f = (faction *)ql_get(flist, qi);
+            faction **fp;
+            for (fp = &factions; *fp; ) {
+                faction *f = *fp;
                 if (f->alliance == al) {
                     ADDMSG(&f->msgs, msg_message("alliance::lost", "alliance", al));
-                    destroyfaction(f);
+                    destroyfaction(fp);
+                } else {
+                    fp = &f->next;
                 }
             }
         }

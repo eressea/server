@@ -1463,7 +1463,7 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
 
     assert(urace);
     if (f) {
-        assert(f->alive);
+        assert(faction_alive(f));
         u_setfaction(u, f);
 
         if (f->locale) {
@@ -1828,7 +1828,7 @@ void remove_empty_units_in_region(region * r)
 
         if (u->number) {
             faction *f = u->faction;
-            if (f == NULL || !f->alive) {
+            if (f == NULL || !faction_alive(f)) {
                 set_number(u, 0);
             }
         }

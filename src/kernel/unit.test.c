@@ -86,7 +86,7 @@ static void test_remove_units_with_dead_faction(CuTest *tc) {
 
     u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
     uid = u->no;
-    u->faction->alive = false;
+    u->faction->_alive = false;
     remove_empty_units_in_region(u->region);
     CuAssertPtrEquals(tc, 0, findunit(uid));
     CuAssertIntEquals(tc, 0, u->number);
