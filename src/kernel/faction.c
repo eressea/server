@@ -658,6 +658,11 @@ void remove_empty_factions(void)
     }
 }
 
+bool faction_alive(faction *f) {
+    assert(f);
+    return f->_alive || (f->flags&FFL_NPC);
+}
+
 void faction_getorigin(const faction * f, int id, int *x, int *y)
 {
     ursprung *ur;

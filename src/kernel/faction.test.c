@@ -107,7 +107,7 @@ static void test_addfaction(CuTest *tc) {
     CuAssertIntEquals(tc, 1234, f->subscription);
     CuAssertIntEquals(tc, 0, f->flags);
     CuAssertIntEquals(tc, 0, f->age);
-    CuAssertIntEquals(tc, true, f->_alive);
+    CuAssertIntEquals(tc, true, faction_alive(f));
     CuAssertIntEquals(tc, M_GRAY, f->magiegebiet);
     CuAssertIntEquals(tc, turn, f->lastorders);
     CuAssertPtrEquals(tc, f, findfaction(f->no));

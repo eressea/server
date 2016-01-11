@@ -123,6 +123,8 @@ extern "C" {
     bool checkpasswd(const faction * f, const char *passwd);
     void destroyfaction(faction ** f);
 
+    bool faction_alive(struct faction *f);
+
     void set_alliance(struct faction *a, struct faction *b, int status);
     int get_alliance(const struct faction *a, const struct faction *b);
 
