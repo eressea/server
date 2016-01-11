@@ -332,7 +332,6 @@ void destroyfaction(faction ** fp)
 {
     faction * f = *fp;
     unit *u = f->units;
-    faction *ff;
 
     *fp = f->next;
     fset(f, FFL_QUIT);
@@ -394,7 +393,8 @@ void destroyfaction(faction ** fp)
     }
 
     handle_event(f->attribs, "destroy", f);
-/* alliedgroup and others should check sf.faction.alive before using a faction from f.allies
+#if 0
+    faction *ff;
     for (ff = factions; ff; ff = ff->next) {
         group *g;
         ally *sf, **sfp;
@@ -421,7 +421,8 @@ void destroyfaction(faction ** fp)
             }
         }
     }
-*/
+#endif
+
     if (f->alliance && f->alliance->_leader == f) {
         setalliance(f, 0);
     }
@@ -431,6 +432,7 @@ void destroyfaction(faction ** fp)
     /* units of other factions that were disguised as this faction
      * have their disguise replaced by ordinary faction hiding. */
     if (rule_stealth_other()) {
+        // TODO: f.alive should be tested for in get_otherfaction
         region *rc;
         for (rc = regions; rc; rc = rc->next) {
             for (u = rc->units; u; u = u->next) {
