@@ -78,6 +78,7 @@ void test_cleanup(void)
 {
     int i;
 
+    free_gamedata();
     free_terrains();
     free_resources();
     free_config();
@@ -89,7 +90,6 @@ void test_cleanup(void)
     free_shiptypes();
     free_races();
     free_spellbooks();
-    free_gamedata();
     free_seen();
     free_prefixes();
     mt_clear();

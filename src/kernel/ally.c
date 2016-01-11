@@ -170,6 +170,9 @@ int
 alliedgroup(const struct plane *pl, const struct faction *f,
     const struct faction *f2, const struct ally *sf, int mode)
 {
+    if (!(faction_alive(f) && faction_alive(f2))) {
+        return 0;
+    }
     while (sf && sf->faction != f2)
         sf = sf->next;
     if (sf == NULL) {

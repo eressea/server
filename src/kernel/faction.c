@@ -71,9 +71,12 @@ faction *factions;
  * but you should still call funhash and remove the faction from the
  * global list.
  */
-void free_faction(faction * f)
+static void free_faction(faction * f)
 {
     funhash(f);
+    if (f->alliance && f->alliance->_leader == f) {
+        setalliance(f, 0);
+    }
     if (f->msgs) {
         free_messagelist(f->msgs->begin);
         free(f->msgs);
@@ -325,13 +328,33 @@ void write_faction_reference(const faction * f, struct storage *store)
     WRITE_INT(store, (f && f->_alive) ? f->no : 0);
 }
 
+static faction *dead_factions;
+
+void free_flist(faction **fp) {
+    faction * flist = *fp;
+    for (flist = factions; flist;) {
+        faction *f = flist;
+        flist = f->next;
+        free_faction(f);
+        free(f);
+    }
+    *fp = 0;
+}
+
+void free_factions(void) {
+    free_flist(&factions);
+    free_flist(&dead_factions);
+}
+
 void destroyfaction(faction ** fp)
 {
     faction * f = *fp;
     unit *u = f->units;
-    faction *ff;
 
     *fp = f->next;
+    f->next = dead_factions;
+    dead_factions = f;
+
     fset(f, FFL_QUIT);
     f->_alive = false;
 
@@ -389,8 +412,10 @@ void destroyfaction(faction ** fp)
             u = u->nextF;
         }
     }
-    /* no way!  f->units = NULL; */
+
     handle_event(f->attribs, "destroy", f);
+#if 0
+    faction *ff;
     for (ff = factions; ff; ff = ff->next) {
         group *g;
         ally *sf, **sfp;
@@ -417,6 +442,7 @@ void destroyfaction(faction ** fp)
             }
         }
     }
+#endif
 
     if (f->alliance && f->alliance->_leader == f) {
         setalliance(f, 0);
@@ -427,6 +453,7 @@ void destroyfaction(faction ** fp)
     /* units of other factions that were disguised as this faction
      * have their disguise replaced by ordinary faction hiding. */
     if (rule_stealth_other()) {
+        // TODO: f.alive should be tested for in get_otherfaction
         region *rc;
         for (rc = regions; rc; rc = rc->next) {
             for (u = rc->units; u; u = u->next) {
@@ -650,6 +677,8 @@ void remove_empty_factions(void)
         if (!(f->_alive && f->units!=NULL) && !fval(f, FFL_NOIDLEOUT)) {
             log_debug("dead: %s", factionname(f));
             destroyfaction(fp);
+            free_faction(f);
+            free(f);
         }
         else {
             fp = &(*fp)->next;
@@ -657,7 +686,7 @@ void remove_empty_factions(void)
     }
 }
 
-bool faction_alive(faction *f) {
+bool faction_alive(const faction *f) {
     assert(f);
     return f->_alive || (f->flags&FFL_NPC);
 }

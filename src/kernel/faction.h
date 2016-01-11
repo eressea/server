@@ -82,8 +82,8 @@ extern "C" {
         int num_total;              /* Anzahl Personen mit Monstern */
         int options;
         int no_units;
-        struct ally *allies;
-        struct group *groups;
+        struct ally *allies; /* alliedgroup and others should check sf.faction.alive before using a faction from f.allies */
+        struct group *groups; /* alliedgroup and others should check sf.faction.alive before using a faction from f.groups */
         int nregions;
         int money;
         score_t score;
@@ -123,7 +123,7 @@ extern "C" {
     bool checkpasswd(const faction * f, const char *passwd);
     void destroyfaction(faction ** f);
 
-    bool faction_alive(struct faction *f);
+    bool faction_alive(const struct faction *f);
 
     void set_alliance(struct faction *a, struct faction *b, int status);
     int get_alliance(const struct faction *a, const struct faction *b);
@@ -136,7 +136,7 @@ extern "C" {
     int resolve_faction(variant data, void *addr);
 
     void renumber_faction(faction * f, int no);
-    void free_faction(struct faction *f);
+    void free_factions(void);
     void remove_empty_factions(void);
 
 #ifdef SMART_INTERVALS

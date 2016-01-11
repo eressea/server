@@ -1058,9 +1058,6 @@ void free_gamedata(void)
 {
     int i;
     free_donations();
-    free_units();
-    free_regions();
-    free_borders();
 
     for (i = 0; i != MAXLOCALES; ++i) {
         if (defaults[i]) {
@@ -1068,14 +1065,11 @@ void free_gamedata(void)
             defaults[i] = 0;
         }
     }
+    free_factions();
+    free_units();
+    free_regions();
+    free_borders();
     free_alliances();
-    while (factions) {
-        faction *f = factions;
-        factions = f->next;
-        funhash(f);
-        free_faction(f);
-        free(f);
-    }
 
     while (planes) {
         plane *pl = planes;
