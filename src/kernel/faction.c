@@ -423,7 +423,6 @@ void destroyfaction(faction ** fp)
     }
 
     funhash(f);
-    free_faction(f);
 
     /* units of other factions that were disguised as this faction
      * have their disguise replaced by ordinary faction hiding. */
