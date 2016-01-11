@@ -333,6 +333,7 @@ void destroyfaction(faction ** fp)
 
     *fp = f->next;
     fset(f, FFL_QUIT);
+    f->_alive = false;
 
     if (f->spellbook) {
         spellbook_clear(f->spellbook);
@@ -388,7 +389,6 @@ void destroyfaction(faction ** fp)
             u = u->nextF;
         }
     }
-    f->alive = false;
     /* no way!  f->units = NULL; */
     handle_event(f->attribs, "destroy", f);
     for (ff = factions; ff; ff = ff->next) {
@@ -648,7 +648,7 @@ void remove_empty_factions(void)
     for (fp = &factions; *fp;) {
         faction *f = *fp;
 
-        if ((!f->alive || !f->units) && !fval(f, FFL_NOIDLEOUT)) {
+        if (!(f->_alive && f->units!=NULL) && !fval(f, FFL_NOIDLEOUT)) {
             log_debug("dead: %s", factionname(f));
             destroyfaction(fp);
         }

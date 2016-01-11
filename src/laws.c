@@ -1244,7 +1244,7 @@ static void remove_idle_players(void)
     age = calloc(_max(4, turn + 1), sizeof(int));
     for (fp = &factions; *fp;) {
         faction *f = *fp;
-        if (f->alive && !is_monsters(f)) {
+        if (!is_monsters(f)) {
             if (RemoveNMRNewbie() && !fval(f, FFL_NOIDLEOUT)) {
                 if (f->age >= 0 && f->age <= turn)
                     ++age[f->age];
@@ -4267,18 +4267,16 @@ static int warn_password(void)
     faction *f;
     for (f = factions; f; f = f->next) {
         bool pwok = true;
-        if (f->alive) {
-            const char *c = f->passw;
-            while (*c && pwok) {
-                if (!isalnum((unsigned char)*c))
-                    pwok = false;
-                c++;
-            }
-            if (!pwok) {
-                free(f->passw);
-                f->passw = _strdup(itoa36(rng_int()));
-                ADDMSG(&f->msgs, msg_message("illegal_password", "newpass", f->passw));
-            }
+        const char *c = f->passw;
+        while (*c && pwok) {
+            if (!isalnum((unsigned char)*c))
+                pwok = false;
+            c++;
+        }
+        if (!pwok) {
+            free(f->passw);
+            f->passw = _strdup(itoa36(rng_int()));
+            ADDMSG(&f->msgs, msg_message("illegal_password", "newpass", f->passw));
         }
     }
     return 0;
