@@ -103,7 +103,7 @@ extern "C" {
         struct item *items;         /* items this faction can claim */
         struct seen_region **seen;
         struct quicklist *seen_factions;
-        bool alive;              /* enno: sollte ein flag werden */
+        bool _alive;              /* enno: sollte ein flag werden */
     } faction;
 
     extern struct faction *factions;
@@ -121,7 +121,9 @@ extern "C" {
     struct faction *addfaction(const char *email, const char *password,
         const struct race *frace, const struct locale *loc, int subscription);
     bool checkpasswd(const faction * f, const char *passwd);
-    void destroyfaction(faction * f);
+    void destroyfaction(faction ** f);
+
+    bool faction_alive(struct faction *f);
 
     void set_alliance(struct faction *a, struct faction *b, int status);
     int get_alliance(const struct faction *a, const struct faction *b);

@@ -1668,7 +1668,7 @@ int readgame(const char *filename, bool backup)
     log_debug("marking factions as alive.\n");
     for (f = factions; f; f = f->next) {
         if (f->flags & FFL_NPC) {
-            f->alive = 1;
+            f->_alive = true;
             f->magiegebiet = M_GRAY;
             if (f->no == 0) {
                 int no = 666;
@@ -1698,7 +1698,7 @@ int readgame(const char *filename, bool backup)
                     }
                 }
                 if (u->number > 0) {
-                    f->alive = true;
+                    f->_alive = true;
                     if (global.data_version >= SPELL_LEVEL_VERSION) {
                         break;
                     }

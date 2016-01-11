@@ -89,7 +89,7 @@ int update_nmrs(void)
         if (fval(f, FFL_ISNEW)) {
             ++newplayers;
         }
-        else if (!fval(f, FFL_NOIDLEOUT) && f->alive) {
+        else if (!fval(f, FFL_NOIDLEOUT)) {
             int nmr = turn - f->lastorders + 1;
             if (nmr < 0 || nmr > NMRTimeout()) {
                 log_error("faction %s has %d NMRS\n", factionid(f), nmr);
@@ -370,7 +370,7 @@ summary *make_summary(void)
         f->nregions = 0;
         f->num_total = 0;
         f->money = 0;
-        if (f->alive && f->units) {
+        if (f->units) {
             s->factions++;
             /* Problem mit Monsterpartei ... */
             if (!is_monsters(f)) {

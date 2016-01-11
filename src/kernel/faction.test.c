@@ -75,8 +75,8 @@ static void test_remove_dead_factions(CuTest *tc) {
     remove_empty_factions();
     CuAssertPtrEquals(tc, f, findfaction(f->no));
     CuAssertPtrNotNull(tc, get_monsters());
-    fm->alive = 0;
-    f->alive = 0;
+    fm->units = 0;
+    f->_alive = false;
     fno = f->no;
     remove_empty_factions();
     CuAssertPtrEquals(tc, 0, findfaction(fno));
@@ -107,7 +107,7 @@ static void test_addfaction(CuTest *tc) {
     CuAssertIntEquals(tc, 1234, f->subscription);
     CuAssertIntEquals(tc, 0, f->flags);
     CuAssertIntEquals(tc, 0, f->age);
-    CuAssertIntEquals(tc, 1, f->alive);
+    CuAssertIntEquals(tc, true, faction_alive(f));
     CuAssertIntEquals(tc, M_GRAY, f->magiegebiet);
     CuAssertIntEquals(tc, turn, f->lastorders);
     CuAssertPtrEquals(tc, f, findfaction(f->no));
