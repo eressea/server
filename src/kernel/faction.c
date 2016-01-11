@@ -74,6 +74,9 @@ faction *factions;
 void free_faction(faction * f)
 {
     funhash(f);
+    if (f->alliance && f->alliance->_leader == f) {
+        setalliance(f, 0);
+    }
     if (f->msgs) {
         free_messagelist(f->msgs->begin);
         free(f->msgs);
@@ -389,8 +392,9 @@ void destroyfaction(faction ** fp)
             u = u->nextF;
         }
     }
-    /* no way!  f->units = NULL; */
+
     handle_event(f->attribs, "destroy", f);
+/* alliedgroup and others should check sf.faction.alive before using a faction from f.allies
     for (ff = factions; ff; ff = ff->next) {
         group *g;
         ally *sf, **sfp;
@@ -417,7 +421,7 @@ void destroyfaction(faction ** fp)
             }
         }
     }
-
+*/
     if (f->alliance && f->alliance->_leader == f) {
         setalliance(f, 0);
     }
@@ -650,6 +654,8 @@ void remove_empty_factions(void)
         if (!(f->_alive && f->units!=NULL) && !fval(f, FFL_NOIDLEOUT)) {
             log_debug("dead: %s", factionname(f));
             destroyfaction(fp);
+            free_faction(f);
+            free(f);
         }
         else {
             fp = &(*fp)->next;
@@ -657,7 +663,7 @@ void remove_empty_factions(void)
     }
 }
 
-bool faction_alive(faction *f) {
+bool faction_alive(const faction *f) {
     assert(f);
     return f->_alive || (f->flags&FFL_NPC);
 }
