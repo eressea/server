@@ -119,6 +119,16 @@ static void test_addfaction(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_check_passwd(CuTest *tc) {
+    faction *f;
+    
+    f = test_create_faction(0);
+    faction_setpassword(f, "password");
+    CuAssertIntEquals(tc, true, checkpasswd(f, "password"));
+    CuAssertIntEquals(tc, true, checkpasswd(f, "PASSWORD"));
+    CuAssertIntEquals(tc, false, checkpasswd(f, "assword"));
+}
+
 static void test_get_monsters(CuTest *tc) {
     faction *f;
 
@@ -185,5 +195,6 @@ CuSuite *get_faction_suite(void)
     SUITE_ADD_TEST(suite, test_get_monsters);
     SUITE_ADD_TEST(suite, test_set_origin);
     SUITE_ADD_TEST(suite, test_set_origin_bug);
+    SUITE_ADD_TEST(suite, test_check_passwd);
     return suite;
 }

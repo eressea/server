@@ -313,7 +313,13 @@ unit *addplayer(region * r, faction * f)
 
 bool checkpasswd(const faction * f, const char *passwd)
 {
-    return (passwd && unicode_utf8_strcasecmp(f->passw, passwd) == 0);
+    if (!passwd) return false;
+    if (strcmp(f->passw, passwd)==0) return true;
+    if (unicode_utf8_strcasecmp(f->passw, passwd) == 0) {
+        log_warning("case-sensitive password check failed: %s", factionname(f));
+        return true;
+    }
+    return false;
 }
 
 variant read_faction_reference(struct storage * store)
