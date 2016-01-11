@@ -136,7 +136,7 @@ extern "C" {
     int resolve_faction(variant data, void *addr);
 
     void renumber_faction(faction * f, int no);
-    void free_faction(struct faction *f);
+    void free_factions(void);
     void remove_empty_factions(void);
 
 #ifdef SMART_INTERVALS

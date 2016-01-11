@@ -1065,12 +1065,7 @@ void free_gamedata(void)
             defaults[i] = 0;
         }
     }
-    while (factions) {
-        faction *f = factions;
-        factions = f->next;
-        free_faction(f);
-        free(f);
-    }
+    free_factions();
     free_units();
     free_regions();
     free_borders();

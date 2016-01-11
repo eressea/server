@@ -71,7 +71,7 @@ faction *factions;
  * but you should still call funhash and remove the faction from the
  * global list.
  */
-void free_faction(faction * f)
+static void free_faction(faction * f)
 {
     funhash(f);
     if (f->alliance && f->alliance->_leader == f) {
@@ -328,12 +328,33 @@ void write_faction_reference(const faction * f, struct storage *store)
     WRITE_INT(store, (f && f->_alive) ? f->no : 0);
 }
 
+static faction *dead_factions;
+
+void free_flist(faction **fp) {
+    faction * flist = *fp;
+    for (flist = factions; flist;) {
+        faction *f = flist;
+        flist = f->next;
+        free_faction(f);
+        free(f);
+    }
+    *fp = 0;
+}
+
+void free_factions(void) {
+    free_flist(&factions);
+    free_flist(&dead_factions);
+}
+
 void destroyfaction(faction ** fp)
 {
     faction * f = *fp;
     unit *u = f->units;
 
     *fp = f->next;
+    f->next = dead_factions;
+    dead_factions = f;
+
     fset(f, FFL_QUIT);
     f->_alive = false;
 
