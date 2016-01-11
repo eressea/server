@@ -75,7 +75,7 @@ static void test_remove_dead_factions(CuTest *tc) {
     remove_empty_factions();
     CuAssertPtrEquals(tc, f, findfaction(f->no));
     CuAssertPtrNotNull(tc, get_monsters());
-    fm->alive = 0;
+    fm->units = 0;
     f->alive = 0;
     fno = f->no;
     remove_empty_factions();

@@ -343,8 +343,14 @@ static int tolua_faction_get_origin(lua_State * L)
 
 static int tolua_faction_destroy(lua_State * L)
 {
-    faction *f = (faction *)tolua_tousertype(L, 1, 0);
-    destroyfaction(f);
+    faction **fp, *f = (faction *)tolua_tousertype(L, 1, 0);
+    // TODO: this loop is slow af, but what can we do?
+    for (fp = &factions; *fp; fp = &(*fp)->next) {
+        if (*fp == f) {
+            destroyfaction(fp);
+            break;
+        }
+    }
     return 0;
 }
 

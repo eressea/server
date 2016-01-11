@@ -1220,42 +1220,45 @@ static void nmr_death(faction * f)
 
 static void remove_idle_players(void)
 {
-    faction *f;
+    faction **fp;
 
     log_info(" - beseitige Spieler, die sich zu lange nicht mehr gemeldet haben...");
 
-    for (f = factions; f; f = f->next) {
+    for (fp = &factions; *fp;) {
+        faction *f = *fp;
         if (fval(f, FFL_NOIDLEOUT)) {
             f->lastorders = turn;
         }
         if (NMRTimeout() > 0 && turn - f->lastorders >= NMRTimeout()) {
             nmr_death(f);
-            destroyfaction(f);
-            continue;
-        }
-        if (turn != f->lastorders) {
+            destroyfaction(fp);
+        } else if (turn != f->lastorders) {
             char info[256];
             sprintf(info, "%d Einheiten, %d Personen, %d Silber",
                 f->no_units, f->num_total, f->money);
         }
+        fp = &f->next;
     }
     log_info(" - beseitige Spieler, die sich nach der Anmeldung nicht gemeldet haben...");
 
     age = calloc(_max(4, turn + 1), sizeof(int));
-    for (f = factions; f; f = f->next)
-        if (!is_monsters(f)) {
+    for (fp = &factions; *fp;) {
+        faction *f = *fp;
+        if (f->alive && !is_monsters(f)) {
             if (RemoveNMRNewbie() && !fval(f, FFL_NOIDLEOUT)) {
                 if (f->age >= 0 && f->age <= turn)
                     ++age[f->age];
                 if (f->age == 2 || f->age == 3) {
                     if (f->lastorders == turn - 2) {
-                        destroyfaction(f);
                         ++dropouts[f->age - 2];
+                        destroyfaction(fp);
                         continue;
                     }
                 }
             }
         }
+        fp = &f->next;
+    }
 }
 
 void quit(void)
@@ -1264,7 +1267,7 @@ void quit(void)
     while (*fptr) {
         faction *f = *fptr;
         if (f->flags & FFL_QUIT) {
-            destroyfaction(f);
+            destroyfaction(fptr);
         }
         else {
             ++f->age;
@@ -1272,8 +1275,6 @@ void quit(void)
                 ADDMSG(&f->msgs, msg_message("newbieimmunity", "turns",
                     NewbieImmunity() - f->age - 1));
             }
-        }
-        if (*fptr == f) {
             fptr = &f->next;
         }
     }
@@ -4263,21 +4264,22 @@ static void maintain_buildings_1(region * r)
  */
 static int warn_password(void)
 {
-    faction *f = factions;
-    while (f) {
+    faction *f;
+    for (f = factions; f; f = f->next) {
         bool pwok = true;
-        const char *c = f->passw;
-        while (*c && pwok) {
-            if (!isalnum((unsigned char)*c))
-                pwok = false;
-            c++;
+        if (f->alive) {
+            const char *c = f->passw;
+            while (*c && pwok) {
+                if (!isalnum((unsigned char)*c))
+                    pwok = false;
+                c++;
+            }
+            if (!pwok) {
+                free(f->passw);
+                f->passw = _strdup(itoa36(rng_int()));
+                ADDMSG(&f->msgs, msg_message("illegal_password", "newpass", f->passw));
+            }
         }
-        if (!pwok) {
-            free(f->passw);
-            f->passw = _strdup(itoa36(rng_int()));
-            ADDMSG(&f->msgs, msg_message("illegal_password", "newpass", f->passw));
-        }
-        f = f->next;
     }
     return 0;
 }

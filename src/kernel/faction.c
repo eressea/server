@@ -252,7 +252,7 @@ faction *addfaction(const char *email, const char *password,
 
     f->alliance_joindate = turn;
     f->lastorders = turn;
-    f->alive = 1;
+    f->_alive = true;
     f->age = 0;
     f->race = frace;
     f->magiegebiet = 0;
@@ -322,17 +322,16 @@ variant read_faction_reference(struct storage * store)
 
 void write_faction_reference(const faction * f, struct storage *store)
 {
-    WRITE_INT(store, (f && f->alive) ? f->no : 0);
+    WRITE_INT(store, (f && f->_alive) ? f->no : 0);
 }
 
-void destroyfaction(faction * f)
+void destroyfaction(faction ** fp)
 {
+    faction * f = *fp;
     unit *u = f->units;
     faction *ff;
 
-    if (!f->alive) {
-        return;
-    }
+    *fp = f->next;
     fset(f, FFL_QUIT);
 
     if (f->spellbook) {
@@ -389,31 +388,42 @@ void destroyfaction(faction * f)
             u = u->nextF;
         }
     }
-    f->alive = 0;
+    f->alive = false;
     /* no way!  f->units = NULL; */
     handle_event(f->attribs, "destroy", f);
     for (ff = factions; ff; ff = ff->next) {
         group *g;
-        ally *sf, *sfn;
+        ally *sf, **sfp;
 
-        /* Alle HELFE für die Partei löschen */
-        for (sf = ff->allies; sf; sf = sf->next) {
-            if (sf->faction == f) {
-                removelist(&ff->allies, sf);
-                break;
+        for (sfp = &ff->allies; *sfp;) {
+            sf = *sfp;
+            if (sf->faction == f || sf->faction == NULL) {
+                *sfp = sf->next;
+                free(sf);
             }
+            else
+                sfp = &(*sfp)->next;
         }
         for (g = ff->groups; g; g = g->next) {
-            for (sf = g->allies; sf;) {
-                sfn = sf->next;
-                if (sf->faction == f) {
-                    removelist(&g->allies, sf);
-                    break;
+            for (sfp = &g->allies; *sfp; ) {
+                sf = *sfp;
+                if (sf->faction == f || sf->faction == NULL) {
+                    *sfp = sf->next;
+                    free(sf);
                 }
-                sf = sfn;
+                else {
+                    sfp = &(*sfp)->next;
+                }
             }
         }
     }
+
+    if (f->alliance && f->alliance->_leader == f) {
+        setalliance(f, 0);
+    }
+
+    funhash(f);
+    free_faction(f);
 
     /* units of other factions that were disguised as this faction
      * have their disguise replaced by ordinary faction hiding. */
@@ -633,60 +643,18 @@ int skill_limit(faction * f, skill_t sk)
 
 void remove_empty_factions(void)
 {
-    faction **fp, *f3;
+    faction **fp;
 
     for (fp = &factions; *fp;) {
         faction *f = *fp;
-        /* monster (0) werden nicht entfernt. alive kann beim readgame
-        * () auf 0 gesetzt werden, wenn monsters keine einheiten mehr
-        * haben. */
-        if ((f->units == NULL || f->alive == 0) && !fval(f, FFL_NOIDLEOUT)) {
-            ursprung *ur = f->ursprung;
-            while (ur && ur->id != 0)
-                ur = ur->next;
+
+        if ((!f->alive || !f->units) && !fval(f, FFL_NOIDLEOUT)) {
             log_debug("dead: %s", factionname(f));
-
-            /* Einfach in eine Datei schreiben und sp�ter vermailen */
-
-            for (f3 = factions; f3; f3 = f3->next) {
-                ally *sf;
-                group *g;
-                ally **sfp = &f3->allies;
-                while (*sfp) {
-                    sf = *sfp;
-                    if (sf->faction == f || sf->faction == NULL) {
-                        *sfp = sf->next;
-                        free(sf);
-                    }
-                    else
-                        sfp = &(*sfp)->next;
-                }
-                for (g = f3->groups; g; g = g->next) {
-                    sfp = &g->allies;
-                    while (*sfp) {
-                        sf = *sfp;
-                        if (sf->faction == f || sf->faction == NULL) {
-                            *sfp = sf->next;
-                            free(sf);
-                        }
-                        else
-                            sfp = &(*sfp)->next;
-                    }
-                }
-            }
-
-            *fp = f->next;
-            funhash(f);
-            free_faction(f);
-            if (f->alliance && f->alliance->_leader == f) {
-                setalliance(f, 0);
-            }
-            destroyfaction(f); // TODO: there was a free() here,
-            // are we duplicating efforts here that also happen
-            // in destroyfaction?
+            destroyfaction(fp);
         }
-        else
+        else {
             fp = &(*fp)->next;
+        }
     }
 }
 
