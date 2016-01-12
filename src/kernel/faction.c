@@ -19,7 +19,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include <kernel/config.h>
 #include "faction.h"
-
 #include "alliance.h"
 #include "ally.h"
 #include "curse.h"
@@ -46,6 +45,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/log.h>
 #include <util/parser.h>
+#include <util/password.h>
 #include <util/resolve.h>
 #include <util/rng.h>
 #include <util/variant.h>
@@ -63,6 +63,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 faction *factions;
 
@@ -252,7 +253,7 @@ faction *addfaction(const char *email, const char *password,
     }
 
     if (!password) password = itoa36(rng_int());
-    faction_setpassword(f, password);
+    faction_setpassword(f, password_hash(password));
     ADDMSG(&f->msgs, msg_message("changepasswd", "value", password));
 
     f->alliance_joindate = turn;
@@ -313,16 +314,27 @@ unit *addplayer(region * r, faction * f)
     return u;
 }
 
+extern char *sha256_crypt(const char *key, const char *salt);
+
+const char * mksalt(char *salt, size_t len) {
+    char *dst = salt;
+    int ent = (int)time(0);
+    // FIXME: worst ever salt generation
+    while (dst < salt + len) {
+        *dst++ = itoa36(ent & rng_int())[0];
+    }
+    return salt;
+}
+
 bool checkpasswd(const faction * f, const char *passwd)
 {
     if (!passwd) return false;
-    if (strcmp(f->_password, passwd)==0) return true;
-    if (unicode_utf8_strcasecmp(f->_password, passwd) == 0) {
-        log_warning("case-sensitive password check failed: %s", factionname(f));
-        return true;
+
+    if (password_verify(f->_password, passwd) == VERIFY_FAIL) {
+        log_warning("password check failed: %s", factionname(f));
+        return false;
     }
-    log_warning("password check failed: %s", factionname(f));
-    return false;
+    return true;
 }
 
 variant read_faction_reference(struct storage * store)
@@ -565,11 +577,11 @@ void faction_setbanner(faction * self, const char *banner)
         self->banner = _strdup(banner);
 }
 
-void faction_setpassword(faction * f, const char *passw)
+void faction_setpassword(faction * f, const char *pwhash)
 {
-    assert(passw);
+    assert(pwhash && pwhash[0] == '$');
     free(f->_password);
-    f->_password = _strdup(passw);
+    f->_password = _strdup(pwhash);
 }
 
 bool valid_race(const struct faction *f, const struct race *rc)

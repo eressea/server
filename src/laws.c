@@ -79,6 +79,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/parser.h>
+#include <util/password.h>
 #include <quicklist.h>
 #include <util/rand.h>
 #include <util/rng.h>
@@ -2169,7 +2170,7 @@ int password_cmd(unit * u, struct order *ord)
         cmistake(u, ord, 283, MSG_EVENT);
         strlcpy(pwbuf, itoa36(rng_int()), sizeof(pwbuf));
     }
-    faction_setpassword(u->faction, pwbuf);
+    faction_setpassword(u->faction, password_hash(pwbuf));
     ADDMSG(&u->faction->msgs, msg_message("changepasswd",
         "value", pwbuf));
     return 0;

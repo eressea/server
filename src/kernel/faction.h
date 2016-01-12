@@ -153,8 +153,7 @@ extern "C" {
     const char *faction_getemail(const struct faction *self);
     void faction_setemail(struct faction *self, const char *email);
 
-    // const char *faction_getpassword(const struct faction *self);
-    void faction_setpassword(struct faction *self, const char *password);
+    void faction_setpassword(struct faction *self, const char *pwhash);
     bool valid_race(const struct faction *f, const struct race *rc);
 
     void faction_getorigin(const struct faction * f, int id, int *x, int *y);

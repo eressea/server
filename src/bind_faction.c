@@ -31,6 +31,8 @@ without prior permission by the authors of Eressea.
 
 #include <util/language.h>
 #include <util/log.h>
+#include <util/password.h>
+
 #include <quicklist.h>
 
 #include <tolua.h>
@@ -383,7 +385,8 @@ static int tolua_faction_create(lua_State * L)
 static int tolua_faction_set_password(lua_State * L)
 {
     faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    faction_setpassword(self, tolua_tostring(L, 2, 0));
+    const char * passw = tolua_tostring(L, 2, 0);
+    faction_setpassword(self, password_hash(passw));
     return 0;
 }
 

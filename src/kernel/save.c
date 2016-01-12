@@ -64,13 +64,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/parser.h>
-#include <quicklist.h>
+#include <util/password.h>
 #include <util/rand.h>
 #include <util/resolve.h>
 #include <util/rng.h>
 #include <util/umlaut.h>
 #include <util/unicode.h>
 
+#include <quicklist.h>
 #include <stream.h>
 #include <filestream.h>
 #include <storage.h>
@@ -1216,7 +1217,7 @@ faction *readfaction(struct gamedata * data)
     }
 
     READ_STR(data->store, name, sizeof(name));
-    faction_setpassword(f, name);
+    faction_setpassword(f, (data->version >= CRYPT_VERSION) ? name : password_hash(name));
     if (data->version < NOOVERRIDE_VERSION) {
         READ_STR(data->store, 0, 0);
     }

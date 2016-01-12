@@ -8,6 +8,7 @@
 #include <kernel/plane.h>
 #include <kernel/config.h>
 #include <util/language.h>
+#include <util/password.h>
 
 #include "monster.h"
 #include <CuTest.h>
@@ -123,7 +124,7 @@ static void test_check_passwd(CuTest *tc) {
     faction *f;
     
     f = test_create_faction(0);
-    faction_setpassword(f, "password");
+    faction_setpassword(f, password_hash("password"));
     CuAssertIntEquals(tc, true, checkpasswd(f, "password"));
     CuAssertIntEquals(tc, true, checkpasswd(f, "PASSWORD"));
     CuAssertIntEquals(tc, false, checkpasswd(f, "assword"));

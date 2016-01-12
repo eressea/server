@@ -3,6 +3,7 @@ project(util C)
 SET(_TEST_FILES
 base36.test.c
 parser.test.c
+password.test.c
 attrib.test.c
 strings.test.c
 bsdstring.test.c
@@ -28,6 +29,7 @@ log.c
 message.c
 nrmessage.c
 parser.c
+password.c
 rand.c
 resolve.c
 strings.c
