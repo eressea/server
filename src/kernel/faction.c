@@ -319,6 +319,7 @@ bool checkpasswd(const faction * f, const char *passwd)
         log_warning("case-sensitive password check failed: %s", factionname(f));
         return true;
     }
+    log_warning("password check failed: %s", factionname(f));
     return false;
 }
 
