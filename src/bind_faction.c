@@ -380,13 +380,6 @@ static int tolua_faction_create(lua_State * L)
     return 1;
 }
 
-static int tolua_faction_get_password(lua_State * L)
-{
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    tolua_pushstring(L, faction_getpassword(self));
-    return 1;
-}
-
 static int tolua_faction_set_password(lua_State * L)
 {
     faction *self = (faction *)tolua_tousertype(L, 1, 0);
@@ -561,7 +554,7 @@ void tolua_faction_open(lua_State * L)
             tolua_variable(L, TOLUA_CAST "heroes", tolua_faction_get_heroes, NULL);
             tolua_variable(L, TOLUA_CAST "maxheroes", tolua_faction_get_maxheroes,
                 NULL);
-            tolua_variable(L, TOLUA_CAST "password", tolua_faction_get_password,
+            tolua_variable(L, TOLUA_CAST "password", NULL,
                 tolua_faction_set_password);
             tolua_variable(L, TOLUA_CAST "email", tolua_faction_get_email,
                 tolua_faction_set_email);

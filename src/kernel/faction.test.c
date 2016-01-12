@@ -107,7 +107,7 @@ static void test_addfaction(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, (void *)f->ursprung);
     CuAssertPtrEquals(tc, (void *)factions, (void *)f);
     CuAssertStrEquals(tc, "test@eressea.de", f->email);
-    CuAssertStrEquals(tc, "hurrdurr", f->passw);
+    CuAssertIntEquals(tc, true, checkpasswd(f, "hurrdurr"));
     CuAssertPtrEquals(tc, (void *)lang, (void *)f->locale);
     CuAssertIntEquals(tc, 1234, f->subscription);
     CuAssertIntEquals(tc, 0, f->flags);

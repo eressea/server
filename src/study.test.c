@@ -45,6 +45,7 @@ static void setup_study(study_fixture *fix, skill_t sk) {
     fix->teachers[1] = test_create_unit(f, r);
     assert(fix->teachers[1]);
     fix->teachers[1]->thisorder = create_order(K_TEACH, f->locale, "%s", itoa36(fix->u->no));
+    test_clear_messages(f);
 }
 
 static void test_study_no_teacher(CuTest *tc) {

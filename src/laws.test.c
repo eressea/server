@@ -1061,6 +1061,7 @@ static void test_ally_cmd(CuTest *tc) {
     test_cleanup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     f = test_create_faction(0);
+
     u->faction->locale = lang = get_or_create_locale("de");
     locale_setstring(lang, parameters[P_NOT], "NICHT");
     locale_setstring(lang, parameters[P_GUARD], "BEWACHE");
@@ -1105,8 +1106,9 @@ static void test_nmr_warnings(CuTest *tc) {
     CuAssertIntEquals(tc, 0, f1->age);
     nmr_warnings();
     CuAssertPtrNotNull(tc, f1->msgs);
-    CuAssertPtrNotNull(tc, test_find_messagetype(f1->msgs, "changepasswd"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f1->msgs, "nmr_warning"));
     CuAssertPtrNotNull(tc, f2->msgs);
+    CuAssertPtrNotNull(tc, f2->msgs->begin);
     CuAssertPtrNotNull(tc, test_find_messagetype(f2->msgs, "nmr_warning"));
     CuAssertPtrNotNull(tc, test_find_messagetype(f2->msgs, "nmr_warning_final"));
     test_cleanup();

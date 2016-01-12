@@ -733,9 +733,6 @@ void nmr_warnings(void)
     faction *f, *fa;
 #define FRIEND (HELP_GUARD|HELP_MONEY)
     for (f = factions; f; f = f->next) {
-        if (f->age <= 1) {
-            ADDMSG(&f->msgs, msg_message("changepasswd", "value", f->passw));
-        }
         if (!fval(f, FFL_NOIDLEOUT) && turn > f->lastorders) {
             ADDMSG(&f->msgs, msg_message("nmr_warning", ""));
             if (turn - f->lastorders == NMRTimeout() - 1) {
@@ -2168,16 +2165,13 @@ int password_cmd(unit * u, struct order *ord)
             }
         }
     }
-    free(u->faction->passw);
     if (!pwok) {
         cmistake(u, ord, 283, MSG_EVENT);
-        u->faction->passw = _strdup(itoa36(rng_int()));
+        strlcpy(pwbuf, itoa36(rng_int()), sizeof(pwbuf));
     }
-    else {
-        u->faction->passw = _strdup(pwbuf);
-    }
+    faction_setpassword(u->faction, pwbuf);
     ADDMSG(&u->faction->msgs, msg_message("changepasswd",
-        "value", u->faction->passw));
+        "value", pwbuf));
     return 0;
 }
 
@@ -4256,32 +4250,6 @@ static void maintain_buildings_1(region * r)
     maintain_buildings(r, false);
 }
 
-/** warn about passwords that are not US ASCII.
- * even though passwords are technically UTF8 strings, the server receives
- * them as part of the Subject of an email when reports are requested.
- * This means that we need to limit them to ASCII characters until that
- * mechanism has been changed.
- */
-static int warn_password(void)
-{
-    faction *f;
-    for (f = factions; f; f = f->next) {
-        bool pwok = true;
-        const char *c = f->passw;
-        while (*c && pwok) {
-            if (!isalnum((unsigned char)*c))
-                pwok = false;
-            c++;
-        }
-        if (!pwok) {
-            free(f->passw);
-            f->passw = _strdup(itoa36(rng_int()));
-            ADDMSG(&f->msgs, msg_message("illegal_password", "newpass", f->passw));
-        }
-    }
-    return 0;
-}
-
 void init_processor(void)
 {
     int p;
@@ -4463,31 +4431,6 @@ void processorders(void)
     /* immer ausführen, wenn neue Sprüche dazugekommen sind, oder sich
      * Beschreibungen geändert haben */
     update_spells();
-    warn_password();
-}
-
-int writepasswd(void)
-{
-    FILE *F;
-    char zText[128];
-
-    sprintf(zText, "%s/passwd", basepath());
-    F = fopen(zText, "w");
-    if (!F) {
-        perror(zText);
-    }
-    else {
-        faction *f;
-        log_info("writing passwords...");
-
-        for (f = factions; f; f = f->next) {
-            fprintf(F, "%s:%s:%s:%u\n",
-                factionid(f), f->email, f->passw, f->subscription);
-        }
-        fclose(F);
-        return 0;
-    }
-    return 1;
 }
 
 void update_subscriptions(void)

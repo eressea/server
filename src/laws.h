@@ -38,7 +38,6 @@ extern "C" {
     extern int dropouts[2];
     extern int *age;
 
-    int writepasswd(void);
     void demographics(void);
     void immigration(void);
     void update_guards(void);

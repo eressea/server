@@ -1216,7 +1216,7 @@ faction *readfaction(struct gamedata * data)
     }
 
     READ_STR(data->store, name, sizeof(name));
-    f->passw = _strdup(name);
+    faction_setpassword(f, name);
     if (data->version < NOOVERRIDE_VERSION) {
         READ_STR(data->store, 0, 0);
     }
@@ -1320,10 +1320,10 @@ void writefaction(struct gamedata *data, const faction * f)
     }
     WRITE_INT(data->store, f->alliance_joindate);
 
-    WRITE_STR(data->store, (const char *)f->name);
-    WRITE_STR(data->store, (const char *)f->banner);
+    WRITE_STR(data->store, f->name);
+    WRITE_STR(data->store, f->banner);
     WRITE_STR(data->store, f->email);
-    WRITE_TOK(data->store, (const char *)f->passw);
+    WRITE_TOK(data->store, f->_password);
     WRITE_TOK(data->store, locale_name(f->locale));
     WRITE_INT(data->store, f->lastorders);
     WRITE_INT(data->store, f->age);
