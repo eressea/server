@@ -80,6 +80,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(bsdstring);
     ADD_SUITE(functions);
     ADD_SUITE(parser);
+    ADD_SUITE(password);
     ADD_SUITE(umlaut);
     ADD_SUITE(unicode);
     ADD_SUITE(strings);

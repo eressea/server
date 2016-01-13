@@ -9,7 +9,7 @@ static void test_passwords(CuTest *tc) {
     CuAssertStrEquals(tc, "$0$saltyfish$password", hash);
     CuAssertIntEquals(tc, VERIFY_OK, password_verify(hash, "password"));
     CuAssertIntEquals(tc, VERIFY_FAIL, password_verify(hash, "arseword"));
-    CuAssertIntEquals(tc, VERIFY_UNKNOWN, password_verify("$9$saltyfish$password", "arseword"));
+    CuAssertIntEquals(tc, VERIFY_UNKNOWN, password_verify("$9$saltyfish$password", "password"));
 }
 
 CuSuite *get_password_suite(void) {
