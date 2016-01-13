@@ -386,7 +386,7 @@ static int tolua_faction_set_password(lua_State * L)
 {
     faction *self = (faction *)tolua_tousertype(L, 1, 0);
     const char * passw = tolua_tostring(L, 2, 0);
-    faction_setpassword(self, password_hash(passw));
+    faction_setpassword(self, password_hash(passw, PASSWORD_DEFAULT));
     return 0;
 }
 

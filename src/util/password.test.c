@@ -5,7 +5,7 @@
 static void test_passwords(CuTest *tc) {
     const char *hash;
 
-    hash = password_hash("password");
+    hash = password_hash("password", PASSWORD_PLAIN);
     CuAssertPtrNotNull(tc, hash);
     CuAssertStrEquals(tc, "$0$saltyfish$password", hash);
     CuAssertIntEquals(tc, VERIFY_OK, password_verify(hash, "password"));
