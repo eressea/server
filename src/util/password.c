@@ -19,8 +19,8 @@ static const char * password_hash_i(const char * passwd, const char *salt, int a
         md5_state_t ms;
         md5_byte_t digest[16];
         md5_init(&ms);
-        md5_append(&ms, (const md5_byte_t *)passwd, strlen(passwd));
-        md5_append(&ms, (const md5_byte_t *)salt, strlen(salt));
+        md5_append(&ms, (const md5_byte_t *)passwd, (int)strlen(passwd));
+        md5_append(&ms, (const md5_byte_t *)salt, (int)strlen(salt));
         md5_finish(&ms, digest);
         _snprintf(result, len, "$1$%s$%s", salt, digest); // FIXME: need to build a hex string first!
     } 
