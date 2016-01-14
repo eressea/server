@@ -2,23 +2,55 @@
 #include "password.h"
 
 #include <md5.h>
+#include <mtrand.h>
 
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
 
 #define MAXSALTLEN 32 // maximum length in characters of any salt
+#define SALTLEN 8 // length of salts we generate
+
+/* Table with characters for base64 transformation.  */
+static const char b64t[65] =
+"./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+#define b64_from_24bit(B2, B1, B0, N)					      \
+  do {									      \
+    unsigned int w = ((B2) << 16) | ((B1) << 8) | (B0);			      \
+    int n = (N);							      \
+    while (n-- > 0 && buflen > 0)					      \
+      {									      \
+	*cp++ = b64t[w & 0x3f];						      \
+	--buflen;							      \
+	w >>= 6;							      \
+      }									      \
+  } while (0)
+
+
+char *password_gensalt(void) {
+    static char salt[SALTLEN + 1];
+    char *cp = salt;
+    int buflen = SALTLEN;
+    while (buflen) {
+        unsigned long ul = genrand_int32();
+        b64_from_24bit(ul & 0xFF, (ul>>8)&0xff, (ul>>16)&0xFF, 4);
+    }
+    salt[SALTLEN] = 0;
+    return salt;
+}
 
 static const char * password_hash_i(const char * passwd, const char *salt, int algo, char *result, size_t len) {
     assert(passwd);
-    assert(salt);
+    if (!salt) {
+        salt = password_gensalt();
+    }
     if (algo==PASSWORD_PLAIN) {
         _snprintf(result, len, "$0$%s$%s", salt, passwd);
     }
     else if (algo == PASSWORD_MD5) {
         char * result = md5_crypt(passwd, salt);
         return result;
-//        _snprintf(result, len, "$1$%s$%s", salt, digest); // FIXME: need to build a hex string first!
     } 
     else {
         return NULL;
@@ -28,7 +60,6 @@ static const char * password_hash_i(const char * passwd, const char *salt, int a
 
 const char * password_hash(const char * passwd, const char * salt, int algo) {
     static char result[64]; // TODO: static result buffers are bad mojo!
-    if (!salt) salt = "saltyass"; // FIXME: generate a secure salt!
     if (algo < 0) algo = PASSWORD_DEFAULT;
     return password_hash_i(passwd, salt, algo, result, sizeof(result));
 }
