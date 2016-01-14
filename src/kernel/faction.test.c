@@ -124,7 +124,7 @@ static void test_check_passwd(CuTest *tc) {
     faction *f;
     
     f = test_create_faction(0);
-    faction_setpassword(f, password_hash("password", PASSWORD_DEFAULT));
+    faction_setpassword(f, password_hash("password", 0, PASSWORD_DEFAULT));
     CuAssertIntEquals(tc, true, checkpasswd(f, "password"));
     CuAssertIntEquals(tc, false, checkpasswd(f, "assword"));
     CuAssertIntEquals(tc, false, checkpasswd(f, "PASSWORD"));
