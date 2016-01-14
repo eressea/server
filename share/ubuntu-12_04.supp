@@ -35,3 +35,9 @@
    fun:__GI___strncasecmp_l
    fun:____strtod_l_internal
 }
+
+{
+   kde-bug-309427
+   Memcheck:Cond
+   fun:__stpncpy_sse2_unaligned
+}
