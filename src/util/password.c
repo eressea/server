@@ -7,6 +7,7 @@
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
+#include <time.h>
 
 #define MAXSALTLEN 32 // maximum length in characters of any salt
 #define SALTLEN 8 // length of salts we generate
@@ -33,7 +34,7 @@ char *password_gensalt(void) {
     char *cp = salt;
     int buflen = SALTLEN;
     while (buflen) {
-        unsigned long ul = genrand_int32();
+        unsigned long ul = genrand_int32() & time(0);
         b64_from_24bit((char)(ul & 0xFF), (char)((ul>>8)&0xff), (char)((ul>>16)&0xFF), 4);
     }
     salt[SALTLEN] = 0;

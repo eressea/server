@@ -63,7 +63,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 
 faction *factions;
 
@@ -312,18 +311,6 @@ unit *addplayer(region * r, faction * f)
     }
 
     return u;
-}
-
-extern char *sha256_crypt(const char *key, const char *salt);
-
-const char * mksalt(char *salt, size_t len) {
-    char *dst = salt;
-    int ent = (int)time(0);
-    // FIXME: worst ever salt generation
-    while (dst < salt + len) {
-        *dst++ = itoa36(ent & rng_int())[0];
-    }
-    return salt;
 }
 
 bool checkpasswd(const faction * f, const char *passwd)
