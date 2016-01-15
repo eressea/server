@@ -68,7 +68,7 @@ extern "C" {
         char *name;
         char *banner;
         char *email;
-        char *passw;
+        char *_password;
         int max_spelllevel;
         struct spellbook *spellbook;
         const struct locale *locale;
@@ -121,6 +121,7 @@ extern "C" {
     struct faction *addfaction(const char *email, const char *password,
         const struct race *frace, const struct locale *loc, int subscription);
     bool checkpasswd(const faction * f, const char *passwd);
+    int writepasswd(void);
     void destroyfaction(faction ** f);
 
     bool faction_alive(const struct faction *f);
@@ -152,8 +153,7 @@ extern "C" {
     const char *faction_getemail(const struct faction *self);
     void faction_setemail(struct faction *self, const char *email);
 
-    const char *faction_getpassword(const struct faction *self);
-    void faction_setpassword(struct faction *self, const char *password);
+    void faction_setpassword(struct faction *self, const char *pwhash);
     bool valid_race(const struct faction *f, const struct race *rc);
 
     void faction_getorigin(const struct faction * f, int id, int *x, int *y);

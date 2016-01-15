@@ -1083,7 +1083,8 @@ function test_parser()
     
     local file = io.open(filename, "w")
     assert_not_nil(file)
-    file:write('ERESSEA ' .. itoa36(f.id) .. ' "' .. f.password .. '"\n')
+    f.password = 'Hodor'
+    file:write('ERESSEA ' .. itoa36(f.id) .. ' "Hodor"\n')
     file:write('EINHEIT ' .. itoa36(u.id) .. "\n")
     file:write("BENENNEN EINHEIT 'Goldene Herde'\n")
     file:close()

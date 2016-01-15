@@ -8,6 +8,7 @@
 #include <kernel/plane.h>
 #include <kernel/config.h>
 #include <util/language.h>
+#include <util/password.h>
 
 #include "monster.h"
 #include <CuTest.h>
@@ -107,7 +108,7 @@ static void test_addfaction(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, (void *)f->ursprung);
     CuAssertPtrEquals(tc, (void *)factions, (void *)f);
     CuAssertStrEquals(tc, "test@eressea.de", f->email);
-    CuAssertStrEquals(tc, "hurrdurr", f->passw);
+    CuAssertIntEquals(tc, true, checkpasswd(f, "hurrdurr"));
     CuAssertPtrEquals(tc, (void *)lang, (void *)f->locale);
     CuAssertIntEquals(tc, 1234, f->subscription);
     CuAssertIntEquals(tc, 0, f->flags);
@@ -117,6 +118,16 @@ static void test_addfaction(CuTest *tc) {
     CuAssertIntEquals(tc, turn, f->lastorders);
     CuAssertPtrEquals(tc, f, findfaction(f->no));
     test_cleanup();
+}
+
+static void test_check_passwd(CuTest *tc) {
+    faction *f;
+    
+    f = test_create_faction(0);
+    faction_setpassword(f, password_hash("password", 0, PASSWORD_DEFAULT));
+    CuAssertIntEquals(tc, true, checkpasswd(f, "password"));
+    CuAssertIntEquals(tc, false, checkpasswd(f, "assword"));
+    CuAssertIntEquals(tc, false, checkpasswd(f, "PASSWORD"));
 }
 
 static void test_get_monsters(CuTest *tc) {
@@ -185,5 +196,6 @@ CuSuite *get_faction_suite(void)
     SUITE_ADD_TEST(suite, test_get_monsters);
     SUITE_ADD_TEST(suite, test_set_origin);
     SUITE_ADD_TEST(suite, test_set_origin_bug);
+    SUITE_ADD_TEST(suite, test_check_passwd);
     return suite;
 }

@@ -64,13 +64,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/parser.h>
-#include <quicklist.h>
+#include <util/password.h>
 #include <util/rand.h>
 #include <util/resolve.h>
 #include <util/rng.h>
 #include <util/umlaut.h>
 #include <util/unicode.h>
 
+#include <quicklist.h>
 #include <stream.h>
 #include <filestream.h>
 #include <storage.h>
@@ -1216,7 +1217,7 @@ faction *readfaction(struct gamedata * data)
     }
 
     READ_STR(data->store, name, sizeof(name));
-    f->passw = _strdup(name);
+    faction_setpassword(f, (data->version >= CRYPT_VERSION) ? name : password_hash(name, 0, PASSWORD_DEFAULT));
     if (data->version < NOOVERRIDE_VERSION) {
         READ_STR(data->store, 0, 0);
     }
@@ -1320,10 +1321,10 @@ void writefaction(struct gamedata *data, const faction * f)
     }
     WRITE_INT(data->store, f->alliance_joindate);
 
-    WRITE_STR(data->store, (const char *)f->name);
-    WRITE_STR(data->store, (const char *)f->banner);
+    WRITE_STR(data->store, f->name);
+    WRITE_STR(data->store, f->banner);
     WRITE_STR(data->store, f->email);
-    WRITE_TOK(data->store, (const char *)f->passw);
+    WRITE_TOK(data->store, f->_password);
     WRITE_TOK(data->store, locale_name(f->locale));
     WRITE_INT(data->store, f->lastorders);
     WRITE_INT(data->store, f->age);

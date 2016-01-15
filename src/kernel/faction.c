@@ -19,7 +19,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include <kernel/config.h>
 #include "faction.h"
-
 #include "alliance.h"
 #include "ally.h"
 #include "curse.h"
@@ -46,6 +45,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/log.h>
 #include <util/parser.h>
+#include <util/password.h>
 #include <util/resolve.h>
 #include <util/rng.h>
 #include <util/variant.h>
@@ -104,7 +104,7 @@ static void free_faction(faction * f)
 
     free(f->email);
     free(f->banner);
-    free(f->passw);
+    free(f->_password);
     free(f->name);
     if (f->seen_factions) {
         ql_free(f->seen_factions);
@@ -251,7 +251,9 @@ faction *addfaction(const char *email, const char *password,
         log_warning("Invalid email address for faction %s: %s\n", itoa36(f->no), email);
     }
 
-    faction_setpassword(f, password);
+    if (!password) password = itoa36(rng_int());
+    faction_setpassword(f, password_hash(password, 0, PASSWORD_DEFAULT));
+    ADDMSG(&f->msgs, msg_message("changepasswd", "value", password));
 
     f->alliance_joindate = turn;
     f->lastorders = turn;
@@ -313,7 +315,13 @@ unit *addplayer(region * r, faction * f)
 
 bool checkpasswd(const faction * f, const char *passwd)
 {
-    return (passwd && unicode_utf8_strcasecmp(f->passw, passwd) == 0);
+    if (!passwd) return false;
+
+    if (password_verify(f->_password, passwd) == VERIFY_FAIL) {
+        log_warning("password check failed: %s", factionname(f));
+        return false;
+    }
+    return true;
 }
 
 variant read_faction_reference(struct storage * store)
@@ -556,13 +564,11 @@ void faction_setbanner(faction * self, const char *banner)
         self->banner = _strdup(banner);
 }
 
-void faction_setpassword(faction * f, const char *passw)
+void faction_setpassword(faction * f, const char *pwhash)
 {
-    free(f->passw);
-    if (passw)
-        f->passw = _strdup(passw);
-    else
-        f->passw = _strdup(itoa36(rng_int()));
+    assert(pwhash && pwhash[0] == '$');
+    free(f->_password);
+    f->_password = _strdup(pwhash);
 }
 
 bool valid_race(const struct faction *f, const struct race *rc)
@@ -575,11 +581,6 @@ bool valid_race(const struct faction *f, const struct race *rc)
             return (bool)(rc_find(str) == rc);
         return false;
     }
-}
-
-const char *faction_getpassword(const faction * f)
-{
-    return f->passw;
 }
 
 struct alliance *f_get_alliance(const struct faction *f)
@@ -846,3 +847,28 @@ faction *dfindhash(int no)
     }
     return 0;
 }
+
+int writepasswd(void)
+{
+    FILE *F;
+    char zText[128];
+
+    sprintf(zText, "%s/passwd", basepath());
+    F = fopen(zText, "w");
+    if (!F) {
+        perror(zText);
+    }
+    else {
+        faction *f;
+        log_info("writing passwords...");
+
+        for (f = factions; f; f = f->next) {
+            fprintf(F, "%s:%s:%s:%u\n",
+                factionid(f), f->email, f->_password, f->subscription);
+        }
+        fclose(F);
+        return 0;
+    }
+    return 1;
+}
+

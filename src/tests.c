@@ -64,6 +64,7 @@ struct region *test_create_region(int x, int y, const terrain_type *terrain)
 struct faction *test_create_faction(const struct race *rc)
 {
     faction *f = addfaction("nobody@eressea.de", NULL, rc ? rc : test_create_race("human"), default_locale, 0);
+    test_clear_messages(f);
     return f;
 }
 

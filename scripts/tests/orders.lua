@@ -73,12 +73,10 @@ function test_process_settings()
     f.options = 0
     u:add_order("EMAIL herp@derp.com")
     u:add_order("BANNER 'Herpderp'")
-    u:add_order("PASSWORT 'HerpDerp'")
     u:add_order("OPTION AUSWERTUNG")
     eressea.process.settings()
     assert_equal("herp@derp.com", f.email)
     assert_equal("Herpderp", f.info)
-    assert_equal("HerpDerp", f.password)
     assert_equal(1, f.options)
 end
 
@@ -98,7 +96,8 @@ end
 
 function test_process_quit()
     fno = f.id
-    u:add_order("STIRB '" .. u.faction.password .. "'")
+    u.faction.password = 'Hodor'
+    u:add_order("STIRB 'Hodor'")
     assert_not_equal(nil, _G.get_faction(fno))
     eressea.process.quit()
     eressea.write_game('test.dat')

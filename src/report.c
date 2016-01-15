@@ -1427,7 +1427,7 @@ report_template(const char *filename, report_context * ctx, const char *charset)
     newline(out);
     newline(out);
 
-    sprintf(buf, "%s %s \"%s\"", LOC(f->locale, "ERESSEA"), factionid(f), f->passw);
+    sprintf(buf, "%s %s \"password\"", LOC(f->locale, "ERESSEA"), factionid(f));
     rps_nowrap(out, buf);
     newline(out);
     newline(out);
@@ -2112,9 +2112,6 @@ const char *charset)
 
     if (f->age <= 2) {
         const char *s;
-        RENDER(f, buf, sizeof(buf), ("newbie_password", "password", f->passw));
-        newline(out);
-        centre(out, buf, true);
         s = locale_getstring(f->locale, "newbie_info_1");
         if (s) {
             newline(out);
