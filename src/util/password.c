@@ -34,7 +34,7 @@ char *password_gensalt(void) {
     char *cp = salt;
     int buflen = SALTLEN;
     while (buflen) {
-        unsigned long ul = genrand_int32() & time(0);
+        unsigned long ul = genrand_int32() & (unsigned long)time(0);
         b64_from_24bit((char)(ul & 0xFF), (char)((ul>>8)&0xff), (char)((ul>>16)&0xFF), 4);
     }
     salt[SALTLEN] = 0;
