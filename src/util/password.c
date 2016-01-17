@@ -81,7 +81,7 @@ int password_verify(const char * pwhash, const char * passwd) {
     assert(pwhash[0] == '$');
     algo = pwhash[1] - '0';
     pos = strchr(pwhash+2, '$');
-    assert(pos[0] == '$');
+    assert(pos && pos[0] == '$');
     ++pos;
     dol = strchr(pos, '$');
     assert(dol>pos && dol[0] == '$');
