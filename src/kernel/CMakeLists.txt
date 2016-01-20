@@ -6,6 +6,7 @@ build.test.c
 config.test.c
 group.test.c
 faction.test.c
+region.test.c
 unit.test.c
 save.test.c
 ship.test.c

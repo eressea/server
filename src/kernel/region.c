@@ -598,12 +598,13 @@ int rpeasants(const region * r)
     return r->land ? r->land->peasants : 0;
 }
 
-void rsetpeasants(region * r, int value)
+int rsetpeasants(const region * r, int value)
 {
+    assert(value >= 0);
     if (r->land) {
-        assert(value >= 0);
-        r->land->peasants = value;
+        return r->land->peasants = value;
     }
+    return 0;
 }
 
 int rmoney(const region * r)
@@ -611,12 +612,13 @@ int rmoney(const region * r)
     return r->land ? r->land->money : 0;
 }
 
-void rsethorses(const region * r, int value)
+int rsethorses(const region * r, int value)
 {
+    assert(value >= 0);
     if (r->land) {
-        assert(value >= 0);
-        r->land->horses = value;
+        return r->land->horses = value;
     }
+    return 0;
 }
 
 int rhorses(const region * r)
@@ -624,12 +626,13 @@ int rhorses(const region * r)
     return r->land ? r->land->horses : 0;
 }
 
-void rsetmoney(region * r, int value)
+int rsetmoney(const region * r, int value)
 {
+    assert(value >= 0);
     if (r->land) {
-        assert(value >= 0);
-        r->land->money = value;
+        return r->land->money = value;
     }
+    return 0;
 }
 
 int rherbs(const struct region *r)
@@ -637,12 +640,13 @@ int rherbs(const struct region *r)
     return r->land?r->land->herbs:0;
 }
 
-void rsetherbs(const struct region *r, int value)
+int rsetherbs(const struct region *r, int value)
 {
+    assert(value >= 0 && value < (1 << 15));
     if (r->land) {
-        assert(value >= 0);
-        r->land->herbs = (short)(value);
+        return r->land->herbs = (short)(value);
     }
+    return 0;
 }
 
 
@@ -704,12 +708,11 @@ int rtrees(const region * r, int ageclass)
 
 int rsettrees(const region * r, int ageclass, int value)
 {
-    if (!r->land)
-        assert(value == 0);
-    else {
+    if (r->land) {
         assert(value >= 0);
         return r->land->trees[ageclass] = value;
     }
+    assert(value == 0);
     return 0;
 }
 
@@ -1124,7 +1127,7 @@ void terraform_region(region * r, const terrain_type * terrain)
         }
         if (itype != NULL) {
             rsetherbtype(r, itype);
-            rsetherbs(r, (short)(50 + rng_int() % 31));
+            rsetherbs(r, 50 +  rng_int() % 31);
         }
         else {
             rsetherbtype(r, NULL);

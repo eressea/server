@@ -947,7 +947,7 @@ static region *readregion(struct gamedata *data, int x, int y)
             rsetherbtype(r, NULL);
         }
         READ_INT(data->store, &n);
-        rsetherbs(r, (short)n);
+        rsetherbs(r, n);
         READ_INT(data->store, &n);
         rsetpeasants(r, n);
         READ_INT(data->store, &n);
