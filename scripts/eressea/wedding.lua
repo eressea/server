@@ -45,7 +45,7 @@ function wedding.update()
     if peacegate and hellgate then
         wedding_exchange(peacegate, hellgate)
     else
-        eressea.log.error("hellgate or peacegate not found!")
+        eressea.log.warning("hellgate or peacegate not found!")
     end
 end
 
