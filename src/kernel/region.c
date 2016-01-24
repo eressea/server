@@ -605,6 +605,7 @@ int rpeasants(const region * r)
 
 void rsetpeasants(region * r, int value)
 {
+    assert(r->land || value==0);
     assert(value >= 0);
     if (r->land) {
         r->land->peasants = value;
@@ -632,8 +633,11 @@ int rhorses(const region * r)
 
 void rsetmoney(region * r, int value)
 {
-    if (r->land) r->land->money = value;
-    else assert(value >= 0);
+    assert(r->land || value==0);
+    assert(value >= 0);
+    if (r->land) {
+        r->land->money = value;
+    }
 }
 
 void r_setdemand(region * r, const luxury_type * ltype, int value)
