@@ -595,14 +595,20 @@ bool is_coastregion(region * r)
 
 int rpeasants(const region * r)
 {
-    return ((r)->land ? (r)->land->peasants : 0);
+    int value = 0;
+    if (r->land) {
+        value = r->land->peasants;
+        assert(value >= 0);
+    }
+    return value;
 }
 
 void rsetpeasants(region * r, int value)
 {
-    if (r->land) r->land->peasants = value;
-    else assert(value>=0);
-
+    assert(value >= 0);
+    if (r->land) {
+        r->land->peasants = value;
+    }
 }
 
 int rmoney(const region * r)
@@ -612,9 +618,11 @@ int rmoney(const region * r)
 
 void rsethorses(const region * r, int value)
 {
+    assert(r->land || value==0);
     assert(value >= 0);
-    if (r->land)
+    if (r->land) {
         r->land->horses = value;
+    }
 }
 
 int rhorses(const region * r)
