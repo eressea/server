@@ -14,7 +14,7 @@ function eternathgate_action(b)
   elseif b2 == nil then
     b2 = b
   else
-    eressea.log.error("data contains more than two Ethernath gates")
+    eressea.log.warning("data contains more than two Eternath gates")
   end
   return 1
 end
@@ -30,7 +30,7 @@ function eternath.update()
         gates.travel(b2, units1)
         gates.travel(b1, units2)
     else
-        eressea.log.error("data contains fewer than two Ethernath gates")
+        eressea.log.warning("data contains fewer than two Eternath gates")
     end
 end
 
