@@ -944,15 +944,19 @@ static region *readregion(struct gamedata *data, int x, int y)
         READ_INT(data->store, &n);
         rsetherbs(r, (short)n);
         READ_INT(data->store, &n);
-        rsetpeasants(r, n);
+        if (n < 0) {
+            /* bug 2182 */
+            log_error("data has negative peasants: %d in %s", n, regionname(r, 0));
+            rsetpeasants(r, 0);
+        }
+        else {
+            rsetpeasants(r, n);
+        }
         READ_INT(data->store, &n);
         rsetmoney(r, n);
     }
 
     assert(r->terrain != NULL);
-    assert(rhorses(r) >= 0);
-    assert(rpeasants(r) >= 0);
-    assert(rmoney(r) >= 0);
 
     if (r->land) {
         int n;
