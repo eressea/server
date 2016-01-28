@@ -2,12 +2,14 @@
 
 #include "magic.h"
 
+#include <kernel/race.h>
 #include <kernel/faction.h>
 #include <kernel/order.h>
 #include <kernel/item.h>
 #include <kernel/region.h>
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
+#include <kernel/teleport.h>
 #include <kernel/unit.h>
 #include <kernel/pool.h>
 #include <quicklist.h>
@@ -402,6 +404,25 @@ void test_multi_cast(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_magic_resistance(CuTest *tc) {
+    unit *u;
+    race *rc;
+
+    test_cleanup();
+    rc = test_create_race("human");
+    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
+    CuAssertDblEquals(tc, rc->magres, magic_resistance(u), 0.01);
+    rc->magres = 1.0;
+    CuAssertDblEquals_Msg(tc, "magic resistance is capped at 0.9", 0.9, magic_resistance(u), 0.01);
+    rc = test_create_race("braineater");
+    rc->magres = 1.0;
+    u_setrace(u, rc);
+    CuAssertDblEquals_Msg(tc, "brain eaters outside astral space have 50% magres", 0.5, magic_resistance(u), 0.01);
+    u->region->_plane = get_astralplane();
+    CuAssertDblEquals_Msg(tc, "brain eaters in astral space have full magres", 0.9, magic_resistance(u), 0.01);
+    test_cleanup();
+}
+
 CuSuite *get_magic_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -417,5 +438,6 @@ CuSuite *get_magic_suite(void)
     SUITE_ADD_TEST(suite, test_set_main_combatspell);
     SUITE_ADD_TEST(suite, test_set_post_combatspell);
     SUITE_ADD_TEST(suite, test_hasspell);
+    SUITE_ADD_TEST(suite, test_magic_resistance);
     return suite;
 }

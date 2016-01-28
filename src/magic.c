@@ -1127,8 +1127,13 @@ double magic_resistance(unit * target)
     curse *c;
     const curse_type * ct_goodresist = 0, *ct_badresist = 0;
     const resource_type *rtype;
-    double probability = u_race(target)->magres;
+    const race *rc = u_race(target);
+    double probability = rc->magres;
+    const plane *pl = rplane(target->region);
 
+    if (rc == get_race(RC_HIRNTOETER) && pl!=get_astralplane()) {
+        probability /= 2;
+    }
     assert(target->number > 0);
     /* Magier haben einen Resistenzbonus vom Magietalent * 5% */
     probability += effskill(target, SK_MAGIC, 0) * 0.05;
