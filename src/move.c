@@ -44,13 +44,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/render.h>
 #include <kernel/save.h>
 #include <kernel/ship.h>
-#include <kernel/teleport.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
 
 #include <spells/flyingship.h>
 
+#include "teleport.h"
 #include "direction.h"
 #include "calendar.h"
 #include "skill.h"

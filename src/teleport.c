@@ -21,19 +21,19 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "teleport.h"
 
 /* kernel includes */
-#include "equipment.h"
-#include "unit.h"
-#include "region.h"
-#include "race.h"
-#include "skill.h"
-#include "terrain.h"
-#include "faction.h"
-#include "plane.h"
+#include <kernel/equipment.h>
+#include <kernel/unit.h>
+#include <kernel/region.h>
+#include <kernel/race.h>
+#include <kernel/terrain.h>
+#include <kernel/faction.h>
+#include <kernel/plane.h>
 
 /* util includes */
 #include <util/log.h>
 #include <util/rng.h>
 
+#include "skill.h"
 #include "monster.h"
 
 /* libc includes */
@@ -96,8 +96,7 @@ region_list *astralregions(const region * r, bool(*valid) (const region *))
 
 region *r_standard_to_astral(const region * r)
 {
-    if (rplane(r) != get_normalplane())
-        return NULL;
+    assert(!rplane(r));
     return tpregion(r);
 }
 
@@ -109,9 +108,9 @@ region *r_astral_to_standard(const region * r)
     assert(is_astral(r));
     x = (r->x - TE_CENTER_X) * TP_DISTANCE;
     y = (r->y - TE_CENTER_Y) * TP_DISTANCE;
-    pnormalize(&x, &y, get_normalplane());
+    pnormalize(&x, &y, NULL);
     r2 = findregion(x, y);
-    if (r2 == NULL || rplane(r2) != get_normalplane())
+    if (r2 == NULL || rplane(r2))
         return NULL;
 
     return r2;
@@ -166,11 +165,6 @@ void spawn_braineaters(float chance)
             next = rng_int() % (int)(chance * 100);
         }
     }
-}
-
-plane *get_normalplane(void)
-{
-    return NULL;
 }
 
 bool is_astral(const region * r)

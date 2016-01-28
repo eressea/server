@@ -43,7 +43,7 @@ extern "C" {
         struct seen_region *next;
         struct region *r;
         seen_t mode;
-        bool disbelieves;
+        bool disbelieves; /* potion of truth */
     } seen_region;
 
 struct seen_region **seen_init(void);

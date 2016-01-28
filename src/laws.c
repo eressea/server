@@ -36,6 +36,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "study.h"
 #include "wormhole.h"
 #include "prefix.h"
+#include "teleport.h"
 #include "calendar.h"
 #include "guard.h"
 
@@ -59,7 +60,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/ship.h>
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
-#include <kernel/teleport.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>   /* for volcanoes in emigration (needs a flag) */
 #include <kernel/unit.h>

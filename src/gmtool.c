@@ -19,6 +19,7 @@
 #include "listbox.h"
 #include "wormhole.h"
 #include "calendar.h"
+#include "teleport.h"
 
 #include <modules/xmas.h>
 #include <modules/gmcmd.h>
@@ -36,7 +37,6 @@
 #include <kernel/plane.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/teleport.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
 #include <kernel/resources.h>

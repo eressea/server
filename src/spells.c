@@ -22,6 +22,7 @@
 #include "direction.h"
 #include "randenc.h"
 #include "monster.h"
+#include "teleport.h"
 
 #include <spells/borders.h>
 #include <spells/buildingcurse.h>
@@ -49,7 +50,6 @@
 #include <kernel/save.h>
 #include <kernel/ship.h>
 #include <kernel/spell.h>
-#include <kernel/teleport.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
@@ -3146,7 +3146,7 @@ static int sp_chaossuction(castorder * co)
     unit *mage = co->magician.u;
     int cast_level = co->level;
 
-    if (getplane(r) != get_normalplane()) {
+    if (rplane(r)) {
         /* Der Zauber funktioniert nur in der materiellen Welt. */
         cmistake(mage, co->order, 190, MSG_MAGIC);
         return 0;
@@ -5436,8 +5436,9 @@ int sp_fetchastral(castorder * co)
     region *rt = co_get_region(co);          /* region to which we are fetching */
     region *ro = NULL;            /* region in which the target is */
 
-    if (rplane(rt) != get_normalplane()) {
-        ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "error190", ""));
+    if (rplane(rt)) {
+        /* Der Zauber funktioniert nur in der materiellen Welt. */
+        cmistake(mage, co->order, 190, MSG_MAGIC);
         return 0;
     }
 

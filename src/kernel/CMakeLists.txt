@@ -50,7 +50,6 @@ ship.c
 skills.c
 spellbook.c
 spell.c
-teleport.c
 terrain.c
 unit.c
 xmlreader.c
