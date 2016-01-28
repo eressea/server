@@ -36,6 +36,7 @@ without prior permission by the authors of Eressea.
 #include "move.h"
 #include "reports.h"
 #include "alchemy.h"
+#include "teleport.h"
 
 /* kernel includes */
 #include <kernel/alliance.h>
@@ -55,7 +56,6 @@ without prior permission by the authors of Eressea.
 #include <kernel/ship.h>
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
-#include <kernel/teleport.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 #include <kernel/save.h>

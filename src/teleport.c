@@ -21,19 +21,19 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "teleport.h"
 
 /* kernel includes */
-#include "equipment.h"
-#include "unit.h"
-#include "region.h"
-#include "race.h"
-#include "skill.h"
-#include "terrain.h"
-#include "faction.h"
-#include "plane.h"
+#include <kernel/equipment.h>
+#include <kernel/unit.h>
+#include <kernel/region.h>
+#include <kernel/race.h>
+#include <kernel/terrain.h>
+#include <kernel/faction.h>
+#include <kernel/plane.h>
 
 /* util includes */
 #include <util/log.h>
 #include <util/rng.h>
 
+#include "skill.h"
 #include "monster.h"
 
 /* libc includes */

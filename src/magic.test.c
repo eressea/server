@@ -1,6 +1,7 @@
 #include <platform.h>
 
 #include "magic.h"
+#include "teleport.h"
 
 #include <kernel/race.h>
 #include <kernel/faction.h>
@@ -9,7 +10,6 @@
 #include <kernel/region.h>
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
-#include <kernel/teleport.h>
 #include <kernel/unit.h>
 #include <kernel/pool.h>
 #include <quicklist.h>

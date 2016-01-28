@@ -22,6 +22,7 @@
 #include "direction.h"
 #include "randenc.h"
 #include "monster.h"
+#include "teleport.h"
 
 #include <spells/borders.h>
 #include <spells/buildingcurse.h>
@@ -49,7 +50,6 @@
 #include <kernel/save.h>
 #include <kernel/ship.h>
 #include <kernel/spell.h>
-#include <kernel/teleport.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>

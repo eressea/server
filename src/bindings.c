@@ -45,7 +45,6 @@ without prior permission by the authors of Eressea.
 #include <kernel/item.h>
 #include <kernel/order.h>
 #include <kernel/ship.h>
-#include <kernel/teleport.h>
 #include <kernel/faction.h>
 #include <kernel/save.h>
 #include <kernel/spell.h>
@@ -54,6 +53,7 @@ without prior permission by the authors of Eressea.
 #include "creport.h"
 #include "economy.h"
 #include "summary.h"
+#include "teleport.h"
 #include "laws.h"
 #include "monster.h"
 #include "market.h"

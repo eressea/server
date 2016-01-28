@@ -41,7 +41,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/ship.h>
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
-#include <kernel/teleport.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 #include <kernel/version.h>
@@ -1131,7 +1130,7 @@ double magic_resistance(unit * target)
     double probability = rc->magres;
     const plane *pl = rplane(target->region);
 
-    if (rc == get_race(RC_HIRNTOETER) && pl!=get_astralplane()) {
+    if (rc == get_race(RC_HIRNTOETER) && !pl) {
         probability /= 2;
     }
     assert(target->number > 0);
@@ -1994,7 +1993,7 @@ static spellparameter *add_spellparameter(region * target_r, unit * u,
         case 'r':
             /* Parameter sind zwei Regionskoordinaten */
             /* this silly thing only works in the normal plane! */
-            j = addparam_region(param + i, &spobj, u, ord, get_normalplane());
+            j = addparam_region(param + i, &spobj, u, ord, NULL);
             ++c;
             break;
         case 'b':
