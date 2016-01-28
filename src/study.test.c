@@ -6,6 +6,7 @@
 #include <kernel/unit.h>
 #include <kernel/faction.h>
 #include <kernel/order.h>
+#include <kernel/region.h>
 #include <util/message.h>
 #include <util/language.h>
 #include <util/base36.h>
@@ -29,7 +30,7 @@ static void setup_study(study_fixture *fix, skill_t sk) {
     test_cleanup();
     config_set("study.random_progress", "0");
     test_create_world();
-    r = test_create_region(0, 0, 0);
+    r = findregion(0, 0);
     f = test_create_faction(0);
     lang = get_or_create_locale(locale_name(f->locale));
     locale_setstring(lang, mkname("skill", skillnames[sk]), skillnames[sk]);

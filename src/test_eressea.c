@@ -156,7 +156,7 @@ int RunAllTests(int argc, char *argv[])
 }
 
 int main(int argc, char ** argv) {
-    log_stderr = 0;
+    log_stderr = LOG_CPERROR|LOG_FLUSH;
     ++argv;
     --argc;
     if (argc > 0 && strcmp("--list", argv[0]) == 0) {
