@@ -185,6 +185,7 @@ struct param;
     double config_get_flt(const char *key, double def);
     bool config_token(const char *key, const char *tok);
 
+    char * join_path(const char *p1, const char *p2, char *dst, size_t len);
     bool ExpensiveMigrants(void);
     int NMRTimeout(void);
     int LongHunger(const struct unit *u);

@@ -653,15 +653,26 @@ void set_basepath(const char *path)
     g_basedir = path;
 }
 
+#ifdef WIN32
+#define PATH_DELIM '\\'
+#else
+#define PATH_DELIM '/'
+#endif
+
+
+char * join_path(const char *p1, const char *p2, char *dst, size_t len) {
+    size_t sz;
+    assert(p1 && p2);
+    sz = strlcpy(dst, p1, len);
+    assert(sz < len);
+    dst[sz++] = PATH_DELIM;
+    strlcpy(dst + sz, p2, len - sz);
+    return dst;
+}
+
 static const char * relpath(char *buf, size_t sz, const char *path) {
     if (g_basedir) {
-        strlcpy(buf, g_basedir, sz);
-#ifdef WIN32
-        strlcat(buf, "\\", sz);
-#else
-        strlcat(buf, "/", sz);
-#endif
-        strlcat(buf, path, sz);
+        join_path(g_basedir, path, buf, sz);
     }
     else {
         strlcpy(buf, path, sz);

@@ -40,7 +40,7 @@ static void test_readwrite_unit(CuTest * tc)
     fno = f->no;
     u = test_create_unit(f, r);
     _mkdir(datapath());
-    sprintf(path, "%s/%s", datapath(), filename);
+    join_path(datapath(), filename, path, sizeof(path));
 
     data = gamedata_open(path, "wb");
     CuAssertPtrNotNull(tc, data); // TODO: intermittent test
