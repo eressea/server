@@ -1869,7 +1869,7 @@ static int addparam_building(const char *const param[], spllprm ** spobjp)
 
 static int
 addparam_region(const char *const param[], spllprm ** spobjp, const unit * u,
-order * ord, plane * pl)
+order * ord)
 {
     assert(param[0]);
     if (param[1] == 0) {
@@ -1878,6 +1878,7 @@ order * ord, plane * pl)
         return -1;
     }
     else {
+        plane *pl = getplanebyid(0);
         int tx = atoi((const char *)param[0]), ty = atoi((const char *)param[1]);
         int x = rel_to_abs(pl, u->faction, tx, 0);
         int y = rel_to_abs(pl, u->faction, ty, 1);
@@ -1991,9 +1992,8 @@ static spellparameter *add_spellparameter(region * target_r, unit * u,
             ++c;
             break;
         case 'r':
-            /* Parameter sind zwei Regionskoordinaten */
-            /* this silly thing only works in the normal plane! */
-            j = addparam_region(param + i, &spobj, u, ord, NULL);
+            /* Parameter sind zwei Regionskoordinaten innerhalb der "normalen" Plane */
+            j = addparam_region(param + i, &spobj, u, ord);
             ++c;
             break;
         case 'b':
