@@ -108,7 +108,7 @@ void test_cleanup(void)
     if (errno) {
         int error = errno;
         errno = 0;
-        log_error("errno: %d", error);
+        log_error("errno: %d (%s)", error, strerror(error));
     }
 
     random_source_reset();

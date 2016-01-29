@@ -32,6 +32,7 @@ static void test_readwrite_unit(CuTest * tc)
     struct region *r;
     struct faction *f;
     int fno;
+    /* FIXME: at some point during this test, errno is set to 17 (File exists), why? */
 
     test_cleanup();
     r = test_create_region(0, 0, 0);

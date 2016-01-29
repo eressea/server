@@ -2,6 +2,7 @@
 
 #include "magic.h"
 
+#include <kernel/config.h>
 #include <kernel/faction.h>
 #include <kernel/order.h>
 #include <kernel/item.h>
@@ -386,6 +387,8 @@ void test_multi_cast(CuTest *tc) {
 
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     u->faction->locale = lang = get_or_create_locale("de");
+    locale_setstring(lang, parameters[P_ANY], "ALLE");
+    init_parameters(lang);
     locale_setstring(lang, mkname("spell", sp->sname), "Feuerball");
     CuAssertStrEquals(tc, "Feuerball", spell_name(sp, lang));
     set_level(u, SK_MAGIC, 10);
