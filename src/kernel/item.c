@@ -568,11 +568,15 @@ struct order *ord)
 {
     if (d == NULL) {
         int use = use_pooled(s, item2resource(itype), GET_SLACK, n);
-        if (use < n)
+        region *r = s->region;
+        if (use < n) {
             use +=
             use_pooled(s, item2resource(itype), GET_RESERVE | GET_POOLED_SLACK,
             n - use);
-        rsethorses(s->region, rhorses(s->region) + use);
+        }
+        if (r->land) {
+            rsethorses(r, rhorses(r) + use);
+        }
         return 0;
     }
     return -1;                    /* use the mechanism */
@@ -584,12 +588,14 @@ struct order *ord)
 {
     if (d == NULL) {
         int use = use_pooled(s, item2resource(itype), GET_SLACK, n);
-        if (use < n)
+        region *r = s->region;
+        if (use < n) {
             use +=
             use_pooled(s, item2resource(itype), GET_RESERVE | GET_POOLED_SLACK,
             n - use);
-        if (s->region->land) {
-            rsetmoney(s->region, rmoney(s->region) + use);
+        }
+        if (r->land) {
+            rsetmoney(r, rmoney(r) + use);
         }
         return 0;
     }
