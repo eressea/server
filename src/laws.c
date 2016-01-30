@@ -720,8 +720,11 @@ void immigration(void)
             }
             if (badunit == 0)
             {
-                peasants += (int)(rng_double()*(wage(r, NULL, NULL, turn) - 9));
-                rsetpeasants(r, peasants);
+                int x = wage(r, NULL, NULL, turn) - 9;
+                if (x>0) {
+                    peasants += (int)(rng_double()*x);
+                    rsetpeasants(r, peasants);
+                }
             }
         }
     }
