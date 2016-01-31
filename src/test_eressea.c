@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h>
+#include <varargs.h>
 #include <util/log.h>
 
 #pragma warning(disable: 4210)
@@ -156,7 +158,7 @@ int RunAllTests(int argc, char *argv[])
 }
 
 int main(int argc, char ** argv) {
-    log_stderr = LOG_CPERROR|LOG_FLUSH;
+    log_to_file(LOG_CPERROR, stderr);
     ++argv;
     --argc;
     if (argc > 0 && strcmp("--list", argv[0]) == 0) {

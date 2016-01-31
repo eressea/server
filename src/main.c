@@ -130,7 +130,7 @@ static int get_arg(int argc, char **argv, size_t len, int index, const char **re
 
 static int parse_args(int argc, char **argv, int *exitcode)
 {
-    int i;
+    int i, log_stderr = 0;
 
     for (i = 1; i != argc; ++i) {
         char *argi = argv[i];
@@ -208,6 +208,10 @@ static int parse_args(int argc, char **argv, int *exitcode)
     default:
         log_stderr = LOG_CPERROR | LOG_CPWARNING | LOG_CPINFO | LOG_CPDEBUG;
         break;
+    }
+
+    if (log_stderr) {
+        log_to_file(log_stderr, stderr);
     }
 
     return 0;
