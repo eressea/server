@@ -6,7 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <varargs.h>
+#include <stdarg.h>
 #include <util/log.h>
 
 #pragma warning(disable: 4210)
