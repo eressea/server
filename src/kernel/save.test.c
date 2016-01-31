@@ -32,6 +32,7 @@ static void test_readwrite_unit(CuTest * tc)
     struct region *r;
     struct faction *f;
     int fno;
+    /* FIXME: at some point during this test, errno is set to 17 (File exists), why? */
 
     test_cleanup();
     r = test_create_region(0, 0, 0);
@@ -39,7 +40,7 @@ static void test_readwrite_unit(CuTest * tc)
     fno = f->no;
     u = test_create_unit(f, r);
     _mkdir(datapath());
-    sprintf(path, "%s/%s", datapath(), filename);
+    join_path(datapath(), filename, path, sizeof(path));
 
     data = gamedata_open(path, "wb");
     CuAssertPtrNotNull(tc, data); // TODO: intermittent test

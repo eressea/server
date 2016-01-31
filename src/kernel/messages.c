@@ -90,7 +90,7 @@ struct message *msg_feedback(const struct unit *u, struct order *ord,
         ord = u->thisorder;
 
     if (!mtype) {
-        log_error("trying to create message of unknown type \"%s\"\n", name);
+        log_warning("trying to create message of unknown type \"%s\"\n", name);
         if (!mt_find("missing_feedback")) {
             mt_register(mt_new_va("missing_feedback", "unit:unit", "region:region", "command:order", "name:string", 0));
         }

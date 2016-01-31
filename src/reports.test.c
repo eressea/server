@@ -253,6 +253,7 @@ static void test_write_unit(CuTest *tc) {
     race *rc;
     struct locale *lang;
     char buffer[1024];
+    /* FIXME: test emits ERROR: no translation for combat status status_aggressive in locale de */
 
     test_cleanup();
     rc = rc_get_or_create("human");

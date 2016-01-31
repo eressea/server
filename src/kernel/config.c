@@ -640,9 +640,43 @@ int check_param(const struct param *p, const char *key, const char *searchvalue)
     return result;
 }
 
-const char * relpath(char *buf, size_t sz, const char *path) {
-    strlcpy(buf, basepath(), sz);
-    strlcat(buf, path, sz);
+static const char *g_basedir;
+const char *basepath(void)
+{
+    if (g_basedir)
+        return g_basedir;
+    return ".";
+}
+
+void set_basepath(const char *path)
+{
+    g_basedir = path;
+}
+
+#ifdef WIN32
+#define PATH_DELIM '\\'
+#else
+#define PATH_DELIM '/'
+#endif
+
+
+char * join_path(const char *p1, const char *p2, char *dst, size_t len) {
+    size_t sz;
+    assert(p1 && p2);
+    sz = strlcpy(dst, p1, len);
+    assert(sz < len);
+    dst[sz++] = PATH_DELIM;
+    strlcpy(dst + sz, p2, len - sz);
+    return dst;
+}
+
+static const char * relpath(char *buf, size_t sz, const char *path) {
+    if (g_basedir) {
+        join_path(g_basedir, path, buf, sz);
+    }
+    else {
+        strlcpy(buf, path, sz);
+    }
     return buf;
 }
 
@@ -652,7 +686,7 @@ const char *datapath(void)
     static char zText[MAX_PATH]; // FIXME: static return value
     if (g_datadir)
         return g_datadir;
-    return relpath(zText, sizeof(zText), "/data");
+    return relpath(zText, sizeof(zText), "data");
 }
 
 void set_datapath(const char *path)
@@ -666,25 +700,12 @@ const char *reportpath(void)
     static char zText[MAX_PATH]; // FIXME: static return value
     if (g_reportdir)
         return g_reportdir;
-    return relpath(zText, sizeof(zText), "/reports");
+    return relpath(zText, sizeof(zText), "reports");
 }
 
 void set_reportpath(const char *path)
 {
     g_reportdir = path;
-}
-
-static const char *g_basedir;
-const char *basepath(void)
-{
-    if (g_basedir)
-        return g_basedir;
-    return ".";
-}
-
-void set_basepath(const char *path)
-{
-    g_basedir = path;
 }
 
 double get_param_flt(const struct param *p, const char *key, double def)

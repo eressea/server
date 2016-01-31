@@ -1229,6 +1229,8 @@ static void test_show_without_item(CuTest *tc)
     test_cleanup();
 
     loc = get_or_create_locale("de");
+    locale_setstring(loc, parameters[P_ANY], "ALLE");
+    init_parameters(loc);
 
     r = test_create_region(0, 0, test_create_terrain("testregion", LAND_REGION));
     f = test_create_faction(test_create_race("human"));
