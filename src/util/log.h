@@ -15,9 +15,10 @@ without prior permission by the authors of Eressea.
 extern "C" {
 #endif
 #include <stdio.h>
+#include <stdarg.h>
+
     extern void log_open(const char *filename);
     extern void log_close(void);
-    extern void log_flush(void);
 
     /* use macros above instead of these: */
     extern void log_fatal(const char *format, ...);
