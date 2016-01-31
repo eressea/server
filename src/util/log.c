@@ -236,7 +236,6 @@ void log_printf(FILE * io, const char *format, ...)
     va_end(args);
 }
 
-
 static FILE *logfile;
 
 void log_close(void)
@@ -257,9 +256,6 @@ void log_close(void)
 
 void log_open(const char *filename)
 {
-    if (logfile) {
-        log_close();
-    }
     log_rotate(filename, LOG_MAXBACKUPS);
     logfile = fopen(filename, "a");
     if (logfile) {
