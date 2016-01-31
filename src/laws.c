@@ -723,7 +723,7 @@ void immigration(void)
                     }
                 }
                 if (badunit == 0) {
-                    peasants += (int)(rng_double()*x);
+                    peasants += (int)(rng_double()*income);
                     rsetpeasants(r, peasants);
                 }
             }
