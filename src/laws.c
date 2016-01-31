@@ -712,7 +712,7 @@ void immigration(void)
         /* if less than 50 are in the region and there is space and no monster or demon units in the region */
         if (repopulate) {
             int peasants = rpeasants(r);
-            int income = wage(r, NULL, NULL, turn) - maintenance_cost(NULL);
+            int income = wage(r, NULL, NULL, turn) - maintenance_cost(NULL) + 1;
             if (income >= 0 && r->land && (peasants < repopulate) && maxworkingpeasants(r) >(peasants + 30) * 2) {
                 int badunit = 0;
                 unit *u;
