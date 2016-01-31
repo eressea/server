@@ -3019,74 +3019,75 @@ int renumber_cmd(unit * u, order * ord)
     return 0;
 }
 
-static building *age_building(building * b)
-{
-    const struct building_type *bt_blessed;
-    const struct curse_type *ct_astralblock;
+/* blesses stone circles create an astral protection in the astral region
+ * above the shield, which prevents chaos suction and other spells.
+ * The shield is created when a magician enters the blessed stone circle,
+ * and lasts for as long as his skill level / 2 is, at no mana cost.
+ *
+ * TODO: this would be nicer in a btype->age function, but we don't have it.
+ */
+static void age_stonecircle(building *b) {
     const struct resource_type *rtype = get_resourcetype(R_UNICORN);
+    region *r = b->region;
+    unit *u, *mage = NULL;
 
-    bt_blessed = bt_find("blessedstonecircle");
-    ct_astralblock = ct_find("astralblock");
-
-    /* blesses stone circles create an astral protection in the astral region
-     * above the shield, which prevents chaos suction and other spells.
-     * The shield is created when a magician enters the blessed stone circle,
-     * and lasts for as long as his skill level / 2 is, at no mana cost.
-     *
-     * TODO: this would be nicer in a btype->age function, but we don't have it.
-     */
-    if (rtype && ct_astralblock && bt_blessed && b->type == bt_blessed) {
-        region *r = b->region;
-        region *rt = r_standard_to_astral(r);
-        unit *u, *mage = NULL;
-
-        /* step 1: give unicorns to people in the building,
-         * find out if there's a magician in there. */
-        for (u = r->units; u; u = u->next) {
-            if (b == u->building && inside_building(u)) {
-                if ((u_race(u)->ec_flags & ECF_KEEP_ITEM) == 0) {
-                    int n, unicorns = 0;
-                    for (n = 0; n != u->number; ++n) {
-                        if (chance(0.02)) {
-                            i_change(&u->items, rtype->itype, 1);
-                            ++unicorns;
-                        }
-                        if (unicorns) {
-                            ADDMSG(&u->faction->msgs, msg_message("scunicorn",
-                                "unit amount rtype",
-                                u, unicorns, rtype));
-                        }
+    /* step 1: give unicorns to people in the building,
+     * find out if there's a magician in there. */
+    for (u = r->units; u; u = u->next) {
+        if (b == u->building && inside_building(u)) {
+            if (!mage && is_mage(u)) {
+                mage = u;
+            }
+            if (rtype && (u_race(u)->ec_flags & ECF_KEEP_ITEM) == 0) {
+                int n, unicorns = 0;
+                for (n = 0; n != u->number; ++n) {
+                    if (chance(0.02)) {
+                        i_change(&u->items, rtype->itype, 1);
+                        ++unicorns;
                     }
-                }
-                if (mage == NULL && is_mage(u)) {
-                    mage = u;
+                    if (unicorns) {
+                        ADDMSG(&u->faction->msgs, msg_message("scunicorn",
+                                                              "unit amount rtype",
+                                                              u, unicorns, rtype));
+                    }
                 }
             }
         }
+    }
 
-        /* if there's a magician, and a connection to astral space, create the
-         * curse. */
-        if (rt && !fval(rt->terrain, FORBIDDEN_REGION) && mage != NULL) {
+    /* step 2: if there's a magician, and a connection to astral space, create the
+     * curse. */
+    if (get_astralplane()) {
+        region *rt = r_standard_to_astral(r);
+        if (mage && rt && !fval(rt->terrain, FORBIDDEN_REGION)) {
+            const struct curse_type *ct_astralblock = ct_find("astralblock");
             curse *c = get_curse(rt->attribs, ct_astralblock);
-            if (c == NULL) {
-                if (mage != NULL) {
-                    int sk = effskill(mage, SK_MAGIC, 0);
-                    float effect = 100;
-                    /* the mage reactivates the circle */
-                    c = create_curse(mage, &rt->attribs, ct_astralblock,
-                        (float)_max(1, sk), _max(1, sk / 2), effect, 0);
-                    ADDMSG(&r->msgs,
-                        msg_message("astralshield_activate", "region unit", r, mage));
-                }
+            if (!c) {
+                int sk = effskill(mage, SK_MAGIC, 0);
+                float effect = 100;
+                /* the mage reactivates the circle */
+                c = create_curse(mage, &rt->attribs, ct_astralblock,
+                    (float)_max(1, sk), _max(1, sk / 2), effect, 0);
+                ADDMSG(&r->msgs,
+                    msg_message("astralshield_activate", "region unit", r, mage));
             }
-            else if (mage != NULL) {
+            else {
                 int sk = effskill(mage, SK_MAGIC, 0);
                 c->duration = _max(c->duration, sk / 2);
                 c->vigour = _max(c->vigour, (float)sk);
             }
         }
     }
+}
 
+static building *age_building(building * b)
+{
+    const struct building_type *bt_blessed;
+
+    bt_blessed = bt_find("blessedstonecircle");
+    if (bt_blessed && b->type == bt_blessed) {
+        age_stonecircle(b);
+    }
     a_age(&b->attribs, b);
     handle_event(b->attribs, "timer", b);
 
