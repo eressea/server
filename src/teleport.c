@@ -96,7 +96,7 @@ region_list *astralregions(const region * r, bool(*valid) (const region *))
 
 region *r_standard_to_astral(const region * r)
 {
-    assert(!rplane(r));
+    assert(!is_astral(r));
     return tpregion(r);
 }
 
