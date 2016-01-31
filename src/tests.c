@@ -45,14 +45,19 @@ struct race *test_create_race(const char *name)
 
 struct region *test_create_region(int x, int y, const terrain_type *terrain)
 {
-    region *r = new_region(x, y, NULL, 0);
+    region *r = findregion(x, y);
+    if (!r) {
+        r = new_region(x, y, NULL, 0);
+    }
     if (!terrain) {
         terrain_type *t = get_or_create_terrain("plain");
         t->size = 1000;
         fset(t, LAND_REGION|CAVALRY_REGION|FOREST_REGION);
         terraform_region(r, t);
-    } else
+    }
+    else {
         terraform_region(r, terrain);
+    }
     rsettrees(r, 0, 0);
     rsettrees(r, 1, 0);
     rsettrees(r, 2, 0);
@@ -103,7 +108,7 @@ void test_cleanup(void)
     if (errno) {
         int error = errno;
         errno = 0;
-        log_error("errno: %d", error);
+        log_error("errno: %d (%s)", error, strerror(error));
     }
 
     random_source_reset();
@@ -255,6 +260,11 @@ void test_create_world(void)
     struct locale * loc;
 
     loc = get_or_create_locale("de");
+
+    locale_setstring(loc, parameters[P_SHIP], "SCHIFF");
+    locale_setstring(loc, parameters[P_ANY], "ALLE");
+    init_parameters(loc);
+
     locale_setstring(loc, keyword(K_RESERVE), "RESERVIEREN");
     locale_setstring(loc, "money", "SILBER");
     init_resources();
@@ -269,6 +279,7 @@ void test_create_world(void)
 
     test_create_itemtype("iron");
     test_create_itemtype("stone");
+
 
     t_plain = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION | SAIL_INTO | FLY_INTO);
     t_plain->size = 1000;

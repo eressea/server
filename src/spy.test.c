@@ -100,7 +100,7 @@ static void test_sabotage_self(CuTest *tc) {
     order *ord;
 
     setup_sabotage();
-    r = test_create_region(0, 0, NULL);
+    r = findregion(0, 0);
     assert(r);
     u = test_create_unit(test_create_faction(NULL), r);
     assert(u && u->faction && u->region == r);
@@ -122,7 +122,7 @@ static void test_sabotage_other_fail(CuTest *tc) {
     message *msg;
 
     setup_sabotage();
-    r = test_create_region(0, 0, NULL);
+    r = findregion(0, 0);
     assert(r);
     u = test_create_unit(test_create_faction(NULL), r);
     u2 = test_create_unit(test_create_faction(NULL), r);
@@ -151,7 +151,7 @@ static void test_sabotage_other_success(CuTest *tc) {
     order *ord;
 
     setup_sabotage();
-    r = test_create_region(0, 0, NULL);
+    r = findregion(0, 0);
     assert(r);
     u = test_create_unit(test_create_faction(NULL), r);
     u2 = test_create_unit(test_create_faction(NULL), r);
