@@ -708,6 +708,20 @@ void set_reportpath(const char *path)
     g_reportdir = path;
 }
 
+int create_directories(void) {
+    int err;
+    err = _mkdir(datapath());
+    if (err) {
+        if (errno == EEXIST) errno = 0;
+        else return err;
+    }
+    err = _mkdir(reportpath());
+    if (err && errno == EEXIST) {
+        errno = 0;
+    }
+    return err;
+}
+
 double get_param_flt(const struct param *p, const char *key, double def)
 {
     const char *str = get_param(p, key);

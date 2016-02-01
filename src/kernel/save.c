@@ -1747,21 +1747,16 @@ int writegame(const char *filename)
     stream strm;
     FILE *F;
 
-    sprintf(path, "%s/%s", datapath(), filename);
+    create_directories();
+    join_path(datapath(), filename, path, sizeof(path));
 #ifdef HAVE_UNISTD_H
     /* make sure we don't overwrite an existing file (hard links) */
     unlink(path);
 #endif
     F = fopen(path, "wb");
     if (!F) {
-        /* we might be missing the directory, let's try creating it */
-        int err = _mkdir(datapath());
-        if (err) return err;
-        F = fopen(path, "wb");
-        if (!F) {
-            perror(path);
-            return -1;
-        }
+        perror(path);
+        return -1;
     }
 
     gdata.store = &store;

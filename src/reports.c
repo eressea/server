@@ -1540,16 +1540,6 @@ static void prepare_report(struct report_context *ctx, faction *f)
     ctx->last = lastregion(f);
 }
 
-static void mkreportdir(const char *rpath) {
-    if (_mkdir(rpath) != 0) {
-        if (_access(rpath, 0) < 0) {
-            log_error("could not create reports directory %s: %s", rpath, strerror(errno));
-            abort();
-        }
-    }
-    errno = 0;
-}
-
 int write_reports(faction * f, time_t ltime)
 {
     unsigned int backup = 1, maxbackup = 128 * 1000;
@@ -1557,14 +1547,12 @@ int write_reports(faction * f, time_t ltime)
     struct report_context ctx;
     const char *encoding = "UTF-8";
     report_type *rtype;
-    const char *path = reportpath();
 
     if (noreports) {
         return false;
     }
     prepare_report(&ctx, f);
     get_addresses(&ctx);
-    mkreportdir(path); // FIXME: too many mkdir calls! init_reports is enough
     log_debug("Reports for %s:", factionname(f));
     for (rtype = report_types; rtype != NULL; rtype = rtype->next) {
         if (f->options & rtype->flag) {
@@ -1635,14 +1623,8 @@ static void check_messages_exist(void) {
 int init_reports(void)
 {
     check_messages_exist();
-
+    create_directories();
     prepare_reports();
-    {
-        if (_access(reportpath(), 0) != 0) {
-            return 0;
-        }
-    }
-    mkreportdir(reportpath());
     return 0;
 }
 
@@ -1659,8 +1641,7 @@ int reports(void)
     report_donations();
     remove_empty_units();
 
-    mkreportdir(rpath); // FIXME: init_reports already does this?
-    sprintf(path, "%s/reports.txt", rpath);
+    join_path(rpath, "reports.txt", path, sizeof(path));
     mailit = fopen(path, "w");
     if (mailit == NULL) {
         log_error("%s could not be opened!\n", path);

@@ -211,7 +211,7 @@ static int parse_args(int argc, char **argv, int *exitcode)
     }
 
     if (log_stderr) {
-        log_to_file(log_stderr, stderr);
+        log_to_file(log_stderr | LOG_FLUSH | LOG_BRIEF, stderr);
     }
 
     return 0;
