@@ -256,7 +256,7 @@ int readorders(const char *filename)
     int nfactions = 0;
     struct faction *f = NULL;
 
-    F = fopen(filename, "rb");
+    F = fopen(filename, "r");
     if (!F) {
         perror(filename);
         return -1;
@@ -1407,7 +1407,7 @@ int readgame(const char *filename, bool backup)
         create_backup(path);
     }
 
-    F = fopen(path, "rb");
+    F = fopen(path, "r");
     if (!F) {
         perror(path);
         return -1;
@@ -1747,21 +1747,16 @@ int writegame(const char *filename)
     stream strm;
     FILE *F;
 
-    sprintf(path, "%s/%s", datapath(), filename);
+    create_directories();
+    join_path(datapath(), filename, path, sizeof(path));
 #ifdef HAVE_UNISTD_H
     /* make sure we don't overwrite an existing file (hard links) */
     unlink(path);
 #endif
-    F = fopen(path, "wb");
+    F = fopen(path, "w");
     if (!F) {
-        /* we might be missing the directory, let's try creating it */
-        int err = _mkdir(datapath());
-        if (err) return err;
-        F = fopen(path, "wb");
-        if (!F) {
-            perror(path);
-            return -1;
-        }
+        perror(path);
+        return -1;
     }
 
     gdata.store = &store;
