@@ -256,7 +256,7 @@ int readorders(const char *filename)
     int nfactions = 0;
     struct faction *f = NULL;
 
-    F = fopen(filename, "rb");
+    F = fopen(filename, "r");
     if (!F) {
         perror(filename);
         return -1;
@@ -1407,7 +1407,7 @@ int readgame(const char *filename, bool backup)
         create_backup(path);
     }
 
-    F = fopen(path, "rb");
+    F = fopen(path, "r");
     if (!F) {
         perror(path);
         return -1;
@@ -1753,7 +1753,7 @@ int writegame(const char *filename)
     /* make sure we don't overwrite an existing file (hard links) */
     unlink(path);
 #endif
-    F = fopen(path, "wb");
+    F = fopen(path, "w");
     if (!F) {
         perror(path);
         return -1;

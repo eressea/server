@@ -32,7 +32,7 @@ without prior permission by the authors of Eressea.
 static int tolua_storage_create(lua_State * L)
 {
     const char *filename = tolua_tostring(L, 1, 0);
-    const char *type = tolua_tostring(L, 2, "rb");
+    const char *type = tolua_tostring(L, 2, "r");
     gamedata *data;
 
     data = gamedata_open(filename, type);

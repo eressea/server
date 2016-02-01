@@ -23,7 +23,7 @@ static void test_group_readwrite(CuTest * tc)
     FILE *F;
     stream strm;
 
-    F = fopen("test.dat", "wb");
+    F = fopen("test.dat", "w");
     fstream_init(&strm, F);
     binstore_init(&store, &strm);
     test_cleanup();
@@ -36,7 +36,7 @@ static void test_group_readwrite(CuTest * tc)
     binstore_done(&store);
     fstream_done(&strm);
 
-    F = fopen("test.dat", "rb");
+    F = fopen("test.dat", "r");
     fstream_init(&strm, F);
     binstore_init(&store, &strm);
     f->groups = 0;

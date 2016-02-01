@@ -50,7 +50,7 @@ static void test_readwrite_unit(CuTest * tc)
     free_gamedata();
     f = test_create_faction(0);
     renumber_faction(f, fno);
-    data = gamedata_open(path, "rb");
+    data = gamedata_open(path, "r");
     u = read_unit(data);
     gamedata_close(data);
 
