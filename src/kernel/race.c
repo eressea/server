@@ -242,10 +242,10 @@ const char *rc_name_s(const race * rc, name_t n)
 
 const char *raceprefix(const unit * u)
 {
-    const attrib *asource = u->faction->attribs;
+    attrib *asource = u->faction->attribs;
 
     if (fval(u, UFL_GROUP)) {
-        const attrib *agroup = a_findc(u->attribs, &at_group);
+        attrib *agroup = a_find(u->attribs, &at_group);
         if (agroup != NULL)
             asource = ((const group *)(agroup->data.v))->attribs;
     }

@@ -149,7 +149,7 @@ attrib *create_special_direction(region * r, region * rt, int duration,
 
 spec_direction *special_direction(const region * from, const region * to)
 {
-    const attrib *a = a_findc(from->attribs, &at_direction);
+    const attrib *a = a_find(from->attribs, &at_direction);
 
     while (a != NULL && a->type == &at_direction) {
         spec_direction *sd = (spec_direction *)a->data.v;
