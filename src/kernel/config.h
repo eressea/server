@@ -148,6 +148,8 @@ struct param;
     const char *reportpath(void);
     void set_reportpath(const char *);
 
+    int create_directories(void);
+
     void kernel_init(void);
     void kernel_done(void);
 
