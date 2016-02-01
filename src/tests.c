@@ -265,6 +265,7 @@ void test_create_world(void)
     locale_setstring(loc, parameters[P_ANY], "ALLE");
     init_parameters(loc);
 
+    locale_setstring(loc, "status_aggressive", "aggressiv");
     locale_setstring(loc, keyword(K_RESERVE), "RESERVIEREN");
     locale_setstring(loc, "money", "SILBER");
     init_resources();
@@ -279,7 +280,6 @@ void test_create_world(void)
 
     test_create_itemtype("iron");
     test_create_itemtype("stone");
-
 
     t_plain = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION | SAIL_INTO | FLY_INTO);
     t_plain->size = 1000;
