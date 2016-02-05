@@ -848,7 +848,7 @@ static void handlekey(state * st, int c)
         break;
     case 'B':
         if (!new_players) {
-            sprintf(sbuffer, "%s/newfactions", basepath());
+            join_path(basepath(), "newfactions", sbuffer, sizeof(sbuffer));
             new_players = read_newfactions(sbuffer);
         }
         cnormalize(&st->cursor, &nx, &ny);
@@ -1063,7 +1063,7 @@ static void handlekey(state * st, int c)
         break;
     case 'A':
         if (!new_players) {
-            sprintf(sbuffer, "%s/newfactions", basepath());
+            join_path(basepath(), "newfactions", sbuffer, sizeof(sbuffer));
             new_players = read_newfactions(sbuffer);
         }
         seed_players(&new_players, false);
@@ -1236,11 +1236,10 @@ void run_mapper(void)
     WINDOW *hwininfo;
     WINDOW *hwinmap;
     int width, height, x, y;
-    int split = 20, old_flags = log_flags;
+    int split = 20;
     state *st;
     point tl;
 
-    log_flags &= ~(LOG_CPERROR | LOG_CPWARNING);
     init_curses();
     curs_set(1);
 
@@ -1332,7 +1331,6 @@ void run_mapper(void)
     set_readline(NULL);
     curs_set(1);
     endwin();
-    log_flags = old_flags;
     state_close(st);
 }
 

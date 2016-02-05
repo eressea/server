@@ -122,7 +122,7 @@ get_followers(unit * target, region * r, const region_list * route_end,
     unit *uf;
     for (uf = r->units; uf; uf = uf->next) {
         if (fval(uf, UFL_FOLLOWING) && !fval(uf, UFL_NOTMOVING)) {
-            const attrib *a = a_findc(uf->attribs, &at_follow);
+            const attrib *a = a_find(uf->attribs, &at_follow);
             if (a && a->data.v == target) {
                 follower *fnew = (follower *)malloc(sizeof(follower));
                 fnew->uf = uf;

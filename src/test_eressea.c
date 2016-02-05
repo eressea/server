@@ -58,10 +58,6 @@ bool list = false;
 
 int RunAllTests(int argc, char *argv[])
 {
-    int flags = log_flags;
-
-    log_flags = LOG_FLUSH | LOG_CPERROR;
-
     /* self-test */
     ADD_SUITE(tests);
     ADD_SUITE(callback);
@@ -146,7 +142,6 @@ int RunAllTests(int argc, char *argv[])
             suites = s;
         }
         printf("\ntest summary: %d tests, %d failed\n", summary->count, summary->failCount);
-        log_flags = flags;
         fail_count = summary->failCount;
         CuSuiteDelete(summary);
         game_done();

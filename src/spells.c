@@ -3091,9 +3091,9 @@ static int sp_summonshadowlords(castorder * co)
 
 static bool chaosgate_valid(const connection * b)
 {
-    const attrib *a = a_findc(b->from->attribs, &at_direction);
+    const attrib *a = a_find(b->from->attribs, &at_direction);
     if (!a)
-        a = a_findc(b->to->attribs, &at_direction);
+        a = a_find(b->to->attribs, &at_direction);
     if (!a)
         return false;
     return true;

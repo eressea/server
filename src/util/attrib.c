@@ -101,13 +101,6 @@ attrib *a_find(attrib * a, const attrib_type * at)
     return a;
 }
 
-const attrib *a_findc(const attrib * a, const attrib_type * at)
-{
-    while (a && a->type != at)
-        a = a->nexttype;
-    return a;
-}
-
 static attrib *a_insert(attrib * head, attrib * a)
 {
     attrib **pa;

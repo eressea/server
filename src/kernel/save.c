@@ -552,7 +552,7 @@ int current_turn(void)
     int cturn = 0;
     FILE *F;
 
-    sprintf(zText, "%s/turn", basepath());
+    join_path(basepath(), "turn", zText, sizeof(zText));
     F = fopen(zText, "r");
     if (!F) {
         perror(zText);
@@ -1166,6 +1166,7 @@ faction *readfaction(struct gamedata * data)
     char name[DISPLAYSIZE];
 
     READ_INT(data->store, &n);
+    assert(n > 0);
     f = findfaction(n);
     if (f == NULL) {
         f = (faction *)calloc(1, sizeof(faction));
@@ -1401,13 +1402,13 @@ int readgame(const char *filename, bool backup)
 
     init_locales();
     log_debug("- reading game data from %s\n", filename);
-    sprintf(path, "%s/%s", datapath(), filename);
+    join_path(datapath(), filename, path, sizeof(path));
 
     if (backup) {
         create_backup(path);
     }
 
-    F = fopen(path, "r");
+    F = fopen(path, "rb");
     if (!F) {
         perror(path);
         return -1;
@@ -1753,7 +1754,7 @@ int writegame(const char *filename)
     /* make sure we don't overwrite an existing file (hard links) */
     unlink(path);
 #endif
-    F = fopen(path, "w");
+    F = fopen(path, "wb");
     if (!F) {
         perror(path);
         return -1;

@@ -853,7 +853,7 @@ int writepasswd(void)
     FILE *F;
     char zText[128];
 
-    sprintf(zText, "%s/passwd", basepath());
+    join_path(basepath(), "passwd", zText, sizeof(zText));
     F = fopen(zText, "w");
     if (!F) {
         perror(zText);

@@ -49,7 +49,7 @@ attrib_type at_movement = {
 
 bool get_movement(attrib * const *alist, int type)
 {
-    const attrib *a = a_findc(*alist, &at_movement);
+    const attrib *a = a_find(*alist, &at_movement);
     if (a == NULL)
         return false;
     if (a->data.i & type)

@@ -1502,7 +1502,7 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
     const char *mailto = LOC(f->locale, "mailto");
     const attrib *a;
     seen_region *sr = NULL;
-    FILE *F = fopen(filename, "wt");
+    FILE *F = fopen(filename, "w");
 
     if (era < 0) {
         era = config_get_int("world.era", 1);

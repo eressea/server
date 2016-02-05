@@ -828,11 +828,11 @@ static void json_include(cJSON *json) {
         FILE *F;
         if (json_relpath) {
             char name[MAX_PATH];
-            _snprintf(name, sizeof(name), "%s/%s", json_relpath, child->valuestring);
-            F = fopen(name, "rt");
+            join_path(json_relpath, child->valuestring, name, sizeof(name));
+            F = fopen(name, "r");
         }
         else {
-            F = fopen(child->valuestring, "rt");
+            F = fopen(child->valuestring, "r");
         }
         if (F) {
             long pos;

@@ -1403,7 +1403,7 @@ report_template(const char *filename, report_context * ctx, const char *charset)
     const resource_type *rsilver = get_resourcetype(R_SILVER);
     faction *f = ctx->f;
     region *r;
-    FILE *F = fopen(filename, "wt");
+    FILE *F = fopen(filename, "w");
     stream strm = { 0 }, *out = &strm;
     seen_region *sr = NULL;
     char buf[8192], *bufp;
@@ -2067,7 +2067,7 @@ const char *charset)
     unsigned char op;
     int maxh, bytes, ix = want(O_STATISTICS);
     int wants_stats = (f->options & ix);
-    FILE *F = fopen(filename, "wt");
+    FILE *F = fopen(filename, "w");
     stream strm = { 0 }, *out = &strm;
     seen_region *sr = NULL;
     char buf[8192];

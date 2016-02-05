@@ -4442,8 +4442,7 @@ void update_subscriptions(void)
     FILE *F;
     char zText[MAX_PATH];
 
-    strlcpy(zText, basepath(), sizeof(zText));
-    strlcat(zText, "/subscriptions", sizeof(zText));
+    join_path(basepath(), "subscriptions", zText, sizeof(zText));
     F = fopen(zText, "r");
     if (F == NULL) {
         log_warning(0, "could not open %s.\n", zText);
@@ -4463,17 +4462,6 @@ void update_subscriptions(void)
         }
     }
     fclose(F);
-
-    sprintf(zText, "subscriptions.%u", turn);
-    F = fopen(zText, "w");
-    if (F) {
-        faction *f;
-        for (f = factions; f != NULL; f = f->next) {
-            fprintf(F, "%s:%u:%s:%s:%u:\n",
-                itoa36(f->no), f->subscription, f->email, dbrace(f->race), f->lastorders);
-        }
-        fclose(F);
-    }
 }
 
 bool
