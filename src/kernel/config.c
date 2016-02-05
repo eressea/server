@@ -659,11 +659,16 @@ void set_basepath(const char *path)
 #define PATH_DELIM '/'
 #endif
 
-
 char * join_path(const char *p1, const char *p2, char *dst, size_t len) {
     size_t sz;
     assert(p1 && p2);
-    sz = strlcpy(dst, p1, len);
+    assert(p2 != dst);
+    if (dst == p1) {
+        sz = strlen(p1);
+    }
+    else {
+        sz = strlcpy(dst, p1, len);
+    }
     assert(sz < len);
     dst[sz++] = PATH_DELIM;
     strlcpy(dst + sz, p2, len - sz);

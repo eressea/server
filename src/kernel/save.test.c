@@ -15,10 +15,10 @@ static void test_readwrite_data(CuTest * tc)
     const char *filename = "test.dat";
     char path[MAX_PATH];
     test_cleanup();
-    sprintf(path, "%s/%s", datapath(), filename);
     CuAssertIntEquals(tc, 0, writegame(filename));
     CuAssertIntEquals(tc, 0, readgame(filename, false));
     CuAssertIntEquals(tc, RELEASE_VERSION, global.data_version);
+    join_path(datapath(), filename, path, sizeof(path));
     CuAssertIntEquals(tc, 0, remove(path));
     test_cleanup();
 }
@@ -42,15 +42,15 @@ static void test_readwrite_unit(CuTest * tc)
     u = test_create_unit(f, r);
     join_path(datapath(), filename, path, sizeof(path));
 
-    data = gamedata_open(path, "w");
-    CuAssertPtrNotNull(tc, data); // TODO: intermittent test
+    data = gamedata_open(path, "wb");
+    CuAssertPtrNotNull(tc, data); // TODO: intermittent test (even after the 'b' fix!)
     write_unit(data, u);
     gamedata_close(data);
 
     free_gamedata();
     f = test_create_faction(0);
     renumber_faction(f, fno);
-    data = gamedata_open(path, "r");
+    data = gamedata_open(path, "rb");
     u = read_unit(data);
     gamedata_close(data);
 

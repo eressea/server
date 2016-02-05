@@ -152,7 +152,7 @@ void score(void)
         allscores = 1;
     }
 
-    sprintf(path, "%s/score", basepath());
+    join_path(basepath(), "score", path, sizeof(path));
     scoreFP = fopen(path, "w");
     if (scoreFP) {
         const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
@@ -177,7 +177,7 @@ void score(void)
         alliance *a;
         const item_type *token = it_find("conquesttoken");
 
-        sprintf(path, "%s/score.alliances", basepath());
+        join_path(basepath(), "score.alliances", path, sizeof(path));
         scoreFP = fopen(path, "w");
         if (scoreFP) {
             const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };

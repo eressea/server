@@ -296,7 +296,7 @@ int main(int argc, char **argv)
     /* parse arguments again, to override ini file */
     parse_args(argc, argv, &err);
 
-    log_open(logfile);
+    log_open(logfile, LOG_CPERROR | LOG_CPWARNING | LOG_CPDEBUG | LOG_FLUSH);
     locale_init();
 
 #ifdef CRTDBG
