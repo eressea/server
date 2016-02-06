@@ -6,7 +6,7 @@
 #define PASSWORD_APACHE_MD5 'a'
 #define PASSWORD_SHA256 '5' // not implemented
 #define PASSWORD_SHA512 '6' // not implemented
-#define PASSWORD_DEFAULT PASSWORD_MD5
+#define PASSWORD_DEFAULT PASSWORD_APACHE_MD5
 
 
 #define VERIFY_OK 0 // password matches hash
