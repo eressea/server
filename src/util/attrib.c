@@ -209,28 +209,37 @@ int a_remove(attrib ** pa, attrib * a)
 void a_removeall(attrib ** pa, const attrib_type * at)
 {
     attrib **pnexttype = pa;
-    attrib **pnext = NULL;
 
-    while (*pnexttype) {
-        attrib *next = *pnexttype;
-        if (next->type == at)
-            break;
-        pnexttype = &next->nexttype;
-        pnext = &next->next;
-    }
-    if (*pnexttype && (*pnexttype)->type == at) {
-        attrib *a = *pnexttype;
-
-        *pnexttype = a->nexttype;
-        if (pnext) {
-            while (*pnext && (*pnext)->type != at)
-                pnext = &(*pnext)->next;
-            *pnext = a->nexttype;
+    if (!at) {
+        while (*pnexttype) {
+            attrib *a = *pnexttype;
+            *pnexttype = a->next;
+            a_free(a);
         }
-        while (a && a->type == at) {
-            attrib *ra = a;
-            a = a->next;
-            a_free(ra);
+    }
+    else {
+        attrib **pnext = NULL;
+        while (*pnexttype) {
+            attrib *a = *pnexttype;
+            if (a->type == at)
+                break;
+            pnexttype = &a->nexttype;
+            pnext = &a->next;
+        }
+        if (*pnexttype && (*pnexttype)->type == at) {
+            attrib *a = *pnexttype;
+
+            *pnexttype = a->nexttype;
+            if (pnext) {
+                while (*pnext && (*pnext)->type != at)
+                    pnext = &(*pnext)->next;
+                *pnext = a->nexttype;
+            }
+            while (a && a->type == at) {
+                attrib *ra = a;
+                a = a->next;
+                a_free(ra);
+            }
         }
     }
 }

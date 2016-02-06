@@ -51,6 +51,23 @@ static void test_attrib_remove_self(CuTest * tc) {
     CuAssertPtrEquals(tc, a, alist);
 }
 
+
+static void test_attrib_removeall(CuTest * tc) {
+    const attrib_type at_foo = { "foo" };
+    const attrib_type at_bar = { "bar" };
+    attrib *alist = 0, *a;
+    a_add(&alist, a_new(&at_foo));
+    a = a_add(&alist, a_new(&at_bar));
+    a_add(&alist, a_new(&at_foo));
+    a_removeall(&alist, &at_foo);
+    CuAssertPtrEquals(tc, a, alist);
+    CuAssertPtrEquals(tc, 0, alist->next);
+    a_add(&alist, a_new(&at_bar));
+    a_add(&alist, a_new(&at_foo));
+    a_removeall(&alist, NULL);
+    CuAssertPtrEquals(tc, 0, alist);
+}
+
 static void test_attrib_remove(CuTest * tc)
 {
     attrib_type at_foo = { "foo" };
@@ -98,6 +115,7 @@ CuSuite *get_attrib_suite(void)
     SUITE_ADD_TEST(suite, test_attrib_new);
     SUITE_ADD_TEST(suite, test_attrib_add);
     SUITE_ADD_TEST(suite, test_attrib_remove);
+    SUITE_ADD_TEST(suite, test_attrib_removeall);
     SUITE_ADD_TEST(suite, test_attrib_remove_self);
     SUITE_ADD_TEST(suite, test_attrib_nexttype);
     return suite;

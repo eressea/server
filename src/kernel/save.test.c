@@ -1,5 +1,7 @@
 #include <platform.h>
 #include <kernel/config.h>
+#include <util/attrib.h>
+#include <attributes/key.h>
 
 #include "save.h"
 #include "unit.h"
@@ -61,9 +63,36 @@ static void test_readwrite_unit(CuTest * tc)
     test_cleanup();
 }
 
+static void test_readwrite_attrib(CuTest *tc) {
+    gamedata *data;
+    attrib *a = NULL;
+    const char *path = "attrib.dat";
+    test_cleanup();
+    data = gamedata_open(path, "wb");
+    CuAssertPtrNotNull(tc, data);
+    add_key(&a, 41);
+    add_key(&a, 42);
+    a_write(data->store, a, NULL);
+    gamedata_close(data);
+    a_removeall(&a, NULL);
+    CuAssertPtrEquals(tc, 0, a);
+
+    data = gamedata_open(path, "rb");
+    CuAssertPtrNotNull(tc, data);
+    a_read(data->store, &a, NULL);
+    gamedata_close(data);
+    CuAssertPtrNotNull(tc, find_key(a, 41));
+    CuAssertPtrNotNull(tc, find_key(a, 42));
+    a_removeall(&a, NULL);
+
+    CuAssertIntEquals(tc, 0, remove(path));
+    test_cleanup();
+}
+
 CuSuite *get_save_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_readwrite_attrib);
     SUITE_ADD_TEST(suite, test_readwrite_data);
     SUITE_ADD_TEST(suite, test_readwrite_unit);
     return suite;
