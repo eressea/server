@@ -12,17 +12,13 @@
 #define MAXSALTLEN 32 // maximum length in characters of any salt
 #define SALTLEN 8 // length of salts we generate
 
-/* Table with characters for base64 transformation.  */
-static const char b64t[65] =
-"./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-
 #define b64_from_24bit(B2, B1, B0, N)					      \
   do {									      \
     unsigned int w = ((B2) << 16) | ((B1) << 8) | (B0);			      \
     int n = (N);							      \
     while (n-- > 0 && buflen > 0)					      \
       {									      \
-	*cp++ = b64t[w & 0x3f];						      \
+	*cp++ = itoa64[w & 0x3f];	   		      \
 	--buflen;							      \
 	w >>= 6;							      \
       }									      \
@@ -50,9 +46,12 @@ static const char * password_hash_i(const char * passwd, const char *salt, int a
         _snprintf(result, len, "$0$%s$%s", salt, passwd);
     }
     else if (algo == PASSWORD_MD5) {
-        char * result = md5_crypt(passwd, salt);
+        return md5_crypt_r(passwd, salt, result, len);
+    }
+    else if (algo == PASSWORD_APACHE_MD5) {
+        apr_md5_encode(passwd, salt, result, len);
         return result;
-    } 
+    }
     else {
         return NULL;
     }
@@ -66,7 +65,7 @@ const char * password_hash(const char * passwd, const char * salt, int algo) {
 }
 
 static bool password_is_implemented(int algo) {
-    return algo==PASSWORD_PLAIN || algo==PASSWORD_MD5;
+    return algo==PASSWORD_PLAIN || algo==PASSWORD_MD5 || algo==PASSWORD_APACHE_MD5;
 }
 
 int password_verify(const char * pwhash, const char * passwd) {
@@ -79,7 +78,7 @@ int password_verify(const char * pwhash, const char * passwd) {
     assert(passwd);
     assert(pwhash);
     assert(pwhash[0] == '$');
-    algo = pwhash[1] - '0';
+    algo = pwhash[1];
     pos = strchr(pwhash+2, '$');
     assert(pos && pos[0] == '$');
     ++pos;
