@@ -72,11 +72,13 @@ extern "C" {
     extern int a_remove(attrib ** pa, attrib * at);
     extern void a_removeall(attrib ** a, const attrib_type * at);
     extern attrib *a_new(const attrib_type * at);
+    int a_age(attrib ** attribs, void *owner);
 
-    extern int a_age(attrib ** attribs, void *owner);
-    extern int a_read(struct storage *store, attrib ** attribs, void *owner);
-    extern void a_write(struct storage *store, const attrib * attribs,
-        const void *owner);
+    int a_read_orig(struct storage *store, attrib ** attribs, void *owner);
+    void a_write_orig(struct storage *store, const attrib * attribs, const void *owner);
+
+    int a_read(struct storage *store, attrib ** attribs, void *owner);
+    void a_write(struct storage *store, const attrib * attribs, const void *owner);
 
     void free_attribs(void);
 

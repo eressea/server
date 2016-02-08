@@ -276,15 +276,79 @@ int a_age(attrib ** p, void *owner)
 
 static critbit_tree cb_deprecated = { 0 };
 
+
+typedef struct deprecated_s {
+    unsigned int hash;
+    int(*reader)(attrib *, void *, struct storage *);
+} deprecated_t;
+
 void at_deprecate(const char * name, int(*reader)(attrib *, void *, struct storage *))
 {
-    char buffer[64];
-    size_t len = strlen(name);
-    len = cb_new_kv(name, len, &reader, sizeof(reader), buffer);
-    cb_insert(&cb_deprecated, buffer, len);
+    deprecated_t value;
+    
+    value.hash = __at_hashkey(name);
+    value.reader = reader;
+    cb_insert(&cb_deprecated, &value, sizeof(value));
 }
 
-int a_read(struct storage *store, attrib ** attribs, void *owner)
+static int a_read_i(struct storage *store, attrib ** attribs, void *owner, unsigned int key) {
+    int retval = AT_READ_FAIL;
+    int(*reader)(attrib *, void *, struct storage *) = 0;
+    attrib_type *at = at_find(key);
+    attrib * na = 0;
+
+    if (at) {
+        reader = at->read;
+        na = a_new(at);
+    }
+    else {
+        void *match;
+        if (cb_find_prefix(&cb_deprecated, &key, sizeof(key), &match, 1, 0)>0) {
+            deprecated_t *value = (deprecated_t *)match;
+            reader = value->reader;
+        }
+        else {
+            log_error("unknown attribute hash: %u\n", key);
+            assert(at || !"attribute not registered");
+        }
+    }
+    if (reader) {
+        retval = reader(na, owner, store);
+        if (na) {
+            switch (retval) {
+            case AT_READ_OK:
+                a_add(attribs, na);
+                break;
+            case AT_READ_FAIL:
+                a_free(na);
+                break;
+            default:
+                assert(!"invalid return value");
+                break;
+            }
+        }
+    }
+    else {
+        assert(!"error: no registered callback can read attribute");
+    }
+    return retval;
+}
+
+int a_read(struct storage *store, attrib ** attribs, void *owner) {
+    int key, retval = AT_READ_OK;
+    char zText[128];
+
+    zText[0] = 0;
+    key = -1;
+    READ_INT(store, &key);
+    while (key > 0 && retval == AT_READ_OK) {
+        retval = a_read_i(store, attribs, owner, key);
+        READ_INT(store, &key);
+    }
+    return retval;
+}
+
+int a_read_orig(struct storage *store, attrib ** attribs, void *owner)
 {
     int key, retval = AT_READ_OK;
     char zText[128];
@@ -292,52 +356,14 @@ int a_read(struct storage *store, attrib ** attribs, void *owner)
     zText[0] = 0;
     key = -1;
     READ_TOK(store, zText, sizeof(zText));
-    if (strcmp(zText, "end") == 0)
+    if (strcmp(zText, "end") == 0) {
         return retval;
-    else
+    }
+    else {
         key = __at_hashkey(zText);
-
-    while (key != -1) {
-        int(*reader)(attrib *, void *, struct storage *) = 0;
-        attrib_type *at = at_find(key);
-        attrib * na = 0;
-
-        if (at) {
-            reader = at->read;
-            na = a_new(at);
-        }
-        else {
-            void * kv = 0;
-            cb_find_prefix(&cb_deprecated, zText, strlen(zText) + 1, &kv, 1, 0);
-            if (kv) {
-                cb_get_kv(kv, &reader, sizeof(reader));
-            }
-            else {
-                fprintf(stderr, "attribute hash: %d (%s)\n", key, zText);
-                assert(at || !"attribute not registered");
-            }
-        }
-        if (reader) {
-            int i = reader(na, owner, store);
-            if (na) {
-                switch (i) {
-                case AT_READ_OK:
-                    a_add(attribs, na);
-                    break;
-                case AT_READ_FAIL:
-                    retval = AT_READ_FAIL;
-                    a_free(na);
-                    break;
-                default:
-                    assert(!"invalid return value");
-                    break;
-                }
-            }
-        }
-        else {
-            assert(!"error: no registered callback can read attribute");
-        }
-
+    }
+    while (key > 0) {
+        retval = a_read_i(store, attribs, owner, key);
         READ_TOK(store, zText, sizeof(zText));
         if (!strcmp(zText, "end"))
             break;
@@ -346,7 +372,24 @@ int a_read(struct storage *store, attrib ** attribs, void *owner)
     return retval;
 }
 
-void a_write(struct storage *store, const attrib * attribs, const void *owner)
+void a_write(struct storage *store, const attrib * attribs, const void *owner) {
+    const attrib *na = attribs;
+
+    while (na) {
+        if (na->type->write) {
+            assert(na->type->hashkey || !"attribute not registered");
+            WRITE_INT(store, na->type->hashkey);
+            na->type->write(na, owner, store);
+            na = na->next;
+        }
+        else {
+            na = na->nexttype;
+        }
+    }
+    WRITE_INT(store, 0);
+}
+
+void a_write_orig(struct storage *store, const attrib * attribs, const void *owner)
 {
     const attrib *na = attribs;
 

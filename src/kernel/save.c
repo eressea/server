@@ -577,6 +577,23 @@ const struct locale *lang)
         WRITE_STR(data->store, obuf);
 }
 
+int read_attribs(storage *store, attrib **alist, void *owner) {
+#if RELEASE_VERSION < ATHASH_VERSION
+    return a_read_orig(store, alist, owner);
+#else
+    return a_read(store, alist, owner);
+#endif
+}
+
+void write_attribs(storage *store, attrib *alist, const void *owner)
+{
+#if RELEASE_VERSION < ATHASH_VERSION
+    a_write_orig(store, alist, owner);
+#else
+    a_write(store, alist, owner);
+#endif
+}
+
 unit *read_unit(struct gamedata *data)
 {
     unit *u;
@@ -748,8 +765,7 @@ unit *read_unit(struct gamedata *data)
         log_error("Einheit %s hat %u Personen, und %u Trefferpunkte\n", itoa36(u->no), u->number, u->hp);
         u->hp = u->number;
     }
-
-    a_read(data->store, &u->attribs, u);
+    read_attribs(data->store, &u->attribs, u);
     return u;
 }
 
@@ -823,7 +839,7 @@ void write_unit(struct gamedata *data, const unit * u)
     }
     WRITE_INT(data->store, u->hp);
     WRITE_SECTION(data->store);
-    a_write(data->store, u->attribs, u);
+    write_attribs(data->store, u->attribs, u);
     WRITE_SECTION(data->store);
 }
 
@@ -982,7 +998,7 @@ static region *readregion(struct gamedata *data, int x, int y)
             read_owner(data, &r->land->ownership);
         }
     }
-    a_read(data->store, &r->attribs, r);
+    read_attribs(data->store, &r->attribs, r);
     return r;
 }
 
@@ -1046,7 +1062,7 @@ void writeregion(struct gamedata *data, const region * r)
         WRITE_SECTION(data->store);
 #endif
     }
-    a_write(data->store, r->attribs, r);
+    write_attribs(data->store, r->attribs, r);
     WRITE_SECTION(data->store);
 }
 
@@ -1253,7 +1269,7 @@ faction *readfaction(struct gamedata * data)
         }
     }
 
-    a_read(data->store, &f->attribs, f);
+    read_attribs(data->store, &f->attribs, f);
     read_items(data->store, &f->items);
     for (;;) {
         READ_TOK(data->store, name, sizeof(name));
@@ -1338,7 +1354,7 @@ void writefaction(struct gamedata *data, const faction * f)
     WRITE_INT(data->store, f->magiegebiet);
 
     WRITE_INT(data->store, f->flags & FFL_SAVEMASK);
-    a_write(data->store, f->attribs, f);
+    write_attribs(data->store, f->attribs, f);
     WRITE_SECTION(data->store);
     write_items(data->store, f->items);
     WRITE_SECTION(data->store);
@@ -1451,7 +1467,7 @@ int readgame(const char *filename, bool backup)
     else {
         READ_STR(&store, NULL, 0);
     }
-    a_read(&store, &global.attribs, NULL);
+    read_attribs(&store, &global.attribs, NULL);
     READ_INT(&store, &turn);
     global.data_turn = turn;
     log_debug(" - reading turn %d\n", turn);
@@ -1512,7 +1528,7 @@ int readgame(const char *filename, bool backup)
                 fno = read_faction_reference(&store);
             }
         }
-        a_read(&store, &pl->attribs, pl);
+        read_attribs(&store, &pl->attribs, pl);
         if (pl->id != 1094969858) { // Regatta
             addlist(&planes, pl);
         }
@@ -1580,7 +1596,7 @@ int readgame(const char *filename, bool backup)
             READ_STR(&store, name, sizeof(name));
             b->type = bt_find(name);
             b->region = r;
-            a_read(&store, &b->attribs, b);
+            read_attribs(&store, &b->attribs, b);
             if (b->type == bt_lighthouse) {
                 r->flags |= RF_LIGHTHOUSE;
             }
@@ -1627,7 +1643,7 @@ int readgame(const char *filename, bool backup)
             if (sh->type->flags & SFL_NOCOAST) {
                 sh->coast = NODIRECTION;
             }
-            a_read(&store, &sh->attribs, sh);
+            read_attribs(&store, &sh->attribs, sh);
         }
 
         *shp = 0;
@@ -1777,7 +1793,7 @@ int writegame(const char *filename)
     WRITE_INT(&store, game_id());
     WRITE_SECTION(&store);
 
-    a_write(&store, global.attribs, NULL);
+    write_attribs(&store, global.attribs, NULL);
     WRITE_SECTION(&store);
 
     WRITE_INT(&store, turn);
@@ -1807,7 +1823,7 @@ int writegame(const char *filename)
             w = w->next;
         }
         write_faction_reference(NULL, &store);       /* mark the end of the list */
-        a_write(&store, pl->attribs, pl);
+        write_attribs(&store, pl->attribs, pl);
         WRITE_SECTION(&store);
     }
 
@@ -1852,7 +1868,7 @@ int writegame(const char *filename)
             WRITE_INT(&store, b->size);
             WRITE_TOK(&store, b->type->_name);
             WRITE_SECTION(&store);
-            a_write(&store, b->attribs, b);
+            write_attribs(&store, b->attribs, b);
             WRITE_SECTION(&store);
         }
 
@@ -1870,7 +1886,7 @@ int writegame(const char *filename)
             assert((sh->type->flags & SFL_NOCOAST) == 0 || sh->coast == NODIRECTION);
             WRITE_INT(&store, sh->coast);
             WRITE_SECTION(&store);
-            a_write(&store, sh->attribs, sh);
+            write_attribs(&store, sh->attribs, sh);
             WRITE_SECTION(&store);
         }
 

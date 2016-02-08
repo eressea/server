@@ -72,14 +72,14 @@ static void test_readwrite_attrib(CuTest *tc) {
     CuAssertPtrNotNull(tc, data);
     add_key(&a, 41);
     add_key(&a, 42);
-    a_write(data->store, a, NULL);
+    write_attribs(data->store, a, NULL);
     gamedata_close(data);
     a_removeall(&a, NULL);
     CuAssertPtrEquals(tc, 0, a);
 
     data = gamedata_open(path, "rb");
     CuAssertPtrNotNull(tc, data);
-    a_read(data->store, &a, NULL);
+    read_attribs(data->store, &a, NULL);
     gamedata_close(data);
     CuAssertPtrNotNull(tc, find_key(a, 41));
     CuAssertPtrNotNull(tc, find_key(a, 42));
