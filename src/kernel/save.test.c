@@ -68,6 +68,7 @@ static void test_readwrite_attrib(CuTest *tc) {
     attrib *a = NULL;
     const char *path = "attrib.dat";
     test_cleanup();
+    global.data_version = RELEASE_VERSION; // FIXME: hack!
     data = gamedata_open(path, "wb");
     CuAssertPtrNotNull(tc, data);
     key_set(&a, 41);

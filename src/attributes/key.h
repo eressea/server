@@ -21,7 +21,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+    struct attrib;
+    struct attrib_type;
     extern struct attrib_type at_key;
     extern struct attrib_type at_keys;
 
