@@ -19,6 +19,7 @@ expr=$2
 expect=$3
 count=`grep -cE $expr $file`
 [ $count -eq $expect ] || quit 1 "expected $expect counts of $expr in $file, got $count"
+echo "PASS: $expr is $expect"
 }
 
 ROOT=`pwd`
@@ -38,6 +39,7 @@ SERVER="$VALGRIND --track-origins=yes --gen-suppressions=all --suppressions=$SUP
 fi
 echo "running $SERVER"
 $SERVER -t 184 ../scripts/run-turn.lua
+echo "integration tests"
 [ -d reports ] || quit 4 "no reports directory created"
 CRFILE=185-zvto.cr
 for file in $NEWFILES reports/$CRFILE ; do
