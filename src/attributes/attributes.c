@@ -125,6 +125,7 @@ void register_attributes(void)
     at_register(&at_raceprefix);
     at_register(&at_iceberg);
     at_register(&at_key);
+    at_register(&at_keys);
     at_register(&at_follow);
     at_register(&at_targetregion);
     at_register(&at_orcification);

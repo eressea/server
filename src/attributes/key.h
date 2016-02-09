@@ -23,6 +23,7 @@ extern "C" {
 #endif
 
     extern struct attrib_type at_key;
+    extern struct attrib_type at_keys;
 
     void key_set(struct attrib **alist, int key);
     void key_unset(struct attrib **alist, int key);

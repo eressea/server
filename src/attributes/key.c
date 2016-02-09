@@ -29,7 +29,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 static void a_writekeys(const attrib *a, const void *o, storage *store) {
     int i, *keys = (int *)a->data.v;
-    for (i = 0; i != keys[0]; ++i) {
+    for (i = 0; i <= keys[0]; ++i) {
         WRITE_INT(store, keys[i]);
     }
 }
@@ -40,7 +40,7 @@ static int a_readkeys(attrib * a, void *owner, struct storage *store) {
     assert(i < 4096 && i>0);
     a->data.v = p = malloc(sizeof(int)*(i + 1));
     *p++ = i;
-    while (--i) {
+    while (i--) {
         READ_INT(store, p++);
     }
     return AT_READ_OK;
@@ -115,27 +115,55 @@ static attrib *find_key(attrib * alist, int key)
 
 void key_set(attrib ** alist, int key)
 {
+    int *keys, n = 1;
     attrib *a;
     assert(key != 0);
-    a = find_key(*alist, key);
+    a = a_find(*alist, &at_keys);
     if (!a) {
-        a = a_add(alist, make_key(key));
+        a = a_add(alist, a_new(&at_keys));
     }
+    keys = (int *)a->data.v;
+    if (keys) {
+        n = keys[0] + 1;
+    }
+    keys = realloc(keys, sizeof(int) *(n + 1));
+    // TODO: does insertion sort pay off here?
+    keys[0] = n;
+    keys[n] = key;
+    a->data.v = keys;
 }
 
 void key_unset(attrib ** alist, int key)
 {
     attrib *a;
     assert(key != 0);
-    a = find_key(*alist, key);
+    a = a_find(*alist, &at_keys);
     if (a) {
-        a_remove(alist, a);
+        int i, *keys = (int *)a->data.v;
+        if (keys) {
+            for (i = 1; i <= keys[0]; ++i) {
+                if (keys[i] == key) {
+                    keys[i] = keys[keys[0]];
+                    keys[0]--;
+                }
+            }
+        }
     }
 }
 
 bool key_get(attrib *alist, int key) {
     attrib *a;
     assert(key != 0);
-    a = find_key(alist, key);
-    return a != NULL;
+    a = a_find(alist, &at_keys);
+    if (a) {
+        int i, *keys = (int *)a->data.v;
+        if (keys) {
+            for (i = 1; i <= keys[0]; ++i) {
+                if (keys[i] == key) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
 }
