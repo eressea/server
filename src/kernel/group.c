@@ -119,7 +119,7 @@ write_group(const attrib * a, const void *owner, struct storage *store)
 attrib_type at_group = {        /* attribute for units assigned to a group */
     "grp",
     DEFAULT_INIT,
-    DEFAULT_FINALIZE, DEFAULT_AGE, write_group, read_group, ATF_UNIQUE };
+    DEFAULT_FINALIZE, DEFAULT_AGE, write_group, read_group, NULL, ATF_UNIQUE };
 
 void free_group(group * g)
 {

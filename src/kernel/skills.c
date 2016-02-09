@@ -59,6 +59,7 @@ attrib_type at_skillmod = {
     NULL,
     NULL,                         /* can't write function pointers */
     NULL,                         /* can't read function pointers */
+    NULL,
     ATF_PRESERVE
 };
 

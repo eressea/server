@@ -285,6 +285,7 @@ attrib_type at_curse = {
     curse_age,
     curse_write,
     curse_read,
+    NULL,
     ATF_CURSE
 };
 

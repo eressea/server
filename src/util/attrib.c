@@ -292,7 +292,7 @@ void at_deprecate(const char * name, int(*reader)(attrib *, void *, struct stora
 }
 
 static int a_read_i(struct storage *store, attrib ** attribs, void *owner, unsigned int key) {
-    int retval = AT_READ_FAIL;
+    int retval = AT_READ_OK;
     int(*reader)(attrib *, void *, struct storage *) = 0;
     attrib_type *at = at_find(key);
     attrib * na = 0;
@@ -313,11 +313,13 @@ static int a_read_i(struct storage *store, attrib ** attribs, void *owner, unsig
         }
     }
     if (reader) {
-        retval = reader(na, owner, store);
+        int ret = reader(na, owner, store);
         if (na) {
-            switch (retval) {
+            switch (ret) {
+            case AT_READ_DEPR:
             case AT_READ_OK:
                 a_add(attribs, na);
+                retval = ret;
                 break;
             case AT_READ_FAIL:
                 a_free(na);
@@ -341,11 +343,24 @@ int a_read(struct storage *store, attrib ** attribs, void *owner) {
     zText[0] = 0;
     key = -1;
     READ_INT(store, &key);
-    while (key > 0 && retval == AT_READ_OK) {
-        retval = a_read_i(store, attribs, owner, key);
+    while (key > 0) {
+        int ret = a_read_i(store, attribs, owner, key);
+        if (ret == AT_READ_DEPR) {
+            retval = AT_READ_DEPR;
+        }
         READ_INT(store, &key);
     }
-    return retval;
+    if (retval == AT_READ_DEPR) {
+        /* handle deprecated attributes */
+        attrib *a = *attribs;
+        while (a) {
+            if (a->type->upgrade) {
+                a->type->upgrade(attribs, a);
+            }
+            a = a->nexttype;
+        }
+    }
+    return AT_READ_OK;
 }
 
 int a_read_orig(struct storage *store, attrib ** attribs, void *owner)

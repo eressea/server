@@ -798,6 +798,7 @@ attrib_type at_maxmagicians = {
     NULL,
     a_writeint,
     a_readint,
+    NULL,
     ATF_UNIQUE
 };
 

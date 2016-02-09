@@ -70,8 +70,8 @@ static void test_readwrite_attrib(CuTest *tc) {
     test_cleanup();
     data = gamedata_open(path, "wb");
     CuAssertPtrNotNull(tc, data);
-    add_key(&a, 41);
-    add_key(&a, 42);
+    key_set(&a, 41);
+    key_set(&a, 42);
     write_attribs(data->store, a, NULL);
     gamedata_close(data);
     a_removeall(&a, NULL);
@@ -81,8 +81,8 @@ static void test_readwrite_attrib(CuTest *tc) {
     CuAssertPtrNotNull(tc, data);
     read_attribs(data->store, &a, NULL);
     gamedata_close(data);
-    CuAssertPtrNotNull(tc, find_key(a, 41));
-    CuAssertPtrNotNull(tc, find_key(a, 42));
+    CuAssertTrue(tc, key_get(a, 41));
+    CuAssertTrue(tc, key_get(a, 42));
     a_removeall(&a, NULL);
 
     CuAssertIntEquals(tc, 0, remove(path));

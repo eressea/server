@@ -121,6 +121,7 @@ attrib_type at_npcfaction = {
     NULL,
     a_writeint,
     a_readint,
+    NULL,
     ATF_UNIQUE
 };
 

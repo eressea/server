@@ -134,6 +134,7 @@ static attrib_type at_wormhole = {
     wormhole_age,
     wormhole_write,
     wormhole_read,
+    NULL,
     ATF_UNIQUE
 };
 

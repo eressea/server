@@ -56,6 +56,7 @@ extern "C" {
         /* age returns 0 if the attribute needs to be removed, !=0 otherwise */
         void(*write) (const struct attrib *, const void *owner, struct storage *);
         int(*read) (struct attrib *, void *owner, struct storage *);       /* return AT_READ_OK on success, AT_READ_FAIL if attrib needs removal */
+        void(*upgrade) (struct attrib **alist, struct attrib *a);
         unsigned int flags;
         /* ---- internal data, do not modify: ---- */
         struct attrib_type *nexthash;
@@ -90,6 +91,7 @@ extern "C" {
 
 #define AT_READ_OK 0
 #define AT_READ_FAIL -1
+#define AT_READ_DEPR 1 /* a deprecated attribute was read, should run a_upgrade */
 
 #define AT_AGE_REMOVE 0         /* remove the attribute after calling age() */
 #define AT_AGE_KEEP 1           /* keep the attribute for another turn */

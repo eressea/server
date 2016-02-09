@@ -53,7 +53,7 @@ int read_of(struct attrib *a, void *owner, struct storage *store)
 }
 
 attrib_type at_otherfaction = {
-    "otherfaction", NULL, NULL, NULL, write_of, read_of, ATF_UNIQUE
+    "otherfaction", NULL, NULL, NULL, write_of, read_of, NULL, ATF_UNIQUE
 };
 
 struct faction *get_otherfaction(const struct attrib *a)

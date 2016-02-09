@@ -96,6 +96,7 @@ static attrib_type at_alp = {
     alp_verify,
     alp_write,
     alp_read,
+    NULL,
     ATF_UNIQUE
 };
 

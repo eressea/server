@@ -112,6 +112,7 @@ static attrib_type at_cursewall = {
     curse_age,
     cw_write,
     cw_read,
+    NULL,
     ATF_CURSE
 };
 
