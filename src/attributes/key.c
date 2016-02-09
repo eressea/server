@@ -25,6 +25,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <storage.h>
 
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 
 static void a_writekeys(const attrib *a, const void *o, storage *store) {
