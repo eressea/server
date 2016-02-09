@@ -60,7 +60,7 @@ local function write_emails(locales)
 end
 
 local function join_path(a, b)
-    if a then return a .. '/' .. b 
+    if a then return a .. '/' .. b end
     return b
 end
 
@@ -99,7 +99,9 @@ local function write_htpasswd()
     local out = io.open(join_path(config.basepath, "htpasswd"), "w")
     if out then
         for f in factions() do
-            out:write(itoa36(f.id) .. ":" .. f.password .. "\n")
+            if f.password then
+                out:write(itoa36(f.id) .. ":" .. f.password .. "\n")
+            end
         end
         out:close()
     end
