@@ -209,7 +209,6 @@ static int tolua_setkey(lua_State * L)
     const char *name = tolua_tostring(L, 1, 0);
     int value = tolua_toboolean(L, 2, 0);
     int flag = atoi36(name);
-    bool isset = key_get(global.attribs, flag);
     if (value) {
         key_set(&global.attribs, flag);
     }

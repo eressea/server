@@ -578,11 +578,12 @@ const struct locale *lang)
 }
 
 int read_attribs(storage *store, attrib **alist, void *owner) {
-#if RELEASE_VERSION < ATHASH_VERSION
-    return a_read_orig(store, alist, owner);
-#else
-    return a_read(store, alist, owner);
-#endif
+    if (global.data_version < ATHASH_VERSION) {
+        return a_read_orig(store, alist, owner);
+    }
+    else {
+        return a_read(store, alist, owner);
+    }
 }
 
 void write_attribs(storage *store, attrib *alist, const void *owner)
