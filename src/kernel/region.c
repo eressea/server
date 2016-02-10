@@ -483,6 +483,7 @@ attrib_type at_horseluck = {
     DEFAULT_AGE,
     NO_WRITE,
     NO_READ,
+    NULL,
     ATF_UNIQUE
 };
 
@@ -496,6 +497,7 @@ attrib_type at_peasantluck = {
     DEFAULT_AGE,
     NO_WRITE,
     NO_READ,
+    NULL,
     ATF_UNIQUE
 };
 
@@ -509,6 +511,7 @@ attrib_type at_deathcount = {
     DEFAULT_AGE,
     a_writeint,
     a_readint,
+    NULL,
     ATF_UNIQUE
 };
 
@@ -522,6 +525,7 @@ attrib_type at_woodcount = {
     DEFAULT_AGE,
     NO_WRITE,
     a_readint,
+    NULL,
     ATF_UNIQUE
 };
 

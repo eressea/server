@@ -30,6 +30,7 @@ attrib_type at_iceberg = {
     NULL,
     a_writeint,
     a_readint,
+    NULL,
     ATF_UNIQUE
 };
 

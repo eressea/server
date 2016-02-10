@@ -659,7 +659,7 @@ int read_borders(struct storage *store)
                 type->read(b, store);
             if (global.data_version < NOBORDERATTRIBS_VERSION) {
                 attrib *a = NULL;
-                int result = a_read(store, &a, b);
+                int result = read_attribs(store, &a, b);
                 if (border_convert_cb) {
                     border_convert_cb(b, a);
                 }

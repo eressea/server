@@ -52,6 +52,7 @@ attrib_type at_targetregion = {
     NULL,
     write_targetregion,
     read_targetregion,
+    NULL,
     ATF_UNIQUE
 };
 

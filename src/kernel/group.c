@@ -119,7 +119,7 @@ write_group(const attrib * a, const void *owner, struct storage *store)
 attrib_type at_group = {        /* attribute for units assigned to a group */
     "grp",
     DEFAULT_INIT,
-    DEFAULT_FINALIZE, DEFAULT_AGE, write_group, read_group, ATF_UNIQUE };
+    DEFAULT_FINALIZE, DEFAULT_AGE, write_group, read_group, NULL, ATF_UNIQUE };
 
 void free_group(group * g)
 {
@@ -209,7 +209,7 @@ void write_groups(struct storage *store, const faction * f)
             }
         }
         WRITE_INT(store, 0);
-        a_write(store, g->attribs, g);
+        write_attribs(store, g->attribs, g);
         WRITE_SECTION(store);
     }
     WRITE_INT(store, 0);
@@ -241,6 +241,6 @@ void read_groups(struct storage *store, faction * f)
             if (!a->faction)
                 ur_add(fid, &a->faction, resolve_faction);
         }
-        a_read(store, &g->attribs, g);
+        read_attribs(store, &g->attribs, g);
     }
 }

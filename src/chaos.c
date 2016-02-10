@@ -50,6 +50,7 @@ attrib_type at_chaoscount = {
     DEFAULT_AGE,
     a_writeint,
     a_readint,
+    NULL,
     ATF_UNIQUE
 };
 

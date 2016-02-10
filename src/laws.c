@@ -486,6 +486,7 @@ attrib_type at_germs = {
     DEFAULT_AGE,
     a_writeshorts,
     a_readshorts,
+    NULL,
     ATF_UNIQUE
 };
 
@@ -2749,7 +2750,7 @@ void sinkships(struct region * r)
 
 static attrib_type at_number = {
     "faction_renum",
-    NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL, NULL,
     ATF_UNIQUE
 };
 

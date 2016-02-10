@@ -96,7 +96,7 @@ TOLUA_PKG(game);
 int log_lua_error(lua_State * L)
 {
     const char *error = lua_tostring(L, -1);
-    log_fatal("LUA call failed.\n%s\n", error);
+    log_fatal("Lua call failed.\n%s\n", error);
     lua_pop(L, 1);
     return 1;
 }
@@ -186,8 +186,8 @@ static int tolua_getkey(lua_State * L)
 {
     const char *name = tolua_tostring(L, 1, 0);
     int flag = atoi36(name);
-    attrib *a = find_key(global.attribs, flag);
-    lua_pushboolean(L, a != NULL);
+
+    lua_pushboolean(L, key_get(global.attribs, flag));
     return 1;
 }
 
@@ -209,12 +209,11 @@ static int tolua_setkey(lua_State * L)
     const char *name = tolua_tostring(L, 1, 0);
     int value = tolua_toboolean(L, 2, 0);
     int flag = atoi36(name);
-    attrib *a = find_key(global.attribs, flag);
-    if (a == NULL && value) {
-        add_key(&global.attribs, flag);
+    if (value) {
+        key_set(&global.attribs, flag);
     }
-    else if (a != NULL && !value) {
-        a_remove(&global.attribs, a);
+    else {
+        key_unset(&global.attribs, flag);
     }
     return 0;
 }
@@ -1184,6 +1183,7 @@ int eressea_run(lua_State *L, const char *luafile)
         err = lua_pcall(L, 1, 1, -3);
         if (err != 0) {
             log_lua_error(L);
+            assert(!"Lua syntax error? check log.");
         }
         else {
             if (lua_isnumber(L, -1)) {

@@ -335,6 +335,7 @@ attrib_type at_mage = {
     NULL,
     write_mage,
     read_mage,
+    NULL,
     ATF_UNIQUE
 };
 
@@ -2416,6 +2417,7 @@ attrib_type at_familiarmage = {
     age_unit,
     a_write_unit,
     read_magician,
+    NULL,
     ATF_UNIQUE
 };
 
@@ -2426,6 +2428,7 @@ attrib_type at_familiar = {
     age_unit,
     a_write_unit,
     read_familiar,
+    NULL,
     ATF_UNIQUE
 };
 
@@ -2436,6 +2439,7 @@ attrib_type at_clonemage = {
     age_unit,
     a_write_unit,
     read_magician,
+    NULL,
     ATF_UNIQUE
 };
 
@@ -2446,6 +2450,7 @@ attrib_type at_clone = {
     age_unit,
     a_write_unit,
     read_clone,
+    NULL,
     ATF_UNIQUE
 };
 

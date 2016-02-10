@@ -38,6 +38,7 @@ attrib_type at_guard = {
     DEFAULT_AGE,
     a_writeint,
     a_readint,
+    NULL,
     ATF_UNIQUE
 };
 
