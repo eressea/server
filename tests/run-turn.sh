@@ -1,4 +1,4 @@
-NEWFILES="data/185.dat datum parteien parteien.full passwd score turn"
+NEWFILES="data/185.dat datum parteien parteien.full passwd htpasswd score turn"
 cleanup () {
 rm -rf reports $NEWFILES
 }
