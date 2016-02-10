@@ -480,7 +480,7 @@ int victorycondition(const alliance * al, const char *name)
 
         for (qi = 0; flist; ql_advance(&flist, &qi, 1)) {
             faction *f = (faction *)ql_get(flist, qi);
-            if (find_key(f->attribs, atoi36("phnx"))) {
+            if (key_get(f->attribs, atoi36("phnx"))) {
                 return 1;
             }
         }
@@ -509,7 +509,7 @@ int victorycondition(const alliance * al, const char *name)
 
         for (qi = 0; flist; ql_advance(&flist, &qi, 1)) {
             faction *f = (faction *)ql_get(flist, qi);
-            if (find_key(f->attribs, atoi36("pyra"))) {
+            if (key_get(f->attribs, atoi36("pyra"))) {
                 return 1;
             }
         }

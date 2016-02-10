@@ -22,6 +22,69 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <kernel/save.h>
 #include <util/attrib.h>
+#include <storage.h>
+
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
+
+static void a_writekeys(const attrib *a, const void *o, storage *store) {
+    int i, *keys = (int *)a->data.v;
+    for (i = 0; i <= keys[0]; ++i) {
+        WRITE_INT(store, keys[i]);
+    }
+}
+
+static int a_readkeys(attrib * a, void *owner, struct storage *store) {
+    int i, *p = 0;
+    READ_INT(store, &i);
+    assert(i < 4096 && i>0);
+    a->data.v = p = malloc(sizeof(int)*(i + 1));
+    *p++ = i;
+    while (i--) {
+        READ_INT(store, p++);
+    }
+    return AT_READ_OK;
+}
+
+static int a_readkey(attrib *a, void *owner, struct storage *store) {
+    int res = a_readint(a, owner, store);
+    return (res != AT_READ_FAIL) ? AT_READ_DEPR : res;
+}
+
+attrib_type at_keys = {
+    "keys",
+    NULL,
+    NULL,
+    NULL,
+    a_writekeys,
+    a_readkeys,
+    NULL
+};
+
+void a_upgradekeys(attrib **alist, attrib *abegin) {
+    int n = 0, *keys = 0;
+    int i = 0, val[4];
+    attrib *a, *ak = a_find(*alist, &at_keys);
+    if (!ak) {
+        ak = a_add(alist, a_new(&at_keys));
+        keys = (int *)ak->data.v;
+        n = keys ? keys[0] : 0;
+    }
+    for (a = abegin; a && a->type == abegin->type; a = a->next) {
+        val[i++] = a->data.i;
+        if (i == 4) {
+            keys = realloc(keys, sizeof(int) * (n + i + 1));
+            memcpy(keys + n + 1, val, sizeof(int)*i);
+            n += i;
+        }
+    }
+    if (i > 0) {
+        keys = realloc(keys, sizeof(int) * (n + i + 1));
+        memcpy(keys + n + 1, val, sizeof(int)*i);
+    }
+    keys[0] = n + i;
+}
 
 attrib_type at_key = {
     "key",
@@ -29,29 +92,61 @@ attrib_type at_key = {
     NULL,
     NULL,
     a_writeint,
-    a_readint,
+    a_readkey,
+    a_upgradekeys
 };
 
-attrib *add_key(attrib ** alist, int key)
+void key_set(attrib ** alist, int key)
 {
-    attrib *a = find_key(*alist, key);
-    if (a == NULL)
-        a = a_add(alist, make_key(key));
-    return a;
-}
-
-attrib *make_key(int key)
-{
-    attrib *a = a_new(&at_key);
-    a->data.i = key;
-    return a;
-}
-
-attrib *find_key(attrib * alist, int key)
-{
-    attrib *a = a_find(alist, &at_key);
-    while (a && a->type == &at_key && a->data.i != key) {
-        a = a->next;
+    int *keys, n = 1;
+    attrib *a;
+    assert(key != 0);
+    a = a_find(*alist, &at_keys);
+    if (!a) {
+        a = a_add(alist, a_new(&at_keys));
     }
-    return (a && a->type == &at_key) ? a : NULL;
+    keys = (int *)a->data.v;
+    if (keys) {
+        n = keys[0] + 1;
+    }
+    keys = realloc(keys, sizeof(int) *(n + 1));
+    // TODO: does insertion sort pay off here?
+    keys[0] = n;
+    keys[n] = key;
+    a->data.v = keys;
+}
+
+void key_unset(attrib ** alist, int key)
+{
+    attrib *a;
+    assert(key != 0);
+    a = a_find(*alist, &at_keys);
+    if (a) {
+        int i, *keys = (int *)a->data.v;
+        if (keys) {
+            for (i = 1; i <= keys[0]; ++i) {
+                if (keys[i] == key) {
+                    keys[i] = keys[keys[0]];
+                    keys[0]--;
+                }
+            }
+        }
+    }
+}
+
+bool key_get(attrib *alist, int key) {
+    attrib *a;
+    assert(key != 0);
+    a = a_find(alist, &at_keys);
+    if (a) {
+        int i, *keys = (int *)a->data.v;
+        if (keys) {
+            for (i = 1; i <= keys[0]; ++i) {
+                if (keys[i] == key) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
 }

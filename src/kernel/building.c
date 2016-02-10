@@ -141,7 +141,7 @@ int buildingcapacity(const building * b)
 }
 
 attrib_type at_building_generic_type = {
-    "building_generic_type", NULL, NULL, NULL, a_writestring, a_readstring,
+    "building_generic_type", NULL, NULL, NULL, a_writestring, a_readstring, NULL,
     ATF_UNIQUE
 };
 

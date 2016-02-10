@@ -157,7 +157,7 @@ static void done_learning(struct attrib *a)
 
 const attrib_type at_learning = {
     "learning",
-    init_learning, done_learning, NULL, NULL, NULL,
+    init_learning, done_learning, NULL, NULL, NULL, NULL,
     ATF_UNIQUE
 };
 

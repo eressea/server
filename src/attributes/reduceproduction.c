@@ -49,6 +49,7 @@ attrib_type at_reduceproduction = {
     age_reduceproduction,
     a_writeshorts,
     a_readshorts,
+    NULL,
     ATF_UNIQUE
 };
 

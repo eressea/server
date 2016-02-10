@@ -926,14 +926,14 @@ struct order *ord)
             "unit item region command", user, itype->rtype, user->region, ord));
         return -1;
     }
-    if (!is_mage(user) || find_key(f->attribs, atoi36("mbst")) != NULL) {
+    if (!is_mage(user) || key_get(f->attribs, atoi36("mbst"))) {
         cmistake(user, user->thisorder, 214, MSG_EVENT);
         return -1;
     }
     use_pooled(user, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
         user->number);
 
-    a_add(&f->attribs, make_key(atoi36("mbst")));
+    key_set(&f->attribs, atoi36("mbst"));
     set_level(user, SK_MAGIC, 3);
 
     ADDMSG(&user->faction->msgs, msg_message("use_item",

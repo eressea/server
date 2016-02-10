@@ -21,12 +21,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+    struct attrib;
+    struct attrib_type;
     extern struct attrib_type at_key;
+    extern struct attrib_type at_keys;
 
-    struct attrib *make_key(int key);
-    struct attrib *find_key(struct attrib *alist, int key);
-    struct attrib *add_key(struct attrib **alist, int key);
+    void key_set(struct attrib **alist, int key);
+    void key_unset(struct attrib **alist, int key);
+    bool key_get(struct attrib *alist, int key);
 
 #ifdef __cplusplus
 }

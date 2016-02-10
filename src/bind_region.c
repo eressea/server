@@ -542,11 +542,9 @@ static int tolua_region_getkey(lua_State * L)
 {
     region *self = (region *)tolua_tousertype(L, 1, 0);
     const char *name = tolua_tostring(L, 2, 0);
-
     int flag = atoi36(name);
-    attrib *a = find_key(self->attribs, flag);
-    lua_pushboolean(L, a != NULL);
 
+    lua_pushboolean(L, key_get(self->attribs, flag));
     return 1;
 }
 
@@ -555,14 +553,13 @@ static int tolua_region_setkey(lua_State * L)
     region *self = (region *)tolua_tousertype(L, 1, 0);
     const char *name = tolua_tostring(L, 2, 0);
     int value = tolua_toboolean(L, 3, 0);
-
     int flag = atoi36(name);
-    attrib *a = find_key(self->attribs, flag);
-    if (a == NULL && value) {
-        add_key(&self->attribs, flag);
+
+    if (value) {
+        key_set(&self->attribs, flag);
     }
-    else if (a != NULL && !value) {
-        a_remove(&self->attribs, a);
+    else {
+        key_unset(&self->attribs, flag);
     }
     return 0;
 }
