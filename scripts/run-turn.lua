@@ -59,11 +59,16 @@ local function write_emails(locales)
   end
 end
 
+local function join_path(a, b)
+    if a then return a .. '/' .. b end
+    return b
+end
+
 local function write_addresses()
   local file
   local faction
 
-  file = io.open(config.basepath .. "/adressen", "w")
+  file = io.open(join_path(config.basepath, "adressen"), "w")
   for faction in factions() do
     -- print(faction.id .. " - " .. faction.locale)
     file:write(tostring(faction) .. ":" .. faction.email .. ":" .. faction.info .. "\n")
@@ -76,7 +81,7 @@ local function write_aliases()
   local file
   local faction
 
-  file = io.open(config.basepath .. "/aliases", "w")
+  file = io.open(join_path(config.basepath, "aliases"), "w")
   for faction in factions() do
     local unit
     if faction.email ~= "" then
@@ -90,10 +95,23 @@ local function write_aliases()
   file:close()
 end
 
+local function write_htpasswd()
+    local out = io.open(join_path(config.basepath, "htpasswd"), "w")
+    if out then
+        for f in factions() do
+            if f.password then
+                out:write(itoa36(f.id) .. ":" .. f.password .. "\n")
+            end
+        end
+        out:close()
+    end
+end
+
 local function write_files(locales)
-  write_passwords()
-  write_reports()
-  write_summary()
+    write_passwords()
+    write_htpasswd()
+    write_reports()
+    write_summary()
 end
 
 local function write_scores()
