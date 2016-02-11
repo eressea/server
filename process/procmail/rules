@@ -56,37 +56,37 @@
 
 :0
 * ^Subject:.*ERESSEA 4 BEFEHLE
-| $HOME/bin/orders-accept 4 de
+| grep -v '>From' | $HOME/bin/orders-accept 4 de
 
 :0
 * ^Subject:.*ERESSEA 4 ORDERS
-| $HOME/bin/orders-accept 4 en
+| grep -v '>From' | $HOME/bin/orders-accept 4 en
 
 :0
 * ^Subject:.*ERESSEA 3 BEFEHLE
-| $HOME/bin/orders-accept 3 de
+| grep -v '>From' | $HOME/bin/orders-accept 3 de
 
 :0
 * ^Subject:.*ERESSEA 3 ORDERS
-| $HOME/bin/orders-accept 3 en
+| grep -v '>From' | $HOME/bin/orders-accept 3 en
 
 ## backwards compatible format
 
 :0
 * ^Subject:.*E3.* BEF.*
-| $HOME/bin/orders-accept 3 de
+| grep -v '>From' | $HOME/bin/orders-accept 3 de
 
 :0
 * ^Subject:.*E3.* ORD.*
-| $HOME/bin/orders-accept 3 en
+| grep -v '>From' | $HOME/bin/orders-accept 3 en
 
 :0
 * ^Subject:.*ERE.* BEF.*
-| $HOME/bin/orders-accept 2 de
+| grep -v '>From' | $HOME/bin/orders-accept 2 de
 
 :0
 * ^Subject:.*ERE.* ORD.*
-| $HOME/bin/orders-accept 2 en
+| grep -v '>From' | $HOME/bin/orders-accept 2 en
 
 :0 c
 * ^Subject:.*ERE.*
