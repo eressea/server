@@ -4,3 +4,5 @@ orders-accept DESTINATION bin)
 
 install(DIRECTORY cron/ DESTINATION bin USE_SOURCE_PERMISSIONS
 FILES_MATCHING PATTERN "*.cron")
+
+install(DIRECTORY procmail DESTINATION share)
