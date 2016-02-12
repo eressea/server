@@ -1239,7 +1239,7 @@ faction *readfaction(struct gamedata * data)
     }
 
     READ_STR(data->store, name, sizeof(name));
-    faction_setpassword(f, (data->version >= CRYPT_VERSION) ? name : password_hash(name, 0, PASSWORD_DEFAULT));
+    faction_setpassword(f, (data->version >= CRYPT_VERSION) ? name : password_encode(name, PASSWORD_DEFAULT));
     if (data->version < NOOVERRIDE_VERSION) {
         READ_STR(data->store, 0, 0);
     }
