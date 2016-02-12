@@ -108,12 +108,12 @@ static void test_addfaction(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, (void *)f->ursprung);
     CuAssertPtrEquals(tc, (void *)factions, (void *)f);
     CuAssertStrEquals(tc, "test@eressea.de", f->email);
-    CuAssertIntEquals(tc, true, checkpasswd(f, "hurrdurr"));
+    CuAssertTrue(tc, checkpasswd(f, "hurrdurr"));
     CuAssertPtrEquals(tc, (void *)lang, (void *)f->locale);
     CuAssertIntEquals(tc, 1234, f->subscription);
     CuAssertIntEquals(tc, 0, f->flags);
     CuAssertIntEquals(tc, 0, f->age);
-    CuAssertIntEquals(tc, true, faction_alive(f));
+    CuAssertTrue(tc, faction_alive(f));
     CuAssertIntEquals(tc, M_GRAY, f->magiegebiet);
     CuAssertIntEquals(tc, turn, f->lastorders);
     CuAssertPtrEquals(tc, f, findfaction(f->no));
@@ -125,9 +125,9 @@ static void test_check_passwd(CuTest *tc) {
     
     f = test_create_faction(0);
     faction_setpassword(f, password_hash("password", 0, PASSWORD_DEFAULT));
-    CuAssertIntEquals(tc, true, checkpasswd(f, "password"));
-    CuAssertIntEquals(tc, false, checkpasswd(f, "assword"));
-    CuAssertIntEquals(tc, false, checkpasswd(f, "PASSWORD"));
+    CuAssertTrue(tc, checkpasswd(f, "password"));
+    CuAssertTrue(tc, !checkpasswd(f, "assword"));
+    CuAssertTrue(tc, !checkpasswd(f, "PASSWORD"));
 }
 
 static void test_get_monsters(CuTest *tc) {

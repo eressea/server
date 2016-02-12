@@ -2,6 +2,8 @@
 #include "password.h"
 
 #include <md5.h>
+#include <crypt_blowfish.h>
+#include <drepper.h>
 #include <mtrand.h>
 
 #include <assert.h>
@@ -25,37 +27,68 @@
   } while (0)
 
 
-char *password_gensalt(void) {
-    static char salt[SALTLEN + 1];
+char *password_gensalt(char *salt, size_t salt_len) {
+    size_t buflen = salt_len-1;
     char *cp = salt;
-    int buflen = SALTLEN;
     while (buflen) {
         unsigned long ul = genrand_int32() & (unsigned long)time(0);
         b64_from_24bit((char)(ul & 0xFF), (char)((ul>>8)&0xff), (char)((ul>>16)&0xFF), 4);
     }
-    salt[SALTLEN] = 0;
+    salt[salt_len-1] = 0;
     return salt;
 }
 
-static const char * password_hash_i(const char * passwd, const char *salt, int algo, char *result, size_t len) {
-    assert(passwd);
-    if (!salt) {
-        salt = password_gensalt();
-    }
-    if (algo==PASSWORD_PLAIN) {
-        _snprintf(result, len, "$0$%s$%s", salt, passwd);
-    }
-    else if (algo == PASSWORD_MD5) {
-        return md5_crypt_r(passwd, salt, result, len);
-    }
-    else if (algo == PASSWORD_APACHE_MD5) {
-        apr_md5_encode(passwd, salt, result, len);
+static bool password_is_implemented(int algo) {
+    return algo == PASSWORD_BCRYPT || algo == PASSWORD_PLAIN || algo == PASSWORD_MD5 || algo == PASSWORD_APACHE_MD5;
+}
+
+static const char * password_hash_i(const char * passwd, const char *input, int algo, char *result, size_t len) {
+    if (algo == PASSWORD_BCRYPT) {
+        char salt[MAXSALTLEN];
+        char setting[40];
+        if (!input) {
+            input = password_gensalt(salt, MAXSALTLEN);
+        }
+        if (_crypt_gensalt_blowfish_rn("$2y$", 5, input, strlen(input), setting, sizeof(setting)) == NULL) {
+            return NULL;
+        }
+        if (_crypt_blowfish_rn(passwd, setting, result, len) == NULL) {
+            return NULL;
+        }
         return result;
     }
-    else {
-        return NULL;
+    else if (algo == PASSWORD_PLAIN) {
+        _snprintf(result, len, "$0$%s", passwd);
+        return result;
     }
-    return result;
+    else if (password_is_implemented(algo)) {
+        char salt[MAXSALTLEN];
+        assert(passwd);
+        if (input) {
+            const char * dol = strchr(input, '$');
+            size_t salt_len;
+            if (dol) {
+                assert(dol > input && dol[0] == '$');
+                salt_len = dol - input;
+            }
+            else {
+                salt_len = strlen(input);
+            }
+            assert(salt_len < MAXSALTLEN);
+            stpncpy(salt, input, salt_len);
+            salt[salt_len] = 0;
+        } else {
+            input = password_gensalt(salt, sizeof(salt));
+        }
+        if (algo == PASSWORD_MD5) {
+            return md5_crypt_r(passwd, input, result, len);
+        }
+        else if (algo == PASSWORD_APACHE_MD5) {
+            apr_md5_encode(passwd, input, result, len);
+            return result;
+        }
+    }
+    return NULL;
 }
 
 const char * password_hash(const char * passwd, const char * salt, int algo) {
@@ -64,31 +97,24 @@ const char * password_hash(const char * passwd, const char * salt, int algo) {
     return password_hash_i(passwd, salt, algo, result, sizeof(result));
 }
 
-static bool password_is_implemented(int algo) {
-    return algo==PASSWORD_PLAIN || algo==PASSWORD_MD5 || algo==PASSWORD_APACHE_MD5;
-}
-
 int password_verify(const char * pwhash, const char * passwd) {
-    char salt[MAXSALTLEN+1];
     char hash[64];
-    size_t len;
     int algo;
     char *pos;
-    const char *dol, *result;
+    const char *result;
     assert(passwd);
     assert(pwhash);
     assert(pwhash[0] == '$');
     algo = pwhash[1];
+    if (algo == PASSWORD_BCRYPT) {
+        char sample[200];
+        _crypt_blowfish_rn(passwd, pwhash, sample, sizeof(sample));
+        return (strcmp(sample, pwhash) == 0) ? VERIFY_OK : VERIFY_FAIL;
+    }
     pos = strchr(pwhash+2, '$');
     assert(pos && pos[0] == '$');
-    ++pos;
-    dol = strchr(pos, '$');
-    assert(dol>pos && dol[0] == '$');
-    len = dol - pos;
-    assert(len <= MAXSALTLEN);
-    strncpy(salt, pos, len);
-    salt[len] = 0;
-    result = password_hash_i(passwd, salt, algo, hash, sizeof(hash));
+    pos = strchr(pos, '$')+1;
+    result = password_hash_i(passwd, pos, algo, hash, sizeof(hash));
     if (!password_is_implemented(algo)) {
         return VERIFY_UNKNOWN;
     }
