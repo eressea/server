@@ -35,7 +35,7 @@ static int tolua_storage_create(lua_State * L)
     const char *type = tolua_tostring(L, 2, "rb");
     gamedata *data;
 
-    data = gamedata_open(filename, type);
+    data = gamedata_open(filename, type, RELEASE_VERSION);
     if (data) {
         tolua_pushusertype(L, (void *)data, TOLUA_CAST "storage");
         return 1;

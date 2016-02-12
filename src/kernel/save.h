@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define H_KRNL_SAVE
 
 #include <stream.h>
+#include <util/gamedata.h> // FIXME: eliminate include dependency from this file
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -30,13 +31,6 @@ extern "C" {
     struct spell;
     struct spellbook;
     struct unit;
-
-    typedef struct gamedata {
-        struct storage *store;
-        stream strm;
-        int version;
-        int encoding;
-    } gamedata;
 
 #define MAX_INPUT_SIZE	DISPLAYSIZE*2
     /* Nach MAX_INPUT_SIZE brechen wir das Einlesen der Zeile ab und nehmen an,
@@ -82,9 +76,6 @@ extern "C" {
     void a_finalizestring(struct attrib *a);
 
     void create_backup(char *file);
-
-    struct gamedata *gamedata_open(const char *filename, const char *mode);
-    void gamedata_close(struct gamedata *data);
 
     /* test-only functions that give access to internal implementation details (BAD) */
     void _test_write_password(struct gamedata *data, const struct faction *f);

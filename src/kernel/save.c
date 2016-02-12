@@ -60,6 +60,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/event.h>
 #include <util/filereader.h>
 #include <util/goodies.h>
+#include <util/gamedata.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
@@ -1951,51 +1952,6 @@ int writegame(const char *filename)
     binstore_done(&store);
     fstream_done(&strm);
 
-    return 0;
-}
-
-void gamedata_close(gamedata *data) {
-    binstore_done(data->store);
-    fstream_done(&data->strm);
-}
-
-gamedata *gamedata_open(const char *filename, const char *mode) {
-    FILE *F = fopen(filename, mode);
-
-    if (F) {
-        gamedata *data = (gamedata *)calloc(1, sizeof(gamedata));
-        storage *store = (storage *)calloc(1, sizeof(storage));
-        int err = 0;
-        size_t sz;
-
-        data->store = store;
-        if (strchr(mode, 'r')) {
-            sz = fread(&data->version, 1, sizeof(int), F);
-            if (sz != sizeof(int)) {
-                err = ferror(F);
-            }
-            else {
-                err = fseek(F, sizeof(int), SEEK_CUR);
-            }
-        }
-        else if (strchr(mode, 'w')) {
-            int n = STREAM_VERSION;
-            data->version = RELEASE_VERSION;
-            fwrite(&data->version, sizeof(int), 1, F);
-            fwrite(&n, sizeof(int), 1, F);
-        }
-        if (err) {
-            fclose(F);
-            free(data);
-            free(store);
-        }
-        else {
-            fstream_init(&data->strm, F);
-            binstore_init(store, &data->strm);
-            return data;
-        }
-    }
-    log_error("could not open %s: %s", filename, strerror(errno));
     return 0;
 }
 

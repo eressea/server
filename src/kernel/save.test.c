@@ -1,6 +1,7 @@
 #include <platform.h>
 #include <kernel/config.h>
 #include <util/attrib.h>
+#include <util/gamedata.h>
 #include <attributes/key.h>
 
 #include "save.h"
@@ -43,7 +44,7 @@ static void test_readwrite_unit(CuTest * tc)
 {
     const char *filename = "test.dat";
     char path[MAX_PATH];
-    gamedata *data;
+    gamedata data;
     struct unit *u;
     struct region *r;
     struct faction *f;
@@ -58,20 +59,16 @@ static void test_readwrite_unit(CuTest * tc)
     u = test_create_unit(f, r);
     join_path(datapath(), filename, path, sizeof(path));
 
-    data = gamedata_open(path, "wb");
-    CuAssertPtrNotNull(tc, data); // TODO: intermittent test (even after the 'b' fix!)
-
-    write_unit(data, u);
-    gamedata_close(data);
-
+    CuAssertIntEquals(tc, 0, gamedata_openfile(&data, path, "wb", RELEASE_VERSION)); // TODO: intermittent test (even after the 'b' fix!)
+    write_unit(&data, u);
+    gamedata_close(&data);
+    
     free_gamedata();
     f = test_create_faction(0);
     renumber_faction(f, fno);
-    data = gamedata_open(path, "rb");
-    CuAssertPtrNotNull(tc, data);
-
-    u = read_unit(data);
-    gamedata_close(data);
+    CuAssertIntEquals(tc, 0, gamedata_openfile(&data, path, "rb", RELEASE_VERSION)); // TODO: intermittent test (even after the 'b' fix!)
+    u = read_unit(&data);
+    gamedata_close(&data);
 
     CuAssertPtrNotNull(tc, u);
     CuAssertPtrEquals(tc, f, u->faction);
@@ -86,7 +83,7 @@ static void test_readwrite_attrib(CuTest *tc) {
     const char *path = "attrib.dat";
     test_cleanup();
     global.data_version = RELEASE_VERSION; // FIXME: hack!
-    data = gamedata_open(path, "wb");
+    data = gamedata_open(path, "wb", RELEASE_VERSION);
     CuAssertPtrNotNull(tc, data);
     key_set(&a, 41);
     key_set(&a, 42);
@@ -95,7 +92,7 @@ static void test_readwrite_attrib(CuTest *tc) {
     a_removeall(&a, NULL);
     CuAssertPtrEquals(tc, 0, a);
 
-    data = gamedata_open(path, "rb");
+    data = gamedata_open(path, "rb", RELEASE_VERSION);
     CuAssertPtrNotNull(tc, data);
     read_attribs(data->store, &a, NULL);
     gamedata_close(data);
@@ -237,11 +234,11 @@ static void test_read_password(CuTest *tc) {
     faction *f;
     f = test_create_faction(0);
     faction_setpassword(f, password_encode("secret", PASSWORD_DEFAULT));
-    data = gamedata_open(path, "wb");
+    data = gamedata_open(path, "wb", RELEASE_VERSION);
     CuAssertPtrNotNull(tc, data);
     _test_write_password(data, f);
     gamedata_close(data);
-    data = gamedata_open(path, "rb");
+    data = gamedata_open(path, "rb", RELEASE_VERSION);
     CuAssertPtrNotNull(tc, data);
     _test_read_password(data, f);
     gamedata_close(data);
@@ -259,12 +256,12 @@ static void test_read_password_external(CuTest *tc) {
     f = test_create_faction(0);
     faction_setpassword(f, password_encode("secret", PASSWORD_DEFAULT));
     CuAssertPtrNotNull(tc, f->_password);
-    data = gamedata_open(path, "wb");
+    data = gamedata_open(path, "wb", RELEASE_VERSION);
     CuAssertPtrNotNull(tc, data);
     WRITE_TOK(data->store, (const char *)f->_password);
     WRITE_TOK(data->store, (const char *)f->_password);
     gamedata_close(data);
-    data = gamedata_open(path, "rb");
+    data = gamedata_open(path, "rb", RELEASE_VERSION);
     CuAssertPtrNotNull(tc, data);
     data->version = BADCRYPT_VERSION;
     _test_read_password(data, f);

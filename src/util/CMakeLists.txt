@@ -23,6 +23,7 @@ event.c
 filereader.c
 functions.c
 goodies.c
+gamedata.c
 language.c
 lists.c
 log.c
