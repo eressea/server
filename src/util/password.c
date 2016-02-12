@@ -91,10 +91,10 @@ static const char * password_hash_i(const char * passwd, const char *input, int 
     return NULL;
 }
 
-const char * password_hash(const char * passwd, const char * salt, int algo) {
+const char * password_encode(const char * passwd, int algo) {
     static char result[64]; // TODO: static result buffers are bad mojo!
     if (algo < 0) algo = PASSWORD_DEFAULT;
-    return password_hash_i(passwd, salt, algo, result, sizeof(result));
+    return password_hash_i(passwd, 0, algo, result, sizeof(result));
 }
 
 int password_verify(const char * pwhash, const char * passwd) {
@@ -106,6 +106,9 @@ int password_verify(const char * pwhash, const char * passwd) {
     assert(pwhash);
     assert(pwhash[0] == '$');
     algo = pwhash[1];
+    if (!password_is_implemented(algo)) {
+        return VERIFY_UNKNOWN;
+    }
     if (algo == PASSWORD_BCRYPT) {
         char sample[200];
         _crypt_blowfish_rn(passwd, pwhash, sample, sizeof(sample));
@@ -115,9 +118,6 @@ int password_verify(const char * pwhash, const char * passwd) {
     assert(pos && pos[0] == '$');
     pos = strchr(pos, '$')+1;
     result = password_hash_i(passwd, pos, algo, hash, sizeof(hash));
-    if (!password_is_implemented(algo)) {
-        return VERIFY_UNKNOWN;
-    }
     if (strcmp(pwhash, result) == 0) {
         return VERIFY_OK;
     }
