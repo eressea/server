@@ -45,38 +45,34 @@ static void test_readwrite_data(CuTest * tc)
 
 static void test_readwrite_unit(CuTest * tc)
 {
-    const char *filename = "test.dat";
-    char path[MAX_PATH];
     gamedata data;
+    storage store;
     struct unit *u;
     struct region *r;
     struct faction *f;
     int fno;
-    /* FIXME: at some point during this test, errno is set to 17 (File exists), why? */
 
-    create_directories();
     test_cleanup();
     r = test_create_region(0, 0, 0);
     f = test_create_faction(0);
     fno = f->no;
     u = test_create_unit(f, r);
-    join_path(datapath(), filename, path, sizeof(path));
 
-    CuAssertIntEquals(tc, 0, gamedata_openfile(&data, path, "wb", RELEASE_VERSION)); // TODO: intermittent test (even after the 'b' fix!)
+    mstream_init(&data.strm);
+    gamedata_init(&data, &store, RELEASE_VERSION);
     write_unit(&data, u);
-    gamedata_close(&data);
     
+    data.strm.api->rewind(data.strm.handle);
     free_gamedata();
     f = test_create_faction(0);
     renumber_faction(f, fno);
-    CuAssertIntEquals(tc, 0, gamedata_openfile(&data, path, "rb", RELEASE_VERSION)); // TODO: intermittent test (even after the 'b' fix!)
+    gamedata_init(&data, &store, RELEASE_VERSION);
     u = read_unit(&data);
-    gamedata_close(&data);
+    gamedata_done(&data);
 
     CuAssertPtrNotNull(tc, u);
     CuAssertPtrEquals(tc, f, u->faction);
     CuAssertPtrEquals(tc, 0, u->region);
-    CuAssertIntEquals(tc, 0, remove(path));
     test_cleanup();
 }
 
