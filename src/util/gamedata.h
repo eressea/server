@@ -14,8 +14,11 @@ typedef struct gamedata {
     int encoding;
 } gamedata;
 
-void gamedata_close(struct gamedata *data);
-struct gamedata *gamedata_open(const char *filename, const char *mode, int version);
+void gamedata_init(gamedata *data, struct storage *store, int version);
+void gamedata_done(gamedata *data);
+
+void gamedata_close(gamedata *data);
+gamedata *gamedata_open(const char *filename, const char *mode, int version);
 int gamedata_openfile(gamedata *data, const char *filename, const char *mode, int version);
 
 #define STREAM_VERSION 2 /* internal encoding of binary files */
