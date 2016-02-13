@@ -30,7 +30,7 @@ extern "C" {
     struct skill;
     struct item;
     struct sc_mage;
-
+    struct gamedata;
 #define UFL_DEAD          (1<<0)
 #define UFL_ISNEW         (1<<1)        /* 2 */
 #define UFL_LONGACTION    (1<<2)        /* 4 */

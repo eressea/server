@@ -26,6 +26,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
+    struct gamedata;
+    
     /* maintenance::flags */
 #define MTF_NONE     0x00
 #define MTF_VARIABLE 0x01       /* resource usage scales with size */

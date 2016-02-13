@@ -21,6 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "variant.h"
 struct storage;
+struct gamedata;
 
 #ifdef __cplusplus
 extern "C" {
