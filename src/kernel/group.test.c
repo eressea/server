@@ -5,8 +5,13 @@
 #include "faction.h"
 #include "unit.h"
 #include "region.h"
+#include "save.h"
+#include "version.h"
+
+#include <util/gamedata.h>
 #include <util/attrib.h>
 #include <attributes/key.h>
+
 #include <stream.h>
 #include <filestream.h>
 #include <storage.h>
@@ -21,35 +26,29 @@ static void test_group_readwrite(CuTest * tc)
     faction * f;
     group *g;
     ally *al;
-    storage store;
-    FILE *F;
-    stream strm;
     int i;
+    gamedata *data;
 
-    F = fopen("test.dat", "wb");
-    fstream_init(&strm, F);
-    binstore_init(&store, &strm);
     test_cleanup();
     test_create_world();
+    data = gamedata_open("test.dat", "wb", RELEASE_VERSION);
     f = test_create_faction(0);
     g = new_group(f, "NW", 42);
     g = new_group(f, "Egoisten", 43);
     key_set(&g->attribs, 44);
     al = ally_add(&g->allies, f);
     al->status = HELP_GIVE;
-    write_groups(&store, f);
-    WRITE_INT(&store, 47);
-    binstore_done(&store);
-    fstream_done(&strm);
+    write_groups(data->store, f);
+    WRITE_INT(data->store, 47);
+    binstore_done(data->store);
+    gamedata_close(data);
 
-    F = fopen("test.dat", "rb");
-    fstream_init(&strm, F);
-    binstore_init(&store, &strm);
     f->groups = 0;
-    read_groups(&store, f);
-    READ_INT(&store, &i);
-    binstore_done(&store);
-    fstream_done(&strm);
+    free_group(g);
+    data = gamedata_open("test.dat", "rb", RELEASE_VERSION);
+    read_groups(data, f);
+    READ_INT(data->store, &i);
+    gamedata_close(data);
 
     CuAssertIntEquals(tc, 47, i);
     CuAssertPtrNotNull(tc, f->groups);

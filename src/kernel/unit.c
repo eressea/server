@@ -52,6 +52,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/base36.h>
 #include <util/bsdstring.h>
 #include <util/event.h>
+#include <util/gamedata.h>
 #include <util/strings.h>
 #include <util/language.h>
 #include <util/lists.h>
@@ -443,8 +444,9 @@ int ualias(const unit * u)
     return a->data.i;
 }
 
-int a_readprivate(attrib * a, void *owner, struct storage *store)
+int a_readprivate(attrib * a, void *owner, gamedata *data)
 {
+    struct storage *store = data->store;
     char lbuf[DISPLAYSIZE];
     READ_STR(store, lbuf, sizeof(lbuf));
     a->data.v = _strdup(lbuf);
@@ -579,8 +581,9 @@ void a_writesiege(const attrib * a, const void *owner, struct storage *store)
     write_building_reference(b, store);
 }
 
-int a_readsiege(attrib * a, void *owner, struct storage *store)
+int a_readsiege(attrib * a, void *owner, gamedata *data)
 {
+    struct storage *store = data->store;
     int result = read_reference(&a->data.v, store, read_building_reference,
         resolve_building);
     if (result == 0 && !a->data.v) {

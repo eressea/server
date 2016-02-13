@@ -82,7 +82,7 @@ static const char * password_hash_i(const char * passwd, const char *input, int 
             memcpy(salt, input, salt_len);
             salt[salt_len] = 0;
         } else {
-            input = password_gensalt(salt, sizeof(salt));
+            input = password_gensalt(salt, SALTLEN);
         }
         if (algo == PASSWORD_MD5) {
             return md5_crypt_r(passwd, input, result, len);

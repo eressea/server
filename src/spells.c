@@ -62,6 +62,7 @@
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/event.h>
+#include <util/gamedata.h>
 #include <util/language.h>
 #include <util/message.h>
 #include <util/parser.h>
@@ -2866,9 +2867,10 @@ static curse *mk_deathcloud(unit * mage, region * r, double force, int duration)
 
 #define COMPAT_DEATHCLOUD
 #ifdef COMPAT_DEATHCLOUD
-static int dc_read_compat(struct attrib *a, void *target, struct storage * store)
+static int dc_read_compat(struct attrib *a, void *target, gamedata *data)
 /* return AT_READ_OK on success, AT_READ_FAIL if attrib needs removal */
 {
+    struct storage *store = data->store;
     region *r = NULL;
     unit *u;
     variant var;

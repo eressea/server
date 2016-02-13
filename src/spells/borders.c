@@ -14,6 +14,7 @@
 #include <kernel/version.h>
 
 #include <util/attrib.h>
+#include <util/gamedata.h>
 #include <util/language.h>
 #include <util/rand.h>
 #include <util/rng.h>
@@ -51,8 +52,9 @@ typedef struct bresolve {
 
 static int resolve_buddy(variant data, void *addr);
 
-static int cw_read(attrib * a, void *target, storage * store)
+static int cw_read(attrib * a, void *target, gamedata *data)
 {
+    storage *store = data->store;
     bresolve *br = calloc(sizeof(bresolve), 1);
     curse *c = (curse *)a->data.v;
     wallcurse *wc = (wallcurse *)c->data.v;

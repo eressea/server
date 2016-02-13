@@ -21,6 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* util includes */
 #include "attrib.h"
+#include "gamedata.h"
 #include "log.h"
 #include "storage.h"
 
@@ -143,8 +144,9 @@ write_handler(const attrib * a, const void *owner, struct storage *store)
     write_triggers(store, hi->triggers);
 }
 
-static int read_handler(attrib * a, void *owner, struct storage *store)
+static int read_handler(attrib * a, void *owner, gamedata *data)
 {
+    struct storage *store = data->store;
     char zText[128];
     handler_info *hi = (handler_info *)a->data.v;
 

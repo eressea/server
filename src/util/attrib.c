@@ -22,6 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "log.h"
 #include "storage.h"
 
+#include <util/gamedata.h>
 #include <critbit.h>
 
 #include <assert.h>
@@ -279,10 +280,10 @@ static critbit_tree cb_deprecated = { 0 };
 
 typedef struct deprecated_s {
     unsigned int hash;
-    int(*reader)(attrib *, void *, struct storage *);
+    int(*reader)(attrib *, void *, struct gamedata *);
 } deprecated_t;
 
-void at_deprecate(const char * name, int(*reader)(attrib *, void *, struct storage *))
+void at_deprecate(const char * name, int(*reader)(attrib *, void *, struct gamedata *))
 {
     deprecated_t value;
     
@@ -291,9 +292,9 @@ void at_deprecate(const char * name, int(*reader)(attrib *, void *, struct stora
     cb_insert(&cb_deprecated, &value, sizeof(value));
 }
 
-static int a_read_i(struct storage *store, attrib ** attribs, void *owner, unsigned int key) {
+static int a_read_i(gamedata *data, attrib ** attribs, void *owner, unsigned int key) {
     int retval = AT_READ_OK;
-    int(*reader)(attrib *, void *, struct storage *) = 0;
+    int(*reader)(attrib *, void *, struct gamedata *) = 0;
     attrib_type *at = at_find(key);
     attrib * na = 0;
 
@@ -313,7 +314,7 @@ static int a_read_i(struct storage *store, attrib ** attribs, void *owner, unsig
         }
     }
     if (reader) {
-        int ret = reader(na, owner, store);
+        int ret = reader(na, owner, data);
         if (na) {
             switch (ret) {
             case AT_READ_DEPR:
@@ -336,13 +337,14 @@ static int a_read_i(struct storage *store, attrib ** attribs, void *owner, unsig
     return retval;
 }
 
-int a_read(struct storage *store, attrib ** attribs, void *owner) {
+int a_read(gamedata *data, attrib ** attribs, void *owner) {
+    struct storage *store = data->store;
     int key, retval = AT_READ_OK;
 
     key = -1;
     READ_INT(store, &key);
     while (key > 0) {
-        int ret = a_read_i(store, attribs, owner, key);
+        int ret = a_read_i(data, attribs, owner, key);
         if (ret == AT_READ_DEPR) {
             retval = AT_READ_DEPR;
         }
@@ -361,14 +363,14 @@ int a_read(struct storage *store, attrib ** attribs, void *owner) {
     return AT_READ_OK;
 }
 
-int a_read_orig(struct storage *store, attrib ** attribs, void *owner)
+int a_read_orig(gamedata *data, attrib ** attribs, void *owner)
 {
     int key, retval = AT_READ_OK;
     char zText[128];
 
     zText[0] = 0;
     key = -1;
-    READ_TOK(store, zText, sizeof(zText));
+    READ_TOK(data->store, zText, sizeof(zText));
     if (strcmp(zText, "end") == 0) {
         return retval;
     }
@@ -376,8 +378,8 @@ int a_read_orig(struct storage *store, attrib ** attribs, void *owner)
         key = __at_hashkey(zText);
     }
     while (key > 0) {
-        retval = a_read_i(store, attribs, owner, key);
-        READ_TOK(store, zText, sizeof(zText));
+        retval = a_read_i(data, attribs, owner, key);
+        READ_TOK(data->store, zText, sizeof(zText));
         if (!strcmp(zText, "end"))
             break;
         key = __at_hashkey(zText);

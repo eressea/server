@@ -40,5 +40,3 @@
 #define RELEASE_VERSION ATHASH_VERSION /* current datafile */
 #define MIN_VERSION INTPAK_VERSION      /* minimal datafile we support */
 #define MAX_VERSION RELEASE_VERSION /* change this if we can need to read the future datafile, and we can do so */
-
-#define STREAM_VERSION 2 /* internal encoding of binary files */

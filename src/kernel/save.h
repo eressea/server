@@ -31,6 +31,7 @@ extern "C" {
     struct spell;
     struct spellbook;
     struct unit;
+    struct gamedata;
 
 #define MAX_INPUT_SIZE	DISPLAYSIZE*2
     /* Nach MAX_INPUT_SIZE brechen wir das Einlesen der Zeile ab und nehmen an,
@@ -53,26 +54,26 @@ extern "C" {
     void write_spellbook(const struct spellbook *book, struct storage *store);
 
     void write_attribs(struct storage *store, struct attrib *alist, const void *owner);
-    int read_attribs(struct storage *store, struct attrib **alist, void *owner);
+    int read_attribs(struct gamedata *store, struct attrib **alist, void *owner);
 
     void write_unit(struct gamedata *data, const struct unit *u);
     struct unit *read_unit(struct gamedata *data);
 
-    int a_readint(struct attrib *a, void *owner, struct storage *store);
+    int a_readint(struct attrib *a, void *owner, struct gamedata *);
     void a_writeint(const struct attrib *a, const void *owner,
         struct storage *store);
-    int a_readshorts(struct attrib *a, void *owner, struct storage *store);
+    int a_readshorts(struct attrib *a, void *owner, struct gamedata *);
     void a_writeshorts(const struct attrib *a, const void *owner,
         struct storage *store);
-    int a_readchars(struct attrib *a, void *owner, struct storage *store);
+    int a_readchars(struct attrib *a, void *owner, struct gamedata *);
     void a_writechars(const struct attrib *a, const void *owner,
         struct storage *store);
-    int a_readvoid(struct attrib *a, void *owner, struct storage *store);
+    int a_readvoid(struct attrib *a, void *owner, struct gamedata *);
     void a_writevoid(const struct attrib *a, const void *owner,
-        struct storage *store);
-    int a_readstring(struct attrib *a, void *owner, struct storage *store);
+        struct storage *);
+    int a_readstring(struct attrib *a, void *owner, struct gamedata *);
     void a_writestring(const struct attrib *a, const void *owner,
-        struct storage *store);
+    struct storage *);
     void a_finalizestring(struct attrib *a);
 
     void create_backup(char *file);

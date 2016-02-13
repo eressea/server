@@ -48,6 +48,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/event.h>
+#include <util/gamedata.h>
 #include <util/functions.h>
 #include <util/strings.h>
 #include <util/lists.h>
@@ -248,10 +249,10 @@ write_hurting(const attrib * a, const void *owner, struct storage *store)
     WRITE_INT(store, b->no);
 }
 
-static int read_hurting(attrib * a, void *owner, struct storage *store)
+static int read_hurting(attrib * a, void *owner, struct gamedata *data)
 {
     int i;
-    READ_INT(store, &i);
+    READ_INT(data->store, &i);
     a->data.v = (void *)findbuilding(i);
     if (a->data.v == NULL) {
         log_error("temple of pain is broken\n");

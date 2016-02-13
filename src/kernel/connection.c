@@ -28,6 +28,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <util/attrib.h>
 #include <util/bsdstring.h>
+#include <util/gamedata.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <quicklist.h>
@@ -601,8 +602,9 @@ void write_borders(struct storage *store)
     WRITE_TOK(store, "end");
 }
 
-int read_borders(struct storage *store)
+int read_borders(gamedata *data)
 {
+    struct storage *store = data->store;
     for (;;) {
         int bid = 0;
         char zText[32];
@@ -613,7 +615,7 @@ int read_borders(struct storage *store)
         if (!strcmp(zText, "end"))
             break;
         READ_INT(store, &bid);
-        if (global.data_version < UIDHASH_VERSION) {
+        if (data->version < UIDHASH_VERSION) {
             int fx, fy, tx, ty;
             READ_INT(store, &fx);
             READ_INT(store, &fy);
@@ -659,7 +661,7 @@ int read_borders(struct storage *store)
                 type->read(b, store);
             if (global.data_version < NOBORDERATTRIBS_VERSION) {
                 attrib *a = NULL;
-                int result = read_attribs(store, &a, b);
+                int result = read_attribs(data, &a, b);
                 if (border_convert_cb) {
                     border_convert_cb(b, a);
                 }

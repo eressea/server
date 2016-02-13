@@ -43,7 +43,7 @@ extern "C" {
     struct group *new_group(struct faction * f, const char *name, int gid);
 
     extern void write_groups(struct storage *data, const struct faction *f);
-    extern void read_groups(struct storage *data, struct faction *f);
+    extern void read_groups(struct gamedata *data, struct faction *f);
 
 #ifdef __cplusplus
 }

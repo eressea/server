@@ -27,6 +27,7 @@
 
 /* util includes */
 #include <util/attrib.h>
+#include <util/gamedata.h>
 #include <util/language.h>
 #include <util/resolve.h>
 #include <util/rng.h>
@@ -109,8 +110,9 @@ static int resolve_exit(variant id, void *address)
     return -1;
 }
 
-static int wormhole_read(struct attrib *a, void *owner, struct storage *store)
+static int wormhole_read(struct attrib *a, void *owner, struct gamedata *data)
 {
+    storage *store = data->store;
     resolve_fun resolver = (global.data_version < UIDHASH_VERSION)
         ? resolve_exit : resolve_region_id;
     read_fun reader = (global.data_version < UIDHASH_VERSION)

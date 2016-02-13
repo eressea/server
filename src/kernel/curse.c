@@ -35,6 +35,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/gamedata.h>
 #include <util/goodies.h>
 #include <util/language.h>
 #include <util/log.h>
@@ -184,8 +185,9 @@ static int read_ccompat(const char *cursename, struct storage *store)
     return -1;
 }
 
-int curse_read(attrib * a, void *owner, struct storage *store)
+int curse_read(attrib * a, void *owner, gamedata *data)
 {
+    storage *store = data->store;
     curse *c = (curse *)a->data.v;
     int ur;
     char cursename[64];
@@ -200,13 +202,13 @@ int curse_read(attrib * a, void *owner, struct storage *store)
     READ_INT(store, &c->duration);
     READ_FLT(store, &flt);
     c->vigour = flt;
-    if (global.data_version < INTPAK_VERSION) {
+    if (data->version < INTPAK_VERSION) {
         ur = read_reference(&c->magician, store, read_int, resolve_unit);
     }
     else {
         ur = read_reference(&c->magician, store, read_unit_reference, resolve_unit);
     }
-    if (global.data_version < CURSEFLOAT_VERSION) {
+    if (data->version < CURSEFLOAT_VERSION) {
         READ_INT(store, &n);
         c->effect = (float)n;
     }
@@ -224,7 +226,7 @@ int curse_read(attrib * a, void *owner, struct storage *store)
         return AT_READ_FAIL;
     }
     c->flags = flags;
-    if (global.data_version < EXPLICIT_CURSE_ISNEW_VERSION) {
+    if (data->version < EXPLICIT_CURSE_ISNEW_VERSION) {
         c_clearflag(c, CURSE_ISNEW);
     }
 

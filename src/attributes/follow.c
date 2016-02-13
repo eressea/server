@@ -23,13 +23,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/unit.h>
 
 #include <util/attrib.h>
+#include <util/gamedata.h>
 #include <util/variant.h>
 
 #include <storage.h>
 
-static int read_follow(attrib * a, void *owner, struct storage *store)
+static int read_follow(attrib * a, void *owner, gamedata *data)
 {
-    read_unit_reference(store);   /* skip it */
+    read_unit_reference(data->store);   /* skip it */
     return AT_READ_FAIL;
 }
 

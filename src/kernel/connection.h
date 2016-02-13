@@ -30,6 +30,7 @@ extern "C" {
     struct faction;
     struct region;
     struct storage;
+    struct gamedata;
     struct unit;
 
     extern int nextborder;
@@ -113,7 +114,7 @@ extern "C" {
     void register_bordertype(border_type * type);
     /* register a new bordertype */
 
-    int read_borders(struct storage *store);
+    int read_borders(struct gamedata *store);
     void write_borders(struct storage *store);
     void age_borders(void);
 

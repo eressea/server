@@ -68,6 +68,7 @@ static void test_readwrite_unit(CuTest * tc)
     renumber_faction(f, fno);
     gamedata_init(&data, &store, RELEASE_VERSION);
     u = read_unit(&data);
+    mstream_done(&data.strm);
     gamedata_done(&data);
 
     CuAssertPtrNotNull(tc, u);
@@ -92,9 +93,9 @@ static void test_readwrite_attrib(CuTest *tc) {
     CuAssertPtrEquals(tc, 0, a);
 
     data.strm.api->rewind(data.strm.handle);
-    read_attribs(data.store, &a, NULL);
-    gamedata_done(&data);
+    read_attribs(&data, &a, NULL);
     mstream_done(&data.strm);
+    gamedata_done(&data);
     CuAssertTrue(tc, key_get(a, 41));
     CuAssertTrue(tc, key_get(a, 42));
     a_removeall(&a, NULL);

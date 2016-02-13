@@ -25,6 +25,7 @@
 /* util includes */
 #include <util/attrib.h>
 #include <util/event.h>
+#include <util/gamedata.h>
 #include <util/resolve.h>
 #include <util/umlaut.h>
 
@@ -76,8 +77,9 @@ alp_write(const attrib * a, const void *owner, struct storage *store)
     write_unit_reference(ad->target, store);
 }
 
-static int alp_read(attrib * a, void *owner, struct storage *store)
+static int alp_read(attrib * a, void *owner, struct gamedata *data)
 {
+    struct storage *store = data->store;
     alp_data *ad = (alp_data *)a->data.v;
     int rm = read_reference(&ad->mage, store, read_unit_reference, resolve_unit);
     int rt =

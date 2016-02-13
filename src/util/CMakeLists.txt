@@ -23,6 +23,7 @@ dice.c
 event.c
 filereader.c
 functions.c
+gamedata.c
 goodies.c
 gamedata.c
 language.c
