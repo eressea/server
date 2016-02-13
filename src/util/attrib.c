@@ -338,9 +338,7 @@ static int a_read_i(struct storage *store, attrib ** attribs, void *owner, unsig
 
 int a_read(struct storage *store, attrib ** attribs, void *owner) {
     int key, retval = AT_READ_OK;
-    char zText[128];
 
-    zText[0] = 0;
     key = -1;
     READ_INT(store, &key);
     while (key > 0) {
