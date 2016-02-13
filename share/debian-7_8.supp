@@ -1,4 +1,14 @@
 {
+   strcpy.S:197
+   Memcheck:Cond
+   obj:/lib/x86_64-linux-gnu/libc-2.13.so
+}
+{
+   strcpy.S:1106
+   Memcheck:Value8
+   obj:/lib/x86_64-linux-gnu/libc-2.13.so
+}
+{
    stpncpy sse3
    Memcheck:Cond
    obj:/lib/x86_64-linux-gnu/libc-2.13.so
