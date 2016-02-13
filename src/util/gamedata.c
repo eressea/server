@@ -51,7 +51,6 @@ int gamedata_openfile(gamedata *data, const char *filename, const char *mode, in
         if (err) {
             log_error("could not open %s: %s", filename, strerror(errno));
             fclose(F);
-            free(data);
         }
         else {
             storage *store = malloc(sizeof(storage));
