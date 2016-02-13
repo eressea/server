@@ -1,7 +1,7 @@
 {
    stpncpy in strcpy-sse2-unaligned.S:1659
    Memcheck:Value8
-   __stpncpy_sse2_unaligned
+   fun:__stpncpy_sse2_unaligned
 }
 # old zlib version
 {
