@@ -194,7 +194,7 @@ void warden_add_give(unit * src, unit * u, const item_type * itype, int n)
 
 void create_museum(void)
 {
-#if 0                           /* TODO: move this to LUA. It should be possible. */
+#if 0                           /* TODO: move this to Lua. It should be possible. */
     unsigned int museum_id = hashstring("museum");
     plane *museum = getplanebyid(museum_id);
     region *r;
