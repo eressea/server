@@ -218,8 +218,9 @@ border_type *find_bordertype(const char *name)
     return bt;
 }
 
-void b_read(connection * b, storage * store)
+void b_read(connection * b, gamedata * data)
 {
+    storage * store = data->store;
     int n, result = 0;
     switch (b->type->datatype) {
     case VAR_NONE:
@@ -530,8 +531,9 @@ static const char *b_nameroad(const connection * b, const region * r,
     return buffer;
 }
 
-static void b_readroad(connection * b, storage * store)
+static void b_readroad(connection * b, gamedata * data)
 {
+    storage * store = data->store;
     int n;
     READ_INT(store, &n);
     b->data.sa[0] = (short)n;
@@ -657,8 +659,9 @@ int read_borders(gamedata *data)
             nextborder--;               /* new_border erhöht den Wert */
             b->id = bid;
             assert(bid <= nextborder);
-            if (type->read)
-                type->read(b, store);
+            if (type->read) {
+                type->read(b, data);
+            }
             if (data->version < NOBORDERATTRIBS_VERSION) {
                 attrib *a = NULL;
                 int result = read_attribs(data, &a, b);

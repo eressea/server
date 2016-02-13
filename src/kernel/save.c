@@ -1498,7 +1498,6 @@ int readgame(const char *filename, bool backup)
     assert(gdata.version >= MIN_VERSION || !"unsupported data format");
     assert(gdata.version <= MAX_VERSION || !"unsupported data format");
 
-    gdata.encoding = enc_gamedata;
     fstream_init(&strm, F);
     binstore_init(&store, &strm);
     gdata.store = &store;
@@ -1834,7 +1833,6 @@ int writegame(const char *filename)
     }
 
     gdata.store = &store;
-    gdata.encoding = enc_gamedata;
     gdata.version = RELEASE_VERSION;
     global.data_version = RELEASE_VERSION; // FIXME: no code that is writing should need this
     n = STREAM_VERSION;

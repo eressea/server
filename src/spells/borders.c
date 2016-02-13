@@ -174,15 +174,15 @@ static void wall_destroy(connection * b)
     free(b->data.v);
 }
 
-static void wall_read(connection * b, storage * store)
+static void wall_read(connection * b, gamedata * data)
 {
     static wall_data dummy;
     wall_data *fd = b->data.v ? (wall_data *)b->data.v : &dummy;
 
-    read_reference(&fd->mage, store, read_unit_reference, resolve_unit);
-    READ_INT(store, &fd->force);
-    if (global.data_version >= NOBORDERATTRIBS_VERSION) {
-        READ_INT(store, &fd->countdown);
+    read_reference(&fd->mage, data->store, read_unit_reference, resolve_unit);
+    READ_INT(data->store, &fd->force);
+    if (data->version >= NOBORDERATTRIBS_VERSION) {
+        READ_INT(data->store, &fd->countdown);
     }
     fd->active = true;
 }

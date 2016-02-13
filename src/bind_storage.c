@@ -101,8 +101,7 @@ static int tolua_storage_tostring(lua_State * L)
 {
     gamedata *data = (gamedata *)tolua_tousertype(L, 1, 0);
     char name[64];
-    _snprintf(name, sizeof(name), "<storage enc=%d ver=%d>", data->encoding,
-        data->version);
+    _snprintf(name, sizeof(name), "<gamedata %p ver=%d>", data, data->version);
     lua_pushstring(L, name);
     return 1;
 }

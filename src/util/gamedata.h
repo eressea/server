@@ -11,7 +11,6 @@ typedef struct gamedata {
     struct storage *store;
     stream strm;
     int version;
-    int encoding;
 } gamedata;
 
 void gamedata_init(gamedata *data, struct storage *store, int version);
