@@ -75,7 +75,7 @@ static const char * password_hash_i(const char * passwd, const char *input, int 
                 salt_len = strlen(input);
             }
             assert(salt_len < MAXSALTLEN);
-            stpncpy(salt, input, salt_len);
+            memcpy(salt, input, salt_len);
             salt[salt_len] = 0;
         } else {
             input = password_gensalt(salt, sizeof(salt));
