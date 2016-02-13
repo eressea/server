@@ -50,7 +50,7 @@ extern "C" {
     void read_items(struct storage *store, struct item **it);
     void write_items(struct storage *store, struct item *it);
 
-    void read_spellbook(struct spellbook **bookp, struct storage *store, int(*get_level)(const struct spell * sp, void *), void * cbdata);
+    void read_spellbook(struct spellbook **bookp, struct gamedata *data, int(*get_level)(const struct spell * sp, void *), void * cbdata);
     void write_spellbook(const struct spellbook *book, struct storage *store);
 
     void write_attribs(struct storage *store, struct attrib *alist, const void *owner);

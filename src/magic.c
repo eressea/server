@@ -294,10 +294,10 @@ static int read_mage(attrib * a, void *owner, struct gamedata *data)
         }
     }
     if (mage->magietyp == M_GRAY) {
-        read_spellbook(&mage->spellbook, store, get_spell_level_mage, mage);
+        read_spellbook(&mage->spellbook, data, get_spell_level_mage, mage);
     }
     else {
-        read_spellbook(0, store, 0, mage);
+        read_spellbook(0, data, 0, mage);
     }
     return AT_READ_OK;
 }

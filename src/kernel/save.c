@@ -1129,14 +1129,14 @@ int get_spell_level_faction(const spell * sp, void * cbdata)
     return 0;
 }
 
-void read_spellbook(spellbook **bookp, struct storage *store, int(*get_level)(const spell * sp, void *), void * cbdata)
+void read_spellbook(spellbook **bookp, gamedata *data, int(*get_level)(const spell * sp, void *), void * cbdata)
 {
     for (;;) {
         spell *sp = 0;
         char spname[64];
         int level = 0;
 
-        READ_TOK(store, spname, sizeof(spname));
+        READ_TOK(data->store, spname, sizeof(spname));
         if (strcmp(spname, "end") == 0)
             break;
         if (bookp) {
@@ -1145,8 +1145,8 @@ void read_spellbook(spellbook **bookp, struct storage *store, int(*get_level)(co
                 log_error("read_spells: could not find spell '%s'\n", spname);
             }
         }
-        if (global.data_version >= SPELLBOOK_VERSION) {
-            READ_INT(store, &level);
+        if (data->version >= SPELLBOOK_VERSION) {
+            READ_INT(data->store, &level);
         }
         if (sp) {
             spellbook * sb = *bookp;
@@ -1157,7 +1157,7 @@ void read_spellbook(spellbook **bookp, struct storage *store, int(*get_level)(co
                 *bookp = create_spellbook(0);
                 sb = *bookp;
             }
-            if (level > 0 && (global.data_version >= SPELLBOOK_VERSION || !spellbook_get(sb, sp))) {
+            if (level > 0 && (data->version >= SPELLBOOK_VERSION || !spellbook_get(sb, sp))) {
                 spellbook_add(sb, sp, level);
             }
         }
@@ -1375,7 +1375,7 @@ faction *readfaction(struct gamedata * data)
     read_groups(data, f);
     f->spellbook = 0;
     if (data->version >= REGIONOWNER_VERSION) {
-        read_spellbook(FactionSpells() ? &f->spellbook : 0, data->store, get_spell_level_faction, (void *)f);
+        read_spellbook(FactionSpells() ? &f->spellbook : 0, data, get_spell_level_faction, (void *)f);
     }
     return f;
 }
