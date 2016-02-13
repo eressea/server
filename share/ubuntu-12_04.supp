@@ -1,12 +1,7 @@
 {
-   strcpy.S:197
-   Memcheck:Cond
-   obj:/lib/x86_64-linux-gnu/libc-2.13.so
-}
-{
-   strcpy.S:1106
+   stpncpy in strcpy-sse2-unaligned.S:1659
    Memcheck:Value8
-   obj:/lib/x86_64-linux-gnu/libc-2.13.so
+   __stpncpy_sse2_unaligned
 }
 # old zlib version
 {
