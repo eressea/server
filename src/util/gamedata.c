@@ -69,5 +69,5 @@ gamedata *gamedata_open(const char *filename, const char *mode, int version) {
         free(data);
         return NULL;
     }
-    return 0;
+    return data;
 }

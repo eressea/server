@@ -17,6 +17,8 @@ without prior permission by the authors of Eressea.
 #include <kernel/save.h>
 #include <kernel/version.h>
 
+#include <util/log.h>
+
 #include <storage.h>
 #include <stream.h>
 #include <filestream.h>
@@ -26,6 +28,7 @@ without prior permission by the authors of Eressea.
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <errno.h>
 
 #include <tolua.h>
 
@@ -40,6 +43,7 @@ static int tolua_storage_create(lua_State * L)
         tolua_pushusertype(L, (void *)data, TOLUA_CAST "storage");
         return 1;
     }
+    log_error("could not open %s, mode %s (%s).", filename, type, strerror(errno));
     return 0;
 }
 
