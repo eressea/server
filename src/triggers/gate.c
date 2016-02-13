@@ -13,7 +13,7 @@
 #include <kernel/config.h>
 #include "gate.h"
 
-/* kernel includes */
+ /* kernel includes */
 #include <kernel/building.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
@@ -78,10 +78,10 @@ static int gate_read(trigger * t, gamedata *data)
     gate_data *gd = (gate_data *)t->data.v;
 
     int bc =
-        read_reference(&gd->gate, data->store, read_building_reference, resolve_building);
+        read_reference(&gd->gate, data, read_building_reference, resolve_building);
     int rc =
-        read_reference(&gd->target, data->store, read_region_reference,
-        RESOLVE_REGION(data->version));
+        read_reference(&gd->target, data, read_region_reference,
+            RESOLVE_REGION(data->version));
 
     if (bc == 0 && rc == 0) {
         if (!gd->gate || !gd->target)

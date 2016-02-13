@@ -135,8 +135,6 @@ static void test_write_flag(CuTest *tc) {
     data.strm.api->rewind(data.strm.handle);
     curse_read(fix.r->attribs, fix.r, &data);
     CuAssertIntEquals(tc, 42 | CURSE_ISNEW, ((curse *) fix.r->attribs->data.v)->flags);
-    global.data_version = RELEASE_VERSION; // FIXME: should not need this!
-    CuAssertIntEquals(tc, RELEASE_VERSION, global.data_version);
 
     mstream_done(&data.strm);
     gamedata_done(&data);

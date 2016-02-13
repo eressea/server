@@ -78,12 +78,16 @@ static void removecurse_write(const trigger * t, struct storage *store)
     WRITE_INT(store, td->curse ? td->curse->no : 0);
 }
 
+static variant read_curse_reference(struct gamedata *data) {
+    return read_int(data->store);
+}
+
 static int removecurse_read(trigger * t, gamedata *data)
 {
     removecurse_data *td = (removecurse_data *)t->data.v;
 
-    read_reference(&td->target, data->store, read_unit_reference, resolve_unit);
-    read_reference(&td->curse, data->store, read_int, resolve_curse);
+    read_reference(&td->target, data, read_unit_reference, resolve_unit);
+    read_reference(&td->curse, data, read_curse_reference, resolve_curse);
 
     return AT_READ_OK;
 }

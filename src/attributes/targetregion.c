@@ -38,8 +38,7 @@ write_targetregion(const attrib * a, const void *owner, struct storage *store)
 
 static int read_targetregion(attrib * a, void *owner, gamedata *data)
 {
-    int result =
-        read_reference(&a->data.v, data->store, read_region_reference,
+    int result = read_reference(&a->data.v, data, read_region_reference,
         RESOLVE_REGION(data->version));
     if (result == 0 && !a->data.v)
         return AT_READ_FAIL;

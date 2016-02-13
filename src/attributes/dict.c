@@ -128,22 +128,22 @@ static int dict_read(attrib * a, void *owner, gamedata *data)
         break;
     case TBUILDING:
         result =
-            read_reference(&dd->data.b, store, read_building_reference,
-            resolve_building);
+            read_reference(&dd->data.b, data, read_building_reference, 
+                resolve_building);
         if (result == 0 && !dd->data.b) {
             return AT_READ_FAIL;
         }
         break;
     case TUNIT:
         result =
-            read_reference(&dd->data.u, store, read_unit_reference, resolve_unit);
+            read_reference(&dd->data.u, data, read_unit_reference, resolve_unit);
         if (result == 0 && !dd->data.u) {
             return AT_READ_FAIL;
         }
         break;
     case TFACTION:
         result =
-            read_reference(&dd->data.f, store, read_faction_reference,
+            read_reference(&dd->data.f, data, read_faction_reference,
             resolve_faction);
         if (result == 0 && !dd->data.f) {
             return AT_READ_FAIL;
@@ -151,7 +151,7 @@ static int dict_read(attrib * a, void *owner, gamedata *data)
         break;
     case TREGION:
         result =
-            read_reference(&dd->data.r, store, read_region_reference,
+            read_reference(&dd->data.r, data, read_region_reference,
             RESOLVE_REGION(data->version));
         if (result == 0 && !dd->data.r) {
             return AT_READ_FAIL;

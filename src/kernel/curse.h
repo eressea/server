@@ -196,8 +196,8 @@ extern "C" {
         struct message *(*curseinfo) (const void *, objtype_t,
             const struct curse *, int);
         void(*change_vigour) (struct curse *, double);
-        int(*read) (struct storage * store, struct curse *, void *target);
-        int(*write) (struct storage * store, const struct curse *,
+        int(*read) (struct gamedata *data, struct curse *, void *target);
+        int(*write) (struct storage *store, const struct curse *,
             const void *target);
         int(*cansee) (const struct faction *, const void *, objtype_t,
             const struct curse *, int);

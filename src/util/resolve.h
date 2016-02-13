@@ -27,8 +27,8 @@ extern "C" {
 #endif
 
     typedef int(*resolve_fun) (variant data, void *address);
-    typedef variant(*read_fun) (struct storage * store);
-    extern int read_reference(void *address, struct storage *store,
+    typedef variant(*read_fun) (struct gamedata * data);
+    extern int read_reference(void *address, struct gamedata *data,
         read_fun reader, resolve_fun resolver);
 
     extern void ur_add(variant data, void *address, resolve_fun fun);

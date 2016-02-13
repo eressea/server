@@ -72,7 +72,7 @@ static void clonedied_write(const trigger * t, struct storage *store)
 static int clonedied_read(trigger * t, gamedata *data)
 {
     int result =
-        read_reference(&t->data.v, data->store, read_unit_reference, resolve_unit);
+        read_reference(&t->data.v, data, read_unit_reference, resolve_unit);
     if (result == 0 && t->data.v == NULL) {
         return AT_READ_FAIL;
     }

@@ -90,7 +90,7 @@ static void changerace_write(const trigger * t, struct storage *store)
 static int changerace_read(trigger * t, gamedata *data)
 {
     changerace_data *td = (changerace_data *)t->data.v;
-    read_reference(&td->u, data->store, read_unit_reference, resolve_unit);
+    read_reference(&td->u, data, read_unit_reference, resolve_unit);
     td->race = (const struct race *)read_race_reference(data->store).v;
     td->irace = (const struct race *)read_race_reference(data->store).v;
     return AT_READ_OK;

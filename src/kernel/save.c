@@ -441,7 +441,7 @@ static void read_alliances(struct gamedata *data)
             READ_INT(store, &al->flags);
         }
         if (data->version >= ALLIANCELEADER_VERSION) {
-            read_reference(&al->_leader, store, read_faction_reference,
+            read_reference(&al->_leader, data, read_faction_reference,
                 resolve_faction);
             READ_INT(store, &id);
         }
@@ -528,7 +528,7 @@ static void read_owner(struct gamedata *data, region_owner ** powner)
         else {
             owner->last_owner = NULL;
         }
-        read_reference(owner, data->store, &read_faction_reference, &resolve_owner);
+        read_reference(owner, data, &read_faction_reference, &resolve_owner);
         *powner = owner;
     }
     else {
@@ -1579,9 +1579,9 @@ int readgame(const char *filename, bool backup)
         else {
             /* WATCHERS - eliminated in February 2016, ca. turn 966 */
             if (gdata.version < NOWATCH_VERSION) {
-                fno = read_faction_reference(&store);
+                fno = read_faction_reference(&gdata);
                 while (fno.i) {
-                    fno = read_faction_reference(&store);
+                    fno = read_faction_reference(&gdata);
                 }
             }
         }

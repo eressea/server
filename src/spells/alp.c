@@ -79,11 +79,10 @@ alp_write(const attrib * a, const void *owner, struct storage *store)
 
 static int alp_read(attrib * a, void *owner, struct gamedata *data)
 {
-    struct storage *store = data->store;
     alp_data *ad = (alp_data *)a->data.v;
-    int rm = read_reference(&ad->mage, store, read_unit_reference, resolve_unit);
+    int rm = read_reference(&ad->mage, data, read_unit_reference, resolve_unit);
     int rt =
-        read_reference(&ad->target, store, read_unit_reference, resolve_unit);
+        read_reference(&ad->target, data, read_unit_reference, resolve_unit);
     if (rt == 0 && rm == 0 && (!ad->target || !ad->mage)) {
         /* the target or mage disappeared. */
         return AT_READ_FAIL;

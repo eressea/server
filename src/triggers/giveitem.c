@@ -88,7 +88,7 @@ static int giveitem_read(trigger * t, gamedata *data)
     giveitem_data *td = (giveitem_data *)t->data.v;
     char zText[128];
 
-    int result = read_reference(&td->u, data->store, read_unit_reference, resolve_unit);
+    int result = read_reference(&td->u, data, read_unit_reference, resolve_unit);
 
     READ_INT(data->store, &td->number);
     READ_TOK(data->store, zText, sizeof(zText));

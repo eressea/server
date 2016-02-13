@@ -236,7 +236,7 @@ void read_groups(gamedata *data, faction * f)
             ally *a;
             variant fid;
 
-            fid = read_faction_reference(store);
+            fid = read_faction_reference(data);
             if (fid.i <= 0)
                 break;
             a = ally_add(pa, findfaction(fid.i));

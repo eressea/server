@@ -90,8 +90,8 @@ static int unitmessage_read(trigger * t, gamedata *data)
     unitmessage_data *td = (unitmessage_data *)t->data.v;
     char zText[256];
 
-    int result =
-        read_reference(&td->target, data->store, read_unit_reference, resolve_unit);
+    int result = read_reference(&td->target, data, read_unit_reference,
+        resolve_unit);
     READ_TOK(data->store, zText, sizeof(zText));
     td->string = _strdup(zText);
     READ_INT(data->store, &td->type);

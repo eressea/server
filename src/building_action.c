@@ -107,7 +107,7 @@ static int lc_read(struct attrib *a, void *owner, gamedata *data)
     building *b = (building *)owner;
     int result = 0;
     if (data->version < ATTRIBOWNER_VERSION) {
-        result = read_reference(&b, store, read_building_reference, resolve_building);
+        result = read_reference(&b, data, read_building_reference, resolve_building);
         assert(b == owner);
     }
     READ_TOK(store, name, sizeof(name));

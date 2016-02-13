@@ -121,7 +121,7 @@ static int wormhole_read(struct attrib *a, void *owner, struct gamedata *data)
     if (data->version < ATTRIBOWNER_VERSION) {
         READ_INT(store, NULL);
     }
-    if (read_reference(&a->data.v, store, reader, resolver) == 0) {
+    if (read_reference(&a->data.v, data, reader, resolver) == 0) {
         if (!a->data.v) {
             return AT_READ_FAIL;
         }

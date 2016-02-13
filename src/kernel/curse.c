@@ -203,10 +203,10 @@ int curse_read(attrib * a, void *owner, gamedata *data)
     READ_FLT(store, &flt);
     c->vigour = flt;
     if (data->version < INTPAK_VERSION) {
-        ur = read_reference(&c->magician, store, read_int, resolve_unit);
+        ur = resolve_unit(read_int(data->store), &c->magician);
     }
     else {
-        ur = read_reference(&c->magician, store, read_unit_reference, resolve_unit);
+        ur = read_reference(&c->magician, data, read_unit_reference, resolve_unit);
     }
     if (data->version < CURSEFLOAT_VERSION) {
         READ_INT(store, &n);
@@ -230,14 +230,15 @@ int curse_read(attrib * a, void *owner, gamedata *data)
         c_clearflag(c, CURSE_ISNEW);
     }
 
-    if (c->type->read)
-        c->type->read(store, c, owner);
+    if (c->type->read) {
+        c->type->read(data, c, owner);
+    }
     else if (c->type->typ == CURSETYP_UNIT) {
         READ_INT(store, &c->data.i);
     }
     if (c->type->typ == CURSETYP_REGION) {
         int rr =
-            read_reference(&c->data.v, store, read_region_reference,
+            read_reference(&c->data.v, data, read_region_reference,
             RESOLVE_REGION(data->version));
         if (ur == 0 && rr == 0 && !c->data.v) {
             return AT_READ_FAIL;

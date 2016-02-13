@@ -158,7 +158,7 @@ extern "C" {
     extern int resolve_building(variant data, void *address);
     extern void write_building_reference(const struct building *b,
     struct storage *store);
-    extern variant read_building_reference(struct storage *store);
+    extern variant read_building_reference(struct gamedata *data);
 
     extern struct building *findbuilding(int n);
 

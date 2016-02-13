@@ -88,8 +88,8 @@ static int changefaction_read(trigger * t, gamedata *data)
     variant var;
     changefaction_data *td = (changefaction_data *)t->data.v;
 
-    read_reference(&td->unit, data->store, read_unit_reference, resolve_unit);
-    var = read_faction_reference(data->store);
+    read_reference(&td->unit, data, read_unit_reference, resolve_unit);
+    var = read_faction_reference(data);
     if (var.i == 0) {
         return AT_READ_FAIL;
     }

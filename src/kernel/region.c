@@ -1226,10 +1226,11 @@ int resolve_region_id(variant id, void *address)
     return 0;
 }
 
-variant read_region_reference(struct storage * store)
+variant read_region_reference(gamedata *data)
 {
+    struct storage * store = data->store;
     variant result;
-    if (global.data_version < UIDHASH_VERSION) {
+    if (data->version < UIDHASH_VERSION) {
         int n;
         READ_INT(store, &n);
         result.sa[0] = (short)n;

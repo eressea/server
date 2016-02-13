@@ -2287,9 +2287,8 @@ static int resolve_familiar(variant data, void *addr)
 
 static int read_familiar(attrib * a, void *owner, struct gamedata *data)
 {
-    storage *store = data->store;
     int result =
-        read_reference(&a->data.v, store, read_unit_reference, resolve_familiar);
+        read_reference(&a->data.v, data, read_unit_reference, resolve_familiar);
     if (result == 0 && a->data.v == NULL) {
         return AT_READ_FAIL;
     }
@@ -2372,9 +2371,8 @@ static int resolve_clone(variant data, void *addr)
 
 static int read_clone(attrib * a, void *owner, struct gamedata *data)
 {
-    storage *store = data->store;
     int result =
-        read_reference(&a->data.v, store, read_unit_reference, resolve_clone);
+        read_reference(&a->data.v, data, read_unit_reference, resolve_clone);
     if (result == 0 && a->data.v == NULL) {
         return AT_READ_FAIL;
     }
@@ -2400,9 +2398,8 @@ static int resolve_mage(variant data, void *addr)
 
 static int read_magician(attrib * a, void *owner, struct gamedata *data)
 {
-    storage *store = data->store;
     int result =
-        read_reference(&a->data.v, store, read_unit_reference, resolve_mage);
+        read_reference(&a->data.v, data, read_unit_reference, resolve_mage);
     if (result == 0 && a->data.v == NULL) {
         return AT_READ_FAIL;
     }
