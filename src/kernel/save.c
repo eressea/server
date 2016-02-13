@@ -1759,7 +1759,7 @@ int readgame(const char *filename, bool backup)
         }
         else {
             for (u = f->units; u; u = u->nextF) {
-                if (global.data_version < SPELL_LEVEL_VERSION) {
+                if (gdata.version < SPELL_LEVEL_VERSION) {
                     sc_mage *mage = get_mage(u);
                     if (mage) {
                         faction *f = u->faction;
@@ -1778,12 +1778,12 @@ int readgame(const char *filename, bool backup)
                 }
                 if (u->number > 0) {
                     f->_alive = true;
-                    if (global.data_version >= SPELL_LEVEL_VERSION) {
+                    if (gdata.version >= SPELL_LEVEL_VERSION) {
                         break;
                     }
                 }
             }
-            if (global.data_version < SPELL_LEVEL_VERSION && f->spellbook) {
+            if (gdata.version < SPELL_LEVEL_VERSION && f->spellbook) {
                 spellbook_foreach(f->spellbook, cb_sb_maxlevel, f);
             }
         }
@@ -1836,7 +1836,7 @@ int writegame(const char *filename)
     gdata.store = &store;
     gdata.encoding = enc_gamedata;
     gdata.version = RELEASE_VERSION;
-    global.data_version = RELEASE_VERSION;
+    global.data_version = RELEASE_VERSION; // FIXME: no code that is writing should need this
     n = STREAM_VERSION;
     fwrite(&gdata.version, sizeof(int), 1, F);
     fwrite(&n, sizeof(int), 1, F);

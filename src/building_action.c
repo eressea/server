@@ -106,7 +106,7 @@ static int lc_read(struct attrib *a, void *owner, gamedata *data)
     building_action *bd = (building_action *)a->data.v;
     building *b = (building *)owner;
     int result = 0;
-    if (global.data_version < ATTRIBOWNER_VERSION) {
+    if (data->version < ATTRIBOWNER_VERSION) {
         result = read_reference(&b, store, read_building_reference, resolve_building);
         assert(b == owner);
     }

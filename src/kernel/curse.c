@@ -238,7 +238,7 @@ int curse_read(attrib * a, void *owner, gamedata *data)
     if (c->type->typ == CURSETYP_REGION) {
         int rr =
             read_reference(&c->data.v, store, read_region_reference,
-            RESOLVE_REGION(global.data_version));
+            RESOLVE_REGION(data->version));
         if (ur == 0 && rr == 0 && !c->data.v) {
             return AT_READ_FAIL;
         }
@@ -255,12 +255,11 @@ void curse_write(const attrib * a, const void *owner, struct storage *store)
     unit *mage = (c->magician && c->magician->number) ? c->magician : NULL;
 
     /* copied from c_clearflag */
-    if (global.data_version < EXPLICIT_CURSE_ISNEW_VERSION) {
-        flags = (c->flags & ~CURSE_ISNEW) | (c->type->flags & CURSE_ISNEW);
-    }
-    else {
-        flags = c->flags | c->type->flags;
-    }
+#if RELEASE_VERSION < EXPLICIT_CURSE_ISNEW_VERSION
+    flags = (c->flags & ~CURSE_ISNEW) | (c->type->flags & CURSE_ISNEW);
+#else
+    flags = c->flags | c->type->flags;
+#endif
 
     WRITE_INT(store, c->no);
     WRITE_TOK(store, ct->cname);

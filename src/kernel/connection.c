@@ -659,7 +659,7 @@ int read_borders(gamedata *data)
             assert(bid <= nextborder);
             if (type->read)
                 type->read(b, store);
-            if (global.data_version < NOBORDERATTRIBS_VERSION) {
+            if (data->version < NOBORDERATTRIBS_VERSION) {
                 attrib *a = NULL;
                 int result = read_attribs(data, &a, b);
                 if (border_convert_cb) {

@@ -40,7 +40,7 @@ static int read_targetregion(attrib * a, void *owner, gamedata *data)
 {
     int result =
         read_reference(&a->data.v, data->store, read_region_reference,
-        RESOLVE_REGION(global.data_version));
+        RESOLVE_REGION(data->version));
     if (result == 0 && !a->data.v)
         return AT_READ_FAIL;
     return AT_READ_OK;

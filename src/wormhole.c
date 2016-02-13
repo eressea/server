@@ -113,12 +113,12 @@ static int resolve_exit(variant id, void *address)
 static int wormhole_read(struct attrib *a, void *owner, struct gamedata *data)
 {
     storage *store = data->store;
-    resolve_fun resolver = (global.data_version < UIDHASH_VERSION)
+    resolve_fun resolver = (data->version < UIDHASH_VERSION)
         ? resolve_exit : resolve_region_id;
-    read_fun reader = (global.data_version < UIDHASH_VERSION)
+    read_fun reader = (data->version < UIDHASH_VERSION)
         ? read_building_reference : read_region_reference;
 
-    if (global.data_version < ATTRIBOWNER_VERSION) {
+    if (data->version < ATTRIBOWNER_VERSION) {
         READ_INT(store, NULL);
     }
     if (read_reference(&a->data.v, store, reader, resolver) == 0) {

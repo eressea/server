@@ -135,7 +135,7 @@ static int a_readicastle(attrib * a, void *owner, struct gamedata *data)
     icastle_data *idata = (icastle_data *)a->data.v;
     char token[32];
     READ_TOK(store, token, sizeof(token));
-    if (global.data_version < ATTRIBOWNER_VERSION) {
+    if (data->version < ATTRIBOWNER_VERSION) {
         READ_INT(store, NULL);
     }
     READ_INT(store, &idata->time);
@@ -378,7 +378,7 @@ static int read_seenspell(attrib * a, void *owner, struct gamedata *data)
         sp = find_spellbyid((unsigned int)i);
     }
     else {
-        if (global.data_version < UNIQUE_SPELLS_VERSION) {
+        if (data->version < UNIQUE_SPELLS_VERSION) {
             READ_INT(store, 0); /* ignore mtype */
         }
         sp = find_spell(token);

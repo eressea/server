@@ -152,7 +152,7 @@ static int dict_read(attrib * a, void *owner, gamedata *data)
     case TREGION:
         result =
             read_reference(&dd->data.r, store, read_region_reference,
-            RESOLVE_REGION(global.data_version));
+            RESOLVE_REGION(data->version));
         if (result == 0 && !dd->data.r) {
             return AT_READ_FAIL;
         }
