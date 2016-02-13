@@ -29,6 +29,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/event.h>
+#include <util/gamedata.h>
 #include <util/log.h>
 #include <util/resolve.h>
 #include <util/base36.h>
@@ -68,10 +69,10 @@ static void clonedied_write(const trigger * t, struct storage *store)
     write_unit_reference(u, store);
 }
 
-static int clonedied_read(trigger * t, struct storage *store)
+static int clonedied_read(trigger * t, gamedata *data)
 {
     int result =
-        read_reference(&t->data.v, store, read_unit_reference, resolve_unit);
+        read_reference(&t->data.v, data->store, read_unit_reference, resolve_unit);
     if (result == 0 && t->data.v == NULL) {
         return AT_READ_FAIL;
     }

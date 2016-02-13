@@ -28,6 +28,7 @@
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/event.h>
+#include <util/gamedata.h>
 #include <util/goodies.h>
 #include <util/resolve.h>
 
@@ -47,10 +48,10 @@ static void xmasgate_write(const trigger * t, struct storage *store)
     WRITE_TOK(store, itoa36(b->no));
 }
 
-static int xmasgate_read(trigger * t, struct storage *store)
+static int xmasgate_read(trigger * t, struct gamedata *data)
 {
     int bc =
-        read_reference(&t->data.v, store, read_building_reference,
+        read_reference(&t->data.v, data->store, read_building_reference,
         resolve_building);
     if (bc == 0 && !t->data.v) {
         return AT_READ_FAIL;

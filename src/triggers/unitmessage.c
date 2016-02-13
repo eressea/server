@@ -20,6 +20,7 @@ without prior permission by the authors of Eressea.
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/event.h>
+#include <util/gamedata.h>
 #include <util/goodies.h>
 #include <util/language.h>
 #include <util/log.h>
@@ -84,17 +85,17 @@ static void unitmessage_write(const trigger * t, struct storage *store)
     WRITE_INT(store, td->level);
 }
 
-static int unitmessage_read(trigger * t, struct storage *store)
+static int unitmessage_read(trigger * t, gamedata *data)
 {
     unitmessage_data *td = (unitmessage_data *)t->data.v;
     char zText[256];
 
     int result =
-        read_reference(&td->target, store, read_unit_reference, resolve_unit);
-    READ_TOK(store, zText, sizeof(zText));
+        read_reference(&td->target, data->store, read_unit_reference, resolve_unit);
+    READ_TOK(data->store, zText, sizeof(zText));
     td->string = _strdup(zText);
-    READ_INT(store, &td->type);
-    READ_INT(store, &td->level);
+    READ_INT(data->store, &td->type);
+    READ_INT(data->store, &td->level);
 
     if (result == 0 && td->target == NULL) {
         return AT_READ_FAIL;

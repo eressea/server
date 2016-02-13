@@ -28,6 +28,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/event.h>
+#include <util/gamedata.h>
 #include <util/log.h>
 #include <util/resolve.h>
 #include <util/base36.h>
@@ -93,30 +94,30 @@ static void createcurse_write(const trigger * t, struct storage *store)
     WRITE_INT(store, td->men);
 }
 
-static int createcurse_read(trigger * t, struct storage *store)
+static int createcurse_read(trigger * t, gamedata *data)
 {
     createcurse_data *td = (createcurse_data *)t->data.v;
     char zText[128];
     float flt;
 
-    read_reference(&td->mage, store, read_unit_reference, resolve_unit);
-    read_reference(&td->target, store, read_unit_reference, resolve_unit);
+    read_reference(&td->mage, data->store, read_unit_reference, resolve_unit);
+    read_reference(&td->target, data->store, read_unit_reference, resolve_unit);
 
-    READ_TOK(store, zText, sizeof(zText));
+    READ_TOK(data->store, zText, sizeof(zText));
     td->type = ct_find(zText);
-    READ_FLT(store, &flt);
+    READ_FLT(data->store, &flt);
     td->vigour = flt;
-    READ_INT(store, &td->duration);
-    if (global.data_version < CURSEFLOAT_VERSION) {
+    READ_INT(data->store, &td->duration);
+    if (data->version < CURSEFLOAT_VERSION) {
         int n;
-        READ_INT(store, &n);
+        READ_INT(data->store, &n);
         td->effect = (float)n;
     }
     else {
-        READ_FLT(store, &flt);
+        READ_FLT(data->store, &flt);
         td->effect = flt;
     }
-    READ_INT(store, &td->men);
+    READ_INT(data->store, &td->men);
     return AT_READ_OK;
 }
 

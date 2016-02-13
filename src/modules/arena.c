@@ -449,10 +449,10 @@ static void caldera_write(const trigger * t, struct storage *store)
     write_building_reference(b, store);
 }
 
-static int caldera_read(trigger * t, struct storage *store)
+static int caldera_read(trigger * t, struct gamedata *data)
 {
     int rb =
-        read_reference(&t->data.v, store, read_building_reference,
+        read_reference(&t->data.v, data->store, read_building_reference,
         resolve_building);
     if (rb == 0 && !t->data.v) {
         return AT_READ_FAIL;

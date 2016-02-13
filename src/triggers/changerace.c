@@ -27,6 +27,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/event.h>
+#include <util/gamedata.h>
 #include <util/log.h>
 #include <util/resolve.h>
 #include <util/base36.h>
@@ -86,12 +87,12 @@ static void changerace_write(const trigger * t, struct storage *store)
     write_race_reference(td->irace, store);
 }
 
-static int changerace_read(trigger * t, struct storage *store)
+static int changerace_read(trigger * t, gamedata *data)
 {
     changerace_data *td = (changerace_data *)t->data.v;
-    read_reference(&td->u, store, read_unit_reference, resolve_unit);
-    td->race = (const struct race *)read_race_reference(store).v;
-    td->irace = (const struct race *)read_race_reference(store).v;
+    read_reference(&td->u, data->store, read_unit_reference, resolve_unit);
+    td->race = (const struct race *)read_race_reference(data->store).v;
+    td->irace = (const struct race *)read_race_reference(data->store).v;
     return AT_READ_OK;
 }
 

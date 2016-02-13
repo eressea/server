@@ -43,20 +43,20 @@ void write_triggers(struct storage *store, const trigger * t)
     WRITE_TOK(store, "end");
 }
 
-int read_triggers(struct storage *store, trigger ** tp)
+int read_triggers(struct gamedata *data, trigger ** tp)
 {
     for (;;) {
         trigger_type *ttype;
         char zText[128];
 
-        READ_TOK(store, zText, sizeof(zText));
+        READ_TOK(data->store, zText, sizeof(zText));
         if (!strcmp(zText, "end"))
             break;
         ttype = tt_find(zText);
         assert(ttype || !"unknown trigger-type");
         *tp = t_new(ttype);
         if (ttype->read) {
-            int i = ttype->read(*tp, store);
+            int i = ttype->read(*tp, data);
             switch (i) {
             case AT_READ_OK:
                 tp = &(*tp)->next;
@@ -152,7 +152,7 @@ static int read_handler(attrib * a, void *owner, gamedata *data)
 
     READ_TOK(store, zText, sizeof(zText));
     hi->event = _strdup(zText);
-    read_triggers(store, &hi->triggers);
+    read_triggers(data, &hi->triggers);
     if (hi->triggers != NULL) {
         return AT_READ_OK;
     }

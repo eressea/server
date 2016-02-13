@@ -33,6 +33,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/event.h>
+#include <util/gamedata.h>
 #include <util/log.h>
 #include <util/resolve.h>
 #include <util/rng.h>
@@ -125,10 +126,10 @@ static void shock_write(const trigger * t, struct storage *store)
     }
 }
 
-static int shock_read(trigger * t, struct storage *store)
+static int shock_read(trigger * t, gamedata *data)
 {
     int result =
-        read_reference(&t->data.v, store, read_unit_reference, resolve_unit);
+        read_reference(&t->data.v, data->store, read_unit_reference, resolve_unit);
     if (result == 0 && t->data.v == NULL) {
         return AT_READ_FAIL;
     }

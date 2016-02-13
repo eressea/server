@@ -22,6 +22,7 @@
 /* util includes */
 #include <util/attrib.h>
 #include <util/event.h>
+#include <util/gamedata.h>
 #include <util/log.h>
 #include <util/resolve.h>
 
@@ -72,14 +73,14 @@ static void gate_write(const trigger * t, struct storage *store)
     write_region_reference(r, store);
 }
 
-static int gate_read(trigger * t, struct storage *store)
+static int gate_read(trigger * t, gamedata *data)
 {
     gate_data *gd = (gate_data *)t->data.v;
 
     int bc =
-        read_reference(&gd->gate, store, read_building_reference, resolve_building);
+        read_reference(&gd->gate, data->store, read_building_reference, resolve_building);
     int rc =
-        read_reference(&gd->target, store, read_region_reference,
+        read_reference(&gd->target, data->store, read_region_reference,
         RESOLVE_REGION(global.data_version));
 
     if (bc == 0 && rc == 0) {
