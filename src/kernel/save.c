@@ -1221,7 +1221,7 @@ faction *readfaction(struct gamedata * data)
     }
 
     READ_STR(data->store, name, sizeof(name));
-    faction_setpassword(f, (data->version >= CRYPT_VERSION) ? name : password_hash(name, 0, PASSWORD_DEFAULT));
+    faction_setpassword(f, (data->version > CRYPT_VERSION) ? name : password_hash(name, 0, PASSWORD_DEFAULT));
     if (data->version < NOOVERRIDE_VERSION) {
         READ_STR(data->store, 0, 0);
     }
@@ -1407,7 +1407,7 @@ int readgame(const char *filename, bool backup)
         create_backup(path);
     }
 
-    F = fopen(path, "r");
+    F = fopen(path, "rb");
     if (!F) {
         perror(path);
         return -1;
@@ -1753,7 +1753,7 @@ int writegame(const char *filename)
     /* make sure we don't overwrite an existing file (hard links) */
     unlink(path);
 #endif
-    F = fopen(path, "w");
+    F = fopen(path, "wb");
     if (!F) {
         perror(path);
         return -1;
