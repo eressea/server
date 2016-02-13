@@ -81,7 +81,7 @@ static int gate_read(trigger * t, gamedata *data)
         read_reference(&gd->gate, data->store, read_building_reference, resolve_building);
     int rc =
         read_reference(&gd->target, data->store, read_region_reference,
-        RESOLVE_REGION(global.data_version));
+        RESOLVE_REGION(data->version));
 
     if (bc == 0 && rc == 0) {
         if (!gd->gate || !gd->target)

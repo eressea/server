@@ -419,11 +419,12 @@ void read_items(struct storage *store, item ** ilist)
     }
 }
 
-static void read_alliances(struct storage *store)
+static void read_alliances(struct gamedata *data)
 {
+    storage *store = data->store;
     char pbuf[8];
     int id, terminator = 0;
-    if (global.data_version < ALLIANCELEADER_VERSION) {
+    if (data->version < ALLIANCELEADER_VERSION) {
         terminator = atoi36("end");
         READ_STR(store, pbuf, sizeof(pbuf));
         id = atoi36(pbuf);
@@ -436,10 +437,10 @@ static void read_alliances(struct storage *store)
         alliance *al;
         READ_STR(store, aname, sizeof(aname));
         al = makealliance(id, aname);
-        if (global.data_version >= OWNER_2_VERSION) {
+        if (data->version >= OWNER_2_VERSION) {
             READ_INT(store, &al->flags);
         }
-        if (global.data_version >= ALLIANCELEADER_VERSION) {
+        if (data->version >= ALLIANCELEADER_VERSION) {
             read_reference(&al->_leader, store, read_faction_reference,
                 resolve_faction);
             READ_INT(store, &id);
@@ -1591,7 +1592,7 @@ int readgame(const char *filename, bool backup)
     }
 
     /* Read factions */
-    read_alliances(&store);
+    read_alliances(&gdata);
     READ_INT(&store, &nread);
     log_debug(" - Einzulesende Parteien: %d\n", nread);
     fp = &factions;
