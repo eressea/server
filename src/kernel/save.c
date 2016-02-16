@@ -544,7 +544,8 @@ static void write_owner(struct gamedata *data, region_owner * owner)
         write_faction_reference((f && f->_alive) ? f : NULL, data->store);
         // TODO: check that destroyfaction does the right thing.
         // TODO: What happens to morale when the owner dies?
-        write_faction_reference(owner->owner, data->store);
+        f = owner->owner;
+        write_faction_reference((f && f->_alive) ? f : NULL, data->store);
     }
     else {
         WRITE_INT(data->store, -1);
@@ -766,6 +767,7 @@ void write_unit(struct gamedata *data, const unit * u)
     const race *irace = u_irace(u);
 
     write_unit_reference(u, data->store);
+    assert(u->faction->_alive);
     write_faction_reference(u->faction, data->store);
     WRITE_STR(data->store, u->_name);
     WRITE_STR(data->store, u->display ? u->display : "");
@@ -1159,6 +1161,58 @@ void write_spellbook(const struct spellbook *book, struct storage *store)
     WRITE_TOK(store, "end");
 }
 
+static char * getpasswd(int fno) {
+    const char *prefix = itoa36(fno);
+    size_t len = strlen(prefix);
+    FILE * F = fopen("passwords.txt", "r");
+    char line[80];
+    if (F) {
+        while (!feof(F)) {
+            fgets(line, sizeof(line), F);
+            if (line[len]==':' && strncmp(prefix, line, len)==0) {
+                size_t slen = strlen(line)-1;
+                assert(line[slen]=='\n');
+                line[slen] = 0;
+                fclose(F);
+                return _strdup(line+len+1);
+            }
+        }
+        fclose(F);
+    }
+    return NULL;
+}
+
+static void read_password(gamedata *data, faction *f) {
+    char name[128];
+    READ_STR(data->store, name, sizeof(name));
+    if (data->version == BADCRYPT_VERSION) {
+        char * pass = getpasswd(f->no);
+        if (pass) {
+            faction_setpassword(f, password_encode(pass, PASSWORD_DEFAULT));
+            free(pass); // TODO: remove this allocation!
+        }
+        else {
+            free(f->_password);
+            f->_password = NULL;
+        }
+    }
+    else {
+        faction_setpassword(f, (data->version >= CRYPT_VERSION) ? name : password_encode(name, PASSWORD_DEFAULT));
+    }
+}
+
+void _test_read_password(gamedata *data, faction *f) {
+    read_password(data, f);
+}
+
+static void write_password(gamedata *data, const faction *f) {
+    WRITE_TOK(data->store, (const char *)f->_password);
+}
+
+void _test_write_password(gamedata *data, const faction *f) {
+    write_password(data, f);
+}
+
 /** Reads a faction from a file.
  * This function requires no context, can be called in any state. The
  * faction may not already exist, however.
@@ -1225,8 +1279,7 @@ faction *readfaction(struct gamedata * data)
         set_email(&f->email, "");
     }
 
-    READ_STR(data->store, name, sizeof(name));
-    faction_setpassword(f, (data->version > CRYPT_VERSION) ? name : password_hash(name, 0, PASSWORD_DEFAULT));
+    read_password(data, f);
     if (data->version < NOOVERRIDE_VERSION) {
         READ_STR(data->store, 0, 0);
     }
@@ -1313,6 +1366,7 @@ void writefaction(struct gamedata *data, const faction * f)
     ally *sf;
     ursprung *ur;
 
+    assert(f->_alive);
     write_faction_reference(f, data->store);
     WRITE_INT(data->store, f->subscription);
 #if RELEASE_VERSION >= SPELL_LEVEL_VERSION
@@ -1333,7 +1387,7 @@ void writefaction(struct gamedata *data, const faction * f)
     WRITE_STR(data->store, f->name);
     WRITE_STR(data->store, f->banner);
     WRITE_STR(data->store, f->email);
-    WRITE_TOK(data->store, f->_password);
+    write_password(data, f);
     WRITE_TOK(data->store, locale_name(f->locale));
     WRITE_INT(data->store, f->lastorders);
     WRITE_INT(data->store, f->age);
@@ -1382,32 +1436,6 @@ static int cb_sb_maxlevel(spellbook_entry *sbe, void *cbdata) {
         f->max_spelllevel = sbe->level;
     }
     return 0;
-}
-
-void write_watchers(storage *store, plane *pl) {
-    watcher *w = pl->watchers;
-    while (w) {
-        if (w->faction && w->faction->_alive) {
-            write_faction_reference(w->faction, store);
-            WRITE_INT(store, w->mode);
-        }
-        w = w->next;
-    }
-    write_faction_reference(NULL, store);       /* mark the end of the list */
-}
-
-void read_watchers(storage *store, plane *pl) {
-    variant fno = read_faction_reference(store);
-    while (fno.i) {
-        int n;
-        watcher *w = (watcher *)malloc(sizeof(watcher));
-        ur_add(fno, &w->faction, resolve_faction);
-        READ_INT(store, &n);
-        w->mode = (unsigned char)n;
-        w->next = pl->watchers;
-        pl->watchers = w;
-        fno = read_faction_reference(store);
-    }
 }
 
 int readgame(const char *filename, bool backup)
@@ -1528,7 +1556,13 @@ int readgame(const char *filename, bool backup)
             }
         }
         else {
-            read_watchers(&store, pl);
+            /* WATCHERS - eliminated in February 2016, ca. turn 966 */
+            if (gdata.version < CRYPT_VERSION) {
+                variant fno;
+                do {
+                    fno = read_faction_reference(&store);
+                }  while (fno.i);
+            }
         }
         a_read(&store, &pl->attribs, pl);
         if (pl->id != 1094969858) { // Regatta
@@ -1815,7 +1849,9 @@ int writegame(const char *filename)
         WRITE_INT(&store, pl->miny);
         WRITE_INT(&store, pl->maxy);
         WRITE_INT(&store, pl->flags);
-        write_watchers(&store, pl);
+#if RELEASE_VERSION < CRYPT_VERSION
+        write_faction_reference(NULL, &store);  /* mark the end of pl->watchers (gone since T966)  */
+#endif
         a_write(&store, pl->attribs, pl);
         WRITE_SECTION(&store);
     }

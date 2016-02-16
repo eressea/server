@@ -4,6 +4,7 @@
 #include "alliance.h"
 #include <CuTest.h>
 #include <tests.h>
+#include <quicklist.h>
 
 #include <assert.h>
 
@@ -61,9 +62,31 @@ static void test_alliance_join(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_alliance_dead_faction(CuTest *tc) {
+    faction *f, *f2;
+    alliance *al;
+
+    test_cleanup();
+    f = test_create_faction(0);
+    f2 = test_create_faction(0);
+    al = makealliance(42, "Hodor");
+    setalliance(f, al);
+    setalliance(f2, al);
+    CuAssertPtrEquals(tc, f, alliance_get_leader(al));
+    CuAssertIntEquals(tc, 2, ql_length(al->members));
+    CuAssertPtrEquals(tc, al, f->alliance);
+    destroyfaction(&factions);
+    CuAssertIntEquals(tc, 1, ql_length(al->members));
+    CuAssertPtrEquals(tc, f2, alliance_get_leader(al));
+    CuAssertPtrEquals(tc, NULL, f->alliance);
+    CuAssertTrue(tc, !f->_alive);
+    test_cleanup();
+}
+
 CuSuite *get_alliance_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_alliance_dead_faction);
     SUITE_ADD_TEST(suite, test_alliance_make);
     SUITE_ADD_TEST(suite, test_alliance_join);
     return suite;
