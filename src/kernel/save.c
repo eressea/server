@@ -544,7 +544,8 @@ static void write_owner(struct gamedata *data, region_owner * owner)
         write_faction_reference((f && f->_alive) ? f : NULL, data->store);
         // TODO: check that destroyfaction does the right thing.
         // TODO: What happens to morale when the owner dies?
-        write_faction_reference(owner->owner, data->store);
+        f = owner->owner;
+        write_faction_reference((f && f->_alive) ? f : NULL, data->store);
     }
     else {
         WRITE_INT(data->store, -1);
