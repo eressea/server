@@ -203,12 +203,12 @@ void write_groups(struct storage *store, const faction * f)
         WRITE_INT(store, g->gid);
         WRITE_STR(store, g->name);
         for (a = g->allies; a; a = a->next) {
-            if (a->faction) {
+            if (a->faction && a->faction->_alive) {
                 write_faction_reference(a->faction, store);
                 WRITE_INT(store, a->status);
             }
         }
-        WRITE_INT(store, 0);
+        write_faction_reference(NULL, store);
         a_write(store, g->attribs, g);
         WRITE_SECTION(store);
     }
@@ -233,7 +233,7 @@ void read_groups(struct storage *store, faction * f)
             ally *a;
             variant fid;
 
-            READ_INT(store, &fid.i);
+            fid = read_faction_reference(store);
             if (fid.i <= 0)
                 break;
             a = ally_add(pa, findfaction(fid.i));
