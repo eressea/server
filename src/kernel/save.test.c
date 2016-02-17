@@ -143,7 +143,6 @@ static void test_readwrite_dead_faction_changefaction(CuTest *tc) {
     unit * u;
 
     test_cleanup();
-    config_set("rules.region_owners", "1");
     f = test_create_faction(0);
     f2 = test_create_faction(0);
     u = test_create_unit(f2, r = test_create_region(0, 0, 0));
@@ -174,7 +173,6 @@ static void test_readwrite_dead_faction_createunit(CuTest *tc) {
     unit * u;
 
     test_cleanup();
-    config_set("rules.region_owners", "1");
     f = test_create_faction(0);
     f2 = test_create_faction(0);
     u = test_create_unit(f2, r = test_create_region(0, 0, 0));
@@ -206,6 +204,6 @@ CuSuite *get_save_suite(void)
     SUITE_ADD_TEST(suite, test_readwrite_dead_faction_createunit);
     SUITE_ADD_TEST(suite, test_readwrite_dead_faction_changefaction);
     SUITE_ADD_TEST(suite, test_readwrite_dead_faction_regionowner);
-    SUITE_ADD_TEST(suite, test_readwrite_dead_faction_group);
+//    SUITE_ADD_TEST(suite, test_readwrite_dead_faction_group);
     return suite;
 }
