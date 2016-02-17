@@ -179,7 +179,7 @@ void set_group(struct unit *u, struct group *g)
     }
 }
 
-bool join_group(unit * u, const char *name)
+group *join_group(unit * u, const char *name)
 {
     group *g = NULL;
 
@@ -192,7 +192,7 @@ bool join_group(unit * u, const char *name)
     }
 
     set_group(u, g);
-    return true;
+    return g;
 }
 
 void write_groups(struct storage *store, const faction * f)

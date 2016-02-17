@@ -68,8 +68,8 @@ static void test_group(CuTest * tc)
     assert(r && f);
     u = test_create_unit(f, r);
     assert(u);
-    CuAssertTrue(tc, join_group(u, "hodor"));
-    CuAssertPtrNotNull(tc, (g = get_group(u)));
+    CuAssertPtrNotNull(tc, (g = join_group(u, "hodor")));
+    CuAssertPtrEquals(tc, g, get_group(u));
     CuAssertStrEquals(tc, "hodor", g->name);
     CuAssertIntEquals(tc, 1, g->members);
     set_group(u, 0);
