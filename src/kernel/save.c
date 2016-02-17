@@ -761,6 +761,7 @@ void write_unit(struct gamedata *data, const unit * u)
     const race *irace = u_irace(u);
 
     write_unit_reference(u, data->store);
+    assert(u->faction->_alive);
     write_faction_reference(u->faction, data->store);
     WRITE_STR(data->store, u->_name);
     WRITE_STR(data->store, u->display ? u->display : "");
