@@ -1309,6 +1309,7 @@ void writefaction(struct gamedata *data, const faction * f)
     ally *sf;
     ursprung *ur;
 
+    assert(f->_alive);
     write_faction_reference(f, data->store);
     WRITE_INT(data->store, f->subscription);
 #if RELEASE_VERSION >= SPELL_LEVEL_VERSION
