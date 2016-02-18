@@ -104,6 +104,7 @@ static int createunit_read(trigger * t, struct storage *store)
     else {
         result = AT_READ_FAIL;
     }
+    // read_reference(&td->f, store, read_faction_reference, resolve_faction);
     read_reference(&td->r, store, read_region_reference,
         RESOLVE_REGION(global.data_version));
     td->race = (const struct race *)read_race_reference(store).v;
