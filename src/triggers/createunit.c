@@ -99,8 +99,9 @@ static int createunit_read(trigger * t, struct storage *store)
     var = read_faction_reference(store);
     if (var.i == 0) {
         result = AT_READ_FAIL;
+    } else {
+        ur_add(var, &td->f, resolve_faction);
     }
-    ur_add(var, &td->f, resolve_faction);
     // read_reference(&td->f, store, read_faction_reference, resolve_faction);
     read_reference(&td->r, store, read_region_reference,
         RESOLVE_REGION(global.data_version));
