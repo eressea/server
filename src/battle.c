@@ -228,21 +228,11 @@ static void message_faction(battle * b, faction * f, struct message *m)
 void message_all(battle * b, message * m)
 {
     bfaction *bf;
-    plane *p = rplane(b->region);
-    watcher *w;
 
     for (bf = b->factions; bf; bf = bf->next) {
         assert(bf->faction);
         message_faction(b, bf->faction, m);
     }
-    if (p)
-        for (w = p->watchers; w; w = w->next) {
-            for (bf = b->factions; bf; bf = bf->next)
-                if (bf->faction == w->faction)
-                    break;
-            if (bf == NULL)
-                message_faction(b, w->faction, m);
-        }
 }
 
 static void fbattlerecord(battle * b, faction * f, const char *s)

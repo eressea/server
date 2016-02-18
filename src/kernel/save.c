@@ -1502,15 +1502,12 @@ int readgame(const char *filename, bool backup)
             }
         }
         else {
-            fno = read_faction_reference(&store);
-            while (fno.i) {
-                watcher *w = (watcher *)malloc(sizeof(watcher));
-                ur_add(fno, &w->faction, resolve_faction);
-                READ_INT(&store, &n);
-                w->mode = (unsigned char)n;
-                w->next = pl->watchers;
-                pl->watchers = w;
+            /* WATCHERS - eliminated in February 2016, ca. turn 966 */
+            if (gdata.version < CRYPT_VERSION) {
                 fno = read_faction_reference(&store);
+                while (fno.i) {
+                    fno = read_faction_reference(&store);
+                }
             }
         }
         a_read(&store, &pl->attribs, pl);
@@ -1791,7 +1788,6 @@ int writegame(const char *filename)
     WRITE_SECTION(&store);
 
     for (pl = planes; pl; pl = pl->next) {
-        watcher *w;
         WRITE_INT(&store, pl->id);
         WRITE_STR(&store, pl->name);
         WRITE_INT(&store, pl->minx);
@@ -1799,15 +1795,9 @@ int writegame(const char *filename)
         WRITE_INT(&store, pl->miny);
         WRITE_INT(&store, pl->maxy);
         WRITE_INT(&store, pl->flags);
-        w = pl->watchers;
-        while (w) {
-            if (w->faction) {
-                write_faction_reference(w->faction, &store);
-                WRITE_INT(&store, w->mode);
-            }
-            w = w->next;
-        }
-        write_faction_reference(NULL, &store);       /* mark the end of the list */
+#if RELEASE_VERSION < CRYPT_VERSION
+        write_faction_reference(NULL, &store);  /* mark the end of pl->watchers (gone since T966)  */
+#endif
         a_write(&store, pl->attribs, pl);
         WRITE_SECTION(&store);
     }
