@@ -66,6 +66,7 @@ extern "C" {
     struct message_list;
     struct rawmaterial;
     struct item;
+    struct faction;
 
 #define MORALE_TAX_FACTOR 0.005 /* 0.5% tax per point of morale */
 #define MORALE_MAX 10           /* Maximum morale allowed */

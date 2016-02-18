@@ -535,11 +535,16 @@ static void read_owner(struct gamedata *data, region_owner ** powner)
 static void write_owner(struct gamedata *data, region_owner * owner)
 {
     if (owner) {
+        faction *f;
         WRITE_INT(data->store, owner->since_turn);
         WRITE_INT(data->store, owner->morale_turn);
         WRITE_INT(data->store, owner->flags);
-        write_faction_reference(owner->last_owner, data->store);
-        write_faction_reference(owner->owner, data->store);
+        f = owner->last_owner;
+        write_faction_reference((f && f->_alive) ? f : NULL, data->store);
+        // TODO: check that destroyfaction does the right thing.
+        // TODO: What happens to morale when the owner dies?
+        f = owner->owner;
+        write_faction_reference((f && f->_alive) ? f : NULL, data->store);
     }
     else {
         WRITE_INT(data->store, -1);
@@ -614,6 +619,7 @@ unit *read_unit(struct gamedata *data)
 
     READ_INT(data->store, &n);
     f = findfaction(n);
+    assert(f);
     if (f != u->faction) {
         u_setfaction(u, f);
     }
@@ -761,6 +767,7 @@ void write_unit(struct gamedata *data, const unit * u)
     const race *irace = u_irace(u);
 
     write_unit_reference(u, data->store);
+    assert(u->faction->_alive);
     write_faction_reference(u->faction, data->store);
     WRITE_STR(data->store, u->_name);
     WRITE_STR(data->store, u->display ? u->display : "");
@@ -1162,14 +1169,14 @@ faction *readfaction(struct gamedata * data)
 {
     ally **sfp;
     int planes, n;
-    faction *f;
+    faction *f = NULL;
     char name[DISPLAYSIZE];
+    variant var;
 
-    READ_INT(data->store, &n);
-    f = findfaction(n);
+    resolve_faction(var = read_faction_reference(data->store), &f);
     if (f == NULL) {
         f = (faction *)calloc(1, sizeof(faction));
-        f->no = n;
+        f->no = var.i;
     }
     else {
         f->allies = NULL;           /* mem leak */
@@ -1308,6 +1315,7 @@ void writefaction(struct gamedata *data, const faction * f)
     ally *sf;
     ursprung *ur;
 
+    assert(f->_alive);
     write_faction_reference(f, data->store);
     WRITE_INT(data->store, f->subscription);
 #if RELEASE_VERSION >= SPELL_LEVEL_VERSION
@@ -1354,20 +1362,18 @@ void writefaction(struct gamedata *data, const faction * f)
     WRITE_SECTION(data->store);
 
     for (sf = f->allies; sf; sf = sf->next) {
-        int no;
-        int status;
+        faction *fa = sf->faction;
 
-        assert(sf->faction);
-
-        no = sf->faction->no;
-        status = alliedfaction(NULL, f, sf->faction, HELP_ALL);
-
-        if (status != 0) {
-            WRITE_INT(data->store, no);
-            WRITE_INT(data->store, sf->status);
+        assert(fa);
+        if (fa->_alive) {
+            int status = alliedfaction(NULL, f, fa, HELP_ALL);
+            if (status != 0) {
+                write_faction_reference(fa, data->store);
+                WRITE_INT(data->store, sf->status);
+            }
         }
     }
-    WRITE_INT(data->store, 0);
+    write_faction_reference(NULL, data->store);
     WRITE_SECTION(data->store);
     write_groups(data->store, f);
     write_spellbook(f->spellbook, data->store);
@@ -1463,7 +1469,6 @@ int readgame(const char *filename, bool backup)
     READ_INT(&store, &nread);
     while (--nread >= 0) {
         int id;
-        variant fno;
         plane *pl;
 
         READ_INT(&store, &id);
@@ -1500,15 +1505,12 @@ int readgame(const char *filename, bool backup)
             }
         }
         else {
-            fno = read_faction_reference(&store);
-            while (fno.i) {
-                watcher *w = (watcher *)malloc(sizeof(watcher));
-                ur_add(fno, &w->faction, resolve_faction);
-                READ_INT(&store, &n);
-                w->mode = (unsigned char)n;
-                w->next = pl->watchers;
-                pl->watchers = w;
-                fno = read_faction_reference(&store);
+            /* WATCHERS - eliminated in February 2016, ca. turn 966 */
+            if (gdata.version < CRYPT_VERSION) {
+                variant fno;
+                do {
+                    fno = read_faction_reference(&store);
+                } while (fno.i);
             }
         }
         a_read(&store, &pl->attribs, pl);
@@ -1789,7 +1791,6 @@ int writegame(const char *filename)
     WRITE_SECTION(&store);
 
     for (pl = planes; pl; pl = pl->next) {
-        watcher *w;
         WRITE_INT(&store, pl->id);
         WRITE_STR(&store, pl->name);
         WRITE_INT(&store, pl->minx);
@@ -1797,15 +1798,9 @@ int writegame(const char *filename)
         WRITE_INT(&store, pl->miny);
         WRITE_INT(&store, pl->maxy);
         WRITE_INT(&store, pl->flags);
-        w = pl->watchers;
-        while (w) {
-            if (w->faction) {
-                write_faction_reference(w->faction, &store);
-                WRITE_INT(&store, w->mode);
-            }
-            w = w->next;
-        }
-        write_faction_reference(NULL, &store);       /* mark the end of the list */
+#if RELEASE_VERSION < CRYPT_VERSION
+        write_faction_reference(NULL, &store);  /* mark the end of pl->watchers (gone since T966)  */
+#endif
         a_write(&store, pl->attribs, pl);
         WRITE_SECTION(&store);
     }

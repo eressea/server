@@ -82,7 +82,9 @@ static int createunit_handle(trigger * t, void *data)
 static void createunit_write(const trigger * t, struct storage *store)
 {
     createunit_data *td = (createunit_data *)t->data.v;
-    write_faction_reference(td->f, store);
+    faction * f = td->f;
+    if (!f->_alive) f = NULL;
+    write_faction_reference(f, store);
     write_region_reference(td->r, store);
     write_race_reference(td->race, store);
     WRITE_INT(store, td->number);
@@ -91,21 +93,24 @@ static void createunit_write(const trigger * t, struct storage *store)
 static int createunit_read(trigger * t, struct storage *store)
 {
     createunit_data *td = (createunit_data *)t->data.v;
+    int result = AT_READ_OK;
+    variant var;
 
-    int uc =
-        read_reference(&td->f, store, read_faction_reference, resolve_faction);
-    int rc =
-        read_reference(&td->r, store, read_region_reference,
+    var = read_faction_reference(store);
+    if (var.i == 0) {
+        result = AT_READ_FAIL;
+    } else {
+        ur_add(var, &td->f, resolve_faction);
+    }
+    // read_reference(&td->f, store, read_faction_reference, resolve_faction);
+    read_reference(&td->r, store, read_region_reference,
         RESOLVE_REGION(global.data_version));
     td->race = (const struct race *)read_race_reference(store).v;
-
-    if (uc == 0 && rc == 0) {
-        if (!td->f || !td->r)
-            return AT_READ_FAIL;
+    if (!td->race) {
+        result = AT_READ_FAIL;
     }
     READ_INT(store, &td->number);
-
-    return AT_READ_OK;
+    return result;
 }
 
 trigger_type tt_createunit = {

@@ -333,7 +333,7 @@ variant read_faction_reference(struct storage * store)
 
 void write_faction_reference(const faction * f, struct storage *store)
 {
-    WRITE_INT(store, (f && f->_alive) ? f->no : 0);
+    WRITE_INT(store, f ? f->no : 0);
 }
 
 static faction *dead_factions;
