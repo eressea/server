@@ -113,12 +113,11 @@ static void test_readwrite_dead_faction_group(CuTest *tc) {
 static void test_readwrite_dead_faction_regionowner(CuTest *tc) {
     faction *f;
     region *r;
-    unit * u;
 
     test_cleanup();
     config_set("rules.region_owners", "1");
     f = test_create_faction(0);
-    u = test_create_unit(f, r = test_create_region(0, 0, 0));
+    test_create_unit(f, r = test_create_region(0, 0, 0));
     region_set_owner(r, f, turn);
     destroyfaction(&factions);
     CuAssertTrue(tc, !f->_alive);
