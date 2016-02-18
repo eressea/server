@@ -454,7 +454,6 @@ void write_alliances(struct gamedata *data)
     alliance *al = alliances;
     while (al) {
         if (al->_leader) {
-            assert(al->_leader->_alive);
             WRITE_INT(data->store, al->id);
             WRITE_STR(data->store, al->name);
             WRITE_INT(data->store, (int)al->flags);
@@ -463,7 +462,7 @@ void write_alliances(struct gamedata *data)
         }
         al = al->next;
     }
-    write_faction_reference(NULL, data->store);
+    WRITE_INT(data->store, 0);
     WRITE_SECTION(data->store);
 }
 
@@ -618,7 +617,8 @@ unit *read_unit(struct gamedata *data)
         uhash(u);
     }
 
-    resolve_faction(read_faction_reference(data->store), &f);
+    READ_INT(data->store, &n);
+    f = findfaction(n);
     assert(f);
     if (f != u->faction) {
         u_setfaction(u, f);
@@ -767,6 +767,7 @@ void write_unit(struct gamedata *data, const unit * u)
     const race *irace = u_irace(u);
 
     write_unit_reference(u, data->store);
+    assert(u->faction->_alive);
     write_faction_reference(u->faction, data->store);
     WRITE_STR(data->store, u->_name);
     WRITE_STR(data->store, u->display ? u->display : "");
@@ -1314,6 +1315,7 @@ void writefaction(struct gamedata *data, const faction * f)
     ally *sf;
     ursprung *ur;
 
+    assert(f->_alive);
     write_faction_reference(f, data->store);
     WRITE_INT(data->store, f->subscription);
 #if RELEASE_VERSION >= SPELL_LEVEL_VERSION
@@ -1383,32 +1385,6 @@ static int cb_sb_maxlevel(spellbook_entry *sbe, void *cbdata) {
         f->max_spelllevel = sbe->level;
     }
     return 0;
-}
-
-void write_watchers(storage *store, plane *pl) {
-    watcher *w = pl->watchers;
-    while (w) {
-        if (w->faction && w->faction->_alive) {
-            write_faction_reference(w->faction, store);
-            WRITE_INT(store, w->mode);
-        }
-        w = w->next;
-    }
-    write_faction_reference(NULL, store);       /* mark the end of the list */
-}
-
-void read_watchers(storage *store, plane *pl) {
-    variant fno = read_faction_reference(store);
-    while (fno.i) {
-        int n;
-        watcher *w = (watcher *)malloc(sizeof(watcher));
-        ur_add(fno, &w->faction, resolve_faction);
-        READ_INT(store, &n);
-        w->mode = (unsigned char)n;
-        w->next = pl->watchers;
-        pl->watchers = w;
-        fno = read_faction_reference(store);
-    }
 }
 
 int readgame(const char *filename, bool backup)
@@ -1529,7 +1505,13 @@ int readgame(const char *filename, bool backup)
             }
         }
         else {
-            read_watchers(&store, pl);
+            /* WATCHERS - eliminated in February 2016, ca. turn 966 */
+            if (gdata.version < CRYPT_VERSION) {
+                variant fno;
+                do {
+                    fno = read_faction_reference(&store);
+                } while (fno.i);
+            }
         }
         a_read(&store, &pl->attribs, pl);
         if (pl->id != 1094969858) { // Regatta
@@ -1816,7 +1798,9 @@ int writegame(const char *filename)
         WRITE_INT(&store, pl->miny);
         WRITE_INT(&store, pl->maxy);
         WRITE_INT(&store, pl->flags);
-        write_watchers(&store, pl);
+#if RELEASE_VERSION < CRYPT_VERSION
+        write_faction_reference(NULL, &store);  /* mark the end of pl->watchers (gone since T966)  */
+#endif
         a_write(&store, pl->attribs, pl);
         WRITE_SECTION(&store);
     }

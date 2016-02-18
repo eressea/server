@@ -43,15 +43,8 @@ extern "C" {
 #define PFL_NOMONSTERS  16384   /* no monster randenc */
 #define PFL_SEESPECIAL  32768   /* far seeing */
 
-    typedef struct watcher {
-        struct watcher *next;
-        struct faction *faction;
-        unsigned char mode;
-    } watcher;
-
     typedef struct plane {
         struct plane *next;
-        struct watcher *watchers;
         int id;
         char *name;
         int minx, maxx, miny, maxy;
@@ -76,7 +69,6 @@ extern "C" {
     struct plane *get_homeplane(void);
     extern int rel_to_abs(const struct plane *pl, const struct faction *f,
         int rel, unsigned char index);
-    extern bool is_watcher(const struct plane *p, const struct faction *f);
     extern void write_plane_reference(const plane * p, struct storage *store);
     extern int read_plane_reference(plane ** pp, struct storage *store);
     extern int plane_width(const plane * pl);

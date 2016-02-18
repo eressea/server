@@ -333,7 +333,6 @@ variant read_faction_reference(struct storage * store)
 
 void write_faction_reference(const faction * f, struct storage *store)
 {
-    assert(!f || f->_alive);
     WRITE_INT(store, f ? f->no : 0);
 }
 
