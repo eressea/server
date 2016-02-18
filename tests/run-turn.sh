@@ -37,7 +37,7 @@ SUPP=../share/ubuntu-12_04.supp
 SERVER="$VALGRIND --suppressions=$SUPP --error-exitcode=1 --leak-check=no $SERVER"
 fi
 echo "running $SERVER"
-$SERVER -t 184 ../scripts/run-turn.lua
+$SERVER -t 184 test-turn.lua
 [ -d reports ] || quit 4 "no reports directory created"
 CRFILE=185-zvto.cr
 for file in $NEWFILES reports/$CRFILE ; do
