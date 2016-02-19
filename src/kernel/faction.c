@@ -217,6 +217,7 @@ int resolve_faction(variant id, void *address)
             result = -1;
         }
     }
+    assert(address);
     *(faction **)address = f;
     return result;
 }
