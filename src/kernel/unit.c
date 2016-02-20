@@ -771,10 +771,11 @@ void set_level(unit * u, skill_t sk, int value)
     sk_set(add_skill(u, sk), value);
 }
 
-static int leftship_age(struct attrib *a)
+static int leftship_age(struct attrib *a, void *owner)
 {
     /* must be aged, so it doesn't affect report generation (cansee) */
     unused_arg(a);
+    unused_arg(owner);
     return AT_AGE_REMOVE;         /* remove me */
 }
 

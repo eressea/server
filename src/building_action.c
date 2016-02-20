@@ -28,17 +28,16 @@ without prior permission by the authors of Eressea.
 #include <string.h>
 
 typedef struct building_action {
-    struct building *b;
     char *fname;
     char *param;
 } building_action;
 
-static int lc_age(struct attrib *a)
+static int lc_age(struct attrib *a, void *owner)
 {
     building_action *data = (building_action *)a->data.v;
     const char *fname = data->fname;
     const char *fparam = data->param;
-    building *b = data->b;
+    building *b = (building *)owner;
     int result = -1;
 
     assert(b != NULL);
@@ -93,9 +92,10 @@ lc_write(const struct attrib *a, const void *owner, struct storage *store)
     building_action *data = (building_action *)a->data.v;
     const char *fname = data->fname;
     const char *fparam = data->param;
-    building *b = data->b;
 
-    write_building_reference(b, store);
+#if RELEASE_VERSION < ATTRIBOWNER_VERSION
+    write_building_reference((building *)owner, store);
+#endif
     WRITE_TOK(store, fname);
     WRITE_TOK(store, fparam ? fparam : NULLSTRING);
 }
@@ -104,13 +104,17 @@ static int lc_read(struct attrib *a, void *owner, struct storage *store)
 {
     char name[NAMESIZE];
     building_action *data = (building_action *)a->data.v;
-    int result =
-        read_reference(&data->b, store, read_building_reference, resolve_building);
+    building *b = (building *)owner;
+    int result = 0;
+    if (global.data_version < ATTRIBOWNER_VERSION) {
+        result = read_reference(&b, store, read_building_reference, resolve_building);
+        assert(b == owner);
+    }
     READ_TOK(store, name, sizeof(name));
     if (strcmp(name, "tunnel_action") == 0) {
         /* E2: Weltentor has a new module, doesn't need this any longer */
         result = 0;
-        data->b = 0;
+        b = 0;
     }
     else {
         data->fname = _strdup(name);
@@ -119,14 +123,14 @@ static int lc_read(struct attrib *a, void *owner, struct storage *store)
     if (strcmp(name, "tnnL") == 0) {
         /* tunnel_action was the old Weltentore, their code has changed. ignore this object */
         result = 0;
-        data->b = 0;
+        b = 0;
     }
     if (strcmp(name, NULLSTRING) == 0)
         data->param = 0;
     else {
         data->param = _strdup(name);
     }
-    if (result == 0 && !data->b) {
+    if (result == 0 && !b) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;
@@ -143,7 +147,6 @@ void building_addaction(building * b, const char *fname, const char *param)
 {
     attrib *a = a_add(&b->attribs, a_new(&at_building_action));
     building_action *data = (building_action *)a->data.v;
-    data->b = b;
     data->fname = _strdup(fname);
     if (param) {
         data->param = _strdup(param);

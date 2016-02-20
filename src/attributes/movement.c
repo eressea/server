@@ -65,8 +65,9 @@ void set_movement(attrib ** alist, int type)
     a->data.i |= type;
 }
 
-static int age_speedup(attrib * a)
+static int age_speedup(attrib * a, void *owner)
 {
+    unused_arg(owner);
     if (a->data.sa[0] > 0) {
         assert(a->data.sa[0] - a->data.sa[1] >= SHRT_MIN);
         assert(a->data.sa[0] - a->data.sa[1] <= SHRT_MAX);
