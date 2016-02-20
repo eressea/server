@@ -1164,7 +1164,7 @@ char * getpasswd(int fno) {
     if (F) {
         while (!feof(F)) {
             fgets(line, sizeof(line), F);
-            if (line[len+1]==':' && strncmp(prefix, line, len)==0) {
+            if (line[len]==':' && strncmp(prefix, line, len)==0) {
                 fclose(F);
                 return _strdup(line+len+1);
             }
