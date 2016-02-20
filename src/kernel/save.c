@@ -1156,7 +1156,7 @@ void write_spellbook(const struct spellbook *book, struct storage *store)
     WRITE_TOK(store, "end");
 }
 
-char * getpasswd(int fno) {
+static char * getpasswd(int fno) {
     const char *prefix = itoa36(fno);
     size_t len = strlen(prefix);
     FILE * F = fopen("passwords.txt", "r");
@@ -1165,6 +1165,9 @@ char * getpasswd(int fno) {
         while (!feof(F)) {
             fgets(line, sizeof(line), F);
             if (line[len]==':' && strncmp(prefix, line, len)==0) {
+                size_t slen = strlen(line)-1;
+                assert(line[slen]=='\n');
+                line[slen] = 0;
                 fclose(F);
                 return _strdup(line+len+1);
             }
