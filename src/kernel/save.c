@@ -1156,6 +1156,23 @@ void write_spellbook(const struct spellbook *book, struct storage *store)
     WRITE_TOK(store, "end");
 }
 
+char * getpasswd(int fno) {
+    const char *prefix = itoa36(fno);
+    size_t len = strlen(prefix);
+    FILE * F = fopen("passwords.txt", "r");
+    char line[80];
+    if (F) {
+        while (!feof(F)) {
+            fgets(line, sizeof(line), F);
+            if (line[len+1]==':' && strncmp(prefix, line, len)==0) {
+                fclose(F);
+                return _strdup(line+len+1);
+            }
+        }
+        fclose(F);
+    }
+    return NULL;
+}
 /** Reads a faction from a file.
  * This function requires no context, can be called in any state. The
  * faction may not already exist, however.
@@ -1223,7 +1240,11 @@ faction *readfaction(struct gamedata * data)
     }
 
     READ_STR(data->store, name, sizeof(name));
-    f->passw = _strdup(name);
+    if (data->version < CRYPT_VERSION) {
+        f->passw = _strdup(name);
+    } else {
+        f->passw = getpasswd(f->no);
+    }
     if (data->version < NOOVERRIDE_VERSION) {
         READ_STR(data->store, 0, 0);
     }
