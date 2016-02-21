@@ -1176,6 +1176,30 @@ static char * getpasswd(int fno) {
     }
     return NULL;
 }
+
+static void read_password(gamedata *data, faction *f) {
+    char name[128];
+    READ_STR(data->store, name, sizeof(name));
+    if (data->version == BADCRYPT_VERSION) {
+        f->passw = getpasswd(f->no);
+    }
+    else {
+        f->passw = _strdup(name);
+    }
+}
+
+void _test_read_password(gamedata *data, faction *f) {
+    read_password(data, f);
+}
+
+static void write_password(gamedata *data, const faction *f) {
+    WRITE_TOK(data->store, (const char *)f->passw);
+}
+
+void _test_write_password(gamedata *data, const faction *f) {
+    write_password(data, f);
+}
+
 /** Reads a faction from a file.
  * This function requires no context, can be called in any state. The
  * faction may not already exist, however.
@@ -1242,12 +1266,7 @@ faction *readfaction(struct gamedata * data)
         set_email(&f->email, "");
     }
 
-    READ_STR(data->store, name, sizeof(name));
-    if (data->version < CRYPT_VERSION) {
-        f->passw = _strdup(name);
-    } else {
-        f->passw = getpasswd(f->no);
-    }
+    read_password(data, f);
     if (data->version < NOOVERRIDE_VERSION) {
         READ_STR(data->store, 0, 0);
     }
@@ -1354,7 +1373,7 @@ void writefaction(struct gamedata *data, const faction * f)
     WRITE_STR(data->store, (const char *)f->name);
     WRITE_STR(data->store, (const char *)f->banner);
     WRITE_STR(data->store, f->email);
-    WRITE_TOK(data->store, (const char *)f->passw);
+    write_password(data, f);
     WRITE_TOK(data->store, locale_name(f->locale));
     WRITE_INT(data->store, f->lastorders);
     WRITE_INT(data->store, f->age);

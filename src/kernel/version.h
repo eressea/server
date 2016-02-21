@@ -33,9 +33,9 @@
 #define SPELL_LEVEL_VERSION 348 /* f->max_spelllevel gets stored, not calculated */
 #define OWNER_3_VERSION 349 /* regions store last owner, not last alliance */
 #define ATTRIBOWNER_VERSION 350 /* all attrib_type functions know who owns the attribute */
-#define CRYPT_VERSION 351 /* passwords are encrypted */
+#define BADCRYPT_VERSION 351 /* passwords are encrypted */
 #define RELEASE_VERSION ATTRIBOWNER_VERSION /* current datafile */
 #define MIN_VERSION INTPAK_VERSION      /* minimal datafile we support */
-#define MAX_VERSION CRYPT_VERSION /* change this if we can need to read the future datafile, and we can do so */
+#define MAX_VERSION BADCRYPT_VERSION /* change this if we can need to read the future datafile, and we can do so */
 
 #define STREAM_VERSION 2 /* internal encoding of binary files */

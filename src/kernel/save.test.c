@@ -59,10 +59,26 @@ static void test_readwrite_unit(CuTest * tc)
     test_cleanup();
 }
 
+static void test_read_password(CuTest *tc) {
+    const char *path = "test.dat";
+    gamedata *data;
+    faction *f;
+    f = test_create_faction(0);
+    faction_setpassword(f, "secret");
+    data = gamedata_open(path, "wb");
+    _test_write_password(data, f);
+    gamedata_close(data);
+    data = gamedata_open(path, "rb");
+    _test_read_password(data, f);
+    gamedata_close(data);
+    CuAssertTrue(tc, checkpasswd(f, "secret"));
+}
+
 CuSuite *get_save_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_readwrite_data);
     SUITE_ADD_TEST(suite, test_readwrite_unit);
+    SUITE_ADD_TEST(suite, test_read_password);
     return suite;
 }
