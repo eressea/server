@@ -566,7 +566,8 @@ void faction_setbanner(faction * self, const char *banner)
 
 void faction_setpassword(faction * f, const char *pwhash)
 {
-    assert(pwhash && pwhash[0] == '$');
+    assert(pwhash);
+    // && pwhash[0] == '$');
     free(f->_password);
     f->_password = _strdup(pwhash);
 }

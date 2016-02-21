@@ -32,14 +32,14 @@ char *password_gensalt(char *salt, size_t salt_len) {
     char *cp = salt;
     while (buflen) {
         unsigned long ul = genrand_int32() & (unsigned long)time(0);
-        b64_from_24bit((char)(ul & 0xFF), (char)((ul>>8)&0xff), (char)((ul>>16)&0xFF), 4);
+        b64_from_24bit((char)(ul & 0xFF), (char)((ul >> 8) & 0xff), (char)((ul >> 16) & 0xFF), 4);
     }
     salt[salt_len-1] = 0;
     return salt;
 }
 
 static bool password_is_implemented(int algo) {
-    return algo == PASSWORD_BCRYPT || algo == PASSWORD_PLAIN || algo == PASSWORD_MD5 || algo == PASSWORD_APACHE_MD5;
+    return algo == PASSWORD_PLAINTEXT || algo == PASSWORD_BCRYPT || algo == PASSWORD_NOCRYPT || algo == PASSWORD_MD5 || algo == PASSWORD_APACHE_MD5;
 }
 
 static const char * password_hash_i(const char * passwd, const char *input, int algo, char *result, size_t len) {
@@ -57,7 +57,11 @@ static const char * password_hash_i(const char * passwd, const char *input, int 
         }
         return result;
     }
-    else if (algo == PASSWORD_PLAIN) {
+    else if (algo == PASSWORD_PLAINTEXT) {
+        _snprintf(result, len, "%s", passwd);
+        return result;
+    }
+    else if (algo == PASSWORD_NOCRYPT) {
         _snprintf(result, len, "$0$%s", passwd);
         return result;
     }
@@ -99,17 +103,20 @@ const char * password_encode(const char * passwd, int algo) {
 
 int password_verify(const char * pwhash, const char * passwd) {
     char hash[64];
-    int algo;
+    int algo = PASSWORD_PLAINTEXT;
     char *pos;
     const char *result;
     assert(passwd);
     assert(pwhash);
-    assert(pwhash[0] == '$');
-    algo = pwhash[1];
+    if (pwhash[0] == '$') {
+        algo = pwhash[1];
+    }
     if (!password_is_implemented(algo)) {
         return VERIFY_UNKNOWN;
     }
-    if (algo == PASSWORD_BCRYPT) {
+    if (algo == PASSWORD_PLAINTEXT) {
+        return (strcmp(passwd, pwhash) == 0) ? VERIFY_OK : VERIFY_FAIL;
+    } else if (algo == PASSWORD_BCRYPT) {
         char sample[200];
         _crypt_blowfish_rn(passwd, pwhash, sample, sizeof(sample));
         return (strcmp(sample, pwhash) == 0) ? VERIFY_OK : VERIFY_FAIL;
