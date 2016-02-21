@@ -1154,6 +1154,58 @@ void write_spellbook(const struct spellbook *book, struct storage *store)
     WRITE_TOK(store, "end");
 }
 
+static char * getpasswd(int fno) {
+    const char *prefix = itoa36(fno);
+    size_t len = strlen(prefix);
+    FILE * F = fopen("passwords.txt", "r");
+    char line[80];
+    if (F) {
+        while (!feof(F)) {
+            fgets(line, sizeof(line), F);
+            if (line[len]==':' && strncmp(prefix, line, len)==0) {
+                size_t slen = strlen(line)-1;
+                assert(line[slen]=='\n');
+                line[slen] = 0;
+                fclose(F);
+                return _strdup(line+len+1);
+            }
+        }
+        fclose(F);
+    }
+    return NULL;
+}
+
+static void read_password(gamedata *data, faction *f) {
+    char name[128];
+    READ_STR(data->store, name, sizeof(name));
+    if (data->version == BADCRYPT_VERSION) {
+        char * pass = getpasswd(f->no);
+        if (pass) {
+            faction_setpassword(f, password_hash(pass, 0, PASSWORD_DEFAULT));
+            free(pass); // TODO: remove this allocation!
+        }
+        else {
+            free(f->_password);
+            f->_password = NULL;
+        }
+    }
+    else {
+        faction_setpassword(f, (data->version >= CRYPT_VERSION) ? name : password_hash(name, 0, PASSWORD_DEFAULT));
+    }
+}
+
+void _test_read_password(gamedata *data, faction *f) {
+    read_password(data, f);
+}
+
+static void write_password(gamedata *data, const faction *f) {
+    WRITE_TOK(data->store, (const char *)f->_password);
+}
+
+void _test_write_password(gamedata *data, const faction *f) {
+    write_password(data, f);
+}
+
 /** Reads a faction from a file.
  * This function requires no context, can be called in any state. The
  * faction may not already exist, however.
@@ -1220,8 +1272,7 @@ faction *readfaction(struct gamedata * data)
         set_email(&f->email, "");
     }
 
-    READ_STR(data->store, name, sizeof(name));
-    faction_setpassword(f, (data->version > CRYPT_VERSION) ? name : password_hash(name, 0, PASSWORD_DEFAULT));
+    read_password(data, f);
     if (data->version < NOOVERRIDE_VERSION) {
         READ_STR(data->store, 0, 0);
     }
@@ -1328,7 +1379,7 @@ void writefaction(struct gamedata *data, const faction * f)
     WRITE_STR(data->store, f->name);
     WRITE_STR(data->store, f->banner);
     WRITE_STR(data->store, f->email);
-    WRITE_TOK(data->store, f->_password);
+    write_password(data, f);
     WRITE_TOK(data->store, locale_name(f->locale));
     WRITE_INT(data->store, f->lastorders);
     WRITE_INT(data->store, f->age);
