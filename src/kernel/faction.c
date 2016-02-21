@@ -252,7 +252,7 @@ faction *addfaction(const char *email, const char *password,
     }
 
     if (!password) password = itoa36(rng_int());
-    faction_setpassword(f, password_hash(password, 0, PASSWORD_DEFAULT));
+    faction_setpassword(f, password_encode(password, PASSWORD_DEFAULT));
     ADDMSG(&f->msgs, msg_message("changepasswd", "value", password));
 
     f->alliance_joindate = turn;
@@ -566,7 +566,8 @@ void faction_setbanner(faction * self, const char *banner)
 
 void faction_setpassword(faction * f, const char *pwhash)
 {
-    assert(pwhash && pwhash[0] == '$');
+    assert(pwhash);
+    // && pwhash[0] == '$');
     free(f->_password);
     f->_password = _strdup(pwhash);
 }
