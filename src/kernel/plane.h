@@ -23,6 +23,7 @@ extern "C" {
 #endif
 
     struct region;
+    struct faction;
     struct plane;
     struct storage;
 
