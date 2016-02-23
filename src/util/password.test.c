@@ -1,25 +1,43 @@
 #include <platform.h>
-#include <CuTest.h>
 #include "password.h"
+#include <CuTest.h>
+#include <string.h>
 
 static void test_passwords(CuTest *tc) {
-    const char *hash;
+    const char *hash, *expect;
 
-    hash = password_hash("Hodor", "FqQLkl8g", PASSWORD_APACHE_MD5);
+    expect = "$apr1$FqQLkl8g$.icQqaDJpim4BVy.Ho5660";
+    CuAssertIntEquals(tc, VERIFY_OK, password_verify(expect, "Hodor"));
+    hash = password_encode("Hodor", PASSWORD_APACHE_MD5);
     CuAssertPtrNotNull(tc, hash);
-    CuAssertStrEquals(tc, "$apr1$FqQLkl8g$.icQqaDJpim4BVy.Ho5660", hash);
-    CuAssertIntEquals(tc, VERIFY_OK, password_verify(hash, "Hodor"));
+    CuAssertIntEquals(tc, 0, strncmp(hash, expect, 6));
 
-    hash = password_hash("jollygood", "ZouUn04i", PASSWORD_MD5);
+    expect = "$1$ZouUn04i$yNnT1Oy8azJ5V.UM9ppP5/";
+    CuAssertIntEquals(tc, VERIFY_OK, password_verify(expect, "jollygood"));
+    hash = password_encode("jollygood", PASSWORD_MD5);
     CuAssertPtrNotNull(tc, hash);
-    CuAssertStrEquals(tc, "$1$ZouUn04i$yNnT1Oy8azJ5V.UM9ppP5/", hash);
-    CuAssertIntEquals(tc, VERIFY_OK, password_verify(hash, "jollygood"));
+    CuAssertIntEquals(tc, 0, strncmp(hash, expect, 3));
 
-    hash = password_hash("password", "hodor", PASSWORD_PLAIN);
+    expect = "password";
+    hash = password_encode("password", PASSWORD_PLAINTEXT);
     CuAssertPtrNotNull(tc, hash);
-    CuAssertStrEquals(tc, "$0$hodor$password", hash);
-    CuAssertIntEquals(tc, VERIFY_OK, password_verify(hash, "password"));
-    CuAssertIntEquals(tc, VERIFY_FAIL, password_verify(hash, "arseword"));
+    CuAssertStrEquals(tc, hash, expect);
+    CuAssertIntEquals(tc, VERIFY_OK, password_verify(expect, "password"));
+    CuAssertIntEquals(tc, VERIFY_FAIL, password_verify(expect, "arseword"));
+
+    expect = "$0$password";
+    hash = password_encode("password", PASSWORD_NOCRYPT);
+    CuAssertPtrNotNull(tc, hash);
+    CuAssertStrEquals(tc, hash, expect);
+    CuAssertIntEquals(tc, VERIFY_OK, password_verify(expect, "password"));
+    CuAssertIntEquals(tc, VERIFY_FAIL, password_verify(expect, "arseword"));
+
+    expect = "$2y$05$RJ8qAhu.foXyJLdc2eHTLOaK4MDYn3/v4HtOVCq0Plv2yxcrEB7Wm";
+    CuAssertIntEquals(tc, VERIFY_OK, password_verify(expect, "Hodor"));
+    hash = password_encode("Hodor", PASSWORD_BCRYPT);
+    CuAssertPtrNotNull(tc, hash);
+    CuAssertIntEquals(tc, 0, strncmp(hash, expect, 7));
+
     CuAssertIntEquals(tc, VERIFY_UNKNOWN, password_verify("$9$saltyfish$password", "password"));
 }
 

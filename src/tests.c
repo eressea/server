@@ -5,6 +5,7 @@
 #include "prefix.h"
 
 #include <kernel/config.h>
+#include <kernel/plane.h>
 #include <kernel/region.h>
 #include <kernel/terrain.h>
 #include <kernel/item.h>
@@ -47,7 +48,7 @@ struct region *test_create_region(int x, int y, const terrain_type *terrain)
 {
     region *r = findregion(x, y);
     if (!r) {
-        r = new_region(x, y, NULL, 0);
+        r = new_region(x, y, findplane(x, y), 0);
     }
     if (!terrain) {
         terrain_type *t = get_or_create_terrain("plain");

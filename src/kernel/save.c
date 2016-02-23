@@ -454,6 +454,7 @@ void write_alliances(struct gamedata *data)
     alliance *al = alliances;
     while (al) {
         if (al->_leader) {
+            assert(al->_leader->_alive);
             WRITE_INT(data->store, al->id);
             WRITE_STR(data->store, al->name);
             WRITE_INT(data->store, (int)al->flags);
@@ -462,7 +463,7 @@ void write_alliances(struct gamedata *data)
         }
         al = al->next;
     }
-    WRITE_INT(data->store, 0);
+    write_faction_reference(NULL, data->store);
     WRITE_SECTION(data->store);
 }
 
@@ -535,11 +536,16 @@ static void read_owner(struct gamedata *data, region_owner ** powner)
 static void write_owner(struct gamedata *data, region_owner * owner)
 {
     if (owner) {
+        faction *f;
         WRITE_INT(data->store, owner->since_turn);
         WRITE_INT(data->store, owner->morale_turn);
         WRITE_INT(data->store, owner->flags);
-        write_faction_reference(owner->last_owner, data->store);
-        write_faction_reference(owner->owner, data->store);
+        f = owner->last_owner;
+        write_faction_reference((f && f->_alive) ? f : NULL, data->store);
+        // TODO: check that destroyfaction does the right thing.
+        // TODO: What happens to morale when the owner dies?
+        f = owner->owner;
+        write_faction_reference((f && f->_alive) ? f : NULL, data->store);
     }
     else {
         WRITE_INT(data->store, -1);
@@ -612,8 +618,8 @@ unit *read_unit(struct gamedata *data)
         uhash(u);
     }
 
-    READ_INT(data->store, &n);
-    f = findfaction(n);
+    resolve_faction(read_faction_reference(data->store), &f);
+    assert(f);
     if (f != u->faction) {
         u_setfaction(u, f);
     }
@@ -761,6 +767,7 @@ void write_unit(struct gamedata *data, const unit * u)
     const race *irace = u_irace(u);
 
     write_unit_reference(u, data->store);
+    assert(u->faction->_alive);
     write_faction_reference(u->faction, data->store);
     WRITE_STR(data->store, u->_name);
     WRITE_STR(data->store, u->display ? u->display : "");
@@ -1154,6 +1161,58 @@ void write_spellbook(const struct spellbook *book, struct storage *store)
     WRITE_TOK(store, "end");
 }
 
+static char * getpasswd(int fno) {
+    const char *prefix = itoa36(fno);
+    size_t len = strlen(prefix);
+    FILE * F = fopen("passwords.txt", "r");
+    char line[80];
+    if (F) {
+        while (!feof(F)) {
+            fgets(line, sizeof(line), F);
+            if (line[len]==':' && strncmp(prefix, line, len)==0) {
+                size_t slen = strlen(line)-1;
+                assert(line[slen]=='\n');
+                line[slen] = 0;
+                fclose(F);
+                return _strdup(line+len+1);
+            }
+        }
+        fclose(F);
+    }
+    return NULL;
+}
+
+static void read_password(gamedata *data, faction *f) {
+    char name[128];
+    READ_STR(data->store, name, sizeof(name));
+    if (data->version == BADCRYPT_VERSION) {
+        char * pass = getpasswd(f->no);
+        if (pass) {
+            faction_setpassword(f, password_encode(pass, PASSWORD_DEFAULT));
+            free(pass); // TODO: remove this allocation!
+        }
+        else {
+            free(f->_password);
+            f->_password = NULL;
+        }
+    }
+    else {
+        faction_setpassword(f, (data->version >= CRYPT_VERSION) ? name : password_encode(name, PASSWORD_DEFAULT));
+    }
+}
+
+void _test_read_password(gamedata *data, faction *f) {
+    read_password(data, f);
+}
+
+static void write_password(gamedata *data, const faction *f) {
+    WRITE_TOK(data->store, (const char *)f->_password);
+}
+
+void _test_write_password(gamedata *data, const faction *f) {
+    write_password(data, f);
+}
+
 /** Reads a faction from a file.
  * This function requires no context, can be called in any state. The
  * faction may not already exist, however.
@@ -1162,14 +1221,14 @@ faction *readfaction(struct gamedata * data)
 {
     ally **sfp;
     int planes, n;
-    faction *f;
+    faction *f = NULL;
     char name[DISPLAYSIZE];
+    variant var;
 
-    READ_INT(data->store, &n);
-    f = findfaction(n);
+    resolve_faction(var = read_faction_reference(data->store), &f);
     if (f == NULL) {
         f = (faction *)calloc(1, sizeof(faction));
-        f->no = n;
+        f->no = var.i;
     }
     else {
         f->allies = NULL;           /* mem leak */
@@ -1220,8 +1279,7 @@ faction *readfaction(struct gamedata * data)
         set_email(&f->email, "");
     }
 
-    READ_STR(data->store, name, sizeof(name));
-    faction_setpassword(f, (data->version > CRYPT_VERSION) ? name : password_hash(name, 0, PASSWORD_DEFAULT));
+    read_password(data, f);
     if (data->version < NOOVERRIDE_VERSION) {
         READ_STR(data->store, 0, 0);
     }
@@ -1308,6 +1366,7 @@ void writefaction(struct gamedata *data, const faction * f)
     ally *sf;
     ursprung *ur;
 
+    assert(f->_alive);
     write_faction_reference(f, data->store);
     WRITE_INT(data->store, f->subscription);
 #if RELEASE_VERSION >= SPELL_LEVEL_VERSION
@@ -1328,7 +1387,7 @@ void writefaction(struct gamedata *data, const faction * f)
     WRITE_STR(data->store, f->name);
     WRITE_STR(data->store, f->banner);
     WRITE_STR(data->store, f->email);
-    WRITE_TOK(data->store, f->_password);
+    write_password(data, f);
     WRITE_TOK(data->store, locale_name(f->locale));
     WRITE_INT(data->store, f->lastorders);
     WRITE_INT(data->store, f->age);
@@ -1354,20 +1413,18 @@ void writefaction(struct gamedata *data, const faction * f)
     WRITE_SECTION(data->store);
 
     for (sf = f->allies; sf; sf = sf->next) {
-        int no;
-        int status;
+        faction *fa = sf->faction;
 
-        assert(sf->faction);
-
-        no = sf->faction->no;
-        status = alliedfaction(NULL, f, sf->faction, HELP_ALL);
-
-        if (status != 0) {
-            WRITE_INT(data->store, no);
-            WRITE_INT(data->store, sf->status);
+        assert(fa);
+        if (fa->_alive) {
+            int status = alliedfaction(NULL, f, fa, HELP_ALL);
+            if (status != 0) {
+                write_faction_reference(fa, data->store);
+                WRITE_INT(data->store, sf->status);
+            }
         }
     }
-    WRITE_INT(data->store, 0);
+    write_faction_reference(NULL, data->store);
     WRITE_SECTION(data->store);
     write_groups(data->store, f);
     write_spellbook(f->spellbook, data->store);
@@ -1463,7 +1520,6 @@ int readgame(const char *filename, bool backup)
     READ_INT(&store, &nread);
     while (--nread >= 0) {
         int id;
-        variant fno;
         plane *pl;
 
         READ_INT(&store, &id);
@@ -1500,15 +1556,12 @@ int readgame(const char *filename, bool backup)
             }
         }
         else {
-            fno = read_faction_reference(&store);
-            while (fno.i) {
-                watcher *w = (watcher *)malloc(sizeof(watcher));
-                ur_add(fno, &w->faction, resolve_faction);
-                READ_INT(&store, &n);
-                w->mode = (unsigned char)n;
-                w->next = pl->watchers;
-                pl->watchers = w;
-                fno = read_faction_reference(&store);
+            /* WATCHERS - eliminated in February 2016, ca. turn 966 */
+            if (gdata.version < CRYPT_VERSION) {
+                variant fno;
+                do {
+                    fno = read_faction_reference(&store);
+                }  while (fno.i);
             }
         }
         a_read(&store, &pl->attribs, pl);
@@ -1789,7 +1842,6 @@ int writegame(const char *filename)
     WRITE_SECTION(&store);
 
     for (pl = planes; pl; pl = pl->next) {
-        watcher *w;
         WRITE_INT(&store, pl->id);
         WRITE_STR(&store, pl->name);
         WRITE_INT(&store, pl->minx);
@@ -1797,15 +1849,9 @@ int writegame(const char *filename)
         WRITE_INT(&store, pl->miny);
         WRITE_INT(&store, pl->maxy);
         WRITE_INT(&store, pl->flags);
-        w = pl->watchers;
-        while (w) {
-            if (w->faction) {
-                write_faction_reference(w->faction, &store);
-                WRITE_INT(&store, w->mode);
-            }
-            w = w->next;
-        }
-        write_faction_reference(NULL, &store);       /* mark the end of the list */
+#if RELEASE_VERSION < CRYPT_VERSION
+        write_faction_reference(NULL, &store);  /* mark the end of pl->watchers (gone since T966)  */
+#endif
         a_write(&store, pl->attribs, pl);
         WRITE_SECTION(&store);
     }
