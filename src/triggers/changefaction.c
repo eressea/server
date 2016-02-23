@@ -79,7 +79,7 @@ static void changefaction_write(const trigger * t, struct storage *store)
 {
     changefaction_data *td = (changefaction_data *)t->data.v;
     write_unit_reference(td->unit, store);
-    write_faction_reference(td->faction, store);
+    write_faction_reference(td->faction->_alive ? td->faction : NULL, store);
 }
 
 static int changefaction_read(trigger * t, struct storage *store)
