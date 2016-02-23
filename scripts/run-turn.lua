@@ -108,8 +108,8 @@ local function write_htpasswd()
 end
 
 local function write_files(locales)
+    write_passwords()
     write_htpasswd()
-    -- write_passwords()
     write_reports()
     write_summary()
 end

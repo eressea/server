@@ -217,6 +217,7 @@ int resolve_faction(variant id, void *address)
             result = -1;
         }
     }
+    assert(address);
     *(faction **)address = f;
     return result;
 }
@@ -252,7 +253,7 @@ faction *addfaction(const char *email, const char *password,
     }
 
     if (!password) password = itoa36(rng_int());
-    faction_setpassword(f, password_hash(password, 0, PASSWORD_DEFAULT));
+    faction_setpassword(f, password_encode(password, PASSWORD_DEFAULT));
     ADDMSG(&f->msgs, msg_message("changepasswd", "value", password));
 
     f->alliance_joindate = turn;
@@ -333,7 +334,8 @@ variant read_faction_reference(struct storage * store)
 
 void write_faction_reference(const faction * f, struct storage *store)
 {
-    WRITE_INT(store, (f && f->_alive) ? f->no : 0);
+    assert(!f || f->_alive);
+    WRITE_INT(store, f ? f->no : 0);
 }
 
 static faction *dead_factions;
@@ -566,7 +568,8 @@ void faction_setbanner(faction * self, const char *banner)
 
 void faction_setpassword(faction * f, const char *pwhash)
 {
-    assert(pwhash && pwhash[0] == '$');
+    assert(pwhash);
+    // && pwhash[0] == '$');
     free(f->_password);
     f->_password = _strdup(pwhash);
 }

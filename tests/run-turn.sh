@@ -1,4 +1,5 @@
-NEWFILES="data/185.dat datum parteien parteien.full htpasswd score turn"
+NEWFILES="data/185.dat datum parteien parteien.full passwd htpasswd score turn"
+
 cleanup () {
 rm -rf reports $NEWFILES
 }
@@ -38,7 +39,7 @@ SUPP=../share/ubuntu-12_04.supp
 SERVER="$VALGRIND --track-origins=yes --gen-suppressions=all --suppressions=$SUPP --error-exitcode=1 --leak-check=no $SERVER"
 fi
 echo "running $SERVER"
-$SERVER -t 184 ../scripts/run-turn.lua
+$SERVER -t 184 test-turn.lua
 echo "integration tests"
 [ -d reports ] || quit 4 "no reports directory created"
 CRFILE=185-zvto.cr

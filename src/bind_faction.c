@@ -384,15 +384,16 @@ static int tolua_faction_create(lua_State * L)
 
 static int tolua_faction_get_password(lua_State * L)
 {
-    unused_arg(L);
-    return 0;
+    faction *self = (faction *)tolua_tousertype(L, 1, 0);
+    tolua_pushstring(L, self->_password);
+    return 1;
 }
 
 static int tolua_faction_set_password(lua_State * L)
 {
     faction *self = (faction *)tolua_tousertype(L, 1, 0);
     const char * passw = tolua_tostring(L, 2, 0);
-    faction_setpassword(self, password_hash(passw, 0, PASSWORD_DEFAULT));
+    faction_setpassword(self, password_encode(passw, PASSWORD_DEFAULT));
     return 0;
 }
 

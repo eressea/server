@@ -25,7 +25,7 @@ TESTS=../Debug/eressea/test_eressea
 SERVER=../Debug/eressea/eressea
 if [ -n "$VALGRIND" ]; then
 SUPP=../share/ubuntu-12_04.supp
-VALGRIND="$VALGRIND --suppressions=$SUPP --error-exitcode=1 --leak-check=no"
+VALGRIND="$VALGRIND --track-origins=yes --gen-suppressions=all --suppressions=$SUPP --error-exitcode=1 --leak-check=no"
 fi
 echo "running $TESTS"
 $VALGRIND $TESTS

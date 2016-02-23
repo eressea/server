@@ -77,6 +77,7 @@ void a_upgradekeys(attrib **alist, attrib *abegin) {
             keys = realloc(keys, sizeof(int) * (n + i + 1));
             memcpy(keys + n + 1, val, sizeof(int)*i);
             n += i;
+            i = 0;
         }
     }
     if (i > 0) {
@@ -84,6 +85,7 @@ void a_upgradekeys(attrib **alist, attrib *abegin) {
         memcpy(keys + n + 1, val, sizeof(int)*i);
     }
     keys[0] = n + i;
+    a->data.v = keys;
 }
 
 attrib_type at_key = {

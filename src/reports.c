@@ -1385,16 +1385,8 @@ static void prepare_reports(void)
 
     for (r = regions; r; r = r->next) {
         unit *u;
-        plane *p = rplane(r);
 
         reorder_units(r);
-
-        if (p) {
-            watcher *w = p->watchers;
-            for (; w; w = w->next) {
-                faction_add_seen(w->faction, r, w->mode);
-            }
-        }
 
         /* Region owner get always the Lighthouse report */
         if (bt_lighthouse && config_token("rules.region_owner_pay_building", bt_lighthouse->_name)) {
@@ -1464,8 +1456,6 @@ static region *lastregion(faction * f)
 
     /* we continue from the best region and look for travelthru etc. */
     for (r = f->last->next; r; r = r->next) {
-        plane *p = rplane(r);
-
         /* search the region for travelthru-attributes: */
         if (fval(r, RF_TRAVELUNIT)) {
             travelthru_map(r, cb_set_last, f);
@@ -1474,9 +1464,6 @@ static region *lastregion(faction * f)
             continue;
         if (check_leuchtturm(r, f))
             f->last = r;
-        if (p && is_watcher(p, f)) {
-            f->last = r;
-        }
     }
     return f->last->next;
 #else
