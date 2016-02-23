@@ -58,6 +58,7 @@ resolve_fun resolver)
 
 void ur_add(variant data, void *ptrptr, resolve_fun fun)
 {
+    assert(ptrptr);
     if (ur_list == NULL) {
         ur_list = malloc(BLOCKSIZE * sizeof(unresolved));
         ur_begin = ur_current = ur_list;
@@ -86,6 +87,7 @@ void resolve(void)
             ur_list = ur;
             continue;
         }
+        assert(ur->ptrptr);
         ur->resolve(ur->data, ur->ptrptr);
         ++ur;
     }

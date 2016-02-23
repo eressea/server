@@ -79,14 +79,20 @@ static void changefaction_write(const trigger * t, struct storage *store)
 {
     changefaction_data *td = (changefaction_data *)t->data.v;
     write_unit_reference(td->unit, store);
-    write_faction_reference(td->faction, store);
+    write_faction_reference(td->faction->_alive ? td->faction : NULL, store);
 }
 
 static int changefaction_read(trigger * t, struct storage *store)
 {
+    variant var;
     changefaction_data *td = (changefaction_data *)t->data.v;
     read_reference(&td->unit, store, read_unit_reference, resolve_unit);
-    read_reference(&td->faction, store, read_faction_reference, resolve_faction);
+    var = read_faction_reference(store);
+    if (var.i == 0) {
+        return AT_READ_FAIL;
+    }
+    ur_add(var, &td->faction, resolve_faction);
+    // read_reference(&td->faction, store, read_faction_reference, resolve_faction);
     return AT_READ_OK;
 }
 

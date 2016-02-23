@@ -290,14 +290,3 @@ int read_plane_reference(plane ** pp, struct storage *store)
         ur_add(id, pp, resolve_plane);
     return AT_READ_OK;
 }
-
-bool is_watcher(const struct plane * p, const struct faction * f)
-{
-    struct watcher *w;
-    if (!p)
-        return false;
-    w = p->watchers;
-    while (w && w->faction != f)
-        w = w->next;
-    return (w != NULL);
-}

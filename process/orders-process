@@ -87,7 +87,7 @@ def check_pwd(filename, email, pw_data):
             fact_nr = str(mo.group(2))
             fact_pw = str(mo.group(3))
             if pw_data.fac_exists(fact_nr):
-                if pw_data.check(fact_nr, fact_pw) == 0:
+                if not pw_data.check(fact_nr, fact_pw):
                     game_email = pw_data.get_email(fact_nr)
                     results = results + [ (fact_nr, game_email, False, fact_pw) ]
                 else:
