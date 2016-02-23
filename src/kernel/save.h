@@ -86,6 +86,9 @@ extern "C" {
     struct gamedata *gamedata_open(const char *filename, const char *mode);
     void gamedata_close(struct gamedata *data);
 
+    /* test-only functions that give access to internal implementation details (BAD) */
+    void _test_write_password(struct gamedata *data, const struct faction *f);
+    void _test_read_password(struct gamedata *data, struct faction *f);
 #ifdef __cplusplus
 }
 #endif

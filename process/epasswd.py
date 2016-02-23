@@ -3,8 +3,15 @@
 from string import split
 from string import strip
 from string import lower
+import subprocess
 
 class EPasswd:
+	def _check_apr1(self, pwhash, pw):
+		spl = split(pwhash, '$')
+		salt = spl[2]
+		hash = subprocess.check_output(['openssl', 'passwd', '-apr1', '-salt', salt, pw]).decode('utf-8').strip()
+		return hash==pwhash
+
 	def __init__(self, file):
 		self.data = {}
 		try:
@@ -16,32 +23,23 @@ class EPasswd:
 				line = fp.readline()
 				if not line: break
 				line = strip(line)
-				[id, email, passwd, overri] = split(line, ":")[0:4]
+				[id, email, passwd] = split(line, ":")[0:3]
 				lc_id = lower(id)
 				self.data[lc_id] = {}
 				self.data[lc_id]["id"] = id
 				self.data[lc_id]["email"] = email
 				self.data[lc_id]["passwd"] = passwd
-				self.data[lc_id]["overri"] = overri
 			fp.close()
 
 	def check(self, id, passwd):
 		pw = self.get_passwd(id)
 		if pw[0:6]=='$apr1$':
-			# htpasswd hashes, cannot check, assume correct
-			return 1
-		if lower(pw) == lower(passwd):
-			return 1
-		if lower(self.get_overri(id)) == lower(passwd):
-			return 1
-		return 0
+			return self._check_apr1(pw, passwd)
+		return pw == passwd
 
 	def get_passwd(self, id):
 		return self.data[lower(id)]["passwd"]
 	
-	def get_overri(self, id):
-		return self.data[lower(id)]["overri"]
-
 	def get_email(self, id):
 		return self.data[lower(id)]["email"]
 	
@@ -49,6 +47,4 @@ class EPasswd:
 		return self.data[lower(id)]["id"]
 
 	def fac_exists(self, id):
-		if self.data.has_key(lower(id)):
-			return 1
-		return 0
+		return self.data.has_key(lower(id))

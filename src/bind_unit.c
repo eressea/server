@@ -153,8 +153,8 @@ static int tolua_unit_get_group(lua_State * L)
 static int tolua_unit_set_group(lua_State * L)
 {
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
-    int result = join_group(self, tolua_tostring(L, 2, 0));
-    lua_pushinteger(L, result);
+    group *g = join_group(self, tolua_tostring(L, 2, 0));
+    lua_pushboolean(L, g!=NULL);
     return 1;
 }
 

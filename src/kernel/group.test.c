@@ -5,6 +5,8 @@
 #include "faction.h"
 #include "unit.h"
 #include "region.h"
+#include <util/attrib.h>
+#include <attributes/key.h>
 #include <stream.h>
 #include <filestream.h>
 #include <storage.h>
@@ -22,6 +24,7 @@ static void test_group_readwrite(CuTest * tc)
     storage store;
     FILE *F;
     stream strm;
+    int i;
 
     F = fopen("test.dat", "wb");
     fstream_init(&strm, F);
@@ -29,10 +32,13 @@ static void test_group_readwrite(CuTest * tc)
     test_cleanup();
     test_create_world();
     f = test_create_faction(0);
-    g = new_group(f, "test", 42);
+    g = new_group(f, "NW", 42);
+    g = new_group(f, "Egoisten", 43);
+    key_set(&g->attribs, 44);
     al = ally_add(&g->allies, f);
     al->status = HELP_GIVE;
     write_groups(&store, f);
+    WRITE_INT(&store, 47);
     binstore_done(&store);
     fstream_done(&strm);
 
@@ -40,16 +46,25 @@ static void test_group_readwrite(CuTest * tc)
     fstream_init(&strm, F);
     binstore_init(&store, &strm);
     f->groups = 0;
-    free_group(g);
     read_groups(&store, f);
+    READ_INT(&store, &i);
     binstore_done(&store);
     fstream_done(&strm);
 
+    CuAssertIntEquals(tc, 47, i);
     CuAssertPtrNotNull(tc, f->groups);
-    CuAssertPtrNotNull(tc, f->groups->allies);
-    CuAssertPtrEquals(tc, 0, f->groups->allies->next);
-    CuAssertPtrEquals(tc, f, f->groups->allies->faction);
-    CuAssertIntEquals(tc, HELP_GIVE, f->groups->allies->status);
+    CuAssertIntEquals(tc, 42, f->groups->gid);
+    CuAssertStrEquals(tc, "NW", f->groups->name);
+    CuAssertPtrNotNull(tc, f->groups->next);
+    CuAssertIntEquals(tc, 43, f->groups->next->gid);
+    CuAssertStrEquals(tc, "Egoisten", f->groups->next->name);
+    CuAssertPtrEquals(tc, 0, f->groups->allies);
+    g = f->groups->next;
+    CuAssertTrue(tc, key_get(g->attribs, 44));
+    CuAssertPtrNotNull(tc, g->allies);
+    CuAssertPtrEquals(tc, 0, g->allies->next);
+    CuAssertPtrEquals(tc, f, g->allies->faction);
+    CuAssertIntEquals(tc, HELP_GIVE, g->allies->status);
     remove("test.dat");
     test_cleanup();
 }
@@ -68,8 +83,8 @@ static void test_group(CuTest * tc)
     assert(r && f);
     u = test_create_unit(f, r);
     assert(u);
-    CuAssertTrue(tc, join_group(u, "hodor"));
-    CuAssertPtrNotNull(tc, (g = get_group(u)));
+    CuAssertPtrNotNull(tc, (g = join_group(u, "hodor")));
+    CuAssertPtrEquals(tc, g, get_group(u));
     CuAssertStrEquals(tc, "hodor", g->name);
     CuAssertIntEquals(tc, 1, g->members);
     set_group(u, 0);

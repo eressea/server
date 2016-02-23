@@ -58,7 +58,8 @@ attrib_type at_otherfaction = {
 
 struct faction *get_otherfaction(const struct attrib *a)
 {
-    return (faction *)(a->data.v);
+    faction * f = (faction *)(a->data.v);
+    return (f && f->_alive) ? f : NULL;
 }
 
 struct attrib *make_otherfaction(struct faction *f)
