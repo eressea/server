@@ -1502,7 +1502,6 @@ int readgame(const char *filename, bool backup)
     fstream_init(&strm, F);
     binstore_init(&store, &strm);
     gdata.store = &store;
-    global.data_version = gdata.version; /* FIXME: hack! attribute::read does not have access to gamedata, only storage */
 
     if (gdata.version >= BUILDNO_VERSION) {
         int build;
@@ -1835,7 +1834,6 @@ int writegame(const char *filename)
 
     gdata.store = &store;
     gdata.version = RELEASE_VERSION;
-    global.data_version = RELEASE_VERSION; // FIXME: no code that is writing should need this
     n = STREAM_VERSION;
     fwrite(&gdata.version, sizeof(int), 1, F);
     fwrite(&n, sizeof(int), 1, F);

@@ -35,8 +35,8 @@
 #define ATTRIBOWNER_VERSION 350 /* all attrib_type functions know who owns the attribute */
 #define BADCRYPT_VERSION 351 /* passwords are encrypted, poorly */
 #define ATHASH_VERSION 352 /* attribute-type hash, not name */
-#define CRYPT_VERSION 353 /* passwords are encrypted */
-#define NOWATCH_VERSION 354 /* plane->watchers is gone */
-#define RELEASE_VERSION ATHASH_VERSION /* current datafile */
+#define NOWATCH_VERSION 353 /* plane->watchers is gone */
+#define CRYPT_VERSION 354 /* passwords are encrypted */
+#define RELEASE_VERSION NOWATCH_VERSION /* current datafile */
 #define MIN_VERSION INTPAK_VERSION      /* minimal datafile we support */
 #define MAX_VERSION RELEASE_VERSION /* change this if we can need to read the future datafile, and we can do so */

@@ -37,7 +37,6 @@ static void test_readwrite_data(CuTest * tc)
     test_cleanup();
     CuAssertIntEquals(tc, 0, writegame(filename));
     CuAssertIntEquals(tc, 0, readgame(filename, false));
-    CuAssertIntEquals(tc, RELEASE_VERSION, global.data_version);
     join_path(datapath(), filename, path, sizeof(path));
     CuAssertIntEquals(tc, 0, remove(path));
     test_cleanup();
@@ -87,7 +86,6 @@ static void test_readwrite_attrib(CuTest *tc) {
     key_set(&a, 42);
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
-    global.data_version = RELEASE_VERSION; // FIXME: hack!
     write_attribs(data.store, a, NULL);
     a_removeall(&a, NULL);
     CuAssertPtrEquals(tc, 0, a);
