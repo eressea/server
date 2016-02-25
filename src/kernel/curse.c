@@ -57,7 +57,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <ctype.h>
 
 #define MAXENTITYHASH 7919
-curse *cursehash[MAXENTITYHASH];
+static curse *cursehash[MAXENTITYHASH];
 
 void c_setflag(curse * c, unsigned int flags)
 {
