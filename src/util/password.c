@@ -38,8 +38,8 @@ char *password_gensalt(char *salt, size_t salt_len) {
     return salt;
 }
 
-static bool password_is_implemented(int algo) {
-    return algo == PASSWORD_PLAINTEXT || algo == PASSWORD_BCRYPT || algo == PASSWORD_NOCRYPT || algo == PASSWORD_MD5 || algo == PASSWORD_APACHE_MD5;
+bool password_is_implemented(int algo) {
+    return algo == PASSWORD_PLAINTEXT;// || algo == PASSWORD_BCRYPT || algo == PASSWORD_NOCRYPT || algo == PASSWORD_MD5 || algo == PASSWORD_APACHE_MD5;
 }
 
 static const char * password_hash_i(const char * passwd, const char *input, int algo, char *result, size_t len) {
