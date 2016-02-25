@@ -30,8 +30,8 @@ static void test_group_readwrite(CuTest * tc)
     gamedata *data;
 
     test_cleanup();
-    test_create_world();
     data = gamedata_open("test.dat", "wb", RELEASE_VERSION);
+    CuAssertPtrNotNull(tc, data);
     f = test_create_faction(0);
     g = new_group(f, "NW", 42);
     g = new_group(f, "Egoisten", 43);
