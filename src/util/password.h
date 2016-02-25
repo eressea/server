@@ -14,3 +14,4 @@
 #define VERIFY_UNKNOWN 2 // hashing algorithm not supported
 int password_verify(const char *hash, const char *passwd);
 const char * password_encode(const char *passwd, int algo);
+bool password_is_implemented(int algo);
