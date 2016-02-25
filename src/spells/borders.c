@@ -14,6 +14,7 @@
 #include <kernel/version.h>
 
 #include <util/attrib.h>
+#include <util/gamedata.h>
 #include <util/language.h>
 #include <util/rand.h>
 #include <util/rng.h>
@@ -51,8 +52,9 @@ typedef struct bresolve {
 
 static int resolve_buddy(variant data, void *addr);
 
-static int cw_read(attrib * a, void *target, storage * store)
+static int cw_read(attrib * a, void *target, gamedata *data)
 {
+    storage *store = data->store;
     bresolve *br = calloc(sizeof(bresolve), 1);
     curse *c = (curse *)a->data.v;
     wallcurse *wc = (wallcurse *)c->data.v;
@@ -172,15 +174,15 @@ static void wall_destroy(connection * b)
     free(b->data.v);
 }
 
-static void wall_read(connection * b, storage * store)
+static void wall_read(connection * b, gamedata * data)
 {
     static wall_data dummy;
     wall_data *fd = b->data.v ? (wall_data *)b->data.v : &dummy;
 
-    read_reference(&fd->mage, store, read_unit_reference, resolve_unit);
-    READ_INT(store, &fd->force);
-    if (global.data_version >= NOBORDERATTRIBS_VERSION) {
-        READ_INT(store, &fd->countdown);
+    read_reference(&fd->mage, data, read_unit_reference, resolve_unit);
+    READ_INT(data->store, &fd->force);
+    if (data->version >= NOBORDERATTRIBS_VERSION) {
+        READ_INT(data->store, &fd->countdown);
     }
     fd->active = true;
 }

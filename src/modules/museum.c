@@ -43,6 +43,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/functions.h>
+#include <util/gamedata.h>
 #include <util/strings.h>
 #include <util/language.h>
 
@@ -79,11 +80,11 @@ struct storage *store)
 }
 
 static int
-a_readmuseumgivebackcookie(attrib * a, void *owner, struct storage *store)
+a_readmuseumgivebackcookie(attrib * a, void *owner, gamedata *data)
 {
     museumgivebackcookie *gbc = (museumgivebackcookie *)a->data.v;
-    READ_INT(store, &gbc->warden_no);
-    READ_INT(store, &gbc->cookie);
+    READ_INT(data->store, &gbc->warden_no);
+    READ_INT(data->store, &gbc->cookie);
     return AT_READ_OK;
 }
 
@@ -121,11 +122,11 @@ struct storage *store)
     write_items(store, gb->items);
 }
 
-static int a_readmuseumgiveback(attrib * a, void *owner, struct storage *store)
+static int a_readmuseumgiveback(attrib * a, void *owner, struct gamedata *data)
 {
     museumgiveback *gb = (museumgiveback *)a->data.v;
-    READ_INT(store, &gb->cookie);
-    read_items(store, &gb->items);
+    READ_INT(data->store, &gb->cookie);
+    read_items(data->store, &gb->items);
     return AT_READ_OK;
 }
 

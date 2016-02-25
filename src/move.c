@@ -59,6 +59,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/bsdstring.h>
+#include <util/gamedata.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
@@ -154,8 +155,9 @@ static int shiptrail_age(attrib * a, void *owner)
     return (t->age > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
 }
 
-static int shiptrail_read(attrib * a, void *owner, struct storage *store)
+static int shiptrail_read(attrib * a, void *owner, struct gamedata *data)
 {
+    storage *store = data->store;
     int n;
     traveldir *t = (traveldir *)(a->data.v);
 

@@ -35,8 +35,6 @@ static void test_ship_not_allowed_in_coast(CuTest * tc)
     ship_type *stype;
 
     test_cleanup();
-    test_create_world();
-
     ttype = test_create_terrain("glacier", LAND_REGION | ARCTIC_REGION | WALK_INTO | SAIL_INTO);
     otype = test_create_terrain("ocean", SEA_REGION | SAIL_INTO);
     stype = test_create_shiptype("derp");
@@ -50,6 +48,7 @@ static void test_ship_not_allowed_in_coast(CuTest * tc)
     CuAssertIntEquals(tc, SA_NO_COAST, check_ship_allowed(sh, r1));
     stype->coasts[0] = ttype;
     CuAssertIntEquals(tc, SA_COAST, check_ship_allowed(sh, r1));
+    test_cleanup();
 }
 
 typedef struct move_fixture {
@@ -68,7 +67,6 @@ static void setup_harbor(move_fixture *mf) {
     unit *u;
 
     test_cleanup();
-    test_create_world();
 
     ttype = test_create_terrain("glacier", LAND_REGION | ARCTIC_REGION | WALK_INTO | SAIL_INTO);
     btype = test_create_buildingtype("harbour");

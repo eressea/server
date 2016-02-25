@@ -325,10 +325,10 @@ bool checkpasswd(const faction * f, const char *passwd)
     return true;
 }
 
-variant read_faction_reference(struct storage * store)
+variant read_faction_reference(gamedata * data)
 {
     variant id;
-    READ_INT(store, &id.i);
+    READ_INT(data->store, &id.i);
     return id;
 }
 

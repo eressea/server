@@ -22,6 +22,7 @@
 /* util includes */
 #include <util/attrib.h>
 #include <util/event.h>
+#include <util/gamedata.h>
 #include <util/log.h>
 #include <util/resolve.h>
 
@@ -48,10 +49,9 @@ static void unguard_write(const trigger * t, struct storage *store)
     write_building_reference((building *)t->data.v, store);
 }
 
-static int unguard_read(trigger * t, struct storage *store)
+static int unguard_read(trigger * t, gamedata *data)
 {
-    int rb =
-        read_reference(&t->data.v, store, read_building_reference,
+    int rb = read_reference(&t->data.v, data, read_building_reference,
         resolve_building);
     if (rb == 0 && !t->data.v) {
         return AT_READ_FAIL;

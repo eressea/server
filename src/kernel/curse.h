@@ -28,6 +28,8 @@ extern "C" {
 
     struct curse;
     struct curse_type;
+    struct gamedata;
+    struct storage;
 
     /* Sprueche in der struct region und auf Einheiten, Schiffen oder Burgen
      * (struct attribute)
@@ -93,7 +95,7 @@ extern "C" {
      *
      * */
 
-#include <util/variant.h>
+    extern struct attrib_type at_curse;
 
     /* ------------------------------------------------------------- */
     /* Zauberwirkungen */
@@ -194,8 +196,8 @@ extern "C" {
         struct message *(*curseinfo) (const void *, objtype_t,
             const struct curse *, int);
         void(*change_vigour) (struct curse *, double);
-        int(*read) (struct storage * store, struct curse *, void *target);
-        int(*write) (struct storage * store, const struct curse *,
+        int(*read) (struct gamedata *data, struct curse *, void *target);
+        int(*write) (struct storage *store, const struct curse *,
             const void *target);
         int(*cansee) (const struct faction *, const void *, objtype_t,
             const struct curse *, int);
@@ -216,10 +218,9 @@ extern "C" {
 
     void free_curses(void); /* de-register all curse-types */
 
-    extern struct attrib_type at_curse;
     void curse_write(const struct attrib *a, const void *owner,
-    struct storage *store);
-    int curse_read(struct attrib *a, void *owner, struct storage *store);
+        struct storage *store);
+    int curse_read(struct attrib *a, void *owner, struct gamedata *store);
 
     /* ------------------------------------------------------------- */
     /* Kommentare:

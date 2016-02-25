@@ -52,6 +52,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/base36.h>
 #include <util/bsdstring.h>
 #include <util/event.h>
+#include <util/gamedata.h>
 #include <util/strings.h>
 #include <util/language.h>
 #include <util/lists.h>
@@ -116,9 +117,9 @@ unit *findunitr(const region * r, int n)
 {
     unit *u;
     /* findunit regional! */
-    assert(n>0);
+    assert(n > 0);
     u = ufindhash(n);
-    return (u && u->region==r)?u:0;
+    return (u && u->region == r) ? u : 0;
 }
 
 // TODO: deprecated, replace with findunit(n)
@@ -443,8 +444,9 @@ int ualias(const unit * u)
     return a->data.i;
 }
 
-int a_readprivate(attrib * a, void *owner, struct storage *store)
+int a_readprivate(attrib * a, void *owner, gamedata *data)
 {
+    struct storage *store = data->store;
     char lbuf[DISPLAYSIZE];
     READ_STR(store, lbuf, sizeof(lbuf));
     a->data.v = _strdup(lbuf);
@@ -579,9 +581,9 @@ void a_writesiege(const attrib * a, const void *owner, struct storage *store)
     write_building_reference(b, store);
 }
 
-int a_readsiege(attrib * a, void *owner, struct storage *store)
+int a_readsiege(attrib * a, void *owner, gamedata *data)
 {
-    int result = read_reference(&a->data.v, store, read_building_reference,
+    int result = read_reference(&a->data.v, data, read_building_reference,
         resolve_building);
     if (result == 0 && !a->data.v) {
         return AT_READ_FAIL;
@@ -656,7 +658,7 @@ bool ucontact(const unit * u, const unit * u2)
 
     /* Explizites KONTAKTIERE */
     for (ru = a_find(u->attribs, &at_contact); ru && ru->type == &at_contact;
-        ru = ru->next) {
+    ru = ru->next) {
         if (((unit *)ru->data.v) == u2) {
             return true;
         }
@@ -698,10 +700,10 @@ int resolve_unit(variant id, void *address)
     return 0;
 }
 
-variant read_unit_reference(struct storage * store)
+variant read_unit_reference(gamedata *data)
 {
     variant var;
-    READ_INT(store, &var.i);
+    READ_INT(data->store, &var.i);
     return var;
 }
 
@@ -830,7 +832,7 @@ bool can_leave(unit * u)
 
     rule_leave = config_get_int("rules.move.owner_leave", 0);
 
-    if (rule_leave!=0 && u->building && u == building_owner(u->building)) {
+    if (rule_leave != 0 && u->building && u == building_owner(u->building)) {
         return false;
     }
     return true;
@@ -1001,7 +1003,7 @@ void transfermen(unit * u, unit * dst, int n)
             set_leftship(dst, sh);
         dst->flags |=
             u->flags & (UFL_LONGACTION | UFL_NOTMOVING | UFL_HUNGER | UFL_MOVED |
-            UFL_ENTER);
+                UFL_ENTER);
         if (u->attribs) {
             transfer_curse(u, dst, n);
         }
@@ -1132,8 +1134,8 @@ bool learn_skill(unit * u, skill_t sk, double learn_chance)
 {
     skill *sv = u->skills;
     if (learn_chance < 1.0 && rng_int() % 10000 >= learn_chance * 10000)
-    if (!chance(learn_chance))
-        return false;
+        if (!chance(learn_chance))
+            return false;
     while (sv != u->skills + u->skill_size) {
         assert(sv->weeks > 0);
         if (sv->id == sk) {
@@ -1280,7 +1282,8 @@ static int att_modification(const unit * u, skill_t sk)
                 bool allied = alliedunit(c->magician, u->faction, HELP_GUARD);
                 if (allied) {
                     if (effect > bonus) bonus = effect;
-                } else {
+                }
+                else {
                     if (effect < malus) malus = effect;
                 }
             }
@@ -1329,7 +1332,7 @@ int eff_skill(const unit * u, const skill *sv, const region *r)
 {
     assert(u);
     if (!r) r = u->region;
-    if (sv && sv->level>0) {
+    if (sv && sv->level > 0) {
         int mlevel = sv->level + get_modifier(u, sv->id, sv->level, r, false);
 
         if (mlevel > 0) {
@@ -1418,10 +1421,10 @@ void default_name(const unit *u, char name[], int len) {
         static const char * prefix[MAXLOCALES];
         int i = locale_index(lang);
         /*if (!prefix[i]) {*/
-            prefix[i] = LOC(lang, "unitdefault");
-            if (!prefix[i]) {
-                prefix[i] = parameters[P_UNIT];
-            }
+        prefix[i] = LOC(lang, "unitdefault");
+        if (!prefix[i]) {
+            prefix[i] = parameters[P_UNIT];
+        }
         /*}*/
         result = prefix[i];
     }
@@ -1733,7 +1736,7 @@ void scale_number(unit * u, int n)
     }
     if (u->number > 0) {
         for (a = a_find(u->attribs, &at_effect); a && a->type == &at_effect;
-            a = a->next) {
+        a = a->next) {
             effect_data *data = (effect_data *)a->data.v;
             int snew = data->value / u->number * n;
             if (n) {
@@ -1893,7 +1896,7 @@ static double produceexp_chance(void) {
     return config_get_flt("study.from_use", 1.0 / 3);
 }
 
-void produceexp_ex(struct unit *u, skill_t sk, int n, bool (*learn)(unit *, skill_t, double))
+void produceexp_ex(struct unit *u, skill_t sk, int n, bool(*learn)(unit *, skill_t, double))
 {
     if (n != 0 && (is_monsters(u->faction) || playerrace(u_race(u)))) {
         double chance = produceexp_chance();

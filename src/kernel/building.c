@@ -386,10 +386,10 @@ int resolve_building(variant id, void *address)
     return result;
 }
 
-variant read_building_reference(struct storage * store)
+variant read_building_reference(gamedata * data)
 {
     variant result;
-    READ_INT(store, &result.i);
+    READ_INT(data->store, &result.i);
     return result;
 }
 

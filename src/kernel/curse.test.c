@@ -5,6 +5,7 @@
 #include <kernel/unit.h>
 #include <kernel/version.h>
 #include <util/attrib.h>
+#include <util/gamedata.h>
 #include <util/message.h>
 #include <binarystore.h>
 #include <filestream.h>
@@ -122,29 +123,21 @@ static void test_memstream(CuTest *tc) {
 
 static void test_write_flag(CuTest *tc) {
     curse_fixture fix;
+    gamedata data;
     storage store;
-    char buf[1024];
-    stream out = { 0 };
-    size_t len;
 
-    mstream_init(&out);
-    binstore_init(&store, &out);
-    store.handle.data = &out;
+    mstream_init(&data.strm);
+    gamedata_init(&data, &store, RELEASE_VERSION);
 
     setup_curse(&fix, "gbdream");
     fix.c->flags = 42 | CURSE_ISNEW;
     curse_write(fix.r->attribs, fix.r, &store);
-    out.api->rewind(out.handle);
-    len = out.api->read(out.handle, buf, sizeof(buf));
-    buf[len] = '\0';
-    out.api->rewind(out.handle);
-    curse_read(fix.r->attribs, fix.r, &store);
+    data.strm.api->rewind(data.strm.handle);
+    curse_read(fix.r->attribs, fix.r, &data);
     CuAssertIntEquals(tc, 42 | CURSE_ISNEW, ((curse *) fix.r->attribs->data.v)->flags);
-    global.data_version = RELEASE_VERSION;
-    CuAssertIntEquals(tc, RELEASE_VERSION, global.data_version);
 
-    mstream_done(&out);
-    binstore_done(&store);
+    mstream_done(&data.strm);
+    gamedata_done(&data);
     test_cleanup();
 }
 

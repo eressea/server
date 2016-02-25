@@ -22,6 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <kernel/save.h>
 #include <util/attrib.h>
+#include <util/gamedata.h>
 #include <storage.h>
 
 #include <stdlib.h>
@@ -35,20 +36,20 @@ static void a_writekeys(const attrib *a, const void *o, storage *store) {
     }
 }
 
-static int a_readkeys(attrib * a, void *owner, struct storage *store) {
+static int a_readkeys(attrib * a, void *owner, gamedata *data) {
     int i, *p = 0;
-    READ_INT(store, &i);
+    READ_INT(data->store, &i);
     assert(i < 4096 && i>0);
     a->data.v = p = malloc(sizeof(int)*(i + 1));
     *p++ = i;
     while (i--) {
-        READ_INT(store, p++);
+        READ_INT(data->store, p++);
     }
     return AT_READ_OK;
 }
 
-static int a_readkey(attrib *a, void *owner, struct storage *store) {
-    int res = a_readint(a, owner, store);
+static int a_readkey(attrib *a, void *owner, struct gamedata *data) {
+    int res = a_readint(a, owner, data);
     return (res != AT_READ_FAIL) ? AT_READ_DEPR : res;
 }
 

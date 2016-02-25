@@ -42,6 +42,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/bsdstring.h>
+#include <util/gamedata.h>
 #include <util/strings.h>
 #include <util/lists.h>
 #include <util/log.h>
@@ -176,12 +177,12 @@ void a_initmoveblock(attrib * a)
     a->data.v = calloc(1, sizeof(moveblock));
 }
 
-int a_readmoveblock(attrib * a, void *owner, struct storage *store)
+int a_readmoveblock(attrib * a, void *owner, gamedata *data)
 {
     moveblock *m = (moveblock *)(a->data.v);
     int i;
 
-    READ_INT(store, &i);
+    READ_INT(data->store, &i);
     m->dir = (direction_t)i;
     return AT_READ_OK;
 }
@@ -1225,10 +1226,11 @@ int resolve_region_id(variant id, void *address)
     return 0;
 }
 
-variant read_region_reference(struct storage * store)
+variant read_region_reference(gamedata *data)
 {
+    struct storage * store = data->store;
     variant result;
-    if (global.data_version < UIDHASH_VERSION) {
+    if (data->version < UIDHASH_VERSION) {
         int n;
         READ_INT(store, &n);
         result.sa[0] = (short)n;

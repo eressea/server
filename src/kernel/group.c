@@ -33,6 +33,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/gamedata.h>
 #include <util/resolve.h>
 #include <util/unicode.h>
 
@@ -95,8 +96,9 @@ static group *find_group(int gid)
     return g;
 }
 
-static int read_group(attrib * a, void *owner, struct storage *store)
+static int read_group(attrib * a, void *owner, gamedata *data)
 {
+    struct storage *store = data->store;
     group *g;
     int gid;
 
@@ -215,8 +217,9 @@ void write_groups(struct storage *store, const faction * f)
     WRITE_INT(store, 0);
 }
 
-void read_groups(struct storage *store, faction * f)
+void read_groups(gamedata *data, faction * f)
 {
+    struct storage *store = data->store;
     for (;;) {
         ally **pa;
         group *g;
@@ -233,7 +236,7 @@ void read_groups(struct storage *store, faction * f)
             ally *a;
             variant fid;
 
-            fid = read_faction_reference(store);
+            fid = read_faction_reference(data);
             if (fid.i <= 0)
                 break;
             a = ally_add(pa, findfaction(fid.i));
@@ -241,6 +244,6 @@ void read_groups(struct storage *store, faction * f)
             if (!a->faction)
                 ur_add(fid, &a->faction, resolve_faction);
         }
-        read_attribs(store, &g->attribs, g);
+        read_attribs(data, &g->attribs, g);
     }
 }

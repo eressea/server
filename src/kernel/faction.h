@@ -30,7 +30,8 @@ extern "C" {
     struct item;
     struct seen_region;
     struct attrib_type;
-
+    struct gamedata;
+    
     extern struct attrib_type at_maxmagicians;
     /* SMART_INTERVALS: define to speed up finding the interval of regions that a
        faction is in. defining this speeds up the turn by 30-40% */
@@ -133,7 +134,7 @@ extern "C" {
 
     void write_faction_reference(const struct faction *f,
         struct storage *store);
-    variant read_faction_reference(struct storage *store);
+    variant read_faction_reference(struct gamedata *store);
     int resolve_faction(variant data, void *addr);
 
     void renumber_faction(faction * f, int no);

@@ -2,6 +2,7 @@ project(util C)
 
 SET(_TEST_FILES
 base36.test.c
+gamedata.test.c
 parser.test.c
 password.test.c
 attrib.test.c
@@ -22,7 +23,9 @@ dice.c
 event.c
 filereader.c
 functions.c
+gamedata.c
 goodies.c
+gamedata.c
 language.c
 lists.c
 log.c

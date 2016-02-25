@@ -17,6 +17,8 @@ without prior permission by the authors of Eressea.
 #include <kernel/save.h>
 #include <kernel/version.h>
 
+#include <util/log.h>
+
 #include <storage.h>
 #include <stream.h>
 #include <filestream.h>
@@ -26,6 +28,7 @@ without prior permission by the authors of Eressea.
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <errno.h>
 
 #include <tolua.h>
 
@@ -35,11 +38,12 @@ static int tolua_storage_create(lua_State * L)
     const char *type = tolua_tostring(L, 2, "rb");
     gamedata *data;
 
-    data = gamedata_open(filename, type);
+    data = gamedata_open(filename, type, RELEASE_VERSION);
     if (data) {
         tolua_pushusertype(L, (void *)data, TOLUA_CAST "storage");
         return 1;
     }
+    log_error("could not open %s, mode %s (%s).", filename, type, strerror(errno));
     return 0;
 }
 
@@ -97,8 +101,7 @@ static int tolua_storage_tostring(lua_State * L)
 {
     gamedata *data = (gamedata *)tolua_tousertype(L, 1, 0);
     char name[64];
-    _snprintf(name, sizeof(name), "<storage enc=%d ver=%d>", data->encoding,
-        data->version);
+    _snprintf(name, sizeof(name), "<gamedata %p ver=%d>", (void *)data, data->version);
     lua_pushstring(L, name);
     return 1;
 }

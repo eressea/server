@@ -45,10 +45,10 @@ variant read_int(struct storage *store)
 }
 
 int
-read_reference(void *address, storage * store, read_fun reader,
-resolve_fun resolver)
+read_reference(void *address, struct gamedata * data, read_fun reader,
+    resolve_fun resolver)
 {
-    variant var = reader(store);
+    variant var = reader(data);
     int result = resolver(var, address);
     if (result != 0) {
         ur_add(var, address, resolver);
