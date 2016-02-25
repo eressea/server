@@ -1461,16 +1461,8 @@ static int cb_sb_maxlevel(spellbook_entry *sbe, void *cbdata) {
 
 int readgame(const char *filename, bool backup)
 {
-    int n, p, nread;
-    faction *f, **fp;
-    region *r;
-    building *b, **bp;
-    ship **shp;
-    unit *u;
-    int rmax = maxregions;
+    int n;
     char path[MAX_PATH];
-    char name[DISPLAYSIZE];
-    const struct building_type *bt_lighthouse = bt_find("lighthouse");
     gamedata gdata = { 0 };
     storage store;
     stream strm;
@@ -1508,10 +1500,27 @@ int readgame(const char *filename, bool backup)
         READ_INT(&store, &build);
         log_debug("data in %s created with build %d.", filename, build);
     }
-    if (gdata.version >= SAVEGAMEID_VERSION) {
+    n = read_game(&gdata);
+    binstore_done(&store);
+    fstream_done(&strm);
+    return n;
+}
+
+int read_game(gamedata *data) {
+    char name[DISPLAYSIZE];
+    int n, p, nread;
+    faction *f, **fp;
+    region *r;
+    building *b, **bp;
+    ship **shp;
+    unit *u;
+    int rmax = maxregions;
+    const struct building_type *bt_lighthouse = bt_find("lighthouse");
+    storage * store = data->store;
+    if (data->version >= SAVEGAMEID_VERSION) {
         int gameid;
 
-        READ_INT(&store, &gameid);
+        READ_INT(store, &gameid);
         if (gameid != game_id()) {
             int c;
             log_warning("game mismatch: datafile contains game %d, but config is for %d", gameid, game_id());
@@ -1524,25 +1533,25 @@ int readgame(const char *filename, bool backup)
         }
     }
     else {
-        READ_STR(&store, NULL, 0);
+        READ_STR(store, NULL, 0);
     }
-    read_attribs(&gdata, &global.attribs, NULL);
-    READ_INT(&store, &turn);
+    read_attribs(data, &global.attribs, NULL);
+    READ_INT(store, &turn);
     global.data_turn = turn;
     log_debug(" - reading turn %d\n", turn);
     rng_init(turn);
-    READ_INT(&store, &nread);          /* max_unique_id = ignore */
-    READ_INT(&store, &nextborder);
+    READ_INT(store, &nread);          /* max_unique_id = ignore */
+    READ_INT(store, &nextborder);
 
     /* Planes */
     planes = NULL;
-    READ_INT(&store, &nread);
+    READ_INT(store, &nread);
     while (--nread >= 0) {
         int id;
         variant fno;
         plane *pl;
 
-        READ_INT(&store, &id);
+        READ_INT(store, &id);
         pl = getplanebyid(id);
 
         if (pl == NULL) {
@@ -1552,20 +1561,20 @@ int readgame(const char *filename, bool backup)
             log_warning("the plane with id=%d already exists.\n", id);
         }
         pl->id = id;
-        READ_STR(&store, name, sizeof(name));
+        READ_STR(store, name, sizeof(name));
         pl->name = _strdup(name);
-        READ_INT(&store, &pl->minx);
-        READ_INT(&store, &pl->maxx);
-        READ_INT(&store, &pl->miny);
-        READ_INT(&store, &pl->maxy);
-        READ_INT(&store, &pl->flags);
+        READ_INT(store, &pl->minx);
+        READ_INT(store, &pl->maxx);
+        READ_INT(store, &pl->miny);
+        READ_INT(store, &pl->maxy);
+        READ_INT(store, &pl->flags);
 
         /* read watchers */
-        if (gdata.version < FIX_WATCHERS_VERSION) {
+        if (data->version < FIX_WATCHERS_VERSION) {
             char rname[64];
             /* before this version, watcher storage was pretty broken. we are incompatible and don't read them */
             for (;;) {
-                READ_TOK(&store, rname, sizeof(rname));
+                READ_TOK(store, rname, sizeof(rname));
                 if (strcmp(rname, "end") == 0) {
                     break;                /* this is most likely the end of the list */
                 }
@@ -1577,29 +1586,29 @@ int readgame(const char *filename, bool backup)
         }
         else {
             /* WATCHERS - eliminated in February 2016, ca. turn 966 */
-            if (gdata.version < NOWATCH_VERSION) {
-                fno = read_faction_reference(&gdata);
+            if (data->version < NOWATCH_VERSION) {
+                fno = read_faction_reference(data);
                 while (fno.i) {
-                    fno = read_faction_reference(&gdata);
+                    fno = read_faction_reference(data);
                 }
             }
         }
-        read_attribs(&gdata, &pl->attribs, pl);
+        read_attribs(data, &pl->attribs, pl);
         if (pl->id != 1094969858) { // Regatta
             addlist(&planes, pl);
         }
     }
 
     /* Read factions */
-    read_alliances(&gdata);
-    READ_INT(&store, &nread);
+    read_alliances(data);
+    READ_INT(store, &nread);
     log_debug(" - Einzulesende Parteien: %d\n", nread);
     fp = &factions;
     while (*fp)
         fp = &(*fp)->next;
 
     while (--nread >= 0) {
-        faction *f = readfaction(&gdata);
+        faction *f = readfaction(data);
 
         *fp = f;
         fp = &f->next;
@@ -1609,7 +1618,7 @@ int readgame(const char *filename, bool backup)
 
     /* Regionen */
 
-    READ_INT(&store, &nread);
+    READ_INT(store, &nread);
     assert(nread < MAXREGIONS);
     if (rmax < 0) {
         rmax = nread;
@@ -1618,67 +1627,67 @@ int readgame(const char *filename, bool backup)
     while (--nread >= 0) {
         unit **up;
         int x, y;
-        READ_INT(&store, &x);
-        READ_INT(&store, &y);
+        READ_INT(store, &x);
+        READ_INT(store, &y);
 
         if ((nread & 0x3FF) == 0) {     /* das spart extrem Zeit */
             log_debug(" - Einzulesende Regionen: %d/%d * %d,%d    \r", rmax, nread, x, y);
         }
         --rmax;
 
-        r = readregion(&gdata, x, y);
+        r = readregion(data, x, y);
 
         /* Burgen */
-        READ_INT(&store, &p);
+        READ_INT(store, &p);
         bp = &r->buildings;
 
         while (--p >= 0) {
 
             b = (building *)calloc(1, sizeof(building));
-            READ_INT(&store, &b->no);
+            READ_INT(store, &b->no);
             *bp = b;
             bp = &b->next;
             bhash(b);
-            READ_STR(&store, name, sizeof(name));
+            READ_STR(store, name, sizeof(name));
             b->name = _strdup(name);
             if (lomem) {
-                READ_STR(gdata.store, NULL, 0);
+                READ_STR(store, NULL, 0);
             }
             else {
-                READ_STR(&store, name, sizeof(name));
+                READ_STR(store, name, sizeof(name));
                 b->display = _strdup(name);
             }
-            READ_INT(&store, &b->size);
-            READ_STR(&store, name, sizeof(name));
+            READ_INT(store, &b->size);
+            READ_STR(store, name, sizeof(name));
             b->type = bt_find(name);
             b->region = r;
-            read_attribs(&gdata, &b->attribs, b);
+            read_attribs(data, &b->attribs, b);
             if (b->type == bt_lighthouse) {
                 r->flags |= RF_LIGHTHOUSE;
             }
         }
         /* Schiffe */
 
-        READ_INT(&store, &p);
+        READ_INT(store, &p);
         shp = &r->ships;
 
         while (--p >= 0) {
             ship *sh = (ship *)calloc(1, sizeof(ship));
             sh->region = r;
-            READ_INT(&store, &sh->no);
+            READ_INT(store, &sh->no);
             *shp = sh;
             shp = &sh->next;
             shash(sh);
-            READ_STR(&store, name, sizeof(name));
+            READ_STR(store, name, sizeof(name));
             sh->name = _strdup(name);
             if (lomem) {
-                READ_STR(&store, NULL, 0);
+                READ_STR(store, NULL, 0);
             }
             else {
-                READ_STR(&store, name, sizeof(name));
+                READ_STR(store, name, sizeof(name));
                 sh->display = _strdup(name);
             }
-            READ_STR(&store, name, sizeof(name));
+            READ_STR(store, name, sizeof(name));
             sh->type = st_find(name);
             if (sh->type == NULL) {
                 /* old datafiles */
@@ -1686,33 +1695,33 @@ int readgame(const char *filename, bool backup)
             }
             assert(sh->type || !"ship_type not registered!");
 
-            READ_INT(&store, &sh->size);
-            READ_INT(&store, &sh->damage);
-            if (gdata.version >= FOSS_VERSION) {
-                READ_INT(&store, &sh->flags);
+            READ_INT(store, &sh->size);
+            READ_INT(store, &sh->damage);
+            if (data->version >= FOSS_VERSION) {
+                READ_INT(store, &sh->flags);
             }
 
             /* Attribute rekursiv einlesen */
 
-            READ_INT(&store, &n);
+            READ_INT(store, &n);
             sh->coast = (direction_t)n;
             if (sh->type->flags & SFL_NOCOAST) {
                 sh->coast = NODIRECTION;
             }
-            read_attribs(&gdata, &sh->attribs, sh);
+            read_attribs(data, &sh->attribs, sh);
         }
 
         *shp = 0;
 
         /* Einheiten */
 
-        READ_INT(&store, &p);
+        READ_INT(store, &p);
         up = &r->units;
 
         while (--p >= 0) {
-            unit *u = read_unit(&gdata);
+            unit *u = read_unit(data);
 
-            if (gdata.version < JSON_REPORT_VERSION) {
+            if (data->version < JSON_REPORT_VERSION) {
                 if (u->_name && fval(u->faction, FFL_NPC)) {
                     if (!u->_name[0] || unit_name_equals_race(u)) {
                         unit_setname(u, NULL);
@@ -1727,10 +1736,8 @@ int readgame(const char *filename, bool backup)
             update_interval(u->faction, u->region);
         }
     }
-    read_borders(&gdata);
+    read_borders(data);
 
-    binstore_done(&store);
-    fstream_done(&strm);
     /* Unaufgeloeste Zeiger initialisieren */
     log_debug("fixing unresolved references.\n");
     resolve();
@@ -1758,7 +1765,7 @@ int readgame(const char *filename, bool backup)
         }
         else {
             for (u = f->units; u; u = u->nextF) {
-                if (gdata.version < SPELL_LEVEL_VERSION) {
+                if (data->version < SPELL_LEVEL_VERSION) {
                     sc_mage *mage = get_mage(u);
                     if (mage) {
                         faction *f = u->faction;
@@ -1777,12 +1784,12 @@ int readgame(const char *filename, bool backup)
                 }
                 if (u->number > 0) {
                     f->_alive = true;
-                    if (gdata.version >= SPELL_LEVEL_VERSION) {
+                    if (data->version >= SPELL_LEVEL_VERSION) {
                         break;
                     }
                 }
             }
-            if (gdata.version < SPELL_LEVEL_VERSION && f->spellbook) {
+            if (data->version < SPELL_LEVEL_VERSION && f->spellbook) {
                 spellbook_foreach(f->spellbook, cb_sb_maxlevel, f);
             }
         }
@@ -1808,12 +1815,6 @@ static void clear_npc_orders(faction *f)
 int writegame(const char *filename)
 {
     int n;
-    faction *f;
-    region *r;
-    building *b;
-    ship *sh;
-    unit *u;
-    plane *pl;
     char path[MAX_PATH];
     gamedata gdata;
     storage store;
@@ -1834,121 +1835,137 @@ int writegame(const char *filename)
 
     gdata.store = &store;
     gdata.version = RELEASE_VERSION;
-    n = STREAM_VERSION;
     fwrite(&gdata.version, sizeof(int), 1, F);
+    n = STREAM_VERSION;
     fwrite(&n, sizeof(int), 1, F);
 
     fstream_init(&strm, F);
     binstore_init(&store, &strm);
 
+    n = write_game(&gdata);
+    binstore_done(&store);
+    fstream_done(&strm);
+    return n;
+}
+
+void write_planes(storage *store) {
+    plane *pl;
+    for (pl = planes; pl; pl = pl->next) {
+        WRITE_INT(store, pl->id);
+        WRITE_STR(store, pl->name);
+        WRITE_INT(store, pl->minx);
+        WRITE_INT(store, pl->maxx);
+        WRITE_INT(store, pl->miny);
+        WRITE_INT(store, pl->maxy);
+        WRITE_INT(store, pl->flags);
+#if RELEASE_VERSION < NOWATCH_VERSION
+        write_faction_reference(NULL, store);  /* mark the end of pl->watchers (gone since T966)  */
+#endif
+        a_write(store, pl->attribs, pl);
+        WRITE_SECTION(store);
+    }
+}
+
+int write_game(gamedata *data) {
+    storage * store = data->store;
+    region *r;
+    faction *f;
+    int n;
+
     /* globale Variablen */
+    assert(data->version <= MAX_VERSION && data->version >= MIN_VERSION);
 
-    WRITE_INT(&store, VERSION_BUILD);
-    WRITE_INT(&store, game_id());
-    WRITE_SECTION(&store);
+    WRITE_INT(store, VERSION_BUILD);
+    WRITE_INT(store, game_id());
+    WRITE_SECTION(store);
 
-    write_attribs(&store, global.attribs, NULL);
-    WRITE_SECTION(&store);
+    write_attribs(store, global.attribs, NULL);
+    WRITE_SECTION(store);
 
-    WRITE_INT(&store, turn);
-    WRITE_INT(&store, 0 /*max_unique_id */);
-    WRITE_INT(&store, nextborder);
+    WRITE_INT(store, turn);
+    WRITE_INT(store, 0 /*max_unique_id */);
+    WRITE_INT(store, nextborder);
 
     /* Write planes */
-    WRITE_SECTION(&store);
-    WRITE_INT(&store, listlen(planes));
-    WRITE_SECTION(&store);
+    WRITE_SECTION(store);
+    WRITE_INT(store, listlen(planes));
+    WRITE_SECTION(store);
 
-    for (pl = planes; pl; pl = pl->next) {
-        WRITE_INT(&store, pl->id);
-        WRITE_STR(&store, pl->name);
-        WRITE_INT(&store, pl->minx);
-        WRITE_INT(&store, pl->maxx);
-        WRITE_INT(&store, pl->miny);
-        WRITE_INT(&store, pl->maxy);
-        WRITE_INT(&store, pl->flags);
-#if RELEASE_VERSION < NOWATCH_VERSION
-        write_faction_reference(NULL, &store);  /* mark the end of pl->watchers (gone since T966)  */
-#endif
-        a_write(&store, pl->attribs, pl);
-        WRITE_SECTION(&store);
-    }
-
-    /* Write factions */
-    write_alliances(&gdata);
+    write_planes(store);
+    write_alliances(data);
     n = listlen(factions);
-    WRITE_INT(&store, n);
-    WRITE_SECTION(&store);
+    WRITE_INT(store, n);
+    WRITE_SECTION(store);
 
     log_debug(" - Schreibe %d Parteien...\n", n);
     for (f = factions; f; f = f->next) {
         if (fval(f, FFL_NPC)) {
             clear_npc_orders(f);
         }
-        writefaction(&gdata, f);
-        WRITE_SECTION(&store);
+        writefaction(data, f);
+        WRITE_SECTION(store);
     }
 
     /* Write regions */
 
     n = listlen(regions);
-    WRITE_INT(&store, n);
-    WRITE_SECTION(&store);
+    WRITE_INT(store, n);
+    WRITE_SECTION(store);
     log_debug(" - Schreibe Regionen: %d", n);
 
     for (r = regions; r; r = r->next, --n) {
+        ship *sh;
+        building *b;
+        unit *u;
         /* plus leerzeile */
         if ((n % 1024) == 0) {      /* das spart extrem Zeit */
             log_debug(" - Schreibe Regionen: %d", n);
         }
-        WRITE_SECTION(&store);
-        WRITE_INT(&store, r->x);
-        WRITE_INT(&store, r->y);
-        writeregion(&gdata, r);
+        WRITE_SECTION(store);
+        WRITE_INT(store, r->x);
+        WRITE_INT(store, r->y);
+        writeregion(data, r);
 
-        WRITE_INT(&store, listlen(r->buildings));
-        WRITE_SECTION(&store);
+        WRITE_INT(store, listlen(r->buildings));
+        WRITE_SECTION(store);
         for (b = r->buildings; b; b = b->next) {
-            write_building_reference(b, &store);
-            WRITE_STR(&store, b->name);
-            WRITE_STR(&store, b->display ? b->display : "");
-            WRITE_INT(&store, b->size);
-            WRITE_TOK(&store, b->type->_name);
-            WRITE_SECTION(&store);
-            write_attribs(&store, b->attribs, b);
-            WRITE_SECTION(&store);
+            write_building_reference(b, store);
+            WRITE_STR(store, b->name);
+            WRITE_STR(store, b->display ? b->display : "");
+            WRITE_INT(store, b->size);
+            WRITE_TOK(store, b->type->_name);
+            WRITE_SECTION(store);
+            write_attribs(store, b->attribs, b);
+            WRITE_SECTION(store);
         }
 
-        WRITE_INT(&store, listlen(r->ships));
-        WRITE_SECTION(&store);
+        WRITE_INT(store, listlen(r->ships));
+        WRITE_SECTION(store);
         for (sh = r->ships; sh; sh = sh->next) {
             assert(sh->region == r);
-            write_ship_reference(sh, &store);
-            WRITE_STR(&store, (const char *)sh->name);
-            WRITE_STR(&store, sh->display ? (const char *)sh->display : "");
-            WRITE_TOK(&store, sh->type->_name);
-            WRITE_INT(&store, sh->size);
-            WRITE_INT(&store, sh->damage);
-            WRITE_INT(&store, sh->flags & SFL_SAVEMASK);
+            write_ship_reference(sh, store);
+            WRITE_STR(store, (const char *)sh->name);
+            WRITE_STR(store, sh->display ? (const char *)sh->display : "");
+            WRITE_TOK(store, sh->type->_name);
+            WRITE_INT(store, sh->size);
+            WRITE_INT(store, sh->damage);
+            WRITE_INT(store, sh->flags & SFL_SAVEMASK);
             assert((sh->type->flags & SFL_NOCOAST) == 0 || sh->coast == NODIRECTION);
-            WRITE_INT(&store, sh->coast);
-            WRITE_SECTION(&store);
-            write_attribs(&store, sh->attribs, sh);
-            WRITE_SECTION(&store);
+            WRITE_INT(store, sh->coast);
+            WRITE_SECTION(store);
+            write_attribs(store, sh->attribs, sh);
+            WRITE_SECTION(store);
         }
 
-        WRITE_INT(&store, listlen(r->units));
-        WRITE_SECTION(&store);
+        WRITE_INT(store, listlen(r->units));
+        WRITE_SECTION(store);
         for (u = r->units; u; u = u->next) {
-            write_unit(&gdata, u);
+            write_unit(data, u);
         }
     }
-    WRITE_SECTION(&store);
-    write_borders(&store);
-    WRITE_SECTION(&store);
-
-    binstore_done(&store);
-    fstream_done(&strm);
+    WRITE_SECTION(store);
+    write_borders(store);
+    WRITE_SECTION(store);
 
     return 0;
 }
