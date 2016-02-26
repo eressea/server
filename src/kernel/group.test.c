@@ -24,6 +24,8 @@
 #include <assert.h>
 
 static void test_group_readwrite_dead_faction(CuTest *tc) {
+    gamedata data;
+    storage store;
     faction *f, *f2;
     unit * u;
     group *g;
@@ -48,10 +50,15 @@ static void test_group_readwrite_dead_faction(CuTest *tc) {
     destroyfaction(&factions);
     CuAssertTrue(tc, !f->_alive);
     CuAssertPtrEquals(tc, f2, factions);
-    writegame("test.dat");
+    mstream_init(&data.strm);
+    gamedata_init(&data, &store, RELEASE_VERSION);
+    write_game(&data);
     free_gamedata();
     f = f2 = NULL;
-    readgame("test.dat", false);
+    data.strm.api->rewind(data.strm.handle);
+    read_game(&data);
+    mstream_done(&data.strm);
+    gamedata_done(&data);
     CuAssertPtrEquals(tc, 0, findfaction(fno));
     f2 = factions;
     CuAssertPtrNotNull(tc, f2);
