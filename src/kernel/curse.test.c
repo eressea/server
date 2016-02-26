@@ -2,6 +2,7 @@
 
 #include <kernel/config.h>
 #include <kernel/region.h>
+#include <kernel/save.h>
 #include <kernel/unit.h>
 #include <kernel/version.h>
 #include <util/attrib.h>
@@ -53,6 +54,11 @@ static void setup_curse(curse_fixture *fix, const char *name) {
     fix->c = create_curse(fix->u, &fix->r->attribs, ct_find(name), 1.0, 1, 1.0, 0);
 }
 
+static void cleanup_curse(curse_fixture *fix) {
+    // destroy_curse(fix->c);
+    test_cleanup();
+}
+
 static void test_magicstreet(CuTest *tc) {
     curse_fixture fix;
     message *msg;
@@ -61,7 +67,7 @@ static void test_magicstreet(CuTest *tc) {
     msg = fix.c->type->curseinfo(fix.r, TYP_REGION, fix.c, 0);
     CuAssertStrEquals(tc, "curseinfo::magicstreet", test_get_messagetype(msg));
     msg_release(msg);
-    test_cleanup();
+    cleanup_curse(&fix);
 }
 
 static void test_magicstreet_warning(CuTest *tc) {
@@ -72,7 +78,7 @@ static void test_magicstreet_warning(CuTest *tc) {
     msg = fix.c->type->curseinfo(fix.r, TYP_REGION, fix.c, 0);
     CuAssertStrEquals(tc, "curseinfo::magicstreetwarn", test_get_messagetype(msg));
     msg_release(msg);
-    test_cleanup();
+    cleanup_curse(&fix);
 }
 
 static void test_good_dreams(CuTest *tc) {
@@ -83,7 +89,7 @@ static void test_good_dreams(CuTest *tc) {
     msg = fix.c->type->curseinfo(fix.r, TYP_REGION, fix.c, 0);
     CuAssertStrEquals(tc, "curseinfo::gooddream", test_get_messagetype(msg));
     msg_release(msg);
-    test_cleanup();
+    cleanup_curse(&fix);
 }
 
 static void test_bad_dreams(CuTest *tc) {
@@ -94,7 +100,7 @@ static void test_bad_dreams(CuTest *tc) {
     msg = fix.c->type->curseinfo(fix.r, TYP_REGION, fix.c, 0);
     CuAssertStrEquals(tc, "curseinfo::baddream", test_get_messagetype(msg));
     msg_release(msg);
-    test_cleanup();
+    cleanup_curse(&fix);
 }
 
 static void test_memstream(CuTest *tc) {
@@ -125,20 +131,31 @@ static void test_write_flag(CuTest *tc) {
     curse_fixture fix;
     gamedata data;
     storage store;
+    region * r;
+    curse * c;
+    int uid;
 
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
 
     setup_curse(&fix, "gbdream");
-    fix.c->flags = 42 | CURSE_ISNEW;
-    curse_write(fix.r->attribs, fix.r, &store);
+    c = fix.c;
+    r = fix.r;
+    uid = r->uid;
+    c->flags = CURSE_ISNEW;
+    write_game(&data);
+    free_gamedata();
     data.strm.api->rewind(data.strm.handle);
-    curse_read(fix.r->attribs, fix.r, &data);
-    CuAssertIntEquals(tc, 42 | CURSE_ISNEW, ((curse *) fix.r->attribs->data.v)->flags);
+    read_game(&data);
+    r = findregionbyid(uid);
+    CuAssertPtrNotNull(tc, r);
+    CuAssertPtrNotNull(tc, r->attribs);
+    c = (curse *)r->attribs->data.v;
+    CuAssertIntEquals(tc, CURSE_ISNEW, c->flags);
 
     mstream_done(&data.strm);
     gamedata_done(&data);
-    test_cleanup();
+    cleanup_curse(&fix);
 }
 
 CuSuite *get_curse_suite(void)

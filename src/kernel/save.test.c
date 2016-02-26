@@ -107,6 +107,11 @@ static void test_readwrite_dead_faction_group(CuTest *tc) {
     group *g;
     ally *al;
     int fno;
+    gamedata data;
+    storage store;
+
+    mstream_init(&data.strm);
+    gamedata_init(&data, &store, RELEASE_VERSION);
 
     test_cleanup();
     f = test_create_faction(0);
@@ -126,10 +131,11 @@ static void test_readwrite_dead_faction_group(CuTest *tc) {
     destroyfaction(&factions);
     CuAssertTrue(tc, !f->_alive);
     CuAssertPtrEquals(tc, f2, factions);
-    writegame("test.dat");
+    write_game(&data);
     free_gamedata();
     f = f2 = NULL;
-    readgame("test.dat", false);
+    data.strm.api->rewind(data.strm.handle);
+    read_game(&data);
     CuAssertPtrEquals(tc, 0, findfaction(fno));
     f2 = factions;
     CuAssertPtrNotNull(tc, f2);
@@ -138,6 +144,8 @@ static void test_readwrite_dead_faction_group(CuTest *tc) {
     g = get_group(u);
     CuAssertPtrNotNull(tc, g);
     CuAssertPtrEquals(tc, 0, g->allies);
+    mstream_done(&data.strm);
+    gamedata_done(&data);
     test_cleanup();
 }
 

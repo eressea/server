@@ -74,17 +74,19 @@ void c_clearflag(curse * c, unsigned int flags)
 
 void chash(curse * c)
 {
-    curse *old = cursehash[c->no % MAXENTITYHASH];
+    int i = c->no % MAXENTITYHASH;
 
-    cursehash[c->no % MAXENTITYHASH] = c;
-    c->nexthash = old;
+    c->nexthash = cursehash[i];
+    cursehash[i] = c;
+    assert(c->nexthash != c);
 }
 
 static void cunhash(curse * c)
 {
     curse **show;
+    int i = c->no % MAXENTITYHASH;
 
-    for (show = &cursehash[c->no % MAXENTITYHASH]; *show;
+    for (show = &cursehash[i]; *show;
         show = &(*show)->nexthash) {
         if ((*show)->no == c->no)
             break;
@@ -195,6 +197,7 @@ int curse_read(attrib * a, void *owner, gamedata *data)
     int flags;
     float flt;
 
+    assert(!c->no);
     READ_INT(store, &c->no);
     chash(c);
     READ_TOK(store, cursename, sizeof(cursename));
@@ -824,7 +827,7 @@ double destr_curse(curse * c, int cast_level, double force)
     return force;
 }
 
-void free_curses(void) {
+void curses_done(void) {
     int i;
     for (i = 0; i != MAXCTHASH; ++i) {
         ql_free(cursetypes[i]);

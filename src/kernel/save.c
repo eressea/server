@@ -1842,6 +1842,7 @@ int writegame(const char *filename)
     fstream_init(&strm, F);
     binstore_init(&store, &strm);
 
+    WRITE_INT(&store, VERSION_BUILD);
     n = write_game(&gdata);
     binstore_done(&store);
     fstream_done(&strm);
@@ -1875,7 +1876,6 @@ int write_game(gamedata *data) {
     /* globale Variablen */
     assert(data->version <= MAX_VERSION && data->version >= MIN_VERSION);
 
-    WRITE_INT(store, VERSION_BUILD);
     WRITE_INT(store, game_id());
     WRITE_SECTION(store);
 
