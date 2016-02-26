@@ -182,6 +182,8 @@ static void test_readwrite_dead_faction_regionowner(CuTest *tc) {
 }
 
 static void test_readwrite_dead_faction_changefaction(CuTest *tc) {
+    gamedata data;
+    storage store;
     faction *f, *f2;
     region *r;
     trigger *tr;
@@ -197,10 +199,15 @@ static void test_readwrite_dead_faction_changefaction(CuTest *tc) {
     destroyfaction(&factions);
     CuAssertTrue(tc, !f->_alive);
     remove_empty_units();
-    writegame("test.dat");
+    mstream_init(&data.strm);
+    gamedata_init(&data, &store, RELEASE_VERSION);
+    write_game(&data);
     free_gamedata();
     f = NULL;
-    readgame("test.dat", false);
+    data.strm.api->rewind(data.strm.handle);
+    read_game(&data);
+    mstream_done(&data.strm);
+    gamedata_done(&data);
     f = factions;
     CuAssertPtrNotNull(tc, f);
     r = regions;
@@ -212,6 +219,8 @@ static void test_readwrite_dead_faction_changefaction(CuTest *tc) {
 }
 
 static void test_readwrite_dead_faction_createunit(CuTest *tc) {
+    gamedata data;
+    storage store;
     faction *f, *f2;
     region *r;
     trigger *tr;
@@ -227,10 +236,15 @@ static void test_readwrite_dead_faction_createunit(CuTest *tc) {
     destroyfaction(&factions);
     CuAssertTrue(tc, !f->_alive);
     remove_empty_units();
-    writegame("test.dat");
+    mstream_init(&data.strm);
+    gamedata_init(&data, &store, RELEASE_VERSION);
+    write_game(&data);
     free_gamedata();
     f = NULL;
-    readgame("test.dat", false);
+    data.strm.api->rewind(data.strm.handle);
+    read_game(&data);
+    mstream_done(&data.strm);
+    gamedata_done(&data);
     f = factions;
     CuAssertPtrNotNull(tc, f);
     r = regions;
@@ -242,26 +256,26 @@ static void test_readwrite_dead_faction_createunit(CuTest *tc) {
 }
 
 static void test_read_password(CuTest *tc) {
-    const char *path = "test.dat";
-    gamedata *data;
+    gamedata data;
+    storage store;
     faction *f;
+
     f = test_create_faction(0);
     faction_setpassword(f, password_encode("secret", PASSWORD_DEFAULT));
-    data = gamedata_open(path, "wb", RELEASE_VERSION);
-    CuAssertPtrNotNull(tc, data);
-    _test_write_password(data, f);
-    gamedata_close(data);
-    data = gamedata_open(path, "rb", RELEASE_VERSION);
-    CuAssertPtrNotNull(tc, data);
-    _test_read_password(data, f);
-    gamedata_close(data);
+    mstream_init(&data.strm);
+    gamedata_init(&data, &store, RELEASE_VERSION);
+    _test_write_password(&data, f);
+    data.strm.api->rewind(data.strm.handle);
+    _test_read_password(&data, f);
+    mstream_done(&data.strm);
+    gamedata_done(&data);
     CuAssertTrue(tc, checkpasswd(f, "secret"));
-    CuAssertIntEquals(tc, 0, remove(path));
 }
 
 static void test_read_password_external(CuTest *tc) {
-    const char *path = "test.dat", *pwfile = "passwords.txt";
-    gamedata *data;
+    gamedata data;
+    storage store;
+    const char *pwfile = "passwords.txt";
     faction *f;
     FILE * F;
 
@@ -269,24 +283,21 @@ static void test_read_password_external(CuTest *tc) {
     f = test_create_faction(0);
     faction_setpassword(f, password_encode("secret", PASSWORD_DEFAULT));
     CuAssertPtrNotNull(tc, f->_password);
-    data = gamedata_open(path, "wb", RELEASE_VERSION);
-    CuAssertPtrNotNull(tc, data);
-    WRITE_TOK(data->store, (const char *)f->_password);
-    WRITE_TOK(data->store, (const char *)f->_password);
-    gamedata_close(data);
-    data = gamedata_open(path, "rb", RELEASE_VERSION);
-    CuAssertPtrNotNull(tc, data);
-    data->version = BADCRYPT_VERSION;
-    _test_read_password(data, f);
+    mstream_init(&data.strm);
+    gamedata_init(&data, &store, RELEASE_VERSION);
+    WRITE_TOK(data.store, (const char *)f->_password);
+    WRITE_TOK(data.store, (const char *)f->_password);
+    data.strm.api->rewind(data.strm.handle);
+    data.version = BADCRYPT_VERSION;
+    _test_read_password(&data, f);
     CuAssertPtrEquals(tc, 0, f->_password);
     F = fopen(pwfile, "wt");
     fprintf(F, "%s:secret\n", itoa36(f->no));
     fclose(F);
-    _test_read_password(data, f);
+    _test_read_password(&data, f);
     CuAssertPtrNotNull(tc, f->_password);
-    gamedata_close(data);
+    gamedata_done(&data);
     CuAssertTrue(tc, checkpasswd(f, "secret"));
-    CuAssertIntEquals(tc, 0, remove(path));
     CuAssertIntEquals(tc, 0, remove(pwfile));
 }
 
