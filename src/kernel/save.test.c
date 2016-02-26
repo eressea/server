@@ -152,6 +152,11 @@ static void test_readwrite_dead_faction_group(CuTest *tc) {
 static void test_readwrite_dead_faction_regionowner(CuTest *tc) {
     faction *f;
     region *r;
+    gamedata data;
+    storage store;
+
+    mstream_init(&data.strm);
+    gamedata_init(&data, &store, RELEASE_VERSION);
 
     test_cleanup();
     config_set("rules.region_owners", "1");
@@ -161,10 +166,13 @@ static void test_readwrite_dead_faction_regionowner(CuTest *tc) {
     destroyfaction(&factions);
     CuAssertTrue(tc, !f->_alive);
     remove_empty_units();
-    writegame("test.dat");
+    write_game(&data);
     free_gamedata();
     f = NULL;
-    readgame("test.dat", false);
+    data.strm.api->rewind(data.strm.handle);
+    read_game(&data);
+    mstream_done(&data.strm);
+    gamedata_done(&data);
     f = factions;
     CuAssertPtrEquals(tc, 0, f);
     r = regions;

@@ -1540,8 +1540,8 @@ int read_game(gamedata *data) {
     global.data_turn = turn;
     log_debug(" - reading turn %d\n", turn);
     rng_init(turn);
-    READ_INT(store, &nread);          /* max_unique_id = ignore */
-    READ_INT(store, &nextborder);
+    READ_INT(store, NULL);          /* max_unique_id = ignore */
+    READ_INT(store, NULL);
 
     /* Planes */
     planes = NULL;
@@ -1619,7 +1619,7 @@ int read_game(gamedata *data) {
     /* Regionen */
 
     READ_INT(store, &nread);
-    assert(nread < MAXREGIONS);
+    assert(nread < MAXREGIONS && nread>=0);
     if (rmax < 0) {
         rmax = nread;
     }
@@ -1883,8 +1883,8 @@ int write_game(gamedata *data) {
     WRITE_SECTION(store);
 
     WRITE_INT(store, turn);
-    WRITE_INT(store, 0 /*max_unique_id */);
-    WRITE_INT(store, nextborder);
+    WRITE_INT(store, 0 /* max_unique_id */);
+    WRITE_INT(store, 0 /* nextborder */);
 
     /* Write planes */
     WRITE_SECTION(store);
