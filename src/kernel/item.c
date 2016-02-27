@@ -1188,6 +1188,7 @@ static item *default_spoil(const struct race *rc, int size)
 }
 
 static void free_itype(item_type *itype) {
+    assert(itype);
     free(itype->construction);
     free(itype->_appearance[0]);
     free(itype->_appearance[1]);
@@ -1195,14 +1196,14 @@ static void free_itype(item_type *itype) {
 }
 
 static void free_wtype(weapon_type *wtype) {
+    assert(wtype);
     free(wtype->damage[0]);
     free(wtype->damage[1]);
     free(wtype);
 }
 
-int free_rtype_cb(const void * match, const void * key, size_t keylen, void *cbdata) {
-    resource_type *rtype;
-    cb_get_kv(match, &rtype, sizeof(rtype));
+void free_rtype(resource_type *rtype) {
+    assert(rtype);
     if (rtype->wtype) {
         free_wtype(rtype->wtype);
     }
@@ -1214,6 +1215,12 @@ int free_rtype_cb(const void * match, const void * key, size_t keylen, void *cbd
     }
     free(rtype->_name);
     free(rtype);
+}
+
+int free_rtype_cb(const void * match, const void * key, size_t keylen, void *cbdata) {
+    resource_type *rtype;
+    cb_get_kv(match, &rtype, sizeof(rtype));
+    free_rtype(rtype);
     return 0;
 }
 
