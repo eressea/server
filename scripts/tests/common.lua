@@ -674,7 +674,7 @@ function test_laen2()
  
   process_orders()
   init_reports()
-  write_report(u1.faction)
+--  write_report(u1.faction)
   assert_equal(laen - 2, r:get_resource("laen"))
   assert_equal(2, u1:get_item("laen"))
 end
@@ -985,13 +985,21 @@ local function find_in_report(f, pattern, extension)
     return start~=nil
 end
 
+local function remove_report(faction)
+    local filetrunk = config.reportpath .. "/" .. get_turn() .. "-" .. itoa36(faction.id)
+    os.remove(filetrunk .. ".nr")    
+    os.remove(filetrunk .. ".cr")    
+    os.remove(filetrunk .. ".txt")    
+end
+
 function test_coordinates_no_plane()
     local r = region.create(0, 0, "mountain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
+    local f = faction.create("noplane@eressea.de", "human", "de")
     local u = unit.create(f, r, 1)
     init_reports()
     write_report(f)
     assert_true(find_in_report(f, r.name .. " %(0,0%), Berg"))
+    remove_report(f)
 end
 
 function test_show_shadowmaster_attacks()
@@ -1005,6 +1013,7 @@ function test_show_shadowmaster_attacks()
     init_reports()
     write_report(f)
     assert_false(find_in_report(f, ", ,"))
+    remove_report(f)
 end
 
 function test_coordinates_named_plane()
@@ -1015,6 +1024,7 @@ function test_coordinates_named_plane()
     init_reports()
     write_report(f)
     assert_true(find_in_report(f, r.name .. " %(0,0,Hell%), Berg"))
+    remove_report(f)
 end
 
 function test_coordinates_unnamed_plane()
@@ -1025,6 +1035,7 @@ function test_coordinates_unnamed_plane()
     init_reports()
     write_report(f)
     assert_true(find_in_report(f, r.name .. " %(0,0%), Berg"))
+    remove_report(f)
 end
 
 function test_coordinates_noname_plane()
@@ -1035,6 +1046,7 @@ function test_coordinates_noname_plane()
     init_reports()
     write_report(f)
     assert_true(find_in_report(f, r.name .. " %(0,0%), Berg"))
+    remove_report(f)
 end
 
 function test_lighthouse()
@@ -1064,6 +1076,7 @@ function test_lighthouse()
     assert_false(find_in_report(f, " %(0,0%) %(vom Turm erblickt%)"))
     assert_false(find_in_report(f, " %(0,1%) %(vom Turm erblickt%)"))
     assert_false(find_in_report(f, " %(4,0%) %(vom Turm erblickt%)"))
+    remove_report(f)
 end
 
 module("tests.parser", package.seeall, lunit.testcase)
