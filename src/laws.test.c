@@ -1335,6 +1335,8 @@ static void test_demon_hunger(CuTest * tc)
     CuAssertIntEquals(tc, 10, i_get(u->items, rtype->itype));
     msg = test_get_last_message(u->faction->msgs);
     CuAssertStrEquals(tc, "malnourish", test_get_messagetype(msg));
+
+    test_cleanup();
 }
 
 CuSuite *get_laws_suite(void)
