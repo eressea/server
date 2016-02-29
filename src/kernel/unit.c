@@ -363,7 +363,7 @@ int gift_items(unit * u, int flags)
         item *itm = *itm_p;
 
         if (flags & GIFT_PEASANTS) {
-            if (!fval(u->region->terrain, SEA_REGION)) {
+            if (u->region->land) {
                 if (itm->type->rtype == rsilver) {
                     rsetmoney(r, rmoney(r) + itm->number);
                     itm->number = 0;
