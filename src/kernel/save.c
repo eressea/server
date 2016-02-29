@@ -238,8 +238,8 @@ static faction *factionorders(void)
         /* Die Partei hat sich zumindest gemeldet, so dass sie noch
          * nicht als untätig gilt */
 
-        /* TODO: +1 ist ein Workaround, weil cturn erst in process_orders
-         * incrementiert wird. */
+         /* TODO: +1 ist ein Workaround, weil cturn erst in process_orders
+          * incrementiert wird. */
         f->lastorders = global.data_turn + 1;
 
     }
@@ -454,7 +454,6 @@ void write_alliances(struct gamedata *data)
     alliance *al = alliances;
     while (al) {
         if (al->_leader) {
-            assert(al->_leader->_alive);
             WRITE_INT(data->store, al->id);
             WRITE_STR(data->store, al->name);
             WRITE_INT(data->store, (int)al->flags);
@@ -463,7 +462,7 @@ void write_alliances(struct gamedata *data)
         }
         al = al->next;
     }
-    write_faction_reference(NULL, data->store);
+    WRITE_INT(data->store, 0);
     WRITE_SECTION(data->store);
 }
 
@@ -514,13 +513,14 @@ static void read_owner(struct gamedata *data, region_owner ** powner)
             int id;
             READ_INT(data->store, &id);
             owner->last_owner = id ? findfaction(id) : NULL;
-        } else if (data->version >= OWNER_2_VERSION) {
+        }
+        else if (data->version >= OWNER_2_VERSION) {
             int id;
             alliance *a;
             READ_INT(data->store, &id);
             a = id ? findalliance(id) : NULL;
             /* don't know which faction, take the leader */
-            owner->last_owner = a? a->_leader : NULL;
+            owner->last_owner = a ? a->_leader : NULL;
         }
         else {
             owner->last_owner = NULL;
@@ -542,8 +542,6 @@ static void write_owner(struct gamedata *data, region_owner * owner)
         WRITE_INT(data->store, owner->flags);
         f = owner->last_owner;
         write_faction_reference((f && f->_alive) ? f : NULL, data->store);
-        // TODO: check that destroyfaction does the right thing.
-        // TODO: What happens to morale when the owner dies?
         f = owner->owner;
         write_faction_reference((f && f->_alive) ? f : NULL, data->store);
     }
@@ -575,7 +573,7 @@ int current_turn(void)
 
 static void
 writeorder(struct gamedata *data, const struct order *ord,
-const struct locale *lang)
+    const struct locale *lang)
 {
     char obuf[1024];
     write_order(ord, obuf, sizeof(obuf));
@@ -618,8 +616,8 @@ unit *read_unit(struct gamedata *data)
         uhash(u);
     }
 
-    resolve_faction(read_faction_reference(data->store), &f);
-    assert(f);
+    READ_INT(data->store, &n);
+    f = findfaction(n);
     if (f != u->faction) {
         u_setfaction(u, f);
     }
@@ -824,7 +822,7 @@ void write_unit(struct gamedata *data, const unit * u)
     WRITE_SECTION(data->store);
     write_items(data->store, u->items);
     WRITE_SECTION(data->store);
-    if (u->hp == 0 && u_race(u)!= get_race(RC_SPELL)) {
+    if (u->hp == 0 && u_race(u) != get_race(RC_SPELL)) {
         log_error("unit %s has 0 hitpoints, adjusting.\n", itoa36(u->no));
         ((unit *)u)->hp = u->number;
     }
@@ -985,7 +983,7 @@ static region *readregion(struct gamedata *data, int x, int y)
         read_items(data->store, &r->land->items);
         if (data->version >= REGIONOWNER_VERSION) {
             READ_INT(data->store, &n);
-            region_set_morale(r, _max(0, (short) n), -1);
+            region_set_morale(r, _max(0, (short)n), -1);
             read_owner(data, &r->land->ownership);
         }
     }
@@ -1008,7 +1006,7 @@ void writeregion(struct gamedata *data, const region * r)
         const item_type *rht;
         struct demand *demand;
         rawmaterial *res = r->resources;
-        
+
         assert(r->land);
         WRITE_STR(data->store, (const char *)r->land->name);
         assert(rtrees(r, 0) >= 0);
@@ -1139,7 +1137,7 @@ void read_spellbook(spellbook **bookp, struct storage *store, int(*get_level)(co
                 *bookp = create_spellbook(0);
                 sb = *bookp;
             }
-            if (level>0 && (global.data_version >= SPELLBOOK_VERSION || !spellbook_get(sb, sp))) {
+            if (level > 0 && (global.data_version >= SPELLBOOK_VERSION || !spellbook_get(sb, sp))) {
                 spellbook_add(sb, sp, level);
             }
         }
@@ -1169,12 +1167,12 @@ static char * getpasswd(int fno) {
     if (F) {
         while (!feof(F)) {
             fgets(line, sizeof(line), F);
-            if (line[len]==':' && strncmp(prefix, line, len)==0) {
-                size_t slen = strlen(line)-1;
-                assert(line[slen]=='\n');
+            if (line[len] == ':' && strncmp(prefix, line, len) == 0) {
+                size_t slen = strlen(line) - 1;
+                assert(line[slen] == '\n');
                 line[slen] = 0;
                 fclose(F);
-                return _strdup(line+len+1);
+                return _strdup(line + len + 1);
             }
         }
         fclose(F);
@@ -1221,14 +1219,14 @@ faction *readfaction(struct gamedata * data)
 {
     ally **sfp;
     int planes, n;
-    faction *f = NULL;
+    faction *f;
     char name[DISPLAYSIZE];
-    variant var;
 
-    resolve_faction(var = read_faction_reference(data->store), &f);
+    READ_INT(data->store, &n);
+    f = findfaction(n);
     if (f == NULL) {
         f = (faction *)calloc(1, sizeof(faction));
-        f->no = var.i;
+        f->no = n;
     }
     else {
         f->allies = NULL;           /* mem leak */
@@ -1413,18 +1411,20 @@ void writefaction(struct gamedata *data, const faction * f)
     WRITE_SECTION(data->store);
 
     for (sf = f->allies; sf; sf = sf->next) {
-        faction *fa = sf->faction;
+        int no;
+        int status;
 
-        assert(fa);
-        if (fa->_alive) {
-            int status = alliedfaction(NULL, f, fa, HELP_ALL);
-            if (status != 0) {
-                write_faction_reference(fa, data->store);
-                WRITE_INT(data->store, sf->status);
-            }
+        assert(sf->faction);
+
+        no = sf->faction->no;
+        status = alliedfaction(NULL, f, sf->faction, HELP_ALL);
+
+        if (status != 0) {
+            WRITE_INT(data->store, no);
+            WRITE_INT(data->store, sf->status);
         }
     }
-    write_faction_reference(NULL, data->store);
+    WRITE_INT(data->store, 0);
     WRITE_SECTION(data->store);
     write_groups(data->store, f);
     write_spellbook(f->spellbook, data->store);
@@ -1470,10 +1470,10 @@ int readgame(const char *filename, bool backup)
         return -1;
     }
     sz = fread(&gdata.version, sizeof(int), 1, F);
-    if (sz!=sizeof(int) || gdata.version >= INTPAK_VERSION) {
+    if (sz != sizeof(int) || gdata.version >= INTPAK_VERSION) {
         int stream_version;
         size_t sz = fread(&stream_version, sizeof(int), 1, F);
-        assert((sz==1 && stream_version == STREAM_VERSION) || !"unsupported data format");
+        assert((sz == 1 && stream_version == STREAM_VERSION) || !"unsupported data format");
     }
     assert(gdata.version >= MIN_VERSION || !"unsupported data format");
     assert(gdata.version <= MAX_VERSION || !"unsupported data format");
@@ -1520,6 +1520,7 @@ int readgame(const char *filename, bool backup)
     READ_INT(&store, &nread);
     while (--nread >= 0) {
         int id;
+        variant fno;
         plane *pl;
 
         READ_INT(&store, &id);
@@ -1558,10 +1559,10 @@ int readgame(const char *filename, bool backup)
         else {
             /* WATCHERS - eliminated in February 2016, ca. turn 966 */
             if (gdata.version < CRYPT_VERSION) {
-                variant fno;
-                do {
+                fno = read_faction_reference(&store);
+                while (fno.i) {
                     fno = read_faction_reference(&store);
-                }  while (fno.i);
+                }
             }
         }
         a_read(&store, &pl->attribs, pl);
