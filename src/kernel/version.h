@@ -32,7 +32,7 @@
 #define EXPLICIT_CURSE_ISNEW_VERSION 347 /* CURSE_ISNEW is not reset in read/write, but in age() */
 #define SPELL_LEVEL_VERSION 348 /* f->max_spelllevel gets stored, not calculated */
 #define OWNER_3_VERSION 349 /* regions store last owner, not last alliance */
-#define ATTRIBOWNER_VERSION 350 /* all attrib_type functions know who owns the attribute */
+#define ATTRIBOWNER_VERSION 351 /* all attrib_type functions know who owns the attribute */
 #define BADCRYPT_VERSION 351 /* passwords are encrypted, poorly */
 #define ATHASH_VERSION 352 /* attribute-type hash, not name */
 #define NOWATCH_VERSION 353 /* plane->watchers is gone */

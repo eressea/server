@@ -318,7 +318,7 @@ bool checkpasswd(const faction * f, const char *passwd)
 {
     if (!passwd) return false;
 
-    if (password_verify(f->_password, passwd) == VERIFY_FAIL) {
+    if (f->_password && password_verify(f->_password, passwd) == VERIFY_FAIL) {
         log_warning("password check failed: %s", factionname(f));
         return false;
     }
