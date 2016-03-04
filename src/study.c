@@ -205,7 +205,7 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
 
     n = _min(n, nteaching);
 
-    if (n != 0) {
+    if (n != 0 && teacher->building && student->building) {
         const struct building_type *btype = bt_find("academy");
         int index = 0;
 
