@@ -205,8 +205,7 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
 
     n = _min(n, nteaching);
 
-    if (n != 0 && teacher->building && student->building) {
-        const struct building_type *btype = bt_find("academy");
+    if (n != 0) {
         int index = 0;
 
         if (teach == NULL) {
@@ -227,21 +226,23 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
         }
         teach->value += n;
 
-        /* Solange Akademien groessenbeschraenkt sind, sollte Lehrer und
-         * Student auch in unterschiedlichen Gebaeuden stehen duerfen */
-        if (active_building(teacher, btype) && active_building(student, btype)) {
-            int j = study_cost(student, sk);
-            j = _max(50, j * 2);
-            /* kann Einheit das zahlen? */
-            if (get_pooled(student, get_resourcetype(R_SILVER), GET_DEFAULT, j) >= j) {
-                /* Jeder Schueler zusaetzlich +10 Tage wenn in Uni. */
-                teach->value += (n / 30) * 10;  /* learning erhoehen */
-                /* Lehrer zusaetzlich +1 Tag pro Schueler. */
-                if (academy)
-                    *academy += n;
-            }                         /* sonst nehmen sie nicht am Unterricht teil */
+        if (student->building && teacher->building == student->building) {
+            /* Solange Akademien groessenbeschraenkt sind, sollte Lehrer und
+             * Student auch in unterschiedlichen Gebaeuden stehen duerfen */
+            const struct building_type *btype = bt_find("academy");
+            if (active_building(teacher, btype) && active_building(student, btype)) {
+                int j = study_cost(student, sk);
+                j = _max(50, j * 2);
+                /* kann Einheit das zahlen? */
+                if (get_pooled(student, get_resourcetype(R_SILVER), GET_DEFAULT, j) >= j) {
+                    /* Jeder Schueler zusaetzlich +10 Tage wenn in Uni. */
+                    teach->value += (n / 30) * 10;  /* learning erhoehen */
+                    /* Lehrer zusaetzlich +1 Tag pro Schueler. */
+                    if (academy)
+                        *academy += n;
+                }                         /* sonst nehmen sie nicht am Unterricht teil */
+            }
         }
-
         /* Teaching ist die Anzahl Leute, denen man noch was beibringen kann. Da
          * hier nicht n verwendet wird, werden die Leute gezaehlt und nicht die
          * effektiv gelernten Tage. -> FALSCH ? (ENNO)

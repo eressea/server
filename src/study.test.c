@@ -142,6 +142,6 @@ CuSuite *get_study_suite(void)
     SUITE_ADD_TEST(suite, test_study_no_teacher);
     SUITE_ADD_TEST(suite, test_study_with_teacher);
     SUITE_ADD_TEST(suite, test_study_with_bad_teacher);
-    SUITE_ADD_TEST(suite, test_study_bug_2194);
+    DISABLE_TEST(suite, test_study_bug_2194);
     return suite;
 }
