@@ -22,6 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "magic.h"
 
 #include "skill.h"
+#include "study.h"
 #include "laws.h"
 
 #include <kernel/ally.h>

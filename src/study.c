@@ -23,6 +23,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "study.h"
 #include "move.h"
+#include "monster.h"
 #include "alchemy.h"
 
 #include <kernel/ally.h>
@@ -803,4 +804,23 @@ int study_cmd(unit * u, order * ord)
     }
 
     return 0;
+}
+
+static double produceexp_chance(void) {
+    return config_get_flt("study.from_use", 1.0 / 3);
+}
+
+void produceexp_ex(struct unit *u, skill_t sk, int n, bool(*learn)(unit *, skill_t, double))
+{
+    if (n != 0 && (is_monsters(u->faction) || playerrace(u_race(u)))) {
+        double chance = produceexp_chance();
+        if (chance > 0.0F) {
+            learn(u, sk, (n * chance) / u->number);
+        }
+    }
+}
+
+void produceexp(struct unit *u, skill_t sk, int n)
+{
+    produceexp_ex(u, sk, n, learn_skill);
 }

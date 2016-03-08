@@ -21,6 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "alchemy.h"
 #include "move.h"
 #include "skill.h"
+#include "study.h"
 
 #include <kernel/item.h>
 #include <kernel/faction.h>

@@ -26,13 +26,15 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-    extern int teach_cmd(struct unit *u, struct order *ord);
-    extern int study_cmd(struct unit *u, struct order *ord);
+    int teach_cmd(struct unit *u, struct order *ord);
+    int study_cmd(struct unit *u, struct order *ord);
 
-    extern magic_t getmagicskill(const struct locale *lang);
-    extern bool is_migrant(struct unit *u);
-    extern int study_cost(struct unit *u, skill_t talent);
+    magic_t getmagicskill(const struct locale *lang);
+    bool is_migrant(struct unit *u);
+    int study_cost(struct unit *u, skill_t talent);
 
+    void produceexp(struct unit *u, skill_t sk, int n);
+    void produceexp_ex(struct unit *u, skill_t sk, int n, bool(*learn)(struct unit *, skill_t, double));
 #define MAXTEACHERS 20
     typedef struct teaching_info {
         struct unit *teachers[MAXTEACHERS];
