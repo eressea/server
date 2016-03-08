@@ -21,6 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "xerewards.h"
 
 #include "magic.h"
+#include "study.h"
 
 /* kernel includes */
 #include <kernel/item.h>

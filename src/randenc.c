@@ -25,6 +25,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "move.h"
 #include "alchemy.h"
 #include "chaos.h"
+#include "study.h"
 
 /* kernel includes */
 #include <kernel/building.h>

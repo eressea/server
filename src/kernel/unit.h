@@ -206,8 +206,6 @@ extern "C" {
     void u_setfaction(struct unit *u, struct faction *f);
     void set_number(struct unit *u, int count);
 
-    bool learn_skill(struct unit *u, skill_t sk, double chance);
-
     int invisible(const struct unit *target, const struct unit *viewer);
     void free_unit(struct unit *u);
 

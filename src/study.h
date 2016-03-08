@@ -33,15 +33,18 @@ extern "C" {
     bool is_migrant(struct unit *u);
     int study_cost(struct unit *u, skill_t talent);
 
+    bool learn_skill(struct unit *u, skill_t sk, double chance);
     void produceexp(struct unit *u, skill_t sk, int n);
     void produceexp_ex(struct unit *u, skill_t sk, int n, bool(*learn)(struct unit *, skill_t, double));
 #define MAXTEACHERS 20
+#define TEACHNUMBER 10
     typedef struct teaching_info {
         struct unit *teachers[MAXTEACHERS];
         int value;
     } teaching_info;
 
     extern const struct attrib_type at_learning;
+
 
 #ifdef __cplusplus
 }

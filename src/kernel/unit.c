@@ -1129,30 +1129,6 @@ void set_number(unit * u, int count)
     u->number = (unsigned short)count;
 }
 
-bool learn_skill(unit * u, skill_t sk, double learn_chance)
-{
-    skill *sv = u->skills;
-    if (learn_chance < 1.0 && rng_int() % 10000 >= learn_chance * 10000)
-        if (!chance(learn_chance))
-            return false;
-    while (sv != u->skills + u->skill_size) {
-        assert(sv->weeks > 0);
-        if (sv->id == sk) {
-            if (sv->weeks <= 1) {
-                sk_set(sv, sv->level + 1);
-            }
-            else {
-                sv->weeks--;
-            }
-            return true;
-        }
-        ++sv;
-    }
-    sv = add_skill(u, sk);
-    sk_set(sv, 1);
-    return true;
-}
-
 void remove_skill(unit * u, skill_t sk)
 {
     skill *sv = u->skills;
