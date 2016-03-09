@@ -216,7 +216,7 @@ extern "C" {
         int duration;               /* Dauer der Verzauberung. Wird jede Runde vermindert */
     } curse;
 
-    void free_curses(void); /* de-register all curse-types */
+    void curses_done(void); /* de-register all curse-types */
 
     void curse_write(const struct attrib *a, const void *owner,
         struct storage *store);
