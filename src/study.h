@@ -26,6 +26,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
+    struct unit;
+
     int teach_cmd(struct unit *u, struct order *ord);
     int study_cmd(struct unit *u, struct order *ord);
 
@@ -33,7 +35,12 @@ extern "C" {
     bool is_migrant(struct unit *u);
     int study_cost(struct unit *u, skill_t talent);
 
+#ifndef NO_TESTS
+    typedef bool(*learn_fun)(struct unit *u, skill_t sk, double ch);
+    void inject_learn(learn_fun fun);
+#endif
     bool learn_skill(struct unit *u, skill_t sk, double chance);
+
     void produceexp(struct unit *u, skill_t sk, int n);
     void produceexp_ex(struct unit *u, skill_t sk, int n, bool(*learn)(struct unit *, skill_t, double));
 #define MAXTEACHERS 20

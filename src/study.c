@@ -824,9 +824,22 @@ void produceexp(struct unit *u, skill_t sk, int n)
     produceexp_ex(u, sk, n, learn_skill);
 }
 
+#ifndef NO_TESTS
+static learn_fun inject_learn_fun = 0;
+
+void inject_learn(learn_fun fun) {
+    inject_learn_fun = fun;
+}
+#endif
+
 bool learn_skill(unit * u, skill_t sk, double learn_chance)
 {
     skill *sv = u->skills;
+#ifndef NO_TESTS
+    if (inject_learn_fun) {
+        return inject_learn_fun(u, sk, learn_chance);
+    }
+#endif
     if (learn_chance < 1.0 && rng_int() % 10000 >= learn_chance * 10000)
         if (!chance(learn_chance))
             return false;

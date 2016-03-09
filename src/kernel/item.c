@@ -1203,13 +1203,16 @@ static void free_wtype(weapon_type *wtype) {
 int free_rtype_cb(const void * match, const void * key, size_t keylen, void *cbdata) {
     resource_type *rtype;
     cb_get_kv(match, &rtype, sizeof(rtype));
-    free(rtype->_name);
-    if (rtype->itype) {
-        free_itype(rtype->itype);
-    }
     if (rtype->wtype) {
         free_wtype(rtype->wtype);
     }
+    if (rtype->atype) {
+        free(rtype->atype);
+    }
+    if (rtype->itype) {
+        free_itype(rtype->itype);
+    }
+    free(rtype->_name);
     free(rtype);
     return 0;
 }

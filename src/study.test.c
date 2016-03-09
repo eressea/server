@@ -30,6 +30,8 @@ static void setup_locale(struct locale *lang) {
         if (!locale_getstring(lang, mkname("skill", skillnames[i])))
             locale_setstring(lang, mkname("skill", skillnames[i]), skillnames[i]);
     }
+    locale_setstring(lang, parameters[P_ANY], "ALLE");
+    init_parameters(lang);
     init_skills(lang);
 }
 
@@ -162,6 +164,71 @@ static void test_produceexp(CuTest *tc) {
     test_cleanup();
 }
 
+#define MAXLOG 4
+typedef struct log_entry {
+    unit *u;
+    skill_t sk;
+    double ch;
+} log_entry;
+
+static log_entry log_learners[MAXLOG];
+static int log_size;
+
+static bool log_learn(unit *u, skill_t sk, double ch) {
+    if (log_size < MAXLOG) {
+        log_entry * entry = &log_learners[log_size++];
+        entry->u = u;
+        entry->sk = sk;
+        entry->ch = ch;
+    }
+    return true;
+}
+
+static void test_academy_building(CuTest *tc) {
+    unit *u, *u1, *u2;
+    struct locale * loc;
+    building * b;
+    message * msg;
+
+    test_cleanup();
+    mt_register(mt_new_va("teach_asgood", "unit:unit", "region:region", "command:order", "student:unit", 0));
+
+    random_source_inject_constant(0.0);
+    init_resources();
+    loc = get_or_create_locale("de");
+    setup_locale(loc);
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    scale_number(u, 2);
+    set_level(u, SK_CROSSBOW, TEACHDIFFERENCE);
+    u->faction->locale = loc;
+    u1 = test_create_unit(u->faction, u->region);
+    scale_number(u1, 15);
+    u1->thisorder = create_order(K_STUDY, loc, skillnames[SK_CROSSBOW]);
+    u2 = test_create_unit(u->faction, u->region);
+    scale_number(u2, 5);
+    u2->thisorder = create_order(K_STUDY, loc, skillnames[SK_CROSSBOW]);
+    set_level(u2, SK_CROSSBOW, 1);
+    u->thisorder = create_order(K_TEACH, loc, "%s %s", itoa36(u1->no), itoa36(u2->no));
+    b = test_create_building(u->region, test_create_buildingtype("academy"));
+    b->size = 22;
+    u_set_building(u, b);
+    u_set_building(u1, b);
+    u_set_building(u2, b);
+    i_change(&u1->items, get_resourcetype(R_SILVER)->itype, 50);
+    i_change(&u2->items, get_resourcetype(R_SILVER)->itype, 50);
+    b->flags = BLD_WORKING;
+    inject_learn(log_learn);
+    teach_cmd(u, u->thisorder);
+    inject_learn(0);
+    CuAssertPtrNotNull(tc, msg = test_find_messagetype(u->faction->msgs, "teach_asgood"));
+    CuAssertPtrEquals(tc, u, (unit *)(msg)->parameters[0].v);
+    CuAssertPtrEquals(tc, u2, (unit *)(msg)->parameters[3].v);
+    CuAssertPtrEquals(tc, u, log_learners[0].u);
+    CuAssertIntEquals(tc, SK_CROSSBOW, log_learners[0].sk);
+    CuAssertDblEquals(tc, 0.05, log_learners[0].ch, 0.001);
+    test_cleanup();
+}
+
 CuSuite *get_study_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -169,6 +236,7 @@ CuSuite *get_study_suite(void)
     SUITE_ADD_TEST(suite, test_study_with_teacher);
     SUITE_ADD_TEST(suite, test_study_with_bad_teacher);
     SUITE_ADD_TEST(suite, test_produceexp);
+    SUITE_ADD_TEST(suite, test_academy_building);
     DISABLE_TEST(suite, test_study_bug_2194);
     return suite;
 }
