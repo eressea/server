@@ -342,7 +342,7 @@ static faction *dead_factions;
 
 void free_flist(faction **fp) {
     faction * flist = *fp;
-    for (flist = factions; flist;) {
+    while (flist) {
         faction *f = flist;
         flist = f->next;
         free_faction(f);
@@ -681,8 +681,6 @@ void remove_empty_factions(void)
         if (!(f->_alive && f->units!=NULL) && !fval(f, FFL_NOIDLEOUT)) {
             log_debug("dead: %s", factionname(f));
             destroyfaction(fp);
-            free_faction(f);
-            free(f);
         }
         else {
             fp = &(*fp)->next;

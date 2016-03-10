@@ -49,6 +49,7 @@ static void test_attrib_remove_self(CuTest * tc) {
     CuAssertPtrEquals(tc, 0, alist->nexttype);
     CuAssertIntEquals(tc, 1, a_remove(&alist, alist));
     CuAssertPtrEquals(tc, a, alist);
+    a_removeall(&alist, NULL);
 }
 
 
