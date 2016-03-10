@@ -53,10 +53,14 @@ static int a_readkey(attrib *a, void *owner, struct gamedata *data) {
     return (res != AT_READ_FAIL) ? AT_READ_DEPR : res;
 }
 
+static void a_freekeys(attrib *a) {
+    free(a->data.v);
+}
+
 attrib_type at_keys = {
     "keys",
     NULL,
-    NULL,
+    a_freekeys,
     NULL,
     a_writekeys,
     a_readkeys,
