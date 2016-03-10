@@ -49,6 +49,7 @@ static void test_flyingship(CuTest * tc)
     CuAssertTrue(tc, !flying_ship(sh1));
     CuAssertIntEquals(tc, 10, sp_flying_ship(&co));
     CuAssertTrue(tc, flying_ship(sh1));
+    co.par = 0;
     free_castorder(&co);
 
     sh2 = test_create_ship(r, shipType2);
@@ -58,6 +59,7 @@ static void test_flyingship(CuTest * tc)
     CuAssertTrue(tc, !flying_ship(sh2));
     CuAssertIntEquals(tc, 0, sp_flying_ship(&co));
     CuAssertTrue(tc, !flying_ship(sh2));
+    co.par = 0;
     free_castorder(&co);
     test_cleanup();
 }
