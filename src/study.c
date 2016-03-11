@@ -230,18 +230,13 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
         if (student->building && teacher->building == student->building) {
             /* Solange Akademien groessenbeschraenkt sind, sollte Lehrer und
              * Student auch in unterschiedlichen Gebaeuden stehen duerfen */
-            const struct building_type *btype = bt_find("academy");
-            if (active_building(teacher, btype) && active_building(student, btype)) {
-                int j = study_cost(student, sk);
-                j = _max(50, j * 2);
-                /* kann Einheit das zahlen? */
-                if (get_pooled(student, get_resourcetype(R_SILVER), GET_DEFAULT, j) >= j) {
-                    /* Jeder Schueler zusaetzlich +10 Tage wenn in Uni. */
-                    teach->value += (n / 30) * 10;  /* learning erhoehen */
-                    /* Lehrer zusaetzlich +1 Tag pro Schueler. */
-                    if (academy)
-                        *academy += n;
-                }                         /* sonst nehmen sie nicht am Unterricht teil */
+            if (academy_can_teach(teacher, student, sk)) {
+                /* Jeder Schueler zusaetzlich +10 Tage wenn in Uni. */
+                teach->value += (n / 30) * 10;  /* learning erhoehen */
+                                                /* Lehrer zusaetzlich +1 Tag pro Schueler. */
+                if (academy) {
+                    *academy += n;
+                }
             }
         }
         /* Teaching ist die Anzahl Leute, denen man noch was beibringen kann. Da
