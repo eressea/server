@@ -296,6 +296,7 @@ static void test_read_password_external(CuTest *tc) {
     fclose(F);
     _test_read_password(&data, f);
     CuAssertPtrNotNull(tc, f->_password);
+    mstream_done(&data.strm);
     gamedata_done(&data);
     CuAssertTrue(tc, checkpasswd(f, "secret"));
     CuAssertIntEquals(tc, 0, remove(pwfile));
