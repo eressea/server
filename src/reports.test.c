@@ -405,7 +405,8 @@ static void test_write_spell_syntax(CuTest *tc) {
     set_parameter(spell, "kc+");
     check_spell_syntax(tc, "kc+", &spell,
         "  ZAUBERE \"Testzauber\" ( REGION | EINHEIT <enr> [<enr> ...] | SCHIFF <snr>\n  [<snr> ...] | BURG <bnr> [<bnr> ...] )");
-
+    spellbook_clear(spell.spb);
+    free(spell.spb);
     test_cleanup();
 }
 
