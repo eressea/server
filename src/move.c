@@ -22,6 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "move.h"
 #include "laws.h"
 #include "reports.h"
+#include "study.h"
 #include "alchemy.h"
 #include "travelthru.h"
 #include "vortex.h"

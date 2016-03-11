@@ -23,7 +23,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "study.h"
 #include "move.h"
+#include "monster.h"
 #include "alchemy.h"
+#include "academy.h"
 
 #include <kernel/ally.h>
 #include <kernel/building.h>
@@ -47,6 +49,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 #include <util/parser.h>
 #include <util/rand.h>
+#include <util/rng.h>
 #include <util/umlaut.h>
 
 /* libc includes */
@@ -56,8 +59,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-
-#define TEACHNUMBER 10
 
 static skill_t getskill(const struct locale *lang)
 {
@@ -206,7 +207,6 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
     n = _min(n, nteaching);
 
     if (n != 0) {
-        const struct building_type *btype = bt_find("academy");
         int index = 0;
 
         if (teach == NULL) {
@@ -227,21 +227,18 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
         }
         teach->value += n;
 
-        /* Solange Akademien groessenbeschraenkt sind, sollte Lehrer und
-         * Student auch in unterschiedlichen Gebaeuden stehen duerfen */
-        if (active_building(teacher, btype) && active_building(student, btype)) {
-            int j = study_cost(student, sk);
-            j = _max(50, j * 2);
-            /* kann Einheit das zahlen? */
-            if (get_pooled(student, get_resourcetype(R_SILVER), GET_DEFAULT, j) >= j) {
+        if (student->building && teacher->building == student->building) {
+            /* Solange Akademien groessenbeschraenkt sind, sollte Lehrer und
+             * Student auch in unterschiedlichen Gebaeuden stehen duerfen */
+            if (academy_can_teach(teacher, student, sk)) {
                 /* Jeder Schueler zusaetzlich +10 Tage wenn in Uni. */
                 teach->value += (n / 30) * 10;  /* learning erhoehen */
-                /* Lehrer zusaetzlich +1 Tag pro Schueler. */
-                if (academy)
+                                                /* Lehrer zusaetzlich +1 Tag pro Schueler. */
+                if (academy) {
                     *academy += n;
-            }                         /* sonst nehmen sie nicht am Unterricht teil */
+                }
+            }
         }
-
         /* Teaching ist die Anzahl Leute, denen man noch was beibringen kann. Da
          * hier nicht n verwendet wird, werden die Leute gezaehlt und nicht die
          * effektiv gelernten Tage. -> FALSCH ? (ENNO)
@@ -482,9 +479,8 @@ int teach_cmd(unit * u, struct order *ord)
         replace_order(&u->orders, ord, new_order);
         free_order(new_order);      /* parse_order & set_order have each increased the refcount */
     }
-    if (academy && sk != NOSKILL) {
-        academy = academy / 30;     /* anzahl gelehrter wochen, max. 10 */
-        learn_skill(u, sk, academy / 30.0 / TEACHNUMBER);
+    if (academy) {
+        academy_teaching_bonus(u, sk, academy);
     }
     return 0;
 }
@@ -802,4 +798,60 @@ int study_cmd(unit * u, order * ord)
     }
 
     return 0;
+}
+
+static double produceexp_chance(void) {
+    return config_get_flt("study.from_use", 1.0 / 3);
+}
+
+void produceexp_ex(struct unit *u, skill_t sk, int n, bool(*learn)(unit *, skill_t, double))
+{
+    if (n != 0 && (is_monsters(u->faction) || playerrace(u_race(u)))) {
+        double chance = produceexp_chance();
+        if (chance > 0.0F) {
+            learn(u, sk, (n * chance) / u->number);
+        }
+    }
+}
+
+void produceexp(struct unit *u, skill_t sk, int n)
+{
+    produceexp_ex(u, sk, n, learn_skill);
+}
+
+#ifndef NO_TESTS
+static learn_fun inject_learn_fun = 0;
+
+void inject_learn(learn_fun fun) {
+    inject_learn_fun = fun;
+}
+#endif
+
+bool learn_skill(unit * u, skill_t sk, double learn_chance)
+{
+    skill *sv = u->skills;
+#ifndef NO_TESTS
+    if (inject_learn_fun) {
+        return inject_learn_fun(u, sk, learn_chance);
+    }
+#endif
+    if (learn_chance < 1.0 && rng_int() % 10000 >= learn_chance * 10000)
+        if (!chance(learn_chance))
+            return false;
+    while (sv != u->skills + u->skill_size) {
+        assert(sv->weeks > 0);
+        if (sv->id == sk) {
+            if (sv->weeks <= 1) {
+                sk_set(sv, sv->level + 1);
+            }
+            else {
+                sv->weeks--;
+            }
+            return true;
+        }
+        ++sv;
+    }
+    sv = add_skill(u, sk);
+    sk_set(sv, 1);
+    return true;
 }

@@ -162,9 +162,6 @@ extern "C" {
     struct skill *unit_skill(const struct unit *u, skill_t id);
     bool has_skill(const unit * u, skill_t sk);
     int effskill(const struct unit *u, skill_t sk, const struct region *r);
-    int SkillCap(skill_t sk);
-    void produceexp(struct unit *u, skill_t sk, int n);
-    void produceexp_ex(struct unit *u, skill_t sk, int n, bool (*learn)(unit *, skill_t, double));
 
     void set_level(struct unit *u, skill_t id, int level);
     int get_level(const struct unit *u, skill_t id);
@@ -208,8 +205,6 @@ extern "C" {
     void free_units(void);
     void u_setfaction(struct unit *u, struct faction *f);
     void set_number(struct unit *u, int count);
-
-    bool learn_skill(struct unit *u, skill_t sk, double chance);
 
     int invisible(const struct unit *target, const struct unit *viewer);
     void free_unit(struct unit *u);

@@ -27,6 +27,7 @@ without prior permission by the authors of Eressea.
 #include "console.h"
 #include "reports.h"
 #include "seen.h"
+#include "study.h"
 #include "calendar.h"
 
 #include <kernel/config.h>

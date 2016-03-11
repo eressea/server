@@ -23,11 +23,6 @@ void gamedata_init(gamedata *data, storage *store, int version) {
     binstore_init(data->store, &data->strm);
 }
 
-void gamedata_close(gamedata *data) {
-    gamedata_done(data);
-    fstream_done(&data->strm);
-}
-
 int gamedata_openfile(gamedata *data, const char *filename, const char *mode, int version) {
     FILE *F = fopen(filename, mode);
     if (F) {
@@ -69,4 +64,10 @@ gamedata *gamedata_open(const char *filename, const char *mode, int version) {
         return NULL;
     }
     return data;
+}
+
+void gamedata_close(gamedata *data) {
+    gamedata_done(data);
+    fstream_done(&data->strm);
+    free(data->store);
 }

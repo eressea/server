@@ -26,6 +26,7 @@
 #include "monster.h"
 #include "laws.h"
 #include "keyword.h"
+#include "study.h"
 
 /* triggers includes */
 #include <triggers/removecurse.h>

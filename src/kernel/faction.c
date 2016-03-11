@@ -318,7 +318,7 @@ bool checkpasswd(const faction * f, const char *passwd)
 {
     if (!passwd) return false;
 
-    if (password_verify(f->_password, passwd) == VERIFY_FAIL) {
+    if (f->_password && password_verify(f->_password, passwd) == VERIFY_FAIL) {
         log_warning("password check failed: %s", factionname(f));
         return false;
     }
@@ -342,7 +342,7 @@ static faction *dead_factions;
 
 void free_flist(faction **fp) {
     faction * flist = *fp;
-    for (flist = factions; flist;) {
+    while (flist) {
         faction *f = flist;
         flist = f->next;
         free_faction(f);
@@ -681,8 +681,6 @@ void remove_empty_factions(void)
         if (!(f->_alive && f->units!=NULL) && !fval(f, FFL_NOIDLEOUT)) {
             log_debug("dead: %s", factionname(f));
             destroyfaction(fp);
-            free_faction(f);
-            free(f);
         }
         else {
             fp = &(*fp)->next;

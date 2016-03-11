@@ -83,6 +83,7 @@ set (ERESSEA_SRC
   spells.c
   battle.c
   alchemy.c
+  academy.c
   upkeep.c
   vortex.c
   names.c

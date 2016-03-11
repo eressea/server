@@ -132,6 +132,9 @@ void free_group(group * g)
     assert(*g_ptr == g);
     *g_ptr = g->nexthash;
 
+    if (g->attribs) {
+        a_removeall(&g->attribs, NULL);
+    }
     while (g->allies) {
         ally *a = g->allies;
         g->allies = a->next;

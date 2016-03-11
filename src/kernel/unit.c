@@ -28,7 +28,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "curse.h"
 #include "item.h"
 #include "move.h"
-#include "monster.h"
 #include "order.h"
 #include "plane.h"
 #include "race.h"
@@ -1130,30 +1129,6 @@ void set_number(unit * u, int count)
     u->number = (unsigned short)count;
 }
 
-bool learn_skill(unit * u, skill_t sk, double learn_chance)
-{
-    skill *sv = u->skills;
-    if (learn_chance < 1.0 && rng_int() % 10000 >= learn_chance * 10000)
-        if (!chance(learn_chance))
-            return false;
-    while (sv != u->skills + u->skill_size) {
-        assert(sv->weeks > 0);
-        if (sv->id == sk) {
-            if (sv->weeks <= 1) {
-                sk_set(sv, sv->level + 1);
-            }
-            else {
-                sv->weeks--;
-            }
-            return true;
-        }
-        ++sv;
-    }
-    sv = add_skill(u, sk);
-    sk_set(sv, 1);
-    return true;
-}
-
 void remove_skill(unit * u, skill_t sk)
 {
     skill *sv = u->skills;
@@ -1890,25 +1865,6 @@ bool unit_name_equals_race(const unit *u) {
 
 bool unit_can_study(const unit *u) {
     return !((u_race(u)->flags & RCF_NOLEARN) || fval(u, UFL_WERE));
-}
-
-static double produceexp_chance(void) {
-    return config_get_flt("study.from_use", 1.0 / 3);
-}
-
-void produceexp_ex(struct unit *u, skill_t sk, int n, bool(*learn)(unit *, skill_t, double))
-{
-    if (n != 0 && (is_monsters(u->faction) || playerrace(u_race(u)))) {
-        double chance = produceexp_chance();
-        if (chance > 0.0F) {
-            learn(u, sk, (n * chance) / u->number);
-        }
-    }
-}
-
-void produceexp(struct unit *u, skill_t sk, int n)
-{
-    produceexp_ex(u, sk, n, learn_skill);
 }
 
 /* ID's für Einheiten und Zauber */

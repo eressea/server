@@ -63,6 +63,7 @@ int read_triggers(struct gamedata *data, trigger ** tp)
                 break;
             case AT_READ_FAIL:
                 t_free(*tp);
+                free(*tp);
                 *tp = NULL;
                 break;
             default:
@@ -107,6 +108,7 @@ int handle_triggers(trigger ** triggers, void *param)
         if (t->type->handle(t, param) != 0) {
             *tp = t->next;
             t_free(t);
+            free(t);
         }
         else
             tp = &t->next;
@@ -260,6 +262,7 @@ const trigger_type * tt)
         if (t->type == tt) {
             *tp = t->next;
             t_free(t);
+            free(t);
         }
         else
             tp = &t->next;

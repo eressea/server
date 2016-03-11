@@ -22,6 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "laws.h"
 #include "move.h"
 #include "reports.h"
+#include "study.h"
 
 /* kernel includes */
 #include <kernel/item.h>

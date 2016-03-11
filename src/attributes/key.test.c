@@ -39,6 +39,7 @@ static void test_upgrade(CuTest *tc) {
     CuAssertTrue(tc, key_get(alist, 42));
     CuAssertTrue(tc, key_get(alist, 43));
     CuAssertTrue(tc, key_get(alist, 44));
+    a_removeall(&alist, NULL);
 }
 
 CuSuite *get_key_suite(void)

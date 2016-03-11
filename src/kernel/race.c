@@ -141,6 +141,7 @@ void racelist_insert(struct race_list **rl, const struct race *r)
 void free_races(void) {
     while (races) {
         race * rc = races->next;
+        free_params(&races->parameters);
         free(races->_name);
         free(races->def_damage);
         free(races);
