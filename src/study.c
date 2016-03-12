@@ -738,17 +738,7 @@ int study_cmd(unit * u, order * ord)
     if (fval(u, UFL_HUNGER))
         days /= 2;
 
-    while (days) {
-        if (days >= u->number * 30) {
-            learn_skill_depr(u, sk, 1.0);
-            days -= u->number * 30;
-        }
-        else {
-            double chance = (double)days / u->number / 30;
-            learn_skill_depr(u, sk, chance);
-            days = 0;
-        }
-    }
+    learn_skill(u, sk, days);
     if (a != NULL) {
         int index = 0;
         while (teach->teachers[index] && index != MAXTEACHERS) {
@@ -857,10 +847,21 @@ bool learn_skill_depr(unit * u, skill_t sk, double learn_chance)
 }
 
 void learn_skill(unit *u, skill_t sk, int days) {
-    double ch = days*1.0 / STUDYDAYS;
-    while (ch >= 1.0) {
-        learn_skill_depr(u, sk, 1.0);
-        ch -= 1.0;
+    skill *sv = u->skills;
+    int weeks = 0;
+    while (days >= STUDYDAYS) {
+        ++weeks;
+        days -= STUDYDAYS;
     }
-    learn_skill_depr(u, sk, ch);
+    if (days > 0 && rng_int() % STUDYDAYS < days) {
+        ++weeks;
+    }
+    if (weeks > 0 && !sv) {
+        sv = add_skill(u, sk);
+    }
+    while (sv->weeks <= weeks) {
+        weeks -= sv->weeks;
+        sk_set(sv, sv->level + 1);
+    }
+    sv->weeks -= weeks;
 }
