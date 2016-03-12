@@ -964,7 +964,7 @@ static void demon_skillchanges(void)
 
                 if (fval(u, UFL_HUNGER)) {
                     /* hungry demons only go down, never up in skill */
-                    int rule_hunger = config_get_int("hunger.demon.skill", 0) != 0;
+                    int rule_hunger = config_get_int("hunger.demons.skill", 0) != 0;
                     if (rule_hunger) {
                         upchance = 0;
                         downchance = 15;
