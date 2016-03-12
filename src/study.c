@@ -740,12 +740,12 @@ int study_cmd(unit * u, order * ord)
 
     while (days) {
         if (days >= u->number * 30) {
-            learn_skill(u, sk, 1.0);
+            learn_skill_depr(u, sk, 1.0);
             days -= u->number * 30;
         }
         else {
             double chance = (double)days / u->number / 30;
-            learn_skill(u, sk, chance);
+            learn_skill_depr(u, sk, chance);
             days = 0;
         }
     }
@@ -816,7 +816,7 @@ void produceexp_ex(struct unit *u, skill_t sk, int n, bool(*learn)(unit *, skill
 
 void produceexp(struct unit *u, skill_t sk, int n)
 {
-    produceexp_ex(u, sk, n, learn_skill);
+    produceexp_ex(u, sk, n, learn_skill_depr);
 }
 
 #ifndef NO_TESTS
@@ -827,7 +827,7 @@ void inject_learn(learn_fun fun) {
 }
 #endif
 
-bool learn_skill(unit * u, skill_t sk, double learn_chance)
+bool learn_skill_depr(unit * u, skill_t sk, double learn_chance)
 {
     skill *sv = u->skills;
 #ifndef NO_TESTS
@@ -854,4 +854,13 @@ bool learn_skill(unit * u, skill_t sk, double learn_chance)
     sv = add_skill(u, sk);
     sk_set(sv, 1);
     return true;
+}
+
+void learn_skill(unit *u, skill_t sk, int days) {
+    double ch = days*1.0 / STUDYDAYS;
+    while (ch >= 1.0) {
+        learn_skill_depr(u, sk, 1.0);
+        ch -= 1.0;
+    }
+    learn_skill_depr(u, sk, ch);
 }

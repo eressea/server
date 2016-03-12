@@ -229,9 +229,28 @@ static void test_academy_building(CuTest *tc) {
     test_cleanup();
 }
 
+void test_learn_skill(CuTest *tc) {
+    unit *u;
+    skill *sv;
+    test_cleanup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    learn_skill(u, SK_ALCHEMY, STUDYDAYS);
+    CuAssertPtrNotNull(tc, sv = u->skills);
+    CuAssertIntEquals(tc, SK_ALCHEMY, sv->id);
+    CuAssertIntEquals(tc, 1, sv->level);
+    CuAssertIntEquals(tc, 2, sv->weeks);
+    learn_skill(u, SK_ALCHEMY, STUDYDAYS);
+    CuAssertIntEquals(tc, 1, sv->weeks);
+    learn_skill(u, SK_ALCHEMY, STUDYDAYS * 2);
+    CuAssertIntEquals(tc, 2, sv->level);
+    CuAssertIntEquals(tc, 1, sv->weeks);
+    test_cleanup();
+}
+
 CuSuite *get_study_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_learn_skill);
     SUITE_ADD_TEST(suite, test_study_no_teacher);
     SUITE_ADD_TEST(suite, test_study_with_teacher);
     SUITE_ADD_TEST(suite, test_study_with_bad_teacher);

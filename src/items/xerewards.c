@@ -55,7 +55,7 @@ struct order *ord)
         while (sv != u->skills + u->skill_size) {
             int i;
             for (i = 0; i != 3; ++i)
-                learn_skill(u, (skill_t)sv->id, 1.0);
+                learn_skill_depr(u, (skill_t)sv->id, 1.0);
             ++sv;
         }
     }

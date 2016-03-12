@@ -39,10 +39,14 @@ extern "C" {
     typedef bool(*learn_fun)(struct unit *u, skill_t sk, double ch);
     void inject_learn(learn_fun fun);
 #endif
-    bool learn_skill(struct unit *u, skill_t sk, double chance);
+
+#define STUDYDAYS 30
+    bool learn_skill_depr(struct unit *u, skill_t sk, double chance);
+    void learn_skill(struct unit *u, skill_t sk, int days);
 
     void produceexp(struct unit *u, skill_t sk, int n);
     void produceexp_ex(struct unit *u, skill_t sk, int n, bool(*learn)(struct unit *, skill_t, double));
+
 #define MAXTEACHERS 20
 #define TEACHNUMBER 10
     typedef struct teaching_info {

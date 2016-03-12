@@ -160,7 +160,7 @@ static int improve_all(faction * f, skill_t sk, int by_weeks)
         if (has_skill(u, sk)) {
             int weeks = 0;
             for (; weeks != by_weeks; ++weeks) {
-                learn_skill(u, sk, 1.0);
+                learn_skill_depr(u, sk, 1.0);
                 ret = 0;
             }
         }
@@ -250,7 +250,7 @@ void find_manual(region * r, unit * u)
     if (improve_all(u->faction, skill, 3) == 3) {
         int i;
         for (i = 0; i != 9; ++i)
-            learn_skill(u, skill, 1.0);
+            learn_skill_depr(u, skill, 1.0);
     }
 }
 
@@ -984,7 +984,7 @@ static void demon_skillchanges(void)
                         }
                         else {
                             while (weeks--) {
-                                learn_skill(u, sv->id, 1.0);
+                                learn_skill_depr(u, sv->id, 1.0);
                             }
                         }
                     }
