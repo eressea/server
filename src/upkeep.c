@@ -271,7 +271,7 @@ void get_food(region * r)
                     peasantfood = 0;
                 }
                 if (hungry > 0) {
-                    bool demon_hunger = config_get_int("hunger.demons", 0) != 0;
+                    bool demon_hunger = config_get_int("hunger.demons.peasant_tolerance", 0) == 0;
                     if (demon_hunger) {
                         /* demons who don't feed are hungry */
                         if (hunger(hungry, u))
