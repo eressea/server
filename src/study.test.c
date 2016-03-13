@@ -234,6 +234,7 @@ void test_learn_skill_single(CuTest *tc) {
     unit *u;
     skill *sv;
     test_cleanup();
+    config_set("study.random_progress", "0");
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     learn_skill(u, SK_ALCHEMY, STUDYDAYS);
     CuAssertPtrNotNull(tc, sv = u->skills);
@@ -244,7 +245,7 @@ void test_learn_skill_single(CuTest *tc) {
     CuAssertIntEquals(tc, 1, sv->weeks);
     learn_skill(u, SK_ALCHEMY, STUDYDAYS * 2);
     CuAssertIntEquals(tc, 2, sv->level);
-    CuAssertIntEquals(tc, 1, sv->weeks);
+    CuAssertIntEquals(tc, 2, sv->weeks);
     test_cleanup();
 }
 
@@ -252,7 +253,8 @@ void test_learn_skill_multi(CuTest *tc) {
     unit *u;
     skill *sv;
     test_cleanup();
-    u = test_create_unit(0, 0);
+    config_set("study.random_progress", "0");
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     scale_number(u, 10);
     learn_skill(u, SK_ALCHEMY, STUDYDAYS * u->number);
     CuAssertPtrNotNull(tc, sv = u->skills);
@@ -263,7 +265,7 @@ void test_learn_skill_multi(CuTest *tc) {
     CuAssertIntEquals(tc, 1, sv->weeks);
     learn_skill(u, SK_ALCHEMY, STUDYDAYS  * u->number * 2);
     CuAssertIntEquals(tc, 2, sv->level);
-    CuAssertIntEquals(tc, 1, sv->weeks);
+    CuAssertIntEquals(tc, 2, sv->weeks);
     test_cleanup();
 }
 
