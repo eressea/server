@@ -826,7 +826,7 @@ bool learn_skill_depr(unit * u, skill_t sk, double learn_chance)
     }
 #endif
     if (learn_chance < 1.0 && rng_int() % 10000 >= learn_chance * 10000)
-        if (!chance(learn_chance))
+        if (!chance(learn_chance)) // FIXME: this nested if looks as if we are rolling twice!
             return false;
     while (sv != u->skills + u->skill_size) {
         assert(sv->weeks > 0);
@@ -864,4 +864,40 @@ void learn_skill(unit *u, skill_t sk, int days) {
         sk_set(sv, sv->level + 1);
     }
     sv->weeks -= weeks;
+}
+
+/** Talente von Dämonen verschieben sich.
+*/
+void demon_skillchange(unit *u)
+{
+    skill *sv = u->skills;
+    int upchance = 15;
+    int downchance = 10;
+
+    if (fval(u, UFL_HUNGER)) {
+        /* hungry demons only go down, never up in skill */
+        int rule_hunger = config_get_int("hunger.demon.skill", 0) != 0;
+        if (rule_hunger) {
+            upchance = 0;
+            downchance = 15;
+        }
+    }
+
+    while (sv != u->skills + u->skill_size) {
+        int roll = rng_int() % 100;
+        if (sv->level > 0 && roll < upchance + downchance) {
+            int weeks = 1 + rng_int() % 3;
+            if (roll < downchance) {
+                reduce_skill(u, sv, weeks);
+                if (sv->level < 1) {
+                    /* demons should never forget below 1 */
+                    set_level(u, sv->id, 1);
+                }
+            }
+            else {
+                learn_skill(u, sv->id, STUDYDAYS*weeks);
+            }
+        }
+        ++sv;
+    }
 }

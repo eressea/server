@@ -47,6 +47,8 @@ extern "C" {
     void produceexp(struct unit *u, skill_t sk, int n);
     void produceexp_ex(struct unit *u, skill_t sk, int n, bool(*learn)(struct unit *, skill_t, double));
 
+    void demon_skillchange(struct unit *u);
+
 #define MAXTEACHERS 20
 #define TEACHNUMBER 10
     typedef struct teaching_info {

@@ -958,38 +958,7 @@ static void demon_skillchanges(void)
         unit *u;
         for (u = r->units; u; u = u->next) {
             if (u_race(u) == get_race(RC_DAEMON)) {
-                skill *sv = u->skills;
-                int upchance = 15;
-                int downchance = 10;
-
-                if (fval(u, UFL_HUNGER)) {
-                    /* hungry demons only go down, never up in skill */
-                    int rule_hunger = config_get_int("hunger.demons.skill", 0) != 0;
-                    if (rule_hunger) {
-                        upchance = 0;
-                        downchance = 15;
-                    }
-                }
-
-                while (sv != u->skills + u->skill_size) {
-                    int roll = rng_int() % 100;
-                    if (sv->level > 0 && roll < upchance + downchance) {
-                        int weeks = 1 + rng_int() % 3;
-                        if (roll < downchance) {
-                            reduce_skill(u, sv, weeks);
-                            if (sv->level < 1) {
-                                /* demons should never forget below 1 */
-                                set_level(u, sv->id, 1);
-                            }
-                        }
-                        else {
-                            while (weeks--) {
-                                learn_skill_depr(u, sv->id, 1.0);
-                            }
-                        }
-                    }
-                    ++sv;
-                }
+                demon_skillchange(u);
             }
         }
     }

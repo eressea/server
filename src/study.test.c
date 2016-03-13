@@ -3,12 +3,13 @@
 #include "study.h"
 
 #include <kernel/config.h>
-#include <kernel/unit.h>
+#include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/order.h>
+#include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/building.h>
+#include <kernel/unit.h>
 #include <util/rand.h>
 #include <util/message.h>
 #include <util/language.h>
@@ -247,6 +248,19 @@ void test_learn_skill(CuTest *tc) {
     test_cleanup();
 }
 
+void test_demon_skillchanges(CuTest *tc) {
+    unit * u;
+    race * rc;
+    test_cleanup();
+    rc = test_create_race("demon");
+    CuAssertPtrEquals(tc, rc, get_race(RC_DAEMON));
+    u = test_create_unit(test_create_faction(rc), 0);
+    CuAssertPtrNotNull(tc, u);
+    set_level(u, SK_CROSSBOW, 1);
+    demon_skillchange(u);
+    test_cleanup();
+}
+
 CuSuite *get_study_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -256,6 +270,7 @@ CuSuite *get_study_suite(void)
     SUITE_ADD_TEST(suite, test_study_with_bad_teacher);
     SUITE_ADD_TEST(suite, test_produceexp);
     SUITE_ADD_TEST(suite, test_academy_building);
+    SUITE_ADD_TEST(suite, test_demon_skillchanges);
     DISABLE_TEST(suite, test_study_bug_2194);
     return suite;
 }
