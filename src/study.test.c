@@ -230,7 +230,7 @@ static void test_academy_building(CuTest *tc) {
     test_cleanup();
 }
 
-void test_learn_skill(CuTest *tc) {
+void test_learn_skill_single(CuTest *tc) {
     unit *u;
     skill *sv;
     test_cleanup();
@@ -243,6 +243,25 @@ void test_learn_skill(CuTest *tc) {
     learn_skill(u, SK_ALCHEMY, STUDYDAYS);
     CuAssertIntEquals(tc, 1, sv->weeks);
     learn_skill(u, SK_ALCHEMY, STUDYDAYS * 2);
+    CuAssertIntEquals(tc, 2, sv->level);
+    CuAssertIntEquals(tc, 1, sv->weeks);
+    test_cleanup();
+}
+
+void test_learn_skill_multi(CuTest *tc) {
+    unit *u;
+    skill *sv;
+    test_cleanup();
+    u = test_create_unit(0, 0);
+    scale_number(u, 10);
+    learn_skill(u, SK_ALCHEMY, STUDYDAYS * u->number);
+    CuAssertPtrNotNull(tc, sv = u->skills);
+    CuAssertIntEquals(tc, SK_ALCHEMY, sv->id);
+    CuAssertIntEquals(tc, 1, sv->level);
+    CuAssertIntEquals(tc, 2, sv->weeks);
+    learn_skill(u, SK_ALCHEMY, STUDYDAYS * u->number);
+    CuAssertIntEquals(tc, 1, sv->weeks);
+    learn_skill(u, SK_ALCHEMY, STUDYDAYS  * u->number * 2);
     CuAssertIntEquals(tc, 2, sv->level);
     CuAssertIntEquals(tc, 1, sv->weeks);
     test_cleanup();
@@ -264,7 +283,8 @@ void test_demon_skillchanges(CuTest *tc) {
 CuSuite *get_study_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
-    SUITE_ADD_TEST(suite, test_learn_skill);
+    SUITE_ADD_TEST(suite, test_learn_skill_single);
+    SUITE_ADD_TEST(suite, test_learn_skill_multi);
     SUITE_ADD_TEST(suite, test_study_no_teacher);
     SUITE_ADD_TEST(suite, test_study_with_teacher);
     SUITE_ADD_TEST(suite, test_study_with_bad_teacher);
