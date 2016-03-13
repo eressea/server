@@ -1541,7 +1541,7 @@ int read_game(gamedata *data) {
     log_debug(" - reading turn %d\n", turn);
     rng_init(turn);
     READ_INT(store, NULL);          /* max_unique_id = ignore */
-    READ_INT(store, NULL);
+    READ_INT(store, &nextborder);
 
     /* Planes */
     planes = NULL;
@@ -1884,7 +1884,7 @@ int write_game(gamedata *data) {
 
     WRITE_INT(store, turn);
     WRITE_INT(store, 0 /* max_unique_id */);
-    WRITE_INT(store, 0 /* nextborder */);
+    WRITE_INT(store, nextborder);
 
     /* Write planes */
     WRITE_SECTION(store);
