@@ -512,8 +512,12 @@ void fleet_cmd(region * r)
                 } else {
                     sh = findship(id);
                 }
-                if (!sh) {
+                if (!sh || sh->fleet || ship_isfleet(sh)) {
                     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "fleet_ship_invalid", "ship", sh));
+                    break;
+                }
+                if (ship_owner(sh) && !ucontact(ship_owner(sh), u)) {
+                    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_no_contact", "target", ship_owner(sh)));
                     break;
                 }
 

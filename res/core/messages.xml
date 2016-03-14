@@ -8441,4 +8441,15 @@
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Heroes cannot recruit."</text>
   </message>
 
+  <message name="fleet_ship_invalid" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="ship" type="ship"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Schiff $if($isnull($ship),"",$ship($ship)) kann nicht zur Flotte hinzugefügt werden."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - ship $if($isnull($ship),"",$ship($ship)) cannot be added to the fleet."</text>
+  </message>
+
 </messages>
