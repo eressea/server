@@ -130,6 +130,7 @@ extern "C" {
 
     int ship_damage_percent(const struct ship *ship);
 
+    bool ship_isfleet(const struct ship *sh);
     void fleet_cmd(struct region * r);
 
 #ifdef __cplusplus
