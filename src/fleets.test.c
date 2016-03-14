@@ -24,7 +24,6 @@
 #include <string.h>
 #include <assert.h>
 
-
 static void setup_fleet(void) {
     ship_type* ftype;
     struct locale* lang;
@@ -38,7 +37,6 @@ static void setup_fleet(void) {
     ftype = st_get_or_create("fleet");
     ftype->cptskill = 6;
 }
-
 
 typedef struct fleet_fixture {
     region *r, *r2;
@@ -59,11 +57,35 @@ static void init_fixture(fleet_fixture *ffix) {
     ffix->u11 = test_create_unit(ffix->f1, ffix->r);
 }
 
+static void assert_fleet(CuTest *tc, region *r, ship *sh, unit *cpt) {
+    ship **shp;
+    ship *found = NULL;
+
+    for (shp = &r->ships; *shp;) {
+        ship *sh = *shp;
+        if (ship_isfleet(sh)) {
+            CuAssertPtrEquals_Msg(tc, "more than one fleet", NULL, found);
+            found = sh;
+            for (shp = &sh->next; *shp; shp = &sh->next) {
+                sh = *shp;
+                CuAssertPtrEquals_Msg(tc, "not all ships in fleet", found, (ship * ) sh->fleet);
+            }
+        }
+        if (*shp == sh)
+            shp = &sh->next;
+    }
+    CuAssertPtrNotNull(tc, found);
+
+    CuAssertPtrEquals_Msg(tc, "ship not added to fleet", (void *) found, (ship *) sh->fleet);
+    CuAssertPtrEquals_Msg(tc, "captain not in fleet", found, (ship *) cpt->ship);
+    CuAssertTrue(tc, ship_isfleet(found));
+    CuAssertPtrEquals_Msg(tc, "captain not fleet owner", cpt, ship_owner(found));
+    CuAssertPtrEquals_Msg(tc, "captain not ship owner", cpt, ship_owner(sh));
+}
+
 static void test_fleet_create(CuTest *tc) {
     fleet_fixture ffix;
     order *ord;
-    ship **shp;
-    ship *found = NULL;
 
     test_cleanup();
     setup_fleet();
@@ -75,30 +97,45 @@ static void test_fleet_create(CuTest *tc) {
     unit_addorder(ffix.u11, ord);
     fleet_cmd(ffix.r);
 
-    for (shp = &ffix.r->ships; *shp; ) {
-        ship *sh = *shp;
-        if (ship_isfleet(sh)) {
-            CuAssertPtrEquals_Msg(tc, "more than one fleet", NULL, found);
-            found = sh;
-            for (shp = &sh->next; *shp; shp = &sh->next) {
-                sh = *shp;
-                CuAssertPtrEquals_Msg(tc, "not all ships in fleet", found, (ship *) sh->fleet);
-            }
-        }
-        if (*shp == sh)
-            shp = &sh->next;
-    }
-    CuAssertPtrNotNull(tc, found);
-
-    CuAssertPtrEquals_Msg(tc, "ship not added to fleet", (void *) found, (ship *) ffix.sh1->fleet);
-    CuAssertPtrEquals_Msg(tc, "captain not in fleet", found, (ship *) ffix.u11->ship);
-    CuAssertTrue(tc, ship_isfleet(found));
-    CuAssertPtrEquals_Msg(tc, "captain not fleet owner", ffix.u11, ship_owner(found));
-    CuAssertPtrEquals_Msg(tc, "captain not ship owner", ffix.u11, ship_owner(ffix.sh1));
+    assert_fleet(tc, ffix.r, ffix.sh1, ffix.u11);
 
     test_cleanup();
 }
 
+static void test_fleet_create_param(CuTest *tc) {
+    fleet_fixture ffix;
+    order *ord;
+
+    test_cleanup();
+    setup_fleet();
+    init_fixture(&ffix);
+
+    ord = create_order(K_FLEET, ffix.f1->locale, "%s", itoa36(ffix.sh1->no));
+    unit_addorder(ffix.u11, ord);
+    fleet_cmd(ffix.r);
+
+    assert_fleet(tc, ffix.r, ffix.sh1, ffix.u11);
+
+    test_cleanup();
+}
+
+static void test_fleet_missing_param(CuTest *tc) {
+    fleet_fixture ffix;
+    order *ord;
+    struct message* msg;
+
+    test_cleanup();
+    setup_fleet();
+    init_fixture(&ffix);
+
+    ord = create_order(K_FLEET, ffix.f1->locale, "%s", itoa36(ffix.sh1->no+1));
+    unit_addorder(ffix.u11, ord);
+    fleet_cmd(ffix.r);
+
+    msg = test_get_last_message(ffix.u11->faction->msgs);
+    CuAssertStrEquals(tc, "fleet_ship_invalid", test_get_messagetype(msg));
+    CuAssertPtrEquals(tc, 0,  (ship *) ffix.sh1->fleet);
+}
 
 /*
 // TODO
@@ -107,7 +144,6 @@ static void test_fleet_create(CuTest *tc) {
 // test command variants
 // test unhappy paths (captain valid, ship owner contacts...)
 // test fleet ship properties
-
 
 // ADD ship:
 // must be empty or own or owner must contact
@@ -168,11 +204,11 @@ static void test_fleet_create(CuTest *tc) {
 // scores, summary!
 */
 
-
-
 CuSuite *get_fleets_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_fleet_create);
+    SUITE_ADD_TEST(suite, test_fleet_create_param);
+    SUITE_ADD_TEST(suite, test_fleet_missing_param);
     return suite;
 }

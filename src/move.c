@@ -2344,7 +2344,7 @@ int follow_ship(unit * u, order * ord)
         return 0;
     }
 
-    id = getshipid();
+    id = getid();
 
     if (id <= 0) {
         cmistake(u, ord, 20, MSG_MOVE);
@@ -2645,7 +2645,7 @@ void follow_unit(unit * u)
                 }
             }
             else if (p == P_SHIP) {
-                id = getshipid();
+                id = getid();
                 if (id <= 0) {
                     /*	cmistake(u, ord, 20, MSG_MOVE); */
                 }

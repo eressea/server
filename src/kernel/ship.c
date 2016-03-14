@@ -24,12 +24,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "build.h"
 #include "curse.h"
 #include "faction.h"
-#include "unit.h"
 #include "item.h"
+#include "messages.h"
 #include "order.h"
+#include "parser_helpers.h"
 #include "race.h"
 #include "region.h"
 #include "skill.h"
+#include "unit.h"
 
 /* util includes */
 #include <util/attrib.h>
@@ -39,6 +41,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/umlaut.h>
+#include <util/parser.h>
 #include <quicklist.h>
 #include <util/xml.h>
 
@@ -499,8 +502,20 @@ void fleet_cmd(region * r)
             order *ord = *ordp;
             if (getkeyword(ord) == K_FLEET) {
                 ship *fleet;
+                int id;
 
-                sh = u->ship;
+                init_order(ord);
+                id = getid();
+
+                if (!id) {
+                    sh = u->ship;
+                } else {
+                    sh = findship(id);
+                }
+                if (!sh) {
+                    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "fleet_ship_invalid", "ship", sh));
+                    break;
+                }
 
                 const ship_type *fleet_type = st_find("fleet");
                 fleet = new_ship(fleet_type, r, u->faction->locale);
@@ -515,3 +530,4 @@ void fleet_cmd(region * r)
             uptr = &u->next;
     }
 }
+
