@@ -8452,4 +8452,25 @@
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - ship $if($isnull($ship),"",$ship($ship)) cannot be added to the fleet."</text>
   </message>
 
+  <message name="fleet_only_captain" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Nur der Kapitän einer Flotte kann dieses Kommando geben."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Only the captain of a fleet can give this order."</text>
+  </message>
+
+  <message name="ship_nofleet" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="ship" type="ship"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Schiff $ship($ship) ist in keiner Flotte."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - ship $ship($ship) is not in a fleet."</text>
+  </message>
+
 </messages>
