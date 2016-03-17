@@ -1571,6 +1571,9 @@
   <string name="fleet">
     <text locale="en">fleet</text>
   </string>
+  <string name="remove">
+    <text locale="en">REMOVE</text>
+  </string>
 </namespace>
 
   <!--  NR generieren -->

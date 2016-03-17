@@ -2026,11 +2026,17 @@
   <string name="LOCALE">
     <text locale="de">LOCALE</text>
   </string>
+  <string name="ENTFERNE">
+    <text locale="de">ENTFERNE</text>
+  </string>
   <string name="ERESSEA">
     <text locale="de">ERESSEA</text>
   </string>
   <string name="FLIEHE">
     <text locale="de">FLIEHE</text>
+  </string>
+  <string name="FLOTTE">
+    <text locale="de">FLOTTE</text>
   </string>
   <string name="FREMDES">
     <text locale="de">FREMDES</text>

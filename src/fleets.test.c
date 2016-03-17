@@ -30,6 +30,7 @@ static void setup_fleet(void) {
 
     lang = get_or_create_locale("de");
     locale_setstring(lang, "fleet", "Flotte");
+    locale_setstring(lang, parameters[P_REMOVE], "ENTFERNE");
     locale_setstring(lang, directions[D_WEST], "WESTEN");
     test_create_world();
     init_locales();
@@ -40,7 +41,7 @@ static void setup_fleet(void) {
 
 typedef struct fleet_fixture {
     region *r, *r2;
-    ship *sh1;
+    ship *sh1, *sh2, *sh3;
     unit *u11, *u21;
     faction *f1, *f2;
     const ship_type *stype1;
@@ -55,6 +56,8 @@ static void init_fixture(fleet_fixture *ffix) {
     ffix->stype1 = st_find("boat");
 
     ffix->sh1 = test_create_ship(ffix->r, ffix->stype1);
+    ffix->sh2 = test_create_ship(ffix->r, ffix->stype1);
+    ffix->sh3 = test_create_ship(ffix->r, ffix->stype1);
     ffix->u11 = test_create_unit(ffix->f1, ffix->r);
 
     ffix->u21 = test_create_unit(ffix->f2, ffix->r);
@@ -208,22 +211,22 @@ static void test_fleet_create_no_add_fleet(CuTest *tc) {
     fleet_fixture ffix;
     order *ord;
     struct message* msg;
-    struct ship *sh2;
+    struct ship *fleet;
 
     test_cleanup();
     setup_fleet();
     init_fixture(&ffix);
 
-    sh2 = test_create_ship(ffix.r, st_find("fleet"));
+    fleet = test_create_ship(ffix.r, st_find("fleet"));
 
-    ord = create_order(K_FLEET, ffix.f1->locale, "%s", itoa36(sh2->no));
+    ord = create_order(K_FLEET, ffix.f1->locale, "%s", itoa36(fleet->no));
     unit_addorder(ffix.u11, ord);
 
     fleet_cmd(ffix.r);
 
     msg = test_get_last_message(ffix.u11->faction->msgs);
     CuAssertStrEquals(tc, "fleet_ship_invalid", test_get_messagetype(msg));
-    CuAssertPtrEquals(tc, 0,  (ship *) sh2->fleet);
+    CuAssertPtrEquals(tc, 0,  (ship *) fleet->fleet);
 
     test_cleanup();
 }
@@ -232,16 +235,15 @@ static void test_fleet_add(CuTest *tc) {
     fleet_fixture ffix;
     order *ord;
     struct message* msg;
-    struct ship *sh2, *fleet;
+    struct ship *fleet;
 
     test_cleanup();
     setup_fleet();
     init_fixture(&ffix);
 
-    sh2 = test_create_ship(ffix.r, st_find("boat"));
-    u_set_ship(ffix.u21, sh2);
+    u_set_ship(ffix.u21, ffix.sh2);
 
-    ord = create_order(K_FLEET, ffix.f1->locale, "%s", itoa36(sh2->no));
+    ord = create_order(K_FLEET, ffix.f1->locale, "%s", itoa36(ffix.sh2->no));
     unit_addorder(ffix.u11, ord);
     usetcontact(ffix.u21, ffix.u11);
 
@@ -249,7 +251,37 @@ static void test_fleet_add(CuTest *tc) {
 
     msg = test_get_last_message(ffix.u11->faction->msgs);
     CuAssertPtrEquals(tc, 0, msg);
-    fleet = assert_fleet(tc, ffix.r, sh2, ffix.u11);
+    fleet = assert_fleet(tc, ffix.r, ffix.sh2, ffix.u11);
+    CuAssertPtrEquals_Msg(tc, "units not moved", fleet, ffix.u21->ship);
+
+    test_cleanup();
+}
+
+static void test_fleet_add2(CuTest *tc) {
+    fleet_fixture ffix;
+    order *ord;
+    struct message* msg;
+    struct ship *fleet;
+
+    test_cleanup();
+    setup_fleet();
+    init_fixture(&ffix);
+
+    u_set_ship(ffix.u11, ffix.sh1);
+    u_set_ship(ffix.u21, ffix.sh2);
+
+    ord = create_order(K_FLEET, ffix.f1->locale, "%s", itoa36(ffix.sh1->no));
+    unit_addorder(ffix.u11, ord);
+    ord = create_order(K_FLEET, ffix.f1->locale, "%s", itoa36(ffix.sh2->no));
+    unit_addorder(ffix.u11, ord);
+    usetcontact(ffix.u21, ffix.u11);
+
+    fleet_cmd(ffix.r);
+
+    msg = test_get_last_message(ffix.u11->faction->msgs);
+    CuAssertPtrEquals(tc, 0, msg);
+    fleet = assert_fleet(tc, ffix.r, ffix.sh1, ffix.u11);
+    CuAssertPtrEquals(tc, fleet, assert_fleet(tc, ffix.r, ffix.sh2, ffix.u11));
     CuAssertPtrEquals_Msg(tc, "units not moved", fleet, ffix.u21->ship);
 
     test_cleanup();
@@ -266,7 +298,7 @@ static void test_fleet_remove1(CuTest *tc) {
 
     ord = create_order(K_FLEET, ffix.f1->locale, "%s", itoa36(ffix.sh1->no));
     unit_addorder(ffix.u11, ord);
-    ord = create_order(K_FLEET, ffix.f1->locale, "%s %s", itoa36(ffix.sh1->no), itoa36(ffix.u11->no));
+    ord = create_order(K_FLEET, ffix.f1->locale, "ENTFERNE %s %s", itoa36(ffix.sh1->no), itoa36(ffix.u11->no));
     unit_addorder(ffix.u11, ord);
 
     fleet_cmd(ffix.r);
@@ -276,6 +308,42 @@ static void test_fleet_remove1(CuTest *tc) {
 
     assert_no_fleet(tc, ffix.r, ffix.sh1, ffix.u11);
 
+    test_cleanup();
+}
+
+static void test_fleet_remove2(CuTest *tc) {
+    fleet_fixture ffix;
+    order *ord;
+    struct message* msg;
+
+    test_cleanup();
+    setup_fleet();
+    init_fixture(&ffix);
+
+    u_set_ship(ffix.u21, ffix.sh2);
+    usetcontact(ffix.u21, ffix.u11);
+
+    ord = create_order(K_FLEET, ffix.f1->locale, "%s", itoa36(ffix.sh1->no));
+    unit_addorder(ffix.u11, ord);
+    ord = create_order(K_FLEET, ffix.f1->locale, "%s", itoa36(ffix.sh2->no));
+    unit_addorder(ffix.u11, ord);
+    ord = create_order(K_FLEET, ffix.f1->locale, "%s", itoa36(ffix.sh3->no));
+    unit_addorder(ffix.u11, ord);
+    ord = create_order(K_FLEET, ffix.f1->locale, "ENTFERNE %s", itoa36(ffix.sh2->no));
+    unit_addorder(ffix.u11, ord);
+    ord = create_order(K_FLEET, ffix.f1->locale, "ENTFERNE %s %s", itoa36(ffix.sh3->no), itoa36(ffix.u21->no));
+    unit_addorder(ffix.u11, ord);
+
+    fleet_cmd(ffix.r);
+
+    msg = test_get_last_message(ffix.u11->faction->msgs);
+    CuAssertPtrEquals(tc, 0, msg);
+
+    assert_fleet(tc, ffix.r, ffix.sh1, ffix.u11);
+    CuAssertPtrEquals_Msg(tc, "ship still in fleet", 0, ffix.sh2->fleet);
+    CuAssertPtrEquals_Msg(tc, "ship still in fleet", 0, ffix.sh3->fleet);
+    CuAssertPtrEquals_Msg(tc, "ship not empty", 0, ship_owner(ffix.sh2));
+    CuAssertPtrEquals_Msg(tc, "command not transferred", ffix.u21, ship_owner(ffix.sh3));
 
     test_cleanup();
 }
@@ -284,7 +352,6 @@ static void test_fleet_remove_wrong_fleet(CuTest *tc) {
     fleet_fixture ffix;
     order *ord;
     struct message* msg;
-    ship *sh2;
 
     test_cleanup();
     setup_fleet();
@@ -293,11 +360,10 @@ static void test_fleet_remove_wrong_fleet(CuTest *tc) {
     ord = create_order(K_FLEET, ffix.f1->locale, "%s", itoa36(ffix.sh1->no));
     unit_addorder(ffix.u11, ord);
 
-    sh2 = test_create_ship(ffix.r, st_find("boat"));
-    ord = create_order(K_FLEET, ffix.f2->locale, "%s", itoa36(sh2->no));
+    ord = create_order(K_FLEET, ffix.f2->locale, "%s", itoa36(ffix.sh2->no));
     unit_addorder(ffix.u21, ord);
 
-    ord = create_order(K_FLEET, ffix.f1->locale, "%s %s", itoa36(ffix.sh1->no), itoa36(ffix.u11->no));
+    ord = create_order(K_FLEET, ffix.f1->locale, "ENTFERNE %s %s", itoa36(ffix.sh1->no), itoa36(ffix.u11->no));
     unit_addorder(ffix.u21, ord);
 
     fleet_cmd(ffix.r);
@@ -308,10 +374,10 @@ static void test_fleet_remove_wrong_fleet(CuTest *tc) {
     CuAssertStrEquals(tc, "ship_nofleet", test_get_messagetype(msg));
 
     CuAssertPtrEquals(tc, ffix.u11, ship_owner(ffix.sh1));
-    CuAssertPtrEquals(tc, ffix.u21, ship_owner(sh2));
+    CuAssertPtrEquals(tc, ffix.u21, ship_owner(ffix.sh2));
 
     CuAssertPtrNotNull(tc, ffix.sh1->fleet);
-    CuAssertPtrNotNull(tc, sh2->fleet);
+    CuAssertPtrNotNull(tc, ffix.sh2->fleet);
 
     test_cleanup();
 }
@@ -325,7 +391,7 @@ static void test_fleet_remove_invalid(CuTest *tc) {
     setup_fleet();
     init_fixture(&ffix);
 
-    ord = create_order(K_FLEET, ffix.f1->locale, "%s %s", itoa36(ffix.sh1->no), itoa36(ffix.u11->no));
+    ord = create_order(K_FLEET, ffix.f1->locale, "ENTFERNE %s %s", itoa36(ffix.sh1->no), itoa36(ffix.u11->no));
     unit_addorder(ffix.u11, ord);
 
     fleet_cmd(ffix.r);
@@ -340,14 +406,10 @@ static void test_fleet_remove_invalid(CuTest *tc) {
 // TODO
 
 // NEW
-// test command variants
-// test unhappy paths (captain valid, ship owner contacts...)
 // test fleet ship properties
 
 // ADD ship:
-// must be empty or own or owner must contact
 // must be complete (?)
-// units where?
 // TRANSFER possible?
 
 // check range
@@ -412,7 +474,9 @@ CuSuite *get_fleets_suite(void)
     SUITE_ADD_TEST(suite, test_fleet_create_external);
     SUITE_ADD_TEST(suite, test_fleet_create_no_add_fleet);
     SUITE_ADD_TEST(suite, test_fleet_add);
+    SUITE_ADD_TEST(suite, test_fleet_add2);
     SUITE_ADD_TEST(suite, test_fleet_remove1);
+    SUITE_ADD_TEST(suite, test_fleet_remove2);
     SUITE_ADD_TEST(suite, test_fleet_remove_wrong_fleet);
     SUITE_ADD_TEST(suite, test_fleet_remove_invalid);
     return suite;

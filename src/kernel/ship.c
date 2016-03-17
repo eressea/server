@@ -501,24 +501,57 @@ void fleet_cmd(region * r)
         while (*ordp) {
             order *ord = *ordp;
             if (getkeyword(ord) == K_FLEET) {
+                char token[128];
+                const char *s;
+                param_t p;
+                int id, id2;
                 ship *fleet;
-                int id;
                 unit *up;
+                unit *cpt = NULL;
 
                 init_order(ord);
-                id = getid();
+                s = gettoken(token, sizeof(token));
 
-                if (!id) {
-                    sh = u->ship;
+                p = s?findparam(s, u->faction->locale):NOPARAM;
+                if (p == P_REMOVE) {
+                    id = getid();
+                    if (id == 0) {
+                        /* oops, maybe we mistakenly took a ship number for a token? */
+                        id = atoi36(s);
+                    } else {
+                        sh = findship(id);
+                        if (sh && sh->region != u->region) {
+                            sh = NULL;
+                        }
+                        if (sh) {
+                            id2 = getid();
+                            if (id2 != 0) {
+                                cpt = findunit(id2);
+                                if (!cpt || cpt->region != u->region) {
+                                    ADDMSG(&u->faction->msgs,
+                                        msg_feedback(u, ord, "feedback_unit_not_found", ""));
+                                    break;
+                                }
+                            }
+                        }
+                    }
                 } else {
-                    sh = findship(id);
-                    if (sh && sh->region != u->region)
-                        sh = NULL;
+                    id = s?atoi36(s):0;
                 }
-                id = getid();
-                if (!id) {
+
+                if (p != P_REMOVE) {
                     /* add ship */
-                    if (!sh || sh->fleet || ship_isfleet(sh)) {
+                    if (id) {
+                        sh = findship(id);
+                    } else {
+                        sh = u->ship;
+                        if (ship_isfleet(sh)) {
+                            /* ignore FLOTTE with no params if already own a fleet */
+                            continue;
+                        }
+                    }
+
+                    if (!sh || sh->fleet || ship_isfleet(sh) || sh->region != u->region) {
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "fleet_ship_invalid", "ship", sh));
                         break;
                     }
@@ -526,8 +559,12 @@ void fleet_cmd(region * r)
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_no_contact", "target", ship_owner(sh)));
                         break;
                     }
-                    const ship_type *fleet_type = st_find("fleet");
-                    fleet = new_ship(fleet_type, r, u->faction->locale);
+                    if (u->ship && ship_isfleet(u->ship)) {
+                        fleet = u->ship;
+                    } else {
+                        const ship_type *fleet_type = st_find("fleet");
+                        fleet = new_ship(fleet_type, r, u->faction->locale);
+                    }
                     for (up = r->units; up; up = up->next) {
                         if (up == u || up->ship == sh) {
                             up->ship = 0;
@@ -537,10 +574,9 @@ void fleet_cmd(region * r)
                     sh->fleet = fleet;
                 } else {
                     /* remove ship */
-                    unit *cpt = findunit(id);
-                    if (cpt && cpt->region != u->region) {
-                        cpt = NULL;
-                    }
+                    ship *shp;
+                    int size = 0;
+
                     if (!u->ship || !ship_isfleet(u->ship) || u != ship_owner(u->ship)) {
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "fleet_only_captain", "id", id));
                         break;
@@ -549,19 +585,27 @@ void fleet_cmd(region * r)
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "ship_nofleet", "id", id));
                         break;
                     }
-                    if (!cpt) {
+                    if (id2 != 0 && !cpt) {
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "unitnotfound_id", "id", id));
                         break;
                     }
-                    if (!ucontact(cpt, u)) {
+                    if (cpt && !ucontact(cpt, u)) {
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_no_contact", "target", cpt));
                         break;
                     }
 
-                    remove_ship(&r->ships, sh->fleet);
+                    for (shp = r->ships; shp; shp = shp->next) {
+                        if (shp->fleet == u->ship)
+                            ++size;
+                    }
+                    if (size == 1)
+                        remove_ship(&r->ships, sh->fleet);
                     sh->fleet = NULL;
-                    cpt->ship = 0;
-                    u_set_ship(cpt, sh);
+
+                    if (cpt) {
+                        cpt->ship = 0;
+                        u_set_ship(cpt, sh);
+                    }
                 }
             }
             if (*ordp == ord)

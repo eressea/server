@@ -132,6 +132,7 @@ typedef enum {
   P_FACTIONSTEALTH,
   P_TREES,
   P_ALLIANCE,
+  P_REMOVE,
   MAXPARAMS,
   NOPARAM = -1
 } param_t;
