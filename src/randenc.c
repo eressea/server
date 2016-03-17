@@ -151,22 +151,17 @@ static void dissolve_units(void)
     remove_empty_units();
 }
 
-static int improve_all(faction * f, skill_t sk, int by_weeks)
+static bool improve_all(faction * f, skill_t sk, int by_weeks)
 {
     unit *u;
-    bool ret = by_weeks;
-
+    bool result = false;
     for (u = f->units; u; u = u->nextF) {
         if (has_skill(u, sk)) {
-            int weeks = 0;
-            for (; weeks != by_weeks; ++weeks) {
-                learn_skill_depr(u, sk, 1.0);
-                ret = 0;
-            }
+            learn_skill(u, sk, by_weeks * STUDYDAYS);
+            result = true;
         }
     }
-
-    return ret;
+    return result;
 }
 
 void find_manual(region * r, unit * u)
@@ -247,10 +242,8 @@ void find_manual(region * r, unit * u)
         msg_release(msg);
     }
 
-    if (improve_all(u->faction, skill, 3) == 3) {
-        int i;
-        for (i = 0; i != 9; ++i)
-            learn_skill_depr(u, skill, 1.0);
+    if (!improve_all(u->faction, skill, 3)) {
+        learn_skill(u, skill, 9 * STUDYDAYS);
     }
 }
 

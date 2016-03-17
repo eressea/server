@@ -31,17 +31,17 @@ static void test_skillpotion(CuTest *tc) {
     itype = test_create_itemtype("skillpotion");
     change_resource(u, itype->rtype, 2);
 
-    learn_skill_depr(u, SK_ENTERTAINMENT, 1.0);
+    learn_skill(u, SK_ENTERTAINMENT, STUDYDAYS);
     pSkill = unit_skill(u, SK_ENTERTAINMENT);
     sk_set(pSkill, 5);
     initialWeeks_Entertainment = pSkill->weeks = 4;
 
-    learn_skill_depr(u, SK_STAMINA, 1.0);
+    learn_skill(u, SK_STAMINA, STUDYDAYS);
     pSkill = unit_skill(u, SK_STAMINA);
     sk_set(pSkill, 5);
     initialWeeks_Stamina = pSkill->weeks = 4;
 
-    learn_skill_depr(u, SK_MAGIC, 1.0);
+    learn_skill(u, SK_MAGIC, STUDYDAYS);
     pSkill = unit_skill(u, SK_MAGIC);
     sk_set(pSkill, 5);
     initialWeeks_Magic = pSkill->weeks = 4;

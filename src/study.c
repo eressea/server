@@ -847,7 +847,6 @@ bool learn_skill_depr(unit * u, skill_t sk, double learn_chance)
 }
 
 void learn_skill(unit *u, skill_t sk, int days) {
-    skill *sv = u->skills;
     int leveldays = STUDYDAYS * u->number;
     int weeks = 0;
     while (days >= leveldays) {
@@ -857,14 +856,17 @@ void learn_skill(unit *u, skill_t sk, int days) {
     if (days > 0 && rng_int() % leveldays < days) {
         ++weeks;
     }
-    if (weeks > 0 && !sv) {
-        sv = add_skill(u, sk);
+    if (weeks > 0) {
+        skill *sv = unit_skill(u, sk);
+        if (!sv) {
+            sv = add_skill(u, sk);
+        }
+        while (sv->weeks <= weeks) {
+            weeks -= sv->weeks;
+            sk_set(sv, sv->level + 1);
+        }
+        sv->weeks -= weeks;
     }
-    while (sv->weeks <= weeks) {
-        weeks -= sv->weeks;
-        sk_set(sv, sv->level + 1);
-    }
-    sv->weeks -= weeks;
 }
 
 /** Talente von Dämonen verschieben sich.

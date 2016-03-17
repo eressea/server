@@ -394,10 +394,10 @@ static int tolua_learn_skill(lua_State * L)
 {
     unit *u = (unit *)tolua_tousertype(L, 1, 0);
     const char *skname = tolua_tostring(L, 2, 0);
-    float chances = (float)tolua_tonumber(L, 3, 0);
+    int days = (int)tolua_tonumber(L, 3, 0);
     skill_t sk = findskill(skname);
     if (sk != NOSKILL) {
-        learn_skill_depr(u, sk, chances);
+        learn_skill(u, sk, days);
     }
     return 0;
 }
@@ -1119,7 +1119,7 @@ int tolua_bindings_open(lua_State * L)
         tolua_function(L, TOLUA_CAST "update_subscriptions", tolua_update_subscriptions);
         tolua_function(L, TOLUA_CAST "update_scores", tolua_update_scores);
         tolua_function(L, TOLUA_CAST "update_owners", tolua_update_owners);
-        tolua_function(L, TOLUA_CAST "learn_skill_depr", tolua_learn_skill);
+        tolua_function(L, TOLUA_CAST "learn_skill", tolua_learn_skill);
         tolua_function(L, TOLUA_CAST "create_curse", tolua_create_curse);
         tolua_function(L, TOLUA_CAST "autoseed", tolua_autoseed);
         tolua_function(L, TOLUA_CAST "get_key", tolua_getkey);
