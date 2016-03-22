@@ -103,8 +103,8 @@ extern "C" {
     void ship_update_owner(struct ship * sh);
 
     extern const char *shipname(const struct ship *self);
-    extern int shipcapacity(const struct ship *sh);
-    extern void getshipweight(const struct ship *sh, int *weight, int *cabins);
+    extern int ship_capacity(const struct ship *sh);
+    extern void ship_weight(const struct ship *sh, int *weight, int *cabins);
 
     extern ship *new_ship(const struct ship_type *stype, struct region *r,
         const struct locale *lang);
@@ -123,10 +123,10 @@ extern "C" {
     extern void free_ship(struct ship *s);
     extern void free_ships(void);
 
-    const char *ship_getname(const struct ship *self);
+    const char *ship_name(const struct ship *self);
     void ship_setname(struct ship *self, const char *name);
-    int shipspeed(const struct ship *sh, const struct unit *u);
-    int crew_skill(const struct ship *sh);
+    int ship_speed(const struct ship *sh, const struct unit *u);
+    int ship_crew_skill(const struct ship *sh);
 
     int ship_damage_percent(const struct ship *ship);
 

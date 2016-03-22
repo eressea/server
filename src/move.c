@@ -474,10 +474,10 @@ static bool cansail(const region * r, ship * sh)
     }
     else {
         int n = 0, p = 0;
-        int mweight = shipcapacity(sh);
+        int mweight = ship_capacity(sh);
         int mcabins = sh->type->cabins;
 
-        getshipweight(sh, &n, &p);
+        ship_weight(sh, &n, &p);
 
         if (n > mweight)
             return false;
@@ -499,7 +499,7 @@ static double overload(const region * r, ship * sh)
         int n = 0, p = 0;
         int mcabins = sh->type->cabins;
 
-        getshipweight(sh, &n, &p);
+        ship_weight(sh, &n, &p);
 
         double ovl = n / (double)sh->type->cargo;
         if (mcabins)
@@ -1835,7 +1835,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
     /* Wir suchen so lange nach neuen Richtungen, wie es geht. Diese werden
      * dann nacheinander ausgeführt. */
 
-    k = shipspeed(sh, u);
+    k = ship_speed(sh, u);
 
     last_point = starting_point;
     current_point = starting_point;
@@ -1872,7 +1872,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
                 stormyness = storms ? storms[date.month] * 5 : 0;
 
                 /* storms should be the first thing we do. */
-                stormchance = stormyness / shipspeed(sh, u);
+                stormchance = stormyness / ship_speed(sh, u);
                 if (check_leuchtturm(next_point, NULL)) {
                     if (lighthouse_div > 0) {
                         stormchance /= lighthouse_div;
@@ -2385,10 +2385,10 @@ int follow_ship(unit * u, order * ord)
 
     speed = (int)getuint();
     if (speed == 0) {
-        speed = shipspeed(u->ship, u);
+        speed = ship_speed(u->ship, u);
     }
     else {
-        int maxspeed = shipspeed(u->ship, u);
+        int maxspeed = ship_speed(u->ship, u);
         if (maxspeed < speed)
             speed = maxspeed;
     }

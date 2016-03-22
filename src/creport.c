@@ -677,12 +677,12 @@ const faction * f, const region * r)
     /* calculate cargo */
     if (u && (u->faction == f || omniscient(f))) {
         int n = 0, p = 0;
-        int mweight = shipcapacity(sh);
-        getshipweight(sh, &n, &p);
+        int mweight = ship_capacity(sh);
+        ship_weight(sh, &n, &p);
 
         fprintf(F, "%d;capacity\n", mweight);
         fprintf(F, "%d;cargo\n", n);
-        fprintf(F, "%d;speed\n", shipspeed(sh, u));
+        fprintf(F, "%d;speed\n", ship_speed(sh, u));
     }
     /* shore */
     w = NODIRECTION;

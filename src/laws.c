@@ -1030,11 +1030,11 @@ int enter_ship(unit * u, struct order *ord, int id, bool report)
     }
     if (CheckOverload()) {
         int sweight, scabins;
-        int mweight = shipcapacity(sh);
+        int mweight = ship_capacity(sh);
         int mcabins = sh->type->cabins;
 
         if (mweight > 0) {
-            getshipweight(sh, &sweight, &scabins);
+            ship_weight(sh, &sweight, &scabins);
             sweight += weight(u);
             if (mcabins) {
                 int pweight = u->number * u_race(u)->weight;

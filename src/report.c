@@ -1802,11 +1802,11 @@ const unit * captain)
 
     if (captain && captain->faction == f) {
         int n = 0, p = 0;
-        getshipweight(sh, &n, &p);
+        ship_weight(sh, &n, &p);
         n = (n + 99) / 100;         /* 1 Silber = 1 GE */
 
         bytes = _snprintf(bufp, size, "%s, %s, (%d/%d)", shipname(sh),
-            LOC(f->locale, sh->type->_name), n, shipcapacity(sh) / 100);
+            LOC(f->locale, sh->type->_name), n, ship_capacity(sh) / 100);
     }
     else {
         bytes =

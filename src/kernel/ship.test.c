@@ -391,7 +391,7 @@ static void test_crew_skill(CuTest *tc) {
         set_level(u, SK_SAILING, 5);
         u->ship = sh;
     }
-    CuAssertIntEquals(tc, 20, crew_skill(sh));
+    CuAssertIntEquals(tc, 20, ship_crew_skill(sh));
     test_cleanup();
 }
 
@@ -433,7 +433,7 @@ static void test_shipspeed_stormwind(CuTest *tc) {
     assert(sh && cap && crew);
 
     create_curse(0, &sh->attribs, ct_find("stormwind"), 1, 1, 1, 0);
-    CuAssertIntEquals_Msg(tc, "stormwind doubles ship range", sh->type->range * 2, shipspeed(sh, cap));
+    CuAssertIntEquals_Msg(tc, "stormwind doubles ship range", sh->type->range * 2, ship_speed(sh, cap));
     test_cleanup();
 }
 
@@ -448,7 +448,7 @@ static void test_shipspeed_nodrift(CuTest *tc) {
     assert(sh && cap && crew);
 
     create_curse(0, &sh->attribs, ct_find("nodrift"), 1, 1, 1, 0);
-    CuAssertIntEquals_Msg(tc, "nodrift adds +1 to range", sh->type->range + 1, shipspeed(sh, cap));
+    CuAssertIntEquals_Msg(tc, "nodrift adds +1 to range", sh->type->range + 1, ship_speed(sh, cap));
     test_cleanup();
 }
 
@@ -463,7 +463,7 @@ static void test_shipspeed_shipspeedup(CuTest *tc) {
     assert(sh && cap && crew);
 
     create_curse(0, &sh->attribs, ct_find("shipspeedup"), 1, 1, 3, 0);
-    CuAssertIntEquals_Msg(tc, "shipspeedup adds effect to range", sh->type->range + 3, shipspeed(sh, cap));
+    CuAssertIntEquals_Msg(tc, "shipspeedup adds effect to range", sh->type->range + 3, ship_speed(sh, cap));
     test_cleanup();
 }
 
@@ -480,7 +480,7 @@ static void test_shipspeed_at_speedup(CuTest *tc) {
     a = a_new(&at_speedup);
     a->data.i = 3;
     a_add(&sh->attribs, a);
-    CuAssertIntEquals_Msg(tc, "at_speedup adds value to range", sh->type->range + 3, shipspeed(sh, cap));
+    CuAssertIntEquals_Msg(tc, "at_speedup adds value to range", sh->type->range + 3, ship_speed(sh, cap));
     test_cleanup();
 }
 
@@ -496,7 +496,7 @@ static void test_shipspeed_race_bonus(CuTest *tc) {
 
     rc = rc_get_or_create(cap->_race->_name);
     rc->flags |= RCF_SHIPSPEED;
-    CuAssertIntEquals_Msg(tc, "captain with RCF_SHIPSPEED adds +1 to range", sh->type->range + 1, shipspeed(sh, cap));
+    CuAssertIntEquals_Msg(tc, "captain with RCF_SHIPSPEED adds +1 to range", sh->type->range + 1, ship_speed(sh, cap));
     test_cleanup();
 }
 
@@ -510,11 +510,11 @@ static void test_shipspeed_damage(CuTest *tc) {
     assert(sh && cap && crew);
 
     sh->damage = 1;
-    CuAssertIntEquals_Msg(tc, "minimally damaged ships lose no range", 2, shipspeed(sh, cap));
+    CuAssertIntEquals_Msg(tc, "minimally damaged ships lose no range", 2, ship_speed(sh, cap));
     sh->damage = sh->size * DAMAGE_SCALE / 2;
-    CuAssertIntEquals_Msg(tc, "damaged ships lose range", 1, shipspeed(sh, cap));
+    CuAssertIntEquals_Msg(tc, "damaged ships lose range", 1, ship_speed(sh, cap));
     sh->damage = sh->size * DAMAGE_SCALE;
-    CuAssertIntEquals_Msg(tc, "fully damaged ships have no range", 0, shipspeed(sh, cap));
+    CuAssertIntEquals_Msg(tc, "fully damaged ships have no range", 0, ship_speed(sh, cap));
     test_cleanup();
 }
 
@@ -527,25 +527,25 @@ static void test_shipspeed(CuTest *tc) {
     sh = setup_ship();
     stype = sh->type;
 
-    CuAssertIntEquals_Msg(tc, "ship without a captain cannot move", 0, shipspeed(sh, NULL));
+    CuAssertIntEquals_Msg(tc, "ship without a captain cannot move", 0, ship_speed(sh, NULL));
 
     setup_crew(sh, 0, &cap, &crew);
 
     CuAssertPtrEquals(tc, cap, ship_owner(sh));
-    CuAssertIntEquals_Msg(tc, "ship with fully skilled crew can sail at max speed", 2, shipspeed(sh, cap));
-    CuAssertIntEquals_Msg(tc, "shipspeed without a hint defaults to captain", 2, shipspeed(sh, NULL));
+    CuAssertIntEquals_Msg(tc, "ship with fully skilled crew can sail at max speed", 2, ship_speed(sh, cap));
+    CuAssertIntEquals_Msg(tc, "shipspeed without a hint defaults to captain", 2, ship_speed(sh, NULL));
 
     set_level(cap, SK_SAILING, stype->cptskill + 5);
     set_level(crew, SK_SAILING, (stype->sumskill - stype->cptskill) * 10);
-    CuAssertIntEquals_Msg(tc, "higher skills should not affect top speed", 2, shipspeed(sh, cap));
+    CuAssertIntEquals_Msg(tc, "higher skills should not affect top speed", 2, ship_speed(sh, cap));
     set_level(cap, SK_SAILING, stype->cptskill);
     set_level(crew, SK_SAILING, stype->sumskill - stype->cptskill);
 
-    CuAssertIntEquals(tc, 2, shipspeed(sh, cap));
+    CuAssertIntEquals(tc, 2, ship_speed(sh, cap));
 
     set_level(crew, SK_SAILING, (stype->sumskill - stype->cptskill) * 11);
     set_level(cap, SK_SAILING, stype->cptskill + 10);
-    CuAssertIntEquals_Msg(tc, "regular skills should not exceed sh.range", 2, shipspeed(sh, cap));
+    CuAssertIntEquals_Msg(tc, "regular skills should not exceed sh.range", 2, ship_speed(sh, cap));
 }
 
 static void test_shipspeed_max_range(CuTest *tc) {
@@ -566,15 +566,15 @@ static void test_shipspeed_max_range(CuTest *tc) {
 
     set_level(cap, SK_SAILING, stype->cptskill + 4);
     set_level(crew, SK_SAILING, (stype->sumskill - stype->cptskill) * 4);
-    CuAssertIntEquals_Msg(tc, "skill bonus requires at least movement.shipspeed.skillbonus points", 2, shipspeed(sh, cap));
+    CuAssertIntEquals_Msg(tc, "skill bonus requires at least movement.shipspeed.skillbonus points", 2, ship_speed(sh, cap));
 
     set_level(cap, SK_SAILING, stype->cptskill + 5);
     set_level(crew, SK_SAILING, (stype->sumskill - stype->cptskill) * 5);
-    CuAssertIntEquals_Msg(tc, "skill bonus from movement.shipspeed.skillbonus", 3, shipspeed(sh, cap));
+    CuAssertIntEquals_Msg(tc, "skill bonus from movement.shipspeed.skillbonus", 3, ship_speed(sh, cap));
 
     set_level(cap, SK_SAILING, stype->cptskill + 15);
     set_level(crew, SK_SAILING, (stype->sumskill - stype->cptskill) * 15);
-    CuAssertIntEquals_Msg(tc, "skill-bonus cannot exceed max_range", 4, shipspeed(sh, cap));
+    CuAssertIntEquals_Msg(tc, "skill-bonus cannot exceed max_range", 4, ship_speed(sh, cap));
     test_cleanup();
 }
 

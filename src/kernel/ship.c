@@ -285,7 +285,7 @@ static int ShipSpeedBonus(const unit * u)
     return 0;
 }
 
-int crew_skill(const ship *sh) {
+int ship_crew_skill(const ship *sh) {
     int n = 0;
     unit *u;
 
@@ -299,7 +299,7 @@ int crew_skill(const ship *sh) {
     return n;
 }
 
-int shipspeed(const ship * sh, const unit * u)
+int ship_speed(const ship * sh, const unit * u)
 {
     int k = sh->type->range;
     static const struct curse_type *stormwind_ct, *nodrift_ct;
@@ -338,7 +338,7 @@ int shipspeed(const ship * sh, const unit * u)
 
     bonus = ShipSpeedBonus(u);
     if (bonus > 0 && sh->type->range_max>sh->type->range) {
-        int crew = crew_skill(sh);
+        int crew = ship_crew_skill(sh);
         int crew_bonus = (crew / sh->type->sumskill / 2) - 1;
         if (crew_bonus > 0) {
             bonus = _min(bonus, crew_bonus);
@@ -379,7 +379,7 @@ const char *shipname(const ship * sh)
     return write_shipname(sh, ibuf, sizeof(name));
 }
 
-int shipcapacity(const ship * sh)
+int ship_capacity(const ship * sh)
 {
     int i = sh->type->cargo;
 
@@ -396,7 +396,7 @@ int shipcapacity(const ship * sh)
     return i;
 }
 
-void getshipweight(const ship * sh, int *sweight, int *scabins)
+void ship_weight(const ship * sh, int *sweight, int *scabins)
 {
     unit *u;
 
@@ -476,7 +476,7 @@ void ship_setname(ship * self, const char *name)
     self->name = name ? _strdup(name) : 0;
 }
 
-const char *ship_getname(const ship * self)
+const char *ship_name(const ship * self)
 {
     return self->name;
 }

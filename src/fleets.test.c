@@ -522,10 +522,10 @@ static void test_fleet_move(CuTest *tc) {
     setup_fleet();
     init_fleet(&ffix);
 
-    /* ship type boat: cptskill 1, sumskill 1, minskill 1, range 2, cargo 1000,
+    / * ship type boat: cptskill 1, sumskill 1, minskill 1, range 2, cargo 1000,
      * construction maxsize 5, minskill 1, reqsize 1
      * coasts: plain
-     */
+     * /
 
     ord = create_order(K_MOVE, ffix.f1->locale, "W NO O SO SW W", itoa36(ffix.sh1->no));
     unit_addorder(ffix.u11, ord);
@@ -547,6 +547,7 @@ static void test_fleet_move(CuTest *tc) {
 
     test_cleanup();
 }
+*/
 
 /*
 // TODO
