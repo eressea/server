@@ -508,9 +508,9 @@ static double overload(const region * r, ship * sh)
     }
 }
 
-int enoughsailors(const ship * sh, int crew_skill)
+int enoughsailors(const ship * sh)
 {
-    return crew_skill >= sh->type->sumskill;
+    return ship_crew_skill(sh) >= ship_type_crew_skill(sh);
 }
 
 /* ------------------------------------------------------------- */
@@ -820,7 +820,7 @@ static void drifting_ships(region * r)
 
             assert(sh->type->construction->improvement == NULL); /* sonst ist construction::size nicht ship_type::maxsize */
             if (captain && sh->size == sh->type->construction->maxsize
-                && enoughsailors(sh, crew_skill(sh)) && cansail(r, sh)) {
+                && enoughsailors(sh) && cansail(r, sh)) {
                 shp = &sh->next;
                 continue;
             }
@@ -1720,40 +1720,23 @@ static const region_list *travel_route(unit * u,
     return iroute;
 }
 
-static int ship_cpt_skill(ship *sh) {
-    if (ship_isfleet(sh)) {
-        int skill = 0;
-        ship *shp;
-        for (shp = sh->region->ships; shp; shp = shp->next) {
-            if (shp->fleet == shp || shp == sh) {
-                skill = _max(skill, shp->type->cptskill);
-            }
-        }
-        return skill;
-    } else
-        return sh->type->cptskill;
-}
-
 static bool ship_ready(const region * r, unit * u, order * ord)
 {
     if (!u->ship || u != ship_owner(u->ship)) {
         cmistake(u, ord, 146, MSG_MOVE);
         return false;
     }
-    if (effskill(u, SK_SAILING, r) < ship_cpt_skill(u->ship)) {
+    if (effskill(u, SK_SAILING, r) < ship_type_cpt_skill(u->ship)) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
             "error_captain_skill_low", "value ship", u->ship->type->cptskill,
             u->ship));
         return false;
     }
-    if (u->ship->type->construction) {
-        assert(!u->ship->type->construction->improvement);     /* sonst ist construction::size nicht ship_type::maxsize */
-        if (u->ship->size != u->ship->type->construction->maxsize) {
-            cmistake(u, ord, 15, MSG_MOVE);
-            return false;
-        }
+    if (!ship_iscomplete(u->ship)) {
+        cmistake(u, ord, 15, MSG_MOVE);
+        return false;
     }
-    if (!enoughsailors(u->ship, crew_skill(u->ship))) {
+    if (!enoughsailors(u->ship)) {
         cmistake(u, ord, 1, MSG_MOVE);
         return false;
     }

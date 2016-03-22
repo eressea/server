@@ -489,6 +489,25 @@ bool ship_isfleet(const ship *sh) {
     return (sh->type == st_find("fleet"));
 }
 
+ship *add_ship(ship *sh, ship *fleet, unit *cpt) {
+    unit * up;
+    region *r = sh->region;
+
+    if (!fleet) {
+        const ship_type *fleet_type = st_find("fleet");
+        fleet = new_ship(fleet_type, r, cpt->faction->locale);
+    }
+
+    for (up = r->units; up; up = up->next) {
+        if (up == cpt || up->ship == sh) {
+            up->ship = 0;
+            u_set_ship(up, fleet);
+        }
+    }
+    sh->fleet = fleet;
+    return fleet;
+}
+
 void fleet_cmd(region * r)
 {
     unit **uptr;
@@ -505,8 +524,6 @@ void fleet_cmd(region * r)
                 const char *s;
                 param_t p;
                 int id, id2;
-                ship *fleet;
-                unit *up;
                 unit *cpt = NULL;
 
                 init_order(ord);
@@ -563,19 +580,13 @@ void fleet_cmd(region * r)
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_no_contact", "target", ship_owner(sh)));
                         break;
                     }
+
                     if (u->ship && ship_isfleet(u->ship)) {
-                        fleet = u->ship;
+                        add_ship(sh, u->ship, u);
                     } else {
-                        const ship_type *fleet_type = st_find("fleet");
-                        fleet = new_ship(fleet_type, r, u->faction->locale);
+                        add_ship(sh, NULL, u);
                     }
-                    for (up = r->units; up; up = up->next) {
-                        if (up == u || up->ship == sh) {
-                            up->ship = 0;
-                            u_set_ship(up, fleet);
-                        }
-                    }
-                    sh->fleet = fleet;
+
                 } else {
                     /* remove ship */
                     ship *shp;
@@ -625,3 +636,53 @@ void fleet_cmd(region * r)
     }
 }
 
+int ship_type_cpt_skill(const ship *sh) {
+    if (ship_isfleet(sh)) {
+        int skill = 0;
+        ship *shp;
+        for (shp = sh->region->ships; shp; shp = shp->next) {
+            if (shp->fleet == sh || shp == sh) {
+                skill = _max(skill, shp->type->cptskill);
+            }
+        }
+        return skill;
+    } else
+        return sh->type->cptskill;
+}
+
+bool ship_iscomplete(const ship *sh) {
+    ship *shp;
+
+    if (ship_isfleet(sh)) {
+        for (shp = sh->region->ships; shp; shp = shp->next) {
+            if (shp->fleet == sh) {
+                if (!ship_iscomplete(shp))
+                    return false;
+            }
+        }
+        return true;
+    }
+
+    if (sh->type->construction) {
+        assert(!sh->type->construction->improvement); /* sonst ist construction::size nicht ship_type::maxsize */
+        if (sh->size != sh->type->construction->maxsize) {
+            return false;
+        }
+    }
+    return true;
+}
+
+int ship_type_crew_skill(const ship *sh) {
+    if (ship_isfleet(sh)) {
+        ship *shp;
+        int skill = 0;
+
+        for (shp = sh->region->ships; shp; shp = shp->next) {
+            if (shp->fleet == sh) {
+                skill += shp->type->sumskill;
+            }
+        }
+        return skill;
+    }
+    return sh->type->sumskill;
+}

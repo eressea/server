@@ -2731,7 +2731,7 @@ void sinkships(struct region * r)
 
         if (!sh->type->construction || sh->size >= sh->type->construction->maxsize) {
             if (fval(r->terrain, SEA_REGION)) {
-                if (!enoughsailors(sh, crew_skill(sh))) {
+                if (!enoughsailors(sh)) {
                     // ship is at sea, but not enough people to control it
                     double dmg = config_get_flt("rules.ship.damage.nocrewocean", 0.3);
                     damage_ship(sh, dmg);

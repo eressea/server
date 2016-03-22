@@ -131,7 +131,12 @@ extern "C" {
     int ship_damage_percent(const struct ship *ship);
 
     bool ship_isfleet(const struct ship *sh);
+    struct ship *add_ship(struct ship *sh, struct ship *fleet, struct unit *cpt);
     void fleet_cmd(struct region * r);
+
+    int ship_type_cpt_skill(const struct ship *sh);
+    int ship_type_crew_skill(const struct ship *sh);
+    bool ship_iscomplete(const struct ship *sh);
 
 #ifdef __cplusplus
 }
