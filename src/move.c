@@ -1720,13 +1720,27 @@ static const region_list *travel_route(unit * u,
     return iroute;
 }
 
+static int ship_cpt_skill(ship *sh) {
+    if (ship_isfleet(sh)) {
+        int skill = 0;
+        ship *shp;
+        for (shp = sh->region->ships; shp; shp = shp->next) {
+            if (shp->fleet == shp || shp == sh) {
+                skill = _max(skill, shp->type->cptskill);
+            }
+        }
+        return skill;
+    } else
+        return sh->type->cptskill;
+}
+
 static bool ship_ready(const region * r, unit * u, order * ord)
 {
     if (!u->ship || u != ship_owner(u->ship)) {
         cmistake(u, ord, 146, MSG_MOVE);
         return false;
     }
-    if (effskill(u, SK_SAILING, r) < u->ship->type->cptskill) {
+    if (effskill(u, SK_SAILING, r) < ship_cpt_skill(u->ship)) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
             "error_captain_skill_low", "value ship", u->ship->type->cptskill,
             u->ship));

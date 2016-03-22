@@ -513,6 +513,41 @@ static void test_fleet_remove_nonsail(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_fleet_move(CuTest *tc) {
+    fleet_fixture ffix;
+    order *ord;
+    struct message* msg;
+
+    test_cleanup();
+    setup_fleet();
+    init_fleet(&ffix);
+
+    /* ship type boat: cptskill 1, sumskill 1, minskill 1, range 2, cargo 1000,
+     * construction maxsize 5, minskill 1, reqsize 1
+     * coasts: plain
+     */
+
+    ord = create_order(K_MOVE, ffix.f1->locale, "W NO O SO SW W", itoa36(ffix.sh1->no));
+    unit_addorder(ffix.u11, ord);
+    set_level(ffix.u11, SK_SAILING, 1);
+
+    move_cmd(ffix.u11, ord, false);
+
+    msg = test_get_last_message(ffix.f1->msgs);
+    CuAssertStrEquals(tc, "error_captain_skill_low", test_get_messagetype(msg));
+    test_clear_messages(ffix.f1);
+
+    set_level(ffix.u11, SK_SAILING, 6);
+    move_cmd(ffix.u11, ord, false);
+
+    msg = test_get_last_message(ffix.f1->msgs);
+    CuAssertPtrEquals(tc, 0, msg);
+
+    CuAssertPtrEquals_Msg(tc, "fleet does not have speed 2", findregion(-1, 1), ffix.sh1->region);
+
+    test_cleanup();
+}
+
 /*
 // TODO
 
@@ -592,5 +627,7 @@ CuSuite *get_fleets_suite(void)
     SUITE_ADD_TEST(suite, test_fleet_remove_nonsail);
     SUITE_ADD_TEST(suite, test_fleet_nonsail);
     SUITE_ADD_TEST(suite, test_fleet_enter);
+
+    SUITE_ADD_TEST(suite, test_fleet_move);
     return suite;
 }
