@@ -1017,6 +1017,8 @@ int enter_ship(unit * u, struct order *ord, int id, bool report)
         }
         return 0;
     }
+    if (sh->fleet)
+        sh = sh->fleet;
     if (sh == u->ship) {
         return 1;
     }

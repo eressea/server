@@ -551,6 +551,10 @@ void fleet_cmd(region * r)
                         }
                     }
 
+                    if (!(u_race(u)->flags & (RCF_CANSAIL | RCF_WALK | RCF_FLY))) {
+                        cmistake(u, ord, 233, MSG_MOVE);
+                        break;
+                    }
                     if (!sh || sh->fleet || ship_isfleet(sh) || sh->region != u->region) {
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "fleet_ship_invalid", "ship", sh));
                         break;
@@ -588,6 +592,11 @@ void fleet_cmd(region * r)
                     if (id2 != 0 && !cpt) {
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "unitnotfound_id", "id", id));
                         break;
+                    }
+                    if (cpt && !(u_race(cpt)->flags & (RCF_CANSAIL | RCF_WALK | RCF_FLY))) {
+                        cmistake(u, ord, 233, MSG_MOVE);
+                        cmistake(cpt, ord, 233, MSG_MOVE);
+                        cpt = NULL;
                     }
                     if (cpt && !ucontact(cpt, u)) {
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_no_contact", "target", cpt));

@@ -300,6 +300,8 @@ void test_create_world(void)
     item_type * itype;
     struct locale * loc;
 
+    assert(!"did you forget to call test_cleanup()?" || !regions);
+
     loc = get_or_create_locale("de");
 
     locale_setstring(loc, parameters[P_SHIP], "SCHIFF");

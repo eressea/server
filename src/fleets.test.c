@@ -15,14 +15,13 @@
 #include <util/base36.h>
 #include <util/language.h>
 
-#include <spells/shipcurse.h>
-#include <attributes/movement.h>
-
 #include <CuTest.h>
 #include <tests.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+
+#include "laws.h"
 
 static void setup_fleet(void) {
     ship_type* ftype;
@@ -42,14 +41,18 @@ static void setup_fleet(void) {
 typedef struct fleet_fixture {
     region *r, *r2;
     ship *sh1, *sh2, *sh3;
+    ship *fleet;
     unit *u11, *u21;
     faction *f1, *f2;
     const ship_type *stype1;
 } fleet_fixture;
 
 static void init_fixture(fleet_fixture *ffix) {
-    ffix->f1 = test_create_faction(NULL);
-    ffix->f2 = test_create_faction(NULL);
+    race *rc = test_create_race("human");
+    fset(rc, RCF_CANSAIL | RCF_WALK);
+
+    ffix->f1 = test_create_faction(rc);
+    ffix->f2 = test_create_faction(rc);
     ffix->r = findregion(0, 0);
     ffix->r2 = findregion(-1, 0);
 
@@ -61,6 +64,16 @@ static void init_fixture(fleet_fixture *ffix) {
     ffix->u11 = test_create_unit(ffix->f1, ffix->r);
 
     ffix->u21 = test_create_unit(ffix->f2, ffix->r);
+}
+
+static void init_fleet(fleet_fixture *ffix) {
+    init_fixture(ffix);
+    assert(st_find("fleet"));
+    ffix->fleet = test_create_ship(ffix->r, st_find("fleet"));
+    u_set_ship(ffix->u11, ffix->fleet);
+    u_set_ship(ffix->u21, ffix->fleet);
+    ffix->sh1->fleet = ffix->fleet;
+    ffix->sh2->fleet = ffix->fleet;
 }
 
 static ship *find_fleet(CuTest *tc, region *r) {
@@ -129,6 +142,34 @@ static void test_fleet_create(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_fleet_nonsail(CuTest *tc) {
+    race *rc;
+    faction *f1;
+    region *r;
+    ship *sh;
+    unit *u1;
+    order *ord;
+    struct message *msg;
+
+    test_cleanup();
+    setup_fleet();
+    rc = test_create_race("human");
+    f1 = test_create_faction(rc);
+    r = findregion(0, 0);
+    sh = test_create_ship(r, st_find("boat"));
+    u1 = test_create_unit(f1, r);
+
+    ord = create_order(K_FLEET, f1->locale, "%s", itoa36(sh->no));
+    unit_addorder(u1, ord);
+
+    fleet_cmd(r);
+    msg = test_get_last_message(f1->msgs);
+    CuAssertStrEquals(tc, "error233", test_get_messagetype(msg));
+    CuAssertPtrEquals(tc, 0, u1->ship);
+
+    test_cleanup();
+}
+
 static void test_fleet_create_param(CuTest *tc) {
     fleet_fixture ffix;
     order *ord;
@@ -162,6 +203,8 @@ static void test_fleet_missing_param(CuTest *tc) {
     msg = test_get_last_message(ffix.u11->faction->msgs);
     CuAssertStrEquals(tc, "fleet_ship_invalid", test_get_messagetype(msg));
     CuAssertPtrEquals(tc, 0,  (ship *) ffix.sh1->fleet);
+
+    test_cleanup();
 }
 
 static void test_fleet_create_external(CuTest *tc) {
@@ -382,6 +425,41 @@ static void test_fleet_remove_wrong_fleet(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_fleet_enter(CuTest *tc) {
+    fleet_fixture ffix;
+    order *ord;
+    struct message* msg;
+    unit *v1, *v2, *v3;
+
+    test_cleanup();
+    setup_fleet();
+    init_fleet(&ffix);
+
+    v1 = test_create_unit(ffix.f1, ffix.r);
+    v2 = test_create_unit(ffix.f1, ffix.r);
+    v3 = test_create_unit(ffix.f2, ffix.r);
+    ord = create_order(K_ENTER, ffix.f1->locale, "SCHIFF %s", itoa36(ffix.sh1->no));
+    unit_addorder(v1, ord);
+    ord = create_order(K_ENTER, ffix.f1->locale, "SCHIFF %s", itoa36(ffix.fleet->no));
+    unit_addorder(v2, ord);
+    ord = create_order(K_ENTER, ffix.f2->locale, "SCHIFF %s", itoa36(ffix.sh1->no));
+    unit_addorder(v3, ord);
+
+    do_enter(ffix.r, 1);
+
+    msg = test_get_last_message(v1->faction->msgs);
+    CuAssertPtrEquals(tc, 0, msg);
+
+    CuAssertPtrEquals(tc, ffix.fleet, v1->ship);
+    CuAssertPtrEquals(tc, ffix.fleet, v2->ship);
+
+    msg = test_get_last_message(v3->faction->msgs);
+    CuAssertStrEquals(tc, "error34", test_get_messagetype(msg));
+    CuAssertPtrEquals(tc, 0, v3->ship);
+
+    test_cleanup();
+}
+
 static void test_fleet_remove_invalid(CuTest *tc) {
     fleet_fixture ffix;
     order *ord;
@@ -398,6 +476,39 @@ static void test_fleet_remove_invalid(CuTest *tc) {
 
     msg = test_get_last_message(ffix.u11->faction->msgs);
     CuAssertStrEquals(tc, "fleet_only_captain", test_get_messagetype(msg));
+
+    test_cleanup();
+}
+
+static void test_fleet_remove_nonsail(CuTest *tc) {
+    fleet_fixture ffix;
+    order *ord;
+    struct message* msg;
+    faction *f3;
+    unit *u31;
+
+    test_cleanup();
+    setup_fleet();
+    init_fixture(&ffix);
+
+    f3 = test_create_faction(test_create_race("blob"));
+    CuAssertIntEquals(tc, 0, f3->flags);
+    u31 = test_create_unit(f3, ffix.r);
+    usetcontact(u31, ffix.u11);
+
+    ord = create_order(K_FLEET, ffix.f1->locale, "%s", itoa36(ffix.sh1->no));
+    unit_addorder(ffix.u11, ord);
+    ord = create_order(K_FLEET, ffix.f1->locale, "ENTFERNE %s %s", itoa36(ffix.sh1->no), itoa36(u31->no));
+    unit_addorder(ffix.u11, ord);
+
+    fleet_cmd(ffix.r);
+
+    assert_no_fleet(tc, ffix.r, ffix.sh1, NULL);
+
+    msg = test_get_last_message(ffix.u11->faction->msgs);
+    CuAssertStrEquals(tc, "error233", test_get_messagetype(msg));
+    msg = test_get_last_message(f3->msgs);
+    CuAssertStrEquals(tc, "error233", test_get_messagetype(msg));
 
     test_cleanup();
 }
@@ -419,7 +530,6 @@ static void test_fleet_remove_invalid(CuTest *tc) {
 // LOAD: fleets of boats cannot load stone?
 
 // ENTER
-// check enter/leave
 // KINGKILLER: check owner leaves/dies
 // damage fleet
 // damage fleet multiple times
@@ -479,5 +589,8 @@ CuSuite *get_fleets_suite(void)
     SUITE_ADD_TEST(suite, test_fleet_remove2);
     SUITE_ADD_TEST(suite, test_fleet_remove_wrong_fleet);
     SUITE_ADD_TEST(suite, test_fleet_remove_invalid);
+    SUITE_ADD_TEST(suite, test_fleet_remove_nonsail);
+    SUITE_ADD_TEST(suite, test_fleet_nonsail);
+    SUITE_ADD_TEST(suite, test_fleet_enter);
     return suite;
 }
