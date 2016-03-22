@@ -51,6 +51,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* libc includes */
 #include <assert.h>
+#include <limits.h>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -171,6 +172,31 @@ struct ship *findshipr(const region * r, int n)
         }
     }
     return 0;
+}
+
+static int fleet_aggregate_int(const ship *fleet, int (aggregator) (int, int), int start_value, int (getvalue)(const ship *)) {
+    int value = start_value, count = 0;
+    ship *shp;
+    for (shp = fleet->region->ships; shp; shp = shp->next) {
+        if (shp->fleet == fleet) {
+            ++count;
+            value = aggregator(value, getvalue(shp));
+        }
+    }
+    assert(count>0);
+    return value;
+}
+
+static int aggregate_max(int i1, int i2) {
+    return _max(i1, i2);
+}
+
+static int aggregate_min(int i1, int i2) {
+    return _min(i1, i2);
+}
+
+static int aggregate_sum(int i1, int i2) {
+    return i1 + i2;
 }
 
 void damage_ship(ship * sh, double percent)
@@ -636,31 +662,24 @@ void fleet_cmd(region * r)
     }
 }
 
+static int cptskill(const ship *sh) {
+    return sh->type->cptskill;
+}
+
 int ship_type_cpt_skill(const ship *sh) {
     if (ship_isfleet(sh)) {
-        int skill = 0;
-        ship *shp;
-        for (shp = sh->region->ships; shp; shp = shp->next) {
-            if (shp->fleet == sh || shp == sh) {
-                skill = _max(skill, shp->type->cptskill);
-            }
-        }
-        return skill;
+        return _max(cptskill(sh), fleet_aggregate_int(sh, aggregate_max, INT_MIN, cptskill));
     } else
         return sh->type->cptskill;
 }
 
-bool ship_iscomplete(const ship *sh) {
-    ship *shp;
+static int shipcmplt(const ship *sh) {
+    return ship_iscomplete(sh)?1:0;
+}
 
+bool ship_iscomplete(const ship *sh) {
     if (ship_isfleet(sh)) {
-        for (shp = sh->region->ships; shp; shp = shp->next) {
-            if (shp->fleet == sh) {
-                if (!ship_iscomplete(shp))
-                    return false;
-            }
-        }
-        return true;
+        return fleet_aggregate_int(sh, aggregate_min, 1, shipcmplt) == 1;
     }
 
     if (sh->type->construction) {
@@ -672,17 +691,13 @@ bool ship_iscomplete(const ship *sh) {
     return true;
 }
 
+static int sumskill(const ship *sh) {
+    return sh->type->sumskill;
+}
+
 int ship_type_crew_skill(const ship *sh) {
     if (ship_isfleet(sh)) {
-        ship *shp;
-        int skill = 0;
-
-        for (shp = sh->region->ships; shp; shp = shp->next) {
-            if (shp->fleet == sh) {
-                skill += shp->type->sumskill;
-            }
-        }
-        return skill;
+        return fleet_aggregate_int(sh, aggregate_sum, 0, sumskill);
     }
     return sh->type->sumskill;
 }
