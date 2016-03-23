@@ -376,6 +376,39 @@ static void test_teach_two(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_teach_two_skills(CuTest *tc) {
+    unit *u1, *u2, *ut;
+    faction *f;
+    region *r;
+
+    test_cleanup();
+    init_resources();
+    f = test_create_faction(0);
+    r = test_create_region(0, 0, 0);
+    u1 = test_create_unit(f, r);
+    scale_number(u1, 5);
+    u1->thisorder = create_order(K_STUDY, f->locale, "CROSSBOW");
+    u2 = test_create_unit(f, r);
+    scale_number(u2, 5);
+    u2->thisorder = create_order(K_STUDY, f->locale, "ENTERTAINMENT");
+    ut = test_create_unit(f, r);
+    set_level(ut, SK_ENTERTAINMENT, TEACHDIFFERENCE);
+    set_level(ut, SK_CROSSBOW, TEACHDIFFERENCE);
+    ut->thisorder = create_order(K_TEACH, f->locale, "%s %s", itoa36(u1->no), itoa36(u2->no));
+    learn_inject();
+    teach_cmd(ut, ut->thisorder);
+    study_cmd(u1, u1->thisorder);
+    study_cmd(u2, u2->thisorder);
+    learn_reset();
+    CuAssertPtrEquals(tc, u1, log_learners[0].u);
+    CuAssertIntEquals(tc, SK_CROSSBOW, log_learners[0].sk);
+    CuAssertIntEquals(tc, STUDYDAYS * 2 * u1->number, log_learners[0].days);
+    CuAssertPtrEquals(tc, u2, log_learners[1].u);
+    CuAssertIntEquals(tc, SK_ENTERTAINMENT, log_learners[1].sk);
+    CuAssertIntEquals(tc, STUDYDAYS * 2 * u2->number, log_learners[1].days);
+    test_cleanup();
+}
+
 static void test_teach_one_to_many(CuTest *tc) {
     unit *u, *ut;
     test_cleanup();
@@ -468,6 +501,7 @@ CuSuite *get_study_suite(void)
     SUITE_ADD_TEST(suite, test_teach_one_to_many);
     SUITE_ADD_TEST(suite, test_teach_many_to_one);
     SUITE_ADD_TEST(suite, test_teach_many_to_many);
+    SUITE_ADD_TEST(suite, test_teach_two_skills);
     SUITE_ADD_TEST(suite, test_learn_skill_single);
     SUITE_ADD_TEST(suite, test_learn_skill_multi);
     SUITE_ADD_TEST(suite, test_study_no_teacher);
