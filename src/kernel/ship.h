@@ -104,6 +104,7 @@ extern "C" {
 
     extern const char *shipname(const struct ship *self);
     extern int ship_capacity(const struct ship *sh);
+    extern int ship_cabins(const struct ship *sh);
     extern void ship_weight(const struct ship *sh, int *weight, int *cabins);
 
     extern ship *new_ship(const struct ship_type *stype, struct region *r,
@@ -131,7 +132,8 @@ extern "C" {
     int ship_damage_percent(const struct ship *ship);
 
     bool ship_isfleet(const struct ship *sh);
-    struct ship *add_ship(struct ship *sh, struct ship *fleet, struct unit *cpt);
+    struct ship *fleet_add_ship(struct ship *sh, struct ship *fleet, struct unit *cpt);
+    struct ship *fleet_remove_ship(struct ship *sh, struct unit *new_cpt);
     void fleet_cmd(struct region * r);
 
     int ship_type_cpt_skill(const struct ship *sh);

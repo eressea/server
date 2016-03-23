@@ -1029,9 +1029,10 @@ int enter_ship(unit * u, struct order *ord, int id, bool report)
         return 0;
     }
     if (CheckOverload()) {
+        /* FIXME get rid of or refactor */
         int sweight, scabins;
         int mweight = ship_capacity(sh);
-        int mcabins = sh->type->cabins;
+        int mcabins = ship_cabins(sh);
 
         if (mweight > 0) {
             ship_weight(sh, &sweight, &scabins);

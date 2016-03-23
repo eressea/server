@@ -519,6 +519,8 @@ static void test_fleet_stats(CuTest *tc) {
     region *r;
     ship *sh1, *sh2, *sh3, *fleet;
     unit *cpt, *crew1, *crew2;
+    order *move_ord;
+    struct message *msg;
 
     test_cleanup();
     setup_fleet();
@@ -529,8 +531,8 @@ static void test_fleet_stats(CuTest *tc) {
     crew2 = test_create_unit(test_create_faction(NULL), r);
 
     stype1 = test_create_shiptype2("boat", 1, 1, 1, 2, 1000, 2000, SK_SHIPBUILDING, 5, 1, 1, 1);
-    stype2 = test_create_shiptype2("boat2", 7, 14, 1, 2, 1000, 2000, SK_SHIPBUILDING, 5, 1, 1, 1);
-    stype3 = test_create_shiptype2("boat3", 8, 10, 2, 3, 2000, 1000, SK_SHIPBUILDING, 10, 2, 1, 2);
+    stype2 = test_create_shiptype2("boat2", 7, 14, 1, 2, 1000, 2500, SK_SHIPBUILDING, 5, 1, 1, 1);
+    stype3 = test_create_shiptype2("boat3", 8, 10, 2, 3, 2000, 1500, SK_SHIPBUILDING, 10, 2, 1, 2);
 
     sh1 = test_create_ship(r, stype1);
     sh2 = test_create_ship(r, stype2);
@@ -539,10 +541,11 @@ static void test_fleet_stats(CuTest *tc) {
     CuAssertIntEquals(tc, 1, ship_type_cpt_skill(sh1));
     CuAssertIntEquals(tc, 7, ship_type_cpt_skill(sh2));
     CuAssertIntEquals(tc, 14, ship_type_crew_skill(sh2));
+    CuAssertIntEquals(tc, 1000, ship_capacity(sh1));
 
     set_level(cpt, SK_SAILING, 1);
     set_level(crew1, SK_SAILING, 2);
-    set_level(crew2, SK_SAILING, 13);
+    set_level(crew2, SK_SAILING, 6);
     u_set_ship(cpt, sh1);
     u_set_ship(crew1, sh1);
 
@@ -552,25 +555,51 @@ static void test_fleet_stats(CuTest *tc) {
     u_set_ship(crew2, sh2);
     CuAssertTrue(tc, !enoughsailors(sh2));
 
-    fleet = add_ship(sh1, NULL, cpt);
+    move_ord = create_order(K_MOVE, cpt->faction->locale, "");
+    CuAssertTrue(tc, ship_ready(r, cpt, move_ord));
+    CuAssertPtrEquals(tc, 0, test_get_last_message(cpt->faction->msgs));
+    test_clear_messages(cpt->faction);
+
+    fleet = fleet_add_ship(sh1, NULL, cpt);
     CuAssertIntEquals(tc, 6, ship_type_cpt_skill(fleet));
     CuAssertIntEquals(tc, 1, ship_type_crew_skill(fleet));
+    CuAssertIntEquals(tc, 1, fleet->size);
     CuAssertTrue(tc, enoughsailors(fleet));
 
-    fleet = add_ship(sh2, NULL, cpt);
+    set_level(cpt, SK_SAILING, 8);
+    fleet = fleet_add_ship(sh2, NULL, cpt);
     CuAssertIntEquals(tc, 7, ship_type_cpt_skill(fleet));
     CuAssertIntEquals(tc, 14, ship_type_crew_skill(fleet));
     CuAssertIntEquals(tc, 14, ship_crew_skill(fleet));
+    CuAssertIntEquals(tc, 1, fleet->size);
     CuAssertTrue(tc, enoughsailors(fleet));
+    CuAssertIntEquals(tc, 1000, ship_capacity(fleet));
+    CuAssertIntEquals(tc, 2500, ship_cabins(fleet));
+
+    CuAssertTrue(tc, ship_ready(r, cpt, move_ord));
+    CuAssertPtrEquals(tc, 0, test_get_last_message(cpt->faction->msgs));
+    test_clear_messages(cpt->faction);
 
     crew1->ship = NULL;
     u_set_ship(crew1, sh3);
 
-    fleet = add_ship(sh3, fleet, cpt);
+    fleet = fleet_add_ship(sh3, fleet, cpt);
     CuAssertIntEquals(tc, 8, ship_type_cpt_skill(fleet));
     CuAssertIntEquals(tc, 24, ship_type_crew_skill(fleet));
     CuAssertIntEquals(tc, 16, ship_crew_skill(fleet));
+    CuAssertIntEquals(tc, 2, fleet->size);
     CuAssertTrue(tc, !enoughsailors(fleet));
+    CuAssertIntEquals(tc, 3000, ship_capacity(fleet));
+    CuAssertIntEquals(tc, 4000, ship_cabins(fleet));
+
+    CuAssertTrue(tc, !ship_ready(r, cpt, move_ord));
+    msg = test_get_last_message(cpt->faction->msgs);
+    CuAssertStrEquals(tc, "error_captain_fleet_size", test_get_messagetype(msg));
+    test_clear_messages(cpt->faction);
+
+    fleet_remove_ship(sh2, cpt);
+    CuAssertIntEquals(tc, 1, fleet->size);
+    CuAssertPtrEquals(tc, 0, sh2->fleet);
 
     test_cleanup();
 }
@@ -601,16 +630,16 @@ static void test_fleet_complete(CuTest *tc) {
     CuAssertTrue(tc, !ship_iscomplete(sh2));
     CuAssertTrue(tc, ship_iscomplete(sh3));
 
-    fleet = add_ship(sh1, NULL, cpt);
+    fleet = fleet_add_ship(sh1, NULL, cpt);
     CuAssertTrue(tc, ship_iscomplete(fleet));
 
-    fleet = add_ship(sh3, fleet, cpt);
+    fleet = fleet_add_ship(sh3, fleet, cpt);
     CuAssertTrue(tc, ship_iscomplete(fleet));
 
-    fleet = add_ship(sh2, NULL, cpt);
+    fleet = fleet_add_ship(sh2, NULL, cpt);
     CuAssertTrue(tc, !ship_iscomplete(fleet));
 
-    fleet = add_ship(sh3, fleet, cpt);
+    fleet = fleet_add_ship(sh3, fleet, cpt);
     CuAssertTrue(tc, !ship_iscomplete(fleet));
 
     test_cleanup();

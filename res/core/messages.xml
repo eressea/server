@@ -8367,7 +8367,17 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Kapitän muß ein Segeltalent von mindestens $int($value) haben, um $ship($ship) zu befehligen."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The captain needs a sailing skill of at least $int($value), to command $ship($ship)."</text>
   </message>
-
+  <message name="error_captain_fleet_size" section="errors">
+    <type>
+      <arg name="region" type="region"/>
+      <arg name="unit" type="unit"/>
+      <arg name="command" type="order"/>
+      <arg name="value" type="int"/>
+      <arg name="ship" type="ship"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Kapitän muß mindestens $int($value) Personen haben, um $ship($ship) zu befehligen."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The captain needs at least $int($value) persons, to command $ship($ship)."</text>
+  </message>
   <message name="error_roads_finished" section="errors">
     <type>
       <arg name="region" type="region"/>

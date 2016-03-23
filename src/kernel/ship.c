@@ -405,8 +405,7 @@ const char *shipname(const ship * sh)
     return write_shipname(sh, ibuf, sizeof(name));
 }
 
-int ship_capacity(const ship * sh)
-{
+static int shpcargo(const ship *sh) {
     int i = sh->type->cargo;
 
     /* sonst ist construction:: size nicht ship_type::maxsize */
@@ -422,6 +421,28 @@ int ship_capacity(const ship * sh)
     return i;
 }
 
+int ship_capacity(const ship * sh)
+{
+    if (ship_isfleet(sh)) {
+        return fleet_aggregate_int(sh, aggregate_sum, 0, shpcargo);
+    }
+
+    return shpcargo(sh);
+}
+
+static int shpcabins(const ship *sh) {
+    return sh->type->cabins;
+}
+
+int ship_cabins(const ship * sh)
+{
+    if (ship_isfleet(sh)) {
+        return fleet_aggregate_int(sh, aggregate_sum, 0, shpcabins);
+    }
+
+    return shpcabins(sh);
+}
+
 void ship_weight(const ship * sh, int *sweight, int *scabins)
 {
     unit *u;
@@ -432,7 +453,7 @@ void ship_weight(const ship * sh, int *sweight, int *scabins)
     for (u = sh->region->units; u; u = u->next) {
         if (u->ship == sh) {
             *sweight += weight(u);
-            if (sh->type->cabins) {
+            if (ship_cabins(sh)) {
                 int pweight = u->number * u_race(u)->weight;
                 /* weight goes into number of cabins, not cargo */
                 *scabins += pweight;
@@ -515,7 +536,7 @@ bool ship_isfleet(const ship *sh) {
     return (sh->type == st_find("fleet"));
 }
 
-ship *add_ship(ship *sh, ship *fleet, unit *cpt) {
+ship *fleet_add_ship(ship *sh, ship *fleet, unit *cpt) {
     unit * up;
     region *r = sh->region;
 
@@ -531,7 +552,22 @@ ship *add_ship(ship *sh, ship *fleet, unit *cpt) {
         }
     }
     sh->fleet = fleet;
+    ++fleet->size;
     return fleet;
+}
+
+ship *fleet_remove_ship(ship *sh, unit *new_cpt) {
+    ship *fleet = sh->fleet;
+
+    if (--fleet->size == 0)
+        remove_ship(&fleet->region->ships, fleet);
+    sh->fleet = NULL;
+
+    if (new_cpt) {
+        new_cpt->ship = 0;
+        u_set_ship(new_cpt, sh);
+    }
+    return fleet->size > 0 ? fleet : NULL;
 }
 
 void fleet_cmd(region * r)
@@ -608,16 +644,13 @@ void fleet_cmd(region * r)
                     }
 
                     if (u->ship && ship_isfleet(u->ship)) {
-                        add_ship(sh, u->ship, u);
+                        fleet_add_ship(sh, u->ship, u);
                     } else {
-                        add_ship(sh, NULL, u);
+                        fleet_add_ship(sh, NULL, u);
                     }
 
                 } else {
                     /* remove ship */
-                    ship *shp;
-                    int size = 0;
-
                     if (!u->ship || !ship_isfleet(u->ship) || u != ship_owner(u->ship)) {
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "fleet_only_captain", "id", id));
                         break;
@@ -640,18 +673,7 @@ void fleet_cmd(region * r)
                         break;
                     }
 
-                    for (shp = r->ships; shp; shp = shp->next) {
-                        if (shp->fleet == u->ship)
-                            ++size;
-                    }
-                    if (size == 1)
-                        remove_ship(&r->ships, sh->fleet);
-                    sh->fleet = NULL;
-
-                    if (cpt) {
-                        cpt->ship = 0;
-                        u_set_ship(cpt, sh);
-                    }
+                    fleet_remove_ship(sh, cpt);
                 }
             }
             if (*ordp == ord)

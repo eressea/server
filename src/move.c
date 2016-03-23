@@ -475,7 +475,7 @@ static bool cansail(const region * r, ship * sh)
     else {
         int n = 0, p = 0;
         int mweight = ship_capacity(sh);
-        int mcabins = sh->type->cabins;
+        int mcabins = ship_cabins(sh);
 
         ship_weight(sh, &n, &p);
 
@@ -497,7 +497,7 @@ static double overload(const region * r, ship * sh)
         return DBL_MAX;
     } else {
         int n = 0, p = 0;
-        int mcabins = sh->type->cabins;
+        int mcabins = ship_cabins(sh);
 
         ship_weight(sh, &n, &p);
 
@@ -1720,27 +1720,34 @@ static const region_list *travel_route(unit * u,
     return iroute;
 }
 
-static bool ship_ready(const region * r, unit * u, order * ord)
+bool ship_ready(const region * r, unit * u, order * ord)
 {
-    if (!u->ship || u != ship_owner(u->ship)) {
+    ship *sh = u->ship;
+
+    if (!sh || u != ship_owner(sh)) {
         cmistake(u, ord, 146, MSG_MOVE);
         return false;
     }
-    if (effskill(u, SK_SAILING, r) < ship_type_cpt_skill(u->ship)) {
+    if (effskill(u, SK_SAILING, r) < ship_type_cpt_skill(sh)) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
-            "error_captain_skill_low", "value ship", u->ship->type->cptskill,
-            u->ship));
+            "error_captain_skill_low", "value ship", ship_type_cpt_skill(sh),
+            sh));
         return false;
     }
-    if (!ship_iscomplete(u->ship)) {
+    if (ship_isfleet(sh) && u->number < sh->size) {
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
+            "error_captain_fleet_size", "value ship", sh->size, sh));
+        return false;
+    }
+    if (!ship_iscomplete(sh)) {
         cmistake(u, ord, 15, MSG_MOVE);
         return false;
     }
-    if (!enoughsailors(u->ship)) {
+    if (!enoughsailors(sh)) {
         cmistake(u, ord, 1, MSG_MOVE);
         return false;
     }
-    if (!cansail(r, u->ship)) {
+    if (!cansail(r, sh)) {
         cmistake(u, ord, 18, MSG_MOVE);
         return false;
     }
