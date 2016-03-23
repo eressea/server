@@ -73,6 +73,7 @@ struct locale * test_create_locale(void) {
     if (!loc) {
         int i;
         loc = get_or_create_locale("test");
+        locale_setstring(loc, "factiondefault", parameters[P_FACTION]);
         for (i = 0; i < MAXSKILLS; ++i) {
             if (!locale_getstring(loc, mkname("skill", skillnames[i])))
                 locale_setstring(loc, mkname("skill", skillnames[i]), skillnames[i]);
@@ -85,7 +86,10 @@ struct locale * test_create_locale(void) {
         for (i = 0; i <= ST_FLEE; ++i) {
             locale_setstring(loc, combatstatus[i], combatstatus[i]+7);
         }
-        locale_setstring(loc, parameters[P_ANY], "ALLE");
+        for (i = 0; i != MAXPARAMS; ++i) {
+            locale_setstring(loc, parameters[i], parameters[i]);
+            test_translate_param(loc, i, parameters[i]);
+        }
         init_parameters(loc);
         init_skills(loc);
     }
