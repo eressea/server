@@ -54,7 +54,7 @@ struct region *test_create_region(int x, int y, const terrain_type *terrain)
     if (!terrain) {
         terrain_type *t = get_or_create_terrain("plain");
         t->size = 1000;
-        fset(t, LAND_REGION|CAVALRY_REGION|FOREST_REGION);
+        fset(t, LAND_REGION|CAVALRY_REGION|FOREST_REGION|FLY_INTO|WALK_INTO|SAIL_INTO);
         terraform_region(r, t);
     }
     else {
@@ -86,6 +86,12 @@ struct locale * test_create_locale(void) {
         for (i = 0; i <= ST_FLEE; ++i) {
             locale_setstring(loc, combatstatus[i], combatstatus[i]+7);
         }
+        for (i = 0; i != MAXKEYWORDS; ++i) {
+            locale_setstring(loc, mkname("keyword", keywords[i]), keywords[i]);
+        }
+        for (i = 0; i != MAXSKILLS; ++i) {
+            locale_setstring(loc, mkname("skill", skillnames[i]), skillnames[i]);
+        }
         for (i = 0; i != MAXPARAMS; ++i) {
             locale_setstring(loc, parameters[i], parameters[i]);
             test_translate_param(loc, i, parameters[i]);
@@ -116,6 +122,7 @@ void test_cleanup(void)
 {
     int i;
 
+    default_locale = 0;
     free_gamedata();
     free_terrains();
     free_resources();

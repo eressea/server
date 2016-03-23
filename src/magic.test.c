@@ -387,12 +387,11 @@ void test_multi_cast(CuTest *tc) {
     sp->cast = cast_fireball;
     CuAssertPtrEquals(tc, sp, find_spell("fireball"));
 
-    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
-    u->faction->locale = lang = get_or_create_locale("de");
-    locale_setstring(lang, parameters[P_ANY], "ALLE");
-    init_parameters(lang);
+    lang = test_create_locale();
     locale_setstring(lang, mkname("spell", sp->sname), "Feuerball");
     CuAssertStrEquals(tc, "Feuerball", spell_name(sp, lang));
+
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     set_level(u, SK_MAGIC, 10);
     unit_add_spell(u, 0, sp, 1);
     CuAssertPtrEquals(tc, sp, unit_getspell(u, "Feuerball", lang));
