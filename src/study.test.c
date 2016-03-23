@@ -349,6 +349,33 @@ static void test_teach_cmd(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_teach_two(CuTest *tc) {
+    unit *u1, *u2, *ut;
+    test_cleanup();
+    init_resources();
+    u1 = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    scale_number(u1, 5);
+    u1->thisorder = create_order(K_STUDY, u1->faction->locale, "CROSSBOW");
+    u2 = test_create_unit(u1->faction, u1->region);
+    scale_number(u2, 5);
+    u2->thisorder = create_order(K_STUDY, u2->faction->locale, "CROSSBOW");
+    ut = test_create_unit(u1->faction, u1->region);
+    set_level(ut, SK_CROSSBOW, TEACHDIFFERENCE);
+    ut->thisorder = create_order(K_TEACH, ut->faction->locale, "%s %s", itoa36(u1->no), itoa36(u2->no));
+    learn_inject();
+    teach_cmd(ut, ut->thisorder);
+    study_cmd(u1, u1->thisorder);
+    study_cmd(u2, u2->thisorder);
+    learn_reset();
+    CuAssertPtrEquals(tc, u1, log_learners[0].u);
+    CuAssertIntEquals(tc, SK_CROSSBOW, log_learners[0].sk);
+    CuAssertIntEquals(tc, STUDYDAYS * 2 * u1->number, log_learners[0].days);
+    CuAssertPtrEquals(tc, u2, log_learners[1].u);
+    CuAssertIntEquals(tc, SK_CROSSBOW, log_learners[1].sk);
+    CuAssertIntEquals(tc, STUDYDAYS * 2 * u2->number, log_learners[1].days);
+    test_cleanup();
+}
+
 static void test_teach_too_many(CuTest *tc) {
     unit *u, *ut;
     test_cleanup();
@@ -375,6 +402,7 @@ CuSuite *get_study_suite(void)
     SUITE_ADD_TEST(suite, test_study_cmd);
     SUITE_ADD_TEST(suite, test_study_cost);
     SUITE_ADD_TEST(suite, test_teach_cmd);
+    SUITE_ADD_TEST(suite, test_teach_two);
     SUITE_ADD_TEST(suite, test_teach_too_many);
     SUITE_ADD_TEST(suite, test_learn_skill_single);
     SUITE_ADD_TEST(suite, test_learn_skill_multi);
