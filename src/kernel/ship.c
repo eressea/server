@@ -339,15 +339,13 @@ int ship_speed(const ship * sh, const unit * u)
     if (!u) return 0;
     assert(u->ship == sh);
     assert(u == ship_owner(sh));
-    assert(sh->type->construction);
-    assert(sh->type->construction->improvement == NULL);  /* sonst ist construction::size nicht ship_type::maxsize */
 
     if (!init) {
         init = true;
         stormwind_ct = ct_find("stormwind");
         nodrift_ct = ct_find("nodrift");
     }
-    if (sh->size != sh->type->construction->maxsize)
+    if (!ship_iscomplete(sh))
         return 0;
 
     if (curse_active(get_curse(sh->attribs, stormwind_ct)))
@@ -408,11 +406,8 @@ const char *shipname(const ship * sh)
 static int shpcargo(const ship *sh) {
     int i = sh->type->cargo;
 
-    /* sonst ist construction:: size nicht ship_type::maxsize */
-    assert(!sh->type->construction
-        || sh->type->construction->improvement == NULL);
 
-    if (sh->type->construction && sh->size != sh->type->construction->maxsize)
+    if (!ship_iscomplete(sh))
         return 0;
 
     if (sh->damage) {

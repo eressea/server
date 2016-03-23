@@ -465,11 +465,7 @@ static int canride(unit * u)
 
 static bool cansail(const region * r, ship * sh)
 {
-    /* sonst ist construction:: size nicht ship_type::maxsize */
-    assert(!sh->type->construction
-        || sh->type->construction->improvement == NULL);
-
-    if (sh->type->construction && sh->size != sh->type->construction->maxsize) {
+    if (!ship_iscomplete(sh)) {
         return false;
     }
     else {
@@ -489,11 +485,7 @@ static bool cansail(const region * r, ship * sh)
 
 static double overload(const region * r, ship * sh)
 {
-    /* sonst ist construction:: size nicht ship_type::maxsize */
-    assert(!sh->type->construction
-        || sh->type->construction->improvement == NULL);
-
-    if (sh->type->construction && sh->size != sh->type->construction->maxsize) {
+    if (!ship_iscomplete(sh)) {
         return DBL_MAX;
     } else {
         int n = 0, p = 0;
@@ -818,9 +810,7 @@ static void drifting_ships(region * r)
             /* Kapitän da? Beschädigt? Genügend Matrosen?
              * Genügend leicht? Dann ist alles OK. */
 
-            assert(sh->type->construction->improvement == NULL); /* sonst ist construction::size nicht ship_type::maxsize */
-            if (captain && sh->size == sh->type->construction->maxsize
-                && enoughsailors(sh) && cansail(r, sh)) {
+            if (ship_iscomplete(sh) && enoughsailors(sh) && cansail(r, sh)) {
                 shp = &sh->next;
                 continue;
             }

@@ -2730,7 +2730,7 @@ void sinkships(struct region * r)
     while (*shp) {
         ship *sh = *shp;
 
-        if (!sh->type->construction || sh->size >= sh->type->construction->maxsize) {
+        if (ship_iscomplete(sh)) {
             if (fval(r->terrain, SEA_REGION)) {
                 if (!enoughsailors(sh)) {
                     // ship is at sea, but not enough people to control it

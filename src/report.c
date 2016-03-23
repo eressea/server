@@ -1816,8 +1816,7 @@ const unit * captain)
     if (wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
 
-    assert(sh->type->construction->improvement == NULL);  /* sonst ist construction::size nicht ship_type::maxsize */
-    if (sh->size != sh->type->construction->maxsize) {
+    if (!ship_iscomplete(sh)) {
         bytes = _snprintf(bufp, size, ", %s (%d/%d)",
             LOC(f->locale, "nr_undercons"), sh->size,
             sh->type->construction->maxsize);
