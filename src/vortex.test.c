@@ -9,6 +9,7 @@
 #include <kernel/region.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
+#include <kernel/faction.h>
 #include <kernel/race.h>
 
 #include <util/language.h>
@@ -30,6 +31,7 @@ static void test_move_to_vortex(CuTest *tc) {
     r2 = test_create_region(5, 0, t_plain);
     CuAssertPtrNotNull(tc, create_special_direction(r1, r2, 10, "", "vortex", true));
     u = test_create_unit(test_create_faction(rc_get_or_create("hodor")), r1);
+    u->faction->locale = lang;
     CuAssertIntEquals(tc, E_MOVE_NOREGION, movewhere(u, "barf", r1, &r));
     CuAssertIntEquals(tc, E_MOVE_OK, movewhere(u, "wirbel", r1, &r));
     CuAssertPtrEquals(tc, r2, r);

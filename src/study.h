@@ -36,7 +36,7 @@ extern "C" {
     int study_cost(struct unit *u, skill_t talent);
 
 #ifndef NO_TESTS
-    typedef bool(*learn_fun)(struct unit *u, skill_t sk, double ch);
+    typedef void(*learn_fun)(struct unit *u, skill_t sk, int days);
     void inject_learn(learn_fun fun);
 #endif
 

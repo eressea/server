@@ -3,6 +3,7 @@
 #include "keyword.h"
 #include "seen.h"
 #include "prefix.h"
+#include "reports.h"
 
 #include <kernel/config.h>
 #include <kernel/plane.h>
@@ -67,9 +68,34 @@ struct region *test_create_region(int x, int y, const terrain_type *terrain)
     return r;
 }
 
+struct locale * test_create_locale(void) {
+    struct locale *loc = get_locale("test");
+    if (!loc) {
+        int i;
+        loc = get_or_create_locale("test");
+        for (i = 0; i < MAXSKILLS; ++i) {
+            if (!locale_getstring(loc, mkname("skill", skillnames[i])))
+                locale_setstring(loc, mkname("skill", skillnames[i]), skillnames[i]);
+        }
+        for (i = 0; i != MAXDIRECTIONS; ++i) {
+            locale_setstring(loc, directions[i], directions[i]);
+            init_direction(loc, i, directions[i]);
+            init_direction(loc, i, coasts[i]+7);
+        }
+        for (i = 0; i <= ST_FLEE; ++i) {
+            locale_setstring(loc, combatstatus[i], combatstatus[i]+7);
+        }
+        locale_setstring(loc, parameters[P_ANY], "ALLE");
+        init_parameters(loc);
+        init_skills(loc);
+    }
+    return loc;
+}
+
 struct faction *test_create_faction(const struct race *rc)
 {
-    faction *f = addfaction("nobody@eressea.de", NULL, rc ? rc : test_create_race("human"), default_locale, 0);
+    struct locale * loc = test_create_locale();
+    faction *f = addfaction("nobody@eressea.de", NULL, rc ? rc : test_create_race("human"), loc, 0);
     test_clear_messages(f);
     return f;
 }

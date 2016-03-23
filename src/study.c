@@ -820,11 +820,6 @@ void inject_learn(learn_fun fun) {
 bool learn_skill_depr(unit * u, skill_t sk, double learn_chance)
 {
     skill *sv = u->skills;
-#ifndef NO_TESTS
-    if (inject_learn_fun) {
-        return inject_learn_fun(u, sk, learn_chance);
-    }
-#endif
     if (learn_chance < 1.0 && rng_int() % 10000 >= learn_chance * 10000)
         if (!chance(learn_chance)) // FIXME: this nested if looks as if we are rolling twice!
             return false;
@@ -849,6 +844,12 @@ bool learn_skill_depr(unit * u, skill_t sk, double learn_chance)
 void learn_skill(unit *u, skill_t sk, int days) {
     int leveldays = STUDYDAYS * u->number;
     int weeks = 0;
+#ifndef NO_TESTS
+    if (inject_learn_fun) {
+        inject_learn_fun(u, sk, days);
+        return;
+    }
+#endif
     while (days >= leveldays) {
         ++weeks;
         days -= leveldays;

@@ -488,10 +488,6 @@ static void test_follow_ship_msg(CuTest * tc) {
     td->dir = D_NORTHWEST;
     td->age = 2;
 
-    locale_setstring(default_locale, "northwest", "Nordwesten");
-    locale_setstring(default_locale, "keyword::move", "NACH");
-    init_locale(default_locale);
-
     mt_register(mt_new_va("error18", "unit:unit", "region:region", "command:order", 0));
 
     init_order(ord);
