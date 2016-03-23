@@ -299,12 +299,33 @@ static void test_study_cmd(CuTest *tc) {
     test_cleanup();
     init_resources();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
-    u->thisorder = create_order(K_STUDY, u->faction->locale, "ALCHEMY");
+    u->thisorder = create_order(K_STUDY, u->faction->locale, "CROSSBOW");
     learn_inject();
     study_cmd(u, u->thisorder);
     learn_reset();
     CuAssertPtrEquals(tc, u, log_learners[0].u);
-    CuAssertIntEquals(tc, SK_ALCHEMY, log_learners[0].sk);
+    CuAssertIntEquals(tc, SK_CROSSBOW, log_learners[0].sk);
+    CuAssertIntEquals(tc, 30, log_learners[0].days);
+    test_cleanup();
+}
+
+static void test_teach_cmd(CuTest *tc) {
+    unit *u, *ut;
+    test_cleanup();
+    init_resources();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    scale_number(u, 10);
+    u->thisorder = create_order(K_STUDY, u->faction->locale, "CROSSBOW");
+    ut = test_create_unit(u->faction, u->region);
+    set_level(ut, SK_CROSSBOW, TEACHDIFFERENCE);
+    ut->thisorder = create_order(K_TEACH, u->faction->locale, itoa36(u->no));
+    learn_inject();
+    teach_cmd(ut, ut->thisorder);
+    study_cmd(u, u->thisorder);
+    learn_reset();
+    CuAssertPtrEquals(tc, u, log_learners[0].u);
+    CuAssertIntEquals(tc, SK_CROSSBOW, log_learners[0].sk);
+    CuAssertIntEquals(tc, 600, log_learners[0].days);
     test_cleanup();
 }
 
@@ -312,6 +333,7 @@ CuSuite *get_study_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_study_cmd);
+    SUITE_ADD_TEST(suite, test_teach_cmd);
     SUITE_ADD_TEST(suite, test_learn_skill_single);
     SUITE_ADD_TEST(suite, test_learn_skill_multi);
     SUITE_ADD_TEST(suite, test_study_no_teacher);

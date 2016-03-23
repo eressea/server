@@ -460,7 +460,6 @@ static void test_follow_ship_msg(CuTest * tc) {
     const ship_type *stype;
     message *msg;
     order *ord;
-
     traveldir *td = NULL;
     attrib *a;
 
