@@ -2,6 +2,7 @@
 #include "move.h"
 
 #include <kernel/build.h>
+#include <kernel/building.h>
 #include <kernel/config.h>
 #include <kernel/faction.h>
 #include <kernel/order.h>
@@ -43,7 +44,7 @@ static void setup_fleet(void) {
 
     ftype = st_get_or_create("fleet");
     ftype->cptskill = 6;
-    test_create_shiptype2("boat", 1, 1, 1, 2, 2000, 0, SK_SHIPBUILDING, 5, 1, 1, 1);
+    test_create_shiptype2("boat", 1, 1, 1, 2, 2000, 0, 5, 1, 1, 1);
 
     config_set("rules.ship.storms", "0");
 }
@@ -538,9 +539,9 @@ static void test_fleet_stats(CuTest *tc) {
     crew1 = test_create_unit(test_create_faction(NULL), r);
     crew2 = test_create_unit(test_create_faction(NULL), r);
 
-    stype1 = test_create_shiptype2("boat", 1, 1, 1, 2, 1000, 2000, SK_SHIPBUILDING, 5, 1, 1, 1);
-    stype2 = test_create_shiptype2("boat2", 7, 14, 1, 2, 1000, 2500, SK_SHIPBUILDING, 5, 1, 1, 1);
-    stype3 = test_create_shiptype2("boat3", 8, 10, 2, 3, 2000, 1500, SK_SHIPBUILDING, 10, 2, 1, 2);
+    stype1 = test_create_shiptype2("boat", 1, 1, 1, 2, 1000, 2000, 5, 1, 1, 1);
+    stype2 = test_create_shiptype2("boat2", 7, 14, 1, 2, 1000, 2500, 5, 1, 1, 1);
+    stype3 = test_create_shiptype2("boat3", 8, 10, 2, 3, 2000, 1500, 10, 2, 1, 2);
 
     sh1 = test_create_ship(r, stype1);
     sh2 = test_create_ship(r, stype2);
@@ -624,10 +625,10 @@ static void test_fleet_complete(CuTest *tc) {
     r = test_create_region(0, 0, NULL);
     cpt = test_create_unit(test_create_faction(NULL), r);
 
-    stype1 = test_create_shiptype2("boat", 1, 1, 1, 2, 1000, 2000, SK_SHIPBUILDING, 5, 1, 1, 1);
+    stype1 = test_create_shiptype2("boat", 1, 1, 1, 2, 1000, 2000, 5, 1, 1, 1);
     stype1->construction = NULL;
-    stype2 = test_create_shiptype2("boat2", 7, 14, 1, 2, 1000, 2000, SK_SHIPBUILDING, 5, 1, 1, 1);
-    stype3 = test_create_shiptype2("boat3", 8, 10, 2, 3, 2000, 1000, SK_SHIPBUILDING, 10, 2, 1, 2);
+    stype2 = test_create_shiptype2("boat2", 7, 14, 1, 2, 1000, 2000, 5, 1, 1, 1);
+    stype3 = test_create_shiptype2("boat3", 8, 10, 2, 3, 2000, 1000, 10, 2, 1, 2);
 
     sh1 = test_create_ship(r, stype1);
     sh2 = test_create_ship(r, stype2);
@@ -662,7 +663,7 @@ static ship *add_ship(ship **fleet, unit *cpt, int speed) {
         r = findregion(0,0);
 
     sprintf(s, "ship%d", *fleet?(*fleet)->size+1:1);
-    stype = test_create_shiptype2(s, 1, 1, 1, speed, 1000, 1000, SK_SHIPBUILDING, 10, 1, 1, 1);
+    stype = test_create_shiptype2(s, 1, 1, 1, speed, 1000, 1000, 10, 1, 1, 1);
     sh = test_create_ship(r, stype);
     *fleet = fleet_add_ship(sh, *fleet, cpt);
 
@@ -735,6 +736,94 @@ static void test_move_ship(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_check_ship_allowed(CuTest *tc) {
+    fleet_fixture ffix;
+    ship_type *stype;
+    ship *sh;
+    building_type* btype;
+    building *b;
+    unit *u1, *u2;
+
+    test_cleanup();
+    setup_fleet();
+    init_fleet(&ffix);
+
+    CuAssertIntEquals(tc, SA_COAST, check_ship_allowed(ffix.fleet, ffix.r));
+    CuAssertIntEquals(tc, SA_COAST, check_ship_allowed(ffix.fleet, ffix.r2));
+    stype = test_create_shiptype2("fuzzyship", 1, 1, 1, 1, 1000, 1000, 10, 1, 1, 0);
+    sh = test_create_ship(ffix.r, stype);
+    fleet_add_ship(sh, ffix.fleet, NULL);
+    CuAssertIntEquals(tc, SA_NO_COAST, check_ship_allowed(ffix.fleet, ffix.r));
+
+    btype = test_create_buildingtype("harbour");
+    b = test_create_building(ffix.r, btype);
+    b->flags |= BLD_WORKING;
+
+    CuAssertIntEquals(tc, SA_HARBOUR, check_ship_allowed(ffix.fleet, ffix.r));
+
+    u1 = test_create_unit(ffix.f1, ffix.r);
+    u_set_building(u1, b);
+    building_set_owner(u1);
+    CuAssertIntEquals(tc, SA_HARBOUR, check_ship_allowed(ffix.fleet, ffix.r));
+
+    u2 = test_create_unit(ffix.f2, ffix.r);
+    u_set_building(u2, b);
+    building_set_owner(u2);
+    CuAssertIntEquals(tc, SA_NO_COAST, check_ship_allowed(ffix.fleet, ffix.r));
+
+    test_cleanup();
+}
+
+static void test_fleet_coast(CuTest *tc) {
+    fleet_fixture ffix;
+    order *ord;
+    struct message* msg;
+    ship *fleet;
+
+    test_cleanup();
+    setup_fleet();
+    init_fixture(&ffix);
+
+    ord = create_order(K_FLEET, ffix.f1->locale, "%s", itoa36(ffix.sh1->no));
+    unit_addorder(ffix.u11, ord);
+    ord = create_order(K_FLEET, ffix.f1->locale, "%s", itoa36(ffix.sh2->no));
+    unit_addorder(ffix.u11, ord);
+
+    ffix.sh1->coast = D_WEST;
+    ffix.sh2->coast = D_NORTHWEST;
+
+    fleet_cmd(ffix.r);
+
+    msg = test_get_last_message(ffix.u11->faction->msgs);
+    CuAssertStrEquals(tc, "fleet_ship_invalid", test_get_messagetype(msg));
+
+    fleet = ffix.sh1->fleet;
+    CuAssertIntEquals_Msg(tc, "ship stays on coast", D_WEST, ffix.sh1->coast);
+    CuAssertIntEquals_Msg(tc, "fleet should be on ship's cost", D_WEST, fleet->coast);
+    CuAssertIntEquals(tc, 1 , fleet->size);
+
+    add_ship(&ffix.sh1->fleet, NULL, 1);
+    fleet_remove_ship(ffix.sh1, NULL);
+    CuAssertIntEquals_Msg(tc, "fleet coast reset", NODIRECTION, fleet->coast);
+
+    test_cleanup();
+}
+
+static void test_fleet_setcoast(CuTest *tc) {
+    fleet_fixture ffix;
+
+    test_cleanup();
+    setup_fleet();
+    init_fleet(&ffix);
+
+    set_coast(ffix.sh1->fleet, ffix.r2, ffix.r);
+
+    CuAssertIntEquals(tc, D_WEST, ffix.sh1->fleet->coast);
+    CuAssertIntEquals(tc, D_WEST, ffix.sh1->coast);
+    CuAssertIntEquals(tc, D_WEST, ffix.sh2->coast);
+
+    test_cleanup();
+}
 static void test_fleet_move(CuTest *tc) {
     fleet_fixture ffix;
     order *ord;
@@ -773,7 +862,7 @@ static void test_fleet_move(CuTest *tc) {
     CuAssertPtrEquals_Msg(tc, "fleet does not have speed 2", findregion(-1, 1), ffix.sh2->region);
     CuAssertPtrEquals_Msg(tc, "fleet does not have speed 2", findregion(-1, 1), ffix.fleet->region);
 
-     /* TODO check_ship_allowed, can_takeoff, move_blocked, maelstrom, set_coast, move_ship, harbourmaster */
+     /* TODO maelstrom, set_coast, move_ship, harbourmaster */
 
     test_cleanup();
 }
@@ -860,6 +949,9 @@ CuSuite *get_fleets_suite(void)
     SUITE_ADD_TEST(suite, test_fleet_complete);
     SUITE_ADD_TEST(suite, test_fleet_speed);
     SUITE_ADD_TEST(suite, test_move_ship);
+    SUITE_ADD_TEST(suite, test_check_ship_allowed);
+    SUITE_ADD_TEST(suite, test_fleet_coast);
+    SUITE_ADD_TEST(suite, test_fleet_setcoast);
     SUITE_ADD_TEST(suite, test_fleet_move);
     return suite;
 }

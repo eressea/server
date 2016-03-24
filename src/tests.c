@@ -177,12 +177,12 @@ ship * test_create_ship(region * r, const ship_type * stype)
 
 ship_type * test_create_shiptype(const char * name)
 {
-    return test_create_shiptype2(name, 1, 1, 1, 2, 1000, 0, SK_SHIPBUILDING, 5, 1, 1, 1);
+    return test_create_shiptype2(name, 1, 1, 1, 2, 1000, 0, 5, 1, 1, 1);
 }
 
 ship_type * test_create_shiptype2(const char * name,
     int cptskill, int sumskill, int minskill, int range, int cargo, int cabins,
-    skill_t cskill, int cmaxsize, int cminskill, int creqsize, int coasts)
+    int cmaxsize, int cminskill, int creqsize, int coasts)
 {
     int c;
     ship_type * stype = st_get_or_create(name);
@@ -199,16 +199,18 @@ ship_type * test_create_shiptype2(const char * name,
         stype->construction->maxsize = cmaxsize;
         stype->construction->minskill = cminskill;
         stype->construction->reqsize = creqsize;
-        stype->construction->skill = cskill;
+        stype->construction->skill = SK_SHIPBUILDING;
     }
 
     stype->coasts =
         (terrain_type **)calloc(coasts + 1, sizeof(terrain_type *));
-    stype->coasts[0] = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION | SAIL_INTO | FLY_INTO);
-    for (c = 1; c < coasts; ++c) {
-        char s[255];
-        sprintf(s, "plain%d", c);
-        stype->coasts[c] = test_create_terrain(s, LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION | SAIL_INTO | FLY_INTO);
+    if (coasts > 0) {
+        stype->coasts[0] = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION | SAIL_INTO | FLY_INTO);
+        for (c = 1; c < coasts; ++c) {
+            char s[255];
+            sprintf(s, "plain%d", c);
+            stype->coasts[c] = test_create_terrain(s, LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION | SAIL_INTO | FLY_INTO);
+        }
     }
     stype->coasts[coasts] = NULL;
     if (default_locale) {

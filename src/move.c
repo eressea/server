@@ -670,9 +670,21 @@ static bool is_freezing(const unit * u)
     return true;
 }
 
+static int shipcheckcoast(ship *sh, void *state) {
+    int c;
+    region *r = (region *) state;
+    if (sh->type->coasts) {
+        for (c = 0; sh->type->coasts[c] != NULL; ++c) {
+            if (sh->type->coasts[c] == r->terrain) {
+                return SA_COAST;
+            }
+        }
+    }
+    return SA_NO_COAST;
+}
+
 int check_ship_allowed(struct ship *sh, const region * r)
 {
-    int c = 0;
     const building_type *bt_harbour = NULL;
     bt_harbour = bt_find("harbour");
 
@@ -710,18 +722,25 @@ int check_ship_allowed(struct ship *sh, const region * r)
     if (fval(r->terrain, SEA_REGION)) {
         return SA_COAST;
     }
-    if (sh->type->coasts) {
-        for (c = 0; sh->type->coasts[c] != NULL; ++c) {
-            if (sh->type->coasts[c] == r->terrain) {
-                return SA_COAST;
-            }
-        }
+
+    if (ship_isfleet(sh)) {
+        return fleet_aggregate_int(sh, aggregate_min, SA_COAST, shipcheckcoast, (void *) r);
+    } else {
+        return shipcheckcoast(sh, (void *) r);
     }
     return SA_NO_COAST;
 }
 
-static void set_coast(ship * sh, region * r, region * rnext)
-{
+typedef struct setcoast_state {
+    const region *r;
+    const region *rnext;
+} setcoast_state;
+
+static int setcoast(ship *sh, void *state) {
+    setcoast_state *sstate = (setcoast_state *)state;
+    const region *r = sstate->r;
+    const region *rnext = sstate->rnext;
+
     if (sh->type->flags & SFL_NOCOAST) {
         sh->coast = NODIRECTION;
     }
@@ -732,6 +751,14 @@ static void set_coast(ship * sh, region * r, region * rnext)
     else {
         sh->coast = NODIRECTION;
     }
+    return 0;
+}
+
+void set_coast(ship * sh, const region * r, const region * rnext)
+{
+    setcoast_state state = { r, rnext};
+
+    fleet_visit(sh, setcoast, &state);
 }
 
 static double overload_start(void) {
@@ -1781,6 +1808,7 @@ unit *owner_buildingtyp(const region * r, const building_type * bt)
 /* Prüft, ob Ablegen von einer Küste in eine der erlaubten Richtungen erfolgt. */
 bool can_takeoff(const ship * sh, const region * from, const region * to)
 {
+    /* no special treatment for fleets because fleet->coast is already set in fleet_add/remove */
     if (!fval(from->terrain, SEA_REGION) && sh->coast != NODIRECTION) {
         direction_t coast = sh->coast;
         direction_t dir = reldirection(from, to);
