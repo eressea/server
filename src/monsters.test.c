@@ -212,7 +212,7 @@ static void test_monsters_learn_exp(CuTest * tc)
     skill* sk;
 
     create_monsters(&f, &f2, &u, &m);
-    config_set("study.from_use", "1");
+    config_set("study.produceexp", "30");
 
     u_setrace(u, u_race(m));
     produceexp(u, SK_MELEE, u->number);

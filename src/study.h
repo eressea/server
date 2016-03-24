@@ -41,11 +41,10 @@ extern "C" {
 #endif
 
 #define STUDYDAYS 30
-    bool learn_skill_depr(struct unit *u, skill_t sk, double chance);
     void learn_skill(struct unit *u, skill_t sk, int days);
 
     void produceexp(struct unit *u, skill_t sk, int n);
-    void produceexp_ex(struct unit *u, skill_t sk, int n, bool(*learn)(struct unit *, skill_t, double));
+    void produceexp_ex(struct unit *u, skill_t sk, int n, learn_fun learn);
 
     void demon_skillchange(struct unit *u);
 

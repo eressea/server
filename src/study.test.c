@@ -141,16 +141,14 @@ static void test_study_bug_2194(CuTest *tc) {
 
 static CuTest *g_tc;
 
-static bool cb_learn_one(unit *u, skill_t sk, double chance) {
+static void cb_learn_one(unit *u, skill_t sk, int days) {
     CuAssertIntEquals(g_tc, SK_ALCHEMY, sk);
-    CuAssertDblEquals(g_tc, 0.5 / u->number, chance, 0.01);
-    return false;
+    CuAssertIntEquals(g_tc, 10, days);
 }
 
-static bool cb_learn_two(unit *u, skill_t sk, double chance) {
+static void cb_learn_two(unit *u, skill_t sk, int days) {
     CuAssertIntEquals(g_tc, SK_ALCHEMY, sk);
-    CuAssertDblEquals(g_tc, 2 * 0.5 / u->number, chance, 0.01);
-    return false;
+    CuAssertIntEquals(g_tc, 20, days);
 }
 
 static void test_produceexp(CuTest *tc) {
@@ -159,7 +157,8 @@ static void test_produceexp(CuTest *tc) {
     g_tc = tc;
     test_cleanup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
-    config_set("study.from_use", "0.5");
+    scale_number(u, 2);
+    config_set("study.produceexp", "20");
     produceexp_ex(u, SK_ALCHEMY, 1, cb_learn_one);
     produceexp_ex(u, SK_ALCHEMY, 2, cb_learn_two);
     test_cleanup();

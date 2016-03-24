@@ -790,23 +790,22 @@ int study_cmd(unit * u, order * ord)
     return 0;
 }
 
-static double produceexp_chance(void) {
-    return config_get_flt("study.from_use", 1.0 / 3);
+static int produceexp_days(void) {
+    return config_get_int("study.produceexp", 10);
 }
 
-void produceexp_ex(struct unit *u, skill_t sk, int n, bool(*learn)(unit *, skill_t, double))
+void produceexp_ex(struct unit *u, skill_t sk, int n, learn_fun learn)
 {
-    if (n != 0 && (is_monsters(u->faction) || playerrace(u_race(u)))) {
-        double chance = produceexp_chance();
-        if (chance > 0.0F) {
-            learn(u, sk, (n * chance) / u->number);
-        }
+    assert(u && n <= u->number);
+    if (n > 0 && (is_monsters(u->faction) || playerrace(u_race(u)))) {
+        int days = produceexp_days();
+        learn(u, sk, days * n / u->number);
     }
 }
 
 void produceexp(struct unit *u, skill_t sk, int n)
 {
-    produceexp_ex(u, sk, n, learn_skill_depr);
+    produceexp_ex(u, sk, n, learn_skill);
 }
 
 #ifndef NO_TESTS
@@ -816,31 +815,6 @@ void inject_learn(learn_fun fun) {
     inject_learn_fun = fun;
 }
 #endif
-
-bool learn_skill_depr(unit * u, skill_t sk, double learn_chance)
-{
-    skill *sv = u->skills;
-    if (learn_chance < 1.0 && rng_int() % 10000 >= learn_chance * 10000)
-        if (!chance(learn_chance)) // FIXME: this nested if looks as if we are rolling twice!
-            return false;
-    while (sv != u->skills + u->skill_size) {
-        assert(sv->weeks > 0);
-        if (sv->id == sk) {
-            if (sv->weeks <= 1) {
-                sk_set(sv, sv->level + 1);
-            }
-            else {
-                sv->weeks--;
-            }
-            return true;
-        }
-        ++sv;
-    }
-    sv = add_skill(u, sk);
-    sk_set(sv, 1);
-    return true;
-}
-
 void learn_skill(unit *u, skill_t sk, int days) {
     int leveldays = STUDYDAYS * u->number;
     int weeks = 0;
