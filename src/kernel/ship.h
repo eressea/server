@@ -140,14 +140,16 @@ extern "C" {
     int ship_type_crew_skill(const struct ship *sh);
     bool ship_iscomplete(const struct ship *sh);
 
-    int fleet_aggregate_int(struct ship *fleet, int (*aggregator) (int, int),
-        int start_value, int (*getvalue)(struct ship *, void *), void *state);
-    int fleet_const_aggregate_int(const struct ship *fleet, int (*aggregator) (int, int),
-        int start_value, int (*getvalue)(const struct ship *, void *), void *state);
-    void fleet_visit(struct ship *sh, int (*visit_ship) (struct ship *sh, void *state), void *state);
     int aggregate_max(int i1, int i2);
     int aggregate_min(int i1, int i2);
     int aggregate_sum(int i1, int i2);
+
+    typedef int (*intvisitor) (const ship *fleet, const ship *sh, void *state);
+    typedef int (*aggregator) (int v1, int v2);
+
+    int fleet_const_int_aggregate(const struct ship *sh, intvisitor getvalue, aggregator aggr, int init_value, void *state);
+    void fleet_visit(struct ship *sh, bool (*visit_ship) (struct ship *fleet, struct ship *sh, void *state), void *state);
+    void fleet_const_visit(const struct ship *sh, bool (*visit_ship) (const struct ship *fleet, const struct ship *sh, void *state), void *state);
 
 #ifdef __cplusplus
 }

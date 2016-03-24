@@ -670,12 +670,19 @@ static bool is_freezing(const unit * u)
     return true;
 }
 
-static int shipcheckcoast(ship *sh, void *state) {
+typedef struct checkstruct {
+    const region *r;
+} checkstruct;
+
+static int shipcheckcoast(const ship *fleet, const ship *sh, void *state) {
     int c;
-    region *r = (region *) state;
+    checkstruct *cs = (checkstruct *) state;
+
+    if (!sh)
+        return SA_COAST;
     if (sh->type->coasts) {
         for (c = 0; sh->type->coasts[c] != NULL; ++c) {
-            if (sh->type->coasts[c] == r->terrain) {
+            if (sh->type->coasts[c] == cs->r->terrain) {
                 return SA_COAST;
             }
         }
@@ -683,7 +690,7 @@ static int shipcheckcoast(ship *sh, void *state) {
     return SA_NO_COAST;
 }
 
-int check_ship_allowed(struct ship *sh, const region * r)
+int check_ship_allowed(const ship *sh, const region * r)
 {
     const building_type *bt_harbour = NULL;
     bt_harbour = bt_find("harbour");
@@ -723,40 +730,39 @@ int check_ship_allowed(struct ship *sh, const region * r)
         return SA_COAST;
     }
 
-    if (ship_isfleet(sh)) {
-        return fleet_aggregate_int(sh, aggregate_min, SA_COAST, shipcheckcoast, (void *) r);
-    } else {
-        return shipcheckcoast(sh, (void *) r);
-    }
-    return SA_NO_COAST;
+    checkstruct checkstate = { r };
+    return fleet_const_int_aggregate(sh, shipcheckcoast, aggregate_min, SA_COAST, &checkstate);
 }
 
 typedef struct setcoast_state {
-    const region *r;
-    const region *rnext;
+    const terrain_type *terrain;
+    const bool landing;
+    const direction_t direction;
 } setcoast_state;
 
-static int setcoast(ship *sh, void *state) {
+static bool setcoast(ship *fleet, ship *sh, void *state) {
     setcoast_state *sstate = (setcoast_state *)state;
-    const region *r = sstate->r;
-    const region *rnext = sstate->rnext;
+
+    if (!sh) {
+        sh = fleet;
+    }
 
     if (sh->type->flags & SFL_NOCOAST) {
         sh->coast = NODIRECTION;
     }
-    else if (!fval(rnext->terrain, SEA_REGION) && !flying_ship(sh)) {
-        sh->coast = reldirection(rnext, r);
-        assert(fval(r->terrain, SEA_REGION));
+    else if (sstate->landing) {
+        sh->coast = sstate->direction;
+        assert(fval(sstate->terrain, SEA_REGION));
     }
     else {
         sh->coast = NODIRECTION;
     }
-    return 0;
+    return true;
 }
 
 void set_coast(ship * sh, const region * r, const region * rnext)
 {
-    setcoast_state state = { r, rnext};
+    setcoast_state state = { r->terrain, !fval(rnext->terrain, SEA_REGION) && !flying_ship(sh), reldirection(rnext, r)};
 
     fleet_visit(sh, setcoast, &state);
 }

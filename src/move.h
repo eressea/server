@@ -83,7 +83,7 @@ extern "C" {
 #define SA_NO_INSECT -1
 #define SA_NO_COAST -2
 
-    int check_ship_allowed(struct ship *sh, const struct region * r);
+    int check_ship_allowed(const struct ship *sh, const struct region * r);
     void set_coast(struct ship * sh, const struct region * r, const struct region * rnext);
 
 #ifdef __cplusplus

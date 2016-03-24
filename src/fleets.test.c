@@ -862,7 +862,7 @@ static void test_fleet_move(CuTest *tc) {
     CuAssertPtrEquals_Msg(tc, "fleet does not have speed 2", findregion(-1, 1), ffix.sh2->region);
     CuAssertPtrEquals_Msg(tc, "fleet does not have speed 2", findregion(-1, 1), ffix.fleet->region);
 
-     /* TODO maelstrom, set_coast, move_ship, harbourmaster */
+     /* TODO maelstrom*/
 
     test_cleanup();
 }

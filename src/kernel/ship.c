@@ -174,41 +174,75 @@ struct ship *findshipr(const region * r, int n)
     return 0;
 }
 
-void fleet_visit(ship *sh, int (*visit_ship) (ship *sh, void *state), void *state) {
+
+void fleet_visit(ship *sh, bool (*visit_ship) (ship *fleet, ship *sh, void *state), void *state) {
     if (ship_isfleet(sh)) {
-        fleet_aggregate_int(sh, aggregate_sum, 0, visit_ship, state);
-    }
-    visit_ship(sh, state);
-}
-
-int fleet_aggregate_int(ship *fleet, int (*aggregator)(int, int), int start_value,
-    int (*getvalue)(ship *, void *state), void *state) {
-    int value = start_value, count = 0;
-    ship *shp;
-    for (shp = fleet->region->ships; shp; shp = shp->next) {
-        if (shp->fleet == fleet) {
+        int count = 0;
+        ship *shp;
+        for (shp = sh->region->ships; shp; ) {
+            ship *next = shp->next;
             ++count;
-            value = aggregator(value, getvalue(shp, state));
+            if (!visit_ship(sh, shp, state))
+                break;
+            shp = next;
         }
+        assert(count > 0);
+        visit_ship(sh, NULL, state);
+    } else {
+        visit_ship(NULL, sh, state);
     }
-    assert(count > 0);
-    return value;
 }
 
-int fleet_const_aggregate_int(const ship *fleet, int (*aggregator)(int, int), int start_value,
-    int (*getvalue)(const ship *, void *state), void *state) {
-    int value = start_value, count = 0;
-    ship *shp;
-    for (shp = fleet->region->ships; shp; shp = shp->next) {
-        if (shp->fleet == fleet) {
-            ++count;
-            value = aggregator(value, getvalue(shp, state));
+void fleet_const_visit(const ship *sh,
+    bool (*visit_ship)(const ship *fleet, const ship *sh, void *state), void *state) {
+    if (ship_isfleet(sh)) {
+        int count = 0;
+        ship *shp;
+        for (shp = sh->region->ships; shp;) {
+            ship *next = shp->next;
+            if (shp->fleet == sh) {
+                ++count;
+                if (!visit_ship(sh, shp, state))
+                    break;
+            }
+            shp = next;
         }
+        assert(count > 0);
+        visit_ship(sh, NULL, state);
+    } else {
+        visit_ship(NULL, sh, state);
     }
-    assert(count > 0);
-    return value;
 }
 
+typedef struct aggregate_state {
+    void *inner_state;
+    intvisitor visitor;
+    aggregator aggregate;
+    int value;
+} aggregate_state;
+
+static void *aggregate_int_state(int init_value, aggregator agg, intvisitor getvalue, void *inner_state, aggregate_state *state) {
+    aggregate_state s2 = { inner_state, getvalue, agg, init_value };
+    *state = s2;
+    return state;
+}
+
+static bool aggregate_int_visitor(const ship *fleet, const ship *sh, void *state) {
+    aggregate_state *outer_state = (aggregate_state *) state;
+    int value = outer_state->visitor(fleet, sh, outer_state->inner_state);
+
+    outer_state->value = outer_state->aggregate(outer_state->value, value);
+
+    return true;
+}
+
+int fleet_const_int_aggregate(const ship *sh, intvisitor getvalue, aggregator aggr, int init_value, void *state) {
+    aggregate_state agg_state;
+    aggregate_int_state(init_value, aggr, getvalue, state, &agg_state);
+
+    fleet_const_visit(sh, aggregate_int_visitor, &agg_state);
+    return agg_state.value;
+}
 
 int aggregate_max(int i1, int i2) {
     return _max(i1, i2);
@@ -512,38 +546,37 @@ const char *shipname(const ship * sh)
     return write_shipname(sh, ibuf, sizeof(name));
 }
 
-static int shpcargo(const ship *sh, void *state) {
-    int i = sh->type->cargo;
+static int shpcargo(const ship *fleet, const ship *sh, void *state) {
+    int cargo;
+
+    if(sh == NULL)
+        return 0;
+
+    cargo = sh->type->cargo;
 
     if (!ship_iscomplete(sh))
         return 0;
 
     if (sh->damage) {
-        i = (int)ceil(i * (1.0 - sh->damage / sh->size / (double)DAMAGE_SCALE));
+        cargo = (int)ceil(cargo * (1.0 - sh->damage / sh->size / (double)DAMAGE_SCALE));
     }
-    return i;
+    return cargo;
 }
 
 int ship_capacity(const ship * sh)
 {
-    if (ship_isfleet(sh)) {
-        return fleet_const_aggregate_int(sh, aggregate_sum, 0, shpcargo, (void *) NULL);
-    }
-
-    return shpcargo(sh, 0);
+    return fleet_const_int_aggregate(sh, shpcargo, aggregate_sum, 0, NULL);
 }
 
-static int shpcabins(const ship *sh, void *state) {
+static int shpcabins(const ship *fleet, const ship *sh, void *state) {
+    if (!sh)
+        return 0;
     return sh->type->cabins;
 }
 
 int ship_cabins(const ship * sh)
 {
-    if (ship_isfleet(sh)) {
-        return fleet_const_aggregate_int(sh, aggregate_sum, 0, shpcabins, (void *) NULL);
-    }
-
-    return shpcabins(sh, 0);
+    return fleet_const_int_aggregate(sh, shpcabins, aggregate_sum, 0, NULL);
 }
 
 void ship_weight(const ship * sh, int *sweight, int *scabins)
@@ -811,42 +844,38 @@ void fleet_cmd(region * r)
     }
 }
 
-static int cptskill(const ship *sh, void *state) {
+static int cptskill(const ship *fleet, const ship *sh, void *state) {
+    if (!sh)
+        return fleet->type->cptskill;
     return sh->type->cptskill;
 }
 
 int ship_type_cpt_skill(const ship *sh) {
-    if (ship_isfleet(sh)) {
-        return _max(cptskill(sh, NULL), fleet_const_aggregate_int(sh, aggregate_max, INT_MIN, cptskill, (void *) NULL));
-    } else
-        return sh->type->cptskill;
+    return fleet_const_int_aggregate(sh, cptskill, aggregate_max, INT_MIN, NULL);
 }
 
-static int shipcmplt(const ship *sh, void *state) {
-    return ship_iscomplete(sh)?1:0;
-}
-
-bool ship_iscomplete(const ship *sh) {
-    if (ship_isfleet(sh)) {
-        return fleet_const_aggregate_int(sh, aggregate_min, 1, shipcmplt, (void *) NULL) == 1;
-    }
-
+static int shipcmplt(const ship *fleet, const ship *sh, void *state) {
+    if (!sh)
+        return 1;
     if (sh->type->construction) {
         assert(!sh->type->construction->improvement); /* sonst ist construction::size nicht ship_type::maxsize */
         if (sh->size != sh->type->construction->maxsize) {
-            return false;
+            return 0;
         }
     }
-    return true;
+    return 1;
 }
 
-static int sumskill(const ship *sh, void *state) {
+bool ship_iscomplete(const ship *sh) {
+    return fleet_const_int_aggregate(sh, shipcmplt, aggregate_min, 1, NULL) == 1;
+}
+
+static int sumskill(const ship *fleet, const ship *sh, void *state) {
+    if (!sh)
+        return 0;
     return sh->type->sumskill;
 }
 
 int ship_type_crew_skill(const ship *sh) {
-    if (ship_isfleet(sh)) {
-        return fleet_const_aggregate_int(sh, aggregate_sum, 0, sumskill, (void *) NULL);
-    }
-    return sh->type->sumskill;
+    return fleet_const_int_aggregate(sh, sumskill, aggregate_sum, 0, NULL);
 }
