@@ -607,7 +607,7 @@ mark_travelthru(unit * u, region * r, const region_list * route,
     }
 }
 
-ship *move_ship(ship * sh, region * from, region * to, region_list * route)
+static ship *move1ship(ship * sh, region * from, region * to, region_list * route)
 {
     unit **iunit = &from->units;
     unit **ulist = &to->units;
@@ -639,6 +639,23 @@ ship *move_ship(ship * sh, region * from, region * to, region_list * route)
         }
         if (*iunit == u)
             iunit = &u->next;
+    }
+    return sh;
+}
+
+ship *move_ship(ship * sh, region * from, region * to, region_list * route)
+{
+    move1ship(sh, from, to, route);
+
+    if (ship_isfleet(sh)) {
+        ship *shp = from->ships;
+        while (shp) {
+            ship *nextship = shp->next;
+            if (shp->fleet == sh) {
+                move1ship(shp, from, to, route);
+            }
+            shp = nextship;
+        }
     }
 
     return sh;

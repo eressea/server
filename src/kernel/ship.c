@@ -527,6 +527,7 @@ int ship_cabins(const ship * sh)
 void ship_weight(const ship * sh, int *sweight, int *scabins)
 {
     unit *u;
+    bool cabins = ship_cabins(sh);
 
     *sweight = 0;
     *scabins = 0;
@@ -534,7 +535,7 @@ void ship_weight(const ship * sh, int *sweight, int *scabins)
     for (u = sh->region->units; u; u = u->next) {
         if (u->ship == sh) {
             *sweight += weight(u);
-            if (ship_cabins(sh)) {
+            if (cabins) {
                 int pweight = u->number * u_race(u)->weight;
                 /* weight goes into number of cabins, not cargo */
                 *scabins += pweight;
@@ -622,6 +623,7 @@ ship *fleet_add_ship(ship *sh, ship *fleet, unit *cpt) {
     region *r = sh->region;
 
     assert(fleet || cpt);
+    assert(!sh->fleet);
     if (!fleet) {
         const ship_type *fleet_type = st_find("fleet");
         fleet = new_ship(fleet_type, r, cpt->faction->locale);

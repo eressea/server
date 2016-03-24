@@ -32,11 +32,20 @@ static void setup_fleet(void) {
     locale_setstring(lang, "fleet", "Flotte");
     locale_setstring(lang, parameters[P_REMOVE], "ENTFERNE");
     locale_setstring(lang, directions[D_WEST], "WESTEN");
+    locale_setstring(lang, directions[D_NORTHEAST], "NORDOSTEN");
+    locale_setstring(lang, directions[D_EAST], "OSTEN");
+    locale_setstring(lang, directions[D_SOUTHEAST], "SUEDOSTEN");
+    locale_setstring(lang, directions[D_SOUTHWEST], "SUEDWESTEN");
+    locale_setstring(lang, directions[D_NORTHWEST], "NORDWESTEN");
+    init_directions(lang);
     test_create_world();
     init_locales();
 
     ftype = st_get_or_create("fleet");
     ftype->cptskill = 6;
+    test_create_shiptype2("boat", 1, 1, 1, 2, 2000, 0, SK_SHIPBUILDING, 5, 1, 1, 1);
+
+    config_set("rules.ship.storms", "0");
 }
 
 typedef struct fleet_fixture {
@@ -72,7 +81,7 @@ static void init_fleet(fleet_fixture *ffix) {
     init_fixture(ffix);
 
     ffix->fleet = fleet_add_ship(ffix->sh1, NULL, ffix->u11);
-    fleet_add_ship(ffix->sh1, ffix->fleet, ffix->u21);
+    fleet_add_ship(ffix->sh2, ffix->fleet, ffix->u21);
 }
 
 static ship *find_fleet(CuTest *tc, region *r) {
@@ -638,9 +647,6 @@ static void test_fleet_complete(CuTest *tc) {
     fleet = fleet_add_ship(sh2, NULL, cpt);
     CuAssertTrue(tc, !ship_iscomplete(fleet));
 
-    fleet = fleet_add_ship(sh3, fleet, cpt);
-    CuAssertTrue(tc, !ship_iscomplete(fleet));
-
     test_cleanup();
 }
 
@@ -708,7 +714,27 @@ static void test_fleet_speed(CuTest *tc) {
     test_cleanup();
 }
 
-/*
+static void test_move_ship(CuTest *tc) {
+    fleet_fixture ffix;
+
+    test_cleanup();
+    setup_fleet();
+    init_fleet(&ffix);
+
+    CuAssertPtrEquals(tc, ffix.r, ffix.fleet->region);
+    CuAssertPtrEquals(tc, ffix.r, ffix.u11->region);
+
+    move_ship(ffix.fleet, ffix.r, ffix.r2, NULL);
+
+    CuAssertPtrEquals(tc, ffix.r2, ffix.fleet->region);
+    CuAssertPtrEquals(tc, ffix.r2, ffix.sh1->region);
+    CuAssertPtrEquals(tc, ffix.r2, ffix.sh2->region);
+    CuAssertPtrEquals(tc, ffix.r2, ffix.u11->region);
+    CuAssertPtrEquals(tc, ffix.r2, ffix.u21->region);
+
+    test_cleanup();
+}
+
 static void test_fleet_move(CuTest *tc) {
     fleet_fixture ffix;
     order *ord;
@@ -718,15 +744,16 @@ static void test_fleet_move(CuTest *tc) {
     setup_fleet();
     init_fleet(&ffix);
 
-    / * ship type boat: cptskill 1, sumskill 1, minskill 1, range 2, cargo 1000,
+    /* ship type boat: cptskill 1, sumskill 1, minskill 1, range 2, cargo 1000,
      * construction maxsize 5, minskill 1, reqsize 1
      * coasts: plain
-     * /
+     */
 
-    ord = create_order(K_MOVE, ffix.f1->locale, "W NO O SO SW W", itoa36(ffix.sh1->no));
+    ord = create_order(K_MOVE, ffix.f1->locale, "W NORDOSTEN O SUEDOSTE SUEDWEST W", itoa36(ffix.sh1->no));
     unit_addorder(ffix.u11, ord);
     set_level(ffix.u11, SK_SAILING, 1);
 
+    init_order(ord);
     move_cmd(ffix.u11, ord, false);
 
     msg = test_get_last_message(ffix.f1->msgs);
@@ -734,16 +761,23 @@ static void test_fleet_move(CuTest *tc) {
     test_clear_messages(ffix.f1);
 
     set_level(ffix.u11, SK_SAILING, 6);
+    set_number(ffix.u11, 2);
+    init_order(ord);
     move_cmd(ffix.u11, ord, false);
 
     msg = test_get_last_message(ffix.f1->msgs);
-    CuAssertPtrEquals(tc, 0, msg);
+    CuAssertPtrNotNull(tc, msg);
+    CuAssertStrEquals(tc, "shipsail", test_get_messagetype(msg));
 
     CuAssertPtrEquals_Msg(tc, "fleet does not have speed 2", findregion(-1, 1), ffix.sh1->region);
+    CuAssertPtrEquals_Msg(tc, "fleet does not have speed 2", findregion(-1, 1), ffix.sh2->region);
+    CuAssertPtrEquals_Msg(tc, "fleet does not have speed 2", findregion(-1, 1), ffix.fleet->region);
+
+     /* TODO check_ship_allowed, can_takeoff, move_blocked, maelstrom, set_coast, move_ship, harbourmaster */
 
     test_cleanup();
 }
-*/
+
 
 /*
 // TODO
@@ -755,13 +789,11 @@ static void test_fleet_move(CuTest *tc) {
 // must be complete (?)
 // TRANSFER possible?
 
-// check range
 // check coast
 // check capacity (freight/cabins)
 // check captain/crew skill
 // LOAD: fleets of boats cannot load stone?
 
-// ENTER
 // KINGKILLER: check owner leaves/dies
 // damage fleet
 // damage fleet multiple times
@@ -773,8 +805,7 @@ static void test_fleet_move(CuTest *tc) {
 // who owns ship? no unintended stealing
 
 // MOVE:
-// check skill
-// check terrain, coast, range
+// check terrain, coast
 // follow?
 // piracy (active/passive)
 // DRIFT
@@ -828,6 +859,7 @@ CuSuite *get_fleets_suite(void)
     SUITE_ADD_TEST(suite, test_fleet_stats);
     SUITE_ADD_TEST(suite, test_fleet_complete);
     SUITE_ADD_TEST(suite, test_fleet_speed);
-    /*    SUITE_ADD_TEST(suite, test_fleet_move);*/
+    SUITE_ADD_TEST(suite, test_move_ship);
+    SUITE_ADD_TEST(suite, test_fleet_move);
     return suite;
 }
