@@ -17,6 +17,7 @@
 
 #include <CuTest.h>
 #include <tests.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -64,16 +65,14 @@ static void init_fixture(fleet_fixture *ffix) {
     ffix->u11 = test_create_unit(ffix->f1, ffix->r);
 
     ffix->u21 = test_create_unit(ffix->f2, ffix->r);
+    ffix->fleet = NULL;
 }
 
 static void init_fleet(fleet_fixture *ffix) {
     init_fixture(ffix);
-    assert(st_find("fleet"));
-    ffix->fleet = test_create_ship(ffix->r, st_find("fleet"));
-    u_set_ship(ffix->u11, ffix->fleet);
-    u_set_ship(ffix->u21, ffix->fleet);
-    ffix->sh1->fleet = ffix->fleet;
-    ffix->sh2->fleet = ffix->fleet;
+
+    ffix->fleet = fleet_add_ship(ffix->sh1, NULL, ffix->u11);
+    fleet_add_ship(ffix->sh1, ffix->fleet, ffix->u21);
 }
 
 static ship *find_fleet(CuTest *tc, region *r) {
@@ -645,6 +644,70 @@ static void test_fleet_complete(CuTest *tc) {
     test_cleanup();
 }
 
+static ship *add_ship(ship **fleet, unit *cpt, int speed) {
+    char s[255];
+    ship_type *stype;
+    ship *sh;
+    region *r;
+
+    if (*fleet)
+        r = (*fleet)->region;
+    else
+        r = findregion(0,0);
+
+    sprintf(s, "ship%d", *fleet?(*fleet)->size+1:1);
+    stype = test_create_shiptype2(s, 1, 1, 1, speed, 1000, 1000, SK_SHIPBUILDING, 10, 1, 1, 1);
+    sh = test_create_ship(r, stype);
+    *fleet = fleet_add_ship(sh, *fleet, cpt);
+
+    return sh;
+}
+
+static void test_fleet_speed(CuTest *tc) {
+    fleet_fixture ffix;
+    ship *sh1, *sh2;
+
+    test_cleanup();
+    setup_fleet();
+    init_fixture(&ffix);
+
+    sh1 = add_ship(&ffix.fleet, ffix.u11, 1);
+    sh2 = add_ship(&ffix.fleet, NULL, 2);
+
+    CuAssertIntEquals(tc, 1, ship_speed(ffix.fleet, ffix.u11));
+
+    sh1->size = 1;
+    CuAssertIntEquals(tc, 0, ship_speed(ffix.fleet, ffix.u11));
+    sh1->size = sh1->type->construction->maxsize;
+
+    config_set("movement.shipspeed.skillbonus", "1");
+    set_level(ffix.u11, SK_SAILING, 3);
+    CuAssertIntEquals_Msg(tc, "fleet should have minimum speed of members", 3, ship_speed(ffix.fleet, ffix.u11));
+
+    ((ship_type *) sh1->type)->range_max = 2;
+    CuAssertIntEquals_Msg(tc, "fleet speed should be bounded by max range for each ship", 2, ship_speed(ffix.fleet, ffix.u11));
+
+    ((ship_type *) sh1->type)->range_max = 10;
+    ((ship_type *) sh2->type)->range_max = 10;
+    set_level(ffix.u11, SK_SAILING, 4);
+    CuAssertIntEquals_Msg(tc, "ship1: 3x1 = speed 3, ship2: 1x1 = speed 2", 2, ship_speed(ffix.fleet, ffix.u11));
+
+    set_level(ffix.u11, SK_SAILING, 5);
+    CuAssertIntEquals_Msg(tc, "ship1: 3x1 = speed 3, ship2: 2x1 = speed 3", 3, ship_speed(ffix.fleet, ffix.u11));
+    set_level(ffix.u11, SK_SAILING, 6);
+    CuAssertIntEquals(tc, 3, ship_speed(ffix.fleet, ffix.u11));
+    set_level(ffix.u11, SK_SAILING, 5);
+
+    damage_ship(sh1, .33);
+    CuAssertIntEquals_Msg(tc, "not enough damage to slow ship down", 3, ship_speed(ffix.fleet, ffix.u11));
+    damage_ship(sh1, .004);
+    CuAssertIntEquals_Msg(tc, "just enough to slow down", 2, ship_speed(ffix.fleet, ffix.u11));
+    set_level(ffix.u11, SK_SAILING, 6);
+    CuAssertIntEquals_Msg(tc, "compensate with additional crew", 3, ship_speed(ffix.fleet, ffix.u11));
+
+    test_cleanup();
+}
+
 /*
 static void test_fleet_move(CuTest *tc) {
     fleet_fixture ffix;
@@ -762,8 +825,9 @@ CuSuite *get_fleets_suite(void)
     SUITE_ADD_TEST(suite, test_fleet_nonsail);
     SUITE_ADD_TEST(suite, test_fleet_enter);
 
-/*    SUITE_ADD_TEST(suite, test_fleet_move);*/
     SUITE_ADD_TEST(suite, test_fleet_stats);
     SUITE_ADD_TEST(suite, test_fleet_complete);
+    SUITE_ADD_TEST(suite, test_fleet_speed);
+    /*    SUITE_ADD_TEST(suite, test_fleet_move);*/
     return suite;
 }

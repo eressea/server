@@ -1785,7 +1785,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
 {
     region *starting_point = u->region;
     region *current_point, *last_point;
-    int k, step = 0;
+    int range, step = 0;
     region_list **iroute = routep;
     ship *sh = u->ship;
     faction *f = u->faction;
@@ -1815,7 +1815,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
     /* Wir suchen so lange nach neuen Richtungen, wie es geht. Diese werden
      * dann nacheinander ausgeführt. */
 
-    k = ship_speed(sh, u);
+    range = ship_speed(sh, u);
 
     last_point = starting_point;
     current_point = starting_point;
@@ -1827,7 +1827,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
      * Durchlauf schon gesetzt (Parameter!). current_point ist die letzte gültige,
      * befahrene Region. */
 
-    while (next_point && current_point != next_point && step < k) {
+    while (next_point && current_point != next_point && step < range) {
         const char *token;
         int error;
         const terrain_type *tthis = current_point->terrain;
@@ -1852,7 +1852,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
                 stormyness = storms ? storms[date.month] * 5 : 0;
 
                 /* storms should be the first thing we do. */
-                stormchance = stormyness / ship_speed(sh, u);
+                stormchance = stormyness / range;
                 if (check_leuchtturm(next_point, NULL)) {
                     if (lighthouse_div > 0) {
                         stormchance /= lighthouse_div;

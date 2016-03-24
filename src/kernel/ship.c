@@ -299,11 +299,10 @@ const char *write_shipname(const ship * sh, char *ibuf, size_t size)
     return ibuf;
 }
 
-static int ShipSpeedBonus(const unit * u)
+static int ShipSpeedBonus(const unit * u, const ship *sh)
 {
     int level = config_get_int("movement.shipspeed.skillbonus", 0);
     if (level > 0) {
-        ship *sh = u->ship;
         int skl = effskill(u, SK_SAILING, 0);
         int minsk = (sh->type->cptskill + 1) / 2;
         return (skl - minsk) / level;
@@ -325,18 +324,87 @@ int ship_crew_skill(const ship *sh) {
     return n;
 }
 
-int ship_speed(const ship * sh, const unit * u)
-{
-    int k = sh->type->range;
-    static const struct curse_type *stormwind_ct, *nodrift_ct;
-    static bool init;
+static const struct curse_type *stormwind_ct, *nodrift_ct;
+static bool init;
+
+static int shiprange(const ship *sh) {
+    int speed = sh->type->range;
+    unit *u = ship_owner(sh);
     attrib *a;
     struct curse *c;
-    int bonus;
+
+    if (curse_active(get_curse(sh->attribs, stormwind_ct)))
+        speed *= 2;
+    if (curse_active(get_curse(sh->attribs, nodrift_ct)))
+        speed += 1;
+
+    if (u->faction->race == u_race(u)) {
+        /* race bonus for this faction? */
+        if (fval(u_race(u), RCF_SHIPSPEED)) {
+            speed += 1;
+        }
+    }
+
+    a = a_find(sh->attribs, &at_speedup);
+    while (a != NULL && a->type == &at_speedup) {
+        speed += a->data.sa[0];
+        a = a->next;
+    }
+
+    c = get_curse(sh->attribs, ct_find("shipspeedup"));
+    while (c) {
+        speed += curse_geteffect_int(c);
+        c = c->nexthash;
+    }
+
+    return speed;
+}
+
+typedef struct shipinfo {
+    const ship *sh;
+    int speed, sumskill, cptbonus;
+    int cur_speed, dmg_speed, damage, size;
+} shipinfo;
+
+static void assigninfo(shipinfo *info, const ship *shp) {
+    info->sh = shp;
+    info->speed = shiprange(shp);
+    info->sumskill = shp->type->sumskill;
+    info->cptbonus = ShipSpeedBonus(ship_owner(shp), shp);
+    info->damage = shp->damage;
+    info->size = shp->size;
+}
+
+static int cmpinfo(const void *i1, const void *i2) {
+    shipinfo *info1 = (shipinfo *) i1, *info2 = (shipinfo *) i2;
+
+    return info1->dmg_speed - info2->dmg_speed;
+}
+
+static void infosort(shipinfo *ships, int size) {
+    qsort(ships, size, sizeof(shipinfo), cmpinfo);
+}
+
+static int applydamage(int speed, int damage, int shsize) {
+    int size = shsize * DAMAGE_SCALE;
+    speed *= (size - damage);
+    speed = (speed + size - 1) / size;
+    return speed;
+}
+
+int ship_speed(const ship * sh, const unit * u)
+{
+    int speed;
+    int crew;
+    ship *shp;
+    shipinfo *ships;
+    int size = 0, i;
 
     assert(sh);
-    if (!u) u = ship_owner(sh);
-    if (!u) return 0;
+    if (!u)
+        u = ship_owner(sh);
+    if (!u)
+        return 0;
     assert(u->ship == sh);
     assert(u == ship_owner(sh));
 
@@ -348,50 +416,68 @@ int ship_speed(const ship * sh, const unit * u)
     if (!ship_iscomplete(sh))
         return 0;
 
-    if (curse_active(get_curse(sh->attribs, stormwind_ct)))
-        k *= 2;
-    if (curse_active(get_curse(sh->attribs, nodrift_ct)))
-        k += 1;
+    if (ship_isfleet(sh)) {
+        ships = calloc(sh->size, sizeof(shipinfo));
+        for (shp = sh->region->ships; shp; shp = shp->next) {
+            if (shp->fleet == sh) {
+                assigninfo(&ships[size++], shp);
+            }
+        }
+    } else {
+        ships = calloc(1, sizeof(shipinfo));
+        assigninfo(&ships[size++], sh);
+    }
 
-    if (u->faction->race == u_race(u)) {
-        /* race bonus for this faction? */
-        if (fval(u_race(u), RCF_SHIPSPEED)) {
-            k += 1;
+    crew = ship_crew_skill(sh);
+    for (i = 0; i < size; ++i) {
+        shipinfo *info = &ships[i];
+        crew -= info->sumskill;
+        if (info->sh->type->range_max <= info->sh->type->range) {
+            /* ship does not require larger crew for speedup */
+            info->speed += info->cptbonus;
+            info->cptbonus = 0;
+        }
+        info->cur_speed = info->speed;
+        info->dmg_speed = applydamage(info->cur_speed, info->damage, info->size);
+    }
+
+    infosort(ships, size);
+    speed = ships[0].dmg_speed;
+    /* assign crew to slower ships first */
+    for (i = 0; i < size && crew > 0;) {
+        shipinfo *info = &ships[i];
+        int dmg_speed;
+
+        assert(info->dmg_speed == speed);
+        if (info->cur_speed >= info->sh->type->range_max || info->cur_speed - info->speed >= info->cptbonus) {
+            /* maximum speed reached */
+            break;
+        }
+        do {
+            /* increase cur_speed by 1; this might not increase dmg_speed */
+            crew -= info->sumskill;
+            if (crew < 0) {
+                break;
+            }
+            ++info->cur_speed;
+            dmg_speed = applydamage(info->cur_speed, info->damage, info->size);
+        } while (dmg_speed == info->dmg_speed);
+        info->dmg_speed = dmg_speed;
+        if (crew < 0)
+            break;
+
+        if (i == size - 1 || ships[i + 1].dmg_speed >= info->dmg_speed) {
+            ++speed;
+            assert(speed == info->dmg_speed);
+            i = 0;
+        } else {
+            assert(speed == info->dmg_speed - 1);
+            ++i;
         }
     }
 
-    bonus = ShipSpeedBonus(u);
-    if (bonus > 0 && sh->type->range_max>sh->type->range) {
-        int crew = ship_crew_skill(sh);
-        int crew_bonus = (crew / sh->type->sumskill / 2) - 1;
-        if (crew_bonus > 0) {
-            bonus = _min(bonus, crew_bonus);
-            bonus = _min(bonus, sh->type->range_max - sh->type->range);
-        }
-        else {
-            bonus = 0;
-        }
-    }
-    k += bonus;
-
-    a = a_find(sh->attribs, &at_speedup);
-    while (a != NULL && a->type == &at_speedup) {
-        k += a->data.sa[0];
-        a = a->next;
-    }
-
-    c = get_curse(sh->attribs, ct_find("shipspeedup"));
-    while (c) {
-        k += curse_geteffect_int(c);
-        c = c->nexthash;
-    }
-
-    if (sh->damage>0) {
-        int size = sh->size * DAMAGE_SCALE;
-        k *= (size - sh->damage);
-        k = (k + size - 1) / size;
-    }
-    return k;
+    free(ships);
+    return speed;
 }
 
 const char *shipname(const ship * sh)
@@ -535,6 +621,7 @@ ship *fleet_add_ship(ship *sh, ship *fleet, unit *cpt) {
     unit * up;
     region *r = sh->region;
 
+    assert(fleet || cpt);
     if (!fleet) {
         const ship_type *fleet_type = st_find("fleet");
         fleet = new_ship(fleet_type, r, cpt->faction->locale);
