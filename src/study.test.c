@@ -230,14 +230,12 @@ static void test_academy_building(CuTest *tc) {
     teach_cmd(u, u->thisorder);
     learn_reset();
     CuAssertPtrNotNull(tc, msg = test_find_messagetype(u->faction->msgs, "teach_asgood"));
-    // FIXME: new injection function
-#if 0
     CuAssertPtrEquals(tc, u, (unit *)(msg)->parameters[0].v);
     CuAssertPtrEquals(tc, u2, (unit *)(msg)->parameters[3].v);
+
     CuAssertPtrEquals(tc, u, log_learners[0].u);
     CuAssertIntEquals(tc, SK_CROSSBOW, log_learners[0].sk);
-    CuAssertIntEquals(tc, 10, log_learners[0].days);
-#endif
+    CuAssertIntEquals(tc, 15, log_learners[0].days);
     test_cleanup();
 }
 
