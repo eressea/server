@@ -20,6 +20,34 @@
 
 #include <CuTest.h>
 
+#define MAXLOG 4
+typedef struct log_entry {
+    unit *u;
+    skill_t sk;
+    int days;
+} log_entry;
+
+static log_entry log_learners[MAXLOG];
+static int log_size;
+
+static void log_learn(unit *u, skill_t sk, int days) {
+    if (log_size < MAXLOG) {
+        log_entry * entry = &log_learners[log_size++];
+        entry->u = u;
+        entry->sk = sk;
+        entry->days = days;
+    }
+}
+
+void learn_inject(void) {
+    log_size = 0;
+    inject_learn(log_learn);
+}
+
+void learn_reset(void) {
+    inject_learn(0);
+}
+
 typedef struct {
     unit *u;
     unit *teachers[2];
@@ -134,8 +162,20 @@ static void test_study_bug_2194(CuTest *tc) {
     i_change(&u1->items, get_resourcetype(R_SILVER)->itype, 50);
     i_change(&u2->items, get_resourcetype(R_SILVER)->itype, 50);
     b->flags = BLD_WORKING;
+    learn_inject();
     teach_cmd(u, u->thisorder);
+    learn_reset();
+    CuAssertPtrEquals(tc, u, log_learners[0].u);
+    CuAssertIntEquals(tc, SK_CROSSBOW, log_learners[0].sk);
+    CuAssertIntEquals(tc, 1, log_size);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "teach_asgood"));
+
+    free_order(u->thisorder);
+    u->thisorder = create_order(K_TEACH, loc, itoa36(u2->no));
+    learn_inject();
+    teach_cmd(u, u->thisorder);
+    learn_reset();
+    CuAssertIntEquals(tc, 0, log_size);
     test_cleanup();
 }
 
@@ -162,34 +202,6 @@ static void test_produceexp(CuTest *tc) {
     produceexp_ex(u, SK_ALCHEMY, 1, cb_learn_one);
     produceexp_ex(u, SK_ALCHEMY, 2, cb_learn_two);
     test_cleanup();
-}
-
-#define MAXLOG 4
-typedef struct log_entry {
-    unit *u;
-    skill_t sk;
-    int days;
-} log_entry;
-
-static log_entry log_learners[MAXLOG];
-static int log_size;
-
-static void log_learn(unit *u, skill_t sk, int days) {
-    if (log_size < MAXLOG) {
-        log_entry * entry = &log_learners[log_size++];
-        entry->u = u;
-        entry->sk = sk;
-        entry->days = days;
-    }
-}
-
-void learn_inject(void) {
-    log_size = 0;
-    inject_learn(log_learn);
-}
-
-void learn_reset(void) {
-    inject_learn(0);
 }
 
 static void test_academy_building(CuTest *tc) {
@@ -507,6 +519,6 @@ CuSuite *get_study_suite(void)
     SUITE_ADD_TEST(suite, test_produceexp);
     SUITE_ADD_TEST(suite, test_academy_building);
     SUITE_ADD_TEST(suite, test_demon_skillchanges);
-    DISABLE_TEST(suite, test_study_bug_2194);
+    SUITE_ADD_TEST(suite, test_study_bug_2194);
     return suite;
 }

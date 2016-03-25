@@ -280,7 +280,7 @@ int teach_cmd(unit * u, struct order *ord)
     static const curse_type *gbdream_ct = NULL;
     plane *pl;
     region *r = u->region;
-    skill_t sk = NOSKILL;
+    skill_t sk_academy = NOSKILL;
     int teaching, i, j, count, academy = 0;
 
     if (gbdream_ct == 0)
@@ -322,6 +322,7 @@ int teach_cmd(unit * u, struct order *ord)
 
 #if TEACH_ALL
     if (getparam(u->faction->locale) == P_ANY) {
+        skill_t sk;
         unit *student;
         skill_t teachskill[MAXSKILLS];
         int t = 0;
@@ -380,6 +381,7 @@ int teach_cmd(unit * u, struct order *ord)
         init_order(ord);
 
         while (!parser_end()) {
+            skill_t sk;
             unit *u2;
             bool feedback;
 
@@ -472,15 +474,15 @@ int teach_cmd(unit * u, struct order *ord)
                     continue;
                 }
             }
-
+            sk_academy = sk;
             teaching -= teach_unit(u, u2, teaching, sk, false, &academy);
         }
         new_order = create_order(K_TEACH, u->faction->locale, "%s", zOrder);
         replace_order(&u->orders, ord, new_order);
         free_order(new_order);      /* parse_order & set_order have each increased the refcount */
     }
-    if (academy) {
-        academy_teaching_bonus(u, sk, academy);
+    if (academy && sk_academy!=NOSKILL) {
+        academy_teaching_bonus(u, sk_academy, academy);
     }
     return 0;
 }
