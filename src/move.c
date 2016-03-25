@@ -520,7 +520,7 @@ static ship *do_maelstrom(region * r, unit * u)
 
     damage_ship(u->ship, 0.01 * damage);
 
-    if (sh->damage >= sh->size * DAMAGE_SCALE) {
+    if (ship_isdestroyed(sh)) {
         ADDMSG(&u->faction->msgs, msg_message("entermaelstrom",
             "region ship damage sink", r, sh, damage, 1));
         remove_ship(&sh->region->ships, sh);
@@ -907,7 +907,7 @@ static void drifting_ships(region * r)
                     msg_to_ship_inmates(sh, &firstu, &lastu, msg_message("massive_overload", "ship", sh));
                 } else
                     damage_ship(sh, damage_drift);
-                if (sh->damage >= sh->size * DAMAGE_SCALE) {
+                if (ship_isdestroyed(sh)) {
                     msg_to_ship_inmates(sh, &firstu, &lastu, msg_message("shipsink", "ship", sh));
                     remove_ship(&sh->region->ships, sh);
                 }
@@ -1937,10 +1937,10 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
                         }
                         if (storm && rnext != NULL) {
                             ADDMSG(&f->msgs, msg_message("storm", "ship region sink",
-                                sh, current_point, sh->damage >= sh->size * DAMAGE_SCALE));
+                                sh, current_point, ship_isdestroyed(sh)));
 
                             damage_ship(sh, damage_storm);
-                            if (sh->damage >= sh->size * DAMAGE_SCALE) {
+                            if (ship_isdestroyed(sh)) {
                                 /* ship sinks, end journey here */
                                 break;
                             }
@@ -2046,7 +2046,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
         }
     }
 
-    if (sh->damage >= sh->size * DAMAGE_SCALE) {
+    if (ship_isdestroyed(sh)) {
         if (sh->region) {
             ADDMSG(&f->msgs, msg_message("shipsink", "ship", sh));
             remove_ship(&sh->region->ships, sh);
@@ -2450,7 +2450,7 @@ void destroy_damaged_ships(void)
     for (r = regions; r; r = r->next) {
         for (sh = r->ships; sh;) {
             shn = sh->next;
-            if (sh->damage >= sh->size * DAMAGE_SCALE) {
+            if (ship_isdestroyed(sh)) {
                 remove_ship(&sh->region->ships, sh);
             }
             sh = shn;

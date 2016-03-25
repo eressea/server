@@ -314,7 +314,7 @@ static void test_ship_no_overload(CuTest *tc) {
     fix.u->number = 2;
     movement();
     CuAssertPtrEquals(tc, fix.u->region, findregion(-1,0));
-    CuAssertIntEquals(tc, 0, fix.sh->damage);
+    CuAssertTrue(tc, !ship_isdamaged(fix.sh));
 
     test_cleanup();
 }

@@ -263,6 +263,39 @@ void damage_ship(ship * sh, double percent)
     sh->damage = (int)damage;
 }
 
+bool ship_isdamaged(const struct ship *sh) {
+    return sh->damage > 0;
+}
+
+bool ship_isdestroyed(const struct ship *sh) {
+    return sh->damage >= sh->size * DAMAGE_SCALE;
+}
+
+/*
+int scale_int_damage(int full_value, int damage, int size, int round) {
+    full_value - damage / (DAMAGE_SCALE * size) * full_value;asd
+}*/
+
+static int applydamage(int speed, int damage, int shsize) {
+    int size = shsize * DAMAGE_SCALE;
+    speed *= (size - damage);
+    speed = (speed + size - 1) / size;
+    return speed;
+}
+
+static int scale_cargo (const ship *sh, int cargo) {
+    return (int)ceil(cargo * (1.0 - sh->damage / sh->size / (double)DAMAGE_SCALE));
+}
+
+int ship_damage_percent(const ship *ship) {
+    return (ship->damage * 100 + DAMAGE_SCALE - 1) / (ship->size * DAMAGE_SCALE);
+}
+
+/* cargo: cargo = (int)ceil(cargo * (1.0 - sh->damage / sh->size / (double)DAMAGE_SCALE));
+ * build: (sh->size * DAMAGE_SCALE - sh->damage) / DAMAGE_SCALE;
+ */
+
+
 /* Alte Schiffstypen: */
 static ship *deleted_ships;
 
@@ -442,13 +475,6 @@ static void infosort(shipinfo *ships, int size) {
     qsort(ships, size, sizeof(shipinfo), cmpinfo);
 }
 
-static int applydamage(int speed, int damage, int shsize) {
-    int size = shsize * DAMAGE_SCALE;
-    speed *= (size - damage);
-    speed = (speed + size - 1) / size;
-    return speed;
-}
-
 int ship_speed(const ship * sh, const unit * u)
 {
     int speed;
@@ -557,8 +583,8 @@ static int shpcargo(const ship *fleet, const ship *sh, void *state) {
     if (!ship_iscomplete(sh))
         return 0;
 
-    if (sh->damage) {
-        cargo = (int)ceil(cargo * (1.0 - sh->damage / sh->size / (double)DAMAGE_SCALE));
+    if (ship_isdamaged(sh)) {
+        cargo = scale_cargo(sh, cargo);
     }
     return cargo;
 }
@@ -663,10 +689,6 @@ void ship_setname(ship * self, const char *name)
 const char *ship_name(const ship * self)
 {
     return self->name;
-}
-
-int ship_damage_percent(const ship *ship) {
-    return (ship->damage * 100 + DAMAGE_SCALE - 1) / (ship->size * DAMAGE_SCALE);
 }
 
 bool ship_isfleet(const ship *sh) {

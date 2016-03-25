@@ -663,9 +663,8 @@ const faction * f, const region * r)
     fprintf(F, "\"%s\";Typ\n", translate(sh->type->_name,
         LOC(f->locale, sh->type->_name)));
     fprintf(F, "%d;Groesse\n", sh->size);
-    if (sh->damage) {
-        int percent =
-            (sh->damage * 100 + DAMAGE_SCALE - 1) / (sh->size * DAMAGE_SCALE);
+    if (ship_isdamaged(sh)) {
+        int percent = ship_damage_percent(sh);
         fprintf(F, "%d;Schaden\n", percent);
     }
     if (u) {

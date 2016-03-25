@@ -1823,7 +1823,7 @@ const unit * captain)
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
     }
-    if (sh->damage) {
+    if (ship_isdamaged(sh)) {
         int percent = ship_damage_percent(sh);
         bytes =
             _snprintf(bufp, size, ", %d%% %s", percent, LOC(f->locale, "nr_damaged"));

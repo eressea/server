@@ -98,6 +98,8 @@ extern "C" {
     } ship;
 
     void damage_ship(struct ship * sh, double percent);
+    bool ship_isdamaged(const struct ship *sh);
+    bool ship_isdestroyed(const struct ship *sh);
     void ship_set_owner(struct unit * u);
     struct unit *ship_owner(const struct ship *sh);
     void ship_update_owner(struct ship * sh);

@@ -197,7 +197,7 @@ static void chaos(region * r)
                                 config_get_flt("rules.ship.damage.atlantis",
                                 0.50);
                             damage_ship(sh, dmg);
-                            if (sh->damage >= sh->size * DAMAGE_SCALE) {
+                            if (ship_isdestroyed(sh)) {
                                 remove_ship(&sh->region->ships, sh);
                             }
                             sh = nsh;

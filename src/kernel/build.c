@@ -948,7 +948,7 @@ void continue_ship(unit * u, int want)
     }
     cons = sh->type->construction;
     assert(cons->improvement == NULL);    /* sonst ist construction::size nicht ship_type::maxsize */
-    if (sh->size == cons->maxsize && !sh->damage) {
+    if (sh->size == cons->maxsize && !ship_isdamaged(sh)) {
         cmistake(u, u->thisorder, 16, MSG_PRODUCE);
         return;
     }
