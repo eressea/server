@@ -97,7 +97,7 @@ static void test_addfaction(CuTest *tc) {
 
     test_cleanup();
     rc = rc_get_or_create("human");
-    lang = get_or_create_locale("en");
+    lang = test_create_locale();
     f = addfaction("test@eressea.de", "hurrdurr", rc, lang, 1234);
     CuAssertPtrNotNull(tc, f);
     CuAssertPtrNotNull(tc, f->name);

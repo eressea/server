@@ -3,6 +3,7 @@
 #include "keyword.h"
 #include "seen.h"
 #include "prefix.h"
+#include "reports.h"
 
 #include <kernel/config.h>
 #include <kernel/plane.h>
@@ -53,7 +54,7 @@ struct region *test_create_region(int x, int y, const terrain_type *terrain)
     if (!terrain) {
         terrain_type *t = get_or_create_terrain("plain");
         t->size = 1000;
-        fset(t, LAND_REGION|CAVALRY_REGION|FOREST_REGION);
+        fset(t, LAND_REGION|CAVALRY_REGION|FOREST_REGION|FLY_INTO|WALK_INTO|SAIL_INTO);
         terraform_region(r, t);
     }
     else {
@@ -67,9 +68,44 @@ struct region *test_create_region(int x, int y, const terrain_type *terrain)
     return r;
 }
 
+struct locale * test_create_locale(void) {
+    struct locale *loc = get_locale("test");
+    if (!loc) {
+        int i;
+        loc = get_or_create_locale("test");
+        locale_setstring(loc, "factiondefault", parameters[P_FACTION]);
+        for (i = 0; i < MAXSKILLS; ++i) {
+            if (!locale_getstring(loc, mkname("skill", skillnames[i])))
+                locale_setstring(loc, mkname("skill", skillnames[i]), skillnames[i]);
+        }
+        for (i = 0; i != MAXDIRECTIONS; ++i) {
+            locale_setstring(loc, directions[i], directions[i]);
+            init_direction(loc, i, directions[i]);
+            init_direction(loc, i, coasts[i]+7);
+        }
+        for (i = 0; i <= ST_FLEE; ++i) {
+            locale_setstring(loc, combatstatus[i], combatstatus[i]+7);
+        }
+        for (i = 0; i != MAXKEYWORDS; ++i) {
+            locale_setstring(loc, mkname("keyword", keywords[i]), keywords[i]);
+        }
+        for (i = 0; i != MAXSKILLS; ++i) {
+            locale_setstring(loc, mkname("skill", skillnames[i]), skillnames[i]);
+        }
+        for (i = 0; i != MAXPARAMS; ++i) {
+            locale_setstring(loc, parameters[i], parameters[i]);
+            test_translate_param(loc, i, parameters[i]);
+        }
+        init_parameters(loc);
+        init_skills(loc);
+    }
+    return loc;
+}
+
 struct faction *test_create_faction(const struct race *rc)
 {
-    faction *f = addfaction("nobody@eressea.de", NULL, rc ? rc : test_create_race("human"), default_locale, 0);
+    struct locale * loc = test_create_locale();
+    faction *f = addfaction("nobody@eressea.de", NULL, rc ? rc : test_create_race("human"), loc, 0);
     test_clear_messages(f);
     return f;
 }
@@ -78,6 +114,7 @@ struct unit *test_create_unit(struct faction *f, struct region *r)
 {
     const struct race * rc = f ? f->race : 0;
     assert(f || !r);
+    if (!rc) rc = rc_get_or_create("human");
     return create_unit(r, f, 1, rc ? rc : rc_get_or_create("human"), 0, 0, 0);
 }
 
@@ -85,6 +122,7 @@ void test_cleanup(void)
 {
     int i;
 
+    default_locale = 0;
     free_gamedata();
     free_terrains();
     free_resources();

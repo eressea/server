@@ -25,11 +25,13 @@ extern "C" {
     struct castorder;
     struct spellparameter;
     struct spell;
+    struct locale;
 
     struct CuTest;
 
     void test_cleanup(void);
 
+    struct locale * test_create_locale(void);
     struct terrain_type * test_create_terrain(const char * name, unsigned int flags);
     struct race *test_create_race(const char *name);
     struct region *test_create_region(int x, int y,

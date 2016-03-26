@@ -35,14 +35,16 @@ extern "C" {
     bool is_migrant(struct unit *u);
     int study_cost(struct unit *u, skill_t talent);
 
-#ifndef NO_TESTS
-    typedef bool(*learn_fun)(struct unit *u, skill_t sk, double ch);
-    void inject_learn(learn_fun fun);
-#endif
-    bool learn_skill(struct unit *u, skill_t sk, double chance);
+    typedef void(*learn_fun)(struct unit *u, skill_t sk, int days);
+
+#define STUDYDAYS 30
+    void learn_skill(struct unit *u, skill_t sk, int days);
 
     void produceexp(struct unit *u, skill_t sk, int n);
-    void produceexp_ex(struct unit *u, skill_t sk, int n, bool(*learn)(struct unit *, skill_t, double));
+    void produceexp_ex(struct unit *u, skill_t sk, int n, learn_fun learn);
+
+    void demon_skillchange(struct unit *u);
+
 #define MAXTEACHERS 20
 #define TEACHNUMBER 10
     typedef struct teaching_info {
@@ -52,6 +54,9 @@ extern "C" {
 
     extern const struct attrib_type at_learning;
 
+#ifndef NO_TESTS
+    void inject_learn(learn_fun fun);
+#endif
 
 #ifdef __cplusplus
 }

@@ -49,7 +49,7 @@
         "recruit.allow_merge": true,
         "study.expensivemigrants": true,
         "study.speedup": 2,
-        "study.from_use": 0.4,
+        "study.produceexp": 12,
         "world.era": 3,
         "rules.reserve.twophase": true,
         "rules.owners.force_leave": false,

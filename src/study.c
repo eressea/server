@@ -280,7 +280,7 @@ int teach_cmd(unit * u, struct order *ord)
     static const curse_type *gbdream_ct = NULL;
     plane *pl;
     region *r = u->region;
-    skill_t sk = NOSKILL;
+    skill_t sk_academy = NOSKILL;
     int teaching, i, j, count, academy = 0;
 
     if (gbdream_ct == 0)
@@ -322,6 +322,7 @@ int teach_cmd(unit * u, struct order *ord)
 
 #if TEACH_ALL
     if (getparam(u->faction->locale) == P_ANY) {
+        skill_t sk;
         unit *student;
         skill_t teachskill[MAXSKILLS];
         int t = 0;
@@ -380,6 +381,7 @@ int teach_cmd(unit * u, struct order *ord)
         init_order(ord);
 
         while (!parser_end()) {
+            skill_t sk;
             unit *u2;
             bool feedback;
 
@@ -472,15 +474,15 @@ int teach_cmd(unit * u, struct order *ord)
                     continue;
                 }
             }
-
+            sk_academy = sk;
             teaching -= teach_unit(u, u2, teaching, sk, false, &academy);
         }
         new_order = create_order(K_TEACH, u->faction->locale, "%s", zOrder);
         replace_order(&u->orders, ord, new_order);
         free_order(new_order);      /* parse_order & set_order have each increased the refcount */
     }
-    if (academy) {
-        academy_teaching_bonus(u, sk, academy);
+    if (academy && sk_academy!=NOSKILL) {
+        academy_teaching_bonus(u, sk_academy, academy);
     }
     return 0;
 }
@@ -738,17 +740,7 @@ int study_cmd(unit * u, order * ord)
     if (fval(u, UFL_HUNGER))
         days /= 2;
 
-    while (days) {
-        if (days >= u->number * 30) {
-            learn_skill(u, sk, 1.0);
-            days -= u->number * 30;
-        }
-        else {
-            double chance = (double)days / u->number / 30;
-            learn_skill(u, sk, chance);
-            days = 0;
-        }
-    }
+    learn_skill(u, sk, days);
     if (a != NULL) {
         int index = 0;
         while (teach->teachers[index] && index != MAXTEACHERS) {
@@ -800,17 +792,16 @@ int study_cmd(unit * u, order * ord)
     return 0;
 }
 
-static double produceexp_chance(void) {
-    return config_get_flt("study.from_use", 1.0 / 3);
+static int produceexp_days(void) {
+    return config_get_int("study.produceexp", 10);
 }
 
-void produceexp_ex(struct unit *u, skill_t sk, int n, bool(*learn)(unit *, skill_t, double))
+void produceexp_ex(struct unit *u, skill_t sk, int n, learn_fun learn)
 {
-    if (n != 0 && (is_monsters(u->faction) || playerrace(u_race(u)))) {
-        double chance = produceexp_chance();
-        if (chance > 0.0F) {
-            learn(u, sk, (n * chance) / u->number);
-        }
+    assert(u && n <= u->number);
+    if (n > 0 && (is_monsters(u->faction) || playerrace(u_race(u)))) {
+        int days = produceexp_days();
+        learn(u, sk, days * n / u->number);
     }
 }
 
@@ -826,32 +817,67 @@ void inject_learn(learn_fun fun) {
     inject_learn_fun = fun;
 }
 #endif
-
-bool learn_skill(unit * u, skill_t sk, double learn_chance)
-{
-    skill *sv = u->skills;
+void learn_skill(unit *u, skill_t sk, int days) {
+    int leveldays = STUDYDAYS * u->number;
+    int weeks = 0;
 #ifndef NO_TESTS
     if (inject_learn_fun) {
-        return inject_learn_fun(u, sk, learn_chance);
+        inject_learn_fun(u, sk, days);
+        return;
     }
 #endif
-    if (learn_chance < 1.0 && rng_int() % 10000 >= learn_chance * 10000)
-        if (!chance(learn_chance))
-            return false;
+    while (days >= leveldays) {
+        ++weeks;
+        days -= leveldays;
+    }
+    if (days > 0 && rng_int() % leveldays < days) {
+        ++weeks;
+    }
+    if (weeks > 0) {
+        skill *sv = unit_skill(u, sk);
+        if (!sv) {
+            sv = add_skill(u, sk);
+        }
+        while (sv->weeks <= weeks) {
+            weeks -= sv->weeks;
+            sk_set(sv, sv->level + 1);
+        }
+        sv->weeks -= weeks;
+    }
+}
+
+/** Talente von Dämonen verschieben sich.
+*/
+void demon_skillchange(unit *u)
+{
+    skill *sv = u->skills;
+    int upchance = 15;
+    int downchance = 10;
+
+    if (fval(u, UFL_HUNGER)) {
+        /* hungry demons only go down, never up in skill */
+        int rule_hunger = config_get_int("hunger.demon.skill", 0) != 0;
+        if (rule_hunger) {
+            upchance = 0;
+            downchance = 15;
+        }
+    }
+
     while (sv != u->skills + u->skill_size) {
-        assert(sv->weeks > 0);
-        if (sv->id == sk) {
-            if (sv->weeks <= 1) {
-                sk_set(sv, sv->level + 1);
+        int roll = rng_int() % 100;
+        if (sv->level > 0 && roll < upchance + downchance) {
+            int weeks = 1 + rng_int() % 3;
+            if (roll < downchance) {
+                reduce_skill(u, sv, weeks);
+                if (sv->level < 1) {
+                    /* demons should never forget below 1 */
+                    set_level(u, sv->id, 1);
+                }
             }
             else {
-                sv->weeks--;
+                learn_skill(u, sv->id, STUDYDAYS*weeks);
             }
-            return true;
         }
         ++sv;
     }
-    sv = add_skill(u, sk);
-    sk_set(sv, 1);
-    return true;
 }

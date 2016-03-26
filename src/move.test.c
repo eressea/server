@@ -284,7 +284,6 @@ struct drift_fixture {
     unit *u;
     terrain_type *t_ocean;
     ship_type *st_boat;
-    struct locale *lang;
     ship *sh;
 
 };
@@ -292,7 +291,6 @@ struct drift_fixture {
 void setup_drift (struct drift_fixture *fix) {
     test_cleanup();
     config_set("rules.ship.storms", "0");
-    fix->lang = get_or_create_locale("de");
 
     test_create_world();
     test_create_shiptype("drifter");
@@ -304,8 +302,6 @@ void setup_drift (struct drift_fixture *fix) {
     set_level(fix->u, SK_SAILING, fix->st_boat->sumskill);
     u_set_ship(fix->u, fix->sh = test_create_ship(fix->u->region, fix->st_boat));
     assert(fix->f && fix->u && fix->sh);
-    fix->f->locale = get_or_create_locale("de");
-
 }
 
 static void test_ship_no_overload(CuTest *tc) {
@@ -460,7 +456,6 @@ static void test_follow_ship_msg(CuTest * tc) {
     const ship_type *stype;
     message *msg;
     order *ord;
-
     traveldir *td = NULL;
     attrib *a;
 
@@ -487,10 +482,6 @@ static void test_follow_ship_msg(CuTest * tc) {
     td->no = 2;
     td->dir = D_NORTHWEST;
     td->age = 2;
-
-    locale_setstring(default_locale, "northwest", "Nordwesten");
-    locale_setstring(default_locale, "keyword::move", "NACH");
-    init_locale(default_locale);
 
     mt_register(mt_new_va("error18", "unit:unit", "region:region", "command:order", 0));
 

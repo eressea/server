@@ -394,10 +394,10 @@ static int tolua_learn_skill(lua_State * L)
 {
     unit *u = (unit *)tolua_tousertype(L, 1, 0);
     const char *skname = tolua_tostring(L, 2, 0);
-    float chances = (float)tolua_tonumber(L, 3, 0);
+    int days = (int)tolua_tonumber(L, 3, 0);
     skill_t sk = findskill(skname);
     if (sk != NOSKILL) {
-        learn_skill(u, sk, chances);
+        learn_skill(u, sk, days);
     }
     return 0;
 }
