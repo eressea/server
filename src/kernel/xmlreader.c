@@ -1981,6 +1981,7 @@ static int parse_messages(xmlDocPtr doc)
         /* strings */
         xpath->node = node;
         result = xmlXPathEvalExpression(BAD_CAST "text", xpath);
+        assert(result->nodesetval->nodeNr>0);
         for (k = 0; k != result->nodesetval->nodeNr; ++k) {
             xmlNodePtr node = result->nodesetval->nodeTab[k];
             struct locale *lang;
