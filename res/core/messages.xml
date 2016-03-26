@@ -65,13 +65,6 @@
     <text locale="de">$unit($owner) bittet $unit($unit), $building($building) zu verlassen.</text>
     <text locale="en">$unit($owner) asks $unit($unit) to leave $building($building).</text>
   </message>
-  <message name="alp_destroyed" section="events">
-    <type>
-      <arg name="region" type="region"/>
-    </type>
-    <text locale="de">Ein Alp starb in $region($region), ohne sein Ziel zu erreichen.</text>
-    <text locale="en">An alp died in $region($region) before reaching its target.</text>
-  </message>
   <message name="nr_claims" section="nr">
     <type>
       <arg name="items" type="items"/>
@@ -1277,11 +1270,6 @@
     <text locale="en">"$unit($unit) stumbles upon $localize($location) while exploring the region. Closer inspection reveals a torn old book titled '$localize($book)'. The expansion of knowledge is tremendous."</text>
   </message>
 
-  <message name="alp_success" section="events">
-    <text locale="de">"Ein Alp hat sein Opfer gefunden und springt auf den Rücken von $unit($target)!"</text>
-    <text locale="en">"An evil spirit has found its victim and mounts the back of $unit($target)!"</text>
-  </message>
-
   <message name="curseinfo::auraboost_0" section="events">
     <type>
       <arg name="unit" type="unit"/>
@@ -1467,16 +1455,6 @@
     </type>
     <text locale="de">"$unit($mage) ruft ein fürchterliches Unwetter über seine Feinde. Der magischen Regen lässt alles Eisen rosten."</text>
     <text locale="en">"$unit($mage) calls forth a terrible torment over the enemy. The magical rain makes all iron rusty."</text>
-  </message>
-
-  <message name="summon_alp_effect" section="magic">
-    <type>
-      <arg name="mage" type="unit"/>
-      <arg name="alp" type="unit"/>
-      <arg name="target" type="unit"/>
-    </type>
-    <text locale="de">"$unit($mage) beschwört den Alp $unit($alp) für $unit($target)."</text>
-    <text locale="en">"$unit($mage) summons the alp $unit($alp) for $unit($target)."</text>
   </message>
 
   <message name="healing_effect_0" section="magic">

@@ -30,7 +30,6 @@
 #include <spells/unitcurse.h>
 #include <spells/shipcurse.h>
 #include <spells/combatspells.h>
-#include <spells/alp.h>
 #include <spells/flyingship.h>
 
 /* kernel includes */
@@ -6510,7 +6509,6 @@ static spelldata spell_functions[] = {
     { "bad_dreams", sp_baddreams, 0 },
     { "mindblast", sp_mindblast_temp, 0 },
     { "orkdream", sp_sweetdreams, 0 },
-    { "summon_alp", sp_summon_alp, 0 }, // TODO: this spell is disabled everywhere
     /* M_CERDDOR */
     { "appeasement", sp_denyattack, 0 },
     { "song_of_healing", sp_healing, 0 },
@@ -6706,9 +6704,6 @@ void register_spells(void)
 
     at_register(&at_wdwpyramid);
     at_register(&at_deathcloud_compat);
-
-    /* sp_summon_alp */
-    register_alp();
 
     /* init_firewall(); */
     ct_register(&ct_firewall);

@@ -98,16 +98,6 @@ static void cunhash(curse * c)
     }
 }
 
-curse *cfindhash(int i)
-{
-    curse *old;
-
-    for (old = cursehash[i % MAXENTITYHASH]; old; old = old->nexthash)
-        if (old->no == i)
-            return old;
-    return NULL;
-}
-
 /* ------------------------------------------------------------- */
 /* at_curse */
 void curse_init(attrib * a)
@@ -389,9 +379,13 @@ curse *get_curse(attrib * ap, const curse_type * ctype)
 /* ------------------------------------------------------------- */
 /* findet einen curse global anhand seiner 'curse-Einheitnummer' */
 
-curse *findcurse(int cid)
+curse *findcurse(int i)
 {
-    return cfindhash(cid);
+    curse *old;
+    for (old = cursehash[i % MAXENTITYHASH]; old; old = old->nexthash)
+        if (old->no == i)
+            return old;
+    return NULL;
 }
 
 /* ------------------------------------------------------------- */
@@ -700,32 +694,6 @@ bool is_cursed_with(const attrib * ap, const curse * c)
 /* ------------------------------------------------------------- */
 /* cursedata */
 /* ------------------------------------------------------------- */
-/*
- * typedef struct curse_type {
- *  const char *cname; (Name der Zauberwirkung, Identifizierung des curse)
- *  int typ;
- *  spread_t spread;
- *  unsigned int mergeflags;
- *  int (*curseinfo)(const struct locale*, const void*, int, curse*, int);
- *  void (*change_vigour)(curse*, double);
- *  int (*read)(struct storage * store, curse * c);
- *  int (*write)(struct storage * store, const curse * c);
- * } curse_type;
- */
-
-int resolve_curse(variant id, void *address)
-{
-    int result = 0;
-    curse *c = NULL;
-    if (id.i != 0) {
-        c = cfindhash(id.i);
-        if (c == NULL) {
-            result = -1;
-        }
-    }
-    *(curse **)address = c;
-    return result;
-}
 
 static const char *oldnames[MAXCURSE] = {
     /* OBS: when removing curses, remember to update read_ccompat() */

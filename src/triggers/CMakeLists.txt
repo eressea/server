@@ -8,7 +8,6 @@ createunit.c
 gate.c
 giveitem.c
 killunit.c
-removecurse.c
 shock.c
 timeout.c
 triggers.c

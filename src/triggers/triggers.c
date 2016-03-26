@@ -28,7 +28,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <triggers/unguard.h>
 #include <triggers/giveitem.h>
 #include <triggers/killunit.h>
-#include <triggers/removecurse.h>
 #include <triggers/shock.h>
 #include <triggers/timeout.h>
 #include <triggers/unitmessage.h>
@@ -50,7 +49,6 @@ void register_triggers(void)
     tt_register(&tt_unguard);
     tt_register(&tt_giveitem);
     tt_register(&tt_killunit);
-    tt_register(&tt_removecurse);
     tt_register(&tt_shock);
     tt_register(&tt_unitmessage);
     tt_register(&tt_timeout);

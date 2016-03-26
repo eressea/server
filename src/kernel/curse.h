@@ -286,8 +286,6 @@ extern "C" {
     void ct_register(const curse_type *);
     void ct_checknames(void);
 
-    curse *cfindhash(int i);
-
     curse *findcurse(int curseid);
 
     void curse_init(struct attrib *a);
@@ -296,7 +294,6 @@ extern "C" {
 
     double destr_curse(struct curse *c, int cast_level, double force);
 
-    int resolve_curse(variant data, void *address);
     bool is_cursed_with(const struct attrib *ap, const struct curse *c);
 
     /* gibt true, wenn der Curse nicht NULL oder inaktiv ist */

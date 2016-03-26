@@ -2906,23 +2906,6 @@
       <text locale="en">toad</text>
     </string>
 
-    <string name="alp">
-      <text locale="de">Alp</text>
-      <text locale="en">nightmare</text>
-    </string>
-    <string name="alp_p">
-      <text locale="de">Alps</text>
-      <text locale="en">nightmaress</text>
-    </string>
-    <string name="alp_d">
-      <text locale="de">Alps</text>
-      <text locale="en">nightmares</text>
-    </string>
-    <string name="alp_x">
-      <text locale="de">Alp</text>
-      <text locale="en">nightmare</text>
-    </string>
-
     <string name="mountainguard">
       <text locale="de">Bergwächter</text>
       <text locale="en">mountainguard</text>
@@ -4356,10 +4339,6 @@
     <string name="readmind">
       <text locale="de">Traumdeuten</text>
       <text locale="en">Mind Probe</text>
-    </string>
-    <string name="summon_alp">
-      <text locale="de">Alp</text>
-      <text locale="en">Nightmare</text>
     </string>
     <string name="create_dreameye">
       <text locale="de">Erschaffe ein Traumauge</text>
@@ -6424,25 +6403,6 @@
         target's faction, skills and possessions will no
         longer be unknown.</text>
     </string>
-    <string name="summon_alp">
-      <text locale="de">Der Magier beschwört ein kleines Monster, einen Alp.  Dieses bewegt sich
-      langsam auf sein Opfer zu (das sich an einem beliebigen Ort an der Welt
-      befinden kann, der Magier oder seine Partei braucht es nicht zu sehen).
-      Sobald das Opfer erreicht ist, wird es gnadenlos gequält, und nur durch
-      einen starken Gegenzauber oder den Tod des beschwörenden Magiers kann
-      das Opfer wieder Frieden finden. Bei der Beschwörung des Alps verliert
-      der Magier einen kleinen Teil seiner Aura für immer.</text>
-      <text locale="en">The magician spawns a little monster, a nightmare. The nightmare slowly
-      approaches its victim (which may be at an arbitrary place in eressea, it
-      is not needed for the magician or his party  to see the victim). As soon
-      as
-      the victim is reached the nightmare starts to torment it  without mercy,
-      only a powerfull counter spell or the death of the casting magician can
-      redeem
-      the victim. When spawning the nightmare the magician loses a small amount
-      of
-      his aura forever.</text>
-    </string>
     <string name="create_dreameye">
       <text locale="de">Ein mit diesem Zauber belegtes Drachenauge, welches zum Abendmahle
       verzehrt wird, erlaubt es dem Benutzer, in die Träume einer anderen
@@ -7352,11 +7312,6 @@
   <string name="firedragon">
     <text locale="de">Feuerdrache</text>
     <text locale="en">fire dragon</text>
-  </string>
-
-  <string name="trigger_alp_destroy">
-    <text locale="de">Ein Alp starb, ohne sein Ziel zu erreichen.</text>
-    <text locale="en">An alp died before it reached its target.</text>
   </string>
 
   <string name="unarmed">
