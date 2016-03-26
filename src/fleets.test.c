@@ -824,6 +824,7 @@ static void test_fleet_setcoast(CuTest *tc) {
 
     test_cleanup();
 }
+
 static void test_fleet_move(CuTest *tc) {
     fleet_fixture ffix;
     order *ord;
@@ -867,6 +868,21 @@ static void test_fleet_move(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_fleet_damage(CuTest *tc) {
+    fleet_fixture ffix;
+
+    test_cleanup();
+    setup_fleet();
+    init_fleet(&ffix);
+
+    damage_ship(ffix.fleet, .05);
+
+    CuAssertIntEquals(tc, 5, ship_damage_percent(ffix.sh1));
+    CuAssertIntEquals(tc, 5, ship_damage_percent(ffix.sh2));
+    CuAssertIntEquals(tc, 0, ship_damage_percent(ffix.fleet));
+
+    test_cleanup();
+}
 
 /*
 // TODO
@@ -877,6 +893,7 @@ static void test_fleet_move(CuTest *tc) {
 // ADD ship:
 // must be complete (?)
 // TRANSFER possible?
+// assert unit order, ship order??
 
 // check coast
 // check capacity (freight/cabins)
@@ -886,7 +903,7 @@ static void test_fleet_move(CuTest *tc) {
 // KINGKILLER: check owner leaves/dies
 // damage fleet
 // damage fleet multiple times
-// damage ship
+// damage ship: check if damage_ship is used correctly everywhere
 // combat damage: if units take damage, damage at random as many ships as would fit the units?
 
 // REMOVE:
@@ -953,5 +970,6 @@ CuSuite *get_fleets_suite(void)
     SUITE_ADD_TEST(suite, test_fleet_coast);
     SUITE_ADD_TEST(suite, test_fleet_setcoast);
     SUITE_ADD_TEST(suite, test_fleet_move);
+    SUITE_ADD_TEST(suite, test_fleet_damage);
     return suite;
 }

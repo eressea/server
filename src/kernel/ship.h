@@ -146,12 +146,14 @@ extern "C" {
     int aggregate_min(int i1, int i2);
     int aggregate_sum(int i1, int i2);
 
-    typedef int (*intvisitor) (const ship *fleet, const ship *sh, void *state);
+    typedef int (*int_visitor) (const ship *fleet, const ship *sh, void *state);
+    typedef bool (*bool_visitor) (struct ship *fleet, struct ship *sh, void *state);
+    typedef bool (*const_bool_visitor) (const struct ship *fleet, const struct ship *sh, void *state);
     typedef int (*aggregator) (int v1, int v2);
 
-    int fleet_const_int_aggregate(const struct ship *sh, intvisitor getvalue, aggregator aggr, int init_value, void *state);
-    void fleet_visit(struct ship *sh, bool (*visit_ship) (struct ship *fleet, struct ship *sh, void *state), void *state);
-    void fleet_const_visit(const struct ship *sh, bool (*visit_ship) (const struct ship *fleet, const struct ship *sh, void *state), void *state);
+    int fleet_const_int_aggregate(const struct ship *sh, int_visitor getvalue, aggregator aggr, int init_value, void *state);
+    void fleet_visit(struct ship *sh, bool_visitor visit_ship, void *state);
+    void fleet_const_visit(const struct ship *sh, const_bool_visitor visit_ship, void *state);
 
 #ifdef __cplusplus
 }

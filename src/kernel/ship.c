@@ -175,7 +175,7 @@ struct ship *findshipr(const region * r, int n)
 }
 
 
-void fleet_visit(ship *sh, bool (*visit_ship) (ship *fleet, ship *sh, void *state), void *state) {
+void fleet_visit(ship *sh, bool_visitor visit_ship, void *state) {
     if (ship_isfleet(sh)) {
         int count = 0;
         ship *shp;
@@ -193,8 +193,7 @@ void fleet_visit(ship *sh, bool (*visit_ship) (ship *fleet, ship *sh, void *stat
     }
 }
 
-void fleet_const_visit(const ship *sh,
-    bool (*visit_ship)(const ship *fleet, const ship *sh, void *state), void *state) {
+void fleet_const_visit(const ship *sh, const_bool_visitor visit_ship, void *state) {
     if (ship_isfleet(sh)) {
         int count = 0;
         ship *shp;
@@ -216,12 +215,12 @@ void fleet_const_visit(const ship *sh,
 
 typedef struct aggregate_state {
     void *inner_state;
-    intvisitor visitor;
+    int_visitor visitor;
     aggregator aggregate;
     int value;
 } aggregate_state;
 
-static void *aggregate_int_state(int init_value, aggregator agg, intvisitor getvalue, void *inner_state, aggregate_state *state) {
+static void *aggregate_int_state(int init_value, aggregator agg, int_visitor getvalue, void *inner_state, aggregate_state *state) {
     aggregate_state s2 = { inner_state, getvalue, agg, init_value };
     *state = s2;
     return state;
@@ -236,7 +235,7 @@ static bool aggregate_int_visitor(const ship *fleet, const ship *sh, void *state
     return true;
 }
 
-int fleet_const_int_aggregate(const ship *sh, intvisitor getvalue, aggregator aggr, int init_value, void *state) {
+int fleet_const_int_aggregate(const ship *sh, int_visitor getvalue, aggregator aggr, int init_value, void *state) {
     aggregate_state agg_state;
     aggregate_int_state(init_value, aggr, getvalue, state, &agg_state);
 
@@ -256,11 +255,21 @@ int aggregate_sum(int i1, int i2) {
     return i1 + i2;
 }
 
+static bool damageship(ship *fleet, ship *sh, void *state) {
+    double damage;
+    if (!sh)
+        return true;
+
+    damage = DAMAGE_SCALE * sh->type->damage * *((double *) state) * sh->size + sh->damage + .000001;
+    sh->damage = (int)damage;
+    return true;
+}
+
 void damage_ship(ship * sh, double percent)
 {
-    double damage =
-        DAMAGE_SCALE * sh->type->damage * percent * sh->size + sh->damage + .000001;
-    sh->damage = (int)damage;
+    double state = percent;
+
+    fleet_visit(sh, damageship, (void *) &state);
 }
 
 bool ship_isdamaged(const struct ship *sh) {
