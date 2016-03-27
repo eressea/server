@@ -29,18 +29,11 @@ static void setup_fleet(void) {
     ship_type* ftype;
     struct locale* lang;
 
-    lang = get_or_create_locale("de");
+    lang = test_create_locale();
+
     locale_setstring(lang, "fleet", "Flotte");
     locale_setstring(lang, parameters[P_REMOVE], "ENTFERNE");
-    locale_setstring(lang, directions[D_WEST], "WESTEN");
-    locale_setstring(lang, directions[D_NORTHEAST], "NORDOSTEN");
-    locale_setstring(lang, directions[D_EAST], "OSTEN");
-    locale_setstring(lang, directions[D_SOUTHEAST], "SUEDOSTEN");
-    locale_setstring(lang, directions[D_SOUTHWEST], "SUEDWESTEN");
-    locale_setstring(lang, directions[D_NORTHWEST], "NORDWESTEN");
-    init_directions(lang);
     test_create_world();
-    init_locales();
 
     ftype = st_get_or_create("fleet");
     ftype->cptskill = 6;
@@ -839,7 +832,7 @@ static void test_fleet_move(CuTest *tc) {
      * coasts: plain
      */
 
-    ord = create_order(K_MOVE, ffix.f1->locale, "W NORDOSTEN O SUEDOSTE SUEDWEST W", itoa36(ffix.sh1->no));
+    ord = create_order(K_MOVE, ffix.f1->locale, "W northeast e southeast southwest w", itoa36(ffix.sh1->no));
     unit_addorder(ffix.u11, ord);
     set_level(ffix.u11, SK_SAILING, 1);
 
