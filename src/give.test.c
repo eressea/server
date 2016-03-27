@@ -31,18 +31,11 @@ struct give {
 
 static void setup_give(struct give *env) {
     struct terrain_type *ter = test_create_terrain("plain", LAND_REGION);
-    struct locale *lang;
     race *rc;
 
     assert(env->f1);
     rc = test_create_race(env->f1->race ? env->f1->race->_name : "humon");
     rc->ec_flags |= GIVEPERSON;
-    lang = get_or_create_locale(env->f1->locale ? locale_name(env->f1->locale) : "test");
-    env->f1->locale = lang;
-    locale_setstring(lang, "ALLES", "ALLES");
-    locale_setstring(lang, "PERSONEN", "PERSONEN");
-    locale_setstring(lang, "KRAEUTER", "KRAUT");
-    init_locale(lang);
 
     env->r = test_create_region(0, 0, ter);
     env->src = test_create_unit(env->f1, env->r);
@@ -277,7 +270,6 @@ static void test_give(CuTest * tc) {
 static void test_give_herbs(CuTest * tc) {
     struct give env;
     struct order *ord;
-    struct locale * lang;
     char cmd[32];
 
     test_cleanup();
@@ -286,12 +278,8 @@ static void test_give_herbs(CuTest * tc) {
     setup_give(&env);
     i_change(&env.src->items, env.itype, 10);
 
-    lang = get_or_create_locale("test");
-    env.f1->locale = lang;
-    locale_setstring(lang, "KRAEUTER", "KRAUT");
-    init_locale(lang);
-    _snprintf(cmd, sizeof(cmd), "%s KRAUT", itoa36(env.dst->no));
-    ord = create_order(K_GIVE, lang, cmd);
+    _snprintf(cmd, sizeof(cmd), "%s %s", itoa36(env.dst->no), LOC(env.f1->locale, parameters[P_HERBS]));
+    ord = create_order(K_GIVE, env.f1->locale, cmd);
     assert(ord);
 
     give_cmd(env.src, ord);
@@ -332,7 +320,6 @@ static void test_give_invalid_target(CuTest *tc) {
     // bug https://bugs.eressea.de/view.php?id=1685
     struct give env;
     order *ord;
-    struct locale * lang;
 
     test_cleanup();
     env.f1 = test_create_faction(0);
@@ -340,11 +327,7 @@ static void test_give_invalid_target(CuTest *tc) {
     setup_give(&env);
 
     i_change(&env.src->items, env.itype, 10);
-    lang = get_or_create_locale("de");
-    env.f1->locale = lang;
-    locale_setstring(lang, "KRAEUTER", "KRAUT");
-    init_locale(lang);
-    ord = create_order(K_GIVE, lang, "## KRAUT");
+    ord = create_order(K_GIVE, env.f1->locale, "## KRAUT");
     assert(ord);
 
     give_cmd(env.src, ord);

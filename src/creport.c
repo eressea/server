@@ -663,9 +663,8 @@ const faction * f, const region * r)
     fprintf(F, "\"%s\";Typ\n", translate(sh->type->_name,
         LOC(f->locale, sh->type->_name)));
     fprintf(F, "%d;Groesse\n", sh->size);
-    if (sh->damage) {
-        int percent =
-            (sh->damage * 100 + DAMAGE_SCALE - 1) / (sh->size * DAMAGE_SCALE);
+    if (ship_isdamaged(sh)) {
+        int percent = ship_damage_percent(sh);
         fprintf(F, "%d;Schaden\n", percent);
     }
     if (u) {
@@ -677,12 +676,12 @@ const faction * f, const region * r)
     /* calculate cargo */
     if (u && (u->faction == f || omniscient(f))) {
         int n = 0, p = 0;
-        int mweight = shipcapacity(sh);
-        getshipweight(sh, &n, &p);
+        int mweight = ship_capacity(sh);
+        ship_weight(sh, &n, &p);
 
         fprintf(F, "%d;capacity\n", mweight);
         fprintf(F, "%d;cargo\n", n);
-        fprintf(F, "%d;speed\n", shipspeed(sh, u));
+        fprintf(F, "%d;speed\n", ship_speed(sh, u));
     }
     /* shore */
     w = NODIRECTION;

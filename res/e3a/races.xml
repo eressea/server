@@ -672,11 +672,6 @@
     <skill name="stamina" modifier="-10"/>
     <attack type="4" damage="1d2"/>
   </race>
-  <race name="alp" magres="0.950000" maxaura="1.0" regaura="1.0" weight="0" capacity="0" speed="1.500000" hp="20" ac="2" damage="1d4" unarmedattack="0" unarmeddefense="0" attackmodifier="2" defensemodifier="20" fly="yes" walk="yes" canlearn="no" canteach="no">
-    <ai splitsize="1"/>
-    <function name="name" value="namegeneric"/>
-    <attack type="1" damage="1d4"/>
-  </race>
   <race name="mountainguard" unarmedguard="yes" magres="0.500000" maxaura="1.0" regaura="0.500000" weight="10000" capacity="2000" speed="0.000000" hp="1000" ac="12" damage="2d40" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="8" cannotmove="yes" canlearn="no" teach="no" noweapons="yes">
     <ai splitsize="1"/>
     <function name="name" value="namegeneric"/>

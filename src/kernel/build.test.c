@@ -34,7 +34,6 @@ static unit * setup_build(build_fixture *bf) {
     bf->rc = test_create_race("human");
     bf->r = test_create_region(0, 0, 0);
     bf->f = test_create_faction(bf->rc);
-    bf->f->locale = get_or_create_locale("de");
     assert(bf->rc && bf->f && bf->r);
     bf->u = test_create_unit(bf->f, bf->r);
     assert(bf->u);

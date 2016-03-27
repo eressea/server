@@ -22,9 +22,9 @@
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
-        <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Ungültige Zielregion."</text>
-      <text locale="en">"$unit($unit) in $region($region): '$order($command)' - invalid target region."</text>
     </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Ungültige Zielregion."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - invalid target region."</text>
   </message>
   
   <message name="missing_direction">
@@ -32,9 +32,9 @@
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
-        <text locale="de">"$unit($unit) in $region($region): '$order($command)' - keine Richtung angegeben."</text>
-      <text locale="en">"$unit($unit) in $region($region): '$order($command)' - no direction was specified."</text>
     </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - keine Richtung angegeben."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - no direction was specified."</text>
   </message>
   
   <message name="target_region_not_empty">
@@ -42,9 +42,9 @@
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
-        <text locale="de">"$unit($unit) in $region($region): '$order($command)' - In der Zielregion befinden sich noch Einheiten."</text>
-      <text locale="en">"$unit($unit) in $region($region): '$order($command)' - There are units in the target region."</text>
     </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - In der Zielregion befinden sich noch Einheiten."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - There are units in the target region."</text>
   </message>
   
   <message name="force_leave_ship" section="events">
@@ -64,13 +64,6 @@
     </type>
     <text locale="de">$unit($owner) bittet $unit($unit), $building($building) zu verlassen.</text>
     <text locale="en">$unit($owner) asks $unit($unit) to leave $building($building).</text>
-  </message>
-  <message name="alp_destroyed" section="events">
-    <type>
-      <arg name="region" type="region"/>
-    </type>
-    <text locale="de">Ein Alp starb in $region($region), ohne sein Ziel zu erreichen.</text>
-    <text locale="en">An alp died in $region($region) before reaching its target.</text>
   </message>
   <message name="nr_claims" section="nr">
     <type>
@@ -1277,11 +1270,6 @@
     <text locale="en">"$unit($unit) stumbles upon $localize($location) while exploring the region. Closer inspection reveals a torn old book titled '$localize($book)'. The expansion of knowledge is tremendous."</text>
   </message>
 
-  <message name="alp_success" section="events">
-    <text locale="de">"Ein Alp hat sein Opfer gefunden und springt auf den Rücken von $unit($target)!"</text>
-    <text locale="en">"An evil spirit has found its victim and mounts the back of $unit($target)!"</text>
-  </message>
-
   <message name="curseinfo::auraboost_0" section="events">
     <type>
       <arg name="unit" type="unit"/>
@@ -1467,16 +1455,6 @@
     </type>
     <text locale="de">"$unit($mage) ruft ein fürchterliches Unwetter über seine Feinde. Der magischen Regen lässt alles Eisen rosten."</text>
     <text locale="en">"$unit($mage) calls forth a terrible torment over the enemy. The magical rain makes all iron rusty."</text>
-  </message>
-
-  <message name="summon_alp_effect" section="magic">
-    <type>
-      <arg name="mage" type="unit"/>
-      <arg name="alp" type="unit"/>
-      <arg name="target" type="unit"/>
-    </type>
-    <text locale="de">"$unit($mage) beschwört den Alp $unit($alp) für $unit($target)."</text>
-    <text locale="en">"$unit($mage) summons the alp $unit($alp) for $unit($target)."</text>
   </message>
 
   <message name="healing_effect_0" section="magic">
@@ -8389,7 +8367,17 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Kapitän muß ein Segeltalent von mindestens $int($value) haben, um $ship($ship) zu befehligen."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The captain needs a sailing skill of at least $int($value), to command $ship($ship)."</text>
   </message>
-
+  <message name="error_captain_fleet_size" section="errors">
+    <type>
+      <arg name="region" type="region"/>
+      <arg name="unit" type="unit"/>
+      <arg name="command" type="order"/>
+      <arg name="value" type="int"/>
+      <arg name="ship" type="ship"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Kapitän muß mindestens $int($value) Personen haben, um $ship($ship) zu befehligen."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The captain needs at least $int($value) persons, to command $ship($ship)."</text>
+  </message>
   <message name="error_roads_finished" section="errors">
     <type>
       <arg name="region" type="region"/>
@@ -8461,6 +8449,38 @@
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Helden können nicht rekrutieren."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Heroes cannot recruit."</text>
+  </message>
+
+  <message name="fleet_ship_invalid" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="ship" type="ship"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Schiff $if($isnull($ship),"",$ship($ship)) kann nicht zur Flotte hinzugefügt werden."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - ship $if($isnull($ship),"",$ship($ship)) cannot be added to the fleet."</text>
+  </message>
+
+  <message name="fleet_only_captain" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Nur der Kapitän einer Flotte kann dieses Kommando geben."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Only the captain of a fleet can give this order."</text>
+  </message>
+
+  <message name="ship_nofleet" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="ship" type="ship"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Schiff $ship($ship) ist in keiner Flotte."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - ship $ship($ship) is not in a fleet."</text>
   </message>
 
 </messages>

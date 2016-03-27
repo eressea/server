@@ -465,19 +465,15 @@ static int canride(unit * u)
 
 static bool cansail(const region * r, ship * sh)
 {
-    /* sonst ist construction:: size nicht ship_type::maxsize */
-    assert(!sh->type->construction
-        || sh->type->construction->improvement == NULL);
-
-    if (sh->type->construction && sh->size != sh->type->construction->maxsize) {
+    if (!ship_iscomplete(sh)) {
         return false;
     }
     else {
         int n = 0, p = 0;
-        int mweight = shipcapacity(sh);
-        int mcabins = sh->type->cabins;
+        int mweight = ship_capacity(sh);
+        int mcabins = ship_cabins(sh);
 
-        getshipweight(sh, &n, &p);
+        ship_weight(sh, &n, &p);
 
         if (n > mweight)
             return false;
@@ -489,17 +485,13 @@ static bool cansail(const region * r, ship * sh)
 
 static double overload(const region * r, ship * sh)
 {
-    /* sonst ist construction:: size nicht ship_type::maxsize */
-    assert(!sh->type->construction
-        || sh->type->construction->improvement == NULL);
-
-    if (sh->type->construction && sh->size != sh->type->construction->maxsize) {
+    if (!ship_iscomplete(sh)) {
         return DBL_MAX;
     } else {
         int n = 0, p = 0;
-        int mcabins = sh->type->cabins;
+        int mcabins = ship_cabins(sh);
 
-        getshipweight(sh, &n, &p);
+        ship_weight(sh, &n, &p);
 
         double ovl = n / (double)sh->type->cargo;
         if (mcabins)
@@ -508,9 +500,9 @@ static double overload(const region * r, ship * sh)
     }
 }
 
-int enoughsailors(const ship * sh, int crew_skill)
+int enoughsailors(const ship * sh)
 {
-    return crew_skill >= sh->type->sumskill;
+    return ship_crew_skill(sh) >= ship_type_crew_skill(sh);
 }
 
 /* ------------------------------------------------------------- */
@@ -528,7 +520,7 @@ static ship *do_maelstrom(region * r, unit * u)
 
     damage_ship(u->ship, 0.01 * damage);
 
-    if (sh->damage >= sh->size * DAMAGE_SCALE) {
+    if (ship_isdestroyed(sh)) {
         ADDMSG(&u->faction->msgs, msg_message("entermaelstrom",
             "region ship damage sink", r, sh, damage, 1));
         remove_ship(&sh->region->ships, sh);
@@ -615,7 +607,7 @@ mark_travelthru(unit * u, region * r, const region_list * route,
     }
 }
 
-ship *move_ship(ship * sh, region * from, region * to, region_list * route)
+static ship *move1ship(ship * sh, region * from, region * to, region_list * route)
 {
     unit **iunit = &from->units;
     unit **ulist = &to->units;
@@ -648,6 +640,23 @@ ship *move_ship(ship * sh, region * from, region * to, region_list * route)
         if (*iunit == u)
             iunit = &u->next;
     }
+    return sh;
+}
+
+ship *move_ship(ship * sh, region * from, region * to, region_list * route)
+{
+    move1ship(sh, from, to, route);
+
+    if (ship_isfleet(sh)) {
+        ship *shp = from->ships;
+        while (shp) {
+            ship *nextship = shp->next;
+            if (shp->fleet == sh) {
+                move1ship(shp, from, to, route);
+            }
+            shp = nextship;
+        }
+    }
 
     return sh;
 }
@@ -661,9 +670,28 @@ static bool is_freezing(const unit * u)
     return true;
 }
 
-int check_ship_allowed(struct ship *sh, const region * r)
+typedef struct checkstruct {
+    const region *r;
+} checkstruct;
+
+static int shipcheckcoast(const ship *fleet, const ship *sh, void *state) {
+    int c;
+    checkstruct *cs = (checkstruct *) state;
+
+    if (!sh)
+        return SA_COAST;
+    if (sh->type->coasts) {
+        for (c = 0; sh->type->coasts[c] != NULL; ++c) {
+            if (sh->type->coasts[c] == cs->r->terrain) {
+                return SA_COAST;
+            }
+        }
+    }
+    return SA_NO_COAST;
+}
+
+int check_ship_allowed(const ship *sh, const region * r)
 {
-    int c = 0;
     const building_type *bt_harbour = NULL;
     bt_harbour = bt_find("harbour");
 
@@ -701,28 +729,42 @@ int check_ship_allowed(struct ship *sh, const region * r)
     if (fval(r->terrain, SEA_REGION)) {
         return SA_COAST;
     }
-    if (sh->type->coasts) {
-        for (c = 0; sh->type->coasts[c] != NULL; ++c) {
-            if (sh->type->coasts[c] == r->terrain) {
-                return SA_COAST;
-            }
-        }
-    }
-    return SA_NO_COAST;
+
+    checkstruct checkstate = { r };
+    return fleet_const_int_aggregate(sh, shipcheckcoast, aggregate_min, SA_COAST, &checkstate);
 }
 
-static void set_coast(ship * sh, region * r, region * rnext)
-{
+typedef struct setcoast_state {
+    const terrain_type *terrain;
+    const bool landing;
+    const direction_t direction;
+} setcoast_state;
+
+static bool setcoast(ship *fleet, ship *sh, void *state) {
+    setcoast_state *sstate = (setcoast_state *)state;
+
+    if (!sh) {
+        sh = fleet;
+    }
+
     if (sh->type->flags & SFL_NOCOAST) {
         sh->coast = NODIRECTION;
     }
-    else if (!fval(rnext->terrain, SEA_REGION) && !flying_ship(sh)) {
-        sh->coast = reldirection(rnext, r);
-        assert(fval(r->terrain, SEA_REGION));
+    else if (sstate->landing) {
+        sh->coast = sstate->direction;
+        assert(fval(sstate->terrain, SEA_REGION));
     }
     else {
         sh->coast = NODIRECTION;
     }
+    return true;
+}
+
+void set_coast(ship * sh, const region * r, const region * rnext)
+{
+    setcoast_state state = { r->terrain, !fval(rnext->terrain, SEA_REGION) && !flying_ship(sh), reldirection(rnext, r)};
+
+    fleet_visit(sh, setcoast, &state);
 }
 
 static double overload_start(void) {
@@ -818,9 +860,7 @@ static void drifting_ships(region * r)
             /* Kapitän da? Beschädigt? Genügend Matrosen?
              * Genügend leicht? Dann ist alles OK. */
 
-            assert(sh->type->construction->improvement == NULL); /* sonst ist construction::size nicht ship_type::maxsize */
-            if (captain && sh->size == sh->type->construction->maxsize
-                && enoughsailors(sh, crew_skill(sh)) && cansail(r, sh)) {
+            if (ship_iscomplete(sh) && enoughsailors(sh) && cansail(r, sh)) {
                 shp = &sh->next;
                 continue;
             }
@@ -867,7 +907,7 @@ static void drifting_ships(region * r)
                     msg_to_ship_inmates(sh, &firstu, &lastu, msg_message("massive_overload", "ship", sh));
                 } else
                     damage_ship(sh, damage_drift);
-                if (sh->damage >= sh->size * DAMAGE_SCALE) {
+                if (ship_isdestroyed(sh)) {
                     msg_to_ship_inmates(sh, &firstu, &lastu, msg_message("shipsink", "ship", sh));
                     remove_ship(&sh->region->ships, sh);
                 }
@@ -1720,30 +1760,34 @@ static const region_list *travel_route(unit * u,
     return iroute;
 }
 
-static bool ship_ready(const region * r, unit * u, order * ord)
+bool ship_ready(const region * r, unit * u, order * ord)
 {
-    if (!u->ship || u != ship_owner(u->ship)) {
+    ship *sh = u->ship;
+
+    if (!sh || u != ship_owner(sh)) {
         cmistake(u, ord, 146, MSG_MOVE);
         return false;
     }
-    if (effskill(u, SK_SAILING, r) < u->ship->type->cptskill) {
+    if (effskill(u, SK_SAILING, r) < ship_type_cpt_skill(sh)) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
-            "error_captain_skill_low", "value ship", u->ship->type->cptskill,
-            u->ship));
+            "error_captain_skill_low", "value ship", ship_type_cpt_skill(sh),
+            sh));
         return false;
     }
-    if (u->ship->type->construction) {
-        assert(!u->ship->type->construction->improvement);     /* sonst ist construction::size nicht ship_type::maxsize */
-        if (u->ship->size != u->ship->type->construction->maxsize) {
-            cmistake(u, ord, 15, MSG_MOVE);
-            return false;
-        }
+    if (ship_isfleet(sh) && u->number < sh->size) {
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
+            "error_captain_fleet_size", "value ship", sh->size, sh));
+        return false;
     }
-    if (!enoughsailors(u->ship, crew_skill(u->ship))) {
+    if (!ship_iscomplete(sh)) {
+        cmistake(u, ord, 15, MSG_MOVE);
+        return false;
+    }
+    if (!enoughsailors(sh)) {
         cmistake(u, ord, 1, MSG_MOVE);
         return false;
     }
-    if (!cansail(r, u->ship)) {
+    if (!cansail(r, sh)) {
         cmistake(u, ord, 18, MSG_MOVE);
         return false;
     }
@@ -1770,6 +1814,7 @@ unit *owner_buildingtyp(const region * r, const building_type * bt)
 /* Prüft, ob Ablegen von einer Küste in eine der erlaubten Richtungen erfolgt. */
 bool can_takeoff(const ship * sh, const region * from, const region * to)
 {
+    /* no special treatment for fleets because fleet->coast is already set in fleet_add/remove */
     if (!fval(from->terrain, SEA_REGION) && sh->coast != NODIRECTION) {
         direction_t coast = sh->coast;
         direction_t dir = reldirection(from, to);
@@ -1791,7 +1836,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
 {
     region *starting_point = u->region;
     region *current_point, *last_point;
-    int k, step = 0;
+    int range, step = 0;
     region_list **iroute = routep;
     ship *sh = u->ship;
     faction *f = u->faction;
@@ -1821,7 +1866,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
     /* Wir suchen so lange nach neuen Richtungen, wie es geht. Diese werden
      * dann nacheinander ausgeführt. */
 
-    k = shipspeed(sh, u);
+    range = ship_speed(sh, u);
 
     last_point = starting_point;
     current_point = starting_point;
@@ -1833,7 +1878,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
      * Durchlauf schon gesetzt (Parameter!). current_point ist die letzte gültige,
      * befahrene Region. */
 
-    while (next_point && current_point != next_point && step < k) {
+    while (next_point && current_point != next_point && step < range) {
         const char *token;
         int error;
         const terrain_type *tthis = current_point->terrain;
@@ -1858,7 +1903,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
                 stormyness = storms ? storms[date.month] * 5 : 0;
 
                 /* storms should be the first thing we do. */
-                stormchance = stormyness / shipspeed(sh, u);
+                stormchance = stormyness / range;
                 if (check_leuchtturm(next_point, NULL)) {
                     if (lighthouse_div > 0) {
                         stormchance /= lighthouse_div;
@@ -1892,10 +1937,10 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
                         }
                         if (storm && rnext != NULL) {
                             ADDMSG(&f->msgs, msg_message("storm", "ship region sink",
-                                sh, current_point, sh->damage >= sh->size * DAMAGE_SCALE));
+                                sh, current_point, ship_isdestroyed(sh)));
 
                             damage_ship(sh, damage_storm);
-                            if (sh->damage >= sh->size * DAMAGE_SCALE) {
+                            if (ship_isdestroyed(sh)) {
                                 /* ship sinks, end journey here */
                                 break;
                             }
@@ -2001,7 +2046,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
         }
     }
 
-    if (sh->damage >= sh->size * DAMAGE_SCALE) {
+    if (ship_isdestroyed(sh)) {
         if (sh->region) {
             ADDMSG(&f->msgs, msg_message("shipsink", "ship", sh));
             remove_ship(&sh->region->ships, sh);
@@ -2344,7 +2389,7 @@ int follow_ship(unit * u, order * ord)
         return 0;
     }
 
-    id = getshipid();
+    id = getid();
 
     if (id <= 0) {
         cmistake(u, ord, 20, MSG_MOVE);
@@ -2371,10 +2416,10 @@ int follow_ship(unit * u, order * ord)
 
     speed = (int)getuint();
     if (speed == 0) {
-        speed = shipspeed(u->ship, u);
+        speed = ship_speed(u->ship, u);
     }
     else {
-        int maxspeed = shipspeed(u->ship, u);
+        int maxspeed = ship_speed(u->ship, u);
         if (maxspeed < speed)
             speed = maxspeed;
     }
@@ -2405,7 +2450,7 @@ void destroy_damaged_ships(void)
     for (r = regions; r; r = r->next) {
         for (sh = r->ships; sh;) {
             shn = sh->next;
-            if (sh->damage >= sh->size * DAMAGE_SCALE) {
+            if (ship_isdestroyed(sh)) {
                 remove_ship(&sh->region->ships, sh);
             }
             sh = shn;
@@ -2645,7 +2690,7 @@ void follow_unit(unit * u)
                 }
             }
             else if (p == P_SHIP) {
-                id = getshipid();
+                id = getid();
                 if (id <= 0) {
                     /*	cmistake(u, ord, 20, MSG_MOVE); */
                 }

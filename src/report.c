@@ -1802,11 +1802,11 @@ const unit * captain)
 
     if (captain && captain->faction == f) {
         int n = 0, p = 0;
-        getshipweight(sh, &n, &p);
+        ship_weight(sh, &n, &p);
         n = (n + 99) / 100;         /* 1 Silber = 1 GE */
 
         bytes = _snprintf(bufp, size, "%s, %s, (%d/%d)", shipname(sh),
-            LOC(f->locale, sh->type->_name), n, shipcapacity(sh) / 100);
+            LOC(f->locale, sh->type->_name), n, ship_capacity(sh) / 100);
     }
     else {
         bytes =
@@ -1816,15 +1816,14 @@ const unit * captain)
     if (wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
 
-    assert(sh->type->construction->improvement == NULL);  /* sonst ist construction::size nicht ship_type::maxsize */
-    if (sh->size != sh->type->construction->maxsize) {
+    if (!ship_iscomplete(sh)) {
         bytes = _snprintf(bufp, size, ", %s (%d/%d)",
             LOC(f->locale, "nr_undercons"), sh->size,
             sh->type->construction->maxsize);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
     }
-    if (sh->damage) {
+    if (ship_isdamaged(sh)) {
         int percent = ship_damage_percent(sh);
         bytes =
             _snprintf(bufp, size, ", %d%% %s", percent, LOC(f->locale, "nr_damaged"));

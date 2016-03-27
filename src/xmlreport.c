@@ -619,7 +619,7 @@ xml_ship(report_context * ctx, const seen_region * sr, const ship * sh,
 
   if ((owner && owner->faction == ctx->f) || omniscient(ctx->f)) {
     int n = 0, p = 0;
-    getshipweight(sh, &n, &p);
+    ship_weight(sh, &n, &p);
     xmlNewTextChild(node, xct->ns_atl, BAD_CAST "cargo",
       (const xmlChar *)itoab(n, 10));
   }

@@ -206,7 +206,7 @@ int level(int days)
 
 void sk_set(skill * sv, int level)
 {
-    assert(level != 0);
+    assert(sv && level != 0);
     sv->weeks = skill_weeks(level);
     sv->level = level;
 }

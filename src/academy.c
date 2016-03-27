@@ -27,8 +27,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 void academy_teaching_bonus(struct unit *u, skill_t sk, int academy) {
     if (academy && sk != NOSKILL) {
-        academy = academy / 30;     /* anzahl gelehrter wochen, max. 10 */
-        learn_skill(u, sk, academy / 30.0 / TEACHNUMBER);
+        learn_skill(u, sk, academy / STUDYDAYS);
     }
 }
 

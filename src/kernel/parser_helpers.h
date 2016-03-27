@@ -1,7 +1,11 @@
 /*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
+  parser_helpers.h
+
+  Created on: Mar 14, 2016
+  Author: steffen
+
+Copyright (c) 2016, Enno Rehling <enno@eressea.de>
+Steffen Mecke <stm2@users.sf.net>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -16,25 +20,18 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#ifndef REMOVECURSE_H
-#define REMOVECURSE_H
+
+#ifndef H_KRNL_PARSER_HELPER
+#define H_KRNL_PARSER_HELPER
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-    /* all types we use are defined here to reduce dependencies */
-    struct trigger_type;
-    struct trigger;
-
-    struct unit;
-    struct curse;
-
-    extern struct trigger_type tt_removecurse;
-
-    extern struct trigger *trigger_removecurse(struct curse *c,
-    struct unit *target);
+struct building *getbuilding(const struct region *r);
+struct ship *getship(const struct region *r);
 
 #ifdef __cplusplus
 }
 #endif
-#endif
+
+#endif /* H_KRNL_PARSER_HELPER */

@@ -28,9 +28,6 @@
 #include "keyword.h"
 #include "study.h"
 
-/* triggers includes */
-#include <triggers/removecurse.h>
-
 /* attributes includes */
 #include <attributes/targetregion.h>
 #include <attributes/hate.h>

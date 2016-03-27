@@ -71,25 +71,6 @@ function test_rename()
   assert_equal(u:get_item("ao_healing"), 1)
 end
 
-function DISABLE_test_alp()
-    local r = region.create(0,0, "plain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
-    local u = unit.create(f, r, 1)
-    local u2 = unit.create(f, r, 1)
-    u.race = "elf"
-    u:set_skill("magic", 10)
-    u:add_item("money", 3010)
-    u.magic = "illaun"
-    u.aura = 200
-    u.ship = s1
-    u:add_spell("summon_alp")
-    u:clear_orders()
-    u:add_order("ZAUBERE 'Alp' " .. itoa36(u2.id))
-    process_orders()
-    print(get_turn(), f)
-    write_reports()
-end
-
 function test_unit_limit_is_1500()
   local r = region.create(0,0, "plain")
   local f = faction.create("noreply@eressea.de", "human", "de")

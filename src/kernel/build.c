@@ -39,6 +39,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/item.h>
 #include <kernel/messages.h>
 #include <kernel/order.h>
+#include <kernel/parser_helpers.h>
 #include <kernel/pool.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
@@ -68,26 +69,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* attributes inclues */
 #include <attributes/matmod.h>
-
-struct building *getbuilding(const struct region *r)
-{
-    building *b = findbuilding(getid());
-    if (b == NULL || r != b->region)
-        return NULL;
-    return b;
-}
-
-ship *getship(const struct region * r)
-{
-    ship *sh, *sx = findship(getshipid());
-    for (sh = r->ships; sh; sh = sh->next) {
-        if (sh == sx)
-            return sh;
-    }
-    return NULL;
-}
-
-/* ------------------------------------------------------------- */
 
 /* ------------------------------------------------------------- */
 
@@ -944,9 +925,9 @@ order * ord)
 void continue_ship(unit * u, int want)
 {
     const construction *cons;
+    int id;
     ship *sh;
     int msize;
-    region * r = u->region;
 
     if (!effskill(u, SK_SHIPBUILDING, 0)) {
         cmistake(u, u->thisorder, 100, MSG_PRODUCE);
@@ -954,10 +935,12 @@ void continue_ship(unit * u, int want)
     }
 
     /* Die Schiffsnummer bzw der Schiffstyp wird eingelesen */
-    sh = getship(r);
-
-    if (!sh)
+    id = getid();
+    if (id) {
+        sh = findshipr(u->region, id);
+    } else {
         sh = u->ship;
+    }
 
     if (!sh) {
         cmistake(u, u->thisorder, 20, MSG_PRODUCE);
@@ -965,7 +948,7 @@ void continue_ship(unit * u, int want)
     }
     cons = sh->type->construction;
     assert(cons->improvement == NULL);    /* sonst ist construction::size nicht ship_type::maxsize */
-    if (sh->size == cons->maxsize && !sh->damage) {
+    if (sh->size == cons->maxsize && !ship_isdamaged(sh)) {
         cmistake(u, u->thisorder, 16, MSG_PRODUCE);
         return;
     }

@@ -74,9 +74,6 @@ extern "C" {
         int size, struct order *ord);
     void continue_ship(struct unit *u, int size);
 
-    struct building *getbuilding(const struct region *r);
-    struct ship *getship(const struct region *r);
-
     void reportevent(struct region *r, char *s);
 
     void shash(struct ship *sh);

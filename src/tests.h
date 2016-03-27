@@ -2,6 +2,7 @@
 #define ERESSEA_TESTS_H
 
 #include <kernel/types.h>
+#include <skill.h>
 #include <stdlib.h>
 
 #ifdef __cplusplus
@@ -25,11 +26,13 @@ extern "C" {
     struct castorder;
     struct spellparameter;
     struct spell;
+    struct locale;
 
     struct CuTest;
 
     void test_cleanup(void);
 
+    struct locale * test_create_locale(void);
     struct terrain_type * test_create_terrain(const char * name, unsigned int flags);
     struct race *test_create_race(const char *name);
     struct region *test_create_region(int x, int y,
@@ -42,6 +45,9 @@ extern "C" {
     struct ship * test_create_ship(struct region * r, const struct ship_type * stype);
     struct item_type * test_create_itemtype(const char * name);
     struct ship_type *test_create_shiptype(const char * name);
+    struct ship_type * test_create_shiptype2(const char * name,
+        int cptskill, int sumskill, int minskill, int range, int cargo, int cabins,
+        int cmaxsize, int cminskill, int creqsize, int coasts);
     struct building_type *test_create_buildingtype(const char *name);
     void test_create_castorder(struct castorder *co, struct unit *u, int level, float force, int range, struct spellparameter *par);
     struct spell * test_create_spell(void);

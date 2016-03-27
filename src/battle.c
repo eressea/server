@@ -2895,7 +2895,7 @@ static void aftermath(battle * b)
         while (*sp) {
             ship *sh = *sp;
             freset(sh, SF_DAMAGED);
-            if (sh->damage >= sh->size * DAMAGE_SCALE) {
+            if (ship_isdestroyed(sh)) {
                 remove_ship(sp, sh);
             }
             if (*sp == sh)

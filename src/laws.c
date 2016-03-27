@@ -51,6 +51,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/item.h>
 #include <kernel/messages.h>
 #include <kernel/order.h>
+#include <kernel/parser_helpers.h>
 #include <kernel/plane.h>
 #include <kernel/pool.h>
 #include <kernel/race.h>
@@ -1016,6 +1017,8 @@ int enter_ship(unit * u, struct order *ord, int id, bool report)
         }
         return 0;
     }
+    if (sh->fleet)
+        sh = sh->fleet;
     if (sh == u->ship) {
         return 1;
     }
@@ -1026,12 +1029,13 @@ int enter_ship(unit * u, struct order *ord, int id, bool report)
         return 0;
     }
     if (CheckOverload()) {
+        /* FIXME get rid of or refactor */
         int sweight, scabins;
-        int mweight = shipcapacity(sh);
-        int mcabins = sh->type->cabins;
+        int mweight = ship_capacity(sh);
+        int mcabins = ship_cabins(sh);
 
         if (mweight > 0) {
-            getshipweight(sh, &sweight, &scabins);
+            ship_weight(sh, &sweight, &scabins);
             sweight += weight(u);
             if (mcabins) {
                 int pweight = u->number * u_race(u)->weight;
@@ -1980,7 +1984,7 @@ int mail_cmd(unit * u, struct order *ord)
             }
 
         case P_FACTION:
-            n = getfactionid();
+            n = getid();
 
             for (u2 = r->units; u2; u2 = u2->next) {
                 if (u2->faction->no == n && seefaction(u->faction, r, u2, 0)) {
@@ -2726,9 +2730,9 @@ void sinkships(struct region * r)
     while (*shp) {
         ship *sh = *shp;
 
-        if (!sh->type->construction || sh->size >= sh->type->construction->maxsize) {
+        if (ship_iscomplete(sh)) {
             if (fval(r->terrain, SEA_REGION)) {
-                if (!enoughsailors(sh, crew_skill(sh))) {
+                if (!enoughsailors(sh)) {
                     // ship is at sea, but not enough people to control it
                     double dmg = config_get_flt("rules.ship.damage.nocrewocean", 0.3);
                     damage_ship(sh, dmg);
@@ -2740,7 +2744,7 @@ void sinkships(struct region * r)
                 damage_ship(sh, dmg);
             }
         }
-        if (sh->damage >= sh->size * DAMAGE_SCALE) {
+        if (ship_isdestroyed(sh)) {
             remove_ship(shp, sh);
         }
         if (*shp == sh)

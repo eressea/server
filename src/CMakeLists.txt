@@ -212,6 +212,7 @@ set(TESTS_SRC
   spy.test.c
   study.test.c
   upkeep.test.c
+  fleets.test.c
   spells/flyingship.test.c
   spells/magicresistance.test.c
   triggers/shock.test.c
