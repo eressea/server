@@ -1568,6 +1568,9 @@
   <string name="loot">
     <text locale="en">loot</text>
   </string>
+  <string name="fleet">
+    <text locale="en">fleet</text>
+  </string>
 </namespace>
 
   <!--  NR generieren -->

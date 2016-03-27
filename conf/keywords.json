@@ -63,7 +63,8 @@
 			"alliance": "ALLIANZ",
 			"claim": ["BEANSPRUCHE", "BEANSPRUCHEN"],
 			"promote": ["BEFÖRDERE", "BEFÖRDERUNG"],
-			"pay": ["BEZAHLE", "BEZAHLEN"]
+			"pay": ["BEZAHLE", "BEZAHLEN"],
+			"fleet": "FLOTTE"
 		}
 	}
 }

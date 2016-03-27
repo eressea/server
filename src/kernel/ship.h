@@ -94,6 +94,7 @@ extern "C" {
         int flags;
         const struct ship_type *type;
         direction_t coast;
+        struct ship *fleet;
     } ship;
 
     void damage_ship(struct ship * sh, double percent);
@@ -128,6 +129,9 @@ extern "C" {
     int crew_skill(const struct ship *sh);
 
     int ship_damage_percent(const struct ship *ship);
+
+    void fleet_cmd(struct region * r);
+
 #ifdef __cplusplus
 }
 #endif

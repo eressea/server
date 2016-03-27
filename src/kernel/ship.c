@@ -24,6 +24,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "build.h"
 #include "curse.h"
 #include "faction.h"
+#include "order.h"
 #include "unit.h"
 #include "item.h"
 #include "race.h"
@@ -472,4 +473,32 @@ const char *ship_getname(const ship * self)
 
 int ship_damage_percent(const ship *ship) {
     return (ship->damage * 100 + DAMAGE_SCALE - 1) / (ship->size * DAMAGE_SCALE);
+}
+
+void fleet_cmd(region * r)
+{
+    unit **uptr;
+    ship *sh;
+
+    for (uptr = &r->units; *uptr;) {
+        unit *u = *uptr;
+        order **ordp = &u->orders;
+
+        while (*ordp) {
+            order *ord = *ordp;
+            if (getkeyword(ord) == K_FLEET) {
+                ship *fleet;
+
+                sh = u->ship;
+
+                const ship_type *fleet_type = st_find("fleet");
+                fleet = new_ship(fleet_type, r, u->faction->locale);
+                sh->fleet = fleet;
+            }
+            if (*ordp == ord)
+                ordp = &ord->next;
+        }
+        if (*uptr == u)
+            uptr = &u->next;
+    }
 }
