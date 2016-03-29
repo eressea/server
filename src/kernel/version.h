@@ -36,7 +36,8 @@
 #define BADCRYPT_VERSION 351 /* passwords are encrypted, poorly */
 #define ATHASH_VERSION 352 /* attribute-type hash, not name */
 #define NOWATCH_VERSION 353 /* plane->watchers is gone */
-#define CRYPT_VERSION 354 /* passwords are encrypted */
-#define RELEASE_VERSION NOWATCH_VERSION /* current datafile */
+#define FLEET_VERSION 354 /* ships can be in fleets */
+#define CRYPT_VERSION 355 /* passwords are encrypted */
+#define RELEASE_VERSION FLEET_VERSION /* current datafile */
 #define MIN_VERSION INTPAK_VERSION      /* minimal datafile we support */
 #define MAX_VERSION RELEASE_VERSION /* change this if we can need to read the future datafile, and we can do so */

@@ -602,6 +602,77 @@ void write_attribs(storage *store, attrib *alist, const void *owner)
 #endif
 }
 
+ship *read_ship(gamedata *data) {
+    const storage* store = data->store;
+    ship *sh = (ship *)calloc(1, sizeof(ship));
+    char name[DISPLAYSIZE];
+    int n;
+
+    READ_INT(store, &sh->no);
+    shash(sh);
+    READ_STR(store, name, sizeof(name));
+    sh->name = _strdup(name);
+    if (lomem) {
+        READ_STR(store, NULL, 0);
+    }
+    else {
+        READ_STR(store, name, sizeof(name));
+        sh->display = _strdup(name);
+    }
+    READ_STR(store, name, sizeof(name));
+    sh->type = st_find(name);
+    if (sh->type == NULL) {
+        /* old datafiles */
+        sh->type = st_find((const char *)LOC(default_locale, name));
+    }
+    assert(sh->type || !"ship_type not registered!");
+
+    READ_INT(store, &sh->size);
+    READ_INT(store, &sh->damage);
+    if (data->version >= FLEET_VERSION) {
+        int fleet_no;
+        READ_INT(store, &fleet_no);
+        if (fleet_no) {
+            sh->fleet = findship(fleet_no);
+            assert(sh->fleet || !"fleet for ship not found!");
+        }
+    }
+
+    if (data->version >= FOSS_VERSION) {
+        READ_INT(store, &sh->flags);
+    }
+
+    /* Attribute rekursiv einlesen */
+
+    READ_INT(store, &n);
+    sh->coast = (direction_t)n;
+    if (sh->type->flags & SFL_NOCOAST) {
+        sh->coast = NODIRECTION;
+    }
+    read_attribs(data, &sh->attribs, sh);
+    return sh;
+}
+
+void write_ship(gamedata *data, const ship *sh) {
+    storage* store = data->store;
+
+    write_ship_reference(sh, store);
+    WRITE_STR(store, (const char *)sh->name);
+    WRITE_STR(store, sh->display ? (const char *)sh->display : "");
+    WRITE_TOK(store, sh->type->_name);
+    WRITE_INT(store, sh->size);
+    WRITE_INT(store, sh->damage);
+
+    write_ship_reference(sh->fleet, store);
+
+    WRITE_INT(store, sh->flags & SFL_SAVEMASK);
+    assert((sh->type->flags & SFL_NOCOAST) == 0 || sh->coast == NODIRECTION);
+    WRITE_INT(store, sh->coast);
+    WRITE_SECTION(store);
+    write_attribs(store, sh->attribs, sh);
+    WRITE_SECTION(store);
+}
+
 unit *read_unit(struct gamedata *data)
 {
     unit *u;
@@ -1508,7 +1579,7 @@ int readgame(const char *filename, bool backup)
 
 int read_game(gamedata *data) {
     char name[DISPLAYSIZE];
-    int n, p, nread;
+    int p, nread;
     faction *f, **fp;
     region *r;
     building *b, **bp;
@@ -1671,44 +1742,37 @@ int read_game(gamedata *data) {
         READ_INT(store, &p);
         shp = &r->ships;
 
-        while (--p >= 0) {
-            ship *sh = (ship *)calloc(1, sizeof(ship));
-            sh->region = r;
-            READ_INT(store, &sh->no);
-            *shp = sh;
-            shp = &sh->next;
-            shash(sh);
-            READ_STR(store, name, sizeof(name));
-            sh->name = _strdup(name);
-            if (lomem) {
-                READ_STR(store, NULL, 0);
-            }
-            else {
-                READ_STR(store, name, sizeof(name));
-                sh->display = _strdup(name);
-            }
-            READ_STR(store, name, sizeof(name));
-            sh->type = st_find(name);
-            if (sh->type == NULL) {
-                /* old datafiles */
-                sh->type = st_find((const char *)LOC(default_locale, name));
-            }
-            assert(sh->type || !"ship_type not registered!");
+        if (p > 0) {
+            ship *fleet = NULL;
+            int fleet_size = 0;
+            while (--p >= 0) {
+                ship *sh = read_ship(data);
+                sh->region = r;
 
-            READ_INT(store, &sh->size);
-            READ_INT(store, &sh->damage);
-            if (data->version >= FOSS_VERSION) {
-                READ_INT(store, &sh->flags);
-            }
+                /* check fleet consistency? */
+                if (fleet) {
+                    if (ship_isfleet(sh)) {
+                        log_error("Fleet %d inside fleet %d", fleet->no, sh->no);
+                    }
+                    if (sh->fleet == fleet) {
+                        ++fleet_size;
+                    } else if (sh->fleet) {
+                        log_error("fleet ship %d out of order", sh->no);
+                    } else if (fleet_size != fleet->size){
+                        log_error("Fleet %d has wrong number of ships: %d != %d!", fleet->no, fleet_size, fleet->size);
+                    } else {
+                        fleet = NULL;
+                        fleet_size = 0;
+                    }
+                } else if (sh->fleet != NULL) {
+                    log_error("fleet ship %d out of order", sh->no);
+                } else if (ship_isfleet(sh)) {
+                    fleet = sh;
+                }
 
-            /* Attribute rekursiv einlesen */
-
-            READ_INT(store, &n);
-            sh->coast = (direction_t)n;
-            if (sh->type->flags & SFL_NOCOAST) {
-                sh->coast = NODIRECTION;
+                *shp = sh;
+                shp = &sh->next;
             }
-            read_attribs(data, &sh->attribs, sh);
         }
 
         *shp = 0;
@@ -1943,18 +2007,7 @@ int write_game(gamedata *data) {
         WRITE_SECTION(store);
         for (sh = r->ships; sh; sh = sh->next) {
             assert(sh->region == r);
-            write_ship_reference(sh, store);
-            WRITE_STR(store, (const char *)sh->name);
-            WRITE_STR(store, sh->display ? (const char *)sh->display : "");
-            WRITE_TOK(store, sh->type->_name);
-            WRITE_INT(store, sh->size);
-            WRITE_INT(store, sh->damage);
-            WRITE_INT(store, sh->flags & SFL_SAVEMASK);
-            assert((sh->type->flags & SFL_NOCOAST) == 0 || sh->coast == NODIRECTION);
-            WRITE_INT(store, sh->coast);
-            WRITE_SECTION(store);
-            write_attribs(store, sh->attribs, sh);
-            WRITE_SECTION(store);
+            write_ship(data, sh);
         }
 
         WRITE_INT(store, listlen(r->units));

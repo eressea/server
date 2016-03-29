@@ -179,14 +179,22 @@ void fleet_visit(ship *sh, bool_visitor visit_ship, void *state) {
     if (ship_isfleet(sh)) {
         int count = 0;
         ship *shp;
-        for (shp = sh->region->ships; shp; ) {
+        for (shp = sh->next; shp; ) {
             ship *next = shp->next;
-            ++count;
-            if (!visit_ship(sh, shp, state))
+            if (shp->fleet == sh) {
+                ++count;
+                if (!visit_ship(sh, shp, state))
+                    break;
+            } else {
+                assert(count == sh->size);
                 break;
+            }
             shp = next;
         }
-        assert(count > 0);
+        if (!shp)
+            assert(count == sh->size);
+        else
+            assert(count > 0);
         visit_ship(sh, NULL, state);
     } else {
         visit_ship(NULL, sh, state);
@@ -196,17 +204,23 @@ void fleet_visit(ship *sh, bool_visitor visit_ship, void *state) {
 void fleet_const_visit(const ship *sh, const_bool_visitor visit_ship, void *state) {
     if (ship_isfleet(sh)) {
         int count = 0;
-        ship *shp;
-        for (shp = sh->region->ships; shp;) {
+        const ship *shp;
+        for (shp = sh->next; shp;) {
             ship *next = shp->next;
             if (shp->fleet == sh) {
                 ++count;
                 if (!visit_ship(sh, shp, state))
                     break;
+            } else {
+                assert(count == sh->size);
+                break;
             }
             shp = next;
         }
-        assert(count > 0);
+        if (!shp)
+            assert(count == sh->size);
+        else
+            assert(count > 0);
         visit_ship(sh, NULL, state);
     } else {
         visit_ship(NULL, sh, state);
@@ -704,6 +718,25 @@ bool ship_isfleet(const ship *sh) {
     return (sh->type == st_find("fleet"));
 }
 
+static void ship_append_after(ship **list, ship *sh, ship *fleet) {
+    ship *shp;
+    assert(list && *list);
+    for (; *list; list = &(*list)->next) {
+        if ((*list) == sh) {
+            (*list) = sh->next;
+            break;
+        }
+    }
+    for (shp = fleet; shp; shp = shp->next) {
+        if (shp->next == NULL || shp->next->fleet != fleet) {
+            ship *succ = shp->next;
+            shp->next = sh;
+            sh->next = succ;
+            break;
+        }
+    }
+}
+
 ship *fleet_add_ship(ship *sh, ship *fleet, unit *cpt) {
     unit * up;
     region *r = sh->region;
@@ -715,18 +748,22 @@ ship *fleet_add_ship(ship *sh, ship *fleet, unit *cpt) {
         fleet = new_ship(fleet_type, r, cpt->faction->locale);
     }
 
-    for (up = r->units; up; up = up->next) {
-        if (up == cpt || up->ship == sh) {
-            up->ship = 0;
-            u_set_ship(up, fleet);
-        }
-    }
     sh->fleet = fleet;
     if (sh->coast != NODIRECTION) {
         assert(fleet->coast == NODIRECTION || fleet->coast == sh->coast);
         fleet->coast = sh->coast;
     }
     ++fleet->size;
+
+    ship_append_after(&sh->region->ships, sh, fleet);
+
+    for (up = r->units; up; up = up->next) {
+        if (up == cpt || up->ship == sh) {
+            up->ship = 0;
+            u_set_ship(up, fleet);
+        }
+    }
+
     return fleet;
 }
 
@@ -742,13 +779,17 @@ ship *fleet_remove_ship(ship *sh, unit *new_cpt) {
 
     if (--fleet->size == 0)
         remove_ship(&fleet->region->ships, fleet);
-    else if (fleet->coast != NODIRECTION && sh->coast != NODIRECTION) {
-        fleet->coast = NODIRECTION;
-        for (shp = sh->region->ships; shp; shp = shp->next) {
-            if (shp->fleet == fleet) {
-                if (shp->coast != NODIRECTION) {
-                    fleet->coast = shp->coast;
-                    break;
+    else {
+        assert(fleet->next != NULL);
+        ship_append_after(&fleet, sh, fleet);
+        if (fleet->coast != NODIRECTION && sh->coast != NODIRECTION) {
+            fleet->coast = NODIRECTION;
+            for (shp = sh->region->ships; shp; shp = shp->next) {
+                if (shp->fleet == fleet) {
+                    if (shp->coast != NODIRECTION) {
+                        fleet->coast = shp->coast;
+                        break;
+                    }
                 }
             }
         }

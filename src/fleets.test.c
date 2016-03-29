@@ -8,13 +8,19 @@
 #include <kernel/order.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
+#include <kernel/save.h>
 #include <kernel/ship.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
+#include <kernel/version.h>
 
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/gamedata.h>
 #include <util/language.h>
+
+#include <storage.h>
+#include <memstream.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -72,51 +78,57 @@ static void init_fixture(fleet_fixture *ffix) {
 }
 
 static void init_fleet(fleet_fixture *ffix) {
+    /* create a fleet with owner u11 and ships sh1 and sh2 */
     init_fixture(ffix);
 
     ffix->fleet = fleet_add_ship(ffix->sh1, NULL, ffix->u11);
     fleet_add_ship(ffix->sh2, ffix->fleet, ffix->u21);
 }
 
-static ship *find_fleet(CuTest *tc, region *r) {
-    ship **shp;
-    ship *found = NULL;
+static ship **find_fleet(CuTest *tc, region *r) {
+    ship *sh;
+    ship **found = NULL;
 
-    for (shp = &r->ships; *shp;) {
-        ship *sh = *shp;
+    for (sh = r->ships; sh; sh = sh ? sh->next : 0) {
         if (ship_isfleet(sh)) {
+            int size = 0;
             CuAssertPtrEquals_Msg(tc, "more than one fleet", NULL, found);
-            found = sh;
-            for (shp = &sh->next; *shp; shp = &sh->next) {
-                sh = *shp;
-                CuAssertPtrEquals_Msg(tc, "not all ships in fleet", found, (ship * ) sh->fleet);
+            CuAssertPtrEquals(tc, 0, sh->fleet);
+            found = calloc(sh->size, sizeof(ship *));
+            found[0] = sh;
+            for (sh = sh->next; sh; sh = sh->next) {
+                if (sh->fleet == found[0])
+                    found[++size] = sh;
             }
+            CuAssertIntEquals_Msg(tc, "not enough ships in fleet", found[0]->size, size);
+            CuAssertTrue(tc, size > 0);
+        } else {
+            CuAssertPtrEquals_Msg(tc, "ship outside fleet", 0, sh->fleet);
         }
-        if (*shp == sh)
-            shp = &sh->next;
     }
     return found;
 }
 
 static void assert_no_fleet(CuTest *tc, region *r, ship *sh, unit *cpt) {
-    ship *fleet = find_fleet(tc, r);
+    ship **fleet = find_fleet(tc, r);
     CuAssertPtrEquals_Msg(tc, "fleet not removed", 0, fleet);
     CuAssertPtrEquals_Msg(tc, "ship still in fleet", 0, sh->fleet);
     CuAssertPtrEquals_Msg(tc, "command not transferred", cpt, ship_owner(sh));
 }
 
 static ship *assert_fleet(CuTest *tc, region *r, ship *sh, unit *cpt) {
-    ship *found = NULL;
+    ship **found = NULL;
 
     found = find_fleet(tc, r);
     CuAssertPtrNotNull(tc, found);
 
-    CuAssertPtrEquals_Msg(tc, "ship not added to fleet", (void *) found, (ship *) sh->fleet);
-    CuAssertPtrEquals_Msg(tc, "captain not in fleet", found, (ship *) cpt->ship);
-    CuAssertTrue(tc, ship_isfleet(found));
-    CuAssertPtrEquals_Msg(tc, "captain not fleet owner", cpt, ship_owner(found));
+    CuAssertPtrEquals_Msg(tc, "ship not added to fleet", (void *) found[0], (ship *) sh->fleet);
+    CuAssertPtrEquals_Msg(tc, "captain not in fleet", found[0], (ship *) cpt->ship);
+    CuAssertTrue(tc, ship_isfleet(found[0]));
+    CuAssertPtrEquals_Msg(tc, "captain not fleet owner", cpt, ship_owner(found[0]));
     CuAssertPtrEquals_Msg(tc, "captain not ship owner", cpt, ship_owner(sh));
-    return found;
+    /*free(ships);*/
+    return found[0];
 }
 
 static void test_fleet_create(CuTest *tc) {
@@ -212,7 +224,6 @@ static void test_fleet_missing_param(CuTest *tc) {
 static void test_fleet_create_external(CuTest *tc) {
     fleet_fixture ffix;
     order *ord;
-//    ship **shp;
     ship *fleet = NULL;
     unit *u12;
     struct message* msg;
@@ -246,7 +257,7 @@ static void test_fleet_create_external(CuTest *tc) {
     fleet_cmd(ffix.r);
 
     msg = test_get_last_message(u12->faction->msgs);
-    CuAssertStrEquals(tc, "fleet_ship_invalid", test_get_messagetype(msg));
+    CuAssertStrEquals_Msg(tc, "ships in fleets cannot be added to other fleets", "fleet_ship_invalid", test_get_messagetype(msg));
     CuAssertPtrEquals(tc, fleet,  (ship *) ffix.sh1->fleet);
 
     test_cleanup();
@@ -392,6 +403,39 @@ static void test_fleet_remove2(CuTest *tc) {
 
     test_cleanup();
 }
+
+static void test_fleet_remove_order(CuTest *tc) {
+    fleet_fixture ffix;
+
+    test_cleanup();
+    setup_fleet();
+    init_fleet(&ffix);
+
+    fleet_remove_ship(ffix.sh1, NULL);
+    CuAssertPtrEquals(tc, 0, ffix.sh1->fleet);
+    CuAssertPtrEquals(tc, ffix.sh2, ffix.fleet->next);
+
+    test_cleanup();
+}
+
+static void test_fleet_transfer_admiral(CuTest *tc) {
+    fleet_fixture ffix;
+
+    test_cleanup();
+    setup_fleet();
+    init_fleet(&ffix);
+
+    CuAssertPtrEquals(tc, ffix.u11, ship_owner(ffix.fleet));
+    fleet_remove_ship(ffix.sh2, ffix.u11);
+
+    CuAssertPtrEquals_Msg(tc, "ship still in fleet", 0, ffix.sh2->fleet);
+    CuAssertPtrEquals_Msg(tc, "commander transferred", ffix.u11, ship_owner(ffix.sh2));
+    CuAssertPtrEquals_Msg(tc, "command not transferred", ffix.sh2, ffix.u11->ship);
+    CuAssertPtrEquals_Msg(tc, "command not transferred", ffix.u21, ship_owner(ffix.fleet));
+
+    test_cleanup();
+}
+
 
 static void test_fleet_remove_wrong_fleet(CuTest *tc) {
     fleet_fixture ffix;
@@ -877,6 +921,41 @@ static void test_fleet_damage(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_fleet_write(CuTest *tc) {
+    fleet_fixture ffix;
+    gamedata data;
+    storage store;
+    ship *sh, *fleet;
+
+
+    test_cleanup();
+    setup_fleet();
+    init_fleet(&ffix);
+
+    mstream_init(&data.strm);
+    gamedata_init(&data, &store, RELEASE_VERSION);
+    write_ship(&data, ffix.fleet);
+    write_ship(&data, ffix.sh1);
+
+    /* TODO FLEET_VERSION > CRYPT_VERSION */
+    /* TODO assert that ships are always after fleet in region order */
+
+    data.strm.api->rewind(data.strm.handle);
+    free_gamedata();
+    gamedata_init(&data, &store, RELEASE_VERSION);
+
+    fleet = read_ship(&data);
+    sh = read_ship(&data);
+    mstream_done(&data.strm);
+    gamedata_done(&data);
+
+    CuAssertPtrNotNull(tc, sh);
+    CuAssertPtrEquals(tc, fleet, sh->fleet);
+    CuAssertTrue(tc, ship_isfleet(fleet));
+
+    test_cleanup();
+}
+
 /*
 // TODO
 
@@ -949,6 +1028,8 @@ CuSuite *get_fleets_suite(void)
     SUITE_ADD_TEST(suite, test_fleet_add2);
     SUITE_ADD_TEST(suite, test_fleet_remove1);
     SUITE_ADD_TEST(suite, test_fleet_remove2);
+    SUITE_ADD_TEST(suite, test_fleet_remove_order);
+    SUITE_ADD_TEST(suite, test_fleet_transfer_admiral);
     SUITE_ADD_TEST(suite, test_fleet_remove_wrong_fleet);
     SUITE_ADD_TEST(suite, test_fleet_remove_invalid);
     SUITE_ADD_TEST(suite, test_fleet_remove_nonsail);
@@ -963,6 +1044,9 @@ CuSuite *get_fleets_suite(void)
     SUITE_ADD_TEST(suite, test_fleet_coast);
     SUITE_ADD_TEST(suite, test_fleet_setcoast);
     SUITE_ADD_TEST(suite, test_fleet_move);
+
     SUITE_ADD_TEST(suite, test_fleet_damage);
+
+    SUITE_ADD_TEST(suite, test_fleet_write);
     return suite;
 }
