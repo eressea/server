@@ -5,6 +5,7 @@
 #include <kernel/building.h>
 #include <kernel/config.h>
 #include <kernel/faction.h>
+#include <kernel/item.h>
 #include <kernel/order.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
@@ -30,6 +31,7 @@
 #include <assert.h>
 
 #include "laws.h"
+#include "creport.h"
 
 static void setup_fleet(void) {
     ship_type* ftype;
@@ -937,9 +939,6 @@ static void test_fleet_write(CuTest *tc) {
     write_ship(&data, ffix.fleet);
     write_ship(&data, ffix.sh1);
 
-    /* TODO FLEET_VERSION > CRYPT_VERSION */
-    /* TODO assert that ships are always after fleet in region order */
-
     data.strm.api->rewind(data.strm.handle);
     free_gamedata();
     gamedata_init(&data, &store, RELEASE_VERSION);
@@ -952,6 +951,74 @@ static void test_fleet_write(CuTest *tc) {
     CuAssertPtrNotNull(tc, sh);
     CuAssertPtrEquals(tc, fleet, sh->fleet);
     CuAssertTrue(tc, ship_isfleet(fleet));
+
+    test_cleanup();
+}
+
+static void assert_cr_line(CuTest *tc, stream strm, const char *format, ...) {
+    char line[1024], s[255];
+    size_t bytes = sizeof(s);
+    va_list args;
+    va_start(args, format);
+
+    if (format) {
+        CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+        sprintf(s, format, args);
+        int result = vsnprintf(s, bytes, format, args);
+        CuAssertTrue(tc, result > 0);
+        CuAssertStrEquals(tc, s, line);
+    } else {
+        CuAssertIntEquals(tc, -1, strm.api->readln(strm.handle, line, sizeof(line)));
+    }
+
+    va_end(args);
+}
+
+static void test_fleet_cr(CuTest *tc) {
+    fleet_fixture ffix;
+    stream strm;
+    ship *sh;
+
+    test_cleanup();
+    setup_fleet();
+    init_fleet(&ffix);
+    ffix.fleet->coast = D_WEST;
+    sh = add_ship(&ffix.fleet, NULL, 1);
+    ((ship_type *)sh->type)->cabins = 1000;
+
+    set_money(ffix.u11, 42);
+
+    mstream_init(&strm);
+    cr_output_ship(&strm, ffix.fleet, ffix.u11, ffix.f1->no, ffix.f1, ffix.r);
+    cr_output_ship(&strm, ffix.sh1, ffix.u11, ffix.f1->no, ffix.f1, ffix.r);
+    strm.api->rewind(strm.handle);
+
+    assert_cr_line(tc, strm, "SCHIFF %d", ffix.fleet->no);
+    assert_cr_line(tc, strm, "\"%s\";Name", ffix.fleet->name);
+    assert_cr_line(tc, strm, "\"Flotte\";Typ");
+    assert_cr_line(tc, strm, "%d;Groesse", ffix.fleet->size);
+    assert_cr_line(tc, strm, "%d;Kapitaen", ffix.u11->no);
+    assert_cr_line(tc, strm, "%d;Partei", ffix.f1->no);
+    assert_cr_line(tc, strm, "5000;capacity");
+    assert_cr_line(tc, strm, "42;cargo", ffix.u11->no);
+    assert_cr_line(tc, strm, "1000;cabins");
+    assert_cr_line(tc, strm, "2000;people", ffix.u11->no);
+    assert_cr_line(tc, strm, "1;speed");
+    assert_cr_line(tc, strm, "%d;Kueste", D_WEST);
+
+    assert_cr_line(tc, strm, "SCHIFF %d", ffix.sh1->no);
+    assert_cr_line(tc, strm, "\"%s\";Name", ffix.sh1->name);
+    assert_cr_line(tc, strm, "\"boat\";Typ");
+    assert_cr_line(tc, strm, "%d;Groesse", ffix.sh1->size);
+    assert_cr_line(tc, strm, "%d;Kapitaen", ffix.u11->no);
+    assert_cr_line(tc, strm, "%d;Partei", ffix.f1->no);
+    assert_cr_line(tc, strm, "2000;capacity");
+    assert_cr_line(tc, strm, "0;cargo", ffix.u11->no);
+    assert_cr_line(tc, strm, "2;speed");
+    assert_cr_line(tc, strm, "%d;fleet", ffix.fleet->no);
+    assert_cr_line(tc, strm, NULL);
+
+    mstream_done(&strm);
 
     test_cleanup();
 }
@@ -1048,5 +1115,6 @@ CuSuite *get_fleets_suite(void)
     SUITE_ADD_TEST(suite, test_fleet_damage);
 
     SUITE_ADD_TEST(suite, test_fleet_write);
+    SUITE_ADD_TEST(suite, test_fleet_cr);
     return suite;
 }

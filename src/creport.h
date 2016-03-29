@@ -25,6 +25,7 @@ extern "C" {
 
     int crwritemap(const char *filename);
     void cr_output_unit(struct stream *out, const struct region * r, const struct faction * f, const struct unit * u, int mode);
+    void cr_output_ship(struct stream *out, const struct ship * sh, const struct unit * u, int fcaptain, const struct faction * f, const struct region * r);
 
 #ifdef __cplusplus
 }

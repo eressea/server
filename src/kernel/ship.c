@@ -511,7 +511,11 @@ int ship_speed(const ship * sh, const unit * u)
         u = ship_owner(sh);
     if (!u)
         return 0;
-    assert(u->ship == sh);
+    if (sh->fleet){
+        assert(u->ship == sh->fleet);
+    } else {
+        assert(u->ship == sh);
+    }
     assert(u == ship_owner(sh));
 
     if (!init) {
