@@ -1837,32 +1837,50 @@ const unit * captain)
     int bytes;
     char ch;
 
-    newline(out);
+    char fleet_trailer[4] = "";
+
+    if (sh->fleet) {
+        strcpy (fleet_trailer, "|- ");
+    } else {
+        newline(out);
+    }
 
     if (captain && captain->faction == f) {
         int n = 0, p = 0;
+        int cabins = ship_cabins(sh);
         ship_weight(sh, &n, &p);
         n = (n + 99) / 100;         /* 1 Silber = 1 GE */
 
-        bytes = _snprintf(bufp, size, "%s, %s, (%d/%d)", shipname(sh),
-            LOC(f->locale, sh->type->_name), n, ship_capacity(sh) / 100);
-    }
-    else {
+
+        if (cabins) {
+            bytes = _snprintf(bufp, size, "%s%s, %s, (%d/%d) (%d/%d)",
+                fleet_trailer, shipname(sh), LOC(f->locale, sh->type->_name),
+                n, ship_capacity(sh) / 100,
+                p / 100, cabins / 100);
+        } else {
+            bytes = _snprintf(bufp, size, "%s%s, %s, (%d/%d)",
+                fleet_trailer, shipname(sh), LOC(f->locale, sh->type->_name),
+                n, ship_capacity(sh) / 100);
+        }
+    } else {
         bytes =
-            _snprintf(bufp, size, "%s, %s", shipname(sh), LOC(f->locale,
-            sh->type->_name));
+            _snprintf(bufp, size, "%s%s, %s", fleet_trailer, shipname(sh), LOC(f->locale,
+                sh->type->_name));
     }
     if (wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
 
     if (!ship_iscomplete(sh)) {
-        bytes = _snprintf(bufp, size, ", %s (%d/%d)",
-            LOC(f->locale, "nr_undercons"), sh->size,
-            sh->type->construction->maxsize);
+        if (ship_isfleet(sh)) {
+            bytes = _snprintf(bufp, size, ", %s", LOC(f->locale, "nr_undercons"));
+        } else {
+            bytes = _snprintf(bufp, size, ", %s (%d/%d)",
+                LOC(f->locale, "nr_undercons"), sh->size, sh->type->construction->maxsize);
+        }
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
     }
-    if (ship_isdamaged(sh)) {
+    if (ship_isdamaged(sh) && ship_isfleet(sh)) {
         int percent = ship_damage_percent(sh);
         bytes =
             _snprintf(bufp, size, ", %d%% %s", percent, LOC(f->locale, "nr_damaged"));
