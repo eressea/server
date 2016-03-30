@@ -62,7 +62,8 @@ extern "C" {
     void run_to(struct unit *u, struct region *to);
     struct unit *is_guarded(struct region *r, struct unit *u, unsigned int mask);
     bool is_guard(const struct unit *u, unsigned int mask);
-    int enoughsailors(const struct ship *sh, int sumskill);
+    int enoughsailors(const struct ship *sh);
+    bool ship_ready(const struct region * r, struct unit * u, struct order * ord);
     bool canswim(struct unit *u);
     bool canfly(struct unit *u);
     struct ship *move_ship(struct ship *sh, struct region *from,
@@ -82,7 +83,9 @@ extern "C" {
 #define SA_NO_INSECT -1
 #define SA_NO_COAST -2
 
-    int check_ship_allowed(struct ship *sh, const struct region * r);
+    int check_ship_allowed(const struct ship *sh, const struct region * r);
+    void set_coast(struct ship * sh, const struct region * r, const struct region * rnext);
+
 #ifdef __cplusplus
 }
 #endif

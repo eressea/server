@@ -153,6 +153,8 @@
       <requirement type="money" quantity="10"/>
     </construction>
   </ship>
-
+  
+  <ship name="fleet" range="1" storm="1.00" damage="1.00" cargo="1" cptskill="6" minskill="1" sumskill="6" opensea="yes">
+  </ship>
 </ships>
 

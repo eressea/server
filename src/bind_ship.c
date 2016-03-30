@@ -52,7 +52,7 @@ static int tolua_ship_get_id(lua_State * L)
 static int tolua_ship_get_name(lua_State * L)
 {
     ship *self = (ship *)tolua_tousertype(L, 1, 0);
-    tolua_pushstring(L, ship_getname(self));
+    tolua_pushstring(L, ship_name(self));
     return 1;
 }
 

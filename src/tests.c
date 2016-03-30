@@ -177,28 +177,42 @@ ship * test_create_ship(region * r, const ship_type * stype)
 
 ship_type * test_create_shiptype(const char * name)
 {
+    return test_create_shiptype2(name, 1, 1, 1, 2, 1000, 0, 5, 1, 1, 1);
+}
+
+ship_type * test_create_shiptype2(const char * name,
+    int cptskill, int sumskill, int minskill, int range, int cargo, int cabins,
+    int cmaxsize, int cminskill, int creqsize, int coasts)
+{
+    int c;
     ship_type * stype = st_get_or_create(name);
-    stype->cptskill = 1;
-    stype->sumskill = 1;
-    stype->minskill = 1;
-    stype->range = 2;
-    stype->cargo = 1000;
-    stype->damage = 1;
+
+    stype->cptskill = cptskill;
+    stype->sumskill = sumskill;
+    stype->minskill = minskill;
+    stype->range = range;
+    stype->cargo = cargo;
+    stype->cabins = cabins;
+    stype->damage = 1.0;
     if (!stype->construction) {
         stype->construction = calloc(1, sizeof(construction));
-        stype->construction->maxsize = 5;
-        stype->construction->minskill = 1;
-        stype->construction->reqsize = 1;
+        stype->construction->maxsize = cmaxsize;
+        stype->construction->minskill = cminskill;
+        stype->construction->reqsize = creqsize;
         stype->construction->skill = SK_SHIPBUILDING;
     }
 
-    if (stype->coasts) {
-        free(stype->coasts);
-    }
     stype->coasts =
-        (terrain_type **)malloc(sizeof(terrain_type *) * 2);
-    stype->coasts[0] = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION | SAIL_INTO | FLY_INTO);
-    stype->coasts[1] = NULL;
+        (terrain_type **)calloc(coasts + 1, sizeof(terrain_type *));
+    if (coasts > 0) {
+        stype->coasts[0] = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION | SAIL_INTO | FLY_INTO);
+        for (c = 1; c < coasts; ++c) {
+            char s[255];
+            sprintf(s, "plain%d", c);
+            stype->coasts[c] = test_create_terrain(s, LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION | SAIL_INTO | FLY_INTO);
+        }
+    }
+    stype->coasts[coasts] = NULL;
     if (default_locale) {
         locale_setstring(default_locale, name, name);
     }
@@ -299,6 +313,8 @@ void test_create_world(void)
     int i;
     item_type * itype;
     struct locale * loc;
+
+    assert(!"did you forget to call test_cleanup()?" || !regions);
 
     loc = get_or_create_locale("de");
 

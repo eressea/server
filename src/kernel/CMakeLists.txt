@@ -40,6 +40,7 @@ item.c
 messages.c
 order.c
 pathfinder.c
+parser_helpers.c
 plane.c
 pool.c
 race.c

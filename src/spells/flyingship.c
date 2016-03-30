@@ -58,7 +58,7 @@ int sp_flying_ship(castorder * co)
     if (pa->param[0]->flag == TARGET_NOTFOUND)
         return 0;
     sh = pa->param[0]->data.sh;
-    if (sh->type->construction->maxsize > 50) {
+    if (ship_isfleet(sh) || sh->type->construction->maxsize > 50) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "error_flying_ship_too_big", "ship", sh));
         return 0;

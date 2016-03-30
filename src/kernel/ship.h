@@ -94,16 +94,20 @@ extern "C" {
         int flags;
         const struct ship_type *type;
         direction_t coast;
+        struct ship *fleet;
     } ship;
 
     void damage_ship(struct ship * sh, double percent);
+    bool ship_isdamaged(const struct ship *sh);
+    bool ship_isdestroyed(const struct ship *sh);
     void ship_set_owner(struct unit * u);
     struct unit *ship_owner(const struct ship *sh);
     void ship_update_owner(struct ship * sh);
 
     extern const char *shipname(const struct ship *self);
-    extern int shipcapacity(const struct ship *sh);
-    extern void getshipweight(const struct ship *sh, int *weight, int *cabins);
+    extern int ship_capacity(const struct ship *sh);
+    extern int ship_cabins(const struct ship *sh);
+    extern void ship_weight(const struct ship *sh, int *weight, int *cabins);
 
     extern ship *new_ship(const struct ship_type *stype, struct region *r,
         const struct locale *lang);
@@ -122,12 +126,35 @@ extern "C" {
     extern void free_ship(struct ship *s);
     extern void free_ships(void);
 
-    const char *ship_getname(const struct ship *self);
+    const char *ship_name(const struct ship *self);
     void ship_setname(struct ship *self, const char *name);
-    int shipspeed(const struct ship *sh, const struct unit *u);
-    int crew_skill(const struct ship *sh);
+    int ship_speed(const struct ship *sh, const struct unit *u);
+    int ship_crew_skill(const struct ship *sh);
 
     int ship_damage_percent(const struct ship *ship);
+
+    bool ship_isfleet(const struct ship *sh);
+    struct ship *fleet_add_ship(struct ship *sh, struct ship *fleet, struct unit *cpt);
+    struct ship *fleet_remove_ship(struct ship *sh, struct unit *new_cpt);
+    void fleet_cmd(struct region * r);
+
+    int ship_type_cpt_skill(const struct ship *sh);
+    int ship_type_crew_skill(const struct ship *sh);
+    bool ship_iscomplete(const struct ship *sh);
+
+    int aggregate_max(int i1, int i2);
+    int aggregate_min(int i1, int i2);
+    int aggregate_sum(int i1, int i2);
+
+    typedef int (*int_visitor) (const ship *fleet, const ship *sh, void *state);
+    typedef bool (*bool_visitor) (struct ship *fleet, struct ship *sh, void *state);
+    typedef bool (*const_bool_visitor) (const struct ship *fleet, const struct ship *sh, void *state);
+    typedef int (*aggregator) (int v1, int v2);
+
+    int fleet_const_int_aggregate(const struct ship *sh, int_visitor getvalue, aggregator aggr, int init_value, void *state);
+    void fleet_visit(struct ship *sh, bool_visitor visit_ship, void *state);
+    void fleet_const_visit(const struct ship *sh, const_bool_visitor visit_ship, void *state);
+
 #ifdef __cplusplus
 }
 #endif

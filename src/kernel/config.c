@@ -209,7 +209,8 @@ const char *parameters[MAXPARAMS] = {
     "GRUPPE",
     "PARTEITARNUNG",
     "BAEUME",
-    "ALLIANZ"
+    "ALLIANZ",
+    "ENTFERNE"
 };
 
 const char *report_options[MAX_MSG] = {
