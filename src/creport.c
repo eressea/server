@@ -92,8 +92,9 @@ bool opt_cr_absolute_coords = false;
 static const char *crtag(const char *key)
 {
     static const struct locale *lang = NULL;
-    if (!lang)
-        lang = get_locale(TAG_LOCALE);
+    /* FIXME static variable breaks tests
+      if (!lang) */
+      lang = get_locale(TAG_LOCALE);
     return LOC(lang, key);
 }
 #else
@@ -650,48 +651,67 @@ faction * f)
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
 
 /* prints a ship */
-static void
-cr_output_ship(FILE * F, const ship * sh, const unit * u, int fcaptain,
+void
+cr_output_ship(stream *out, const ship * sh, const unit * u, int fcaptain,
 const faction * f, const region * r)
 {
     int w = 0;
     assert(sh);
-    fprintf(F, "SCHIFF %d\n", sh->no);
-    fprintf(F, "\"%s\";Name\n", sh->name);
+    stream_printf(out, "SCHIFF %d\n", sh->no);
+    stream_printf(out, "\"%s\";Name\n", sh->name);
     if (sh->display && sh->display[0])
-        fprintf(F, "\"%s\";Beschr\n", sh->display);
-    fprintf(F, "\"%s\";Typ\n", translate(sh->type->_name,
+        stream_printf(out, "\"%s\";Beschr\n", sh->display);
+    stream_printf(out, "\"%s\";Typ\n", translate(sh->type->_name,
         LOC(f->locale, sh->type->_name)));
-    fprintf(F, "%d;Groesse\n", sh->size);
+    stream_printf(out, "%d;Groesse\n", sh->size);
     if (ship_isdamaged(sh)) {
         int percent = ship_damage_percent(sh);
-        fprintf(F, "%d;Schaden\n", percent);
+        stream_printf(out, "%d;Schaden\n", percent);
     }
     if (u) {
-        fprintf(F, "%d;Kapitaen\n", u->no);
+        stream_printf(out, "%d;Kapitaen\n", u->no);
     }
     if (fcaptain >= 0)
-        fprintf(F, "%d;Partei\n", fcaptain);
+        stream_printf(out, "%d;Partei\n", fcaptain);
 
     /* calculate cargo */
     if (u && (u->faction == f || omniscient(f))) {
         int n = 0, p = 0;
         int mweight = ship_capacity(sh);
+        int cabins = ship_cabins(sh);
         ship_weight(sh, &n, &p);
 
-        fprintf(F, "%d;capacity\n", mweight);
-        fprintf(F, "%d;cargo\n", n);
-        fprintf(F, "%d;speed\n", ship_speed(sh, u));
+        stream_printf(out, "%d;capacity\n", mweight);
+        stream_printf(out, "%d;cargo\n", n);
+
+        if (cabins) {
+            stream_printf(out, "%d;cabins\n", cabins);
+            stream_printf(out, "%d;people\n", p);
+        }
+        stream_printf(out, "%d;speed\n", ship_speed(sh, u));
+    }
+    if (sh->fleet) {
+        stream_printf(out, "%d;fleet\n", sh->fleet->no);
     }
     /* shore */
     w = NODIRECTION;
     if (!fval(r->terrain, SEA_REGION))
         w = sh->coast;
     if (w != NODIRECTION)
-        fprintf(F, "%d;Kueste\n", w);
+        stream_printf(out, "%d;Kueste\n", w);
 
-    cr_output_curses_compat(F, f, sh, TYP_SHIP);
+    cr_output_curses(out, f, sh, TYP_SHIP);
 }
+
+static void cr_output_ship_compat(FILE * F, const ship * sh, const unit * u, int fcaptain,
+    const faction * f, const region * r)
+{
+    // TODO: eliminate this function
+    stream strm;
+    fstream_init(&strm, F);
+    cr_output_ship(&strm, sh, u, fcaptain, f, r);
+}
+
 
 static int stream_order(stream *out, const struct order *ord) {
     const char *str;
@@ -1475,7 +1495,7 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
                 fno = sf->no;
             }
 
-            cr_output_ship(F, sh, u, fno, f, r);
+            cr_output_ship_compat(F, sh, u, fno, f, r);
         }
 
         /* visible units */
@@ -1489,41 +1509,14 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
     }
 }
 
-/* main function of the creport. creates the header and traverses all regions */
-static int
-report_computer(const char *filename, report_context * ctx, const char *charset)
-{
-    static int era = -1;
-    int i;
-    faction *f = ctx->f;
-    const char *prefix;
-    region *r;
+static void show_header_cr(FILE *F, const char *charset, faction *f, long long date, int era) {
     const char *mailto = LOC(f->locale, "mailto");
-    const attrib *a;
-    seen_region *sr = NULL;
-    FILE *F = fopen(filename, "w");
-
-    if (era < 0) {
-        era = config_get_int("world.era", 1);
-    }
-    if (F == NULL) {
-        perror(filename);
-        return -1;
-    }
-    else if (_strcmpl(charset, "utf-8") == 0 || _strcmpl(charset, "utf8") == 0) {
-        const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
-        fwrite(utf8_bom, 1, 3, F);
-    }
-
-    /* must call this to get all the neighbour regions */
-    /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = */
-    /* initialisations, header and lists */
 
     fprintf(F, "VERSION %d\n", C_REPORT_VERSION);
     fprintf(F, "\"%s\";charset\n", charset);
     fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
     fprintf(F, "%d;noskillpoints\n", 1);
-    fprintf(F, "%lld;date\n", (long long)ctx->report_time);
+    fprintf(F, "%lld;date\n", date);
     fprintf(F, "\"%s\";Spiel\n", game_name());
     fprintf(F, "\"%s\";Konfiguration\n", "Standard");
     fprintf(F, "\"%s\";Koordinaten\n", "Hex");
@@ -1536,8 +1529,11 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
         fprintf(F, "\"%s\";mailto\n", mailto);
         fprintf(F, "\"%s\";mailcmd\n", LOC(f->locale, "mailcmd"));
     }
+}
 
-    show_alliances_cr(F, f);
+static void show_owner_faction_cr(FILE *F, faction *f) {
+    const char *prefix;
+    int i;
 
     fprintf(F, "PARTEI %d\n", f->no);
     fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
@@ -1589,6 +1585,11 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
     if (f->banner)
         fprintf(F, "\"%s\";banner\n", f->banner);
     print_items(F, f->items, f->locale);
+}
+
+static void show_options_cr(FILE *F, faction *f) {
+    int i;
+
     fputs("OPTIONEN\n", F);
     for (i = 0; i != MAXOPTIONS; ++i) {
         int flag = want(i);
@@ -1599,50 +1600,29 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
             f->options &= (~flag);
         }
     }
-    show_allies_cr(F, f, f->allies);
-    {
-        group *g;
-        for (g = f->groups; g; g = g->next) {
+}
 
-            fprintf(F, "GRUPPE %d\n", g->gid);
-            fprintf(F, "\"%s\";name\n", g->name);
-            prefix = get_prefix(g->attribs);
-            if (prefix != NULL) {
-                prefix = mkname("prefix", prefix);
-                fprintf(F, "\"%s\";typprefix\n",
-                    translate(prefix, LOC(f->locale, prefix)));
-            }
-            show_allies_cr(F, f, g->allies);
+static void show_groups_cr(FILE *F, faction *f) {
+    group *g;
+    const char *prefix;
+
+    for (g = f->groups; g; g = g->next) {
+
+        fprintf(F, "GRUPPE %d\n", g->gid);
+        fprintf(F, "\"%s\";name\n", g->name);
+        prefix = get_prefix(g->attribs);
+        if (prefix != NULL) {
+            prefix = mkname("prefix", prefix);
+            fprintf(F, "\"%s\";typprefix\n",
+                translate(prefix, LOC(f->locale, prefix)));
         }
+        show_allies_cr(F, f, g->allies);
     }
+}
 
-    cr_output_messages(F, f->msgs, f);
-    {
-        struct bmsg *bm;
-        for (bm = f->battles; bm; bm = bm->next) {
-            plane *pl = rplane(bm->r);
-            int plid = plane_id(pl);
-            region *r = bm->r;
-            int nx = r->x, ny = r->y;
+static void show_potions_cr(FILE *F, faction *f) {
+    attrib *a;
 
-            pnormalize(&nx, &ny, pl);
-            adjust_coordinates(f, &nx, &ny, pl);
-            if (!plid)
-                fprintf(F, "BATTLE %d %d\n", nx, ny);
-            else {
-                fprintf(F, "BATTLE %d %d %d\n", nx, ny, plid);
-            }
-            cr_output_messages(F, bm->msgs, f);
-        }
-    }
-
-    cr_find_address(F, f, ctx->addresses);
-    a = a_find(f->attribs, &at_reportspell);
-    while (a && a->type == &at_reportspell) {
-        spellbook_entry *sbe = (spellbook_entry *)a->data.v;
-        cr_reportspell(F, sbe->sp, sbe->level, f->locale);
-        a = a->next;
-    }
     for (a = a_find(f->attribs, &at_showitem); a && a->type == &at_showitem;
         a = a->next) {
         const potion_type *ptype =
@@ -1676,6 +1656,81 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
             }
         }
     }
+}
+
+static void show_battle_messages_cr(FILE *F, faction *f, struct bmsg *bm) {
+    plane *pl = rplane(bm->r);
+    int plid = plane_id(pl);
+    region *r = bm->r;
+    int nx = r->x, ny = r->y;
+
+    pnormalize(&nx, &ny, pl);
+    adjust_coordinates(f, &nx, &ny, pl);
+    if (!plid)
+        fprintf(F, "BATTLE %d %d\n", nx, ny);
+    else {
+        fprintf(F, "BATTLE %d %d %d\n", nx, ny, plid);
+    }
+    cr_output_messages(F, bm->msgs, f);
+}
+
+/* main function of the creport. creates the header and traverses all regions */
+static int
+report_computer(const char *filename, report_context * ctx, const char *charset)
+{
+    static int era = -1;
+    faction *f = ctx->f;
+    region *r;
+    const attrib *a;
+    seen_region *sr = NULL;
+    FILE *F = fopen(filename, "w");
+
+    if (era < 0) {
+        era = config_get_int("world.era", 1);
+    }
+    if (F == NULL) {
+        perror(filename);
+        return -1;
+    }
+    else if (_strcmpl(charset, "utf-8") == 0 || _strcmpl(charset, "utf8") == 0) {
+        const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
+        fwrite(utf8_bom, 1, 3, F);
+    }
+
+    /* must call this to get all the neighbour regions */
+    /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = */
+    /* initialisations, header and lists */
+
+    show_header_cr(F, charset, f, (long long)ctx->report_time, era);
+
+    show_alliances_cr(F, f);
+
+    show_owner_faction_cr(F, f);
+
+    show_options_cr(F, f);
+
+    show_allies_cr(F, f, f->allies);
+
+    show_groups_cr(F, f);
+
+    cr_output_messages(F, f->msgs, f);
+    {
+        struct bmsg *bm;
+        for (bm = f->battles; bm; bm = bm->next) {
+            show_battle_messages_cr(F, f, bm);
+        }
+    }
+
+    cr_find_address(F, f, ctx->addresses);
+
+    a = a_find(f->attribs, &at_reportspell);
+    while (a && a->type == &at_reportspell) {
+        spellbook_entry *sbe = (spellbook_entry *)a->data.v;
+        cr_reportspell(F, sbe->sp, sbe->level, f->locale);
+        a = a->next;
+    }
+
+    show_potions_cr(F, f);
 
     /* traverse all regions */
     for (r = ctx->first; sr == NULL && r != ctx->last; r = r->next) {

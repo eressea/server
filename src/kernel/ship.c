@@ -179,14 +179,22 @@ void fleet_visit(ship *sh, bool_visitor visit_ship, void *state) {
     if (ship_isfleet(sh)) {
         int count = 0;
         ship *shp;
-        for (shp = sh->region->ships; shp; ) {
+        for (shp = sh->next; shp; ) {
             ship *next = shp->next;
-            ++count;
-            if (!visit_ship(sh, shp, state))
+            if (shp->fleet == sh) {
+                ++count;
+                if (!visit_ship(sh, shp, state))
+                    break;
+            } else {
+                assert(count == sh->size);
                 break;
+            }
             shp = next;
         }
-        assert(count > 0);
+        if (!shp)
+            assert(count == sh->size);
+        else
+            assert(count > 0);
         visit_ship(sh, NULL, state);
     } else {
         visit_ship(NULL, sh, state);
@@ -196,17 +204,23 @@ void fleet_visit(ship *sh, bool_visitor visit_ship, void *state) {
 void fleet_const_visit(const ship *sh, const_bool_visitor visit_ship, void *state) {
     if (ship_isfleet(sh)) {
         int count = 0;
-        ship *shp;
-        for (shp = sh->region->ships; shp;) {
+        const ship *shp;
+        for (shp = sh->next; shp;) {
             ship *next = shp->next;
             if (shp->fleet == sh) {
                 ++count;
                 if (!visit_ship(sh, shp, state))
                     break;
+            } else {
+                assert(count == sh->size);
+                break;
             }
             shp = next;
         }
-        assert(count > 0);
+        if (!shp)
+            assert(count == sh->size);
+        else
+            assert(count > 0);
         visit_ship(sh, NULL, state);
     } else {
         visit_ship(NULL, sh, state);
@@ -497,7 +511,11 @@ int ship_speed(const ship * sh, const unit * u)
         u = ship_owner(sh);
     if (!u)
         return 0;
-    assert(u->ship == sh);
+    if (sh->fleet){
+        assert(u->ship == sh->fleet);
+    } else {
+        assert(u->ship == sh);
+    }
     assert(u == ship_owner(sh));
 
     if (!init) {
@@ -704,6 +722,25 @@ bool ship_isfleet(const ship *sh) {
     return (sh->type == st_find("fleet"));
 }
 
+static void ship_append_after(ship **list, ship *sh, ship *fleet) {
+    ship *shp;
+    assert(list && *list);
+    for (; *list; list = &(*list)->next) {
+        if ((*list) == sh) {
+            (*list) = sh->next;
+            break;
+        }
+    }
+    for (shp = fleet; shp; shp = shp->next) {
+        if (shp->next == NULL || shp->next->fleet != fleet) {
+            ship *succ = shp->next;
+            shp->next = sh;
+            sh->next = succ;
+            break;
+        }
+    }
+}
+
 ship *fleet_add_ship(ship *sh, ship *fleet, unit *cpt) {
     unit * up;
     region *r = sh->region;
@@ -715,18 +752,22 @@ ship *fleet_add_ship(ship *sh, ship *fleet, unit *cpt) {
         fleet = new_ship(fleet_type, r, cpt->faction->locale);
     }
 
-    for (up = r->units; up; up = up->next) {
-        if (up == cpt || up->ship == sh) {
-            up->ship = 0;
-            u_set_ship(up, fleet);
-        }
-    }
     sh->fleet = fleet;
     if (sh->coast != NODIRECTION) {
         assert(fleet->coast == NODIRECTION || fleet->coast == sh->coast);
         fleet->coast = sh->coast;
     }
     ++fleet->size;
+
+    ship_append_after(&sh->region->ships, sh, fleet);
+
+    for (up = r->units; up; up = up->next) {
+        if (up == cpt || up->ship == sh) {
+            up->ship = 0;
+            u_set_ship(up, fleet);
+        }
+    }
+
     return fleet;
 }
 
@@ -742,13 +783,17 @@ ship *fleet_remove_ship(ship *sh, unit *new_cpt) {
 
     if (--fleet->size == 0)
         remove_ship(&fleet->region->ships, fleet);
-    else if (fleet->coast != NODIRECTION && sh->coast != NODIRECTION) {
-        fleet->coast = NODIRECTION;
-        for (shp = sh->region->ships; shp; shp = shp->next) {
-            if (shp->fleet == fleet) {
-                if (shp->coast != NODIRECTION) {
-                    fleet->coast = shp->coast;
-                    break;
+    else {
+        assert(fleet->next != NULL);
+        ship_append_after(&fleet, sh, fleet);
+        if (fleet->coast != NODIRECTION && sh->coast != NODIRECTION) {
+            fleet->coast = NODIRECTION;
+            for (shp = sh->region->ships; shp; shp = shp->next) {
+                if (shp->fleet == fleet) {
+                    if (shp->coast != NODIRECTION) {
+                        fleet->coast = shp->coast;
+                        break;
+                    }
                 }
             }
         }
@@ -765,9 +810,16 @@ void fleet_cmd(region * r)
     for (uptr = &r->units; *uptr;) {
         unit *u = *uptr;
         order **ordp = &u->orders;
+        order *ord = NULL;
 
         while (*ordp) {
-            order *ord = *ordp;
+            if (*ordp == ord) {
+                ordp = &ord->next;
+                if (*ordp == NULL)
+                    break;
+            }
+            ord = *ordp;
+
             if (getkeyword(ord) == K_FLEET) {
                 char token[128];
                 const char *s;
@@ -796,7 +848,7 @@ void fleet_cmd(region * r)
                                 if (!cpt || cpt->region != u->region) {
                                     ADDMSG(&u->faction->msgs,
                                         msg_feedback(u, ord, "feedback_unit_not_found", ""));
-                                    break;
+                                    continue;
                                 }
                             }
                         }
@@ -819,21 +871,21 @@ void fleet_cmd(region * r)
 
                     if (!(u_race(u)->flags & (RCF_CANSAIL | RCF_WALK | RCF_FLY))) {
                         cmistake(u, ord, 233, MSG_MOVE);
-                        break;
+                        continue;
                     }
                     if (!sh || sh->fleet || ship_isfleet(sh) || sh->region != u->region) {
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "fleet_ship_invalid", "ship", sh));
-                        break;
+                        continue;
                     }
                     if (ship_owner(sh) && !ucontact(ship_owner(sh), u)) {
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_no_contact", "target", ship_owner(sh)));
-                        break;
+                        continue;
                     }
 
                     if (u->ship && ship_isfleet(u->ship)) {
                         if (sh->coast != NODIRECTION && u->ship->coast != NODIRECTION && sh->coast != u->ship->coast){
                             ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "fleet_ship_invalid", "ship", sh));
-                            break;
+                            continue;
                         }
                         fleet_add_ship(sh, u->ship, u);
                     } else {
@@ -844,15 +896,15 @@ void fleet_cmd(region * r)
                     /* remove ship */
                     if (!u->ship || !ship_isfleet(u->ship) || u != ship_owner(u->ship)) {
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "fleet_only_captain", "id", id));
-                        break;
+                        continue;
                     }
                     if (!sh || sh->fleet != u->ship || u != ship_owner(sh)) {
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "ship_nofleet", "id", id));
-                        break;
+                        continue;
                     }
                     if (id2 != 0 && !cpt) {
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "unitnotfound_id", "id", id));
-                        break;
+                        continue;
                     }
                     if (cpt && !(u_race(cpt)->flags & (RCF_CANSAIL | RCF_WALK | RCF_FLY))) {
                         cmistake(u, ord, 233, MSG_MOVE);
@@ -861,14 +913,12 @@ void fleet_cmd(region * r)
                     }
                     if (cpt && !ucontact(cpt, u)) {
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_no_contact", "target", cpt));
-                        break;
+                        continue;
                     }
 
                     fleet_remove_ship(sh, cpt);
                 }
             }
-            if (*ordp == ord)
-                ordp = &ord->next;
         }
         if (*uptr == u)
             uptr = &u->next;

@@ -8,3 +8,5 @@ require 'tests.orders'
 require 'tests.common'
 require 'tests.magicbag'
 require 'tests.process'
+
+require 'tests.e3.fleets'

@@ -23,6 +23,8 @@ extern "C" {
     struct spellbook_entry;
     struct region;
     struct faction;
+    struct seen_region;
+
     void register_nr(void);
     void report_cleanup(void);
     void write_spaces(struct stream *out, size_t num);
@@ -30,6 +32,10 @@ extern "C" {
 
     void nr_spell_syntax(struct stream *out, struct spellbook_entry * sbe, const struct locale *lang);
     void nr_spell(struct stream *out, struct spellbook_entry * sbe, const struct locale *lang);
+
+    void nr_ship(struct stream *out, const struct region * r, const struct ship * sh, const struct faction * f,
+    const struct unit * captain);
+    void nr_units(struct stream *out, const struct seen_region *sr, const struct faction *f);
 
 #ifdef __cplusplus
 }

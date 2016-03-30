@@ -248,6 +248,46 @@ static size_t write_spell_modifier(spell * sp, int flag, const char * str, bool 
     return 0;
 }
 
+void nr_potion(stream *out, const potion_type *ptype, const struct locale *lang) {
+    const char *pname = resourcename(ptype->itype->rtype, 0);
+    char buf[4096];
+    char *bufp = buf;
+    size_t size = sizeof(buf) - 1;
+    int bytes;
+    const char *potiontext = mkname("potion", pname);
+
+    newline(out);
+    centre(out, LOC(lang, pname), true);
+    _snprintf(buf, sizeof(buf), "%s %d", LOC(lang, "nr_level"),
+        ptype->level);
+    centre(out, buf, true);
+    newline(out);
+
+    bytes = _snprintf(bufp, size, "%s: ", LOC(lang, "nr_herbsrequired"));
+    if (wrptr(&bufp, &size, bytes) != 0)
+        WARN_STATIC_BUFFER();
+
+    if (ptype->itype->construction) {
+        requirement *m = ptype->itype->construction->materials;
+        while (m->number) {
+            bytes =
+                (int)strlcpy(bufp, LOC(lang, resourcename(m->rtype, 0)), size);
+            if (wrptr(&bufp, &size, bytes) != 0)
+                WARN_STATIC_BUFFER();
+            ++m;
+            if (m->number)
+                bytes = (int)strlcpy(bufp, ", ", size);
+            if (wrptr(&bufp, &size, bytes) != 0)
+                WARN_STATIC_BUFFER();
+        }
+    }
+    *bufp = 0;
+    centre(out, buf, true);
+    newline(out);
+
+    centre(out, LOC(lang, potiontext), true);
+}
+
 void nr_spell_syntax(struct stream *out, struct spellbook_entry * sbe, const struct locale *lang);
 
 void nr_spell(stream *out, spellbook_entry * sbe, const struct locale *lang)
@@ -718,7 +758,7 @@ nr_unit(stream *out, const faction * f, const unit * u, int indent, int mode)
 }
 
 static void
-rp_messages(stream *out, message_list * msgs, faction * viewer, int indent,
+rp_messages(stream *out, message_list * msgs, const faction * viewer, int indent,
 bool categorized)
 {
     nrsection *section;
@@ -876,7 +916,7 @@ bool see_border(const connection * b, const faction * f, const region * r)
     return cs;
 }
 
-static void describe(stream *out, const seen_region * sr, faction * f)
+static void describe(stream *out, const seen_region * sr, const faction * f)
 {
     const region *r;
     int n;
@@ -1788,42 +1828,59 @@ static void list_address(stream *out, const faction * uf, quicklist * seenfactio
     rpline(out);
 }
 
-static void
-nr_ship(stream *out, const seen_region * sr, const ship * sh, const faction * f,
+void
+nr_ship(stream *out, const region *r, const ship * sh, const faction * f,
 const unit * captain)
 {
-    const region *r = sr->r;
     char buffer[8192], *bufp = buffer;
     size_t size = sizeof(buffer) - 1;
     int bytes;
     char ch;
 
-    newline(out);
+    char fleet_trailer[4] = "";
+
+    if (sh->fleet) {
+        strcpy (fleet_trailer, "|- ");
+    } else {
+        newline(out);
+    }
 
     if (captain && captain->faction == f) {
         int n = 0, p = 0;
+        int cabins = ship_cabins(sh);
         ship_weight(sh, &n, &p);
         n = (n + 99) / 100;         /* 1 Silber = 1 GE */
 
-        bytes = _snprintf(bufp, size, "%s, %s, (%d/%d)", shipname(sh),
-            LOC(f->locale, sh->type->_name), n, ship_capacity(sh) / 100);
-    }
-    else {
+
+        if (cabins) {
+            bytes = _snprintf(bufp, size, "%s%s, %s, (%d/%d) (%d/%d)",
+                fleet_trailer, shipname(sh), LOC(f->locale, sh->type->_name),
+                n, ship_capacity(sh) / 100,
+                p / 100, cabins / 100);
+        } else {
+            bytes = _snprintf(bufp, size, "%s%s, %s, (%d/%d)",
+                fleet_trailer, shipname(sh), LOC(f->locale, sh->type->_name),
+                n, ship_capacity(sh) / 100);
+        }
+    } else {
         bytes =
-            _snprintf(bufp, size, "%s, %s", shipname(sh), LOC(f->locale,
-            sh->type->_name));
+            _snprintf(bufp, size, "%s%s, %s", fleet_trailer, shipname(sh), LOC(f->locale,
+                sh->type->_name));
     }
     if (wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
 
     if (!ship_iscomplete(sh)) {
-        bytes = _snprintf(bufp, size, ", %s (%d/%d)",
-            LOC(f->locale, "nr_undercons"), sh->size,
-            sh->type->construction->maxsize);
+        if (ship_isfleet(sh)) {
+            bytes = _snprintf(bufp, size, ", %s", LOC(f->locale, "nr_undercons"));
+        } else {
+            bytes = _snprintf(bufp, size, ", %s (%d/%d)",
+                LOC(f->locale, "nr_undercons"), sh->size, sh->type->construction->maxsize);
+        }
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
     }
-    if (ship_isdamaged(sh)) {
+    if (ship_isdamaged(sh) && ship_isfleet(sh)) {
         int percent = ship_damage_percent(sh);
         bytes =
             _snprintf(bufp, size, ", %d%% %s", percent, LOC(f->locale, "nr_damaged"));
@@ -1937,7 +1994,7 @@ const faction * f)
     nr_curses(out, 4, f, TYP_BUILDING, b);
 }
 
-static void nr_paragraph(stream *out, message * m, faction * f)
+static void nr_paragraph(stream *out, message * m, const faction * f)
 {
     int bytes;
     char buf[4096], *bufp = buf;
@@ -2050,61 +2107,34 @@ void write_travelthru(stream *out, region * r, const faction * f)
     }
 }
 
-int
-report_plaintext(const char *filename, report_context * ctx,
-const char *charset)
-{
-    int flag = 0;
-    char ch;
-    int anyunits, no_units, no_people;
-    const struct region *r;
-    faction *f = ctx->f;
-    unit *u;
-    char pzTime[64];
-    attrib *a;
-    message *m;
-    unsigned char op;
-    int maxh, bytes, ix = want(O_STATISTICS);
-    int wants_stats = (f->options & ix);
-    FILE *F = fopen(filename, "w");
-    stream strm = { 0 }, *out = &strm;
-    seen_region *sr = NULL;
+static void nr_header(stream *out, report_context *ctx) {
     char buf[8192];
     char *bufp;
-    bool utf8 = _strcmpl(charset, "utf8") == 0 || _strcmpl(charset, "utf-8") == 0;
     size_t size;
-    int thisseason;
-    int nextseason;
-    gamedate date;
-    
-    get_gamedate(turn + 1, &date);
-    thisseason = date.season;
-    get_gamedate(turn + 2, &date);
-    nextseason = date.season;
+    int bytes;
+    message *m;
+    faction *f = ctx->f;
+    int no_units, no_people, maxh;
+    int flag = 0;
+    unsigned char op;
 
-    if (F == NULL) {
-        perror(filename);
-        return -1;
+    {
+        char pzTime[64];
+
+        strftime(pzTime, 64, "%A, %d. %B %Y, %H:%M", localtime(&ctx->report_time));
+        m = msg_message("nr_header_date", "game date", game_name(), pzTime);
+        nr_render(m, f->locale, buf, sizeof(buf), f);
+        msg_release(m);
+        centre(out, buf, true);
+        centre(out, gamedate_season(f->locale), true);
+        newline(out);
     }
-    fstream_init(&strm, F);
 
-    if (utf8) {
-        const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
-        fwrite(utf8_bom, 1, 3, F);
-    }
-
-    strftime(pzTime, 64, "%A, %d. %B %Y, %H:%M", localtime(&ctx->report_time));
-    m = msg_message("nr_header_date", "game date", game_name(), pzTime);
-    nr_render(m, f->locale, buf, sizeof(buf), f);
-    msg_release(m);
-    centre(out, buf, true);
-
-    centre(out, gamedate_season(f->locale), true);
-    newline(out);
     sprintf(buf, "%s, %s/%s (%s)", factionname(f),
         LOC(f->locale, rc_name_s(f->race, NAME_PLURAL)),
         LOC(f->locale, mkname("school", magic_school[f->magiegebiet])), f->email);
     centre(out, buf, true);
+
     if (f_get_alliance(f)) {
         centre(out, alliancename(f->alliance), true);
     }
@@ -2131,6 +2161,7 @@ const char *charset)
         }
     }
     newline(out);
+
     if (f->options & want(O_SCORE) && f->age > DISPLAYSCORE) {
         char score[32], avg[32];
         write_score(score, sizeof(score), f->score);
@@ -2153,7 +2184,7 @@ const char *charset)
     }
     if (no_people != f->num_people) {
         f->num_people = no_people;
-}
+    }
 #else
     no_units = count_units(f);
     no_people = count_all(f);
@@ -2181,8 +2212,8 @@ const char *charset)
     if (f_get_alliance(f)) {
         m =
             msg_message("nr_alliance", "leader name id age",
-            alliance_get_leader(f->alliance), f->alliance->name, f->alliance->id,
-            turn - f->alliance_joindate);
+                alliance_get_leader(f->alliance), f->alliance->name, f->alliance->id,
+                turn - f->alliance_joindate);
         nr_render(m, f->locale, buf, sizeof(buf), f);
         msg_release(m);
         centre(out, buf, true);
@@ -2206,6 +2237,15 @@ const char *charset)
 
     /* Insekten-Winter-Warnung */
     if (f->race == get_race(RC_INSECT)) {
+        gamedate date;
+        int thisseason;
+        int nextseason;
+
+        get_gamedate(turn + 1, &date);
+        thisseason = date.season;
+        get_gamedate(turn + 2, &date);
+        nextseason = date.season;
+
         if (thisseason == 0) {
             centre(out, LOC(f->locale, "nr_insectwinter"), true);
             newline(out);
@@ -2240,100 +2280,81 @@ const char *charset)
         *bufp = 0;
         centre(out, buf, true);
     }
+}
 
-    rp_messages(out, f->msgs, f, 0, true);
-    rp_battles(out, f);
-    a = a_find(f->attribs, &at_reportspell);
-    if (a) {
-        newline(out);
-        centre(out, LOC(f->locale, "section_newspells"), true);
-        while (a && a->type == &at_reportspell) {
-            spellbook_entry *sbe = (spellbook_entry *)a->data.v;
-            nr_spell(out, sbe, f->locale);
-            a = a->next;
+void nr_units(stream *out, const seen_region *sr, const faction *f) {
+    region *r = sr->r;
+    building *b = r->buildings;
+    ship *sh = r->ships;
+    int stealthmod = stealth_modifier(sr->mode);
+
+    /* report all units. they are pre-sorted in an efficient manner */
+    unit *u = r->units;
+    while (b) {
+        while (b && (!u || u->building != b)) {
+            nr_building(out, sr, b, f);
+            b = b->next;
+        }
+        if (b) {
+            nr_building(out, sr, b, f);
+            while (u && u->building == b) {
+                nr_unit(out, f, u, 6, sr->mode);
+                u = u->next;
+            }
+            b = b->next;
+        }
+    }
+    while (u && !u->ship) {
+        if (stealthmod > INT_MIN) {
+            if (u->faction == f || cansee(f, r, u, stealthmod)) {
+                nr_unit(out, f, u, 4, sr->mode);
+            }
+        }
+        assert(!u->building);
+        u = u->next;
+    }
+    while (sh) {
+        while (sh && (!u || u->ship != sh)) {
+            assert(!sh->fleet || !"fleet member outside fleet");
+            nr_ship(out, sr->r, sh, f, NULL);
+            sh = sh->next;
+        }
+        if (sh) {
+            ship *fleet = sh;
+            nr_ship(out, sr->r, sh, f, u);
+            while(sh->next && sh->next->fleet == fleet) {
+                sh = sh->next;
+                nr_ship(out, sr->r, sh, f, u);
+            }
+            while (u && u->ship == fleet) {
+                nr_unit(out, f, u, 6, sr->mode);
+                u = u->next;
+            }
+            sh = sh->next;
         }
     }
 
-    ch = 0;
-    CHECK_ERRNO();
-    for (a = a_find(f->attribs, &at_showitem); a && a->type == &at_showitem;
-        a = a->next) {
-        const potion_type *ptype =
-            resource2potion(((const item_type *)a->data.v)->rtype);
-        const char *description = NULL;
-        if (ptype != NULL) {
-            const char *pname = resourcename(ptype->itype->rtype, 0);
+    assert(!u);
 
-            if (ch == 0) {
-                newline(out);
-                centre(out, LOC(f->locale, "section_newpotions"), true);
-                ch = 1;
-            }
-
-            newline(out);
-            centre(out, LOC(f->locale, pname), true);
-            _snprintf(buf, sizeof(buf), "%s %d", LOC(f->locale, "nr_level"),
-                ptype->level);
-            centre(out, buf, true);
-            newline(out);
-
-            bufp = buf;
-            size = sizeof(buf) - 1;
-            bytes = _snprintf(bufp, size, "%s: ", LOC(f->locale, "nr_herbsrequired"));
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
-
-            if (ptype->itype->construction) {
-                requirement *m = ptype->itype->construction->materials;
-                while (m->number) {
-                    bytes =
-                        (int)strlcpy(bufp, LOC(f->locale, resourcename(m->rtype, 0)), size);
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
-                    ++m;
-                    if (m->number)
-                        bytes = (int)strlcpy(bufp, ", ", size);
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
-                }
-            }
-            *bufp = 0;
-            centre(out, buf, true);
-            newline(out);
-            if (description == NULL) {
-                const char *potiontext = mkname("potion", pname);
-                description = LOC(f->locale, potiontext);
-            }
-            centre(out, description, true);
-        }
-    }
     newline(out);
-    CHECK_ERRNO();
-    centre(out, LOC(f->locale, "nr_alliances"), false);
-    newline(out);
+}
 
-    allies(out, f);
+int nr_regions(stream *out, const faction *f, region *first, region *last, int wants_stats) {
+    seen_region *sr = NULL;
+    region *r;
+    int anyunits = 0;
 
-    rpline(out);
-
-    CHECK_ERRNO();
-    anyunits = 0;
-
-    for (r = ctx->first; sr == NULL && r != ctx->last; r = r->next) {
-        sr = find_seen(ctx->f->seen, r);
+    for (r = first; sr == NULL && r != last; r = r->next) {
+        sr = find_seen(f->seen, r);
     }
     for (; sr != NULL; sr = sr->next) {
         region *r = sr->r;
-        int stealthmod = stealth_modifier(sr->mode);
-        building *b = r->buildings;
-        ship *sh = r->ships;
-
         if (sr->mode < see_lighthouse)
             continue;
         /* Beschreibung */
 
         if (sr->mode == see_unit) {
-            anyunits = 1;
+            ++anyunits;
             describe(out, sr, f);
             if (markets_module() && r->land) {
                 const item_type *lux = r_luxury(r);
@@ -2397,52 +2418,81 @@ const char *charset)
             }
         }
 
-        /* report all units. they are pre-sorted in an efficient manner */
-        u = r->units;
-        while (b) {
-            while (b && (!u || u->building != b)) {
-                nr_building(out, sr, b, f);
-                b = b->next;
-            }
-            if (b) {
-                nr_building(out, sr, b, f);
-                while (u && u->building == b) {
-                    nr_unit(out, f, u, 6, sr->mode);
-                    u = u->next;
-                }
-                b = b->next;
-            }
-        }
-        while (u && !u->ship) {
-            if (stealthmod > INT_MIN) {
-                if (u->faction == f || cansee(f, r, u, stealthmod)) {
-                    nr_unit(out, f, u, 4, sr->mode);
-                }
-            }
-            assert(!u->building);
-            u = u->next;
-        }
-        while (sh) {
-            while (sh && (!u || u->ship != sh)) {
-                nr_ship(out, sr, sh, f, NULL);
-                sh = sh->next;
-            }
-            if (sh) {
-                nr_ship(out, sr, sh, f, u);
-                while (u && u->ship == sh) {
-                    nr_unit(out, f, u, 6, sr->mode);
-                    u = u->next;
-                }
-                sh = sh->next;
-            }
-        }
-
-        assert(!u);
-
-        newline(out);
+        nr_units(out, sr, f);
         rpline(out);
         CHECK_ERRNO();
+
     }
+    return anyunits;
+}
+
+int
+report_plaintext(const char *filename, report_context * ctx,
+const char *charset)
+{
+    char ch;
+    int anyunits;
+    faction *f = ctx->f;
+    attrib *a;
+    int ix = want(O_STATISTICS);
+    int wants_stats = (f->options & ix);
+    FILE *F = fopen(filename, "w");
+    stream strm = { 0 }, *out = &strm;
+    bool utf8 = _strcmpl(charset, "utf8") == 0 || _strcmpl(charset, "utf-8") == 0;
+
+    if (F == NULL) {
+        perror(filename);
+        return -1;
+    }
+    fstream_init(&strm, F);
+
+    if (utf8) {
+        const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
+        fwrite(utf8_bom, 1, 3, F);
+    }
+
+    nr_header(out, ctx);
+
+    rp_messages(out, f->msgs, f, 0, true);
+    rp_battles(out, f);
+    a = a_find(f->attribs, &at_reportspell);
+    if (a) {
+        newline(out);
+        centre(out, LOC(f->locale, "section_newspells"), true);
+        while (a && a->type == &at_reportspell) {
+            spellbook_entry *sbe = (spellbook_entry *)a->data.v;
+            nr_spell(out, sbe, f->locale);
+            a = a->next;
+        }
+    }
+
+    ch = 0;
+    CHECK_ERRNO();
+    for (a = a_find(f->attribs, &at_showitem); a && a->type == &at_showitem;
+        a = a->next) {
+        const potion_type *ptype =
+            resource2potion(((const item_type *)a->data.v)->rtype);
+        if (ptype != NULL) {
+            if (ch == 0) {
+                newline(out);
+                centre(out, LOC(f->locale, "section_newpotions"), true);
+                ch = 1;
+            }
+            nr_potion(out, ptype, f->locale);
+        }
+    }
+    newline(out);
+    CHECK_ERRNO();
+    centre(out, LOC(f->locale, "nr_alliances"), false);
+    newline(out);
+
+    allies(out, f);
+
+    rpline(out);
+
+    CHECK_ERRNO();
+    anyunits = nr_regions(out, ctx->f, ctx->first, ctx->last, wants_stats);
+
     if (!is_monsters(f)) {
         if (!anyunits) {
             newline(out);

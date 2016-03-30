@@ -4303,6 +4303,9 @@ void init_processor(void)
     add_proc_region(p, do_contact, "Kontaktieren");
     add_proc_order(p, K_MAIL, mail_cmd, 0, "Botschaften");
 
+    p += 10;
+    add_proc_region(p, fleet_cmd, "Fleets");
+
     p += 10;                      /* all claims must be done before we can USE */
     add_proc_region(p, enter_1, "Betreten (1. Versuch)");     /* for GIVE CONTROL */
     add_proc_order(p, K_USE, use_cmd, 0, "Benutzen");
