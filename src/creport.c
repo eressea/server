@@ -92,8 +92,9 @@ bool opt_cr_absolute_coords = false;
 static const char *crtag(const char *key)
 {
     static const struct locale *lang = NULL;
-    if (!lang)
-        lang = get_locale(TAG_LOCALE);
+    /* FIXME static variable breaks tests
+      if (!lang) */
+      lang = get_locale(TAG_LOCALE);
     return LOC(lang, key);
 }
 #else
