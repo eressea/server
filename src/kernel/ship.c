@@ -810,9 +810,16 @@ void fleet_cmd(region * r)
     for (uptr = &r->units; *uptr;) {
         unit *u = *uptr;
         order **ordp = &u->orders;
+        order *ord = NULL;
 
         while (*ordp) {
-            order *ord = *ordp;
+            if (*ordp == ord) {
+                ordp = &ord->next;
+                if (*ordp == NULL)
+                    break;
+            }
+            ord = *ordp;
+
             if (getkeyword(ord) == K_FLEET) {
                 char token[128];
                 const char *s;
@@ -841,7 +848,7 @@ void fleet_cmd(region * r)
                                 if (!cpt || cpt->region != u->region) {
                                     ADDMSG(&u->faction->msgs,
                                         msg_feedback(u, ord, "feedback_unit_not_found", ""));
-                                    break;
+                                    continue;
                                 }
                             }
                         }
@@ -864,21 +871,21 @@ void fleet_cmd(region * r)
 
                     if (!(u_race(u)->flags & (RCF_CANSAIL | RCF_WALK | RCF_FLY))) {
                         cmistake(u, ord, 233, MSG_MOVE);
-                        break;
+                        continue;
                     }
                     if (!sh || sh->fleet || ship_isfleet(sh) || sh->region != u->region) {
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "fleet_ship_invalid", "ship", sh));
-                        break;
+                        continue;
                     }
                     if (ship_owner(sh) && !ucontact(ship_owner(sh), u)) {
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_no_contact", "target", ship_owner(sh)));
-                        break;
+                        continue;
                     }
 
                     if (u->ship && ship_isfleet(u->ship)) {
                         if (sh->coast != NODIRECTION && u->ship->coast != NODIRECTION && sh->coast != u->ship->coast){
                             ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "fleet_ship_invalid", "ship", sh));
-                            break;
+                            continue;
                         }
                         fleet_add_ship(sh, u->ship, u);
                     } else {
@@ -889,15 +896,15 @@ void fleet_cmd(region * r)
                     /* remove ship */
                     if (!u->ship || !ship_isfleet(u->ship) || u != ship_owner(u->ship)) {
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "fleet_only_captain", "id", id));
-                        break;
+                        continue;
                     }
                     if (!sh || sh->fleet != u->ship || u != ship_owner(sh)) {
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "ship_nofleet", "id", id));
-                        break;
+                        continue;
                     }
                     if (id2 != 0 && !cpt) {
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "unitnotfound_id", "id", id));
-                        break;
+                        continue;
                     }
                     if (cpt && !(u_race(cpt)->flags & (RCF_CANSAIL | RCF_WALK | RCF_FLY))) {
                         cmistake(u, ord, 233, MSG_MOVE);
@@ -906,14 +913,12 @@ void fleet_cmd(region * r)
                     }
                     if (cpt && !ucontact(cpt, u)) {
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_no_contact", "target", cpt));
-                        break;
+                        continue;
                     }
 
                     fleet_remove_ship(sh, cpt);
                 }
             }
-            if (*ordp == ord)
-                ordp = &ord->next;
         }
         if (*uptr == u)
             uptr = &u->next;

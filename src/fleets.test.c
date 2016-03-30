@@ -35,6 +35,8 @@
 #include "laws.h"
 #include "creport.h"
 #include "report.h"
+#include "reports.h"
+#include "seen.h"
 
 static void setup_fleet(void) {
     ship_type* ftype;
@@ -271,6 +273,30 @@ static void test_fleet_create_external(CuTest *tc) {
     msg = test_get_last_message(u12->faction->msgs);
     CuAssertStrEquals_Msg(tc, "ships in fleets cannot be added to other fleets", "fleet_ship_invalid", test_get_messagetype(msg));
     CuAssertPtrEquals(tc, fleet,  (ship *) ffix.sh1->fleet);
+
+    test_cleanup();
+}
+
+static void test_fleet_create_continue(CuTest *tc) {
+    fleet_fixture ffix;
+    order *ord;
+    struct message* msg;
+
+    test_cleanup();
+    setup_fleet();
+    init_fixture(&ffix);
+
+    u_set_ship(ffix.u21, ffix.sh1);
+
+    ord = create_order(K_FLEET, ffix.f1->locale, "%s", itoa36(ffix.sh1->no));
+    unit_addorder(ffix.u11, ord);
+    ord = create_order(K_FLEET, ffix.f1->locale, "%s", itoa36(ffix.sh2->no));
+    unit_addorder(ffix.u11, ord);
+    fleet_cmd(ffix.r);
+
+    msg = test_get_last_message(ffix.u11->faction->msgs);
+    CuAssertStrEquals(tc, "feedback_no_contact", test_get_messagetype(msg));
+    assert_fleet(tc, ffix.r, ffix.sh2, ffix.u11);
 
     test_cleanup();
 }
@@ -1108,6 +1134,7 @@ static void test_fleet_nr(CuTest *tc) {
 
 // MOVE:
 // check terrain, coast
+// travelthru messages
 // follow?
 // piracy (active/passive)
 // DRIFT
@@ -1147,6 +1174,7 @@ CuSuite *get_fleets_suite(void)
     SUITE_ADD_TEST(suite, test_fleet_create_param);
     SUITE_ADD_TEST(suite, test_fleet_missing_param);
     SUITE_ADD_TEST(suite, test_fleet_create_external);
+    SUITE_ADD_TEST(suite, test_fleet_create_continue);
     SUITE_ADD_TEST(suite, test_fleet_create_no_add_fleet);
     SUITE_ADD_TEST(suite, test_fleet_add);
     SUITE_ADD_TEST(suite, test_fleet_add2);

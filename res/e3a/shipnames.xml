@@ -105,4 +105,8 @@
     <text locale="de">Trireme</text>
     <text locale="en">trireme</text>
   </string>
+  <string name="fleet">
+    <text locale="de">Flotte</text>
+    <text locale="en">fleet</text>
+  </string>
 </strings>
