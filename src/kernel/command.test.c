@@ -17,8 +17,12 @@
 #include <CuTest.h>
 #include <tests.h>
 
-static void parser_scale(const void *nodes, struct unit * u, struct order *ord) {
+static void parser_two(const void *nodes, struct unit * u, struct order *ord) {
     scale_number(u, 2);
+}
+
+static void parser_six(const void *nodes, struct unit * u, struct order *ord) {
+    scale_number(u, 6);
 }
 
 static void test_command(CuTest * tc) {
@@ -33,11 +37,12 @@ static void test_command(CuTest * tc) {
     CuAssertPtrEquals(tc, loc, (struct locale *)st->lang);
     CuAssertPtrEquals(tc, 0, st->root);
     CuAssertPtrEquals(tc, 0, st->next);
-    add_command(&st->root, 0, "scale", parser_scale);
+    add_command(&st->root, 0, "two", parser_two);
+    add_command(&st->root, 0, "six", parser_six);
     CuAssertPtrNotNull(tc, st->root);
     CuAssertPtrEquals(tc, st->root, stree_find(st, loc));
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
-    u->thisorder = create_order(K_ALLIANCE, loc, "scale");
+    u->thisorder = create_order(K_ALLIANCE, loc, "two");
     do_command(st->root, u, u->thisorder);
     CuAssertIntEquals(tc, u->number, 2);
     stree_free(st);
