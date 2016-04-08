@@ -86,6 +86,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(xerewards);
     /* kernel */
     ADD_SUITE(alliance);
+    ADD_SUITE(command);
     ADD_SUITE(unit);
     ADD_SUITE(faction);
     ADD_SUITE(group);

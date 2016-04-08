@@ -38,6 +38,7 @@ extern "C" {
         ALLIANCE_MAX
     };
 
+    extern const char* alliance_kwd[ALLIANCE_MAX];
 #define ALF_NON_ALLIED (1<<0)   /* this alliance is just a default for a non-allied faction */
 
 #define ALLY_ENEMY (1<<0)

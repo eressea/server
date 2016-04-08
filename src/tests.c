@@ -6,6 +6,7 @@
 #include "reports.h"
 
 #include <kernel/config.h>
+#include <kernel/alliance.h>
 #include <kernel/plane.h>
 #include <kernel/region.h>
 #include <kernel/terrain.h>
@@ -77,6 +78,9 @@ struct locale * test_create_locale(void) {
         for (i = 0; i < MAXSKILLS; ++i) {
             if (!locale_getstring(loc, mkname("skill", skillnames[i])))
                 locale_setstring(loc, mkname("skill", skillnames[i]), skillnames[i]);
+        }
+        for (i = 0; i != ALLIANCE_MAX; ++i) {
+            locale_setstring(loc, alliance_kwd[i], alliance_kwd[i]);
         }
         for (i = 0; i != MAXDIRECTIONS; ++i) {
             locale_setstring(loc, directions[i], directions[i]);

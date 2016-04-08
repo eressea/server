@@ -314,6 +314,15 @@ static void execute(const struct syntaxtree *syntax, keyword_t kwd)
     }
 }
 
+const char* alliance_kwd[ALLIANCE_MAX] = {
+    "kick",
+    "leave",
+    "command",
+    "new",
+    "invite",
+    "join"
+};
+
 void alliance_cmd(void)
 {
     static syntaxtree *stree = NULL;
@@ -321,33 +330,19 @@ void alliance_cmd(void)
         syntaxtree *slang = stree = stree_create();
         while (slang) {
             void *leaf = 0;
-            add_command(&leaf, NULL, LOC(slang->lang, "new"), &cmd_new);
-            add_command(&leaf, NULL, LOC(slang->lang, "invite"), &cmd_invite);
-            add_command(&leaf, NULL, LOC(slang->lang, "join"), &cmd_join);
-            add_command(&leaf, NULL, LOC(slang->lang, "kick"), &cmd_kick);
-            add_command(&leaf, NULL, LOC(slang->lang, "leave"), &cmd_leave);
-            add_command(&leaf, NULL, LOC(slang->lang, "command"), &cmd_transfer);
+            add_command(&leaf, NULL, LOC(slang->lang, alliance_kwd[ALLIANCE_KICK]), &cmd_kick);
+            add_command(&leaf, NULL, LOC(slang->lang, alliance_kwd[ALLIANCE_LEAVE]), &cmd_leave);
+            add_command(&leaf, NULL, LOC(slang->lang, alliance_kwd[ALLIANCE_TRANSFER]), &cmd_transfer);
+            add_command(&leaf, NULL, LOC(slang->lang, alliance_kwd[ALLIANCE_NEW]), &cmd_new);
+            add_command(&leaf, NULL, LOC(slang->lang, alliance_kwd[ALLIANCE_INVITE]), &cmd_invite);
+            add_command(&leaf, NULL, LOC(slang->lang, alliance_kwd[ALLIANCE_JOIN]), &cmd_join);
             slang->root = leaf;
             slang = slang->next;
         }
     }
     execute(stree, K_ALLIANCE);
+    stree_free(stree);
     /* some may have been kicked, must remove f->alliance==NULL */
-}
-
-void alliancejoin(void)
-{
-    static syntaxtree *stree = NULL;
-    if (stree == NULL) {
-        syntaxtree *slang = stree = stree_create();
-        while (slang) {
-            void *leaf = 0;
-            add_command(&leaf, NULL, LOC(slang->lang, "join"), &cmd_join);
-            add_command(&slang->root, leaf, LOC(slang->lang, "alliance"), NULL);
-            slang = slang->next;
-        }
-    }
-    execute(stree, K_ALLIANCE);
 }
 
 void setalliance(faction * f, alliance * al)
@@ -440,82 +435,6 @@ void alliancevictory(void)
         }
         al = al->next;
     }
-}
-
-int victorycondition(const alliance * al, const char *name)
-{
-    const char *gems[] =
-    { "opal", "diamond", "zaphire", "topaz", "beryl", "agate", "garnet",
-    "emerald", NULL };
-    if (strcmp(name, "gems") == 0) {
-        const char **igem;
-
-        for (igem = gems; *igem; ++igem) {
-            const struct resource_type *rtype = rt_find(*igem);
-            quicklist *flist = al->members;
-            int qi;
-            bool found = false;
-
-            assert(rtype);
-            for (qi = 0; flist && !found; ql_advance(&flist, &qi, 1)) {
-                faction *f = (faction *)ql_get(flist, 0);
-                unit *u;
-
-                for (u = f->units; u; u = u->nextF) {
-                    if (i_get(u->items, rtype->itype) > 0) {
-                        found = true;
-                        break;
-                    }
-                }
-            }
-            if (!found)
-                return 0;
-        }
-        return 1;
-
-    }
-    else if (strcmp(name, "phoenix") == 0) {
-        quicklist *flist = al->members;
-        int qi;
-
-        for (qi = 0; flist; ql_advance(&flist, &qi, 1)) {
-            faction *f = (faction *)ql_get(flist, qi);
-            if (key_get(f->attribs, atoi36("phnx"))) {
-                return 1;
-            }
-        }
-        return 0;
-
-    }
-    else if (strcmp(name, "pyramid") == 0) {
-
-        /* Logik:
-         * - if (pyr > last_passed_size && pyr > all_others) {
-         *     pyr->passed->counter++;
-         *     for(all_other_pyrs) {
-         *       pyr->passed->counter=0;
-         *     }
-         *
-         *     if(pyr->passed->counter >= 3) {
-         *       set(pyr, passed);
-         *       pyr->owner->set_attrib(pyra);
-         *     }
-         *     last_passed_size = pyr->size;
-         *   }
-         */
-
-        quicklist *flist = al->members;
-        int qi;
-
-        for (qi = 0; flist; ql_advance(&flist, &qi, 1)) {
-            faction *f = (faction *)ql_get(flist, qi);
-            if (key_get(f->attribs, atoi36("pyra"))) {
-                return 1;
-            }
-        }
-        return 0;
-    }
-    return -1;
 }
 
 void alliance_setname(alliance * self, const char *name)

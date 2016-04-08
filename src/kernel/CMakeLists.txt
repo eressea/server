@@ -2,26 +2,26 @@ project(kernel C)
 
 SET(_TEST_FILES
 alliance.test.c
-build.test.c
-config.test.c
-group.test.c
-faction.test.c
-unit.test.c
-save.test.c
-ship.test.c
-spell.test.c
 ally.test.c
+build.test.c
 building.test.c
-equipment.test.c
+command.test.c
+config.test.c
 curse.test.c
+equipment.test.c
+faction.test.c
+group.test.c
 item.test.c
+messages.test.c
 order.test.c
 pool.test.c
 race.test.c
+save.test.c
+ship.test.c
 spellbook.test.c
-curse.test.c
+spell.test.c
+unit.test.c
 jsonconf.test.c
-messages.test.c
 )
 
 SET(_FILES
