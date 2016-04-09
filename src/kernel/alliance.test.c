@@ -175,6 +175,25 @@ static void test_alliance_cmd_leave(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_alliance_cmd_transfer(CuTest *tc) {
+    unit *u1, *u2;
+    struct region *r;
+    struct alliance *al;
+
+    test_cleanup();
+    al = makealliance(42, "Hodor");
+    r = test_create_region(0, 0, 0);
+    u1 = test_create_unit(test_create_faction(0), r);
+    u2 = test_create_unit(test_create_faction(0), r);
+    setalliance(u1->faction, al);
+    setalliance(u2->faction, al);
+    CuAssertPtrEquals(tc, u1->faction, alliance_get_leader(al));
+    unit_addorder(u1, create_order(K_ALLIANCE, u1->faction->locale, "%s %s", alliance_kwd[ALLIANCE_TRANSFER], itoa36(u2->faction->no)));
+    alliance_cmd();
+    CuAssertPtrEquals(tc, u2->faction, alliance_get_leader(al));
+    test_cleanup();
+}
+
 
 CuSuite *get_alliance_suite(void)
 {
@@ -186,6 +205,7 @@ CuSuite *get_alliance_suite(void)
     SUITE_ADD_TEST(suite, test_alliance_cmd_no_invite);
     SUITE_ADD_TEST(suite, test_alliance_cmd_kick);
     SUITE_ADD_TEST(suite, test_alliance_cmd_leave);
+    SUITE_ADD_TEST(suite, test_alliance_cmd_transfer);
     return suite;
 }
 
