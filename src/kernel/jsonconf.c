@@ -511,7 +511,7 @@ static void json_prefixes(cJSON *json) {
 }
 
 /** disable a feature.
- * features are identified by eone of:
+ * features are identified by one of:
  * 1. the keyword for their orders,
  * 2. the name of the skill they use,
  * 3. a "module.enabled" flag in the settings
@@ -525,13 +525,11 @@ static void disable_feature(const char *str) {
         enable_skill(sk, false);
         return;
     }
-    for (k = 0; k != MAXKEYWORDS; ++k) {
-        // FIXME: this loop is slow as balls.
-        if (strcmp(keywords[k], str) == 0) {
-            log_debug("disable keyword %s\n", str);
-            enable_keyword(k, false);
-            return;
-        }
+    k = findkeyword(str);
+    if (k!=NOKEYWORD) {
+        log_debug("disable keyword %s\n", str);
+        enable_keyword(k, false);
+        return;
     }
     _snprintf(name, sizeof(name), "%s.enabled", str);
     log_info("disable feature %s\n", name);

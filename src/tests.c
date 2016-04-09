@@ -101,6 +101,7 @@ struct locale * test_create_locale(void) {
             test_translate_param(loc, i, parameters[i]);
         }
         init_parameters(loc);
+        init_keywords(loc);
         init_skills(loc);
     }
     return loc;

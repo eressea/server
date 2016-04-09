@@ -172,6 +172,22 @@ static void test_forbiddenid(CuTest *tc) {
     CuAssertIntEquals(tc, 1, forbiddenid(atoi36("t")));
 }
 
+static void test_default_order(CuTest *tc) {
+    order *ord;
+    struct locale * loc;
+
+    test_cleanup();
+    loc = test_create_locale();
+    ord = default_order(loc);
+    CuAssertPtrEquals(tc, 0, ord);
+    locale_setstring(loc, "defaultorder", "work");
+    ord = default_order(loc);
+    CuAssertPtrNotNull(tc, ord);
+    CuAssertIntEquals(tc, K_WORK, getkeyword(ord));
+    CuAssertPtrEquals(tc, ord->data, default_order(loc)->data);
+    test_cleanup();
+}
+
 CuSuite *get_config_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -181,5 +197,6 @@ CuSuite *get_config_suite(void)
     SUITE_ADD_TEST(suite, test_forbiddenid);
     SUITE_ADD_TEST(suite, test_getunit);
     SUITE_ADD_TEST(suite, test_read_unitid);
+    SUITE_ADD_TEST(suite, test_default_order);
     return suite;
 }

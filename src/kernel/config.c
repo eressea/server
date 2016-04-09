@@ -1013,7 +1013,6 @@ void set_default_order(int kwd) {
 // see also test_long_order_hungry
 order *default_order(const struct locale *lang)
 {
-    static int usedefault = 1;
     int i = locale_index(lang);
     order *result = 0;
     assert(i < MAXLOCALES);
@@ -1023,13 +1022,10 @@ order *default_order(const struct locale *lang)
     }
 
     result = defaults[i];
-    if (!result && usedefault) {
+    if (!result) {
         const char * str = LOC(lang, "defaultorder");
         if (str) {
             result = defaults[i] = parse_order(str, lang);
-        }
-        else {
-            usedefault = 0;
         }
     }
     return result ? copy_order(result) : 0;
