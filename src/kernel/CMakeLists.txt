@@ -14,6 +14,7 @@ group.test.c
 item.test.c
 messages.test.c
 order.test.c
+plane.test.c
 pool.test.c
 race.test.c
 save.test.c
