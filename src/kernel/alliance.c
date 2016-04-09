@@ -277,9 +277,25 @@ static void perform_join(void)
     }
 }
 
-static void execute(const struct syntaxtree *syntax, keyword_t kwd)
+
+static syntaxtree * build_syntax(void) {
+    syntaxtree *slang, *stree = stree_create();
+    for (slang = stree; slang; slang = slang->next) {
+        void *leaf = 0;
+        add_command(&leaf, NULL, LOC(slang->lang, alliance_kwd[ALLIANCE_KICK]), &cmd_kick);
+        add_command(&leaf, NULL, LOC(slang->lang, alliance_kwd[ALLIANCE_LEAVE]), &cmd_leave);
+        add_command(&leaf, NULL, LOC(slang->lang, alliance_kwd[ALLIANCE_TRANSFER]), &cmd_transfer);
+        add_command(&leaf, NULL, LOC(slang->lang, alliance_kwd[ALLIANCE_NEW]), &cmd_new);
+        add_command(&leaf, NULL, LOC(slang->lang, alliance_kwd[ALLIANCE_INVITE]), &cmd_invite);
+        add_command(&leaf, NULL, LOC(slang->lang, alliance_kwd[ALLIANCE_JOIN]), &cmd_join);
+        slang->root = leaf;
+    }
+    return stree;
+}
+
+static void execute(keyword_t kwd)
 {
-    int run = 0;
+    struct syntaxtree *syntax = 0;
 
     region **rp = &regions;
     while (*rp) {
@@ -289,12 +305,13 @@ static void execute(const struct syntaxtree *syntax, keyword_t kwd)
             unit *u = *up;
             if (u->number) {
                 const struct locale *lang = u->faction->locale;
-                void *root = stree_find(syntax, lang);
                 order *ord;
                 for (ord = u->orders; ord; ord = ord->next) {
                     if (getkeyword(ord) == kwd) {
+                        void *root;
+                        if (!syntax) syntax = build_syntax();
+                        root = stree_find(syntax, lang);
                         do_command(root, u, ord);
-                        run = 1;
                     }
                 }
             }
@@ -304,8 +321,8 @@ static void execute(const struct syntaxtree *syntax, keyword_t kwd)
         if (*rp == r)
             rp = &r->next;
     }
-
-    if (run) {
+    if (syntax) {
+        stree_free(syntax);
         perform_kick();
         perform_leave();
         perform_transfer();
@@ -325,23 +342,7 @@ const char* alliance_kwd[ALLIANCE_MAX] = {
 
 void alliance_cmd(void)
 {
-    static syntaxtree *stree = NULL;
-    if (stree == NULL) {
-        syntaxtree *slang = stree = stree_create();
-        while (slang) {
-            void *leaf = 0;
-            add_command(&leaf, NULL, LOC(slang->lang, alliance_kwd[ALLIANCE_KICK]), &cmd_kick);
-            add_command(&leaf, NULL, LOC(slang->lang, alliance_kwd[ALLIANCE_LEAVE]), &cmd_leave);
-            add_command(&leaf, NULL, LOC(slang->lang, alliance_kwd[ALLIANCE_TRANSFER]), &cmd_transfer);
-            add_command(&leaf, NULL, LOC(slang->lang, alliance_kwd[ALLIANCE_NEW]), &cmd_new);
-            add_command(&leaf, NULL, LOC(slang->lang, alliance_kwd[ALLIANCE_INVITE]), &cmd_invite);
-            add_command(&leaf, NULL, LOC(slang->lang, alliance_kwd[ALLIANCE_JOIN]), &cmd_join);
-            slang->root = leaf;
-            slang = slang->next;
-        }
-    }
-    execute(stree, K_ALLIANCE);
-    stree_free(stree);
+    execute(K_ALLIANCE);
     /* some may have been kicked, must remove f->alliance==NULL */
 }
 
