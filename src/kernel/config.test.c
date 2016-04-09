@@ -180,7 +180,8 @@ static void test_default_order(CuTest *tc) {
     loc = test_create_locale();
     ord = default_order(loc);
     CuAssertPtrEquals(tc, 0, ord);
-    locale_setstring(loc, "defaultorder", "work");
+
+    config_set("orders.default", "work");
     ord = default_order(loc);
     CuAssertPtrNotNull(tc, ord);
     CuAssertIntEquals(tc, K_WORK, getkeyword(ord));

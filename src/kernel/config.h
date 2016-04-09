@@ -195,7 +195,6 @@ struct param;
     bool IsImmune(const struct faction *f);
 
     struct order *default_order(const struct locale *lang);
-    void set_default_order(int kwd);
 
     int entertainmoney(const struct region *r);
     void init_parameters(struct locale *lang);
