@@ -113,7 +113,28 @@ static void test_alliance_cmd(CuTest *tc) {
     test_cleanup();
 }
 
-static void test_alliance_no_invite(CuTest *tc) {
+static void test_alliance_cmd_kick(CuTest *tc) {
+    unit *u1, *u2;
+    struct region *r;
+    struct alliance *al;
+
+    test_cleanup();
+    al = makealliance(42, "Hodor");
+    r = test_create_region(0, 0, 0);
+    u1 = test_create_unit(test_create_faction(0), r);
+    u2 = test_create_unit(test_create_faction(0), r);
+    setalliance(u1->faction, al);
+    setalliance(u2->faction, al);
+
+    unit_addorder(u1, create_order(K_ALLIANCE, u1->faction->locale, "%s %s", alliance_kwd[ALLIANCE_KICK], itoa36(u2->faction->no)));
+    CuAssertTrue(tc, is_allied(u1->faction, u2->faction));
+    alliance_cmd();
+    CuAssertTrue(tc, !is_allied(u1->faction, u2->faction));
+    CuAssertPtrEquals(tc, 0, f_get_alliance(u2->faction));
+    test_cleanup();
+}
+
+static void test_alliance_cmd_no_invite(CuTest *tc) {
     unit *u1, *u2;
     struct region *r;
 
@@ -133,6 +154,28 @@ static void test_alliance_no_invite(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_alliance_cmd_leave(CuTest *tc) {
+    unit *u1, *u2;
+    struct region *r;
+    struct alliance *al;
+
+    test_cleanup();
+    al = makealliance(42, "Hodor");
+    r = test_create_region(0, 0, 0);
+    u1 = test_create_unit(test_create_faction(0), r);
+    u2 = test_create_unit(test_create_faction(0), r);
+    setalliance(u1->faction, al);
+    setalliance(u2->faction, al);
+
+    unit_addorder(u1, create_order(K_ALLIANCE, u1->faction->locale, "%s", alliance_kwd[ALLIANCE_LEAVE]));
+    CuAssertTrue(tc, is_allied(u1->faction, u2->faction));
+    alliance_cmd();
+    CuAssertTrue(tc, !is_allied(u1->faction, u2->faction));
+    CuAssertPtrEquals(tc, 0, f_get_alliance(u1->faction));
+    test_cleanup();
+}
+
+
 CuSuite *get_alliance_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -140,7 +183,9 @@ CuSuite *get_alliance_suite(void)
     SUITE_ADD_TEST(suite, test_alliance_make);
     SUITE_ADD_TEST(suite, test_alliance_join);
     SUITE_ADD_TEST(suite, test_alliance_cmd);
-    SUITE_ADD_TEST(suite, test_alliance_no_invite);
+    SUITE_ADD_TEST(suite, test_alliance_cmd_no_invite);
+    SUITE_ADD_TEST(suite, test_alliance_cmd_kick);
+    SUITE_ADD_TEST(suite, test_alliance_cmd_leave);
     return suite;
 }
 
