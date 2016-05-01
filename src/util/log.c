@@ -192,13 +192,16 @@ static void log_write(int flags, const char *module, const char *format, va_list
         int level = flags & LOG_LEVELS;
         if (lg->flags & level) {
             int dupe = 0;
+            va_list copy;
 
+            va_copy(copy, args);
             if (lg->flags & LOG_BRIEF) {
                 dupe = check_dupe(format, level);
             }
             if (dupe == 0) {
-                lg->log(lg->data, level, NULL, format, args);
+                lg->log(lg->data, level, NULL, format, copy);
             }
+            va_end(copy);
         }
     }
 }
