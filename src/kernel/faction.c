@@ -74,9 +74,6 @@ faction *factions;
 static void free_faction(faction * f)
 {
     funhash(f);
-    if (f->alliance && f->alliance->_leader == f) {
-        setalliance(f, 0);
-    }
     if (f->msgs) {
         free_messagelist(f->msgs->begin);
         free(f->msgs);
@@ -454,7 +451,7 @@ void destroyfaction(faction ** fp)
     }
 #endif
 
-    if (f->alliance && f->alliance->_leader == f) {
+    if (f->alliance) {
         setalliance(f, 0);
     }
 

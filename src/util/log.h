@@ -23,6 +23,7 @@ extern "C" {
 
     struct log_t * log_open(const char *filename, int flags);
     struct log_t * log_create(int flags, void *data, log_fun call);
+    void log_destroy(struct log_t *handle);
     struct log_t * log_to_file(int flags, FILE *out);
     int log_level(struct log_t *log, int flags);
     void log_close(void);
