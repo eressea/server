@@ -71,10 +71,9 @@ void a_upgradekeys(attrib **alist, attrib *abegin) {
     int n = 0, *keys = 0;
     int i = 0, val[4];
     attrib *a, *ak = a_find(*alist, &at_keys);
-    if (!ak) {
-        ak = a_add(alist, a_new(&at_keys));
+    if (ak) {
         keys = (int *)ak->data.v;
-        n = keys ? keys[0] : 0;
+        if (keys) n = keys[0];
     }
     for (a = abegin; a && a->type == abegin->type; a = a->next) {
         val[i++] = a->data.i;
@@ -88,9 +87,12 @@ void a_upgradekeys(attrib **alist, attrib *abegin) {
     if (i > 0) {
         keys = realloc(keys, sizeof(int) * (n + i + 1));
         memcpy(keys + n + 1, val, sizeof(int)*i);
+        if (!ak) {
+            ak = a_add(alist, a_new(&at_keys));
+        }
     }
+    ak->data.v = keys;
     keys[0] = n + i;
-    a->data.v = keys;
 }
 
 attrib_type at_key = {
