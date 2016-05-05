@@ -69,12 +69,12 @@ end
 
 function autoseed.init()
     -- local newbs = {}
-    local num_seeded = 2
+    local num_seeded = per_region
     local start = nil
 
     eressea.log.info('autoseed new players')
     players = read_players()
-    if players and #players > 0 then
+    if players and #players >= per_region then
         local sel
         eressea.log.info(#players .. ' new players')
         sel = select_regions(regions(), peasants, trees)
