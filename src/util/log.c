@@ -176,6 +176,7 @@ static void log_stdio(void *data, int level, const char *module, const char *for
     if (format[len - 1] != '\n') {
         fputc('\n', out);
     }
+    fflush(out);
 }
 
 log_t *log_to_file(int flags, FILE *out) {
