@@ -39,7 +39,7 @@ local function read_players()
         local str = input:read("*line")
         if str==nil then break end
         local email, race, lang = str:match("([^ ]*) ([^ ]*) ([^ ]*)")
-        if string.char(string.byte(email, 1))~='#' then
+        if email and string.char(string.byte(email, 1))~='#' then
             table.insert(players, { race = race, lang = lang, email = email })
         end
     end
