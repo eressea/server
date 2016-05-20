@@ -1185,15 +1185,14 @@ static char * getpasswd(int fno) {
 static void read_password(gamedata *data, faction *f) {
     char name[128];
     READ_STR(data->store, name, sizeof(name));
-    if (data->version == BADCRYPT_VERSION) {
+    if (name[0]=='$' && data->version == BADCRYPT_VERSION) {
         char * pass = getpasswd(f->no);
         if (pass) {
             faction_setpassword(f, password_encode(pass, PASSWORD_DEFAULT));
             free(pass); // TODO: remove this allocation!
         }
         else {
-            free(f->_password);
-            f->_password = NULL;
+            log_error("data version is BADCRYPT but %s not in password.txt", itoa36(f->no));
         }
     }
     else {
