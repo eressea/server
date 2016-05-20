@@ -1,3 +1,4 @@
+#include <platform.h>
 #include <CuTest.h>
 
 #include "log.h"
