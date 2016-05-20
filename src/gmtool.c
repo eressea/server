@@ -1239,7 +1239,10 @@ void run_mapper(void)
     int split = 20;
     state *st;
     point tl;
-
+/* FIXME: dsiable logging
+    int old_flags = log_flags;
+    log_flags &= ~(LOG_CPERROR | LOG_CPWARNING);
+*/
     init_curses();
     curs_set(1);
 
@@ -1331,6 +1334,9 @@ void run_mapper(void)
     set_readline(NULL);
     curs_set(1);
     endwin();
+/* FIXME: reset logging
+    log_flags = old_flags;
+*/
     state_close(st);
 }
 
