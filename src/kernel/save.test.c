@@ -285,20 +285,25 @@ static void test_read_password_external(CuTest *tc) {
     CuAssertPtrNotNull(tc, f->_password);
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
-    WRITE_TOK(data.store, (const char *)f->_password);
-    WRITE_TOK(data.store, (const char *)f->_password);
+    WRITE_TOK(data.store, "newpassword");
+    WRITE_TOK(data.store, "secret");
+    WRITE_TOK(data.store, "$brokenhash");
     data.strm.api->rewind(data.strm.handle);
+    data.version = NOCRYPT_VERSION;
+    _test_read_password(&data, f);
+    CuAssertStrEquals(tc, "newpassword", f->_password);
     data.version = BADCRYPT_VERSION;
     _test_read_password(&data, f);
-    CuAssertPtrEquals(tc, 0, f->_password);
+    CuAssertStrEquals(tc, "secret", f->_password);
     F = fopen(pwfile, "wt");
-    fprintf(F, "%s:secret\n", itoa36(f->no));
+    fprintf(F, "%s:pwfile\n", itoa36(f->no));
     fclose(F);
+    CuAssertTrue(tc, checkpasswd(f, "secret"));
     _test_read_password(&data, f);
-    CuAssertPtrNotNull(tc, f->_password);
+    CuAssertStrEquals(tc, "pwfile", f->_password);
+    CuAssertTrue(tc, checkpasswd(f, "pwfile"));
     mstream_done(&data.strm);
     gamedata_done(&data);
-    CuAssertTrue(tc, checkpasswd(f, "secret"));
     CuAssertIntEquals(tc, 0, remove(pwfile));
 }
 
