@@ -350,17 +350,7 @@ int a_read(gamedata *data, attrib ** attribs, void *owner) {
         }
         READ_INT(store, &key);
     }
-    if (retval == AT_READ_DEPR) {
-        /* handle deprecated attributes */
-        attrib *a = *attribs;
-        while (a) {
-            if (a->type->upgrade) {
-                a->type->upgrade(attribs, a);
-            }
-            a = a->nexttype;
-        }
-    }
-    return AT_READ_OK;
+    return retval;
 }
 
 int a_read_orig(gamedata *data, attrib ** attribs, void *owner)

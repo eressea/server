@@ -29,6 +29,7 @@
 #include <kernel/order.h>
 #include <kernel/plane.h>
 #include <kernel/region.h>
+#include <kernel/save.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
@@ -48,7 +49,7 @@
 static int read_permissions(attrib * a, void *owner, struct gamedata *data)
 {
     assert(!a);
-    a_read(data, &a, owner);
+    read_attribs(data, &a, owner);
     a_remove(&a, a);
     return AT_READ_OK;
 }
