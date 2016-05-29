@@ -230,7 +230,7 @@ static faction *factionorders(void)
         const char *pass = gettoken(token, sizeof(token));
 
         if (!checkpasswd(f, (const char *)pass)) {
-            log_debug("Invalid password for faction %s\n", itoa36(fid));
+            log_debug("Invalid password for faction %s", itoa36(fid));
             ADDMSG(&f->msgs, msg_message("wrongpasswd", "faction password",
                 f->no, pass));
             return 0;
@@ -244,7 +244,7 @@ static faction *factionorders(void)
 
     }
     else {
-        log_debug("orders for invalid faction %s\n", itoa36(fid));
+        log_debug("orders for invalid faction %s", itoa36(fid));
     }
     return f;
 }
@@ -403,14 +403,14 @@ void read_items(struct storage *store, item ** ilist)
         itype = it_find(ibuf);
         READ_INT(store, &i);
         if (i <= 0) {
-            log_error("data contains an entry with %d %s\n", i, resourcename(itype->rtype, NMF_PLURAL));
+            log_error("data contains an entry with %d %s", i, resourcename(itype->rtype, NMF_PLURAL));
         }
         else {
             if (itype && itype->rtype) {
                 i_change(ilist, itype, i);
             }
             else {
-                log_error("data contains unknown item type %s.\n", ibuf);
+                log_error("data contains unknown item type %s.", ibuf);
             }
             assert(itype && itype->rtype);
         }
@@ -488,7 +488,7 @@ static int resolve_owner(variant id, void *address)
     if (id.i != 0) {
         f = findfaction(id.i);
         if (f == NULL) {
-            log_error("region has an invalid owner (%s)\n", itoa36(id.i));
+            log_error("region has an invalid owner (%s)", itoa36(id.i));
         }
     }
     owner->owner = f;
@@ -594,13 +594,13 @@ unit *read_unit(struct gamedata *data)
 
     READ_INT(data->store, &n);
     if (n <= 0) {
-        log_error("data contains invalid unit %d.\n", n);
+        log_error("data contains invalid unit %d.", n);
         assert(n > 0);
         return 0;
     }
     u = findunit(n);
     if (u) {
-        log_error("reading unit %s that already exists.\n", unitname(u));
+        log_error("reading unit %s that already exists.", unitname(u));
         while (u->attribs) {
             a_remove(&u->attribs, u->attribs);
         }
@@ -627,7 +627,7 @@ unit *read_unit(struct gamedata *data)
         ++u->faction->no_units;
     }
     else {
-        log_error("unit %s has faction == NULL\n", itoa36(u->no));
+        log_error("unit %s has faction == NULL", itoa36(u->no));
         return 0;
     }
 
@@ -676,7 +676,7 @@ unit *read_unit(struct gamedata *data)
             }
         }
         else {
-            log_error("read_unit: unit in unkown building '%s'\n", itoa36(n));
+            log_error("read_unit: unit in unkown building '%s'", itoa36(n));
         }
     }
 
@@ -690,7 +690,7 @@ unit *read_unit(struct gamedata *data)
             }
         }
         else {
-            log_error("read_unit: unit in unkown ship '%s'\n", itoa36(n));
+            log_error("read_unit: unit in unkown ship '%s'", itoa36(n));
         }
     }
 
@@ -701,7 +701,7 @@ unit *read_unit(struct gamedata *data)
     if ((u->flags & UFL_ANON_FACTION) && !rule_stealth_anon()) {
         /* if this rule is broken, then fix broken units */
         u->flags -= UFL_ANON_FACTION;
-        log_warning("%s was anonymous.\n", unitname(u));
+        log_warning("%s was anonymous.", unitname(u));
     }
     /* Persistente Befehle einlesen */
     free_orders(&u->orders);
@@ -719,11 +719,11 @@ unit *read_unit(struct gamedata *data)
                         ord = NULL;
                     }
                     else if (p == MAXPERSISTENT) {
-                        log_info("%s had %d or more persistent orders\n", unitname(u), MAXPERSISTENT);
+                        log_info("%s had %d or more persistent orders", unitname(u), MAXPERSISTENT);
                     }
                 }
                 else if (n == MAXORDERS) {
-                    log_info("%s had %d or more orders\n", unitname(u), MAXORDERS);
+                    log_info("%s had %d or more orders", unitname(u), MAXORDERS);
                 }
                 if (ord != NULL)
                     free_order(ord);
@@ -751,7 +751,7 @@ unit *read_unit(struct gamedata *data)
     read_items(data->store, &u->items);
     READ_INT(data->store, &u->hp);
     if (u->hp < u->number) {
-        log_error("Einheit %s hat %u Personen, und %u Trefferpunkte\n", itoa36(u->no), u->number, u->hp);
+        log_error("Einheit %s hat %u Personen, und %u Trefferpunkte", itoa36(u->no), u->number, u->hp);
         u->hp = u->number;
     }
 
@@ -787,7 +787,7 @@ void write_unit(struct gamedata *data, const unit * u)
             writeorder(data, ord, u->faction->locale);
         }
         else {
-            log_info("%s had %d or more persistent orders\n", unitname(u), MAXPERSISTENT);
+            log_info("%s had %d or more persistent orders", unitname(u), MAXPERSISTENT);
             break;
         }
     }
@@ -800,7 +800,7 @@ void write_unit(struct gamedata *data, const unit * u)
                 writeorder(data, ord, u->faction->locale);
             }
             else {
-                log_info("%s had %d or more persistent orders\n", unitname(u), MAXPERSISTENT);
+                log_info("%s had %d or more persistent orders", unitname(u), MAXPERSISTENT);
                 break;
             }
         }
@@ -825,7 +825,7 @@ void write_unit(struct gamedata *data, const unit * u)
     write_items(data->store, u->items);
     WRITE_SECTION(data->store);
     if (u->hp == 0 && u_race(u)!= get_race(RC_SPELL)) {
-        log_error("unit %s has 0 hitpoints, adjusting.\n", itoa36(u->no));
+        log_error("unit %s has 0 hitpoints, adjusting.", itoa36(u->no));
         ((unit *)u)->hp = u->number;
     }
     WRITE_INT(data->store, u->hp);
@@ -876,7 +876,7 @@ static region *readregion(struct gamedata *data, int x, int y)
     READ_STR(data->store, name, sizeof(name));
     terrain = get_terrain(name);
     if (terrain == NULL) {
-        log_error("Unknown terrain '%s'\n", name);
+        log_error("Unknown terrain '%s'", name);
         assert(!"unknown terrain");
     }
     r->terrain = terrain;
@@ -895,19 +895,19 @@ static region *readregion(struct gamedata *data, int x, int y)
 
         READ_INT(data->store, &i);
         if (i < 0) {
-            log_error("number of trees in %s is %d.\n", regionname(r, NULL), i);
+            log_error("number of trees in %s is %d.", regionname(r, NULL), i);
             i = 0;
         }
         rsettrees(r, 0, i);
         READ_INT(data->store, &i);
         if (i < 0) {
-            log_error("number of young trees in %s is %d.\n", regionname(r, NULL), i);
+            log_error("number of young trees in %s is %d.", regionname(r, NULL), i);
             i = 0;
         }
         rsettrees(r, 1, i);
         READ_INT(data->store, &i);
         if (i < 0) {
-            log_error("number of seeds in %s is %d.\n", regionname(r, NULL), i);
+            log_error("number of seeds in %s is %d.", regionname(r, NULL), i);
             i = 0;
         }
         rsettrees(r, 2, i);
@@ -923,7 +923,7 @@ static region *readregion(struct gamedata *data, int x, int y)
             res = malloc(sizeof(rawmaterial));
             res->type = rmt_find(name);
             if (res->type == NULL) {
-                log_error("invalid resourcetype %s in data.\n", name);
+                log_error("invalid resourcetype %s in data.", name);
             }
             assert(res->type != NULL);
             READ_INT(data->store, &n);
@@ -1124,7 +1124,7 @@ void read_spellbook(spellbook **bookp, struct storage *store, int(*get_level)(co
         if (bookp) {
             sp = find_spell(spname);
             if (!sp) {
-                log_error("read_spells: could not find spell '%s'\n", spname);
+                log_error("read_spells: could not find spell '%s'", spname);
             }
         }
         if (global.data_version >= SPELLBOOK_VERSION) {
@@ -1185,7 +1185,7 @@ static char * getpasswd(int fno) {
 static void read_password(gamedata *data, faction *f) {
     char name[128];
     READ_STR(data->store, name, sizeof(name));
-    if (name[0]=='$' && data->version == BADCRYPT_VERSION) {
+    if (name[0] == '$' && data->version == BADCRYPT_VERSION) {
         char * pass = getpasswd(f->no);
         if (pass) {
             faction_setpassword(f, password_encode(pass, PASSWORD_DEFAULT));
@@ -1274,7 +1274,7 @@ faction *readfaction(struct gamedata * data)
 
     READ_STR(data->store, name, sizeof(name));
     if (set_email(&f->email, name) != 0) {
-        log_warning("Invalid email address for faction %s: %s\n", itoa36(f->no), name);
+        log_warning("Invalid email address for faction %s: %s", itoa36(f->no), name);
         set_email(&f->email, "");
     }
 
@@ -1291,7 +1291,7 @@ faction *readfaction(struct gamedata * data)
     READ_STR(data->store, name, sizeof(name));
     f->race = rc_find(name);
     if (!f->race) {
-        log_error("unknown race in data: %s\n", name);
+        log_error("unknown race in data: %s", name);
     }
     assert(f->race);
     READ_INT(data->store, &n);
@@ -1456,7 +1456,7 @@ int readgame(const char *filename, bool backup)
     size_t sz;
 
     init_locales();
-    log_debug("- reading game data from %s\n", filename);
+    log_debug("- reading game data from %s", filename);
     sprintf(path, "%s/%s", datapath(), filename);
 
     if (backup) {
@@ -1509,7 +1509,7 @@ int readgame(const char *filename, bool backup)
     a_read(&store, &global.attribs, NULL);
     READ_INT(&store, &turn);
     global.data_turn = turn;
-    log_debug(" - reading turn %d\n", turn);
+    log_debug(" - reading turn %d", turn);
     rng_init(turn);
     READ_INT(&store, &nread);          /* max_unique_id = ignore */
     READ_INT(&store, &nextborder);
@@ -1528,7 +1528,7 @@ int readgame(const char *filename, bool backup)
             pl = calloc(1, sizeof(plane));
         }
         else {
-            log_warning("the plane with id=%d already exists.\n", id);
+            log_warning("the plane with id=%d already exists.", id);
         }
         pl->id = id;
         READ_STR(&store, name, sizeof(name));
@@ -1550,7 +1550,7 @@ int readgame(const char *filename, bool backup)
                 }
                 else {
                     log_error(
-                        ("This datafile contains watchers, but we are unable to read them\n"));
+                        ("This datafile contains watchers, but we are unable to read them."));
                 }
             }
         }
@@ -1711,10 +1711,10 @@ int readgame(const char *filename, bool backup)
     binstore_done(&store);
     fstream_done(&strm);
     /* Unaufgeloeste Zeiger initialisieren */
-    log_debug("fixing unresolved references.\n");
+    log_debug("fixing unresolved references.");
     resolve();
 
-    log_debug("updating area information for lighthouses.\n");
+    log_debug("updating area information for lighthouses.");
     for (r = regions; r; r = r->next) {
         if (r->flags & RF_LIGHTHOUSE) {
             building *b;
@@ -1722,7 +1722,7 @@ int readgame(const char *filename, bool backup)
                 update_lighthouse(b);
         }
     }
-    log_debug("marking factions as alive.\n");
+    log_debug("marking factions as alive.");
     for (f = factions; f; f = f->next) {
         if (f->flags & FFL_NPC) {
             f->_alive = true;
@@ -1731,7 +1731,7 @@ int readgame(const char *filename, bool backup)
                 int no = 666;
                 while (findfaction(no))
                     ++no;
-                log_warning("renum(monsters, %d)\n", no);
+                log_warning("renum(monsters, %d)", no);
                 renumber_faction(f, no);
             }
         }
@@ -1743,7 +1743,7 @@ int readgame(const char *filename, bool backup)
                         faction *f = u->faction;
                         int skl = effskill(u, SK_MAGIC, 0);
                         if (f->magiegebiet == M_GRAY) {
-                            log_error("faction %s had magic=gray, fixing (%s)\n", factionname(f), magic_school[mage->magietyp]);
+                            log_error("faction %s had magic=gray, fixing (%s)", factionname(f), magic_school[mage->magietyp]);
                             f->magiegebiet = mage->magietyp;
                         }
                         if (f->max_spelllevel < skl) {
@@ -1769,7 +1769,7 @@ int readgame(const char *filename, bool backup)
     if (loadplane || maxregions >= 0) {
         remove_empty_factions();
     }
-    log_debug("Done loading turn %d.\n", turn);
+    log_debug("Done loading turn %d.", turn);
 
     return 0;
 }
@@ -1861,7 +1861,7 @@ int writegame(const char *filename)
     WRITE_INT(&store, n);
     WRITE_SECTION(&store);
 
-    log_debug(" - Schreibe %d Parteien...\n", n);
+    log_debug(" - Schreibe %d Parteien...", n);
     for (f = factions; f; f = f->next) {
         if (fval(f, FFL_NPC)) {
             clear_npc_orders(f);

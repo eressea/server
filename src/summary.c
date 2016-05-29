@@ -89,12 +89,15 @@ int update_nmrs(void)
         if (fval(f, FFL_ISNEW)) {
             ++newplayers;
         }
-        else if (!fval(f, FFL_NOIDLEOUT)) {
+        else if (!fval(f, FFL_NOIDLEOUT|FFL_CURSED)) {
             int nmr = turn - f->lastorders + 1;
             if (nmr < 0 || nmr > NMRTimeout()) {
-                log_error("faction %s has %d NMRS\n", factionid(f), nmr);
+                log_error("faction %s has %d NMR", factionid(f), nmr);
                 nmr = _max(0, nmr);
                 nmr = _min(nmr, NMRTimeout());
+            }
+            if (nmr > 0) {
+                log_debug("faction %s has %d NMR", factionid(f), nmr);
             }
             ++nmrs[nmr];
         }
