@@ -547,21 +547,13 @@ static order *monster_seeks_target(region * r, unit * u)
 }
 #endif
 
-static const char *random_growl(void)
+void random_growl(const unit *u, region *target, int rand)
 {
-    switch (rng_int() % 5) {
-    case 0:
-        return "Groammm";
-    case 1:
-        return "Roaaarrrr";
-    case 2:
-        return "Chhhhhhhhhh";
-    case 3:
-        return "Tschrrrkk";
-    case 4:
-        return "Schhhh";
+    const struct locale *lang = u->faction->locale;
+    if (rname(target, lang)) {
+        message *msg = msg_message("dragon_growl", "dragon number target choice", u, u->number, target, rand);
+        ADDMSG(&u->region->msgs, msg);
     }
-    return "";
 }
 
 extern struct attrib_type at_direction;
@@ -707,17 +699,7 @@ static order *plan_dragon(unit * u)
             reduce_weight(u);
         }
         if (rng_int() % 100 < 15) {
-            const struct locale *lang = u->faction->locale;
-            /* do a growl */
-            if (rname(tr, lang)) {
-                addlist(&u->orders,
-                    create_order(K_MAIL, lang, "%s '%s... %s %s %s'",
-                    LOC(lang, parameters[P_REGION]),
-                    random_growl(),
-                    u->number ==
-                    1 ? "Ich rieche" : "Wir riechen",
-                    "etwas in", rname(tr, u->faction->locale)));
-            }
+            random_growl(u, tr, rng_int() % 5);
         }
     }
     else {
