@@ -390,6 +390,29 @@ void test_clear_messages(faction *f) {
     }
 }
 
+void assert_message(CuTest * tc, message *msg, char *name, int numpar, ...)
+{
+    va_list vargs;
+    const message_type *mtype = msg->type;
+    assert(mtype);
+    int i;
+
+    va_start(vargs, numpar);
+
+    CuAssertStrEquals(tc, name, mtype->name);
+    CuAssertIntEquals(tc, numpar, mtype->nparameters);
+    for (i = 0; i != mtype->nparameters; ++i) {
+        variant value = va_arg(vargs, variant);
+        if (mtype->types[i]->vtype == VAR_VOIDPTR) {
+            CuAssertPtrEquals(tc, value.v, msg->parameters[i].v);
+        } else if (mtype->types[i]->vtype == VAR_INT) {
+            CuAssertIntEquals(tc, value.i, msg->parameters[i].i);
+        } else {
+            assert(!"unknown variant type");
+        }
+    }
+}
+
 void disabled_test(void *suite, void (*test)(CuTest *), const char *name) {
     (void)test;
     fprintf(stderr, "%s: SKIP\n", name);

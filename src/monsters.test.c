@@ -188,74 +188,6 @@ static void test_dragon_attacks_the_rich(CuTest * tc)
     test_cleanup();
 }
 
-typedef struct msg_info {
-    const char *name;
-    int numpar;
-    const char **argv;
-    const char **pnames, **tnames;
-    variant *values;
-} msg_info;
-
-static msg_info *test_create_messagetype(const struct locale *lang, const char *name, int num_args, ...) {
-    va_list vargs;
-    const message_type *mtype;
-    char zBuffer[128];
-    int i;
-    msg_info *info = malloc(sizeof(msg_info));
-    info->argv = calloc(num_args + 1, sizeof(char *));
-    info->pnames = calloc(num_args, sizeof(char *));
-    info->tnames = calloc(num_args, sizeof(char *));
-    info->values = calloc(num_args, sizeof(variant_type));
-
-    va_start(vargs, num_args);
-
-    info->numpar = num_args;
-    info->name = name;
-
-    for(i = 0; i<num_args; ++i) {
-        info->pnames[i] = va_arg(vargs, char *);
-        info->tnames[i] = va_arg(vargs, char *);
-        sprintf(zBuffer, "%s:%s", info->pnames[i], info->tnames[i]);
-        info->argv[i] = _strdup(zBuffer);
-    }
-
-    mtype = mt_register(mt_new(name, info->argv));
-    nrt_register(mtype, lang, "mocktext", 0, "mocksection");
-
-    for(i = 0; i<num_args; ++i) {
-        if (mtype->types[i]->vtype == VAR_VOIDPTR) {
-            info->values[i].v = va_arg(vargs, char *);
-        } else if (mtype->types[i]->vtype == VAR_INT) {
-            info->values[i].i = va_arg(vargs, int);
-        } else {
-            assert(!"unknown variant type");
-        }
-    }
-    va_end(vargs);
-    return info;
-}
-
-static void assert_message(CuTest * tc, message *msg, msg_info *info)
-{
-    const message_type *mtype = msg->type;
-    assert(mtype);
-    int i;
-
-    CuAssertStrEquals(tc, info->name, mtype->name);
-    CuAssertIntEquals(tc, info->numpar, mtype->nparameters);
-    for (i = 0; i != mtype->nparameters; ++i) {
-        CuAssertStrEquals(tc, info->pnames[i], mtype->pnames[i]);
-        CuAssertStrEquals(tc, info->tnames[i], mtype->types[i]->name);
-        if (mtype->types[i]->vtype == VAR_VOIDPTR) {
-            CuAssertPtrEquals(tc, info->values[i].v, msg->parameters[i].v);
-        } else if (mtype->types[i]->vtype == VAR_INT) {
-            CuAssertIntEquals(tc, info->values[i].i, msg->parameters[i].i);
-        } else {
-            assert(!"unknown variant type");
-        }
-    }
-}
-
 extern void random_growl(const unit *u, region *tr, int rand);
 
 static void test_dragon_moves(CuTest * tc)
@@ -264,7 +196,6 @@ static void test_dragon_moves(CuTest * tc)
     region *r;
     unit *u, *m;
     struct message *msg;
-    struct msg_info *msginfo;
 
     create_monsters(&f, &f2, &u, &m);
     rsetmoney(findregion(1, 0), 1000);
@@ -278,13 +209,12 @@ static void test_dragon_moves(CuTest * tc)
 
     CuAssertPtrNotNull(tc, find_order("move east", m));
 
-    register_reports();
-    msginfo = test_create_messagetype(f->locale, "dragon_growl", 4, "dragon", "unit", "number", "int", "target", "region", "choice", "int", m, 1, findregion(1,0), 3);
+    mt_register(mt_new_va("dragon_growl", "dragon:unit", "number:int", "target:region", "choice:int", 0));
 
     random_growl(m, findregion(1, 0), 3);
 
     msg = test_get_last_message(r->msgs);
-    assert_message(tc, msg, msginfo);
+    assert_message(tc, msg, "dragon_growl", 4, m, 1, findregion(1,0), 3);
 
     test_cleanup();
 }
