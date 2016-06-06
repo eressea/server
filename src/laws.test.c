@@ -1253,13 +1253,14 @@ static void test_show_without_item(CuTest *tc)
 
 static void test_show_elf(CuTest *tc) {
     order *ord;
+    race * rc;
     unit *u;
     struct locale *loc;
     message * msg;
 
     test_cleanup();
 
-    test_create_race("elf");
+    rc = test_create_race("elf");
     test_create_itemtype("elvenhorse");
 
     loc = get_or_create_locale("de");
@@ -1272,13 +1273,14 @@ static void test_show_elf(CuTest *tc) {
     CuAssertPtrNotNull(tc, finditemtype("elf", loc));
     CuAssertPtrNotNull(tc, findrace("elf", loc));
 
-    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
     u->faction->locale = loc;
     ord = create_order(K_RESHOW, loc, "Elf");
     reshow_cmd(u, ord);
     CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "error36") == NULL);
     msg = test_find_messagetype(u->faction->msgs, "msg_event");
     CuAssertPtrNotNull(tc, msg);
+    test_clear_messages(u->faction);
     free_order(ord);
     test_cleanup();
 }
