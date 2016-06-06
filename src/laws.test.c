@@ -1251,6 +1251,38 @@ static void test_show_without_item(CuTest *tc)
     test_cleanup();
 }
 
+static void test_show_elf(CuTest *tc) {
+    order *ord;
+    unit *u;
+    struct locale *loc;
+    message * msg;
+
+    test_cleanup();
+
+    test_create_race("elf");
+    test_create_itemtype("elvenhorse");
+
+    loc = get_or_create_locale("de");
+    locale_setstring(loc, "elvenhorse", "Elfenpferd");
+    locale_setstring(loc, "elvenhorse_p", "Elfenpferde");
+    locale_setstring(loc, "race::elf_p", "Elfen");
+    locale_setstring(loc, "race::elf", "Elf");
+    init_locale(loc);
+
+    CuAssertPtrNotNull(tc, finditemtype("elf", loc));
+    CuAssertPtrNotNull(tc, findrace("elf", loc));
+
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u->faction->locale = loc;
+    ord = create_order(K_RESHOW, loc, "Elf");
+    reshow_cmd(u, ord);
+    CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "error36") == NULL);
+    msg = test_find_messagetype(u->faction->msgs, "msg_event");
+    CuAssertPtrNotNull(tc, msg);
+    free_order(ord);
+    test_cleanup();
+}
+
 static int low_wage(const region * r, const faction * f, const race * rc, int in_turn) {
     return 1;
 }
@@ -1386,6 +1418,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_name_building);
     SUITE_ADD_TEST(suite, test_name_ship);
     SUITE_ADD_TEST(suite, test_show_without_item);
+    SUITE_ADD_TEST(suite, test_show_elf);
     SUITE_ADD_TEST(suite, test_immigration);
     SUITE_ADD_TEST(suite, test_demon_hunger);
 
