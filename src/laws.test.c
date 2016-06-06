@@ -27,6 +27,7 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
 
 static void test_new_building_can_be_renamed(CuTest * tc)
 {
