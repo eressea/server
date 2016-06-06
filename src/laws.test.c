@@ -1260,6 +1260,7 @@ static void test_show_elf(CuTest *tc) {
 
     test_cleanup();
 
+    mt_register(mt_new_va("msg_event", "string:string", 0));
     rc = test_create_race("elf");
     test_create_itemtype("elvenhorse");
 
@@ -1280,8 +1281,50 @@ static void test_show_elf(CuTest *tc) {
     CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "error36") == NULL);
     msg = test_find_messagetype(u->faction->msgs, "msg_event");
     CuAssertPtrNotNull(tc, msg);
+    CuAssertTrue(tc, memcmp("Elf:", msg->parameters[0].v, 4) == 0);
     test_clear_messages(u->faction);
     free_order(ord);
+    test_cleanup();
+}
+
+static void test_show_race(CuTest *tc) {
+    order *ord;
+    race * rc;
+    unit *u;
+    struct locale *loc;
+    message * msg;
+
+    test_cleanup();
+
+    mt_register(mt_new_va("msg_event", "string:string", 0));
+    test_create_race("human");
+    rc = test_create_race("elf");
+
+    loc = get_or_create_locale("de");
+    locale_setstring(loc, "race::elf_p", "Elfen");
+    locale_setstring(loc, "race::elf", "Elf");
+    locale_setstring(loc, "race::human_p", "Menschen");
+    locale_setstring(loc, "race::human", "Mensch");
+    init_locale(loc);
+    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
+    u->faction->locale = loc;
+
+    ord = create_order(K_RESHOW, loc, "Mensch");
+    reshow_cmd(u, ord);
+    CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "error21") != NULL);
+    CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "msg_event") == NULL);
+    test_clear_messages(u->faction);
+    free_order(ord);
+
+    ord = create_order(K_RESHOW, loc, "Elf");
+    reshow_cmd(u, ord);
+    CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "error21") == NULL);
+    msg = test_find_messagetype(u->faction->msgs, "msg_event");
+    CuAssertPtrNotNull(tc, msg);
+    CuAssertTrue(tc, memcmp("Elf:", msg->parameters[0].v, 4) == 0);
+    test_clear_messages(u->faction);
+    free_order(ord);
+
     test_cleanup();
 }
 
@@ -1421,6 +1464,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_name_ship);
     SUITE_ADD_TEST(suite, test_show_without_item);
     SUITE_ADD_TEST(suite, test_show_elf);
+    SUITE_ADD_TEST(suite, test_show_race);
     SUITE_ADD_TEST(suite, test_immigration);
     SUITE_ADD_TEST(suite, test_demon_hunger);
 
