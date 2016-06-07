@@ -1,6 +1,7 @@
 #include <platform.h>
 #include "parser.h"
 
+#include <string.h>
 #include <CuTest.h>
 
 static void test_parse_token(CuTest *tc) {
@@ -13,7 +14,7 @@ static void test_parse_token(CuTest *tc) {
     CuAssertPtrEquals(tc, (void *)(orig+5), (void *)str);
     CuAssertStrEquals(tc, "SHORT", tok);
     tok = parse_token(&str, lbuf, sizeof(lbuf));
-    CuAssertPtrEquals(tc, (void *)(orig + 11), (void *)str);
+    CuAssertPtrEquals(tc, (void *)(orig + strlen(orig)), (void *)str);
     CuAssertStrEquals(tc, "TOKEN", tok);
     tok = parse_token(&str, lbuf, sizeof(lbuf));
     CuAssertPtrEquals(tc, NULL, (void *)tok);
@@ -26,7 +27,7 @@ static void test_parse_token_limit(CuTest *tc) {
 
     orig = str = "LONG_TOKEN";
     tok = parse_token(&str, lbuf, sizeof(lbuf));
-    CuAssertPtrEquals(tc, (void *)(orig + 10), (void *)str);
+    CuAssertPtrEquals(tc, (void *)(orig + strlen(orig)), (void *)str);
     CuAssertStrEquals(tc, tok, "LONG_TO");
     tok = parse_token(&str, lbuf, sizeof(lbuf));
     CuAssertPtrEquals(tc, NULL, (void *)tok);
