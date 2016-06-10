@@ -836,7 +836,7 @@ static void drifting_ships(region * r)
                     region *rn;
                     dir = (direction_t)((d + d_offset) % MAXDIRECTIONS);
                     rn = rconnect(r, dir);
-                    if (rn != NULL && fval(rn->terrain, SAIL_INTO) && check_ship_allowed(sh, rn) > 0) {
+                    if (rn != NULL && fval(rn->terrain, SAIL_INTO) && check_ship_allowed(sh, rn) >= 0) {
                         rnext = rn;
                         if (!fval(rnext->terrain, SEA_REGION))
                             break;
