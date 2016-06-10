@@ -54,7 +54,7 @@ struct region *test_create_region(int x, int y, const terrain_type *terrain)
     if (!terrain) {
         terrain_type *t = get_or_create_terrain("plain");
         t->size = 1000;
-        fset(t, LAND_REGION|CAVALRY_REGION|FOREST_REGION|FLY_INTO|WALK_INTO|SAIL_INTO);
+        fset(t, LAND_REGION|CAVALRY_REGION|FOREST_REGION|FLY_INTO|WALK_INTO);
         terraform_region(r, t);
     }
     else {
@@ -197,8 +197,8 @@ ship_type * test_create_shiptype(const char * name)
     }
     stype->coasts =
         (terrain_type **)malloc(sizeof(terrain_type *) * 3);
-    stype->coasts[0] = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION | SAIL_INTO | FLY_INTO);
-    stype->coasts[1] = test_create_terrain("ocean", SEA_REGION | SWIM_INTO | SAIL_INTO | FLY_INTO);
+    stype->coasts[0] = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION | FLY_INTO);
+    stype->coasts[1] = test_create_terrain("ocean", SEA_REGION | SWIM_INTO | FLY_INTO);
     stype->coasts[2] = NULL;
     if (default_locale) {
         locale_setstring(default_locale, name, name);
@@ -323,10 +323,10 @@ void test_create_world(void)
     test_create_itemtype("iron");
     test_create_itemtype("stone");
 
-    t_plain = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION | SAIL_INTO | FLY_INTO);
+    t_plain = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION |  FLY_INTO);
     t_plain->size = 1000;
     t_plain->max_road = 100;
-    t_ocean = test_create_terrain("ocean", SEA_REGION | SAIL_INTO | SWIM_INTO | FLY_INTO);
+    t_ocean = test_create_terrain("ocean", SEA_REGION |  SWIM_INTO | FLY_INTO);
     t_ocean->size = 0;
 
     island[0] = test_create_region(0, 0, t_plain);

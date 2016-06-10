@@ -784,7 +784,7 @@ region * drift_target(ship *sh) {
         region *rn;
         direction_t dir = (direction_t)((d + d_offset) % MAXDIRECTIONS);
         rn = rconnect(sh->region, dir);
-        if (rn != NULL && fval(rn->terrain, SAIL_INTO) && check_ship_allowed(sh, rn) >= 0) {
+        if (rn != NULL && check_ship_allowed(sh, rn) >= 0) {
             rnext = rn;
             if (!fval(rnext->terrain, SEA_REGION)) {
                 // prefer drifting towards non-ocean regions
