@@ -498,6 +498,24 @@ static void test_follow_ship_msg(CuTest * tc) {
     test_cleanup();
 }
 
+static void test_drifting_ships(CuTest *tc) {
+    ship *sh;
+    region *r1, *r2, *r3;
+    terrain_type *t_ocean, *t_plain;
+    ship_type *st_boat;
+    test_cleanup();
+    t_ocean = test_create_terrain("ocean", SEA_REGION|SAIL_INTO);
+    t_plain = test_create_terrain("plain", LAND_REGION|SAIL_INTO);
+    r1 = test_create_region(0, 0, t_ocean);
+    r2 = test_create_region(1, 0, t_ocean);
+    st_boat = test_create_shiptype("boat");
+    sh = test_create_ship(r1, st_boat);
+    CuAssertPtrEquals(tc, r2, drift_target(sh));
+    r3 = test_create_region(-1, 0, t_plain);
+    CuAssertPtrEquals(tc, r3, drift_target(sh));
+    test_cleanup();
+}
+
 CuSuite *get_move_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -521,5 +539,6 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_ship_ridiculous_overload_no_captain);
     SUITE_ADD_TEST(suite, test_ship_damage_overload);
     SUITE_ADD_TEST(suite, test_follow_ship_msg);
+    SUITE_ADD_TEST(suite, test_drifting_ships);
     return suite;
 }

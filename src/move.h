@@ -83,6 +83,7 @@ extern "C" {
 #define SA_NO_COAST -2
 
     int check_ship_allowed(struct ship *sh, const struct region * r);
+    struct region * drift_target(struct ship *sh);
 #ifdef __cplusplus
 }
 #endif

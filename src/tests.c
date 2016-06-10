@@ -196,9 +196,10 @@ ship_type * test_create_shiptype(const char * name)
         free(stype->coasts);
     }
     stype->coasts =
-        (terrain_type **)malloc(sizeof(terrain_type *) * 2);
+        (terrain_type **)malloc(sizeof(terrain_type *) * 3);
     stype->coasts[0] = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION | SAIL_INTO | FLY_INTO);
-    stype->coasts[1] = NULL;
+    stype->coasts[1] = test_create_terrain("ocean", SEA_REGION | SWIM_INTO | SAIL_INTO | FLY_INTO);
+    stype->coasts[2] = NULL;
     if (default_locale) {
         locale_setstring(default_locale, name, name);
     }
