@@ -677,12 +677,6 @@ int check_ship_allowed(struct ship *sh, const region * r)
             }
 
             if (is_freezing(u)) {
-                unit *captain = ship_owner(sh);
-                if (captain) {
-                    ADDMSG(&captain->faction->msgs,
-                        msg_message("detectforbidden", "unit region", u, r));
-                }
-
                 return SA_NO_INSECT;
             }
         }
@@ -1952,7 +1946,10 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
             reason = check_ship_allowed(sh, next_point);
             if (reason < 0) {
                 /* for some reason or another, we aren't allowed in there.. */
-                if (check_leuchtturm(current_point, NULL) || reason == SA_NO_INSECT) {
+                if (reason == SA_NO_INSECT) {
+                    ADDMSG(&f->msgs, msg_message("detectforbidden", "unit region", u, sh->region));
+                }
+                else if (check_leuchtturm(current_point, NULL)) {
                     ADDMSG(&f->msgs, msg_message("sailnolandingstorm", "ship region", sh, next_point));
                 }
                 else {
