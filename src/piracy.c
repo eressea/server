@@ -151,7 +151,7 @@ void piracy_cmd(unit * u, order *ord)
             // TODO this could still result in an illegal movement order (through a wall or whatever)
             // which will be prevented by move_cmd below
             if (rc &&
-                ((sh && fval(rc->terrain, SAIL_INTO) && can_takeoff(sh, r, rc))
+                ((sh && !fval(rc->terrain, FORBIDDEN_REGION) && can_takeoff(sh, r, rc))
                     || (canswim(u) && fval(rc->terrain, SWIM_INTO) && fval(rc->terrain, SEA_REGION)))) {
 
                 for (sh2 = rc->ships; sh2; sh2 = sh2->next) {

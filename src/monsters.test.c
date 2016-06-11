@@ -55,7 +55,7 @@ static void create_monsters(faction **player, faction **monsters, unit **u, unit
     fset(*monsters, FFL_NOIDLEOUT);
     assert(fval(*monsters, FFL_NPC) && fval((*monsters)->race, RCF_UNARMEDGUARD) && fval((*monsters)->race, RCF_NPC) && fval(*monsters, FFL_NOIDLEOUT));
 
-    test_create_region(-1, 0, test_create_terrain("ocean", SEA_REGION | SAIL_INTO | SWIM_INTO | FLY_INTO));
+    test_create_region(-1, 0, test_create_terrain("ocean", SEA_REGION | SWIM_INTO | FLY_INTO));
     test_create_region(1, 0, 0);
     r = test_create_region(0, 0, 0);
 

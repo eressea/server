@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <ships>
   <ship name="canoe" nocoast="true" range="3" fishing="20" storm="1.00" damage="1.00" cabins="2" cargo="2000" cptskill="1" minskill="1" sumskill="2" opensea="no">
-    <coast terrain="ocean"/>
     <coast terrain="plain"/>
     <coast terrain="packice"/>
     <coast terrain="swamp"/>
@@ -17,7 +16,6 @@
   </ship>
 
   <ship name="raft" range="1" fishing="20" storm="1.00" damage="1.00" cabins="5" cargo="50000" cptskill="1" minskill="1" sumskill="5" opensea="no">
-    <coast terrain="ocean"/>
     <coast terrain="plain"/>
     <coast terrain="packice"/>
     <coast terrain="swamp"/>
@@ -28,7 +26,6 @@
   </ship>
 
   <ship name="cutter" range="2" fishing="20" storm="1.00" damage="1.00" cabins="5" cargo="5500" cptskill="2" minskill="1" sumskill="5" opensea="yes">
-    <coast terrain="ocean"/>
     <coast terrain="plain"/>
     <coast terrain="packice"/>
     <coast terrain="swamp"/>
@@ -44,7 +41,6 @@
   </ship>
 
   <ship name="barge" range="3" fishing="20" storm="1.00" damage="1.00" cabins="11" cargo="5000" cptskill="2" minskill="1" sumskill="5" opensea="no">
-    <coast terrain="ocean"/>
     <coast terrain="plain"/>
     <coast terrain="packice"/>
     <coast terrain="swamp"/>
@@ -61,7 +57,6 @@
 
 
   <ship name="royalbarge" range="5" storm="0.25" damage="1.00" cabins="11" cargo="5000" cptskill="5" minskill="1" sumskill="10" opensea="no">
-    <coast terrain="ocean"/>
     <coast terrain="plain"/>
     <coast terrain="packice"/>
     <coast terrain="swamp"/>
@@ -78,7 +73,6 @@
   </ship>
 
   <ship name="catamaran" range="7" storm="0.25" damage="1.00" cabins="22" cargo="10000" cptskill="7" minskill="1" sumskill="20" opensea="yes">
-    <coast terrain="ocean"/>
     <coast terrain="plain"/>
     <coast terrain="packice"/>
     <construction skill="shipcraft" minskill="8" maxsize="30" reqsize="1">
@@ -89,7 +83,6 @@
 
 
   <ship name="cog" range="4" storm="0.50" damage="1.00" cabins="50" cargo="200000" cptskill="4" minskill="1" sumskill="20" opensea="yes">
-    <coast terrain="ocean"/>
     <coast terrain="plain"/>
     <coast terrain="packice"/>
     <construction skill="shipcraft" minskill="4" maxsize="100" reqsize="1">
@@ -98,7 +91,6 @@
   </ship>
   
   <ship name="caravel" range="4" storm="0.50" damage="1.00" cabins="150" cargo="600000" cptskill="6" minskill="1" sumskill="30" opensea="yes">
-    <coast terrain="ocean"/>
     <coast terrain="plain"/>
     <coast terrain="packice"/>
     <construction skill="shipcraft" minskill="6" maxsize="300" reqsize="1">
@@ -109,7 +101,6 @@
 
   <ship name="frigate" range="4" storm="1.00" damage="1.00" cabins="110" cargo="100000" cptskill="5" minskill="1" sumskill="40" opensea="yes">
     <modifier type="defense" value="+2"/>
-    <coast terrain="ocean"/>
     <coast terrain="plain"/>
     <coast terrain="packice"/>
     <construction skill="shipcraft" minskill="5" maxsize="100" reqsize="1">
@@ -120,7 +111,6 @@
   
   <ship name="galleon" range="4" storm="1.00" damage="1.00" cabins="310" cargo="300000" cptskill="7" minskill="1" sumskill="60" opensea="yes">
     <modifier type="defense" value="+2"/>
-    <coast terrain="ocean"/>
     <coast terrain="plain"/>
     <coast terrain="packice"/>
     <construction skill="shipcraft" minskill="7" maxsize="300" reqsize="1">
@@ -133,7 +123,6 @@
   <ship name="dragonship" range="6" storm="1.00" damage="1.00" cabins="110" cargo="50000" cptskill="5" minskill="1" sumskill="60" opensea="yes">
     <modifier type="attack" value="+1"/>
     <modifier type="tactics" factor="2.00"/>
-    <coast terrain="ocean"/>
     <coast terrain="plain"/>
     <coast terrain="packice"/>
     <construction skill="shipcraft" minskill="5" maxsize="100" reqsize="1">
@@ -145,7 +134,6 @@
   <ship name="trireme" range="6" storm="1.00" damage="1.00" cabins="310" cargo="150000" cptskill="7" minskill="1" sumskill="90" opensea="yes">
     <modifier type="attack" value="+1"/>
     <modifier type="tactics" factor="2.00"/>
-    <coast terrain="ocean"/>
     <coast terrain="plain"/>
     <coast terrain="packice"/>
     <construction skill="shipcraft" minskill="7" maxsize="300" reqsize="1">

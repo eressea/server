@@ -35,8 +35,8 @@ static void test_ship_not_allowed_in_coast(CuTest * tc)
     ship_type *stype;
 
     test_cleanup();
-    ttype = test_create_terrain("glacier", LAND_REGION | ARCTIC_REGION | WALK_INTO | SAIL_INTO);
-    otype = test_create_terrain("ocean", SEA_REGION | SAIL_INTO);
+    ttype = test_create_terrain("glacier", LAND_REGION | ARCTIC_REGION | WALK_INTO);
+    otype = test_create_terrain("ocean", SEA_REGION);
     stype = test_create_shiptype("derp");
     free(stype->coasts);
     stype->coasts = (struct terrain_type **)calloc(2, sizeof(struct terrain_type *));
@@ -69,7 +69,7 @@ static void setup_harbor(move_fixture *mf) {
 
     test_cleanup();
 
-    ttype = test_create_terrain("glacier", LAND_REGION | ARCTIC_REGION | WALK_INTO | SAIL_INTO);
+    ttype = test_create_terrain("glacier", LAND_REGION | ARCTIC_REGION | WALK_INTO);
     btype = test_create_buildingtype("harbour");
 
     sh = test_create_ship(0, 0);
@@ -232,7 +232,7 @@ static void test_ship_trails(CuTest *tc) {
     region_list *route = 0;
 
     test_cleanup();
-    otype = test_create_terrain("ocean", SEA_REGION | SAIL_INTO);
+    otype = test_create_terrain("ocean", SEA_REGION);
     r1 = test_create_region(0, 0, otype);
     r2 = test_create_region(1, 0, otype);
     r3 = test_create_region(2, 0, otype);
@@ -298,7 +298,7 @@ void setup_drift (struct drift_fixture *fix) {
     fix->st_boat->cabins = 20000;
 
     fix->u = test_create_unit(fix->f = test_create_faction(0), fix->r=findregion(-1,0));
-    assert(fix->r && fix->r->terrain->flags & SAIL_INTO);
+    assert(fix->r);
     set_level(fix->u, SK_SAILING, fix->st_boat->sumskill);
     u_set_ship(fix->u, fix->sh = test_create_ship(fix->u->region, fix->st_boat));
     assert(fix->f && fix->u && fix->sh);
@@ -498,6 +498,24 @@ static void test_follow_ship_msg(CuTest * tc) {
     test_cleanup();
 }
 
+static void test_drifting_ships(CuTest *tc) {
+    ship *sh;
+    region *r1, *r2, *r3;
+    terrain_type *t_ocean, *t_plain;
+    ship_type *st_boat;
+    test_cleanup();
+    t_ocean = test_create_terrain("ocean", SEA_REGION);
+    t_plain = test_create_terrain("plain", LAND_REGION);
+    r1 = test_create_region(0, 0, t_ocean);
+    r2 = test_create_region(1, 0, t_ocean);
+    st_boat = test_create_shiptype("boat");
+    sh = test_create_ship(r1, st_boat);
+    CuAssertPtrEquals(tc, r2, drift_target(sh));
+    r3 = test_create_region(-1, 0, t_plain);
+    CuAssertPtrEquals(tc, r3, drift_target(sh));
+    test_cleanup();
+}
+
 CuSuite *get_move_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -521,5 +539,6 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_ship_ridiculous_overload_no_captain);
     SUITE_ADD_TEST(suite, test_ship_damage_overload);
     SUITE_ADD_TEST(suite, test_follow_ship_msg);
+    SUITE_ADD_TEST(suite, test_drifting_ships);
     return suite;
 }
