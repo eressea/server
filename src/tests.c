@@ -391,6 +391,29 @@ void test_clear_messages(faction *f) {
     }
 }
 
+void assert_message(CuTest * tc, message *msg, char *name, int numpar) {
+    const message_type *mtype = msg->type;
+    assert(mtype);
+
+    CuAssertStrEquals(tc, name, mtype->name);
+    CuAssertIntEquals(tc, numpar, mtype->nparameters);
+}
+
+void assert_pointer_parameter(CuTest * tc, message *msg, int index, void *arg) {
+    const message_type *mtype = (msg)->type;
+    CuAssertIntEquals((tc), VAR_VOIDPTR, mtype->types[(index)]->vtype);CuAssertPtrEquals((tc), (arg), msg->parameters[(index)].v);
+}
+
+void assert_int_parameter(CuTest * tc, message *msg, int index, int arg) {
+    const message_type *mtype = (msg)->type;
+    CuAssertIntEquals((tc), VAR_INT, mtype->types[(index)]->vtype);CuAssertIntEquals((tc), (arg), msg->parameters[(index)].i);
+}
+
+void assert_string_parameter(CuTest * tc, message *msg, int index, const char *arg) {
+    const message_type *mtype = (msg)->type;
+    CuAssertIntEquals((tc), VAR_VOIDPTR, mtype->types[(index)]->vtype);CuAssertStrEquals((tc), (arg), msg->parameters[(index)].v);
+}
+
 void disabled_test(void *suite, void (*test)(CuTest *), const char *name) {
     (void)test;
     fprintf(stderr, "%s: SKIP\n", name);

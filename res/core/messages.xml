@@ -8441,4 +8441,15 @@
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Heroes cannot recruit."</text>
   </message>
 
+  <message name="dragon_growl" section="mail">
+    <type>
+      <arg name="dragon" type="unit"/>
+      <arg name="number" type="int"/>
+      <arg name="target" type="region"/>
+      <arg name="growl" type="string"/>
+    </type>
+    <text locale="de">"$unit($dragon): \"$localize($growl) $if($eq($number,1), "Ich rieche", "Wir riechen") etwas in $region($target)\"."</text>
+    <text locale="en">"$unit($dragon): \"$localize($growl) $if($eq($number,1), "I smell", "We smell") something in $region($target)\"."</text>
+  </message>
+
 </messages>
