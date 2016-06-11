@@ -2213,25 +2213,12 @@ int send_cmd(unit * u, struct order *ord)
     return 0;
 }
 
-static bool display_item(faction * f, unit * u, const item_type * itype)
+static void display_item(unit * u, const item_type * itype)
 {
+    faction * f = u->faction;
     const char *name;
     const char *key;
     const char *info;
-
-    if (u != NULL) {
-        int i = i_get(u->items, itype);
-        if (i == 0) {
-            if (u->region->land != NULL) {
-                i = i_get(u->region->land->items, itype);
-            }
-            if (i == 0) {
-                i = i_get(u->faction->items, itype);
-                if (i == 0)
-                    return false;
-            }
-        }
-    }
 
     name = resourcename(itype->rtype, 0);
     key = mkname("iteminfo", name);
@@ -2242,22 +2229,12 @@ static bool display_item(faction * f, unit * u, const item_type * itype)
     }
     ADDMSG(&f->msgs, msg_message("displayitem", "weight item description",
         itype->weight, itype->rtype, info));
-
-    return true;
 }
 
-static bool display_potion(faction * f, unit * u, const potion_type * ptype)
+static void display_potion(unit * u, const potion_type * ptype)
 {
+    faction * f = u->faction;
     attrib *a;
-
-    if (ptype == NULL)
-        return false;
-    else {
-        int i = i_get(u->items, ptype->itype);
-        if (i == 0 && 2 * ptype->level > effskill(u, SK_ALCHEMY, 0)) {
-            return false;
-        }
-    }
 
     a = a_find(f->attribs, &at_showitem);
     while (a && a->data.v != ptype)
@@ -2266,12 +2243,11 @@ static bool display_potion(faction * f, unit * u, const potion_type * ptype)
         a = a_add(&f->attribs, a_new(&at_showitem));
         a->data.v = (void *)ptype->itype;
     }
-
-    return true;
 }
 
-static bool display_race(faction * f, unit * u, const race * rc)
+static void display_race(unit * u, const race * rc)
 {
+    faction * f = u->faction;
     const char *name, *key;
     const char *info;
     int a, at_count;
@@ -2279,8 +2255,6 @@ static bool display_race(faction * f, unit * u, const race * rc)
     size_t size = sizeof(buf) - 1;
     size_t bytes;
 
-    if (u && u_race(u) != rc)
-        return false;
     name = rc_name_s(rc, NAME_SINGULAR);
 
     bytes = slprintf(bufp, size, "%s: ", LOC(f->locale, name));
@@ -2294,7 +2268,7 @@ static bool display_race(faction * f, unit * u, const race * rc)
         info = LOC(f->locale, mkname("raceinfo", "no_info"));
     }
 
-    bufp = STRLCPY(bufp, info, size);
+    if (info) bufp = STRLCPY(bufp, info, size);
 
     /* hp_p : Trefferpunkte */
     bytes =
@@ -2412,17 +2386,72 @@ static bool display_race(faction * f, unit * u, const race * rc)
 
     *bufp = 0;
     addmessage(0, f, buf, MSG_EVENT, ML_IMPORTANT);
+}
 
-    return true;
+static void reshow_other(unit * u, struct order *ord, const char *s) {
+    int err = 21;
+
+    if (s) {
+        const spell *sp = 0;
+        const item_type *itype;
+        const race *rc;
+        /* check if it's an item */
+        itype = finditemtype(s, u->faction->locale);
+        sp = unit_getspell(u, s, u->faction->locale);
+        rc = findrace(s, u->faction->locale);
+
+        if (itype) {
+            // if this is a potion, we need the right alchemy skill
+            int i = i_get(u->items, itype);
+            
+            err = 36; // we do not have this item?
+            if (i <= 0) {
+                // we don't have the item, but it may be a potion that we know
+                const potion_type *ptype = resource2potion(item2resource(itype));
+                if (ptype) {
+                    if (2 * ptype->level > effskill(u, SK_ALCHEMY, 0)) {
+                        itype = NULL;
+                    }
+                } else {
+                    itype = NULL;
+                }
+            }
+        }
+
+        if (itype) {
+            const potion_type *ptype = itype->rtype->ptype;
+            if (ptype) {
+                display_potion(u, ptype);
+            }
+            else {
+                display_item(u, itype);
+            }
+            return;
+        }
+
+        if (sp) {
+            attrib *a = a_find(u->faction->attribs, &at_seenspell);
+            while (a != NULL && a->type == &at_seenspell && a->data.v != sp) {
+                a = a->next;
+            }
+            if (a != NULL) {
+                a_remove(&u->faction->attribs, a);
+            }
+            return;
+        }
+
+        if (rc && u_race(u) == rc) {
+            display_race(u, rc);
+            return;
+        }
+    }
+    cmistake(u, ord, err, MSG_EVENT);
 }
 
 static void reshow(unit * u, struct order *ord, const char *s, param_t p)
 {
     int skill, c;
     const potion_type *ptype;
-    const item_type *itype;
-    const spell *sp = 0;
-    const race *rc;
 
     switch (p) {
     case P_ZAUBER:
@@ -2433,48 +2462,15 @@ static void reshow(unit * u, struct order *ord, const char *s, param_t p)
         c = 0;
         for (ptype = potiontypes; ptype != NULL; ptype = ptype->next) {
             if (ptype->level * 2 <= skill) {
-                c += display_potion(u->faction, u, ptype);
+                display_potion(u, ptype);
+                ++c;
             }
         }
         if (c == 0)
             cmistake(u, ord, 285, MSG_EVENT);
         break;
     case NOPARAM:
-        if (s) {
-            /* check if it's an item */
-            itype = finditemtype(s, u->faction->locale);
-            if (itype != NULL) {
-                ptype = resource2potion(item2resource(itype));
-                if (ptype != NULL) {
-                    if (display_potion(u->faction, u, ptype))
-                        break;
-                }
-                else {
-                    if (!display_item(u->faction, u, itype))
-                        cmistake(u, ord, 36, MSG_EVENT);
-
-                    break;
-                }
-            }
-            /* try for a spell */
-            sp = unit_getspell(u, s, u->faction->locale);
-            if (sp) {
-                attrib *a = a_find(u->faction->attribs, &at_seenspell);
-                while (a != NULL && a->type == &at_seenspell && a->data.v != sp) {
-                    a = a->next;
-                }
-                if (a != NULL) {
-                    a_remove(&u->faction->attribs, a);
-                }
-                break;
-            }
-            /* last, check if it's a race. */
-            rc = findrace(s, u->faction->locale);
-            if (rc != NULL && display_race(u->faction, u, rc)) {
-                break;
-            }
-        }
-        cmistake(u, ord, 21, MSG_EVENT);
+        reshow_other(u, ord, s);
         break;
     default:
         cmistake(u, ord, 222, MSG_EVENT);
