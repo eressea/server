@@ -8446,10 +8446,10 @@
       <arg name="dragon" type="unit"/>
       <arg name="number" type="int"/>
       <arg name="target" type="region"/>
-      <arg name="choice" type="int"/>
+      <arg name="growl" type="string"/>
     </type>
-    <text locale="de">"$unit($dragon): \"$if($eq($choice,0), "Groaaaam... ", "")$if($eq($choice,1), "Chrrrr... ", "")$if($eq($choice,2), "Roooarrr... ", "")$if($eq($choice,3), "Tschrrrk... ", "")$if($eq($choice,4), "Shhhhhh... ", "")$if($eq($number,1), "Ich rieche", "Wir riechen") etwas in $region($target)\"."</text>
-    <text locale="en">"$unit($dragon): \"$if($eq($choice,0), "Groaaaam... ", "")$if($eq($choice,1), "Chrrrr... ", "")$if($eq($choice,2), "Roooarrr... ", "")$if($eq($choice,3), "Tschrrrk... ", "")$if($eq($choice,4), "Shhhhhh... ", "")$if($eq($number,1), "I smell", "We smell") something in $region($target)\"."</text>
+    <text locale="de">"$unit($dragon): \"$localize($growl) $if($eq($number,1), "Ich rieche", "Wir riechen") etwas in $region($target)\"."</text>
+    <text locale="en">"$unit($dragon): \"$localize($growl) $if($eq($number,1), "I smell", "We smell") something in $region($target)\"."</text>
   </message>
 
 </messages>

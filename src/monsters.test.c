@@ -209,12 +209,16 @@ static void test_dragon_moves(CuTest * tc)
 
     CuAssertPtrNotNull(tc, find_order("move east", m));
 
-    mt_register(mt_new_va("dragon_growl", "dragon:unit", "number:int", "target:region", "choice:int", 0));
+    mt_register(mt_new_va("dragon_growl", "dragon:unit", "number:int", "target:region", "growl:string", 0));
 
     random_growl(m, findregion(1, 0), 3);
 
     msg = test_get_last_message(r->msgs);
-    assert_message(tc, msg, "dragon_growl", 4, m, 1, findregion(1,0), 3);
+    assert_message(tc, msg, "dragon_growl", 4);
+    assert_pointer_parameter(tc, msg, 0, m);
+    assert_int_parameter(tc, msg, 1, 1);
+    assert_pointer_parameter(tc, msg, 2, findregion(1,0));
+    assert_string_parameter(tc, msg, 3, "growl3");
 
     test_cleanup();
 }

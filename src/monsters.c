@@ -550,8 +550,18 @@ static order *monster_seeks_target(region * r, unit * u)
 void random_growl(const unit *u, region *target, int rand)
 {
     const struct locale *lang = u->faction->locale;
+    const char *growl;
+    switch(rand){
+    case 1: growl = "growl1"; break;
+    case 2: growl = "growl2"; break;
+    case 3: growl = "growl3"; break;
+    case 4: growl = "growl4"; break;
+    default: growl = "growl0";
+    }
+
+
     if (rname(target, lang)) {
-        message *msg = msg_message("dragon_growl", "dragon number target choice", u, u->number, target, rand);
+        message *msg = msg_message("dragon_growl", "dragon number target growl", u, u->number, target, growl);
         ADDMSG(&u->region->msgs, msg);
     }
 }

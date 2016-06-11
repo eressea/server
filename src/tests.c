@@ -390,27 +390,27 @@ void test_clear_messages(faction *f) {
     }
 }
 
-void assert_message(CuTest * tc, message *msg, char *name, int numpar, ...)
-{
-    va_list vargs;
+void assert_message(CuTest * tc, message *msg, char *name, int numpar) {
     const message_type *mtype = msg->type;
     assert(mtype);
-    int i;
-
-    va_start(vargs, numpar);
 
     CuAssertStrEquals(tc, name, mtype->name);
     CuAssertIntEquals(tc, numpar, mtype->nparameters);
-    for (i = 0; i != mtype->nparameters; ++i) {
-        variant value = va_arg(vargs, variant);
-        if (mtype->types[i]->vtype == VAR_VOIDPTR) {
-            CuAssertPtrEquals(tc, value.v, msg->parameters[i].v);
-        } else if (mtype->types[i]->vtype == VAR_INT) {
-            CuAssertIntEquals(tc, value.i, msg->parameters[i].i);
-        } else {
-            assert(!"unknown variant type");
-        }
-    }
+}
+
+void assert_pointer_parameter(CuTest * tc, message *msg, int index, void *arg) {
+    const message_type *mtype = (msg)->type;
+    CuAssertIntEquals((tc), VAR_VOIDPTR, mtype->types[(index)]->vtype);CuAssertPtrEquals((tc), (arg), msg->parameters[(index)].v);
+}
+
+void assert_int_parameter(CuTest * tc, message *msg, int index, int arg) {
+    const message_type *mtype = (msg)->type;
+    CuAssertIntEquals((tc), VAR_INT, mtype->types[(index)]->vtype);CuAssertIntEquals((tc), (arg), msg->parameters[(index)].i);
+}
+
+void assert_string_parameter(CuTest * tc, message *msg, int index, const char *arg) {
+    const message_type *mtype = (msg)->type;
+    CuAssertIntEquals((tc), VAR_VOIDPTR, mtype->types[(index)]->vtype);CuAssertStrEquals((tc), (arg), msg->parameters[(index)].v);
 }
 
 void disabled_test(void *suite, void (*test)(CuTest *), const char *name) {

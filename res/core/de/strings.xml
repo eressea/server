@@ -7574,4 +7574,22 @@
     </string>
   </namespace>
 
+  <string name="growl0">
+    <text locale="de">Groaamm...</text>
+  </string>
+  <string name="growl1">
+    <text locale="de">Tschrrrk...</text>
+    <text locale="en">Tshrrrk...</text>
+  </string>
+  <string name="growl2">
+    <text locale="de">Schhhhh...</text>
+    <text locale="en">Shhhhhh...</text>
+  </string>
+  <string name="growl3">
+    <text locale="de">Roaarrr...</text>
+  </string>
+  <string name="growl4">
+    <text locale="de">Chrrr...</text>
+  </string>
+
 </strings>
