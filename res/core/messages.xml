@@ -7293,8 +7293,8 @@
     <type>
       <arg name="unit" type="unit"/>
     </type>
-    <text locale="de">"$unit($unit) konnte durch einen Heiltrank überleben."</text>
-    <text locale="en">"$unit($unit) was saved by a healing potion."</text>
+    <text locale="de">"Eine Person von $unit($unit) konnte durch einen Heiltrank überleben."</text>
+    <text locale="en">"A fighter of $unit($unit) was saved by a healing potion."</text>
   </message>
   <message name="battle::tactics_lost" section="battle">
     <type>

@@ -1156,7 +1156,6 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
     unit *au = af->unit;
     unit *du = df->unit;
     battle *b = df->side->battle;
-    int heiltrank = 0;
 
     /* Schild */
     side *ds = df->side;
@@ -1289,7 +1288,7 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
         }
     }
 
-    assert(dt.index < du->number);
+    assert(dt.index >= 0 && dt.index < du->number);
     if (rda>0) {
         df->person[dt.index].hp -= rda;
         if (u_race(au) == get_race(RC_DAEMON)) {
@@ -1314,38 +1313,24 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
                 df->person[dt.index].defence--;
             }
         }
-        df->person[dt.index].flags = (df->person[dt.index].flags & ~FL_SLEEPING);
         return false;
     }
 
     /* Sieben Leben */
     if (u_race(du) == get_race(RC_CAT) && (chance(1.0 / 7))) {
-        assert(dt.index >= 0 && dt.index < du->number);
         df->person[dt.index].hp = unit_max_hp(du);
         return false;
     }
 
     /* Heiltrank schluerfen und hoffen */
-    if (oldpotiontype[P_HEAL]) {
-        if (get_effect(du, oldpotiontype[P_HEAL]) > 0) {
-            change_effect(du, oldpotiontype[P_HEAL], -1);
-            heiltrank = 1;
-        }
-        else if (i_get(du->items, oldpotiontype[P_HEAL]->itype) > 0) {
-            i_change(&du->items, oldpotiontype[P_HEAL]->itype, -1);
-            change_effect(du, oldpotiontype[P_HEAL], 3);
-            heiltrank = 1;
-        }
-        if (heiltrank && (chance(0.50))) {
-            {
-                message *m = msg_message("battle::potionsave", "unit", du);
-                message_faction(b, du->faction, m);
-                msg_release(m);
-            }
-            assert(dt.index >= 0 && dt.index < du->number);
-            df->person[dt.index].hp = u_race(du)->hitpoints;
-            return false;
-        }
+    if (oldpotiontype[P_HEAL] && i_get(du->items, oldpotiontype[P_HEAL]->itype) > 0 && !fval(&df->person[dt.index], FL_HEALING_USED)) {
+        i_change(&du->items, oldpotiontype[P_HEAL]->itype, -1);
+        message *m = msg_message("battle::potionsave", "unit", du);
+        message_faction(b, du->faction, m);
+        msg_release(m);
+        fset(&df->person[dt.index], FL_HEALING_USED);
+        df->person[dt.index].hp = u_race(du)->hitpoints*5;
+        return false;
     }
     ++at.fighter->kills;
 
