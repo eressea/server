@@ -690,7 +690,7 @@ static int CavalryBonus(const unit * u, troop enemy, int type)
         int skl = effskill(u, SK_RIDING, 0);
         /* only half against trolls */
         if (skl > 0) {
-            if (type == BONUS_DAMAGE) {
+            if (type == BONUS_SKILL) {
                 int dmg = _min(skl, 8);
                 if (u_race(enemy.fighter->unit) == get_race(RC_TROLL)) {
                     dmg = dmg / 4;
@@ -2384,15 +2384,13 @@ static void add_tactics(tactics * ta, fighter * fig, int value)
     ta->value = value;
 }
 
-static double horsebonus(const unit * u)
+static double horse_fleeing_bonus(const unit * u)
 {
     const item_type *it_horse, *it_elvenhorse, *it_charger;
     int n1 = 0, n2 = 0, n3 = 0;
     item *itm;
     int skl = effskill(u, SK_RIDING, 0);
     const resource_type *rtype;
-
-    if (skl < 1) return 0.0;
 
     it_horse = ((rtype = get_resourcetype(R_HORSE)) != NULL) ? rtype->itype : 0;
     it_elvenhorse = ((rtype = get_resourcetype(R_UNICORN)) != NULL) ? rtype->itype : 0;
@@ -2410,9 +2408,9 @@ static double horsebonus(const unit * u)
     }
     if (skl >= 5 && n3 >= u->number)
         return 0.30;
-    if (skl >= 3 && n2 + n3 >= u->number)
+    if (skl >= 2 && n2 + n3 >= u->number)
         return 0.20;
-    if (skl >= 1 && n1 + n2 + n3 >= u->number)
+    if (n1 + n2 + n3 >= u->number)
         return 0.10;
     return 0.0F;
 }
@@ -2424,7 +2422,7 @@ double fleechance(unit * u)
     /* Einheit u versucht, dem Getümmel zu entkommen */
 
     c += (effskill(u, SK_STEALTH, 0) * 0.05);
-    c += horsebonus(u);
+    c += horse_fleeing_bonus(u);
 
     if (u_race(u) == get_race(RC_HALFLING)) {
         c += 0.20;
