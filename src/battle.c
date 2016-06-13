@@ -1322,15 +1322,19 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
         return false;
     }
 
-    /* Heiltrank schluerfen und hoffen */
-    if (oldpotiontype[P_HEAL] && i_get(du->items, oldpotiontype[P_HEAL]->itype) > 0 && !fval(&df->person[dt.index], FL_HEALING_USED)) {
-        i_change(&du->items, oldpotiontype[P_HEAL]->itype, -1);
-        message *m = msg_message("battle::potionsave", "unit", du);
-        message_faction(b, du->faction, m);
-        msg_release(m);
-        fset(&df->person[dt.index], FL_HEALING_USED);
-        df->person[dt.index].hp = u_race(du)->hitpoints*5;
-        return false;
+    if (oldpotiontype[P_HEAL] && !fval(&df->person[dt.index], FL_HEALING_USED)) {
+        if ((get_effect(du, oldpotiontype[P_HEAL]) || i_get(du->items, oldpotiontype[P_HEAL]->itype) > 0)) {
+            if (get_effect(du, oldpotiontype[P_HEAL]))
+                change_effect(du, oldpotiontype[P_HEAL], -1);
+            else
+                i_change(&du->items, oldpotiontype[P_HEAL]->itype, -1);
+            message *m = msg_message("battle::potionsave", "unit", du);
+            message_faction(b, du->faction, m);
+            msg_release(m);
+            fset(&df->person[dt.index], FL_HEALING_USED);
+            df->person[dt.index].hp = u_race(du)->hitpoints * 5; /* give the person a buffer */
+            return false;
+        }
     }
     ++at.fighter->kills;
 
