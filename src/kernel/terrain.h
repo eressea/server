@@ -31,7 +31,6 @@ extern "C" {
 #define CAVALRY_REGION   (1<<4) /* riding in combat is possible */
     /* Achtung: SEA_REGION ist nicht das Gegenteil von LAND_REGION. Die zwei schliessen sich nichtmal aus! */
 #define FORBIDDEN_REGION (1<<5) /* unpassierbare Blockade-struct region */
-#define SAIL_INTO		     (1<<6)     /* man darf hierhin segeln */
 #define FLY_INTO		     (1<<7)     /* man darf hierhin fliegen */
 #define SWIM_INTO		     (1<<8)     /* man darf hierhin schwimmen */
 #define WALK_INTO		     (1<<9)     /* man darf hierhin laufen */

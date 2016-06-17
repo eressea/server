@@ -137,6 +137,7 @@ extern "C" {
 #define FL_SLEEPING 16
 #define FL_STUNNED    32      /* eine Runde keinen Angriff */
 #define FL_HIT        64      /* the person at attacked */
+#define FL_HEALING_USED 128   /* has used a healing potion */
 
     typedef struct troop {
         struct fighter *fighter;

@@ -690,7 +690,7 @@ static int CavalryBonus(const unit * u, troop enemy, int type)
         int skl = effskill(u, SK_RIDING, 0);
         /* only half against trolls */
         if (skl > 0) {
-            if (type == BONUS_DAMAGE) {
+            if (type == BONUS_SKILL) {
                 int dmg = _min(skl, 8);
                 if (u_race(enemy.fighter->unit) == get_race(RC_TROLL)) {
                     dmg = dmg / 4;
@@ -1156,7 +1156,6 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
     unit *au = af->unit;
     unit *du = df->unit;
     battle *b = df->side->battle;
-    int heiltrank = 0;
 
     /* Schild */
     side *ds = df->side;
@@ -1289,7 +1288,7 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
         }
     }
 
-    assert(dt.index < du->number);
+    assert(dt.index >= 0 && dt.index < du->number);
     if (rda>0) {
         df->person[dt.index].hp -= rda;
         if (u_race(au) == get_race(RC_DAEMON)) {
@@ -1314,36 +1313,23 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
                 df->person[dt.index].defence--;
             }
         }
-        df->person[dt.index].flags = (df->person[dt.index].flags & ~FL_SLEEPING);
         return false;
     }
 
     /* Sieben Leben */
     if (u_race(du) == get_race(RC_CAT) && (chance(1.0 / 7))) {
-        assert(dt.index >= 0 && dt.index < du->number);
         df->person[dt.index].hp = unit_max_hp(du);
         return false;
     }
 
-    /* Heiltrank schluerfen und hoffen */
-    if (oldpotiontype[P_HEAL]) {
-        if (get_effect(du, oldpotiontype[P_HEAL]) > 0) {
-            change_effect(du, oldpotiontype[P_HEAL], -1);
-            heiltrank = 1;
-        }
-        else if (i_get(du->items, oldpotiontype[P_HEAL]->itype) > 0) {
+    if (oldpotiontype[P_HEAL] && !fval(&df->person[dt.index], FL_HEALING_USED)) {
+        if (i_get(du->items, oldpotiontype[P_HEAL]->itype) > 0) {
             i_change(&du->items, oldpotiontype[P_HEAL]->itype, -1);
-            change_effect(du, oldpotiontype[P_HEAL], 3);
-            heiltrank = 1;
-        }
-        if (heiltrank && (chance(0.50))) {
-            {
-                message *m = msg_message("battle::potionsave", "unit", du);
-                message_faction(b, du->faction, m);
-                msg_release(m);
-            }
-            assert(dt.index >= 0 && dt.index < du->number);
-            df->person[dt.index].hp = u_race(du)->hitpoints;
+            message *m = msg_message("battle::potionsave", "unit", du);
+            message_faction(b, du->faction, m);
+            msg_release(m);
+            fset(&df->person[dt.index], FL_HEALING_USED);
+            df->person[dt.index].hp = u_race(du)->hitpoints * 5; /* give the person a buffer */
             return false;
         }
     }
@@ -2384,15 +2370,13 @@ static void add_tactics(tactics * ta, fighter * fig, int value)
     ta->value = value;
 }
 
-static double horsebonus(const unit * u)
+static double horse_fleeing_bonus(const unit * u)
 {
     const item_type *it_horse, *it_elvenhorse, *it_charger;
     int n1 = 0, n2 = 0, n3 = 0;
     item *itm;
     int skl = effskill(u, SK_RIDING, 0);
     const resource_type *rtype;
-
-    if (skl < 1) return 0.0;
 
     it_horse = ((rtype = get_resourcetype(R_HORSE)) != NULL) ? rtype->itype : 0;
     it_elvenhorse = ((rtype = get_resourcetype(R_UNICORN)) != NULL) ? rtype->itype : 0;
@@ -2410,9 +2394,9 @@ static double horsebonus(const unit * u)
     }
     if (skl >= 5 && n3 >= u->number)
         return 0.30;
-    if (skl >= 3 && n2 + n3 >= u->number)
+    if (skl >= 2 && n2 + n3 >= u->number)
         return 0.20;
-    if (skl >= 1 && n1 + n2 + n3 >= u->number)
+    if (n1 + n2 + n3 >= u->number)
         return 0.10;
     return 0.0F;
 }
@@ -2424,7 +2408,7 @@ double fleechance(unit * u)
     /* Einheit u versucht, dem Getümmel zu entkommen */
 
     c += (effskill(u, SK_STEALTH, 0) * 0.05);
-    c += horsebonus(u);
+    c += horse_fleeing_bonus(u);
 
     if (u_race(u) == get_race(RC_HALFLING)) {
         c += 0.20;

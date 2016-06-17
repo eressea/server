@@ -1,6 +1,5 @@
 <?xml version="1.0" ?>
 <ship name="boat" range="2" storm="1.00" damage="1.00" cargo="5000" cptskill="1" minskill="1" sumskill="2" opensea="yes">
-  <coast terrain="ocean"/>
   <coast terrain="plain"/>
   <coast terrain="swamp"/>
   <coast terrain="desert"/>

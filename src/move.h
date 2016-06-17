@@ -77,12 +77,13 @@ extern "C" {
     void move_cmd(struct unit * u, struct order * ord, bool move_on_land);
     int follow_ship(struct unit * u, struct order * ord);
 
-#define SA_HARBOUR 2
-#define SA_COAST 1
+#define SA_HARBOUR 1
+#define SA_COAST 0
 #define SA_NO_INSECT -1
 #define SA_NO_COAST -2
 
     int check_ship_allowed(struct ship *sh, const struct region * r);
+    struct region * drift_target(struct ship *sh);
 #ifdef __cplusplus
 }
 #endif

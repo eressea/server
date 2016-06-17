@@ -12,10 +12,13 @@
 
 #include "monster.h"
 #include "guard.h"
+#include "reports.h"
 #include "skill.h"
 #include "study.h"
 
 #include <util/language.h>
+#include <util/message.h>
+#include <util/nrmessage.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -55,7 +58,7 @@ static void create_monsters(faction **player, faction **monsters, unit **u, unit
     fset(*monsters, FFL_NOIDLEOUT);
     assert(fval(*monsters, FFL_NPC) && fval((*monsters)->race, RCF_UNARMEDGUARD) && fval((*monsters)->race, RCF_NPC) && fval(*monsters, FFL_NOIDLEOUT));
 
-    test_create_region(-1, 0, test_create_terrain("ocean", SEA_REGION | SAIL_INTO | SWIM_INTO | FLY_INTO));
+    test_create_region(-1, 0, test_create_terrain("ocean", SEA_REGION | SWIM_INTO | FLY_INTO));
     test_create_region(1, 0, 0);
     r = test_create_region(0, 0, 0);
 
@@ -185,11 +188,14 @@ static void test_dragon_attacks_the_rich(CuTest * tc)
     test_cleanup();
 }
 
+extern void random_growl(const unit *u, region *tr, int rand);
+
 static void test_dragon_moves(CuTest * tc)
 {
     faction *f, *f2;
     region *r;
     unit *u, *m;
+    struct message *msg;
 
     create_monsters(&f, &f2, &u, &m);
     rsetmoney(findregion(1, 0), 1000);
@@ -202,6 +208,18 @@ static void test_dragon_moves(CuTest * tc)
     plan_monsters(f2);
 
     CuAssertPtrNotNull(tc, find_order("move east", m));
+
+    mt_register(mt_new_va("dragon_growl", "dragon:unit", "number:int", "target:region", "growl:string", 0));
+
+    random_growl(m, findregion(1, 0), 3);
+
+    msg = test_get_last_message(r->msgs);
+    assert_message(tc, msg, "dragon_growl", 4);
+    assert_pointer_parameter(tc, msg, 0, m);
+    assert_int_parameter(tc, msg, 1, 1);
+    assert_pointer_parameter(tc, msg, 2, findregion(1,0));
+    assert_string_parameter(tc, msg, 3, "growl3");
+
     test_cleanup();
 }
 

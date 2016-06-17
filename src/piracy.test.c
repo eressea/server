@@ -26,7 +26,7 @@ static void setup_piracy(void) {
     lang = get_or_create_locale("de");
     locale_setstring(lang, directions[D_EAST], "OSTEN");
     init_directions(lang);
-    test_create_terrain("ocean", SAIL_INTO | SEA_REGION);
+    test_create_terrain("ocean", SEA_REGION);
     st_boat = test_create_shiptype("boat");
     st_boat->cargo = 1000;
 }
@@ -184,7 +184,7 @@ static void test_piracy_cmd_land_to_land(CuTest * tc) {
 
     test_cleanup();
 
-    setup_pirate(&pirate, 0, 0, "boat", &ord, &victim, SAIL_INTO, "boat");
+    setup_pirate(&pirate, 0, 0, "boat", &ord, &victim, SEA_REGION, "boat");
     set_level(pirate, SK_SAILING, pirate->ship->type->sumskill);
     r = pirate->region;
 

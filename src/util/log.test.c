@@ -23,10 +23,10 @@ static void test_logging(CuTest * tc)
     struct log_t * id2 = log_create(LOG_CPWARNING, str2, log_string);
     CuAssertTrue(tc, id1!=id2);
     log_warning("Hello %s", "World");
-    CuAssertStrEquals(tc, str1, "World");
-    CuAssertStrEquals(tc, str2, "World");
     log_destroy(id1);
     log_destroy(id2);
+    CuAssertStrEquals(tc, "World", str1);
+    CuAssertStrEquals(tc, "World", str2);
 }
 
 CuSuite *get_log_suite(void)

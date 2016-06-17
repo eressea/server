@@ -167,7 +167,7 @@ void score(void)
                 fprintf(scoreFP, "(%s) ", score);
                 fprintf(scoreFP, "%30.30s (%3.3s) %5s (%3d)\n",
                     f->name,
-                    rc_name_s(f->race, NAME_SINGULAR),
+                    f->race->_name,
                     factionid(f),
                     f->age);
             }

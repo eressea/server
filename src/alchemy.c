@@ -318,6 +318,10 @@ static int a_readeffect(attrib * a, void *owner, struct gamedata *data)
     if (rtype == NULL || rtype->ptype == NULL || power <= 0) {
         return AT_READ_FAIL;
     }
+    if (rtype->ptype==oldpotiontype[P_HEAL]) {
+        // healing potions used to have long-term effects
+        return AT_READ_FAIL;
+    }
     edata->type = rtype->ptype;
     edata->value = power;
     return AT_READ_OK;
