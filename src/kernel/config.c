@@ -1057,7 +1057,7 @@ int rule_give(void)
     return config_get_int("rules.give.flags", GIVE_DEFAULT);
 }
 
-bool markets_module(void)
+int markets_module(void)
 {
     return config_get_int("modules.markets", 0);
 }
