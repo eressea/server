@@ -1369,12 +1369,13 @@ static void test_show_elf(CuTest *tc) {
     unit *u;
     struct locale *loc;
     message * msg;
+    const struct item_type *itype;
 
     test_setup();
 
     mt_register(mt_new_va("msg_event", "string:string", 0));
     rc = test_create_race("elf");
-    test_create_itemtype("elvenhorse");
+    itype = test_create_itemtype("elvenhorse");
 
     loc = test_create_locale();
     locale_setstring(loc, "elvenhorse", "Elfenpferd");
@@ -1389,12 +1390,22 @@ static void test_show_elf(CuTest *tc) {
     u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
     u->faction->locale = loc;
     ord = create_order(K_RESHOW, loc, "Elf");
+
     reshow_cmd(u, ord);
     CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "error36") == NULL);
     msg = test_find_messagetype(u->faction->msgs, "msg_event");
     CuAssertPtrNotNull(tc, msg);
     CuAssertTrue(tc, memcmp("Elf:", msg->parameters[0].v, 4) == 0);
     test_clear_messages(u->faction);
+
+    i_change(&u->items, itype, 1);
+    reshow_cmd(u, ord);
+    CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "error36") == NULL);
+    msg = test_find_messagetype(u->faction->msgs, "msg_event");
+    CuAssertPtrNotNull(tc, msg);
+    CuAssertTrue(tc, memcmp("Elf:", msg->parameters[0].v, 4) == 0);
+    test_clear_messages(u->faction);
+
     free_order(ord);
     test_cleanup();
 }
