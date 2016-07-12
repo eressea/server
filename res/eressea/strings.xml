@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <strings>
   <namespace name="spellinfo">
-    <string name="concealing_aura">
-      <text locale="de">Dieser Zauber wird die gesamte Ausrüstung der
-      Zieleinheit für
-      einige Zeit vor den Blicken anderer verschleiern. </text>
-      <text locale="en">This spell will hide the whole equipment of a target
-      unit from the
-      looks of others.</text>
-    </string>
   <string name="headache">
       <text locale="de">
       Aufzeichung des Vortrags von Selen Ard'Ragorn in Bar'Glingal: 

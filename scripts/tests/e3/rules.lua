@@ -965,3 +965,24 @@ function test_no_uruk()
   local f1 = faction.create("noreply@eressea.de", "uruk", "de")
   assert_equal(f1.race, "orc")
 end
+
+function test_bug2187()
+  set_rule("rules.food.flags", "0")
+
+  local r = region.create(0,0,"plain")
+  local f = faction.create("2187@eressea.de", "goblin", "de")
+  local u = unit.create(f, r, 1)
+  u.race = "demon"
+  u.hp = u.hp_max * u.number
+
+  r:set_resource("peasant", 0)
+  u:add_item("money", 500)
+
+  hp = u.hp
+  process_orders()
+  assert_equal(hp, u.hp)
+--  init_reports()
+--  write_report(f)
+      
+  set_rule("rules.food.flags", "4")
+end

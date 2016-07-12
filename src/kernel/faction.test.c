@@ -8,6 +8,7 @@
 #include <kernel/plane.h>
 #include <kernel/config.h>
 #include <util/language.h>
+#include <util/password.h>
 
 #include "monster.h"
 #include <CuTest.h>
@@ -16,18 +17,23 @@
 #include <assert.h>
 #include <stdio.h>
 
-static void test_remove_empty_factions_allies(CuTest *tc) {
+static void test_destroyfaction_allies(CuTest *tc) {
     faction *f1, *f2;
     region *r;
+    ally *al;
 
     test_cleanup();
     r = test_create_region(0, 0, 0);
     f1 = test_create_faction(0);
     test_create_unit(f1, r);
     f2 = test_create_faction(0);
-    ally_add(&f1->allies, f2);
-    remove_empty_factions();
-    CuAssertPtrEquals(tc, 0, f1->allies);
+    al = ally_add(&f1->allies, f2);
+    al->status = HELP_FIGHT;
+    CuAssertIntEquals(tc, HELP_FIGHT, alliedgroup(0, f1, f2, f1->allies, HELP_ALL));
+    CuAssertPtrEquals(tc, f2, f1->next);
+    destroyfaction(&f1->next);
+    CuAssertIntEquals(tc, false, faction_alive(f2));
+    CuAssertIntEquals(tc, 0, alliedgroup(0, f1, f2, f1->allies, HELP_ALL));
     test_cleanup();
 }
 
@@ -75,8 +81,8 @@ static void test_remove_dead_factions(CuTest *tc) {
     remove_empty_factions();
     CuAssertPtrEquals(tc, f, findfaction(f->no));
     CuAssertPtrNotNull(tc, get_monsters());
-    fm->alive = 0;
-    f->alive = 0;
+    fm->units = 0;
+    f->_alive = false;
     fno = f->no;
     remove_empty_factions();
     CuAssertPtrEquals(tc, 0, findfaction(fno));
@@ -102,16 +108,26 @@ static void test_addfaction(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, (void *)f->ursprung);
     CuAssertPtrEquals(tc, (void *)factions, (void *)f);
     CuAssertStrEquals(tc, "test@eressea.de", f->email);
-    CuAssertStrEquals(tc, "hurrdurr", f->passw);
+    CuAssertTrue(tc, checkpasswd(f, "hurrdurr"));
     CuAssertPtrEquals(tc, (void *)lang, (void *)f->locale);
     CuAssertIntEquals(tc, 1234, f->subscription);
     CuAssertIntEquals(tc, 0, f->flags);
     CuAssertIntEquals(tc, 0, f->age);
-    CuAssertIntEquals(tc, 1, f->alive);
+    CuAssertTrue(tc, faction_alive(f));
     CuAssertIntEquals(tc, M_GRAY, f->magiegebiet);
     CuAssertIntEquals(tc, turn, f->lastorders);
     CuAssertPtrEquals(tc, f, findfaction(f->no));
     test_cleanup();
+}
+
+static void test_check_passwd(CuTest *tc) {
+    faction *f;
+    
+    f = test_create_faction(0);
+    faction_setpassword(f, password_encode("password", PASSWORD_DEFAULT));
+    CuAssertTrue(tc, checkpasswd(f, "password"));
+    CuAssertTrue(tc, !checkpasswd(f, "assword"));
+    CuAssertTrue(tc, !checkpasswd(f, "PASSWORD"));
 }
 
 static void test_get_monsters(CuTest *tc) {
@@ -174,11 +190,12 @@ CuSuite *get_faction_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_addfaction);
     SUITE_ADD_TEST(suite, test_remove_empty_factions);
-    SUITE_ADD_TEST(suite, test_remove_empty_factions_allies);
+    SUITE_ADD_TEST(suite, test_destroyfaction_allies);
     SUITE_ADD_TEST(suite, test_remove_empty_factions_alliance);
     SUITE_ADD_TEST(suite, test_remove_dead_factions);
     SUITE_ADD_TEST(suite, test_get_monsters);
     SUITE_ADD_TEST(suite, test_set_origin);
     SUITE_ADD_TEST(suite, test_set_origin_bug);
+    SUITE_ADD_TEST(suite, test_check_passwd);
     return suite;
 }

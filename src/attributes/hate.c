@@ -24,6 +24,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/version.h>
 
 #include <util/attrib.h>
+#include <util/gamedata.h>
 #include <util/resolve.h>
 
 #include <storage.h>
@@ -43,10 +44,10 @@ write_hate(const attrib * a, const void *owner, struct storage *store)
     write_unit_reference((unit *)a->data.v, store);
 }
 
-static int read_hate(attrib * a, void *owner, struct storage *store)
+static int read_hate(attrib * a, void *owner, gamedata *data)
 {
-    int result =
-        read_reference(&a->data.v, store, read_unit_reference, resolve_unit);
+    int result = read_reference(&a->data.v, data, read_unit_reference,
+        resolve_unit);
     if (result == 0 && !a->data.v) {
         return AT_READ_FAIL;
     }

@@ -5,7 +5,6 @@ eressea.log.debug("rules for game E3")
 
 return {
     require('eressea'),
-    require('eressea.xmas'),
     require('eressea.xmasitems'),
     require('eressea.markets'),
     require('eressea.frost'),

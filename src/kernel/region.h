@@ -18,9 +18,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #ifndef H_KRNL_REGION
 #define H_KRNL_REGION
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include <stddef.h>
 #include "types.h"
@@ -66,6 +63,8 @@ extern "C" {
     struct message_list;
     struct rawmaterial;
     struct item;
+    struct faction;
+    struct gamedata;
 
 #define MORALE_TAX_FACTOR 0.005 /* 0.5% tax per point of morale */
 #define MORALE_MAX 10           /* Maximum morale allowed */
@@ -74,6 +73,11 @@ extern "C" {
 #define MORALE_COOLDOWN 2       /* minimum cooldown before a morale change occurs */
 #define MORALE_AVERAGE 6        /* default average time for morale to change */
 #define MORALE_TRANSFER 2       /* points of morale lost when GIVE COMMAND */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
     typedef struct region_owner {
         struct faction *owner;
@@ -254,7 +258,7 @@ extern "C" {
     void region_set_morale(region * r, int morale, int turn);
 
     void write_region_reference(const struct region *r, struct storage *store);
-    variant read_region_reference(struct storage *store);
+    variant read_region_reference(struct gamedata *data);
     int resolve_region_coor(variant id, void *address);
     int resolve_region_id(variant id, void *address);
 #define RESOLVE_REGION(version) ((version<UIDHASH_VERSION)?resolve_region_coor:resolve_region_id)

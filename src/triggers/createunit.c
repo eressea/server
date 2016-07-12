@@ -31,6 +31,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/event.h>
+#include <util/gamedata.h>
 #include <util/log.h>
 #include <util/resolve.h>
 
@@ -82,30 +83,37 @@ static int createunit_handle(trigger * t, void *data)
 static void createunit_write(const trigger * t, struct storage *store)
 {
     createunit_data *td = (createunit_data *)t->data.v;
-    write_faction_reference(td->f, store);
+    write_faction_reference(td->f->_alive ? td->f : NULL, store);
     write_region_reference(td->r, store);
     write_race_reference(td->race, store);
     WRITE_INT(store, td->number);
 }
 
-static int createunit_read(trigger * t, struct storage *store)
+static int createunit_read(trigger * t, gamedata *data)
 {
     createunit_data *td = (createunit_data *)t->data.v;
-
-    int uc =
-        read_reference(&td->f, store, read_faction_reference, resolve_faction);
-    int rc =
-        read_reference(&td->r, store, read_region_reference,
-        RESOLVE_REGION(global.data_version));
-    td->race = (const struct race *)read_race_reference(store).v;
-
-    if (uc == 0 && rc == 0) {
-        if (!td->f || !td->r)
-            return AT_READ_FAIL;
+    variant var;
+    int result = AT_READ_OK;
+    var = read_faction_reference(data);
+    if (var.i > 0) {
+        td->f = findfaction(var.i);
+        if (!td->f) {
+            ur_add(var, &td->f, resolve_faction);
+        }
     }
-    READ_INT(store, &td->number);
+    else {
+        result = AT_READ_FAIL;
+    }
+    // read_reference(&td->f, store, read_faction_reference, resolve_faction);
 
-    return AT_READ_OK;
+    read_reference(&td->r, data, read_region_reference,
+        RESOLVE_REGION(data->version));
+    td->race = (const struct race *)read_race_reference(data->store).v;
+    if (!td->race) {
+        result = AT_READ_FAIL;
+    }
+    READ_INT(data->store, &td->number);
+    return result;
 }
 
 trigger_type tt_createunit = {

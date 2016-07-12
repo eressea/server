@@ -45,10 +45,10 @@ variant read_int(struct storage *store)
 }
 
 int
-read_reference(void *address, storage * store, read_fun reader,
-resolve_fun resolver)
+read_reference(void *address, struct gamedata * data, read_fun reader,
+    resolve_fun resolver)
 {
-    variant var = reader(store);
+    variant var = reader(data);
     int result = resolver(var, address);
     if (result != 0) {
         ur_add(var, address, resolver);
@@ -58,6 +58,7 @@ resolve_fun resolver)
 
 void ur_add(variant data, void *ptrptr, resolve_fun fun)
 {
+    assert(ptrptr);
     if (ur_list == NULL) {
         ur_list = malloc(BLOCKSIZE * sizeof(unresolved));
         ur_begin = ur_current = ur_list;
@@ -86,6 +87,7 @@ void resolve(void)
             ur_list = ur;
             continue;
         }
+        assert(ur->ptrptr);
         ur->resolve(ur->data, ur->ptrptr);
         ++ur;
     }

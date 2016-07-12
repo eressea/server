@@ -33,6 +33,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/gamedata.h>
 #include <util/resolve.h>
 #include <util/unicode.h>
 
@@ -95,8 +96,9 @@ static group *find_group(int gid)
     return g;
 }
 
-static int read_group(attrib * a, void *owner, struct storage *store)
+static int read_group(attrib * a, void *owner, gamedata *data)
 {
+    struct storage *store = data->store;
     group *g;
     int gid;
 
@@ -119,7 +121,7 @@ write_group(const attrib * a, const void *owner, struct storage *store)
 attrib_type at_group = {        /* attribute for units assigned to a group */
     "grp",
     DEFAULT_INIT,
-    DEFAULT_FINALIZE, DEFAULT_AGE, write_group, read_group, ATF_UNIQUE };
+    DEFAULT_FINALIZE, DEFAULT_AGE, write_group, read_group, NULL, ATF_UNIQUE };
 
 void free_group(group * g)
 {
@@ -130,6 +132,9 @@ void free_group(group * g)
     assert(*g_ptr == g);
     *g_ptr = g->nexthash;
 
+    if (g->attribs) {
+        a_removeall(&g->attribs, NULL);
+    }
     while (g->allies) {
         ally *a = g->allies;
         g->allies = a->next;
@@ -179,7 +184,7 @@ void set_group(struct unit *u, struct group *g)
     }
 }
 
-bool join_group(unit * u, const char *name)
+group *join_group(unit * u, const char *name)
 {
     group *g = NULL;
 
@@ -192,7 +197,7 @@ bool join_group(unit * u, const char *name)
     }
 
     set_group(u, g);
-    return true;
+    return g;
 }
 
 void write_groups(struct storage *store, const faction * f)
@@ -203,20 +208,21 @@ void write_groups(struct storage *store, const faction * f)
         WRITE_INT(store, g->gid);
         WRITE_STR(store, g->name);
         for (a = g->allies; a; a = a->next) {
-            if (a->faction) {
+            if (a->faction && a->faction->_alive) {
                 write_faction_reference(a->faction, store);
                 WRITE_INT(store, a->status);
             }
         }
-        WRITE_INT(store, 0);
+        write_faction_reference(NULL, store);
         a_write(store, g->attribs, g);
         WRITE_SECTION(store);
     }
     WRITE_INT(store, 0);
 }
 
-void read_groups(struct storage *store, faction * f)
+void read_groups(gamedata *data, faction * f)
 {
+    struct storage *store = data->store;
     for (;;) {
         ally **pa;
         group *g;
@@ -233,7 +239,7 @@ void read_groups(struct storage *store, faction * f)
             ally *a;
             variant fid;
 
-            READ_INT(store, &fid.i);
+            fid = read_faction_reference(data);
             if (fid.i <= 0)
                 break;
             a = ally_add(pa, findfaction(fid.i));
@@ -241,6 +247,6 @@ void read_groups(struct storage *store, faction * f)
             if (!a->faction)
                 ur_add(fid, &a->faction, resolve_faction);
         }
-        a_read(store, &g->attribs, g);
+        read_attribs(data, &g->attribs, g);
     }
 }

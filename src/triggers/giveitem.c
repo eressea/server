@@ -28,6 +28,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/event.h>
+#include <util/gamedata.h>
 #include <util/log.h>
 #include <util/resolve.h>
 
@@ -82,15 +83,15 @@ static void giveitem_write(const trigger * t, struct storage *store)
     WRITE_TOK(store, td->itype->rtype->_name);
 }
 
-static int giveitem_read(trigger * t, struct storage *store)
+static int giveitem_read(trigger * t, gamedata *data)
 {
     giveitem_data *td = (giveitem_data *)t->data.v;
     char zText[128];
 
-    int result = read_reference(&td->u, store, read_unit_reference, resolve_unit);
+    int result = read_reference(&td->u, data, read_unit_reference, resolve_unit);
 
-    READ_INT(store, &td->number);
-    READ_TOK(store, zText, sizeof(zText));
+    READ_INT(data->store, &td->number);
+    READ_TOK(data->store, zText, sizeof(zText));
     td->itype = it_find(zText);
     assert(td->itype);
 

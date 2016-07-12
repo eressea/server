@@ -28,6 +28,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "laws.h"
 #include "randenc.h"
 #include "spy.h"
+#include "study.h"
 #include "move.h"
 #include "monster.h"
 #include "morale.h"

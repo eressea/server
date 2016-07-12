@@ -130,7 +130,7 @@ static int get_arg(int argc, char **argv, size_t len, int index, const char **re
 
 static int parse_args(int argc, char **argv, int *exitcode)
 {
-    int i;
+    int i, log_stderr = 0;
 
     for (i = 1; i != argc; ++i) {
         char *argi = argv[i];
@@ -210,6 +210,10 @@ static int parse_args(int argc, char **argv, int *exitcode)
         break;
     }
 
+    if (log_stderr) {
+        log_to_file(log_stderr | LOG_FLUSH | LOG_BRIEF, stderr);
+    }
+
     return 0;
 }
 
@@ -284,10 +288,6 @@ int main(int argc, char **argv)
     int err = 0;
     lua_State *L;
     setup_signal_handler();
-    /* parse args once to read config file location */
-    if (parse_args(argc, argv, &err) != 0) {
-        return err;
-    }
     /* ini file sets defaults for arguments*/
     parse_config(inifile);
     if (!global.inifile) {
@@ -296,7 +296,7 @@ int main(int argc, char **argv)
     /* parse arguments again, to override ini file */
     parse_args(argc, argv, &err);
 
-    log_open(logfile);
+    log_open(logfile, LOG_CPERROR | LOG_CPWARNING | LOG_CPDEBUG | LOG_FLUSH);
     locale_init();
 
 #ifdef CRTDBG

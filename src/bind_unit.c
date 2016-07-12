@@ -153,8 +153,8 @@ static int tolua_unit_get_group(lua_State * L)
 static int tolua_unit_set_group(lua_State * L)
 {
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
-    int result = join_group(self, tolua_tostring(L, 2, 0));
-    lua_pushinteger(L, result);
+    group *g = join_group(self, tolua_tostring(L, 2, 0));
+    lua_pushboolean(L, g!=NULL);
     return 1;
 }
 
@@ -807,8 +807,7 @@ static int tolua_unit_get_flag(lua_State * L)
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
     const char *name = tolua_tostring(L, 2, 0);
     int flag = atoi36(name);
-    attrib *a = find_key(self->attribs, flag);
-    lua_pushboolean(L, (a != NULL));
+    lua_pushboolean(L, key_get(self->attribs, flag));
     return 1;
 }
 
@@ -818,12 +817,11 @@ static int tolua_unit_set_flag(lua_State * L)
     const char *name = tolua_tostring(L, 2, 0);
     int value = (int)tolua_tonumber(L, 3, 0);
     int flag = atoi36(name);
-    attrib *a = find_key(self->attribs, flag);
-    if (a == NULL && value) {
-        add_key(&self->attribs, flag);
+    if (value) {
+        key_set(&self->attribs, flag);
     }
-    else if (a != NULL && !value) {
-        a_remove(&self->attribs, a);
+    else {
+        key_unset(&self->attribs, flag);
     }
     return 0;
 }

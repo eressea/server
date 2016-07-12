@@ -1,0 +1,93 @@
+##
+## Eressea Reportversand
+##
+
+:0:server.lock
+* ^Subject:.*ERE.*2.*PASSWOR.*
+| sendpassword.py $HOME/eressea/game-2/passwd
+
+:0:server.lock
+* ^Subject:.*ERE.*3.*PASSWOR.*
+| sendpassword.py $HOME/eressea/game-3/passwd
+
+:0:server.lock
+* ^Subject:.*ERE.*4.*PASSWOR.*
+| sendpassword.py $HOME/eressea/game-4/passwd
+
+:0:server.lock
+* ^Subject:.*ERE.*PASSWOR.*
+| sendpassword.py $HOME/eressea/game-2/passwd
+
+:0:server.lock
+* ^Subject:.*E3.*PASSWOR.*
+| sendpassword.py $HOME/eressea/game-3/passwd
+
+:0:server.lock
+* ^Subject:.*ERE.*2.*REPORT \/.*
+* !From: .*eressea.*@eressea.de
+| tr -d '' | ERESSEA=$HOME/eressea sendreport.sh 2 $FROM $MATCH
+
+:0:server.lock
+* ^Subject:.*ERE.*3.*REPORT \/.*
+* !From: .*eressea.*@eressea.de
+| tr -d '' | ERESSEA=$HOME/eressea sendreport.sh 3 $FROM $MATCH
+
+:0:server.lock
+* ^Subject:.*ERE.*4.*REPORT \/.*
+* !From: .*eressea.*@eressea.de
+| tr -d '' | ERESSEA=$HOME/eressea sendreport.sh 4 $FROM $MATCH
+
+:0:server.lock
+* ^Subject:.*ERE.*REPORT \/.*
+* !From: .*eressea.*@eressea.de
+| sendreport.sh 2 $FROM $MATCH
+
+:0:server.lock
+* ^Subject:.*E3.*REPORT \/.*
+* !From: .*eressea.*@eressea.de
+| tr -d '' | ERESSEA=$HOME/eressea sendreport.sh 3 $FROM $MATCH
+
+:0 he
+| ( formail -I"Precedence: junk" -r -A"X-Loop: eressea@eressea.de" ; cat $HOME/etc/report-failure.txt ) | $SENDMAIL -t
+
+##
+## Eressea Befehle
+##
+
+:0
+* ^Subject:.*ERESSEA 4 BEFEHLE
+| grep -v '>From' | $HOME/bin/orders-accept 4 de
+
+:0
+* ^Subject:.*ERESSEA 4 ORDERS
+| grep -v '>From' | $HOME/bin/orders-accept 4 en
+
+:0
+* ^Subject:.*ERESSEA 3 BEFEHLE
+| grep -v '>From' | $HOME/bin/orders-accept 3 de
+
+:0
+* ^Subject:.*ERESSEA 3 ORDERS
+| grep -v '>From' | $HOME/bin/orders-accept 3 en
+
+## backwards compatible format
+
+:0
+* ^Subject:.*E3.* BEF.*
+| grep -v '>From' | $HOME/bin/orders-accept 3 de
+
+:0
+* ^Subject:.*E3.* ORD.*
+| grep -v '>From' | $HOME/bin/orders-accept 3 en
+
+:0
+* ^Subject:.*ERE.* BEF.*
+| grep -v '>From' | $HOME/bin/orders-accept 2 de
+
+:0
+* ^Subject:.*ERE.* ORD.*
+| grep -v '>From' | $HOME/bin/orders-accept 2 en
+
+:0 c
+* ^Subject:.*ERE.*
+eressea

@@ -22,6 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "move.h"
 #include "laws.h"
 #include "reports.h"
+#include "study.h"
 #include "alchemy.h"
 #include "travelthru.h"
 #include "vortex.h"
@@ -44,13 +45,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/render.h>
 #include <kernel/save.h>
 #include <kernel/ship.h>
-#include <kernel/teleport.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
 
 #include <spells/flyingship.h>
 
+#include "teleport.h"
 #include "direction.h"
 #include "calendar.h"
 #include "skill.h"
@@ -59,6 +60,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/bsdstring.h>
+#include <util/gamedata.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
@@ -122,7 +124,7 @@ get_followers(unit * target, region * r, const region_list * route_end,
     unit *uf;
     for (uf = r->units; uf; uf = uf->next) {
         if (fval(uf, UFL_FOLLOWING) && !fval(uf, UFL_NOTMOVING)) {
-            const attrib *a = a_findc(uf->attribs, &at_follow);
+            const attrib *a = a_find(uf->attribs, &at_follow);
             if (a && a->data.v == target) {
                 follower *fnew = (follower *)malloc(sizeof(follower));
                 fnew->uf = uf;
@@ -154,8 +156,9 @@ static int shiptrail_age(attrib * a, void *owner)
     return (t->age > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
 }
 
-static int shiptrail_read(attrib * a, void *owner, struct storage *store)
+static int shiptrail_read(attrib * a, void *owner, struct gamedata *data)
 {
+    storage *store = data->store;
     int n;
     traveldir *t = (traveldir *)(a->data.v);
 

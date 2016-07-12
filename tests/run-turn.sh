@@ -1,4 +1,5 @@
-NEWFILES="data/185.dat datum parteien parteien.full passwd score turn"
+NEWFILES="data/185.dat datum parteien parteien.full passwd htpasswd score turn"
+
 cleanup () {
 rm -rf reports $NEWFILES
 }
@@ -19,6 +20,7 @@ expr=$2
 expect=$3
 count=`grep -cE $expr $file`
 [ $count -eq $expect ] || quit 1 "expected $expect counts of $expr in $file, got $count"
+echo "PASS: $expr is $expect"
 }
 
 ROOT=`pwd`
@@ -34,10 +36,11 @@ VALGRIND=`which valgrind`
 SERVER=../Debug/eressea/eressea
 if [ -n "$VALGRIND" ]; then
 SUPP=../share/ubuntu-12_04.supp
-SERVER="$VALGRIND --suppressions=$SUPP --error-exitcode=1 --leak-check=no $SERVER"
+SERVER="$VALGRIND --track-origins=yes --gen-suppressions=all --suppressions=$SUPP --error-exitcode=1 --leak-check=no $SERVER"
 fi
 echo "running $SERVER"
-$SERVER -t 184 ../scripts/run-turn.lua
+$SERVER -t 184 test-turn.lua
+echo "integration tests"
 [ -d reports ] || quit 4 "no reports directory created"
 CRFILE=185-zvto.cr
 for file in $NEWFILES reports/$CRFILE ; do

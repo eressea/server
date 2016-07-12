@@ -8,7 +8,6 @@ return {
     require('eressea.xmasitems'),
     require('eressea.wedding'),
     require('eressea.embassy'),
-    require('eressea.eternath'),
     require('eressea.tunnels'),
     require('eressea.ponnuki'),
     require('eressea.astral'),

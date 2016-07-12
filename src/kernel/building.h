@@ -26,6 +26,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
+    struct gamedata;
+    
     /* maintenance::flags */
 #define MTF_NONE     0x00
 #define MTF_VARIABLE 0x01       /* resource usage scales with size */
@@ -158,7 +160,7 @@ extern "C" {
     extern int resolve_building(variant data, void *address);
     extern void write_building_reference(const struct building *b,
     struct storage *store);
-    extern variant read_building_reference(struct storage *store);
+    extern variant read_building_reference(struct gamedata *data);
 
     extern struct building *findbuilding(int n);
 

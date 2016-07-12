@@ -1,0 +1,60 @@
+{
+   strcpy.S:197
+   Memcheck:Cond
+   obj:/lib/x86_64-linux-gnu/libc-2.13.so
+}
+{
+   strcpy.S:1106
+   Memcheck:Value8
+   obj:/lib/x86_64-linux-gnu/libc-2.13.so
+}
+{
+   stpncpy sse3
+   Memcheck:Cond
+   obj:/lib/x86_64-linux-gnu/libc-2.13.so
+   fun:md5_crypt_r
+   fun:md5_crypt
+   fun:password_hash_i
+   fun:password_verify
+   fun:checkpasswd
+   fun:factionorders
+   fun:readorders
+   fun:tolua_read_orders
+   obj:/usr/lib/x86_64-linux-gnu/liblua5.2.so.0.0.0
+   obj:/usr/lib/x86_64-linux-gnu/liblua5.2.so.0.0.0
+   obj:/usr/lib/x86_64-linux-gnu/liblua5.2.so.0.0.0
+}
+
+{
+   stpncpy sse3
+   Memcheck:Value8
+   obj:/lib/x86_64-linux-gnu/libc-2.13.so
+   fun:md5_crypt_r
+   fun:md5_crypt
+   fun:password_hash_i
+   fun:password_verify
+   fun:checkpasswd
+   fun:factionorders
+   fun:readorders
+   fun:tolua_read_orders
+   obj:/usr/lib/x86_64-linux-gnu/liblua5.2.so.0.0.0
+   obj:/usr/lib/x86_64-linux-gnu/liblua5.2.so.0.0.0
+   obj:/usr/lib/x86_64-linux-gnu/liblua5.2.so.0.0.0
+}
+
+{
+   strtod sse
+   Memcheck:Addr8
+   fun:__GI___strncasecmp_l
+   fun:____strtod_l_internal
+   obj:/usr/lib/x86_64-linux-gnu/liblua5.2.so.0.0.0
+   obj:/usr/lib/x86_64-linux-gnu/liblua5.2.so.0.0.0
+   fun:lua_isnumber
+   fun:class_index_event
+   obj:/usr/lib/x86_64-linux-gnu/liblua5.2.so.0.0.0
+   obj:/usr/lib/x86_64-linux-gnu/liblua5.2.so.0.0.0
+   obj:/usr/lib/x86_64-linux-gnu/liblua5.2.so.0.0.0
+   obj:/usr/lib/x86_64-linux-gnu/liblua5.2.so.0.0.0
+   obj:/usr/lib/x86_64-linux-gnu/liblua5.2.so.0.0.0
+   obj:/usr/lib/x86_64-linux-gnu/liblua5.2.so.0.0.0
+}

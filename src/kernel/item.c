@@ -568,11 +568,15 @@ struct order *ord)
 {
     if (d == NULL) {
         int use = use_pooled(s, item2resource(itype), GET_SLACK, n);
-        if (use < n)
+        region *r = s->region;
+        if (use < n) {
             use +=
             use_pooled(s, item2resource(itype), GET_RESERVE | GET_POOLED_SLACK,
             n - use);
-        rsethorses(s->region, rhorses(s->region) + use);
+        }
+        if (r->land) {
+            rsethorses(r, rhorses(r) + use);
+        }
         return 0;
     }
     return -1;                    /* use the mechanism */
@@ -584,12 +588,14 @@ struct order *ord)
 {
     if (d == NULL) {
         int use = use_pooled(s, item2resource(itype), GET_SLACK, n);
-        if (use < n)
+        region *r = s->region;
+        if (use < n) {
             use +=
             use_pooled(s, item2resource(itype), GET_RESERVE | GET_POOLED_SLACK,
             n - use);
-        if (s->region->land) {
-            rsetmoney(s->region, rmoney(s->region) + use);
+        }
+        if (r->land) {
+            rsetmoney(r, rmoney(r) + use);
         }
         return 0;
     }
@@ -920,14 +926,14 @@ struct order *ord)
             "unit item region command", user, itype->rtype, user->region, ord));
         return -1;
     }
-    if (!is_mage(user) || find_key(f->attribs, atoi36("mbst")) != NULL) {
+    if (!is_mage(user) || key_get(f->attribs, atoi36("mbst"))) {
         cmistake(user, user->thisorder, 214, MSG_EVENT);
         return -1;
     }
     use_pooled(user, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
         user->number);
 
-    a_add(&f->attribs, make_key(atoi36("mbst")));
+    key_set(&f->attribs, atoi36("mbst"));
     set_level(user, SK_MAGIC, 3);
 
     ADDMSG(&user->faction->msgs, msg_message("use_item",
@@ -1197,13 +1203,16 @@ static void free_wtype(weapon_type *wtype) {
 int free_rtype_cb(const void * match, const void * key, size_t keylen, void *cbdata) {
     resource_type *rtype;
     cb_get_kv(match, &rtype, sizeof(rtype));
-    free(rtype->_name);
-    if (rtype->itype) {
-        free_itype(rtype->itype);
-    }
     if (rtype->wtype) {
         free_wtype(rtype->wtype);
     }
+    if (rtype->atype) {
+        free(rtype->atype);
+    }
+    if (rtype->itype) {
+        free_itype(rtype->itype);
+    }
+    free(rtype->_name);
     free(rtype);
     return 0;
 }

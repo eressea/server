@@ -83,11 +83,13 @@ set (ERESSEA_SRC
   spells.c
   battle.c
   alchemy.c
+  academy.c
   upkeep.c
   vortex.c
   names.c
   lighthouse.c
   reports.c
+  teleport.c
   guard.c
   prefix.c
   donations.c
@@ -139,6 +141,7 @@ set(SERVER_SRC
   bind_eressea.c
   bind_faction.c
   bind_dict.c
+  bind_order.c
   bindings.c
   bind_message.c
   bind_monsters.c

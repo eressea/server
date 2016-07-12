@@ -36,6 +36,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "study.h"
 #include "wormhole.h"
 #include "prefix.h"
+#include "teleport.h"
 #include "calendar.h"
 #include "guard.h"
 
@@ -59,7 +60,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/ship.h>
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
-#include <kernel/teleport.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>   /* for volcanoes in emigration (needs a flag) */
 #include <kernel/unit.h>
@@ -79,6 +79,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/parser.h>
+#include <util/password.h>
 #include <quicklist.h>
 #include <util/rand.h>
 #include <util/rng.h>
@@ -485,6 +486,7 @@ attrib_type at_germs = {
     DEFAULT_AGE,
     a_writeshorts,
     a_readshorts,
+    NULL,
     ATF_UNIQUE
 };
 
@@ -709,20 +711,22 @@ void immigration(void)
         }
         /* Genereate some (0-6 depending on the income) peasants out of nothing */
         /* if less than 50 are in the region and there is space and no monster or demon units in the region */
-        int peasants = rpeasants(r);
-        int income = wage(r, NULL, NULL, turn) - maintenance_cost(NULL);
-        if (repopulate && r->land && (peasants < repopulate) && maxworkingpeasants(r) > (peasants + 30) * 2 && income >= 0) {
-            int badunit = 0;
-            unit *u;
-            for (u = r->units; u; u = u->next) {
-                if (!playerrace(u_race(u)) || u_race(u) == get_race(RC_DAEMON)) {
-                    badunit = 1;
-                    break;
+        if (repopulate) {
+            int peasants = rpeasants(r);
+            int income = wage(r, NULL, NULL, turn) - maintenance_cost(NULL) + 1;
+            if (income >= 0 && r->land && (peasants < repopulate) && maxworkingpeasants(r) >(peasants + 30) * 2) {
+                int badunit = 0;
+                unit *u;
+                for (u = r->units; u; u = u->next) {
+                    if (!playerrace(u_race(u)) || u_race(u) == get_race(RC_DAEMON)) {
+                        badunit = 1;
+                        break;
+                    }
                 }
-            }
-            if (badunit == 0) {
-                peasants += (int)(rng_double() * (income + 1));
-                rsetpeasants(r, peasants);
+                if (badunit == 0) {
+                    peasants += (int)(rng_double()*income);
+                    rsetpeasants(r, peasants);
+                }
             }
         }
     }
@@ -733,9 +737,6 @@ void nmr_warnings(void)
     faction *f, *fa;
 #define FRIEND (HELP_GUARD|HELP_MONEY)
     for (f = factions; f; f = f->next) {
-        if (f->age <= 1) {
-            ADDMSG(&f->msgs, msg_message("changepasswd", "value", f->passw));
-        }
         if (!fval(f, FFL_NOIDLEOUT) && turn > f->lastorders) {
             ADDMSG(&f->msgs, msg_message("nmr_warning", ""));
             if (turn - f->lastorders == NMRTimeout() - 1) {
@@ -785,14 +786,14 @@ void demographics(void)
     }
 
     for (r = regions; r; r = r->next) {
-        ++r->age;                   /* also oceans. no idea why we didn't always do that */
+        ++r->age; /* also oceans. no idea why we didn't always do that */
         live(r);
 
         if (!fval(r->terrain, SEA_REGION)) {
             /* die Nachfrage nach Produkten steigt. */
             struct demand *dmd;
             if (r->land) {
-                int plant_rules = config_get_int("rules.grow.formula", 0);
+                int plant_rules = config_get_int("rules.grow.formula", 2);
                 for (dmd = r->land->demands; dmd; dmd = dmd->next) {
                     if (dmd->value > 0 && dmd->value < MAXDEMAND) {
                         float rise = DMRISE;
@@ -818,11 +819,11 @@ void demographics(void)
                     }
                 }
                 horses(r);
-                if (plant_rules == 0) { /* E1 */
+                if (plant_rules == 2) { /* E2 */
                     growing_trees(r, current_season, last_weeks_season);
                     growing_herbs(r, current_season, last_weeks_season);
                 }
-                else {                /* E3 */
+                else if (plant_rules==1) { /* E3 */
                     growing_trees_e3(r, current_season, last_weeks_season);
                 }
             }
@@ -1220,42 +1221,45 @@ static void nmr_death(faction * f)
 
 static void remove_idle_players(void)
 {
-    faction *f;
+    faction **fp;
 
     log_info(" - beseitige Spieler, die sich zu lange nicht mehr gemeldet haben...");
 
-    for (f = factions; f; f = f->next) {
+    for (fp = &factions; *fp;) {
+        faction *f = *fp;
         if (fval(f, FFL_NOIDLEOUT)) {
             f->lastorders = turn;
         }
         if (NMRTimeout() > 0 && turn - f->lastorders >= NMRTimeout()) {
             nmr_death(f);
-            destroyfaction(f);
-            continue;
-        }
-        if (turn != f->lastorders) {
+            destroyfaction(fp);
+        } else if (turn != f->lastorders) {
             char info[256];
             sprintf(info, "%d Einheiten, %d Personen, %d Silber",
                 f->no_units, f->num_total, f->money);
         }
+        fp = &f->next;
     }
     log_info(" - beseitige Spieler, die sich nach der Anmeldung nicht gemeldet haben...");
 
     age = calloc(_max(4, turn + 1), sizeof(int));
-    for (f = factions; f; f = f->next)
+    for (fp = &factions; *fp;) {
+        faction *f = *fp;
         if (!is_monsters(f)) {
             if (RemoveNMRNewbie() && !fval(f, FFL_NOIDLEOUT)) {
                 if (f->age >= 0 && f->age <= turn)
                     ++age[f->age];
                 if (f->age == 2 || f->age == 3) {
                     if (f->lastorders == turn - 2) {
-                        destroyfaction(f);
                         ++dropouts[f->age - 2];
+                        destroyfaction(fp);
                         continue;
                     }
                 }
             }
         }
+        fp = &f->next;
+    }
 }
 
 void quit(void)
@@ -1264,7 +1268,7 @@ void quit(void)
     while (*fptr) {
         faction *f = *fptr;
         if (f->flags & FFL_QUIT) {
-            destroyfaction(f);
+            destroyfaction(fptr);
         }
         else {
             ++f->age;
@@ -1272,8 +1276,6 @@ void quit(void)
                 ADDMSG(&f->msgs, msg_message("newbieimmunity", "turns",
                     NewbieImmunity() - f->age - 1));
             }
-        }
-        if (*fptr == f) {
             fptr = &f->next;
         }
     }
@@ -2167,16 +2169,13 @@ int password_cmd(unit * u, struct order *ord)
             }
         }
     }
-    free(u->faction->passw);
     if (!pwok) {
         cmistake(u, ord, 283, MSG_EVENT);
-        u->faction->passw = _strdup(itoa36(rng_int()));
+        strlcpy(pwbuf, itoa36(rng_int()), sizeof(pwbuf));
     }
-    else {
-        u->faction->passw = _strdup(pwbuf);
-    }
+    faction_setpassword(u->faction, password_encode(pwbuf, PASSWORD_DEFAULT));
     ADDMSG(&u->faction->msgs, msg_message("changepasswd",
-        "value", u->faction->passw));
+        "value", pwbuf));
     return 0;
 }
 
@@ -2751,7 +2750,7 @@ void sinkships(struct region * r)
 
 static attrib_type at_number = {
     "faction_renum",
-    NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL, NULL,
     ATF_UNIQUE
 };
 
@@ -3019,74 +3018,75 @@ int renumber_cmd(unit * u, order * ord)
     return 0;
 }
 
-static building *age_building(building * b)
-{
-    const struct building_type *bt_blessed;
-    const struct curse_type *ct_astralblock;
+/* blesses stone circles create an astral protection in the astral region
+ * above the shield, which prevents chaos suction and other spells.
+ * The shield is created when a magician enters the blessed stone circle,
+ * and lasts for as long as his skill level / 2 is, at no mana cost.
+ *
+ * TODO: this would be nicer in a btype->age function, but we don't have it.
+ */
+static void age_stonecircle(building *b) {
     const struct resource_type *rtype = get_resourcetype(R_UNICORN);
+    region *r = b->region;
+    unit *u, *mage = NULL;
 
-    bt_blessed = bt_find("blessedstonecircle");
-    ct_astralblock = ct_find("astralblock");
-
-    /* blesses stone circles create an astral protection in the astral region
-     * above the shield, which prevents chaos suction and other spells.
-     * The shield is created when a magician enters the blessed stone circle,
-     * and lasts for as long as his skill level / 2 is, at no mana cost.
-     *
-     * TODO: this would be nicer in a btype->age function, but we don't have it.
-     */
-    if (rtype && ct_astralblock && bt_blessed && b->type == bt_blessed) {
-        region *r = b->region;
-        region *rt = r_standard_to_astral(r);
-        unit *u, *mage = NULL;
-
-        /* step 1: give unicorns to people in the building,
-         * find out if there's a magician in there. */
-        for (u = r->units; u; u = u->next) {
-            if (b == u->building && inside_building(u)) {
-                if ((u_race(u)->ec_flags & ECF_KEEP_ITEM) == 0) {
-                    int n, unicorns = 0;
-                    for (n = 0; n != u->number; ++n) {
-                        if (chance(0.02)) {
-                            i_change(&u->items, rtype->itype, 1);
-                            ++unicorns;
-                        }
-                        if (unicorns) {
-                            ADDMSG(&u->faction->msgs, msg_message("scunicorn",
-                                "unit amount rtype",
-                                u, unicorns, rtype));
-                        }
+    /* step 1: give unicorns to people in the building,
+     * find out if there's a magician in there. */
+    for (u = r->units; u; u = u->next) {
+        if (b == u->building && inside_building(u)) {
+            if (!mage && is_mage(u)) {
+                mage = u;
+            }
+            if (rtype && (u_race(u)->ec_flags & ECF_KEEP_ITEM) == 0) {
+                int n, unicorns = 0;
+                for (n = 0; n != u->number; ++n) {
+                    if (chance(0.02)) {
+                        i_change(&u->items, rtype->itype, 1);
+                        ++unicorns;
                     }
-                }
-                if (mage == NULL && is_mage(u)) {
-                    mage = u;
+                    if (unicorns) {
+                        ADDMSG(&u->faction->msgs, msg_message("scunicorn",
+                                                              "unit amount rtype",
+                                                              u, unicorns, rtype));
+                    }
                 }
             }
         }
+    }
 
-        /* if there's a magician, and a connection to astral space, create the
-         * curse. */
-        if (rt && !fval(rt->terrain, FORBIDDEN_REGION) && mage != NULL) {
+    /* step 2: if there's a magician, and a connection to astral space, create the
+     * curse. */
+    if (get_astralplane()) {
+        region *rt = r_standard_to_astral(r);
+        if (mage && rt && !fval(rt->terrain, FORBIDDEN_REGION)) {
+            const struct curse_type *ct_astralblock = ct_find("astralblock");
             curse *c = get_curse(rt->attribs, ct_astralblock);
-            if (c == NULL) {
-                if (mage != NULL) {
-                    int sk = effskill(mage, SK_MAGIC, 0);
-                    float effect = 100;
-                    /* the mage reactivates the circle */
-                    c = create_curse(mage, &rt->attribs, ct_astralblock,
-                        (float)_max(1, sk), _max(1, sk / 2), effect, 0);
-                    ADDMSG(&r->msgs,
-                        msg_message("astralshield_activate", "region unit", r, mage));
-                }
+            if (!c) {
+                int sk = effskill(mage, SK_MAGIC, 0);
+                float effect = 100;
+                /* the mage reactivates the circle */
+                c = create_curse(mage, &rt->attribs, ct_astralblock,
+                    (float)_max(1, sk), _max(1, sk / 2), effect, 0);
+                ADDMSG(&r->msgs,
+                    msg_message("astralshield_activate", "region unit", r, mage));
             }
-            else if (mage != NULL) {
+            else {
                 int sk = effskill(mage, SK_MAGIC, 0);
                 c->duration = _max(c->duration, sk / 2);
                 c->vigour = _max(c->vigour, (float)sk);
             }
         }
     }
+}
 
+static building *age_building(building * b)
+{
+    const struct building_type *bt_blessed;
+
+    bt_blessed = bt_find("blessedstonecircle");
+    if (bt_blessed && b->type == bt_blessed) {
+        age_stonecircle(b);
+    }
     a_age(&b->attribs, b);
     handle_event(b->attribs, "timer", b);
 
@@ -3432,10 +3432,13 @@ void update_long_order(unit * u)
 static int use_item(unit * u, const item_type * itype, int amount, struct order *ord)
 {
     int i;
-    int target = read_unitid(u->faction, u->region);
+    int target = -1;
+
+    if (itype->useonother) {
+        target = read_unitid(u->faction, u->region);
+    }
 
     i = get_pooled(u, itype->rtype, GET_DEFAULT, amount);
-
     if (amount > i) {
         /* TODO: message? eg. "not enough %, using only %" */
         amount = i;
@@ -3445,20 +3448,16 @@ static int use_item(unit * u, const item_type * itype, int amount, struct order 
     }
 
     if (target == -1) {
-        int result;
-        if (itype->use == NULL) {
-            return EUNUSABLE;
+        if (itype->use) {
+            int result = itype->use(u, itype, amount, ord);
+            if (result > 0) {
+                use_pooled(u, itype->rtype, GET_DEFAULT, result);
+            }
+            return result;
         }
-        result = itype->use ? itype->use(u, itype, amount, ord) : EUNUSABLE;
-        if (result > 0) {
-            use_pooled(u, itype->rtype, GET_DEFAULT, result);
-        }
-        return result;
+        return EUNUSABLE;
     }
     else {
-        if (itype->useonother == NULL) {
-            return EUNUSABLE;
-        }
         return itype->useonother(u, target, itype, amount, ord);
     }
 }
@@ -4256,33 +4255,6 @@ static void maintain_buildings_1(region * r)
     maintain_buildings(r, false);
 }
 
-/** warn about passwords that are not US ASCII.
- * even though passwords are technically UTF8 strings, the server receives
- * them as part of the Subject of an email when reports are requested.
- * This means that we need to limit them to ASCII characters until that
- * mechanism has been changed.
- */
-static int warn_password(void)
-{
-    faction *f = factions;
-    while (f) {
-        bool pwok = true;
-        const char *c = f->passw;
-        while (*c && pwok) {
-            if (!isalnum((unsigned char)*c))
-                pwok = false;
-            c++;
-        }
-        if (!pwok) {
-            free(f->passw);
-            f->passw = _strdup(itoa36(rng_int()));
-            ADDMSG(&f->msgs, msg_message("illegal_password", "newpass", f->passw));
-        }
-        f = f->next;
-    }
-    return 0;
-}
-
 void init_processor(void)
 {
     int p;
@@ -4464,31 +4436,6 @@ void processorders(void)
     /* immer ausführen, wenn neue Sprüche dazugekommen sind, oder sich
      * Beschreibungen geändert haben */
     update_spells();
-    warn_password();
-}
-
-int writepasswd(void)
-{
-    FILE *F;
-    char zText[128];
-
-    sprintf(zText, "%s/passwd", basepath());
-    F = fopen(zText, "w");
-    if (!F) {
-        perror(zText);
-    }
-    else {
-        faction *f;
-        log_info("writing passwords...");
-
-        for (f = factions; f; f = f->next) {
-            fprintf(F, "%s:%s:%s:%u\n",
-                factionid(f), f->email, f->passw, f->subscription);
-        }
-        fclose(F);
-        return 0;
-    }
-    return 1;
 }
 
 void update_subscriptions(void)
@@ -4496,8 +4443,7 @@ void update_subscriptions(void)
     FILE *F;
     char zText[MAX_PATH];
 
-    strlcpy(zText, basepath(), sizeof(zText));
-    strlcat(zText, "/subscriptions", sizeof(zText));
+    join_path(basepath(), "subscriptions", zText, sizeof(zText));
     F = fopen(zText, "r");
     if (F == NULL) {
         log_warning(0, "could not open %s.\n", zText);
@@ -4517,17 +4463,6 @@ void update_subscriptions(void)
         }
     }
     fclose(F);
-
-    sprintf(zText, "subscriptions.%u", turn);
-    F = fopen(zText, "w");
-    if (F) {
-        faction *f;
-        for (f = factions; f != NULL; f = f->next) {
-            fprintf(F, "%s:%u:%s:%s:%u:\n",
-                itoa36(f->no), f->subscription, f->email, dbrace(f->race), f->lastorders);
-        }
-        fclose(F);
-    }
 }
 
 bool

@@ -4,7 +4,49 @@
     <text locale="de">Die Region ist verwüstet, der Boden karg.</text>
     <text locale="en">The region is ravaged, the ground infertile.</text>
   </message>
+  <message name="santa_f" section="events">
+    <type>
+      <arg name="item" type="resource"/>
+    </type>
+    <text locale="de">'Ho ho ho!' Ein dicker Gnom fliegt auf einem von
+    8 Jungdrachen gezogenen Schlitten durch die Nacht und vermacht Deiner
+    Partei eine $resource($item,1). (Um diesen Gegenstand einer Einheit zu geben, gib
+    ihr den Befehl 'BEANSPRUCHE 1 $resource($item,1)').</text>
+    <text locale="en">'Ho ho ho!' A fat little gnome Gnom on a sled
+    pulled by 8 young dragons flies through the stary night and presents
+    your faction with a $resource($item,1).</text>
+  </message>
 
+  <message name="target_region_invalid">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+        <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Ungültige Zielregion."</text>
+      <text locale="en">"$unit($unit) in $region($region): '$order($command)' - invalid target region."</text>
+    </type>
+  </message>
+  
+  <message name="missing_direction">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+        <text locale="de">"$unit($unit) in $region($region): '$order($command)' - keine Richtung angegeben."</text>
+      <text locale="en">"$unit($unit) in $region($region): '$order($command)' - no direction was specified."</text>
+    </type>
+  </message>
+  
+  <message name="target_region_not_empty">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+        <text locale="de">"$unit($unit) in $region($region): '$order($command)' - In der Zielregion befinden sich noch Einheiten."</text>
+      <text locale="en">"$unit($unit) in $region($region): '$order($command)' - There are units in the target region."</text>
+    </type>
+  </message>
+  
   <message name="force_leave_ship" section="events">
     <type>
       <arg name="unit" type="unit"/>

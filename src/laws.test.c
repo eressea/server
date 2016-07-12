@@ -1061,6 +1061,7 @@ static void test_ally_cmd(CuTest *tc) {
     test_cleanup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     f = test_create_faction(0);
+
     u->faction->locale = lang = get_or_create_locale("de");
     locale_setstring(lang, parameters[P_NOT], "NICHT");
     locale_setstring(lang, parameters[P_GUARD], "BEWACHE");
@@ -1105,8 +1106,9 @@ static void test_nmr_warnings(CuTest *tc) {
     CuAssertIntEquals(tc, 0, f1->age);
     nmr_warnings();
     CuAssertPtrNotNull(tc, f1->msgs);
-    CuAssertPtrNotNull(tc, test_find_messagetype(f1->msgs, "changepasswd"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f1->msgs, "nmr_warning"));
     CuAssertPtrNotNull(tc, f2->msgs);
+    CuAssertPtrNotNull(tc, f2->msgs->begin);
     CuAssertPtrNotNull(tc, test_find_messagetype(f2->msgs, "nmr_warning"));
     CuAssertPtrNotNull(tc, test_find_messagetype(f2->msgs, "nmr_warning_final"));
     test_cleanup();
@@ -1227,6 +1229,8 @@ static void test_show_without_item(CuTest *tc)
     test_cleanup();
 
     loc = get_or_create_locale("de");
+    locale_setstring(loc, parameters[P_ANY], "ALLE");
+    init_parameters(loc);
 
     r = test_create_region(0, 0, test_create_terrain("testregion", LAND_REGION));
     f = test_create_faction(test_create_race("human"));
@@ -1295,6 +1299,46 @@ static void test_immigration(CuTest * tc)
     test_cleanup();
 }
 
+static void test_demon_hunger(CuTest * tc)
+{
+    const resource_type *rtype;
+    region *r;
+    race *rc;
+    faction *f;
+    unit *u;
+    message* msg;
+
+    test_cleanup();
+    test_create_world();
+    r = findregion(0, 0);
+    rc = test_create_race("demon");
+    f = test_create_faction(rc);
+    u = test_create_unit(f, r);
+    u->hp = 999;
+
+    config_set("hunger.demons.peasant_tolerance", "1");
+
+    rtype = get_resourcetype(R_SILVER);
+    i_change(&u->items, rtype->itype, 30);
+    scale_number(u, 1);
+    rsetpeasants(r, 0);
+
+    get_food(r);
+
+    CuAssertIntEquals(tc, 20, i_get(u->items, rtype->itype));
+    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "malnourish"));
+
+    config_set("hunger.demons.peasant_tolerance", "0");
+
+    get_food(r);
+
+    CuAssertIntEquals(tc, 10, i_get(u->items, rtype->itype));
+    msg = test_get_last_message(u->faction->msgs);
+    CuAssertStrEquals(tc, "malnourish", test_get_messagetype(msg));
+
+    test_cleanup();
+}
+
 CuSuite *get_laws_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -1354,6 +1398,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_name_ship);
     SUITE_ADD_TEST(suite, test_show_without_item);
     SUITE_ADD_TEST(suite, test_immigration);
+    SUITE_ADD_TEST(suite, test_demon_hunger);
 
     return suite;
 }

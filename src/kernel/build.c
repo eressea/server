@@ -23,6 +23,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "alchemy.h"
 #include "direction.h"
 #include "move.h"
+#include "study.h"
 #include "laws.h"
 #include "skill.h"
 #include "lighthouse.h"

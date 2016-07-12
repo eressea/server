@@ -1,3 +1,48 @@
+local function get_direction(locale, token)
+    local dir = eressea.locale.direction(locale, token)
+    if dir and dir>=0 then
+        return dir
+    end
+    return nil
+end
+
+local function error_message(msg, u, ord)
+    local msg = message.create(msg)
+    msg:set_unit("unit", u)
+    msg:set_region("region", u.region)
+    msg:set_order("command", ord)
+    msg:send_faction(u.faction)
+    return -1
+end
+
+function use_snowglobe(u, amount, token, ord)
+    local transform = {
+        ocean = "glacier",
+        firewall = "volcano",
+        volcano = "mountain",
+        desert = "plain"
+    }
+    local direction = get_direction(u.faction.locale, token)
+    if direction then
+        local r = u.region:next(direction)
+        if r.units() then
+            return error_message('target_region_not_empty', u, ord)
+        end
+        if r then 
+            local trans = transform[r.terrain]
+            if trans then
+                r.terrain = trans
+                return 1
+            else
+                return error_message('target_region_invalid', u, ord)
+            end
+        else
+            return error_message('target_region_invalid', u, ord)
+        end
+    end
+    return error_message('missing_direction', u, ord)
+end
+
 function use_snowman(u, amount)
     if amount>0 and u.region.terrain == "glacier" then
         local man = unit.create(u.faction, u.region)

@@ -148,6 +148,8 @@ struct param;
     const char *reportpath(void);
     void set_reportpath(const char *);
 
+    int create_directories(void);
+
     void kernel_init(void);
     void kernel_done(void);
 
@@ -185,6 +187,7 @@ struct param;
     double config_get_flt(const char *key, double def);
     bool config_token(const char *key, const char *tok);
 
+    char * join_path(const char *p1, const char *p2, char *dst, size_t len);
     bool ExpensiveMigrants(void);
     int NMRTimeout(void);
     int LongHunger(const struct unit *u);

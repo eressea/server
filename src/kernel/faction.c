@@ -19,7 +19,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include <kernel/config.h>
 #include "faction.h"
-
 #include "alliance.h"
 #include "ally.h"
 #include "curse.h"
@@ -46,6 +45,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/log.h>
 #include <util/parser.h>
+#include <util/password.h>
 #include <util/resolve.h>
 #include <util/rng.h>
 #include <util/variant.h>
@@ -71,9 +71,12 @@ faction *factions;
  * but you should still call funhash and remove the faction from the
  * global list.
  */
-void free_faction(faction * f)
+static void free_faction(faction * f)
 {
     funhash(f);
+    if (f->alliance && f->alliance->_leader == f) {
+        setalliance(f, 0);
+    }
     if (f->msgs) {
         free_messagelist(f->msgs->begin);
         free(f->msgs);
@@ -101,7 +104,7 @@ void free_faction(faction * f)
 
     free(f->email);
     free(f->banner);
-    free(f->passw);
+    free(f->_password);
     free(f->name);
     if (f->seen_factions) {
         ql_free(f->seen_factions);
@@ -214,6 +217,7 @@ int resolve_faction(variant id, void *address)
             result = -1;
         }
     }
+    assert(address);
     *(faction **)address = f;
     return result;
 }
@@ -248,11 +252,13 @@ faction *addfaction(const char *email, const char *password,
         log_warning("Invalid email address for faction %s: %s\n", itoa36(f->no), email);
     }
 
-    faction_setpassword(f, password);
+    if (!password) password = itoa36(rng_int());
+    faction_setpassword(f, password_encode(password, PASSWORD_DEFAULT));
+    ADDMSG(&f->msgs, msg_message("changepasswd", "value", password));
 
     f->alliance_joindate = turn;
     f->lastorders = turn;
-    f->alive = 1;
+    f->_alive = true;
     f->age = 0;
     f->race = frace;
     f->magiegebiet = 0;
@@ -310,30 +316,57 @@ unit *addplayer(region * r, faction * f)
 
 bool checkpasswd(const faction * f, const char *passwd)
 {
-    return (passwd && unicode_utf8_strcasecmp(f->passw, passwd) == 0);
+    if (!passwd) return false;
+
+    if (f->_password && password_verify(f->_password, passwd) == VERIFY_FAIL) {
+        log_warning("password check failed: %s", factionname(f));
+        return false;
+    }
+    return true;
 }
 
-variant read_faction_reference(struct storage * store)
+variant read_faction_reference(gamedata * data)
 {
     variant id;
-    READ_INT(store, &id.i);
+    READ_INT(data->store, &id.i);
     return id;
 }
 
 void write_faction_reference(const faction * f, struct storage *store)
 {
+    assert(!f || f->_alive);
     WRITE_INT(store, f ? f->no : 0);
 }
 
-void destroyfaction(faction * f)
-{
-    unit *u = f->units;
-    faction *ff;
+static faction *dead_factions;
 
-    if (!f->alive) {
-        return;
+void free_flist(faction **fp) {
+    faction * flist = *fp;
+    while (flist) {
+        faction *f = flist;
+        flist = f->next;
+        free_faction(f);
+        free(f);
     }
+    *fp = 0;
+}
+
+void free_factions(void) {
+    free_flist(&factions);
+    free_flist(&dead_factions);
+}
+
+void destroyfaction(faction ** fp)
+{
+    faction * f = *fp;
+    unit *u = f->units;
+
+    *fp = f->next;
+    f->next = dead_factions;
+    dead_factions = f;
+
     fset(f, FFL_QUIT);
+    f->_alive = false;
 
     if (f->spellbook) {
         spellbook_clear(f->spellbook);
@@ -389,35 +422,48 @@ void destroyfaction(faction * f)
             u = u->nextF;
         }
     }
-    f->alive = 0;
-    /* no way!  f->units = NULL; */
+
     handle_event(f->attribs, "destroy", f);
+#if 0
+    faction *ff;
     for (ff = factions; ff; ff = ff->next) {
         group *g;
-        ally *sf, *sfn;
+        ally *sf, **sfp;
 
-        /* Alle HELFE für die Partei löschen */
-        for (sf = ff->allies; sf; sf = sf->next) {
-            if (sf->faction == f) {
-                removelist(&ff->allies, sf);
-                break;
+        for (sfp = &ff->allies; *sfp;) {
+            sf = *sfp;
+            if (sf->faction == f || sf->faction == NULL) {
+                *sfp = sf->next;
+                free(sf);
             }
+            else
+                sfp = &(*sfp)->next;
         }
         for (g = ff->groups; g; g = g->next) {
-            for (sf = g->allies; sf;) {
-                sfn = sf->next;
-                if (sf->faction == f) {
-                    removelist(&g->allies, sf);
-                    break;
+            for (sfp = &g->allies; *sfp; ) {
+                sf = *sfp;
+                if (sf->faction == f || sf->faction == NULL) {
+                    *sfp = sf->next;
+                    free(sf);
                 }
-                sf = sfn;
+                else {
+                    sfp = &(*sfp)->next;
+                }
             }
         }
     }
+#endif
+
+    if (f->alliance && f->alliance->_leader == f) {
+        setalliance(f, 0);
+    }
+
+    funhash(f);
 
     /* units of other factions that were disguised as this faction
      * have their disguise replaced by ordinary faction hiding. */
     if (rule_stealth_other()) {
+        // TODO: f.alive should be tested for in get_otherfaction
         region *rc;
         for (rc = regions; rc; rc = rc->next) {
             for (u = rc->units; u; u = u->next) {
@@ -520,13 +566,12 @@ void faction_setbanner(faction * self, const char *banner)
         self->banner = _strdup(banner);
 }
 
-void faction_setpassword(faction * f, const char *passw)
+void faction_setpassword(faction * f, const char *pwhash)
 {
-    free(f->passw);
-    if (passw)
-        f->passw = _strdup(passw);
-    else
-        f->passw = _strdup(itoa36(rng_int()));
+    assert(pwhash);
+    // && pwhash[0] == '$');
+    free(f->_password);
+    f->_password = _strdup(pwhash);
 }
 
 bool valid_race(const struct faction *f, const struct race *rc)
@@ -539,11 +584,6 @@ bool valid_race(const struct faction *f, const struct race *rc)
             return (bool)(rc_find(str) == rc);
         return false;
     }
-}
-
-const char *faction_getpassword(const faction * f)
-{
-    return f->passw;
 }
 
 struct alliance *f_get_alliance(const struct faction *f)
@@ -633,59 +673,24 @@ int skill_limit(faction * f, skill_t sk)
 
 void remove_empty_factions(void)
 {
-    faction **fp, *f3;
+    faction **fp;
 
     for (fp = &factions; *fp;) {
         faction *f = *fp;
-        /* monster (0) werden nicht entfernt. alive kann beim readgame
-        * () auf 0 gesetzt werden, wenn monsters keine einheiten mehr
-        * haben. */
-        if ((f->units == NULL || f->alive == 0) && !fval(f, FFL_NOIDLEOUT)) {
-            ursprung *ur = f->ursprung;
-            while (ur && ur->id != 0)
-                ur = ur->next;
+
+        if (!(f->_alive && f->units!=NULL) && !fval(f, FFL_NOIDLEOUT)) {
             log_debug("dead: %s", factionname(f));
-
-            /* Einfach in eine Datei schreiben und sp�ter vermailen */
-
-            for (f3 = factions; f3; f3 = f3->next) {
-                ally *sf;
-                group *g;
-                ally **sfp = &f3->allies;
-                while (*sfp) {
-                    sf = *sfp;
-                    if (sf->faction == f || sf->faction == NULL) {
-                        *sfp = sf->next;
-                        free(sf);
-                    }
-                    else
-                        sfp = &(*sfp)->next;
-                }
-                for (g = f3->groups; g; g = g->next) {
-                    sfp = &g->allies;
-                    while (*sfp) {
-                        sf = *sfp;
-                        if (sf->faction == f || sf->faction == NULL) {
-                            *sfp = sf->next;
-                            free(sf);
-                        }
-                        else
-                            sfp = &(*sfp)->next;
-                    }
-                }
-            }
-
-            *fp = f->next;
-            funhash(f);
-            free_faction(f);
-            if (f->alliance && f->alliance->_leader == f) {
-                setalliance(f, 0);
-            }
-            free(f);
+            destroyfaction(fp);
         }
-        else
+        else {
             fp = &(*fp)->next;
+        }
     }
+}
+
+bool faction_alive(const faction *f) {
+    assert(f);
+    return f->_alive || (f->flags&FFL_NPC);
 }
 
 void faction_getorigin(const faction * f, int id, int *x, int *y)
@@ -794,6 +799,7 @@ attrib_type at_maxmagicians = {
     NULL,
     a_writeint,
     a_readint,
+    NULL,
     ATF_UNIQUE
 };
 
@@ -843,3 +849,28 @@ faction *dfindhash(int no)
     }
     return 0;
 }
+
+int writepasswd(void)
+{
+    FILE *F;
+    char zText[128];
+
+    join_path(basepath(), "passwd", zText, sizeof(zText));
+    F = fopen(zText, "w");
+    if (!F) {
+        perror(zText);
+    }
+    else {
+        faction *f;
+        log_info("writing passwords...");
+
+        for (f = factions; f; f = f->next) {
+            fprintf(F, "%s:%s:%s:%u\n",
+                factionid(f), f->email, f->_password, f->subscription);
+        }
+        fclose(F);
+        return 0;
+    }
+    return 1;
+}
+

@@ -1,6 +1,7 @@
 #include <platform.h>
 
 #include <magic.h>
+#include <kernel/config.h>
 #include <kernel/types.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
@@ -90,7 +91,8 @@ static void setup_sabotage(void) {
     test_cleanup();
     lang = get_or_create_locale("de");
     locale_setstring(lang, parameters[P_SHIP], "SCHIFF");
-    test_create_world();
+    locale_setstring(lang, parameters[P_ANY], "ALLE");
+    init_parameters(lang);
     init_locales();
 }
 
@@ -100,7 +102,7 @@ static void test_sabotage_self(CuTest *tc) {
     order *ord;
 
     setup_sabotage();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_region(0, 0, 0);
     assert(r);
     u = test_create_unit(test_create_faction(NULL), r);
     assert(u && u->faction && u->region == r);
@@ -122,7 +124,7 @@ static void test_sabotage_other_fail(CuTest *tc) {
     message *msg;
 
     setup_sabotage();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_region(0, 0, 0);
     assert(r);
     u = test_create_unit(test_create_faction(NULL), r);
     u2 = test_create_unit(test_create_faction(NULL), r);
@@ -151,7 +153,7 @@ static void test_sabotage_other_success(CuTest *tc) {
     order *ord;
 
     setup_sabotage();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_region(0, 0, 0);
     assert(r);
     u = test_create_unit(test_create_faction(NULL), r);
     u2 = test_create_unit(test_create_faction(NULL), r);

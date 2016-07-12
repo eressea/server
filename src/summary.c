@@ -89,7 +89,7 @@ int update_nmrs(void)
         if (fval(f, FFL_ISNEW)) {
             ++newplayers;
         }
-        else if (!fval(f, FFL_NOIDLEOUT) && f->alive) {
+        else if (!fval(f, FFL_NOIDLEOUT)) {
             int nmr = turn - f->lastorders + 1;
             if (nmr < 0 || nmr > NMRTimeout()) {
                 log_error("faction %s has %d NMRS\n", factionid(f), nmr);
@@ -152,7 +152,7 @@ static void writeturn(void)
     char zText[MAX_PATH];
     FILE *f;
 
-    sprintf(zText, "%s/datum", basepath());
+    join_path(basepath(), "datum", zText, sizeof(zText));
     f = fopen(zText, "w");
     if (!f) {
         perror(zText);
@@ -160,7 +160,7 @@ static void writeturn(void)
     }
     fputs(gamedate2(default_locale), f);
     fclose(f);
-    sprintf(zText, "%s/turn", basepath());
+    join_path(basepath(), "turn", zText, sizeof(zText));
     f = fopen(zText, "w");
     if (!f) {
         perror(zText);
@@ -178,10 +178,10 @@ void report_summary(summary * s, summary * o, bool full)
     char zText[MAX_PATH];
 
     if (full) {
-        sprintf(zText, "%s/parteien.full", basepath());
+        join_path(basepath(), "parteien.full", zText, sizeof(zText));
     }
     else {
-        sprintf(zText, "%s/parteien", basepath());
+        join_path(basepath(), "parteien", zText, sizeof(zText));
     }
     F = fopen(zText, "w");
     if (!F) {
@@ -370,7 +370,7 @@ summary *make_summary(void)
         f->nregions = 0;
         f->num_total = 0;
         f->money = 0;
-        if (f->alive && f->units) {
+        if (f->units) {
             s->factions++;
             /* Problem mit Monsterpartei ... */
             if (!is_monsters(f)) {

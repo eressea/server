@@ -55,7 +55,8 @@ extern "C" {
         int(*age) (struct attrib *, void *owner);
         /* age returns 0 if the attribute needs to be removed, !=0 otherwise */
         void(*write) (const struct attrib *, const void *owner, struct storage *);
-        int(*read) (struct attrib *, void *owner, struct storage *);       /* return AT_READ_OK on success, AT_READ_FAIL if attrib needs removal */
+        int(*read) (struct attrib *, void *owner, struct gamedata *);       /* return AT_READ_OK on success, AT_READ_FAIL if attrib needs removal */
+        void(*upgrade) (struct attrib **alist, struct attrib *a);
         unsigned int flags;
         /* ---- internal data, do not modify: ---- */
         struct attrib_type *nexthash;
@@ -63,21 +64,22 @@ extern "C" {
     } attrib_type;
 
     extern void at_register(attrib_type * at);
-    extern void at_deprecate(const char * name, int(*reader)(attrib *, void *, struct storage *));
+    extern void at_deprecate(const char * name, int(*reader)(attrib *, void *, struct gamedata *));
 
     extern attrib *a_select(attrib * a, const void *data,
         bool(*compare) (const attrib *, const void *));
     extern attrib *a_find(attrib * a, const attrib_type * at);
-    extern const attrib *a_findc(const attrib * a, const attrib_type * at);
     extern attrib *a_add(attrib ** pa, attrib * at);
     extern int a_remove(attrib ** pa, attrib * at);
     extern void a_removeall(attrib ** a, const attrib_type * at);
     extern attrib *a_new(const attrib_type * at);
+    int a_age(attrib ** attribs, void *owner);
 
-    extern int a_age(attrib ** attribs, void *owner);
-    extern int a_read(struct storage *store, attrib ** attribs, void *owner);
-    extern void a_write(struct storage *store, const attrib * attribs,
-        const void *owner);
+    int a_read_orig(struct gamedata *data, attrib ** attribs, void *owner);
+    void a_write_orig(struct storage *store, const attrib * attribs, const void *owner);
+
+    int a_read(struct gamedata *data, attrib ** attribs, void *owner);
+    void a_write(struct storage *store, const attrib * attribs, const void *owner);
 
     void free_attribs(void);
 
@@ -89,6 +91,7 @@ extern "C" {
 
 #define AT_READ_OK 0
 #define AT_READ_FAIL -1
+#define AT_READ_DEPR 1 /* a deprecated attribute was read, should run a_upgrade */
 
 #define AT_AGE_REMOVE 0         /* remove the attribute after calling age() */
 #define AT_AGE_KEEP 1           /* keep the attribute for another turn */

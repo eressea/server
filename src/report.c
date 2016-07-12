@@ -42,6 +42,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "upkeep.h"
 #include "vortex.h"
 #include "calendar.h"
+#include "teleport.h"
 
 /* kernel includes */
 #include <kernel/ally.h>
@@ -65,7 +66,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/ship.h>
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
-#include <kernel/teleport.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
@@ -1403,7 +1403,7 @@ report_template(const char *filename, report_context * ctx, const char *charset)
     const resource_type *rsilver = get_resourcetype(R_SILVER);
     faction *f = ctx->f;
     region *r;
-    FILE *F = fopen(filename, "wt");
+    FILE *F = fopen(filename, "w");
     stream strm = { 0 }, *out = &strm;
     seen_region *sr = NULL;
     char buf[8192], *bufp;
@@ -1427,7 +1427,7 @@ report_template(const char *filename, report_context * ctx, const char *charset)
     newline(out);
     newline(out);
 
-    sprintf(buf, "%s %s \"%s\"", LOC(f->locale, "ERESSEA"), factionid(f), f->passw);
+    sprintf(buf, "%s %s \"password\"", LOC(f->locale, "ERESSEA"), factionid(f));
     rps_nowrap(out, buf);
     newline(out);
     newline(out);
@@ -2067,7 +2067,7 @@ const char *charset)
     unsigned char op;
     int maxh, bytes, ix = want(O_STATISTICS);
     int wants_stats = (f->options & ix);
-    FILE *F = fopen(filename, "wt");
+    FILE *F = fopen(filename, "w");
     stream strm = { 0 }, *out = &strm;
     seen_region *sr = NULL;
     char buf[8192];
@@ -2112,9 +2112,6 @@ const char *charset)
 
     if (f->age <= 2) {
         const char *s;
-        RENDER(f, buf, sizeof(buf), ("newbie_password", "password", f->passw));
-        newline(out);
-        centre(out, buf, true);
         s = locale_getstring(f->locale, "newbie_info_1");
         if (s) {
             newline(out);

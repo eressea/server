@@ -26,6 +26,7 @@
 #include "monster.h"
 #include "laws.h"
 #include "keyword.h"
+#include "study.h"
 
 /* triggers includes */
 #include <triggers/removecurse.h>
@@ -677,7 +678,7 @@ static order *plan_dragon(unit * u)
         }
     }
 
-    if (move) {
+    if (move && (!ta || chance(0.1))) {
         /* dragon gets bored and looks for a different place to go */
         ta = set_new_dragon_target(u, u->region, DRAGON_RANGE);
     }

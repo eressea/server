@@ -2,6 +2,7 @@
 
 #include <quicklist.h>
 #include <kernel/spell.h>
+#include <util/log.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -24,6 +25,7 @@ static void test_create_a_spell(CuTest * tc)
 static void test_create_duplicate_spell(CuTest * tc)
 {
     spell *sp;
+    /* FIXME: this test emits ERROR messages (duplicate spells), inject a logger to verify that */
 
     test_cleanup();
     CuAssertPtrEquals(tc, 0, find_spell("testspell"));
@@ -36,6 +38,7 @@ static void test_create_duplicate_spell(CuTest * tc)
 static void test_create_spell_with_id(CuTest * tc)
 {
     spell *sp;
+    /* FIXME: this test emits ERROR messages (duplicate spells), inject a logger to verify that */
 
     test_cleanup();
     CuAssertPtrEquals(tc, 0, find_spellbyid(42));

@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define H_KRNL_SAVE
 
 #include <stream.h>
+#include <util/gamedata.h> // FIXME: eliminate include dependency from this file
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -30,13 +31,7 @@ extern "C" {
     struct spell;
     struct spellbook;
     struct unit;
-
-    typedef struct gamedata {
-        struct storage *store;
-        stream strm;
-        int version;
-        int encoding;
-    } gamedata;
+    struct gamedata;
 
 #define MAX_INPUT_SIZE	DISPLAYSIZE*2
     /* Nach MAX_INPUT_SIZE brechen wir das Einlesen der Zeile ab und nehmen an,
@@ -55,34 +50,40 @@ extern "C" {
     void read_items(struct storage *store, struct item **it);
     void write_items(struct storage *store, struct item *it);
 
-    void read_spellbook(struct spellbook **bookp, struct storage *store, int(*get_level)(const struct spell * sp, void *), void * cbdata);
+    void read_spellbook(struct spellbook **bookp, struct gamedata *data, int(*get_level)(const struct spell * sp, void *), void * cbdata);
     void write_spellbook(const struct spellbook *book, struct storage *store);
+
+    void write_attribs(struct storage *store, struct attrib *alist, const void *owner);
+    int read_attribs(struct gamedata *store, struct attrib **alist, void *owner);
 
     void write_unit(struct gamedata *data, const struct unit *u);
     struct unit *read_unit(struct gamedata *data);
 
-    int a_readint(struct attrib *a, void *owner, struct storage *store);
+    int a_readint(struct attrib *a, void *owner, struct gamedata *);
     void a_writeint(const struct attrib *a, const void *owner,
         struct storage *store);
-    int a_readshorts(struct attrib *a, void *owner, struct storage *store);
+    int a_readshorts(struct attrib *a, void *owner, struct gamedata *);
     void a_writeshorts(const struct attrib *a, const void *owner,
         struct storage *store);
-    int a_readchars(struct attrib *a, void *owner, struct storage *store);
+    int a_readchars(struct attrib *a, void *owner, struct gamedata *);
     void a_writechars(const struct attrib *a, const void *owner,
         struct storage *store);
-    int a_readvoid(struct attrib *a, void *owner, struct storage *store);
+    int a_readvoid(struct attrib *a, void *owner, struct gamedata *);
     void a_writevoid(const struct attrib *a, const void *owner,
-        struct storage *store);
-    int a_readstring(struct attrib *a, void *owner, struct storage *store);
+        struct storage *);
+    int a_readstring(struct attrib *a, void *owner, struct gamedata *);
     void a_writestring(const struct attrib *a, const void *owner,
-        struct storage *store);
+    struct storage *);
     void a_finalizestring(struct attrib *a);
 
     void create_backup(char *file);
 
-    struct gamedata *gamedata_open(const char *filename, const char *mode);
-    void gamedata_close(struct gamedata *data);
+    int write_game(gamedata *data);
+    int read_game(gamedata *data);
 
+    /* test-only functions that give access to internal implementation details (BAD) */
+    void _test_write_password(struct gamedata *data, const struct faction *f);
+    void _test_read_password(struct gamedata *data, struct faction *f);
 #ifdef __cplusplus
 }
 #endif

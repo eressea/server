@@ -121,6 +121,7 @@ attrib_type at_npcfaction = {
     NULL,
     a_writeint,
     a_readint,
+    NULL,
     ATF_UNIQUE
 };
 
@@ -170,6 +171,9 @@ int
 alliedgroup(const struct plane *pl, const struct faction *f,
     const struct faction *f2, const struct ally *sf, int mode)
 {
+    if (!(faction_alive(f) && faction_alive(f2))) {
+        return 0;
+    }
     while (sf && sf->faction != f2)
         sf = sf->next;
     if (sf == NULL) {
@@ -177,10 +181,10 @@ alliedgroup(const struct plane *pl, const struct faction *f,
     }
     mode = ally_mode(sf, mode) | (mode & autoalliance(pl, f, f2));
     if (AllianceRestricted()) {
-        if (a_findc(f->attribs, &at_npcfaction)) {
+        if (a_find(f->attribs, &at_npcfaction)) {
             return mode;
         }
-        if (a_findc(f2->attribs, &at_npcfaction)) {
+        if (a_find(f2->attribs, &at_npcfaction)) {
             return mode;
         }
         if (f->alliance != f2->alliance) {
@@ -229,7 +233,7 @@ int alliedunit(const unit * u, const faction * f2, int mode)
 
         sf = u->faction->allies;
         if (fval(u, UFL_GROUP)) {
-            const attrib *a = a_findc(u->attribs, &at_group);
+            const attrib *a = a_find(u->attribs, &at_group);
             if (a != NULL)
                 sf = ((group *)a->data.v)->allies;
         }

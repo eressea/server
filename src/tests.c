@@ -5,6 +5,7 @@
 #include "prefix.h"
 
 #include <kernel/config.h>
+#include <kernel/plane.h>
 #include <kernel/region.h>
 #include <kernel/terrain.h>
 #include <kernel/item.h>
@@ -45,14 +46,19 @@ struct race *test_create_race(const char *name)
 
 struct region *test_create_region(int x, int y, const terrain_type *terrain)
 {
-    region *r = new_region(x, y, NULL, 0);
+    region *r = findregion(x, y);
+    if (!r) {
+        r = new_region(x, y, findplane(x, y), 0);
+    }
     if (!terrain) {
         terrain_type *t = get_or_create_terrain("plain");
         t->size = 1000;
         fset(t, LAND_REGION|CAVALRY_REGION|FOREST_REGION);
         terraform_region(r, t);
-    } else
+    }
+    else {
         terraform_region(r, terrain);
+    }
     rsettrees(r, 0, 0);
     rsettrees(r, 1, 0);
     rsettrees(r, 2, 0);
@@ -64,6 +70,7 @@ struct region *test_create_region(int x, int y, const terrain_type *terrain)
 struct faction *test_create_faction(const struct race *rc)
 {
     faction *f = addfaction("nobody@eressea.de", NULL, rc ? rc : test_create_race("human"), default_locale, 0);
+    test_clear_messages(f);
     return f;
 }
 
@@ -78,6 +85,7 @@ void test_cleanup(void)
 {
     int i;
 
+    free_gamedata();
     free_terrains();
     free_resources();
     free_config();
@@ -89,7 +97,6 @@ void test_cleanup(void)
     free_shiptypes();
     free_races();
     free_spellbooks();
-    free_gamedata();
     free_seen();
     free_prefixes();
     mt_clear();
@@ -102,7 +109,7 @@ void test_cleanup(void)
     if (errno) {
         int error = errno;
         errno = 0;
-        log_error("errno: %d", error);
+        log_error("errno: %d (%s)", error, strerror(error));
     }
 
     random_source_reset();
@@ -147,11 +154,13 @@ ship_type * test_create_shiptype(const char * name)
         stype->construction->skill = SK_SHIPBUILDING;
     }
 
+    if (stype->coasts) {
+        free(stype->coasts);
+    }
     stype->coasts =
-        (terrain_type **)malloc(sizeof(terrain_type *)*2);
-    stype->coasts[0] = get_or_create_terrain("plain");
+        (terrain_type **)malloc(sizeof(terrain_type *) * 2);
+    stype->coasts[0] = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION | SAIL_INTO | FLY_INTO);
     stype->coasts[1] = NULL;
-
     if (default_locale) {
         locale_setstring(default_locale, name, name);
     }
@@ -254,6 +263,12 @@ void test_create_world(void)
     struct locale * loc;
 
     loc = get_or_create_locale("de");
+
+    locale_setstring(loc, parameters[P_SHIP], "SCHIFF");
+    locale_setstring(loc, parameters[P_ANY], "ALLE");
+    init_parameters(loc);
+
+    locale_setstring(loc, "status_aggressive", "aggressiv");
     locale_setstring(loc, keyword(K_RESERVE), "RESERVIEREN");
     locale_setstring(loc, "money", "SILBER");
     init_resources();

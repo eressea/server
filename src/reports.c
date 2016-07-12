@@ -354,7 +354,7 @@ const char **illusion)
 
         bt_illusion = bt_find("illusioncastle");
         if (bt_illusion && b->type == bt_illusion) {
-            const attrib *a = a_findc(b->attribs, &at_icastle);
+            const attrib *a = a_find(b->attribs, &at_icastle);
             if (a != NULL) {
                 *illusion = buildingtype(icastle_type(a), b, b->size);
             }
@@ -1385,16 +1385,8 @@ static void prepare_reports(void)
 
     for (r = regions; r; r = r->next) {
         unit *u;
-        plane *p = rplane(r);
 
         reorder_units(r);
-
-        if (p) {
-            watcher *w = p->watchers;
-            for (; w; w = w->next) {
-                faction_add_seen(w->faction, r, w->mode);
-            }
-        }
 
         /* Region owner get always the Lighthouse report */
         if (bt_lighthouse && config_token("rules.region_owner_pay_building", bt_lighthouse->_name)) {
@@ -1464,8 +1456,6 @@ static region *lastregion(faction * f)
 
     /* we continue from the best region and look for travelthru etc. */
     for (r = f->last->next; r; r = r->next) {
-        plane *p = rplane(r);
-
         /* search the region for travelthru-attributes: */
         if (fval(r, RF_TRAVELUNIT)) {
             travelthru_map(r, cb_set_last, f);
@@ -1474,9 +1464,6 @@ static region *lastregion(faction * f)
             continue;
         if (check_leuchtturm(r, f))
             f->last = r;
-        if (p && is_watcher(p, f)) {
-            f->last = r;
-        }
     }
     return f->last->next;
 #else
@@ -1540,16 +1527,6 @@ static void prepare_report(struct report_context *ctx, faction *f)
     ctx->last = lastregion(f);
 }
 
-static void mkreportdir(const char *rpath) {
-    if (_mkdir(rpath) != 0) {
-        if (_access(rpath, 0) < 0) {
-            log_error("could not create reports directory %s: %s", rpath, strerror(errno));
-            abort();
-        }
-    }
-    errno = 0;
-}
-
 int write_reports(faction * f, time_t ltime)
 {
     unsigned int backup = 1, maxbackup = 128 * 1000;
@@ -1557,24 +1534,24 @@ int write_reports(faction * f, time_t ltime)
     struct report_context ctx;
     const char *encoding = "UTF-8";
     report_type *rtype;
-    const char *path = reportpath();
 
     if (noreports) {
         return false;
     }
     prepare_report(&ctx, f);
     get_addresses(&ctx);
-    mkreportdir(path); // FIXME: too many mkdir calls! init_reports is enough
     log_debug("Reports for %s:", factionname(f));
     for (rtype = report_types; rtype != NULL; rtype = rtype->next) {
         if (f->options & rtype->flag) {
             int error;
             do {
-                char filename[MAX_PATH];
-                sprintf(filename, "%s/%d-%s.%s", reportpath(), turn, factionid(f),
+                char filename[32];
+                char path[MAX_PATH];
+                sprintf(filename, "%d-%s.%s", turn, factionid(f),
                     rtype->extension);
+                join_path(reportpath(), filename, path, sizeof(path));
                 error = 0;
-                if (rtype->write(filename, &ctx, encoding) == 0) {
+                if (rtype->write(path, &ctx, encoding) == 0) {
                     gotit = true;
                 }
                 if (errno) {
@@ -1635,14 +1612,8 @@ static void check_messages_exist(void) {
 int init_reports(void)
 {
     check_messages_exist();
-
+    create_directories();
     prepare_reports();
-    {
-        if (_access(reportpath(), 0) != 0) {
-            return 0;
-        }
-    }
-    mkreportdir(reportpath());
     return 0;
 }
 
@@ -1659,8 +1630,7 @@ int reports(void)
     report_donations();
     remove_empty_units();
 
-    mkreportdir(rpath); // FIXME: init_reports already does this?
-    sprintf(path, "%s/reports.txt", rpath);
+    join_path(rpath, "reports.txt", path, sizeof(path));
     mailit = fopen(path, "w");
     if (mailit == NULL) {
         log_error("%s could not be opened!\n", path);
@@ -1676,15 +1646,6 @@ int reports(void)
     if (mailit)
         fclose(mailit);
     free_seen();
-#ifdef GLOBAL_REPORT
-    {
-        const char *str = config_get("globalreport");
-        if (str != NULL) {
-            sprintf(path, "%s/%s.%u.cr", reportpath(), str, turn);
-            global_report(path);
-        }
-    }
-#endif
     return retval;
 }
 

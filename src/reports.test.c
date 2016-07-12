@@ -253,6 +253,7 @@ static void test_write_unit(CuTest *tc) {
     race *rc;
     struct locale *lang;
     char buffer[1024];
+    /* FIXME: test emits ERROR: no translation for combat status status_aggressive in locale de */
 
     test_cleanup();
     rc = rc_get_or_create("human");
@@ -261,6 +262,7 @@ static void test_write_unit(CuTest *tc) {
     locale_setstring(lang, "nr_skills", "Talente");
     locale_setstring(lang, "skill::sailing", "Segeln");
     locale_setstring(lang, "skill::alchemy", "Alchemie");
+    locale_setstring(lang, "status_aggressive", "aggressiv");
     init_skills(lang);
     u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
     u->faction->locale = lang;
@@ -270,15 +272,15 @@ static void test_write_unit(CuTest *tc) {
     unit_setid(u, 1);
 
     bufunit(u->faction, u, 0, 0, buffer, sizeof(buffer));
-    CuAssertStrEquals(tc, "Hodor (1), 1 human, status_aggressive.", buffer);
+    CuAssertStrEquals(tc, "Hodor (1), 1 human, aggressiv.", buffer);
 
     set_level(u, SK_SAILING, 1);
     bufunit(u->faction, u, 0, 0, buffer, sizeof(buffer));
-    CuAssertStrEquals(tc, "Hodor (1), 1 human, status_aggressive, Talente: Segeln 1.", buffer);
+    CuAssertStrEquals(tc, "Hodor (1), 1 human, aggressiv, Talente: Segeln 1.", buffer);
 
     set_level(u, SK_ALCHEMY, 1);
     bufunit(u->faction, u, 0, 0, buffer, sizeof(buffer));
-    CuAssertStrEquals(tc, "Hodor (1), 1 human, status_aggressive, Talente: Segeln 1, Alchemie 2.", buffer);
+    CuAssertStrEquals(tc, "Hodor (1), 1 human, aggressiv, Talente: Segeln 1, Alchemie 2.", buffer);
 
     f = test_create_faction(0);
     f->locale = get_or_create_locale("de");
@@ -403,7 +405,8 @@ static void test_write_spell_syntax(CuTest *tc) {
     set_parameter(spell, "kc+");
     check_spell_syntax(tc, "kc+", &spell,
         "  ZAUBERE \"Testzauber\" ( REGION | EINHEIT <enr> [<enr> ...] | SCHIFF <snr>\n  [<snr> ...] | BURG <bnr> [<bnr> ...] )");
-
+    spellbook_clear(spell.spb);
+    free(spell.spb);
     test_cleanup();
 }
 

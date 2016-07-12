@@ -19,6 +19,7 @@ without prior permission by the authors of Eressea.
 #include "bind_message.h"
 #include "bind_building.h"
 #include "bind_faction.h"
+#include "bind_order.h"
 #include "bind_ship.h"
 #include "bind_gmtool.h"
 #include "bind_region.h"
@@ -26,6 +27,7 @@ without prior permission by the authors of Eressea.
 #include "console.h"
 #include "reports.h"
 #include "seen.h"
+#include "study.h"
 #include "calendar.h"
 
 #include <kernel/config.h>
@@ -44,7 +46,6 @@ without prior permission by the authors of Eressea.
 #include <kernel/item.h>
 #include <kernel/order.h>
 #include <kernel/ship.h>
-#include <kernel/teleport.h>
 #include <kernel/faction.h>
 #include <kernel/save.h>
 #include <kernel/spell.h>
@@ -53,6 +54,7 @@ without prior permission by the authors of Eressea.
 #include "creport.h"
 #include "economy.h"
 #include "summary.h"
+#include "teleport.h"
 #include "laws.h"
 #include "monster.h"
 #include "market.h"
@@ -95,7 +97,7 @@ TOLUA_PKG(game);
 int log_lua_error(lua_State * L)
 {
     const char *error = lua_tostring(L, -1);
-    log_fatal("LUA call failed.\n%s\n", error);
+    log_fatal("Lua call failed.\n%s\n", error);
     lua_pop(L, 1);
     return 1;
 }
@@ -185,8 +187,8 @@ static int tolua_getkey(lua_State * L)
 {
     const char *name = tolua_tostring(L, 1, 0);
     int flag = atoi36(name);
-    attrib *a = find_key(global.attribs, flag);
-    lua_pushboolean(L, a != NULL);
+
+    lua_pushboolean(L, key_get(global.attribs, flag));
     return 1;
 }
 
@@ -208,12 +210,11 @@ static int tolua_setkey(lua_State * L)
     const char *name = tolua_tostring(L, 1, 0);
     int value = tolua_toboolean(L, 2, 0);
     int flag = atoi36(name);
-    attrib *a = find_key(global.attribs, flag);
-    if (a == NULL && value) {
-        add_key(&global.attribs, flag);
+    if (value) {
+        key_set(&global.attribs, flag);
     }
-    else if (a != NULL && !value) {
-        a_remove(&global.attribs, a);
+    else {
+        key_unset(&global.attribs, flag);
     }
     return 0;
 }
@@ -1157,6 +1158,7 @@ lua_State *lua_init(void) {
     tolua_faction_open(L);
     tolua_unit_open(L);
     tolua_message_open(L);
+    tolua_order_open(L);
     tolua_dict_open(L);
 #ifdef USE_CURSES
     tolua_gmtool_open(L);
@@ -1182,6 +1184,7 @@ int eressea_run(lua_State *L, const char *luafile)
         err = lua_pcall(L, 1, 1, -3);
         if (err != 0) {
             log_lua_error(L);
+            assert(!"Lua syntax error? check log.");
         }
         else {
             if (lua_isnumber(L, -1)) {

@@ -31,7 +31,6 @@ extern "C" {
     extern bool inhabitable(const struct region *r);
     extern bool is_astral(const struct region *r);
     extern struct plane *get_astralplane(void);
-    extern struct plane *get_normalplane(void);
 
     void create_teleport_plane(void);
     void set_teleport_plane_regiontypes(void);

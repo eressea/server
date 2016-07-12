@@ -257,8 +257,59 @@
       the bearer for one week.</text>
     </string>
     <string name="skillpotion">
-        <text locale="en">The recipe of this potion is a well kept secret. Some even say it couldn't be brewed by mere mortals. One thing is certain though, the drinker receives further insight into any learned skills, which furthers their progress towards the mastery of those skills.</text>
-        <text locale="de">Die Herstellung dieses Trunkes ist ein wohlgehütetes Geheimnis. Manche behaupten gar, von Sterblichen könne er gar nicht gebraut werden. Tatsache ist, dass er dem Trinkenden tiefere Einsicht in seine erlernten Talente gewährt, was ihn in der Meisterung dieser Talente voranbringt.</text>
+      <text locale="de">
+      Die Herstellung dieses Trunkes ist ein wohlgehütetes Geheimnis. Manche 
+      behaupten gar, von Sterblichen könne er gar nicht gebraut werden. 
+      Tatsache ist, dass er dem Trinkenden tiefere Einsicht in seine erlernten 
+      Talente gewährt, was ihn in der Meisterung dieser Talente voranbringt.
+      </text>
+      <text locale="en">
+      The recipe of this potion is a well kept secret. Some even say it 
+      couldn't be brewed by mere mortals. One thing is certain though, the 
+      drinker receives further insight into any learned skills, which furthers 
+      their progress towards the mastery of those skills.
+      </text>
+    </string>
+    <string name="snowglobe">
+      <text locale="de">
+      Eine Kugel aus Kristallglas von circa drei Zoll Durchmesser, welche auf 
+      einem Sockel aus Granit ruht.
+      Im Inneren tanzen unzählige winzige Schneeflocken munter umher. Auf der 
+      Unterseite des Sockels ist eine goldene Windrose mit den sechs 
+      Himmelsrichtungen abgebildet. Eigentlich ein sehr schöner Anblick, doch 
+      strahlt sie eine namenlose Kälte aus.
+      Unter Magiern und anderen der arkanen Künste kundigen ist die Funktion 
+      und Wirkungsweise des Artefaktes heftig umstritten. Einig scheint man 
+      sich darüber zu sein, dass in dieser kleinen Kugel so viel Kälte 
+      gefangen ist, dass es dauerhafte Folgen für eine weiträumige Umgebung 
+      hätte wenn man sie zerstört. Größte Brände ließen sich damit wohl 
+      löschen, Vulkane besänftigen und Unmengen von Wasser zum gefrieren 
+      bringen. Doch auch in weniger extremen Umgebungen würden sich bestimmt 
+      dauerhafte Veränderungen ereignen.
+      Es wäre sicherlich nicht zu empfehlen das Kleinod einfach fallen zu 
+      lassen. Man sollte es anstelle dessen so weit wie möglich von sich 
+      schleudern und dafür sorge tragen, dass sich am Einschlagsort kein 
+      Lebewesen aufhält. So man denn eine Benutzung tatsächlich riskieren 
+      will. 
+      (BENUTZE Schneekugel &lt;HIMMELSRICHTUNG&gt;)
+      </text>
+      <text locale="en">
+      A sphere with a diameter of three inches made of crystal glass, sitting 
+      on a granite base.
+      On the inside countless tiny snowflakes dance around lively. On the 
+      bottom of the base a golden compass rose is engraved. A beautiful sight 
+      to behold, but it emanates a nameless cold.
+      Among mages and others knowledgeable in the arcane arts the function and 
+      effect of the artefact are disputed intensely. Although there is 
+      agreement about something: upon release the intensity of the contained 
+      cold would have permanent repercussions for a large area. Gigantic fires 
+      would be extinguished, volcanos quelled and large bodies of water frozen 
+      solid. In less extreme environments permanent changes were also probable.
+      Therefore it isn't recommended to drop the cold treasure. It should be 
+      thrown far off instead, while making sure there is no living being 
+      within the impact zone, if one is willing to risk the usage. 
+      (USE "snow globe" &lt;DIRECTION&gt;)
+      </text>
     </string>
   </namespace>
 
@@ -1590,6 +1641,14 @@
   <string name="snowman">
     <text locale="de">Schneemann</text>
     <text locale="en">snowman</text>
+  </string>
+  <string name="snowglobe">
+    <text locale="de">Schneekugel</text>
+    <text locale="en">snow globe</text>
+  </string>
+  <string name="snowglobe_p">
+    <text locale="de">Schneekugeln</text>
+    <text locale="en">snow globes</text>
   </string>
   <string name="snowman_p">
     <text locale="de">Schneemänner</text>

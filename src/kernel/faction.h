@@ -30,7 +30,8 @@ extern "C" {
     struct item;
     struct seen_region;
     struct attrib_type;
-
+    struct gamedata;
+    
     extern struct attrib_type at_maxmagicians;
     /* SMART_INTERVALS: define to speed up finding the interval of regions that a
        faction is in. defining this speeds up the turn by 30-40% */
@@ -68,7 +69,7 @@ extern "C" {
         char *name;
         char *banner;
         char *email;
-        char *passw;
+        char *_password;
         int max_spelllevel;
         struct spellbook *spellbook;
         const struct locale *locale;
@@ -82,8 +83,8 @@ extern "C" {
         int num_total;              /* Anzahl Personen mit Monstern */
         int options;
         int no_units;
-        struct ally *allies;
-        struct group *groups;
+        struct ally *allies; /* alliedgroup and others should check sf.faction.alive before using a faction from f.allies */
+        struct group *groups; /* alliedgroup and others should check sf.faction.alive before using a faction from f.groups */
         int nregions;
         int money;
         score_t score;
@@ -103,7 +104,7 @@ extern "C" {
         struct item *items;         /* items this faction can claim */
         struct seen_region **seen;
         struct quicklist *seen_factions;
-        bool alive;              /* enno: sollte ein flag werden */
+        bool _alive;              /* enno: sollte ein flag werden */
     } faction;
 
     extern struct faction *factions;
@@ -121,7 +122,10 @@ extern "C" {
     struct faction *addfaction(const char *email, const char *password,
         const struct race *frace, const struct locale *loc, int subscription);
     bool checkpasswd(const faction * f, const char *passwd);
-    void destroyfaction(faction * f);
+    int writepasswd(void);
+    void destroyfaction(faction ** f);
+
+    bool faction_alive(const struct faction *f);
 
     void set_alliance(struct faction *a, struct faction *b, int status);
     int get_alliance(const struct faction *a, const struct faction *b);
@@ -130,11 +134,11 @@ extern "C" {
 
     void write_faction_reference(const struct faction *f,
         struct storage *store);
-    variant read_faction_reference(struct storage *store);
+    variant read_faction_reference(struct gamedata *store);
     int resolve_faction(variant data, void *addr);
 
     void renumber_faction(faction * f, int no);
-    void free_faction(struct faction *f);
+    void free_factions(void);
     void remove_empty_factions(void);
 
 #ifdef SMART_INTERVALS
@@ -150,8 +154,7 @@ extern "C" {
     const char *faction_getemail(const struct faction *self);
     void faction_setemail(struct faction *self, const char *email);
 
-    const char *faction_getpassword(const struct faction *self);
-    void faction_setpassword(struct faction *self, const char *password);
+    void faction_setpassword(struct faction *self, const char *pwhash);
     bool valid_race(const struct faction *f, const struct race *rc);
 
     void faction_getorigin(const struct faction * f, int id, int *x, int *y);

@@ -36,14 +36,14 @@ extern "C" {
     } group;
 
     extern struct attrib_type at_group;   /* attribute for units assigned to a group */
-    extern bool join_group(struct unit *u, const char *name);
+    extern struct group *join_group(struct unit *u, const char *name);
     extern void set_group(struct unit *u, struct group *g);
     extern struct group * get_group(const struct unit *u);
     extern void free_group(struct group *g);
     struct group *new_group(struct faction * f, const char *name, int gid);
 
     extern void write_groups(struct storage *data, const struct faction *f);
-    extern void read_groups(struct storage *data, struct faction *f);
+    extern void read_groups(struct gamedata *data, struct faction *f);
 
 #ifdef __cplusplus
 }

@@ -21,6 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* util includes */
 #include "attrib.h"
+#include "gamedata.h"
 #include "log.h"
 #include "storage.h"
 
@@ -42,26 +43,27 @@ void write_triggers(struct storage *store, const trigger * t)
     WRITE_TOK(store, "end");
 }
 
-int read_triggers(struct storage *store, trigger ** tp)
+int read_triggers(struct gamedata *data, trigger ** tp)
 {
     for (;;) {
         trigger_type *ttype;
         char zText[128];
 
-        READ_TOK(store, zText, sizeof(zText));
+        READ_TOK(data->store, zText, sizeof(zText));
         if (!strcmp(zText, "end"))
             break;
         ttype = tt_find(zText);
         assert(ttype || !"unknown trigger-type");
         *tp = t_new(ttype);
         if (ttype->read) {
-            int i = ttype->read(*tp, store);
+            int i = ttype->read(*tp, data);
             switch (i) {
             case AT_READ_OK:
                 tp = &(*tp)->next;
                 break;
             case AT_READ_FAIL:
                 t_free(*tp);
+                free(*tp);
                 *tp = NULL;
                 break;
             default:
@@ -106,6 +108,7 @@ int handle_triggers(trigger ** triggers, void *param)
         if (t->type->handle(t, param) != 0) {
             *tp = t->next;
             t_free(t);
+            free(t);
         }
         else
             tp = &t->next;
@@ -143,14 +146,15 @@ write_handler(const attrib * a, const void *owner, struct storage *store)
     write_triggers(store, hi->triggers);
 }
 
-static int read_handler(attrib * a, void *owner, struct storage *store)
+static int read_handler(attrib * a, void *owner, gamedata *data)
 {
+    struct storage *store = data->store;
     char zText[128];
     handler_info *hi = (handler_info *)a->data.v;
 
     READ_TOK(store, zText, sizeof(zText));
     hi->event = _strdup(zText);
-    read_triggers(store, &hi->triggers);
+    read_triggers(data, &hi->triggers);
     if (hi->triggers != NULL) {
         return AT_READ_OK;
     }
@@ -258,6 +262,7 @@ const trigger_type * tt)
         if (t->type == tt) {
             *tp = t->next;
             t_free(t);
+            free(t);
         }
         else
             tp = &t->next;

@@ -228,21 +228,11 @@ static void message_faction(battle * b, faction * f, struct message *m)
 void message_all(battle * b, message * m)
 {
     bfaction *bf;
-    plane *p = rplane(b->region);
-    watcher *w;
 
     for (bf = b->factions; bf; bf = bf->next) {
         assert(bf->faction);
         message_faction(b, bf->faction, m);
     }
-    if (p)
-        for (w = p->watchers; w; w = w->next) {
-            for (bf = b->factions; bf; bf = bf->next)
-                if (bf->faction == w->faction)
-                    break;
-            if (bf == NULL)
-                message_faction(b, w->faction, m);
-        }
 }
 
 static void fbattlerecord(battle * b, faction * f, const char *s)
@@ -3595,14 +3585,15 @@ battle *make_battle(region * r)
     if (battledebug) {
         char zText[MAX_PATH];
         char zFilename[MAX_PATH];
-        sprintf(zText, "%s/battles", basepath());
+        join_path(basepath(), "battles", zText, sizeof(zText));
         if (_mkdir(zText) != 0) {
             log_error("could not create subdirectory for battle logs: %s", zText);
             battledebug = false;
         }
         else {
-            sprintf(zFilename, "%s/battle-%d-%s.log", zText, obs_count++, simplename(r));
-            bdebug = fopen(zFilename, "w");
+            sprintf(zFilename, "battle-%d-%s.log", obs_count++, simplename(r));
+            join_path(zText, zFilename, zText, sizeof(zText));
+            bdebug = fopen(zText, "w");
             if (!bdebug)
                 log_error("battles cannot be debugged");
             else {

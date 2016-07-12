@@ -1,3 +1,8 @@
+{
+   stpncpy in strcpy-sse2-unaligned.S:1659
+   Memcheck:Value8
+   fun:__stpncpy_sse2_unaligned
+}
 # old zlib version
 {
    zlib1g-dev-1:1.2.3.4.dfsg
@@ -34,4 +39,10 @@
    Memcheck:Value8
    fun:__GI___strncasecmp_l
    fun:____strtod_l_internal
+}
+
+{
+   kde-bug-309427
+   Memcheck:Cond
+   fun:__stpncpy_sse2_unaligned
 }

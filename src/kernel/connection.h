@@ -30,6 +30,7 @@ extern "C" {
     struct faction;
     struct region;
     struct storage;
+    struct gamedata;
     struct unit;
 
     extern int nextborder;
@@ -52,7 +53,7 @@ extern "C" {
         /* constructor: initialize the connection. allocate extra memory if needed */
         void(*destroy) (connection *);
         /* destructor: remove all extra memory for destruction */
-        void(*read) (connection *, struct storage *);
+        void(*read) (connection *, struct gamedata *);
         void(*write) (const connection *, struct storage *);
         bool(*block) (const connection *, const struct unit *,
             const struct region * r);
@@ -113,12 +114,12 @@ extern "C" {
     void register_bordertype(border_type * type);
     /* register a new bordertype */
 
-    int read_borders(struct storage *store);
+    int read_borders(struct gamedata *store);
     void write_borders(struct storage *store);
     void age_borders(void);
 
     /* provide default implementations for some member functions: */
-    void b_read(connection * b, struct storage *store);
+    void b_read(connection * b, struct gamedata *store);
     void b_write(const connection * b, struct storage *store);
     bool b_blockall(const connection *, const struct unit *,
         const struct region *);

@@ -1,6 +1,7 @@
 #include "bind_config.h"
 
 #include <platform.h>
+#include <kernel/config.h>
 #include <kernel/jsonconf.h>
 #include <util/log.h>
 #include <util/language.h>
@@ -58,11 +59,11 @@ int config_read(const char *filename, const char * relpath)
 
     json_relpath = relpath;
     if (relpath) {
-        _snprintf(name, sizeof(name), "%s/%s", relpath, filename);
-        F = fopen(name, "rt");
+        join_path(relpath, filename, name, sizeof(name));
+        F = fopen(name, "r");
     }
     else {
-        F = fopen(filename, "rt");
+        F = fopen(filename, "r");
     }
     if (F) {
         long size;

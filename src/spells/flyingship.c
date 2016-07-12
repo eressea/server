@@ -11,6 +11,8 @@
 #include <kernel/unit.h>
 #include <kernel/ship.h>
 
+#include <util/gamedata.h>
+
 #include <magic.h>
 
 #include <spells/shipcurse.h>
@@ -95,11 +97,11 @@ int sp_flying_ship(castorder * co)
     return cast_level;
 }
 
-static int flyingship_read(storage * store, curse * c, void *target)
+static int flyingship_read(gamedata * data, curse * c, void *target)
 {
     ship *sh = (ship *)target;
     c->data.v = sh;
-    if (global.data_version < FOSS_VERSION) {
+    if (data->version < FOSS_VERSION) {
         sh->flags |= SF_FLYING;
         return 0;
     }

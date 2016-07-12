@@ -15,6 +15,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/building.h>
 #include <kernel/version.h>
 #include <util/attrib.h>
+#include <util/gamedata.h>
 #include <util/log.h>
 #include <util/resolve.h>
 
@@ -98,14 +99,15 @@ lc_write(const struct attrib *a, const void *owner, struct storage *store)
     WRITE_TOK(store, fparam ? fparam : NULLSTRING);
 }
 
-static int lc_read(struct attrib *a, void *owner, struct storage *store)
+static int lc_read(struct attrib *a, void *owner, gamedata *data)
 {
+    struct storage *store = data->store;
     char name[NAMESIZE];
-    building_action *data = (building_action *)a->data.v;
+    building_action *bd = (building_action *)a->data.v;
     building *b = (building *)owner;
     int result = 0;
-    if (global.data_version < ATTRIBOWNER_VERSION) {
-        result = read_reference(&b, store, read_building_reference, resolve_building);
+    if (data->version < ATTRIBOWNER_VERSION) {
+        result = read_reference(&b, data, read_building_reference, resolve_building);
         assert(b == owner);
     }
     READ_TOK(store, name, sizeof(name));
@@ -115,7 +117,7 @@ static int lc_read(struct attrib *a, void *owner, struct storage *store)
         b = 0;
     }
     else {
-        data->fname = _strdup(name);
+        bd->fname = _strdup(name);
     }
     READ_TOK(store, name, sizeof(name));
     if (strcmp(name, "tnnL") == 0) {
@@ -124,9 +126,9 @@ static int lc_read(struct attrib *a, void *owner, struct storage *store)
         b = 0;
     }
     if (strcmp(name, NULLSTRING) == 0)
-        data->param = 0;
+        bd->param = 0;
     else {
-        data->param = _strdup(name);
+        bd->param = _strdup(name);
     }
     if (result == 0 && !b) {
         return AT_READ_FAIL;

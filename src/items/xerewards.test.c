@@ -1,6 +1,7 @@
 #include <platform.h>
 
 #include "xerewards.h"
+#include "study.h"
 
 #include <kernel/unit.h>
 #include <kernel/item.h>

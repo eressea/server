@@ -13,6 +13,7 @@
 #include "monster.h"
 #include "guard.h"
 #include "skill.h"
+#include "study.h"
 
 #include <util/language.h>
 

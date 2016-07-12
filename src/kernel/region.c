@@ -42,6 +42,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/bsdstring.h>
+#include <util/gamedata.h>
 #include <util/strings.h>
 #include <util/lists.h>
 #include <util/log.h>
@@ -176,12 +177,12 @@ void a_initmoveblock(attrib * a)
     a->data.v = calloc(1, sizeof(moveblock));
 }
 
-int a_readmoveblock(attrib * a, void *owner, struct storage *store)
+int a_readmoveblock(attrib * a, void *owner, gamedata *data)
 {
     moveblock *m = (moveblock *)(a->data.v);
     int i;
 
-    READ_INT(store, &i);
+    READ_INT(data->store, &i);
     m->dir = (direction_t)i;
     return AT_READ_OK;
 }
@@ -483,6 +484,7 @@ attrib_type at_horseluck = {
     DEFAULT_AGE,
     NO_WRITE,
     NO_READ,
+    NULL,
     ATF_UNIQUE
 };
 
@@ -496,6 +498,7 @@ attrib_type at_peasantluck = {
     DEFAULT_AGE,
     NO_WRITE,
     NO_READ,
+    NULL,
     ATF_UNIQUE
 };
 
@@ -509,6 +512,7 @@ attrib_type at_deathcount = {
     DEFAULT_AGE,
     a_writeint,
     a_readint,
+    NULL,
     ATF_UNIQUE
 };
 
@@ -522,6 +526,7 @@ attrib_type at_woodcount = {
     DEFAULT_AGE,
     NO_WRITE,
     a_readint,
+    NULL,
     ATF_UNIQUE
 };
 
@@ -595,13 +600,19 @@ bool is_coastregion(region * r)
 
 int rpeasants(const region * r)
 {
-    return r->land ? r->land->peasants : 0;
+    int value = 0;
+    if (r->land) {
+        value = r->land->peasants;
+        assert(value >= 0);
+    }
+    return value;
 }
 
 void rsetpeasants(region * r, int value)
 {
+    assert(r->land || value==0);
+    assert(value >= 0);
     if (r->land) {
-        assert(value >= 0);
         r->land->peasants = value;
     }
 }
@@ -613,8 +624,9 @@ int rmoney(const region * r)
 
 void rsethorses(const region * r, int value)
 {
+    assert(r->land || value==0);
+    assert(value >= 0);
     if (r->land) {
-        assert(value >= 0);
         r->land->horses = value;
     }
 }
@@ -626,8 +638,9 @@ int rhorses(const region * r)
 
 void rsetmoney(region * r, int value)
 {
+    assert(r->land || value==0);
+    assert(value >= 0);
     if (r->land) {
-        assert(value >= 0);
         r->land->money = value;
     }
 }
@@ -639,8 +652,9 @@ int rherbs(const struct region *r)
 
 void rsetherbs(const struct region *r, int value)
 {
+    assert(r->land || value==0);
+    assert(value >= 0);
     if (r->land) {
-        assert(value >= 0);
         r->land->herbs = (short)(value);
     }
 }
@@ -1212,10 +1226,11 @@ int resolve_region_id(variant id, void *address)
     return 0;
 }
 
-variant read_region_reference(struct storage * store)
+variant read_region_reference(gamedata *data)
 {
+    struct storage * store = data->store;
     variant result;
-    if (global.data_version < UIDHASH_VERSION) {
+    if (data->version < UIDHASH_VERSION) {
         int n;
         READ_INT(store, &n);
         result.sa[0] = (short)n;
