@@ -135,7 +135,7 @@ struct param;
 #define GUARD_ALL 0xFFFF
 
     int maxworkingpeasants(const struct region *r);
-    int markets_module(void);
+    bool markets_module(void);
     int wage(const struct region *r, const struct faction *f,
         const struct race *rc, int in_turn);
 

@@ -1057,9 +1057,9 @@ int rule_give(void)
     return config_get_int("rules.give.flags", GIVE_DEFAULT);
 }
 
-int markets_module(void)
+bool markets_module(void)
 {
-    return config_get_int("modules.markets", 0);
+    return (bool)config_get_int("modules.markets", 0);
 }
 
 static struct param *configuration;
