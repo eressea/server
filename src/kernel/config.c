@@ -1059,7 +1059,7 @@ int rule_give(void)
 
 bool markets_module(void)
 {
-    return config_get_int("modules.markets", 0);
+    return (bool)config_get_int("modules.markets", 0);
 }
 
 static struct param *configuration;
