@@ -161,11 +161,9 @@ struct param;
         void *vm_state;
         int data_version; /* TODO: eliminate in favor of gamedata.version */
         struct _dictionary_ *inifile;
-
         struct global_functions {
             int(*wage) (const struct region * r, const struct faction * f,
                 const struct race * rc, int in_turn);
-            int(*maintenance) (const struct unit * u);
         } functions;
     } settings;
 
