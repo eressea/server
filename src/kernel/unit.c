@@ -1980,11 +1980,6 @@ int maintenance_cost(const struct unit *u)
 {
     if (u == NULL)
         return MAINTENANCE;
-    if (global.functions.maintenance) {
-        int retval = global.functions.maintenance(u);
-        if (retval >= 0)
-            return retval;
-    }
     return u_race(u)->maintenance * u->number;
 }
 

@@ -898,9 +898,6 @@ static int parse_rules(xmlDocPtr doc)
                 (int(*)(const struct region *, const struct faction *,
                 const struct race *, int))fun;
         }
-        else if (strcmp((const char *)propValue, "maintenance") == 0) {
-            global.functions.maintenance = (int(*)(const struct unit *))fun;
-        }
         else {
             log_error("unknown function for rule '%s'\n", (const char *)propValue);
         }
