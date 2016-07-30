@@ -349,11 +349,6 @@ static void test_fishing_feeds_2_people(CuTest * tc)
     CuAssertIntEquals(tc, 32, i_get(u->items, rtype->itype));
 }
 
-static int not_so_hungry(const unit * u)
-{
-    return 6 * u->number;
-}
-
 static void test_fishing_does_not_give_goblins_money(CuTest * tc)
 {
     const resource_type *rtype;
@@ -374,7 +369,6 @@ static void test_fishing_does_not_give_goblins_money(CuTest * tc)
     u_set_ship(u, sh);
     i_change(&u->items, rtype->itype, 42);
 
-    global.functions.maintenance = not_so_hungry;
     scale_number(u, 2);
     sh->flags |= SF_FISHING;
     get_food(r);
