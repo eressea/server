@@ -43,6 +43,8 @@ extern "C" {
 #define LOG_FLUSH      0x10
 #define LOG_BRIEF      0x20
 
+
+    extern int log_stderr;
 #ifdef __cplusplus
 }
 #endif

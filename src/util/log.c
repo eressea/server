@@ -22,9 +22,6 @@ without prior permission by the authors of Eressea.
 #include <stdarg.h>
 #include <time.h>
 
-/* TODO: set from external function */
-int log_flags = LOG_FLUSH | LOG_CPERROR | LOG_CPWARNING | LOG_CPDEBUG;
-
 #ifdef STDIO_CP
 static int stdio_codepage = STDIO_CP;
 #else
@@ -126,7 +123,7 @@ static const char *log_prefix(int level) {
     return prefix;
 }
 
-static int check_dupe(const char *format, int type)
+static int check_dupe(const char *format, int level)
 {
     static int last_type; /* STATIC_XCALL: used across calls */
     static char last_message[32]; /* STATIC_XCALL: used across calls */
@@ -136,12 +133,14 @@ static int check_dupe(const char *format, int type)
         return 1;
     }
     if (dupes) {
-        fprintf(stderr, "%s: last message repeated %d times\n", log_prefix(last_type),
-            dupes + 1);
+        if (level & LOG_CPERROR) {
+            fprintf(stderr, "%s: last message repeated %d times\n", log_prefix(last_type),
+                dupes + 1);
+        }
         dupes = 0;
     }
     strlcpy(last_message, format, sizeof(last_message));
-    last_type = type;
+    last_type = level;
     return 0;
 }
 
@@ -176,6 +175,7 @@ static void log_stdio(void *data, int level, const char *module, const char *for
     if (format[len - 1] != '\n') {
         fputc('\n', out);
     }
+    fflush(out);
 }
 
 log_t *log_to_file(int flags, FILE *out) {
@@ -280,7 +280,7 @@ log_t *log_open(const char *filename, int log_flags)
         fprintf(logfile, "===\n=== Logfile started at %s===\n", ctime(&ltime));
         return log_create(log_flags, logfile, log_stdio);
     }
-    return 0;
+    return NULL;
 }
 
 int log_level(log_t * log, int flags)
