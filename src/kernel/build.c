@@ -848,6 +848,7 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
     }
 
     b->size += built;
+    assert(b->type->maxsize <= 0 || b->size <= b->type->maxsize);
     fset(b, BLD_EXPANDED);
 
     update_lighthouse(b);

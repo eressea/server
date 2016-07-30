@@ -174,7 +174,7 @@ static unit *unitorders(FILE * F, int enc, struct faction *f)
                 if (s[0] != '@') {
                     char token[128];
                     const char *stok = s;
-                    stok = parse_token(&stok, token, sizeof(token));
+                    stok = parse_token(&stok, token, 64); // FIXME: use sizeof, but parse_token overwrites the buffer
 
                     if (stok) {
                         bool quit = false;
@@ -1675,6 +1675,11 @@ int read_game(gamedata *data) {
             read_attribs(data, &b->attribs, b);
             if (b->type == bt_lighthouse) {
                 r->flags |= RF_LIGHTHOUSE;
+            }
+            // repairs, bug 2221:
+            if (b->type->maxsize>0 && b->size>b->type->maxsize) {
+                log_error("building too big: %s (%s size %d of %d), fixing.", buildingname(b), b->type->_name, b->size, b->type->maxsize);
+                b->size = b->type->maxsize;
             }
         }
         /* Schiffe */
