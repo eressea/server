@@ -174,7 +174,7 @@ static unit *unitorders(FILE * F, int enc, struct faction *f)
                 if (s[0] != '@') {
                     char token[128];
                     const char *stok = s;
-                    stok = parse_token(&stok, token, sizeof(token));
+                    stok = parse_token(&stok, token, 64); // FIXME: use sizeof, but parse_token overwrites the buffer
 
                     if (stok) {
                         bool quit = false;
