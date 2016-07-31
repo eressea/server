@@ -514,7 +514,7 @@ int build(unit * u, const construction * ctype, int completed, int want)
          *  (enno): Nein, das ist für Dinge, bei denen die nächste Ausbaustufe
          *  die gleiche wie die vorherige ist. z.b. gegenstände.
          */
-        if (type->maxsize > 1) {
+        if (type->maxsize > 0) {
             completed = completed % type->maxsize;
         }
         else {
@@ -848,7 +848,10 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
     }
 
     b->size += built;
-    assert(b->type->maxsize <= 0 || b->size <= b->type->maxsize);
+    if (b->type->maxsize > 0 && b->size > b->type->maxsize) {
+        // this seems to be okay for a watch, but is not okay for an academy or harbour
+        log_error("build: %s has size=%d, maxsize=%d", buildingname(b), b->size, b->type->maxsize);
+    }
     fset(b, BLD_EXPANDED);
 
     update_lighthouse(b);
