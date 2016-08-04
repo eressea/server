@@ -27,7 +27,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "battle.h"
 #include "economy.h"
 #include "keyword.h"
-#include "market.h"
 #include "morale.h"
 #include "monster.h"
 #include "move.h"
@@ -4415,10 +4414,6 @@ void processorders(void)
     init_processor();
     process();
     /*************************************************/
-
-    if (config_get_int("modules.markets", 0)) {
-        do_markets();
-    }
 
     log_info(" - Attribute altern");
     ageing();
