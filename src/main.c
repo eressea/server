@@ -152,7 +152,9 @@ static int verbosity_to_flags(int verbosity) {
 
 static int parse_args(int argc, char **argv, int *exitcode)
 {
-    int i, log_stderr = 0, log_flags = 0;
+    int i;
+    int log_stderr = LOG_CPERROR;
+    int log_flags = LOG_CPERROR | LOG_CPWARNING | LOG_CPINFO;
 
     for (i = 1; i != argc; ++i) {
         char *argi = argv[i];
