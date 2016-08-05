@@ -651,17 +651,12 @@ int read_borders(gamedata *data)
             if (r != NULL)
                 to = r;
         }
-        if ((type->read && !type->write)) {
-            log_warning("ignore invalid border '%s' between '%s' and '%s'\n", zText, regionname(from, 0), regionname(to, 0));
-        }
-        else {
+        if (type->read) {
             connection *b = new_border(type, from, to);
             nextborder--;               /* new_border erhöht den Wert */
             b->id = bid;
             assert(bid <= nextborder);
-            if (type->read) {
-                type->read(b, data);
-            }
+            type->read(b, data);
             if (data->version < NOBORDERATTRIBS_VERSION) {
                 attrib *a = NULL;
                 int result = read_attribs(data, &a, b);
@@ -674,6 +669,9 @@ int read_borders(gamedata *data)
                 if (result < 0) {
                     return result;
                 }
+            }
+            if (!type->write) {
+                log_warning("invalid border '%s' between '%s' and '%s'\n", zText, regionname(from, 0), regionname(to, 0));
             }
         }
     }
