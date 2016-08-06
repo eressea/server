@@ -148,6 +148,9 @@ extern "C" {
     /* game-specific callbacks */
     void(*border_convert_cb) (struct connection * con, struct attrib * attr);
 
+    const char * border_name(const struct connection *co,
+        const struct region * r, const struct faction * f, int flags);
+
 #ifdef __cplusplus
 }
 #endif

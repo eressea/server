@@ -1044,7 +1044,7 @@ struct building *inside_building(const struct unit *u)
     if (!u->building) {
         return NULL;
     }
-    else if (u->building->size < u->building->type->maxsize) {
+    else if (!building_finished(u->building)) {
         /* Gebaeude noch nicht fertig */
         return NULL;
     }

@@ -143,7 +143,7 @@
 
   <resource name="catapultammo">
     <item weight="1000">
-      <construction skill="quarrying" minskill="3" reqsize="1">
+      <construction skill="quarrying" minskill="3">
         <requirement type="stone" quantity="1"/>
       </construction>
     </item>

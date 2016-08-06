@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <resource name="mallornspear">
   <item weight="100">
-    <construction skill="weaponsmithing" minskill="5" reqsize="1">
+    <construction skill="weaponsmithing" minskill="5">
       <requirement type="mallorn" quantity="1"/>
     </construction>
     <weapon pierce="true" skill="polearm" minskill="5" offmod="0" defmod="0" magres="0.15">

@@ -2,7 +2,7 @@
 <resource name="towershield">
   <item weight="200" score="60">
     <function name="canuse" value="lua_canuse_item"/>
-    <construction skill="armorer" minskill="4" reqsize="1">
+    <construction skill="armorer" minskill="4">
       <modifier function="mod_dwarves_only"/>
       <requirement type="iron" quantity="1"/>
     </construction>

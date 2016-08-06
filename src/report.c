@@ -915,7 +915,7 @@ static void describe(stream *out, const seen_region * sr, faction * f)
         for (b = get_borders(r, r2); b;) {
             struct edge *e = edges;
             bool transparent = b->type->transparent(b, f);
-            const char *name = b->type->name(b, r, f, GF_DETAILED | GF_ARTICLE);
+            const char *name = border_name(b, r, f, GF_DETAILED | GF_ARTICLE);
 
             if (!transparent)
                 see[d] = false;
@@ -1898,7 +1898,7 @@ const faction * f)
         }
     }
 
-    if (b->size < b->type->maxsize) {
+    if (!building_finished(b)) {
         bytes = (int)strlcpy(bufp, LOC(lang, "nr_building_inprogress"), size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();

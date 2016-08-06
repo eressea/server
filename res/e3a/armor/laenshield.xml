@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <resource name="laenshield">
   <item weight="0" score="1000">
-    <construction skill="armorer" minskill="7" reqsize="1">
+    <construction skill="armorer" minskill="7">
       <requirement type="laen" quantity="1"/>
     </construction>
     <armor ac="1" penalty="-0.10" magres="0.3" laen="yes" shield="yes" />

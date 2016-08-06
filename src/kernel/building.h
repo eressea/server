@@ -92,15 +92,7 @@ extern "C" {
         const struct building *b, int bsize);
 
     bool in_safe_building(struct unit *u1, struct unit *u2);
-    /* buildingt => building_type
-     * Name => locale_string(name)
-     * MaxGroesse => levels
-     * MinBauTalent => construction->minskill
-     * Kapazitaet => capacity, maxcapacity
-     * Materialien => construction->materials
-     * UnterSilber, UnterSpezialTyp, UnterSpezial => maintenance
-     * per_size => !maintenance->fixed
-     */
+
 #define BFL_NONE           0x00
 #define BLD_MAINTAINED     0x01 /* vital maintenance paid for */
 #define BLD_WORKING        0x02 /* full maintenance paid, it works */
@@ -138,6 +130,7 @@ extern "C" {
     struct region *r, const struct locale *lang);
     int build_building(struct unit *u, const struct building_type *typ,
         int id, int size, struct order *ord);
+    bool building_finished(const struct building *b);
 
     /* Alte Gebäudetypen: */
 
@@ -172,10 +165,6 @@ extern "C" {
         const struct building_type *bt, bool working);
     bool building_is_active(const struct building *b);
     struct building *active_building(const struct unit *u, const struct building_type *btype);
-
-#ifdef WDW_PYRAMID
-    extern int wdw_pyramid_level(const struct building *b);
-#endif
 
     extern const char *buildingname(const struct building *b);
 

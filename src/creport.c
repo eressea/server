@@ -1160,7 +1160,8 @@ int seemode, FILE * F)
                 }
             }
             if (cs) {
-                const char *bname = mkname("border", b->type->name(b, r, f, GF_PURE));
+                const char *bname = border_name(b, r, f, GF_PURE);
+                bname = mkname("border", bname);
                 fprintf(F, "GRENZE %d\n", ++g);
                 fprintf(F, "\"%s\";typ\n", LOC(default_locale, bname));
                 fprintf(F, "%d;richtung\n", d);

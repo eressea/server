@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <resource name="rustyshield">
   <item weight="100" score="10">
-    <construction skill="armorer" minskill="2" reqsize="1">
+    <construction skill="armorer" minskill="2">
       <requirement type="iron" quantity="1"/>
     </construction>
     <armor ac="0" penalty="-0.05" magres="0.0" shield="yes"/>

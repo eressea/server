@@ -1676,6 +1676,7 @@ int read_game(gamedata *data) {
             if (b->type == bt_lighthouse) {
                 r->flags |= RF_LIGHTHOUSE;
             }
+
             // repairs, bug 2221:
             if (b->type->maxsize>0 && b->size>b->type->maxsize) {
                 log_error("building too big: %s (%s size %d of %d), fixing.", buildingname(b), b->type->_name, b->size, b->type->maxsize);
