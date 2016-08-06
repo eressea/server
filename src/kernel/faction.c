@@ -387,7 +387,7 @@ void destroyfaction(faction ** fp)
         else {
             region *r = u->region;
 
-            if (!fval(r->terrain, SEA_REGION) && !!playerrace(u_race(u))) {
+            if (r->land && !!playerrace(u_race(u))) {
                 const race *rc = u_race(u);
                 int m = rmoney(r);
 

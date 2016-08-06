@@ -1222,23 +1222,28 @@ static void nmr_death(faction * f)
 static void remove_idle_players(void)
 {
     faction **fp;
+    int timeout = NMRTimeout();
 
     log_info(" - beseitige Spieler, die sich zu lange nicht mehr gemeldet haben...");
 
     for (fp = &factions; *fp;) {
         faction *f = *fp;
-        if (fval(f, FFL_NOIDLEOUT)) {
-            f->lastorders = turn;
-        }
-        if (NMRTimeout() > 0 && turn - f->lastorders >= NMRTimeout()) {
+
+        if (timeout > 0 && turn - f->lastorders >= timeout) {
             nmr_death(f);
             destroyfaction(fp);
-        } else if (turn != f->lastorders) {
-            char info[256];
-            sprintf(info, "%d Einheiten, %d Personen, %d Silber",
-                f->no_units, f->num_total, f->money);
+        } else {
+            if (fval(f, FFL_NOIDLEOUT)) {
+                f->lastorders = turn;
+                fp = &f->next;
+            }
+            else if (turn != f->lastorders) {
+                char info[256];
+                sprintf(info, "%d Einheiten, %d Personen, %d Silber",
+                    f->no_units, f->num_total, f->money);
+            }
+            fp = &f->next;
         }
-        fp = &f->next;
     }
     log_info(" - beseitige Spieler, die sich nach der Anmeldung nicht gemeldet haben...");
 
