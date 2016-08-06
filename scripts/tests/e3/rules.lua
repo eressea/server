@@ -399,7 +399,7 @@ local function test_items(u, names, amount)
   end
 end
 
-function test_market_regions()
+function disable_test_market_regions()
     -- if i am the only trader around, i should be getting all the herbs from all 7 regions
     local r, u, b, herbnames, luxurynames, herbtable, luxurytable = market_fixture()
 
@@ -410,7 +410,7 @@ function test_market_regions()
     test_items(u, luxurytable, 5)
 end
 
-function test_multiple_markets()
+function disable_test_multiple_markets()
    local r, u1, b, herbnames, luxurynames, herbtable, luxurytable = market_fixture()
    local r2 = get_region(1,0)
    local f = faction.create("multim@eressea.de", "human", "de")
@@ -433,7 +433,7 @@ function test_multiple_markets()
 end
 
 
-function test_market()
+function disable_test_market()
   local r = region.create(0, 0, "plain")
   local f1 = faction.create("market2@eressea.de", "human", "de")
   local u1 = unit.create(f1, r, 1)
@@ -523,7 +523,7 @@ function test_market()
   eressea.settings.set("rules.peasants.growth", "1")
 end
 
-function test_market_gives_items()
+function disable_test_market_gives_items()
     local r
     for x = -1, 1 do for y = -1, 1 do
         r = region.create(x, y, "plain")

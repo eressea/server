@@ -51,30 +51,6 @@ static int tolua_process_eressea_process_update_long_order00(lua_State* tolua_S)
 #endif
 }
 
-/* function: process_markets */
-static int tolua_process_eressea_process_markets00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
- !tolua_isnoobj(tolua_S,1,&tolua_err)
- )
- goto tolua_lerror;
- else
-#endif
- {
- {
-  process_markets();
- }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'markets'.",&tolua_err);
- return 0;
-#endif
-}
-
 /* function: process_produce */
 static int tolua_process_eressea_process_produce00(lua_State* tolua_S)
 {
@@ -1001,7 +977,6 @@ LUALIB_API int luaopen_process (lua_State* tolua_S)
  tolua_module(tolua_S,"process",0);
  tolua_beginmodule(tolua_S,"process");
  tolua_function(tolua_S,"update_long_order",tolua_process_eressea_process_update_long_order00);
- tolua_function(tolua_S,"markets",tolua_process_eressea_process_markets00);
  tolua_function(tolua_S,"produce",tolua_process_eressea_process_produce00);
  tolua_function(tolua_S,"make_temp",tolua_process_eressea_process_make_temp00);
  tolua_function(tolua_S,"settings",tolua_process_eressea_process_settings00);

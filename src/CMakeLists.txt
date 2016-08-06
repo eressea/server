@@ -107,7 +107,6 @@ set (ERESSEA_SRC
   items.c
   laws.c
   magic.c
-  market.c
   morale.c
   monster.c
   randenc.c
@@ -202,7 +201,6 @@ set(TESTS_SRC
   give.test.c
   laws.test.c
   magic.test.c
-  market.test.c
   monsters.test.c
   move.test.c
   piracy.test.c

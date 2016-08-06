@@ -5,7 +5,6 @@ $#include "bind_process.h"
 module eressea {
     module process {
         void process_update_long_order @ update_long_order(void);
-        void process_markets @ markets(void); /* operate the e3 markets */
         void process_produce @ produce(void); /* MAKE+BUY/SELL/ENTERTAIN/WORK/TAX/STEAL/SPY/SABOTAGE/PLANT/BREED/RESEARCH */
         void process_make_temp @ make_temp(void); /* MAKE TEMP */
         void process_settings @ settings(void); /* EMAIL/PASSWORD/BANNER/OPTION */

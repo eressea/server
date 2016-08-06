@@ -14,7 +14,6 @@ end
 
 function test_process()
 	assert_equal("function", _G.type(eressea.process.update_long_order))
-	assert_equal("function", _G.type(eressea.process.markets))
 	assert_equal("function", _G.type(eressea.process.produce))
 
 	assert_equal("function", _G.type(eressea.process.make_temp))

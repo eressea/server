@@ -57,7 +57,6 @@ without prior permission by the authors of Eressea.
 #include "teleport.h"
 #include "laws.h"
 #include "monster.h"
-#include "market.h"
 
 #include <modules/autoseed.h>
 #include <modules/score.h>

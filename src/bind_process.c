@@ -12,7 +12,6 @@
 #include "keyword.h"
 #include "laws.h"
 #include "magic.h"
-#include "market.h"
 #include "move.h"
 #include "study.h"
 
@@ -85,10 +84,6 @@ void process_update_long_order(void) {
             update_long_order(u);
         }
     }
-}
-
-void process_markets(void) {
-    do_markets();
 }
 
 void process_make_temp(void) {
