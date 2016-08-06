@@ -975,7 +975,7 @@ static int sp_blessstonecircle(castorder * co)
         return 0;
     }
 
-    if (b->size < b->type->maxsize) {
+    if (!building_finished(b)) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "error_notcomplete", "building", b));
         return 0;
@@ -4502,11 +4502,11 @@ int sp_icastle(castorder * co)
     if (type == bt_illusion) {
         b->size = (rng_int() % (int)((power * power) + 1) * 10);
     }
-    else if (type->maxsize == -1) {
-        b->size = ((rng_int() % (int)(power)) + 1) * 5;
+    else if (type->maxsize >0) {
+        b->size = type->maxsize;
     }
     else {
-        b->size = type->maxsize;
+        b->size = ((rng_int() % (int)(power)) + 1) * 5;
     }
 
     if (type->name == NULL) {

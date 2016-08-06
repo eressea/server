@@ -132,7 +132,7 @@ int buildingcapacity(const building * b)
         }
         return b->size * b->type->capacity;
     }
-    if (b->size >= b->type->maxsize) {
+    if (building_finished(b)) {
         if (b->type->maxcapacity >= 0) {
             return b->type->maxcapacity;
         }
@@ -648,15 +648,20 @@ buildingtype_exists(const region * r, const building_type * bt, bool working)
     building *b;
 
     for (b = rbuildings(r); b; b = b->next) {
-        if (b->type == bt && b->size >= bt->maxsize && (!working || fval(b, BLD_WORKING)))
+        if (b->type == bt && (!working || fval(b, BLD_WORKING)) && building_finished(b)) {
             return true;
+        }
     }
 
     return false;
 }
 
+bool building_finished(const struct building *b) {
+    return b->size >= b->type->maxsize;
+}
+
 bool building_is_active(const struct building *b) {
-    return b && fval(b, BLD_WORKING)  && b->size >= b->type->maxsize;
+    return b && fval(b, BLD_WORKING) && building_finished(b);
 }
 
 building *active_building(const unit *u, const struct building_type *btype) {

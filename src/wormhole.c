@@ -149,8 +149,7 @@ make_wormhole(const building_type * bt_wormhole, region * r1, region * r2)
     attrib *a2 = a_add(&b2->attribs, a_new(&at_wormhole));
     a1->data.v = b2->region;
     a2->data.v = b1->region;
-    b1->size = bt_wormhole->maxsize;
-    b2->size = bt_wormhole->maxsize;
+    b1->size = b2->size = bt_wormhole->maxcapacity * bt_wormhole->capacity;
     ADDMSG(&r1->msgs, msg_message("wormhole_appear", "region", r1));
     ADDMSG(&r2->msgs, msg_message("wormhole_appear", "region", r2));
 }

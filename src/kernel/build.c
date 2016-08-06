@@ -849,7 +849,6 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
 
     b->size += built;
     if (b->type->maxsize > 0 && b->size > b->type->maxsize) {
-        // this seems to be okay for a watch, but is not okay for an academy or harbour
         log_error("build: %s has size=%d, maxsize=%d", buildingname(b), b->size, b->type->maxsize);
     }
     fset(b, BLD_EXPANDED);

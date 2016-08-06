@@ -1898,7 +1898,7 @@ const faction * f)
         }
     }
 
-    if (b->size < b->type->maxsize) {
+    if (!building_finished(b)) {
         bytes = (int)strlcpy(bufp, LOC(lang, "nr_building_inprogress"), size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
