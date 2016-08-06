@@ -75,8 +75,7 @@ faction *visible_faction(const faction * f, const unit * u)
         attrib *a = a_find(u->attribs, &at_otherfaction);
         if (a) {
             faction *fv = get_otherfaction(a);
-            assert(fv != NULL);       /* fv should never be NULL! */
-            return fv;
+            if (fv) return fv;
         }
     }
     return u->faction;
