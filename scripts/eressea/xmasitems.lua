@@ -15,6 +15,23 @@ local function error_message(msg, u, ord)
     return -1
 end
 
+
+local function usepotion_message(u, type)
+  msg = message.create("usepotion")
+  msg:set_unit("unit", u)
+  msg:set_resource("potion", type)
+  return msg
+end
+
+function use_stardust(u, amount)
+  local p = u.region:get_resource("peasant")
+  p = math.ceil(1.5 * p)
+  u.region:set_resource("peasant", p)
+  local msg = usepotion_message(u, "stardust")
+  msg:send_region(u.region)
+  return 1
+end
+
 function use_snowglobe(u, amount, token, ord)
     local transform = {
         ocean = "glacier",
@@ -59,9 +76,7 @@ function use_xmastree(u, amount)
         local trees = u.region:get_resource("tree")
         u.region:set_key("xm06", true)
         u.region:set_resource("tree", 10+trees)
-        local msg = message.create("usepotion")
-        msg:set_unit("unit", u)
-        msg:set_resource("potion", "xmastree")
+        local msg = usepotion_message(u, "xmastree")
         msg:send_region(u.region)
         return amount
     end
