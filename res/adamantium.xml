@@ -3,7 +3,7 @@
 
   <resource name="adamantium" limited="yes" material="rm_adamantium">
     <item weight="200" score="200">
-      <construction skill="mining" minskill="8" reqsize="1"/>
+      <construction skill="mining" minskill="8"/>
     </item>
     <resourcelimit>
       <modifier type="require" building="mine"/>
@@ -13,7 +13,7 @@
 
   <resource name="adamantiumaxe">
     <item weight="100" score="500">
-      <construction skill="weaponsmithing" minskill="8" reqsize="1">
+      <construction skill="weaponsmithing" minskill="8">
         <requirement type="adamantium" quantity="1"/>
         <requirement type="log" quantity="1"/>
       </construction>
@@ -26,7 +26,7 @@
 
   <resource name="adamantiumplate">
     <item weight="100" score="2000">
-      <construction skill="armorer" minskill="10" reqsize="1">
+      <construction skill="armorer" minskill="10">
         <requirement type="adamantium" quantity="3"/>
       </construction>
       <armor ac="7" penalty="0.1"/>

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <resource name="laenmail">
   <item weight="100" score="1000">
-    <construction skill="armorer" minskill="9" reqsize="1">
+    <construction skill="armorer" minskill="9">
       <requirement type="laen" quantity="2"/>
     </construction>
     <armor ac="3" penalty="0.0" projectile="0.10" magres="0.3" laen="yes" />

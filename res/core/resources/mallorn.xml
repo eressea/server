@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <resource name="mallorn" material="rm_mallorn">
   <item weight="500" score="30">
-    <construction skill="forestry" minskill="2" reqsize="1"/>
+    <construction skill="forestry" minskill="2"/>
   </item>
   <resourcelimit>
     <modifier building="sawmill" type="skill" value="1"/>
