@@ -317,6 +317,12 @@ static void setup_spell_fixture(spell_fixture * spf) {
     spf->sbe = spellbook_get(spf->spb, spf->sp);
 }
 
+static void cleanup_spell_fixture(spell_fixture *spf) {
+    spellbook_clear(spf->spb);
+    free(spf->spb);
+    test_cleanup();
+}
+
 static void check_spell_syntax(CuTest *tc, char *msg, spell_fixture *spell, char *syntax) {
     stream strm;
     char buf[1024];
@@ -405,9 +411,8 @@ static void test_write_spell_syntax(CuTest *tc) {
     set_parameter(spell, "kc+");
     check_spell_syntax(tc, "kc+", &spell,
         "  ZAUBERE \"Testzauber\" ( REGION | EINHEIT <enr> [<enr> ...] | SCHIFF <snr>\n  [<snr> ...] | BURG <bnr> [<bnr> ...] )");
-    spellbook_clear(spell.spb);
-    free(spell.spb);
-    test_cleanup();
+
+    cleanup_spell_fixture(&spell);
 }
 
 CuSuite *get_reports_suite(void)
