@@ -1543,21 +1543,21 @@ int write_reports(faction * f, time_t ltime)
     log_debug("Reports for %s:", factionname(f));
     for (rtype = report_types; rtype != NULL; rtype = rtype->next) {
         if (f->options & rtype->flag) {
-            int error;
+            int error = 0;
             do {
                 char filename[32];
                 char path[MAX_PATH];
                 sprintf(filename, "%d-%s.%s", turn, factionid(f),
                     rtype->extension);
                 join_path(reportpath(), filename, path, sizeof(path));
-                error = 0;
+                errno = 0;
                 if (rtype->write(path, &ctx, encoding) == 0) {
                     gotit = true;
                 }
                 if (errno) {
                     char zText[64];
-                    log_warning("retrying, error %d during %s report for faction %s", error, rtype->extension, factionname(f));
-                    sprintf(zText, "waiting %u seconds before we retry", backup / 1000);
+                    log_warning("retrying, error %d during %s report for faction %s", errno, rtype->extension, factionname(f));
+                    sprintf(zText, "waiting %u seconds before we retry", backup);
                     perror(zText);
                     _sleep(backup);
                     if (backup < maxbackup) {
