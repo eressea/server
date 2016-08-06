@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <resource name="stone" limited="yes" material="rm_stone">
   <item weight="6000" score="10" big="yes">
-    <construction skill="quarrying" minskill="1" reqsize="1"/>
+    <construction skill="quarrying" minskill="1"/>
   </item>
   <resourcelimit>
     <modifier building="quarry" type="skill" value="1"/>

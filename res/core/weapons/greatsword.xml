@@ -2,7 +2,7 @@
 <resource name="greatsword">
   <item weight="200" score="30">
     <function name="canuse" value="lua_canuse_item"/>
-    <construction skill="weaponsmithing" minskill="4" reqsize="1">
+    <construction skill="weaponsmithing" minskill="4">
       <requirement type="iron" quantity="2"/>
     </construction>
     <weapon cut="true" skill="melee" offmod="-1" defmod="-2">

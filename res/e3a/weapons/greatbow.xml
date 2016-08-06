@@ -6,7 +6,7 @@
 <resource name="greatbow">
   <item weight="100">
     <function name="canuse" value="lua_canuse_item"/>
-    <construction skill="weaponsmithing" minskill="5" reqsize="1">
+    <construction skill="weaponsmithing" minskill="5">
       <modifier function="mod_elves_only"/>
       <requirement type="mallorn" quantity="2"/>
     </construction>

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <resource name="catapult">
   <item weight="10000" big="yes">
-    <construction skill="cartmaking" minskill="5" reqsize="1">
+    <construction skill="cartmaking" minskill="5">
       <requirement type="log" quantity="10"/>
     </construction>
     <weapon siege="true" bash="true" missile="true" skill="catapult" offmod="0" defmod="0" reload="5">

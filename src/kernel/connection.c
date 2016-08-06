@@ -677,3 +677,7 @@ int read_borders(gamedata *data)
     }
     return 0;
 }
+
+const char * border_name(const connection *co, const struct region * r, const struct faction * f, int flags) {
+    return (co->type->name) ? co->type->name(co, r, f, flags) : co->type->__name;
+}

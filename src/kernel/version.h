@@ -10,7 +10,7 @@
  without prior permission by the authors of Eressea.
  
  */
-#define INTPAK_VERSION 329      /* in binary, ints can get packed */
+#define INTPAK_VERSION 329      /* in binary, ints can get packed. starting with E2/572 */
 #define NOZEROIDS_VERSION 330   /* 2008-05-16 zero is not a valid ID for anything (including factions) */
 #define NOBORDERATTRIBS_VERSION 331     /* 2008-05-17 connection::attribs has been moved to userdata */
 #define UIDHASH_VERSION 332     /* 2008-05-22 borders use the region.uid to store */

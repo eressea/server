@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <resource name="bow">
   <item weight="100">
-    <construction skill="weaponsmithing" minskill="2" reqsize="1">
+    <construction skill="weaponsmithing" minskill="2">
       <requirement type="log" quantity="1"/>
     </construction>
     <weapon pierce="true" missile="true" skill="bow" offmod="0" defmod="0" reload="0">

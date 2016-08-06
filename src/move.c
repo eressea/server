@@ -1758,7 +1758,7 @@ unit *owner_buildingtyp(const region * r, const building_type * bt)
     for (b = rbuildings(r); b; b = b->next) {
         owner = building_owner(b);
         if (b->type == bt && owner != NULL) {
-            if (b->size >= bt->maxsize) {
+            if (building_finished(b)) {
                 return owner;
             }
         }

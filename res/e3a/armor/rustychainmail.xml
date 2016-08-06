@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <resource name="rustychainmail">
   <item weight="200" score="30">
-    <construction skill="armorer" minskill="3" reqsize="1">
+    <construction skill="armorer" minskill="3">
       <requirement type="iron" quantity="3"/>
     </construction>
     <armor ac="1" penalty="0.20" magres="0.0"/>

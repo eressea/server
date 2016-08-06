@@ -458,6 +458,7 @@ static int tolua_region_create(lua_State * L)
         const terrain_type *terrain = get_terrain(tname);
         region *r, *result;
         if (!terrain) {
+            log_error("lua: region.create with invalid terrain %s", tname);
             return 0;
         }
 
@@ -481,6 +482,7 @@ static int tolua_region_create(lua_State * L)
         tolua_pushusertype(L, result, TOLUA_CAST "region");
         return 1;
     }
+    log_error("lua: region.create with invalid terrain %s", tname);
     return 0;
 }
 

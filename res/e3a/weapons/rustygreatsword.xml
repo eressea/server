@@ -4,7 +4,7 @@
 -->
 <resource name="rustygreatsword">
   <item weight="200" score="20">
-    <construction skill="weaponsmithing" minskill="4" reqsize="1">
+    <construction skill="weaponsmithing" minskill="4">
       <requirement type="iron" quantity="2"/>
     </construction>
     <weapon useshield="false" cut="true" skill="melee" offmod="-2" defmod="-3" horse="false">

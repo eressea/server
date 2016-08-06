@@ -36,13 +36,16 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 static critbit_tree cb_spells;
 quicklist * spells;
 
-static void free_spell_cb(void *cbdata) {
-    spell *sp = (spell *)cbdata;
+static void free_spell(spell *sp) {
     free(sp->syntax);
     free(sp->parameter);
     free(sp->sname);
     free(sp->components);
     free(sp);
+}
+
+static void free_spell_cb(void *cbdata) {
+    free_spell((spell *)cbdata);
 }
 
 void free_spells(void) {
