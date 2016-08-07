@@ -96,6 +96,7 @@ static void parse_config(const char *filename)
 #ifdef USE_CURSES
         /* only one value in the [editor] section */
         force_color = iniparser_getint(d, "editor:color", force_color);
+        gm_codepage = iniparser_getint(d, "editor:codepage", gm_codepage);
 #endif
     }
 }
