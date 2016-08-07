@@ -116,12 +116,11 @@ static void simplify(const char *rp, char *wp) {
 
 int umvwprintw(WINDOW *win, int y, int x, const char *format, ...) {
     char buffer[128];
-    int result;
     va_list args;
 
     va_start(args, format);
     memset(buffer, 0, sizeof(buffer));
-    result = vsnprintf(buffer, sizeof(buffer)-1, format, args);
+    vsnprintf(buffer, sizeof(buffer)-1, format, args);
     va_end(args);
 
     simplify(buffer, buffer);
