@@ -78,30 +78,28 @@ state *current_state = NULL;
 
 static WINDOW *hstatus;
 
-static int unicode_utf8_to_ascii(char *result, const utf8_t * utf8_string,
-    size_t *length)
-{
-    int retval = unicode_utf8_to_cp437(result, utf8_string, length);
-    if (*length > 1) {
-        *result = '?';
-    }
-    return retval;
-}
-
-#ifdef WIN32
-#define CODEPAGE_TRANS unicode_utf8_to_cp1252
-#elif defined(NCURSES_VERSION)
-#define CODEPAGE_TRANS unicode_utf8_to_cp437
-#else
-#define CODEPAGE_TRANS unicode_utf8_to_ascii
+#ifdef STDIO_CP
+int gm_codepage = STDIO_CP;
+#else 
+int gm_codepage = -1;
 #endif
 
 static void unicode_remove_diacritics(const char *rp, char *wp) {
     while (*rp) {
-        if (*rp & 0x80) {
+        if (gm_codepage >=0 && *rp & 0x80) {
             size_t sz = 0;
             char ch;
-            CODEPAGE_TRANS(&ch, rp, &sz);
+            switch (gm_codepage) {
+            case 1252:
+                unicode_utf8_to_cp1252(&ch, rp, &sz);
+                break;
+            case 437:
+                unicode_utf8_to_cp437(&ch, rp, &sz);
+                break;
+            default:
+                unicode_utf8_to_ascii(&ch, rp, &sz);
+                break;
+            }
             rp += sz;
             *wp++ = ch;
         }
