@@ -78,17 +78,42 @@ state *current_state = NULL;
 
 static WINDOW *hstatus;
 
-static void simplify(const char *rp, char *wp) {
+static int unicode_utf8_to_ascii(char *result, const utf8_t * utf8_string,
+    size_t *length)
+{
+    int retval = unicode_utf8_to_cp437(result, utf8_string, length);
+    if (*length > 1) {
+        *result = '?';
+    }
+    return retval;
+}
+
+#ifdef WIN32
+#define CODEPAGE_TRANS unicode_utf8_to_cp1252
+#elif defined(NCURSES_VERSION)
+#define CODEPAGE_TRANS unicode_utf8_to_cp437
+#else
+#define CODEPAGE_TRANS unicode_utf8_to_ascii
+#endif
+
+static void unicode_remove_diacritics(const char *rp, char *wp) {
     while (*rp) {
         if (*rp & 0x80) {
-            while (*rp & 0x80) ++rp;
-            *wp++ = '?';
+            size_t sz = 0;
+            char ch;
+            CODEPAGE_TRANS(&ch, rp, &sz);
+            rp += sz;
+            *wp++ = ch;
         }
         else {
             *wp++ = *rp++;
         }
     }
     *wp = 0;
+}
+
+static void simplify(const char *rp, char *wp) {
+    unicode_remove_diacritics(rp, wp);
 }
 
 int umvwprintw(WINDOW *win, int y, int x, const char *format, ...) {
