@@ -16,9 +16,17 @@ static void test_unicode_tolower(CuTest * tc)
     CuAssertStrEquals(tc, "helloX", buffer);
 }
 
+static void test_unicode_compare(CuTest *tc)
+{
+    CuAssertIntEquals(tc, 0, unicode_utf8_strcasecmp("ABCDEFG", "abcdefg"));
+    CuAssertIntEquals(tc, 0, unicode_utf8_strcasecmp("abcdefg123", "ABCDEFG123"));
+    CuAssertIntEquals(tc, 1, unicode_utf8_strcasecmp("bacdefg123", "ABCDEFG123"));
+}
+
 CuSuite *get_unicode_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_unicode_tolower);
+    SUITE_ADD_TEST(suite, test_unicode_compare);
     return suite;
 }
