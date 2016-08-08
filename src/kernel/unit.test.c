@@ -227,14 +227,13 @@ static void test_default_name(CuTest *tc) {
     test_cleanup();
     test_create_world();
     lang = get_or_create_locale("de");
-    /* FIXME this has no real effect: default_name uses a static buffer that is initialized in some other test. This sucks. */
-    locale_setstring(lang, "unitdefault", "Einheit");
+    locale_setstring(lang, "unitdefault", "Zweiheit");
 
     u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
 
     default_name(u, buf, sizeof(buf));
 
-    sprintf(compare, "Einheit %s", itoa36(u->no));
+    sprintf(compare, "Zweiheit %s", itoa36(u->no));
     CuAssertStrEquals(tc, compare, buf);
 
     test_cleanup();

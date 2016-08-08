@@ -60,7 +60,6 @@ extern "C" {
 
     struct plane *getplane(const struct region *r);
     struct plane *findplane(int x, int y);
-    void init_planes(void);
     int getplaneid(const struct region *r);
     struct plane *getplanebyid(int id);
     int plane_center_x(const struct plane *pl);

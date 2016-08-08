@@ -39,6 +39,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/functions.h>
+#include <util/gamedata.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <quicklist.h>

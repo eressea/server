@@ -1003,33 +1003,24 @@ void kernel_init(void)
 }
 
 static order * defaults[MAXLOCALES];
-keyword_t default_keyword = NOKEYWORD;
 
-void set_default_order(int kwd) {
-    default_keyword = (keyword_t)kwd;
-}
-
-// TODO: outside of tests, default_keyword is never used, why is this here?
-// see also test_long_order_hungry
 order *default_order(const struct locale *lang)
 {
-    static int usedefault = 1;
     int i = locale_index(lang);
     order *result = 0;
     assert(i < MAXLOCALES);
 
-    if (default_keyword != NOKEYWORD) {
-        return create_order(default_keyword, lang, 0);
-    }
-
     result = defaults[i];
-    if (!result && usedefault) {
-        const char * str = LOC(lang, "defaultorder");
+    if (!result) {
+        const char * str;
+        keyword_t kwd = NOKEYWORD;
+        str = config_get("orders.default");
         if (str) {
-            result = defaults[i] = parse_order(str, lang);
+            kwd = findkeyword(str);
         }
-        else {
-            usedefault = 0;
+        if (kwd != NOKEYWORD) {
+            result = create_order(kwd, lang, NULL);
+            defaults[i] = result;
         }
     }
     return result ? copy_order(result) : 0;

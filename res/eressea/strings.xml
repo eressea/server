@@ -284,10 +284,6 @@
     getting it after the second turn, please make one of your units give the
     order OPTION COMPUTER.</text>
   </string>
-  <string name="defaultorder">
-    <text locale="de">ARBEITEN</text>
-    <text locale="en">WORK</text>
-  </string>
   <string name="temple">
     <text locale="de">Tempel</text>
     <text locale="en">temple</text>

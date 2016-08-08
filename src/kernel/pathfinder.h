@@ -22,11 +22,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-#define MAXDEPTH 1024
-
-    extern int search[MAXDEPTH][2];
-    extern int search_len;
-
     extern struct region **path_find(struct region *start,
         const struct region *target, int maxlen,
         bool(*allowed) (const struct region *, const struct region *));

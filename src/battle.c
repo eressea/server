@@ -2318,7 +2318,7 @@ void do_attack(fighter * af)
                 if (apr > 0) {
                     /* Wenn die Waffe nachladen muss, oder es sich nicht um einen
                      * Waffen-Angriff handelt, dann gilt der Speed nicht. */
-                    /* FIXME allow multiple AT_NATURAL attacks? */
+                    /* TODO: allow multiple AT_NATURAL attacks? */
                     if (u_race(au)->attack[a].type != AT_STANDARD) 
                         continue;
                     else {

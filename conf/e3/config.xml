@@ -59,9 +59,5 @@
       <text locale="de">ERESSEA 3 BEFEHLE</text>
       <text locale="en">ERESSEA 3 ORDERS</text>
     </string>
-    <string name="defaultorder">
-      <text locale="de">ARBEITEN</text>
-      <text locale="en">WORK</text>
-    </string> 
   </strings>
 </eressea>

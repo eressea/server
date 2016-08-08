@@ -20,7 +20,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define H_KRNL_SAVE
 
 #include <stream.h>
-#include <util/gamedata.h> // FIXME: eliminate include dependency from this file
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -78,8 +77,8 @@ extern "C" {
 
     void create_backup(char *file);
 
-    int write_game(gamedata *data);
-    int read_game(gamedata *data);
+    int write_game(struct gamedata *data);
+    int read_game(struct gamedata *data);
 
     /* test-only functions that give access to internal implementation details (BAD) */
     void _test_write_password(struct gamedata *data, const struct faction *f);
