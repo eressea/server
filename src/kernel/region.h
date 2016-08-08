@@ -168,7 +168,6 @@ extern "C" {
     extern struct attrib_type at_woodcount;
     extern struct attrib_type at_deathcount;
 
-    void initrhash(void);
     void rhash(struct region *r);
     void runhash(struct region *r);
 
@@ -176,10 +175,7 @@ extern "C" {
     void add_regionlist(region_list ** rl, struct region *r);
 
     int deathcount(const struct region *r);
-    int chaoscount(const struct region *r);
-
     void deathcounts(struct region *r, int delta);
-    void chaoscounts(struct region *r, int delta);
 
     void setluxuries(struct region *r, const struct luxury_type *sale);
     int get_maxluxuries(void);

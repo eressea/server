@@ -11,6 +11,7 @@
     "settings": {
         "game.id": 2,
         "game.name": "Eressea",
+        "orders.default": "work",
         "NewbieImmunity": 8,
         "modules.wormholes": true,
         "entertain.base": 0,

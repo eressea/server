@@ -28,6 +28,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <assert.h>
 
+#define MAXDEPTH 1024
+
 bool allowed_swim(const region * src, const region * r)
 {
     if (fval(r->terrain, SWIM_INTO))

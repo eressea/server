@@ -998,8 +998,6 @@ static void test_long_order_buy_cast(CuTest *tc) {
 }
 
 static void test_long_order_hungry(CuTest *tc) {
-    // FIXME: set_default_order is a test-only function, this is a bad test.
-    // see also default_order
     unit *u;
     test_cleanup();
     config_set("hunger.long", "1");
@@ -1007,12 +1005,11 @@ static void test_long_order_hungry(CuTest *tc) {
     fset(u, UFL_HUNGER);
     unit_addorder(u, create_order(K_MOVE, u->faction->locale, 0));
     unit_addorder(u, create_order(K_DESTROY, u->faction->locale, 0));
-    set_default_order(K_WORK);
+    config_set("orders.default", "work");
     update_long_order(u);
     CuAssertIntEquals(tc, K_WORK, getkeyword(u->thisorder));
     CuAssertPtrNotNull(tc, u->orders);
     CuAssertPtrEquals(tc, 0, u->faction->msgs);
-    set_default_order(NOKEYWORD);
     test_cleanup();
 }
 

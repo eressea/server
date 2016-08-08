@@ -60,9 +60,5 @@
       <text locale="de">ERESSEA 4 BEFEHLE</text>
       <text locale="en">ERESSEA 4 ORDERS</text>
     </string>
-    <string name="defaultorder">
-      <text locale="de">ARBEITEN</text>
-      <text locale="en">WORK</text>
-    </string>
   </strings>
 </eressea>
