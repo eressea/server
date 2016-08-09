@@ -93,25 +93,34 @@ cp_convert(const char *format, char *buffer, size_t length, int codepage)
 void log_rotate(const char *filename, int maxindex)
 {
     char buffer[2][MAX_PATH];
-    int err, dst = 1;
+    int dst = 1;
     assert(strlen(filename) < sizeof(buffer[0]) - 4);
 
     sprintf(buffer[dst], "%s.%d", filename, maxindex);
     /* make sure we don't overwrite an existing file (hard links) */
-    remove(buffer[dst]);
+    if (remove(buffer[dst]) != 0) {
+        if (errno != ENOENT) {
+            fprintf(stderr, "log rotate %s: %d %s", buffer[dst], errno, strerror(errno));
+        }
+        errno = 0;
+    }
 
     while (maxindex > 0) {
         int src = 1 - dst;
         sprintf(buffer[src], "%s.%d", filename, --maxindex);
-        err = rename(buffer[src], buffer[dst]);
-        if ((err != 0) && (err != ENOENT)) {
-            fprintf(stderr, "log rotate %s: %d %s", buffer[dst], errno, strerror(errno));
+        if (rename(buffer[src], buffer[dst]) != 0) {
+            if (errno != ENOENT) {
+                fprintf(stderr, "log rotate %s: %d %s", buffer[dst], errno, strerror(errno));
+            }
+            errno = 0;
         }
         dst = src;
     }
-    err = rename(filename, buffer[dst]);
-    if ((err != 0) && (err != ENOENT)) {
-        fprintf(stderr, "log rotate %s: %d %s", buffer[dst], errno, strerror(errno));
+    if (rename(filename, buffer[dst]) != 0) {
+        if (errno != ENOENT) {
+            fprintf(stderr, "log rotate %s: %d %s", buffer[dst], errno, strerror(errno));
+        }
+        errno = 0;
     }
 }
 
