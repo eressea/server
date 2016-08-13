@@ -22,9 +22,9 @@
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
-        <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Ungültige Zielregion."</text>
-      <text locale="en">"$unit($unit) in $region($region): '$order($command)' - invalid target region."</text>
     </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Ungültige Zielregion."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - invalid target region."</text>
   </message>
   
   <message name="missing_direction">
@@ -32,9 +32,9 @@
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
-        <text locale="de">"$unit($unit) in $region($region): '$order($command)' - keine Richtung angegeben."</text>
-      <text locale="en">"$unit($unit) in $region($region): '$order($command)' - no direction was specified."</text>
     </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - keine Richtung angegeben."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - no direction was specified."</text>
   </message>
   
   <message name="target_region_not_empty">
@@ -42,9 +42,9 @@
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
-        <text locale="de">"$unit($unit) in $region($region): '$order($command)' - In der Zielregion befinden sich noch Einheiten."</text>
-      <text locale="en">"$unit($unit) in $region($region): '$order($command)' - There are units in the target region."</text>
     </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - In der Zielregion befinden sich noch Einheiten."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - There are units in the target region."</text>
   </message>
   
   <message name="force_leave_ship" section="events">

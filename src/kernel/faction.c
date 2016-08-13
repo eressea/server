@@ -74,9 +74,6 @@ faction *factions;
 static void free_faction(faction * f)
 {
     funhash(f);
-    if (f->alliance && f->alliance->_leader == f) {
-        setalliance(f, 0);
-    }
     if (f->msgs) {
         free_messagelist(f->msgs->begin);
         free(f->msgs);
@@ -390,7 +387,7 @@ void destroyfaction(faction ** fp)
         else {
             region *r = u->region;
 
-            if (!fval(r->terrain, SEA_REGION) && !!playerrace(u_race(u))) {
+            if (r->land && !!playerrace(u_race(u))) {
                 const race *rc = u_race(u);
                 int m = rmoney(r);
 
@@ -454,7 +451,7 @@ void destroyfaction(faction ** fp)
     }
 #endif
 
-    if (f->alliance && f->alliance->_leader == f) {
+    if (f->alliance) {
         setalliance(f, 0);
     }
 
@@ -681,8 +678,6 @@ void remove_empty_factions(void)
         if (!(f->_alive && f->units!=NULL) && !fval(f, FFL_NOIDLEOUT)) {
             log_debug("dead: %s", factionname(f));
             destroyfaction(fp);
-            free_faction(f);
-            free(f);
         }
         else {
             fp = &(*fp)->next;

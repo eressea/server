@@ -35,18 +35,34 @@ typedef struct logger {
     void(*log)(void *data, int level, const char *module, const char *format, va_list args);
     void *data;
     int flags;
+    int id;
     struct logger *next;
 } logger;
 
 static logger *loggers;
+static int log_id;
 
-void log_create(int flags, void *data, log_fun call) {
+int log_create(int flags, void *data, log_fun call) {
     logger *lgr = malloc(sizeof(logger));
     lgr->log = call;
     lgr->flags = flags;
     lgr->data = data;
     lgr->next = loggers;
     loggers = lgr;
+    return lgr->id = ++log_id;
+}
+
+void log_destroy(int id) {
+    logger ** lp = &loggers;
+    while (*lp) {
+        logger *lg = *lp;
+        if (lg->id==id) {
+            *lp = lg->next;
+            free(lg);
+            break;
+        }
+        lp = &lg->next;
+    }
 }
 
 #define MAXLENGTH 4096          /* because I am lazy, CP437 output is limited to this many chars */
@@ -138,7 +154,6 @@ static void _log_write(FILE * stream, int codepage, const char *format, va_list 
     if (codepage) {
         char buffer[MAXLENGTH];
         char converted[MAXLENGTH];
-
         vsnprintf(buffer, sizeof(buffer), format, args);
         if (cp_convert(buffer, converted, MAXLENGTH, codepage) == 0) {
             fputs(converted, stream);
@@ -177,12 +192,16 @@ static void log_write(int flags, const char *module, const char *format, va_list
         int level = flags & LOG_LEVELS;
         if (lg->flags & level) {
             int dupe = 0;
+            va_list copy;
+
+            va_copy(copy, args);
             if (lg->flags & LOG_BRIEF) {
                 dupe = check_dupe(format, level);
             }
             if (dupe == 0) {
-                lg->log(lg->data, level, NULL, format, args);
+                lg->log(lg->data, level, NULL, format, copy);
             }
+            va_end(copy);
         }
     }
 }

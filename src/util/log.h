@@ -38,7 +38,8 @@ extern "C" {
 
     typedef void(*log_fun)(void *data, int level, const char *module, const char *format, va_list args);
 
-    void log_create(int flags, void *data, log_fun call);
+    int log_create(int flags, void *data, log_fun call);
+    void log_destroy(int id);
     void log_to_file(int flags, FILE *out);
 
     extern int log_flags;

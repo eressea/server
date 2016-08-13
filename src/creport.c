@@ -795,10 +795,8 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
             stream_printf(out, "%d;Verkleidung\n", sf->no);
         if (fval(u, UFL_ANON_FACTION))
             stream_printf(out, "%d;Parteitarnung\n", i2b(fval(u, UFL_ANON_FACTION)));
-        if (otherfaction) {
-            if (otherfaction != u->faction) {
-                stream_printf(out, "%d;Anderepartei\n", otherfaction->no);
-            }
+        if (otherfaction && otherfaction != u->faction) {
+            stream_printf(out, "%d;Anderepartei\n", otherfaction->no);
         }
         mage = get_familiar_mage(u);
         if (mage) {
@@ -819,11 +817,9 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
             if (sf == f) {
                 stream_printf(out, "1;Verraeter\n");
             }
-            if (a_otherfaction) {
-                if (otherfaction != u->faction) {
-                    if (alliedunit(u, f, HELP_FSTEALTH)) {
-                        stream_printf(out, "%d;Anderepartei\n", otherfaction->no);
-                    }
+            if (otherfaction && otherfaction != u->faction) {
+                if (alliedunit(u, f, HELP_FSTEALTH)) {
+                    stream_printf(out, "%d;Anderepartei\n", otherfaction->no);
                 }
             }
         }

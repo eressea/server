@@ -8,6 +8,7 @@ attrib.test.c
 strings.test.c
 bsdstring.test.c
 functions.test.c
+log.test.c
 umlaut.test.c
 unicode.test.c
 rng.test.c

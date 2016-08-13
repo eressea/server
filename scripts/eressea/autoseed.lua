@@ -39,7 +39,7 @@ local function read_players()
         local str = input:read("*line")
         if str==nil then break end
         local email, race, lang = str:match("([^ ]*) ([^ ]*) ([^ ]*)")
-        if string.char(string.byte(email, 1))~='#' then
+        if email and string.char(string.byte(email, 1))~='#' then
             table.insert(players, { race = race, lang = lang, email = email })
         end
     end
@@ -69,12 +69,12 @@ end
 
 function autoseed.init()
     -- local newbs = {}
-    local num_seeded = 2
+    local num_seeded = per_region
     local start = nil
 
     eressea.log.info('autoseed new players')
     players = read_players()
-    if players and #players > 0 then
+    if players and #players >= per_region then
         local sel
         eressea.log.info(#players .. ' new players')
         sel = select_regions(regions(), peasants, trees)

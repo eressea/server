@@ -84,6 +84,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(umlaut);
     ADD_SUITE(unicode);
     ADD_SUITE(strings);
+    ADD_SUITE(log);
     ADD_SUITE(rng);
     /* items */
     ADD_SUITE(xerewards);
