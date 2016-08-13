@@ -3,7 +3,6 @@ function nmr_check(maxnmrs)
   if nmrs >= maxnmrs then
     eressea.log.error("Shit. More than " .. maxnmrs .. " factions with 1 NMR (" .. nmrs .. ")")
     write_summary()
-    eressea.write_game("aborted.dat")
     return -1
   end
   print (nmrs .. " Factions with 1 NMR")

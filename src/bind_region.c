@@ -583,6 +583,13 @@ static int tolua_plane_get(lua_State * L)
     return 1;
 }
 
+static int tolua_plane_erase(lua_State *L)
+{
+    plane *self = (plane *)tolua_tousertype(L, 1, 0);
+    remove_plane(self);
+    return 0;
+}
+
 static int tolua_plane_create(lua_State * L)
 {
     int id = (int)tolua_tonumber(L, 1, 0);
@@ -740,6 +747,7 @@ void tolua_region_open(lua_State * L)
         tolua_beginmodule(L, TOLUA_CAST "plane");
         {
             tolua_function(L, TOLUA_CAST "create", tolua_plane_create);
+            tolua_function(L, TOLUA_CAST "erase", tolua_plane_erase);
             tolua_function(L, TOLUA_CAST "get", tolua_plane_get);
             tolua_function(L, TOLUA_CAST "__tostring", tolua_plane_tostring);
 

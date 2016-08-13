@@ -640,20 +640,38 @@ void rsetmoney(region * r, int value)
     }
 }
 
-int rherbs(const struct region *r)
+int rherbs(const region *r)
 {
     return r->land?r->land->herbs:0;
 }
 
-void rsetherbs(const struct region *r, int value)
+void rsetherbs(region *r, int value)
 {
     assert(r->land || value==0);
-    assert(value >= 0);
+    assert(value >= 0 && value<=SHRT_MAX);
     if (r->land) {
-        r->land->herbs = (short)(value);
+        r->land->herbs = (short)value;
     }
 }
 
+void rsetherbtype(region *r, const struct item_type *itype) {
+    assert(r->land && r->terrain);
+    if (itype == NULL) {
+        r->land->herbtype = NULL;
+    }
+    else {
+        if (r->terrain->herbs) {
+            int i;
+            for (i = 0; r->terrain->herbs[i]; ++i) {
+                if (r->terrain->herbs[i] == itype) {
+                    r->land->herbtype = itype;
+                    return;
+                }
+            }
+        }
+        log_error("attempt to set herbtype=%s for terrain=%s in %s", itype->rtype->_name, r->terrain->_name, regionname(r, 0));
+    }
+}
 
 void r_setdemand(region * r, const luxury_type * ltype, int value)
 {
