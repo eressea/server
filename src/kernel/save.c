@@ -419,6 +419,67 @@ void read_items(struct storage *store, item ** ilist)
     }
 }
 
+static void read_planes(gamedata *gdata)
+{
+    storage * store = gdata->store;
+    char name[DISPLAYSIZE];
+    int nread;
+
+    READ_INT(store, &nread);
+    while (--nread >= 0) {
+        int id;
+        variant fno;
+        plane *pl;
+
+        READ_INT(store, &id);
+        pl = getplanebyid(id);
+
+        if (pl == NULL) {
+            pl = calloc(1, sizeof(plane));
+        }
+        else {
+            log_warning("the plane with id=%d already exists.", id);
+        }
+        pl->id = id;
+        READ_STR(store, name, sizeof(name));
+        pl->name = _strdup(name);
+        READ_INT(store, &pl->minx);
+        READ_INT(store, &pl->maxx);
+        READ_INT(store, &pl->miny);
+        READ_INT(store, &pl->maxy);
+        READ_INT(store, &pl->flags);
+
+        /* read watchers */
+        if (gdata->version < FIX_WATCHERS_VERSION) {
+            char rname[64];
+            /* before this version, watcher storage was pretty broken. we are incompatible and don't read them */
+            for (;;) {
+                READ_TOK(store, rname, sizeof(rname));
+                if (strcmp(rname, "end") == 0) {
+                    break;                /* this is most likely the end of the list */
+                }
+                else {
+                    log_error(
+                        ("This datafile contains watchers, but we are unable to read them."));
+                }
+            }
+        }
+        else {
+            /* WATCHERS - eliminated in February 2016, ca. turn 966 */
+            if (gdata->version < CRYPT_VERSION) {
+                fno = read_faction_reference(gdata);
+                while (fno.i) {
+                    fno = read_faction_reference(gdata);
+                }
+            }
+        }
+        a_read(gdata, &pl->attribs, pl);
+        if (pl->id != 1094969858) { // Regatta
+            addlist(&planes, pl);
+        }
+    }
+}
+
 static void read_alliances(struct gamedata *data)
 {
     storage *store = data->store;
@@ -1555,62 +1616,7 @@ int read_game(gamedata *data) {
     READ_INT(store, &nextborder);
 
     /* Planes */
-    planes = NULL;
-    READ_INT(store, &nread);
-    while (--nread >= 0) {
-        int id;
-        variant fno;
-        plane *pl;
-
-        READ_INT(store, &id);
-        pl = getplanebyid(id);
-
-        if (pl == NULL) {
-            pl = calloc(1, sizeof(plane));
-        }
-        else {
-            log_warning("the plane with id=%d already exists.", id);
-        }
-        pl->id = id;
-        READ_STR(store, name, sizeof(name));
-        pl->name = _strdup(name);
-        READ_INT(store, &pl->minx);
-        READ_INT(store, &pl->maxx);
-        READ_INT(store, &pl->miny);
-        READ_INT(store, &pl->maxy);
-        READ_INT(store, &pl->flags);
-
-        /* read watchers */
-        if (data->version < FIX_WATCHERS_VERSION) {
-            char rname[64];
-            /* before this version, watcher storage was pretty broken. we are incompatible and don't read them */
-            for (;;) {
-                READ_TOK(store, rname, sizeof(rname));
-                if (strcmp(rname, "end") == 0) {
-                    break;                /* this is most likely the end of the list */
-                }
-                else {
-                    log_error(
-                        ("This datafile contains watchers, but we are unable to read them."));
-                }
-            }
-        }
-        else {
-            /* WATCHERS - eliminated in February 2016, ca. turn 966 */
-            if (data->version < NOWATCH_VERSION) {
-                fno = read_faction_reference(data);
-                while (fno.i) {
-                    fno = read_faction_reference(data);
-                }
-            }
-        }
-        read_attribs(data, &pl->attribs, pl);
-        if (pl->id != 1094969858) { // Regatta
-            addlist(&planes, pl);
-        }
-    }
-
-    /* Read factions */
+    read_planes(data);
     read_alliances(data);
     READ_INT(store, &nread);
     log_debug(" - Einzulesende Parteien: %d\n", nread);

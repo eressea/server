@@ -647,7 +647,7 @@ int read_borders(gamedata *data)
             if (type->read) {
                 // skip ahead
                 connection dummy;
-                type->read(&dummy, store);
+                type->read(&dummy, data);
             }
             continue;
         }
