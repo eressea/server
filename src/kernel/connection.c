@@ -616,6 +616,13 @@ int read_borders(gamedata *data)
         READ_TOK(store, zText, sizeof(zText));
         if (!strcmp(zText, "end"))
             break;
+        type = find_bordertype(zText);
+        if (type == NULL) {
+            log_error("[read_borders] connection %d type %s is not registered", bid, zText);
+            assert(type || !"connection type not registered");
+        }
+
+
         READ_INT(store, &bid);
         if (data->version < UIDHASH_VERSION) {
             int fx, fy, tx, ty;
@@ -632,16 +639,17 @@ int read_borders(gamedata *data)
             READ_INT(store, &tid);
             from = findregionbyid(fid);
             to = findregionbyid(tid);
-            if (!to || !from) {
-                log_error("%s connection between missing regions %d and %d", zText, fid, tid);
-                assert((to && from) || !"connection between missing regions");
-            }
         }
-
-        type = find_bordertype(zText);
-        if (type == NULL) {
-            log_error("[read_borders] unknown connection type '%s' in %s\n", zText, regionname(from, NULL));
-            assert(type || !"connection type not registered");
+        if (!to || !from) {
+            if (!to || !from) {
+                log_error("%s connection %d has missing regions", zText, bid);
+            }
+            if (type->read) {
+                // skip ahead
+                connection dummy;
+                type->read(&dummy, store);
+            }
+            continue;
         }
 
         if (to == from && type && from) {
