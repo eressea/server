@@ -311,6 +311,7 @@ void remove_plane(plane *pl) {
     }
     while (*pp) {
         if (pl==*pp) {
+            *pp = pl->next;
             free_plane(pl);
             break;
         }
