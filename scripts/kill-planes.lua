@@ -13,7 +13,7 @@ require 'eressea.xmlconf'
 require 'eressea.path'
 
 eressea.read_game(get_turn() .. '.dat')
-p=plane.create(50, -7278, -4493, 83,83, "Regatta")
+p=plane.create(50, -7280, -4494, 83, 83, "Regatta")
 ids = {50, 2081501646, 1967748303, 1137, 2000, 1456894557, 1580742069, 1143084084, 285224813, 604912520, 296884068}
 
 for k,v in ipairs(ids) do
@@ -24,3 +24,5 @@ end
 eressea.write_game(get_turn() .. '.new')
 eressea.free_game()
 eressea.read_game(get_turn() .. '.new')
+write_reports()
+eressea.write_game(get_turn() .. '.fix')
