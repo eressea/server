@@ -13,7 +13,8 @@ require 'eressea.xmlconf'
 require 'eressea.path'
 
 eressea.read_game(get_turn() .. '.dat')
-ids = {2081501646, 1967748303, 1137, 2000, 1456894557, 1580742069, 1143084084, 285224813, 604912520, 296884068, 50}
+p=plane.create(50, -7278, -4493, 83,83, "Regatta")
+ids = {50, 2081501646, 1967748303, 1137, 2000, 1456894557, 1580742069, 1143084084, 285224813, 604912520, 296884068}
 
 for k,v in ipairs(ids) do
     p = plane.get(v)
