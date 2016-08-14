@@ -1109,8 +1109,7 @@ void free_gamedata(void)
     while (planes) {
         plane *pl = planes;
         planes = planes->next;
-        free(pl->name);
-        free(pl);
+        free_plane(pl);
     }
 
     while (global.attribs) {

@@ -93,7 +93,6 @@ static int createunit_read(trigger * t, struct storage *store)
     createunit_data *td = (createunit_data *)t->data.v;
     variant var;
     int result = AT_READ_OK;
-
     var = read_faction_reference(store);
     if (var.i > 0) {
         td->f = findfaction(var.i);
@@ -105,6 +104,7 @@ static int createunit_read(trigger * t, struct storage *store)
         result = AT_READ_FAIL;
     }
     // read_reference(&td->f, store, read_faction_reference, resolve_faction);
+
     read_reference(&td->r, store, read_region_reference,
         RESOLVE_REGION(global.data_version));
     td->race = (const struct race *)read_race_reference(store).v;

@@ -69,13 +69,16 @@ extern "C" {
         int miny, int maxy, int flags);
     struct plane *getplanebyname(const char *);
     struct plane *get_homeplane(void);
-    extern int rel_to_abs(const struct plane *pl, const struct faction *f,
+    int rel_to_abs(const struct plane *pl, const struct faction *f,
         int rel, unsigned char index);
-    extern void write_plane_reference(const plane * p, struct storage *store);
-    extern int read_plane_reference(plane ** pp, struct storage *store);
-    extern int plane_width(const plane * pl);
-    extern int plane_height(const plane * pl);
+    void write_plane_reference(const plane * p, struct storage *store);
+    int read_plane_reference(plane ** pp, struct storage *store);
+    int plane_width(const plane * pl);
+    int plane_height(const plane * pl);
     void adjust_coordinates(const struct faction *f, int *x, int *y, const struct plane *pl);
+
+    void free_plane(struct plane *pl);
+    void remove_plane(struct plane *pl);
 #ifdef __cplusplus
 }
 #endif

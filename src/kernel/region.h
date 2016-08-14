@@ -203,12 +203,12 @@ extern "C" {
     void rsethorses(const struct region *r, int value);
 
     int rherbs(const struct region *r);
-    void rsetherbs(const struct region *r, int value);
+    void rsetherbs(struct region *r, int value);
+    void rsetherbtype(struct region *r, const struct item_type *itype);
 
 #define rbuildings(r) ((r)->buildings)
 
 #define rherbtype(r) ((r)->land?(r)->land->herbtype:0)
-#define rsetherbtype(r, value) if ((r)->land) (r)->land->herbtype=(value)
 
 
     bool r_isforest(const struct region *r);
@@ -276,6 +276,8 @@ extern "C" {
     void get_neighbours(const struct region *r, struct region **list);
 
     struct faction *update_owners(struct region *r);
+
+    void region_erase(struct region *r);
 
 #ifdef __cplusplus
 }

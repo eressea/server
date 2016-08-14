@@ -612,6 +612,13 @@ int read_borders(struct storage *store)
         READ_TOK(store, zText, sizeof(zText));
         if (!strcmp(zText, "end"))
             break;
+        type = find_bordertype(zText);
+        if (type == NULL) {
+            log_error("[read_borders] connection %d type %s is not registered", bid, zText);
+            assert(type || !"connection type not registered");
+        }
+
+
         READ_INT(store, &bid);
         if (global.data_version < UIDHASH_VERSION) {
             int fx, fy, tx, ty;
@@ -628,16 +635,17 @@ int read_borders(struct storage *store)
             READ_INT(store, &tid);
             from = findregionbyid(fid);
             to = findregionbyid(tid);
-            if (!to || !from) {
-                log_warning("%s connection between incomplete regions %d and %d", zText, fid, tid);
-                continue;
-            }
         }
-
-        type = find_bordertype(zText);
-        if (type == NULL) {
-            log_error("[read_borders] unknown connection type '%s' in %s\n", zText, regionname(from, NULL));
-            assert(type || !"connection type not registered");
+        if (!to || !from) {
+            if (!to || !from) {
+                log_error("%s connection %d has missing regions", zText, bid);
+            }
+            if (type->read) {
+                // skip ahead
+                connection dummy;
+                type->read(&dummy, store);
+            }
+            continue;
         }
 
         if (to == from && type && from) {
