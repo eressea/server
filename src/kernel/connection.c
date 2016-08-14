@@ -629,8 +629,8 @@ int read_borders(struct storage *store)
             from = findregionbyid(fid);
             to = findregionbyid(tid);
             if (!to || !from) {
-                log_warning("%s connection between incomplete regions %d and %d", zText, fid, tid);
-                continue;
+                log_error("%s connection between missing regions %d and %d", zText, fid, tid);
+                assert((to && from) || !"connection between missing regions");
             }
         }
 
