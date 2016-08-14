@@ -21,3 +21,5 @@ for k,v in ipairs(ids) do
     p:erase()
 end
 eressea.write_game(get_turn() .. '.new')
+eressea.free_game()
+eressea.read_game(get_turn() .. '.new')
