@@ -497,7 +497,7 @@ static void read_alliances(struct gamedata *data)
         char aname[128];
         alliance *al;
         READ_STR(store, aname, sizeof(aname));
-        al = makealliance(id, aname);
+        al = new_alliance(id, aname);
         if (data->version >= OWNER_2_VERSION) {
             READ_INT(store, &al->flags);
         }
