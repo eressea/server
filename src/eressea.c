@@ -49,6 +49,8 @@ void game_done(void)
     calendar_cleanup();
 #endif
     free_functions();
+    free_config();
+    free_locales();
     curses_done();
     kernel_done();
 }
