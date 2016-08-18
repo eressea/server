@@ -134,7 +134,7 @@ extern "C" {
 
     void write_faction_reference(const struct faction *f,
         struct storage *store);
-    variant read_faction_reference(struct gamedata *store);
+    variant read_faction_reference(struct gamedata *data);
     int resolve_faction(variant data, void *addr);
 
     void renumber_faction(faction * f, int no);

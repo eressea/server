@@ -290,3 +290,33 @@ int read_plane_reference(plane ** pp, struct storage *store)
         ur_add(id, pp, resolve_plane);
     return AT_READ_OK;
 }
+
+void free_plane(plane *pl) {
+    free(pl->name);
+    free(pl);
+}
+
+void remove_plane(plane *pl) {
+    region **rp = &regions;
+    plane **pp = &planes;
+    assert(pl);
+    while (*rp) {
+        region *r = *rp;
+        if (r->_plane == pl) {
+            remove_region(rp, r);
+        }
+        else {
+            rp = &r->next;
+        }
+    }
+    while (*pp) {
+        if (pl==*pp) {
+            *pp = pl->next;
+            free_plane(pl);
+            break;
+        }
+        else {
+            pp = &(*pp)->next;
+        }
+    }
+}

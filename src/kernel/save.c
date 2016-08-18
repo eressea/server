@@ -436,7 +436,7 @@ static void read_alliances(struct gamedata *data)
         char aname[128];
         alliance *al;
         READ_STR(store, aname, sizeof(aname));
-        al = makealliance(id, aname);
+        al = new_alliance(id, aname);
         if (data->version >= OWNER_2_VERSION) {
             READ_INT(store, &al->flags);
         }
@@ -449,6 +449,88 @@ static void read_alliances(struct gamedata *data)
             READ_STR(store, pbuf, sizeof(pbuf));
             id = atoi36(pbuf);
         }
+    }
+}
+
+void read_planes(gamedata *data) {
+    struct storage *store = data->store;
+    int nread;
+    char name[32];
+
+    /* Planes */
+    planes = NULL;
+    READ_INT(store, &nread);
+    while (--nread >= 0) {
+        int id;
+        variant fno;
+        plane *pl;
+
+        READ_INT(store, &id);
+        pl = getplanebyid(id);
+
+        if (pl == NULL) {
+            pl = calloc(1, sizeof(plane));
+        }
+        else {
+            log_warning("the plane with id=%d already exists.", id);
+        }
+        pl->id = id;
+        READ_STR(store, name, sizeof(name));
+        pl->name = _strdup(name);
+        READ_INT(store, &pl->minx);
+        READ_INT(store, &pl->maxx);
+        READ_INT(store, &pl->miny);
+        READ_INT(store, &pl->maxy);
+        READ_INT(store, &pl->flags);
+
+        /* read watchers */
+        if (data->version < FIX_WATCHERS_VERSION) {
+            char rname[64];
+            /* before this version, watcher storage was pretty broken. we are incompatible and don't read them */
+            for (;;) {
+                READ_TOK(store, rname, sizeof(rname));
+                if (strcmp(rname, "end") == 0) {
+                    break;                /* this is most likely the end of the list */
+                }
+                else {
+                    log_error(
+                        ("This datafile contains watchers, but we are unable to read them."));
+                }
+            }
+        }
+        else {
+            /* WATCHERS - eliminated in February 2016, ca. turn 966 */
+            if (data->version < NOWATCH_VERSION) {
+                fno = read_faction_reference(data);
+                while (fno.i) {
+                    fno = read_faction_reference(data);
+                }
+            }
+        }
+        read_attribs(data, &pl->attribs, pl);
+        if (pl->id != 1094969858) { // Regatta
+            addlist(&planes, pl);
+        }
+    }
+}
+
+void write_planes(storage *store) {
+    plane *pl;
+    /* Write planes */
+    WRITE_INT(store, listlen(planes));
+    for (pl = planes; pl; pl = pl->next) {
+        WRITE_INT(store, pl->id);
+        WRITE_STR(store, pl->name);
+        WRITE_INT(store, pl->minx);
+        WRITE_INT(store, pl->maxx);
+        WRITE_INT(store, pl->miny);
+        WRITE_INT(store, pl->maxy);
+        WRITE_INT(store, pl->flags);
+#if RELEASE_VERSION < NOWATCH_VERSION
+        write_faction_reference(NULL, store);  /* mark the end of pl->watchers (gone since T966)  */
+#endif
+        a_write(store, pl->attribs, pl);
+        WRITE_SECTION(store);
     }
 }
 
@@ -984,7 +1066,7 @@ static region *readregion(struct gamedata *data, int x, int y)
             rsetherbtype(r, NULL);
         }
         READ_INT(data->store, &n);
-        rsetherbs(r, (short)n);
+        rsetherbs(r, n);
         READ_INT(data->store, &n);
         if (n < 0) {
             /* bug 2182 */
@@ -1554,63 +1636,7 @@ int read_game(gamedata *data) {
     READ_INT(store, NULL);          /* max_unique_id = ignore */
     READ_INT(store, &nextborder);
 
-    /* Planes */
-    planes = NULL;
-    READ_INT(store, &nread);
-    while (--nread >= 0) {
-        int id;
-        variant fno;
-        plane *pl;
-
-        READ_INT(store, &id);
-        pl = getplanebyid(id);
-
-        if (pl == NULL) {
-            pl = calloc(1, sizeof(plane));
-        }
-        else {
-            log_warning("the plane with id=%d already exists.", id);
-        }
-        pl->id = id;
-        READ_STR(store, name, sizeof(name));
-        pl->name = _strdup(name);
-        READ_INT(store, &pl->minx);
-        READ_INT(store, &pl->maxx);
-        READ_INT(store, &pl->miny);
-        READ_INT(store, &pl->maxy);
-        READ_INT(store, &pl->flags);
-
-        /* read watchers */
-        if (data->version < FIX_WATCHERS_VERSION) {
-            char rname[64];
-            /* before this version, watcher storage was pretty broken. we are incompatible and don't read them */
-            for (;;) {
-                READ_TOK(store, rname, sizeof(rname));
-                if (strcmp(rname, "end") == 0) {
-                    break;                /* this is most likely the end of the list */
-                }
-                else {
-                    log_error(
-                        ("This datafile contains watchers, but we are unable to read them."));
-                }
-            }
-        }
-        else {
-            /* WATCHERS - eliminated in February 2016, ca. turn 966 */
-            if (data->version < NOWATCH_VERSION) {
-                fno = read_faction_reference(data);
-                while (fno.i) {
-                    fno = read_faction_reference(data);
-                }
-            }
-        }
-        read_attribs(data, &pl->attribs, pl);
-        if (pl->id != 1094969858) { // Regatta
-            addlist(&planes, pl);
-        }
-    }
-
-    /* Read factions */
+    read_planes(data);
     read_alliances(data);
     READ_INT(store, &nread);
     log_debug(" - Einzulesende Parteien: %d\n", nread);
@@ -1866,24 +1892,6 @@ int writegame(const char *filename)
     return n;
 }
 
-void write_planes(storage *store) {
-    plane *pl;
-    for (pl = planes; pl; pl = pl->next) {
-        WRITE_INT(store, pl->id);
-        WRITE_STR(store, pl->name);
-        WRITE_INT(store, pl->minx);
-        WRITE_INT(store, pl->maxx);
-        WRITE_INT(store, pl->miny);
-        WRITE_INT(store, pl->maxy);
-        WRITE_INT(store, pl->flags);
-#if RELEASE_VERSION < NOWATCH_VERSION
-        write_faction_reference(NULL, store);  /* mark the end of pl->watchers (gone since T966)  */
-#endif
-        a_write(store, pl->attribs, pl);
-        WRITE_SECTION(store);
-    }
-}
-
 int write_game(gamedata *data) {
     storage * store = data->store;
     region *r;
@@ -1902,11 +1910,6 @@ int write_game(gamedata *data) {
     WRITE_INT(store, turn);
     WRITE_INT(store, 0 /* max_unique_id */);
     WRITE_INT(store, nextborder);
-
-    /* Write planes */
-    WRITE_SECTION(store);
-    WRITE_INT(store, listlen(planes));
-    WRITE_SECTION(store);
 
     write_planes(store);
     write_alliances(data);

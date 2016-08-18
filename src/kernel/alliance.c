@@ -58,7 +58,7 @@ void free_alliances(void)
 
 alliance *makealliance(int id, const char *name)
 {
-    alliance *al;;
+    alliance *al;
 
     for (;;) {
         if (id > 0) {
@@ -73,6 +73,13 @@ alliance *makealliance(int id, const char *name)
         }
         id = id ? id : (1 + (rng_int() % MAX_UNIT_NR));
     }
+    return new_alliance(id, name);
+}
+
+alliance *new_alliance(int id, const char *name) {
+    alliance *al;
+    assert(id>0);
+
     al = calloc(1, sizeof(alliance));
     al->id = id;
     if (name) {
