@@ -2272,6 +2272,7 @@ static void travel(unit * u, region_list ** routep)
     }
 }
 
+// FIXME: move_on_land argument is unused, kill it
 void move_cmd(unit * u, order * ord, bool move_on_land)
 {
     region_list *route = NULL;
