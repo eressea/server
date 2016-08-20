@@ -226,7 +226,7 @@ CuSuite *get_piracy_suite(void)
     SUITE_ADD_TEST(suite, test_piracy_cmd_errors);
     SUITE_ADD_TEST(suite, test_piracy_cmd);
     SUITE_ADD_TEST(suite, test_piracy_cmd_walking);
-    DISABLE_TEST(suite, test_piracy_cmd_land_to_land);
+    SUITE_ADD_TEST(suite, test_piracy_cmd_land_to_land);
     SUITE_ADD_TEST(suite, test_piracy_cmd_swimmer);
     return suite;
 }
