@@ -1786,8 +1786,7 @@ bool can_takeoff(const ship * sh, const region * from, const region * to)
     return true;
 }
 
-static void
-sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
+static void sail(unit * u, order * ord, region_list ** routep)
 {
     region *starting_point = u->region;
     region *current_point, *last_point;
@@ -1909,12 +1908,10 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
             } // storms_enabled
             if (!fval(tthis, SEA_REGION)) {
                 if (!fval(tnext, SEA_REGION)) {
-                    if (!move_on_land) {
-                        /* check that you're not traveling from one land region to another. */
-                        ADDMSG(&u->faction->msgs, msg_message("shipnoshore",
-                            "ship region", sh, next_point));
-                        break;
-                    }
+                    /* check that you're not traveling from one land region to another. */
+                    ADDMSG(&u->faction->msgs, msg_message("shipnoshore",
+                        "ship region", sh, next_point));
+                    break;
                 }
                 else {
                     if (!can_takeoff(sh, current_point, next_point)) {
@@ -2024,9 +2021,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
          * transferiert wurden, kann der aktuelle Befehl gelöscht werden. */
         cycle_route(ord, u, step);
         set_order(&u->thisorder, NULL);
-        if (!move_on_land) {
-            set_coast(sh, last_point, current_point);
-        }
+        set_coast(sh, last_point, current_point);
 
         if (is_cursed(sh->attribs, C_SHIP_FLYING, 0)) {
             ADDMSG(&f->msgs, msg_message("shipfly", "ship from to", sh,
@@ -2272,13 +2267,13 @@ static void travel(unit * u, region_list ** routep)
     }
 }
 
-void move_cmd(unit * u, order * ord, bool move_on_land)
+void move_cmd(unit * u, order * ord)
 {
     region_list *route = NULL;
 
     assert(u->number);
     if (u->ship && u == ship_owner(u->ship)) {
-        sail(u, ord, move_on_land, &route);
+        sail(u, ord, &route);
     }
     else {
         travel(u, &route);
@@ -2396,7 +2391,7 @@ int follow_ship(unit * u, order * ord)
     init_tokens_str(command);
     getstrtoken();
     /* NACH ausführen */
-    move_cmd(u, ord, false);
+    move_cmd(u, ord);
     return 1;                     /* true -> Einheitenliste von vorne durchgehen */
 }
 
@@ -2563,13 +2558,13 @@ void movement(void)
                         if (ships) {
                             if (u->ship && ship_owner(u->ship) == u) {
                                 init_order(u->thisorder);
-                                move_cmd(u, u->thisorder, false);
+                                move_cmd(u, u->thisorder);
                             }
                         }
                         else {
                             if (!u->ship || ship_owner(u->ship) != u) {
                                 init_order(u->thisorder);
-                                move_cmd(u, u->thisorder, false);
+                                move_cmd(u, u->thisorder);
                             }
                         }
                     }
