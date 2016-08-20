@@ -2267,8 +2267,7 @@ static void travel(unit * u, region_list ** routep)
     }
 }
 
-// FIXME: move_on_land argument is unused, kill it
-void move_cmd(unit * u, order * ord, bool move_on_land)
+void move_cmd(unit * u, order * ord)
 {
     region_list *route = NULL;
 
@@ -2392,7 +2391,7 @@ int follow_ship(unit * u, order * ord)
     init_tokens_str(command);
     getstrtoken();
     /* NACH ausführen */
-    move_cmd(u, ord, false);
+    move_cmd(u, ord);
     return 1;                     /* true -> Einheitenliste von vorne durchgehen */
 }
 
@@ -2559,13 +2558,13 @@ void movement(void)
                         if (ships) {
                             if (u->ship && ship_owner(u->ship) == u) {
                                 init_order(u->thisorder);
-                                move_cmd(u, u->thisorder, false);
+                                move_cmd(u, u->thisorder);
                             }
                         }
                         else {
                             if (!u->ship || ship_owner(u->ship) != u) {
                                 init_order(u->thisorder);
-                                move_cmd(u, u->thisorder, false);
+                                move_cmd(u, u->thisorder);
                             }
                         }
                     }
