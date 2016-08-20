@@ -283,14 +283,6 @@
         },
         "wall1": {
             "flags": [ "forbidden", "land" ]
-        },
-        "default": {
-            "size": 0,
-            "herbs": [],
-            "seed": 0,
-            "road": 0,
-            "flags": [ "land", "walk", "sail", "fly" ],
-            "production": {}
         }
     }
 }

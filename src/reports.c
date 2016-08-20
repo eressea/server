@@ -1540,7 +1540,7 @@ int write_reports(faction * f, time_t ltime)
     }
     prepare_report(&ctx, f);
     get_addresses(&ctx);
-    log_debug("Reports for %s:", factionname(f));
+    log_debug("Reports for %s", factionname(f));
     for (rtype = report_types; rtype != NULL; rtype = rtype->next) {
         if (f->options & rtype->flag) {
             int error = 0;
