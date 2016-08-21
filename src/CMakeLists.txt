@@ -111,6 +111,7 @@ set (ERESSEA_SRC
   morale.c
   monster.c
   randenc.c
+  volcano.c
   chaos.c
   report.c
   spy.c
