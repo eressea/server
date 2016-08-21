@@ -717,7 +717,7 @@ static int maintain(building * b)
     unit *u;
 
     if (fval(b, BLD_MAINTAINED) || b->type == NULL || b->type->maintenance == NULL) {
-        return (BLD_MAINTAINED|BLD_WORKING);
+        return BLD_MAINTAINED;
     }
     if (fval(b, BLD_DONTPAY)) {
         return 0;
@@ -801,7 +801,7 @@ static int maintain(building * b)
         }
         if (work) {
             ADDMSG(&u->faction->msgs, msg_message("maintenance", "unit building", u, b));
-            return (BLD_MAINTAINED | BLD_WORKING);
+            return BLD_MAINTAINED;
         }
     }
     ADDMSG(&u->faction->msgs, msg_message("maintenancefail", "unit building", u, b));
@@ -814,19 +814,16 @@ void maintain_buildings(region * r)
     building **bp = &r->buildings;
     while (*bp) {
         building *b = *bp;
-        int flags = (BLD_MAINTAINED | BLD_WORKING);
+        int flags = BLD_MAINTAINED;
         
         if (!curse_active(get_curse(b->attribs, nocost_ct))) {
             flags = maintain(b);
         }
         fset(b, flags);
 
-        if (!fval(b, BLD_WORKING)) {
+        if (!fval(b, BLD_MAINTAINED)) {
             unit *u = building_owner(b);
-            const char *msgtype =
-                flags ? "maintenance_nowork" : "maintenance_none";
-            struct message *msg = msg_message(msgtype, "building", b);
-
+            struct message *msg = msg_message("maintenance_nowork", "building", b);
             if (u) {
                 add_message(&u->faction->msgs, msg);
                 r_addmessage(r, u->faction, msg);

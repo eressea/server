@@ -66,7 +66,7 @@ void update_lighthouse(building * lh)
 int lighthouse_range(const building * b, const faction * f)
 {
     int d = 0;
-    if (fval(b, BLD_WORKING) && b->size >= 10) {
+    if (fval(b, BLD_MAINTAINED) && b->size >= 10) {
         int maxd = (int)log10(b->size) + 1;
 
         if (skill_enabled(SK_PERCEPTION)) {
@@ -112,7 +112,7 @@ bool check_leuchtturm(region * r, faction * f)
         building *b = (building *)a->data.v;
 
         assert(b->type == bt_find("lighthouse"));
-        if (fval(b, BLD_WORKING) && b->size >= 10) {
+        if (fval(b, BLD_MAINTAINED) && b->size >= 10) {
             int maxd = (int)log10(b->size) + 1;
 
             if (skill_enabled(SK_PERCEPTION) && f) {

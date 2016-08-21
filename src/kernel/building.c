@@ -648,7 +648,7 @@ buildingtype_exists(const region * r, const building_type * bt, bool working)
     building *b;
 
     for (b = rbuildings(r); b; b = b->next) {
-        if (b->type == bt && (!working || fval(b, BLD_WORKING)) && building_finished(b)) {
+        if (b->type == bt && (!working || fval(b, BLD_MAINTAINED)) && building_finished(b)) {
             return true;
         }
     }
@@ -661,7 +661,7 @@ bool building_finished(const struct building *b) {
 }
 
 bool building_is_active(const struct building *b) {
-    return b && fval(b, BLD_WORKING) && building_finished(b);
+    return b && fval(b, BLD_MAINTAINED) && building_finished(b);
 }
 
 building *active_building(const unit *u, const struct building_type *btype) {
