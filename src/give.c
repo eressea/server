@@ -70,7 +70,11 @@ static void feedback_give_not_allowed(unit * u, order * ord)
 static bool can_give(const unit * u, const unit * u2, const item_type * itype, int mask)
 {
     if (u2) {
-        if (u->faction != u2->faction) {
+        if (u2->number==0 && !fval(u2, UFL_ISNEW)) {
+            // https://bugs.eressea.de/view.php?id=2230
+            // cannot give anything to dead units
+            return false;
+        } else if (u->faction != u2->faction) {
             int rule = rule_give();
             if (itype) {
                 assert(mask == 0);
