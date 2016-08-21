@@ -222,8 +222,6 @@ static void test_tax_cmd(CuTest *tc) {
     CuAssertPtrEquals(tc, 0, test_find_messagetype(u->faction->msgs, "error_no_tax_skill"));
     CuAssertPtrNotNull(tc, taxorders);
 
-
-
     rsetmoney(r, 11);
     expandtax(r, taxorders);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "income"));
@@ -243,6 +241,55 @@ static void test_tax_cmd(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_maintain_buildings(CuTest *tc) {
+    region *r;
+    building *b;
+    building_type *btype;
+    unit *u;
+    maintenance *req;
+    item_type *itype;
+
+    test_cleanup();
+    btype = test_create_buildingtype("Hort");
+    btype->maxsize = 10;
+    r = test_create_region(0, 0, 0);
+    u = test_create_unit(test_create_faction(0), r);
+    b = test_create_building(r, btype);
+    itype = test_create_itemtype("money");
+    b->size = btype->maxsize;
+    u_set_building(u, b);
+
+    // this building has no upkeep, it just works:
+    b->flags = 0;
+    maintain_buildings(r, false);
+    CuAssertIntEquals(tc, BLD_MAINTAINED, fval(b, BLD_MAINTAINED));
+
+    req = calloc(2, sizeof(maintenance));
+    req[0].number = 100;
+    req[0].rtype = itype->rtype;
+    btype->maintenance = req;
+
+    // we cannot afford to pay:
+    b->flags = 0;
+    maintain_buildings(r, false);
+    CuAssertIntEquals(tc, 0, fval(b, BLD_MAINTAINED));
+
+    // we can afford to pay:
+    i_change(&u->items, itype, 100);
+    b->flags = 0;
+    maintain_buildings(r, false);
+    CuAssertIntEquals(tc, BLD_MAINTAINED, fval(b, BLD_MAINTAINED));
+    CuAssertIntEquals(tc, 0, i_get(u->items, itype));
+
+    // this building has no owner, it doesn't work:
+    u_set_building(u, NULL);
+    b->flags = 0;
+    maintain_buildings(r, false);
+    CuAssertIntEquals(tc, 0, fval(b, BLD_MAINTAINED));
+
+    test_cleanup();
+}
+
 CuSuite *get_economy_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -254,5 +301,6 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_normals_recruit);
     SUITE_ADD_TEST(suite, test_heroes_dont_recruit);
     SUITE_ADD_TEST(suite, test_tax_cmd);
+    SUITE_ADD_TEST(suite, test_maintain_buildings);
     return suite;
 }
