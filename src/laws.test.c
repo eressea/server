@@ -576,7 +576,12 @@ static void test_new_units(CuTest *tc) {
     assert(loc);
     u->orders = create_order(K_MAKETEMP, loc, "hurr");
     new_units();
-    CuAssertPtrNotNull(tc, u->next);
+    CuAssertPtrNotNull(tc, u = u->next);
+    CuAssertIntEquals(tc, UFL_ISNEW, fval(u, UFL_ISNEW));
+    CuAssertIntEquals(tc, 0, u->number);
+    CuAssertIntEquals(tc, 0, u->age);
+    CuAssertPtrEquals(tc, f, u->faction);
+    CuAssertStrEquals(tc, "EINHEIT hurr", u->_name);
     test_cleanup();
 }
 
