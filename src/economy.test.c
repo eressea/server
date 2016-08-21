@@ -261,7 +261,7 @@ static void test_maintain_buildings(CuTest *tc) {
 
     // this building has no upkeep, it just works:
     b->flags = 0;
-    maintain_buildings(r, false);
+    maintain_buildings(r);
     CuAssertIntEquals(tc, BLD_MAINTAINED, fval(b, BLD_MAINTAINED));
 
     req = calloc(2, sizeof(maintenance));
@@ -271,20 +271,20 @@ static void test_maintain_buildings(CuTest *tc) {
 
     // we cannot afford to pay:
     b->flags = 0;
-    maintain_buildings(r, false);
+    maintain_buildings(r);
     CuAssertIntEquals(tc, 0, fval(b, BLD_MAINTAINED));
 
     // we can afford to pay:
     i_change(&u->items, itype, 100);
     b->flags = 0;
-    maintain_buildings(r, false);
+    maintain_buildings(r);
     CuAssertIntEquals(tc, BLD_MAINTAINED, fval(b, BLD_MAINTAINED));
     CuAssertIntEquals(tc, 0, i_get(u->items, itype));
 
     // this building has no owner, it doesn't work:
     u_set_building(u, NULL);
     b->flags = 0;
-    maintain_buildings(r, false);
+    maintain_buildings(r);
     CuAssertIntEquals(tc, 0, fval(b, BLD_MAINTAINED));
 
     test_cleanup();
