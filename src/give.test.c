@@ -316,6 +316,34 @@ static void test_give_denied_by_rules(CuTest * tc) {
     test_cleanup();
 }
 
+static void test_give_dead_unit(CuTest * tc) {
+    struct give env;
+    struct message *msg;
+
+    test_cleanup();
+    env.f1 = test_create_faction(0);
+    env.f2 = test_create_faction(0);
+    setup_give(&env);
+    env.dst->number = 0;
+    freset(env.dst, UFL_ISNEW);
+    CuAssertPtrNotNull(tc, msg = check_give(env.src, env.dst, 0));
+    msg_release(msg);
+    test_cleanup();
+}
+
+static void test_give_new_unit(CuTest * tc) {
+    struct give env;
+
+    test_cleanup();
+    env.f1 = test_create_faction(0);
+    env.f2 = test_create_faction(0);
+    setup_give(&env);
+    env.dst->number = 0;
+    fset(env.dst, UFL_ISNEW);
+    CuAssertPtrEquals(tc, 0, check_give(env.src, env.dst, 0));
+    test_cleanup();
+}
+
 static void test_give_invalid_target(CuTest *tc) {
     // bug https://bugs.eressea.de/view.php?id=1685
     struct give env;
@@ -357,5 +385,7 @@ CuSuite *get_give_suite(void)
     SUITE_ADD_TEST(suite, test_give_okay);
     SUITE_ADD_TEST(suite, test_give_denied_by_rules);
     SUITE_ADD_TEST(suite, test_give_invalid_target);
+    SUITE_ADD_TEST(suite, test_give_new_unit);
+    SUITE_ADD_TEST(suite, test_give_dead_unit);
     return suite;
 }
