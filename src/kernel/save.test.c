@@ -316,7 +316,7 @@ CuSuite *get_save_suite(void)
     SUITE_ADD_TEST(suite, test_readwrite_dead_faction_createunit);
     SUITE_ADD_TEST(suite, test_readwrite_dead_faction_changefaction);
     SUITE_ADD_TEST(suite, test_readwrite_dead_faction_regionowner);
-    DISABLE_TEST(suite, test_readwrite_dead_faction_group);
+    SUITE_ADD_TEST(suite, test_readwrite_dead_faction_group);
     SUITE_ADD_TEST(suite, test_read_password);
     SUITE_ADD_TEST(suite, test_read_password_external);
     return suite;
