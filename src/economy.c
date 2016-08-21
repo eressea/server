@@ -709,7 +709,7 @@ static int forget_cmd(unit * u, order * ord)
     return 0;
 }
 
-static bool maintain(building * b, bool first)
+static int maintain(building * b, bool first)
 /* first==false -> take money from wherever you can */
 {
     const resource_type *rsilver = get_resourcetype(R_SILVER);
@@ -718,24 +718,22 @@ static bool maintain(building * b, bool first)
     bool paid = true, work = first;
     unit *u;
 
-    if (fval(b, BLD_MAINTAINED) || b->type == NULL || b->type->maintenance == NULL || is_cursed(b->attribs, C_NOCOST, 0)) {
-        fset(b, BLD_MAINTAINED);
-        fset(b, BLD_WORKING);
-        return true;
+    if (fval(b, BLD_MAINTAINED) || b->type == NULL || b->type->maintenance == NULL) {
+        return (BLD_MAINTAINED|BLD_WORKING);
     }
     if (fval(b, BLD_DONTPAY)) {
-        return false;
+        return 0;
     }
     u = building_owner(b);
     if (u == NULL) {
         /* no owner - send a message to the entire region */
         ADDMSG(&r->msgs, msg_message("maintenance_noowner", "building", b));
-        return false;
+        return 0;
     }
     /* If the owner is the region owner, check if dontpay flag is set for the building where he is in */
     if (config_token("rules.region_owner_pay_building", b->type->_name)) {
         if (fval(u->building, BLD_DONTPAY)) {
-            return false;
+            return 0;
         }
     }
     for (c = 0; b->type->maintenance[c].number; ++c) {
@@ -778,11 +776,12 @@ static bool maintain(building * b, bool first)
         }
     }
     if (fval(b, BLD_DONTPAY)) {
-        return false;
+        return 0;
     }
     u = building_owner(b);
-    if (u == NULL)
-        return false;
+    if (!u) {
+        return 0;
+    }
     for (c = 0; b->type->maintenance[c].number; ++c) {
         const maintenance *m = b->type->maintenance + c;
         int need = m->number;
@@ -823,20 +822,9 @@ static bool maintain(building * b, bool first)
         }
     }
     if (paid && c > 0) {
-        /* TODO: wieviel von was wurde bezahlt */
-        if (first && work) {
-            ADDMSG(&u->faction->msgs, msg_message("maintenance", "unit building", u, b));
-            fset(b, BLD_WORKING);
-            fset(b, BLD_MAINTAINED);
-        }
-        if (!first) {
-            ADDMSG(&u->faction->msgs, msg_message("maintenance_late", "building", b));
-            fset(b, BLD_MAINTAINED);
-        }
-
         if (first && !work) {
             ADDMSG(&u->faction->msgs, msg_message("maintenancefail", "unit building", u, b));
-            return false;
+            return 0;
         }
 
         for (c = 0; b->type->maintenance[c].number; ++c) {
@@ -876,27 +864,38 @@ static bool maintain(building * b, bool first)
             }
             assert(cost == 0);
         }
+        if (!first) {
+            ADDMSG(&u->faction->msgs, msg_message("maintenance_late", "building", b));
+            return (BLD_MAINTAINED);
+        }
+        else if (work) {
+            ADDMSG(&u->faction->msgs, msg_message("maintenance", "unit building", u, b));
+            return (BLD_MAINTAINED | BLD_WORKING);
+        }
     }
-    else {
-        ADDMSG(&u->faction->msgs, msg_message("maintenancefail", "unit building", u, b));
-        return false;
-    }
-    return true;
+    ADDMSG(&u->faction->msgs, msg_message("maintenancefail", "unit building", u, b));
+    return 0;
 }
 
 void maintain_buildings(region * r, bool crash)
 {
+    const curse_type *nocost_ct = ct_find("nocostbuilding");
     building **bp = &r->buildings;
     while (*bp) {
         building *b = *bp;
-        bool maintained = maintain(b, !crash);
+        int flags = (BLD_MAINTAINED | BLD_WORKING);
+        
+        if (!curse_active(get_curse(b->attribs, nocost_ct))) {
+            flags = maintain(b, !crash);
+        }
+        fset(b, flags);
 
         /* the second time, send a message */
         if (crash) {
             if (!fval(b, BLD_WORKING)) {
                 unit *u = building_owner(b);
                 const char *msgtype =
-                    maintained ? "maintenance_nowork" : "maintenance_none";
+                    flags ? "maintenance_nowork" : "maintenance_none";
                 struct message *msg = msg_message(msgtype, "building", b);
 
                 if (u) {

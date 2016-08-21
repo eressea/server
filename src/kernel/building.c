@@ -23,7 +23,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* kernel includes */
 #include "item.h"
-#include "curse.h"              /* für C_NOCOST */
 #include "unit.h"
 #include "faction.h"
 #include "race.h"

@@ -57,7 +57,6 @@ extern "C" {
     void maintain_buildings(struct region *r, bool crash);
     int make_cmd(struct unit *u, struct order *ord);
     void split_allocations(struct region *r);
-    int recruit_archetypes(void);
     int give_control_cmd(struct unit *u, struct order *ord);
     void give_control(struct unit * u, struct unit * u2);
     void tax_cmd(struct unit * u, struct order *ord, struct request ** taxorders);
