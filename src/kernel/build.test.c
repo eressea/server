@@ -83,7 +83,7 @@ static void test_build_requires_building(CuTest *tc) {
     btype->capacity = 1;
     CuAssertIntEquals_Msg(tc, "must be inside a production building", EBUILDINGREQ, build(u, &bf.cons, 0, 1));
     u->building = test_create_building(u->region, btype);
-    fset(u->building, BLD_WORKING);
+    fset(u->building, BLD_MAINTAINED);
     CuAssertIntEquals(tc, 1, build(u, &bf.cons, 0, 1));
     btype->maxcapacity = 0;
     CuAssertIntEquals_Msg(tc, "cannot build when production building capacity exceeded", EBUILDINGREQ, build(u, &bf.cons, 0, 1));

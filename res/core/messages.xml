@@ -1097,13 +1097,6 @@
     <text locale="de">"Plötzlich löst sich $building($building) in kleine Traumwolken auf."</text>
     <text locale="en">"$building($building) suddenly dissolves into small pink clouds."</text>
   </message>
-  <message name="maintenance_none" section="events">
-    <type>
-      <arg name="building" type="building"/>
-    </type>
-    <text locale="de">"Für das Gebäude $building($building) konnte die ganze Woche kein Unterhalt bezahlt werden."</text>
-    <text locale="en">"Upkeep for $building($building) could not be paid all week."</text>
-  </message>
   <message name="buildingcrash" section="events">
     <type>
       <arg name="region" type="region"/>
@@ -7086,13 +7079,6 @@
     </type>
     <text locale="de">"Der Unterhalt von $building($building) konnte nicht gezahlt werden, das Gebäude war diese Woche nicht funktionstüchtig."</text>
     <text locale="en">"The upkeep for $building($building) was not paid, the building was not operational this week."</text>
-  </message>
-  <message name="maintenance_late" section="errors">
-    <type>
-      <arg name="building" type="building"/>
-    </type>
-    <text locale="de">"Der Unterhalt von $building($building) konnte nur verspätet gezahlt werden, das Gebäude war diese Woche nicht funktionstüchtig."</text>
-    <text locale="en">"The upkeep for $building($building) was paid late, the building was not operational this week."</text>
   </message>
   <message name="income_tradetax" section="economy">
     <type>

@@ -95,11 +95,10 @@ extern "C" {
 
 #define BFL_NONE           0x00
 #define BLD_MAINTAINED     0x01 /* vital maintenance paid for */
-#define BLD_WORKING        0x02 /* full maintenance paid, it works */
+#define BLD_DONTPAY        0x02 /* PAY NOT */
 #define BLD_UNGUARDED      0x04 /* you can enter this building anytime */
 #define BLD_EXPANDED       0x08 /* has been expanded this turn */
 #define BLD_SELECT         0x10 /* formerly FL_DH */
-#define BLD_DONTPAY        0x20 /* PAY NOT */
 
 #define BLD_SAVEMASK       0x00 /* mask for persistent flags */
 

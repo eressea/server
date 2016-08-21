@@ -709,33 +709,29 @@ static int forget_cmd(unit * u, order * ord)
     return 0;
 }
 
-static bool maintain(building * b, bool first)
-/* first==false -> take money from wherever you can */
+static int maintain(building * b)
 {
-    const resource_type *rsilver = get_resourcetype(R_SILVER);
     int c;
     region *r = b->region;
-    bool paid = true, work = first;
+    bool paid = true, work = true;
     unit *u;
 
-    if (fval(b, BLD_MAINTAINED) || b->type == NULL || b->type->maintenance == NULL || is_cursed(b->attribs, C_NOCOST, 0)) {
-        fset(b, BLD_MAINTAINED);
-        fset(b, BLD_WORKING);
-        return true;
+    if (fval(b, BLD_MAINTAINED) || b->type == NULL || b->type->maintenance == NULL) {
+        return BLD_MAINTAINED;
     }
     if (fval(b, BLD_DONTPAY)) {
-        return false;
+        return 0;
     }
     u = building_owner(b);
     if (u == NULL) {
         /* no owner - send a message to the entire region */
         ADDMSG(&r->msgs, msg_message("maintenance_noowner", "building", b));
-        return false;
+        return 0;
     }
     /* If the owner is the region owner, check if dontpay flag is set for the building where he is in */
     if (config_token("rules.region_owner_pay_building", b->type->_name)) {
         if (fval(u->building, BLD_DONTPAY)) {
-            return false;
+            return 0;
         }
     }
     for (c = 0; b->type->maintenance[c].number; ++c) {
@@ -748,25 +744,7 @@ static bool maintain(building * b, bool first)
             /* first ist im ersten versuch true, im zweiten aber false! Das
              * bedeutet, das in der Runde in die Region geschafften Resourcen
              * nicht genutzt werden können, weil die reserviert sind! */
-            if (!first)
-                need -= get_pooled(u, m->rtype, GET_ALL, need);
-            else
-                need -= get_pooled(u, m->rtype, GET_DEFAULT, need);
-            if (!first && need > 0) {
-                unit *ua;
-                for (ua = r->units; ua; ua = ua->next)
-                    freset(ua->faction, FFL_SELECT);
-                fset(u->faction, FFL_SELECT);   /* hat schon */
-                for (ua = r->units; ua; ua = ua->next) {
-                    if (!fval(ua->faction, FFL_SELECT) && (ua->faction == u->faction
-                        || alliedunit(ua, u->faction, HELP_MONEY))) {
-                        need -= get_pooled(ua, m->rtype, GET_ALL, need);
-                        fset(ua->faction, FFL_SELECT);
-                        if (need <= 0)
-                            break;
-                    }
-                }
-            }
+            need -= get_pooled(u, m->rtype, GET_DEFAULT, need);
         }
         if (need > 0) {
             if (!fval(m, MTF_VITAL))
@@ -778,11 +756,12 @@ static bool maintain(building * b, bool first)
         }
     }
     if (fval(b, BLD_DONTPAY)) {
-        return false;
+        return 0;
     }
     u = building_owner(b);
-    if (u == NULL)
-        return false;
+    if (!u) {
+        return 0;
+    }
     for (c = 0; b->type->maintenance[c].number; ++c) {
         const maintenance *m = b->type->maintenance + c;
         int need = m->number;
@@ -790,32 +769,10 @@ static bool maintain(building * b, bool first)
         if (fval(m, MTF_VARIABLE))
             need = need * b->size;
         if (u) {
-            /* first ist im ersten versuch true, im zweiten aber false! Das
-             * bedeutet, das in der Runde in die Region geschafften Resourcen
-             * nicht genutzt werden können, weil die reserviert sind! */
-            if (!first)
-                need -= get_pooled(u, m->rtype, GET_ALL, need);
-            else
-                need -= get_pooled(u, m->rtype, GET_DEFAULT, need);
-            if (!first && need > 0) {
-                unit *ua;
-                for (ua = r->units; ua; ua = ua->next)
-                    freset(ua->faction, FFL_SELECT);
-                fset(u->faction, FFL_SELECT);   /* hat schon */
-                for (ua = r->units; ua; ua = ua->next) {
-                    if (!fval(ua->faction, FFL_SELECT) && (ua->faction == u->faction
-                        || alliedunit(ua, u->faction, HELP_MONEY))) {
-                        need -= get_pooled(ua, m->rtype, GET_ALL, need);
-                        fset(ua->faction, FFL_SELECT);
-                        if (need <= 0)
-                            break;
-                    }
-                }
-            }
+            need -= get_pooled(u, m->rtype, GET_DEFAULT, need);
             if (need > 0) {
                 work = false;
-                if (fval(m, MTF_VITAL))
-                {
+                if (fval(m, MTF_VITAL)) {
                     paid = false;
                     break;
                 }
@@ -823,20 +780,9 @@ static bool maintain(building * b, bool first)
         }
     }
     if (paid && c > 0) {
-        /* TODO: wieviel von was wurde bezahlt */
-        if (first && work) {
-            ADDMSG(&u->faction->msgs, msg_message("maintenance", "unit building", u, b));
-            fset(b, BLD_WORKING);
-            fset(b, BLD_MAINTAINED);
-        }
-        if (!first) {
-            ADDMSG(&u->faction->msgs, msg_message("maintenance_late", "building", b));
-            fset(b, BLD_MAINTAINED);
-        }
-
-        if (first && !work) {
+        if (!work) {
             ADDMSG(&u->faction->msgs, msg_message("maintenancefail", "unit building", u, b));
-            return false;
+            return 0;
         }
 
         for (c = 0; b->type->maintenance[c].number; ++c) {
@@ -848,66 +794,44 @@ static bool maintain(building * b, bool first)
             if (fval(m, MTF_VARIABLE))
                 cost = cost * b->size;
 
-            if (!first)
-                cost -= use_pooled(u, m->rtype, GET_ALL, cost);
-            else
-                cost -=
+            cost -=
                 use_pooled(u, m->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
                 cost);
-            if (!first && cost > 0) {
-                unit *ua;
-                for (ua = r->units; ua; ua = ua->next)
-                    freset(ua->faction, FFL_SELECT);
-                fset(u->faction, FFL_SELECT);   /* hat schon */
-                for (ua = r->units; ua; ua = ua->next) {
-                    if (!fval(ua->faction, FFL_SELECT)
-                        && alliedunit(ua, u->faction, HELP_MONEY)) {
-                        int give = use_pooled(ua, m->rtype, GET_ALL, cost);
-                        if (!give)
-                            continue;
-                        cost -= give;
-                        fset(ua->faction, FFL_SELECT);
-                        if (m->rtype == rsilver)
-                            add_donation(ua->faction, u->faction, give, r);
-                        if (cost <= 0)
-                            break;
-                    }
-                }
-            }
             assert(cost == 0);
         }
+        if (work) {
+            ADDMSG(&u->faction->msgs, msg_message("maintenance", "unit building", u, b));
+            return BLD_MAINTAINED;
+        }
     }
-    else {
-        ADDMSG(&u->faction->msgs, msg_message("maintenancefail", "unit building", u, b));
-        return false;
-    }
-    return true;
+    ADDMSG(&u->faction->msgs, msg_message("maintenancefail", "unit building", u, b));
+    return 0;
 }
 
-void maintain_buildings(region * r, bool crash)
+void maintain_buildings(region * r)
 {
+    const curse_type *nocost_ct = ct_find("nocostbuilding");
     building **bp = &r->buildings;
     while (*bp) {
         building *b = *bp;
-        bool maintained = maintain(b, !crash);
+        int flags = BLD_MAINTAINED;
+        
+        if (!curse_active(get_curse(b->attribs, nocost_ct))) {
+            flags = maintain(b);
+        }
+        fset(b, flags);
 
-        /* the second time, send a message */
-        if (crash) {
-            if (!fval(b, BLD_WORKING)) {
-                unit *u = building_owner(b);
-                const char *msgtype =
-                    maintained ? "maintenance_nowork" : "maintenance_none";
-                struct message *msg = msg_message(msgtype, "building", b);
-
-                if (u) {
-                    add_message(&u->faction->msgs, msg);
-                    r_addmessage(r, u->faction, msg);
-                }
-                else {
-                    add_message(&r->msgs, msg);
-                }
-                msg_release(msg);
+        if (!fval(b, BLD_MAINTAINED)) {
+            unit *u = building_owner(b);
+            struct message *msg = msg_message("maintenance_nowork", "building", b);
+            if (u) {
+                add_message(&u->faction->msgs, msg);
+                r_addmessage(r, u->faction, msg);
             }
+            else {
+                add_message(&r->msgs, msg);
+            }
+            msg_release(msg);
         }
         bp = &b->next;
     }

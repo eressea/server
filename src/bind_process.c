@@ -274,7 +274,7 @@ void process_maintenance(void) {
                 }
             }
         }
-        maintain_buildings(r, 0);
+        maintain_buildings(r);
     }
 }
 

@@ -130,7 +130,6 @@ extern "C" {
         C_OLDRACE,
         C_FUMBLE,
         C_RIOT,                     /*region in Aufruhr */
-        C_NOCOST,
         C_CURSED_BY_THE_GODS,
         C_SPEED,                    /* Beschleunigt */
         C_ORC,

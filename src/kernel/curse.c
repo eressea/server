@@ -359,6 +359,7 @@ static bool cmp_curse(const attrib * a, const void *data)
 curse *get_curse(attrib * ap, const curse_type * ctype)
 {
     attrib *a = ap;
+    if (!ctype) return NULL;
     while (a) {
         if (a->type->flags & ATF_CURSE) {
             const attrib_type *at = a->type;
@@ -724,7 +725,6 @@ static const char *oldnames[MAXCURSE] = {
     "oldrace",
     "fumble",
     "riotzone",
-    "nocostbuilding",
     "godcursezone",
     "speed",
     "orcish",

@@ -77,8 +77,8 @@ static int tolua_region_set_blocked(lua_State * L)
 {
     region *self = (region *)tolua_tousertype(L, 1, 0);
     bool flag = !!tolua_toboolean(L, 2, 1);
-    if (flag) self->flags |= BLD_WORKING;
-    else self->flags &= ~BLD_WORKING;
+    if (flag) self->flags |= RF_BLOCKED;
+    else self->flags &= ~RF_BLOCKED;
     return 0;
 }
 

@@ -4251,11 +4251,6 @@ bool rule_force_leave(int flags) {
     return (rules&flags) == flags;
 }
 
-static void maintain_buildings_1(region * r)
-{
-    maintain_buildings(r, false);
-}
-
 void init_processor(void)
 {
     int p;
@@ -4340,10 +4335,9 @@ void init_processor(void)
 
     p += 10;
     if (!keyword_disabled(K_PAY)) {
-        add_proc_order(p, K_PAY, pay_cmd, 0, "Gebaeudeunterhalt (disable)");
+        add_proc_order(p, K_PAY, pay_cmd, 0, "Gebaeudeunterhalt (BEZAHLE NICHT)");
     }
-    add_proc_postregion(p, maintain_buildings_1,
-        "Gebaeudeunterhalt (1. Versuch)");
+    add_proc_postregion(p, maintain_buildings, "Gebaeudeunterhalt");
 
     p += 10;                      /* QUIT fuer sich alleine */
     add_proc_global(p, quit, "Sterben");

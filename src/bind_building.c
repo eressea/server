@@ -52,15 +52,15 @@ static int tolua_building_set_working(lua_State * L)
 {
     building *self = (building *)tolua_tousertype(L, 1, 0);
     bool flag = !!lua_toboolean(L, 2);
-    if (flag) self->flags |= BLD_WORKING;
-    else self->flags &= ~BLD_WORKING;
+    if (flag) self->flags |= BLD_MAINTAINED;
+    else self->flags &= ~BLD_MAINTAINED;
     return 1;
 }
 
 static int tolua_building_get_working(lua_State * L)
 {
     building *self = (building *)tolua_tousertype(L, 1, 0);
-    bool flag = (self->flags&BLD_WORKING) != 0;
+    bool flag = (self->flags&BLD_MAINTAINED) != 0;
     lua_pushboolean(L, flag);
     return 1;
 }
