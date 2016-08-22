@@ -192,6 +192,7 @@ set(TESTS_SRC
   battle.test.c
   vortex.test.c
   tests.test.c
+  volcano.test.c
   reports.test.c
   seen.test.c
   travelthru.test.c

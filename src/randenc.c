@@ -842,33 +842,8 @@ void randomevents(void)
             }
         }
     }
-
-    /* Vulkane qualmen, brechen aus ... */
-    for (r = regions; r; r = r->next) {
-        if (r->terrain == newterrain(T_VOLCANO_SMOKING)) {
-            if (a_find(r->attribs, &at_reduceproduction)) {
-                ADDMSG(&r->msgs, msg_message("volcanostopsmoke", "region", r));
-                rsetterrain(r, T_VOLCANO);
-            }
-            else {
-                if (rng_int() % 100 < 12) {
-                    ADDMSG(&r->msgs, msg_message("volcanostopsmoke", "region", r));
-                    rsetterrain(r, T_VOLCANO);
-                }
-                else if (r->age > 20 && rng_int() % 100 < 8) {
-                    volcano_outbreak(r);
-                    rsetterrain(r, T_VOLCANO);
-                }
-            }
-        }
-        else if (r->terrain == newterrain(T_VOLCANO)) {
-            if (rng_int() % 100 < 4) {
-                ADDMSG(&r->msgs, msg_message("volcanostartsmoke", "region", r));
-                rsetterrain(r, T_VOLCANO_SMOKING);
-            }
-        }
-    }
-
+    
+    volcano_update();
     /* Monumente zerfallen, Schiffe verfaulen */
 
     for (r = regions; r; r = r->next) {
