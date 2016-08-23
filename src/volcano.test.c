@@ -1,11 +1,21 @@
+#include <platform.h>
 #include <tests.h>
 #include "volcano.h"
 
+#include <kernel/region.h>
+#include <kernel/terrain.h>
 #include <CuTest.h>
 
 static void test_volcano_update(CuTest *tc) {
+    region *r;
+    const struct terrain_type *t_volcano, *t_active;
+    
+    t_volcano = test_create_terrain("volcano", LAND_REGION);
+    t_active = test_create_terrain("activevolcano", LAND_REGION);
     test_cleanup();
+    r = test_create_region(0, 0, t_active);
     volcano_update();
+    CuAssertPtrEquals(tc, (void *)t_volcano, (void *)r->terrain);
     test_cleanup();
 }
 
