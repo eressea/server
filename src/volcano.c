@@ -269,6 +269,7 @@ void volcano_update(void)
                 rsetterrain(r, T_VOLCANO);
             }
             else {
+                // TODO: this code path is inactive. are we only keeping it for old data? fix data instead.
                 if (rng_int() % 100 < 12) {
                     ADDMSG(&r->msgs, msg_message("volcanostopsmoke", "region", r));
                     rsetterrain(r, T_VOLCANO);
