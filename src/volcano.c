@@ -30,7 +30,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
-#include <kernel/terrainid.h>
+#include <kernel/terrain.h>
 
 /* attributes includes */
 #include <attributes/reduceproduction.h>
@@ -237,9 +237,8 @@ volcano_destruction(region * volcano, region * r, const char *damage)
     remove_empty_units_in_region(r);
 }
 
-void volcano_outbreak(region * r)
+void volcano_outbreak(region * r, region *rn)
 {
-    region *rn;
     unit *u;
     faction *f;
 
@@ -250,8 +249,6 @@ void volcano_outbreak(region * r)
         }
     }
 
-    /* Zufällige Nachbarregion verwüsten */
-    rn = rrandneighbour(r);
     volcano_destruction(r, r, "4d10");
     if (rn) {
         volcano_destruction(r, rn, "3d10");
@@ -261,31 +258,37 @@ void volcano_outbreak(region * r)
 void volcano_update(void) 
 {
     region *r; 
+    const struct terrain_type *t_active, *t_volcano;
+
+    t_volcano = get_terrain("volcano");
+    t_active = get_terrain("activevolcano");
     /* Vulkane qualmen, brechen aus ... */
     for (r = regions; r; r = r->next) {
-        if (r->terrain == newterrain(T_VOLCANO_SMOKING)) {
+        if (r->terrain == t_active) {
             if (a_find(r->attribs, &at_reduceproduction)) {
                 ADDMSG(&r->msgs, msg_message("volcanostopsmoke", "region", r));
-                rsetterrain(r, T_VOLCANO);
+                r->terrain = t_volcano;
             }
             else {
                 // TODO: is this code path inactive? are we only keeping it for old data? fix data instead.
                 if (rng_int() % 100 < 12) {
                     ADDMSG(&r->msgs, msg_message("volcanostopsmoke", "region", r));
-                    rsetterrain(r, T_VOLCANO);
+                    r->terrain = t_volcano;
                 }
-                else if (r->age > 20 && rng_int() % 100 < 8) {
-                    volcano_outbreak(r);
-                    rsetterrain(r, T_VOLCANO);
+                else if (r->uid == 1246051340 || (r->age > 20 && rng_int() % 100 < 8)) {
+                    region *rn;
+                    /* Zufällige Nachbarregion verwüsten */
+                    rn = rrandneighbour(r);
+                    volcano_outbreak(r, rn);
+                    r->terrain = t_volcano;
                 }
             }
         }
-        else if (r->terrain == newterrain(T_VOLCANO)) {
+        else if (r->terrain == t_volcano) {
             if (rng_int() % 100 < 4) {
                 ADDMSG(&r->msgs, msg_message("volcanostartsmoke", "region", r));
-                rsetterrain(r, T_VOLCANO_SMOKING);
+                r->terrain = t_active;
             }
         }
     }
-
 }

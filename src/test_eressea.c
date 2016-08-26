@@ -112,6 +112,7 @@ int RunAllTests(int argc, char *argv[])
     /* gamecode */
     ADD_SUITE(prefix);
     ADD_SUITE(battle);
+    ADD_SUITE(volcano);
     ADD_SUITE(donations);
     ADD_SUITE(travelthru);
     ADD_SUITE(economy);
