@@ -270,7 +270,6 @@ void volcano_update(void)
                 r->terrain = t_volcano;
             }
             else {
-                // TODO: is this code path inactive? are we only keeping it for old data? fix data instead.
                 if (rng_int() % 100 < 12) {
                     ADDMSG(&r->msgs, msg_message("volcanostopsmoke", "region", r));
                     r->terrain = t_volcano;

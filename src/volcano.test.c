@@ -4,6 +4,7 @@
 
 #include <kernel/region.h>
 #include <kernel/terrain.h>
+#include <kernel/messages.h>
 
 #include <util/attrib.h>
 
@@ -30,20 +31,24 @@ static void test_volcano_update(CuTest *tc) {
 
 static void test_volcano_outbreak(CuTest *tc) {
     region *r, *rn;
+    message *m;
     const struct terrain_type *t_volcano, *t_active;
     
     test_cleanup();
+    mt_register(mt_new_va("volcanooutbreak", "regionv:region", "regionn:region", 0));
     t_volcano = test_create_terrain("volcano", LAND_REGION);
     t_active = test_create_terrain("activevolcano", LAND_REGION);
     r = test_create_region(0, 0, t_active);
     rn = test_create_region(1, 0, t_volcano);
 
     volcano_outbreak(r, rn);
-//    CuAssertPtrEquals(tc, (void *)t_volcano, (void *)r->terrain);
+    CuAssertPtrEquals(tc, (void *)t_active, (void *)r->terrain);
     CuAssertIntEquals(tc, 0, rtrees(r, 0));
     CuAssertIntEquals(tc, 0, rtrees(r, 1));
     CuAssertIntEquals(tc, 0, rtrees(r, 2));
-    CuAssertPtrNotNull(tc, test_find_messagetype(rn->msgs, "volcanooutbreak"));
+    CuAssertPtrNotNull(tc, m = test_find_messagetype(rn->msgs, "volcanooutbreak"));
+    CuAssertPtrEquals(tc, r, m->parameters[0].v);
+    CuAssertPtrEquals(tc, rn, m->parameters[1].v);
     CuAssertPtrNotNull(tc, a_find(r->attribs, &at_reduceproduction));
     CuAssertPtrNotNull(tc, a_find(rn->attribs, &at_reduceproduction));
 
