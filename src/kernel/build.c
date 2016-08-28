@@ -165,19 +165,17 @@ int destroy_cmd(unit * u, struct order *ord)
     init_order(ord);
     s = gettoken(token, sizeof(token));
 
-    if (findparam(s, u->faction->locale) == P_ROAD) {
-        destroy_road(u, INT_MAX, ord);
-        return 0;
-    }
-
     if (s && *s) {
         n = atoi((const char *)s);
         if (n <= 0) {
             n = INT_MAX;
         }
+        else {
+            s = gettoken(token, sizeof(token));
+        }
     }
 
-    if (getparam(u->faction->locale) == P_ROAD) {
+    if (isparam(s, u->faction->locale, P_ROAD)) {
         destroy_road(u, n, ord);
         return 0;
     }
