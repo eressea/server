@@ -319,6 +319,10 @@ const char *dbrace(const struct race *rc)
     return zText;
 }
 
+void register_race_name_function(race_name_func func, const char *name) {
+    register_function((pf_generic)func, name);
+}
+
 char * race_namegen(const struct race *rc, const struct unit *u) {
     if (rc->generate_name) {
         const char * str = rc->generate_name(u);

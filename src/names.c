@@ -22,6 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* kernel includes */
 #include <kernel/unit.h>
+#include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/faction.h>
 #include <kernel/race.h>
@@ -31,8 +32,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/base36.h>
 #include <util/bsdstring.h>
-#include <util/functions.h>
 #include <util/language.h>
+#include <util/functions.h>
 #include <util/rng.h>
 #include <util/unicode.h>
 
@@ -482,11 +483,11 @@ void register_names(void)
     /* function name
      * generate a name for a nonplayerunit
      * race->generate_name() */
-    register_function((pf_generic)undead_name, "nameundead");
-    register_function((pf_generic)skeleton_name, "nameskeleton");
-    register_function((pf_generic)zombie_name, "namezombie");
-    register_function((pf_generic)ghoul_name, "nameghoul");
-    register_function((pf_generic)dragon_name, "namedragon");
-    register_function((pf_generic)dracoid_name, "namedracoid");
-    register_function((pf_generic)generic_name, "namegeneric");
+    register_race_name_function(undead_name, "nameundead");
+    register_race_name_function(skeleton_name, "nameskeleton");
+    register_race_name_function(zombie_name, "namezombie");
+    register_race_name_function(ghoul_name, "nameghoul");
+    register_race_name_function(dragon_name, "namedragon");
+    register_race_name_function(dracoid_name, "namedracoid");
+    register_race_name_function(generic_name, "namegeneric");
 }

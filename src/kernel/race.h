@@ -151,7 +151,7 @@ extern "C" {
         struct att attack[RACE_ATTACKS];
         signed char bonus[MAXSKILLS];
 
-        const char *(*generate_name) (const struct unit *);
+        race_name_func generate_name;
         const char *(*describe) (const struct unit *, const struct locale *);
         void(*age) (struct unit * u);
         bool(*move_allowed) (const struct region *, const struct region *);
@@ -261,6 +261,7 @@ extern "C" {
     void give_starting_equipment(const struct equipment *eq,
         struct unit *u);
     const char *dbrace(const struct race *rc);
+    void register_race_name_function(race_name_func, const char *);
     char * race_namegen(const struct race *rc, const struct unit *u);
 
 #ifdef __cplusplus
