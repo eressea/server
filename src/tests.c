@@ -377,15 +377,28 @@ const char * test_get_messagetype(const message *msg) {
     return name;
 }
 
-struct message * test_find_messagetype(struct message_list *msgs, const char *name) {
+struct message * test_find_messagetype_ex(struct message_list *msgs, const char *name, struct message *prev)
+{
     struct mlist *ml;
     if (!msgs) return 0;
     for (ml = msgs->begin; ml; ml = ml->next) {
         if (strcmp(name, test_get_messagetype(ml->msg)) == 0) {
-            return ml->msg;
+            if (prev) {
+                if (ml->msg == prev) {
+                    prev = NULL;
+                }
+            }
+            else {
+                return ml->msg;
+            }
         }
     }
     return 0;
+}
+
+struct message * test_find_messagetype(struct message_list *msgs, const char *name)
+{
+    return test_find_messagetype_ex(msgs, name, NULL);
 }
 
 void test_clear_messages(faction *f) {
