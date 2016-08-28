@@ -40,6 +40,7 @@ static void test_volcano_outbreak(CuTest *tc) {
     
     test_cleanup();
     mt_register(mt_new_va("volcanooutbreak", "regionv:region", "regionn:region", 0));
+    mt_register(mt_new_va("volcano_dead", "unit:unit", "region:region", "dead:int", 0));
     t_volcano = test_create_terrain("volcano", LAND_REGION);
     t_active = test_create_terrain("activevolcano", LAND_REGION);
     r = test_create_region(0, 0, t_active);
@@ -63,7 +64,13 @@ static void test_volcano_outbreak(CuTest *tc) {
     CuAssertPtrEquals(tc, rn, m->parameters[1].v);
 
     CuAssertPtrNotNull(tc, m = test_find_messagetype_ex(f->msgs, "volcano_dead", NULL));
+    CuAssertPtrEquals(tc, u1, m->parameters[0].v);
+    CuAssertPtrEquals(tc, r, m->parameters[1].v);
+    CuAssertIntEquals(tc, 1, m->parameters[2].i);
     CuAssertPtrNotNull(tc, m = test_find_messagetype_ex(f->msgs, "volcano_dead", m));
+    CuAssertPtrEquals(tc, u2, m->parameters[0].v);
+    CuAssertPtrEquals(tc, r, m->parameters[1].v);
+    CuAssertIntEquals(tc, 1, m->parameters[2].i);
     test_cleanup();
 }
 
