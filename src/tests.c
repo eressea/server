@@ -191,6 +191,7 @@ ship_type * test_create_shiptype(const char * name)
     stype->damage = 1;
     if (!stype->construction) {
         stype->construction = calloc(1, sizeof(construction));
+        assert(stype->construction || !"out of memory");
         stype->construction->maxsize = 5;
         stype->construction->minskill = 1;
         stype->construction->reqsize = 1;
@@ -259,6 +260,7 @@ spell * test_create_spell(void)
     sp = create_spell("testspell", 0);
 
     sp->components = (spell_component *)calloc(4, sizeof(spell_component));
+    assert(sp->components || !"out of memory");
     sp->components[0].amount = 1;
     sp->components[0].type = get_resourcetype(R_SILVER);
     sp->components[0].cost = SPC_FIX;
