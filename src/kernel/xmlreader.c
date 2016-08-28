@@ -1797,7 +1797,7 @@ static int parse_races(xmlDocPtr doc)
             }
             assert(propValue != NULL);
             if (strcmp((const char *)propValue, "name") == 0) {
-                rc->generate_name = (const char *(*)(const struct unit *))fun;
+                rc->generate_name = (race_name_func)fun;
             }
             else if (strcmp((const char *)propValue, "describe") == 0) {
                 rc->describe =

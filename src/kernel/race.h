@@ -119,6 +119,8 @@ extern "C" {
 
     extern int num_races;
 
+    typedef const char *(*race_name_func)(const struct unit *);
+
     typedef struct race {
         char *_name;
         float magres;

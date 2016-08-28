@@ -23,7 +23,6 @@ extern "C" {
 #endif
 
     struct unit;
-    typedef const char *(*name_func)(const struct unit *);
     void register_names(void);
     const char *abkz(const char *s, char *buf, size_t size, size_t maxchars);
 

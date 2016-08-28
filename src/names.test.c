@@ -2,6 +2,7 @@
 
 #include "names.h"
 
+#include <kernel/race.h>
 #include <util/language.h>
 #include <util/functions.h>
 
@@ -10,14 +11,14 @@
 
 static void test_names(CuTest * tc)
 {
-    name_func foo;
+    race_name_func foo;
     test_cleanup();
     register_names();
     default_locale = test_create_locale();
     locale_setstring(default_locale, "undead_prefix_0", "Kleine");
     locale_setstring(default_locale, "undead_name_0", "Graue");
     locale_setstring(default_locale, "undead_postfix_0", "Kobolde");
-    CuAssertPtrNotNull(tc, foo = (name_func)get_function("nameundead"));
+    CuAssertPtrNotNull(tc, foo = (race_name_func)get_function("nameundead"));
     CuAssertStrEquals(tc, "Kleine Graue Kobolde", foo(NULL));
     CuAssertPtrNotNull(tc, get_function("nameskeleton"));
     CuAssertPtrNotNull(tc, get_function("namezombie"));

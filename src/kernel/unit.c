@@ -1416,7 +1416,8 @@ void name_unit(unit * u)
     if (u_race(u)->generate_name) {
         const char *gen_name = u_race(u)->generate_name(u);
         if (gen_name) {
-            unit_setname(u, gen_name);
+            free(u->_name);
+            u->_name = _strdup(gen_name);
         }
         else {
             unit_setname(u, racename(u->faction->locale, u, u_race(u)));
