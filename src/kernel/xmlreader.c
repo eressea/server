@@ -1800,8 +1800,7 @@ static int parse_races(xmlDocPtr doc)
                 rc->generate_name = (race_name_func)fun;
             }
             else if (strcmp((const char *)propValue, "describe") == 0) {
-                rc->describe =
-                    (const char *(*)(const struct unit *, const struct locale *))fun;
+                rc->describe = (race_desc_func)fun;
             }
             else if (strcmp((const char *)propValue, "age") == 0) {
                 rc->age = (void(*)(struct unit *))fun;

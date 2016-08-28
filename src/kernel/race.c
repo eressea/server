@@ -319,6 +319,10 @@ const char *dbrace(const struct race *rc)
     return zText;
 }
 
+void register_race_description_function(race_desc_func func, const char *name) {
+    register_function((pf_generic)func, name);
+}
+
 void register_race_name_function(race_name_func func, const char *name) {
     register_function((pf_generic)func, name);
 }

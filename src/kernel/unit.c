@@ -470,7 +470,7 @@ const char *u_description(const unit * u, const struct locale *lang)
         return u->display;
     }
     else if (u_race(u)->describe) {
-        return u_race(u)->describe(u, lang);
+        return u_race(u)->describe(u->_race, lang);
     }
     return NULL;
 }

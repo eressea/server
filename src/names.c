@@ -45,9 +45,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdio.h>
 #include <string.h>
 
-static const char *describe_braineater(unit * u, const struct locale *lang)
+static const char *describe_race(const race * rc, const struct locale *lang)
 {
-    return LOC(lang, "describe_braineater");
+    char zText[32];
+    sprintf(zText, "describe_%s", rc->_name);
+    return LOC(lang, zText);
 }
 
 static void count_particles(const char *monster, int *num_prefix, int *num_name, int *num_postfix) 
@@ -480,7 +482,7 @@ const char *abkz(const char *s, char *buf, size_t buflen, size_t maxchars)
 
 void register_names(void)
 {
-    register_function((pf_generic)describe_braineater, "describe_braineater");
+    register_race_description_function(describe_race, "describe_race");
     /* function name
      * generate a name for a nonplayerunit
      * race->generate_name() */

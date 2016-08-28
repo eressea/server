@@ -32,7 +32,7 @@ static void test_names(CuTest * tc)
     CuAssertPtrNotNull(tc, get_function("namedragon"));
     CuAssertPtrNotNull(tc, get_function("namedracoid"));
     CuAssertPtrNotNull(tc, get_function("namegeneric"));
-    CuAssertPtrNotNull(tc, get_function("describe_braineater"));
+    CuAssertPtrNotNull(tc, get_function("describe_race"));
     test_cleanup();
 }
 

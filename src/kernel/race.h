@@ -45,6 +45,8 @@ extern "C" {
     struct param;
     struct spell;
 
+    extern int num_races;
+
     typedef enum {
         RC_DWARF,                     /* 0 - Zwerg */
         RC_ELF,
@@ -117,8 +119,7 @@ extern "C" {
         int level;
     } att;
 
-    extern int num_races;
-
+    typedef const char *(*race_desc_func)(const struct race *rc, const struct locale *lang);
     typedef void (*race_name_func)(struct unit *);
 
     typedef struct race {
@@ -152,7 +153,7 @@ extern "C" {
         signed char bonus[MAXSKILLS];
 
         race_name_func generate_name;
-        const char *(*describe) (const struct unit *, const struct locale *);
+        race_desc_func describe;
         void(*age) (struct unit * u);
         bool(*move_allowed) (const struct region *, const struct region *);
         struct item *(*itemdrop) (const struct race *, int size);
@@ -168,8 +169,8 @@ extern "C" {
         const struct race *data;
     } race_list;
 
-    extern void racelist_clear(struct race_list **rl);
-    extern void racelist_insert(struct race_list **rl, const struct race *r);
+    void racelist_clear(struct race_list **rl);
+    void racelist_insert(struct race_list **rl, const struct race *r);
 
 
     struct race_list *get_familiarraces(void);
@@ -178,8 +179,8 @@ extern "C" {
     /** TODO: compatibility hacks: **/
     race_t old_race(const struct race *);
 
-    extern race *rc_get_or_create(const char *name);
-    extern const race *rc_find(const char *);
+    race *rc_get_or_create(const char *name);
+    const race *rc_find(const char *);
     void free_races(void);
 
     typedef enum name_t { NAME_SINGULAR, NAME_PLURAL, NAME_DEFINITIVE, NAME_CATEGORY } name_t;
@@ -236,7 +237,6 @@ extern "C" {
 #define BF_INV_NONMAGIC (1<<5)  /* Immun gegen nichtmagischen Schaden */
 #define BF_NO_ATTACK    (1<<6)  /* Kann keine ATTACKIERE Befehle ausfuehren */
 
-    int unit_old_max_hp(struct unit *u);
     const char *racename(const struct locale *lang, const struct unit *u,
         const race * rc);
 
@@ -257,11 +257,9 @@ extern "C" {
     variant read_race_reference(struct storage *store);
 
     const char *raceprefix(const struct unit *u);
-
-    void give_starting_equipment(const struct equipment *eq,
-        struct unit *u);
     const char *dbrace(const struct race *rc);
     void register_race_name_function(race_name_func, const char *);
+    void register_race_description_function(race_desc_func, const char *);
     char * race_namegen(const struct race *rc, struct unit *u);
 
 #ifdef __cplusplus
