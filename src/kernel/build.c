@@ -135,8 +135,10 @@ static void destroy_road(unit * u, int nmax, struct order *ord)
             else
                 road = (short)(road - willdo);
             rsetroad(r, d, road);
-            ADDMSG(&u->faction->msgs, msg_message("destroy_road",
-                "unit from to", u, r, r2));
+            if (willdo > 0) {
+                ADDMSG(&u->faction->msgs, msg_message("destroy_road",
+                    "unit from to", u, r, r2));
+            }
         }
     }
 }
