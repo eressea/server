@@ -77,14 +77,14 @@ static void count_particles(const char *monster, int *num_prefix, int *num_name,
     }
 }
 
-static const char *make_names(const char *monster, int *num_postfix,
+static void make_name(unit *u, const char *monster, int *num_postfix,
     int pprefix, int *num_name, int *num_prefix, int ppostfix)
 {
     if (*num_name == 0) {
         count_particles(monster, num_prefix, num_name, num_postfix);
     }
     if (*num_name > 0) {
-        static char name[NAMESIZE + 1]; // FIXME: static return value
+        char name[NAMESIZE + 1]; // FIXME: static return value
         char zText[32];
         int uv = 0, uu = 0, un = 0;
         const char *str;
@@ -124,37 +124,32 @@ static const char *make_names(const char *monster, int *num_postfix,
                 strlcat(name, (const char *)str, sizeof(name));
             }
         }
-        return name;
+        unit_setname(u, name);
     }
-    return NULL;
 }
 
 static void undead_name(unit * u)
 {
     static int num_postfix, num_name, num_prefix;
-    const char *str = make_names("undead", &num_postfix, 2, &num_name, &num_prefix, 2);
-    unit_setname(u, str);
+    make_name(u, "undead", &num_postfix, 2, &num_name, &num_prefix, 2);
 }
 
 static void skeleton_name(unit * u)
 {
     static int num_postfix, num_name, num_prefix;
-    const char *str = make_names("skeleton", &num_postfix, 5, &num_name, &num_prefix, 2);
-    unit_setname(u, str);
+    make_name(u, "skeleton", &num_postfix, 5, &num_name, &num_prefix, 2);
 }
 
 static void zombie_name(unit * u)
 {
     static int num_postfix, num_name, num_prefix;
-    const char *str = make_names("zombie", &num_postfix, 5, &num_name, &num_prefix, 2);
-    unit_setname(u, str);
+    make_name(u, "zombie", &num_postfix, 5, &num_name, &num_prefix, 2);
 }
 
 static void ghoul_name(unit * u)
 {
     static int num_postfix, num_name, num_prefix;
-    const char *str = make_names("ghoul", &num_postfix, 5, &num_name, &num_prefix, 4);
-    unit_setname(u, str);
+    make_name(u, "ghoul", &num_postfix, 5, &num_name, &num_prefix, 4);
 }
 
 /* Drachen */
