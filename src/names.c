@@ -49,14 +49,10 @@ static const char *describe_braineater(unit * u, const struct locale *lang)
     return LOC(lang, "describe_braineater");
 }
 
-static const char *make_names(const char *monster, int *num_postfix,
-    int pprefix, int *num_name, int *num_prefix, int ppostfix)
+static void count_particles(const char *monster, int *num_prefix, int *num_name, int *num_postfix) 
 {
-    int uv, uu, un;
-    static char name[NAMESIZE + 1]; // FIXME: static return value
-    char zText[32];
     const char *str;
-
+    char zText[32];
     if (*num_prefix == 0) {
 
         for (*num_prefix = 0;; ++*num_prefix) {
@@ -80,48 +76,59 @@ static const char *make_names(const char *monster, int *num_postfix,
                 break;
         }
     }
+}
 
+static const char *make_names(const char *monster, int *num_postfix,
+    int pprefix, int *num_name, int *num_prefix, int ppostfix)
+{
     if (*num_name == 0) {
-        return NULL;
+        count_particles(monster, num_prefix, num_name, num_postfix);
     }
+    if (*num_name > 0) {
+        static char name[NAMESIZE + 1]; // FIXME: static return value
+        char zText[32];
+        int uv, uu, un;
+        const char *str;
 
-    /* nur 50% aller Namen haben "Vor-Teil" */
-    uv = rng_int() % (*num_prefix * pprefix);
+        /* nur 50% aller Namen haben "Vor-Teil" */
+        uv = rng_int() % (*num_prefix * pprefix);
 
-    uu = rng_int() % *num_name;
+        uu = rng_int() % *num_name;
 
-    /* nur 50% aller Namen haben "Nach-Teil", wenn kein Vor-Teil */
-    if (*num_postfix > 0 && uv >= *num_prefix) {
-        un = rng_int() % *num_postfix;
-    }
-    else {
-        un = rng_int() % (*num_postfix * ppostfix);
-    }
-
-    name[0] = 0;
-    if (uv < *num_prefix) {
-        sprintf(zText, "%s_prefix_%d", monster, uv);
-        str = locale_getstring(default_locale, zText);
-        if (str) {
-            size_t sz = strlcpy(name, (const char *)str, sizeof(name));
-            strlcpy(name + sz, " ", sizeof(name) - sz);
+        /* nur 50% aller Namen haben "Nach-Teil", wenn kein Vor-Teil */
+        if (*num_postfix > 0 && uv >= *num_prefix) {
+            un = rng_int() % *num_postfix;
         }
-    }
+        else {
+            un = rng_int() % (*num_postfix * ppostfix);
+        }
 
-    sprintf(zText, "%s_name_%d", monster, uu);
-    str = locale_getstring(default_locale, zText);
-    if (str)
-        strlcat(name, (const char *)str, sizeof(name));
+        name[0] = 0;
+        if (uv < *num_prefix) {
+            sprintf(zText, "%s_prefix_%d", monster, uv);
+            str = locale_getstring(default_locale, zText);
+            if (str) {
+                size_t sz = strlcpy(name, (const char *)str, sizeof(name));
+                strlcpy(name + sz, " ", sizeof(name) - sz);
+            }
+        }
 
-    if (un < *num_postfix) {
-        sprintf(zText, "%s_postfix_%d", monster, un);
+        sprintf(zText, "%s_name_%d", monster, uu);
         str = locale_getstring(default_locale, zText);
-        if (str) {
-            strlcat(name, " ", sizeof(name));
+        if (str)
             strlcat(name, (const char *)str, sizeof(name));
+
+        if (un < *num_postfix) {
+            sprintf(zText, "%s_postfix_%d", monster, un);
+            str = locale_getstring(default_locale, zText);
+            if (str) {
+                strlcat(name, " ", sizeof(name));
+                strlcat(name, (const char *)str, sizeof(name));
+            }
         }
+        return name;
     }
-    return name;
+    return NULL;
 }
 
 static const char *undead_name(const unit * u)
