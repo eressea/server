@@ -286,6 +286,14 @@ static void test_build_destroy_road(CuTest *tc)
     CuAssertIntEquals(tc, 0, destroy_cmd(u, ord));
     CuAssertIntEquals(tc, 99, rroad(r, D_EAST));
 
+    set_level(u, SK_ROAD_BUILDING, 4);
+    CuAssertIntEquals(tc, 0, destroy_cmd(u, ord));
+    CuAssertIntEquals(tc, 95, rroad(r, D_EAST));
+
+    scale_number(u, 4);
+    set_level(u, SK_ROAD_BUILDING, 2);
+    CuAssertIntEquals(tc, 0, destroy_cmd(u, ord));
+    CuAssertIntEquals(tc, 87, rroad(r, D_EAST));
     test_cleanup();
 }
 
