@@ -16,16 +16,19 @@
 
 static void test_volcano_update(CuTest *tc) {
     region *r;
+    message *m;
     const struct terrain_type *t_volcano, *t_active;
     
     test_cleanup();
+    mt_register(mt_new_va("volcanostopsmoke", "region:region", 0));
     t_volcano = test_create_terrain("volcano", LAND_REGION);
     t_active = test_create_terrain("activevolcano", LAND_REGION);
     r = test_create_region(0, 0, t_active);
     a_add(&r->attribs, make_reduceproduction(25, 10));
 
     volcano_update();
-    CuAssertPtrNotNull(tc, test_find_messagetype(r->msgs, "volcanostopsmoke"));
+    CuAssertPtrNotNull(tc, m = test_find_messagetype(r->msgs, "volcanostopsmoke"));
+    CuAssertPtrEquals(tc, r, m->parameters[0].v);
     CuAssertPtrEquals(tc, (void *)t_volcano, (void *)r->terrain);
     
     test_cleanup();
