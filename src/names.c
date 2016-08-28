@@ -86,15 +86,14 @@ static const char *make_names(const char *monster, int *num_postfix,
     if (*num_name > 0) {
         static char name[NAMESIZE + 1]; // FIXME: static return value
         char zText[32];
-        int uv, uu, un;
+        int uv = 0, uu = 0, un = 0;
         const char *str;
 
-        /* nur 50% aller Namen haben "Vor-Teil" */
-        uv = rng_int() % (*num_prefix * pprefix);
-
+        if (*num_prefix > 0) {
+            uv = rng_int() % (*num_prefix * pprefix);
+        }
         uu = rng_int() % *num_name;
 
-        /* nur 50% aller Namen haben "Nach-Teil", wenn kein Vor-Teil */
         if (*num_postfix > 0 && uv >= *num_prefix) {
             un = rng_int() % *num_postfix;
         }
@@ -130,28 +129,32 @@ static const char *make_names(const char *monster, int *num_postfix,
     return NULL;
 }
 
-static const char *undead_name(const unit * u)
+static void undead_name(unit * u)
 {
     static int num_postfix, num_name, num_prefix;
-    return make_names("undead", &num_postfix, 2, &num_name, &num_prefix, 2);
+    const char *str = make_names("undead", &num_postfix, 2, &num_name, &num_prefix, 2);
+    unit_setname(u, str);
 }
 
-static const char *skeleton_name(const unit * u)
+static void skeleton_name(unit * u)
 {
     static int num_postfix, num_name, num_prefix;
-    return make_names("skeleton", &num_postfix, 5, &num_name, &num_prefix, 2);
+    const char *str = make_names("skeleton", &num_postfix, 5, &num_name, &num_prefix, 2);
+    unit_setname(u, str);
 }
 
-static const char *zombie_name(const unit * u)
+static void zombie_name(unit * u)
 {
     static int num_postfix, num_name, num_prefix;
-    return make_names("zombie", &num_postfix, 5, &num_name, &num_prefix, 2);
+    const char *str = make_names("zombie", &num_postfix, 5, &num_name, &num_prefix, 2);
+    unit_setname(u, str);
 }
 
-static const char *ghoul_name(const unit * u)
+static void ghoul_name(unit * u)
 {
     static int num_postfix, num_name, num_prefix;
-    return make_names("ghoul", &num_postfix, 5, &num_name, &num_prefix, 4);
+    const char *str = make_names("ghoul", &num_postfix, 5, &num_name, &num_prefix, 4);
+    unit_setname(u, str);
 }
 
 /* Drachen */
@@ -219,15 +222,18 @@ const char *silbe3[SIL3] = {
     "bus",
 };
 
-static const char *generic_name(const unit * u)
+static void generic_name(unit * u)
 {
     const char * name = rc_name_s(u_race(u), (u->number == 1) ? NAME_SINGULAR : NAME_PLURAL);
-    return LOC(u->faction->locale, name);
+    name = LOC(u->faction->locale, name);
+    if (name) {
+        unit_setname(u, name);
+    }
 }
 
-static const char *dragon_name(const unit * u)
+static void dragon_name(unit * u)
 {
-    static char name[NAMESIZE + 1]; // FIXME: static return value
+    char name[NAMESIZE + 1];
     int rnd, ter = 0;
     int anzahl = 1;
     static int num_postfix;
@@ -268,7 +274,7 @@ static const char *dragon_name(const unit * u)
     }
 
     if (num_postfix <=0) {
-        return NULL;
+        return;
     }
     else if (num_postfix < 6) {
         rnd = rng_int() % num_postfix;
@@ -311,7 +317,7 @@ static const char *dragon_name(const unit * u)
         }
     }
 
-    return name;
+    unit_setname(u, name);
 }
 
 /* Dracoide */
@@ -363,7 +369,7 @@ static const char *drac_suf[DRAC_SUF] = {
     "k"
 };
 
-static const char *dracoid_name(const unit * u)
+static void dracoid_name(unit * u)
 {
     static char name[NAMESIZE + 1]; // FIXME: static return value
     int mid_syllabels;
@@ -383,7 +389,7 @@ static const char *dracoid_name(const unit * u)
         sz += strlcat(name, drac_mid[rng_int() % DRAC_MID], sizeof(name));
     }
     sz += strlcat(name, drac_suf[rng_int() % DRAC_SUF], sizeof(name));
-    return name;
+    unit_setname(u, name);
 }
 
 /** returns an abbreviation of a string.
@@ -487,7 +493,7 @@ void register_names(void)
     register_race_name_function(skeleton_name, "nameskeleton");
     register_race_name_function(zombie_name, "namezombie");
     register_race_name_function(ghoul_name, "nameghoul");
-    register_race_name_function(dragon_name, "namedragon");
     register_race_name_function(dracoid_name, "namedracoid");
+    register_race_name_function(dragon_name, "namedragon");
     register_race_name_function(generic_name, "namegeneric");
 }

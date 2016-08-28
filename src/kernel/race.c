@@ -323,12 +323,9 @@ void register_race_name_function(race_name_func func, const char *name) {
     register_function((pf_generic)func, name);
 }
 
-char * race_namegen(const struct race *rc, const struct unit *u) {
+char * race_namegen(const struct race *rc, struct unit *u) {
     if (rc->generate_name) {
-        const char * str = rc->generate_name(u);
-        if (str) {
-            return _strdup(str);
-        }
+        rc->generate_name(u);
     }
     return NULL;
 }

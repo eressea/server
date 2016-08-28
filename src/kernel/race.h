@@ -119,7 +119,7 @@ extern "C" {
 
     extern int num_races;
 
-    typedef const char *(*race_name_func)(const struct unit *);
+    typedef void (*race_name_func)(struct unit *);
 
     typedef struct race {
         char *_name;
@@ -262,7 +262,7 @@ extern "C" {
         struct unit *u);
     const char *dbrace(const struct race *rc);
     void register_race_name_function(race_name_func, const char *);
-    char * race_namegen(const struct race *rc, const struct unit *u);
+    char * race_namegen(const struct race *rc, struct unit *u);
 
 #ifdef __cplusplus
 }
