@@ -218,6 +218,7 @@ static void message_faction(battle * b, faction * f, struct message *m)
     assert(f);
     if (f->battles == NULL || f->battles->r != r) {
         struct bmsg *bm = (struct bmsg *)calloc(1, sizeof(struct bmsg));
+        assert(bm || !"out of memory");
         bm->next = f->battles;
         f->battles = bm;
         bm->r = r;
@@ -251,6 +252,7 @@ static void fbattlerecord(battle * b, faction * f, const char *s)
 static bool set_enemy(side * as, side * ds, bool attacking)
 {
     int i;
+    assert(as && ds);
     for (i = 0; i != MAXSIDES; ++i) {
         if (ds->enemies[i] == NULL)
             ds->enemies[i] = as;
@@ -1942,10 +1944,12 @@ int skilldiff(troop at, troop dt, int dist)
                 is_protected = 2;
             }
         }
-        if (magicwalls_ct
-            && curse_active(get_curse(df->building->attribs, magicwalls_ct))) {
-            /* Verdoppelt Burgenbonus */
-            skdiff -= df->building->type->protection(df->building, du, DEFENSE_BONUS);
+        if (df->building->type->protection) {
+            if (magicwalls_ct
+                && curse_active(get_curse(df->building->attribs, magicwalls_ct))) {
+                /* Verdoppelt Burgenbonus */
+                skdiff -= df->building->type->protection(df->building, du, DEFENSE_BONUS);
+            }
         }
     }
     /* Goblin-Verteidigung

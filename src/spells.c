@@ -1263,6 +1263,7 @@ add_ironweapon(const struct item_type *type, const struct item_type *rusty,
 float chance)
 {
     iron_weapon *iweapon = malloc(sizeof(iron_weapon));
+    assert(iweapon || !"out of memory");
     iweapon->type = type;
     iweapon->rusty = rusty;
     iweapon->chance = chance;
