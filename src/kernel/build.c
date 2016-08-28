@@ -130,7 +130,7 @@ static void destroy_road(unit * u, int nmax, struct order *ord)
             if (willdo == 0) {
                 /* TODO: error message */
             }
-            if (willdo > SHRT_MAX)
+            else if (willdo > SHRT_MAX)
                 road = 0;
             else
                 road = (short)(road - willdo);
