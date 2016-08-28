@@ -1,5 +1,7 @@
 #include <platform.h>
 #include <kernel/config.h>
+
+#include <kernel/messages.h>
 #include "alchemy.h"
 #include "types.h"
 #include "build.h"
@@ -268,13 +270,15 @@ static void test_build_building_success(CuTest *tc) {
 
 static void test_build_destroy_road(CuTest *tc)
 {
-    region *r;
+    region *r, *r2;
     faction *f;
     unit *u;
     order *ord;
+    message *m;
 
     test_cleanup();
-    test_create_region(1, 0, 0);
+    mt_register(mt_new_va("destroy_road", "unit:unit", "from:region", "to:region", 0));
+    r2 = test_create_region(1, 0, 0);
     r = test_create_region(0, 0, 0);
     rsetroad(r, D_EAST, 100);
     u = test_create_unit(f = test_create_faction(0), r);
@@ -287,7 +291,10 @@ static void test_build_destroy_road(CuTest *tc)
     set_level(u, SK_ROAD_BUILDING, 1);
     CuAssertIntEquals(tc, 0, destroy_cmd(u, ord));
     CuAssertIntEquals(tc, 99, rroad(r, D_EAST));
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "destroy_road"));
+    CuAssertPtrNotNull(tc, m = test_find_messagetype(f->msgs, "destroy_road"));
+    CuAssertPtrEquals(tc, u, m->parameters[0].v);
+    CuAssertPtrEquals(tc, r, m->parameters[1].v);
+    CuAssertPtrEquals(tc, r2, m->parameters[2].v);
 
     set_level(u, SK_ROAD_BUILDING, 4);
     CuAssertIntEquals(tc, 0, destroy_cmd(u, ord));
