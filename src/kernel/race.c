@@ -319,3 +319,12 @@ const char *dbrace(const struct race *rc)
     return zText;
 }
 
+char * race_namegen(const struct race *rc, const struct unit *u) {
+    if (rc->generate_name) {
+        const char * str = rc->generate_name(u);
+        if (str) {
+            return _strdup(str);
+        }
+    }
+    return NULL;
+}

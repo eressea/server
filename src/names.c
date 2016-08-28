@@ -51,30 +51,28 @@ static const char *describe_braineater(unit * u, const struct locale *lang)
 
 static void count_particles(const char *monster, int *num_prefix, int *num_name, int *num_postfix) 
 {
-    const char *str;
     char zText[32];
-    if (*num_prefix == 0) {
+    const char *str;
 
-        for (*num_prefix = 0;; ++*num_prefix) {
-            sprintf(zText, "%s_prefix_%d", monster, *num_prefix);
-            str = locale_getstring(default_locale, zText);
-            if (str == NULL)
-                break;
-        }
+    for (*num_prefix = 0;; ++*num_prefix) {
+        sprintf(zText, "%s_prefix_%d", monster, *num_prefix);
+        str = locale_getstring(default_locale, zText);
+        if (str == NULL)
+            break;
+    }
 
-        for (*num_name = 0;; ++*num_name) {
-            sprintf(zText, "%s_name_%d", monster, *num_name);
-            str = locale_getstring(default_locale, zText);
-            if (str == NULL)
-                break;
-        }
+    for (*num_name = 0;; ++*num_name) {
+        sprintf(zText, "%s_name_%d", monster, *num_name);
+        str = locale_getstring(default_locale, zText);
+        if (str == NULL)
+            break;
+    }
 
-        for (*num_postfix = 0;; ++*num_postfix) {
-            sprintf(zText, "%s_postfix_%d", monster, *num_postfix);
-            str = locale_getstring(default_locale, zText);
-            if (str == NULL)
-                break;
-        }
+    for (*num_postfix = 0;; ++*num_postfix) {
+        sprintf(zText, "%s_postfix_%d", monster, *num_postfix);
+        str = locale_getstring(default_locale, zText);
+        if (str == NULL)
+            break;
     }
 }
 

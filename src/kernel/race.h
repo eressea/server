@@ -261,6 +261,7 @@ extern "C" {
     void give_starting_equipment(const struct equipment *eq,
         struct unit *u);
     const char *dbrace(const struct race *rc);
+    char * race_namegen(const struct race *rc, const struct unit *u);
 
 #ifdef __cplusplus
 }
