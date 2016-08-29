@@ -123,10 +123,24 @@ struct unit *test_create_unit(struct faction *f, struct region *r)
     return create_unit(r, f, 1, rc ? rc : rc_get_or_create("human"), 0, 0, 0);
 }
 
-void test_cleanup(void)
-{
-    int i;
+void test_log_stderr(int flags) {
+    static struct log_t *stderrlog;
+    if (flags) {
+        if (stderrlog) {
+            log_error("stderr logging is still active. did you call test_cleanup?");
+            log_destroy(stderrlog);
+        }
+        stderrlog = log_to_file(flags, stderr);
+    }
+    else {
+        log_destroy(stderrlog);
+        stderrlog = 0;
+    }
 
+}
+
+static void test_reset(void) {
+    int i;
     default_locale = 0;
     free_gamedata();
     free_terrains();
@@ -156,6 +170,17 @@ void test_cleanup(void)
     }
 
     random_source_reset();
+}
+
+void test_setup(void) {
+    test_log_stderr(LOG_CPERROR);
+    test_reset();
+}
+
+void test_cleanup(void)
+{
+    test_reset();
+    test_log_stderr(0);
 }
 
 terrain_type *

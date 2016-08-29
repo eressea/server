@@ -29,7 +29,9 @@ extern "C" {
 
     struct CuTest;
 
+    void test_setup(void);
     void test_cleanup(void);
+    void test_log_stderr(int on);
 
     struct locale * test_create_locale(void);
     struct terrain_type * test_create_terrain(const char * name, unsigned int flags);
