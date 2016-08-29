@@ -257,7 +257,6 @@ extern "C" {
     variant read_race_reference(struct storage *store);
 
     const char *raceprefix(const struct unit *u);
-    const char *dbrace(const struct race *rc);
     void register_race_name_function(race_name_func, const char *);
     void register_race_description_function(race_desc_func, const char *);
     char * race_namegen(const struct race *rc, struct unit *u);
