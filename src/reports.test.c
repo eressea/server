@@ -10,6 +10,7 @@
 
 #include <kernel/building.h>
 #include <kernel/faction.h>
+#include <kernel/item.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
@@ -19,6 +20,7 @@
 
 #include <util/language.h>
 #include <util/lists.h>
+#include <util/message.h>
 
 #include <quicklist.h>
 #include <stream.h>
@@ -415,6 +417,39 @@ static void test_write_spell_syntax(CuTest *tc) {
     cleanup_spell_fixture(&spell);
 }
 
+static void test_arg_resources(CuTest *tc) {
+    variant v1, v2;
+    arg_type *atype;
+    resource *res;
+    item_type *itype;
+
+    test_setup();
+    itype = test_create_itemtype("stone");
+    v1.v = res = malloc(sizeof(resource)*2);
+    res[0].number = 10;
+    res[0].type = itype->rtype;
+    res[0].next = &res[1];
+    res[1].number = 5;
+    res[1].type = itype->rtype;
+    res[1].next = NULL;
+
+    register_reports();
+    atype = find_argtype("resource_list");
+    CuAssertPtrNotNull(tc, atype);
+    v2 = atype->copy(v1);
+    free(v1.v);
+    CuAssertPtrNotNull(tc, v2.v);
+    res = (resource *)v2.v;
+    CuAssertPtrEquals(tc, itype->rtype, (void *)res->type);
+    CuAssertIntEquals(tc, 10, res->number);
+    CuAssertPtrNotNull(tc, res = res->next);
+    CuAssertPtrEquals(tc, itype->rtype, (void *)res->type);
+    CuAssertIntEquals(tc, 5, res->number);
+    CuAssertPtrEquals(tc, 0, res->next);
+    atype->release(v2);
+    test_cleanup();
+}
+
 CuSuite *get_reports_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -428,5 +463,6 @@ CuSuite *get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_write_travelthru);
     SUITE_ADD_TEST(suite, test_write_unit);
     SUITE_ADD_TEST(suite, test_write_spell_syntax);
+    SUITE_ADD_TEST(suite, test_arg_resources);
     return suite;
 }

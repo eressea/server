@@ -776,7 +776,7 @@
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
-      <arg name="required" type="resources"/>
+      <arg name="required" type="resource_list"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Dafür braucht die Einheit $resources($required)."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - For this, the unit needs $resources($required)."</text>
@@ -2374,7 +2374,7 @@
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
-      <arg name="list" type="resources"/>
+      <arg name="list" type="resource_list"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Für diesen Zauber fehlen noch $resources($list)."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Casting this spell requires an additional $resources($list)."</text>
