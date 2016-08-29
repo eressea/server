@@ -455,7 +455,6 @@ size_t size)
     const char *pzTmp, *str;
     building *b;
     bool isbattle = (bool)(mode == see_battle);
-    int telepath_see = 0;
     item *itm;
     item *show;
     faction *fv = visible_faction(f, u);
@@ -553,7 +552,7 @@ size_t size)
     }
     /* status */
 
-    if (u->number && (u->faction == f || telepath_see || isbattle)) {
+    if (u->number && (u->faction == f || isbattle)) {
         const char *c = hp_status(u);
         c = c ? LOC(f->locale, c) : 0;
         bufp = STRLCPY(bufp, ", ", size);
@@ -586,7 +585,7 @@ size_t size)
     }
 
     dh = 0;
-    if (u->faction == f || telepath_see) {
+    if (u->faction == f) {
         skill *sv;
         for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
             size_t bytes = spskill(bufp, size, f->locale, u, sv, &dh, 1);
@@ -597,7 +596,7 @@ size_t size)
     }
 
     dh = 0;
-    if (f == u->faction || telepath_see || omniscient(f)) {
+    if (f == u->faction || omniscient(f)) {
         show = u->items;
     }
     else if (!itemcloak && mode >= see_unit) {
@@ -634,7 +633,7 @@ size_t size)
         }
     }
 
-    if (u->faction == f || telepath_see) {
+    if (u->faction == f) {
         spellbook *book = unit_get_spellbook(u);
 
         if (book) {
@@ -760,11 +759,6 @@ size_t size)
     }
     return dh;
 }
-
-/* TODO: telepath_see wird nicht berücksichtigt: Parteien mit
- * telepath_see sollten immer einzelne Einheiten zu sehen
- * bekommen, alles andere ist darstellungsteschnisch kompliziert.
- */
 
 size_t
 spskill(char *buffer, size_t size, const struct locale * lang,
