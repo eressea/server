@@ -75,7 +75,7 @@ extern "C" {
             const struct building * b, int size);
         void(*init) (struct building_type *);
         void(*age) (struct building *);
-        int(*protection) (struct building *, struct unit *, building_bonus);
+        int(*protection) (const struct building *, const struct unit *, building_bonus bonus);
         double(*taxes) (const struct building *, int size);
         struct attrib *attribs;
     } building_type;

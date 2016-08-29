@@ -322,9 +322,8 @@ const building_type *findbuildingtype(const char *name,
     return (const building_type *)type.v;
 }
 
-static int building_protection(building * b, unit * u, building_bonus bonus)
+static int building_protection(const building * b, const unit * u, building_bonus bonus)
 {
-
     int i = 0;
     int bsize = buildingeffsize(b, false);
     const construction *cons = b->type->construction;
@@ -350,17 +349,10 @@ static int building_protection(building * b, unit * u, building_bonus bonus)
     }
 }
 
-static int meropis_building_protection(building * b, unit * u)
-{
-    return 2;
-}
-
 void register_buildings(void)
 {
     register_function((pf_generic)building_protection,
         "building_protection");
-    register_function((pf_generic)meropis_building_protection,
-        "meropis_building_protection");
     register_function((pf_generic)init_smithy, "init_smithy");
     register_function((pf_generic)castle_name, "castle_name");
     register_function((pf_generic)castle_name_2, "castle_name_2");

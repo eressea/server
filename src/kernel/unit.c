@@ -1217,16 +1217,12 @@ static int item_modification(const unit * u, skill_t sk, int val)
 static int att_modification(const unit * u, skill_t sk)
 {
     double result = 0;
-    static bool init = false; // TODO: static variables are bad global state
     static const curse_type *skillmod_ct, *gbdream_ct, *worse_ct;
     curse *c;
 
-    if (!init) {
-        init = true;
-        skillmod_ct = ct_find("skillmod");
-        gbdream_ct = ct_find("gbdream");
-        worse_ct = ct_find("worse");
-    }
+    skillmod_ct = ct_find("skillmod");
+    gbdream_ct = ct_find("gbdream");
+    worse_ct = ct_find("worse");
 
     c = get_curse(u->attribs, worse_ct);
     if (c != NULL)

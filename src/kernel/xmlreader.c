@@ -305,7 +305,7 @@ static int parse_buildings(xmlDocPtr doc)
                     btype->age = (void(*)(struct building *))fun;
                 }
                 else if (strcmp((const char *)propValue, "protection") == 0) {
-                    btype->protection = (int(*)(struct building *, struct unit *, building_bonus))fun;
+                    btype->protection = (int(*)(const struct building *, const struct unit *, building_bonus))fun;
                 }
                 else if (strcmp((const char *)propValue, "taxes") == 0) {
                     btype->taxes = (double(*)(const struct building *, int))fun;
