@@ -1662,7 +1662,6 @@ int unit_max_hp(const unit * u)
 {
     int h;
     double p;
-    static const curse_type *heal_ct = NULL;
     int rule_stamina = config_get_int("rules.stamina", STAMINA_AFFECTS_HP);
     h = u_race(u)->hitpoints;
 
@@ -1672,9 +1671,8 @@ int unit_max_hp(const unit * u)
     }
 
     /* der healing curse veraendert die maximalen hp */
-    if (u->region) {
-        if (heal_ct == NULL)
-            heal_ct = ct_find("healingzone");
+    if (u->region && u->region->attribs) {
+        const curse_type *heal_ct = ct_find("healingzone");
         if (heal_ct) {
             curse *c = get_curse(u->region->attribs, heal_ct);
             if (c) {

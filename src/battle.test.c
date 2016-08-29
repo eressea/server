@@ -449,7 +449,7 @@ static void test_battle_skilldiff_building(CuTest *tc)
     unit *ua, *ud;
     battle *b = NULL;
     building_type *btype;
-    static const curse_type *strongwall_ct, *magicwalls_ct;
+    const curse_type *strongwall_ct, *magicwalls_ct;
 
     test_cleanup();
     btype = test_create_buildingtype("castle");
