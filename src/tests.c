@@ -24,6 +24,7 @@
 #include <util/bsdstring.h>
 #include <util/functions.h>
 #include <util/language.h>
+#include <util/lists.h>
 #include <util/message.h>
 #include <util/log.h>
 #include <util/rand.h>
@@ -121,6 +122,20 @@ struct unit *test_create_unit(struct faction *f, struct region *r)
     assert(f || !r);
     if (!rc) rc = rc_get_or_create("human");
     return create_unit(r, f, 1, rc ? rc : rc_get_or_create("human"), 0, 0, 0);
+}
+
+static void log_list(void *udata, int flags, const char *module, const char *format, va_list args) {
+    strlist **slp = (strlist **)udata;
+    addstrlist(slp, format);
+}
+
+struct log_t * test_log_start(int flags, strlist **slist) {
+    return log_create(flags, slist, log_list);
+}
+
+void test_log_stop(struct log_t *log, struct strlist *slist) {
+    freestrlist(slist);
+    log_destroy(log);
 }
 
 void test_log_stderr(int flags) {

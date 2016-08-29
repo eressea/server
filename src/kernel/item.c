@@ -491,7 +491,7 @@ item *i_change(item ** pi, const item_type * itype, int delta)
         item *i = *pi;
         i->number += delta;
         if (i->number < 0) {
-            log_error("serious accounting error. number of items is %d.\n", i->number);
+            log_error("serious accounting error. number of items is %d.", i->number);
             i->number = 0;
         }
         if (i->number == 0) {

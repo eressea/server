@@ -26,12 +26,16 @@ extern "C" {
     struct spellparameter;
     struct spell;
     struct locale;
+    struct strlist;
+    struct log_t;
 
     struct CuTest;
 
     void test_setup(void);
     void test_cleanup(void);
     void test_log_stderr(int on);
+    struct log_t * test_log_start(int flags, struct strlist **slist);
+    void test_log_stop(struct log_t *log, struct strlist *slist);
 
     struct locale * test_create_locale(void);
     struct terrain_type * test_create_terrain(const char * name, unsigned int flags);
