@@ -3260,8 +3260,8 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
 
     /* Effekte von Sprüchen */
 
-    {
-        static const curse_type *speed_ct;
+    if (u->attribs) {
+        const curse_type *speed_ct;
         speed_ct = ct_find("speed");
         if (speed_ct) {
             curse *c = get_curse(u->attribs, speed_ct);
