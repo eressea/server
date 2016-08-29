@@ -270,18 +270,18 @@ report_items(const unit *u, item * result, int size, const unit * owner,
 {
     const item *itm, *items = u->items;
     int n = 0;                    /* number of results */
-    bool itemcloak = false;
-    const curse_type *itemcloak_ct = ct_find("itemcloak");
 
     assert(owner == NULL || viewer != owner->faction);
     assert(size);
 
-    if (itemcloak_ct) {
-        curse * cu = get_curse(u->attribs, itemcloak_ct);
-        itemcloak = cu && curse_active(cu);
-    }
-    if (itemcloak) {
-        return 0;
+    if (u->attribs) {
+        const curse_type *itemcloak_ct = ct_find("itemcloak");
+        if (itemcloak_ct) {
+            curse * cu = get_curse(u->attribs, itemcloak_ct);
+            if (cu && curse_active(cu)) {
+                return 0;
+            }
+        }
     }
     for (itm = items; itm; itm = itm->next) {
         item *ishow;

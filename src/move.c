@@ -1463,8 +1463,6 @@ static void make_route(unit * u, order * ord, region_list ** routep)
 static int movement_speed(unit * u)
 {
     int mp = BP_WALKING;
-    static const curse_type *speed_ct;
-    static bool init = false;
     double dk = u_race(u)->speed;
 
     assert(u->number);
@@ -1482,15 +1480,14 @@ static int movement_speed(unit * u)
         break;
     }
 
-    if (!init) {
-        init = true;
-        speed_ct = ct_find("speed");
-    }
-    if (speed_ct) {
-        curse *c = get_curse(u->attribs, speed_ct);
-        if (c != NULL) {
-            int men = get_cursedmen(u, c);
-            dk *= 1.0 + (double)men / (double)u->number;
+    if (u->attribs) {
+        const curse_type *speed_ct = ct_find("speed");
+        if (speed_ct) {
+            curse *c = get_curse(u->attribs, speed_ct);
+            if (c != NULL) {
+                int men = get_cursedmen(u, c);
+                dk *= 1.0 + (double)men / (double)u->number;
+            }
         }
     }
 
