@@ -53,7 +53,7 @@ extern "C" {
 
     typedef enum {
         DEFENSE_BONUS,
-        CLOSE_COMBAT_ATTACK_BONUS,
+        CLOSE_COMBAT_ATTACK_BONUS, // TODO: only DEFENSE_BONUS is in use?
         RANGED_ATTACK_BONUS,
     } building_bonus;
 

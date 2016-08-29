@@ -432,6 +432,7 @@ static void test_battle_skilldiff(CuTest *tc)
 
     // TODO: unarmed halfling vs. dragon: +5
     // TODO: rule_goblin_bonus
+    // TODO: weapon modifiers, missiles, skill_formula
 
     free_battle(b);
     test_cleanup();

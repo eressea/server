@@ -1948,10 +1948,6 @@ int skilldiff(troop at, troop dt, int dist)
             }
         }
     }
-    /* Goblin-Verteidigung
-     * ist direkt in der Rassentabelle als df_default
-     */
-
     /* Effekte der Waffen */
     skdiff += weapon_effskill(at, dt, awp, true, dist > 1);
     if (awp && fval(awp->type, WTF_MISSILE)) {
