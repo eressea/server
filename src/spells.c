@@ -2012,7 +2012,7 @@ static int sp_treewalkexit(castorder * co)
  */
 static int sp_holyground(castorder * co)
 {
-    static const curse_type *ctype = NULL;
+    const curse_type *ctype = NULL;
     region *r = co_get_region(co);
     unit *mage = co->magician.u;
     int cast_level = co->level;
@@ -2021,9 +2021,7 @@ static int sp_holyground(castorder * co)
     report_spell(mage, r, msg);
     msg_release(msg);
 
-    if (!ctype) {
-        ctype = ct_find("holyground");
-    }
+    ctype = ct_find("holyground");
     create_curse(mage, &r->attribs, ctype, power * power, 1, zero_effect, 0);
 
     a_removeall(&r->attribs, &at_deathcount);
@@ -3206,15 +3204,14 @@ static int sp_magicboost(castorder * co)
     double power = co->force;
     double effect;
     trigger *tsummon;
-    static const curse_type *ct_auraboost;
-    static const curse_type *ct_magicboost;
+    const curse_type *ct_auraboost;
+    const curse_type *ct_magicboost;
 
-    if (!ct_auraboost) {
-        ct_auraboost = ct_find("auraboost");
-        ct_magicboost = ct_find("magicboost");
-        assert(ct_auraboost != NULL);
-        assert(ct_magicboost != NULL);
-    }
+    ct_auraboost = ct_find("auraboost");
+    ct_magicboost = ct_find("magicboost");
+    assert(ct_auraboost != NULL);
+    assert(ct_magicboost != NULL);
+
     /* fehler, wenn schon ein boost */
     if (is_cursed(mage->attribs, C_MBOOST, 0)) {
         report_failure(mage, co->order);

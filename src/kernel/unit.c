@@ -863,16 +863,15 @@ bool can_survive(const unit * u, const region * r)
     if ((fval(r->terrain, WALK_INTO) && (u_race(u)->flags & RCF_WALK))
         || (fval(r->terrain, SWIM_INTO) && (u_race(u)->flags & RCF_SWIM))
         || (fval(r->terrain, FLY_INTO) && (u_race(u)->flags & RCF_FLY))) {
-        static const curse_type *ctype = NULL;
 
         if (has_horses(u) && !fval(r->terrain, WALK_INTO))
             return false;
 
-        if (!ctype)
-            ctype = ct_find("holyground");
-        if (fval(u_race(u), RCF_UNDEAD) && curse_active(get_curse(r->attribs, ctype)))
-            return false;
-
+        if (r->attribs) {
+            const curse_type *ctype = ct_find("holyground");
+            if (fval(u_race(u), RCF_UNDEAD) && curse_active(get_curse(r->attribs, ctype)))
+                return false;
+        }
         return true;
     }
     return false;
@@ -1217,50 +1216,51 @@ static int item_modification(const unit * u, skill_t sk, int val)
 static int att_modification(const unit * u, skill_t sk)
 {
     double result = 0;
-    static const curse_type *skillmod_ct, *gbdream_ct, *worse_ct;
-    curse *c;
 
-    skillmod_ct = ct_find("skillmod");
-    gbdream_ct = ct_find("gbdream");
-    worse_ct = ct_find("worse");
-
-    c = get_curse(u->attribs, worse_ct);
-    if (c != NULL)
-        result += curse_geteffect(c);
-    if (skillmod_ct) {
-        attrib *a = a_find(u->attribs, &at_curse);
-        while (a && a->type == &at_curse) {
-            curse *c = (curse *)a->data.v;
-            if (c->type == skillmod_ct && c->data.i == sk) {
-                result += curse_geteffect(c);
-                break;
+    if (u->attribs) {
+        curse *c;
+        const curse_type *skillmod_ct = ct_find("skillmod");
+        const curse_type *worse_ct = ct_find("worse");
+        c = get_curse(u->attribs, worse_ct);
+        if (c != NULL)
+            result += curse_geteffect(c);
+        if (skillmod_ct) {
+            attrib *a = a_find(u->attribs, &at_curse);
+            while (a && a->type == &at_curse) {
+                curse *c = (curse *)a->data.v;
+                if (c->type == skillmod_ct && c->data.i == sk) {
+                    result += curse_geteffect(c);
+                    break;
+                }
+                a = a->next;
             }
-            a = a->next;
         }
     }
-
     /* TODO hier kann nicht mit get/iscursed gearbeitet werden, da nur der
      * jeweils erste vom Typ C_GBDREAM zurueckgegen wird, wir aber alle
      * durchsuchen und aufaddieren muessen */
-    if (gbdream_ct && u->region) {
-        int bonus = 0, malus = 0;
-        attrib *a = a_find(u->region->attribs, &at_curse);
-        while (a && a->type == &at_curse) {
-            curse *c = (curse *)a->data.v;
+    if (u->region && u->region->attribs) {
+        const curse_type *gbdream_ct = ct_find("gbdream");
+        if (gbdream_ct) {
+            int bonus = 0, malus = 0;
+            attrib *a = a_find(u->region->attribs, &at_curse);
+            while (a && a->type == &at_curse) {
+                curse *c = (curse *)a->data.v;
 
-            if (curse_active(c) && c->type == gbdream_ct) {
-                int effect = curse_geteffect_int(c);
-                bool allied = alliedunit(c->magician, u->faction, HELP_GUARD);
-                if (allied) {
-                    if (effect > bonus) bonus = effect;
+                if (curse_active(c) && c->type == gbdream_ct) {
+                    int effect = curse_geteffect_int(c);
+                    bool allied = alliedunit(c->magician, u->faction, HELP_GUARD);
+                    if (allied) {
+                        if (effect > bonus) bonus = effect;
+                    }
+                    else {
+                        if (effect < malus) malus = effect;
+                    }
                 }
-                else {
-                    if (effect < malus) malus = effect;
-                }
+                a = a->next;
             }
-            a = a->next;
+            result = result + bonus + malus;
         }
-        result = result + bonus + malus;
     }
 
     return (int)result;

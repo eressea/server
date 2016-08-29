@@ -277,21 +277,20 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
 
 int teach_cmd(unit * u, struct order *ord)
 {
-    static const curse_type *gbdream_ct = NULL;
     plane *pl;
     region *r = u->region;
     skill_t sk_academy = NOSKILL;
     int teaching, i, j, count, academy = 0;
 
-    if (gbdream_ct == 0)
-        gbdream_ct = ct_find("gbdream");
-    if (gbdream_ct) {
-        if (get_curse(u->region->attribs, gbdream_ct)) {
-            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "gbdream_noteach", ""));
-            return 0;
+    if (u->region->attribs) {
+        const curse_type *gbdream_ct = ct_find("gbdream");
+        if (gbdream_ct) {
+            if (get_curse(u->region->attribs, gbdream_ct)) {
+                ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "gbdream_noteach", ""));
+                return 0;
+            }
         }
     }
-
     if ((u_race(u)->flags & RCF_NOTEACH) || fval(u, UFL_WERE)) {
         cmistake(u, ord, 274, MSG_EVENT);
         return 0;
