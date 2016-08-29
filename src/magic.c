@@ -993,7 +993,6 @@ cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
 
             itemhave = get_pooled(u, rtype, GET_DEFAULT, itemanz);
             if (itemhave < itemanz) {
-                // TODO: lots of alloc/dealloc calls here (make var_copy_resources take an array)
                 resource *res = malloc(sizeof(resource));
                 res->number = itemanz - itemhave;
                 res->type = rtype;

@@ -434,7 +434,7 @@ static void test_arg_resources(CuTest *tc) {
     res[1].next = NULL;
 
     register_reports();
-    atype = find_argtype("resource_list");
+    atype = find_argtype("resources");
     CuAssertPtrNotNull(tc, atype);
     v2 = atype->copy(v1);
     free(v1.v);

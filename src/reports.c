@@ -1688,7 +1688,7 @@ static variant var_copy_items(variant x)
     return x;
 }
 
-static variant var_copy_resource_list(variant x)
+static variant var_copy_resources(variant x)
 {
     resource *rsrc;
     resource *rdst = NULL, **rptr = &rdst;
@@ -1705,7 +1705,7 @@ static variant var_copy_resource_list(variant x)
     return x;
 }
 
-static void var_free_resource_list(variant x)
+static void var_free_resources(variant x)
 {
     resource *rsrc = (resource *)x.v;
     while (rsrc) {
@@ -2250,9 +2250,8 @@ void register_reports(void)
     register_argtype("int", NULL, NULL, VAR_INT);
     register_argtype("string", var_free_string, var_copy_string, VAR_VOIDPTR);
     register_argtype("order", var_free_order, var_copy_order, VAR_VOIDPTR);
-    register_argtype("resource_list", var_free_resource_list, var_copy_resource_list, VAR_VOIDPTR);
-    //register_argtype("resources", var_free_resources, var_copy_resources, VAR_VOIDPTR);
-    register_argtype("items", var_free_resource_list, var_copy_items, VAR_VOIDPTR);
+    register_argtype("resources", var_free_resources, var_copy_resources, VAR_VOIDPTR);
+    register_argtype("items", var_free_resources, var_copy_items, VAR_VOIDPTR);
     register_argtype("regions", var_free_regions, NULL, VAR_VOIDPTR);
 
     msg_log_create = &log_orders;
