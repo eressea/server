@@ -49,13 +49,10 @@ int amount, struct order *ord)
     direction_t direction;
     unit *u2;
     direction_t closest_neighbour_direction = 0;
-    static const race *rc_phoenix = NULL;
+    const race *rc_phoenix = rc_find("phoenix");
 
-    if (rc_phoenix == NULL) {
-        rc_phoenix = rc_find("phoenix");
-        if (rc_phoenix == NULL)
-            return 0;
-    }
+    if (rc_phoenix == NULL)
+        return 0;
 
     /* find the closest phoenix. */
 
