@@ -959,13 +959,7 @@ int sp_strong_wall(struct castorder * co)
     unit *mage = fi->unit;
     building *burg;
     double effect;
-    static bool init = false;
     message *msg;
-    static const curse_type *strongwall_ct;
-    if (!init) {
-        init = true;
-        strongwall_ct = ct_find("strongwall");
-    }
 
     if (!mage->building) {
         return 0;
@@ -973,7 +967,7 @@ int sp_strong_wall(struct castorder * co)
     burg = mage->building;
 
     effect = power / 4;
-    create_curse(mage, &burg->attribs, strongwall_ct, power, 1, effect, 0);
+    create_curse(mage, &burg->attribs, ct_find("strongwall"), power, 1, effect, 0);
 
     msg =
         msg_message("sp_strongwalls_effect", "mage building", mage, mage->building);

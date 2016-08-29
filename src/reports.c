@@ -265,16 +265,24 @@ static size_t buforder(char *buffer, size_t size, const order * ord, int mode)
  * \param viewer: the faction looking at the items
  */
 int
-report_items(const item * items, item * result, int size, const unit * owner,
-const faction * viewer)
+report_items(const unit *u, item * result, int size, const unit * owner,
+    const faction * viewer)
 {
-    const item *itm;
+    const item *itm, *items = u->items;
     int n = 0;                    /* number of results */
+    bool itemcloak = false;
+    const curse_type *itemcloak_ct = ct_find("itemcloak");
 
-    assert(owner == NULL || viewer != owner->faction
-        || !"not required for owner=viewer!");
+    assert(owner == NULL || viewer != owner->faction);
     assert(size);
 
+    if (itemcloak_ct) {
+        curse * cu = get_curse(u->attribs, itemcloak_ct);
+        itemcloak = cu && curse_active(cu);
+    }
+    if (itemcloak) {
+        return 0;
+    }
     for (itm = items; itm; itm = itm->next) {
         item *ishow;
         const char *ic;
@@ -455,19 +463,11 @@ size_t size)
     const char *pzTmp, *str;
     building *b;
     bool isbattle = (bool)(mode == see_battle);
-    item *itm;
-    item *show;
+    item *itm, *show = NULL;
     faction *fv = visible_faction(f, u);
     char *bufp = buf;
-    bool itemcloak = false;
-    const curse_type *itemcloak_ct = 0;
     int result = 0;
     item results[MAX_INVENTORY];
-
-    itemcloak_ct = ct_find("itemcloak");
-    if (itemcloak_ct) {
-        itemcloak = curse_active(get_curse(u->attribs, itemcloak_ct));
-    }
 
     bufp = STRLCPY(bufp, unitname(u), size);
 
@@ -599,16 +599,12 @@ size_t size)
     if (f == u->faction || omniscient(f)) {
         show = u->items;
     }
-    else if (!itemcloak && mode >= see_unit) {
-        int n = report_items(u->items, results, MAX_INVENTORY, u, f);
+    else if (mode >= see_unit) {
+        int n = report_items(u, results, MAX_INVENTORY, u, f);
         assert(n >= 0);
-        if (n > 0)
+        if (n > 0) {
             show = results;
-        else
-            show = NULL;
-    }
-    else {
-        show = NULL;
+        }
     }
     for (itm = show; itm; itm = itm->next) {
         const char *ic;

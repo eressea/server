@@ -107,7 +107,7 @@ extern "C" {
     void view_neighbours(struct seen_region **seen, struct region * r, struct faction * f);
     int report_resources(const struct seen_region *sr,
     struct resource_report *result, int size, const struct faction *viewer);
-    int report_items(const struct item *items, struct item *result, int size,
+    int report_items(const struct unit *u, struct item *result, int size,
         const struct unit *owner, const struct faction *viewer);
     void report_item(const struct unit *owner, const struct item *i,
         const struct faction *viewer, const char **name, const char **basename,
