@@ -2756,13 +2756,10 @@ expandwork(region * r, request * work_begin, request * work_end, int maxwork)
         jobs = rpeasants(r);
     }
     earnings = jobs * p_wage;
-    if (rule_blessed_harvest() == HARVEST_TAXES) {
+    if (r->attribs && rule_blessed_harvest() == HARVEST_TAXES) {
         /* E3 rules */
-        static const curse_type *blessedharvest_ct;
-        if (!blessedharvest_ct) {
-            blessedharvest_ct = ct_find("blessedharvest");
-        }
-        if (blessedharvest_ct && r->attribs) {
+        const curse_type *blessedharvest_ct = ct_find("blessedharvest");
+        if (blessedharvest_ct) {
             int happy =
                 (int)curse_geteffect(get_curse(r->attribs, blessedharvest_ct));
             happy = _min(happy, jobs);

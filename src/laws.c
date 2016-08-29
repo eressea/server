@@ -3487,15 +3487,13 @@ static double heal_factor(const unit * u)
 void monthly_healing(void)
 {
     region *r;
-    static const curse_type *heal_ct = NULL;
-    if (heal_ct == NULL)
-        heal_ct = ct_find("healingzone");
+    const curse_type *heal_ct = ct_find("healingzone");
 
     for (r = regions; r; r = r->next) {
         unit *u;
         double healingcurse = 0;
 
-        if (heal_ct != NULL) {
+        if (r->attribs && heal_ct) {
             /* bonus zurücksetzen */
             curse *c = get_curse(r->attribs, heal_ct);
             if (c != NULL) {

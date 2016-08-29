@@ -496,7 +496,8 @@ static double overload(const region * r, ship * sh)
 
     if (sh->type->construction && sh->size != sh->type->construction->maxsize) {
         return DBL_MAX;
-    } else {
+    }
+    else {
         int n = 0, p = 0;
         int mcabins = sh->type->cabins;
 
@@ -828,7 +829,7 @@ static void drifting_ships(region * r)
             /* Kapitän bestimmen */
             captain = ship_owner(sh);
             if (captain && effskill(captain, SK_SAILING, r) < sh->type->cptskill)
-               captain = NULL;
+                captain = NULL;
 
             /* Kapitän da? Beschädigt? Genügend Matrosen?
              * Genügend leicht? Dann ist alles OK. */
@@ -843,7 +844,8 @@ static void drifting_ships(region * r)
             ovl = overload(r, sh);
             if (ovl >= overload_start()) {
                 rnext = NULL;
-            } else {
+            }
+            else {
                 /* Auswahl einer Richtung: Zuerst auf Land, dann
                  * zufällig. Falls unmögliches Resultat: vergiß es. */
                 rnext = drift_target(sh);
@@ -870,7 +872,8 @@ static void drifting_ships(region * r)
                 if (ovl >= overload_start()) {
                     damage_ship(sh, damage_overload(ovl));
                     msg_to_ship_inmates(sh, &firstu, &lastu, msg_message("massive_overload", "ship", sh));
-                } else
+                }
+                else
                     damage_ship(sh, damage_drift);
                 if (sh->damage >= sh->size * DAMAGE_SCALE) {
                     msg_to_ship_inmates(sh, &firstu, &lastu, msg_message("shipsink", "ship", sh));
@@ -1053,23 +1056,22 @@ unit *is_guarded(region * r, unit * u, unsigned int mask)
 bool move_blocked(const unit * u, const region * r, const region * r2)
 {
     connection *b;
-    curse *c;
-    static const curse_type *fogtrap_ct = NULL;
 
     if (r2 == NULL)
         return true;
     b = get_borders(r, r2);
     while (b) {
-        if (b->type->block && b->type->block(b, u, r))
+        if (b->type->block && b->type->block(b, u, r)) {
             return true;
+        }
         b = b->next;
     }
 
-    if (fogtrap_ct == NULL)
-        fogtrap_ct = ct_find("fogtrap");
-    c = get_curse(r->attribs, fogtrap_ct);
-    if (curse_active(c))
-        return true;
+    if (r->attribs) {
+        const curse_type *fogtrap_ct = ct_find("fogtrap");
+        curse *c = get_curse(r->attribs, fogtrap_ct);
+        return curse_active(c);
+    }
     return false;
 }
 
@@ -1308,7 +1310,6 @@ static bool roadto(const region * r, direction_t dir)
     /* wenn es hier genug strassen gibt, und verbunden ist, und es dort
      * genug strassen gibt, dann existiert eine strasse in diese richtung */
     region *r2;
-    static const curse_type *roads_ct = NULL;
 
     assert(r);
     assert(dir < MAXDIRECTIONS);
@@ -1318,13 +1319,14 @@ static bool roadto(const region * r, direction_t dir)
     if (r == NULL || r2 == NULL)
         return false;
 
-    if (roads_ct == NULL)
-        roads_ct = ct_find("magicstreet");
-    if (roads_ct != NULL) {
-        if (get_curse(r->attribs, roads_ct) != NULL)
-            return true;
-        if (get_curse(r2->attribs, roads_ct) != NULL)
-            return true;
+    if (r->attribs || r2->attribs) {
+        const curse_type *roads_ct = ct_find("magicstreet");
+        if (roads_ct != NULL) {
+            if (get_curse(r->attribs, roads_ct) != NULL)
+                return true;
+            if (get_curse(r2->attribs, roads_ct) != NULL)
+                return true;
+        }
     }
 
     if (r->terrain->max_road <= 0)
