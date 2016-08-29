@@ -56,6 +56,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/moved.h>
 
 /* util includes */
+#include <util/assert.h>
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/bsdstring.h>
@@ -67,7 +68,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/rng.h>
 
 /* libc includes */
-#include <assert.h>
 #include <ctype.h>
 #include <limits.h>
 #include <math.h>
@@ -218,7 +218,7 @@ static void message_faction(battle * b, faction * f, struct message *m)
     assert(f);
     if (f->battles == NULL || f->battles->r != r) {
         struct bmsg *bm = (struct bmsg *)calloc(1, sizeof(struct bmsg));
-        assert(bm || !"out of memory");
+        assert_alloc(bm);
         bm->next = f->battles;
         f->battles = bm;
         bm->r = r;

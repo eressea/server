@@ -57,6 +57,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "skill.h"
 
 /* util includes */
+#include <util/assert.h>
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/bsdstring.h>
@@ -77,7 +78,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/targetregion.h>
 
 /* libc includes */
-#include <assert.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -127,7 +127,7 @@ get_followers(unit * target, region * r, const region_list * route_end,
             const attrib *a = a_find(uf->attribs, &at_follow);
             if (a && a->data.v == target) {
                 follower *fnew = (follower *)malloc(sizeof(follower));
-                assert(fnew || !"out of memory");
+                assert_alloc(fnew);
                 fnew->uf = uf;
                 fnew->ut = target;
                 fnew->route_end = route_end;
@@ -1545,7 +1545,7 @@ static arg_regions *var_copy_regions(const region_list * begin, int size)
         assert(size > 0);
         arg_regions *dst =
             (arg_regions *)malloc(sizeof(arg_regions) + sizeof(region *) * (size_t)size);
-        assert(dst || !"out of memory");
+        assert_alloc(dst);
         dst->nregions = size;
         dst->regions = (region **)(dst + 1);
         for (rsrc = begin; i != size; rsrc = rsrc->next) {

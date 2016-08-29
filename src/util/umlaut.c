@@ -19,6 +19,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include "umlaut.h"
 
+#include "assert.h"
 #include "log.h"
 #include "unicode.h"
 
@@ -183,6 +184,7 @@ void addtoken(void ** root, const char *str, variant id)
                 index = lcs % NODEHASHSIZE;
 #endif
                 ref = (tref *)malloc(sizeof(tref));
+                assert_alloc(ref);
                 ref->ucs = lcs;
                 ref->node = node;
                 ref->nexthash = tk->next[index];

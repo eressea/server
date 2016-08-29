@@ -18,6 +18,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <platform.h>
 
+#include "assert.h"
+
 /* libc includes */
 #include <string.h>
 #include <assert.h>
@@ -34,7 +36,9 @@ char *set_string(char **s, const char *neu)
         strcpy(*s, neu);
     }
     else {
-        *s = realloc(*s, strlen(neu) + 1);
+        char *rs = realloc(*s, strlen(neu) + 1);
+        assert_alloc(rs);
+        *s = rs;
         strcpy(*s, neu);
     }
     return *s;
