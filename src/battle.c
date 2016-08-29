@@ -1923,28 +1923,29 @@ int skilldiff(troop at, troop dt, int dist)
     }
 
     if (df->building) {
-        static const curse_type *strongwall_ct;
-        strongwall_ct = ct_find("strongwall");
-        if (strongwall_ct) {
-            curse *c = get_curse(df->building->attribs, strongwall_ct);
-            if (curse_active(c)) {
-                /* wirkt auf alle Gebäude */
-                skdiff -= curse_geteffect_int(c);
-                is_protected = 2;
+        if (df->building->attribs) {
+            const curse_type *strongwall_ct = ct_find("strongwall");
+            if (strongwall_ct) {
+                curse *c = get_curse(df->building->attribs, strongwall_ct);
+                if (curse_active(c)) {
+                    /* wirkt auf alle Gebäude */
+                    skdiff -= curse_geteffect_int(c);
+                    is_protected = 2;
+                }
             }
         }
-
         if (df->building->type->protection) {
             int beff = df->building->type->protection(df->building, du, DEFENSE_BONUS);
             if (beff) {
-                static const curse_type *magicwalls_ct;
                 skdiff -= beff;
                 is_protected = 2;
-                magicwalls_ct = ct_find("magicwalls");
-                if (magicwalls_ct
-                    && curse_active(get_curse(df->building->attribs, magicwalls_ct))) {
-                    /* Verdoppelt Burgenbonus */
-                    skdiff -= beff;
+                if (df->building->attribs) {
+                    const curse_type *magicwalls_ct = ct_find("magicwalls");
+                    if (magicwalls_ct
+                        && curse_active(get_curse(df->building->attribs, magicwalls_ct))) {
+                        /* Verdoppelt Burgenbonus */
+                        skdiff -= beff;
+                    }
                 }
             }
         }

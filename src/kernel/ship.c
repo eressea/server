@@ -298,8 +298,6 @@ int crew_skill(const ship *sh) {
 int shipspeed(const ship * sh, const unit * u)
 {
     int k = sh->type->range;
-    static const struct curse_type *stormwind_ct, *nodrift_ct;
-    static bool init;
     attrib *a;
     struct curse *c;
     int bonus;
@@ -312,19 +310,17 @@ int shipspeed(const ship * sh, const unit * u)
     assert(sh->type->construction);
     assert(sh->type->construction->improvement == NULL);  /* sonst ist construction::size nicht ship_type::maxsize */
 
-    if (!init) {
-        init = true;
-        stormwind_ct = ct_find("stormwind");
-        nodrift_ct = ct_find("nodrift");
-    }
     if (sh->size != sh->type->construction->maxsize)
         return 0;
 
-    if (curse_active(get_curse(sh->attribs, stormwind_ct)))
-        k *= 2;
-    if (curse_active(get_curse(sh->attribs, nodrift_ct)))
-        k += 1;
-
+    if (sh->attribs) {
+        if (curse_active(get_curse(sh->attribs, ct_find("stormwind")))) {
+            k *= 2;
+        }
+        if (curse_active(get_curse(sh->attribs, ct_find("nodrift")))) {
+            k += 1;
+        }
+    }
     if (u->faction->race == u_race(u)) {
         /* race bonus for this faction? */
         if (fval(u_race(u), RCF_SHIPSPEED)) {
@@ -333,7 +329,7 @@ int shipspeed(const ship * sh, const unit * u)
     }
 
     bonus = ShipSpeedBonus(u);
-    if (bonus > 0 && sh->type->range_max>sh->type->range) {
+    if (bonus > 0 && sh->type->range_max > sh->type->range) {
         int crew = crew_skill(sh);
         int crew_bonus = (crew / sh->type->sumskill / 2) - 1;
         if (crew_bonus > 0) {
@@ -358,7 +354,7 @@ int shipspeed(const ship * sh, const unit * u)
         c = c->nexthash;
     }
 
-    if (sh->damage>0) {
+    if (sh->damage > 0) {
         int size = sh->size * DAMAGE_SCALE;
         k *= (size - sh->damage);
         k = (k + size - 1) / size;
