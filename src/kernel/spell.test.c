@@ -29,6 +29,7 @@ static void test_create_duplicate_spell(CuTest * tc)
     /* FIXME: this test emits ERROR messages (duplicate spells), inject a logger to verify that */
 
     test_setup();
+    test_log_stderr(0);
     CuAssertPtrEquals(tc, 0, find_spell("testspell"));
 
     sp = create_spell("testspell", 0);
@@ -43,6 +44,7 @@ static void test_create_spell_with_id(CuTest * tc)
     /* FIXME: this test emits ERROR messages (duplicate spells), inject a logger to verify that */
 
     test_setup();
+    test_log_stderr(0);
     CuAssertPtrEquals(tc, 0, find_spellbyid(42));
     sp = create_spell("testspell", 42);
     CuAssertPtrEquals(tc, sp, find_spellbyid(42));

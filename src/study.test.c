@@ -70,7 +70,7 @@ static void setup_study(study_fixture *fix, skill_t sk) {
     struct locale *lang;
 
     assert(fix);
-    test_cleanup();
+    test_setup();
     config_set("study.random_progress", "0");
     test_create_world();
     r = findregion(0, 0);
@@ -138,7 +138,7 @@ static void test_study_bug_2194(CuTest *tc) {
     struct locale * loc;
     building * b;
 
-    test_cleanup();
+    test_setup();
     random_source_inject_constant(0.0);
     init_resources();
     loc = get_or_create_locale("de");
@@ -195,7 +195,7 @@ static void test_produceexp(CuTest *tc) {
     unit *u;
 
     g_tc = tc;
-    test_cleanup();
+    test_setup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     scale_number(u, 2);
     config_set("study.produceexp", "20");
@@ -210,7 +210,7 @@ static void test_academy_building(CuTest *tc) {
     building * b;
     message * msg;
 
-    test_cleanup();
+    test_setup();
     mt_register(mt_new_va("teach_asgood", "unit:unit", "region:region", "command:order", "student:unit", 0));
 
     random_source_inject_constant(0.0);
@@ -253,7 +253,7 @@ static void test_academy_building(CuTest *tc) {
 void test_learn_skill_single(CuTest *tc) {
     unit *u;
     skill *sv;
-    test_cleanup();
+    test_setup();
     config_set("study.random_progress", "0");
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     learn_skill(u, SK_ALCHEMY, STUDYDAYS);
@@ -272,7 +272,7 @@ void test_learn_skill_single(CuTest *tc) {
 void test_learn_skill_multi(CuTest *tc) {
     unit *u;
     skill *sv;
-    test_cleanup();
+    test_setup();
     config_set("study.random_progress", "0");
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     scale_number(u, 10);
@@ -292,7 +292,7 @@ void test_learn_skill_multi(CuTest *tc) {
 static void test_demon_skillchanges(CuTest *tc) {
     unit * u;
     race * rc;
-    test_cleanup();
+    test_setup();
     rc = test_create_race("demon");
     CuAssertPtrEquals(tc, rc, get_race(RC_DAEMON));
     u = test_create_unit(test_create_faction(rc), 0);
@@ -305,7 +305,7 @@ static void test_demon_skillchanges(CuTest *tc) {
 
 static void test_study_cmd(CuTest *tc) {
     unit *u;
-    test_cleanup();
+    test_setup();
     init_resources();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     u->thisorder = create_order(K_STUDY, u->faction->locale, "CROSSBOW");
@@ -321,7 +321,7 @@ static void test_study_cmd(CuTest *tc) {
 static void test_study_cost(CuTest *tc) {
     unit *u;
     const struct item_type *itype;
-    test_cleanup();
+    test_setup();
     init_resources();
     itype = get_resourcetype(R_SILVER)->itype;
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
@@ -340,7 +340,7 @@ static void test_study_cost(CuTest *tc) {
 
 static void test_teach_cmd(CuTest *tc) {
     unit *u, *ut;
-    test_cleanup();
+    test_setup();
     init_resources();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     scale_number(u, 10);
@@ -360,7 +360,7 @@ static void test_teach_cmd(CuTest *tc) {
 
 static void test_teach_two(CuTest *tc) {
     unit *u1, *u2, *ut;
-    test_cleanup();
+    test_setup();
     init_resources();
     u1 = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     scale_number(u1, 5);
@@ -390,7 +390,7 @@ static void test_teach_two_skills(CuTest *tc) {
     faction *f;
     region *r;
 
-    test_cleanup();
+    test_setup();
     init_resources();
     f = test_create_faction(0);
     r = test_create_region(0, 0, 0);
@@ -420,7 +420,7 @@ static void test_teach_two_skills(CuTest *tc) {
 
 static void test_teach_one_to_many(CuTest *tc) {
     unit *u, *ut;
-    test_cleanup();
+    test_setup();
     init_resources();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     scale_number(u, 20);
@@ -440,7 +440,7 @@ static void test_teach_one_to_many(CuTest *tc) {
 
 static void test_teach_many_to_one(CuTest *tc) {
     unit *u, *u1, *u2;
-    test_cleanup();
+    test_setup();
     init_resources();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     scale_number(u, 20);
@@ -467,7 +467,7 @@ static void test_teach_many_to_many(CuTest *tc) {
     region *r;
     faction *f;
 
-    test_cleanup();
+    test_setup();
     init_resources();
     f = test_create_faction(0);
     r = test_create_region(0, 0, 0);

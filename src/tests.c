@@ -133,7 +133,12 @@ void test_log_stderr(int flags) {
         stderrlog = log_to_file(flags, stderr);
     }
     else {
-        log_destroy(stderrlog);
+        if (stderrlog) {
+            log_destroy(stderrlog);
+        }
+        else {
+            log_warning("stderr logging is inactive. did you call test_cleanup twice?");
+        }
         stderrlog = 0;
     }
 

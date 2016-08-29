@@ -6,7 +6,7 @@
 #include <CuTest.h>
 
 static void test_add_prefix(CuTest *tc) {
-    test_cleanup();
+    test_setup();
     CuAssertPtrEquals(tc, 0, race_prefixes);
     add_raceprefix("sea");
     CuAssertPtrNotNull(tc, race_prefixes);

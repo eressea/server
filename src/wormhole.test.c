@@ -22,7 +22,7 @@ static void test_make_wormholes(CuTest *tc) {
     terrain_type *t_plain;
     building_type *btype;
 
-    test_cleanup();
+    test_setup();
     t_plain = test_create_terrain("plain", LAND_REGION);
     btype = test_create_buildingtype("wormhole");
     match[0] = r1 = test_create_region(0, 0, t_plain);
@@ -44,7 +44,7 @@ static void test_sort_wormhole_regions(CuTest *tc) {
     terrain_type *t_plain;
     quicklist *rlist = 0;
 
-    test_cleanup();
+    test_setup();
     t_plain = test_create_terrain("plain", LAND_REGION);
     r1 = test_create_region(0, 0, t_plain);
     r2 = test_create_region(1, 0, t_plain);
