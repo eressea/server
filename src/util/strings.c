@@ -18,6 +18,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <platform.h>
 
+#include "strings.h"
 #include "assert.h"
 
 /* libc includes */

@@ -121,3 +121,22 @@ unsigned int listlen(void *l)
     for (p = (void_list *)l, i = 0; p; p = p->next, i++);
     return i;
 }
+/* - String Listen --------------------------------------------- */
+void addstrlist(strlist ** SP, const char *s)
+{
+    strlist *slist = malloc(sizeof(strlist));
+    slist->next = NULL;
+    slist->s = _strdup(s);
+    addlist(SP, slist);
+}
+
+void freestrlist(strlist * s)
+{
+    strlist *q, *p = s;
+    while (p) {
+        q = p->next;
+        free(p->s);
+        free(p);
+        p = q;
+    }
+}

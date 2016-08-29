@@ -18,6 +18,7 @@
 #include <kernel/spellbook.h>
 
 #include <util/language.h>
+#include <util/lists.h>
 
 #include <quicklist.h>
 #include <stream.h>

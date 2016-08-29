@@ -121,14 +121,7 @@ extern "C" {
     size_t f_regionid(const struct region *r, const struct faction *f,
         char *buffer, size_t size);
 
-    typedef struct strlist {
-        struct strlist *next;
-        char *s;
-    } strlist;
-
-    void addstrlist(strlist ** SP, const char *s);
-    void freestrlist(strlist * s);
-    void split_paragraph(strlist ** SP, const char *s, unsigned int indent, unsigned int width, char mark);
+    void split_paragraph(struct strlist ** SP, const char *s, unsigned int indent, unsigned int width, char mark);
 
     int stream_printf(struct stream * out, const char *format, ...);
 
