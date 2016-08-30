@@ -899,7 +899,6 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
     int esize = 0;
     double wage;
     attrib *a;
-    const building_type *artsculpture_type = bt_find("artsculpture");
     const struct curse_type *ctype;
 
     if (b != NULL) {
@@ -935,7 +934,7 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
 
     /* Artsculpture: Income +5 */
     for (b = r->buildings; b; b = b->next) {
-        if (b->type == artsculpture_type) {
+        if (is_building_type(b->type, "artsculpture")) {
             wage += 5;
         }
     }

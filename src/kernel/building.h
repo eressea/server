@@ -163,6 +163,7 @@ extern "C" {
     bool buildingtype_exists(const struct region *r,
         const struct building_type *bt, bool working);
     bool building_is_active(const struct building *b);
+    bool is_building_type(const struct building_type *btype, const char *name);
     struct building *active_building(const struct unit *u, const struct building_type *btype);
 
     extern const char *buildingname(const struct building *b);

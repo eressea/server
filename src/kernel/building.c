@@ -158,9 +158,7 @@ const char *buildingtype(const building_type * btype, const building * b, int bs
         s = btype->name(btype, b, bsize);
     }
     if (b && b->attribs) {
-        const struct building_type *bt_generic = bt_find("generic");
-
-        if (btype == bt_generic) {
+        if (is_building_type(btype, "generic")) {
             const attrib *a = a_find(b->attribs, &at_building_generic_type);
             if (a) {
                 s = (const char *)a->data.v;
@@ -390,15 +388,8 @@ building *new_building(const struct building_type * btype, region * r,
 {
     building **bptr = &r->buildings;
     building *b = (building *)calloc(1, sizeof(building));
-    static bool init_lighthouse = false;
-    static const struct building_type *bt_lighthouse = 0;
     const char *bname = 0;
     char buffer[32];
-
-    if (!init_lighthouse) {
-        bt_lighthouse = bt_find("lighthouse");
-        init_lighthouse = true;
-    }
 
     b->no = newcontainerid();
     bhash(b);
@@ -409,9 +400,7 @@ building *new_building(const struct building_type * btype, region * r,
         bptr = &(*bptr)->next;
     *bptr = b;
 
-    if (b->type == bt_lighthouse) {
-        r->flags |= RF_LIGHTHOUSE;
-    }
+    update_lighthouse(b);
     if (b->type->name) {
         bname = LOC(lang, buildingtype(btype, b, 0));
     }
@@ -694,4 +683,9 @@ bool in_safe_building(unit *u1, unit *u2) {
         }
     }
     return false;
+}
+
+bool is_building_type(const struct building_type *btype, const char *name) {
+    assert(btype);
+    return name && strcmp(btype->_name, name)==0;
 }

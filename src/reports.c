@@ -1754,11 +1754,9 @@ f_regionid(const region * r, const faction * f, char *buffer, size_t size)
 
 static char *f_regionid_s(const region * r, const faction * f)
 {
-    static int i = 0;
-    static char bufs[4][NAMESIZE + 20]; // FIXME: static return value
-    char *buf = bufs[(++i) % 4];
+    static char buf[NAMESIZE + 20]; // FIXME: static return value
 
-    f_regionid(r, f, buf, NAMESIZE + 20);
+    f_regionid(r, f, buf, sizeof(buf));
     return buf;
 }
 

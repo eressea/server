@@ -25,8 +25,7 @@ static attrib_type at_lighthouse = {
 */
 void update_lighthouse(building * lh)
 {
-    const struct building_type *bt_lighthouse = bt_find("lighthouse");
-    if (bt_lighthouse && lh->type == bt_lighthouse) {
+    if (is_building_type(lh->type, "lighthouse")) {
         region *r = lh->region;
         int d = (int)log10(lh->size) + 1;
         int x;
