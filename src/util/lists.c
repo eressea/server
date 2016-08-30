@@ -16,12 +16,12 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
+#include <platform.h>
+#include "lists.h"
+
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-
-#include <platform.h>
-#include "lists.h"
 
 typedef struct void_list {
     struct void_list *next;
