@@ -86,7 +86,7 @@ static void make_name(unit *u, const char *monster, int *num_postfix,
         count_particles(monster, num_prefix, num_name, num_postfix);
     }
     if (*num_name > 0) {
-        char name[NAMESIZE + 1]; // FIXME: static return value
+        char name[NAMESIZE + 1];
         char zText[32];
         int uv = 0, uu = 0, un = 0;
         const char *str;
@@ -368,7 +368,7 @@ static const char *drac_suf[DRAC_SUF] = {
 
 static void dracoid_name(unit * u)
 {
-    static char name[NAMESIZE + 1]; // FIXME: static return value
+    static char name[NAMESIZE + 1];
     int mid_syllabels;
     size_t sz;
 
