@@ -862,11 +862,9 @@ struct order *ord)
     else {
         const race *irace = u_irace(u);
         if (irace == u_race(u)) {
-            static const race *rcfailure;
+            const race *rcfailure = rc_find("smurf");
             if (!rcfailure) {
-                rcfailure = rc_find("smurf");
-                if (!rcfailure)
-                    rcfailure = rc_find("toad");
+                rcfailure = rc_find("toad");
             }
             if (rcfailure) {
                 trigger *trestore = trigger_changerace(u, u_race(u), irace);

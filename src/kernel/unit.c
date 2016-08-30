@@ -1389,15 +1389,12 @@ void default_name(const unit *u, char name[], int len) {
     const char * result;
     const struct locale * lang = u->faction ? u->faction->locale : default_locale;
     if (lang) {
-        static const char * prefix[MAXLOCALES];
-        int i = locale_index(lang);
-        /*if (!prefix[i]) {*/
-        prefix[i] = LOC(lang, "unitdefault");
-        if (!prefix[i]) {
-            prefix[i] = parameters[P_UNIT];
+        const char * prefix;
+        prefix = LOC(lang, "unitdefault");
+        if (!prefix) {
+            prefix= parameters[P_UNIT];
         }
-        /*}*/
-        result = prefix[i];
+        result = prefix;
     }
     else {
         result = parameters[P_UNIT];

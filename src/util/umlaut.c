@@ -117,7 +117,7 @@ char * transliterate(char * out, size_t size, const char * in)
 void addtoken(void ** root, const char *str, variant id)
 {
     tnode * tk;
-    static const struct replace { /* STATIC_CONST: constant value */
+    static const struct replace {
         ucs4_t ucs;
         const char str[3];
     } replace[] = {
