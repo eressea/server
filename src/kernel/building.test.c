@@ -486,7 +486,6 @@ static void test_building_type(CuTest *tc) {
     btype = test_create_buildingtype("house");
     CuAssertIntEquals(tc, true, is_building_type(btype, "house"));
     CuAssertIntEquals(tc, false, is_building_type(btype, "castle"));
-    CuAssertIntEquals(tc, false, is_building_type(NULL, "house"));
     test_cleanup();
 }
 

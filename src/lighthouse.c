@@ -110,7 +110,7 @@ bool check_leuchtturm(region * r, faction * f)
         a = a->next) {
         building *b = (building *)a->data.v;
 
-        assert(b->type == bt_find("lighthouse"));
+        assert(is_building_type(b->type, "lighthouse"));
         if (fval(b, BLD_MAINTAINED) && b->size >= 10) {
             int maxd = (int)log10(b->size) + 1;
 

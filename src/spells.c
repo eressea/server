@@ -969,7 +969,7 @@ static int sp_blessstonecircle(castorder * co)
 
     b = p->param[0]->data.b;
 
-    if (b->type != bt_find("stonecircle")) {
+    if (!is_building_type(b->type, "stonecircle")) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "error_notstonecircle", "building", b));
         return 0;
@@ -2052,7 +2052,7 @@ static int sp_homestone(castorder * co)
     double force = co->force;
     double effect;
     message *msg;
-    if (!mage->building || mage->building->type != bt_find("castle")) {
+    if (!mage->building || !is_building_type(mage->building->type, "castle")) {
         cmistake(mage, co->order, 197, MSG_MAGIC);
         return 0;
     }
@@ -5971,8 +5971,8 @@ int sp_movecastle(castorder * co)
         u = unext;
     }
 
-    if ((b->type == bt_find("caravan") || b->type == bt_find("dam")
-        || b->type == bt_find("tunnel"))) {
+    if ((is_building_type(b->type, "caravan") || is_building_type(b->type, "dam")
+        || is_building_type(b->type, "tunnel"))) {
         direction_t d;
         for (d = 0; d != MAXDIRECTIONS; ++d) {
             if (rroad(r, d)) {

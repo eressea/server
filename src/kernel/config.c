@@ -764,8 +764,7 @@ static const int wagetable[7][4] = {
 
 int cmp_wage(const struct building *b, const building * a)
 {
-    const struct building_type *bt_castle = bt_find("castle");
-    if (b->type == bt_castle) {
+    if (is_building_type(b->type, "castle")) {
         if (!a)
             return 1;
         if (b->size > a->size)

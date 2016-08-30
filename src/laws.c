@@ -3082,10 +3082,7 @@ static void age_stonecircle(building *b) {
 
 static building *age_building(building * b)
 {
-    const struct building_type *bt_blessed;
-
-    bt_blessed = bt_find("blessedstonecircle");
-    if (bt_blessed && b->type == bt_blessed) {
+    if (is_building_type(b->type, "blessedstonecircle")) {
         age_stonecircle(b);
     }
     a_age(&b->attribs, b);

@@ -352,16 +352,13 @@ void
 report_building(const struct building *b, const char **name,
 const char **illusion)
 {
-    const struct building_type *bt_illusion;
-
     if (name) {
         *name = buildingtype(b->type, b, b->size);
     }
     if (illusion) {
         *illusion = NULL;
 
-        bt_illusion = bt_find("illusioncastle");
-        if (bt_illusion && b->type == bt_illusion) {
+        if (is_building_type(b->type, "illusioncastle")) {
             const attrib *a = a_find(b->attribs, &at_icastle);
             if (a != NULL) {
                 *illusion = buildingtype(icastle_type(a), b, b->size);

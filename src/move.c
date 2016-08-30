@@ -669,8 +669,7 @@ static bool is_freezing(const unit * u)
 int check_ship_allowed(struct ship *sh, const region * r)
 {
     int c = 0;
-    const building_type *bt_harbour = NULL;
-    bt_harbour = bt_find("harbour");
+    const building_type *bt_harbour = bt_find("harbour");
 
     if (sh->region && r_insectstalled(r)) {
         /* insekten dürfen nicht hier rein. haben wir welche? */
@@ -923,6 +922,7 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
     int guard_count = 0;
     int stealth = eff_stealth(reisender, r);
     const struct resource_type *ramulet = get_resourcetype(R_AMULET_OF_TRUE_SEEING);
+    const struct building_type *castle_bt = bt_find("castle");
 
     double base_prob = config_get_flt("rules.guard.base_stop_prob", .3);
     double skill_prob = config_get_flt("rules.guard.skill_stop_prob", .1);
@@ -947,7 +947,7 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
                 double prob_u = (sk - stealth) * skill_prob;
                 /* amulet counts at most once */
                 prob_u += _min(1, _min(u->number, i_get(u->items, ramulet->itype))) * amulet_prob;
-                if (u->building && (u->building->type == bt_find("castle")) && u == building_owner(u->building))
+                if (u->building && (u->building->type == castle_bt) && u == building_owner(u->building))
                     prob_u += castle_prob*buildingeffsize(u->building, 0);
                 if (prob_u >= prob) {
                     prob = prob_u;

@@ -446,6 +446,7 @@ void remove_building(building ** blist, building * b)
 
     /* Falls Karawanserei, Damm oder Tunnel einstürzen, wird die schon
      * gebaute Straße zur Hälfte vernichtet */
+    // TODO: caravan, tunnel, dam modularization ? is_building_type ?
     if (b->type == bt_caravan || b->type == bt_dam || b->type == bt_tunnel) {
         region *r = b->region;
         int d;

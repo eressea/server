@@ -1795,6 +1795,7 @@ static void expandselling(region * r, request * sellorders, int limit)
     unit *hafenowner;
     static int counter[MAXLUXURIES];
     static int ncounter = 0;
+    const struct building_type *castle_bt;
 
     if (ncounter == 0) {
         const luxury_type *ltype;
@@ -1810,15 +1811,15 @@ static void expandselling(region * r, request * sellorders, int limit)
     }
     /* Stelle Eigentümer der größten Burg fest. Bekommt Steuern aus jedem
      * Verkauf. Wenn zwei Burgen gleicher Größe bekommt gar keiner etwas. */
-
+    castle_bt = bt_find("castle");
     for (b = rbuildings(r); b; b = b->next) {
         if (b->size > maxsize && building_owner(b) != NULL
-            && b->type == bt_find("castle")) {
+            && b->type == castle_bt) {
             maxb = b;
             maxsize = b->size;
             maxowner = building_owner(b);
         }
-        else if (b->size == maxsize && b->type == bt_find("castle")) {
+        else if (b->size == maxsize && b->type == castle_bt) {
             maxb = (building *)NULL;
             maxowner = (unit *)NULL;
         }
@@ -1923,13 +1924,7 @@ static void expandselling(region * r, request * sellorders, int limit)
             }
         }
         if (use > 0) {
-#ifdef NDEBUG
             use_pooled(oa[j].unit, ltype->itype->rtype, GET_DEFAULT, use);
-#else
-            /* int i = */ use_pooled(oa[j].unit, ltype->itype->rtype, GET_DEFAULT,
-                use);
-            /* assert(i==use); */
-#endif
         }
     }
     free(oa);
