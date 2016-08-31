@@ -207,153 +207,69 @@
   </namespace>
   
   <namespace name="spellinfo">
-	<string name="concealing_aura">
-		<text locale="de">Dieser Zauber wird die gesamte Ausrüstung der
-		Zieleinheit für
-		einige Zeit vor den Blicken anderer verschleiern. Der
-		Zauber
-		schützt nicht vor Dieben und Spionen.</text>
-		<text locale="en">This spell will hide the whole equipment of a target
-		unit from the
-		looks of others. It will not protect against thieves or
-		spies.</text>
+    <string name="concealing_aura">
+      <text locale="de">Dieser Zauber wird die gesamte Ausrüstung der Zieleinheit für einige Zeit vor den Blicken anderer verschleiern. Der Zauber schützt nicht vor Dieben und Spionen.</text>
+      <text locale="en">This spell will hide the whole equipment of a target unit from the looks of others. It will not protect against thieves or spies.</text>
 	</string>
     <string name="raindance">
-      <text locale="de">Durch dieses uralte Tanzritual ruft der Zauberkundige 
-        die Kräfte des Lebens und der Fruchtbarkeit an. Die darauf folgenden
-        Regenfälle begünstigen das Wachstum und erhöhen die Ernteerträge 
-        einiger Bauern der Region bis der Regen wieder nachlässt.</text>
-      <text locale="en">This ancient rite calls upon the
-      forces of life and fertility. For the next few weeks,
-      the peasant's harvest will be extraordinary good.
-      (OBS: this spell has been changed and needs a new translation).</text>
+      <text locale="de">Durch dieses uralte Tanzritual ruft der Zauberkundige die Kräfte des Lebens und der Fruchtbarkeit an. Die darauf folgenden Regenfälle begünstigen das Wachstum und erhöhen die Ernteerträge einiger Bauern der Region bis der Regen wieder nachlässt.</text>
+      <text locale="en">This ancient rite calls upon the forces of life and fertility. For the next few weeks, the peasants' harvest will be extraordinary good.</text>
     </string>
     <string name="blessedharvest">
-      <text locale="de">Für dieses Ernteritual sendet der Druide seine arkane Energie entlang
-        der astralen Kraftlinien der gesamten Umgebung, um selbst weit entfernte
-        Naturgeister zu erreichen. Die Beschwörung dieser Naturgeister ist eine
-        hohe Kunst, die höchste Konzentration und vor allem viel Erfahrung
-        erfordert. Die Bauern werden nach und nach von den besseren Ernten
-        profitieren und ihre Ersparnisse steigern können.</text>
-      <text locale="en">This ritual increases the output of the local farms.
-      Peasants in the region produce an extra silverpiece. The stronger the
-      druid's spell is, the longer the effect will last.
-      (OBS: this spell has been changed and needs a new translation).</text>
+      <text locale="de">Für dieses Ernteritual sendet der Druide seine arkane Energie entlang der astralen Kraftlinien der gesamten Umgebung, um selbst weit entfernte Naturgeister zu erreichen. Die Beschwörung dieser Naturgeister ist eine hohe Kunst, die höchste Konzentration und vor allem viel Erfahrung erfordert. Die Bauern werden nach und nach von den besseren Ernten profitieren und ihre Ersparnisse steigern können.</text>
+      <text locale="en">This ritual not only increases the output of the local farms. Activating the astral ley lines, the druid is capable of activating even the nature spirits far away. Peasants' harvest in the affected regions will be extraordinarily good for a few weeks. </text>
     </string>
     <string name="earn_silver#draig">
-      <text locale="de">In den dunkleren Gassen gibt es sie,
-        die Flüche und Verhexungen auf Bestellung. Aber
-        auch Gegenzauber hat der Jünger des Draigs
-        natürlich im Angebot. Ob nun der Sohn des
-        Nachbarn in einen Liebesbann gezogen werden soll
-        oder die Nebenbuhlerin Pickel und Warzen
-        bekommen soll, niemand gibt gerne zu, zu solchen
-        Mitteln gegriffen zu haben.  Für diese
-        Dienstleistung streicht der Magier 25 Silber pro
-        Stufe ein.</text>
-      <text locale="en">In the dark alleys you can find those
-        who sell curses and hexes on demand - but you
-        can buy the apropriate counterspells from the
-        followers of Draig as well. May it be a love
-        spell for the son of a neighbour or a wart in
-        the face of a rival. For offering these
-        services, the sorcerer charges 25 silver pieces.
-        per level.</text>
+      <text locale="de">In den dunkleren Gassen gibt es sie, die Flüche und Verhexungen auf Bestellung. Aber auch Gegenzauber hat der Jünger des Draigs natürlich im Angebot. Ob nun der Sohn des Nachbarn in einen Liebesbann gezogen werden soll oder die Nebenbuhlerin Pickel und Warzen bekommen soll: niemand gibt gerne zu, zu solchen Mitteln gegriffen zu haben. Für diese Dienstleistung streicht der Magier 25 Silber pro Stufe ein.</text>
+      <text locale="en">In the dark alleys you can find those who sell curses and hexes on demand -- but you can buy the apropriate counterspells from the followers of Draig as well. May it be a love spell for the son of a neighbour or a wart in the face of a rival. For offering these services, the sorcerer charges 25 silver pieces per level.</text>
     </string>
     <string name="earn_silver#illaun">
-      <text locale="de">Niemand kann so gut die Träume deuten
-        wie ein Magier des Illaun. Auch die Kunst der
-        Wahrsagerei, des Kartenlegens und des Handlesens
-        sind ihm geläufig. Dafür zahlen ihm die Bauern
-        25 Silber pro Stufe.</text>
-      <text locale="en">No one can read dreams as well as the
-        mages of Illaun. Furthermore, they are also
-        familiar with all other common means of
-        foretelling the future like crystal balls, tarot
-        cards or palms. A mentalist can earn 25 silver
-        pieces per level and week for offering these
-        services to peasants.</text>
+      <text locale="de">Niemand kann so gut die Träume deuten wie ein Magier des Illaun. Auch die Kunst der Wahrsagerei, des Kartenlegens und des Handlesens sind ihm geläufig. Dafür zahlen ihm die Bauern 25 Silber pro Stufe.</text>
+      <text locale="en">No one can read dreams as well as the mages of Illaun. Furthermore, they are also familiar with all other common means of foretelling the future like crystal balls, tarot cards or palms. A mentalist can earn 25 silver pieces per level and week for offering these services to peasants.</text>
     </string>
     <string name="earn_silver#tybied">
-      <text locale="de">Wenn einem der Alchemist nicht weiterhelfen kann, geht man zu dem
-      gelehrten Tybiedmagier. Seine Tränke und Tinkturen helfen gegen
-      alles, was man sonst nicht bekommen kann. Ob nun die kryptische
-      Formel unter dem Holzschuh des untreuen Ehemannes wirklich geholfen
-      hat - nun, der des Lesens nicht mächtige Bauer wird es nie wissen.
-      Dem Magier hilft es auf jeden Fall... beim Füllen seines
-      Geldbeutels. 25 Silber pro Stufe lassen sich so in einer Woche
-      verdienen.</text>
-      <text locale="en">If the local alchemist could not help you, you should visit a
-      scholar of Tybied. His potions and tinctures may help when nothing
-      else does. If the cryptic formula under the wooden shoes of the
-      unfaithful husband really helped? - well, the peasant, who isn't
-      capable of reading, will never know. At least it helped the magician...
-      to fill his purse. In one week he can earn 25 silver per level that
-      way.</text>
+      <text locale="de">Wenn einem der Alchemist nicht weiterhelfen kann, geht man zu dem gelehrten Tybiedmagier. Seine Tränke und Tinkturen helfen gegen alles, was man sonst nicht bekommen kann. Ob nun die kryptische Formel unter dem Holzschuh des untreuen Ehemannes wirklich geholfen hat -- nun, der des Lesens nicht mächtige Bauer wird es nie wissen. Dem Magier hilft es auf jeden Fall... beim Füllen seines Geldbeutels. 25 Silber pro Stufe lassen sich so in einer Woche verdienen.</text>
+      <text locale="en">If the local alchemist could not help you, you should visit a scholar of Tybied. His potions and tinctures may help when nothing else does. If the cryptic formula under the wooden shoes of the unfaithful husband really helped? - Well, the peasant, who isn't capable of reading, will never know. At least it helped the magician... to fill his purse. In one week he can earn 25 silver per level that way.</text>
     </string>
     <string name="earn_silver#cerddor">
-      <text locale="de">Cerddormagier sind _die_ Gaukler unter
-      den Magiern, sie lieben es das Volk zu unterhalten und
-      im Mittelpunkt zu stehen. Schon Anfänger lernen die
-      kleinen Kunststücke und magischen Tricks, mit denen man
-      das Volk locken und verführen kann, den Geldbeutel ganz
-      weit zu öffnen, und am Ende der Woche wird der Gaukler
-      25 Silber pro Stufe verdient haben.</text>
-      <text locale="en">The mages of Cerddor truly are the
-      bards of the wizards; they love to use their sorcery to
-      entertain the crowds and to be the center of attention.
-      Even the apprentices study those little magic tricks,
-      which attract and fascinate the people and thus ensnare
-      them into leaving a few coins or more for the artist. By
-      the end of the week, the bard will have earned 25 silver
-      per level. </text>
+      <text locale="de">Cerddormagier sind _die_ Gaukler unter den Magiern; sie lieben es, das Volk zu unterhalten und im Mittelpunkt zu stehen. Schon Anfänger lernen die kleinen Kunststücke und magischen Tricks, mit denen man das Volk locken und verführen kann, den Geldbeutel ganz weit zu öffnen, und am Ende der Woche wird der Gaukler 25 Silber pro Stufe verdient haben.</text>
+      <text locale="en">The mages of Cerddor truly are the bards of the wizards; they love to use their sorcery to entertain the crowds and to be the center of attention. Even the apprentices study those little magic tricks, which attract and fascinate the people and thus ensnare them into leaving a few coins or more for the artist. By the end of the week, the bard will have earned 25 silver per level. </text>
     </string>
     <string name="earn_silver#gwyrrd">
-      <text locale="de">Die Fähigkeiten der Gwyrrd-Magier in
-      der Viehzucht und Heilung sind bei den Bauern sehr
-      begehrt. Gerade auf Märkten sind ihre Dienste häufig sehr
-      gefragt. Manch einer mag auch sein Talent dazu nutzen,
-      ein Tier für einen besseren Preis zu verkaufen. Pro
-      Stufe kann der Magier so 25 Silber verdienen.</text>
-      <text locale="en">The abilities of the mages of Gwyrrd
-      concerning the breeding and healing of cattle are highly
-      appreciated among the peasants. Especially at the
-      markets, their services are demanded frequently. Some of
-      them also use their talents to sell an animal at a
-      higher price. A magician can earn 25 silver pieces per level
-      in this way.</text>
+      <text locale="de">Die Fähigkeiten der Gwyrrd-Magier in der Viehzucht und Heilung sind bei den Bauern sehr begehrt. Gerade auf Märkten sind ihre Dienste häufig sehr gefragt. Manch einer mag auch sein Talent dazu nutzen, ein Tier für einen besseren Preis zu verkaufen. Pro Stufe kann der Magier so 25 Silber verdienen.</text>
+      <text locale="en">The abilities of the mages of Gwyrrd concerning the breeding and healing of cattle are highly appreciated among the peasants. Especially at the markets their services are demanded frequently. Some of them also use their talents to sell an animal at a higher price. A magician can earn 25 silver pieces per level in this way.</text>
     </string>
     <string name="create_potion_p0">
-      <text locale="en">Time is one of the first mysteries every magician tries to solve. If he succeeds, he can focus all his energies on his magical studies as the ways between dormatory, library and magician tower now pass much faster. To keep his heart in tune the magician uses a special self made tey. Some mages even share it with up to 10 people</text>
-      <text locale="de">Die Zeit ist eines der ersten Geheimnisse, die jeder Magier zu erkunden versucht. Gelingt ihm dies, kann er alle seine Energie auf das Studium der Magie verwenden, die Wege zwischen Dormitorium, Bibliothek und Magierturm schafft er nun viel schneller. Um sein Herz im Takt zu halten verwendet er einen speziellen selbstgemachten Tee. Manche Magier teilen diesen Tee mit bis zu 10 Personen. </text>
+      <text locale="en">Time is one of the first mysteries every magician tries to solve. If they succeed, they can focus all their energies on their magical studies as the ways between dormatory, library and magician tower now pass much faster. To keep their heart in tune the magicians use a special self-made tea. Some mages even share it with up to 10 people</text>
+      <text locale="de">Die Zeit ist eines der ersten Geheimnisse, die jeder Magier zu erkunden versucht. Gelingt ihm dies, kann er alle seine Energie auf das Studium der Magie verwenden; die Wege zwischen Dormitorium, Bibliothek und Magierturm schafft er nun viel schneller. Um sein Herz im Takt zu halten, verwendet er einen speziellen selbstgemachten Tee. Manche Magier teilen diesen Tee mit bis zu 10 Personen. </text>
     </string>
     <string name="create_potion_p2">
-      <text locale="en">One of the most strange spells enables the magician to withdraw a little life energy from his surroundings to produce the so called water of life. The juice of some selected herbs is used to conserve the energies of life. As the magician is protected by his magical abilities, he is the only one who can touch the juice without taking damage. This is necessary because the juice must be carried around from place to place to avoid damaging one region by taking too much energy at once.</text>
-      <text locale="de">In einem der seltsamsten Zauber kann der Magier seiner Umgebung ein klein wenig der Lebensenergie entziehen um das sogenannte Wasser des Lebens herstellen. Als Basis dient ihm hierbei der Saft aus einigen ausgesuchten Kräutern, welcher die Lebensenergie speichern kann. Da der Magier aufgrund seiner magischen Fähigkeiten immun ist, ist er der einzige, der den Saft berühren kann, ohne Schaden zu nehmen. Sodenn muß er diesen eine Woche lang von Ort zu Ort tragen, damit er sich mit Lebensenergie vollsaugt, ohne einem einzelnen Ort soviel zu entfernen, daß er Schaden nimmt. </text>
+      <text locale="en">One of the most strange spells enables the magician to withdraw a little life energy from their surroundings to produce the so called water of life. The juice of some selected herbs is used to conserve the energies of life. As the magician is protected by his magical abilities, he is the only one who can touch the juice without taking damage. This is necessary because the juice must be carried around from place to place to avoid damaging one region by taking too much energy at once.</text>
+      <text locale="de">In einem der seltsamsten Zauber kann der Magier seiner Umgebung ein klein wenig der Lebensenergie entziehen um das sogenannte Wasser des Lebens herstellen. Als Basis dient ihm hierbei der Saft aus einigen ausgesuchten Kräutern, welcher die Lebensenergie speichern kann. Da der Magier aufgrund seiner magischen Fähigkeiten immun ist, ist er der einzige, der den Saft berühren kann, ohne Schaden zu nehmen. Sodann muss er diesen eine Woche lang von Ort zu Ort tragen, damit er sich mit Lebensenergie vollsaugt, ohne einem einzelnen Ort soviel zu entfernen, dass er Schaden nimmt. </text>
     </string>
     <string name="create_potion_p3">
-      <text locale="en">Busybeer is another application for the knowledge about time a magician accumulates. Even though manual labour is only seldom done by mages, they still show interest in increasing the efficiency of their minions that do this work for them. Mornac the wise was the first to discover how to produce a potion that would enable 10 minions to do the work of 20, thus freeing the other 10 for different experiments.</text>
-      <text locale="de">Ein weiteres Anwendungsgebiet des Wissens über die Zeit welches ein Magier ansammelt stellt der Schaffenstrunk dar. Auch wenn körperliche Arbeiten eher selten von Magiern ausgeführt werden, so haben diese doch ein Interesse daran, die Effizienz ihrer Untergebenen bei solchen Arbeiten zu steigern. Mornac der Weise war der erste, der entdeckte, daß man einen Trunk herstellen kann, durch den 10 Untergebene die arbeit von 20 erledigen können, wodurch 10 für andere Experimente weiterverwendet werden konnten. </text>
+      <text locale="en">Busybeer is another application for the knowledge about time a magician accumulates. Even though manual labour is only seldom done by mages, they still show interest in increasing the efficiency of their minions that do this work for them. Mornac the Wise was the first to discover how to produce a potion that would enable 10 minions to do the work of 20, thus freeing the other 10 for different experiments.</text>
+      <text locale="de">Ein weiteres Anwendungsgebiet des Wissens über die Zeit, welches ein Magier ansammelt, stellt der Schaffenstrunk dar. Auch wenn körperliche Arbeiten eher selten von Magiern ausgeführt werden, so haben diese doch ein Interesse daran, die Effizienz ihrer Untergebenen bei solchen Arbeiten zu steigern. Mornac der Weise war der erste, der entdeckte, dass man einen Trunk herstellen kann, durch den 10 Untergebene die Arbeit von 20 erledigen, wodurch der Rest für andere Experimente eingesetzt werden kann. </text>
     </string>
     <string name="create_potion_ointment">
-      <text locale="en">In the aftermath of battle it is vital to heal your own troops. This can be done by a healer as well as by a magician. In contrast to a healer, the magician can fullfill his treatment already before the battle by binding his magical powers into a potent salve. This salve can be stored and only needs to be applied to the wounds after the battle. </text>
-      <text locale="de">Nach einem harten Kampf sollte man sich heilen lassen. Diese Möglichkeit bietet der Magier ebenso wie der Heiler. Im Gegensatz zum Heiler ist der Magier jedoch in der Lage, seine Behandlung bereits vor dem Kampf durchzuführen, indem er seine Heilkräfte in eine magische Salbe bindet, welche gelagert werden kann und nach dem Kampf nur aufgetragen werden muß.</text>
+      <text locale="en">In the aftermath of battle it is vital to heal your own troops. This can be done by a healer as well as by a magician. In contrast to a healer, the magician can fullfill this treatment already before the battle by binding magical powers into a potent salve. This salve can be stored and only needs to be applied to the wounds after the battle. </text>
+      <text locale="de">Nach einem harten Kampf sollte man sich heilen lassen. Diese Möglichkeit bietet der Magier ebenso wie der Heiler. Im Gegensatz zum Heiler ist der Magier jedoch in der Lage, seine Behandlung bereits vor dem Kampf durchzuführen, indem er seine Heilkräfte in eine magische Salbe bindet, welche gelagert werden kann und nach dem Kampf nur aufgetragen werden muss.</text>
     </string>
     <string name="create_potion_peasantblood">
-      <text locale="en">One of the most dangerous and best guarded secrets of all mages is the knowledge about the power of death. Even though most of them would not openly admit it, and it is at least partially forbidden in most countries, each of them studies death sooner or later. When they do, they quickly find out that there is another plane of existance, the home of the demons. Only blood can quelch the thirst of those, when they switch from their home to our world. But experienced mages will find out that the demons bloodwine can be deluted when apropiate herbs are included, making it enough for 100 instead of 10 demons. As the demons may not know about that, the magician has to secretly sacrifice one of his freed minions.</text>
-      <text locale="de">Zu den gefährlichsten und geheimsten Wissen der Magier zählt das Wissen über die Macht des Todes. Auch wenn die meisten es nicht zugeben, so fasziniert dieses Thema jeden Magier. Früher oder später beschäftigen sich alle mit diesem, teilweise verbotenen, Gebiet. Sodann werden sie feststellen, das es noch eine weitere Ebene der Existenz gibt, in der die Dämonen beheimatet sind. Nur Blut allein vermag den Hunger dieser Wesen zu befriedigen, wenn sie ihre Ebene verlassen und unsere betreten. Erfahrene Magier werden jedoch feststellen, dass man den Blutwein, den die Dämonen zu sich nehmen strecken kann, so daß davon 100 anstatt nur 10 Dämonen satt werden. Da die Dämonen davon jedoch nichts wissen dürfen, muß der Magier selbst klammheimlich einen seiner urplötzlich verfügbar gewordenen Untergebenen opfern. </text>
+      <text locale="en">One of the most dangerous and best guarded secrets of all mages is the knowledge about the power of death. Even though most of them would not openly admit it, and it is at least partially forbidden in most countries, each of them studies death sooner or later. When they do, they quickly find out that there is another plane of existance: the home of the demons. Only blood can quelch the thirst of those, when they switch from their home to our world. But experienced mages will find out that the demons bloodwine can be deluted when appropiate herbs are included, making it enough for 100 instead of 10 demons. As the demons may not know about that, the magician has to secretly sacrifice one of his freed minions.</text>
+      <text locale="de">Zu dem gefährlichsten und geheimsten Wissen der Magier zählt das Wissen über die Macht des Todes. Auch wenn die meisten es nicht zugeben, so fasziniert dieses Thema jeden Magier. Früher oder später beschäftigen sich alle mit diesem teilweise verbotenen Gebiet. Sodann werden sie feststellen, dass es noch eine weitere Ebene der Existenz gibt, in der die Dämonen beheimatet sind. Nur Blut allein vermag den Hunger dieser Wesen zu befriedigen, wenn sie ihre Ebene verlassen und unsere betreten. Erfahrene Magier werden jedoch feststellen, dass man den Blutwein, den die Dämonen zu sich nehmen, strecken kann, so dass davon 100 anstatt nur 10 Dämonen satt werden. Da die Dämonen davon jedoch nichts wissen dürfen, muss der Magier selbst klammheimlich einen seiner urplötzlich verfügbar gewordenen Untergebenen opfern. </text>
     </string>
     <string name="create_potion_p9">
-      <text locale="en">Even though mages live in strict cellibate they know a lot about creating certain longings. Peasants keep asking them for this love potion or that. But the penality for bewitching a peasant is death, so the mages offer their services only to farmers for their breeding stock. In an elaborate ritual, which only serves to hide the simplicity of the procedure, the magician draws the fluids from certains plants. while doing so, he calls upon the spirits of fertility which of course only listen when he talkes to them. Now the farmer knows that any attempt to draw the fluids himself will only result in a useless waste of resorces. Finally, the magician hands the vial with the fluids to the farmer, who pours it into his horses drinking water.</text>
-      <text locale="de">Obwohl für Magier das Gebiet der Liebe Tabu ist und sie im strengen Zölibat leben, haben sie ein großes Wissen darüber, wie man gewisse Bedürfnisse weckt, weshalb sie immer wieder von Dorfbewohnerinnen und Dorfbewohnern nach entsprechenden Zaubern gefragt werden. Da die Verzauberung eines Bewohners jedoch streng verboten ist, bieten sie ihre Dienste nur für die Züchter an. In einem Aufwendigen Ritual, welches jedoch nur dazu dient zu verschleiern, wie einfach dies eigentlich ist, vermischt der Magier vor den Augen des Züchters einige Pflanzensäfte. Dabei ruft er die Geister an die dem Pferdezüchter das Glück bescheren sollen, um klarzumachen, das diese nur mit ihm sprechen und jeglicher Versuch des Züchters, selbst die Kräuter zu mischen nur eine unbrauchbare Pampe produzieren würde. Anschließend überreicht der Magier dem Züchter eine Phiole, die dieser in die Tränke seiner Pferde entleeren muß.</text>
+      <text locale="en">Even though mages live in strict celibacy, they know a lot about creating certain longings. Peasants keep asking them for this love potion or that. But the penality for bewitching a peasant is death, so the mages offer their services only to farmers for their breeding stock. In an elaborate ritual, which only serves to hide the simplicity of the procedure, the magician draws the fluids from certains plants. While doing so he calls upon the spirits of fertility, which of course only listen when he talkes to them. Now the farmer knows that any attempt to draw the fluids himself will only result in a useless waste of resources. Finally, the magician hands the vial with the fluids to the farmer, who pours it into his horses' drinking water.</text>
+      <text locale="de">Obwohl für Magier das Gebiet der Liebe tabu ist und sie im strengen Zölibat leben, haben sie ein großes Wissen darüber, wie man gewisse Bedürfnisse weckt, weshalb sie immer wieder von Dorfbewohnerinnen und Dorfbewohnern nach entsprechenden Zaubern gefragt werden. Da die Verzauberung eines Bewohners jedoch streng verboten ist, bieten sie ihre Dienste nur für die Züchter an. In einem aufwendigen Ritual, welches jedoch nur dazu dient zu verschleiern, wie einfach dies eigentlich ist, vermischt der Magier vor den Augen des Züchters einige Pflanzensäfte. Dabei ruft er die Geister an, die dem Pferdezüchter das Glück bescheren sollen, um klarzumachen, das diese nur mit ihm sprechen und jeglicher Versuch des Züchters, selbst die Kräuter zu mischen, nur eine unbrauchbare Pampe produzieren würde. Anschließend überreicht der Magier dem Züchter eine Phiole, die dieser in die Tränke seiner Pferde entleeren muss.</text>
     </string>
     <string name="create_potion_p13">
-      <text locale="en">Just like with the knowledge about death, the peasants feel uncomfortable with the knowledge about monsters. A few warriors though, who have already faced these creatures in combat, foud that the monsters blood had en invigourating effect on them. There is talk about some warriors, who bathed in the blood of the slain monsters to take up their strenght. But this effect ends soon, and only occurs with fresh blood. As no one has time to quickly slay a wyrm before attacking his neighbors, a way had to be found to make the effect last longer. After lots of experiments that cost the life of lots of good warriors who had to constantly bring in fresh dragon blood, Manasouf the black finally found a way. Originally a closely guarded secret, the recipe is now knows in all lands. First, the hardened dragon blood needs to be melted in hot tin. After that, the magician binds the spirit of the dragon to its blood once again. It can not fnd eternal rest until the last bit of blood has been used. </text>
-      <text locale="de">Ebenso wie das Wissen über den Tod ist das Wissen über gewisse Monster bei der abergläubigen Bevölkerung nicht gerne gesehen. Einige wenige Krieger jedoch, die diesen Kreaturen schon mal im Kampf gegenüberstanden haben entdeckt, daß deren Blut eine belebende Wirkung auf sie hatte. So solle es schon Kriger gegeben haben, die im Blut der erschlagenen Monster badeten, um deren Stärke in sich aufzunehmen. Diese Wirkung verfliegt jedoch rasch, und wirkt nur bei frischen Blut. Da niemand vor dem Kampf gegen seinen Nachbarn die Zeit hat, schnell noch einen Wyrm zu erschlagen musste ein Weg gefunden werden, die Wirkung haltbar zu machen. Manasouf dem schwarzen gelang dies nach zahlreichen Experimenten, die das Leben vieler guter Männer kosteten, welche ständig neues Drachenblut für seine Versuche beschaffen mussten. Ursprünglich ein streng gehütetes Geheimnis, ist das Rezept inzwischen im ganzen Land bekannt. Zunächst muß geronnene Drachenblut muß in einem Tiegel wieder verflüssigt werden. Anschließend wird der Geist des erschlagenen Drachen in der Geisterebene wieder an sein Blut gebunden, und kann solange nicht in frieden ruhen, bis das letzte bisschen seines Blutes verbraucht wurde.</text>
+      <text locale="en">Just like with the knowledge about death, the peasants feel uncomfortable with the knowledge about monsters. A few warriors though, who have already faced these creatures in combat, found that the monsters blood had an invigourating effect on them. There is talk about some warriors who bathed in the blood of the slain monsters to take up their strength. But this effect ends soon, and only occurs with fresh blood. As no one has time to quickly slay a wyrm before attacking their neighbors, a way had to be found to make the effect last longer. After lots of experiments that cost the life of lots of good warriors who had to constantly bring in fresh dragon blood, Manasouf the black finally found a way. Originally a closely guarded secret, the recipe is now known in all lands. First, the hardened dragon blood needs to be melted in hot tin. After that, the magician binds the spirit of the dragon to its blood once again. It can not find eternal rest until the last bit of blood has been used. </text>
+      <text locale="de">Ebenso wie das Wissen über den Tod ist das Wissen über gewisse Monster bei der abergläubigen Bevölkerung nicht gerne gesehen. Einige wenige Krieger jedoch, die diesen Kreaturen schon mal im Kampf gegenüberstanden, haben entdeckt, dass deren Blut eine belebende Wirkung auf sie hatte. So soll es schon Krieger gegeben haben, die im Blut der erschlagenen Monster badeten, um deren Stärke in sich aufzunehmen. Diese Wirkung verfliegt jedoch rasch und wirkt nur bei frischen Blut. Da niemand vor dem Kampf gegen seinen Nachbarn die Zeit hat, schnell noch einen Wyrm zu erschlagen, musste ein Weg gefunden werden, die Wirkung haltbar zu machen. Manasouf dem Schwarzen gelang dies nach zahlreichen Experimenten, die das Leben vieler guter Männer kosteten, welche ständig neues Drachenblut für seine Versuche beschaffen mussten. Ursprünglich ein streng gehütetes Geheimnis ist das Rezept inzwischen im ganzen Land bekannt. Zunächst muss geronnenes Drachenblut in heißem Zinn verflüssigt werden. Anschließend wird der Geist des erschlagenen Drachen in der Geisterebene wieder an sein Blut gebunden und kann so lange nicht in Frieden ruhen, bis das letzte bisschen seines Blutes verbraucht wurde.</text>
     </string>
     <string name="create_potion_p14">
-      <text locale="en">Some mages research deth's secrets until they can bring the dead back to life. But those who are brought back are often only shadows of ther former self and turn against their erstwhile friends. But those mages that study life and its iteraction with death find a possibility, to bring the deceased back as their original selves. A drawback is that this is only possible in the very first minutes after the death. As even mages can not be everywhere at the same time, a way had to be found to give this ability to helpers. All healers who tried to learn this from the mages failed, though, until one of those healers was backstabbingly killed. In the moment of his death he used the knowledge gained and was able to have his murderer executed the following day. The potion he designed has to be blessed by a magician before usage at any given time. This potion gives 4 people (or 1 person 4 times) a 50% chance to survive an otherwise deadly wound. It is used automatically by the victom.</text>
-      <text locale="de">Manche Magier erforschen den Tod, bis sie verstorbene wieder ins Leben zurück bringen können. Diese sind jedoch meist bösartig und nur noch Schatten ihres früheren selbst. Diejenigen jedoch, die sich intensiv mit dem Leben und seiner Kombination mit dem Tod beschäftigen finden eine Möglichkeit, verstorbene in ihrer wahren Gestallt zurück zu rufen. Dies ist allerdings nur wenige Minuten nach dem Tod möglich. Da selbst Magier nicht überall gleichzeitig sein können, musste ein Weg gefunden werden, diese Fähigkeit auf andere zu übertragen. Alle Versuche, dies feldschern beizubringen scheiterten jedoch, bis einer dieser Felschner von einem Widersacher hinterrücks ermordet wurde. Im Moment seines Todes wandte er sein erworbenes Wissen an und konnte tags darauf den Übeltäter wegen Mordes hinrichten lassen. Der von ihm entwickelte magische Trank muß jedoch von einem der Magie des Lebens kundigen gesegnet werden, um seine volle Wirkung zu entfalten. Ein solcher Trank gibt vier Männern (oder einem Mann vier mal) im Kampf eine Chance von 50%, sonst tödliche Wunden zu überleben. Der Trank wird von ihnen automatisch bei Verletzung angewandt.</text>
+      <text locale="en">Some mages research death's secrets until they can bring the dead back to life. But those who are brought back are often only shadows of ther former self and turn against their erstwhile friends. But those mages that study life and its iteraction with death find a possibility to bring the deceased back as their original selves. A drawback is that this is only possible in the very first minutes after death. As even mages can not be everywhere at the same time, a way had to be found to give this ability to helpers. All healers who tried to learn this from the mages failed, though, until one of those healers was backstabbingly killed. In the moment of his death he used the knowledge gained and was able to have his murderer executed the following day. The potion he designed has to be blessed by a magician before usage at any given time. This potion gives four people (or one person four times) a 50% chance to survive an otherwise deadly wound. It is used automatically by the victom.</text>
+      <text locale="de">Manche Magier erforschen den Tod, bis sie Verstorbene wieder ins Leben zurück bringen können. Diese sind jedoch meist bösartig und nur noch Schatten ihres früheren Selbst. Diejenigen jedoch, die sich intensiv mit dem Leben und seiner Kombination mit dem Tod beschäftigen, finden eine Möglichkeit, Verstorbene in ihrer wahren Gestalt zurück zu rufen. Dies ist allerdings nur wenige Minuten nach dem Tod möglich. Da selbst Magier nicht überall gleichzeitig sein können, musste ein Weg gefunden werden, diese Fähigkeit auf andere zu übertragen. Alle Versuche, dies Feldschern beizubringen, scheiterten jedoch, bis einer dieser Feldscher von einem Widersacher hinterrücks ermordet wurde. Im Moment seines Todes wandte er sein erworbenes Wissen an und konnte tags darauf den Übeltäter wegen Mordes hinrichten lassen. Der von ihm entwickelte magische Trank muss jedoch von einem der Magie des Lebens Kundigen gesegnet werden, um seine volle Wirkung zu entfalten. Ein solcher Trank gibt vier Männern (oder einem Mann viermal) im Kampf eine Chance von 50%, sonst tödliche Wunden zu überleben. Der Trank wird von ihnen automatisch bei Verletzung angewandt.</text>
     </string>
   </namespace>
 
@@ -365,13 +281,8 @@
   </namespace>
   <namespace name="spellinfo">
     <string name="commonfamiliar">
-      <text locale="de">Einem erfahrenen Magier wird
-        irgendwann auf seinen Wanderungen ein
-        ungewöhnliches Exemplar einer Gattung begegnen,
-        welches sich dem Magier anschließen wird.</text>
-      <text locale="en">During their travel, seasoned
-        magicians will occasionally befriend an extraordinary
-        creature of an unusual species that will join them.</text>
+      <text locale="de">Einem erfahrenen Magier wird irgendwann auf seinen Wanderungen ein ungewöhnliches Exemplar einer Gattung begegnen, welches sich dem Magier anschließen wird.</text>
+      <text locale="en">During their travel, seasoned magicians will occasionally befriend an extraordinary creature of an unusual species that will join them.</text>
     </string>
   </namespace>
 

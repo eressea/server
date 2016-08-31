@@ -32,6 +32,7 @@ extern "C" {
     void do_command(const void *troot, struct unit *u, struct order *);
 
     struct syntaxtree *stree_create(void);
+    void stree_free(struct syntaxtree *);
     void *stree_find(const struct syntaxtree *stree,
         const struct locale *lang);
 

@@ -43,6 +43,15 @@ void *stree_find(const syntaxtree * stree, const struct locale *lang)
     return NULL;
 }
 
+void stree_free(syntaxtree *stree) {
+    while (stree) {
+        syntaxtree *snext = stree->next;
+        freetokens(stree->root);
+        free(stree);
+        stree = snext;
+    }
+}
+
 syntaxtree *stree_create(void)
 {
     syntaxtree *sroot = NULL;
@@ -65,6 +74,7 @@ const char *str, parser fun)
     command *cmd = (command *)malloc(sizeof(command));
     variant var;
 
+    assert(str);
     cmd->fun = fun;
     cmd->nodes = tnext;
     var.v = cmd;

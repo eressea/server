@@ -25,9 +25,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "give.h"
 #include "move.h"
 
-/* triggers includes */
-#include <triggers/removecurse.h>
-
 /* attributes includes */
 #include <attributes/targetregion.h>
 #include <attributes/hate.h>

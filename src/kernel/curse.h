@@ -28,6 +28,8 @@ extern "C" {
 
     struct curse;
     struct curse_type;
+    struct gamedata;
+    struct storage;
 
     /* Sprueche in der struct region und auf Einheiten, Schiffen oder Burgen
      * (struct attribute)
@@ -93,7 +95,7 @@ extern "C" {
      *
      * */
 
-#include <util/variant.h>
+    extern struct attrib_type at_curse;
 
     /* ------------------------------------------------------------- */
     /* Zauberwirkungen */
@@ -128,7 +130,6 @@ extern "C" {
         C_OLDRACE,
         C_FUMBLE,
         C_RIOT,                     /*region in Aufruhr */
-        C_NOCOST,
         C_CURSED_BY_THE_GODS,
         C_SPEED,                    /* Beschleunigt */
         C_ORC,
@@ -194,8 +195,8 @@ extern "C" {
         struct message *(*curseinfo) (const void *, objtype_t,
             const struct curse *, int);
         void(*change_vigour) (struct curse *, double);
-        int(*read) (struct storage * store, struct curse *, void *target);
-        int(*write) (struct storage * store, const struct curse *,
+        int(*read) (struct gamedata *data, struct curse *, void *target);
+        int(*write) (struct storage *store, const struct curse *,
             const void *target);
         int(*cansee) (const struct faction *, const void *, objtype_t,
             const struct curse *, int);
@@ -214,12 +215,11 @@ extern "C" {
         int duration;               /* Dauer der Verzauberung. Wird jede Runde vermindert */
     } curse;
 
-    void free_curses(void); /* de-register all curse-types */
+    void curses_done(void); /* de-register all curse-types */
 
-    extern struct attrib_type at_curse;
     void curse_write(const struct attrib *a, const void *owner,
-    struct storage *store);
-    int curse_read(struct attrib *a, void *owner, struct storage *store);
+        struct storage *store);
+    int curse_read(struct attrib *a, void *owner, struct gamedata *store);
 
     /* ------------------------------------------------------------- */
     /* Kommentare:
@@ -285,8 +285,6 @@ extern "C" {
     void ct_register(const curse_type *);
     void ct_checknames(void);
 
-    curse *cfindhash(int i);
-
     curse *findcurse(int curseid);
 
     void curse_init(struct attrib *a);
@@ -295,7 +293,6 @@ extern "C" {
 
     double destr_curse(struct curse *c, int cast_level, double force);
 
-    int resolve_curse(variant data, void *address);
     bool is_cursed_with(const struct attrib *ap, const struct curse *c);
 
     /* gibt true, wenn der Curse nicht NULL oder inaktiv ist */

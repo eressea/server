@@ -192,7 +192,7 @@ char *parse_token(const char **str, char *lbuf, size_t buflen)
             copy = true;
         }
         if (copy) {
-            if (cursor - buflen < lbuf - 1) {
+            if (cursor - buflen < lbuf - len) {
                 memcpy(cursor, ctoken, len);
                 cursor += len;
             }

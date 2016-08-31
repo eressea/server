@@ -22,8 +22,7 @@ static void test_read_unitid(CuTest *tc) {
     struct terrain_type *t_plain;
 
     test_cleanup();
-    lang = get_or_create_locale("de");
-    test_translate_param(lang, P_TEMP, "TEMP");
+    lang = test_create_locale();
     /* note that the english order is FIGHT, not COMBAT, so this is a poor example */
     t_plain = test_create_terrain("plain", LAND_REGION);
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, t_plain));
@@ -68,8 +67,7 @@ static void test_getunit(CuTest *tc) {
     struct terrain_type *t_plain;
 
     test_cleanup();
-    lang = get_or_create_locale("de");
-    test_translate_param(lang, P_TEMP, "TEMP");
+    lang = test_create_locale();
     /* note that the english order is FIGHT, not COMBAT, so this is a poor example */
     t_plain = test_create_terrain("plain", LAND_REGION);
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, t_plain));
@@ -174,6 +172,23 @@ static void test_forbiddenid(CuTest *tc) {
     CuAssertIntEquals(tc, 1, forbiddenid(atoi36("t")));
 }
 
+static void test_default_order(CuTest *tc) {
+    order *ord;
+    struct locale * loc;
+
+    test_cleanup();
+    loc = test_create_locale();
+    ord = default_order(loc);
+    CuAssertPtrEquals(tc, 0, ord);
+
+    config_set("orders.default", "work");
+    ord = default_order(loc);
+    CuAssertPtrNotNull(tc, ord);
+    CuAssertIntEquals(tc, K_WORK, getkeyword(ord));
+    CuAssertPtrEquals(tc, ord->data, default_order(loc)->data);
+    test_cleanup();
+}
+
 CuSuite *get_config_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -183,5 +198,6 @@ CuSuite *get_config_suite(void)
     SUITE_ADD_TEST(suite, test_forbiddenid);
     SUITE_ADD_TEST(suite, test_getunit);
     SUITE_ADD_TEST(suite, test_read_unitid);
+    SUITE_ADD_TEST(suite, test_default_order);
     return suite;
 }

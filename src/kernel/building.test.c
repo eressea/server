@@ -409,17 +409,17 @@ static void test_buildingtype_exists(CuTest * tc)
 
     CuAssertTrue(tc, buildingtype_exists(r, btype, false));
     b->size = 9;
-    fset(b, BLD_WORKING);
+    fset(b, BLD_MAINTAINED);
     CuAssertTrue(tc, !buildingtype_exists(r, btype, false));
     btype->maxsize = 0;
-    freset(b, BLD_WORKING);
+    freset(b, BLD_MAINTAINED);
     CuAssertTrue(tc, buildingtype_exists(r, btype, false));
     btype->maxsize = 10;
     b->size = 10;
 
-    fset(b, BLD_WORKING);
+    fset(b, BLD_MAINTAINED);
     CuAssertTrue(tc, buildingtype_exists(r, btype, true));
-    freset(b, BLD_WORKING);
+    freset(b, BLD_MAINTAINED);
     CuAssertTrue(tc, !buildingtype_exists(r, btype, true));
 }
 
@@ -438,7 +438,7 @@ static void test_active_building(CuTest *tc) {
     CuAssertIntEquals(tc, false, building_is_active(b));
     CuAssertPtrEquals(tc, NULL, active_building(u, btype));
 
-    b->flags |= BLD_WORKING;
+    b->flags |= BLD_MAINTAINED;
     CuAssertIntEquals(tc, true, building_is_active(b));
     CuAssertPtrEquals(tc, NULL, active_building(u, btype));
     u_set_building(u, b);
@@ -452,7 +452,7 @@ static void test_active_building(CuTest *tc) {
     CuAssertIntEquals(tc, false, building_is_active(b));
     CuAssertPtrEquals(tc, NULL, active_building(u, btype));
     btype->maxsize = -1;
-    b->flags &= ~BLD_WORKING;
+    b->flags &= ~BLD_MAINTAINED;
     CuAssertIntEquals(tc, false, building_is_active(b));
     CuAssertPtrEquals(tc, NULL, active_building(u, btype));
     test_cleanup();

@@ -926,14 +926,14 @@ struct order *ord)
             "unit item region command", user, itype->rtype, user->region, ord));
         return -1;
     }
-    if (!is_mage(user) || find_key(f->attribs, atoi36("mbst")) != NULL) {
+    if (!is_mage(user) || key_get(f->attribs, atoi36("mbst"))) {
         cmistake(user, user->thisorder, 214, MSG_EVENT);
         return -1;
     }
     use_pooled(user, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
         user->number);
 
-    a_add(&f->attribs, make_key(atoi36("mbst")));
+    key_set(&f->attribs, atoi36("mbst"));
     set_level(user, SK_MAGIC, 3);
 
     ADDMSG(&user->faction->msgs, msg_message("use_item",
@@ -1188,6 +1188,7 @@ static item *default_spoil(const struct race *rc, int size)
 }
 
 static void free_itype(item_type *itype) {
+    assert(itype);
     free(itype->construction);
     free(itype->_appearance[0]);
     free(itype->_appearance[1]);
@@ -1195,22 +1196,31 @@ static void free_itype(item_type *itype) {
 }
 
 static void free_wtype(weapon_type *wtype) {
+    assert(wtype);
     free(wtype->damage[0]);
     free(wtype->damage[1]);
     free(wtype);
 }
 
-int free_rtype_cb(const void * match, const void * key, size_t keylen, void *cbdata) {
-    resource_type *rtype;
-    cb_get_kv(match, &rtype, sizeof(rtype));
-    free(rtype->_name);
-    if (rtype->itype) {
-        free_itype(rtype->itype);
-    }
+void free_rtype(resource_type *rtype) {
+    assert(rtype);
     if (rtype->wtype) {
         free_wtype(rtype->wtype);
     }
+    if (rtype->atype) {
+        free(rtype->atype);
+    }
+    if (rtype->itype) {
+        free_itype(rtype->itype);
+    }
+    free(rtype->_name);
     free(rtype);
+}
+
+int free_rtype_cb(const void * match, const void * key, size_t keylen, void *cbdata) {
+    resource_type *rtype;
+    cb_get_kv(match, &rtype, sizeof(rtype));
+    free_rtype(rtype);
     return 0;
 }
 

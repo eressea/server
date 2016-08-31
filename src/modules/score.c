@@ -152,7 +152,7 @@ void score(void)
         allscores = 1;
     }
 
-    sprintf(path, "%s/score", basepath());
+    join_path(basepath(), "score", path, sizeof(path));
     scoreFP = fopen(path, "w");
     if (scoreFP) {
         const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
@@ -167,7 +167,7 @@ void score(void)
                 fprintf(scoreFP, "(%s) ", score);
                 fprintf(scoreFP, "%30.30s (%3.3s) %5s (%3d)\n",
                     f->name,
-                    rc_name_s(f->race, NAME_SINGULAR),
+                    f->race->_name,
                     factionid(f),
                     f->age);
             }
@@ -177,7 +177,7 @@ void score(void)
         alliance *a;
         const item_type *token = it_find("conquesttoken");
 
-        sprintf(path, "%s/score.alliances", basepath());
+        join_path(basepath(), "score.alliances", path, sizeof(path));
         scoreFP = fopen(path, "w");
         if (scoreFP) {
             const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };

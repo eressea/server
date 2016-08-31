@@ -31,6 +31,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* util includes */
 #include <util/attrib.h>
+#include <util/gamedata.h>
 #include <util/resolve.h>
 
 #include <storage.h>
@@ -95,63 +96,64 @@ dict_write(const attrib * a, const void *owner, struct storage *store)
     }
 }
 
-static int dict_read(attrib * a, void *owner, struct storage *store)
+static int dict_read(attrib * a, void *owner, gamedata *data)
 {
+    storage *store = data->store;
     char name[NAMESIZE];
-    dict_data *data = (dict_data *)a->data.v;
+    dict_data *dd = (dict_data *)a->data.v;
     int result, n;
     float flt;
 
     READ_STR(store, name, sizeof(name));
-    data->name = _strdup(name);
+    dd->name = _strdup(name);
     READ_INT(store, &n);
-    data->type = (dict_type)n;
-    switch (data->type) {
+    dd->type = (dict_type)n;
+    switch (dd->type) {
     case TINTEGER:
-        READ_INT(store, &data->data.i);
+        READ_INT(store, &dd->data.i);
         break;
     case TREAL:
         READ_FLT(store, &flt);
         if ((int)flt == flt) {
-            data->type = TINTEGER;
-            data->data.i = (int)flt;
+            dd->type = TINTEGER;
+            dd->data.i = (int)flt;
         }
         else {
-            data->data.real = flt;
+            dd->data.real = flt;
         }
         break;
     case TSTRING:
         READ_STR(store, name, sizeof(name));
-        data->data.str = _strdup(name);
+        dd->data.str = _strdup(name);
         break;
     case TBUILDING:
         result =
-            read_reference(&data->data.b, store, read_building_reference,
-            resolve_building);
-        if (result == 0 && !data->data.b) {
+            read_reference(&dd->data.b, data, read_building_reference, 
+                resolve_building);
+        if (result == 0 && !dd->data.b) {
             return AT_READ_FAIL;
         }
         break;
     case TUNIT:
         result =
-            read_reference(&data->data.u, store, read_unit_reference, resolve_unit);
-        if (result == 0 && !data->data.u) {
+            read_reference(&dd->data.u, data, read_unit_reference, resolve_unit);
+        if (result == 0 && !dd->data.u) {
             return AT_READ_FAIL;
         }
         break;
     case TFACTION:
         result =
-            read_reference(&data->data.f, store, read_faction_reference,
+            read_reference(&dd->data.f, data, read_faction_reference,
             resolve_faction);
-        if (result == 0 && !data->data.f) {
+        if (result == 0 && !dd->data.f) {
             return AT_READ_FAIL;
         }
         break;
     case TREGION:
         result =
-            read_reference(&data->data.r, store, read_region_reference,
-            RESOLVE_REGION(global.data_version));
-        if (result == 0 && !data->data.r) {
+            read_reference(&dd->data.r, data, read_region_reference,
+            RESOLVE_REGION(data->version));
+        if (result == 0 && !dd->data.r) {
             return AT_READ_FAIL;
         }
         break;

@@ -42,6 +42,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/bsdstring.h>
+#include <util/gamedata.h>
 #include <util/strings.h>
 #include <util/lists.h>
 #include <util/log.h>
@@ -176,12 +177,12 @@ void a_initmoveblock(attrib * a)
     a->data.v = calloc(1, sizeof(moveblock));
 }
 
-int a_readmoveblock(attrib * a, void *owner, struct storage *store)
+int a_readmoveblock(attrib * a, void *owner, gamedata *data)
 {
     moveblock *m = (moveblock *)(a->data.v);
     int i;
 
-    READ_INT(store, &i);
+    READ_INT(data->store, &i);
     m->dir = (direction_t)i;
     return AT_READ_OK;
 }
@@ -483,6 +484,7 @@ attrib_type at_horseluck = {
     DEFAULT_AGE,
     NO_WRITE,
     NO_READ,
+    NULL,
     ATF_UNIQUE
 };
 
@@ -496,6 +498,7 @@ attrib_type at_peasantluck = {
     DEFAULT_AGE,
     NO_WRITE,
     NO_READ,
+    NULL,
     ATF_UNIQUE
 };
 
@@ -509,6 +512,7 @@ attrib_type at_deathcount = {
     DEFAULT_AGE,
     a_writeint,
     a_readint,
+    NULL,
     ATF_UNIQUE
 };
 
@@ -522,6 +526,7 @@ attrib_type at_woodcount = {
     DEFAULT_AGE,
     NO_WRITE,
     a_readint,
+    NULL,
     ATF_UNIQUE
 };
 
@@ -633,27 +638,46 @@ int rhorses(const region * r)
 
 void rsetmoney(region * r, int value)
 {
-    assert(r->land || value==0);
+    assert(r && (r->land || value==0));
     assert(value >= 0);
     if (r->land) {
         r->land->money = value;
     }
 }
 
-int rherbs(const struct region *r)
+int rherbs(const region *r)
 {
     return r->land?r->land->herbs:0;
 }
 
-void rsetherbs(const struct region *r, int value)
+void rsetherbs(region *r, int value)
 {
     assert(r->land || value==0);
-    assert(value >= 0);
+    assert(value >= 0 && value<=SHRT_MAX);
     if (r->land) {
-        r->land->herbs = (short)(value);
+        r->land->herbs = (short)value;
     }
 }
 
+void rsetherbtype(region *r, const struct item_type *itype) {
+    assert(r->land && r->terrain);
+    if (itype == NULL) {
+        r->land->herbtype = NULL;
+    }
+    else {
+        if (r->terrain->herbs) {
+            int i;
+            for (i = 0; r->terrain->herbs[i]; ++i) {
+                if (r->terrain->herbs[i] == itype) {
+                    r->land->herbtype = itype;
+                    return;
+                }
+            }
+        }
+        log_debug("attempt to set herbtype=%s for terrain=%s in %s", itype->rtype->_name, r->terrain->_name, regionname(r, 0));
+        r->land->herbtype = itype;
+    }
+}
 
 void r_setdemand(region * r, const luxury_type * ltype, int value)
 {
@@ -1221,10 +1245,11 @@ int resolve_region_id(variant id, void *address)
     return 0;
 }
 
-variant read_region_reference(struct storage * store)
+variant read_region_reference(gamedata *data)
 {
+    struct storage * store = data->store;
     variant result;
-    if (global.data_version < UIDHASH_VERSION) {
+    if (data->version < UIDHASH_VERSION) {
         int n;
         READ_INT(store, &n);
         result.sa[0] = (short)n;

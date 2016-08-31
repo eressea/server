@@ -7,7 +7,7 @@
     <item weight="0" score="30">
       <function name="use" value="usepotion"/>
       <potion level="1"/>
-      <construction skill="alchemy" minskill="2" reqsize="1">
+      <construction skill="alchemy" minskill="2">
         <requirement type="h4"/>
         <requirement type="h12"/>
       </construction>
@@ -18,7 +18,7 @@
     <item weight="0" score="30">
       <function name="use" value="usepotion"/>
       <potion level="1"/>
-      <construction skill="alchemy" minskill="2" reqsize="1">
+      <construction skill="alchemy" minskill="2">
         <requirement type="h6"/>
         <requirement type="h13"/>
       </construction>
@@ -29,7 +29,7 @@
     <item weight="0" score="30">
       <function name="use" value="usepotion"/>
       <potion level="1"/>
-      <construction skill="alchemy" minskill="2" reqsize="1">
+      <construction skill="alchemy" minskill="2">
         <requirement type="h0"/>
         <requirement type="h13"/>
       </construction>
@@ -40,7 +40,7 @@
     <item weight="0" score="30">
       <function name="use" value="usepotion"/>
       <potion level="1"/>
-      <construction skill="alchemy" minskill="2" reqsize="1">
+      <construction skill="alchemy" minskill="2">
         <requirement type="h5"/>
         <requirement type="h7"/>
       </construction>
@@ -51,7 +51,7 @@
     <item weight="0" score="60">
       <function name="use" value="usepotion"/>
       <potion level="2"/>
-      <construction skill="alchemy" minskill="4" reqsize="1">
+      <construction skill="alchemy" minskill="4">
         <requirement type="h14"/>
         <requirement type="h16"/>
         <requirement type="h1"/>
@@ -64,7 +64,7 @@
     <item weight="0" score="60">
       <function name="use" value="usehealingpotion"/>
       <potion level="2"/>
-      <construction skill="alchemy" minskill="4" reqsize="1">
+      <construction skill="alchemy" minskill="4">
         <requirement type="h19"/>
         <requirement type="h4"/>
         <requirement type="h1"/>
@@ -77,7 +77,7 @@
     <item weight="0" score="60">
       <function name="use" value="usebloodpotion"/>
       <potion level="2"/>
-      <construction skill="alchemy" minskill="4" reqsize="1">
+      <construction skill="alchemy" minskill="4">
         <requirement type="h17"/>
         <requirement type="h13"/>
         <requirement type="h4"/>
@@ -90,7 +90,7 @@
     <item weight="0" score="90">
       <function name="use" value="usepotion"/>
       <potion level="3"/>
-      <construction skill="alchemy" minskill="6" reqsize="1">
+      <construction skill="alchemy" minskill="6">
         <requirement type="h9"/>
         <requirement type="h15"/>
         <requirement type="h12"/>
@@ -103,7 +103,7 @@
     <item weight="0" score="90">
       <function name="useonother" value="usefoolpotion"/>
       <potion level="3"/>
-      <construction skill="alchemy" minskill="6" reqsize="1">
+      <construction skill="alchemy" minskill="6">
         <requirement type="h2"/>
         <requirement type="h3"/>
         <requirement type="h17"/>
@@ -116,7 +116,7 @@
     <item weight="0" score="90">
       <function name="use" value="usewarmthpotion"/>
       <potion level="3"/>
-      <construction skill="alchemy" minskill="6" reqsize="1">
+      <construction skill="alchemy" minskill="6">
         <requirement type="h18"/>
         <requirement type="h3"/>
         <requirement type="h16"/>
@@ -129,7 +129,7 @@
     <item weight="0" score="90">
       <function name="use" value="usepotion"/>
       <potion level="3"/>
-      <construction skill="alchemy" minskill="6" reqsize="1">
+      <construction skill="alchemy" minskill="6">
         <requirement type="h4"/>
         <requirement type="h11"/>
         <requirement type="h10"/>
@@ -142,7 +142,7 @@
     <item weight="0" score="90">
       <function name="use" value="usepotion"/>
       <potion level="3"/>
-      <construction skill="alchemy" minskill="6" reqsize="1">
+      <construction skill="alchemy" minskill="6">
         <requirement type="h19"/>
         <requirement type="h14"/>
         <requirement type="h0"/>
@@ -155,7 +155,7 @@
     <item weight="0" score="120">
       <function name="use" value="usepotion"/>
       <potion level="4"/>
-      <construction skill="alchemy" minskill="8" reqsize="1">
+      <construction skill="alchemy" minskill="8">
         <requirement type="h14"/>
         <requirement type="h20"/>
         <requirement type="h15"/>
@@ -169,7 +169,7 @@
     <item weight="0" score="120">
       <function name="use" value="usepotion"/>
       <potion level="4"/>
-      <construction skill="alchemy" minskill="8" reqsize="1">
+      <construction skill="alchemy" minskill="8">
         <requirement type="h5"/>
         <requirement type="h9"/>
         <requirement type="h12"/>
@@ -184,7 +184,7 @@
     <item weight="0" score="120">
       <function name="use" value="usepotion"/>
       <potion level="4"/>
-      <construction skill="alchemy" minskill="8" reqsize="1">
+      <construction skill="alchemy" minskill="8">
         <requirement type="h6"/>
         <requirement type="h12"/>
         <requirement type="h18"/>

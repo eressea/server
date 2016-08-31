@@ -227,14 +227,13 @@ static void test_default_name(CuTest *tc) {
     test_cleanup();
     test_create_world();
     lang = get_or_create_locale("de");
-    /* FIXME this has no real effect: default_name uses a static buffer that is initialized in some other test. This sucks. */
-    locale_setstring(lang, "unitdefault", "Einheit");
+    locale_setstring(lang, "unitdefault", "Zweiheit");
 
     u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
 
     default_name(u, buf, sizeof(buf));
 
-    sprintf(compare, "Einheit %s", itoa36(u->no));
+    sprintf(compare, "Zweiheit %s", itoa36(u->no));
     CuAssertStrEquals(tc, compare, buf);
 
     test_cleanup();
@@ -341,32 +340,6 @@ static void test_age_familiar(CuTest *tc) {
     test_cleanup();
 }
 
-static CuTest *g_tc;
-
-static bool cb_learn_one(unit *u, skill_t sk, double chance) {
-    CuAssertIntEquals(g_tc, SK_ALCHEMY, sk);
-    CuAssertDblEquals(g_tc, 0.5 / u->number, chance, 0.01);
-    return false;
-}
-
-static bool cb_learn_two(unit *u, skill_t sk, double chance) {
-    CuAssertIntEquals(g_tc, SK_ALCHEMY, sk);
-    CuAssertDblEquals(g_tc, 2 * 0.5 / u->number, chance, 0.01);
-    return false;
-}
-
-static void test_produceexp(CuTest *tc) {
-    unit *u;
-
-    g_tc = tc;
-    test_cleanup();
-    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
-    config_set("study.from_use", "0.5");
-    produceexp_ex(u, SK_ALCHEMY, 1, cb_learn_one);
-    produceexp_ex(u, SK_ALCHEMY, 2, cb_learn_two);
-    test_cleanup();
-}
-
 static void test_inside_building(CuTest *tc) {
     unit *u;
     building *b;
@@ -433,7 +406,6 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_skill_familiar);
     SUITE_ADD_TEST(suite, test_age_familiar);
     SUITE_ADD_TEST(suite, test_inside_building);
-    SUITE_ADD_TEST(suite, test_produceexp);
     SUITE_ADD_TEST(suite, test_limited_skills);
     return suite;
 }

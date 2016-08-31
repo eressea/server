@@ -32,7 +32,7 @@ int eressea_read_orders(const char * filename) {
 }
 
 int eressea_export_json(const char * filename, int flags) {
-    FILE *F = fopen(filename, "wt");
+    FILE *F = fopen(filename, "w");
     if (F) {
         stream out = { 0 };
         int err;
@@ -46,7 +46,7 @@ int eressea_export_json(const char * filename, int flags) {
 }
 
 int eressea_import_json(const char * filename) {
-    FILE *F = fopen(filename, "rt");
+    FILE *F = fopen(filename, "r");
     if (F) {
         stream out = { 0 };
         int err;

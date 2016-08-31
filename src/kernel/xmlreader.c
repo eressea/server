@@ -169,7 +169,7 @@ construction ** consPtr)
         con->skill = sk;
         con->maxsize = xml_ivalue(node, "maxsize", -1);
         con->minskill = xml_ivalue(node, "minskill", -1);
-        con->reqsize = xml_ivalue(node, "reqsize", -1);
+        con->reqsize = xml_ivalue(node, "reqsize", 1);
         con->defense_bonus = xml_ivalue(node, "defense_bonus", 0);
         con->close_combat_bonus = xml_ivalue(node, "close_combat_bonus", 0);
         con->ranged_bonus = xml_ivalue(node, "ranged_bonus", 0);
@@ -897,9 +897,6 @@ static int parse_rules(xmlDocPtr doc)
             global.functions.wage =
                 (int(*)(const struct region *, const struct faction *,
                 const struct race *, int))fun;
-        }
-        else if (strcmp((const char *)propValue, "maintenance") == 0) {
-            global.functions.maintenance = (int(*)(const struct unit *))fun;
         }
         else {
             log_error("unknown function for rule '%s'\n", (const char *)propValue);

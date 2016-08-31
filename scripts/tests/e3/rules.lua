@@ -4,6 +4,14 @@ module("tests.e3.e3features", package.seeall, lunit.testcase)
 
 local settings
 
+-- use the C implementation in market.c, because the Lua
+-- module is wrong (https://bugs.eressea.de/view.php?id=2225)
+local function process_markets()
+    -- markets = require("eressea.markets")
+    -- markets.update()
+    eressea.process.markets()
+end
+
 local function set_rule(key, value)
     if value==nil then
         eressea.settings.set(key, settings[key])
@@ -403,8 +411,7 @@ function test_market_regions()
     -- if i am the only trader around, i should be getting all the herbs from all 7 regions
     local r, u, b, herbnames, luxurynames, herbtable, luxurytable = market_fixture()
 
-
-    eressea.process.markets()
+    process_markets()
 
     test_items(u, herbtable, 10)
     test_items(u, luxurytable, 5)
@@ -420,9 +427,8 @@ function test_multiple_markets()
    b2.working = true
    reset_items(u2)
    u2.building = b2
-   
 
-   eressea.process.markets()
+   process_markets()
    for _, i in pairs(luxurytable) do
      assert_equal(5, u1:get_item(i)+u2:get_item(i), "not enough " .. i )
    end
@@ -432,12 +438,11 @@ function test_multiple_markets()
    assert_equal(5, u1:get_item('silk')) -- uncontested
 end
 
-
 function test_market()
   local r = region.create(0, 0, "plain")
   local f1 = faction.create("market2@eressea.de", "human", "de")
   local u1 = unit.create(f1, r, 1)
-	
+
   local b = building.create(r, "market")
 
   eressea.settings.set("rules.peasants.growth", "0")
@@ -469,7 +474,7 @@ function test_market()
   end
   reset_items()
   b.size = 1  
-  eressea.process.markets()
+  process_markets()
 
   assert_equal(0, u1:get_item("h0"))
   b.size = 10 
@@ -477,38 +482,38 @@ function test_market()
 
   reset_items()
   r:set_resource("peasant", 2100)
-  eressea.process.markets()
+  process_markets()
   
   assert_equal(5, u1:get_item("h0"))
   assert_equal(3, u1:get_item("balm"))
 
   reset_items()
   r:set_resource("peasant", 1049)
-  eressea.process.markets()
+  process_markets()
   assert_equal(2, u1:get_item("h0"))
   assert_equal(1, u1:get_item("balm"))
 
   reset_items()
   r:set_resource("peasant", 550)
-  eressea.process.markets()
+  process_markets()
   assert_equal(2, u1:get_item("h0"))
   assert_equal(1, u1:get_item("balm"))
 
   reset_items()
   r:set_resource("peasant", 549)
-  eressea.process.markets()
+  process_markets()
   assert_equal(1, u1:get_item("h0"))
   assert_equal(1, u1:get_item("balm"))
 
   reset_items()
   r:set_resource("peasant", 50)
-  eressea.process.markets()
+  process_markets()
   assert_equal(1, u1:get_item("h0"))
   assert_equal(1, u1:get_item("balm"))
 
   reset_items()
   r:set_resource("peasant", 49)
-  eressea.process.markets()
+  process_markets()
   assert_equal(0, u1:get_item("h0"))
   r:set_resource("peasant", 1050)
 

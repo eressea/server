@@ -1,8 +1,8 @@
 local autoseed = {}
 
 -- minimum required resources in the 7-hex neighborhood:
-local peasants = 20000
-local trees = 1000
+local peasants = 10000
+local trees = 800
 -- number of starters per region:
 local per_region = 2
     
@@ -23,8 +23,12 @@ local function select_regions(regions, peasants, trees)
     local sel = {}
     for r in regions do
         if not r.plane and r.terrain~="ocean" and not r.units() then
-            if score(r, "peasant") >= peasants and score(r, "tree") >= trees then
-                table.insert(sel, r)
+            sp = score(r, "peasant")
+            st = score(r, "tree")
+            if sp >= peasants then
+                if st >= trees then
+                    table.insert(sel, r)
+                end
             end
         end
     end
@@ -47,8 +51,11 @@ local function read_players()
 end
 
 local function seed(r, email, race, lang)
+    assert(r)
     local f = faction.create(email, race, lang)
+    assert(f)
     local u = unit.create(f, r)
+    assert(u)
     equip_unit(u, "new_faction")
     equip_unit(u, "first_unit")
     equip_unit(u, "first_" .. race, 7) -- disable old callbacks
@@ -69,31 +76,38 @@ end
 
 function autoseed.init()
     -- local newbs = {}
-    local num_seeded = per_region
+    local num_seeded = 0
     local start = nil
 
     eressea.log.info('autoseed new players')
     players = read_players()
+    if players then
+        print('autoseed ' .. #players .. ' new players')
+    end
     if players and #players >= per_region then
         local sel
         eressea.log.info(#players .. ' new players')
         sel = select_regions(regions(), peasants, trees)
-        for _, p in ipairs(players) do
-            if num_seeded == per_region then
-                while not start or start.units() do
-                    local index = 1 + (rng_int() % #sel)
-                    start = sel[index]
+        if #sel == 0 then
+            eressea.log.error("autoseed could not select regions for new factions")
+        else
+            for _, p in ipairs(players) do
+                if num_seeded == per_region then
+                    local index = rng_int() % #sel
+                    while not start do
+                        start = sel[index + 1]
+                        index = (index + 1) % #sel
+                    end
+                    num_seeded = 0
                 end
-                num_seeded = 0
-            end
-            local dupe = get_faction_by_email(p.email)
-            if dupe then
-                eressea.log.warning("seed: duplicate email " .. p.email .. " already used by " .. tostring(dupe))
-            else
-                local f = seed(start, p.email, p.race or "human", p.lang or "de")
-                num_seeded = num_seeded + 1
-                print("new faction ".. tostring(f) .. " starts in ".. tostring(start))
-                -- table.insert(newbs, f)
+                local dupe = get_faction_by_email(p.email)
+                if dupe then
+                    eressea.log.warning("seed: duplicate email " .. p.email .. " already used by " .. tostring(dupe))
+                else
+                    print("new faction ".. p.email .. " starts in ".. tostring(start))
+                    local f = seed(start, p.email, p.race or "human", p.lang or "de")
+                    num_seeded = num_seeded + 1
+                end
             end
         end
     end

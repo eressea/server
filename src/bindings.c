@@ -27,6 +27,7 @@ without prior permission by the authors of Eressea.
 #include "console.h"
 #include "reports.h"
 #include "seen.h"
+#include "study.h"
 #include "calendar.h"
 
 #include <kernel/config.h>
@@ -96,7 +97,7 @@ TOLUA_PKG(game);
 int log_lua_error(lua_State * L)
 {
     const char *error = lua_tostring(L, -1);
-    log_fatal("LUA call failed.\n%s\n", error);
+    log_fatal("Lua call failed.\n%s\n", error);
     lua_pop(L, 1);
     return 1;
 }
@@ -186,8 +187,8 @@ static int tolua_getkey(lua_State * L)
 {
     const char *name = tolua_tostring(L, 1, 0);
     int flag = atoi36(name);
-    attrib *a = find_key(global.attribs, flag);
-    lua_pushboolean(L, a != NULL);
+
+    lua_pushboolean(L, key_get(global.attribs, flag));
     return 1;
 }
 
@@ -209,12 +210,11 @@ static int tolua_setkey(lua_State * L)
     const char *name = tolua_tostring(L, 1, 0);
     int value = tolua_toboolean(L, 2, 0);
     int flag = atoi36(name);
-    attrib *a = find_key(global.attribs, flag);
-    if (a == NULL && value) {
-        add_key(&global.attribs, flag);
+    if (value) {
+        key_set(&global.attribs, flag);
     }
-    else if (a != NULL && !value) {
-        a_remove(&global.attribs, a);
+    else {
+        key_unset(&global.attribs, flag);
     }
     return 0;
 }
@@ -394,10 +394,10 @@ static int tolua_learn_skill(lua_State * L)
 {
     unit *u = (unit *)tolua_tousertype(L, 1, 0);
     const char *skname = tolua_tostring(L, 2, 0);
-    float chances = (float)tolua_tonumber(L, 3, 0);
+    int days = (int)tolua_tonumber(L, 3, 0);
     skill_t sk = findskill(skname);
     if (sk != NOSKILL) {
-        learn_skill(u, sk, chances);
+        learn_skill(u, sk, days);
     }
     return 0;
 }
@@ -448,7 +448,7 @@ static int tolua_equipunit(lua_State * L)
     unit *u = (unit *)tolua_tousertype(L, 1, 0);
     const char *eqname = tolua_tostring(L, 2, 0);
     int mask = (int)tolua_tonumber(L, 3, EQUIP_ALL);
-    assert(mask > 0);
+    assert(u && mask > 0);
     equip_unit_mask(u, get_equipment(eqname), mask);
     return 0;
 }
@@ -1184,6 +1184,7 @@ int eressea_run(lua_State *L, const char *luafile)
         err = lua_pcall(L, 1, 1, -3);
         if (err != 0) {
             log_lua_error(L);
+            assert(!"Lua syntax error? check log.");
         }
         else {
             if (lua_isnumber(L, -1)) {

@@ -26,9 +26,7 @@
 #include "monster.h"
 #include "laws.h"
 #include "keyword.h"
-
-/* triggers includes */
-#include <triggers/removecurse.h>
+#include "study.h"
 
 /* attributes includes */
 #include <attributes/targetregion.h>
@@ -549,21 +547,23 @@ static order *monster_seeks_target(region * r, unit * u)
 }
 #endif
 
-static const char *random_growl(void)
+void random_growl(const unit *u, region *target, int rand)
 {
-    switch (rng_int() % 5) {
-    case 0:
-        return "Groammm";
-    case 1:
-        return "Roaaarrrr";
-    case 2:
-        return "Chhhhhhhhhh";
-    case 3:
-        return "Tschrrrkk";
-    case 4:
-        return "Schhhh";
+    const struct locale *lang = u->faction->locale;
+    const char *growl;
+    switch(rand){
+    case 1: growl = "growl1"; break;
+    case 2: growl = "growl2"; break;
+    case 3: growl = "growl3"; break;
+    case 4: growl = "growl4"; break;
+    default: growl = "growl0";
     }
-    return "";
+
+
+    if (rname(target, lang)) {
+        message *msg = msg_message("dragon_growl", "dragon number target growl", u, u->number, target, growl);
+        ADDMSG(&u->region->msgs, msg);
+    }
 }
 
 extern struct attrib_type at_direction;
@@ -709,17 +709,7 @@ static order *plan_dragon(unit * u)
             reduce_weight(u);
         }
         if (rng_int() % 100 < 15) {
-            const struct locale *lang = u->faction->locale;
-            /* do a growl */
-            if (rname(tr, lang)) {
-                addlist(&u->orders,
-                    create_order(K_MAIL, lang, "%s '%s... %s %s %s'",
-                    LOC(lang, parameters[P_REGION]),
-                    random_growl(),
-                    u->number ==
-                    1 ? "Ich rieche" : "Wir riechen",
-                    "etwas in", rname(tr, u->faction->locale)));
-            }
+            random_growl(u, tr, rng_int() % 5);
         }
     }
     else {

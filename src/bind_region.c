@@ -77,8 +77,8 @@ static int tolua_region_set_blocked(lua_State * L)
 {
     region *self = (region *)tolua_tousertype(L, 1, 0);
     bool flag = !!tolua_toboolean(L, 2, 1);
-    if (flag) self->flags |= BLD_WORKING;
-    else self->flags &= ~BLD_WORKING;
+    if (flag) self->flags |= RF_BLOCKED;
+    else self->flags &= ~RF_BLOCKED;
     return 0;
 }
 
@@ -458,6 +458,7 @@ static int tolua_region_create(lua_State * L)
         const terrain_type *terrain = get_terrain(tname);
         region *r, *result;
         if (!terrain) {
+            log_error("lua: region.create with invalid terrain %s", tname);
             return 0;
         }
 
@@ -481,6 +482,7 @@ static int tolua_region_create(lua_State * L)
         tolua_pushusertype(L, result, TOLUA_CAST "region");
         return 1;
     }
+    log_error("lua: region.create with invalid terrain %s", tname);
     return 0;
 }
 
@@ -542,11 +544,9 @@ static int tolua_region_getkey(lua_State * L)
 {
     region *self = (region *)tolua_tousertype(L, 1, 0);
     const char *name = tolua_tostring(L, 2, 0);
-
     int flag = atoi36(name);
-    attrib *a = find_key(self->attribs, flag);
-    lua_pushboolean(L, a != NULL);
 
+    lua_pushboolean(L, key_get(self->attribs, flag));
     return 1;
 }
 
@@ -555,14 +555,13 @@ static int tolua_region_setkey(lua_State * L)
     region *self = (region *)tolua_tousertype(L, 1, 0);
     const char *name = tolua_tostring(L, 2, 0);
     int value = tolua_toboolean(L, 3, 0);
-
     int flag = atoi36(name);
-    attrib *a = find_key(self->attribs, flag);
-    if (a == NULL && value) {
-        add_key(&self->attribs, flag);
+
+    if (value) {
+        key_set(&self->attribs, flag);
     }
-    else if (a != NULL && !value) {
-        a_remove(&self->attribs, a);
+    else {
+        key_unset(&self->attribs, flag);
     }
     return 0;
 }
@@ -581,6 +580,13 @@ static int tolua_plane_get(lua_State * L)
 
     tolua_pushusertype(L, pl, TOLUA_CAST "plane");
     return 1;
+}
+
+static int tolua_plane_erase(lua_State *L)
+{
+    plane *self = (plane *)tolua_tousertype(L, 1, 0);
+    remove_plane(self);
+    return 0;
 }
 
 static int tolua_plane_create(lua_State * L)
@@ -740,6 +746,7 @@ void tolua_region_open(lua_State * L)
         tolua_beginmodule(L, TOLUA_CAST "plane");
         {
             tolua_function(L, TOLUA_CAST "create", tolua_plane_create);
+            tolua_function(L, TOLUA_CAST "erase", tolua_plane_erase);
             tolua_function(L, TOLUA_CAST "get", tolua_plane_get);
             tolua_function(L, TOLUA_CAST "__tostring", tolua_plane_tostring);
 

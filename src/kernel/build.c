@@ -23,6 +23,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "alchemy.h"
 #include "direction.h"
 #include "move.h"
+#include "study.h"
 #include "laws.h"
 #include "skill.h"
 #include "lighthouse.h"
@@ -513,7 +514,7 @@ int build(unit * u, const construction * ctype, int completed, int want)
          *  (enno): Nein, das ist für Dinge, bei denen die nächste Ausbaustufe
          *  die gleiche wie die vorherige ist. z.b. gegenstände.
          */
-        if (type->maxsize > 1) {
+        if (type->maxsize > 0) {
             completed = completed % type->maxsize;
         }
         else {
@@ -804,7 +805,7 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
         /* build a new building */
         b = new_building(btype, r, lang);
         b->type = btype;
-        fset(b, BLD_MAINTAINED | BLD_WORKING);
+        fset(b, BLD_MAINTAINED);
 
         /* Die Einheit befindet sich automatisch im Inneren der neuen Burg. */
         if (u->number && leave(u, false)) {
@@ -847,6 +848,9 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
     }
 
     b->size += built;
+    if (b->type->maxsize > 0 && b->size > b->type->maxsize) {
+        log_error("build: %s has size=%d, maxsize=%d", buildingname(b), b->size, b->type->maxsize);
+    }
     fset(b, BLD_EXPANDED);
 
     update_lighthouse(b);

@@ -1,17 +1,34 @@
 project(util C)
 
 SET(_TEST_FILES
+attrib.test.c
 base36.test.c
+bsdstring.test.c
+# crmessage.test.c
+# dice.test.c
+# event.test.c
+# filereader.test.c
+functions.test.c
+gamedata.test.c
+# goodies.test.c
+# language.test.c
+# lists.test.c
+# log.test.c
+# message.test.c
+# nrmessage.test.c
 parser.test.c
 password.test.c
-attrib.test.c
+# rand.test.c
+# resolve.test.c
+rng.test.c
 strings.test.c
 bsdstring.test.c
 functions.test.c
 log.test.c
+# translation.test.c
 umlaut.test.c
 unicode.test.c
-rng.test.c
+# xml.test.c
 )
 
 SET(_FILES
@@ -23,6 +40,7 @@ dice.c
 event.c
 filereader.c
 functions.c
+gamedata.c
 goodies.c
 language.c
 lists.c

@@ -96,6 +96,7 @@ static void parse_config(const char *filename)
 #ifdef USE_CURSES
         /* only one value in the [editor] section */
         force_color = iniparser_getint(d, "editor:color", force_color);
+        gm_codepage = iniparser_getint(d, "editor:codepage", gm_codepage);
 #endif
     }
 }
@@ -128,9 +129,33 @@ static int get_arg(int argc, char **argv, size_t len, int index, const char **re
     return index;
 }
 
+static int verbosity_to_flags(int verbosity) {
+    int flags = 0;
+    switch (verbosity) {
+    case 0:
+        flags = 0;
+        break;
+    case 1:
+        flags = LOG_CPERROR;
+        break;
+    case 2:
+        flags = LOG_CPERROR | LOG_CPWARNING;
+        break;
+    case 3:
+        flags = LOG_CPERROR | LOG_CPWARNING | LOG_CPINFO;
+        break;
+    default:
+        flags = LOG_CPERROR | LOG_CPWARNING | LOG_CPINFO | LOG_CPDEBUG;
+        break;
+    }
+    return flags;
+}
+
 static int parse_args(int argc, char **argv, int *exitcode)
 {
-    int i, log_stderr = 0;
+    int i;
+    int log_stderr = LOG_CPERROR;
+    int log_flags = LOG_CPERROR | LOG_CPWARNING | LOG_CPINFO;
 
     for (i = 1; i != argc; ++i) {
         char *argi = argv[i];
@@ -168,7 +193,8 @@ static int parse_args(int argc, char **argv, int *exitcode)
                 i = get_arg(argc, argv, 2, i, &luafile, 0);
                 break;
             case 'l':
-                i = get_arg(argc, argv, 2, i, &logfile, 0);
+                i = get_arg(argc, argv, 2, i, &arg, 0);
+                log_flags = arg ? atoi(arg) : 0xff;
                 break;
             case 't':
                 i = get_arg(argc, argv, 2, i, &arg, 0);
@@ -192,28 +218,15 @@ static int parse_args(int argc, char **argv, int *exitcode)
         }
     }
 
-    switch (verbosity) {
-    case 0:
-        log_stderr = 0;
-        break;
-    case 1:
-        log_stderr = LOG_CPERROR;
-        break;
-    case 2:
-        log_stderr = LOG_CPERROR | LOG_CPWARNING;
-        break;
-    case 3:
-        log_stderr = LOG_CPERROR | LOG_CPWARNING | LOG_CPINFO;
-        break;
-    default:
-        log_stderr = LOG_CPERROR | LOG_CPWARNING | LOG_CPINFO | LOG_CPDEBUG;
-        break;
-    }
+    // open logfile on disk:
+    log_flags = verbosity_to_flags(log_flags);
+    log_open(logfile, log_flags);
 
+    // also log to stderr:
+    log_stderr = verbosity_to_flags(verbosity);
     if (log_stderr) {
         log_to_file(log_stderr | LOG_FLUSH | LOG_BRIEF, stderr);
     }
-
     return 0;
 }
 
@@ -296,7 +309,6 @@ int main(int argc, char **argv)
     /* parse arguments again, to override ini file */
     parse_args(argc, argv, &err);
 
-    log_open(logfile);
     locale_init();
 
 #ifdef CRTDBG

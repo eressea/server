@@ -26,7 +26,7 @@ static void setup_piracy(void) {
     lang = get_or_create_locale("de");
     locale_setstring(lang, directions[D_EAST], "OSTEN");
     init_directions(lang);
-    test_create_terrain("ocean", SAIL_INTO | SEA_REGION);
+    test_create_terrain("ocean", SEA_REGION);
     st_boat = test_create_shiptype("boat");
     st_boat->cargo = 1000;
 }
@@ -47,6 +47,7 @@ static void setup_pirate(unit **pirate, int p_r_flags, int p_rc_flags, const cha
     if (v_shiptype) {
         st_boat = st_get_or_create(v_shiptype);
         u_set_ship(*victim, test_create_ship((*victim)->region, st_boat));
+        free(st_boat->coasts);
         st_boat->coasts = (struct terrain_type **)calloc(2, sizeof(struct terrain_type *));
         st_boat->coasts[0] = vterrain;
         st_boat->coasts[1] = 0;
@@ -59,6 +60,7 @@ static void setup_pirate(unit **pirate, int p_r_flags, int p_rc_flags, const cha
     if (p_shiptype) {
         st_boat = st_get_or_create(p_shiptype);
         u_set_ship(*pirate, test_create_ship((*pirate)->region, st_boat));
+        free(st_boat->coasts);
         st_boat->coasts = (struct terrain_type **)calloc(2, sizeof(struct terrain_type *));
         st_boat->coasts[0] = vterrain;
         st_boat->coasts[1] = 0;
@@ -176,22 +178,39 @@ static void test_piracy_cmd_walking(CuTest * tc) {
 }
 
 static void test_piracy_cmd_land_to_land(CuTest * tc) {
-    unit *pirate, *victim;
+    unit *u;
     order *ord;
     region *r;
+    faction *f;
+    int target;
+    const terrain_type *t_plain;
+    const ship_type *stype;
 
     test_cleanup();
 
-    setup_pirate(&pirate, 0, 0, "boat", &ord, &victim, SAIL_INTO, "boat");
-    set_level(pirate, SK_SAILING, pirate->ship->type->sumskill);
-    r = pirate->region;
+    setup_piracy();
+    t_plain = get_or_create_terrain("plain");
+    stype = test_create_shiptype("boat");
 
-    piracy_cmd(pirate, ord);
-    CuAssertPtrEquals(tc, 0, pirate->thisorder);
-    CuAssertTrue(tc, pirate->region == r);
-    /* TODO check message
-     CuAssertPtrNotNullMsg(tc, "successful PIRACY movement", test_find_messagetype(pirate->faction->msgs, "travel"));
-     */
+    // create a target:
+    r = test_create_region(0, 0, t_plain);
+    f = test_create_faction(0);
+    u = test_create_unit(f, r);
+    u->ship = test_create_ship(r, stype);
+    target = f->no;
+
+    // create a pirate:
+    r = test_create_region(1, 0, t_plain);
+    f = test_create_faction(0);
+    u = test_create_unit(f, r);
+    u->ship = test_create_ship(r, stype);
+    set_level(u, SK_SAILING, u->ship->type->sumskill);
+    ord = create_order(K_PIRACY, f->locale, "%s", itoa36(target));
+
+    piracy_cmd(u, ord);
+    CuAssertPtrEquals(tc, 0, u->thisorder);
+    CuAssertPtrEquals(tc, r, u->region);
+    // TODO check message
     free_order(ord);
 
     test_cleanup();
@@ -224,7 +243,7 @@ CuSuite *get_piracy_suite(void)
     SUITE_ADD_TEST(suite, test_piracy_cmd_errors);
     SUITE_ADD_TEST(suite, test_piracy_cmd);
     SUITE_ADD_TEST(suite, test_piracy_cmd_walking);
-    DISABLE_TEST(suite, test_piracy_cmd_land_to_land);
+    SUITE_ADD_TEST(suite, test_piracy_cmd_land_to_land);
     SUITE_ADD_TEST(suite, test_piracy_cmd_swimmer);
     return suite;
 }

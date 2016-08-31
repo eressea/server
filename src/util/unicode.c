@@ -518,10 +518,22 @@ size_t * length)
     return 0;
 }
 
+/** Convert a UTF-8 encoded character to ASCII, with '?' replacements. */
+int unicode_utf8_to_ascii(char *cp_character, const utf8_t * utf8_string,
+    size_t *length)
+{
+    int result = unicode_utf8_to_cp437(cp_character, utf8_string, length);
+    if (result == 0) {
+        if (*length > 1) {
+            *cp_character = '?';
+        }
+    }
+    return result;
+}
+
 /** Convert a UTF-8 encoded character to CP1252. */
-int
-unicode_utf8_to_cp1252(char *cp_character, const utf8_t * utf8_string,
-size_t * length)
+int unicode_utf8_to_cp1252(char *cp_character, const utf8_t * utf8_string,
+    size_t * length)
 {
     ucs4_t ucs4_character;
     int result;

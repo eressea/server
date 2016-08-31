@@ -82,3 +82,18 @@ function test_xmastree()
     r = use_tree("plain")
     assert_equal(10, r:get_resource("tree"))
 end
+
+function test_stardust()
+    -- fix random peasant changes:
+    eressea.settings.set("rules.economy.repopulate_maximum", 0)
+    local r = region.create(0, 0, "plain")
+    r:set_resource("peasant", 10)
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 5)
+    u:add_item("stardust", 1)
+    u:clear_orders()
+    u:add_order("BENUTZEN 1 Sternenstaub")
+    process_orders()
+    assert_equal(15, r:get_resource("peasant"))
+    assert_equal(0, u:get_item('stardust'))
+end

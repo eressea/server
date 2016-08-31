@@ -24,6 +24,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/faction.h>
 #include <kernel/unit.h>
 #include <util/attrib.h>
+#include <util/gamedata.h>
 
 #include <storage.h>
 #include <assert.h>
@@ -38,11 +39,11 @@ void write_of(const struct attrib *a, const void *owner, struct storage *store)
     WRITE_INT(store, f->no);
 }
 
-int read_of(struct attrib *a, void *owner, struct storage *store)
+int read_of(struct attrib *a, void *owner, gamedata *data)
 {                               /* return 1 on success, 0 if attrib needs removal */
     int of;
 
-    READ_INT(store, &of);
+    READ_INT(data->store, &of);
     if (rule_stealth_other()) {
         a->data.v = findfaction(of);
         if (a->data.v) {
@@ -53,7 +54,7 @@ int read_of(struct attrib *a, void *owner, struct storage *store)
 }
 
 attrib_type at_otherfaction = {
-    "otherfaction", NULL, NULL, NULL, write_of, read_of, ATF_UNIQUE
+    "otherfaction", NULL, NULL, NULL, write_of, read_of, NULL, ATF_UNIQUE
 };
 
 struct faction *get_otherfaction(const struct attrib *a)

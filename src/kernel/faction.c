@@ -40,6 +40,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/base36.h>
 #include <util/bsdstring.h>
 #include <util/event.h>
+#include <util/gamedata.h>
 #include <util/goodies.h>
 #include <util/lists.h>
 #include <util/language.h>
@@ -322,10 +323,10 @@ bool checkpasswd(const faction * f, const char *passwd)
     return true;
 }
 
-variant read_faction_reference(struct storage * store)
+variant read_faction_reference(gamedata * data)
 {
     variant id;
-    READ_INT(store, &id.i);
+    READ_INT(data->store, &id.i);
     return id;
 }
 
@@ -339,7 +340,7 @@ static faction *dead_factions;
 
 void free_flist(faction **fp) {
     faction * flist = *fp;
-    for (flist = factions; flist;) {
+    while (flist) {
         faction *f = flist;
         flist = f->next;
         free_faction(f);
@@ -796,6 +797,7 @@ attrib_type at_maxmagicians = {
     NULL,
     a_writeint,
     a_readint,
+    NULL,
     ATF_UNIQUE
 };
 
@@ -851,7 +853,7 @@ int writepasswd(void)
     FILE *F;
     char zText[128];
 
-    sprintf(zText, "%s/passwd", basepath());
+    join_path(basepath(), "passwd", zText, sizeof(zText));
     F = fopen(zText, "w");
     if (!F) {
         perror(zText);

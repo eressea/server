@@ -11,7 +11,7 @@ static void test_init_directions(CuTest *tc) {
     struct locale *lang;
 
     test_cleanup();
-    lang = get_or_create_locale("en");
+    lang = get_or_create_locale("de");
     locale_setstring(lang, "dir_nw", "NW");
     init_directions(lang);
     CuAssertIntEquals(tc, D_NORTHWEST, get_direction("nw", lang));

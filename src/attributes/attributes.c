@@ -57,6 +57,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/event.h>
+#include <util/gamedata.h>
 
 #include <storage.h>
 
@@ -64,12 +65,12 @@ attrib_type at_unitdissolve = {
     "unitdissolve", NULL, NULL, NULL, a_writechars, a_readchars
 };
 
-static int read_ext(attrib * a, void *owner, struct storage *store)
+static int read_ext(attrib * a, void *owner, gamedata *data)
 {
     int len;
 
-    READ_INT(store, &len);
-    store->api->r_bin(store->handle, NULL, (size_t)len);
+    READ_INT(data->store, &len);
+    data->store->api->r_bin(data->store->handle, NULL, (size_t)len);
     return AT_READ_OK;
 }
 
@@ -125,6 +126,7 @@ void register_attributes(void)
     at_register(&at_raceprefix);
     at_register(&at_iceberg);
     at_register(&at_key);
+    at_register(&at_keys);
     at_register(&at_follow);
     at_register(&at_targetregion);
     at_register(&at_orcification);

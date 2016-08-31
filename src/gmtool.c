@@ -51,6 +51,7 @@
 #include <items/itemtypes.h>
 
 #include <util/log.h>
+#include <util/unicode.h>
 #include <util/lists.h>
 #include <util/rng.h>
 #include <util/base36.h>
@@ -76,6 +77,62 @@ state *current_state = NULL;
 #define IFL_BUILDINGS (1<<3)
 
 static WINDOW *hstatus;
+
+#ifdef STDIO_CP
+int gm_codepage = STDIO_CP;
+#else 
+int gm_codepage = -1;
+#endif
+
+static void unicode_remove_diacritics(const char *rp, char *wp) {
+    while (*rp) {
+        if (gm_codepage >=0 && *rp & 0x80) {
+            size_t sz = 0;
+            char ch;
+            switch (gm_codepage) {
+            case 1252:
+                unicode_utf8_to_cp1252(&ch, rp, &sz);
+                break;
+            case 437:
+                unicode_utf8_to_cp437(&ch, rp, &sz);
+                break;
+            default:
+                unicode_utf8_to_ascii(&ch, rp, &sz);
+                break;
+            }
+            rp += sz;
+            *wp++ = ch;
+        }
+        else {
+            *wp++ = *rp++;
+        }
+    }
+    *wp = 0;
+}
+
+static void simplify(const char *rp, char *wp) {
+    unicode_remove_diacritics(rp, wp);
+}
+
+int umvwprintw(WINDOW *win, int y, int x, const char *format, ...) {
+    char buffer[128];
+    va_list args;
+
+    va_start(args, format);
+    memset(buffer, 0, sizeof(buffer));
+    vsnprintf(buffer, sizeof(buffer)-1, format, args);
+    va_end(args);
+
+    simplify(buffer, buffer);
+
+    return mvwaddstr(win, y, x, buffer);
+}
+
+int umvwaddnstr(WINDOW *w, int y, int x, const char * str, int len) {
+    char buffer[128];
+    simplify(str, buffer);
+    return mvwaddnstr(w, y, x, buffer, len);
+}
 
 static void init_curses(void)
 {
@@ -354,7 +411,7 @@ static void paint_status(window * wnd, const state * st)
         terrain = mr->r->terrain->_name;
     }
     cnormalize(&st->cursor, &nx, &ny);
-    mvwprintw(win, 0, 0, "%4d %4d | %.4s | %.20s (%d)", nx, ny, terrain, name,
+    umvwprintw(win, 0, 0, "%4d %4d | %.4s | %.20s (%d)", nx, ny, terrain, name,
         uid);
     wclrtoeol(win);
 }
@@ -377,13 +434,13 @@ static void paint_info_region(window * wnd, const state * st)
     if (mr && mr->r) {
         const region *r = mr->r;
         if (r->land) {
-            mvwaddnstr(win, line++, 1, (char *)r->land->name, size);
+            umvwaddnstr(win, line++, 1, (char *)r->land->name, size);
         }
         else {
-            mvwaddnstr(win, line++, 1, r->terrain->_name, size);
+            umvwaddnstr(win, line++, 1, r->terrain->_name, size);
         }
         line++;
-        mvwprintw(win, line++, 1, "%s, age %d", r->terrain->_name, r->age);
+        umvwprintw(win, line++, 1, "%s, age %d", r->terrain->_name, r->age);
         if (r->land) {
             mvwprintw(win, line++, 1, "$:%6d  P:%5d", rmoney(r), rpeasants(r));
             mvwprintw(win, line++, 1, "H:%6d  %s:%5d", rhorses(r),
@@ -398,7 +455,7 @@ static void paint_info_region(window * wnd, const state * st)
             wattroff(win, A_BOLD | COLOR_PAIR(COLOR_YELLOW));
             for (sh = r->ships; sh && line < maxline; sh = sh->next) {
                 mvwprintw(win, line, 1, "%.4s ", itoa36(sh->no));
-                mvwaddnstr(win, line++, 6, (char *)sh->type->_name, size - 5);
+                umvwaddnstr(win, line++, 6, (char *)sh->type->_name, size - 5);
             }
         }
         if (r->units && (st->info_flags & IFL_FACTIONS)) {
@@ -409,7 +466,7 @@ static void paint_info_region(window * wnd, const state * st)
             for (u = r->units; u && line < maxline; u = u->next) {
                 if (!fval(u->faction, FFL_MARK)) {
                     mvwprintw(win, line, 1, "%.4s ", itoa36(u->faction->no));
-                    mvwaddnstr(win, line++, 6, (char *)u->faction->name, size - 5);
+                    umvwaddnstr(win, line++, 6, (char *)u->faction->name, size - 5);
                     fset(u->faction, FFL_MARK);
                 }
             }
@@ -424,7 +481,7 @@ static void paint_info_region(window * wnd, const state * st)
             wattroff(win, A_BOLD | COLOR_PAIR(COLOR_YELLOW));
             for (u = r->units; u && line < maxline; u = u->next) {
                 mvwprintw(win, line, 1, "%.4s ", itoa36(u->no));
-                mvwaddnstr(win, line++, 6, unit_getname(u), size - 5);
+                umvwaddnstr(win, line++, 6, unit_getname(u), size - 5);
             }
         }
     }
@@ -848,7 +905,7 @@ static void handlekey(state * st, int c)
         break;
     case 'B':
         if (!new_players) {
-            sprintf(sbuffer, "%s/newfactions", basepath());
+            join_path(basepath(), "newfactions", sbuffer, sizeof(sbuffer));
             new_players = read_newfactions(sbuffer);
         }
         cnormalize(&st->cursor, &nx, &ny);
@@ -1063,7 +1120,7 @@ static void handlekey(state * st, int c)
         break;
     case 'A':
         if (!new_players) {
-            sprintf(sbuffer, "%s/newfactions", basepath());
+            join_path(basepath(), "newfactions", sbuffer, sizeof(sbuffer));
             new_players = read_newfactions(sbuffer);
         }
         seed_players(&new_players, false);
@@ -1236,11 +1293,13 @@ void run_mapper(void)
     WINDOW *hwininfo;
     WINDOW *hwinmap;
     int width, height, x, y;
-    int split = 20, old_flags = log_flags;
+    int split = 20;
     state *st;
     point tl;
-
+/* FIXME: dsiable logging
+    int old_flags = log_flags;
     log_flags &= ~(LOG_CPERROR | LOG_CPWARNING);
+*/
     init_curses();
     curs_set(1);
 
@@ -1332,7 +1391,9 @@ void run_mapper(void)
     set_readline(NULL);
     curs_set(1);
     endwin();
+/* FIXME: reset logging
     log_flags = old_flags;
+*/
     state_close(st);
 }
 

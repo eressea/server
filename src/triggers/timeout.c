@@ -23,6 +23,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/event.h>
+#include <util/gamedata.h>
 #include <util/log.h>
 
 #include <storage.h>
@@ -72,11 +73,11 @@ static void timeout_write(const trigger * t, struct storage *store)
     write_triggers(store, td->triggers);
 }
 
-static int timeout_read(trigger * t, struct storage *store)
+static int timeout_read(trigger * t, gamedata *data)
 {
     timeout_data *td = (timeout_data *)t->data.v;
-    READ_INT(store, &td->timer);
-    read_triggers(store, &td->triggers);
+    READ_INT(data->store, &td->timer);
+    read_triggers(data, &td->triggers);
     if (td->timer > 20) {
         trigger *tr = td->triggers;
         log_warning("there is a timeout lasting for another %d turns\n", td->timer);

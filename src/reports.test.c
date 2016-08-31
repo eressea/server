@@ -253,7 +253,6 @@ static void test_write_unit(CuTest *tc) {
     race *rc;
     struct locale *lang;
     char buffer[1024];
-    /* FIXME: test emits ERROR: no translation for combat status status_aggressive in locale de */
 
     test_cleanup();
     rc = rc_get_or_create("human");
@@ -315,6 +314,12 @@ static void setup_spell_fixture(spell_fixture * spf) {
     spf->sp = test_create_spell();
     spellbook_add(spf->spb, spf->sp, 1);
     spf->sbe = spellbook_get(spf->spb, spf->sp);
+}
+
+static void cleanup_spell_fixture(spell_fixture *spf) {
+    spellbook_clear(spf->spb);
+    free(spf->spb);
+    test_cleanup();
 }
 
 static void check_spell_syntax(CuTest *tc, char *msg, spell_fixture *spell, char *syntax) {
@@ -406,7 +411,7 @@ static void test_write_spell_syntax(CuTest *tc) {
     check_spell_syntax(tc, "kc+", &spell,
         "  ZAUBERE \"Testzauber\" ( REGION | EINHEIT <enr> [<enr> ...] | SCHIFF <snr>\n  [<snr> ...] | BURG <bnr> [<bnr> ...] )");
 
-    test_cleanup();
+    cleanup_spell_fixture(&spell);
 }
 
 CuSuite *get_reports_suite(void)

@@ -915,7 +915,7 @@ static void describe(stream *out, const seen_region * sr, faction * f)
         for (b = get_borders(r, r2); b;) {
             struct edge *e = edges;
             bool transparent = b->type->transparent(b, f);
-            const char *name = b->type->name(b, r, f, GF_DETAILED | GF_ARTICLE);
+            const char *name = border_name(b, r, f, GF_DETAILED | GF_ARTICLE);
 
             if (!transparent)
                 see[d] = false;
@@ -1376,15 +1376,7 @@ static int buildingmaintenance(const building * b, const resource_type * rtype)
 {
     const building_type *bt = b->type;
     int c, cost = 0;
-    static bool init = false;
-    static const curse_type *nocost_ct;
-    if (!init) {
-        init = true;
-        nocost_ct = ct_find("nocostbuilding");
-    }
-    if (curse_active(get_curse(b->attribs, nocost_ct))) {
-        return 0;
-    }
+
     for (c = 0; bt->maintenance && bt->maintenance[c].number; ++c) {
         const maintenance *m = bt->maintenance + c;
         if (m->rtype == rtype) {
@@ -1403,13 +1395,14 @@ report_template(const char *filename, report_context * ctx, const char *charset)
     const resource_type *rsilver = get_resourcetype(R_SILVER);
     faction *f = ctx->f;
     region *r;
-    FILE *F = fopen(filename, "wt");
+    FILE *F = fopen(filename, "w");
     stream strm = { 0 }, *out = &strm;
     seen_region *sr = NULL;
     char buf[8192], *bufp;
     size_t size;
     int bytes;
     bool utf8 = _strcmpl(charset, "utf8") == 0 || _strcmpl(charset, "utf-8") == 0;
+    const curse_type *nocost_ct = ct_find("nocostbuilding");
 
     if (F == NULL) {
         perror(filename);
@@ -1484,15 +1477,16 @@ report_template(const char *filename, report_context * ctx, const char *charset)
                     WARN_STATIC_BUFFER();
                 if (u->building && building_owner(u->building) == u) {
                     building *b = u->building;
-                    int cost = buildingmaintenance(b, rsilver);
-
-                    if (cost > 0) {
-                        bytes = (int)strlcpy(bufp, ",U", size);
-                        if (wrptr(&bufp, &size, bytes) != 0)
-                            WARN_STATIC_BUFFER();
-                        bytes = (int)strlcpy(bufp, itoa10(cost), size);
-                        if (wrptr(&bufp, &size, bytes) != 0)
-                            WARN_STATIC_BUFFER();
+                    if (!curse_active(get_curse(b->attribs, nocost_ct))) {
+                        int cost = buildingmaintenance(b, rsilver);
+                        if (cost > 0) {
+                            bytes = (int)strlcpy(bufp, ",U", size);
+                            if (wrptr(&bufp, &size, bytes) != 0)
+                                WARN_STATIC_BUFFER();
+                            bytes = (int)strlcpy(bufp, itoa10(cost), size);
+                            if (wrptr(&bufp, &size, bytes) != 0)
+                                WARN_STATIC_BUFFER();
+                        }
                     }
                 }
                 else if (u->ship) {
@@ -1898,7 +1892,7 @@ const faction * f)
         }
     }
 
-    if (b->size < b->type->maxsize) {
+    if (!building_finished(b)) {
         bytes = (int)strlcpy(bufp, LOC(lang, "nr_building_inprogress"), size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
@@ -2067,7 +2061,7 @@ const char *charset)
     unsigned char op;
     int maxh, bytes, ix = want(O_STATISTICS);
     int wants_stats = (f->options & ix);
-    FILE *F = fopen(filename, "wt");
+    FILE *F = fopen(filename, "w");
     stream strm = { 0 }, *out = &strm;
     seen_region *sr = NULL;
     char buf[8192];

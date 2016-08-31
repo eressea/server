@@ -38,6 +38,7 @@ extern "C" {
         ALLIANCE_MAX
     };
 
+    extern const char* alliance_kwd[ALLIANCE_MAX];
 #define ALF_NON_ALLIED (1<<0)   /* this alliance is just a default for a non-allied faction */
 
 #define ALLY_ENEMY (1<<0)
@@ -53,13 +54,14 @@ extern "C" {
     } alliance;
 
     extern alliance *alliances;
-    extern alliance *findalliance(int id);
-    extern alliance *makealliance(int id, const char *name);
-    extern const char *alliancename(const struct alliance *al);
-    extern void setalliance(struct faction *f, alliance * al);
+    alliance *findalliance(int id);
+    alliance *new_alliance(int id, const char *name);
+    alliance *makealliance(int id, const char *name);
+    const char *alliancename(const struct alliance *al);
+    void setalliance(struct faction *f, alliance * al);
     void free_alliances(void);
-    extern struct faction *alliance_get_leader(struct alliance *al);
-    extern void alliance_cmd(void);
+    struct faction *alliance_get_leader(struct alliance *al);
+    void alliance_cmd(void);
     bool is_allied(const struct faction *f1, const struct faction *f2);
 
     void alliance_setname(alliance * self, const char *name);

@@ -1,39 +1,34 @@
 <?xml version="1.0"?>
 <ships>
   <ship name="trireme" range="7" storm="1.00" damage="1.00" cargo="200000" cptskill="4" minskill="1" sumskill="120" opensea="yes">
-    <coast terrain="ocean"/>
     <coast terrain="plain"/>
-    <construction skill="shipcraft" minskill="4" maxsize="200" reqsize="1">
+    <construction skill="shipcraft" minskill="4" maxsize="200">
       <requirement type="log" quantity="1"/>
     </construction>
   </ship>
 
   <ship name="caravel" range="5" storm="1.00" damage="1.00" cargo="300000" cptskill="3" minskill="1" sumskill="30" opensea="yes">
-    <coast terrain="ocean"/>
     <coast terrain="plain"/>
-    <construction skill="shipcraft" minskill="3" maxsize="250" reqsize="1">
+    <construction skill="shipcraft" minskill="3" maxsize="250">
       <requirement type="log" quantity="1"/>
     </construction>
   </ship>
 
   <ship name="dragonship" range="5" storm="1.00" damage="1.00" cargo="100000" cptskill="2" minskill="1" sumskill="50" opensea="yes">
-    <coast terrain="ocean"/>
     <coast terrain="plain"/>
-    <construction skill="shipcraft" minskill="2" maxsize="100" reqsize="1">
+    <construction skill="shipcraft" minskill="2" maxsize="100">
       <requirement type="log" quantity="1"/>
     </construction>
   </ship>
 
   <ship name="longboat" range="3" storm="1.00" damage="1.00" cargo="50000" cptskill="1" minskill="1" sumskill="10" opensea="yes">
-    <coast terrain="ocean"/>
     <coast terrain="plain"/>
-    <construction skill="shipcraft" minskill="1" maxsize="50" reqsize="1">
+    <construction skill="shipcraft" minskill="1" maxsize="50">
       <requirement type="log" quantity="1"/>
     </construction>
   </ship>
 
   <ship name="balloon" range="2" storm="1.00" damage="1.00" cargo="5000" cptskill="6" minskill="6" sumskill="6" opensea="yes" fly="yes">
-    <coast terrain="ocean"/>
     <coast terrain="plain"/>
     <coast terrain="swamp"/>
     <coast terrain="desert"/>
@@ -44,11 +39,10 @@
     <coast terrain="activevolcano"/>
     <coast terrain="iceberg_sleep"/>
     <coast terrain="iceberg"/>
-    <construction skill="shipcraft" minskill="100" maxsize="5" reqsize="1"/>
+    <construction skill="shipcraft" minskill="100" maxsize="5"/>
   </ship>
 
   <ship name="boat" range="2" storm="1.00" damage="1.00" cargo="5000" cptskill="1" minskill="1" sumskill="2" opensea="yes">
-    <coast terrain="ocean"/>
     <coast terrain="plain"/>
     <coast terrain="swamp"/>
     <coast terrain="desert"/>
@@ -59,13 +53,12 @@
     <coast terrain="activevolcano"/>
     <coast terrain="iceberg_sleep"/>
     <coast terrain="iceberg"/>
-    <construction skill="shipcraft" minskill="1" maxsize="5" reqsize="1">
+    <construction skill="shipcraft" minskill="1" maxsize="5">
       <requirement type="log" quantity="1"/>
     </construction>
   </ship>
 
   <ship name="flyingcarpet" range="3" storm="1.00" damage="1.00" cargo="50000" cptskill="6" minskill="6" sumskill="10" opensea="yes" fly="yes">
-    <coast terrain="ocean"/>
     <coast terrain="plain"/>
     <coast terrain="swamp"/>
     <coast terrain="desert"/>
@@ -76,7 +69,7 @@
     <coast terrain="activevolcano"/>
     <coast terrain="iceberg_sleep"/>
     <coast terrain="iceberg"/>
-    <construction skill="shipcraft" minskill="100" maxsize="50" reqsize="1"/>
+    <construction skill="shipcraft" minskill="100" maxsize="50"/>
   </ship>
 
 </ships>
