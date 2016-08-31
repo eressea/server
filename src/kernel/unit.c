@@ -1470,11 +1470,11 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
     /* u->region auch */
     u->hp = unit_max_hp(u) * number;
 
-    if (!dname) {
-        name_unit(u);
-    }
-    else {
+    if (dname) {
         u->_name = _strdup(dname);
+    }
+    else if (urace->generate_name || playerrace(urace)) {
+        name_unit(u);
     }
 
     if (creator) {
