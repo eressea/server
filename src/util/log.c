@@ -102,21 +102,29 @@ void log_rotate(const char *filename, int maxindex)
     assert(strlen(filename) < sizeof(buffer[0]) - 4);
 
     sprintf(buffer[dst], "%s.%d", filename, maxindex);
-#ifdef HAVE_UNISTD_H
-    /* make sure we don't overwrite an existing file (hard links) */
-    unlink(buffer[dst]);
-#endif
+    if (remove(buffer[dst]) != 0) {
+        if (errno != ENOENT) {
+            fprintf(stderr, "log rotate %s: %d %s", buffer[dst], errno, strerror(errno));
+        }
+        errno = 0;
+    }
+
     while (maxindex > 0) {
-        int err, src = 1 - dst;
+        int src = 1 - dst;
         sprintf(buffer[src], "%s.%d", filename, --maxindex);
-        err = rename(buffer[src], buffer[dst]);
-        if (err != 0) {
-            log_debug("log rotate %s: %s", buffer[dst], strerror(errno));
+        if (rename(buffer[src], buffer[dst]) != 0) {
+            if (errno != ENOENT) {
+                fprintf(stderr, "log rotate %s: %d %s", buffer[dst], errno, strerror(errno));
+            }
+            errno = 0;
         }
         dst = src;
     }
     if (rename(filename, buffer[dst]) != 0) {
-        log_debug("log rotate %s: %s", buffer[dst], strerror(errno));
+        if (errno != ENOENT) {
+            fprintf(stderr, "log rotate %s: %d %s", buffer[dst], errno, strerror(errno));
+        }
+        errno = 0;
     }
 }
 
