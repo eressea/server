@@ -11,6 +11,7 @@
 #include <kernel/unit.h>
 
 #include "monster.h"
+#include "monsters.h"
 #include "guard.h"
 #include "reports.h"
 #include "skill.h"
@@ -244,10 +245,24 @@ static void test_monsters_learn_exp(CuTest * tc)
     test_cleanup();
 }
 
+static void test_spawn_seaserpent(CuTest *tc) {
+    region *r;
+    unit *u;
+    faction *f;
+    test_cleanup();
+    r = test_create_region(0, 0, 0);
+    f = test_create_faction(0);
+    u = spawn_seaserpent(r, f);
+    CuAssertPtrNotNull(tc, u);
+    CuAssertPtrEquals(tc, 0, u->_name);
+    test_cleanup();
+}
+
 CuSuite *get_monsters_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_monsters_attack);
+    SUITE_ADD_TEST(suite, test_spawn_seaserpent);
     SUITE_ADD_TEST(suite, test_monsters_attack_ocean);
     SUITE_ADD_TEST(suite, test_seaserpent_piracy);
     SUITE_ADD_TEST(suite, test_monsters_waiting);
