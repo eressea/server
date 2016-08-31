@@ -8,7 +8,6 @@ SET(_FILES
 artrewards.c
 demonseye.c
 itemtypes.c
-phoenixcompass.c
 seed.c
 speedsail.c
 weapons.c

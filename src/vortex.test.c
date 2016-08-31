@@ -22,7 +22,7 @@ static void test_move_to_vortex(CuTest *tc) {
     unit *u;
     struct locale *lang;
 
-    test_cleanup();
+    test_setup();
     lang = get_or_create_locale("en");
     locale_setstring(lang, "vortex", "wirbel");
     init_locale(lang);

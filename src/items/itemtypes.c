@@ -16,7 +16,6 @@
 
 #include "xerewards.h"
 #include "artrewards.h"
-#include "phoenixcompass.h"
 #include "weapons.h"
 #include "seed.h"
 
@@ -26,7 +25,6 @@ void register_itemtypes(void)
     register_weapons();
     register_xerewards();
     register_artrewards();
-    register_phoenixcompass();
 }
 
 void init_itemtypes(void)

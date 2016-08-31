@@ -56,10 +56,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/moved.h>
 
 /* util includes */
+#include <util/assert.h>
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/bsdstring.h>
 #include <util/language.h>
+#include <util/lists.h>
 #include <util/log.h>
 #include <util/parser.h>
 #include <quicklist.h>
@@ -67,7 +69,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/rng.h>
 
 /* libc includes */
-#include <assert.h>
 #include <ctype.h>
 #include <limits.h>
 #include <math.h>
@@ -218,6 +219,7 @@ static void message_faction(battle * b, faction * f, struct message *m)
     assert(f);
     if (f->battles == NULL || f->battles->r != r) {
         struct bmsg *bm = (struct bmsg *)calloc(1, sizeof(struct bmsg));
+        assert_alloc(bm);
         bm->next = f->battles;
         f->battles = bm;
         bm->r = r;
@@ -251,6 +253,7 @@ static void fbattlerecord(battle * b, faction * f, const char *s)
 static bool set_enemy(side * as, side * ds, bool attacking)
 {
     int i;
+    assert(as && ds);
     for (i = 0; i != MAXSIDES; ++i) {
         if (ds->enemies[i] == NULL)
             ds->enemies[i] = as;
@@ -1920,38 +1923,33 @@ int skilldiff(troop at, troop dt, int dist)
     }
 
     if (df->building) {
-        bool init = false;
-        static const curse_type *strongwall_ct, *magicwalls_ct;
-        if (!init) {
-            strongwall_ct = ct_find("strongwall");
-            magicwalls_ct = ct_find("magicwalls");
-            init = true;
+        if (df->building->attribs) {
+            const curse_type *strongwall_ct = ct_find("strongwall");
+            if (strongwall_ct) {
+                curse *c = get_curse(df->building->attribs, strongwall_ct);
+                if (curse_active(c)) {
+                    /* wirkt auf alle Gebäude */
+                    skdiff -= curse_geteffect_int(c);
+                    is_protected = 2;
+                }
+            }
         }
         if (df->building->type->protection) {
             int beff = df->building->type->protection(df->building, du, DEFENSE_BONUS);
             if (beff) {
                 skdiff -= beff;
                 is_protected = 2;
+                if (df->building->attribs) {
+                    const curse_type *magicwalls_ct = ct_find("magicwalls");
+                    if (magicwalls_ct
+                        && curse_active(get_curse(df->building->attribs, magicwalls_ct))) {
+                        /* Verdoppelt Burgenbonus */
+                        skdiff -= beff;
+                    }
+                }
             }
-        }
-        if (strongwall_ct) {
-            curse *c = get_curse(df->building->attribs, strongwall_ct);
-            if (curse_active(c)) {
-                /* wirkt auf alle Gebäude */
-                skdiff -= curse_geteffect_int(c);
-                is_protected = 2;
-            }
-        }
-        if (magicwalls_ct
-            && curse_active(get_curse(df->building->attribs, magicwalls_ct))) {
-            /* Verdoppelt Burgenbonus */
-            skdiff -= df->building->type->protection(df->building, du, DEFENSE_BONUS);
         }
     }
-    /* Goblin-Verteidigung
-     * ist direkt in der Rassentabelle als df_default
-     */
-
     /* Effekte der Waffen */
     skdiff += weapon_effskill(at, dt, awp, true, dist > 1);
     if (awp && fval(awp->type, WTF_MISSILE)) {
@@ -3262,8 +3260,8 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
 
     /* Effekte von Sprüchen */
 
-    {
-        static const curse_type *speed_ct;
+    if (u->attribs) {
+        const curse_type *speed_ct;
         speed_ct = ct_find("speed");
         if (speed_ct) {
             curse *c = get_curse(u->attribs, speed_ct);

@@ -19,6 +19,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include "umlaut.h"
 
+#include "assert.h"
 #include "log.h"
 #include "unicode.h"
 
@@ -116,7 +117,7 @@ char * transliterate(char * out, size_t size, const char * in)
 void addtoken(void ** root, const char *str, variant id)
 {
     tnode * tk;
-    static const struct replace { /* STATIC_CONST: constant value */
+    static const struct replace {
         ucs4_t ucs;
         const char str[3];
     } replace[] = {
@@ -183,6 +184,7 @@ void addtoken(void ** root, const char *str, variant id)
                 index = lcs % NODEHASHSIZE;
 #endif
                 ref = (tref *)malloc(sizeof(tref));
+                assert_alloc(ref);
                 ref->ucs = lcs;
                 ref->node = node;
                 ref->nexthash = tk->next[index];

@@ -939,16 +939,16 @@ void spawn_undead(void)
 {
     region *r;
     faction *monsters = get_monsters();
+    const curse_type *ctype = ct_find("holyground");
 
     for (r = regions; r; r = r->next) {
         int unburied = deathcount(r);
-        static const curse_type *ctype = NULL;
 
-        if (!ctype)
-            ctype = ct_find("holyground");
-        if (ctype && curse_active(get_curse(r->attribs, ctype)))
-            continue;
-
+        if (r->attribs && ctype) {
+            if (curse_active(get_curse(r->attribs, ctype))) {
+                continue;
+            }
+        }
         /* Chance 0.1% * chaosfactor */
         if (r->land && unburied > rpeasants(r) / 20
             && rng_int() % 10000 < (100 + 100 * chaosfactor(r))) {

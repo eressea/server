@@ -305,7 +305,7 @@ static int parse_buildings(xmlDocPtr doc)
                     btype->age = (void(*)(struct building *))fun;
                 }
                 else if (strcmp((const char *)propValue, "protection") == 0) {
-                    btype->protection = (int(*)(struct building *, struct unit *, building_bonus))fun;
+                    btype->protection = (int(*)(const struct building *, const struct unit *, building_bonus))fun;
                 }
                 else if (strcmp((const char *)propValue, "taxes") == 0) {
                     btype->taxes = (double(*)(const struct building *, int))fun;
@@ -1797,11 +1797,10 @@ static int parse_races(xmlDocPtr doc)
             }
             assert(propValue != NULL);
             if (strcmp((const char *)propValue, "name") == 0) {
-                rc->generate_name = (const char *(*)(const struct unit *))fun;
+                rc->generate_name = (race_name_func)fun;
             }
             else if (strcmp((const char *)propValue, "describe") == 0) {
-                rc->describe =
-                    (const char *(*)(const struct unit *, const struct locale *))fun;
+                rc->describe = (race_desc_func)fun;
             }
             else if (strcmp((const char *)propValue, "age") == 0) {
                 rc->age = (void(*)(struct unit *))fun;

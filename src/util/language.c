@@ -22,11 +22,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "log.h"
 #include "strings.h"
 #include "umlaut.h"
+#include "assert.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <assert.h>
 #include <critbit.h>
 
 #define SMAXHASH 2048
@@ -84,6 +84,7 @@ locale *get_or_create_locale(const char *name)
         }
     }
     *lp = l = (locale *)calloc(sizeof(locale), 1);
+    assert_alloc(l);
     l->hashkey = hkey;
     l->name = _strdup(name);
     l->index = nextlocaleindex++;

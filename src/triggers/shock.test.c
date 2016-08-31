@@ -12,8 +12,8 @@
 static void test_shock(CuTest *tc) {
     unit *u;
     trigger *tt;
-    test_cleanup();
 
+    test_setup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     create_mage(u, M_GRAY);
     set_level(u, SK_MAGIC, 5);
@@ -32,8 +32,8 @@ static void test_shock(CuTest *tc) {
 static void test_shock_low(CuTest *tc) {
     unit *u;
     trigger *tt;
-    test_cleanup();
 
+    test_setup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     create_mage(u, M_GRAY);
     set_level(u, SK_MAGIC, 5);

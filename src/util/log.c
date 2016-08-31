@@ -138,6 +138,7 @@ static int check_dupe(const char *format, int level)
     static char last_message[32]; /* STATIC_XCALL: used across calls */
     static int dupes = 0;         /* STATIC_XCALL: used across calls */
     if (strncmp(last_message, format, sizeof(last_message)) == 0) {
+        // TODO: C6054: String 'last_message' might not be zero - terminated.
         ++dupes;
         return 1;
     }

@@ -16,7 +16,7 @@
 #include <assert.h>
 
 static void test_rules(CuTest *tc) {
-    test_cleanup();
+    test_setup();
     config_set("stealth.faction.other", NULL);
     CuAssertIntEquals(tc, true, rule_stealth_other());
     config_set("stealth.faction.other", "0");
@@ -37,7 +37,7 @@ static void test_otherfaction(CuTest *tc) {
     unit *u;
     faction *f;
 
-    test_cleanup();
+    test_setup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     f = test_create_faction(0);
     config_set("stealth.faction.other", "1");

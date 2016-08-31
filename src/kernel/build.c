@@ -130,13 +130,15 @@ static void destroy_road(unit * u, int nmax, struct order *ord)
             if (willdo == 0) {
                 /* TODO: error message */
             }
-            if (willdo > SHRT_MAX)
+            else if (willdo > SHRT_MAX)
                 road = 0;
             else
                 road = (short)(road - willdo);
             rsetroad(r, d, road);
-            ADDMSG(&u->faction->msgs, msg_message("destroy_road",
-                "unit from to", u, r, r2));
+            if (willdo > 0) {
+                ADDMSG(&u->faction->msgs, msg_message("destroy_road",
+                    "unit from to", u, r, r2));
+            }
         }
     }
 }
@@ -163,19 +165,17 @@ int destroy_cmd(unit * u, struct order *ord)
     init_order(ord);
     s = gettoken(token, sizeof(token));
 
-    if (findparam(s, u->faction->locale) == P_ROAD) {
-        destroy_road(u, INT_MAX, ord);
-        return 0;
-    }
-
     if (s && *s) {
         n = atoi((const char *)s);
         if (n <= 0) {
             n = INT_MAX;
         }
+        else {
+            s = gettoken(token, sizeof(token));
+        }
     }
 
-    if (getparam(u->faction->locale) == P_ROAD) {
+    if (isparam(s, u->faction->locale, P_ROAD)) {
         destroy_road(u, n, ord);
         return 0;
     }
@@ -640,7 +640,6 @@ message *msg_materials_required(unit * u, order * ord,
     if (multi <= 0 || multi == INT_MAX)
         multi = 1;
     for (c = 0; ctype && ctype->materials[c].number; ++c) {
-        // TODO: lots of alloc/dealloc calls here (make var_copy_resources take an array)
         resource *res = malloc(sizeof(resource));
         res->number = multi * ctype->materials[c].number / ctype->reqsize;
         res->type = ctype->materials[c].rtype;

@@ -21,7 +21,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifdef __cplusplus
 extern "C" {
 #endif
-    extern void register_names(void);
+
+    struct unit;
+    void register_names(void);
     const char *abkz(const char *s, char *buf, size_t size, size_t maxchars);
 
 #ifdef __cplusplus

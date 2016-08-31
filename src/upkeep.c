@@ -58,27 +58,28 @@ static void help_feed(unit * donor, unit * u, int *need_p)
     *need_p = need;
 }
 
+static const char *hunger_damage(const race *rc) {
+    const char * damage = get_param(rc->parameters, "hunger.damage");
+    if (!damage) {
+        damage = config_get("hunger.damage");
+    }
+    if (!damage) {
+        damage = "1d12+12";
+    }
+    return damage;
+}
+
 static bool hunger(int number, unit * u)
 {
     region *r = u->region;
     int dead = 0, hpsub = 0;
     int hp = u->hp / u->number;
-    static const char *damage = 0;
-    static const char *rcdamage = 0;
-    static const race *rc = 0;
+    const char *damage = 0;
 
-    if (!damage) {
-        damage = config_get("hunger.damage");
-        if (damage == NULL)
-            damage = "1d12+12";
-    }
-    if (rc != u_race(u)) {
-        rcdamage = get_param(u_race(u)->parameters, "hunger.damage");
-        rc = u_race(u);
-    }
+    damage = hunger_damage(u_race(u));
 
     while (number--) {
-        int dam = dice_rand(rcdamage ? rcdamage : damage);
+        int dam = dice_rand(damage);
         if (dam >= hp) {
             ++dead;
         }

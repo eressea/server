@@ -53,7 +53,7 @@ extern "C" {
 
     typedef enum {
         DEFENSE_BONUS,
-        CLOSE_COMBAT_ATTACK_BONUS,
+        CLOSE_COMBAT_ATTACK_BONUS, // TODO: only DEFENSE_BONUS is in use?
         RANGED_ATTACK_BONUS,
     } building_bonus;
 
@@ -75,7 +75,7 @@ extern "C" {
             const struct building * b, int size);
         void(*init) (struct building_type *);
         void(*age) (struct building *);
-        int(*protection) (struct building *, struct unit *, building_bonus);
+        int(*protection) (const struct building *, const struct unit *, building_bonus bonus);
         double(*taxes) (const struct building *, int size);
         struct attrib *attribs;
     } building_type;
@@ -163,6 +163,7 @@ extern "C" {
     bool buildingtype_exists(const struct region *r,
         const struct building_type *bt, bool working);
     bool building_is_active(const struct building *b);
+    bool is_building_type(const struct building_type *btype, const char *name);
     struct building *active_building(const struct unit *u, const struct building_type *btype);
 
     extern const char *buildingname(const struct building *b);

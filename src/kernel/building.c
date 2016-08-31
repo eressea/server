@@ -158,9 +158,7 @@ const char *buildingtype(const building_type * btype, const building * b, int bs
         s = btype->name(btype, b, bsize);
     }
     if (b && b->attribs) {
-        const struct building_type *bt_generic = bt_find("generic");
-
-        if (btype == bt_generic) {
+        if (is_building_type(btype, "generic")) {
             const attrib *a = a_find(b->attribs, &at_building_generic_type);
             if (a) {
                 s = (const char *)a->data.v;
@@ -322,9 +320,8 @@ const building_type *findbuildingtype(const char *name,
     return (const building_type *)type.v;
 }
 
-static int building_protection(building * b, unit * u, building_bonus bonus)
+static int building_protection(const building * b, const unit * u, building_bonus bonus)
 {
-
     int i = 0;
     int bsize = buildingeffsize(b, false);
     const construction *cons = b->type->construction;
@@ -350,17 +347,10 @@ static int building_protection(building * b, unit * u, building_bonus bonus)
     }
 }
 
-static int meropis_building_protection(building * b, unit * u)
-{
-    return 2;
-}
-
 void register_buildings(void)
 {
     register_function((pf_generic)building_protection,
         "building_protection");
-    register_function((pf_generic)meropis_building_protection,
-        "meropis_building_protection");
     register_function((pf_generic)init_smithy, "init_smithy");
     register_function((pf_generic)castle_name, "castle_name");
     register_function((pf_generic)castle_name_2, "castle_name_2");
@@ -398,15 +388,8 @@ building *new_building(const struct building_type * btype, region * r,
 {
     building **bptr = &r->buildings;
     building *b = (building *)calloc(1, sizeof(building));
-    static bool init_lighthouse = false;
-    static const struct building_type *bt_lighthouse = 0;
     const char *bname = 0;
     char buffer[32];
-
-    if (!init_lighthouse) {
-        bt_lighthouse = bt_find("lighthouse");
-        init_lighthouse = true;
-    }
 
     b->no = newcontainerid();
     bhash(b);
@@ -417,9 +400,7 @@ building *new_building(const struct building_type * btype, region * r,
         bptr = &(*bptr)->next;
     *bptr = b;
 
-    if (b->type == bt_lighthouse) {
-        r->flags |= RF_LIGHTHOUSE;
-    }
+    update_lighthouse(b);
     if (b->type->name) {
         bname = LOC(lang, buildingtype(btype, b, 0));
     }
@@ -465,6 +446,7 @@ void remove_building(building ** blist, building * b)
 
     /* Falls Karawanserei, Damm oder Tunnel einstürzen, wird die schon
      * gebaute Straße zur Hälfte vernichtet */
+    // TODO: caravan, tunnel, dam modularization ? is_building_type ?
     if (b->type == bt_caravan || b->type == bt_dam || b->type == bt_tunnel) {
         region *r = b->region;
         int d;
@@ -702,4 +684,9 @@ bool in_safe_building(unit *u1, unit *u2) {
         }
     }
     return false;
+}
+
+bool is_building_type(const struct building_type *btype, const char *name) {
+    assert(btype);
+    return name && strcmp(btype->_name, name)==0;
 }

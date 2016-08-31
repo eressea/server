@@ -1,8 +1,11 @@
 #include <platform.h>
 #include <kernel/config.h>
+
+#include <kernel/messages.h>
 #include "alchemy.h"
 #include "types.h"
 #include "build.h"
+#include "guard.h"
 #include "order.h"
 #include "unit.h"
 #include "building.h"
@@ -265,6 +268,120 @@ static void test_build_building_success(CuTest *tc) {
     teardown_build(&bf);
 }
 
+static void test_build_destroy_road(CuTest *tc)
+{
+    region *r, *r2;
+    faction *f;
+    unit *u;
+    order *ord;
+    message *m;
+
+    test_cleanup();
+    mt_register(mt_new_va("destroy_road", "unit:unit", "from:region", "to:region", 0));
+    r2 = test_create_region(1, 0, 0);
+    r = test_create_region(0, 0, 0);
+    rsetroad(r, D_EAST, 100);
+    u = test_create_unit(f = test_create_faction(0), r);
+    ord = create_order(K_DESTROY, f->locale, "%s %s", LOC(f->locale, parameters[P_ROAD]), LOC(f->locale, directions[D_EAST]));
+
+    CuAssertIntEquals(tc, 0, destroy_cmd(u, ord));
+    CuAssertIntEquals(tc, 100, rroad(r, D_EAST));
+    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "destroy_road"));
+
+    set_level(u, SK_ROAD_BUILDING, 1);
+    CuAssertIntEquals(tc, 0, destroy_cmd(u, ord));
+    CuAssertIntEquals(tc, 99, rroad(r, D_EAST));
+    CuAssertPtrNotNull(tc, m = test_find_messagetype(f->msgs, "destroy_road"));
+    CuAssertPtrEquals(tc, u, m->parameters[0].v);
+    CuAssertPtrEquals(tc, r, m->parameters[1].v);
+    CuAssertPtrEquals(tc, r2, m->parameters[2].v);
+
+    set_level(u, SK_ROAD_BUILDING, 4);
+    CuAssertIntEquals(tc, 0, destroy_cmd(u, ord));
+    CuAssertIntEquals(tc, 95, rroad(r, D_EAST));
+
+    scale_number(u, 4);
+    set_level(u, SK_ROAD_BUILDING, 2);
+    CuAssertIntEquals(tc, 0, destroy_cmd(u, ord));
+    CuAssertIntEquals(tc, 87, rroad(r, D_EAST));
+    test_cleanup();
+}
+
+unit *test_create_guard(region *r, faction *f, race *rc) {
+    unit *ug;
+
+    if (!rc) {
+        rc = test_create_race("guardian");
+        rc->flags |= RCF_UNARMEDGUARD;
+    }
+    if (!f) {
+        f = test_create_faction(rc);
+    }
+    ug = test_create_unit(f, r);
+    guard(ug, GUARD_TAX);
+
+    return ug;
+}
+
+static void test_build_destroy_road_guard(CuTest *tc)
+{
+    region *r;
+    faction *f;
+    unit *u, *ug;
+    order *ord;
+
+    test_cleanup();
+    test_create_region(1, 0, 0);
+    r = test_create_region(0, 0, 0);
+    rsetroad(r, D_EAST, 100);
+    ug = test_create_guard(r, 0, 0);
+    u = test_create_unit(f = test_create_faction(0), r);
+    ord = create_order(K_DESTROY, f->locale, "%s %s", LOC(f->locale, parameters[P_ROAD]), LOC(f->locale, directions[D_EAST]));
+
+    set_level(u, SK_ROAD_BUILDING, 1);
+    CuAssertIntEquals(tc, 0, destroy_cmd(u, ord));
+    CuAssertIntEquals(tc, 100, rroad(r, D_EAST));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error70"));
+    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "destroy_road"));
+
+    test_clear_messages(f);
+    guard(ug, GUARD_NONE);
+
+    CuAssertIntEquals(tc, 0, destroy_cmd(u, ord));
+    CuAssertIntEquals(tc, 99, rroad(r, D_EAST));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "error70"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "destroy_road"));
+
+    test_cleanup();
+}
+
+static void test_build_destroy_road_limit(CuTest *tc)
+{
+    region *r;
+    faction *f;
+    unit *u;
+    order *ord;
+
+    test_cleanup();
+    test_create_region(1, 0, 0);
+    r = test_create_region(0, 0, 0);
+    rsetroad(r, D_EAST, 100);
+    u = test_create_unit(f = test_create_faction(0), r);
+    ord = create_order(K_DESTROY, f->locale, "1 %s %s", LOC(f->locale, parameters[P_ROAD]), LOC(f->locale, directions[D_EAST]));
+
+    set_level(u, SK_ROAD_BUILDING, 1);
+    CuAssertIntEquals(tc, 0, destroy_cmd(u, ord));
+    CuAssertIntEquals(tc, 99, rroad(r, D_EAST));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "destroy_road"));
+
+    set_level(u, SK_ROAD_BUILDING, 4);
+    CuAssertIntEquals(tc, 0, destroy_cmd(u, ord));
+    CuAssertIntEquals(tc, 98, rroad(r, D_EAST));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "destroy_road"));
+
+    test_cleanup();
+}
+
 CuSuite *get_build_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -279,6 +396,9 @@ CuSuite *get_build_suite(void)
     SUITE_ADD_TEST(suite, test_build_building_success);
     SUITE_ADD_TEST(suite, test_build_building_with_golem);
     SUITE_ADD_TEST(suite, test_build_building_no_materials);
+    SUITE_ADD_TEST(suite, test_build_destroy_road);
+    SUITE_ADD_TEST(suite, test_build_destroy_road_limit);
+    SUITE_ADD_TEST(suite, test_build_destroy_road_guard);
     return suite;
 }
 

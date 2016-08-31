@@ -47,7 +47,7 @@ variant(*copy_arg) (variant), variant_type type)
     argtypes = atype;
 }
 
-static arg_type *find_argtype(const char *name)
+arg_type *find_argtype(const char *name)
 {
     arg_type *atype = argtypes;
     while (atype != NULL) {
@@ -83,7 +83,7 @@ message_type *mt_new(const char *name, const char *args[])
         mtype->pnames = NULL;
         mtype->types = NULL;
     }
-    if (args != NULL)
+    if (args != NULL) {
         for (i = 0; args[i]; ++i) {
             const char *x = args[i];
             const char *spos = strchr(x, ':');
@@ -102,6 +102,7 @@ message_type *mt_new(const char *name, const char *args[])
                 assert(mtype->types[i]);
             }
         }
+    }
     return mtype;
 }
 
