@@ -175,7 +175,7 @@ int destroy_cmd(unit * u, struct order *ord)
         }
     }
 
-    if (isparam(s, u->faction->locale, P_ROAD)) {
+    if (s && isparam(s, u->faction->locale, P_ROAD)) {
         destroy_road(u, n, ord);
         return 0;
     }
