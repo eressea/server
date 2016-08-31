@@ -5,8 +5,13 @@ while [ ! -d $ROOT/.git ]; do
 done
 
 [ -z "$BUILD" ] && BUILD=Debug
-
-[ -z "$JOBS" ] && [ "" != "which nproc" ] && JOBS=`nproc`
+if [ -z "$JOBS" ] ; then
+  if [ -e /usr/sbin/sysctl ]; then
+    JOBS=`sysctl -n hw.ncpu`
+  else
+    JOBS=`nproc`
+  fi
+fi
 DISTCC=`which distcc`
 if [ ! -z "$DISTCC" ] ; then
 JOBS=`distcc -j`
