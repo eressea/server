@@ -249,7 +249,10 @@ static void test_spawn_seaserpent(CuTest *tc) {
     region *r;
     unit *u;
     faction *f;
+    race *rc;
     test_cleanup();
+    rc = test_create_race("seaserpent");
+    rc->flags |= RCF_NPC;
     r = test_create_region(0, 0, 0);
     f = test_create_faction(0);
     u = spawn_seaserpent(r, f);
