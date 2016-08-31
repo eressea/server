@@ -20,6 +20,8 @@
 #include <platform.h>
 #include <kernel/config.h>
 
+#include "monsters.h"
+
 #include "economy.h"
 #include "chaos.h"
 #include "give.h"
@@ -883,7 +885,16 @@ static int nrand(int start, int sub)
     return res;
 }
 
-/** Drachen und Seeschlangen können entstehen */
+unit *spawn_seaserpent(region *r, faction *f) {
+    unit *u = create_unit(r, f, 1, get_race(RC_SEASERPENT), 0, NULL, NULL);
+    fset(u, UFL_ISNEW | UFL_MOVED);
+    equip_unit(u, get_equipment("monster_seaserpent"));
+    return u;
+}
+
+/** 
+ * Drachen und Seeschlangen können entstehen 
+ */
 void spawn_dragons(void)
 {
     region *r;
@@ -892,13 +903,12 @@ void spawn_dragons(void)
     for (r = regions; r; r = r->next) {
         unit *u;
 
-        if (fval(r->terrain, SEA_REGION) && rng_int() % 10000 < 1) {
-            u = create_unit(r, monsters, 1, get_race(RC_SEASERPENT), 0, NULL, NULL);
-            fset(u, UFL_ISNEW | UFL_MOVED);
-            equip_unit(u, get_equipment("monster_seaserpent"));
+        if (fval(r->terrain, SEA_REGION)) {
+            if (rng_int() % 10000 < 1) {
+                u = spawn_seaserpent(r, monsters);
+            }
         }
-
-        if ((r->terrain == newterrain(T_GLACIER)
+        else if ((r->terrain == newterrain(T_GLACIER)
             || r->terrain == newterrain(T_SWAMP)
             || r->terrain == newterrain(T_DESERT))
             && rng_int() % 10000 < (5 + 100 * chaosfactor(r))) {
