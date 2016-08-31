@@ -5354,7 +5354,7 @@ int sp_leaveastral(castorder * co)
         u = pa->param[n]->data.u;
 
         if (!ucontact(u, mage)) {
-            if (power > 10 && !pa->param[n]->flag == TARGET_RESISTS
+            if (power > 10 && !(pa->param[n]->flag == TARGET_RESISTS)
                 && can_survive(u, rt)) {
                 ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
                     "feedback_no_contact_no_resist", "target", u));
