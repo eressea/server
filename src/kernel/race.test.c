@@ -41,11 +41,20 @@ static void test_rc_defaults(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_rc_find(CuTest *tc) {
+    race *rc;
+    test_cleanup();
+    rc = test_create_race("hungryhippos");
+    CuAssertPtrEquals(tc, rc, (void *)rc_find("hungryhippos"));
+    test_cleanup();
+}
+
 CuSuite *get_race_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_rc_name);
     SUITE_ADD_TEST(suite, test_rc_defaults);
+    SUITE_ADD_TEST(suite, test_rc_find);
     return suite;
 }
 

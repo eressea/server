@@ -1,6 +1,7 @@
 #include <platform.h>
 #include "spells/shipcurse.h"
 #include "monster.h"
+#include "monsters.h"
 
 #include <kernel/equipment.h>
 #include <kernel/faction.h>
@@ -28,7 +29,6 @@ static int tolua_levitate_ship(lua_State * L)
 }
 
 extern void spawn_undead(void);
-extern void spawn_dragons(void);
 extern void plan_monsters(struct faction *f);
 
 static int tolua_planmonsters(lua_State * L)
