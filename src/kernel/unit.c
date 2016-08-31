@@ -470,7 +470,7 @@ const char *u_description(const unit * u, const struct locale *lang)
         return u->display;
     }
     else if (u_race(u)->describe) {
-        return u_race(u)->describe(u, lang);
+        return u_race(u)->describe(u->_race, lang);
     }
     return NULL;
 }
@@ -863,16 +863,15 @@ bool can_survive(const unit * u, const region * r)
     if ((fval(r->terrain, WALK_INTO) && (u_race(u)->flags & RCF_WALK))
         || (fval(r->terrain, SWIM_INTO) && (u_race(u)->flags & RCF_SWIM))
         || (fval(r->terrain, FLY_INTO) && (u_race(u)->flags & RCF_FLY))) {
-        static const curse_type *ctype = NULL;
 
         if (has_horses(u) && !fval(r->terrain, WALK_INTO))
             return false;
 
-        if (!ctype)
-            ctype = ct_find("holyground");
-        if (fval(u_race(u), RCF_UNDEAD) && curse_active(get_curse(r->attribs, ctype)))
-            return false;
-
+        if (r->attribs) {
+            const curse_type *ctype = ct_find("holyground");
+            if (fval(u_race(u), RCF_UNDEAD) && curse_active(get_curse(r->attribs, ctype)))
+                return false;
+        }
         return true;
     }
     return false;
@@ -1217,54 +1216,51 @@ static int item_modification(const unit * u, skill_t sk, int val)
 static int att_modification(const unit * u, skill_t sk)
 {
     double result = 0;
-    static bool init = false; // TODO: static variables are bad global state
-    static const curse_type *skillmod_ct, *gbdream_ct, *worse_ct;
-    curse *c;
 
-    if (!init) {
-        init = true;
-        skillmod_ct = ct_find("skillmod");
-        gbdream_ct = ct_find("gbdream");
-        worse_ct = ct_find("worse");
-    }
-
-    c = get_curse(u->attribs, worse_ct);
-    if (c != NULL)
-        result += curse_geteffect(c);
-    if (skillmod_ct) {
-        attrib *a = a_find(u->attribs, &at_curse);
-        while (a && a->type == &at_curse) {
-            curse *c = (curse *)a->data.v;
-            if (c->type == skillmod_ct && c->data.i == sk) {
-                result += curse_geteffect(c);
-                break;
+    if (u->attribs) {
+        curse *c;
+        const curse_type *skillmod_ct = ct_find("skillmod");
+        const curse_type *worse_ct = ct_find("worse");
+        c = get_curse(u->attribs, worse_ct);
+        if (c != NULL)
+            result += curse_geteffect(c);
+        if (skillmod_ct) {
+            attrib *a = a_find(u->attribs, &at_curse);
+            while (a && a->type == &at_curse) {
+                curse *c = (curse *)a->data.v;
+                if (c->type == skillmod_ct && c->data.i == sk) {
+                    result += curse_geteffect(c);
+                    break;
+                }
+                a = a->next;
             }
-            a = a->next;
         }
     }
-
     /* TODO hier kann nicht mit get/iscursed gearbeitet werden, da nur der
      * jeweils erste vom Typ C_GBDREAM zurueckgegen wird, wir aber alle
      * durchsuchen und aufaddieren muessen */
-    if (gbdream_ct && u->region) {
-        int bonus = 0, malus = 0;
-        attrib *a = a_find(u->region->attribs, &at_curse);
-        while (a && a->type == &at_curse) {
-            curse *c = (curse *)a->data.v;
+    if (u->region && u->region->attribs) {
+        const curse_type *gbdream_ct = ct_find("gbdream");
+        if (gbdream_ct) {
+            int bonus = 0, malus = 0;
+            attrib *a = a_find(u->region->attribs, &at_curse);
+            while (a && a->type == &at_curse) {
+                curse *c = (curse *)a->data.v;
 
-            if (curse_active(c) && c->type == gbdream_ct) {
-                int effect = curse_geteffect_int(c);
-                bool allied = alliedunit(c->magician, u->faction, HELP_GUARD);
-                if (allied) {
-                    if (effect > bonus) bonus = effect;
+                if (curse_active(c) && c->type == gbdream_ct) {
+                    int effect = curse_geteffect_int(c);
+                    bool allied = alliedunit(c->magician, u->faction, HELP_GUARD);
+                    if (allied) {
+                        if (effect > bonus) bonus = effect;
+                    }
+                    else {
+                        if (effect < malus) malus = effect;
+                    }
                 }
-                else {
-                    if (effect < malus) malus = effect;
-                }
+                a = a->next;
             }
-            a = a->next;
+            result = result + bonus + malus;
         }
-        result = result + bonus + malus;
     }
 
     return (int)result;
@@ -1393,15 +1389,12 @@ void default_name(const unit *u, char name[], int len) {
     const char * result;
     const struct locale * lang = u->faction ? u->faction->locale : default_locale;
     if (lang) {
-        static const char * prefix[MAXLOCALES];
-        int i = locale_index(lang);
-        /*if (!prefix[i]) {*/
-        prefix[i] = LOC(lang, "unitdefault");
-        if (!prefix[i]) {
-            prefix[i] = parameters[P_UNIT];
+        const char * prefix;
+        prefix = LOC(lang, "unitdefault");
+        if (!prefix) {
+            prefix= parameters[P_UNIT];
         }
-        /*}*/
-        result = prefix[i];
+        result = prefix;
     }
     else {
         result = parameters[P_UNIT];
@@ -1414,9 +1407,10 @@ void default_name(const unit *u, char name[], int len) {
 void name_unit(unit * u)
 {
     if (u_race(u)->generate_name) {
-        const char *gen_name = u_race(u)->generate_name(u);
+        char *gen_name = race_namegen(u_race(u), u);
         if (gen_name) {
-            unit_setname(u, gen_name);
+            free(u->_name);
+            u->_name = gen_name;
         }
         else {
             unit_setname(u, racename(u->faction->locale, u, u_race(u)));
@@ -1665,7 +1659,6 @@ int unit_max_hp(const unit * u)
 {
     int h;
     double p;
-    static const curse_type *heal_ct = NULL;
     int rule_stamina = config_get_int("rules.stamina", STAMINA_AFFECTS_HP);
     h = u_race(u)->hitpoints;
 
@@ -1675,9 +1668,8 @@ int unit_max_hp(const unit * u)
     }
 
     /* der healing curse veraendert die maximalen hp */
-    if (u->region) {
-        if (heal_ct == NULL)
-            heal_ct = ct_find("healingzone");
+    if (u->region && u->region->attribs) {
+        const curse_type *heal_ct = ct_find("healingzone");
         if (heal_ct) {
             curse *c = get_curse(u->region->attribs, heal_ct);
             if (c) {

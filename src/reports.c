@@ -265,16 +265,24 @@ static size_t buforder(char *buffer, size_t size, const order * ord, int mode)
  * \param viewer: the faction looking at the items
  */
 int
-report_items(const item * items, item * result, int size, const unit * owner,
-const faction * viewer)
+report_items(const unit *u, item * result, int size, const unit * owner,
+    const faction * viewer)
 {
-    const item *itm;
+    const item *itm, *items = u->items;
     int n = 0;                    /* number of results */
 
-    assert(owner == NULL || viewer != owner->faction
-        || !"not required for owner=viewer!");
+    assert(owner == NULL || viewer != owner->faction);
     assert(size);
 
+    if (u->attribs) {
+        const curse_type *itemcloak_ct = ct_find("itemcloak");
+        if (itemcloak_ct) {
+            curse * cu = get_curse(u->attribs, itemcloak_ct);
+            if (cu && curse_active(cu)) {
+                return 0;
+            }
+        }
+    }
     for (itm = items; itm; itm = itm->next) {
         item *ishow;
         const char *ic;
@@ -344,16 +352,13 @@ void
 report_building(const struct building *b, const char **name,
 const char **illusion)
 {
-    const struct building_type *bt_illusion;
-
     if (name) {
         *name = buildingtype(b->type, b, b->size);
     }
     if (illusion) {
         *illusion = NULL;
 
-        bt_illusion = bt_find("illusioncastle");
-        if (bt_illusion && b->type == bt_illusion) {
+        if (is_building_type(b->type, "illusioncastle")) {
             const attrib *a = a_find(b->attribs, &at_icastle);
             if (a != NULL) {
                 *illusion = buildingtype(icastle_type(a), b, b->size);
@@ -455,20 +460,11 @@ size_t size)
     const char *pzTmp, *str;
     building *b;
     bool isbattle = (bool)(mode == see_battle);
-    int telepath_see = 0;
-    item *itm;
-    item *show;
+    item *itm, *show = NULL;
     faction *fv = visible_faction(f, u);
     char *bufp = buf;
-    bool itemcloak = false;
-    const curse_type *itemcloak_ct = 0;
     int result = 0;
     item results[MAX_INVENTORY];
-
-    itemcloak_ct = ct_find("itemcloak");
-    if (itemcloak_ct) {
-        itemcloak = curse_active(get_curse(u->attribs, itemcloak_ct));
-    }
 
     bufp = STRLCPY(bufp, unitname(u), size);
 
@@ -553,7 +549,7 @@ size_t size)
     }
     /* status */
 
-    if (u->number && (u->faction == f || telepath_see || isbattle)) {
+    if (u->number && (u->faction == f || isbattle)) {
         const char *c = hp_status(u);
         c = c ? LOC(f->locale, c) : 0;
         bufp = STRLCPY(bufp, ", ", size);
@@ -586,7 +582,7 @@ size_t size)
     }
 
     dh = 0;
-    if (u->faction == f || telepath_see) {
+    if (u->faction == f) {
         skill *sv;
         for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
             size_t bytes = spskill(bufp, size, f->locale, u, sv, &dh, 1);
@@ -597,19 +593,15 @@ size_t size)
     }
 
     dh = 0;
-    if (f == u->faction || telepath_see || omniscient(f)) {
+    if (f == u->faction || omniscient(f)) {
         show = u->items;
     }
-    else if (!itemcloak && mode >= see_unit) {
-        int n = report_items(u->items, results, MAX_INVENTORY, u, f);
+    else if (mode >= see_unit) {
+        int n = report_items(u, results, MAX_INVENTORY, u, f);
         assert(n >= 0);
-        if (n > 0)
+        if (n > 0) {
             show = results;
-        else
-            show = NULL;
-    }
-    else {
-        show = NULL;
+        }
     }
     for (itm = show; itm; itm = itm->next) {
         const char *ic;
@@ -634,7 +626,7 @@ size_t size)
         }
     }
 
-    if (u->faction == f || telepath_see) {
+    if (u->faction == f) {
         spellbook *book = unit_get_spellbook(u);
 
         if (book) {
@@ -760,11 +752,6 @@ size_t size)
     }
     return dh;
 }
-
-/* TODO: telepath_see wird nicht berücksichtigt: Parteien mit
- * telepath_see sollten immer einzelne Einheiten zu sehen
- * bekommen, alles andere ist darstellungsteschnisch kompliziert.
- */
 
 size_t
 spskill(char *buffer, size_t size, const struct locale * lang,
@@ -1764,11 +1751,9 @@ f_regionid(const region * r, const faction * f, char *buffer, size_t size)
 
 static char *f_regionid_s(const region * r, const faction * f)
 {
-    static int i = 0;
-    static char bufs[4][NAMESIZE + 20]; // FIXME: static return value
-    char *buf = bufs[(++i) % 4];
+    static char buf[NAMESIZE + 20]; // FIXME: static return value
 
-    f_regionid(r, f, buf, NAMESIZE + 20);
+    f_regionid(r, f, buf, sizeof(buf));
     return buf;
 }
 
@@ -2175,26 +2160,6 @@ static void eval_int36(struct opstack **stack, const void *userdata)
 }
 
 /*** END MESSAGE RENDERING ***/
-
-/* - String Listen --------------------------------------------- */
-void addstrlist(strlist ** SP, const char *s)
-{
-    strlist *slist = malloc(sizeof(strlist));
-    slist->next = NULL;
-    slist->s = _strdup(s);
-    addlist(SP, slist);
-}
-
-void freestrlist(strlist * s)
-{
-    strlist *q, *p = s;
-    while (p) {
-        q = p->next;
-        free(p->s);
-        free(p);
-        p = q;
-    }
-}
 
 #include <util/nrmessage.h>
 

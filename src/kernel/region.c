@@ -146,23 +146,24 @@ int deathcount(const region * r)
 
 void deathcounts(region * r, int fallen)
 {
-    attrib *a;
-    static const curse_type *ctype = NULL;
+    attrib *a = NULL;
 
     if (fallen == 0)
         return;
-    if (!ctype)
-        ctype = ct_find("holyground");
-    if (ctype && curse_active(get_curse(r->attribs, ctype)))
-        return;
-
-    a = a_find(r->attribs, &at_deathcount);
-    if (!a)
+    if (r->attribs) {
+        const curse_type *ctype = ct_find("holyground");
+        if (ctype && curse_active(get_curse(r->attribs, ctype)))
+            return;
+        a = a_find(r->attribs, &at_deathcount);
+    }
+    if (!a) {
         a = a_add(&r->attribs, a_new(&at_deathcount));
+    }
     a->data.i += fallen;
 
-    if (a->data.i <= 0)
+    if (a->data.i <= 0) {
         a_remove(&r->attribs, a);
+    }
 }
 
 /* Moveblock wird zur Zeit nicht über Attribute, sondern ein Bitfeld

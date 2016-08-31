@@ -25,7 +25,7 @@ static void test_herbsearch(CuTest * tc)
     region *r;
     const item_type *itype;
 
-    test_cleanup();
+    test_setup();
     r = test_create_region(0, 0, 0);
     rc = rc_get_or_create("dragon");
     rc->flags |= RCF_UNARMEDGUARD;

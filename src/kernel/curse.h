@@ -304,7 +304,7 @@ extern "C" {
         const struct curse *c, int self);
     int curse_cansee(const struct curse *c, const struct faction *viewer, objtype_t typ, const void *obj, int self);
 #define is_cursed(a, id, id2) \
-  curse_active(get_curse(a, ct_find(oldcursename(id))))
+  (a && curse_active(get_curse(a, ct_find(oldcursename(id)))))
 #define get_curseeffect(a, id, id2) \
   curse_geteffect(get_curse(a, ct_find(oldcursename(id))))
 

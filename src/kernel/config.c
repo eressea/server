@@ -764,8 +764,7 @@ static const int wagetable[7][4] = {
 
 int cmp_wage(const struct building *b, const building * a)
 {
-    const struct building_type *bt_castle = bt_find("castle");
-    if (b->type == bt_castle) {
+    if (is_building_type(b->type, "castle")) {
         if (!a)
             return 1;
         if (b->size > a->size)
@@ -897,18 +896,9 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
 {
     building *b = largestbuilding(r, &cmp_wage, false);
     int esize = 0;
-    curse *c;
     double wage;
     attrib *a;
-    const building_type *artsculpture_type = bt_find("artsculpture");
-    static const curse_type *drought_ct, *blessedharvest_ct;
-    static bool init;
-
-    if (!init) {
-        init = true;
-        drought_ct = ct_find("drought");
-        blessedharvest_ct = ct_find("blessedharvest");
-    }
+    const struct curse_type *ctype;
 
     if (b != NULL) {
         /* TODO: this reveals imaginary castles */
@@ -937,13 +927,13 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
         }
         if (rule_blessed_harvest() == HARVEST_WORK) {
             /* E1 rules */
-            wage += curse_geteffect(get_curse(r->attribs, blessedharvest_ct));
+            wage += curse_geteffect(get_curse(r->attribs, ct_find("blessedharvest")));
         }
     }
 
     /* Artsculpture: Income +5 */
     for (b = r->buildings; b; b = b->next) {
-        if (b->type == artsculpture_type) {
+        if (is_building_type(b->type, "artsculpture")) {
             wage += 5;
         }
     }
@@ -954,8 +944,9 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
     }
 
     /* Bei einer Dürre verdient man nur noch ein Viertel  */
-    if (drought_ct) {
-        c = get_curse(r->attribs, drought_ct);
+    ctype = ct_find("drought");
+    if (ctype) {
+        curse *c = get_curse(r->attribs, ctype);
         if (curse_active(c))
             wage /= curse_geteffect(c);
     }

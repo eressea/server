@@ -24,13 +24,14 @@
 #include <util/bsdstring.h>
 #include <util/functions.h>
 #include <util/language.h>
+#include <util/lists.h>
 #include <util/message.h>
 #include <util/log.h>
 #include <util/rand.h>
+#include <util/assert.h>
 
 #include <CuTest.h>
 
-#include <assert.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
@@ -123,10 +124,43 @@ struct unit *test_create_unit(struct faction *f, struct region *r)
     return create_unit(r, f, 1, rc ? rc : rc_get_or_create("human"), 0, 0, 0);
 }
 
-void test_cleanup(void)
-{
-    int i;
+static void log_list(void *udata, int flags, const char *module, const char *format, va_list args) {
+    strlist **slp = (strlist **)udata;
+    addstrlist(slp, format);
+}
 
+struct log_t * test_log_start(int flags, strlist **slist) {
+    return log_create(flags, slist, log_list);
+}
+
+void test_log_stop(struct log_t *log, struct strlist *slist) {
+    freestrlist(slist);
+    log_destroy(log);
+}
+
+void test_log_stderr(int flags) {
+    static struct log_t *stderrlog;
+    if (flags) {
+        if (stderrlog) {
+            log_error("stderr logging is still active. did you call test_cleanup?");
+            log_destroy(stderrlog);
+        }
+        stderrlog = log_to_file(flags, stderr);
+    }
+    else {
+        if (stderrlog) {
+            log_destroy(stderrlog);
+        }
+        else {
+            log_warning("stderr logging is inactive. did you call test_cleanup twice?");
+        }
+        stderrlog = 0;
+    }
+
+}
+
+static void test_reset(void) {
+    int i;
     default_locale = 0;
     free_gamedata();
     free_terrains();
@@ -156,6 +190,17 @@ void test_cleanup(void)
     }
 
     random_source_reset();
+}
+
+void test_setup(void) {
+    test_log_stderr(LOG_CPERROR);
+    test_reset();
+}
+
+void test_cleanup(void)
+{
+    test_reset();
+    test_log_stderr(0);
 }
 
 terrain_type *
@@ -191,6 +236,7 @@ ship_type * test_create_shiptype(const char * name)
     stype->damage = 1;
     if (!stype->construction) {
         stype->construction = calloc(1, sizeof(construction));
+        assert_alloc(stype->construction);
         stype->construction->maxsize = 5;
         stype->construction->minskill = 1;
         stype->construction->reqsize = 1;
@@ -259,6 +305,7 @@ spell * test_create_spell(void)
     sp = create_spell("testspell", 0);
 
     sp->components = (spell_component *)calloc(4, sizeof(spell_component));
+    assert_alloc(sp->components);
     sp->components[0].amount = 1;
     sp->components[0].type = get_resourcetype(R_SILVER);
     sp->components[0].cost = SPC_FIX;
@@ -377,15 +424,28 @@ const char * test_get_messagetype(const message *msg) {
     return name;
 }
 
-struct message * test_find_messagetype(struct message_list *msgs, const char *name) {
+struct message * test_find_messagetype_ex(struct message_list *msgs, const char *name, struct message *prev)
+{
     struct mlist *ml;
     if (!msgs) return 0;
     for (ml = msgs->begin; ml; ml = ml->next) {
         if (strcmp(name, test_get_messagetype(ml->msg)) == 0) {
-            return ml->msg;
+            if (prev) {
+                if (ml->msg == prev) {
+                    prev = NULL;
+                }
+            }
+            else {
+                return ml->msg;
+            }
         }
     }
     return 0;
+}
+
+struct message * test_find_messagetype(struct message_list *msgs, const char *name)
+{
+    return test_find_messagetype_ex(msgs, name, NULL);
 }
 
 void test_clear_messages(faction *f) {

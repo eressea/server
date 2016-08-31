@@ -1,9 +1,11 @@
 #include <platform.h>
 
-#include <quicklist.h>
 #include <kernel/spell.h>
-#include <util/log.h>
 
+#include <util/log.h>
+#include <util/lists.h>
+
+#include <quicklist.h>
 #include <CuTest.h>
 #include <tests.h>
 
@@ -13,39 +15,58 @@ static void test_create_a_spell(CuTest * tc)
 {
     spell * sp;
 
-    test_cleanup();
+    test_setup();
     CuAssertPtrEquals(tc, 0, spells);
     CuAssertPtrEquals(tc, 0, find_spell("testspell"));
 
     sp = create_spell("testspell", 0);
     CuAssertPtrEquals(tc, sp, find_spell("testspell"));
     CuAssertPtrNotNull(tc, spells);
+    test_cleanup();
 }
 
 static void test_create_duplicate_spell(CuTest * tc)
 {
     spell *sp;
-    /* FIXME: this test emits ERROR messages (duplicate spells), inject a logger to verify that */
+    struct log_t *log;
+    strlist *sl = 0;
 
-    test_cleanup();
+    test_setup();
+    test_log_stderr(0);
+    log = test_log_start(LOG_CPERROR, &sl);
+
     CuAssertPtrEquals(tc, 0, find_spell("testspell"));
 
     sp = create_spell("testspell", 0);
     CuAssertPtrEquals(tc, 0, create_spell("testspell", 0));
+    CuAssertPtrNotNull(tc, sl);
+    CuAssertStrEquals(tc, "create_spell: duplicate name '%s'", sl->s);
+    CuAssertPtrEquals(tc, 0, sl->next);
     CuAssertPtrEquals(tc, sp, find_spell("testspell"));
+    test_log_stop(log, sl);
+    test_cleanup();
 }
 
 static void test_create_spell_with_id(CuTest * tc)
 {
     spell *sp;
-    /* FIXME: this test emits ERROR messages (duplicate spells), inject a logger to verify that */
+    struct log_t *log;
+    strlist *sl = 0;
 
-    test_cleanup();
+    test_setup();
+    test_log_stderr(0);
+    log = test_log_start(LOG_CPERROR, &sl);
+
     CuAssertPtrEquals(tc, 0, find_spellbyid(42));
     sp = create_spell("testspell", 42);
     CuAssertPtrEquals(tc, sp, find_spellbyid(42));
     CuAssertPtrEquals(tc, 0, create_spell("testspell", 47));
     CuAssertPtrEquals(tc, 0, find_spellbyid(47));
+    CuAssertPtrNotNull(tc, sl);
+    CuAssertStrEquals(tc, "create_spell: duplicate name '%s'", sl->s);
+    CuAssertPtrEquals(tc, 0, sl->next);
+    test_log_stop(log, sl);
+    test_cleanup();
 }
 
 CuSuite *get_spell_suite(void)

@@ -58,6 +58,7 @@
 #include <races/races.h>
 
 /* util includes */
+#include <util/assert.h>
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/event.h>
@@ -80,7 +81,6 @@
 #include <storage.h>
 
 /* libc includes */
-#include <assert.h>
 #include <ctype.h>
 #include <math.h>
 #include <stdio.h>
@@ -969,7 +969,7 @@ static int sp_blessstonecircle(castorder * co)
 
     b = p->param[0]->data.b;
 
-    if (b->type != bt_find("stonecircle")) {
+    if (!is_building_type(b->type, "stonecircle")) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "error_notstonecircle", "building", b));
         return 0;
@@ -1263,6 +1263,7 @@ add_ironweapon(const struct item_type *type, const struct item_type *rusty,
 float chance)
 {
     iron_weapon *iweapon = malloc(sizeof(iron_weapon));
+    assert_alloc(iweapon);
     iweapon->type = type;
     iweapon->rusty = rusty;
     iweapon->chance = chance;
@@ -2011,7 +2012,7 @@ static int sp_treewalkexit(castorder * co)
  */
 static int sp_holyground(castorder * co)
 {
-    static const curse_type *ctype = NULL;
+    const curse_type *ctype = NULL;
     region *r = co_get_region(co);
     unit *mage = co->magician.u;
     int cast_level = co->level;
@@ -2020,9 +2021,7 @@ static int sp_holyground(castorder * co)
     report_spell(mage, r, msg);
     msg_release(msg);
 
-    if (!ctype) {
-        ctype = ct_find("holyground");
-    }
+    ctype = ct_find("holyground");
     create_curse(mage, &r->attribs, ctype, power * power, 1, zero_effect, 0);
 
     a_removeall(&r->attribs, &at_deathcount);
@@ -2053,7 +2052,7 @@ static int sp_homestone(castorder * co)
     double force = co->force;
     double effect;
     message *msg;
-    if (!mage->building || mage->building->type != bt_find("castle")) {
+    if (!mage->building || !is_building_type(mage->building->type, "castle")) {
         cmistake(mage, co->order, 197, MSG_MAGIC);
         return 0;
     }
@@ -3205,15 +3204,14 @@ static int sp_magicboost(castorder * co)
     double power = co->force;
     double effect;
     trigger *tsummon;
-    static const curse_type *ct_auraboost;
-    static const curse_type *ct_magicboost;
+    const curse_type *ct_auraboost;
+    const curse_type *ct_magicboost;
 
-    if (!ct_auraboost) {
-        ct_auraboost = ct_find("auraboost");
-        ct_magicboost = ct_find("magicboost");
-        assert(ct_auraboost != NULL);
-        assert(ct_magicboost != NULL);
-    }
+    ct_auraboost = ct_find("auraboost");
+    ct_magicboost = ct_find("magicboost");
+    assert(ct_auraboost != NULL);
+    assert(ct_magicboost != NULL);
+
     /* fehler, wenn schon ein boost */
     if (is_cursed(mage->attribs, C_MBOOST, 0)) {
         report_failure(mage, co->order);
@@ -5973,8 +5971,8 @@ int sp_movecastle(castorder * co)
         u = unext;
     }
 
-    if ((b->type == bt_find("caravan") || b->type == bt_find("dam")
-        || b->type == bt_find("tunnel"))) {
+    if ((is_building_type(b->type, "caravan") || is_building_type(b->type, "dam")
+        || is_building_type(b->type, "tunnel"))) {
         direction_t d;
         for (d = 0; d != MAXDIRECTIONS; ++d) {
             if (rroad(r, d)) {

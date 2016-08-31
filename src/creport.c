@@ -742,13 +742,10 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
     const char *str;
     const item_type *lasttype;
     int pr;
-    item *itm, *show;
+    item *itm, *show = NULL;
     building *b;
     const char *pzTmp;
     skill *sv;
-    bool itemcloak = false;
-    static const curse_type *itemcloak_ct = 0;
-    static bool init = false;
     item result[MAX_INVENTORY];
     const faction *sf;
     const char *prefix;
@@ -757,15 +754,6 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
     assert(u->region == r); // TODO: if this holds true, then why did we pass in r?
     if (fval(u_race(u), RCF_INVISIBLE))
         return;
-
-    if (!init) {
-        init = true;
-        itemcloak_ct = ct_find("itemcloak");
-    }
-    if (itemcloak_ct != NULL) {
-        curse * cu = get_curse(u->attribs, itemcloak_ct);
-        itemcloak = cu && curse_active(cu);
-    }
 
     stream_printf(out, "EINHEIT %d\n", u->no);
     stream_printf(out, "\"%s\";Name\n", unit_getname(u));
@@ -970,16 +958,14 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
     if (f == u->faction || omniscient(f)) {
         show = u->items;
     }
-    else if (!itemcloak && mode >= see_unit) {
-        int n = report_items(u->items, result, MAX_INVENTORY, u, f);
-        assert(n >= 0);
-        if (n > 0)
-            show = result;
-        else
-            show = NULL;
-    }
     else {
-        show = NULL;
+        if (mode >= see_unit) {
+            int n = report_items(u, result, MAX_INVENTORY, u, f);
+            assert(n >= 0);
+            if (n > 0) {
+                show = result;
+            }
+        }
     }
     lasttype = NULL;
     for (itm = show; itm; itm = itm->next) {

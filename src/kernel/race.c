@@ -303,19 +303,17 @@ variant read_race_reference(struct storage *store)
     return result;
 }
 
-/** Returns the English name of the race, which is what the database uses.
-*/
-const char *dbrace(const struct race *rc)
-{
-    static char zText[32]; // FIXME: static return value
-    char *zPtr = zText;
-
-    /* the english names are all in ASCII, so we don't need to worry about UTF8 */
-    strlcpy(zText, (const char *)LOC(get_locale("en"), rc_name_s(rc, NAME_SINGULAR)), sizeof(zText));
-    while (*zPtr) {
-        *zPtr = (char)(toupper(*zPtr));
-        ++zPtr;
-    }
-    return zText;
+void register_race_description_function(race_desc_func func, const char *name) {
+    register_function((pf_generic)func, name);
 }
 
+void register_race_name_function(race_name_func func, const char *name) {
+    register_function((pf_generic)func, name);
+}
+
+char * race_namegen(const struct race *rc, struct unit *u) {
+    if (rc->generate_name) {
+        rc->generate_name(u);
+    }
+    return NULL;
+}

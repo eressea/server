@@ -8090,27 +8090,6 @@
     <text locale="en">"The plank of $ship($ship) are inscribed with strange runes. ($int36($id))"</text>
   </message>
 
-  <message name="phoenixcompass_confusion" section="magic">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-    </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Kompassnadel springt wild hin und her und es lässt sich keine Richtung erkennen."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The needle jumps wildly and there is no specific direction recognizable."</text>
-  </message>
-  
-  <message name="phoenixcompass_success" section="magic">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-      <arg name="dir" type="int"/>
-    </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Kompassnadel zeigt nach $direction($dir)."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The needle points $direction($dir)."</text>
-  </message>
-
   <message name="disrupt_astral" section="magic">
     <type>
       <arg name="unit" type="unit"/>

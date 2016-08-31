@@ -16,11 +16,12 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#include <stdlib.h>
-#include <assert.h>
-
 #include <platform.h>
 #include "lists.h"
+
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
 
 typedef struct void_list {
     struct void_list *next;
@@ -120,4 +121,23 @@ unsigned int listlen(void *l)
 
     for (p = (void_list *)l, i = 0; p; p = p->next, i++);
     return i;
+}
+/* - String Listen --------------------------------------------- */
+void addstrlist(strlist ** SP, const char *s)
+{
+    strlist *slist = malloc(sizeof(strlist));
+    slist->next = NULL;
+    slist->s = _strdup(s);
+    addlist(SP, slist);
+}
+
+void freestrlist(strlist * s)
+{
+    strlist *q, *p = s;
+    while (p) {
+        q = p->next;
+        free(p->s);
+        free(p);
+        p = q;
+    }
 }

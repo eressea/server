@@ -19,7 +19,7 @@ void test_upkeep_default(CuTest * tc)
     faction *f1, *f2;
     const item_type *i_silver;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
 
     i_silver = it_find("money");
@@ -50,7 +50,7 @@ void test_upkeep_hunger_damage(CuTest * tc)
     faction *f1;
     const item_type *i_silver;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
 
     i_silver = it_find("money");
@@ -75,7 +75,7 @@ void test_upkeep_from_pool(CuTest * tc)
     unit *u1, *u2;
     const item_type *i_silver;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
 
     i_silver = it_find("money");
@@ -108,7 +108,7 @@ void test_upkeep_from_friend(CuTest * tc)
     faction *f1, *f2;
     const item_type *i_silver;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
 
     i_silver = it_find("money");
@@ -142,7 +142,7 @@ void test_upkeep_free(CuTest * tc)
     unit *u;
     const item_type *i_silver;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
 
     i_silver = it_find("money");

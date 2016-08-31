@@ -111,7 +111,9 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(messages);
     /* gamecode */
     ADD_SUITE(prefix);
+    ADD_SUITE(names);
     ADD_SUITE(battle);
+    ADD_SUITE(volcano);
     ADD_SUITE(donations);
     ADD_SUITE(travelthru);
     ADD_SUITE(economy);
@@ -156,7 +158,6 @@ int RunAllTests(int argc, char *argv[])
 }
 
 int main(int argc, char ** argv) {
-    log_to_file(LOG_CPERROR, stderr);
     ++argv;
     --argc;
     if (argc > 0 && strcmp("--list", argv[0]) == 0) {

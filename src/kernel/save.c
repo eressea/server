@@ -172,9 +172,9 @@ static unit *unitorders(FILE * F, int enc, struct faction *f)
 
             if (s[0]) {
                 if (s[0] != '@') {
-                    char token[128];
+                    char token[64];
                     const char *stok = s;
-                    stok = parse_token(&stok, token, 64); // FIXME: use sizeof, but parse_token overwrites the buffer
+                    stok = parse_token(&stok, token, sizeof(token)); 
 
                     if (stok) {
                         bool quit = false;
@@ -699,6 +699,7 @@ void write_attribs(storage *store, attrib *alist, const void *owner)
 unit *read_unit(struct gamedata *data)
 {
     unit *u;
+    const race *rc;
     int number, n, p;
     order **orderp;
     char obuf[DISPLAYSIZE];
@@ -760,7 +761,9 @@ unit *read_unit(struct gamedata *data)
     u->age = (short)n;
 
     READ_TOK(data->store, rname, sizeof(rname));
-    u_setrace(u, rc_find(rname));
+    rc = rc_find(rname);
+    assert(rc);
+    u_setrace(u, rc);
 
     READ_TOK(data->store, rname, sizeof(rname));
     if (rname[0] && skill_enabled(SK_STEALTH))
@@ -768,8 +771,8 @@ unit *read_unit(struct gamedata *data)
     else
         u->irace = NULL;
 
-    if (u_race(u)->describe) {
-        const char *rcdisp = u_race(u)->describe(u, u->faction->locale);
+    if (rc->describe) {
+        const char *rcdisp = rc->describe(rc, u->faction->locale);
         if (u->display && rcdisp) {
             /* see if the data file contains old descriptions */
             if (strcmp(rcdisp, u->display) == 0) {

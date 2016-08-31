@@ -1,4 +1,4 @@
-/* 
+/*
  +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  |                   |  Enno Rehling <enno@eressea.de>
  | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
@@ -16,9 +16,9 @@
 #include "bsdstring.h"
 #include "critbit.h"
 #include "log.h"
+#include "assert.h"
 
-/* libc includes */
-#include <assert.h>
+ /* libc includes */
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
@@ -48,6 +48,7 @@ void opstack_push(opstack ** stackp, variant data)
     opstack *stack = *stackp;
     if (stack == NULL) {
         stack = (opstack *)malloc(sizeof(opstack));
+        assert_alloc(stack);
         stack->size = 2;
         stack->begin = malloc(sizeof(variant) * stack->size);
         stack->top = stack->begin;
@@ -58,10 +59,7 @@ void opstack_push(opstack ** stackp, variant data)
         void *tmp;
         stack->size += stack->size;
         tmp = realloc(stack->begin, sizeof(variant) * stack->size);
-        if (!tmp) {
-            log_error("realloc out of memory");
-            abort();
-        }
+        assert_alloc(tmp);
         stack->begin = (variant *)tmp;
         stack->top = stack->begin + pos;
     }

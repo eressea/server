@@ -33,7 +33,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 double normalvariate(double mu, double sigma)
 {
-    static const double NV_MAGICCONST = 1.7155277699214135;       /* STATIC_CONST: a constant */
+    static const double NV_MAGICCONST = 1.7155277699214135;
     double z;
     for (;;) {
         double u1 = rng_double();

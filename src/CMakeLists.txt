@@ -111,6 +111,7 @@ set (ERESSEA_SRC
   morale.c
   monster.c
   randenc.c
+  volcano.c
   chaos.c
   report.c
   spy.c
@@ -183,6 +184,7 @@ target_link_libraries(eressea
 
 set(TESTS_SRC
   monsters.test.c
+  names.test.c
   donations.test.c
   wormhole.test.c
   alchemy.test.c
@@ -191,6 +193,7 @@ set(TESTS_SRC
   battle.test.c
   vortex.test.c
   tests.test.c
+  volcano.test.c
   reports.test.c
   seen.test.c
   travelthru.test.c

@@ -1,3 +1,4 @@
+#pragma once
 /*
 Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
@@ -16,14 +17,17 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#ifndef H_ITM_PHOENIXCOMPASS
-#define H_ITM_PHOENIXCOMPASS
+#ifndef H_GC_VOLCANO
+#define H_GC_VOLCANO
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-    extern void register_phoenixcompass(void);
+    struct region;
 
+    void volcano_outbreak(struct region * r, struct region *rn);
+    void volcano_update(void);
+    
 #ifdef __cplusplus
 }
 #endif

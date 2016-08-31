@@ -107,7 +107,7 @@ extern "C" {
     void view_neighbours(struct seen_region **seen, struct region * r, struct faction * f);
     int report_resources(const struct seen_region *sr,
     struct resource_report *result, int size, const struct faction *viewer);
-    int report_items(const struct item *items, struct item *result, int size,
+    int report_items(const struct unit *u, struct item *result, int size,
         const struct unit *owner, const struct faction *viewer);
     void report_item(const struct unit *owner, const struct item *i,
         const struct faction *viewer, const char **name, const char **basename,
@@ -121,14 +121,7 @@ extern "C" {
     size_t f_regionid(const struct region *r, const struct faction *f,
         char *buffer, size_t size);
 
-    typedef struct strlist {
-        struct strlist *next;
-        char *s;
-    } strlist;
-
-    void addstrlist(strlist ** SP, const char *s);
-    void freestrlist(strlist * s);
-    void split_paragraph(strlist ** SP, const char *s, unsigned int indent, unsigned int width, char mark);
+    void split_paragraph(struct strlist ** SP, const char *s, unsigned int indent, unsigned int width, char mark);
 
     int stream_printf(struct stream * out, const char *format, ...);
 
