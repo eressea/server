@@ -97,7 +97,6 @@ void log_rotate(const char *filename, int maxindex)
     assert(strlen(filename) < sizeof(buffer[0]) - 4);
 
     sprintf(buffer[dst], "%s.%d", filename, maxindex);
-    /* make sure we don't overwrite an existing file (hard links) */
     if (remove(buffer[dst]) != 0) {
         if (errno != ENOENT) {
             fprintf(stderr, "log rotate %s: %d %s", buffer[dst], errno, strerror(errno));

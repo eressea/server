@@ -32,7 +32,7 @@ static void setup_piracy(void) {
 }
 
 static void setup_pirate(unit **pirate, int p_r_flags, int p_rc_flags, const char *p_shiptype,
-    order **ord, unit **victim, int v_r_flags, const char *v_shiptype) {
+    unit **victim, int v_r_flags, const char *v_shiptype) {
     terrain_type *vterrain;
     ship_type *st_boat = NULL;
     race *rc;
@@ -67,16 +67,13 @@ static void setup_pirate(unit **pirate, int p_r_flags, int p_rc_flags, const cha
     }
 
     f->locale = get_or_create_locale("de");
-    *ord = create_order(K_PIRACY, f->locale, "%s", itoa36((*victim)->faction->no));
-    assert(*ord);
-
+    (*pirate)->thisorder = create_order(K_PIRACY, f->locale, "%s", itoa36((*victim)->faction->no));
 }
 
 static void test_piracy_cmd(CuTest * tc) {
     faction *f;
     region *r;
     unit *u, *u2;
-    order *ord;
     terrain_type *t_ocean;
     ship_type *st_boat;
 
@@ -93,10 +90,9 @@ static void test_piracy_cmd(CuTest * tc) {
     u_set_ship(u, test_create_ship(u->region, st_boat));
     assert(f && u);
     f->locale = get_or_create_locale("de");
-    ord = create_order(K_PIRACY, f->locale, "%s", itoa36(u2->faction->no));
-    assert(ord);
+    u->thisorder = create_order(K_PIRACY, f->locale, "%s", itoa36(u2->faction->no));
 
-    piracy_cmd(u, ord);
+    piracy_cmd(u);
     CuAssertPtrEquals(tc, 0, u->thisorder);
     CuAssertTrue(tc, u->region != r);
     CuAssertPtrEquals(tc, u2->region, u->region);
@@ -104,7 +100,6 @@ static void test_piracy_cmd(CuTest * tc) {
     CuAssertPtrNotNullMsg(tc, "successful PIRACY sets attribute", r->attribs); // FIXME: this is testing implementation, not interface
     CuAssertPtrNotNullMsg(tc, "successful PIRACY message", test_find_messagetype(f->msgs, "piratesawvictim"));
     CuAssertPtrNotNullMsg(tc, "successful PIRACY movement", test_find_messagetype(f->msgs, "shipsail"));
-    free_order(ord);
 
     test_cleanup();
 }
@@ -113,7 +108,6 @@ static void test_piracy_cmd_errors(CuTest * tc) {
     race *r;
     faction *f;
     unit *u, *u2;
-    order *ord;
     ship_type *st_boat;
 
     test_cleanup();
@@ -123,15 +117,15 @@ static void test_piracy_cmd_errors(CuTest * tc) {
     r = test_create_race("pirates");
     u = test_create_unit(f = test_create_faction(r), test_create_region(0, 0, get_or_create_terrain("ocean")));
     f->locale = get_or_create_locale("de");
-    ord = create_order(K_PIRACY, f->locale, "");
-    assert(u && ord);
+    u->thisorder = create_order(K_PIRACY, f->locale, "");
+    assert(u && u->thisorder);
 
-    piracy_cmd(u, ord);
+    piracy_cmd(u);
     CuAssertPtrNotNullMsg(tc, "must be on a ship for PIRACY", test_find_messagetype(f->msgs, "error144"));
 
     test_clear_messages(f);
     fset(r, RCF_SWIM);
-    piracy_cmd(u, ord);
+    piracy_cmd(u);
     CuAssertPtrEquals_Msg(tc, "swimmers are pirates", 0, test_find_messagetype(f->msgs, "error144"));
     CuAssertPtrEquals_Msg(tc, "swimmers are pirates", 0, test_find_messagetype(f->msgs, "error146"));
     freset(r, RCF_SWIM);
@@ -146,40 +140,37 @@ static void test_piracy_cmd_errors(CuTest * tc) {
     u_set_ship(u2, u->ship);
 
     test_clear_messages(f);
-    piracy_cmd(u2, ord);
+    piracy_cmd(u2);
     CuAssertPtrNotNullMsg(tc, "must be owner for PIRACY", test_find_messagetype(f->msgs, "error146"));
 
     test_clear_messages(f);
-    piracy_cmd(u, ord);
+    piracy_cmd(u);
     CuAssertPtrNotNullMsg(tc, "must specify target for PIRACY", test_find_messagetype(f->msgs, "piratenovictim"));
-    free_order(ord);
+    CuAssertPtrNotNull(tc, u->thisorder);
 
     test_cleanup();
 }
 
 static void test_piracy_cmd_walking(CuTest * tc) {
     unit *pirate, *victim;
-    order *ord;
     region *r;
 
     test_cleanup();
 
-    setup_pirate(&pirate, 0, 0, NULL, &ord, &victim, SWIM_INTO | SEA_REGION, "boat");
+    setup_pirate(&pirate, 0, 0, NULL, &victim, SWIM_INTO | SEA_REGION, "boat");
     /* fset(rc, RCF_SWIM); */
     r = pirate->region;
 
-    piracy_cmd(pirate, ord);
-    CuAssertPtrEquals(tc, 0, pirate->thisorder);
+    piracy_cmd(pirate);
+    CuAssertPtrNotNull(tc, pirate->thisorder);
     CuAssertTrue(tc, pirate->region == r);
     CuAssertPtrNotNullMsg(tc, "successful PIRACY message", test_find_messagetype(pirate->faction->msgs, "error144"));
-    free_order(ord);
 
     test_cleanup();
 }
 
 static void test_piracy_cmd_land_to_land(CuTest * tc) {
     unit *u;
-    order *ord;
     region *r;
     faction *f;
     int target;
@@ -205,34 +196,30 @@ static void test_piracy_cmd_land_to_land(CuTest * tc) {
     u = test_create_unit(f, r);
     u->ship = test_create_ship(r, stype);
     set_level(u, SK_SAILING, u->ship->type->sumskill);
-    ord = create_order(K_PIRACY, f->locale, "%s", itoa36(target));
+    u->thisorder = create_order(K_PIRACY, f->locale, "%s", itoa36(target));
 
-    piracy_cmd(u, ord);
+    piracy_cmd(u);
     CuAssertPtrEquals(tc, 0, u->thisorder);
     CuAssertPtrEquals(tc, r, u->region);
-    // TODO check message
-    free_order(ord);
 
     test_cleanup();
 }
 
 static void test_piracy_cmd_swimmer(CuTest * tc) {
     unit *pirate, *victim;
-    order *ord;
     region *r;
 
     test_cleanup();
 
-    setup_pirate(&pirate, 0, RCF_SWIM, NULL, &ord, &victim, SWIM_INTO | SEA_REGION, "boat");
+    setup_pirate(&pirate, 0, RCF_SWIM, NULL, &victim, SWIM_INTO | SEA_REGION, "boat");
     r = pirate->region;
 
-    piracy_cmd(pirate, ord);
+    piracy_cmd(pirate);
     CuAssertPtrEquals(tc, 0, pirate->thisorder);
     CuAssertTrue(tc, pirate->region != r);
     CuAssertPtrEquals(tc, victim->region, pirate->region);
     CuAssertPtrNotNullMsg(tc, "successful PIRACY message", test_find_messagetype(pirate->faction->msgs, "piratesawvictim"));
     CuAssertPtrNotNullMsg(tc, "successful PIRACY movement", test_find_messagetype(pirate->faction->msgs, "travel"));
-    free_order(ord);
 
     test_cleanup();
 }
