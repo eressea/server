@@ -115,8 +115,9 @@ direction_t find_piracy_target(unit *u, int *il) {
     return NODIRECTION;
 }
 
-void piracy_cmd(unit * u, order *ord)
+void piracy_cmd(unit * u)
 {
+    order *ord;
     region *r = u->region;
     ship *sh = u->ship, *sh2;
     direction_t target_dir;
@@ -127,11 +128,11 @@ void piracy_cmd(unit * u, order *ord)
     int saff = 0;
     int *il;
 
-    if (!validate_pirate(u, ord)) {
+    if (!validate_pirate(u, u->thisorder)) {
         return;
     }
 
-    il = parse_ids(ord);
+    il = parse_ids(u->thisorder);
     /* Feststellen, ob schon ein anderer alliierter Pirat ein
     * Ziel gefunden hat. */
 
@@ -201,11 +202,12 @@ void piracy_cmd(unit * u, order *ord)
         "ship unit region dir", sh, u, r, target_dir));
 
     /* Befehl konstruieren */
-    set_order(&u->thisorder, create_order(K_MOVE, u->faction->locale, "%s",
-        LOC(u->faction->locale, directions[target_dir])));
+    // TODO: why change u->thisorder?
+    // FIXME: when u->thisorder == ord, set_order calls free, destroys both.
+    ord = create_order(K_MOVE, u->faction->locale, "%s", LOC(u->faction->locale, directions[target_dir]));
 
     /* Bewegung ausführen */
-    init_order(u->thisorder);
+    init_order(ord);
     move_cmd(u, ord);
 }
 
