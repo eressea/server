@@ -49,7 +49,7 @@ static const char *describe_race(const race * rc, const struct locale *lang)
 {
     char zText[32];
     sprintf(zText, "describe_%s", rc->_name);
-    return LOC(lang, zText);
+    return locale_getstring(lang, zText);
 }
 
 static void count_particles(const char *monster, int *num_prefix, int *num_name, int *num_postfix) 

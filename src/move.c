@@ -2487,7 +2487,7 @@ static void move_pirates(void)
             unit *u = *up;
 
             if (!fval(u, UFL_NOTMOVING) && getkeyword(u->thisorder) == K_PIRACY) {
-                piracy_cmd(u, u->thisorder);
+                piracy_cmd(u);
                 fset(u, UFL_LONGACTION | UFL_NOTMOVING);
             }
 

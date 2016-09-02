@@ -4439,6 +4439,10 @@
       <text locale="de">Heimstein</text>
       <text locale="en">Homestone</text>
     </string>
+    <string name="nocostbuilding">
+      <text locale="de">Mauern der Ewigkeit</text>
+      <text locale="en">Eternal Walls</text>
+    </string>
     <string name="nodrift">
       <text locale="de">Wasserelementar</text>
       <text locale="en">Water Elemental</text>
