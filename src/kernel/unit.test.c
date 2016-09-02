@@ -387,10 +387,25 @@ static void test_limited_skills(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_unit_description(CuTest *tc) {
+    race *rc;
+    unit *u;
+    test_setup();
+    rc = test_create_race("hodor");
+    u = test_create_unit(test_create_faction(rc), test_create_region(0,0,0));
+    CuAssertPtrEquals(tc, 0, u->display);
+    CuAssertStrEquals(tc, 0, u_description(u, u->faction->locale));
+    u->display = _strdup("Hodor");
+    CuAssertStrEquals(tc, "Hodor", u_description(u, NULL));
+    CuAssertStrEquals(tc, "Hodor", u_description(u, u->faction->locale));
+    test_cleanup();
+}
+
 CuSuite *get_unit_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_scale_number);
+    SUITE_ADD_TEST(suite, test_unit_description);
     SUITE_ADD_TEST(suite, test_unit_name);
     SUITE_ADD_TEST(suite, test_unit_name_from_race);
     SUITE_ADD_TEST(suite, test_update_monster_name);
