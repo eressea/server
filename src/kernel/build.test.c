@@ -382,6 +382,18 @@ static void test_build_destroy_road_limit(CuTest *tc)
     test_cleanup();
 }
 
+static void test_build_destroy_cmd(CuTest *tc) {
+    unit *u;
+    faction *f;
+
+    test_setup();
+    u = test_create_unit(f = test_create_faction(0), test_create_region(0, 0, 0));
+    u->thisorder = create_order(K_DESTROY, f->locale, NULL);
+    CuAssertIntEquals(tc, 138, destroy_cmd(u, u->thisorder));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error138"));
+    test_cleanup();
+}
+
 CuSuite *get_build_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -396,6 +408,7 @@ CuSuite *get_build_suite(void)
     SUITE_ADD_TEST(suite, test_build_building_success);
     SUITE_ADD_TEST(suite, test_build_building_with_golem);
     SUITE_ADD_TEST(suite, test_build_building_no_materials);
+    SUITE_ADD_TEST(suite, test_build_destroy_cmd);
     SUITE_ADD_TEST(suite, test_build_destroy_road);
     SUITE_ADD_TEST(suite, test_build_destroy_road_limit);
     SUITE_ADD_TEST(suite, test_build_destroy_road_guard);
