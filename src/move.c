@@ -1791,7 +1791,7 @@ bool can_takeoff(const ship * sh, const region * from, const region * to)
     return true;
 }
 
-static void sail(unit * u, order * ord, region_list ** routep)
+static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
 {
     region *starting_point = u->region;
     region *current_point, *last_point;
@@ -1801,8 +1801,8 @@ static void sail(unit * u, order * ord, region_list ** routep)
     faction *f = u->faction;
     region *next_point = NULL;
     int error;
-    double damage_storm = config_get_flt("rules.ship.damage_storm", 0.02);
-    bool storms_enabled = config_get_int("rules.ship.storms", 1) != 0;
+    bool storms_enabled = drifting && (config_get_int("rules.ship.storms", 1) != 0);
+    double damage_storm = storms_enabled ? config_get_flt("rules.ship.damage_storm", 0.02) : 0.0;
     int lighthouse_div = config_get_int("rules.storm.lighthouse.divisor", 0);
     const char *token = getstrtoken();
 
@@ -2278,7 +2278,8 @@ void move_cmd(unit * u, order * ord)
 
     assert(u->number);
     if (u->ship && u == ship_owner(u->ship)) {
-        sail(u, ord, &route);
+        bool drifting = (getkeyword(ord) == K_MOVE);
+        sail(u, ord, &route, drifting);
     }
     else {
         travel(u, &route);
