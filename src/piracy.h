@@ -11,7 +11,7 @@ extern "C" {
     struct order;
     struct region;
 
-    void piracy_cmd(struct unit * u, struct order *ord);
+    void piracy_cmd(struct unit * u);
     void age_piracy(struct region *r);
 
 #ifdef __cplusplus

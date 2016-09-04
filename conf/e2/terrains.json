@@ -141,7 +141,7 @@
         },
         "glacier": {
             "size": 100,
-            "herbs": [ "h15", "h16", "h17" ],
+            "herbs": [ "h18", "h19", "h20" ],
             "seed": 2,
             "road": 250,
             "flags": [ "arctic", "land", "walk", "sail", "fly" ],
