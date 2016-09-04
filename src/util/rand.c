@@ -18,6 +18,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <platform.h>
 #include "rand.h"
+#include "mtrand.h"
 #include "rng.h"
 
 #include <assert.h>
@@ -66,9 +67,6 @@ bool chance(double x)
         return true;
     return rng_double() < x;
 }
-
-extern double genrand_real2(void);
-
 
 typedef struct random_source {
     double (*double_source) (void);
