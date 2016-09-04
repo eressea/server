@@ -5,7 +5,6 @@ include_directories (${CMAKE_CURRENT_SOURCE_DIR})
 include_directories (${CRITBIT_INCLUDE_DIR})
 include_directories (${CJSON_INCLUDE_DIR})
 include_directories (${STORAGE_INCLUDE_DIR})
-include_directories (${CRYPTO_INCLUDE_DIR})
 include_directories (${QUICKLIST_INCLUDE_DIR})
 include_directories (${CUTEST_INCLUDE_DIR})
 include_directories (${LUA_INCLUDE_DIR})
@@ -177,7 +176,6 @@ target_link_libraries(eressea
   ${QUICKLIST_LIBRARIES}
   ${STORAGE_LIBRARIES}
   ${CRITBIT_LIBRARIES}
-  ${CRYPTO_LIBRARIES}
   ${CJSON_LIBRARIES}
   ${INIPARSER_LIBRARIES}
 )
@@ -232,7 +230,6 @@ target_link_libraries(test_eressea
   ${QUICKLIST_LIBRARIES}
   ${STORAGE_LIBRARIES}
   ${CRITBIT_LIBRARIES}
-  ${CRYPTO_LIBRARIES}
   ${CJSON_LIBRARIES}
   ${INIPARSER_LIBRARIES}
   )

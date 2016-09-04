@@ -9,7 +9,6 @@
 #include <util/log.h>
 #include <quicklist.h>
 #include <sqlite3.h>
-#include <md5.h>
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>

@@ -9,6 +9,7 @@
  */
 #ifndef UTIL_RNG_H
 #define UTIL_RNG_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif

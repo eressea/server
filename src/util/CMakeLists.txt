@@ -46,6 +46,7 @@ language.c
 lists.c
 log.c
 message.c
+mt19937ar.c
 nrmessage.c
 parser.c
 password.c
