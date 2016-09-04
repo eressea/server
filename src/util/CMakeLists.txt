@@ -11,7 +11,7 @@ bsdstring.test.c
 functions.test.c
 gamedata.test.c
 # goodies.test.c
-# language.test.c
+language.test.c
 # lists.test.c
 # log.test.c
 # message.test.c
