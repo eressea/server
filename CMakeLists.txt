@@ -63,7 +63,6 @@ INCLUDE_DIRECTORIES (${CMAKE_BINARY_DIR}/include)
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DUSE_AUTOCONF")
 
 add_subdirectory (cutest)
-add_subdirectory (crypto)
 add_subdirectory (cJSON)
 add_subdirectory (storage)
 add_subdirectory (iniparser)
