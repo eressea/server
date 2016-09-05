@@ -97,6 +97,16 @@ static void test_umlaut(CuTest * tc)
     freetokens(tokens);
 }
 
+static void test_leak(CuTest *tc) {
+    void *tokens = NULL;
+    variant token;
+    
+    token.i = 42;
+    addtoken(&tokens, "NW", token);
+    addtoken(&tokens, "northwest", token);
+    freetokens(tokens);
+}
+
 CuSuite *get_umlaut_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -104,5 +114,6 @@ CuSuite *get_umlaut_suite(void)
     SUITE_ADD_TEST(suite, test_directions);
     SUITE_ADD_TEST(suite, test_transliterate);
     SUITE_ADD_TEST(suite, test_transliterations);
+    SUITE_ADD_TEST(suite, test_leak);
     return suite;
 }

@@ -19,21 +19,6 @@ static void test_init_directions(CuTest *tc) {
     test_cleanup();
 }
 
-static void test_leak(CuTest *tc) {
-    struct locale *lang;
-    void **tokens;
-    variant token;
-    
-    test_setup();
-    lang = get_or_create_locale("de");
-    tokens = get_translations(lang, UT_DIRECTIONS);
-    token.i = D_NORTHWEST;
-    addtoken(tokens, "NW", token);
-    addtoken(tokens, "northwest", token);
-
-    test_cleanup();
-}   
-
 static void test_init_direction(CuTest *tc) {
     struct locale *lang;
     test_setup();
@@ -68,12 +53,9 @@ static void test_finddirection(CuTest *tc) {
 CuSuite *get_direction_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
-    SUITE_ADD_TEST(suite, test_leak);
-    /*
     SUITE_ADD_TEST(suite, test_init_direction);
     SUITE_ADD_TEST(suite, test_init_directions);
     SUITE_ADD_TEST(suite, test_finddirection);
-    */
     return suite;
 }
 
