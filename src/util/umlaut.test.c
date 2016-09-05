@@ -4,6 +4,7 @@
 #include <string.h>
 #include "umlaut.h"
 
+#ifdef LEAK_FREE
 static void test_transliterate(CuTest * tc)
 {
     char buffer[32];
@@ -96,14 +97,15 @@ static void test_umlaut(CuTest * tc)
 
     freetokens(tokens);
 }
+#endif
 
 static void test_leak(CuTest *tc) {
     void *tokens = NULL;
     variant token;
     
     token.i = 42;
-    addtoken(&tokens, "NW", token);
-    addtoken(&tokens, "northwest", token);
+    addtoken(&tokens, "No", token);
+    addtoken(&tokens, "nw", token);
     CuAssertIntEquals(tc, E_TOK_SUCCESS, findtoken(tokens, "n", &token));
     freetokens(tokens);
 }
@@ -111,10 +113,12 @@ static void test_leak(CuTest *tc) {
 CuSuite *get_umlaut_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+#ifdef LEAK_FREE
     SUITE_ADD_TEST(suite, test_umlaut);
     SUITE_ADD_TEST(suite, test_directions);
     SUITE_ADD_TEST(suite, test_transliterate);
     SUITE_ADD_TEST(suite, test_transliterations);
+#endif
     SUITE_ADD_TEST(suite, test_leak);
     return suite;
 }
