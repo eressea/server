@@ -104,6 +104,7 @@ static void test_leak(CuTest *tc) {
     token.i = 42;
     addtoken(&tokens, "NW", token);
     addtoken(&tokens, "northwest", token);
+    CuAssertIntEquals(tc, E_TOK_SUCCESS, findtoken(tokens, "n", &token));
     freetokens(tokens);
 }
 
