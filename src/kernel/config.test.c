@@ -186,7 +186,6 @@ static void test_default_order(CuTest *tc) {
     ord = default_order(loc);
     CuAssertPtrNotNull(tc, ord);
     CuAssertIntEquals(tc, K_WORK, getkeyword(ord));
-    CuAssertPtrEquals(tc, ord->data, default_order(loc)->data);
     free_order(ord);
     test_cleanup();
 }
