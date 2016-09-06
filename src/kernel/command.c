@@ -78,7 +78,7 @@ const char *str, parser fun)
     cmd->fun = fun;
     cmd->nodes = tnext;
     var.v = cmd;
-    addtoken(keys, str, var);
+    addtoken((struct tnode **)keys, str, var);
 }
 
 static int do_command_i(const void *keys, struct unit *u, struct order *ord)

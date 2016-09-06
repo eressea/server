@@ -36,7 +36,7 @@ void register_special_direction(struct locale *lang, const char *name)
         char *str = _strdup(name);
 
         var.v = str;
-        addtoken(tokens, token, var);
+        addtoken((struct tnode **)tokens, token, var);
 
         if (lang == locales) {
             dir_lookup *dl = malloc(sizeof(dir_lookup));

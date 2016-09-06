@@ -78,7 +78,7 @@ const ship_type *findshiptype(const char *name, const struct locale *lang)
             variant var2;
             const char *n = LOC(lang, stype->_name);
             var2.v = (void *)stype;
-            addtoken(&sn->names, n, var2);
+            addtoken((struct tnode **)&sn->names, n, var2);
         }
         snames = sn;
     }

@@ -4,7 +4,6 @@
 #include <string.h>
 #include "umlaut.h"
 
-#ifdef LEAK_FREE
 static void test_transliterate(CuTest * tc)
 {
     char buffer[32];
@@ -29,7 +28,7 @@ static void test_transliterate(CuTest * tc)
 
 static void test_transliterations(CuTest *tc) {
     const char * umlauts = "\xc3\xa4\xc3\xb6\xc3\xbc\xc3\x9f"; /* auml ouml uuml szlig nul */
-    void * tokens = 0;
+    struct tnode * tokens = 0;
     variant id;
     int result;
 
@@ -49,7 +48,7 @@ static void test_transliterations(CuTest *tc) {
 
 static void test_directions(CuTest * tc)
 {
-    void * tokens = 0;
+    struct tnode * tokens = 0;
     variant id;
     int result;
 
@@ -65,7 +64,7 @@ static void test_directions(CuTest * tc)
 
 static void test_umlaut(CuTest * tc)
 {
-    void * tokens = 0;
+    struct tnode *tokens = 0;
     variant id;
     int result;
 
@@ -97,14 +96,13 @@ static void test_umlaut(CuTest * tc)
 
     freetokens(tokens);
 }
-#endif
 
 static void test_leak(CuTest *tc) {
-    void *tokens = NULL;
+    struct tnode *tokens = NULL;
     variant token;
     
     token.i = 42;
-    addtoken(&tokens, "No", token);
+    addtoken(&tokens, "NO", token);
     addtoken(&tokens, "nw", token);
     CuAssertIntEquals(tc, E_TOK_SUCCESS, findtoken(tokens, "n", &token));
     freetokens(tokens);
@@ -113,12 +111,10 @@ static void test_leak(CuTest *tc) {
 CuSuite *get_umlaut_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
-#ifdef LEAK_FREE
     SUITE_ADD_TEST(suite, test_umlaut);
     SUITE_ADD_TEST(suite, test_directions);
     SUITE_ADD_TEST(suite, test_transliterate);
     SUITE_ADD_TEST(suite, test_transliterations);
-#endif
     SUITE_ADD_TEST(suite, test_leak);
     return suite;
 }
