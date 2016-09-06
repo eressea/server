@@ -209,6 +209,7 @@ void piracy_cmd(unit * u)
     /* Bewegung ausführen */
     init_order(ord);
     move_cmd(u, ord);
+    free_order(ord);
 }
 
 void age_piracy(region *r) {
