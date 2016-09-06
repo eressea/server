@@ -19,10 +19,11 @@ extern "C" {
     struct locale;
     struct order;
     struct unit;
+    struct tnode;
 
     typedef struct syntaxtree {
         const struct locale *lang;
-        void *root;
+        struct tnode *root;
         struct syntaxtree *next;
     } syntaxtree;
 
