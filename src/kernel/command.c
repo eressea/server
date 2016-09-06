@@ -68,7 +68,7 @@ syntaxtree *stree_create(void)
 }
 
 void
-add_command(void **keys, void *tnext,
+add_command(struct tnode **keys, void *tnext,
 const char *str, parser fun)
 {
     command *cmd = (command *)malloc(sizeof(command));
@@ -78,10 +78,10 @@ const char *str, parser fun)
     cmd->fun = fun;
     cmd->nodes = tnext;
     var.v = cmd;
-    addtoken((struct tnode **)keys, str, var);
+    addtoken(keys, str, var);
 }
 
-static int do_command_i(const void *keys, struct unit *u, struct order *ord)
+static int do_command_i(const struct tnode *keys, struct unit *u, struct order *ord)
 {
     char token[128];
     const char *c;
@@ -102,7 +102,7 @@ static int do_command_i(const void *keys, struct unit *u, struct order *ord)
     return E_TOK_NOMATCH;
 }
 
-void do_command(const void *keys, struct unit *u, struct order *ord)
+void do_command(const struct tnode *keys, struct unit *u, struct order *ord)
 {
     init_order(ord);
     if (do_command_i(keys, u, ord) != E_TOK_SUCCESS) {

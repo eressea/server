@@ -288,7 +288,7 @@ static void perform_join(void)
 static syntaxtree * build_syntax(void) {
     syntaxtree *slang, *stree = stree_create();
     for (slang = stree; slang; slang = slang->next) {
-        void *leaf = 0;
+        struct tnode *leaf = 0;
         add_command(&leaf, NULL, LOC(slang->lang, alliance_kwd[ALLIANCE_KICK]), &cmd_kick);
         add_command(&leaf, NULL, LOC(slang->lang, alliance_kwd[ALLIANCE_LEAVE]), &cmd_leave);
         add_command(&leaf, NULL, LOC(slang->lang, alliance_kwd[ALLIANCE_TRANSFER]), &cmd_transfer);
