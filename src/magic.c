@@ -2954,7 +2954,7 @@ static void select_spellbook(void **tokens, spellbook *sb, const struct locale *
         else {
             variant token;
             token.v = sp;
-            addtoken(tokens, n, token);
+            addtoken((struct tnode **)tokens, n, token);
         }
     }
 }

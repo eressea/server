@@ -471,7 +471,7 @@ void init_terrains_translation(const struct locale *lang) {
         var.v = (void *)terrain;
         name = locale_string(lang, terrain->_name, false);
         if (name) {
-            addtoken(tokens, name, var);
+            addtoken((struct tnode **)tokens, name, var);
         }
         else {
             log_debug("no translation for terrain %s in locale %s", terrain->_name, locale_name(lang));
@@ -490,7 +490,7 @@ void init_options_translation(const struct locale * lang) {
         if (options[i]) {
             const char *name = locale_string(lang, options[i], false);
             if (name) {
-                addtoken(tokens, name, var);
+                addtoken((struct tnode **)tokens, name, var);
             }
             else {
                 log_debug("no translation for OPTION %s in locale %s", options[i], locale_name(lang));
@@ -525,7 +525,7 @@ void init_locale(struct locale *lang)
             var.i = i;
             name = LOC(lang, mkname("school", tok));
             if (name) {
-                addtoken(tokens, name, var);
+                addtoken((struct tnode **)tokens, name, var);
             }
             else {
                 log_warning("no translation for magic school %s in locale %s", tok, locale_name(lang));
@@ -544,9 +544,9 @@ void init_locale(struct locale *lang)
         const char *name;
         var.v = (void *)rc;
         name = locale_string(lang, rc_name_s(rc, NAME_PLURAL), false);
-        if (name) addtoken(tokens, name, var);
+        if (name) addtoken((struct tnode **)tokens, name, var);
         name = locale_string(lang, rc_name_s(rc, NAME_SINGULAR), false);
-        if (name) addtoken(tokens, name, var);
+        if (name) addtoken((struct tnode **)tokens, name, var);
     }
 
     init_parameters(lang);

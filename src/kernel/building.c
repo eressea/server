@@ -311,7 +311,7 @@ const building_type *findbuildingtype(const char *name,
 
             const char *n = LOC(lang, btype->_name);
             type.v = (void *)btype;
-            addtoken(&bn->names, n, type);
+            addtoken((struct tnode **)&bn->names, n, type);
         }
         bnames = bn;
     }

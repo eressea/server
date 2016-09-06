@@ -12,7 +12,7 @@ void init_direction(const struct locale *lang, direction_t dir, const char *str)
     void **tokens = get_translations(lang, UT_DIRECTIONS);
     variant token;
     token.i = dir;
-    addtoken(tokens, str, token);
+    addtoken((struct tnode **)tokens, str, token);
 }
 
 void init_directions(struct locale *lang) {
@@ -47,7 +47,7 @@ void init_directions(struct locale *lang) {
         if (str) {
             variant token;
             token.i = dirs[i].direction;
-            addtoken(tokens, str, token);
+            addtoken((struct tnode **)tokens, str, token);
         }
     }
 }

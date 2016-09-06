@@ -1438,8 +1438,8 @@ static void init_prefixnames(void)
                     LOC(lang, mkname("prefix", race_prefixes[key]));
                 if (findtoken(in->names, pname, &var) == E_TOK_NOMATCH || var.i != key) {
                     var.i = key;
-                    addtoken(&in->names, pname, var);
-                    addtoken(&in->names, LOC(lang, mkname("prefix",
+                    addtoken((struct tnode **)&in->names, pname, var);
+                    addtoken((struct tnode **)&in->names, LOC(lang, mkname("prefix",
                         race_prefixes[key])), var);
                 }
             }

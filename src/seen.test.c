@@ -23,7 +23,7 @@ static void test_add_seen(CuTest *tc) {
     region *r;
     seen_region **seen, *sr;
 
-    test_cleanup();
+    test_setup();
     seen = seen_init();
     r = test_create_region(0, 0, 0);
     sr = add_seen(seen, r, see_travel, false);
@@ -47,7 +47,7 @@ static void test_faction_add_seen(CuTest *tc) {
     faction *f;
     seen_region *sr;
 
-    test_cleanup();
+    test_setup();
     f = test_create_faction(0);
     f->seen = seen_init();
     test_create_region(0, 0, 0);
@@ -65,7 +65,7 @@ static void test_prepare_seen(CuTest *tc) {
     faction *f;
     unit *u;
 
-    test_cleanup();
+    test_setup();
     f = test_create_faction(0);
     r = test_create_region(0, 0, 0);
     u = test_create_unit(f, r);
@@ -90,7 +90,7 @@ static void test_seen_travelthru(CuTest *tc) {
     faction *f;
     unit *u;
 
-    test_cleanup();
+    test_setup();
     setup_seen(0, 0);
     r = test_create_region(0, 0, 0);
     f = test_create_faction(0);
@@ -116,7 +116,7 @@ static void test_seen_region(CuTest *tc) {
     seen_region **seen, *sr;
     region *r;
 
-    test_cleanup();
+    test_setup();
     setup_seen(0, 0);
     r = test_create_region(0, 0, 0);
     seen = seen_init();
@@ -131,7 +131,7 @@ static void test_seen_interval_backward(CuTest *tc) {
     region *r, *first, *last;
     seen_region **seen;
 
-    test_cleanup();
+    test_setup();
     r = test_create_region(0, 0, 0);
     setup_seen(0, 0);
     seen = seen_init();
@@ -150,7 +150,7 @@ static void test_seen_interval_forward(CuTest *tc) {
     region *r, *first, *last;
     seen_region **seen;
 
-    test_cleanup();
+    test_setup();
     setup_seen(0, 0);
     r = test_create_region(0, 0, 0);
     seen = seen_init();
@@ -175,7 +175,7 @@ static void test_seenhash_map(CuTest *tc) {
     seen_region **seen;
     int i = 0;
 
-    test_cleanup();
+    test_setup();
     seen = seen_init();
     r = test_create_region(1, 1, 0);
     add_seen(seen, r, see_unit, false);

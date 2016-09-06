@@ -282,7 +282,7 @@ static void test_build_destroy_road(CuTest *tc)
     r = test_create_region(0, 0, 0);
     rsetroad(r, D_EAST, 100);
     u = test_create_unit(f = test_create_faction(0), r);
-    ord = create_order(K_DESTROY, f->locale, "%s %s", LOC(f->locale, parameters[P_ROAD]), LOC(f->locale, directions[D_EAST]));
+    u->orders = ord = create_order(K_DESTROY, f->locale, "%s %s", LOC(f->locale, parameters[P_ROAD]), LOC(f->locale, directions[D_EAST]));
 
     CuAssertIntEquals(tc, 0, destroy_cmd(u, ord));
     CuAssertIntEquals(tc, 100, rroad(r, D_EAST));
@@ -336,7 +336,7 @@ static void test_build_destroy_road_guard(CuTest *tc)
     rsetroad(r, D_EAST, 100);
     ug = test_create_guard(r, 0, 0);
     u = test_create_unit(f = test_create_faction(0), r);
-    ord = create_order(K_DESTROY, f->locale, "%s %s", LOC(f->locale, parameters[P_ROAD]), LOC(f->locale, directions[D_EAST]));
+    u->orders = ord = create_order(K_DESTROY, f->locale, "%s %s", LOC(f->locale, parameters[P_ROAD]), LOC(f->locale, directions[D_EAST]));
 
     set_level(u, SK_ROAD_BUILDING, 1);
     CuAssertIntEquals(tc, 0, destroy_cmd(u, ord));
@@ -367,7 +367,7 @@ static void test_build_destroy_road_limit(CuTest *tc)
     r = test_create_region(0, 0, 0);
     rsetroad(r, D_EAST, 100);
     u = test_create_unit(f = test_create_faction(0), r);
-    ord = create_order(K_DESTROY, f->locale, "1 %s %s", LOC(f->locale, parameters[P_ROAD]), LOC(f->locale, directions[D_EAST]));
+    u->orders = ord = create_order(K_DESTROY, f->locale, "1 %s %s", LOC(f->locale, parameters[P_ROAD]), LOC(f->locale, directions[D_EAST]));
 
     set_level(u, SK_ROAD_BUILDING, 1);
     CuAssertIntEquals(tc, 0, destroy_cmd(u, ord));
