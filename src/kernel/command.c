@@ -67,7 +67,7 @@ syntaxtree *stree_create(void)
 }
 
 void
-add_command(struct tnode **keys, void *tnext,
+add_command(struct tnode **keys,
     const char *str, parser fun)
 {
     command *cmd = (command *)malloc(sizeof(command));

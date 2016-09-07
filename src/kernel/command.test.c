@@ -37,8 +37,8 @@ static void test_command(CuTest * tc) {
     CuAssertPtrEquals(tc, loc, (struct locale *)st->lang);
     CuAssertPtrEquals(tc, 0, st->root);
     CuAssertPtrEquals(tc, 0, st->next);
-    add_command(&st->root, 0, "two", parser_two);
-    add_command(&st->root, 0, "six", parser_six);
+    add_command(&st->root, "two", parser_two);
+    add_command(&st->root, "six", parser_six);
     CuAssertPtrNotNull(tc, st->root);
     CuAssertPtrEquals(tc, st->root, stree_find(st, loc));
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));

@@ -28,7 +28,7 @@ extern "C" {
     } syntaxtree;
 
     typedef void(*parser) (const void *nodes, struct unit * u, struct order *);
-    void add_command(struct tnode **troot, void *tnext,
+    void add_command(struct tnode **troot,
         const char *str, parser fun);
     void do_command(const struct tnode *troot, struct unit *u, struct order *);
 
