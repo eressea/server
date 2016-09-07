@@ -30,7 +30,7 @@
 
 typedef struct command {
     parser fun;
-    void *nodes;
+    struct tnode *nodes;
 } command;
 
 void *stree_find(const syntaxtree * stree, const struct locale *lang)
