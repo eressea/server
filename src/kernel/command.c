@@ -30,7 +30,7 @@
 
 typedef struct command {
     parser fun;
-    void *nodes;
+    struct command *next;
 } command;
 
 void *stree_find(const syntaxtree * stree, const struct locale *lang)
@@ -44,6 +44,11 @@ void *stree_find(const syntaxtree * stree, const struct locale *lang)
 }
 
 void stree_free(syntaxtree *stree) {
+    while (stree->cmds) {
+        command *next = stree->cmds->next;
+        free(stree->cmds);
+        stree->cmds = next;
+    }
     while (stree) {
         syntaxtree *snext = stree->next;
         freetokens(stree->root);
@@ -61,24 +66,23 @@ syntaxtree *stree_create(void)
         stree->lang = lang;
         stree->next = sroot;
         stree->root = 0;
+        stree->cmds = 0;
         sroot = stree;
         lang = nextlocale(lang);
     }
     return sroot;
 }
 
-void
-add_command(struct tnode **keys, void *tnext,
-const char *str, parser fun)
-{
+void stree_add(struct syntaxtree *stree, const char *str, parser fun) {
     command *cmd = (command *)malloc(sizeof(command));
     variant var;
 
     assert(str);
     cmd->fun = fun;
-    cmd->nodes = tnext;
     var.v = cmd;
-    addtoken(keys, str, var);
+    cmd->next = stree->cmds;
+    stree->cmds = cmd;
+    addtoken(&stree->root, str, var);
 }
 
 static int do_command_i(const struct tnode *keys, struct unit *u, struct order *ord)
@@ -90,12 +94,8 @@ static int do_command_i(const struct tnode *keys, struct unit *u, struct order *
     c = gettoken(token, sizeof(token));
     if (findtoken(keys, c, &var) == E_TOK_SUCCESS) {
         command *cmd = (command *)var.v;
-        if (cmd->nodes && *c) {
-            assert(!cmd->fun);
-            return do_command_i(cmd->nodes, u, ord);
-        }
-        else if (cmd->fun) {
-            cmd->fun(cmd->nodes, u, ord);
+        if (cmd->fun) {
+            cmd->fun(0, u, ord);
             return E_TOK_SUCCESS;
         }
     }
