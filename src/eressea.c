@@ -55,10 +55,6 @@ void game_done(void)
     free_functions();
     free_config();
     free_locales();
-    message_done();
-    equipment_done();
-    reports_done();
-    curses_done();
     kernel_done();
 }
 

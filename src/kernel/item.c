@@ -518,6 +518,11 @@ static item *icache;
 static int icache_size;
 #define ICACHE_MAX 100
 
+void item_done(void) {
+    i_freeall(&icache);
+    icache_size = 0;
+}
+
 void i_free(item * i)
 {
     if (icache_size >= ICACHE_MAX) {

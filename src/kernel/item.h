@@ -59,6 +59,8 @@ extern "C" {
 #define NMF_PLURAL     0x01
 #define NMF_APPEARANCE 0x02
 
+    void item_done(void);
+
     typedef int(*rtype_uchange) (struct unit * user,
         const struct resource_type * rtype, int delta);
     typedef int(*rtype_uget) (const struct unit * user,

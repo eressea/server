@@ -21,13 +21,17 @@ extern "C" {
   /* new xml functions: */
 #include <libxml/tree.h>
 
-  typedef int (*xml_callback) (xmlDocPtr);
-  extern void xml_register_callback(xml_callback callback);
-  extern double xml_fvalue(xmlNodePtr node, const char *name, double dflt);
-  extern int xml_ivalue(xmlNodePtr node, const char *name, int dflt);
-  extern bool xml_bvalue(xmlNodePtr node, const char *name, bool dflt);
+
+    typedef int (*xml_callback) (xmlDocPtr);
+
+    void xml_register_callback(xml_callback callback);
+    double xml_fvalue(xmlNodePtr node, const char *name, double dflt);
+    int xml_ivalue(xmlNodePtr node, const char *name, int dflt);
+    bool xml_bvalue(xmlNodePtr node, const char *name, bool dflt);
 #endif
-  extern int read_xml(const char *filename, const char *catalog);
+
+    void xml_done(void);
+    int read_xml(const char *filename, const char *catalog);
 
 #ifdef __cplusplus
 }

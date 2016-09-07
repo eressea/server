@@ -412,6 +412,7 @@ void a_write_orig(struct storage *store, const attrib * attribs, const void *own
     WRITE_TOK(store, "end");
 }
 
-void free_attribs(void) {
+void attrib_done(void) {
     cb_clear(&cb_deprecated);
+    memset(at_hash, 0, sizeof at_hash);
 }

@@ -232,6 +232,7 @@ void equipment_done(void) {
         free(eq->name);
         if (eq->spellbook) {
             spellbook_clear(eq->spellbook);
+            free(eq->spellbook);
         }
         // TODO: items, subsets
         free(eq);
