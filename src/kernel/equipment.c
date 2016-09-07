@@ -230,7 +230,9 @@ void free_equipment(void) {
         equipment *eq = *eqp;
         *eqp = eq->next;
         free(eq->name);
-        spellbook_clear(eq->spellbook);
+        if (eq->spellbook) {
+            spellbook_clear(eq->spellbook);
+        }
         // TODO: items, subsets
         free(eq);
     }
