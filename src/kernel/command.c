@@ -30,7 +30,6 @@
 
 typedef struct command {
     parser fun;
-    struct tnode *nodes;
 } command;
 
 void *stree_find(const syntaxtree * stree, const struct locale *lang)
@@ -69,14 +68,13 @@ syntaxtree *stree_create(void)
 
 void
 add_command(struct tnode **keys, void *tnext,
-const char *str, parser fun)
+    const char *str, parser fun)
 {
     command *cmd = (command *)malloc(sizeof(command));
     variant var;
 
     assert(str);
     cmd->fun = fun;
-    cmd->nodes = tnext;
     var.v = cmd;
     addtoken(keys, str, var);
 }
@@ -90,12 +88,8 @@ static int do_command_i(const struct tnode *keys, struct unit *u, struct order *
     c = gettoken(token, sizeof(token));
     if (findtoken(keys, c, &var) == E_TOK_SUCCESS) {
         command *cmd = (command *)var.v;
-        if (cmd->nodes && *c) {
-            assert(!cmd->fun);
-            return do_command_i(cmd->nodes, u, ord);
-        }
-        else if (cmd->fun) {
-            cmd->fun(cmd->nodes, u, ord);
+        if (cmd->fun) {
+            cmd->fun(0, u, ord);
             return E_TOK_SUCCESS;
         }
     }
