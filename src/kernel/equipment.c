@@ -234,7 +234,13 @@ void equipment_done(void) {
             spellbook_clear(eq->spellbook);
             free(eq->spellbook);
         }
-        // TODO: items, subsets
+        while (eq->items) {
+            itemdata *next = eq->items->next;
+            free(eq->items->value);
+            free(eq->items);
+            eq->items = next;
+        }
+        // TODO: subsets
         free(eq);
     }
 }
