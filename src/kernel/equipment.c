@@ -223,3 +223,15 @@ void equip_items(struct item **items, const struct equipment *eq)
         }
     }
 }
+
+void free_equipment(void) {
+    equipment **eqp = &equipment_sets;
+    while (*eqp) {
+        equipment *eq = *eqp;
+        *eqp = eq->next;
+        free(eq->name);
+        spellbook_clear(eq->spellbook);
+        // TODO: items, subsets
+        free(eq);
+    }
+}

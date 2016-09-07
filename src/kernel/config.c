@@ -31,6 +31,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "building.h"
 #include "calendar.h"
 #include "direction.h"
+#include "equipment.h"
 #include "faction.h"
 #include "group.h"
 #include "item.h"
@@ -1079,6 +1080,7 @@ void free_gamedata(void)
 {
     int i;
     free_donations();
+    free_equipment();
 
     for (i = 0; i != MAXLOCALES; ++i) {
         if (defaults[i]) {

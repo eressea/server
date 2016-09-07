@@ -75,6 +75,7 @@ extern "C" {
         int mask);
     void equip_items(struct item **items, const struct equipment *eq);
 
+    void free_equipment(void);
 #ifdef __cplusplus
 }
 #endif
