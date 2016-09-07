@@ -66,6 +66,7 @@ syntaxtree *stree_create(void)
         stree->lang = lang;
         stree->next = sroot;
         stree->root = 0;
+        stree->cmds = 0;
         sroot = stree;
         lang = nextlocale(lang);
     }
