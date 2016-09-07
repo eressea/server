@@ -85,19 +85,6 @@ void stree_add(struct syntaxtree *stree, const char *str, parser fun) {
     addtoken(&stree->root, str, var);
 }
 
-void
-add_command(struct tnode **keys,
-    const char *str, parser fun)
-{
-    command *cmd = (command *)malloc(sizeof(command));
-    variant var;
-
-    assert(str);
-    cmd->fun = fun;
-    var.v = cmd;
-    addtoken(keys, str, var);
-}
-
 static int do_command_i(const struct tnode *keys, struct unit *u, struct order *ord)
 {
     char token[128];
