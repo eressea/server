@@ -30,6 +30,7 @@
 
 typedef struct command {
     parser fun;
+    struct command *next;
 } command;
 
 void *stree_find(const syntaxtree * stree, const struct locale *lang)
@@ -43,6 +44,11 @@ void *stree_find(const syntaxtree * stree, const struct locale *lang)
 }
 
 void stree_free(syntaxtree *stree) {
+    while (stree->cmds) {
+        command *next = stree->cmds->next;
+        free(stree->cmds);
+        stree->cmds = next;
+    }
     while (stree) {
         syntaxtree *snext = stree->next;
         freetokens(stree->root);
@@ -64,6 +70,18 @@ syntaxtree *stree_create(void)
         lang = nextlocale(lang);
     }
     return sroot;
+}
+
+void stree_add(struct syntaxtree *stree, const char *str, parser fun) {
+    command *cmd = (command *)malloc(sizeof(command));
+    variant var;
+
+    assert(str);
+    cmd->fun = fun;
+    var.v = cmd;
+    cmd->next = stree->cmds;
+    stree->cmds = cmd;
+    addtoken(&stree->root, str, var);
 }
 
 void
