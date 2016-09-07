@@ -1080,7 +1080,6 @@ void free_gamedata(void)
 {
     int i;
     free_donations();
-    free_equipment();
 
     for (i = 0; i != MAXLOCALES; ++i) {
         if (defaults[i]) {
@@ -1094,14 +1093,14 @@ void free_gamedata(void)
     free_borders();
     free_alliances();
 
+    while (global.attribs) {
+        a_remove(&global.attribs, global.attribs);
+    }
+
     while (planes) {
         plane *pl = planes;
         planes = planes->next;
         free_plane(pl);
-    }
-
-    while (global.attribs) {
-        a_remove(&global.attribs, global.attribs);
     }
 }
 

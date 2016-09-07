@@ -32,7 +32,7 @@ const char *mt_name(const message_type * mtype)
     return mtype->name;
 }
 
-arg_type *argtypes = NULL;
+static arg_type *argtypes = NULL;
 
 void
 register_argtype(const char *name, void(*free_arg) (variant),
@@ -245,4 +245,13 @@ struct message *msg_addref(struct message *msg)
     assert(msg->refcount > 0);
     ++msg->refcount;
     return msg;
+}
+
+void message_done(void) {
+    arg_type **atp = &argtypes;
+    while (*atp) {
+        arg_type *at = *atp;
+        *atp = at->next;
+        free(at);
+    }
 }

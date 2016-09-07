@@ -1094,6 +1094,15 @@ void register_reporttype(const char *extension, report_fun write, int flag)
     report_types = type;
 }
 
+void reports_done(void) {
+    report_type **rtp = &report_types;
+    while (*rtp) {
+        report_type *rt = *rtp;
+        *rtp = rt->next;
+        free(rt);
+    }
+}
+
 static quicklist *get_regions_distance(region * root, int radius)
 {
     quicklist *ql, *rlist = NULL;

@@ -2547,13 +2547,6 @@ static void update_find(void)
     initial = false;
 }
 
-bool kann_finden(faction * f1, faction * f2)
-{
-    update_find();
-    return (bool)(can_find(f1, f2) != NULL);
-}
-
-/******* end summary ******/
 
 void register_nr(void)
 {

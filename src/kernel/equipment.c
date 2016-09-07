@@ -224,7 +224,7 @@ void equip_items(struct item **items, const struct equipment *eq)
     }
 }
 
-void free_equipment(void) {
+void equipment_done(void) {
     equipment **eqp = &equipment_sets;
     while (*eqp) {
         equipment *eq = *eqp;
