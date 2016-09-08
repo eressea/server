@@ -91,6 +91,7 @@ static void test_group_readwrite(CuTest * tc)
     write_groups(&store, f);
     WRITE_INT(&store, 47);
 
+    free_group(f->groups);
     free_group(g);
     f->groups = 0;
     data.strm.api->rewind(data.strm.handle);
