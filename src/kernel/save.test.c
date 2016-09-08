@@ -155,10 +155,10 @@ static void test_readwrite_dead_faction_regionowner(CuTest *tc) {
     gamedata data;
     storage store;
 
+    test_setup();
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
 
-    test_cleanup();
     config_set("rules.region_owners", "1");
     f = test_create_faction(0);
     test_create_unit(f, r = test_create_region(0, 0, 0));
