@@ -227,6 +227,7 @@ void equip_items(struct item **items, const struct equipment *eq)
 void equipment_done(void) {
     equipment **eqp = &equipment_sets;
     while (*eqp) {
+        int i;
         equipment *eq = *eqp;
         *eqp = eq->next;
         free(eq->name);
@@ -240,7 +241,10 @@ void equipment_done(void) {
             free(eq->items);
             eq->items = next;
         }
-        // TODO: subsets
+        // TODO: subsets, skills
+        for (i=0;i!=MAXSKILLS;++i) {
+            free(eq->skills[i]);
+        }
         free(eq);
     }
 }
