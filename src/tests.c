@@ -161,6 +161,7 @@ void test_log_stderr(int flags) {
 
 static void test_reset(void) {
     int i;
+    turn = 0;
     default_locale = 0;
     free_gamedata();
     free_terrains();
