@@ -76,7 +76,7 @@ end
 
 function autoseed.init()
     -- local newbs = {}
-    local num_seeded = 0
+    local num_seeded = per_region
     local start = nil
 
     eressea.log.info('autoseed new players')
@@ -94,8 +94,10 @@ function autoseed.init()
             for _, p in ipairs(players) do
                 if num_seeded == per_region then
                     local index = rng_int() % #sel
+                    start = nil
                     while not start do
                         start = sel[index + 1]
+                        sel[index+1] = nil
                         index = (index + 1) % #sel
                     end
                     num_seeded = 0
