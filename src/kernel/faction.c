@@ -336,7 +336,39 @@ void write_faction_reference(const faction * f, struct storage *store)
     WRITE_INT(store, f ? f->no : 0);
 }
 
-static faction *dead_factions;
+#define DMAXHASH 7919
+typedef struct dead {
+    struct dead *nexthash;
+    faction *f;
+    int no;
+} dead;
+
+static dead *deadhash[DMAXHASH];
+
+void dhash(int no, faction * f)
+{
+    dead *hash = (dead *)calloc(1, sizeof(dead));
+    dead *old = deadhash[no % DMAXHASH];
+    hash->no = no;
+    hash->f = f;
+    deadhash[no % DMAXHASH] = hash;
+    hash->nexthash = old;
+}
+
+faction *dfindhash(int no)
+{
+    dead *old;
+
+    if (no < 0)
+        return 0;
+
+    for (old = deadhash[no % DMAXHASH]; old; old = old->nexthash) {
+        if (old->no == no) {
+            return old->f;
+        }
+    }
+    return 0;
+}
 
 void free_flist(faction **fp) {
     faction * flist = *fp;
@@ -349,10 +381,7 @@ void free_flist(faction **fp) {
     *fp = 0;
 }
 
-void free_factions(void) {
-    free_flist(&factions);
-    free_flist(&dead_factions);
-}
+static faction *dead_factions;
 
 void destroyfaction(faction ** fp)
 {
@@ -814,40 +843,6 @@ int max_magicians(const faction * f)
     return m;
 }
 
-#define DMAXHASH 7919
-typedef struct dead {
-    struct dead *nexthash;
-    faction *f;
-    int no;
-} dead;
-
-static dead *deadhash[DMAXHASH];
-
-void dhash(int no, faction * f)
-{
-    dead *hash = (dead *)calloc(1, sizeof(dead));
-    dead *old = deadhash[no % DMAXHASH];
-    hash->no = no;
-    hash->f = f;
-    deadhash[no % DMAXHASH] = hash;
-    hash->nexthash = old;
-}
-
-faction *dfindhash(int no)
-{
-    dead *old;
-
-    if (no < 0)
-        return 0;
-
-    for (old = deadhash[no % DMAXHASH]; old; old = old->nexthash) {
-        if (old->no == no) {
-            return old->f;
-        }
-    }
-    return 0;
-}
-
 int writepasswd(void)
 {
     FILE *F;
@@ -870,5 +865,17 @@ int writepasswd(void)
         return 0;
     }
     return 1;
+}
+
+void free_factions(void) {
+    int i;
+    for (i = 0; i != DMAXHASH; ++i) {
+        while (deadhash[i]) {
+            dead *d = deadhash[i];
+            deadhash[i] = d->nexthash;
+        }
+    }
+    free_flist(&factions);
+    free_flist(&dead_factions);
 }
 
