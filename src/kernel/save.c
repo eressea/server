@@ -623,12 +623,14 @@ static void write_owner(struct gamedata *data, region_owner * owner)
     if (owner) {
         faction *f;
         WRITE_INT(data->store, owner->since_turn);
-        WRITE_INT(data->store, owner->morale_turn);
-        WRITE_INT(data->store, owner->flags);
-        f = owner->last_owner;
-        write_faction_reference((f && f->_alive) ? f : NULL, data->store);
-        f = owner->owner;
-        write_faction_reference((f && f->_alive) ? f : NULL, data->store);
+        if (owner->since_turn >= 0) {
+            WRITE_INT(data->store, owner->morale_turn);
+            WRITE_INT(data->store, owner->flags);
+            f = owner->last_owner;
+            write_faction_reference((f && f->_alive) ? f : NULL, data->store);
+            f = owner->owner;
+            write_faction_reference((f && f->_alive) ? f : NULL, data->store);
+        }
     }
     else {
         WRITE_INT(data->store, -1);

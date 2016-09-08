@@ -44,8 +44,8 @@ extern "C" {
     extern bool noreports;
     extern const char *visibility[];
 
-    /* kann_finden speedups */
-    bool kann_finden(struct faction *f1, struct faction *f2);
+    void reports_done(void);
+
     struct unit *can_find(struct faction *, struct faction *);
 
     /* funktionen zum schreiben eines reports */

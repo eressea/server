@@ -89,6 +89,15 @@ typedef struct xml_reader {
 
 static xml_reader *xmlReaders;
 
+void xml_done(void) {
+    xml_reader ** xrp = &xmlReaders;
+    while (*xrp) {
+        xml_reader *xr = *xrp;
+        *xrp = xr->next;
+        free(xr);
+    }
+}
+
 void xml_register_callback(xml_callback callback)
 {
     xml_reader *reader = (xml_reader *)malloc(sizeof(xml_reader));

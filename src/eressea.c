@@ -14,23 +14,27 @@
 #include <triggers/triggers.h>
 #include <util/language.h>
 #include <util/functions.h>
-#include <kernel/xmlreader.h>
-#include <kernel/item.h>
-#include <kernel/curse.h>
 #include <kernel/building.h>
+#include <kernel/curse.h>
+#include <kernel/equipment.h>
+#include <kernel/item.h>
+#include <kernel/xmlreader.h>
 #include <modules/gmcmd.h>
 #include <modules/xmas.h>
 #include <items/itemtypes.h>
 #include <attributes/attributes.h>
+#include <util/message.h>
 #include <races/races.h>
+
 #include "chaos.h"
-#include "report.h"
-#include "items.h"
 #include "creport.h"
+#include "items.h"
 #include "jsreport.h"
 #include "names.h"
-#include "wormhole.h"
+#include "report.h"
+#include "reports.h"
 #include "spells.h"
+#include "wormhole.h"
 
 void game_done(void)
 {
@@ -51,7 +55,6 @@ void game_done(void)
     free_functions();
     free_config();
     free_locales();
-    curses_done();
     kernel_done();
 }
 

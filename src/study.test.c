@@ -295,7 +295,7 @@ static void test_demon_skillchanges(CuTest *tc) {
     test_setup();
     rc = test_create_race("demon");
     CuAssertPtrEquals(tc, rc, get_race(RC_DAEMON));
-    u = test_create_unit(test_create_faction(rc), 0);
+    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
     CuAssertPtrNotNull(tc, u);
     set_level(u, SK_CROSSBOW, 1);
     demon_skillchange(u);

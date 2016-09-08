@@ -31,6 +31,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "building.h"
 #include "calendar.h"
 #include "direction.h"
+#include "equipment.h"
 #include "faction.h"
 #include "group.h"
 #include "item.h"
@@ -400,24 +401,24 @@ building *largestbuilding(const region * r, cmp_building_cb cmp_gt,
 
 static const char *forbidden[] = { "t", "te", "tem", "temp", NULL };
 // PEASANT: "b", "ba", "bau", "baue", "p", "pe", "pea", "peas"
+static int *forbidden_ids;
 
 int forbiddenid(int id)
 {
-    static int *forbid = NULL;
     static size_t len;
     size_t i;
     if (id <= 0)
         return 1;
-    if (!forbid) {
+    if (!forbidden_ids) {
         while (forbidden[len])
             ++len;
-        forbid = calloc(len, sizeof(int));
+        forbidden_ids = calloc(len, sizeof(int));
         for (i = 0; i != len; ++i) {
-            forbid[i] = atoi36(forbidden[i]);
+            forbidden_ids[i] = atoi36(forbidden[i]);
         }
     }
     for (i = 0; i != len; ++i)
-        if (id == forbid[i])
+        if (id == forbidden_ids[i])
             return 1;
     return 0;
 }
@@ -738,8 +739,15 @@ void kernel_done(void)
     /* calling this function releases memory assigned to static variables, etc.
      * calling it is optional, e.g. a release server will most likely not do it.
      */
+    xml_done();
+    attrib_done();
+    item_done();
+    message_done();
+    equipment_done();
+    reports_done();
+    curses_done();
+    crmessage_done();
     translation_done();
-    free_attribs();
 }
 
 #ifndef HAVE_STRDUP
@@ -1078,7 +1086,6 @@ void free_config(void) {
 void free_gamedata(void)
 {
     int i;
-    free_donations();
 
     for (i = 0; i != MAXLOCALES; ++i) {
         if (defaults[i]) {
@@ -1086,20 +1093,24 @@ void free_gamedata(void)
             defaults[i] = 0;
         }
     }
+    free(forbidden_ids);
+    forbidden_ids = NULL;
+
+    free_donations();
     free_factions();
     free_units();
     free_regions();
     free_borders();
     free_alliances();
 
+    while (global.attribs) {
+        a_remove(&global.attribs, global.attribs);
+    }
+
     while (planes) {
         plane *pl = planes;
         planes = planes->next;
         free_plane(pl);
-    }
-
-    while (global.attribs) {
-        a_remove(&global.attribs, global.attribs);
     }
 }
 

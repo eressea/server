@@ -92,9 +92,9 @@ static void test_seen_travelthru(CuTest *tc) {
 
     test_setup();
     setup_seen(0, 0);
-    r = test_create_region(0, 0, 0);
     f = test_create_faction(0);
-    u = test_create_unit(f, 0);
+    u = test_create_unit(f, test_create_region(0, 0, 0));
+    r = test_create_region(0, 1, 0);
     travelthru_add(r, u);
     init_reports();
     view_default(f->seen, r, f);
@@ -190,10 +190,10 @@ static void test_seenhash_map(CuTest *tc) {
 CuSuite *get_seen_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
-    SUITE_ADD_TEST(suite, test_add_seen);
-    SUITE_ADD_TEST(suite, test_faction_add_seen);
     SUITE_ADD_TEST(suite, test_prepare_seen);
     SUITE_ADD_TEST(suite, test_seen_travelthru);
+    SUITE_ADD_TEST(suite, test_add_seen);
+    SUITE_ADD_TEST(suite, test_faction_add_seen);
     SUITE_ADD_TEST(suite, test_seen_region);
     SUITE_ADD_TEST(suite, test_seen_interval_backward);
     SUITE_ADD_TEST(suite, test_seen_interval_forward);

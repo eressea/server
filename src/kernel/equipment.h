@@ -54,6 +54,8 @@ extern "C" {
         void(*callback) (const struct equipment *, struct unit *);
     } equipment;
 
+    void equipment_done(void);
+
     struct equipment *create_equipment(const char *eqname);
     struct equipment *get_equipment(const char *eqname);
 

@@ -81,7 +81,7 @@ extern "C" {
     int a_read(struct gamedata *data, attrib ** attribs, void *owner);
     void a_write(struct storage *store, const attrib * attribs, const void *owner);
 
-    void free_attribs(void);
+    void attrib_done(void);
 
 #define DEFAULT_AGE NULL
 #define DEFAULT_INIT NULL

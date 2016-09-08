@@ -2493,68 +2493,6 @@ unit *can_find(faction * f, faction * f2)
     return NULL;
 }
 
-static void add_find(faction * f, unit * u, faction * f2)
-{
-    /* faction f sees f2 through u */
-    int key = f->no % FMAXHASH;
-    struct fsee **fp = &fsee[key];
-    struct fsee *fs;
-    struct see **sp;
-    struct see *ss;
-    while (*fp && (*fp)->f != f)
-        fp = &(*fp)->nexthash;
-    if (!*fp) {
-        fs = *fp = calloc(sizeof(struct fsee), 1);
-        fs->f = f;
-    }
-    else
-        fs = *fp;
-    sp = &fs->see;
-    while (*sp && (*sp)->seen != f2)
-        sp = &(*sp)->next;
-    if (!*sp) {
-        ss = *sp = calloc(sizeof(struct see), 1);
-        ss->proof = u;
-        ss->seen = f2;
-    }
-    else
-        ss = *sp;
-    ss->proof = u;
-}
-
-static void update_find(void)
-{
-    region *r;
-    static bool initial = true;
-
-    if (initial)
-        for (r = regions; r; r = r->next) {
-            unit *u;
-            for (u = r->units; u; u = u->next) {
-                faction *lastf = u->faction;
-                unit *u2;
-                for (u2 = r->units; u2; u2 = u2->next) {
-                    if (u2->faction == lastf || u2->faction == u->faction)
-                        continue;
-                    if (seefaction(u->faction, r, u2, 0)) {
-                        faction *fv = visible_faction(u->faction, u2);
-                        lastf = fv;
-                        add_find(u->faction, u2, fv);
-                    }
-                }
-            }
-        }
-    initial = false;
-}
-
-bool kann_finden(faction * f1, faction * f2)
-{
-    update_find();
-    return (bool)(can_find(f1, f2) != NULL);
-}
-
-/******* end summary ******/
-
 void register_nr(void)
 {
     if (!nocr)

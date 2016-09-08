@@ -119,7 +119,7 @@ struct faction *test_create_faction(const struct race *rc)
 struct unit *test_create_unit(struct faction *f, struct region *r)
 {
     const struct race * rc = f ? f->race : 0;
-    assert(f || !r);
+    assert(f && r);
     if (!rc) rc = rc_get_or_create("human");
     return create_unit(r, f, 1, rc ? rc : rc_get_or_create("human"), 0, 0, 0);
 }
@@ -161,6 +161,7 @@ void test_log_stderr(int flags) {
 
 static void test_reset(void) {
     int i;
+    turn = 0;
     default_locale = 0;
     free_gamedata();
     free_terrains();
