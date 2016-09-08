@@ -34,7 +34,7 @@ static void test_readwrite_data(CuTest * tc)
 {
     const char *filename = "test.dat";
     char path[MAX_PATH];
-    test_cleanup();
+    test_setup();
     CuAssertIntEquals(tc, 0, writegame(filename));
     CuAssertIntEquals(tc, 0, readgame(filename, false));
     join_path(datapath(), filename, path, sizeof(path));
@@ -51,7 +51,7 @@ static void test_readwrite_unit(CuTest * tc)
     struct faction *f;
     int fno;
 
-    test_cleanup();
+    test_setup();
     r = test_create_region(0, 0, 0);
     f = test_create_faction(0);
     fno = f->no;
@@ -81,7 +81,7 @@ static void test_readwrite_attrib(CuTest *tc) {
     storage store;
     attrib *a = NULL;
 
-    test_cleanup();
+    test_setup();
     key_set(&a, 41);
     key_set(&a, 42);
     mstream_init(&data.strm);
@@ -260,6 +260,7 @@ static void test_read_password(CuTest *tc) {
     storage store;
     faction *f;
 
+    test_setup();
     f = test_create_faction(0);
     faction_setpassword(f, password_encode("secret", PASSWORD_DEFAULT));
     mstream_init(&data.strm);
@@ -270,6 +271,7 @@ static void test_read_password(CuTest *tc) {
     mstream_done(&data.strm);
     gamedata_done(&data);
     CuAssertTrue(tc, checkpasswd(f, "secret"));
+    test_cleanup();
 }
 
 static void test_read_password_external(CuTest *tc) {
@@ -279,6 +281,7 @@ static void test_read_password_external(CuTest *tc) {
     faction *f;
     FILE * F;
 
+    test_setup();
     remove(pwfile);
     f = test_create_faction(0);
     faction_setpassword(f, password_encode("secret", PASSWORD_DEFAULT));
@@ -305,6 +308,7 @@ static void test_read_password_external(CuTest *tc) {
     mstream_done(&data.strm);
     gamedata_done(&data);
     CuAssertIntEquals(tc, 0, remove(pwfile));
+    test_cleanup();
 }
 
 CuSuite *get_save_suite(void)
