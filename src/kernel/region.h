@@ -18,9 +18,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #ifndef H_KRNL_REGION
 #define H_KRNL_REGION
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include <stddef.h>
 #include "types.h"
@@ -67,6 +64,7 @@ extern "C" {
     struct rawmaterial;
     struct item;
     struct faction;
+    struct gamedata;
 
 #define MORALE_TAX_FACTOR 0.005 /* 0.5% tax per point of morale */
 #define MORALE_MAX 10           /* Maximum morale allowed */
@@ -75,6 +73,11 @@ extern "C" {
 #define MORALE_COOLDOWN 2       /* minimum cooldown before a morale change occurs */
 #define MORALE_AVERAGE 6        /* default average time for morale to change */
 #define MORALE_TRANSFER 2       /* points of morale lost when GIVE COMMAND */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
     typedef struct region_owner {
         struct faction *owner;
@@ -165,7 +168,6 @@ extern "C" {
     extern struct attrib_type at_woodcount;
     extern struct attrib_type at_deathcount;
 
-    void initrhash(void);
     void rhash(struct region *r);
     void runhash(struct region *r);
 
@@ -173,10 +175,7 @@ extern "C" {
     void add_regionlist(region_list ** rl, struct region *r);
 
     int deathcount(const struct region *r);
-    int chaoscount(const struct region *r);
-
     void deathcounts(struct region *r, int delta);
-    void chaoscounts(struct region *r, int delta);
 
     void setluxuries(struct region *r, const struct luxury_type *sale);
     int get_maxluxuries(void);
@@ -203,12 +202,12 @@ extern "C" {
     void rsethorses(const struct region *r, int value);
 
     int rherbs(const struct region *r);
-    void rsetherbs(const struct region *r, int value);
+    void rsetherbs(struct region *r, int value);
+    void rsetherbtype(struct region *r, const struct item_type *itype);
 
 #define rbuildings(r) ((r)->buildings)
 
 #define rherbtype(r) ((r)->land?(r)->land->herbtype:0)
-#define rsetherbtype(r, value) if ((r)->land) (r)->land->herbtype=(value)
 
 
     bool r_isforest(const struct region *r);
@@ -255,7 +254,7 @@ extern "C" {
     void region_set_morale(region * r, int morale, int turn);
 
     void write_region_reference(const struct region *r, struct storage *store);
-    variant read_region_reference(struct storage *store);
+    variant read_region_reference(struct gamedata *data);
     int resolve_region_coor(variant id, void *address);
     int resolve_region_id(variant id, void *address);
 #define RESOLVE_REGION(version) ((version<UIDHASH_VERSION)?resolve_region_coor:resolve_region_id)
@@ -276,6 +275,8 @@ extern "C" {
     void get_neighbours(const struct region *r, struct region **list);
 
     struct faction *update_owners(struct region *r);
+
+    void region_erase(struct region *r);
 
 #ifdef __cplusplus
 }

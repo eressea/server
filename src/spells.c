@@ -30,7 +30,6 @@
 #include <spells/unitcurse.h>
 #include <spells/shipcurse.h>
 #include <spells/combatspells.h>
-#include <spells/alp.h>
 #include <spells/flyingship.h>
 
 /* kernel includes */
@@ -62,6 +61,7 @@
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/event.h>
+#include <util/gamedata.h>
 #include <util/language.h>
 #include <util/message.h>
 #include <util/parser.h>
@@ -975,7 +975,7 @@ static int sp_blessstonecircle(castorder * co)
         return 0;
     }
 
-    if (b->size < b->type->maxsize) {
+    if (!building_finished(b)) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "error_notcomplete", "building", b));
         return 0;
@@ -2866,9 +2866,10 @@ static curse *mk_deathcloud(unit * mage, region * r, double force, int duration)
 
 #define COMPAT_DEATHCLOUD
 #ifdef COMPAT_DEATHCLOUD
-static int dc_read_compat(struct attrib *a, void *target, struct storage * store)
+static int dc_read_compat(struct attrib *a, void *target, gamedata *data)
 /* return AT_READ_OK on success, AT_READ_FAIL if attrib needs removal */
 {
+    struct storage *store = data->store;
     region *r = NULL;
     unit *u;
     variant var;
@@ -3091,9 +3092,9 @@ static int sp_summonshadowlords(castorder * co)
 
 static bool chaosgate_valid(const connection * b)
 {
-    const attrib *a = a_findc(b->from->attribs, &at_direction);
+    const attrib *a = a_find(b->from->attribs, &at_direction);
     if (!a)
-        a = a_findc(b->to->attribs, &at_direction);
+        a = a_find(b->to->attribs, &at_direction);
     if (!a)
         return false;
     return true;
@@ -4501,11 +4502,11 @@ int sp_icastle(castorder * co)
     if (type == bt_illusion) {
         b->size = (rng_int() % (int)((power * power) + 1) * 10);
     }
-    else if (type->maxsize == -1) {
-        b->size = ((rng_int() % (int)(power)) + 1) * 5;
+    else if (type->maxsize >0) {
+        b->size = type->maxsize;
     }
     else {
-        b->size = type->maxsize;
+        b->size = ((rng_int() % (int)(power)) + 1) * 5;
     }
 
     if (type->name == NULL) {
@@ -6508,7 +6509,6 @@ static spelldata spell_functions[] = {
     { "bad_dreams", sp_baddreams, 0 },
     { "mindblast", sp_mindblast_temp, 0 },
     { "orkdream", sp_sweetdreams, 0 },
-    { "summon_alp", sp_summon_alp, 0 }, // TODO: this spell is disabled everywhere
     /* M_CERDDOR */
     { "appeasement", sp_denyattack, 0 },
     { "song_of_healing", sp_healing, 0 },
@@ -6704,9 +6704,6 @@ void register_spells(void)
 
     at_register(&at_wdwpyramid);
     at_register(&at_deathcloud_compat);
-
-    /* sp_summon_alp */
-    register_alp();
 
     /* init_firewall(); */
     ct_register(&ct_firewall);

@@ -22,6 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "magic.h"
 
 #include "skill.h"
+#include "study.h"
 #include "laws.h"
 
 #include <kernel/ally.h>
@@ -54,7 +55,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* util includes */
 #include <util/attrib.h>
-#include <critbit.h>
+#include <util/gamedata.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
@@ -67,6 +68,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/base36.h>
 #include <util/event.h>
 
+#include <critbit.h>
 #include <storage.h>
 
 /* libc includes */
@@ -128,16 +130,17 @@ typedef struct icastle_data {
     int time;
 } icastle_data;
 
-static int a_readicastle(attrib * a, void *owner, struct storage *store)
+static int a_readicastle(attrib * a, void *owner, struct gamedata *data)
 {
-    icastle_data *data = (icastle_data *)a->data.v;
+    storage *store = data->store;
+    icastle_data *idata = (icastle_data *)a->data.v;
     char token[32];
     READ_TOK(store, token, sizeof(token));
-    if (global.data_version < ATTRIBOWNER_VERSION) {
+    if (data->version < ATTRIBOWNER_VERSION) {
         READ_INT(store, NULL);
     }
-    READ_INT(store, &data->time);
-    data->type = bt_find(token);
+    READ_INT(store, &idata->time);
+    idata->type = bt_find(token);
     return AT_READ_OK;
 }
 
@@ -254,8 +257,9 @@ int get_spell_level_mage(const spell * sp, void * cbdata)
     return sbe ? sbe->level : 0;
 }
 
-static int read_mage(attrib * a, void *owner, struct storage *store)
+static int read_mage(attrib * a, void *owner, struct gamedata *data)
 {
+    storage *store = data->store;
     int i, mtype;
     sc_mage *mage = (sc_mage *)a->data.v;
     char spname[64];
@@ -291,10 +295,10 @@ static int read_mage(attrib * a, void *owner, struct storage *store)
         }
     }
     if (mage->magietyp == M_GRAY) {
-        read_spellbook(&mage->spellbook, store, get_spell_level_mage, mage);
+        read_spellbook(&mage->spellbook, data, get_spell_level_mage, mage);
     }
     else {
-        read_spellbook(0, store, 0, mage);
+        read_spellbook(0, data, 0, mage);
     }
     return AT_READ_OK;
 }
@@ -335,6 +339,7 @@ attrib_type at_mage = {
     NULL,
     write_mage,
     read_mage,
+    NULL,
     ATF_UNIQUE
 };
 
@@ -361,8 +366,9 @@ sc_mage *get_mage(const unit * u)
 * Spruch zu seiner List-of-known-spells hinzugefügt werden.
 */
 
-static int read_seenspell(attrib * a, void *owner, struct storage *store)
+static int read_seenspell(attrib * a, void *owner, struct gamedata *data)
 {
+    storage *store = data->store;
     int i;
     spell *sp = 0;
     char token[32];
@@ -373,7 +379,7 @@ static int read_seenspell(attrib * a, void *owner, struct storage *store)
         sp = find_spellbyid((unsigned int)i);
     }
     else {
-        if (global.data_version < UNIQUE_SPELLS_VERSION) {
+        if (data->version < UNIQUE_SPELLS_VERSION) {
             READ_INT(store, 0); /* ignore mtype */
         }
         sp = find_spell(token);
@@ -2280,10 +2286,10 @@ static int resolve_familiar(variant data, void *addr)
     return result;
 }
 
-static int read_familiar(attrib * a, void *owner, struct storage *store)
+static int read_familiar(attrib * a, void *owner, struct gamedata *data)
 {
     int result =
-        read_reference(&a->data.v, store, read_unit_reference, resolve_familiar);
+        read_reference(&a->data.v, data, read_unit_reference, resolve_familiar);
     if (result == 0 && a->data.v == NULL) {
         return AT_READ_FAIL;
     }
@@ -2364,10 +2370,10 @@ static int resolve_clone(variant data, void *addr)
     return result;
 }
 
-static int read_clone(attrib * a, void *owner, struct storage *store)
+static int read_clone(attrib * a, void *owner, struct gamedata *data)
 {
     int result =
-        read_reference(&a->data.v, store, read_unit_reference, resolve_clone);
+        read_reference(&a->data.v, data, read_unit_reference, resolve_clone);
     if (result == 0 && a->data.v == NULL) {
         return AT_READ_FAIL;
     }
@@ -2391,10 +2397,10 @@ static int resolve_mage(variant data, void *addr)
     return result;
 }
 
-static int read_magician(attrib * a, void *owner, struct storage *store)
+static int read_magician(attrib * a, void *owner, struct gamedata *data)
 {
     int result =
-        read_reference(&a->data.v, store, read_unit_reference, resolve_mage);
+        read_reference(&a->data.v, data, read_unit_reference, resolve_mage);
     if (result == 0 && a->data.v == NULL) {
         return AT_READ_FAIL;
     }
@@ -2416,6 +2422,7 @@ attrib_type at_familiarmage = {
     age_unit,
     a_write_unit,
     read_magician,
+    NULL,
     ATF_UNIQUE
 };
 
@@ -2426,6 +2433,7 @@ attrib_type at_familiar = {
     age_unit,
     a_write_unit,
     read_familiar,
+    NULL,
     ATF_UNIQUE
 };
 
@@ -2436,6 +2444,7 @@ attrib_type at_clonemage = {
     age_unit,
     a_write_unit,
     read_magician,
+    NULL,
     ATF_UNIQUE
 };
 
@@ -2446,6 +2455,7 @@ attrib_type at_clone = {
     age_unit,
     a_write_unit,
     read_clone,
+    NULL,
     ATF_UNIQUE
 };
 

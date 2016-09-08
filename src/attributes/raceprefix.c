@@ -28,7 +28,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 
 attrib_type at_raceprefix = {
-    "raceprefix", NULL, a_finalizestring, NULL, a_writestring, a_readstring,
+    "raceprefix", NULL, a_finalizestring, NULL, a_writestring, a_readstring, NULL,
     ATF_UNIQUE
 };
 
@@ -45,10 +45,10 @@ void set_prefix(attrib ** ap, const char *str)
     a->data.v = _strdup(str);
 }
 
-const char *get_prefix(const attrib * a)
+const char *get_prefix(attrib * a)
 {
     char *str;
-    a = a_findc(a, &at_raceprefix);
+    a = a_find(a, &at_raceprefix);
     if (a == NULL)
         return NULL;
     str = (char *)a->data.v;

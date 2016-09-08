@@ -6,6 +6,7 @@
 #include <kernel/region.h>
 
 #include <util/attrib.h>
+#include <util/gamedata.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/umlaut.h>
@@ -74,8 +75,9 @@ static int a_agedirection(attrib * a, void *owner)
     return (d->duration > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
 }
 
-static int a_readdirection(attrib * a, void *owner, struct storage *store)
+static int a_readdirection(attrib * a, void *owner, struct gamedata *data)
 {
+    struct storage *store = data->store;
     spec_direction *d = (spec_direction *)(a->data.v);
     char lbuf[32];
 
@@ -149,7 +151,7 @@ attrib *create_special_direction(region * r, region * rt, int duration,
 
 spec_direction *special_direction(const region * from, const region * to)
 {
-    const attrib *a = a_findc(from->attribs, &at_direction);
+    const attrib *a = a_find(from->attribs, &at_direction);
 
     while (a != NULL && a->type == &at_direction) {
         spec_direction *sd = (spec_direction *)a->data.v;

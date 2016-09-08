@@ -3,8 +3,10 @@
 #include "keyword.h"
 #include "seen.h"
 #include "prefix.h"
+#include "reports.h"
 
 #include <kernel/config.h>
+#include <kernel/alliance.h>
 #include <kernel/plane.h>
 #include <kernel/region.h>
 #include <kernel/terrain.h>
@@ -53,7 +55,7 @@ struct region *test_create_region(int x, int y, const terrain_type *terrain)
     if (!terrain) {
         terrain_type *t = get_or_create_terrain("plain");
         t->size = 1000;
-        fset(t, LAND_REGION|CAVALRY_REGION|FOREST_REGION);
+        fset(t, LAND_REGION|CAVALRY_REGION|FOREST_REGION|FLY_INTO|WALK_INTO);
         terraform_region(r, t);
     }
     else {
@@ -67,9 +69,48 @@ struct region *test_create_region(int x, int y, const terrain_type *terrain)
     return r;
 }
 
+struct locale * test_create_locale(void) {
+    struct locale *loc = get_locale("test");
+    if (!loc) {
+        int i;
+        loc = get_or_create_locale("test");
+        locale_setstring(loc, "factiondefault", parameters[P_FACTION]);
+        for (i = 0; i < MAXSKILLS; ++i) {
+            if (!locale_getstring(loc, mkname("skill", skillnames[i])))
+                locale_setstring(loc, mkname("skill", skillnames[i]), skillnames[i]);
+        }
+        for (i = 0; i != ALLIANCE_MAX; ++i) {
+            locale_setstring(loc, alliance_kwd[i], alliance_kwd[i]);
+        }
+        for (i = 0; i != MAXDIRECTIONS; ++i) {
+            locale_setstring(loc, directions[i], directions[i]);
+            init_direction(loc, i, directions[i]);
+            init_direction(loc, i, coasts[i]+7);
+        }
+        for (i = 0; i <= ST_FLEE; ++i) {
+            locale_setstring(loc, combatstatus[i], combatstatus[i]+7);
+        }
+        for (i = 0; i != MAXKEYWORDS; ++i) {
+            locale_setstring(loc, mkname("keyword", keywords[i]), keywords[i]);
+        }
+        for (i = 0; i != MAXSKILLS; ++i) {
+            locale_setstring(loc, mkname("skill", skillnames[i]), skillnames[i]);
+        }
+        for (i = 0; i != MAXPARAMS; ++i) {
+            locale_setstring(loc, parameters[i], parameters[i]);
+            test_translate_param(loc, i, parameters[i]);
+        }
+        init_parameters(loc);
+        init_keywords(loc);
+        init_skills(loc);
+    }
+    return loc;
+}
+
 struct faction *test_create_faction(const struct race *rc)
 {
-    faction *f = addfaction("nobody@eressea.de", NULL, rc ? rc : test_create_race("human"), default_locale, 0);
+    struct locale * loc = test_create_locale();
+    faction *f = addfaction("nobody@eressea.de", NULL, rc ? rc : test_create_race("human"), loc, 0);
     test_clear_messages(f);
     return f;
 }
@@ -78,6 +119,7 @@ struct unit *test_create_unit(struct faction *f, struct region *r)
 {
     const struct race * rc = f ? f->race : 0;
     assert(f || !r);
+    if (!rc) rc = rc_get_or_create("human");
     return create_unit(r, f, 1, rc ? rc : rc_get_or_create("human"), 0, 0, 0);
 }
 
@@ -85,6 +127,7 @@ void test_cleanup(void)
 {
     int i;
 
+    default_locale = 0;
     free_gamedata();
     free_terrains();
     free_resources();
@@ -154,11 +197,14 @@ ship_type * test_create_shiptype(const char * name)
         stype->construction->skill = SK_SHIPBUILDING;
     }
 
+    if (stype->coasts) {
+        free(stype->coasts);
+    }
     stype->coasts =
-        (terrain_type **)malloc(sizeof(terrain_type *)*2);
-    stype->coasts[0] = get_or_create_terrain("plain");
-    stype->coasts[1] = NULL;
-
+        (terrain_type **)malloc(sizeof(terrain_type *) * 3);
+    stype->coasts[0] = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION | FLY_INTO);
+    stype->coasts[1] = test_create_terrain("ocean", SEA_REGION | SWIM_INTO | FLY_INTO);
+    stype->coasts[2] = NULL;
     if (default_locale) {
         locale_setstring(default_locale, name, name);
     }
@@ -282,10 +328,10 @@ void test_create_world(void)
     test_create_itemtype("iron");
     test_create_itemtype("stone");
 
-    t_plain = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION | SAIL_INTO | FLY_INTO);
+    t_plain = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION |  FLY_INTO);
     t_plain->size = 1000;
     t_plain->max_road = 100;
-    t_ocean = test_create_terrain("ocean", SEA_REGION | SAIL_INTO | SWIM_INTO | FLY_INTO);
+    t_ocean = test_create_terrain("ocean", SEA_REGION |  SWIM_INTO | FLY_INTO);
     t_ocean->size = 0;
 
     island[0] = test_create_region(0, 0, t_plain);
@@ -348,6 +394,29 @@ void test_clear_messages(faction *f) {
         free(f->msgs);
         f->msgs = 0;
     }
+}
+
+void assert_message(CuTest * tc, message *msg, char *name, int numpar) {
+    const message_type *mtype = msg->type;
+    assert(mtype);
+
+    CuAssertStrEquals(tc, name, mtype->name);
+    CuAssertIntEquals(tc, numpar, mtype->nparameters);
+}
+
+void assert_pointer_parameter(CuTest * tc, message *msg, int index, void *arg) {
+    const message_type *mtype = (msg)->type;
+    CuAssertIntEquals((tc), VAR_VOIDPTR, mtype->types[(index)]->vtype);CuAssertPtrEquals((tc), (arg), msg->parameters[(index)].v);
+}
+
+void assert_int_parameter(CuTest * tc, message *msg, int index, int arg) {
+    const message_type *mtype = (msg)->type;
+    CuAssertIntEquals((tc), VAR_INT, mtype->types[(index)]->vtype);CuAssertIntEquals((tc), (arg), msg->parameters[(index)].i);
+}
+
+void assert_string_parameter(CuTest * tc, message *msg, int index, const char *arg) {
+    const message_type *mtype = (msg)->type;
+    CuAssertIntEquals((tc), VAR_VOIDPTR, mtype->types[(index)]->vtype);CuAssertStrEquals((tc), (arg), msg->parameters[(index)].v);
 }
 
 void disabled_test(void *suite, void (*test)(CuTest *), const char *name) {

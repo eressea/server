@@ -21,6 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "alchemy.h"
 #include "move.h"
 #include "skill.h"
+#include "study.h"
 
 #include <kernel/item.h>
 #include <kernel/faction.h>
@@ -33,6 +34,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* util includes */
 #include <util/attrib.h>
+#include <util/gamedata.h>
 #include <util/base36.h>
 #include <util/log.h>
 #include <util/rand.h>
@@ -301,8 +303,9 @@ a_writeeffect(const attrib * a, const void *owner, struct storage *store)
     WRITE_INT(store, edata->value);
 }
 
-static int a_readeffect(attrib * a, void *owner, struct storage *store)
+static int a_readeffect(attrib * a, void *owner, struct gamedata *data)
 {
+    struct storage *store = data->store;
     int power;
     const resource_type *rtype;
     effect_data *edata = (effect_data *)a->data.v;
@@ -313,6 +316,10 @@ static int a_readeffect(attrib * a, void *owner, struct storage *store)
 
     READ_INT(store, &power);
     if (rtype == NULL || rtype->ptype == NULL || power <= 0) {
+        return AT_READ_FAIL;
+    }
+    if (rtype->ptype==oldpotiontype[P_HEAL]) {
+        // healing potions used to have long-term effects
         return AT_READ_FAIL;
     }
     edata->type = rtype->ptype;

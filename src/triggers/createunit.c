@@ -31,6 +31,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/event.h>
+#include <util/gamedata.h>
 #include <util/log.h>
 #include <util/resolve.h>
 
@@ -88,12 +89,12 @@ static void createunit_write(const trigger * t, struct storage *store)
     WRITE_INT(store, td->number);
 }
 
-static int createunit_read(trigger * t, struct storage *store)
+static int createunit_read(trigger * t, gamedata *data)
 {
     createunit_data *td = (createunit_data *)t->data.v;
     variant var;
     int result = AT_READ_OK;
-    var = read_faction_reference(store);
+    var = read_faction_reference(data);
     if (var.i > 0) {
         td->f = findfaction(var.i);
         if (!td->f) {
@@ -105,13 +106,13 @@ static int createunit_read(trigger * t, struct storage *store)
     }
     // read_reference(&td->f, store, read_faction_reference, resolve_faction);
 
-    read_reference(&td->r, store, read_region_reference,
-        RESOLVE_REGION(global.data_version));
-    td->race = (const struct race *)read_race_reference(store).v;
+    read_reference(&td->r, data, read_region_reference,
+        RESOLVE_REGION(data->version));
+    td->race = (const struct race *)read_race_reference(data->store).v;
     if (!td->race) {
         result = AT_READ_FAIL;
     }
-    READ_INT(store, &td->number);
+    READ_INT(data->store, &td->number);
     return result;
 }
 

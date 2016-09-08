@@ -27,6 +27,7 @@
     "settings": {
         "game.id": 4,
         "game.name": "Deveron",
+        "orders.default": "work",
         "database.gameid": 7,
         "NewbieImmunity": 4,
         "modules.astralspace": false,
@@ -49,7 +50,7 @@
         "recruit.allow_merge": true,
         "study.expensivemigrants": true,
         "study.speedup": 2,
-        "study.from_use": 0.4,
+        "study.produceexp": 12,
         "world.era": 3,
         "rules.reserve.twophase": true,
         "rules.owners.force_leave": false,

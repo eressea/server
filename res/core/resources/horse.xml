@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <resource name="horse" limited="yes" material="rm_horse">
   <item big="yes" weight="5000" score="10" capacity="7000" animal="yes">
-    <construction skill="training" minskill="1" reqsize="1"/>
+    <construction skill="training" minskill="1"/>
     <function name="give" value="givehorses"/>
   </item>
   <resourcelimit>

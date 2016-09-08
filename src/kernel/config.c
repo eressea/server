@@ -659,11 +659,16 @@ void set_basepath(const char *path)
 #define PATH_DELIM '/'
 #endif
 
-
 char * join_path(const char *p1, const char *p2, char *dst, size_t len) {
     size_t sz;
     assert(p1 && p2);
-    sz = strlcpy(dst, p1, len);
+    assert(p2 != dst);
+    if (dst == p1) {
+        sz = strlen(p1);
+    }
+    else {
+        sz = strlcpy(dst, p1, len);
+    }
     assert(sz < len);
     dst[sz++] = PATH_DELIM;
     strlcpy(dst + sz, p2, len - sz);
@@ -998,33 +1003,24 @@ void kernel_init(void)
 }
 
 static order * defaults[MAXLOCALES];
-keyword_t default_keyword = NOKEYWORD;
 
-void set_default_order(int kwd) {
-    default_keyword = (keyword_t)kwd;
-}
-
-// TODO: outside of tests, default_keyword is never used, why is this here?
-// see also test_long_order_hungry
 order *default_order(const struct locale *lang)
 {
-    static int usedefault = 1;
     int i = locale_index(lang);
     order *result = 0;
     assert(i < MAXLOCALES);
 
-    if (default_keyword != NOKEYWORD) {
-        return create_order(default_keyword, lang, 0);
-    }
-
     result = defaults[i];
-    if (!result && usedefault) {
-        const char * str = LOC(lang, "defaultorder");
+    if (!result) {
+        const char * str;
+        keyword_t kwd = NOKEYWORD;
+        str = config_get("orders.default");
         if (str) {
-            result = defaults[i] = parse_order(str, lang);
+            kwd = findkeyword(str);
         }
-        else {
-            usedefault = 0;
+        if (kwd != NOKEYWORD) {
+            result = create_order(kwd, lang, NULL);
+            defaults[i] = result;
         }
     }
     return result ? copy_order(result) : 0;
@@ -1054,7 +1050,7 @@ int rule_give(void)
 
 bool markets_module(void)
 {
-    return config_get_int("modules.markets", 0);
+    return (bool)config_get_int("modules.markets", 0);
 }
 
 static struct param *configuration;
@@ -1080,7 +1076,6 @@ bool config_token(const char *key, const char *tok) {
 }
 
 void free_config(void) {
-    global.functions.maintenance = NULL;
     global.functions.wage = NULL;
     free_params(&configuration);
 }
@@ -1109,8 +1104,7 @@ void free_gamedata(void)
     while (planes) {
         plane *pl = planes;
         planes = planes->next;
-        free(pl->name);
-        free(pl);
+        free_plane(pl);
     }
 
     while (global.attribs) {

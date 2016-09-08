@@ -438,7 +438,7 @@ static void test_configs(CuTest * tc)
 
     test_cleanup();
 
-    F = fopen("test.json", "wt");
+    F = fopen("test.json", "w");
     fwrite(building_data, 1, strlen(building_data), F);
     fclose(F);
     CuAssertPtrNotNull(tc, json);
@@ -458,7 +458,7 @@ static void test_terrains(CuTest * tc)
         "\"size\": 4000, "
         "\"road\": 50, "
         "\"seed\": 3, "
-        "\"flags\" : [ \"forbidden\", \"arctic\", \"cavalry\", \"sea\", \"forest\", \"land\", \"sail\", \"fly\", \"swim\", \"walk\" ] } }}";
+        "\"flags\" : [ \"forbidden\", \"arctic\", \"cavalry\", \"sea\", \"forest\", \"land\", \"fly\", \"swim\", \"walk\" ] } }}";
     const terrain_type *ter;
 
     cJSON *json = cJSON_Parse(data);
@@ -470,7 +470,7 @@ static void test_terrains(CuTest * tc)
     json_config(json);
     ter = get_terrain("plain");
     CuAssertPtrNotNull(tc, ter);
-    CuAssertIntEquals(tc, ARCTIC_REGION | LAND_REGION | SEA_REGION | FOREST_REGION | CAVALRY_REGION | FORBIDDEN_REGION | FLY_INTO | WALK_INTO | SWIM_INTO | SAIL_INTO, ter->flags);
+    CuAssertIntEquals(tc, ARCTIC_REGION | LAND_REGION | SEA_REGION | FOREST_REGION | CAVALRY_REGION | FORBIDDEN_REGION | FLY_INTO | WALK_INTO | SWIM_INTO , ter->flags);
     CuAssertIntEquals(tc, 4000, ter->size);
     CuAssertIntEquals(tc, 50, ter->max_road);
     CuAssertIntEquals(tc, 3, ter->distribution);

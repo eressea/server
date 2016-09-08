@@ -17,10 +17,17 @@ extern "C" {
 #include <stdio.h>
 #include <stdarg.h>
 
-    extern void log_open(const char *filename);
-    extern void log_close(void);
+    struct log_t;
 
-    /* use macros above instead of these: */
+    typedef void(*log_fun)(void *data, int level, const char *module, const char *format, va_list args);
+
+    struct log_t * log_open(const char *filename, int flags);
+    struct log_t * log_create(int flags, void *data, log_fun call);
+    void log_destroy(struct log_t *handle);
+    struct log_t * log_to_file(int flags, FILE *out);
+    int log_level(struct log_t *log, int flags);
+    void log_close(void);
+
     extern void log_fatal(const char *format, ...);
     extern void log_error(const char *format, ...);
     extern void log_warning(const char *format, ...);
@@ -36,13 +43,7 @@ extern "C" {
 #define LOG_FLUSH      0x10
 #define LOG_BRIEF      0x20
 
-    typedef void(*log_fun)(void *data, int level, const char *module, const char *format, va_list args);
 
-    int log_create(int flags, void *data, log_fun call);
-    void log_destroy(int id);
-    void log_to_file(int flags, FILE *out);
-
-    extern int log_flags;
     extern int log_stderr;
 #ifdef __cplusplus
 }

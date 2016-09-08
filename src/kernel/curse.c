@@ -35,6 +35,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/gamedata.h>
 #include <util/goodies.h>
 #include <util/language.h>
 #include <util/log.h>
@@ -56,7 +57,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <ctype.h>
 
 #define MAXENTITYHASH 7919
-curse *cursehash[MAXENTITYHASH];
+static curse *cursehash[MAXENTITYHASH];
 
 void c_setflag(curse * c, unsigned int flags)
 {
@@ -73,17 +74,19 @@ void c_clearflag(curse * c, unsigned int flags)
 
 void chash(curse * c)
 {
-    curse *old = cursehash[c->no % MAXENTITYHASH];
+    int i = c->no % MAXENTITYHASH;
 
-    cursehash[c->no % MAXENTITYHASH] = c;
-    c->nexthash = old;
+    c->nexthash = cursehash[i];
+    cursehash[i] = c;
+    assert(c->nexthash != c);
 }
 
 static void cunhash(curse * c)
 {
     curse **show;
+    int i = c->no % MAXENTITYHASH;
 
-    for (show = &cursehash[c->no % MAXENTITYHASH]; *show;
+    for (show = &cursehash[i]; *show;
         show = &(*show)->nexthash) {
         if ((*show)->no == c->no)
             break;
@@ -93,16 +96,6 @@ static void cunhash(curse * c)
         *show = (*show)->nexthash;
         c->nexthash = 0;
     }
-}
-
-curse *cfindhash(int i)
-{
-    curse *old;
-
-    for (old = cursehash[i % MAXENTITYHASH]; old; old = old->nexthash)
-        if (old->no == i)
-            return old;
-    return NULL;
 }
 
 /* ------------------------------------------------------------- */
@@ -184,8 +177,9 @@ static int read_ccompat(const char *cursename, struct storage *store)
     return -1;
 }
 
-int curse_read(attrib * a, void *owner, struct storage *store)
+int curse_read(attrib * a, void *owner, gamedata *data)
 {
+    storage *store = data->store;
     curse *c = (curse *)a->data.v;
     int ur;
     char cursename[64];
@@ -193,6 +187,7 @@ int curse_read(attrib * a, void *owner, struct storage *store)
     int flags;
     float flt;
 
+    assert(!c->no);
     READ_INT(store, &c->no);
     chash(c);
     READ_TOK(store, cursename, sizeof(cursename));
@@ -200,13 +195,13 @@ int curse_read(attrib * a, void *owner, struct storage *store)
     READ_INT(store, &c->duration);
     READ_FLT(store, &flt);
     c->vigour = flt;
-    if (global.data_version < INTPAK_VERSION) {
-        ur = read_reference(&c->magician, store, read_int, resolve_unit);
+    if (data->version < INTPAK_VERSION) {
+        ur = resolve_unit(read_int(data->store), &c->magician);
     }
     else {
-        ur = read_reference(&c->magician, store, read_unit_reference, resolve_unit);
+        ur = read_reference(&c->magician, data, read_unit_reference, resolve_unit);
     }
-    if (global.data_version < CURSEFLOAT_VERSION) {
+    if (data->version < CURSEFLOAT_VERSION) {
         READ_INT(store, &n);
         c->effect = (float)n;
     }
@@ -224,19 +219,20 @@ int curse_read(attrib * a, void *owner, struct storage *store)
         return AT_READ_FAIL;
     }
     c->flags = flags;
-    if (global.data_version < EXPLICIT_CURSE_ISNEW_VERSION) {
+    if (data->version < EXPLICIT_CURSE_ISNEW_VERSION) {
         c_clearflag(c, CURSE_ISNEW);
     }
 
-    if (c->type->read)
-        c->type->read(store, c, owner);
+    if (c->type->read) {
+        c->type->read(data, c, owner);
+    }
     else if (c->type->typ == CURSETYP_UNIT) {
         READ_INT(store, &c->data.i);
     }
     if (c->type->typ == CURSETYP_REGION) {
         int rr =
-            read_reference(&c->data.v, store, read_region_reference,
-            RESOLVE_REGION(global.data_version));
+            read_reference(&c->data.v, data, read_region_reference,
+            RESOLVE_REGION(data->version));
         if (ur == 0 && rr == 0 && !c->data.v) {
             return AT_READ_FAIL;
         }
@@ -253,12 +249,11 @@ void curse_write(const attrib * a, const void *owner, struct storage *store)
     unit *mage = (c->magician && c->magician->number) ? c->magician : NULL;
 
     /* copied from c_clearflag */
-    if (global.data_version < EXPLICIT_CURSE_ISNEW_VERSION) {
-        flags = (c->flags & ~CURSE_ISNEW) | (c->type->flags & CURSE_ISNEW);
-    }
-    else {
-        flags = c->flags | c->type->flags;
-    }
+#if RELEASE_VERSION < EXPLICIT_CURSE_ISNEW_VERSION
+    flags = (c->flags & ~CURSE_ISNEW) | (c->type->flags & CURSE_ISNEW);
+#else
+    flags = c->flags | c->type->flags;
+#endif
 
     WRITE_INT(store, c->no);
     WRITE_TOK(store, ct->cname);
@@ -285,6 +280,7 @@ attrib_type at_curse = {
     curse_age,
     curse_write,
     curse_read,
+    NULL,
     ATF_CURSE
 };
 
@@ -363,6 +359,7 @@ static bool cmp_curse(const attrib * a, const void *data)
 curse *get_curse(attrib * ap, const curse_type * ctype)
 {
     attrib *a = ap;
+    if (!ctype) return NULL;
     while (a) {
         if (a->type->flags & ATF_CURSE) {
             const attrib_type *at = a->type;
@@ -383,9 +380,13 @@ curse *get_curse(attrib * ap, const curse_type * ctype)
 /* ------------------------------------------------------------- */
 /* findet einen curse global anhand seiner 'curse-Einheitnummer' */
 
-curse *findcurse(int cid)
+curse *findcurse(int i)
 {
-    return cfindhash(cid);
+    curse *old;
+    for (old = cursehash[i % MAXENTITYHASH]; old; old = old->nexthash)
+        if (old->no == i)
+            return old;
+    return NULL;
 }
 
 /* ------------------------------------------------------------- */
@@ -694,32 +695,6 @@ bool is_cursed_with(const attrib * ap, const curse * c)
 /* ------------------------------------------------------------- */
 /* cursedata */
 /* ------------------------------------------------------------- */
-/*
- * typedef struct curse_type {
- *  const char *cname; (Name der Zauberwirkung, Identifizierung des curse)
- *  int typ;
- *  spread_t spread;
- *  unsigned int mergeflags;
- *  int (*curseinfo)(const struct locale*, const void*, int, curse*, int);
- *  void (*change_vigour)(curse*, double);
- *  int (*read)(struct storage * store, curse * c);
- *  int (*write)(struct storage * store, const curse * c);
- * } curse_type;
- */
-
-int resolve_curse(variant id, void *address)
-{
-    int result = 0;
-    curse *c = NULL;
-    if (id.i != 0) {
-        c = cfindhash(id.i);
-        if (c == NULL) {
-            result = -1;
-        }
-    }
-    *(curse **)address = c;
-    return result;
-}
 
 static const char *oldnames[MAXCURSE] = {
     /* OBS: when removing curses, remember to update read_ccompat() */
@@ -750,7 +725,6 @@ static const char *oldnames[MAXCURSE] = {
     "oldrace",
     "fumble",
     "riotzone",
-    "nocostbuilding",
     "godcursezone",
     "speed",
     "orcish",
@@ -821,7 +795,7 @@ double destr_curse(curse * c, int cast_level, double force)
     return force;
 }
 
-void free_curses(void) {
+void curses_done(void) {
     int i;
     for (i = 0; i != MAXCTHASH; ++i) {
         ql_free(cursetypes[i]);

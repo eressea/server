@@ -807,8 +807,7 @@ static int tolua_unit_get_flag(lua_State * L)
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
     const char *name = tolua_tostring(L, 2, 0);
     int flag = atoi36(name);
-    attrib *a = find_key(self->attribs, flag);
-    lua_pushboolean(L, (a != NULL));
+    lua_pushboolean(L, key_get(self->attribs, flag));
     return 1;
 }
 
@@ -818,12 +817,11 @@ static int tolua_unit_set_flag(lua_State * L)
     const char *name = tolua_tostring(L, 2, 0);
     int value = (int)tolua_tonumber(L, 3, 0);
     int flag = atoi36(name);
-    attrib *a = find_key(self->attribs, flag);
-    if (a == NULL && value) {
-        add_key(&self->attribs, flag);
+    if (value) {
+        key_set(&self->attribs, flag);
     }
-    else if (a != NULL && !value) {
-        a_remove(&self->attribs, a);
+    else {
+        key_unset(&self->attribs, flag);
     }
     return 0;
 }
@@ -891,19 +889,15 @@ static int tolua_unit_create(lua_State * L)
 {
     faction *f = (faction *)tolua_tousertype(L, 1, 0);
     region *r = (region *)tolua_tousertype(L, 2, 0);
+    const char *rcname = tolua_tostring(L, 4, NULL);
     int num = (int)tolua_tonumber(L, 3, 1);
-    if (f && r) {
-        const race *rc = f->race;
-        const char *rcname = tolua_tostring(L, 4, NULL);
-        if (rcname)
-            rc = rc_find(rcname);
-        if (rc) {
-            unit *u = create_unit(r, f, num, rc, 0, NULL, NULL);
-            tolua_pushusertype(L, u, TOLUA_CAST "unit");
-            return 1;
-        }
-    }
-    return 0;
+    const race *rc;
+    assert(f && r);
+    rc = rcname ? rc_find(rcname) : f->race;
+    assert(rc);
+    unit *u = create_unit(r, f, num, rc, 0, NULL, NULL);
+    tolua_pushusertype(L, u, TOLUA_CAST "unit");
+    return 1;
 }
 
 static int tolua_unit_tostring(lua_State * L)

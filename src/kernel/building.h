@@ -26,6 +26,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
+    struct gamedata;
+    
     /* maintenance::flags */
 #define MTF_NONE     0x00
 #define MTF_VARIABLE 0x01       /* resource usage scales with size */
@@ -90,22 +92,13 @@ extern "C" {
         const struct building *b, int bsize);
 
     bool in_safe_building(struct unit *u1, struct unit *u2);
-    /* buildingt => building_type
-     * Name => locale_string(name)
-     * MaxGroesse => levels
-     * MinBauTalent => construction->minskill
-     * Kapazitaet => capacity, maxcapacity
-     * Materialien => construction->materials
-     * UnterSilber, UnterSpezialTyp, UnterSpezial => maintenance
-     * per_size => !maintenance->fixed
-     */
+
 #define BFL_NONE           0x00
 #define BLD_MAINTAINED     0x01 /* vital maintenance paid for */
-#define BLD_WORKING        0x02 /* full maintenance paid, it works */
+#define BLD_DONTPAY        0x02 /* PAY NOT */
 #define BLD_UNGUARDED      0x04 /* you can enter this building anytime */
 #define BLD_EXPANDED       0x08 /* has been expanded this turn */
 #define BLD_SELECT         0x10 /* formerly FL_DH */
-#define BLD_DONTPAY        0x20 /* PAY NOT */
 
 #define BLD_SAVEMASK       0x00 /* mask for persistent flags */
 
@@ -136,6 +129,7 @@ extern "C" {
     struct region *r, const struct locale *lang);
     int build_building(struct unit *u, const struct building_type *typ,
         int id, int size, struct order *ord);
+    bool building_finished(const struct building *b);
 
     /* Alte Gebäudetypen: */
 
@@ -158,7 +152,7 @@ extern "C" {
     extern int resolve_building(variant data, void *address);
     extern void write_building_reference(const struct building *b,
     struct storage *store);
-    extern variant read_building_reference(struct storage *store);
+    extern variant read_building_reference(struct gamedata *data);
 
     extern struct building *findbuilding(int n);
 
@@ -170,10 +164,6 @@ extern "C" {
         const struct building_type *bt, bool working);
     bool building_is_active(const struct building *b);
     struct building *active_building(const struct unit *u, const struct building_type *btype);
-
-#ifdef WDW_PYRAMID
-    extern int wdw_pyramid_level(const struct building *b);
-#endif
 
     extern const char *buildingname(const struct building *b);
 

@@ -2,7 +2,7 @@
 <resource name="plate">
   <item weight="400" score="150">
     <function name="canuse" value="lua_canuse_item"/>
-    <construction skill="armorer" minskill="4" reqsize="1">
+    <construction skill="armorer" minskill="4">
       <requirement type="iron" quantity="5"/>
     </construction>
     <armor ac="5" penalty="0.30" magres="0.0"/>

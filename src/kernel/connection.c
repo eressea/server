@@ -28,6 +28,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <util/attrib.h>
 #include <util/bsdstring.h>
+#include <util/gamedata.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <quicklist.h>
@@ -217,8 +218,9 @@ border_type *find_bordertype(const char *name)
     return bt;
 }
 
-void b_read(connection * b, storage * store)
+void b_read(connection * b, gamedata * data)
 {
+    storage * store = data->store;
     int n, result = 0;
     switch (b->type->datatype) {
     case VAR_NONE:
@@ -529,8 +531,9 @@ static const char *b_nameroad(const connection * b, const region * r,
     return buffer;
 }
 
-static void b_readroad(connection * b, storage * store)
+static void b_readroad(connection * b, gamedata * data)
 {
+    storage * store = data->store;
     int n;
     READ_INT(store, &n);
     b->data.sa[0] = (short)n;
@@ -601,8 +604,9 @@ void write_borders(struct storage *store)
     WRITE_TOK(store, "end");
 }
 
-int read_borders(struct storage *store)
+int read_borders(gamedata *data)
 {
+    struct storage *store = data->store;
     for (;;) {
         int bid = 0;
         char zText[32];
@@ -612,8 +616,15 @@ int read_borders(struct storage *store)
         READ_TOK(store, zText, sizeof(zText));
         if (!strcmp(zText, "end"))
             break;
+        type = find_bordertype(zText);
+        if (type == NULL) {
+            log_error("[read_borders] connection %d type %s is not registered", bid, zText);
+            assert(type || !"connection type not registered");
+        }
+
+
         READ_INT(store, &bid);
-        if (global.data_version < UIDHASH_VERSION) {
+        if (data->version < UIDHASH_VERSION) {
             int fx, fy, tx, ty;
             READ_INT(store, &fx);
             READ_INT(store, &fy);
@@ -628,16 +639,17 @@ int read_borders(struct storage *store)
             READ_INT(store, &tid);
             from = findregionbyid(fid);
             to = findregionbyid(tid);
-            if (!to || !from) {
-                log_warning("%s connection between incomplete regions %d and %d", zText, fid, tid);
-                continue;
-            }
         }
-
-        type = find_bordertype(zText);
-        if (type == NULL) {
-            log_error("[read_borders] unknown connection type '%s' in %s\n", zText, regionname(from, NULL));
-            assert(type || !"connection type not registered");
+        if (!to || !from) {
+            if (!to || !from) {
+                log_error("%s connection %d has missing regions", zText, bid);
+            }
+            if (type->read) {
+                // skip ahead
+                connection dummy;
+                type->read(&dummy, data);
+            }
+            continue;
         }
 
         if (to == from && type && from) {
@@ -647,19 +659,15 @@ int read_borders(struct storage *store)
             if (r != NULL)
                 to = r;
         }
-        if ((type->read && !type->write)) {
-            log_warning("ignore invalid border '%s' between '%s' and '%s'\n", zText, regionname(from, 0), regionname(to, 0));
-        }
-        else {
+        if (type->read) {
             connection *b = new_border(type, from, to);
             nextborder--;               /* new_border erhöht den Wert */
             b->id = bid;
             assert(bid <= nextborder);
-            if (type->read)
-                type->read(b, store);
-            if (global.data_version < NOBORDERATTRIBS_VERSION) {
+            type->read(b, data);
+            if (data->version < NOBORDERATTRIBS_VERSION) {
                 attrib *a = NULL;
-                int result = a_read(store, &a, b);
+                int result = read_attribs(data, &a, b);
                 if (border_convert_cb) {
                     border_convert_cb(b, a);
                 }
@@ -670,7 +678,14 @@ int read_borders(struct storage *store)
                     return result;
                 }
             }
+            if (!type->write) {
+                log_warning("invalid border '%s' between '%s' and '%s'\n", zText, regionname(from, 0), regionname(to, 0));
+            }
         }
     }
     return 0;
+}
+
+const char * border_name(const connection *co, const struct region * r, const struct faction * f, int flags) {
+    return (co->type->name) ? co->type->name(co, r, f, flags) : co->type->__name;
 }

@@ -1160,7 +1160,8 @@ int seemode, FILE * F)
                 }
             }
             if (cs) {
-                const char *bname = mkname("border", b->type->name(b, r, f, GF_PURE));
+                const char *bname = border_name(b, r, f, GF_PURE);
+                bname = mkname("border", bname);
                 fprintf(F, "GRENZE %d\n", ++g);
                 fprintf(F, "\"%s\";typ\n", LOC(default_locale, bname));
                 fprintf(F, "%d;richtung\n", d);
@@ -1498,7 +1499,7 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
     const char *mailto = LOC(f->locale, "mailto");
     const attrib *a;
     seen_region *sr = NULL;
-    FILE *F = fopen(filename, "wt");
+    FILE *F = fopen(filename, "w");
 
     if (era < 0) {
         era = config_get_int("world.era", 1);

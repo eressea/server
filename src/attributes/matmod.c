@@ -28,6 +28,7 @@ attrib_type at_matmod = {
     NULL,
     NULL,
     NULL,
+    NULL,
     ATF_PRESERVE
 };
 

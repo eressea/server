@@ -23,7 +23,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* kernel includes */
 #include "item.h"
-#include "curse.h"              /* für C_NOCOST */
 #include "unit.h"
 #include "faction.h"
 #include "race.h"
@@ -39,6 +38,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/functions.h>
+#include <util/gamedata.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <quicklist.h>
@@ -132,7 +132,7 @@ int buildingcapacity(const building * b)
         }
         return b->size * b->type->capacity;
     }
-    if (b->size >= b->type->maxsize) {
+    if (building_finished(b)) {
         if (b->type->maxcapacity >= 0) {
             return b->type->maxcapacity;
         }
@@ -141,7 +141,7 @@ int buildingcapacity(const building * b)
 }
 
 attrib_type at_building_generic_type = {
-    "building_generic_type", NULL, NULL, NULL, a_writestring, a_readstring,
+    "building_generic_type", NULL, NULL, NULL, a_writestring, a_readstring, NULL,
     ATF_UNIQUE
 };
 
@@ -386,10 +386,10 @@ int resolve_building(variant id, void *address)
     return result;
 }
 
-variant read_building_reference(struct storage * store)
+variant read_building_reference(gamedata * data)
 {
     variant result;
-    READ_INT(store, &result.i);
+    READ_INT(data->store, &result.i);
     return result;
 }
 
@@ -648,15 +648,20 @@ buildingtype_exists(const region * r, const building_type * bt, bool working)
     building *b;
 
     for (b = rbuildings(r); b; b = b->next) {
-        if (b->type == bt && b->size >= bt->maxsize && (!working || fval(b, BLD_WORKING)))
+        if (b->type == bt && (!working || fval(b, BLD_MAINTAINED)) && building_finished(b)) {
             return true;
+        }
     }
 
     return false;
 }
 
+bool building_finished(const struct building *b) {
+    return b->size >= b->type->maxsize;
+}
+
 bool building_is_active(const struct building *b) {
-    return b && fval(b, BLD_WORKING)  && b->size >= b->type->maxsize;
+    return b && fval(b, BLD_MAINTAINED) && building_finished(b);
 }
 
 building *active_building(const unit *u, const struct building_type *btype) {

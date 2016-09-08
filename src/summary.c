@@ -155,7 +155,7 @@ static void writeturn(void)
     char zText[MAX_PATH];
     FILE *f;
 
-    sprintf(zText, "%s/datum", basepath());
+    join_path(basepath(), "datum", zText, sizeof(zText));
     f = fopen(zText, "w");
     if (!f) {
         perror(zText);
@@ -163,7 +163,7 @@ static void writeturn(void)
     }
     fputs(gamedate2(default_locale), f);
     fclose(f);
-    sprintf(zText, "%s/turn", basepath());
+    join_path(basepath(), "turn", zText, sizeof(zText));
     f = fopen(zText, "w");
     if (!f) {
         perror(zText);
@@ -181,10 +181,10 @@ void report_summary(summary * s, summary * o, bool full)
     char zText[MAX_PATH];
 
     if (full) {
-        sprintf(zText, "%s/parteien.full", basepath());
+        join_path(basepath(), "parteien.full", zText, sizeof(zText));
     }
     else {
-        sprintf(zText, "%s/parteien", basepath());
+        join_path(basepath(), "parteien", zText, sizeof(zText));
     }
     F = fopen(zText, "w");
     if (!F) {

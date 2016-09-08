@@ -23,7 +23,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "study.h"
 #include "move.h"
+#include "monster.h"
 #include "alchemy.h"
+#include "academy.h"
 
 #include <kernel/ally.h>
 #include <kernel/building.h>
@@ -47,6 +49,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 #include <util/parser.h>
 #include <util/rand.h>
+#include <util/rng.h>
 #include <util/umlaut.h>
 
 /* libc includes */
@@ -56,8 +59,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-
-#define TEACHNUMBER 10
 
 static skill_t getskill(const struct locale *lang)
 {
@@ -157,7 +158,7 @@ static void done_learning(struct attrib *a)
 
 const attrib_type at_learning = {
     "learning",
-    init_learning, done_learning, NULL, NULL, NULL,
+    init_learning, done_learning, NULL, NULL, NULL, NULL,
     ATF_UNIQUE
 };
 
@@ -206,7 +207,6 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
     n = _min(n, nteaching);
 
     if (n != 0) {
-        const struct building_type *btype = bt_find("academy");
         int index = 0;
 
         if (teach == NULL) {
@@ -227,21 +227,18 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
         }
         teach->value += n;
 
-        /* Solange Akademien groessenbeschraenkt sind, sollte Lehrer und
-         * Student auch in unterschiedlichen Gebaeuden stehen duerfen */
-        if (active_building(teacher, btype) && active_building(student, btype)) {
-            int j = study_cost(student, sk);
-            j = _max(50, j * 2);
-            /* kann Einheit das zahlen? */
-            if (get_pooled(student, get_resourcetype(R_SILVER), GET_DEFAULT, j) >= j) {
+        if (student->building && teacher->building == student->building) {
+            /* Solange Akademien groessenbeschraenkt sind, sollte Lehrer und
+             * Student auch in unterschiedlichen Gebaeuden stehen duerfen */
+            if (academy_can_teach(teacher, student, sk)) {
                 /* Jeder Schueler zusaetzlich +10 Tage wenn in Uni. */
                 teach->value += (n / 30) * 10;  /* learning erhoehen */
-                /* Lehrer zusaetzlich +1 Tag pro Schueler. */
-                if (academy)
+                                                /* Lehrer zusaetzlich +1 Tag pro Schueler. */
+                if (academy) {
                     *academy += n;
-            }                         /* sonst nehmen sie nicht am Unterricht teil */
+                }
+            }
         }
-
         /* Teaching ist die Anzahl Leute, denen man noch was beibringen kann. Da
          * hier nicht n verwendet wird, werden die Leute gezaehlt und nicht die
          * effektiv gelernten Tage. -> FALSCH ? (ENNO)
@@ -283,7 +280,7 @@ int teach_cmd(unit * u, struct order *ord)
     static const curse_type *gbdream_ct = NULL;
     plane *pl;
     region *r = u->region;
-    skill_t sk = NOSKILL;
+    skill_t sk_academy = NOSKILL;
     int teaching, i, j, count, academy = 0;
 
     if (gbdream_ct == 0)
@@ -325,6 +322,7 @@ int teach_cmd(unit * u, struct order *ord)
 
 #if TEACH_ALL
     if (getparam(u->faction->locale) == P_ANY) {
+        skill_t sk;
         unit *student;
         skill_t teachskill[MAXSKILLS];
         int t = 0;
@@ -383,6 +381,7 @@ int teach_cmd(unit * u, struct order *ord)
         init_order(ord);
 
         while (!parser_end()) {
+            skill_t sk;
             unit *u2;
             bool feedback;
 
@@ -475,16 +474,15 @@ int teach_cmd(unit * u, struct order *ord)
                     continue;
                 }
             }
-
+            sk_academy = sk;
             teaching -= teach_unit(u, u2, teaching, sk, false, &academy);
         }
         new_order = create_order(K_TEACH, u->faction->locale, "%s", zOrder);
         replace_order(&u->orders, ord, new_order);
         free_order(new_order);      /* parse_order & set_order have each increased the refcount */
     }
-    if (academy && sk != NOSKILL) {
-        academy = academy / 30;     /* anzahl gelehrter wochen, max. 10 */
-        learn_skill(u, sk, academy / 30.0 / TEACHNUMBER);
+    if (academy && sk_academy!=NOSKILL) {
+        academy_teaching_bonus(u, sk_academy, academy);
     }
     return 0;
 }
@@ -742,17 +740,7 @@ int study_cmd(unit * u, order * ord)
     if (fval(u, UFL_HUNGER))
         days /= 2;
 
-    while (days) {
-        if (days >= u->number * 30) {
-            learn_skill(u, sk, 1.0);
-            days -= u->number * 30;
-        }
-        else {
-            double chance = (double)days / u->number / 30;
-            learn_skill(u, sk, chance);
-            days = 0;
-        }
-    }
+    learn_skill(u, sk, days);
     if (a != NULL) {
         int index = 0;
         while (teach->teachers[index] && index != MAXTEACHERS) {
@@ -802,4 +790,94 @@ int study_cmd(unit * u, order * ord)
     }
 
     return 0;
+}
+
+static int produceexp_days(void) {
+    return config_get_int("study.produceexp", 10);
+}
+
+void produceexp_ex(struct unit *u, skill_t sk, int n, learn_fun learn)
+{
+    assert(u && n <= u->number);
+    if (n > 0 && (is_monsters(u->faction) || playerrace(u_race(u)))) {
+        int days = produceexp_days();
+        learn(u, sk, days * n / u->number);
+    }
+}
+
+void produceexp(struct unit *u, skill_t sk, int n)
+{
+    produceexp_ex(u, sk, n, learn_skill);
+}
+
+#ifndef NO_TESTS
+static learn_fun inject_learn_fun = 0;
+
+void inject_learn(learn_fun fun) {
+    inject_learn_fun = fun;
+}
+#endif
+void learn_skill(unit *u, skill_t sk, int days) {
+    int leveldays = STUDYDAYS * u->number;
+    int weeks = 0;
+#ifndef NO_TESTS
+    if (inject_learn_fun) {
+        inject_learn_fun(u, sk, days);
+        return;
+    }
+#endif
+    while (days >= leveldays) {
+        ++weeks;
+        days -= leveldays;
+    }
+    if (days > 0 && rng_int() % leveldays < days) {
+        ++weeks;
+    }
+    if (weeks > 0) {
+        skill *sv = unit_skill(u, sk);
+        if (!sv) {
+            sv = add_skill(u, sk);
+        }
+        while (sv->weeks <= weeks) {
+            weeks -= sv->weeks;
+            sk_set(sv, sv->level + 1);
+        }
+        sv->weeks -= weeks;
+    }
+}
+
+/** Talente von Dämonen verschieben sich.
+*/
+void demon_skillchange(unit *u)
+{
+    skill *sv = u->skills;
+    int upchance = 15;
+    int downchance = 10;
+
+    if (fval(u, UFL_HUNGER)) {
+        /* hungry demons only go down, never up in skill */
+        int rule_hunger = config_get_int("hunger.demon.skill", 0) != 0;
+        if (rule_hunger) {
+            upchance = 0;
+            downchance = 15;
+        }
+    }
+
+    while (sv != u->skills + u->skill_size) {
+        int roll = rng_int() % 100;
+        if (sv->level > 0 && roll < upchance + downchance) {
+            int weeks = 1 + rng_int() % 3;
+            if (roll < downchance) {
+                reduce_skill(u, sv, weeks);
+                if (sv->level < 1) {
+                    /* demons should never forget below 1 */
+                    set_level(u, sv->id, 1);
+                }
+            }
+            else {
+                learn_skill(u, sv->id, STUDYDAYS*weeks);
+            }
+        }
+        ++sv;
+    }
 }

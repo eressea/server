@@ -22,6 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <kernel/save.h>
 #include <util/attrib.h>
+#include <util/gamedata.h>
 
 #include <storage.h>
 
@@ -34,9 +35,9 @@ write_movement(const attrib * a, const void *owner, struct storage *store)
     WRITE_INT(store, a->data.i);
 }
 
-static int read_movement(attrib * a, void *owner, struct storage *store)
+static int read_movement(attrib * a, void *owner, gamedata *data)
 {
-    READ_INT(store, &a->data.i);
+    READ_INT(data->store, &a->data.i);
     if (a->data.i != 0)
         return AT_READ_OK;
     else
@@ -49,7 +50,7 @@ attrib_type at_movement = {
 
 bool get_movement(attrib * const *alist, int type)
 {
-    const attrib *a = a_findc(*alist, &at_movement);
+    const attrib *a = a_find(*alist, &at_movement);
     if (a == NULL)
         return false;
     if (a->data.i & type)

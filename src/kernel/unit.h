@@ -30,7 +30,7 @@ extern "C" {
     struct skill;
     struct item;
     struct sc_mage;
-
+    struct gamedata;
 #define UFL_DEAD          (1<<0)
 #define UFL_ISNEW         (1<<1)        /* 2 */
 #define UFL_LONGACTION    (1<<2)        /* 4 */
@@ -162,9 +162,6 @@ extern "C" {
     struct skill *unit_skill(const struct unit *u, skill_t id);
     bool has_skill(const unit * u, skill_t sk);
     int effskill(const struct unit *u, skill_t sk, const struct region *r);
-    int SkillCap(skill_t sk);
-    void produceexp(struct unit *u, skill_t sk, int n);
-    void produceexp_ex(struct unit *u, skill_t sk, int n, bool (*learn)(unit *, skill_t, double));
 
     void set_level(struct unit *u, skill_t id, int level);
     int get_level(const struct unit *u, skill_t id);
@@ -186,7 +183,7 @@ extern "C" {
     /* see resolve.h */
     int resolve_unit(variant data, void *address);
     void write_unit_reference(const struct unit *u, struct storage *store);
-    variant read_unit_reference(struct storage *store);
+    variant read_unit_reference(struct gamedata *data);
 
     bool leave(struct unit *u, bool force);
     bool can_leave(struct unit *u);
@@ -208,8 +205,6 @@ extern "C" {
     void free_units(void);
     void u_setfaction(struct unit *u, struct faction *f);
     void set_number(struct unit *u, int count);
-
-    bool learn_skill(struct unit *u, skill_t sk, double chance);
 
     int invisible(const struct unit *target, const struct unit *viewer);
     void free_unit(struct unit *u);

@@ -45,9 +45,6 @@ extern "C" {
         fumble_f fumble;
     } spell;
 
-    int use_item_power(struct region *r, struct unit *u);
-    int use_item_regeneration(struct region *r, struct unit *u);
-    void showspells(struct region *r, struct unit *u);
     int sp_antimagiczone(struct castorder *co);
 
     struct spell * create_spell(const char * name, unsigned int id);

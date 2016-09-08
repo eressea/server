@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <resource name="chainmail">
   <item weight="200" score="90">
-    <construction skill="armorer" minskill="3" reqsize="1">
+    <construction skill="armorer" minskill="3">
       <requirement type="iron" quantity="2"/>
     </construction>
     <armor ac="2" penalty="0.10" projectile="0.0" magres="0.0"/>

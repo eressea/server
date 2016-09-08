@@ -22,6 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "move.h"
 #include "laws.h"
 #include "reports.h"
+#include "study.h"
 #include "alchemy.h"
 #include "travelthru.h"
 #include "vortex.h"
@@ -59,6 +60,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/bsdstring.h>
+#include <util/gamedata.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
@@ -122,7 +124,7 @@ get_followers(unit * target, region * r, const region_list * route_end,
     unit *uf;
     for (uf = r->units; uf; uf = uf->next) {
         if (fval(uf, UFL_FOLLOWING) && !fval(uf, UFL_NOTMOVING)) {
-            const attrib *a = a_findc(uf->attribs, &at_follow);
+            const attrib *a = a_find(uf->attribs, &at_follow);
             if (a && a->data.v == target) {
                 follower *fnew = (follower *)malloc(sizeof(follower));
                 fnew->uf = uf;
@@ -154,8 +156,9 @@ static int shiptrail_age(attrib * a, void *owner)
     return (t->age > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
 }
 
-static int shiptrail_read(attrib * a, void *owner, struct storage *store)
+static int shiptrail_read(attrib * a, void *owner, struct gamedata *data)
 {
+    storage *store = data->store;
     int n;
     traveldir *t = (traveldir *)(a->data.v);
 
@@ -674,12 +677,6 @@ int check_ship_allowed(struct ship *sh, const region * r)
             }
 
             if (is_freezing(u)) {
-                unit *captain = ship_owner(sh);
-                if (captain) {
-                    ADDMSG(&captain->faction->msgs,
-                        msg_message("detectforbidden", "unit region", u, r));
-                }
-
                 return SA_NO_INSECT;
             }
         }
@@ -780,9 +777,26 @@ static void msg_to_ship_inmates(ship *sh, unit **firstu, unit **lastu, message *
     msg_release(msg);
 }
 
+region * drift_target(ship *sh) {
+    int d, d_offset = rng_int() % MAXDIRECTIONS;
+    region *rnext = NULL;
+    for (d = 0; d != MAXDIRECTIONS; ++d) {
+        region *rn;
+        direction_t dir = (direction_t)((d + d_offset) % MAXDIRECTIONS);
+        rn = rconnect(sh->region, dir);
+        if (rn != NULL && check_ship_allowed(sh, rn) >= 0) {
+            rnext = rn;
+            if (!fval(rnext->terrain, SEA_REGION)) {
+                // prefer drifting towards non-ocean regions
+                break;
+            }
+        }
+    }
+    return rnext;
+}
+
 static void drifting_ships(region * r)
 {
-    direction_t d;
     bool drift = config_get_int("rules.ship.drifting", 1) != 0;
     double damage_drift = config_get_flt("rules.ship.damage_drift", 0.02);
 
@@ -793,7 +807,6 @@ static void drifting_ships(region * r)
             region *rnext = NULL;
             region_list *route = NULL;
             unit *firstu = r->units, *lastu = NULL, *captain;
-            int d_offset;
             direction_t dir = 0;
             double ovl;
 
@@ -828,17 +841,7 @@ static void drifting_ships(region * r)
             } else {
                 /* Auswahl einer Richtung: Zuerst auf Land, dann
                  * zufällig. Falls unmögliches Resultat: vergiß es. */
-                d_offset = rng_int () % MAXDIRECTIONS;
-                for (d = 0; d != MAXDIRECTIONS; ++d) {
-                    region *rn;
-                    dir = (direction_t)((d + d_offset) % MAXDIRECTIONS);
-                    rn = rconnect(r, dir);
-                    if (rn != NULL && fval(rn->terrain, SAIL_INTO) && check_ship_allowed(sh, rn) > 0) {
-                        rnext = rn;
-                        if (!fval(rnext->terrain, SEA_REGION))
-                            break;
-                    }
-                }
+                rnext = drift_target(sh);
             }
 
             if (rnext != NULL) {
@@ -1755,7 +1758,7 @@ unit *owner_buildingtyp(const region * r, const building_type * bt)
     for (b = rbuildings(r); b; b = b->next) {
         owner = building_owner(b);
         if (b->type == bt && owner != NULL) {
-            if (b->size >= bt->maxsize) {
+            if (building_finished(b)) {
                 return owner;
             }
         }
@@ -1783,8 +1786,7 @@ bool can_takeoff(const ship * sh, const region * from, const region * to)
     return true;
 }
 
-static void
-sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
+static void sail(unit * u, order * ord, region_list ** routep)
 {
     region *starting_point = u->region;
     region *current_point, *last_point;
@@ -1906,12 +1908,10 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
             } // storms_enabled
             if (!fval(tthis, SEA_REGION)) {
                 if (!fval(tnext, SEA_REGION)) {
-                    if (!move_on_land) {
-                        /* check that you're not traveling from one land region to another. */
-                        ADDMSG(&u->faction->msgs, msg_message("shipnoshore",
-                            "ship region", sh, next_point));
-                        break;
-                    }
+                    /* check that you're not traveling from one land region to another. */
+                    ADDMSG(&u->faction->msgs, msg_message("shipnoshore",
+                        "ship region", sh, next_point));
+                    break;
                 }
                 else {
                     if (!can_takeoff(sh, current_point, next_point)) {
@@ -1943,7 +1943,10 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
             reason = check_ship_allowed(sh, next_point);
             if (reason < 0) {
                 /* for some reason or another, we aren't allowed in there.. */
-                if (check_leuchtturm(current_point, NULL) || reason == SA_NO_INSECT) {
+                if (reason == SA_NO_INSECT) {
+                    ADDMSG(&f->msgs, msg_message("detectforbidden", "unit region", u, sh->region));
+                }
+                else if (check_leuchtturm(current_point, NULL)) {
                     ADDMSG(&f->msgs, msg_message("sailnolandingstorm", "ship region", sh, next_point));
                 }
                 else {
@@ -2018,9 +2021,7 @@ sail(unit * u, order * ord, bool move_on_land, region_list ** routep)
          * transferiert wurden, kann der aktuelle Befehl gelöscht werden. */
         cycle_route(ord, u, step);
         set_order(&u->thisorder, NULL);
-        if (!move_on_land) {
-            set_coast(sh, last_point, current_point);
-        }
+        set_coast(sh, last_point, current_point);
 
         if (is_cursed(sh->attribs, C_SHIP_FLYING, 0)) {
             ADDMSG(&f->msgs, msg_message("shipfly", "ship from to", sh,
@@ -2266,13 +2267,13 @@ static void travel(unit * u, region_list ** routep)
     }
 }
 
-void move_cmd(unit * u, order * ord, bool move_on_land)
+void move_cmd(unit * u, order * ord)
 {
     region_list *route = NULL;
 
     assert(u->number);
     if (u->ship && u == ship_owner(u->ship)) {
-        sail(u, ord, move_on_land, &route);
+        sail(u, ord, &route);
     }
     else {
         travel(u, &route);
@@ -2390,7 +2391,7 @@ int follow_ship(unit * u, order * ord)
     init_tokens_str(command);
     getstrtoken();
     /* NACH ausführen */
-    move_cmd(u, ord, false);
+    move_cmd(u, ord);
     return 1;                     /* true -> Einheitenliste von vorne durchgehen */
 }
 
@@ -2557,13 +2558,13 @@ void movement(void)
                         if (ships) {
                             if (u->ship && ship_owner(u->ship) == u) {
                                 init_order(u->thisorder);
-                                move_cmd(u, u->thisorder, false);
+                                move_cmd(u, u->thisorder);
                             }
                         }
                         else {
                             if (!u->ship || ship_owner(u->ship) != u) {
                                 init_order(u->thisorder);
-                                move_cmd(u, u->thisorder, false);
+                                move_cmd(u, u->thisorder);
                             }
                         }
                     }

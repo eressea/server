@@ -34,7 +34,6 @@ static unit * setup_build(build_fixture *bf) {
     bf->rc = test_create_race("human");
     bf->r = test_create_region(0, 0, 0);
     bf->f = test_create_faction(bf->rc);
-    bf->f->locale = get_or_create_locale("de");
     assert(bf->rc && bf->f && bf->r);
     bf->u = test_create_unit(bf->f, bf->r);
     assert(bf->u);
@@ -84,7 +83,7 @@ static void test_build_requires_building(CuTest *tc) {
     btype->capacity = 1;
     CuAssertIntEquals_Msg(tc, "must be inside a production building", EBUILDINGREQ, build(u, &bf.cons, 0, 1));
     u->building = test_create_building(u->region, btype);
-    fset(u->building, BLD_WORKING);
+    fset(u->building, BLD_MAINTAINED);
     CuAssertIntEquals(tc, 1, build(u, &bf.cons, 0, 1));
     btype->maxcapacity = 0;
     CuAssertIntEquals_Msg(tc, "cannot build when production building capacity exceeded", EBUILDINGREQ, build(u, &bf.cons, 0, 1));

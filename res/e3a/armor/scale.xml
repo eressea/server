@@ -2,7 +2,7 @@
 <resource name="scale">
   <item weight="300" score="150">
     <function name="canuse" value="lua_canuse_item"/>
-    <construction skill="armorer" minskill="5" reqsize="1">
+    <construction skill="armorer" minskill="5">
       <modifier function="mod_dwarves_only"/>
       <requirement type="iron" quantity="2"/>
     </construction>

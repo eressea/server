@@ -25,6 +25,7 @@
 #include <kernel/version.h>
 
 /* util includes */
+#include <util/gamedata.h>
 #include <util/language.h>
 #include <util/nrmessage.h>
 #include <util/message.h>
@@ -307,10 +308,10 @@ static struct curse_type ct_oldrace = {
  * C_SKILL
  */
 
-static int read_skill(struct storage *store, curse * c, void *target)
+static int read_skill(gamedata *data, curse * c, void *target)
 {
     int skill;
-    READ_INT(store, &skill);
+    READ_INT(data->store, &skill);
     c->data.i = skill;
     return 0;
 }

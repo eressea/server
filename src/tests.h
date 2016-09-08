@@ -25,11 +25,13 @@ extern "C" {
     struct castorder;
     struct spellparameter;
     struct spell;
+    struct locale;
 
     struct CuTest;
 
     void test_cleanup(void);
 
+    struct locale * test_create_locale(void);
     struct terrain_type * test_create_terrain(const char * name, unsigned int flags);
     struct race *test_create_race(const char *name);
     struct region *test_create_region(int x, int y,
@@ -52,6 +54,11 @@ extern "C" {
     struct message * test_find_messagetype(struct message_list *msgs, const char *name);
     struct message * test_get_last_message(struct message_list *mlist);
     void test_clear_messages(struct faction *f);
+    void assert_message(struct CuTest * tc, struct message *msg, char *name, int numpar);
+
+    void assert_pointer_parameter(struct CuTest * tc, struct message *msg, int index, void *arg);
+    void assert_int_parameter(struct CuTest * tc, struct message *msg, int index, int arg);
+    void assert_string_parameter(struct CuTest * tc, struct message *msg, int index, const char *arg);
 
     void disabled_test(void *suite, void (*)(struct CuTest *), const char *name);
 

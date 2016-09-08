@@ -27,6 +27,7 @@ extern "C" {
     struct attrib;
     struct trigger;
     struct storage;
+    struct gamedata;
 
     typedef struct trigger_type {
         const char *name;
@@ -34,7 +35,7 @@ extern "C" {
         void(*finalize) (struct trigger *);
         int(*handle) (struct trigger *, void *);
         void(*write) (const struct trigger *, struct storage * store);
-        int(*read) (struct trigger *, struct storage * store);
+        int(*read) (struct trigger *, struct gamedata * store);
 
         struct trigger_type *next;
     } trigger_type;
@@ -73,7 +74,7 @@ extern "C" {
     /* functions for making complex triggers: */
     void free_triggers(trigger * triggers);        /* release all these triggers */
     void write_triggers(struct storage *store, const trigger * t);
-    int read_triggers(struct storage *store, trigger ** tp);
+    int read_triggers(struct gamedata *data, trigger ** tp);
     int handle_triggers(trigger ** triggers, void *data);
 
     extern struct attrib_type at_eventhandler;

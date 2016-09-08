@@ -354,7 +354,7 @@ const char **illusion)
 
         bt_illusion = bt_find("illusioncastle");
         if (bt_illusion && b->type == bt_illusion) {
-            const attrib *a = a_findc(b->attribs, &at_icastle);
+            const attrib *a = a_find(b->attribs, &at_icastle);
             if (a != NULL) {
                 *illusion = buildingtype(icastle_type(a), b, b->size);
             }
@@ -1540,22 +1540,24 @@ int write_reports(faction * f, time_t ltime)
     }
     prepare_report(&ctx, f);
     get_addresses(&ctx);
-    log_debug("Reports for %s:", factionname(f));
+    log_debug("Reports for %s", factionname(f));
     for (rtype = report_types; rtype != NULL; rtype = rtype->next) {
         if (f->options & rtype->flag) {
-            int error;
+            int error = 0;
             do {
-                char filename[MAX_PATH];
-                sprintf(filename, "%s/%d-%s.%s", reportpath(), turn, factionid(f),
+                char filename[32];
+                char path[MAX_PATH];
+                sprintf(filename, "%d-%s.%s", turn, factionid(f),
                     rtype->extension);
-                error = 0;
-                if (rtype->write(filename, &ctx, encoding) == 0) {
+                join_path(reportpath(), filename, path, sizeof(path));
+                errno = 0;
+                if (rtype->write(path, &ctx, encoding) == 0) {
                     gotit = true;
                 }
                 if (errno) {
                     char zText[64];
-                    log_warning("retrying, error %d during %s report for faction %s", error, rtype->extension, factionname(f));
-                    sprintf(zText, "waiting %u seconds before we retry", backup / 1000);
+                    log_warning("retrying, error %d during %s report for faction %s", errno, rtype->extension, factionname(f));
+                    sprintf(zText, "waiting %u seconds before we retry", backup);
                     perror(zText);
                     _sleep(backup);
                     if (backup < maxbackup) {
@@ -1644,15 +1646,6 @@ int reports(void)
     if (mailit)
         fclose(mailit);
     free_seen();
-#ifdef GLOBAL_REPORT
-    {
-        const char *str = config_get("globalreport");
-        if (str != NULL) {
-            sprintf(path, "%s/%s.%u.cr", reportpath(), str, turn);
-            global_report(path);
-        }
-    }
-#endif
     return retval;
 }
 

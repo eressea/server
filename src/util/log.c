@@ -22,41 +22,36 @@ without prior permission by the authors of Eressea.
 #include <stdarg.h>
 #include <time.h>
 
-/* TODO: set from external function */
-int log_flags = LOG_FLUSH | LOG_CPERROR | LOG_CPWARNING | LOG_CPDEBUG;
-
 #ifdef STDIO_CP
 static int stdio_codepage = STDIO_CP;
 #else
 static int stdio_codepage = 0;
 #endif
 
-typedef struct logger {
+typedef struct log_t {
     void(*log)(void *data, int level, const char *module, const char *format, va_list args);
     void *data;
     int flags;
-    int id;
-    struct logger *next;
-} logger;
+    struct log_t *next;
+} log_t;
 
-static logger *loggers;
-static int log_id;
+static log_t *loggers;
 
-int log_create(int flags, void *data, log_fun call) {
-    logger *lgr = malloc(sizeof(logger));
+log_t *log_create(int flags, void *data, log_fun call) {
+    log_t *lgr = malloc(sizeof(log_t));
     lgr->log = call;
     lgr->flags = flags;
     lgr->data = data;
     lgr->next = loggers;
     loggers = lgr;
-    return lgr->id = ++log_id;
+    return lgr;
 }
 
-void log_destroy(int id) {
-    logger ** lp = &loggers;
+void log_destroy(log_t *handle) {
+    log_t ** lp = &loggers;
     while (*lp) {
-        logger *lg = *lp;
-        if (lg->id==id) {
+        log_t *lg = *lp;
+        if (lg==handle) {
             *lp = lg->next;
             free(lg);
             break;
@@ -136,7 +131,7 @@ static const char *log_prefix(int level) {
     return prefix;
 }
 
-static int check_dupe(const char *format, int type)
+static int check_dupe(const char *format, int level)
 {
     static int last_type; /* STATIC_XCALL: used across calls */
     static char last_message[32]; /* STATIC_XCALL: used across calls */
@@ -146,14 +141,14 @@ static int check_dupe(const char *format, int type)
         return 1;
     }
     if (dupes) {
-        if (log_flags & LOG_CPERROR) {
+        if (level & LOG_CPERROR) {
             fprintf(stderr, "%s: last message repeated %d times\n", log_prefix(last_type),
                 dupes + 1);
         }
         dupes = 0;
     }
     strlcpy(last_message, format, sizeof(last_message));
-    last_type = type;
+    last_type = level;
     return 0;
 }
 
@@ -188,14 +183,15 @@ static void log_stdio(void *data, int level, const char *module, const char *for
     if (format[len - 1] != '\n') {
         fputc('\n', out);
     }
+    fflush(out);
 }
 
-void log_to_file(int flags, FILE *out) {
-    log_create(flags, out, log_stdio);
+log_t *log_to_file(int flags, FILE *out) {
+    return log_create(flags, out, log_stdio);
 }
 
 static void log_write(int flags, const char *module, const char *format, va_list args) {
-    logger *lg;
+    log_t *lg;
     for (lg = loggers; lg; lg = lg->next) {
         int level = flags & LOG_LEVELS;
         if (lg->flags & level) {
@@ -268,7 +264,7 @@ static FILE *logfile;
 void log_close(void)
 {
     while (loggers) {
-        logger *lgr = loggers;
+        log_t *lgr = loggers;
         loggers = lgr->next;
         free(lgr);
     }
@@ -281,7 +277,7 @@ void log_close(void)
     logfile = 0;
 }
 
-void log_open(const char *filename)
+log_t *log_open(const char *filename, int log_flags)
 {
     log_rotate(filename, LOG_MAXBACKUPS);
     logfile = fopen(filename, "a");
@@ -290,6 +286,14 @@ void log_open(const char *filename)
         time_t ltime;
         time(&ltime);
         fprintf(logfile, "===\n=== Logfile started at %s===\n", ctime(&ltime));
-        log_create(log_flags, logfile, log_stdio);
+        return log_create(log_flags, logfile, log_stdio);
     }
+    return NULL;
+}
+
+int log_level(log_t * log, int flags)
+{
+    int old = log->flags;
+    log->flags = flags;
+    return old;
 }

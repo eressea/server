@@ -8,6 +8,31 @@ function setup()
     eressea.settings.set("NewbieImmunity", "0")
 end
 
+ function test_piracy()
+    local r = region.create(0, 0, "plain")
+    local r2 = region.create(1, 0, "plain")
+    local r3 = region.create(-1, 0, "ocean")
+    local f = faction.create("pirate@eressea.de", "human", "de")
+    local f2 = faction.create("elf@eressea.de", "human", "de")
+    local u1 = unit.create(f, r2, 1)
+    local u2 = unit.create(f2, r3, 1)
+    
+    u1.ship = ship.create(r2, "longboat")
+    u2.ship = ship.create(r3, "longboat")
+    u1:set_skill("sailing", 10)
+    u2:set_skill("sailing", 10)
+
+    u1:clear_orders()
+    u1:add_order("PIRATERIE")
+    u2:clear_orders()
+    u2:add_order("NACH o")
+
+    process_orders()
+
+-- write_reports()
+    assert_equal(r2, u1.region) -- should pass, but fails!!!
+end 
+
 function test_dolphin_on_land()
     local r1 = region.create(0, 0, "plain")
     local r2 = region.create(1, 0, "plain")

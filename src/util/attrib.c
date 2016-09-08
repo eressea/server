@@ -22,6 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "log.h"
 #include "storage.h"
 
+#include <util/gamedata.h>
 #include <critbit.h>
 
 #include <assert.h>
@@ -95,13 +96,6 @@ attrib *a_select(attrib * a, const void *data,
 }
 
 attrib *a_find(attrib * a, const attrib_type * at)
-{
-    while (a && a->type != at)
-        a = a->nexttype;
-    return a;
-}
-
-const attrib *a_findc(const attrib * a, const attrib_type * at)
 {
     while (a && a->type != at)
         a = a->nexttype;
@@ -216,28 +210,37 @@ int a_remove(attrib ** pa, attrib * a)
 void a_removeall(attrib ** pa, const attrib_type * at)
 {
     attrib **pnexttype = pa;
-    attrib **pnext = NULL;
 
-    while (*pnexttype) {
-        attrib *next = *pnexttype;
-        if (next->type == at)
-            break;
-        pnexttype = &next->nexttype;
-        pnext = &next->next;
-    }
-    if (*pnexttype && (*pnexttype)->type == at) {
-        attrib *a = *pnexttype;
-
-        *pnexttype = a->nexttype;
-        if (pnext) {
-            while (*pnext && (*pnext)->type != at)
-                pnext = &(*pnext)->next;
-            *pnext = a->nexttype;
+    if (!at) {
+        while (*pnexttype) {
+            attrib *a = *pnexttype;
+            *pnexttype = a->next;
+            a_free(a);
         }
-        while (a && a->type == at) {
-            attrib *ra = a;
-            a = a->next;
-            a_free(ra);
+    }
+    else {
+        attrib **pnext = NULL;
+        while (*pnexttype) {
+            attrib *a = *pnexttype;
+            if (a->type == at)
+                break;
+            pnexttype = &a->nexttype;
+            pnext = &a->next;
+        }
+        if (*pnexttype && (*pnexttype)->type == at) {
+            attrib *a = *pnexttype;
+
+            *pnexttype = a->nexttype;
+            if (pnext) {
+                while (*pnext && (*pnext)->type != at)
+                    pnext = &(*pnext)->next;
+                *pnext = a->nexttype;
+            }
+            while (a && a->type == at) {
+                attrib *ra = a;
+                a = a->next;
+                a_free(ra);
+            }
         }
     }
 }
@@ -274,69 +277,99 @@ int a_age(attrib ** p, void *owner)
 
 static critbit_tree cb_deprecated = { 0 };
 
-void at_deprecate(const char * name, int(*reader)(attrib *, void *, struct storage *))
+
+typedef struct deprecated_s {
+    unsigned int hash;
+    int(*reader)(attrib *, void *, struct gamedata *);
+} deprecated_t;
+
+void at_deprecate(const char * name, int(*reader)(attrib *, void *, struct gamedata *))
 {
-    char buffer[64];
-    size_t len = strlen(name);
-    len = cb_new_kv(name, len, &reader, sizeof(reader), buffer);
-    cb_insert(&cb_deprecated, buffer, len);
+    deprecated_t value;
+    
+    value.hash = __at_hashkey(name);
+    value.reader = reader;
+    cb_insert(&cb_deprecated, &value, sizeof(value));
 }
 
-int a_read(struct storage *store, attrib ** attribs, void *owner)
+static int a_read_i(gamedata *data, attrib ** attribs, void *owner, unsigned int key) {
+    int retval = AT_READ_OK;
+    int(*reader)(attrib *, void *, struct gamedata *) = 0;
+    attrib_type *at = at_find(key);
+    attrib * na = 0;
+
+    if (at) {
+        reader = at->read;
+        na = a_new(at);
+    }
+    else {
+        void *match;
+        if (cb_find_prefix(&cb_deprecated, &key, sizeof(key), &match, 1, 0)>0) {
+            deprecated_t *value = (deprecated_t *)match;
+            reader = value->reader;
+        }
+        else {
+            log_error("unknown attribute hash: %u\n", key);
+            assert(at || !"attribute not registered");
+        }
+    }
+    if (reader) {
+        int ret = reader(na, owner, data);
+        if (na) {
+            switch (ret) {
+            case AT_READ_DEPR:
+            case AT_READ_OK:
+                a_add(attribs, na);
+                retval = ret;
+                break;
+            case AT_READ_FAIL:
+                a_free(na);
+                break;
+            default:
+                assert(!"invalid return value");
+                break;
+            }
+        }
+    }
+    else {
+        assert(!"error: no registered callback can read attribute");
+    }
+    return retval;
+}
+
+int a_read(gamedata *data, attrib ** attribs, void *owner) {
+    struct storage *store = data->store;
+    int key, retval = AT_READ_OK;
+
+    key = -1;
+    READ_INT(store, &key);
+    while (key > 0) {
+        int ret = a_read_i(data, attribs, owner, key);
+        if (ret == AT_READ_DEPR) {
+            retval = AT_READ_DEPR;
+        }
+        READ_INT(store, &key);
+    }
+    return retval;
+}
+
+int a_read_orig(gamedata *data, attrib ** attribs, void *owner)
 {
     int key, retval = AT_READ_OK;
     char zText[128];
 
     zText[0] = 0;
     key = -1;
-    READ_TOK(store, zText, sizeof(zText));
-    if (strcmp(zText, "end") == 0)
+    READ_TOK(data->store, zText, sizeof(zText));
+    if (strcmp(zText, "end") == 0) {
         return retval;
-    else
+    }
+    else {
         key = __at_hashkey(zText);
-
-    while (key != -1) {
-        int(*reader)(attrib *, void *, struct storage *) = 0;
-        attrib_type *at = at_find(key);
-        attrib * na = 0;
-
-        if (at) {
-            reader = at->read;
-            na = a_new(at);
-        }
-        else {
-            void * kv = 0;
-            cb_find_prefix(&cb_deprecated, zText, strlen(zText) + 1, &kv, 1, 0);
-            if (kv) {
-                cb_get_kv(kv, &reader, sizeof(reader));
-            }
-            else {
-                fprintf(stderr, "attribute hash: %d (%s)\n", key, zText);
-                assert(at || !"attribute not registered");
-            }
-        }
-        if (reader) {
-            int i = reader(na, owner, store);
-            if (na) {
-                switch (i) {
-                case AT_READ_OK:
-                    a_add(attribs, na);
-                    break;
-                case AT_READ_FAIL:
-                    retval = AT_READ_FAIL;
-                    a_free(na);
-                    break;
-                default:
-                    assert(!"invalid return value");
-                    break;
-                }
-            }
-        }
-        else {
-            assert(!"error: no registered callback can read attribute");
-        }
-
-        READ_TOK(store, zText, sizeof(zText));
+    }
+    while (key > 0) {
+        retval = a_read_i(data, attribs, owner, key);
+        READ_TOK(data->store, zText, sizeof(zText));
         if (!strcmp(zText, "end"))
             break;
         key = __at_hashkey(zText);
@@ -344,7 +377,24 @@ int a_read(struct storage *store, attrib ** attribs, void *owner)
     return retval;
 }
 
-void a_write(struct storage *store, const attrib * attribs, const void *owner)
+void a_write(struct storage *store, const attrib * attribs, const void *owner) {
+    const attrib *na = attribs;
+
+    while (na) {
+        if (na->type->write) {
+            assert(na->type->hashkey || !"attribute not registered");
+            WRITE_INT(store, na->type->hashkey);
+            na->type->write(na, owner, store);
+            na = na->next;
+        }
+        else {
+            na = na->nexttype;
+        }
+    }
+    WRITE_INT(store, 0);
+}
+
+void a_write_orig(struct storage *store, const attrib * attribs, const void *owner)
 {
     const attrib *na = attribs;
 

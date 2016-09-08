@@ -1,6 +1,5 @@
 PROJECT(spells C)
 SET(_FILES
-alp.c
 borders.c
 buildingcurse.c
 combatspells.c

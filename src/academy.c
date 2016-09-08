@@ -16,25 +16,29 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#ifndef REMOVECURSE_H
-#define REMOVECURSE_H
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <platform.h>
+#include <kernel/config.h>
+#include <kernel/unit.h>
+#include <kernel/building.h>
+#include <kernel/item.h>
+#include <kernel/pool.h>
+#include "academy.h"
+#include "study.h"
 
-    /* all types we use are defined here to reduce dependencies */
-    struct trigger_type;
-    struct trigger;
-
-    struct unit;
-    struct curse;
-
-    extern struct trigger_type tt_removecurse;
-
-    extern struct trigger *trigger_removecurse(struct curse *c,
-    struct unit *target);
-
-#ifdef __cplusplus
+void academy_teaching_bonus(struct unit *u, skill_t sk, int academy) {
+    if (academy && sk != NOSKILL) {
+        learn_skill(u, sk, academy / STUDYDAYS);
+    }
 }
-#endif
-#endif
+
+bool academy_can_teach(unit *teacher, unit *student, skill_t sk) {
+    const struct building_type *btype = bt_find("academy");
+    if (active_building(teacher, btype) && active_building(student, btype)) {
+        int j = study_cost(student, sk);
+        j = _max(50, j * 2);
+        /* kann Einheit das zahlen? */
+        return get_pooled(student, get_resourcetype(R_SILVER), GET_DEFAULT, j) >= j;
+        /* sonst nehmen sie nicht am Unterricht teil */
+    }
+    return false;
+}

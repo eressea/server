@@ -171,7 +171,6 @@ void addtoken(void ** root, const char *str, variant id)
 
             ref = (tref *)malloc(sizeof(tref));
             ref->ucs = ucs;
-            ref->node = 0;
             ref->node = node;
             ref->nexthash = tk->next[index];
             tk->next[index] = ref;

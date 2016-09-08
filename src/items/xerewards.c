@@ -21,6 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "xerewards.h"
 
 #include "magic.h"
+#include "study.h"
 
 /* kernel includes */
 #include <kernel/item.h>
@@ -52,9 +53,7 @@ struct order *ord)
     for (n = 0; n != amount; ++n) {
         skill *sv = u->skills;
         while (sv != u->skills + u->skill_size) {
-            int i;
-            for (i = 0; i != 3; ++i)
-                learn_skill(u, (skill_t)sv->id, 1.0);
+            learn_skill(u, (skill_t)sv->id, STUDYDAYS * 3);
             ++sv;
         }
     }

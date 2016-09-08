@@ -63,7 +63,7 @@ static void free_market(attrib * a)
 attrib_type at_market = {
     "script",
     NULL, free_market, NULL,
-    NULL, NULL, ATF_UNIQUE
+    NULL, NULL, NULL, ATF_UNIQUE
 };
 
 static int rc_luxury_trade(const struct race *rc)

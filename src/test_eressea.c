@@ -58,10 +58,6 @@ bool list = false;
 
 int RunAllTests(int argc, char *argv[])
 {
-    int flags = log_flags;
-
-    log_flags = LOG_FLUSH | LOG_CPERROR;
-
     /* self-test */
     ADD_SUITE(tests);
     ADD_SUITE(callback);
@@ -79,6 +75,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(base36);
     ADD_SUITE(bsdstring);
     ADD_SUITE(functions);
+    ADD_SUITE(gamedata);
     ADD_SUITE(parser);
     ADD_SUITE(password);
     ADD_SUITE(umlaut);
@@ -90,6 +87,8 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(xerewards);
     /* kernel */
     ADD_SUITE(alliance);
+    ADD_SUITE(command);
+    ADD_SUITE(plane);
     ADD_SUITE(unit);
     ADD_SUITE(faction);
     ADD_SUITE(group);
@@ -123,6 +122,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(monsters);
     ADD_SUITE(move);
     ADD_SUITE(piracy);
+    ADD_SUITE(key);
     ADD_SUITE(stealth);
     ADD_SUITE(otherfaction);
     ADD_SUITE(upkeep);
@@ -147,7 +147,6 @@ int RunAllTests(int argc, char *argv[])
             suites = s;
         }
         printf("\ntest summary: %d tests, %d failed\n", summary->count, summary->failCount);
-        log_flags = flags;
         fail_count = summary->failCount;
         CuSuiteDelete(summary);
         game_done();
