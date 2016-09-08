@@ -12,7 +12,7 @@
 
 static void test_resources(CuTest *tc) {
     resource_type *rtype;
-    test_cleanup();
+    test_setup();
     init_resources();
     CuAssertPtrNotNull(tc, rt_find("hp"));
     CuAssertPtrEquals(tc, rt_find("hp"), (void *)get_resourcetype(R_LIFE));
@@ -36,7 +36,7 @@ static void test_resources(CuTest *tc) {
 
 static void test_recreate_world(CuTest * tc)
 {
-    test_cleanup();
+    test_setup();
     CuAssertPtrEquals(tc, 0, get_locale("de"));
     CuAssertPtrEquals(tc, 0, (void *)rt_find("horse"));
 
