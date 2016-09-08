@@ -220,7 +220,7 @@ static void test_write_travelthru(CuTest *tc) {
     r->flags |= RF_TRAVELUNIT;
     f = test_create_faction(0);
     f->locale = lang;
-    u = test_create_unit(f, 0);
+    u = test_create_unit(f, test_create_region(0, 1, 0));
     unit_setname(u, "Hodor");
     unit_setid(u, 1);
 
