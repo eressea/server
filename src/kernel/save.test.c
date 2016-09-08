@@ -64,15 +64,17 @@ static void test_readwrite_unit(CuTest * tc)
     data.strm.api->rewind(data.strm.handle);
     free_gamedata();
     f = test_create_faction(0);
+    r = test_create_region(0, 0, 0);
     renumber_faction(f, fno);
     gamedata_init(&data, &store, RELEASE_VERSION);
     u = read_unit(&data);
-    mstream_done(&data.strm);
-    gamedata_done(&data);
-
     CuAssertPtrNotNull(tc, u);
     CuAssertPtrEquals(tc, f, u->faction);
     CuAssertPtrEquals(tc, 0, u->region);
+
+    mstream_done(&data.strm);
+    gamedata_done(&data);
+    move_unit(u, r, NULL); // this makes sure that u doesn't leak
     test_cleanup();
 }
 
