@@ -3,7 +3,7 @@ eressea.log.debug("rules for game E2")
 
 return {
     require('eressea'),
---    require('eressea.autoseed'),
+    require('eressea.autoseed'),
     require('eressea.xmas'),
     require('eressea.xmasitems'),
     require('eressea.wedding'),
