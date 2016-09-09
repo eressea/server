@@ -194,6 +194,7 @@ set(TESTS_SRC
   volcano.test.c
   reports.test.c
   seen.test.c
+  summary.test.c
   travelthru.test.c
   callback.test.c
   direction.test.c

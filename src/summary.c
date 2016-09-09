@@ -32,6 +32,7 @@
 #include <util/lists.h>
 #include <util/log.h>
 
+#include <assert.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -142,6 +143,8 @@ static char *gamedate2(const struct locale *lang)
     static char buf[256];
     gamedate gd;
 
+    assert(weeknames2);
+    assert(monthnames);
     get_gamedate(turn, &gd);
     sprintf(buf, "in %s des Monats %s im Jahre %d %s.",
         LOC(lang, weeknames2[gd.week]),
@@ -348,6 +351,10 @@ void report_summary(summary * s, summary * o, bool full)
     }
     free(nmrs);
     nmrs = NULL;
+}
+
+void free_summary(summary *sum) {
+    free(sum);
 }
 
 summary *make_summary(void)
