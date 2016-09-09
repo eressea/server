@@ -150,13 +150,13 @@ static char *gamedate2(const struct locale *lang)
     gamedate gd;
     const char *week = "a_week", *month = "a_month";
 
+    get_gamedate(turn, &gd);
     if (weeknames2) {
         week = weeknames2[gd.week];
     }
     if (monthnames) {
         month = monthnames[gd.month];
     }
-    get_gamedate(turn, &gd);
     sprintf(buf, "in %s des Monats %s im Jahre %d %s.",
         LOC(lang, week),
         LOC(lang, month),
