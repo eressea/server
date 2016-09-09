@@ -12,6 +12,8 @@ static void test_summary(CuTest * tc)
 {
     struct summary *sum;
     test_setup();
+    test_create_faction(0);
+    test_create_faction(0);
     sum = make_summary();
     report_summary(sum, sum, true);
     CuAssertIntEquals(tc, 0, remove("parteien.full"));

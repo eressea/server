@@ -79,28 +79,34 @@ int update_nmrs(void)
     int i, newplayers = 0;
     faction *f;
     int turn = global.data_turn;
+    int timeout = NMRTimeout();
 
-    if (nmrs == NULL)
-        nmrs = malloc(sizeof(int) * (NMRTimeout() + 1));
-    for (i = 0; i <= NMRTimeout(); ++i) {
-        nmrs[i] = 0;
+    if (timeout>0) {
+        if (nmrs == NULL) {
+            nmrs = malloc(sizeof(int) * (timeout + 1));
+        }
+        for (i = 0; i <= timeout; ++i) {
+            nmrs[i] = 0;
+        }
     }
-
+    
     for (f = factions; f; f = f->next) {
         if (fval(f, FFL_ISNEW)) {
             ++newplayers;
         }
         else if (!fval(f, FFL_NOIDLEOUT|FFL_CURSED)) {
             int nmr = turn - f->lastorders + 1;
-            if (nmr < 0 || nmr > NMRTimeout()) {
-                log_error("faction %s has %d NMR", factionid(f), nmr);
-                nmr = _max(0, nmr);
-                nmr = _min(nmr, NMRTimeout());
+            if (timeout>0) {
+                if (nmr < 0 || nmr > timeout) {
+                    log_error("faction %s has %d NMR", factionid(f), nmr);
+                    nmr = _max(0, nmr);
+                    nmr = _min(nmr, timeout);
+                }
+                if (nmr > 0) {
+                    log_debug("faction %s has %d NMR", factionid(f), nmr);
+                }
+                ++nmrs[nmr];
             }
-            if (nmr > 0) {
-                log_debug("faction %s has %d NMR", factionid(f), nmr);
-            }
-            ++nmrs[nmr];
         }
     }
     return newplayers;
@@ -187,6 +193,7 @@ void report_summary(summary * s, summary * o, bool full)
     int i, newplayers = 0;
     faction *f;
     char zText[MAX_PATH];
+    int timeout = NMRTimeout();
 
     if (full) {
         join_path(basepath(), "parteien.full", zText, sizeof(zText));
@@ -303,12 +310,14 @@ void report_summary(summary * s, summary * o, bool full)
 
     newplayers = update_nmrs();
 
-    for (i = 0; i <= NMRTimeout(); ++i) {
-        if (i == NMRTimeout()) {
-            fprintf(F, "+ NMR:\t\t %d\n", nmrs[i]);
-        }
-        else {
-            fprintf(F, "%d NMR:\t\t %d\n", i, nmrs[i]);
+    if (nmrs) {
+        for (i = 0; i <= timeout; ++i) {
+            if (i == timeout) {
+                fprintf(F, "+ NMR:\t\t %d\n", nmrs[i]);
+            }
+            else {
+                fprintf(F, "%d NMR:\t\t %d\n", i, nmrs[i]);
+            }
         }
     }
     if (age) {
@@ -322,18 +331,18 @@ void report_summary(summary * s, summary * o, bool full)
     fprintf(F, "Neue Spieler:\t %d\n", newplayers);
 
     if (full) {
-        if (factions)
+        if (factions) {
             fprintf(F, "\nParteien:\n\n");
-
-        for (f = factions; f; f = f->next) {
-            out_faction(F, f);
+            for (f = factions; f; f = f->next) {
+                out_faction(F, f);
+            }
         }
 
-        if (NMRTimeout() && full) {
+        if (timeout>0 && full) {
             fprintf(F, "\n\nFactions with NMRs:\n");
-            for (i = NMRTimeout(); i > 0; --i) {
+            for (i = timeout; i > 0; --i) {
                 for (f = factions; f; f = f->next) {
-                    if (i == NMRTimeout()) {
+                    if (i == timeout) {
                         if (turn - f->lastorders >= i) {
                             out_faction(F, f);
                         }
@@ -359,6 +368,11 @@ void report_summary(summary * s, summary * o, bool full)
 }
 
 void free_summary(summary *sum) {
+    while (sum->languages) {
+        struct language *next = sum->languages->next;
+        free(sum->languages);
+        sum->languages = next;
+    }
     free(sum);
 }
 
