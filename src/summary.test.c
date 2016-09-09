@@ -6,6 +6,8 @@
 #include <CuTest.h>
 #include "tests.h"
 
+#include <stdio.h>
+
 static void test_summary(CuTest * tc)
 {
     struct summary *sum;
