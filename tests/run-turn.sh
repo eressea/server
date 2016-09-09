@@ -36,7 +36,7 @@ VALGRIND=`which valgrind`
 SERVER=../Debug/eressea/eressea
 if [ -n "$VALGRIND" ]; then
 SUPP=../share/ubuntu-12_04.supp
-SERVER="$VALGRIND --track-origins=yes --gen-suppressions=all --suppressions=$SUPP --error-exitcode=1 --leak-check=full $SERVER"
+SERVER="$VALGRIND --track-origins=yes --gen-suppressions=all --suppressions=$SUPP --error-exitcode=1 --leak-check=no $SERVER"
 fi
 echo "running $SERVER"
 $SERVER -t 184 test-turn.lua
