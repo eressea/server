@@ -872,6 +872,7 @@ void free_factions(void) {
         while (deadhash[i]) {
             dead *d = deadhash[i];
             deadhash[i] = d->nexthash;
+            free(d);
         }
     }
     free_flist(&factions);
