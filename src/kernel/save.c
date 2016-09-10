@@ -21,8 +21,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/version.h>
 #include "save.h"
 
-#include <buildno.h>
-
 #include "alchemy.h"
 #include "alliance.h"
 #include "ally.h"

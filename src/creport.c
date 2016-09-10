@@ -10,7 +10,6 @@ without prior permission by the authors of Eressea.
 #include <platform.h>
 #include <kernel/config.h>
 #include <kernel/version.h>
-#include "buildno.h"
 #include "creport.h"
 #include "seen.h"
 #include "travelthru.h"
