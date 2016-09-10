@@ -42,5 +42,7 @@ fi
 
 echo "build eressea"
 cd $ROOT/$BUILD
+VERSION=$(git describe --tags)
+cmake -DERESSEA_VERSION="$VERSION" ..
 make $MAKEOPTS && make test
 cd $OLDPWD

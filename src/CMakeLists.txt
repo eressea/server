@@ -12,6 +12,10 @@ include_directories (${TOLUA_INCLUDE_DIR})
 include_directories (${BSON_INCLUDE_DIR})
 include_directories (${INIPARSER_INCLUDE_DIR})
 
+IF(DEFINED ERESSEA_VERSION)
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DERESSEA_VERSION=\\\"${ERESSEA_VERSION}\\\"")
+ENDIF()
+
 IF(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_CLANG)
 #    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wconversion -Wno-sign-conversion")
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic -Wsign-compare -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long")
