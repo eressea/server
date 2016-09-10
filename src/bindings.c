@@ -566,6 +566,9 @@ static int tolua_write_summary(lua_State * L)
         struct summary *sum_end = make_summary();
         report_summary(sum_end, sum_begin, false);
         report_summary(sum_end, sum_begin, true);
+        free_summary(sum_end);
+        free_summary(sum_begin);
+        sum_begin = 0;
         return 0;
     }
     return 0;

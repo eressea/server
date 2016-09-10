@@ -25,7 +25,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "faction.h"
 #include "save.h"
 #include "unit.h"
-#include "version.h"
 
 /* attrib includes */
 #include <attributes/raceprefix.h>
@@ -125,10 +124,14 @@ attrib_type at_group = {        /* attribute for units assigned to a group */
 
 void free_group(group * g)
 {
-    int index = g->gid % GMAXHASH;
-    group **g_ptr = ghash + index;
-    while (*g_ptr && (*g_ptr)->gid != g->gid)
+    int index;
+    group **g_ptr;
+    assert(g);
+    index = g->gid % GMAXHASH;
+    g_ptr = ghash + index;
+    while (*g_ptr && (*g_ptr)->gid != g->gid) {
         g_ptr = &(*g_ptr)->nexthash;
+    }
     assert(*g_ptr == g);
     *g_ptr = g->nexthash;
 

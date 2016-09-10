@@ -1,6 +1,5 @@
 #include <platform.h>
 #include <kernel/config.h>
-#include <kernel/version.h>
 #include "flyingship.h"
 
 #include <kernel/build.h>

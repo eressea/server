@@ -471,6 +471,8 @@ static int parse_calendar(xmlDocPtr doc)
             }
             xmlXPathFreeObject(xpathMonths);
             xmlXPathFreeObject(xpathSeasons);
+            xmlFree(newyear);
+            newyear = NULL;
         }
     xmlXPathFreeObject(xpathCalendars);
     xmlXPathFreeContext(xpath);

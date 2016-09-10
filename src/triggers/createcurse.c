@@ -21,7 +21,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "createcurse.h"
 
 /* kernel includes */
-#include <kernel/version.h>
 #include <kernel/curse.h>
 #include <kernel/unit.h>
 

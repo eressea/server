@@ -9,7 +9,7 @@ without prior permission by the authors of Eressea.
 
 #include <platform.h>
 #include <kernel/config.h>
-#include "buildno.h"
+#include <kernel/version.h>
 #include "creport.h"
 #include "seen.h"
 #include "travelthru.h"
@@ -1515,7 +1515,7 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
     fprintf(F, "%d;Basis\n", 36);
     fprintf(F, "%d;Runde\n", turn);
     fprintf(F, "%d;Zeitalter\n", era);
-    fprintf(F, "\"%d.%d.%d\";Build\n", VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD);
+    fprintf(F, "\"%s\";Build\n", ERESSEA_VERSION);
     if (mailto != NULL) {
         fprintf(F, "\"%s\";mailto\n", mailto);
         fprintf(F, "\"%s\";mailcmd\n", LOC(f->locale, "mailcmd"));

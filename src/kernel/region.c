@@ -37,7 +37,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "terrain.h"
 #include "terrainid.h"
 #include "unit.h"
-#include "version.h"
 
 /* util includes */
 #include <util/attrib.h>

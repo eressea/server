@@ -2,7 +2,6 @@
 #include "vortex.h"
 
 #include <kernel/config.h>
-#include <kernel/version.h>
 #include <kernel/region.h>
 
 #include <util/attrib.h>

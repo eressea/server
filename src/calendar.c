@@ -38,22 +38,34 @@ void calendar_cleanup(void)
 
     free(agename);
 
-    for (i = 0; i != seasons; ++i) {
-        free(seasonnames[i]);
+    if (seasonnames) {
+        for (i = 0; i != seasons; ++i) {
+            free(seasonnames[i]);
+        }
+        free(seasonnames);
+        seasonnames = 0;
     }
-    free(seasonnames);
 
-    for (i = 0; i != months_per_year; ++i) {
-        free(monthnames[i]);
+    if (monthnames) {
+        for (i = 0; i != months_per_year; ++i) {
+            free(monthnames[i]);
+        }
+        free(storms);
+        storms = 0;
+        free(month_season);
+        month_season = 0;
+        free(monthnames);
+        monthnames = 0;
     }
-    free(storms);
-    free(month_season);
-    free(monthnames);
 
     for (i = 0; i != weeks_per_month; ++i) {
-        free(weeknames[i]);
-        free(weeknames2[i]);
+        if (weeknames)
+            free(weeknames[i]);
+        if (weeknames2)
+            free(weeknames2[i]);
     }
     free(weeknames);
+    weeknames = 0;
     free(weeknames2);
+    weeknames2 = 0;
 }

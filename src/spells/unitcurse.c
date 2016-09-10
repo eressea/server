@@ -22,7 +22,6 @@
 #include <kernel/unit.h>
 #include <kernel/faction.h>
 #include <kernel/objtypes.h>
-#include <kernel/version.h>
 
 /* util includes */
 #include <util/gamedata.h>

@@ -21,7 +21,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "hate.h"
 
 #include <kernel/unit.h>
-#include <kernel/version.h>
 
 #include <util/attrib.h>
 #include <util/gamedata.h>

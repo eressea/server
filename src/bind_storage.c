@@ -15,7 +15,6 @@ without prior permission by the authors of Eressea.
 #include "bind_storage.h"
 
 #include <kernel/save.h>
-#include <kernel/version.h>
 
 #include <util/gamedata.h>
 #include <util/log.h>

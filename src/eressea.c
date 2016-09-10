@@ -26,6 +26,7 @@
 #include <util/message.h>
 #include <races/races.h>
 
+#include "calendar.h"
 #include "chaos.h"
 #include "creport.h"
 #include "items.h"
@@ -50,8 +51,8 @@ void game_done(void)
 #ifdef REPORT_FORMAT_NR
     report_cleanup();
 #endif
-    calendar_cleanup();
 #endif
+    calendar_cleanup();
     free_functions();
     free_config();
     free_locales();
