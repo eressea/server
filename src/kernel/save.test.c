@@ -312,6 +312,12 @@ static void test_read_password_external(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_version_no(CuTest *tc) {
+    CuAssertIntEquals(tc, 0, version_no("0.0.0-devel"));
+    CuAssertIntEquals(tc, 0x10000, version_no("1.0.0-test"));
+    CuAssertIntEquals(tc, 0x10203, version_no("1.2.3-what.is.42"));
+}
+
 CuSuite *get_save_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -324,5 +330,7 @@ CuSuite *get_save_suite(void)
     SUITE_ADD_TEST(suite, test_readwrite_dead_faction_group);
     SUITE_ADD_TEST(suite, test_read_password);
     SUITE_ADD_TEST(suite, test_read_password_external);
+    SUITE_ADD_TEST(suite, test_version_no);
+
     return suite;
 }

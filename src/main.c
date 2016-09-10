@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 
 #include <kernel/config.h>
+#include <kernel/version.h>
 #include <kernel/save.h>
 #include <util/filereader.h>
 #include <util/language.h>
@@ -165,8 +166,8 @@ static int parse_args(int argc, char **argv, int *exitcode)
             if (strcmp(argi + 2, "version") == 0) {
                 printf("\n%s PBEM host\n"
                     "Copyright (C) 1996-2005 C. Schlittchen, K. Zedel, E. Rehling, H. Peters.\n\n"
-                    "Compilation: " __DATE__ " at " __TIME__ "\nVersion: %d.%d.%d\n\n",
-                    game_name(), VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD);
+                    "Compilation: " __DATE__ " at " __TIME__ "\nVersion: %s\n\n",
+                    game_name(), ERESSEA_VERSION);
 #ifdef USE_CURSES          
             }
             else if (strcmp(argi + 2, "color") == 0) {

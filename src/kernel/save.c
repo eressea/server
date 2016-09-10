@@ -18,6 +18,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <platform.h>
 #include <kernel/config.h>
+#include <kernel/version.h>
 #include "save.h"
 
 #include <buildno.h>
@@ -1859,6 +1860,12 @@ static void clear_npc_orders(faction *f)
     }
 }
 
+int version_no(const char *str) {
+    int maj = 0, min = 0, bld = 0;
+    sscanf(str, "%d.%d.%d", &maj, &min, &bld);
+    return (maj << 16) | (min << 8) | bld;
+}
+
 int writegame(const char *filename)
 {
     int n;
@@ -1889,7 +1896,7 @@ int writegame(const char *filename)
     fstream_init(&strm, F);
     binstore_init(&store, &strm);
 
-    WRITE_INT(&store, VERSION_BUILD);
+    WRITE_INT(&store, version_no(ERESSEA_VERSION));
     n = write_game(&gdata);
     binstore_done(&store);
     fstream_done(&strm);
