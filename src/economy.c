@@ -2543,6 +2543,8 @@ static void steal_cmd(unit * u, struct order *ord, request ** stealorders)
         f = u2->faction;
     }
     else {
+        // TODO: is this really necessary? it's the only time we use faction.c/deadhash
+        // it allows stealing from a unit in a dead faction, but why?
         f = dfindhash(id);
     }
 
