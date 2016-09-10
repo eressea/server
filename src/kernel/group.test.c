@@ -7,7 +7,6 @@
 #include "unit.h"
 #include "region.h"
 #include "save.h"
-#include "version.h"
 
 #include <util/gamedata.h>
 #include <util/attrib.h>

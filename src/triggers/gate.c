@@ -17,7 +17,6 @@
 #include <kernel/building.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
-#include <kernel/version.h>
 
 /* util includes */
 #include <util/attrib.h>

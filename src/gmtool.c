@@ -44,7 +44,6 @@
 #include <kernel/ship.h>
 #include <kernel/terrain.h>
 #include <kernel/xmlreader.h>
-#include <kernel/version.h>
 
 #include <attributes/attributes.h>
 #include <triggers/triggers.h>

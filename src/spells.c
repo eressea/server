@@ -53,7 +53,6 @@
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
 #include <kernel/xmlreader.h>
-#include <kernel/version.h>
 
 #include <races/races.h>
 

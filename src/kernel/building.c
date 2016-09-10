@@ -30,7 +30,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "skill.h"
 #include "save.h"
 #include "lighthouse.h"
-#include "version.h"
 
 /* util includes */
 #include <util/attrib.h>

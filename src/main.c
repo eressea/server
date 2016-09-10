@@ -21,7 +21,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <kernel/config.h>
 #include <kernel/save.h>
-#include <kernel/version.h>
 #include <util/filereader.h>
 #include <util/language.h>
 #include "eressea.h"

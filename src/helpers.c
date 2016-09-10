@@ -31,7 +31,6 @@ without prior permission by the authors of Eressea.
 #include <kernel/building.h>
 #include <kernel/item.h>
 #include <kernel/region.h>
-#include <kernel/version.h>
 
 #include <storage.h>
 

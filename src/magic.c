@@ -44,7 +44,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/spellbook.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
-#include <kernel/version.h>
 
 #include <triggers/timeout.h>
 #include <triggers/shock.h>

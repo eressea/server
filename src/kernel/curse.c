@@ -30,7 +30,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "ship.h"
 #include "skill.h"
 #include "unit.h"
-#include "version.h"
 
 /* util includes */
 #include <util/attrib.h>

@@ -24,7 +24,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "save.h"
 #include "terrain.h"
 #include "unit.h"
-#include "version.h"
 
 #include <util/attrib.h>
 #include <util/bsdstring.h>

@@ -47,7 +47,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "terrainid.h"          /* only for conversion code */
 #include "unit.h"
 #include "lighthouse.h"
-#include "version.h"
 
 /* attributes includes */
 #include <attributes/key.h>

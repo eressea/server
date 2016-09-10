@@ -25,7 +25,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "faction.h"
 #include "save.h"
 #include "unit.h"
-#include "version.h"
 
 /* attrib includes */
 #include <attributes/raceprefix.h>

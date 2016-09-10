@@ -11,7 +11,6 @@
 #include "faction.h"
 #include "plane.h"
 #include "region.h"
-#include "version.h"
 
 #include <triggers/changefaction.h>
 #include <triggers/createunit.h>
