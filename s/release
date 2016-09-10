@@ -3,6 +3,9 @@
 import os
 import sys
 
+print("This script uses buildno.h, which is deprecated\nExiting.\n")
+sys.exit(1)
+
 template="""#define VERSION_MAJOR %s
 #define VERSION_MINOR %s
 #define VERSION_BUILD %s
