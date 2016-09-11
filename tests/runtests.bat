@@ -11,4 +11,4 @@ SET SERVER=%BUILD%\eressea.exe
 %SERVER% ..\scripts\run-tests-e4.lua
 PAUSE
 RMDIR /s /q reports
-DEL score score.alliances
+DEL score score.alliances datum turn
