@@ -3,6 +3,8 @@ local autoseed = {}
 -- minimum required resources in the 7-hex neighborhood:
 local peasants = 10000
 local trees = 800
+-- minimum resources in the region itself:
+local min_peasants = 2000
 -- number of starters per region:
 local per_region = 2
     
@@ -23,11 +25,13 @@ local function select_regions(regions, peasants, trees)
     local sel = {}
     for r in regions do
         if not r.plane and r.terrain~="ocean" and not r.units() then
-            sp = score(r, "peasant")
-            st = score(r, "tree")
-            if sp >= peasants then
-                if st >= trees then
-                    table.insert(sel, r)
+            if r:get_resource("peasant") >= min_peasants then
+                sp = score(r, "peasant")
+                st = score(r, "tree")
+                if sp >= peasants then
+                    if st >= trees then
+                        table.insert(sel, r)
+                    end
                 end
             end
         end
