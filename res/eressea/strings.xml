@@ -268,13 +268,7 @@
     <text locale="de">Muscheln</text>
     <text locale="en">seashells</text>
   </string>
-
-  <string name="newbie_info_2">
-    <text locale="de">Die ersten beiden Züge mußt du abgeben, sonst wird deine
-    Partei sofort wieder gelöscht, um Karteileichen zu vermeiden.</text>
-    <text locale="en">If you fail to send in orders for one of the first two turns, your faction will be erased from the game to reduce the number of inactive players in Eressea.</text>
-  </string>
-  <string name="newbie_info_3">
+  <string name="newbie_info_cr">
     <text locale="de">Mit der ersten Auswertung bekommst du einen
     Computerreport, den du mit vielen Tools wie z.B. Magellan benutzen kannst. Wenn du ihn
     weiterhin bekommen willst, gib einer deiner Einheiten den Befehl OPTION

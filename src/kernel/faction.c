@@ -261,6 +261,7 @@ faction *addfaction(const char *email, const char *password,
     f->magiegebiet = 0;
     f->locale = loc;
     f->subscription = subscription;
+    f->flags = FFL_ISNEW;
 
     f->options =
         want(O_REPORT) | want(O_ZUGVORLAGE) | want(O_COMPUTER) | want(O_COMPRESS) |

@@ -2106,19 +2106,14 @@ const char *charset)
 
     if (f->age <= 2) {
         const char *s;
-        s = locale_getstring(f->locale, "newbie_info_1");
-        if (s) {
-            newline(out);
-            centre(out, s, true);
-        }
-        s = locale_getstring(f->locale, "newbie_info_2");
+        s = locale_getstring(f->locale, "newbie_info_game");
         if (s) {
             newline(out);
             centre(out, s, true);
         }
         if ((f->options & want(O_COMPUTER)) == 0) {
             f->options |= want(O_COMPUTER);
-            s = locale_getstring(f->locale, "newbie_info_3");
+            s = locale_getstring(f->locale, "newbie_info_cr");
             if (s) {
                 newline(out);
                 centre(out, s, true);
