@@ -776,6 +776,8 @@ void demographics(void)
     region *r;
     static int last_weeks_season = -1;
     static int current_season = -1;
+    int plant_rules = config_get_int("rules.grow.formula", 2);
+    const struct building_type *bt_harbour = bt_find("harbour");
 
     if (current_season < 0) {
         gamedate date;
@@ -793,11 +795,10 @@ void demographics(void)
             /* die Nachfrage nach Produkten steigt. */
             struct demand *dmd;
             if (r->land) {
-                int plant_rules = config_get_int("rules.grow.formula", 2);
                 for (dmd = r->land->demands; dmd; dmd = dmd->next) {
                     if (dmd->value > 0 && dmd->value < MAXDEMAND) {
                         float rise = DMRISE;
-                        if (buildingtype_exists(r, bt_find("harbour"), true))
+                        if (buildingtype_exists(r, bt_harbour, true))
                             rise = DMRISEHAFEN;
                         if (rng_double() < rise)
                             ++dmd->value;

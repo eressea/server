@@ -123,9 +123,14 @@ static void end_potion(unit * u, const potion_type * ptype, int amount)
 }
 
 static int potion_water_of_life(unit * u, region *r, int amount) {
+    static int config;
+    static int tree_type, tree_count;
     int wood = 0;
-    int tree_type = config_get_int("rules.magic.wol_type", 1);
-    int tree_count = config_get_int("rules.magic.wol_effect", 10);
+
+    if (config_changed(&config)) {
+        tree_type = config_get_int("rules.magic.wol_type", 1);
+        tree_count = config_get_int("rules.magic.wol_effect", 10);
+    }
     /* mallorn is required to make mallorn forests, wood for regular ones */
     if (fval(r, RF_MALLORN)) {
         wood = use_pooled(u, rt_find("mallorn"),

@@ -419,8 +419,9 @@ int value)
 
 int roqf_factor(void)
 {
-    int value = -1;
-    if (value < 0) {
+    static int config;
+    static int value;
+    if (config_changed(&config)) {
         value = config_get_int("rules.economy.roqf", 10);
     }
     return value;

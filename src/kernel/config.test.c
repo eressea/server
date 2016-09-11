@@ -198,6 +198,8 @@ static void test_config_cache(CuTest *tc) {
     config_set("hodor", "0");
     CuAssertTrue(tc, config_changed(&key));
     CuAssertTrue(tc, !config_changed(&key));
+    free_config();
+    CuAssertTrue(tc, config_changed(&key));
     test_cleanup();
 }
 

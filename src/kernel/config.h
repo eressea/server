@@ -64,7 +64,6 @@ struct param;
     int lovar(double xpct_x2);
     /* returns a value between [0..xpct_2], generated with two dice */
 
-    int distribute(int old, int new_value, int n);
     void init_locale(struct locale *lang);
 
     int forbiddenid(int id);

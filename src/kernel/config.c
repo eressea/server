@@ -1097,6 +1097,7 @@ bool config_token(const char *key, const char *tok) {
 void free_config(void) {
     global.functions.wage = NULL;
     free_params(&configuration);
+    ++config_cache_key;
 }
 
 /** releases all memory associated with the game state.

@@ -394,10 +394,19 @@ static void test_build_destroy_cmd(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_build_roqf_factor(CuTest *tc) {
+    test_setup();
+    CuAssertIntEquals(tc, 10, roqf_factor());
+    config_set("rules.economy.roqf", "50");
+    CuAssertIntEquals(tc, 50, roqf_factor());
+    test_cleanup();
+}
+
 CuSuite *get_build_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_build_limits);
+    SUITE_ADD_TEST(suite, test_build_roqf_factor);
     SUITE_ADD_TEST(suite, test_build_failure_low_skill);
     SUITE_ADD_TEST(suite, test_build_failure_missing_skill);
     SUITE_ADD_TEST(suite, test_build_requires_materials);

@@ -141,6 +141,7 @@ static int rule_goblin_bonus;
 static int rule_tactics_formula;
 static int rule_nat_armor;
 static int rule_cavalry_mode;
+static int rule_vampire;
 
 static const curse_type *peace_ct, *slave_ct, *calm_ct;
 
@@ -159,6 +160,7 @@ static void init_rules(void)
     rule_anon_battle = config_get_int("rules.stealth.anon_battle", 1) != 0;
     rule_cavalry_mode = config_get_int("rules.cavalry.mode", 1);
     rule_cavalry_skill = config_get_int("rules.cavalry.skill", 2);
+    rule_vampire = config_get_int("rules.combat.demon_vampire", 0);
     rule_loot = config_get_int("rules.combat.loot",
         LOOT_MONSTERS | LOOT_OTHERS | LOOT_KEEPLOOT);
     /* new formula to calculate to-hit-chance */
@@ -1009,11 +1011,10 @@ const char *rel_dam(int dam, int hp)
 
 static void vampirism(troop at, int damage)
 {
-    int vampire = config_get_int("rules.combat.demon_vampire", 0);
-    if (vampire > 0) {
-        int gain = damage / vampire;
-        int chance = damage - vampire * gain;
-        if (chance > 0 && (rng_int() % vampire < chance))
+    if (rule_vampire > 0) {
+        int gain = damage / rule_vampire;
+        int chance = damage - rule_vampire * gain;
+        if (chance > 0 && (rng_int() % rule_vampire < chance))
             ++gain;
         if (gain > 0) {
             int maxhp = unit_max_hp(at.fighter->unit);
