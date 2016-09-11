@@ -184,6 +184,7 @@ struct param;
     int config_get_int(const char *key, int def);
     double config_get_flt(const char *key, double def);
     bool config_token(const char *key, const char *tok);
+    bool config_changed(int *cache_key);
 
     char * join_path(const char *p1, const char *p2, char *dst, size_t len);
     bool ExpensiveMigrants(void);

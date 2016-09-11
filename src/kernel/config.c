@@ -887,14 +887,23 @@ int rule_blessed_harvest(void)
 
 int rule_alliance_limit(void)
 {
-    int rule = config_get_int("rules.limit.alliance", 0);
+    static int cache_token;
+    static int rule = 0;
+
+    if (config_changed(&cache_token)) {
+        rule = config_get_int("rules.limit.alliance", 0);
+    }
     assert(rule >= 0);
     return rule;
 }
 
 int rule_faction_limit(void)
 {
-    int rule = config_get_int("rules.limit.faction", 0);
+    static int cache_token;
+    static int rule = 0;
+    if (config_changed(&cache_token)) {
+        rule = config_get_int("rules.limit.faction", 0);
+    }
     assert(rule >= 0);
     return rule;
 }
@@ -1053,8 +1062,19 @@ bool markets_module(void)
 }
 
 static struct param *configuration;
+static int config_cache_key = 1;
+
+bool config_changed(int *cache_key) {
+    assert(cache_key);
+    if (config_cache_key != *cache_key) {
+        *cache_key = config_cache_key;
+        return true;
+    }
+    return false;
+}
 
 void config_set(const char *key, const char *value) {
+    ++config_cache_key;
     set_param(&configuration, key, value);
 }
 
