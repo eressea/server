@@ -27,27 +27,29 @@ else
 end
 
 local f=assert(io.open("factions", "r"))
-line=f:read("*line")
-players = {}
-emails = {}
-patrons = {}
-nplayers = 0
-while line~=nil do
-    fields = {}
-    line:gsub("([^\t]*)\t*", function(c) table.insert(fields, c) end)
+if f then
     line=f:read("*line")
-    email = fields[1]
-    if fields[2]=='yes' then
-        table.insert(patrons, email)
-    else
-        table.insert(emails, email)
+    players = {}
+    emails = {}
+    patrons = {}
+    nplayers = 0
+    while line~=nil do
+        fields = {}
+        line:gsub("([^\t]*)\t*", function(c) table.insert(fields, c) end)
+        line=f:read("*line")
+        email = fields[1]
+        if fields[2]=='yes' then
+            table.insert(patrons, email)
+        else
+            table.insert(emails, email)
+        end
+        if fields[3]=='German' then lang='de' else lang='en' end
+        race=string.gsub(fields[4], "/.*", ''):lower()
+        players[email] = { ['lang'] = lang, ['race'] = race }
+        nplayers = nplayers + 1
     end
-    if fields[3]=='German' then lang='de' else lang='en' end
-    race=string.gsub(fields[4], "/.*", ''):lower()
-    players[email] = { ['lang'] = lang, ['race'] = race }
-    nplayers = nplayers + 1
+    f:close()
 end
-
 for k, r in ipairs(homes) do
     print(k, r)
 end
