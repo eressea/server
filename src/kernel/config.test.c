@@ -204,6 +204,26 @@ static void test_config_cache(CuTest *tc) {
 }
 
 static void test_rules(CuTest *tc) {
+    CuAssertIntEquals(tc, HARVEST_WORK, rule_blessed_harvest());
+    config_set("rules.blessed_harvest.flags", "15");
+    CuAssertIntEquals(tc, 15, rule_blessed_harvest());
+
+    CuAssertTrue(tc, !rule_region_owners());
+    config_set("rules.region_owners", "1");
+    CuAssertTrue(tc, rule_region_owners());
+
+    CuAssertTrue(tc, rule_stealth_anon());
+    config_set("stealth.faction.anon", "0");
+    CuAssertTrue(tc, !rule_stealth_anon());
+
+    CuAssertTrue(tc, rule_stealth_other());
+    config_set("stealth.faction.other", "0");
+    CuAssertTrue(tc, !rule_stealth_other());
+
+    CuAssertIntEquals(tc, GIVE_DEFAULT, rule_give());
+    config_set("rules.give.flags", "15");
+    CuAssertIntEquals(tc, 15, rule_give());
+
     CuAssertIntEquals(tc, 0, rule_alliance_limit());
     config_set("rules.limit.alliance", "1");
     CuAssertIntEquals(tc, 1, rule_alliance_limit());
