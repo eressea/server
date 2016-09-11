@@ -8,6 +8,7 @@
 #include <kernel/region.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
+#include <util/log.h>
 #include <util/attrib.h>
 
 #include <assert.h>
@@ -25,14 +26,12 @@ static attrib_type at_lighthouse = {
 */
 void update_lighthouse(building * lh)
 {
-    if (is_building_type(lh->type, "lighthouse")) {
+    if (lh->size>0 && is_building_type(lh->type, "lighthouse")) {
         region *r = lh->region;
         int d = (int)log10(lh->size) + 1;
         int x;
 
-        if (lh->size > 0) {
-            r->flags |= RF_LIGHTHOUSE;
-        }
+        r->flags |= RF_LIGHTHOUSE;
 
         for (x = -d; x <= d; ++x) {
             int y;
@@ -40,6 +39,7 @@ void update_lighthouse(building * lh)
                 attrib *a;
                 region *r2;
                 int px = r->x + x, py = r->y + y;
+
                 pnormalize(&px, &py, rplane(r));
                 r2 = findregion(px, py);
                 if (!r2 || !fval(r2->terrain, SEA_REGION))

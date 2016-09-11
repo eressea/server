@@ -522,7 +522,7 @@ static void test_pay_cmd_other_building(CuTest *tc) {
     building *b;
     char cmd[32];
 
-    test_cleanup();
+    test_setup();
     setup_pay_cmd(&fix);
     f = fix.u1->faction;
     b = test_create_building(fix.u1->region, bt_get_or_create("lighthouse"));

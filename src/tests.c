@@ -94,16 +94,14 @@ struct locale * test_create_locale(void) {
         for (i = 0; i != MAXKEYWORDS; ++i) {
             locale_setstring(loc, mkname("keyword", keywords[i]), keywords[i]);
         }
-        for (i = 0; i != MAXSKILLS; ++i) {
-            locale_setstring(loc, mkname("skill", skillnames[i]), skillnames[i]);
-        }
         for (i = 0; i != MAXPARAMS; ++i) {
             locale_setstring(loc, parameters[i], parameters[i]);
             test_translate_param(loc, i, parameters[i]);
         }
-        init_parameters(loc);
-        init_keywords(loc);
-        init_skills(loc);
+        for (i = 0; i != MAXMAGIETYP; ++i) {
+            locale_setstring(loc, mkname("school", magic_school[i]), magic_school[i]);
+        }
+        init_locale(loc);
     }
     return loc;
 }
@@ -163,6 +161,13 @@ static void test_reset(void) {
     int i;
     turn = 0;
     default_locale = 0;
+
+    if (errno) {
+        int error = errno;
+        errno = 0;
+        log_error("errno: %d (%s)", error, strerror(error));
+    }
+
     free_gamedata();
     free_terrains();
     free_resources();
@@ -184,13 +189,13 @@ static void test_reset(void) {
     for (i = 0; i != MAXKEYWORDS; ++i) {
         enable_keyword(i, true);
     }
+    random_source_reset();
+
     if (errno) {
         int error = errno;
         errno = 0;
         log_error("errno: %d (%s)", error, strerror(error));
     }
-
-    random_source_reset();
 }
 
 void test_setup(void) {

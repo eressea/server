@@ -25,9 +25,8 @@
 #include <CuTest.h>
 #include <tests.h>
 
-#include <storage.h>
-
 #include <stdio.h>
+#include <errno.h>
 
 static void test_readwrite_data(CuTest * tc)
 {
@@ -283,7 +282,9 @@ static void test_read_password_external(CuTest *tc) {
     FILE * F;
 
     test_setup();
-    remove(pwfile);
+    if (remove(pwfile) != 0) {
+        errno = 0;
+    }
     f = test_create_faction(0);
     faction_setpassword(f, password_encode("secret", PASSWORD_DEFAULT));
     CuAssertPtrNotNull(tc, f->_password);
