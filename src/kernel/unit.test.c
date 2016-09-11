@@ -50,14 +50,16 @@ static void test_remove_empty_units_in_region(CuTest *tc) {
     test_create_world();
 
     u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
+    u = test_create_unit(u->faction, u->region);
+    CuAssertPtrNotNull(tc, u->nextF);
     uid = u->no;
     remove_empty_units_in_region(u->region);
     CuAssertPtrNotNull(tc, findunit(uid));
     u->number = 0;
     remove_empty_units_in_region(u->region);
     CuAssertPtrEquals(tc, 0, findunit(uid));
+    CuAssertPtrEquals(tc, 0, u->nextF);
     CuAssertPtrEquals(tc, 0, u->region);
-    CuAssertPtrEquals(tc, 0, u->faction);
     test_cleanup();
 }
 
@@ -401,6 +403,34 @@ static void test_unit_description(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_remove_unit(CuTest *tc) {
+    region *r;
+    unit *u;
+    faction *f;
+    int uno;
+    const resource_type *rtype;
+
+    test_setup();
+    init_resources();
+    rtype = get_resourcetype(R_SILVER);
+    r = test_create_region(0, 0, 0);
+    f = test_create_faction(0);
+    u = test_create_unit(f, r);
+    uno = u->no;
+    region_setresource(r, rtype, 0);
+    i_change(&u->items, rtype->itype, 100);
+    remove_unit(&r->units, u);
+    CuAssertIntEquals(tc, 100, region_getresource(r, rtype));
+    CuAssertIntEquals(tc, 0, u->number);
+    CuAssertPtrEquals(tc, 0, u->region);
+    CuAssertPtrEquals(tc, 0, u->items);
+    CuAssertPtrEquals(tc, 0, u->nextF);
+    CuAssertPtrEquals(tc, 0, r->units);
+    CuAssertPtrEquals(tc, 0, findunit(uno));
+    CuAssertPtrEquals(tc, f, dfindhash(uno));
+    test_cleanup();
+}
+
 CuSuite *get_unit_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -409,6 +439,7 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_unit_name);
     SUITE_ADD_TEST(suite, test_unit_name_from_race);
     SUITE_ADD_TEST(suite, test_update_monster_name);
+    SUITE_ADD_TEST(suite, test_remove_unit);
     SUITE_ADD_TEST(suite, test_remove_empty_units);
     SUITE_ADD_TEST(suite, test_remove_units_ignores_spells);
     SUITE_ADD_TEST(suite, test_remove_units_without_faction);

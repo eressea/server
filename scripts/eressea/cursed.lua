@@ -23,6 +23,7 @@ function cursed.init()
     if f then
         print("found cursed.txt")
         curse(f)
+        f:close()
     end
 end
 

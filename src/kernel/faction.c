@@ -336,40 +336,6 @@ void write_faction_reference(const faction * f, struct storage *store)
     WRITE_INT(store, f ? f->no : 0);
 }
 
-#define DMAXHASH 7919
-typedef struct dead {
-    struct dead *nexthash;
-    faction *f;
-    int no;
-} dead;
-
-static dead *deadhash[DMAXHASH];
-
-void dhash(int no, faction * f)
-{
-    dead *hash = (dead *)calloc(1, sizeof(dead));
-    dead *old = deadhash[no % DMAXHASH];
-    hash->no = no;
-    hash->f = f;
-    deadhash[no % DMAXHASH] = hash;
-    hash->nexthash = old;
-}
-
-faction *dfindhash(int no)
-{
-    dead *old;
-
-    if (no < 0)
-        return 0;
-
-    for (old = deadhash[no % DMAXHASH]; old; old = old->nexthash) {
-        if (old->no == no) {
-            return old->f;
-        }
-    }
-    return 0;
-}
-
 void free_flist(faction **fp) {
     faction * flist = *fp;
     while (flist) {
@@ -868,6 +834,7 @@ int writepasswd(void)
 }
 
 void free_factions(void) {
+#ifdef DMAXHASH
     int i;
     for (i = 0; i != DMAXHASH; ++i) {
         while (deadhash[i]) {
@@ -876,6 +843,7 @@ void free_factions(void) {
             free(d);
         }
     }
+#endif
     free_flist(&factions);
     free_flist(&dead_factions);
 }

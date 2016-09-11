@@ -174,6 +174,9 @@ extern "C" {
         const struct region *r, bool noitem);
     int remove_unit(struct unit **ulist, struct unit *u);
 
+    /* looking up dead units' factions: */
+    struct faction *dfindhash(int no);
+
 #define GIFT_SELF     1<<0
 #define GIFT_FRIENDS  1<<1
 #define GIFT_PEASANTS 1<<2

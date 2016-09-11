@@ -366,6 +366,51 @@ int gift_items(unit * u, int flags)
 
 static unit *deleted_units = NULL;
 
+#define DMAXHASH 7919
+#undef DMAXHASH // TODO: makes dfindhash slow!
+#ifdef DMAXHASH
+typedef struct dead {
+    struct dead *nexthash;
+    faction *f;
+    int no;
+} dead;
+
+static dead *deadhash[DMAXHASH];
+
+static void dhash(int no, faction * f)
+{
+    dead *hash = (dead *)calloc(1, sizeof(dead));
+    dead *old = deadhash[no % DMAXHASH];
+    hash->no = no;
+    hash->f = f;
+    deadhash[no % DMAXHASH] = hash;
+    hash->nexthash = old;
+}
+
+faction *dfindhash(int no)
+{
+    dead *old;
+
+    if (no < 0)
+        return 0;
+
+    for (old = deadhash[no % DMAXHASH]; old; old = old->nexthash) {
+        if (old->no == no) {
+            return old->f;
+        }
+    }
+    return 0;
+}
+#else
+struct faction *dfindhash(int no) {
+    unit *u = deleted_units;
+    while (u && u->no != no) {
+        u = u->next;
+    }
+    return u ? u->faction : NULL;
+}
+#endif
+
 int remove_unit(unit ** ulist, unit * u)
 {
     int result;
@@ -379,8 +424,9 @@ int remove_unit(unit ** ulist, unit * u)
         return -1;
     }
 
-    if (u->number)
+    if (u->number) {
         set_number(u, 0);
+    }
     leave(u, true);
     u->region = NULL;
 
@@ -393,11 +439,22 @@ int remove_unit(unit ** ulist, unit * u)
         *ulist = u->next;
     }
 
+    if (u->prevF) {
+        u->prevF->nextF = u->nextF;
+    }
+    if (u->nextF) {
+        u->nextF->prevF = u->prevF;
+    }
+    u->nextF = 0;
+    u->prevF = 0;
+
     u->next = deleted_units;
     deleted_units = u;
+#ifdef DMAXHASH
     dhash(u->no, u->faction);
+#endif
+    // u_setfaction(u, NULL);
 
-    u_setfaction(u, NULL);
     u->region = NULL;
 
     return 0;

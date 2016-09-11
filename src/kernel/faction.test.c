@@ -191,30 +191,10 @@ static void test_set_origin_bug(CuTest *tc) {
     test_cleanup();
 }
 
-static void test_deadhash(CuTest *tc) {
-    faction *f;
-    int no;
-
-    test_setup();
-    f = test_create_faction(0);
-    no = f->no;
-    CuAssertPtrEquals(tc, f, findfaction(no));
-    CuAssertPtrEquals(tc, NULL, dfindhash(42));
-    dhash(41, f);
-    dhash(42, f);
-    assert(f == factions);
-    destroyfaction(&factions);
-    CuAssertPtrEquals(tc, 0, findfaction(no));
-    CuAssertPtrEquals(tc, f, dfindhash(42));
-    CuAssertPtrEquals(tc, f, dfindhash(41));
-    test_cleanup();
-}
-
 CuSuite *get_faction_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_addfaction);
-    SUITE_ADD_TEST(suite, test_deadhash);
     SUITE_ADD_TEST(suite, test_remove_empty_factions);
     SUITE_ADD_TEST(suite, test_destroyfaction_allies);
     SUITE_ADD_TEST(suite, test_remove_empty_factions_alliance);

@@ -180,10 +180,6 @@ extern "C" {
 
     struct faction *getfaction(void);
 
-    /* looking up dead factions: */
-    void dhash(int no, struct faction * f);
-    struct faction *dfindhash(int no);
-
 #ifdef __cplusplus
 }
 #endif

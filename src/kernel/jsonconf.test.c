@@ -22,6 +22,7 @@
 #include <tests.h>
 #include <string.h>
 #include <stdio.h>
+#include <errno.h>
 
 static const struct race * race_with_flag(const char * name) {
     char data[1024];
@@ -445,7 +446,9 @@ static void test_configs(CuTest * tc)
     CuAssertPtrEquals(tc, 0, buildingtypes);
     json_config(json);
     CuAssertPtrNotNull(tc, buildingtypes);
-    unlink("test.json");
+    if (unlink("test.json")!=0 && errno==ENOENT) {
+        errno = 0;
+    }
     cJSON_Delete(json);
     test_cleanup();
 }

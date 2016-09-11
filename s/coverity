@@ -1,9 +1,7 @@
 #!/bin/bash
-set -e
-VERSION="$1"
+#set -e
+VERSION=$(git describe --tags --match 'v*.*.*')
 echo "submitting version $VERSION"
-shift
-DESC="$*"
 cd Debug
 make clean
 ../../coverity/bin/cov-build --dir cov-int make eressea
@@ -12,5 +10,5 @@ curl --form token=IISXKH3A1ngZGfFmBz_aSA \
   --form email=enno.rehling@gmail.com \
   --form file=@eressea.tgz \
   --form version="$VERSION" \
-  --form description="$DESC" \
+  --form description="Eressea coverity check" \
   https://scan.coverity.com/builds?project=eressea%2Fserver
