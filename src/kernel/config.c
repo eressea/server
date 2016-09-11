@@ -867,21 +867,29 @@ bool rule_stealth_other(void)
 
 bool rule_stealth_anon(void)
 {
-    int rule = config_get_int("stealth.faction.anon", 1);
+    static int rule, config;
+    if (config_changed(&config)) {
+        rule = config_get_int("stealth.faction.anon", 1);
+    }
     return rule != 0;
 }
 
 bool rule_region_owners(void)
 {
-    int rule = config_get_int("rules.region_owners", 0);
+    static int rule, config;
+    if (config_changed(&config)) {
+        rule = config_get_int("rules.region_owners", 0);
+    }
     return rule != 0;
 }
 
 int rule_blessed_harvest(void)
 {
-    int rule = config_get_int("rules.blessed_harvest.flags",
-        HARVEST_WORK);
-    assert(rule >= 0);
+    static int rule, config;
+    if (config_changed(&config)) {
+        rule = config_get_int("rules.blessed_harvest.flags", HARVEST_WORK);
+        assert(rule >= 0);
+    }
     return rule;
 }
 
@@ -1053,7 +1061,12 @@ int entertainmoney(const region * r)
 
 int rule_give(void)
 {
-    return config_get_int("rules.give.flags", GIVE_DEFAULT);
+    static int config;
+    static int rule;
+    if (config_changed(&config)) {
+        rule = config_get_int("rules.give.flags", GIVE_DEFAULT);
+    }
+    return rule;
 }
 
 bool markets_module(void)

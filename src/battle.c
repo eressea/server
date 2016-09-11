@@ -88,7 +88,6 @@ static FILE *bdebug;
 #define TDIFF_CHANGE    5       /* 5% höher pro Stufe */
 #define DAMAGE_QUOTIENT 2       /* damage += skilldiff/DAMAGE_QUOTIENT */
 
-#undef DEBUG_FAST               /* should be disabled when b->fast and b->rowcache works */
 #define DEBUG_SELECT            /* should be disabled if select_enemy works */
 
 typedef enum combatmagic {
@@ -205,12 +204,7 @@ static const char *sideabkz(side * s, bool truename)
     const faction *f = (s->stealthfaction
         && !truename) ? s->stealthfaction : s->faction;
 
-#undef SIDE_ABKZ
-#ifdef SIDE_ABKZ
-    abkz(f->name, sideabkz_buf, sizeof(sideabkz_buf), 3);
-#else
     strlcpy(sideabkz_buf, itoa36(f->no), sizeof(sideabkz_buf));
-#endif
     return sideabkz_buf;
 }
 
@@ -471,13 +465,7 @@ static int get_unitrow(const fighter * af, const side * vs)
             b->rowcache.result = get_row(af->side, row, vs);
             return b->rowcache.result;
         }
-#ifdef DEBUG_FAST               /* validation code */
-    {
-        int i = get_row(af->side, row, vs);
-        assert(i == b->rowcache.result);
-    }
-#endif
-    return b->rowcache.result;
+        return b->rowcache.result;
     }
 }
 
@@ -1445,18 +1433,10 @@ int select)
     if (b->alive == b->fast.alive && as == b->fast.side && sr == b->fast.status
         && minrow == b->fast.minrow && maxrow == b->fast.maxrow) {
         if (b->fast.enemies[select] >= 0) {
-#ifdef DEBUG_FAST
-            int i = count_enemies_i(b, af, minrow, maxrow, select);
-            assert(i == b->fast.enemies[select]);
-#endif
             return b->fast.enemies[select];
         }
         else if (select & SELECT_FIND) {
             if (b->fast.enemies[select - SELECT_FIND] >= 0) {
-#ifdef DEBUG_FAST
-                int i = count_enemies_i(b, af, minrow, maxrow, select);
-                assert((i > 0) == (b->fast.enemies[select - SELECT_FIND] > 0));
-#endif
                 return b->fast.enemies[select - SELECT_FIND];
             }
         }

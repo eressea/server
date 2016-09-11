@@ -40,7 +40,6 @@ extern "C" {
     /* faction flags */
 #define FFL_NEWID (1<<0)        /* Die Partei hat bereits einmal ihre no gewechselt */
 #define FFL_ISNEW         (1<<1)
-#define FFL_RESTART       (1<<2)
 #define FFL_QUIT          (1<<3)
 #define FFL_CURSED        (1<<4) /* you're going to have a bad time */
 #define FFL_DEFENDER      (1<<10)
@@ -52,8 +51,7 @@ extern "C" {
                                              * FL_MARK hinterher löschen) */
 #define FFL_NOIDLEOUT     (1<<24)       /* Partei stirbt nicht an NMRs */
 #define FFL_NPC           (1<<25)       /* eine Partei mit Monstern */
-#define FFL_DBENTRY       (1<<28)       /* Partei ist in Datenbank eingetragen */
-#define FFL_SAVEMASK (FFL_DEFENDER|FFL_NEWID|FFL_NPC|FFL_DBENTRY|FFL_NOIDLEOUT|FFL_CURSED)
+#define FFL_SAVEMASK (FFL_DEFENDER|FFL_NEWID|FFL_NPC|FFL_NOIDLEOUT|FFL_CURSED)
 
     typedef struct faction {
         struct faction *next;

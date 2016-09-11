@@ -322,10 +322,6 @@ int main(int argc, char **argv)
         log_error("script %s failed with code %d\n", luafile, err);
         return err;
     }
-#ifdef MSPACES
-    malloc_stats();
-#endif
-
     game_done();
     lua_done(L);
     log_close();

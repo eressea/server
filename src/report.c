@@ -2106,19 +2106,14 @@ const char *charset)
 
     if (f->age <= 2) {
         const char *s;
-        s = locale_getstring(f->locale, "newbie_info_1");
-        if (s) {
-            newline(out);
-            centre(out, s, true);
-        }
-        s = locale_getstring(f->locale, "newbie_info_2");
+        s = locale_getstring(f->locale, "newbie_info_game");
         if (s) {
             newline(out);
             centre(out, s, true);
         }
         if ((f->options & want(O_COMPUTER)) == 0) {
             f->options |= want(O_COMPUTER);
-            s = locale_getstring(f->locale, "newbie_info_3");
+            s = locale_getstring(f->locale, "newbie_info_cr");
             if (s) {
                 newline(out);
                 centre(out, s, true);
@@ -2133,23 +2128,6 @@ const char *charset)
         RENDER(f, buf, sizeof(buf), ("nr_score", "score average", score, avg));
         centre(out, buf, true);
     }
-#ifdef COUNT_AGAIN
-    no_units = 0;
-    no_people = 0;
-    for (u = f->units; u; u = u->nextF) {
-        if (playerrace(u_race(u))) {
-            ++no_people;
-            no_units += u->number;
-            assert(f == u->faction);
-        }
-    }
-    if (no_units != f->no_units) {
-        f->no_units = no_units;
-    }
-    if (no_people != f->num_people) {
-        f->num_people = no_people;
-}
-#else
     no_units = count_units(f);
     no_people = count_all(f);
     if (f->flags & FFL_NPC) {
@@ -2158,7 +2136,6 @@ const char *charset)
     else {
         no_people = f->num_people;
     }
-#endif
     m = msg_message("nr_population", "population units limit", no_people, no_units, rule_faction_limit());
     nr_render(m, f->locale, buf, sizeof(buf), f);
     msg_release(m);
