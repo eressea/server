@@ -233,15 +233,7 @@ void tolua_ship_open(lua_State * L)
             tolua_variable(L, TOLUA_CAST "type", tolua_ship_get_type, 0);
             tolua_variable(L, TOLUA_CAST "damage", tolua_ship_get_damage,
                 tolua_ship_set_damage);
-
-#ifdef TODO
-            .property("weight", &ship_getweight)
-                .property("capacity", &ship_getcapacity)
-                .property("maxsize", &ship_maxsize)
-                .def_readwrite("damage", &ship::damage)
-                .def_readwrite("size", &ship::size)
-#endif
-                tolua_variable(L, TOLUA_CAST "objects", tolua_ship_get_objects, 0);
+            tolua_variable(L, TOLUA_CAST "objects", tolua_ship_get_objects, 0);
 
             tolua_function(L, TOLUA_CAST "create", tolua_ship_create);
         }
