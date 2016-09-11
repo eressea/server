@@ -64,7 +64,6 @@ struct param;
     int lovar(double xpct_x2);
     /* returns a value between [0..xpct_2], generated with two dice */
 
-    int distribute(int old, int new_value, int n);
     void init_locale(struct locale *lang);
 
     int forbiddenid(int id);
@@ -184,6 +183,7 @@ struct param;
     int config_get_int(const char *key, int def);
     double config_get_flt(const char *key, double def);
     bool config_token(const char *key, const char *tok);
+    bool config_changed(int *cache_key);
 
     char * join_path(const char *p1, const char *p2, char *dst, size_t len);
     bool ExpensiveMigrants(void);

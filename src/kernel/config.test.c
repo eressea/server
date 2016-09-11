@@ -190,9 +190,33 @@ static void test_default_order(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_config_cache(CuTest *tc) {
+    int key = 0;
+
+    test_setup();
+    CuAssertTrue(tc, config_changed(&key));
+    config_set("hodor", "0");
+    CuAssertTrue(tc, config_changed(&key));
+    CuAssertTrue(tc, !config_changed(&key));
+    free_config();
+    CuAssertTrue(tc, config_changed(&key));
+    test_cleanup();
+}
+
+static void test_rules(CuTest *tc) {
+    CuAssertIntEquals(tc, 0, rule_alliance_limit());
+    config_set("rules.limit.alliance", "1");
+    CuAssertIntEquals(tc, 1, rule_alliance_limit());
+
+    CuAssertIntEquals(tc, 0, rule_faction_limit());
+    config_set("rules.limit.faction", "1000");
+    CuAssertIntEquals(tc, 1000, rule_faction_limit());
+}
+
 CuSuite *get_config_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_config_cache);
     SUITE_ADD_TEST(suite, test_get_set_param);
     SUITE_ADD_TEST(suite, test_param_int);
     SUITE_ADD_TEST(suite, test_param_flt);
@@ -200,5 +224,6 @@ CuSuite *get_config_suite(void)
     SUITE_ADD_TEST(suite, test_getunit);
     SUITE_ADD_TEST(suite, test_read_unitid);
     SUITE_ADD_TEST(suite, test_default_order);
+    SUITE_ADD_TEST(suite, test_rules);
     return suite;
 }
