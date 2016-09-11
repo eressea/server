@@ -1877,7 +1877,11 @@ int writegame(const char *filename)
     join_path(datapath(), filename, path, sizeof(path));
 #ifdef HAVE_UNISTD_H
     /* make sure we don't overwrite an existing file (hard links) */
-    unlink(path);
+    if (unlink(path)!=0) {
+        if (errno==ENOENT) {
+            errno = 0;
+        }
+    }
 #endif
     F = fopen(path, "wb");
     if (!F) {
