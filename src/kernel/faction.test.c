@@ -194,7 +194,6 @@ static void test_set_origin_bug(CuTest *tc) {
 static void test_deadhash(CuTest *tc) {
     faction *f;
     int no;
-
     test_setup();
     f = test_create_faction(0);
     no = f->no;

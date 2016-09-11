@@ -232,11 +232,11 @@ static void dragon_name(unit * u)
 {
     char name[NAMESIZE + 1];
     int rnd, ter = 0;
-    int anzahl = 1;
     static int num_postfix;
     char zText[32];
     const char *str;
 
+    assert(u);
     if (num_postfix == 0) {
         for (num_postfix = 0;; ++num_postfix) {
             sprintf(zText, "dragon_postfix_%d", num_postfix);
@@ -248,26 +248,22 @@ static void dragon_name(unit * u)
             num_postfix = -1;
     }
 
-    if (u) {
-        region *r = u->region;
-        anzahl = u->number;
-        switch (rterrain(r)) {
-        case T_PLAIN:
-            ter = 1;
-            break;
-        case T_MOUNTAIN:
-            ter = 2;
-            break;
-        case T_DESERT:
-            ter = 3;
-            break;
-        case T_SWAMP:
-            ter = 4;
-            break;
-        case T_GLACIER:
-            ter = 5;
-            break;
-        }
+    switch (rterrain(u->region)) {
+    case T_PLAIN:
+        ter = 1;
+        break;
+    case T_MOUNTAIN:
+        ter = 2;
+        break;
+    case T_DESERT:
+        ter = 3;
+        break;
+    case T_SWAMP:
+        ter = 4;
+        break;
+    case T_GLACIER:
+        ter = 5;
+        break;
     }
 
     if (num_postfix <=0) {
@@ -285,7 +281,7 @@ static void dragon_name(unit * u)
     str = locale_getstring(default_locale, zText);
     assert(str != NULL);
 
-    if (anzahl > 1) {
+    if (u->number > 1) {
         const char *no_article = strchr((const char *)str, ' ');
         assert(no_article);
         // TODO: localization
@@ -308,7 +304,7 @@ static void dragon_name(unit * u)
             sz += strlcat(name, " ", sizeof(name));
             sz += strlcat(name, n, sizeof(name));
         }
-        if (u && (rng_int() % 3 == 0)) {
+        if (rng_int() % 3 == 0) {
             sz += strlcat(name, " von ", sizeof(name));
             sz += strlcat(name, (const char *)rname(u->region, default_locale), sizeof(name));
         }
