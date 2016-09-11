@@ -124,30 +124,33 @@ end
 
 function seed()
   local input = io.open(config.basepath .. "/parteien.txt")
-  for f in factions() do
-    if f.race=="vampunicorn" then
-      local str = input:read("*line")
-      if str==nil then break end
-      local race, lang, email = str:match("([^ ]*) ([^ ]*) ([^ ]*)")
-      f.race = race:lower()
-      f.options = f.options + 4096
-      f.email = email
-      f.locale = lang
-      for u in f.units do
-        u.race = race:lower()
-        u.hp = u.hp_max
-        local b = building.create(u.region, "castle")
-        if lang=="de" then
-          u.name = "Entdecker"
-          b.name = "Heimat"
-        else
-          u.name = "Explorer"
-          b.name = "Home"
+  if input then
+      for f in factions() do
+        if f.race=="vampunicorn" then
+          local str = input:read("*line")
+          if str==nil then break end
+          local race, lang, email = str:match("([^ ]*) ([^ ]*) ([^ ]*)")
+          f.race = race:lower()
+          f.options = f.options + 4096
+          f.email = email
+          f.locale = lang
+          for u in f.units do
+            u.race = race:lower()
+            u.hp = u.hp_max
+            local b = building.create(u.region, "castle")
+            if lang=="de" then
+              u.name = "Entdecker"
+              b.name = "Heimat"
+            else
+              u.name = "Explorer"
+              b.name = "Home"
+            end
+            b.size = 10
+            u.building = b
+          end
         end
-        b.size = 10
-        u.building = b
       end
-    end
+      input:close()
   end
   for r in regions() do
     r:set_resource("sapling", r:get_resource("tree")/4)

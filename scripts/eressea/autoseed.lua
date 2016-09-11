@@ -39,13 +39,17 @@ local function read_players()
 --    return {{ email = "noreply@mailinator.com", race = "dwarf",  lang = "de" }}
     local players =  {}
     local input = io.open("newfactions", "r")
-    while input do
+    if input then
         local str = input:read("*line")
-        if str==nil then break end
-        local email, race, lang = str:match("([^ ]*) ([^ ]*) ([^ ]*)")
-        if email and string.char(string.byte(email, 1))~='#' then
-            table.insert(players, { race = race, lang = lang, email = email })
+        while str do
+            if str==nil then break end
+            local email, race, lang = str:match("([^ ]*) ([^ ]*) ([^ ]*)")
+            if email and string.char(string.byte(email, 1))~='#' then
+                table.insert(players, { race = race, lang = lang, email = email })
+            end
+            str = input:read("*line")
         end
+        input:close()
     end
     return players
 end

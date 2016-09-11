@@ -24,6 +24,7 @@ function cursed.init()
         print("found cursed.txt")
         curse(f)
     end
+    f:close()
 end
 
 return cursed
