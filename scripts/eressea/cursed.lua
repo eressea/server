@@ -25,6 +25,7 @@ function cursed.init()
         curse(f)
         f:close()
     end
+    f:close()
 end
 
 return cursed
