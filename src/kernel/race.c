@@ -155,7 +155,7 @@ static race *rc_find_i(const char *name)
     const char *rname = name;
     race *rc = races;
 
-    while (rc && !strcmp(rname, rc->_name) == 0) {
+    while (rc && strcmp(rname, rc->_name) != 0) {
         rc = rc->next;
     }
     if (!rc && strcmp(name, "uruk") == 0) {
