@@ -50,14 +50,16 @@ static void test_remove_empty_units_in_region(CuTest *tc) {
     test_create_world();
 
     u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
+    u = test_create_unit(u->faction, u->region);
+    CuAssertPtrNotNull(tc, u->nextF);
     uid = u->no;
     remove_empty_units_in_region(u->region);
     CuAssertPtrNotNull(tc, findunit(uid));
     u->number = 0;
     remove_empty_units_in_region(u->region);
     CuAssertPtrEquals(tc, 0, findunit(uid));
+    CuAssertPtrEquals(tc, 0, u->nextF);
     CuAssertPtrEquals(tc, 0, u->region);
-    CuAssertPtrEquals(tc, 0, u->faction);
     test_cleanup();
 }
 
@@ -422,7 +424,7 @@ static void test_remove_unit(CuTest *tc) {
     CuAssertIntEquals(tc, 0, u->number);
     CuAssertPtrEquals(tc, 0, u->region);
     CuAssertPtrEquals(tc, 0, u->items);
-    CuAssertPtrEquals(tc, 0, u->faction);
+    CuAssertPtrEquals(tc, 0, u->nextF);
     CuAssertPtrEquals(tc, 0, r->units);
     CuAssertPtrEquals(tc, 0, findunit(uno));
     CuAssertPtrEquals(tc, f, dfindhash(uno));
