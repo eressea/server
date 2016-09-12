@@ -1367,17 +1367,14 @@ static void cb_add_seen(region *r, unit *u, void *cbdata) {
     }
 }
 
-static void prepare_reports(void)
+void prepare_seen(faction *f)
 {
     region *r;
-    faction *f;
     building *b;
     const struct building_type *bt_lighthouse = bt_find("lighthouse");
 
-    for (f = factions; f; f = f->next) {
-        if (f->seen) seen_done(f->seen);
-        f->seen = seen_init();
-    }
+    if (f->seen) seen_done(f->seen);
+    f->seen = seen_init();
 
     for (r = regions; r; r = r->next) {
         unit *u;
@@ -1498,20 +1495,6 @@ static void cb_view_neighbours(seen_region *sr, void *cbdata) {
     }
 }
 
-void prepare_seen(faction *f)
-{
-    region *r;
-    struct seen_region *sr;
-
-    for (r = f->first, sr = NULL; sr == NULL && r != f->last; r = r->next) {
-        sr = find_seen(f->seen, r);
-    }
-
-    seenhash_map(f->seen, cb_view_neighbours, f);
-    get_seen_interval(f->seen, &f->first, &f->last);
-    link_seen(f->seen, f->first, f->last);
-}
-
 static void prepare_report(struct report_context *ctx, faction *f)
 {
     prepare_seen(f);
@@ -1609,7 +1592,6 @@ int init_reports(void)
 {
     check_messages_exist();
     create_directories();
-    prepare_reports();
     return 0;
 }
 
