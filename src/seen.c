@@ -137,32 +137,3 @@ void get_seen_interval(struct seen_region *seen[], struct region **firstp, struc
     *firstp = interval.first;
     *lastp = interval.last;
 }
-
-seen_region *add_seen(struct seen_region *seehash[], struct region *r, seen_t mode, bool dis)
-{
-    seen_region *find = find_seen(seehash, r);
-    if (find == NULL) {
-        unsigned int index = reg_hashkey(r) & (MAXSEEHASH - 1);
-        if (!reuse)
-            reuse = (seen_region *)calloc(1, sizeof(struct seen_region));
-        find = reuse;
-        reuse = reuse->nextHash;
-        find->nextHash = seehash[index];
-        find->mode = mode;
-        seehash[index] = find;
-        find->r = r;
-    }
-    else if (find->mode < mode) {
-        find->mode = mode;
-    }
-    find->disbelieves |= dis;
-    return find;
-}
-
-seen_region *faction_add_seen(faction *f, region *r, seen_t mode) {
-    assert(f->seen);
-#ifdef SMART_INTERVALS
-    update_interval(f, r);
-#endif
-    return add_seen(f->seen, r, mode, false);
-}

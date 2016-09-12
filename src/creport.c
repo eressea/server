@@ -1165,13 +1165,13 @@ int seemode, FILE * F)
 }
 
 static void
-cr_output_resources(FILE * F, report_context * ctx, seen_region * sr)
+cr_output_resources(FILE * F, report_context * ctx, seen_region * sr, bool see_unit)
 {
     char cbuf[BUFFERSIZE], *pos = cbuf;
     const region *r = sr->r;
     faction *f = ctx->f;
     resource_report result[MAX_RAWMATERIALS];
-    int n, size = report_resources(sr, result, MAX_RAWMATERIALS, f);
+    int n, size = report_resources(sr, result, MAX_RAWMATERIALS, f, see_unit);
 
 #ifdef RESOURCECOMPAT
     int trees = rtrees(r, 2);

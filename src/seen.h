@@ -28,16 +28,6 @@ struct seen_region;
 extern "C" {
 #endif
 
-    typedef enum {
-        see_none,
-        see_neighbour,
-        see_lighthouse,
-        see_travel,
-        see_far,
-        see_unit,
-        see_battle
-    } seen_t;
-
     typedef struct seen_region {
         struct seen_region *nextHash;
         struct seen_region *next;

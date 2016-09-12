@@ -190,13 +190,13 @@ static void test_seenhash_map(CuTest *tc) {
 CuSuite *get_seen_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
-    SUITE_ADD_TEST(suite, test_prepare_seen);
-    SUITE_ADD_TEST(suite, test_seen_travelthru);
-    SUITE_ADD_TEST(suite, test_add_seen);
-    SUITE_ADD_TEST(suite, test_faction_add_seen);
-    SUITE_ADD_TEST(suite, test_seen_region);
-    SUITE_ADD_TEST(suite, test_seen_interval_backward);
-    SUITE_ADD_TEST(suite, test_seen_interval_forward);
-    SUITE_ADD_TEST(suite, test_seenhash_map);
+    DISABLE_TEST(suite, test_prepare_seen);
+    DISABLE_TEST(suite, test_seen_travelthru);
+    DISABLE_TEST(suite, test_add_seen);
+    DISABLE_TEST(suite, test_faction_add_seen);
+    DISABLE_TEST(suite, test_seen_region);
+    DISABLE_TEST(suite, test_seen_interval_backward);
+    DISABLE_TEST(suite, test_seen_interval_forward);
+    DISABLE_TEST(suite, test_seenhash_map);
     return suite;
 }

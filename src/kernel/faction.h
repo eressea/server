@@ -100,7 +100,6 @@ extern "C" {
             struct message_list *msgs;
         } *battles;
         struct item *items;         /* items this faction can claim */
-        struct seen_region **seen;
         struct quicklist *seen_factions;
         bool _alive;              /* enno: sollte ein flag werden */
     } faction;

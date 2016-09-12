@@ -36,7 +36,6 @@ extern "C" {
 #define UFL_LONGACTION    (1<<2)        /* 4 */
 #define UFL_OWNER         (1<<3)        /* 8 */
 #define UFL_ANON_FACTION  (1<<4)        /* 16 */
-#define UFL_DISBELIEVES   (1<<5)        /* 32 */
 #define UFL_WARMTH        (1<<6)        /* 64 */
 #define UFL_HERO          (1<<7)
 #define UFL_MOVED         (1<<8)

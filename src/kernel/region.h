@@ -137,6 +137,9 @@ extern "C" {
 #ifdef FAST_CONNECT
         struct region *connect[MAXDIRECTIONS];      /* use rconnect(r, dir) to access */
 #endif
+        struct {
+            seen_mode mode;
+        } seen;
     } region;
 
     extern struct region *regions;
