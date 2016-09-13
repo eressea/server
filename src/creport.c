@@ -958,7 +958,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
         show = u->items;
     }
     else {
-        if (mode >= see_unit) {
+        if (mode >= seen_unit) {
             int n = report_items(u, result, MAX_INVENTORY, u, f);
             assert(n >= 0);
             if (n > 0) {
@@ -1111,8 +1111,7 @@ static char *cr_output_resource(char *buf, const char *name,
 }
 
 static void
-cr_borders(seen_region ** seen, const region * r, const faction * f,
-int seemode, FILE * F)
+cr_borders(const region * r, const faction * f, seen_mode mode, FILE * F)
 {
     direction_t d;
     int g = 0;
@@ -1121,9 +1120,8 @@ int seemode, FILE * F)
         const connection *b;
         if (!r2)
             continue;
-        if (seemode == see_neighbour) {
-            seen_region *sr = find_seen(seen, r2);
-            if (sr == NULL || sr->mode <= see_neighbour)
+        if (mode == seen_neighbour) {
+            if (r2->seen.mode <= seen_neighbour)
                 continue;
         }
         b = get_borders(r, r2);
@@ -1164,13 +1162,12 @@ int seemode, FILE * F)
 }
 
 static void
-cr_output_resources(FILE * F, report_context * ctx, seen_region * sr, bool see_unit)
+cr_output_resources(FILE * F, report_context * ctx, region *r, bool see_unit)
 {
     char cbuf[BUFFERSIZE], *pos = cbuf;
-    const region *r = sr->r;
     faction *f = ctx->f;
     resource_report result[MAX_RAWMATERIALS];
-    int n, size = report_resources(sr, result, MAX_RAWMATERIALS, f, see_unit);
+    int n, size = report_resources(r, result, MAX_RAWMATERIALS, f, see_unit);
 
 #ifdef RESOURCECOMPAT
     int trees = rtrees(r, 2);
@@ -1256,10 +1253,9 @@ static void cr_output_travelthru(FILE *F, region *r, const faction *f) {
     travelthru_map(r, cb_cr_travelthru_unit, &cbdata);
 }
 
-static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
+static void cr_output_region(FILE * F, report_context * ctx, region * r)
 {
     faction *f = ctx->f;
-    region *r = sr->r;
     plane *pl = rplane(r);
     int plid = plane_id(pl), nx, ny;
     const char *tname;
@@ -1267,7 +1263,7 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
     int uid = r->uid;
 
 #ifdef OCEAN_NEIGHBORS_GET_NO_ID
-    if (sr->mode <= see_neighbour && !r->land) {
+    if (r->seen.mode <= seen_neighbour && !r->land) {
         uid = 0;
     }
 #endif
@@ -1316,16 +1312,16 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
     tname = terrain_name(r);
 
     fprintf(F, "\"%s\";Terrain\n", translate(tname, LOC(f->locale, tname)));
-    if (sr->mode != see_unit)
-        fprintf(F, "\"%s\";visibility\n", visibility[sr->mode]);
-    if (sr->mode == see_neighbour) {
-        cr_borders(ctx->f->seen, r, f, sr->mode, F);
+    if (r->seen.mode != seen_unit)
+        fprintf(F, "\"%s\";visibility\n", visibility[r->seen.mode]);
+    if (r->seen.mode == seen_neighbour) {
+        cr_borders(r, f, r->seen.mode, F);
     }
     else {
         building *b;
         ship *sh;
         unit *u;
-        int stealthmod = stealth_modifier(sr->mode);
+        int stealthmod = stealth_modifier(r->seen.mode);
 
         if (r->display && r->display[0])
             fprintf(F, "\"%s\";Beschr\n", r->display);
@@ -1337,7 +1333,7 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
             }
             fprintf(F, "%d;Pferde\n", rhorses(r));
 
-            if (sr->mode >= see_unit) {
+            if (r->seen.mode >= seen_unit) {
                 if (rule_region_owners()) {
                     faction *owner = region_get_owner(r);
                     if (owner) {
@@ -1368,9 +1364,9 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
 
             /* this writes both some tags (RESOURCECOMPAT) and a block.
              * must not write any blocks before it */
-            cr_output_resources(F, ctx, sr);
+            cr_output_resources(F, ctx, r, r->seen.mode >= seen_unit);
 
-            if (sr->mode >= see_unit) {
+            if (r->seen.mode >= seen_unit) {
                 /* trade */
                 if (markets_module() && r->land) {
                     const item_type *lux = r_luxury(r);
@@ -1407,8 +1403,8 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
             print_items(F, r->land->items, f->locale);
         }
         cr_output_curses_compat(F, f, r, TYP_REGION);
-        cr_borders(ctx->f->seen, r, f, sr->mode, F);
-        if (sr->mode == see_unit && is_astral(r)
+        cr_borders(r, f, r->seen.mode, F);
+        if (r->seen.mode == seen_unit && is_astral(r)
             && !is_cursed(r->attribs, C_ASTRALBLOCK, 0)) {
             /* Sonderbehandlung Teleport-Ebene */
             region_list *rl = astralregions(r, inhabitable);
@@ -1431,7 +1427,7 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
         }
 
         cr_output_travelthru(F, r, f);
-        if (sr->mode == see_unit || sr->mode == see_travel) {
+        if (r->seen.mode == seen_unit || r->seen.mode == seen_travel) {
             message_list *mlist = r_getmessages(r, f);
             cr_output_messages(F, r->msgs, f);
             if (mlist) {
@@ -1466,7 +1462,7 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
 
             if (u->building || u->ship || (stealthmod > INT_MIN
                 && cansee(f, r, u, stealthmod))) {
-                cr_output_unit_compat(F, r, f, u, sr->mode);
+                cr_output_unit_compat(F, r, f, u, r->seen.mode);
             }
         }
     }
@@ -1483,7 +1479,6 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
     region *r;
     const char *mailto = LOC(f->locale, "mailto");
     const attrib *a;
-    seen_region *sr = NULL;
     FILE *F = fopen(filename, "w");
 
     if (era < 0) {
@@ -1661,11 +1656,8 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
     }
 
     /* traverse all regions */
-    for (r = ctx->first; sr == NULL && r != ctx->last; r = r->next) {
-        sr = find_seen(ctx->f->seen, r);
-    }
-    for (; sr != NULL; sr = sr->next) {
-        cr_output_region(F, ctx, sr);
+    for (r = ctx->first; r != ctx->last; r = r->next) {
+        cr_output_region(F, ctx, r);
     }
     report_crtypes(F, f->locale);
     write_translations(F);
