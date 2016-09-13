@@ -1,7 +1,6 @@
 #include <platform.h>
 #include <config.h>
 #include "reports.h"
-#include "creport.h"
 #include "move.h"
 #include "travelthru.h"
 #include "keyword.h"
@@ -149,28 +148,6 @@ static void test_sparagraph(CuTest *tc) {
     freestrlist(sp);
 }
 
-static void test_cr_unit(CuTest *tc) {
-    stream strm;
-    char line[1024];
-    faction *f;
-    region *r;
-    unit *u;
-
-    test_cleanup();
-    f = test_create_faction(0);
-    r = test_create_region(0, 0, 0);
-    u = test_create_unit(f, r);
-    renumber_unit(u, 1234);
-
-    mstream_init(&strm);
-    cr_output_unit(&strm, r, f, u, seen_unit);
-    strm.api->rewind(strm.handle);
-    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
-    CuAssertStrEquals(tc, line, "EINHEIT 1234");
-    mstream_done(&strm);
-    test_cleanup();
-}
-
 static void test_write_unit(CuTest *tc) {
     unit *u;
     faction *f;
@@ -248,7 +225,6 @@ static void test_arg_resources(CuTest *tc) {
 CuSuite *get_reports_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
-    SUITE_ADD_TEST(suite, test_cr_unit);
     SUITE_ADD_TEST(suite, test_reorder_units);
     SUITE_ADD_TEST(suite, test_seen_faction);
     SUITE_ADD_TEST(suite, test_regionid);

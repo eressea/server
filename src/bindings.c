@@ -1090,7 +1090,7 @@ int tolua_bindings_open(lua_State * L)
         tolua_function(L, TOLUA_CAST "factions", tolua_get_factions);
         tolua_function(L, TOLUA_CAST "regions", tolua_get_regions);
         tolua_function(L, TOLUA_CAST "read_turn", tolua_read_turn);
-        tolua_function(L, TOLUA_CAST "write_map", &tolua_write_map);
+//        tolua_function(L, TOLUA_CAST "write_map", &tolua_write_map);
         tolua_function(L, TOLUA_CAST "read_orders", tolua_read_orders);
         tolua_function(L, TOLUA_CAST "process_orders", tolua_process_orders);
         tolua_function(L, TOLUA_CAST "init_reports", tolua_init_reports);
