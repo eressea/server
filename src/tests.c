@@ -179,7 +179,6 @@ static void test_reset(void) {
     free_shiptypes();
     free_races();
     free_spellbooks();
-    free_seen();
     free_prefixes();
     mt_clear();
     for (i = 0; i != MAXSKILLS; ++i) {

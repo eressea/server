@@ -734,7 +734,7 @@ static void cr_output_spells(stream *out, const unit * u, int maxlevel)
 * @param u unit to report
 */
 void cr_output_unit(stream *out, const region * r, const faction * f,
-    const unit * u, int mode)
+    const unit * u, seen_mode mode)
 {
     /* Race attributes are always plural and item attributes always
      * singular */

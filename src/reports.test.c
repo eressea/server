@@ -194,7 +194,7 @@ static void test_cr_unit(CuTest *tc) {
     renumber_unit(u, 1234);
 
     mstream_init(&strm);
-    cr_output_unit(&strm, r, f, u, see_unit);
+    cr_output_unit(&strm, r, f, u, seen_unit);
     strm.api->rewind(strm.handle);
     CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
     CuAssertStrEquals(tc, line, "EINHEIT 1234");

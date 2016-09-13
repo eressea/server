@@ -974,7 +974,7 @@ static int tolua_report_unit(lua_State * L)
     char buffer[512];
     unit *u = (unit *)tolua_tousertype(L, 1, 0);
     faction *f = (faction *)tolua_tousertype(L, 2, 0);
-    bufunit(f, u, 0, see_unit, buffer, sizeof(buffer));
+    bufunit(f, u, 0, seen_unit, buffer, sizeof(buffer));
     tolua_pushstring(L, buffer);
     return 1;
 }

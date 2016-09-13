@@ -61,7 +61,6 @@ int RunAllTests(int argc, char *argv[])
     /* self-test */
     ADD_SUITE(tests);
     ADD_SUITE(callback);
-    ADD_SUITE(seen);
     ADD_SUITE(json);
     ADD_SUITE(jsonconf);
     ADD_SUITE(direction);
