@@ -195,7 +195,7 @@ set(TESTS_SRC
   tests.test.c
   volcano.test.c
   reports.test.c
-  creport.test.c
+#  creport.test.c
 #  report.test.c
   summary.test.c
   travelthru.test.c

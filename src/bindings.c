@@ -50,7 +50,6 @@ without prior permission by the authors of Eressea.
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
 
-#include "creport.h"
 #include "economy.h"
 #include "summary.h"
 #include "teleport.h"
@@ -572,7 +571,7 @@ static int tolua_write_summary(lua_State * L)
     }
     return 0;
 }
-
+/*
 static int tolua_write_map(lua_State * L)
 {
     const char *filename = tolua_tostring(L, 1, 0);
@@ -581,7 +580,7 @@ static int tolua_write_map(lua_State * L)
     }
     return 0;
 }
-
+*/
 static int tolua_read_turn(lua_State * L)
 {
     int cturn = current_turn();
