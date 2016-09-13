@@ -1142,25 +1142,6 @@ static void faction_add_seen(faction *f, region *r, seen_mode mode) {
 #endif
 }
 
-static void view_default(region * r, faction * f)
-{
-    int dir;
-    for (dir = 0; dir != MAXDIRECTIONS; ++dir) {
-        region *r2 = rconnect(r, dir);
-        if (r2) {
-            connection *b = get_borders(r, r2);
-            while (b) {
-                if (!b->type->transparent(b, f))
-                    break;
-                b = b->next;
-            }
-            if (!b) {
-                add_seen(r2, seen_neighbour);
-            }
-        }
-    }
-}
-
 void view_neighbours(struct seen_region **seen, region * r, faction * f)
 {
     int d;
@@ -1468,13 +1449,6 @@ void prepare_seen(report_context *ctx)
     // them outside of the CR?
     ctx->first = firstregion(f);
     ctx->last = lastregion(f);
-}
-
-static void cb_set_last(region *r, unit *u, void *cbdata) {
-    faction *f = (faction *)cbdata;
-    if (u->faction == f) {
-        f->last = r;
-    }
 }
 
 static void prepare_report(report_context *ctx, faction *f)

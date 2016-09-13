@@ -1,7 +1,6 @@
 #include <platform.h>
 #include "tests.h"
 #include "keyword.h"
-#include "seen.h"
 #include "prefix.h"
 #include "reports.h"
 

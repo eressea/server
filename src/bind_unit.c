@@ -18,7 +18,6 @@ without prior permission by the authors of Eressea.
 #include "bindings.h"
 #include "move.h"
 #include "reports.h"
-#include "seen.h"
 #include "guard.h"
 
 /*  attributes includes */
