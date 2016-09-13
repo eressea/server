@@ -1,7 +1,7 @@
 #include <platform.h>
 #include <config.h>
 #include "reports.h"
-#include "report.h"
+//#include "report.h"
 #include "creport.h"
 #include "move.h"
 #include "travelthru.h"

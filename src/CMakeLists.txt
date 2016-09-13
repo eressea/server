@@ -114,7 +114,7 @@ set (ERESSEA_SRC
   randenc.c
   volcano.c
   chaos.c
-  report.c
+  #  report.c
   spy.c
   study.c
   summary.c

@@ -65,9 +65,8 @@ void game_init(void)
     register_triggers();
     register_xmas();
 
-    register_nr();
+//    register_nr();
     register_cr();
-    register_jsreport();
 
     register_races();
     register_spells();
