@@ -1356,7 +1356,7 @@ void reorder_units(region * r)
 static region *lastregion(faction * f)
 {
 #ifdef SMART_INTERVALS
-    return f->last->next;
+    return f->last ? f->last->next : NULL;
 #else
     return NULL;
 #endif
