@@ -96,7 +96,6 @@ set (ERESSEA_SRC
   guard.c
   prefix.c
   donations.c
-  seen.c
   eressea.c
   callback.c
   direction.c
@@ -197,7 +196,6 @@ set(TESTS_SRC
   tests.test.c
   volcano.test.c
   reports.test.c
-  seen.test.c
   summary.test.c
   travelthru.test.c
   callback.test.c

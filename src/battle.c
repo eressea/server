@@ -23,7 +23,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "chaos.h"
 #include "move.h"
 #include "laws.h"
-#include "seen.h"
 #include "skill.h"
 #include "monster.h"
 
@@ -2884,7 +2883,7 @@ static void battle_punit(unit * u, battle * b)
         faction *f = bf->faction;
         strlist *S = 0, *x;
 
-        spunit(&S, f, u, 4, see_battle);
+        spunit(&S, f, u, 4, seen_battle);
         for (x = S; x; x = x->next) {
             fbattlerecord(b, f, x->s);
             if (bdebug && u->faction == f) {

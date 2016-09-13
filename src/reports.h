@@ -56,7 +56,6 @@ extern "C" {
     void spunit(struct strlist **SP, const struct faction *f,
         const struct unit *u, unsigned int indent, seen_mode mode);
 
-    void prepare_seen(struct faction *f);
     int reports(void);
     int write_reports(struct faction *f, time_t ltime);
     int init_reports(void);
@@ -74,6 +73,8 @@ extern "C" {
         void *userdata;
         time_t report_time;
     } report_context;
+
+    void prepare_seen(struct report_context *ctx);
 
     typedef int(*report_fun) (const char *filename, report_context * ctx,
         const char *charset);

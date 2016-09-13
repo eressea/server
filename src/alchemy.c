@@ -170,7 +170,8 @@ static int potion_luck(unit *u, region *r, attrib_type *atype, int amount) {
 }
 
 static int potion_truth(unit *u) {
-    fset(u, UFL_DISBELIEVES);
+    // TODO: this potion does nothing!
+    // fset(u, UFL_DISBELIEVES);
     return 1;
 }
 

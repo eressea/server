@@ -1372,6 +1372,31 @@ void reorder_units(region * r)
     }
 }
 
+static region *lastregion(faction * f)
+{
+#ifdef SMART_INTERVALS
+    return f->last->next;
+#else
+    return NULL;
+#endif
+}
+
+static region *firstregion(faction * f)
+{
+#ifdef SMART_INTERVALS
+    region *r = f->first;
+
+    if (f->units == NULL)
+        return NULL;
+    if (r != NULL)
+        return r;
+
+    return f->first = regions;
+#else
+    return regions;
+#endif
+}
+
 static void cb_add_seen(region *r, unit *u, void *cbdata) {
     unused_arg(cbdata);
     faction_add_seen(u->faction, r, seen_travel);
@@ -1391,6 +1416,9 @@ void prepare_seen(report_context *ctx)
     static bool rule_region_owners;
     const struct building_type *bt_lighthouse = bt_find("lighthouse");
 
+    // [fast,last) interval of regions with a unit in it
+    ctx->first = firstregion(f);
+    ctx->last = lastregion(f);
     if (config_changed(&config)) {
         rule_region_owners = config_token("rules.region_owner_pay_building", bt_lighthouse->_name);
     }
@@ -1421,7 +1449,7 @@ void prepare_seen(report_context *ctx)
                 if (u_race(u) != get_race(RC_SPELL) || u->number == RS_FARVISION) {
                     faction_add_seen(f, r, seen_unit);
                 }
-                if (fval(r, RF_LIGHTHOUSE) {
+                if (fval(r, RF_LIGHTHOUSE)) {
                     // TODO: is the building big enough for the unit?
                     if (u->building && u->building->type == bt_lighthouse) {
                         /* we are in a lighthouse. add the regions we can see from here! */
@@ -1435,6 +1463,11 @@ void prepare_seen(report_context *ctx)
             travelthru_map(r, cb_add_seen, ctx);
         }
     }
+    // [fast,last) interval of seen regions (with lighthouses and travel)
+    // TODO: what about neighbours? when are they included? do we need
+    // them outside of the CR?
+    ctx->first = firstregion(f);
+    ctx->last = lastregion(f);
 }
 
 static void cb_set_last(region *r, unit *u, void *cbdata) {
@@ -1444,40 +1477,13 @@ static void cb_set_last(region *r, unit *u, void *cbdata) {
     }
 }
 
-static region *lastregion(faction * f)
-{
-#ifdef SMART_INTERVALS
-    return f->last->next;
-#else
-    return NULL;
-#endif
-}
-
-static region *firstregion(faction * f)
-{
-#ifdef SMART_INTERVALS
-    region *r = f->first;
-
-    if (f->units == NULL)
-        return NULL;
-    if (r != NULL)
-        return r;
-
-    return f->first = regions;
-#else
-    return regions;
-#endif
-}
-
 static void prepare_report(report_context *ctx, faction *f)
 {
     ctx->f = f;
     ctx->report_time = time(NULL);
     ctx->addresses = NULL;
     ctx->userdata = NULL;
-    ctx->first = firstregion(f);
-    ctx->last = lastregion(f);
-    prepare_seen(&ctx);
+    prepare_seen(ctx);
 }
 
 static void finish_reports(report_context *ctx) {
