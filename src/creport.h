@@ -11,6 +11,9 @@
  */
 #ifndef H_GC_CREPORT
 #define H_GC_CREPORT
+
+#include <kernel/types.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

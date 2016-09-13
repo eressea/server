@@ -114,7 +114,7 @@ set (ERESSEA_SRC
   randenc.c
   volcano.c
   chaos.c
-  #  report.c
+  report.c
   spy.c
   study.c
   summary.c
@@ -194,7 +194,8 @@ set(TESTS_SRC
   vortex.test.c
   tests.test.c
   volcano.test.c
-#  reports.test.c
+  reports.test.c
+  report.test.c
   summary.test.c
   travelthru.test.c
   callback.test.c

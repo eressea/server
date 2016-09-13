@@ -144,7 +144,6 @@ void write_spaces(stream *out, size_t num) {
     }
 }
 
-
 static void centre(stream *out, const char *s, bool breaking)
 {
     /* Bei Namen die genau 80 Zeichen lang sind, kann es hier Probleme
@@ -245,125 +244,6 @@ static size_t write_spell_modifier(spell * sp, int flag, const char * str, bool 
         return bytes;
     }
     return 0;
-}
-
-void nr_spell_syntax(struct stream *out, struct spellbook_entry * sbe, const struct locale *lang);
-
-void nr_spell(stream *out, spellbook_entry * sbe, const struct locale *lang)
-{
-    int bytes, k, itemanz, costtyp;
-    char buf[4096];
-    char *startp, *bufp = buf;
-    size_t size = sizeof(buf) - 1;
-    spell * sp = sbe->sp;
-
-    newline(out);
-    centre(out, spell_name(sp, lang), true);
-    newline(out);
-    paragraph(out, LOC(lang, "nr_spell_description"), 0, 0, 0);
-    paragraph(out, spell_info(sp, lang), 2, 0, 0);
-
-    bytes = (int)strlcpy(bufp, LOC(lang, "nr_spell_type"), size);
-    if (wrptr(&bufp, &size, bytes) != 0)
-        WARN_STATIC_BUFFER();
-
-    if (size) {
-        *bufp++ = ' ';
-        --size;
-    }
-    if (sp->sptyp & PRECOMBATSPELL) {
-        bytes = (int)strlcpy(bufp, LOC(lang, "sptype_precombat"), size);
-    }
-    else if (sp->sptyp & COMBATSPELL) {
-        bytes = (int)strlcpy(bufp, LOC(lang, "sptype_combat"), size);
-    }
-    else if (sp->sptyp & POSTCOMBATSPELL) {
-        bytes = (int)strlcpy(bufp, LOC(lang, "sptype_postcombat"), size);
-    }
-    else {
-        bytes = (int)strlcpy(bufp, LOC(lang, "sptype_normal"), size);
-    }
-    if (wrptr(&bufp, &size, bytes) != 0)
-        WARN_STATIC_BUFFER();
-    *bufp = 0;
-    paragraph(out, buf, 0, 0, 0);
-
-    sprintf(buf, "%s %d", LOC(lang, "nr_spell_level"), sbe->level);
-    paragraph(out, buf, 0, 0, 0);
-
-    sprintf(buf, "%s %d", LOC(lang, "nr_spell_rank"), sp->rank);
-    paragraph(out, buf, 0, 0, 0);
-
-    paragraph(out, LOC(lang, "nr_spell_components"), 0, 0, 0);
-    for (k = 0; sp->components[k].type; ++k) {
-        const resource_type *rtype = sp->components[k].type;
-        itemanz = sp->components[k].amount;
-        costtyp = sp->components[k].cost;
-        if (itemanz > 0) {
-            size = sizeof(buf) - 1;
-            bufp = buf;
-            if (sp->sptyp & SPELLLEVEL) {
-                bytes =
-                    _snprintf(bufp, size, "  %d %s", itemanz, LOC(lang, resourcename(rtype,
-                        itemanz != 1)));
-                if (wrptr(&bufp, &size, bytes) != 0)
-                    WARN_STATIC_BUFFER();
-                if (costtyp == SPC_LEVEL || costtyp == SPC_LINEAR) {
-                    bytes = _snprintf(bufp, size, " * %s", LOC(lang, "nr_level"));
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
-                }
-            }
-            else {
-                bytes = _snprintf(bufp, size, "%d %s", itemanz, LOC(lang, resourcename(rtype, itemanz != 1)));
-                if (wrptr(&bufp, &size, bytes) != 0) {
-                    WARN_STATIC_BUFFER();
-                }
-            }
-            *bufp = 0;
-            paragraph(out, buf, 2, 2, '-');
-        }
-    }
-
-    size = sizeof(buf) - 1;
-    bufp = buf;
-    bytes = (int)strlcpy(buf, LOC(lang, "nr_spell_modifiers"), size);
-    if (wrptr(&bufp, &size, bytes) != 0)
-        WARN_STATIC_BUFFER();
-
-    startp = bufp;
-    bytes = (int)write_spell_modifier(sp, FARCASTING, LOC(lang, "smod_far"), startp != bufp, bufp, size);
-    if (bytes && wrptr(&bufp, &size, bytes) != 0) {
-        WARN_STATIC_BUFFER();
-    }
-    bytes = (int)write_spell_modifier(sp, OCEANCASTABLE, LOC(lang, "smod_sea"), startp != bufp, bufp, size);
-    if (bytes && wrptr(&bufp, &size, bytes) != 0) {
-        WARN_STATIC_BUFFER();
-    }
-    bytes = (int)write_spell_modifier(sp, ONSHIPCAST, LOC(lang, "smod_ship"), startp != bufp, bufp, size);
-    if (bytes && wrptr(&bufp, &size, bytes) != 0) {
-        WARN_STATIC_BUFFER();
-    }
-    bytes = (int)write_spell_modifier(sp, NOTFAMILIARCAST, LOC(lang, "smod_nofamiliar"), startp != bufp, bufp, size);
-    if (bytes && wrptr(&bufp, &size, bytes) != 0) {
-        WARN_STATIC_BUFFER();
-    }
-    if (startp == bufp) {
-        bytes = (int)write_spell_modifier(sp, NOTFAMILIARCAST, LOC(lang, "smod_none"), startp != bufp, bufp, size);
-        if (bytes && wrptr(&bufp, &size, bytes) != 0) {
-            WARN_STATIC_BUFFER();
-        }
-    }
-    *bufp = 0;
-    paragraph(out, buf, 0, 0, 0);
-    paragraph(out, LOC(lang, "nr_spell_syntax"), 0, 0, 0);
-
-    bufp = buf;
-    size = sizeof(buf) - 1;
-
-    nr_spell_syntax(out, sbe, lang);
-
-    newline(out);
 }
 
 void nr_spell_syntax(stream *out, spellbook_entry * sbe, const struct locale *lang)
@@ -544,13 +424,131 @@ void nr_spell_syntax(stream *out, spellbook_entry * sbe, const struct locale *la
             }
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
-        } else {
-           log_error("unknown spell parameter %c for spell %s", cp, sp->sname);
+        }
+        else {
+            log_error("unknown spell parameter %c for spell %s", cp, sp->sname);
         }
     }
     *bufp = 0;
     paragraph(out, buf, 2, 0, 0);
 
+}
+
+void nr_spell(stream *out, spellbook_entry * sbe, const struct locale *lang)
+{
+    int bytes, k, itemanz, costtyp;
+    char buf[4096];
+    char *startp, *bufp = buf;
+    size_t size = sizeof(buf) - 1;
+    spell * sp = sbe->sp;
+
+    newline(out);
+    centre(out, spell_name(sp, lang), true);
+    newline(out);
+    paragraph(out, LOC(lang, "nr_spell_description"), 0, 0, 0);
+    paragraph(out, spell_info(sp, lang), 2, 0, 0);
+
+    bytes = (int)strlcpy(bufp, LOC(lang, "nr_spell_type"), size);
+    if (wrptr(&bufp, &size, bytes) != 0)
+        WARN_STATIC_BUFFER();
+
+    if (size) {
+        *bufp++ = ' ';
+        --size;
+    }
+    if (sp->sptyp & PRECOMBATSPELL) {
+        bytes = (int)strlcpy(bufp, LOC(lang, "sptype_precombat"), size);
+    }
+    else if (sp->sptyp & COMBATSPELL) {
+        bytes = (int)strlcpy(bufp, LOC(lang, "sptype_combat"), size);
+    }
+    else if (sp->sptyp & POSTCOMBATSPELL) {
+        bytes = (int)strlcpy(bufp, LOC(lang, "sptype_postcombat"), size);
+    }
+    else {
+        bytes = (int)strlcpy(bufp, LOC(lang, "sptype_normal"), size);
+    }
+    if (wrptr(&bufp, &size, bytes) != 0)
+        WARN_STATIC_BUFFER();
+    *bufp = 0;
+    paragraph(out, buf, 0, 0, 0);
+
+    sprintf(buf, "%s %d", LOC(lang, "nr_spell_level"), sbe->level);
+    paragraph(out, buf, 0, 0, 0);
+
+    sprintf(buf, "%s %d", LOC(lang, "nr_spell_rank"), sp->rank);
+    paragraph(out, buf, 0, 0, 0);
+
+    paragraph(out, LOC(lang, "nr_spell_components"), 0, 0, 0);
+    for (k = 0; sp->components[k].type; ++k) {
+        const resource_type *rtype = sp->components[k].type;
+        itemanz = sp->components[k].amount;
+        costtyp = sp->components[k].cost;
+        if (itemanz > 0) {
+            size = sizeof(buf) - 1;
+            bufp = buf;
+            if (sp->sptyp & SPELLLEVEL) {
+                bytes =
+                    _snprintf(bufp, size, "  %d %s", itemanz, LOC(lang, resourcename(rtype,
+                        itemanz != 1)));
+                if (wrptr(&bufp, &size, bytes) != 0)
+                    WARN_STATIC_BUFFER();
+                if (costtyp == SPC_LEVEL || costtyp == SPC_LINEAR) {
+                    bytes = _snprintf(bufp, size, " * %s", LOC(lang, "nr_level"));
+                    if (wrptr(&bufp, &size, bytes) != 0)
+                        WARN_STATIC_BUFFER();
+                }
+            }
+            else {
+                bytes = _snprintf(bufp, size, "%d %s", itemanz, LOC(lang, resourcename(rtype, itemanz != 1)));
+                if (wrptr(&bufp, &size, bytes) != 0) {
+                    WARN_STATIC_BUFFER();
+                }
+            }
+            *bufp = 0;
+            paragraph(out, buf, 2, 2, '-');
+        }
+    }
+
+    size = sizeof(buf) - 1;
+    bufp = buf;
+    bytes = (int)strlcpy(buf, LOC(lang, "nr_spell_modifiers"), size);
+    if (wrptr(&bufp, &size, bytes) != 0)
+        WARN_STATIC_BUFFER();
+
+    startp = bufp;
+    bytes = (int)write_spell_modifier(sp, FARCASTING, LOC(lang, "smod_far"), startp != bufp, bufp, size);
+    if (bytes && wrptr(&bufp, &size, bytes) != 0) {
+        WARN_STATIC_BUFFER();
+    }
+    bytes = (int)write_spell_modifier(sp, OCEANCASTABLE, LOC(lang, "smod_sea"), startp != bufp, bufp, size);
+    if (bytes && wrptr(&bufp, &size, bytes) != 0) {
+        WARN_STATIC_BUFFER();
+    }
+    bytes = (int)write_spell_modifier(sp, ONSHIPCAST, LOC(lang, "smod_ship"), startp != bufp, bufp, size);
+    if (bytes && wrptr(&bufp, &size, bytes) != 0) {
+        WARN_STATIC_BUFFER();
+    }
+    bytes = (int)write_spell_modifier(sp, NOTFAMILIARCAST, LOC(lang, "smod_nofamiliar"), startp != bufp, bufp, size);
+    if (bytes && wrptr(&bufp, &size, bytes) != 0) {
+        WARN_STATIC_BUFFER();
+    }
+    if (startp == bufp) {
+        bytes = (int)write_spell_modifier(sp, NOTFAMILIARCAST, LOC(lang, "smod_none"), startp != bufp, bufp, size);
+        if (bytes && wrptr(&bufp, &size, bytes) != 0) {
+            WARN_STATIC_BUFFER();
+        }
+    }
+    *bufp = 0;
+    paragraph(out, buf, 0, 0, 0);
+    paragraph(out, LOC(lang, "nr_spell_syntax"), 0, 0, 0);
+
+    bufp = buf;
+    size = sizeof(buf) - 1;
+
+    nr_spell_syntax(out, sbe, lang);
+
+    newline(out);
 }
 
 static void
@@ -675,12 +673,12 @@ static void rps_nowrap(stream *out, const char *s)
 }
 
 static void
-nr_unit(stream *out, const faction * f, const unit * u, int indent, int mode)
+nr_unit(stream *out, const faction * f, const unit * u, int indent, seen_mode mode)
 {
     attrib *a_otherfaction;
     char marker;
     int dh;
-    bool isbattle = (bool)(mode == see_battle);
+    bool isbattle = (bool)(mode == seen_battle);
     char buf[8192];
 
     if (fval(u_race(u), RCF_INVISIBLE))
@@ -875,9 +873,8 @@ bool see_border(const connection * b, const faction * f, const region * r)
     return cs;
 }
 
-static void describe(stream *out, const seen_region * sr, faction * f)
+static void describe(stream *out, const region * r, faction * f)
 {
-    const region *r;
     int n;
     bool dh;
     direction_t d;
@@ -901,9 +898,8 @@ static void describe(stream *out, const seen_region * sr, faction * f)
 
     assert(out);
     assert(f);
-    assert(sr);
+    assert(r);
 
-    r = sr->r;
     for (d = 0; d != MAXDIRECTIONS; d++) {
         /* Nachbarregionen, die gesehen werden, ermitteln */
         region *r2 = rconnect(r, d);
