@@ -1249,8 +1249,9 @@ static void view_regatta(region * r, faction * f)
 
 /** mark all regions seen by the lighthouse.
  */
-static void prepare_lighthouse(building * b, faction *f)
+static void prepare_lighthouse(building * b, report_context *ctx)
 {
+    faction *f = ctx->f;
     int range = lighthouse_range(b, f);
     quicklist *ql, *rlist = get_regions_distance(b->region, range);
     int qi;
@@ -1378,7 +1379,7 @@ static void cb_add_seen(region *r, unit *u, void *cbdata) {
 
 /** set region.seen based on visibility by one faction.
  *
- * this function may also update f->last and f->first for potential 
+ * this function may also update ctx->last and ctx->first for potential 
  * lighthouses and travelthru reports
  */
 void prepare_seen(report_context *ctx)
@@ -1398,35 +1399,40 @@ void prepare_seen(report_context *ctx)
 
         reorder_units(r);
 
-        /* region owner get the report from lighthouses */
-        if (fval(r, RF_LIGHTHOUSE) && rule_region_owners && bt_lighthouse) {
-            for (b = rbuildings(r); b; b = b->next) {
-                if (b && b->type == bt_lighthouse) {
-                    u = building_owner(b);
-                    if (u && u->faction==f) {
-                        prepare_lighthouse(b, f);
-                        if (u_race(u) != get_race(RC_SPELL) || u->number == RS_FARVISION) {
-                            faction_add_seen(f, r, seen_unit);
+        if (fval(r, RF_LIGHTHOUSE)) {
+            /* region owners get the report from lighthouses */
+            if (rule_region_owners && bt_lighthouse) {
+                for (b = rbuildings(r); b; b = b->next) {
+                    if (b && b->type == bt_lighthouse) {
+                        u = building_owner(b);
+                        if (u && u->faction==f) {
+                            prepare_lighthouse(b, ctx);
+                            if (u_race(u) != get_race(RC_SPELL) || u->number == RS_FARVISION) {
+                                faction_add_seen(f, r, seen_unit);
+                            }
                         }
+                    }
+                }
+            }
+
+        }
+        for (u = r->units; u; u = u->next) {
+            if (u->faction==f) {
+                if (u_race(u) != get_race(RC_SPELL) || u->number == RS_FARVISION) {
+                    faction_add_seen(f, r, seen_unit);
+                }
+                if (fval(r, RF_LIGHTHOUSE) {
+                    // TODO: is the building big enough for the unit?
+                    if (u->building && u->building->type == bt_lighthouse) {
+                        /* we are in a lighthouse. add the regions we can see from here! */
+                        prepare_lighthouse(u->building, ctx);
                     }
                 }
             }
         }
 
-        for (u = r->units; u; u = u->next) {
-            if (u->building && u->building->type == bt_lighthouse) {
-                /* we are in a lighthouse. add the regions we can see from here! */
-                prepare_lighthouse(u->building, u->faction);
-            }
-
-            if (u_race(u) != get_race(RC_SPELL) || u->number == RS_FARVISION) {
-                faction_add_seen(f, r, seen_unit);
-            }
-        }
-
-
         if (fval(r, RF_TRAVELUNIT)) {
-            travelthru_map(r, cb_add_seen, r);
+            travelthru_map(r, cb_add_seen, ctx);
         }
     }
 }
@@ -1441,34 +1447,6 @@ static void cb_set_last(region *r, unit *u, void *cbdata) {
 static region *lastregion(faction * f)
 {
 #ifdef SMART_INTERVALS
-    unit *u = f->units;
-    region *r = f->last;
-
-    if (u == NULL)
-        return NULL;
-    if (r != NULL)
-        return r->next;
-
-    /* it is safe to start in the region of the first unit. */
-    f->last = u->region;
-    /* if regions have indices, we can skip ahead: */
-    for (u = u->nextF; u != NULL; u = u->nextF) {
-        r = u->region;
-        if (r->index > f->last->index)
-            f->last = r;
-    }
-
-    /* we continue from the best region and look for travelthru etc. */
-    for (r = f->last->next; r; r = r->next) {
-        /* search the region for travelthru-attributes: */
-        if (fval(r, RF_TRAVELUNIT)) {
-            travelthru_map(r, cb_set_last, f);
-        }
-        if (f->last == r)
-            continue;
-        if (check_leuchtturm(r, f))
-            f->last = r;
-    }
     return f->last->next;
 #else
     return NULL;
