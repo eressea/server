@@ -1388,7 +1388,7 @@ static void cb_add_seen(region *r, unit *u, void *cbdata) {
  * this function may also update ctx->last and ctx->first for potential 
  * lighthouses and travelthru reports
  */
-static void prepare_report(report_context *ctx, faction *f)
+void prepare_report(report_context *ctx, faction *f)
 {
     region *r;
     building *b;
@@ -1454,7 +1454,7 @@ static void prepare_report(report_context *ctx, faction *f)
     ctx->last = lastregion(f);
 }
 
-static void finish_reports(report_context *ctx) {
+void finish_reports(report_context *ctx) {
     region *r;
     ql_free(ctx->addresses);
     for (r = ctx->first; r != ctx->last; r = r->next) {

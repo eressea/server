@@ -222,9 +222,37 @@ static void test_arg_resources(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_prepare_report(CuTest *tc) {
+    report_context ctx;
+    faction *f;
+    region *r;
+    unit *u;
+
+    test_setup();
+    f = test_create_faction(0);
+    r = test_create_region(0, 0, 0);
+
+    prepare_report(&ctx, f);
+    CuAssertPtrEquals(tc, 0, ctx.first);
+    CuAssertPtrEquals(tc, 0, ctx.last);
+    CuAssertIntEquals(tc, seen_none, r->seen.mode);
+    finish_reports(&ctx);
+
+    u = test_create_unit(f, r);
+    prepare_report(&ctx, f);
+    CuAssertPtrEquals(tc, r, ctx.first);
+    CuAssertPtrEquals(tc, 0, ctx.last);
+    CuAssertIntEquals(tc, seen_unit, r->seen.mode);
+    finish_reports(&ctx);
+    CuAssertIntEquals(tc, seen_none, r->seen.mode);
+
+    test_cleanup();
+}
+
 CuSuite *get_reports_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_prepare_report);
     SUITE_ADD_TEST(suite, test_reorder_units);
     SUITE_ADD_TEST(suite, test_seen_faction);
     SUITE_ADD_TEST(suite, test_regionid);

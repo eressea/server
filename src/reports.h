@@ -74,7 +74,8 @@ extern "C" {
         time_t report_time;
     } report_context;
 
-    void prepare_seen(struct report_context *ctx);
+    void prepare_report(report_context *ctx, struct faction *f);
+    void finish_reports(report_context *ctx);
 
     typedef int(*report_fun) (const char *filename, report_context * ctx,
         const char *charset);
