@@ -1388,25 +1388,28 @@ static void cb_add_seen(region *r, unit *u, void *cbdata) {
  * this function may also update ctx->last and ctx->first for potential 
  * lighthouses and travelthru reports
  */
-void prepare_seen(report_context *ctx)
+static void prepare_report(report_context *ctx, faction *f)
 {
-    faction *f = ctx->f;
     region *r;
     building *b;
     static int config;
     static bool rule_region_owners;
     const struct building_type *bt_lighthouse = bt_find("lighthouse");
 
-    // [fast,last) interval of regions with a unit in it
-    ctx->first = firstregion(f);
-    ctx->last = lastregion(f);
     if (config_changed(&config)) {
         rule_region_owners = config_token("rules.region_owner_pay_building", bt_lighthouse->_name);
     }
+
+    ctx->f = f;
+    ctx->report_time = time(NULL);
+    ctx->addresses = NULL;
+    ctx->userdata = NULL;
+    // [first,last) interval of regions with a unit in it:
+    ctx->first = firstregion(f);
+    ctx->last = lastregion(f);
+
     for (r = ctx->first; r!=ctx->last; r = r->next) {
         unit *u;
-
-        reorder_units(r);
 
         if (fval(r, RF_LIGHTHOUSE)) {
             /* region owners get the report from lighthouses */
@@ -1449,15 +1452,6 @@ void prepare_seen(report_context *ctx)
     // them outside of the CR?
     ctx->first = firstregion(f);
     ctx->last = lastregion(f);
-}
-
-static void prepare_report(report_context *ctx, faction *f)
-{
-    ctx->f = f;
-    ctx->report_time = time(NULL);
-    ctx->addresses = NULL;
-    ctx->userdata = NULL;
-    prepare_seen(ctx);
 }
 
 static void finish_reports(report_context *ctx) {
@@ -1549,8 +1543,12 @@ static void check_messages_exist(void) {
 
 int init_reports(void)
 {
+    region *r;
     check_messages_exist();
     create_directories();
+    for (r = regions; r; r = r->next) {
+        reorder_units(r);
+    }
     return 0;
 }
 
