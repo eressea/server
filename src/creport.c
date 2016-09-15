@@ -1509,7 +1509,7 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
     fprintf(F, "%d;Basis\n", 36);
     fprintf(F, "%d;Runde\n", turn);
     fprintf(F, "%d;Zeitalter\n", era);
-    fprintf(F, "\"%s\";Build\n", ERESSEA_VERSION);
+    fprintf(F, "\"%s\";Build\n", eressea_version());
     if (mailto != NULL) {
         fprintf(F, "\"%s\";mailto\n", mailto);
         fprintf(F, "\"%s\";mailcmd\n", LOC(f->locale, "mailcmd"));
