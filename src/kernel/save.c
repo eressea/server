@@ -1898,7 +1898,7 @@ int writegame(const char *filename)
     fstream_init(&strm, F);
     binstore_init(&store, &strm);
 
-    WRITE_INT(&store, version_no(ERESSEA_VERSION));
+    WRITE_INT(&store, version_no(eressea_version()));
     n = write_game(&gdata);
     binstore_done(&store);
     fstream_done(&strm);
