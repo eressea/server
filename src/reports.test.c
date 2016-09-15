@@ -226,7 +226,6 @@ static void test_prepare_report(CuTest *tc) {
     report_context ctx;
     faction *f;
     region *r;
-    unit *u;
 
     test_setup();
     f = test_create_faction(0);
@@ -238,14 +237,22 @@ static void test_prepare_report(CuTest *tc) {
     CuAssertIntEquals(tc, seen_none, r->seen.mode);
     finish_reports(&ctx);
 
-    u = test_create_unit(f, r);
+    test_create_unit(f, r);
     prepare_report(&ctx, f);
     CuAssertPtrEquals(tc, r, ctx.first);
     CuAssertPtrEquals(tc, 0, ctx.last);
     CuAssertIntEquals(tc, seen_unit, r->seen.mode);
     finish_reports(&ctx);
     CuAssertIntEquals(tc, seen_none, r->seen.mode);
-
+    finish_reports(&ctx);
+    
+    r = test_create_region(1, 0, 0);
+    CuAssertPtrEquals(tc, r, regions->next);
+    prepare_report(&ctx, f);
+    CuAssertPtrEquals(tc, regions, ctx.first);
+    CuAssertPtrEquals(tc, r, ctx.last);
+    CuAssertIntEquals(tc, seen_neighbour, r->seen.mode);
+    
     test_cleanup();
 }
 
