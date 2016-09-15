@@ -33,6 +33,7 @@ jsonconf.test.c
 )
 
 SET(_FILES
+version.c
 alliance.c
 ally.c
 build.c
