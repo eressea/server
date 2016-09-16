@@ -95,7 +95,7 @@ bool travelthru_cansee(const struct region *r, const struct faction *f, const st
     return false;
 }
 
-void travelthru_map(region * r, void(*cb)(region *, struct unit *, void *), void *cbdata)
+void travelthru_map(const region * r, void(*cb)(const region *, struct unit *, void *), void *cbdata)
 {
     attrib *a;
     assert(r);

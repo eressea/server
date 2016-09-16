@@ -30,7 +30,7 @@
 #include "chaos.h"
 #include "items.h"
 //#include "creport.h"
-//#include "report.h"
+#include "report.h"
 #include "names.h"
 #include "reports.h"
 #include "spells.h"
@@ -64,7 +64,7 @@ void game_init(void)
     register_triggers();
     register_xmas();
 
-//    register_nr();
+    register_nr();
 //    register_cr();
 
     register_races();

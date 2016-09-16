@@ -105,7 +105,7 @@ set (ERESSEA_SRC
   skill.c
   json.c
 #  creport.c
-#  report.c
+  report.c
   economy.c
   give.c
   items.c
@@ -200,7 +200,7 @@ set(TESTS_SRC
   volcano.test.c
   reports.test.c
 #  creport.test.c
-#  report.test.c
+  report.test.c
   summary.test.c
   travelthru.test.c
   callback.test.c

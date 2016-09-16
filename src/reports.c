@@ -971,7 +971,7 @@ typedef struct address_data {
     int stealthmod;
 } address_data;
 
-static void cb_add_address(region *r, unit *ut, void *cbdata) {
+static void cb_add_address(const region *r, unit *ut, void *cbdata) {
     address_data *data = (address_data *)cbdata;
     faction *f = data->f;
 
@@ -1378,8 +1378,9 @@ static region *firstregion(faction * f)
 #endif
 }
 
-static void cb_add_seen(region *r, unit *u, void *cbdata) {
-    unused_arg(cbdata);
+static void cb_add_seen(const region *rc, unit *u, void *cbdata) {
+    region *r = (region *)cbdata;
+    assert(rc == r);
     faction_add_seen(u->faction, r, seen_travel);
 }
 
@@ -1444,7 +1445,7 @@ void prepare_report(report_context *ctx, faction *f)
         }
 
         if (fval(r, RF_TRAVELUNIT)) {
-            travelthru_map(r, cb_add_seen, ctx);
+            travelthru_map(r, cb_add_seen, r);
         }
     }
     // [fast,last) interval of seen regions (with lighthouses and travel)
@@ -2147,7 +2148,7 @@ typedef struct count_data {
     const struct faction *f;
 } count_data;
 
-static void count_cb(region *r, unit *u, void *cbdata) {
+static void count_cb(const region *r, unit *u, void *cbdata) {
     count_data *data = (count_data *)cbdata;
     const struct faction *f = data->f;
     if (r != u->region && (!u->ship || ship_owner(u->ship) == u)) {
@@ -2157,7 +2158,7 @@ static void count_cb(region *r, unit *u, void *cbdata) {
     }
 }
 
-int count_travelthru(struct region *r, const struct faction *f) {
+int count_travelthru(const struct region *r, const struct faction *f) {
     count_data data = { 0 };
     data.f = f;
     travelthru_map(r, count_cb, &data);

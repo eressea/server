@@ -274,7 +274,7 @@ extern "C" {
         int value);
     int owner_change(const region * r);
     bool is_mourning(const region * r, int in_turn);
-    const struct item_type *r_luxury(struct region *r);
+    const struct item_type *r_luxury(const struct region *r);
     void get_neighbours(const struct region *r, struct region **list);
 
     struct faction *update_owners(struct region *r);
