@@ -1142,92 +1142,6 @@ static void faction_add_seen(faction *f, region *r, seen_mode mode) {
 #endif
 }
 
-void view_neighbours(struct seen_region **seen, region * r, faction * f)
-{
-    int d;
-    region * nb[MAXDIRECTIONS];
-
-    get_neighbours(r, nb);
-    for (d = 0; d != MAXDIRECTIONS; ++d) {
-        region *r2 = nb[d];
-        if (r2) {
-            connection *b = get_borders(r, r2);
-            while (b) {
-                if (!b->type->transparent(b, f))
-                    break;
-                b = b->next;
-            }
-            if (!b) {
-                add_seen(r2, seen_far);
-                if (!(fval(r2->terrain, FORBIDDEN_REGION))) {
-                    int dir;
-                    for (dir = 0; dir != MAXDIRECTIONS; ++dir) {
-                        region *r3 = rconnect(r2, dir);
-                        if (r3) {
-                            connection *b = get_borders(r2, r3);
-                            while (b) {
-                                if (!b->type->transparent(b, f))
-                                    break;
-                                b = b->next;
-                            }
-                            if (!b) {
-                                add_seen(r3, seen_neighbour);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-static void
-recurse_regatta(region * center, region * r, faction * f, int maxdist)
-{
-    int d;
-    int dist = distance(center, r);
-    region * nb[MAXDIRECTIONS];
-
-    get_neighbours(r, nb);
-    for (d = 0; d != MAXDIRECTIONS; ++d) {
-        region *r2 = nb[d];
-        if (r2) {
-            int ndist = distance(center, r2);
-            if (ndist > dist && fval(r2->terrain, SEA_REGION)) {
-                connection *b = get_borders(r, r2);
-                while (b) {
-                    if (!b->type->transparent(b, f))
-                        break;
-                    b = b->next;
-                }
-                if (!b) {
-                    if (ndist < maxdist) {
-                        add_seen(r2, seen_far);
-                        recurse_regatta(center, r2, f, maxdist);
-                    }
-                    else {
-                        add_seen(r2, seen_neighbour);
-                    }
-                }
-            }
-        }
-    }
-}
-
-static void view_regatta(region * r, faction * f)
-{
-    unit *u;
-    int skill = 0;
-    for (u = r->units; u; u = u->next) {
-        if (u->faction == f) {
-            int es = effskill(u, SK_PERCEPTION, 0);
-            if (es > skill)
-                skill = es;
-        }
-    }
-    recurse_regatta(r, r, f, skill / 2);
-}
-
 /** mark all regions seen by the lighthouse.
  */
 static void prepare_lighthouse(building * b, report_context *ctx)
@@ -2215,8 +2129,4 @@ void register_reports(void)
     add_function("resources", &eval_resources);
     add_function("regions", &eval_regions);
     add_function("trail", &eval_trail);
-
-    /* register alternative visibility functions */
-    register_function((pf_generic)view_neighbours, "view_neighbours");
-    register_function((pf_generic)view_regatta, "view_regatta");
 }
