@@ -1858,12 +1858,6 @@ static void clear_npc_orders(faction *f)
     }
 }
 
-int version_no(const char *str) {
-    int maj = 0, min = 0, bld = 0;
-    sscanf(str, "%d.%d.%d", &maj, &min, &bld);
-    return (maj << 16) | (min << 8) | bld;
-}
-
 int writegame(const char *filename)
 {
     int n;

@@ -5,6 +5,7 @@
 #include <attributes/key.h>
 
 #include "save.h"
+#include "version.h"
 #include "unit.h"
 #include "group.h"
 #include "ally.h"
