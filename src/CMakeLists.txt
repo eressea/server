@@ -171,7 +171,10 @@ set (SERVER_SRC ${SERVER_SRC}
 )
 endif(CURSES_FOUND)
 
-add_library(game ${ERESSEA_SRC})
+add_library(version OBJECT ${VERSION_SRC})
+add_library(game ${ERESSEA_SRC}
+  $<TARGET_OBJECTS:version>
+)
 add_executable(eressea ${SERVER_SRC})
 target_link_libraries(eressea
   game
