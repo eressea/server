@@ -225,12 +225,13 @@ static void test_arg_resources(CuTest *tc) {
 
 static void test_prepare_travelthru(CuTest *tc) {
     report_context ctx;
-    faction *f;
+    faction *f, *f2;
     region *r1, *r2, *r3;
     unit *u;
 
     test_setup();
     f = test_create_faction(0);
+    f2 = test_create_faction(0);
     r1 = test_create_region(0, 0, 0);
     r2 = test_create_region(1, 0, 0);
     r3 = test_create_region(2, 0, 0);
@@ -239,9 +240,18 @@ static void test_prepare_travelthru(CuTest *tc) {
     prepare_report(&ctx, f);
     CuAssertPtrEquals(tc, r1, ctx.first);
     CuAssertPtrEquals(tc, r3, ctx.last);
+    CuAssertPtrEquals(tc, f, ctx.f);
     CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
     CuAssertIntEquals(tc, seen_travel, r2->seen.mode);
     CuAssertIntEquals(tc, seen_none, r3->seen.mode);
+    finish_reports(&ctx);
+    CuAssertIntEquals(tc, seen_none, r2->seen.mode);
+
+    prepare_report(&ctx, f2);
+    CuAssertIntEquals(tc, seen_none, r2->seen.mode);
+    CuAssertPtrEquals(tc, f2, ctx.f);
+    CuAssertPtrEquals(tc, NULL, ctx.first);
+    CuAssertPtrEquals(tc, NULL, ctx.last);
     test_cleanup();
 }
 

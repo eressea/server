@@ -1311,7 +1311,7 @@ void prepare_report(report_context *ctx, faction *f)
     static bool rule_region_owners;
     const struct building_type *bt_lighthouse = bt_find("lighthouse");
 
-    if (config_changed(&config)) {
+    if (bt_lighthouse && config_changed(&config)) {
         rule_region_owners = config_token("rules.region_owner_pay_building", bt_lighthouse->_name);
     }
 
