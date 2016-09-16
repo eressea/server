@@ -12,7 +12,6 @@ fi
 
 set -e
 [ -z $BUILD ] && BUILD=Debug ; export BUILD
-cmake --version
 s/cmake-init
 s/build
 cd $ROOT
