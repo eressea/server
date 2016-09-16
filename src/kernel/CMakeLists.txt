@@ -33,7 +33,6 @@ jsonconf.test.c
 )
 
 SET(_FILES
-version.c
 alliance.c
 ally.c
 build.c
@@ -64,6 +63,8 @@ unit.c
 xmlreader.c
 jsonconf.c
 )
+
+SET(VERSION_SRC ${PROJECT_NAME}/version.c PARENT_SCOPE)
 
 FOREACH(_FILE ${_FILES})
     LIST(APPEND _SOURCES ${PROJECT_NAME}/${_FILE})
