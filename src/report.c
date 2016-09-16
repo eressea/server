@@ -939,13 +939,13 @@ static void describe(stream *out, const region * r, faction * f)
         WARN_STATIC_BUFFER();
 
     if (r->seen.mode == seen_travel) {
-        bytes = _snprintf(bufp, size, " (%s)", LOC(f->locale, "seen_travel"));
+        bytes = _snprintf(bufp, size, " (%s)", LOC(f->locale, "see_travel"));
     }
     else if (r->seen.mode == seen_neighbour) {
         bytes = _snprintf(bufp, size, " (%s)", LOC(f->locale, "see_neighbour"));
     }
     else if (r->seen.mode == seen_lighthouse) {
-        bytes = _snprintf(bufp, size, " (%s)", LOC(f->locale, "seen_lighthouse"));
+        bytes = _snprintf(bufp, size, " (%s)", LOC(f->locale, "see_lighthouse"));
     }
     else {
         bytes = 0;
