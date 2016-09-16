@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.8)
+cmake_minimum_required(VERSION 2.8)
 project (server C)
 
 include_directories (${CMAKE_CURRENT_SOURCE_DIR})
@@ -171,11 +171,10 @@ set (SERVER_SRC ${SERVER_SRC}
 )
 endif(CURSES_FOUND)
 
-add_library(version OBJECT ${VERSION_SRC})
-add_library(game ${ERESSEA_SRC}
-  $<TARGET_OBJECTS:version>
-)
+add_library(version STATIC ${VERSION_SRC})
+add_library(game ${ERESSEA_SRC})
 add_executable(eressea ${SERVER_SRC})
+target_link_libraries(game version)
 target_link_libraries(eressea
   game
   ${TOLUA_LIBRARIES}
