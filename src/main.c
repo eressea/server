@@ -166,7 +166,7 @@ static int parse_args(int argc, char **argv, int *exitcode)
                 printf("\n%s PBEM host\n"
                     "Copyright (C) 1996-2005 C. Schlittchen, K. Zedel, E. Rehling, H. Peters.\n\n"
                     "Compilation: " __DATE__ " at " __TIME__ "\nVersion: %s\n\n",
-                    game_name(), ERESSEA_VERSION);
+                    game_name(), eressea_version());
 #ifdef USE_CURSES          
             }
             else if (strcmp(argi + 2, "color") == 0) {

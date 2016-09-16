@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 2.6)
 project(kernel C)
 
 SET(_TEST_FILES
@@ -63,6 +64,8 @@ unit.c
 xmlreader.c
 jsonconf.c
 )
+
+SET(VERSION_SRC ${PROJECT_NAME}/version.c PARENT_SCOPE)
 
 FOREACH(_FILE ${_FILES})
     LIST(APPEND _SOURCES ${PROJECT_NAME}/${_FILE})
