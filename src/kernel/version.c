@@ -1,3 +1,4 @@
+#include <platform.h>
 #include "version.h"
 
 #include <stdio.h>
