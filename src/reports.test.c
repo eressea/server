@@ -235,6 +235,8 @@ static void test_prepare_travelthru(CuTest *tc) {
     r1 = test_create_region(0, 0, 0);
     r2 = test_create_region(1, 0, 0);
     r3 = test_create_region(2, 0, 0);
+    test_create_unit(f2, r1);
+    test_create_unit(f2, r3);
     u = test_create_unit(f, r1);
     travelthru_add(r2, u);
     prepare_report(&ctx, f);
@@ -250,7 +252,7 @@ static void test_prepare_travelthru(CuTest *tc) {
     prepare_report(&ctx, f2);
     CuAssertIntEquals(tc, seen_none, r2->seen.mode);
     CuAssertPtrEquals(tc, f2, ctx.f);
-    CuAssertPtrEquals(tc, NULL, ctx.first);
+    CuAssertPtrEquals(tc, r1, ctx.first);
     CuAssertPtrEquals(tc, NULL, ctx.last);
     test_cleanup();
 }
