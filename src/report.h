@@ -23,6 +23,7 @@ extern "C" {
     struct spellbook_entry;
     struct region;
     struct faction;
+    struct locale;
     void register_nr(void);
     void report_cleanup(void);
     void write_spaces(struct stream *out, size_t num);
