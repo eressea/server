@@ -71,15 +71,18 @@ int lighthouse_range(const building * b, const faction * f)
         if (skill_enabled(SK_PERCEPTION)) {
             region *r = b->region;
             int c = 0;
+            int cap = buildingcapacity(b);
             unit *u;
+
             for (u = r->units; u; u = u->next) {
                 if (u->building == b || u == building_owner(b)) {
                     if (u->building == b) {
                         c += u->number;
                     }
-                    if (c > buildingcapacity(b))
+                    if (c > cap) {
                         break;
-                    if (f == NULL || u->faction == f) {
+                    }
+                    else if (f == NULL || u->faction == f) {
                         int sk = effskill(u, SK_PERCEPTION, 0) / 3;
                         d = _max(d, sk);
                         d = _min(maxd, d);

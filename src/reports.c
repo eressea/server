@@ -1350,8 +1350,7 @@ void prepare_report(report_context *ctx, faction *f)
                     faction_add_seen(f, r, seen_unit);
                 }
                 if (fval(r, RF_LIGHTHOUSE)) {
-                    // TODO: is the building big enough for the unit?
-                    if (u->building && u->building->type == bt_lighthouse) {
+                    if (u->building && u->building->type == bt_lighthouse && inside_building(u)) {
                         /* we are in a lighthouse. add the regions we can see from here! */
                         prepare_lighthouse(u->building, ctx);
                     }

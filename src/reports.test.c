@@ -12,6 +12,7 @@
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
+#include <kernel/terrain.h>
 #include <kernel/unit.h>
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
@@ -264,24 +265,29 @@ static void test_prepare_lighthouse(CuTest *tc) {
     unit *u;
     building *b;
     building_type *btype;
+    const struct terrain_type *t_ocean, *t_plain;
 
     test_setup();
+    t_ocean = test_create_terrain("ocean", SEA_REGION);
+    t_plain = test_create_terrain("plain", LAND_REGION);
     f = test_create_faction(0);
-    r1 = test_create_region(0, 0, 0);
-    r2 = test_create_region(1, 0, 0);
-    r3 = test_create_region(2, 0, 0);
+    r1 = test_create_region(0, 0, t_plain);
+    r2 = test_create_region(1, 0, t_ocean);
+    r3 = test_create_region(2, 0, t_ocean);
     btype = test_create_buildingtype("lighthouse");
     b = test_create_building(r1, btype);
+    b->flags |= BLD_MAINTAINED;
     b->size = 10;
+    update_lighthouse(b);
     u = test_create_unit(f, r1);
     u->building = b;
-    update_lighthouse(b);
+    set_level(u, SK_PERCEPTION, 3);
     prepare_report(&ctx, f);
     CuAssertPtrEquals(tc, r1, ctx.first);
-    CuAssertPtrEquals(tc, r3, ctx.last);
+    CuAssertPtrEquals(tc, NULL, ctx.last);
     CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
     CuAssertIntEquals(tc, seen_lighthouse, r2->seen.mode);
-    CuAssertIntEquals(tc, seen_none, r3->seen.mode);
+    CuAssertIntEquals(tc, seen_neighbour, r3->seen.mode);
     test_cleanup();
 }
 
@@ -314,7 +320,7 @@ static void test_prepare_report(CuTest *tc) {
     prepare_report(&ctx, f);
     CuAssertPtrEquals(tc, regions, ctx.first);
     CuAssertPtrEquals(tc, r, ctx.last);
-    CuAssertIntEquals(tc, seen_neighbour, r->seen.mode);
+    CuAssertIntEquals(tc, seen_none, r->seen.mode);
     
     test_cleanup();
 }
