@@ -1317,7 +1317,7 @@ static void prepare_reports(void)
 
         for (u = r->units; u; u = u->next) {
             b = u->building;
-            if (b && b->type == bt_lighthouse) {
+            if (b && b->type == bt_lighthouse && inside_building(u)) {
                 /* we are in a lighthouse. add the regions we can see from here! */
                 prepare_lighthouse(b, u->faction);
             }
