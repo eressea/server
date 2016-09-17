@@ -211,6 +211,7 @@ set(TESTS_SRC
   keyword.test.c
   give.test.c
   laws.test.c
+  lighthouse.test.c
   magic.test.c
   market.test.c
   monsters.test.c
