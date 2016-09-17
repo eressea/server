@@ -57,6 +57,7 @@ extern "C" {
         const struct unit *u, unsigned int indent, int mode);
 
     void prepare_seen(struct faction *f);
+    void prepare_report(struct report_context *ctx, struct faction *f);
     int reports(void);
     int write_reports(struct faction *f, time_t ltime);
     int init_reports(void);

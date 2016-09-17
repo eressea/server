@@ -1418,8 +1418,9 @@ void prepare_seen(faction *f)
     link_seen(f->seen, f->first, f->last);
 }
 
-static void prepare_report(struct report_context *ctx, faction *f)
+void prepare_report(struct report_context *ctx, faction *f)
 {
+    assert(f->seen);
     prepare_seen(f);
     ctx->f = f;
     ctx->report_time = time(NULL);

@@ -3,6 +3,7 @@
 #include "reports.h"
 #include "report.h"
 #include "creport.h"
+#include "lighthouse.h"
 #include "move.h"
 #include "seen.h"
 #include "travelthru.h"
@@ -17,6 +18,7 @@
 #include <kernel/unit.h>
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
+#include <kernel/terrain.h>
 
 #include <util/language.h>
 #include <util/lists.h>
@@ -450,6 +452,41 @@ static void test_arg_resources(CuTest *tc) {
     test_cleanup();
 }
 
+void test_prepare_lighthouse(CuTest *tc) {
+    building *b;
+    building_type *btype;
+    unit *u;
+    region *r1, *r2;
+    faction *f;
+    report_context ctx;
+    const struct terrain_type *t_ocean, *t_plain;
+
+    test_setup();
+    f = test_create_faction(0);
+    t_ocean = test_create_terrain("ocean", SEA_REGION);
+    t_plain = test_create_terrain("plain", LAND_REGION);
+    btype = test_create_buildingtype("lighthouse");
+    btype->maxcapacity = 4;
+    r1 = test_create_region(0, 0, 0);
+    r2 = test_create_region(0, 0, 0);
+    b = test_create_building(r1, btype);
+    b->size = 10;
+    update_lighthouse(b);
+    u = test_create_unit(test_create_faction(0), r1);
+    u->number = 4;
+    u->building = b;
+    CuAssertPtrEquals(tc, b, inside_building(u));
+    u = test_create_unit(f, r1);
+    u->building = b;
+    CuAssertPtrEquals(tc, NULL, inside_building(u));
+    u->faction->seen = seen_init();
+    prepare_report(&ctx, f);
+    CuAssertPtrEquals(tc, r1, ctx.first);
+    CuAssertPtrEquals(tc, r2, ctx.last);
+    seen_done(f->seen);
+    test_cleanup();
+}
+
 CuSuite *get_reports_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -464,5 +501,6 @@ CuSuite *get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_write_unit);
     SUITE_ADD_TEST(suite, test_write_spell_syntax);
     SUITE_ADD_TEST(suite, test_arg_resources);
+    SUITE_ADD_TEST(suite, test_prepare_lighthouse);
     return suite;
 }
