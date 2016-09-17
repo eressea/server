@@ -1316,9 +1316,10 @@ static void prepare_reports(void)
         }
 
         for (u = r->units; u; u = u->next) {
-            if (u->building && u->building->type == bt_lighthouse) {
+            b = u->building;
+            if (b && b->type == bt_lighthouse && inside_building(u)) {
                 /* we are in a lighthouse. add the regions we can see from here! */
-                prepare_lighthouse(u->building, u->faction);
+                prepare_lighthouse(b, u->faction);
             }
 
             if (u_race(u) != get_race(RC_SPELL) || u->number == RS_FARVISION) {
@@ -1420,6 +1421,7 @@ void prepare_seen(faction *f)
 
 static void prepare_report(struct report_context *ctx, faction *f)
 {
+    assert(f->seen);
     prepare_seen(f);
     ctx->f = f;
     ctx->report_time = time(NULL);
