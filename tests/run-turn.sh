@@ -53,7 +53,7 @@ assert_grep_count reports/$CRFILE '^BURG' 1
 assert_grep_count reports/$CRFILE '^EINHEIT' 2
 assert_grep_count reports/$CRFILE '^GEGENSTAENDE' 2
 
-assert_grep_count reports/185-heg.nr 'vom Turm erblickt' 6
+assert_grep_count reports/185-heg.nr 'erblickt' 6
 assert_grep_count reports/185-heg.cr '"lighthouse";visibility' 6
 assert_grep_count reports/185-heg.cr '"neighbour";visibility' 11
 assert_grep_count reports/185-6rLo.cr '^EINHEIT' 2
