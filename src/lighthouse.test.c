@@ -18,12 +18,11 @@ static void test_lighthouse_range(CuTest * tc)
 {
     faction *f;
     unit *u;
-    region *r1, *r2;
+    region *r1;
     building *b;
 
     test_setup();
     r1 = test_create_region(0, 0, 0);
-    r2 = test_create_region(1, 0, 0);
     f = test_create_faction(0);
     u = test_create_unit(f, r1);
     b = test_create_building(r1, test_create_buildingtype("lighthouse"));

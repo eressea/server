@@ -26,12 +26,6 @@ ipch/
 *.bak
 bin/
 build*/
-game-e2/data
-game-e2/*.log*
-game-e2/reports/
-game-e3/data/
-game-e3/*.log*
-game-e3/reports/
 *.log
 *.log.*
 tags
