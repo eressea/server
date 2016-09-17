@@ -13,7 +13,7 @@
 
 struct attrib;
 
-static void count_travelers(const region *r, unit *u, void *cbdata) {
+static void count_travelers(region *r, unit *u, void *cbdata) {
     int *n = (int *)cbdata;
     unused_arg(r);
     *n += u->number;

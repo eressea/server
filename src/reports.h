@@ -125,7 +125,7 @@ extern "C" {
 
     int stream_printf(struct stream * out, const char *format, ...);
 
-    int count_travelthru(const struct region *r, const struct faction *f);
+    int count_travelthru(struct region *r, const struct faction *f);
 
 #define GR_PLURAL     0x01      /* grammar: plural */
 #define MAX_INVENTORY 128       /* maimum number of different items in an inventory */

@@ -1951,7 +1951,7 @@ static void init_cb(cb_data *data, stream *out, char *buffer, size_t size, const
     data->counter = 0;
 }
 
-static void cb_write_travelthru(const region *r, unit *u, void *cbdata) {
+static void cb_write_travelthru(region *r, unit *u, void *cbdata) {
     cb_data *data = (cb_data *)cbdata;
     const faction *f = data->f;
 
@@ -2006,7 +2006,7 @@ static void cb_write_travelthru(const region *r, unit *u, void *cbdata) {
     }
 }
 
-void write_travelthru(stream *out, const region *r, const faction *f)
+void write_travelthru(stream *out, region *r, const faction *f)
 {
     int maxtravel;
     char buf[8192];
@@ -2038,7 +2038,7 @@ report_plaintext(const char *filename, report_context * ctx,
     int flag = 0;
     char ch;
     int anyunits, no_units, no_people;
-    const struct region *r;
+    region *r;
     faction *f = ctx->f;
     unit *u;
     char pzTime[64];
