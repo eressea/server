@@ -458,7 +458,6 @@ void test_prepare_lighthouse(CuTest *tc) {
     unit *u;
     region *r1, *r2;
     faction *f;
-    report_context ctx;
     const struct terrain_type *t_ocean, *t_plain;
 
     test_setup();
@@ -467,23 +466,26 @@ void test_prepare_lighthouse(CuTest *tc) {
     t_plain = test_create_terrain("plain", LAND_REGION);
     btype = test_create_buildingtype("lighthouse");
     btype->maxcapacity = 4;
-    r1 = test_create_region(0, 0, 0);
-    r2 = test_create_region(0, 0, 0);
+    r1 = test_create_region(0, 0, t_plain);
+    r2 = test_create_region(1, 0, t_ocean);
     b = test_create_building(r1, btype);
+    b->flags |= BLD_MAINTAINED;
     b->size = 10;
     update_lighthouse(b);
     u = test_create_unit(test_create_faction(0), r1);
     u->number = 4;
     u->building = b;
+    set_level(u, SK_PERCEPTION, 3);
+    CuAssertIntEquals(tc, 1, lighthouse_range(b, u->faction));
     CuAssertPtrEquals(tc, b, inside_building(u));
     u = test_create_unit(f, r1);
     u->building = b;
+    set_level(u, SK_PERCEPTION, 3);
+    CuAssertIntEquals(tc, 0, lighthouse_range(b, u->faction));
     CuAssertPtrEquals(tc, NULL, inside_building(u));
-    u->faction->seen = seen_init();
-    prepare_report(&ctx, f);
-    CuAssertPtrEquals(tc, r1, ctx.first);
-    CuAssertPtrEquals(tc, r2, ctx.last);
-    seen_done(f->seen);
+    init_reports();
+    CuAssertPtrNotNull(tc, find_seen(f->seen, r1));
+    CuAssertPtrEquals(tc, 0, find_seen(f->seen, r2));
     test_cleanup();
 }
 
