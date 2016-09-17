@@ -1792,8 +1792,9 @@ int read_game(gamedata *data) {
     for (r = regions; r; r = r->next) {
         if (r->flags & RF_LIGHTHOUSE) {
             building *b;
-            for (b = r->buildings; b; b = b->next)
+            for (b = r->buildings; b; b = b->next) {
                 update_lighthouse(b);
+            }
         }
     }
     log_debug("marking factions as alive.");
