@@ -1,6 +1,7 @@
 #include <platform.h>
 #include <config.h>
 #include "reports.h"
+
 #include "move.h"
 #include "lighthouse.h"
 #include "travelthru.h"
@@ -16,6 +17,7 @@
 #include <kernel/unit.h>
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
+#include <kernel/terrain.h>
 
 #include <util/language.h>
 #include <util/lists.h>
@@ -258,6 +260,49 @@ static void test_prepare_travelthru(CuTest *tc) {
     test_cleanup();
 }
 
+void test_prepare_lighthouse_capacity(CuTest *tc) {
+    building *b;
+    building_type *btype;
+    unit *u1, *u2;
+    region *r1, *r2;
+    faction *f;
+    const struct terrain_type *t_ocean, *t_plain;
+    report_context ctx;
+
+    test_setup();
+    f = test_create_faction(0);
+    t_ocean = test_create_terrain("ocean", SEA_REGION);
+    t_plain = test_create_terrain("plain", LAND_REGION);
+    btype = test_create_buildingtype("lighthouse");
+    btype->maxcapacity = 4;
+    r1 = test_create_region(0, 0, t_plain);
+    r2 = test_create_region(1, 0, t_ocean);
+    b = test_create_building(r1, btype);
+    b->flags |= BLD_MAINTAINED;
+    b->size = 10;
+    update_lighthouse(b);
+    u1 = test_create_unit(test_create_faction(0), r1);
+    u1->number = 4;
+    u1->building = b;
+    set_level(u1, SK_PERCEPTION, 3);
+    CuAssertIntEquals(tc, 1, lighthouse_range(b, u1->faction));
+    CuAssertPtrEquals(tc, b, inside_building(u1));
+    u2 = test_create_unit(f, r1);
+    u2->building = b;
+    set_level(u2, SK_PERCEPTION, 3);
+    CuAssertIntEquals(tc, 0, lighthouse_range(b, u2->faction));
+    CuAssertPtrEquals(tc, NULL, inside_building(u2));
+    prepare_report(&ctx, u1->faction);
+    CuAssertPtrEquals(tc, r1, ctx.first);
+    CuAssertPtrEquals(tc, NULL, ctx.last);
+    finish_reports(&ctx);
+    prepare_report(&ctx, u2->faction);
+    CuAssertPtrEquals(tc, r1, ctx.first);
+    CuAssertPtrEquals(tc, r2, ctx.last);
+    finish_reports(&ctx);
+    test_cleanup();
+}
+
 static void test_prepare_lighthouse(CuTest *tc) {
     report_context ctx;
     faction *f;
@@ -314,14 +359,13 @@ static void test_prepare_report(CuTest *tc) {
     finish_reports(&ctx);
     CuAssertIntEquals(tc, seen_none, r->seen.mode);
     finish_reports(&ctx);
-    
+
     r = test_create_region(1, 0, 0);
     CuAssertPtrEquals(tc, r, regions->next);
     prepare_report(&ctx, f);
     CuAssertPtrEquals(tc, regions, ctx.first);
     CuAssertPtrEquals(tc, r, ctx.last);
     CuAssertIntEquals(tc, seen_none, r->seen.mode);
-    
     test_cleanup();
 }
 
@@ -330,6 +374,7 @@ CuSuite *get_reports_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_prepare_report);
     SUITE_ADD_TEST(suite, test_prepare_lighthouse);
+    SUITE_ADD_TEST(suite, test_prepare_lighthouse_capacity);
     SUITE_ADD_TEST(suite, test_prepare_travelthru);
     SUITE_ADD_TEST(suite, test_reorder_units);
     SUITE_ADD_TEST(suite, test_seen_faction);
