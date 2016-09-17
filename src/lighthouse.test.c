@@ -17,15 +17,15 @@
 static void test_lighthouse_range(CuTest * tc)
 {
     unit *u1, *u2;
-    region *r1, *r2;
+    region *r;
     building *b;
 
     test_setup();
-    r1 = test_create_region(0, 0, 0);
-    r2 = test_create_region(1, 0, 0);
-    u1 = test_create_unit(test_create_faction(0), r1);
-    u2 = test_create_unit(test_create_faction(0), r1);
-    b = test_create_building(r1, test_create_buildingtype("lighthouse"));
+    r = test_create_region(0, 0, 0);
+    test_create_region(1, 0, 0);
+    u1 = test_create_unit(test_create_faction(0), r);
+    u2 = test_create_unit(test_create_faction(0), r);
+    b = test_create_building(r, test_create_buildingtype("lighthouse"));
     CuAssertIntEquals(tc, 0, lighthouse_range(b, NULL));
     CuAssertIntEquals(tc, 0, lighthouse_range(b, u1->faction));
     b->size = 10;
