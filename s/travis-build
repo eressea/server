@@ -25,4 +25,4 @@ cd $ROOT
 inifile
 s/runtests
 
-# integraton_tests
+integraton_tests

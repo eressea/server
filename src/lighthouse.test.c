@@ -65,7 +65,7 @@ static void test_lighthouse_update(CuTest * tc)
     r2 = test_create_region(1, 0, t_ocean);
     r3 = test_create_region(2, 0, t_ocean);
     b = test_create_building(r1, test_create_buildingtype("lighthouse"));
-    CuAssertIntEquals(tc, 0, r1->flags&RF_LIGHTHOUSE);
+    CuAssertIntEquals(tc, RF_LIGHTHOUSE, r1->flags&RF_LIGHTHOUSE);
     CuAssertPtrEquals(tc, NULL, r1->attribs);
     CuAssertPtrEquals(tc, NULL, r2->attribs);
     CuAssertPtrEquals(tc, NULL, r3->attribs);

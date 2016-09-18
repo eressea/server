@@ -23,7 +23,7 @@ local function assert_file(filename)
     os.remove(filename)
 end
 
-function disable_test_process_turn()
+function test_process_turn()
     u:add_order("NUMMER PARTEI 777")
     process_orders()
     assert_equal(0, init_reports())

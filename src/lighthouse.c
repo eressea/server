@@ -26,36 +26,37 @@ const attrib_type at_lighthouse = {
 */
 void update_lighthouse(building * lh)
 {
-    if (lh->size>0 && is_building_type(lh->type, "lighthouse")) {
+    if (is_building_type(lh->type, "lighthouse")) {
         region *r = lh->region;
-        int d = (int)log10(lh->size) + 1;
-        int x;
 
         r->flags |= RF_LIGHTHOUSE;
+        if (lh->size > 0) {
+            int d = (int)log10(lh->size) + 1;
+            int x;
+            for (x = -d; x <= d; ++x) {
+                int y;
+                for (y = -d; y <= d; ++y) {
+                    attrib *a;
+                    region *r2;
+                    int px = r->x + x, py = r->y + y;
 
-        for (x = -d; x <= d; ++x) {
-            int y;
-            for (y = -d; y <= d; ++y) {
-                attrib *a;
-                region *r2;
-                int px = r->x + x, py = r->y + y;
-
-                pnormalize(&px, &py, rplane(r));
-                r2 = findregion(px, py);
-                if (!r2 || !fval(r2->terrain, SEA_REGION))
-                    continue;
-                if (distance(r, r2) > d)
-                    continue;
-                a = a_find(r2->attribs, &at_lighthouse);
-                while (a && a->type == &at_lighthouse) {
-                    building *b = (building *)a->data.v;
-                    if (b == lh)
-                        break;
-                    a = a->next;
-                }
-                if (!a) {
-                    a = a_add(&r2->attribs, a_new(&at_lighthouse));
-                    a->data.v = (void *)lh;
+                    pnormalize(&px, &py, rplane(r));
+                    r2 = findregion(px, py);
+                    if (!r2 || !fval(r2->terrain, SEA_REGION))
+                        continue;
+                    if (distance(r, r2) > d)
+                        continue;
+                    a = a_find(r2->attribs, &at_lighthouse);
+                    while (a && a->type == &at_lighthouse) {
+                        building *b = (building *)a->data.v;
+                        if (b == lh)
+                            break;
+                        a = a->next;
+                    }
+                    if (!a) {
+                        a = a_add(&r2->attribs, a_new(&at_lighthouse));
+                        a->data.v = (void *)lh;
+                    }
                 }
             }
         }
