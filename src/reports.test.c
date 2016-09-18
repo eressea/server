@@ -369,10 +369,56 @@ static void test_prepare_report(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_seen_neighbours(CuTest *tc) {
+    report_context ctx;
+    faction *f;
+    region *r1, *r2;
+
+    test_setup();
+    f = test_create_faction(0);
+    r1 = test_create_region(0, 0, 0);
+    r2 = test_create_region(1, 0, 0);
+
+    test_create_unit(f, r1);
+    prepare_report(&ctx, f);
+    CuAssertPtrEquals(tc, r1, ctx.first);
+    CuAssertPtrEquals(tc, 0, ctx.last);
+    CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
+    CuAssertIntEquals(tc, seen_neighbour, r2->seen.mode);
+    finish_reports(&ctx);
+    test_cleanup();
+}
+
+static void test_seen_travelthru(CuTest *tc) {
+    report_context ctx;
+    faction *f;
+    unit *u;
+    region *r1, *r2, *r3;
+
+    test_setup();
+    f = test_create_faction(0);
+    r1 = test_create_region(0, 0, 0);
+    r2 = test_create_region(1, 0, 0);
+    r3 = test_create_region(2, 0, 0);
+
+    u = test_create_unit(f, r1);
+    travelthru_add(r2, u);
+    prepare_report(&ctx, f);
+    CuAssertPtrEquals(tc, r1, ctx.first);
+    CuAssertPtrEquals(tc, 0, ctx.last);
+    CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
+    CuAssertIntEquals(tc, seen_travel, r2->seen.mode);
+    CuAssertIntEquals(tc, seen_neighbour, r3->seen.mode);
+    finish_reports(&ctx);
+    test_cleanup();
+}
+
 CuSuite *get_reports_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_prepare_report);
+    SUITE_ADD_TEST(suite, test_seen_neighbours);
+    SUITE_ADD_TEST(suite, test_seen_travelthru);
     SUITE_ADD_TEST(suite, test_prepare_lighthouse);
     SUITE_ADD_TEST(suite, test_prepare_lighthouse_capacity);
     SUITE_ADD_TEST(suite, test_prepare_travelthru);
