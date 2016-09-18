@@ -1023,3 +1023,16 @@ function test_prefix()
     u1.faction.locale = "en"
     assert_not_nil(u1:show():find("archelf"))
 end
+
+function test_recruit()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+
+    u:add_item("money", 1000)
+    set_order(u, "REKRUTIERE 5")
+    process_orders()
+    for u in f.units do
+        assert_equal(6, u.number)
+    end
+end

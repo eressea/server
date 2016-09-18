@@ -290,6 +290,22 @@ static void test_maintain_buildings(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_recruit(CuTest *tc) {
+    unit *u;
+    faction *f;
+
+    test_setup();
+    f = test_create_faction(0);
+    u = test_create_unit(f, test_create_region(0, 0, 0));
+    CuAssertIntEquals(tc, 1, u->number);
+    add_recruits(u, 1, 1);
+    CuAssertIntEquals(tc, 2, u->number);
+    CuAssertPtrEquals(tc, u, f->units);
+    CuAssertPtrEquals(tc, NULL, u->nextF);
+    CuAssertPtrEquals(tc, NULL, u->prevF);
+    test_cleanup();
+}
+
 CuSuite *get_economy_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -302,5 +318,6 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_heroes_dont_recruit);
     SUITE_ADD_TEST(suite, test_tax_cmd);
     SUITE_ADD_TEST(suite, test_maintain_buildings);
+    SUITE_ADD_TEST(suite, test_recruit);
     return suite;
 }
