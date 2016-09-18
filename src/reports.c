@@ -1137,6 +1137,16 @@ static void add_seen(region *r, seen_mode mode) {
 
 static void faction_add_seen(faction *f, region *r, seen_mode mode) {
     add_seen(r, mode);
+    if (mode > seen_neighbour) {
+        region *next[MAXDIRECTIONS];
+        int d;
+        get_neighbours(r, next);
+        for (d = 0; d != MAXDIRECTIONS; ++d) {
+            if (next[d] && next[d]->seen.mode<seen_neighbour) {
+                faction_add_seen(f, next[d], seen_neighbour);
+            }
+        }
+    }
 #ifdef SMART_INTERVALS
     update_interval(f, r);
 #endif
@@ -1154,16 +1164,7 @@ static void prepare_lighthouse(building * b, report_context *ctx)
     for (ql = rlist, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
         region *rl = (region *)ql_get(ql, qi);
         if (!fval(rl->terrain, FORBIDDEN_REGION)) {
-            region * next[MAXDIRECTIONS];
-            int d;
-
-            get_neighbours(rl, next);
             faction_add_seen(f, rl, seen_lighthouse);
-            for (d = 0; d != MAXDIRECTIONS; ++d) {
-                if (next[d]) {
-                    faction_add_seen(f, next[d], seen_neighbour);
-                }
-            }
         }
     }
     ql_free(rlist);

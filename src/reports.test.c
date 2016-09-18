@@ -237,7 +237,7 @@ static void test_prepare_travelthru(CuTest *tc) {
     f2 = test_create_faction(0);
     r1 = test_create_region(0, 0, 0);
     r2 = test_create_region(1, 0, 0);
-    r3 = test_create_region(2, 0, 0);
+    r3 = test_create_region(3, 0, 0);
     test_create_unit(f2, r1);
     test_create_unit(f2, r3);
     u = test_create_unit(f, r1);
@@ -253,7 +253,9 @@ static void test_prepare_travelthru(CuTest *tc) {
     CuAssertIntEquals(tc, seen_none, r2->seen.mode);
 
     prepare_report(&ctx, f2);
-    CuAssertIntEquals(tc, seen_none, r2->seen.mode);
+    CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
+    CuAssertIntEquals(tc, seen_neighbour, r2->seen.mode);
+    CuAssertIntEquals(tc, seen_unit, r3->seen.mode);
     CuAssertPtrEquals(tc, f2, ctx.f);
     CuAssertPtrEquals(tc, r1, ctx.first);
     CuAssertPtrEquals(tc, NULL, ctx.last);
@@ -295,11 +297,17 @@ void test_prepare_lighthouse_capacity(CuTest *tc) {
     prepare_report(&ctx, u1->faction);
     CuAssertPtrEquals(tc, r1, ctx.first);
     CuAssertPtrEquals(tc, NULL, ctx.last);
+    CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
+    CuAssertIntEquals(tc, seen_lighthouse, r2->seen.mode);
     finish_reports(&ctx);
+
     prepare_report(&ctx, u2->faction);
     CuAssertPtrEquals(tc, r1, ctx.first);
-    CuAssertPtrEquals(tc, r2, ctx.last);
+    CuAssertPtrEquals(tc, 0, ctx.last);
+    CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
+    CuAssertIntEquals(tc, seen_neighbour, r2->seen.mode);
     finish_reports(&ctx);
+
     test_cleanup();
 }
 
@@ -360,7 +368,7 @@ static void test_prepare_report(CuTest *tc) {
     CuAssertIntEquals(tc, seen_none, r->seen.mode);
     finish_reports(&ctx);
 
-    r = test_create_region(1, 0, 0);
+    r = test_create_region(2, 0, 0);
     CuAssertPtrEquals(tc, r, regions->next);
     prepare_report(&ctx, f);
     CuAssertPtrEquals(tc, regions, ctx.first);
