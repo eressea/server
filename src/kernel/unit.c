@@ -439,6 +439,9 @@ int remove_unit(unit ** ulist, unit * u)
         *ulist = u->next;
     }
 
+    if (u->faction && u->faction->units == u) {
+        u->faction->units = u->nextF;
+    }
     if (u->prevF) {
         u->prevF->nextF = u->nextF;
     }

@@ -244,7 +244,7 @@ static recruitment *select_recruitment(request ** rop,
     return recruits;
 }
 
-static void add_recruits(unit * u, int number, int wanted)
+void add_recruits(unit * u, int number, int wanted)
 {
     region *r = u->region;
     assert(number <= wanted);

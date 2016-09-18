@@ -405,7 +405,7 @@ static void test_unit_description(CuTest *tc) {
 
 static void test_remove_unit(CuTest *tc) {
     region *r;
-    unit *u;
+    unit *u1, *u2;
     faction *f;
     int uno;
     const resource_type *rtype;
@@ -415,19 +415,42 @@ static void test_remove_unit(CuTest *tc) {
     rtype = get_resourcetype(R_SILVER);
     r = test_create_region(0, 0, 0);
     f = test_create_faction(0);
-    u = test_create_unit(f, r);
-    uno = u->no;
+    u2 = test_create_unit(f, r);
+    u1 = test_create_unit(f, r);
+    CuAssertPtrEquals(tc, u1, f->units);
+    CuAssertPtrEquals(tc, u2, u1->nextF);
+    CuAssertPtrEquals(tc, u1, u2->prevF);
+    CuAssertPtrEquals(tc, 0, u2->nextF);
+    uno = u1->no;
     region_setresource(r, rtype, 0);
-    i_change(&u->items, rtype->itype, 100);
-    remove_unit(&r->units, u);
-    CuAssertIntEquals(tc, 100, region_getresource(r, rtype));
-    CuAssertIntEquals(tc, 0, u->number);
-    CuAssertPtrEquals(tc, 0, u->region);
-    CuAssertPtrEquals(tc, 0, u->items);
-    CuAssertPtrEquals(tc, 0, u->nextF);
-    CuAssertPtrEquals(tc, 0, r->units);
+    i_change(&u1->items, rtype->itype, 100);
+    remove_unit(&r->units, u1);
+    CuAssertIntEquals(tc, 0, u1->number);
+    CuAssertPtrEquals(tc, 0, u1->region);
+    // money is given to a survivor:
+    CuAssertPtrEquals(tc, 0, u1->items);
+    CuAssertIntEquals(tc, 0, region_getresource(r, rtype));
+    CuAssertIntEquals(tc, 100, i_get(u2->items, rtype->itype));
+
+    // unit is removed from f->units:
+    CuAssertPtrEquals(tc, 0, u1->nextF);
+    CuAssertPtrEquals(tc, u2, f->units);
+    CuAssertPtrEquals(tc, 0, u2->nextF);
+    CuAssertPtrEquals(tc, 0, u2->prevF);
+    // unit is no longer in r->units:
+    CuAssertPtrEquals(tc, u2, r->units);
+    CuAssertPtrEquals(tc, 0, u2->next);
+
+    // unit is in deleted_units:
     CuAssertPtrEquals(tc, 0, findunit(uno));
     CuAssertPtrEquals(tc, f, dfindhash(uno));
+
+    remove_unit(&r->units, u2);
+    // no survivor, give money to peasants:
+    CuAssertIntEquals(tc, 100, region_getresource(r, rtype));
+    // there are now no more units:
+    CuAssertPtrEquals(tc, 0, r->units);
+    CuAssertPtrEquals(tc, 0, f->units);
     test_cleanup();
 }
 
