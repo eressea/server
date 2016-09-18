@@ -1657,7 +1657,9 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
 
     /* traverse all regions */
     for (r = ctx->first; r != ctx->last; r = r->next) {
-        cr_output_region(F, ctx, r);
+        if (r->seen.mode > seen_none) {
+            cr_output_region(F, ctx, r);
+        }
     }
     report_crtypes(F, f->locale);
     write_translations(F);
