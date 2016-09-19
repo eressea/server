@@ -2730,6 +2730,22 @@ static int sp_firewall(castorder * co)
  *   (SPELLLEVEL | TESTCANSEE)
  */
 
+static race *unholy_race(const race *rc) {
+    race *target_race = NULL;
+    switch (old_race(rc)) {
+    case RC_SKELETON:
+        target_race = get_race(RC_SKELETON_LORD);
+        break;
+    case RC_ZOMBIE:
+        target_race = get_race(RC_ZOMBIE_LORD);
+        break;
+    case RC_GHOUL:
+        target_race = get_race(RC_GHOUL_LORD);
+        break;
+    }
+    return target_race;
+}
+
 static int sp_unholypower(castorder * co)
 {
     region * r = co_get_region(co);
@@ -2752,17 +2768,8 @@ static int sp_unholypower(castorder * co)
 
         u = pa->param[i]->data.u;
 
-        switch (old_race(u_race(u))) {
-        case RC_SKELETON:
-            target_race = get_race(RC_SKELETON_LORD);
-            break;
-        case RC_ZOMBIE:
-            target_race = get_race(RC_ZOMBIE_LORD);
-            break;
-        case RC_GHOUL:
-            target_race = get_race(RC_GHOUL_LORD);
-            break;
-        default:
+        target_race = unholy_race(u_race(u));
+        if (!target_race) {
             cmistake(mage, co->order, 284, MSG_MAGIC);
             continue;
         }
