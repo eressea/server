@@ -1279,8 +1279,12 @@ static int att_modification(const unit * u, skill_t sk)
 
     if (u->attribs) {
         curse *c;
-        const curse_type *skillmod_ct = ct_find("skillmod");
-        const curse_type *worse_ct = ct_find("worse");
+        static int cache;
+        static const curse_type *skillmod_ct, *worse_ct;
+        if (ct_changed(&cache)) {
+            skillmod_ct = ct_find("skillmod");
+            worse_ct = ct_find("worse");
+        }
         c = get_curse(u->attribs, worse_ct);
         if (c != NULL)
             result += curse_geteffect(c);
