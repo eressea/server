@@ -84,6 +84,7 @@ extern "C" {
     extern struct attrib_type at_building_action;
 
     building_type *bt_get_or_create(const char *name);
+    bool bt_changed(int *cache);
     const building_type *bt_find(const char *name);
     void free_buildingtypes(void);
     void register_buildings(void);
