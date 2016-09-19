@@ -50,11 +50,18 @@ static void test_rc_find(CuTest *tc) {
 }
 
 static void test_race_get(CuTest *tc) {
+    int cache;
     race *rc;
     test_setup();
+    CuAssertTrue(tc, rc_changed(&cache));
+    CuAssertTrue(tc, !rc_changed(&cache));
     rc = get_race(RC_ELF);
-    CuAssertPtrEquals(tc, rc, (void *)rc_find("elf"));
     CuAssertPtrEquals(tc, rc, (void *)rc_get_or_create("elf"));
+    CuAssertTrue(tc, rc_changed(&cache));
+    CuAssertTrue(tc, !rc_changed(&cache));
+    CuAssertPtrEquals(tc, rc, (void *)rc_find("elf"));
+    free_races();
+    CuAssertTrue(tc, rc_changed(&cache));
     test_cleanup();
 }
 

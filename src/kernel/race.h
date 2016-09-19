@@ -180,6 +180,7 @@ extern "C" {
     race_t old_race(const struct race *);
 
     race *rc_get_or_create(const char *name);
+    bool rc_changed(int *cache);
     const race *rc_find(const char *);
     void free_races(void);
 
