@@ -1713,7 +1713,11 @@ static void buy(unit * u, request ** buyorders, struct order *ord)
         /* ...oder in der Region muß es eine Burg geben. */
         building *b = 0;
         if (r->buildings) {
-            const struct building_type *bt_castle = bt_find("castle");
+            static int cache;
+            static const struct building_type *bt_castle;
+            if (bt_changed(&cache)) {
+                bt_castle = bt_find("castle");
+            }
 
             for (b = r->buildings; b; b = b->next) {
                 if (b->type == bt_castle && b->size >= 2) {
@@ -1799,8 +1803,14 @@ static void expandselling(region * r, request * sellorders, int limit)
     unit *hafenowner;
     static int counter[MAXLUXURIES];
     static int ncounter = 0;
-    const struct building_type *castle_bt;
+    static int bt_cache;
+    static const struct building_type *castle_bt, *harbour_bt, *caravan_bt;
 
+    if (bt_changed(&bt_cache)) {
+        castle_bt = bt_find("castle");
+        harbour_bt = bt_find("harbour");
+        caravan_bt = bt_find("caravan");
+    }
     if (ncounter == 0) {
         const luxury_type *ltype;
         for (ltype = luxurytypes; ltype; ltype = ltype->next) {
@@ -1815,7 +1825,6 @@ static void expandselling(region * r, request * sellorders, int limit)
     }
     /* Stelle Eigentümer der größten Burg fest. Bekommt Steuern aus jedem
      * Verkauf. Wenn zwei Burgen gleicher Größe bekommt gar keiner etwas. */
-    castle_bt = bt_find("castle");
     for (b = rbuildings(r); b; b = b->next) {
         if (b->size > maxsize && building_owner(b) != NULL
             && b->type == castle_bt) {
@@ -1829,7 +1838,7 @@ static void expandselling(region * r, request * sellorders, int limit)
         }
     }
 
-    hafenowner = owner_buildingtyp(r, bt_find("harbour"));
+    hafenowner = owner_buildingtyp(r, harbour_bt);
 
     if (maxb != (building *)NULL && maxowner != (unit *)NULL) {
         maxeffsize = buildingeffsize(maxb, false);
@@ -1851,7 +1860,7 @@ static void expandselling(region * r, request * sellorders, int limit)
         return;
 
     if (r->terrain == newterrain(T_DESERT)
-        && buildingtype_exists(r, bt_find("caravan"), true)) {
+        && buildingtype_exists(r, caravan_bt, true)) {
         max_products = rpeasants(r) * 2 / TRADE_FRACTION;
     }
     /* Verkauf: so programmiert, dass er leicht auf mehrere Gueter pro
@@ -1978,6 +1987,13 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
     region *r = u->region;
     const char *s;
     keyword_t kwd;
+    static int bt_cache;
+    static const struct building_type *castle_bt, *caravan_bt;
+
+    if (bt_changed(&bt_cache)) {
+        castle_bt = bt_find("castle");
+        caravan_bt = bt_find("caravan");
+    }
 
     if (u->ship && is_guarded(r, u, GUARD_CREWS)) {
         cmistake(u, ord, 69, MSG_INCOME);
@@ -1994,7 +2010,7 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
         unlimited = false;
         n = rpeasants(r) / TRADE_FRACTION;
         if (r->terrain == newterrain(T_DESERT)
-            && buildingtype_exists(r, bt_find("caravan"), true))
+            && buildingtype_exists(r, caravan_bt, true))
             n *= 2;
         if (n == 0) {
             cmistake(u, ord, 303, MSG_COMMERCE);
@@ -2027,9 +2043,8 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
         /* ...oder in der Region muß es eine Burg geben. */
         building *b = 0;
         if (r->buildings) {
-            const struct building_type *bt_castle = bt_find("castle");
             for (b = r->buildings; b; b = b->next) {
-                if (b->type == bt_castle && b->size >= 2) break;
+                if (b->type == castle_bt && b->size >= 2) break;
             }
         }
         if (!b) {
@@ -2344,9 +2359,15 @@ static void breedhorses(unit * u)
     int n, c, breed = 0;
     const struct resource_type *rhorse = get_resourcetype(R_HORSE);
     int horses, effsk;
+    static int bt_cache;
+    static const struct building_type *stables_bt;
+
+    if (bt_changed(&bt_cache)) {
+        stables_bt = bt_find("stables");
+    }
 
     assert(rhorse && rhorse->itype);
-    if (!active_building(u, bt_find("stables"))) {
+    if (!active_building(u, stables_bt)) {
         cmistake(u, u->thisorder, 122, MSG_PRODUCE);
         return;
     }
@@ -3083,6 +3104,13 @@ void produce(struct region *r)
     unit *u;
     bool limited = true;
     request *nextworker = workers;
+    static int bt_cache;
+    static const struct building_type *caravan_bt;
+
+    if (bt_changed(&bt_cache)) {
+        caravan_bt = bt_find("caravan");
+    }
+
     assert(r);
 
     /* das sind alles befehle, die 30 tage brauchen, und die in thisorder
@@ -3232,7 +3260,7 @@ void produce(struct region *r)
     if (sellorders) {
         int limit = rpeasants(r) / TRADE_FRACTION;
         if (r->terrain == newterrain(T_DESERT)
-            && buildingtype_exists(r, bt_find("caravan"), true))
+            && buildingtype_exists(r, caravan_bt, true))
             limit *= 2;
         expandselling(r, sellorders, limited ? limit : INT_MAX);
     }

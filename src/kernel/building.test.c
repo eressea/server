@@ -17,16 +17,20 @@
 static void test_register_building(CuTest * tc)
 {
     building_type *btype;
+    int cache = 0;
 
     test_cleanup();
 
     btype = (building_type *)calloc(sizeof(building_type), 1);
     btype->_name = _strdup("herp");
+    CuAssertIntEquals(tc, true, bt_changed(&cache));
+    CuAssertIntEquals(tc, false, bt_changed(&cache));
     bt_register(btype);
+    CuAssertIntEquals(tc, true, bt_changed(&cache));
 
     CuAssertPtrNotNull(tc, bt_find("herp"));
-    //    free(btype->_name);
-    //    free(btype);
+    free_buildingtypes();
+    CuAssertIntEquals(tc, true, bt_changed(&cache));
     test_cleanup();
 }
 
