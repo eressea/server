@@ -75,30 +75,15 @@ static const char *racenames[MAXRACES] = {
     "clone"
 };
 
-static race * race_cache[MAXRACES];
-
 struct race *get_race(race_t rt) {
-    static int cache = -1;
     const char * name;
-    race * result = 0;
 
     assert(rt < MAXRACES);
     name = racenames[rt];
     if (!name) {
-        return 0;
+        return NULL;
     }
-    if (cache_breaker != cache) {
-        cache = cache_breaker;
-        memset(race_cache, 0, sizeof(race_cache));
-        return race_cache[rt] = rc_get_or_create(name);
-    }
-    else {
-        result = race_cache[rt];
-        if (!result) {
-            result = race_cache[rt] = rc_get_or_create(name);
-        }
-    }
-    return result;
+    return rc_get_or_create(name);
 }
 
 race_list *get_familiarraces(void)
