@@ -1502,7 +1502,7 @@ static int sp_create_irongolem(castorder * co)
     double force = co->force;
     int number = lovar(force * 8 * RESOURCE_QUANTITY);
     static int cache;
-    const race * golem_rc;
+    static const race * golem_rc;
     
     if (rc_changed(&cache)) {
         golem_rc = rc_find("irongolem");
@@ -1570,7 +1570,8 @@ static int sp_create_stonegolem(castorder * co)
     unit *mage = co->magician.u;
     int cast_level = co->level;
     int number = lovar(co->force * 5 * RESOURCE_QUANTITY);
-    const race * golem_rc;
+    static int cache;
+    static const race * golem_rc;
     
     if (rc_changed(&cache)) {
         golem_rc = rc_find("stonegolem");
