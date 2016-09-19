@@ -1501,16 +1501,23 @@ static int sp_create_irongolem(castorder * co)
     int cast_level = co->level;
     double force = co->force;
     int number = lovar(force * 8 * RESOURCE_QUANTITY);
-    if (number < 1)
+    static int cache;
+    race * golem_rc;
+    
+    if (rc_changed(&cache)) {
+        golem_rc = rc_find("irongolem");
+    }
+    
+    if (number < 1) {
         number = 1;
+    }
 
     if (r->terrain == newterrain(T_SWAMP)) {
         cmistake(mage, co->order, 188, MSG_MAGIC);
         return 0;
     }
 
-    u2 =
-        create_unit(r, mage->faction, number, rc_find("irongolem"), 0, NULL, mage);
+    u2 = create_unit(r, mage->faction, number, golem_rc, 0, NULL, mage);
 
     set_level(u2, SK_ARMORER, 1);
     set_level(u2, SK_WEAPONSMITH, 1);
@@ -1523,7 +1530,7 @@ static int sp_create_irongolem(castorder * co)
     ADDMSG(&mage->faction->msgs,
         msg_message("magiccreate_effect", "region command unit amount object",
         mage->region, co->order, mage, number,
-        LOC(mage->faction->locale, rc_name_s(rc_find("irongolem"), (u2->number == 1) ? NAME_SINGULAR : NAME_PLURAL))));
+        LOC(mage->faction->locale, rc_name_s(golem_rc, (u2->number == 1) ? NAME_SINGULAR : NAME_PLURAL))));
 
     return cast_level;
 }
