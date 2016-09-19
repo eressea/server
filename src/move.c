@@ -1473,7 +1473,7 @@ static int movement_speed(unit * u)
         return BP_DRAGON;
     }
     switch (old_race(u_race(u))) {
-    case RC_BIRTHDAYDRAGON:
+    case RC_BIRTHDAYDRAGON: // FIXME: catdragon has RCF_DRAGON, so this cannot happen
     case RC_SONGDRAGON:
         mp = BP_DRAGON;
         break;

@@ -54,8 +54,7 @@ static void create_monsters(faction **player, faction **monsters, unit **u, unit
     *monsters = get_or_create_monsters();
     assert(rc_find((*monsters)->race->_name));
     rc = rc_get_or_create((*monsters)->race->_name);
-    fset(rc, RCF_UNARMEDGUARD);
-    fset(rc, RCF_NPC);
+    fset(rc, RCF_UNARMEDGUARD|RCF_NPC|RCF_DRAGON);
     fset(*monsters, FFL_NOIDLEOUT);
     assert(fval(*monsters, FFL_NPC) && fval((*monsters)->race, RCF_UNARMEDGUARD) && fval((*monsters)->race, RCF_NPC) && fval(*monsters, FFL_NOIDLEOUT));
 
