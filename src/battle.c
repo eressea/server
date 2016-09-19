@@ -1037,31 +1037,33 @@ static int rc_specialdamage(const unit *au, const unit *du, const struct weapon_
 {
     const race *ar = u_race(au);
     int m, modifier = 0;
-
-    switch (old_race(ar)) {
-    case RC_HALFLING:
-        if (wtype != NULL && dragonrace(u_race(du))) {
-            modifier += 5;
+    if (wtype != NULL) {
+        if (fval(u_race(du), RCF_DRAGON)) {
+            static int cache;
+            static race *rc_halfling;
+            if (rc_changed(&cache)) {
+                rc_halfling = get_race(RC_HALFLING);
+            }
+            if (ar == rc_halfling) {
+                modifier += 5;
+            }
         }
-        break;
-    default:
-        break;
-    }
-    if (wtype != NULL && wtype->modifiers != NULL) {
-        for (m = 0; wtype->modifiers[m].value; ++m) {
-            /* weapon damage for this weapon, possibly by race */
-            if (wtype->modifiers[m].flags & WMF_DAMAGE) {
-                race_list *rlist = wtype->modifiers[m].races;
-                if (rlist != NULL) {
-                    while (rlist) {
-                        if (rlist->data == ar)
-                            break;
-                        rlist = rlist->next;
+        if (wtype->modifiers != NULL) {
+            for (m = 0; wtype->modifiers[m].value; ++m) {
+                /* weapon damage for this weapon, possibly by race */
+                if (wtype->modifiers[m].flags & WMF_DAMAGE) {
+                    race_list *rlist = wtype->modifiers[m].races;
+                    if (rlist != NULL) {
+                        while (rlist) {
+                            if (rlist->data == ar)
+                                break;
+                            rlist = rlist->next;
+                        }
+                        if (rlist == NULL)
+                            continue;
                     }
-                    if (rlist == NULL)
-                        continue;
+                    modifier += wtype->modifiers[m].value;
                 }
-                modifier += wtype->modifiers[m].value;
             }
         }
     }

@@ -83,6 +83,7 @@ static void eaten_by_monster(unit * u)
         multi = RESOURCE_QUANTITY * newterrain(T_PLAIN)->size / 10000.0;
     }
 
+    // TODO: do not hard-code, make it a race property or callback? it's already RCF_KILLPEASANTS
     switch (old_race(u_race(u))) {
     case RC_FIREDRAGON:
         n = rng_int() % 80 * u->number;
@@ -118,12 +119,7 @@ static void eaten_by_monster(unit * u)
 
 static void absorbed_by_monster(unit * u)
 {
-    int n;
-
-    switch (old_race(u_race(u))) {
-    default:
-        n = rng_int() % (u->number / 20 + 1);
-    }
+    int n = rng_int() % (u->number / 20 + 1);
 
     if (n > 0) {
         n = lovar(n);

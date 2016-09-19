@@ -9,7 +9,7 @@
 
 static void test_rc_name(CuTest *tc) {
     struct race *rc;
-    test_cleanup();
+    test_setup();
     rc = test_create_race("human");
     CuAssertStrEquals(tc, "race::human", rc_name_s(rc, NAME_SINGULAR));
     CuAssertStrEquals(tc, "race::human_p", rc_name_s(rc, NAME_PLURAL));
@@ -20,7 +20,7 @@ static void test_rc_name(CuTest *tc) {
 
 static void test_rc_defaults(CuTest *tc) {
     struct race *rc;
-    test_cleanup();
+    test_setup();
     rc = rc_get_or_create("human");
     CuAssertStrEquals(tc, "human", rc->_name);
     CuAssertDblEquals(tc, 0.0, rc->magres, 0.0);
@@ -43,15 +43,32 @@ static void test_rc_defaults(CuTest *tc) {
 
 static void test_rc_find(CuTest *tc) {
     race *rc;
-    test_cleanup();
+    test_setup();
     rc = test_create_race("hungryhippos");
     CuAssertPtrEquals(tc, rc, (void *)rc_find("hungryhippos"));
+    test_cleanup();
+}
+
+static void test_race_get(CuTest *tc) {
+    int cache = 0;
+    race *rc;
+    test_setup();
+    CuAssertTrue(tc, rc_changed(&cache));
+    CuAssertTrue(tc, !rc_changed(&cache));
+    rc = get_race(RC_ELF);
+    CuAssertPtrEquals(tc, rc, (void *)rc_get_or_create("elf"));
+    CuAssertTrue(tc, rc_changed(&cache));
+    CuAssertTrue(tc, !rc_changed(&cache));
+    CuAssertPtrEquals(tc, rc, (void *)rc_find("elf"));
+    free_races();
+    CuAssertTrue(tc, rc_changed(&cache));
     test_cleanup();
 }
 
 CuSuite *get_race_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_race_get);
     SUITE_ADD_TEST(suite, test_rc_name);
     SUITE_ADD_TEST(suite, test_rc_defaults);
     SUITE_ADD_TEST(suite, test_rc_find);

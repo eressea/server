@@ -1465,16 +1465,15 @@ static void make_route(unit * u, order * ord, region_list ** routep)
 static int movement_speed(unit * u)
 {
     int mp = BP_WALKING;
-    double dk = u_race(u)->speed;
-
+    const race *rc = u_race(u);
+    double dk = rc->speed;
     assert(u->number);
     /* dragons have a fixed speed, and no other effects work on them: */
-    switch (old_race(u_race(u))) {
-    case RC_DRAGON:
-    case RC_WYRM:
-    case RC_FIREDRAGON:
+    if (fval(rc, RCF_DRAGON)) {
         return BP_DRAGON;
-    case RC_BIRTHDAYDRAGON:
+    }
+    switch (old_race(u_race(u))) {
+    case RC_BIRTHDAYDRAGON: // FIXME: catdragon has RCF_DRAGON, so this cannot happen
     case RC_SONGDRAGON:
         mp = BP_DRAGON;
         break;

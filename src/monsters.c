@@ -380,20 +380,15 @@ static order *monster_move(region * r, unit * u)
     if (monster_is_waiting(u)) {
         return NULL;
     }
-    switch (old_race(u_race(u))) {
-    case RC_FIREDRAGON:
-    case RC_DRAGON:
-    case RC_WYRM:
+    if (fval(u_race(u), RCF_DRAGON)) {
         d = richest_neighbour(r, u->faction, 1);
-        break;
-    case RC_TREEMAN:
-        d = treeman_neighbour(r);
-        break;
-    default:
-        d = random_neighbour(r, u);
-        break;
     }
-
+    else if (get_race(RC_TREEMAN)==u_race(u)) {
+        d = treeman_neighbour(r);
+    }
+    else {
+        d = random_neighbour(r, u);
+    }
     /* falls kein geld gefunden wird, zufaellig verreisen, aber nicht in
      * den ozean */
 
@@ -489,65 +484,6 @@ static order *make_movement_order(unit * u, const region * target, int moves,
     *bufp = 0;
     return parse_order(zOrder, u->faction->locale);
 }
-
-#ifdef TODO_ALP
-static order *monster_seeks_target(region * r, unit * u)
-{
-    direction_t d;
-    unit *target = NULL;
-    int dist, dist2;
-    direction_t i;
-    region *nr;
-
-    /* Das Monster sucht ein bestimmtes Opfer. Welches, steht
-     * in einer Referenz/attribut
-     * derzeit gibt es nur den alp
-     */
-
-    switch (old_race(u_race(u))) {
-    case RC_ALP:
-        target = alp_target(u);
-        break;
-    default:
-        assert(!"Seeker-Monster gibt kein Ziel an");
-    }
-
-    /* TODO: prüfen, ob target überhaupt noch existiert... */
-    if (!target) {
-        log_error("Monster '%s' hat kein Ziel!\n", unitname(u));
-        return NULL;                /* this is a bug workaround! remove!! */
-    }
-
-    if (r == target->region) {    /* Wir haben ihn! */
-        if (u_race(u) == get_race(RC_ALP)) {
-            alp_findet_opfer(u, r);
-        } else {
-            assert(!"Seeker-Monster hat keine Aktion fuer Ziel");
-        }
-        return NULL;
-    }
-
-    /* Simpler Ansatz: Nachbarregion mit gerinster Distanz suchen.
-     * Sinnvoll momentan nur bei Monstern, die sich nicht um das
-     * Terrain kümmern.  Nebelwände & Co machen derzeit auch nix...
-     */
-    dist2 = distance(r, target->region);
-    d = NODIRECTION;
-    for (i = 0; i < MAXDIRECTIONS; i++) {
-        nr = rconnect(r, i);
-        assert(nr);
-        dist = distance(nr, target->region);
-        if (dist < dist2) {
-            dist2 = dist;
-            d = i;
-        }
-    }
-    assert(d != NODIRECTION);
-
-    return create_order(K_MOVE, u->faction->locale, "%s",
-        LOC(u->faction->locale, directions[d]));
-}
-#endif
 
 void random_growl(const unit *u, region *target, int rand)
 {
@@ -657,6 +593,13 @@ static order *plan_dragon(unit * u)
     region *tr = NULL;
     bool move = false;
     order *long_order = NULL;
+    static int rc_cache;
+    static const race *rc_wyrm;
+    const race * rc = u_race(u);
+
+    if (rc_changed(&rc_cache)) {
+        rc_wyrm = get_race(RC_WYRM);
+    }
 
     if (ta == NULL) {
         move |= (rpeasants(r) == 0);   /* when no peasants, move */
@@ -664,7 +607,7 @@ static order *plan_dragon(unit * u)
     }
     move |= chance(0.04);         /* 4% chance to change your mind */
 
-    if (u_race(u) == get_race(RC_WYRM) && !move) {
+    if (rc == rc_wyrm && !move) {
         unit *u2;
         for (u2 = r->units; u2; u2 = u2->next) {
             /* wyrme sind einzelgänger */
@@ -694,18 +637,21 @@ static order *plan_dragon(unit * u)
     }
     if (tr != NULL) {
         assert(long_order == NULL);
-        switch (old_race(u_race(u))) {
-        case RC_FIREDRAGON:
-            long_order = make_movement_order(u, tr, 4, allowed_dragon);
-            break;
-        case RC_DRAGON:
-            long_order = make_movement_order(u, tr, 3, allowed_dragon);
-            break;
-        case RC_WYRM:
+        // TODO: per-race planning functions?
+        if (rc == rc_wyrm) {
             long_order = make_movement_order(u, tr, 1, allowed_dragon);
-            break;
-        default:
-            break;
+        }
+        else {
+            switch (old_race(rc)) {
+            case RC_FIREDRAGON:
+                long_order = make_movement_order(u, tr, 4, allowed_dragon);
+                break;
+            case RC_DRAGON:
+                long_order = make_movement_order(u, tr, 3, allowed_dragon);
+                break;
+            default:
+                break;
+            }
         }
         if (long_order) {
             reduce_weight(u);
@@ -757,6 +703,7 @@ void plan_monsters(faction * f)
         bool attacking = chance(attack_chance);
 
         for (u = r->units; u; u = u->next) {
+            const race *rc = u_race(u);
             attrib *ta;
             order *long_order = NULL;
 
@@ -812,7 +759,7 @@ void plan_monsters(faction * f)
                         a_remove(&u->attribs, ta);
                     }
                 }
-                else if (u_race(u)->flags & RCF_MOVERANDOM) {
+                else if (rc->flags & RCF_MOVERANDOM) {
                     if (chance(random_move_chance()) || check_overpopulated(u)) {
                         long_order = monster_move(r, u);
                     }
@@ -826,31 +773,24 @@ void plan_monsters(faction * f)
                     handle_event(u->attribs, "ai_move", u);
                 }
 
-                switch (old_race(u_race(u))) {
-                case RC_SEASERPENT:
-                    long_order = create_order(K_PIRACY, f->locale, NULL);
-                    break;
-#ifdef TODO_ALP
-                case RC_ALP:
-                    long_order = monster_seeks_target(r, u);
-                    break;
-#endif
-                case RC_FIREDRAGON:
-                case RC_DRAGON:
-                case RC_WYRM:
+                if (fval(rc, RCF_DRAGON)) {
                     long_order = plan_dragon(u);
-                    break;
-                default:
-                    if (u_race(u)->flags & RCF_LEARN) {
-                        long_order = monster_learn(u);
+                }
+                else {
+                    if (rc == get_race(RC_SEASERPENT)) {
+                        long_order = create_order(K_PIRACY, f->locale, NULL);
                     }
-                    break;
+                    else {
+                        if (rc->flags & RCF_LEARN) {
+                            long_order = monster_learn(u);
+                        }
+                    }
                 }
             }
             if (long_order == NULL && unit_can_study(u)) {
                 /* Einheiten, die Waffenlosen Kampf lernen könnten, lernen es um
                 * zu bewachen: */
-                if (u_race(u)->bonus[SK_WEAPONLESS] != -99) {
+                if (rc->bonus[SK_WEAPONLESS] != -99) {
                     if (effskill(u, SK_WEAPONLESS, 0) < 1) {
                         long_order =
                             create_order(K_STUDY, f->locale, "'%s'",

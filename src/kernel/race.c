@@ -59,7 +59,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /** external variables **/
 race *races;
 int num_races = 0;
-static int cache_breaker;
+static int rc_changes = 1;
 
 static const char *racenames[MAXRACES] = {
     "dwarf", "elf", NULL, "goblin", "human", "troll", "demon", "insect",
@@ -75,30 +75,15 @@ static const char *racenames[MAXRACES] = {
     "clone"
 };
 
-static race * race_cache[MAXRACES];
-
 struct race *get_race(race_t rt) {
-    static int cache = -1;
     const char * name;
-    race * result = 0;
 
     assert(rt < MAXRACES);
     name = racenames[rt];
     if (!name) {
-        return 0;
+        return NULL;
     }
-    if (cache_breaker != cache) {
-        cache = cache_breaker;
-        memset(race_cache, 0, sizeof(race_cache));
-        return race_cache[rt] = rc_get_or_create(name);
-    }
-    else {
-        result = race_cache[rt];
-        if (!result) {
-            result = race_cache[rt] = rc_get_or_create(name);
-        }
-    }
-    return result;
+    return rc_get_or_create(name);
 }
 
 race_list *get_familiarraces(void)
@@ -147,6 +132,7 @@ void free_races(void) {
         races = rc;
     }
     num_races = 0;
+    ++rc_changes;
 }
 
 static race *rc_find_i(const char *name)
@@ -166,6 +152,15 @@ static race *rc_find_i(const char *name)
 
 const race * rc_find(const char *name) {
     return rc_find_i(name);
+}
+
+bool rc_changed(int *cache) {
+    assert(cache);
+    if (*cache != rc_changes) {
+        *cache = rc_changes;
+        return true;
+    }
+    return false;
 }
 
 race *rc_get_or_create(const char *zName)
@@ -195,7 +190,7 @@ race *rc_get_or_create(const char *zName)
         for (i = 1; i < RACE_ATTACKS; ++i)
             rc->attack[i].type = AT_NONE;
         rc->index = num_races++;
-        ++cache_breaker;
+        ++rc_changes;
         rc->next = races;
         return races = rc;
     }

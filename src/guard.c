@@ -67,28 +67,34 @@ void update_guards(void)
 
 unsigned int guard_flags(const unit * u)
 {
+    // TODO: this should be a property of the race, like race.guard_flags
+    static int rc_cache;
+    static race *rc_elf, *rc_ent, *rc_ironkeeper;
+    const race *rc = u_race(u);
     unsigned int flags =
         GUARD_CREWS | GUARD_LANDING | GUARD_TRAVELTHRU | GUARD_TAX;
+    // TODO: configuration, not define
 #if GUARD_DISABLES_PRODUCTION == 1
     flags |= GUARD_PRODUCE;
 #endif
 #if GUARD_DISABLES_RECRUIT == 1
     flags |= GUARD_RECRUIT;
 #endif
-    switch (old_race(u_race(u))) {
-    case RC_ELF:
-        if (u->faction->race != u_race(u))
-            break;
-        /* else fallthrough */
-    case RC_TREEMAN:
+    if (rc_changed(&rc_cache)) {
+        rc_elf = get_race(RC_ELF);
+        rc_ent = get_race(RC_TREEMAN);
+        rc_ironkeeper = get_race(RC_IRONKEEPER);
+    }
+    if (rc == rc_elf) {
+        if (u->faction->race == u_race(u)) {
+            flags |= GUARD_TREES;
+        }
+    }
+    else if (rc == rc_ent) {
         flags |= GUARD_TREES;
-        break;
-    case RC_IRONKEEPER:
+    }
+    else if (rc == rc_ironkeeper) {
         flags = GUARD_MINING;
-        break;
-    default:
-        /* TODO: This should be configuration variables, all of it */
-        break;
     }
     return flags;
 }

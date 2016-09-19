@@ -114,16 +114,20 @@ static void recruit_init(void)
 
 int income(const unit * u)
 {
-    switch (old_race(u_race(u))) {
-    case RC_FIREDRAGON:
-        return 150 * u->number;
-    case RC_DRAGON:
-        return 1000 * u->number;
-    case RC_WYRM:
-        return 5000 * u->number;
-    default:
-        return 20 * u->number;
+    // TODO: make this a property, like race.income, no hard-coding of values
+    if (fval(u_race(u), RCF_DRAGON)) {
+        switch (old_race(u_race(u))) {
+        case RC_FIREDRAGON:
+            return 150 * u->number;
+        case RC_DRAGON:
+            return 1000 * u->number;
+        case RC_WYRM:
+            return 5000 * u->number;
+        default:
+            break;
+        }
     }
+    return 20 * u->number;
 }
 
 static void scramble(void *data, unsigned int n, size_t width)
@@ -478,7 +482,7 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
 
     init_order(ord);
     n = getint();
-    if (n<=0) {
+    if (n <= 0) {
         syntax_error(u, ord);
         return;
     }
@@ -796,7 +800,7 @@ static int maintain(building * b)
 
             cost -=
                 use_pooled(u, m->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
-                cost);
+                    cost);
             assert(cost == 0);
         }
         if (work) {
@@ -815,7 +819,7 @@ void maintain_buildings(region * r)
     while (*bp) {
         building *b = *bp;
         int flags = BLD_MAINTAINED;
-        
+
         if (!curse_active(get_curse(b->attribs, nocost_ct))) {
             flags = maintain(b);
         }
@@ -929,12 +933,12 @@ static void manufacture(unit * u, const item_type * itype, int want)
     case EBUILDINGREQ:
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "building_needed", "building",
-            itype->construction->btype->_name));
+                itype->construction->btype->_name));
         return;
     case ELOWSKILL:
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "manufacture_skills",
-            "skill minskill product", sk, minskill, itype->rtype, 1));
+                "skill minskill product", sk, minskill, itype->rtype, 1));
         return;
     case ENOMATERIALS:
         ADDMSG(&u->faction->msgs, msg_materials_required(u, u->thisorder,
@@ -1077,8 +1081,8 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
         skill_t sk = itype->construction->skill;
         add_message(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "manufacture_skills",
-            "skill minskill product", sk, itype->construction->minskill,
-            itype->rtype));
+                "skill minskill product", sk, itype->construction->minskill,
+                itype->rtype));
         return;
     }
     else {
@@ -1276,7 +1280,7 @@ attrib_allocation(const resource_type * rtype, region * r, allocation * alist)
 }
 
 typedef void(*allocate_function) (const resource_type *, struct region *,
-struct allocation *);
+    struct allocation *);
 
 static allocate_function get_allocator(const struct resource_type *rtype)
 {
@@ -1345,7 +1349,7 @@ static void create_potion(unit * u, const potion_type * ptype, int want)
     case EBUILDINGREQ:
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "building_needed", "building",
-            ptype->itype->construction->btype->_name));
+                ptype->itype->construction->btype->_name));
         break;
     case ECOMPLETE:
         assert(0);
@@ -1687,7 +1691,7 @@ static void buy(unit * u, request ** buyorders, struct order *ord)
     kwd = init_order(ord);
     assert(kwd == K_BUY);
     n = getint();
-    if (n<=0) {
+    if (n <= 0) {
         cmistake(u, ord, 26, MSG_COMMERCE);
         return;
     }
@@ -2082,7 +2086,7 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
          * produktion, wo für jedes produkt einzeln eine obere limite
          * existiert, so dass man arrays von orders machen kann. */
 
-        /* Ein Händler kann nur 10 Güter pro Talentpunkt handeln. */
+         /* Ein Händler kann nur 10 Güter pro Talentpunkt handeln. */
         k = u->number * 10 * effskill(u, SK_TRADE, 0);
 
         /* hat der Händler bereits gehandelt, muss die Menge der bereits
@@ -2188,7 +2192,7 @@ static void plant(unit * u, int raw)
     if (skill < 6) {
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "plant_skills",
-            "skill minskill product", SK_HERBALISM, 6, itype->rtype, 1));
+                "skill minskill product", SK_HERBALISM, 6, itype->rtype, 1));
         return;
     }
     /* Wasser des Lebens prüfen */
@@ -2202,7 +2206,7 @@ static void plant(unit * u, int raw)
     if (n == 0) {
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "resource_missing", "missing",
-            itype->rtype));
+                itype->rtype));
         return;
     }
 
@@ -2218,7 +2222,7 @@ static void plant(unit * u, int raw)
     /* Alles ok. Abziehen. */
     use_pooled(u, rt_water, GET_DEFAULT, 1);
     use_pooled(u, itype->rtype, GET_DEFAULT, n);
-    rsetherbs(r, (short) (rherbs(r) + planted));
+    rsetherbs(r, (short)(rherbs(r) + planted));
     ADDMSG(&u->faction->msgs, msg_message("plant", "unit region amount herb",
         u, r, planted, itype->rtype));
 }
@@ -2241,13 +2245,13 @@ static void planttrees(unit * u, int raw)
     if (skill < 6) {
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "plant_skills",
-            "skill minskill product", SK_HERBALISM, 6, rtype, 1));
+                "skill minskill product", SK_HERBALISM, 6, rtype, 1));
         return;
     }
     if (fval(r, RF_MALLORN) && skill < 7) {
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "plant_skills",
-            "skill minskill product", SK_HERBALISM, 7, rtype, 1));
+                "skill minskill product", SK_HERBALISM, 7, rtype, 1));
         return;
     }
 
@@ -2284,7 +2288,7 @@ static void breedtrees(unit * u, int raw)
     int current_season;
     region *r = u->region;
     gamedate date;
-    
+
     get_gamedate(turn, &date);
     current_season = date.season;
 
@@ -2536,7 +2540,7 @@ static void steal_cmd(unit * u, struct order *ord, request ** stealorders)
         return;
     }
     id = read_unitid(u->faction, r);
-    if (id>0) {
+    if (id > 0) {
         u2 = findunitr(r, id);
     }
     if (u2 && u2->region == u->region) {
