@@ -924,8 +924,12 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
     int esize = 0;
     double wage;
     attrib *a;
-    const struct curse_type *ctype;
+    static int ct_cache;
+    static const struct curse_type *drought_ct;
 
+    if (ct_changed(&ct_cache)) {
+        drought_ct = ct_find("drought");
+    }
     if (b != NULL) {
         /* TODO: this reveals imaginary castles */
         esize = buildingeffsize(b, false);
@@ -970,9 +974,8 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
     }
 
     /* Bei einer Dürre verdient man nur noch ein Viertel  */
-    ctype = ct_find("drought");
-    if (ctype) {
-        curse *c = get_curse(r->attribs, ctype);
+    if (drought_ct) {
+        curse *c = get_curse(r->attribs, drought_ct);
         if (curse_active(c))
             wage /= curse_geteffect(c);
     }
