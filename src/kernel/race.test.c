@@ -50,7 +50,7 @@ static void test_rc_find(CuTest *tc) {
 }
 
 static void test_race_get(CuTest *tc) {
-    int cache;
+    int cache = 0;
     race *rc;
     test_setup();
     CuAssertTrue(tc, rc_changed(&cache));
