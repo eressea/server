@@ -2742,6 +2742,8 @@ static race *unholy_race(const race *rc) {
     case RC_GHOUL:
         target_race = get_race(RC_GHOUL_LORD);
         break;
+    default:
+        target_race = NULL;
     }
     return target_race;
 }

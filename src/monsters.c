@@ -380,20 +380,15 @@ static order *monster_move(region * r, unit * u)
     if (monster_is_waiting(u)) {
         return NULL;
     }
-    switch (old_race(u_race(u))) {
-    case RC_FIREDRAGON:
-    case RC_DRAGON:
-    case RC_WYRM:
+    if (fval(u_race(u), RCF_DRAGON)) {
         d = richest_neighbour(r, u->faction, 1);
-        break;
-    case RC_TREEMAN:
-        d = treeman_neighbour(r);
-        break;
-    default:
-        d = random_neighbour(r, u);
-        break;
     }
-
+    else if (get_race(RC_TREEMAN)==u_race(u)) {
+        d = treeman_neighbour(r);
+    }
+    else {
+        d = random_neighbour(r, u);
+    }
     /* falls kein geld gefunden wird, zufaellig verreisen, aber nicht in
      * den ozean */
 
