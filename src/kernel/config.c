@@ -140,6 +140,7 @@ int NMRTimeout(void)
 race_t old_race(const struct race * rc)
 {
     race_t i;
+    // TODO: this sucks so bad!
     for (i = 0; i != MAXRACES; ++i) {
         if (get_race(i) == rc)  return i;
     }
