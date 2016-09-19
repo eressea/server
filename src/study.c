@@ -94,6 +94,9 @@ magic_t getmagicskill(const struct locale * lang)
 /* familiars and toads are not migrants */
 bool is_migrant(unit * u)
 {
+    static int cache;
+    static race *toad_rc;
+
     if (u_race(u) == u->faction->race)
         return false;
 
@@ -101,16 +104,21 @@ bool is_migrant(unit * u)
         return false;
     if (is_familiar(u))
         return false;
-    if (u_race(u) == get_race(RC_TOAD))
-        return false;
-
-    return true;
+    if (rc_changed(&cache)) {
+        toad_rc = get_race(RC_TOAD);
+    }
+    return u_race(u) != toad_rc;
 }
 
 /* ------------------------------------------------------------- */
 bool magic_lowskill(unit * u)
 {
-    return (u_race(u) == get_race(RC_TOAD)) ? true : false;
+    static race *toad_rc;
+    static int cache;
+    if (rc_changed(&cache)) {
+        toad_rc = get_race(RC_TOAD);
+    }
+    return u_race(u) == toad_rc;
 }
 
 /* ------------------------------------------------------------- */

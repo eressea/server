@@ -1501,16 +1501,23 @@ static int sp_create_irongolem(castorder * co)
     int cast_level = co->level;
     double force = co->force;
     int number = lovar(force * 8 * RESOURCE_QUANTITY);
-    if (number < 1)
+    static int cache;
+    static const race * golem_rc;
+    
+    if (rc_changed(&cache)) {
+        golem_rc = rc_find("irongolem");
+    }
+    
+    if (number < 1) {
         number = 1;
+    }
 
     if (r->terrain == newterrain(T_SWAMP)) {
         cmistake(mage, co->order, 188, MSG_MAGIC);
         return 0;
     }
 
-    u2 =
-        create_unit(r, mage->faction, number, rc_find("irongolem"), 0, NULL, mage);
+    u2 = create_unit(r, mage->faction, number, golem_rc, 0, NULL, mage);
 
     set_level(u2, SK_ARMORER, 1);
     set_level(u2, SK_WEAPONSMITH, 1);
@@ -1523,7 +1530,7 @@ static int sp_create_irongolem(castorder * co)
     ADDMSG(&mage->faction->msgs,
         msg_message("magiccreate_effect", "region command unit amount object",
         mage->region, co->order, mage, number,
-        LOC(mage->faction->locale, rc_name_s(rc_find("irongolem"), (u2->number == 1) ? NAME_SINGULAR : NAME_PLURAL))));
+        LOC(mage->faction->locale, rc_name_s(golem_rc, (u2->number == 1) ? NAME_SINGULAR : NAME_PLURAL))));
 
     return cast_level;
 }
@@ -1563,6 +1570,12 @@ static int sp_create_stonegolem(castorder * co)
     unit *mage = co->magician.u;
     int cast_level = co->level;
     int number = lovar(co->force * 5 * RESOURCE_QUANTITY);
+    static int cache;
+    static const race * golem_rc;
+    
+    if (rc_changed(&cache)) {
+        golem_rc = rc_find("stonegolem");
+    }
     if (number < 1)
         number = 1;
 
@@ -1572,7 +1585,7 @@ static int sp_create_stonegolem(castorder * co)
     }
 
     u2 =
-        create_unit(r, mage->faction, number, rc_find("stonegolem"), 0, NULL, mage);
+        create_unit(r, mage->faction, number, golem_rc, 0, NULL, mage);
     set_level(u2, SK_ROAD_BUILDING, 1);
     set_level(u2, SK_BUILDING, 1);
 
@@ -1584,7 +1597,7 @@ static int sp_create_stonegolem(castorder * co)
     ADDMSG(&mage->faction->msgs,
         msg_message("magiccreate_effect", "region command unit amount object",
         mage->region, co->order, mage, number,
-        LOC(mage->faction->locale, rc_name_s(rc_find("stonegolem"), (u2->number == 1) ? NAME_SINGULAR : NAME_PLURAL))));
+        LOC(mage->faction->locale, rc_name_s(golem_rc, (u2->number == 1) ? NAME_SINGULAR : NAME_PLURAL))));
 
     return cast_level;
 }
@@ -2717,6 +2730,26 @@ static int sp_firewall(castorder * co)
  *   (SPELLLEVEL | TESTCANSEE)
  */
 
+static race *unholy_race(const race *rc) {
+    static int cache;
+    static race * rc_skeleton, *rc_zombie, *rc_ghoul;
+    if (rc_changed(&cache)) {
+        rc_skeleton = get_race(RC_SKELETON);
+        rc_zombie = get_race(RC_ZOMBIE);
+        rc_ghoul = get_race(RC_GHOUL);
+    }
+    if (rc == rc_skeleton) {
+        return get_race(RC_SKELETON_LORD);
+    }
+    if (rc == rc_zombie) {
+        return get_race(RC_ZOMBIE_LORD);
+    }
+    if (rc == rc_ghoul) {
+        return get_race(RC_GHOUL_LORD);
+    }
+    return NULL;
+}
+
 static int sp_unholypower(castorder * co)
 {
     region * r = co_get_region(co);
@@ -2739,17 +2772,8 @@ static int sp_unholypower(castorder * co)
 
         u = pa->param[i]->data.u;
 
-        switch (old_race(u_race(u))) {
-        case RC_SKELETON:
-            target_race = get_race(RC_SKELETON_LORD);
-            break;
-        case RC_ZOMBIE:
-            target_race = get_race(RC_ZOMBIE_LORD);
-            break;
-        case RC_GHOUL:
-            target_race = get_race(RC_GHOUL_LORD);
-            break;
-        default:
+        target_race = unholy_race(u_race(u));
+        if (!target_race) {
             cmistake(mage, co->order, 284, MSG_MAGIC);
             continue;
         }

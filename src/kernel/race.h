@@ -180,6 +180,7 @@ extern "C" {
     race_t old_race(const struct race *);
 
     race *rc_get_or_create(const char *name);
+    bool rc_changed(int *cache);
     const race *rc_find(const char *);
     void free_races(void);
 
@@ -243,7 +244,7 @@ extern "C" {
 #define omniscient(f) ((f)->race==get_race(RC_ILLUSION) || (f)->race==get_race(RC_TEMPLATE))
 
 #define playerrace(rc) (!fval((rc), RCF_NPC))
-#define dragonrace(rc) ((rc) == get_race(RC_FIREDRAGON) || (rc) == get_race(RC_DRAGON) || (rc) == get_race(RC_WYRM) || (rc) == get_race(RC_BIRTHDAYDRAGON))
+#define dragonrace(rc) (fval(rc, RCF_DRAGON))
 #define humanoidrace(rc) (fval((rc), RCF_UNDEAD) || (rc)==get_race(RC_DRACOID) || playerrace(rc))
 #define illusionaryrace(rc) (fval(rc, RCF_ILLUSIONARY))
 

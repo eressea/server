@@ -3464,7 +3464,7 @@ static int use_item(unit * u, const item_type * itype, int amount, struct order 
 static double heal_factor(const unit * u)
 {
     double elf_regen;
-
+    // TODO: do not hard-code, make this a property, race.healing
     switch (old_race(u_race(u))) {
     case RC_TROLL:
     case RC_DAEMON:

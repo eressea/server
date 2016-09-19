@@ -118,7 +118,7 @@ damage_unit(unit * u, const char *dam, bool physical, bool magic)
             heiltrank = 0;
 
             /* Sieben Leben */
-            if (old_race(u_race(u)) == RC_CAT && (chance(1.0 / 7))) {
+            if (u_race(u) == get_race(RC_CAT) && (chance(1.0 / 7))) {
                 hp[i] = u->hp / u->number;
                 hp_rem += hp[i];
                 continue;

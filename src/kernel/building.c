@@ -83,15 +83,28 @@ const building_type *bt_find(const char *name)
     return bt_find_i(name);
 }
 
+static int bt_changes = 1;
+
+bool bt_changed(int *cache)
+{
+    assert(cache);
+    if (*cache != bt_changes) {
+        *cache = bt_changes;
+        return true;
+    }
+    return false;
+}
+
 void bt_register(building_type * type)
 {
     if (type->init) {
         type->init(type);
     }
     ql_push(&buildingtypes, (void *)type);
+    ++bt_changes;
 }
 
-void free_buildingtype(void *ptr) {
+static void free_buildingtype(void *ptr) {
     building_type *btype = (building_type *)ptr;
     free_construction(btype->construction);
     free(btype->maintenance);
@@ -103,6 +116,7 @@ void free_buildingtypes(void) {
     ql_foreach(buildingtypes, free_buildingtype);
     ql_free(buildingtypes);
     buildingtypes = 0;
+    ++bt_changes;
 }
 
 building_type *bt_get_or_create(const char *name)

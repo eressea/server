@@ -114,16 +114,20 @@ static void recruit_init(void)
 
 int income(const unit * u)
 {
-    switch (old_race(u_race(u))) {
-    case RC_FIREDRAGON:
-        return 150 * u->number;
-    case RC_DRAGON:
-        return 1000 * u->number;
-    case RC_WYRM:
-        return 5000 * u->number;
-    default:
-        return 20 * u->number;
+    // TODO: make this a property, like race.income, no hard-coding of values
+    if (fval(u_race(u), RCF_DRAGON)) {
+        switch (old_race(u_race(u))) {
+        case RC_FIREDRAGON:
+            return 150 * u->number;
+        case RC_DRAGON:
+            return 1000 * u->number;
+        case RC_WYRM:
+            return 5000 * u->number;
+        default:
+            break;
+        }
     }
+    return 20 * u->number;
 }
 
 static void scramble(void *data, unsigned int n, size_t width)
@@ -478,7 +482,7 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
 
     init_order(ord);
     n = getint();
-    if (n<=0) {
+    if (n <= 0) {
         syntax_error(u, ord);
         return;
     }
@@ -796,7 +800,7 @@ static int maintain(building * b)
 
             cost -=
                 use_pooled(u, m->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
-                cost);
+                    cost);
             assert(cost == 0);
         }
         if (work) {
@@ -815,7 +819,7 @@ void maintain_buildings(region * r)
     while (*bp) {
         building *b = *bp;
         int flags = BLD_MAINTAINED;
-        
+
         if (!curse_active(get_curse(b->attribs, nocost_ct))) {
             flags = maintain(b);
         }
@@ -929,12 +933,12 @@ static void manufacture(unit * u, const item_type * itype, int want)
     case EBUILDINGREQ:
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "building_needed", "building",
-            itype->construction->btype->_name));
+                itype->construction->btype->_name));
         return;
     case ELOWSKILL:
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "manufacture_skills",
-            "skill minskill product", sk, minskill, itype->rtype, 1));
+                "skill minskill product", sk, minskill, itype->rtype, 1));
         return;
     case ENOMATERIALS:
         ADDMSG(&u->faction->msgs, msg_materials_required(u, u->thisorder,
@@ -1077,8 +1081,8 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
         skill_t sk = itype->construction->skill;
         add_message(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "manufacture_skills",
-            "skill minskill product", sk, itype->construction->minskill,
-            itype->rtype));
+                "skill minskill product", sk, itype->construction->minskill,
+                itype->rtype));
         return;
     }
     else {
@@ -1276,7 +1280,7 @@ attrib_allocation(const resource_type * rtype, region * r, allocation * alist)
 }
 
 typedef void(*allocate_function) (const resource_type *, struct region *,
-struct allocation *);
+    struct allocation *);
 
 static allocate_function get_allocator(const struct resource_type *rtype)
 {
@@ -1345,7 +1349,7 @@ static void create_potion(unit * u, const potion_type * ptype, int want)
     case EBUILDINGREQ:
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "building_needed", "building",
-            ptype->itype->construction->btype->_name));
+                ptype->itype->construction->btype->_name));
         break;
     case ECOMPLETE:
         assert(0);
@@ -1687,7 +1691,7 @@ static void buy(unit * u, request ** buyorders, struct order *ord)
     kwd = init_order(ord);
     assert(kwd == K_BUY);
     n = getint();
-    if (n<=0) {
+    if (n <= 0) {
         cmistake(u, ord, 26, MSG_COMMERCE);
         return;
     }
@@ -1709,7 +1713,11 @@ static void buy(unit * u, request ** buyorders, struct order *ord)
         /* ...oder in der Region muß es eine Burg geben. */
         building *b = 0;
         if (r->buildings) {
-            const struct building_type *bt_castle = bt_find("castle");
+            static int cache;
+            static const struct building_type *bt_castle;
+            if (bt_changed(&cache)) {
+                bt_castle = bt_find("castle");
+            }
 
             for (b = r->buildings; b; b = b->next) {
                 if (b->type == bt_castle && b->size >= 2) {
@@ -1795,8 +1803,14 @@ static void expandselling(region * r, request * sellorders, int limit)
     unit *hafenowner;
     static int counter[MAXLUXURIES];
     static int ncounter = 0;
-    const struct building_type *castle_bt;
+    static int bt_cache;
+    static const struct building_type *castle_bt, *harbour_bt, *caravan_bt;
 
+    if (bt_changed(&bt_cache)) {
+        castle_bt = bt_find("castle");
+        harbour_bt = bt_find("harbour");
+        caravan_bt = bt_find("caravan");
+    }
     if (ncounter == 0) {
         const luxury_type *ltype;
         for (ltype = luxurytypes; ltype; ltype = ltype->next) {
@@ -1811,7 +1825,6 @@ static void expandselling(region * r, request * sellorders, int limit)
     }
     /* Stelle Eigentümer der größten Burg fest. Bekommt Steuern aus jedem
      * Verkauf. Wenn zwei Burgen gleicher Größe bekommt gar keiner etwas. */
-    castle_bt = bt_find("castle");
     for (b = rbuildings(r); b; b = b->next) {
         if (b->size > maxsize && building_owner(b) != NULL
             && b->type == castle_bt) {
@@ -1825,7 +1838,7 @@ static void expandselling(region * r, request * sellorders, int limit)
         }
     }
 
-    hafenowner = owner_buildingtyp(r, bt_find("harbour"));
+    hafenowner = owner_buildingtyp(r, harbour_bt);
 
     if (maxb != (building *)NULL && maxowner != (unit *)NULL) {
         maxeffsize = buildingeffsize(maxb, false);
@@ -1847,7 +1860,7 @@ static void expandselling(region * r, request * sellorders, int limit)
         return;
 
     if (r->terrain == newterrain(T_DESERT)
-        && buildingtype_exists(r, bt_find("caravan"), true)) {
+        && buildingtype_exists(r, caravan_bt, true)) {
         max_products = rpeasants(r) * 2 / TRADE_FRACTION;
     }
     /* Verkauf: so programmiert, dass er leicht auf mehrere Gueter pro
@@ -1974,6 +1987,13 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
     region *r = u->region;
     const char *s;
     keyword_t kwd;
+    static int bt_cache;
+    static const struct building_type *castle_bt, *caravan_bt;
+
+    if (bt_changed(&bt_cache)) {
+        castle_bt = bt_find("castle");
+        caravan_bt = bt_find("caravan");
+    }
 
     if (u->ship && is_guarded(r, u, GUARD_CREWS)) {
         cmistake(u, ord, 69, MSG_INCOME);
@@ -1990,7 +2010,7 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
         unlimited = false;
         n = rpeasants(r) / TRADE_FRACTION;
         if (r->terrain == newterrain(T_DESERT)
-            && buildingtype_exists(r, bt_find("caravan"), true))
+            && buildingtype_exists(r, caravan_bt, true))
             n *= 2;
         if (n == 0) {
             cmistake(u, ord, 303, MSG_COMMERCE);
@@ -2023,9 +2043,8 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
         /* ...oder in der Region muß es eine Burg geben. */
         building *b = 0;
         if (r->buildings) {
-            const struct building_type *bt_castle = bt_find("castle");
             for (b = r->buildings; b; b = b->next) {
-                if (b->type == bt_castle && b->size >= 2) break;
+                if (b->type == castle_bt && b->size >= 2) break;
             }
         }
         if (!b) {
@@ -2082,7 +2101,7 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
          * produktion, wo für jedes produkt einzeln eine obere limite
          * existiert, so dass man arrays von orders machen kann. */
 
-        /* Ein Händler kann nur 10 Güter pro Talentpunkt handeln. */
+         /* Ein Händler kann nur 10 Güter pro Talentpunkt handeln. */
         k = u->number * 10 * effskill(u, SK_TRADE, 0);
 
         /* hat der Händler bereits gehandelt, muss die Menge der bereits
@@ -2188,7 +2207,7 @@ static void plant(unit * u, int raw)
     if (skill < 6) {
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "plant_skills",
-            "skill minskill product", SK_HERBALISM, 6, itype->rtype, 1));
+                "skill minskill product", SK_HERBALISM, 6, itype->rtype, 1));
         return;
     }
     /* Wasser des Lebens prüfen */
@@ -2202,7 +2221,7 @@ static void plant(unit * u, int raw)
     if (n == 0) {
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "resource_missing", "missing",
-            itype->rtype));
+                itype->rtype));
         return;
     }
 
@@ -2218,7 +2237,7 @@ static void plant(unit * u, int raw)
     /* Alles ok. Abziehen. */
     use_pooled(u, rt_water, GET_DEFAULT, 1);
     use_pooled(u, itype->rtype, GET_DEFAULT, n);
-    rsetherbs(r, (short) (rherbs(r) + planted));
+    rsetherbs(r, (short)(rherbs(r) + planted));
     ADDMSG(&u->faction->msgs, msg_message("plant", "unit region amount herb",
         u, r, planted, itype->rtype));
 }
@@ -2241,13 +2260,13 @@ static void planttrees(unit * u, int raw)
     if (skill < 6) {
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "plant_skills",
-            "skill minskill product", SK_HERBALISM, 6, rtype, 1));
+                "skill minskill product", SK_HERBALISM, 6, rtype, 1));
         return;
     }
     if (fval(r, RF_MALLORN) && skill < 7) {
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "plant_skills",
-            "skill minskill product", SK_HERBALISM, 7, rtype, 1));
+                "skill minskill product", SK_HERBALISM, 7, rtype, 1));
         return;
     }
 
@@ -2284,7 +2303,7 @@ static void breedtrees(unit * u, int raw)
     int current_season;
     region *r = u->region;
     gamedate date;
-    
+
     get_gamedate(turn, &date);
     current_season = date.season;
 
@@ -2340,9 +2359,15 @@ static void breedhorses(unit * u)
     int n, c, breed = 0;
     const struct resource_type *rhorse = get_resourcetype(R_HORSE);
     int horses, effsk;
+    static int bt_cache;
+    static const struct building_type *stables_bt;
+
+    if (bt_changed(&bt_cache)) {
+        stables_bt = bt_find("stables");
+    }
 
     assert(rhorse && rhorse->itype);
-    if (!active_building(u, bt_find("stables"))) {
+    if (!active_building(u, stables_bt)) {
         cmistake(u, u->thisorder, 122, MSG_PRODUCE);
         return;
     }
@@ -2536,7 +2561,7 @@ static void steal_cmd(unit * u, struct order *ord, request ** stealorders)
         return;
     }
     id = read_unitid(u->faction, r);
-    if (id>0) {
+    if (id > 0) {
         u2 = findunitr(r, id);
     }
     if (u2 && u2->region == u->region) {
@@ -3079,6 +3104,13 @@ void produce(struct region *r)
     unit *u;
     bool limited = true;
     request *nextworker = workers;
+    static int bt_cache;
+    static const struct building_type *caravan_bt;
+
+    if (bt_changed(&bt_cache)) {
+        caravan_bt = bt_find("caravan");
+    }
+
     assert(r);
 
     /* das sind alles befehle, die 30 tage brauchen, und die in thisorder
@@ -3228,7 +3260,7 @@ void produce(struct region *r)
     if (sellorders) {
         int limit = rpeasants(r) / TRADE_FRACTION;
         if (r->terrain == newterrain(T_DESERT)
-            && buildingtype_exists(r, bt_find("caravan"), true))
+            && buildingtype_exists(r, caravan_bt, true))
             limit *= 2;
         expandselling(r, sellorders, limited ? limit : INT_MAX);
     }

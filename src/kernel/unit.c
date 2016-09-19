@@ -1279,8 +1279,12 @@ static int att_modification(const unit * u, skill_t sk)
 
     if (u->attribs) {
         curse *c;
-        const curse_type *skillmod_ct = ct_find("skillmod");
-        const curse_type *worse_ct = ct_find("worse");
+        static int cache;
+        static const curse_type *skillmod_ct, *worse_ct;
+        if (ct_changed(&cache)) {
+            skillmod_ct = ct_find("skillmod");
+            worse_ct = ct_find("worse");
+        }
         c = get_curse(u->attribs, worse_ct);
         if (c != NULL)
             result += curse_geteffect(c);
@@ -1729,7 +1733,11 @@ int unit_max_hp(const unit * u)
 
     /* der healing curse veraendert die maximalen hp */
     if (u->region && u->region->attribs) {
-        const curse_type *heal_ct = ct_find("healingzone");
+        static int cache;
+        static const curse_type *heal_ct;
+        if (ct_changed(&cache)) {
+            heal_ct = ct_find("healingzone");
+        }
         if (heal_ct) {
             curse *c = get_curse(u->region->attribs, heal_ct);
             if (c) {
