@@ -1502,7 +1502,7 @@ static int sp_create_irongolem(castorder * co)
     double force = co->force;
     int number = lovar(force * 8 * RESOURCE_QUANTITY);
     static int cache;
-    race * golem_rc;
+    const race * golem_rc;
     
     if (rc_changed(&cache)) {
         golem_rc = rc_find("irongolem");
@@ -1570,6 +1570,11 @@ static int sp_create_stonegolem(castorder * co)
     unit *mage = co->magician.u;
     int cast_level = co->level;
     int number = lovar(co->force * 5 * RESOURCE_QUANTITY);
+    const race * golem_rc;
+    
+    if (rc_changed(&cache)) {
+        golem_rc = rc_find("stonegolem");
+    }
     if (number < 1)
         number = 1;
 
@@ -1579,7 +1584,7 @@ static int sp_create_stonegolem(castorder * co)
     }
 
     u2 =
-        create_unit(r, mage->faction, number, rc_find("stonegolem"), 0, NULL, mage);
+        create_unit(r, mage->faction, number, golem_rc, 0, NULL, mage);
     set_level(u2, SK_ROAD_BUILDING, 1);
     set_level(u2, SK_BUILDING, 1);
 
@@ -1591,7 +1596,7 @@ static int sp_create_stonegolem(castorder * co)
     ADDMSG(&mage->faction->msgs,
         msg_message("magiccreate_effect", "region command unit amount object",
         mage->region, co->order, mage, number,
-        LOC(mage->faction->locale, rc_name_s(rc_find("stonegolem"), (u2->number == 1) ? NAME_SINGULAR : NAME_PLURAL))));
+        LOC(mage->faction->locale, rc_name_s(golem_rc, (u2->number == 1) ? NAME_SINGULAR : NAME_PLURAL))));
 
     return cast_level;
 }
