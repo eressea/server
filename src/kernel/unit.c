@@ -1733,7 +1733,11 @@ int unit_max_hp(const unit * u)
 
     /* der healing curse veraendert die maximalen hp */
     if (u->region && u->region->attribs) {
-        const curse_type *heal_ct = ct_find("healingzone");
+        static int cache;
+        static const curse_type *heal_ct;
+        if (ct_changed(&cache)) {
+            heal_ct = ct_find("healingzone");
+        }
         if (heal_ct) {
             curse *c = get_curse(u->region->attribs, heal_ct);
             if (c) {
