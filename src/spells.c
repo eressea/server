@@ -2731,21 +2731,23 @@ static int sp_firewall(castorder * co)
  */
 
 static race *unholy_race(const race *rc) {
-    race *target_race = NULL;
-    switch (old_race(rc)) {
-    case RC_SKELETON:
-        target_race = get_race(RC_SKELETON_LORD);
-        break;
-    case RC_ZOMBIE:
-        target_race = get_race(RC_ZOMBIE_LORD);
-        break;
-    case RC_GHOUL:
-        target_race = get_race(RC_GHOUL_LORD);
-        break;
-    default:
-        target_race = NULL;
+    static int cache;
+    static race * rc_skeleton, *rc_zombie, *rc_ghoul;
+    if (rc_changed(&cache)) {
+        rc_skeleton = get_race(RC_SKELETON);
+        rc_zombie = get_race(RC_ZOMBIE);
+        rc_ghoul = get_race(RC_GHOUL);
     }
-    return target_race;
+    if (rc == rc_skeleton) {
+        return get_race(RC_SKELETON_LORD);
+    }
+    if (rc == rc_zombie) {
+        return get_race(RC_ZOMBIE_LORD);
+    }
+    if (rc == rc_ghoul) {
+        return get_race(RC_GHOUL_LORD);
+    }
+    return NULL;
 }
 
 static int sp_unholypower(castorder * co)
