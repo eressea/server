@@ -291,6 +291,17 @@ attrib_type at_curse = {
 
 #define MAXCTHASH 128
 static quicklist *cursetypes[MAXCTHASH];
+static int ct_changes = 1;
+
+bool ct_changed(int *cache)
+{
+    assert(cache);
+    if (*cache != ct_changes) {
+        *cache = ct_changes;
+        return true;
+    }
+    return false;
+}
 
 void ct_register(const curse_type * ct)
 {
@@ -298,6 +309,27 @@ void ct_register(const curse_type * ct)
     quicklist **ctlp = cursetypes + hash;
 
     ql_set_insert(ctlp, (void *)ct);
+    ++ct_changes;
+}
+
+void ct_remove(const char *c)
+{
+    unsigned int hash = tolower(c[0]);
+    quicklist *ctl = cursetypes[hash];
+
+    if (ctl) {
+        int qi;
+
+        for (qi = 0; ctl; ql_advance(&ctl, &qi, 1)) {
+            curse_type *type = (curse_type *)ql_get(ctl, qi);
+
+            if (strcmp(c, type->cname) == 0) {
+                ql_delete(&ctl, qi);
+                ++ct_changes;
+                break;
+            }
+        }
+    }
 }
 
 const curse_type *ct_find(const char *c)
@@ -798,5 +830,7 @@ void curses_done(void) {
     int i;
     for (i = 0; i != MAXCTHASH; ++i) {
         ql_free(cursetypes[i]);
+        cursetypes[i] = 0;
     }
+    ++ct_changes;
 }
