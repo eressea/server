@@ -717,7 +717,7 @@
     <attack type="4" damage="1d6"/>
     <attack type="1" damage="1d5"/>
   </race>
-  <race name="catdragon" magres="0.900000" maxaura="1.000000" regaura="1.000000" recruitcost="500000" weight="20000" capacity="10000" speed="1.000000" hp="20" damage="2d40" unarmedattack="0" unarmeddefense="0" defensemodifier="50" fly="yes" walk="yes" teach="no" shapeshift="yes" giveperson="yes" getitem="yes">
+  <race name="catdragon" magres="0.900000" maxaura="1.000000" regaura="1.000000" recruitcost="500000" weight="20000" capacity="10000" speed="1.000000" hp="20" damage="2d40" unarmedattack="0" unarmeddefense="0" defensemodifier="50" fly="yes" walk="yes" teach="no" shapeshift="yes" giveperson="yes" getitem="yes" dragon="yes">
     <ai splitsize="1"/>
     <attack type="4" damage="2d40"/>
     <attack type="4" damage="2d40"/>
