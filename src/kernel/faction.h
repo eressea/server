@@ -33,9 +33,6 @@ extern "C" {
     struct gamedata;
     
     extern struct attrib_type at_maxmagicians;
-    /* SMART_INTERVALS: define to speed up finding the interval of regions that a
-       faction is in. defining this speeds up the turn by 30-40% */
-#define SMART_INTERVALS
 
     /* faction flags */
 #define FFL_NEWID (1<<0)        /* Die Partei hat bereits einmal ihre no gewechselt */
@@ -57,10 +54,8 @@ extern "C" {
         struct faction *next;
         struct faction *nexthash;
 
-#ifdef SMART_INTERVALS
         struct region *first;
         struct region *last;
-#endif
         int no;
         int subscription;
         int flags;
@@ -138,9 +133,7 @@ extern "C" {
     void free_factions(void);
     void remove_empty_factions(void);
 
-#ifdef SMART_INTERVALS
     void update_interval(struct faction *f, struct region *r);
-#endif
 
     const char *faction_getbanner(const struct faction *self);
     void faction_setbanner(struct faction *self, const char *name);

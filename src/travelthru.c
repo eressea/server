@@ -80,12 +80,10 @@ void travelthru_add(region * r, unit * u)
     ql_push(&ql, u);
     a->data.v = ql;
 
-#ifdef SMART_INTERVALS
     /* the first and last region of the faction gets reset, because travelthrough
     * could be in regions that are located before the [first, last] interval,
     * and recalculation is needed */
     update_interval(u->faction, r);
-#endif
 }
 
 bool travelthru_cansee(const struct region *r, const struct faction *f, const struct unit *u) {

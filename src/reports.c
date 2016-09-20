@@ -1147,9 +1147,7 @@ static void faction_add_seen(faction *f, region *r, seen_mode mode) {
             }
         }
     }
-#ifdef SMART_INTERVALS
     update_interval(f, r);
-#endif
 }
 
 /** mark all regions seen by the lighthouse.
@@ -1270,16 +1268,11 @@ void reorder_units(region * r)
 
 static region *lastregion(faction * f)
 {
-#ifdef SMART_INTERVALS
     return f->last ? f->last->next : NULL;
-#else
-    return NULL;
-#endif
 }
 
 static region *firstregion(faction * f)
 {
-#ifdef SMART_INTERVALS
     region *r = f->first;
 
     if (f->units == NULL)
@@ -1288,9 +1281,6 @@ static region *firstregion(faction * f)
         return r;
 
     return f->first = regions;
-#else
-    return regions;
-#endif
 }
 
 static void cb_add_seen(region *r, unit *u, void *cbdata) {
