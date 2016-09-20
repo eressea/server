@@ -64,6 +64,8 @@ attrib_type at_travelunit = {
 */
 void travelthru_add(region * r, unit * u)
 {
+    region *next[MAXDIRECTIONS];
+    int d;
     attrib *a;
     quicklist *ql;
 
@@ -84,6 +86,10 @@ void travelthru_add(region * r, unit * u)
     * could be in regions that are located before the [first, last] interval,
     * and recalculation is needed */
     update_interval(u->faction, r);
+    get_neighbours(r, next);
+    for (d=0;d!=MAXDIRECTIONS;++d) {
+        update_interval(u->faction, next[d]);
+    }
 }
 
 bool travelthru_cansee(const struct region *r, const struct faction *f, const struct unit *u) {
