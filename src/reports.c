@@ -20,7 +20,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "reports.h"
 #include "laws.h"
-#include "seen.h"
 #include "travelthru.h"
 #include "lighthouse.h"
 #include "donations.h"
@@ -368,10 +367,9 @@ const char **illusion)
 }
 
 int
-report_resources(const seen_region * sr, resource_report * result, int size,
-const faction * viewer)
+report_resources(const region * r, resource_report * result, int size,
+const faction * viewer, bool see_unit)
 {
-    const region *r = sr->r;
     int n = 0;
 
     if (r->land) {
@@ -416,7 +414,7 @@ const faction * viewer)
         }
     }
 
-    if (sr->mode >= see_unit) {
+    if (see_unit) {
         rawmaterial *res = r->resources;
         while (res) {
             int maxskill = 0;
@@ -452,14 +450,14 @@ const faction * viewer)
 }
 
 int
-bufunit(const faction * f, const unit * u, unsigned int indent, int mode, char *buf,
+bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, char *buf,
 size_t size)
 {
     int i, dh;
     int getarnt = fval(u, UFL_ANON_FACTION);
     const char *pzTmp, *str;
     building *b;
-    bool isbattle = (bool)(mode == see_battle);
+    bool isbattle = (bool)(mode == seen_battle);
     item *itm, *show = NULL;
     faction *fv = visible_faction(f, u);
     char *bufp = buf;
@@ -596,7 +594,7 @@ size_t size)
     if (f == u->faction || omniscient(f)) {
         show = u->items;
     }
-    else if (mode >= see_unit) {
+    else if (mode >= seen_unit) {
         int n = report_items(u, results, MAX_INVENTORY, u, f);
         assert(n >= 0);
         if (n > 0) {
@@ -890,7 +888,7 @@ void lparagraph(struct strlist **SP, char *s, unsigned int indent, char mark)
 
 void
 spunit(struct strlist **SP, const struct faction *f, const unit * u, unsigned int indent,
-int mode)
+seen_mode mode)
 {
     char buf[DISPLAYSIZE];
     int dh = bufunit(f, u, indent, mode, buf, sizeof(buf));
@@ -929,15 +927,15 @@ const struct unit *ucansee(const struct faction *f, const struct unit *u,
     return x;
 }
 
-int stealth_modifier(int seen_mode)
+int stealth_modifier(seen_mode mode)
 {
-    switch (seen_mode) {
-    case see_unit:
+    switch (mode) {
+    case seen_unit:
         return 0;
-    case see_far:
-    case see_lighthouse:
+    case seen_far:
+    case seen_lighthouse:
         return -2;
-    case see_travel:
+    case seen_travel:
         return -1;
     default:
         return INT_MIN;
@@ -1003,7 +1001,6 @@ static void add_travelthru_addresses(region *r, faction *f, quicklist **flist, i
 static void get_addresses(report_context * ctx)
 {
     /* "TODO: travelthru" */
-    seen_region *sr = NULL;
     region *r;
     const faction *lastf = NULL;
     quicklist *flist = 0;
@@ -1022,14 +1019,13 @@ static void get_addresses(report_context * ctx)
     }
 
     /* find the first region that this faction can see */
-    for (r = ctx->first; sr == NULL && r != ctx->last; r = r->next) {
-        sr = find_seen(ctx->f->seen, r);
+    for (r = ctx->first; r != ctx->last; r = r->next) {
+        if (r->seen.mode > seen_none) break;
     }
 
-    for (; sr != NULL; sr = sr->next) {
-        int stealthmod = stealth_modifier(sr->mode);
-        r = sr->r;
-        if (sr->mode == see_lighthouse) {
+    for (; r != NULL; r = r->next) {
+        int stealthmod = stealth_modifier(r->seen.mode);
+        if (r->seen.mode == seen_lighthouse) {
             unit *u = r->units;
             for (; u; u = u->next) {
                 faction *sf = visible_faction(ctx->f, u);
@@ -1042,12 +1038,12 @@ static void get_addresses(report_context * ctx)
                 }
             }
         }
-        else if (sr->mode == see_travel) {
+        else if (r->seen.mode == seen_travel) {
             /* when we travel through a region, then we must add
              * the factions of any units we saw */
             add_travelthru_addresses(r, ctx->f, &flist, stealthmod);
         }
-        else if (sr->mode > see_travel) {
+        else if (r->seen.mode > seen_travel) {
             const unit *u = r->units;
             while (u != NULL) {
                 if (u->faction != ctx->f) {
@@ -1133,26 +1129,34 @@ static quicklist *get_regions_distance(region * root, int radius)
     return rlist;
 }
 
-void view_default(struct seen_region **seen, region * r, faction * f)
-{
-    int dir;
-    for (dir = 0; dir != MAXDIRECTIONS; ++dir) {
-        region *r2 = rconnect(r, dir);
-        if (r2) {
-            connection *b = get_borders(r, r2);
-            while (b) {
-                if (!b->type->transparent(b, f))
-                    break;
-                b = b->next;
-            }
-            if (!b)
-                add_seen(seen, r2, see_neighbour, false);
-        }
+static void add_seen(region *r, seen_mode mode) {
+    if (r->seen.mode < mode) {
+        r->seen.mode = mode;
     }
 }
 
-static void prepare_lighthouse(building * b, faction * f)
+static void faction_add_seen(faction *f, region *r, seen_mode mode) {
+    add_seen(r, mode);
+    if (mode > seen_neighbour) {
+        region *next[MAXDIRECTIONS];
+        int d;
+        get_neighbours(r, next);
+        for (d = 0; d != MAXDIRECTIONS; ++d) {
+            if (next[d] && next[d]->seen.mode<seen_neighbour) {
+                faction_add_seen(f, next[d], seen_neighbour);
+            }
+        }
+    }
+#ifdef SMART_INTERVALS
+    update_interval(f, r);
+#endif
+}
+
+/** mark all regions seen by the lighthouse.
+ */
+static void prepare_lighthouse(building * b, report_context *ctx)
 {
+    faction *f = ctx->f;
     int range = lighthouse_range(b, f);
     quicklist *ql, *rlist = get_regions_distance(b->region, range);
     int qi;
@@ -1160,16 +1164,7 @@ static void prepare_lighthouse(building * b, faction * f)
     for (ql = rlist, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
         region *rl = (region *)ql_get(ql, qi);
         if (!fval(rl->terrain, FORBIDDEN_REGION)) {
-            region * next[MAXDIRECTIONS];
-            int d;
-
-            get_neighbours(rl, next);
-            faction_add_seen(f, rl, see_lighthouse);
-            for (d = 0; d != MAXDIRECTIONS; ++d) {
-                if (next[d]) {
-                    faction_add_seen(f, next[d], see_neighbour);
-                }
-            }
+            faction_add_seen(f, rl, seen_lighthouse);
         }
     }
     ql_free(rlist);
@@ -1273,109 +1268,10 @@ void reorder_units(region * r)
     }
 }
 
-static void cb_add_seen(region *r, unit *u, void *cbdata) {
-    unused_arg(cbdata);
-    if (u->faction) {
-        faction_add_seen(u->faction, r, see_travel);
-    }
-}
-
-static void prepare_reports(void)
-{
-    region *r;
-    faction *f;
-    building *b;
-    const struct building_type *bt_lighthouse = bt_find("lighthouse");
-
-    for (f = factions; f; f = f->next) {
-        if (f->seen) seen_done(f->seen);
-        f->seen = seen_init();
-    }
-
-    for (r = regions; r; r = r->next) {
-        unit *u;
-
-        reorder_units(r);
-
-        /* Region owner get always the Lighthouse report */
-        if (bt_lighthouse && config_token("rules.region_owner_pay_building", bt_lighthouse->_name)) {
-            for (b = rbuildings(r); b; b = b->next) {
-                if (b && b->type == bt_lighthouse) {
-                    u = building_owner(b);
-                    if (u) {
-                        prepare_lighthouse(b, u->faction);
-                        if (u_race(u) != get_race(RC_SPELL) || u->number == RS_FARVISION) {
-                            seen_region *sr = faction_add_seen(u->faction, r, see_unit);
-                            if (fval(u, UFL_DISBELIEVES)) {
-                                sr->disbelieves = true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        for (u = r->units; u; u = u->next) {
-            b = u->building;
-            if (b && b->type == bt_lighthouse && inside_building(u)) {
-                /* we are in a lighthouse. add the regions we can see from here! */
-                prepare_lighthouse(b, u->faction);
-            }
-
-            if (u_race(u) != get_race(RC_SPELL) || u->number == RS_FARVISION) {
-                seen_region *sr = faction_add_seen(u->faction, r, see_unit);
-                if (fval(u, UFL_DISBELIEVES)) {
-                    sr->disbelieves = true;
-                }
-            }
-        }
-
-
-        if (fval(r, RF_TRAVELUNIT)) {
-            travelthru_map(r, cb_add_seen, r);
-        }
-    }
-}
-
-static void cb_set_last(region *r, unit *u, void *cbdata) {
-    faction *f = (faction *)cbdata;
-    if (u->faction == f) {
-        f->last = r;
-    }
-}
-
 static region *lastregion(faction * f)
 {
 #ifdef SMART_INTERVALS
-    unit *u = f->units;
-    region *r = f->last;
-
-    if (u == NULL)
-        return NULL;
-    if (r != NULL)
-        return r->next;
-
-    /* it is safe to start in the region of the first unit. */
-    f->last = u->region;
-    /* if regions have indices, we can skip ahead: */
-    for (u = u->nextF; u != NULL; u = u->nextF) {
-        r = u->region;
-        if (r->index > f->last->index)
-            f->last = r;
-    }
-
-    /* we continue from the best region and look for travelthru etc. */
-    for (r = f->last->next; r; r = r->next) {
-        /* search the region for travelthru-attributes: */
-        if (fval(r, RF_TRAVELUNIT)) {
-            travelthru_map(r, cb_set_last, f);
-        }
-        if (f->last == r)
-            continue;
-        if (check_leuchtturm(r, f))
-            f->last = r;
-    }
-    return f->last->next;
+    return f->last ? f->last->next : NULL;
 #else
     return NULL;
 #endif
@@ -1397,38 +1293,89 @@ static region *firstregion(faction * f)
 #endif
 }
 
-static void cb_view_neighbours(seen_region *sr, void *cbdata) {
+static void cb_add_seen(region *r, unit *u, void *cbdata) {
     faction *f = (faction *)cbdata;
-    if (sr->mode > see_neighbour) {
-        region *r = sr->r;
-        view_default(f->seen, r, f);
+    if (u->faction==f) {
+        faction_add_seen(f, r, seen_travel);
     }
 }
 
-void prepare_seen(faction *f)
+/** set region.seen based on visibility by one faction.
+ *
+ * this function may also update ctx->last and ctx->first for potential 
+ * lighthouses and travelthru reports
+ */
+void prepare_report(report_context *ctx, faction *f)
 {
     region *r;
-    struct seen_region *sr;
+    building *b;
+    static int config;
+    static bool rule_region_owners;
+    const struct building_type *bt_lighthouse = bt_find("lighthouse");
 
-    for (r = f->first, sr = NULL; sr == NULL && r != f->last; r = r->next) {
-        sr = find_seen(f->seen, r);
+    if (bt_lighthouse && config_changed(&config)) {
+        rule_region_owners = config_token("rules.region_owner_pay_building", bt_lighthouse->_name);
     }
 
-    seenhash_map(f->seen, cb_view_neighbours, f);
-    get_seen_interval(f->seen, &f->first, &f->last);
-    link_seen(f->seen, f->first, f->last);
-}
-
-static void prepare_report(struct report_context *ctx, faction *f)
-{
-    assert(f->seen);
-    prepare_seen(f);
     ctx->f = f;
     ctx->report_time = time(NULL);
     ctx->addresses = NULL;
     ctx->userdata = NULL;
+    // [first,last) interval of regions with a unit in it:
     ctx->first = firstregion(f);
     ctx->last = lastregion(f);
+
+    for (r = ctx->first; r!=ctx->last; r = r->next) {
+        unit *u;
+
+        if (fval(r, RF_LIGHTHOUSE)) {
+            /* region owners get the report from lighthouses */
+            if (rule_region_owners && bt_lighthouse) {
+                for (b = rbuildings(r); b; b = b->next) {
+                    if (b && b->type == bt_lighthouse) {
+                        u = building_owner(b);
+                        if (u && u->faction==f) {
+                            prepare_lighthouse(b, ctx);
+                            if (u_race(u) != get_race(RC_SPELL) || u->number == RS_FARVISION) {
+                                faction_add_seen(f, r, seen_unit);
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+        for (u = r->units; u; u = u->next) {
+            if (u->faction==f) {
+                if (u_race(u) != get_race(RC_SPELL) || u->number == RS_FARVISION) {
+                    faction_add_seen(f, r, seen_unit);
+                }
+                if (fval(r, RF_LIGHTHOUSE)) {
+                    if (u->building && u->building->type == bt_lighthouse && inside_building(u)) {
+                        /* we are in a lighthouse. add the regions we can see from here! */
+                        prepare_lighthouse(u->building, ctx);
+                    }
+                }
+            }
+        }
+
+        if (fval(r, RF_TRAVELUNIT)) {
+            travelthru_map(r, cb_add_seen, f);
+        }
+    }
+    // [fast,last) interval of seen regions (with lighthouses and travel)
+    // TODO: what about neighbours? when are they included? do we need
+    // them outside of the CR?
+    ctx->first = firstregion(f);
+    ctx->last = lastregion(f);
+}
+
+void finish_reports(report_context *ctx) {
+    region *r;
+    ql_free(ctx->addresses);
+    for (r = ctx->first; r != ctx->last; r = r->next) {
+        r->seen.mode = seen_none;
+    }
 }
 
 int write_reports(faction * f, time_t ltime)
@@ -1476,10 +1423,7 @@ int write_reports(faction * f, time_t ltime)
     if (!gotit) {
         log_warning("No report for faction %s!", factionid(f));
     }
-    ql_free(ctx.addresses);
-    if (ctx.f->seen) {
-        seen_done(ctx.f->seen);
-    }
+    finish_reports(&ctx);
     return 0;
 }
 
@@ -1515,9 +1459,12 @@ static void check_messages_exist(void) {
 
 int init_reports(void)
 {
+    region *r;
     check_messages_exist();
     create_directories();
-    prepare_reports();
+    for (r = regions; r; r = r->next) {
+        reorder_units(r);
+    }
     return 0;
 }
 
@@ -1549,7 +1496,6 @@ int reports(void)
     }
     if (mailit)
         fclose(mailit);
-    free_seen();
     return retval;
 }
 

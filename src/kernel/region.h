@@ -58,7 +58,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #define RF_ALL 0xFFFFFF
 
-#define RF_SAVEMASK (RF_CHAOTIC|RF_MALLORN|RF_BLOCKED|RF_ENCOUNTER|RF_ORCIFIED|RF_GUARDED)
+#define RF_SAVEMASK (RF_CHAOTIC|RF_MALLORN|RF_BLOCKED|RF_ENCOUNTER|RF_ORCIFIED|RF_GUARDED|RF_LIGHTHOUSE)
     struct message;
     struct message_list;
     struct rawmaterial;
@@ -137,6 +137,9 @@ extern "C" {
 #ifdef FAST_CONNECT
         struct region *connect[MAXDIRECTIONS];      /* use rconnect(r, dir) to access */
 #endif
+        struct {
+            seen_mode mode;
+        } seen;
     } region;
 
     extern struct region *regions;
@@ -271,7 +274,7 @@ extern "C" {
         int value);
     int owner_change(const region * r);
     bool is_mourning(const region * r, int in_turn);
-    const struct item_type *r_luxury(struct region *r);
+    const struct item_type *r_luxury(const struct region *r);
     void get_neighbours(const struct region *r, struct region **list);
 
     struct faction *update_owners(struct region *r);

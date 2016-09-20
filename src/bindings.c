@@ -26,7 +26,6 @@ without prior permission by the authors of Eressea.
 #include "helpers.h"
 #include "console.h"
 #include "reports.h"
-#include "seen.h"
 #include "study.h"
 #include "calendar.h"
 
@@ -51,7 +50,6 @@ without prior permission by the authors of Eressea.
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
 
-#include "creport.h"
 #include "economy.h"
 #include "summary.h"
 #include "teleport.h"
@@ -573,7 +571,7 @@ static int tolua_write_summary(lua_State * L)
     }
     return 0;
 }
-
+/*
 static int tolua_write_map(lua_State * L)
 {
     const char *filename = tolua_tostring(L, 1, 0);
@@ -582,7 +580,7 @@ static int tolua_write_map(lua_State * L)
     }
     return 0;
 }
-
+*/
 static int tolua_read_turn(lua_State * L)
 {
     int cturn = current_turn();
@@ -975,7 +973,7 @@ static int tolua_report_unit(lua_State * L)
     char buffer[512];
     unit *u = (unit *)tolua_tousertype(L, 1, 0);
     faction *f = (faction *)tolua_tousertype(L, 2, 0);
-    bufunit(f, u, 0, see_unit, buffer, sizeof(buffer));
+    bufunit(f, u, 0, seen_unit, buffer, sizeof(buffer));
     tolua_pushstring(L, buffer);
     return 1;
 }
@@ -1091,7 +1089,7 @@ int tolua_bindings_open(lua_State * L)
         tolua_function(L, TOLUA_CAST "factions", tolua_get_factions);
         tolua_function(L, TOLUA_CAST "regions", tolua_get_regions);
         tolua_function(L, TOLUA_CAST "read_turn", tolua_read_turn);
-        tolua_function(L, TOLUA_CAST "write_map", &tolua_write_map);
+//        tolua_function(L, TOLUA_CAST "write_map", &tolua_write_map);
         tolua_function(L, TOLUA_CAST "read_orders", tolua_read_orders);
         tolua_function(L, TOLUA_CAST "process_orders", tolua_process_orders);
         tolua_function(L, TOLUA_CAST "init_reports", tolua_init_reports);

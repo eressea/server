@@ -73,6 +73,17 @@ typedef struct ursprung {
   int x, y;
 } ursprung;
 
+/* seen_mode: visibility in the report */
+typedef enum {
+    seen_none,
+    seen_neighbour,
+    seen_lighthouse,
+    seen_travel,
+    seen_far,
+    seen_unit,
+    seen_battle
+} seen_mode;
+
 /* ------------------ Status von Einheiten --------------------- */
 
 typedef unsigned char status_t;

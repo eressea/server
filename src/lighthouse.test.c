@@ -16,32 +16,38 @@
 
 static void test_lighthouse_range(CuTest * tc)
 {
-    faction *f;
-    unit *u;
-    region *r1;
+    unit *u1, *u2;
+    region *r;
     building *b;
 
     test_setup();
-    r1 = test_create_region(0, 0, 0);
-    f = test_create_faction(0);
-    u = test_create_unit(f, r1);
-    b = test_create_building(r1, test_create_buildingtype("lighthouse"));
+    r = test_create_region(0, 0, 0);
+    test_create_region(1, 0, 0);
+    u1 = test_create_unit(test_create_faction(0), r);
+    u2 = test_create_unit(test_create_faction(0), r);
+    b = test_create_building(r, test_create_buildingtype("lighthouse"));
     CuAssertIntEquals(tc, 0, lighthouse_range(b, NULL));
-    CuAssertIntEquals(tc, 0, lighthouse_range(b, f));
+    CuAssertIntEquals(tc, 0, lighthouse_range(b, u1->faction));
     b->size = 10;
     CuAssertIntEquals(tc, 0, lighthouse_range(b, NULL));
-    u->building = b;
-    set_level(u, SK_PERCEPTION, 3);
+    u1->building = b;
+    u2->building = b;
+    u1->number = 10;
+    set_level(u1, SK_PERCEPTION, 3);
+    set_level(u2, SK_PERCEPTION, 3);
     CuAssertIntEquals(tc, 0, lighthouse_range(b, NULL));
     b->flags |= BLD_MAINTAINED;
     CuAssertIntEquals(tc, 1, lighthouse_range(b, NULL));
-    set_level(u, SK_PERCEPTION, 6);
-    CuAssertIntEquals(tc, 2, lighthouse_range(b, NULL));
+    set_level(u1, SK_PERCEPTION, 6);
+    CuAssertIntEquals(tc, 2, lighthouse_range(b, u1->faction));
+    CuAssertIntEquals(tc, 0, lighthouse_range(b, u2->faction));
     b->size = 100;
+    update_lighthouse(b);
     CuAssertIntEquals(tc, 2, lighthouse_range(b, NULL));
-    set_level(u, SK_PERCEPTION, 9);
+    set_level(u1, SK_PERCEPTION, 9);
     CuAssertIntEquals(tc, 3, lighthouse_range(b, NULL));
-    CuAssertIntEquals(tc, 3, lighthouse_range(b, f));
+    CuAssertIntEquals(tc, 3, lighthouse_range(b, u1->faction));
+    CuAssertIntEquals(tc, 1, lighthouse_range(b, u2->faction));
     CuAssertIntEquals(tc, 0, lighthouse_range(b, test_create_faction(0)));
     test_cleanup();
 }
@@ -59,7 +65,7 @@ static void test_lighthouse_update(CuTest * tc)
     r2 = test_create_region(1, 0, t_ocean);
     r3 = test_create_region(2, 0, t_ocean);
     b = test_create_building(r1, test_create_buildingtype("lighthouse"));
-    CuAssertIntEquals(tc, 0, r1->flags&RF_LIGHTHOUSE);
+    CuAssertIntEquals(tc, RF_LIGHTHOUSE, r1->flags&RF_LIGHTHOUSE);
     CuAssertPtrEquals(tc, NULL, r1->attribs);
     CuAssertPtrEquals(tc, NULL, r2->attribs);
     CuAssertPtrEquals(tc, NULL, r3->attribs);

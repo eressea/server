@@ -18,7 +18,6 @@ without prior permission by the authors of Eressea.
 #include "bindings.h"
 #include "move.h"
 #include "reports.h"
-#include "seen.h"
 #include "guard.h"
 
 /*  attributes includes */
@@ -60,7 +59,7 @@ without prior permission by the authors of Eressea.
 static int tolua_bufunit(lua_State * L) {
     char buf[8192];
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
-    int mode = (int)tolua_tonumber(L, 2, see_unit);
+    int mode = (int)tolua_tonumber(L, 2, (int)seen_unit);
     if (!self)  return 0;
 
     bufunit(self->faction, self, 0, mode, buf, sizeof(buf));

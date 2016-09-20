@@ -923,7 +923,6 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
     building *b = largestbuilding(r, &cmp_wage, false);
     int esize = 0;
     double wage;
-    attrib *a;
     static int ct_cache;
     static const struct curse_type *drought_ct;
 
@@ -968,22 +967,27 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
         }
     }
 
-    /* Godcurse: Income -10 */
-    if (curse_active(get_curse(r->attribs, ct_find("godcursezone")))) {
-        wage = _max(0, wage - 10);
+    if (r->attribs) {
+        attrib *a;
+        const struct curse_type *ctype;
+        /* Godcurse: Income -10 */
+        ctype = ct_find("godcursezone");
+        if (ctype && curse_active(get_curse(r->attribs, ctype))) {
+            wage = _max(0, wage - 10);
+        }
+
+        /* Bei einer Dürre verdient man nur noch ein Viertel  */
+        if (drought_ct) {
+            curse *c = get_curse(r->attribs, drought_ct);
+            if (curse_active(c))
+                wage /= curse_geteffect(c);
+        }
+
+        a = a_find(r->attribs, &at_reduceproduction);
+        if (a) {
+            wage = (wage * a->data.sa[0]) / 100;
+        }
     }
-
-    /* Bei einer Dürre verdient man nur noch ein Viertel  */
-    if (drought_ct) {
-        curse *c = get_curse(r->attribs, drought_ct);
-        if (curse_active(c))
-            wage /= curse_geteffect(c);
-    }
-
-    a = a_find(r->attribs, &at_reduceproduction);
-    if (a)
-        wage = (wage * a->data.sa[0]) / 100;
-
     return (int)wage;
 }
 

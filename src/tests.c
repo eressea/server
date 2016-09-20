@@ -1,7 +1,6 @@
 #include <platform.h>
 #include "tests.h"
 #include "keyword.h"
-#include "seen.h"
 #include "prefix.h"
 #include "reports.h"
 
@@ -180,7 +179,6 @@ static void test_reset(void) {
     free_shiptypes();
     free_races();
     free_spellbooks();
-    free_seen();
     free_prefixes();
     mt_clear();
     for (i = 0; i != MAXSKILLS; ++i) {

@@ -28,11 +28,10 @@
 
 #include "calendar.h"
 #include "chaos.h"
-#include "creport.h"
 #include "items.h"
-#include "jsreport.h"
-#include "names.h"
+#include "creport.h"
 #include "report.h"
+#include "names.h"
 #include "reports.h"
 #include "spells.h"
 #include "wormhole.h"
@@ -67,7 +66,6 @@ void game_init(void)
 
     register_nr();
     register_cr();
-    register_jsreport();
 
     register_races();
     register_spells();

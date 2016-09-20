@@ -61,7 +61,6 @@ int RunAllTests(int argc, char *argv[])
     /* self-test */
     ADD_SUITE(tests);
     ADD_SUITE(callback);
-    ADD_SUITE(seen);
     ADD_SUITE(json);
     ADD_SUITE(jsonconf);
     ADD_SUITE(direction);
@@ -111,6 +110,8 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(ally);
     ADD_SUITE(messages);
     /* gamecode */
+    ADD_SUITE(report);
+//    ADD_SUITE(creport);
     ADD_SUITE(prefix);
     ADD_SUITE(summary);
     ADD_SUITE(names);

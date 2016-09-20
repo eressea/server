@@ -1,11 +1,9 @@
 #include <platform.h>
 #include <config.h>
 #include "reports.h"
-#include "report.h"
-#include "creport.h"
-#include "lighthouse.h"
+
 #include "move.h"
-#include "seen.h"
+#include "lighthouse.h"
 #include "travelthru.h"
 #include "keyword.h"
 
@@ -15,6 +13,7 @@
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
+#include <kernel/terrain.h>
 #include <kernel/unit.h>
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
@@ -121,36 +120,6 @@ static void test_seen_faction(CuTest *tc) {
     test_cleanup();
 }
 
-static void test_write_spaces(CuTest *tc) {
-    stream out = { 0 };
-    char buf[1024];
-    size_t len;
-
-    mstream_init(&out);
-    write_spaces(&out, 4);
-    out.api->rewind(out.handle);
-    len = out.api->read(out.handle, buf, sizeof(buf));
-    buf[len] = '\0';
-    CuAssertStrEquals(tc, "    ", buf);
-    CuAssertIntEquals(tc, ' ', buf[3]);
-    mstream_done(&out);
-}
-
-static void test_write_many_spaces(CuTest *tc) {
-    stream out = { 0 };
-    char buf[1024];
-    size_t len;
-
-    mstream_init(&out);
-    write_spaces(&out, 100);
-    out.api->rewind(out.handle);
-    len = out.api->read(out.handle, buf, sizeof(buf));
-    buf[len] = '\0';
-    CuAssertIntEquals(tc, 100, (int)len);
-    CuAssertIntEquals(tc, ' ', buf[99]);
-    mstream_done(&out);
-}
-
 static void test_sparagraph(CuTest *tc) {
     strlist *sp = 0;
 
@@ -181,75 +150,6 @@ static void test_sparagraph(CuTest *tc) {
     CuAssertStrEquals(tc, "12345678", sp->next->next->s);
     CuAssertPtrEquals(tc, 0, sp->next->next->next);
     freestrlist(sp);
-}
-
-static void test_cr_unit(CuTest *tc) {
-    stream strm;
-    char line[1024];
-    faction *f;
-    region *r;
-    unit *u;
-
-    test_cleanup();
-    f = test_create_faction(0);
-    r = test_create_region(0, 0, 0);
-    u = test_create_unit(f, r);
-    renumber_unit(u, 1234);
-
-    mstream_init(&strm);
-    cr_output_unit(&strm, r, f, u, see_unit);
-    strm.api->rewind(strm.handle);
-    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
-    CuAssertStrEquals(tc, line, "EINHEIT 1234");
-    mstream_done(&strm);
-    test_cleanup();
-}
-
-static void test_write_travelthru(CuTest *tc) {
-    stream out = { 0 };
-    char buf[1024];
-    size_t len;
-    region *r;
-    faction *f;
-    unit *u;
-    struct locale *lang;
-
-    test_cleanup();
-    lang = get_or_create_locale("de");
-    locale_setstring(lang, "travelthru_header", "Durchreise: ");
-    mstream_init(&out);
-    r = test_create_region(0, 0, 0);
-    r->flags |= RF_TRAVELUNIT;
-    f = test_create_faction(0);
-    f->locale = lang;
-    u = test_create_unit(f, test_create_region(0, 1, 0));
-    unit_setname(u, "Hodor");
-    unit_setid(u, 1);
-
-    write_travelthru(&out, r, f);
-    out.api->rewind(out.handle);
-    len = out.api->read(out.handle, buf, sizeof(buf));
-    CuAssertIntEquals_Msg(tc, "no travelers, no report", 0, (int)len);
-    mstream_done(&out);
-    
-    mstream_init(&out);
-    travelthru_add(r, u);
-    write_travelthru(&out, r, f);
-    out.api->rewind(out.handle);
-    len = out.api->read(out.handle, buf, sizeof(buf));
-    buf[len] = '\0';
-    CuAssertStrEquals_Msg(tc, "list one unit", "Durchreise: Hodor (1).\n", buf);
-    mstream_done(&out);
-
-    mstream_init(&out);
-    move_unit(u, r, 0);
-    write_travelthru(&out, r, f);
-    out.api->rewind(out.handle);
-    len = out.api->read(out.handle, buf, sizeof(buf));
-    CuAssertIntEquals_Msg(tc, "do not list units that stopped in the region", 0, (int)len);
-
-    mstream_done(&out);
-    test_cleanup();
 }
 
 static void test_write_unit(CuTest *tc) {
@@ -293,132 +193,6 @@ static void test_write_unit(CuTest *tc) {
     test_cleanup();
 }
 
-typedef struct {
-    struct locale *lang;
-    spell *sp;
-    spellbook *spb;
-    spellbook_entry * sbe;
-} spell_fixture;
-
-static void setup_spell_fixture(spell_fixture * spf) {
-    spf->lang = get_or_create_locale("de");
-    locale_setstring(spf->lang, mkname("spell", "testspell"), "Testzauber");
-    locale_setstring(spf->lang, "nr_spell_type", "Typ:");
-    locale_setstring(spf->lang, "sptype_normal", "Normal");
-    locale_setstring(spf->lang, "nr_spell_modifiers", "Modifier:");
-    locale_setstring(spf->lang, "smod_none", "Keine");
-    locale_setstring(spf->lang, keyword(K_CAST), "ZAUBERE");
-    locale_setstring(spf->lang, parameters[P_REGION], "REGION");
-    locale_setstring(spf->lang, parameters[P_LEVEL], "STUFE");
-    locale_setstring(spf->lang, "par_unit", "enr");
-    locale_setstring(spf->lang, "par_ship", "snr");
-    locale_setstring(spf->lang, "par_building", "bnr");
-    locale_setstring(spf->lang, "spellpar::hodor", "Hodor");
-
-    spf->spb = create_spellbook("testbook");
-    spf->sp = test_create_spell();
-    spellbook_add(spf->spb, spf->sp, 1);
-    spf->sbe = spellbook_get(spf->spb, spf->sp);
-}
-
-static void cleanup_spell_fixture(spell_fixture *spf) {
-    spellbook_clear(spf->spb);
-    free(spf->spb);
-    test_cleanup();
-}
-
-static void check_spell_syntax(CuTest *tc, char *msg, spell_fixture *spell, char *syntax) {
-    stream strm;
-    char buf[1024];
-    char *linestart, *newline;
-    size_t len;
-
-    mstream_init(&strm);
-    nr_spell_syntax(&strm, spell->sbe, spell->lang);
-    strm.api->rewind(strm.handle);
-    len = strm.api->read(strm.handle, buf, sizeof(buf));
-    buf[len] = '\0';
-
-    linestart = strtok(buf, "\n");
-    while (linestart && !strstr(linestart, "ZAUBERE"))
-        linestart = strtok(NULL, "\n") ;
-
-    CuAssertPtrNotNull(tc, linestart);
-
-    newline = strtok(NULL, "\n");
-    while (newline) {
-        *(newline - 1) = '\n';
-        newline = strtok(NULL, "\n");
-    }
-
-    CuAssertStrEquals_Msg(tc, msg, syntax, linestart);
-
-    mstream_done(&strm);
-}
-
-static void set_parameter(spell_fixture spell, char *value) {
-    free(spell.sp->parameter);
-    spell.sp->parameter = _strdup(value);
-}
-
-static void test_write_spell_syntax(CuTest *tc) {
-    spell_fixture spell;
-
-    test_cleanup();
-    setup_spell_fixture(&spell);
-
-    check_spell_syntax(tc, "vanilla",  &spell,   "  ZAUBERE \"Testzauber\"");
-
-    spell.sp->sptyp |= FARCASTING;
-    check_spell_syntax(tc, "far",  &spell,   "  ZAUBERE [REGION x y] \"Testzauber\"");
-
-    spell.sp->sptyp |= SPELLLEVEL;
-    check_spell_syntax(tc, "farlevel",  &spell,   "  ZAUBERE [REGION x y] [STUFE n] \"Testzauber\"");
-    spell.sp->sptyp = 0;
-
-    set_parameter(spell, "kc");
-    check_spell_syntax(tc, "kc", &spell,   "  ZAUBERE \"Testzauber\" ( REGION | EINHEIT <enr> | SCHIFF <snr> | BURG <bnr> )");
-
-    spell.sp->sptyp |= BUILDINGSPELL;
-    check_spell_syntax(tc, "kc typed", &spell,   "  ZAUBERE \"Testzauber\" BURG <bnr>");
-    spell.sp->sptyp = 0;
-
-    set_parameter(spell, "b");
-    check_spell_syntax(tc, "b", &spell,   "  ZAUBERE \"Testzauber\" <bnr>");
-
-    set_parameter(spell, "s");
-    check_spell_syntax(tc, "s", &spell,   "  ZAUBERE \"Testzauber\" <snr>");
-
-    set_parameter(spell, "s+");
-    check_spell_syntax(tc, "s+", &spell,   "  ZAUBERE \"Testzauber\" <snr> [<snr> ...]");
-
-    set_parameter(spell, "u");
-    check_spell_syntax(tc, "u", &spell,   "  ZAUBERE \"Testzauber\" <enr>");
-
-    set_parameter(spell, "r");
-    check_spell_syntax(tc, "r", &spell,   "  ZAUBERE \"Testzauber\" <x> <y>");
-
-    set_parameter(spell, "bc");
-    free(spell.sp->syntax);
-    spell.sp->syntax = _strdup("hodor");
-    check_spell_syntax(tc, "bc hodor", &spell,   "  ZAUBERE \"Testzauber\" <bnr> <Hodor>");
-    free(spell.sp->syntax);
-    spell.sp->syntax = 0;
-
-    set_parameter(spell, "c?");
-    free(spell.sp->syntax);
-    spell.sp->syntax = _strdup("hodor");
-    check_spell_syntax(tc, "c?", &spell,   "  ZAUBERE \"Testzauber\" [<Hodor>]");
-    free(spell.sp->syntax);
-    spell.sp->syntax = 0;
-
-    set_parameter(spell, "kc+");
-    check_spell_syntax(tc, "kc+", &spell,
-        "  ZAUBERE \"Testzauber\" ( REGION | EINHEIT <enr> [<enr> ...] | SCHIFF <snr>\n  [<snr> ...] | BURG <bnr> [<bnr> ...] )");
-
-    cleanup_spell_fixture(&spell);
-}
-
 static void test_arg_resources(CuTest *tc) {
     variant v1, v2;
     arg_type *atype;
@@ -452,13 +226,50 @@ static void test_arg_resources(CuTest *tc) {
     test_cleanup();
 }
 
-void test_prepare_lighthouse(CuTest *tc) {
+static void test_prepare_travelthru(CuTest *tc) {
+    report_context ctx;
+    faction *f, *f2;
+    region *r1, *r2, *r3;
+    unit *u;
+
+    test_setup();
+    f = test_create_faction(0);
+    f2 = test_create_faction(0);
+    r1 = test_create_region(0, 0, 0);
+    r2 = test_create_region(1, 0, 0);
+    r3 = test_create_region(3, 0, 0);
+    test_create_unit(f2, r1);
+    test_create_unit(f2, r3);
+    u = test_create_unit(f, r1);
+    travelthru_add(r2, u);
+    prepare_report(&ctx, f);
+    CuAssertPtrEquals(tc, r1, ctx.first);
+    CuAssertPtrEquals(tc, r3, ctx.last);
+    CuAssertPtrEquals(tc, f, ctx.f);
+    CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
+    CuAssertIntEquals(tc, seen_travel, r2->seen.mode);
+    CuAssertIntEquals(tc, seen_none, r3->seen.mode);
+    finish_reports(&ctx);
+    CuAssertIntEquals(tc, seen_none, r2->seen.mode);
+
+    prepare_report(&ctx, f2);
+    CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
+    CuAssertIntEquals(tc, seen_neighbour, r2->seen.mode);
+    CuAssertIntEquals(tc, seen_unit, r3->seen.mode);
+    CuAssertPtrEquals(tc, f2, ctx.f);
+    CuAssertPtrEquals(tc, r1, ctx.first);
+    CuAssertPtrEquals(tc, NULL, ctx.last);
+    test_cleanup();
+}
+
+void test_prepare_lighthouse_capacity(CuTest *tc) {
     building *b;
     building_type *btype;
-    unit *u;
+    unit *u1, *u2;
     region *r1, *r2;
     faction *f;
     const struct terrain_type *t_ocean, *t_plain;
+    report_context ctx;
 
     test_setup();
     f = test_create_faction(0);
@@ -472,37 +283,158 @@ void test_prepare_lighthouse(CuTest *tc) {
     b->flags |= BLD_MAINTAINED;
     b->size = 10;
     update_lighthouse(b);
-    u = test_create_unit(test_create_faction(0), r1);
-    u->number = 4;
-    u->building = b;
-    set_level(u, SK_PERCEPTION, 3);
-    CuAssertIntEquals(tc, 1, lighthouse_range(b, u->faction));
-    CuAssertPtrEquals(tc, b, inside_building(u));
+    u1 = test_create_unit(test_create_faction(0), r1);
+    u1->number = 4;
+    u1->building = b;
+    set_level(u1, SK_PERCEPTION, 3);
+    CuAssertIntEquals(tc, 1, lighthouse_range(b, u1->faction));
+    CuAssertPtrEquals(tc, b, inside_building(u1));
+    u2 = test_create_unit(f, r1);
+    u2->building = b;
+    set_level(u2, SK_PERCEPTION, 3);
+    CuAssertIntEquals(tc, 0, lighthouse_range(b, u2->faction));
+    CuAssertPtrEquals(tc, NULL, inside_building(u2));
+    prepare_report(&ctx, u1->faction);
+    CuAssertPtrEquals(tc, r1, ctx.first);
+    CuAssertPtrEquals(tc, NULL, ctx.last);
+    CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
+    CuAssertIntEquals(tc, seen_lighthouse, r2->seen.mode);
+    finish_reports(&ctx);
+
+    prepare_report(&ctx, u2->faction);
+    CuAssertPtrEquals(tc, r1, ctx.first);
+    CuAssertPtrEquals(tc, 0, ctx.last);
+    CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
+    CuAssertIntEquals(tc, seen_neighbour, r2->seen.mode);
+    finish_reports(&ctx);
+
+    test_cleanup();
+}
+
+static void test_prepare_lighthouse(CuTest *tc) {
+    report_context ctx;
+    faction *f;
+    region *r1, *r2, *r3;
+    unit *u;
+    building *b;
+    building_type *btype;
+    const struct terrain_type *t_ocean, *t_plain;
+
+    test_setup();
+    t_ocean = test_create_terrain("ocean", SEA_REGION);
+    t_plain = test_create_terrain("plain", LAND_REGION);
+    f = test_create_faction(0);
+    r1 = test_create_region(0, 0, t_plain);
+    r2 = test_create_region(1, 0, t_ocean);
+    r3 = test_create_region(2, 0, t_ocean);
+    btype = test_create_buildingtype("lighthouse");
+    b = test_create_building(r1, btype);
+    b->flags |= BLD_MAINTAINED;
+    b->size = 10;
+    update_lighthouse(b);
     u = test_create_unit(f, r1);
     u->building = b;
     set_level(u, SK_PERCEPTION, 3);
-    CuAssertIntEquals(tc, 0, lighthouse_range(b, u->faction));
-    CuAssertPtrEquals(tc, NULL, inside_building(u));
-    init_reports();
-    CuAssertPtrNotNull(tc, find_seen(f->seen, r1));
-    CuAssertPtrEquals(tc, 0, find_seen(f->seen, r2));
+    prepare_report(&ctx, f);
+    CuAssertPtrEquals(tc, r1, ctx.first);
+    CuAssertPtrEquals(tc, NULL, ctx.last);
+    CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
+    CuAssertIntEquals(tc, seen_lighthouse, r2->seen.mode);
+    CuAssertIntEquals(tc, seen_neighbour, r3->seen.mode);
+    test_cleanup();
+}
+
+static void test_prepare_report(CuTest *tc) {
+    report_context ctx;
+    faction *f;
+    region *r;
+
+    test_setup();
+    f = test_create_faction(0);
+    r = test_create_region(0, 0, 0);
+
+    prepare_report(&ctx, f);
+    CuAssertPtrEquals(tc, 0, ctx.first);
+    CuAssertPtrEquals(tc, 0, ctx.last);
+    CuAssertIntEquals(tc, seen_none, r->seen.mode);
+    finish_reports(&ctx);
+
+    test_create_unit(f, r);
+    prepare_report(&ctx, f);
+    CuAssertPtrEquals(tc, r, ctx.first);
+    CuAssertPtrEquals(tc, 0, ctx.last);
+    CuAssertIntEquals(tc, seen_unit, r->seen.mode);
+    finish_reports(&ctx);
+    CuAssertIntEquals(tc, seen_none, r->seen.mode);
+    finish_reports(&ctx);
+
+    r = test_create_region(2, 0, 0);
+    CuAssertPtrEquals(tc, r, regions->next);
+    prepare_report(&ctx, f);
+    CuAssertPtrEquals(tc, regions, ctx.first);
+    CuAssertPtrEquals(tc, r, ctx.last);
+    CuAssertIntEquals(tc, seen_none, r->seen.mode);
+    test_cleanup();
+}
+
+static void test_seen_neighbours(CuTest *tc) {
+    report_context ctx;
+    faction *f;
+    region *r1, *r2;
+
+    test_setup();
+    f = test_create_faction(0);
+    r1 = test_create_region(0, 0, 0);
+    r2 = test_create_region(1, 0, 0);
+
+    test_create_unit(f, r1);
+    prepare_report(&ctx, f);
+    CuAssertPtrEquals(tc, r1, ctx.first);
+    CuAssertPtrEquals(tc, 0, ctx.last);
+    CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
+    CuAssertIntEquals(tc, seen_neighbour, r2->seen.mode);
+    finish_reports(&ctx);
+    test_cleanup();
+}
+
+static void test_seen_travelthru(CuTest *tc) {
+    report_context ctx;
+    faction *f;
+    unit *u;
+    region *r1, *r2, *r3;
+
+    test_setup();
+    f = test_create_faction(0);
+    r1 = test_create_region(0, 0, 0);
+    r2 = test_create_region(1, 0, 0);
+    r3 = test_create_region(2, 0, 0);
+
+    u = test_create_unit(f, r1);
+    travelthru_add(r2, u);
+    prepare_report(&ctx, f);
+    CuAssertPtrEquals(tc, r1, ctx.first);
+    CuAssertPtrEquals(tc, 0, ctx.last);
+    CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
+    CuAssertIntEquals(tc, seen_travel, r2->seen.mode);
+    CuAssertIntEquals(tc, seen_neighbour, r3->seen.mode);
+    finish_reports(&ctx);
     test_cleanup();
 }
 
 CuSuite *get_reports_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
-    SUITE_ADD_TEST(suite, test_cr_unit);
+    SUITE_ADD_TEST(suite, test_prepare_report);
+    SUITE_ADD_TEST(suite, test_seen_neighbours);
+    SUITE_ADD_TEST(suite, test_seen_travelthru);
+    SUITE_ADD_TEST(suite, test_prepare_lighthouse);
+    SUITE_ADD_TEST(suite, test_prepare_lighthouse_capacity);
+    SUITE_ADD_TEST(suite, test_prepare_travelthru);
     SUITE_ADD_TEST(suite, test_reorder_units);
     SUITE_ADD_TEST(suite, test_seen_faction);
     SUITE_ADD_TEST(suite, test_regionid);
-    SUITE_ADD_TEST(suite, test_write_spaces);
-    SUITE_ADD_TEST(suite, test_write_many_spaces);
     SUITE_ADD_TEST(suite, test_sparagraph);
-    SUITE_ADD_TEST(suite, test_write_travelthru);
     SUITE_ADD_TEST(suite, test_write_unit);
-    SUITE_ADD_TEST(suite, test_write_spell_syntax);
     SUITE_ADD_TEST(suite, test_arg_resources);
-    SUITE_ADD_TEST(suite, test_prepare_lighthouse);
     return suite;
 }

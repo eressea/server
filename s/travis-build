@@ -10,13 +10,19 @@ $BUILD/iniparser/inifile eressea.ini add lua:paths lunit:scripts
 fi
 }
 
+integraton_tests() {
+cd tests
+./write-reports.sh
+./run-turn.sh
+}
+
 set -e
 [ -z $BUILD ] && BUILD=Debug ; export BUILD
+cmake --version
 s/cmake-init
 s/build
 cd $ROOT
 inifile
 s/runtests
-cd tests
-./write-reports.sh
-./run-turn.sh
+
+integraton_tests
