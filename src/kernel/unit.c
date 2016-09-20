@@ -964,9 +964,7 @@ void move_unit(unit * u, region * r, unit ** ulist)
         addlist(ulist, u);
     }
 
-#ifdef SMART_INTERVALS
     update_interval(u->faction, r);
-#endif
     u->region = r;
 }
 

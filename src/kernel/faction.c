@@ -509,7 +509,6 @@ void renumber_faction(faction * f, int no)
     fset(f, FFL_NEWID);
 }
 
-#ifdef SMART_INTERVALS
 void update_interval(struct faction *f, struct region *r)
 {
     if (r == NULL || f == NULL)
@@ -521,7 +520,6 @@ void update_interval(struct faction *f, struct region *r)
         f->last = r;
     }
 }
-#endif
 
 const char *faction_getname(const faction * self)
 {
