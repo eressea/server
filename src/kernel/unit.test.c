@@ -102,7 +102,7 @@ static void test_remove_units_ignores_spells(CuTest *tc) {
     test_cleanup();
     test_create_world();
 
-    u = create_unit(findregion(0, 0), test_create_faction(test_create_race("human")), 1, get_race(RC_SPELL), 0, 0, 0);
+    u = create_unit(findregion(0, 0), test_create_faction(test_create_race("human")), 1, test_create_race("spell"), 0, 0, 0);
     uid = u->no;
     u->number = 0;
     u->age = 1;

@@ -2730,9 +2730,9 @@ static int sp_firewall(castorder * co)
  *   (SPELLLEVEL | TESTCANSEE)
  */
 
-static race *unholy_race(const race *rc) {
+static const race *unholy_race(const race *rc) {
     static int cache;
-    static race * rc_skeleton, *rc_zombie, *rc_ghoul;
+    static const race * rc_skeleton, *rc_zombie, *rc_ghoul;
     if (rc_changed(&cache)) {
         rc_skeleton = get_race(RC_SKELETON);
         rc_zombie = get_race(RC_ZOMBIE);

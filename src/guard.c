@@ -69,7 +69,7 @@ unsigned int guard_flags(const unit * u)
 {
     // TODO: this should be a property of the race, like race.guard_flags
     static int rc_cache;
-    static race *rc_elf, *rc_ent, *rc_ironkeeper;
+    static const race *rc_elf, *rc_ent, *rc_ironkeeper;
     const race *rc = u_race(u);
     unsigned int flags =
         GUARD_CREWS | GUARD_LANDING | GUARD_TRAVELTHRU | GUARD_TAX;

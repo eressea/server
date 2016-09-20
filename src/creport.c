@@ -1480,6 +1480,8 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
     const char *mailto = LOC(f->locale, "mailto");
     const attrib *a;
     FILE *F = fopen(filename, "w");
+    static const race *rc_human;
+    static int rc_cache;
 
     if (era < 0) {
         era = config_get_int("world.era", 1);
@@ -1546,7 +1548,10 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
     fprintf(F, "%d;Anzahl Personen\n", count_all(f));
     fprintf(F, "\"%s\";Magiegebiet\n", magic_school[f->magiegebiet]);
 
-    if (f->race == get_race(RC_HUMAN)) {
+    if (rc_changed(&rc_cache)) {
+        rc_human = rc_find("human");
+    }
+    if (f->race == rc_human) {
         fprintf(F, "%d;Anzahl Immigranten\n", count_migrants(f));
         fprintf(F, "%d;Max. Immigranten\n", count_maxmigrants(f));
     }

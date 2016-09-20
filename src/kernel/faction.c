@@ -301,7 +301,7 @@ unit *addplayer(region * r, faction * f)
     fset(u, UFL_ISNEW);
     if (f->race == get_race(RC_DAEMON)) {
         race_t urc;
-        race *rc;
+        const race *rc;
         do {
             urc = (race_t)(rng_int() % MAXRACES);
             rc = get_race(urc);

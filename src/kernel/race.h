@@ -175,10 +175,11 @@ extern "C" {
 
     struct race_list *get_familiarraces(void);
     struct race *races;
-    struct race *get_race(race_t rt);
+    const struct race *get_race(race_t rt);
     /** TODO: compatibility hacks: **/
     race_t old_race(const struct race *);
 
+    race *rc_create(const char *zName);
     race *rc_get_or_create(const char *name);
     bool rc_changed(int *cache);
     const race *rc_find(const char *);
@@ -240,8 +241,6 @@ extern "C" {
 
     const char *racename(const struct locale *lang, const struct unit *u,
         const race * rc);
-
-#define omniscient(f) ((f)->race==get_race(RC_ILLUSION) || (f)->race==get_race(RC_TEMPLATE))
 
 #define playerrace(rc) (!fval((rc), RCF_NPC))
 #define dragonrace(rc) (fval(rc, RCF_DRAGON))

@@ -36,6 +36,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "study.h"
 #include "wormhole.h"
 #include "prefix.h"
+#include "reports.h"
 #include "teleport.h"
 #include "calendar.h"
 #include "guard.h"

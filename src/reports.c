@@ -104,6 +104,19 @@ const char *coasts[MAXDIRECTIONS] = {
     "coast::w"
 };
 
+bool omniscient(const faction *f)
+{
+    static const race *rc_template, *rc_illusion;
+    static int cache;
+    if (rc_changed(&cache)) {
+        rc_illusion = get_race(RC_ILLUSION);
+        rc_template = get_race(RC_TEMPLATE);
+    }
+    return (f->race == rc_template || f->race == rc_illusion);
+}
+
+
+
 static char *groupid(const struct group *g, const struct faction *f)
 {
     typedef char name[OBJECTIDSIZE + 1];

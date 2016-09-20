@@ -105,7 +105,7 @@ int skill_mod(const race * rc, skill_t sk, const struct terrain_type *terrain)
 {
     int result = 0;
     static int rc_cache;
-    static race *rc_dwarf, *rc_insect;
+    static const race *rc_dwarf, *rc_insect;
 
     if (rc_changed(&rc_cache)) {
         rc_dwarf = get_race(RC_DWARF);
@@ -140,7 +140,7 @@ int rc_skillmod(const struct race *rc, const region * r, skill_t sk)
     }
     if (r && r_isforest(r)) {
         static int rc_cache;
-        static race * rc_elf;
+        static const race * rc_elf;
         if (rc_changed(&rc_cache)) {
             rc_elf = get_race(RC_ELF);
         }

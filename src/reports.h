@@ -48,6 +48,8 @@ extern "C" {
 
     struct unit *can_find(struct faction *, struct faction *);
 
+    bool omniscient(const struct faction *f);
+
     /* funktionen zum schreiben eines reports */
     void sparagraph(struct strlist **SP, const char *s, unsigned int indent, char mark);
     void lparagraph(struct strlist **SP, char *s, unsigned int indent, char mark);

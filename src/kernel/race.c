@@ -75,7 +75,7 @@ static const char *racenames[MAXRACES] = {
     "clone"
 };
 
-struct race *get_race(race_t rt) {
+const struct race *get_race(race_t rt) {
     const char * name;
 
     assert(rt < MAXRACES);
@@ -83,7 +83,7 @@ struct race *get_race(race_t rt) {
     if (!name) {
         return NULL;
     }
-    return rc_get_or_create(name);
+    return rc_find(name);
 }
 
 race_list *get_familiarraces(void)
@@ -163,38 +163,43 @@ bool rc_changed(int *cache) {
     return false;
 }
 
-race *rc_get_or_create(const char *zName)
+race *rc_create(const char *zName)
 {
     race *rc;
     int i;
 
     assert(zName);
-    rc = rc_find_i(zName);
-    if (!rc) {
-        rc = (race *)calloc(sizeof(race), 1);
-        rc->hitpoints = 1;
-        rc->weight = PERSON_WEIGHT;
-        rc->capacity = 540;
-        rc->recruit_multi = 1.0F;
-        rc->regaura = 1.0F;
-        rc->speed = 1.0F;
-        rc->battle_flags = 0;
-        if (strchr(zName, ' ') != NULL) {
-            log_error("race '%s' has an invalid name. remove spaces\n", zName);
-            assert(strchr(zName, ' ') == NULL);
-        }
-        rc->_name = _strdup(zName);
-        rc->precombatspell = NULL;
-
-        rc->attack[0].type = AT_COMBATSPELL;
-        for (i = 1; i < RACE_ATTACKS; ++i)
-            rc->attack[i].type = AT_NONE;
-        rc->index = num_races++;
-        ++rc_changes;
-        rc->next = races;
-        return races = rc;
+    rc = (race *)calloc(sizeof(race), 1);
+    rc->hitpoints = 1;
+    rc->weight = PERSON_WEIGHT;
+    rc->capacity = 540;
+    rc->recruit_multi = 1.0F;
+    rc->regaura = 1.0F;
+    rc->speed = 1.0F;
+    rc->battle_flags = 0;
+    if (strchr(zName, ' ') != NULL) {
+        log_error("race '%s' has an invalid name. remove spaces\n", zName);
+        assert(strchr(zName, ' ') == NULL);
     }
-    return rc;
+    rc->_name = _strdup(zName);
+    rc->precombatspell = NULL;
+
+    rc->attack[0].type = AT_COMBATSPELL;
+    for (i = 1; i < RACE_ATTACKS; ++i)
+        rc->attack[i].type = AT_NONE;
+    rc->index = num_races++;
+    ++rc_changes;
+    rc->next = races;
+    return races = rc;
+}
+
+race *rc_get_or_create(const char *zName)
+{
+    race *rc;
+
+    assert(zName);
+    rc = rc_find_i(zName);
+    return rc ? rc : rc_create(zName);
 }
 
 /** dragon movement **/
