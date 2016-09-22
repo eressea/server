@@ -1673,8 +1673,10 @@ static int parse_races(xmlDocPtr doc)
         rc->at_bonus = (char)xml_ivalue(node, "attackmodifier", rc->at_bonus);
         rc->df_bonus = (char)xml_ivalue(node, "defensemodifier", rc->df_bonus);
 
-        if (!xml_bvalue(node, "playerrace", false))
+        if (!xml_bvalue(node, "playerrace", false)) {
+            assert(rc->recruitcost == 0);
             rc->flags |= RCF_NPC;
+        }
         if (xml_bvalue(node, "scarepeasants", false))
             rc->flags |= RCF_SCAREPEASANTS;
         if (!xml_bvalue(node, "cansteal", true))
