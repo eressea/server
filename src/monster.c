@@ -170,19 +170,7 @@ static void scared_by_monster(unit * u)
     if (a) {
         n = rng_int() & a->data.i * u->number;
     } else {
-        switch (old_race(u_race(u))) {
-        case RC_FIREDRAGON:
-            n = rng_int() % 160 * u->number;
-            break;
-        case RC_DRAGON:
-            n = rng_int() % 400 * u->number;
-            break;
-        case RC_WYRM:
-            n = rng_int() % 1000 * u->number;
-            break;
-        default:
-            n = rng_int() % (u->number / 4 + 1);
-        }
+        n = rng_int() % (u->number / 4 + 1);
     }
     if (n > 0) {
         n = lovar(n);
