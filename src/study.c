@@ -95,7 +95,7 @@ magic_t getmagicskill(const struct locale * lang)
 bool is_migrant(unit * u)
 {
     static int cache;
-    static race *toad_rc;
+    static const race *toad_rc;
 
     if (u_race(u) == u->faction->race)
         return false;
@@ -113,7 +113,7 @@ bool is_migrant(unit * u)
 /* ------------------------------------------------------------- */
 bool magic_lowskill(unit * u)
 {
-    static race *toad_rc;
+    static const race *toad_rc;
     static int cache;
     if (rc_changed(&cache)) {
         toad_rc = get_race(RC_TOAD);

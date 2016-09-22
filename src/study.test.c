@@ -291,10 +291,10 @@ void test_learn_skill_multi(CuTest *tc) {
 
 static void test_demon_skillchanges(CuTest *tc) {
     unit * u;
-    race * rc;
+    const race * rc;
     test_setup();
     rc = test_create_race("demon");
-    CuAssertPtrEquals(tc, rc, get_race(RC_DAEMON));
+    CuAssertPtrEquals(tc, (void *)rc, (void *)get_race(RC_DAEMON));
     u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
     CuAssertPtrNotNull(tc, u);
     set_level(u, SK_CROSSBOW, 1);

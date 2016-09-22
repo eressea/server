@@ -1363,7 +1363,9 @@ static void do_fumble(castorder * co)
     int level = co->level;
     int duration;
     double effect;
-
+	static const race *rc_toad;
+    static int rc_cache;
+    
     ADDMSG(&u->faction->msgs,
         msg_message("patzer", "unit region spell", u, r, sp));
     switch (rng_int() % 10) {
@@ -1394,7 +1396,10 @@ static void do_fumble(castorder * co)
         duration = rng_int() % level / 2;
         if (duration < 2) duration = 2;
         add_trigger(&u->attribs, "timer", trigger_timeout(duration, trestore));
-        u_setrace(u, get_race(RC_TOAD));
+        if (rc_changed(&rc_cache)) {
+            rc_toad = get_race(RC_TOAD);
+        }
+        u_setrace(u, rc_toad);
         u->irace = NULL;
         ADDMSG(&r->msgs, msg_message("patzer6", "unit region spell", u, r, sp));
         break;

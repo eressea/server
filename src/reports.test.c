@@ -410,7 +410,11 @@ static void test_seen_travelthru(CuTest *tc) {
     r3 = test_create_region(2, 0, 0);
 
     u = test_create_unit(f, r1);
+    CuAssertPtrEquals(tc, r1, f->first);
+    CuAssertPtrEquals(tc, r1, f->last);
     travelthru_add(r2, u);
+    CuAssertPtrEquals(tc, r1, f->first);
+    CuAssertPtrEquals(tc, r3, f->last);
     prepare_report(&ctx, f);
     CuAssertPtrEquals(tc, r1, ctx.first);
     CuAssertPtrEquals(tc, 0, ctx.last);

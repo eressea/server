@@ -61,6 +61,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <storage.h>
 
+attrib_type at_scare = { // monster scares peasants
+    "scare", NULL, NULL, NULL, a_writeint, a_readint
+};
+
 attrib_type at_unitdissolve = {
     "unitdissolve", NULL, NULL, NULL, a_writechars, a_readchars
 };
@@ -77,6 +81,7 @@ static int read_ext(attrib * a, void *owner, gamedata *data)
 void register_attributes(void)
 {
     /* Alle speicherbaren Attribute müssen hier registriert werden */
+    at_register(&at_scare);
     at_register(&at_shiptrail);
     at_register(&at_familiar);
     at_register(&at_familiarmage);

@@ -22,6 +22,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
+    struct attrib_type;
+    extern struct attrib_type at_scare;
     extern void register_attributes(void);
 
 #ifdef __cplusplus

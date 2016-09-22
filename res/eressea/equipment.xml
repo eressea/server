@@ -68,10 +68,6 @@
     <callback name="equip_newunits"/>
   </set>
 
-  <set name="first_centaur">
-    <callback name="equip_newunits"/>
-  </set>
-
   <!-- equipment-sets for random encounters -->
   <set name="random_desert">
     <skill name="melee" level="d2"/>

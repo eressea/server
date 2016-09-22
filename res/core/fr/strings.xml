@@ -1894,12 +1894,6 @@
     <string name="eagle">
       <text locale="fr">aigle</text>
     </string>
-    <string name="centaur_p">
-      <text locale="fr">centaures</text>
-    </string>
-    <string name="centaur">
-      <text locale="fr">centaure</text>
-    </string>
     <string name="skeleton_p">
       <text locale="fr">squelettes</text>
     </string>

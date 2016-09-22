@@ -1039,7 +1039,7 @@ static int rc_specialdamage(const unit *au, const unit *du, const struct weapon_
     if (wtype != NULL) {
         if (fval(u_race(du), RCF_DRAGON)) {
             static int cache;
-            static race *rc_halfling;
+            static const race *rc_halfling;
             if (rc_changed(&cache)) {
                 rc_halfling = get_race(RC_HALFLING);
             }

@@ -115,7 +115,12 @@ void get_food(region * r)
     unit *u;
     int peasantfood = rpeasants(r) * 10;
     int food_rules = config_get_int("rules.food.flags", 0);
-
+    static const race *rc_demon;
+    static int rc_cache;
+    
+    if (rc_changed(&rc_cache)) {
+        rc_demon = get_race(RC_DAEMON);
+    }
     if (food_rules & FOOD_IS_FREE) {
         return;
     }
@@ -228,7 +233,7 @@ void get_food(region * r)
     * bei fehlenden Bauern den Dämon hungern lassen
     */
     for (u = r->units; u; u = u->next) {
-        if (u_race(u) == get_race(RC_DAEMON)) {
+        if (u_race(u) == rc_demon) {
             int hungry = u->number;
 
             /* use peasantblood before eating the peasants themselves */
@@ -250,7 +255,7 @@ void get_food(region * r)
                     if (donor == u)
                         donor = r->units;
                     while (donor != NULL) {
-                        if (u_race(donor) == get_race(RC_DAEMON) && donor != u) {
+                        if (u_race(donor) == rc_demon && donor != u) {
                             if (get_effect(donor, pt_blood)) {
                                 /* if he's in our faction, drain him: */
                                 if (donor->faction == u->faction)

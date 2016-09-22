@@ -84,9 +84,6 @@ static void equip_newunits(const struct equipment *eq, struct unit *u)
         u_set_ship(u, sh);
     }
     break;
-    case RC_CENTAUR:
-        rsethorses(r, 250 + rng_int() % 51 + rng_int() % 51);
-        break;
     default:
         break;
     }

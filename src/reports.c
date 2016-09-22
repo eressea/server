@@ -104,6 +104,19 @@ const char *coasts[MAXDIRECTIONS] = {
     "coast::w"
 };
 
+bool omniscient(const faction *f)
+{
+    static const race *rc_template, *rc_illusion;
+    static int cache;
+    if (rc_changed(&cache)) {
+        rc_illusion = get_race(RC_ILLUSION);
+        rc_template = get_race(RC_TEMPLATE);
+    }
+    return (f->race == rc_template || f->race == rc_illusion);
+}
+
+
+
 static char *groupid(const struct group *g, const struct faction *f)
 {
     typedef char name[OBJECTIDSIZE + 1];
@@ -1135,19 +1148,24 @@ static void add_seen(region *r, seen_mode mode) {
     }
 }
 
-static void faction_add_seen(faction *f, region *r, seen_mode mode) {
+static void add_seen_nb(faction *f, region *r, seen_mode mode) {
+    region *first = r, *last = r;
     add_seen(r, mode);
     if (mode > seen_neighbour) {
         region *next[MAXDIRECTIONS];
         int d;
         get_neighbours(r, next);
         for (d = 0; d != MAXDIRECTIONS; ++d) {
-            if (next[d] && next[d]->seen.mode<seen_neighbour) {
-                faction_add_seen(f, next[d], seen_neighbour);
+            region *rn = next[d];
+            if (rn && rn->seen.mode<seen_neighbour) {
+                add_seen(rn, seen_neighbour);
+                if (first->index>rn->index) first = rn;
+                if (last->index<rn->index) last = rn;
             }
         }
     }
-    update_interval(f, r);
+    update_interval(f, first);
+    update_interval(f, last);
 }
 
 /** mark all regions seen by the lighthouse.
@@ -1162,7 +1180,7 @@ static void prepare_lighthouse(building * b, report_context *ctx)
     for (ql = rlist, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
         region *rl = (region *)ql_get(ql, qi);
         if (!fval(rl->terrain, FORBIDDEN_REGION)) {
-            faction_add_seen(f, rl, seen_lighthouse);
+            add_seen_nb(f, rl, seen_lighthouse);
         }
     }
     ql_free(rlist);
@@ -1286,7 +1304,7 @@ static region *firstregion(faction * f)
 static void cb_add_seen(region *r, unit *u, void *cbdata) {
     faction *f = (faction *)cbdata;
     if (u->faction==f) {
-        faction_add_seen(f, r, seen_travel);
+        add_seen_nb(f, r, seen_travel);
     }
 }
 
@@ -1327,7 +1345,7 @@ void prepare_report(report_context *ctx, faction *f)
                         if (u && u->faction==f) {
                             prepare_lighthouse(b, ctx);
                             if (u_race(u) != get_race(RC_SPELL) || u->number == RS_FARVISION) {
-                                faction_add_seen(f, r, seen_unit);
+                                add_seen_nb(f, r, seen_unit);
                             }
                         }
                     }
@@ -1338,7 +1356,7 @@ void prepare_report(report_context *ctx, faction *f)
         for (u = r->units; u; u = u->next) {
             if (u->faction==f) {
                 if (u_race(u) != get_race(RC_SPELL) || u->number == RS_FARVISION) {
-                    faction_add_seen(f, r, seen_unit);
+                    add_seen_nb(f, r, seen_unit);
                 }
                 if (fval(r, RF_LIGHTHOUSE)) {
                     if (u->building && u->building->type == bt_lighthouse && inside_building(u)) {
@@ -1349,7 +1367,7 @@ void prepare_report(report_context *ctx, faction *f)
             }
         }
 
-        if (fval(r, RF_TRAVELUNIT)) {
+        if (fval(r, RF_TRAVELUNIT) && r->seen.mode<seen_travel) {
             travelthru_map(r, cb_add_seen, f);
         }
     }
