@@ -125,6 +125,7 @@ extern "C" {
     typedef struct race {
         char *_name;
         float magres;
+        float healing;
         double maxaura;            /* Faktor auf Maximale Aura */
         double regaura;            /* Faktor auf Regeneration */
         double recruit_multi;      /* Faktor für Bauernverbrauch */

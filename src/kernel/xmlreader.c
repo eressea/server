@@ -1647,6 +1647,7 @@ static int parse_races(xmlDocPtr doc)
         xmlFree(propValue);
 
         rc->magres = (float)xml_fvalue(node, "magres", rc->magres);
+        rc->healing = (float)xml_fvalue(node, "healing", rc->healing);
         rc->maxaura = (float)xml_fvalue(node, "maxaura", rc->maxaura);
         rc->regaura = (float)xml_fvalue(node, "regaura", rc->regaura);
         rc->recruitcost = xml_ivalue(node, "recruitcost", rc->recruitcost);

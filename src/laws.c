@@ -3464,23 +3464,23 @@ static int use_item(unit * u, const item_type * itype, int amount, struct order 
 
 static double heal_factor(const unit * u)
 {
-    double elf_regen;
-    // TODO: do not hard-code, make this a property, race.healing
-    switch (old_race(u_race(u))) {
-    case RC_TROLL:
-    case RC_DAEMON:
-        return 1.5;
-    case RC_GOBLIN:
-        return 2.0;
-    case RC_ELF:
-        elf_regen = get_param_flt(u_race(u)->parameters, "regen.forest", 1.0F);
-        if (elf_regen != 1.0 && r_isforest(u->region)) {
+    const race * rc = u_race(u);
+    if (rc->healing>0) {    
+        return rc->healing;
+    }
+    if (r_isforest(u->region)) {
+        static int rc_cache;
+        static const race *rc_elf;
+        if (rc==rc_elf) {
+            static int config;
+            static double elf_regen = 1.0;
+            if (config_changed(&config)) {
+                elf_regen = get_param_flt(u_race(u)->parameters, "regen.forest", 1.0F);
+            }
             return elf_regen;
         }
-        return 1.0;
-    default:
-        return 1.0;
     }
+    return 1.0;
 }
 
 void monthly_healing(void)
