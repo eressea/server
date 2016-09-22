@@ -33,6 +33,7 @@ without prior permission by the authors of Eressea.
 #include "vortex.h"
 
 #include <modules/score.h>
+#include <attributes/attributes.h>
 
 /* util includes */
 #include <util/attrib.h>
@@ -1605,6 +1606,14 @@ static void parse_param(struct param **params, xmlNodePtr node)
 
 static void parse_ai(race * rc, xmlNodePtr node)
 {
+    int n;
+
+    n = xml_ivalue(node, "scare", 0);
+    if (n>0) {
+        attrib *a = a_new(&at_scare);
+        a->data.i = n;
+        a_add(&rc->attribs, a);
+    }
     rc->splitsize = xml_ivalue(node, "splitsize", 0);
     rc->aggression = (float)xml_fvalue(node, "aggression", 0.04);
     if (xml_bvalue(node, "killpeasants", false))
