@@ -2456,23 +2456,6 @@
       <text locale="en">skeleton</text>
     </string>
 
-    <string name="centaur">
-      <text locale="de">Zentaur</text>
-      <text locale="en">centaur</text>
-    </string>
-    <string name="centaur_p">
-      <text locale="de">Zentauren</text>
-      <text locale="en">centaurs</text>
-    </string>
-    <string name="centaur_d">
-      <text locale="de">Zentauren</text>
-      <text locale="en">centaurs</text>
-    </string>
-    <string name="centaur_x">
-      <text locale="de">Zentauren</text>
-      <text locale="en">centaur</text>
-    </string>
-
     <string name="shadowknight">
       <text locale="de">Schattenritter</text>
       <text locale="en">shadow knight</text>

@@ -52,37 +52,31 @@ extern "C" {
         RC_ELF,
         RC_GOBLIN = 3,
         RC_HUMAN,
-
         RC_TROLL,
         RC_DAEMON,
         RC_INSECT,
         RC_HALFLING,
         RC_CAT,
-
         RC_AQUARIAN,
         RC_ORC,
         RC_SNOTLING,
         RC_UNDEAD,
         RC_ILLUSION,
-
         RC_FIREDRAGON,
         RC_DRAGON,
         RC_WYRM,
         RC_TREEMAN,
         RC_BIRTHDAYDRAGON,
-
         RC_DRACOID,
-        RC_SPECIAL,
-        RC_SPELL,
+
+        RC_SPELL = 22,
         RC_IRONGOLEM,
         RC_STONEGOLEM,
-
         RC_SHADOW,
         RC_SHADOWLORD,
         RC_IRONKEEPER,
         RC_ALP,
         RC_TOAD,
-
         RC_HIRNTOETER,
         RC_PEASANT,
         RC_WOLF = 32,
@@ -91,20 +85,15 @@ extern "C" {
 
         RC_SEASERPENT = 51,
         RC_SHADOWKNIGHT,
-        RC_CENTAUR,
-        RC_SKELETON,
 
+        RC_SKELETON = 54,
         RC_SKELETON_LORD,
         RC_ZOMBIE,
         RC_ZOMBIE_LORD,
         RC_GHOUL,
         RC_GHOUL_LORD,
-
-        RC_MUS_SPIRIT,
-        RC_GNOME,
-        RC_TEMPLATE,
+        RC_TEMPLATE = 62,
         RC_CLONE,
-
         MAXRACES,
         NORACE = -1
     } race_t;

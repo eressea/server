@@ -65,13 +65,13 @@ static const char *racenames[MAXRACES] = {
     "dwarf", "elf", NULL, "goblin", "human", "troll", "demon", "insect",
     "halfling", "cat", "aquarian", "orc", "snotling", "undead", "illusion",
     "youngdragon", "dragon", "wyrm", "ent", "catdragon", "dracoid",
-    "special", "spell", "irongolem", "stonegolem", "shadowdemon",
+    NULL, "spell", "irongolem", "stonegolem", "shadowdemon",
     "shadowmaster", "mountainguard", "alp", "toad", "braineater", "peasant",
     "wolf", NULL, NULL, NULL, NULL, "songdragon", NULL,
     NULL, NULL, NULL, NULL, NULL, NULL, NULL,
     NULL, NULL, NULL, NULL, NULL, "seaserpent",
-    "shadowknight", "centaur", "skeleton", "skeletonlord", "zombie",
-    "juju-zombie", "ghoul", "ghast", "museumghost", "gnome", "template",
+    "shadowknight", NULL, "skeleton", "skeletonlord", "zombie",
+    "juju-zombie", "ghoul", "ghast", NULL, NULL, "template",
     "clone"
 };
 
