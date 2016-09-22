@@ -3471,6 +3471,9 @@ static double heal_factor(const unit * u)
     if (r_isforest(u->region)) {
         static int rc_cache;
         static const race *rc_elf;
+        if (rc_changed(&rc_cache)) {
+            rc_elf = get_race(RC_ELF);
+        }
         if (rc==rc_elf) {
             static int config;
             static double elf_regen = 1.0;
