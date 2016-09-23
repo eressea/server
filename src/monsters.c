@@ -84,7 +84,12 @@ static void give_peasants(unit *u, const item_type *itype, int reduce) {
 }
 
 static double random_move_chance(void) {
-    return config_get_flt("rules.monsters.random_move_chance", MOVECHANCE);
+    static double rule;
+    static int config;
+    if (config_changed(&config)) {
+        rule = config_get_flt("rules.monsters.random_move_chance", MOVECHANCE);
+    }
+    return rule;
 }
 
 static void reduce_weight(unit * u)

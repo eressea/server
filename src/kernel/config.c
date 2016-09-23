@@ -731,7 +731,7 @@ int create_directories(void) {
 
 double get_param_flt(const struct param *p, const char *key, double def)
 {
-    const char *str = get_param(p, key);
+    const char *str = p ? get_param(p, key) : NULL;
     return str ? atof(str) : def;
 }
 
@@ -862,7 +862,10 @@ int cmp_current_owner(const building * b, const building * a)
 
 bool rule_stealth_other(void)
 {
-    int rule = config_get_int("stealth.faction.other", 1);
+    static int rule, config;
+    if (config_changed(&config)) {
+        rule = config_get_int("stealth.faction.other", 1);
+    }
     return rule != 0;
 }
 

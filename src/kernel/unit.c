@@ -883,15 +883,16 @@ void leave_building(unit * u)
 
 bool can_leave(unit * u)
 {
-    int rule_leave;
+    static int config;
+    static bool rule_leave;
 
     if (!u->building) {
         return true;
     }
-
-    rule_leave = config_get_int("rules.move.owner_leave", 0);
-
-    if (rule_leave != 0 && u->building && u == building_owner(u->building)) {
+    if (config_changed(&config)) {
+        rule_leave = config_get_int("rules.move.owner_leave", 0) != 0;
+    }
+    if (rule_leave && u->building && u == building_owner(u->building)) {
         return false;
     }
     return true;
@@ -1721,9 +1722,13 @@ int unit_max_hp(const unit * u)
 {
     int h;
     double p;
-    int rule_stamina = config_get_int("rules.stamina", STAMINA_AFFECTS_HP);
+    static int config;
+    static int rule_stamina;
     h = u_race(u)->hitpoints;
 
+    if (config_changed(&config)) {
+        rule_stamina = config_get_int("rules.stamina", STAMINA_AFFECTS_HP);
+    }
     if (rule_stamina & 1) {
         p = pow(effskill(u, SK_STAMINA, u->region) / 2.0, 1.5) * 0.2;
         h += (int)(h * p + 0.5);
