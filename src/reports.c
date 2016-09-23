@@ -1112,6 +1112,29 @@ void reports_done(void) {
     }
 }
 
+static int get_regions_distance_arr(region *r, int radius,
+                                    region *result[], int size)
+{
+    int n = 0, i;
+    
+    if (size>n) {
+        result[n++] = r;
+    }
+    for (i = 0; i != n; ++i) {
+        region *adj[MAXDIRECTIONS];
+        int d;
+        
+        r = result[i];
+        get_neighbours(r, adj);
+        for (d = 0; d != MAXDIRECTIONS; ++d) {
+            r = adj[d];
+            if (size>n) {
+                result[n++] = r;
+            }
+        }
+    }
+}
+
 static quicklist *get_regions_distance(region * root, int radius)
 {
     quicklist *ql, *rlist = NULL;
