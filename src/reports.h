@@ -49,7 +49,8 @@ extern "C" {
     struct unit *can_find(struct faction *, struct faction *);
 
     bool omniscient(const struct faction *f);
-
+    struct quicklist *get_regions_distance(struct region * root, int radius);
+    int get_regions_distance_arr(struct region *r, int radius, struct region *result[], int size);
     /* funktionen zum schreiben eines reports */
     void sparagraph(struct strlist **SP, const char *s, unsigned int indent, char mark);
     void lparagraph(struct strlist **SP, char *s, unsigned int indent, char mark);

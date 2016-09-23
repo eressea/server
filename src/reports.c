@@ -1112,30 +1112,43 @@ void reports_done(void) {
     }
 }
 
-static int get_regions_distance_arr(region *r, int radius,
-                                    region *result[], int size)
+int get_regions_distance_arr(region *rc, int radius, region *result[], int size)
 {
     int n = 0, i;
     
     if (size>n) {
-        result[n++] = r;
+        result[n++] = rc;
     }
     for (i = 0; i != n; ++i) {
-        region *adj[MAXDIRECTIONS];
-        int d;
-        
+        region *r;
+        int dist;
+
         r = result[i];
-        get_neighbours(r, adj);
-        for (d = 0; d != MAXDIRECTIONS; ++d) {
-            r = adj[d];
-            if (size>n) {
-                result[n++] = r;
+        dist = distance(rc, r);
+        if (dist<radius) {
+            region *adj[MAXDIRECTIONS];
+            int d;
+
+            get_neighbours(r, adj);
+            for (d = 0; d != MAXDIRECTIONS; ++d) {
+                r = adj[d];
+                if (r) {
+                    if (size > n) {
+                        if (dist < distance(rc, r)) {
+                            result[n++] = r;
+                        }
+                    }
+                    else {
+                        return -1;
+                    }
+                }
             }
         }
     }
+    return n;
 }
 
-static quicklist *get_regions_distance(region * root, int radius)
+quicklist *get_regions_distance(region * root, int radius)
 {
     quicklist *ql, *rlist = NULL;
     int qi = 0;
@@ -1193,11 +1206,8 @@ static void add_seen_nb(faction *f, region *r, seen_mode mode) {
 
 /** mark all regions seen by the lighthouse.
  */
-static void prepare_lighthouse(building * b, report_context *ctx)
-{
-    faction *f = ctx->f;
-    int range = lighthouse_range(b, f);
-    quicklist *ql, *rlist = get_regions_distance(b->region, range);
+static void prepare_lighthouse_ql(faction *f, quicklist *rlist) {
+    quicklist *ql;
     int qi;
 
     for (ql = rlist, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
@@ -1207,6 +1217,29 @@ static void prepare_lighthouse(building * b, report_context *ctx)
         }
     }
     ql_free(rlist);
+}
+
+static void prepare_lighthouse(building * b, report_context *ctx)
+{
+    faction *f = ctx->f;
+    int range = lighthouse_range(b, f);
+
+    if (range > 2) {
+        prepare_lighthouse_ql(f, get_regions_distance(b->region, range));
+    }
+    else {
+        region *result[64];
+        int n, i;
+
+        n = get_regions_distance_arr(b->region, range, result, 64);
+        assert(n > 0 && n <= 64);
+        for (i = 0; i != n; ++i) {
+            region *rl = result[i];
+            if (!fval(rl->terrain, FORBIDDEN_REGION)) {
+                add_seen_nb(f, rl, seen_lighthouse);
+            }
+        }
+    }
 }
 
 void reorder_units(region * r)

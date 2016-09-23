@@ -425,9 +425,47 @@ static void test_seen_travelthru(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_region_distance(CuTest *tc) {
+    region *r;
+    region *result[8];
+    test_setup();
+    r = test_create_region(0, 0, 0);
+    CuAssertIntEquals(tc, 1, get_regions_distance_arr(r, 0, result, 8));
+    CuAssertPtrEquals(tc, r, result[0]);
+    CuAssertIntEquals(tc, 1, get_regions_distance_arr(r, 1, result, 8));
+    test_create_region(1, 0, 0);
+    test_create_region(0, 1, 0);
+    CuAssertIntEquals(tc, 1, get_regions_distance_arr(r, 0, result, 8));
+    CuAssertIntEquals(tc, 3, get_regions_distance_arr(r, 1, result, 8));
+    CuAssertIntEquals(tc, 3, get_regions_distance_arr(r, 2, result, 8));
+    test_cleanup();
+}
+
+static void test_region_distance_ql(CuTest *tc) {
+    region *r;
+    quicklist *ql;
+    test_setup();
+    r = test_create_region(0, 0, 0);
+    ql = get_regions_distance(r, 0);
+    CuAssertIntEquals(tc, 1, ql_length(ql));
+    CuAssertPtrEquals(tc, r, ql_get(ql, 0));
+    ql_free(ql);
+    test_create_region(1, 0, 0);
+    test_create_region(0, 1, 0);
+    ql = get_regions_distance(r, 1);
+    CuAssertIntEquals(tc, 3, ql_length(ql));
+    ql_free(ql);
+    ql = get_regions_distance(r, 2);
+    CuAssertIntEquals(tc, 3, ql_length(ql));
+    ql_free(ql);
+    test_cleanup();
+}
+
 CuSuite *get_reports_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_region_distance);
+    SUITE_ADD_TEST(suite, test_region_distance_ql);
     SUITE_ADD_TEST(suite, test_prepare_report);
     SUITE_ADD_TEST(suite, test_seen_neighbours);
     SUITE_ADD_TEST(suite, test_seen_travelthru);
