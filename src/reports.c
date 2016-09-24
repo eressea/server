@@ -1229,7 +1229,7 @@ static void prepare_lighthouse(building * b, report_context *ctx)
     faction *f = ctx->f;
     int range = lighthouse_range(b, f);
 
-    if (range > 2) {
+    if (range > 3) {
         prepare_lighthouse_ql(f, get_regions_distance(b->region, range));
     }
     else {
