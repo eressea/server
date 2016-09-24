@@ -800,7 +800,11 @@ int study_cmd(unit * u, order * ord)
 }
 
 static int produceexp_days(void) {
-    return config_get_int("study.produceexp", 10);
+    static int config, rule;
+    if (config_changed(&config)) {
+        rule = config_get_int("study.produceexp", 10);
+    }
+    return rule;
 }
 
 void produceexp_ex(struct unit *u, skill_t sk, int n, learn_fun learn)
@@ -863,7 +867,11 @@ void demon_skillchange(unit *u)
 
     if (fval(u, UFL_HUNGER)) {
         /* hungry demons only go down, never up in skill */
-        int rule_hunger = config_get_int("hunger.demon.skill", 0) != 0;
+        static int config;
+        static bool rule_hunger;
+        if (config_changed(&config)) {
+            rule_hunger = config_get_int("hunger.demon.skill", 0) != 0;
+        }
         if (rule_hunger) {
             upchance = 0;
             downchance = 15;

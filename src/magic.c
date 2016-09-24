@@ -225,7 +225,11 @@ static void free_mage(attrib * a)
 
 bool FactionSpells(void)
 {
-    return config_get_int("rules.magic.factionlist", 0) != 0;
+    static int config, rule;
+    if (config_changed(&config)) {
+        rule = config_get_int("rules.magic.factionlist", 0);
+    }
+    return rule != 0;
 }
 
 void read_spells(struct quicklist **slistp, magic_t mtype, 

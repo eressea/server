@@ -796,14 +796,26 @@ attrib_type at_maxmagicians = {
 
 int max_magicians(const faction * f)
 {
-    int m = config_get_int("rules.maxskills.magic", MAXMAGICIANS);
-    attrib *a;
+    static int rule, config, rc_cache;
+    static const race *rc_elf;
+    int m;
 
-    if ((a = a_find(f->attribs, &at_maxmagicians)) != NULL) {
-        m = a->data.i;
+    if (config_changed(&config)) {
+        rule = config_get_int("rules.maxskills.magic", MAXMAGICIANS);
     }
-    if (f->race == get_race(RC_ELF))
+    m = rule;
+    if (f->attribs) {
+        attrib *a = a_find(f->attribs, &at_maxmagicians);
+        if (a) {
+            m = a->data.i;
+        }
+    }
+    if (rc_changed(&rc_cache)) {
+        rc_elf = get_race(RC_ELF);
+    }
+    if (f->race == rc_elf) {
         ++m;
+    }
     return m;
 }
 
