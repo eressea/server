@@ -425,6 +425,29 @@ static void test_seen_travelthru(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_report_far_vision(CuTest *tc) {
+    unit *u1, *u2;
+    faction *f;
+    region *r1, *r2;
+    const race *rc;
+    test_setup();
+    f = test_create_faction(0);
+    r1 = test_create_region(0, 0, 0);
+    u1 = test_create_unit(f, r1);
+    r2 = test_create_region(10, 0, 0);
+    rc = test_create_race("spell");
+    u2 = create_unit(r2, u1->faction, 1, rc, 0, "spell/dreamreading", NULL);
+    set_number(u2, 1);
+    report_context ctx;
+    prepare_report(&ctx, f);
+    CuAssertPtrEquals(tc, r1, ctx.first);
+    CuAssertPtrEquals(tc, 0, ctx.last);
+    CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
+    CuAssertIntEquals(tc, seen_unit, r2->seen.mode);
+    finish_reports(&ctx);
+    test_cleanup();
+}
+
 CuSuite *get_reports_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -434,6 +457,7 @@ CuSuite *get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_prepare_lighthouse);
     SUITE_ADD_TEST(suite, test_prepare_lighthouse_capacity);
     SUITE_ADD_TEST(suite, test_prepare_travelthru);
+    SUITE_ADD_TEST(suite, test_report_far_vision);
     SUITE_ADD_TEST(suite, test_reorder_units);
     SUITE_ADD_TEST(suite, test_seen_faction);
     SUITE_ADD_TEST(suite, test_regionid);

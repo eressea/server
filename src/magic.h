@@ -184,12 +184,6 @@ extern "C" {
         SPC_LINEAR                  /* Komponenten pro Level und müssen vorhanden sein */
     };
 
-    enum {
-        RS_DUMMY,
-        RS_FARVISION,
-        MAX_REGIONSPELLS
-    };
-
     /* ------------------------------------------------------------- */
     /* Prototypen */
 

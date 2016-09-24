@@ -1308,17 +1308,6 @@ static void cb_add_seen(region *r, unit *u, void *cbdata) {
     }
 }
 
-static bool unit_cansee(const unit *u)
-{
-    const race *rc = u_race(u);
-    static const race *rc_spell;
-    static int rc_cache;
-    if (rc_changed(&rc_cache)) {
-        rc_spell = get_race(RC_SPELL);
-    }
-    return (rc!=rc_spell || u->number == RS_FARVISION);
-}
-
 /** set region.seen based on visibility by one faction.
  *
  * this function may also update ctx->last and ctx->first for potential 
@@ -1355,9 +1344,7 @@ void prepare_report(report_context *ctx, faction *f)
                         u = building_owner(b);
                         if (u && u->faction==f) {
                             prepare_lighthouse(b, ctx);
-                            if (unit_cansee(u)) {
-                                add_seen_nb(f, r, seen_unit);
-                            }
+                            add_seen_nb(f, r, seen_unit);
                         }
                     }
                 }
@@ -1366,9 +1353,7 @@ void prepare_report(report_context *ctx, faction *f)
         }
         for (u = r->units; u; u = u->next) {
             if (u->faction==f) {
-                if (unit_cansee(u)) {
-                    add_seen_nb(f, r, seen_unit);
-                }
+                add_seen_nb(f, r, seen_unit);
                 if (fval(r, RF_LIGHTHOUSE)) {
                     if (u->building && u->building->type == bt_lighthouse && inside_building(u)) {
                         /* we are in a lighthouse. add the regions we can see from here! */

@@ -184,6 +184,9 @@ static int parse_args(int argc, char **argv, int *exitcode)
         else {
             const char *arg;
             switch (argi[1]) {
+            case 'd': // check configuration for consistency
+                i = get_arg(argc, argv, 2, i, &arg, 0);
+                global.debug = arg ? atoi(arg) : 0xff;
             case 'r':
                 i = get_arg(argc, argv, 2, i, &arg, 0);
                 config_set("config.rules", arg);
