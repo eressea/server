@@ -4111,6 +4111,14 @@ static int sp_bigrecruit(castorder * co)
     return cast_level;
 }
 
+static void watch_region(region *r, faction *f, int perception) {
+    unit *u;
+
+    u = create_unit(r, f, 1, get_race(RC_SPELL), 0, NULL, NULL);
+    u->age = 2;
+    set_level(u, SK_PERCEPTION, perception);
+}
+
 /* ------------------------------------------------------------- */
 /* Name:     Aushorchen
  * Stufe:   7
@@ -4167,12 +4175,7 @@ static int sp_pump(castorder * co)
         return cast_level / 2;
     }
 
-    u =
-        create_unit(rt, mage->faction, 1, get_race(RC_SPELL), 0,
-        "spell/pump", NULL);
-    u->age = 2;
-    set_level(u, SK_PERCEPTION, effskill(target, SK_PERCEPTION, 0));
-
+    watch_region(rt, mage->faction, effskill(target, SK_PERCEPTION, 0));
     return cast_level;
 }
 
@@ -4778,7 +4781,7 @@ int sp_clonecopy(castorder * co)
 /* ------------------------------------------------------------- */
 int sp_dreamreading(castorder * co)
 {
-    unit *u, *u2;
+    unit *u;
     region *r = co_get_region(co);
     unit *mage = co->magician.u;
     int cast_level = co->level;
@@ -4811,11 +4814,7 @@ int sp_dreamreading(castorder * co)
         return 0;
     }
 
-    u2 =
-        create_unit(u->region, mage->faction, 1, get_race(RC_SPELL), 0,
-        "spell/dreamreading", NULL);
-    u2->age = 2;                  /* Nur fuer diese Runde. */
-    set_level(u2, SK_PERCEPTION, effskill(u, SK_PERCEPTION, u2->region));
+    watch_region(u->region, mage->faction, effskill(u, SK_PERCEPTION, u->region));
 
     msg =
         msg_message("sp_dreamreading_effect", "mage unit region", mage, u,
@@ -5612,7 +5611,7 @@ int sp_showastral(castorder * co)
         region *r2 = rl2->data;
         if (!is_cursed(r2->attribs, C_ASTRALBLOCK, 0)) {
             for (u = r2->units; u; u = u->next) {
-                if (u_race(u) != get_race(RC_SPECIAL) && u_race(u) != get_race(RC_SPELL))
+                if (u_race(u) != get_race(RC_SPELL))
                     n++;
             }
         }
@@ -5632,7 +5631,7 @@ int sp_showastral(castorder * co)
         for (rl2 = rl; rl2; rl2 = rl2->next) {
             if (!is_cursed(rl2->data->attribs, C_ASTRALBLOCK, 0)) {
                 for (u = rl2->data->units; u; u = u->next) {
-                    if (u_race(u) != get_race(RC_SPECIAL) && u_race(u) != get_race(RC_SPELL)) {
+                    if (u_race(u) != get_race(RC_SPELL)) {
                         c++;
                         scat(unitname(u));
                         scat(" (");
@@ -5670,7 +5669,6 @@ int sp_showastral(castorder * co)
 int sp_viewreality(castorder * co)
 {
     region_list *rl, *rl2;
-    unit *u;
     region *r = co_get_region(co);
     unit *mage = co->magician.u;
     int cast_level = co->level;
@@ -5689,11 +5687,7 @@ int sp_viewreality(castorder * co)
     for (rl2 = rl; rl2; rl2 = rl2->next) {
         region *rt = rl2->data;
         if (!is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
-            u =
-                create_unit(rt, mage->faction, 1, get_race(RC_SPELL), 0,
-                "spell/viewreality", NULL);
-            set_level(u, SK_PERCEPTION, co->level / 2);
-            u->age = 2;
+            watch_region(rt, mage->faction, co->level / 2);
         }
     }
 
