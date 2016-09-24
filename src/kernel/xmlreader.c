@@ -1191,22 +1191,18 @@ static void add_spells(equipment * eq, xmlNodeSetPtr nsetItems)
         for (i = 0; i != nsetItems->nodeNr; ++i) {
             xmlNodePtr node = nsetItems->nodeTab[i];
             xmlChar *propValue;
-            struct spell *sp;
+            int level;
+            const char *name;
 
             propValue = xmlGetProp(node, BAD_CAST "name");
             assert(propValue != NULL);
-            sp = find_spell((const char *)propValue);
-            if (!sp) {
-                log_error("no spell '%s' for equipment-set '%s'\n", (const char *)propValue, eq->name);
+            name = (const char *)propValue;
+            level = xml_ivalue(node, "level", 0);
+            if (level > 0) {
+                equipment_addspell(eq, name, level);
             }
             else {
-                int level = xml_ivalue(node, "level", 0);
-                if (level > 0) {
-                    equipment_addspell(eq, sp, level);
-                }
-                else {
-                    log_error("spell '%s' for equipment-set '%s' has no level\n", sp->sname, eq->name);
-                }
+                log_error("spell '%s' for equipment-set '%s' has no level\n", name, eq->name);
             }
             xmlFree(propValue);
         }
@@ -1331,7 +1327,7 @@ static int parse_equipment(xmlDocPtr doc)
                 xmlXPathFreeObject(xpathResult);
 
                 xpathResult = xmlXPathEvalExpression(BAD_CAST "spell", xpath);
-                assert(!eq->spellbook);
+                assert(!eq->spells);
                 add_spells(eq, xpathResult->nodesetval);
                 xmlXPathFreeObject(xpathResult);
 
