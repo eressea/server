@@ -25,9 +25,13 @@ extern "C" {
     struct ship;
     struct curse;
     struct unit;
+    struct faction;
+    struct region;
     struct message;
 
     void register_spells(void);
+
+    void watch_region(struct region *r, struct faction *f, int perception);
 
     int sp_baddreams(castorder * co);
     int sp_gooddreams(castorder * co);

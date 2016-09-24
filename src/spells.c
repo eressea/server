@@ -4111,7 +4111,8 @@ static int sp_bigrecruit(castorder * co)
     return cast_level;
 }
 
-static void watch_region(region *r, faction *f, int perception) {
+void watch_region(region *r, faction *f, int perception)
+{
     unit *u;
 
     u = create_unit(r, f, 1, get_race(RC_SPELL), 0, NULL, NULL);

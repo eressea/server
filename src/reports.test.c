@@ -6,6 +6,7 @@
 #include "lighthouse.h"
 #include "travelthru.h"
 #include "keyword.h"
+#include "spells.h"
 
 #include <kernel/building.h>
 #include <kernel/faction.h>
@@ -426,7 +427,7 @@ static void test_seen_travelthru(CuTest *tc) {
 }
 
 static void test_report_far_vision(CuTest *tc) {
-    unit *u1, *u2;
+    unit *u1;
     faction *f;
     region *r1, *r2;
     const race *rc;
@@ -436,8 +437,9 @@ static void test_report_far_vision(CuTest *tc) {
     u1 = test_create_unit(f, r1);
     r2 = test_create_region(10, 0, 0);
     rc = test_create_race("spell");
-    u2 = create_unit(r2, u1->faction, 1, rc, 0, "spell/dreamreading", NULL);
-    set_number(u2, 1);
+    watch_region(r2, f, 10);
+    CuAssertPtrEquals(tc, r1, f->first);
+    CuAssertPtrEquals(tc, r2, f->last);
     report_context ctx;
     prepare_report(&ctx, f);
     CuAssertPtrEquals(tc, r1, ctx.first);
