@@ -425,6 +425,26 @@ static void test_seen_travelthru(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_region_distance_max(CuTest *tc) {
+    region *r;
+    region *result[64];
+    int x, y;
+    test_setup();
+    r = test_create_region(0, 0, 0);
+    for (x=-3;x<=3;++x) {
+        for (y = -3; y <= 3; ++y) {
+            if (x != 0 || y != 0) {
+                test_create_region(x, y, 0);
+            }
+        }
+    }
+    CuAssertIntEquals(tc, 1, get_regions_distance_arr(r, 0, result, 64));
+    CuAssertIntEquals(tc, 7, get_regions_distance_arr(r, 1, result, 64));
+    CuAssertIntEquals(tc, 19, get_regions_distance_arr(r, 2, result, 64));
+    CuAssertIntEquals(tc, 37, get_regions_distance_arr(r, 3, result, 64));
+    test_cleanup();
+}
+
 static void test_region_distance(CuTest *tc) {
     region *r;
     region *result[8];
@@ -465,6 +485,7 @@ CuSuite *get_reports_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_region_distance);
+    SUITE_ADD_TEST(suite, test_region_distance_max);
     SUITE_ADD_TEST(suite, test_region_distance_ql);
     SUITE_ADD_TEST(suite, test_prepare_report);
     SUITE_ADD_TEST(suite, test_seen_neighbours);

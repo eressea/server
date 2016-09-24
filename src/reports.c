@@ -1118,6 +1118,7 @@ int get_regions_distance_arr(region *rc, int radius, region *result[], int size)
     
     if (size>n) {
         result[n++] = rc;
+        fset(rc, RF_MARK);
     }
     for (i = 0; i != n; ++i) {
         region *r;
@@ -1134,8 +1135,9 @@ int get_regions_distance_arr(region *rc, int radius, region *result[], int size)
                 r = adj[d];
                 if (r) {
                     if (size > n) {
-                        if (dist < distance(rc, r)) {
+                        if (!fval(r, RF_MARK) && dist < distance(rc, r)) {
                             result[n++] = r;
+                            fset(r, RF_MARK);
                         }
                     }
                     else {
@@ -1144,6 +1146,9 @@ int get_regions_distance_arr(region *rc, int radius, region *result[], int size)
                 }
             }
         }
+    }
+    for (i = 0; i != n; ++i) {
+        freset(result[i], RF_MARK);
     }
     return n;
 }
