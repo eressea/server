@@ -437,7 +437,7 @@ static void test_report_far_vision(CuTest *tc) {
     u1 = test_create_unit(f, r1);
     r2 = test_create_region(10, 0, 0);
     rc = test_create_race("spell");
-    watch_region(r2, f, 10);
+    set_observer(r2, f, 10);
     CuAssertPtrEquals(tc, r1, f->first);
     CuAssertPtrEquals(tc, r2, f->last);
     report_context ctx;
@@ -445,7 +445,7 @@ static void test_report_far_vision(CuTest *tc) {
     CuAssertPtrEquals(tc, r1, ctx.first);
     CuAssertPtrEquals(tc, 0, ctx.last);
     CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
-    CuAssertIntEquals(tc, seen_unit, r2->seen.mode);
+    CuAssertIntEquals(tc, seen_spell, r2->seen.mode);
     finish_reports(&ctx);
     test_cleanup();
 }

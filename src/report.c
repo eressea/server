@@ -992,7 +992,7 @@ static void describe(stream *out, const region * r, faction * f)
     }
 
     /* iron & stone */
-    if (r->seen.mode == seen_unit) {
+    if (r->seen.mode >= seen_unit) {
         resource_report result[MAX_RAWMATERIALS];
         int n, numresults = report_resources(r, result, MAX_RAWMATERIALS, f, true);
 
@@ -1190,7 +1190,7 @@ static void describe(stream *out, const region * r, faction * f)
     *bufp = 0;
     paragraph(out, buf, 0, 0, 0);
 
-    if (r->seen.mode == seen_unit && is_astral(r) &&
+    if (r->seen.mode >= seen_unit && is_astral(r) &&
         !is_cursed(r->attribs, C_ASTRALBLOCK, 0)) {
         /* Sonderbehandlung Teleport-Ebene */
         region_list *rl = astralregions(r, inhabitable);
@@ -2285,7 +2285,7 @@ report_plaintext(const char *filename, report_context * ctx,
             continue;
         /* Beschreibung */
 
-        if (r->seen.mode == seen_unit) {
+        if (r->seen.mode >= seen_unit) {
             anyunits = 1;
             describe(out, r, f);
             if (markets_module() && r->land) {
@@ -2317,27 +2317,18 @@ report_plaintext(const char *filename, report_context * ctx,
             write_travelthru(out, r, f);
         }
         else {
-            if (r->seen.mode == seen_far) {
-                describe(out, r, f);
-                newline(out);
-                guards(out, r, f);
-                newline(out);
-                write_travelthru(out, r, f);
-            }
-            else {
-                describe(out, r, f);
-                newline(out);
-                write_travelthru(out, r, f);
-            }
+            describe(out, r, f);
+            newline(out);
+            write_travelthru(out, r, f);
         }
         /* Statistik */
 
-        if (wants_stats && r->seen.mode == seen_unit)
+        if (wants_stats && r->seen.mode >= seen_unit)
             statistics(out, r, f);
 
         /* Nachrichten an REGION in der Region */
 
-        if (r->seen.mode == seen_unit || r->seen.mode == seen_travel) {
+        if (r->seen.mode >= seen_travel) {
             // TODO: Bug 2073
             message_list *mlist = r_getmessages(r, f);
             if (mlist) {

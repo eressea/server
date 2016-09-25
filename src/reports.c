@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "reports.h"
 #include "laws.h"
+#include "spells.h"
 #include "travelthru.h"
 #include "lighthouse.h"
 #include "donations.h"
@@ -92,6 +93,7 @@ const char *visibility[] = {
     "travel",
     "far",
     "unit",
+    "spell",
     "battle"
 };
 
@@ -943,9 +945,9 @@ const struct unit *ucansee(const struct faction *f, const struct unit *u,
 int stealth_modifier(seen_mode mode)
 {
     switch (mode) {
+    case seen_spell:
     case seen_unit:
         return 0;
-    case seen_far:
     case seen_lighthouse:
         return -2;
     case seen_travel:
@@ -1336,6 +1338,12 @@ void prepare_report(report_context *ctx, faction *f)
     for (r = ctx->first; r!=ctx->last; r = r->next) {
         unit *u;
 
+        if (fval(r, RF_OBSERVER)) {
+            int skill = get_observer(r, f);
+            if (skill >= 0) {
+                add_seen_nb(f, r, seen_spell);
+            }
+        }
         if (fval(r, RF_LIGHTHOUSE)) {
             /* region owners get the report from lighthouses */
             if (rule_region_owners && bt_lighthouse) {
