@@ -4285,12 +4285,18 @@ void update_subscriptions(void)
     fclose(F);
 }
 
-bool
-cansee(const faction * f, const region * r, const unit * u, int modifier)
-/* r kann != u->region sein, wenn es um Durchreisen geht,
+/** determine if unit can be seen by faction
+ * @param f -- the observiong faction
+ * @param u -- the unit that is observed
+ * @param r -- the region that u is obesrved in (see below)
+ * @param m -- terrain modifier to stealth
+ * 
+ * r kann != u->region sein, wenn es um Durchreisen geht,
  * oder Zauber (sp_generous, sp_fetchastral).
  * Es muss auch niemand aus f in der region sein, wenn sie vom Turm
  * erblickt wird */
+bool
+cansee(const faction * f, const region * r, const unit * u, int modifier)
 {
     int stealth, rings;
     unit *u2 = r->units;
