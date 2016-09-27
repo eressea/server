@@ -286,6 +286,9 @@ static void test_maintain_buildings(CuTest *tc) {
     maintain_buildings(r);
     CuAssertIntEquals(tc, BLD_MAINTAINED, fval(b, BLD_MAINTAINED));
     CuAssertIntEquals(tc, 0, i_get(u->items, itype));
+    CuAssertPtrEquals(tc, 0, r->msgs);
+    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "maintenance_nowork"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "maintenance"));
     test_clear_messages(f);
 
     // this building has no owner, it doesn't work:
@@ -293,7 +296,7 @@ static void test_maintain_buildings(CuTest *tc) {
     b->flags = 0;
     maintain_buildings(r);
     CuAssertIntEquals(tc, 0, fval(b, BLD_MAINTAINED));
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "maintenance_nowork"));
+    CuAssertPtrEquals(tc, 0, f->msgs);
     CuAssertPtrNotNull(tc, test_find_messagetype(r->msgs, "maintenance_noowner"));
 
     test_cleanup();
