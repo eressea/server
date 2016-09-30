@@ -46,9 +46,9 @@ if [ "$HAVE_TOLUA" = "0" ] || [ -z $path ] ; then
  echo "tolua is not installed, building from source"
  cd $ROOT
  if [ ! -d tolua ]; then
-  LUA_VERSION="5.2"
-  if [ ! -d /usr/include/lua5.2 ] ; then
-   LUA_VERSION="5.1"
+  LUA_VERSION="5.1"
+  if [ -d /usr/include/lua5.2 ] || [ -d /usr/local/include/lua5.2 ]; then
+   LUA_VERSION="5.2"
   fi
   echo "fetching tolua ${LUA_VERSION} from github..."
   git clone https://github.com/ennorehling/tolua-${LUA_VERSION}.git tolua
