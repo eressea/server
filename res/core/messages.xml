@@ -7512,7 +7512,7 @@
       <arg name="mage" type="unit"/>
       <arg name="building" type="building"/>
     </type>
-    <text locale="de">"$unit($mage) weight $building($building)."</text>
+    <text locale="de">"$unit($mage) weiht $building($building)."</text>
     <text locale="en">"$unit($mage) blesses $building($building)."</text>
   </message>
 
