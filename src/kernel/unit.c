@@ -1172,7 +1172,6 @@ void u_setfaction(unit * u, faction * f)
     }
 }
 
-/* vorsicht Sprueche koennen u->number == RS_FARVISION haben! */
 void set_number(unit * u, int count)
 {
     assert(count >= 0);

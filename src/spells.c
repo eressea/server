@@ -4168,7 +4168,7 @@ static int sp_pump(castorder * co)
     }
 
     u =
-        create_unit(rt, mage->faction, RS_FARVISION, get_race(RC_SPELL), 0,
+        create_unit(rt, mage->faction, 1, get_race(RC_SPELL), 0,
         "spell/pump", NULL);
     u->age = 2;
     set_level(u, SK_PERCEPTION, effskill(target, SK_PERCEPTION, 0));
@@ -4812,7 +4812,7 @@ int sp_dreamreading(castorder * co)
     }
 
     u2 =
-        create_unit(u->region, mage->faction, RS_FARVISION, get_race(RC_SPELL), 0,
+        create_unit(u->region, mage->faction, 1, get_race(RC_SPELL), 0,
         "spell/dreamreading", NULL);
     set_number(u2, 1);
     u2->age = 2;                  /* Nur fuer diese Runde. */
@@ -5691,7 +5691,7 @@ int sp_viewreality(castorder * co)
         region *rt = rl2->data;
         if (!is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
             u =
-                create_unit(rt, mage->faction, RS_FARVISION, get_race(RC_SPELL), 0,
+                create_unit(rt, mage->faction, 1, get_race(RC_SPELL), 0,
                 "spell/viewreality", NULL);
             set_level(u, SK_PERCEPTION, co->level / 2);
             u->age = 2;
