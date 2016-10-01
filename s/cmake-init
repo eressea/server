@@ -44,7 +44,18 @@ ARGS=" -DCMAKE_MODULE_PATH=$ROOT/cmake/Modules \
 path="$(which tolua)"
 if [ "$HAVE_TOLUA" = "0" ] || [ -z $path ] ; then
  echo "tolua is not installed, building from source"
- cd $ROOT/tolua ; make
+ cd $ROOT
+ if [ ! -d tolua ]; then
+  LUA_VERSION="5.1"
+  if [ -d /usr/include/lua5.2 ] || [ -d /usr/local/include/lua5.2 ]; then
+   LUA_VERSION="5.2"
+  fi
+  echo "fetching tolua ${LUA_VERSION} from github..."
+  git clone https://github.com/ennorehling/tolua-${LUA_VERSION}.git tolua
+ fi
+ echo "building tolua..."
+ cd tolua
+ make
  ARGS="$ARGS -DPC_TOLUA_DIR=$ROOT/tolua"
 else
  echo "tolua is $path"

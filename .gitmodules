@@ -26,6 +26,3 @@
 	path = storage
 	url = https://github.com/ennorehling/storage.git
 	branch = master
-[submodule "tolua"]
-	path = tolua
-	url = https://github.com/ennorehling/tolua.git
