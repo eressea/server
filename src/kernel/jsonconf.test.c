@@ -319,7 +319,7 @@ static void test_spells(CuTest * tc)
 static const char * building_data = "{\"buildings\": { "
 "\"house\" : { "
 "\"maintenance\" : "
-"{ \"type\" : \"iron\", \"amount\" : 1, \"flags\" : [ \"required\", \"variable\" ] }"
+"{ \"type\" : \"iron\", \"amount\" : 1, \"flags\" : [ \"variable\" ] }"
 ","
 "\"construction\" : {"
 "\"maxsize\" : 20,"
@@ -363,7 +363,7 @@ static void test_buildings(CuTest * tc)
     CuAssertPtrNotNull(tc, bt->maintenance);
     CuAssertIntEquals(tc, 1, bt->maintenance[0].number);
     CuAssertPtrEquals(tc, (void *)get_resourcetype(R_IRON), (void *)bt->maintenance[0].rtype);
-    CuAssertIntEquals(tc, MTF_VARIABLE | MTF_VITAL, bt->maintenance[0].flags);
+    CuAssertIntEquals(tc, MTF_VARIABLE, bt->maintenance[0].flags);
     CuAssertIntEquals(tc, 0, bt->maintenance[1].number);
 
     CuAssertPtrNotNull(tc, bt->construction);
