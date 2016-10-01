@@ -61,6 +61,7 @@ extern "C" {
     struct message * test_find_messagetype(struct message_list *msgs, const char *name);
     struct message * test_get_last_message(struct message_list *mlist);
     void test_clear_messages(struct faction *f);
+    void test_clear_messagelist(struct message_list **msgs);
     void assert_message(struct CuTest * tc, struct message *msg, char *name, int numpar);
 
     void assert_pointer_parameter(struct CuTest * tc, struct message *msg, int index, void *arg);

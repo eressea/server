@@ -241,11 +241,15 @@ static void test_tax_cmd(CuTest *tc) {
     test_cleanup();
 }
 
+/** 
+ * see https://bugs.eressea.de/view.php?id=2234
+ */
 static void test_maintain_buildings(CuTest *tc) {
     region *r;
     building *b;
     building_type *btype;
     unit *u;
+    faction *f;
     maintenance *req;
     item_type *itype;
 
@@ -253,7 +257,8 @@ static void test_maintain_buildings(CuTest *tc) {
     btype = test_create_buildingtype("Hort");
     btype->maxsize = 10;
     r = test_create_region(0, 0, 0);
-    u = test_create_unit(test_create_faction(0), r);
+    f = test_create_faction(0);
+    u = test_create_unit(f, r);
     b = test_create_building(r, btype);
     itype = test_create_itemtype("money");
     b->size = btype->maxsize;
@@ -263,6 +268,8 @@ static void test_maintain_buildings(CuTest *tc) {
     b->flags = 0;
     maintain_buildings(r);
     CuAssertIntEquals(tc, BLD_MAINTAINED, fval(b, BLD_MAINTAINED));
+    CuAssertPtrEquals(tc, 0, f->msgs);
+    CuAssertPtrEquals(tc, 0, r->msgs);
 
     req = calloc(2, sizeof(maintenance));
     req[0].number = 100;
@@ -273,19 +280,30 @@ static void test_maintain_buildings(CuTest *tc) {
     b->flags = 0;
     maintain_buildings(r);
     CuAssertIntEquals(tc, 0, fval(b, BLD_MAINTAINED));
-
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "maintenancefail"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(r->msgs, "maintenance_nowork"));
+    test_clear_messagelist(&f->msgs);
+    test_clear_messagelist(&r->msgs);
+    
     // we can afford to pay:
     i_change(&u->items, itype, 100);
     b->flags = 0;
     maintain_buildings(r);
     CuAssertIntEquals(tc, BLD_MAINTAINED, fval(b, BLD_MAINTAINED));
     CuAssertIntEquals(tc, 0, i_get(u->items, itype));
+    CuAssertPtrEquals(tc, 0, r->msgs);
+    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "maintenance_nowork"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "maintenance"));
+    test_clear_messagelist(&f->msgs);
 
     // this building has no owner, it doesn't work:
     u_set_building(u, NULL);
     b->flags = 0;
     maintain_buildings(r);
     CuAssertIntEquals(tc, 0, fval(b, BLD_MAINTAINED));
+    CuAssertPtrEquals(tc, 0, f->msgs);
+    CuAssertPtrNotNull(tc, test_find_messagetype(r->msgs, "maintenance_noowner"));
+    test_clear_messagelist(&r->msgs);
 
     test_cleanup();
 }

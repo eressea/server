@@ -452,6 +452,14 @@ struct message * test_find_messagetype(struct message_list *msgs, const char *na
     return test_find_messagetype_ex(msgs, name, NULL);
 }
 
+void test_clear_messagelist(message_list **msgs) {
+    if (*msgs) {
+        free_messagelist((*msgs)->begin);
+        free(*msgs);
+        *msgs = NULL;
+    }
+}
+
 void test_clear_messages(faction *f) {
     if (f->msgs) {
         free_messagelist(f->msgs->begin);

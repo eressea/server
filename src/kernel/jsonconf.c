@@ -106,7 +106,7 @@ static void json_maintenance_i(cJSON *json, maintenance *mt) {
             break;
         case cJSON_Array:
             if (strcmp(child->string, "flags") == 0) {
-                const char * flags[] = { "variable", "required", 0 };
+                const char * flags[] = { "variable", 0 };
                 mt->flags = json_flags(child, flags);
             }
             else {

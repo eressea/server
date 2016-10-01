@@ -31,7 +31,6 @@ extern "C" {
     /* maintenance::flags */
 #define MTF_NONE     0x00
 #define MTF_VARIABLE 0x01       /* resource usage scales with size */
-#define MTF_VITAL    0x02       /* if resource missing, building may crash */
 
     typedef struct maintenance {
         const struct resource_type *rtype;  /* type of resource required */
