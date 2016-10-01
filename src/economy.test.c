@@ -241,6 +241,9 @@ static void test_tax_cmd(CuTest *tc) {
     test_cleanup();
 }
 
+/** 
+ * see https://bugs.eressea.de/view.php?id=2234
+ */
 static void test_maintain_buildings(CuTest *tc) {
     region *r;
     building *b;
@@ -265,7 +268,8 @@ static void test_maintain_buildings(CuTest *tc) {
     b->flags = 0;
     maintain_buildings(r);
     CuAssertIntEquals(tc, BLD_MAINTAINED, fval(b, BLD_MAINTAINED));
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "maintenance_nowork"));
+    CuAssertPtrEquals(tc, 0, f->msgs);
+    CuAssertPtrEquals(tc, 0, r->msgs);
 
     req = calloc(2, sizeof(maintenance));
     req[0].number = 100;
@@ -276,9 +280,10 @@ static void test_maintain_buildings(CuTest *tc) {
     b->flags = 0;
     maintain_buildings(r);
     CuAssertIntEquals(tc, 0, fval(b, BLD_MAINTAINED));
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "maintenance_nowork"));
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(r->msgs, "maintenance_noowner"));
-    test_clear_messages(f);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "maintenancefail"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(r->msgs, "maintenance_nowork"));
+    test_clear_messagelist(&f->msgs);
+    test_clear_messagelist(&r->msgs);
     
     // we can afford to pay:
     i_change(&u->items, itype, 100);
@@ -289,7 +294,7 @@ static void test_maintain_buildings(CuTest *tc) {
     CuAssertPtrEquals(tc, 0, r->msgs);
     CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "maintenance_nowork"));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "maintenance"));
-    test_clear_messages(f);
+    test_clear_messagelist(&f->msgs);
 
     // this building has no owner, it doesn't work:
     u_set_building(u, NULL);
@@ -298,6 +303,7 @@ static void test_maintain_buildings(CuTest *tc) {
     CuAssertIntEquals(tc, 0, fval(b, BLD_MAINTAINED));
     CuAssertPtrEquals(tc, 0, f->msgs);
     CuAssertPtrNotNull(tc, test_find_messagetype(r->msgs, "maintenance_noowner"));
+    test_clear_messagelist(&r->msgs);
 
     test_cleanup();
 }

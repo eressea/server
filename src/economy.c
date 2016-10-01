@@ -717,7 +717,7 @@ static int maintain(building * b)
 {
     int c;
     region *r = b->region;
-    bool paid = true, work = true;
+    bool paid = true;
     unit *u;
 
     if (fval(b, BLD_MAINTAINED) || b->type == NULL || b->type->maintenance == NULL) {
@@ -738,78 +738,40 @@ static int maintain(building * b)
             return 0;
         }
     }
-    for (c = 0; b->type->maintenance[c].number; ++c) {
+    for (c = 0; b->type->maintenance[c].number && paid; ++c) {
         const maintenance *m = b->type->maintenance + c;
         int need = m->number;
 
         if (fval(m, MTF_VARIABLE))
             need = need * b->size;
-        if (u) {
-            /* first ist im ersten versuch true, im zweiten aber false! Das
-             * bedeutet, das in der Runde in die Region geschafften Resourcen
-             * nicht genutzt werden können, weil die reserviert sind! */
-            need -= get_pooled(u, m->rtype, GET_DEFAULT, need);
-        }
+        need -= get_pooled(u, m->rtype, GET_DEFAULT, need);
         if (need > 0) {
-            if (!fval(m, MTF_VITAL))
-                work = false;
-            else {
-                paid = false;
-                break;
-            }
+            paid = false;
         }
     }
     if (fval(b, BLD_DONTPAY)) {
+        ADDMSG(&r->msgs, msg_message("maintenance_nowork", "building", b));
         return 0;
     }
-    u = building_owner(b);
-    if (!u) {
+    if (!paid) {
+        ADDMSG(&u->faction->msgs, msg_message("maintenancefail", "unit building", u, b));
+        ADDMSG(&r->msgs, msg_message("maintenance_nowork", "building", b));
         return 0;
     }
     for (c = 0; b->type->maintenance[c].number; ++c) {
         const maintenance *m = b->type->maintenance + c;
-        int need = m->number;
+        int cost = m->number;
 
-        if (fval(m, MTF_VARIABLE))
-            need = need * b->size;
-        if (u) {
-            need -= get_pooled(u, m->rtype, GET_DEFAULT, need);
-            if (need > 0) {
-                work = false;
-                if (fval(m, MTF_VITAL)) {
-                    paid = false;
-                    break;
-                }
-            }
+        if (fval(m, MTF_VARIABLE)) {
+            cost = cost * b->size;
         }
+        cost -=
+            use_pooled(u, m->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
+                cost);
+        assert(cost == 0);
     }
-    if (paid && c > 0) {
-        if (!work) {
-            ADDMSG(&u->faction->msgs, msg_message("maintenancefail", "unit building", u, b));
-            return 0;
-        }
-
-        for (c = 0; b->type->maintenance[c].number; ++c) {
-            const maintenance *m = b->type->maintenance + c;
-            int cost = m->number;
-
-            if (!fval(m, MTF_VITAL) && !work)
-                continue;
-            if (fval(m, MTF_VARIABLE))
-                cost = cost * b->size;
-
-            cost -=
-                use_pooled(u, m->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
-                    cost);
-            assert(cost == 0);
-        }
-        if (work) {
-            ADDMSG(&u->faction->msgs, msg_message("maintenance", "unit building", u, b));
-            return BLD_MAINTAINED;
-        }
-    }
-    ADDMSG(&u->faction->msgs, msg_message("maintenancefail", "unit building", u, b));
-    return 0;
+    ADDMSG(&u->faction->msgs, msg_message("maintenance", "unit building", u, b));
+    return BLD_MAINTAINED;
 }
 
 void maintain_buildings(region * r)
@@ -824,19 +786,6 @@ void maintain_buildings(region * r)
             flags = maintain(b);
         }
         fset(b, flags);
-
-        if (!fval(b, BLD_MAINTAINED)) {
-            unit *u = building_owner(b);
-            struct message *msg = msg_message("maintenance_nowork", "building", b);
-            if (u) {
-                add_message(&u->faction->msgs, msg);
-                r_addmessage(r, u->faction, msg);
-            }
-            else {
-                add_message(&r->msgs, msg);
-            }
-            msg_release(msg);
-        }
         bp = &b->next;
     }
 }

@@ -339,9 +339,6 @@ static int parse_buildings(xmlDocPtr doc)
 
                 if (xml_bvalue(node, "variable", false))
                     mt->flags |= MTF_VARIABLE;
-                if (xml_bvalue(node, "vital", false))
-                    mt->flags |= MTF_VITAL;
-
             }
             xmlXPathFreeObject(result);
 

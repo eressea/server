@@ -19,7 +19,7 @@
   </building>
 
   <building name="market" capacity="1" maxsize="10">
-    <maintenance type="money" amount="200" vital="yes"/>
+    <maintenance type="money" amount="200"/>
     <construction skill="building" minskill="3">
       <requirement type="log" quantity="1"/>
       <requirement type="stone" quantity="1"/>
