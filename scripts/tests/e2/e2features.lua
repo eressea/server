@@ -215,7 +215,8 @@ function test_snowman()
     process_orders()
     for u2 in r.units do
         if u2.id~=u.id then
-            assert_equal(u2.race, "snowman")
+            assert_equal("snowman", u2.race)
+            assert_equal(1000, u2.hp)
             u = nil
             break
         end
