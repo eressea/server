@@ -64,11 +64,11 @@ void log_destroy(log_t *handle) {
 #define LOG_MAXBACKUPS 5
 
 static int
-cp_convert(const char *format, char *buffer, size_t length, int codepage)
+cp_convert(const char *format, unsigned char *buffer, size_t length, int codepage)
 {
     /* when console output on MSDOS, convert to codepage */
     const char *input = format;
-    char *pos = buffer;
+    unsigned char *pos = buffer;
 
     while (pos + 1 < buffer + length && *input) {
         size_t size = 0;
@@ -156,10 +156,10 @@ static void _log_write(FILE * stream, int codepage, const char *format, va_list 
 {
     if (codepage) {
         char buffer[MAXLENGTH];
-        char converted[MAXLENGTH];
+        unsigned char converted[MAXLENGTH];
         vsnprintf(buffer, sizeof(buffer), format, args);
         if (cp_convert(buffer, converted, MAXLENGTH, codepage) == 0) {
-            fputs(converted, stream);
+            fputs((char *)converted, stream);
         }
         else {
             /* fall back to non-converted output */

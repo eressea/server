@@ -88,7 +88,7 @@ static void unicode_remove_diacritics(const char *rp, char *wp) {
     while (*rp) {
         if (gm_codepage >=0 && *rp & 0x80) {
             size_t sz = 0;
-            char ch;
+            unsigned char ch;
             switch (gm_codepage) {
             case 1252:
                 unicode_utf8_to_cp1252(&ch, rp, &sz);
@@ -101,7 +101,7 @@ static void unicode_remove_diacritics(const char *rp, char *wp) {
                 break;
             }
             rp += sz;
-            *wp++ = ch;
+            *wp++ = (char)ch;
         }
         else {
             *wp++ = *rp++;
