@@ -506,10 +506,14 @@ size_t * length)
                 *cp_character = (char)xref[m].cp437;
                 break;
             }
-            else if (xref[m].ucs4 < ucs4_character)
-                l = m;
-            else
-                r = m;
+            else if (xref[m].ucs4 < ucs4_character) {
+                if (l == m) l = r;
+                else l = m;
+            } 
+            else {
+                if (r == m) r = l;
+                else r = m;
+            }
         }
         if (l == r) {
             *cp_character = '?';
