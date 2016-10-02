@@ -25,11 +25,10 @@ function ponnuki.init()
         local home = get_region(-67, -5)
         local f = get_faction(666)
         if home and f then
-            u = add_unit(f, home)
+            u = unit.create(f, home, 1, "illusion")
             u.id = atoi36("ponn")
             u.name = "Ponnuki"
             u.info = "Go, Ponnuki, Go!"
-            u.race = "illusion"
             u:set_racename("Ritter von Go")
         else
             eressea.log.error("Ponnuki cannot find Magrathea")
