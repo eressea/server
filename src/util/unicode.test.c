@@ -16,20 +16,55 @@ static void test_unicode_tolower(CuTest * tc)
     CuAssertStrEquals(tc, "helloX", buffer);
 }
 
-static void test_unicode_utf8_to_cp437(CuTest *tc)
+static void test_unicode_utf8_to_other(CuTest *tc)
 {
-    const char utf8_str[4] = { 0xc3, 0x98, 'l', 0 }; // &Oslash;l
-    char ch;
+    const char utf8_str[] = { 0xc3, 0x98, 0xc5, 0xb8, 0xc2, 0x9d, 'l', 0 }; // &Oslash;&Yuml;&#157;l
+    unsigned char ch;
     size_t sz;
     CuAssertIntEquals(tc, 0, unicode_utf8_to_cp437(&ch, utf8_str, &sz));
     CuAssertIntEquals(tc, 2, sz);
     CuAssertIntEquals(tc, '?', ch);
+    CuAssertIntEquals(tc, 0, unicode_utf8_to_cp437(&ch, utf8_str+2, &sz));
+    CuAssertIntEquals(tc, 2, sz);
+    CuAssertIntEquals(tc, '?', ch);
+    CuAssertIntEquals(tc, 0, unicode_utf8_to_cp437(&ch, utf8_str+4, &sz));
+    CuAssertIntEquals(tc, 2, sz);
+    CuAssertIntEquals(tc, '?', ch);
+    CuAssertIntEquals(tc, 0, unicode_utf8_to_cp437(&ch, utf8_str + 6, &sz));
+    CuAssertIntEquals(tc, 1, sz);
+    CuAssertIntEquals(tc, 'l', ch);
+
+    CuAssertIntEquals(tc, 0, unicode_utf8_to_cp1252(&ch, utf8_str, &sz));
+    CuAssertIntEquals(tc, 2, sz);
+    CuAssertIntEquals(tc, 216, ch);
+    CuAssertIntEquals(tc, 0, unicode_utf8_to_cp1252(&ch, utf8_str+2, &sz));
+    CuAssertIntEquals(tc, 2, sz);
+    CuAssertIntEquals(tc, 120, ch);
+    CuAssertIntEquals(tc, 0, unicode_utf8_to_cp1252(&ch, utf8_str + 4, &sz));
+    CuAssertIntEquals(tc, 2, sz);
+    CuAssertIntEquals(tc, 0x9d, ch);
+    CuAssertIntEquals(tc, 0, unicode_utf8_to_cp1252(&ch, utf8_str + 6, &sz));
+    CuAssertIntEquals(tc, 1, sz);
+    CuAssertIntEquals(tc, 'l', ch);
+
+    CuAssertIntEquals(tc, 0, unicode_utf8_to_ascii(&ch, utf8_str, &sz));
+    CuAssertIntEquals(tc, 2, sz);
+    CuAssertIntEquals(tc, '?', ch);
+    CuAssertIntEquals(tc, 0, unicode_utf8_to_ascii(&ch, utf8_str + 2, &sz));
+    CuAssertIntEquals(tc, 2, sz);
+    CuAssertIntEquals(tc, '?', ch);
+    CuAssertIntEquals(tc, 0, unicode_utf8_to_ascii(&ch, utf8_str + 4, &sz));
+    CuAssertIntEquals(tc, 2, sz);
+    CuAssertIntEquals(tc, '?', ch);
+    CuAssertIntEquals(tc, 0, unicode_utf8_to_ascii(&ch, utf8_str + 6, &sz));
+    CuAssertIntEquals(tc, 1, sz);
+    CuAssertIntEquals(tc, 'l', ch);
 }
 
 CuSuite *get_unicode_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_unicode_tolower);
-    SUITE_ADD_TEST(suite, test_unicode_utf8_to_cp437);
+    SUITE_ADD_TEST(suite, test_unicode_utf8_to_other);
     return suite;
 }
