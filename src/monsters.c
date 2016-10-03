@@ -277,27 +277,26 @@ static bool room_for_race_in_region(region * r, const race * rc)
             c += u->number;
     }
 
-    if (c > (rc->splitsize * 2))
-        return false;
-
-    return true;
+    return (c <= (rc->splitsize * 2));
 }
 
 static direction_t random_neighbour(region * r, unit * u)
 {
     int i;
-    region *rc;
     region * next[MAXDIRECTIONS];
     int rr, c = 0, c2 = 0;
+    const race *rc = u_race(u);
 
     get_neighbours(r, next);
     /* Nachsehen, wieviele Regionen in Frage kommen */
 
     for (i = 0; i != MAXDIRECTIONS; i++) {
-        rc = next[i];
-        if (rc && can_survive(u, rc)) {
-            if (room_for_race_in_region(rc, u_race(u))) {
+        region *rn = next[i];
+        if (rn && can_survive(u, rn)) {
+            if (room_for_race_in_region(rn, rc)) {
                 c++;
+            } else {
+                next[i] = NULL;
             }
             c2++;
         }
@@ -321,12 +320,12 @@ static direction_t random_neighbour(region * r, unit * u)
 
     c = -1;
     for (i = 0; i != MAXDIRECTIONS; i++) {
-        rc = next[i];
-        if (rc && can_survive(u, rc)) {
+        region *rn = next[i];
+        if (rn && can_survive(u, rn)) {
             if (c2 == 0) {
                 c++;
             }
-            else if (room_for_race_in_region(rc, u_race(u))) {
+            else if (room_for_race_in_region(rn, rc)) {
                 c++;
             }
             if (c == rr)
