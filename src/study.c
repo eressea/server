@@ -546,6 +546,12 @@ int study_cmd(unit * u, order * ord)
     int maxalchemy = 0;
     int speed_rule = (study_rule_t)config_get_int("study.speedup", 0);
     bool learn_newskills = config_get_int("study.newskills", 1) != 0;
+    static const race *rc_snotling;
+    static int rc_cache;
+
+    if (rc_changed(&rc_cache)) {
+        rc_snotling = get_race(RC_SNOTLING);
+    }
 
     if (!unit_can_study(u)) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_race_nolearn", "race",
@@ -575,7 +581,7 @@ int study_cmd(unit * u, order * ord)
     }
 
     /* snotlings koennen Talente nur bis T8 lernen */
-    if (u_race(u) == get_race(RC_SNOTLING)) {
+    if (u_race(u) == rc_snotling) {
         if (get_level(u, sk) >= 8) {
             cmistake(u, ord, 308, MSG_EVENT);
             return 0;

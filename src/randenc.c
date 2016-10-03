@@ -731,11 +731,16 @@ static void orc_growth(void)
 static void demon_skillchanges(void)
 {
     region *r;
+    static const race *rc_demon;
+    static int rc_cache;
 
+    if (rc_changed(&rc_cache)) {
+        rc_demon = get_race(RC_DAEMON);
+    }
     for (r = regions; r; r = r->next) {
         unit *u;
         for (u = r->units; u; u = u->next) {
-            if (u_race(u) == get_race(RC_DAEMON)) {
+            if (u_race(u) == rc_demon) {
                 demon_skillchange(u);
             }
         }
