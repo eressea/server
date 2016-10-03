@@ -322,14 +322,10 @@ static direction_t random_neighbour(region * r, unit * u)
     for (i = 0; i != MAXDIRECTIONS; i++) {
         region *rn = next[i];
         if (rn && can_survive(u, rn)) {
-            if (c2 == 0) {
-                c++;
-            }
-            else if (room_for_race_in_region(rn, rc)) {
-                c++;
-            }
-            if (c == rr)
+            c++;
+            if (c == rr) {
                 return (direction_t)i;
+            }
         }
     }
 
