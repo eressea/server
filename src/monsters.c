@@ -299,6 +299,8 @@ static direction_t random_neighbour(region * r, unit * u)
                 next[i] = NULL;
             }
             c2++;
+        } else {
+            next[i] = NULL;
         }
     }
 
@@ -321,7 +323,7 @@ static direction_t random_neighbour(region * r, unit * u)
     c = -1;
     for (i = 0; i != MAXDIRECTIONS; i++) {
         region *rn = next[i];
-        if (rn && can_survive(u, rn)) {
+        if (rn) {
             c++;
             if (c == rr) {
                 return (direction_t)i;
