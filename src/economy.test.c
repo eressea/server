@@ -328,11 +328,25 @@ static void test_recruit(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_income(CuTest *tc)
+{
+    race *rc;
+    unit *u;
+    test_setup();
+    rc = test_create_race("nerd");
+    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
+    CuAssertIntEquals(tc, 20, income(u));
+    u->number = 5;
+    CuAssertIntEquals(tc, 100, income(u));
+    test_cleanup();
+}
+
 CuSuite *get_economy_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_give_control_building);
     SUITE_ADD_TEST(suite, test_give_control_ship);
+    SUITE_ADD_TEST(suite, test_income);
     SUITE_ADD_TEST(suite, test_steal_okay);
     SUITE_ADD_TEST(suite, test_steal_ocean);
     SUITE_ADD_TEST(suite, test_steal_nosteal);

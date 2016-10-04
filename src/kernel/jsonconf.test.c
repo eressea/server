@@ -141,6 +141,7 @@ static void test_races(CuTest * tc)
         "\"maintenance\" : 2,"
         "\"weight\" : 3,"
         "\"capacity\" : 4,"
+        "\"income\" : 30,"
         "\"hp\" : 5,"
         "\"ac\" : 6,"
         "\"flags\" : [ \"npc\", \"walk\", \"undead\" ]"
@@ -167,6 +168,7 @@ static void test_races(CuTest * tc)
     CuAssertIntEquals(tc, 2, rc->maintenance);
     CuAssertIntEquals(tc, 3, rc->weight);
     CuAssertIntEquals(tc, 4, rc->capacity);
+    CuAssertIntEquals(tc, 30, rc->income);
     CuAssertIntEquals(tc, 5, rc->hitpoints);
     CuAssertIntEquals(tc, 6, rc->armor);
     cJSON_Delete(json);

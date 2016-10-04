@@ -1656,6 +1656,7 @@ static int parse_races(xmlDocPtr doc)
         rc->maintenance = xml_ivalue(node, "maintenance", rc->maintenance);
         rc->weight = xml_ivalue(node, "weight", rc->weight);
         rc->capacity = xml_ivalue(node, "capacity", rc->capacity);
+        rc->income = xml_ivalue(node, "income", rc->income);
         rc->speed = (float)xml_fvalue(node, "speed", rc->speed);
         rc->hitpoints = xml_ivalue(node, "hp", rc->hitpoints);
         rc->armor = (char)xml_ivalue(node, "ac", rc->armor);
