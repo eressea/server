@@ -1886,7 +1886,13 @@ int skilldiff(troop at, troop dt, int dist)
     unit *au = af->unit, *du = df->unit;
     int is_protected = 0, skdiff = 0;
     weapon *awp = select_weapon(at, true, dist > 1);
+    static int rc_cache;
+    static const race *rc_halfling, *rc_goblin;
 
+    if (rc_changed(&rc_cache)) {
+        rc_halfling = get_race(RC_HALFLING);
+        rc_goblin = get_race(RC_GOBLIN);
+    }
     skdiff += af->person[at.index].attack;
     skdiff -= df->person[dt.index].defence;
 
@@ -1894,11 +1900,10 @@ int skilldiff(troop at, troop dt, int dist)
         skdiff += 2;
 
     /* Effekte durch Rassen */
-    if (awp != NULL && u_race(au) == get_race(RC_HALFLING) && dragonrace(u_race(du))) {
+    if (awp != NULL && u_race(au) == rc_halfling && dragonrace(u_race(du))) {
         skdiff += 5;
     }
-
-    if (u_race(au) == get_race(RC_GOBLIN)) {
+    else if (u_race(au) == rc_goblin) {
         if (af->side->size[SUM_ROW] >= df->side->size[SUM_ROW] * rule_goblin_bonus) {
             skdiff += 1;
         }
