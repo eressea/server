@@ -32,6 +32,7 @@ static void test_rc_defaults(CuTest *tc) {
     CuAssertIntEquals(tc, 0, rc->recruitcost);
     CuAssertIntEquals(tc, 0, rc->maintenance);
     CuAssertIntEquals(tc, 540, rc->capacity);
+    CuAssertIntEquals(tc, 20, rc->income);
     CuAssertIntEquals(tc, 1, rc->hitpoints);
     CuAssertIntEquals(tc, 0, rc->armor);
     CuAssertIntEquals(tc, 0, rc->at_bonus);

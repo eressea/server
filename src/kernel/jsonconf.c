@@ -481,6 +481,9 @@ static void json_race(cJSON *json, race *rc) {
             else if (strcmp(child->string, "capacity") == 0) {
                 rc->capacity = child->valueint;
             }
+            else if (strcmp(child->string, "income") == 0) {
+                rc->income = child->valueint;
+            }
             else if (strcmp(child->string, "hp") == 0) {
                 rc->hitpoints = child->valueint;
             }

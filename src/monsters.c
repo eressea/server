@@ -269,47 +269,57 @@ static direction_t richest_neighbour(region * r, faction * f, int absolut)
 
 static bool room_for_race_in_region(region * r, const race * rc)
 {
-    unit *u;
-    int c = 0;
+    if (rc->splitsize > 0) {
+        unit *u;
+        int c = 0;
 
-    for (u = r->units; u; u = u->next) {
-        if (u_race(u) == rc)
-            c += u->number;
+        for (u = r->units; u; u = u->next) {
+            if (u_race(u) == rc) {
+                c += u->number;
+                if (c > rc->splitsize * 2) {
+                    return false;
+                }
+            }
+        }
     }
-
-    if (c > (rc->splitsize * 2))
-        return false;
-
     return true;
 }
 
 static direction_t random_neighbour(region * r, unit * u)
 {
     int i;
-    region *rc;
-    region * next[MAXDIRECTIONS];
+    region *next[MAXDIRECTIONS], *backup[MAXDIRECTIONS];
+    region **pick;
     int rr, c = 0, c2 = 0;
+    const race *rc = u_race(u);
 
     get_neighbours(r, next);
     /* Nachsehen, wieviele Regionen in Frage kommen */
 
     for (i = 0; i != MAXDIRECTIONS; i++) {
-        rc = next[i];
-        if (rc && can_survive(u, rc)) {
-            if (room_for_race_in_region(rc, u_race(u))) {
+        region *rn = next[i];
+        if (rn && can_survive(u, rn)) {
+            if (room_for_race_in_region(rn, rc)) {
                 c++;
+            } else {
+                next[i] = NULL;
             }
+            backup[i] = rn;
             c2++;
+        } else {
+            next[i] = NULL;
+            backup[i] = NULL;
         }
     }
 
+    pick = next;
     if (c == 0) {
         if (c2 == 0) {
             return NODIRECTION;
         }
         else {
+            pick = backup;
             c = c2;
-            c2 = 0;                   /* c2 == 0 -> room_for_race nicht beachten */
         }
     }
 
@@ -319,18 +329,14 @@ static direction_t random_neighbour(region * r, unit * u)
 
     /* Durchzählen */
 
-    c = -1;
+    c = 0;
     for (i = 0; i != MAXDIRECTIONS; i++) {
-        rc = next[i];
-        if (rc && can_survive(u, rc)) {
-            if (c2 == 0) {
-                c++;
-            }
-            else if (room_for_race_in_region(rc, u_race(u))) {
-                c++;
-            }
-            if (c == rr)
+        region *rn = pick[i];
+        if (rn) {
+            if (c == rr) {
                 return (direction_t)i;
+            }
+            c++;
         }
     }
 
@@ -546,19 +552,21 @@ static order *monster_learn(unit * u)
     return NULL;
 }
 
-static bool check_overpopulated(unit * u)
+static bool check_overpopulated(const unit * u)
 {
-    unit *u2;
-    int c = 0;
+    const race *rc = u_race(u);
+    if (rc->splitsize > 0) {
+        unit *u2;
+        int c = 0;
 
-    for (u2 = u->region->units; u2; u2 = u2->next) {
-        if (u_race(u2) == u_race(u) && u != u2)
-            c += u2->number;
+        for (u2 = u->region->units; u2; u2 = u2->next) {
+            if (u != u2 && u_race(u2) == rc) {
+                c += u2->number;
+                if (c > rc->splitsize * 2)
+                    return true;
+            }
+        }
     }
-
-    if (c > u_race(u)->splitsize * 2)
-        return true;
-
     return false;
 }
 

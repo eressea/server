@@ -125,7 +125,13 @@ static bool RemoveNMRNewbie(void)
 
 static void age_unit(region * r, unit * u)
 {
-    if (u_race(u) == get_race(RC_SPELL)) {
+    static int rc_cache;
+    static const race *rc_spell;
+
+    if (rc_changed(&rc_cache)) {
+        rc_spell = get_race(RC_SPELL);
+    }
+    if (u_race(u) == rc_spell) {
         if (--u->age <= 0) {
             remove_unit(&r->units, u);
         }

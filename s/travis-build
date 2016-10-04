@@ -10,7 +10,7 @@ $BUILD/iniparser/inifile eressea.ini add lua:paths lunit:scripts
 fi
 }
 
-integraton_tests() {
+integration_tests() {
 cd tests
 ./write-reports.sh
 ./run-turn.sh
@@ -24,4 +24,4 @@ cd $ROOT
 inifile
 s/runtests
 
-integraton_tests
+integration_tests

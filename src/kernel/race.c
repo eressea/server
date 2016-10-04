@@ -173,6 +173,7 @@ race *rc_create(const char *zName)
     rc->hitpoints = 1;
     rc->weight = PERSON_WEIGHT;
     rc->capacity = 540;
+    rc->income = 20;
     rc->recruit_multi = 1.0F;
     rc->regaura = 1.0F;
     rc->speed = 1.0F;
