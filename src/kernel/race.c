@@ -100,10 +100,10 @@ int cmp_xref(const void *a, const void *b)
     return 0;
 }
 
+static rc_xref *xrefs;
 race_t old_race(const struct race * rc)
 {
     static int cache;
-    static rc_xref *xrefs;
     int i, l, r;
     
     if (rc_changed(&cache)) {
@@ -170,6 +170,8 @@ void free_races(void) {
     while (races) {
         race * rc = races->next;
         free_params(&races->parameters);
+        free(xrefs);
+        xrefs = 0;
         free(races->_name);
         free(races->def_damage);
         free(races);
