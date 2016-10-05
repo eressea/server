@@ -1170,11 +1170,9 @@ static void add_seen_nb(faction *f, region *r, seen_mode mode) {
 
 /** mark all regions seen by the lighthouse.
  */
-static void prepare_lighthouse(building * b, report_context *ctx)
+static void prepare_lighthouse(faction *f, region *r, int range)
 {
-    faction *f = ctx->f;
-    int range = lighthouse_range(b, f);
-    quicklist *ql, *rlist = get_regions_distance(b->region, range);
+    quicklist *ql, *rlist = get_regions_distance(r, range);
     int qi;
 
     for (ql = rlist, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
@@ -1316,7 +1314,6 @@ static void cb_add_seen(region *r, unit *u, void *cbdata) {
 void prepare_report(report_context *ctx, faction *f)
 {
     region *r;
-    building *b;
     static int config;
     static bool rule_region_owners;
     const struct building_type *bt_lighthouse = bt_find("lighthouse");
@@ -1334,33 +1331,35 @@ void prepare_report(report_context *ctx, faction *f)
     ctx->last = lastregion(f);
 
     for (r = ctx->first; r!=ctx->last; r = r->next) {
+        int range = 0;
         unit *u;
+        if (fval(r, RF_LIGHTHOUSE) && bt_lighthouse) {
+            if (rule_region_owners && f == region_get_owner(r)) {
+                /* region owners get the report from lighthouses */
+                building *b;
 
-        if (fval(r, RF_LIGHTHOUSE)) {
-            /* region owners get the report from lighthouses */
-            if (rule_region_owners && bt_lighthouse) {
-                for (b = rbuildings(r); b; b = b->next) {
-                    if (b && b->type == bt_lighthouse) {
-                        u = building_owner(b);
-                        if (u && u->faction==f) {
-                            prepare_lighthouse(b, ctx);
-                            add_seen_nb(f, r, seen_unit);
-                        }
+                for (b = r->buildings; b; b = b->next) {
+                    if (b->type == bt_lighthouse) {
+                        int br = lighthouse_range(b, NULL);
+                        if (br > range) range = br;
                     }
                 }
             }
-
         }
         for (u = r->units; u; u = u->next) {
-            if (u->faction==f) {
+            if (u->faction == f) {
                 add_seen_nb(f, r, seen_unit);
-                if (fval(r, RF_LIGHTHOUSE)) {
+                if (fval(r, RF_LIGHTHOUSE) && bt_lighthouse) {
                     if (u->building && u->building->type == bt_lighthouse && inside_building(u)) {
-                        /* we are in a lighthouse. add the regions we can see from here! */
-                        prepare_lighthouse(u->building, ctx);
+                        int br = lighthouse_range(u->building, f);
+                        if (br > range) range = br;
                     }
                 }
             }
+        }
+        if (range > 0) {
+            /* we are in at least one lighthouse. add the regions we can see from here! */
+            prepare_lighthouse(f, r, range);
         }
 
         if (fval(r, RF_TRAVELUNIT) && r->seen.mode<seen_travel) {

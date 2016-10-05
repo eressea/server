@@ -73,13 +73,11 @@ int lighthouse_range(const building * b, const faction * f)
             region *r = b->region;
             int c = 0;
             int cap = buildingcapacity(b);
-            unit *u;
+            unit *u, *uown = building_owner(b);
 
             for (u = r->units; u; u = u->next) {
-                if (u->building == b || u == building_owner(b)) {
-                    if (u->building == b) {
-                        c += u->number;
-                    }
+                if (u->building == b || u == uown) {
+                    c += u->number;
                     if (c > cap) {
                         break;
                     }
