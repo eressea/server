@@ -66,10 +66,26 @@ static void test_race_get(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_old_race(CuTest *tc)
+{
+    race * rc1, *rc2;
+    test_setup();
+    test_create_race("dwarf");
+    rc1 = test_create_race("elf");
+    rc2 = test_create_race("onkel");
+    CuAssertIntEquals(tc, RC_ELF, old_race(rc1));
+    CuAssertIntEquals(tc, NORACE, old_race(rc2));
+    rc2 = test_create_race("human");
+    CuAssertIntEquals(tc, RC_ELF, old_race(rc1));
+    CuAssertIntEquals(tc, RC_HUMAN, old_race(rc2));
+    test_cleanup();
+}
+
 CuSuite *get_race_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_race_get);
+    SUITE_ADD_TEST(suite, test_old_race);
     SUITE_ADD_TEST(suite, test_rc_name);
     SUITE_ADD_TEST(suite, test_rc_defaults);
     SUITE_ADD_TEST(suite, test_rc_find);
