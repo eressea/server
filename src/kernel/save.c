@@ -69,7 +69,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/resolve.h>
 #include <util/rng.h>
 #include <util/umlaut.h>
-#include <util/unicode.h>
 
 #include <quicklist.h>
 #include <stream.h>
