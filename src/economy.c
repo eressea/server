@@ -180,15 +180,6 @@ static void expandorders(region * r, request * requests)
 
 /* ------------------------------------------------------------- */
 
-static void change_level(unit * u, skill_t sk, int bylevel)
-{
-    skill *sv = unit_skill(u, sk);
-    assert(bylevel > 0);
-    if (sv == 0)
-        sv = add_skill(u, sk);
-    sk_set(sv, sv->level + bylevel);
-}
-
 typedef struct recruitment {
     struct recruitment *next;
     faction *f;
