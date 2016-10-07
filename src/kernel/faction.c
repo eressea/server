@@ -386,19 +386,14 @@ void destroyfaction(faction ** fp)
                 const race *rc = u_race(u);
                 int m = rmoney(r);
 
+                /* Personen gehen nur an die Bauern, wenn sie auch von dort
+                 * stammen */
                 if ((rc->ec_flags & ECF_REC_ETHEREAL) == 0) {
                     int p = rpeasants(u->region);
                     int h = rhorses(u->region);
                     item *itm;
 
-                    /* Personen gehen nur an die Bauern, wenn sie auch von dort
-                     * stammen */
-                    if (rc->ec_flags & ECF_REC_HORSES) {  /* Zentauren an die Pferde */
-                        h += u->number;
-                    }
-                    else {              /* Orks zählen nur zur Hälfte */
-                        p += (int)(u->number * rc->recruit_multi);
-                    }
+                    p += (int)(u->number * rc->recruit_multi);
                     for (itm = u->items; itm; itm = itm->next) {
                         if (itm->type->flags & ITF_ANIMAL) {
                             h += itm->number;

@@ -258,10 +258,6 @@ void add_recruits(unit * u, int number, int wanted)
         strlcat(equipment, "_unit", sizeof(equipment));
         equip_unit(unew, get_equipment(equipment));
 
-        if (u_race(unew)->ec_flags & ECF_REC_HORSES) {
-            change_level(unew, SK_RIDING, 1);
-        }
-
         if (unew != u) {
             transfermen(unew, u, unew->number);
             remove_unit(&r->units, unew);
@@ -276,24 +272,6 @@ void add_recruits(unit * u, int number, int wanted)
 static int any_recruiters(const struct race *rc, int qty)
 {
     return (int)(qty * 2 * rc->recruit_multi);
-}
-
-/*static int peasant_recruiters(const struct race *rc, int qty)
-{
-if (rc->ec_flags & ECF_REC_ETHEREAL)
-return -1;
-if (rc->ec_flags & ECF_REC_HORSES)
-return -1;
-return (int)(qty * 2 * rc->recruit_multi);
-}*/
-
-static int horse_recruiters(const struct race *rc, int qty)
-{
-    if (rc->ec_flags & ECF_REC_ETHEREAL)
-        return -1;
-    if (rc->ec_flags & ECF_REC_HORSES)
-        return (int)(qty * 2.0 * rc->recruit_multi);
-    return -1;
 }
 
 static int do_recruiting(recruitment * recruits, int available)
@@ -406,17 +384,6 @@ static void expandrecruit(region * r, request * recruitorders)
     recruitment *recruits = NULL;
 
     int orc_total = 0;
-
-    /* centaurs: */
-    recruits = select_recruitment(&recruitorders, horse_recruiters, &orc_total);
-    if (recruits) {
-        int recruited, horses = rhorses(r) * 2;
-        if (orc_total < horses)
-            horses = orc_total;
-        recruited = do_recruiting(recruits, horses);
-        rsethorses(r, (horses - recruited) / 2);
-        free_recruitments(recruits);
-    }
 
     /* peasant limited: */
     recruits = select_recruitment(&recruitorders, any_recruiters, &orc_total);
@@ -539,7 +506,7 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
         return;
     }
 
-    if (!(rc->ec_flags & ECF_REC_HORSES) && fval(r, RF_ORCIFIED)) {
+    if (fval(r, RF_ORCIFIED)) {
         if (rc != get_race(RC_ORC)) {
             cmistake(u, ord, 238, MSG_EVENT);
             return;

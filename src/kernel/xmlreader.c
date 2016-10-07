@@ -1730,8 +1730,6 @@ static int parse_races(xmlDocPtr doc)
             rc->ec_flags |= GIVEUNIT;
         if (xml_bvalue(node, "getitem", false))
             rc->ec_flags |= GETITEM;
-        if (xml_bvalue(node, "recruithorses", false))
-            rc->ec_flags |= ECF_REC_HORSES;
         if (xml_bvalue(node, "recruitethereal", false))
             rc->ec_flags |= ECF_REC_ETHEREAL;
         if (xml_bvalue(node, "recruitunlimited", false))
