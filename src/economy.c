@@ -114,20 +114,8 @@ static void recruit_init(void)
 
 int income(const unit * u)
 {
-    // TODO: make this a property, like race.income, no hard-coding of values
-    if (fval(u_race(u), RCF_DRAGON)) {
-        switch (old_race(u_race(u))) {
-        case RC_FIREDRAGON:
-            return 150 * u->number;
-        case RC_DRAGON:
-            return 1000 * u->number;
-        case RC_WYRM:
-            return 5000 * u->number;
-        default:
-            break;
-        }
-    }
-    return 20 * u->number;
+    const race *rc = u_race(u);
+    return rc->income * u->number;
 }
 
 static void scramble(void *data, unsigned int n, size_t width)

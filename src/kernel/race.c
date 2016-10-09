@@ -86,6 +86,50 @@ const struct race *get_race(race_t rt) {
     return rc_find(name);
 }
 
+typedef struct xref {
+    race_t id;
+    const race *rc;
+} rc_xref;
+
+int cmp_xref(const void *a, const void *b)
+{
+    const rc_xref *l = (const rc_xref *)a;
+    const rc_xref *r = (const rc_xref *)b;
+    if (l->rc<r->rc) return -1;
+    if (l->rc>r->rc) return 1;
+    return 0;
+}
+
+static rc_xref *xrefs;
+race_t old_race(const struct race * rc)
+{
+    static int cache;
+    int i, l, r;
+    
+    if (rc_changed(&cache)) {
+        if (!xrefs) {
+            xrefs = malloc(sizeof(rc_xref) * MAXRACES);
+        }
+        for (i = 0; i != MAXRACES; ++i) {
+            xrefs[i].rc = get_race(i);
+            xrefs[i].id = (race_t)i;
+        }
+        qsort(xrefs, MAXRACES, sizeof(rc_xref), cmp_xref);
+    }
+    l=0; r=MAXRACES-1;
+    while (l<=r) {
+        int m = (l+r)/2;
+        if (rc<xrefs[m].rc) {
+            r = m-1;
+        } else if (rc>xrefs[m].rc) {
+            l = m+1;
+        } else {
+            return (race_t)xrefs[m].id;
+        }
+    }
+    return NORACE;
+}
+
 race_list *get_familiarraces(void)
 {
     static int init = 0;
@@ -126,6 +170,8 @@ void free_races(void) {
     while (races) {
         race * rc = races->next;
         free_params(&races->parameters);
+        free(xrefs);
+        xrefs = 0;
         free(races->_name);
         free(races->def_damage);
         free(races);
@@ -173,6 +219,7 @@ race *rc_create(const char *zName)
     rc->hitpoints = 1;
     rc->weight = PERSON_WEIGHT;
     rc->capacity = 540;
+    rc->income = 20;
     rc->recruit_multi = 1.0F;
     rc->regaura = 1.0F;
     rc->speed = 1.0F;

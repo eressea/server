@@ -1,4 +1,8 @@
-<race name="youngdragon" magres="0.500000" maxaura="1.0" regaura="1.0" weight="8000" capacity="10000" speed="1.0" hp="300" ac="4" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes" dragon="yes">
+<race name="youngdragon" magres="0.500000" maxaura="1.0" regaura="1.0"
+weight="8000" capacity="10000" speed="1.0" hp="300" ac="4"
+damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4"
+defensemodifier="4" scarepeasants="yes" fly="yes" walk="yes"
+teach="no" getitem="yes" resistbash="yes" dragon="yes" income="150">
   <ai splitsize="6" killpeasants="yes" learn="yes" scare="160"/>
   <function name="name" value="namedragon"/>
   <function name="age" value="agefiredragon"/>

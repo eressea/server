@@ -137,16 +137,6 @@ int NMRTimeout(void)
     return config_get_int("nmr.timeout", 0);
 }
 
-race_t old_race(const struct race * rc)
-{
-    race_t i;
-    // TODO: this sucks so bad!
-    for (i = 0; i != MAXRACES; ++i) {
-        if (get_race(i) == rc)  return i;
-    }
-    return NORACE;
-}
-
 helpmode helpmodes[] = {
     { "all", HELP_ALL }
     ,

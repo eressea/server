@@ -124,6 +124,7 @@ extern "C" {
         int splitsize;
         int weight;
         int capacity;
+        int income;
         float speed;
         float aggression;           /* chance that a monster will attack */
         int hitpoints;
