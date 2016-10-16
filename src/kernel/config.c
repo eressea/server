@@ -679,7 +679,7 @@ static const char * relpath(char *buf, size_t sz, const char *path) {
 static const char *g_datadir;
 const char *datapath(void)
 {
-    static char zText[MAX_PATH]; // FIXME: static return value
+    static char zText[MAX_PATH];
     if (g_datadir)
         return g_datadir;
     return relpath(zText, sizeof(zText), "data");
@@ -693,7 +693,7 @@ void set_datapath(const char *path)
 static const char *g_reportdir;
 const char *reportpath(void)
 {
-    static char zText[MAX_PATH]; // FIXME: static return value
+    static char zText[MAX_PATH];
     if (g_reportdir)
         return g_reportdir;
     return relpath(zText, sizeof(zText), "reports");

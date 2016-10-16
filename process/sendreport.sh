@@ -14,7 +14,7 @@ GAME=$1
 EMAIL=$2
 FACTION=$3
 PASSWD=$4
-echo "$GAME $EMAIL $FACTION $PASSWD" >> /tmp/report.log
+#echo "$GAME $EMAIL $FACTION $PASSWD" >> /tmp/report.log
 
 function reply() {
   echo $@ | mutt -s "Reportnachforderung Partei ${FACTION}" $EMAIL
