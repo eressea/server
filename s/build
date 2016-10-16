@@ -33,6 +33,7 @@ if [ ! -d $ROOT/$BUILD ]; then
   exit
 fi
 
+rm -rf crypto tolua
 git submodule update
 
 echo "build eressea"
