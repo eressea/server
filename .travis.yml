@@ -12,7 +12,6 @@ addons:
       - libsqlite3-dev
       - libxml2-dev
       - valgrind
-      - libtolua-dev
 os:
   - linux
 notifications:
