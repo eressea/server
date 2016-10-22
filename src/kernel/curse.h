@@ -285,6 +285,7 @@ extern "C" {
     void ct_register(const curse_type *);
     void ct_checknames(void);
 
+    curse *cfindhash(int i);
     curse *findcurse(int curseid);
 
     void curse_init(struct attrib *a);
