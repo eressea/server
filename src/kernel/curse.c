@@ -97,6 +97,15 @@ static void cunhash(curse * c)
     }
 }
 
+curse *cfindhash(int i)
+{
+    curse *old;
+
+    for (old = cursehash[i % MAXENTITYHASH]; old; old = old->nexthash)
+        if (old->no == i)
+            return old;
+    return NULL;
+}
 /* ------------------------------------------------------------- */
 /* at_curse */
 void curse_init(attrib * a)

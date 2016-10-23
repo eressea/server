@@ -287,6 +287,7 @@ extern "C" {
     void ct_remove(const char *c);
     void ct_checknames(void);
 
+    curse *cfindhash(int i);
     curse *findcurse(int curseid);
 
     void curse_init(struct attrib *a);

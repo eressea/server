@@ -1938,6 +1938,7 @@ int newunitid(void)
     start_random_no = random_unit_no;
 
     while (ufindhash(random_unit_no) || dfindhash(random_unit_no)
+        || cfindhash(random_unit_no)
         || forbiddenid(random_unit_no)) {
         random_unit_no++;
         if (random_unit_no == MAX_UNIT_NR + 1) {
