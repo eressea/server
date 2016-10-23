@@ -7,7 +7,8 @@ script: s/travis-build
 addons:
   apt:
     packages:
-      - liblua5.2-dev
+      - liblua5.1-dev
+      - libtolua-dev
       - libncurses5-dev
       - libsqlite3-dev
       - libxml2-dev

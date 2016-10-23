@@ -61,7 +61,6 @@ without prior permission by the authors of Eressea.
 #include <util/language.h>
 #include <util/message.h>
 #include <quicklist.h>
-#include <util/unicode.h>
 #include <util/xml.h>
 
 #ifdef USE_LIBXML2

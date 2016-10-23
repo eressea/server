@@ -258,7 +258,6 @@ extern "C" {
 #define GET_PEASANTS 2
 
     int getunit(const struct region * r, const struct faction * f, struct unit **uresult);
-    int newunitid(void);
     int read_unitid(const struct faction *f, const struct region *r);
 
     void setstatus(struct unit *u, int status);

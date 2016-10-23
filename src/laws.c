@@ -2916,7 +2916,7 @@ int renumber_cmd(unit * u, order * ord)
 {
     char token[128];
     const char *s;
-    int i;
+    int i = 0;
     faction *f = u->faction;
 
     init_order(ord);
@@ -2936,10 +2936,7 @@ int renumber_cmd(unit * u, order * ord)
 
     case P_UNIT:
         s = gettoken(token, sizeof(token));
-        if (s == NULL || *s == 0) {
-            i = newunitid();
-        }
-        else {
+        if (s && *s) {
             i = atoi36((const char *)s);
             if (i <= 0 || i > MAX_UNIT_NR) {
                 cmistake(u, ord, 114, MSG_EVENT);

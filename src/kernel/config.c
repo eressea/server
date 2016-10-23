@@ -70,7 +70,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/translation.h>
-#include <util/unicode.h>
 #include <util/umlaut.h>
 #include <util/xml.h>
 

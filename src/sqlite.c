@@ -3,7 +3,6 @@
 #include <kernel/faction.h>
 #include <kernel/race.h>
 #include <util/language.h>
-#include <util/unicode.h>
 #include <util/log.h>
 #include <util/base36.h>
 #include <util/log.h>

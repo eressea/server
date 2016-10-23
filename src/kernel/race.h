@@ -217,7 +217,6 @@ extern "C" {
 #define GIVEPERSON     (1<<2)   /* übergibt Personen */
 #define GIVEUNIT       (1<<3)   /* Einheiten an andere Partei übergeben */
 #define GETITEM        (1<<4)   /* nimmt Gegenstände an */
-#define ECF_REC_HORSES     (1<<6)       /* Rekrutiert aus Pferden */
 #define ECF_REC_ETHEREAL   (1<<7)       /* Rekrutiert aus dem Nichts */
 #define ECF_REC_UNLIMITED  (1<<8)       /* Rekrutiert ohne Limit */
 
