@@ -45,13 +45,6 @@ function assert_dir() {
 [ -d $1 ] || abort "missing directory: $1"
 }
 
-function version() {
-assert_dir $SOURCE
-cd $SOURCE
-build=$(grep BUILD src/buildno.h | awk '{ print $3 }')
-echo "eressea build $build"
-}
-
 function setup() {
 assert_dir $SOURCE
 assert_dir $LIVE
@@ -138,9 +131,6 @@ shift $((OPTIND-1))
 
 while [ ! -z $1 ]; do
 case "$1" in
-"version")
-  version
-  ;;
 "build")
   shift
   build $*
