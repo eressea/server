@@ -1084,15 +1084,9 @@ void transfermen(unit * u, unit * dst, int n)
     else if (r->land) {
         if ((u_race(u)->ec_flags & ECF_REC_ETHEREAL) == 0) {
             const race *rc = u_race(u);
-            if (rc->ec_flags & ECF_REC_HORSES) {      /* Zentauren an die Pferde */
-                int h = rhorses(r) + n;
-                rsethorses(r, h);
-            }
-            else {
-                int p = rpeasants(r);
-                p += (int)(n * rc->recruit_multi);
-                rsetpeasants(r, p);
-            }
+            int p = rpeasants(r);
+            p += (int)(n * rc->recruit_multi);
+            rsetpeasants(r, p);
         }
     }
 }
