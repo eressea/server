@@ -1437,6 +1437,26 @@ void free_unit(unit * u)
     }
 }
 
+static int newunitid(void)
+{
+    int random_unit_no;
+    int start_random_no;
+    random_unit_no = 1 + (rng_int() % MAX_UNIT_NR);
+    start_random_no = random_unit_no;
+
+    while (ufindhash(random_unit_no) || dfindhash(random_unit_no)
+        || forbiddenid(random_unit_no)) {
+        random_unit_no++;
+        if (random_unit_no == MAX_UNIT_NR + 1) {
+            random_unit_no = 1;
+        }
+        if (random_unit_no == start_random_no) {
+            random_unit_no = (int)MAX_UNIT_NR + 1;
+        }
+    }
+    return random_unit_no;
+}
+
 static void createunitid(unit * u, int id)
 {
     if (id <= 0 || id > MAX_UNIT_NR || ufindhash(id) || dfindhash(id)
@@ -1699,6 +1719,7 @@ int unit_getcapacity(const unit * u)
 }
 
 void renumber_unit(unit *u, int no) {
+    if (no == 0) no = newunitid();
     uunhash(u);
     if (!ualias(u)) {
         attrib *a = a_add(&u->attribs, a_new(&at_alias));
@@ -1927,28 +1948,6 @@ bool unit_name_equals_race(const unit *u) {
 
 bool unit_can_study(const unit *u) {
     return !((u_race(u)->flags & RCF_NOLEARN) || fval(u, UFL_WERE));
-}
-
-/* ID's für Einheiten und Zauber */
-int newunitid(void)
-{
-    int random_unit_no;
-    int start_random_no;
-    random_unit_no = 1 + (rng_int() % MAX_UNIT_NR);
-    start_random_no = random_unit_no;
-
-    while (ufindhash(random_unit_no) || dfindhash(random_unit_no)
-        || cfindhash(random_unit_no)
-        || forbiddenid(random_unit_no)) {
-        random_unit_no++;
-        if (random_unit_no == MAX_UNIT_NR + 1) {
-            random_unit_no = 1;
-        }
-        if (random_unit_no == start_random_no) {
-            random_unit_no = (int)MAX_UNIT_NR + 1;
-        }
-    }
-    return random_unit_no;
 }
 
 static int read_newunitid(const faction * f, const region * r)

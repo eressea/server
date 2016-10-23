@@ -97,15 +97,6 @@ static void cunhash(curse * c)
     }
 }
 
-curse *cfindhash(int i)
-{
-    curse *old;
-
-    for (old = cursehash[i % MAXENTITYHASH]; old; old = old->nexthash)
-        if (old->no == i)
-            return old;
-    return NULL;
-}
 /* ------------------------------------------------------------- */
 /* at_curse */
 void curse_init(attrib * a)
@@ -531,6 +522,24 @@ static void set_cursedmen(curse * c, int cursedmen)
     }
 }
 
+static int newcurseid(void) {
+    int random_no;
+    int start_random_no;
+    random_no = 1 + (rng_int() % MAX_UNIT_NR);
+    start_random_no = random_no;
+
+    while (findcurse(random_no)) {
+        random_no++;
+        if (random_no == MAX_UNIT_NR + 1) {
+            random_no = 1;
+        }
+        if (random_no == start_random_no) {
+            random_no = (int)MAX_UNIT_NR + 1;
+        }
+    }
+    return random_no;
+}
+
 /* ------------------------------------------------------------- */
 /* Legt eine neue Verzauberung an. Sollte es schon einen Zauber
  * dieses Typs geben, gibt es den bestehenden zurück.
@@ -552,7 +561,7 @@ static curse *make_curse(unit * mage, attrib ** ap, const curse_type * ct,
     c->effect = effect;
     c->magician = mage;
 
-    c->no = newunitid();
+    c->no = newcurseid();
     chash(c);
 
     switch (c->type->typ) {
