@@ -100,6 +100,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(magic);
     ADD_SUITE(alchemy);
     ADD_SUITE(reports);
+    ADD_SUITE(region);
     ADD_SUITE(save);
     ADD_SUITE(ship);
     ADD_SUITE(spellbook);
@@ -111,7 +112,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(messages);
     /* gamecode */
     ADD_SUITE(report);
-//    ADD_SUITE(creport);
+    ADD_SUITE(creport);
     ADD_SUITE(prefix);
     ADD_SUITE(summary);
     ADD_SUITE(names);

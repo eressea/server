@@ -20,7 +20,7 @@ order.test.c
 plane.test.c
 pool.test.c
 race.test.c
-# region.test.c
+region.test.c
 # resources.test.c
 save.test.c
 ship.test.c

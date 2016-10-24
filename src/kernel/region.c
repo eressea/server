@@ -1057,7 +1057,6 @@ void terraform_region(region * r, const terrain_type * terrain)
         rsetmoney(r, 0);
         freset(r, RF_ENCOUNTER);
         freset(r, RF_MALLORN);
-        /* Beschreibung und Namen löschen */
         return;
     }
 
@@ -1082,6 +1081,7 @@ void terraform_region(region * r, const terrain_type * terrain)
         r->land->ownership = NULL;
         region_set_morale(r, MORALE_DEFAULT, -1);
         region_setname(r, makename());
+        fix_demand(r);
         for (d = 0; d != MAXDIRECTIONS; ++d) {
             region *nr = rconnect(r, d);
             if (nr && nr->land) {
