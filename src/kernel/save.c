@@ -1096,6 +1096,9 @@ static region *readregion(struct gamedata *data, int x, int y)
             READ_INT(data->store, &n);
             r_setdemand(r, rtype->ltype, n);
         }
+        if (!r->land->demands) {
+            fix_demand(r);
+        }
         read_items(data->store, &r->land->items);
         if (data->version >= REGIONOWNER_VERSION) {
             READ_INT(data->store, &n);

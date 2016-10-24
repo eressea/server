@@ -1009,6 +1009,20 @@ void setluxuries(region * r, const luxury_type * sale)
     }
 }
 
+int fix_demand(region * rd) {
+    luxury_type * ltype;
+    int maxluxuries = get_maxluxuries();
+    if (maxluxuries > 0) {
+        int sale = rng_int() % maxluxuries;
+        for (ltype = luxurytypes; sale != 0 && ltype; ltype = ltype->next) {
+            --sale;
+        }
+        setluxuries(rd, ltype);
+        return 0;
+    }
+    return -1;
+}
+
 void terraform_region(region * r, const terrain_type * terrain)
 {
     /* Resourcen, die nicht mehr vorkommen können, löschen */
