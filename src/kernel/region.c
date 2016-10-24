@@ -1009,6 +1009,20 @@ void setluxuries(region * r, const luxury_type * sale)
     }
 }
 
+int fix_demand(region * rd) {
+    luxury_type * ltype;
+    int maxluxuries = get_maxluxuries();
+    if (maxluxuries > 0) {
+        int sale = rng_int() % maxluxuries;
+        for (ltype = luxurytypes; sale != 0 && ltype; ltype = ltype->next) {
+            --sale;
+        }
+        setluxuries(rd, ltype);
+        return 0;
+    }
+    return -1;
+}
+
 void terraform_region(region * r, const terrain_type * terrain)
 {
     /* Resourcen, die nicht mehr vorkommen können, löschen */
@@ -1057,7 +1071,6 @@ void terraform_region(region * r, const terrain_type * terrain)
         rsetmoney(r, 0);
         freset(r, RF_ENCOUNTER);
         freset(r, RF_MALLORN);
-        /* Beschreibung und Namen löschen */
         return;
     }
 
@@ -1082,6 +1095,7 @@ void terraform_region(region * r, const terrain_type * terrain)
         r->land->ownership = NULL;
         region_set_morale(r, MORALE_DEFAULT, -1);
         region_setname(r, makename());
+        fix_demand(r);
         for (d = 0; d != MAXDIRECTIONS; ++d) {
             region *nr = rconnect(r, d);
             if (nr && nr->land) {
