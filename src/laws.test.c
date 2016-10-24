@@ -1403,6 +1403,8 @@ static void test_demon_hunger(CuTest * tc)
 }
 
 static void test_armedmen(CuTest *tc) {
+    // TODO: test wtype->minskill and WTF_SIEGE
+    // TODO: test RCF_NOWEAPONS and SK_WEAPONLESS
     unit *u;
     item_type *it_sword;
     test_setup();
@@ -1417,6 +1419,9 @@ static void test_armedmen(CuTest *tc) {
     CuAssertIntEquals(tc, 1, armedmen(u, false));
     i_change(&u->items, it_sword, 1);
     CuAssertIntEquals(tc, 1, armedmen(u, false));
+    scale_number(u, 2);
+    set_level(u, SK_MELEE, 1);
+    CuAssertIntEquals(tc, 2, armedmen(u, false));
     set_level(u, SK_MELEE, 0);
     CuAssertIntEquals(tc, 0, armedmen(u, false));
     test_cleanup();
