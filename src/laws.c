@@ -4128,7 +4128,7 @@ int armedmen(const unit * u, bool siege_weapons)
                 if (effskill(u, wtype->skill, 0) >= wtype->minskill)
                     n += itm->number;
                 /* if (effskill(u, wtype->skill) >= wtype->minskill) n += itm->number; */
-                if (n > u->number)
+                if (n >= u->number)
                     break;
             }
             n = _min(n, u->number);
