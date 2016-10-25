@@ -1403,14 +1403,14 @@ static void test_demon_hunger(CuTest * tc)
 }
 
 static void test_armedmen(CuTest *tc) {
-    // TODO: test wtype->minskill and WTF_SIEGE
     // TODO: test RCF_NOWEAPONS and SK_WEAPONLESS
     unit *u;
     item_type *it_sword;
+    weapon_type *wtype;
     test_setup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     it_sword = test_create_itemtype("sword");
-    new_weapontype(it_sword, 0, 0.5, 0, 0, 0, 0, SK_MELEE, 1);
+    wtype = new_weapontype(it_sword, 0, 0.5, 0, 0, 0, 0, SK_MELEE, 1);
     CuAssertIntEquals(tc, 0, armedmen(u, false));
     CuAssertIntEquals(tc, 0, armedmen(u, true));
     set_level(u, SK_MELEE, 1);
@@ -1424,6 +1424,17 @@ static void test_armedmen(CuTest *tc) {
     CuAssertIntEquals(tc, 2, armedmen(u, false));
     set_level(u, SK_MELEE, 0);
     CuAssertIntEquals(tc, 0, armedmen(u, false));
+    set_level(u, SK_MELEE, 1);
+    i_change(&u->items, it_sword, -1);
+    CuAssertIntEquals(tc, 1, armedmen(u, false));
+    wtype->minskill = 2;
+    CuAssertIntEquals(tc, 0, armedmen(u, false));
+    set_level(u, SK_MELEE, 2);
+    CuAssertIntEquals(tc, 1, armedmen(u, false));
+    CuAssertIntEquals(tc, 1, armedmen(u, true));
+    wtype->flags |= WTF_SIEGE;
+    CuAssertIntEquals(tc, 0, armedmen(u, false));
+    CuAssertIntEquals(tc, 1, armedmen(u, true));
     test_cleanup();
 }
 
