@@ -20,7 +20,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "alchemy.h"
 #include "guard.h"
-#include "move.h"
 #include "skill.h"
 #include "study.h"
 
