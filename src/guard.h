@@ -7,7 +7,8 @@ extern "C" {
 #endif
 
     struct unit;
-
+    struct region;
+    
     typedef enum { E_GUARD_OK, E_GUARD_UNARMED, E_GUARD_NEWBIE, E_GUARD_FLEEING } guard_t;
 
     extern struct attrib_type at_guard;
