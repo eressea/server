@@ -1,6 +1,7 @@
 #include <platform.h>
 
 #include "guard.h"
+#include "laws.h"
 #include "monster.h"
 
 #include <kernel/config.h>
@@ -54,6 +55,31 @@ static void test_guard_armed(CuTest * tc)
     test_cleanup();
 }
 
+static void test_is_guard(CuTest * tc)
+{
+    unit *ug;
+    region *r;
+    item_type *itype;
+
+    test_setup();
+    itype = it_get_or_create(rt_get_or_create("sword"));
+    new_weapontype(itype, 0, 0.0, NULL, 0, 0, 0, SK_MELEE, 2);
+    r = test_create_region(0, 0, 0);
+    ug = test_create_unit(test_create_faction(0), r);
+    i_change(&ug->items, itype, 1);
+    set_level(ug, SK_MELEE, 2);
+    setguard(ug, GUARD_ALL);
+    CuAssertIntEquals(tc, 1, armedmen(ug, false));
+    CuAssertTrue(tc, is_guard(ug, GUARD_RECRUIT));
+    set_level(ug, SK_MELEE, 1);
+    CuAssertIntEquals(tc, 0, armedmen(ug, false));
+    CuAssertTrue(tc, !is_guard(ug, GUARD_RECRUIT));
+    set_level(ug, SK_MELEE, 2);
+    CuAssertIntEquals(tc, 1, armedmen(ug, false));
+    CuAssertTrue(tc, is_guard(ug, GUARD_RECRUIT));
+    test_cleanup();
+}
+
 static void test_guard_unarmed(CuTest * tc)
 {
     unit *u, *ug;
@@ -88,6 +114,7 @@ static void test_guard_monsters(CuTest * tc)
 CuSuite *get_guard_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_is_guard);
     SUITE_ADD_TEST(suite, test_guard_unskilled);
     SUITE_ADD_TEST(suite, test_guard_armed);
     SUITE_ADD_TEST(suite, test_guard_unarmed);
