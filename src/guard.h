@@ -20,6 +20,9 @@ extern "C" {
 
     void guard(struct unit * u, unsigned int mask);
 
+    struct unit *is_guarded(struct region *r, struct unit *u, unsigned int mask);
+    bool is_guard(const struct unit *u, unsigned int mask);
+
 #ifdef __cplusplus
 }
 #endif
