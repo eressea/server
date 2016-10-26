@@ -8,9 +8,10 @@
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/spell.h>
+#include <util/attrib.h>
 #include <util/base36.h>
 #include <util/language.h>
-#include <util/attrib.h>
+#include <util/rng.h>
 #include <spells/regioncurse.h>
 #include <alchemy.h>
 #include <laws.h>
@@ -454,6 +455,19 @@ static void test_remove_unit(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_renumber_unit(CuTest *tc) {
+    unit *u1, *u2;
+    test_setup();
+    u1 = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u2 = test_create_unit(u1->faction, u1->region);
+    rng_init(0);
+    renumber_unit(u1, 0);
+    rng_init(0);
+    renumber_unit(u2, 0);
+    CuAssertTrue(tc, u1->no != u2->no);
+    test_cleanup();
+}
+
 CuSuite *get_unit_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -476,5 +490,6 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_age_familiar);
     SUITE_ADD_TEST(suite, test_inside_building);
     SUITE_ADD_TEST(suite, test_limited_skills);
+    SUITE_ADD_TEST(suite, test_renumber_unit);
     return suite;
 }

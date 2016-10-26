@@ -160,6 +160,7 @@ extern "C" {
 
 #define reg_hashkey(r) (r->index)
 
+    extern int fix_demand(struct region *r);
     int distance(const struct region *, const struct region *);
     int koor_distance(int ax, int ay, int bx, int by);
     struct region *findregion(int x, int y);

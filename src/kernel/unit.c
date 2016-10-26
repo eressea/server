@@ -1717,7 +1717,7 @@ void renumber_unit(unit *u, int no) {
     uunhash(u);
     if (!ualias(u)) {
         attrib *a = a_add(&u->attribs, a_new(&at_alias));
-        a->data.i = -u->no;
+        a->data.i = -u->no; // TODO: why is the alias negative? confusing!
     }
     u->no = no;
     uhash(u);
