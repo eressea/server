@@ -192,6 +192,7 @@ set(TESTS_SRC
   donations.test.c
   wormhole.test.c
   alchemy.test.c
+  guard.test.c
   test_eressea.c
   tests.c
   battle.test.c

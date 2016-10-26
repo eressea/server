@@ -111,6 +111,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(ally);
     ADD_SUITE(messages);
     /* gamecode */
+    ADD_SUITE(guard);
     ADD_SUITE(report);
     ADD_SUITE(creport);
     ADD_SUITE(prefix);
