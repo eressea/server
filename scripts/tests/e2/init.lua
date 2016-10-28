@@ -1,3 +1,5 @@
+require 'tests.economy'
+
 require 'tests.e2.undead'
 require 'tests.e2.shiplanding'
 require 'tests.e2.e2features'
@@ -13,4 +15,3 @@ require 'tests.storage'
 require 'tests.magicbag'
 require 'tests.process'
 require 'tests.xmas'
-require 'tests.economy'
