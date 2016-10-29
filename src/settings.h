@@ -10,10 +10,6 @@
  without prior permission by the authors of Eressea.
  */
 
-/*
- * Contains defines for the "free" game (Eressea) .
- * Include this file from settings.h to make eressea work.
- */
 #define ENTERTAINFRACTION 20
 #define TEACHDIFFERENCE 2
 #define GUARD_DISABLES_RECRUIT 1
