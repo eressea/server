@@ -1015,7 +1015,7 @@ static bool is_guardian_r(const unit * guard)
 
     if ((guard->flags & UFL_GUARD) == 0)
         return false;
-    return armedmen(guard, true) > 0 || fval(u_race(guard), RCF_UNARMEDGUARD);
+    return fval(u_race(guard), RCF_UNARMEDGUARD) || is_monsters(guard->faction) || (armedmen(guard, true) > 0);
 }
 
 bool is_guard(const struct unit * u, unsigned int mask)
