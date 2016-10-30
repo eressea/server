@@ -82,10 +82,10 @@ void setguard(unit * u, unsigned int flags)
 {
     bool enabled = (flags!=GUARD_NONE);
     if (!enabled) {
-        assert(!fval(u, UFL_MOVED));
-        assert(u->status < ST_FLEE);
         freset(u, UFL_GUARD);
     } else {
+        assert(!fval(u, UFL_MOVED));
+        assert(u->status < ST_FLEE);
         fset(u, UFL_GUARD);
         fset(u->region, RF_GUARDED);
     }
