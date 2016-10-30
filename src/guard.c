@@ -39,7 +39,7 @@ attrib_type at_guard = {
     DEFAULT_INIT,
     DEFAULT_FINALIZE,
     DEFAULT_AGE,
-    a_writeint,
+    NULL,
     a_readint,
     NULL,
     ATF_UNIQUE
@@ -70,13 +70,6 @@ void update_guards(void)
                 if (can_start_guarding(u) != E_GUARD_OK) {
                     setguard(u, GUARD_NONE);
                 }
-                else {
-                    attrib *a = a_find(u->attribs, &at_guard);
-                    if (a && a->data.i == (int)guard_flags(u)) {
-                        /* this is really rather not necessary */
-                        a_remove(&u->attribs, a);
-                    }
-                }
             }
         }
     }
@@ -97,50 +90,19 @@ unsigned int guard_flags(const unit * u)
 #if GUARD_DISABLES_RECRUIT == 1
     flags |= GUARD_RECRUIT;
 #endif
-    if (rc_changed(&rc_cache)) {
-        rc_elf = get_race(RC_ELF);
-        rc_ent = get_race(RC_TREEMAN);
-        rc_ironkeeper = get_race(RC_IRONKEEPER);
-    }
-    if (rc == rc_elf) {
-        if (u->faction->race == u_race(u)) {
-            flags |= GUARD_TREES;
-        }
-    }
-    else if (rc == rc_ent) {
-        flags |= GUARD_TREES;
-    }
-    else if (rc == rc_ironkeeper) {
-        flags = GUARD_MINING;
-    }
     return flags;
 }
 
 void setguard(unit * u, unsigned int flags)
 {
-    /* setzt die guard-flags der Einheit */
-    attrib *a = NULL;
-    assert(flags == 0 || !fval(u, UFL_MOVED));
-    assert(flags == 0 || u->status < ST_FLEE);
-    if (fval(u, UFL_GUARD)) {
-        a = a_find(u->attribs, &at_guard);
-    }
-    if (flags == GUARD_NONE) {
+    bool enabled = (flags!=GUARD_NONE);
+    if (!enabled) {
+        assert(!fval(u, UFL_MOVED));
+        assert(u->status < ST_FLEE);
         freset(u, UFL_GUARD);
-        if (a)
-            a_remove(&u->attribs, a);
-        return;
-    }
-    fset(u, UFL_GUARD);
-    fset(u->region, RF_GUARDED);
-    if (flags == guard_flags(u)) {
-        if (a)
-            a_remove(&u->attribs, a);
-    }
-    else {
-        if (!a)
-            a = a_add(&u->attribs, a_new(&at_guard));
-        a->data.i = (int)flags;
+    } else {
+        fset(u, UFL_GUARD);
+        fset(u->region, RF_GUARDED);
     }
 }
 
@@ -150,10 +112,6 @@ unsigned int getguard(const unit * u)
 
     assert(fval(u, UFL_GUARD) || (u->building && u == building_owner(u->building))
         || !"you're doing it wrong! check is_guard first");
-    a = a_find(u->attribs, &at_guard);
-    if (a) {
-        return (unsigned int)a->data.i;
-    }
     return guard_flags(u);
 }
 

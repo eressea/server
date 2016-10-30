@@ -27,16 +27,9 @@ static void test_is_guarded(CuTest *tc) {
     r = test_create_region(0, 0, 0);
     u1 = test_create_unit(test_create_faction(0), r);
     u2 = test_create_unit(test_create_faction(rc), r);
-    CuAssertPtrEquals(tc, 0, is_guarded(r, u1, GUARD_TRAVELTHRU));
-    CuAssertPtrEquals(tc, 0, is_guarded(r, u1, GUARD_PRODUCE));
-    CuAssertPtrEquals(tc, 0, is_guarded(r, u1, GUARD_TREES));
-    CuAssertPtrEquals(tc, 0, is_guarded(r, u1, GUARD_MINING));
-    guard(u2, GUARD_MINING | GUARD_PRODUCE);
-    CuAssertIntEquals(tc, GUARD_CREWS | GUARD_LANDING | GUARD_TRAVELTHRU | GUARD_TAX | GUARD_PRODUCE | GUARD_RECRUIT, guard_flags(u2));
-    CuAssertPtrEquals(tc, 0, is_guarded(r, u1, GUARD_TRAVELTHRU));
-    CuAssertPtrEquals(tc, 0, is_guarded(r, u1, GUARD_TREES));
-    CuAssertPtrEquals(tc, 0, is_guarded(r, u1, GUARD_MINING));
-    CuAssertPtrEquals(tc, u2, is_guarded(r, u1, GUARD_PRODUCE));
+    CuAssertPtrEquals(tc, 0, is_guarded(r, u1, GUARD_ALL));
+    guard(u2, GUARD_ALL);
+    CuAssertPtrEquals(tc, u2, is_guarded(r, u1, GUARD_ALL));
     test_cleanup();
 }
 

@@ -2196,7 +2196,7 @@ static int sp_ironkeeper(castorder * co)
 
     /*keeper->age = cast_level + 2; */
     setstatus(keeper, ST_AVOID);  /* kaempft nicht */
-    guard(keeper, GUARD_MINING);
+    setguard(keeper, GUARD_ALL);
     fset(keeper, UFL_ISNEW);
     /* Parteitarnen, damit man nicht sofort weiﬂ, wer dahinter steckt */
     if (rule_stealth_anon()) {

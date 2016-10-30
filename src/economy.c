@@ -935,17 +935,6 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
         }
     }
 
-    if (rdata->guard != 0) {
-        unit *u2;
-        for (u2 = r->units; u2; u2 = u2->next) {
-            if (is_guard(u2, rdata->guard) != 0 && can_guard(u2, u)) {
-                ADDMSG(&u->faction->msgs,
-                    msg_feedback(u, u->thisorder, "region_guarded", "guard", u2));
-                return;
-            }
-        }
-    }
-
     /* Bergwächter können Abbau von Eisen/Laen durch Bewachen verhindern.
      * Als magische Wesen 'sehen' Bergwächter alles und werden durch
      * Belagerung nicht aufgehalten.  (Ansonsten wie oben bei Elfen anpassen).
@@ -953,7 +942,7 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
     if (itype->rtype && (itype->rtype == get_resourcetype(R_IRON) || itype->rtype == rt_find("laen"))) {
         unit *u2;
         for (u2 = r->units; u2; u2 = u2->next) {
-            if (is_guard(u, GUARD_MINING)
+            if (is_guard(u, GUARD_ALL)
                 && !fval(u2, UFL_ISNEW)
                 && u2->number && !alliedunit(u2, u->faction, HELP_GUARD)) {
                 ADDMSG(&u->faction->msgs,
