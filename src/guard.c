@@ -30,20 +30,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/building.h>
-#include <util/attrib.h>
 
 #include <assert.h>
-
-attrib_type at_guard = {
-    "guard",
-    DEFAULT_INIT,
-    DEFAULT_FINALIZE,
-    DEFAULT_AGE,
-    NULL,
-    a_readint,
-    NULL,
-    ATF_UNIQUE
-};
 
 guard_t can_start_guarding(const unit * u)
 {
@@ -80,7 +68,6 @@ unsigned int guard_flags(const unit * u)
     // TODO: this should be a property of the race, like race.guard_flags
     static int rc_cache;
     static const race *rc_elf, *rc_ent, *rc_ironkeeper;
-    const race *rc = u_race(u);
     unsigned int flags =
         GUARD_CREWS | GUARD_LANDING | GUARD_TRAVELTHRU | GUARD_TAX;
     // TODO: configuration, not define
@@ -108,8 +95,6 @@ void setguard(unit * u, unsigned int flags)
 
 unsigned int getguard(const unit * u)
 {
-    attrib *a;
-
     assert(fval(u, UFL_GUARD) || (u->building && u == building_owner(u->building))
         || !"you're doing it wrong! check is_guard first");
     return guard_flags(u);
