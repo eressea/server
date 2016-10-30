@@ -15,6 +15,7 @@ without prior permission by the authors of Eressea.
 #include "xmlreader.h"
 
 #include "building.h"
+#include "guard.h"
 #include "equipment.h"
 #include "item.h"
 #include "keyword.h"

@@ -114,25 +114,6 @@ struct param;
 #define GF_PURE 64
     /* untranslated */
 
-#define GUARD_NONE 0
-#define GUARD_TAX 1
-    /* Verhindert Steuereintreiben */
-#define GUARD_MINING 2
-    /* Verhindert Bergbau */
-#define GUARD_TREES 4
-    /* Verhindert Waldarbeiten */
-#define GUARD_TRAVELTHRU 8
-    /* Blockiert Durchreisende */
-#define GUARD_LANDING 16
-    /* Verhindert Ausstieg + Weiterreise */
-#define GUARD_CREWS 32
-    /* Verhindert Unterhaltung auf Schiffen */
-#define GUARD_RECRUIT 64
-    /* Verhindert Rekrutieren */
-#define GUARD_PRODUCE 128
-    /* Verhindert Abbau von Resourcen mit RTF_LIMITED */
-#define GUARD_ALL 0xFFFF
-
     int maxworkingpeasants(const struct region *r);
     bool markets_module(void);
     int wage(const struct region *r, const struct faction *f,
