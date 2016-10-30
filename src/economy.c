@@ -872,19 +872,6 @@ typedef struct allocation_list {
 
 static allocation_list *allocations;
 
-static bool can_guard(const unit * guard, const unit * u)
-{
-    if (fval(guard, UFL_ISNEW))
-        return false;
-    if (guard->number <= 0 || !cansee(guard->faction, guard->region, u, 0))
-        return false;
-    if (besieged(guard) || !(fval(u_race(guard), RCF_UNARMEDGUARD)
-        || armedmen(guard, true)))
-        return false;
-
-    return !alliedunit(guard, u->faction, HELP_GUARD);
-}
-
 enum {
     AFL_DONE = 1 << 0,
     AFL_LOWSKILL = 1 << 1
