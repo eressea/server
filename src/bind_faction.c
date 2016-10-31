@@ -376,7 +376,7 @@ static int tolua_faction_create(lua_State * L)
         f = addfaction(email, NULL, frace, loc, 0);
     }
     if (!f) {
-        log_error("faction.create(%s, %s, %s)\n", email, racename, locale_name(loc));
+        log_error("cannot create %s faction for %s, unknown race.", racename, email);
     }
     tolua_pushusertype(L, f, TOLUA_CAST "faction");
     return 1;

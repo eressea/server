@@ -16,10 +16,10 @@ fi
 $ROOT/$BUILD/eressea/test_eressea
 cd $ROOT
 [ -e eressea.ini ] || ln -sf conf/eressea.ini
-$ROOT/$BUILD/eressea/eressea -v0 scripts/run-tests.lua
-$ROOT/$BUILD/eressea/eressea -v0 scripts/run-tests-e2.lua
-$ROOT/$BUILD/eressea/eressea -v0 scripts/run-tests-e3.lua
-$ROOT/$BUILD/eressea/eressea -v0 scripts/run-tests-e4.lua
+$ROOT/$BUILD/eressea/eressea -v1 scripts/run-tests.lua
+$ROOT/$BUILD/eressea/eressea -v1 scripts/run-tests-e2.lua
+$ROOT/$BUILD/eressea/eressea -v1 scripts/run-tests-e3.lua
+$ROOT/$BUILD/eressea/eressea -v1 scripts/run-tests-e4.lua
 rm -rf data reports orders.txt score score.alliances datum turn
 
 cd $OLDWPD
