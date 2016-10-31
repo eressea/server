@@ -56,31 +56,15 @@ void update_guards(void)
         for (u = r->units; u; u = u->next) {
             if (fval(u, UFL_GUARD)) {
                 if (can_start_guarding(u) != E_GUARD_OK) {
-                    setguard(u, GUARD_NONE);
+                    setguard(u, false);
                 }
             }
         }
     }
 }
 
-unsigned int guard_flags(const unit * u)
+void setguard(unit * u, bool enabled)
 {
-    // TODO: this should be a property of the race, like race.guard_flags
-    unsigned int flags =
-        GUARD_CREWS | GUARD_LANDING | GUARD_TRAVELTHRU | GUARD_TAX;
-    // TODO: configuration, not define
-#if GUARD_DISABLES_PRODUCTION == 1
-    flags |= GUARD_PRODUCE;
-#endif
-#if GUARD_DISABLES_RECRUIT == 1
-    flags |= GUARD_RECRUIT;
-#endif
-    return flags;
-}
-
-void setguard(unit * u, unsigned int flags)
-{
-    bool enabled = (flags!=GUARD_NONE);
     if (!enabled) {
         freset(u, UFL_GUARD);
     } else {
@@ -91,24 +75,16 @@ void setguard(unit * u, unsigned int flags)
     }
 }
 
-unsigned int getguard(const unit * u)
+void guard(unit * u)
 {
-    assert(fval(u, UFL_GUARD) || (u->building && u == building_owner(u->building))
-        || !"you're doing it wrong! check is_guard first");
-    return guard_flags(u);
+    setguard(u, true);
 }
 
-void guard(unit * u, unsigned int mask)
-{
-    unsigned int flags = guard_flags(u);
-    setguard(u, flags & mask);
-}
-
-static bool is_guardian_u(const unit * guard, unit * u, unsigned int mask)
+static bool is_guardian_u(const unit * guard, unit * u)
 {
     if (guard->faction == u->faction)
         return false;
-    if (is_guard(guard, mask) == 0)
+    if (is_guard(guard) == 0)
         return false;
     if (alliedunit(guard, u->faction, HELP_GUARD))
         return false;
@@ -145,12 +121,12 @@ static bool is_guardian_r(const unit * guard)
     return fval(u_race(guard), RCF_UNARMEDGUARD) || is_monsters(guard->faction) || (armedmen(guard, true) > 0);
 }
 
-bool is_guard(const struct unit * u, unsigned int mask)
+bool is_guard(const struct unit * u)
 {
-    return is_guardian_r(u) && (getguard(u) & mask) != 0;
+    return is_guardian_r(u);
 }
 
-unit *is_guarded(region * r, unit * u, unsigned int mask)
+unit *is_guarded(region * r, unit * u)
 {
     unit *u2;
     int noguards = 1;
@@ -166,7 +142,7 @@ unit *is_guarded(region * r, unit * u, unsigned int mask)
     for (u2 = r->units; u2; u2 = u2->next) {
         if (is_guardian_r(u2)) {
             noguards = 0;
-            if (is_guardian_u(u2, u, mask)) {
+            if (is_guardian_u(u2, u)) {
                 /* u2 is our guard. stop processing (we might have to go further next time) */
                 return u2;
             }

@@ -2196,7 +2196,7 @@ static int sp_ironkeeper(castorder * co)
 
     /*keeper->age = cast_level + 2; */
     setstatus(keeper, ST_AVOID);  /* kaempft nicht */
-    setguard(keeper, GUARD_ALL);
+    setguard(keeper, true);
     fset(keeper, UFL_ISNEW);
     /* Parteitarnen, damit man nicht sofort weiß, wer dahinter steckt */
     if (rule_stealth_anon()) {
@@ -2386,7 +2386,6 @@ void patzer_peasantmob(const castorder * co)
             create_unit(r, f, n, get_race(RC_PEASANT), 0, LOC(f->locale, "angry_mob"),
             NULL);
         fset(u, UFL_ISNEW);
-        /* guard(u, GUARD_ALL);  hier zu frueh! Befehl BEWACHE setzten */
         addlist(&u->orders, create_order(K_GUARD, lang, NULL));
         set_order(&u->thisorder, default_order(lang));
         a = a_new(&at_unitdissolve);
@@ -3746,7 +3745,7 @@ static int sp_rallypeasantmob(castorder * co)
             rsetpeasants(r, rpeasants(r) + u->number);
             rsetmoney(r, rmoney(r) + get_money(u));
             set_money(u, 0);
-            setguard(u, GUARD_NONE);
+            setguard(u, false);
             set_number(u, 0);
             erfolg = cast_level;
         }
@@ -3813,7 +3812,7 @@ static int sp_raisepeasantmob(castorder * co)
         create_unit(r, monsters, n, get_race(RC_PEASANT), 0, LOC(monsters->locale,
         "furious_mob"), NULL);
     fset(u, UFL_ISNEW);
-    guard(u, GUARD_ALL);
+    setguard(u, true);
     a = a_new(&at_unitdissolve);
     a->data.ca[0] = 1;            /* An rpeasants(r). */
     a->data.ca[1] = 15;           /* 15% */

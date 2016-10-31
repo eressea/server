@@ -48,7 +48,7 @@ static void test_guard_unskilled(CuTest * tc)
     ug = test_create_unit(test_create_faction(0), r);
     i_change(&ug->items, itype, 1);
     set_level(ug, SK_MELEE, 1);
-    setguard(ug, GUARD_ALL);
+    setguard(ug, true);
     CuAssertPtrEquals(tc, 0, is_guarded(r, u, GUARD_PRODUCE));
     test_cleanup();
 }
@@ -67,7 +67,7 @@ static void test_guard_armed(CuTest * tc)
     ug = test_create_unit(test_create_faction(0), r);
     i_change(&ug->items, itype, 1);
     set_level(ug, SK_MELEE, 2);
-    setguard(ug, GUARD_ALL);
+    setguard(ug, true);
     CuAssertPtrEquals(tc, ug, is_guarded(r, u, GUARD_PRODUCE));
     test_cleanup();
 }
@@ -85,7 +85,7 @@ static void test_is_guard(CuTest * tc)
     ug = test_create_unit(test_create_faction(0), r);
     i_change(&ug->items, itype, 1);
     set_level(ug, SK_MELEE, 2);
-    setguard(ug, GUARD_ALL);
+    setguard(ug, true);
     CuAssertIntEquals(tc, 1, armedmen(ug, false));
     CuAssertTrue(tc, is_guard(ug, GUARD_RECRUIT));
     set_level(ug, SK_MELEE, 1);
@@ -109,7 +109,7 @@ static void test_guard_unarmed(CuTest * tc)
     r = test_create_region(0, 0, 0);
     u = test_create_unit(test_create_faction(0), r);
     ug = test_create_unit(test_create_faction(rc), r);
-    setguard(ug, GUARD_ALL);
+    setguard(ug, true);
     CuAssertPtrEquals(tc, ug, is_guarded(r, u, GUARD_PRODUCE));
     test_cleanup();
 }
@@ -123,7 +123,7 @@ static void test_guard_monsters(CuTest * tc)
     r = test_create_region(0, 0, 0);
     u = test_create_unit(test_create_faction(0), r);
     ug = test_create_unit(get_monsters(), r);
-    setguard(ug, GUARD_ALL);
+    setguard(ug, true);
     CuAssertPtrEquals(tc, ug, is_guarded(r, u, GUARD_PRODUCE));
     test_cleanup();
 }

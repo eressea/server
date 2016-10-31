@@ -948,7 +948,7 @@ void move_unit(unit * u, region * r, unit ** ulist)
     if (!ulist)
         ulist = (&r->units);
     if (u->region) {
-        setguard(u, GUARD_NONE);
+        setguard(u, false);
         fset(u, UFL_MOVED);
         if (u->ship || u->building) {
             /* can_leave must be checked in travel_i */

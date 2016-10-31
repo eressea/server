@@ -202,7 +202,7 @@ static order *get_money_for_dragon(region * r, unit * udragon, int wanted)
     /* falls der drache launisch ist, oder das regionssilber knapp, greift er alle an
      * und holt sich Silber von Einheiten, vorausgesetzt er bewacht bereits */
     money = 0;
-    if (attacks && is_guard(udragon, GUARD_TAX)) {
+    if (attacks && is_guard(udragon)) {
         money += monster_attacks(udragon, true, true);
     }
 
@@ -735,7 +735,7 @@ void plan_monsters(faction * f)
                 setstatus(u, ST_FIGHT);
                 /* all monsters fight */
             }
-            if (attacking && (!r->land || is_guard(u, GUARD_TAX))) {
+            if (attacking && (!r->land || is_guard(u))) {
                 monster_attacks(u, true, false);
             }
 

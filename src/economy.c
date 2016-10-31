@@ -459,7 +459,7 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
     /* this is a very special case because the recruiting unit may be empty
      * at this point and we have to look at the creating unit instead. This
      * is done in cansee, which is called indirectly by is_guarded(). */
-    if (is_guarded(r, u, GUARD_RECRUIT)) {
+    if (is_guarded(r, u)) {
         cmistake(u, ord, 70, MSG_EVENT);
         return;
     }
@@ -929,7 +929,7 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
     if (itype->rtype && (itype->rtype == get_resourcetype(R_IRON) || itype->rtype == rt_find("laen"))) {
         unit *u2;
         for (u2 = r->units; u2; u2 = u2->next) {
-            if (is_guard(u, GUARD_ALL)
+            if (is_guard(u)
                 && !fval(u2, UFL_ISNEW)
                 && u2->number && !alliedunit(u2, u->faction, HELP_GUARD)) {
                 ADDMSG(&u->faction->msgs,
@@ -1246,7 +1246,7 @@ static void create_item(unit * u, const item_type * itype, int want)
 {
     if (itype->construction && fval(itype->rtype, RTF_LIMITED)) {
 #if GUARD_DISABLES_PRODUCTION == 1
-        if (is_guarded(u->region, u, GUARD_PRODUCE)) {
+        if (is_guarded(u->region, u)) {
             cmistake(u, u->thisorder, 70, MSG_EVENT);
             return;
         }
@@ -1548,11 +1548,11 @@ static void buy(unit * u, request ** buyorders, struct order *ord)
     keyword_t kwd;
     const char *s;
 
-    if (u->ship && is_guarded(r, u, GUARD_CREWS)) {
+    if (u->ship && is_guarded(r, u)) {
         cmistake(u, ord, 69, MSG_INCOME);
         return;
     }
-    if (u->ship && is_guarded(r, u, GUARD_CREWS)) {
+    if (u->ship && is_guarded(r, u)) {
         cmistake(u, ord, 69, MSG_INCOME);
         return;
     }
@@ -1866,7 +1866,7 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
         caravan_bt = bt_find("caravan");
     }
 
-    if (u->ship && is_guarded(r, u, GUARD_CREWS)) {
+    if (u->ship && is_guarded(r, u)) {
         cmistake(u, ord, 69, MSG_INCOME);
         return false;
     }
@@ -2581,7 +2581,7 @@ void entertain_cmd(unit * u, struct order *ord)
         cmistake(u, ord, 60, MSG_INCOME);
         return;
     }
-    if (u->ship && is_guarded(r, u, GUARD_CREWS)) {
+    if (u->ship && is_guarded(r, u)) {
         cmistake(u, ord, 69, MSG_INCOME);
         return;
     }
@@ -2678,7 +2678,7 @@ static int do_work(unit * u, order * ord, request * o)
                 cmistake(u, ord, 60, MSG_INCOME);
             return -1;
         }
-        if (u->ship && is_guarded(r, u, GUARD_CREWS)) {
+        if (u->ship && is_guarded(r, u)) {
             if (ord)
                 cmistake(u, ord, 69, MSG_INCOME);
             return -1;
@@ -2815,7 +2815,7 @@ void tax_cmd(unit * u, struct order *ord, request ** taxorders)
         u->wants = _min(n * effskill(u, SK_TAXING, 0) * taxperlevel, max);
     }
 
-    u2 = is_guarded(r, u, GUARD_TAX);
+    u2 = is_guarded(r, u);
     if (u2) {
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, ord, "region_guarded", "guard", u2));
@@ -2870,7 +2870,7 @@ void loot_cmd(unit * u, struct order *ord, request ** lootorders)
         return;
     }
 
-    u2 = is_guarded(r, u, GUARD_TAX);
+    u2 = is_guarded(r, u);
     if (u2) {
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, ord, "region_guarded", "guard", u2));

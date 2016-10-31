@@ -61,7 +61,7 @@ void herbsearch(unit * u, int max)
         return;
     }
 
-    if (is_guarded(r, u, GUARD_PRODUCE)) {
+    if (is_guarded(r, u)) {
         cmistake(u, u->thisorder, 70, MSG_EVENT);
         return;
     }

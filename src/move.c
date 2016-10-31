@@ -934,7 +934,7 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
     if (fval(u_race(reisender), RCF_ILLUSIONARY))
         return NULL;
     for (u = r->units; u; u = u->next) {
-        if (is_guard(u, GUARD_TRAVELTHRU)) {
+        if (is_guard(u)) {
             int sk = effskill(u, SK_PERCEPTION, r);
             if (invisible(reisender, u) >= reisender->number)
                 continue;
@@ -1615,7 +1615,7 @@ static const region_list *travel_route(unit * u,
         /* the unit has moved at least one region */
         int walkmode;
 
-        setguard(u, GUARD_NONE);
+        setguard(u, false);
         cycle_route(ord, u, steps);
 
         if (mode == TRAVEL_RUNNING) {
@@ -1643,7 +1643,7 @@ static const region_list *travel_route(unit * u,
         /* make orders for the followers */
     }
     fset(u, UFL_LONGACTION | UFL_NOTMOVING);
-    setguard(u, GUARD_NONE);
+    setguard(u, false);
     assert(u->region == current);
     return iroute;
 }
@@ -2141,7 +2141,7 @@ static void travel(unit * u, region_list ** routep)
                 sh = NULL;
         }
         if (sh) {
-            unit *guard = is_guarded(r, u, GUARD_LANDING);
+            unit *guard = is_guarded(r, u);
             if (guard) {
                 ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
                     "region_guarded", "guard", guard));

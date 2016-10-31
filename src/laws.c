@@ -2556,7 +2556,7 @@ int guard_off_cmd(unit * u, struct order *ord)
     init_order(ord);
 
     if (getparam(u->faction->locale) == P_NOT) {
-        setguard(u, GUARD_NONE);
+        setguard(u, false);
     }
     return 0;
 }
@@ -2698,7 +2698,7 @@ int guard_on_cmd(unit * u, struct order *ord)
         else {
             int err = can_start_guarding(u);
             if (err == E_GUARD_OK) {
-                guard(u, GUARD_ALL);
+                setguard(u, true);
             }
             else if (err == E_GUARD_UNARMED) {
                 ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "unit_unarmed", ""));
@@ -4171,7 +4171,7 @@ int siege_cmd(unit * u, order * ord)
         return 80;
     }
 
-    if (!is_guard(u, GUARD_TRAVELTHRU)) {
+    if (!is_guard(u)) {
         /* abbruch, wenn die einheit nicht vorher die region bewacht - als
          * warnung fuer alle anderen! */
         cmistake(u, ord, 81, MSG_EVENT);
@@ -4485,7 +4485,7 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
         return false;
 
     /* simple visibility, just gotta have a unit in the region to see 'em */
-    if (is_guard(u, GUARD_ALL) != 0 || usiege(u) || u->building || u->ship) {
+    if (is_guard(u) || usiege(u) || u->building || u->ship) {
         return true;
     }
 
@@ -4524,7 +4524,7 @@ bool cansee_unit(const unit * u, const unit * target, int modifier)
     else {
         int n, rings, o;
 
-        if (is_guard(target, GUARD_ALL) != 0 || usiege(target) || target->building
+        if (is_guard(target) || usiege(target) || target->building
             || target->ship) {
             return true;
         }
@@ -4568,7 +4568,7 @@ cansee_durchgezogen(const faction * f, const region * r, const unit * u,
     else {
         int rings;
 
-        if (is_guard(u, GUARD_ALL) != 0 || usiege(u) || u->building || u->ship) {
+        if (is_guard(u) || usiege(u) || u->building || u->ship) {
             return true;
         }
 

@@ -1437,7 +1437,7 @@ int sp_denyattack(struct castorder * co)
         leave(mage, false);
     }
     /* und bewachen nicht */
-    setguard(mage, GUARD_NONE);
+    setguard(mage, false);
     /* irgendwie den langen befehl sperren */
     /* fset(fi, FIG_ATTACKED); */
 
@@ -1800,7 +1800,7 @@ int sp_undeadhero(struct castorder * co)
                     unit_setinfo(u, NULL);
                 }
                 setstatus(u, du->status);
-                setguard(u, GUARD_NONE);
+                setguard(u, false);
                 for (ilist = &du->items; *ilist;) {
                     item *itm = *ilist;
                     int loot = itm->number * j / du->number;
