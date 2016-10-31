@@ -345,7 +345,7 @@ static void test_build_destroy_road_guard(CuTest *tc)
     CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "destroy_road"));
 
     test_clear_messages(f);
-    setguard(ug, true);
+    setguard(ug, false);
 
     CuAssertIntEquals(tc, 0, destroy_cmd(u, ord));
     CuAssertIntEquals(tc, 99, rroad(r, D_EAST));
