@@ -258,18 +258,15 @@ static int tolua_unit_set_flags(lua_State * L)
 static int tolua_unit_get_guard(lua_State * L)
 {
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
-    if (is_guard(self, GUARD_ALL)) {
-        lua_pushinteger(L, getguard(self));
-        return 1;
-    }
-    return 0;
+    lua_pushboolean(L, is_guard(self));
+    return 1;
 }
 
 static int tolua_unit_set_guard(lua_State * L)
 {
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
     unsigned int flags = (unsigned int)tolua_tonumber(L, 2, 0);
-    setguard(self, flags);
+    setguard(self, flags!=0);
     return 0;
 }
 

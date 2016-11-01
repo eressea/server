@@ -112,7 +112,6 @@ extern "C" {
     #define FORCE_LEAVE_ALL 2
     bool rule_force_leave(int flag);
     bool help_enter(struct unit *uo, struct unit *u);
-    guard_t can_start_guarding(const struct unit * u);
 
 #ifdef __cplusplus
 }

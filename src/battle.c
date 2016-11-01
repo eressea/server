@@ -2425,7 +2425,7 @@ side *make_side(battle * b, const faction * f, const group * g,
     else {
         unit *u;
         for (u = b->region->units; u; u = u->next) {
-            if (is_guard(u, HELP_ALL)) {
+            if (is_guard(u)) {
                 if (alliedunit(u, f, HELP_GUARD)) {
                     flags |= SIDE_HASGUARDS;
                     break;
@@ -2726,7 +2726,7 @@ static void aftermath(battle * b)
                     }
                     scale_number(du, df->run.number);
                     du->hp = df->run.hp;
-                    setguard(du, GUARD_NONE);
+                    setguard(du, false);
                     /* must leave ships or buildings, or a stealthy hobbit
                      * can hold castles indefinitely */
                     if (!fval(r->terrain, SEA_REGION)) {
@@ -2763,7 +2763,7 @@ static void aftermath(battle * b)
                     /* Distribute Loot */
                     loot_items(df);
 
-                    setguard(du, GUARD_NONE);
+                    setguard(du, true);
                     scale_number(du, 0);
                 }
                 else {
@@ -3878,7 +3878,7 @@ static void flee(const troop dt)
     fig->run.hp += fig->person[dt.index].hp;
     ++fig->run.number;
 
-    setguard(u, GUARD_NONE);
+    setguard(u, false);
 
     kill_troop(dt);
 }
@@ -3941,7 +3941,7 @@ static bool start_battle(region * r, battle ** bp)
 
                     if ((u->ship != NULL && !fval(r->terrain, SEA_REGION))
                         || (lsh = leftship(u)) != NULL) {
-                        if (is_guarded(r, u, GUARD_TRAVELTHRU)) {
+                        if (is_guarded(r, u)) {
                             if (lsh) {
                                 cmistake(u, ord, 234, MSG_BATTLE);
                             }

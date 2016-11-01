@@ -74,7 +74,7 @@ static void test_monsters_attack(CuTest * tc)
 
     create_monsters(&f, &f2, &u, &m);
 
-    guard(m, GUARD_TAX);
+    setguard(m, true);
 
     config_set("rules.monsters.attack_chance", "1");
 
@@ -111,7 +111,7 @@ static void test_monsters_waiting(CuTest * tc)
     unit *u, *m;
 
     create_monsters(&f, &f2, &u, &m);
-    guard(m, GUARD_TAX);
+    setguard(m, true);
     fset(m, UFL_ISNEW);
     monster_attacks(m, false, false);
     CuAssertPtrEquals(tc, 0, find_order("attack 1", m));
@@ -150,8 +150,8 @@ static void test_monsters_attack_not(CuTest * tc)
 
     create_monsters(&f, &f2, &u, &m);
 
-    guard(m, GUARD_TAX);
-    guard(u, GUARD_TAX);
+    setguard(m, true);
+    setguard(u, true);
 
     config_set("rules.monsters.attack_chance", "0");
 
@@ -170,7 +170,7 @@ static void test_dragon_attacks_the_rich(CuTest * tc)
     create_monsters(&f, &f2, &u, &m);
     init_resources();
 
-    guard(m, GUARD_TAX);
+    setguard(m, true);
     set_level(m, SK_WEAPONLESS, 10);
 
     rsetmoney(findregion(0, 0), 1);

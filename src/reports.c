@@ -582,7 +582,7 @@ size_t size)
             }
         }
     }
-    if (is_guard(u, GUARD_ALL) != 0) {
+    if (is_guard(u)) {
         bufp = STRLCPY(bufp, ", ", size);
         bufp = STRLCPY(bufp, LOC(f->locale, "unit_guards"), size);
     }

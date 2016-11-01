@@ -7,6 +7,5 @@
     <modifier building="mine" type="skill" value="1"/>
     <modifier building="mine" type="material" value="0.5"/>
     <modifier race="dwarf" type="material" value="0.60"/>
-    <guard flag="mining"/>
   </resourcelimit>
 </resource>

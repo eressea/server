@@ -849,7 +849,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
         assert(u->ship->region);
         stream_printf(out, "%d;Schiff\n", u->ship->no);
     }
-    if (is_guard(u, GUARD_ALL) != 0) {
+    if (is_guard(u)) {
         stream_printf(out, "%d;bewacht\n", 1);
     }
     if ((b = usiege(u)) != NULL) {

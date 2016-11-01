@@ -1671,7 +1671,7 @@ static void guards(stream *out, const region * r, const faction * see)
     /* Bewachung */
 
     for (u = r->units; u; u = u->next) {
-        if (is_guard(u, GUARD_ALL) != 0) {
+        if (is_guard(u) != 0) {
             faction *f = u->faction;
             faction *fv = visible_faction(see, u);
 

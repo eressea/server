@@ -262,27 +262,6 @@ static int setup_signal_handler(void)
 }
 #endif
 
-#undef CRTDBG
-#ifdef CRTDBG
-#include <crtdbg.h>
-void init_crtdbg(void)
-{
-#if (defined(_MSC_VER))
-    int flags = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
-    if (memdebug == 1) {
-        flags |= _CRTDBG_CHECK_ALWAYS_DF;   /* expensive */
-    } else if (memdebug == 2) {
-        flags = (flags & 0x0000FFFF) | _CRTDBG_CHECK_EVERY_16_DF;
-    } else if (memdebug == 3) {
-        flags = (flags & 0x0000FFFF) | _CRTDBG_CHECK_EVERY_128_DF;
-    } else if (memdebug == 4) {
-        flags = (flags & 0x0000FFFF) | _CRTDBG_CHECK_EVERY_1024_DF;
-    }
-    _CrtSetDbgFlag(flags);
-#endif
-}
-#endif
-
 void locale_init(void)
 {
     setlocale(LC_CTYPE, "");
@@ -309,10 +288,6 @@ int main(int argc, char **argv)
     parse_args(argc, argv, &err);
 
     locale_init();
-
-#ifdef CRTDBG
-    init_crtdbg();
-#endif
 
     L = lua_init();
     game_init();
