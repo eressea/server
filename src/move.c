@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include <kernel/config.h>
 #include "move.h"
+#include "guard.h"
 #include "laws.h"
 #include "reports.h"
 #include "study.h"

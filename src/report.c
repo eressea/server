@@ -23,6 +23,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "report.h"
 #include "reports.h"
+#include "guard.h"
 #include "laws.h"
 #include "travelthru.h"
 #include "monster.h"

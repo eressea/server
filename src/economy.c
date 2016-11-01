@@ -24,6 +24,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "alchemy.h"
 #include "direction.h"
 #include "donations.h"
+#include "guard.h"
 #include "give.h"
 #include "laws.h"
 #include "randenc.h"

@@ -19,6 +19,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include <kernel/config.h>
 #include "spy.h"
+#include "guard.h"
 #include "laws.h"
 #include "move.h"
 #include "reports.h"

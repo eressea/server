@@ -25,6 +25,7 @@
 #include "economy.h"
 #include "chaos.h"
 #include "give.h"
+#include "guard.h"
 #include "monster.h"
 #include "laws.h"
 #include "keyword.h"

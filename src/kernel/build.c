@@ -24,6 +24,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "direction.h"
 #include "move.h"
 #include "study.h"
+#include "guard.h"
 #include "laws.h"
 #include "skill.h"
 #include "lighthouse.h"

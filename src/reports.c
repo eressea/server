@@ -19,6 +19,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include <kernel/config.h>
 #include "reports.h"
+#include "guard.h"
 #include "laws.h"
 #include "travelthru.h"
 #include "lighthouse.h"

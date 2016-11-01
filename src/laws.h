@@ -20,7 +20,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define H_GC_LAWS
 
 #include <kernel/types.h>
-#include "guard.h"
 
 #ifdef __cplusplus
 extern "C" {

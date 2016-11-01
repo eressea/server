@@ -21,10 +21,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "battle.h"
 #include "alchemy.h"
 #include "chaos.h"
-#include "move.h"
+#include "guard.h"
 #include "laws.h"
-#include "skill.h"
 #include "monster.h"
+#include "move.h"
+#include "skill.h"
 
 #include <kernel/ally.h>
 #include <kernel/alliance.h>
