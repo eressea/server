@@ -1,4 +1,4 @@
-﻿#include "reports.h"
+#include "reports.h"
 #include "jsreport.h"
 #include <kernel/faction.h>
 #include <kernel/region.h>

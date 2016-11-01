@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 1998-2015,
 Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
@@ -37,7 +37,7 @@ guard_t can_start_guarding(const unit * u)
 {
     if (u->status >= ST_FLEE || fval(u, UFL_FLEEING))
         return E_GUARD_FLEEING;
-    /* Monster der Monsterpartei dürfen immer bewachen */
+    /* Monster der Monsterpartei duerfen immer bewachen */
     if (is_monsters(u->faction) || fval(u_race(u), RCF_UNARMEDGUARD))
         return E_GUARD_OK;
     if (!armedmen(u, true))
