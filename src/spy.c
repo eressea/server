@@ -463,7 +463,7 @@ static void sink_ship(region * r, ship * sh, unit * saboteur)
                 }
                 leave_ship(u);
                 if (r != safety) {
-                    setguard(u, GUARD_NONE);
+                    setguard(u, false);
                 }
                 while (u->items) {
                     i_remove(&u->items, u->items);

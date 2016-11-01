@@ -934,7 +934,7 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
     if (fval(u_race(reisender), RCF_ILLUSIONARY))
         return NULL;
     for (u = r->units; u; u = u->next) {
-        if (is_guard(u, GUARD_TRAVELTHRU)) {
+        if (is_guard(u)) {
             int sk = effskill(u, SK_PERCEPTION, r);
             if (invisible(reisender, u) >= reisender->number)
                 continue;
@@ -973,82 +973,6 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
         if (prob > 0 && chance(prob)) {
             return guard;
         }
-    }
-    return NULL;
-}
-
-static bool is_guardian_u(const unit * guard, unit * u, unsigned int mask)
-{
-    if (guard->faction == u->faction)
-        return false;
-    if (is_guard(guard, mask) == 0)
-        return false;
-    if (alliedunit(guard, u->faction, HELP_GUARD))
-        return false;
-    if (ucontact(guard, u))
-        return false;
-    if (!cansee(guard->faction, u->region, u, 0))
-        return false;
-    if (!(u_race(guard)->flags & RCF_FLY) && u_race(u)->flags & RCF_FLY)
-        return false;
-
-    return true;
-}
-
-static bool is_guardian_r(const unit * guard)
-{
-    if (guard->number == 0)
-        return false;
-    if (besieged(guard))
-        return false;
-
-    /* if region_owners exist then they may be guardians: */
-    if (guard->building && rule_region_owners() && guard == building_owner(guard->building)) {
-        faction *owner = region_get_owner(guard->region);
-        if (owner == guard->faction) {
-            building *bowner = largestbuilding(guard->region, &cmp_taxes, false);
-            if (bowner == guard->building) {
-                return true;
-            }
-        }
-    }
-
-    if ((guard->flags & UFL_GUARD) == 0)
-        return false;
-    return armedmen(guard, true) > 0 || fval(u_race(guard), RCF_UNARMEDGUARD);
-}
-
-bool is_guard(const struct unit * u, unsigned int mask)
-{
-    return is_guardian_r(u) && (getguard(u) & mask) != 0;
-}
-
-unit *is_guarded(region * r, unit * u, unsigned int mask)
-{
-    unit *u2;
-    int noguards = 1;
-
-    if (!fval(r, RF_GUARDED)) {
-        return NULL;
-    }
-
-    /* at this point, u2 is the last unit we tested to
-     * be a guard (and failed), or NULL
-     * i is the position of the first free slot in the cache */
-
-    for (u2 = r->units; u2; u2 = u2->next) {
-        if (is_guardian_r(u2)) {
-            noguards = 0;
-            if (is_guardian_u(u2, u, mask)) {
-                /* u2 is our guard. stop processing (we might have to go further next time) */
-                return u2;
-            }
-        }
-    }
-
-    if (noguards) {
-        /* you are mistaken, sir. there are no guards in these lands */
-        freset(r, RF_GUARDED);
     }
     return NULL;
 }
@@ -1691,7 +1615,7 @@ static const region_list *travel_route(unit * u,
         /* the unit has moved at least one region */
         int walkmode;
 
-        setguard(u, GUARD_NONE);
+        setguard(u, false);
         cycle_route(ord, u, steps);
 
         if (mode == TRAVEL_RUNNING) {
@@ -1719,7 +1643,7 @@ static const region_list *travel_route(unit * u,
         /* make orders for the followers */
     }
     fset(u, UFL_LONGACTION | UFL_NOTMOVING);
-    setguard(u, GUARD_NONE);
+    setguard(u, false);
     assert(u->region == current);
     return iroute;
 }
@@ -2217,7 +2141,7 @@ static void travel(unit * u, region_list ** routep)
                 sh = NULL;
         }
         if (sh) {
-            unit *guard = is_guarded(r, u, GUARD_LANDING);
+            unit *guard = is_guarded(r, u);
             if (guard) {
                 ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
                     "region_guarded", "guard", guard));

@@ -47,6 +47,12 @@ static int tolua_spawn_dragons(lua_State * L)
     return 0;
 }
 
+static int tolua_get_monsters(lua_State * L)
+{
+    tolua_pushusertype(L, get_monsters(), "faction");
+    return 1;
+}
+
 static int tolua_spawn_undead(lua_State * L)
 {
     spawn_undead();
@@ -90,7 +96,8 @@ void bind_monsters(struct lua_State *L)
         tolua_function(L, TOLUA_CAST "plan_monsters", tolua_planmonsters);
         tolua_function(L, TOLUA_CAST "spawn_undead", tolua_spawn_undead);
         tolua_function(L, TOLUA_CAST "spawn_dragons", tolua_spawn_dragons);
-        tolua_function(L, TOLUA_CAST "fix_familiars", &fix_familiars);
+        tolua_function(L, TOLUA_CAST "fix_familiars", fix_familiars);
+        tolua_function(L, TOLUA_CAST "get_monsters", tolua_get_monsters);
     }
     tolua_endmodule(L);
 }

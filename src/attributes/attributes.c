@@ -22,7 +22,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "laws.h"
 #include "move.h"
-#include "guard.h"
 
 /* attributes includes */
 #include "follow.h"
@@ -105,7 +104,6 @@ void register_attributes(void)
     at_register(&at_private);
 
     at_register(&at_icastle);
-    at_register(&at_guard);
     at_register(&at_group);
 
     at_register(&at_building_generic_type);
@@ -124,6 +122,7 @@ void register_attributes(void)
     at_deprecate("xontormiaexpress", a_readint);    /* required for old datafiles */
     at_deprecate("lua", read_ext);    /* required for old datafiles */
     at_deprecate("gm", a_readint);
+    at_deprecate("guard", a_readint); /* used to contain guard-flags (v3.10.0-259-g8597e8b) */
     at_register(&at_stealth);
     at_register(&at_dict);
     at_register(&at_unitdissolve);

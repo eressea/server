@@ -19,7 +19,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include <kernel/config.h>
 #include "alchemy.h"
-#include "move.h"
+#include "guard.h"
 #include "skill.h"
 #include "study.h"
 
@@ -61,7 +61,7 @@ void herbsearch(unit * u, int max)
         return;
     }
 
-    if (is_guarded(r, u, GUARD_PRODUCE)) {
+    if (is_guarded(r, u)) {
         cmistake(u, u->thisorder, 70, MSG_EVENT);
         return;
     }

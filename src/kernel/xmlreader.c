@@ -15,6 +15,7 @@ without prior permission by the authors of Eressea.
 #include "xmlreader.h"
 
 #include "building.h"
+#include "guard.h"
 #include "equipment.h"
 #include "item.h"
 #include "keyword.h"
@@ -1050,24 +1051,6 @@ static int parse_resources(xmlDocPtr doc)
                     xmlFree(propValue);
                 }
             }
-            xmlXPathFreeObject(result);
-
-            result = xmlXPathEvalExpression(BAD_CAST "guard", xpath);
-            if (result->nodesetval != NULL)
-                for (k = 0; k != result->nodesetval->nodeNr; ++k) {
-                    xmlNodePtr node = result->nodesetval->nodeTab[k];
-                    xmlChar *propFlag = xmlGetProp(node, BAD_CAST "flag");
-
-                    if (propFlag != NULL) {
-                        if (strcmp((const char *)propFlag, "logging") == 0) {
-                            rdata->guard |= GUARD_TREES;
-                        }
-                        else if (strcmp((const char *)propFlag, "mining") == 0) {
-                            rdata->guard |= GUARD_MINING;
-                        }
-                        xmlFree(propFlag);
-                    }
-                }
             xmlXPathFreeObject(result);
 
             /* reading eressea/resources/resource/resourcelimit/function */

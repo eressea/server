@@ -141,9 +141,9 @@ size_t report_status(const unit * u, const struct locale *lang, char *fsbuf, siz
     if (!status) {
         const char *lname = locale_name(lang);
         struct locale *wloc = get_or_create_locale(lname);
-        log_error("no translation for combat status %s in %s", combatstatus[u->status], lname);
-        locale_setstring(wloc, combatstatus[u->status], combatstatus[u->status]);
-        len = strlcpy(fsbuf, combatstatus[u->status], buflen);
+        log_warning("no translation for combat status %s in %s", combatstatus[u->status], lname);
+        locale_setstring(wloc, combatstatus[u->status], combatstatus[u->status]+7);
+        len = strlcpy(fsbuf, combatstatus[u->status]+7, buflen);
     }
     else {
         len = strlcpy(fsbuf, status, buflen);
@@ -582,7 +582,7 @@ size_t size)
             }
         }
     }
-    if (is_guard(u, GUARD_ALL) != 0) {
+    if (is_guard(u)) {
         bufp = STRLCPY(bufp, ", ", size);
         bufp = STRLCPY(bufp, LOC(f->locale, "unit_guards"), size);
     }
