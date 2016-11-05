@@ -206,12 +206,14 @@ static unit *unitorders(FILE * F, int enc, struct faction *f)
                 if (*ordp) {
                     ordp = &(*ordp)->next;
                 }
+                else {
+                    ADDMSG(&f->msgs, msg_message("parse_error", "unit command", u, s));
+                }
             }
         }
 
     }
     else {
-        /* cmistake(?, buf, 160, MSG_EVENT); */
         return NULL;
     }
     return u;

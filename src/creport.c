@@ -1,4 +1,4 @@
-﻿/*
+/*
 +-------------------+  Enno Rehling <enno@eressea.de>
 | Eressea PBEM host |  Christian Schlittchen <corwin@amber.kn-bremen.de>
 | (c) 1998 - 2008   |  Katja Zedel <katze@felidae.kn-bremen.de>
@@ -11,6 +11,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/config.h>
 #include <kernel/version.h>
 #include "creport.h"
+#include "guard.h"
 #include "travelthru.h"
 
 /* tweakable features */
@@ -185,9 +186,9 @@ cr_output_curses(stream *out, const faction * viewer, const void *obj, objtype_t
     region *r;
 
     /* Die Sichtbarkeit eines Zaubers und die Zaubermeldung sind bei
-     * Gebäuden und Schiffen je nach, ob man Besitzer ist, verschieden.
+     * Gebaeuden und Schiffen je nach, ob man Besitzer ist, verschieden.
      * Bei Einheiten sieht man Wirkungen auf eigene Einheiten immer.
-     * Spezialfälle (besonderes Talent, verursachender Magier usw. werde
+     * Spezialfaelle (besonderes Talent, verursachender Magier usw. werde
      * bei jedem curse gesondert behandelt. */
     if (typ == TYP_SHIP) {
         ship *sh = (ship *)obj;

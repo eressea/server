@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #ifndef H_GUARD
 #define H_GUARD

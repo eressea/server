@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 1998-2014,
 Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include <kernel/config.h>
 #include "move.h"
+#include "guard.h"
 #include "laws.h"
 #include "reports.h"
 #include "study.h"

@@ -15,6 +15,7 @@
 #include <platform.h>
 #include <kernel/config.h>
 
+#include "guard.h"
 #include "spy.h"
 #include "vortex.h"
 #include "laws.h"

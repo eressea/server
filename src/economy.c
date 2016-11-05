@@ -24,6 +24,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "alchemy.h"
 #include "direction.h"
 #include "donations.h"
+#include "guard.h"
 #include "give.h"
 #include "laws.h"
 #include "randenc.h"
@@ -340,8 +341,8 @@ static int do_recruiting(recruitment * recruits, int available)
                 /* unit is empty, dead, and cannot recruit */
                 number = 0;
             }
+            add_recruits(u, number, req->qty);
             if (number > 0) {
-                add_recruits(u, number, req->qty);
                 dec = (int)(number * multi);
                 if ((rc->ec_flags & ECF_REC_ETHEREAL) == 0) {
                     recruited += dec;

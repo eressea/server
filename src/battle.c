@@ -21,10 +21,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "battle.h"
 #include "alchemy.h"
 #include "chaos.h"
-#include "move.h"
+#include "guard.h"
 #include "laws.h"
-#include "skill.h"
 #include "monster.h"
+#include "move.h"
+#include "skill.h"
 
 #include <kernel/ally.h>
 #include <kernel/alliance.h>
@@ -2763,7 +2764,7 @@ static void aftermath(battle * b)
                     /* Distribute Loot */
                     loot_items(df);
 
-                    setguard(du, true);
+                    setguard(du, false);
                     scale_number(du, 0);
                 }
                 else {

@@ -1,4 +1,4 @@
-﻿#include <platform.h>
+#include <platform.h>
 #include "upkeep.h"
 
 #include <kernel/config.h>
