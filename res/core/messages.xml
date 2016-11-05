@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <messages>
+  <message name="parse_error" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="command" type="string"/>
+    </type>
+    <text locale="de">"$unit($unit): '$command' - Dieser Befehl ist unbekannt."</text>
+    <text locale="en">"$unit($unit): '$command' - Parse error, unknown command."</text>
+  </message>
   <message name="reduced_production">
     <text locale="de">Die Region ist verwüstet, der Boden karg.</text>
     <text locale="en">The region is ravaged, the ground infertile.</text>
