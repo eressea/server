@@ -2764,7 +2764,7 @@ static void aftermath(battle * b)
                     /* Distribute Loot */
                     loot_items(df);
 
-                    setguard(du, true);
+                    setguard(du, false);
                     scale_number(du, 0);
                 }
                 else {
