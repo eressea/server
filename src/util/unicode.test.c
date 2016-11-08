@@ -5,6 +5,17 @@
 #include <string.h>
 #include <errno.h>
 
+static void test_unicode_mkname(CuTest * tc)
+{
+    char buffer[32];
+    CuAssertIntEquals(tc, 0, unicode_utf8_mkname(buffer, sizeof(buffer), "HeLlO\nW0Rld"));
+    CuAssertStrEquals(tc, "HeLlOW0Rld", buffer);
+    memset(buffer, 0, sizeof(buffer));
+    buffer[5] = 'X';
+    CuAssertIntEquals(tc, ENOMEM, unicode_utf8_mkname(buffer, 5, "HeLl\n W0Rld"));
+    CuAssertStrEquals(tc, "HeLl X", buffer);
+}
+
 static void test_unicode_tolower(CuTest * tc)
 {
     char buffer[32];
@@ -66,6 +77,7 @@ CuSuite *get_unicode_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_unicode_tolower);
+    SUITE_ADD_TEST(suite, test_unicode_mkname);
     SUITE_ADD_TEST(suite, test_unicode_utf8_to_other);
     return suite;
 }
