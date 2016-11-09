@@ -35,22 +35,27 @@
 int unicode_utf8_mkname(utf8_t * op, size_t outlen, const utf8_t * ip)
 {
     int ret = 0;
+    bool iss = true;
     while (*ip) {
-        ucs4_t ucs = *ip;
         size_t size = 1;
         bool isp = false;
-//        bool iss = false;
-        if (ucs & 0x80) {
-            ret = unicode_utf8_to_ucs4(&ucs, ip, &size);
-            if (ret !=0) {
-                return ret;
-            }
-            isp = iswprint(ucs);
-//            iss = iswspace(ucs);
-        } else {
-            isp = isprint(ucs);
-//            iss = isspace(ucs);
-        }
+        do {
+			ucs4_t ucs = *ip;
+			if (ucs & 0x80) {
+				ret = unicode_utf8_to_ucs4(&ucs, ip, &size);
+				if (ret !=0) {
+					return ret;
+				}
+				isp = iswprint(ucs);
+				iss &= !!iswspace(ucs);
+			} else {
+				isp = isprint(ucs);
+				iss &= !!isspace(ucs);
+			}
+			if (iss) {
+				ip += size;
+			}
+		} while (iss);
         if (size > outlen) {
             return ENOMEM;
         }

@@ -8,9 +8,10 @@
 static void test_unicode_mkname(CuTest * tc)
 {
     char buffer[32];
+    CuAssertIntEquals(tc, 0, unicode_utf8_mkname(buffer, sizeof(buffer), "    HeLlO W0Rld"));
+    CuAssertStrEquals(tc, "HeLlO W0Rld", buffer);
     CuAssertIntEquals(tc, 0, unicode_utf8_mkname(buffer, sizeof(buffer), "HeLlO W0Rld"));
     CuAssertStrEquals(tc, "HeLlO W0Rld", buffer);
-    memset(buffer, 0, sizeof(buffer));
     CuAssertIntEquals(tc, 1, unicode_utf8_mkname(buffer, sizeof(buffer), "HeLlO\nW0Rld"));
     CuAssertStrEquals(tc, "HeLlOW0Rld", buffer);
     memset(buffer, 0, sizeof(buffer));
