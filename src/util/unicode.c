@@ -34,13 +34,14 @@
 
 int unicode_utf8_mkname(utf8_t * op, size_t outlen, const utf8_t * ip)
 {
+    int ret = 0;
     while (*ip) {
         ucs4_t ucs = *ip;
         size_t size = 1;
         bool isp = false;
 //        bool iss = false;
         if (ucs & 0x80) {
-            int ret = unicode_utf8_to_ucs4(&ucs, ip, &size);
+            ret = unicode_utf8_to_ucs4(&ucs, ip, &size);
             if (ret !=0) {
                 return ret;
             }
@@ -57,6 +58,8 @@ int unicode_utf8_mkname(utf8_t * op, size_t outlen, const utf8_t * ip)
             memcpy(op, ip, size);
             op += size;
             outlen -= size;
+        } else {
+            ret = 1;
         }
         ip += size;
     }
@@ -64,7 +67,7 @@ int unicode_utf8_mkname(utf8_t * op, size_t outlen, const utf8_t * ip)
         return ENOMEM;
     }
     *op = 0;
-    return 0;
+    return ret;
 }
 
 int unicode_utf8_tolower(utf8_t * op, size_t outlen, const utf8_t * ip)
