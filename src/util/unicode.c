@@ -32,6 +32,36 @@
 #define B00000011 0x03
 #define B00000001 0x01
 
+int unicode_utf8_trim(utf8_t *buf)
+{
+	int result = 0;
+    utf8_t *op = buf, *ip = buf;
+    while (*ip) {
+        ucs4_t ucs = *ip;
+        size_t size = 1;
+        if (ucs & 0x80) {
+            int ret = unicode_utf8_to_ucs4(&ucs, ip, &size);
+            if (ret != 0) {
+                return ret;
+            }
+        }
+        if (op == buf && iswspace(ucs)) {
+			++result;
+		}
+        else if (iswprint(ucs)) {
+			if (op != ip) {
+				memcpy(op, ip, size);
+            }
+            op += size;
+        } else {
+			++result;
+		}
+        ip += size;
+    }
+    *op = '\0';
+    return result;
+}
+
 int unicode_utf8_mkname(utf8_t * op, size_t outlen, const utf8_t * ip)
 {
     int ret = 0;
@@ -40,22 +70,22 @@ int unicode_utf8_mkname(utf8_t * op, size_t outlen, const utf8_t * ip)
         size_t size = 1;
         bool isp = false;
         do {
-			ucs4_t ucs = *ip;
-			if (ucs & 0x80) {
-				ret = unicode_utf8_to_ucs4(&ucs, ip, &size);
-				if (ret !=0) {
-					return ret;
-				}
-				isp = iswprint(ucs);
-				iss &= !!iswspace(ucs);
-			} else {
-				isp = isprint(ucs);
-				iss &= !!isspace(ucs);
-			}
-			if (iss) {
-				ip += size;
-			}
-		} while (iss);
+            ucs4_t ucs = *ip;
+            if (ucs & 0x80) {
+                ret = unicode_utf8_to_ucs4(&ucs, ip, &size);
+                if (ret !=0) {
+                    return ret;
+                }
+                isp = iswprint(ucs);
+                iss &= !!iswspace(ucs);
+            } else {
+                isp = isprint(ucs);
+                iss &= !!isspace(ucs);
+            }
+            if (iss) {
+                ip += size;
+            }
+        } while (iss);
         if (size > outlen) {
             return ENOMEM;
         }

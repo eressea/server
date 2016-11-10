@@ -43,6 +43,7 @@ extern "C" {
         const char *in, size_t * inlen);
     int unicode_utf8_tolower(utf8_t *op, size_t outlen, const utf8_t *ip);
     int unicode_utf8_mkname(utf8_t *op, size_t outlen, const utf8_t *ip);
+	int unicode_utf8_trim(utf8_t *ip);
 
 #ifdef __cplusplus
 }

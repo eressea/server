@@ -5,6 +5,27 @@
 #include <string.h>
 #include <errno.h>
 
+static void test_unicode_trim(CuTest * tc)
+{
+    char buffer[32];
+
+    strcpy(buffer, "Hello Word");
+    CuAssertIntEquals(tc, 0, unicode_utf8_trim(buffer));
+    CuAssertStrEquals(tc, "Hello Word", buffer);
+
+    strcpy(buffer, "Hello Word\n");
+    CuAssertIntEquals(tc, 1, unicode_utf8_trim(buffer));
+    CuAssertStrEquals(tc, "Hello Word", buffer);
+
+    strcpy(buffer, "  Hello Word\t\n");
+    CuAssertIntEquals(tc, 4, unicode_utf8_trim(buffer));
+    CuAssertStrEquals(tc, "Hello Word", buffer);
+
+    strcpy(buffer, " \t Hello Word");
+    CuAssertIntEquals(tc, 3, unicode_utf8_trim(buffer));
+    CuAssertStrEquals(tc, "Hello Word", buffer);
+}
+
 static void test_unicode_mkname(CuTest * tc)
 {
     char buffer[32];
@@ -82,6 +103,7 @@ CuSuite *get_unicode_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_unicode_tolower);
     SUITE_ADD_TEST(suite, test_unicode_mkname);
+    SUITE_ADD_TEST(suite, test_unicode_trim);
     SUITE_ADD_TEST(suite, test_unicode_utf8_to_other);
     return suite;
 }

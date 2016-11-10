@@ -69,6 +69,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/resolve.h>
 #include <util/rng.h>
 #include <util/umlaut.h>
+#include <util/unicode.h>
 
 #include <quicklist.h>
 #include <stream.h>
@@ -747,12 +748,18 @@ unit *read_unit(struct gamedata *data)
     }
 
     READ_STR(data->store, obuf, sizeof(obuf));
+    if (unicode_utf8_trim(obuf)!=0) {
+		log_error("trim unit %s name to '%s'", itoa36(u->no), obuf);
+	};
     u->_name = obuf[0] ? _strdup(obuf) : 0;
     if (lomem) {
         READ_STR(data->store, NULL, 0);
     }
     else {
         READ_STR(data->store, obuf, sizeof(obuf));
+		if (unicode_utf8_trim(obuf)!=0) {
+			log_error("trim unit %s info to '%s'", itoa36(u->no), obuf);
+		};
         u->display = obuf[0] ? _strdup(obuf) : 0;
     }
     READ_INT(data->store, &number);
@@ -986,6 +993,9 @@ static region *readregion(struct gamedata *data, int x, int y)
     else {
         char info[DISPLAYSIZE];
         READ_STR(data->store, info, sizeof(info));
+		if (unicode_utf8_trim(info)!=0) {
+			log_error("trim region %d info to '%s'", uid, info);
+		};
         region_setinfo(r, info);
     }
 
@@ -1003,6 +1013,9 @@ static region *readregion(struct gamedata *data, int x, int y)
     if (fval(r->terrain, LAND_REGION)) {
         r->land = calloc(1, sizeof(land_region));
         READ_STR(data->store, name, sizeof(name));
+		if (unicode_utf8_trim(name)!=0) {
+			log_error("trim region %d name to '%s'", uid, name);
+		};
         r->land->name = _strdup(name);
     }
     if (r->land) {
@@ -1386,8 +1399,14 @@ faction *readfaction(struct gamedata * data)
     }
 
     READ_STR(data->store, name, sizeof(name));
+	if (unicode_utf8_trim(name)!=0) {
+		log_error("trim faction %s name to '%s'", itoa36(f->no), name);
+	};
     f->name = _strdup(name);
     READ_STR(data->store, name, sizeof(name));
+	if (unicode_utf8_trim(name)!=0) {
+		log_error("trim faction %s banner to '%s'", itoa36(f->no), name);
+	};
     f->banner = _strdup(name);
 
     log_debug("   - Lese Partei %s (%s)", f->name, factionid(f));
@@ -1686,7 +1705,6 @@ int read_game(gamedata *data) {
         bp = &r->buildings;
 
         while (--p >= 0) {
-
             b = (building *)calloc(1, sizeof(building));
             READ_INT(store, &b->no);
             *bp = b;
