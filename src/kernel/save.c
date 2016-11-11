@@ -750,7 +750,7 @@ unit *read_unit(struct gamedata *data)
     READ_STR(data->store, obuf, sizeof(obuf));
     if (unicode_utf8_trim(obuf)!=0) {
 		log_warning("trim unit %s name to '%s'", itoa36(u->no), obuf);
-	};
+	}
     u->_name = obuf[0] ? _strdup(obuf) : 0;
     if (lomem) {
         READ_STR(data->store, NULL, 0);
@@ -759,7 +759,7 @@ unit *read_unit(struct gamedata *data)
         READ_STR(data->store, obuf, sizeof(obuf));
 		if (unicode_utf8_trim(obuf)!=0) {
 			log_warning("trim unit %s info to '%s'", itoa36(u->no), obuf);
-		};
+		}
         u->display = obuf[0] ? _strdup(obuf) : 0;
     }
     READ_INT(data->store, &number);
@@ -1646,12 +1646,18 @@ struct building *read_building(gamedata *data) {
     READ_INT(store, &b->no);
     bhash(b);
     READ_STR(store, name, sizeof(name));
+    if (unicode_utf8_trim(name)!=0) {
+		log_warning("trim building %s name to '%s'", itoa36(b->no), name);
+	}
     b->name = _strdup(name);
     if (lomem) {
         READ_STR(store, NULL, 0);
     }
     else {
         READ_STR(store, name, sizeof(name));
+        if (unicode_utf8_trim(name)!=0) {
+            log_warning("trim building %s info to '%s'", itoa36(b->no), name);
+        }
         b->display = _strdup(name);
     }
     READ_INT(store, &b->size);

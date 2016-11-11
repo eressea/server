@@ -92,7 +92,7 @@ static void test_readwrite_building(CuTest * tc)
     r = test_create_region(0, 0, 0);
     b = test_create_building(r, 0);
     free(b->name);
-    b->name = strdup("  Hodor  ");
+    b->name = _strdup("  Hodor  ");
     CuAssertStrEquals(tc, "  Hodor  ", b->name);
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
