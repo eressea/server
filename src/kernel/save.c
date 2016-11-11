@@ -749,7 +749,7 @@ unit *read_unit(struct gamedata *data)
 
     READ_STR(data->store, obuf, sizeof(obuf));
     if (unicode_utf8_trim(obuf)!=0) {
-		log_error("trim unit %s name to '%s'", itoa36(u->no), obuf);
+		log_warning("trim unit %s name to '%s'", itoa36(u->no), obuf);
 	};
     u->_name = obuf[0] ? _strdup(obuf) : 0;
     if (lomem) {
@@ -758,7 +758,7 @@ unit *read_unit(struct gamedata *data)
     else {
         READ_STR(data->store, obuf, sizeof(obuf));
 		if (unicode_utf8_trim(obuf)!=0) {
-			log_error("trim unit %s info to '%s'", itoa36(u->no), obuf);
+			log_warning("trim unit %s info to '%s'", itoa36(u->no), obuf);
 		};
         u->display = obuf[0] ? _strdup(obuf) : 0;
     }
@@ -994,7 +994,7 @@ static region *readregion(struct gamedata *data, int x, int y)
         char info[DISPLAYSIZE];
         READ_STR(data->store, info, sizeof(info));
 		if (unicode_utf8_trim(info)!=0) {
-			log_error("trim region %d info to '%s'", uid, info);
+			log_warning("trim region %d info to '%s'", uid, info);
 		};
         region_setinfo(r, info);
     }
@@ -1014,7 +1014,7 @@ static region *readregion(struct gamedata *data, int x, int y)
         r->land = calloc(1, sizeof(land_region));
         READ_STR(data->store, name, sizeof(name));
 		if (unicode_utf8_trim(name)!=0) {
-			log_error("trim region %d name to '%s'", uid, name);
+			log_warning("trim region %d name to '%s'", uid, name);
 		};
         r->land->name = _strdup(name);
     }
@@ -1400,12 +1400,12 @@ faction *readfaction(struct gamedata * data)
 
     READ_STR(data->store, name, sizeof(name));
 	if (unicode_utf8_trim(name)!=0) {
-		log_error("trim faction %s name to '%s'", itoa36(f->no), name);
+		log_warning("trim faction %s name to '%s'", itoa36(f->no), name);
 	};
     f->name = _strdup(name);
     READ_STR(data->store, name, sizeof(name));
 	if (unicode_utf8_trim(name)!=0) {
-		log_error("trim faction %s banner to '%s'", itoa36(f->no), name);
+		log_warning("trim faction %s banner to '%s'", itoa36(f->no), name);
 	};
     f->banner = _strdup(name);
 
