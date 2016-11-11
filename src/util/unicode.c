@@ -34,8 +34,8 @@
 
 int unicode_utf8_trim(utf8_t *buf)
 {
-	int result = 0;
-    utf8_t *op = buf, *ip = buf;
+    int result = 0, ts = 0;
+    utf8_t *op = buf, *ip = buf, *lc = buf;
     while (*ip) {
         ucs4_t ucs = *ip;
         size_t size = 1;
@@ -46,20 +46,25 @@ int unicode_utf8_trim(utf8_t *buf)
             }
         }
         if (op == buf && iswspace(ucs)) {
-			++result;
-		}
+            ++result;
+        }
         else if (iswprint(ucs)) {
-			if (op != ip) {
-				memcpy(op, ip, size);
+            if (op != ip) {
+                memcpy(op, ip, size);
             }
             op += size;
+            if (iswspace(ucs)) ++ts;
+            else {
+                lc = op;
+                ts = 0;
+            }
         } else {
-			++result;
-		}
+            ++result;
+        }
         ip += size;
     }
-    *op = '\0';
-    return result;
+    *lc = '\0';
+    return result + ts;
 }
 
 int unicode_utf8_mkname(utf8_t * op, size_t outlen, const utf8_t * ip)
