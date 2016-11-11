@@ -1348,7 +1348,7 @@ void _test_write_password(gamedata *data, const faction *f) {
  * This function requires no context, can be called in any state. The
  * faction may not already exist, however.
  */
-faction *readfaction(struct gamedata * data)
+faction *read_faction(struct gamedata * data)
 {
     ally **sfp;
     int planes, n;
@@ -1363,9 +1363,10 @@ faction *readfaction(struct gamedata * data)
         f->no = n;
     }
     else {
-        f->allies = NULL;           /* mem leak */
-        while (f->attribs)
+        f->allies = NULL;           /* FIXME: mem leak */
+        while (f->attribs) {
             a_remove(&f->attribs, f->attribs);
+        }
     }
     READ_INT(data->store, &f->subscription);
 
@@ -1499,7 +1500,7 @@ faction *readfaction(struct gamedata * data)
     return f;
 }
 
-void writefaction(struct gamedata *data, const faction * f)
+void write_faction(struct gamedata *data, const faction * f)
 {
     ally *sf;
     ursprung *ur;
@@ -1781,11 +1782,12 @@ int read_game(gamedata *data) {
     READ_INT(store, &nread);
     log_debug(" - Einzulesende Parteien: %d\n", nread);
     fp = &factions;
-    while (*fp)
+    while (*fp) {
         fp = &(*fp)->next;
+    }
 
     while (--nread >= 0) {
-        faction *f = readfaction(data);
+        faction *f = read_faction(data);
 
         *fp = f;
         fp = &f->next;
@@ -2010,7 +2012,7 @@ int write_game(gamedata *data) {
         if (fval(f, FFL_NPC)) {
             clear_npc_orders(f);
         }
-        writefaction(data, f);
+        write_faction(data, f);
         WRITE_SECTION(store);
     }
 

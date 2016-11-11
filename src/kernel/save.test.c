@@ -82,6 +82,35 @@ static void test_readwrite_unit(CuTest * tc)
     test_cleanup();
 }
 
+static void test_readwrite_faction(CuTest * tc)
+{
+    gamedata data;
+    storage store;
+    faction *f;
+
+    test_setup();
+    f = test_create_faction(0);
+    free(f->name);
+    f->name = _strdup("  Hodor  ");
+    CuAssertStrEquals(tc, "  Hodor  ", f->name);
+    mstream_init(&data.strm);
+    gamedata_init(&data, &store, RELEASE_VERSION);
+    write_faction(&data, f);
+    
+    data.strm.api->rewind(data.strm.handle);
+    free_gamedata();
+    gamedata_init(&data, &store, RELEASE_VERSION);
+    f = read_faction(&data);
+    CuAssertPtrNotNull(tc, f);
+    CuAssertStrEquals(tc, "Hodor", f->name);
+    CuAssertPtrEquals(tc, 0, f->units);
+    factions = f;
+
+    mstream_done(&data.strm);
+    gamedata_done(&data);
+    test_cleanup();
+}
+
 static void test_readwrite_building(CuTest * tc)
 {
     gamedata data;
@@ -397,6 +426,7 @@ CuSuite *get_save_suite(void)
     SUITE_ADD_TEST(suite, test_readwrite_attrib);
     SUITE_ADD_TEST(suite, test_readwrite_data);
     SUITE_ADD_TEST(suite, test_readwrite_unit);
+    SUITE_ADD_TEST(suite, test_readwrite_faction);
     SUITE_ADD_TEST(suite, test_readwrite_building);
     SUITE_ADD_TEST(suite, test_readwrite_ship);
     SUITE_ADD_TEST(suite, test_readwrite_dead_faction_createunit);
