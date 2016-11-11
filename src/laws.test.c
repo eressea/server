@@ -1024,7 +1024,7 @@ static void test_ally_cmd_errors(CuTest *tc) {
     int fid;
     order *ord;
 
-    test_cleanup();
+    test_setup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     fid = u->faction->no + 1;
     CuAssertPtrEquals(tc, 0, findfaction(fid));
@@ -1037,12 +1037,33 @@ static void test_ally_cmd_errors(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_name_cmd(CuTest *tc) {
+    unit *u;
+    faction *f;
+    order *ord;
+
+    test_setup();
+    u = test_create_unit(f = test_create_faction(0), test_create_region(0, 0, 0));
+
+    ord = create_order(K_NAME, f->locale, "%s '  Ho\tdor  '", LOC(f->locale, parameters[P_UNIT]));
+    name_cmd(u, ord);
+    CuAssertStrEquals(tc, "Hodor", u->_name);
+    free_order(ord);
+
+    ord = create_order(K_NAME, f->locale, "%s '  Ho\tdor  '", LOC(f->locale, parameters[P_FACTION]));
+    name_cmd(u, ord);
+    CuAssertStrEquals(tc, "Hodor", f->name);
+    free_order(ord);
+
+    test_cleanup();
+}
+
 static void test_ally_cmd(CuTest *tc) {
     unit *u;
     faction * f;
     order *ord;
 
-    test_cleanup();
+    test_setup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     f = test_create_faction(0);
 
@@ -1444,6 +1465,7 @@ CuSuite *get_laws_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_nmr_warnings);
     SUITE_ADD_TEST(suite, test_ally_cmd);
+    SUITE_ADD_TEST(suite, test_name_cmd);
     SUITE_ADD_TEST(suite, test_ally_cmd_errors);
     SUITE_ADD_TEST(suite, test_long_order_normal);
     SUITE_ADD_TEST(suite, test_long_order_none);
