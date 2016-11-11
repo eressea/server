@@ -55,7 +55,8 @@ static void test_readwrite_unit(CuTest * tc)
     f = test_create_faction(0);
     fno = f->no;
     u = test_create_unit(f, r);
-
+    unit_setname(u, "  Hodor  ");
+    CuAssertStrEquals(tc, "  Hodor  ", u->_name);
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
     write_unit(&data, u);
@@ -69,6 +70,7 @@ static void test_readwrite_unit(CuTest * tc)
     u = read_unit(&data);
     CuAssertPtrNotNull(tc, u);
     CuAssertPtrEquals(tc, f, u->faction);
+    CuAssertStrEquals(tc, "Hodor", u->_name);
     CuAssertPtrEquals(tc, 0, u->region);
 
     mstream_done(&data.strm);
