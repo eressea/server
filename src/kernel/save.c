@@ -1699,12 +1699,18 @@ ship *read_ship(struct gamedata *data)
     READ_INT(store, &sh->no);
     shash(sh);
     READ_STR(store, name, sizeof(name));
+    if (unicode_utf8_trim(name)!=0) {
+		log_warning("trim ship %s name to '%s'", itoa36(sh->no), name);
+	}
     sh->name = _strdup(name);
     if (lomem) {
         READ_STR(store, NULL, 0);
     }
     else {
         READ_STR(store, name, sizeof(name));
+        if (unicode_utf8_trim(name)!=0) {
+            log_warning("trim ship %s info to '%s'", itoa36(sh->no), name);
+        }
         sh->display = _strdup(name);
     }
     READ_STR(store, name, sizeof(name));
