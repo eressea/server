@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -1625,17 +1625,60 @@ int readgame(const char *filename, bool backup)
     return n;
 }
 
+void write_building(gamedata *data, const building *b)
+{
+    storage *store = data->store;
+
+    write_building_reference(b, store);
+    WRITE_STR(store, b->name);
+    WRITE_STR(store, b->display ? b->display : "");
+    WRITE_INT(store, b->size);
+    WRITE_TOK(store, b->type->_name);
+    write_attribs(store, b->attribs, b);
+}
+
+struct building *read_building(gamedata *data) {
+    char name[DISPLAYSIZE];
+	building *b;
+    storage * store = data->store;
+
+    b = (building *)calloc(1, sizeof(building));
+    READ_INT(store, &b->no);
+    bhash(b);
+    READ_STR(store, name, sizeof(name));
+    b->name = _strdup(name);
+    if (lomem) {
+        READ_STR(store, NULL, 0);
+    }
+    else {
+        READ_STR(store, name, sizeof(name));
+        b->display = _strdup(name);
+    }
+    READ_INT(store, &b->size);
+    READ_STR(store, name, sizeof(name));
+    b->type = bt_find(name);
+    read_attribs(data, &b->attribs, b);
+
+    // repairs, bug 2221:
+    if (b->type->maxsize>0 && b->size>b->type->maxsize) {
+        log_error("building too big: %s (%s size %d of %d), fixing.", buildingname(b), b->type->_name, b->size, b->type->maxsize);
+        b->size = b->type->maxsize;
+    }
+	return b;
+}
+
 int read_game(gamedata *data) {
     char name[DISPLAYSIZE];
     int n, p, nread;
     faction *f, **fp;
     region *r;
-    building *b, **bp;
+    building **bp;
     ship **shp;
     unit *u;
     int rmax = maxregions;
-    const struct building_type *bt_lighthouse = bt_find("lighthouse");
     storage * store = data->store;
+    const struct building_type *bt_lighthouse = bt_find("lighthouse");
+
     if (data->version >= SAVEGAMEID_VERSION) {
         int gameid;
 
@@ -1705,34 +1748,12 @@ int read_game(gamedata *data) {
         bp = &r->buildings;
 
         while (--p >= 0) {
-            b = (building *)calloc(1, sizeof(building));
-            READ_INT(store, &b->no);
-            *bp = b;
-            bp = &b->next;
-            bhash(b);
-            READ_STR(store, name, sizeof(name));
-            b->name = _strdup(name);
-            if (lomem) {
-                READ_STR(store, NULL, 0);
-            }
-            else {
-                READ_STR(store, name, sizeof(name));
-                b->display = _strdup(name);
-            }
-            READ_INT(store, &b->size);
-            READ_STR(store, name, sizeof(name));
-            b->type = bt_find(name);
+            building *b = *bp = read_building(data);
             b->region = r;
-            read_attribs(data, &b->attribs, b);
             if (b->type == bt_lighthouse) {
                 r->flags |= RF_LIGHTHOUSE;
             }
-
-            // repairs, bug 2221:
-            if (b->type->maxsize>0 && b->size>b->type->maxsize) {
-                log_error("building too big: %s (%s size %d of %d), fixing.", buildingname(b), b->type->_name, b->size, b->type->maxsize);
-                b->size = b->type->maxsize;
-            }
+            bp = &b->next;
         }
         /* Schiffe */
 
@@ -1979,14 +2000,7 @@ int write_game(gamedata *data) {
         WRITE_INT(store, listlen(r->buildings));
         WRITE_SECTION(store);
         for (b = r->buildings; b; b = b->next) {
-            write_building_reference(b, store);
-            WRITE_STR(store, b->name);
-            WRITE_STR(store, b->display ? b->display : "");
-            WRITE_INT(store, b->size);
-            WRITE_TOK(store, b->type->_name);
-            WRITE_SECTION(store);
-            write_attribs(store, b->attribs, b);
-            WRITE_SECTION(store);
+            write_building(data, b);
         }
 
         WRITE_INT(store, listlen(r->ships));

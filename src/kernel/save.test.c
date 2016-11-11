@@ -6,6 +6,7 @@
 
 #include "save.h"
 #include "version.h"
+#include "building.h"
 #include "unit.h"
 #include "group.h"
 #include "ally.h"
@@ -27,6 +28,7 @@
 #include <tests.h>
 
 #include <stdio.h>
+#include <string.h>
 #include <errno.h>
 
 static void test_readwrite_data(CuTest * tc)
@@ -76,6 +78,39 @@ static void test_readwrite_unit(CuTest * tc)
     mstream_done(&data.strm);
     gamedata_done(&data);
     move_unit(u, r, NULL); // this makes sure that u doesn't leak
+    test_cleanup();
+}
+
+static void test_readwrite_building(CuTest * tc)
+{
+    gamedata data;
+    storage store;
+    struct building *b;
+    struct region *r;
+
+    test_setup();
+    r = test_create_region(0, 0, 0);
+    b = test_create_building(r, 0);
+    free(b->name);
+    b->name = strdup("  Hodor  ");
+    CuAssertStrEquals(tc, "  Hodor  ", b->name);
+    mstream_init(&data.strm);
+    gamedata_init(&data, &store, RELEASE_VERSION);
+    write_building(&data, b);
+    
+    data.strm.api->rewind(data.strm.handle);
+    free_gamedata();
+    r = test_create_region(0, 0, 0);
+    gamedata_init(&data, &store, RELEASE_VERSION);
+    b = read_building(&data);
+    CuAssertPtrNotNull(tc, b);
+    CuAssertStrEquals(tc, "Hodor", b->name);
+    CuAssertPtrEquals(tc, 0, b->region);
+    b->region = r;
+    r->buildings = b;
+
+    mstream_done(&data.strm);
+    gamedata_done(&data);
     test_cleanup();
 }
 
@@ -328,6 +363,7 @@ CuSuite *get_save_suite(void)
     SUITE_ADD_TEST(suite, test_readwrite_attrib);
     SUITE_ADD_TEST(suite, test_readwrite_data);
     SUITE_ADD_TEST(suite, test_readwrite_unit);
+    SUITE_ADD_TEST(suite, test_readwrite_building);
     SUITE_ADD_TEST(suite, test_readwrite_dead_faction_createunit);
     SUITE_ADD_TEST(suite, test_readwrite_dead_faction_changefaction);
     SUITE_ADD_TEST(suite, test_readwrite_dead_faction_regionowner);

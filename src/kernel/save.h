@@ -57,6 +57,9 @@ extern "C" {
 
     void write_unit(struct gamedata *data, const struct unit *u);
     struct unit *read_unit(struct gamedata *data);
+    
+    void write_building(struct gamedata *data, const struct building *b);
+    struct building *read_building(struct gamedata *data);
 
     int a_readint(struct attrib *a, void *owner, struct gamedata *);
     void a_writeint(const struct attrib *a, const void *owner,
