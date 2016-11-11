@@ -30,6 +30,8 @@ extern "C" {
     struct spell;
     struct spellbook;
     struct unit;
+    struct building;
+    struct ship;
     struct gamedata;
 
 #define MAX_INPUT_SIZE	DISPLAYSIZE*2
@@ -60,6 +62,9 @@ extern "C" {
     
     void write_building(struct gamedata *data, const struct building *b);
     struct building *read_building(struct gamedata *data);
+
+    void write_ship(struct gamedata *data, const struct ship *sh);
+    struct ship *read_ship(struct gamedata *data);
 
     int a_readint(struct attrib *a, void *owner, struct gamedata *);
     void a_writeint(const struct attrib *a, const void *owner,

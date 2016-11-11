@@ -7,6 +7,7 @@
 #include "save.h"
 #include "version.h"
 #include "building.h"
+#include "ship.h"
 #include "unit.h"
 #include "group.h"
 #include "ally.h"
@@ -85,8 +86,8 @@ static void test_readwrite_building(CuTest * tc)
 {
     gamedata data;
     storage store;
-    struct building *b;
-    struct region *r;
+    building *b;
+    region *r;
 
     test_setup();
     r = test_create_region(0, 0, 0);
@@ -108,6 +109,39 @@ static void test_readwrite_building(CuTest * tc)
     CuAssertPtrEquals(tc, 0, b->region);
     b->region = r;
     r->buildings = b;
+
+    mstream_done(&data.strm);
+    gamedata_done(&data);
+    test_cleanup();
+}
+
+static void test_readwrite_ship(CuTest * tc)
+{
+    gamedata data;
+    storage store;
+    ship *sh;
+    region *r;
+
+    test_setup();
+    r = test_create_region(0, 0, 0);
+    sh = test_create_ship(r, 0);
+    free(sh->name);
+    sh->name = _strdup("  Hodor  ");
+    CuAssertStrEquals(tc, "  Hodor  ", sh->name);
+    mstream_init(&data.strm);
+    gamedata_init(&data, &store, RELEASE_VERSION);
+    write_ship(&data, sh);
+    
+    data.strm.api->rewind(data.strm.handle);
+    free_gamedata();
+    r = test_create_region(0, 0, 0);
+    gamedata_init(&data, &store, RELEASE_VERSION);
+    sh = read_ship(&data);
+    CuAssertPtrNotNull(tc, sh);
+    CuAssertStrEquals(tc, "Hodor", sh->name);
+    CuAssertPtrEquals(tc, 0, sh->region);
+    sh->region = r;
+    r->ships = sh;
 
     mstream_done(&data.strm);
     gamedata_done(&data);
@@ -364,6 +398,7 @@ CuSuite *get_save_suite(void)
     SUITE_ADD_TEST(suite, test_readwrite_data);
     SUITE_ADD_TEST(suite, test_readwrite_unit);
     SUITE_ADD_TEST(suite, test_readwrite_building);
+    SUITE_ADD_TEST(suite, test_readwrite_ship);
     SUITE_ADD_TEST(suite, test_readwrite_dead_faction_createunit);
     SUITE_ADD_TEST(suite, test_readwrite_dead_faction_changefaction);
     SUITE_ADD_TEST(suite, test_readwrite_dead_faction_regionowner);

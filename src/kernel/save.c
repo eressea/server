@@ -1673,9 +1673,68 @@ struct building *read_building(gamedata *data) {
 	return b;
 }
 
-int read_game(gamedata *data) {
+void write_ship(gamedata *data, const ship *sh)
+{
+    storage *store = data->store;
+    write_ship_reference(sh, store);
+    WRITE_STR(store, (const char *)sh->name);
+    WRITE_STR(store, sh->display ? (const char *)sh->display : "");
+    WRITE_TOK(store, sh->type->_name);
+    WRITE_INT(store, sh->size);
+    WRITE_INT(store, sh->damage);
+    WRITE_INT(store, sh->flags & SFL_SAVEMASK);
+    assert((sh->type->flags & SFL_NOCOAST) == 0 || sh->coast == NODIRECTION);
+    WRITE_INT(store, sh->coast);
+    write_attribs(store, sh->attribs, sh);
+}
+
+ship *read_ship(struct gamedata *data)
+{
     char name[DISPLAYSIZE];
-    int n, p, nread;
+    ship *sh;
+    int n;
+    storage *store = data->store;
+
+    sh = (ship *)calloc(1, sizeof(ship));
+    READ_INT(store, &sh->no);
+    shash(sh);
+    READ_STR(store, name, sizeof(name));
+    sh->name = _strdup(name);
+    if (lomem) {
+        READ_STR(store, NULL, 0);
+    }
+    else {
+        READ_STR(store, name, sizeof(name));
+        sh->display = _strdup(name);
+    }
+    READ_STR(store, name, sizeof(name));
+    sh->type = st_find(name);
+    if (sh->type == NULL) {
+        /* old datafiles */
+        sh->type = st_find((const char *)LOC(default_locale, name));
+    }
+    assert(sh->type || !"ship_type not registered!");
+
+    READ_INT(store, &sh->size);
+    READ_INT(store, &sh->damage);
+    if (data->version >= FOSS_VERSION) {
+        READ_INT(store, &sh->flags);
+    }
+
+    /* Attribute rekursiv einlesen */
+
+    READ_INT(store, &n);
+    sh->coast = (direction_t)n;
+    if (sh->type->flags & SFL_NOCOAST) {
+        sh->coast = NODIRECTION;
+    }
+    read_attribs(data, &sh->attribs, sh);
+    return sh;
+}
+
+
+int read_game(gamedata *data) {
+    int p, nread;
     faction *f, **fp;
     region *r;
     building **bp;
@@ -1755,10 +1814,10 @@ int read_game(gamedata *data) {
 
         while (--p >= 0) {
             building *b = *bp = read_building(data);
-            b->region = r;
             if (b->type == bt_lighthouse) {
                 r->flags |= RF_LIGHTHOUSE;
             }
+            b->region = r;
             bp = &b->next;
         }
         /* Schiffe */
@@ -1767,43 +1826,9 @@ int read_game(gamedata *data) {
         shp = &r->ships;
 
         while (--p >= 0) {
-            ship *sh = (ship *)calloc(1, sizeof(ship));
+            ship *sh = *shp = read_ship(data);
             sh->region = r;
-            READ_INT(store, &sh->no);
-            *shp = sh;
             shp = &sh->next;
-            shash(sh);
-            READ_STR(store, name, sizeof(name));
-            sh->name = _strdup(name);
-            if (lomem) {
-                READ_STR(store, NULL, 0);
-            }
-            else {
-                READ_STR(store, name, sizeof(name));
-                sh->display = _strdup(name);
-            }
-            READ_STR(store, name, sizeof(name));
-            sh->type = st_find(name);
-            if (sh->type == NULL) {
-                /* old datafiles */
-                sh->type = st_find((const char *)LOC(default_locale, name));
-            }
-            assert(sh->type || !"ship_type not registered!");
-
-            READ_INT(store, &sh->size);
-            READ_INT(store, &sh->damage);
-            if (data->version >= FOSS_VERSION) {
-                READ_INT(store, &sh->flags);
-            }
-
-            /* Attribute rekursiv einlesen */
-
-            READ_INT(store, &n);
-            sh->coast = (direction_t)n;
-            if (sh->type->flags & SFL_NOCOAST) {
-                sh->coast = NODIRECTION;
-            }
-            read_attribs(data, &sh->attribs, sh);
         }
 
         *shp = 0;
@@ -2006,6 +2031,7 @@ int write_game(gamedata *data) {
         WRITE_INT(store, listlen(r->buildings));
         WRITE_SECTION(store);
         for (b = r->buildings; b; b = b->next) {
+            assert(b->region == r);
             write_building(data, b);
         }
 
@@ -2013,23 +2039,13 @@ int write_game(gamedata *data) {
         WRITE_SECTION(store);
         for (sh = r->ships; sh; sh = sh->next) {
             assert(sh->region == r);
-            write_ship_reference(sh, store);
-            WRITE_STR(store, (const char *)sh->name);
-            WRITE_STR(store, sh->display ? (const char *)sh->display : "");
-            WRITE_TOK(store, sh->type->_name);
-            WRITE_INT(store, sh->size);
-            WRITE_INT(store, sh->damage);
-            WRITE_INT(store, sh->flags & SFL_SAVEMASK);
-            assert((sh->type->flags & SFL_NOCOAST) == 0 || sh->coast == NODIRECTION);
-            WRITE_INT(store, sh->coast);
-            WRITE_SECTION(store);
-            write_attribs(store, sh->attribs, sh);
-            WRITE_SECTION(store);
+            write_ship(data, sh);
         }
 
         WRITE_INT(store, listlen(r->units));
         WRITE_SECTION(store);
         for (u = r->units; u; u = u->next) {
+            assert(u->region == r);
             write_unit(data, u);
         }
     }
