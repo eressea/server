@@ -1055,6 +1055,14 @@ static void test_name_cmd(CuTest *tc) {
     CuAssertStrEquals(tc, "Hodor", f->name);
     free_order(ord);
 
+    ord = create_order(K_NAME, f->locale, "%s '  Ho\tdor  '", LOC(f->locale, parameters[P_REGION]));
+    name_cmd(u, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error145"));
+    u->building = test_create_building(u->region, 0);
+    name_cmd(u, ord);
+    CuAssertStrEquals(tc, "Hodor", u->region->land->name);
+    free_order(ord);
+
     test_cleanup();
 }
 
