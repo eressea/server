@@ -79,17 +79,17 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <util/message.h>
 #include <util/parser.h>
 #include <util/password.h>
-#include <quicklist.h>
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/umlaut.h>
-#include <util/message.h>
-#include <util/rng.h>
+#include <util/unicode.h>
 
 #include <attributes/otherfaction.h>
 
+#include <quicklist.h>
 #include <iniparser.h>
 /* libc includes */
 #include <assert.h>
@@ -1627,6 +1627,7 @@ bool renamed_building(const building * b)
 
 static int rename_cmd(unit * u, order * ord, char **s, const char *s2)
 {
+	char name[NAMESIZE];
     assert(s2);
     if (!s2[0]) {
         cmistake(u, ord, 84, MSG_EVENT);
@@ -1635,12 +1636,11 @@ static int rename_cmd(unit * u, order * ord, char **s, const char *s2)
 
     /* TODO: Validate to make sure people don't have illegal characters in
      * names, phishing-style? () come to mind. */
+    strlcpy(name, s2, sizeof(name));
+    unicode_utf8_trim(name);
 
     free(*s);
-    *s = _strdup(s2);
-    if (strlen(s2) >= NAMESIZE) {
-        (*s)[NAMESIZE] = 0;
-    }
+    *s = _strdup(name);
     return 0;
 }
 

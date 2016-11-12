@@ -14,6 +14,7 @@
 #include <errno.h>
 #include <string.h>
 #include <wctype.h>
+#include <ctype.h>
 
 #define B00000000 0x00
 #define B10000000 0x80
@@ -30,6 +31,84 @@
 #define B00000111 0x07
 #define B00000011 0x03
 #define B00000001 0x01
+
+int unicode_utf8_trim(utf8_t *buf)
+{
+    int result = 0, ts = 0;
+    utf8_t *op = buf, *ip = buf, *lc = buf;
+    while (*ip) {
+        ucs4_t ucs = *ip;
+        size_t size = 1;
+        if (ucs & 0x80) {
+            int ret = unicode_utf8_to_ucs4(&ucs, ip, &size);
+            if (ret != 0) {
+                return ret;
+            }
+        }
+        if (op == buf && iswspace(ucs)) {
+            ++result;
+        }
+        else if (iswprint(ucs)) {
+            if (op != ip) {
+                memcpy(op, ip, size);
+            }
+            op += size;
+            if (iswspace(ucs)) ++ts;
+            else {
+                lc = op;
+                ts = 0;
+            }
+        } else {
+            ++result;
+        }
+        ip += size;
+    }
+    *lc = '\0';
+    return result + ts;
+}
+
+int unicode_utf8_mkname(utf8_t * op, size_t outlen, const utf8_t * ip)
+{
+    int ret = 0;
+    bool iss = true;
+    while (*ip) {
+        size_t size = 1;
+        bool isp = false;
+        do {
+            ucs4_t ucs = *ip;
+            if (ucs & 0x80) {
+                ret = unicode_utf8_to_ucs4(&ucs, ip, &size);
+                if (ret !=0) {
+                    return ret;
+                }
+                isp = iswprint(ucs);
+                iss &= !!iswspace(ucs);
+            } else {
+                isp = isprint(ucs);
+                iss &= !!isspace(ucs);
+            }
+            if (iss) {
+                ip += size;
+            }
+        } while (iss);
+        if (size > outlen) {
+            return ENOMEM;
+        }
+        if (isp) {
+            memcpy(op, ip, size);
+            op += size;
+            outlen -= size;
+        } else {
+            ret = 1;
+        }
+        ip += size;
+    }
+    if (outlen <= 0) {
+        return ENOMEM;
+    }
+    *op = 0;
+    return ret;
+}
 
 int unicode_utf8_tolower(utf8_t * op, size_t outlen, const utf8_t * ip)
 {

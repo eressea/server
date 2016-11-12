@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -69,6 +69,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/resolve.h>
 #include <util/rng.h>
 #include <util/umlaut.h>
+#include <util/unicode.h>
 
 #include <quicklist.h>
 #include <stream.h>
@@ -747,12 +748,18 @@ unit *read_unit(struct gamedata *data)
     }
 
     READ_STR(data->store, obuf, sizeof(obuf));
+    if (unicode_utf8_trim(obuf)!=0) {
+		log_warning("trim unit %s name to '%s'", itoa36(u->no), obuf);
+	}
     u->_name = obuf[0] ? _strdup(obuf) : 0;
     if (lomem) {
         READ_STR(data->store, NULL, 0);
     }
     else {
         READ_STR(data->store, obuf, sizeof(obuf));
+		if (unicode_utf8_trim(obuf)!=0) {
+			log_warning("trim unit %s info to '%s'", itoa36(u->no), obuf);
+		}
         u->display = obuf[0] ? _strdup(obuf) : 0;
     }
     READ_INT(data->store, &number);
@@ -986,6 +993,9 @@ static region *readregion(struct gamedata *data, int x, int y)
     else {
         char info[DISPLAYSIZE];
         READ_STR(data->store, info, sizeof(info));
+		if (unicode_utf8_trim(info)!=0) {
+			log_warning("trim region %d info to '%s'", uid, info);
+		};
         region_setinfo(r, info);
     }
 
@@ -1003,6 +1013,9 @@ static region *readregion(struct gamedata *data, int x, int y)
     if (fval(r->terrain, LAND_REGION)) {
         r->land = calloc(1, sizeof(land_region));
         READ_STR(data->store, name, sizeof(name));
+		if (unicode_utf8_trim(name)!=0) {
+			log_warning("trim region %d name to '%s'", uid, name);
+		};
         r->land->name = _strdup(name);
     }
     if (r->land) {
@@ -1112,6 +1125,17 @@ static region *readregion(struct gamedata *data, int x, int y)
     return r;
 }
 
+region *read_region(gamedata *data)
+{
+    storage *store = data->store;
+    region *r;
+    int x, y;
+    READ_INT(store, &x);
+    READ_INT(store, &y);
+    r = readregion(data, x, y);
+    return r;
+}
+
 void writeregion(struct gamedata *data, const region * r)
 {
     assert(r);
@@ -1174,6 +1198,14 @@ void writeregion(struct gamedata *data, const region * r)
     }
     write_attribs(data->store, r->attribs, r);
     WRITE_SECTION(data->store);
+}
+
+void write_region(gamedata *data, const region *r)
+{
+    storage *store = data->store;
+    WRITE_INT(store, r->x);
+    WRITE_INT(store, r->y);
+    writeregion(data, r);
 }
 
 static ally **addally(const faction * f, ally ** sfp, int aid, int state)
@@ -1331,11 +1363,7 @@ void _test_write_password(gamedata *data, const faction *f) {
     write_password(data, f);
 }
 
-/** Reads a faction from a file.
- * This function requires no context, can be called in any state. The
- * faction may not already exist, however.
- */
-faction *readfaction(struct gamedata * data)
+faction *read_faction(struct gamedata * data)
 {
     ally **sfp;
     int planes, n;
@@ -1350,9 +1378,10 @@ faction *readfaction(struct gamedata * data)
         f->no = n;
     }
     else {
-        f->allies = NULL;           /* mem leak */
-        while (f->attribs)
+        f->allies = NULL;           /* FIXME: mem leak */
+        while (f->attribs) {
             a_remove(&f->attribs, f->attribs);
+        }
     }
     READ_INT(data->store, &f->subscription);
 
@@ -1386,8 +1415,14 @@ faction *readfaction(struct gamedata * data)
     }
 
     READ_STR(data->store, name, sizeof(name));
+	if (unicode_utf8_trim(name)!=0) {
+		log_warning("trim faction %s name to '%s'", itoa36(f->no), name);
+	};
     f->name = _strdup(name);
     READ_STR(data->store, name, sizeof(name));
+	if (unicode_utf8_trim(name)!=0) {
+		log_warning("trim faction %s banner to '%s'", itoa36(f->no), name);
+	};
     f->banner = _strdup(name);
 
     log_debug("   - Lese Partei %s (%s)", f->name, factionid(f));
@@ -1480,7 +1515,7 @@ faction *readfaction(struct gamedata * data)
     return f;
 }
 
-void writefaction(struct gamedata *data, const faction * f)
+void write_faction(struct gamedata *data, const faction * f)
 {
     ally *sf;
     ursprung *ur;
@@ -1606,17 +1641,131 @@ int readgame(const char *filename, bool backup)
     return n;
 }
 
-int read_game(gamedata *data) {
+void write_building(gamedata *data, const building *b)
+{
+    storage *store = data->store;
+
+    write_building_reference(b, store);
+    WRITE_STR(store, b->name);
+    WRITE_STR(store, b->display ? b->display : "");
+    WRITE_INT(store, b->size);
+    WRITE_TOK(store, b->type->_name);
+    write_attribs(store, b->attribs, b);
+}
+
+struct building *read_building(gamedata *data) {
     char name[DISPLAYSIZE];
-    int n, p, nread;
+	building *b;
+    storage * store = data->store;
+
+    b = (building *)calloc(1, sizeof(building));
+    READ_INT(store, &b->no);
+    bhash(b);
+    READ_STR(store, name, sizeof(name));
+    if (unicode_utf8_trim(name)!=0) {
+		log_warning("trim building %s name to '%s'", itoa36(b->no), name);
+	}
+    b->name = _strdup(name);
+    if (lomem) {
+        READ_STR(store, NULL, 0);
+    }
+    else {
+        READ_STR(store, name, sizeof(name));
+        if (unicode_utf8_trim(name)!=0) {
+            log_warning("trim building %s info to '%s'", itoa36(b->no), name);
+        }
+        b->display = _strdup(name);
+    }
+    READ_INT(store, &b->size);
+    READ_STR(store, name, sizeof(name));
+    b->type = bt_find(name);
+    read_attribs(data, &b->attribs, b);
+
+    // repairs, bug 2221:
+    if (b->type->maxsize>0 && b->size>b->type->maxsize) {
+        log_error("building too big: %s (%s size %d of %d), fixing.", buildingname(b), b->type->_name, b->size, b->type->maxsize);
+        b->size = b->type->maxsize;
+    }
+	return b;
+}
+
+void write_ship(gamedata *data, const ship *sh)
+{
+    storage *store = data->store;
+    write_ship_reference(sh, store);
+    WRITE_STR(store, (const char *)sh->name);
+    WRITE_STR(store, sh->display ? (const char *)sh->display : "");
+    WRITE_TOK(store, sh->type->_name);
+    WRITE_INT(store, sh->size);
+    WRITE_INT(store, sh->damage);
+    WRITE_INT(store, sh->flags & SFL_SAVEMASK);
+    assert((sh->type->flags & SFL_NOCOAST) == 0 || sh->coast == NODIRECTION);
+    WRITE_INT(store, sh->coast);
+    write_attribs(store, sh->attribs, sh);
+}
+
+ship *read_ship(struct gamedata *data)
+{
+    char name[DISPLAYSIZE];
+    ship *sh;
+    int n;
+    storage *store = data->store;
+
+    sh = (ship *)calloc(1, sizeof(ship));
+    READ_INT(store, &sh->no);
+    shash(sh);
+    READ_STR(store, name, sizeof(name));
+    if (unicode_utf8_trim(name)!=0) {
+		log_warning("trim ship %s name to '%s'", itoa36(sh->no), name);
+	}
+    sh->name = _strdup(name);
+    if (lomem) {
+        READ_STR(store, NULL, 0);
+    }
+    else {
+        READ_STR(store, name, sizeof(name));
+        if (unicode_utf8_trim(name)!=0) {
+            log_warning("trim ship %s info to '%s'", itoa36(sh->no), name);
+        }
+        sh->display = _strdup(name);
+    }
+    READ_STR(store, name, sizeof(name));
+    sh->type = st_find(name);
+    if (sh->type == NULL) {
+        /* old datafiles */
+        sh->type = st_find((const char *)LOC(default_locale, name));
+    }
+    assert(sh->type || !"ship_type not registered!");
+
+    READ_INT(store, &sh->size);
+    READ_INT(store, &sh->damage);
+    if (data->version >= FOSS_VERSION) {
+        READ_INT(store, &sh->flags);
+    }
+
+    /* Attribute rekursiv einlesen */
+
+    READ_INT(store, &n);
+    sh->coast = (direction_t)n;
+    if (sh->type->flags & SFL_NOCOAST) {
+        sh->coast = NODIRECTION;
+    }
+    read_attribs(data, &sh->attribs, sh);
+    return sh;
+}
+
+
+int read_game(gamedata *data) {
+    int p, nread;
     faction *f, **fp;
     region *r;
-    building *b, **bp;
+    building **bp;
     ship **shp;
     unit *u;
     int rmax = maxregions;
-    const struct building_type *bt_lighthouse = bt_find("lighthouse");
     storage * store = data->store;
+    const struct building_type *bt_lighthouse = bt_find("lighthouse");
+
     if (data->version >= SAVEGAMEID_VERSION) {
         int gameid;
 
@@ -1648,11 +1797,12 @@ int read_game(gamedata *data) {
     READ_INT(store, &nread);
     log_debug(" - Einzulesende Parteien: %d\n", nread);
     fp = &factions;
-    while (*fp)
+    while (*fp) {
         fp = &(*fp)->next;
+    }
 
     while (--nread >= 0) {
-        faction *f = readfaction(data);
+        faction *f = read_faction(data);
 
         *fp = f;
         fp = &f->next;
@@ -1668,53 +1818,23 @@ int read_game(gamedata *data) {
         rmax = nread;
     }
     log_debug(" - Einzulesende Regionen: %d/%d\r", rmax, nread);
+
     while (--nread >= 0) {
         unit **up;
-        int x, y;
-        READ_INT(store, &x);
-        READ_INT(store, &y);
 
-        if ((nread & 0x3FF) == 0) {     /* das spart extrem Zeit */
-            log_debug(" - Einzulesende Regionen: %d/%d * %d,%d    \r", rmax, nread, x, y);
-        }
-        --rmax;
-
-        r = readregion(data, x, y);
+        r = read_region(data);
 
         /* Burgen */
         READ_INT(store, &p);
         bp = &r->buildings;
 
         while (--p >= 0) {
-
-            b = (building *)calloc(1, sizeof(building));
-            READ_INT(store, &b->no);
-            *bp = b;
-            bp = &b->next;
-            bhash(b);
-            READ_STR(store, name, sizeof(name));
-            b->name = _strdup(name);
-            if (lomem) {
-                READ_STR(store, NULL, 0);
-            }
-            else {
-                READ_STR(store, name, sizeof(name));
-                b->display = _strdup(name);
-            }
-            READ_INT(store, &b->size);
-            READ_STR(store, name, sizeof(name));
-            b->type = bt_find(name);
-            b->region = r;
-            read_attribs(data, &b->attribs, b);
+            building *b = *bp = read_building(data);
             if (b->type == bt_lighthouse) {
                 r->flags |= RF_LIGHTHOUSE;
             }
-
-            // repairs, bug 2221:
-            if (b->type->maxsize>0 && b->size>b->type->maxsize) {
-                log_error("building too big: %s (%s size %d of %d), fixing.", buildingname(b), b->type->_name, b->size, b->type->maxsize);
-                b->size = b->type->maxsize;
-            }
+            b->region = r;
+            bp = &b->next;
         }
         /* Schiffe */
 
@@ -1722,43 +1842,9 @@ int read_game(gamedata *data) {
         shp = &r->ships;
 
         while (--p >= 0) {
-            ship *sh = (ship *)calloc(1, sizeof(ship));
+            ship *sh = *shp = read_ship(data);
             sh->region = r;
-            READ_INT(store, &sh->no);
-            *shp = sh;
             shp = &sh->next;
-            shash(sh);
-            READ_STR(store, name, sizeof(name));
-            sh->name = _strdup(name);
-            if (lomem) {
-                READ_STR(store, NULL, 0);
-            }
-            else {
-                READ_STR(store, name, sizeof(name));
-                sh->display = _strdup(name);
-            }
-            READ_STR(store, name, sizeof(name));
-            sh->type = st_find(name);
-            if (sh->type == NULL) {
-                /* old datafiles */
-                sh->type = st_find((const char *)LOC(default_locale, name));
-            }
-            assert(sh->type || !"ship_type not registered!");
-
-            READ_INT(store, &sh->size);
-            READ_INT(store, &sh->damage);
-            if (data->version >= FOSS_VERSION) {
-                READ_INT(store, &sh->flags);
-            }
-
-            /* Attribute rekursiv einlesen */
-
-            READ_INT(store, &n);
-            sh->coast = (direction_t)n;
-            if (sh->type->flags & SFL_NOCOAST) {
-                sh->coast = NODIRECTION;
-            }
-            read_attribs(data, &sh->attribs, sh);
         }
 
         *shp = 0;
@@ -1783,8 +1869,13 @@ int read_game(gamedata *data) {
             *up = u;
             up = &u->next;
 
-            update_interval(u->faction, u->region);
+            update_interval(u->faction, r);
         }
+
+        if ((nread & 0x3FF) == 0) {     /* das spart extrem Zeit */
+            log_debug(" - Einzulesende Regionen: %d/%d * %d,%d    \r", rmax, nread, r->x, r->y);
+        }
+        --rmax;
     }
     read_borders(data);
 
@@ -1934,7 +2025,7 @@ int write_game(gamedata *data) {
         if (fval(f, FFL_NPC)) {
             clear_npc_orders(f);
         }
-        writefaction(data, f);
+        write_faction(data, f);
         WRITE_SECTION(store);
     }
 
@@ -1954,44 +2045,26 @@ int write_game(gamedata *data) {
             log_debug(" - Schreibe Regionen: %d", n);
         }
         WRITE_SECTION(store);
-        WRITE_INT(store, r->x);
-        WRITE_INT(store, r->y);
-        writeregion(data, r);
+        write_region(data, r);
 
         WRITE_INT(store, listlen(r->buildings));
         WRITE_SECTION(store);
         for (b = r->buildings; b; b = b->next) {
-            write_building_reference(b, store);
-            WRITE_STR(store, b->name);
-            WRITE_STR(store, b->display ? b->display : "");
-            WRITE_INT(store, b->size);
-            WRITE_TOK(store, b->type->_name);
-            WRITE_SECTION(store);
-            write_attribs(store, b->attribs, b);
-            WRITE_SECTION(store);
+            assert(b->region == r);
+            write_building(data, b);
         }
 
         WRITE_INT(store, listlen(r->ships));
         WRITE_SECTION(store);
         for (sh = r->ships; sh; sh = sh->next) {
             assert(sh->region == r);
-            write_ship_reference(sh, store);
-            WRITE_STR(store, (const char *)sh->name);
-            WRITE_STR(store, sh->display ? (const char *)sh->display : "");
-            WRITE_TOK(store, sh->type->_name);
-            WRITE_INT(store, sh->size);
-            WRITE_INT(store, sh->damage);
-            WRITE_INT(store, sh->flags & SFL_SAVEMASK);
-            assert((sh->type->flags & SFL_NOCOAST) == 0 || sh->coast == NODIRECTION);
-            WRITE_INT(store, sh->coast);
-            WRITE_SECTION(store);
-            write_attribs(store, sh->attribs, sh);
-            WRITE_SECTION(store);
+            write_ship(data, sh);
         }
 
         WRITE_INT(store, listlen(r->units));
         WRITE_SECTION(store);
         for (u = r->units; u; u = u->next) {
+            assert(u->region == r);
             write_unit(data, u);
         }
     }

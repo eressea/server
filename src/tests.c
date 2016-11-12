@@ -217,7 +217,9 @@ test_create_terrain(const char * name, unsigned int flags)
 
 building * test_create_building(region * r, const building_type * btype)
 {
-    building * b = new_building(btype ? btype : test_create_buildingtype("castle"), r, default_locale);
+    building * b;
+    assert(r);
+    b = new_building(btype ? btype : test_create_buildingtype("castle"), r, default_locale);
     b->size = b->type->maxsize > 0 ? b->type->maxsize : 1;
     return b;
 }
