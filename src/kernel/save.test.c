@@ -111,6 +111,34 @@ static void test_readwrite_faction(CuTest * tc)
     test_cleanup();
 }
 
+static void test_readwrite_region(CuTest * tc)
+{
+    gamedata data;
+    storage store;
+    region *r;
+
+    test_setup();
+    r = test_create_region(0, 0, 0);
+    free(r->land->name);
+    r->land->name = _strdup("  Hodor  ");
+    CuAssertStrEquals(tc, "  Hodor  ", r->land->name);
+    mstream_init(&data.strm);
+    gamedata_init(&data, &store, RELEASE_VERSION);
+    write_region(&data, r);
+    
+    data.strm.api->rewind(data.strm.handle);
+    free_gamedata();
+    gamedata_init(&data, &store, RELEASE_VERSION);
+    r = read_region(&data);
+    CuAssertPtrNotNull(tc, r);
+    CuAssertStrEquals(tc, "Hodor", r->land->name);
+    regions = r;
+
+    mstream_done(&data.strm);
+    gamedata_done(&data);
+    test_cleanup();
+}
+
 static void test_readwrite_building(CuTest * tc)
 {
     gamedata data;
@@ -427,6 +455,7 @@ CuSuite *get_save_suite(void)
     SUITE_ADD_TEST(suite, test_readwrite_data);
     SUITE_ADD_TEST(suite, test_readwrite_unit);
     SUITE_ADD_TEST(suite, test_readwrite_faction);
+    SUITE_ADD_TEST(suite, test_readwrite_region);
     SUITE_ADD_TEST(suite, test_readwrite_building);
     SUITE_ADD_TEST(suite, test_readwrite_ship);
     SUITE_ADD_TEST(suite, test_readwrite_dead_faction_createunit);

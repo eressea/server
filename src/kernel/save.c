@@ -1125,6 +1125,17 @@ static region *readregion(struct gamedata *data, int x, int y)
     return r;
 }
 
+region *read_region(gamedata *data)
+{
+    storage *store = data->store;
+    region *r;
+    int x, y;
+    READ_INT(store, &x);
+    READ_INT(store, &y);
+    r = readregion(data, x, y);
+    return r;
+}
+
 void writeregion(struct gamedata *data, const region * r)
 {
     assert(r);
@@ -1187,6 +1198,14 @@ void writeregion(struct gamedata *data, const region * r)
     }
     write_attribs(data->store, r->attribs, r);
     WRITE_SECTION(data->store);
+}
+
+void write_region(gamedata *data, const region *r)
+{
+    storage *store = data->store;
+    WRITE_INT(store, r->x);
+    WRITE_INT(store, r->y);
+    writeregion(data, r);
 }
 
 static ally **addally(const faction * f, ally ** sfp, int aid, int state)
@@ -1344,10 +1363,6 @@ void _test_write_password(gamedata *data, const faction *f) {
     write_password(data, f);
 }
 
-/** Reads a faction from a file.
- * This function requires no context, can be called in any state. The
- * faction may not already exist, however.
- */
 faction *read_faction(struct gamedata * data)
 {
     ally **sfp;
@@ -1803,18 +1818,11 @@ int read_game(gamedata *data) {
         rmax = nread;
     }
     log_debug(" - Einzulesende Regionen: %d/%d\r", rmax, nread);
+
     while (--nread >= 0) {
         unit **up;
-        int x, y;
-        READ_INT(store, &x);
-        READ_INT(store, &y);
 
-        if ((nread & 0x3FF) == 0) {     /* das spart extrem Zeit */
-            log_debug(" - Einzulesende Regionen: %d/%d * %d,%d    \r", rmax, nread, x, y);
-        }
-        --rmax;
-
-        r = readregion(data, x, y);
+        r = read_region(data);
 
         /* Burgen */
         READ_INT(store, &p);
@@ -1861,8 +1869,13 @@ int read_game(gamedata *data) {
             *up = u;
             up = &u->next;
 
-            update_interval(u->faction, u->region);
+            update_interval(u->faction, r);
         }
+
+        if ((nread & 0x3FF) == 0) {     /* das spart extrem Zeit */
+            log_debug(" - Einzulesende Regionen: %d/%d * %d,%d    \r", rmax, nread, r->x, r->y);
+        }
+        --rmax;
     }
     read_borders(data);
 
@@ -2032,9 +2045,7 @@ int write_game(gamedata *data) {
             log_debug(" - Schreibe Regionen: %d", n);
         }
         WRITE_SECTION(store);
-        WRITE_INT(store, r->x);
-        WRITE_INT(store, r->y);
-        writeregion(data, r);
+        write_region(data, r);
 
         WRITE_INT(store, listlen(r->buildings));
         WRITE_SECTION(store);

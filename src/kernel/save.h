@@ -63,6 +63,9 @@ extern "C" {
     void write_faction(struct gamedata *data, const struct faction *f);
     struct faction *read_faction(struct gamedata *data);
 
+    void write_region(struct gamedata *data, const struct region *r);
+    struct region *read_region(struct gamedata *data);
+
     void write_building(struct gamedata *data, const struct building *b);
     struct building *read_building(struct gamedata *data);
 
