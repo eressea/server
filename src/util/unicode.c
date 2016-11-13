@@ -37,23 +37,25 @@ int unicode_utf8_trim(utf8_t *buf)
     int result = 0, ts = 0;
     utf8_t *op = buf, *ip = buf, *lc = buf;
     while (*ip) {
-        ucs4_t ucs = *ip;
         size_t size = 1;
-        if (ucs & 0x80) {
+        wint_t wc = *ip;
+        if (wc & 0x80) {
+            ucs4_t ucs;
             int ret = unicode_utf8_to_ucs4(&ucs, ip, &size);
             if (ret != 0) {
                 return ret;
             }
+            wc = (wint_t)ucs;
         }
-        if (op == buf && iswspace(ucs)) {
+        if (op == buf && iswspace(wc)) {
             ++result;
         }
-        else if (iswprint(ucs)) {
+        else if (iswprint(wc)) {
             if (op != ip) {
-                memcpy(op, ip, size);
+                memmove(op, ip, size);
             }
             op += size;
-            if (iswspace(ucs)) ++ts;
+            if (iswspace(wc)) ++ts;
             else {
                 lc = op;
                 ts = 0;
@@ -65,49 +67,6 @@ int unicode_utf8_trim(utf8_t *buf)
     }
     *lc = '\0';
     return result + ts;
-}
-
-int unicode_utf8_mkname(utf8_t * op, size_t outlen, const utf8_t * ip)
-{
-    int ret = 0;
-    bool iss = true;
-    while (*ip) {
-        size_t size = 1;
-        bool isp = false;
-        do {
-            ucs4_t ucs = *ip;
-            if (ucs & 0x80) {
-                ret = unicode_utf8_to_ucs4(&ucs, ip, &size);
-                if (ret !=0) {
-                    return ret;
-                }
-                isp = iswprint(ucs);
-                iss &= !!iswspace(ucs);
-            } else {
-                isp = isprint(ucs);
-                iss &= !!isspace(ucs);
-            }
-            if (iss) {
-                ip += size;
-            }
-        } while (iss);
-        if (size > outlen) {
-            return ENOMEM;
-        }
-        if (isp) {
-            memcpy(op, ip, size);
-            op += size;
-            outlen -= size;
-        } else {
-            ret = 1;
-        }
-        ip += size;
-    }
-    if (outlen <= 0) {
-        return ENOMEM;
-    }
-    *op = 0;
-    return ret;
 }
 
 int unicode_utf8_tolower(utf8_t * op, size_t outlen, const utf8_t * ip)
@@ -128,7 +87,7 @@ int unicode_utf8_tolower(utf8_t * op, size_t outlen, const utf8_t * ip)
         }
         low = towlower((wint_t)ucs);
         if (low == ucs) {
-            memcpy(op, ip, size);
+            memmove(op, ip, size);
             ip += size;
             op += size;
             outlen -= size;
