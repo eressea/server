@@ -7,6 +7,7 @@
 #include <memstream.h>
 #include <CuTest.h>
 #include <tests.h>
+#include <string.h>
 
 static void test_attrib_new(CuTest * tc)
 {
