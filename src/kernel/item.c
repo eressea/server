@@ -30,7 +30,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "pool.h"
 #include "race.h"
 #include "region.h"
-#include "save.h"
 #include "skill.h"
 #include "terrain.h"
 #include "unit.h"

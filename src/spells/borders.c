@@ -8,7 +8,6 @@
 #include <kernel/faction.h>
 #include <kernel/messages.h>
 #include <kernel/region.h>
-#include <kernel/save.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 

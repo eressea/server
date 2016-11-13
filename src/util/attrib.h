@@ -81,6 +81,20 @@ extern "C" {
     int a_read(struct gamedata *data, attrib ** attribs, void *owner);
     void a_write(struct storage *store, const attrib * attribs, const void *owner);
 
+    int a_readint(struct attrib *a, void *owner, struct gamedata *);
+    void a_writeint(const struct attrib *a, const void *owner,
+        struct storage *store);
+    int a_readshorts(struct attrib *a, void *owner, struct gamedata *);
+    void a_writeshorts(const struct attrib *a, const void *owner,
+        struct storage *store);
+    int a_readchars(struct attrib *a, void *owner, struct gamedata *);
+    void a_writechars(const struct attrib *a, const void *owner,
+        struct storage *store);
+    int a_readstring(struct attrib *a, void *owner, struct gamedata *);
+    void a_writestring(const struct attrib *a, const void *owner,
+        struct storage *);
+    void a_finalizestring(struct attrib *a);
+
     void attrib_done(void);
 
 #define DEFAULT_AGE NULL

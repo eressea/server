@@ -19,7 +19,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include <kernel/config.h>
 #include "raceprefix.h"
-#include <kernel/save.h>
 
 #include <util/attrib.h>
 

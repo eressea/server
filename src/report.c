@@ -63,7 +63,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/region.h>
 #include <kernel/render.h>
 #include <kernel/resources.h>
-#include <kernel/save.h>
 #include <kernel/ship.h>
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
@@ -85,6 +84,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <quicklist.h>
 #include <util/rng.h>
 #include <filestream.h>
+#include <stream.h>
 
 /* libc includes */
 #include <assert.h>
@@ -133,11 +133,11 @@ static char *gamedate_season(const struct locale *lang)
     return buf;
 }
 
-void newline(stream *out) {
+void newline(struct stream *out) {
     sputs("", out);
 }
 
-void write_spaces(stream *out, size_t num) {
+void write_spaces(struct stream *out, size_t num) {
     static const char spaces[REPORTWIDTH] = "                                                                             ";
     while (num > 0) {
         size_t bytes = (num > REPORTWIDTH) ? REPORTWIDTH : num;
@@ -146,7 +146,7 @@ void write_spaces(stream *out, size_t num) {
     }
 }
 
-static void centre(stream *out, const char *s, bool breaking)
+static void centre(struct stream *out, const char *s, bool breaking)
 {
     /* Bei Namen die genau 80 Zeichen lang sind, kann es hier Probleme
      * geben. Seltsamerweise wird i dann auf MAXINT oder aehnlich
@@ -170,7 +170,7 @@ static void centre(stream *out, const char *s, bool breaking)
 }
 
 static void
-paragraph(stream *out, const char *str, ptrdiff_t indent, int hanging_indent,
+paragraph(struct stream *out, const char *str, ptrdiff_t indent, int hanging_indent,
     char marker)
 {
     size_t length = REPORTWIDTH;
@@ -248,7 +248,7 @@ static size_t write_spell_modifier(spell * sp, int flag, const char * str, bool 
     return 0;
 }
 
-void nr_spell_syntax(stream *out, spellbook_entry * sbe, const struct locale *lang)
+void nr_spell_syntax(struct stream *out, spellbook_entry * sbe, const struct locale *lang)
 {
     int bytes;
     char buf[4096];
@@ -436,7 +436,7 @@ void nr_spell_syntax(stream *out, spellbook_entry * sbe, const struct locale *la
 
 }
 
-void nr_spell(stream *out, spellbook_entry * sbe, const struct locale *lang)
+void nr_spell(struct stream *out, spellbook_entry * sbe, const struct locale *lang)
 {
     int bytes, k, itemanz, costtyp;
     char buf[4096];
@@ -554,7 +554,7 @@ void nr_spell(stream *out, spellbook_entry * sbe, const struct locale *lang)
 }
 
 static void
-nr_curses_i(stream *out, int indent, const faction *viewer, objtype_t typ, const void *obj, attrib *a, int self)
+nr_curses_i(struct stream *out, int indent, const faction *viewer, objtype_t typ, const void *obj, attrib *a, int self)
 {
     for (; a; a = a->next) {
         char buf[4096];
@@ -582,7 +582,7 @@ nr_curses_i(stream *out, int indent, const faction *viewer, objtype_t typ, const
     }
 }
 
-static void nr_curses(stream *out, int indent, const faction *viewer, objtype_t typ, const void *obj)
+static void nr_curses(struct stream *out, int indent, const faction *viewer, objtype_t typ, const void *obj)
 {
     int self = 0;
     attrib *a = NULL;
@@ -652,7 +652,7 @@ static void nr_curses(stream *out, int indent, const faction *viewer, objtype_t 
     nr_curses_i(out, indent, viewer, typ, obj, a, self);
 }
 
-static void rps_nowrap(stream *out, const char *s)
+static void rps_nowrap(struct stream *out, const char *s)
 {
     const char *x = s;
     size_t indent = 0;
@@ -675,7 +675,7 @@ static void rps_nowrap(stream *out, const char *s)
 }
 
 static void
-nr_unit(stream *out, const faction * f, const unit * u, int indent, seen_mode mode)
+nr_unit(struct stream *out, const faction * f, const unit * u, int indent, seen_mode mode)
 {
     attrib *a_otherfaction;
     char marker;
@@ -717,7 +717,7 @@ nr_unit(stream *out, const faction * f, const unit * u, int indent, seen_mode mo
 }
 
 static void
-rp_messages(stream *out, message_list * msgs, faction * viewer, int indent,
+rp_messages(struct stream *out, message_list * msgs, faction * viewer, int indent,
     bool categorized)
 {
     nrsection *section;
@@ -753,7 +753,7 @@ rp_messages(stream *out, message_list * msgs, faction * viewer, int indent,
     }
 }
 
-static void rp_battles(stream *out, faction * f)
+static void rp_battles(struct stream *out, faction * f)
 {
     if (f->battles != NULL) {
         struct bmsg *bm = f->battles;
@@ -773,7 +773,7 @@ static void rp_battles(stream *out, faction * f)
     }
 }
 
-static void prices(stream *out, const region * r, const faction * f)
+static void prices(struct stream *out, const region * r, const faction * f)
 {
     const luxury_type *sale = NULL;
     struct demand *dmd;
@@ -875,7 +875,7 @@ bool see_border(const connection * b, const faction * f, const region * r)
     return cs;
 }
 
-static void describe(stream *out, const region * r, faction * f)
+static void describe(struct stream *out, const region * r, faction * f)
 {
     int n;
     bool dh;
@@ -1268,7 +1268,7 @@ static void describe(stream *out, const region * r, faction * f)
     }
 }
 
-static void statistics(stream *out, const region * r, const faction * f)
+static void statistics(struct stream *out, const region * r, const faction * f)
 {
     const unit *u;
     int number = 0, p = rpeasants(r);
@@ -1620,7 +1620,7 @@ show_allies(const faction * f, const ally * allies, char *buf, size_t size)
     *bufp = 0;
 }
 
-static void allies(stream *out, const faction * f)
+static void allies(struct stream *out, const faction * f)
 {
     const group *g = f->groups;
     char buf[16384];
@@ -1649,7 +1649,7 @@ static void allies(stream *out, const faction * f)
     }
 }
 
-static void guards(stream *out, const region * r, const faction * see)
+static void guards(struct stream *out, const region * r, const faction * see)
 {
     /* die Partei  see  sieht dies; wegen
      * "unbekannte Partei", wenn man es selbst ist... */
@@ -1722,7 +1722,7 @@ static void guards(stream *out, const region * r, const faction * see)
     }
 }
 
-static void rpline(stream *out)
+static void rpline(struct stream *out)
 {
     static char line[REPORTWIDTH + 1];
     if (line[0] != '-') {
@@ -1732,7 +1732,7 @@ static void rpline(stream *out)
     swrite(line, sizeof(char), sizeof(line), out);
 }
 
-static void list_address(stream *out, const faction * uf, quicklist * seenfactions)
+static void list_address(struct stream *out, const faction * uf, quicklist * seenfactions)
 {
     int qi = 0;
     quicklist *flist = seenfactions;
@@ -1763,7 +1763,7 @@ static void list_address(stream *out, const faction * uf, quicklist * seenfactio
 }
 
 static void
-nr_ship(stream *out, const region *r, const ship * sh, const faction * f,
+nr_ship(struct stream *out, const region *r, const ship * sh, const faction * f,
     const unit * captain)
 {
     char buffer[8192], *bufp = buffer;
@@ -1836,7 +1836,7 @@ nr_ship(stream *out, const region *r, const ship * sh, const faction * f,
 }
 
 static void
-nr_building(stream *out, const region *r, const building *b, const faction *f)
+nr_building(struct stream *out, const region *r, const building *b, const faction *f)
 {
     int i, bytes;
     const char *name, *bname, *billusion = NULL;
@@ -1908,7 +1908,7 @@ nr_building(stream *out, const region *r, const building *b, const faction *f)
     }
 }
 
-static void nr_paragraph(stream *out, message * m, faction * f)
+static void nr_paragraph(struct stream *out, message * m, faction * f)
 {
     int bytes;
     char buf[4096], *bufp = buf;
@@ -1924,14 +1924,14 @@ static void nr_paragraph(stream *out, message * m, faction * f)
 }
 
 typedef struct cb_data {
-    stream *out;
+    struct stream *out;
     char *start, *writep;
     size_t size;
     const faction *f;
     int maxtravel, counter;
 } cb_data;
 
-static void init_cb(cb_data *data, stream *out, char *buffer, size_t size, const faction *f) {
+static void init_cb(cb_data *data, struct stream *out, char *buffer, size_t size, const faction *f) {
     data->out = out;
     data->writep = buffer;
     data->start = buffer;
@@ -1996,7 +1996,7 @@ static void cb_write_travelthru(region *r, unit *u, void *cbdata) {
     }
 }
 
-void write_travelthru(stream *out, region *r, const faction *f)
+void write_travelthru(struct stream *out, region *r, const faction *f)
 {
     int maxtravel;
     char buf[8192];

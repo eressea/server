@@ -28,7 +28,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "race.h"
 #include "region.h"
 #include "skill.h"
-#include "save.h"
 #include "lighthouse.h"
 
 /* util includes */

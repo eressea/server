@@ -57,7 +57,6 @@ without prior permission by the authors of Eressea.
 #include <kernel/spellbook.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
-#include <kernel/save.h>
 
 /* util includes */
 #include <util/attrib.h>
@@ -70,6 +69,7 @@ without prior permission by the authors of Eressea.
 #include <util/nrmessage.h>
 #include <quicklist.h>
 #include <filestream.h>
+#include <stream.h>
 
 /* libc includes */
 #include <assert.h>
@@ -177,7 +177,7 @@ static void print_items(FILE * F, item * items, const struct locale *lang)
 }
 
 static void
-cr_output_curses(stream *out, const faction * viewer, const void *obj, objtype_t typ)
+cr_output_curses(struct stream *out, const faction * viewer, const void *obj, objtype_t typ)
 {
     bool header = false;
     attrib *a = NULL;

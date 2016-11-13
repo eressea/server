@@ -39,6 +39,8 @@ extern "C" {
      * dass hier ein Fehler (fehlende ") vorliegt */
 
     extern int data_version;
+
+    // TODO: is this *really* still in use?
     extern int enc_gamedata;
 
     int readorders(const char *filename);
@@ -71,23 +73,6 @@ extern "C" {
 
     void write_ship(struct gamedata *data, const struct ship *sh);
     struct ship *read_ship(struct gamedata *data);
-
-    int a_readint(struct attrib *a, void *owner, struct gamedata *);
-    void a_writeint(const struct attrib *a, const void *owner,
-        struct storage *store);
-    int a_readshorts(struct attrib *a, void *owner, struct gamedata *);
-    void a_writeshorts(const struct attrib *a, const void *owner,
-        struct storage *store);
-    int a_readchars(struct attrib *a, void *owner, struct gamedata *);
-    void a_writechars(const struct attrib *a, const void *owner,
-        struct storage *store);
-    int a_readvoid(struct attrib *a, void *owner, struct gamedata *);
-    void a_writevoid(const struct attrib *a, const void *owner,
-        struct storage *);
-    int a_readstring(struct attrib *a, void *owner, struct gamedata *);
-    void a_writestring(const struct attrib *a, const void *owner,
-    struct storage *);
-    void a_finalizestring(struct attrib *a);
 
     void create_backup(char *file);
 
