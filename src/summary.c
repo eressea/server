@@ -59,7 +59,6 @@ typedef struct summary {
     int landregionen;
     int regionen_mit_spielern;
     int landregionen_mit_spielern;
-    int orkifizierte_regionen;
     int inactive_volcanos;
     int active_volcanos;
     int spielerpferde;
@@ -227,7 +226,6 @@ void report_summary(summary * s, summary * o, bool full)
         fprintf(F, "Landregionen:          %d\n", s->landregionen);
         fprintf(F, "Spielerregionen:       %d\n", s->regionen_mit_spielern);
         fprintf(F, "Landspielerregionen:   %d\n", s->landregionen_mit_spielern);
-        fprintf(F, "Orkifizierte Regionen: %d\n", s->orkifizierte_regionen);
         fprintf(F, "Inaktive Vulkane:      %d\n", s->inactive_volcanos);
         fprintf(F, "Aktive Vulkane:        %d\n\n", s->active_volcanos);
     }
@@ -421,9 +419,6 @@ summary *make_summary(void)
             s->landregionen++;
             if (r->units) {
                 s->landregionen_mit_spielern++;
-            }
-            if (fval(r, RF_ORCIFIED)) {
-                s->orkifizierte_regionen++;
             }
             if (r->terrain == newterrain(T_VOLCANO)) {
                 s->inactive_volcanos++;

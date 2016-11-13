@@ -1021,23 +1021,12 @@ static void describe(stream *out, const region * r, faction * f)
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
         }
-        if (fval(r, RF_ORCIFIED)) {
-            bytes = (int)strlcpy(bufp, " ", size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
-
-            bytes =
-                (int)strlcpy(bufp, LOC(f->locale, n == 1 ? "rc_orc" : "rc_orc_p"),
-                    size);
-        }
-        else {
-            bytes = (int)strlcpy(bufp, " ", size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
-            bytes =
-                (int)strlcpy(bufp, LOC(f->locale, n == 1 ? "peasant" : "peasant_p"),
-                    size);
-        }
+        bytes = (int)strlcpy(bufp, " ", size);
+        if (wrptr(&bufp, &size, bytes) != 0)
+            WARN_STATIC_BUFFER();
+        bytes =
+            (int)strlcpy(bufp, LOC(f->locale, n == 1 ? "peasant" : "peasant_p"),
+                size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
         if (is_mourning(r, turn + 1)) {

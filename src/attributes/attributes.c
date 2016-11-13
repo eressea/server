@@ -33,7 +33,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "moved.h"
 #include "movement.h"
 #include "dict.h"
-#include "orcification.h"
 #include "otherfaction.h"
 #include "overrideroads.h"
 #include "racename.h"
@@ -120,6 +119,7 @@ void register_attributes(void)
     at_register(&at_germs);
 
     at_deprecate("xontormiaexpress", a_readint);    /* required for old datafiles */
+    at_deprecate("orcification", a_readint);    /* required for old datafiles */
     at_deprecate("lua", read_ext);    /* required for old datafiles */
     at_deprecate("gm", a_readint);
     at_deprecate("guard", a_readint); /* used to contain guard-flags (v3.10.0-259-g8597e8b) */
@@ -133,7 +133,6 @@ void register_attributes(void)
     at_register(&at_keys);
     at_register(&at_follow);
     at_register(&at_targetregion);
-    at_register(&at_orcification);
     at_register(&at_hate);
     at_register(&at_reduceproduction);
     at_register(&at_otherfaction);
