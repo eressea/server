@@ -44,7 +44,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define RF_ENCOUNTER   (1<<9) /* persistent */
 #define RF_MAPPER_HIGHLIGHT (1<<10)
 #define RF_LIGHTHOUSE  (1<<11) /* this region may contain a lighthouse */
-#define RF_ORCIFIED    (1<<12) /* persistent */
 #define RF_MIGRATION   (1<<13)
 
 #define RF_UNUSED_14 (1<<14)
@@ -58,7 +57,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #define RF_ALL 0xFFFFFF
 
-#define RF_SAVEMASK (RF_CHAOTIC|RF_MALLORN|RF_BLOCKED|RF_ENCOUNTER|RF_ORCIFIED|RF_GUARDED|RF_LIGHTHOUSE)
+#define RF_SAVEMASK (RF_CHAOTIC|RF_MALLORN|RF_BLOCKED|RF_ENCOUNTER|RF_GUARDED|RF_LIGHTHOUSE)
     struct message;
     struct message_list;
     struct rawmaterial;

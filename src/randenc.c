@@ -67,7 +67,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <attributes/iceberg.h>
 extern struct attrib_type at_unitdissolve;
-extern struct attrib_type at_orcification;
 
 /* In a->data.ca[1] steht der Prozentsatz mit dem sich die Einheit
  * auflöst, in a->data.ca[0] kann angegeben werden, wohin die Personen
@@ -807,47 +806,6 @@ void randomevents(void)
     godcurse();
     orc_growth();
     demon_skillchanges();
-
-    /* Orkifizierte Regionen mutieren und mutieren zurück */
-
-    for (r = regions; r; r = r->next) {
-        if (fval(r, RF_ORCIFIED)) {
-            direction_t dir;
-            double probability = 0.0;
-            for (dir = 0; dir < MAXDIRECTIONS; dir++) {
-                region *rc = rconnect(r, dir);
-                if (rc && rpeasants(rc) > 0 && !fval(rc, RF_ORCIFIED))
-                    probability += 0.02;
-            }
-            if (chance(probability)) {
-                ADDMSG(&r->msgs, msg_message("deorcified", "region", r));
-                freset(r, RF_ORCIFIED);
-            }
-        }
-        else {
-            attrib *a = a_find(r->attribs, &at_orcification);
-            if (a != NULL) {
-                if (rpeasants(r) <= 0) {
-                    a_remove(&r->attribs, a);
-                }
-                else {
-                    double probability = 0.0;
-                    probability = a->data.i / (double)rpeasants(r);
-                    if (chance(probability)) {
-                        fset(r, RF_ORCIFIED);
-                        a_remove(&r->attribs, a);
-                        ADDMSG(&r->msgs, msg_message("orcified", "region", r));
-                    }
-                    else {
-                        a->data.i -= _max(10, a->data.i / 10);
-                        if (a->data.i <= 0)
-                            a_remove(&r->attribs, a);
-                    }
-                }
-            }
-        }
-    }
-    
     volcano_update();
     /* Monumente zerfallen, Schiffe verfaulen */
 

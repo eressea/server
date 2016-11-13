@@ -24,7 +24,6 @@ without prior permission by the authors of Eressea.
 
 /* attributes include */
 #include <attributes/follow.h>
-#include <attributes/orcification.h>
 #include <attributes/otherfaction.h>
 #include <attributes/racename.h>
 #include <attributes/raceprefix.h>
@@ -1329,9 +1328,6 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
         if (fval(r->terrain, LAND_REGION)) {
             assert(r->land);
             fprintf(F, "%d;Bauern\n", rpeasants(r));
-            if (fval(r, RF_ORCIFIED)) {
-                fprintf(F, "1;Verorkt\n");
-            }
             fprintf(F, "%d;Pferde\n", rhorses(r));
 
             if (r->seen.mode >= seen_unit) {

@@ -942,9 +942,6 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
         else if (fval(r->terrain, SEA_REGION)) {
             wage = 11;
         }
-        else if (fval(r, RF_ORCIFIED)) {
-            wage = wagetable[esize][1];
-        }
         else {
             wage = wagetable[esize][2];
         }

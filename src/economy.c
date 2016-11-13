@@ -69,7 +69,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <attributes/reduceproduction.h>
 #include <attributes/racename.h>
-#include <attributes/orcification.h>
 
 /* libs includes */
 #include <math.h>
@@ -496,13 +495,6 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
         /* Die Region befindet sich in Aufruhr */
         cmistake(u, ord, 237, MSG_EVENT);
         return;
-    }
-
-    if (fval(r, RF_ORCIFIED)) {
-        if (rc != get_race(RC_ORC)) {
-            cmistake(u, ord, 238, MSG_EVENT);
-            return;
-        }
     }
 
     if (recruitcost) {

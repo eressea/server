@@ -34,7 +34,6 @@
 
 /* attributes includes */
 #include <attributes/racename.h>
-#include <attributes/orcification.h>
 
 /* util includes */
 #include <util/attrib.h>
@@ -411,16 +410,6 @@ message * disband_men(int n, unit * u, struct order *ord) {
         return msg;
     }
     transfermen(u, NULL, n);
-    //TODO: is ORCIFICATION still working? snotlings cannot be given to peasants
-#ifdef ORCIFICATION
-    if (u_race(u) == rc_snotling && !fval(u->region, RF_ORCIFIED)) {
-        attrib *a = a_find(u->region->attribs, &at_orcification);
-        if (!a) {
-            a = a_add(&u->region->attribs, a_new(&at_orcification));
-        }
-        a->data.i += n;
-    }
-#endif
     if (fval(u->region->terrain, SEA_REGION)) {
         return msg_message("give_person_ocean", "unit amount", u, n);
     }
