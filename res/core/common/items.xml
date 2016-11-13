@@ -135,12 +135,6 @@
     </item>
   </resource>
 
-  <resource name="wand_of_tears">
-    <item notlost="yes" weight="0">
-      <function name="use" value="use_wand_of_tears"/>
-    </item>
-  </resource>
-
   <resource name="catapultammo">
     <item weight="1000">
       <construction skill="quarrying" minskill="3">
