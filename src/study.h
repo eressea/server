@@ -45,7 +45,7 @@ extern "C" {
 
     void demon_skillchange(struct unit *u);
 
-#define MAXTEACHERS 20
+#define MAXTEACHERS 32
 #define TEACHNUMBER 10
     typedef struct teaching_info {
         struct unit *teachers[MAXTEACHERS];
