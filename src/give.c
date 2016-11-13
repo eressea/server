@@ -396,9 +396,14 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
 
 message * disband_men(int n, unit * u, struct order *ord) {
     message * msg;
+    static const race *rc_snotling;
+    static int rccache;
 
-    // TODO: cache RC_SNOTLING
-    if (u_race(u) == get_race(RC_SNOTLING)) {
+    if (rc_changed(&rccache)) {
+        rc_snotling = get_race(RC_SNOTLING);
+    }
+
+    if (u_race(u) == rc_snotling) {
         /* snotlings may not be given to the peasants. */
         return msg_error(u, ord, 307);
     }
@@ -408,7 +413,7 @@ message * disband_men(int n, unit * u, struct order *ord) {
     transfermen(u, NULL, n);
     //TODO: is ORCIFICATION still working? snotlings cannot be given to peasants
 #ifdef ORCIFICATION
-    if (u_race(u) == get_race(RC_SNOTLING) && !fval(u->region, RF_ORCIFIED)) {
+    if (u_race(u) == rc_snotling && !fval(u->region, RF_ORCIFIED)) {
         attrib *a = a_find(u->region->attribs, &at_orcification);
         if (!a) {
             a = a_add(&u->region->attribs, a_new(&at_orcification));

@@ -827,19 +827,22 @@ void randomevents(void)
         else {
             attrib *a = a_find(r->attribs, &at_orcification);
             if (a != NULL) {
-                double probability = 0.0;
-                if (rpeasants(r) <= 0)
-                    continue;
-                probability = a->data.i / (double)rpeasants(r);
-                if (chance(probability)) {
-                    fset(r, RF_ORCIFIED);
+                if (rpeasants(r) <= 0) {
                     a_remove(&r->attribs, a);
-                    ADDMSG(&r->msgs, msg_message("orcified", "region", r));
                 }
                 else {
-                    a->data.i -= _max(10, a->data.i / 10);
-                    if (a->data.i <= 0)
+                    double probability = 0.0;
+                    probability = a->data.i / (double)rpeasants(r);
+                    if (chance(probability)) {
+                        fset(r, RF_ORCIFIED);
                         a_remove(&r->attribs, a);
+                        ADDMSG(&r->msgs, msg_message("orcified", "region", r));
+                    }
+                    else {
+                        a->data.i -= _max(10, a->data.i / 10);
+                        if (a->data.i <= 0)
+                            a_remove(&r->attribs, a);
+                    }
                 }
             }
         }
