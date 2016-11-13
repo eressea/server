@@ -670,36 +670,6 @@ writeorder(struct gamedata *data, const struct order *ord,
         WRITE_STR(data->store, obuf);
 }
 
-int read_attribs(gamedata *data, attrib **alist, void *owner) {
-    int result;
-    if (data->version < ATHASH_VERSION) {
-        result = a_read_orig(data, alist, owner);
-    }
-    else {
-        result = a_read(data, alist, owner);
-    }
-    if (result == AT_READ_DEPR) {
-        /* handle deprecated attributes */
-        attrib *a = *alist;
-        while (a) {
-            if (a->type->upgrade) {
-                a->type->upgrade(alist, a);
-            }
-            a = a->nexttype;
-        }
-    }
-    return result;
-}
-
-void write_attribs(storage *store, attrib *alist, const void *owner)
-{
-#if RELEASE_VERSION < ATHASH_VERSION
-    a_write_orig(store, alist, owner);
-#else
-    a_write(store, alist, owner);
-#endif
-}
-
 unit *read_unit(struct gamedata *data)
 {
     unit *u;

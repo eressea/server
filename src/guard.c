@@ -24,7 +24,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "monster.h"
 
 #include <kernel/ally.h>
-#include <kernel/save.h>
 #include <kernel/unit.h>
 #include <kernel/faction.h>
 #include <kernel/race.h>

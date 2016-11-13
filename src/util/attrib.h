@@ -66,6 +66,9 @@ extern "C" {
     extern void at_register(attrib_type * at);
     extern void at_deprecate(const char * name, int(*reader)(attrib *, void *, struct gamedata *));
 
+    void write_attribs(struct storage *store, struct attrib *alist, const void *owner);
+    int read_attribs(struct gamedata *store, struct attrib **alist, void *owner);
+
     extern attrib *a_select(attrib * a, const void *data,
         bool(*compare) (const attrib *, const void *));
     extern attrib *a_find(attrib * a, const attrib_type * at);

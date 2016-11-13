@@ -56,9 +56,6 @@ extern "C" {
     void read_spellbook(struct spellbook **bookp, struct gamedata *data, int(*get_level)(const struct spell * sp, void *), void * cbdata);
     void write_spellbook(const struct spellbook *book, struct storage *store);
 
-    void write_attribs(struct storage *store, struct attrib *alist, const void *owner);
-    int read_attribs(struct gamedata *store, struct attrib **alist, void *owner);
-
     void write_unit(struct gamedata *data, const struct unit *u);
     struct unit *read_unit(struct gamedata *data);
     
