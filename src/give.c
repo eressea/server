@@ -224,15 +224,11 @@ static bool unit_has_cursed_item(const unit * u)
     return false;
 }
 
-static bool can_give_men(const unit *u, order *ord, message **msg) {
-    if (u_race(u) == get_race(RC_SNOTLING)) {
-        /* snotlings may not be given to the peasants. */
-        if (msg) *msg = msg_error(u, ord, 307);
-    }
-    else if (unit_has_cursed_item(u)) {
+static bool can_give_men(const unit *u, const unit *dst, order *ord, message **msg) {
+    if (unit_has_cursed_item(u)) {
         if (msg) *msg = msg_error(u, ord, 78);
     }
-    else if (has_skill(u, SK_MAGIC)) {
+    else if (dst && (has_skill(u, SK_MAGIC) && dst->number > 0)) {
         /* cannot give units to and from magicians */
         if (msg) *msg = msg_error(u, ord, 158);
     }
@@ -263,9 +259,9 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
     message * msg;
     int maxt = max_transfers();
 
-    assert(u2);
+    assert(u2); // use disband_men for GIVE 0
 
-    if (!can_give_men(u, ord, &msg)) {
+    if (!can_give_men(u, u2, ord, &msg)) {
         return msg;
     }
 
@@ -401,10 +397,16 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
 message * disband_men(int n, unit * u, struct order *ord) {
     message * msg;
 
-    if (!can_give_men(u, ord, &msg)) {
+    // TODO: cache RC_SNOTLING
+    if (u_race(u) == get_race(RC_SNOTLING)) {
+        /* snotlings may not be given to the peasants. */
+        return msg_error(u, ord, 307);
+    }
+    if (!can_give_men(u, NULL, ord, &msg)) {
         return msg;
     }
     transfermen(u, NULL, n);
+    //TODO: is ORCIFICATION still working? snotlings cannot be given to peasants
 #ifdef ORCIFICATION
     if (u_race(u) == get_race(RC_SNOTLING) && !fval(u->region, RF_ORCIFIED)) {
         attrib *a = a_find(u->region->attribs, &at_orcification);
