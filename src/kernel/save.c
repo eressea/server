@@ -2077,8 +2077,9 @@ int write_game(gamedata *data) {
 
 int a_readint(attrib * a, void *owner, struct gamedata *data)
 {
-    /*  assert(sizeof(int)==sizeof(a->data)); */
-    READ_INT(data->store, &a->data.i);
+    int n;
+    READ_INT(data->store, &n);
+    if (a) a->data.i = n;
     return AT_READ_OK;
 }
 
