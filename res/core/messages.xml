@@ -1565,13 +1565,6 @@
     <text locale="de">"$unit($mage) konnte $int($amount) $if($eq($amount,1),"Bauer","Bauern") anwerben."</text>
     <text locale="en">"$unit($mage) managed to recruit $int($amount) $if($eq($amount,1),"peasant","peasants")."</text>
   </message>
-  <message name="cryinpain" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-    </type>
-    <text locale="de">""AAAAAAAGHHHHHH!" - Ein Schrei durchzieht die Region, $unit($unit) windet sich vor Schmerz."</text>
-    <text locale="en">""AAAAAAAGHHHHHH!" - $unit($unit) screams and squirms with pain."</text>
-  </message>
 
   <message name="error_giveeye" section="events">
     <type>
@@ -1581,14 +1574,6 @@
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Eine höhere Macht hindert $unit($unit) daran, das Objekt zu übergeben. 'ES IST DEINS, MEIN KIND. DEINS GANZ ALLEIN'."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - A higher power prevents $unit($unit) from giving the object away. 'IT IS YOURS MY CHILD. ONLY YOURS.'."</text>
-  </message>
-
-  <message name="praytoigjarjuk" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-    </type>
-    <text locale="de">"$unit($unit) sendet ein Stoßgebet an den Herrn der Schreie."</text>
-    <text locale="en">"$unit($unit) sends a prayer to the Lord of Screams."</text>
   </message>
 
   <message name="iceberg_melt" section="events">

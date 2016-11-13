@@ -38,6 +38,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/pool.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
+#include <kernel/save.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
@@ -175,62 +176,6 @@ enter_arena(unit * u, const item_type * itype, int amount, order * ord)
     move_unit(u, start_region[rng_int() % 6], NULL);
     return 0;
 }
-
-/**
- * Tempel der Schreie, Demo-Gebäude **/
-
-static int age_hurting(attrib * a, void *owner)
-{
-    building *b = (building *)a->data.v;
-    unit *u;
-    int active = 0;
-    assert(owner == b);
-    if (b == NULL)
-        return AT_AGE_REMOVE;
-    for (u = b->region->units; u; u = u->next) {
-        if (u->building == b) {
-            if (u->faction->magiegebiet == M_DRAIG) {
-                active++;
-                ADDMSG(&b->region->msgs, msg_message("praytoigjarjuk", "unit", u));
-            }
-        }
-    }
-    if (active)
-        for (u = b->region->units; u; u = u->next)
-            if (playerrace(u->faction->race)) {
-                int i;
-                if (u->faction->magiegebiet != M_DRAIG) {
-                    for (i = 0; i != active; ++i)
-                        u->hp = (u->hp + 1) / 2;    /* make them suffer, but not die */
-                    ADDMSG(&b->region->msgs, msg_message("cryinpain", "unit", u));
-                }
-            }
-    return AT_AGE_KEEP;
-}
-
-static void
-write_hurting(const attrib * a, const void *owner, struct storage *store)
-{
-    building *b = a->data.v;
-    WRITE_INT(store, b->no);
-}
-
-static int read_hurting(attrib * a, void *owner, struct gamedata *data)
-{
-    int i;
-    READ_INT(data->store, &i);
-    a->data.v = (void *)findbuilding(i);
-    if (a->data.v == NULL) {
-        log_error("temple of pain is broken\n");
-        return AT_READ_FAIL;
-    }
-    return AT_READ_OK;
-}
-
-static attrib_type at_hurting = {
-    "hurting", NULL, NULL, age_hurting, write_hurting, read_hurting
-};
-
 #ifdef CENTRAL_VOLCANO
 
 static int caldera_handle(trigger * t, void *data)
@@ -302,7 +247,7 @@ struct trigger_type tt_caldera = {
 
 void register_arena(void)
 {
-    at_register(&at_hurting);
+    at_deprecate("hurting", a_readint);
     register_function((pf_generic)enter_arena, "enter_arena");
     register_function((pf_generic)leave_arena, "leave_arena");
     tt_register(&tt_caldera);
