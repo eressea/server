@@ -181,35 +181,6 @@ enter_arena(unit * u, const item_type * itype, int amount, order * ord)
     return 0;
 }
 
-/***
- ** Szepter der Tränen, Demo-Item
- ***/
-
-static int
-use_wand_of_tears(unit * user, const struct item_type *itype, int amount,
-order * ord)
-{
-    int n;
-    unused_arg(ord);
-    for (n = 0; n != amount; ++n) {
-        unit *u;
-        for (u = user->region->units; u; u = u->next) {
-            if (u->faction != user->faction) {
-                int i;
-
-                for (i = 0; i != u->skill_size; ++i) {
-                    if (rng_int() % 3)
-                        reduce_skill(u, u->skills + i, 1);
-                }
-                ADDMSG(&u->faction->msgs, msg_message("wand_of_tears_effect",
-                    "unit", u));
-            }
-        }
-    }
-    ADDMSG(&user->region->msgs, msg_message("wand_of_tears_usage", "unit", user));
-    return 0;
-}
-
 /**
  * Tempel der Schreie, Demo-Gebäude **/
 
@@ -556,7 +527,6 @@ void create_arena(void)
 void register_arena(void)
 {
     at_register(&at_hurting);
-    register_item_use(use_wand_of_tears, "use_wand_of_tears");
     register_function((pf_generic)enter_arena, "enter_arena");
     register_function((pf_generic)leave_arena, "leave_arena");
     tt_register(&tt_caldera);

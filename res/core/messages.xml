@@ -1253,14 +1253,6 @@
     <text locale="en">"$unit($unit) dies from poison damage taken in $region($region)."</text>
   </message>
 
-  <message name="wand_of_tears_usage" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-    </type>
-    <text locale="de">"$unit($unit) schwenkt sein Szepter und sorgt für Verwirrung und Chaos in der Region."</text>
-    <text locale="en">"$unit($unit) waves their scepter and causes chaos and confusion in the region."</text>
-  </message>
-
   <message name="find_manual" section="events">
     <type>
       <arg name="unit" type="unit"/>
@@ -1572,13 +1564,6 @@
     </type>
     <text locale="de">"$unit($mage) konnte $int($amount) $if($eq($amount,1),"Bauer","Bauern") anwerben."</text>
     <text locale="en">"$unit($mage) managed to recruit $int($amount) $if($eq($amount,1),"peasant","peasants")."</text>
-  </message>
-  <message name="wand_of_tears_effect" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-    </type>
-    <text locale="de">"Ein bohrender Schmerz durchzuckt $unit($unit), Verwirrung macht sich breit."</text>
-    <text locale="en">"Pain pulses through $unit($unit), confusion spreads."</text>
   </message>
   <message name="cryinpain" section="events">
     <type>

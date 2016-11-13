@@ -235,11 +235,6 @@
       einzige Vorteil ihrer geringen Größe ist, dass sie sich leichter
       verstecken kann.</text>
     </string>
-    <string name="wand_of_tears">
-      <text locale="de">Dieses magische Szepter, ein Geschenk Igjarjuks, sorgt für große
-      Verwirrung und Gedächtnisverlust. Syntax: BENUTZE "Szepter der
-      Tränen"</text>
-    </string>
     <string name="speedsail">
       <text locale="de">Setzt eine Einheit dieses Segel auf einem Schiff, so erhöht
       sich dessen Reichweite permanent um 1 Region.</text>
@@ -1613,14 +1608,6 @@
   </string>
   <string name="presspass_p">
     <text locale="de">Akkreditionen des Xontormia-Expreß</text>
-  </string>
-  <string name="wand_of_tears">
-    <text locale="de">Szepter der Tränen</text>
-    <text locale="en">wand of tears</text>
-  </string>
-  <string name="wand_of_tears_p">
-    <text locale="de">Szepter der Tränen</text>
-    <text locale="en">wands of tears</text>
   </string>
   <string name="snowball">
     <text locale="de">Schneeball</text>
