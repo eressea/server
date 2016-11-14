@@ -23,7 +23,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* kernel includes */
 #include "ally.h"
 #include "faction.h"
-#include "save.h"
 #include "unit.h"
 
 /* attrib includes */

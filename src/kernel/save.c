@@ -378,49 +378,6 @@ race_t typus2race(unsigned char typus)
     return NORACE;
 }
 
-void create_backup(char *file)
-{
-#ifdef HAVE_LINK
-    char bfile[MAX_PATH];
-    int c = 1;
-
-    if (access(file, R_OK) == 0)
-        return;
-    do {
-        sprintf(bfile, "%s.backup%d", file, c);
-        c++;
-    } while (access(bfile, R_OK) == 0);
-    link(file, bfile);
-#endif
-}
-
-void read_items(struct storage *store, item ** ilist)
-{
-    for (;;) {
-        char ibuf[32];
-        const item_type *itype;
-        int i;
-        READ_STR(store, ibuf, sizeof(ibuf));
-        if (!strcmp("end", ibuf)) {
-            break;
-        }
-        itype = it_find(ibuf);
-        READ_INT(store, &i);
-        if (i <= 0) {
-            log_error("data contains an entry with %d %s", i, resourcename(itype->rtype, NMF_PLURAL));
-        }
-        else {
-            if (itype && itype->rtype) {
-                i_change(ilist, itype, i);
-            }
-            else {
-                log_error("data contains unknown item type %s.", ibuf);
-            }
-            assert(itype && itype->rtype);
-        }
-    }
-}
-
 static void read_alliances(struct gamedata *data)
 {
     storage *store = data->store;
@@ -551,19 +508,6 @@ void write_alliances(struct gamedata *data)
     }
     WRITE_INT(data->store, 0);
     WRITE_SECTION(data->store);
-}
-
-void write_items(struct storage *store, item * ilist)
-{
-    item *itm;
-    for (itm = ilist; itm; itm = itm->next) {
-        assert(itm->number >= 0);
-        if (itm->number) {
-            WRITE_TOK(store, resourcename(itm->type->rtype, 0));
-            WRITE_INT(store, itm->number);
-        }
-    }
-    WRITE_TOK(store, "end");
 }
 
 static int resolve_owner(variant id, void *address)
@@ -1234,56 +1178,6 @@ int get_spell_level_faction(const spell * sp, void * cbdata)
     return 0;
 }
 
-void read_spellbook(spellbook **bookp, gamedata *data, int(*get_level)(const spell * sp, void *), void * cbdata)
-{
-    for (;;) {
-        spell *sp = 0;
-        char spname[64];
-        int level = 0;
-
-        READ_TOK(data->store, spname, sizeof(spname));
-        if (strcmp(spname, "end") == 0)
-            break;
-        if (bookp) {
-            sp = find_spell(spname);
-            if (!sp) {
-                log_error("read_spells: could not find spell '%s'", spname);
-            }
-        }
-        if (data->version >= SPELLBOOK_VERSION) {
-            READ_INT(data->store, &level);
-        }
-        if (sp) {
-            spellbook * sb = *bookp;
-            if (level <= 0 && get_level) {
-                level = get_level(sp, cbdata);
-            }
-            if (!sb) {
-                *bookp = create_spellbook(0);
-                sb = *bookp;
-            }
-            if (level > 0 && (data->version >= SPELLBOOK_VERSION || !spellbook_get(sb, sp))) {
-                spellbook_add(sb, sp, level);
-            }
-        }
-    }
-}
-
-void write_spellbook(const struct spellbook *book, struct storage *store)
-{
-    quicklist *ql;
-    int qi;
-
-    if (book) {
-        for (ql = book->spells, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-            spellbook_entry *sbe = (spellbook_entry *)ql_get(ql, qi);
-            WRITE_TOK(store, sbe->sp->sname);
-            WRITE_INT(store, sbe->level);
-        }
-    }
-    WRITE_TOK(store, "end");
-}
-
 static char * getpasswd(int fno) {
     const char *prefix = itoa36(fno);
     size_t len = strlen(prefix);
@@ -1566,7 +1460,7 @@ static int cb_sb_maxlevel(spellbook_entry *sbe, void *cbdata) {
     return 0;
 }
 
-int readgame(const char *filename, bool backup)
+int readgame(const char *filename)
 {
     int n;
     char path[MAX_PATH];
@@ -1579,10 +1473,6 @@ int readgame(const char *filename, bool backup)
     init_locales();
     log_debug("- reading game data from %s", filename);
     join_path(datapath(), filename, path, sizeof(path));
-
-    if (backup) {
-        create_backup(path);
-    }
 
     F = fopen(path, "rb");
     if (!F) {

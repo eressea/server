@@ -7,6 +7,7 @@
 #include <memstream.h>
 #include <CuTest.h>
 #include <tests.h>
+#include <string.h>
 
 static void test_attrib_new(CuTest * tc)
 {
@@ -161,7 +162,7 @@ static void test_attrib_rwchars(CuTest *tc) {
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
     a_writeint(&a, NULL, &store);
-    memset(a.data.ca, 42, 0);
+    memset(a.data.ca, 0, 4);
     data.strm.api->rewind(data.strm.handle);
     a_readint(&a, NULL, &data);
     CuAssertIntEquals(tc, 1, a.data.ca[0]);
@@ -182,7 +183,7 @@ static void test_attrib_rwshorts(CuTest *tc) {
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
     a_writeint(&a, NULL, &store);
-    memset(a.data.ca, 42, 0);
+    memset(a.data.ca, 0, 4);
     data.strm.api->rewind(data.strm.handle);
     a_readint(&a, NULL, &data);
     CuAssertIntEquals(tc, -4, a.data.sa[0]);

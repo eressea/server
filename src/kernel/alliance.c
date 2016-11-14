@@ -23,7 +23,6 @@ without prior permission by the authors of Eressea.
 #include <kernel/order.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
-#include <kernel/item.h>
 #include <kernel/command.h>
 
 /* util includes */

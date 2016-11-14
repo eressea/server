@@ -823,8 +823,7 @@ void loaddata(state *st)  {
 
     askstring(st->wnd_status->handle, "save as:", datafile, sizeof(datafile));
     if (strlen(datafile) > 0) {
-        create_backup(datafile);
-        readgame(datafile, false);
+        readgame(datafile);
         st->modified = 0;
     }
 }
@@ -834,7 +833,6 @@ void savedata(state *st)  {
 
     askstring(st->wnd_status->handle, "save as:", datafile, sizeof(datafile));
     if (strlen(datafile) > 0) {
-        create_backup(datafile);
         remove_empty_units();
         writegame(datafile);
         st->modified = 0;
