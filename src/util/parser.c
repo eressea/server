@@ -250,7 +250,7 @@ unsigned int atoip(const char *s)
     int n;
 
     assert(s);
-    n = atoi(s);
+    n = isdigit(s[0]) ? atoi(s) : 0;
 
     if (n < 0)
         n = 0;
