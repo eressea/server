@@ -21,7 +21,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "connection.h"
 
 #include "region.h"
-#include "save.h"
 #include "terrain.h"
 #include "unit.h"
 
