@@ -394,33 +394,6 @@ void create_backup(char *file)
 #endif
 }
 
-void read_items(struct storage *store, item ** ilist)
-{
-    for (;;) {
-        char ibuf[32];
-        const item_type *itype;
-        int i;
-        READ_STR(store, ibuf, sizeof(ibuf));
-        if (!strcmp("end", ibuf)) {
-            break;
-        }
-        itype = it_find(ibuf);
-        READ_INT(store, &i);
-        if (i <= 0) {
-            log_error("data contains an entry with %d %s", i, resourcename(itype->rtype, NMF_PLURAL));
-        }
-        else {
-            if (itype && itype->rtype) {
-                i_change(ilist, itype, i);
-            }
-            else {
-                log_error("data contains unknown item type %s.", ibuf);
-            }
-            assert(itype && itype->rtype);
-        }
-    }
-}
-
 static void read_alliances(struct gamedata *data)
 {
     storage *store = data->store;
@@ -551,19 +524,6 @@ void write_alliances(struct gamedata *data)
     }
     WRITE_INT(data->store, 0);
     WRITE_SECTION(data->store);
-}
-
-void write_items(struct storage *store, item * ilist)
-{
-    item *itm;
-    for (itm = ilist; itm; itm = itm->next) {
-        assert(itm->number >= 0);
-        if (itm->number) {
-            WRITE_TOK(store, resourcename(itm->type->rtype, 0));
-            WRITE_INT(store, itm->number);
-        }
-    }
-    WRITE_TOK(store, "end");
 }
 
 static int resolve_owner(variant id, void *address)

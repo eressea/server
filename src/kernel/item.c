@@ -51,6 +51,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/umlaut.h>
 #include <util/rng.h>
 
+#include <storage.h>
+
 /* libc includes */
 #include <assert.h>
 #include <errno.h>
@@ -1187,6 +1189,46 @@ static item *default_spoil(const struct race *rc, int size)
         }
     }
     return itm;
+}
+
+void read_items(struct storage *store, item ** ilist)
+{
+    for (;;) {
+        char ibuf[32];
+        const item_type *itype;
+        int i;
+        READ_STR(store, ibuf, sizeof(ibuf));
+        if (!strcmp("end", ibuf)) {
+            break;
+        }
+        itype = it_find(ibuf);
+        READ_INT(store, &i);
+        if (i <= 0) {
+            log_error("data contains an entry with %d %s", i, resourcename(itype->rtype, NMF_PLURAL));
+        }
+        else {
+            if (itype && itype->rtype) {
+                i_change(ilist, itype, i);
+            }
+            else {
+                log_error("data contains unknown item type %s.", ibuf);
+            }
+            assert(itype && itype->rtype);
+        }
+    }
+}
+
+void write_items(struct storage *store, item * ilist)
+{
+    item *itm;
+    for (itm = ilist; itm; itm = itm->next) {
+        assert(itm->number >= 0);
+        if (itm->number) {
+            WRITE_TOK(store, resourcename(itm->type->rtype, 0));
+            WRITE_INT(store, itm->number);
+        }
+    }
+    WRITE_TOK(store, "end");
 }
 
 static void free_itype(item_type *itype) {
