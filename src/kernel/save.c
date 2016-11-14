@@ -1194,56 +1194,6 @@ int get_spell_level_faction(const spell * sp, void * cbdata)
     return 0;
 }
 
-void read_spellbook(spellbook **bookp, gamedata *data, int(*get_level)(const spell * sp, void *), void * cbdata)
-{
-    for (;;) {
-        spell *sp = 0;
-        char spname[64];
-        int level = 0;
-
-        READ_TOK(data->store, spname, sizeof(spname));
-        if (strcmp(spname, "end") == 0)
-            break;
-        if (bookp) {
-            sp = find_spell(spname);
-            if (!sp) {
-                log_error("read_spells: could not find spell '%s'", spname);
-            }
-        }
-        if (data->version >= SPELLBOOK_VERSION) {
-            READ_INT(data->store, &level);
-        }
-        if (sp) {
-            spellbook * sb = *bookp;
-            if (level <= 0 && get_level) {
-                level = get_level(sp, cbdata);
-            }
-            if (!sb) {
-                *bookp = create_spellbook(0);
-                sb = *bookp;
-            }
-            if (level > 0 && (data->version >= SPELLBOOK_VERSION || !spellbook_get(sb, sp))) {
-                spellbook_add(sb, sp, level);
-            }
-        }
-    }
-}
-
-void write_spellbook(const struct spellbook *book, struct storage *store)
-{
-    quicklist *ql;
-    int qi;
-
-    if (book) {
-        for (ql = book->spells, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-            spellbook_entry *sbe = (spellbook_entry *)ql_get(ql, qi);
-            WRITE_TOK(store, sbe->sp->sname);
-            WRITE_INT(store, sbe->level);
-        }
-    }
-    WRITE_TOK(store, "end");
-}
-
 static char * getpasswd(int fno) {
     const char *prefix = itoa36(fno);
     size_t len = strlen(prefix);

@@ -50,9 +50,6 @@ extern "C" {
 
     int current_turn(void);
 
-    void read_spellbook(struct spellbook **bookp, struct gamedata *data, int(*get_level)(const struct spell * sp, void *), void * cbdata);
-    void write_spellbook(const struct spellbook *book, struct storage *store);
-
     void write_unit(struct gamedata *data, const struct unit *u);
     struct unit *read_unit(struct gamedata *data);
     
