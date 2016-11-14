@@ -600,16 +600,19 @@ void give_cmd(unit * u, order * ord)
     }
 
     if (u2 && u_race(u2) == get_race(RC_SPELL)) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found",
-            ""));
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
+            "feedback_unit_not_found", ""));
         return;
     }
-
     else if (u2 && !alliedunit(u2, u->faction, HELP_GIVE) && !ucontact(u2, u)) {
         cmistake(u, ord, 40, MSG_COMMERCE);
         return;
     }
-
+    else if (p == NOKEYWORD) {
+        /* the most likely case: giving items to someone.
+         * let's catch this and save ourselves the rest of the param_t checks.
+         */
+    } 
     else if (p == P_HERBS) {
         bool given = false;
         if ((u_race(u)->ec_flags & ECF_KEEP_ITEM) && u2 != NULL) {
