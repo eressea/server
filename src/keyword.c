@@ -14,6 +14,9 @@
 const char * keyword(keyword_t kwd)
 {
     static char result[32]; // FIXME: static return value
+    if (kwd==NOKEYWORD) {
+        return NULL;
+    }
     if (!result[0]) {
         strcpy(result, "keyword::");
     }
