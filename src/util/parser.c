@@ -6,6 +6,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include <wctype.h>
 #include <memory.h>
 
