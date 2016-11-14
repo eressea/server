@@ -3693,7 +3693,7 @@ int use_cmd(unit * u, struct order *ord)
         cmistake(u, ord, 43, MSG_PRODUCE);
         return err;
     }
-    n = atoi((const char *)t);
+    n = atoip((const char *)t);
     if (n == 0) {
         if (isparam(t, u->faction->locale, P_ANY)) {
             /* BENUTZE ALLES Yanxspirit */
@@ -3841,7 +3841,7 @@ int claim_cmd(unit * u, struct order *ord)
 
     t = gettoken(token, sizeof(token));
     if (t) {
-        n = atoi((const char *)t);
+        n = atoip((const char *)t);
         if (n == 0) {
             n = 1;
         }
