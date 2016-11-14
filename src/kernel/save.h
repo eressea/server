@@ -45,7 +45,7 @@ extern "C" {
 
     int readorders(const char *filename);
     int creategame(void);
-    int readgame(const char *filename, bool backup);
+    int readgame(const char *filename);
     int writegame(const char *filename);
 
     int current_turn(void);
@@ -64,8 +64,6 @@ extern "C" {
 
     void write_ship(struct gamedata *data, const struct ship *sh);
     struct ship *read_ship(struct gamedata *data);
-
-    void create_backup(char *file);
 
     int write_game(struct gamedata *data);
     int read_game(struct gamedata *data);

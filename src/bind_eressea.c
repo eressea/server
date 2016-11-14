@@ -19,7 +19,7 @@ void eressea_free_game(void) {
 }
 
 int eressea_read_game(const char * filename) {
-    return readgame(filename, false);
+    return readgame(filename);
 }
 
 int eressea_write_game(const char * filename) {

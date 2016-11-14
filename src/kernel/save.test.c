@@ -38,7 +38,7 @@ static void test_readwrite_data(CuTest * tc)
     char path[MAX_PATH];
     test_setup();
     CuAssertIntEquals(tc, 0, writegame(filename));
-    CuAssertIntEquals(tc, 0, readgame(filename, false));
+    CuAssertIntEquals(tc, 0, readgame(filename));
     join_path(datapath(), filename, path, sizeof(path));
     CuAssertIntEquals(tc, 0, remove(path));
     test_cleanup();

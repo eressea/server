@@ -378,22 +378,6 @@ race_t typus2race(unsigned char typus)
     return NORACE;
 }
 
-void create_backup(char *file)
-{
-#ifdef HAVE_LINK
-    char bfile[MAX_PATH];
-    int c = 1;
-
-    if (access(file, R_OK) == 0)
-        return;
-    do {
-        sprintf(bfile, "%s.backup%d", file, c);
-        c++;
-    } while (access(bfile, R_OK) == 0);
-    link(file, bfile);
-#endif
-}
-
 static void read_alliances(struct gamedata *data)
 {
     storage *store = data->store;
@@ -1476,7 +1460,7 @@ static int cb_sb_maxlevel(spellbook_entry *sbe, void *cbdata) {
     return 0;
 }
 
-int readgame(const char *filename, bool backup)
+int readgame(const char *filename)
 {
     int n;
     char path[MAX_PATH];
@@ -1489,10 +1473,6 @@ int readgame(const char *filename, bool backup)
     init_locales();
     log_debug("- reading game data from %s", filename);
     join_path(datapath(), filename, path, sizeof(path));
-
-    if (backup) {
-        create_backup(path);
-    }
 
     F = fopen(path, "rb");
     if (!F) {
