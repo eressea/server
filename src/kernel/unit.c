@@ -34,7 +34,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "region.h"
 #include "spell.h"
 #include "spellbook.h"
-#include "save.h"
 #include "ship.h"
 #include "skill.h"
 #include "terrain.h"

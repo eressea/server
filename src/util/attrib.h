@@ -66,6 +66,9 @@ extern "C" {
     extern void at_register(attrib_type * at);
     extern void at_deprecate(const char * name, int(*reader)(attrib *, void *, struct gamedata *));
 
+    void write_attribs(struct storage *store, struct attrib *alist, const void *owner);
+    int read_attribs(struct gamedata *store, struct attrib **alist, void *owner);
+
     extern attrib *a_select(attrib * a, const void *data,
         bool(*compare) (const attrib *, const void *));
     extern attrib *a_find(attrib * a, const attrib_type * at);
@@ -80,6 +83,20 @@ extern "C" {
 
     int a_read(struct gamedata *data, attrib ** attribs, void *owner);
     void a_write(struct storage *store, const attrib * attribs, const void *owner);
+
+    int a_readint(struct attrib *a, void *owner, struct gamedata *);
+    void a_writeint(const struct attrib *a, const void *owner,
+        struct storage *store);
+    int a_readshorts(struct attrib *a, void *owner, struct gamedata *);
+    void a_writeshorts(const struct attrib *a, const void *owner,
+        struct storage *store);
+    int a_readchars(struct attrib *a, void *owner, struct gamedata *);
+    void a_writechars(const struct attrib *a, const void *owner,
+        struct storage *store);
+    int a_readstring(struct attrib *a, void *owner, struct gamedata *);
+    void a_writestring(const struct attrib *a, const void *owner,
+        struct storage *);
+    void a_finalizestring(struct attrib *a);
 
     void attrib_done(void);
 

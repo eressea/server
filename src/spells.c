@@ -47,7 +47,6 @@
 #include <kernel/pool.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/save.h>
 #include <kernel/ship.h>
 #include <kernel/spell.h>
 #include <kernel/terrain.h>
@@ -109,7 +108,7 @@
 static double zero_effect = 0.0;
 
 attrib_type at_wdwpyramid = {
-    "wdwpyramid", NULL, NULL, NULL, a_writevoid, a_readvoid
+    "wdwpyramid", NULL, NULL, NULL, NULL, NULL
 };
 
 /* ----------------------------------------------------------------------- */

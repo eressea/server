@@ -32,7 +32,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "plane.h"
 #include "region.h"
 #include "resources.h"
-#include "save.h"
 #include "ship.h"
 #include "terrain.h"
 #include "terrainid.h"

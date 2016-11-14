@@ -70,7 +70,7 @@ extern "C"
         K_PAY,
         K_LOOT,
         MAXKEYWORDS,
-        NOKEYWORD = -1
+        NOKEYWORD
     } keyword_t;
 
     extern const char *keywords[MAXKEYWORDS];

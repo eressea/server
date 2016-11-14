@@ -93,6 +93,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* exported symbols symbols */
 int firstx = 0, firsty = 0;
+
+// TODO: is this still important?
 int enc_gamedata = ENCODING_UTF8;
 
 /* local symbols */
@@ -376,49 +378,6 @@ race_t typus2race(unsigned char typus)
     return NORACE;
 }
 
-void create_backup(char *file)
-{
-#ifdef HAVE_LINK
-    char bfile[MAX_PATH];
-    int c = 1;
-
-    if (access(file, R_OK) == 0)
-        return;
-    do {
-        sprintf(bfile, "%s.backup%d", file, c);
-        c++;
-    } while (access(bfile, R_OK) == 0);
-    link(file, bfile);
-#endif
-}
-
-void read_items(struct storage *store, item ** ilist)
-{
-    for (;;) {
-        char ibuf[32];
-        const item_type *itype;
-        int i;
-        READ_STR(store, ibuf, sizeof(ibuf));
-        if (!strcmp("end", ibuf)) {
-            break;
-        }
-        itype = it_find(ibuf);
-        READ_INT(store, &i);
-        if (i <= 0) {
-            log_error("data contains an entry with %d %s", i, resourcename(itype->rtype, NMF_PLURAL));
-        }
-        else {
-            if (itype && itype->rtype) {
-                i_change(ilist, itype, i);
-            }
-            else {
-                log_error("data contains unknown item type %s.", ibuf);
-            }
-            assert(itype && itype->rtype);
-        }
-    }
-}
-
 static void read_alliances(struct gamedata *data)
 {
     storage *store = data->store;
@@ -551,19 +510,6 @@ void write_alliances(struct gamedata *data)
     WRITE_SECTION(data->store);
 }
 
-void write_items(struct storage *store, item * ilist)
-{
-    item *itm;
-    for (itm = ilist; itm; itm = itm->next) {
-        assert(itm->number >= 0);
-        if (itm->number) {
-            WRITE_TOK(store, resourcename(itm->type->rtype, 0));
-            WRITE_INT(store, itm->number);
-        }
-    }
-    WRITE_TOK(store, "end");
-}
-
 static int resolve_owner(variant id, void *address)
 {
     region_owner *owner = (region_owner *)address;
@@ -666,36 +612,6 @@ writeorder(struct gamedata *data, const struct order *ord,
     write_order(ord, obuf, sizeof(obuf));
     if (obuf[0])
         WRITE_STR(data->store, obuf);
-}
-
-int read_attribs(gamedata *data, attrib **alist, void *owner) {
-    int result;
-    if (data->version < ATHASH_VERSION) {
-        result = a_read_orig(data, alist, owner);
-    }
-    else {
-        result = a_read(data, alist, owner);
-    }
-    if (result == AT_READ_DEPR) {
-        /* handle deprecated attributes */
-        attrib *a = *alist;
-        while (a) {
-            if (a->type->upgrade) {
-                a->type->upgrade(alist, a);
-            }
-            a = a->nexttype;
-        }
-    }
-    return result;
-}
-
-void write_attribs(storage *store, attrib *alist, const void *owner)
-{
-#if RELEASE_VERSION < ATHASH_VERSION
-    a_write_orig(store, alist, owner);
-#else
-    a_write(store, alist, owner);
-#endif
 }
 
 unit *read_unit(struct gamedata *data)
@@ -1262,56 +1178,6 @@ int get_spell_level_faction(const spell * sp, void * cbdata)
     return 0;
 }
 
-void read_spellbook(spellbook **bookp, gamedata *data, int(*get_level)(const spell * sp, void *), void * cbdata)
-{
-    for (;;) {
-        spell *sp = 0;
-        char spname[64];
-        int level = 0;
-
-        READ_TOK(data->store, spname, sizeof(spname));
-        if (strcmp(spname, "end") == 0)
-            break;
-        if (bookp) {
-            sp = find_spell(spname);
-            if (!sp) {
-                log_error("read_spells: could not find spell '%s'", spname);
-            }
-        }
-        if (data->version >= SPELLBOOK_VERSION) {
-            READ_INT(data->store, &level);
-        }
-        if (sp) {
-            spellbook * sb = *bookp;
-            if (level <= 0 && get_level) {
-                level = get_level(sp, cbdata);
-            }
-            if (!sb) {
-                *bookp = create_spellbook(0);
-                sb = *bookp;
-            }
-            if (level > 0 && (data->version >= SPELLBOOK_VERSION || !spellbook_get(sb, sp))) {
-                spellbook_add(sb, sp, level);
-            }
-        }
-    }
-}
-
-void write_spellbook(const struct spellbook *book, struct storage *store)
-{
-    quicklist *ql;
-    int qi;
-
-    if (book) {
-        for (ql = book->spells, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-            spellbook_entry *sbe = (spellbook_entry *)ql_get(ql, qi);
-            WRITE_TOK(store, sbe->sp->sname);
-            WRITE_INT(store, sbe->level);
-        }
-    }
-    WRITE_TOK(store, "end");
-}
-
 static char * getpasswd(int fno) {
     const char *prefix = itoa36(fno);
     size_t len = strlen(prefix);
@@ -1594,7 +1460,7 @@ static int cb_sb_maxlevel(spellbook_entry *sbe, void *cbdata) {
     return 0;
 }
 
-int readgame(const char *filename, bool backup)
+int readgame(const char *filename)
 {
     int n;
     char path[MAX_PATH];
@@ -1607,10 +1473,6 @@ int readgame(const char *filename, bool backup)
     init_locales();
     log_debug("- reading game data from %s", filename);
     join_path(datapath(), filename, path, sizeof(path));
-
-    if (backup) {
-        create_backup(path);
-    }
 
     F = fopen(path, "rb");
     if (!F) {
@@ -2073,94 +1935,4 @@ int write_game(gamedata *data) {
     WRITE_SECTION(store);
 
     return 0;
-}
-
-int a_readint(attrib * a, void *owner, struct gamedata *data)
-{
-    int n;
-    READ_INT(data->store, &n);
-    if (a) a->data.i = n;
-    return AT_READ_OK;
-}
-
-void a_writeint(const attrib * a, const void *owner, struct storage *store)
-{
-    WRITE_INT(store, a->data.i);
-}
-
-int a_readshorts(attrib * a, void *owner, struct gamedata *data)
-{
-    int n;
-    READ_INT(data->store, &n);
-    a->data.sa[0] = (short)n;
-    READ_INT(data->store, &n);
-    a->data.sa[1] = (short)n;
-    return AT_READ_OK;
-}
-
-void a_writeshorts(const attrib * a, const void *owner, struct storage *store)
-{
-    WRITE_INT(store, a->data.sa[0]);
-    WRITE_INT(store, a->data.sa[1]);
-}
-
-int a_readchars(attrib * a, void *owner, struct gamedata *data)
-{
-    int i;
-    for (i = 0; i != 4; ++i) {
-        int n;
-        READ_INT(data->store, &n);
-        a->data.ca[i] = (char)n;
-    }
-    return AT_READ_OK;
-}
-
-void a_writechars(const attrib * a, const void *owner, struct storage *store)
-{
-    int i;
-
-    for (i = 0; i != 4; ++i) {
-        WRITE_INT(store, a->data.ca[i]);
-    }
-}
-
-int a_readvoid(attrib * a, void *owner, struct gamedata *data)
-{
-    return AT_READ_OK;
-}
-
-void a_writevoid(const attrib * a, const void *owner, struct storage *store)
-{
-}
-
-int a_readstring(attrib * a, void *owner, struct gamedata *data)
-{
-    char buf[DISPLAYSIZE];
-    char * result = 0;
-    int e;
-    size_t len = 0;
-    do {
-        e = READ_STR(data->store, buf, sizeof(buf));
-        if (result) {
-            result = realloc(result, len + DISPLAYSIZE - 1);
-            strcpy(result + len, buf);
-            len += DISPLAYSIZE - 1;
-        }
-        else {
-            result = _strdup(buf);
-        }
-    } while (e == ENOMEM);
-    a->data.v = result;
-    return AT_READ_OK;
-}
-
-void a_writestring(const attrib * a, const void *owner, struct storage *store)
-{
-    assert(a->data.v);
-    WRITE_STR(store, (const char *)a->data.v);
-}
-
-void a_finalizestring(attrib * a)
-{
-    free(a->data.v);
 }

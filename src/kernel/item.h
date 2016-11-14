@@ -35,6 +35,8 @@ extern "C" {
     struct troop;
     struct item;
     struct order;
+    struct storage;
+    struct gamedata;
 
     typedef struct item {
         struct item *next;
@@ -246,6 +248,9 @@ extern "C" {
     void i_free(item * i);
     void i_freeall(item ** i);
     item *i_new(const item_type * it, int number);
+
+    void read_items(struct storage *store, struct item **it);
+    void write_items(struct storage *store, struct item *it);
 
     /* convenience: */
     item *i_change(item ** items, const item_type * it, int delta);

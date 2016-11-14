@@ -44,7 +44,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/render.h>
-#include <kernel/save.h>
 #include <kernel/ship.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
