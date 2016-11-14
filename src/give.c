@@ -608,7 +608,7 @@ void give_cmd(unit * u, order * ord)
         cmistake(u, ord, 40, MSG_COMMERCE);
         return;
     }
-    else if (p == NOKEYWORD) {
+    else if (p == NOPARAM) {
         /* the most likely case: giving items to someone.
          * let's catch this and save ourselves the rest of the param_t checks.
          */
