@@ -21,7 +21,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "skill.h"
 
 #include "curse.h"
-#include "item.h"
 #include "race.h"
 #include "region.h"
 #include "terrain.h"
