@@ -59,7 +59,6 @@ extern "C" {
     void defaultorders(void);
     void quit(void);
     void monthly_healing(void);
-    void renumber_factions(void);
     void restack_units(void);
     void update_long_order(struct unit *u);
     void sinkships(struct region * r);
@@ -83,7 +82,6 @@ extern "C" {
     int leave_cmd(struct unit *u, struct order *ord);
     int pay_cmd(struct unit *u, struct order *ord);
     int promotion_cmd(struct unit *u, struct order *ord);
-    int renumber_cmd(struct unit *u, struct order *ord);
     int combatspell_cmd(struct unit *u, struct order *ord);
     int contact_cmd(struct unit *u, struct order *ord);
     int guard_on_cmd(struct unit *u, struct order *ord);
