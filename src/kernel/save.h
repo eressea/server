@@ -38,8 +38,6 @@ extern "C" {
     /* Nach MAX_INPUT_SIZE brechen wir das Einlesen der Zeile ab und nehmen an,
      * dass hier ein Fehler (fehlende ") vorliegt */
 
-    extern int data_version;
-
     // TODO: is this *really* still in use?
     extern int enc_gamedata;
 
