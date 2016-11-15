@@ -376,7 +376,7 @@ static int read_seenspell(attrib * a, void *owner, struct gamedata *data)
     char token[32];
 
     READ_TOK(store, token, sizeof(token));
-    i = atoi(token);
+    i = atoip(token);
     if (i != 0) {
         sp = find_spellbyid((unsigned int)i);
     }

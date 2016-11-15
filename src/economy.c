@@ -1278,7 +1278,7 @@ int make_cmd(unit * u, struct order *ord)
     s = gettoken(token, sizeof(token));
 
     if (s) {
-        m = atoi((const char *)s);
+        m = atoip(s);
         sprintf(ibuf, "%d", m);
         if (!strcmp(ibuf, (const char *)s)) {
             /* a quantity was given */
@@ -1882,7 +1882,7 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
         }
     }
     else {
-        n = s ? atoi(s) : 0;
+        n = s ? atoip(s) : 0;
         if (n == 0) {
             cmistake(u, ord, 27, MSG_COMMERCE);
             return false;
@@ -2274,7 +2274,7 @@ static void breed_cmd(unit * u, struct order *ord)
     (void)init_order(ord);
     s = gettoken(token, sizeof(token));
 
-    m = s ? atoi((const char *)s) : 0;
+    m = s ? atoip(s) : 0;
     if (m != 0) {
         /* first came a want-paramter */
         s = gettoken(token, sizeof(token));

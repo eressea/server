@@ -136,7 +136,7 @@ typedef enum {
   P_TREES,
   P_ALLIANCE,
   MAXPARAMS,
-  NOPARAM = -1
+  NOPARAM 
 } param_t;
 
 typedef enum {                  /* Fehler und Meldungen im Report */
