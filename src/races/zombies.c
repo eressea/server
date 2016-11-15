@@ -13,9 +13,9 @@
  */
 
 #include <platform.h>
-#include <kernel/config.h>
 
 /* kernel includes */
+#include <kernel/config.h>
 #include <kernel/race.h>
 #include <kernel/order.h>
 #include <kernel/unit.h>

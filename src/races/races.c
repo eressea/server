@@ -9,7 +9,6 @@
  */
 
 #include <platform.h>
-#include <kernel/config.h>
 #include "races.h"
 
 #include <kernel/building.h>

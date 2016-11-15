@@ -11,7 +11,6 @@
  */
 
 #include <platform.h>
-#include <kernel/config.h>
 
 /* kernel includes */
 #include <kernel/race.h>
