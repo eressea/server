@@ -433,13 +433,6 @@ int newcontainerid(void)
     return random_no;
 }
 
-int maxworkingpeasants(const struct region *r)
-{
-    int size = production(r);
-    int treespace = (rtrees(r, 2) + rtrees(r, 1) / 2) * TREESIZE;
-    return _max(size - treespace, _min(size / 10, 200));
-}
-
 static const char * parameter_key(int i)
 {
     assert(i < MAXPARAMS && i >= 0);

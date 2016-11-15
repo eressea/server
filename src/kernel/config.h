@@ -114,7 +114,6 @@ struct param;
 #define GF_PURE 64
     /* untranslated */
 
-    int maxworkingpeasants(const struct region *r);
     bool markets_module(void);
     int wage(const struct region *r, const struct faction *f,
         const struct race *rc, int in_turn);

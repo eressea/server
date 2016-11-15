@@ -2908,7 +2908,7 @@ void auto_work(region * r)
         }
     }
     if (nextworker != workers) {
-        expandwork(r, workers, nextworker, maxworkingpeasants(r));
+        expandwork(r, workers, nextworker, region_maxworkers(r));
     }
 }
 
@@ -3112,7 +3112,7 @@ void produce(struct region *r)
     if (entertaining)
         expandentertainment(r);
     if (!rule_autowork()) {
-        expandwork(r, workers, nextworker, maxworkingpeasants(r));
+        expandwork(r, workers, nextworker, region_maxworkers(r));
     }
     if (taxorders)
         expandtax(r, taxorders);

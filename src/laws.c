@@ -221,7 +221,7 @@ static void live(region * r)
 static void calculate_emigration(region * r)
 {
     int i;
-    int maxp = maxworkingpeasants(r);
+    int maxp = region_maxworkers(r);
     int rp = rpeasants(r);
     int max_immigrants = MAX_IMMIGRATION(maxp - rp);
 
@@ -236,7 +236,7 @@ static void calculate_emigration(region * r)
 
         if (rc != NULL && fval(rc->terrain, LAND_REGION)) {
             int rp2 = rpeasants(rc);
-            int maxp2 = maxworkingpeasants(rc);
+            int maxp2 = region_maxworkers(rc);
             int max_emigration = MAX_EMIGRATION(rp2 - maxp2);
 
             if (max_emigration > 0) {
@@ -419,7 +419,7 @@ static void horses(region * r)
     direction_t n;
 
     /* Logistisches Wachstum, Optimum bei halbem Maximalbesatz. */
-    maxhorses = maxworkingpeasants(r) / 10;
+    maxhorses = region_maxworkers(r) / 10;
     maxhorses = _max(0, maxhorses);
     horses = rhorses(r);
     if (horses > 0) {
@@ -621,7 +621,7 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
                  * verfügbaren Fläche ab. In Gletschern gibt es weniger
                  * Möglichkeiten als in Ebenen. */
                 sprout = 0;
-                seedchance = (1000 * maxworkingpeasants(r2)) / r2->terrain->size;
+                seedchance = (1000 * region_maxworkers(r2)) / r2->terrain->size;
                 for (i = 0; i < seeds / MAXDIRECTIONS; i++) {
                     if (rng_int() % 10000 < seedchance)
                         sprout++;
@@ -720,7 +720,7 @@ void immigration(void)
         if (repopulate) {
             int peasants = rpeasants(r);
             int income = wage(r, NULL, NULL, turn) - maintenance_cost(NULL) + 1;
-            if (income >= 0 && r->land && (peasants < repopulate) && maxworkingpeasants(r) >(peasants + 30) * 2) {
+            if (income >= 0 && r->land && (peasants < repopulate) && region_maxworkers(r) >(peasants + 30) * 2) {
                 int badunit = 0;
                 unit *u;
                 for (u = r->units; u; u = u->next) {
@@ -816,7 +816,7 @@ void demographics(void)
                 calculate_emigration(r);
                 peasants(r);
                 if (r->age > 20) {
-                    double mwp = _max(maxworkingpeasants(r), 1);
+                    double mwp = _max(region_maxworkers(r), 1);
                     double prob =
                         pow(rpeasants(r) / (mwp * wage(r, NULL, NULL, turn) * 0.13), 4.0)
                         * PLAGUE_CHANCE;
