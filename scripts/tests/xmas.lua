@@ -52,7 +52,7 @@ function test_snowglobe()
     for k, v in pairs(xform) do
         r2.terrain = k
         process_orders()
-        -- TODO: re-enable! assert_equal(v, r2.terrain)
+        assert_equal(v, r2.terrain)
         if k~=v then
             have=have - 1 
         else
