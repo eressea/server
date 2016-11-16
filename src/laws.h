@@ -108,6 +108,10 @@ extern "C" {
     #define FORCE_LEAVE_POSTCOMBAT 1
     #define FORCE_LEAVE_ALL 2
     bool rule_force_leave(int flag);
+    bool LongHunger(const struct unit *u);
+    int NMRTimeout(void);
+    int NewbieImmunity(void);
+    bool IsImmune(const struct faction *f);
     bool help_enter(struct unit *uo, struct unit *u);
 
 #ifdef __cplusplus

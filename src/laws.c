@@ -117,6 +117,32 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* - exported global symbols ----------------------------------- */
 
+int NewbieImmunity(void)
+{
+    return config_get_int("NewbieImmunity", 0);
+}
+
+bool IsImmune(const faction * f)
+{
+    return !fval(f, FFL_NPC) && f->age < NewbieImmunity();
+}
+
+int NMRTimeout(void)
+{
+    return config_get_int("nmr.timeout", 0);
+}
+
+bool LongHunger(const struct unit *u)
+{
+    if (u != NULL) {
+        if (!fval(u, UFL_HUNGER))
+            return false;
+        if (u_race(u) == get_race(RC_DAEMON))
+            return false;
+    }
+    return config_get_int("hunger.long", 0) != 0;
+}
+
 static bool RemoveNMRNewbie(void)
 {
     int value = config_get_int("nmr.removenewbie", 0);

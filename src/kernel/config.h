@@ -164,11 +164,6 @@ struct param;
     bool config_changed(int *cache_key);
 
     char * join_path(const char *p1, const char *p2, char *dst, size_t len);
-    bool ExpensiveMigrants(void);
-    int NMRTimeout(void);
-    int LongHunger(const struct unit *u);
-    int NewbieImmunity(void);
-    bool IsImmune(const struct faction *f);
 
     struct order *default_order(const struct locale *lang);
 

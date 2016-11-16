@@ -105,37 +105,6 @@ FILE *logfile;
 bool battledebug = false;
 int turn = -1;
 
-int NewbieImmunity(void)
-{
-    return config_get_int("NewbieImmunity", 0);
-}
-
-bool IsImmune(const faction * f)
-{
-    return !fval(f, FFL_NPC) && f->age < NewbieImmunity();
-}
-
-bool ExpensiveMigrants(void)
-{
-    return config_get_int("study.expensivemigrants", 0) != 0;
-}
-
-int LongHunger(const struct unit *u)
-{
-    if (u != NULL) {
-        if (!fval(u, UFL_HUNGER))
-            return false;
-        if (u_race(u) == get_race(RC_DAEMON))
-            return false;
-    }
-    return config_get_int("hunger.long", 0);
-}
-
-int NMRTimeout(void)
-{
-    return config_get_int("nmr.timeout", 0);
-}
-
 helpmode helpmodes[] = {
     { "all", HELP_ALL }
     ,
