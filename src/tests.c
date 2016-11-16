@@ -196,9 +196,15 @@ static void test_reset(void) {
     }
 }
 
-void test_setup(void) {
+void test_setup_test(CuTest *tc, const char *file, int line) {
     test_log_stderr(LOG_CPERROR);
     test_reset();
+    if (tc) {
+        log_debug("start test: %s", tc->name);
+    }
+    else {
+        log_debug("start test in %s:%d", file, line);
+    }
 }
 
 void test_cleanup(void)
