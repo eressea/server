@@ -107,10 +107,6 @@
 
 static double zero_effect = 0.0;
 
-attrib_type at_wdwpyramid = {
-    "wdwpyramid", NULL, NULL, NULL, NULL, NULL
-};
-
 /* ----------------------------------------------------------------------- */
 
 static void report_spell(unit * mage, region * r, message * msg)
@@ -6722,7 +6718,6 @@ void register_spells(void)
 {
     register_borders();
 
-    at_register(&at_wdwpyramid);
     at_register(&at_deathcloud_compat);
 
     /* init_firewall(); */
