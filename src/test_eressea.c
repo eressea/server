@@ -114,7 +114,6 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(guard);
     ADD_SUITE(report);
     ADD_SUITE(creport);
-    ADD_SUITE(prefix);
     ADD_SUITE(summary);
     ADD_SUITE(names);
     ADD_SUITE(battle);
@@ -130,6 +129,8 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(monsters);
     ADD_SUITE(move);
     ADD_SUITE(piracy);
+    ADD_SUITE(prefix);
+    ADD_SUITE(renumber);
     ADD_SUITE(key);
     ADD_SUITE(stealth);
     ADD_SUITE(otherfaction);

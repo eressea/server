@@ -219,6 +219,7 @@ set(TESTS_SRC
   move.test.c
   piracy.test.c
   prefix.test.c
+  renumber.test.c
   skill.test.c
   spells.test.c
   spy.test.c
