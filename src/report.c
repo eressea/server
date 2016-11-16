@@ -25,8 +25,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "reports.h"
 #include "guard.h"
 #include "laws.h"
-#include "travelthru.h"
+#include "market.h"
 #include "monster.h"
+#include "travelthru.h"
 
 /* modules includes */
 #include <modules/score.h>

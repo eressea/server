@@ -1061,11 +1061,6 @@ int rule_give(void)
     return rule;
 }
 
-bool markets_module(void)
-{
-    return (bool)config_get_int("modules.markets", 0);
-}
-
 static struct param *configuration;
 static int config_cache_key = 1;
 

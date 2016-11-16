@@ -85,6 +85,11 @@ static int rc_herb_trade(const struct race *rc)
 #define MAX_MARKETS 128
 #define MIN_PEASANTS 50         /* if there are at least this many peasants, you will get 1 good */
 
+bool markets_module(void)
+{
+    return (bool)config_get_int("modules.markets", 0);
+}
+
 void do_markets(void)
 {
     quicklist *traders = 0;

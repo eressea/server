@@ -11,6 +11,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/config.h>
 #include <kernel/version.h>
 #include "creport.h"
+#include "market.h"
 #include "guard.h"
 #include "travelthru.h"
 

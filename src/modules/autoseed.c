@@ -14,6 +14,8 @@
 #include <kernel/config.h>
 #include "autoseed.h"
 
+#include "market.h"
+
 /* kernel includes */
 #include <kernel/alliance.h>
 #include <kernel/item.h>
