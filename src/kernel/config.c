@@ -102,7 +102,6 @@ struct settings global = {
 
 bool lomem = false;
 FILE *logfile;
-bool battledebug = false;
 int turn = -1;
 
 const char *parameters[MAXPARAMS] = {

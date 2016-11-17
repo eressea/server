@@ -167,7 +167,6 @@ struct param;
     extern const char *localenames[];
     extern settings global;
 
-    extern bool battledebug;
     extern bool sqlpatch;
     extern bool lomem;         /* save memory */
     extern int turn;
