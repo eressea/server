@@ -15,7 +15,6 @@
 #include <platform.h>
 
 /* kernel includes */
-#include <kernel/config.h>
 #include <kernel/race.h>
 #include <kernel/order.h>
 #include <kernel/unit.h>
@@ -40,7 +39,7 @@ void make_undead_unit(unit * u)
 {
     free_orders(&u->orders);
     name_unit(u);
-    fset(u, UFL_ISNEW);
+    u->flags |= UFL_ISNEW;
 }
 
 void age_undead(unit * u)
