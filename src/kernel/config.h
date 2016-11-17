@@ -47,8 +47,6 @@ struct param;
 
 #define buildingid(x) itoa36((x)->no)
 #define shipid(x) itoa36((x)->no)
-#define factionid(x) itoa36((x)->no)
-#define curseid(x) itoa36((x)->no)
 
     const char * game_name(void);
     int game_id(void);

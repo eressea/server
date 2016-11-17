@@ -169,7 +169,7 @@ void score(void)
                 fprintf(scoreFP, "%30.30s (%3.3s) %5s (%3d)\n",
                     f->name,
                     f->race->_name,
-                    factionid(f),
+                    itoa36(f->no),
                     f->age);
             }
         fclose(scoreFP);

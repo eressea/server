@@ -273,11 +273,11 @@ faction *addfaction(const char *email, const char *password,
     addlist(&factions, f);
     fhash(f);
 
-    slprintf(buf, sizeof(buf), "%s %s", LOC(loc, "factiondefault"), factionid(f));
+    slprintf(buf, sizeof(buf), "%s %s", LOC(loc, "factiondefault"), itoa36(f->no));
     f->name = _strdup(buf);
 
     if (!f->race) {
-        log_warning("creating a faction that has no race", factionid(f));
+        log_warning("creating a faction that has no race", itoa36(f->no));
     }
 
     return f;
@@ -828,7 +828,7 @@ int writepasswd(void)
 
         for (f = factions; f; f = f->next) {
             fprintf(F, "%s:%s:%s:%u\n",
-                factionid(f), f->email, f->_password, f->subscription);
+                itoa36(f->no), f->email, f->_password, f->subscription);
         }
         fclose(F);
         return 0;

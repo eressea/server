@@ -1406,7 +1406,7 @@ report_template(const char *filename, report_context * ctx, const char *charset)
     newline(out);
     newline(out);
 
-    sprintf(buf, "%s %s \"password\"", LOC(f->locale, "ERESSEA"), factionid(f));
+    sprintf(buf, "%s %s \"password\"", LOC(f->locale, "ERESSEA"), itoa36(f->no));
     rps_nowrap(out, buf);
     newline(out);
     newline(out);

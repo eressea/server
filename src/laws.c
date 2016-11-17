@@ -997,7 +997,7 @@ int quit_cmd(unit * u, struct order *ord)
         char buffer[64];
         write_order(ord, buffer, sizeof(buffer));
         cmistake(u, ord, 86, MSG_EVENT);
-        log_warning("QUIT with illegal password for faction %s: %s\n", factionid(f), buffer);
+        log_warning("QUIT with illegal password for faction %s: %s\n", itoa36(f->no), buffer);
     }
     return 0;
 }
