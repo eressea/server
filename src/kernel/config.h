@@ -158,10 +158,8 @@ struct param;
     extern const char *localenames[];
     extern settings global;
 
-    extern bool sqlpatch;
     extern bool lomem;         /* save memory */
     extern int turn;
-    extern bool getunitpeasants;
 
 #ifdef __cplusplus
 }
