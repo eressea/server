@@ -155,7 +155,6 @@ struct param;
     void free_config(void);
 
     extern const char *parameters[];
-    extern const char *localenames[];
     extern settings global;
 
     extern bool lomem;         /* save memory */
