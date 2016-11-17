@@ -31,6 +31,8 @@ extern "C" {
     struct spellbook;
     struct unit;
     struct building;
+    struct faction;
+    struct region;
     struct ship;
     struct gamedata;
 

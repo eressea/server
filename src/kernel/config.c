@@ -105,26 +105,6 @@ FILE *logfile;
 bool battledebug = false;
 int turn = -1;
 
-helpmode helpmodes[] = {
-    { "all", HELP_ALL }
-    ,
-    { "money", HELP_MONEY }
-    ,
-    { "fight", HELP_FIGHT }
-    ,
-    { "observe", HELP_OBSERVE }
-    ,
-    { "give", HELP_GIVE }
-    ,
-    { "guard", HELP_GUARD }
-    ,
-    { "stealth", HELP_FSTEALTH }
-    ,
-    { "travel", HELP_TRAVEL }
-    ,
-    { NULL, 0 }
-};
-
 const char *parameters[MAXPARAMS] = {
     "LOCALE",
     "ALLES",
@@ -148,7 +128,7 @@ const char *parameters[MAXPARAMS] = {
     "TEMP",
     "FLIEHE",
     "GEBAEUDE",
-    "GIB",                        /* Für HELFE */
+    "GIB",                        /* Fï¿½r HELFE */
     "KAEMPFE",
     "DURCHREISE",
     "BEWACHE",
@@ -170,43 +150,6 @@ const char *parameters[MAXPARAMS] = {
     "PARTEITARNUNG",
     "BAEUME",
     "ALLIANZ"
-};
-
-const char *report_options[MAX_MSG] = {
-    "Kampf",
-    "Ereignisse",
-    "Bewegung",
-    "Einkommen",
-    "Handel",
-    "Produktion",
-    "Orkvermehrung",
-    "Zauber",
-    "",
-    ""
-};
-
-const char *message_levels[ML_MAX] = {
-    "Wichtig",
-    "Debug",
-    "Fehler",
-    "Warnungen",
-    "Infos"
-};
-
-const char *options[MAXOPTIONS] = {
-    "AUSWERTUNG",
-    "COMPUTER",
-    "ZUGVORLAGE",
-    NULL,
-    "STATISTIK",
-    "DEBUG",
-    "ZIPPED",
-    "ZEITUNG",                    /* Option hat Sonderbehandlung! */
-    NULL,
-    "ADRESSEN",
-    "BZIP2",
-    "PUNKTE",
-    "SHOWSKCHANGE"
 };
 
 FILE *debug;
@@ -711,8 +654,8 @@ char *_strdup(const char *s)
 }
 #endif
 
-/* Lohn bei den einzelnen Burgstufen für Normale Typen, Orks, Bauern,
- * Modifikation für Städter. */
+/* Lohn bei den einzelnen Burgstufen fï¿½r Normale Typen, Orks, Bauern,
+ * Modifikation fï¿½r Stï¿½dter. */
 
 static const int wagetable[7][4] = {
     { 10, 10, 11, -7 },             /* Baustelle */
@@ -929,7 +872,7 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
             wage = _max(0, wage - 10);
         }
 
-        /* Bei einer Dürre verdient man nur noch ein Viertel  */
+        /* Bei einer Dï¿½rre verdient man nur noch ein Viertel  */
         if (drought_ct) {
             curse *c = get_curse(r->attribs, drought_ct);
             if (curse_active(c))
@@ -953,7 +896,7 @@ minimum_wage(const region * r, const faction * f, const race * rc, int in_turn)
     return default_wage(r, f, rc, in_turn);
 }
 
-/* Gibt Arbeitslohn für entsprechende Rasse zurück, oder für
+/* Gibt Arbeitslohn fï¿½r entsprechende Rasse zurï¿½ck, oder fï¿½r
 * die Bauern wenn f == NULL. */
 int wage(const region * r, const faction * f, const race * rc, int in_turn)
 {

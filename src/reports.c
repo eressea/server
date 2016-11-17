@@ -105,6 +105,22 @@ const char *coasts[MAXDIRECTIONS] = {
     "coast::w"
 };
 
+const char *options[MAXOPTIONS] = {
+    "AUSWERTUNG",
+    "COMPUTER",
+    "ZUGVORLAGE",
+    NULL,
+    "STATISTIK",
+    "DEBUG",
+    "ZIPPED",
+    "ZEITUNG",                    /* Option hat Sonderbehandlung! */
+    NULL,
+    "ADRESSEN",
+    "BZIP2",
+    "PUNKTE",
+    "SHOWSKCHANGE"
+};
+
 bool omniscient(const faction *f)
 {
     static const race *rc_template, *rc_illusion;

@@ -27,17 +27,12 @@ extern "C" {
 #include "types.h"
 struct param;
 
-#define DISPLAYSIZE         8192        /* max. Länge einer Beschreibung, incl trailing 0 */
+#define DISPLAYSIZE         8192        /* max. Lï¿½nge einer Beschreibung, incl trailing 0 */
 #define ORDERSIZE           (DISPLAYSIZE*2) /* max. length of an order */
-#define NAMESIZE            128 /* max. Länge eines Namens, incl trailing 0 */
-#define IDSIZE              16  /* max. Länge einer no (als String), incl trailing 0 */
-#define OBJECTIDSIZE        (NAMESIZE+5+IDSIZE) /* max. Länge der Strings, die
-     * von struct unitname, etc. zurückgegeben werden. ohne die 0 */
-
-    /* ----------------- Befehle ----------------------------------- */
-
-#define want(option) (1<<option)
-    /* ------------------------------------------------------------- */
+#define NAMESIZE            128 /* max. Lï¿½nge eines Namens, incl trailing 0 */
+#define IDSIZE              16  /* max. Lï¿½nge einer no (als String), incl trailing 0 */
+#define OBJECTIDSIZE        (NAMESIZE+5+IDSIZE) /* max. Lï¿½nge der Strings, die
+     * von struct unitname, etc. zurï¿½ckgegeben werden. ohne die 0 */
 
 #define i2b(i) ((bool)((i)?(true):(false)))
 
@@ -110,7 +105,7 @@ struct param;
 #define GF_SPECIFIC 16
     /* der, die, das vs. ein, eine */
 #define GF_DETAILED 32
-    /* mehr Informationen. z.b. straße zu 50% */
+    /* mehr Informationen. z.b. straï¿½e zu 50% */
 #define GF_PURE 64
     /* untranslated */
 
@@ -144,11 +139,6 @@ struct param;
         } functions;
     } settings;
 
-    typedef struct helpmode {
-        const char *name;
-        int status;
-    } helpmode;
-
     void set_param(struct param **p, const char *key, const char *value);
     const char *get_param(const struct param *p, const char *key);
     int get_param_int(const struct param *p, const char *key, int def);
@@ -173,7 +163,6 @@ struct param;
     void free_gamedata(void);
     void free_config(void);
 
-    extern struct helpmode helpmodes[];
     extern const char *parameters[];
     extern const char *localenames[];
     extern settings global;
@@ -183,8 +172,6 @@ struct param;
     extern bool lomem;         /* save memory */
     extern int turn;
     extern bool getunitpeasants;
-
-    extern const char *options[MAXOPTIONS];    /* report options */
 
 #ifdef __cplusplus
 }
