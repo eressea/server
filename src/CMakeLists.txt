@@ -99,7 +99,6 @@ set (ERESSEA_SRC
   prefix.c
   donations.c
   eressea.c
-  callback.c
   direction.c
   keyword.c
   skill.c
@@ -205,7 +204,6 @@ set(TESTS_SRC
   report.test.c
   summary.test.c
   travelthru.test.c
-  callback.test.c
   direction.test.c
   economy.test.c
   json.test.c
