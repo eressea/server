@@ -45,8 +45,6 @@ struct param;
     bool isparam(const char *s, const struct locale * lang, param_t param);
     param_t getparam(const struct locale *lang);
 
-#define unitid(x) itoa36((x)->no)
-
 #define buildingid(x) itoa36((x)->no)
 #define shipid(x) itoa36((x)->no)
 #define factionid(x) itoa36((x)->no)

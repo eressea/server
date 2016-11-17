@@ -6291,7 +6291,7 @@ int sp_q_antimagie(castorder * co)
     {
         unit *u = pa->param[0]->data.u;
         ap = &u->attribs;
-        ts = unitid(u);
+        ts = itoa36(u->no);
         break;
     }
     case SPP_BUILDING:
@@ -6384,7 +6384,7 @@ int sp_break_curse(castorder * co)
         {
             unit *u = pa->param[0]->data.u;
             ap = &u->attribs;
-            ts = unitid(u);
+            ts = itoa36(u->no);
             break;
         }
         case SPP_BUILDING:

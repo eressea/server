@@ -1216,7 +1216,7 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
 
             while (chance(kritchance)) {
                 if (bdebug) {
-                    fprintf(bdebug, "%s/%d lands a critical hit\n", unitid(au), at.index);
+                    fprintf(bdebug, "%s/%d lands a critical hit\n", itoa36(au->no), at.index);
                 }
                 da += dice_rand(damage);
             }
@@ -1980,10 +1980,10 @@ debug_hit(troop at, const weapon * awp, troop dt, const weapon * dwp,
 int skdiff, int dist, bool success)
 {
     fprintf(bdebug, "%.4s/%d [%6s/%d] %s %.4s/%d [%6s/%d] with %d, distance %d\n",
-        unitid(at.fighter->unit), at.index,
+        itoa36(at.fighter->unit->no), at.index,
         LOC(default_locale, awp ? resourcename(awp->type->itype->rtype,
         0) : "unarmed"), weapon_effskill(at, dt, awp, true, dist > 1),
-        success ? "hits" : "misses", unitid(dt.fighter->unit), dt.index,
+        success ? "hits" : "misses", itoa36(dt.fighter->unit->no), dt.index,
         LOC(default_locale, dwp ? resourcename(dwp->type->itype->rtype,
         0) : "unarmed"), weapon_effskill(dt, at, dwp, false, dist > 1), skdiff,
         dist);
@@ -2194,7 +2194,7 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
                 if (reload && wp && wp->type->reload && !getreload(ta)) {
                     int i = setreload(ta);
                     if (bdebug) {
-                        fprintf(bdebug, "%s/%d reloading %d turns\n", unitid(au),
+                        fprintf(bdebug, "%s/%d reloading %d turns\n", itoa36(au->no),
                             ta.index, i);
                     }
                 }
