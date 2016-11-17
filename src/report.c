@@ -1479,7 +1479,7 @@ report_template(const char *filename, report_context * ctx, const char *charset)
                     }
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
-                    bytes = (int)strlcpy(bufp, shipid(u->ship), size);
+                    bytes = (int)strlcpy(bufp, itoa36(u->ship->no), size);
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
                 }

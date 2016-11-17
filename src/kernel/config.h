@@ -45,9 +45,6 @@ struct param;
     bool isparam(const char *s, const struct locale * lang, param_t param);
     param_t getparam(const struct locale *lang);
 
-#define buildingid(x) itoa36((x)->no)
-#define shipid(x) itoa36((x)->no)
-
     const char * game_name(void);
     int game_id(void);
     int lovar(double xpct_x2);
