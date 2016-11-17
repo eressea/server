@@ -347,7 +347,7 @@ attrib_type at_mage = {
 
 bool is_mage(const unit * u)
 {
-    return i2b(get_mage(u) != NULL);
+    return get_mage(u) != NULL;
 }
 
 sc_mage *get_mage(const unit * u)
@@ -2167,7 +2167,7 @@ typedef struct familiar_data {
 bool is_familiar(const unit * u)
 {
     attrib *a = a_find(u->attribs, &at_familiarmage);
-    return i2b(a != NULL);
+    return a != NULL;
 }
 
 static void

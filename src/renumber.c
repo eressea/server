@@ -36,19 +36,12 @@ void renumber_factions(void)
         attrib *a = a_find(f->attribs, &at_number);
         int want;
         struct renum **rn;
-        faction *old;
 
         if (!a)
             continue;
         want = a->data.i;
         if (fval(f, FFL_NEWID)) {
             ADDMSG(&f->msgs, msg_message("renumber_twice", "id", want));
-            continue;
-        }
-        old = findfaction(want);
-        if (old) {
-            a_remove(&f->attribs, a);
-            ADDMSG(&f->msgs, msg_message("renumber_inuse", "id", want));
             continue;
         }
         if (!faction_id_is_unused(want)) {
@@ -151,7 +144,7 @@ int renumber_cmd(unit * u, order * ord)
                 cmistake(u, ord, 114, MSG_EVENT);
                 break;
             }
-            if (findship(i) || findbuilding(i)) {
+            if (findship(i)) {
                 cmistake(u, ord, 115, MSG_EVENT);
                 break;
             }
@@ -180,7 +173,7 @@ int renumber_cmd(unit * u, order * ord)
                 cmistake(u, ord, 114, MSG_EVENT);
                 break;
             }
-            if (findship(i) || findbuilding(i)) {
+            if (findbuilding(i)) {
                 cmistake(u, ord, 115, MSG_EVENT);
                 break;
             }

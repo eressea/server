@@ -6291,21 +6291,21 @@ int sp_q_antimagie(castorder * co)
     {
         unit *u = pa->param[0]->data.u;
         ap = &u->attribs;
-        ts = unitid(u);
+        ts = itoa36(u->no);
         break;
     }
     case SPP_BUILDING:
     {
         building *b = pa->param[0]->data.b;
         ap = &b->attribs;
-        ts = buildingid(b);
+        ts = itoa36(b->no);
         break;
     }
     case SPP_SHIP:
     {
         ship *sh = pa->param[0]->data.sh;
         ap = &sh->attribs;
-        ts = shipid(sh);
+        ts = itoa36(sh->no);
         break;
     }
     default:
@@ -6384,21 +6384,21 @@ int sp_break_curse(castorder * co)
         {
             unit *u = pa->param[0]->data.u;
             ap = &u->attribs;
-            ts = unitid(u);
+            ts = itoa36(u->no);
             break;
         }
         case SPP_BUILDING:
         {
             building *b = pa->param[0]->data.b;
             ap = &b->attribs;
-            ts = buildingid(b);
+            ts = itoa36(b->no);
             break;
         }
         case SPP_SHIP:
         {
             ship *sh = pa->param[0]->data.sh;
             ap = &sh->attribs;
-            ts = shipid(sh);
+            ts = itoa36(sh->no);
             break;
         }
         default:

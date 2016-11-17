@@ -494,6 +494,10 @@ attrib_type at_alias = {
     NO_READ
 };
 
+/** remember old unit.no (for the creport, mostly)
+ * if alias is positive, then this unit was a TEMP
+ * if alias is negative, then this unit has been RENUMBERed
+ */
 int ualias(const unit * u)
 {
     attrib *a = a_find(u->attribs, &at_alias);
@@ -1716,7 +1720,7 @@ void renumber_unit(unit *u, int no) {
     uunhash(u);
     if (!ualias(u)) {
         attrib *a = a_add(&u->attribs, a_new(&at_alias));
-        a->data.i = -u->no; // TODO: why is the alias negative? confusing!
+        a->data.i = -u->no;
     }
     u->no = no;
     uhash(u);

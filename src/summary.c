@@ -96,12 +96,12 @@ int update_nmrs(void)
             int nmr = turn - f->lastorders + 1;
             if (timeout>0) {
                 if (nmr < 0 || nmr > timeout) {
-                    log_error("faction %s has %d NMR", factionid(f), nmr);
+                    log_error("faction %s has %d NMR", itoa36(f->no), nmr);
                     nmr = _max(0, nmr);
                     nmr = _min(nmr, timeout);
                 }
                 if (nmr > 0) {
-                    log_debug("faction %s has %d NMR", factionid(f), nmr);
+                    log_debug("faction %s has %d NMR", itoa36(f->no), nmr);
                 }
                 ++nmrs[nmr];
             }

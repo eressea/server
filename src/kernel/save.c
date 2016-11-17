@@ -1291,7 +1291,7 @@ faction *read_faction(struct gamedata * data)
 	};
     f->banner = _strdup(name);
 
-    log_debug("   - Lese Partei %s (%s)", f->name, factionid(f));
+    log_debug("   - Lese Partei %s (%s)", f->name, itoa36(f->no));
 
     READ_STR(data->store, name, sizeof(name));
     if (set_email(&f->email, name) != 0) {

@@ -34,8 +34,6 @@ struct param;
 #define OBJECTIDSIZE        (NAMESIZE+5+IDSIZE) /* max. L�nge der Strings, die
      * von struct unitname, etc. zur�ckgegeben werden. ohne die 0 */
 
-#define i2b(i) ((bool)((i)?(true):(false)))
-
 #define fval(u, i) ((u)->flags & (i))
 #define fset(u, i) ((u)->flags |= (i))
 #define freset(u, i) ((u)->flags &= ~(i))
@@ -46,13 +44,6 @@ struct param;
     param_t findparam_ex(const char *s, const struct locale * lang);
     bool isparam(const char *s, const struct locale * lang, param_t param);
     param_t getparam(const struct locale *lang);
-
-#define unitid(x) itoa36((x)->no)
-
-#define buildingid(x) itoa36((x)->no)
-#define shipid(x) itoa36((x)->no)
-#define factionid(x) itoa36((x)->no)
-#define curseid(x) itoa36((x)->no)
 
     const char * game_name(void);
     int game_id(void);
@@ -166,10 +157,8 @@ struct param;
     extern const char *localenames[];
     extern settings global;
 
-    extern bool sqlpatch;
     extern bool lomem;         /* save memory */
     extern int turn;
-    extern bool getunitpeasants;
 
 #ifdef __cplusplus
 }

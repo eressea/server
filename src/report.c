@@ -1406,7 +1406,7 @@ report_template(const char *filename, report_context * ctx, const char *charset)
     newline(out);
     newline(out);
 
-    sprintf(buf, "%s %s \"password\"", LOC(f->locale, "ERESSEA"), factionid(f));
+    sprintf(buf, "%s %s \"password\"", LOC(f->locale, "ERESSEA"), itoa36(f->no));
     rps_nowrap(out, buf);
     newline(out);
     newline(out);
@@ -1453,7 +1453,7 @@ report_template(const char *filename, report_context * ctx, const char *charset)
                 size = sizeof(buf) - 1;
                 bytes = _snprintf(bufp, size, "%s %s;    %s [%d,%d$",
                     LOC(u->faction->locale, parameters[P_UNIT]),
-                    unitid(u), unit_getname(u), u->number, get_money(u));
+                    itoa36(u->no), unit_getname(u), u->number, get_money(u));
                 if (wrptr(&bufp, &size, bytes) != 0)
                     WARN_STATIC_BUFFER();
                 if (u->building && building_owner(u->building) == u) {
@@ -1479,7 +1479,7 @@ report_template(const char *filename, report_context * ctx, const char *charset)
                     }
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
-                    bytes = (int)strlcpy(bufp, shipid(u->ship), size);
+                    bytes = (int)strlcpy(bufp, itoa36(u->ship->no), size);
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
                 }

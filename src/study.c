@@ -439,7 +439,7 @@ int teach_cmd(unit * u, struct order *ord)
                 strncat(zOrder, " ", sz - 1);
                 --sz;
             }
-            sz -= strlcpy(zOrder + 4096 - sz, unitid(u2), sz);
+            sz -= strlcpy(zOrder + 4096 - sz, itoa36(u2->no), sz);
 
             if (getkeyword(u2->thisorder) != K_STUDY) {
                 ADDMSG(&u->faction->msgs,

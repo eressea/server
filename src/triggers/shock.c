@@ -118,7 +118,7 @@ static void shock_write(const trigger * t, struct storage *store)
         next = next->next;
     }
     if (next && u) {
-        log_error("more than one shock-attribut for %s on a unit. FIXED.\n", unitid(u));
+        log_error("more than one shock-attribut for %s on a unit. FIXED.\n", itoa36(u->no));
         write_unit_reference(NULL, store);
     }
     else {
