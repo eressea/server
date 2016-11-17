@@ -3130,7 +3130,7 @@ static void print_stats(battle * b)
 
 static int weapon_weight(const weapon * w, bool missile)
 {
-    if (missile == i2b(fval(w->type, WTF_MISSILE))) {
+    if (missile == !!(fval(w->type, WTF_MISSILE))) {
         return w->attackskill + w->defenseskill;
     }
     return 0;

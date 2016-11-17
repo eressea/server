@@ -34,8 +34,6 @@ struct param;
 #define OBJECTIDSIZE        (NAMESIZE+5+IDSIZE) /* max. L�nge der Strings, die
      * von struct unitname, etc. zur�ckgegeben werden. ohne die 0 */
 
-#define i2b(i) ((bool)((i)?(true):(false)))
-
 #define fval(u, i) ((u)->flags & (i))
 #define fset(u, i) ((u)->flags |= (i))
 #define freset(u, i) ((u)->flags &= ~(i))
