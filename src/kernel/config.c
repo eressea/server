@@ -904,14 +904,6 @@ int wage(const region * r, const faction * f, const race * rc, int in_turn)
     return default_wage(r, f, rc, in_turn);
 }
 
-int lovar(double xpct_x2)
-{
-    int n = (int)(xpct_x2 * 500) + 1;
-    if (n == 0)
-        return 0;
-    return (rng_int() % n + rng_int() % n) / 1000;
-}
-
 void kernel_init(void)
 {
     register_reports();

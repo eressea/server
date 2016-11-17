@@ -47,7 +47,6 @@ struct param;
 
     const char * game_name(void);
     int game_id(void);
-    int lovar(double xpct_x2);
     /* returns a value between [0..xpct_2], generated with two dice */
 
     void init_locale(struct locale *lang);

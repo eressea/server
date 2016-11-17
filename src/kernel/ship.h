@@ -51,8 +51,8 @@ extern "C" {
         int minskill;               /* min. skill to sail this (crew) */
         int sumskill;               /* min. sum of crew+captain */
 
-        int at_bonus;               /* Verändert den Angriffsskill (default: 0) */
-        int df_bonus;               /* Verändert den Verteidigungskill (default: 0) */
+        int at_bonus;               /* Verï¿½ndert den Angriffsskill (default: 0) */
+        int df_bonus;               /* Verï¿½ndert den Verteidigungskill (default: 0) */
         float tac_bonus;
 
         struct terrain_type ** coasts; /* coast that this ship can land on */
@@ -70,12 +70,12 @@ extern "C" {
 
 #define NOSHIP NULL
 
-#define SF_DRIFTED 1<<0
-#define SF_MOVED   1<<1
-#define SF_DAMAGED 1<<2         /* for use in combat */
-#define SF_SELECT  1<<3         /* previously FL_DH */
-#define SF_FISHING 1<<4         /* was on an ocean, can fish */
-#define SF_FLYING  1<<5         /* the ship can fly */
+#define SF_DRIFTED (1<<0)
+#define SF_MOVED   (1<<1)
+#define SF_DAMAGED (1<<2)         /* for use in combat */
+#define SF_SELECT  (1<<3)         /* previously FL_DH */
+#define SF_FISHING (1<<4)         /* was on an ocean, can fish */
+#define SF_FLYING  (1<<5)         /* the ship can fly */
 
 #define SFL_SAVEMASK (SF_FLYING)
 #define INCOME_FISHING 10

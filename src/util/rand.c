@@ -28,6 +28,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <float.h>
 #include <ctype.h>
 
+int lovar(double xpct_x2)
+{
+    int n = (int)(xpct_x2 * 500) + 1;
+    if (n == 0)
+        return 0;
+    return (rng_int() % n + rng_int() % n) / 1000;
+}
+
 /* NormalRand aus python, random.py geklaut, dort ist Referenz auf
 * den Algorithmus. mu = Mittelwert, sigma = Standardabweichung.
 * http://de.wikipedia.org/wiki/Standardabweichung#Diskrete_Gleichverteilung.2C_W.C3.BCrfel

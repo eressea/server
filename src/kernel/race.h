@@ -117,7 +117,7 @@ extern "C" {
         float healing;
         double maxaura;            /* Faktor auf Maximale Aura */
         double regaura;            /* Faktor auf Regeneration */
-        double recruit_multi;      /* Faktor für Bauernverbrauch */
+        double recruit_multi;      /* Faktor fï¿½r Bauernverbrauch */
         int index;
         int recruitcost;
         int maintenance;
@@ -132,8 +132,8 @@ extern "C" {
         int armor;
         int at_default;             /* Angriffsskill Unbewaffnet (default: -2) */
         int df_default;             /* Verteidigungsskill Unbewaffnet (default: -2) */
-        int at_bonus;               /* Verändert den Angriffsskill (default: 0) */
-        int df_bonus;               /* Verändert den Verteidigungskill (default: 0) */
+        int at_bonus;               /* Verï¿½ndert den Angriffsskill (default: 0) */
+        int df_bonus;               /* Verï¿½ndert den Verteidigungskill (default: 0) */
         struct param *parameters;   // additional properties, for an example see natural_armor
         const struct spell *precombatspell;
         signed char *study_speed;   /* study-speed-bonus in points/turn (0=30 Tage) */
@@ -190,20 +190,20 @@ extern "C" {
 #define RCF_LEARN          (1<<6)       /* Lernt automatisch wenn struct faction == 0 */
 #define RCF_FLY            (1<<7)       /* kann fliegen */
 #define RCF_SWIM           (1<<8)       /* kann schwimmen */
-#define RCF_WALK           (1<<9)       /* kann über Land gehen */
+#define RCF_WALK           (1<<9)       /* kann ï¿½ber Land gehen */
 #define RCF_NOLEARN        (1<<10)      /* kann nicht normal lernen */
 #define RCF_NOTEACH        (1<<11)      /* kann nicht lehren */
 #define RCF_HORSE          (1<<12)      /* Einheit ist Pferd, sozusagen */
 #define RCF_DESERT         (1<<13)      /* 5% Chance, das Einheit desertiert */
 #define RCF_ILLUSIONARY    (1<<14)      /* (Illusion & Spell) Does not drop items. */
-#define RCF_ABSORBPEASANTS (1<<15)      /* Tötet und absorbiert Bauern */
+#define RCF_ABSORBPEASANTS (1<<15)      /* Tï¿½tet und absorbiert Bauern */
 #define RCF_NOHEAL         (1<<16)      /* Einheit kann nicht geheilt werden */
 #define RCF_NOWEAPONS      (1<<17)      /* Einheit kann keine Waffen benutzen */
 #define RCF_SHAPESHIFT     (1<<18)      /* Kann TARNE RASSE benutzen. */
 #define RCF_SHAPESHIFTANY  (1<<19)      /* Kann TARNE RASSE "string" benutzen. */
 #define RCF_UNDEAD         (1<<20)      /* Undead. */
-#define RCF_DRAGON         (1<<21)      /* Drachenart (für Zauber) */
-#define RCF_COASTAL        (1<<22)      /* kann in Landregionen an der Küste sein */
+#define RCF_DRAGON         (1<<21)      /* Drachenart (fï¿½r Zauber) */
+#define RCF_COASTAL        (1<<22)      /* kann in Landregionen an der Kï¿½ste sein */
 #define RCF_UNARMEDGUARD   (1<<23)      /* kann ohne Waffen bewachen */
 #define RCF_CANSAIL        (1<<24)      /* Einheit darf Schiffe betreten */
 #define RCF_INVISIBLE      (1<<25)      /* not visible in any report */
@@ -213,16 +213,16 @@ extern "C" {
 #define RCF_ATTACK_MOVED   (1<<29)      /* may attack if it has moved */
 
     /* Economic flags */
-#define ECF_KEEP_ITEM       (1<<1)   /* gibt Gegenstände weg */
-#define GIVEPERSON     (1<<2)   /* übergibt Personen */
-#define GIVEUNIT       (1<<3)   /* Einheiten an andere Partei übergeben */
-#define GETITEM        (1<<4)   /* nimmt Gegenstände an */
+#define ECF_KEEP_ITEM       (1<<1)   /* gibt Gegenstï¿½nde weg */
+#define GIVEPERSON     (1<<2)   /* ï¿½bergibt Personen */
+#define GIVEUNIT       (1<<3)   /* Einheiten an andere Partei ï¿½bergeben */
+#define GETITEM        (1<<4)   /* nimmt Gegenstï¿½nde an */
 #define ECF_REC_ETHEREAL   (1<<7)       /* Rekrutiert aus dem Nichts */
 #define ECF_REC_UNLIMITED  (1<<8)       /* Rekrutiert ohne Limit */
 
     /* Battle-Flags */
-#define BF_EQUIPMENT    (1<<0)  /* Kann Ausrüstung benutzen */
-#define BF_NOBLOCK      (1<<1)  /* Wird in die Rückzugsberechnung nicht einbezogen */
+#define BF_EQUIPMENT    (1<<0)  /* Kann Ausrï¿½stung benutzen */
+#define BF_NOBLOCK      (1<<1)  /* Wird in die Rï¿½ckzugsberechnung nicht einbezogen */
 #define BF_RES_PIERCE   (1<<2)  /* Halber Schaden durch PIERCE */
 #define BF_RES_CUT      (1<<3)  /* Halber Schaden durch CUT */
 #define BF_RES_BASH     (1<<4)  /* Halber Schaden durch BASH */
@@ -232,10 +232,10 @@ extern "C" {
     const char *racename(const struct locale *lang, const struct unit *u,
         const race * rc);
 
-#define playerrace(rc) (!fval((rc), RCF_NPC))
-#define dragonrace(rc) (fval(rc, RCF_DRAGON))
-#define humanoidrace(rc) (fval((rc), RCF_UNDEAD) || (rc)==get_race(RC_DRACOID) || playerrace(rc))
-#define illusionaryrace(rc) (fval(rc, RCF_ILLUSIONARY))
+#define playerrace(rc) (!((rc)->flags & RCF_NPC))
+#define dragonrace(rc) ((rc)->flags & RCF_DRAGON)
+#define humanoidrace(rc) (((rc)->flags & RCF_UNDEAD) || (rc)==get_race(RC_DRACOID) || playerrace(rc))
+#define illusionaryrace(rc) ((rc)->flags & RCF_ILLUSIONARY)
 
     bool allowed_dragon(const struct region *src,
         const struct region *target);
