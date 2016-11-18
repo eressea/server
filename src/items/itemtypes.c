@@ -11,7 +11,6 @@
  */
 
 #include <platform.h>
-#include <kernel/config.h>
 #include "itemtypes.h"
 
 #include "xerewards.h"

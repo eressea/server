@@ -31,7 +31,10 @@ extern "C" {
 
     struct CuTest;
 
-    void test_setup(void);
+    void test_setup_test(struct CuTest *tc, const char *file, int line);
+#define test_setup() test_setup_test(NULL, __FILE__, __LINE__)
+#define test_setup_ex(tc) test_setup_test(tc, __FILE__, __LINE__)
+
     void test_cleanup(void);
     void test_log_stderr(int on);
     struct log_t * test_log_start(int flags, struct strlist **slist);

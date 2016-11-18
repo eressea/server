@@ -347,7 +347,7 @@ attrib_type at_mage = {
 
 bool is_mage(const unit * u)
 {
-    return i2b(get_mage(u) != NULL);
+    return get_mage(u) != NULL;
 }
 
 sc_mage *get_mage(const unit * u)
@@ -376,7 +376,7 @@ static int read_seenspell(attrib * a, void *owner, struct gamedata *data)
     char token[32];
 
     READ_TOK(store, token, sizeof(token));
-    i = atoi(token);
+    i = atoip(token);
     if (i != 0) {
         sp = find_spellbyid((unsigned int)i);
     }
@@ -2167,7 +2167,7 @@ typedef struct familiar_data {
 bool is_familiar(const unit * u)
 {
     attrib *a = a_find(u->attribs, &at_familiarmage);
-    return i2b(a != NULL);
+    return a != NULL;
 }
 
 static void

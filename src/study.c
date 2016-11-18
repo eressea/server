@@ -22,6 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include <kernel/config.h>
 #include "study.h"
+#include "laws.h"
 #include "move.h"
 #include "monster.h"
 #include "alchemy.h"
@@ -438,7 +439,7 @@ int teach_cmd(unit * u, struct order *ord)
                 strncat(zOrder, " ", sz - 1);
                 --sz;
             }
-            sz -= strlcpy(zOrder + 4096 - sz, unitid(u2), sz);
+            sz -= strlcpy(zOrder + 4096 - sz, itoa36(u2->no), sz);
 
             if (getkeyword(u2->thisorder) != K_STUDY) {
                 ADDMSG(&u->faction->msgs,
@@ -529,6 +530,16 @@ static double study_speedup(unit * u, skill_t s, study_rule_t rule)
         }
     }
     return 1.0;
+}
+
+static bool ExpensiveMigrants(void)
+{
+	static bool rule;
+	static int cache;
+	if (config_changed(&cache)) {
+		rule = config_get_int("study.expensivemigrants", 0) != 0;
+	}
+	return rule;
 }
 
 int study_cmd(unit * u, order * ord)
@@ -772,7 +783,7 @@ int study_cmd(unit * u, order * ord)
         a_remove(&u->attribs, a);
         a = NULL;
     }
-    fset(u, UFL_LONGACTION | UFL_NOTMOVING);
+    u->flags |= (UFL_LONGACTION | UFL_NOTMOVING);
 
     /* Anzeigen neuer Traenke */
     /* Spruchlistenaktualiesierung ist in Regeneration */

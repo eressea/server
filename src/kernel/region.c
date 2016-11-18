@@ -134,6 +134,13 @@ const char *regionname(const region * r, const faction * f)
     return write_regionname(r, f, buf[index], sizeof(buf[index]));
 }
 
+int region_maxworkers(const region *r)
+{
+    int size = production(r);
+    int treespace = (rtrees(r, 2) + rtrees(r, 1) / 2) * TREESIZE;
+    return _max(size - treespace, _min(size / 10, 200));
+}
+
 int deathcount(const region * r)
 {
     attrib *a = a_find(r->attribs, &at_deathcount);
@@ -1207,7 +1214,7 @@ void terraform_region(region * r, const terrain_type * terrain)
 
         if (!fval(r, RF_CHAOTIC)) {
             int peasants;
-            peasants = (maxworkingpeasants(r) * (20 + dice_rand("6d10"))) / 100;
+            peasants = (region_maxworkers(r) * (20 + dice_rand("6d10"))) / 100;
             rsetpeasants(r, _max(100, peasants));
             rsetmoney(r, rpeasants(r) * ((wage(r, NULL, NULL,
                 INT_MAX) + 1) + rng_int() % 5));

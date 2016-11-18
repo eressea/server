@@ -101,60 +101,7 @@ struct settings global = {
 };
 
 bool lomem = false;
-FILE *logfile;
-bool battledebug = false;
 int turn = -1;
-
-int NewbieImmunity(void)
-{
-    return config_get_int("NewbieImmunity", 0);
-}
-
-bool IsImmune(const faction * f)
-{
-    return !fval(f, FFL_NPC) && f->age < NewbieImmunity();
-}
-
-bool ExpensiveMigrants(void)
-{
-    return config_get_int("study.expensivemigrants", 0) != 0;
-}
-
-int LongHunger(const struct unit *u)
-{
-    if (u != NULL) {
-        if (!fval(u, UFL_HUNGER))
-            return false;
-        if (u_race(u) == get_race(RC_DAEMON))
-            return false;
-    }
-    return config_get_int("hunger.long", 0);
-}
-
-int NMRTimeout(void)
-{
-    return config_get_int("nmr.timeout", 0);
-}
-
-helpmode helpmodes[] = {
-    { "all", HELP_ALL }
-    ,
-    { "money", HELP_MONEY }
-    ,
-    { "fight", HELP_FIGHT }
-    ,
-    { "observe", HELP_OBSERVE }
-    ,
-    { "give", HELP_GIVE }
-    ,
-    { "guard", HELP_GUARD }
-    ,
-    { "stealth", HELP_FSTEALTH }
-    ,
-    { "travel", HELP_TRAVEL }
-    ,
-    { NULL, 0 }
-};
 
 const char *parameters[MAXPARAMS] = {
     "LOCALE",
@@ -179,7 +126,7 @@ const char *parameters[MAXPARAMS] = {
     "TEMP",
     "FLIEHE",
     "GEBAEUDE",
-    "GIB",                        /* Für HELFE */
+    "GIB",                        /* Fï¿½r HELFE */
     "KAEMPFE",
     "DURCHREISE",
     "BEWACHE",
@@ -201,43 +148,6 @@ const char *parameters[MAXPARAMS] = {
     "PARTEITARNUNG",
     "BAEUME",
     "ALLIANZ"
-};
-
-const char *report_options[MAX_MSG] = {
-    "Kampf",
-    "Ereignisse",
-    "Bewegung",
-    "Einkommen",
-    "Handel",
-    "Produktion",
-    "Orkvermehrung",
-    "Zauber",
-    "",
-    ""
-};
-
-const char *message_levels[ML_MAX] = {
-    "Wichtig",
-    "Debug",
-    "Fehler",
-    "Warnungen",
-    "Infos"
-};
-
-const char *options[MAXOPTIONS] = {
-    "AUSWERTUNG",
-    "COMPUTER",
-    "ZUGVORLAGE",
-    NULL,
-    "STATISTIK",
-    "DEBUG",
-    "ZIPPED",
-    "ZEITUNG",                    /* Option hat Sonderbehandlung! */
-    NULL,
-    "ADRESSEN",
-    "BZIP2",
-    "PUNKTE",
-    "SHOWSKCHANGE"
 };
 
 FILE *debug;
@@ -431,13 +341,6 @@ int newcontainerid(void)
         }
     }
     return random_no;
-}
-
-int maxworkingpeasants(const struct region *r)
-{
-    int size = production(r);
-    int treespace = (rtrees(r, 2) + rtrees(r, 1) / 2) * TREESIZE;
-    return _max(size - treespace, _min(size / 10, 200));
 }
 
 static const char * parameter_key(int i)
@@ -749,8 +652,8 @@ char *_strdup(const char *s)
 }
 #endif
 
-/* Lohn bei den einzelnen Burgstufen für Normale Typen, Orks, Bauern,
- * Modifikation für Städter. */
+/* Lohn bei den einzelnen Burgstufen fï¿½r Normale Typen, Orks, Bauern,
+ * Modifikation fï¿½r Stï¿½dter. */
 
 static const int wagetable[7][4] = {
     { 10, 10, 11, -7 },             /* Baustelle */
@@ -967,7 +870,7 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
             wage = _max(0, wage - 10);
         }
 
-        /* Bei einer Dürre verdient man nur noch ein Viertel  */
+        /* Bei einer Dï¿½rre verdient man nur noch ein Viertel  */
         if (drought_ct) {
             curse *c = get_curse(r->attribs, drought_ct);
             if (curse_active(c))
@@ -991,7 +894,7 @@ minimum_wage(const region * r, const faction * f, const race * rc, int in_turn)
     return default_wage(r, f, rc, in_turn);
 }
 
-/* Gibt Arbeitslohn für entsprechende Rasse zurück, oder für
+/* Gibt Arbeitslohn fï¿½r entsprechende Rasse zurï¿½ck, oder fï¿½r
 * die Bauern wenn f == NULL. */
 int wage(const region * r, const faction * f, const race * rc, int in_turn)
 {
@@ -999,14 +902,6 @@ int wage(const region * r, const faction * f, const race * rc, int in_turn)
         return global.functions.wage(r, f, rc, in_turn);
     }
     return default_wage(r, f, rc, in_turn);
-}
-
-int lovar(double xpct_x2)
-{
-    int n = (int)(xpct_x2 * 500) + 1;
-    if (n == 0)
-        return 0;
-    return (rng_int() % n + rng_int() % n) / 1000;
 }
 
 void kernel_init(void)
@@ -1066,11 +961,6 @@ int rule_give(void)
         rule = config_get_int("rules.give.flags", GIVE_DEFAULT);
     }
     return rule;
-}
-
-bool markets_module(void)
-{
-    return (bool)config_get_int("modules.markets", 0);
 }
 
 static struct param *configuration;

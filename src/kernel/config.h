@@ -27,19 +27,12 @@ extern "C" {
 #include "types.h"
 struct param;
 
-#define DISPLAYSIZE         8192        /* max. Länge einer Beschreibung, incl trailing 0 */
+#define DISPLAYSIZE         8192        /* max. Lï¿½nge einer Beschreibung, incl trailing 0 */
 #define ORDERSIZE           (DISPLAYSIZE*2) /* max. length of an order */
-#define NAMESIZE            128 /* max. Länge eines Namens, incl trailing 0 */
-#define IDSIZE              16  /* max. Länge einer no (als String), incl trailing 0 */
-#define OBJECTIDSIZE        (NAMESIZE+5+IDSIZE) /* max. Länge der Strings, die
-     * von struct unitname, etc. zurückgegeben werden. ohne die 0 */
-
-    /* ----------------- Befehle ----------------------------------- */
-
-#define want(option) (1<<option)
-    /* ------------------------------------------------------------- */
-
-#define i2b(i) ((bool)((i)?(true):(false)))
+#define NAMESIZE            128 /* max. Lï¿½nge eines Namens, incl trailing 0 */
+#define IDSIZE              16  /* max. Lï¿½nge einer no (als String), incl trailing 0 */
+#define OBJECTIDSIZE        (NAMESIZE+5+IDSIZE) /* max. Lï¿½nge der Strings, die
+     * von struct unitname, etc. zurï¿½ckgegeben werden. ohne die 0 */
 
 #define fval(u, i) ((u)->flags & (i))
 #define fset(u, i) ((u)->flags |= (i))
@@ -52,16 +45,8 @@ struct param;
     bool isparam(const char *s, const struct locale * lang, param_t param);
     param_t getparam(const struct locale *lang);
 
-#define unitid(x) itoa36((x)->no)
-
-#define buildingid(x) itoa36((x)->no)
-#define shipid(x) itoa36((x)->no)
-#define factionid(x) itoa36((x)->no)
-#define curseid(x) itoa36((x)->no)
-
     const char * game_name(void);
     int game_id(void);
-    int lovar(double xpct_x2);
     /* returns a value between [0..xpct_2], generated with two dice */
 
     void init_locale(struct locale *lang);
@@ -110,12 +95,10 @@ struct param;
 #define GF_SPECIFIC 16
     /* der, die, das vs. ein, eine */
 #define GF_DETAILED 32
-    /* mehr Informationen. z.b. straße zu 50% */
+    /* mehr Informationen. z.b. straï¿½e zu 50% */
 #define GF_PURE 64
     /* untranslated */
 
-    int maxworkingpeasants(const struct region *r);
-    bool markets_module(void);
     int wage(const struct region *r, const struct faction *f,
         const struct race *rc, int in_turn);
 
@@ -139,18 +122,12 @@ struct param;
         struct attrib *attribs;
         unsigned int data_turn;
         void *vm_state;
-        int data_version; /* TODO: eliminate in favor of gamedata.version */
         struct _dictionary_ *inifile;
         struct global_functions {
             int(*wage) (const struct region * r, const struct faction * f,
                 const struct race * rc, int in_turn);
         } functions;
     } settings;
-
-    typedef struct helpmode {
-        const char *name;
-        int status;
-    } helpmode;
 
     void set_param(struct param **p, const char *key, const char *value);
     const char *get_param(const struct param *p, const char *key);
@@ -167,11 +144,6 @@ struct param;
     bool config_changed(int *cache_key);
 
     char * join_path(const char *p1, const char *p2, char *dst, size_t len);
-    bool ExpensiveMigrants(void);
-    int NMRTimeout(void);
-    int LongHunger(const struct unit *u);
-    int NewbieImmunity(void);
-    bool IsImmune(const struct faction *f);
 
     struct order *default_order(const struct locale *lang);
 
@@ -181,18 +153,11 @@ struct param;
     void free_gamedata(void);
     void free_config(void);
 
-    extern struct helpmode helpmodes[];
     extern const char *parameters[];
-    extern const char *localenames[];
     extern settings global;
 
-    extern bool battledebug;
-    extern bool sqlpatch;
     extern bool lomem;         /* save memory */
     extern int turn;
-    extern bool getunitpeasants;
-
-    extern const char *options[MAXOPTIONS];    /* report options */
 
 #ifdef __cplusplus
 }

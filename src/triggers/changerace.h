@@ -26,6 +26,7 @@ extern "C" {
     struct trigger_type;
     struct trigger;
     struct unit;
+    struct race;
 
     extern struct trigger_type tt_changerace;
 

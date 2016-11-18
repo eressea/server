@@ -25,6 +25,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/filereader.h>
 #include <util/language.h>
 #include "eressea.h"
+#include "battle.h"
 #ifdef USE_CURSES
 #include "gmtool.h"
 #endif

@@ -107,10 +107,6 @@
 
 static double zero_effect = 0.0;
 
-attrib_type at_wdwpyramid = {
-    "wdwpyramid", NULL, NULL, NULL, NULL, NULL
-};
-
 /* ----------------------------------------------------------------------- */
 
 static void report_spell(unit * mage, region * r, message * msg)
@@ -450,7 +446,7 @@ report_effect(region * r, unit * mage, message * seen, message * unseen)
  * Vertrauten sehen, und durch den Vertrauten zaubern, allerdings nur
  * mit seiner halben Stufe. Je nach Vertrautem erhaelt der Magier
  * evtl diverse Skillmodifikationen.  Der Typ des Vertrauten ist
- * zufaellig bestimmt, wird aber durch Magiegebiet und Rasse beeinflußt.
+ * zufaellig bestimmt, wird aber durch Magiegebiet und Rasse beeinfluï¿½t.
  * "Tierische" Vertraute brauchen keinen Unterhalt.
  *
  * Ein paar Moeglichkeiten:
@@ -1603,7 +1599,7 @@ static int sp_create_stonegolem(castorder * co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:       Große Duerre
+/* Name:       Groï¿½e Duerre
  * Stufe:      17
  * Kategorie:  Region, negativ
  * Gebiet:     Gwyrrd
@@ -1911,7 +1907,7 @@ static int sp_treewalkexit(castorder * co)
         return 0;
     }
 
-    /* Koordinaten setzen und Region loeschen fuer Überpruefung auf
+    /* Koordinaten setzen und Region loeschen fuer ï¿½berpruefung auf
      * Gueltigkeit */
     rt = pa->param[0]->data.r;
     tax = rt->x;
@@ -2198,7 +2194,7 @@ static int sp_ironkeeper(castorder * co)
     setstatus(keeper, ST_AVOID);  /* kaempft nicht */
     setguard(keeper, true);
     fset(keeper, UFL_ISNEW);
-    /* Parteitarnen, damit man nicht sofort weiß, wer dahinter steckt */
+    /* Parteitarnen, damit man nicht sofort weiï¿½, wer dahinter steckt */
     if (rule_stealth_anon()) {
         fset(keeper, UFL_ANON_FACTION);
     }
@@ -2576,7 +2572,7 @@ void patzer_fumblecurse(const castorder * co)
  *
  * Wirkung:
  *  In einer Wueste, Sumpf oder Gletscher gezaubert kann innerhalb der
- *  naechsten 6 Runden ein bis 6 Dracheneinheiten bis Groeße Wyrm
+ *  naechsten 6 Runden ein bis 6 Dracheneinheiten bis Groeï¿½e Wyrm
  *  entstehen.
  *
  *  Mit Stufe 12-15 erscheinen Jung- oder normaler Drachen, mit Stufe
@@ -2821,7 +2817,7 @@ static int change_hitpoints(unit * u, int value)
 
     hp += value;
 
-    /* Jede Person benötigt mindestens 1 HP */
+    /* Jede Person benï¿½tigt mindestens 1 HP */
     if (hp < u->number) {
         if (hp < 0) {               /* Einheit tot */
             hp = 0;
@@ -3768,7 +3764,7 @@ static int sp_rallypeasantmob(castorder * co)
  * Gebiet:   Cerddor
  * Wirkung:
  *  Wiegelt 60% bis 90% der Bauern einer Region auf.  Bauern werden ein
- *  großer Mob, der zur Monsterpartei gehoert und die Region bewacht.
+ *  groï¿½er Mob, der zur Monsterpartei gehoert und die Region bewacht.
  *  Regionssilber sollte auch nicht durch Unterhaltung gewonnen werden
  *  koennen.
  *
@@ -4029,7 +4025,7 @@ static int sp_recruit(castorder * co)
         return 0;
     }
     /* Immer noch zuviel auf niedrigen Stufen. Deshalb die Rekrutierungskosten
-     * mit einfliessen lassen und dafuer den Exponenten etwas groeßer.
+     * mit einfliessen lassen und dafuer den Exponenten etwas groeï¿½er.
      * Wenn die Rekrutierungskosten deutlich hoeher sind als der Faktor,
      * ist das Verhaeltniss von ausgegebene Aura pro Bauer bei Stufe 2
      * ein mehrfaches von Stufe 1, denn in beiden Faellen gibt es nur 1
@@ -4060,7 +4056,7 @@ static int sp_recruit(castorder * co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:    Wanderprediger - Große Anwerbung
+/* Name:    Wanderprediger - Groï¿½e Anwerbung
  * Stufe:   14
  * Gebiet:  Cerddor
  * Wirkung:
@@ -4116,8 +4112,8 @@ static int sp_bigrecruit(castorder * co)
  * Gebiet:   Cerddor
  * Wirkung:
  *  Erliegt die Einheit dem Zauber, so wird sie dem Magier alles
- *  erzaehlen, was sie ueber die gefragte Region weiß. Ist in der Region
- *  niemand ihrer Partei, so weiß sie nichts zu berichten.  Auch kann
+ *  erzaehlen, was sie ueber die gefragte Region weiï¿½. Ist in der Region
+ *  niemand ihrer Partei, so weiï¿½ sie nichts zu berichten.  Auch kann
  *  sie nur das erzaehlen, was sie selber sehen koennte.
  * Flags:
  *   (UNITSPELL | TESTCANSEE)
@@ -4180,7 +4176,7 @@ static int sp_pump(castorder * co)
  * Stufe:   6
  * Gebiet:   Cerddor
  * Wirkung:
- *  Betoert eine Einheit, so das sie ihm den groeßten Teil ihres Bargelds
+ *  Betoert eine Einheit, so das sie ihm den groeï¿½ten Teil ihres Bargelds
  *  und 50% ihres Besitzes schenkt. Sie behaelt jedoch immer soviel, wie
  *  sie zum ueberleben braucht. Wirkt gegen Magieresistenz.
  *  _min(Stufe*1000$, u->money - maintenace)
@@ -4337,7 +4333,7 @@ static int sp_headache(castorder * co)
     if (target->number == 0 || pa->param[0]->flag == TARGET_NOTFOUND)
         return 0;
 
-    /* finde das groeßte Talent: */
+    /* finde das groeï¿½te Talent: */
     for (i = 0; i != target->skill_size; ++i) {
         skill *sv = target->skills + i;
         if (smax == NULL || skill_compare(sv, smax) > 0) {
@@ -4483,7 +4479,7 @@ int sp_puttorest(castorder * co)
     return co->level;
 }
 
-/* Name:       Traumschloeßchen
+/* Name:       Traumschloeï¿½chen
  * Stufe:      3
  * Kategorie:  Region, Gebaeude, positiv
  * Gebiet:     Illaun
@@ -4518,7 +4514,7 @@ int sp_icastle(castorder * co)
 
     b = new_building(bt_illusion, r, mage->faction->locale);
 
-    /* Groeße festlegen. */
+    /* Groeï¿½e festlegen. */
     if (type == bt_illusion) {
         b->size = (rng_int() % (int)((power * power) + 1) * 10);
     }
@@ -4696,7 +4692,7 @@ int sp_baddreams(castorder * co)
  * Kategorie:
  * Wirkung:
  *   Dieser Zauber ermoeglicht es dem Traeumer, den Schlaf aller aliierten
- *   Einheiten in der Region so zu beeinflussen, daß sie fuer einige Zeit
+ *   Einheiten in der Region so zu beeinflussen, daï¿½ sie fuer einige Zeit
  *   einen Bonus von 1 Talentstufe in allen Talenten
  *   bekommen. Der Zauber wirkt erst im Folgemonat.
  * Flags:
@@ -6295,21 +6291,21 @@ int sp_q_antimagie(castorder * co)
     {
         unit *u = pa->param[0]->data.u;
         ap = &u->attribs;
-        ts = unitid(u);
+        ts = itoa36(u->no);
         break;
     }
     case SPP_BUILDING:
     {
         building *b = pa->param[0]->data.b;
         ap = &b->attribs;
-        ts = buildingid(b);
+        ts = itoa36(b->no);
         break;
     }
     case SPP_SHIP:
     {
         ship *sh = pa->param[0]->data.sh;
         ap = &sh->attribs;
-        ts = shipid(sh);
+        ts = itoa36(sh->no);
         break;
     }
     default:
@@ -6388,21 +6384,21 @@ int sp_break_curse(castorder * co)
         {
             unit *u = pa->param[0]->data.u;
             ap = &u->attribs;
-            ts = unitid(u);
+            ts = itoa36(u->no);
             break;
         }
         case SPP_BUILDING:
         {
             building *b = pa->param[0]->data.b;
             ap = &b->attribs;
-            ts = buildingid(b);
+            ts = itoa36(b->no);
             break;
         }
         case SPP_SHIP:
         {
             ship *sh = pa->param[0]->data.sh;
             ap = &sh->attribs;
-            ts = shipid(sh);
+            ts = itoa36(sh->no);
             break;
         }
         default:
@@ -6722,7 +6718,6 @@ void register_spells(void)
 {
     register_borders();
 
-    at_register(&at_wdwpyramid);
     at_register(&at_deathcloud_compat);
 
     /* init_firewall(); */

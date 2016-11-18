@@ -380,6 +380,21 @@ function test_events()
   assert(fail==0)
 end
 
+function test_renumber_ship()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply4@eressea.de", "human", "de")
+    local u = unit.create(f, r)
+    local s = ship.create(r, config.ships[1])
+    u.ship = s
+    u:add_order("NUMMER SCHIFF 1")
+    process_orders()
+    assert_equal(1, s.id)
+    u:clear_orders()
+    u:add_order("NUMMER SCHIFF 2")
+    process_orders()
+    assert_equal(2, s.id)
+end
+
 function test_recruit2()
     local r = region.create(0, 0, "plain")
     local f = faction.create("noreply4@eressea.de", "human", "de")

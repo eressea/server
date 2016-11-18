@@ -23,13 +23,14 @@ extern "C" {
 #endif
 
     /* in dice.c: */
-    extern int dice_rand(const char *str);
-    extern int dice(int count, int value);
+    int dice_rand(const char *str);
+    int dice(int count, int value);
 
     /* in rand.c: */
-    extern double normalvariate(double mu, double sigma);
-    extern int ntimespprob(int n, double p, double mod);
-    extern bool chance(double x);
+    int lovar(double xpct_x2);
+    double normalvariate(double mu, double sigma);
+    int ntimespprob(int n, double p, double mod);
+    bool chance(double x);
 
     /* a random source that generates numbers in [0, 1).
        By calling the random_source_inject... functions you can set a special random source,

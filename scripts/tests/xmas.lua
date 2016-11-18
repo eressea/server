@@ -7,6 +7,7 @@ function setup()
     eressea.settings.set("nmr.timeout", "0")
     eressea.settings.set("rules.grow.formula", "0")
     eressea.settings.set("rules.peasants.growth.factor", "0")
+    eressea.settings.set("volcano.active.percent", "0")
 end
 
 function test_snowglobe_fail()
@@ -52,7 +53,7 @@ function test_snowglobe()
     for k, v in pairs(xform) do
         r2.terrain = k
         process_orders()
-        -- TODO: re-enable! assert_equal(v, r2.terrain)
+        assert_equal(v, r2.terrain)
         if k~=v then
             have=have - 1 
         else

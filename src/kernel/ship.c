@@ -201,7 +201,7 @@ ship *new_ship(const ship_type * stype, region * r, const struct locale *lang)
         sname = parameters[P_SHIP];
     }
     assert(sname);
-    slprintf(buffer, sizeof(buffer), "%s %s", sname, shipid(sh));
+    slprintf(buffer, sizeof(buffer), "%s %s", sname, itoa36(sh->no));
     sh->name = _strdup(buffer);
     shash(sh);
     if (r) {

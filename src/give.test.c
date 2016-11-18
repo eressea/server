@@ -23,6 +23,7 @@
 #include <assert.h>
 
 struct give {
+    struct locale * lang;
     struct unit *src, *dst;
     struct region *r;
     struct faction *f1, *f2;
@@ -46,11 +47,16 @@ static void setup_give(struct give *env) {
         ally * al = ally_add(&env->f2->allies, env->f1);
         al->status = HELP_GIVE;
     }
+    if (env->lang) {
+        locale_setstring(env->lang, env->itype->rtype->_name, "SILBER");
+        init_locale(env->lang);
+        env->f1->locale = env->lang;
+    }
 }
 
 static void test_give_unit_to_peasants(CuTest * tc) {
-    struct give env;
-    test_setup();
+    struct give env = { 0 };
+    test_setup_ex(tc);
     env.f1 = test_create_faction(0);
     env.f2 = 0;
     setup_give(&env);
@@ -62,8 +68,8 @@ static void test_give_unit_to_peasants(CuTest * tc) {
 }
 
 static void test_give_unit(CuTest * tc) {
-    struct give env;
-    test_setup();
+    struct give env = { 0 };
+    test_setup_ex(tc);
     env.f1 = test_create_faction(0);
     env.f2 = test_create_faction(0);
     setup_give(&env);
@@ -81,8 +87,8 @@ static void test_give_unit(CuTest * tc) {
 }
 
 static void test_give_unit_in_ocean(CuTest * tc) {
-    struct give env;
-    test_setup();
+    struct give env = { 0 };
+    test_setup_ex(tc);
     env.f1 = test_create_faction(0);
     env.f2 = 0;
     setup_give(&env);
@@ -93,8 +99,8 @@ static void test_give_unit_in_ocean(CuTest * tc) {
 }
 
 static void test_give_men(CuTest * tc) {
-    struct give env;
-    test_setup();
+    struct give env = { 0 };
+    test_setup_ex(tc);
     env.f2 = env.f1 = test_create_faction(0);
     setup_give(&env);
     CuAssertPtrEquals(tc, 0, give_men(1, env.src, env.dst, NULL));
@@ -104,11 +110,11 @@ static void test_give_men(CuTest * tc) {
 }
 
 static void test_give_men_magicians(CuTest * tc) {
-    struct give env;
+    struct give env = { 0 };
     int p;
     message * msg;
 
-    test_setup();
+    test_setup_ex(tc);
     env.f2 = env.f1 = test_create_faction(0);
     setup_give(&env);
     set_level(env.src, SK_MAGIC, 1);
@@ -135,9 +141,9 @@ static void test_give_men_magicians(CuTest * tc) {
 }
 
 static void test_give_men_limit(CuTest * tc) {
-    struct give env;
+    struct give env = { 0 };
     message *msg;
-    test_setup();
+    test_setup_ex(tc);
     env.f2 = test_create_faction(0);
     env.f1 = test_create_faction(0);
     setup_give(&env);
@@ -165,10 +171,10 @@ static void test_give_men_limit(CuTest * tc) {
 }
 
 static void test_give_men_in_ocean(CuTest * tc) {
-    struct give env;
+    struct give env = { 0 };
     message * msg;
 
-    test_setup();
+    test_setup_ex(tc);
     env.f1 = test_create_faction(0);
     env.f2 = 0;
     setup_give(&env);
@@ -181,8 +187,8 @@ static void test_give_men_in_ocean(CuTest * tc) {
 }
 
 static void test_give_men_too_many(CuTest * tc) {
-    struct give env;
-    test_setup();
+    struct give env = { 0 };
+    test_setup_ex(tc);
     env.f2 = env.f1 = test_create_faction(0);
     setup_give(&env);
     CuAssertPtrEquals(tc, 0, give_men(2, env.src, env.dst, NULL));
@@ -192,10 +198,10 @@ static void test_give_men_too_many(CuTest * tc) {
 }
 
 static void test_give_men_none(CuTest * tc) {
-    struct give env;
+    struct give env = { 0 };
     message * msg;
 
-    test_setup();
+    test_setup_ex(tc);
     env.f2 = env.f1 = test_create_faction(0);
     setup_give(&env);
     msg = give_men(0, env.src, env.dst, NULL);
@@ -207,10 +213,10 @@ static void test_give_men_none(CuTest * tc) {
 }
 
 static void test_give_men_other_faction(CuTest * tc) {
-    struct give env;
+    struct give env = { 0 };
     message * msg;
 
-    test_setup();
+    test_setup_ex(tc);
     env.f1 = test_create_faction(0);
     env.f2 = test_create_faction(0);
     setup_give(&env);
@@ -224,12 +230,12 @@ static void test_give_men_other_faction(CuTest * tc) {
 }
 
 static void test_give_men_requires_contact(CuTest * tc) {
-    struct give env;
+    struct give env = { 0 };
     message * msg;
     order *ord;
     char cmd[32];
 
-    test_setup();
+    test_setup_ex(tc);
     env.f1 = test_create_faction(0);
     env.f2 = test_create_faction(0);
     setup_give(&env);
@@ -251,9 +257,9 @@ static void test_give_men_requires_contact(CuTest * tc) {
 }
 
 static void test_give_men_not_to_self(CuTest * tc) {
-    struct give env;
+    struct give env = { 0 };
     message * msg;
-    test_setup();
+    test_setup_ex(tc);
     env.f2 = env.f1 = test_create_faction(0);
     setup_give(&env);
     msg = give_men(1, env.src, env.src, NULL);
@@ -264,10 +270,10 @@ static void test_give_men_not_to_self(CuTest * tc) {
 }
 
 static void test_give_peasants(CuTest * tc) {
-    struct give env;
+    struct give env = { 0 };
     message * msg;
 
-    test_setup();
+    test_setup_ex(tc);
     env.f1 = test_create_faction(0);
     env.f2 = 0;
     setup_give(&env);
@@ -281,9 +287,9 @@ static void test_give_peasants(CuTest * tc) {
 }
 
 static void test_give(CuTest * tc) {
-    struct give env;
+    struct give env = { 0 };
 
-    test_setup();
+    test_setup_ex(tc);
     env.f2 = env.f1 = test_create_faction(0);
     setup_give(&env);
 
@@ -298,12 +304,35 @@ static void test_give(CuTest * tc) {
     test_cleanup();
 }
 
-static void test_give_herbs(CuTest * tc) {
-    struct give env;
+static void test_give_cmd(CuTest * tc) {
+    struct give env = { 0 };
     struct order *ord;
     char cmd[32];
 
-    test_setup();
+    test_setup_ex(tc);
+    env.lang = test_create_locale();
+    env.f2 = env.f1 = test_create_faction(0);
+    setup_give(&env);
+
+    i_change(&env.src->items, env.itype, 10);
+
+    _snprintf(cmd, sizeof(cmd), "%s 5 %s", itoa36(env.dst->no), LOC(env.f1->locale, env.itype->rtype->_name));
+    ord = create_order(K_GIVE, env.f1->locale, cmd);
+    assert(ord);
+    give_cmd(env.src, ord);
+    CuAssertIntEquals(tc, 5, i_get(env.src->items, env.itype));
+    CuAssertIntEquals(tc, 5, i_get(env.dst->items, env.itype));
+
+    free_order(ord);
+    test_cleanup();
+}
+
+static void test_give_herbs(CuTest * tc) {
+    struct give env = { 0 };
+    struct order *ord;
+    char cmd[32];
+
+    test_setup_ex(tc);
     test_create_world();
     env.f2 = env.f1 = test_create_faction(0);
     setup_give(&env);
@@ -321,9 +350,9 @@ static void test_give_herbs(CuTest * tc) {
 }
 
 static void test_give_okay(CuTest * tc) {
-    struct give env;
+    struct give env = { 0 };
 
-    test_setup();
+    test_setup_ex(tc);
     env.f2 = env.f1 = test_create_faction(0);
     setup_give(&env);
 
@@ -333,10 +362,10 @@ static void test_give_okay(CuTest * tc) {
 }
 
 static void test_give_denied_by_rules(CuTest * tc) {
-    struct give env;
+    struct give env = { 0 };
     struct message *msg;
 
-    test_setup();
+    test_setup_ex(tc);
     env.f1 = test_create_faction(0);
     env.f2 = test_create_faction(0);
     setup_give(&env);
@@ -348,10 +377,10 @@ static void test_give_denied_by_rules(CuTest * tc) {
 }
 
 static void test_give_dead_unit(CuTest * tc) {
-    struct give env;
+    struct give env = { 0 };
     struct message *msg;
 
-    test_setup();
+    test_setup_ex(tc);
     env.f1 = test_create_faction(0);
     env.f2 = test_create_faction(0);
     setup_give(&env);
@@ -363,9 +392,9 @@ static void test_give_dead_unit(CuTest * tc) {
 }
 
 static void test_give_new_unit(CuTest * tc) {
-    struct give env;
+    struct give env = { 0 };
 
-    test_setup();
+    test_setup_ex(tc);
     env.f1 = test_create_faction(0);
     env.f2 = test_create_faction(0);
     setup_give(&env);
@@ -377,10 +406,10 @@ static void test_give_new_unit(CuTest * tc) {
 
 static void test_give_invalid_target(CuTest *tc) {
     // bug https://bugs.eressea.de/view.php?id=1685
-    struct give env;
+    struct give env = { 0 };
     order *ord;
 
-    test_setup();
+    test_setup_ex(tc);
     env.f1 = test_create_faction(0);
     env.f2 = 0;
     setup_give(&env);
@@ -400,6 +429,7 @@ CuSuite *get_give_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_give);
+    SUITE_ADD_TEST(suite, test_give_cmd);
     SUITE_ADD_TEST(suite, test_give_men);
     SUITE_ADD_TEST(suite, test_give_men_magicians);
     SUITE_ADD_TEST(suite, test_give_men_limit);

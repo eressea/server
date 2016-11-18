@@ -43,6 +43,7 @@ extern "C" {
     extern bool nocr;
     extern bool noreports;
     extern const char *visibility[];
+    extern const char *options[MAXOPTIONS];    /* report options */
 
     void reports_done(void);
 

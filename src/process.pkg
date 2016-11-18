@@ -25,7 +25,6 @@ module eressea {
         void process_leave @ leave(void); /* LEAVE */
         void process_maintenance @ maintenance(void); /* PAY */
         void process_promote @ promote(void); /* PROMOTE */
-        void process_renumber @ renumber(void); /* RENUMBER */
         void process_restack @ restack(void); /* SORT */
         void process_setspells @ set_spells(void); /* COMBATSPELL */
         void process_sethelp @ set_help(void); /* HELP */

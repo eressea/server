@@ -17,10 +17,12 @@ set_source_files_properties(kernel/version.c PROPERTIES
 COMPILE_DEFINITIONS ERESSEA_VERSION="${ERESSEA_VERSION}")
 ENDIF()
 
-IF(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_CLANG)
+IF (CMAKE_COMPILER_IS_GNUCC)
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-error=unused-but-set-variable")
+ENDIF()
+IF (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
 #    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wconversion -Wno-sign-conversion")
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic -Wsign-compare -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long")
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-error=unused-but-set-variable")
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
     add_definitions(-DHAVE__BOOL)
 ELSEIF(MSVC)
@@ -99,7 +101,6 @@ set (ERESSEA_SRC
   prefix.c
   donations.c
   eressea.c
-  callback.c
   direction.c
   keyword.c
   skill.c
@@ -115,6 +116,7 @@ set (ERESSEA_SRC
   morale.c
   monster.c
   randenc.c
+  renumber.c
   volcano.c
   chaos.c
   spy.c
@@ -204,7 +206,6 @@ set(TESTS_SRC
   report.test.c
   summary.test.c
   travelthru.test.c
-  callback.test.c
   direction.test.c
   economy.test.c
   json.test.c
@@ -218,6 +219,7 @@ set(TESTS_SRC
   move.test.c
   piracy.test.c
   prefix.test.c
+  renumber.test.c
   skill.test.c
   spells.test.c
   spy.test.c

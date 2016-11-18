@@ -30,6 +30,8 @@ extern "C" {
     struct curse_type;
     struct gamedata;
     struct storage;
+    struct attrib;
+    struct faction;
 
     /* Sprueche in der struct region und auf Einheiten, Schiffen oder Burgen
      * (struct attribute)

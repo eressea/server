@@ -42,10 +42,10 @@ extern "C" {
 #define FFL_DEFENDER      (1<<10)
 #define FFL_SELECT        (1<<18)       /* ehemals f->dh, u->dh, r->dh, etc... */
 #define FFL_NOAID         (1<<21)       /* Hilfsflag Kampf */
-#define FFL_MARK          (1<<23)       /* für markierende algorithmen, die das 
-                                             * hinterher auch wieder löschen müssen!
+#define FFL_MARK          (1<<23)       /* fï¿½r markierende algorithmen, die das 
+                                             * hinterher auch wieder lï¿½schen mï¿½ssen!
                                              * (FFL_SELECT muss man vorher initialisieren,
-                                             * FL_MARK hinterher löschen) */
+                                             * FL_MARK hinterher lï¿½schen) */
 #define FFL_NOIDLEOUT     (1<<24)       /* Partei stirbt nicht an NMRs */
 #define FFL_NPC           (1<<25)       /* eine Partei mit Monstern */
 #define FFL_SAVEMASK (FFL_DEFENDER|FFL_NEWID|FFL_NPC|FFL_NOIDLEOUT|FFL_CURSED)
@@ -100,6 +100,8 @@ extern "C" {
     } faction;
 
     extern struct faction *factions;
+
+#define want(option) (1<<option)
 
     void fhash(struct faction *f);
     void funhash(struct faction *f);

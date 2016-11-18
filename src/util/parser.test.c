@@ -2,7 +2,15 @@
 #include "parser.h"
 
 #include <string.h>
+#include <errno.h>
 #include <CuTest.h>
+
+static void test_atoip(CuTest *tc) {
+    CuAssertIntEquals(tc, 0, atoip("ALLES"));
+    CuAssertIntEquals(tc, 0, errno);
+    CuAssertIntEquals(tc, 42, atoip("42"));
+    CuAssertIntEquals(tc, 0, atoip("-1"));
+}
 
 static void test_parse_token(CuTest *tc) {
     char lbuf[8];
@@ -101,12 +109,6 @@ static void test_getstrtoken(CuTest *tc) {
     CuAssertStrEquals(tc, "TWO", getstrtoken());
     CuAssertStrEquals(tc, "THREE", getstrtoken());
     CuAssertPtrEquals(tc, NULL, (void *)getstrtoken());
-}
-
-static void test_atoip(CuTest *tc) {
-    CuAssertIntEquals(tc, 42, atoip("42"));
-    CuAssertIntEquals(tc, 0, atoip("-42"));
-    CuAssertIntEquals(tc, 0, atoip("NOPE"));
 }
 
 CuSuite *get_parser_suite(void)

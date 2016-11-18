@@ -11,6 +11,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/config.h>
 #include <kernel/version.h>
 #include "creport.h"
+#include "market.h"
 #include "guard.h"
 #include "travelthru.h"
 
@@ -781,7 +782,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
         if (sf != u->faction)
             stream_printf(out, "%d;Verkleidung\n", sf->no);
         if (fval(u, UFL_ANON_FACTION))
-            stream_printf(out, "%d;Parteitarnung\n", i2b(fval(u, UFL_ANON_FACTION)));
+            stream_printf(out, "%d;Parteitarnung\n", (u->flags & UFL_ANON_FACTION)!=0);
         if (otherfaction && otherfaction != u->faction) {
             stream_printf(out, "%d;Anderepartei\n", otherfaction->no);
         }
@@ -793,7 +794,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
     else {
         if (fval(u, UFL_ANON_FACTION)) {
             /* faction info is hidden */
-            stream_printf(out, "%d;Parteitarnung\n", i2b(fval(u, UFL_ANON_FACTION)));
+            stream_printf(out, "%d;Parteitarnung\n", (u->flags & UFL_ANON_FACTION) != 0);
         }
         else {
             const attrib *a_otherfaction = a_find(u->attribs, &at_otherfaction);

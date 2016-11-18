@@ -426,7 +426,7 @@ building *new_building(const struct building_type * btype, region * r,
         bname = parameters[P_GEBAEUDE];
     }
     assert(bname);
-    slprintf(buffer, sizeof(buffer), "%s %s", bname, buildingid(b));
+    slprintf(buffer, sizeof(buffer), "%s %s", bname, itoa36(b->no));
     b->name = _strdup(bname);
     return b;
 }

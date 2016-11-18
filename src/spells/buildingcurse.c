@@ -12,7 +12,6 @@
  */
 
 #include <platform.h>
-#include <kernel/config.h>
 #include "buildingcurse.h"
 
 /* kernel includes */

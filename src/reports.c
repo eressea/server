@@ -105,6 +105,22 @@ const char *coasts[MAXDIRECTIONS] = {
     "coast::w"
 };
 
+const char *options[MAXOPTIONS] = {
+    "AUSWERTUNG",
+    "COMPUTER",
+    "ZUGVORLAGE",
+    NULL,
+    "STATISTIK",
+    "DEBUG",
+    "ZIPPED",
+    "ZEITUNG",                    /* Option hat Sonderbehandlung! */
+    NULL,
+    "ADRESSEN",
+    "BZIP2",
+    "PUNKTE",
+    "SHOWSKCHANGE"
+};
+
 bool omniscient(const faction *f)
 {
     static const race *rc_template, *rc_illusion;
@@ -124,7 +140,7 @@ static char *groupid(const struct group *g, const struct faction *f)
     static name idbuf[8];
     static int nextbuf = 0;
     char *buf = idbuf[(++nextbuf) % 8];
-    sprintf(buf, "%s (%s)", g->name, factionid(f));
+    sprintf(buf, "%s (%s)", g->name, itoa36(f->no));
     return buf;
 }
 
@@ -1402,7 +1418,7 @@ int write_reports(faction * f, time_t ltime)
             do {
                 char filename[32];
                 char path[MAX_PATH];
-                sprintf(filename, "%d-%s.%s", turn, factionid(f),
+                sprintf(filename, "%d-%s.%s", turn, itoa36(f->no),
                     rtype->extension);
                 join_path(reportpath(), filename, path, sizeof(path));
                 errno = 0;
@@ -1425,7 +1441,7 @@ int write_reports(faction * f, time_t ltime)
         }
     }
     if (!gotit) {
-        log_warning("No report for faction %s!", factionid(f));
+        log_warning("No report for faction %s!", itoa36(f->no));
     }
     finish_reports(&ctx);
     return 0;
@@ -1436,7 +1452,7 @@ static void write_script(FILE * F, const faction * f)
     report_type *rtype;
     char buf[1024];
 
-    fprintf(F, "faction=%s:email=%s:lang=%s", factionid(f), f->email,
+    fprintf(F, "faction=%s:email=%s:lang=%s", itoa36(f->no), f->email,
         locale_name(f->locale));
     if (f->options & (1 << O_BZIP2))
         fputs(":compression=bz2", F);
