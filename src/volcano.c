@@ -284,7 +284,8 @@ void volcano_update(void)
             }
         }
         else if (r->terrain == t_volcano) {
-            if (rng_int() % 100 < 4) {
+            int volcano_chance = config_get_int("volcano.active.percent", 4);
+            if (rng_int() % 100 < volcano_chance) {
                 ADDMSG(&r->msgs, msg_message("volcanostartsmoke", "region", r));
                 r->terrain = t_active;
             }
