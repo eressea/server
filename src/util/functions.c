@@ -52,3 +52,4 @@ void register_function(pf_generic fun, const char *name)
 void free_functions(void) {
     cb_clear(&cb_functions);
 }
+
