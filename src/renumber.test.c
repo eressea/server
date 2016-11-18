@@ -102,6 +102,27 @@ static void test_renumber_ship(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_renumber_ship_twice(CuTest *tc) {
+    unit *u;
+    int uno, no;
+    const struct locale *lang;
+
+    test_setup_ex(tc);
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u->ship = test_create_ship(u->region, 0);
+    no = u->ship->no;
+    uno = (no > 1) ? no - 1 : no + 1;
+    lang = u->faction->locale;
+    u->thisorder = create_order(K_NUMBER, lang, "%s %s", LOC(lang, parameters[P_SHIP]), itoa36(uno));
+    renumber_cmd(u, u->thisorder);
+    CuAssertIntEquals(tc, uno, u->ship->no);
+    free_order(u->thisorder);
+    u->thisorder = create_order(K_NUMBER, lang, "%s %s", LOC(lang, parameters[P_SHIP]), itoa36(no));
+    renumber_cmd(u, u->thisorder);
+    CuAssertIntEquals(tc, no, u->ship->no);
+    test_cleanup();
+}
+
 static void test_renumber_ship_duplicate(CuTest *tc) {
     unit *u;
     faction *f;
@@ -204,6 +225,7 @@ CuSuite *get_renumber_suite(void)
     SUITE_ADD_TEST(suite, test_renumber_building);
     SUITE_ADD_TEST(suite, test_renumber_building_duplicate);
     SUITE_ADD_TEST(suite, test_renumber_ship);
+    SUITE_ADD_TEST(suite, test_renumber_ship_twice);
     SUITE_ADD_TEST(suite, test_renumber_ship_duplicate);
     SUITE_ADD_TEST(suite, test_renumber_faction);
     SUITE_ADD_TEST(suite, test_renumber_faction_duplicate);
