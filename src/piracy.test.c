@@ -83,12 +83,12 @@ static void test_piracy_cmd(CuTest * tc) {
     t_ocean = get_or_create_terrain("ocean");
     st_boat = st_get_or_create("boat");
     u2 = test_create_unit(test_create_faction(0), test_create_region(1, 0, t_ocean));
-    u_set_ship(u2, test_create_ship(u2->region, st_boat));
     assert(u2);
+    u_set_ship(u2, test_create_ship(u2->region, st_boat));
     u = test_create_unit(f = test_create_faction(0), r = test_create_region(0, 0, t_ocean));
+    assert(f && u);
     set_level(u, SK_SAILING, st_boat->sumskill);
     u_set_ship(u, test_create_ship(u->region, st_boat));
-    assert(f && u);
     f->locale = get_or_create_locale("de");
     u->thisorder = create_order(K_PIRACY, f->locale, "%s", itoa36(u2->faction->no));
 

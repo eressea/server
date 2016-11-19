@@ -211,7 +211,7 @@ border_type *find_bordertype(const char *name)
 {
     border_type *bt = bordertypes;
 
-    while (bt && strcmp(bt->__name, name))
+    while (bt && strcmp(bt->__name, name)!=0)
         bt = bt->next;
     return bt;
 }
@@ -620,7 +620,6 @@ int read_borders(gamedata *data)
             assert(type || !"connection type not registered");
         }
 
-
         READ_INT(store, &bid);
         if (data->version < UIDHASH_VERSION) {
             int fx, fy, tx, ty;
@@ -639,9 +638,7 @@ int read_borders(gamedata *data)
             to = findregionbyid(tid);
         }
         if (!to || !from) {
-            if (!to || !from) {
-                log_error("%s connection %d has missing regions", zText, bid);
-            }
+            log_error("%s connection %d has missing regions", zText, bid);
             if (type->read) {
                 // skip ahead
                 connection dummy;
@@ -650,7 +647,7 @@ int read_borders(gamedata *data)
             continue;
         }
 
-        if (to == from && type && from) {
+        if (to == from && from) {
             direction_t dir = (direction_t)(rng_int() % MAXDIRECTIONS);
             region *r = rconnect(from, dir);
             log_error("[read_borders] invalid %s in %s\n", type->__name, regionname(from, NULL));
@@ -659,7 +656,7 @@ int read_borders(gamedata *data)
         }
         if (type->read) {
             connection *b = new_border(type, from, to);
-            nextborder--;               /* new_border erhöht den Wert */
+            nextborder--;               /* new_border erhï¿½ht den Wert */
             b->id = bid;
             assert(bid <= nextborder);
             type->read(b, data);
