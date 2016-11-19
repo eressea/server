@@ -241,6 +241,10 @@ static void init_potiondelay(attrib * a)
     a->data.v = malloc(sizeof(potiondelay));
 }
 
+static void free_potiondelay(attrib * a) {
+    free(a->data.v);
+}
+
 static int age_potiondelay(attrib * a, void *owner)
 {
     potiondelay *pd = (potiondelay *)a->data.v;
@@ -252,7 +256,7 @@ static int age_potiondelay(attrib * a, void *owner)
 attrib_type at_potiondelay = {
     "potiondelay",
     init_potiondelay,
-    a_finalizeeffect,
+    free_potiondelay,
     age_potiondelay, 0, 0
 };
 

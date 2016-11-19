@@ -1028,9 +1028,9 @@ int natural_armor(unit * du)
     an = armor_bonus(rc);
     if (an > 0) {
         int sk = effskill(du, SK_STAMINA, 0);
-        an = sk / an;
+        return rc->armor + sk / an;
     }
-    return an + rc->armor;
+    return rc->armor;
 }
 
 static int rc_specialdamage(const unit *au, const unit *du, const struct weapon_type *wtype)
@@ -2046,7 +2046,7 @@ void dazzle(battle * b, troop * td)
         return;
     }
 #endif
-    if (td->fighter->person[td->index].flags & (FL_COURAGE|FL_DAZZLED) {
+    if (td->fighter->person[td->index].flags & (FL_COURAGE|FL_DAZZLED)) {
         return;
     }
 
