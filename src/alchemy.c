@@ -181,7 +181,7 @@ static int potion_power(unit *u, int amount) {
         if (u->number % 10 > 0) ++use;
         amount = use;
     }
-    /* Verfünffacht die HP von max. 10 Personen in der Einheit */
+    /* Verfï¿½nffacht die HP von max. 10 Personen in der Einheit */
     u->hp += _min(u->number, 10 * amount) * unit_max_hp(u) * 4;
     return amount;
 }
@@ -241,11 +241,6 @@ static void init_potiondelay(attrib * a)
     a->data.v = malloc(sizeof(potiondelay));
 }
 
-static void free_potiondelay(attrib * a)
-{
-    free(a->data.v);
-}
-
 static int age_potiondelay(attrib * a, void *owner)
 {
     potiondelay *pd = (potiondelay *)a->data.v;
@@ -257,7 +252,7 @@ static int age_potiondelay(attrib * a, void *owner)
 attrib_type at_potiondelay = {
     "potiondelay",
     init_potiondelay,
-    free_potiondelay,
+    a_finalizeeffect,
     age_potiondelay, 0, 0
 };
 
