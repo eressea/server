@@ -40,12 +40,19 @@ int unicode_utf8_trim(utf8_t *buf)
         size_t size = 1;
         wint_t wc = *ip;
         if (wc & 0x80) {
-            ucs4_t ucs;
-            int ret = unicode_utf8_to_ucs4(&ucs, ip, &size);
-            if (ret != 0) {
-                return ret;
+            ucs4_t ucs = 0;
+            if (ip[1]) {
+                int ret = unicode_utf8_to_ucs4(&ucs, ip, &size);
+                if (ret != 0) {
+                    return ret;
+                }
+                wc = (wint_t)ucs;
             }
-            wc = (wint_t)ucs;
+            else {
+                wc = *op = '?';
+                size = 1;
+                ++result;
+            }
         }
         if (op == buf && iswspace(wc)) {
             ++result;

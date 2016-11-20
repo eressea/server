@@ -28,6 +28,10 @@ static void test_unicode_trim(CuTest * tc)
     strcpy(buffer, " \t Hello Word");
     CuAssertIntEquals(tc, 3, unicode_utf8_trim(buffer));
     CuAssertStrEquals(tc, "Hello Word", buffer);
+
+    buffer[9] = 0xc3;
+    CuAssertIntEquals(tc, 1, unicode_utf8_trim(buffer));
+    CuAssertStrEquals(tc, "Hello Wor?", buffer);
 }
 
 static void test_unicode_tolower(CuTest * tc)
@@ -87,11 +91,21 @@ static void test_unicode_utf8_to_other(CuTest *tc)
     CuAssertIntEquals(tc, 'l', ch);
 }
 
+static void test_unicode_utf8_to_ucs(CuTest *tc) {
+    ucs4_t ucs;
+    size_t sz;
+
+    CuAssertIntEquals(tc, 0, unicode_utf8_to_ucs4(&ucs, "a", &sz));
+    CuAssertIntEquals(tc, 'a', ucs);
+    CuAssertIntEquals(tc, 1, sz);
+}
+
 CuSuite *get_unicode_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_unicode_tolower);
     SUITE_ADD_TEST(suite, test_unicode_trim);
     SUITE_ADD_TEST(suite, test_unicode_utf8_to_other);
+    SUITE_ADD_TEST(suite, test_unicode_utf8_to_ucs);
     return suite;
 }
