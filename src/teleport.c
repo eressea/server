@@ -185,9 +185,7 @@ plane *get_astralplane(void)
     if (!rule_astralplane) {
         return NULL;
     }
-    if (!astralspace) {
-        astralspace = getplanebyname("Astralraum");
-    }
+    astralspace = getplanebyname("Astralraum");
     if (!astralspace) {
         astralspace = create_new_plane(1, "Astralraum",
             TE_CENTER_X - 500, TE_CENTER_X + 500,

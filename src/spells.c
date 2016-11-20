@@ -3237,8 +3237,7 @@ static int sp_magicboost(castorder * co)
     }
 
     effect = 6;
-    c = create_curse(mage, &mage->attribs, ct_magicboost, power, 10, effect, 1);
-
+    create_curse(mage, &mage->attribs, ct_magicboost, power, 10, effect, 1);
     /* one aura boost with 200% aura now: */
     effect = 200;
     c = create_curse(mage, &mage->attribs, ct_auraboost, power, 4, effect, 1);
@@ -4031,7 +4030,7 @@ static int sp_recruit(castorder * co)
      * ein mehrfaches von Stufe 1, denn in beiden Faellen gibt es nur 1
      * Bauer, nur die Kosten steigen. */
     n = (pow(force, 1.6) * 100) / f->race->recruitcost;
-    if (rc->recruit_multi != 0) {
+    if (rc->recruit_multi > 0) {
         double multp = (double)maxp / rc->recruit_multi;
         n = _min(multp, n);
         n = _max(n, 1);

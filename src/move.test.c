@@ -273,10 +273,10 @@ void setup_drift (struct drift_fixture *fix) {
     fix->st_boat->cabins = 20000;
 
     fix->u = test_create_unit(fix->f = test_create_faction(0), fix->r=findregion(-1,0));
-    assert(fix->r);
+    assert(fix->r && fix->u && fix->f);
     set_level(fix->u, SK_SAILING, fix->st_boat->sumskill);
     u_set_ship(fix->u, fix->sh = test_create_ship(fix->u->region, fix->st_boat));
-    assert(fix->f && fix->u && fix->sh);
+    assert(fix->sh);
 }
 
 static void test_ship_no_overload(CuTest *tc) {

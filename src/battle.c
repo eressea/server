@@ -1022,16 +1022,15 @@ static int armor_bonus(const race *rc) {
 int natural_armor(unit * du)
 {
     const race *rc = u_race(du);
-    int bonus, an = rc->armor;
+    int an;
 
     assert(rc);
-    bonus = armor_bonus(rc);
-    if (bonus > 0) {
+    an = armor_bonus(rc);
+    if (an > 0) {
         int sk = effskill(du, SK_STAMINA, 0);
-        sk /= bonus;
-        an += sk;
+        return rc->armor + sk / an;
     }
-    return an;
+    return rc->armor;
 }
 
 static int rc_specialdamage(const unit *au, const unit *du, const struct weapon_type *wtype)
@@ -2042,19 +2041,12 @@ int hits(troop at, troop dt, weapon * awp)
 void dazzle(battle * b, troop * td)
 {
     /* Nicht kumulativ ! */
-    if (td->fighter->person[td->index].flags & FL_DAZZLED)
-        return;
-
 #ifdef TODO_RUNESWORD
     if (td->fighter->weapon[WP_RUNESWORD].count > td->index) {
         return;
     }
 #endif
-    if (td->fighter->person[td->index].flags & FL_COURAGE) {
-        return;
-    }
-
-    if (td->fighter->person[td->index].flags & FL_DAZZLED) {
+    if (td->fighter->person[td->index].flags & (FL_COURAGE|FL_DAZZLED)) {
         return;
     }
 
@@ -2497,7 +2489,7 @@ static int loot_quota(const unit * src, const unit * dst,
 {
     if (dst && src && src->faction != dst->faction) {
         double divisor = config_get_flt("rules.items.loot_divisor", 1);
-        assert(divisor == 0 || divisor >= 1);
+        assert(divisor <= 0 || divisor >= 1);
         if (divisor >= 1) {
             double r = n / divisor;
             int x = (int)r;

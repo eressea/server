@@ -81,10 +81,11 @@ void test_upkeep_from_pool(CuTest * tc)
     i_silver = it_find("money");
     assert(i_silver);
     r = findregion(0, 0);
+    assert(r);
     u1 = test_create_unit(test_create_faction(test_create_race("human")), r);
 	assert(u1);
     u2 = test_create_unit(u1->faction, r);
-    assert(r && u1 && u2);
+    assert(u2);
 
     config_set("rules.food.flags", "0");
     i_change(&u1->items, i_silver, 30);

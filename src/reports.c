@@ -489,13 +489,14 @@ size_t size)
     building *b;
     bool isbattle = (bool)(mode == seen_battle);
     item *itm, *show = NULL;
-    faction *fv = visible_faction(f, u);
+    faction *fv;
     char *bufp = buf;
     int result = 0;
     item results[MAX_INVENTORY];
 
+    assert(f);
     bufp = STRLCPY(bufp, unitname(u), size);
-
+    fv = visible_faction(f, u);
     if (!isbattle) {
         attrib *a_otherfaction = a_find(u->attribs, &at_otherfaction);
         if (u->faction == f) {
@@ -770,7 +771,7 @@ size_t size)
     }
 
     dh = 0;
-    if (!getarnt && f) {
+    if (!getarnt) {
         if (alliedfaction(rplane(u->region), f, fv, HELP_ALL)) {
             dh = 1;
         }
