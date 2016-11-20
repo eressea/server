@@ -741,10 +741,15 @@ int cmp_current_owner(const building * b, const building * a)
             int oldsize = buildingeffsize(a, false);
             double oldtaxes = a->type->taxes(a, oldsize);
 
-            if (newtaxes != oldtaxes)
-                return (newtaxes > oldtaxes) ? 1 : -1;
-            if (newsize != oldsize)
+            if (newtaxes > oldtaxes) {
+                return 1;
+            }
+            if (newtaxes < oldtaxes) {
+                return -1;
+            }
+            if (newsize != oldsize) {
                 return newsize - oldsize;
+            }
             return (b->size - a->size);
         }
         else {
@@ -944,7 +949,7 @@ int entertainmoney(const region * r)
         return 0;
     }
 
-    n = rmoney(r) / ENTERTAINFRACTION;
+    n = rmoney(r) / (double)ENTERTAINFRACTION;
 
     if (is_cursed(r->attribs, C_GENEROUS, 0)) {
         n *= get_curseeffect(r->attribs, C_GENEROUS, 0);

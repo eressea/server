@@ -765,7 +765,7 @@ bool missile)
         skill += CavalryBonus(tu, enemy, BONUS_SKILL);
         if (wtype)
             skill =
-            skillmod(urace(tu)->attribs, tu, tu->region, wtype->skill, skill,
+            skillmod(u_race(tu)->attribs, tu, tu->region, wtype->skill, skill,
             SMF_RIDING);
     }
 

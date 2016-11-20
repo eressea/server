@@ -76,16 +76,12 @@ bool monster_is_waiting(const unit * u)
 static void eaten_by_monster(unit * u)
 {
     /* adjustment for smaller worlds */
-    static double multi = 0.0;
+    double multi = RESOURCE_QUANTITY * newterrain(T_PLAIN)->size / 10000.0;
     int n = 0;
     int horse = -1;
     const resource_type *rhorse = get_resourcetype(R_HORSE);
     const race *rc = u_race(u);
     attrib *a;
-
-    if (multi == 0.0) {
-        multi = RESOURCE_QUANTITY * newterrain(T_PLAIN)->size / 10000.0;
-    }
 
     a = a_find(rc->attribs, &at_scare);
     if (a) {

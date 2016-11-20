@@ -1730,7 +1730,7 @@ static void rpline(struct stream *out)
         memset(line, '-', sizeof(line));
         line[REPORTWIDTH] = '\n';
     }
-    swrite(line, sizeof(char), sizeof(line), out);
+    swrite(line, sizeof(line), 1, out);
 }
 
 static void list_address(struct stream *out, const faction * uf, quicklist * seenfactions)

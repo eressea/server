@@ -114,10 +114,9 @@ struct order *ord)
     const resource_type *rt_crystal = NULL;
     int i;
 
-    if (rt_crystal == NULL) {
-        rt_crystal = rt_find("antimagic");
-        assert(rt_crystal != NULL);
-    }
+    rt_crystal = rt_find("antimagic");
+    assert(rt_crystal != NULL);
+
     for (i = 0; i != amount; ++i) {
         int effect, duration = 2;
         double force;

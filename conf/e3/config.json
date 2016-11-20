@@ -1,9 +1,9 @@
 {
-	"include": [
-		"keywords.json",
+    "include": [
+        "keywords.json",
         "prefixes.json",
         "e3/terrains.json"
-	],
+    ],
     "disabled": [
         "herbalism",
         "alchemy",

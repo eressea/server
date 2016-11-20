@@ -825,7 +825,7 @@ double destr_curse(curse * c, int cast_level, double force)
                 c->type->change_vigour(c, -(cast_level + 1) / 2);
             }
             else {
-                c->vigour -= cast_level + 1 / 2;
+                c->vigour -= (cast_level + 1) / 2.0;
             }
         }
     }

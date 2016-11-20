@@ -29,7 +29,7 @@ static void test_unicode_trim(CuTest * tc)
     CuAssertIntEquals(tc, 3, unicode_utf8_trim(buffer));
     CuAssertStrEquals(tc, "Hello Word", buffer);
 
-    buffer[9] = (char)0xc3;
+    buffer[9] = -61;
     CuAssertIntEquals(tc, 1, unicode_utf8_trim(buffer));
     CuAssertStrEquals(tc, "Hello Wor?", buffer);
 }

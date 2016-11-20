@@ -648,7 +648,7 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
                  * verfügbaren Fläche ab. In Gletschern gibt es weniger
                  * Möglichkeiten als in Ebenen. */
                 sprout = 0;
-                seedchance = (1000 * region_maxworkers(r2)) / r2->terrain->size;
+                seedchance = (1000 * region_maxworkers(r2)) / (double)r2->terrain->size;
                 for (i = 0; i < seeds / MAXDIRECTIONS; i++) {
                     if (rng_int() % 10000 < seedchance)
                         sprout++;
@@ -3636,7 +3636,7 @@ int pay_cmd(unit * u, struct order *ord)
 static int reserve_i(unit * u, struct order *ord, int flags)
 {
     char token[128];
-    if (u->number > 0 && (urace(u)->ec_flags & GETITEM)) {
+    if (u->number > 0 && (u_race(u)->ec_flags & GETITEM)) {
         int use, count, para;
         const item_type *itype;
         const char *s;
@@ -3945,7 +3945,7 @@ int armedmen(const unit * u, bool siege_weapons)
 {
     item *itm;
     int n = 0;
-    if (!(urace(u)->flags & RCF_NOWEAPONS)) {
+    if (!(u_race(u)->flags & RCF_NOWEAPONS)) {
         if (effskill(u, SK_WEAPONLESS, 0) >= 1) {
             /* kann ohne waffen bewachen: fuer drachen */
             n = u->number;

@@ -827,7 +827,7 @@ int writepasswd(void)
         log_info("writing passwords...");
 
         for (f = factions; f; f = f->next) {
-            fprintf(F, "%s:%s:%s:%u\n",
+            fprintf(F, "%s:%s:%s:%d\n",
                 itoa36(f->no), f->email, f->_password, f->subscription);
         }
         fclose(F);
