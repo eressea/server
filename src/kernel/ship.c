@@ -297,10 +297,9 @@ int crew_skill(const ship *sh) {
 
 int shipspeed(const ship * sh, const unit * u)
 {
-    int k = sh->type->range;
     attrib *a;
     struct curse *c;
-    int bonus;
+    int k, bonus;
 
     assert(sh);
     if (!u) u = ship_owner(sh);
@@ -310,6 +309,7 @@ int shipspeed(const ship * sh, const unit * u)
     assert(sh->type->construction);
     assert(sh->type->construction->improvement == NULL);  /* sonst ist construction::size nicht ship_type::maxsize */
 
+    k = sh->type->range;
     if (sh->size != sh->type->construction->maxsize)
         return 0;
 
@@ -417,7 +417,7 @@ static unit * ship_owner_ex(const ship * sh, const struct faction * last_owner)
 {
     unit *u, *heir = 0;
 
-    /* Eigentümer tot oder kein Eigentümer vorhanden. Erste lebende Einheit
+    /* Eigentï¿½mer tot oder kein Eigentï¿½mer vorhanden. Erste lebende Einheit
       * nehmen. */
     for (u = sh->region->units; u; u = u->next) {
         if (u->ship == sh) {

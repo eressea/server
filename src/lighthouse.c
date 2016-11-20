@@ -16,7 +16,7 @@
 
 const attrib_type at_lighthouse = {
     "lighthouse"
-    /* Rest ist NULL; temporäres, nicht alterndes Attribut */
+    /* Rest ist NULL; temporï¿½res, nicht alterndes Attribut */
 };
 
 /* update_lighthouse: call this function whenever the size of a lighthouse changes
@@ -127,7 +127,7 @@ bool check_leuchtturm(region * r, faction * f)
                         c += u->number;
                         if (c > buildingcapacity(b))
                             break;
-                        if (f == NULL || u->faction == f) {
+                        if (u->faction == f) {
                             if (!d)
                                 d = distance(r, r2);
                             if (maxd < d)

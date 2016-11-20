@@ -1240,9 +1240,9 @@ static bool roadto(const region * r, direction_t dir)
     if (!r || dir >= MAXDIRECTIONS || dir < 0)
         return false;
     r2 = rconnect(r, dir);
-    if (r == NULL || r2 == NULL)
+    if (!r2) {
         return false;
-
+    }
     if (r->attribs || r2->attribs) {
         const curse_type *roads_ct = ct_find("magicstreet");
         if (roads_ct != NULL) {

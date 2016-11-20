@@ -75,3 +75,4 @@ CuSuite *get_messages_suite(void) {
     SUITE_ADD_TEST(suite, test_message);
     return suite;
 }
+
