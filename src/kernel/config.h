@@ -147,7 +147,6 @@ struct param;
 
     struct order *default_order(const struct locale *lang);
 
-    int entertainmoney(const struct region *r);
     void init_parameters(struct locale *lang);
 
     void free_gamedata(void);

@@ -112,6 +112,23 @@ static void recruit_init(void)
     }
 }
 
+int entertainmoney(const region * r)
+{
+    double n;
+
+    if (is_cursed(r->attribs, C_DEPRESSION, 0)) {
+        return 0;
+    }
+
+    n = rmoney(r) / (double)ENTERTAINFRACTION;
+
+    if (is_cursed(r->attribs, C_GENEROUS, 0)) {
+        n *= get_curseeffect(r->attribs, C_GENEROUS, 0);
+    }
+
+    return (int)n;
+}
+
 int income(const unit * u)
 {
     const race *rc = u_race(u);

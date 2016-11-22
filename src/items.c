@@ -1,8 +1,8 @@
 #include <platform.h>
-#include <kernel/config.h>
 #include "items.h"
 
 #include "study.h"
+#include "economy.h"
 #include "move.h"
 #include "magic.h"
 
@@ -137,7 +137,7 @@ struct order *ord)
         while (*ap && force > 0) {
             curse *c;
             attrib *a = *ap;
-            if (!fval(a->type, ATF_CURSE)) {
+            if (!(a->type->flags & ATF_CURSE)) {
                 do {
                     ap = &(*ap)->next;
                 } while (*ap && a->type == (*ap)->type);

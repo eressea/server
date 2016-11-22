@@ -941,23 +941,6 @@ order *default_order(const struct locale *lang)
     return result ? copy_order(result) : 0;
 }
 
-int entertainmoney(const region * r)
-{
-    double n;
-
-    if (is_cursed(r->attribs, C_DEPRESSION, 0)) {
-        return 0;
-    }
-
-    n = rmoney(r) / (double)ENTERTAINFRACTION;
-
-    if (is_cursed(r->attribs, C_GENEROUS, 0)) {
-        n *= get_curseeffect(r->attribs, C_GENEROUS, 0);
-    }
-
-    return (int)n;
-}
-
 int rule_give(void)
 {
     static int config;
