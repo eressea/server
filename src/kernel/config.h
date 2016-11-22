@@ -83,8 +83,6 @@ struct param;
 #define GIVE_DEFAULT (GIVE_SELF|GIVE_PEASANTS|GIVE_LUXURIES|GIVE_HERBS|GIVE_GOODS)
     int rule_give(void);
 
-    const struct race *findrace(const char *, const struct locale *);
-
     /* grammatik-flags: */
 #define GF_NONE 0
     /* singular, ohne was dran */

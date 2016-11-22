@@ -183,18 +183,6 @@ parse(keyword_t kword, int(*dofun) (unit *, struct order *), bool thisorder)
     }
 }
 
-const struct race *findrace(const char *s, const struct locale *lang)
-{
-    void **tokens = get_translations(lang, UT_RACES);
-    variant token;
-
-    assert(lang);
-    if (tokens && findtoken(*tokens, s, &token) == E_TOK_SUCCESS) {
-        return (const struct race *)token.v;
-    }
-    return NULL;
-}
-
 int findoption(const char *s, const struct locale *lang)
 {
     void **tokens = get_translations(lang, UT_OPTIONS);
