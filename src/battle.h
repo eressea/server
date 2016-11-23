@@ -72,7 +72,7 @@ extern "C" {
         unsigned char relations[MAXSIDES];
         struct side *enemies[MAXSIDES];
         struct fighter *fighters;
-        int index;                  /* Eintrag der Fraktion in b->matrix/b->enemies */
+        unsigned int index;                  /* Eintrag der Fraktion in b->matrix/b->enemies */
         int size[NUMROWS];          /* Anzahl Personen in Reihe X. 0 = Summe */
         int nonblockers[NUMROWS];   /* Anzahl nichtblockierender Kaempfer, z.B. Schattenritter. */
         int alive;                  /* Die Partei hat den Kampf verlassen */

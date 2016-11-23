@@ -915,14 +915,16 @@ static void describe(struct stream *out, const region * r, faction * f)
             bool transparent = b->type->transparent(b, f);
             const char *name = border_name(b, r, f, GF_DETAILED | GF_ARTICLE);
 
-            if (!transparent)
+            if (!transparent) {
                 see[d] = false;
+            }
             if (!see_border(b, f, r)) {
                 b = b->next;
                 continue;
             }
-            while (e && (e->transparent != transparent || strcmp(name, e->name)))
+            while (e && (e->transparent != transparent || strcmp(name, e->name)!=0)) {
                 e = e->next;
+            }
             if (!e) {
                 e = calloc(sizeof(struct edge), 1);
                 e->name = _strdup(name);
@@ -2248,10 +2250,8 @@ report_plaintext(const char *filename, report_context * ctx,
             *bufp = 0;
             centre(out, buf, true);
             newline(out);
-            if (description == NULL) {
-                const char *potiontext = mkname("potion", pname);
-                description = LOC(f->locale, potiontext);
-            }
+            description = mkname("potion", pname);
+            description = LOC(f->locale, description);
             centre(out, description, true);
         }
     }

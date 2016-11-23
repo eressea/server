@@ -69,7 +69,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern struct attrib_type at_unitdissolve;
 
 /* In a->data.ca[1] steht der Prozentsatz mit dem sich die Einheit
- * auflöst, in a->data.ca[0] kann angegeben werden, wohin die Personen
+ * auflï¿½st, in a->data.ca[0] kann angegeben werden, wohin die Personen
  * verschwinden. Passiert bereits in der ersten Runde! */
 static void dissolve_units(void)
 {
@@ -442,12 +442,12 @@ static void melt_iceberg(region * r)
             ADDMSG(&u->faction->msgs, msg_message("iceberg_melt", "region", r));
         }
 
-    /* driftrichtung löschen */
+    /* driftrichtung lï¿½schen */
     a = a_find(r->attribs, &at_iceberg);
     if (a)
         a_remove(&r->attribs, a);
 
-    /* Gebäude löschen */
+    /* Gebï¿½ude lï¿½schen */
     while (r->buildings) {
         remove_building(&r->buildings, r->buildings);
     }
@@ -455,7 +455,7 @@ static void melt_iceberg(region * r)
     /* in Ozean wandeln */
     terraform_region(r, newterrain(T_OCEAN));
 
-    /* Einheiten, die nicht schwimmen können oder in Schiffen sind,
+    /* Einheiten, die nicht schwimmen kï¿½nnen oder in Schiffen sind,
      * ertrinken */
     drown(r);
 }
@@ -519,13 +519,13 @@ static void move_iceberg(region * r)
                 freset(sh, SF_SELECT);
 
             for (sh = r->ships; sh; sh = sh->next) {
-                /* Meldung an Kapitän */
+                /* Meldung an Kapitï¿½n */
                 double dmg = config_get_flt("rules.ship.damage.intoiceberg", 0.1);
                 damage_ship(sh, dmg);
                 fset(sh, SF_SELECT);
             }
 
-            /* Personen, Schiffe und Gebäude verschieben */
+            /* Personen, Schiffe und Gebï¿½ude verschieben */
             while (rc->buildings) {
                 rc->buildings->region = r;
                 translist(&rc->buildings, &r->buildings, rc->buildings);
@@ -544,7 +544,7 @@ static void move_iceberg(region * r)
                 u_set_building(u, b); /* undo leave-prevention */
             }
 
-            /* Beschädigte Schiffe können sinken */
+            /* Beschï¿½digte Schiffe kï¿½nnen sinken */
 
             for (sh = r->ships; sh;) {
                 shn = sh->next;
@@ -725,7 +725,7 @@ static void orc_growth(void)
     }
 }
 
-/** Talente von Dämonen verschieben sich.
+/** Talente von Dï¿½monen verschieben sich.
  */
 static void demon_skillchanges(void)
 {
@@ -760,7 +760,7 @@ static void icebergs(void)
 }
 
 #define HERBS_ROT               /* herbs owned by units have a chance to rot. */
-#define HERBROTCHANCE 5         /* Verrottchance für Kräuter (ifdef HERBS_ROT) */
+#define HERBROTCHANCE 5         /* Verrottchance fï¿½r Krï¿½uter (ifdef HERBS_ROT) */
 #ifdef HERBS_ROT
 static void rotting_herbs(void)
 {

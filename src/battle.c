@@ -3984,7 +3984,7 @@ static bool start_battle(region * r, battle ** bp)
                         while (a && a->type == &at_curse) {
                             curse *c = (curse *)a->data.v;
                             if (c->type == calm_ct
-                                && curse_geteffect(c) == u2->faction->subscription) {
+                                && curse_geteffect_int(c) == u2->faction->subscription) {
                                 if (curse_active(c)) {
                                     calm = true;
                                     break;
@@ -4275,9 +4275,7 @@ void do_battle(region * r)
     /* Hier ist das Gefecht beendet, und wir k�nnen die
      * Hilfsstrukturen * wieder l�schen: */
 
-    if (b) {
-        free_battle(b);
-    }
+    free_battle(b);
 }
 
 void do_battles(void) {

@@ -295,7 +295,7 @@ static void a_initeffect(attrib * a)
     a->data.v = calloc(sizeof(effect_data), 1);
 }
 
-static void a_finalizeeffect(attrib * a)
+static void a_finalizeeffect(attrib * a) //-V524
 {
     free(a->data.v);
 }
