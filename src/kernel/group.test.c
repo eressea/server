@@ -82,7 +82,7 @@ static void test_group_readwrite(CuTest * tc)
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
     f = test_create_faction(0);
-    g = new_group(f, "NW", 42);
+    new_group(f, "NW", 42);
     g = new_group(f, "Egoisten", 43);
     key_set(&g->attribs, 44);
     al = ally_add(&g->allies, f);

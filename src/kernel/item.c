@@ -239,7 +239,6 @@ item_type *it_get_or_create(resource_type *rtype) {
     item_type * itype;
     assert(rtype);
     itype = it_find(rtype->_name);
-    assert(!itype || !itype->rtype || itype->rtype == rtype);
     if (!itype) {
         itype = (item_type *)calloc(sizeof(item_type), 1);
     }

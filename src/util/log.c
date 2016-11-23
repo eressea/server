@@ -220,7 +220,7 @@ void log_fatal(const char *format, ...)
     va_end(args);
 }
 
-void log_error(const char *format, ...)
+void log_error(const char *format, ...) //-V524
 {
     va_list args;
     va_start(args, format);

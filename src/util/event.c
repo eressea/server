@@ -244,7 +244,7 @@ void tt_register(trigger_type * tt)
 trigger_type *tt_find(const char *name)
 {
     trigger_type *tt = triggertypes;
-    while (tt && strcmp(tt->name, name))
+    while (tt && strcmp(tt->name, name)!=0)
         tt = tt->next;
     return tt;
 }

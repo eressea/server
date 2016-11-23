@@ -756,9 +756,7 @@ static int tolua_unit_get_spells(lua_State * L)
     quicklist *slist = 0;
     if (sb) {
         quicklist **slist_ptr = &sb->spells;
-        if (slist_ptr) {
-            slist = *slist_ptr;
-        }
+        slist = *slist_ptr;
     }
     return tolua_quicklist_push(L, "spellbook", "spell_entry", slist);
 }

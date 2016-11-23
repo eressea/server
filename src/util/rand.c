@@ -103,13 +103,13 @@ void random_source_inject_constant(double value) {
     r_source = &constant_provider;
 }
 
-static int i = 0;
 static double *values;
-static int value_size = 0;
+static int value_size;
+static int value_index;
 
 static double array_source (void) {
-    assert(i<value_size);
-    return values[i++];
+    assert(value_index<value_size);
+    return values[value_index++];
 }
 
 struct random_source array_provider = {
@@ -117,6 +117,7 @@ struct random_source array_provider = {
 };
 
 void random_source_inject_array(double inject[], int size) {
+    int i;
     assert(size > 0);
     value_size = size;
     if (values)
@@ -125,7 +126,7 @@ void random_source_inject_array(double inject[], int size) {
     for (i=0; i < size; ++i) {
         values[i] = inject[i];
     }
-    i = 0;
+    value_index = 0;
     r_source = &array_provider;
 }
 
