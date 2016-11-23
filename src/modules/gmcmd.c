@@ -19,7 +19,6 @@
 #include <items/demonseye.h>
 #include <attributes/key.h>
 #include <triggers/gate.h>
-#include <triggers/unguard.h>
 
 /* kernel includes */
 #include <kernel/building.h>
