@@ -249,7 +249,7 @@ int destroy_cmd(unit * u, struct order *ord)
     }
 
     if (con) {
-        /* TODO: Nicht an ZERSTÖRE mit Punktangabe angepasst! */
+        /* TODO: Nicht an ZERSTï¿½RE mit Punktangabe angepasst! */
         int c;
         for (c = 0; con->materials[c].number; ++c) {
             const requirement *rq = con->materials + c;
@@ -513,8 +513,8 @@ int build(unit * u, const construction * ctype, int completed, int want)
 
         /*  Hier ist entweder maxsize == -1, oder completed < maxsize.
          *  Andernfalls ist das Datenfile oder sonstwas kaputt...
-         *  (enno): Nein, das ist für Dinge, bei denen die nächste Ausbaustufe
-         *  die gleiche wie die vorherige ist. z.b. gegenstände.
+         *  (enno): Nein, das ist fï¿½r Dinge, bei denen die nï¿½chste Ausbaustufe
+         *  die gleiche wie die vorherige ist. z.b. gegenstï¿½nde.
          */
         if (type->maxsize > 0) {
             completed = completed % type->maxsize;
@@ -759,10 +759,8 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
                 return 0;
             }
         }
-    }
-
-    if (b)
         built = b->size;
+    }
     if (n <= 0 || n == INT_MAX) {
         if (b == NULL) {
             if (btype->maxsize > 0) {
@@ -817,11 +815,11 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
     btname = LOC(lang, btype->_name);
 
     if (want - built <= 0) {
-        /* gebäude fertig */
+        /* gebï¿½ude fertig */
         new_order = default_order(lang);
     }
     else if (want != INT_MAX && btname) {
-        /* reduzierte restgröße */
+        /* reduzierte restgrï¿½ï¿½e */
         const char *hasspace = strchr(btname, ' ');
         if (hasspace) {
             new_order =
@@ -833,7 +831,7 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
         }
     }
     else if (btname) {
-        /* Neues Haus, Befehl mit Gebäudename */
+        /* Neues Haus, Befehl mit Gebï¿½udename */
         const char *hasspace = strchr(btname, ' ');
         if (hasspace) {
             new_order = create_order(K_MAKE, lang, "\"%s\" %i", btname, b->no);

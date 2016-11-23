@@ -184,7 +184,7 @@ map_region *mr_get(const view * vi, int xofs, int yofs)
 static point *coor2point(const coordinate * c, point * p)
 {
     assert(c && p);
-    p->x = c->x * TWIDTH + c->y * TWIDTH / 2;
+    p->x = c->x * TWIDTH + c->y * TWIDTH / 2; //-V537
     p->y = c->y * THEIGHT;
     return p;
 }
@@ -262,7 +262,7 @@ static chtype mr_tile(const map_region * mr, int highlight)
         const region *r = mr->r;
         switch (r->terrain->_name[0]) {
         case 'o':
-            return '.' | COLOR_PAIR(hl + COLOR_CYAN) | A_BOLD;
+            return '.' | COLOR_PAIR(hl + COLOR_CYAN) | A_BOLD; //-V525
         case 'd':
             return 'D' | COLOR_PAIR(hl + COLOR_YELLOW) | A_BOLD;
         case 't':
@@ -1167,7 +1167,7 @@ static void handlekey(state * st, int c)
             region *first = (mr && mr->r && mr->r->next) ? mr->r->next : regions;
 
             if (findmode == 'f') {
-                sprintf(sbuffer, "find-faction: %s", locate);
+                snprintf(sbuffer, sizeof(sbuffer), "find-faction: %s", locate);
                 statusline(st->wnd_status->handle, sbuffer);
                 f = findfaction(atoi36(locate));
                 if (f == NULL) {

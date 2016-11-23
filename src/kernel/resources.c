@@ -46,7 +46,7 @@ extern int dice_rand(const char *s);
 
 static void update_resource(struct rawmaterial *res, double modifier)
 {
-    double amount = 1 + (res->level - res->startlevel) * res->divisor / 100.0;
+    double amount = (res->level - res->startlevel) / 100.0 * res->divisor + 1;
     amount = ResourceFactor() * res->base * amount * modifier;
     if (amount < 1.0)
         res->amount = 1;

@@ -220,7 +220,7 @@ void report_summary(summary * s, summary * o, bool full)
     fprintf(F, " Helden:               %s\n", pcomp(s->heroes, o->heroes));
 
     if (full) {
-        fprintf(F, "Regionen:              %d\n", listlen(regions));
+        fprintf(F, "Regionen:              %d\n", (int)listlen(regions));
         fprintf(F, "Bewohnte Regionen:     %d\n", s->inhabitedregions);
         fprintf(F, "Landregionen:          %d\n", s->landregionen);
         fprintf(F, "Spielerregionen:       %d\n", s->regionen_mit_spielern);

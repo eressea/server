@@ -917,11 +917,6 @@ bool leave(unit * u, bool force)
     return true;
 }
 
-const struct race *urace(const struct unit *u)
-{
-    return u->_race;
-}
-
 bool can_survive(const unit * u, const region * r)
 {
     if ((fval(r->terrain, WALK_INTO) && (u_race(u)->flags & RCF_WALK))

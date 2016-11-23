@@ -239,7 +239,6 @@ item_type *it_get_or_create(resource_type *rtype) {
     item_type * itype;
     assert(rtype);
     itype = it_find(rtype->_name);
-    assert(!itype || !itype->rtype || itype->rtype == rtype);
     if (!itype) {
         itype = (item_type *)calloc(sizeof(item_type), 1);
     }
@@ -973,7 +972,7 @@ void init_resources(void)
 {
     resource_type *rtype;
 
-    rtype = rt_get_or_create(resourcenames[R_PERSON]); // lousy hack
+    rt_get_or_create(resourcenames[R_PERSON]); // lousy hack
 
     rtype = rt_get_or_create(resourcenames[R_PEASANT]);
     rtype->uchange = res_changepeasants;
@@ -1204,7 +1203,7 @@ void read_items(struct storage *store, item ** ilist)
         itype = it_find(ibuf);
         READ_INT(store, &i);
         if (i <= 0) {
-            log_error("data contains an entry with %d %s", i, resourcename(itype->rtype, NMF_PLURAL));
+            log_error("data contains an entry with %d %s", i, ibuf);
         }
         else {
             if (itype && itype->rtype) {

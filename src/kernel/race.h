@@ -44,6 +44,7 @@ extern "C" {
 
     struct param;
     struct spell;
+    struct locale;
 
     extern int num_races;
 
@@ -163,6 +164,7 @@ extern "C" {
     void racelist_clear(struct race_list **rl);
     void racelist_insert(struct race_list **rl, const struct race *r);
 
+    const struct race *findrace(const char *, const struct locale *);
 
     struct race_list *get_familiarraces(void);
     struct race *races;

@@ -97,7 +97,7 @@ static request *nextentertainer;
 static int entertaining;
 
 static unsigned int norders;
-static request *oa;
+static request *g_requests;
 
 #define RECRUIT_MERGE 1
 static int rules_recruit = -1;
@@ -110,6 +110,23 @@ static void recruit_init(void)
             rules_recruit |= RECRUIT_MERGE;
         }
     }
+}
+
+int entertainmoney(const region * r)
+{
+    double n;
+
+    if (is_cursed(r->attribs, C_DEPRESSION, 0)) {
+        return 0;
+    }
+
+    n = rmoney(r) / (double)ENTERTAINFRACTION;
+
+    if (is_cursed(r->attribs, C_GENEROUS, 0)) {
+        n *= get_curseeffect(r->attribs, C_GENEROUS, 0);
+    }
+
+    return (int)n;
 }
 
 int income(const unit * u)
@@ -154,21 +171,21 @@ static void expandorders(region * r, request * requests)
 
     if (norders > 0) {
         int i = 0;
-        oa = (request *)calloc(norders, sizeof(request));
+        g_requests = (request *)calloc(norders, sizeof(request));
         for (o = requests; o; o = o->next) {
             if (o->qty > 0) {
                 unsigned int j;
                 for (j = o->qty; j; j--) {
-                    oa[i] = *o;
-                    oa[i].unit->n = 0;
+                    g_requests[i] = *o;
+                    g_requests[i].unit->n = 0;
                     i++;
                 }
             }
         }
-        scramble(oa, norders, sizeof(request));
+        scramble(g_requests, norders, sizeof(request));
     }
     else {
-        oa = NULL;
+        g_requests = NULL;
     }
     while (requests) {
         request *o = requests->next;
@@ -1458,16 +1475,16 @@ static void expandbuying(region * r, request * buyorders)
 
         for (j = 0; j != norders; j++) {
             int price, multi;
-            ltype = oa[j].type.ltype;
+            ltype = g_requests[j].type.ltype;
             trade = trades;
             while (trade->type != ltype)
                 ++trade;
             multi = trade->multi;
             price = ltype->price * multi;
 
-            if (get_pooled(oa[j].unit, rsilver, GET_DEFAULT,
+            if (get_pooled(g_requests[j].unit, rsilver, GET_DEFAULT,
                 price) >= price) {
-                unit *u = oa[j].unit;
+                unit *u = g_requests[j].unit;
                 item *items;
 
                 /* litems zählt die Güter, die verkauft wurden, u->n das Geld, das
@@ -1481,7 +1498,7 @@ static void expandbuying(region * r, request * buyorders)
                 items = a->data.v;
                 i_change(&items, ltype->itype, 1);
                 a->data.v = items;
-                i_change(&oa[j].unit->items, ltype->itype, 1);
+                i_change(&g_requests[j].unit->items, ltype->itype, 1);
                 use_pooled(u, rsilver, GET_DEFAULT, price);
                 if (u->n < 0)
                     u->n = 0;
@@ -1499,7 +1516,7 @@ static void expandbuying(region * r, request * buyorders)
                 fset(u, UFL_LONGACTION | UFL_NOTMOVING);
             }
         }
-        free(oa);
+        free(g_requests);
 
         /* Ausgabe an Einheiten */
 
@@ -1736,7 +1753,7 @@ static void expandselling(region * r, request * sellorders, int limit)
 
     for (j = 0; j != norders; j++) {
         const luxury_type *search = NULL;
-        const luxury_type *ltype = oa[j].type.ltype;
+        const luxury_type *ltype = g_requests[j].type.ltype;
         int multi = r_demand(r, ltype);
         int i;
         int use = 0;
@@ -1753,7 +1770,7 @@ static void expandselling(region * r, request * sellorders, int limit)
         if (money >= price) {
             int abgezogenhafen = 0;
             int abgezogensteuer = 0;
-            unit *u = oa[j].unit;
+            unit *u = g_requests[j].unit;
             item *itm;
             attrib *a = a_find(u->attribs, &at_luxuries);
             if (a == NULL)
@@ -1801,10 +1818,10 @@ static void expandselling(region * r, request * sellorders, int limit)
             }
         }
         if (use > 0) {
-            use_pooled(oa[j].unit, ltype->itype->rtype, GET_DEFAULT, use);
+            use_pooled(g_requests[j].unit, ltype->itype->rtype, GET_DEFAULT, use);
         }
     }
-    free(oa);
+    free(g_requests);
 
     /* Steuern. Hier werden die Steuern dem Besitzer der größten Burg gegeben. */
     if (maxowner) {
@@ -1928,7 +1945,7 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
     s = gettoken(token, sizeof(token));
     itype = s ? finditemtype(s, u->faction->locale) : 0;
     ltype = itype ? resource2luxury(itype->rtype) : 0;
-    if (ltype == NULL) {
+    if (ltype == NULL || itype == NULL) {
         cmistake(u, ord, 126, MSG_COMMERCE);
         return false;
     }
@@ -2010,8 +2027,8 @@ static void expandstealing(region * r, request * stealorders)
      * u ist die beklaute unit. oa.unit ist die klauende unit.
      */
 
-    for (j = 0; j != norders && oa[j].unit->n <= oa[j].unit->wants; j++) {
-        unit *u = findunitg(oa[j].no, r);
+    for (j = 0; j != norders && g_requests[j].unit->n <= g_requests[j].unit->wants; j++) {
+        unit *u = findunitg(g_requests[j].no, r);
         int n = 0;
         if (u && u->region == r) {
             n = get_pooled(u, rsilver, GET_ALL, INT_MAX);
@@ -2035,17 +2052,17 @@ static void expandstealing(region * r, request * stealorders)
             n = 10;
         }
         if (n > 0) {
-            n = _min(n, oa[j].unit->wants);
+            n = _min(n, g_requests[j].unit->wants);
             use_pooled(u, rsilver, GET_ALL, n);
-            oa[j].unit->n = n;
-            change_money(oa[j].unit, n);
+            g_requests[j].unit->n = n;
+            change_money(g_requests[j].unit, n);
             ADDMSG(&u->faction->msgs, msg_message("stealeffect", "unit region amount",
                 u, u->region, n));
         }
-        add_income(oa[j].unit, IC_STEAL, oa[j].unit->wants, oa[j].unit->n);
-        fset(oa[j].unit, UFL_LONGACTION | UFL_NOTMOVING);
+        add_income(g_requests[j].unit, IC_STEAL, g_requests[j].unit->wants, g_requests[j].unit->n);
+        fset(g_requests[j].unit, UFL_LONGACTION | UFL_NOTMOVING);
     }
-    free(oa);
+    free(g_requests);
 }
 
 /* ------------------------------------------------------------- */
@@ -2060,14 +2077,14 @@ static void plant(unit * u, int raw)
     if (!fval(r->terrain, LAND_REGION)) {
         return;
     }
-    if (rherbtype(r) == NULL) {
+    itype = rherbtype(r);
+    if (itype == NULL) {
         cmistake(u, u->thisorder, 108, MSG_PRODUCE);
         return;
     }
 
     /* Skill prüfen */
     skill = effskill(u, SK_HERBALISM, 0);
-    itype = rherbtype(r);
     if (skill < 6) {
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "plant_skills",
@@ -2702,13 +2719,13 @@ static void expandloot(region * r, request * lootorders)
         return;
 
     for (i = 0; i != norders && startmoney > looted + TAXFRACTION * 2; i++) {
-        change_money(oa[i].unit, TAXFRACTION);
-        oa[i].unit->n += TAXFRACTION;
+        change_money(g_requests[i].unit, TAXFRACTION);
+        g_requests[i].unit->n += TAXFRACTION;
         /*Looting destroys double the money*/
         looted += TAXFRACTION * 2;
     }
     rsetmoney(r, startmoney - looted);
-    free(oa);
+    free(g_requests);
 
     /* Lowering morale by 1 depending on the looted money (+20%) */
     if (rng_int() % 100 < 20 + (looted * 80) / startmoney) {
@@ -2737,11 +2754,11 @@ void expandtax(region * r, request * taxorders)
         return;
 
     for (i = 0; i != norders && rmoney(r) > TAXFRACTION; i++) {
-        change_money(oa[i].unit, TAXFRACTION);
-        oa[i].unit->n += TAXFRACTION;
+        change_money(g_requests[i].unit, TAXFRACTION);
+        g_requests[i].unit->n += TAXFRACTION;
         rsetmoney(r, rmoney(r) - TAXFRACTION);
     }
-    free(oa);
+    free(g_requests);
 
     for (u = r->units; u; u = u->next) {
         if (u->n >= 0) {
@@ -2939,9 +2956,10 @@ static void peasant_taxes(region * r)
     maxsize = buildingeffsize(b, false);
     if (maxsize > 0) {
         double taxfactor = money * b->type->taxes(b, maxsize);
-        double morale = money * region_get_morale(r) * MORALE_TAX_FACTOR;
-        if (taxfactor > morale)
+        double morale = MORALE_TAX_FACTOR * money * region_get_morale(r);
+        if (taxfactor > morale) {
             taxfactor = morale;
+        }
         if (taxfactor > 0) {
             int taxmoney = (int)taxfactor;
             change_money(u, taxmoney);

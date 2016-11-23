@@ -720,7 +720,7 @@ size_t size)
             }
         }
         if (!isbattle) {
-            bool printed = 0;
+            int printed = 0;
             order *ord;;
             for (ord = u->old_orders; ord; ord = ord->next) {
                 keyword_t kwd = getkeyword(ord);
@@ -1587,7 +1587,7 @@ static void var_free_resources(variant x)
     x.v = 0;
 }
 
-static void var_free_regions(variant x)
+static void var_free_regions(variant x) //-V524
 {
     free(x.v);
 }
@@ -1716,18 +1716,6 @@ static void eval_curse(struct opstack **stack, const void *userdata)
     opush(stack, var);
 }
 
-static void eval_unitname(struct opstack **stack, const void *userdata)
-{                               /* unit -> string */
-    const struct faction *f = (const struct faction *)userdata;
-    const struct unit *u = (const struct unit *)opop(stack).v;
-    const char *c = u ? unit_getname(u) : LOC(f->locale, "an_unknown_unit");
-    size_t len = strlen(c);
-    variant var;
-
-    var.v = strcpy(balloc(len + 1), c);
-    opush(stack, var);
-}
-
 static void eval_unitid(struct opstack **stack, const void *userdata)
 {                               /* unit -> int */
     const struct faction *f = (const struct faction *)userdata;
@@ -1836,16 +1824,16 @@ static void eval_weight(struct opstack **stack, const void *userdata)
             sprintf(buffer, "1 %s", LOC(lang, "weight_unit"));
         }
         else {
-            sprintf(buffer, "%u %s", weight / SCALEWEIGHT, LOC(lang,
+            sprintf(buffer, "%d %s", weight / SCALEWEIGHT, LOC(lang,
                 "weight_unit_p"));
         }
     }
     else {
         if (weight == 1) {
-            sprintf(buffer, "1 %s %u", LOC(lang, "weight_per"), SCALEWEIGHT);
+            sprintf(buffer, "1 %s %d", LOC(lang, "weight_per"), SCALEWEIGHT);
         }
         else {
-            sprintf(buffer, "%u %s %u", weight, LOC(lang, "weight_per_p"),
+            sprintf(buffer, "%d %s %d", weight, LOC(lang, "weight_per_p"),
                 SCALEWEIGHT);
         }
     }
@@ -2136,7 +2124,6 @@ void register_reports(void)
     add_function("ship", &eval_ship);
     add_function("unit", &eval_unit);
     add_function("unit.dative", &eval_unit_dative);
-    add_function("unit.name", &eval_unitname);
     add_function("unit.id", &eval_unitid);
     add_function("unit.size", &eval_unitsize);
     add_function("building", &eval_building);

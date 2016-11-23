@@ -137,7 +137,7 @@ int give_quota(const unit * src, const unit * dst, const item_type * type,
     }
     if (dst && src && src->faction != dst->faction) {
         divisor = config_get_flt("rules.items.give_divisor", 1);
-        assert(divisor == 0 || divisor >= 1);
+        assert(divisor <= 0 || divisor >= 1);
         if (divisor >= 1) {
             /* predictable > correct: */
             int x = (int)(n / divisor);
@@ -781,7 +781,7 @@ void give_cmd(unit * u, order * ord)
     }
 
     if (u2 != NULL) {
-        if ((u_race(u)->ec_flags & ECF_KEEP_ITEM) && u2 != NULL) {
+        if ((u_race(u)->ec_flags & ECF_KEEP_ITEM)) {
             ADDMSG(&u->faction->msgs,
                 msg_feedback(u, ord, "race_nogive", "race", u_race(u)));
             return;

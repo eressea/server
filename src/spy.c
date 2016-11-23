@@ -17,7 +17,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
 #include <platform.h>
-#include <kernel/config.h>
 #include "spy.h"
 #include "guard.h"
 #include "laws.h"
@@ -26,6 +25,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "study.h"
 
 /* kernel includes */
+#include <kernel/config.h>
 #include <kernel/item.h>
 #include <kernel/faction.h>
 #include <kernel/messages.h>
@@ -44,10 +44,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/bsdstring.h>
 #include <util/parser.h>
-#include <quicklist.h>
 #include <util/rand.h>
 #include <util/rng.h>
+
+#include <quicklist.h>
 
 /* libc includes */
 #include <assert.h>
@@ -98,13 +100,13 @@ void spy_message(int spy, const unit * u, const unit * target)
                     first = 0;
                 }
                 else {
-                    strncat(buf, ", ", sizeof(buf) - 1);
+                    strlcat(buf, ", ", sizeof(buf));
                 }
-                strncat(buf, (const char *)skillname((skill_t)sv->id, u->faction->locale),
-                    sizeof(buf) - 1);
-                strncat(buf, " ", sizeof(buf) - 1);
-                strncat(buf, itoa10(eff_skill(target, sv, target->region)),
-                    sizeof(buf) - 1);
+                strlcat(buf, (const char *)skillname((skill_t)sv->id, u->faction->locale),
+                    sizeof(buf));
+                strlcat(buf, " ", sizeof(buf));
+                strlcat(buf, itoa10(eff_skill(target, sv, target->region)),
+                    sizeof(buf));
             }
         }
         if (found) {
@@ -297,7 +299,7 @@ int setstealth_cmd(unit * u, struct order *ord)
                 break;
             }
             else if (findparam(s, u->faction->locale) == P_NOT) {
-                freset(u, UFL_ANON_FACTION);
+                u->flags |= ~UFL_ANON_FACTION;
                 break;
             }
         }
@@ -414,18 +416,18 @@ static void sink_ship(region * r, ship * sh, unit * saboteur)
         /* slight optimization to avoid dereferencing u->faction each time */
         if (f != u->faction) {
             f = u->faction;
-            freset(f, FFL_SELECT);
+            f->flags |= ~FFL_SELECT;
         }
     }
 
     /* figure out what a unit's chances of survival are: */
-    if (!fval(r->terrain, SEA_REGION)) {
+    if (!(r->terrain->flags & SEA_REGION)) {
         probability = CANAL_SWIMMER_CHANCE;
     }
     else {
         for (d = 0; d != MAXDIRECTIONS; ++d) {
             region *rn = rconnect(r, d);
-            if (rn && !fval(rn->terrain, SEA_REGION) && !move_blocked(NULL, r, rn)) {
+            if (rn && !(rn->terrain->flags & SEA_REGION) && !move_blocked(NULL, r, rn)) {
                 safety = rn;
                 probability = OCEAN_SWIMMER_CHANCE;
                 break;
@@ -436,7 +438,7 @@ static void sink_ship(region * r, ship * sh, unit * saboteur)
         unit *u = *ui;
 
         /* inform this faction about the sinking ship: */
-        if (!fval(u->faction, FFL_SELECT)) {
+        if (!(u->faction->flags & FFL_SELECT)) {
             fset(u->faction, FFL_SELECT);
             if (sink_msg == NULL) {
                 sink_msg = msg_message("sink_msg", "ship region", sh, r);

@@ -695,7 +695,7 @@ static order *plan_dragon(unit * u)
         int attempts = 0;
         skill_t sk = SK_PERCEPTION;
         /* study perception (or a random useful skill) */
-        while ((!skill_enabled(sk) || (attempts < MAXSKILLS && u_race(u)->bonus[sk] < (++attempts < 10?1:-5 )))) {
+        while (!skill_enabled(sk) || (attempts < MAXSKILLS && u_race(u)->bonus[sk] < (++attempts < 10?1:-5 ))) {
             sk = (skill_t)(rng_int() % MAXSKILLS);
         }
         long_order = create_order(K_STUDY, u->faction->locale, "'%s'",

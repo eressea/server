@@ -48,6 +48,7 @@ extern "C" {
     struct request;
 
     int income(const struct unit *u);
+    int entertainmoney(const struct region *r);
 
     void economics(struct region *r);
     void produce(struct region *r);

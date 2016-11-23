@@ -173,7 +173,7 @@ static void a_initicastle(struct attrib *a)
     a->data.v = calloc(sizeof(icastle_data), 1);
 }
 
-static void a_finalizeicastle(struct attrib *a)
+static void a_finalizeicastle(struct attrib *a) //-V524
 {
     free(a->data.v);
 }

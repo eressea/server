@@ -405,8 +405,8 @@ static void test_buildingtype_exists(CuTest * tc)
 
     r = findregion(-1, 0);
     b = new_building(btype, r, default_locale);
-    b->size = 10;
     CuAssertPtrNotNull(tc, b);
+    b->size = 10;
 
     CuAssertTrue(tc, !buildingtype_exists(r, NULL, false));
     CuAssertTrue(tc, !buildingtype_exists(r, btype2, false));

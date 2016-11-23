@@ -60,8 +60,8 @@ extern "C" {
         char *_name;
 
         int flags;                  /* flags */
-        int capacity;               /* Kapazität pro Größenpunkt */
-        int maxcapacity;            /* Max. Kapazität */
+        int capacity;               /* Kapazitï¿½t pro Grï¿½ï¿½enpunkt */
+        int maxcapacity;            /* Max. Kapazitï¿½t */
         int maxsize;                /* how big can it get, with all the extensions? */
         int magres;                 /* how well it resists against spells */
         int magresbonus;            /* bonus it gives the target against spells */
@@ -131,7 +131,17 @@ extern "C" {
         int id, int size, struct order *ord);
     bool building_finished(const struct building *b);
 
-    /* Alte Gebäudetypen: */
+    int wage(const struct region *r, const struct faction *f,
+        const struct race *rc, int in_turn);
+
+    typedef int(*cmp_building_cb) (const struct building * b,
+        const struct building * a);
+    struct building *largestbuilding(const struct region *r, cmp_building_cb,
+        bool imaginary);
+    int cmp_wage(const struct building *b, const struct building *bother);
+    int cmp_taxes(const struct building *b, const struct building *bother);
+    int cmp_current_owner(const struct building *b,
+        const struct building *bother);
 
     /* old functions, still in build.c: */
     int buildingeffsize(const building * b, int imaginary);

@@ -25,6 +25,7 @@ extern "C" {
     struct unit;
     struct region;
     struct strlist;
+    struct order;
 
     extern int setstealth_cmd(struct unit *u, struct order *ord);
     extern int spy_cmd(struct unit *u, struct order *ord);

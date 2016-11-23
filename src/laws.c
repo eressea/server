@@ -648,7 +648,7 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
                  * verfügbaren Fläche ab. In Gletschern gibt es weniger
                  * Möglichkeiten als in Ebenen. */
                 sprout = 0;
-                seedchance = (1000 * region_maxworkers(r2)) / r2->terrain->size;
+                seedchance = (1000.0 * region_maxworkers(r2)) / r2->terrain->size;
                 for (i = 0; i < seeds / MAXDIRECTIONS; i++) {
                     if (rng_int() % 10000 < seedchance)
                         sprout++;
@@ -1269,7 +1269,6 @@ static void remove_idle_players(void)
         } else {
             if (fval(f, FFL_NOIDLEOUT)) {
                 f->lastorders = turn;
-                fp = &f->next;
             }
             else if (turn != f->lastorders) {
                 char info[256];
@@ -2995,9 +2994,9 @@ static void ageing(void)
         for (up = &r->units; *up;) {
             unit *u = *up;
             a_age(&u->attribs, u);
-            if (u == *up)
+            if (u == *up) 
                 handle_event(u->attribs, "timer", u);
-            if (u == *up)
+            if (u == *up) //-V581
                 up = &(*up)->next;
         }
 
@@ -3007,7 +3006,7 @@ static void ageing(void)
             a_age(&s->attribs, s);
             if (s == *sp)
                 handle_event(s->attribs, "timer", s);
-            if (s == *sp)
+            if (s == *sp) //-V581
                 sp = &(*sp)->next;
         }
 
@@ -3636,7 +3635,7 @@ int pay_cmd(unit * u, struct order *ord)
 static int reserve_i(unit * u, struct order *ord, int flags)
 {
     char token[128];
-    if (u->number > 0 && (urace(u)->ec_flags & GETITEM)) {
+    if (u->number > 0 && (u_race(u)->ec_flags & GETITEM)) {
         int use, count, para;
         const item_type *itype;
         const char *s;
@@ -3945,7 +3944,7 @@ int armedmen(const unit * u, bool siege_weapons)
 {
     item *itm;
     int n = 0;
-    if (!(urace(u)->flags & RCF_NOWEAPONS)) {
+    if (!(u_race(u)->flags & RCF_NOWEAPONS)) {
         if (effskill(u, SK_WEAPONLESS, 0) >= 1) {
             /* kann ohne waffen bewachen: fuer drachen */
             n = u->number;

@@ -39,6 +39,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 #include <util/bsdstring.h>
 #include <util/functions.h>
+#include <util/umlaut.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/rng.h>
@@ -74,6 +75,18 @@ static const char *racenames[MAXRACES] = {
     "juju-zombie", "ghoul", "ghast", NULL, NULL, "template",
     "clone"
 };
+
+const struct race *findrace(const char *s, const struct locale *lang)
+{
+    void **tokens = get_translations(lang, UT_RACES);
+    variant token;
+
+    assert(lang);
+    if (tokens && findtoken(*tokens, s, &token) == E_TOK_SUCCESS) {
+        return (const struct race *)token.v;
+    }
+    return NULL;
+}
 
 const struct race *get_race(race_t rt) {
     const char * name;
