@@ -10,7 +10,6 @@
  without prior permission by the authors of Eressea.
  */
 #include <platform.h>
-#include <kernel/config.h>
 #include "unguard.h"
 
 /* kernel includes */
@@ -34,7 +33,7 @@ static int unguard_handle(trigger * t, void *data)
     building *b = (building *)t->data.v;
 
     if (b) {
-        fset(b, BLD_UNGUARDED);
+        b-> flags |= BLD_UNGUARDED;
     }
     else {
         log_error("could not perform unguard::handle()\n");

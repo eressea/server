@@ -28,6 +28,7 @@ extern "C" {
     struct region;
     struct faction;
     struct unit;
+    struct race;
 
     extern struct trigger_type tt_createunit;
 
