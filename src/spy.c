@@ -44,10 +44,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/bsdstring.h>
 #include <util/parser.h>
-#include <quicklist.h>
 #include <util/rand.h>
 #include <util/rng.h>
+
+#include <quicklist.h>
 
 /* libc includes */
 #include <assert.h>
@@ -98,13 +100,13 @@ void spy_message(int spy, const unit * u, const unit * target)
                     first = 0;
                 }
                 else {
-                    strncat(buf, ", ", sizeof(buf) - 1);
+                    strlcat(buf, ", ", sizeof(buf));
                 }
-                strncat(buf, (const char *)skillname((skill_t)sv->id, u->faction->locale),
-                    sizeof(buf) - 1);
-                strncat(buf, " ", sizeof(buf) - 1);
-                strncat(buf, itoa10(eff_skill(target, sv, target->region)),
-                    sizeof(buf) - 1);
+                strlcat(buf, (const char *)skillname((skill_t)sv->id, u->faction->locale),
+                    sizeof(buf));
+                strlcat(buf, " ", sizeof(buf));
+                strlcat(buf, itoa10(eff_skill(target, sv, target->region)),
+                    sizeof(buf));
             }
         }
         if (found) {
