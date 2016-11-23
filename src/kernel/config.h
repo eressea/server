@@ -54,17 +54,6 @@ struct param;
     int forbiddenid(int id);
     int newcontainerid(void);
 
-    char *untilde(char *s);
-
-    typedef int(*cmp_building_cb) (const struct building * b,
-        const struct building * a);
-    struct building *largestbuilding(const struct region *r, cmp_building_cb,
-        bool imaginary);
-    int cmp_wage(const struct building *b, const struct building *bother);
-    int cmp_taxes(const struct building *b, const struct building *bother);
-    int cmp_current_owner(const struct building *b,
-        const struct building *bother);
-
     bool rule_region_owners(void);
     bool rule_stealth_other(void); // units can pretend to be another faction, TARNE PARTEI <no>
     bool rule_stealth_anon(void);  // units can anonymize their faction, TARNE PARTEI [NICHT]
@@ -96,9 +85,6 @@ struct param;
     /* mehr Informationen. z.b. stra�e zu 50% */
 #define GF_PURE 64
     /* untranslated */
-
-    int wage(const struct region *r, const struct faction *f,
-        const struct race *rc, int in_turn);
 
     const char *datapath(void);
     void set_datapath(const char *path);

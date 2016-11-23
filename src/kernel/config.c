@@ -19,9 +19,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include <kernel/config.h>
 
-/* attributes includes */
-#include <attributes/reduceproduction.h>
-
 /* kernel includes */
 #include "alliance.h"
 #include "ally.h"
@@ -253,37 +250,6 @@ unit *getnewunit(const region * r, const faction * f)
     return findnewunit(r, f, n);
 }
 
-/* - Namen der Strukturen -------------------------------------- */
-char *untilde(char *ibuf)
-{
-    char *p = ibuf;
-
-    while (*p) {
-        if (*p == '~') {
-            *p = ' ';
-        }
-        ++p;
-    }
-    return ibuf;
-}
-
-building *largestbuilding(const region * r, cmp_building_cb cmp_gt,
-    bool imaginary)
-{
-    building *b, *best = NULL;
-
-    for (b = rbuildings(r); b; b = b->next) {
-        if (cmp_gt(b, best) <= 0)
-            continue;
-        if (!imaginary) {
-            const attrib *a = a_find(b->attribs, &at_icastle);
-            if (a)
-                continue;
-        }
-        best = b;
-    }
-    return best;
-}
 
 /* -- Erschaffung neuer Einheiten ------------------------------ */
 
@@ -640,113 +606,6 @@ char *_strdup(const char *s)
 }
 #endif
 
-/* Lohn bei den einzelnen Burgstufen f�r Normale Typen, Orks, Bauern,
- * Modifikation f�r St�dter. */
-
-static const int wagetable[7][4] = {
-    { 10, 10, 11, -7 },             /* Baustelle */
-    { 10, 10, 11, -5 },             /* Handelsposten */
-    { 11, 11, 12, -3 },             /* Befestigung */
-    { 12, 11, 13, -1 },             /* Turm */
-    { 13, 12, 14, 0 },              /* Burg */
-    { 14, 12, 15, 1 },              /* Festung */
-    { 15, 13, 16, 2 }               /* Zitadelle */
-};
-
-int cmp_wage(const struct building *b, const building * a)
-{
-    if (is_building_type(b->type, "castle")) {
-        if (!a)
-            return 1;
-        if (b->size > a->size)
-            return 1;
-        if (b->size == a->size)
-            return 0;
-    }
-    return -1;
-}
-
-bool is_owner_building(const struct building * b)
-{
-    region *r = b->region;
-    if (b->type->taxes && r->land && r->land->ownership) {
-        unit *u = building_owner(b);
-        return u && u->faction == r->land->ownership->owner;
-    }
-    return false;
-}
-
-int cmp_taxes(const building * b, const building * a)
-{
-    faction *f = region_get_owner(b->region);
-    if (b->type->taxes) {
-        unit *u = building_owner(b);
-        if (!u) {
-            return -1;
-        }
-        else if (a) {
-            int newsize = buildingeffsize(b, false);
-            double newtaxes = b->type->taxes(b, newsize);
-            int oldsize = buildingeffsize(a, false);
-            double oldtaxes = a->type->taxes(a, oldsize);
-
-            if (newtaxes < oldtaxes)
-                return -1;
-            else if (newtaxes > oldtaxes)
-                return 1;
-            else if (b->size < a->size)
-                return -1;
-            else if (b->size > a->size)
-                return 1;
-            else {
-                if (u && u->faction == f) {
-                    u = building_owner(a);
-                    if (u && u->faction == f)
-                        return -1;
-                    return 1;
-                }
-            }
-        }
-        else {
-            return 1;
-        }
-    }
-    return -1;
-}
-
-int cmp_current_owner(const building * b, const building * a)
-{
-    faction *f = region_get_owner(b->region);
-
-    assert(rule_region_owners());
-    if (f && b->type->taxes) {
-        unit *u = building_owner(b);
-        if (!u || u->faction != f)
-            return -1;
-        if (a) {
-            int newsize = buildingeffsize(b, false);
-            double newtaxes = b->type->taxes(b, newsize);
-            int oldsize = buildingeffsize(a, false);
-            double oldtaxes = a->type->taxes(a, oldsize);
-
-            if (newtaxes > oldtaxes) {
-                return 1;
-            }
-            if (newtaxes < oldtaxes) {
-                return -1;
-            }
-            if (newsize != oldsize) {
-                return newsize - oldsize;
-            }
-            return (b->size - a->size);
-        }
-        else {
-            return 1;
-        }
-    }
-    return -1;
-}
-
 bool rule_stealth_other(void)
 {
     static int rule, config;
@@ -807,102 +666,11 @@ int rule_faction_limit(void)
     return rule;
 }
 
-static int
-default_wage(const region * r, const faction * f, const race * rc, int in_turn)
-{
-    building *b = largestbuilding(r, &cmp_wage, false);
-    int esize = 0;
-    double wage;
-    static int ct_cache;
-    static const struct curse_type *drought_ct;
-
-    if (ct_changed(&ct_cache)) {
-        drought_ct = ct_find("drought");
-    }
-    if (b != NULL) {
-        /* TODO: this reveals imaginary castles */
-        esize = buildingeffsize(b, false);
-    }
-
-    if (f != NULL) {
-        int index = 0;
-        if (rc == get_race(RC_ORC) || rc == get_race(RC_SNOTLING)) {
-            index = 1;
-        }
-        wage = wagetable[esize][index];
-    }
-    else {
-        if (is_mourning(r, in_turn)) {
-            wage = 10;
-        }
-        else if (fval(r->terrain, SEA_REGION)) {
-            wage = 11;
-        }
-        else {
-            wage = wagetable[esize][2];
-        }
-        if (rule_blessed_harvest() == HARVEST_WORK) {
-            /* E1 rules */
-            wage += curse_geteffect(get_curse(r->attribs, ct_find("blessedharvest")));
-        }
-    }
-
-    /* Artsculpture: Income +5 */
-    for (b = r->buildings; b; b = b->next) {
-        if (is_building_type(b->type, "artsculpture")) {
-            wage += 5;
-        }
-    }
-
-    if (r->attribs) {
-        attrib *a;
-        const struct curse_type *ctype;
-        /* Godcurse: Income -10 */
-        ctype = ct_find("godcursezone");
-        if (ctype && curse_active(get_curse(r->attribs, ctype))) {
-            wage = _max(0, wage - 10);
-        }
-
-        /* Bei einer D�rre verdient man nur noch ein Viertel  */
-        if (drought_ct) {
-            curse *c = get_curse(r->attribs, drought_ct);
-            if (curse_active(c))
-                wage /= curse_geteffect(c);
-        }
-
-        a = a_find(r->attribs, &at_reduceproduction);
-        if (a) {
-            wage = (wage * a->data.sa[0]) / 100;
-        }
-    }
-    return (int)wage;
-}
-
-static int
-minimum_wage(const region * r, const faction * f, const race * rc, int in_turn)
-{
-    if (f && rc) {
-        return rc->maintenance;
-    }
-    return default_wage(r, f, rc, in_turn);
-}
-
-/* Gibt Arbeitslohn f�r entsprechende Rasse zur�ck, oder f�r
-* die Bauern wenn f == NULL. */
-int wage(const region * r, const faction * f, const race * rc, int in_turn)
-{
-    if (global.functions.wage) {
-        return global.functions.wage(r, f, rc, in_turn);
-    }
-    return default_wage(r, f, rc, in_turn);
-}
-
 void kernel_init(void)
 {
     register_reports();
     mt_clear();
     translation_init();
-    register_function((pf_generic)minimum_wage, "minimum_wage");
 }
 
 static order * defaults[MAXLOCALES];
