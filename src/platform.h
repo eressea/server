@@ -78,9 +78,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 # define _CRTDBG_MAP_ALLOC
 #endif
 
-#endif /* _MSC_VER_ */
-
-#if defined __GNUC__
+#elif defined __GLIBC__
+#error gnuc
 # define _POSIX_C_SOURCE 200809L
 # undef _DEFAULT_SOURCE
 # define _DEFAULT_SOURCE
@@ -90,12 +89,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 # define HAVE_SYS_STAT_MKDIR
 # define HAVE_STRDUP
 # define HAVE_UNISTD_H
-#endif
-
-#ifdef SOLARIS
+#elif defined SOLARIS
 # define _SYS_PROCSET_H
 #undef _XOPEN_SOURCE
 # define _XOPEN_SOURCE
+#else
+#include <autoconf.h>
 #endif
 
 #define unused_arg (void)
