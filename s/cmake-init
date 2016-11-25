@@ -9,17 +9,18 @@ while [ ! -d $ROOT/.git ]; do
 done
 
 [ -z $BUILD ] && BUILD=Debug
-MACHINE=`uname -m`
 [ -z "$CC" ] && [ ! -z `which clang` ] && CC="clang"
 [ -z "$CC" ] && [ ! -z `which gcc` ] && CC="gcc"
 [ -z "$CC" ] && [ ! -z `which tcc` ] && CC="tcc"
 [ -z "$CC" ] && [ ! -z `which cc` ] && CC="cc"
+
+MACHINE=`$CC -dumpmachine`
+[ -z $MACHINE ] && MACHINE=`uname -m`
 BIN_DIR="$ROOT/build-$MACHINE-$CC-$BUILD"
 mkdir -p $BIN_DIR
 rm -f $BUILD
 ln -sf $BIN_DIR $BUILD
 
-MACHINE=$(gcc -dumpmachine)
 rm -f CMakeCache.txt
 
 # use anything installed in /opt or /usr
@@ -40,6 +41,8 @@ ARGS=" -DCMAKE_MODULE_PATH=$ROOT/cmake/Modules \
  -DCMAKE_INCLUDE_PATH=$INCLUDE_PATH \
  -DCMAKE_PREFIX_PATH=$PREFIX_PATH \
  -DCMAKE_INSTALL_PREFIX=$HOME/eressea/server"
+
+git submodule update --init
 
 path="$(which tolua)"
 if [ "$HAVE_TOLUA" = "0" ] || [ -z $path ] ; then
