@@ -81,15 +81,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #endif /* _MSC_VER_ */
 
 #if defined __GNUC__
-# undef _BSD_SOURCE
-# define _BSD_SOURCE
+# undef _DEFAULT_SOURCE
+# define _DEFAULT_SOURCE
 # undef __USE_BSD
 # define __USE_BSD
-#endif
-
-#ifdef _BSD_SOURCE
-# undef __EXTENSIONS__
-# define __EXTENSIONS__
 #endif
 
 #ifdef SOLARIS
