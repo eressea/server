@@ -1379,7 +1379,7 @@ static int buildingmaintenance(const building * b, const resource_type * rtype)
 }
 
 static int
-report_template(const char *filename, report_context * ctx, const char *charset)
+report_template(const char *filename, report_context * ctx, const char *bom)
 {
     const resource_type *rsilver = get_resourcetype(R_SILVER);
     faction *f = ctx->f;
@@ -1389,7 +1389,6 @@ report_template(const char *filename, report_context * ctx, const char *charset)
     char buf[8192], *bufp;
     size_t size;
     int bytes;
-    bool utf8 = _strcmpl(charset, "utf8") == 0 || _strcmpl(charset, "utf-8") == 0;
     const curse_type *nocost_ct = ct_find("nocostbuilding");
 
     if (F == NULL) {
@@ -1398,9 +1397,8 @@ report_template(const char *filename, report_context * ctx, const char *charset)
     }
     fstream_init(&strm, F);
 
-    if (utf8) {
-        const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
-        swrite(utf8_bom, 1, 3, out);
+    if (bom) {
+        swrite(bom, 1, strlen(bom), out);
     }
 
     newline(out);
@@ -2026,7 +2024,7 @@ void write_travelthru(struct stream *out, region *r, const faction *f)
 
 int
 report_plaintext(const char *filename, report_context * ctx,
-    const char *charset)
+    const char *bom)
 {
     int flag = 0;
     char ch;
@@ -2044,7 +2042,6 @@ report_plaintext(const char *filename, report_context * ctx,
     stream strm = { 0 }, *out = &strm;
     char buf[8192];
     char *bufp;
-    bool utf8 = _strcmpl(charset, "utf8") == 0 || _strcmpl(charset, "utf-8") == 0;
     size_t size;
     int thisseason;
     int nextseason;
@@ -2061,9 +2058,8 @@ report_plaintext(const char *filename, report_context * ctx,
     }
     fstream_init(&strm, F);
 
-    if (utf8) {
-        const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
-        fwrite(utf8_bom, 1, 3, F);
+    if (bom) {
+        fwrite(bom, 1, strlen(bom), F);
     }
 
     strftime(pzTime, 64, "%A, %d. %B %Y, %H:%M", localtime(&ctx->report_time));

@@ -1468,7 +1468,7 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
 
 /* main function of the creport. creates the header and traverses all regions */
 static int
-report_computer(const char *filename, report_context * ctx, const char *charset)
+report_computer(const char *filename, report_context * ctx, const char *bom)
 {
     static int era = -1;
     int i;
@@ -1488,9 +1488,8 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
         perror(filename);
         return -1;
     }
-    else if (_strcmpl(charset, "utf-8") == 0 || _strcmpl(charset, "utf8") == 0) {
-        const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
-        fwrite(utf8_bom, 1, 3, F);
+    else if (bom) {
+        fwrite(bom, 1, strlen(bom), F);
     }
 
     /* must call this to get all the neighbour regions */
@@ -1498,8 +1497,8 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
     /* initialisations, header and lists */
 
     fprintf(F, "VERSION %d\n", C_REPORT_VERSION);
-    fprintf(F, "\"%s\";charset\n", charset);
-    fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
+    fprintf(F, "\"utf-8\";charset\n\"%s\";locale\n",
+            locale_name(f->locale));
     fprintf(F, "%d;noskillpoints\n", 1);
     fprintf(F, "%lld;date\n", (long long)ctx->report_time);
     fprintf(F, "\"%s\";Spiel\n", game_name());

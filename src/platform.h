@@ -81,10 +81,15 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #endif /* _MSC_VER_ */
 
 #if defined __GNUC__
+# define _POSIX_C_SOURCE 200809L
 # undef _DEFAULT_SOURCE
 # define _DEFAULT_SOURCE
 # undef __USE_BSD
 # define __USE_BSD
+# define HAVE_SNPRINTF
+# define HAVE_SYS_STAT_MKDIR
+# define HAVE_STRDUP
+# define HAVE_UNISTD_H
 #endif
 
 #ifdef SOLARIS
@@ -104,10 +109,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #define TOLUA_CAST (char*)
 
-#ifdef USE_AUTOCONF
-# include <autoconf.h>
-#endif
-
 #if !defined(MAX_PATH)
 #if defined(PATH_MAX)
 # define MAX_PATH PATH_MAX
@@ -122,6 +123,73 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #ifdef HAVE_STRINGS_H
 #include <strings.h>
+#endif
+
+#if defined(HAVE_STDBOOL_H)
+# include <stdbool.h>
+#else
+# if ! HAVE__BOOL
+#  ifdef __cplusplus
+typedef bool _Bool;
+#  else
+typedef unsigned char _Bool;
+#  endif
+# endif
+# define bool _Bool
+# define false 0
+# define true 1
+# define __bool_true_false_are_defined 1
+#endif
+
+#ifndef HAVE__ACCESS
+#ifdef HAVE_ACCESS
+#define _access(path, mode) access(path, mode)
+#endif
+#endif
+
+#if defined(HAVE_DIRECT__MKDIR)
+#include <direct.h>
+#elif defined(HAVE_DIRECT_MKDIR)
+#include <direct.h>
+#define _mkdir(a) mkdir(a)
+#elif defined(HAVE_SYS_STAT_MKDIR)
+#include <sys/stat.h>
+#define _mkdir(a) mkdir(a, 0777)
+#endif
+
+#ifndef _min
+#define _min(a,b) ((a) < (b) ? (a) : (b))
+#endif
+#ifndef _max
+#define _max(a,b) ((a) > (b) ? (a) : (b))
+#endif
+
+#if !defined(HAVE__STRDUP)
+#if defined(HAVE_STRDUP)
+#define _strdup(a) strdup(a)
+#else
+#define _strdup(a) lcp_strdup(a)
+#endif
+#endif
+
+#if !defined(HAVE__SNPRINTF)
+#if defined(HAVE_SNPRINTF)
+#define _snprintf snprintf
+#endif
+#endif
+
+#if !defined(HAVE__STRCMPL)
+#if defined(HAVE_STRCMPL)
+#define _strcmpl(a, b) strcmpl(a, b)
+#elif defined(HAVE__STRICMP)
+#define _strcmpl(a, b) _stricmp(a, b)
+#elif defined(HAVE_STRICMP)
+#define _strcmpl(a, b) stricmp(a, b)
+#elif defined(HAVE_STRCASECMP)
+#define _strcmpl(a, b) strcasecmp(a, b)
+#else
+#define _strcmpl(a, b) lcp_strcmpl(a, b)
+#endif
 #endif
 
 #endif

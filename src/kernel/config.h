@@ -24,6 +24,7 @@ extern "C" {
 #endif
 
     /* this should always be the first thing included after platform.h */
+#include <stddef.h>
 #include "types.h"
 struct param;
 

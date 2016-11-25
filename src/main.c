@@ -70,11 +70,6 @@ static void load_inifile(dictionary * d)
 
     lomem = iniparser_getint(d, "eressea:lomem", lomem) ? 1 : 0;
 
-    str = iniparser_getstring(d, "eressea:encoding", NULL);
-    if (str && (_strcmpl(str, "utf8") == 0 || _strcmpl(str, "utf-8") == 0)) {
-        enc_gamedata = ENCODING_UTF8;
-    }
-
     verbosity = iniparser_getint(d, "eressea:verbose", 2);
     battledebug = iniparser_getint(d, "eressea:debug", battledebug) ? 1 : 0;
 

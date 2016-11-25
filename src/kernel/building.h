@@ -22,6 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/types.h>
 #include <util/variant.h>
 
+#include <stddef.h>
 #ifdef __cplusplus
 extern "C" {
 #endif

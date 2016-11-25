@@ -21,6 +21,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <util/attrib.h>
 
+#include <stdlib.h>
+
 attrib_type at_fleechance = {
     "fleechance",
     NULL,
