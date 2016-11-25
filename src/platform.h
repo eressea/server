@@ -23,6 +23,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define LOMEM
 #endif
 
+#undef USE_AUTOCONF
+#define USE_AUTOCONF
+
 #ifdef _MSC_VER
 # define VC_EXTRALEAN
 # define WIN32_LEAN_AND_MEAN
@@ -78,7 +81,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 # define _CRTDBG_MAP_ALLOC
 #endif
 
-#elif defined __GLIBC__
+#undef USE_AUTOCONF
+#elif __GNUC__
+#include <features.h>
+#if __GLIBC__ >= 2
 # define _POSIX_C_SOURCE 200809L
 # undef _DEFAULT_SOURCE
 # define _DEFAULT_SOURCE
@@ -88,11 +94,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 # define HAVE_SYS_STAT_MKDIR
 # define HAVE_STRDUP
 # define HAVE_UNISTD_H
-#elif defined SOLARIS
-# define _SYS_PROCSET_H
-#undef _XOPEN_SOURCE
-# define _XOPEN_SOURCE
-#else
+# undef USE_AUTOCONF
+#endif
+#endif
+
+#ifdef USE_AUTOCONF
 #include <autoconf.h>
 #endif
 
@@ -164,29 +170,14 @@ typedef unsigned char _Bool;
 
 #if !defined(HAVE__STRDUP)
 #if defined(HAVE_STRDUP)
+#undef _strdup
 #define _strdup(a) strdup(a)
-#else
-#define _strdup(a) lcp_strdup(a)
 #endif
 #endif
 
 #if !defined(HAVE__SNPRINTF)
 #if defined(HAVE_SNPRINTF)
 #define _snprintf snprintf
-#endif
-#endif
-
-#if !defined(HAVE__STRCMPL)
-#if defined(HAVE_STRCMPL)
-#define _strcmpl(a, b) strcmpl(a, b)
-#elif defined(HAVE__STRICMP)
-#define _strcmpl(a, b) _stricmp(a, b)
-#elif defined(HAVE_STRICMP)
-#define _strcmpl(a, b) stricmp(a, b)
-#elif defined(HAVE_STRCASECMP)
-#define _strcmpl(a, b) strcasecmp(a, b)
-#else
-#define _strcmpl(a, b) lcp_strcmpl(a, b)
 #endif
 #endif
 
