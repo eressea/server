@@ -39,5 +39,5 @@ echo "build eressea"
 cd $ROOT/$BUILD
 VERSION=$(git describe --match 'v*.*.*' --tags | sed 's/^v//')
 cmake -DERESSEA_VERSION="$VERSION" ..
-make -k $MAKEOPTS && make test
+make $MAKEOPTS && make test
 cd $OLDPWD

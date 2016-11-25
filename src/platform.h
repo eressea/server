@@ -79,7 +79,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #endif
 
 #elif defined __GLIBC__
-#error gnuc
 # define _POSIX_C_SOURCE 200809L
 # undef _DEFAULT_SOURCE
 # define _DEFAULT_SOURCE
