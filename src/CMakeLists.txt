@@ -84,6 +84,7 @@ TOLUA_BINDING(settings.pkg kenel/config.h)
 ENDIF()
 
 set (ERESSEA_SRC
+  vortex.c
   calendar.c
   move.c
   piracy.c
@@ -92,7 +93,6 @@ set (ERESSEA_SRC
   alchemy.c
   academy.c
   upkeep.c
-  vortex.c
   names.c
   lighthouse.c
   reports.c
