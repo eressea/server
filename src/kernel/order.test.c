@@ -1,5 +1,4 @@
 #include <platform.h>
-#include <config.h>
 #include <kernel/config.h>
 #include "order.h"
 

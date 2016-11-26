@@ -1,5 +1,4 @@
 #include <platform.h>
-#include <config.h>
 #include "report.h"
 #include "move.h"
 #include "travelthru.h"
