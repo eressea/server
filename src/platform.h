@@ -28,12 +28,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define _XOPEN_SOURCE 700
 #endif
 
-// enable bsd string extensions, prior to glibc 2.12:
-#ifndef _BSD_SOURCE
-#define _BSD_SOURCE
-#endif
-
-// enable bsd string extensions, since glibc 2.12:
+// enable bsd string extensions, since glibc 2.12 (_BSD_SOURCE is dead):
 #ifndef _POSIX_C_SOURCE
 #define _POSIX_C_SOURCE 200809L
 #endif
