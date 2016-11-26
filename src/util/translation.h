@@ -12,6 +12,9 @@
 
 #ifndef H_UTIL_TRANSLATION
 #define H_UTIL_TRANSLATION
+
+#include <stddef.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

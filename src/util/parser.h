@@ -10,6 +10,9 @@
 
 #ifndef UTIL_PARSER_H
 #define UTIL_PARSER_H
+
+#include <stddef.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

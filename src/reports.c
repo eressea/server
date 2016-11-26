@@ -1401,12 +1401,10 @@ void finish_reports(report_context *ctx) {
 
 int write_reports(faction * f, time_t ltime)
 {
-    unsigned int backup = 1, maxbackup = 128 * 1000;
     bool gotit = false;
     struct report_context ctx;
-    const char *encoding = "UTF-8";
+    const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
     report_type *rtype;
-
     if (noreports) {
         return false;
     }
@@ -1423,19 +1421,12 @@ int write_reports(faction * f, time_t ltime)
                     rtype->extension);
                 join_path(reportpath(), filename, path, sizeof(path));
                 errno = 0;
-                if (rtype->write(path, &ctx, encoding) == 0) {
+                if (rtype->write(path, &ctx, (const char *)utf8_bom) == 0) {
                     gotit = true;
                 }
                 if (errno) {
-                    char zText[64];
-                    log_warning("retrying, error %d during %s report for faction %s", errno, rtype->extension, factionname(f));
-                    sprintf(zText, "waiting %u seconds before we retry", backup);
-                    perror(zText);
-                    _sleep(backup);
-                    if (backup < maxbackup) {
-                        backup *= 2;
-                    }
                     error = errno;
+                    log_fatal("error %d during %s report for faction %s: %s", errno, rtype->extension, factionname(f), strerror(error));
                     errno = 0;
                 }
             } while (error);

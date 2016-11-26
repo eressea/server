@@ -1,5 +1,4 @@
 #include <platform.h>
-#include <config.h>
 #include "reports.h"
 
 #include "move.h"

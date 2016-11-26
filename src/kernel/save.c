@@ -298,7 +298,7 @@ int readorders(const char *filename)
              * vermerkt. */
 
         case P_UNIT:
-            if (!f || !unitorders(F, enc_gamedata, f))
+            if (!f || !unitorders(F, enc_gamedata, f)) {
                 do {
                     b = getbuf(F, enc_gamedata);
                     if (!b) {
@@ -309,7 +309,8 @@ int readorders(const char *filename)
                     p = (s && s[0] != '@') ? findparam(s, lang) : NOPARAM;
                 } while ((p != P_UNIT || !f) && p != P_FACTION && p != P_NEXT
                     && p != P_GAMENAME);
-                break;
+	    }
+            break;
 
                 /* Falls in unitorders() abgebrochen wird, steht dort entweder eine neue
                  * Partei, eine neue Einheit oder das File-Ende. Das switch() wird erneut

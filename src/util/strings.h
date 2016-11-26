@@ -18,6 +18,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #ifndef STRINGS_H
 #define STRINGS_H
+
+#include <stddef.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
