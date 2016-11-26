@@ -27,6 +27,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define USE_AUTOCONF
 
 #ifdef _MSC_VER
+# define HAVE_STDBOOL_H
+# define HAVE_DIRECT__MKDIR
+# define HAVE__ACCESS
 # define VC_EXTRALEAN
 # define WIN32_LEAN_AND_MEAN
 #pragma warning(push)
@@ -129,7 +132,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #if defined(HAVE_STDBOOL_H)
 # include <stdbool.h>
 #else
-# if ! HAVE__BOOL
+# ifndef HAVE__BOOL
 #  ifdef __cplusplus
 typedef bool _Bool;
 #  else
