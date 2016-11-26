@@ -18,7 +18,7 @@ static void unicode_warning(const char *bp)
     log_warning("invalid sequence in UTF-8 string: %s\n", bp);
 }
 
-INLINE_FUNCTION int eatwhite(const char *ptr, size_t * total_size)
+static int eatwhite(const char *ptr, size_t * total_size)
 {
     int ret = 0;
 

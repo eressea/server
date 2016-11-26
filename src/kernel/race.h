@@ -18,12 +18,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #ifndef H_KRNL_RACE_H
 #define H_KRNL_RACE_H
+#include <stddef.h>
+#include "magic.h"              /* wegen MAXMAGIETYP */
+#include "skill.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "magic.h"              /* wegen MAXMAGIETYP */
-#include "skill.h"
 
 #define AT_NONE 0
 #define AT_STANDARD	1

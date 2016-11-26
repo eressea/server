@@ -599,13 +599,6 @@ void kernel_done(void)
     translation_done();
 }
 
-#ifndef HAVE_STRDUP
-char *_strdup(const char *s)
-{
-    return strcpy((char *)malloc(sizeof(char) * (strlen(s) + 1)), s);
-}
-#endif
-
 bool rule_stealth_other(void)
 {
     static int rule, config;

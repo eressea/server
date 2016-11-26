@@ -18,12 +18,15 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #ifndef H_KRNL_SHIP
 #define H_KRNL_SHIP
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include "types.h"
 #include "direction.h"
+
+#include <stddef.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define DAMAGE_SCALE 100        /* multiplier for sh->damage */
 

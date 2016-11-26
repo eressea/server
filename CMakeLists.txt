@@ -60,7 +60,9 @@ CONFIGURE_FILE (
     ${CMAKE_CURRENT_SOURCE_DIR}/autoconf.h.in
     ${CMAKE_BINARY_DIR}/include/autoconf.h)
 INCLUDE_DIRECTORIES (${CMAKE_BINARY_DIR}/include)
-add_definitions(-DUSE_AUTOCONF)
+
+## skip compiler/libc detection and force cmake autoconf:
+#add_definitions(-DUSE_AUTOCONF)
 
 add_subdirectory (cutest)
 add_subdirectory (cJSON)

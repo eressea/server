@@ -22,6 +22,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/variant.h>
 #include "types.h"
 #include "skills.h"
+#include <stddef.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

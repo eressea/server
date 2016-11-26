@@ -18,6 +18,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #ifndef SCORE_H
 #define SCORE_H
+
+#include <stddef.h>
 #ifdef __cplusplus
 extern "C" {
 #endif

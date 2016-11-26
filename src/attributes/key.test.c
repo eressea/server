@@ -3,6 +3,7 @@
 
 #include <util/attrib.h>
 #include <CuTest.h>
+#include <stdlib.h>
 
 static void test_get_set_keys(CuTest *tc) {
     attrib *a = 0;
