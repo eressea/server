@@ -18,7 +18,6 @@ without prior permission by the authors of Eressea.
 #include "bindings.h"
 #include "move.h"
 #include "reports.h"
-#include "seen.h"
 #include "guard.h"
 
 /*  attributes includes */
@@ -60,7 +59,7 @@ without prior permission by the authors of Eressea.
 static int tolua_bufunit(lua_State * L) {
     char buf[8192];
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
-    int mode = (int)tolua_tonumber(L, 2, see_unit);
+    int mode = (int)tolua_tonumber(L, 2, (int)seen_unit);
     if (!self)  return 0;
 
     bufunit(self->faction, self, 0, mode, buf, sizeof(buf));
@@ -259,18 +258,15 @@ static int tolua_unit_set_flags(lua_State * L)
 static int tolua_unit_get_guard(lua_State * L)
 {
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
-    if (is_guard(self, GUARD_ALL)) {
-        lua_pushinteger(L, getguard(self));
-        return 1;
-    }
-    return 0;
+    lua_pushboolean(L, is_guard(self));
+    return 1;
 }
 
 static int tolua_unit_set_guard(lua_State * L)
 {
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
     unsigned int flags = (unsigned int)tolua_tonumber(L, 2, 0);
-    setguard(self, flags);
+    setguard(self, flags!=0);
     return 0;
 }
 
@@ -760,31 +756,10 @@ static int tolua_unit_get_spells(lua_State * L)
     quicklist *slist = 0;
     if (sb) {
         quicklist **slist_ptr = &sb->spells;
-        if (slist_ptr) {
-            slist = *slist_ptr;
-        }
+        slist = *slist_ptr;
     }
     return tolua_quicklist_push(L, "spellbook", "spell_entry", slist);
 }
-
-#ifdef TODO /* spellbooks */
-static void unit_removespell(unit * u, spell * sp)
-{
-    quicklist **isptr;
-
-    isptr = get_spelllist(get_mage(u), u->faction);
-    ql_set_remove(isptr, sp);
-}
-
-static int tolua_unit_removespell(lua_State * L)
-{
-    unit *self = (unit *) tolua_tousertype(L, 1, 0);
-    spell *sp = (spell *) tolua_tousertype(L, 2, 0);
-    unit_removespell(self, sp);
-    return 0;
-}
-
-#endif
 
 static int tolua_unit_get_orders(lua_State * L)
 {
@@ -1019,9 +994,6 @@ void tolua_unit_open(lua_State * L)
             tolua_variable(L, TOLUA_CAST "race_name", &tolua_unit_get_racename,
                 &tolua_unit_set_racename);
             tolua_function(L, TOLUA_CAST "add_spell", &tolua_unit_addspell);
-#ifdef TODO /* spellbooks */
-            tolua_function(L, TOLUA_CAST "remove_spell", &tolua_unit_removespell);
-#endif
             tolua_variable(L, TOLUA_CAST "spells", &tolua_unit_get_spells, 0);
             tolua_function(L, TOLUA_CAST "cast_spell", &tolua_unit_castspell);
 

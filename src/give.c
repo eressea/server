@@ -1,4 +1,4 @@
-﻿/*
+/*
  +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  |                   |  Enno Rehling <enno@eressea.de>
  | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
@@ -34,7 +34,6 @@
 
 /* attributes includes */
 #include <attributes/racename.h>
-#include <attributes/orcification.h>
 
 /* util includes */
 #include <util/attrib.h>
@@ -138,7 +137,7 @@ int give_quota(const unit * src, const unit * dst, const item_type * type,
     }
     if (dst && src && src->faction != dst->faction) {
         divisor = config_get_flt("rules.items.give_divisor", 1);
-        assert(divisor == 0 || divisor >= 1);
+        assert(divisor <= 0 || divisor >= 1);
         if (divisor >= 1) {
             /* predictable > correct: */
             int x = (int)(n / divisor);
@@ -224,15 +223,11 @@ static bool unit_has_cursed_item(const unit * u)
     return false;
 }
 
-static bool can_give_men(const unit *u, order *ord, message **msg) {
-    if (u_race(u) == get_race(RC_SNOTLING)) {
-        /* snotlings may not be given to the peasants. */
-        if (msg) *msg = msg_error(u, ord, 307);
-    }
-    else if (unit_has_cursed_item(u)) {
+static bool can_give_men(const unit *u, const unit *dst, order *ord, message **msg) {
+    if (unit_has_cursed_item(u)) {
         if (msg) *msg = msg_error(u, ord, 78);
     }
-    else if (has_skill(u, SK_MAGIC)) {
+    else if (dst && (has_skill(u, SK_MAGIC) && dst->number > 0)) {
         /* cannot give units to and from magicians */
         if (msg) *msg = msg_error(u, ord, 158);
     }
@@ -263,9 +258,9 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
     message * msg;
     int maxt = max_transfers();
 
-    assert(u2);
+    assert(u2); // use disband_men for GIVE 0
 
-    if (!can_give_men(u, ord, &msg)) {
+    if (!can_give_men(u, u2, ord, &msg)) {
         return msg;
     }
 
@@ -400,20 +395,21 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
 
 message * disband_men(int n, unit * u, struct order *ord) {
     message * msg;
+    static const race *rc_snotling;
+    static int rccache;
 
-    if (!can_give_men(u, ord, &msg)) {
+    if (rc_changed(&rccache)) {
+        rc_snotling = get_race(RC_SNOTLING);
+    }
+
+    if (u_race(u) == rc_snotling) {
+        /* snotlings may not be given to the peasants. */
+        return msg_error(u, ord, 307);
+    }
+    if (!can_give_men(u, NULL, ord, &msg)) {
         return msg;
     }
     transfermen(u, NULL, n);
-#ifdef ORCIFICATION
-    if (u_race(u) == get_race(RC_SNOTLING) && !fval(u->region, RF_ORCIFIED)) {
-        attrib *a = a_find(u->region->attribs, &at_orcification);
-        if (!a) {
-            a = a_add(&u->region->attribs, a_new(&at_orcification));
-        }
-        a->data.i += n;
-    }
-#endif
     if (fval(u->region->terrain, SEA_REGION)) {
         return msg_message("give_person_ocean", "unit amount", u, n);
     }
@@ -604,16 +600,19 @@ void give_cmd(unit * u, order * ord)
     }
 
     if (u2 && u_race(u2) == get_race(RC_SPELL)) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found",
-            ""));
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
+            "feedback_unit_not_found", ""));
         return;
     }
-
     else if (u2 && !alliedunit(u2, u->faction, HELP_GIVE) && !ucontact(u2, u)) {
         cmistake(u, ord, 40, MSG_COMMERCE);
         return;
     }
-
+    else if (p == NOPARAM) {
+        /* the most likely case: giving items to someone.
+         * let's catch this and save ourselves the rest of the param_t checks.
+         */
+    } 
     else if (p == P_HERBS) {
         bool given = false;
         if ((u_race(u)->ec_flags & ECF_KEEP_ITEM) && u2 != NULL) {
@@ -782,7 +781,7 @@ void give_cmd(unit * u, order * ord)
     }
 
     if (u2 != NULL) {
-        if ((u_race(u)->ec_flags & ECF_KEEP_ITEM) && u2 != NULL) {
+        if ((u_race(u)->ec_flags & ECF_KEEP_ITEM)) {
             ADDMSG(&u->faction->msgs,
                 msg_feedback(u, ord, "race_nogive", "race", u_race(u)));
             return;

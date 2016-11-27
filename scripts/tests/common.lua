@@ -380,6 +380,21 @@ function test_events()
   assert(fail==0)
 end
 
+function test_renumber_ship()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply4@eressea.de", "human", "de")
+    local u = unit.create(f, r)
+    local s = ship.create(r, config.ships[1])
+    u.ship = s
+    u:add_order("NUMMER SCHIFF 1")
+    process_orders()
+    assert_equal(1, s.id)
+    u:clear_orders()
+    u:add_order("NUMMER SCHIFF 2")
+    process_orders()
+    assert_equal(2, s.id)
+end
+
 function test_recruit2()
     local r = region.create(0, 0, "plain")
     local f = faction.create("noreply4@eressea.de", "human", "de")
@@ -673,8 +688,6 @@ function test_laen2()
   local laen = r:get_resource("laen")
  
   process_orders()
-  init_reports()
---  write_report(u1.faction)
   assert_equal(laen - 2, r:get_resource("laen"))
   assert_equal(2, u1:get_item("laen"))
 end
@@ -965,120 +978,6 @@ function test_bug_1795_demons()
   assert_equal(peasants, r:get_resource("peasant"))
 end
 
-module("tests.report", package.seeall, lunit.testcase)
-
-function setup()
-    eressea.free_game()
-    eressea.settings.set("nmr.timeout", "0")
-    eressea.settings.set("rules.food.flags", "4")
-end
-
-local function find_in_report(f, pattern, extension)
-    extension = extension or "nr"
-    local filename = config.reportpath .. "/" .. get_turn() .. "-" .. itoa36(f.id) .. "." .. extension
-    local report = io.open(filename, 'r');
-    assert_not_nil(report)
-    t = report:read("*all")
-    report:close()
-
-    local start, _ = string.find(t, pattern)
-    return start~=nil
-end
-
-local function remove_report(faction)
-    local filetrunk = config.reportpath .. "/" .. get_turn() .. "-" .. itoa36(faction.id)
-    os.remove(filetrunk .. ".nr")    
-    os.remove(filetrunk .. ".cr")    
-    os.remove(filetrunk .. ".txt")    
-end
-
-function test_coordinates_no_plane()
-    local r = region.create(0, 0, "mountain")
-    local f = faction.create("noplane@eressea.de", "human", "de")
-    local u = unit.create(f, r, 1)
-    init_reports()
-    write_report(f)
-    assert_true(find_in_report(f, r.name .. " %(0,0%), Berg"))
-    remove_report(f)
-end
-
-function test_show_shadowmaster_attacks()
-    local r = region.create(0, 0, "plain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
-    local u = unit.create(f, r, 1)
-    u.race = "shadowmaster"
-    u:clear_orders()
-    u:add_order("ZEIGE Schattenmeister")
-    process_orders()
-    init_reports()
-    write_report(f)
-    assert_false(find_in_report(f, ", ,"))
-    remove_report(f)
-end
-
-function test_coordinates_named_plane()
-    local p = plane.create(0, -3, -3, 7, 7, "Hell")
-    local r = region.create(0, 0, "mountain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
-    local u = unit.create(f, r, 1)
-    init_reports()
-    write_report(f)
-    assert_true(find_in_report(f, r.name .. " %(0,0,Hell%), Berg"))
-    remove_report(f)
-end
-
-function test_coordinates_unnamed_plane()
-    local p = plane.create(0, -3, -3, 7, 7)
-    local r = region.create(0, 0, "mountain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
-    local u = unit.create(f, r, 1)
-    init_reports()
-    write_report(f)
-    assert_true(find_in_report(f, r.name .. " %(0,0%), Berg"))
-    remove_report(f)
-end
-
-function test_coordinates_noname_plane()
-    local p = plane.create(0, -3, -3, 7, 7, "")
-    local r = region.create(0, 0, "mountain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
-    local u = unit.create(f, r, 1)
-    init_reports()
-    write_report(f)
-    assert_true(find_in_report(f, r.name .. " %(0,0%), Berg"))
-    remove_report(f)
-end
-
-function test_lighthouse()
-    eressea.free_game()
-    local r = region.create(0, 0, "mountain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
-    region.create(1, 0, "mountain")
-    region.create(2, 0, "ocean")
-    region.create(0, 1, "firewall")
-    region.create(3, 0, "mountain")
-    region.create(4, 0, "plain")
-    local u = unit.create(f, r, 1)
-    local b = building.create(r, "lighthouse")
-    b.size = 100
-    b.working = true
-    u.building = b
-    u:set_skill("perception", 9)
-    u:add_item("money", 1000)
-    assert_not_nil(b)
-
-    init_reports()
-    write_report(f)
-    assert_true(find_in_report(f, " %(1,0%) %(vom Turm erblickt%)"))
-    assert_true(find_in_report(f, " %(2,0%) %(vom Turm erblickt%)"))
-    assert_true(find_in_report(f, " %(3,0%) %(vom Turm erblickt%)"))
-
-    assert_false(find_in_report(f, " %(0,0%) %(vom Turm erblickt%)"))
-    assert_false(find_in_report(f, " %(0,1%) %(vom Turm erblickt%)"))
-    assert_false(find_in_report(f, " %(4,0%) %(vom Turm erblickt%)"))
-    remove_report(f)
-end
-
 module("tests.parser", package.seeall, lunit.testcase)
 
 function setup()
@@ -1138,4 +1037,17 @@ function test_prefix()
     assert_not_nil(u1:show():find("Erzelf"))
     u1.faction.locale = "en"
     assert_not_nil(u1:show():find("archelf"))
+end
+
+function test_recruit()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+
+    u:add_item("money", 1000)
+    set_order(u, "REKRUTIERE 5")
+    process_orders()
+    for u in f.units do
+        assert_equal(6, u.number)
+    end
 end

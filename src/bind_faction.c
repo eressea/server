@@ -19,7 +19,6 @@ without prior permission by the authors of Eressea.
 
 #include <kernel/alliance.h>
 #include <kernel/faction.h>
-#include <kernel/config.h>
 #include <kernel/unit.h>
 #include <kernel/item.h>
 #include <kernel/faction.h>
@@ -37,6 +36,23 @@ without prior permission by the authors of Eressea.
 
 #include <tolua.h>
 #include <string.h>
+
+typedef struct helpmode {
+    const char *name;
+    int status;
+} helpmode;
+
+static helpmode helpmodes[] = {
+    { "all", HELP_ALL },
+    { "money", HELP_MONEY },
+    { "fight", HELP_FIGHT },
+    { "observe", HELP_OBSERVE },
+    { "give", HELP_GIVE },
+    { "guard", HELP_GUARD },
+    { "stealth", HELP_FSTEALTH },
+    { "travel", HELP_TRAVEL },
+    { NULL, 0 }
+};
 
 int tolua_factionlist_next(lua_State * L)
 {
@@ -376,7 +392,7 @@ static int tolua_faction_create(lua_State * L)
         f = addfaction(email, NULL, frace, loc, 0);
     }
     if (!f) {
-        log_error("faction.create(%s, %s, %s)\n", email, racename, locale_name(loc));
+        log_error("cannot create %s faction for %s, unknown race.", racename, email);
     }
     tolua_pushusertype(L, f, TOLUA_CAST "faction");
     return 1;

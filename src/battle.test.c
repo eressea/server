@@ -6,6 +6,7 @@
 #include <kernel/config.h>
 #include <kernel/building.h>
 #include <kernel/faction.h>
+#include <kernel/curse.h>
 #include <kernel/item.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
@@ -59,7 +60,7 @@ static void test_make_fighter(CuTest * tc)
     test_cleanup();
 }
 
-static int add_two(building * b, unit * u, building_bonus bonus) {
+static int add_two(const building * b, const unit * u, building_bonus bonus) {
     return 2;
 }
 
@@ -187,7 +188,7 @@ static void test_building_defence_bonus(CuTest * tc)
     test_cleanup();
     r = test_create_region(0, 0, 0);
     btype = test_create_buildingtype("castle");
-    btype->protection = (int(*)(struct building *, struct unit *, building_bonus))get_function("building_protection");
+    btype->protection = (int(*)(const struct building *, const struct unit *, building_bonus))get_function("building_protection");
     btype->construction->defense_bonus = 3;
     bld = test_create_building(r, btype);
     bld->size = 1;
@@ -203,10 +204,14 @@ static void test_building_defence_bonus(CuTest * tc)
 }
 
 static fighter *setup_fighter(battle **bp, unit *u) {
-    battle *b;
+    battle *b = *bp;
+    side *s;
 
-    *bp = b = make_battle(u->region);
-    return make_fighter(b, u, make_side(b, u->faction, 0, 0, 0), false);
+    if (!b) {
+        *bp = b = make_battle(u->region);
+    }
+    s = make_side(b, u->faction, 0, 0, 0);
+    return make_fighter(b, u, s, false);
 }
 
 static void test_natural_armor(CuTest * tc)
@@ -229,7 +234,7 @@ static void test_natural_armor(CuTest * tc)
 static void test_calculate_armor(CuTest * tc)
 {
     troop dt;
-    battle *b;
+    battle *b = NULL;
     region *r;
     unit *du;
     weapon_type *wtype;
@@ -255,6 +260,7 @@ static void test_calculate_armor(CuTest * tc)
     CuAssertDblEquals_Msg(tc, "magres unmodified", 1.0, magres, 0.01);
     free_battle(b);
 
+    b = NULL;
     i_change(&du->items, ibelt, 1);
     dt.fighter = setup_fighter(&b, du);
     CuAssertIntEquals_Msg(tc, "magical armor", 1, calculate_armor(dt, 0, 0, 0));
@@ -263,6 +269,7 @@ static void test_calculate_armor(CuTest * tc)
     rc->armor = 0;
     free_battle(b);
 
+    b = NULL;
     i_change(&du->items, ishield, 1);
     i_change(&du->items, ichain, 1);
     dt.fighter = setup_fighter(&b, du);
@@ -270,6 +277,7 @@ static void test_calculate_armor(CuTest * tc)
     CuAssertIntEquals_Msg(tc, "require BF_EQUIPMENT", 1, calculate_armor(dt, 0, 0, 0));
     free_battle(b);
 
+    b = NULL;
     rc->battle_flags |= BF_EQUIPMENT;
     dt.fighter = setup_fighter(&b, du);
     CuAssertIntEquals_Msg(tc, "stack equipment rc", 5, calculate_armor(dt, 0, 0, 0));
@@ -296,7 +304,7 @@ static void test_calculate_armor(CuTest * tc)
 static void test_magic_resistance(CuTest *tc)
 {
     troop dt;
-    battle *b;
+    battle *b = NULL;
     region *r;
     unit *du;
     armor_type *ashield, *achain;
@@ -324,6 +332,7 @@ static void test_magic_resistance(CuTest *tc)
     calculate_armor(dt, 0, 0, &magres);
     free_battle(b);
 
+    b = NULL;
     i_change(&du->items, ishield, 1);
     i_change(&du->items, ichain, 1);
     achain->flags |= ATF_LAEN;
@@ -335,6 +344,7 @@ static void test_magic_resistance(CuTest *tc)
     CuAssertDblEquals_Msg(tc, "laen reduction", 0.81, magres, 0.01);
     free_battle(b);
 
+    b = NULL;
     i_change(&du->items, ishield, -1);
     i_change(&du->items, ichain, -1);
     set_level(du, SK_MAGIC, 2);
@@ -359,7 +369,7 @@ static void test_magic_resistance(CuTest *tc)
 static void test_projectile_armor(CuTest * tc)
 {
     troop dt;
-    battle *b;
+    battle *b = NULL;
     region *r;
     unit *du;
     weapon_type *wtype;
@@ -394,10 +404,88 @@ static void test_projectile_armor(CuTest * tc)
     test_cleanup();
 }
 
+static void test_battle_skilldiff(CuTest *tc)
+{
+    troop ta, td;
+    region *r;
+    unit *ua, *ud;
+    battle *b = NULL;
+
+    test_cleanup();
+
+    r = test_create_region(0, 0, 0);
+    ud = test_create_unit(test_create_faction(0), r);
+    ua = test_create_unit(test_create_faction(0), r);
+    td.fighter = setup_fighter(&b, ud);
+    td.index = 0;
+    ta.fighter = setup_fighter(&b, ua);
+    ta.index = 0;
+    ua = test_create_unit(test_create_faction(0), r);
+    CuAssertIntEquals(tc, 0, skilldiff(ta, td, 0));
+
+    ta.fighter->person[0].attack = 2;
+    td.fighter->person[0].defence = 1;
+    CuAssertIntEquals(tc, 1, skilldiff(ta, td, 0));
+
+    td.fighter->person[0].flags |= FL_SLEEPING;
+    CuAssertIntEquals(tc, 3, skilldiff(ta, td, 0));
+
+    // TODO: unarmed halfling vs. dragon: +5
+    // TODO: rule_goblin_bonus
+    // TODO: weapon modifiers, missiles, skill_formula
+
+    free_battle(b);
+    test_cleanup();
+}
+
+static int protect(const building *b, const unit *u, building_bonus bonus) {
+    return (bonus == DEFENSE_BONUS) ? 4 : 0;
+}
+
+static void test_battle_skilldiff_building(CuTest *tc)
+{
+    troop ta, td;
+    region *r;
+    unit *ua, *ud;
+    battle *b = NULL;
+    building_type *btype;
+    const curse_type *strongwall_ct, *magicwalls_ct;
+
+    test_cleanup();
+    btype = test_create_buildingtype("castle");
+    strongwall_ct = ct_find("strongwall");
+    magicwalls_ct = ct_find("magicwalls");
+
+    r = test_create_region(0, 0, 0);
+    ud = test_create_unit(test_create_faction(0), r);
+    ud->building = test_create_building(ud->region, btype);
+    ua = test_create_unit(test_create_faction(0), r);
+    td.fighter = setup_fighter(&b, ud);
+    td.index = 0;
+    ta.fighter = setup_fighter(&b, ua);
+    ta.index = 0;
+    ua = test_create_unit(test_create_faction(0), r);
+    CuAssertIntEquals(tc, 0, skilldiff(ta, td, 0));
+
+    btype->protection = protect;
+    CuAssertIntEquals(tc, -4, skilldiff(ta, td, 0));
+
+    create_curse(NULL, &ud->building->attribs, magicwalls_ct, 1, 1, 1, 1);
+    CuAssertIntEquals(tc, -8, skilldiff(ta, td, 0));
+
+    create_curse(NULL, &ud->building->attribs, strongwall_ct, 1, 1, 2, 1);
+    CuAssertIntEquals(tc, -10, skilldiff(ta, td, 0));
+
+    free_battle(b);
+    test_cleanup();
+}
+
 CuSuite *get_battle_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_make_fighter);
+    SUITE_ADD_TEST(suite, test_battle_skilldiff);
+    SUITE_ADD_TEST(suite, test_battle_skilldiff_building);
     SUITE_ADD_TEST(suite, test_defenders_get_building_bonus);
     SUITE_ADD_TEST(suite, test_attackers_get_no_building_bonus);
     SUITE_ADD_TEST(suite, test_building_bonus_respects_size);

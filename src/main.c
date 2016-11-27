@@ -20,16 +20,16 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 
 #include <kernel/config.h>
-#include <kernel/save.h>
 #include <kernel/version.h>
+#include <kernel/save.h>
 #include <util/filereader.h>
 #include <util/language.h>
 #include "eressea.h"
+#include "battle.h"
 #ifdef USE_CURSES
 #include "gmtool.h"
 #endif
 
-#include "buildno.h"
 #include "bindings.h"
 #include "races/races.h"
 #include "spells.h"
@@ -69,11 +69,6 @@ static void load_inifile(dictionary * d)
     }
 
     lomem = iniparser_getint(d, "eressea:lomem", lomem) ? 1 : 0;
-
-    str = iniparser_getstring(d, "eressea:encoding", NULL);
-    if (str && (_strcmpl(str, "utf8") == 0 || _strcmpl(str, "utf-8") == 0)) {
-        enc_gamedata = ENCODING_UTF8;
-    }
 
     verbosity = iniparser_getint(d, "eressea:verbose", 2);
     battledebug = iniparser_getint(d, "eressea:debug", battledebug) ? 1 : 0;
@@ -166,8 +161,8 @@ static int parse_args(int argc, char **argv, int *exitcode)
             if (strcmp(argi + 2, "version") == 0) {
                 printf("\n%s PBEM host\n"
                     "Copyright (C) 1996-2005 C. Schlittchen, K. Zedel, E. Rehling, H. Peters.\n\n"
-                    "Compilation: " __DATE__ " at " __TIME__ "\nVersion: %d.%d.%d\n\n",
-                    game_name(), VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD);
+                    "Compilation: " __DATE__ " at " __TIME__ "\nVersion: %s\n\n",
+                    game_name(), eressea_version());
 #ifdef USE_CURSES          
             }
             else if (strcmp(argi + 2, "color") == 0) {
@@ -263,27 +258,6 @@ static int setup_signal_handler(void)
 }
 #endif
 
-#undef CRTDBG
-#ifdef CRTDBG
-#include <crtdbg.h>
-void init_crtdbg(void)
-{
-#if (defined(_MSC_VER))
-    int flags = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
-    if (memdebug == 1) {
-        flags |= _CRTDBG_CHECK_ALWAYS_DF;   /* expensive */
-    } else if (memdebug == 2) {
-        flags = (flags & 0x0000FFFF) | _CRTDBG_CHECK_EVERY_16_DF;
-    } else if (memdebug == 3) {
-        flags = (flags & 0x0000FFFF) | _CRTDBG_CHECK_EVERY_128_DF;
-    } else if (memdebug == 4) {
-        flags = (flags & 0x0000FFFF) | _CRTDBG_CHECK_EVERY_1024_DF;
-    }
-    _CrtSetDbgFlag(flags);
-#endif
-}
-#endif
-
 void locale_init(void)
 {
     setlocale(LC_CTYPE, "");
@@ -311,10 +285,6 @@ int main(int argc, char **argv)
 
     locale_init();
 
-#ifdef CRTDBG
-    init_crtdbg();
-#endif
-
     L = lua_init();
     game_init();
     bind_monsters(L);
@@ -323,10 +293,6 @@ int main(int argc, char **argv)
         log_error("script %s failed with code %d\n", luafile, err);
         return err;
     }
-#ifdef MSPACES
-    malloc_stats();
-#endif
-
     game_done();
     lua_done(L);
     log_close();

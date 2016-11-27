@@ -1,7 +1,6 @@
 #include <platform.h>
 #include "tests.h"
 #include "keyword.h"
-#include "seen.h"
 #include "prefix.h"
 #include "reports.h"
 
@@ -24,13 +23,14 @@
 #include <util/bsdstring.h>
 #include <util/functions.h>
 #include <util/language.h>
+#include <util/lists.h>
 #include <util/message.h>
 #include <util/log.h>
 #include <util/rand.h>
+#include <util/assert.h>
 
 #include <CuTest.h>
 
-#include <assert.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
@@ -93,16 +93,14 @@ struct locale * test_create_locale(void) {
         for (i = 0; i != MAXKEYWORDS; ++i) {
             locale_setstring(loc, mkname("keyword", keywords[i]), keywords[i]);
         }
-        for (i = 0; i != MAXSKILLS; ++i) {
-            locale_setstring(loc, mkname("skill", skillnames[i]), skillnames[i]);
-        }
         for (i = 0; i != MAXPARAMS; ++i) {
             locale_setstring(loc, parameters[i], parameters[i]);
             test_translate_param(loc, i, parameters[i]);
         }
-        init_parameters(loc);
-        init_keywords(loc);
-        init_skills(loc);
+        for (i = 0; i != MAXMAGIETYP; ++i) {
+            locale_setstring(loc, mkname("school", magic_school[i]), magic_school[i]);
+        }
+        init_locale(loc);
     }
     return loc;
 }
@@ -118,16 +116,57 @@ struct faction *test_create_faction(const struct race *rc)
 struct unit *test_create_unit(struct faction *f, struct region *r)
 {
     const struct race * rc = f ? f->race : 0;
-    assert(f || !r);
+    assert(f && r);
     if (!rc) rc = rc_get_or_create("human");
     return create_unit(r, f, 1, rc ? rc : rc_get_or_create("human"), 0, 0, 0);
 }
 
-void test_cleanup(void)
-{
-    int i;
+static void log_list(void *udata, int flags, const char *module, const char *format, va_list args) {
+    strlist **slp = (strlist **)udata;
+    addstrlist(slp, format);
+}
 
+struct log_t * test_log_start(int flags, strlist **slist) {
+    return log_create(flags, slist, log_list);
+}
+
+void test_log_stop(struct log_t *log, struct strlist *slist) {
+    freestrlist(slist);
+    log_destroy(log);
+}
+
+void test_log_stderr(int flags) {
+    static struct log_t *stderrlog;
+    if (flags) {
+        if (stderrlog) {
+            log_error("stderr logging is still active. did you call test_cleanup?");
+            log_destroy(stderrlog);
+        }
+        stderrlog = log_to_file(flags, stderr);
+    }
+    else {
+        if (stderrlog) {
+            log_destroy(stderrlog);
+        }
+        else {
+            log_warning("stderr logging is inactive. did you call test_cleanup twice?");
+        }
+        stderrlog = 0;
+    }
+
+}
+
+static void test_reset(void) {
+    int i;
+    turn = 0;
     default_locale = 0;
+
+    if (errno) {
+        int error = errno;
+        errno = 0;
+        log_error("errno: %d (%s)", error, strerror(error));
+    }
+
     free_gamedata();
     free_terrains();
     free_resources();
@@ -140,7 +179,6 @@ void test_cleanup(void)
     free_shiptypes();
     free_races();
     free_spellbooks();
-    free_seen();
     free_prefixes();
     mt_clear();
     for (i = 0; i != MAXSKILLS; ++i) {
@@ -149,13 +187,30 @@ void test_cleanup(void)
     for (i = 0; i != MAXKEYWORDS; ++i) {
         enable_keyword(i, true);
     }
+    random_source_reset();
+
     if (errno) {
         int error = errno;
         errno = 0;
         log_error("errno: %d (%s)", error, strerror(error));
     }
+}
 
-    random_source_reset();
+void test_setup_test(CuTest *tc, const char *file, int line) {
+    test_log_stderr(LOG_CPERROR);
+    test_reset();
+    if (tc) {
+        log_debug("start test: %s", tc->name);
+    }
+    else {
+        log_debug("start test in %s:%d", file, line);
+    }
+}
+
+void test_cleanup(void)
+{
+    test_reset();
+    test_log_stderr(0);
 }
 
 terrain_type *
@@ -168,7 +223,9 @@ test_create_terrain(const char * name, unsigned int flags)
 
 building * test_create_building(region * r, const building_type * btype)
 {
-    building * b = new_building(btype ? btype : test_create_buildingtype("castle"), r, default_locale);
+    building * b;
+    assert(r);
+    b = new_building(btype ? btype : test_create_buildingtype("castle"), r, default_locale);
     b->size = b->type->maxsize > 0 ? b->type->maxsize : 1;
     return b;
 }
@@ -191,6 +248,7 @@ ship_type * test_create_shiptype(const char * name)
     stype->damage = 1;
     if (!stype->construction) {
         stype->construction = calloc(1, sizeof(construction));
+        assert_alloc(stype->construction);
         stype->construction->maxsize = 5;
         stype->construction->minskill = 1;
         stype->construction->reqsize = 1;
@@ -259,6 +317,7 @@ spell * test_create_spell(void)
     sp = create_spell("testspell", 0);
 
     sp->components = (spell_component *)calloc(4, sizeof(spell_component));
+    assert_alloc(sp->components);
     sp->components[0].amount = 1;
     sp->components[0].type = get_resourcetype(R_SILVER);
     sp->components[0].cost = SPC_FIX;
@@ -377,15 +436,36 @@ const char * test_get_messagetype(const message *msg) {
     return name;
 }
 
-struct message * test_find_messagetype(struct message_list *msgs, const char *name) {
+struct message * test_find_messagetype_ex(struct message_list *msgs, const char *name, struct message *prev)
+{
     struct mlist *ml;
     if (!msgs) return 0;
     for (ml = msgs->begin; ml; ml = ml->next) {
         if (strcmp(name, test_get_messagetype(ml->msg)) == 0) {
-            return ml->msg;
+            if (prev) {
+                if (ml->msg == prev) {
+                    prev = NULL;
+                }
+            }
+            else {
+                return ml->msg;
+            }
         }
     }
     return 0;
+}
+
+struct message * test_find_messagetype(struct message_list *msgs, const char *name)
+{
+    return test_find_messagetype_ex(msgs, name, NULL);
+}
+
+void test_clear_messagelist(message_list **msgs) {
+    if (*msgs) {
+        free_messagelist((*msgs)->begin);
+        free(*msgs);
+        *msgs = NULL;
+    }
 }
 
 void test_clear_messages(faction *f) {

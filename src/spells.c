@@ -15,6 +15,7 @@
 #include <platform.h>
 #include <kernel/config.h>
 
+#include "guard.h"
 #include "spy.h"
 #include "vortex.h"
 #include "laws.h"
@@ -46,18 +47,17 @@
 #include <kernel/pool.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/save.h>
 #include <kernel/ship.h>
 #include <kernel/spell.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
 #include <kernel/xmlreader.h>
-#include <kernel/version.h>
 
 #include <races/races.h>
 
 /* util includes */
+#include <util/assert.h>
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/event.h>
@@ -80,7 +80,6 @@
 #include <storage.h>
 
 /* libc includes */
-#include <assert.h>
 #include <ctype.h>
 #include <math.h>
 #include <stdio.h>
@@ -107,10 +106,6 @@
 #endif
 
 static double zero_effect = 0.0;
-
-attrib_type at_wdwpyramid = {
-    "wdwpyramid", NULL, NULL, NULL, a_writevoid, a_readvoid
-};
 
 /* ----------------------------------------------------------------------- */
 
@@ -451,7 +446,7 @@ report_effect(region * r, unit * mage, message * seen, message * unseen)
  * Vertrauten sehen, und durch den Vertrauten zaubern, allerdings nur
  * mit seiner halben Stufe. Je nach Vertrautem erhaelt der Magier
  * evtl diverse Skillmodifikationen.  Der Typ des Vertrauten ist
- * zufaellig bestimmt, wird aber durch Magiegebiet und Rasse beeinflußt.
+ * zufaellig bestimmt, wird aber durch Magiegebiet und Rasse beeinfluï¿½t.
  * "Tierische" Vertraute brauchen keinen Unterhalt.
  *
  * Ein paar Moeglichkeiten:
@@ -969,7 +964,7 @@ static int sp_blessstonecircle(castorder * co)
 
     b = p->param[0]->data.b;
 
-    if (b->type != bt_find("stonecircle")) {
+    if (!is_building_type(b->type, "stonecircle")) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "error_notstonecircle", "building", b));
         return 0;
@@ -1263,6 +1258,7 @@ add_ironweapon(const struct item_type *type, const struct item_type *rusty,
 float chance)
 {
     iron_weapon *iweapon = malloc(sizeof(iron_weapon));
+    assert_alloc(iweapon);
     iweapon->type = type;
     iweapon->rusty = rusty;
     iweapon->chance = chance;
@@ -1501,16 +1497,23 @@ static int sp_create_irongolem(castorder * co)
     int cast_level = co->level;
     double force = co->force;
     int number = lovar(force * 8 * RESOURCE_QUANTITY);
-    if (number < 1)
+    static int cache;
+    static const race * golem_rc;
+    
+    if (rc_changed(&cache)) {
+        golem_rc = rc_find("irongolem");
+    }
+    
+    if (number < 1) {
         number = 1;
+    }
 
     if (r->terrain == newterrain(T_SWAMP)) {
         cmistake(mage, co->order, 188, MSG_MAGIC);
         return 0;
     }
 
-    u2 =
-        create_unit(r, mage->faction, number, rc_find("irongolem"), 0, NULL, mage);
+    u2 = create_unit(r, mage->faction, number, golem_rc, 0, NULL, mage);
 
     set_level(u2, SK_ARMORER, 1);
     set_level(u2, SK_WEAPONSMITH, 1);
@@ -1523,7 +1526,7 @@ static int sp_create_irongolem(castorder * co)
     ADDMSG(&mage->faction->msgs,
         msg_message("magiccreate_effect", "region command unit amount object",
         mage->region, co->order, mage, number,
-        LOC(mage->faction->locale, rc_name_s(rc_find("irongolem"), (u2->number == 1) ? NAME_SINGULAR : NAME_PLURAL))));
+        LOC(mage->faction->locale, rc_name_s(golem_rc, (u2->number == 1) ? NAME_SINGULAR : NAME_PLURAL))));
 
     return cast_level;
 }
@@ -1563,6 +1566,12 @@ static int sp_create_stonegolem(castorder * co)
     unit *mage = co->magician.u;
     int cast_level = co->level;
     int number = lovar(co->force * 5 * RESOURCE_QUANTITY);
+    static int cache;
+    static const race * golem_rc;
+    
+    if (rc_changed(&cache)) {
+        golem_rc = rc_find("stonegolem");
+    }
     if (number < 1)
         number = 1;
 
@@ -1572,7 +1581,7 @@ static int sp_create_stonegolem(castorder * co)
     }
 
     u2 =
-        create_unit(r, mage->faction, number, rc_find("stonegolem"), 0, NULL, mage);
+        create_unit(r, mage->faction, number, golem_rc, 0, NULL, mage);
     set_level(u2, SK_ROAD_BUILDING, 1);
     set_level(u2, SK_BUILDING, 1);
 
@@ -1584,13 +1593,13 @@ static int sp_create_stonegolem(castorder * co)
     ADDMSG(&mage->faction->msgs,
         msg_message("magiccreate_effect", "region command unit amount object",
         mage->region, co->order, mage, number,
-        LOC(mage->faction->locale, rc_name_s(rc_find("stonegolem"), (u2->number == 1) ? NAME_SINGULAR : NAME_PLURAL))));
+        LOC(mage->faction->locale, rc_name_s(golem_rc, (u2->number == 1) ? NAME_SINGULAR : NAME_PLURAL))));
 
     return cast_level;
 }
 
 /* ------------------------------------------------------------- */
-/* Name:       Große Duerre
+/* Name:       Groï¿½e Duerre
  * Stufe:      17
  * Kategorie:  Region, negativ
  * Gebiet:     Gwyrrd
@@ -1898,7 +1907,7 @@ static int sp_treewalkexit(castorder * co)
         return 0;
     }
 
-    /* Koordinaten setzen und Region loeschen fuer Überpruefung auf
+    /* Koordinaten setzen und Region loeschen fuer ï¿½berpruefung auf
      * Gueltigkeit */
     rt = pa->param[0]->data.r;
     tax = rt->x;
@@ -2011,7 +2020,7 @@ static int sp_treewalkexit(castorder * co)
  */
 static int sp_holyground(castorder * co)
 {
-    static const curse_type *ctype = NULL;
+    const curse_type *ctype = NULL;
     region *r = co_get_region(co);
     unit *mage = co->magician.u;
     int cast_level = co->level;
@@ -2020,9 +2029,7 @@ static int sp_holyground(castorder * co)
     report_spell(mage, r, msg);
     msg_release(msg);
 
-    if (!ctype) {
-        ctype = ct_find("holyground");
-    }
+    ctype = ct_find("holyground");
     create_curse(mage, &r->attribs, ctype, power * power, 1, zero_effect, 0);
 
     a_removeall(&r->attribs, &at_deathcount);
@@ -2053,7 +2060,7 @@ static int sp_homestone(castorder * co)
     double force = co->force;
     double effect;
     message *msg;
-    if (!mage->building || mage->building->type != bt_find("castle")) {
+    if (!mage->building || !is_building_type(mage->building->type, "castle")) {
         cmistake(mage, co->order, 197, MSG_MAGIC);
         return 0;
     }
@@ -2185,9 +2192,9 @@ static int sp_ironkeeper(castorder * co)
 
     /*keeper->age = cast_level + 2; */
     setstatus(keeper, ST_AVOID);  /* kaempft nicht */
-    guard(keeper, GUARD_MINING);
+    setguard(keeper, true);
     fset(keeper, UFL_ISNEW);
-    /* Parteitarnen, damit man nicht sofort weiß, wer dahinter steckt */
+    /* Parteitarnen, damit man nicht sofort weiï¿½, wer dahinter steckt */
     if (rule_stealth_anon()) {
         fset(keeper, UFL_ANON_FACTION);
     }
@@ -2375,7 +2382,6 @@ void patzer_peasantmob(const castorder * co)
             create_unit(r, f, n, get_race(RC_PEASANT), 0, LOC(f->locale, "angry_mob"),
             NULL);
         fset(u, UFL_ISNEW);
-        /* guard(u, GUARD_ALL);  hier zu frueh! Befehl BEWACHE setzten */
         addlist(&u->orders, create_order(K_GUARD, lang, NULL));
         set_order(&u->thisorder, default_order(lang));
         a = a_new(&at_unitdissolve);
@@ -2566,7 +2572,7 @@ void patzer_fumblecurse(const castorder * co)
  *
  * Wirkung:
  *  In einer Wueste, Sumpf oder Gletscher gezaubert kann innerhalb der
- *  naechsten 6 Runden ein bis 6 Dracheneinheiten bis Groeße Wyrm
+ *  naechsten 6 Runden ein bis 6 Dracheneinheiten bis Groeï¿½e Wyrm
  *  entstehen.
  *
  *  Mit Stufe 12-15 erscheinen Jung- oder normaler Drachen, mit Stufe
@@ -2719,6 +2725,26 @@ static int sp_firewall(castorder * co)
  *   (SPELLLEVEL | TESTCANSEE)
  */
 
+static const race *unholy_race(const race *rc) {
+    static int cache;
+    static const race * rc_skeleton, *rc_zombie, *rc_ghoul;
+    if (rc_changed(&cache)) {
+        rc_skeleton = get_race(RC_SKELETON);
+        rc_zombie = get_race(RC_ZOMBIE);
+        rc_ghoul = get_race(RC_GHOUL);
+    }
+    if (rc == rc_skeleton) {
+        return get_race(RC_SKELETON_LORD);
+    }
+    if (rc == rc_zombie) {
+        return get_race(RC_ZOMBIE_LORD);
+    }
+    if (rc == rc_ghoul) {
+        return get_race(RC_GHOUL_LORD);
+    }
+    return NULL;
+}
+
 static int sp_unholypower(castorder * co)
 {
     region * r = co_get_region(co);
@@ -2741,17 +2767,8 @@ static int sp_unholypower(castorder * co)
 
         u = pa->param[i]->data.u;
 
-        switch (old_race(u_race(u))) {
-        case RC_SKELETON:
-            target_race = get_race(RC_SKELETON_LORD);
-            break;
-        case RC_ZOMBIE:
-            target_race = get_race(RC_ZOMBIE_LORD);
-            break;
-        case RC_GHOUL:
-            target_race = get_race(RC_GHOUL_LORD);
-            break;
-        default:
+        target_race = unholy_race(u_race(u));
+        if (!target_race) {
             cmistake(mage, co->order, 284, MSG_MAGIC);
             continue;
         }
@@ -2800,7 +2817,7 @@ static int change_hitpoints(unit * u, int value)
 
     hp += value;
 
-    /* Jede Person benötigt mindestens 1 HP */
+    /* Jede Person benï¿½tigt mindestens 1 HP */
     if (hp < u->number) {
         if (hp < 0) {               /* Einheit tot */
             hp = 0;
@@ -3205,15 +3222,14 @@ static int sp_magicboost(castorder * co)
     double power = co->force;
     double effect;
     trigger *tsummon;
-    static const curse_type *ct_auraboost;
-    static const curse_type *ct_magicboost;
+    const curse_type *ct_auraboost;
+    const curse_type *ct_magicboost;
 
-    if (!ct_auraboost) {
-        ct_auraboost = ct_find("auraboost");
-        ct_magicboost = ct_find("magicboost");
-        assert(ct_auraboost != NULL);
-        assert(ct_magicboost != NULL);
-    }
+    ct_auraboost = ct_find("auraboost");
+    ct_magicboost = ct_find("magicboost");
+    assert(ct_auraboost != NULL);
+    assert(ct_magicboost != NULL);
+
     /* fehler, wenn schon ein boost */
     if (is_cursed(mage->attribs, C_MBOOST, 0)) {
         report_failure(mage, co->order);
@@ -3221,8 +3237,7 @@ static int sp_magicboost(castorder * co)
     }
 
     effect = 6;
-    c = create_curse(mage, &mage->attribs, ct_magicboost, power, 10, effect, 1);
-
+    create_curse(mage, &mage->attribs, ct_magicboost, power, 10, effect, 1);
     /* one aura boost with 200% aura now: */
     effect = 200;
     c = create_curse(mage, &mage->attribs, ct_auraboost, power, 4, effect, 1);
@@ -3725,7 +3740,7 @@ static int sp_rallypeasantmob(castorder * co)
             rsetpeasants(r, rpeasants(r) + u->number);
             rsetmoney(r, rmoney(r) + get_money(u));
             set_money(u, 0);
-            setguard(u, GUARD_NONE);
+            setguard(u, false);
             set_number(u, 0);
             erfolg = cast_level;
         }
@@ -3748,7 +3763,7 @@ static int sp_rallypeasantmob(castorder * co)
  * Gebiet:   Cerddor
  * Wirkung:
  *  Wiegelt 60% bis 90% der Bauern einer Region auf.  Bauern werden ein
- *  großer Mob, der zur Monsterpartei gehoert und die Region bewacht.
+ *  groï¿½er Mob, der zur Monsterpartei gehoert und die Region bewacht.
  *  Regionssilber sollte auch nicht durch Unterhaltung gewonnen werden
  *  koennen.
  *
@@ -3792,7 +3807,7 @@ static int sp_raisepeasantmob(castorder * co)
         create_unit(r, monsters, n, get_race(RC_PEASANT), 0, LOC(monsters->locale,
         "furious_mob"), NULL);
     fset(u, UFL_ISNEW);
-    guard(u, GUARD_ALL);
+    setguard(u, true);
     a = a_new(&at_unitdissolve);
     a->data.ca[0] = 1;            /* An rpeasants(r). */
     a->data.ca[1] = 15;           /* 15% */
@@ -4009,13 +4024,13 @@ static int sp_recruit(castorder * co)
         return 0;
     }
     /* Immer noch zuviel auf niedrigen Stufen. Deshalb die Rekrutierungskosten
-     * mit einfliessen lassen und dafuer den Exponenten etwas groeßer.
+     * mit einfliessen lassen und dafuer den Exponenten etwas groeï¿½er.
      * Wenn die Rekrutierungskosten deutlich hoeher sind als der Faktor,
      * ist das Verhaeltniss von ausgegebene Aura pro Bauer bei Stufe 2
      * ein mehrfaches von Stufe 1, denn in beiden Faellen gibt es nur 1
      * Bauer, nur die Kosten steigen. */
     n = (pow(force, 1.6) * 100) / f->race->recruitcost;
-    if (rc->recruit_multi != 0) {
+    if (rc->recruit_multi > 0) {
         double multp = (double)maxp / rc->recruit_multi;
         n = _min(multp, n);
         n = _max(n, 1);
@@ -4040,7 +4055,7 @@ static int sp_recruit(castorder * co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:    Wanderprediger - Große Anwerbung
+/* Name:    Wanderprediger - Groï¿½e Anwerbung
  * Stufe:   14
  * Gebiet:  Cerddor
  * Wirkung:
@@ -4096,8 +4111,8 @@ static int sp_bigrecruit(castorder * co)
  * Gebiet:   Cerddor
  * Wirkung:
  *  Erliegt die Einheit dem Zauber, so wird sie dem Magier alles
- *  erzaehlen, was sie ueber die gefragte Region weiß. Ist in der Region
- *  niemand ihrer Partei, so weiß sie nichts zu berichten.  Auch kann
+ *  erzaehlen, was sie ueber die gefragte Region weiï¿½. Ist in der Region
+ *  niemand ihrer Partei, so weiï¿½ sie nichts zu berichten.  Auch kann
  *  sie nur das erzaehlen, was sie selber sehen koennte.
  * Flags:
  *   (UNITSPELL | TESTCANSEE)
@@ -4147,7 +4162,7 @@ static int sp_pump(castorder * co)
     }
 
     u =
-        create_unit(rt, mage->faction, RS_FARVISION, get_race(RC_SPELL), 0,
+        create_unit(rt, mage->faction, 1, get_race(RC_SPELL), 0,
         "spell/pump", NULL);
     u->age = 2;
     set_level(u, SK_PERCEPTION, effskill(target, SK_PERCEPTION, 0));
@@ -4160,7 +4175,7 @@ static int sp_pump(castorder * co)
  * Stufe:   6
  * Gebiet:   Cerddor
  * Wirkung:
- *  Betoert eine Einheit, so das sie ihm den groeßten Teil ihres Bargelds
+ *  Betoert eine Einheit, so das sie ihm den groeï¿½ten Teil ihres Bargelds
  *  und 50% ihres Besitzes schenkt. Sie behaelt jedoch immer soviel, wie
  *  sie zum ueberleben braucht. Wirkt gegen Magieresistenz.
  *  _min(Stufe*1000$, u->money - maintenace)
@@ -4317,7 +4332,7 @@ static int sp_headache(castorder * co)
     if (target->number == 0 || pa->param[0]->flag == TARGET_NOTFOUND)
         return 0;
 
-    /* finde das groeßte Talent: */
+    /* finde das groeï¿½te Talent: */
     for (i = 0; i != target->skill_size; ++i) {
         skill *sv = target->skills + i;
         if (smax == NULL || skill_compare(sv, smax) > 0) {
@@ -4463,7 +4478,7 @@ int sp_puttorest(castorder * co)
     return co->level;
 }
 
-/* Name:       Traumschloeßchen
+/* Name:       Traumschloeï¿½chen
  * Stufe:      3
  * Kategorie:  Region, Gebaeude, positiv
  * Gebiet:     Illaun
@@ -4498,7 +4513,7 @@ int sp_icastle(castorder * co)
 
     b = new_building(bt_illusion, r, mage->faction->locale);
 
-    /* Groeße festlegen. */
+    /* Groeï¿½e festlegen. */
     if (type == bt_illusion) {
         b->size = (rng_int() % (int)((power * power) + 1) * 10);
     }
@@ -4676,7 +4691,7 @@ int sp_baddreams(castorder * co)
  * Kategorie:
  * Wirkung:
  *   Dieser Zauber ermoeglicht es dem Traeumer, den Schlaf aller aliierten
- *   Einheiten in der Region so zu beeinflussen, daß sie fuer einige Zeit
+ *   Einheiten in der Region so zu beeinflussen, daï¿½ sie fuer einige Zeit
  *   einen Bonus von 1 Talentstufe in allen Talenten
  *   bekommen. Der Zauber wirkt erst im Folgemonat.
  * Flags:
@@ -4791,7 +4806,7 @@ int sp_dreamreading(castorder * co)
     }
 
     u2 =
-        create_unit(u->region, mage->faction, RS_FARVISION, get_race(RC_SPELL), 0,
+        create_unit(u->region, mage->faction, 1, get_race(RC_SPELL), 0,
         "spell/dreamreading", NULL);
     set_number(u2, 1);
     u2->age = 2;                  /* Nur fuer diese Runde. */
@@ -5670,7 +5685,7 @@ int sp_viewreality(castorder * co)
         region *rt = rl2->data;
         if (!is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
             u =
-                create_unit(rt, mage->faction, RS_FARVISION, get_race(RC_SPELL), 0,
+                create_unit(rt, mage->faction, 1, get_race(RC_SPELL), 0,
                 "spell/viewreality", NULL);
             set_level(u, SK_PERCEPTION, co->level / 2);
             u->age = 2;
@@ -5973,8 +5988,8 @@ int sp_movecastle(castorder * co)
         u = unext;
     }
 
-    if ((b->type == bt_find("caravan") || b->type == bt_find("dam")
-        || b->type == bt_find("tunnel"))) {
+    if ((is_building_type(b->type, "caravan") || is_building_type(b->type, "dam")
+        || is_building_type(b->type, "tunnel"))) {
         direction_t d;
         for (d = 0; d != MAXDIRECTIONS; ++d) {
             if (rroad(r, d)) {
@@ -6275,21 +6290,21 @@ int sp_q_antimagie(castorder * co)
     {
         unit *u = pa->param[0]->data.u;
         ap = &u->attribs;
-        ts = unitid(u);
+        ts = itoa36(u->no);
         break;
     }
     case SPP_BUILDING:
     {
         building *b = pa->param[0]->data.b;
         ap = &b->attribs;
-        ts = buildingid(b);
+        ts = itoa36(b->no);
         break;
     }
     case SPP_SHIP:
     {
         ship *sh = pa->param[0]->data.sh;
         ap = &sh->attribs;
-        ts = shipid(sh);
+        ts = itoa36(sh->no);
         break;
     }
     default:
@@ -6368,21 +6383,21 @@ int sp_break_curse(castorder * co)
         {
             unit *u = pa->param[0]->data.u;
             ap = &u->attribs;
-            ts = unitid(u);
+            ts = itoa36(u->no);
             break;
         }
         case SPP_BUILDING:
         {
             building *b = pa->param[0]->data.b;
             ap = &b->attribs;
-            ts = buildingid(b);
+            ts = itoa36(b->no);
             break;
         }
         case SPP_SHIP:
         {
             ship *sh = pa->param[0]->data.sh;
             ap = &sh->attribs;
-            ts = shipid(sh);
+            ts = itoa36(sh->no);
             break;
         }
         default:
@@ -6702,7 +6717,6 @@ void register_spells(void)
 {
     register_borders();
 
-    at_register(&at_wdwpyramid);
     at_register(&at_deathcloud_compat);
 
     /* init_firewall(); */

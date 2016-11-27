@@ -35,6 +35,8 @@ extern "C" {
     struct troop;
     struct item;
     struct order;
+    struct storage;
+    struct gamedata;
 
     typedef struct item {
         struct item *next;
@@ -58,6 +60,8 @@ extern "C" {
     /* flags for resource_type::name() */
 #define NMF_PLURAL     0x01
 #define NMF_APPEARANCE 0x02
+
+    void item_done(void);
 
     typedef int(*rtype_uchange) (struct unit * user,
         const struct resource_type * rtype, int delta);
@@ -106,7 +110,6 @@ extern "C" {
     typedef struct resource_limit {
         rlimit_limit limit;
         rlimit_produce produce;
-        unsigned int guard;         /* how to guard against theft */
         int value;
         resource_mod *modifiers;
     } resource_limit;
@@ -245,6 +248,9 @@ extern "C" {
     void i_free(item * i);
     void i_freeall(item ** i);
     item *i_new(const item_type * it, int number);
+
+    void read_items(struct storage *store, struct item **it);
+    void write_items(struct storage *store, struct item *it);
 
     /* convenience: */
     item *i_change(item ** items, const item_type * it, int delta);

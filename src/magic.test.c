@@ -27,7 +27,7 @@ void test_updatespells(CuTest * tc)
     spell * sp;
     spellbook *book = 0;
 
-    test_cleanup();
+    test_setup();
     test_create_race("human");
 
     f = test_create_faction(0);
@@ -53,7 +53,7 @@ void test_spellbooks(CuTest * tc)
     spellbook *herp, *derp;
     spellbook_entry *entry;
     const char * sname = "herpderp";
-    test_cleanup();
+    test_setup();
 
     herp = get_spellbook("herp");
     CuAssertPtrNotNull(tc, herp);
@@ -85,7 +85,7 @@ void test_pay_spell(CuTest * tc)
     region * r;
     int level;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
     r = findregion(0, 0);
     f = test_create_faction(0);
@@ -119,7 +119,7 @@ void test_pay_spell_failure(CuTest * tc)
     struct region * r;
     int level;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
     r = findregion(0, 0);
     f = test_create_faction(0);
@@ -157,7 +157,7 @@ void test_getspell_unit(CuTest * tc)
     struct region * r;
     struct locale * lang;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
     r = findregion(0, 0);
     f = test_create_faction(0);
@@ -186,7 +186,7 @@ void test_getspell_faction(CuTest * tc)
     struct region * r;
     struct locale * lang;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
     r = findregion(0, 0);
     f = test_create_faction(0);
@@ -218,7 +218,7 @@ void test_getspell_school(CuTest * tc)
     struct locale * lang;
     struct spellbook * book;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
     r = findregion(0, 0);
     f = test_create_faction(0);
@@ -249,7 +249,7 @@ void test_set_pre_combatspell(CuTest * tc)
     struct region * r;
     const int index = 0;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
     r = findregion(0, 0);
     f = test_create_faction(0);
@@ -282,7 +282,7 @@ void test_set_main_combatspell(CuTest * tc)
     struct region * r;
     const int index = 1;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
     r = findregion(0, 0);
     f = test_create_faction(0);
@@ -315,7 +315,7 @@ void test_set_post_combatspell(CuTest * tc)
     struct region * r;
     const int index = 2;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
     r = findregion(0, 0);
     f = test_create_faction(0);
@@ -347,7 +347,7 @@ void test_hasspell(CuTest * tc)
     struct faction * f;
     struct region * r;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
     r = findregion(0, 0);
     f = test_create_faction(0);
@@ -382,7 +382,7 @@ void test_multi_cast(CuTest *tc) {
     spell *sp;
     struct locale * lang;
 
-    test_cleanup();
+    test_setup();
     sp = create_spell("fireball", 0);
     sp->cast = cast_fireball;
     CuAssertPtrEquals(tc, sp, find_spell("fireball"));
@@ -410,7 +410,7 @@ static void test_magic_resistance(CuTest *tc) {
     unit *u;
     race *rc;
 
-    test_cleanup();
+    test_setup();
     rc = test_create_race("human");
     u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
     CuAssertDblEquals(tc, rc->magres, magic_resistance(u), 0.01);

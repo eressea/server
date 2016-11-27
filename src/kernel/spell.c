@@ -71,7 +71,7 @@ spell * create_spell(const char * name, unsigned int id)
     assert(len + sizeof(sp) < sizeof(buffer));
 
     if (cb_find_str(&cb_spells, name)) {
-        log_error("create_spell: duplicate name '%s'\n", name);
+        log_error("create_spell: duplicate name '%s'", name);
         return 0;
     }
     sp = (spell *)calloc(1, sizeof(spell));

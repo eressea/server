@@ -30,15 +30,15 @@ rejecthtml = True
 
 games = [
     {
-        "from" : "Eressea Server <eressea-server@eressea.de>",
+        "from" : "Eressea Server <eressea-server@eressea.kn-bremen.de>",
         "prefix" : "Eressea"
     },
     {
-        "from" : "Eressea Server <eressea-server@eressea.de>",
+        "from" : "Eressea Server <eressea-server@eressea.kn-bremen.de>",
         "prefix": "E3"
     },
     {
-        "from" : "Eressea Server <eressea-server@eressea.de>",
+        "from" : "Eressea Server <eressea-server@eressea.kn-bremen.de>",
         "prefix": "E4"
     },
 ]

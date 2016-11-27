@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include "move.h"
 
-#include "guard.h"
 #include "keyword.h"
 
 #include <kernel/config.h>
@@ -201,30 +200,6 @@ static void test_walkingcapacity(CuTest *tc) {
     test_cleanup();
 }
 
-static void test_is_guarded(CuTest *tc) {
-    unit *u1, *u2;
-    region *r;
-    race *rc;
-
-    test_cleanup();
-    rc = rc_get_or_create("dragon");
-    rc->flags |= RCF_UNARMEDGUARD;
-    r = test_create_region(0, 0, 0);
-    u1 = test_create_unit(test_create_faction(0), r);
-    u2 = test_create_unit(test_create_faction(rc), r);
-    CuAssertPtrEquals(tc, 0, is_guarded(r, u1, GUARD_TRAVELTHRU));
-    CuAssertPtrEquals(tc, 0, is_guarded(r, u1, GUARD_PRODUCE));
-    CuAssertPtrEquals(tc, 0, is_guarded(r, u1, GUARD_TREES));
-    CuAssertPtrEquals(tc, 0, is_guarded(r, u1, GUARD_MINING));
-    guard(u2, GUARD_MINING | GUARD_PRODUCE);
-    CuAssertIntEquals(tc, GUARD_CREWS | GUARD_LANDING | GUARD_TRAVELTHRU | GUARD_TAX | GUARD_PRODUCE | GUARD_RECRUIT, guard_flags(u2));
-    CuAssertPtrEquals(tc, 0, is_guarded(r, u1, GUARD_TRAVELTHRU));
-    CuAssertPtrEquals(tc, 0, is_guarded(r, u1, GUARD_TREES));
-    CuAssertPtrEquals(tc, 0, is_guarded(r, u1, GUARD_MINING));
-    CuAssertPtrEquals(tc, u2, is_guarded(r, u1, GUARD_PRODUCE));
-    test_cleanup();
-}
-
 static void test_ship_trails(CuTest *tc) {
     ship *sh;
     region *r1, *r2, *r3;
@@ -298,10 +273,10 @@ void setup_drift (struct drift_fixture *fix) {
     fix->st_boat->cabins = 20000;
 
     fix->u = test_create_unit(fix->f = test_create_faction(0), fix->r=findregion(-1,0));
-    assert(fix->r);
+    assert(fix->r && fix->u && fix->f);
     set_level(fix->u, SK_SAILING, fix->st_boat->sumskill);
     u_set_ship(fix->u, fix->sh = test_create_ship(fix->u->region, fix->st_boat));
-    assert(fix->f && fix->u && fix->sh);
+    assert(fix->sh);
 }
 
 static void test_ship_no_overload(CuTest *tc) {
@@ -526,7 +501,6 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_ship_has_harbormaster_contact);
     SUITE_ADD_TEST(suite, test_ship_has_harbormaster_ally);
     SUITE_ADD_TEST(suite, test_ship_has_harbormaster_same_faction);
-    SUITE_ADD_TEST(suite, test_is_guarded);
     SUITE_ADD_TEST(suite, test_ship_trails);
     SUITE_ADD_TEST(suite, test_age_trails);
     SUITE_ADD_TEST(suite, test_ship_no_overload);

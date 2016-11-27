@@ -25,7 +25,7 @@ extern "C" {
 
 #include <wchar.h>
 #define USE_UNICODE
-    typedef unsigned long ucs4_t;
+    typedef long ucs4_t;
     typedef char utf8_t;
 
     int unicode_utf8_to_cp437(unsigned char *result, const utf8_t * utf8_string,
@@ -41,8 +41,8 @@ extern "C" {
     int unicode_utf8_strcasecmp(const utf8_t * a, const utf8_t * b);
     int unicode_latin1_to_utf8(utf8_t * out, size_t * outlen,
         const char *in, size_t * inlen);
-    int unicode_utf8_tolower(utf8_t * out, size_t outlen,
-        const utf8_t * in);
+    int unicode_utf8_tolower(utf8_t *op, size_t outlen, const utf8_t *ip);
+	int unicode_utf8_trim(utf8_t *ip);
 
 #ifdef __cplusplus
 }

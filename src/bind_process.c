@@ -182,11 +182,6 @@ void process_promote(void) {
     process_cmd(K_PROMOTION, promotion_cmd, 0);
 }
 
-void process_renumber(void) {
-    process_cmd(K_NUMBER, renumber_cmd, 0);
-    renumber_factions();
-}
-
 void process_restack(void) {
     restack_units();
 }

@@ -17,12 +17,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
 #include <platform.h>
-#include <kernel/config.h>
 #include "changefaction.h"
 
 /* kernel includes */
 #include <kernel/unit.h>
-#include <kernel/save.h>
 #include <kernel/faction.h>
 
 /* util includes */

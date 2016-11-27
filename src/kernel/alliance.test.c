@@ -17,7 +17,6 @@ typedef struct alliance_fixture {
 } alliance_fixture;
 
 static void setup_alliance(alliance_fixture *fix) {
-    test_cleanup();
     test_create_world();
     fix->rc = test_create_race("human");
     fix->f1 = test_create_faction(fix->rc);
@@ -28,7 +27,7 @@ static void setup_alliance(alliance_fixture *fix) {
 static void test_alliance_make(CuTest *tc) {
     alliance * al;
 
-    test_cleanup();
+    test_setup();
     assert(!alliances);
     al = makealliance(1, "Hodor");
     CuAssertPtrNotNull(tc, al);
@@ -50,6 +49,7 @@ static void test_alliance_join(CuTest *tc) {
     alliance_fixture fix;
     alliance * al;
 
+    test_setup();
     setup_alliance(&fix);
     CuAssertPtrEquals(tc, 0, fix.f1->alliance);
     CuAssertPtrEquals(tc, 0, fix.f2->alliance);
@@ -69,7 +69,7 @@ static void test_alliance_dead_faction(CuTest *tc) {
     faction *f, *f2;
     alliance *al;
 
-    test_cleanup();
+    test_setup();
     f = test_create_faction(0);
     f2 = test_create_faction(0);
     al = makealliance(42, "Hodor");
@@ -91,7 +91,7 @@ static void test_alliance_cmd(CuTest *tc) {
     struct region *r;
     struct alliance *al;
 
-    test_cleanup();
+    test_setup();
     r = test_create_region(0, 0, 0);
     u1 = test_create_unit(test_create_faction(0), r);
     u2 = test_create_unit(test_create_faction(0), r);
@@ -118,7 +118,7 @@ static void test_alliance_cmd_kick(CuTest *tc) {
     struct region *r;
     struct alliance *al;
 
-    test_cleanup();
+    test_setup();
     al = makealliance(42, "Hodor");
     r = test_create_region(0, 0, 0);
     u1 = test_create_unit(test_create_faction(0), r);
@@ -138,7 +138,7 @@ static void test_alliance_cmd_no_invite(CuTest *tc) {
     unit *u1, *u2;
     struct region *r;
 
-    test_cleanup();
+    test_setup();
     r = test_create_region(0, 0, 0);
     u1 = test_create_unit(test_create_faction(0), r);
     u2 = test_create_unit(test_create_faction(0), r);
@@ -159,7 +159,7 @@ static void test_alliance_cmd_leave(CuTest *tc) {
     struct region *r;
     struct alliance *al;
 
-    test_cleanup();
+    test_setup();
     al = makealliance(42, "Hodor");
     r = test_create_region(0, 0, 0);
     u1 = test_create_unit(test_create_faction(0), r);
@@ -180,7 +180,7 @@ static void test_alliance_cmd_transfer(CuTest *tc) {
     struct region *r;
     struct alliance *al;
 
-    test_cleanup();
+    test_setup();
     al = makealliance(42, "Hodor");
     r = test_create_region(0, 0, 0);
     u1 = test_create_unit(test_create_faction(0), r);

@@ -24,10 +24,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/region.h>
-#include <kernel/save.h>
 #include <kernel/ship.h>
 #include <kernel/unit.h>
-#include <kernel/version.h>
 
 /* util includes */
 #include <util/attrib.h>

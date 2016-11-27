@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -22,6 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include <kernel/config.h>
 #include "study.h"
+#include "laws.h"
 #include "move.h"
 #include "monster.h"
 #include "alchemy.h"
@@ -94,6 +95,9 @@ magic_t getmagicskill(const struct locale * lang)
 /* familiars and toads are not migrants */
 bool is_migrant(unit * u)
 {
+    static int cache;
+    static const race *toad_rc;
+
     if (u_race(u) == u->faction->race)
         return false;
 
@@ -101,16 +105,21 @@ bool is_migrant(unit * u)
         return false;
     if (is_familiar(u))
         return false;
-    if (u_race(u) == get_race(RC_TOAD))
-        return false;
-
-    return true;
+    if (rc_changed(&cache)) {
+        toad_rc = get_race(RC_TOAD);
+    }
+    return u_race(u) != toad_rc;
 }
 
 /* ------------------------------------------------------------- */
 bool magic_lowskill(unit * u)
 {
-    return (u_race(u) == get_race(RC_TOAD)) ? true : false;
+    static const race *toad_rc;
+    static int cache;
+    if (rc_changed(&cache)) {
+        toad_rc = get_race(RC_TOAD);
+    }
+    return u_race(u) == toad_rc;
 }
 
 /* ------------------------------------------------------------- */
@@ -277,21 +286,20 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
 
 int teach_cmd(unit * u, struct order *ord)
 {
-    static const curse_type *gbdream_ct = NULL;
     plane *pl;
     region *r = u->region;
     skill_t sk_academy = NOSKILL;
     int teaching, i, j, count, academy = 0;
 
-    if (gbdream_ct == 0)
-        gbdream_ct = ct_find("gbdream");
-    if (gbdream_ct) {
-        if (get_curse(u->region->attribs, gbdream_ct)) {
-            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "gbdream_noteach", ""));
-            return 0;
+    if (u->region->attribs) {
+        const curse_type *gbdream_ct = ct_find("gbdream");
+        if (gbdream_ct) {
+            if (get_curse(u->region->attribs, gbdream_ct)) {
+                ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "gbdream_noteach", ""));
+                return 0;
+            }
         }
     }
-
     if ((u_race(u)->flags & RCF_NOTEACH) || fval(u, UFL_WERE)) {
         cmistake(u, ord, 274, MSG_EVENT);
         return 0;
@@ -431,7 +439,7 @@ int teach_cmd(unit * u, struct order *ord)
                 strncat(zOrder, " ", sz - 1);
                 --sz;
             }
-            sz -= strlcpy(zOrder + 4096 - sz, unitid(u2), sz);
+            sz -= strlcpy(zOrder + 4096 - sz, itoa36(u2->no), sz);
 
             if (getkeyword(u2->thisorder) != K_STUDY) {
                 ADDMSG(&u->faction->msgs,
@@ -524,6 +532,16 @@ static double study_speedup(unit * u, skill_t s, study_rule_t rule)
     return 1.0;
 }
 
+static bool ExpensiveMigrants(void)
+{
+	static bool rule;
+	static int cache;
+	if (config_changed(&cache)) {
+		rule = config_get_int("study.expensivemigrants", 0) != 0;
+	}
+	return rule;
+}
+
 int study_cmd(unit * u, order * ord)
 {
     region *r = u->region;
@@ -539,6 +557,12 @@ int study_cmd(unit * u, order * ord)
     int maxalchemy = 0;
     int speed_rule = (study_rule_t)config_get_int("study.speedup", 0);
     bool learn_newskills = config_get_int("study.newskills", 1) != 0;
+    static const race *rc_snotling;
+    static int rc_cache;
+
+    if (rc_changed(&rc_cache)) {
+        rc_snotling = get_race(RC_SNOTLING);
+    }
 
     if (!unit_can_study(u)) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_race_nolearn", "race",
@@ -568,7 +592,7 @@ int study_cmd(unit * u, order * ord)
     }
 
     /* snotlings koennen Talente nur bis T8 lernen */
-    if (u_race(u) == get_race(RC_SNOTLING)) {
+    if (u_race(u) == rc_snotling) {
         if (get_level(u, sk) >= 8) {
             cmistake(u, ord, 308, MSG_EVENT);
             return 0;
@@ -759,7 +783,7 @@ int study_cmd(unit * u, order * ord)
         a_remove(&u->attribs, a);
         a = NULL;
     }
-    fset(u, UFL_LONGACTION | UFL_NOTMOVING);
+    u->flags |= (UFL_LONGACTION | UFL_NOTMOVING);
 
     /* Anzeigen neuer Traenke */
     /* Spruchlistenaktualiesierung ist in Regeneration */
@@ -793,7 +817,11 @@ int study_cmd(unit * u, order * ord)
 }
 
 static int produceexp_days(void) {
-    return config_get_int("study.produceexp", 10);
+    static int config, rule;
+    if (config_changed(&config)) {
+        rule = config_get_int("study.produceexp", 10);
+    }
+    return rule;
 }
 
 void produceexp_ex(struct unit *u, skill_t sk, int n, learn_fun learn)
@@ -856,7 +884,11 @@ void demon_skillchange(unit *u)
 
     if (fval(u, UFL_HUNGER)) {
         /* hungry demons only go down, never up in skill */
-        int rule_hunger = config_get_int("hunger.demon.skill", 0) != 0;
+        static int config;
+        static bool rule_hunger;
+        if (config_changed(&config)) {
+            rule_hunger = config_get_int("hunger.demon.skill", 0) != 0;
+        }
         if (rule_hunger) {
             upchance = 0;
             downchance = 15;

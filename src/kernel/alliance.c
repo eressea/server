@@ -23,7 +23,6 @@ without prior permission by the authors of Eressea.
 #include <kernel/order.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
-#include <kernel/item.h>
 #include <kernel/command.h>
 
 /* util includes */
@@ -288,14 +287,12 @@ static void perform_join(void)
 static syntaxtree * build_syntax(void) {
     syntaxtree *slang, *stree = stree_create();
     for (slang = stree; slang; slang = slang->next) {
-        void *leaf = 0;
-        add_command(&leaf, NULL, LOC(slang->lang, alliance_kwd[ALLIANCE_KICK]), &cmd_kick);
-        add_command(&leaf, NULL, LOC(slang->lang, alliance_kwd[ALLIANCE_LEAVE]), &cmd_leave);
-        add_command(&leaf, NULL, LOC(slang->lang, alliance_kwd[ALLIANCE_TRANSFER]), &cmd_transfer);
-        add_command(&leaf, NULL, LOC(slang->lang, alliance_kwd[ALLIANCE_NEW]), &cmd_new);
-        add_command(&leaf, NULL, LOC(slang->lang, alliance_kwd[ALLIANCE_INVITE]), &cmd_invite);
-        add_command(&leaf, NULL, LOC(slang->lang, alliance_kwd[ALLIANCE_JOIN]), &cmd_join);
-        slang->root = leaf;
+        stree_add(slang, LOC(slang->lang, alliance_kwd[ALLIANCE_KICK]), &cmd_kick);
+        stree_add(slang, LOC(slang->lang, alliance_kwd[ALLIANCE_LEAVE]), &cmd_leave);
+        stree_add(slang, LOC(slang->lang, alliance_kwd[ALLIANCE_TRANSFER]), &cmd_transfer);
+        stree_add(slang, LOC(slang->lang, alliance_kwd[ALLIANCE_NEW]), &cmd_new);
+        stree_add(slang, LOC(slang->lang, alliance_kwd[ALLIANCE_INVITE]), &cmd_invite);
+        stree_add(slang, LOC(slang->lang, alliance_kwd[ALLIANCE_JOIN]), &cmd_join);
     }
     return stree;
 }

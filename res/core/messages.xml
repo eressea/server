@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <messages>
+  <message name="parse_error" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="command" type="string"/>
+    </type>
+    <text locale="de">"$unit($unit): '$command' - Dieser Befehl ist unbekannt."</text>
+    <text locale="en">"$unit($unit): '$command' - Parse error, unknown command."</text>
+  </message>
   <message name="reduced_production">
     <text locale="de">Die Region ist verwüstet, der Boden karg.</text>
     <text locale="en">The region is ravaged, the ground infertile.</text>
@@ -1245,14 +1253,6 @@
     <text locale="en">"$unit($unit) dies from poison damage taken in $region($region)."</text>
   </message>
 
-  <message name="wand_of_tears_usage" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-    </type>
-    <text locale="de">"$unit($unit) schwenkt sein Szepter und sorgt für Verwirrung und Chaos in der Region."</text>
-    <text locale="en">"$unit($unit) waves their scepter and causes chaos and confusion in the region."</text>
-  </message>
-
   <message name="find_manual" section="events">
     <type>
       <arg name="unit" type="unit"/>
@@ -1565,20 +1565,6 @@
     <text locale="de">"$unit($mage) konnte $int($amount) $if($eq($amount,1),"Bauer","Bauern") anwerben."</text>
     <text locale="en">"$unit($mage) managed to recruit $int($amount) $if($eq($amount,1),"peasant","peasants")."</text>
   </message>
-  <message name="wand_of_tears_effect" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-    </type>
-    <text locale="de">"Ein bohrender Schmerz durchzuckt $unit($unit), Verwirrung macht sich breit."</text>
-    <text locale="en">"Pain pulses through $unit($unit), confusion spreads."</text>
-  </message>
-  <message name="cryinpain" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-    </type>
-    <text locale="de">""AAAAAAAGHHHHHH!" - Ein Schrei durchzieht die Region, $unit($unit) windet sich vor Schmerz."</text>
-    <text locale="en">""AAAAAAAGHHHHHH!" - $unit($unit) screams and squirms with pain."</text>
-  </message>
 
   <message name="error_giveeye" section="events">
     <type>
@@ -1588,14 +1574,6 @@
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Eine höhere Macht hindert $unit($unit) daran, das Objekt zu übergeben. 'ES IST DEINS, MEIN KIND. DEINS GANZ ALLEIN'."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - A higher power prevents $unit($unit) from giving the object away. 'IT IS YOURS MY CHILD. ONLY YOURS.'."</text>
-  </message>
-
-  <message name="praytoigjarjuk" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-    </type>
-    <text locale="de">"$unit($unit) sendet ein Stoßgebet an den Herrn der Schreie."</text>
-    <text locale="en">"$unit($unit) sends a prayer to the Lord of Screams."</text>
   </message>
 
   <message name="iceberg_melt" section="events">
@@ -7512,7 +7490,7 @@
       <arg name="mage" type="unit"/>
       <arg name="building" type="building"/>
     </type>
-    <text locale="de">"$unit($mage) weight $building($building)."</text>
+    <text locale="de">"$unit($mage) weiht $building($building)."</text>
     <text locale="en">"$unit($mage) blesses $building($building)."</text>
   </message>
 
@@ -8088,27 +8066,6 @@
     </type>
     <text locale="de">"Auf den Planken von $ship($ship) erkennt man seltsame Runen. ($int36($id))"</text>
     <text locale="en">"The plank of $ship($ship) are inscribed with strange runes. ($int36($id))"</text>
-  </message>
-
-  <message name="phoenixcompass_confusion" section="magic">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-    </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Kompassnadel springt wild hin und her und es lässt sich keine Richtung erkennen."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The needle jumps wildly and there is no specific direction recognizable."</text>
-  </message>
-  
-  <message name="phoenixcompass_success" section="magic">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-      <arg name="dir" type="int"/>
-    </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Kompassnadel zeigt nach $direction($dir)."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The needle points $direction($dir)."</text>
   </message>
 
   <message name="disrupt_astral" section="magic">

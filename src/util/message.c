@@ -32,7 +32,7 @@ const char *mt_name(const message_type * mtype)
     return mtype->name;
 }
 
-arg_type *argtypes = NULL;
+static arg_type *argtypes = NULL;
 
 void
 register_argtype(const char *name, void(*free_arg) (variant),
@@ -47,7 +47,7 @@ variant(*copy_arg) (variant), variant_type type)
     argtypes = atype;
 }
 
-static arg_type *find_argtype(const char *name)
+arg_type *find_argtype(const char *name)
 {
     arg_type *atype = argtypes;
     while (atype != NULL) {
@@ -83,7 +83,7 @@ message_type *mt_new(const char *name, const char *args[])
         mtype->pnames = NULL;
         mtype->types = NULL;
     }
-    if (args != NULL)
+    if (args != NULL) {
         for (i = 0; args[i]; ++i) {
             const char *x = args[i];
             const char *spos = strchr(x, ':');
@@ -102,6 +102,7 @@ message_type *mt_new(const char *name, const char *args[])
                 assert(mtype->types[i]);
             }
         }
+    }
     return mtype;
 }
 
@@ -244,4 +245,13 @@ struct message *msg_addref(struct message *msg)
     assert(msg->refcount > 0);
     ++msg->refcount;
     return msg;
+}
+
+void message_done(void) {
+    arg_type **atp = &argtypes;
+    while (*atp) {
+        arg_type *at = *atp;
+        *atp = at->next;
+        free(at);
+    }
 }

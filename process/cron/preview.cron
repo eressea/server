@@ -7,7 +7,6 @@ if [ -e ${ERESSEA}/build/.preview ]; then
 fi
 SRC=${ERESSEA}/git
 ${SRC}/s/preview build ${branch} || exit $?
-${SRC}/s/preview version
 for game in 2 3 4 ; do
 	${SRC}/s/preview -g ${game} run && \
 	${SRC}/s/preview -g ${game} send

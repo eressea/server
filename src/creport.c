@@ -1,4 +1,4 @@
-﻿/*
+/*
 +-------------------+  Enno Rehling <enno@eressea.de>
 | Eressea PBEM host |  Christian Schlittchen <corwin@amber.kn-bremen.de>
 | (c) 1998 - 2008   |  Katja Zedel <katze@felidae.kn-bremen.de>
@@ -9,9 +9,10 @@ without prior permission by the authors of Eressea.
 
 #include <platform.h>
 #include <kernel/config.h>
-#include "buildno.h"
+#include <kernel/version.h>
 #include "creport.h"
-#include "seen.h"
+#include "market.h"
+#include "guard.h"
 #include "travelthru.h"
 
 /* tweakable features */
@@ -24,7 +25,6 @@ without prior permission by the authors of Eressea.
 
 /* attributes include */
 #include <attributes/follow.h>
-#include <attributes/orcification.h>
 #include <attributes/otherfaction.h>
 #include <attributes/racename.h>
 #include <attributes/raceprefix.h>
@@ -58,7 +58,6 @@ without prior permission by the authors of Eressea.
 #include <kernel/spellbook.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
-#include <kernel/save.h>
 
 /* util includes */
 #include <util/attrib.h>
@@ -71,6 +70,7 @@ without prior permission by the authors of Eressea.
 #include <util/nrmessage.h>
 #include <quicklist.h>
 #include <filestream.h>
+#include <stream.h>
 
 /* libc includes */
 #include <assert.h>
@@ -178,7 +178,7 @@ static void print_items(FILE * F, item * items, const struct locale *lang)
 }
 
 static void
-cr_output_curses(stream *out, const faction * viewer, const void *obj, objtype_t typ)
+cr_output_curses(struct stream *out, const faction * viewer, const void *obj, objtype_t typ)
 {
     bool header = false;
     attrib *a = NULL;
@@ -186,9 +186,9 @@ cr_output_curses(stream *out, const faction * viewer, const void *obj, objtype_t
     region *r;
 
     /* Die Sichtbarkeit eines Zaubers und die Zaubermeldung sind bei
-     * Gebäuden und Schiffen je nach, ob man Besitzer ist, verschieden.
+     * Gebaeuden und Schiffen je nach, ob man Besitzer ist, verschieden.
      * Bei Einheiten sieht man Wirkungen auf eigene Einheiten immer.
-     * Spezialfälle (besonderes Talent, verursachender Magier usw. werde
+     * Spezialfaelle (besonderes Talent, verursachender Magier usw. werde
      * bei jedem curse gesondert behandelt. */
     if (typ == TYP_SHIP) {
         ship *sh = (ship *)obj;
@@ -735,20 +735,17 @@ static void cr_output_spells(stream *out, const unit * u, int maxlevel)
 * @param u unit to report
 */
 void cr_output_unit(stream *out, const region * r, const faction * f,
-    const unit * u, int mode)
+    const unit * u, seen_mode mode)
 {
     /* Race attributes are always plural and item attributes always
      * singular */
     const char *str;
     const item_type *lasttype;
     int pr;
-    item *itm, *show;
+    item *itm, *show = NULL;
     building *b;
     const char *pzTmp;
     skill *sv;
-    bool itemcloak = false;
-    static const curse_type *itemcloak_ct = 0;
-    static bool init = false;
     item result[MAX_INVENTORY];
     const faction *sf;
     const char *prefix;
@@ -757,15 +754,6 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
     assert(u->region == r); // TODO: if this holds true, then why did we pass in r?
     if (fval(u_race(u), RCF_INVISIBLE))
         return;
-
-    if (!init) {
-        init = true;
-        itemcloak_ct = ct_find("itemcloak");
-    }
-    if (itemcloak_ct != NULL) {
-        curse * cu = get_curse(u->attribs, itemcloak_ct);
-        itemcloak = cu && curse_active(cu);
-    }
 
     stream_printf(out, "EINHEIT %d\n", u->no);
     stream_printf(out, "\"%s\";Name\n", unit_getname(u));
@@ -794,7 +782,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
         if (sf != u->faction)
             stream_printf(out, "%d;Verkleidung\n", sf->no);
         if (fval(u, UFL_ANON_FACTION))
-            stream_printf(out, "%d;Parteitarnung\n", i2b(fval(u, UFL_ANON_FACTION)));
+            stream_printf(out, "%d;Parteitarnung\n", (u->flags & UFL_ANON_FACTION)!=0);
         if (otherfaction && otherfaction != u->faction) {
             stream_printf(out, "%d;Anderepartei\n", otherfaction->no);
         }
@@ -806,7 +794,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
     else {
         if (fval(u, UFL_ANON_FACTION)) {
             /* faction info is hidden */
-            stream_printf(out, "%d;Parteitarnung\n", i2b(fval(u, UFL_ANON_FACTION)));
+            stream_printf(out, "%d;Parteitarnung\n", (u->flags & UFL_ANON_FACTION) != 0);
         }
         else {
             const attrib *a_otherfaction = a_find(u->attribs, &at_otherfaction);
@@ -862,7 +850,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
         assert(u->ship->region);
         stream_printf(out, "%d;Schiff\n", u->ship->no);
     }
-    if (is_guard(u, GUARD_ALL) != 0) {
+    if (is_guard(u)) {
         stream_printf(out, "%d;bewacht\n", 1);
     }
     if ((b = usiege(u)) != NULL) {
@@ -970,16 +958,14 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
     if (f == u->faction || omniscient(f)) {
         show = u->items;
     }
-    else if (!itemcloak && mode >= see_unit) {
-        int n = report_items(u->items, result, MAX_INVENTORY, u, f);
-        assert(n >= 0);
-        if (n > 0)
-            show = result;
-        else
-            show = NULL;
-    }
     else {
-        show = NULL;
+        if (mode >= seen_unit) {
+            int n = report_items(u, result, MAX_INVENTORY, u, f);
+            assert(n >= 0);
+            if (n > 0) {
+                show = result;
+            }
+        }
     }
     lasttype = NULL;
     for (itm = show; itm; itm = itm->next) {
@@ -1126,8 +1112,7 @@ static char *cr_output_resource(char *buf, const char *name,
 }
 
 static void
-cr_borders(seen_region ** seen, const region * r, const faction * f,
-int seemode, FILE * F)
+cr_borders(const region * r, const faction * f, seen_mode mode, FILE * F)
 {
     direction_t d;
     int g = 0;
@@ -1136,9 +1121,8 @@ int seemode, FILE * F)
         const connection *b;
         if (!r2)
             continue;
-        if (seemode == see_neighbour) {
-            seen_region *sr = find_seen(seen, r2);
-            if (sr == NULL || sr->mode <= see_neighbour)
+        if (mode == seen_neighbour) {
+            if (r2->seen.mode <= seen_neighbour)
                 continue;
         }
         b = get_borders(r, r2);
@@ -1179,13 +1163,12 @@ int seemode, FILE * F)
 }
 
 static void
-cr_output_resources(FILE * F, report_context * ctx, seen_region * sr)
+cr_output_resources(FILE * F, report_context * ctx, region *r, bool see_unit)
 {
     char cbuf[BUFFERSIZE], *pos = cbuf;
-    const region *r = sr->r;
     faction *f = ctx->f;
     resource_report result[MAX_RAWMATERIALS];
-    int n, size = report_resources(sr, result, MAX_RAWMATERIALS, f);
+    int n, size = report_resources(r, result, MAX_RAWMATERIALS, f, see_unit);
 
 #ifdef RESOURCECOMPAT
     int trees = rtrees(r, 2);
@@ -1271,10 +1254,9 @@ static void cr_output_travelthru(FILE *F, region *r, const faction *f) {
     travelthru_map(r, cb_cr_travelthru_unit, &cbdata);
 }
 
-static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
+static void cr_output_region(FILE * F, report_context * ctx, region * r)
 {
     faction *f = ctx->f;
-    region *r = sr->r;
     plane *pl = rplane(r);
     int plid = plane_id(pl), nx, ny;
     const char *tname;
@@ -1282,7 +1264,7 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
     int uid = r->uid;
 
 #ifdef OCEAN_NEIGHBORS_GET_NO_ID
-    if (sr->mode <= see_neighbour && !r->land) {
+    if (r->seen.mode <= seen_neighbour && !r->land) {
         uid = 0;
     }
 #endif
@@ -1331,28 +1313,25 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
     tname = terrain_name(r);
 
     fprintf(F, "\"%s\";Terrain\n", translate(tname, LOC(f->locale, tname)));
-    if (sr->mode != see_unit)
-        fprintf(F, "\"%s\";visibility\n", visibility[sr->mode]);
-    if (sr->mode == see_neighbour) {
-        cr_borders(ctx->f->seen, r, f, sr->mode, F);
+    if (r->seen.mode != seen_unit)
+        fprintf(F, "\"%s\";visibility\n", visibility[r->seen.mode]);
+    if (r->seen.mode == seen_neighbour) {
+        cr_borders(r, f, r->seen.mode, F);
     }
     else {
         building *b;
         ship *sh;
         unit *u;
-        int stealthmod = stealth_modifier(sr->mode);
+        int stealthmod = stealth_modifier(r->seen.mode);
 
         if (r->display && r->display[0])
             fprintf(F, "\"%s\";Beschr\n", r->display);
         if (fval(r->terrain, LAND_REGION)) {
             assert(r->land);
             fprintf(F, "%d;Bauern\n", rpeasants(r));
-            if (fval(r, RF_ORCIFIED)) {
-                fprintf(F, "1;Verorkt\n");
-            }
             fprintf(F, "%d;Pferde\n", rhorses(r));
 
-            if (sr->mode >= see_unit) {
+            if (r->seen.mode >= seen_unit) {
                 if (rule_region_owners()) {
                     faction *owner = region_get_owner(r);
                     if (owner) {
@@ -1383,9 +1362,9 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
 
             /* this writes both some tags (RESOURCECOMPAT) and a block.
              * must not write any blocks before it */
-            cr_output_resources(F, ctx, sr);
+            cr_output_resources(F, ctx, r, r->seen.mode >= seen_unit);
 
-            if (sr->mode >= see_unit) {
+            if (r->seen.mode >= seen_unit) {
                 /* trade */
                 if (markets_module() && r->land) {
                     const item_type *lux = r_luxury(r);
@@ -1422,8 +1401,8 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
             print_items(F, r->land->items, f->locale);
         }
         cr_output_curses_compat(F, f, r, TYP_REGION);
-        cr_borders(ctx->f->seen, r, f, sr->mode, F);
-        if (sr->mode == see_unit && is_astral(r)
+        cr_borders(r, f, r->seen.mode, F);
+        if (r->seen.mode == seen_unit && is_astral(r)
             && !is_cursed(r->attribs, C_ASTRALBLOCK, 0)) {
             /* Sonderbehandlung Teleport-Ebene */
             region_list *rl = astralregions(r, inhabitable);
@@ -1446,7 +1425,7 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
         }
 
         cr_output_travelthru(F, r, f);
-        if (sr->mode == see_unit || sr->mode == see_travel) {
+        if (r->seen.mode == seen_unit || r->seen.mode == seen_travel) {
             message_list *mlist = r_getmessages(r, f);
             cr_output_messages(F, r->msgs, f);
             if (mlist) {
@@ -1481,7 +1460,7 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
 
             if (u->building || u->ship || (stealthmod > INT_MIN
                 && cansee(f, r, u, stealthmod))) {
-                cr_output_unit_compat(F, r, f, u, sr->mode);
+                cr_output_unit_compat(F, r, f, u, r->seen.mode);
             }
         }
     }
@@ -1489,7 +1468,7 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
 
 /* main function of the creport. creates the header and traverses all regions */
 static int
-report_computer(const char *filename, report_context * ctx, const char *charset)
+report_computer(const char *filename, report_context * ctx, const char *bom)
 {
     static int era = -1;
     int i;
@@ -1498,8 +1477,9 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
     region *r;
     const char *mailto = LOC(f->locale, "mailto");
     const attrib *a;
-    seen_region *sr = NULL;
     FILE *F = fopen(filename, "w");
+    static const race *rc_human;
+    static int rc_cache;
 
     if (era < 0) {
         era = config_get_int("world.era", 1);
@@ -1508,9 +1488,8 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
         perror(filename);
         return -1;
     }
-    else if (_strcmpl(charset, "utf-8") == 0 || _strcmpl(charset, "utf8") == 0) {
-        const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
-        fwrite(utf8_bom, 1, 3, F);
+    else if (bom) {
+        fwrite(bom, 1, strlen(bom), F);
     }
 
     /* must call this to get all the neighbour regions */
@@ -1518,8 +1497,8 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
     /* initialisations, header and lists */
 
     fprintf(F, "VERSION %d\n", C_REPORT_VERSION);
-    fprintf(F, "\"%s\";charset\n", charset);
-    fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
+    fprintf(F, "\"utf-8\";charset\n\"%s\";locale\n",
+            locale_name(f->locale));
     fprintf(F, "%d;noskillpoints\n", 1);
     fprintf(F, "%lld;date\n", (long long)ctx->report_time);
     fprintf(F, "\"%s\";Spiel\n", game_name());
@@ -1529,7 +1508,7 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
     fprintf(F, "%d;Basis\n", 36);
     fprintf(F, "%d;Runde\n", turn);
     fprintf(F, "%d;Zeitalter\n", era);
-    fprintf(F, "\"%d.%d.%d\";Build\n", VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD);
+    fprintf(F, "\"%s\";Build\n", eressea_version());
     if (mailto != NULL) {
         fprintf(F, "\"%s\";mailto\n", mailto);
         fprintf(F, "\"%s\";mailcmd\n", LOC(f->locale, "mailcmd"));
@@ -1566,7 +1545,10 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
     fprintf(F, "%d;Anzahl Personen\n", count_all(f));
     fprintf(F, "\"%s\";Magiegebiet\n", magic_school[f->magiegebiet]);
 
-    if (f->race == get_race(RC_HUMAN)) {
+    if (rc_changed(&rc_cache)) {
+        rc_human = rc_find("human");
+    }
+    if (f->race == rc_human) {
         fprintf(F, "%d;Anzahl Immigranten\n", count_migrants(f));
         fprintf(F, "%d;Max. Immigranten\n", count_maxmigrants(f));
     }
@@ -1676,11 +1658,10 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
     }
 
     /* traverse all regions */
-    for (r = ctx->first; sr == NULL && r != ctx->last; r = r->next) {
-        sr = find_seen(ctx->f->seen, r);
-    }
-    for (; sr != NULL; sr = sr->next) {
-        cr_output_region(F, ctx, sr);
+    for (r = ctx->first; r != ctx->last; r = r->next) {
+        if (r->seen.mode > seen_none) {
+            cr_output_region(F, ctx, r);
+        }
     }
     report_crtypes(F, f->locale);
     write_translations(F);

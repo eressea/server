@@ -12,6 +12,9 @@
 
 #ifndef H_UTIL_NRMESSAGE
 #define H_UTIL_NRMESSAGE
+
+#include <stddef.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

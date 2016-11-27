@@ -19,6 +19,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include "umlaut.h"
 
+#include "assert.h"
 #include "log.h"
 #include "unicode.h"
 
@@ -31,7 +32,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 typedef struct tref {
     struct tref *nexthash;
     ucs4_t ucs;
-    void *node;
+    struct tnode *node;
 } tref;
 
 #define LEAF 1                  /* leaf node for a word. always matches */
@@ -41,6 +42,7 @@ typedef struct tnode {
     struct tref *next[NODEHASHSIZE];
     unsigned char flags;
     variant id;
+    int refcount;
 } tnode;
 
 char * transliterate(char * out, size_t size, const char * in)
@@ -113,10 +115,16 @@ char * transliterate(char * out, size_t size, const char * in)
     return *src ? 0 : out;
 }
 
-void addtoken(void ** root, const char *str, variant id)
+tnode * mknode(void) {
+    tnode * node = calloc(1, sizeof(tnode));
+    node->refcount = 1;
+    return node;
+}
+
+void addtoken(tnode ** root, const char *str, variant id)
 {
     tnode * tk;
-    static const struct replace { /* STATIC_CONST: constant value */
+    static const struct replace {
         ucs4_t ucs;
         const char str[3];
     } replace[] = {
@@ -127,7 +135,7 @@ void addtoken(void ** root, const char *str, variant id)
 
     assert(root && str);
     if (!*root) {
-        tk = *root = calloc(1, sizeof(tnode));
+        tk = *root = mknode();
     }
     else {
         tk = *root;
@@ -160,7 +168,7 @@ void addtoken(void ** root, const char *str, variant id)
             next = next->nexthash;
         if (!next) {
             tref *ref;
-            tnode *node = (tnode *)calloc(1, sizeof(tnode)); // TODO: what is the reason for this empty node to exist?
+            tnode *node = mknode(); // TODO: what is the reason for this empty node to exist?
 
             if (ucs < 'a' || ucs > 'z') {
                 lcs = towlower((wint_t)ucs);
@@ -183,8 +191,10 @@ void addtoken(void ** root, const char *str, variant id)
                 index = lcs % NODEHASHSIZE;
 #endif
                 ref = (tref *)malloc(sizeof(tref));
+                assert_alloc(ref);
                 ref->ucs = lcs;
                 ref->node = node;
+                ++node->refcount;
                 ref->nexthash = tk->next[index];
                 tk->next[index] = ref;
             }
@@ -210,23 +220,25 @@ void addtoken(void ** root, const char *str, variant id)
     }
 }
 
-void freetokens(void * root)
+void freetokens(tnode * root)
 {
-    tnode * node = (tnode *)root;
+    tnode * node = root;
     int i;
     for (i = 0; node && i != NODEHASHSIZE; ++i) {
         if (node->next[i]) {
-            tref ** refs = &node->next[i];
-            freetokens(node->next[i]->node);
-            while (*refs) {
-                tref * ref = *refs;
-                *refs = ref->nexthash;
-//                free(ref->node);
+            tref * ref = node->next[i];
+            while (ref) {
+                tref * next = ref->nexthash;
+                freetokens(ref->node);
                 free(ref);
+                ref = next;
             }
+            node->next[i] = 0;
         }
     }
-    free(node);
+    if (--node->refcount == 0) {
+        free(node);
+    }
 }
 
 int findtoken(const void * root, const char *key, variant * result)

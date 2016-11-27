@@ -1,4 +1,4 @@
-﻿/* 
+/* 
  * +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  * |                   |  Enno Rehling <enno@eressea.de>
  * | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
@@ -22,7 +22,6 @@
 #include <kernel/item.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/save.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
@@ -32,6 +31,7 @@
 #include <util/lists.h>
 #include <util/log.h>
 
+#include <assert.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -58,7 +58,6 @@ typedef struct summary {
     int landregionen;
     int regionen_mit_spielern;
     int landregionen_mit_spielern;
-    int orkifizierte_regionen;
     int inactive_volcanos;
     int active_volcanos;
     int spielerpferde;
@@ -78,28 +77,34 @@ int update_nmrs(void)
     int i, newplayers = 0;
     faction *f;
     int turn = global.data_turn;
+    int timeout = NMRTimeout();
 
-    if (nmrs == NULL)
-        nmrs = malloc(sizeof(int) * (NMRTimeout() + 1));
-    for (i = 0; i <= NMRTimeout(); ++i) {
-        nmrs[i] = 0;
+    if (timeout>0) {
+        if (nmrs == NULL) {
+            nmrs = malloc(sizeof(int) * (timeout + 1));
+        }
+        for (i = 0; i <= timeout; ++i) {
+            nmrs[i] = 0;
+        }
     }
-
+    
     for (f = factions; f; f = f->next) {
         if (fval(f, FFL_ISNEW)) {
             ++newplayers;
         }
         else if (!fval(f, FFL_NOIDLEOUT|FFL_CURSED)) {
             int nmr = turn - f->lastorders + 1;
-            if (nmr < 0 || nmr > NMRTimeout()) {
-                log_error("faction %s has %d NMR", factionid(f), nmr);
-                nmr = _max(0, nmr);
-                nmr = _min(nmr, NMRTimeout());
+            if (timeout>0) {
+                if (nmr < 0 || nmr > timeout) {
+                    log_error("faction %s has %d NMR", itoa36(f->no), nmr);
+                    nmr = _max(0, nmr);
+                    nmr = _min(nmr, timeout);
+                }
+                if (nmr > 0) {
+                    log_debug("faction %s has %d NMR", itoa36(f->no), nmr);
+                }
+                ++nmrs[nmr];
             }
-            if (nmr > 0) {
-                log_debug("faction %s has %d NMR", factionid(f), nmr);
-            }
-            ++nmrs[nmr];
         }
     }
     return newplayers;
@@ -141,11 +146,18 @@ static char *gamedate2(const struct locale *lang)
 {
     static char buf[256];
     gamedate gd;
+    const char *week = "a_week", *month = "a_month";
 
     get_gamedate(turn, &gd);
+    if (weeknames2) {
+        week = weeknames2[gd.week];
+    }
+    if (monthnames) {
+        month = monthnames[gd.month];
+    }
     sprintf(buf, "in %s des Monats %s im Jahre %d %s.",
-        LOC(lang, weeknames2[gd.week]),
-        LOC(lang, monthnames[gd.month]),
+        LOC(lang, week),
+        LOC(lang, month),
         gd.year, agename ? LOC(lang, agename) : "");
     return buf;
 }
@@ -179,6 +191,7 @@ void report_summary(summary * s, summary * o, bool full)
     int i, newplayers = 0;
     faction *f;
     char zText[MAX_PATH];
+    int timeout = NMRTimeout();
 
     if (full) {
         join_path(basepath(), "parteien.full", zText, sizeof(zText));
@@ -207,12 +220,11 @@ void report_summary(summary * s, summary * o, bool full)
     fprintf(F, " Helden:               %s\n", pcomp(s->heroes, o->heroes));
 
     if (full) {
-        fprintf(F, "Regionen:              %d\n", listlen(regions));
+        fprintf(F, "Regionen:              %d\n", (int)listlen(regions));
         fprintf(F, "Bewohnte Regionen:     %d\n", s->inhabitedregions);
         fprintf(F, "Landregionen:          %d\n", s->landregionen);
         fprintf(F, "Spielerregionen:       %d\n", s->regionen_mit_spielern);
         fprintf(F, "Landspielerregionen:   %d\n", s->landregionen_mit_spielern);
-        fprintf(F, "Orkifizierte Regionen: %d\n", s->orkifizierte_regionen);
         fprintf(F, "Inaktive Vulkane:      %d\n", s->inactive_volcanos);
         fprintf(F, "Aktive Vulkane:        %d\n\n", s->active_volcanos);
     }
@@ -295,12 +307,14 @@ void report_summary(summary * s, summary * o, bool full)
 
     newplayers = update_nmrs();
 
-    for (i = 0; i <= NMRTimeout(); ++i) {
-        if (i == NMRTimeout()) {
-            fprintf(F, "+ NMR:\t\t %d\n", nmrs[i]);
-        }
-        else {
-            fprintf(F, "%d NMR:\t\t %d\n", i, nmrs[i]);
+    if (nmrs) {
+        for (i = 0; i <= timeout; ++i) {
+            if (i == timeout) {
+                fprintf(F, "+ NMR:\t\t %d\n", nmrs[i]);
+            }
+            else {
+                fprintf(F, "%d NMR:\t\t %d\n", i, nmrs[i]);
+            }
         }
     }
     if (age) {
@@ -314,18 +328,18 @@ void report_summary(summary * s, summary * o, bool full)
     fprintf(F, "Neue Spieler:\t %d\n", newplayers);
 
     if (full) {
-        if (factions)
+        if (factions) {
             fprintf(F, "\nParteien:\n\n");
-
-        for (f = factions; f; f = f->next) {
-            out_faction(F, f);
+            for (f = factions; f; f = f->next) {
+                out_faction(F, f);
+            }
         }
 
-        if (NMRTimeout() && full) {
+        if (timeout>0 && full) {
             fprintf(F, "\n\nFactions with NMRs:\n");
-            for (i = NMRTimeout(); i > 0; --i) {
+            for (i = timeout; i > 0; --i) {
                 for (f = factions; f; f = f->next) {
-                    if (i == NMRTimeout()) {
+                    if (i == timeout) {
                         if (turn - f->lastorders >= i) {
                             out_faction(F, f);
                         }
@@ -348,6 +362,15 @@ void report_summary(summary * s, summary * o, bool full)
     }
     free(nmrs);
     nmrs = NULL;
+}
+
+void free_summary(summary *sum) {
+    while (sum->languages) {
+        struct language *next = sum->languages->next;
+        free(sum->languages);
+        sum->languages = next;
+    }
+    free(sum);
 }
 
 summary *make_summary(void)
@@ -395,9 +418,6 @@ summary *make_summary(void)
             s->landregionen++;
             if (r->units) {
                 s->landregionen_mit_spielern++;
-            }
-            if (fval(r, RF_ORCIFIED)) {
-                s->orkifizierte_regionen++;
             }
             if (r->terrain == newterrain(T_VOLCANO)) {
                 s->inactive_volcanos++;

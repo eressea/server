@@ -17,7 +17,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
 #include <platform.h>
-#include <kernel/config.h>
 #include "createunit.h"
 
 /* kernel includes */
@@ -25,7 +24,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/unit.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/version.h>
 
 /* util includes */
 #include <util/attrib.h>

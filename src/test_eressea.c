@@ -60,8 +60,6 @@ int RunAllTests(int argc, char *argv[])
 {
     /* self-test */
     ADD_SUITE(tests);
-    ADD_SUITE(callback);
-    ADD_SUITE(seen);
     ADD_SUITE(json);
     ADD_SUITE(jsonconf);
     ADD_SUITE(direction);
@@ -76,6 +74,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(bsdstring);
     ADD_SUITE(functions);
     ADD_SUITE(gamedata);
+    ADD_SUITE(language);
     ADD_SUITE(parser);
     ADD_SUITE(password);
     ADD_SUITE(umlaut);
@@ -100,6 +99,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(magic);
     ADD_SUITE(alchemy);
     ADD_SUITE(reports);
+    ADD_SUITE(region);
     ADD_SUITE(save);
     ADD_SUITE(ship);
     ADD_SUITE(spellbook);
@@ -110,18 +110,26 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(ally);
     ADD_SUITE(messages);
     /* gamecode */
-    ADD_SUITE(prefix);
+    ADD_SUITE(guard);
+    ADD_SUITE(report);
+    ADD_SUITE(creport);
+    ADD_SUITE(summary);
+    ADD_SUITE(names);
     ADD_SUITE(battle);
+    ADD_SUITE(volcano);
     ADD_SUITE(donations);
     ADD_SUITE(travelthru);
     ADD_SUITE(economy);
     ADD_SUITE(flyingship);
     ADD_SUITE(give);
     ADD_SUITE(laws);
+    ADD_SUITE(lighthouse);
     ADD_SUITE(market);
     ADD_SUITE(monsters);
     ADD_SUITE(move);
     ADD_SUITE(piracy);
+    ADD_SUITE(prefix);
+    ADD_SUITE(renumber);
     ADD_SUITE(key);
     ADD_SUITE(stealth);
     ADD_SUITE(otherfaction);
@@ -156,7 +164,6 @@ int RunAllTests(int argc, char *argv[])
 }
 
 int main(int argc, char ** argv) {
-    log_to_file(LOG_CPERROR, stderr);
     ++argv;
     --argc;
     if (argc > 0 && strcmp("--list", argv[0]) == 0) {

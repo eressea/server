@@ -106,7 +106,7 @@ static void json_maintenance_i(cJSON *json, maintenance *mt) {
             break;
         case cJSON_Array:
             if (strcmp(child->string, "flags") == 0) {
-                const char * flags[] = { "variable", "required", 0 };
+                const char * flags[] = { "variable", 0 };
                 mt->flags = json_flags(child, flags);
             }
             else {
@@ -481,6 +481,9 @@ static void json_race(cJSON *json, race *rc) {
             else if (strcmp(child->string, "capacity") == 0) {
                 rc->capacity = child->valueint;
             }
+            else if (strcmp(child->string, "income") == 0) {
+                rc->income = child->valueint;
+            }
             else if (strcmp(child->string, "hp") == 0) {
                 rc->hitpoints = child->valueint;
             }
@@ -793,7 +796,7 @@ static void json_settings(cJSON *json) {
         else {
             char value[32];
             if (child->type == cJSON_Number && child->valuedouble && child->valueint<child->valuedouble) {
-                _snprintf(value, sizeof(value), "%lf", child->valuedouble);
+                _snprintf(value, sizeof(value), "%f", child->valuedouble);
             }
             else {
                 _snprintf(value, sizeof(value), "%d", child->valueint);

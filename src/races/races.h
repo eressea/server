@@ -14,6 +14,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+    struct unit;
 
     void register_races(void);
     void make_undead_unit(struct unit *);

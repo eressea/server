@@ -21,7 +21,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "skill.h"
 
 #include "curse.h"
-#include "item.h"
 #include "race.h"
 #include "region.h"
 #include "terrain.h"
@@ -104,16 +103,22 @@ int value, int flags)
 int skill_mod(const race * rc, skill_t sk, const struct terrain_type *terrain)
 {
     int result = 0;
+    static int rc_cache;
+    static const race *rc_dwarf, *rc_insect;
 
+    if (rc_changed(&rc_cache)) {
+        rc_dwarf = get_race(RC_DWARF);
+        rc_insect = get_race(RC_INSECT);
+    }
     result = rc->bonus[sk];
 
-    if (rc == get_race(RC_DWARF)) {
+    if (rc == rc_dwarf) {
         if (sk == SK_TACTICS) {
             if (terrain == newterrain(T_MOUNTAIN) || fval(terrain, ARCTIC_REGION))
                 ++result;
         }
     }
-    else if (rc == get_race(RC_INSECT)) {
+    else if (rc == rc_insect) {
         if (terrain == newterrain(T_MOUNTAIN) || fval(terrain, ARCTIC_REGION))
             --result;
         else if (terrain == newterrain(T_DESERT) || terrain == newterrain(T_SWAMP))
@@ -123,61 +128,28 @@ int skill_mod(const race * rc, skill_t sk, const struct terrain_type *terrain)
     return result;
 }
 
-#define RCMODMAXHASH 31
-#ifdef FASTER_SKILLMOD
-static struct skillmods {
-    struct skillmods *next;
-    const struct race *race;
-    struct modifiers {
-        int value[MAXSKILLS];
-    } mod[MAXTERRAINS];
-} *modhash[RCMODMAXHASH];
-
-static struct skillmods *init_skills(const race * rc)
-{
-    terrain_t t;
-    struct skillmods *mods =
-        (struct skillmods *)calloc(1, sizeof(struct skillmods));
-    mods->race = rc;
-
-    for (t = 0; t != MAXTERRAINS; ++t) {
-        skill_t sk;
-        for (sk = 0; sk != MAXSKILLS; ++sk) {
-            mods->mod[t].value[sk] = skill_mod(rc, sk, newterrain(t));
-        }
-    }
-    return mods;
-}
-#endif
-
 int rc_skillmod(const struct race *rc, const region * r, skill_t sk)
 {
     int mods = 0;
-
     if (!skill_enabled(sk)) {
         return 0;
     }
-#ifdef FASTER_SKILLMOD
-    unsigned int index = hashstring(rc->_name) % RCMODMAXHASH;
-    struct skillmods **imods = &modhash[index];
-    while (*imods && (*imods)->race != rc) {
-        imods = &(*imods)->next;
-    }
-    if (*imods == NULL) {
-        *imods = init_skills(rc);
-    }
-    mods = (*imods)->mod[rterrain(r)].value[sk];
-#else
     if (r) {
         mods = skill_mod(rc, sk, r->terrain);
     }
-#endif
-    if (rc == get_race(RC_ELF) && r && r_isforest(r)) {
-        if (sk == SK_PERCEPTION || sk == SK_STEALTH) {
-            ++mods;
+    if (r && r_isforest(r)) {
+        static int rc_cache;
+        static const race * rc_elf;
+        if (rc_changed(&rc_cache)) {
+            rc_elf = get_race(RC_ELF);
         }
-        else if (sk == SK_TACTICS) {
-            mods += 2;
+        if (rc == rc_elf) {
+            if (sk == SK_PERCEPTION || sk == SK_STEALTH) {
+                ++mods;
+            }
+            else if (sk == SK_TACTICS) {
+                mods += 2;
+            }
         }
     }
     return mods;
@@ -211,9 +183,13 @@ void sk_set(skill * sv, int level)
     sv->level = level;
 }
 
-static int rule_random_progress(void)
+static bool rule_random_progress(void)
 {
-    return config_get_int("study.random_progress", 1);
+    static int rule, config;
+    if (config_changed(&config)) {
+        rule = config_get_int("study.random_progress", 1);
+    }
+    return rule != 0;
 }
 
 int skill_weeks(int level)

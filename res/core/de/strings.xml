@@ -34,7 +34,7 @@
     </string>
     <string name="songdragon">
       <text locale="de">Singdrachen sind von der Größe eines ausgewachsenden Tigers. Ihre Färbung reicht von schillerndem Rot, über dunkles Grün bis hin zu tiefem Schwarz. Alle bekannten Drachen dieser Art weisen eine hohe Intelligenz und ein hohes Maß an magischen Fähigkeiten auf. Wie Ihre großen Verwandten verfügen sie über einen Feuerodem. Sie lieben den Gesang und das üppige Mahl. Von Zeit zu Zeit gehen sie eine engen magisches Bund zu einem Magier ein. Wenn dies geschieht, so steht dem Magier ein äußerst loyaler und lohnender Vertrauter zur Seite.
-</text>
+    </text>
       <text locale="en">Song Dragons are roughly the size of a fully grown tiger. Their coloring ranges from bright red, through a dark green shade to a deep black. All known dragons of this species display a high level of intelligence and highly developed magical skills. Like their larger cousins, Song Dragons posess a firegland. They love singing and a good meal. From time to time one of these magnificent creatures will bond with a mage. When this happens, the mage is assured of a most loyal and useful familiar at his side.</text>
     </string>
     <string name="unicorn">
@@ -234,11 +234,6 @@
       nur unter Schwierigkeiten normale Tätigkeiten ausüben. Der
       einzige Vorteil ihrer geringen Größe ist, dass sie sich leichter
       verstecken kann.</text>
-    </string>
-    <string name="wand_of_tears">
-      <text locale="de">Dieses magische Szepter, ein Geschenk Igjarjuks, sorgt für große
-      Verwirrung und Gedächtnisverlust. Syntax: BENUTZE "Szepter der
-      Tränen"</text>
     </string>
     <string name="speedsail">
       <text locale="de">Setzt eine Einheit dieses Segel auf einem Schiff, so erhöht
@@ -1118,14 +1113,6 @@
     <text locale="de">Trollhörner</text>
     <text locale="en">troll horns</text>
   </string>
-  <string name="phoenixfeather">
-    <text locale="de">Feder des Phönix</text>
-    <text locale="en">feather of the phoenix</text>
-  </string>
-  <string name="phoenixfeather_p">
-    <text locale="de">Federn des Phönix</text>
-    <text locale="en">feathers of the phoenix</text>
-  </string>
 
   <!--Resourcen -->
   <string name="money">
@@ -1621,14 +1608,6 @@
   </string>
   <string name="presspass_p">
     <text locale="de">Akkreditionen des Xontormia-Expreß</text>
-  </string>
-  <string name="wand_of_tears">
-    <text locale="de">Szepter der Tränen</text>
-    <text locale="en">wand of tears</text>
-  </string>
-  <string name="wand_of_tears_p">
-    <text locale="de">Szepter der Tränen</text>
-    <text locale="en">wands of tears</text>
   </string>
   <string name="snowball">
     <text locale="de">Schneeball</text>
@@ -2464,23 +2443,6 @@
       <text locale="en">skeleton</text>
     </string>
 
-    <string name="centaur">
-      <text locale="de">Zentaur</text>
-      <text locale="en">centaur</text>
-    </string>
-    <string name="centaur_p">
-      <text locale="de">Zentauren</text>
-      <text locale="en">centaurs</text>
-    </string>
-    <string name="centaur_d">
-      <text locale="de">Zentauren</text>
-      <text locale="en">centaurs</text>
-    </string>
-    <string name="centaur_x">
-      <text locale="de">Zentauren</text>
-      <text locale="en">centaur</text>
-    </string>
-
     <string name="shadowknight">
       <text locale="de">Schattenritter</text>
       <text locale="en">shadow knight</text>
@@ -3193,23 +3155,6 @@
     <string name="youngdragon_x">
       <text locale="de">Jungdrachen</text>
       <text locale="en">young dragon</text>
-    </string>
-
-    <string name="phoenix">
-      <text locale="de">Phönix</text>
-      <text locale="en">phoenix</text>
-    </string>
-    <string name="phoenix_p">
-      <text locale="de">Phönixe</text>
-      <text locale="en">phoenixes</text>
-    </string>
-    <string name="phoenix_d">
-      <text locale="de">Phönixen</text>
-      <text locale="en">phoenixes</text>
-    </string>
-    <string name="phoenix_x">
-      <text locale="de">Phönix</text>
-      <text locale="en">phoenix</text>
     </string>
 
     <string name="illusion">

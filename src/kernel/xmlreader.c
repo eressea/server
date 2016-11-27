@@ -15,6 +15,7 @@ without prior permission by the authors of Eressea.
 #include "xmlreader.h"
 
 #include "building.h"
+#include "guard.h"
 #include "equipment.h"
 #include "item.h"
 #include "keyword.h"
@@ -33,6 +34,7 @@ without prior permission by the authors of Eressea.
 #include "vortex.h"
 
 #include <modules/score.h>
+#include <attributes/attributes.h>
 
 /* util includes */
 #include <util/attrib.h>
@@ -305,7 +307,7 @@ static int parse_buildings(xmlDocPtr doc)
                     btype->age = (void(*)(struct building *))fun;
                 }
                 else if (strcmp((const char *)propValue, "protection") == 0) {
-                    btype->protection = (int(*)(struct building *, struct unit *, building_bonus))fun;
+                    btype->protection = (int(*)(const struct building *, const struct unit *, building_bonus))fun;
                 }
                 else if (strcmp((const char *)propValue, "taxes") == 0) {
                     btype->taxes = (double(*)(const struct building *, int))fun;
@@ -338,9 +340,6 @@ static int parse_buildings(xmlDocPtr doc)
 
                 if (xml_bvalue(node, "variable", false))
                     mt->flags |= MTF_VARIABLE;
-                if (xml_bvalue(node, "vital", false))
-                    mt->flags |= MTF_VITAL;
-
             }
             xmlXPathFreeObject(result);
 
@@ -471,6 +470,8 @@ static int parse_calendar(xmlDocPtr doc)
             }
             xmlXPathFreeObject(xpathMonths);
             xmlXPathFreeObject(xpathSeasons);
+            xmlFree(newyear);
+            newyear = NULL;
         }
     xmlXPathFreeObject(xpathCalendars);
     xmlXPathFreeContext(xpath);
@@ -1052,24 +1053,6 @@ static int parse_resources(xmlDocPtr doc)
             }
             xmlXPathFreeObject(result);
 
-            result = xmlXPathEvalExpression(BAD_CAST "guard", xpath);
-            if (result->nodesetval != NULL)
-                for (k = 0; k != result->nodesetval->nodeNr; ++k) {
-                    xmlNodePtr node = result->nodesetval->nodeTab[k];
-                    xmlChar *propFlag = xmlGetProp(node, BAD_CAST "flag");
-
-                    if (propFlag != NULL) {
-                        if (strcmp((const char *)propFlag, "logging") == 0) {
-                            rdata->guard |= GUARD_TREES;
-                        }
-                        else if (strcmp((const char *)propFlag, "mining") == 0) {
-                            rdata->guard |= GUARD_MINING;
-                        }
-                        xmlFree(propFlag);
-                    }
-                }
-            xmlXPathFreeObject(result);
-
             /* reading eressea/resources/resource/resourcelimit/function */
             result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
             if (result->nodesetval != NULL)
@@ -1188,22 +1171,18 @@ static void add_spells(equipment * eq, xmlNodeSetPtr nsetItems)
         for (i = 0; i != nsetItems->nodeNr; ++i) {
             xmlNodePtr node = nsetItems->nodeTab[i];
             xmlChar *propValue;
-            struct spell *sp;
+            int level;
+            const char *name;
 
             propValue = xmlGetProp(node, BAD_CAST "name");
             assert(propValue != NULL);
-            sp = find_spell((const char *)propValue);
-            if (!sp) {
-                log_error("no spell '%s' for equipment-set '%s'\n", (const char *)propValue, eq->name);
+            name = (const char *)propValue;
+            level = xml_ivalue(node, "level", 0);
+            if (level > 0) {
+                equipment_addspell(eq, name, level);
             }
             else {
-                int level = xml_ivalue(node, "level", 0);
-                if (level > 0) {
-                    equipment_addspell(eq, sp, level);
-                }
-                else {
-                    log_error("spell '%s' for equipment-set '%s' has no level\n", sp->sname, eq->name);
-                }
+                log_error("spell '%s' for equipment-set '%s' has no level\n", name, eq->name);
             }
             xmlFree(propValue);
         }
@@ -1328,7 +1307,7 @@ static int parse_equipment(xmlDocPtr doc)
                 xmlXPathFreeObject(xpathResult);
 
                 xpathResult = xmlXPathEvalExpression(BAD_CAST "spell", xpath);
-                assert(!eq->spellbook);
+                assert(!eq->spells);
                 add_spells(eq, xpathResult->nodesetval);
                 xmlXPathFreeObject(xpathResult);
 
@@ -1603,6 +1582,14 @@ static void parse_param(struct param **params, xmlNodePtr node)
 
 static void parse_ai(race * rc, xmlNodePtr node)
 {
+    int n;
+
+    n = xml_ivalue(node, "scare", 0);
+    if (n>0) {
+        attrib *a = a_new(&at_scare);
+        a->data.i = n;
+        a_add(&rc->attribs, a);
+    }
     rc->splitsize = xml_ivalue(node, "splitsize", 0);
     rc->aggression = (float)xml_fvalue(node, "aggression", 0.04);
     if (xml_bvalue(node, "killpeasants", false))
@@ -1645,12 +1632,14 @@ static int parse_races(xmlDocPtr doc)
         xmlFree(propValue);
 
         rc->magres = (float)xml_fvalue(node, "magres", rc->magres);
+        rc->healing = (float)xml_fvalue(node, "healing", rc->healing);
         rc->maxaura = (float)xml_fvalue(node, "maxaura", rc->maxaura);
         rc->regaura = (float)xml_fvalue(node, "regaura", rc->regaura);
         rc->recruitcost = xml_ivalue(node, "recruitcost", rc->recruitcost);
         rc->maintenance = xml_ivalue(node, "maintenance", rc->maintenance);
         rc->weight = xml_ivalue(node, "weight", rc->weight);
         rc->capacity = xml_ivalue(node, "capacity", rc->capacity);
+        rc->income = xml_ivalue(node, "income", rc->income);
         rc->speed = (float)xml_fvalue(node, "speed", rc->speed);
         rc->hitpoints = xml_ivalue(node, "hp", rc->hitpoints);
         rc->armor = (char)xml_ivalue(node, "ac", rc->armor);
@@ -1661,8 +1650,10 @@ static int parse_races(xmlDocPtr doc)
         rc->at_bonus = (char)xml_ivalue(node, "attackmodifier", rc->at_bonus);
         rc->df_bonus = (char)xml_ivalue(node, "defensemodifier", rc->df_bonus);
 
-        if (!xml_bvalue(node, "playerrace", false))
+        if (!xml_bvalue(node, "playerrace", false)) {
+            assert(rc->recruitcost == 0);
             rc->flags |= RCF_NPC;
+        }
         if (xml_bvalue(node, "scarepeasants", false))
             rc->flags |= RCF_SCAREPEASANTS;
         if (!xml_bvalue(node, "cansteal", true))
@@ -1722,8 +1713,6 @@ static int parse_races(xmlDocPtr doc)
             rc->ec_flags |= GIVEUNIT;
         if (xml_bvalue(node, "getitem", false))
             rc->ec_flags |= GETITEM;
-        if (xml_bvalue(node, "recruithorses", false))
-            rc->ec_flags |= ECF_REC_HORSES;
         if (xml_bvalue(node, "recruitethereal", false))
             rc->ec_flags |= ECF_REC_ETHEREAL;
         if (xml_bvalue(node, "recruitunlimited", false))
@@ -1797,11 +1786,10 @@ static int parse_races(xmlDocPtr doc)
             }
             assert(propValue != NULL);
             if (strcmp((const char *)propValue, "name") == 0) {
-                rc->generate_name = (const char *(*)(const struct unit *))fun;
+                rc->generate_name = (race_name_func)fun;
             }
             else if (strcmp((const char *)propValue, "describe") == 0) {
-                rc->describe =
-                    (const char *(*)(const struct unit *, const struct locale *))fun;
+                rc->describe = (race_desc_func)fun;
             }
             else if (strcmp((const char *)propValue, "age") == 0) {
                 rc->age = (void(*)(struct unit *))fun;

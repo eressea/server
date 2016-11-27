@@ -10,7 +10,6 @@
  without prior permission by the authors of Eressea.
  */
 #include <platform.h>
-#include <kernel/config.h>
 #include "combatspells.h"
 
 /* kernel includes */
@@ -81,7 +80,7 @@ static const char *spell_damage(int sp)
 {
     switch (sp) {
     case 0:
-        /* meist tödlich 20-65 HP */
+        /* meist tï¿½dlich 20-65 HP */
         return "5d10+15";
     case 1:
         /* sehr variabel 4-48 HP */
@@ -90,7 +89,7 @@ static const char *spell_damage(int sp)
         /* leicht verwundet 4-18 HP */
         return "2d8+2";
     case 3:
-        /* fast immer tödlich 30-50 HP */
+        /* fast immer tï¿½dlich 30-50 HP */
         return "5d5+25";
     case 4:
         /* verwundet 11-26 HP */
@@ -382,11 +381,11 @@ int sp_combatrosthauch(struct castorder * co)
     ql_free(fgs);
 
     if (k == 0) {
-        /* keine Waffen mehr da, die zerstört werden könnten */
+        /* keine Waffen mehr da, die zerstï¿½rt werden kï¿½nnten */
         message *msg = msg_message("rust_effect_1", "mage", fi->unit);
         message_all(b, msg);
         msg_release(msg);
-        fi->magic = 0;              /* kämpft nichtmagisch weiter */
+        fi->magic = 0;              /* kï¿½mpft nichtmagisch weiter */
         level = 0;
     }
     else {
@@ -453,7 +452,7 @@ int sp_speed(struct castorder * co)
 
     allies =
         count_allies(fi->side, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE, ALLY_ANY);
-    /* maximal 2*allies Versuche ein Opfer zu finden, ansonsten bestände
+    /* maximal 2*allies Versuche ein Opfer zu finden, ansonsten bestï¿½nde
      * die Gefahr eine Endlosschleife*/
     allies *= 2;
 
@@ -546,7 +545,7 @@ int sp_mindblast_temp(struct castorder * co)
 
         assert(dt.fighter);
         du = dt.fighter->unit;
-        if (fval(du, UFL_MARK)) {
+        if (du->flags & UFL_MARK) {
             /* not this one again */
             continue;
         }
@@ -564,7 +563,7 @@ int sp_mindblast_temp(struct castorder * co)
             }
             force -= du->number;
         }
-        fset(du, UFL_MARK);
+        du->flags |= UFL_MARK;
         reset = 1;
         enemies -= du->number;
     }
@@ -572,7 +571,7 @@ int sp_mindblast_temp(struct castorder * co)
     if (reset) {
         unit *u;
         for (u = b->region->units; u; u = u->next) {
-            freset(u, UFL_MARK);
+            u->flags &= ~UFL_MARK;
         }
     }
 
@@ -612,7 +611,7 @@ int sp_mindblast(struct castorder * co)
 
         assert(dt.fighter);
         du = dt.fighter->unit;
-        if (fval(du, UFL_MARK)) {
+        if (du->flags & UFL_MARK) {
             /* not this one again */
             continue;
         }
@@ -640,7 +639,7 @@ int sp_mindblast(struct castorder * co)
         else {
             /* only works against humanoids, don't try others. but do remove them
              * from 'force' once or we may never terminate. */
-            fset(du, UFL_MARK);
+            du->flags |= UFL_MARK;
             reset = 1;
         }
         enemies -= du->number;
@@ -649,7 +648,7 @@ int sp_mindblast(struct castorder * co)
     if (reset) {
         unit *u;
         for (u = b->region->units; u; u = u->next) {
-            freset(u, UFL_MARK);
+            u->flags &= ~UFL_MARK;
         }
     }
 
@@ -866,8 +865,8 @@ static fighter *summon_allies(const fighter *fi, const race *rc, int number) {
     
     u->hp = u->number * unit_max_hp(u);
     
-    if (fval(mage, UFL_ANON_FACTION)) {
-        fset(u, UFL_ANON_FACTION);
+    if (mage->flags & UFL_ANON_FACTION) {
+        u->flags |= UFL_ANON_FACTION;
     }
     
     a = a_new(&at_unitdissolve);
@@ -932,8 +931,8 @@ int sp_shadowknights(struct castorder * co)
 
     u->hp = u->number * unit_max_hp(u);
 
-    if (fval(mage, UFL_ANON_FACTION)) {
-        fset(u, UFL_ANON_FACTION);
+    if (mage->flags & UFL_ANON_FACTION) {
+        u->flags |= UFL_ANON_FACTION;
     }
 
     a = a_new(&at_unitdissolve);
@@ -959,13 +958,7 @@ int sp_strong_wall(struct castorder * co)
     unit *mage = fi->unit;
     building *burg;
     double effect;
-    static bool init = false;
     message *msg;
-    static const curse_type *strongwall_ct;
-    if (!init) {
-        init = true;
-        strongwall_ct = ct_find("strongwall");
-    }
 
     if (!mage->building) {
         return 0;
@@ -973,7 +966,7 @@ int sp_strong_wall(struct castorder * co)
     burg = mage->building;
 
     effect = power / 4;
-    create_curse(mage, &burg->attribs, strongwall_ct, power, 1, effect, 0);
+    create_curse(mage, &burg->attribs, ct_find("strongwall"), power, 1, effect, 0);
 
     msg =
         msg_message("sp_strongwalls_effect", "mage building", mage, mage->building);
@@ -1022,7 +1015,7 @@ int sp_chaosrow(struct castorder * co)
             continue;
         if (power <= 0.0)
             break;
-        /* force sollte wegen des _max(0,x) nicht unter 0 fallen können */
+        /* force sollte wegen des _max(0,x) nicht unter 0 fallen kï¿½nnen */
 
         if (is_magic_resistant(mage, df->unit, 0))
             continue;
@@ -1074,7 +1067,7 @@ int sp_chaosrow(struct castorder * co)
 }
 
 /* Gesang der Furcht (Kampfzauber) */
-/* Panik (Präkampfzauber) */
+/* Panik (Prï¿½kampfzauber) */
 
 int sp_flee(struct castorder * co)
 {
@@ -1120,13 +1113,13 @@ int sp_flee(struct castorder * co)
             if (force < 0)
                 break;
 
-            if (df->person[n].flags & FL_PANICED) {   /* bei SPL_SONG_OF_FEAR möglich */
+            if (df->person[n].flags & FL_PANICED) {   /* bei SPL_SONG_OF_FEAR mï¿½glich */
                 df->person[n].attack -= 1;
                 --force;
                 ++panik;
             }
             else if (!(df->person[n].flags & FL_COURAGE)
-                || !fval(u_race(df->unit), RCF_UNDEAD)) {
+                || !(u_race(df->unit)->flags & RCF_UNDEAD)) {
                 if (!is_magic_resistant(mage, df->unit, 0)) {
                     df->person[n].flags |= FL_PANICED;
                     ++panik;
@@ -1171,7 +1164,7 @@ int sp_hero(struct castorder * co)
 
     allies =
         count_allies(fi->side, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE, ALLY_ANY);
-    /* maximal 2*allies Versuche ein Opfer zu finden, ansonsten bestände
+    /* maximal 2*allies Versuche ein Opfer zu finden, ansonsten bestï¿½nde
      * die Gefahr eine Endlosschleife*/
     allies *= 2;
 
@@ -1228,7 +1221,7 @@ int sp_berserk(struct castorder * co)
 
     allies =
         count_allies(fi->side, FIGHT_ROW, BEHIND_ROW - 1, SELECT_ADVANCE, ALLY_ANY);
-    /* maximal 2*allies Versuche ein Opfer zu finden, ansonsten bestände
+    /* maximal 2*allies Versuche ein Opfer zu finden, ansonsten bestï¿½nde
      * die Gefahr eine Endlosschleife*/
     allies *= 2;
 
@@ -1425,7 +1418,7 @@ int sp_reeling_arrows(struct castorder * co)
 }
 
 /* Magier weicht dem Kampf aus. Wenn er sich bewegen kann, zieht er in
- * eine Nachbarregion, wobei ein NACH berücksichtigt wird. Ansonsten
+ * eine Nachbarregion, wobei ein NACH berï¿½cksichtigt wird. Ansonsten
  * bleibt er stehen und nimmt nicht weiter am Kampf teil. */
 int sp_denyattack(struct castorder * co)
 {
@@ -1438,17 +1431,16 @@ int sp_denyattack(struct castorder * co)
     region *r = b->region;
     message *m;
 
-    /* Fliehende Einheiten verlassen auf jeden Fall Gebäude und Schiffe. */
-    if (!fval(r->terrain, SEA_REGION)) {
+    /* Fliehende Einheiten verlassen auf jeden Fall Gebï¿½ude und Schiffe. */
+    if (!(r->terrain->flags & SEA_REGION)) {
         leave(mage, false);
     }
     /* und bewachen nicht */
-    setguard(mage, GUARD_NONE);
+    setguard(mage, false);
     /* irgendwie den langen befehl sperren */
-    /* fset(fi, FIG_ATTACKED); */
 
-    /* wir tun so, als wäre die Person geflohen */
-    fset(fi, FIG_NOLOOT);
+    /* wir tun so, als wï¿½re die Person geflohen */
+    fi->flags |= FIG_NOLOOT;
     fi->run.hp = mage->hp;
     fi->run.number = mage->number;
     /* fighter leeren */
@@ -1486,7 +1478,7 @@ int sp_armorshield(struct castorder * co)
     message_all(b, m);
     msg_release(m);
 
-    /* gibt Rüstung +effect für duration Treffer */
+    /* gibt Rï¿½stung +effect fï¿½r duration Treffer */
 
     switch (sp->id) {
     case SPL_ARMORSHIELD:
@@ -1545,7 +1537,7 @@ int sp_fumbleshield(struct castorder * co)
     message_all(b, m);
     msg_release(m);
 
-    /* der erste Zauber schlägt mit 100% fehl  */
+    /* der erste Zauber schlï¿½gt mit 100% fehl  */
 
     switch (sp->id) {
     case SPL_DRAIG_FUMBLESHIELD:
@@ -1611,7 +1603,7 @@ int sp_reanimate(struct castorder * co)
             && u_race(tf->unit) != get_race(RC_DAEMON)
             && (chance(c))) {
             assert(tf->alive < tf->unit->number);
-            /* t.fighter->person[].hp beginnt mit t.index = 0 zu zählen,
+            /* t.fighter->person[].hp beginnt mit t.index = 0 zu zï¿½hlen,
              * t.fighter->alive ist jedoch die Anzahl lebender in der Einheit,
              * also sind die hp von t.fighter->alive
              * t.fighter->hitpoints[t.fighter->alive-1] und der erste Tote
@@ -1674,7 +1666,7 @@ static int heal_fighters(quicklist * fgs, int *power, bool heal_monsters)
             break;
 
         /* Untote kann man nicht heilen */
-        if (df->unit->number == 0 || fval(u_race(df->unit), RCF_NOHEAL))
+        if (df->unit->number == 0 || (u_race(df->unit)->flags & RCF_NOHEAL))
             continue;
 
         /* wir heilen erstmal keine Monster */
@@ -1717,8 +1709,8 @@ int sp_healing(struct castorder * co)
     message *msg;
     bool use_item = has_ao_healing(mage);
 
-    /* bis zu 11 Personen pro Stufe (einen HP müssen sie ja noch
-     * haben, sonst wären sie tot) können geheilt werden */
+    /* bis zu 11 Personen pro Stufe (einen HP mï¿½ssen sie ja noch
+     * haben, sonst wï¿½ren sie tot) kï¿½nnen geheilt werden */
 
     if (use_item) {
         healhp *= 2;
@@ -1764,7 +1756,7 @@ int sp_undeadhero(struct castorder * co)
     int force = (int)get_force(power, 0);
     double c = 0.50 + 0.02 * power;
 
-    /* Liste aus allen Kämpfern */
+    /* Liste aus allen Kï¿½mpfern */
     fgs = fighters(b, fi->side, FIGHT_ROW, AVOID_ROW, FS_ENEMY | FS_HELP);
     scramble_fighters(fgs);
 
@@ -1782,7 +1774,7 @@ int sp_undeadhero(struct castorder * co)
         if (df->alive + df->run.number < du->number) {
             int j = 0;
 
-            /* Wieviele Untote können wir aus dieser Einheit wecken? */
+            /* Wieviele Untote kï¿½nnen wir aus dieser Einheit wecken? */
             for (n = df->alive + df->run.number; n != du->number; n++) {
                 if (chance(c)) {
                     ++j;
@@ -1806,7 +1798,7 @@ int sp_undeadhero(struct castorder * co)
                     unit_setinfo(u, NULL);
                 }
                 setstatus(u, du->status);
-                setguard(u, GUARD_NONE);
+                setguard(u, false);
                 for (ilist = &du->items; *ilist;) {
                     item *itm = *ilist;
                     int loot = itm->number * j / du->number;
@@ -1824,8 +1816,8 @@ int sp_undeadhero(struct castorder * co)
                 }
 
                 /* inherit stealth from magician */
-                if (fval(mage, UFL_ANON_FACTION)) {
-                    fset(u, UFL_ANON_FACTION);
+                if (mage->flags & UFL_ANON_FACTION) {
+                    u->flags |= UFL_ANON_FACTION;
                 }
 
                 /* transfer dead people to new unit, set hitpoints to those of old unit */

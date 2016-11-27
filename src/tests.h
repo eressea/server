@@ -26,10 +26,19 @@ extern "C" {
     struct spellparameter;
     struct spell;
     struct locale;
+    struct strlist;
+    struct log_t;
 
     struct CuTest;
 
+    void test_setup_test(struct CuTest *tc, const char *file, int line);
+#define test_setup() test_setup_test(NULL, __FILE__, __LINE__)
+#define test_setup_ex(tc) test_setup_test(tc, __FILE__, __LINE__)
+
     void test_cleanup(void);
+    void test_log_stderr(int on);
+    struct log_t * test_log_start(int flags, struct strlist **slist);
+    void test_log_stop(struct log_t *log, struct strlist *slist);
 
     struct locale * test_create_locale(void);
     struct terrain_type * test_create_terrain(const char * name, unsigned int flags);
@@ -51,9 +60,11 @@ extern "C" {
     int RunAllTests(void);
     void test_translate_param(const struct locale *lang, param_t param, const char *text);
     const char * test_get_messagetype(const struct message *msg);
+    struct message * test_find_messagetype_ex(struct message_list *msgs, const char *name, struct message *prev);
     struct message * test_find_messagetype(struct message_list *msgs, const char *name);
     struct message * test_get_last_message(struct message_list *mlist);
     void test_clear_messages(struct faction *f);
+    void test_clear_messagelist(struct message_list **msgs);
     void assert_message(struct CuTest * tc, struct message *msg, char *name, int numpar);
 
     void assert_pointer_parameter(struct CuTest * tc, struct message *msg, int index, void *arg);

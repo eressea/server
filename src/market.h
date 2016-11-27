@@ -17,7 +17,8 @@ extern "C" {
 #endif
     struct building;
 
-    extern void do_markets(void);
+    bool markets_module(void);
+    void do_markets(void);
 
 #ifdef __cplusplus
 }

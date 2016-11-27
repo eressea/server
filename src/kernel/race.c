@@ -34,12 +34,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "skill.h"
 #include "terrain.h"
 #include "unit.h"
-#include "version.h"
 
 /* util includes */
 #include <util/attrib.h>
 #include <util/bsdstring.h>
 #include <util/functions.h>
+#include <util/umlaut.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/rng.h>
@@ -60,46 +60,87 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /** external variables **/
 race *races;
 int num_races = 0;
-static int cache_breaker;
+static int rc_changes = 1;
 
 static const char *racenames[MAXRACES] = {
     "dwarf", "elf", NULL, "goblin", "human", "troll", "demon", "insect",
     "halfling", "cat", "aquarian", "orc", "snotling", "undead", "illusion",
     "youngdragon", "dragon", "wyrm", "ent", "catdragon", "dracoid",
-    "special", "spell", "irongolem", "stonegolem", "shadowdemon",
+    NULL, "spell", "irongolem", "stonegolem", "shadowdemon",
     "shadowmaster", "mountainguard", "alp", "toad", "braineater", "peasant",
     "wolf", NULL, NULL, NULL, NULL, "songdragon", NULL,
     NULL, NULL, NULL, NULL, NULL, NULL, NULL,
     NULL, NULL, NULL, NULL, NULL, "seaserpent",
-    "shadowknight", "centaur", "skeleton", "skeletonlord", "zombie",
-    "juju-zombie", "ghoul", "ghast", "museumghost", "gnome", "template",
+    "shadowknight", NULL, "skeleton", "skeletonlord", "zombie",
+    "juju-zombie", "ghoul", "ghast", NULL, NULL, "template",
     "clone"
 };
 
-static race * race_cache[MAXRACES];
+const struct race *findrace(const char *s, const struct locale *lang)
+{
+    void **tokens = get_translations(lang, UT_RACES);
+    variant token;
 
-struct race *get_race(race_t rt) {
-    static int cache = -1;
+    assert(lang);
+    if (tokens && findtoken(*tokens, s, &token) == E_TOK_SUCCESS) {
+        return (const struct race *)token.v;
+    }
+    return NULL;
+}
+
+const struct race *get_race(race_t rt) {
     const char * name;
-    race * result = 0;
 
     assert(rt < MAXRACES);
     name = racenames[rt];
     if (!name) {
-        return 0;
+        return NULL;
     }
-    if (cache_breaker != cache) {
-        cache = cache_breaker;
-        memset(race_cache, 0, sizeof(race_cache));
-        return race_cache[rt] = rc_get_or_create(name);
+    return rc_find(name);
+}
+
+typedef struct xref {
+    race_t id;
+    const race *rc;
+} rc_xref;
+
+int cmp_xref(const void *a, const void *b)
+{
+    const rc_xref *l = (const rc_xref *)a;
+    const rc_xref *r = (const rc_xref *)b;
+    if (l->rc<r->rc) return -1;
+    if (l->rc>r->rc) return 1;
+    return 0;
+}
+
+static rc_xref *xrefs;
+race_t old_race(const struct race * rc)
+{
+    static int cache;
+    int i, l, r;
+    
+    if (rc_changed(&cache)) {
+        if (!xrefs) {
+            xrefs = malloc(sizeof(rc_xref) * MAXRACES);
+        }
+        for (i = 0; i != MAXRACES; ++i) {
+            xrefs[i].rc = get_race(i);
+            xrefs[i].id = (race_t)i;
+        }
+        qsort(xrefs, MAXRACES, sizeof(rc_xref), cmp_xref);
     }
-    else {
-        result = race_cache[rt];
-        if (!result) {
-            result = race_cache[rt] = rc_get_or_create(name);
+    l=0; r=MAXRACES-1;
+    while (l<=r) {
+        int m = (l+r)/2;
+        if (rc<xrefs[m].rc) {
+            r = m-1;
+        } else if (rc>xrefs[m].rc) {
+            l = m+1;
+        } else {
+            return (race_t)xrefs[m].id;
         }
     }
-    return result;
+    return NORACE;
 }
 
 race_list *get_familiarraces(void)
@@ -142,12 +183,15 @@ void free_races(void) {
     while (races) {
         race * rc = races->next;
         free_params(&races->parameters);
+        free(xrefs);
+        xrefs = 0;
         free(races->_name);
         free(races->def_damage);
         free(races);
         races = rc;
     }
     num_races = 0;
+    ++rc_changes;
 }
 
 static race *rc_find_i(const char *name)
@@ -169,38 +213,53 @@ const race * rc_find(const char *name) {
     return rc_find_i(name);
 }
 
-race *rc_get_or_create(const char *zName)
+bool rc_changed(int *cache) {
+    assert(cache);
+    if (*cache != rc_changes) {
+        *cache = rc_changes;
+        return true;
+    }
+    return false;
+}
+
+race *rc_create(const char *zName)
 {
     race *rc;
     int i;
 
     assert(zName);
-    rc = rc_find_i(zName);
-    if (!rc) {
-        rc = (race *)calloc(sizeof(race), 1);
-        rc->hitpoints = 1;
-        rc->weight = PERSON_WEIGHT;
-        rc->capacity = 540;
-        rc->recruit_multi = 1.0F;
-        rc->regaura = 1.0F;
-        rc->speed = 1.0F;
-        rc->battle_flags = 0;
-        if (strchr(zName, ' ') != NULL) {
-            log_error("race '%s' has an invalid name. remove spaces\n", zName);
-            assert(strchr(zName, ' ') == NULL);
-        }
-        rc->_name = _strdup(zName);
-        rc->precombatspell = NULL;
-
-        rc->attack[0].type = AT_COMBATSPELL;
-        for (i = 1; i < RACE_ATTACKS; ++i)
-            rc->attack[i].type = AT_NONE;
-        rc->index = num_races++;
-        ++cache_breaker;
-        rc->next = races;
-        return races = rc;
+    rc = (race *)calloc(sizeof(race), 1);
+    rc->hitpoints = 1;
+    rc->weight = PERSON_WEIGHT;
+    rc->capacity = 540;
+    rc->income = 20;
+    rc->recruit_multi = 1.0F;
+    rc->regaura = 1.0F;
+    rc->speed = 1.0F;
+    rc->battle_flags = 0;
+    if (strchr(zName, ' ') != NULL) {
+        log_error("race '%s' has an invalid name. remove spaces\n", zName);
+        assert(strchr(zName, ' ') == NULL);
     }
-    return rc;
+    rc->_name = _strdup(zName);
+    rc->precombatspell = NULL;
+
+    rc->attack[0].type = AT_COMBATSPELL;
+    for (i = 1; i < RACE_ATTACKS; ++i)
+        rc->attack[i].type = AT_NONE;
+    rc->index = num_races++;
+    ++rc_changes;
+    rc->next = races;
+    return races = rc;
+}
+
+race *rc_get_or_create(const char *zName)
+{
+    race *rc;
+
+    assert(zName);
+    rc = rc_find_i(zName);
+    return rc ? rc : rc_create(zName);
 }
 
 /** dragon movement **/
@@ -303,19 +362,17 @@ variant read_race_reference(struct storage *store)
     return result;
 }
 
-/** Returns the English name of the race, which is what the database uses.
-*/
-const char *dbrace(const struct race *rc)
-{
-    static char zText[32]; // FIXME: static return value
-    char *zPtr = zText;
-
-    /* the english names are all in ASCII, so we don't need to worry about UTF8 */
-    strlcpy(zText, (const char *)LOC(get_locale("en"), rc_name_s(rc, NAME_SINGULAR)), sizeof(zText));
-    while (*zPtr) {
-        *zPtr = (char)(toupper(*zPtr));
-        ++zPtr;
-    }
-    return zText;
+void register_race_description_function(race_desc_func func, const char *name) {
+    register_function((pf_generic)func, name);
 }
 
+void register_race_name_function(race_name_func func, const char *name) {
+    register_function((pf_generic)func, name);
+}
+
+char * race_namegen(const struct race *rc, struct unit *u) {
+    if (rc->generate_name) {
+        rc->generate_name(u);
+    }
+    return NULL;
+}

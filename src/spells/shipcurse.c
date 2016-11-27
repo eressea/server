@@ -12,8 +12,6 @@
  */
 
 #include <platform.h>
-#include <kernel/config.h>
-#include <kernel/version.h>
 #include "shipcurse.h"
 
 /* kernel includes */

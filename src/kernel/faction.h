@@ -33,36 +33,29 @@ extern "C" {
     struct gamedata;
     
     extern struct attrib_type at_maxmagicians;
-    /* SMART_INTERVALS: define to speed up finding the interval of regions that a
-       faction is in. defining this speeds up the turn by 30-40% */
-#define SMART_INTERVALS
 
     /* faction flags */
 #define FFL_NEWID (1<<0)        /* Die Partei hat bereits einmal ihre no gewechselt */
 #define FFL_ISNEW         (1<<1)
-#define FFL_RESTART       (1<<2)
 #define FFL_QUIT          (1<<3)
 #define FFL_CURSED        (1<<4) /* you're going to have a bad time */
 #define FFL_DEFENDER      (1<<10)
 #define FFL_SELECT        (1<<18)       /* ehemals f->dh, u->dh, r->dh, etc... */
 #define FFL_NOAID         (1<<21)       /* Hilfsflag Kampf */
-#define FFL_MARK          (1<<23)       /* für markierende algorithmen, die das 
-                                             * hinterher auch wieder löschen müssen!
+#define FFL_MARK          (1<<23)       /* fï¿½r markierende algorithmen, die das 
+                                             * hinterher auch wieder lï¿½schen mï¿½ssen!
                                              * (FFL_SELECT muss man vorher initialisieren,
-                                             * FL_MARK hinterher löschen) */
+                                             * FL_MARK hinterher lï¿½schen) */
 #define FFL_NOIDLEOUT     (1<<24)       /* Partei stirbt nicht an NMRs */
 #define FFL_NPC           (1<<25)       /* eine Partei mit Monstern */
-#define FFL_DBENTRY       (1<<28)       /* Partei ist in Datenbank eingetragen */
-#define FFL_SAVEMASK (FFL_DEFENDER|FFL_NEWID|FFL_NPC|FFL_DBENTRY|FFL_NOIDLEOUT|FFL_CURSED)
+#define FFL_SAVEMASK (FFL_DEFENDER|FFL_NEWID|FFL_NPC|FFL_NOIDLEOUT|FFL_CURSED)
 
     typedef struct faction {
         struct faction *next;
         struct faction *nexthash;
 
-#ifdef SMART_INTERVALS
         struct region *first;
         struct region *last;
-#endif
         int no;
         int subscription;
         int flags;
@@ -102,12 +95,13 @@ extern "C" {
             struct message_list *msgs;
         } *battles;
         struct item *items;         /* items this faction can claim */
-        struct seen_region **seen;
         struct quicklist *seen_factions;
         bool _alive;              /* enno: sollte ein flag werden */
     } faction;
 
     extern struct faction *factions;
+
+#define want(option) (1<<option)
 
     void fhash(struct faction *f);
     void funhash(struct faction *f);
@@ -141,9 +135,7 @@ extern "C" {
     void free_factions(void);
     void remove_empty_factions(void);
 
-#ifdef SMART_INTERVALS
     void update_interval(struct faction *f, struct region *r);
-#endif
 
     const char *faction_getbanner(const struct faction *self);
     void faction_setbanner(struct faction *self, const char *name);
@@ -181,10 +173,6 @@ extern "C" {
     int max_magicians(const struct faction * f);
 
     struct faction *getfaction(void);
-
-    /* looking up dead factions: */
-    void dhash(int no, struct faction * f);
-    struct faction *dfindhash(int no);
 
 #ifdef __cplusplus
 }

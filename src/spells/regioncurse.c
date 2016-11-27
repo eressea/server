@@ -12,7 +12,6 @@
  */
 
 #include <platform.h>
-#include <kernel/config.h>
 #include "regioncurse.h"
 #include "magic.h"
 
@@ -50,7 +49,7 @@ static message *cinfo_cursed_by_the_gods(const void *obj, objtype_t typ,
     unused_arg(self);
     assert(typ == TYP_REGION);
 
-    if (fval(r->terrain, SEA_REGION)) {
+    if (r->terrain->flags & SEA_REGION) {
         return msg_message("curseinfo::godcurseocean", "id", c->no);
     }
     return msg_message("curseinfo::godcurse", "id", c->no);

@@ -16,16 +16,34 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#ifndef CONFIG_H
-#define CONFIG_H
+#ifndef PLATFORM_H
+#define PLATFORM_H
 
 #ifdef NDEBUG
 #define LOMEM
 #endif
 
+// enable X/Open 7 extensions (like strdup):
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 700
+#endif
+
+// enable bsd string extensions, since glibc 2.12 (_BSD_SOURCE is dead):
+#ifndef _POSIX_C_SOURCE
+#define _POSIX_C_SOURCE 200809L
+#endif
+
+#ifndef USE_AUTOCONF
+#define USE_AUTOCONF
+
 #ifdef _MSC_VER
-# define VC_EXTRALEAN
-# define WIN32_LEAN_AND_MEAN
+#undef USE_AUTOCONF
+#define HAVE_STDBOOL_H
+#define HAVE_DIRECT__MKDIR
+#define HAVE__ACCESS
+
+#define VC_EXTRALEAN
+#define WIN32_LEAN_AND_MEAN
 #pragma warning(push)
 #pragma warning(disable:4820 4255 4668)
 # include <windows.h>
@@ -60,7 +78,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* warning C4100: <name> was declared deprecated */
 #ifndef _CRT_SECURE_NO_DEPRECATE
-# define _CRT_SECURE_NO_DEPRECATE
+#define _CRT_SECURE_NO_DEPRECATE
 #endif
 
 /*
@@ -69,49 +87,29 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * single-threaded I/O model and use the _nolock forms of the functions. 
  */
 #ifndef _CRT_DISABLE_PERFCRIT_LOCKS
-# define _CRT_DISABLE_PERFCRIT_LOCKS
+#define _CRT_DISABLE_PERFCRIT_LOCKS
 #endif
 
-/* define CRTDBG to enable MSVC CRT Debug library functions */
-#if defined(_DEBUG) && defined(CRTDBG)
-# include <crtdbg.h>
-# define _CRTDBG_MAP_ALLOC
+#elif __GNUC__
+#undef USE_AUTOCONF
+#define HAVE_SNPRINTF
+#define HAVE_SYS_STAT_MKDIR
+#define HAVE_STRDUP
+#define HAVE_UNISTD_H
+#endif
 #endif
 
-#endif /* _MSC_VER_ */
-
-#if defined __GNUC__
-# undef _BSD_SOURCE
-# define _BSD_SOURCE
-# undef __USE_BSD
-# define __USE_BSD
-#endif
-
-#ifdef _BSD_SOURCE
-# undef __EXTENSIONS__
-# define __EXTENSIONS__
-#endif
-
-#ifdef SOLARIS
-# define _SYS_PROCSET_H
-#undef _XOPEN_SOURCE
-# define _XOPEN_SOURCE
+#ifdef USE_AUTOCONF
+// unknown toolchain, using autoconf
+#include <autoconf.h>
 #endif
 
 #define unused_arg (void)
-
-#ifndef INLINE_FUNCTION
-# define INLINE_FUNCTION
-#endif
 
 #define iswxspace(c) (c==160 || iswspace(c))
 #define isxspace(c) (c==160 || isspace(c))
 
 #define TOLUA_CAST (char*)
-
-#ifdef USE_AUTOCONF
-# include <autoconf.h>
-#endif
 
 #if !defined(MAX_PATH)
 #if defined(PATH_MAX)
@@ -125,8 +123,56 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <unistd.h>
 #endif
 
-#ifdef HAVE_STRINGS_H
-#include <strings.h>
+#if defined(HAVE_STDBOOL_H)
+# include <stdbool.h>
+#else
+# ifndef HAVE__BOOL
+#  ifdef __cplusplus
+typedef bool _Bool;
+#  else
+typedef unsigned char _Bool;
+#  endif
+# endif
+# define bool _Bool
+# define false 0
+# define true 1
+# define __bool_true_false_are_defined 1
+#endif
+
+#ifndef HAVE__ACCESS
+#ifdef HAVE_ACCESS
+#define _access(path, mode) access(path, mode)
+#endif
+#endif
+
+#if defined(HAVE_DIRECT__MKDIR)
+#include <direct.h>
+#elif defined(HAVE_DIRECT_MKDIR)
+#include <direct.h>
+#define _mkdir(a) mkdir(a)
+#elif defined(HAVE_SYS_STAT_MKDIR)
+#include <sys/stat.h>
+#define _mkdir(a) mkdir(a, 0777)
+#endif
+
+#ifndef _min
+#define _min(a,b) ((a) < (b) ? (a) : (b))
+#endif
+#ifndef _max
+#define _max(a,b) ((a) > (b) ? (a) : (b))
+#endif
+
+#if !defined(HAVE__STRDUP)
+#if defined(HAVE_STRDUP)
+#undef _strdup
+#define _strdup strdup
+#endif
+#endif
+
+#if !defined(HAVE__SNPRINTF)
+#if defined(HAVE_SNPRINTF)
+#define _snprintf snprintf
+#endif
 #endif
 
 #endif

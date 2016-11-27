@@ -32,12 +32,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "plane.h"
 #include "region.h"
 #include "resources.h"
-#include "save.h"
 #include "ship.h"
 #include "terrain.h"
 #include "terrainid.h"
 #include "unit.h"
-#include "version.h"
 
 /* util includes */
 #include <util/attrib.h>
@@ -136,6 +134,13 @@ const char *regionname(const region * r, const faction * f)
     return write_regionname(r, f, buf[index], sizeof(buf[index]));
 }
 
+int region_maxworkers(const region *r)
+{
+    int size = production(r);
+    int treespace = (rtrees(r, 2) + rtrees(r, 1) / 2) * TREESIZE;
+    return _max(size - treespace, _min(size / 10, 200));
+}
+
 int deathcount(const region * r)
 {
     attrib *a = a_find(r->attribs, &at_deathcount);
@@ -146,23 +151,24 @@ int deathcount(const region * r)
 
 void deathcounts(region * r, int fallen)
 {
-    attrib *a;
-    static const curse_type *ctype = NULL;
+    attrib *a = NULL;
 
     if (fallen == 0)
         return;
-    if (!ctype)
-        ctype = ct_find("holyground");
-    if (ctype && curse_active(get_curse(r->attribs, ctype)))
-        return;
-
-    a = a_find(r->attribs, &at_deathcount);
-    if (!a)
+    if (r->attribs) {
+        const curse_type *ctype = ct_find("holyground");
+        if (ctype && curse_active(get_curse(r->attribs, ctype)))
+            return;
+        a = a_find(r->attribs, &at_deathcount);
+    }
+    if (!a) {
         a = a_add(&r->attribs, a_new(&at_deathcount));
+    }
     a->data.i += fallen;
 
-    if (a->data.i <= 0)
+    if (a->data.i <= 0) {
         a_remove(&r->attribs, a);
+    }
 }
 
 /* Moveblock wird zur Zeit nicht über Attribute, sondern ein Bitfeld
@@ -697,13 +703,11 @@ void r_setdemand(region * r, const luxury_type * ltype, int value)
     d->value = value;
 }
 
-const item_type *r_luxury(region * r)
+const item_type *r_luxury(const region * r)
 {
     struct demand *dmd;
     if (r->land) {
-        if (!r->land->demands) {
-            fix_demand(r);
-        }
+        assert(r->land->demands || !"need to call fix_demands on a region");
         for (dmd = r->land->demands; dmd; dmd = dmd->next) {
             if (dmd->value == 0)
                 return dmd->type->itype;
@@ -1011,6 +1015,20 @@ void setluxuries(region * r, const luxury_type * sale)
     }
 }
 
+int fix_demand(region * rd) {
+    luxury_type * ltype;
+    int maxluxuries = get_maxluxuries();
+    if (maxluxuries > 0) {
+        int sale = rng_int() % maxluxuries;
+        for (ltype = luxurytypes; sale != 0 && ltype; ltype = ltype->next) {
+            --sale;
+        }
+        setluxuries(rd, ltype);
+        return 0;
+    }
+    return -1;
+}
+
 void terraform_region(region * r, const terrain_type * terrain)
 {
     /* Resourcen, die nicht mehr vorkommen können, löschen */
@@ -1059,7 +1077,6 @@ void terraform_region(region * r, const terrain_type * terrain)
         rsetmoney(r, 0);
         freset(r, RF_ENCOUNTER);
         freset(r, RF_MALLORN);
-        /* Beschreibung und Namen löschen */
         return;
     }
 
@@ -1084,6 +1101,7 @@ void terraform_region(region * r, const terrain_type * terrain)
         r->land->ownership = NULL;
         region_set_morale(r, MORALE_DEFAULT, -1);
         region_setname(r, makename());
+        fix_demand(r);
         for (d = 0; d != MAXDIRECTIONS; ++d) {
             region *nr = rconnect(r, d);
             if (nr && nr->land) {
@@ -1196,7 +1214,7 @@ void terraform_region(region * r, const terrain_type * terrain)
 
         if (!fval(r, RF_CHAOTIC)) {
             int peasants;
-            peasants = (maxworkingpeasants(r) * (20 + dice_rand("6d10"))) / 100;
+            peasants = (region_maxworkers(r) * (20 + dice_rand("6d10"))) / 100;
             rsetpeasants(r, _max(100, peasants));
             rsetmoney(r, rpeasants(r) * ((wage(r, NULL, NULL,
                 INT_MAX) + 1) + rng_int() % 5));

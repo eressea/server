@@ -1,8 +1,8 @@
 #include <platform.h>
-#include <kernel/config.h>
 #include "items.h"
 
 #include "study.h"
+#include "economy.h"
 #include "move.h"
 #include "magic.h"
 
@@ -114,10 +114,9 @@ struct order *ord)
     const resource_type *rt_crystal = NULL;
     int i;
 
-    if (rt_crystal == NULL) {
-        rt_crystal = rt_find("antimagic");
-        assert(rt_crystal != NULL);
-    }
+    rt_crystal = rt_find("antimagic");
+    assert(rt_crystal != NULL);
+
     for (i = 0; i != amount; ++i) {
         int effect, duration = 2;
         double force;
@@ -138,7 +137,7 @@ struct order *ord)
         while (*ap && force > 0) {
             curse *c;
             attrib *a = *ap;
-            if (!fval(a->type, ATF_CURSE)) {
+            if (!(a->type->flags & ATF_CURSE)) {
                 do {
                     ap = &(*ap)->next;
                 } while (*ap && a->type == (*ap)->type);

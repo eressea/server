@@ -17,16 +17,20 @@
 static void test_register_building(CuTest * tc)
 {
     building_type *btype;
+    int cache = 0;
 
     test_cleanup();
 
     btype = (building_type *)calloc(sizeof(building_type), 1);
     btype->_name = _strdup("herp");
+    CuAssertIntEquals(tc, true, bt_changed(&cache));
+    CuAssertIntEquals(tc, false, bt_changed(&cache));
     bt_register(btype);
+    CuAssertIntEquals(tc, true, bt_changed(&cache));
 
     CuAssertPtrNotNull(tc, bt_find("herp"));
-    //    free(btype->_name);
-    //    free(btype);
+    free_buildingtypes();
+    CuAssertIntEquals(tc, true, bt_changed(&cache));
     test_cleanup();
 }
 
@@ -401,8 +405,8 @@ static void test_buildingtype_exists(CuTest * tc)
 
     r = findregion(-1, 0);
     b = new_building(btype, r, default_locale);
-    b->size = 10;
     CuAssertPtrNotNull(tc, b);
+    b->size = 10;
 
     CuAssertTrue(tc, !buildingtype_exists(r, NULL, false));
     CuAssertTrue(tc, !buildingtype_exists(r, btype2, false));
@@ -480,6 +484,15 @@ static void test_safe_building(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_building_type(CuTest *tc) {
+    building_type *btype;
+    test_setup();
+    btype = test_create_buildingtype("house");
+    CuAssertIntEquals(tc, true, is_building_type(btype, "house"));
+    CuAssertIntEquals(tc, false, is_building_type(btype, "castle"));
+    test_cleanup();
+}
+
 CuSuite *get_building_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -494,6 +507,7 @@ CuSuite *get_building_suite(void)
     SUITE_ADD_TEST(suite, test_buildingowner_goes_to_other_after_leave);
     SUITE_ADD_TEST(suite, test_buildingowner_goes_to_same_faction_after_leave);
     SUITE_ADD_TEST(suite, test_buildingowner_goes_to_empty_unit_after_leave);
+    SUITE_ADD_TEST(suite, test_building_type);
     SUITE_ADD_TEST(suite, test_active_building);
     SUITE_ADD_TEST(suite, test_buildingtype_exists);
     SUITE_ADD_TEST(suite, test_safe_building);

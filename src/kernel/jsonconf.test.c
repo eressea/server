@@ -22,6 +22,7 @@
 #include <tests.h>
 #include <string.h>
 #include <stdio.h>
+#include <errno.h>
 
 static const struct race * race_with_flag(const char * name) {
     char data[1024];
@@ -140,6 +141,7 @@ static void test_races(CuTest * tc)
         "\"maintenance\" : 2,"
         "\"weight\" : 3,"
         "\"capacity\" : 4,"
+        "\"income\" : 30,"
         "\"hp\" : 5,"
         "\"ac\" : 6,"
         "\"flags\" : [ \"npc\", \"walk\", \"undead\" ]"
@@ -166,6 +168,7 @@ static void test_races(CuTest * tc)
     CuAssertIntEquals(tc, 2, rc->maintenance);
     CuAssertIntEquals(tc, 3, rc->weight);
     CuAssertIntEquals(tc, 4, rc->capacity);
+    CuAssertIntEquals(tc, 30, rc->income);
     CuAssertIntEquals(tc, 5, rc->hitpoints);
     CuAssertIntEquals(tc, 6, rc->armor);
     cJSON_Delete(json);
@@ -318,7 +321,7 @@ static void test_spells(CuTest * tc)
 static const char * building_data = "{\"buildings\": { "
 "\"house\" : { "
 "\"maintenance\" : "
-"{ \"type\" : \"iron\", \"amount\" : 1, \"flags\" : [ \"required\", \"variable\" ] }"
+"{ \"type\" : \"iron\", \"amount\" : 1, \"flags\" : [ \"variable\" ] }"
 ","
 "\"construction\" : {"
 "\"maxsize\" : 20,"
@@ -362,7 +365,7 @@ static void test_buildings(CuTest * tc)
     CuAssertPtrNotNull(tc, bt->maintenance);
     CuAssertIntEquals(tc, 1, bt->maintenance[0].number);
     CuAssertPtrEquals(tc, (void *)get_resourcetype(R_IRON), (void *)bt->maintenance[0].rtype);
-    CuAssertIntEquals(tc, MTF_VARIABLE | MTF_VITAL, bt->maintenance[0].flags);
+    CuAssertIntEquals(tc, MTF_VARIABLE, bt->maintenance[0].flags);
     CuAssertIntEquals(tc, 0, bt->maintenance[1].number);
 
     CuAssertPtrNotNull(tc, bt->construction);
@@ -445,7 +448,9 @@ static void test_configs(CuTest * tc)
     CuAssertPtrEquals(tc, 0, buildingtypes);
     json_config(json);
     CuAssertPtrNotNull(tc, buildingtypes);
-    unlink("test.json");
+    if (unlink("test.json")!=0 && errno==ENOENT) {
+        errno = 0;
+    }
     cJSON_Delete(json);
     test_cleanup();
 }

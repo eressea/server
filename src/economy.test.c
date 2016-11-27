@@ -241,11 +241,15 @@ static void test_tax_cmd(CuTest *tc) {
     test_cleanup();
 }
 
+/** 
+ * see https://bugs.eressea.de/view.php?id=2234
+ */
 static void test_maintain_buildings(CuTest *tc) {
     region *r;
     building *b;
     building_type *btype;
     unit *u;
+    faction *f;
     maintenance *req;
     item_type *itype;
 
@@ -253,7 +257,8 @@ static void test_maintain_buildings(CuTest *tc) {
     btype = test_create_buildingtype("Hort");
     btype->maxsize = 10;
     r = test_create_region(0, 0, 0);
-    u = test_create_unit(test_create_faction(0), r);
+    f = test_create_faction(0);
+    u = test_create_unit(f, r);
     b = test_create_building(r, btype);
     itype = test_create_itemtype("money");
     b->size = btype->maxsize;
@@ -263,6 +268,8 @@ static void test_maintain_buildings(CuTest *tc) {
     b->flags = 0;
     maintain_buildings(r);
     CuAssertIntEquals(tc, BLD_MAINTAINED, fval(b, BLD_MAINTAINED));
+    CuAssertPtrEquals(tc, 0, f->msgs);
+    CuAssertPtrEquals(tc, 0, r->msgs);
 
     req = calloc(2, sizeof(maintenance));
     req[0].number = 100;
@@ -273,20 +280,64 @@ static void test_maintain_buildings(CuTest *tc) {
     b->flags = 0;
     maintain_buildings(r);
     CuAssertIntEquals(tc, 0, fval(b, BLD_MAINTAINED));
-
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "maintenancefail"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(r->msgs, "maintenance_nowork"));
+    test_clear_messagelist(&f->msgs);
+    test_clear_messagelist(&r->msgs);
+    
     // we can afford to pay:
     i_change(&u->items, itype, 100);
     b->flags = 0;
     maintain_buildings(r);
     CuAssertIntEquals(tc, BLD_MAINTAINED, fval(b, BLD_MAINTAINED));
     CuAssertIntEquals(tc, 0, i_get(u->items, itype));
+    CuAssertPtrEquals(tc, 0, r->msgs);
+    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "maintenance_nowork"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "maintenance"));
+    test_clear_messagelist(&f->msgs);
 
     // this building has no owner, it doesn't work:
     u_set_building(u, NULL);
     b->flags = 0;
     maintain_buildings(r);
     CuAssertIntEquals(tc, 0, fval(b, BLD_MAINTAINED));
+    CuAssertPtrEquals(tc, 0, f->msgs);
+    CuAssertPtrNotNull(tc, test_find_messagetype(r->msgs, "maintenance_noowner"));
+    test_clear_messagelist(&r->msgs);
 
+    test_cleanup();
+}
+
+static void test_recruit(CuTest *tc) {
+    unit *u;
+    faction *f;
+
+    test_setup();
+    f = test_create_faction(0);
+    u = test_create_unit(f, test_create_region(0, 0, 0));
+    CuAssertIntEquals(tc, 1, u->number);
+    add_recruits(u, 1, 1);
+    CuAssertIntEquals(tc, 2, u->number);
+    CuAssertPtrEquals(tc, u, f->units);
+    CuAssertPtrEquals(tc, NULL, u->nextF);
+    CuAssertPtrEquals(tc, NULL, u->prevF);
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "recruit"));
+    add_recruits(u, 1, 2);
+    CuAssertIntEquals(tc, 3, u->number);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "recruit"));
+    test_cleanup();
+}
+
+static void test_income(CuTest *tc)
+{
+    race *rc;
+    unit *u;
+    test_setup();
+    rc = test_create_race("nerd");
+    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
+    CuAssertIntEquals(tc, 20, income(u));
+    u->number = 5;
+    CuAssertIntEquals(tc, 100, income(u));
     test_cleanup();
 }
 
@@ -295,6 +346,7 @@ CuSuite *get_economy_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_give_control_building);
     SUITE_ADD_TEST(suite, test_give_control_ship);
+    SUITE_ADD_TEST(suite, test_income);
     SUITE_ADD_TEST(suite, test_steal_okay);
     SUITE_ADD_TEST(suite, test_steal_ocean);
     SUITE_ADD_TEST(suite, test_steal_nosteal);
@@ -302,5 +354,6 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_heroes_dont_recruit);
     SUITE_ADD_TEST(suite, test_tax_cmd);
     SUITE_ADD_TEST(suite, test_maintain_buildings);
+    SUITE_ADD_TEST(suite, test_recruit);
     return suite;
 }

@@ -19,9 +19,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include <kernel/config.h>
 
-/* attributes includes */
-#include <attributes/reduceproduction.h>
-
 /* kernel includes */
 #include "alliance.h"
 #include "ally.h"
@@ -31,6 +28,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "building.h"
 #include "calendar.h"
 #include "direction.h"
+#include "equipment.h"
 #include "faction.h"
 #include "group.h"
 #include "item.h"
@@ -69,7 +67,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/translation.h>
-#include <util/unicode.h>
 #include <util/umlaut.h>
 #include <util/xml.h>
 
@@ -101,69 +98,7 @@ struct settings global = {
 };
 
 bool lomem = false;
-FILE *logfile;
-bool battledebug = false;
 int turn = -1;
-
-int NewbieImmunity(void)
-{
-    return config_get_int("NewbieImmunity", 0);
-}
-
-bool IsImmune(const faction * f)
-{
-    return !fval(f, FFL_NPC) && f->age < NewbieImmunity();
-}
-
-bool ExpensiveMigrants(void)
-{
-    return config_get_int("study.expensivemigrants", 0) != 0;
-}
-
-int LongHunger(const struct unit *u)
-{
-    if (u != NULL) {
-        if (!fval(u, UFL_HUNGER))
-            return false;
-        if (u_race(u) == get_race(RC_DAEMON))
-            return false;
-    }
-    return config_get_int("hunger.long", 0);
-}
-
-int NMRTimeout(void)
-{
-    return config_get_int("nmr.timeout", 0);
-}
-
-race_t old_race(const struct race * rc)
-{
-    race_t i;
-    for (i = 0; i != MAXRACES; ++i) {
-        if (get_race(i) == rc)  return i;
-    }
-    return NORACE;
-}
-
-helpmode helpmodes[] = {
-    { "all", HELP_ALL }
-    ,
-    { "money", HELP_MONEY }
-    ,
-    { "fight", HELP_FIGHT }
-    ,
-    { "observe", HELP_OBSERVE }
-    ,
-    { "give", HELP_GIVE }
-    ,
-    { "guard", HELP_GUARD }
-    ,
-    { "stealth", HELP_FSTEALTH }
-    ,
-    { "travel", HELP_TRAVEL }
-    ,
-    { NULL, 0 }
-};
 
 const char *parameters[MAXPARAMS] = {
     "LOCALE",
@@ -188,7 +123,7 @@ const char *parameters[MAXPARAMS] = {
     "TEMP",
     "FLIEHE",
     "GEBAEUDE",
-    "GIB",                        /* Für HELFE */
+    "GIB",                        /* Fï¿½r HELFE */
     "KAEMPFE",
     "DURCHREISE",
     "BEWACHE",
@@ -210,43 +145,6 @@ const char *parameters[MAXPARAMS] = {
     "PARTEITARNUNG",
     "BAEUME",
     "ALLIANZ"
-};
-
-const char *report_options[MAX_MSG] = {
-    "Kampf",
-    "Ereignisse",
-    "Bewegung",
-    "Einkommen",
-    "Handel",
-    "Produktion",
-    "Orkvermehrung",
-    "Zauber",
-    "",
-    ""
-};
-
-const char *message_levels[ML_MAX] = {
-    "Wichtig",
-    "Debug",
-    "Fehler",
-    "Warnungen",
-    "Infos"
-};
-
-const char *options[MAXOPTIONS] = {
-    "AUSWERTUNG",
-    "COMPUTER",
-    "ZUGVORLAGE",
-    NULL,
-    "STATISTIK",
-    "DEBUG",
-    "ZIPPED",
-    "ZEITUNG",                    /* Option hat Sonderbehandlung! */
-    NULL,
-    "ADRESSEN",
-    "BZIP2",
-    "PUNKTE",
-    "SHOWSKCHANGE"
 };
 
 FILE *debug;
@@ -280,18 +178,6 @@ parse(keyword_t kword, int(*dofun) (unit *, struct order *), bool thisorder)
                 up = &u->next;
         }
     }
-}
-
-const struct race *findrace(const char *s, const struct locale *lang)
-{
-    void **tokens = get_translations(lang, UT_RACES);
-    variant token;
-
-    assert(lang);
-    if (tokens && findtoken(*tokens, s, &token) == E_TOK_SUCCESS) {
-        return (const struct race *)token.v;
-    }
-    return NULL;
 }
 
 int findoption(const char *s, const struct locale *lang)
@@ -364,60 +250,29 @@ unit *getnewunit(const region * r, const faction * f)
     return findnewunit(r, f, n);
 }
 
-/* - Namen der Strukturen -------------------------------------- */
-char *untilde(char *ibuf)
-{
-    char *p = ibuf;
-
-    while (*p) {
-        if (*p == '~') {
-            *p = ' ';
-        }
-        ++p;
-    }
-    return ibuf;
-}
-
-building *largestbuilding(const region * r, cmp_building_cb cmp_gt,
-    bool imaginary)
-{
-    building *b, *best = NULL;
-
-    for (b = rbuildings(r); b; b = b->next) {
-        if (cmp_gt(b, best) <= 0)
-            continue;
-        if (!imaginary) {
-            const attrib *a = a_find(b->attribs, &at_icastle);
-            if (a)
-                continue;
-        }
-        best = b;
-    }
-    return best;
-}
 
 /* -- Erschaffung neuer Einheiten ------------------------------ */
 
 static const char *forbidden[] = { "t", "te", "tem", "temp", NULL };
 // PEASANT: "b", "ba", "bau", "baue", "p", "pe", "pea", "peas"
+static int *forbidden_ids;
 
 int forbiddenid(int id)
 {
-    static int *forbid = NULL;
     static size_t len;
     size_t i;
     if (id <= 0)
         return 1;
-    if (!forbid) {
+    if (!forbidden_ids) {
         while (forbidden[len])
             ++len;
-        forbid = calloc(len, sizeof(int));
+        forbidden_ids = calloc(len, sizeof(int));
         for (i = 0; i != len; ++i) {
-            forbid[i] = atoi36(forbidden[i]);
+            forbidden_ids[i] = atoi36(forbidden[i]);
         }
     }
     for (i = 0; i != len; ++i)
-        if (id == forbid[i])
+        if (id == forbidden_ids[i])
             return 1;
     return 0;
 }
@@ -442,13 +297,6 @@ int newcontainerid(void)
     return random_no;
 }
 
-int maxworkingpeasants(const struct region *r)
-{
-    int size = production(r);
-    int treespace = (rtrees(r, 2) + rtrees(r, 1) / 2) * TREESIZE;
-    return _max(size - treespace, _min(size / 10, 200));
-}
-
 static const char * parameter_key(int i)
 {
     assert(i < MAXPARAMS && i >= 0);
@@ -471,7 +319,7 @@ void init_terrains_translation(const struct locale *lang) {
         var.v = (void *)terrain;
         name = locale_string(lang, terrain->_name, false);
         if (name) {
-            addtoken(tokens, name, var);
+            addtoken((struct tnode **)tokens, name, var);
         }
         else {
             log_debug("no translation for terrain %s in locale %s", terrain->_name, locale_name(lang));
@@ -490,7 +338,7 @@ void init_options_translation(const struct locale * lang) {
         if (options[i]) {
             const char *name = locale_string(lang, options[i], false);
             if (name) {
-                addtoken(tokens, name, var);
+                addtoken((struct tnode **)tokens, name, var);
             }
             else {
                 log_debug("no translation for OPTION %s in locale %s", options[i], locale_name(lang));
@@ -525,7 +373,7 @@ void init_locale(struct locale *lang)
             var.i = i;
             name = LOC(lang, mkname("school", tok));
             if (name) {
-                addtoken(tokens, name, var);
+                addtoken((struct tnode **)tokens, name, var);
             }
             else {
                 log_warning("no translation for magic school %s in locale %s", tok, locale_name(lang));
@@ -544,9 +392,9 @@ void init_locale(struct locale *lang)
         const char *name;
         var.v = (void *)rc;
         name = locale_string(lang, rc_name_s(rc, NAME_PLURAL), false);
-        if (name) addtoken(tokens, name, var);
+        if (name) addtoken((struct tnode **)tokens, name, var);
         name = locale_string(lang, rc_name_s(rc, NAME_SINGULAR), false);
-        if (name) addtoken(tokens, name, var);
+        if (name) addtoken((struct tnode **)tokens, name, var);
     }
 
     init_parameters(lang);
@@ -688,7 +536,7 @@ static const char * relpath(char *buf, size_t sz, const char *path) {
 static const char *g_datadir;
 const char *datapath(void)
 {
-    static char zText[MAX_PATH]; // FIXME: static return value
+    static char zText[MAX_PATH];
     if (g_datadir)
         return g_datadir;
     return relpath(zText, sizeof(zText), "data");
@@ -702,7 +550,7 @@ void set_datapath(const char *path)
 static const char *g_reportdir;
 const char *reportpath(void)
 {
-    static char zText[MAX_PATH]; // FIXME: static return value
+    static char zText[MAX_PATH];
     if (g_reportdir)
         return g_reportdir;
     return relpath(zText, sizeof(zText), "reports");
@@ -729,7 +577,7 @@ int create_directories(void) {
 
 double get_param_flt(const struct param *p, const char *key, double def)
 {
-    const char *str = get_param(p, key);
+    const char *str = p ? get_param(p, key) : NULL;
     return str ? atof(str) : def;
 }
 
@@ -738,260 +586,77 @@ void kernel_done(void)
     /* calling this function releases memory assigned to static variables, etc.
      * calling it is optional, e.g. a release server will most likely not do it.
      */
-    translation_done();
-    free_attribs();
-}
-
-#ifndef HAVE_STRDUP
-char *_strdup(const char *s)
-{
-    return strcpy((char *)malloc(sizeof(char) * (strlen(s) + 1)), s);
-}
+#ifdef USE_LIBXML2
+    xml_done();
 #endif
-
-/* Lohn bei den einzelnen Burgstufen für Normale Typen, Orks, Bauern,
- * Modifikation für Städter. */
-
-static const int wagetable[7][4] = {
-    { 10, 10, 11, -7 },             /* Baustelle */
-    { 10, 10, 11, -5 },             /* Handelsposten */
-    { 11, 11, 12, -3 },             /* Befestigung */
-    { 12, 11, 13, -1 },             /* Turm */
-    { 13, 12, 14, 0 },              /* Burg */
-    { 14, 12, 15, 1 },              /* Festung */
-    { 15, 13, 16, 2 }               /* Zitadelle */
-};
-
-int cmp_wage(const struct building *b, const building * a)
-{
-    const struct building_type *bt_castle = bt_find("castle");
-    if (b->type == bt_castle) {
-        if (!a)
-            return 1;
-        if (b->size > a->size)
-            return 1;
-        if (b->size == a->size)
-            return 0;
-    }
-    return -1;
-}
-
-bool is_owner_building(const struct building * b)
-{
-    region *r = b->region;
-    if (b->type->taxes && r->land && r->land->ownership) {
-        unit *u = building_owner(b);
-        return u && u->faction == r->land->ownership->owner;
-    }
-    return false;
-}
-
-int cmp_taxes(const building * b, const building * a)
-{
-    faction *f = region_get_owner(b->region);
-    if (b->type->taxes) {
-        unit *u = building_owner(b);
-        if (!u) {
-            return -1;
-        }
-        else if (a) {
-            int newsize = buildingeffsize(b, false);
-            double newtaxes = b->type->taxes(b, newsize);
-            int oldsize = buildingeffsize(a, false);
-            double oldtaxes = a->type->taxes(a, oldsize);
-
-            if (newtaxes < oldtaxes)
-                return -1;
-            else if (newtaxes > oldtaxes)
-                return 1;
-            else if (b->size < a->size)
-                return -1;
-            else if (b->size > a->size)
-                return 1;
-            else {
-                if (u && u->faction == f) {
-                    u = building_owner(a);
-                    if (u && u->faction == f)
-                        return -1;
-                    return 1;
-                }
-            }
-        }
-        else {
-            return 1;
-        }
-    }
-    return -1;
-}
-
-int cmp_current_owner(const building * b, const building * a)
-{
-    faction *f = region_get_owner(b->region);
-
-    assert(rule_region_owners());
-    if (f && b->type->taxes) {
-        unit *u = building_owner(b);
-        if (!u || u->faction != f)
-            return -1;
-        if (a) {
-            int newsize = buildingeffsize(b, false);
-            double newtaxes = b->type->taxes(b, newsize);
-            int oldsize = buildingeffsize(a, false);
-            double oldtaxes = a->type->taxes(a, oldsize);
-
-            if (newtaxes != oldtaxes)
-                return (newtaxes > oldtaxes) ? 1 : -1;
-            if (newsize != oldsize)
-                return newsize - oldsize;
-            return (b->size - a->size);
-        }
-        else {
-            return 1;
-        }
-    }
-    return -1;
+    attrib_done();
+    item_done();
+    message_done();
+    equipment_done();
+    reports_done();
+    curses_done();
+    crmessage_done();
+    translation_done();
 }
 
 bool rule_stealth_other(void)
 {
-    int rule = config_get_int("stealth.faction.other", 1);
+    static int rule, config;
+    if (config_changed(&config)) {
+        rule = config_get_int("stealth.faction.other", 1);
+    }
     return rule != 0;
 }
 
 bool rule_stealth_anon(void)
 {
-    int rule = config_get_int("stealth.faction.anon", 1);
+    static int rule, config;
+    if (config_changed(&config)) {
+        rule = config_get_int("stealth.faction.anon", 1);
+    }
     return rule != 0;
 }
 
 bool rule_region_owners(void)
 {
-    int rule = config_get_int("rules.region_owners", 0);
+    static int rule, config;
+    if (config_changed(&config)) {
+        rule = config_get_int("rules.region_owners", 0);
+    }
     return rule != 0;
 }
 
 int rule_blessed_harvest(void)
 {
-    int rule = config_get_int("rules.blessed_harvest.flags",
-        HARVEST_WORK);
-    assert(rule >= 0);
+    static int rule, config;
+    if (config_changed(&config)) {
+        rule = config_get_int("rules.blessed_harvest.flags", HARVEST_WORK);
+        assert(rule >= 0);
+    }
     return rule;
 }
 
 int rule_alliance_limit(void)
 {
-    int rule = config_get_int("rules.limit.alliance", 0);
+    static int cache_token;
+    static int rule = 0;
+
+    if (config_changed(&cache_token)) {
+        rule = config_get_int("rules.limit.alliance", 0);
+    }
     assert(rule >= 0);
     return rule;
 }
 
 int rule_faction_limit(void)
 {
-    int rule = config_get_int("rules.limit.faction", 0);
+    static int cache_token;
+    static int rule = 0;
+    if (config_changed(&cache_token)) {
+        rule = config_get_int("rules.limit.faction", 0);
+    }
     assert(rule >= 0);
     return rule;
-}
-
-static int
-default_wage(const region * r, const faction * f, const race * rc, int in_turn)
-{
-    building *b = largestbuilding(r, &cmp_wage, false);
-    int esize = 0;
-    curse *c;
-    double wage;
-    attrib *a;
-    const building_type *artsculpture_type = bt_find("artsculpture");
-    static const curse_type *drought_ct, *blessedharvest_ct;
-    static bool init;
-
-    if (!init) {
-        init = true;
-        drought_ct = ct_find("drought");
-        blessedharvest_ct = ct_find("blessedharvest");
-    }
-
-    if (b != NULL) {
-        /* TODO: this reveals imaginary castles */
-        esize = buildingeffsize(b, false);
-    }
-
-    if (f != NULL) {
-        int index = 0;
-        if (rc == get_race(RC_ORC) || rc == get_race(RC_SNOTLING)) {
-            index = 1;
-        }
-        wage = wagetable[esize][index];
-    }
-    else {
-        if (is_mourning(r, in_turn)) {
-            wage = 10;
-        }
-        else if (fval(r->terrain, SEA_REGION)) {
-            wage = 11;
-        }
-        else if (fval(r, RF_ORCIFIED)) {
-            wage = wagetable[esize][1];
-        }
-        else {
-            wage = wagetable[esize][2];
-        }
-        if (rule_blessed_harvest() == HARVEST_WORK) {
-            /* E1 rules */
-            wage += curse_geteffect(get_curse(r->attribs, blessedharvest_ct));
-        }
-    }
-
-    /* Artsculpture: Income +5 */
-    for (b = r->buildings; b; b = b->next) {
-        if (b->type == artsculpture_type) {
-            wage += 5;
-        }
-    }
-
-    /* Godcurse: Income -10 */
-    if (curse_active(get_curse(r->attribs, ct_find("godcursezone")))) {
-        wage = _max(0, wage - 10);
-    }
-
-    /* Bei einer Dürre verdient man nur noch ein Viertel  */
-    if (drought_ct) {
-        c = get_curse(r->attribs, drought_ct);
-        if (curse_active(c))
-            wage /= curse_geteffect(c);
-    }
-
-    a = a_find(r->attribs, &at_reduceproduction);
-    if (a)
-        wage = (wage * a->data.sa[0]) / 100;
-
-    return (int)wage;
-}
-
-static int
-minimum_wage(const region * r, const faction * f, const race * rc, int in_turn)
-{
-    if (f && rc) {
-        return rc->maintenance;
-    }
-    return default_wage(r, f, rc, in_turn);
-}
-
-/* Gibt Arbeitslohn für entsprechende Rasse zurück, oder für
-* die Bauern wenn f == NULL. */
-int wage(const region * r, const faction * f, const race * rc, int in_turn)
-{
-    if (global.functions.wage) {
-        return global.functions.wage(r, f, rc, in_turn);
-    }
-    return default_wage(r, f, rc, in_turn);
-}
-
-int lovar(double xpct_x2)
-{
-    int n = (int)(xpct_x2 * 500) + 1;
-    if (n == 0)
-        return 0;
-    return (rng_int() % n + rng_int() % n) / 1000;
 }
 
 void kernel_init(void)
@@ -999,7 +664,6 @@ void kernel_init(void)
     register_reports();
     mt_clear();
     translation_init();
-    register_function((pf_generic)minimum_wage, "minimum_wage");
 }
 
 static order * defaults[MAXLOCALES];
@@ -1026,36 +690,30 @@ order *default_order(const struct locale *lang)
     return result ? copy_order(result) : 0;
 }
 
-int entertainmoney(const region * r)
-{
-    double n;
-
-    if (is_cursed(r->attribs, C_DEPRESSION, 0)) {
-        return 0;
-    }
-
-    n = rmoney(r) / ENTERTAINFRACTION;
-
-    if (is_cursed(r->attribs, C_GENEROUS, 0)) {
-        n *= get_curseeffect(r->attribs, C_GENEROUS, 0);
-    }
-
-    return (int)n;
-}
-
 int rule_give(void)
 {
-    return config_get_int("rules.give.flags", GIVE_DEFAULT);
-}
-
-bool markets_module(void)
-{
-    return (bool)config_get_int("modules.markets", 0);
+    static int config;
+    static int rule;
+    if (config_changed(&config)) {
+        rule = config_get_int("rules.give.flags", GIVE_DEFAULT);
+    }
+    return rule;
 }
 
 static struct param *configuration;
+static int config_cache_key = 1;
+
+bool config_changed(int *cache_key) {
+    assert(cache_key);
+    if (config_cache_key != *cache_key) {
+        *cache_key = config_cache_key;
+        return true;
+    }
+    return false;
+}
 
 void config_set(const char *key, const char *value) {
+    ++config_cache_key;
     set_param(&configuration, key, value);
 }
 
@@ -1078,6 +736,7 @@ bool config_token(const char *key, const char *tok) {
 void free_config(void) {
     global.functions.wage = NULL;
     free_params(&configuration);
+    ++config_cache_key;
 }
 
 /** releases all memory associated with the game state.
@@ -1087,7 +746,6 @@ void free_config(void) {
 void free_gamedata(void)
 {
     int i;
-    free_donations();
 
     for (i = 0; i != MAXLOCALES; ++i) {
         if (defaults[i]) {
@@ -1095,20 +753,24 @@ void free_gamedata(void)
             defaults[i] = 0;
         }
     }
+    free(forbidden_ids);
+    forbidden_ids = NULL;
+
+    free_donations();
     free_factions();
     free_units();
     free_regions();
     free_borders();
     free_alliances();
 
+    while (global.attribs) {
+        a_remove(&global.attribs, global.attribs);
+    }
+
     while (planes) {
         plane *pl = planes;
         planes = planes->next;
         free_plane(pl);
-    }
-
-    while (global.attribs) {
-        a_remove(&global.attribs, global.attribs);
     }
 }
 

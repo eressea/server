@@ -30,7 +30,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "pool.h"
 #include "race.h"
 #include "region.h"
-#include "save.h"
 #include "skill.h"
 #include "terrain.h"
 #include "unit.h"
@@ -51,6 +50,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/message.h>
 #include <util/umlaut.h>
 #include <util/rng.h>
+
+#include <storage.h>
 
 /* libc includes */
 #include <assert.h>
@@ -238,7 +239,6 @@ item_type *it_get_or_create(resource_type *rtype) {
     item_type * itype;
     assert(rtype);
     itype = it_find(rtype->_name);
-    assert(!itype || !itype->rtype || itype->rtype == rtype);
     if (!itype) {
         itype = (item_type *)calloc(sizeof(item_type), 1);
     }
@@ -491,7 +491,7 @@ item *i_change(item ** pi, const item_type * itype, int delta)
         item *i = *pi;
         i->number += delta;
         if (i->number < 0) {
-            log_error("serious accounting error. number of items is %d.\n", i->number);
+            log_error("serious accounting error. number of items is %d.", i->number);
             i->number = 0;
         }
         if (i->number == 0) {
@@ -517,6 +517,11 @@ item *i_remove(item ** pi, item * i)
 static item *icache;
 static int icache_size;
 #define ICACHE_MAX 100
+
+void item_done(void) {
+    i_freeall(&icache);
+    icache_size = 0;
+}
 
 void i_free(item * i)
 {
@@ -862,11 +867,9 @@ struct order *ord)
     else {
         const race *irace = u_irace(u);
         if (irace == u_race(u)) {
-            static const race *rcfailure;
+            const race *rcfailure = rc_find("smurf");
             if (!rcfailure) {
-                rcfailure = rc_find("smurf");
-                if (!rcfailure)
-                    rcfailure = rc_find("toad");
+                rcfailure = rc_find("toad");
             }
             if (rcfailure) {
                 trigger *trestore = trigger_changerace(u, u_race(u), irace);
@@ -969,7 +972,7 @@ void init_resources(void)
 {
     resource_type *rtype;
 
-    rtype = rt_get_or_create(resourcenames[R_PERSON]); // lousy hack
+    rt_get_or_create(resourcenames[R_PERSON]); // lousy hack
 
     rtype = rt_get_or_create(resourcenames[R_PEASANT]);
     rtype->uchange = res_changepeasants;
@@ -1185,6 +1188,46 @@ static item *default_spoil(const struct race *rc, int size)
         }
     }
     return itm;
+}
+
+void read_items(struct storage *store, item ** ilist)
+{
+    for (;;) {
+        char ibuf[32];
+        const item_type *itype;
+        int i;
+        READ_STR(store, ibuf, sizeof(ibuf));
+        if (!strcmp("end", ibuf)) {
+            break;
+        }
+        itype = it_find(ibuf);
+        READ_INT(store, &i);
+        if (i <= 0) {
+            log_error("data contains an entry with %d %s", i, ibuf);
+        }
+        else {
+            if (itype && itype->rtype) {
+                i_change(ilist, itype, i);
+            }
+            else {
+                log_error("data contains unknown item type %s.", ibuf);
+            }
+            assert(itype && itype->rtype);
+        }
+    }
+}
+
+void write_items(struct storage *store, item * ilist)
+{
+    item *itm;
+    for (itm = ilist; itm; itm = itm->next) {
+        assert(itm->number >= 0);
+        if (itm->number) {
+            WRITE_TOK(store, resourcename(itm->type->rtype, 0));
+            WRITE_INT(store, itm->number);
+        }
+    }
+    WRITE_TOK(store, "end");
 }
 
 static void free_itype(item_type *itype) {

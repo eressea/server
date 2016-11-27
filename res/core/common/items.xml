@@ -100,14 +100,14 @@
   </resource>
 
 <!-- XE items -->
-  <resource name="skillpotion">
+  <resource name="skillpotion" appearance="vial">
     <!-- gives user one free learning attempt -->
     <item weight="0">
       <function name="use" value="use_skillpotion"/>
     </item>
   </resource>
 
-  <resource name="manacrystal">
+  <resource name="manacrystal" appearance="amulet">
     <!-- gives user free aura -->
     <item weight="0">
       <function name="use" value="use_manacrystal"/>
@@ -132,12 +132,6 @@
   <resource name="antimagic" appearance="amulet">
     <item weight="0" score="2000">
       <function name="use" value="use_antimagiccrystal"/>
-    </item>
-  </resource>
-
-  <resource name="wand_of_tears">
-    <item notlost="yes" weight="0">
-      <function name="use" value="use_wand_of_tears"/>
     </item>
   </resource>
 

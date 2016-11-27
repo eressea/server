@@ -4,6 +4,7 @@ module("tests.e2.movement", package.seeall, lunit.testcase)
 
 function setup()
     eressea.free_game()
+    eressea.settings.set("rules.food.flags", "4")
     eressea.settings.set("nmr.timeout", "0")
     eressea.settings.set("NewbieImmunity", "0")
 end
@@ -29,7 +30,9 @@ end
 
     process_orders()
 
--- write_reports()
+    if r2~=u1.region then
+        write_reports()
+    end
     assert_equal(r2, u1.region) -- should pass, but fails!!!
 end 
 

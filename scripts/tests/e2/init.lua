@@ -1,3 +1,5 @@
+require 'tests.economy'
+
 require 'tests.e2.undead'
 require 'tests.e2.shiplanding'
 require 'tests.e2.e2features'
@@ -8,6 +10,7 @@ require 'tests.e2.spells'
 require 'tests.e2.stealth'
 require 'tests.orders'
 require 'tests.common'
+require 'tests.report'
 require 'tests.storage'
 require 'tests.magicbag'
 require 'tests.process'

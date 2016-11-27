@@ -24,6 +24,13 @@ extern "C" {
 
 #include <stddef.h>
 
+    typedef struct strlist {
+        struct strlist *next;
+        char *s;
+    } strlist;
+
+    void addstrlist(strlist ** SP, const char *s);
+    void freestrlist(strlist * s);
     void addlist(void *l1, void *p1);
     void translist(void *l1, void *l2, void *p);
 #ifndef MALLOCDBG

@@ -14,6 +14,7 @@
 #include <errno.h>
 #include <string.h>
 #include <wctype.h>
+#include <ctype.h>
 
 #define B00000000 0x00
 #define B10000000 0x80
@@ -30,6 +31,50 @@
 #define B00000111 0x07
 #define B00000011 0x03
 #define B00000001 0x01
+
+int unicode_utf8_trim(utf8_t *buf)
+{
+    int result = 0, ts = 0;
+    utf8_t *op = buf, *ip = buf, *lc = buf;
+    while (*ip) {
+        size_t size = 1;
+        wint_t wc = *ip;
+        if (wc & 0x80) {
+            ucs4_t ucs = 0;
+            if (ip[1]) {
+                int ret = unicode_utf8_to_ucs4(&ucs, ip, &size);
+                if (ret != 0) {
+                    return ret;
+                }
+                wc = (wint_t)ucs;
+            }
+            else {
+                wc = *op = '?';
+                size = 1;
+                ++result;
+            }
+        }
+        if (op == buf && iswspace(wc)) {
+            ++result;
+        }
+        else if (iswprint(wc)) {
+            if (op != ip) {
+                memmove(op, ip, size);
+            }
+            op += size;
+            if (iswspace(wc)) ++ts;
+            else {
+                lc = op;
+                ts = 0;
+            }
+        } else {
+            ++result;
+        }
+        ip += size;
+    }
+    *lc = '\0';
+    return result + ts;
+}
 
 int unicode_utf8_tolower(utf8_t * op, size_t outlen, const utf8_t * ip)
 {
@@ -49,7 +94,7 @@ int unicode_utf8_tolower(utf8_t * op, size_t outlen, const utf8_t * ip)
         }
         low = towlower((wint_t)ucs);
         if (low == ucs) {
-            memcpy(op, ip, size);
+            memmove(op, ip, size);
             ip += size;
             op += size;
             outlen -= size;

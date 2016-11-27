@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 2.6)
 project(kernel C)
 
 SET(_TEST_FILES
@@ -19,7 +20,7 @@ order.test.c
 plane.test.c
 pool.test.c
 race.test.c
-# region.test.c
+region.test.c
 # resources.test.c
 save.test.c
 ship.test.c
@@ -63,6 +64,8 @@ unit.c
 xmlreader.c
 jsonconf.c
 )
+
+SET(VERSION_SRC ${PROJECT_NAME}/version.c PARENT_SCOPE)
 
 FOREACH(_FILE ${_FILES})
     LIST(APPEND _SOURCES ${PROJECT_NAME}/${_FILE})

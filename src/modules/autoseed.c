@@ -14,6 +14,8 @@
 #include <kernel/config.h>
 #include "autoseed.h"
 
+#include "market.h"
+
 /* kernel includes */
 #include <kernel/alliance.h>
 #include <kernel/item.h>
@@ -130,20 +132,6 @@ bool(*fun) (const region * r))
 static bool f_nolux(const region * r)
 {
     return (r->land && count_demand(r) != get_maxluxuries());
-}
-
-int fix_demand(region * rd) {
-    luxury_type * ltype;
-    int maxluxuries = get_maxluxuries();
-    if (maxluxuries > 0) {
-        int sale = rng_int() % maxluxuries;
-        for (ltype = luxurytypes; sale != 0 && ltype; ltype = ltype->next) {
-            --sale;
-        }
-        setluxuries(rd, ltype);
-        return 0;
-    }
-    return -1;
 }
 
 int fix_all_demand(region *rd) {

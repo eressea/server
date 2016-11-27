@@ -19,7 +19,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include <kernel/config.h>
 #include "alchemy.h"
-#include "move.h"
+#include "guard.h"
 #include "skill.h"
 #include "study.h"
 
@@ -61,7 +61,7 @@ void herbsearch(unit * u, int max)
         return;
     }
 
-    if (is_guarded(r, u, GUARD_PRODUCE)) {
+    if (is_guarded(r, u)) {
         cmistake(u, u->thisorder, 70, MSG_EVENT);
         return;
     }
@@ -123,9 +123,14 @@ static void end_potion(unit * u, const potion_type * ptype, int amount)
 }
 
 static int potion_water_of_life(unit * u, region *r, int amount) {
+    static int config;
+    static int tree_type, tree_count;
     int wood = 0;
-    int tree_type = config_get_int("rules.magic.wol_type", 1);
-    int tree_count = config_get_int("rules.magic.wol_effect", 10);
+
+    if (config_changed(&config)) {
+        tree_type = config_get_int("rules.magic.wol_type", 1);
+        tree_count = config_get_int("rules.magic.wol_effect", 10);
+    }
     /* mallorn is required to make mallorn forests, wood for regular ones */
     if (fval(r, RF_MALLORN)) {
         wood = use_pooled(u, rt_find("mallorn"),
@@ -165,7 +170,8 @@ static int potion_luck(unit *u, region *r, attrib_type *atype, int amount) {
 }
 
 static int potion_truth(unit *u) {
-    fset(u, UFL_DISBELIEVES);
+    // TODO: this potion does nothing!
+    // fset(u, UFL_DISBELIEVES);
     return 1;
 }
 
@@ -175,7 +181,7 @@ static int potion_power(unit *u, int amount) {
         if (u->number % 10 > 0) ++use;
         amount = use;
     }
-    /* Verfünffacht die HP von max. 10 Personen in der Einheit */
+    /* Verfï¿½nffacht die HP von max. 10 Personen in der Einheit */
     u->hp += _min(u->number, 10 * amount) * unit_max_hp(u) * 4;
     return amount;
 }
@@ -235,8 +241,7 @@ static void init_potiondelay(attrib * a)
     a->data.v = malloc(sizeof(potiondelay));
 }
 
-static void free_potiondelay(attrib * a)
-{
+static void free_potiondelay(attrib * a) {
     free(a->data.v);
 }
 
@@ -290,7 +295,7 @@ static void a_initeffect(attrib * a)
     a->data.v = calloc(sizeof(effect_data), 1);
 }
 
-static void a_finalizeeffect(attrib * a)
+static void a_finalizeeffect(attrib * a) //-V524
 {
     free(a->data.v);
 }

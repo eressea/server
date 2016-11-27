@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 1998-2014,
 Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
@@ -32,10 +32,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "monster.h"
 #include "move.h"
 #include "randenc.h"
+#include "renumber.h"
 #include "spy.h"
 #include "study.h"
 #include "wormhole.h"
 #include "prefix.h"
+#include "reports.h"
 #include "teleport.h"
 #include "calendar.h"
 #include "guard.h"
@@ -56,7 +58,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/resources.h>
-#include <kernel/save.h>
 #include <kernel/ship.h>
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
@@ -78,17 +79,17 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <util/message.h>
 #include <util/parser.h>
 #include <util/password.h>
-#include <quicklist.h>
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/umlaut.h>
-#include <util/message.h>
-#include <util/rng.h>
+#include <util/unicode.h>
 
 #include <attributes/otherfaction.h>
 
+#include <quicklist.h>
 #include <iniparser.h>
 /* libc includes */
 #include <assert.h>
@@ -116,6 +117,32 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* - exported global symbols ----------------------------------- */
 
+int NewbieImmunity(void)
+{
+    return config_get_int("NewbieImmunity", 0);
+}
+
+bool IsImmune(const faction * f)
+{
+    return !fval(f, FFL_NPC) && f->age < NewbieImmunity();
+}
+
+int NMRTimeout(void)
+{
+    return config_get_int("nmr.timeout", 0);
+}
+
+bool LongHunger(const struct unit *u)
+{
+    if (u != NULL) {
+        if (!fval(u, UFL_HUNGER))
+            return false;
+        if (u_race(u) == get_race(RC_DAEMON))
+            return false;
+    }
+    return config_get_int("hunger.long", 0) != 0;
+}
+
 static bool RemoveNMRNewbie(void)
 {
     int value = config_get_int("nmr.removenewbie", 0);
@@ -124,7 +151,13 @@ static bool RemoveNMRNewbie(void)
 
 static void age_unit(region * r, unit * u)
 {
-    if (u_race(u) == get_race(RC_SPELL)) {
+    static int rc_cache;
+    static const race *rc_spell;
+
+    if (rc_changed(&rc_cache)) {
+        rc_spell = get_race(RC_SPELL);
+    }
+    if (u_race(u) == rc_spell) {
         if (--u->age <= 0) {
             remove_unit(&r->units, u);
         }
@@ -215,7 +248,7 @@ static void live(region * r)
 static void calculate_emigration(region * r)
 {
     int i;
-    int maxp = maxworkingpeasants(r);
+    int maxp = region_maxworkers(r);
     int rp = rpeasants(r);
     int max_immigrants = MAX_IMMIGRATION(maxp - rp);
 
@@ -230,7 +263,7 @@ static void calculate_emigration(region * r)
 
         if (rc != NULL && fval(rc->terrain, LAND_REGION)) {
             int rp2 = rpeasants(rc);
-            int maxp2 = maxworkingpeasants(rc);
+            int maxp2 = region_maxworkers(rc);
             int max_emigration = MAX_EMIGRATION(rp2 - maxp2);
 
             if (max_emigration > 0) {
@@ -413,7 +446,7 @@ static void horses(region * r)
     direction_t n;
 
     /* Logistisches Wachstum, Optimum bei halbem Maximalbesatz. */
-    maxhorses = maxworkingpeasants(r) / 10;
+    maxhorses = region_maxworkers(r) / 10;
     maxhorses = _max(0, maxhorses);
     horses = rhorses(r);
     if (horses > 0) {
@@ -615,7 +648,7 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
                  * verfügbaren Fläche ab. In Gletschern gibt es weniger
                  * Möglichkeiten als in Ebenen. */
                 sprout = 0;
-                seedchance = (1000 * maxworkingpeasants(r2)) / r2->terrain->size;
+                seedchance = (1000.0 * region_maxworkers(r2)) / r2->terrain->size;
                 for (i = 0; i < seeds / MAXDIRECTIONS; i++) {
                     if (rng_int() % 10000 < seedchance)
                         sprout++;
@@ -714,7 +747,7 @@ void immigration(void)
         if (repopulate) {
             int peasants = rpeasants(r);
             int income = wage(r, NULL, NULL, turn) - maintenance_cost(NULL) + 1;
-            if (income >= 0 && r->land && (peasants < repopulate) && maxworkingpeasants(r) >(peasants + 30) * 2) {
+            if (income >= 0 && r->land && (peasants < repopulate) && region_maxworkers(r) >(peasants + 30) * 2) {
                 int badunit = 0;
                 unit *u;
                 for (u = r->units; u; u = u->next) {
@@ -776,6 +809,8 @@ void demographics(void)
     region *r;
     static int last_weeks_season = -1;
     static int current_season = -1;
+    int plant_rules = config_get_int("rules.grow.formula", 2);
+    const struct building_type *bt_harbour = bt_find("harbour");
 
     if (current_season < 0) {
         gamedate date;
@@ -793,11 +828,10 @@ void demographics(void)
             /* die Nachfrage nach Produkten steigt. */
             struct demand *dmd;
             if (r->land) {
-                int plant_rules = config_get_int("rules.grow.formula", 2);
                 for (dmd = r->land->demands; dmd; dmd = dmd->next) {
                     if (dmd->value > 0 && dmd->value < MAXDEMAND) {
                         float rise = DMRISE;
-                        if (buildingtype_exists(r, bt_find("harbour"), true))
+                        if (buildingtype_exists(r, bt_harbour, true))
                             rise = DMRISEHAFEN;
                         if (rng_double() < rise)
                             ++dmd->value;
@@ -809,7 +843,7 @@ void demographics(void)
                 calculate_emigration(r);
                 peasants(r);
                 if (r->age > 20) {
-                    double mwp = _max(maxworkingpeasants(r), 1);
+                    double mwp = _max(region_maxworkers(r), 1);
                     double prob =
                         pow(rpeasants(r) / (mwp * wage(r, NULL, NULL, turn) * 0.13), 4.0)
                         * PLAGUE_CHANCE;
@@ -963,7 +997,7 @@ int quit_cmd(unit * u, struct order *ord)
         char buffer[64];
         write_order(ord, buffer, sizeof(buffer));
         cmistake(u, ord, 86, MSG_EVENT);
-        log_warning("QUIT with illegal password for faction %s: %s\n", factionid(f), buffer);
+        log_warning("QUIT with illegal password for faction %s: %s\n", itoa36(f->no), buffer);
     }
     return 0;
 }
@@ -1235,7 +1269,6 @@ static void remove_idle_players(void)
         } else {
             if (fval(f, FFL_NOIDLEOUT)) {
                 f->lastorders = turn;
-                fp = &f->next;
             }
             else if (turn != f->lastorders) {
                 char info[256];
@@ -1438,8 +1471,8 @@ static void init_prefixnames(void)
                     LOC(lang, mkname("prefix", race_prefixes[key]));
                 if (findtoken(in->names, pname, &var) == E_TOK_NOMATCH || var.i != key) {
                     var.i = key;
-                    addtoken(&in->names, pname, var);
-                    addtoken(&in->names, LOC(lang, mkname("prefix",
+                    addtoken((struct tnode **)&in->names, pname, var);
+                    addtoken((struct tnode **)&in->names, LOC(lang, mkname("prefix",
                         race_prefixes[key])), var);
                 }
             }
@@ -1619,6 +1652,7 @@ bool renamed_building(const building * b)
 
 static int rename_cmd(unit * u, order * ord, char **s, const char *s2)
 {
+	char name[NAMESIZE];
     assert(s2);
     if (!s2[0]) {
         cmistake(u, ord, 84, MSG_EVENT);
@@ -1627,12 +1661,11 @@ static int rename_cmd(unit * u, order * ord, char **s, const char *s2)
 
     /* TODO: Validate to make sure people don't have illegal characters in
      * names, phishing-style? () come to mind. */
+    strlcpy(name, s2, sizeof(name));
+    unicode_utf8_trim(name);
 
     free(*s);
-    *s = _strdup(s2);
-    if (strlen(s2) >= NAMESIZE) {
-        (*s)[NAMESIZE] = 0;
-    }
+    *s = _strdup(name);
     return 0;
 }
 
@@ -2548,7 +2581,7 @@ int guard_off_cmd(unit * u, struct order *ord)
     init_order(ord);
 
     if (getparam(u->faction->locale) == P_NOT) {
-        setguard(u, GUARD_NONE);
+        setguard(u, false);
     }
     return 0;
 }
@@ -2663,20 +2696,6 @@ int combatspell_cmd(unit * u, struct order *ord)
     return 0;
 }
 
-guard_t can_start_guarding(const unit * u)
-{
-    if (u->status >= ST_FLEE || fval(u, UFL_FLEEING))
-        return E_GUARD_FLEEING;
-    /* Monster der Monsterpartei dürfen immer bewachen */
-    if (is_monsters(u->faction) || fval(u_race(u), RCF_UNARMEDGUARD))
-        return E_GUARD_OK;
-    if (!armedmen(u, true))
-        return E_GUARD_UNARMED;
-    if (IsImmune(u->faction))
-        return E_GUARD_NEWBIE;
-    return E_GUARD_OK;
-}
-
 int guard_on_cmd(unit * u, struct order *ord)
 {
     assert(getkeyword(ord) == K_GUARD);
@@ -2704,7 +2723,7 @@ int guard_on_cmd(unit * u, struct order *ord)
         else {
             int err = can_start_guarding(u);
             if (err == E_GUARD_OK) {
-                guard(u, GUARD_ALL);
+                setguard(u, true);
             }
             else if (err == E_GUARD_UNARMED) {
                 ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "unit_unarmed", ""));
@@ -2746,74 +2765,6 @@ void sinkships(struct region * r)
         }
         if (*shp == sh)
             shp = &sh->next;
-    }
-}
-
-static attrib_type at_number = {
-    "faction_renum",
-    NULL, NULL, NULL, NULL, NULL, NULL,
-    ATF_UNIQUE
-};
-
-void renumber_factions(void)
-/* gibt parteien neue nummern */
-{
-    struct renum {
-        struct renum *next;
-        int want;
-        faction *faction;
-        attrib *attrib;
-    } *renum = NULL, *rp;
-    faction *f;
-    for (f = factions; f; f = f->next) {
-        attrib *a = a_find(f->attribs, &at_number);
-        int want;
-        struct renum **rn;
-        faction *old;
-
-        if (!a)
-            continue;
-        want = a->data.i;
-        if (fval(f, FFL_NEWID)) {
-            ADDMSG(&f->msgs, msg_message("renumber_twice", "id", want));
-            continue;
-        }
-        old = findfaction(want);
-        if (old) {
-            a_remove(&f->attribs, a);
-            ADDMSG(&f->msgs, msg_message("renumber_inuse", "id", want));
-            continue;
-        }
-        if (!faction_id_is_unused(want)) {
-            a_remove(&f->attribs, a);
-            ADDMSG(&f->msgs, msg_message("renumber_inuse", "id", want));
-            continue;
-        }
-        for (rn = &renum; *rn; rn = &(*rn)->next) {
-            if ((*rn)->want >= want)
-                break;
-        }
-        if (*rn && (*rn)->want == want) {
-            ADDMSG(&f->msgs, msg_message("renumber_inuse", "id", want));
-        }
-        else {
-            struct renum *r = calloc(sizeof(struct renum), 1);
-            r->next = *rn;
-            r->attrib = a;
-            r->faction = f;
-            r->want = want;
-            *rn = r;
-        }
-    }
-    for (rp = renum; rp; rp = rp->next) {
-        f = rp->faction;
-        a_remove(&f->attribs, rp->attrib);
-        renumber_faction(f, rp->want);
-    }
-    while (renum) {
-        rp = renum->next;
-        free(renum);
-        renum = rp;
     }
 }
 
@@ -2904,121 +2855,6 @@ void restack_units(void)
     }
 }
 
-int renumber_cmd(unit * u, order * ord)
-{
-    char token[128];
-    const char *s;
-    int i;
-    faction *f = u->faction;
-
-    init_order(ord);
-    s = gettoken(token, sizeof(token));
-    switch (findparam_ex(s, u->faction->locale)) {
-
-    case P_FACTION:
-        s = gettoken(token, sizeof(token));
-        if (s && *s) {
-            int id = atoi36((const char *)s);
-            attrib *a = a_find(f->attribs, &at_number);
-            if (!a)
-                a = a_add(&f->attribs, a_new(&at_number));
-            a->data.i = id;
-        }
-        break;
-
-    case P_UNIT:
-        s = gettoken(token, sizeof(token));
-        if (s == NULL || *s == 0) {
-            i = newunitid();
-        }
-        else {
-            i = atoi36((const char *)s);
-            if (i <= 0 || i > MAX_UNIT_NR) {
-                cmistake(u, ord, 114, MSG_EVENT);
-                break;
-            }
-
-            if (forbiddenid(i)) {
-                cmistake(u, ord, 116, MSG_EVENT);
-                break;
-            }
-
-            if (findunitg(i, u->region)) {
-                cmistake(u, ord, 115, MSG_EVENT);
-                break;
-            }
-        }
-        renumber_unit(u, i);
-        break;
-
-    case P_SHIP:
-        if (!u->ship) {
-            cmistake(u, ord, 144, MSG_EVENT);
-            break;
-        }
-        if (ship_owner(u->ship) != u) {
-            cmistake(u, ord, 146, MSG_EVENT);
-            break;
-        }
-        if (u->ship->coast != NODIRECTION) {
-            cmistake(u, ord, 116, MSG_EVENT);
-            break;
-        }
-        s = gettoken(token, sizeof(token));
-        if (s == NULL || *s == 0) {
-            i = newcontainerid();
-        }
-        else {
-            i = atoi36((const char *)s);
-            if (i <= 0 || i > MAX_CONTAINER_NR) {
-                cmistake(u, ord, 114, MSG_EVENT);
-                break;
-            }
-            if (findship(i) || findbuilding(i)) {
-                cmistake(u, ord, 115, MSG_EVENT);
-                break;
-            }
-        }
-        sunhash(u->ship);
-        u->ship->no = i;
-        shash(u->ship);
-        break;
-    case P_BUILDING:
-    case P_GEBAEUDE:
-        if (!u->building) {
-            cmistake(u, ord, 145, MSG_EVENT);
-            break;
-        }
-        if (building_owner(u->building) != u) {
-            cmistake(u, ord, 148, MSG_EVENT);
-            break;
-        }
-        s = gettoken(token, sizeof(token));
-        if (*s == 0) {
-            i = newcontainerid();
-        }
-        else {
-            i = atoi36((const char *)s);
-            if (i <= 0 || i > MAX_CONTAINER_NR) {
-                cmistake(u, ord, 114, MSG_EVENT);
-                break;
-            }
-            if (findship(i) || findbuilding(i)) {
-                cmistake(u, ord, 115, MSG_EVENT);
-                break;
-            }
-        }
-        bunhash(u->building);
-        u->building->no = i;
-        bhash(u->building);
-        break;
-
-    default:
-        cmistake(u, ord, 239, MSG_EVENT);
-    }
-    return 0;
-}
-
 /* blesses stone circles create an astral protection in the astral region
  * above the shield, which prevents chaos suction and other spells.
  * The shield is created when a magician enters the blessed stone circle,
@@ -3082,10 +2918,7 @@ static void age_stonecircle(building *b) {
 
 static building *age_building(building * b)
 {
-    const struct building_type *bt_blessed;
-
-    bt_blessed = bt_find("blessedstonecircle");
-    if (bt_blessed && b->type == bt_blessed) {
+    if (is_building_type(b->type, "blessedstonecircle")) {
         age_stonecircle(b);
     }
     a_age(&b->attribs, b);
@@ -3161,9 +2994,9 @@ static void ageing(void)
         for (up = &r->units; *up;) {
             unit *u = *up;
             a_age(&u->attribs, u);
-            if (u == *up)
+            if (u == *up) 
                 handle_event(u->attribs, "timer", u);
-            if (u == *up)
+            if (u == *up) //-V581
                 up = &(*up)->next;
         }
 
@@ -3173,7 +3006,7 @@ static void ageing(void)
             a_age(&s->attribs, s);
             if (s == *sp)
                 handle_event(s->attribs, "timer", s);
-            if (s == *sp)
+            if (s == *sp) //-V581
                 sp = &(*sp)->next;
         }
 
@@ -3465,37 +3298,38 @@ static int use_item(unit * u, const item_type * itype, int amount, struct order 
 
 static double heal_factor(const unit * u)
 {
-    double elf_regen;
-
-    switch (old_race(u_race(u))) {
-    case RC_TROLL:
-    case RC_DAEMON:
-        return 1.5;
-    case RC_GOBLIN:
-        return 2.0;
-    case RC_ELF:
-        elf_regen = get_param_flt(u_race(u)->parameters, "regen.forest", 1.0F);
-        if (elf_regen != 1.0 && r_isforest(u->region)) {
+    const race * rc = u_race(u);
+    if (rc->healing>0) {    
+        return rc->healing;
+    }
+    if (r_isforest(u->region)) {
+        static int rc_cache;
+        static const race *rc_elf;
+        if (rc_changed(&rc_cache)) {
+            rc_elf = get_race(RC_ELF);
+        }
+        if (rc==rc_elf) {
+            static int config;
+            static double elf_regen = 1.0;
+            if (config_changed(&config)) {
+                elf_regen = get_param_flt(u_race(u)->parameters, "regen.forest", 1.0F);
+            }
             return elf_regen;
         }
-        return 1.0;
-    default:
-        return 1.0;
     }
+    return 1.0;
 }
 
 void monthly_healing(void)
 {
     region *r;
-    static const curse_type *heal_ct = NULL;
-    if (heal_ct == NULL)
-        heal_ct = ct_find("healingzone");
+    const curse_type *heal_ct = ct_find("healingzone");
 
     for (r = regions; r; r = r->next) {
         unit *u;
         double healingcurse = 0;
 
-        if (heal_ct != NULL) {
+        if (r->attribs && heal_ct) {
             /* bonus zurücksetzen */
             curse *c = get_curse(r->attribs, heal_ct);
             if (c != NULL) {
@@ -3705,7 +3539,7 @@ int use_cmd(unit * u, struct order *ord)
         cmistake(u, ord, 43, MSG_PRODUCE);
         return err;
     }
-    n = atoi((const char *)t);
+    n = atoip((const char *)t);
     if (n == 0) {
         if (isparam(t, u->faction->locale, P_ANY)) {
             /* BENUTZE ALLES Yanxspirit */
@@ -3801,7 +3635,7 @@ int pay_cmd(unit * u, struct order *ord)
 static int reserve_i(unit * u, struct order *ord, int flags)
 {
     char token[128];
-    if (u->number > 0 && (urace(u)->ec_flags & GETITEM)) {
+    if (u->number > 0 && (u_race(u)->ec_flags & GETITEM)) {
         int use, count, para;
         const item_type *itype;
         const char *s;
@@ -3853,7 +3687,7 @@ int claim_cmd(unit * u, struct order *ord)
 
     t = gettoken(token, sizeof(token));
     if (t) {
-        n = atoi((const char *)t);
+        n = atoip((const char *)t);
         if (n == 0) {
             n = 1;
         }
@@ -4110,7 +3944,7 @@ int armedmen(const unit * u, bool siege_weapons)
 {
     item *itm;
     int n = 0;
-    if (!(urace(u)->flags & RCF_NOWEAPONS)) {
+    if (!(u_race(u)->flags & RCF_NOWEAPONS)) {
         if (effskill(u, SK_WEAPONLESS, 0) >= 1) {
             /* kann ohne waffen bewachen: fuer drachen */
             n = u->number;
@@ -4125,7 +3959,7 @@ int armedmen(const unit * u, bool siege_weapons)
                 if (effskill(u, wtype->skill, 0) >= wtype->minskill)
                     n += itm->number;
                 /* if (effskill(u, wtype->skill) >= wtype->minskill) n += itm->number; */
-                if (n > u->number)
+                if (n >= u->number)
                     break;
             }
             n = _min(n, u->number);
@@ -4182,7 +4016,7 @@ int siege_cmd(unit * u, order * ord)
         return 80;
     }
 
-    if (!is_guard(u, GUARD_TRAVELTHRU)) {
+    if (!is_guard(u)) {
         /* abbruch, wenn die einheit nicht vorher die region bewacht - als
          * warnung fuer alle anderen! */
         cmistake(u, ord, 81, MSG_EVENT);
@@ -4496,7 +4330,7 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
         return false;
 
     /* simple visibility, just gotta have a unit in the region to see 'em */
-    if (is_guard(u, GUARD_ALL) != 0 || usiege(u) || u->building || u->ship) {
+    if (is_guard(u) || usiege(u) || u->building || u->ship) {
         return true;
     }
 
@@ -4535,7 +4369,7 @@ bool cansee_unit(const unit * u, const unit * target, int modifier)
     else {
         int n, rings, o;
 
-        if (is_guard(target, GUARD_ALL) != 0 || usiege(target) || target->building
+        if (is_guard(target) || usiege(target) || target->building
             || target->ship) {
             return true;
         }
@@ -4579,7 +4413,7 @@ cansee_durchgezogen(const faction * f, const region * r, const unit * u,
     else {
         int rings;
 
-        if (is_guard(u, GUARD_ALL) != 0 || usiege(u) || u->building || u->ship) {
+        if (is_guard(u) || usiege(u) || u->building || u->ship) {
             return true;
         }
 

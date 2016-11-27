@@ -20,7 +20,7 @@ void test_equipment(CuTest * tc)
     spell *sp;
     sc_mage * mage;
 
-    test_cleanup();
+    test_setup();
     test_create_race("human");
     enable_skill(SK_MAGIC, true);
     it_horses = test_create_itemtype("horse");
@@ -34,9 +34,9 @@ void test_equipment(CuTest * tc)
 
     equipment_setitem(eq, it_horses, "1");
     equipment_setskill(eq, SK_MAGIC, "5");
-    equipment_addspell(eq, sp, 1);
+    equipment_addspell(eq, sp->sname, 1);
 
-    u = test_create_unit(test_create_faction(0), 0);
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     equip_unit_mask(u, eq, EQUIP_ALL);
     CuAssertIntEquals(tc, 1, i_get(u->items, it_horses));
     CuAssertIntEquals(tc, 5, get_level(u, SK_MAGIC));
@@ -45,6 +45,7 @@ void test_equipment(CuTest * tc)
     CuAssertPtrNotNull(tc, mage);
     CuAssertPtrNotNull(tc, mage->spellbook);
     CuAssertTrue(tc, u_hasspell(u, sp));
+    test_cleanup();
 }
 
 CuSuite *get_equipment_suite(void)

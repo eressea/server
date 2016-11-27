@@ -5,13 +5,15 @@
 #include <attributes/key.h>
 
 #include "save.h"
+#include "version.h"
+#include "building.h"
+#include "ship.h"
 #include "unit.h"
 #include "group.h"
 #include "ally.h"
 #include "faction.h"
 #include "plane.h"
 #include "region.h"
-#include "version.h"
 
 #include <triggers/changefaction.h>
 #include <triggers/createunit.h>
@@ -26,17 +28,17 @@
 #include <CuTest.h>
 #include <tests.h>
 
-#include <storage.h>
-
 #include <stdio.h>
+#include <string.h>
+#include <errno.h>
 
 static void test_readwrite_data(CuTest * tc)
 {
     const char *filename = "test.dat";
     char path[MAX_PATH];
-    test_cleanup();
+    test_setup();
     CuAssertIntEquals(tc, 0, writegame(filename));
-    CuAssertIntEquals(tc, 0, readgame(filename, false));
+    CuAssertIntEquals(tc, 0, readgame(filename));
     join_path(datapath(), filename, path, sizeof(path));
     CuAssertIntEquals(tc, 0, remove(path));
     test_cleanup();
@@ -51,12 +53,13 @@ static void test_readwrite_unit(CuTest * tc)
     struct faction *f;
     int fno;
 
-    test_cleanup();
+    test_setup();
     r = test_create_region(0, 0, 0);
     f = test_create_faction(0);
     fno = f->no;
     u = test_create_unit(f, r);
-
+    unit_setname(u, "  Hodor  ");
+    CuAssertStrEquals(tc, "  Hodor  ", u->_name);
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
     write_unit(&data, u);
@@ -64,15 +67,141 @@ static void test_readwrite_unit(CuTest * tc)
     data.strm.api->rewind(data.strm.handle);
     free_gamedata();
     f = test_create_faction(0);
+    r = test_create_region(0, 0, 0);
     renumber_faction(f, fno);
     gamedata_init(&data, &store, RELEASE_VERSION);
     u = read_unit(&data);
-    mstream_done(&data.strm);
-    gamedata_done(&data);
-
     CuAssertPtrNotNull(tc, u);
     CuAssertPtrEquals(tc, f, u->faction);
+    CuAssertStrEquals(tc, "Hodor", u->_name);
     CuAssertPtrEquals(tc, 0, u->region);
+
+    mstream_done(&data.strm);
+    gamedata_done(&data);
+    move_unit(u, r, NULL); // this makes sure that u doesn't leak
+    test_cleanup();
+}
+
+static void test_readwrite_faction(CuTest * tc)
+{
+    gamedata data;
+    storage store;
+    faction *f;
+
+    test_setup();
+    f = test_create_faction(0);
+    free(f->name);
+    f->name = _strdup("  Hodor  ");
+    CuAssertStrEquals(tc, "  Hodor  ", f->name);
+    mstream_init(&data.strm);
+    gamedata_init(&data, &store, RELEASE_VERSION);
+    write_faction(&data, f);
+    
+    data.strm.api->rewind(data.strm.handle);
+    free_gamedata();
+    gamedata_init(&data, &store, RELEASE_VERSION);
+    f = read_faction(&data);
+    CuAssertPtrNotNull(tc, f);
+    CuAssertStrEquals(tc, "Hodor", f->name);
+    CuAssertPtrEquals(tc, 0, f->units);
+    factions = f;
+
+    mstream_done(&data.strm);
+    gamedata_done(&data);
+    test_cleanup();
+}
+
+static void test_readwrite_region(CuTest * tc)
+{
+    gamedata data;
+    storage store;
+    region *r;
+
+    test_setup();
+    r = test_create_region(0, 0, 0);
+    free(r->land->name);
+    r->land->name = _strdup("  Hodor  ");
+    CuAssertStrEquals(tc, "  Hodor  ", r->land->name);
+    mstream_init(&data.strm);
+    gamedata_init(&data, &store, RELEASE_VERSION);
+    write_region(&data, r);
+    
+    data.strm.api->rewind(data.strm.handle);
+    free_gamedata();
+    gamedata_init(&data, &store, RELEASE_VERSION);
+    r = read_region(&data);
+    CuAssertPtrNotNull(tc, r);
+    CuAssertStrEquals(tc, "Hodor", r->land->name);
+    regions = r;
+
+    mstream_done(&data.strm);
+    gamedata_done(&data);
+    test_cleanup();
+}
+
+static void test_readwrite_building(CuTest * tc)
+{
+    gamedata data;
+    storage store;
+    building *b;
+    region *r;
+
+    test_setup();
+    r = test_create_region(0, 0, 0);
+    b = test_create_building(r, 0);
+    free(b->name);
+    b->name = _strdup("  Hodor  ");
+    CuAssertStrEquals(tc, "  Hodor  ", b->name);
+    mstream_init(&data.strm);
+    gamedata_init(&data, &store, RELEASE_VERSION);
+    write_building(&data, b);
+    
+    data.strm.api->rewind(data.strm.handle);
+    free_gamedata();
+    r = test_create_region(0, 0, 0);
+    gamedata_init(&data, &store, RELEASE_VERSION);
+    b = read_building(&data);
+    CuAssertPtrNotNull(tc, b);
+    CuAssertStrEquals(tc, "Hodor", b->name);
+    CuAssertPtrEquals(tc, 0, b->region);
+    b->region = r;
+    r->buildings = b;
+
+    mstream_done(&data.strm);
+    gamedata_done(&data);
+    test_cleanup();
+}
+
+static void test_readwrite_ship(CuTest * tc)
+{
+    gamedata data;
+    storage store;
+    ship *sh;
+    region *r;
+
+    test_setup();
+    r = test_create_region(0, 0, 0);
+    sh = test_create_ship(r, 0);
+    free(sh->name);
+    sh->name = _strdup("  Hodor  ");
+    CuAssertStrEquals(tc, "  Hodor  ", sh->name);
+    mstream_init(&data.strm);
+    gamedata_init(&data, &store, RELEASE_VERSION);
+    write_ship(&data, sh);
+    
+    data.strm.api->rewind(data.strm.handle);
+    free_gamedata();
+    r = test_create_region(0, 0, 0);
+    gamedata_init(&data, &store, RELEASE_VERSION);
+    sh = read_ship(&data);
+    CuAssertPtrNotNull(tc, sh);
+    CuAssertStrEquals(tc, "Hodor", sh->name);
+    CuAssertPtrEquals(tc, 0, sh->region);
+    sh->region = r;
+    r->ships = sh;
+
+    mstream_done(&data.strm);
+    gamedata_done(&data);
     test_cleanup();
 }
 
@@ -81,7 +210,7 @@ static void test_readwrite_attrib(CuTest *tc) {
     storage store;
     attrib *a = NULL;
 
-    test_cleanup();
+    test_setup();
     key_set(&a, 41);
     key_set(&a, 42);
     mstream_init(&data.strm);
@@ -155,14 +284,14 @@ static void test_readwrite_dead_faction_regionowner(CuTest *tc) {
     gamedata data;
     storage store;
 
+    test_setup();
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
 
-    test_cleanup();
     config_set("rules.region_owners", "1");
     f = test_create_faction(0);
     test_create_unit(f, r = test_create_region(0, 0, 0));
-    region_set_owner(r, f, turn);
+    region_set_owner(r, f, 0);
     destroyfaction(&factions);
     CuAssertTrue(tc, !f->_alive);
     remove_empty_units();
@@ -260,6 +389,7 @@ static void test_read_password(CuTest *tc) {
     storage store;
     faction *f;
 
+    test_setup();
     f = test_create_faction(0);
     faction_setpassword(f, password_encode("secret", PASSWORD_DEFAULT));
     mstream_init(&data.strm);
@@ -270,6 +400,7 @@ static void test_read_password(CuTest *tc) {
     mstream_done(&data.strm);
     gamedata_done(&data);
     CuAssertTrue(tc, checkpasswd(f, "secret"));
+    test_cleanup();
 }
 
 static void test_read_password_external(CuTest *tc) {
@@ -279,7 +410,10 @@ static void test_read_password_external(CuTest *tc) {
     faction *f;
     FILE * F;
 
-    remove(pwfile);
+    test_setup();
+    if (remove(pwfile) != 0) {
+        errno = 0;
+    }
     f = test_create_faction(0);
     faction_setpassword(f, password_encode("secret", PASSWORD_DEFAULT));
     CuAssertPtrNotNull(tc, f->_password);
@@ -305,6 +439,13 @@ static void test_read_password_external(CuTest *tc) {
     mstream_done(&data.strm);
     gamedata_done(&data);
     CuAssertIntEquals(tc, 0, remove(pwfile));
+    test_cleanup();
+}
+
+static void test_version_no(CuTest *tc) {
+    CuAssertIntEquals(tc, 0, version_no("0.0.0-devel"));
+    CuAssertIntEquals(tc, 0x10000, version_no("1.0.0-test"));
+    CuAssertIntEquals(tc, 0x10203, version_no("1.2.3-what.is.42"));
 }
 
 CuSuite *get_save_suite(void)
@@ -313,11 +454,17 @@ CuSuite *get_save_suite(void)
     SUITE_ADD_TEST(suite, test_readwrite_attrib);
     SUITE_ADD_TEST(suite, test_readwrite_data);
     SUITE_ADD_TEST(suite, test_readwrite_unit);
+    SUITE_ADD_TEST(suite, test_readwrite_faction);
+    SUITE_ADD_TEST(suite, test_readwrite_region);
+    SUITE_ADD_TEST(suite, test_readwrite_building);
+    SUITE_ADD_TEST(suite, test_readwrite_ship);
     SUITE_ADD_TEST(suite, test_readwrite_dead_faction_createunit);
     SUITE_ADD_TEST(suite, test_readwrite_dead_faction_changefaction);
     SUITE_ADD_TEST(suite, test_readwrite_dead_faction_regionowner);
     SUITE_ADD_TEST(suite, test_readwrite_dead_faction_group);
     SUITE_ADD_TEST(suite, test_read_password);
     SUITE_ADD_TEST(suite, test_read_password_external);
+    SUITE_ADD_TEST(suite, test_version_no);
+
     return suite;
 }

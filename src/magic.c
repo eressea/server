@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 1998-2014,
 Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
@@ -38,13 +38,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/pool.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/save.h>
 #include <kernel/ship.h>
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
-#include <kernel/version.h>
 
 #include <triggers/timeout.h>
 #include <triggers/shock.h>
@@ -175,7 +173,7 @@ static void a_initicastle(struct attrib *a)
     a->data.v = calloc(sizeof(icastle_data), 1);
 }
 
-static void a_finalizeicastle(struct attrib *a)
+static void a_finalizeicastle(struct attrib *a) //-V524
 {
     free(a->data.v);
 }
@@ -226,7 +224,11 @@ static void free_mage(attrib * a)
 
 bool FactionSpells(void)
 {
-    return config_get_int("rules.magic.factionlist", 0) != 0;
+    static int config, rule;
+    if (config_changed(&config)) {
+        rule = config_get_int("rules.magic.factionlist", 0);
+    }
+    return rule != 0;
 }
 
 void read_spells(struct quicklist **slistp, magic_t mtype, 
@@ -345,7 +347,7 @@ attrib_type at_mage = {
 
 bool is_mage(const unit * u)
 {
-    return i2b(get_mage(u) != NULL);
+    return get_mage(u) != NULL;
 }
 
 sc_mage *get_mage(const unit * u)
@@ -374,7 +376,7 @@ static int read_seenspell(attrib * a, void *owner, struct gamedata *data)
     char token[32];
 
     READ_TOK(store, token, sizeof(token));
-    i = atoi(token);
+    i = atoip(token);
     if (i != 0) {
         sp = find_spellbyid((unsigned int)i);
     }
@@ -1028,9 +1030,8 @@ cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
 double
 spellpower(region * r, unit * u, const spell * sp, int cast_level, struct order *ord)
 {
-    curse *c;
     double force = cast_level;
-    int elf_power;
+    static int elf_power, config;
     const struct resource_type *rtype;
 
     if (sp == NULL) {
@@ -1043,54 +1044,65 @@ spellpower(region * r, unit * u, const spell * sp, int cast_level, struct order 
         if (btype && btype->flags & BTF_MAGIC) ++force;
     }
 
-    elf_power = config_get_int("rules.magic.elfpower", 0);
-
-    if (elf_power && u_race(u) == get_race(RC_ELF) && r_isforest(r)) {
-        ++force;
+    if (config_changed(&config)) {
+        elf_power = config_get_int("rules.magic.elfpower", 0);
+    }
+    if (elf_power) {
+        static int rc_cache;
+        static const race *rc_elf;
+        if (rc_changed(&rc_cache)) {
+            rc_elf = get_race(RC_ELF);
+        }
+        if (u_race(u) == rc_elf && r_isforest(r)) {
+            ++force;
+        }
     }
     rtype = rt_find("rop");
     if (rtype && i_get(u->items, rtype->itype) > 0) {
         ++force;
     }
 
-    /* Antimagie in der Zielregion */
-    c = get_curse(r->attribs, ct_find("antimagiczone"));
-    if (curse_active(c)) {
-        unit *mage = c->magician;
-        force -= curse_geteffect(c);
-        curse_changevigour(&r->attribs, c, -cast_level);
-        cmistake(u, ord, 185, MSG_MAGIC);
-        if (mage != NULL && mage->faction != NULL) {
-            if (force > 0) {
-                ADDMSG(&mage->faction->msgs, msg_message("reduce_spell",
-                    "self mage region", mage, u, r));
+    if (r->attribs) {
+        curse *c;
+
+        /* Antimagie in der Zielregion */
+        c = get_curse(r->attribs, ct_find("antimagiczone"));
+        if (curse_active(c)) {
+            unit *mage = c->magician;
+            force -= curse_geteffect(c);
+            curse_changevigour(&r->attribs, c, -cast_level);
+            cmistake(u, ord, 185, MSG_MAGIC);
+            if (mage != NULL && mage->faction != NULL) {
+                if (force > 0) {
+                    ADDMSG(&mage->faction->msgs, msg_message("reduce_spell",
+                        "self mage region", mage, u, r));
+                }
+                else {
+                    ADDMSG(&mage->faction->msgs, msg_message("block_spell",
+                        "self mage region", mage, u, r));
+                }
             }
-            else {
-                ADDMSG(&mage->faction->msgs, msg_message("block_spell",
-                    "self mage region", mage, u, r));
+        }
+
+        /* Patzerfluch-Effekt: */
+        c = get_curse(r->attribs, ct_find("fumble"));
+        if (curse_active(c)) {
+            unit *mage = c->magician;
+            force -= curse_geteffect(c);
+            curse_changevigour(&u->attribs, c, -1);
+            cmistake(u, ord, 185, MSG_MAGIC);
+            if (mage != NULL && mage->faction != NULL) {
+                if (force > 0) {
+                    ADDMSG(&mage->faction->msgs, msg_message("reduce_spell",
+                        "self mage region", mage, u, r));
+                }
+                else {
+                    ADDMSG(&mage->faction->msgs, msg_message("block_spell",
+                        "self mage region", mage, u, r));
+                }
             }
         }
     }
-
-    /* Patzerfluch-Effekt: */
-    c = get_curse(r->attribs, ct_find("fumble"));
-    if (curse_active(c)) {
-        unit *mage = c->magician;
-        force -= curse_geteffect(c);
-        curse_changevigour(&u->attribs, c, -1);
-        cmistake(u, ord, 185, MSG_MAGIC);
-        if (mage != NULL && mage->faction != NULL) {
-            if (force > 0) {
-                ADDMSG(&mage->faction->msgs, msg_message("reduce_spell",
-                    "self mage region", mage, u, r));
-            }
-            else {
-                ADDMSG(&mage->faction->msgs, msg_message("block_spell",
-                    "self mage region", mage, u, r));
-            }
-        }
-    }
-
     return _max(force, 0);
 }
 
@@ -1364,7 +1376,9 @@ static void do_fumble(castorder * co)
     int level = co->level;
     int duration;
     double effect;
-
+	static const race *rc_toad;
+    static int rc_cache;
+    
     ADDMSG(&u->faction->msgs,
         msg_message("patzer", "unit region spell", u, r, sp));
     switch (rng_int() % 10) {
@@ -1395,7 +1409,10 @@ static void do_fumble(castorder * co)
         duration = rng_int() % level / 2;
         if (duration < 2) duration = 2;
         add_trigger(&u->attribs, "timer", trigger_timeout(duration, trestore));
-        u_setrace(u, get_race(RC_TOAD));
+        if (rc_changed(&rc_cache)) {
+            rc_toad = get_race(RC_TOAD);
+        }
+        u_setrace(u, rc_toad);
         u->irace = NULL;
         ADDMSG(&r->msgs, msg_message("patzer6", "unit region spell", u, r, sp));
         break;
@@ -2150,7 +2167,7 @@ typedef struct familiar_data {
 bool is_familiar(const unit * u)
 {
     attrib *a = a_find(u->attribs, &at_familiarmage);
-    return i2b(a != NULL);
+    return a != NULL;
 }
 
 static void
@@ -2776,6 +2793,8 @@ void magic(void)
     int rank;
     castorder *co;
     spellrank spellranks[MAX_SPELLRANK];
+    const race *rc_spell = get_race(RC_SPELL);
+    const race *rc_insect = get_race(RC_INSECT);
 
     memset(spellranks, 0, sizeof(spellranks));
 
@@ -2784,10 +2803,10 @@ void magic(void)
         for (u = r->units; u; u = u->next) {
             order *ord;
 
-            if (u->number <= 0 || u_race(u) == get_race(RC_SPELL))
+            if (u->number <= 0 || u_race(u) == rc_spell)
                 continue;
 
-            if (u_race(u) == get_race(RC_INSECT) && r_insectstalled(r) &&
+            if (u_race(u) == rc_insect && r_insectstalled(r) &&
                 !is_cursed(u->attribs, C_KAELTESCHUTZ, 0))
                 continue;
 
@@ -2954,7 +2973,7 @@ static void select_spellbook(void **tokens, spellbook *sb, const struct locale *
         else {
             variant token;
             token.v = sp;
-            addtoken(tokens, n, token);
+            addtoken((struct tnode **)tokens, n, token);
         }
     }
 }

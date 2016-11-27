@@ -28,6 +28,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* attributes includes */
 #include <attributes/targetregion.h>
 #include <attributes/hate.h>
+#include <attributes/attributes.h>
 
 /* kernel includes */
 #include <kernel/build.h>
@@ -75,25 +76,17 @@ bool monster_is_waiting(const unit * u)
 static void eaten_by_monster(unit * u)
 {
     /* adjustment for smaller worlds */
-    static double multi = 0.0;
+    double multi = RESOURCE_QUANTITY * newterrain(T_PLAIN)->size / 10000.0;
     int n = 0;
     int horse = -1;
     const resource_type *rhorse = get_resourcetype(R_HORSE);
-    if (multi == 0.0) {
-        multi = RESOURCE_QUANTITY * newterrain(T_PLAIN)->size / 10000.0;
-    }
+    const race *rc = u_race(u);
+    attrib *a;
 
-    switch (old_race(u_race(u))) {
-    case RC_FIREDRAGON:
-        n = rng_int() % 80 * u->number;
-        break;
-    case RC_DRAGON:
-        n = rng_int() % 200 * u->number;
-        break;
-    case RC_WYRM:
-        n = rng_int() % 500 * u->number;
-        break;
-    default:
+    a = a_find(rc->attribs, &at_scare);
+    if (a) {
+        n = rng_int() & a->data.i * u->number;
+    } else {
         n = rng_int() % (u->number / 20 + 1);
         horse = 0;
     }
@@ -118,12 +111,7 @@ static void eaten_by_monster(unit * u)
 
 static void absorbed_by_monster(unit * u)
 {
-    int n;
-
-    switch (old_race(u_race(u))) {
-    default:
-        n = rng_int() % (u->number / 20 + 1);
-    }
+    int n = rng_int() % (u->number / 20 + 1);
 
     if (n > 0) {
         n = lovar(n);
@@ -172,21 +160,14 @@ static int scareaway(region * r, int anzahl)
 static void scared_by_monster(unit * u)
 {
     int n;
-
-    switch (old_race(u_race(u))) {
-    case RC_FIREDRAGON:
-        n = rng_int() % 160 * u->number;
-        break;
-    case RC_DRAGON:
-        n = rng_int() % 400 * u->number;
-        break;
-    case RC_WYRM:
-        n = rng_int() % 1000 * u->number;
-        break;
-    default:
+    const race *rc = u_race(u);
+    attrib *a;
+    a = a_find(rc->attribs, &at_scare);
+    if (a) {
+        n = rng_int() & a->data.i * u->number;
+    } else {
         n = rng_int() % (u->number / 4 + 1);
     }
-
     if (n > 0) {
         n = lovar(n);
         n = _min(rpeasants(u->region), n);

@@ -30,6 +30,8 @@ extern "C" {
     struct curse_type;
     struct gamedata;
     struct storage;
+    struct attrib;
+    struct faction;
 
     /* Sprueche in der struct region und auf Einheiten, Schiffen oder Burgen
      * (struct attribute)
@@ -280,12 +282,12 @@ extern "C" {
      * */
     struct curse *get_curse(struct attrib *ap, const curse_type * ctype);
 
-    int find_cursebyname(const char *c);
     const curse_type *ct_find(const char *c);
+    bool ct_changed(int *cache);
     void ct_register(const curse_type *);
+    void ct_remove(const char *c);
     void ct_checknames(void);
 
-    curse *cfindhash(int i);
     curse *findcurse(int curseid);
 
     void curse_init(struct attrib *a);
@@ -305,7 +307,7 @@ extern "C" {
         const struct curse *c, int self);
     int curse_cansee(const struct curse *c, const struct faction *viewer, objtype_t typ, const void *obj, int self);
 #define is_cursed(a, id, id2) \
-  curse_active(get_curse(a, ct_find(oldcursename(id))))
+  (a && curse_active(get_curse(a, ct_find(oldcursename(id)))))
 #define get_curseeffect(a, id, id2) \
   curse_geteffect(get_curse(a, ct_find(oldcursename(id))))
 

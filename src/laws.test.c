@@ -1,6 +1,7 @@
 #include <platform.h>
 #include "laws.h"
 #include "battle.h"
+#include "guard.h"
 #include "monster.h"
 
 #include <kernel/ally.h>
@@ -522,7 +523,7 @@ static void test_pay_cmd_other_building(CuTest *tc) {
     building *b;
     char cmd[32];
 
-    test_cleanup();
+    test_setup();
     setup_pay_cmd(&fix);
     f = fix.u1->faction;
     b = test_create_building(fix.u1->region, bt_get_or_create("lighthouse"));
@@ -1023,7 +1024,7 @@ static void test_ally_cmd_errors(CuTest *tc) {
     int fid;
     order *ord;
 
-    test_cleanup();
+    test_setup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     fid = u->faction->no + 1;
     CuAssertPtrEquals(tc, 0, findfaction(fid));
@@ -1036,12 +1037,50 @@ static void test_ally_cmd_errors(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_name_cmd(CuTest *tc) {
+    unit *u;
+    faction *f;
+    order *ord;
+
+    test_setup();
+    u = test_create_unit(f = test_create_faction(0), test_create_region(0, 0, 0));
+
+    ord = create_order(K_NAME, f->locale, "%s '  Ho\tdor  '", LOC(f->locale, parameters[P_UNIT]));
+    name_cmd(u, ord);
+    CuAssertStrEquals(tc, "Hodor", u->_name);
+    free_order(ord);
+
+    ord = create_order(K_NAME, f->locale, "%s '  Ho\tdor  '", LOC(f->locale, parameters[P_FACTION]));
+    name_cmd(u, ord);
+    CuAssertStrEquals(tc, "Hodor", f->name);
+    free_order(ord);
+
+    ord = create_order(K_NAME, f->locale, "%s '  Ho\tdor  '", LOC(f->locale, parameters[P_SHIP]));
+    u->ship = test_create_ship(u->region, 0);
+    name_cmd(u, ord);
+    CuAssertStrEquals(tc, "Hodor", u->ship->name);
+    free_order(ord);
+    
+    ord = create_order(K_NAME, f->locale, "%s '  Ho\tdor  '", LOC(f->locale, parameters[P_BUILDING]));
+    u->building = test_create_building(u->region, 0);
+    name_cmd(u, ord);
+    CuAssertStrEquals(tc, "Hodor", u->building->name);
+    free_order(ord);
+    
+    ord = create_order(K_NAME, f->locale, "%s '  Ho\tdor  '", LOC(f->locale, parameters[P_REGION]));
+    name_cmd(u, ord);
+    CuAssertStrEquals(tc, "Hodor", u->region->land->name);
+    free_order(ord);
+
+    test_cleanup();
+}
+
 static void test_ally_cmd(CuTest *tc) {
     unit *u;
     faction * f;
     order *ord;
 
-    test_cleanup();
+    test_setup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     f = test_create_faction(0);
 
@@ -1402,11 +1441,48 @@ static void test_demon_hunger(CuTest * tc)
     test_cleanup();
 }
 
+static void test_armedmen(CuTest *tc) {
+    // TODO: test RCF_NOWEAPONS and SK_WEAPONLESS
+    unit *u;
+    item_type *it_sword;
+    weapon_type *wtype;
+    test_setup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    it_sword = test_create_itemtype("sword");
+    wtype = new_weapontype(it_sword, 0, 0.5, 0, 0, 0, 0, SK_MELEE, 1);
+    CuAssertIntEquals(tc, 0, armedmen(u, false));
+    CuAssertIntEquals(tc, 0, armedmen(u, true));
+    set_level(u, SK_MELEE, 1);
+    CuAssertIntEquals(tc, 0, armedmen(u, false));
+    i_change(&u->items, it_sword, 1);
+    CuAssertIntEquals(tc, 1, armedmen(u, false));
+    i_change(&u->items, it_sword, 1);
+    CuAssertIntEquals(tc, 1, armedmen(u, false));
+    scale_number(u, 2);
+    set_level(u, SK_MELEE, 1);
+    CuAssertIntEquals(tc, 2, armedmen(u, false));
+    set_level(u, SK_MELEE, 0);
+    CuAssertIntEquals(tc, 0, armedmen(u, false));
+    set_level(u, SK_MELEE, 1);
+    i_change(&u->items, it_sword, -1);
+    CuAssertIntEquals(tc, 1, armedmen(u, false));
+    wtype->minskill = 2;
+    CuAssertIntEquals(tc, 0, armedmen(u, false));
+    set_level(u, SK_MELEE, 2);
+    CuAssertIntEquals(tc, 1, armedmen(u, false));
+    CuAssertIntEquals(tc, 1, armedmen(u, true));
+    wtype->flags |= WTF_SIEGE;
+    CuAssertIntEquals(tc, 0, armedmen(u, false));
+    CuAssertIntEquals(tc, 1, armedmen(u, true));
+    test_cleanup();
+}
+
 CuSuite *get_laws_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_nmr_warnings);
     SUITE_ADD_TEST(suite, test_ally_cmd);
+    SUITE_ADD_TEST(suite, test_name_cmd);
     SUITE_ADD_TEST(suite, test_ally_cmd_errors);
     SUITE_ADD_TEST(suite, test_long_order_normal);
     SUITE_ADD_TEST(suite, test_long_order_none);
@@ -1464,6 +1540,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_show_race);
     SUITE_ADD_TEST(suite, test_immigration);
     SUITE_ADD_TEST(suite, test_demon_hunger);
+    SUITE_ADD_TEST(suite, test_armedmen);
 
     return suite;
 }

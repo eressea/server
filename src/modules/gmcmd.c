@@ -19,7 +19,6 @@
 #include <items/demonseye.h>
 #include <attributes/key.h>
 #include <triggers/gate.h>
-#include <triggers/unguard.h>
 
 /* kernel includes */
 #include <kernel/building.h>
@@ -29,7 +28,6 @@
 #include <kernel/order.h>
 #include <kernel/plane.h>
 #include <kernel/region.h>
-#include <kernel/save.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>

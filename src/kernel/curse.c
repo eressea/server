@@ -30,7 +30,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "ship.h"
 #include "skill.h"
 #include "unit.h"
-#include "version.h"
 
 /* util includes */
 #include <util/attrib.h>
@@ -98,15 +97,6 @@ static void cunhash(curse * c)
     }
 }
 
-curse *cfindhash(int i)
-{
-    curse *old;
-
-    for (old = cursehash[i % MAXENTITYHASH]; old; old = old->nexthash)
-        if (old->no == i)
-            return old;
-    return NULL;
-}
 /* ------------------------------------------------------------- */
 /* at_curse */
 void curse_init(attrib * a)
@@ -301,6 +291,17 @@ attrib_type at_curse = {
 
 #define MAXCTHASH 128
 static quicklist *cursetypes[MAXCTHASH];
+static int ct_changes = 1;
+
+bool ct_changed(int *cache)
+{
+    assert(cache);
+    if (*cache != ct_changes) {
+        *cache = ct_changes;
+        return true;
+    }
+    return false;
+}
 
 void ct_register(const curse_type * ct)
 {
@@ -308,6 +309,27 @@ void ct_register(const curse_type * ct)
     quicklist **ctlp = cursetypes + hash;
 
     ql_set_insert(ctlp, (void *)ct);
+    ++ct_changes;
+}
+
+void ct_remove(const char *c)
+{
+    unsigned int hash = tolower(c[0]);
+    quicklist *ctl = cursetypes[hash];
+
+    if (ctl) {
+        int qi;
+
+        for (qi = 0; ctl; ql_advance(&ctl, &qi, 1)) {
+            curse_type *type = (curse_type *)ql_get(ctl, qi);
+
+            if (strcmp(c, type->cname) == 0) {
+                ql_delete(&ctl, qi);
+                ++ct_changes;
+                break;
+            }
+        }
+    }
 }
 
 const curse_type *ct_find(const char *c)
@@ -327,7 +349,7 @@ const curse_type *ct_find(const char *c)
             }
             else {
                 size_t k = _min(c_len, strlen(type->cname));
-                if (!_memicmp(c, type->cname, k)) {
+                if (!memcmp(c, type->cname, k)) {
                     return type;
                 }
             }
@@ -500,6 +522,24 @@ static void set_cursedmen(curse * c, int cursedmen)
     }
 }
 
+static int newcurseid(void) {
+    int random_no;
+    int start_random_no;
+    random_no = 1 + (rng_int() % MAX_UNIT_NR);
+    start_random_no = random_no;
+
+    while (findcurse(random_no)) {
+        random_no++;
+        if (random_no == MAX_UNIT_NR + 1) {
+            random_no = 1;
+        }
+        if (random_no == start_random_no) {
+            random_no = (int)MAX_UNIT_NR + 1;
+        }
+    }
+    return random_no;
+}
+
 /* ------------------------------------------------------------- */
 /* Legt eine neue Verzauberung an. Sollte es schon einen Zauber
  * dieses Typs geben, gibt es den bestehenden zurück.
@@ -521,7 +561,7 @@ static curse *make_curse(unit * mage, attrib ** ap, const curse_type * ct,
     c->effect = effect;
     c->magician = mage;
 
-    c->no = newunitid();
+    c->no = newcurseid();
     chash(c);
 
     switch (c->type->typ) {
@@ -785,7 +825,7 @@ double destr_curse(curse * c, int cast_level, double force)
                 c->type->change_vigour(c, -(cast_level + 1) / 2);
             }
             else {
-                c->vigour -= cast_level + 1 / 2;
+                c->vigour -= (cast_level + 1) / 2.0;
             }
         }
     }
@@ -808,5 +848,7 @@ void curses_done(void) {
     int i;
     for (i = 0; i != MAXCTHASH; ++i) {
         ql_free(cursetypes[i]);
+        cursetypes[i] = 0;
     }
+    ++ct_changes;
 }

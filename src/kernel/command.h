@@ -19,19 +19,21 @@ extern "C" {
     struct locale;
     struct order;
     struct unit;
+    struct tnode;
+    struct command;
 
     typedef struct syntaxtree {
         const struct locale *lang;
-        void *root;
+        struct tnode *root;
         struct syntaxtree *next;
+        struct command *cmds;
     } syntaxtree;
 
     typedef void(*parser) (const void *nodes, struct unit * u, struct order *);
-    void add_command(void **troot, void *tnext,
-        const char *str, parser fun);
-    void do_command(const void *troot, struct unit *u, struct order *);
+    void do_command(const struct tnode *troot, struct unit *u, struct order *);
 
     struct syntaxtree *stree_create(void);
+    void stree_add(struct syntaxtree *, const char *str, parser fun);
     void stree_free(struct syntaxtree *);
     void *stree_find(const struct syntaxtree *stree,
         const struct locale *lang);

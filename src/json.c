@@ -1,8 +1,9 @@
 #include "platform.h"
-#include <util/base36.h>
 
 #include "json.h"
 
+#include <util/base36.h>
+#include <util/log.h>
 #include <kernel/plane.h>
 #include <kernel/region.h>
 #include <kernel/faction.h>
@@ -22,12 +23,20 @@ int json_import(struct stream * out) {
     assert(out && out->api);
     while (!out->api->readln(out->handle, buffer, sizeof(buffer))) {
         size_t len = strlen(buffer);
-        data = (char *)realloc(data, sz + len + 1);
+        char *tmp;
+        tmp = (char *)realloc(data, sz + len + 1);
+        if (!tmp) {
+            log_fatal("allocation failure in json_import");
+            free(data);
+            return 1;
+        }
+        data = tmp;
         memcpy(data + sz, buffer, len);
         sz += len;
         data[sz] = 0;
     }
     json = cJSON_Parse(data);
+    free(data);
     child = cJSON_GetObjectItem(json, "regions");
     if (child && child->type == cJSON_Object) {
         cJSON *j;
@@ -64,7 +73,7 @@ int json_export(stream * out, int flags) {
         cJSON_AddItemToObject(root, "planes", json = cJSON_CreateObject());
         for (p = planes; p; p = p->next) {
             cJSON *data;
-            _snprintf(id, sizeof(id), "%u", p->id);
+            _snprintf(id, sizeof(id), "%d", p->id);
             cJSON_AddItemToObject(json, id, data = cJSON_CreateObject());
             cJSON_AddNumberToObject(data, "x", p->minx);
             cJSON_AddNumberToObject(data, "y", p->miny);
@@ -76,7 +85,7 @@ int json_export(stream * out, int flags) {
         cJSON_AddItemToObject(root, "regions", json = cJSON_CreateObject());
         for (r = regions; r; r = r->next) {
             cJSON *data;
-            _snprintf(id, sizeof(id), "%u", r->uid);
+            _snprintf(id, sizeof(id), "%d", r->uid);
             cJSON_AddItemToObject(json, id, data = cJSON_CreateObject());
             cJSON_AddNumberToObject(data, "x", r->x);
             cJSON_AddNumberToObject(data, "y", r->y);

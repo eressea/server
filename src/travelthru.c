@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -64,6 +64,8 @@ attrib_type at_travelunit = {
 */
 void travelthru_add(region * r, unit * u)
 {
+    region *next[MAXDIRECTIONS];
+    int d;
     attrib *a;
     quicklist *ql;
 
@@ -80,12 +82,14 @@ void travelthru_add(region * r, unit * u)
     ql_push(&ql, u);
     a->data.v = ql;
 
-#ifdef SMART_INTERVALS
     /* the first and last region of the faction gets reset, because travelthrough
     * could be in regions that are located before the [first, last] interval,
     * and recalculation is needed */
     update_interval(u->faction, r);
-#endif
+    get_neighbours(r, next);
+    for (d=0;d!=MAXDIRECTIONS;++d) {
+        update_interval(u->faction, next[d]);
+    }
 }
 
 bool travelthru_cansee(const struct region *r, const struct faction *f, const struct unit *u) {

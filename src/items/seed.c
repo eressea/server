@@ -17,13 +17,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
 #include <platform.h>
-#include <kernel/config.h>
 
 #include "seed.h"
 
 /* kernel includes */
 #include <kernel/build.h>
-#include <kernel/config.h>
 #include <kernel/item.h>
 #include <kernel/region.h>
 
@@ -42,7 +40,7 @@ static void produce_seeds(region * r, const resource_type * rtype, int norders)
 
 static int limit_seeds(const region * r, const resource_type * rtype)
 {
-    if (fval(r, RF_MALLORN)) {
+    if ((r->flags & RF_MALLORN)) {
         return 0;
     }
     return r->land ? r->land->trees[0] : 0;
@@ -68,13 +66,13 @@ void init_seed(void)
 static void
 produce_mallornseeds(region * r, const resource_type * rtype, int norders)
 {
-    assert(fval(r, RF_MALLORN));
+    assert(r->flags & RF_MALLORN);
     r->land->trees[0] -= norders;
 }
 
 static int limit_mallornseeds(const region * r, const resource_type * rtype)
 {
-    if (!fval(r, RF_MALLORN)) {
+    if (!(r->flags & RF_MALLORN)) {
         return 0;
     }
     return r->land ? r->land->trees[0] : 0;

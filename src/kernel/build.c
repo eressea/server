@@ -24,6 +24,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "direction.h"
 #include "move.h"
 #include "study.h"
+#include "guard.h"
 #include "laws.h"
 #include "skill.h"
 #include "lighthouse.h"
@@ -113,7 +114,7 @@ static void destroy_road(unit * u, int nmax, struct order *ord)
         }
 
         for (u2 = r->units; u2; u2 = u2->next) {
-            if (u2->faction != u->faction && is_guard(u2, GUARD_TAX)
+            if (u2->faction != u->faction && is_guard(u2)
                 && cansee(u2->faction, u->region, u, 0)
                 && !alliedunit(u, u2->faction, HELP_GUARD)) {
                 cmistake(u, ord, 70, MSG_EVENT);
@@ -130,13 +131,15 @@ static void destroy_road(unit * u, int nmax, struct order *ord)
             if (willdo == 0) {
                 /* TODO: error message */
             }
-            if (willdo > SHRT_MAX)
+            else if (willdo > SHRT_MAX)
                 road = 0;
             else
                 road = (short)(road - willdo);
             rsetroad(r, d, road);
-            ADDMSG(&u->faction->msgs, msg_message("destroy_road",
-                "unit from to", u, r, r2));
+            if (willdo > 0) {
+                ADDMSG(&u->faction->msgs, msg_message("destroy_road",
+                    "unit from to", u, r, r2));
+            }
         }
     }
 }
@@ -163,19 +166,17 @@ int destroy_cmd(unit * u, struct order *ord)
     init_order(ord);
     s = gettoken(token, sizeof(token));
 
-    if (findparam(s, u->faction->locale) == P_ROAD) {
-        destroy_road(u, INT_MAX, ord);
-        return 0;
-    }
-
     if (s && *s) {
         n = atoi((const char *)s);
         if (n <= 0) {
             n = INT_MAX;
         }
+        else {
+            s = gettoken(token, sizeof(token));
+        }
     }
 
-    if (getparam(u->faction->locale) == P_ROAD) {
+    if (s && isparam(s, u->faction->locale, P_ROAD)) {
         destroy_road(u, n, ord);
         return 0;
     }
@@ -248,7 +249,7 @@ int destroy_cmd(unit * u, struct order *ord)
     }
 
     if (con) {
-        /* TODO: Nicht an ZERSTÖRE mit Punktangabe angepasst! */
+        /* TODO: Nicht an ZERSTï¿½RE mit Punktangabe angepasst! */
         int c;
         for (c = 0; con->materials[c].number; ++c) {
             const requirement *rq = con->materials + c;
@@ -419,8 +420,9 @@ int value)
 
 int roqf_factor(void)
 {
-    int value = -1;
-    if (value < 0) {
+    static int config;
+    static int value;
+    if (config_changed(&config)) {
         value = config_get_int("rules.economy.roqf", 10);
     }
     return value;
@@ -511,8 +513,8 @@ int build(unit * u, const construction * ctype, int completed, int want)
 
         /*  Hier ist entweder maxsize == -1, oder completed < maxsize.
          *  Andernfalls ist das Datenfile oder sonstwas kaputt...
-         *  (enno): Nein, das ist für Dinge, bei denen die nächste Ausbaustufe
-         *  die gleiche wie die vorherige ist. z.b. gegenstände.
+         *  (enno): Nein, das ist fï¿½r Dinge, bei denen die nï¿½chste Ausbaustufe
+         *  die gleiche wie die vorherige ist. z.b. gegenstï¿½nde.
          */
         if (type->maxsize > 0) {
             completed = completed % type->maxsize;
@@ -640,7 +642,6 @@ message *msg_materials_required(unit * u, order * ord,
     if (multi <= 0 || multi == INT_MAX)
         multi = 1;
     for (c = 0; ctype && ctype->materials[c].number; ++c) {
-        // TODO: lots of alloc/dealloc calls here (make var_copy_resources take an array)
         resource *res = malloc(sizeof(resource));
         res->number = multi * ctype->materials[c].number / ctype->reqsize;
         res->type = ctype->materials[c].rtype;
@@ -758,10 +759,8 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
                 return 0;
             }
         }
-    }
-
-    if (b)
         built = b->size;
+    }
     if (n <= 0 || n == INT_MAX) {
         if (b == NULL) {
             if (btype->maxsize > 0) {
@@ -816,11 +815,11 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
     btname = LOC(lang, btype->_name);
 
     if (want - built <= 0) {
-        /* gebäude fertig */
+        /* gebï¿½ude fertig */
         new_order = default_order(lang);
     }
     else if (want != INT_MAX && btname) {
-        /* reduzierte restgröße */
+        /* reduzierte restgrï¿½ï¿½e */
         const char *hasspace = strchr(btname, ' ');
         if (hasspace) {
             new_order =
@@ -832,7 +831,7 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
         }
     }
     else if (btname) {
-        /* Neues Haus, Befehl mit Gebäudename */
+        /* Neues Haus, Befehl mit Gebï¿½udename */
         const char *hasspace = strchr(btname, ' ');
         if (hasspace) {
             new_order = create_order(K_MAKE, lang, "\"%s\" %i", btname, b->no);

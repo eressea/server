@@ -22,6 +22,8 @@ extern "C" {
     struct message;
     struct message_type;
 
+    void crmessage_done(void);
+
     typedef int(*tostring_f) (variant data, char *buffer, const void *userdata);
     void tsf_register(const char *name, tostring_f fun);
     /* registers a new type->string-function */

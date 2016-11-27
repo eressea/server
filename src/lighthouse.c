@@ -8,14 +8,15 @@
 #include <kernel/region.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
+#include <util/log.h>
 #include <util/attrib.h>
 
 #include <assert.h>
 #include <math.h>
 
-static attrib_type at_lighthouse = {
+const attrib_type at_lighthouse = {
     "lighthouse"
-    /* Rest ist NULL; temporäres, nicht alterndes Attribut */
+    /* Rest ist NULL; temporï¿½res, nicht alterndes Attribut */
 };
 
 /* update_lighthouse: call this function whenever the size of a lighthouse changes
@@ -25,38 +26,37 @@ static attrib_type at_lighthouse = {
 */
 void update_lighthouse(building * lh)
 {
-    const struct building_type *bt_lighthouse = bt_find("lighthouse");
-    if (bt_lighthouse && lh->type == bt_lighthouse) {
+    if (is_building_type(lh->type, "lighthouse")) {
         region *r = lh->region;
-        int d = (int)log10(lh->size) + 1;
-        int x;
 
+        r->flags |= RF_LIGHTHOUSE;
         if (lh->size > 0) {
-            r->flags |= RF_LIGHTHOUSE;
-        }
+            int d = (int)log10(lh->size) + 1;
+            int x;
+            for (x = -d; x <= d; ++x) {
+                int y;
+                for (y = -d; y <= d; ++y) {
+                    attrib *a;
+                    region *r2;
+                    int px = r->x + x, py = r->y + y;
 
-        for (x = -d; x <= d; ++x) {
-            int y;
-            for (y = -d; y <= d; ++y) {
-                attrib *a;
-                region *r2;
-                int px = r->x + x, py = r->y + y;
-                pnormalize(&px, &py, rplane(r));
-                r2 = findregion(px, py);
-                if (!r2 || !fval(r2->terrain, SEA_REGION))
-                    continue;
-                if (distance(r, r2) > d)
-                    continue;
-                a = a_find(r2->attribs, &at_lighthouse);
-                while (a && a->type == &at_lighthouse) {
-                    building *b = (building *)a->data.v;
-                    if (b == lh)
-                        break;
-                    a = a->next;
-                }
-                if (!a) {
-                    a = a_add(&r2->attribs, a_new(&at_lighthouse));
-                    a->data.v = (void *)lh;
+                    pnormalize(&px, &py, rplane(r));
+                    r2 = findregion(px, py);
+                    if (!r2 || !fval(r2->terrain, SEA_REGION))
+                        continue;
+                    if (distance(r, r2) > d)
+                        continue;
+                    a = a_find(r2->attribs, &at_lighthouse);
+                    while (a && a->type == &at_lighthouse) {
+                        building *b = (building *)a->data.v;
+                        if (b == lh)
+                            break;
+                        a = a->next;
+                    }
+                    if (!a) {
+                        a = a_add(&r2->attribs, a_new(&at_lighthouse));
+                        a->data.v = (void *)lh;
+                    }
                 }
             }
         }
@@ -72,15 +72,16 @@ int lighthouse_range(const building * b, const faction * f)
         if (skill_enabled(SK_PERCEPTION)) {
             region *r = b->region;
             int c = 0;
-            unit *u;
+            int cap = buildingcapacity(b);
+            unit *u, *uown = building_owner(b);
+
             for (u = r->units; u; u = u->next) {
-                if (u->building == b || u == building_owner(b)) {
-                    if (u->building == b) {
-                        c += u->number;
-                    }
-                    if (c > buildingcapacity(b))
+                if (u->building == b || u == uown) {
+                    c += u->number;
+                    if (c > cap) {
                         break;
-                    if (f == NULL || u->faction == f) {
+                    }
+                    else if (f == NULL || u->faction == f) {
                         int sk = effskill(u, SK_PERCEPTION, 0) / 3;
                         d = _max(d, sk);
                         d = _min(maxd, d);
@@ -111,7 +112,7 @@ bool check_leuchtturm(region * r, faction * f)
         a = a->next) {
         building *b = (building *)a->data.v;
 
-        assert(b->type == bt_find("lighthouse"));
+        assert(is_building_type(b->type, "lighthouse"));
         if (fval(b, BLD_MAINTAINED) && b->size >= 10) {
             int maxd = (int)log10(b->size) + 1;
 
@@ -126,7 +127,7 @@ bool check_leuchtturm(region * r, faction * f)
                         c += u->number;
                         if (c > buildingcapacity(b))
                             break;
-                        if (f == NULL || u->faction == f) {
+                        if (u->faction == f) {
                             if (!d)
                                 d = distance(r, r2);
                             if (maxd < d)

@@ -26,10 +26,45 @@ static void test_transliterate(CuTest * tc)
     CuAssertStrEquals(tc, "h?", buffer);
 }
 
+static void test_transliterations(CuTest *tc) {
+    const char * umlauts = "\xc3\xa4\xc3\xb6\xc3\xbc\xc3\x9f"; /* auml ouml uuml szlig nul */
+    struct tnode * tokens = 0;
+    variant id;
+    int result;
+
+    id.i = 3;
+    addtoken(&tokens, umlauts, id);
+    /* transliteration is the real magic */
+    result = findtoken(tokens, "AEoeUEss", &id);
+    CuAssertIntEquals(tc, E_TOK_SUCCESS, result);
+    CuAssertIntEquals(tc, 3, id.i);
+
+    result = findtoken(tokens, umlauts, &id);
+    CuAssertIntEquals(tc, E_TOK_SUCCESS, result);
+    CuAssertIntEquals(tc, 3, id.i);
+
+    freetokens(tokens);
+}
+
+static void test_directions(CuTest * tc)
+{
+    struct tnode * tokens = 0;
+    variant id;
+    int result;
+
+    id.i = 2;
+    addtoken(&tokens, "nw", id);
+    addtoken(&tokens, "northwest", id);
+    
+    result = findtoken(tokens, "northw", &id);
+    CuAssertIntEquals(tc, E_TOK_SUCCESS, result);
+    CuAssertIntEquals(tc, 2, id.i);
+    freetokens(tokens);
+}
+
 static void test_umlaut(CuTest * tc)
 {
-    const char * umlauts = "\xc3\xa4\xc3\xb6\xc3\xbc\xc3\x9f"; /* auml ouml uuml szlig nul */
-    void * tokens = 0;
+    struct tnode *tokens = 0;
     variant id;
     int result;
 
@@ -41,8 +76,7 @@ static void test_umlaut(CuTest * tc)
     addtoken(&tokens, "herpderp", id);
     id.i = 2;
     addtoken(&tokens, "derp", id);
-    id.i = 3;
-    addtoken(&tokens, umlauts, id);
+    addtoken(&tokens, "d", id);
 
     /* we can find substrings if they are significant */
     result = findtoken(tokens, "herp", &id);
@@ -57,18 +91,20 @@ static void test_umlaut(CuTest * tc)
     CuAssertIntEquals(tc, E_TOK_SUCCESS, findtoken(tokens, "DERP", &id));
     CuAssertIntEquals(tc, 2, id.i);
 
-    result = findtoken(tokens, umlauts, &id);
-    CuAssertIntEquals(tc, E_TOK_SUCCESS, result);
-    CuAssertIntEquals(tc, 3, id.i);
-
-    /* transliteration is the real magic */
-    result = findtoken(tokens, "AEoeUEss", &id);
-    CuAssertIntEquals(tc, E_TOK_SUCCESS, result);
-    CuAssertIntEquals(tc, 3, id.i);
-
     result = findtoken(tokens, "herp-a-derp", &id);
     CuAssertIntEquals(tc, E_TOK_NOMATCH, result);
 
+    freetokens(tokens);
+}
+
+static void test_leak(CuTest *tc) {
+    struct tnode *tokens = NULL;
+    variant token;
+    
+    token.i = 42;
+    addtoken(&tokens, "NO", token);
+    addtoken(&tokens, "nw", token);
+    CuAssertIntEquals(tc, E_TOK_SUCCESS, findtoken(tokens, "n", &token));
     freetokens(tokens);
 }
 
@@ -76,6 +112,9 @@ CuSuite *get_umlaut_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_umlaut);
+    SUITE_ADD_TEST(suite, test_directions);
     SUITE_ADD_TEST(suite, test_transliterate);
+    SUITE_ADD_TEST(suite, test_transliterations);
+    SUITE_ADD_TEST(suite, test_leak);
     return suite;
 }

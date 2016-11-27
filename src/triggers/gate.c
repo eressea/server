@@ -10,14 +10,12 @@
  without prior permission by the authors of Eressea.
  */
 #include <platform.h>
-#include <kernel/config.h>
 #include "gate.h"
 
  /* kernel includes */
 #include <kernel/building.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
-#include <kernel/version.h>
 
 /* util includes */
 #include <util/attrib.h>

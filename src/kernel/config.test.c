@@ -21,7 +21,7 @@ static void test_read_unitid(CuTest *tc) {
     struct locale *lang;
     struct terrain_type *t_plain;
 
-    test_cleanup();
+    test_setup();
     lang = test_create_locale();
     /* note that the english order is FIGHT, not COMBAT, so this is a poor example */
     t_plain = test_create_terrain("plain", LAND_REGION);
@@ -66,7 +66,7 @@ static void test_getunit(CuTest *tc) {
     struct locale *lang;
     struct terrain_type *t_plain;
 
-    test_cleanup();
+    test_setup();
     lang = test_create_locale();
     /* note that the english order is FIGHT, not COMBAT, so this is a poor example */
     t_plain = test_create_terrain("plain", LAND_REGION);
@@ -122,7 +122,7 @@ static void test_getunit(CuTest *tc) {
 static void test_get_set_param(CuTest * tc)
 {
     struct param *par = 0;
-    test_cleanup();
+    test_setup();
     CuAssertStrEquals(tc, 0, get_param(par, "foo"));
     set_param(&par, "foo", "bar");
     set_param(&par, "bar", "foo");
@@ -139,7 +139,7 @@ static void test_get_set_param(CuTest * tc)
 static void test_param_int(CuTest * tc)
 {
     struct param *par = 0;
-    test_cleanup();
+    test_setup();
     CuAssertIntEquals(tc, 13, get_param_int(par, "foo", 13));
     set_param(&par, "foo", "23");
     set_param(&par, "bar", "42");
@@ -152,7 +152,7 @@ static void test_param_int(CuTest * tc)
 static void test_param_flt(CuTest * tc)
 {
     struct param *par = 0;
-    test_cleanup();
+    test_setup();
     CuAssertDblEquals(tc, 13, get_param_flt(par, "foo", 13), 0.01);
     set_param(&par, "foo", "23.0");
     set_param(&par, "bar", "42.0");
@@ -176,22 +176,67 @@ static void test_default_order(CuTest *tc) {
     order *ord;
     struct locale * loc;
 
-    test_cleanup();
+    test_setup();
     loc = test_create_locale();
     ord = default_order(loc);
     CuAssertPtrEquals(tc, 0, ord);
+    free_order(ord);
 
     config_set("orders.default", "work");
     ord = default_order(loc);
     CuAssertPtrNotNull(tc, ord);
     CuAssertIntEquals(tc, K_WORK, getkeyword(ord));
-    CuAssertPtrEquals(tc, ord->data, default_order(loc)->data);
+    free_order(ord);
     test_cleanup();
+}
+
+static void test_config_cache(CuTest *tc) {
+    int key = 0;
+
+    test_setup();
+    CuAssertTrue(tc, config_changed(&key));
+    config_set("hodor", "0");
+    CuAssertTrue(tc, config_changed(&key));
+    CuAssertTrue(tc, !config_changed(&key));
+    free_config();
+    CuAssertTrue(tc, config_changed(&key));
+    test_cleanup();
+}
+
+static void test_rules(CuTest *tc) {
+    CuAssertIntEquals(tc, HARVEST_WORK, rule_blessed_harvest());
+    config_set("rules.blessed_harvest.flags", "15");
+    CuAssertIntEquals(tc, 15, rule_blessed_harvest());
+
+    CuAssertTrue(tc, !rule_region_owners());
+    config_set("rules.region_owners", "1");
+    CuAssertTrue(tc, rule_region_owners());
+
+    CuAssertTrue(tc, rule_stealth_anon());
+    config_set("stealth.faction.anon", "0");
+    CuAssertTrue(tc, !rule_stealth_anon());
+
+    CuAssertTrue(tc, rule_stealth_other());
+    config_set("stealth.faction.other", "0");
+    CuAssertTrue(tc, !rule_stealth_other());
+
+    CuAssertIntEquals(tc, GIVE_DEFAULT, rule_give());
+    config_set("rules.give.flags", "15");
+    CuAssertIntEquals(tc, 15, rule_give());
+
+    CuAssertIntEquals(tc, 0, rule_alliance_limit());
+    config_set("rules.limit.alliance", "1");
+    CuAssertIntEquals(tc, 1, rule_alliance_limit());
+
+    CuAssertIntEquals(tc, 0, rule_faction_limit());
+    config_set("rules.limit.faction", "1000");
+    CuAssertIntEquals(tc, 1000, rule_faction_limit());
 }
 
 CuSuite *get_config_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_config_cache);
     SUITE_ADD_TEST(suite, test_get_set_param);
     SUITE_ADD_TEST(suite, test_param_int);
     SUITE_ADD_TEST(suite, test_param_flt);
@@ -199,5 +244,6 @@ CuSuite *get_config_suite(void)
     SUITE_ADD_TEST(suite, test_getunit);
     SUITE_ADD_TEST(suite, test_read_unitid);
     SUITE_ADD_TEST(suite, test_default_order);
+    SUITE_ADD_TEST(suite, test_rules);
     return suite;
 }

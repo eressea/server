@@ -20,7 +20,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "key.h"
 
-#include <kernel/save.h>
 #include <util/attrib.h>
 #include <util/gamedata.h>
 #include <storage.h>

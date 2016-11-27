@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "matmod.h"
 
 #include <util/attrib.h>
+#include <stddef.h>
 
 attrib_type at_matmod = {
     "matmod",

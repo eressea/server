@@ -1,6 +1,4 @@
 #include <platform.h>
-#include <kernel/config.h>
-#include <kernel/version.h>
 #include "flyingship.h"
 
 #include <kernel/build.h>
@@ -28,8 +26,8 @@
 * Stufe:      6
 *
 * Wirkung:
-* Laeßt ein Schiff eine Runde lang fliegen.  Wirkt nur auf Boote
-* bis Kapazität 50.
+* Laeï¿½t ein Schiff eine Runde lang fliegen.  Wirkt nur auf Boote
+* bis Kapazitï¿½t 50.
 * Kombinierbar mit "Guenstige Winde", aber nicht mit "Sturmwind".
 *
 * Flag:
@@ -82,18 +80,20 @@ int sp_flying_ship(castorder * co)
 
     /* melden, 1x pro Partei */
     for (u = r->units; u; u = u->next)
-        freset(u->faction, FFL_SELECT);
+        u->faction->flags &= ~FFL_SELECT;
     for (u = r->units; u; u = u->next) {
         /* das sehen natuerlich auch die Leute an Land */
-        if (!fval(u->faction, FFL_SELECT)) {
-            fset(u->faction, FFL_SELECT);
-            if (!m)
+        if (!(u->faction->flags & FFL_SELECT)) {
+            u->faction->flags |= FFL_SELECT;
+            if (!m) {
                 m = msg_message("flying_ship_result", "mage ship", mage, sh);
+            }
             add_message(&u->faction->msgs, m);
         }
     }
-    if (m)
+    if (m) {
         msg_release(m);
+    }
     return cast_level;
 }
 
@@ -121,7 +121,7 @@ static int flyingship_age(curse * c)
 {
     ship *sh = (ship *)c->data.v;
     if (sh && c->duration == 1) {
-        freset(sh, SF_FLYING);
+        sh->flags &= ~SF_FLYING;
         return 1;
     }
     return 0;
@@ -148,29 +148,26 @@ bool flying_ship(const ship * sh)
 
 static curse *shipcurse_flyingship(ship * sh, unit * mage, double power, int duration)
 {
-    static const curse_type *ct_flyingship = NULL;
-    if (!ct_flyingship) {
-        ct_flyingship = ct_find("flyingship");
-        assert(ct_flyingship);
-    }
-    if (curse_active(get_curse(sh->attribs, ct_flyingship))) {
-        return NULL;
-    }
-    else if (is_cursed(sh->attribs, C_SHIP_SPEEDUP, 0)) {
-        return NULL;
-    }
-    else {
-        /* mit C_SHIP_NODRIFT haben wir kein Problem */
-        curse *c =
-            create_curse(mage, &sh->attribs, ct_flyingship, power, duration, 0.0, 0);
-        if (c) {
-            c->data.v = sh;
-            if (c->duration > 0) {
-                sh->flags |= SF_FLYING;
-            }
+    curse *c;
+    const curse_type *ct_flyingship = ct_find("flyingship");
+    assert(ct_flyingship);
+    if (sh->attribs) {
+        if (curse_active(get_curse(sh->attribs, ct_flyingship))) {
+            return NULL;
         }
-        return c;
+        if (is_cursed(sh->attribs, C_SHIP_SPEEDUP, 0)) {
+            return NULL;
+        }
     }
+    /* mit C_SHIP_NODRIFT haben wir kein Problem */
+    c = create_curse(mage, &sh->attribs, ct_flyingship, power, duration, 0.0, 0);
+    if (c) {
+        c->data.v = sh;
+        if (c->duration > 0) {
+            sh->flags |= SF_FLYING;
+        }
+    }
+    return c;
 }
 
 int levitate_ship(ship * sh, unit * mage, double power, int duration)

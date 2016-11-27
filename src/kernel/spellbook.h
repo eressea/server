@@ -24,6 +24,8 @@ extern "C" {
 #endif
 
     struct spell;
+    struct storage;
+    struct gamedata;
     struct quicklist;
 
     typedef struct spellbook_entry {
@@ -38,6 +40,9 @@ extern "C" {
     } spellbook;
 
     spellbook * create_spellbook(const char * name);
+
+    void read_spellbook(struct spellbook **bookp, struct gamedata *data, int(*get_level)(const struct spell * sp, void *), void * cbdata);
+    void write_spellbook(const struct spellbook *book, struct storage *store);
 
     void spellbook_add(spellbook *sbp, struct spell * sp, int level);
     int spellbook_foreach(spellbook *sb, int(*callback)(spellbook_entry *, void *), void * data);

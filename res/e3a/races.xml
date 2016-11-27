@@ -619,7 +619,7 @@
   <race name="braineater" magres="0.900000" maxaura="1.0" regaura="1.0" weight="100" capacity="540" speed="1.0" hp="20" damage="0d0" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" invinciblenonmagic="yes">
     <ai splitsize="500" killpeasants="yes" moverandom="yes" learn="yes"/>
     <function name="name" value="namegeneric"/>
-    <function name="describe" value="describe_braineater"/>
+    <function name="describe" value="describe_race"/>
     <attack type="2" damage="3d15"/>
     <attack type="3" damage="1d1"/>
     <attack type="4" damage="1d1"/>
@@ -890,7 +890,7 @@
   </race>
 
   <!-- for the shadowcall spell -->
-  <race name="shadowbat" magres="0.800000" maxaura="0.000000" regaura="0.000000" recruitcost="500" weight="500" capacity="540" speed="1.0" hp="1" ac="4" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="3" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes">
+  <race name="shadowbat" magres="0.800000" maxaura="0.000000" regaura="0.000000" weight="500" capacity="540" speed="1.0" hp="1" ac="4" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="3" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes">
     <ai splitsize="5000" killpeasants="yes"/>
     <function name="name" value="namegeneric"/>
     <attack type="4" damage="1d6"/>
@@ -898,7 +898,7 @@
   </race>
 
   <!-- for the shadowcall spell -->
-  <race name="nightmare" magres="0.500000" maxaura="0.000000" regaura="0.000000" recruitcost="500" weight="100" capacity="540" speed="1.0" hp="80" ac="10" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="3" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" invinciblenonmagic="yes">
+  <race name="nightmare" magres="0.500000" maxaura="0.000000" regaura="0.000000" weight="100" capacity="540" speed="1.0" hp="80" ac="10" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="3" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" invinciblenonmagic="yes">
     <ai splitsize="500" killpeasants="yes"/>
     <function name="name" value="namegeneric"/>
     <attack type="4" damage="1d4"/>
@@ -909,7 +909,7 @@
   </race>
 
   <!-- for the shadowcall spell -->
-  <race name="vampunicorn" magres="1.0" maxaura="0.000000" regaura="0.000000" recruitcost="500" weight="5000" capacity="2000" speed="1.0" hp="30" ac="4" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="3" scarepeasants="yes" walk="yes" teach="no" getitem="yes">
+  <race name="vampunicorn" magres="1.0" maxaura="0.000000" regaura="0.000000" weight="5000" capacity="2000" speed="1.0" hp="30" ac="4" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="3" scarepeasants="yes" walk="yes" teach="no" getitem="yes">
     <ai splitsize="5000" killpeasants="yes"/>
     <function name="name" value="namegeneric"/>
     <attack type="4" damage="2d10"/>

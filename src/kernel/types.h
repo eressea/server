@@ -19,14 +19,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifndef ERESSEA_TYPES_H
 #define ERESSEA_TYPES_H
 
-/*
- * Features enabled:
- * If you are lacking the settings.h, create a new file common/settings.h,
- * and write #include <settings-config.h> (or whatever settings you want
- * your game to use) in there.
- * !!! DO NOT COMMIT THE SETTINGS.H FILE TO CVS !!!
- * settings.h should always be the first thing you include (after platform.h).
- */
 #include <settings.h>
 #include <util/variant.h>
 
@@ -72,6 +64,17 @@ typedef struct ursprung {
   int id;
   int x, y;
 } ursprung;
+
+/* seen_mode: visibility in the report */
+typedef enum {
+    seen_none,
+    seen_neighbour,
+    seen_lighthouse,
+    seen_travel,
+    seen_far,
+    seen_unit,
+    seen_battle
+} seen_mode;
 
 /* ------------------ Status von Einheiten --------------------- */
 
@@ -133,7 +136,7 @@ typedef enum {
   P_TREES,
   P_ALLIANCE,
   MAXPARAMS,
-  NOPARAM = -1
+  NOPARAM 
 } param_t;
 
 typedef enum {                  /* Fehler und Meldungen im Report */

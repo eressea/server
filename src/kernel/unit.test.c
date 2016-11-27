@@ -8,9 +8,10 @@
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/spell.h>
+#include <util/attrib.h>
 #include <util/base36.h>
 #include <util/language.h>
-#include <util/attrib.h>
+#include <util/rng.h>
 #include <spells/regioncurse.h>
 #include <alchemy.h>
 #include <laws.h>
@@ -50,14 +51,16 @@ static void test_remove_empty_units_in_region(CuTest *tc) {
     test_create_world();
 
     u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
+    u = test_create_unit(u->faction, u->region);
+    CuAssertPtrNotNull(tc, u->nextF);
     uid = u->no;
     remove_empty_units_in_region(u->region);
     CuAssertPtrNotNull(tc, findunit(uid));
     u->number = 0;
     remove_empty_units_in_region(u->region);
     CuAssertPtrEquals(tc, 0, findunit(uid));
+    CuAssertPtrEquals(tc, 0, u->nextF);
     CuAssertPtrEquals(tc, 0, u->region);
-    CuAssertPtrEquals(tc, 0, u->faction);
     test_cleanup();
 }
 
@@ -100,7 +103,7 @@ static void test_remove_units_ignores_spells(CuTest *tc) {
     test_cleanup();
     test_create_world();
 
-    u = create_unit(findregion(0, 0), test_create_faction(test_create_race("human")), 1, get_race(RC_SPELL), 0, 0, 0);
+    u = create_unit(findregion(0, 0), test_create_faction(test_create_race("human")), 1, test_create_race("spell"), 0, 0, 0);
     uid = u->no;
     u->number = 0;
     u->age = 1;
@@ -387,13 +390,93 @@ static void test_limited_skills(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_unit_description(CuTest *tc) {
+    race *rc;
+    unit *u;
+    test_setup();
+    rc = test_create_race("hodor");
+    u = test_create_unit(test_create_faction(rc), test_create_region(0,0,0));
+    CuAssertPtrEquals(tc, 0, u->display);
+    CuAssertStrEquals(tc, 0, u_description(u, u->faction->locale));
+    u->display = _strdup("Hodor");
+    CuAssertStrEquals(tc, "Hodor", u_description(u, NULL));
+    CuAssertStrEquals(tc, "Hodor", u_description(u, u->faction->locale));
+    test_cleanup();
+}
+
+static void test_remove_unit(CuTest *tc) {
+    region *r;
+    unit *u1, *u2;
+    faction *f;
+    int uno;
+    const resource_type *rtype;
+
+    test_setup();
+    init_resources();
+    rtype = get_resourcetype(R_SILVER);
+    r = test_create_region(0, 0, 0);
+    f = test_create_faction(0);
+    u2 = test_create_unit(f, r);
+    u1 = test_create_unit(f, r);
+    CuAssertPtrEquals(tc, u1, f->units);
+    CuAssertPtrEquals(tc, u2, u1->nextF);
+    CuAssertPtrEquals(tc, u1, u2->prevF);
+    CuAssertPtrEquals(tc, 0, u2->nextF);
+    uno = u1->no;
+    region_setresource(r, rtype, 0);
+    i_change(&u1->items, rtype->itype, 100);
+    remove_unit(&r->units, u1);
+    CuAssertIntEquals(tc, 0, u1->number);
+    CuAssertPtrEquals(tc, 0, u1->region);
+    // money is given to a survivor:
+    CuAssertPtrEquals(tc, 0, u1->items);
+    CuAssertIntEquals(tc, 0, region_getresource(r, rtype));
+    CuAssertIntEquals(tc, 100, i_get(u2->items, rtype->itype));
+
+    // unit is removed from f->units:
+    CuAssertPtrEquals(tc, 0, u1->nextF);
+    CuAssertPtrEquals(tc, u2, f->units);
+    CuAssertPtrEquals(tc, 0, u2->nextF);
+    CuAssertPtrEquals(tc, 0, u2->prevF);
+    // unit is no longer in r->units:
+    CuAssertPtrEquals(tc, u2, r->units);
+    CuAssertPtrEquals(tc, 0, u2->next);
+
+    // unit is in deleted_units:
+    CuAssertPtrEquals(tc, 0, findunit(uno));
+    CuAssertPtrEquals(tc, f, dfindhash(uno));
+
+    remove_unit(&r->units, u2);
+    // no survivor, give money to peasants:
+    CuAssertIntEquals(tc, 100, region_getresource(r, rtype));
+    // there are now no more units:
+    CuAssertPtrEquals(tc, 0, r->units);
+    CuAssertPtrEquals(tc, 0, f->units);
+    test_cleanup();
+}
+
+static void test_renumber_unit(CuTest *tc) {
+    unit *u1, *u2;
+    test_setup();
+    u1 = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u2 = test_create_unit(u1->faction, u1->region);
+    rng_init(0);
+    renumber_unit(u1, 0);
+    rng_init(0);
+    renumber_unit(u2, 0);
+    CuAssertTrue(tc, u1->no != u2->no);
+    test_cleanup();
+}
+
 CuSuite *get_unit_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_scale_number);
+    SUITE_ADD_TEST(suite, test_unit_description);
     SUITE_ADD_TEST(suite, test_unit_name);
     SUITE_ADD_TEST(suite, test_unit_name_from_race);
     SUITE_ADD_TEST(suite, test_update_monster_name);
+    SUITE_ADD_TEST(suite, test_remove_unit);
     SUITE_ADD_TEST(suite, test_remove_empty_units);
     SUITE_ADD_TEST(suite, test_remove_units_ignores_spells);
     SUITE_ADD_TEST(suite, test_remove_units_without_faction);
@@ -407,5 +490,6 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_age_familiar);
     SUITE_ADD_TEST(suite, test_inside_building);
     SUITE_ADD_TEST(suite, test_limited_skills);
+    SUITE_ADD_TEST(suite, test_renumber_unit);
     return suite;
 }

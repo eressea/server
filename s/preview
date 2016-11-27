@@ -22,6 +22,7 @@ exit $2 # otherwise
 function build() {
 assert_dir $SOURCE
 cd $SOURCE
+rm -rf crypto tolua
 git fetch || abort "failed to update source. do you have local changes?"
 [ -z $1 ] || git checkout $1
 git pull
@@ -42,13 +43,6 @@ done
 
 function assert_dir() {
 [ -d $1 ] || abort "missing directory: $1"
-}
-
-function version() {
-assert_dir $SOURCE
-cd $SOURCE
-build=$(grep BUILD src/buildno.h | awk '{ print $3 }')
-echo "eressea build $build"
 }
 
 function setup() {
@@ -137,9 +131,6 @@ shift $((OPTIND-1))
 
 while [ ! -z $1 ]; do
 case "$1" in
-"version")
-  version
-  ;;
 "build")
   shift
   build $*

@@ -2,7 +2,6 @@
 #include "vortex.h"
 
 #include <kernel/config.h>
-#include <kernel/version.h>
 #include <kernel/region.h>
 
 #include <util/attrib.h>
@@ -15,8 +14,9 @@
 #include <storage.h>
 
 #include <assert.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
+
 
 typedef struct dir_lookup {
     char *name;
@@ -33,10 +33,10 @@ void register_special_direction(struct locale *lang, const char *name)
     if (token) {
         void **tokens = get_translations(lang, UT_SPECDIR);
         variant var;
-        char *str = _strdup(name);
+        char *str = strdup(name);
 
         var.v = str;
-        addtoken(tokens, token, var);
+        addtoken((struct tnode **)tokens, token, var);
 
         if (lang == locales) {
             dir_lookup *dl = malloc(sizeof(dir_lookup));

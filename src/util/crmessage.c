@@ -32,6 +32,15 @@ typedef struct tsf_list {
 
 static tsf_list *tostringfs;
 
+void crmessage_done(void) {
+    tsf_list **tsp = &tostringfs;
+    while (*tsp) {
+        tsf_list *ts = *tsp;
+        *tsp = ts->next;
+        free(ts);
+    }
+}
+
 static tostring_f tsf_find(const char *name)
 {
     if (name != NULL) {

@@ -17,11 +17,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
 #include <platform.h>
-#include <kernel/config.h>
 #include "createcurse.h"
 
 /* kernel includes */
-#include <kernel/version.h>
 #include <kernel/curse.h>
 #include <kernel/unit.h>
 

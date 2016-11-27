@@ -32,7 +32,7 @@ typedef struct {
 } spy_fixture;
 
 static void setup_spy(spy_fixture *fix) {
-    test_cleanup();
+    test_setup();
     fix->r = test_create_region(0, 0, NULL);
     fix->spy = test_create_unit(test_create_faction(NULL), fix->r);
     fix->victim = test_create_unit(test_create_faction(NULL), fix->r);
@@ -88,7 +88,7 @@ static void test_all_spy_message(CuTest *tc) {
 static void setup_sabotage(void) {
     struct locale *lang;
 
-    test_cleanup();
+    test_setup();
     lang = get_or_create_locale("de");
     locale_setstring(lang, parameters[P_SHIP], "SCHIFF");
     locale_setstring(lang, parameters[P_ANY], "ALLE");

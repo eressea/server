@@ -14,6 +14,7 @@
 
 /* util includes */
 #include "log.h"
+#include "assert.h"
 
 #ifdef USE_LIBXML2
 #include <libxml/catalog.h>
@@ -21,7 +22,6 @@
 #endif
 
 /* libc includes */
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -89,10 +89,20 @@ typedef struct xml_reader {
 
 static xml_reader *xmlReaders;
 
+void xml_done(void) {
+    xml_reader ** xrp = &xmlReaders;
+    while (*xrp) {
+        xml_reader *xr = *xrp;
+        *xrp = xr->next;
+        free(xr);
+    }
+}
+
 void xml_register_callback(xml_callback callback)
 {
     xml_reader *reader = (xml_reader *)malloc(sizeof(xml_reader));
     xml_reader **insert = &xmlReaders;
+    assert_alloc(reader);
     reader->callback = callback;
     reader->next = NULL;
 

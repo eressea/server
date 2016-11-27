@@ -8,7 +8,6 @@ without prior permission by the authors of Eressea.
 */
 
 #include <platform.h>
-#include <kernel/config.h>
 #include "unitmessage.h"
 
 /* kernel includes */

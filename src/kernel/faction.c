@@ -29,11 +29,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "plane.h"
 #include "race.h"
 #include "region.h"
-#include "save.h"
 #include "spellbook.h"
 #include "terrain.h"
 #include "unit.h"
-#include "version.h"
 
 /* util includes */
 #include <util/attrib.h>
@@ -50,7 +48,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/resolve.h>
 #include <util/rng.h>
 #include <util/variant.h>
-#include <util/unicode.h>
 
 #include <attributes/otherfaction.h>
 
@@ -262,6 +259,7 @@ faction *addfaction(const char *email, const char *password,
     f->magiegebiet = 0;
     f->locale = loc;
     f->subscription = subscription;
+    f->flags = FFL_ISNEW;
 
     f->options =
         want(O_REPORT) | want(O_ZUGVORLAGE) | want(O_COMPUTER) | want(O_COMPRESS) |
@@ -275,11 +273,11 @@ faction *addfaction(const char *email, const char *password,
     addlist(&factions, f);
     fhash(f);
 
-    slprintf(buf, sizeof(buf), "%s %s", LOC(loc, "factiondefault"), factionid(f));
+    slprintf(buf, sizeof(buf), "%s %s", LOC(loc, "factiondefault"), itoa36(f->no));
     f->name = _strdup(buf);
 
     if (!f->race) {
-        log_warning("creating a faction that has no race", factionid(f));
+        log_warning("creating a faction that has no race", itoa36(f->no));
     }
 
     return f;
@@ -301,7 +299,7 @@ unit *addplayer(region * r, faction * f)
     fset(u, UFL_ISNEW);
     if (f->race == get_race(RC_DAEMON)) {
         race_t urc;
-        race *rc;
+        const race *rc;
         do {
             urc = (race_t)(rng_int() % MAXRACES);
             rc = get_race(urc);
@@ -336,8 +334,6 @@ void write_faction_reference(const faction * f, struct storage *store)
     WRITE_INT(store, f ? f->no : 0);
 }
 
-static faction *dead_factions;
-
 void free_flist(faction **fp) {
     faction * flist = *fp;
     while (flist) {
@@ -349,10 +345,7 @@ void free_flist(faction **fp) {
     *fp = 0;
 }
 
-void free_factions(void) {
-    free_flist(&factions);
-    free_flist(&dead_factions);
-}
+static faction *dead_factions;
 
 void destroyfaction(faction ** fp)
 {
@@ -392,19 +385,14 @@ void destroyfaction(faction ** fp)
                 const race *rc = u_race(u);
                 int m = rmoney(r);
 
+                /* Personen gehen nur an die Bauern, wenn sie auch von dort
+                 * stammen */
                 if ((rc->ec_flags & ECF_REC_ETHEREAL) == 0) {
                     int p = rpeasants(u->region);
                     int h = rhorses(u->region);
                     item *itm;
 
-                    /* Personen gehen nur an die Bauern, wenn sie auch von dort
-                     * stammen */
-                    if (rc->ec_flags & ECF_REC_HORSES) {  /* Zentauren an die Pferde */
-                        h += u->number;
-                    }
-                    else {              /* Orks zählen nur zur Hälfte */
-                        p += (int)(u->number * rc->recruit_multi);
-                    }
+                    p += (int)(u->number * rc->recruit_multi);
                     for (itm = u->items; itm; itm = itm->next) {
                         if (itm->type->flags & ITF_ANIMAL) {
                             h += itm->number;
@@ -514,7 +502,6 @@ void renumber_faction(faction * f, int no)
     fset(f, FFL_NEWID);
 }
 
-#ifdef SMART_INTERVALS
 void update_interval(struct faction *f, struct region *r)
 {
     if (r == NULL || f == NULL)
@@ -526,7 +513,6 @@ void update_interval(struct faction *f, struct region *r)
         f->last = r;
     }
 }
-#endif
 
 const char *faction_getname(const faction * self)
 {
@@ -803,49 +789,27 @@ attrib_type at_maxmagicians = {
 
 int max_magicians(const faction * f)
 {
-    int m = config_get_int("rules.maxskills.magic", MAXMAGICIANS);
-    attrib *a;
+    static int rule, config, rc_cache;
+    static const race *rc_elf;
+    int m;
 
-    if ((a = a_find(f->attribs, &at_maxmagicians)) != NULL) {
-        m = a->data.i;
+    if (config_changed(&config)) {
+        rule = config_get_int("rules.maxskills.magic", MAXMAGICIANS);
     }
-    if (f->race == get_race(RC_ELF))
-        ++m;
-    return m;
-}
-
-#define DMAXHASH 7919
-typedef struct dead {
-    struct dead *nexthash;
-    faction *f;
-    int no;
-} dead;
-
-static dead *deadhash[DMAXHASH];
-
-void dhash(int no, faction * f)
-{
-    dead *hash = (dead *)calloc(1, sizeof(dead));
-    dead *old = deadhash[no % DMAXHASH];
-    hash->no = no;
-    hash->f = f;
-    deadhash[no % DMAXHASH] = hash;
-    hash->nexthash = old;
-}
-
-faction *dfindhash(int no)
-{
-    dead *old;
-
-    if (no < 0)
-        return 0;
-
-    for (old = deadhash[no % DMAXHASH]; old; old = old->nexthash) {
-        if (old->no == no) {
-            return old->f;
+    m = rule;
+    if (f->attribs) {
+        attrib *a = a_find(f->attribs, &at_maxmagicians);
+        if (a) {
+            m = a->data.i;
         }
     }
-    return 0;
+    if (rc_changed(&rc_cache)) {
+        rc_elf = get_race(RC_ELF);
+    }
+    if (f->race == rc_elf) {
+        ++m;
+    }
+    return m;
 }
 
 int writepasswd(void)
@@ -863,12 +827,27 @@ int writepasswd(void)
         log_info("writing passwords...");
 
         for (f = factions; f; f = f->next) {
-            fprintf(F, "%s:%s:%s:%u\n",
-                factionid(f), f->email, f->_password, f->subscription);
+            fprintf(F, "%s:%s:%s:%d\n",
+                itoa36(f->no), f->email, f->_password, f->subscription);
         }
         fclose(F);
         return 0;
     }
     return 1;
+}
+
+void free_factions(void) {
+#ifdef DMAXHASH
+    int i;
+    for (i = 0; i != DMAXHASH; ++i) {
+        while (deadhash[i]) {
+            dead *d = deadhash[i];
+            deadhash[i] = d->nexthash;
+            free(d);
+        }
+    }
+#endif
+    free_flist(&factions);
+    free_flist(&dead_factions);
 }
 

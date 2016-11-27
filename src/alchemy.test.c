@@ -25,12 +25,12 @@ static void test_herbsearch(CuTest * tc)
     region *r;
     const item_type *itype;
 
-    test_cleanup();
+    test_setup();
     r = test_create_region(0, 0, 0);
     rc = rc_get_or_create("dragon");
     rc->flags |= RCF_UNARMEDGUARD;
     u2 = test_create_unit(test_create_faction(rc), r);
-    guard(u2, GUARD_PRODUCE);
+    setguard(u2, true);
 
     f = test_create_faction(0);
     u = test_create_unit(f, r);
@@ -41,14 +41,14 @@ static void test_herbsearch(CuTest * tc)
     test_clear_messages(f);
 
     set_level(u, SK_HERBALISM, 1);
-    CuAssertPtrEquals(tc, u2, is_guarded(r, u, GUARD_PRODUCE));
+    CuAssertPtrEquals(tc, u2, is_guarded(r, u));
     herbsearch(u, INT_MAX);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error70"));
     CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error59"));
     test_clear_messages(f);
 
-    guard(u2, GUARD_NONE);
-    CuAssertPtrEquals(tc, 0, is_guarded(r, u, GUARD_PRODUCE));
+    setguard(u2, false);
+    CuAssertPtrEquals(tc, 0, is_guarded(r, u));
     CuAssertPtrEquals(tc, 0, (void *)rherbtype(r));
     herbsearch(u, INT_MAX);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error108"));
