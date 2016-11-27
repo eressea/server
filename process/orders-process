@@ -65,7 +65,7 @@ messages = {
 
 # base directory for all your games:
 rootdir = "/home/eressea/eressea"
-frommail = "Eressea Server <eressea-server@eressea.de>"
+frommail = "Eressea Server <eressea-server@eressea.kn-bremen.de>"
 orderbase = "orders.dir"
 sendmail = True
 maxlines = 25

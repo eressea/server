@@ -54,14 +54,14 @@
   <xi:include href="config://default/names-dragons.xml"/>
   <strings>
     <string name="mailto">
-      <text locale="de">eressea-server@eressea.de</text>
-      <text locale="en">eressea-server@eressea.de</text>
+      <text locale="de">eressea-server@eressea.kn-bremen.de</text>
+      <text locale="en">eressea-server@eressea.kn-bremen.de</text>
     </string>
     <string name="newbie_info_game">
       <text locale="de">Bitte denke daran, deine Befehle mit dem Betreff
-      ERESSEA 2 BEFEHLE an eressea-server@eressea.de zu senden.</text>
+      ERESSEA 2 BEFEHLE an eressea-server@eressea.kn-bremen.de zu senden.</text>
       <text locale="en">Remember to send your orders to
-      eressea-server@eressea.de with the subject ERESSEA 2 ORDERS.</text>
+      eressea-server@eressea.kn-bremen.de with the subject ERESSEA 2 ORDERS.</text>
     </string>
     <string name="mailcmd">
       <text locale="de">ERESSEA 2 BEFEHLE</text>
