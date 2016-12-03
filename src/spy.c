@@ -295,11 +295,11 @@ int setstealth_cmd(unit * u, struct order *ord)
         s = gettoken(token, sizeof(token));
         if (rule_stealth_anon()) {
             if (!s || *s == 0) {
-                fset(u, UFL_ANON_FACTION);
+                u->flags |= UFL_ANON_FACTION;
                 break;
             }
             else if (findparam(s, u->faction->locale) == P_NOT) {
-                u->flags |= ~UFL_ANON_FACTION;
+                u->flags &= ~UFL_ANON_FACTION;
                 break;
             }
         }
@@ -416,7 +416,7 @@ static void sink_ship(region * r, ship * sh, unit * saboteur)
         /* slight optimization to avoid dereferencing u->faction each time */
         if (f != u->faction) {
             f = u->faction;
-            f->flags |= ~FFL_SELECT;
+            f->flags &= ~FFL_SELECT;
         }
     }
 
