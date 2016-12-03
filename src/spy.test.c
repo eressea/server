@@ -146,6 +146,26 @@ static void test_sabotage_other_fail(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_setstealth_cmd(CuTest *tc) {
+    unit *u;
+    const struct locale *lang;
+    
+    test_setup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0,0,0));
+    lang = u->faction->locale;
+    u->flags = UFL_ANON_FACTION|UFL_SIEGE;
+    u->thisorder = create_order(K_SETSTEALTH, lang, "%s %s",
+            LOC(lang, parameters[P_FACTION]),
+            LOC(lang, parameters[P_NOT]));
+    setstealth_cmd(u, u->thisorder);
+    CuAssertIntEquals(tc, UFL_SIEGE, u->flags);
+    free_order(u->thisorder);
+    u->thisorder = create_order(K_SETSTEALTH, lang, "%s",
+            LOC(lang, parameters[P_FACTION]));
+    setstealth_cmd(u, u->thisorder);
+    CuAssertIntEquals(tc, UFL_SIEGE|UFL_ANON_FACTION, u->flags);
+    test_cleanup();
+}
 
 static void test_sabotage_other_success(CuTest *tc) {
     unit *u, *u2;
@@ -178,6 +198,7 @@ CuSuite *get_spy_suite(void)
     SUITE_ADD_TEST(suite, test_simple_spy_message);
     SUITE_ADD_TEST(suite, test_all_spy_message);
     SUITE_ADD_TEST(suite, test_sabotage_self);
+    SUITE_ADD_TEST(suite, test_setstealth_cmd);
     SUITE_ADD_TEST(suite, test_sabotage_other_fail);
     SUITE_ADD_TEST(suite, test_sabotage_other_success);
     return suite;
