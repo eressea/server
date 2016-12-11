@@ -18,9 +18,11 @@
 #include <util/base36.h>
 #include <tests.h>
 
+#include <CuTest.h>
+#include <quicklist.h>
+
 #include <assert.h>
 
-#include <CuTest.h>
 
 #define MAXLOG 4
 typedef struct log_entry {
@@ -537,9 +539,9 @@ static void test_teach_message(CuTest *tc) {
     teach = (teaching_info *)a->data.v;
     CuAssertPtrNotNull(tc, teach->teachers);
     CuAssertIntEquals(tc, 600, teach->value);
-    CuAssertPtrEquals(tc, u1, teach->teachers[0]);
-    CuAssertPtrEquals(tc, u2, teach->teachers[1]);
-    CuAssertPtrEquals(tc, NULL, teach->teachers[2]);
+    CuAssertIntEquals(tc, 2, ql_length(teach->teachers));
+    CuAssertPtrEquals(tc, u1, ql_get(teach->teachers, 0));
+    CuAssertPtrEquals(tc, u2, ql_get(teach->teachers, 1));
     study_cmd(u, u->thisorder);
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(u1->faction->msgs, "teach_teacher"));
     CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "teach_teacher"));
