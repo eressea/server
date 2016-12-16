@@ -128,7 +128,7 @@ bool is_guard(const struct unit * u)
 unit *is_guarded(region * r, unit * u)
 {
     unit *u2;
-    int noguards = 1;
+    bool noguards = true;
 
     if (!fval(r, RF_GUARDED)) {
         return NULL;
@@ -140,7 +140,7 @@ unit *is_guarded(region * r, unit * u)
 
     for (u2 = r->units; u2; u2 = u2->next) {
         if (is_guardian_r(u2)) {
-            noguards = 0;
+            noguards = false;
             if (is_guardian_u(u2, u)) {
                 /* u2 is our guard. stop processing (we might have to go further next time) */
                 return u2;

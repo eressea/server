@@ -2,6 +2,7 @@
 
 #include "study.h"
 
+#include <kernel/ally.h>
 #include <kernel/config.h>
 #include <kernel/building.h>
 #include <kernel/faction.h>
@@ -10,15 +11,18 @@
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
+#include <util/attrib.h>
 #include <util/rand.h>
 #include <util/message.h>
 #include <util/language.h>
 #include <util/base36.h>
 #include <tests.h>
 
+#include <CuTest.h>
+#include <quicklist.h>
+
 #include <assert.h>
 
-#include <CuTest.h>
 
 #define MAXLOG 4
 typedef struct log_entry {
@@ -483,6 +487,7 @@ static void test_teach_one_to_many(CuTest *tc) {
 
 static void test_teach_many_to_one(CuTest *tc) {
     unit *u, *u1, *u2;
+
     test_setup();
     init_resources();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
@@ -502,6 +507,47 @@ static void test_teach_many_to_one(CuTest *tc) {
     CuAssertPtrEquals(tc, u, log_learners[0].u);
     CuAssertIntEquals(tc, SK_CROSSBOW, log_learners[0].sk);
     CuAssertIntEquals(tc, 2 * STUDYDAYS * u->number, log_learners[0].days);
+    test_cleanup();
+}
+
+static void test_teach_message(CuTest *tc) {
+    unit *u, *u1, *u2;
+    attrib *a;
+    ally *al;
+    teaching_info *teach;
+
+    test_setup();
+    init_resources();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    scale_number(u, 20);
+    u->thisorder = create_order(K_STUDY, u->faction->locale, "CROSSBOW");
+    u1 = test_create_unit(test_create_faction(0), u->region);
+    set_level(u1, SK_CROSSBOW, TEACHDIFFERENCE);
+    u1->thisorder = create_order(K_TEACH, u->faction->locale, itoa36(u->no));
+    u2 = test_create_unit(test_create_faction(0), u->region);
+    al = ally_add(&u->faction->allies, u2->faction);
+    al->status = HELP_GUARD;
+    set_level(u2, SK_CROSSBOW, TEACHDIFFERENCE);
+    u2->thisorder = create_order(K_TEACH, u->faction->locale, itoa36(u->no));
+    CuAssertTrue(tc, !alliedunit(u, u1->faction, HELP_GUARD));
+    CuAssertTrue(tc, alliedunit(u, u2->faction, HELP_GUARD));
+    teach_cmd(u1, u1->thisorder);
+    teach_cmd(u2, u2->thisorder);
+    a = a_find(u->attribs, &at_learning);
+    CuAssertPtrNotNull(tc, a);
+    CuAssertPtrNotNull(tc, a->data.v);
+    teach = (teaching_info *)a->data.v;
+    CuAssertPtrNotNull(tc, teach->teachers);
+    CuAssertIntEquals(tc, 600, teach->value);
+    CuAssertIntEquals(tc, 2, ql_length(teach->teachers));
+    CuAssertPtrEquals(tc, u1, ql_get(teach->teachers, 0));
+    CuAssertPtrEquals(tc, u2, ql_get(teach->teachers, 1));
+    study_cmd(u, u->thisorder);
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(u1->faction->msgs, "teach_teacher"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "teach_teacher"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "teach_student"));
+    a = a_find(u->attribs, &at_learning);
+    CuAssertPtrEquals(tc, NULL, a);
     test_cleanup();
 }
 
@@ -554,6 +600,7 @@ CuSuite *get_study_suite(void)
     SUITE_ADD_TEST(suite, test_teach_one_to_many);
     SUITE_ADD_TEST(suite, test_teach_many_to_one);
     SUITE_ADD_TEST(suite, test_teach_many_to_many);
+    SUITE_ADD_TEST(suite, test_teach_message);
     SUITE_ADD_TEST(suite, test_teach_two_skills);
     SUITE_ADD_TEST(suite, test_learn_skill_single);
     SUITE_ADD_TEST(suite, test_learn_skill_multi);
