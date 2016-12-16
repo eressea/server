@@ -3,6 +3,7 @@
 #include "move.h"
 
 #include "keyword.h"
+#include "lighthouse.h"
 
 #include <kernel/config.h>
 #include <kernel/ally.h>
@@ -478,7 +479,7 @@ static void test_drifting_ships(CuTest *tc) {
     region *r1, *r2, *r3;
     terrain_type *t_ocean, *t_plain;
     ship_type *st_boat;
-    test_cleanup();
+    test_setup();
     t_ocean = test_create_terrain("ocean", SEA_REGION);
     t_plain = test_create_terrain("plain", LAND_REGION);
     r1 = test_create_region(0, 0, t_ocean);
@@ -491,11 +492,41 @@ static void test_drifting_ships(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_ship_leave_trail(CuTest *tc) {
+    ship *s1, *s2;
+    region *r1, *r2;
+    terrain_type *t_ocean;
+    ship_type *st_boat;
+    region_list *route = NULL;
+
+    test_setup();
+    t_ocean = test_create_terrain("ocean", SEA_REGION);
+    r1 = test_create_region(0, 0, t_ocean);
+    add_regionlist(&route, test_create_region(2, 0, t_ocean));
+    add_regionlist(&route, r2 = test_create_region(1, 0, t_ocean));
+    st_boat = test_create_shiptype("boat");
+    s1 = test_create_ship(r1, st_boat);
+    s2 = test_create_ship(r1, st_boat);
+    leave_trail(s1, r1, route);
+    a_add(&r1->attribs, a_new(&at_lighthouse));
+    leave_trail(s2, r1, route);
+    a_add(&r2->attribs, a_new(&at_lighthouse));
+    CuAssertPtrEquals(tc, &at_shiptrail, (void *)r1->attribs->type);
+    CuAssertPtrEquals(tc, &at_shiptrail, (void *)r1->attribs->next->type);
+    CuAssertPtrEquals(tc, &at_lighthouse, (void *)r1->attribs->next->next->type);
+    CuAssertPtrEquals(tc, &at_shiptrail, (void *)r2->attribs->type);
+    CuAssertPtrEquals(tc, &at_shiptrail, (void *)r2->attribs->next->type);
+    CuAssertPtrEquals(tc, &at_lighthouse, (void *)r2->attribs->next->next->type);
+    free_regionlist(route);
+    test_cleanup();
+}
+
 CuSuite *get_move_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_walkingcapacity);
     SUITE_ADD_TEST(suite, test_ship_not_allowed_in_coast);
+    SUITE_ADD_TEST(suite, test_ship_leave_trail);
     SUITE_ADD_TEST(suite, test_ship_allowed_without_harbormaster);
     SUITE_ADD_TEST(suite, test_ship_blocked_by_harbormaster);
     SUITE_ADD_TEST(suite, test_ship_has_harbormaster_contact);
