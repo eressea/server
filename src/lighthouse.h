@@ -29,7 +29,7 @@ extern "C" {
     struct building;
     struct attrib;
 
-    extern const struct attrib_type at_lighthouse;
+    extern struct attrib_type at_lighthouse;
     /* leuchtturm */
     bool check_leuchtturm(struct region *r, struct faction *f);
     void update_lighthouse(struct building *lh);
