@@ -571,7 +571,7 @@ direction_t reldirection(const region * from, const region * to)
     return NODIRECTION;
 }
 
-static void leave_trail(ship * sh, region * from, region_list * route)
+void leave_trail(ship * sh, region * from, region_list * route)
 {
     region *r = from;
 
