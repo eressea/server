@@ -3,6 +3,7 @@
 #include "move.h"
 
 #include "keyword.h"
+#include "lighthouse.h"
 
 #include <kernel/config.h>
 #include <kernel/ally.h>
@@ -501,15 +502,21 @@ static void test_ship_leave_trail(CuTest *tc) {
     test_setup();
     t_ocean = test_create_terrain("ocean", SEA_REGION);
     r1 = test_create_region(0, 0, t_ocean);
-    add_regionlist(&route, r2 = test_create_region(1, 0, t_ocean));
     add_regionlist(&route, test_create_region(2, 0, t_ocean));
+    add_regionlist(&route, r2 = test_create_region(1, 0, t_ocean));
     st_boat = test_create_shiptype("boat");
     s1 = test_create_ship(r1, st_boat);
     s2 = test_create_ship(r1, st_boat);
     leave_trail(s1, r1, route);
+    a_add(&r1->attribs, a_new(&at_lighthouse));
     leave_trail(s2, r1, route);
-//    CuAssertPtrNotNull(tc, r1->attribs);
-    CuAssertPtrNotNull(tc, r2->attribs);
+    a_add(&r2->attribs, a_new(&at_lighthouse));
+    CuAssertPtrEquals(tc, &at_shiptrail, (void *)r1->attribs->type);
+    CuAssertPtrEquals(tc, &at_shiptrail, (void *)r1->attribs->next->type);
+    CuAssertPtrEquals(tc, &at_lighthouse, (void *)r1->attribs->next->next->type);
+    CuAssertPtrEquals(tc, &at_shiptrail, (void *)r2->attribs->type);
+    CuAssertPtrEquals(tc, &at_shiptrail, (void *)r2->attribs->next->type);
+    CuAssertPtrEquals(tc, &at_lighthouse, (void *)r2->attribs->next->next->type);
     free_regionlist(route);
     test_cleanup();
 }
