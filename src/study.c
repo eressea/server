@@ -53,6 +53,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/rng.h>
 #include <util/umlaut.h>
 
+#include <quicklist.h>
+
 /* libc includes */
 #include <assert.h>
 #include <limits.h>
@@ -216,24 +218,11 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
     n = _min(n, nteaching);
 
     if (n != 0) {
-        int index = 0;
-
         if (teach == NULL) {
             a = a_add(&student->attribs, a_new(&at_learning));
             teach = (teaching_info *)a->data.v;
         }
-        else {
-            while (teach->teachers[index] && index != MAXTEACHERS)
-                ++index;
-        }
-        if (index < MAXTEACHERS)
-            teach->teachers[index++] = teacher;
-        if (index < MAXTEACHERS) {
-            teach->teachers[index] = NULL;
-        }
-        else {
-            log_error("MAXTEACHERS=%d is too low for student %s, teacher %s", MAXTEACHERS, unitname(student), unitname(teacher));
-        }
+        ql_push(&teach->teachers, teacher);
         teach->value += n;
 
         if (student->building && teacher->building == student->building) {
@@ -717,7 +706,7 @@ int study_cmd(unit * u, order * ord)
         a = a_add(&u->attribs, a_new(&at_learning));
         teach = (teaching_info *)a->data.v;
         assert(teach);
-        teach->teachers[0] = 0;
+        teach->teachers = NULL;
     }
     if (money > 0) {
         use_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT, money);
@@ -766,9 +755,9 @@ int study_cmd(unit * u, order * ord)
 
     learn_skill(u, sk, days);
     if (a != NULL) {
-        int index = 0;
-        while (teach->teachers[index] && index != MAXTEACHERS) {
-            unit *teacher = teach->teachers[index++];
+        ql_iter qli = qli_init(&teach->teachers);
+        while (qli_more(qli)) {
+            unit *teacher = (unit *)qli_next(&qli);
             if (teacher->faction != u->faction) {
                 bool feedback = alliedunit(u, teacher->faction, HELP_GUARD);
                 if (feedback) {
