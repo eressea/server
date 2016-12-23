@@ -23,7 +23,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "chaos.h"
 #include "guard.h"
 #include "laws.h"
-#include "monster.h"
+#include "monsters.h"
 #include "move.h"
 #include "skill.h"
 

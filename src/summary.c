@@ -14,7 +14,7 @@
 
 #include "summary.h"
 #include "laws.h"
-#include "monster.h"
+#include "monsters.h"
 #include "calendar.h"
 
 #include <kernel/alliance.h>

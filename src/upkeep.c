@@ -16,7 +16,7 @@
 
 #include "alchemy.h"
 #include "economy.h"
-#include "monster.h"
+#include "monsters.h"
 #include "donations.h"
 
 #include <assert.h>

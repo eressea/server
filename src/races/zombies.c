@@ -24,7 +24,7 @@
 /* util iclude */
 #include <util/rng.h>
 
-#include "monster.h"
+#include "monsters.h"
 
 /* libc includes */
 #include <stdlib.h>

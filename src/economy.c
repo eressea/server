@@ -31,7 +31,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "spy.h"
 #include "study.h"
 #include "move.h"
-#include "monster.h"
+#include "monsters.h"
 #include "morale.h"
 #include "reports.h"
 #include "calendar.h"

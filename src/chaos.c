@@ -19,7 +19,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include <kernel/config.h>
 #include "chaos.h"
-#include "monster.h"
+#include "monsters.h"
 #include "move.h"
 
 #include <kernel/building.h>

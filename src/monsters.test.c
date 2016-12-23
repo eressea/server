@@ -10,7 +10,6 @@
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 
-#include "monster.h"
 #include "monsters.h"
 #include "guard.h"
 #include "reports.h"

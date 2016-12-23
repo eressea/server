@@ -22,7 +22,7 @@
 #include "spells.h"
 #include "direction.h"
 #include "randenc.h"
-#include "monster.h"
+#include "monsters.h"
 #include "teleport.h"
 
 #include <spells/borders.h>

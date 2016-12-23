@@ -26,12 +26,12 @@
 #include "chaos.h"
 #include "give.h"
 #include "guard.h"
-#include "monster.h"
 #include "laws.h"
 #include "keyword.h"
 #include "study.h"
 
 /* attributes includes */
+#include <attributes/attributes.h>
 #include <attributes/targetregion.h>
 #include <attributes/hate.h>
 
@@ -72,8 +72,8 @@
 #include <string.h>
 #include <assert.h>
 
-#define MOVECHANCE                  .25  /* chance fuer bewegung */
-#define DRAGON_RANGE 20         /* Max. Distanz zum nächsten Drachenziel */
+#define DRAGON_RANGE       20  /* max. Distanz zum nächsten Drachenziel */
+#define MOVE_PERCENT       25  /* chance fuer bewegung */
 #define MAXILLUSION_TEXTS   3
 
 static double attack_chance; /* rules.monsters.attack_chance, or default 0.4 */
@@ -85,12 +85,12 @@ static void give_peasants(unit *u, const item_type *itype, int reduce) {
 }
 
 static double random_move_chance(void) {
-    static double rule;
+    static int rule;
     static int config;
     if (config_changed(&config)) {
-        rule = config_get_flt("rules.monsters.random_move_chance", MOVECHANCE);
+        rule = config_get_flt("rules.monsters.random_move_percent", MOVE_PERCENT);
     }
-    return rule;
+    return rule * 0.01;
 }
 
 static void reduce_weight(unit * u)
@@ -163,6 +163,29 @@ static order *monster_attack(unit * u, const unit * target)
         return NULL;
 
     return create_order(K_ATTACK, u->faction->locale, "%i", target->no);
+}
+
+void monsters_desert(struct faction *monsters)
+{
+    region *r;
+
+    assert(monsters!=NULL);
+    for (r = regions; r; r = r->next) {
+        unit *u;
+        
+        for (u = r->units; u; u = u->next) {
+            if (u->faction!=monsters
+                && (u_race(u)->flags & RCF_DESERT)) {
+                if (fval(u, UFL_ISNEW))
+                    continue;
+                if (rng_int() % 100 < 5) {
+                    ADDMSG(&u->faction->msgs, msg_message("desertion",
+                        "unit region", u, r));
+                    u_setfaction(u, monsters);
+                }
+            }
+        }
+    }
 }
 
 int monster_attacks(unit * monster, bool respect_buildings, bool rich_only)
@@ -972,4 +995,162 @@ void spawn_undead(void)
             }
         }
     }
+}
+
+bool monster_is_waiting(const unit * u)
+{
+    int test = fval(u_race(u), RCF_ATTACK_MOVED) ? UFL_ISNEW : UFL_ISNEW | UFL_MOVED;
+    if (fval(u, test))
+        return true;
+    return false;
+}
+
+static void eaten_by_monster(unit * u)
+{
+    /* adjustment for smaller worlds */
+    double multi = RESOURCE_QUANTITY * newterrain(T_PLAIN)->size / 10000.0;
+    int n = 0;
+    int horse = -1;
+    const resource_type *rhorse = get_resourcetype(R_HORSE);
+    const race *rc = u_race(u);
+    attrib *a;
+
+    a = a_find(rc->attribs, &at_scare);
+    if (a) {
+        n = rng_int() & a->data.i * u->number;
+    } else {
+        n = rng_int() % (u->number / 20 + 1);
+        horse = 0;
+    }
+    horse = horse ? i_get(u->items, rhorse->itype) : 0;
+
+    n = (int)(n * multi);
+    if (n > 0) {
+        n = lovar(n);
+        n = _min(rpeasants(u->region), n);
+
+        if (n > 0) {
+            deathcounts(u->region, n);
+            rsetpeasants(u->region, rpeasants(u->region) - n);
+            ADDMSG(&u->region->msgs, msg_message("eatpeasants", "unit amount", u, n));
+        }
+    }
+    if (horse > 0) {
+        i_change(&u->items, rhorse->itype, -horse);
+        ADDMSG(&u->region->msgs, msg_message("eathorse", "unit amount", u, horse));
+    }
+}
+
+static void absorbed_by_monster(unit * u)
+{
+    int n = rng_int() % (u->number / 20 + 1);
+
+    if (n > 0) {
+        n = lovar(n);
+        n = _min(rpeasants(u->region), n);
+        if (n > 0) {
+            rsetpeasants(u->region, rpeasants(u->region) - n);
+            scale_number(u, u->number + n);
+            ADDMSG(&u->region->msgs, msg_message("absorbpeasants",
+                "unit race amount", u, u_race(u), n));
+        }
+    }
+}
+
+static int scareaway(region * r, int anzahl)
+{
+    int n, p, diff = 0, emigrants[MAXDIRECTIONS];
+    direction_t d;
+
+    anzahl = _min(_max(1, anzahl), rpeasants(r));
+
+    /* Wandern am Ende der Woche (normal) oder wegen Monster. Die
+     * Wanderung wird erst am Ende von demographics () ausgefuehrt.
+     * emigrants[] ist local, weil r->newpeasants durch die Monster
+     * vielleicht schon hochgezaehlt worden ist. */
+
+    for (d = 0; d != MAXDIRECTIONS; d++)
+        emigrants[d] = 0;
+
+    p = rpeasants(r);
+    assert(p >= 0 && anzahl >= 0);
+    for (n = _min(p, anzahl); n; n--) {
+        direction_t dir = (direction_t)(rng_int() % MAXDIRECTIONS);
+        region *rc = rconnect(r, dir);
+
+        if (rc && fval(rc->terrain, LAND_REGION)) {
+            ++diff;
+            rc->land->newpeasants++;
+            emigrants[dir]++;
+        }
+    }
+    rsetpeasants(r, p - diff);
+    assert(p >= diff);
+    return diff;
+}
+
+static void scared_by_monster(unit * u)
+{
+    int n;
+    const race *rc = u_race(u);
+    attrib *a;
+    a = a_find(rc->attribs, &at_scare);
+    if (a) {
+        n = rng_int() & a->data.i * u->number;
+    } else {
+        n = rng_int() % (u->number / 4 + 1);
+    }
+    if (n > 0) {
+        n = lovar(n);
+        n = _min(rpeasants(u->region), n);
+        if (n > 0) {
+            n = scareaway(u->region, n);
+            if (n > 0) {
+                ADDMSG(&u->region->msgs, msg_message("fleescared",
+                    "amount unit", n, u));
+            }
+        }
+    }
+}
+
+void monster_kills_peasants(unit * u)
+{
+    if (!monster_is_waiting(u)) {
+        if (u_race(u)->flags & RCF_SCAREPEASANTS) {
+            scared_by_monster(u);
+        }
+        if (u_race(u)->flags & RCF_KILLPEASANTS) {
+            eaten_by_monster(u);
+        }
+        if (u_race(u)->flags & RCF_ABSORBPEASANTS) {
+            absorbed_by_monster(u);
+        }
+    }
+}
+
+faction *get_or_create_monsters(void)
+{
+    faction *f = findfaction(MONSTER_ID);
+    if (!f) {
+        const race *rc = rc_get_or_create("dragon");
+        const char *email = config_get("monster.email");
+        f = addfaction(email ? email : "noreply@eressea.de", NULL, rc, default_locale, 0);
+        renumber_faction(f, MONSTER_ID);
+        faction_setname(f, "Monster");
+        fset(f, FFL_NPC | FFL_NOIDLEOUT);
+    }
+    return f;
+}
+
+faction *get_monsters(void) {
+    return get_or_create_monsters();
+}
+
+void make_zombie(unit * u)
+{
+    u_setfaction(u, get_monsters());
+    scale_number(u, 1);
+    u->hp = unit_max_hp(u) * u->number;
+    u_setrace(u, get_race(RC_ZOMBIE));
+    u->irace = NULL;
 }

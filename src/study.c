@@ -24,7 +24,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "study.h"
 #include "laws.h"
 #include "move.h"
-#include "monster.h"
+#include "monsters.h"
 #include "alchemy.h"
 #include "academy.h"
 
