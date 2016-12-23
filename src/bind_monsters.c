@@ -1,6 +1,5 @@
 #include <platform.h>
 #include "spells/shipcurse.h"
-#include "monster.h"
 #include "monsters.h"
 
 #include <kernel/equipment.h>

@@ -29,7 +29,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "keyword.h"
 #include "market.h"
 #include "morale.h"
-#include "monster.h"
+#include "monsters.h"
 #include "move.h"
 #include "randenc.h"
 #include "renumber.h"

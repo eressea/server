@@ -27,7 +27,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "alchemy.h"
 #include "travelthru.h"
 #include "vortex.h"
-#include "monster.h"
+#include "monsters.h"
 #include "lighthouse.h"
 #include "piracy.h"
 

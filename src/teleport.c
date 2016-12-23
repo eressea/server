@@ -34,7 +34,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/rng.h>
 
 #include "skill.h"
-#include "monster.h"
+#include "monsters.h"
 
 /* libc includes */
 #include <assert.h>

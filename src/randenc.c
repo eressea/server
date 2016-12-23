@@ -22,7 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "volcano.h"
 #include "economy.h"
-#include "monster.h"
+#include "monsters.h"
 #include "move.h"
 #include "chaos.h"
 #include "study.h"
@@ -826,22 +826,7 @@ void randomevents(void)
 
     /* monster-einheiten desertieren */
     if (monsters) {
-        for (r = regions; r; r = r->next) {
-            unit *u;
-
-            for (u = r->units; u; u = u->next) {
-                if (u->faction && !is_monsters(u->faction)
-                    && (u_race(u)->flags & RCF_DESERT)) {
-                    if (fval(u, UFL_ISNEW))
-                        continue;
-                    if (rng_int() % 100 < 5) {
-                        ADDMSG(&u->faction->msgs, msg_message("desertion",
-                            "unit region", u, r));
-                        u_setfaction(u, monsters);
-                    }
-                }
-            }
-        }
+        monsters_desert(monsters);
     }
 
     chaos_update();

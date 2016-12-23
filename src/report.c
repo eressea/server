@@ -26,7 +26,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "guard.h"
 #include "laws.h"
 #include "market.h"
-#include "monster.h"
+#include "monsters.h"
 #include "travelthru.h"
 
 /* modules includes */
