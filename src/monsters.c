@@ -88,7 +88,7 @@ static double random_move_chance(void) {
     static int rule;
     static int config;
     if (config_changed(&config)) {
-        rule = config_get_flt("rules.monsters.random_move_percent", MOVE_PERCENT);
+        rule = config_get_int("rules.monsters.random_move_percent", MOVE_PERCENT);
     }
     return rule * 0.01;
 }
