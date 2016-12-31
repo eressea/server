@@ -36,9 +36,25 @@ static void test_names(CuTest * tc)
     test_cleanup();
 }
 
+static void test_monster_names(CuTest *tc) {
+    unit *u;
+    race *rc;
+
+    test_setup();
+    register_names();
+    rc = test_create_race("irongolem");
+    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
+    CuAssertPtrNotNull(tc, u->_name);
+    rc->generate_name = (race_name_func)get_function("namegeneric");
+    rc->generate_name(u);
+    CuAssertPtrEquals(tc, 0, u->_name);
+    test_cleanup();
+}
+
 CuSuite *get_names_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_names);
+    SUITE_ADD_TEST(suite, test_monster_names);
     return suite;
 }
