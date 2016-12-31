@@ -114,7 +114,6 @@ set (ERESSEA_SRC
   magic.c
   market.c
   morale.c
-  monster.c
   randenc.c
   renumber.c
   volcano.c

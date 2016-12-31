@@ -10,7 +10,7 @@
 #include <util/language.h>
 #include <util/password.h>
 
-#include "monster.h"
+#include "monsters.h"
 #include <CuTest.h>
 #include <tests.h>
 #include <quicklist.h>

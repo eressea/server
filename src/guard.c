@@ -21,7 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "guard.h"
 #include "laws.h"
-#include "monster.h"
+#include "monsters.h"
 
 #include <kernel/ally.h>
 #include <kernel/unit.h>

@@ -2,7 +2,7 @@
 
 #include "guard.h"
 #include "laws.h"
-#include "monster.h"
+#include "monsters.h"
 
 #include <kernel/config.h>
 #include <kernel/faction.h>
