@@ -252,7 +252,6 @@ extern "C" {
     const char *raceprefix(const struct unit *u);
     void register_race_name_function(race_name_func, const char *);
     void register_race_description_function(race_desc_func, const char *);
-    char * race_namegen(const struct race *rc, struct unit *u);
 
 #ifdef __cplusplus
 }
