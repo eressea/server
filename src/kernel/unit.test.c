@@ -468,6 +468,24 @@ static void test_renumber_unit(CuTest *tc) {
     test_cleanup();
 }
 
+static void gen_name(unit *u)
+{
+    unit_setname(u, "Hodor");
+}
+
+static void test_name_unit(CuTest *tc) {
+    race *rc;
+    unit * u;
+
+    test_setup();
+    rc = test_create_race("skeleton");
+    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
+    rc->generate_name = gen_name;
+    name_unit(u);
+    CuAssertStrEquals(tc, "Hodor", unit_getname(u));
+    test_cleanup();
+}
+
 CuSuite *get_unit_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -491,5 +509,6 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_inside_building);
     SUITE_ADD_TEST(suite, test_limited_skills);
     SUITE_ADD_TEST(suite, test_renumber_unit);
+    SUITE_ADD_TEST(suite, test_name_unit);
     return suite;
 }
