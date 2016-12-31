@@ -24,7 +24,7 @@ static void test_names(CuTest * tc)
     locale_setstring(default_locale, "undead_postfix_0", "Kobolde");
     CuAssertPtrNotNull(tc, foo = (race_name_func)get_function("nameundead"));
     rc->generate_name = foo;
-    race_namegen(rc, u);
+    rc->generate_name(u);
     CuAssertStrEquals(tc, "Graue Kobolde", u->_name);
     CuAssertPtrNotNull(tc, get_function("nameskeleton"));
     CuAssertPtrNotNull(tc, get_function("namezombie"));
