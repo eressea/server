@@ -101,16 +101,23 @@ locale *get_or_create_locale(const char *name)
 void make_locales(const char *str)
 {
     const char *tok = str;
-    while (*tok) {
-        char zText[32];
-        while (*tok && *tok != ',')
-            ++tok;
-        strncpy(zText, str, tok - str);
-        zText[tok - str] = 0;
-        get_or_create_locale(zText);
-        if (*tok) {
-            str = ++tok;
+    while (tok) {
+        char zText[16];
+        size_t len;
+
+        tok = strchr(str, ',');
+        if (tok) {
+            len = tok - str;
+            assert(sizeof(zText) > len);
+            memcpy(zText, str, len);
+            str = tok + 1;
         }
+        else {
+            len = strlen(str);
+            memcpy(zText, str, len);
+        }
+        zText[len] = 0;
+        get_or_create_locale(zText);
     }
 }
 

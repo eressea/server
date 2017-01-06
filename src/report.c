@@ -413,7 +413,8 @@ void nr_spell_syntax(struct stream *out, spellbook_entry * sbe, const struct loc
             }
             else {
                 char substr[32];
-                strncpy(substr, syntaxp, cstr - syntaxp);
+                assert(sizeof(substr) > (cstr - syntaxp));
+                memcpy(substr, syntaxp, cstr - syntaxp);
                 substr[cstr - syntaxp] = 0;
                 locp = LOC(lang, mkname("spellpar", substr));
                 syntaxp = substr + 1;
