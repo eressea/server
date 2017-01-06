@@ -6,7 +6,6 @@
 #include <util/log.h>
 #include <util/lists.h>
 
-#include <quicklist.h>
 #include <CuTest.h>
 #include <tests.h>
 

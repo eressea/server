@@ -32,8 +32,6 @@ without prior permission by the authors of Eressea.
 #include <util/log.h>
 #include <util/password.h>
 
-#include <quicklist.h>
-
 #include <tolua.h>
 #include <string.h>
 

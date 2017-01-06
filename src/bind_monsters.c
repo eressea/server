@@ -12,8 +12,6 @@
 
 #include <spells/flyingship.h>
 
-#include <quicklist.h>
-
 #include <tolua.h>
 #include <stdlib.h>
 
