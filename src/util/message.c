@@ -87,19 +87,21 @@ message_type *mt_new(const char *name, const char *args[])
         for (i = 0; args[i]; ++i) {
             const char *x = args[i];
             const char *spos = strchr(x, ':');
-            if (spos == NULL) {
-                mtype->pnames[i] = _strdup(x);
-                mtype->types[i] = NULL;
+            struct arg_type *atype = NULL;
+            if (spos != NULL) {
+                atype = find_argtype(spos + 1);
+            }
+            if (!atype) {
+                log_error("unknown argument type %s for message type %s\n", spos + 1, mtype->name);
+                assert(atype);
             }
             else {
-                char *cp = strncpy((char *)malloc(spos - x + 1), x, spos - x);
+                char *cp;
+                cp = malloc(spos - x + 1);
+                memcpy(cp, x, spos - x);
                 cp[spos - x] = '\0';
                 mtype->pnames[i] = cp;
-                mtype->types[i] = find_argtype(spos + 1);
-                if (mtype->types[i] == NULL) {
-                    log_error("unknown argument type %s for message type %s\n", spos + 1, mtype->name);
-                }
-                assert(mtype->types[i]);
+                mtype->types[i] = atype;
             }
         }
     }
