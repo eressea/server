@@ -849,10 +849,6 @@ const struct unit * u, struct skill * sv, int *dh, int days)
 
 void split_paragraph(strlist ** SP, const char *s, unsigned int indent, unsigned int width, char mark)
 {
-
-    /* Die Liste SP wird mit dem String s aufgefuellt, mit indent und einer
-    * mark, falls angegeben. SP wurde also auf 0 gesetzt vor dem Aufruf.
-    * Vgl. spunit (). */
     bool firstline;
     static char buf[REPORTWIDTH + 1]; // FIXME: static buffer, artificial limit
     size_t len = strlen(s);
@@ -883,7 +879,7 @@ void split_paragraph(strlist ** SP, const char *s, unsigned int indent, unsigned
         if (!cut) {
             cut = s + _min(len, REPORTWIDTH);
         }
-        strncpy(buf + indent, s, cut - s);
+        memcpy(buf + indent, s, cut - s);
         buf[indent + (cut - s)] = 0;
         addstrlist(SP, buf); // TODO: too much string copying, cut out this function
         while (*cut == ' ') {
