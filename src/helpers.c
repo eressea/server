@@ -167,7 +167,7 @@ static int lua_callspell(castorder * co)
     if (hashpos != NULL) {
         ptrdiff_t len = hashpos - fname;
         assert(len < (ptrdiff_t) sizeof(fbuf));
-        strncpy(fbuf, fname, len);
+        memcpy(fbuf, fname, len);
         fbuf[len] = '\0';
         fname = fbuf;
     }

@@ -3,6 +3,7 @@
 #include <platform.h>
 #include <kernel/config.h>
 #include <kernel/jsonconf.h>
+#include <util/bsdstring.h>
 #include <util/log.h>
 #include <util/language.h>
 #include <cJSON.h>
@@ -45,7 +46,7 @@ int config_parse(const char *json)
             if (xp >= ep) break;
         }
         xp = (ep > json + 10) ? ep - 10 : json;
-        strncpy(buffer, xp, sizeof(buffer));
+        strlcpy(buffer, xp, sizeof(buffer));
         buffer[9] = 0;
         log_error("json parse error in line %d, position %d, near `%s`\n", line, ep - lp, buffer);
     }
