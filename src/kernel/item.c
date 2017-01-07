@@ -156,7 +156,10 @@ const char *resourcename(const resource_type * rtype, int flags)
         }
         if (flags & NMF_PLURAL) {
             static char name[64]; // FIXME: static return value
-            _snprintf(name, sizeof(name), "%s_p", rtype->_name);
+            size_t len = strlen(rtype->_name);
+            assert(len <= sizeof(name) - 3);
+            memcpy(name, rtype->_name, len);
+            strcpy(name + len, "_p");
             return name;
         }
         return rtype->_name;

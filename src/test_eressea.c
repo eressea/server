@@ -65,6 +65,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(direction);
     ADD_SUITE(skill);
     ADD_SUITE(keyword);
+    ADD_SUITE(message);
     ADD_SUITE(order);
     ADD_SUITE(race);
     /* util */

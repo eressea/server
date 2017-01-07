@@ -14,7 +14,7 @@ gamedata.test.c
 language.test.c
 # lists.test.c
 # log.test.c
-# message.test.c
+message.test.c
 # nrmessage.test.c
 parser.test.c
 password.test.c

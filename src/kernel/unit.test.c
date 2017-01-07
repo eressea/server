@@ -140,37 +140,34 @@ static void test_scale_number(CuTest *tc) {
 
 static void test_unit_name(CuTest *tc) {
     unit *u;
-    char name[32];
 
     test_cleanup();
     test_create_world();
     u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
+    renumber_unit(u, 666);
     unit_setname(u, "Hodor");
-    _snprintf(name, sizeof(name), "Hodor (%s)", itoa36(u->no));
-    CuAssertStrEquals(tc, name, unitname(u));
+    CuAssertStrEquals(tc, "Hodor (ii)", unitname(u));
     test_cleanup();
 }
 
 static void test_unit_name_from_race(CuTest *tc) {
     unit *u;
-    char name[32];
     struct locale *lang;
 
     test_cleanup();
     test_create_world();
     u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
+    renumber_unit(u, 666);
     unit_setname(u, NULL);
     lang = get_or_create_locale("de");
     locale_setstring(lang, rc_name_s(u->_race, NAME_SINGULAR), "Mensch");
     locale_setstring(lang, rc_name_s(u->_race, NAME_PLURAL), "Menschen");
 
-    _snprintf(name, sizeof(name), "Mensch (%s)", itoa36(u->no));
-    CuAssertStrEquals(tc, name, unitname(u));
+    CuAssertStrEquals(tc, "Mensch (ii)", unitname(u));
     CuAssertStrEquals(tc, "Mensch", unit_getname(u));
 
     u->number = 2;
-    _snprintf(name, sizeof(name), "Menschen (%s)", itoa36(u->no));
-    CuAssertStrEquals(tc, name, unitname(u));
+    CuAssertStrEquals(tc, "Menschen (ii)", unitname(u));
     CuAssertStrEquals(tc, "Menschen", unit_getname(u));
 
     test_cleanup();

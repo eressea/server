@@ -523,6 +523,8 @@ static void disable_feature(const char *str) {
     char name[32];
     int k;
     skill_t sk;
+    size_t len;
+
     sk = findskill(str);
     if (sk != NOSKILL) {
         enable_skill(sk, false);
@@ -534,7 +536,10 @@ static void disable_feature(const char *str) {
         enable_keyword(k, false);
         return;
     }
-    _snprintf(name, sizeof(name), "%s.enabled", str);
+    len = strlen(str);
+    assert(len <= sizeof(name) - 9);
+    memcpy(name, str, len);
+    strcpy(name+len, ".enabled");
     log_info("disable feature %s\n", name);
     config_set(name, "0");
 }
@@ -796,10 +801,10 @@ static void json_settings(cJSON *json) {
         else {
             char value[32];
             if (child->type == cJSON_Number && child->valuedouble && child->valueint<child->valuedouble) {
-                _snprintf(value, sizeof(value), "%f", child->valuedouble);
+                sprintf(value, "%f", child->valuedouble);
             }
             else {
-                _snprintf(value, sizeof(value), "%d", child->valueint);
+                sprintf(value, "%d", child->valueint);
             }
             config_set(child->string, value);
         }
