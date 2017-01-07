@@ -233,7 +233,6 @@ static void test_give_men_requires_contact(CuTest * tc) {
     struct give env = { 0 };
     message * msg;
     order *ord;
-    char cmd[32];
 
     test_setup_ex(tc);
     env.f1 = test_create_faction(0);
@@ -244,8 +243,7 @@ static void test_give_men_requires_contact(CuTest * tc) {
     CuAssertIntEquals(tc, 1, env.dst->number);
     CuAssertIntEquals(tc, 1, env.src->number);
 
-    _snprintf(cmd, sizeof(cmd), "%s ALLES PERSONEN", itoa36(env.dst->no));
-    ord = create_order(K_GIVE, env.f1->locale, cmd);
+    ord = create_order(K_GIVE, env.f1->locale, "%s ALLES PERSONEN", itoa36(env.dst->no));
     test_clear_messages(env.f1);
     give_cmd(env.src, ord);
     CuAssertPtrEquals(tc, 0, test_find_messagetype(env.f1->msgs, "give_person"));
@@ -307,7 +305,6 @@ static void test_give(CuTest * tc) {
 static void test_give_cmd(CuTest * tc) {
     struct give env = { 0 };
     struct order *ord;
-    char cmd[32];
 
     test_setup_ex(tc);
     env.lang = test_create_locale();
@@ -316,8 +313,7 @@ static void test_give_cmd(CuTest * tc) {
 
     i_change(&env.src->items, env.itype, 10);
 
-    _snprintf(cmd, sizeof(cmd), "%s 5 %s", itoa36(env.dst->no), LOC(env.f1->locale, env.itype->rtype->_name));
-    ord = create_order(K_GIVE, env.f1->locale, cmd);
+    ord = create_order(K_GIVE, env.f1->locale, "%s 5 %s", itoa36(env.dst->no), LOC(env.f1->locale, env.itype->rtype->_name));
     assert(ord);
     give_cmd(env.src, ord);
     CuAssertIntEquals(tc, 5, i_get(env.src->items, env.itype));
@@ -330,7 +326,6 @@ static void test_give_cmd(CuTest * tc) {
 static void test_give_herbs(CuTest * tc) {
     struct give env = { 0 };
     struct order *ord;
-    char cmd[32];
 
     test_setup_ex(tc);
     test_create_world();
@@ -338,8 +333,7 @@ static void test_give_herbs(CuTest * tc) {
     setup_give(&env);
     i_change(&env.src->items, env.itype, 10);
 
-    _snprintf(cmd, sizeof(cmd), "%s %s", itoa36(env.dst->no), LOC(env.f1->locale, parameters[P_HERBS]));
-    ord = create_order(K_GIVE, env.f1->locale, cmd);
+    ord = create_order(K_GIVE, env.f1->locale, "%s %s", itoa36(env.dst->no), LOC(env.f1->locale, parameters[P_HERBS]));
     assert(ord);
 
     give_cmd(env.src, ord);
