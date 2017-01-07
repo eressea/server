@@ -801,10 +801,10 @@ static void json_settings(cJSON *json) {
         else {
             char value[32];
             if (child->type == cJSON_Number && child->valuedouble && child->valueint<child->valuedouble) {
-                _snprintf(value, sizeof(value), "%f", child->valuedouble);
+                sprintf(value, "%f", child->valuedouble);
             }
             else {
-                _snprintf(value, sizeof(value), "%d", child->valueint);
+                sprintf(value, "%d", child->valueint);
             }
             config_set(child->string, value);
         }
