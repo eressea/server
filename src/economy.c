@@ -1041,10 +1041,10 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
 
 static int required(int want, double save)
 {
-    int norders = (int)(want * save);
-    if (norders < want * save)
-        ++norders;
-    return norders;
+    int req = (int)(want * save);
+    if (req < want * save)
+        ++req;
+    return req;
 }
 
 static void
@@ -1058,7 +1058,7 @@ leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
     if (rm != NULL) {
         do {
             int avail = rm->amount;
-            int norders = 0;
+            int nreq = 0;
             allocation *al;
 
             if (avail <= 0) {
@@ -1077,7 +1077,7 @@ leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
                     if (effskill(al->unit, itype->construction->skill, 0)
                         >= rm->level + itype->construction->minskill - 1) {
                         if (req) {
-                            norders += req;
+                            nreq += req;
                         }
                         else {
                             fset(al, AFL_DONE);
@@ -1089,22 +1089,22 @@ leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
                             fset(al, AFL_LOWSKILL);
                     }
                 }
-            need = norders;
+            need = nreq;
 
-            avail = MIN(avail, norders);
+            avail = MIN(avail, nreq);
             if (need > 0) {
                 int use = 0;
                 for (al = alist; al; al = al->next)
                     if (!fval(al, AFL_DONE)) {
                         if (avail > 0) {
                             int want = required(al->want - al->get, al->save);
-                            int x = avail * want / norders;
+                            int x = avail * want / nreq;
                             /* Wenn Rest, dann würfeln, ob ich was bekomme: */
-                            if (rng_int() % norders < (avail * want) % norders)
+                            if (rng_int() % nreq < (avail * want) % nreq)
                                 ++x;
                             avail -= x;
                             use += x;
-                            norders -= want;
+                            nreq -= want;
                             need -= x;
                             al->get = MIN(al->want, al->get + (int)(x / al->save));
                         }
@@ -1113,7 +1113,7 @@ leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
                     assert(use <= rm->amount);
                     rm->type->use(rm, r, use);
                 }
-                assert(avail == 0 || norders == 0);
+                assert(avail == 0 || nreq == 0);
             }
             first = false;
         } while (need > 0);
@@ -1124,13 +1124,13 @@ static void
 attrib_allocation(const resource_type * rtype, region * r, allocation * alist)
 {
     allocation *al;
-    int norders = 0;
+    int nreq = 0;
     attrib *a = a_find(rtype->attribs, &at_resourcelimit);
     resource_limit *rdata = (resource_limit *)a->data.v;
     int avail = rdata->value;
 
     for (al = alist; al; al = al->next) {
-        norders += required(al->want, al->save);
+        nreq += required(al->want, al->save);
     }
 
     if (rdata->limit) {
@@ -1139,16 +1139,16 @@ attrib_allocation(const resource_type * rtype, region * r, allocation * alist)
             avail = 0;
     }
 
-    avail = MIN(avail, norders);
+    avail = MIN(avail, nreq);
     for (al = alist; al; al = al->next) {
         if (avail > 0) {
             int want = required(al->want, al->save);
-            int x = avail * want / norders;
+            int x = avail * want / nreq;
             /* Wenn Rest, dann würfeln, ob ich was bekomme: */
-            if (rng_int() % norders < (avail * want) % norders)
+            if (rng_int() % nreq < (avail * want) % nreq)
                 ++x;
             avail -= x;
-            norders -= want;
+            nreq -= want;
             al->get = MIN(al->want, (int)(x / al->save));
             if (rdata->produce) {
                 int use = required(al->get, al->save);
@@ -1157,7 +1157,7 @@ attrib_allocation(const resource_type * rtype, region * r, allocation * alist)
             }
         }
     }
-    assert(avail == 0 || norders == 0);
+    assert(avail == 0 || nreq == 0);
 }
 
 typedef void(*allocate_function) (const resource_type *, struct region *,

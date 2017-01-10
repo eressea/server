@@ -826,8 +826,8 @@ int sp_shadowcall(struct castorder * co)
     attrib *a;
     int force = (int)(get_force(power, 3) / 2);
     unit *u;
-    const char *races[3] = { "shadowbat", "nightmare", "vampunicorn" };
-    const race *rc = rc_find(races[rng_int() % 3]);
+    const char *rcnames[3] = { "shadowbat", "nightmare", "vampunicorn" };
+    const race *rc = rc_find(rcnames[rng_int() % 3]);
     message *msg;
 
     u = create_unit(r, mage->faction, force, rc, 0, NULL, mage);

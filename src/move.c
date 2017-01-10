@@ -163,6 +163,7 @@ static int shiptrail_read(attrib * a, void *owner, struct gamedata *data)
     int n;
     traveldir *t = (traveldir *)(a->data.v);
 
+    UNUSED_ARG(owner);
     READ_INT(store, &t->no);
     READ_INT(store, &n);
     t->dir = (direction_t)n;
@@ -174,6 +175,8 @@ static void
 shiptrail_write(const attrib * a, const void *owner, struct storage *store)
 {
     traveldir *t = (traveldir *)(a->data.v);
+
+    UNUSED_ARG(owner);
     WRITE_INT(store, t->no);
     WRITE_INT(store, t->dir);
     WRITE_INT(store, t->age);
@@ -204,6 +207,8 @@ static bool entrance_allowed(const struct unit *u, const struct region *r)
         return true;
     return false;
 #else
+    UNUSED_ARG(u);
+    UNUSED_ARG(r);
     return true;
 #endif
 }
@@ -466,6 +471,8 @@ static int canride(unit * u)
 
 static bool cansail(const region * r, ship * sh)
 {
+    UNUSED_ARG(r);
+
     /* sonst ist construction:: size nicht ship_type::maxsize */
     assert(!sh->type->construction
         || sh->type->construction->improvement == NULL);
@@ -490,6 +497,8 @@ static bool cansail(const region * r, ship * sh)
 
 static double overload(const region * r, ship * sh)
 {
+    UNUSED_ARG(r);
+
     /* sonst ist construction:: size nicht ship_type::maxsize */
     assert(!sh->type->construction
         || sh->type->construction->improvement == NULL);
@@ -1761,8 +1770,6 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
      * befahrene Region. */
 
     while (next_point && current_point != next_point && step < k) {
-        const char *token;
-        int error;
         const terrain_type *tthis = current_point->terrain;
         /* these values need to be updated if next_point changes (due to storms): */
         const terrain_type *tnext = next_point->terrain;

@@ -394,8 +394,8 @@ const char *abkz(const char *s, char *buf, size_t buflen, size_t maxchars)
     size_t size;
     int result;
 
+    UNUSED_ARG(buflen);
     /* Prüfen, ob Kurz genug */
-
     if (strlen(s) <= maxchars) {
         return s;
     }
