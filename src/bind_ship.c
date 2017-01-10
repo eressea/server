@@ -94,7 +94,7 @@ static int tolua_ship_set_display(lua_State * L)
 {
     ship *self = (ship *)tolua_tousertype(L, 1, 0);
     free(self->display);
-    self->display = _strdup(tolua_tostring(L, 2, 0));
+    self->display = strdup(tolua_tostring(L, 2, 0));
     return 0;
 }
 

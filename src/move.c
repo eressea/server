@@ -151,8 +151,8 @@ static void shiptrail_finalize(attrib * a)
 static int shiptrail_age(attrib * a, void *owner)
 {
     traveldir *t = (traveldir *)(a->data.v);
-    unused_arg(owner);
 
+    (void)owner;
     t->age--;
     return (t->age > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
 }
@@ -267,12 +267,12 @@ static int ridingcapacity(unit * u)
      ** tragen nichts (siehe walkingcapacity). Ein Wagen zählt nur, wenn er
      ** von zwei Pferden gezogen wird */
 
-    animals = _min(animals, effskill(u, SK_RIDING, 0) * u->number * 2);
+    animals = MIN(animals, effskill(u, SK_RIDING, 0) * u->number * 2);
     if (fval(u_race(u), RCF_HORSE))
         animals += u->number;
 
     /* maximal diese Pferde können zum Ziehen benutzt werden */
-    vehicles = _min(animals / HORSESNEEDED, vehicles);
+    vehicles = MIN(animals / HORSESNEEDED, vehicles);
 
     return vehicles * vcap + animals * acap;
 }
@@ -291,7 +291,7 @@ int walkingcapacity(const struct unit *u)
     /* Das Gewicht, welches die Pferde tragen, plus das Gewicht, welches
      * die Leute tragen */
 
-    pferde_fuer_wagen = _min(animals, effskill(u, SK_RIDING, 0) * u->number * 4);
+    pferde_fuer_wagen = MIN(animals, effskill(u, SK_RIDING, 0) * u->number * 4);
     if (fval(u_race(u), RCF_HORSE)) {
         animals += u->number;
         people = 0;
@@ -301,7 +301,7 @@ int walkingcapacity(const struct unit *u)
     }
 
     /* maximal diese Pferde können zum Ziehen benutzt werden */
-    wagen_mit_pferden = _min(vehicles, pferde_fuer_wagen / HORSESNEEDED);
+    wagen_mit_pferden = MIN(vehicles, pferde_fuer_wagen / HORSESNEEDED);
 
     n = wagen_mit_pferden * vcap;
 
@@ -311,7 +311,7 @@ int walkingcapacity(const struct unit *u)
         wagen_ohne_pferde = vehicles - wagen_mit_pferden;
 
         /* Genug Trolle, um die Restwagen zu ziehen? */
-        wagen_mit_trollen = _min(u->number / 4, wagen_ohne_pferde);
+        wagen_mit_trollen = MIN(u->number / 4, wagen_ohne_pferde);
 
         /* Wagenkapazität hinzuzählen */
         n += wagen_mit_trollen * vcap;
@@ -335,7 +335,7 @@ int walkingcapacity(const struct unit *u)
         int belts = i_get(u->items, rbelt->itype);
         if (belts) {
             int multi = config_get_int("rules.trollbelt.multiplier", STRENGTHMULTIPLIER);
-            n += _min(people, belts) * (multi - 1) * u_race(u)->capacity;
+            n += MIN(people, belts) * (multi - 1) * u_race(u)->capacity;
         }
     }
 
@@ -366,7 +366,7 @@ static int canwalk(unit * u)
     effsk = effskill(u, SK_RIDING, 0);
     maxwagen = effsk * u->number * 2;
     if (u_race(u) == get_race(RC_TROLL)) {
-        maxwagen = _max(maxwagen, u->number / 4);
+        maxwagen = MAX(maxwagen, u->number / 4);
     }
     maxpferde = effsk * u->number * 4 + u->number;
 
@@ -505,7 +505,7 @@ static double overload(const region * r, ship * sh)
 
         double ovl = n / (double)sh->type->cargo;
         if (mcabins)
-            ovl = _max(ovl, p / (double)mcabins);
+            ovl = MAX(ovl, p / (double)mcabins);
         return ovl;
     }
 }
@@ -752,7 +752,7 @@ double damage_overload(double overload)
     badness = overload - overload_worse();
     if (badness >= 0) {
         assert(overload_worst() > overload_worse() || !"overload.worst must be > overload.worse");
-        damage += _min(badness, overload_worst() - overload_worse()) *
+        damage += MIN(badness, overload_worst() - overload_worse()) *
             (overload_max_damage() - damage) /
             (overload_worst() - overload_worse());
     }
@@ -946,7 +946,7 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
                 guard_count += u->number;
                 double prob_u = (sk - stealth) * skill_prob;
                 /* amulet counts at most once */
-                prob_u += _min(1, _min(u->number, i_get(u->items, ramulet->itype))) * amulet_prob;
+                prob_u += MIN(1, MIN(u->number, i_get(u->items, ramulet->itype))) * amulet_prob;
                 if (u->building && (u->building->type == castle_bt) && u == building_owner(u->building))
                     prob_u += castle_prob*buildingeffsize(u->building, 0);
                 if (prob_u >= prob) {
@@ -1985,7 +1985,7 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
                             const luxury_type *ltype = resource2luxury(itm->type->rtype);
                             if (ltype != NULL && itm->number > 0) {
                                 int st = itm->number * effskill(harbourmaster, SK_TRADE, 0) / 50;
-                                st = _min(itm->number, st);
+                                st = MIN(itm->number, st);
 
                                 if (st > 0) {
                                     i_change(&u2->items, itm->type, -st);

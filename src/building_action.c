@@ -93,7 +93,7 @@ lc_write(const struct attrib *a, const void *owner, struct storage *store)
     const char *fname = data->fname;
     const char *fparam = data->param;
 
-    unused_arg(owner);
+    UNUSED_ARG(owner);
     WRITE_TOK(store, fname);
     WRITE_TOK(store, fparam ? fparam : NULLSTRING);
 }
@@ -116,7 +116,7 @@ static int lc_read(struct attrib *a, void *owner, gamedata *data)
         b = 0;
     }
     else {
-        bd->fname = _strdup(name);
+        bd->fname = strdup(name);
     }
     READ_TOK(store, name, sizeof(name));
     if (strcmp(name, "tnnL") == 0) {
@@ -127,7 +127,7 @@ static int lc_read(struct attrib *a, void *owner, gamedata *data)
     if (strcmp(name, NULLSTRING) == 0)
         bd->param = 0;
     else {
-        bd->param = _strdup(name);
+        bd->param = strdup(name);
     }
     if (result == 0 && !b) {
         return AT_READ_FAIL;
@@ -146,8 +146,8 @@ void building_addaction(building * b, const char *fname, const char *param)
 {
     attrib *a = a_add(&b->attribs, a_new(&at_building_action));
     building_action *data = (building_action *)a->data.v;
-    data->fname = _strdup(fname);
+    data->fname = strdup(fname);
     if (param) {
-        data->param = _strdup(param);
+        data->param = strdup(param);
     }
 }

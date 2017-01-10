@@ -22,6 +22,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "skill.h"
 #include "types.h"
 #include <modules/score.h>
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

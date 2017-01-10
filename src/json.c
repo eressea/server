@@ -73,7 +73,7 @@ int json_export(stream * out, int flags) {
         cJSON_AddItemToObject(root, "planes", json = cJSON_CreateObject());
         for (p = planes; p; p = p->next) {
             cJSON *data;
-            _snprintf(id, sizeof(id), "%d", p->id);
+            snprintf(id, sizeof(id), "%d", p->id);
             cJSON_AddItemToObject(json, id, data = cJSON_CreateObject());
             cJSON_AddNumberToObject(data, "x", p->minx);
             cJSON_AddNumberToObject(data, "y", p->miny);
@@ -85,7 +85,7 @@ int json_export(stream * out, int flags) {
         cJSON_AddItemToObject(root, "regions", json = cJSON_CreateObject());
         for (r = regions; r; r = r->next) {
             cJSON *data;
-            _snprintf(id, sizeof(id), "%d", r->uid);
+            snprintf(id, sizeof(id), "%d", r->uid);
             cJSON_AddItemToObject(json, id, data = cJSON_CreateObject());
             cJSON_AddNumberToObject(data, "x", r->x);
             cJSON_AddNumberToObject(data, "y", r->y);

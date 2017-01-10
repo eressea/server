@@ -199,7 +199,7 @@ newfaction *read_newfactions(const char *filename)
             free(nf);
             continue;
         }
-        nf->password = _strdup(password);
+        nf->password = strdup(password);
         nf->race = rc_find(race);
         nf->subscription = subscription;
         if (alliances != NULL) {
@@ -962,8 +962,8 @@ int build_island_e3(newfaction ** players, int x, int y, int numfactions, int mi
                 q = region_quality(r, rn);
                 if (q >= MIN_QUALITY && nfactions < numfactions && *players) {
                     starting_region(players, r, rn);
-                    minq = _min(minq, q);
-                    maxq = _max(maxq, q);
+                    minq = MIN(minq, q);
+                    maxq = MAX(maxq, q);
                     ++nfactions;
                 }
             }
@@ -977,8 +977,8 @@ int build_island_e3(newfaction ** players, int x, int y, int numfactions, int mi
                 q = region_quality(r, rn);
                 if (q >= MIN_QUALITY * 4 / 3 && nfactions < numfactions && *players) {
                     starting_region(players, r, rn);
-                    minq = _min(minq, q);
-                    maxq = _max(maxq, q);
+                    minq = MIN(minq, q);
+                    maxq = MAX(maxq, q);
                     ++nfactions;
                 }
             }

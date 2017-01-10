@@ -146,7 +146,7 @@ static void test_unit_name(CuTest *tc) {
     test_create_world();
     u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
     unit_setname(u, "Hodor");
-    _snprintf(name, sizeof(name), "Hodor (%s)", itoa36(u->no));
+    snprintf(name, sizeof(name), "Hodor (%s)", itoa36(u->no));
     CuAssertStrEquals(tc, name, unitname(u));
     test_cleanup();
 }
@@ -164,12 +164,12 @@ static void test_unit_name_from_race(CuTest *tc) {
     locale_setstring(lang, rc_name_s(u->_race, NAME_SINGULAR), "Mensch");
     locale_setstring(lang, rc_name_s(u->_race, NAME_PLURAL), "Menschen");
 
-    _snprintf(name, sizeof(name), "Mensch (%s)", itoa36(u->no));
+    snprintf(name, sizeof(name), "Mensch (%s)", itoa36(u->no));
     CuAssertStrEquals(tc, name, unitname(u));
     CuAssertStrEquals(tc, "Mensch", unit_getname(u));
 
     u->number = 2;
-    _snprintf(name, sizeof(name), "Menschen (%s)", itoa36(u->no));
+    snprintf(name, sizeof(name), "Menschen (%s)", itoa36(u->no));
     CuAssertStrEquals(tc, name, unitname(u));
     CuAssertStrEquals(tc, "Menschen", unit_getname(u));
 
@@ -243,9 +243,9 @@ static void test_default_name(CuTest *tc) {
 }
 
 static int cb_skillmod(const unit *u, const region *r, skill_t sk, int level) {
-    unused_arg(u);
-    unused_arg(r);
-    unused_arg(sk);
+    UNUSED_ARG(u);
+    UNUSED_ARG(r);
+    UNUSED_ARG(sk);
     return level + 3;
 }
 
@@ -398,7 +398,7 @@ static void test_unit_description(CuTest *tc) {
     u = test_create_unit(test_create_faction(rc), test_create_region(0,0,0));
     CuAssertPtrEquals(tc, 0, u->display);
     CuAssertStrEquals(tc, 0, u_description(u, u->faction->locale));
-    u->display = _strdup("Hodor");
+    u->display = strdup("Hodor");
     CuAssertStrEquals(tc, "Hodor", u_description(u, NULL));
     CuAssertStrEquals(tc, "Hodor", u_description(u, u->faction->locale));
     test_cleanup();

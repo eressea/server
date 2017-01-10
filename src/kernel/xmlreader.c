@@ -94,8 +94,8 @@ static xmlChar *xml_cleanup_string(xmlChar * str)
 
     while (*read) {
         /* eat leading whitespace */
-        if (*read && isxspace(*read)) {
-            while (*read && isxspace(*read)) {
+        if (*read && isspace(*read)) {
+            while (*read && isspace(*read)) {
                 ++read;
             }
             *write++ = ' ';
@@ -379,7 +379,7 @@ static int parse_calendar(xmlDocPtr doc)
             first_turn = xml_ivalue(calendar, "start", first_turn);
             if (propValue) {
                 free(agename);
-                agename = _strdup(mkname("calendar", (const char *)propValue));
+                agename = strdup(mkname("calendar", (const char *)propValue));
                 xmlFree(propValue);
             }
 
@@ -398,7 +398,7 @@ static int parse_calendar(xmlDocPtr doc)
                     xmlNodePtr week = nsetWeeks->nodeTab[i];
                     xmlChar *propValue = xmlGetProp(week, BAD_CAST "name");
                     if (propValue) {
-                        weeknames[i] = _strdup(mkname("calendar", (const char *)propValue));
+                        weeknames[i] = strdup(mkname("calendar", (const char *)propValue));
                         weeknames2[i] = malloc(strlen(weeknames[i]) + 3);
                         sprintf(weeknames2[i], "%s_d", weeknames[i]);
                         xmlFree(propValue);
@@ -421,7 +421,7 @@ static int parse_calendar(xmlDocPtr doc)
                     xmlChar *propValue = xmlGetProp(season, BAD_CAST "name");
                     if (propValue) {
                         seasonnames[i] =
-                            _strdup(mkname("calendar", (const char *)propValue));
+                            strdup(mkname("calendar", (const char *)propValue));
                         xmlFree(propValue);
                     }
                 }
@@ -451,7 +451,7 @@ static int parse_calendar(xmlDocPtr doc)
                             xmlFree(newyear);
                             newyear = NULL;
                         }
-                        monthnames[i] = _strdup(mkname("calendar", (const char *)propValue));
+                        monthnames[i] = strdup(mkname("calendar", (const char *)propValue));
                         xmlFree(propValue);
                     }
                     if (nsetSeasons) {
@@ -663,7 +663,7 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
         xmlFree(propValue);
 
         propValue = xmlGetProp(node, BAD_CAST "value");
-        wtype->damage[pos] = _strdup((const char *)propValue); // TODO: this is a memory leak
+        wtype->damage[pos] = strdup((const char *)propValue); // TODO: this is a memory leak
         if (k == 0)
             wtype->damage[1 - pos] = wtype->damage[pos];
         xmlFree(propValue);
@@ -1426,13 +1426,13 @@ static int parse_spells(xmlDocPtr doc)
 
             propValue = xmlGetProp(node, BAD_CAST "parameters");
             if (propValue) {
-                sp->parameter = _strdup((const char *)propValue);
+                sp->parameter = strdup((const char *)propValue);
                 xmlFree(propValue);
             }
 
             propValue = xmlGetProp(node, BAD_CAST "syntax");
             if (propValue) {
-                sp->syntax = _strdup((const char *)propValue);
+                sp->syntax = strdup((const char *)propValue);
                 xmlFree(propValue);
             }
 #ifdef TODO /* no longer need it, spellbooks! */
@@ -1628,7 +1628,7 @@ static int parse_races(xmlDocPtr doc)
 
         propValue = xmlGetProp(node, BAD_CAST "damage");
         assert(propValue != NULL);
-        rc->def_damage = _strdup((const char *)propValue);
+        rc->def_damage = strdup((const char *)propValue);
         xmlFree(propValue);
 
         rc->magres = (float)xml_fvalue(node, "magres", rc->magres);
@@ -1869,7 +1869,7 @@ static int parse_races(xmlDocPtr doc)
 
             propValue = xmlGetProp(node, BAD_CAST "damage");
             if (propValue != NULL) {
-                attack->data.dice = _strdup((const char *)propValue);
+                attack->data.dice = strdup((const char *)propValue);
                 xmlFree(propValue);
             }
             else {
@@ -1932,7 +1932,7 @@ static int parse_messages(xmlDocPtr doc)
                     (const char *)propType);
                 xmlFree(propName);
                 xmlFree(propType);
-                argv[k] = _strdup(zBuffer);
+                argv[k] = strdup(zBuffer);
             }
             argv[result->nodesetval->nodeNr] = NULL;
         }

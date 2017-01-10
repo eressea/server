@@ -156,7 +156,7 @@ struct order *ord)
 
     assert(itype != NULL);
     n = get_pooled(src, item2resource(itype), GET_SLACK | GET_POOLED_SLACK, want);
-    n = _min(want, n);
+    n = MIN(want, n);
     r = n;
     if (dest && src->faction != dest->faction
         && src->faction->age < GiveRestriction()) {
@@ -772,7 +772,7 @@ void give_cmd(unit * u, order * ord)
                 msg_feedback(u, ord, "race_noregroup", "race", u_race(u)));
             return;
         }
-        n = _min(u->number, n);
+        n = MIN(u->number, n);
         msg = u2 ? give_men(n, u, u2, ord) : disband_men(n, u, ord);
         if (msg) {
             ADDMSG(&u->faction->msgs, msg);

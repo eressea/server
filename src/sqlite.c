@@ -94,9 +94,9 @@ read_factions(sqlite3 * db, int game_id) {
         text = (const char *)sqlite3_column_text(stmt, 1);
         if (text) dbf->no = atoi36(text);
         text = (const char *)sqlite3_column_text(stmt, 2);
-        if (text) dbf->name = _strdup(text);
+        if (text) dbf->name = strdup(text);
         text = (const char *)sqlite3_column_text(stmt, 3);
-        if (text) dbf->email = _strdup(text);
+        if (text) dbf->email = strdup(text);
         ql_push(&result, dbf);
         res = sqlite3_step(stmt);
     }

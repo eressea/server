@@ -109,7 +109,7 @@ int curse_age(attrib * a, void *owner)
     curse *c = (curse *)a->data.v;
     int result = 0;
 
-    unused_arg(owner);
+    UNUSED_ARG(owner);
     c_clearflag(c, CURSE_ISNEW);
 
     if (c_flags(c) & CURSE_NOAGE) {
@@ -122,7 +122,7 @@ int curse_age(attrib * a, void *owner)
         c->duration = 0;
     }
     else if (c->duration != INT_MAX) {
-        c->duration = _max(0, c->duration - 1);
+        c->duration = MAX(0, c->duration - 1);
     }
     return (c->duration > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
 }
@@ -348,7 +348,7 @@ const curse_type *ct_find(const char *c)
                 return type;
             }
             else {
-                size_t k = _min(c_len, strlen(type->cname));
+                size_t k = MIN(c_len, strlen(type->cname));
                 if (!memcmp(c, type->cname, k)) {
                     return type;
                 }
@@ -507,7 +507,7 @@ int get_cursedmen(unit * u, const curse * c)
         cursedmen = c->data.i;
     }
 
-    return _min(u->number, cursedmen);
+    return MIN(u->number, cursedmen);
 }
 
 /* setzt die Anzahl der betroffenen Personen auf cursedmen */
@@ -596,7 +596,7 @@ curse *create_curse(unit * magician, attrib ** ap, const curse_type * ct,
     /* es gibt schon eins diese Typs */
     if (c && ct->mergeflags != NO_MERGE) {
         if (ct->mergeflags & M_DURATION) {
-            c->duration = _max(c->duration, duration);
+            c->duration = MAX(c->duration, duration);
         }
         if (ct->mergeflags & M_SUMDURATION) {
             c->duration += duration;
@@ -605,10 +605,10 @@ curse *create_curse(unit * magician, attrib ** ap, const curse_type * ct,
             c->effect += effect;
         }
         if (ct->mergeflags & M_MAXEFFECT) {
-            c->effect = _max(c->effect, effect);
+            c->effect = MAX(c->effect, effect);
         }
         if (ct->mergeflags & M_VIGOUR) {
-            c->vigour = _max(vigour, c->vigour);
+            c->vigour = MAX(vigour, c->vigour);
         }
         if (ct->mergeflags & M_VIGOUR_ADD) {
             c->vigour = vigour + c->vigour;
@@ -792,9 +792,9 @@ message *cinfo_simple(const void *obj, objtype_t typ, const struct curse * c,
 {
     struct message *msg;
 
-    unused_arg(typ);
-    unused_arg(self);
-    unused_arg(obj);
+    UNUSED_ARG(typ);
+    UNUSED_ARG(self);
+    UNUSED_ARG(obj);
 
     msg = msg_message(mkname("curseinfo", c->type->cname), "id", c->no);
     if (msg == NULL) {

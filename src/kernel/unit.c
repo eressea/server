@@ -123,7 +123,7 @@ unit *findunitr(const region * r, int n)
 // TODO: deprecated, replace with findunit(n)
 unit *findunitg(int n, const region * hint)
 {
-    unused_arg(hint);
+    UNUSED_ARG(hint);
     /* Abfangen von Syntaxfehlern. */
     if (n <= 0)
         return NULL;
@@ -511,7 +511,7 @@ int a_readprivate(attrib * a, void *owner, gamedata *data)
     struct storage *store = data->store;
     char lbuf[DISPLAYSIZE];
     READ_STR(store, lbuf, sizeof(lbuf));
-    a->data.v = _strdup(lbuf);
+    a->data.v = strdup(lbuf);
     return (a->data.v) ? AT_READ_OK : AT_READ_FAIL;
 }
 
@@ -562,7 +562,7 @@ void usetprivate(unit * u, const char *str)
     if (a->data.v) {
         free(a->data.v);
     }
-    a->data.v = _strdup(str);
+    a->data.v = strdup(str);
 }
 
 /*********************/
@@ -809,8 +809,8 @@ void set_level(unit * u, skill_t sk, int value)
 static int leftship_age(struct attrib *a, void *owner)
 {
     /* must be aged, so it doesn't affect report generation (cansee) */
-    unused_arg(a);
-    unused_arg(owner);
+    UNUSED_ARG(a);
+    UNUSED_ARG(owner);
     return AT_AGE_REMOVE;         /* remove me */
 }
 
@@ -1390,7 +1390,7 @@ int invisible(const unit * target, const unit * viewer)
     else {
         int hidden = item_invis(target);
         if (hidden) {
-            hidden = _min(hidden, target->number);
+            hidden = MIN(hidden, target->number);
             if (viewer) {
                 const resource_type *rtype = get_resourcetype(R_AMULET_OF_TRUE_SEEING);
                 hidden -= i_get(viewer->items, rtype->itype);
@@ -1533,7 +1533,7 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
     u->hp = unit_max_hp(u) * number;
 
     if (dname) {
-        u->_name = _strdup(dname);
+        u->_name = strdup(dname);
     }
     else if (urace->generate_name || playerrace(urace)) {
         name_unit(u);
@@ -1640,7 +1640,7 @@ void unit_setname(unit * u, const char *name)
 {
     free(u->_name);
     if (name && name[0])
-        u->_name = _strdup(name);
+        u->_name = strdup(name);
     else
         u->_name = NULL;
 }
@@ -1654,7 +1654,7 @@ void unit_setinfo(unit * u, const char *info)
 {
     free(u->display);
     if (info)
-        u->display = _strdup(info);
+        u->display = strdup(info);
     else
         u->display = NULL;
 }

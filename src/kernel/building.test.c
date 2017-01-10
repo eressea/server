@@ -22,7 +22,7 @@ static void test_register_building(CuTest * tc)
     test_cleanup();
 
     btype = (building_type *)calloc(sizeof(building_type), 1);
-    btype->_name = _strdup("herp");
+    btype->_name = strdup("herp");
     CuAssertIntEquals(tc, true, bt_changed(&cache));
     CuAssertIntEquals(tc, false, bt_changed(&cache));
     bt_register(btype);

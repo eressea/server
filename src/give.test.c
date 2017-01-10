@@ -244,7 +244,7 @@ static void test_give_men_requires_contact(CuTest * tc) {
     CuAssertIntEquals(tc, 1, env.dst->number);
     CuAssertIntEquals(tc, 1, env.src->number);
 
-    _snprintf(cmd, sizeof(cmd), "%s ALLES PERSONEN", itoa36(env.dst->no));
+    snprintf(cmd, sizeof(cmd), "%s ALLES PERSONEN", itoa36(env.dst->no));
     ord = create_order(K_GIVE, env.f1->locale, cmd);
     test_clear_messages(env.f1);
     give_cmd(env.src, ord);
@@ -316,7 +316,7 @@ static void test_give_cmd(CuTest * tc) {
 
     i_change(&env.src->items, env.itype, 10);
 
-    _snprintf(cmd, sizeof(cmd), "%s 5 %s", itoa36(env.dst->no), LOC(env.f1->locale, env.itype->rtype->_name));
+    snprintf(cmd, sizeof(cmd), "%s 5 %s", itoa36(env.dst->no), LOC(env.f1->locale, env.itype->rtype->_name));
     ord = create_order(K_GIVE, env.f1->locale, cmd);
     assert(ord);
     give_cmd(env.src, ord);
@@ -338,7 +338,7 @@ static void test_give_herbs(CuTest * tc) {
     setup_give(&env);
     i_change(&env.src->items, env.itype, 10);
 
-    _snprintf(cmd, sizeof(cmd), "%s %s", itoa36(env.dst->no), LOC(env.f1->locale, parameters[P_HERBS]));
+    snprintf(cmd, sizeof(cmd), "%s %s", itoa36(env.dst->no), LOC(env.f1->locale, parameters[P_HERBS]));
     ord = create_order(K_GIVE, env.f1->locale, cmd);
     assert(ord);
 

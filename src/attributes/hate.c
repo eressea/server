@@ -30,7 +30,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 static int verify_hate(attrib * a, void *owner)
 {
-    unused_arg(owner);
+    UNUSED_ARG(owner);
     if (a->data.v == NULL) {
         return 0;
     }

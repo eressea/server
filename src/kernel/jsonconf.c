@@ -224,7 +224,7 @@ static void json_terrain_production(cJSON *json, terrain_production *prod) {
         if (dst) {
             free(*dst);
             assert(child->type == cJSON_String);
-            *dst = _strdup(child->valuestring);
+            *dst = strdup(child->valuestring);
         }
     }
 }
@@ -453,7 +453,7 @@ static void json_race(cJSON *json, race *rc) {
         switch (child->type) {
         case cJSON_String:
             if (strcmp(child->string, "damage") == 0) {
-                rc->def_damage = _strdup(child->valuestring);
+                rc->def_damage = strdup(child->valuestring);
             }
             break;
         case cJSON_Number:
@@ -534,7 +534,7 @@ static void disable_feature(const char *str) {
         enable_keyword(k, false);
         return;
     }
-    _snprintf(name, sizeof(name), "%s.enabled", str);
+    snprintf(name, sizeof(name), "%s.enabled", str);
     log_info("disable feature %s\n", name);
     config_set(name, "0");
 }
@@ -594,7 +594,7 @@ static void json_spells(cJSON *json) {
                     sp->fumble = (fumble_f)get_function(item->valuestring);
                 }
                 else if (strcmp(item->string, "syntax") == 0) {
-                    sp->syntax = _strdup(item->valuestring);
+                    sp->syntax = strdup(item->valuestring);
                 }
             }
         }
@@ -796,10 +796,10 @@ static void json_settings(cJSON *json) {
         else {
             char value[32];
             if (child->type == cJSON_Number && child->valuedouble && child->valueint<child->valuedouble) {
-                _snprintf(value, sizeof(value), "%f", child->valuedouble);
+                snprintf(value, sizeof(value), "%f", child->valuedouble);
             }
             else {
-                _snprintf(value, sizeof(value), "%d", child->valueint);
+                snprintf(value, sizeof(value), "%d", child->valueint);
             }
             config_set(child->string, value);
         }

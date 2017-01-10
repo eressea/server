@@ -97,8 +97,8 @@ int update_nmrs(void)
             if (timeout>0) {
                 if (nmr < 0 || nmr > timeout) {
                     log_error("faction %s has %d NMR", itoa36(f->no), nmr);
-                    nmr = _max(0, nmr);
-                    nmr = _min(nmr, timeout);
+                    nmr = MAX(0, nmr);
+                    nmr = MIN(nmr, timeout);
                 }
                 if (nmr > 0) {
                     log_debug("faction %s has %d NMR", itoa36(f->no), nmr);
@@ -164,7 +164,7 @@ static char *gamedate2(const struct locale *lang)
 
 static void writeturn(void)
 {
-    char zText[MAX_PATH];
+    char zText[4096];
     FILE *f;
 
     join_path(basepath(), "datum", zText, sizeof(zText));
@@ -190,7 +190,7 @@ void report_summary(summary * s, summary * o, bool full)
     FILE *F = NULL;
     int i, newplayers = 0;
     faction *f;
-    char zText[MAX_PATH];
+    char zText[4096];
     int timeout = NMRTimeout();
 
     if (full) {

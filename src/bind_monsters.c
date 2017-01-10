@@ -74,7 +74,7 @@ static int fix_familiars(struct lua_State *L)
                     free(mage->spellbook);
                     mage->spellbook = 0;
 
-                    _snprintf(buffer, sizeof(buffer), "%s_familiar", u_race(u)->_name);
+                    snprintf(buffer, sizeof(buffer), "%s_familiar", u_race(u)->_name);
                     eq = get_equipment(buffer);
                     if (eq) {
                         equip_unit_mask(u, eq, EQUIP_SPELLS);

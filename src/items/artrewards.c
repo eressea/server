@@ -45,7 +45,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 static int age_peaceimmune(attrib * a, void *owner)
 {
-    unused_arg(owner);
+    UNUSED_ARG(owner);
     return (--a->data.i > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
 }
 

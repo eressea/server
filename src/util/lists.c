@@ -127,7 +127,7 @@ void addstrlist(strlist ** SP, const char *s)
 {
     strlist *slist = malloc(sizeof(strlist));
     slist->next = NULL;
-    slist->s = _strdup(s);
+    slist->s = strdup(s);
     addlist(SP, slist);
 }
 

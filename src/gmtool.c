@@ -427,7 +427,7 @@ static void paint_info_region(window * wnd, const state * st)
     int line = 0, maxline = getmaxy(win) - 2;
     map_region *mr = cursor_region(&st->display, &st->cursor);
 
-    unused_arg(st);
+    UNUSED_ARG(st);
     werase(win);
     wxborder(win);
     if (mr && mr->r) {
@@ -1398,7 +1398,7 @@ int
 curses_readline(struct lua_State *L, char *buffer, size_t size,
 const char *prompt)
 {
-    unused_arg(L);
+    UNUSED_ARG(L);
     askstring(hstatus, prompt, buffer, size);
     return buffer[0] != 0;
 }

@@ -103,7 +103,7 @@ static int dict_read(attrib * a, void *owner, gamedata *data)
     float flt;
 
     READ_STR(store, name, sizeof(name));
-    dd->name = _strdup(name);
+    dd->name = strdup(name);
     READ_INT(store, &n);
     dd->type = (dict_type)n;
     switch (dd->type) {
@@ -122,7 +122,7 @@ static int dict_read(attrib * a, void *owner, gamedata *data)
         break;
     case TSTRING:
         READ_STR(store, name, sizeof(name));
-        dd->data.str = _strdup(name);
+        dd->data.str = strdup(name);
         break;
     case TBUILDING:
         result =
@@ -199,7 +199,7 @@ struct attrib *dict_create(const char *name, dict_type type, variant value)
 {
     attrib *a = a_new(&at_dict);
     dict_data *data = (dict_data *)a->data.v;
-    data->name = _strdup(name);
+    data->name = strdup(name);
 
     dict_set(a, type, value);
     return a;
@@ -214,7 +214,7 @@ void dict_set(attrib * a, dict_type type, variant value)
     data->type = type;
     switch (type) {
     case TSTRING:
-        data->data.str = value.v ? _strdup(value.v) : NULL;
+        data->data.str = value.v ? strdup(value.v) : NULL;
         break;
     case TINTEGER:
         data->data.i = value.i;

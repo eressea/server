@@ -47,7 +47,7 @@ static void help_feed(unit * donor, unit * u, int *need_p)
 {
     int need = *need_p;
     int give = get_money(donor) - lifestyle(donor);
-    give = _min(need, give);
+    give = MIN(need, give);
 
     if (give > 0) {
         change_money(donor, -give);
@@ -161,7 +161,7 @@ void get_food(region * r)
             * food from the peasants - should not be used with WORK */
             if (owner != NULL && (get_alliance(owner, u->faction) & HELP_MONEY)) {
                 int rm = rmoney(r);
-                int use = _min(rm, need);
+                int use = MIN(rm, need);
                 rsetmoney(r, rm - use);
                 need -= use;
             }
@@ -174,7 +174,7 @@ void get_food(region * r)
             for (v = r->units; need && v; v = v->next) {
                 if (v->faction == u->faction && help_money(v)) {
                     int give = get_money(v) - lifestyle(v);
-                    give = _min(need, give);
+                    give = MIN(need, give);
                     if (give > 0) {
                         change_money(v, -give);
                         change_money(u, give);
@@ -191,7 +191,7 @@ void get_food(region * r)
         int need = lifestyle(u);
         faction *f = u->faction;
 
-        need -= _max(0, get_money(u));
+        need -= MAX(0, get_money(u));
 
         if (need > 0) {
             unit *v;
@@ -247,7 +247,7 @@ void get_food(region * r)
                 unit *donor = u;
                 while (donor != NULL && hungry > 0) {
                     int blut = get_effect(donor, pt_blood);
-                    blut = _min(blut, hungry);
+                    blut = MIN(blut, hungry);
                     if (blut) {
                         change_effect(donor, pt_blood, -blut);
                         hungry -= blut;
@@ -295,7 +295,7 @@ void get_food(region * r)
 
     /* 3. Von den überlebenden das Geld abziehen: */
     for (u = r->units; u; u = u->next) {
-        int need = _min(get_money(u), lifestyle(u));
+        int need = MIN(get_money(u), lifestyle(u));
         change_money(u, -need);
     }
 }
