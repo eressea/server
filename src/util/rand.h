@@ -1,3 +1,4 @@
+#pragma once
 /*
 Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
