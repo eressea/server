@@ -162,6 +162,7 @@ static int potion_healing(unit * u, int amount) {
 
 static int potion_luck(unit *u, region *r, attrib_type *atype, int amount) {
     attrib *a = (attrib *)a_find(r->attribs, atype);
+    UNUSED_ARG(u);
     if (!a) {
         a = a_add(&r->attribs, a_new(atype));
     }
@@ -170,6 +171,7 @@ static int potion_luck(unit *u, region *r, attrib_type *atype, int amount) {
 }
 
 static int potion_truth(unit *u) {
+    UNUSED_ARG(u);
     // TODO: this potion does nothing!
     // fset(u, UFL_DISBELIEVES);
     return 1;
@@ -304,6 +306,7 @@ static void
 a_writeeffect(const attrib * a, const void *owner, struct storage *store)
 {
     effect_data *edata = (effect_data *)a->data.v;
+    UNUSED_ARG(owner);
     WRITE_TOK(store, resourcename(edata->type->itype->rtype, 0));
     WRITE_INT(store, edata->value);
 }
@@ -316,6 +319,7 @@ static int a_readeffect(attrib * a, void *owner, struct gamedata *data)
     effect_data *edata = (effect_data *)a->data.v;
     char zText[32];
 
+    UNUSED_ARG(owner);
     READ_TOK(store, zText, sizeof(zText));
     rtype = rt_find(zText);
 

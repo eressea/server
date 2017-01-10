@@ -398,6 +398,7 @@ static void
 report_effect(region * r, unit * mage, message * seen, message * unseen)
 {
     int err = report_action(r, mage, seen, ACTION_RESET | ACTION_CANSEE);
+    UNUSED_ARG(unseen);
     if (err) {
         report_action(r, mage, seen, ACTION_CANNOTSEE);
     }
@@ -2895,6 +2896,8 @@ static int dc_read_compat(struct attrib *a, void *target, gamedata *data)
     float strength;
     int rx, ry;
 
+    UNUSED_ARG(a);
+    UNUSED_ARG(target);
     READ_INT(store, &duration);
     READ_FLT(store, &strength);
     READ_INT(store, &var.i);
@@ -3119,8 +3122,10 @@ static bool chaosgate_valid(const connection * b)
 }
 
 static struct region *chaosgate_move(const connection * b, struct unit *u,
-struct region *from, struct region *to, bool routing)
+    struct region *from, struct region *to, bool routing)
 {
+    UNUSED_ARG(from);
+    UNUSED_ARG(b);
     if (!routing) {
         int maxhp = u->hp / 4;
         if (maxhp < u->number)
@@ -6438,6 +6443,7 @@ int sp_break_curse(castorder * co)
 /* ------------------------------------------------------------- */
 int sp_becomewyrm(castorder * co)
 {
+    UNUSED_ARG(co);
     return 0;
 }
 

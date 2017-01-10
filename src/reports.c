@@ -1906,23 +1906,23 @@ static void eval_regions(struct opstack **stack, const void *userdata)
     const faction *report = (const faction *)userdata;
     int i = opop(stack).i;
     int end, begin = opop(stack).i;
-    const arg_regions *regions = (const arg_regions *)opop(stack).v;
+    const arg_regions *aregs = (const arg_regions *)opop(stack).v;
     char buf[256];
     size_t size = sizeof(buf) - 1;
     variant var;
     char *bufp = buf;
 
-    if (regions == NULL) {
+    if (aregs == NULL) {
         end = begin;
     }
     else {
         if (i >= 0)
             end = begin + i;
         else
-            end = regions->nregions + i;
+            end = aregs->nregions + i;
     }
     for (i = begin; i < end; ++i) {
-        const char *rname = (const char *)regionname(regions->regions[i], report);
+        const char *rname = (const char *)regionname(aregs->regions[i], report);
         bufp = STRLCPY(bufp, rname, size);
 
         if (i + 1 < end && size > 2) {
@@ -1941,7 +1941,7 @@ static void eval_trail(struct opstack **stack, const void *userdata)
     const faction *report = (const faction *)userdata;
     const struct locale *lang = report ? report->locale : default_locale;
     int i, end = 0, begin = 0;
-    const arg_regions *regions = (const arg_regions *)opop(stack).v;
+    const arg_regions *aregs = (const arg_regions *)opop(stack).v;
     char buf[512];
     size_t size = sizeof(buf) - 1;
     variant var;
@@ -1951,10 +1951,10 @@ static void eval_trail(struct opstack **stack, const void *userdata)
     int eold = errno;
 #endif
 
-    if (regions != NULL) {
-        end = regions->nregions;
+    if (aregs != NULL) {
+        end = aregs->nregions;
         for (i = begin; i < end; ++i) {
-            region *r = regions->regions[i];
+            region *r = aregs->regions[i];
             const char *trail = trailinto(r, lang);
             const char *rn = f_regionid_s(r, report);
 

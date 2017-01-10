@@ -509,6 +509,9 @@ contest_new(int skilldiff, const troop dt, const armor_type * ar,
 const armor_type * sh)
 {
     double tohit = 0.5 + skilldiff * 0.1;
+
+    UNUSED_ARG(sh);
+    UNUSED_ARG(ar);
     if (tohit < 0.5)
         tohit = 0.5;
     if (chance(tohit)) {
@@ -839,6 +842,7 @@ int select_magicarmor(troop t)
 /* Sind side ds und Magier des meffect verb�ndet, dann return 1*/
 bool meffect_protection(battle * b, meffect * s, side * ds)
 {
+    UNUSED_ARG(b);
     if (!s->magician->alive)
         return false;
     if (s->duration <= 0)
@@ -853,6 +857,7 @@ bool meffect_protection(battle * b, meffect * s, side * ds)
 /* Sind side as und Magier des meffect verfeindet, dann return 1*/
 bool meffect_blocked(battle * b, meffect * s, side * as)
 {
+    UNUSED_ARG(b);
     if (!s->magician->alive)
         return false;
     if (s->duration <= 0)
@@ -1763,8 +1768,8 @@ void do_combatmagic(battle * b, combatmagic_t was)
         for (co = spellranks[rank].begin; co; co = co->next) {
             fighter *fig = co->magician.fig;
             const spell *sp = co->sp;
-            int level = co->level;
 
+            level = co->level;
             if (!sp->cast) {
                 log_error("spell '%s' has no function.\n", sp->sname);
             }
@@ -2040,6 +2045,7 @@ int hits(troop at, troop dt, weapon * awp)
 
 void dazzle(battle * b, troop * td)
 {
+    UNUSED_ARG(b);
     /* Nicht kumulativ ! */
 #ifdef TODO_RUNESWORD
     if (td->fighter->weapon[WP_RUNESWORD].count > td->index) {
@@ -2487,6 +2493,7 @@ troop select_ally(fighter * af, int minrow, int maxrow, int allytype)
 static int loot_quota(const unit * src, const unit * dst,
     const item_type * type, int n)
 {
+    UNUSED_ARG(type);
     if (dst && src && src->faction != dst->faction) {
         double divisor = config_get_flt("rules.items.loot_divisor", 1);
         assert(divisor <= 0 || divisor >= 1);
@@ -2636,7 +2643,6 @@ static void reorder_fleeing(region * r)
 static void aftermath(battle * b)
 {
     region *r = b->region;
-    ship *sh;
     side *s;
     int dead_players = 0;
     bfaction *bf;
@@ -2833,6 +2839,7 @@ static void aftermath(battle * b)
              * dieses Schiff besch�digt. Andernfalls ein Schiff, welches
              * evt. zuvor verlassen wurde. */
             if (ships_damaged) {
+                ship *sh;
                 if (du->ship)
                     sh = du->ship;
                 else
