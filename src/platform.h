@@ -10,7 +10,6 @@
 #endif
 #define NO_STRDUP
 #define NO_MKDIR
-#define NO_UNLINK
 #define _CRT_SECURE_NO_WARNINGS
 #pragma warning(disable: 4710 4820)
 #pragma warning(disable: 4100) // unreferenced formal parameter
@@ -38,7 +37,4 @@ char * strdup(const char *s);
 int mkdir(const char *pathname, int mode);
 #endif
 
-#ifdef NO_UNLINK
-int unlink(const char *pathname);
-#endif
 #endif
