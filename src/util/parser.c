@@ -32,7 +32,7 @@ static int eatwhitespace_c(const char **str_p)
     for (;;) {
         unsigned char utf8_character = (unsigned char)*str;
         if (~utf8_character & 0x80) {
-            if (!iswxspace(utf8_character))
+            if (!iswspace(utf8_character))
                 break;
             ++str;
         }
@@ -42,7 +42,7 @@ static int eatwhitespace_c(const char **str_p)
                 log_warning("illegal character sequence in UTF8 string: %s\n", str);
                 break;
             }
-            if (!iswxspace((wint_t)ucs))
+            if (!iswspace((wint_t)ucs))
                 break;
             str += len;
         }
@@ -106,7 +106,7 @@ void skip_token(void)
                 log_warning("illegal character sequence in UTF8 string: %s\n", states->current_token);
             }
         }
-        if (iswxspace((wint_t)ucs) && quotechar == 0) {
+        if (iswspace((wint_t)ucs) && quotechar == 0) {
             return;
         }
         else {
@@ -163,7 +163,7 @@ char *parse_token(const char **str, char *lbuf, size_t buflen)
             copy = true;
             escape = false;
         }
-        else if (iswxspace((wint_t)ucs)) {
+        else if (iswspace((wint_t)ucs)) {
             if (quotechar == 0)
                 break;
             copy = true;
