@@ -18,6 +18,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #ifndef H_ATTRIBUTE_KEY
 #define H_ATTRIBUTE_KEY
+
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
