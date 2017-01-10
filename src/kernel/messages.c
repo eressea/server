@@ -212,7 +212,7 @@ caddmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
 {
     message *m = NULL;
 
-    unused_arg(level);
+    UNUSED_ARG(level);
     switch (mtype) {
     case MSG_INCOME:
         assert(f);
@@ -275,7 +275,7 @@ message * msg_error(const unit * u, struct order *ord, int mno) {
 message * cmistake(const unit * u, struct order *ord, int mno, int mtype)
 {
     message * result;
-    unused_arg(mtype);
+    UNUSED_ARG(mtype);
     result = msg_error(u, ord, mno);
     ADDMSG(&u->faction->msgs, result);
     return result;

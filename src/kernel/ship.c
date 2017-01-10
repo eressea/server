@@ -109,7 +109,7 @@ ship_type *st_get_or_create(const char * name) {
     ship_type * st = st_find_i(name);
     if (!st) {
         st = (ship_type *)calloc(sizeof(ship_type), 1);
-        st->_name = _strdup(name);
+        st->_name = strdup(name);
         st->storm = 1.0;
         selist_push(&shiptypes, (void *)st);
     }
@@ -202,7 +202,7 @@ ship *new_ship(const ship_type * stype, region * r, const struct locale *lang)
     }
     assert(sname);
     slprintf(buffer, sizeof(buffer), "%s %s", sname, itoa36(sh->no));
-    sh->name = _strdup(buffer);
+    sh->name = strdup(buffer);
     shash(sh);
     if (r) {
         addlist(&r->ships, sh);
@@ -333,8 +333,8 @@ int shipspeed(const ship * sh, const unit * u)
         int crew = crew_skill(sh);
         int crew_bonus = (crew / sh->type->sumskill / 2) - 1;
         if (crew_bonus > 0) {
-            bonus = _min(bonus, crew_bonus);
-            bonus = _min(bonus, sh->type->range_max - sh->type->range);
+            bonus = MIN(bonus, crew_bonus);
+            bonus = MIN(bonus, sh->type->range_max - sh->type->range);
         }
         else {
             bonus = 0;
@@ -458,7 +458,7 @@ void write_ship_reference(const struct ship *sh, struct storage *store)
 void ship_setname(ship * self, const char *name)
 {
     free(self->name);
-    self->name = name ? _strdup(name) : 0;
+    self->name = name ? strdup(name) : 0;
 }
 
 const char *ship_getname(const ship * self)

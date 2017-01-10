@@ -71,7 +71,7 @@ static int unitmessage_handle(trigger * t, void *data)
                 td->level);
         }
     }
-    unused_arg(data);
+    UNUSED_ARG(data);
     return 0;
 }
 
@@ -92,7 +92,7 @@ static int unitmessage_read(trigger * t, gamedata *data)
     int result = read_reference(&td->target, data, read_unit_reference,
         resolve_unit);
     READ_TOK(data->store, zText, sizeof(zText));
-    td->string = _strdup(zText);
+    td->string = strdup(zText);
     READ_INT(data->store, &td->type);
     READ_INT(data->store, &td->level);
 
@@ -117,7 +117,7 @@ trigger *trigger_unitmessage(unit * target, const char *string, int type,
     trigger *t = t_new(&tt_unitmessage);
     unitmessage_data *td = (unitmessage_data *)t->data.v;
     td->target = target;
-    td->string = _strdup(string);
+    td->string = strdup(string);
     td->type = type;
     td->level = level;
     return t;

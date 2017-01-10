@@ -70,7 +70,7 @@ static int giveitem_handle(trigger * t, void *data)
     else {
         log_error("could not perform giveitem::handle()\n");
     }
-    unused_arg(data);
+    UNUSED_ARG(data);
     return 0;
 }
 

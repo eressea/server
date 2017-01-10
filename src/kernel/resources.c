@@ -111,7 +111,7 @@ static void terraform_default(struct rawmaterial *res, const region * r)
     res->amount = (int)(res->amount * modifier);  /* random adjustment, +/- 91% */
     if (res->amount < 1)
         res->amount = 1;
-    unused_arg(r);
+    UNUSED_ARG(r);
 }
 
 #ifdef RANDOM_CHANGE
@@ -205,7 +205,7 @@ struct rawmaterial_type *rmt_create(const struct resource_type *rtype,
     const char *name)
 {
     rawmaterial_type *rmtype = malloc(sizeof(rawmaterial_type));
-    rmtype->name = _strdup(name);
+    rmtype->name = strdup(name);
     rmtype->rtype = rtype;
     rmtype->terraform = terraform_default;
     rmtype->update = NULL;

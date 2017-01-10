@@ -57,8 +57,8 @@ group *new_group(faction * f, const char *name, int gid)
         gp = &(*gp)->next;
     *gp = g;
 
-    maxgid = _max(gid, maxgid);
-    g->name = _strdup(name);
+    maxgid = MAX(gid, maxgid);
+    g->name = strdup(name);
     g->gid = gid;
 
     g->nexthash = ghash[index];

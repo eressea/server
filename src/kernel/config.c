@@ -91,6 +91,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <limits.h>
 #include <time.h>
 #include <errno.h>
+#include <sys/stat.h>
 
 struct settings global = {
     "Eressea",                    /* gamename */
@@ -361,7 +362,7 @@ void init_locale(struct locale *lang)
             str = "gwyrrd illaun draig cerddor tybied";
         }
 
-        sstr = _strdup(str);
+        sstr = strdup(str);
         tok = strtok(sstr, " ");
         while (tok) {
             const char *name;
@@ -472,7 +473,7 @@ int check_param(const struct param *p, const char *key, const char *searchvalue)
     if (!value) {
         return 0;
     }
-    char *p_value = _strdup(value);
+    char *p_value = strdup(value);
     const char *delimiter = " ,;";
     char *v = strtok(p_value, delimiter);
 
@@ -535,7 +536,7 @@ static const char * relpath(char *buf, size_t sz, const char *path) {
 static const char *g_datadir;
 const char *datapath(void)
 {
-    static char zText[MAX_PATH];
+    static char zText[4096];
     if (g_datadir)
         return g_datadir;
     return relpath(zText, sizeof(zText), "data");
@@ -549,7 +550,7 @@ void set_datapath(const char *path)
 static const char *g_reportdir;
 const char *reportpath(void)
 {
-    static char zText[MAX_PATH];
+    static char zText[4096];
     if (g_reportdir)
         return g_reportdir;
     return relpath(zText, sizeof(zText), "reports");
@@ -562,12 +563,12 @@ void set_reportpath(const char *path)
 
 int create_directories(void) {
     int err;
-    err = _mkdir(datapath());
+    err = mkdir(datapath(), 0777);
     if (err) {
         if (errno == EEXIST) errno = 0;
         else return err;
     }
-    err = _mkdir(reportpath());
+    err = mkdir(reportpath(), 0777);
     if (err && errno == EEXIST) {
         errno = 0;
     }

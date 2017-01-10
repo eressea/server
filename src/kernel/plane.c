@@ -234,7 +234,7 @@ plane *create_new_plane(int id, const char *name, int minx, int maxx, int miny,
     pl->next = NULL;
     pl->id = id;
     if (name)
-        pl->name = _strdup(name);
+        pl->name = strdup(name);
     pl->minx = minx;
     pl->maxx = maxx;
     pl->miny = miny;

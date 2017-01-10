@@ -33,7 +33,7 @@ static void add_suite(CuSuite *(*csuite)(void), const char *name, int argc, char
     }
     if (s) {
         s->next = suites;
-        s->name = _strdup(name);
+        s->name = strdup(name);
         s->csuite = csuite();
         suites = s;
     }

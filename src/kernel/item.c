@@ -189,7 +189,7 @@ resource_type *rt_get_or_create(const char *name) {
             perror("resource_type allocation failed");
         }
         else {
-            rtype->_name = _strdup(name);
+            rtype->_name = strdup(name);
             rt_register(rtype);
             return rt_find(name);
         }
@@ -285,8 +285,8 @@ weapon_type *new_weapontype(item_type * itype,
 
     wtype = calloc(sizeof(weapon_type), 1);
     if (damage) {
-        wtype->damage[0] = _strdup(damage[0]);
-        wtype->damage[1] = _strdup(damage[1]);
+        wtype->damage[0] = strdup(damage[0]);
+        wtype->damage[1] = strdup(damage[1]);
     }
     wtype->defmod = defmod;
     wtype->flags |= wflags;
@@ -345,7 +345,7 @@ void it_set_appearance(item_type *itype, const char *appearance) {
     assert(itype);
     assert(itype->rtype);
     if (appearance) {
-        itype->_appearance[0] = _strdup(appearance);
+        itype->_appearance[0] = strdup(appearance);
         itype->_appearance[1] = strcat(strcpy((char *)malloc(strlen((char *)appearance) + 3), (char *)appearance), "_p");
     } else {
         itype->_appearance[0] = 0;
@@ -679,9 +679,9 @@ struct order *ord)
     direction_t d;
     message *msg = msg_message("meow", "");
 
-    unused_arg(ord);
-    unused_arg(amount);
-    unused_arg(itype);
+    UNUSED_ARG(ord);
+    UNUSED_ARG(amount);
+    UNUSED_ARG(itype);
 
     add_message(&u->region->msgs, msg);
     for (d = 0; d < MAXDIRECTIONS; d++) {
@@ -720,7 +720,7 @@ struct order *ord)
         c = create_curse(u, &u->attribs, ct_find("skillmod"), power,
             duration, effect, u->number);
         c->data.i = SK_TACTICS;
-        unused_arg(ord);
+        UNUSED_ARG(ord);
     }
     use_pooled(u, itype->rtype, GET_DEFAULT, amount);
     ADDMSG(&u->faction->msgs, msg_message("use_tacticcrystal",
@@ -749,14 +749,14 @@ mod_elves_only(const unit * u, const region * r, skill_t sk, int value)
 {
     if (u_race(u) == get_race(RC_ELF))
         return value;
-    unused_arg(r);
+    UNUSED_ARG(r);
     return -118;
 }
 
 static int
 mod_dwarves_only(const unit * u, const region * r, skill_t sk, int value)
 {
-    unused_arg(r);
+    UNUSED_ARG(r);
     if (u_race(u) == get_race(RC_DWARF) || (u_race(u)->flags & RCF_IRONGOLEM)) {
         return value;
     }
@@ -767,7 +767,7 @@ static int heal(unit * user, int effect)
 {
     int req = unit_max_hp(user) * user->number - user->hp;
     if (req > 0) {
-        req = _min(req, effect);
+        req = MIN(req, effect);
         effect -= req;
         user->hp += req;
     }

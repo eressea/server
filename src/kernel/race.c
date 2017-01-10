@@ -241,7 +241,7 @@ race *rc_create(const char *zName)
         log_error("race '%s' has an invalid name. remove spaces\n", zName);
         assert(strchr(zName, ' ') == NULL);
     }
-    rc->_name = _strdup(zName);
+    rc->_name = strdup(zName);
     rc->precombatspell = NULL;
 
     rc->attack[0].type = AT_COMBATSPELL;
@@ -288,7 +288,7 @@ const char* rc_name(const race * rc, name_t n, char *name, size_t size) {
     default: assert(!"invalid name_t enum in rc_name_s");
     }
     if (postfix) {
-        _snprintf(name, size, "race::%s%s", rc->_name, postfix);
+        snprintf(name, size, "race::%s%s", rc->_name, postfix);
         return name;
     }
     return NULL;

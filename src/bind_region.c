@@ -615,7 +615,7 @@ static int tolua_plane_set_name(lua_State * L)
     const char *str = tolua_tostring(L, 2, 0);
     free(self->name);
     if (str)
-        self->name = _strdup(str);
+        self->name = strdup(str);
     else
         self->name = 0;
     return 0;

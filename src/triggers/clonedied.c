@@ -58,7 +58,7 @@ static int clonedied_handle(trigger * t, void *data)
     }
     else
         log_error("could not perform clonedied::handle()\n");
-    unused_arg(data);
+    UNUSED_ARG(data);
     return 0;
 }
 

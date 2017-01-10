@@ -131,7 +131,7 @@ static connection **get_borders_i(const region * r1, const region * r2)
     int key = reg_hashkey(r1);
     int k2 = reg_hashkey(r2);
 
-    key = _min(k2, key) % BORDER_MAXHASH;
+    key = MIN(k2, key) % BORDER_MAXHASH;
     bp = &borders[key];
     while (*bp) {
         connection *b = *bp;
@@ -258,31 +258,31 @@ void b_write(const connection * b, storage * store)
 
 bool b_transparent(const connection * b, const struct faction *f)
 {
-    unused_arg(b);
-    unused_arg(f);
+    UNUSED_ARG(b);
+    UNUSED_ARG(f);
     return true;
 }
 
 bool b_opaque(const connection * b, const struct faction * f)
 {
-    unused_arg(b);
-    unused_arg(f);
+    UNUSED_ARG(b);
+    UNUSED_ARG(f);
     return false;
 }
 
 bool b_blockall(const connection * b, const unit * u, const region * r)
 {
-    unused_arg(u);
-    unused_arg(r);
-    unused_arg(b);
+    UNUSED_ARG(u);
+    UNUSED_ARG(r);
+    UNUSED_ARG(b);
     return true;
 }
 
 bool b_blocknone(const connection * b, const unit * u, const region * r)
 {
-    unused_arg(u);
-    unused_arg(r);
-    unused_arg(b);
+    UNUSED_ARG(u);
+    UNUSED_ARG(r);
+    UNUSED_ARG(b);
     return false;
 }
 
@@ -294,39 +294,39 @@ bool b_rvisible(const connection * b, const region * r)
 bool b_fvisible(const connection * b, const struct faction * f,
     const region * r)
 {
-    unused_arg(r);
-    unused_arg(f);
-    unused_arg(b);
+    UNUSED_ARG(r);
+    UNUSED_ARG(f);
+    UNUSED_ARG(b);
     return true;
 }
 
 bool b_uvisible(const connection * b, const unit * u)
 {
-    unused_arg(u);
-    unused_arg(b);
+    UNUSED_ARG(u);
+    UNUSED_ARG(b);
     return true;
 }
 
 bool b_rinvisible(const connection * b, const region * r)
 {
-    unused_arg(r);
-    unused_arg(b);
+    UNUSED_ARG(r);
+    UNUSED_ARG(b);
     return false;
 }
 
 bool b_finvisible(const connection * b, const struct faction * f,
     const region * r)
 {
-    unused_arg(r);
-    unused_arg(f);
-    unused_arg(b);
+    UNUSED_ARG(r);
+    UNUSED_ARG(f);
+    UNUSED_ARG(b);
     return false;
 }
 
 bool b_uinvisible(const connection * b, const unit * u)
 {
-    unused_arg(u);
-    unused_arg(b);
+    UNUSED_ARG(u);
+    UNUSED_ARG(b);
     return false;
 }
 
@@ -380,9 +380,9 @@ static const char *b_namewall(const connection * b, const region * r,
 {
     const char *bname = "wall";
 
-    unused_arg(f);
-    unused_arg(r);
-    unused_arg(b);
+    UNUSED_ARG(f);
+    UNUSED_ARG(r);
+    UNUSED_ARG(b);
     if (gflags & GF_ARTICLE)
         bname = "a_wall";
     if (gflags & GF_PURE)
@@ -421,9 +421,9 @@ border_type bt_noway = {
 static const char *b_namefogwall(const connection * b, const region * r,
     const struct faction *f, int gflags)
 {
-    unused_arg(f);
-    unused_arg(b);
-    unused_arg(r);
+    UNUSED_ARG(f);
+    UNUSED_ARG(b);
+    UNUSED_ARG(r);
     if (gflags & GF_PURE)
         return "fogwall";
     if (gflags & GF_ARTICLE)
@@ -434,7 +434,7 @@ static const char *b_namefogwall(const connection * b, const region * r,
 static bool
 b_blockfogwall(const connection * b, const unit * u, const region * r)
 {
-    unused_arg(b);
+    UNUSED_ARG(b);
     if (!u)
         return true;
     return (bool)(effskill(u, SK_PERCEPTION, r) > 4);    /* Das ist die alte Nebelwand */
@@ -459,8 +459,8 @@ static const char *b_nameillusionwall(const connection * b, const region * r,
     const struct faction *f, int gflags)
 {
     int fno = b->data.i;
-    unused_arg(b);
-    unused_arg(r);
+    UNUSED_ARG(b);
+    UNUSED_ARG(r);
     if (gflags & GF_PURE)
         return (f && fno == f->no) ? "illusionwall" : "wall";
     if (gflags & GF_ARTICLE) {
@@ -496,7 +496,7 @@ static const char *b_nameroad(const connection * b, const region * r,
     int local = (r == b->from) ? b->data.sa[0] : b->data.sa[1];
     static char buffer[64];
 
-    unused_arg(f);
+    UNUSED_ARG(f);
     if (gflags & GF_PURE)
         return "road";
     if (gflags & GF_ARTICLE) {
@@ -512,7 +512,7 @@ static const char *b_nameroad(const connection * b, const region * r,
             }
         }
         else {
-            int percent = _max(1, 100 * local / r->terrain->max_road);
+            int percent = MAX(1, 100 * local / r->terrain->max_road);
             if (local) {
                 slprintf(buffer, sizeof(buffer), LOC(f->locale, mkname("border",
                     "a_road_percent")), percent);

@@ -1,5 +1,8 @@
 #ifndef H_KRNL_CURSES
 #define H_KRNL_CURSES
+
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

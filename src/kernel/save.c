@@ -436,7 +436,7 @@ void read_planes(gamedata *data) {
         }
         pl->id = id;
         READ_STR(store, name, sizeof(name));
-        pl->name = _strdup(name);
+        pl->name = strdup(name);
         READ_INT(store, &pl->minx);
         READ_INT(store, &pl->maxx);
         READ_INT(store, &pl->miny);
@@ -668,7 +668,7 @@ unit *read_unit(struct gamedata *data)
     if (unicode_utf8_trim(obuf)!=0) {
 		log_warning("trim unit %s name to '%s'", itoa36(u->no), obuf);
 	}
-    u->_name = obuf[0] ? _strdup(obuf) : 0;
+    u->_name = obuf[0] ? strdup(obuf) : 0;
     if (lomem) {
         READ_STR(data->store, NULL, 0);
     }
@@ -677,7 +677,7 @@ unit *read_unit(struct gamedata *data)
 		if (unicode_utf8_trim(obuf)!=0) {
 			log_warning("trim unit %s info to '%s'", itoa36(u->no), obuf);
 		}
-        u->display = obuf[0] ? _strdup(obuf) : 0;
+        u->display = obuf[0] ? strdup(obuf) : 0;
     }
     READ_INT(data->store, &number);
     set_number(u, number);
@@ -933,7 +933,7 @@ static region *readregion(struct gamedata *data, int x, int y)
 		if (unicode_utf8_trim(name)!=0) {
 			log_warning("trim region %d name to '%s'", uid, name);
 		};
-        r->land->name = _strdup(name);
+        r->land->name = strdup(name);
     }
     if (r->land) {
         int i;
@@ -1034,7 +1034,7 @@ static region *readregion(struct gamedata *data, int x, int y)
         read_items(data->store, &r->land->items);
         if (data->version >= REGIONOWNER_VERSION) {
             READ_INT(data->store, &n);
-            region_set_morale(r, _max(0, (short)n), -1);
+            region_set_morale(r, MAX(0, (short)n), -1);
             read_owner(data, &r->land->ownership);
         }
     }
@@ -1192,7 +1192,7 @@ static char * getpasswd(int fno) {
                 assert(line[slen] == '\n');
                 line[slen] = 0;
                 fclose(F);
-                return _strdup(line + len + 1);
+                return strdup(line + len + 1);
             }
         }
         fclose(F);
@@ -1285,12 +1285,12 @@ faction *read_faction(struct gamedata * data)
 	if (unicode_utf8_trim(name)!=0) {
 		log_warning("trim faction %s name to '%s'", itoa36(f->no), name);
 	};
-    f->name = _strdup(name);
+    f->name = strdup(name);
     READ_STR(data->store, name, sizeof(name));
 	if (unicode_utf8_trim(name)!=0) {
 		log_warning("trim faction %s banner to '%s'", itoa36(f->no), name);
 	};
-    f->banner = _strdup(name);
+    f->banner = strdup(name);
 
     log_debug("   - Lese Partei %s (%s)", f->name, itoa36(f->no));
 
@@ -1528,7 +1528,7 @@ struct building *read_building(gamedata *data) {
     if (unicode_utf8_trim(name)!=0) {
 		log_warning("trim building %s name to '%s'", itoa36(b->no), name);
 	}
-    b->name = _strdup(name);
+    b->name = strdup(name);
     if (lomem) {
         READ_STR(store, NULL, 0);
     }
@@ -1537,7 +1537,7 @@ struct building *read_building(gamedata *data) {
         if (unicode_utf8_trim(name)!=0) {
             log_warning("trim building %s info to '%s'", itoa36(b->no), name);
         }
-        b->display = _strdup(name);
+        b->display = strdup(name);
     }
     READ_INT(store, &b->size);
     READ_STR(store, name, sizeof(name));
@@ -1581,7 +1581,7 @@ ship *read_ship(struct gamedata *data)
     if (unicode_utf8_trim(name)!=0) {
 		log_warning("trim ship %s name to '%s'", itoa36(sh->no), name);
 	}
-    sh->name = _strdup(name);
+    sh->name = strdup(name);
     if (lomem) {
         READ_STR(store, NULL, 0);
     }
@@ -1590,7 +1590,7 @@ ship *read_ship(struct gamedata *data)
         if (unicode_utf8_trim(name)!=0) {
             log_warning("trim ship %s info to '%s'", itoa36(sh->no), name);
         }
-        sh->display = _strdup(name);
+        sh->display = strdup(name);
     }
     READ_STR(store, name, sizeof(name));
     sh->type = st_find(name);

@@ -73,7 +73,7 @@ void morale_update(region *r) {
 void morale_change(region *r, int value) {
     int morale = region_get_morale(r);
     if (morale > 0) {
-        morale = _max(0, morale - value);
+        morale = MAX(0, morale - value);
         region_set_morale(r, morale, turn);
     }
 }

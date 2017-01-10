@@ -70,7 +70,7 @@ static void a_freedirection(attrib * a)
 static int a_agedirection(attrib * a, void *owner)
 {
     spec_direction *d = (spec_direction *)(a->data.v);
-    unused_arg(owner);
+    (void)owner;
     --d->duration;
     return (d->duration > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
 }
@@ -81,14 +81,14 @@ static int a_readdirection(attrib * a, void *owner, struct gamedata *data)
     spec_direction *d = (spec_direction *)(a->data.v);
     char lbuf[32];
 
-    unused_arg(owner);
+    (void)owner;
     READ_INT(store, &d->x);
     READ_INT(store, &d->y);
     READ_INT(store, &d->duration);
     READ_TOK(store, lbuf, sizeof(lbuf));
-    d->desc = _strdup(lbuf);
+    d->desc = strdup(lbuf);
     READ_TOK(store, lbuf, sizeof(lbuf));
-    d->keyword = _strdup(lbuf);
+    d->keyword = strdup(lbuf);
     d->active = true;
     return AT_READ_OK;
 }
@@ -98,7 +98,7 @@ a_writedirection(const attrib * a, const void *owner, struct storage *store)
 {
     spec_direction *d = (spec_direction *)(a->data.v);
 
-    unused_arg(owner);
+    (void)owner;
     WRITE_INT(store, d->x);
     WRITE_INT(store, d->y);
     WRITE_INT(store, d->duration);
@@ -143,8 +143,8 @@ attrib *create_special_direction(region * r, region * rt, int duration,
     d->x = rt->x;
     d->y = rt->y;
     d->duration = duration;
-    d->desc = _strdup(desc);
-    d->keyword = _strdup(keyword);
+    d->desc = strdup(desc);
+    d->keyword = strdup(keyword);
 
     return a;
 }

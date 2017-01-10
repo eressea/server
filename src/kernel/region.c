@@ -138,7 +138,7 @@ int region_maxworkers(const region *r)
 {
     int size = production(r);
     int treespace = (rtrees(r, 2) + rtrees(r, 1) / 2) * TREESIZE;
-    return _max(size - treespace, _min(size / 10, 200));
+    return MAX(size - treespace, MIN(size / 10, 200));
 }
 
 int deathcount(const region * r)
@@ -403,7 +403,7 @@ koor_distance_wrap_xy(int x1, int y1, int x2, int y2, int width, int height)
     int dx = x1 - x2;
     int dy = y1 - y2;
     int result, dist;
-    int mindist = _min(width, height) >> 1;
+    int mindist = MIN(width, height) >> 1;
 
     /* Bei negativem dy am Ursprung spiegeln, das veraendert
      * den Abstand nicht
@@ -426,13 +426,13 @@ koor_distance_wrap_xy(int x1, int y1, int x2, int y2, int width, int height)
         if (result <= mindist)
             return result;
     }
-    dist = _max(dx, height - dy);
+    dist = MAX(dx, height - dy);
     if (dist >= 0 && dist < result) {
         result = dist;
         if (result <= mindist)
             return result;
     }
-    dist = _max(width - dx, dy);
+    dist = MAX(width - dx, dy);
     if (dist >= 0 && dist < result)
         result = dist;
     return result;
@@ -1215,7 +1215,7 @@ void terraform_region(region * r, const terrain_type * terrain)
         if (!fval(r, RF_CHAOTIC)) {
             int peasants;
             peasants = (region_maxworkers(r) * (20 + dice_rand("6d10"))) / 100;
-            rsetpeasants(r, _max(100, peasants));
+            rsetpeasants(r, MAX(100, peasants));
             rsetmoney(r, rpeasants(r) * ((wage(r, NULL, NULL,
                 INT_MAX) + 1) + rng_int() % 5));
         }
@@ -1395,7 +1395,7 @@ faction *update_owners(region * r)
                     else if (f || new_owner->faction != region_get_last_owner(r)) {
                         alliance *al = region_get_alliance(r);
                         if (al && new_owner->faction->alliance == al) {
-                            int morale = _max(0, region_get_morale(r) - MORALE_TRANSFER);
+                            int morale = MAX(0, region_get_morale(r) - MORALE_TRANSFER);
                             region_set_morale(r, morale, turn);
                         }
                         else {
@@ -1418,7 +1418,7 @@ faction *update_owners(region * r)
 void region_setinfo(struct region *r, const char *info)
 {
     free(r->display);
-    r->display = info ? _strdup(info) : 0;
+    r->display = info ? strdup(info) : 0;
 }
 
 const char *region_getinfo(const region * r)
@@ -1430,7 +1430,7 @@ void region_setname(struct region *r, const char *name)
 {
     if (r->land) {
         free(r->land->name);
-        r->land->name = name ? _strdup(name) : 0;
+        r->land->name = name ? strdup(name) : 0;
     }
 }
 

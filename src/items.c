@@ -122,7 +122,7 @@ struct order *ord)
         double force;
         spell *sp = find_spell("antimagiczone");
         attrib **ap = &r->attribs;
-        unused_arg(ord);
+        UNUSED_ARG(ord);
         assert(sp);
 
         /* Reduziert die Stärke jedes Spruchs um effect */

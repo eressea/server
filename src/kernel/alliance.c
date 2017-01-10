@@ -83,7 +83,7 @@ alliance *new_alliance(int id, const char *name) {
     al = calloc(1, sizeof(alliance));
     al->id = id;
     if (name) {
-        al->name = _strdup(name);
+        al->name = strdup(name);
     }
     else {
         al->flags |= ALF_NON_ALLIED;
@@ -447,7 +447,7 @@ void alliance_setname(alliance * self, const char *name)
 {
     free(self->name);
     if (name)
-        self->name = _strdup(name);
+        self->name = strdup(name);
     else
         self->name = NULL;
 }

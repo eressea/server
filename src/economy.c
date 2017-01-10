@@ -337,11 +337,11 @@ static int do_recruiting(recruitment * recruits, int available)
             int number, dec;
             double multi = 2.0 * rc->recruit_multi;
 
-            number = _min(req->qty, (int)(get / multi));
+            number = MIN(req->qty, (int)(get / multi));
             if (rc->recruitcost) {
                 int afford = get_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT,
                     number * rc->recruitcost) / rc->recruitcost;
-                number = _min(number, afford);
+                number = MIN(number, afford);
             }
             if (u->number + number > UNIT_MAXSIZE) {
                 ADDMSG(&u->faction->msgs, msg_feedback(u, req->ord, "error_unit_size",
@@ -551,7 +551,7 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
     if (recruitcost > 0) {
         int pooled =
             get_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT, recruitcost * n);
-        n = _min(n, pooled / recruitcost);
+        n = MIN(n, pooled / recruitcost);
     }
 
     u->wants = n;
@@ -990,12 +990,12 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
     rring = get_resourcetype(R_RING_OF_NIMBLEFINGER);
     if (rring) {
         int dm = i_get(u->items, rring->itype);
-        amount += skill * _min(u->number, dm) * (roqf_factor() - 1);
+        amount += skill * MIN(u->number, dm) * (roqf_factor() - 1);
     }
 
     /* Schaffenstrunk: */
     if ((dm = get_effect(u, oldpotiontype[P_DOMORE])) != 0) {
-        dm = _min(dm, u->number);
+        dm = MIN(dm, u->number);
         change_effect(u, oldpotiontype[P_DOMORE], -dm);
         amount += dm * skill;       /* dm Personen produzieren doppelt */
     }
@@ -1091,7 +1091,7 @@ leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
                 }
             need = norders;
 
-            avail = _min(avail, norders);
+            avail = MIN(avail, norders);
             if (need > 0) {
                 int use = 0;
                 for (al = alist; al; al = al->next)
@@ -1106,7 +1106,7 @@ leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
                             use += x;
                             norders -= want;
                             need -= x;
-                            al->get = _min(al->want, al->get + (int)(x / al->save));
+                            al->get = MIN(al->want, al->get + (int)(x / al->save));
                         }
                     }
                 if (use) {
@@ -1139,7 +1139,7 @@ attrib_allocation(const resource_type * rtype, region * r, allocation * alist)
             avail = 0;
     }
 
-    avail = _min(avail, norders);
+    avail = MIN(avail, norders);
     for (al = alist; al; al = al->next) {
         if (avail > 0) {
             int want = required(al->want, al->save);
@@ -1149,7 +1149,7 @@ attrib_allocation(const resource_type * rtype, region * r, allocation * alist)
                 ++x;
             avail -= x;
             norders -= want;
-            al->get = _min(al->want, (int)(x / al->save));
+            al->get = MIN(al->want, (int)(x / al->save));
             if (rdata->produce) {
                 int use = required(al->get, al->save);
                 if (use)
@@ -1625,7 +1625,7 @@ static void buy(unit * u, request ** buyorders, struct order *ord)
         k -= a->data.i;
     }
 
-    n = _min(n, k);
+    n = MIN(n, k);
 
     if (!n) {
         cmistake(u, ord, 102, MSG_COMMERCE);
@@ -1936,7 +1936,7 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
 
     /* Ein Händler kann nur 10 Güter pro Talentpunkt verkaufen. */
 
-    n = _min(n, u->number * 10 * effskill(u, SK_TRADE, 0));
+    n = MIN(n, u->number * 10 * effskill(u, SK_TRADE, 0));
 
     if (!n) {
         cmistake(u, ord, 54, MSG_COMMERCE);
@@ -1966,11 +1966,11 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
             if (o->type.ltype == ltype && o->unit->faction == u->faction) {
                 int fpool =
                     o->qty - get_pooled(o->unit, itype->rtype, GET_RESERVE, INT_MAX);
-                available -= _max(0, fpool);
+                available -= MAX(0, fpool);
             }
         }
 
-        n = _min(n, available);
+        n = MIN(n, available);
 
         if (n <= 0) {
             cmistake(u, ord, 264, MSG_COMMERCE);
@@ -1995,7 +1995,7 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
             k -= a->data.i;
         }
 
-        n = _min(n, k);
+        n = MIN(n, k);
         assert(n >= 0);
         /* die Menge der verkauften Güter merken */
         a->data.i += n;
@@ -2052,7 +2052,7 @@ static void expandstealing(region * r, request * stealorders)
             n = 10;
         }
         if (n > 0) {
-            n = _min(n, g_requests[j].unit->wants);
+            n = MIN(n, g_requests[j].unit->wants);
             use_pooled(u, rsilver, GET_ALL, n);
             g_requests[j].unit->n = n;
             change_money(g_requests[j].unit, n);
@@ -2106,8 +2106,8 @@ static void plant(unit * u, int raw)
         return;
     }
 
-    n = _min(skill * u->number, n);
-    n = _min(raw, n);
+    n = MIN(skill * u->number, n);
+    n = MIN(raw, n);
     /* Für jedes Kraut Talent*10% Erfolgschance. */
     for (i = n; i > 0; i--) {
         if (rng_int() % 10 < skill)
@@ -2152,14 +2152,14 @@ static void planttrees(unit * u, int raw)
     }
 
     /* wenn eine Anzahl angegeben wurde, nur soviel verbrauchen */
-    raw = _min(raw, skill * u->number);
+    raw = MIN(raw, skill * u->number);
     n = get_pooled(u, rtype, GET_DEFAULT, raw);
     if (n == 0) {
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "resource_missing", "missing", rtype));
         return;
     }
-    n = _min(raw, n);
+    n = MIN(raw, n);
 
     /* Für jeden Samen Talent*10% Erfolgschance. */
     for (i = n; i > 0; i--) {
@@ -2209,7 +2209,7 @@ static void breedtrees(unit * u, int raw)
     }
 
     /* wenn eine Anzahl angegeben wurde, nur soviel verbrauchen */
-    raw = _min(skill * u->number, raw);
+    raw = MIN(skill * u->number, raw);
     n = get_pooled(u, rtype, GET_DEFAULT, raw);
     /* Samen prüfen */
     if (n == 0) {
@@ -2217,7 +2217,7 @@ static void breedtrees(unit * u, int raw)
             msg_feedback(u, u->thisorder, "resource_missing", "missing", rtype));
         return;
     }
-    n = _min(raw, n);
+    n = MIN(raw, n);
 
     /* Für jeden Samen Talent*5% Erfolgschance. */
     for (i = n; i > 0; i--) {
@@ -2259,7 +2259,7 @@ static void breedhorses(unit * u)
     }
     effsk = effskill(u, SK_HORSE_TRAINING, 0);
     n = u->number * effsk;
-    n = _min(n, horses);
+    n = MIN(n, horses);
 
     for (c = 0; c < n; c++) {
         if (rng_int() % 100 < effsk) {
@@ -2508,7 +2508,7 @@ static void steal_cmd(unit * u, struct order *ord, request ** stealorders)
         }
     }
 
-    i = _min(u->number, i_get(u->items, rring->itype));
+    i = MIN(u->number, i_get(u->items, rring->itype));
     if (i > 0) {
         n *= STEALINCOME * (u->number + i * (roqf_factor() - 1));
     }
@@ -2530,7 +2530,7 @@ static void steal_cmd(unit * u, struct order *ord, request ** stealorders)
 
     /* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
 
-    produceexp(u, SK_STEALTH, _min(n, u->number));
+    produceexp(u, SK_STEALTH, MIN(n, u->number));
 }
 
 /* ------------------------------------------------------------- */
@@ -2554,7 +2554,7 @@ static void expandentertainment(region * r)
         entertaining -= o->qty;
 
         /* Nur soviel PRODUCEEXP wie auch tatsächlich gemacht wurde */
-        produceexp(u, SK_ENTERTAINMENT, _min(u->n, u->number));
+        produceexp(u, SK_ENTERTAINMENT, MIN(u->n, u->number));
         add_income(u, IC_ENTERTAIN, o->qty, u->n);
         fset(u, UFL_LONGACTION | UFL_NOTMOVING);
     }
@@ -2605,7 +2605,7 @@ void entertain_cmd(unit * u, struct order *ord)
 
     max_e = getuint();
     if (max_e != 0) {
-        u->wants = _min(u->wants, max_e);
+        u->wants = MIN(u->wants, max_e);
     }
     o = nextentertainer++;
     o->unit = u;
@@ -2665,7 +2665,7 @@ expandwork(region * r, request * work_begin, request * work_end, int maxwork)
         if (blessedharvest_ct) {
             int happy =
                 (int)curse_geteffect(get_curse(r->attribs, blessedharvest_ct));
-            happy = _min(happy, jobs);
+            happy = MIN(happy, jobs);
             earnings += happy;
         }
     }
@@ -2819,10 +2819,10 @@ void tax_cmd(unit * u, struct order *ord, request ** taxorders)
         max = INT_MAX;
     }
     if (!playerrace(u_race(u))) {
-        u->wants = _min(income(u), max);
+        u->wants = MIN(income(u), max);
     }
     else {
-        u->wants = _min(n * effskill(u, SK_TAXING, 0) * taxperlevel, max);
+        u->wants = MIN(n * effskill(u, SK_TAXING, 0) * taxperlevel, max);
     }
 
     u2 = is_guarded(r, u);
@@ -2893,12 +2893,12 @@ void loot_cmd(unit * u, struct order *ord, request ** lootorders)
         max = INT_MAX;
     }
     if (!playerrace(u_race(u))) {
-        u->wants = _min(income(u), max);
+        u->wants = MIN(income(u), max);
     }
     else {
         /* For player start with 20 Silver +10 every 5 level of close combat skill*/
-        int skbonus = (_max(effskill(u, SK_MELEE, 0), effskill(u, SK_SPEAR, 0)) * 2 / 10) + 2;
-        u->wants = _min(n * skbonus * 10, max);
+        int skbonus = (MAX(effskill(u, SK_MELEE, 0), effskill(u, SK_SPEAR, 0)) * 2 / 10) + 2;
+        u->wants = MIN(n * skbonus * 10, max);
     }
 
     o = (request *)calloc(1, sizeof(request));
