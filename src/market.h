@@ -12,6 +12,9 @@ without prior permission by the authors of Eressea.
 */
 #ifndef H_GC_MARKET
 #define H_GC_MARKET
+
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

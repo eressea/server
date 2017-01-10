@@ -12,6 +12,9 @@
  */
 #ifndef H_GC_GIVE
 #define H_GC_GIVE
+
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
