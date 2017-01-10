@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdbool.h>
 #define PASSWORD_PLAINTEXT 0
 #define PASSWORD_DEFAULT PASSWORD_PLAINTEXT
 

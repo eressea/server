@@ -2,6 +2,8 @@
 #define H_KEYWORD_H
 
 #include "kernel/types.h"
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C"
 {
