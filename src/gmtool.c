@@ -1167,7 +1167,7 @@ static void handlekey(state * st, int c)
             region *first = (mr && mr->r && mr->r->next) ? mr->r->next : regions;
 
             if (findmode == 'f') {
-                snprintf(sbuffer, sizeof(sbuffer), "find-faction: %s", locate);
+                slprintf(sbuffer, sizeof(sbuffer), "find-faction: %s", locate);
                 statusline(st->wnd_status->handle, sbuffer);
                 f = findfaction(atoi36(locate));
                 if (f == NULL) {

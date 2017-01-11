@@ -521,7 +521,6 @@ static void test_pay_cmd_other_building(CuTest *tc) {
     order *ord;
     faction *f;
     building *b;
-    char cmd[32];
 
     test_setup();
     setup_pay_cmd(&fix);
@@ -531,8 +530,7 @@ static void test_pay_cmd_other_building(CuTest *tc) {
     config_set("rules.region_owner_pay_building", "lighthouse");
     update_owners(b->region);
 
-    snprintf(cmd, sizeof(cmd), "NOT %s", itoa36(b->no));
-    ord = create_order(K_PAY, f->locale, cmd);
+    ord = create_order(K_PAY, f->locale, "NOT %s", itoa36(b->no));
     assert(ord);
     CuAssertPtrEquals(tc, fix.u1, building_owner(b));
     CuAssertIntEquals(tc, 0, pay_cmd(fix.u1, ord));
