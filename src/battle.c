@@ -93,12 +93,6 @@ typedef enum combatmagic {
     DO_POSTCOMBATSPELL
 } combatmagic_t;
 
-/* globals */
-bool battledebug = false;
-
-static int obs_count = 0;
-static FILE *bdebug;
-
 #define MINSPELLRANGE 1
 #define MAXSPELLRANGE 7
 
@@ -1219,9 +1213,6 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
             kritchance = MIN(0.9, kritchance);
 
             while (chance(kritchance)) {
-                if (bdebug) {
-                    fprintf(bdebug, "%s/%d lands a critical hit\n", itoa36(au->no), at.index);
-                }
                 da += dice_rand(damage);
             }
         }
@@ -1302,10 +1293,6 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
 
     }
     if (df->person[dt.index].hp > 0) {    /* Hat �berlebt */
-        if (bdebug) {
-            fprintf(bdebug, "Damage %d, armor %d: %d -> %d HP\n",
-                da, ar, df->person[dt.index].hp + rda, df->person[dt.index].hp);
-        }
         if (u_race(au) == get_race(RC_DAEMON)) {
             if (!(df->person[dt.index].flags & (FL_COURAGE | FL_DAZZLED))) {
                 df->person[dt.index].flags |= FL_DAZZLED;
@@ -1334,10 +1321,6 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
     }
     ++at.fighter->kills;
 
-    if (bdebug) {
-        fprintf(bdebug, "Damage %d, armor %d, type %d: %d -> %d HP, tot.\n",
-            da, ar, type, df->person[dt.index].hp + rda, df->person[dt.index].hp);
-    }
     for (pitm = &du->items; *pitm;) {
         item *itm = *pitm;
         const item_type *itype = itm->type;
@@ -1979,20 +1962,6 @@ int getreload(troop at)
     return at.fighter->person[at.index].reload;
 }
 
-static void
-debug_hit(troop at, const weapon * awp, troop dt, const weapon * dwp,
-int skdiff, int dist, bool success)
-{
-    fprintf(bdebug, "%.4s/%d [%6s/%d] %s %.4s/%d [%6s/%d] with %d, distance %d\n",
-        itoa36(at.fighter->unit->no), at.index,
-        LOC(default_locale, awp ? resourcename(awp->type->itype->rtype,
-        0) : "unarmed"), weapon_effskill(at, dt, awp, true, dist > 1),
-        success ? "hits" : "misses", itoa36(dt.fighter->unit->no), dt.index,
-        LOC(default_locale, dwp ? resourcename(dwp->type->itype->rtype,
-        0) : "unarmed"), weapon_effskill(dt, at, dwp, false, dist > 1), skdiff,
-        dist);
-}
-
 int hits(troop at, troop dt, weapon * awp)
 {
     fighter *af = at.fighter, *df = dt.fighter;
@@ -2032,13 +2001,7 @@ int hits(troop at, troop dt, weapon * awp)
         shield = select_armor(dt, false);
     }
     if (contest(skdiff, dt, armor, shield)) {
-        if (bdebug) {
-            debug_hit(at, awp, dt, dwp, skdiff, dist, true);
-        }
         return 1;
-    }
-    if (bdebug) {
-        debug_hit(at, awp, dt, dwp, skdiff, dist, false);
     }
     return 0;
 }
@@ -2190,11 +2153,7 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
                     }
                 }
                 if (reload && wp && wp->type->reload && !getreload(ta)) {
-                    int i = setreload(ta);
-                    if (bdebug) {
-                        fprintf(bdebug, "%s/%d reloading %d turns\n", itoa36(au->no),
-                            ta.index, i);
-                    }
+                    setreload(ta);
                 }
             }
         }
@@ -2874,13 +2833,6 @@ static void aftermath(battle * b)
     }
 
     reorder_fleeing(r);
-
-    if (bdebug) {
-        fprintf(bdebug, "The battle lasted %d turns, %s and %s.\n",
-            b->turn,
-            b->has_tactics_turn ? "had a tactic turn" : "had no tactic turn",
-            ships_damaged ? "was relevant" : "was not relevant.");
-    }
 }
 
 static void battle_punit(unit * u, battle * b)
@@ -2894,10 +2846,6 @@ static void battle_punit(unit * u, battle * b)
         spunit(&S, f, u, 4, seen_battle);
         for (x = S; x; x = x->next) {
             fbattlerecord(b, f, x->s);
-            if (bdebug && u->faction == f) {
-                fputs(x->s, bdebug);
-                fputc('\n', bdebug);
-            }
         }
         if (S)
             freestrlist(S);
@@ -3077,17 +3025,6 @@ static void print_stats(battle * b)
                 fbattlerecord(b, f, buf);
         }
 
-        if (bdebug && s->faction) {
-            if (f_get_alliance(s->faction)) {
-                fprintf(bdebug, "##### %s (%s/%d)\n", s->faction->name,
-                    itoa36(s->faction->no),
-                    s->faction->alliance ? s->faction->alliance->id : 0);
-            }
-            else {
-                fprintf(bdebug, "##### %s (%s)\n", s->faction->name,
-                    itoa36(s->faction->no));
-            }
-        }
         print_fighters(b, s);
     }
 
@@ -3519,28 +3456,6 @@ static int join_battle(battle * b, unit * u, bool attack, fighter ** cp)
     return false;
 }
 
-static const char *simplename(region * r)
-{
-    int i;
-    static char name[17];
-    const char *cp = rname(r, default_locale);
-    for (i = 0; *cp && i != 16; ++i, ++cp) {
-        int c = *(unsigned char *)cp;
-        while (c && !isalpha(c) && !isspace(c)) {
-            ++cp;
-            c = *(unsigned char *)cp;
-        }
-        if (isspace(c))
-            name[i] = '_';
-        else
-            name[i] = *cp;
-        if (c == 0)
-            break;
-    }
-    name[i] = 0;
-    return name;
-}
-
 battle *make_battle(region * r)
 {
     battle *b = (battle *)calloc(1, sizeof(battle));
@@ -3551,29 +3466,6 @@ battle *make_battle(region * r)
     /* Alle Mann raus aus der Burg! */
     for (bld = r->buildings; bld != NULL; bld = bld->next)
         bld->sizeleft = bld->size;
-
-    if (battledebug) {
-        char zText[4096];
-        char zFilename[4096];
-        join_path(basepath(), "battles", zText, sizeof(zText));
-        if (mkdir(zText, 0777) != 0) {
-            log_error("could not create subdirectory for battle logs: %s", zText);
-            battledebug = false;
-        }
-        else {
-            sprintf(zFilename, "battle-%d-%s.log", obs_count++, simplename(r));
-            join_path(zText, zFilename, zText, sizeof(zText));
-            bdebug = fopen(zText, "w");
-            if (!bdebug)
-                log_error("battles cannot be debugged");
-            else {
-                const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
-                fwrite(utf8_bom, 1, 3, bdebug);
-                fprintf(bdebug, "In %s findet ein Kampf statt:\n", rname(r,
-                    default_locale));
-            }
-        }
-    }
 
     b->region = r;
     b->plane = getplane(r);
@@ -3644,10 +3536,6 @@ static void battle_free(battle * b) {
 
 void free_battle(battle * b)
 {
-    if (bdebug) {
-        fclose(bdebug);
-    }
-
     while (b->factions) {
         bfaction *bf = b->factions;
         b->factions = bf->next;
@@ -3812,13 +3700,7 @@ static void join_allies(battle * b)
                 }
                 /* keine Einw�nde, also soll er mitmachen: */
                 if (c == NULL) {
-                    if (join_battle(b, u, false, &c)) {
-                        if (battledebug) {
-                            fprintf(bdebug, "%s joins to help %s against %s.\n",
-                                unitname(u), factionname(s->faction), factionname(se->faction));
-                        }
-                    }
-                    else if (c == NULL) {
+                    if (!join_battle(b, u, false, &c)) {
                         continue;
                     }
                 }
@@ -3826,12 +3708,7 @@ static void join_allies(battle * b)
                 /* the enemy of my friend is my enemy: */
                 for (se = b->sides; se != s_end; ++se) {
                     if (se->faction != u->faction && enemy(s, se)) {
-                        if (set_enemy(se, c->side, false) && battledebug) {
-                            fprintf(bdebug,
-                                "%u/%s hates %u/%s because they are enemies with %u/%s.\n",
-                                c->side->index, sidename(c->side), se->index, sidename(se),
-                                s->index, sidename(s));
-                        }
+                        set_enemy(se, c->side, false);
                     }
                 }
             }
@@ -4012,18 +3889,8 @@ static bool start_battle(region * r, battle ** bp)
                         }
                         b = make_battle(r);
                     }
-                    if (join_battle(b, u, true, &c1)) {
-                        if (battledebug) {
-                            fprintf(bdebug, "%s joins by attacking %s.\n",
-                                unitname(u), unitname(u2));
-                        }
-                    }
-                    if (join_battle(b, u2, false, &c2)) {
-                        if (battledebug) {
-                            fprintf(bdebug, "%s joins because of an attack from %s.\n",
-                                unitname(u2), unitname(u));
-                        }
-                    }
+                    join_battle(b, u, true, &c1);
+                    join_battle(b, u2, false, &c2);
 
                     /* Hat die attackierte Einheit keinen Noaid-Status,
                      * wird das Flag von der Faction genommen, andere
@@ -4036,11 +3903,7 @@ static bool start_battle(region * r, battle ** bp)
                          * Pr�combataura bei kurzem Kampf. */
                         c1->side->bf->attacker = true;
 
-                        if (set_enemy(c1->side, c2->side, true) && battledebug) {
-                            fprintf(bdebug, "%u/%s hates %u/%s because they attacked them.\n",
-                                c2->side->index, sidename(c2->side),
-                                c1->side->index, sidename(c1->side));
-                        }
+                        set_enemy(c1->side, c2->side, true);
                         fighting = true;
                     }
                 }
@@ -4159,10 +4022,6 @@ static void battle_flee(battle * b)
                         flee(dt);
                     }
                 }
-                if (bdebug && runners > 0) {
-                    fprintf(bdebug, "Fleeing: %d from %s\n", runners,
-                        itoa36(fig->unit->no));
-                }
             }
         }
     }
@@ -4265,9 +4124,6 @@ void do_battle(region * r)
     log_debug("battle in %s (%d, %d) : ", regionname(r, 0), r->x, r->y);
 
     for (; battle_report(b) && b->turn <= max_turns; ++b->turn) {
-        if (bdebug) {
-            fprintf(bdebug, "*** Turn: %d\n", b->turn);
-        }
         battle_flee(b);
         battle_update(b);
         battle_attacks(b);
