@@ -225,7 +225,6 @@ extern "C" {
     } meffect;
 
     extern const troop no_troop;
-    extern bool battledebug;
 
     /* BEGIN battle interface */
     side * find_side(battle * b, const struct faction * f, const struct group * g, unsigned int flags, const struct faction * stealthfaction);

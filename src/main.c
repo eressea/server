@@ -25,7 +25,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/filereader.h>
 #include <util/language.h>
 #include "eressea.h"
-#include "battle.h"
 #ifdef USE_CURSES
 #include "gmtool.h"
 #endif
@@ -71,8 +70,6 @@ static void load_inifile(dictionary * d)
     lomem = iniparser_getint(d, "eressea:lomem", lomem) ? 1 : 0;
 
     verbosity = iniparser_getint(d, "eressea:verbose", 2);
-    battledebug = iniparser_getint(d, "eressea:debug", battledebug) ? 1 : 0;
-
     str = iniparser_getstring(d, "eressea:locales", "de,en");
     make_locales(str);
 
