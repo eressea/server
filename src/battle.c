@@ -440,7 +440,7 @@ static int get_row(const side * s, int row, const side * vs)
     /* every entry in the size[] array means someone trying to defend us.
      * 'retreat' is the number of rows falling.
      */
-    result = _max(FIRST_ROW, row - retreat);
+    result = MAX(FIRST_ROW, row - retreat);
 
     return result;
 }
@@ -509,6 +509,9 @@ contest_new(int skilldiff, const troop dt, const armor_type * ar,
 const armor_type * sh)
 {
     double tohit = 0.5 + skilldiff * 0.1;
+
+    UNUSED_ARG(sh);
+    UNUSED_ARG(ar);
     if (tohit < 0.5)
         tohit = 0.5;
     if (chance(tohit)) {
@@ -600,12 +603,12 @@ weapon_skill(const weapon_type * wtype, const unit * u, bool attacking)
             if (u_race(u) == get_race(RC_ORC)) {
                 int sword = effskill(u, SK_MELEE, 0);
                 int spear = effskill(u, SK_SPEAR, 0);
-                skill = _max(sword, spear) - 3;
+                skill = MAX(sword, spear) - 3;
                 if (attacking) {
-                    skill = _max(skill, u_race(u)->at_default);
+                    skill = MAX(skill, u_race(u)->at_default);
                 }
                 else {
-                    skill = _max(skill, u_race(u)->df_default);
+                    skill = MAX(skill, u_race(u)->df_default);
                 }
             }
             else {
@@ -685,7 +688,7 @@ static int CavalryBonus(const unit * u, troop enemy, int type)
         /* only half against trolls */
         if (skl > 0) {
             if (type == BONUS_SKILL) {
-                int dmg = _min(skl, 8);
+                int dmg = MIN(skl, 8);
                 if (u_race(enemy.fighter->unit) == get_race(RC_TROLL)) {
                     dmg = dmg / 4;
                 }
@@ -696,7 +699,7 @@ static int CavalryBonus(const unit * u, troop enemy, int type)
             }
             else {
                 skl = skl / 2;
-                return _min(skl, 4);
+                return MIN(skl, 4);
             }
         }
     }
@@ -839,6 +842,7 @@ int select_magicarmor(troop t)
 /* Sind side ds und Magier des meffect verb�ndet, dann return 1*/
 bool meffect_protection(battle * b, meffect * s, side * ds)
 {
+    UNUSED_ARG(b);
     if (!s->magician->alive)
         return false;
     if (s->duration <= 0)
@@ -853,6 +857,7 @@ bool meffect_protection(battle * b, meffect * s, side * ds)
 /* Sind side as und Magier des meffect verfeindet, dann return 1*/
 bool meffect_blocked(battle * b, meffect * s, side * as)
 {
+    UNUSED_ARG(b);
     if (!s->magician->alive)
         return false;
     if (s->duration <= 0)
@@ -1008,7 +1013,7 @@ static void vampirism(troop at, int damage)
         if (gain > 0) {
             int maxhp = unit_max_hp(at.fighter->unit);
             at.fighter->person[at.index].hp =
-                _min(gain + at.fighter->person[at.index].hp, maxhp);
+                MIN(gain + at.fighter->person[at.index].hp, maxhp);
         }
     }
 }
@@ -1203,15 +1208,15 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
 
     /* TODO not sure if res could be > 1 here */
     if (magic) {
-        da = (int)(_max(da * res, 0));
+        da = (int)(MAX(da * res, 0));
     }
 
     if (type != AT_COMBATSPELL && type != AT_SPELL) {
         if (rule_damage & DAMAGE_CRITICAL) {
             double kritchance = (sk * 3 - sd) / 200.0;
 
-            kritchance = _max(kritchance, 0.005);
-            kritchance = _min(0.9, kritchance);
+            kritchance = MAX(kritchance, 0.005);
+            kritchance = MIN(0.9, kritchance);
 
             while (chance(kritchance)) {
                 if (bdebug) {
@@ -1238,11 +1243,11 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
 
         /* Skilldifferenzbonus */
         if (rule_damage & DAMAGE_SKILL_BONUS) {
-            da += _max(0, (sk - sd) / DAMAGE_QUOTIENT);
+            da += MAX(0, (sk - sd) / DAMAGE_QUOTIENT);
         }
     }
 
-    rda = _max(da - ar, 0);
+    rda = MAX(da - ar, 0);
 
     if ((u_race(du)->battle_flags & BF_INV_NONMAGIC) && !magic)
         rda = 0;
@@ -1275,7 +1280,7 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
                 }
                 /* gibt R�stung +effect f�r duration Treffer */
                 if (me->typ == SHIELD_ARMOR) {
-                    rda = _max(rda - me->effect, 0);
+                    rda = MAX(rda - me->effect, 0);
                     me->duration--;
                 }
             }
@@ -1474,7 +1479,7 @@ troop select_enemy(fighter * af, int minrow, int maxrow, int select)
         minrow = FIGHT_ROW;
         maxrow = BEHIND_ROW;
     }
-    minrow = _max(minrow, FIGHT_ROW);
+    minrow = MAX(minrow, FIGHT_ROW);
 
     enemies = count_enemies(b, af, minrow, maxrow, select);
 
@@ -1574,7 +1579,7 @@ static troop select_opponent(battle * b, troop at, int mindist, int maxdist)
         dt = select_enemy(at.fighter, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
     }
     else {
-        mindist = _max(mindist, FIGHT_ROW);
+        mindist = MAX(mindist, FIGHT_ROW);
         dt = select_enemy(at.fighter, mindist, maxdist, SELECT_ADVANCE);
     }
 
@@ -1735,7 +1740,7 @@ void do_combatmagic(battle * b, combatmagic_t was)
 
                 level = eff_spelllevel(mage, sp, level, 1);
                 if (sl > 0)
-                    level = _min(sl, level);
+                    level = MIN(sl, level);
                 if (level < 0) {
                     report_failed_spell(b, mage, sp);
                     free_order(ord);
@@ -1763,8 +1768,8 @@ void do_combatmagic(battle * b, combatmagic_t was)
         for (co = spellranks[rank].begin; co; co = co->next) {
             fighter *fig = co->magician.fig;
             const spell *sp = co->sp;
-            int level = co->level;
 
+            level = co->level;
             if (!sp->cast) {
                 log_error("spell '%s' has no function.\n", sp->sname);
             }
@@ -1822,7 +1827,7 @@ static void do_combatspell(troop at)
 
     level = eff_spelllevel(caster, sp, fi->magic, 1);
     if ((sl = get_combatspelllevel(caster, 1)) > 0)
-        level = _min(level, sl);
+        level = MIN(level, sl);
 
     if (fumble(r, caster, sp, level)) {
         report_failed_spell(b, caster, sp);
@@ -2040,6 +2045,7 @@ int hits(troop at, troop dt, weapon * awp)
 
 void dazzle(battle * b, troop * td)
 {
+    UNUSED_ARG(b);
     /* Nicht kumulativ ! */
 #ifdef TODO_RUNESWORD
     if (td->fighter->weapon[WP_RUNESWORD].count > td->index) {
@@ -2056,7 +2062,7 @@ void dazzle(battle * b, troop * td)
 
 void damage_building(battle * b, building * bldg, int damage_abs)
 {
-    bldg->size = _max(1, bldg->size - damage_abs);
+    bldg->size = MAX(1, bldg->size - damage_abs);
 
     /* Wenn Burg, dann gucken, ob die Leute alle noch in das Geb�ude passen. */
 
@@ -2332,7 +2338,7 @@ void do_regenerate(fighter * af)
     while (ta.index--) {
         struct person *p = af->person + ta.index;
         p->hp += effskill(au, SK_STAMINA, 0);
-        p->hp = _min(unit_max_hp(au), p->hp);
+        p->hp = MIN(unit_max_hp(au), p->hp);
     }
 }
 
@@ -2391,10 +2397,10 @@ double fleechance(unit * u)
 
     if (u_race(u) == get_race(RC_HALFLING)) {
         c += 0.20;
-        c = _min(c, 0.90);
+        c = MIN(c, 0.90);
     }
     else {
-        c = _min(c, 0.75);
+        c = MIN(c, 0.75);
     }
 
     if (a != NULL)
@@ -2487,6 +2493,7 @@ troop select_ally(fighter * af, int minrow, int maxrow, int allytype)
 static int loot_quota(const unit * src, const unit * dst,
     const item_type * type, int n)
 {
+    UNUSED_ARG(type);
     if (dst && src && src->faction != dst->faction) {
         double divisor = config_get_flt("rules.items.loot_divisor", 1);
         assert(divisor <= 0 || divisor >= 1);
@@ -2518,7 +2525,7 @@ static void loot_items(fighter * corpse)
         float lootfactor = (float)dead / (float)u->number; /* only loot the dead! */
         int maxloot = (int)((float)itm->number * lootfactor);
         if (maxloot > 0) {
-            int i = _min(10, maxloot);
+            int i = MIN(10, maxloot);
             for (; i != 0; --i) {
                 int loot = maxloot / i;
 
@@ -2599,7 +2606,7 @@ static void battle_effects(battle * b, int dead_players)
 {
     region *r = b->region;
     int dead_peasants =
-        _min(rpeasants(r), (int)(dead_players * PopulationDamage()));
+        MIN(rpeasants(r), (int)(dead_players * PopulationDamage()));
     if (dead_peasants) {
         deathcounts(r, dead_peasants + dead_players);
         add_chaoscount(r, dead_peasants / 2);
@@ -2636,7 +2643,6 @@ static void reorder_fleeing(region * r)
 static void aftermath(battle * b)
 {
     region *r = b->region;
-    ship *sh;
     side *s;
     int dead_players = 0;
     bfaction *bf;
@@ -2833,6 +2839,7 @@ static void aftermath(battle * b)
              * dieses Schiff besch�digt. Andernfalls ein Schiff, welches
              * evt. zuvor verlassen wurde. */
             if (ships_damaged) {
+                ship *sh;
                 if (du->ship)
                     sh = du->ship;
                 else
@@ -3092,7 +3099,7 @@ static void print_stats(battle * b)
 
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
         if (!ql_empty(s->leader.fighters)) {
-            b->max_tactics = _max(b->max_tactics, s->leader.value);
+            b->max_tactics = MAX(b->max_tactics, s->leader.value);
         }
     }
 
@@ -3258,7 +3265,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     /* change_effect wird in ageing gemacht */
 
     /* Effekte von Artefakten */
-    strongmen = _min(fig->unit->number, trollbelts(u));
+    strongmen = MIN(fig->unit->number, trollbelts(u));
 
     /* Hitpoints, Attack- und Defence-Boni f�r alle Personen */
     for (i = 0; i < fig->alive; i++) {
@@ -3448,7 +3455,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
                 else
                     p_bonus += 3;
             } while (rnd >= 97);
-            bonus = _max(p_bonus, bonus);
+            bonus = MAX(p_bonus, bonus);
         }
         tactics += bonus;
     }
@@ -3519,11 +3526,11 @@ static const char *simplename(region * r)
     const char *cp = rname(r, default_locale);
     for (i = 0; *cp && i != 16; ++i, ++cp) {
         int c = *(unsigned char *)cp;
-        while (c && !isalpha(c) && !isxspace(c)) {
+        while (c && !isalpha(c) && !isspace(c)) {
             ++cp;
             c = *(unsigned char *)cp;
         }
-        if (isxspace(c))
+        if (isspace(c))
             name[i] = '_';
         else
             name[i] = *cp;
@@ -3546,10 +3553,10 @@ battle *make_battle(region * r)
         bld->sizeleft = bld->size;
 
     if (battledebug) {
-        char zText[MAX_PATH];
-        char zFilename[MAX_PATH];
+        char zText[4096];
+        char zFilename[4096];
         join_path(basepath(), "battles", zText, sizeof(zText));
-        if (_mkdir(zText) != 0) {
+        if (mkdir(zText, 0777) != 0) {
             log_error("could not create subdirectory for battle logs: %s", zText);
             battledebug = false;
         }
@@ -4104,7 +4111,7 @@ static void battle_flee(battle * b)
                 troop dt;
                 int runners = 0;
                 /* Flucht nicht bei mehr als 600 HP. Damit Wyrme t�tbar bleiben. */
-                int runhp = _min(600, (int)(0.9 + unit_max_hp(u) * hpflee(u->status)));
+                int runhp = MIN(600, (int)(0.9 + unit_max_hp(u) * hpflee(u->status)));
 
                 if (u->ship && fval(u->region->terrain, SEA_REGION)) {
                     /* keine Flucht von Schiffen auf hoher See */
@@ -4147,7 +4154,7 @@ static void battle_flee(battle * b)
                     if (fig->person[dt.index].flags & FL_PANICED) {
                         ispaniced = EFFECT_PANIC_SPELL;
                     }
-                    if (chance(_min(fleechance(u) + ispaniced, 0.90))) {
+                    if (chance(MIN(fleechance(u) + ispaniced, 0.90))) {
                         ++runners;
                         flee(dt);
                     }

@@ -125,7 +125,7 @@ static const char *translate(const char *key, const char *value)
         }
         else
             t = malloc(sizeof(translation));
-        t->key = _strdup(key);
+        t->key = strdup(key);
         t->value = value;
         t->next = translation_table[kk];
         translation_table[kk] = t;
@@ -361,7 +361,7 @@ static int cr_race(variant var, char *buffer, const void *userdata)
 static int cr_alliance(variant var, char *buffer, const void *userdata)
 {
     const alliance *al = (const alliance *)var.v;
-    unused_arg(userdata);
+    UNUSED_ARG(userdata);
     if (al != NULL) {
         sprintf(buffer, "%d", al->id);
     }
@@ -372,7 +372,7 @@ static int cr_skill(variant var, char *buffer, const void *userdata)
 {
     const faction *report = (const faction *)userdata;
     skill_t sk = (skill_t)var.i;
-    unused_arg(userdata);
+    UNUSED_ARG(userdata);
     if (sk != NOSKILL)
         sprintf(buffer, "\"%s\"",
         translate(mkname("skill", skillnames[sk]), skillname(sk,
@@ -385,7 +385,7 @@ static int cr_skill(variant var, char *buffer, const void *userdata)
 static int cr_order(variant var, char *buffer, const void *userdata)
 {
     order *ord = (order *)var.v;
-    unused_arg(userdata);
+    UNUSED_ARG(userdata);
     if (ord != NULL) {
         char cmd[ORDERSIZE];
         char *wp = buffer;

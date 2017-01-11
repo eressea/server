@@ -57,7 +57,7 @@ extern "C" {
     struct mlist ** merge_messages(message_list *mlist, message_list *append);
     void split_messages(message_list *mlist, struct mlist **split);
 
-#define ADDMSG(msgs, mcreate) { message * m = mcreate; if (m) { assert(m->refcount>=1); add_message(msgs, m); msg_release(m); } }
+#define ADDMSG(msgs, mcreate) { message * mx = mcreate; if (mx) { assert(mx->refcount>=1); add_message(msgs, mx); msg_release(mx); } }
 
     void syntax_error(const struct unit *u, struct order *ord);
     struct message * cmistake(const struct unit *u, struct order *ord, int mno, int mtype);

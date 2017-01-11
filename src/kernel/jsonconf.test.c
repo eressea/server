@@ -448,7 +448,7 @@ static void test_configs(CuTest * tc)
     CuAssertPtrEquals(tc, 0, buildingtypes);
     json_config(json);
     CuAssertPtrNotNull(tc, buildingtypes);
-    if (unlink("test.json")!=0 && errno==ENOENT) {
+    if (remove("test.json")!=0 && errno==ENOENT) {
         errno = 0;
     }
     cJSON_Delete(json);

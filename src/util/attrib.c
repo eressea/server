@@ -124,7 +124,7 @@ int a_readstring(attrib * a, void *owner, struct gamedata *data)
             len += DISPLAYSIZE - 1;
         }
         else {
-            result = _strdup(buf);
+            result = strdup(buf);
         }
     } while (e == ENOMEM);
     a->data.v = result;

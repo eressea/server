@@ -11,6 +11,8 @@
 #ifndef H_GC_SUMMARY
 #define H_GC_SUMMARY
 
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

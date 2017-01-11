@@ -42,8 +42,8 @@ use_speedsail(struct unit *u, const struct item_type *itype, int amount,
 struct order *ord)
 {
     struct plane *p = rplane(u->region);
-    unused_arg(amount);
-    unused_arg(itype);
+    UNUSED_ARG(amount);
+    UNUSED_ARG(itype);
     if (p != NULL) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "use_realworld_only", ""));
     }

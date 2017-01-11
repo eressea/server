@@ -47,7 +47,7 @@ equipment *create_equipment(const char *eqname)
         int i = eq ? strcmp(eq->name, eqname) : 1;
         if (i > 0) {
             eq = (equipment *)calloc(1, sizeof(equipment));
-            eq->name = _strdup(eqname);
+            eq->name = strdup(eqname);
             eq->next = *eqp;
             memset(eq->skills, 0, sizeof(eq->skills));
             *eqp = eq;
@@ -78,7 +78,7 @@ void equipment_setskill(equipment * eq, skill_t sk, const char *value)
 {
     if (eq != NULL) {
         if (value != NULL) {
-            eq->skills[sk] = _strdup(value);
+            eq->skills[sk] = strdup(value);
         }
         else if (eq->skills[sk]) {
             free(eq->skills[sk]);
@@ -98,7 +98,7 @@ void equipment_addspell(equipment * eq, const char * name, int level)
         lazy_spell *ls = malloc(sizeof(lazy_spell));
         ls->sp = NULL;
         ls->level = level;
-        ls->name = _strdup(name);
+        ls->name = strdup(name);
         ql_push(&eq->spells, ls);
     }
 }
@@ -115,7 +115,7 @@ equipment_setitem(equipment * eq, const item_type * itype, const char *value)
             if (idata == NULL) {
                 idata = (itemdata *)malloc(sizeof(itemdata));
                 idata->itype = itype;
-                idata->value = _strdup(value);
+                idata->value = strdup(value);
                 idata->next = eq->items;
                 eq->items = idata;
             }

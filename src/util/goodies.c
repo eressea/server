@@ -113,7 +113,7 @@ int set_email(char **pemail, const char *newmail)
         free(*pemail);
     *pemail = 0;
     if (newmail) {
-        *pemail = _strdup(newmail);
+        *pemail = strdup(newmail);
     }
     return 0;
 }

@@ -785,7 +785,7 @@ static void rotting_herbs(void)
                 if (fval(itm->type, ITF_HERB)) {
                     double nv = normalvariate(k, k / 4);
                     int inv = (int)nv;
-                    int delta = _min(n, inv);
+                    int delta = MIN(n, inv);
                     if (!i_change(itmp, itm->type, -delta)) {
                         continue;
                     }
@@ -814,7 +814,7 @@ void randomevents(void)
         while (*blist) {
             building *b = *blist;
             if (fval(b->type, BTF_DECAY) && !building_owner(b)) {
-                b->size -= _max(1, (b->size * 20) / 100);
+                b->size -= MAX(1, (b->size * 20) / 100);
                 if (b->size == 0) {
                     remove_building(blist, r->buildings);
                 }

@@ -76,7 +76,7 @@ static int createcurse_handle(trigger * t, void *data)
     else {
         log_error("could not perform createcurse::handle()\n");
     }
-    unused_arg(data);
+    UNUSED_ARG(data);
     return 0;
 }
 

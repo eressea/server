@@ -100,7 +100,7 @@ static void reduce_weight(unit * u)
     int horses = get_resource(u, get_resourcetype(R_HORSE));
 
     if (horses > 0) {
-        horses = _min(horses, (u->number * 2));
+        horses = MIN(horses, (u->number * 2));
         change_resource(u, get_resourcetype(R_HORSE), -horses);
     }
 
@@ -129,7 +129,7 @@ static void reduce_weight(unit * u)
             if (itype->weight >= 10 && itype->rtype->wtype == 0
                 && itype->rtype->atype == 0) {
                 if (itype->capacity < itype->weight) {
-                    int reduce = _min(itm->number, -((capacity - weight) / itype->weight));
+                    int reduce = MIN(itm->number, -((capacity - weight) / itype->weight));
                     give_peasants(u, itm->type, reduce);
                     weight -= reduce * itype->weight;
                 }
@@ -144,7 +144,7 @@ static void reduce_weight(unit * u)
         const item_type *itype = itm->type;
         weight += itm->number * itype->weight;
         if (itype->capacity < itype->weight) {
-            int reduce = _min(itm->number, -((capacity - weight) / itype->weight));
+            int reduce = MIN(itm->number, -((capacity - weight) / itype->weight));
             give_peasants(u, itm->type, reduce);
             weight -= reduce * itype->weight;
         }
@@ -1027,7 +1027,7 @@ static void eaten_by_monster(unit * u)
     n = (int)(n * multi);
     if (n > 0) {
         n = lovar(n);
-        n = _min(rpeasants(u->region), n);
+        n = MIN(rpeasants(u->region), n);
 
         if (n > 0) {
             deathcounts(u->region, n);
@@ -1047,7 +1047,7 @@ static void absorbed_by_monster(unit * u)
 
     if (n > 0) {
         n = lovar(n);
-        n = _min(rpeasants(u->region), n);
+        n = MIN(rpeasants(u->region), n);
         if (n > 0) {
             rsetpeasants(u->region, rpeasants(u->region) - n);
             scale_number(u, u->number + n);
@@ -1062,7 +1062,7 @@ static int scareaway(region * r, int anzahl)
     int n, p, diff = 0, emigrants[MAXDIRECTIONS];
     direction_t d;
 
-    anzahl = _min(_max(1, anzahl), rpeasants(r));
+    anzahl = MIN(MAX(1, anzahl), rpeasants(r));
 
     /* Wandern am Ende der Woche (normal) oder wegen Monster. Die
      * Wanderung wird erst am Ende von demographics () ausgefuehrt.
@@ -1074,7 +1074,7 @@ static int scareaway(region * r, int anzahl)
 
     p = rpeasants(r);
     assert(p >= 0 && anzahl >= 0);
-    for (n = _min(p, anzahl); n; n--) {
+    for (n = MIN(p, anzahl); n; n--) {
         direction_t dir = (direction_t)(rng_int() % MAXDIRECTIONS);
         region *rc = rconnect(r, dir);
 
@@ -1102,7 +1102,7 @@ static void scared_by_monster(unit * u)
     }
     if (n > 0) {
         n = lovar(n);
-        n = _min(rpeasants(u->region), n);
+        n = MIN(rpeasants(u->region), n);
         if (n > 0) {
             n = scareaway(u->region, n);
             if (n > 0) {

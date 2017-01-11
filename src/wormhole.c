@@ -63,7 +63,7 @@ static int wormhole_age(struct attrib *a, void *owner)
     region *r = entry->region;
     unit *u = r->units;
 
-    unused_arg(owner);
+    UNUSED_ARG(owner);
     for (; u != NULL && maxtransport != 0; u = u->next) {
         if (u->building == entry) {
             message *m = NULL;

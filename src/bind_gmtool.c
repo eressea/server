@@ -133,14 +133,14 @@ static int tolua_selected_regions(lua_State * L)
 
 static int tolua_state_open(lua_State * L)
 {
-    unused_arg(L);
+    UNUSED_ARG(L);
     state_open();
     return 0;
 }
 
 static int tolua_state_close(lua_State * L)
 {
-    unused_arg(L);
+    UNUSED_ARG(L);
     state_close(current_state);
     return 0;
 }
@@ -188,7 +188,7 @@ static void lua_paint_info(struct window *wnd, const struct state *st)
                 break;
             else {
                 size_t len = end - str;
-                int bytes = _min((int)len, size);
+                int bytes = MIN((int)len, size);
                 mvwaddnstr(win, line++, 1, str, bytes);
                 wclrtoeol(win);
                 str = end + 1;

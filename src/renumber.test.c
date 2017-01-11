@@ -1,3 +1,4 @@
+#include <platform.h>
 #include "renumber.h"
 
 #include <tests.h>

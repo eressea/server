@@ -45,8 +45,8 @@ static message *cinfo_cursed_by_the_gods(const void *obj, objtype_t typ,
 {
     region *r = (region *)obj;
 
-    unused_arg(typ);
-    unused_arg(self);
+    UNUSED_ARG(typ);
+    UNUSED_ARG(self);
     assert(typ == TYP_REGION);
 
     if (r->terrain->flags & SEA_REGION) {
@@ -68,9 +68,9 @@ static struct curse_type ct_godcursezone = {
 static message *cinfo_dreamcurse(const void *obj, objtype_t typ, const curse * c,
     int self)
 {
-    unused_arg(self);
-    unused_arg(typ);
-    unused_arg(obj);
+    UNUSED_ARG(self);
+    UNUSED_ARG(typ);
+    UNUSED_ARG(obj);
     assert(typ == TYP_REGION);
 
     if (c->effect > 0) {
@@ -94,9 +94,9 @@ static struct curse_type ct_gbdream = {
 static message *cinfo_magicstreet(const void *obj, objtype_t typ, const curse * c,
     int self)
 {
-    unused_arg(typ);
-    unused_arg(self);
-    unused_arg(obj);
+    UNUSED_ARG(typ);
+    UNUSED_ARG(self);
+    UNUSED_ARG(obj);
     assert(typ == TYP_REGION);
 
     /* Warnung vor Auflösung */
@@ -117,9 +117,9 @@ static struct curse_type ct_magicstreet = {
 static message *cinfo_antimagiczone(const void *obj, objtype_t typ, const curse * c,
     int self)
 {
-    unused_arg(typ);
-    unused_arg(self);
-    unused_arg(obj);
+    UNUSED_ARG(typ);
+    UNUSED_ARG(self);
+    UNUSED_ARG(obj);
     assert(typ == TYP_REGION);
 
     /* Magier spüren eine Antimagiezone */
@@ -139,7 +139,7 @@ const curse * c, int self)
     unit *u = NULL;
     unit *mage = c->magician;
 
-    unused_arg(typ);
+    UNUSED_ARG(typ);
 
     assert(typ == TYP_REGION);
     r = (region *)obj;
@@ -167,8 +167,8 @@ static struct curse_type ct_antimagiczone = {
 static message *cinfo_farvision(const void *obj, objtype_t typ, const curse * c,
     int self)
 {
-    unused_arg(typ);
-    unused_arg(obj);
+    UNUSED_ARG(typ);
+    UNUSED_ARG(obj);
 
     assert(typ == TYP_REGION);
 

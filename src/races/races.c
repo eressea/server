@@ -42,7 +42,7 @@ static void oldfamiliars(unit * u)
     char fname[64];
     /* these familiars have no special skills.
      */
-    _snprintf(fname, sizeof(fname), "%s_familiar", u_race(u)->_name);
+    snprintf(fname, sizeof(fname), "%s_familiar", u_race(u)->_name);
     create_mage(u, M_GRAY);
     equip_unit(u, get_equipment(fname));
 }

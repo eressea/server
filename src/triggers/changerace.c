@@ -74,7 +74,7 @@ static int changerace_handle(trigger * t, void *data)
     else {
         log_error("could not perform changerace::handle()\n");
     }
-    unused_arg(data);
+    UNUSED_ARG(data);
     return 0;
 }
 

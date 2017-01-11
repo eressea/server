@@ -106,7 +106,7 @@ static int tolua_dict_set_string(lua_State * L)
     attrib *a = a_find(*self, &at_dict);
     variant val;
 
-    val.v = _strdup(value);
+    val.v = strdup(value);
 
     for (; a && a->type == &at_dict; a = a->next) {
         if (strcmp(dict_name(a), name) == 0) {

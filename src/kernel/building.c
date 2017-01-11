@@ -127,7 +127,7 @@ building_type *bt_get_or_create(const char *name)
         building_type *btype = bt_find_i(name);
         if (btype == NULL) {
             btype = calloc(sizeof(building_type), 1);
-            btype->_name = _strdup(name);
+            btype->_name = strdup(name);
             btype->auraregen = 1.0;
             btype->maxsize = -1;
             btype->capacity = 1;
@@ -143,7 +143,7 @@ int buildingcapacity(const building * b)
 {
     if (b->type->capacity >= 0) {
         if (b->type->maxcapacity >= 0) {
-            return _min(b->type->maxcapacity, b->size * b->type->capacity);
+            return MIN(b->type->maxcapacity, b->size * b->type->capacity);
         }
         return b->size * b->type->capacity;
     }
@@ -420,7 +420,7 @@ building *new_building(const struct building_type * btype, region * r,
     }
     assert(bname);
     slprintf(buffer, sizeof(buffer), "%s %s", bname, itoa36(b->no));
-    b->name = _strdup(bname);
+    b->name = strdup(bname);
     return b;
 }
 
@@ -619,7 +619,7 @@ void building_setname(building * self, const char *name)
 {
     free(self->name);
     if (name)
-        self->name = _strdup(name);
+        self->name = strdup(name);
     else
         self->name = NULL;
 }
@@ -779,7 +779,7 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
         /* Godcurse: Income -10 */
         ctype = ct_find("godcursezone");
         if (ctype && curse_active(get_curse(r->attribs, ctype))) {
-            wage = _max(0, wage - 10);
+            wage = MAX(0, wage - 10);
         }
 
         /* Bei einer D�rre verdient man nur noch ein Viertel  */

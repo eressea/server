@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define H_GC_LAWS
 
 #include <kernel/types.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {

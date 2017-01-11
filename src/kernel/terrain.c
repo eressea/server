@@ -110,7 +110,7 @@ terrain_type * get_or_create_terrain(const char *name) {
     if (!terrain) {
         terrain = (terrain_type *)calloc(sizeof(terrain_type), 1);
         if (terrain) {
-            terrain->_name = _strdup(name);
+            terrain->_name = strdup(name);
             terrain->next = registered_terrains;
             registered_terrains = terrain;
             if (strcmp("plain", name) == 0) {

@@ -119,7 +119,7 @@ static void test_attrib_rwstring(CuTest *tc) {
     attrib a = { 0 };
 
     test_setup();
-    a.data.v = _strdup("Hello World");
+    a.data.v = strdup("Hello World");
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
     a_writestring(&a, NULL, &store);

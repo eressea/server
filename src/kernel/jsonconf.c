@@ -224,7 +224,7 @@ static void json_terrain_production(cJSON *json, terrain_production *prod) {
         if (dst) {
             free(*dst);
             assert(child->type == cJSON_String);
-            *dst = _strdup(child->valuestring);
+            *dst = strdup(child->valuestring);
         }
     }
 }
@@ -453,7 +453,7 @@ static void json_race(cJSON *json, race *rc) {
         switch (child->type) {
         case cJSON_String:
             if (strcmp(child->string, "damage") == 0) {
-                rc->def_damage = _strdup(child->valuestring);
+                rc->def_damage = strdup(child->valuestring);
             }
             break;
         case cJSON_Number:
@@ -599,7 +599,7 @@ static void json_spells(cJSON *json) {
                     sp->fumble = (fumble_f)get_function(item->valuestring);
                 }
                 else if (strcmp(item->string, "syntax") == 0) {
-                    sp->syntax = _strdup(item->valuestring);
+                    sp->syntax = strdup(item->valuestring);
                 }
             }
         }

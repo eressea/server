@@ -365,7 +365,7 @@ static void dracoid_name(unit * u)
     size_t sz;
 
     /* ignore u */
-    unused_arg(u);
+    UNUSED_ARG(u);
     /* Wieviele Mittelteile? */
 
     mid_syllabels = rng_int() % 4;
@@ -394,8 +394,8 @@ const char *abkz(const char *s, char *buf, size_t buflen, size_t maxchars)
     size_t size;
     int result;
 
+    UNUSED_ARG(buflen);
     /* Prüfen, ob Kurz genug */
-
     if (strlen(s) <= maxchars) {
         return s;
     }
@@ -425,8 +425,8 @@ const char *abkz(const char *s, char *buf, size_t buflen, size_t maxchars)
         }
     }
 
-    /* Buchstaben pro Teilkürzel = _max(1,max/AnzWort) */
-    bpt = (c > 0) ? _max(1, maxchars / c) : 1;
+    /* Buchstaben pro Teilkürzel = MAX(1,max/AnzWort) */
+    bpt = (c > 0) ? MAX(1, maxchars / c) : 1;
 
     /* Einzelne Wörter anspringen und jeweils die ersten BpT kopieren */
 

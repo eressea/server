@@ -1,3 +1,4 @@
+#include <platform.h>
 #include <kernel/types.h>
 #include "donations.h"
 

@@ -33,7 +33,7 @@
 #define UNDEAD_BREAKUP              25  /* chance dafuer */
 #define UNDEAD_BREAKUP_FRACTION     (25+rng_int()%70)   /* anteil der weg geht */
 
-#define age_chance(a,b,p) (_max(0,a-b)*p)
+#define age_chance(a,b,p) (MAX(0,a-b)*p)
 
 void make_undead_unit(unit * u)
 {
@@ -70,7 +70,7 @@ void age_undead(unit * u)
 void age_skeleton(unit * u)
 {
     if (is_monsters(u->faction) && rng_int() % 100 < age_chance(u->age, 27, 1)) {
-        int n = _max(1, u->number / 2);
+        int n = MAX(1, u->number / 2);
         double q = (double)u->hp / (double)(unit_max_hp(u) * u->number);
         u_setrace(u, get_race(RC_SKELETON_LORD));
         u->irace = NULL;
@@ -82,7 +82,7 @@ void age_skeleton(unit * u)
 void age_zombie(unit * u)
 {
     if (is_monsters(u->faction) && rng_int() % 100 < age_chance(u->age, 27, 1)) {
-        int n = _max(1, u->number / 2);
+        int n = MAX(1, u->number / 2);
         double q = (double)u->hp / (double)(unit_max_hp(u) * u->number);
         u_setrace(u, get_race(RC_ZOMBIE_LORD));
         u->irace = NULL;
@@ -94,7 +94,7 @@ void age_zombie(unit * u)
 void age_ghoul(unit * u)
 {
     if (is_monsters(u->faction) && rng_int() % 100 < age_chance(u->age, 27, 1)) {
-        int n = _max(1, u->number / 2);
+        int n = MAX(1, u->number / 2);
         double q = (double)u->hp / (double)(unit_max_hp(u) * u->number);
         u_setrace(u, get_race(RC_GHOUL_LORD));
         u->irace = NULL;

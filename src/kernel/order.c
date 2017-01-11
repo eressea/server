@@ -405,7 +405,7 @@ order *parse_order(const char *s, const struct locale * lang)
             }
         }
         if (kwd != NOKEYWORD) {
-            while (isxspace(*(unsigned char *)sptr)) ++sptr;
+            while (isspace(*(unsigned char *)sptr)) ++sptr;
             s = sptr;
             return create_order_i(kwd, s, persistent, lang);
         }
