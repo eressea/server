@@ -1,5 +1,15 @@
 #!/bin/bash
 
+ROOT=$(pwd)
+while [ ! -d $ROOT/.git ]; do
+  ROOT=$(dirname $ROOT)
+  if [ "/" = "$ROOT" ]; then
+    echo "could not find root, are you in the git repository?"
+    exit
+  fi
+done
+ERESSEA=$(dirname $ROOT)
+
 function abort() {
 echo $1
 [ -z $2 ] && exit -1
@@ -37,7 +47,6 @@ while getopts :d:g:r:s:hfn o; do
 done
 
 [ $game -gt 0 ] || abort "must use a positive integer for game id"
-[ -d $ERESSEA ] || abort "invalid or missing env variable ERESSEA ($ERESSEA)"
 [ -z $SOURCE ] && SOURCE=$ERESSEA/$src
 [ -d $SOURCE ] || abort "invalid source directory $SOURCE"
 [ -z $rules ] && rules=e$game
@@ -46,7 +55,8 @@ done
 [ -e $TOOLS ] || TOOLS=$SOURCE/bin
 [ -z $INIFILE ] && INIFILE=$TOOLS/inifile
 [ -e $INIFILE ] || INIFILE=$TOOLS/iniparser/inifile
-#[ -e $INIFILE ] || abort "tool is not installed: $INIFILE"
+
+[ -e $SOURCE/conf/$rules/config.xml ] || abort "cannot find conf/$rules/config.xml"
 
 cd $ERESSEA
 if [ -d $dir ] ; then
