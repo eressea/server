@@ -8,8 +8,6 @@ while [ ! -d $ROOT/.git ]; do
   fi
 done
 
-DEST=$(dirname $ROOT)/server
-
 [ -z "$CC" ] && [ ! -z `which clang` ] && CC="clang"
 [ -z "$CC" ] && [ ! -z `which gcc` ] && CC="gcc"
 [ -z "$CC" ] && [ ! -z `which tcc` ] && CC="tcc"
