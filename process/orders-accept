@@ -27,13 +27,12 @@ if not os.path.isdir(dir):
     sys.exit(1)
 rootdir = dir
 
-try:
-    game = int(sys.argv[1])
-except:
-    game = sys.argv[1]
+game = int(sys.argv[1])
 gamedir = os.path.join(rootdir, "game-%d" % (game, ))
-frommail = 'Eressea Server <eressea-server@eressea.kn-bremen.de>'
+frommail = 'eressea-server@kn-bremen.de'
 gamename = 'Eressea'
+sender = '%s Server <%s>' % (gamename, frommail)
+
 inifile = os.path.join(gamedir, 'eressea.ini')
 if not os.path.exists(inifile):
     print "no such file: " . inifile
@@ -44,6 +43,10 @@ else:
         frommail = config.get('game', 'email')
     if config.has_option('game', 'name'):
         gamename = config.get('game', 'name')
+    if config.has_option('game', 'sender'):
+        sender = config.get('game', 'sender')
+    else:
+        sender = "%s Server <%s>" % (gamename, frommail)
     config = None
 prefix = 'turn-'
 hostname = gethostname()
@@ -278,7 +281,7 @@ def copy_orders(message, filename, sender):
 # create a file, containing:
 # game=0 locale=de file=/path/to/filename email=rcpt@domain.to
 def accept(game, locale, stream, extend=None):
-    global rootdir, orderbase, gamedir, gamename, frommail
+    global rootdir, orderbase, gamedir, gamename, sender
     if extend is not None:
         orderbase = orderbase + ".pre-" + extend
     savedir = os.path.join(gamedir, orderbase)
@@ -288,21 +291,21 @@ def accept(game, locale, stream, extend=None):
     if not os.path.exists(savedir): os.mkdir(savedir)
     # parse message
     message = Parser().parse(stream)
-    sender = get_sender(message)
-    logger = logging.getLogger(sender)
+    email = get_sender(message)
+    logger = logging.getLogger(email)
     # write syslog
-    if sender is None or valid_email(sender)==0:
-        logger.warning("invalid email address: " + str(sender))
+    if email is None or valid_email(email)==0:
+        logger.warning("invalid email address: " + str(email))
         return -1
-    logger.info("received orders from " + sender)
+    logger.info("received orders from " + email)
     # get an available filename
     lock_file(gamedir + "/orders.queue")
-    maxdate, filename = available_file(savedir, prefix + sender)
+    maxdate, filename = available_file(savedir, prefix + email)
     if filename is None:
-        logger.warning("more than " + str(maxfiles) + " orders from " + sender)
+        logger.warning("more than " + str(maxfiles) + " orders from " + email)
         return -1
     # copy the orders to the file
-    text_ok = copy_orders(message, filename, sender)
+    text_ok = copy_orders(message, filename, email)
     unlock_file(gamedir + "/orders.queue")
 
     warning, msg, fail = None, "", False
@@ -312,47 +315,47 @@ def accept(game, locale, stream, extend=None):
         os.utime(filename, (turndate, turndate))
         logger.debug("mail date is '%s' (%d)" % (maildate, turndate))
         if turndate < maxdate:
-            logger.warning("inconsistent message date " + sender)
+            logger.warning("inconsistent message date " + email)
             warning = " (" + messages["warning-" + locale] + ")"
             msg = msg + formatpar(messages["maildate-" + locale] % (ctime(maxdate),ctime(turndate)), 76, 2) + "\n"
     else:
-        logger.warning("missing message date " + sender)
+        logger.warning("missing message date " + email)
         warning = " (" + messages["warning-" + locale] + ")"
         msg = msg + formatpar(messages["nodate-" + locale], 76, 2) + "\n"
 
     if not text_ok:
         warning = " (" + messages["error-" + locale] + ")"
         msg = msg + formatpar(messages["multipart-" + locale], 76, 2) + "\n"
-        logger.warning("rejected - no text/plain in orders from " + sender)
+        logger.warning("rejected - no text/plain in orders from " + email)
         os.unlink(filename)
         savedir = savedir + "/rejected"
         if not os.path.exists(savedir): os.mkdir(savedir)
         lock_file(gamedir + "/orders.queue")
-        maxdate, filename = available_file(savedir, prefix + sender)
+        maxdate, filename = available_file(savedir, prefix + email)
         store_message(message, filename)
         unlock_file(gamedir + "/orders.queue")
         fail = True
 
     if sendmail and warning is not None:
         subject = gamename + " " + messages["subject-"+locale] + warning
-        mail = "Subject: %s\nFrom: %s\nTo: %s\n\n" % (subject, frommail, sender) + msg
+        mail = "Subject: %s\nFrom: %s\nTo: %s\n\n" % (subject, sender, email) + msg
         from smtplib import SMTP
         server = SMTP("localhost")
-        server.sendmail(frommail, sender, mail)
+        server.sendmail(sender, email, mail)
         server.close()
 
     if not sendmail:
-        print text_ok, fail, sender
+        print text_ok, fail, email
         print filename
 
     if not fail:
         lock_file(gamedir + "/orders.queue")
         queue = open(gamedir + "/orders.queue", "a")
-        queue.write("email=%s file=%s locale=%s game=%s\n" % (sender, filename, locale, game))
+        queue.write("email=%s file=%s locale=%s game=%s\n" % (email, filename, locale, game))
         queue.close()
         unlock_file(gamedir + "/orders.queue")
 
-    logger.info("done - accepted orders from " + sender)
+    logger.info("done - accepted orders from " + email)
 
     return 0
 
