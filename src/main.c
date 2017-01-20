@@ -54,23 +54,23 @@ static void load_inifile(dictionary * d)
 
     assert(d);
 
-    str = iniparser_getstring(d, "eressea:base", basedir);
+    str = iniparser_getstring(d, "game:base", basedir);
     if (str != basedir) {
         set_basepath(str);
     }
-    str = iniparser_getstring(d, "eressea:report", reportdir);
+    str = iniparser_getstring(d, "game:report", reportdir);
     if (str != reportdir) {
         set_reportpath(str);
     }
-    str = iniparser_getstring(d, "eressea:data", datadir);
+    str = iniparser_getstring(d, "game:data", datadir);
     if (str != datadir) {
         set_datapath(str);
     }
 
-    lomem = iniparser_getint(d, "eressea:lomem", lomem) ? 1 : 0;
+    lomem = iniparser_getint(d, "game:lomem", lomem) ? 1 : 0;
 
-    verbosity = iniparser_getint(d, "eressea:verbose", 2);
-    str = iniparser_getstring(d, "eressea:locales", "de,en");
+    verbosity = iniparser_getint(d, "game:verbose", 2);
+    str = iniparser_getstring(d, "game:locales", "de,en");
     make_locales(str);
 
     if (global.inifile) iniparser_freedict(global.inifile);
@@ -84,7 +84,7 @@ static void parse_config(const char *filename)
         load_inifile(d);
         log_debug("reading from configuration file %s\n", filename);
 
-        memdebug = iniparser_getint(d, "eressea:memcheck", memdebug);
+        memdebug = iniparser_getint(d, "game:memcheck", memdebug);
 #ifdef USE_CURSES
         /* only one value in the [editor] section */
         force_color = iniparser_getint(d, "editor:color", force_color);
