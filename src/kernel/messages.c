@@ -214,29 +214,11 @@ caddmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
 
     UNUSED_ARG(level);
     switch (mtype) {
-    case MSG_INCOME:
-        assert(f);
-        m = add_message(&f->msgs, msg_message("msg_economy", "string", s));
-        break;
     case MSG_BATTLE:
         assert(0 || !"battle messages must not use addmessage");
         break;
-    case MSG_MOVE:
-        assert(f);
-        m = add_message(&f->msgs, msg_message("msg_movement", "string", s));
-        break;
-    case MSG_COMMERCE:
-        assert(f);
-        m = add_message(&f->msgs, msg_message("msg_economy", "string", s));
-        break;
-    case MSG_PRODUCE:
-        assert(f);
-        m = add_message(&f->msgs, msg_message("msg_production", "string", s));
-        break;
     case MSG_MAGIC:
-    case MSG_COMMENT:
     case MSG_MESSAGE:
-    case MSG_ORCVERMEHRUNG:
     case MSG_EVENT:
         /* Botschaften an REGION oder einzelne PARTEI */
         m = msg_message("msg_event", "string", s);

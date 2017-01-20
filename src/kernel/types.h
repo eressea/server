@@ -146,9 +146,7 @@ typedef enum {                  /* Fehler und Meldungen im Report */
   MSG_INCOME,
   MSG_COMMERCE,
   MSG_PRODUCE,
-  MSG_ORCVERMEHRUNG,
   MSG_MESSAGE,
-  MSG_COMMENT,
   MSG_MAGIC,
   MAX_MSG
 } msg_t;
