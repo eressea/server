@@ -2,7 +2,9 @@
 # -*- coding: iso-8859-1 -*-
 
 from os import unlink, symlink, rename, popen, tmpfile
-from os.path import exists
+import os
+import os.path
+import ConfigParser
 from re import compile, IGNORECASE
 from string import split, join, upper, strip
 from sys import argv, exit
@@ -14,9 +16,8 @@ from epasswd import EPasswd
 def pwd_get_email(faction, pwd, pwdfile=None):
     return None
 
-def splitfilename(filename):
-    from os.path import split
-    return split(filename)
+def split_filename(filename):
+    return os.path.split(filename)
 
 def unlock_file(filename):
     try:
@@ -28,7 +29,7 @@ def unlock_file(filename):
 def lock_file(filename):
     i = 0
     wait = 1
-    if not exists(filename):
+    if not os.path.exists(filename):
         file=open(filename, "w")
         file.close()
     while True:
@@ -62,17 +63,47 @@ messages = {
 "error-en": "Error",
 }
 
+game = int(sys.argv[1])
+echeck_cmd = "/home/eressea/echeck/echeck.sh"
+maxlines = 25
 
 # base directory for all your games:
-rootdir = "/home/eressea/eressea"
-frommail = "Eressea Server <eressea-server@eressea.kn-bremen.de>"
-orderbase = "orders.dir"
-sendmail = True
-maxlines = 25
-echeck_cmd = "/home/eressea/echeck/echeck.sh"
+install_dir = "/home/eressea/eressea"
+if 'ERESSEA' in os.environ:
+    install_dir = os.environ['ERESSEA']
+elif 'HOME' in os.environ:
+    install_dir = os.path.join(os.environ['HOME'], '/eressea')
+if not os.path.isdir(install_dir):
+    print "please set the ERESSEA environment variable to the install path"
+    sys.exit(1)
+
+game_dir = os.path.join(install_dir, "game-%d" % (game, ))
+frommail = 'eressea-server@kn-bremen.de'
+gamename = 'Eressea'
+sender = '%s Server <%s>' % (gamename, frommail)
+
+inifile = os.path.join(gamedir, 'eressea.ini')
+if not os.path.exists(inifile):
+    print "no such file: " . inifile
+else:
+    config = ConfigParser.ConfigParser()
+    config.read(inifile)
+    if config.has_option('game', 'email'):
+        frommail = config.get('game', 'email')
+    if config.has_option('game', 'name'):
+        gamename = config.get('game', 'name')
+    if config.has_option('game', 'sender'):
+        sender = config.get('game', 'sender')
+    else:
+        sender = "%s Server <%s>" % (gamename, frommail)
+    config = None
+
+queue_file = os.path.join(game_dir, "orders.queue")
+if not os.path.exists(queue_file):
+    exit(0)
 
 # regular expression that finds the start of a faction
-fact_re = compile("^\s*(eressea|vinyambar|partei|faction)\s+([a-zA-Z0-9]+)\s+\"?([^\"]*)\"?", IGNORECASE)
+fact_re = compile("^\s*(eressea|partei|faction)\s+([a-zA-Z0-9]+)\s+\"?([^\"]*)\"?", IGNORECASE)
 
 def check_pwd(filename, email, pw_data):
     results = []
@@ -98,7 +129,7 @@ def check_pwd(filename, email, pw_data):
     return results
 
 def echeck(filename, locale, rules):
-    dirname, filename = splitfilename(filename)
+    dirname, filename = split_filename(filename)
     stream = popen("%s %s %s %s %s" % (echeck_cmd, locale, filename, dirname, rules), 'r')
     lines = stream.readlines()
     if len(lines)==0:
@@ -111,14 +142,6 @@ def echeck(filename, locale, rules):
     stream.close()
     return mail
 
-## the main body of the script
-game = int(argv[1])
-
-basedir = rootdir + "/game-%d"  % (game, )
-queuename = basedir + "/orders.queue"
-if not exists(queuename):
-    exit(0)
-
 # parse the queue file -
 #print "connecting to SMTP..."
 from smtplib import SMTP
@@ -127,16 +150,17 @@ try:
 except:
     print "could not connect to SMTP server"
     exit(0)
+
 #print "reading password file..."
-pw_data = EPasswd(basedir + "/passwd")
+pw_data = EPasswd(os.path.join(game_dir,"passwd"))
 
 #print "reading orders.queue..."
 # move the queue file to a save space while locking it:
 try:
-    lock_file(queuename)
+    lock_file(queue_file)
 except:
     exit(0)
-queuefile = open(queuename, "r")
+queuefile = open(queue_file, "r")
 lines = queuefile.readlines()
 queuefile.close()
 
@@ -154,9 +178,9 @@ tmpfile.close()
 
 openlog("orders")
 
-unlink(queuename)
+unlink(queue_file)
 try:
-    unlock_file(queuename)
+    unlock_file(queue_file)
 except:
     pass
 
@@ -170,15 +194,15 @@ for line in lines:
     email = dict["email"]
     locale = dict["locale"]
     game = int(dict["game"])
-    file = dict["file"]
+    infile = dict["file"]
     gamename='[E%d]' % game
     rules='e%d' % game
     warning = ""
     failed = True
-    results = check_pwd(file, email, pw_data)
-    logfile = open(basedir+"/zug.log", "a")
-    dirname, filename = splitfilename(file)
-    msg = messages["validate-"+locale] + " " + filename + "\n\n"
+    results = check_pwd(infile, email, pw_data)
+    logfile = open(os.path.join(game_dir, "zug.log"), "a")
+    dirname, filename = split_filename(infile)
+    msg = messages["validate-"+locale] + " " + infilename + "\n\n"
     for faction, game_email, success, pwd in results:
         msg = msg + messages["faction-"+locale] + " " + faction + "\n"
         if success: failed = False
@@ -189,25 +213,24 @@ for line in lines:
 
     if failed:
         warning = " (" + messages["warning-" + locale] + ")"
-        syslog("failed - no valid password in " + file)
+        syslog("failed - no valid password in " + infile)
     else:
-        result = echeck(file, locale, rules)
-        if email=='eressea':
-            print result
-            continue
-        elif result is None:
+        result = None
+        if os.path.exists(echeck_cmd):
+            result = echeck(infile, locale, rules)
+        if result is None:
             # echeck did not finish
-            msg = msg + "Echeck was killed. Your turn was accepted, but could not be verified.\n"
+            msg = msg + "Echeck is broken. Your turn was accepted, but could not be verified.\n"
             warning = " (" + messages["warning-" + locale] + ")"
-            syslog("process - echeck got killed, " + file)
+            syslog("process - echeck broken, " + infile)
         else:
             msg = msg + result
-            syslog("process - checked orders in " + file)
+            syslog("process - checked orders in " + infile)
 
     subject = gamename + " " + messages["subject-" + locale] + warning
-    msg = "Subject: %s\nFrom: %s\nTo: %s\nContent-Type: text/plain; charset=utf-8\n\n" % (subject, frommail, email) + msg
+    msg = "Subject: %s\nFrom: %s\nTo: %s\nContent-Type: text/plain; charset=utf-8\n\n" % (subject, sender, email) + msg
     try:
-        server.sendmail(frommail, email, msg)
+        server.sendmail(sender, email, msg)
     except:
         syslog("failed - cannot send to " + email)
 

@@ -8,7 +8,6 @@ if [ -z $ERESSEA ]; then
   exit -2
 fi
 source $HOME/bin/functions.sh
-source $ERESSEA/etc/eressea.conf
 
 if [ ! -z $1 ]; then
   GAME=$ERESSEA/game-$1
