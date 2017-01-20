@@ -8,7 +8,6 @@ if [ -z $ERESSEA ]; then
   exit -2
 fi
 source $HOME/bin/functions.sh
-source $HOME/etc/eressea.conf
 
 GAME=$1
 EMAIL=$2
