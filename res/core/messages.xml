@@ -1804,7 +1804,7 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Magier erschafft ein Traumgebäude."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The magician creates an illusionary building."</text>
   </message>
-  <message name="sp_shapeshift_fail" section="magic">
+  <message name="sp_shapeshift_fail" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -2402,7 +2402,7 @@
     <text locale="de">"Eine Botschaft von $unit.dative($unit) in $region($region): 'Ups! Quack, Quack!'"</text>
     <text locale="en">"A message from $unit($unit) in $region($region): 'Oops! Croak, Croak!'"</text>
   </message>
-  <message name="familiar_farcast" section="magic">
+  <message name="familiar_farcast" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -2412,7 +2412,7 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $unit($mage) kann Zauber, die durch $unit($unit) gewirkt werden, nicht zusätzlich in die Ferne richten."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $unit($mage) cannot direct spells that are channeled through $unit($unit) into distant regions."</text>
   </message>
-  <message name="familiar_toofar" section="magic">
+  <message name="familiar_toofar" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -2552,13 +2552,6 @@
     <text locale="de">"$unit($unit) in $region($region) regeneriert $int($amount) Aura."</text>
     <text locale="en">"$unit($unit) regenerates $int($amount) aura in $region($region)."</text>
   </message>
-  <message name="msg_magic" section="magic">
-    <type>
-      <arg name="string" type="string"/>
-    </type>
-    <text locale="de">"$string"</text>
-    <text locale="en">"$string"</text>
-  </message>
   <message name="studycost" section="study">
     <type>
       <arg name="unit" type="unit"/>
@@ -2595,13 +2588,6 @@
     </type>
     <text locale="de">"$unit($teacher) lehrt $unit($student) $skill($skill)."</text>
     <text locale="en">"$unit($teacher) teaches $unit($student) $skill($skill)."</text>
-  </message>
-  <message name="msg_study" section="study">
-    <type>
-      <arg name="string" type="string"/>
-    </type>
-    <text locale="de">"$string"</text>
-    <text locale="en">"$string"</text>
   </message>
   <message name="sellamount" section="economy">
     <type>
@@ -2834,13 +2820,6 @@
     <text locale="de">"$unit($unit) baut für $int($size) an $ship($ship) weiter."</text>
     <text locale="en">"$unit($unit) builds $int($size) more on $ship($ship)."</text>
   </message>
-  <message name="msg_production" section="production">
-    <type>
-      <arg name="string" type="string"/>
-    </type>
-    <text locale="de">"$string"</text>
-    <text locale="en">"$string"</text>
-  </message>
   <message name="firewall_death" section="movement">
     <type>
       <arg name="unit" type="unit"/>
@@ -2878,15 +2857,7 @@
     <text locale="de">"$unit($unit) $if($eq($mode,1),"reitet", "wandert") von $region($start) nach $region($end).$if($isnull($regions),""," Dabei wurde $trail($regions) durchquert.")"</text>
     <text locale="en">"$unit($unit) $if($eq($mode,1),"rides", "walks") from $region($start) to $region($end)$if($isnull($regions),""," by way of $trail($regions)")."</text>
   </message>
-  <message name="detectoceandir" section="movement">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="direction" type="direction"/>
-    </type>
-    <text locale="de">"$unit($unit) entdeckt dass im $direction($direction) $terrain($region) ist."</text>
-    <text locale="en">"$unit($unit) discovered that $terrain($region) lies in the $direction($direction)."</text>
-  </message>
-  <message name="detectocean" section="movement">
+  <message name="detectocean" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -2895,7 +2866,7 @@
     <text locale="de">"$unit($unit) entdeckt, dass $region($region) $localize($terrain) ist."</text>
     <text locale="en">"$unit($unit) discovered that $region($region) is $localize($terrain)."</text>
   </message>
-  <message name="leftship" section="movement">
+  <message name="leftship" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -2903,7 +2874,7 @@
     <text locale="de">"$unit($unit) ist in dieser Runde gelandet und kann nicht weiter ins Landesinnere nach $region($region) vorstossen."</text>
     <text locale="en">"$unit($unit) has just landed and cannot continue moving to $region($region)."</text>
   </message>
-  <message name="sailnolandingstorm" section="movement">
+  <message name="sailnolandingstorm" section="errors">
     <type>
       <arg name="ship" type="ship"/>
       <arg name="region" type="region"/>
@@ -2911,7 +2882,7 @@
     <text locale="de">"Die Mannschaft der $ship($ship) kann in letzter Sekunde verhindern, dass das Schiff in $region($region) auf Land aufläuft."</text>
     <text locale="en">"At the very last moment, the crew of the $ship($ship) saved the ship from running aground in $region($region)."</text>
   </message>
-  <message name="sailnolanding" section="movement">
+  <message name="sailnolanding" section="errors">
     <type>
       <arg name="ship" type="ship"/>
       <arg name="region" type="region"/>
@@ -2919,7 +2890,7 @@
     <text locale="de">"Die $ship($ship) konnte in $region($region) nicht einreisen, die Küste ist zu gefährlich für das Schiff."</text>
     <text locale="en">"The $ship($ship) could not berth in $region($region). The coast is too dangerous for the vessel."</text>
   </message>
-  <message name="sailforbiddendir" section="movement">
+  <message name="sailforbiddendir" section="errors">
     <type>
       <arg name="ship" type="ship"/>
       <arg name="direction" type="direction"/>
@@ -2927,7 +2898,7 @@
     <text locale="de">"Die Mannschaft der $ship($ship) weigert sich, nach $direction($direction) zu reisen."</text>
     <text locale="en">"The crew of the $ship($ship) refuses to travel to the $direction($direction)."</text>
   </message>
-  <message name="sailforbidden" section="movement">
+  <message name="sailforbidden" section="errors">
     <type>
       <arg name="ship" type="ship"/>
       <arg name="region" type="region"/>
@@ -2935,7 +2906,7 @@
     <text locale="de">"Die Mannschaft der $ship($ship) weigert sich, nach $region($region) zu reisen."</text>
     <text locale="en">"The crew of the $ship($ship) refuses to travel to $region($region)."</text>
   </message>
-  <message name="detectforbiddendir" section="movement">
+  <message name="detectforbiddendir" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="direction" type="direction"/>
@@ -2943,7 +2914,7 @@
     <text locale="de">"$unit($unit) weigert sich, nach $direction($direction) zu reisen."</text>
     <text locale="en">"$unit($unit) refuses to travel to the $direction($direction)."</text>
   </message>
-  <message name="detectforbidden" section="movement">
+  <message name="detectforbidden" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -2951,7 +2922,7 @@
     <text locale="de">"$unit($unit) weigert sich, nach $region($region) zu reisen."</text>
     <text locale="en">"$unit($unit) refuses to travel to $region($region)."</text>
   </message>
-  <message name="sailfail" section="movement">
+  <message name="sailfail" section="errors">
     <type>
       <arg name="ship" type="ship"/>
       <arg name="region" type="region"/>
@@ -2959,7 +2930,7 @@
     <text locale="de">"Die $ship($ship) konnte $region($region) nicht verlassen."</text>
     <text locale="en">"The $ship($ship) could not leave $region($region)."</text>
   </message>
-  <message name="moveblockedbyguard" section="movement">
+  <message name="moveblockedbyguard" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -2968,35 +2939,7 @@
     <text locale="de">"$unit($unit) wurde in $region($region) von $unit.dative($guard) aufgehalten."</text>
     <text locale="en">"$unit($unit) was kept in $region($region) by $unit($guard)."</text>
   </message>
-  <message name="peace_confirm" section="events">
-    <type>
-      <arg name="enemy" type="faction"/>
-    </type>
-    <text locale="de">"Wir haben den Krieg mit $faction($faction) beendet."</text>
-    <text locale="en">"We declared peace with $faction($faction)."</text>
-  </message>
-  <message name="peace_notify" section="events">
-    <type>
-      <arg name="enemy" type="faction"/>
-    </type>
-    <text locale="de">"$faction($faction) hat den Krieg mit uns beendet."</text>
-    <text locale="en">"$faction($faction) has declared peace with us."</text>
-  </message>
-  <message name="war_confirm" section="events">
-    <type>
-      <arg name="enemy" type="faction"/>
-    </type>
-    <text locale="de">"Wir haben $faction($faction) den Krieg erklärt."</text>
-    <text locale="en">"We declared war on $faction($faction)."</text>
-  </message>
-  <message name="war_notify" section="events">
-    <type>
-      <arg name="enemy" type="faction"/>
-    </type>
-    <text locale="de">"$faction($faction) hat uns den Krieg erklärt."</text>
-    <text locale="en">"$faction($faction) has declared war on us."</text>
-  </message>
-  <message name="regionowned" section="movement">
+  <message name="regionowned" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -3005,7 +2948,7 @@
     <text locale="de">"$unit($unit) konnte nicht von $region($region) nach $region($target) reisen, da der Besitzer der Region es verhinderte."</text>
     <text locale="en">"$unit($unit) could not travel from $region($region) to $region($target) because the owner denied entrance."</text>
   </message>
-  <message name="leavefail" section="movement">
+  <message name="leavefail" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -3029,7 +2972,7 @@
     <text locale="de">"$unit($follower) konnte $unit($unit) nicht folgen."</text>
     <text locale="en">"$unit($follower) could not follow $unit($unit)."</text>
   </message>
-  <message name="moveblocked" section="movement">
+  <message name="moveblocked" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="direction" type="direction"/>
@@ -3037,7 +2980,7 @@
     <text locale="de">"$unit($unit) entdeckt, dass es keinen Weg nach $direction($direction) gibt."</text>
     <text locale="en">"$unit($unit) discovers that there is no route going $direction($direction)."</text>
   </message>
-  <message name="fogblock" section="movement">
+  <message name="fogblock" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -3045,13 +2988,6 @@
     </type>
     <text locale="de">"$unit($unit) konnte von $region($region) nicht nach $direction($direction) ausreisen, der Nebel war zu dicht."</text>
     <text locale="en">"$unit($unit) could not travel $direction($direction) from $region($region), the fog was too dense."</text>
-  </message>
-  <message name="msg_movement" section="movement">
-    <type>
-      <arg name="string" type="string"/>
-    </type>
-    <text locale="de">"$string"</text>
-    <text locale="en">"$string"</text>
   </message>
   <message name="entrise" section="events">
     <type>
@@ -6945,21 +6881,7 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Man benötigt mindestens $int($minskill) $skill($skill), um $resource($product,0) zu produzieren."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - You need at least $int($minskill) $skill($skill), to produce $resource($product,0)."</text>
   </message>
-  <message name="msg_errors" section="errors">
-    <type>
-      <arg name="string" type="string"/>
-    </type>
-    <text locale="de">"$string"</text>
-    <text locale="en">"$string"</text>
-  </message>
   <message name="msg_event" section="events">
-    <type>
-      <arg name="string" type="string"/>
-    </type>
-    <text locale="de">"$string"</text>
-    <text locale="en">"$string"</text>
-  </message>
-  <message name="msg_economy" section="economy">
     <type>
       <arg name="string" type="string"/>
     </type>
@@ -6997,7 +6919,6 @@
     <text locale="de">"$unit($target) erhält $int($amount) $resource($resource,$amount) von $unit($unit)."</text>
     <text locale="en">"$unit($target) receives $int($amount) $resource($resource,$amount) from $unit($unit)."</text>
   </message>
-
   <message name="give_person_ocean" section="economy">
     <type>
       <arg name="unit" type="unit"/>
@@ -7200,7 +7121,7 @@
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - No pyramids may be build in this region. The closest region to build a pyramid in is between $int($mindist) and $int($maxdist) regions away."</text>
   </message>
 
-  <message name="wormhole_requirements" section="events">
+  <message name="wormhole_requirements" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -7621,7 +7542,7 @@
     <text locale="de">"Heer $int($index)($abbrev): $int($dead) Tote, $int($fled) Geflohene, $int($survived) Überlebende."</text>
     <text locale="en">"Army $int($index)($abbrev): $int($dead) dead, $int($fled) fled, $int($survived) survivors."</text>
   </message>
-  <message name="spellfail::nolevel" section="magic">
+  <message name="spellfail::nolevel" section="errors">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="region" type="region"/>

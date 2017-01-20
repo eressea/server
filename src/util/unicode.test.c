@@ -100,9 +100,26 @@ static void test_unicode_utf8_to_ucs(CuTest *tc) {
     CuAssertIntEquals(tc, 1, sz);
 }
 
+static void test_unicode_bug2262(CuTest *tc) {
+    char name[7];
+    ucs4_t ucs;
+    size_t sz;
+
+    strcpy(name, "utende");
+    CuAssertIntEquals(tc, 0, unicode_utf8_to_ucs4(&ucs, name, &sz));
+    CuAssertIntEquals(tc, 1, sz);
+    CuAssertIntEquals(tc, 'u', ucs);
+    CuAssertIntEquals(tc, 0, unicode_utf8_trim(name));
+
+    name[0] = -4; // latin1: &uuml; should fail to decode
+    CuAssertIntEquals(tc, EILSEQ, unicode_utf8_to_ucs4(&ucs, name, &sz));
+    CuAssertIntEquals(tc, EILSEQ, unicode_utf8_trim(name));
+}
+
 CuSuite *get_unicode_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_unicode_bug2262);
     SUITE_ADD_TEST(suite, test_unicode_tolower);
     SUITE_ADD_TEST(suite, test_unicode_trim);
     SUITE_ADD_TEST(suite, test_unicode_utf8_to_other);
