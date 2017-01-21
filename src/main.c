@@ -83,6 +83,7 @@ static void parse_config(const char *filename)
     if (d) {
         load_inifile(d);
         log_debug("reading from configuration file %s\n", filename);
+        config_set_from(d);
 
         memdebug = iniparser_getint(d, "game:memcheck", memdebug);
 #ifdef USE_CURSES
