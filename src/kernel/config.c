@@ -721,12 +721,12 @@ void config_set_from(const dictionary *d)
         char key[128];
         const char *sec = iniparser_getsecname(d, s);
         int k, nkeys = iniparser_getsecnkeys(d, sec);
-        const char *akeys[MAXKEYS];
-        const char ** keys = akeys;
+        char *akeys[MAXKEYS];
+        char ** keys = akeys;
         size_t slen = strlen(sec);
         assert(slen<sizeof(key));
         memcpy(key, sec, slen);
-        key[slen] = ':';
+        key[slen] = '.';
         if (nkeys>MAXKEYS) {
             keys = malloc(sizeof(const char *) * nkeys);
         }
@@ -735,8 +735,8 @@ void config_set_from(const dictionary *d)
             const char *val;
             size_t klen = strlen(keys[k]);
             assert(klen+slen+1<sizeof(key));
-            memcpy(key+slen+1, keys[k], klen+1);
-            val = iniparser_getstring(d, key, NULL);
+            memcpy(key+slen+1, keys[k]+slen+1, klen+1);
+            val = iniparser_getstring(d, keys[k], NULL);
             if (val) {
                 config_set(key, val);
             }
