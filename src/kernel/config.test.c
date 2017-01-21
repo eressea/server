@@ -9,6 +9,8 @@
 #include <util/base36.h>
 #include <util/attrib.h>
 
+#include <iniparser.h>
+
 #include <CuTest.h>
 #include <tests.h>
 
@@ -233,9 +235,24 @@ static void test_rules(CuTest *tc) {
     CuAssertIntEquals(tc, 1000, rule_faction_limit());
 }
 
+static void test_config_inifile(CuTest *tc) {
+    dictionary *ini;
+    test_setup();
+    ini = dictionary_new(0);
+    dictionary_set(ini, "game", NULL);
+    iniparser_set(ini, "game:id", "42");
+    iniparser_set(ini, "game:name", "Eressea");
+    config_set_from(ini);
+    CuAssertStrEquals(tc, "Eressea", config_get("game.name"));
+    CuAssertIntEquals(tc, 42, game_id());
+    iniparser_freedict(ini);
+    test_cleanup();
+}
+
 CuSuite *get_config_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_config_inifile);
     SUITE_ADD_TEST(suite, test_config_cache);
     SUITE_ADD_TEST(suite, test_get_set_param);
     SUITE_ADD_TEST(suite, test_param_int);

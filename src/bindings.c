@@ -978,7 +978,7 @@ static int tolua_report_unit(lua_State * L)
     return 1;
 }
 
-static void parse_inifile(lua_State * L, dictionary * d, const char *section)
+static void parse_inifile(lua_State * L, const dictionary * d, const char *section)
 {
     int i;
     const char *arg;
@@ -1018,7 +1018,7 @@ static void parse_inifile(lua_State * L, dictionary * d, const char *section)
 
 void tolua_bind_open(lua_State * L);
 
-int tolua_bindings_open(lua_State * L)
+int tolua_bindings_open(lua_State * L, const dictionary *inifile)
 {
     tolua_open(L);
 
@@ -1072,7 +1072,7 @@ int tolua_bindings_open(lua_State * L)
         tolua_module(L, TOLUA_CAST "config", 1);
         tolua_beginmodule(L, TOLUA_CAST "config");
         {
-            parse_inifile(L, global.inifile, "lua");
+            parse_inifile(L, inifile, "lua");
             tolua_variable(L, TOLUA_CAST "locales", &config_get_locales, 0);
             tolua_function(L, TOLUA_CAST "get_resource", &config_get_resource);
             tolua_variable(L, TOLUA_CAST "buildings", &config_get_buildings, 0);
@@ -1142,12 +1142,12 @@ void lua_done(lua_State * L) {
     lua_close(L);
 }
 
-lua_State *lua_init(void) {
+lua_State *lua_init(const dictionary *inifile) {
     lua_State *L = luaL_newstate();
 
     openlibs(L);
     register_tolua_helpers();
-    tolua_bindings_open(L);
+    tolua_bindings_open(L, inifile);
     tolua_eressea_open(L);
 #ifdef USE_SQLITE
     tolua_sqlite_open(L);
