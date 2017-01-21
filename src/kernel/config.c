@@ -732,7 +732,7 @@ void config_set_from(const dictionary *d)
             const char *val;
             size_t klen = strlen(keys[k]);
             assert(klen+slen+1<sizeof(key));
-            memcpy(key+slen+1, keys[k]+slen+1, klen+1);
+            memcpy(key+slen+1, keys[k]+slen+1, klen-slen);
             val = iniparser_getstring(d, keys[k], NULL);
             if (val) {
                 config_set(key, val);
