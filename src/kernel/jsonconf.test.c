@@ -69,12 +69,15 @@ static void test_settings(CuTest * tc)
         "\"string\" : \"1d4\","
         "\"integer\" : 14,"
         "\"true\": true,"
+        "\"game.id\": 4,"
         "\"false\": false,"
         "\"float\" : 1.5 }}";
     cJSON *json = cJSON_Parse(data);
 
     test_cleanup();
+    config_set("game.id", "42"); // should not be replaced
     json_config(json);
+    CuAssertStrEquals(tc, "42", config_get("game.id"));
     CuAssertStrEquals(tc, "1", config_get("true"));
     CuAssertStrEquals(tc, "0", config_get("false"));
     CuAssertStrEquals(tc, "1d4", config_get("string"));
