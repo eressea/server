@@ -806,7 +806,9 @@ static void json_settings(cJSON *json) {
             else {
                 sprintf(value, "%d", child->valueint);
             }
-            config_set(child->string, value);
+            if (config_get(child->string) == NULL) {
+                config_set(child->string, value);
+            }
         }
     }
 }

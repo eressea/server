@@ -72,17 +72,15 @@ static void load_inifile(dictionary * d)
     verbosity = iniparser_getint(d, "game:verbose", 2);
     str = iniparser_getstring(d, "game:locales", "de,en");
     make_locales(str);
-
-    if (global.inifile) iniparser_freedict(global.inifile);
-    global.inifile = d;
 }
 
-static void parse_config(const char *filename)
+static dictionary *parse_config(const char *filename)
 {
     dictionary *d = iniparser_load(filename);
     if (d) {
         load_inifile(d);
         log_debug("reading from configuration file %s\n", filename);
+        config_set_from(d);
 
         memdebug = iniparser_getint(d, "game:memcheck", memdebug);
 #ifdef USE_CURSES
@@ -91,6 +89,7 @@ static void parse_config(const char *filename)
         gm_codepage = iniparser_getint(d, "editor:codepage", gm_codepage);
 #endif
     }
+    return d;
 }
 
 static int usage(const char *prog, const char *arg)
@@ -271,10 +270,11 @@ int main(int argc, char **argv)
 {
     int err = 0;
     lua_State *L;
+    dictionary *d;
     setup_signal_handler();
     /* ini file sets defaults for arguments*/
-    parse_config(inifile);
-    if (!global.inifile) {
+    d = parse_config(inifile);
+    if (!d) {
         log_error("could not open ini configuration %s\n", inifile);
     }
     /* parse arguments again, to override ini file */
@@ -282,7 +282,7 @@ int main(int argc, char **argv)
 
     locale_init();
 
-    L = lua_init();
+    L = lua_init(d);
     game_init();
     bind_monsters(L);
     err = eressea_run(L, luafile);
@@ -293,8 +293,8 @@ int main(int argc, char **argv)
     game_done();
     lua_done(L);
     log_close();
-    if (global.inifile) {
-        iniparser_freedict(global.inifile);
+    if (d) {
+        iniparser_freedict(d);
     }
     return 0;
 }

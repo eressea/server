@@ -713,6 +713,34 @@ bool config_changed(int *cache_key) {
     return false;
 }
 
+#define MAXKEYS 16
+void config_set_from(const dictionary *d)
+{
+    int s, nsec = iniparser_getnsec(d);
+    for (s=0;s!=nsec;++s) {
+        char key[128];
+        const char *sec = iniparser_getsecname(d, s);
+        int k, nkeys = iniparser_getsecnkeys(d, sec);
+        const char *keys[MAXKEYS];
+        size_t slen = strlen(sec);
+        assert(nkeys <= MAXKEYS);
+        assert(slen<sizeof(key));
+        memcpy(key, sec, slen);
+        key[slen] = '.';
+        iniparser_getseckeys(d, sec, keys);
+        for (k=0;k!=nkeys;++k) {
+            const char *val;
+            size_t klen = strlen(keys[k]);
+            assert(klen+slen+1<sizeof(key));
+            memcpy(key+slen+1, keys[k]+slen+1, klen-slen);
+            val = iniparser_getstring(d, keys[k], NULL);
+            if (val) {
+                config_set(key, val);
+            }
+        }
+    }
+}
+
 void config_set(const char *key, const char *value) {
     ++config_cache_key;
     set_param(&configuration, key, value);

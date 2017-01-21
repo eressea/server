@@ -27,7 +27,9 @@ extern "C" {
 #include <stddef.h>
 #include <stdbool.h>
 #include "types.h"
-struct param;
+
+    struct param;
+    struct _dictionary_;
 
 #define DISPLAYSIZE         8192        /* max. L�nge einer Beschreibung, incl trailing 0 */
 #define ORDERSIZE           (DISPLAYSIZE*2) /* max. length of an order */
@@ -108,7 +110,6 @@ struct param;
         struct attrib *attribs;
         unsigned int data_turn;
         void *vm_state;
-        struct _dictionary_ *inifile;
         struct global_functions {
             int(*wage) (const struct region * r, const struct faction * f,
                 const struct race * rc, int in_turn);
@@ -123,6 +124,7 @@ struct param;
     void free_params(struct param **pp);
 
     void config_set(const char *key, const char *value);
+    void config_set_from(const struct _dictionary_ *d);
     const char *config_get(const char *key);
     int config_get_int(const char *key, int def);
     double config_get_flt(const char *key, double def);
