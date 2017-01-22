@@ -26,15 +26,17 @@ function callbacks(rules, name, ...)
 end
 
 local function dbupdate()
-  update_scores()
-  dbname = config.dbname or 'eressea.db'
-  edb = db.open(config.basepath..'/'..dbname)
-  if edb~=nil then
-    edb:update_factions()
-    edb:update_scores()
-  else
-    eressea.log.error("could not open "..config.basepath..'/'..dbname)
-  end
+    update_scores()
+    if config.dbname then
+        dbname = config.basepath..'/'..config.dbname
+        edb = db.open(dbame)
+        if edb~=nil then
+            edb:update_factions()
+            edb:update_scores()
+        else
+            eressea.log.error("could not open "..dbname)
+        end
+    end
 end
 
 local function write_emails(locales)
