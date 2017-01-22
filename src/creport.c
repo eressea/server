@@ -1475,7 +1475,7 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
     faction *f = ctx->f;
     const char *prefix;
     region *r;
-    const char *mailto = LOC(f->locale, "mailto");
+    const char *mailto = config_get("game.email");
     const attrib *a;
     FILE *F = fopen(filename, "w");
     static const race *rc_human;
@@ -1510,8 +1510,11 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
     fprintf(F, "%d;Zeitalter\n", era);
     fprintf(F, "\"%s\";Build\n", eressea_version());
     if (mailto != NULL) {
+        // char mailcmd[64];
+        // snprintf(mailcmd, sizeof(mailcmd), "%s %d, %s", game_name(), game_id(), LOC(f->locale, "mailcmd"));
+        const char * mailcmd = LOC(f->locale, "mailcmd");
         fprintf(F, "\"%s\";mailto\n", mailto);
-        fprintf(F, "\"%s\";mailcmd\n", LOC(f->locale, "mailcmd"));
+        fprintf(F, "\"%s\";mailcmd\n", mailcmd);
     }
 
     show_alliances_cr(F, f);
