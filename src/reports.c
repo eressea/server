@@ -1944,6 +1944,13 @@ static void eval_regions(struct opstack **stack, const void *userdata)
     opush(stack, var);
 }
 
+const char *get_mailcmd(const struct locale *loc)
+{
+    static char result[64]; // FIXME: static return buffer
+    snprintf(result, sizeof(result), "%s %d %s", game_name_upper(), game_id(), LOC(loc, "mailcmd"));
+    return result;
+}
+
 static void eval_trail(struct opstack **stack, const void *userdata)
 {                               /* order -> string */
     const faction *report = (const faction *)userdata;

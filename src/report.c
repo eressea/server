@@ -2081,19 +2081,24 @@ report_plaintext(const char *filename, report_context * ctx,
     }
 
     if (f->age <= 2) {
-        const char *s;
-        s = locale_getstring(f->locale, "newbie_info_game");
-        if (s) {
-            newline(out);
-            centre(out, s, true);
+        const char *email;
+        const char *subject;
+        email = config_get("game.email");
+        subject = get_mailcmd(f->locale);
+        m = msg_message("newbie_info_game", "email subject", email, subject);
+        if (m) {
+            nr_render(m, f->locale, buf, sizeof(buf), f);
+            msg_release(m);
+            centre(out, buf, true);
         }
         if ((f->options & want(O_COMPUTER)) == 0) {
-            f->options |= want(O_COMPUTER);
+            const char *s;
             s = locale_getstring(f->locale, "newbie_info_cr");
             if (s) {
                 newline(out);
                 centre(out, s, true);
             }
+            f->options |= want(O_COMPUTER);
         }
     }
     newline(out);
