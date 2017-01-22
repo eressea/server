@@ -1,8 +1,5 @@
 -- Muschelplateau
 
-local embassy = {}
-local home = nil
-
 -- global exports (use item)
 function use_seashell(u, amount)
 -- Muschelplateau...
@@ -16,6 +13,11 @@ function use_seashell(u, amount)
     end
     return -4
 end
+
+if not config.embassy then return nil end
+
+local embassy = {}
+local home = nil
 
 function embassy.init()
     home = get_region(165,30)
