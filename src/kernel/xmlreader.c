@@ -1266,7 +1266,7 @@ add_subsets(xmlDocPtr doc, equipment * eq, xmlNodeSetPtr nsetSubsets)
                         assert(propValue != NULL);
                         eq->subsets[i].sets[set].chance = chance;
                         eq->subsets[i].sets[set].set =
-                            create_equipment((const char *)propValue);
+                            get_or_create_equipment((const char *)propValue);
                         xmlFree(propValue);
                     }
                 }
@@ -1296,7 +1296,7 @@ static int parse_equipment(xmlDocPtr doc)
             xmlChar *propName = xmlGetProp(node, BAD_CAST "name");
 
             if (propName != NULL) {
-                equipment *eq = create_equipment((const char *)propName);
+                equipment *eq = get_or_create_equipment((const char *)propName);
                 xmlXPathObjectPtr xpathResult;
 
                 xpath->node = node;
