@@ -44,7 +44,6 @@ extern "C" {
     extern int enc_gamedata;
 
     int readorders(const char *filename);
-    int creategame(void);
     int readgame(const char *filename);
     int writegame(const char *filename);
 
