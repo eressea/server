@@ -25,8 +25,6 @@
         "jsreport"
     ],
     "settings": {
-        "game.id": 3,
-        "game.name": "E3",
         "orders.default": "work",
         "database.gameid": 7,
         "NewbieImmunity": 4,

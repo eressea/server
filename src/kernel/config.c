@@ -815,7 +815,7 @@ const char * game_name_upper(void)
     char *r = result;
     const char *param = game_name();
     const char *c = param;
-    while (*c && (r-result)<sizeof(result)) {
+    while (*c && (result+sizeof(result))>r) {
         *r++ = (char)toupper(*c++);
     }
     *r = '\0';
