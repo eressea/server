@@ -39,7 +39,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 static equipment *equipment_sets;
 
-equipment *create_equipment(const char *eqname)
+equipment *get_or_create_equipment(const char *eqname)
 {
     equipment **eqp = &equipment_sets;
     for (;;) {

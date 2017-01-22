@@ -83,7 +83,7 @@ without prior permission by the authors of Eressea.
 #include <errno.h>
 #include <assert.h>
 
-#define TOLUA_PKG(NAME) extern void tolua_##NAME##_open(lua_State * L)
+#define TOLUA_PKG(NAME) void tolua_##NAME##_open(lua_State * L)
 
 TOLUA_PKG(eressea);
 TOLUA_PKG(process);
@@ -328,7 +328,7 @@ static int tolua_addequipment(lua_State * L)
     if (iname != NULL) {
         const struct item_type *itype = it_find(iname);
         if (itype != NULL) {
-            equipment_setitem(create_equipment(eqname), itype, value);
+            equipment_setitem(get_or_create_equipment(eqname), itype, value);
             result = 0;
         }
     }
@@ -461,7 +461,7 @@ static int tolua_equipment_setitem(lua_State * L)
     if (iname != NULL) {
         const struct item_type *itype = it_find(iname);
         if (itype != NULL) {
-            equipment_setitem(create_equipment(eqname), itype, value);
+            equipment_setitem(get_or_create_equipment(eqname), itype, value);
             result = 0;
         }
     }
