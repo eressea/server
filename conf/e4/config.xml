@@ -27,15 +27,6 @@
   <xi:include href="config://game/resources.xml" />
 
   <calendar name="thirdage" newyear="month_1" start="1"/>
-
-  <equipment>
-    <set name="first_unit">
-      <item name="log" amount="10"/>
-      <item name="stone" amount="10"/>
-      <item name="money" amount="5000"/>
-    </set>
-  </equipment>
-
   <xi:include href="config://default/names-undead.xml"/>
   <xi:include href="config://default/names-skeletons.xml"/>
   <xi:include href="config://default/names-zombies.xml"/>

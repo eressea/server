@@ -42,7 +42,7 @@
       <skill name="perception" level="30"/>
       <skill name="melee" level="1"/>
     </set>
-    <set name="new_faction">
+    <set name="autoseed_faction">
       <item name="adamantium" amount="1"/>
     </set>
   </equipment>
