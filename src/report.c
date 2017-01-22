@@ -1408,7 +1408,7 @@ report_template(const char *filename, report_context * ctx, const char *bom)
     newline(out);
     newline(out);
 
-    sprintf(buf, "%s %s \"password\"", LOC(f->locale, "ERESSEA"), itoa36(f->no));
+    sprintf(buf, "%s %s \"password\"", LOC(f->locale, parameters[P_FACTION]), itoa36(f->no));
     rps_nowrap(out, buf);
     newline(out);
     newline(out);
