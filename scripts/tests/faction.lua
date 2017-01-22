@@ -17,7 +17,7 @@ function setup()
 end
 
 function test_faction_flags()
-    assert_equal(2, f.flags) -- FFL_ISNEW
+    assert_equal(6, f.flags) -- FFL_ISNEW|FFL_PWMSG
     f.flags = 42
     assert_equal(42, f.flags)
 end
