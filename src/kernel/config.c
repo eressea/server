@@ -803,12 +803,25 @@ void free_gamedata(void)
     }
 }
 
-const char * game_name(void) {
+const char * game_name(void)
+{
     const char * param = config_get("game.name");
     return param ? param : global.gamename;
+}
+
+const char * game_name_upper(void)
+{
+    static char result[32]; // FIXME: static result
+    char *r = result;
+    const char *param = game_name();
+    const char *c = param;
+    while (*c && (r-result)<sizeof(result)) {
+        *r++ = (char)toupper(*c++);
+    }
+    *r = '\0';
+    return result;
 }
 
 int game_id(void) {
     return config_get_int("game.id", 0);
 }
-

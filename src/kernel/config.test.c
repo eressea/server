@@ -244,6 +244,8 @@ static void test_config_inifile(CuTest *tc) {
     iniparser_set(ini, "game:name", "Eressea");
     config_set_from(ini);
     CuAssertStrEquals(tc, "Eressea", config_get("game.name"));
+    CuAssertStrEquals(tc, "Eressea", game_name());
+    CuAssertStrEquals(tc, "ERESSEA", game_name_upper());
     CuAssertIntEquals(tc, 42, game_id());
     iniparser_freedict(ini);
     test_cleanup();

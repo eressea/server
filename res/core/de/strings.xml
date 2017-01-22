@@ -6,6 +6,12 @@
     _x: preposition (15 /Schlumpf/schwerter)
     _a: including article (ein Schlumpf, a smurf)
    -->
+  <strings>
+    <string name="mailcmd">
+      <text locale="de">BEFEHLE</text>
+      <text locale="en">ORDERS</text>
+    </string>
+  </strings>
   <string name="vortex">
     <text locale="de">Wirbel</text>
     <text locale="en">vortex</text>

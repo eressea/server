@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <messages>
+  <message name="newbie_info_game" section="events">
+    <type>
+      <arg name="subject" type="string"/>
+      <arg name="email" type="string"/>
+    </type>
+      <text locale="de">Bitte denke daran, deine Befehle mit dem Betreff
+      $subject an $email zu senden.</text>
+      <text locale="en">Remember to send your orders to
+      $email with the subject ${subject}.</text>
+  </message>
   <message name="parse_error" section="errors">
     <type>
       <arg name="unit" type="unit"/>
