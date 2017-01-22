@@ -2214,6 +2214,7 @@ int password_cmd(unit * u, struct order *ord)
     faction_setpassword(u->faction, password_encode(pwbuf, PASSWORD_DEFAULT));
     ADDMSG(&u->faction->msgs, msg_message("changepasswd",
         "value", pwbuf));
+    u->faction->flags |= FFL_PWMSG;
     return 0;
 }
 
