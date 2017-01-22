@@ -96,7 +96,8 @@ touch eressea.ini
 ini_start
 ini_sec game
 ini_add game locales de,en
-ini_add id $game
+ini_add game id $game
+ini_add game start 1
 ini_sec lua
 ini_add lua install $SOURCE
 ini_add lua paths $SOURCE/scripts:$SOURCE/lunit

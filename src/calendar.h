@@ -13,7 +13,6 @@ extern "C" {
     };
 
     extern char *agename;
-    extern int first_turn;
     extern int first_month;
 
     extern int seasons;
@@ -35,8 +34,9 @@ extern "C" {
         int week;
     } gamedate;
 
-    extern const gamedate *get_gamedate(int turn, gamedate * gd);
-    extern void calendar_cleanup(void);
+const gamedate *get_gamedate(int turn, gamedate * gd);
+void calendar_cleanup(void);
+int first_turn(void);
 
 #ifdef __cplusplus
 }
