@@ -22,7 +22,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "alliance.h"
 #include "ally.h"
 #include "curse.h"
-#include "equipment.h"
 #include "group.h"
 #include "item.h"
 #include "messages.h"
@@ -286,15 +285,10 @@ faction *addfaction(const char *email, const char *password,
 unit *addplayer(region * r, faction * f)
 {
     unit *u;
-    char buffer[32];
 
     assert(f->units == NULL);
     faction_setorigin(f, 0, r->x, r->y);
     u = create_unit(r, f, 1, f->race, 0, NULL, NULL);
-    equip_items(&u->faction->items, get_equipment("new_faction"));
-    equip_unit(u, get_equipment("first_unit"));
-    sprintf(buffer, "first_%s", u_race(u)->_name);
-    equip_unit(u, get_equipment(buffer));
     u->hp = unit_max_hp(u) * u->number;
     fset(u, UFL_ISNEW);
     if (f->race == get_race(RC_DAEMON)) {

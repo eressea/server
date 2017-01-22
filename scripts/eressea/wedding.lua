@@ -1,4 +1,5 @@
 -- DEPRECATED
+if not config.wedding then return nil end
 
 -- this script contains the action functions for the two portals
 -- used on the jadee/wildente wedding island. the two _action functions
