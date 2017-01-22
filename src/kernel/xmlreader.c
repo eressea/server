@@ -375,8 +375,13 @@ static int parse_calendar(xmlDocPtr doc)
             xmlNodeSetPtr nsetWeeks, nsetMonths, nsetSeasons;
             xmlChar *propValue = xmlGetProp(calendar, BAD_CAST "name");
             xmlChar *newyear = xmlGetProp(calendar, BAD_CAST "newyear");
+            xmlChar *start;
 
-            first_turn = xml_ivalue(calendar, "start", first_turn);
+            start = xmlGetProp(calendar, BAD_CAST "start");
+            if (start && config_get("game.start")==NULL) {
+                config_set("game.start", (const char *)start);
+                xmlFree(start);
+            }
             if (propValue) {
                 free(agename);
                 agename = strdup(mkname("calendar", (const char *)propValue));
