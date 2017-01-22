@@ -1336,6 +1336,14 @@ void prepare_report(report_context *ctx, faction *f)
         rule_region_owners = config_token("rules.region_owner_pay_building", bt_lighthouse->_name);
     }
 
+    if (f->age<=2) {
+        if ((f->flags&FFL_PWMSG)==0) {
+            // TODO: this assumes unencrypted passwords
+            f->flags |= FFL_PWMSG;
+            ADDMSG(&f->msgs, msg_message("changepasswd", "value", f->_password));
+        }
+    }
+
     ctx->f = f;
     ctx->report_time = time(NULL);
     ctx->addresses = NULL;

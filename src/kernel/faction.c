@@ -249,6 +249,7 @@ faction *addfaction(const char *email, const char *password,
     if (!password) password = itoa36(rng_int());
     faction_setpassword(f, password_encode(password, PASSWORD_DEFAULT));
     ADDMSG(&f->msgs, msg_message("changepasswd", "value", password));
+    f->flags |= FFL_PWMSG;
 
     f->alliance_joindate = turn;
     f->lastorders = turn;
