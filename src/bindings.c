@@ -1149,6 +1149,9 @@ lua_State *lua_init(const dictionary *inifile) {
     register_tolua_helpers();
     tolua_bindings_open(L, inifile);
     tolua_eressea_open(L);
+#ifdef USE_SQLITE
+    tolua_sqlite_open(L);
+#endif
     tolua_unit_open(L);
     tolua_building_open(L);
     tolua_ship_open(L);
