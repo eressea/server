@@ -226,6 +226,23 @@ static void test_arg_resources(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_newbie_password_message(CuTest *tc) {
+    report_context ctx;
+    faction *f;
+    test_setup();
+    f = test_create_faction(0);
+    f->age = 5;
+    f->flags = 0;
+    prepare_report(&ctx, f);
+    CuAssertIntEquals(tc, 0, f->flags&FFL_PWMSG);
+    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "changepasswd"));
+    f->age=2;
+    prepare_report(&ctx, f);
+    CuAssertIntEquals(tc, FFL_PWMSG, f->flags&FFL_PWMSG);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "changepasswd"));
+    test_cleanup();
+}
+
 static void test_prepare_travelthru(CuTest *tc) {
     report_context ctx;
     faction *f, *f2;
@@ -465,6 +482,7 @@ static void test_seen_travelthru(CuTest *tc) {
 CuSuite *get_reports_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_newbie_password_message);
     SUITE_ADD_TEST(suite, test_prepare_report);
     SUITE_ADD_TEST(suite, test_seen_neighbours);
     SUITE_ADD_TEST(suite, test_seen_travelthru);

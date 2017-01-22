@@ -80,9 +80,10 @@ without prior permission by the authors of Eressea.
 #include <lauxlib.h>
 
 #include <time.h>
+#include <errno.h>
 #include <assert.h>
 
-#define TOLUA_PKG(NAME) extern void tolua_##NAME##_open(lua_State * L)
+#define TOLUA_PKG(NAME) void tolua_##NAME##_open(lua_State * L)
 
 TOLUA_PKG(eressea);
 TOLUA_PKG(process);
@@ -318,23 +319,6 @@ static int tolua_dice_rand(lua_State * L)
     return 1;
 }
 
-static int tolua_addequipment(lua_State * L)
-{
-    const char *eqname = tolua_tostring(L, 1, 0);
-    const char *iname = tolua_tostring(L, 2, 0);
-    const char *value = tolua_tostring(L, 3, 0);
-    int result = -1;
-    if (iname != NULL) {
-        const struct item_type *itype = it_find(iname);
-        if (itype != NULL) {
-            equipment_setitem(create_equipment(eqname), itype, value);
-            result = 0;
-        }
-    }
-    lua_pushinteger(L, result);
-    return 1;
-}
-
 static int tolua_get_season(lua_State * L)
 {
     int turnno = (int)tolua_tonumber(L, 1, 0);
@@ -460,7 +444,7 @@ static int tolua_equipment_setitem(lua_State * L)
     if (iname != NULL) {
         const struct item_type *itype = it_find(iname);
         if (itype != NULL) {
-            equipment_setitem(create_equipment(eqname), itype, value);
+            equipment_setitem(get_or_create_equipment(eqname), itype, value);
             result = 0;
         }
     }
@@ -1111,7 +1095,6 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
         tolua_function(L, TOLUA_CAST "get_season", tolua_get_season);
         tolua_function(L, TOLUA_CAST "equipment_setitem", tolua_equipment_setitem);
         tolua_function(L, TOLUA_CAST "equip_unit", tolua_equipunit);
-        tolua_function(L, TOLUA_CAST "add_equipment", tolua_addequipment);
         tolua_function(L, TOLUA_CAST "atoi36", tolua_atoi36);
         tolua_function(L, TOLUA_CAST "itoa36", tolua_itoa36);
         tolua_function(L, TOLUA_CAST "dice_roll", tolua_dice_rand);
@@ -1168,32 +1151,56 @@ lua_State *lua_init(const dictionary *inifile) {
     return L;
 }
 
+static int run_script(lua_State *L, const char *luafile) {
+    int err;
+    FILE *F;
+
+    F = fopen(luafile, "r");
+    if (!F) {
+        log_debug("dofile('%s'): %s", luafile, strerror(errno));
+        return errno;
+    }
+    fclose(F);
+
+    log_debug("executing script %s", luafile);
+    lua_getglobal(L, "dofile");
+    lua_pushstring(L, luafile);
+    err = lua_pcall(L, 1, 1, -3); /* error handler (debug.traceback) is now at stack -3 */
+    if (err != 0) {
+        log_lua_error(L);
+        assert(!"Lua syntax error? check log.");
+    }
+    else {
+        if (lua_isnumber(L, -1)) {
+            err = (int)lua_tonumber(L, -1);
+        }
+        lua_pop(L, 1);
+    }
+    return err;
+}
+
 int eressea_run(lua_State *L, const char *luafile)
 {
-    int err = 0;
-
+    int err;
     global.vm_state = L;
+
+    /* push an error handling function on the stack: */
+    lua_getglobal(L, "debug");
+    lua_getfield(L, -1, "traceback");
+    lua_remove(L, -2);
+
+    /* try to run configuration scripts: */
+    err = run_script(L, "config.lua");
+    err = run_script(L, "custom.lua");
+
     /* run the main script */
     if (luafile) {
-        log_debug("executing script %s\n", luafile);
-
-        lua_getglobal(L, "debug");
-        lua_getfield(L, -1, "traceback");
-        lua_remove(L, -2);
-        lua_getglobal(L, "dofile");
-        lua_pushstring(L, luafile);
-        err = lua_pcall(L, 1, 1, -3);
-        if (err != 0) {
-            log_lua_error(L);
-            assert(!"Lua syntax error? check log.");
-        }
-        else {
-            if (lua_isnumber(L, -1)) {
-                err = (int)lua_tonumber(L, -1);
-            }
-            lua_pop(L, 1);
-        }
-        return err;
+        err = run_script(L, luafile);
     }
-    return lua_console(L);
+    else {
+        err = lua_console(L);
+    }
+    /* pop error handler off the stack: */
+    lua_pop(L, 1);
+    return err;
 }

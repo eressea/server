@@ -29,7 +29,7 @@
   <xi:include href="config://game/strings.xml"/>
   <xi:include href="config://default/adamantium.xml"/>
   <equipment>
-    <set name="first_unit">
+    <set name="autoseed_unit">
       <item name="log" amount="50"/>
       <item name="stone" amount="50"/>
       <item name="iron" amount="50"/>

@@ -235,8 +235,7 @@ static faction *factionorders(void)
 
         if (!checkpasswd(f, (const char *)pass)) {
             log_debug("Invalid password for faction %s", itoa36(fid));
-            ADDMSG(&f->msgs, msg_message("wrongpasswd", "faction password",
-                f->no, pass));
+            ADDMSG(&f->msgs, msg_message("wrongpasswd", "password", pass));
             return 0;
         }
         /* Die Partei hat sich zumindest gemeldet, so dass sie noch
