@@ -80,6 +80,7 @@ without prior permission by the authors of Eressea.
 #include <lauxlib.h>
 
 #include <time.h>
+#include <errno.h>
 #include <assert.h>
 
 #define TOLUA_PKG(NAME) extern void tolua_##NAME##_open(lua_State * L)
