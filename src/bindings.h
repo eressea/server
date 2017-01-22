@@ -18,6 +18,7 @@ extern "C" {
     struct quicklist;
     struct _dictionary_;
 
+    int tolua_sqlite_open(struct lua_State *L);
     int tolua_bindings_open(struct lua_State *L, const struct _dictionary_ *d);
     int tolua_itemlist_next(struct lua_State *L);
     int tolua_orderlist_next(struct lua_State *L);
