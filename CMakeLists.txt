@@ -9,7 +9,6 @@ project (eressea-server C)
 
 enable_testing()
 find_package (LibXml2)
-find_package (SQLite3)
 find_package (Curses)
 find_package (Lua REQUIRED)
 find_package (ToLua REQUIRED)

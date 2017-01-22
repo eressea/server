@@ -157,13 +157,6 @@ set(SERVER_SRC
   bind_unit.c
 )
 
-if (SQLITE3_FOUND)
-set (SERVER_SRC ${SERVER_SRC}
-  sqlite.c
-  bind_sqlite.c
-)
-endif (SQLITE3_FOUND)
-
 if (CURSES_FOUND)
 set (SERVER_SRC ${SERVER_SRC}
   gmtool.c
@@ -254,11 +247,6 @@ add_test(server test_eressea)
 #  COMMAND $<TARGET_FILE:eressea> runtests.lua )
 
 install(TARGETS eressea DESTINATION "bin")
-
-if (SQLITE3_FOUND)
-target_link_libraries(eressea ${SQLITE3_LIBRARIES})
-add_definitions(-DUSE_SQLITE)
-endif(SQLITE3_FOUND)
 
 if (CURSES_FOUND)
 include_directories (${CURSES_INCLUDE_DIR})
