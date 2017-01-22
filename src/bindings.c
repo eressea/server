@@ -319,23 +319,6 @@ static int tolua_dice_rand(lua_State * L)
     return 1;
 }
 
-static int tolua_addequipment(lua_State * L)
-{
-    const char *eqname = tolua_tostring(L, 1, 0);
-    const char *iname = tolua_tostring(L, 2, 0);
-    const char *value = tolua_tostring(L, 3, 0);
-    int result = -1;
-    if (iname != NULL) {
-        const struct item_type *itype = it_find(iname);
-        if (itype != NULL) {
-            equipment_setitem(get_or_create_equipment(eqname), itype, value);
-            result = 0;
-        }
-    }
-    lua_pushinteger(L, result);
-    return 1;
-}
-
 static int tolua_get_season(lua_State * L)
 {
     int turnno = (int)tolua_tonumber(L, 1, 0);
@@ -1112,7 +1095,6 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
         tolua_function(L, TOLUA_CAST "get_season", tolua_get_season);
         tolua_function(L, TOLUA_CAST "equipment_setitem", tolua_equipment_setitem);
         tolua_function(L, TOLUA_CAST "equip_unit", tolua_equipunit);
-        tolua_function(L, TOLUA_CAST "add_equipment", tolua_addequipment);
         tolua_function(L, TOLUA_CAST "atoi36", tolua_atoi36);
         tolua_function(L, TOLUA_CAST "itoa36", tolua_itoa36);
         tolua_function(L, TOLUA_CAST "dice_roll", tolua_dice_rand);
