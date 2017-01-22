@@ -1168,32 +1168,56 @@ lua_State *lua_init(const dictionary *inifile) {
     return L;
 }
 
+static int run_script(lua_State *L, const char *luafile) {
+    int err;
+    FILE *F;
+
+    F = fopen(luafile, "r");
+    if (!F) {
+        log_debug("dofile('%s'): %s", luafile, strerror(errno));
+        return errno;
+    }
+    fclose(F);
+
+    log_debug("executing script %s", luafile);
+    lua_getglobal(L, "dofile");
+    lua_pushstring(L, luafile);
+    err = lua_pcall(L, 1, 1, -3); /* error handler (debug.traceback) is now at stack -3 */
+    if (err != 0) {
+        log_lua_error(L);
+        assert(!"Lua syntax error? check log.");
+    }
+    else {
+        if (lua_isnumber(L, -1)) {
+            err = (int)lua_tonumber(L, -1);
+        }
+        lua_pop(L, 1);
+    }
+    return err;
+}
+
 int eressea_run(lua_State *L, const char *luafile)
 {
-    int err = 0;
-
+    int err;
     global.vm_state = L;
+
+    /* push an error handling function on the stack: */
+    lua_getglobal(L, "debug");
+    lua_getfield(L, -1, "traceback");
+    lua_remove(L, -2);
+
+    /* try to run configuration scripts: */
+    err = run_script(L, "config.lua");
+    err = run_script(L, "custom.lua");
+
     /* run the main script */
     if (luafile) {
-        log_debug("executing script %s\n", luafile);
-
-        lua_getglobal(L, "debug");
-        lua_getfield(L, -1, "traceback");
-        lua_remove(L, -2);
-        lua_getglobal(L, "dofile");
-        lua_pushstring(L, luafile);
-        err = lua_pcall(L, 1, 1, -3);
-        if (err != 0) {
-            log_lua_error(L);
-            assert(!"Lua syntax error? check log.");
-        }
-        else {
-            if (lua_isnumber(L, -1)) {
-                err = (int)lua_tonumber(L, -1);
-            }
-            lua_pop(L, 1);
-        }
-        return err;
+        err = run_script(L, luafile);
     }
-    return lua_console(L);
+    else {
+        err = lua_console(L);
+    }
+    /* pop error handler off the stack: */
+    lua_pop(L, 1);
+    return err;
 }
