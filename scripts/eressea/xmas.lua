@@ -1,3 +1,5 @@
+if not config.xmas then return nil end
+
 local gifts = {
     e2 = {
         { year = 2015, turn = 959, item = 'snowglobe', msg='santa_f' },

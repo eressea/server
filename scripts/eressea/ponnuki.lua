@@ -1,3 +1,4 @@
+if not config.ponnuki then return nil end
 local ponnuki = {}
 
 local directions = { "NW", "NO", "O", "SO", "SW", "W" }
