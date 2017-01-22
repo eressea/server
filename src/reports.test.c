@@ -232,7 +232,7 @@ static void test_newbie_password_message(CuTest *tc) {
     test_setup();
     f = test_create_faction(0);
     f->age = 5;
-    CuAssertIntEquals(tc, 0, f->flags&FFL_PWMSG);
+    f->flags = 0;
     prepare_report(&ctx, f);
     CuAssertIntEquals(tc, 0, f->flags&FFL_PWMSG);
     CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "changepasswd"));
