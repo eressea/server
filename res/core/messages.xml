@@ -3306,11 +3306,10 @@
   </message>
   <message name="wrongpasswd" section="events">
     <type>
-      <arg name="faction" type="int"/>
       <arg name="password" type="string"/>
     </type>
-    <text locale="de">"ERESSEA $int36($faction) \"${password}\" - Deine Befehle hatten ein falsches Passwort."</text>
-    <text locale="en">"ERESSEA $int36($faction) \"${password}\" - Your orders had the wrong password."</text>
+    <text locale="de">"Deine Befehle hatten ein falsches Passwort (${password})."</text>
+    <text locale="en">"Your orders had the wrong password (${password})."</text>
   </message>
   <message name="changepasswd" section="events">
     <type>
