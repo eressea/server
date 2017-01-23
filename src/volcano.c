@@ -256,11 +256,19 @@ void volcano_outbreak(region * r, region *rn)
 }
 
 static bool stop_smoke_chance(void) {
-    return rng_int() % 100 < 12;
+    static int cache, percent = 0;
+    if (config_changed(&cache)) {
+        percent = config_get_int("volcano.stop.percent", 12);
+    }
+    return percent!=0 && (rng_int() % 100) < percent;
 }
 
 static bool outbreak_chance(void) {
-    return rng_int() % 100 < 8;
+    static int cache, percent = 0;
+    if (config_changed(&cache)) {
+        percent = config_get_int("volcano.outbreak.percent", 8);
+    }
+    return percent!=0 && (rng_int() % 100) < percent;
 }
 
 void volcano_update(void) 
