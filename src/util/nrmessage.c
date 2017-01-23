@@ -178,3 +178,16 @@ const char *nrt_section(const nrmessage_type * nrt)
 {
     return nrt ? nrt->section : NULL;
 }
+
+void free_nrmesssages(void) {
+    int i;
+    for (i = 0; i != NRT_MAXHASH; ++i) {
+        while (nrtypes[i]) {
+            nrmessage_type *nr = nrtypes[i];
+            nrtypes[i] = nr->next;
+            free(nr->string);
+            free(nr->vars);
+            free(nr);
+        }
+    }
+}
