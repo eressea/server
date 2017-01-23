@@ -119,7 +119,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 int NewbieImmunity(void)
 {
-    return config_get_int("NewbieImmunity", 0);
+    int result = config_get_int("NewbieImmunity", 0);
+    return result;
 }
 
 bool IsImmune(const faction * f)

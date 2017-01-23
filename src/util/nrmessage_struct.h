@@ -8,8 +8,8 @@
 typedef struct nrmessage_type {
   const struct message_type *mtype;
   const struct locale *lang;
-  const char *string;
-  const char *vars;
+  char *string;
+  char *vars;
   struct nrmessage_type *next;
   int level;
   const char *section;
