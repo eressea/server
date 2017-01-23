@@ -295,10 +295,11 @@ void init_translations(const struct locale *lang, int ut, const char * (*string_
         // TODO: swap the name of s and key
         const char * s = string_cb(i);
         if (s) {
-            struct critbit_tree ** cb = (struct critbit_tree **)tokens;
             const char * key = locale_string(lang, s, false);
-            if (!key) key = s;
-            add_translation(cb, key, i);
+            if (key) {
+                struct critbit_tree ** cb = (struct critbit_tree **)tokens;
+                add_translation(cb, key, i);
+            }
         }
     }
 }

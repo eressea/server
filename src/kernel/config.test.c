@@ -251,9 +251,33 @@ static void test_config_inifile(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_findparam(CuTest *tc) {
+    struct locale *en, *de;
+    test_setup();
+    en = get_or_create_locale("en");
+    locale_setstring(en, parameters[P_FACTION], "FACTION");
+    CuAssertIntEquals(tc, NOPARAM, findparam("FACTION", en));
+    init_parameters(en);
+    CuAssertIntEquals(tc, P_FACTION, findparam("FACTION", en));
+    de = get_or_create_locale("de");
+    locale_setstring(de, parameters[P_FACTION], "PARTEI");
+    CuAssertIntEquals(tc, NOPARAM, findparam("PARTEI", de));
+    init_parameters(de);
+    CuAssertIntEquals(tc, P_FACTION, findparam("PARTEI", de));
+    CuAssertIntEquals(tc, NOPARAM, findparam("HODOR", de));
+
+    CuAssertIntEquals(tc, NOPARAM, findparam("PARTEI", en));
+    CuAssertIntEquals(tc, NOPARAM, findparam_block("HODOR", de, false));
+    CuAssertIntEquals(tc, P_FACTION, findparam_block("PARTEI", de, true));
+    CuAssertIntEquals(tc, NOPARAM, findparam_block("PARTEI", en, false));
+    CuAssertIntEquals(tc, P_FACTION, findparam_block("PARTEI", en, true));
+    test_cleanup();
+}
+
 CuSuite *get_config_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_findparam);
     SUITE_ADD_TEST(suite, test_config_inifile);
     SUITE_ADD_TEST(suite, test_config_cache);
     SUITE_ADD_TEST(suite, test_get_set_param);
