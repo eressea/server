@@ -252,6 +252,26 @@ static faction *factionorders(void)
     return f;
 }
 
+static param_t next_param(const char *s, const struct locale *lang) {
+    param_t p;
+    if (!s || s[0] == '@') {
+        return NOPARAM;
+    }
+    p = findparam(s, lang);
+    if (p==NOPARAM) {
+        const struct locale *loc;
+        for (loc=locales;loc;loc=nextlocale(loc)) {
+            if (loc!=lang) {
+                p = findparam(s, lang);
+                if (p==P_FACTION || p==P_GAMENAME) {
+                    break;
+                }
+            }
+        }
+    }
+    return p;
+}
+
 int readorders(const char *filename)
 {
     FILE *F = NULL;
@@ -279,7 +299,7 @@ int readorders(const char *filename)
         const char *s;
         init_tokens_str(b);
         s = gettoken(token, sizeof(token));
-        p = (s && s[0] != '@') ? findparam(s, lang) : NOPARAM;
+        p = next_param(s, lang);
         switch (p) {
         case P_GAMENAME:
         case P_FACTION:
@@ -308,7 +328,7 @@ int readorders(const char *filename)
                     p = (s && s[0] != '@') ? findparam(s, lang) : NOPARAM;
                 } while ((p != P_UNIT || !f) && p != P_FACTION && p != P_NEXT
                     && p != P_GAMENAME);
-	    }
+	        }
             break;
 
                 /* Falls in unitorders() abgebrochen wird, steht dort entweder eine neue
