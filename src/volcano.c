@@ -55,7 +55,7 @@ static int nb_armor(const unit * u, int index)
     if (!(u_race(u)->battle_flags & BF_EQUIPMENT))
         return 0;
 
-    /* Normale Rüstung */
+    /* Normale Rï¿½stung */
 
     for (itm = u->items; itm; itm = itm->next) {
         const armor_type *atype = itm->type->rtype->atype;
@@ -169,11 +169,11 @@ static region *rrandneighbour(region * r)
     for (i = 0; i != MAXDIRECTIONS; i++) {
         c++;
     }
-    /* Zufällig eine auswählen */
+    /* Zufï¿½llig eine auswï¿½hlen */
 
     rr = rng_int() % c;
 
-    /* Durchzählen */
+    /* Durchzï¿½hlen */
 
     c = -1;
     for (i = 0; i != MAXDIRECTIONS; i++) {
@@ -204,7 +204,7 @@ volcano_destruction(region * volcano, region * r, const char *damage)
     else {
         /* Produktion vierteln ... */
         a->data.sa[0] = (short)percent;
-        /* Für 6-17 Runden */
+        /* Fï¿½r 6-17 Runden */
         a->data.sa[1] = (short)(a->data.sa[1] + time);
     }
 
@@ -255,6 +255,14 @@ void volcano_outbreak(region * r, region *rn)
     }
 }
 
+static bool stop_smoke_chance(void) {
+    return rng_int() % 100 < 12;
+}
+
+static bool outbreak_chance(void) {
+    return rng_int() % 100 < 8;
+}
+
 void volcano_update(void) 
 {
     region *r; 
@@ -270,13 +278,16 @@ void volcano_update(void)
                 r->terrain = t_volcano;
             }
             else {
-                if (rng_int() % 100 < 12) {
+                if (stop_smoke_chance()) {
                     ADDMSG(&r->msgs, msg_message("volcanostopsmoke", "region", r));
                     r->terrain = t_volcano;
                 }
-                else if (r->uid == 1246051340 || (r->age > 20 && rng_int() % 100 < 8)) {
+                else if (r->uid == 1246051340 || outbreak_chance()) {
+                    // HACK: a fixed E4-only region-uid in Code.
+                    // FIXME: In E4 gibt es eine Ebene #1246051340, die Smalland heisst.
+                    // da das kein aktiver Vulkan ist, ist dieser Test da nicht idiotisch?
+                    // das sollte bestimmt rn betreffen?
                     region *rn;
-                    /* Zufällige Nachbarregion verwüsten */
                     rn = rrandneighbour(r);
                     volcano_outbreak(r, rn);
                     r->terrain = t_volcano;
