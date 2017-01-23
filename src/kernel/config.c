@@ -213,6 +213,27 @@ param_t findparam(const char *s, const struct locale * lang)
     return result;
 }
 
+param_t findparam_block(const char *s, const struct locale *lang, bool any_locale)
+{
+    param_t p;
+    if (!s || s[0] == '@') {
+        return NOPARAM;
+    }
+    p = findparam(s, lang);
+    if (any_locale && p==NOPARAM) {
+        const struct locale *loc;
+        for (loc=locales;loc;loc=nextlocale(loc)) {
+            if (loc!=lang) {
+                p = findparam(s, loc);
+                if (p==P_FACTION || p==P_GAMENAME) {
+                    break;
+                }
+            }
+        }
+    }
+    return p;
+}
+
 param_t findparam_ex(const char *s, const struct locale * lang)
 {
     param_t result = findparam(s, lang);
