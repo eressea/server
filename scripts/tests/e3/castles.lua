@@ -46,7 +46,7 @@ end
 
 function test_build_packice()
 	local r = region.create(0, 0, "packice")
-	local f = faction.create("noreply@eressea.de", "human", "de")
+	local f = faction.create("packice@eressea.de", "human", "de")
 	local u = unit.create(f, r, 1)
     u:clear_orders()
     u:add_item("stone", 10)
