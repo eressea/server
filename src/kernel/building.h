@@ -85,6 +85,8 @@ extern "C" {
     extern struct quicklist *buildingtypes;
     extern struct attrib_type at_building_action;
 
+    int cmp_castle_size(const struct building * b, const struct building * a);
+    int building_protection(const struct building * b, const struct unit * u, building_bonus bonus);
     building_type *bt_get_or_create(const char *name);
     bool bt_changed(int *cache);
     const building_type *bt_find(const char *name);
