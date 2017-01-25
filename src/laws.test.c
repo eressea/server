@@ -229,6 +229,11 @@ static void test_display_cmd(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, u->display);
     free_order(ord);
 
+    ord = create_order(K_DISPLAY, f->locale, "%s Hodor", LOC(f->locale, parameters[P_REGION]));
+    CuAssertIntEquals(tc, 0, display_cmd(u, ord));
+    CuAssertPtrEquals(tc, NULL, r->display);
+    free_order(ord);
+
     test_cleanup();
 }
 
