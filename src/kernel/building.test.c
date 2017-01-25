@@ -496,15 +496,12 @@ static void test_building_type(CuTest *tc) {
 static void test_cmp_castle_size(CuTest *tc) {
     region *r;
     building *b1, *b2;
-    building_type *bt_castle;
     unit *u1, *u2;
 
     test_setup();
-    bt_castle = test_create_buildingtype("castle");
-    bt_castle->protection = building_protection;
     r = test_create_region(0, 0, 0);
-    b1 = test_create_building(r, bt_castle);
-    b2 = test_create_building(r, bt_castle);
+    b1 = test_create_building(r, NULL);
+    b2 = test_create_building(r, NULL);
     u1 = test_create_unit(test_create_faction(0), r);
     u_set_building(u1, b1);
     u2 = test_create_unit(test_create_faction(0), r);

@@ -1892,16 +1892,7 @@ int name_cmd(struct unit *u, struct order *ord)
         break;
 
     case P_REGION:
-        if (!b) {
-            cmistake(u, ord, 145, MSG_EVENT);
-            break;
-        }
-        if (building_owner(b) != u) {
-            cmistake(u, ord, 148, MSG_EVENT);
-            break;
-        }
-
-        if (b != largestbuilding(r, get_cmp_region_owner(), false)) {
+        if (u->faction != region_get_owner(r)) {
             cmistake(u, ord, 147, MSG_EVENT);
             break;
         }
