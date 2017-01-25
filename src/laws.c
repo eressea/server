@@ -1538,16 +1538,6 @@ int prefix_cmd(unit * u, struct order *ord)
     return 0;
 }
 
-static cmp_building_cb get_cmp_region_owner(void)
-{
-    if (rule_region_owners()) {
-        return &cmp_current_owner;
-    }
-    else {
-        return &cmp_wage;
-    }
-}
-
 int display_cmd(unit * u, struct order *ord)
 {
     char token[128];
@@ -1597,15 +1587,7 @@ int display_cmd(unit * u, struct order *ord)
         break;
 
     case P_REGION:
-        if (!u->building) {
-            cmistake(u, ord, 145, MSG_EVENT);
-            break;
-        }
-        if (building_owner(u->building) != u) {
-            cmistake(u, ord, 148, MSG_EVENT);
-            break;
-        }
-        if (u->building != largestbuilding(r, get_cmp_region_owner(), false)) {
+        if (u->faction != region_get_owner(r)) {
             cmistake(u, ord, 147, MSG_EVENT);
             break;
         }
