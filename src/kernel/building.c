@@ -335,7 +335,18 @@ const building_type *findbuildingtype(const char *name,
     return (const building_type *)type.v;
 }
 
-static int building_protection(const building * b, const unit * u, building_bonus bonus)
+int cmp_castle_size(const building * b, const building * a)
+{
+    if (!b || !b->type->protection || !building_owner(b)) {
+        return -1;
+    }
+    if (!a || !a->type->protection || !building_owner(a)) {
+        return 1;
+    }
+    return b->size - a->size;
+}
+
+int building_protection(const building * b, const unit * u, building_bonus bonus)
 {
     int i = 0;
     int bsize = buildingeffsize(b, false);
