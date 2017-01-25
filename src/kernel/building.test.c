@@ -493,9 +493,35 @@ static void test_building_type(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_cmp_castle_size(CuTest *tc) {
+    region *r;
+    building *b1, *b2;
+    building_type *bt_castle;
+    unit *u1, *u2;
+
+    test_setup();
+    bt_castle = test_create_buildingtype("castle");
+    bt_castle->protection = building_protection;
+    r = test_create_region(0, 0, 0);
+    b1 = test_create_building(r, bt_castle);
+    b2 = test_create_building(r, bt_castle);
+    u1 = test_create_unit(test_create_faction(0), r);
+    u_set_building(u1, b1);
+    u2 = test_create_unit(test_create_faction(0), r);
+    u_set_building(u2, b2);
+    b1->size = 5;
+    b2->size = 10;
+    CuAssertTrue(tc, cmp_castle_size(b1, b2)<0);
+    CuAssertTrue(tc, cmp_castle_size(b2, b1)>0);
+    CuAssertTrue(tc, cmp_castle_size(b1, NULL)>0);
+    CuAssertTrue(tc, cmp_castle_size(NULL, b1)<0);
+    test_cleanup();
+}
+
 CuSuite *get_building_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_cmp_castle_size);
     SUITE_ADD_TEST(suite, test_register_building);
     SUITE_ADD_TEST(suite, test_btype_defaults);
     SUITE_ADD_TEST(suite, test_building_set_owner);

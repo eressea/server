@@ -1324,9 +1324,17 @@ struct message *msg)
 
 struct faction *region_get_owner(const struct region *r)
 {
-    assert(rule_region_owners());
-    if (r->land && r->land->ownership) {
-        return r->land->ownership->owner;
+    if (r->land) {
+        if (rule_region_owners()) {
+            if (r->land->ownership) {
+                return r->land->ownership->owner;
+            }
+        }
+        else {
+            building *b = largestbuilding(r, cmp_castle_size, false);
+            unit * u = b ? building_owner(b) : NULL;
+            return u ? u->faction : NULL;
+        }
     }
     return NULL;
 }
