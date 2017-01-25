@@ -812,10 +812,7 @@ static void test_name_region(CuTest *tc) {
     f = u->faction;
 
     ord = create_order(K_NAME, f->locale, "%s Hodor", LOC(f->locale, parameters[P_REGION]));
-    name_cmd(u, ord);
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error145"));
-
-    u->building = test_create_building(u->region, 0);
+    u_set_building(u, test_create_building(u->region, 0));
     name_cmd(u, ord);
     CuAssertStrEquals(tc, "Hodor", u->region->land->name);
     free_order(ord);
@@ -1060,7 +1057,7 @@ static void test_name_cmd(CuTest *tc) {
     free_order(ord);
     
     ord = create_order(K_NAME, f->locale, "%s '  Ho\tdor  '", LOC(f->locale, parameters[P_BUILDING]));
-    u->building = test_create_building(u->region, 0);
+    u_set_building(u, test_create_building(u->region, 0));
     name_cmd(u, ord);
     CuAssertStrEquals(tc, "Hodor", u->building->name);
     free_order(ord);
@@ -1069,6 +1066,37 @@ static void test_name_cmd(CuTest *tc) {
     name_cmd(u, ord);
     CuAssertStrEquals(tc, "Hodor", u->region->land->name);
     free_order(ord);
+
+    test_cleanup();
+}
+
+static void test_name_cmd_2274(CuTest *tc) {
+    unit *u1, *u2, *u3;
+    faction *f;
+    region *r;
+
+    test_setup();
+    r = test_create_region(0, 0, 0);
+    u1 = test_create_unit(test_create_faction(0), r);
+    u2 = test_create_unit(test_create_faction(0), r);
+    u3 = test_create_unit(u2->faction, r);
+    u_set_building(u1, test_create_building(r, NULL));
+    u1->building->size = 10;
+    u_set_building(u2, test_create_building(r, NULL));
+    u2->building->size = 20;
+
+    f = u2->faction;
+    u2->thisorder = create_order(K_NAME, f->locale, "%s Heimat", LOC(f->locale, parameters[P_REGION]));
+    name_cmd(u2, u2->thisorder);
+    CuAssertStrEquals(tc, "Heimat", r->land->name);
+    f = u3->faction;
+    u3->thisorder = create_order(K_NAME, f->locale, "%s Hodor", LOC(f->locale, parameters[P_REGION]));
+    name_cmd(u3, u3->thisorder);
+    CuAssertStrEquals(tc, "Hodor", r->land->name);
+    f = u1->faction;
+    u1->thisorder = create_order(K_NAME, f->locale, "%s notallowed", LOC(f->locale, parameters[P_REGION]));
+    name_cmd(u1, u1->thisorder);
+    CuAssertStrEquals(tc, "Hodor", r->land->name);
 
     test_cleanup();
 }
@@ -1481,6 +1509,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_nmr_warnings);
     SUITE_ADD_TEST(suite, test_ally_cmd);
     SUITE_ADD_TEST(suite, test_name_cmd);
+    SUITE_ADD_TEST(suite, test_name_cmd_2274);
     SUITE_ADD_TEST(suite, test_ally_cmd_errors);
     SUITE_ADD_TEST(suite, test_long_order_normal);
     SUITE_ADD_TEST(suite, test_long_order_none);
