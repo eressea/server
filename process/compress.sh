@@ -20,5 +20,5 @@ if [ ! -d $GAME/reports ]; then
 fi
 
 cd $GAME/reports
-$HOME/bin/compress.py $TURN "$GAME_NAME"
+$ERESSEA/server/bin/compress.py $TURN "$GAME_NAME"
 cd -
